@@ -18,7 +18,7 @@ Some screen shots below of rfswarm in action:
 ![Image](Doc/Images/Plan.png "Plan - Planning a performance test")
 ##### Run - This is where you monitor your test scenario as it runs, here you will see number of robots running, how long the has been running and live updates of the test results
 ![Image](Doc/Images/Run_v0.1.png "Run - Showing results being collected live")
-##### Run - This is where you can see which agents have connected, number of robots on each agent and monitor the performance of the agents
+##### Agents - This is where you can see which agents have connected, number of robots on each agent and monitor the performance of the agents
 ![Image](Doc/Images/Agents_ready.png "Agents Ready")
 ![Image](Doc/Images/Agents_running.png "Agents Running")
 
