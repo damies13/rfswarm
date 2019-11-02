@@ -13,3 +13,21 @@ Some screen shots below of rfswarm in action:
 ##### Agents - This is where you can see which agents have connected, number of robots on each agent and monitor the performance of the agents
 ![Image](Images/Agents_ready.png "Agents Ready")
 ![Image](Images/Agents_running.png "Agents Running")
+
+### Install and Setup
+
+#### 1. Install the prerequisites
+
+TODO:
+```
+pip install <something>
+```
+
+\*or pip3 on some systems
+
+#### 2. Run the GUI Server
+
+```
+python rfswarm.py
+```
+\*or python3 on some systems

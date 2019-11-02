@@ -13,7 +13,7 @@ Firstly ensure Robot Framework is installed with the libraries needed for your a
 robot -t "test case" script.robot
 ```
 
-#### 1. Install the prerequisites
+#### 2. Install the prerequisites
 
 TODO:
 ```
@@ -22,7 +22,7 @@ pip install <something>
 
 \*or pip3 on some systems
 
-#### 1. Run Agent 1st time
+#### 3. Run Agent 1st time
 
 ```
 python rfswarm_agent.py
@@ -41,9 +41,9 @@ RFSwarmAgent: mainloop: Running 2019-11-03 00:08:40 ( 1572703720 )isrunning: Fal
 RFSwarmAgent: connectserver: Try connecting to http://localhost:8138/
 ```
 
-Now edit RFSwarmAgent.ini and change http://localhost:8138/ to http://<your rfswarm server>:8138/
+Now edit RFSwarmAgent.ini and change http://localhost:8138/ to http://\<your rfswarm server\>:8138/
 
-#### 1. Run Agent
+#### 4. Run Agent
 
 Now you agent is setup and ready to use, so run it again and wait for it to try connecting to your rfswarm server.
 ```
@@ -59,3 +59,5 @@ RFSwarmAgent: mainloop: Running 2019-11-03 00:17:20 ( 1572704240 )isrunning: Fal
 RFSwarmAgent: mainloop: Running 2019-11-03 00:17:30 ( 1572704250 )isrunning: False isconnected: True
 RFSwarmAgent: mainloop: Running 2019-11-03 00:17:40 ( 1572704260 )isrunning: False isconnected: True
 ```
+
+![Image](Images/Agents_ready.png "Agents Ready")
