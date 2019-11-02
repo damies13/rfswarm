@@ -6,6 +6,7 @@
 Some of the things you will need to consider when taking a functional or regression test and using it for performance are:
 - [think time](#think-time)
 - [data management](#data-management)
+- [Browser](#Browser)
 
 ### think time
 
@@ -36,4 +37,9 @@ Then you can simply include the `Standard Think Time` keyword between each user 
 
 Because functional and regression tests are designed to test specific functionality, the test data is designed to test boundary or edge cases so are limited to a small set of cases or static. With performance testing we don't want this, rather we want hundreds or even thousands of different data values so we can better emulate user behaviour and ensure we are not constantly hitting a single cached value and reporting unrealistically fast response times.
 
-.
+
+### Browser
+
+For SeleniumLibrary based scripts you will want to use one of the headless browser types as these should use less resources on the agent so this will allow more virtual users per agent machine.
+
+Refer to the [SeleniumLibrary documentation](https://robotframework.org/SeleniumLibrary/SeleniumLibrary.html#Open%20Browser) for the headless browser types, you should run a trial with each type to confirm they work with your application and what the resource cost is for each.
