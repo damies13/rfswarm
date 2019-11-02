@@ -15,7 +15,7 @@ Because functional and regression tests are designed to run as a single user and
 
 The only issue with this is that it can make the script too regular and cause cadence issues, so just like with other performance testing tools we want to have a variable think time, to do this we can import randint from python's random library to pick a time to sleep between a minimum and maximum value, e.g. 15 and 45.
 
-`	${number}    Evaluate    random.randint(15, 45)    random  
+`	${number}    Evaluate    random.randint(15, 45)    random   
 	Sleep    ${number}`
 
 Adding these 2 lines many places throughout your script could become messy and also a hassle should you need to change the minimum and maximum values. So to make life easier in the [Robot Resources](../Robot_Resources) folder there is a [perftest.resource](../Robot_Resources/perftest.resource) file that you can include in the Settings section of your .robot file like this:
