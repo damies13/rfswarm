@@ -4,8 +4,8 @@
 ## Preparing a test case for performance
 
 Some of the things you will need to consider when taking a functional or regression test and using it for performance are:
-1. [think time]("think time")
-1. [data management]("data management")
+- [think time](#think time)
+- [data management](#data management)
 
 ### think time
 
