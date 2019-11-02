@@ -16,3 +16,9 @@ rfswarm is written completely in python, so if you are already using Robot Frame
 To learn more about rfswarm please refer to the [Documantation](Doc/Index.md)
 
 ![Image](Doc/Images/Run_v0.1.png "Run - Showing results being collected live")
+
+## Donations
+
+If you would like to thank me for this project please use this [PayPal.me](https://paypal.me/damies13/5) link, the $5 is a suggestion, feel free to change to any amount you would like.
+
+If you do make a donation and would like me to prioritise a feature / issue send me a [quick message](mailto:damies13+rfswarm@gmail.com) and let me know.
