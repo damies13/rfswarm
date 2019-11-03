@@ -1,0 +1,215 @@
+
+[Index](Index.md)
+
+## Agent Communication
+
+In this page the generic host names guiserver and myagent are used, replace guiserver with the host name of the machine that is running rfswarm.py and myagent with the host name of the machine that is running rfswarm_agent.py
+
+- [Get /](#Get-/)
+- [POST /AgentStatus](#POST-/AgentStatus)
+- [POST /Jobs](#POST-/Jobs)
+- [POST /Scripts](#POST-/Scripts)
+- [POST /File](#POST-/File)
+- [POST /Result](#POST-/Result)
+
+### Get /
+HTTP GET http://guiserver:8138/
+
+Response Body:
+```
+{
+    "POST": {
+        "AgentStatus": {
+            "URI": "/AgentStatus",
+            "Body": {
+                "AgentName": "<Agent Host Name>",
+                "Status": "<Agent Status>",
+                "AgentIPs": [
+                    "<Agent IP Address>",
+                    "<Agent IP Address>"
+                ],
+                "Robots": "<sum>,"
+                "CPU%": "0-100",
+                "MEM%": "0-100",
+                "NET%": "0-100"
+            }
+        },
+        "Jobs": {
+            "URI": "/Jobs",
+            "Body": {
+                "AgentName": "<Agent Host Name>"
+            }
+        },
+        "Scripts": {
+            "URI": "/Scripts",
+            "Body": {
+                "AgentName": "<Agent Host Name>"
+            }
+        },
+        "File": {
+            "URI": "/File",
+            "Body": {
+                "AgentName": "<Agent Host Name>",
+                "Hash": "<File Hash, provided by /Scripts>"
+            }
+        },
+        "Result": {
+            "URI": "/Result",
+            "Body": {
+                "AgentName": "<Agent Host Name>",
+                "ResultName": "<A Text String>",
+                "Result": "<PASS | FAIL>",
+                "ElapsedTime": <seconds as decimal number>,
+                "StartTime": <epoch seconds as decimal number>,
+                "EndTime": <epoch seconds as decimal number>,
+                "ScriptIndex": "<Index>",
+                "VUser": "<user number>",
+                "Iteration": <iteration number>,
+                "Sequence": <sequence number that ResultName occurred in test case>
+            }
+        }
+    }
+}
+```
+
+### POST /AgentStatus
+HTTP POST http://guiserver:8138/AgentStatus
+
+Request Body:
+```
+{
+    "AgentName": "myagent",
+	"Status": "Ready",
+	"AgentIPs": ["192.168.1.150", "fe80::1c80:a965:7be5:d524"],
+	"Robots": "0,"
+	"CPU%": "3.4",
+	"MEM%": "20.51",
+	"NET%": "0.01"
+}
+```
+
+Response Body:
+```
+{
+    "AgentName": "myagent",
+	"Status": "Updated"
+}
+```
+
+### POST /Jobs
+HTTP POST http://guiserver:8138/Jobs
+
+Request Body:
+```
+{
+    "AgentName": "myagent"
+}
+```
+
+Response Body:
+```
+{
+    "AgentName": "myagent",
+    "StartTime": 1572057404,
+    "EndTime": 1572064628,
+    "RunName": "Scenario_1572057404",
+    "Schedule": {
+        "1_1": {
+            "ScriptHash": "c4307dee904afe7df89fa33d193a7d30",
+            "Test": "Browse Store Products",
+            "StartTime": 1572057416,
+            "EndTime": 1572064616,
+            "id": "1_1"
+        },
+        "1_2": {
+            "ScriptHash": "c4307dee904afe7df89fa33d193a7d30",
+            "Test": "Browse Store Products",
+            "StartTime": 1572057428,
+            "EndTime": 1572064628,
+            "id": "1_2"
+        }
+    }
+}
+```
+
+### POST /Scripts
+HTTP POST http://guiserver:8138/Scripts
+
+Request Body:
+```
+{
+    "AgentName": "myagent"
+}
+```
+
+Response Body:
+```
+{
+    "AgentName": "myagent",
+	"Scripts": [
+		{
+			"File": "OC_Demo.robot",
+			"Hash": "c4307dee904afe7df89fa33d193a7d30"
+		},
+		{
+			"File": "resources/OC_Demo.resource",
+			"Hash": "904afec4307dee7df89fa33d193a7d30"
+		},
+		{
+			"File": "resources/perftest.resource",
+			"Hash": "33d193a7d30904afec4307dee7df89fa"
+		}
+	]
+}
+```
+
+### POST /File
+HTTP POST http://guiserver:8138/File
+
+Request Body:
+```
+{
+    "AgentName": "myagent",
+	"Hash": "33d193a7d30904afec4307dee7df89fa"
+}
+```
+
+Response Body:
+```
+{
+	"AgentName": "myagent",
+	"Hash": "33d193a7d30904afec4307dee7df89fa",
+	"File": "resources/perftest.resource",
+	"FileData": <This field will contain a string that is a base64 encoded
+				lzma (7zip) compressed version of the file. The agent will base64
+				decode the string, lzma decompress, then save to a file using the
+				relative file path above relative to the agents temp directory>
+}
+```
+
+### POST /Result
+HTTP POST http://guiserver:8138/Result
+
+Request Body:
+```
+{
+    "AgentName": "myagent",
+    "ResultName": "Page title is \"Your Store\".",
+    "Result": "PASS",
+    "ElapsedTime": 0.003000020980834961,
+    "StartTime": 1572435546.383,
+    "EndTime": 1572435546.386,
+    "ScriptIndex": "1",
+    "VUser": "1",
+    "Iteration": 5,
+    "Sequence": 2
+}
+```
+
+Response Body:
+```
+{
+    "AgentName": "myagent",
+    "Result": "Queued"
+}
+```

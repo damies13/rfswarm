@@ -6,3 +6,4 @@
 1. [rfswarm.py (GUI / Server)](rfswarm_py.md)
 1. [rfswarm_agent.py (Agent)](rfswarm_agent_py.md)
 1. [Preparing a test case for performance](Preparing_for_perf.md)
+1. [Agent Communication](Agent_Communication.md)
