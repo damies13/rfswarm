@@ -17,6 +17,7 @@
 
 import sys
 import os
+import glob
 import hashlib
 import lzma
 import base64
@@ -1414,12 +1415,12 @@ class RFSwarmGUI(tk.Frame):
 					if checking:
 						# print("find_dependancies: line", line)
 						try:
-							if 'Resource' in line or 'Variables' in line:
+							if 'Resource' in line or 'Variables' in line or 'Metadata	File' in line:
 								linearr = line.strip().split()
 								# print("find_dependancies: linearr", linearr)
 								if len(linearr)>1:
 									# print("find_dependancies: linearr[1]", linearr[1])
-									resfile = linearr[1]
+									resfile = linearr[-1]
 									localrespath = os.path.join(localdir, resfile)
 									# print("find_dependancies: localrespath", localrespath)
 									if os.path.isfile(localrespath):
@@ -1431,7 +1432,20 @@ class RFSwarmGUI(tk.Frame):
 												'relpath': resfile,
 												'type': linearr[0]
 											}
-
+									else:
+										filelst = glob.glob(localrespath)
+										for file in filelst:
+											print("find_dependancies: file", file)
+											relpath = file.replace(localdir, "")[1:]
+											print("find_dependancies: relpath", relpath)
+											newhash = self.hash_file(file)
+											print("find_dependancies: newhash", newhash)
+											self.scriptfiles[newhash] = {
+													'id': newhash,
+													'localpath': file,
+													'relpath': relpath,
+													'type': linearr[0]
+												}
 
 						except Exception as e:
 							print("find_dependancies: line", line)

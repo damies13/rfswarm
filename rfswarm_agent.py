@@ -274,7 +274,7 @@ class RFSwarmAgent():
 			# print("getfile: jsonresp:", jsonresp)
 
 			# print('scriptdir', self.scriptdir)
-			localfile = os.path.join(self.scriptdir, jsonresp['File'])
+			localfile = os.path.abspath(os.path.join(self.scriptdir, jsonresp['File']))
 			print('getfile: localfile', localfile)
 			self.scriptlist[hash]['localfile'] = localfile
 			self.scriptlist[hash]['file'] = jsonresp['File']
@@ -283,18 +283,28 @@ class RFSwarmAgent():
 
 			filedata = jsonresp['FileData']
 			# print("filedata:", filedata)
+			# print("getfile: filedata:")
 
 			decoded = base64.b64decode(filedata)
 			# print("b64decode: decoded:", decoded)
+			# print("getfile: b64decode:")
 
 			uncompressed = lzma.decompress(decoded)
 			# print("uncompressed:", uncompressed)
+			# print("getfile: uncompressed:")
+
+			localfiledir = os.path.dirname(localfile)
+			# print("getfile: localfiledir:", localfiledir)
+			self.ensuredir(localfiledir)
+			# print("getfile: ensuredir:")
 
 			with open(localfile, 'wb') as afile:
-			    afile.write(uncompressed)
+				# print("getfile: afile:")
+				afile.write(uncompressed)
+				# print("getfile: write:")
 
 		except Exception as e:
-			print("getscripts: Exception:", e)
+			print("getfile: Exception:", e)
 
 	def getjobs(self):
 		# print("getjobs")
@@ -465,9 +475,10 @@ class RFSwarmAgent():
 		# print("root: '", root)
 		# .//kw/msg/..[not(@library='BuiltIn')]
 		for result in root.findall(".//kw/msg/..[@library]"):
-			# print("result: ", result)
+			# print("run_process_output: result: ", result)
 			library = result.get('library')
-			if library != "BuiltIn":
+			if library not in ["BuiltIn", "String", "OperatingSystem", "perftest"]:
+				# print("run_process_output: library: ", library)
 				seq += 1
 				# print("result: library:", library)
 				txn = result.find('msg').text
@@ -514,7 +525,7 @@ class RFSwarmAgent():
 					"Sequence": seq
 				}
 
-				print("run_proces_output: payload", payload)
+				# print("run_proces_output: payload", payload)
 				try:
 					r = requests.post(uri, json=payload)
 					# print("run_proces_output: ",r.status_code, r.text)
@@ -544,7 +555,8 @@ class RFSwarmAgent():
 			os.mkdir(dir, mode=0o777)
 			# print("Directory Created: ", dir)
 		except FileExistsError:
-			print("Directory Exists: ", dir)
+			# print("Directory Exists: ", dir)
+			pass
 		except Exception as e:
 			print("Directory Create failed: ", dir)
 			print("with error: ", e)
