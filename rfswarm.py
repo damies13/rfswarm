@@ -202,10 +202,12 @@ class AgentServer(BaseHTTPRequestHandler):
 				jsonresp["POST"]["AgentStatus"]["URI"] = "/AgentStatus"
 				jsonresp["POST"]["AgentStatus"]["Body"] = {}
 				jsonresp["POST"]["AgentStatus"]["Body"]["AgentName"] = "<Agent Host Name>"
+				jsonresp["POST"]["AgentStatus"]["Body"]["Status"] = "<Agent Status>"
 				jsonresp["POST"]["AgentStatus"]["Body"]["AgentIPs"] = ["<Agent IP Address>","<Agent IP Address>"]
+				jsonresp["POST"]["AgentStatus"]["Body"]["Robots"] = "<sum>"
 				jsonresp["POST"]["AgentStatus"]["Body"]["CPU%"] = "0-100"
 				jsonresp["POST"]["AgentStatus"]["Body"]["MEM%"] = "0-100"
-				jsonresp["POST"]["AgentStatus"]["Body"]["Robots"] = "<sum>"
+				jsonresp["POST"]["AgentStatus"]["Body"]["NET%"] = "0-100"
 
 				jsonresp["POST"]["Jobs"] = {}
 				jsonresp["POST"]["Jobs"]["URI"] = "/Jobs"
@@ -216,6 +218,26 @@ class AgentServer(BaseHTTPRequestHandler):
 				jsonresp["POST"]["Scripts"]["URI"] = "/Scripts"
 				jsonresp["POST"]["Scripts"]["Body"] = {}
 				jsonresp["POST"]["Scripts"]["Body"]["AgentName"] = "<Agent Host Name>"
+
+				jsonresp["POST"]["File"] = {}
+				jsonresp["POST"]["File"]["URI"] = "/File"
+				jsonresp["POST"]["File"]["Body"] = {}
+				jsonresp["POST"]["File"]["Body"]["AgentName"] = "<Agent Host Name>"
+				jsonresp["POST"]["File"]["Body"]["Hash"] = "<File Hash, provided by /Scripts>"
+
+				jsonresp["POST"]["Result"] = {}
+				jsonresp["POST"]["Result"]["URI"] = "/Result"
+				jsonresp["POST"]["Result"]["Body"] = {}
+				jsonresp["POST"]["Result"]["Body"]["AgentName"] = "<Agent Host Name>"
+				jsonresp["POST"]["Result"]["Body"]["ResultName"] = "<A Text String>"
+				jsonresp["POST"]["Result"]["Body"]["Result"] = "<PASS | FAIL>"
+				jsonresp["POST"]["Result"]["Body"]["ElapsedTime"] = "<seconds as decimal number>"
+				jsonresp["POST"]["Result"]["Body"]["StartTime"] = "<epoch seconds as decimal number>"
+				jsonresp["POST"]["Result"]["Body"]["EndTime"] = "<epoch seconds as decimal number>"
+				jsonresp["POST"]["Result"]["Body"]["ScriptIndex"] = "<Index>"
+				jsonresp["POST"]["Result"]["Body"]["VUser"] = "<user number>"
+				jsonresp["POST"]["Result"]["Body"]["Iteration"] = "<iteration number>"
+				jsonresp["POST"]["Result"]["Body"]["Sequence"] = "<sequence number that ResultName occurred in test case>"
 
 				message = json.dumps(jsonresp)
 			else:
