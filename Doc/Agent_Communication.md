@@ -5,12 +5,12 @@
 
 In this page the generic host names guiserver and myagent are used, replace guiserver with the host name of the machine that is running rfswarm.py and myagent with the host name of the machine that is running rfswarm_agent.py
 
-- [Get /](#Get-/)
-- [POST /AgentStatus](#POST-/AgentStatus)
-- [POST /Jobs](#POST-/Jobs)
-- [POST /Scripts](#POST-/Scripts)
-- [POST /File](#POST-/File)
-- [POST /Result](#POST-/Result)
+- [Get /](#Get-)
+- [POST /AgentStatus](#POST-AgentStatus)
+- [POST /Jobs](#POST-Jobs)
+- [POST /Scripts](#POST-Scripts)
+- [POST /File](#POST-File)
+- [POST /Result](#POST-Result)
 
 ### Get /
 HTTP GET http://guiserver:8138/
@@ -79,12 +79,12 @@ Request Body:
 ```
 {
     "AgentName": "myagent",
-	"Status": "Ready",
-	"AgentIPs": ["192.168.1.150", "fe80::1c80:a965:7be5:d524"],
-	"Robots": "0,"
-	"CPU%": "3.4",
-	"MEM%": "20.51",
-	"NET%": "0.01"
+    "Status": "Ready",
+    "AgentIPs": ["192.168.1.150", "fe80::1c80:a965:7be5:d524"],
+    "Robots": "0,"
+    "CPU%": "3.4",
+    "MEM%": "20.51",
+    "NET%": "0.01"
 }
 ```
 
@@ -92,7 +92,7 @@ Response Body:
 ```
 {
     "AgentName": "myagent",
-	"Status": "Updated"
+    "Status": "Updated"
 }
 ```
 
@@ -146,20 +146,20 @@ Response Body:
 ```
 {
     "AgentName": "myagent",
-	"Scripts": [
-		{
-			"File": "OC_Demo.robot",
-			"Hash": "c4307dee904afe7df89fa33d193a7d30"
-		},
-		{
-			"File": "resources/OC_Demo.resource",
-			"Hash": "904afec4307dee7df89fa33d193a7d30"
-		},
-		{
-			"File": "resources/perftest.resource",
-			"Hash": "33d193a7d30904afec4307dee7df89fa"
-		}
-	]
+    "Scripts": [
+        {
+            "File": "OC_Demo.robot",
+            "Hash": "c4307dee904afe7df89fa33d193a7d30"
+        },
+        {
+            "File": "resources/OC_Demo.resource",
+            "Hash": "904afec4307dee7df89fa33d193a7d30"
+        },
+        {
+            "File": "resources/perftest.resource",
+            "Hash": "33d193a7d30904afec4307dee7df89fa"
+        }
+    ]
 }
 ```
 
@@ -170,20 +170,20 @@ Request Body:
 ```
 {
     "AgentName": "myagent",
-	"Hash": "33d193a7d30904afec4307dee7df89fa"
+    "Hash": "33d193a7d30904afec4307dee7df89fa"
 }
 ```
 
 Response Body:
 ```
 {
-	"AgentName": "myagent",
-	"Hash": "33d193a7d30904afec4307dee7df89fa",
-	"File": "resources/perftest.resource",
-	"FileData": <This field will contain a string that is a base64 encoded
-				lzma (7zip) compressed version of the file. The agent will base64
-				decode the string, lzma decompress, then save to a file using the
-				relative file path above relative to the agents temp directory>
+    "AgentName": "myagent",
+    "Hash": "33d193a7d30904afec4307dee7df89fa",
+    "File": "resources/perftest.resource",
+    "FileData": <This field will contain a string that is a base64 encoded
+                lzma (7zip) compressed version of the file. The agent will base64
+                decode the string, lzma decompress, then save to a file using the
+                relative file path above relative to the agents temp directory>
 }
 ```
 
