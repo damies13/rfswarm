@@ -455,36 +455,36 @@ class RFSwarmGUI(tk.Frame):
 		#
 		# run info bar
 		#
-		# usr = ttk.Label(rgbar, text="Unique by:") #, borderwidth=2, relief="raised")
-		# usr.grid(column=11, row=0, sticky="nsew") # , rowspan=2
-		#
-		# # gblist = ["script_index", "iteration", "sequence"]
-		# if "display_index" not in self.display_run:
-		# 	self.display_run['display_index'] = tk.BooleanVar()
-		# 	self.display_run['display_index'].set(False)
-		# usr = ttk.Label(rgbar, text="  Index  ") #, borderwidth=2, relief="raised")
-		# usr.grid(column=10, row=1, sticky="nsew")
-		# # chk = tk.Checkbutton(rgbar, text="Index", variable=self.display_run['display_index'], onvalue=1, offvalue=0) #, height = 2, width = 10)
-		# chk = tk.Checkbutton(rgbar, variable=self.display_run['display_index'], onvalue=True, offvalue=False) #, height = 2, width = 10)
-		# chk.grid(column=10, row=2, sticky="nsew")
-		#
-		# if "display_iteration" not in self.display_run:
-		# 	self.display_run['display_iteration'] = tk.BooleanVar()
-		# 	self.display_run['display_iteration'].set(False)
-		# usr = ttk.Label(rgbar, text="  Iteration  ") #, borderwidth=2, relief="raised")
-		# usr.grid(column=11, row=1, sticky="nsew")
-		# # chk = tk.Checkbutton(rgbar, text="Iteration", variable=self.display_run['display_iteration'], onvalue=1, offvalue=0) #, height = 2, width = 10)
-		# chk = tk.Checkbutton(rgbar, variable=self.display_run['display_iteration'], onvalue=True, offvalue=False) #, height = 2, width = 10)
-		# chk.grid(column=11, row=2, sticky="nsew")
-		#
-		# if "display_sequence" not in self.display_run:
-		# 	self.display_run['display_sequence'] = tk.BooleanVar()
-		# 	self.display_run['display_sequence'].set(False)
-		# usr = ttk.Label(rgbar, text="  Sequence  ") #, borderwidth=2, relief="raised")
-		# usr.grid(column=12, row=1, sticky="nsew")
-		# # chk = tk.Checkbutton(rgbar, text="Sequence", variable=self.display_run['display_sequence'], onvalue=1, offvalue=0) #, height = 2, width = 10)
-		# chk = tk.Checkbutton(rgbar, variable=self.display_run['display_sequence'], onvalue=True, offvalue=False) #, height = 2, width = 10)
-		# chk.grid(column=12, row=2, sticky="nsew")
+		usr = ttk.Label(rgbar, text="Unique by:") #, borderwidth=2, relief="raised")
+		usr.grid(column=11, row=0, sticky="nsew") # , rowspan=2
+
+		# gblist = ["script_index", "iteration", "sequence"]
+		if "display_index" not in self.display_run:
+			self.display_run['display_index'] = tk.BooleanVar()
+			self.display_run['display_index'].set(False)
+		usr = ttk.Label(rgbar, text="  Index  ") #, borderwidth=2, relief="raised")
+		usr.grid(column=10, row=1, sticky="nsew")
+		# chk = tk.Checkbutton(rgbar, text="Index", variable=self.display_run['display_index'], onvalue=1, offvalue=0) #, height = 2, width = 10)
+		chk = tk.Checkbutton(rgbar, variable=self.display_run['display_index'], onvalue=True, offvalue=False) #, height = 2, width = 10)
+		chk.grid(column=10, row=2, sticky="nsew")
+
+		if "display_iteration" not in self.display_run:
+			self.display_run['display_iteration'] = tk.BooleanVar()
+			self.display_run['display_iteration'].set(False)
+		usr = ttk.Label(rgbar, text="  Iteration  ") #, borderwidth=2, relief="raised")
+		usr.grid(column=11, row=1, sticky="nsew")
+		# chk = tk.Checkbutton(rgbar, text="Iteration", variable=self.display_run['display_iteration'], onvalue=1, offvalue=0) #, height = 2, width = 10)
+		chk = tk.Checkbutton(rgbar, variable=self.display_run['display_iteration'], onvalue=True, offvalue=False) #, height = 2, width = 10)
+		chk.grid(column=11, row=2, sticky="nsew")
+
+		if "display_sequence" not in self.display_run:
+			self.display_run['display_sequence'] = tk.BooleanVar()
+			self.display_run['display_sequence'].set(False)
+		usr = ttk.Label(rgbar, text="  Sequence  ") #, borderwidth=2, relief="raised")
+		usr.grid(column=12, row=1, sticky="nsew")
+		# chk = tk.Checkbutton(rgbar, text="Sequence", variable=self.display_run['display_sequence'], onvalue=1, offvalue=0) #, height = 2, width = 10)
+		chk = tk.Checkbutton(rgbar, variable=self.display_run['display_sequence'], onvalue=True, offvalue=False) #, height = 2, width = 10)
+		chk.grid(column=12, row=2, sticky="nsew")
 
 		if "start_time" not in self.display_run:
 			self.display_run['start_time'] = tk.StringVar()
@@ -996,12 +996,12 @@ class RFSwarmGUI(tk.Frame):
 			# https://docs.python.org/2/library/sqlite3.html#sqlite3.Connection.create_aggregate
 
 		gblist = []
-		# if self.display_run['display_index'].get():
-		# 	gblist.append("script_index")
-		# if self.display_run['display_iteration'].get():
-		# 	gblist.append("iteration")
-		# if self.display_run['display_sequence'].get():
-		# 	gblist.append("sequence")
+		if self.display_run['display_index'].get():
+			gblist.append("script_index")
+		if self.display_run['display_iteration'].get():
+			gblist.append("iteration")
+		if self.display_run['display_sequence'].get():
+			gblist.append("sequence")
 
 		gblist.append("result_name")
 		# print("delayed_UpdateRunStats:	gblist:", gblist)
@@ -1026,8 +1026,9 @@ class RFSwarmGUI(tk.Frame):
 		sql += 		"round(max(elapsed_time),3) 'max' "
 		sql += "FROM Results "
 		sql += "WHERE result = 'PASS' "
-		sql += "GROUP BY  "
-		sql += 		gbcols
+		if len(gblist)>0:
+			sql += "GROUP BY  "
+			sql += 		gbcols
 
 		# round(-4.535,2);
 
