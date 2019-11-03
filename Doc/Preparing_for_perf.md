@@ -50,8 +50,62 @@ Iteration should be available through the variable `${iteration}`, This is simpl
 
 ### Data Management
 
+#### Reading Data Files
+
 Because functional and regression tests are designed to test specific functionality, the test data is designed to test boundary or edge cases so are limited to a small set of cases or static. With performance testing we don't want this, rather we want hundreds or even thousands of different data values so we can better emulate user behaviour and ensure we are not constantly hitting a single cached value and reporting unrealistically fast response times.
 
+So to make life easier in the [Robot Resources](../Robot_Resources) folder there is a [perftest.resource](../Robot_Resources/perftest.resource) file that you can include in the Settings section of your .robot file like this:
+
+```
+*** Settings ***
+Resource    perftest.resource
+```
+
+For Reading Data Files [perftest.resource](../Robot_Resources/perftest.resource) provides the keywords `Get File Dir` and `Get Data Row`
+
+```
+*** Test Cases ***
+File Test Examples
+	${FILE_DIR} = 	Get File Dir
+	Get Data Row	${FILE_DIR}/ProductList.csv
+	Get Data Row	${FILE_DIR}/ProductList.csv 	"Random"
+	Get Data Row	${FILE_DIR}/ProductList.tsv 	"Sequential"
+	Get Data Row	${FILE_DIR}/ProductList.csv 	3
+	${next_row} = 	Evaluate	${vuser} + ${iteration}
+	Get Data Row	${FILE_DIR}/ProductList.csv 	${next_row}
+
+```
+
+- `Get Data Row` defaults to Random, so the first 2 `Get Data Row` examples are the same
+- Sequential is only useful if you are accessing multiple rows in the same test case
+- The third option is to parse a row number directly, this could be a fixed number or a calculated value
+
+#### Support Files
+
+Robot Framework only has 2 ways to include a file in your robot file, the `Resource` Setting or the `Variables` Setting.
+
+```
+*** Settings ***
+Resource    perftest.resource
+Resource    ../Robot_Resources/perftest.resource
+Variables   myvariables.py
+```
+
+Unfortunately if you include a csv or tsv file with either `Resource` or `Variables` setting, Robot Framework will error.
+
+Likewise for some test cases you will want to have some additional support files like Images, PDF's, Word or Excel Documents that you want to use for attaching to a web form, loading into a client application etc. If you use either `Resource` or `Variables` setting for these files Robot Framework will most likely error too.
+
+To ensure these files get transferred to the Agent so that your test case can find them rfswarm uses the `Metadata` Setting with the name `File` to provide an additional way to include files. As a bonus when using `Metadata    File` you can also use wildcards to transfer multiple files
+
+```
+*** Settings ***
+Metadata	File    ProductList.tsv
+Metadata	File    *.csv
+Metadata	File    images/*.jpg
+Metadata	File    uploads/*.*
+```
+
+rfswarm ensures all the files referenced using `Resource`, `Variables` and `Metadata    File` in the Settings section of your robot file are transferred to the agent in the same relative path to your robot file.
 
 ### Browser
 
