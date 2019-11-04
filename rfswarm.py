@@ -16,6 +16,7 @@
 
 
 import sys
+import signal
 import os
 import glob
 import configparser
@@ -41,8 +42,8 @@ import tkinter as tk				#python3
 # import ttk						#python2
 import tkinter.ttk as ttk			#python3
 # import tkFileDialog as tkf		#python2
-import tkinter.filedialog as tkf	#python2
-
+import tkinter.filedialog as tkf	#python3
+import tkinter.messagebox as tkm	#python3
 
 
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer, HTTPServer
@@ -268,6 +269,7 @@ class RFSwarmGUI(tk.Frame):
 	index = ""
 	file = ""
 	sheet = ""
+	titleprefix = 'Robot Framework Swarm'
 
 	tabs = None
 
@@ -332,10 +334,10 @@ class RFSwarmGUI(tk.Frame):
 
 		self.config = configparser.ConfigParser()
 		scrdir = os.path.dirname(__file__)
-		print("RFSwarmAgent: __init__: scrdir: ", scrdir)
+		# print("RFSwarmGUI: __init__: scrdir: ", scrdir)
 		self.gui_ini = os.path.join(scrdir, "RFSwarmGUI.ini")
 		if os.path.isfile(self.gui_ini):
-			print("RFSwarmAgent: __init__: agentini: ", self.gui_ini)
+			# print("RFSwarmGUI: __init__: agentini: ", self.gui_ini)
 			self.config.read(self.gui_ini)
 		else:
 			self.saveini()
@@ -352,6 +354,13 @@ class RFSwarmGUI(tk.Frame):
 		self.dbthread = threading.Thread(target=self.run_db_thread)
 		self.dbthread.start()
 
+	def updateTitle(self):
+		titletext = "{} - {}".format(self.titleprefix, "Untitled")
+		if 'Plan' in self.config and 'ScenarioFile' in self.config['Plan']:
+			if len(self.config['Plan']['ScenarioFile'])>0:
+				titletext = "{} - {}".format(self.titleprefix, self.config['Plan']['ScenarioFile'])
+
+		self.master.title(titletext)
 
 	def saveini(self):
 		with open(self.gui_ini, 'w') as configfile:    # save
@@ -361,6 +370,14 @@ class RFSwarmGUI(tk.Frame):
 	# 	pass
 
 	def on_closing(self):
+
+		print("on_closing: Close Scenario")
+		sf = self.config['Plan']['ScenarioFile']
+		self.mnu_file_Close()
+		# mnu_file_Close clears this value, need to set it back so that it is saved
+		# 		in the ini file so the next app open loads the file
+		self.config['Plan']['ScenarioFile'] = sf
+
 		print("on_closing: self.destroy")
 		self.destroy()
 		print("on_closing: Shutdown Agent Server")
@@ -413,17 +430,21 @@ class RFSwarmGUI(tk.Frame):
 		root_menu = tk.Menu(window)
 		window.config(menu = root_menu)
 
+			# sub_menu.add_command(label="Print", command=self.print_, accelerator="Command-P")
+			# https://stackoverflow.com/questions/16847584/how-do-i-get-the-mac-command-symbol-in-a-tkinter-menu
+
 		# creating sub menus in the root menu
 		file_menu = tk.Menu(root_menu) # it intializes a new su menu in the root menu
 		root_menu.add_cascade(label = "File", menu = file_menu) # it creates the name of the sub menu
-		file_menu.add_command(label = "New", command = self.mnu_file_New) # it adds a option to the sub menu 'command' parameter is used to do some action
-		file_menu.add_command(label = "Open", command = self.mnu_file_Open)
-		file_menu.add_command(label = "Save", command = self.mnu_file_Save)
-		file_menu.add_command(label = "Save As", command = self.mnu_file_SaveAs)
-		file_menu.add_command(label = "Close", command = self.mnu_file_Close)
+		file_menu.add_command(label = "New", command = self.mnu_file_New, accelerator="Command-N") # it adds a option to the sub menu 'command' parameter is used to do some action
+		file_menu.add_command(label = "Open", command = self.mnu_file_Open, accelerator="Command-O")
+		file_menu.add_command(label = "Save", command = self.mnu_file_Save, accelerator="Command-S")
+		file_menu.add_command(label = "Save As", command = self.mnu_file_SaveAs, accelerator="Command-A")
+		file_menu.add_command(label = "Close", command = self.mnu_file_Close, accelerator="Command-L")
 
-		file_menu.add_separator() # it adds a line after the 'Open files' option
-		file_menu.add_command(label = "Exit", command = self.on_closing)
+		# file_menu.add_separator() # it adds a line after the 'Open files' option
+		# file_menu.add_command(label = "Exit", command = self.on_closing, accelerator="Command-N")
+		file_menu.add_command(label = "Quit", command = self.on_closing, accelerator="Command-Q")
 
 		# # creting another sub menu
 		# edit_menu = tk.Menu(root_menu)
@@ -432,6 +453,16 @@ class RFSwarmGUI(tk.Frame):
 		# edit_menu.add_command(label = "Redo", command = function)
 
 		window.protocol("WM_DELETE_WINDOW", self.on_closing)
+		window.protocol("WM_QUERYENDSESSION", self.on_closing)
+		window.protocol("WM_ENDSESSION", self.on_closing)
+		window.protocol("WM_QUIT", self.on_closing)
+		window.protocol("WM_DESTROY", self.on_closing)
+		window.protocol("WM_CLOSE", self.on_closing)
+		window.protocol("CTRL_SHUTDOWN_EVENT", self.on_closing)
+		window.protocol("HWND_MESSAGE", self.on_closing)
+
+		signal.signal(signal.SIGTERM, self.on_closing)
+
 
 
 	def BuildPlan(self, p):
@@ -451,6 +482,8 @@ class RFSwarmGUI(tk.Frame):
 		if 'ScenarioFile' not in self.config['Plan']:
 			self.config['Plan']['ScenarioFile'] = ""
 			self.saveini()
+
+		self.updateTitle()
 
 		p.columnconfigure(0, weight=2)
 		p.rowconfigure(0, weight=1)
@@ -613,8 +646,8 @@ class RFSwarmGUI(tk.Frame):
 		collst = ["result_name", "result", "count", "min", "avg", "max"]
 		colno = 0
 		for col in collst:
-			print("UpdateRunStats: colno:", colno, "col:", col)
-			print("UpdateRunStats: display_run:", self.display_run)
+			# print("BuildRun: colno:", colno, "col:", col)
+			# print("BuildRun: display_run:", self.display_run)
 			if colno in self.display_run["columns"]:
 				currcol = self.display_run["columns"][colno].get()
 				if col != currcol:
@@ -623,12 +656,12 @@ class RFSwarmGUI(tk.Frame):
 				self.display_run["columns"][colno] = tk.StringVar()
 				self.display_run["columns"][colno].set("  {}  ".format(col))
 
-			print("UpdateRunStats: display_run[columns][colno]:", self.display_run["columns"][colno])
+			# print("BuildRun: display_run[columns][colno]:", self.display_run["columns"][colno])
 
 			grdcols = self.rungrid.grid_size()[0]
-			print("UpdateRunStats: grdcols:", grdcols)
+			# print("BuildRun: grdcols:", grdcols)
 			grdcols += -1
-			print("UpdateRunStats: grdcols:", grdcols, " 	colno:", colno)
+			# print("BuildRun: grdcols:", grdcols, " 	colno:", colno)
 			if grdcols < colno:
 				usr = ttk.Label(self.rungrid, textvariable=self.display_run["columns"][colno], borderwidth=2, relief="raised")
 				usr.grid(column=colno, row=0, sticky="nsew")
@@ -1778,7 +1811,10 @@ class RFSwarmGUI(tk.Frame):
 			durinc = 7200	# 2 hr
 		# print("durinc", durinc)
 
-		mrkpct = durinc / (mxdur * 1.0)
+		if mxdur>0:
+			mrkpct = durinc / (mxdur * 1.0)
+		else:
+			mrkpct = 0
 		# print("mrkpct", mrkpct)
 		# print("xm1", xm1, "xm2", xm2, "xm2-xm1", xm2-xm1)
 		mrkinc = int(xmt * mrkpct)
@@ -1818,7 +1854,10 @@ class RFSwarmGUI(tk.Frame):
 		# print("usrinc", usrinc)
 		# print("usrinc", usrinc)
 		usrmrk = usrinc
-		mrkpct = usrmrk / (mxuser * 1.0)
+		if mxuser>0:
+			mrkpct = usrmrk / (mxuser * 1.0)
+		else:
+			mrkpct = 0
 		# print("mrkpct", mrkpct)
 		txtmrkoffset = int(int(ym1 * mrkpct)/2)
 		# print("txtmrkoffset", txtmrkoffset)
@@ -1839,6 +1878,7 @@ class RFSwarmGUI(tk.Frame):
 
 		xlen = xmt
 
+		delx = 0
 		for grp in self.scriptlist:
 			if "Users" in grp.keys():
 				colour = self.line_colour(grp["Index"])
@@ -2279,18 +2319,102 @@ class RFSwarmGUI(tk.Frame):
 	#
 	def mnu_file_New(self):
 		print("mnu_file_New")
+		if len(self.config['Plan']['ScenarioFile'])>0:
+			self.mnu_file_Close()
+
+		self.updateTitle()
+		while self.scriptcount > 0:
+			self.sr_remove_row(self.scriptcount)
+			self.scriptcount += -1
+		self.scriptlist = [{}]
+		self.addScriptRow()
+
 
 	def mnu_file_Open(self):
 		print("mnu_file_Open")
+		ScenarioFile = str(tkf.askopenfilename(initialdir=self.config['Plan']['ScriptDir'], title = "Select RFSwarm Scenario File", filetypes = (("RFSwarm","*.rfs"),("all files","*.*"))))
+		print("mnu_file_Open: ScenarioFile:", ScenarioFile)
+
 
 	def mnu_file_Save(self):
 		print("mnu_file_Save")
+		if len(self.config['Plan']['ScenarioFile'])<1:
+			self.mnu_file_SaveAs()
+		else:
+
+			print("mnu_file_Save: ScenarioFile:", self.config['Plan']['ScenarioFile'])
+			print("mnu_file_Save: scriptlist:", self.scriptlist)
+			filedata = configparser.ConfigParser()
+
+			if 'Scenario' not in filedata:
+				filedata['Scenario'] = {}
+
+			scriptidx = str(0)
+			if 'ScriptCount' not in filedata['Scenario']:
+				# filedata['Scenario']['ScriptCount'] = str(len(self.scriptlist)-1)
+				filedata['Scenario']['ScriptCount'] = scriptidx
+
+			for scrp in self.scriptlist:
+				if 'Index' in scrp:
+					scriptidx = str(scrp['Index'])
+
+					if scriptidx not in filedata:
+						filedata[scriptidx] = {}
+					for key in scrp.keys():
+						if key not in ['Index', 'TestVar', 'ScriptHash']:
+							filedata[scriptidx][key] = str(scrp[key])
+
+			filedata['Scenario']['ScriptCount'] = scriptidx
+			with open(self.config['Plan']['ScenarioFile'], 'w') as sf:    # save
+			    filedata.write(sf)
+
+
+			# self.config = configparser.ConfigParser()
+			# scrdir = os.path.dirname(__file__)
+			# # print("RFSwarmGUI: __init__: scrdir: ", scrdir)
+			# self.gui_ini = os.path.join(scrdir, "RFSwarmGUI.ini")
+			# if 'Plan' not in self.config:
+			# 	self.config['Plan'] = {}
+			# 	self.saveini()
+			#
+			# if 'ScriptDir' not in self.config['Plan']:
+			# 	self.config['Plan']['ScriptDir'] = self.dir_path
+			# 	self.saveini()
+
+			# if os.path.isfile(self.gui_ini):
+			# with open(self.gui_ini, 'w') as configfile:    # save
+			#     self.config.write(configfile)
+
+			self.updateTitle()
 
 	def mnu_file_SaveAs(self):
 		print("mnu_file_SaveAs")
+		# asksaveasfilename
+		ScenarioFile = str(tkf.asksaveasfilename(\
+						initialdir=self.config['Plan']['ScenarioDir'], \
+						title = "Save RFSwarm Scenario File", \
+						filetypes = (("RFSwarm","*.rfs"),("all files","*.*"))\
+						))
+		print("mnu_file_SaveAs: ScenarioFile:", ScenarioFile)
+		if ScenarioFile is not None and len(ScenarioFile)>0:
+			# ScenarioFile
+			filetupl = os.path.splitext(ScenarioFile)
+			print("mnu_file_SaveAs: filetupl:", filetupl)
+			if filetupl != ".rfs":
+				ScenarioFile += ".rfs"
+				print("mnu_file_SaveAs: ScenarioFile:", ScenarioFile)
+			self.config['Plan']['ScenarioFile'] = ScenarioFile
+			self.mnu_file_Save()
 
 	def mnu_file_Close(self):
 		print("mnu_file_Close")
+		MsgBox = tkm.askyesno('Save Scenario','Do you want to save the current scenario?')
+		print("mnu_file_Close: MsgBox:", MsgBox)
+		if MsgBox:
+			self.mnu_file_Save()
+
+		self.config['Plan']['ScenarioFile'] = ""
+		self.mnu_file_New()
 
 	#
 	# End class RFSwarmGUI
@@ -2299,7 +2423,13 @@ class RFSwarmGUI(tk.Frame):
 
 rfs = RFSwarmGUI()
 print("Robot Framework Swarm: Run GUI")
-rfs.master.title('Robot Framework Swarm')
+# rfs.master.title('Robot Framework Swarm')
 # rfs.columnconfigure(0, weight=1)
 # rfs.rowconfigure(0, weight=1)
-rfs.mainloop()
+try:
+	rfs.mainloop()
+except KeyboardInterrupt:
+	rfs.on_closing()
+except Exception as e:
+	print("rfs.Exception:", e)
+	rfs.on_closing()
