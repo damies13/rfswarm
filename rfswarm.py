@@ -316,7 +316,6 @@ class RFSwarmGUI(tk.Frame):
 
 
 	dir_path = os.path.dirname(os.path.realpath(__file__))
-	lastdir = dir_path
 	resultsdir = ""
 	run_dbthread = True
 	dbthread = None
@@ -403,9 +402,36 @@ class RFSwarmGUI(tk.Frame):
 		self.tabs.add(a, text='Agents')
 		self.tabs.grid(column=0, row=0) # , sticky="nsew")
 
+		self.BuildMenu()
 		self.BuildPlan(p)
 		self.BuildRun(r)
 		self.BuildAgent(a)
+
+	def BuildMenu(self):
+		# creating a root menu to insert all the sub menus
+		window = self.master
+		root_menu = tk.Menu(window)
+		window.config(menu = root_menu)
+
+		# creating sub menus in the root menu
+		file_menu = tk.Menu(root_menu) # it intializes a new su menu in the root menu
+		root_menu.add_cascade(label = "File", menu = file_menu) # it creates the name of the sub menu
+		file_menu.add_command(label = "New", command = self.mnu_file_New) # it adds a option to the sub menu 'command' parameter is used to do some action
+		file_menu.add_command(label = "Open", command = self.mnu_file_Open)
+		file_menu.add_command(label = "Save", command = self.mnu_file_Save)
+		file_menu.add_command(label = "Save As", command = self.mnu_file_SaveAs)
+		file_menu.add_command(label = "Close", command = self.mnu_file_Close)
+
+		file_menu.add_separator() # it adds a line after the 'Open files' option
+		file_menu.add_command(label = "Exit", command = self.on_closing)
+
+		# # creting another sub menu
+		# edit_menu = tk.Menu(root_menu)
+		# root_menu.add_cascade(label = "Edit", menu = edit_menu)
+		# edit_menu.add_command(label = "Undo", command = function)
+		# edit_menu.add_command(label = "Redo", command = function)
+
+		window.protocol("WM_DELETE_WINDOW", self.on_closing)
 
 
 	def BuildPlan(self, p):
@@ -414,8 +440,16 @@ class RFSwarmGUI(tk.Frame):
 			self.config['Plan'] = {}
 			self.saveini()
 
-		if 'LastDir' not in self.config['Plan']:
-			self.config['Plan']['LastDir'] = self.dir_path
+		if 'ScriptDir' not in self.config['Plan']:
+			self.config['Plan']['ScriptDir'] = self.dir_path
+			self.saveini()
+
+		if 'ScenarioDir' not in self.config['Plan']:
+			self.config['Plan']['ScenarioDir'] = self.dir_path
+			self.saveini()
+
+		if 'ScenarioFile' not in self.config['Plan']:
+			self.config['Plan']['ScenarioFile'] = ""
 			self.saveini()
 
 		p.columnconfigure(0, weight=2)
@@ -1559,7 +1593,7 @@ class RFSwarmGUI(tk.Frame):
 		# print(fg)
 		# print(fg[1].get())
 		# root.filename = tkFileDialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
-		scriptfile = str(tkf.askopenfilename(initialdir=self.config['Plan']['LastDir'], title = "Select Robot Framework File", filetypes = (("Robot Framework","*.robot"),("all files","*.*"))))
+		scriptfile = str(tkf.askopenfilename(initialdir=self.config['Plan']['ScriptDir'], title = "Select Robot Framework File", filetypes = (("Robot Framework","*.robot"),("all files","*.*"))))
 		# print("scriptfile:", scriptfile)
 		if len(scriptfile)>0:
 			fg[1].configure(state='normal')
@@ -1581,7 +1615,7 @@ class RFSwarmGUI(tk.Frame):
 			t = threading.Thread(target=self.find_dependancies, args=(script_hash, ))
 			t.start()
 
-			self.config['Plan']['LastDir'] = os.path.dirname(scriptfile)
+			self.config['Plan']['ScriptDir'] = os.path.dirname(scriptfile)
 			self.saveini()
 			self.sr_test_genlist(r)
 		else:
@@ -2239,6 +2273,29 @@ class RFSwarmGUI(tk.Frame):
 		if instr in ["True", "true", "TRUE", "YES", "yes", "Yes", "1"]:
 			return True
 		return False
+
+	#
+	# menu functions
+	#
+	def mnu_file_New(self):
+		print("mnu_file_New")
+
+	def mnu_file_Open(self):
+		print("mnu_file_Open")
+
+	def mnu_file_Save(self):
+		print("mnu_file_Save")
+
+	def mnu_file_SaveAs(self):
+		print("mnu_file_SaveAs")
+
+	def mnu_file_Close(self):
+		print("mnu_file_Close")
+
+	#
+	# End class RFSwarmGUI
+	#
+
 
 rfs = RFSwarmGUI()
 print("Robot Framework Swarm: Run GUI")
