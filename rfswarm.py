@@ -2235,6 +2235,7 @@ class RFSwarmGUI(tk.Frame):
 
 
 	def str2bool(self, instr):
+		# print("str2bool: instr:", instr)
 		if instr in ["True", "true", "TRUE", "YES", "yes", "Yes", "1"]:
 			return True
 		return False
