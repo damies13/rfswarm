@@ -18,6 +18,7 @@
 import sys
 import os
 import glob
+import configparser
 import hashlib
 import lzma
 import base64
@@ -270,6 +271,9 @@ class RFSwarmGUI(tk.Frame):
 
 	tabs = None
 
+	config = None
+	gui_ini = None
+
 	# #000000 = Black
 	defcolours = ['#000000']
 
@@ -327,6 +331,16 @@ class RFSwarmGUI(tk.Frame):
 		# Grid.columnconfigure(root, 0, weight=1)
 		root.protocol("WM_DELETE_WINDOW", self.on_closing)
 
+		self.config = configparser.ConfigParser()
+		scrdir = os.path.dirname(__file__)
+		print("RFSwarmAgent: __init__: scrdir: ", scrdir)
+		self.gui_ini = os.path.join(scrdir, "RFSwarmGUI.ini")
+		if os.path.isfile(self.gui_ini):
+			print("RFSwarmAgent: __init__: agentini: ", self.gui_ini)
+			self.config.read(self.gui_ini)
+		else:
+			self.saveini()
+
 		tk.Frame.__init__(self, root)
 		self.grid(row=0, column=0, sticky="nsew")
 		self.columnconfigure(0, weight=1)
@@ -339,6 +353,10 @@ class RFSwarmGUI(tk.Frame):
 		self.dbthread = threading.Thread(target=self.run_db_thread)
 		self.dbthread.start()
 
+
+	def saveini(self):
+		with open(self.gui_ini, 'w') as configfile:    # save
+		    self.config.write(configfile)
 
 	# def mainloop(self):
 	# 	pass
@@ -361,6 +379,8 @@ class RFSwarmGUI(tk.Frame):
 		print("on_closing: Join DB Thread")
 		self.dbthread.join()
 
+		print("on_closing: Save ini File")
+		self.saveini()
 
 		print("on_closing: exit")
 		exit()
@@ -389,6 +409,14 @@ class RFSwarmGUI(tk.Frame):
 
 
 	def BuildPlan(self, p):
+
+		if 'Plan' not in self.config:
+			self.config['Plan'] = {}
+			self.saveini()
+
+		if 'LastDir' not in self.config['Plan']:
+			self.config['Plan']['LastDir'] = self.dir_path
+			self.saveini()
 
 		p.columnconfigure(0, weight=2)
 		p.rowconfigure(0, weight=1)
@@ -447,6 +475,23 @@ class RFSwarmGUI(tk.Frame):
 
 	def BuildRun(self, r):
 
+		if 'Run' not in self.config:
+			self.config['Run'] = {}
+			self.saveini()
+
+		if 'display_index' not in self.config['Run']:
+			self.config['Run']['display_index'] = str(False)
+			self.saveini()
+
+		if 'display_iteration' not in self.config['Run']:
+			self.config['Run']['display_iteration'] = str(False)
+			self.saveini()
+
+		if 'display_sequence' not in self.config['Run']:
+			self.config['Run']['display_sequence'] = str(False)
+			self.saveini()
+
+
 		rg = ttk.Frame(r)
 		rg.grid(column=0, row=1, sticky="nsew")
 		rgbar = ttk.Frame(rg)
@@ -461,29 +506,29 @@ class RFSwarmGUI(tk.Frame):
 		# gblist = ["script_index", "iteration", "sequence"]
 		if "display_index" not in self.display_run:
 			self.display_run['display_index'] = tk.BooleanVar()
-			self.display_run['display_index'].set(False)
+			self.display_run['display_index'].set(self.str2bool(self.config['Run']['display_index']))
 		usr = ttk.Label(rgbar, text="  Index  ") #, borderwidth=2, relief="raised")
 		usr.grid(column=10, row=1, sticky="nsew")
 		# chk = tk.Checkbutton(rgbar, text="Index", variable=self.display_run['display_index'], onvalue=1, offvalue=0) #, height = 2, width = 10)
-		chk = tk.Checkbutton(rgbar, variable=self.display_run['display_index'], onvalue=True, offvalue=False) #, height = 2, width = 10)
+		chk = tk.Checkbutton(rgbar, variable=self.display_run['display_index'], onvalue=True, offvalue=False, command=self.delayed_UpdateRunStats_bg) #, height = 2, width = 10)
 		chk.grid(column=10, row=2, sticky="nsew")
 
 		if "display_iteration" not in self.display_run:
 			self.display_run['display_iteration'] = tk.BooleanVar()
-			self.display_run['display_iteration'].set(False)
+			self.display_run['display_iteration'].set(self.str2bool(self.config['Run']['display_iteration']))
 		usr = ttk.Label(rgbar, text="  Iteration  ") #, borderwidth=2, relief="raised")
 		usr.grid(column=11, row=1, sticky="nsew")
 		# chk = tk.Checkbutton(rgbar, text="Iteration", variable=self.display_run['display_iteration'], onvalue=1, offvalue=0) #, height = 2, width = 10)
-		chk = tk.Checkbutton(rgbar, variable=self.display_run['display_iteration'], onvalue=True, offvalue=False) #, height = 2, width = 10)
+		chk = tk.Checkbutton(rgbar, variable=self.display_run['display_iteration'], onvalue=True, offvalue=False, command=self.delayed_UpdateRunStats_bg) #, height = 2, width = 10)
 		chk.grid(column=11, row=2, sticky="nsew")
 
 		if "display_sequence" not in self.display_run:
 			self.display_run['display_sequence'] = tk.BooleanVar()
-			self.display_run['display_sequence'].set(False)
+			self.display_run['display_sequence'].set(self.str2bool(self.config['Run']['display_sequence']))
 		usr = ttk.Label(rgbar, text="  Sequence  ") #, borderwidth=2, relief="raised")
 		usr.grid(column=12, row=1, sticky="nsew")
 		# chk = tk.Checkbutton(rgbar, text="Sequence", variable=self.display_run['display_sequence'], onvalue=1, offvalue=0) #, height = 2, width = 10)
-		chk = tk.Checkbutton(rgbar, variable=self.display_run['display_sequence'], onvalue=True, offvalue=False) #, height = 2, width = 10)
+		chk = tk.Checkbutton(rgbar, variable=self.display_run['display_sequence'], onvalue=True, offvalue=False, command=self.delayed_UpdateRunStats_bg) #, height = 2, width = 10)
 		chk.grid(column=12, row=2, sticky="nsew")
 
 		if "start_time" not in self.display_run:
@@ -988,106 +1033,145 @@ class RFSwarmGUI(tk.Frame):
 			else:
 				return None
 
+	def delayed_UpdateRunStats_bg(self):
+
+		display_index = self.display_run['display_index'].get()
+		if display_index != self.str2bool(self.config['Run']['display_index']):
+			self.config['Run']['display_index'] = str(display_index)
+			self.saveini()
+
+		display_iteration = self.display_run['display_iteration'].get()
+		if display_iteration != self.str2bool(self.config['Run']['display_iteration']):
+			self.config['Run']['display_iteration'] = str(display_iteration)
+			self.saveini()
+
+		display_sequence = self.display_run['display_sequence'].get()
+		if display_sequence != self.str2bool(self.config['Run']['display_sequence']):
+			self.config['Run']['display_sequence'] = str(display_sequence)
+			self.saveini()
+
+		time_elapsed = int(time.time()) - self.rungridupdate
+		if (time_elapsed>5):
+			ut = threading.Thread(target=self.delayed_UpdateRunStats)
+			ut.start()
+
 	def delayed_UpdateRunStats(self):
-		time.sleep(5)
-		# queue sqls so UpdateRunStats should have the results
+		time_elapsed = int(time.time()) - self.rungridupdate
+		if (time_elapsed>5):
+			# queue sqls so UpdateRunStats should have the results
 
-		# TODO: to query the percentile value we'll need to create an aggregate class
-			# https://docs.python.org/2/library/sqlite3.html#sqlite3.Connection.create_aggregate
+			# TODO: to query the percentile value we'll need to create an aggregate class
+				# https://docs.python.org/2/library/sqlite3.html#sqlite3.Connection.create_aggregate
 
-		gblist = []
-		if self.display_run['display_index'].get():
-			gblist.append("script_index")
-		if self.display_run['display_iteration'].get():
-			gblist.append("iteration")
-		if self.display_run['display_sequence'].get():
-			gblist.append("sequence")
+			gblist = []
+			display_index = self.display_run['display_index'].get()
+			# print("delayed_UpdateRunStats: display_index:", display_index, "	config[Run][display_index]:", self.config['Run']['display_index'], "	bool(config[Run][display_index]):", self.str2bool(self.config['Run']['display_index']))
+			if display_index != self.str2bool(self.config['Run']['display_index']):
+				self.config['Run']['display_index'] = str(display_index)
+				self.saveini()
+			if display_index:
+				gblist.append("script_index")
 
-		gblist.append("result_name")
-		# print("delayed_UpdateRunStats:	gblist:", gblist)
-		# gblist = ["result_name"]
-		# gblist = ["sequence", "result_name"]
-		# gblist = ["script_index", "result_name"]
-		# gblist = ["script_index", "iteration", "sequence", "result_name"]
-		gbcols = ", ".join(gblist)
+			display_iteration = self.display_run['display_iteration'].get()
+			if display_iteration != self.str2bool(self.config['Run']['display_iteration']):
+				self.config['Run']['display_iteration'] = str(display_iteration)
+				self.saveini()
+			if display_iteration:
+				gblist.append("iteration")
 
-		# print("delayed_UpdateRunStats:	gbcols:", gbcols)
+			display_sequence = self.display_run['display_sequence'].get()
+			if display_sequence != self.str2bool(self.config['Run']['display_sequence']):
+				self.config['Run']['display_sequence'] = str(display_sequence)
+				self.saveini()
+			if display_sequence:
+				gblist.append("sequence")
+
+			gblist.append("result_name")
+			# print("delayed_UpdateRunStats:	gblist:", gblist)
+			# gblist = ["result_name"]
+			# gblist = ["sequence", "result_name"]
+			# gblist = ["script_index", "result_name"]
+			# gblist = ["script_index", "iteration", "sequence", "result_name"]
+			gbcols = ", ".join(gblist)
+
+			# print("delayed_UpdateRunStats:	gbcols:", gbcols)
 
 
-		sql = "SELECT "
-		if len(gblist)>0:
-			sql += 	gbcols
-			sql += 	", "
-		sql += 		"result_name, "
-		sql += 		"result, "
-		sql += 		"count(*) 'count', "
-		sql += 		"round(min(elapsed_time),3) 'min', "
-		sql += 		"round(avg(elapsed_time),3) 'avg', "
-		sql += 		"round(max(elapsed_time),3) 'max' "
-		sql += "FROM Results "
-		sql += "WHERE result = 'PASS' "
-		if len(gblist)>0:
+			sql = "SELECT "
+			if len(gblist)>0:
+				sql += 	gbcols
+				sql += 	", "
+			sql += 		"result_name, "
+			sql += 		"result, "
+			sql += 		"count(*) 'count', "
+			sql += 		"round(min(elapsed_time),3) 'min', "
+			sql += 		"round(avg(elapsed_time),3) 'avg', "
+			sql += 		"round(max(elapsed_time),3) 'max' "
+			sql += "FROM Results "
+			sql += "WHERE result = 'PASS' "
+			if len(gblist)>0:
+				sql += "GROUP BY  "
+				sql += 		gbcols
+
+			# round(-4.535,2);
+
+			# sql = """SELECT
+			# 			script_index,
+			# 			sequence,
+			# 			result_name,
+			# 			result,
+			# 			count(*) 'count',
+			# 			min(elapsed_time) 'min',
+			# 			avg(elapsed_time) 'avg',
+			# 			max(elapsed_time) 'max'
+			# 		FROM Results
+			# 		WHERE result = 'PASS'
+			# 		GROUP BY script_index, sequence, result_name"""
+
+			# print("delayed_UpdateRunStats:	sql:", sql)
+
+			self.dbqueue["Read"].append({"SQL": sql, "KEY": "RunStats_Pass"})
+
+			sql = "SELECT "
+			if len(gblist)>0:
+				sql += 	gbcols
+				sql += 	", "
+			sql += 		"result_name, "
+			sql += 		"result, "
+			sql += 		"count(*) 'count' "
+			sql += "FROM Results "
+			sql += "WHERE result <> 'PASS' "
 			sql += "GROUP BY  "
 			sql += 		gbcols
 
-		# round(-4.535,2);
+			# sql = """SELECT
+			# 			script_index,
+			# 			sequence,
+			# 			result_name,
+			# 			result,
+			# 			count(*) 'count'
+			# 		FROM Results
+			# 		WHERE result <> 'PASS'
+			# 		GROUP BY 	script_index,
+			# 					sequence,
+			# 					result_name"""
 
-		# sql = """SELECT
-		# 			script_index,
-		# 			sequence,
-		# 			result_name,
-		# 			result,
-		# 			count(*) 'count',
-		# 			min(elapsed_time) 'min',
-		# 			avg(elapsed_time) 'avg',
-		# 			max(elapsed_time) 'max'
-		# 		FROM Results
-		# 		WHERE result = 'PASS'
-		# 		GROUP BY script_index, sequence, result_name"""
+			# print("delayed_UpdateRunStats:	sql:", sql)
 
-		# print("delayed_UpdateRunStats:	sql:", sql)
+			self.dbqueue["Read"].append({"SQL": sql, "KEY": "RunStats_NotPass"})
 
-		self.dbqueue["Read"].append({"SQL": sql, "KEY": "RunStats_Pass"})
-
-		sql = "SELECT "
-		if len(gblist)>0:
-			sql += 	gbcols
-			sql += 	", "
-		sql += 		"result_name, "
-		sql += 		"result, "
-		sql += 		"count(*) 'count' "
-		sql += "FROM Results "
-		sql += "WHERE result <> 'PASS' "
-		sql += "GROUP BY  "
-		sql += 		gbcols
-
-		# sql = """SELECT
-		# 			script_index,
-		# 			sequence,
-		# 			result_name,
-		# 			result,
-		# 			count(*) 'count'
-		# 		FROM Results
-		# 		WHERE result <> 'PASS'
-		# 		GROUP BY 	script_index,
-		# 					sequence,
-		# 					result_name"""
-
-		# print("delayed_UpdateRunStats:	sql:", sql)
-
-		self.dbqueue["Read"].append({"SQL": sql, "KEY": "RunStats_NotPass"})
-
-		time.sleep(1)
-		self.UpdateRunStats()
+			time.sleep(1)
+			self.UpdateRunStats()
 
 	def UpdateRunStats(self):
 		rnum = 0
 		removestat = []
 
-		stm = time.localtime(self.robot_schedule["Start"])
-		self.display_run['start_time'].set("  {}  ".format(time.strftime("%H:%M:%S", stm)))
-		etm = time.gmtime(int(time.time()) - self.robot_schedule["Start"])
-		self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
+		if "Start" in self.robot_schedule:
+			stm = time.localtime(self.robot_schedule["Start"])
+			self.display_run['start_time'].set("  {}  ".format(time.strftime("%H:%M:%S", stm)))
+			etm = time.gmtime(int(time.time()) - self.robot_schedule["Start"])
+			self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
 
 		time_elapsed = int(time.time()) - self.rungridupdate
 		if (time_elapsed>5):
@@ -1129,19 +1213,43 @@ class RFSwarmGUI(tk.Frame):
 
 					colno += 1
 
+				colno += -1
 				grdcols = self.rungrid.grid_size()[0]-1
+				# print("UpdateRunStats: grdcols:", grdcols, "	colno:",colno)
+				if grdcols>colno:
+					# print("UpdateRunStats: need to remove columns grdcols:", grdcols, "	colno:",colno)
+					c = grdcols
+					while c>colno:
+						# print("UpdateRunStats: need to remove rows c:", c, "	colno:",colno)
+						relmts = self.rungrid.grid_slaves(row=None, column=c)
+						# print(relmts)
+						for elmt in relmts:
+							elmt.destroy()
+						c += -1
+
+
+				datarows = len(self.dbqueue["ReadResult"]["RunStats_Pass"])
+				grdrows = self.rungrid.grid_size()[1]-1
+				# print("UpdateRunStats: grdrows:", grdrows, " > datarows:",datarows)
+				if grdrows>datarows:
+					# print("UpdateRunStats: need to remove rows grdrows:", grdrows, " > datarows:",datarows)
+					r = grdrows
+					while r>datarows:
+						# print("UpdateRunStats: need to remove rows r:", r, " > datarows:",datarows)
+						relmts = self.rungrid.grid_slaves(row=r, column=None)
+						# print(relmts)
+						for elmt in relmts:
+							elmt.destroy()
+						r += -1
+
 				rowno = 1
 				for row in self.dbqueue["ReadResult"]["RunStats_Pass"]:
 					newrow = False
-					grdrows = self.agenttgrid.grid_size()[1]
+					grdrows = self.rungrid.grid_size()[1]
 					# print("UpdateRunStats: grdrows:", grdrows)
 
 					if rowno not in self.display_run["rows"]:
 						self.display_run["rows"][rowno] = {}
-						newrow = True
-					if rowno>grdrows:
-						newrow = True
-					# print("UpdateRunStats: newrow:", newrow)
 
 					colno = 0
 					newcell = False
@@ -1149,12 +1257,15 @@ class RFSwarmGUI(tk.Frame):
 						# print("UpdateRunStats: colno:", colno, "col:", col)
 						# print("UpdateRunStats: row[col]:", row[col])
 						if colno>len(self.display_run["rows"][rowno])-1:
-							newcell = True
 							self.display_run["rows"][rowno][colno] = tk.StringVar()
 
 						self.display_run["rows"][rowno][colno].set("  {}  ".format(row[col]))
 
-						if newrow or newcell:
+						relmts = self.rungrid.grid_slaves(row=rowno, column=colno)
+						# print("UpdateRunStats: relmts:", relmts)
+
+						# if newrow or newcell:
+						if len(relmts) < 1:
 							usr = ttk.Label(self.rungrid, textvariable=self.display_run["rows"][rowno][colno], borderwidth=2, relief="groove")
 							usr.grid(column=colno, row=rowno, sticky="nsew")
 
@@ -1163,22 +1274,7 @@ class RFSwarmGUI(tk.Frame):
 
 					rowno += 1
 
-				# self.display_run["columns"]
-				# self.display_agents[rnum]["Agent"] = tk.StringVar()
 
-				# usr = ttk.Label(self.rungrid, textvariable=self.display_run["columns"][colno], borderwidth=2, relief="groove")
-				# usr = ttk.Label(self.rungrid, text="  Status  ", borderwidth=2, relief="raised")
-
-				# self.display_run
-				# self.display_run["columns"] = self.dbqueue["ReadResult"][0].keys()
-				# for col in self.display_run["columns"]:
-				# 	usr = ttk.Label(self.agenttgrid, text="  Status  ", borderwidth=2, relief="raised")
-				# 	usr.grid(column=0, row=0, sticky="nsew")
-
-			# self.rungrid
-			# grdrows = self.agenttgrid.grid_size()[1]-1
-
-			# if rnum>0:
 			ut = threading.Thread(target=self.delayed_UpdateRunStats)
 			ut.start()
 
@@ -1463,7 +1559,7 @@ class RFSwarmGUI(tk.Frame):
 		# print(fg)
 		# print(fg[1].get())
 		# root.filename = tkFileDialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
-		scriptfile = str(tkf.askopenfilename(initialdir=self.lastdir, title = "Select Robot Framework File", filetypes = (("Robot Framework","*.robot"),("all files","*.*"))))
+		scriptfile = str(tkf.askopenfilename(initialdir=self.config['Plan']['LastDir'], title = "Select Robot Framework File", filetypes = (("Robot Framework","*.robot"),("all files","*.*"))))
 		# print("scriptfile:", scriptfile)
 		if len(scriptfile)>0:
 			fg[1].configure(state='normal')
@@ -1485,7 +1581,8 @@ class RFSwarmGUI(tk.Frame):
 			t = threading.Thread(target=self.find_dependancies, args=(script_hash, ))
 			t.start()
 
-			self.lastdir = os.path.dirname(scriptfile)
+			self.config['Plan']['LastDir'] = os.path.dirname(scriptfile)
+			self.saveini()
 			self.sr_test_genlist(r)
 		else:
 			fg[1].configure(state='normal')
@@ -2135,6 +2232,12 @@ class RFSwarmGUI(tk.Frame):
 
 		ut = threading.Thread(target=self.delayed_UpdateRunStats)
 		ut.start()
+
+
+	def str2bool(self, instr):
+		if instr in ["True", "true", "TRUE", "YES", "yes", "Yes", "1"]:
+			return True
+		return False
 
 rfs = RFSwarmGUI()
 print("Robot Framework Swarm: Run GUI")
