@@ -463,6 +463,10 @@ class RFSwarmAgent():
 		self.robotcount += -1
 
 	def run_process_output(self, outputFile, index, vuser, iter):
+		# This should be a better way to do this
+		# https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#listener-interface
+		# https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#listener-examples
+
 		seq = 0
 		# .//kw[@library!='BuiltIn' and msg]
 		# .//kw[@library!='BuiltIn' and msg]/msg
