@@ -369,7 +369,8 @@ class RFSwarmGUI(tk.Frame):
 	# def mainloop(self):
 	# 	pass
 
-	def on_closing(self):
+	def on_closing(self, _event=None):
+		# , _event=None is required for any function that has a shortcut key bound to it
 
 		print("on_closing: Close Scenario")
 		sf = self.config['Plan']['ScenarioFile']
@@ -436,21 +437,45 @@ class RFSwarmGUI(tk.Frame):
 		# creating sub menus in the root menu
 		file_menu = tk.Menu(root_menu) # it intializes a new su menu in the root menu
 		root_menu.add_cascade(label = "File", menu = file_menu) # it creates the name of the sub menu
-		file_menu.add_command(label = "New", command = self.mnu_file_New, accelerator="Command-N") # it adds a option to the sub menu 'command' parameter is used to do some action
-		file_menu.add_command(label = "Open", command = self.mnu_file_Open, accelerator="Command-O")
-		file_menu.add_command(label = "Save", command = self.mnu_file_Save, accelerator="Command-S")
-		file_menu.add_command(label = "Save As", command = self.mnu_file_SaveAs, accelerator="Command-A")
-		file_menu.add_command(label = "Close", command = self.mnu_file_Close, accelerator="Command-L")
 
-		# file_menu.add_separator() # it adds a line after the 'Open files' option
-		# file_menu.add_command(label = "Exit", command = self.on_closing, accelerator="Command-N")
-		file_menu.add_command(label = "Quit", command = self.on_closing, accelerator="Command-Q")
+		accelkey = "Ctrl"
+		if sys.platform.startswith('darwin'):
+			accelkey = "Command"
+
+		file_menu.add_command(label = "New", command = self.mnu_file_New, accelerator="{}-n".format(accelkey)) # it adds a option to the sub menu 'command' parameter is used to do some action
+		window.bind('n', self.mnu_file_New)
+		file_menu.add_command(label = "Open", command = self.mnu_file_Open, accelerator="{}-o".format(accelkey))
+		window.bind('o', self.mnu_file_Open)
+		file_menu.add_command(label = "Save", command = self.mnu_file_Save, accelerator="{}-s".format(accelkey))
+		window.bind('s', self.mnu_file_Save)
+		file_menu.add_command(label = "Save As", command = self.mnu_file_SaveAs, accelerator="{}-a".format(accelkey))
+		window.bind('a', self.mnu_file_SaveAs)
+		file_menu.add_command(label = "Close", command = self.mnu_file_Close, accelerator="{}-l".format(accelkey))
+		window.bind('l', self.mnu_file_Close)
+
+		file_menu.add_separator() # it adds a line after the 'Open files' option
+		# if sys.platform.startswith('darwin'):
+		# 	file_menu.add_command(label = "Quit", command = self.on_closing, accelerator="Command-q")
+		# 	window.bind('q', self.on_closing)  # This doesn't work yet, the mac python overrides it ?
+		# else:
+		file_menu.add_command(label = "Exit", command = self.on_closing, accelerator="{}-x".format(accelkey))
+		window.bind('x', self.on_closing)
 
 		# # creting another sub menu
 		# edit_menu = tk.Menu(root_menu)
 		# root_menu.add_cascade(label = "Edit", menu = edit_menu)
 		# edit_menu.add_command(label = "Undo", command = function)
 		# edit_menu.add_command(label = "Redo", command = function)
+
+
+		# creting another sub menu
+		run_menu = tk.Menu(root_menu)
+		root_menu.add_cascade(label = "Run", menu = run_menu)
+		run_menu.add_command(label = "Play", command = self.ClickPlay, accelerator="{}-p".format(accelkey))
+		window.bind('p', self.ClickPlay)
+		run_menu.add_command(label = "Stop", command = self.ClickStop, accelerator="{}-t".format(accelkey))
+		window.bind('t', self.ClickStop)
+
 
 		window.protocol("WM_DELETE_WINDOW", self.on_closing)
 		window.protocol("WM_QUERYENDSESSION", self.on_closing)
@@ -485,15 +510,47 @@ class RFSwarmGUI(tk.Frame):
 
 		self.updateTitle()
 
-		p.columnconfigure(0, weight=2)
-		p.rowconfigure(0, weight=1)
-		# p.rowconfigure(1, weight=1)
+		planrow = 0
+		p.columnconfigure(planrow, weight=1)
+		p.rowconfigure(planrow, weight=1)
+		# Button Bar
+
+		bbar = ttk.Frame(p)
+		bbar.grid(column=0, row=planrow, sticky="nsew")
+		bbargrid = ttk.Frame(bbar)
+		bbargrid.grid(row=0, column=0, sticky="nsew")
+		# new
+		btnno = 0
+		bnew = ttk.Button(bbargrid, text="New", command=self.mnu_file_New)	# , image=icon
+		bnew.grid(column=btnno, row=0, sticky="nsew")
+		# open
+		btnno += 1
+		bnew = ttk.Button(bbargrid, text="Open", command=self.mnu_file_Open)
+		bnew.grid(column=btnno, row=0, sticky="nsew")
+		# save
+		btnno += 1
+		bnew = ttk.Button(bbargrid, text="Save", command=self.mnu_file_Save)
+		bnew.grid(column=btnno, row=0, sticky="nsew")
+		# play
+		btnno += 1
+		bnew = ttk.Button(bbargrid, text="Play", command=self.ClickPlay)
+		bnew.grid(column=btnno, row=0, sticky="nsew")
+
+
+		planrow += 1
+		p.columnconfigure(planrow, weight=2)
+		p.rowconfigure(planrow, weight=1)
+		# Plan Graph
+
 		self.pln_graph = tk.Canvas(p)
 		self.pln_graph.pack(fill="both", expand=True)
-		self.pln_graph.grid(column=0, row=0, sticky="nsew") # sticky="wens"
+		self.pln_graph.grid(column=0, row=planrow, sticky="nsew") # sticky="wens"
+
+		planrow += 1
+		# Plan scripts
 
 		sg = ttk.Frame(p)
-		sg.grid(column=0, row=1, sticky="nsew")
+		sg.grid(column=0, row=planrow, sticky="nsew")
 		self.scriptgrid = ttk.Frame(sg)
 		self.scriptgrid.grid(row=0, column=0, sticky="nsew")
 
@@ -1346,7 +1403,7 @@ class RFSwarmGUI(tk.Frame):
 			ut.start()
 
 
-	def ClickPlay(self):
+	def ClickPlay(self, _event=None):
 		self.sr_validate()
 		# print(self.tabs.tabs())
 		self.tabs.select(1)
@@ -1367,7 +1424,7 @@ class RFSwarmGUI(tk.Frame):
 		t.start()
 
 
-	def ClickStop(self):
+	def ClickStop(self, _event=None):
 		self.run_end = int(time.time()) #time now
 		print("ClickStop: run_end", self.run_end)
 		self.robot_schedule["End"] = self.run_end
@@ -1483,7 +1540,10 @@ class RFSwarmGUI(tk.Frame):
 			r = args[0]
 			dly = self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].get()
 			# print("Row:", r, "Delay:", dly)
-			self.scriptlist[r]["Delay"] = int(dly)
+			if len(dly)>0:
+				self.scriptlist[r]["Delay"] = int(dly)
+			else:
+				self.scriptlist[r]["Delay"] = 0
 			self.pln_update_graph()
 			return True
 		# print(self.scriptgrid.grid_size())
@@ -2317,7 +2377,7 @@ class RFSwarmGUI(tk.Frame):
 	#
 	# menu functions
 	#
-	def mnu_file_New(self):
+	def mnu_file_New(self, _event=None):
 		print("mnu_file_New")
 		if len(self.config['Plan']['ScenarioFile'])>0:
 			self.mnu_file_Close()
@@ -2330,13 +2390,13 @@ class RFSwarmGUI(tk.Frame):
 		self.addScriptRow()
 
 
-	def mnu_file_Open(self):
+	def mnu_file_Open(self, _event=None):
 		print("mnu_file_Open")
 		ScenarioFile = str(tkf.askopenfilename(initialdir=self.config['Plan']['ScriptDir'], title = "Select RFSwarm Scenario File", filetypes = (("RFSwarm","*.rfs"),("all files","*.*"))))
 		print("mnu_file_Open: ScenarioFile:", ScenarioFile)
 
 
-	def mnu_file_Save(self):
+	def mnu_file_Save(self, _event=None):
 		print("mnu_file_Save")
 		if len(self.config['Plan']['ScenarioFile'])<1:
 			self.mnu_file_SaveAs()
@@ -2387,7 +2447,7 @@ class RFSwarmGUI(tk.Frame):
 
 			self.updateTitle()
 
-	def mnu_file_SaveAs(self):
+	def mnu_file_SaveAs(self, _event=None):
 		print("mnu_file_SaveAs")
 		# asksaveasfilename
 		ScenarioFile = str(tkf.asksaveasfilename(\
@@ -2406,7 +2466,7 @@ class RFSwarmGUI(tk.Frame):
 			self.config['Plan']['ScenarioFile'] = ScenarioFile
 			self.mnu_file_Save()
 
-	def mnu_file_Close(self):
+	def mnu_file_Close(self, _event=None):
 		print("mnu_file_Close")
 		MsgBox = tkm.askyesno('Save Scenario','Do you want to save the current scenario?')
 		print("mnu_file_Close: MsgBox:", MsgBox)
@@ -2415,6 +2475,24 @@ class RFSwarmGUI(tk.Frame):
 
 		self.config['Plan']['ScenarioFile'] = ""
 		self.mnu_file_New()
+
+	# # https://www.daniweb.com/programming/software-development/code/216634/jpeg-image-embedded-in-python
+	# def get_icon(self, icontext):
+	# 	# http://www.famfamfam.com/lab/icons/silk/
+	# 	files = {}
+	# 	files["New"] = "famfamfam_silk_icons/icons/page_white.png"
+	# 	files["Save"] = "famfamfam_silk_icons/icons/disk.png"
+	# 	files["SaveAs"] = "famfamfam_silk_icons/icons/disk_multiple.png"
+	# 	files["Open"] = "famfamfam_silk_icons/icons/folder_explore.png"
+	# 	files["Play"] = "famfamfam_silk_icons/icons/resultset_next.png"
+	# 	files["Stop"] = "famfamfam_silk_icons/icons/stop.png"
+	#
+	# 	if icontext in files:
+	# 		pngfile = files[icontext]
+	# 		png_text = 'png_b64 = \\\n"""' + base64.encodestring(open(pngfile,"rb").read()) + '"""'
+	# 		print(png_text)
+	#
+	# 	pass
 
 	#
 	# End class RFSwarmGUI
