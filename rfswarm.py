@@ -50,6 +50,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer, HTTPServer
 import urllib.parse
 import json
 
+
+from PIL import Image, ImageTk
+
 __name__ = "rfswarm"
 
 
@@ -488,6 +491,12 @@ class RFSwarmGUI(tk.Frame):
 
 		signal.signal(signal.SIGTERM, self.on_closing)
 
+		# self.get_icon("New")
+		# self.get_icon("Save")
+		# self.get_icon("SaveAs")
+		# self.get_icon("Open")
+		# self.get_icon("Play")
+		# self.get_icon("Stop")
 
 
 	def BuildPlan(self, p):
@@ -521,20 +530,28 @@ class RFSwarmGUI(tk.Frame):
 		bbargrid.grid(row=0, column=0, sticky="nsew")
 		# new
 		btnno = 0
-		bnew = ttk.Button(bbargrid, text="New", command=self.mnu_file_New)	# , image=icon
+		# self.iconew = self.get_icon("New")
+		# bnew = ttk.Button(bbargrid, image=self.iconew, padding='3 3 3 3', command=self.mnu_file_New)
+		bnew = ttk.Button(bbargrid, text="New", command=self.mnu_file_New)
 		bnew.grid(column=btnno, row=0, sticky="nsew")
 		# open
 		btnno += 1
-		bnew = ttk.Button(bbargrid, text="Open", command=self.mnu_file_Open)
-		bnew.grid(column=btnno, row=0, sticky="nsew")
+		# self.icoopen = self.get_icon("Open")
+		# bopen = ttk.Button(bbargrid, image=self.icoopen, padding='3 3 3 3', command=self.mnu_file_Open)
+		bopen = ttk.Button(bbargrid, text="Open", command=self.mnu_file_Open)
+		bopen.grid(column=btnno, row=0, sticky="nsew")
 		# save
 		btnno += 1
-		bnew = ttk.Button(bbargrid, text="Save", command=self.mnu_file_Save)
-		bnew.grid(column=btnno, row=0, sticky="nsew")
+		# self.icoSave = self.get_icon("Save")
+		# bSave = ttk.Button(bbargrid, image=self.icoSave, padding='3 3 3 3', command=self.mnu_file_Save)
+		bSave = ttk.Button(bbargrid, text="Save", command=self.mnu_file_Save)
+		bSave.grid(column=btnno, row=0, sticky="nsew")
 		# play
 		btnno += 1
-		bnew = ttk.Button(bbargrid, text="Play", command=self.ClickPlay)
-		bnew.grid(column=btnno, row=0, sticky="nsew")
+		self.icoPlay = self.get_icon("Play")
+		bPlay = ttk.Button(bbargrid, image=self.icoPlay, padding='3 3 3 3', command=self.ClickPlay)
+		# bPlay = ttk.Button(bbargrid, text="Play", command=self.ClickPlay)
+		bPlay.grid(column=btnno, row=0, sticky="nsew")
 
 
 		planrow += 1
@@ -2477,21 +2494,64 @@ class RFSwarmGUI(tk.Frame):
 		self.mnu_file_New()
 
 	# # https://www.daniweb.com/programming/software-development/code/216634/jpeg-image-embedded-in-python
-	# def get_icon(self, icontext):
-	# 	# http://www.famfamfam.com/lab/icons/silk/
-	# 	files = {}
-	# 	files["New"] = "famfamfam_silk_icons/icons/page_white.png"
-	# 	files["Save"] = "famfamfam_silk_icons/icons/disk.png"
-	# 	files["SaveAs"] = "famfamfam_silk_icons/icons/disk_multiple.png"
-	# 	files["Open"] = "famfamfam_silk_icons/icons/folder_explore.png"
-	# 	files["Play"] = "famfamfam_silk_icons/icons/resultset_next.png"
-	# 	files["Stop"] = "famfamfam_silk_icons/icons/stop.png"
-	#
-	# 	if icontext in files:
-	# 		pngfile = files[icontext]
-	# 		png_text = 'png_b64 = \\\n"""' + base64.encodestring(open(pngfile,"rb").read()) + '"""'
-	# 		print(png_text)
-	#
+	def get_icon(self, icontext):
+		print("get_icon: icontext:", icontext)
+		# http://www.famfamfam.com/lab/icons/silk/
+		files = {}
+		files["New"] = "famfamfam_silk_icons/icons/page_white.png"
+		files["Save"] = "famfamfam_silk_icons/icons/disk.png"
+		files["SaveAs"] = "famfamfam_silk_icons/icons/disk_multiple.png"
+		files["Open"] = "famfamfam_silk_icons/icons/folder_explore.png"
+		files["Play"] = "famfamfam_silk_icons/icons/resultset_next.png"
+		files["Stop"] = "famfamfam_silk_icons/icons/stop.png"
+		# files["New"] = "famfamfam_silk_icons/icons/_finder.png"
+		# files["Play"] = "famfamfam_silk_icons/icons/_finder.png"
+
+		if icontext in files:
+			scrdir = os.path.dirname(__file__)
+			# print("get_icon: scrdir:", scrdir)
+			pngfile = os.path.join(scrdir, files[icontext])
+			# print("get_icon: pngfile:", pngfile)
+			if os.path.isfile(pngfile):
+				print("get_icon: isfile: pngfile:", pngfile)
+				with open(pngfile,"rb") as f:
+					png_raw = f.read()
+				# png_rawo = Image.open(pngfile)
+				# png_raw = ImageTk.PhotoImage(png_rawo)
+				print("get_icon: png_raw:", png_raw)
+				b64 = base64.encodestring(png_raw)
+				png_text = 'png_b64 = \\\n"""{}"""'.format(b64)
+				print(png_text)
+				test = base64.b64decode(b64)
+				print(test)
+				buttonPhoto = ImageTk.PhotoImage(data=test)
+				return buttonPhoto
+
+
+
+				buttonImage = Image.open(pngfile)
+				buttonPhoto = ImageTk.PhotoImage(buttonImage)
+				return buttonPhoto
+
+
+
+		# png_b64 = """b'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAAK/INwWK6QAAABl0RVh0\nU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAC4SURBVCjPdZFbDsIgEEWnrsMm7oGGfZro\nhxvU+Iq1TyjU60Bf1pac4Yc5YS4ZAtGWBMk/drQBOVwJlZrWYkLhsB8UV9K0BUrPGy9cWbng2CtE\nEUmLGppPjRwpbixUKHBiZRS0p+ZGhvs4irNEvWD8heHpbsyDXznPhYFOyTjJc13olIqzZCHBouE0\nFRMUjA+s1gTjaRgVFpqRwC8mfoXPPEVPS7LbRaJL2y7bOifRCTEli3U7BMWgLzKlW/CuebZPAAAA\nAElFTkSuQmCC\n'"""
+
+		b64 = {}
+		b64["New"] = """iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAAK/INwWK6QAAABl0RVh0\nU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAC4SURBVCjPdZFbDsIgEEWnrsMm7oGGfZro\nhxvU+Iq1TyjU60Bf1pac4Yc5YS4ZAtGWBMk/drQBOVwJlZrWYkLhsB8UV9K0BUrPGy9cWbng2CtE\nEUmLGppPjRwpbixUKHBiZRS0p+ZGhvs4irNEvWD8heHpbsyDXznPhYFOyTjJc13olIqzZCHBouE0\nFRMUjA+s1gTjaRgVFpqRwC8mfoXPPEVPS7LbRaJL2y7bOifRCTEli3U7BMWgLzKlW/CuebZPAAAA\nAElFTkSuQmCC\n"""
+		b64["Save"] = """iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0\nU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAH+SURBVBgZBcE9i11VGAbQtc/sO0OCkqhg\nhEREAwpWAWUg8aMVf4KFaJEqQtAipTZWViKiCGOh2Ap2gmJhlSIWFsFOxUK0EsUM3pl79n4f12qH\nb3z3Fh7D83gC95GOJsDe0ixLk5Qq/+xv/Lw9Xd+78/HLX3Y8fXTr2nWapy4eCFKxG7Fby97SnDlY\ntMbxthyfzHO//nl85fNvfvnk8MbX5xa8IHx1518Vkrj54Q+qQms2vVmWZjdiu5ZR2rT01166/NCZ\ng/2PFjwSVMU6yjoC1oq+x6Y3VbHdlXWExPd379nf7Nmejv2Os6OC2O4KLK0RNn3RNCdr2Z5GJSpU\n4o+/TkhaJ30mEk5HwNuvX7Hpi76wzvjvtIwqVUSkyjqmpHS0mki8+9mPWmuWxqYvGkbFGCUAOH/+\nQevYI9GFSqmaHr5wkUYTAlGhqiRRiaqiNes6SOkwJwnQEqBRRRJEgkRLJGVdm6R0GLMQENE0Ekmk\nSkQSVVMqopyuIaUTs0J455VLAAAAAODW0U/GiKT0pTWziEj44PZ1AAAAcPPqkTmH3QiJrlEVDXDt\n0qsAAAAAapa5BqUnyaw0Am7//gUAAAB49tEXzTmtM5KkV/y2G/X4M5fPao03n/sUAAAAwIX7y5yB\nv9vhjW/fT/IkuSp5gJKElKRISYoUiSRIyD1tufs/IXxui20QsKIAAAAASUVORK5CYII=\n"""
+		b64["SaveAs"] = """iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0\nU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAJFSURBVDjLpZPNS1RhFMZ/5733zkzjR/ZB\nCUpoJdUiBCkll4m0CUKJIGpVSLjyL2gntDFop6shAolWbcSNIW0ircHBUHCloo3VjNY0jjP3831b\nWA5ai8Bnfc7vPOfhHDHGcBjZAENji7N1cSj7IcdqY2zkKoiC2qSFNsKPYoXpTPbBynj/4j8BlbLL\n9c4L3OqoZWLmM4/vXdpX9OJtHq0lBXQdBIgxhvtPZmZ7ui+yspZrjwKfWExxtMbh66YLAgj4geZn\nyd2YzmT7Vsb75/c5UEqwDLgVl55r57hxuYY3c18Y6mtDgO1KSBBETMwV0VpeA2f3ARKOwvUCcgWX\n9bzH0NhqvC4Okx9zBzNpPdGQ4OHIrJnOZLtWxvs/2AChNnhRiFIKy8j/ZjILiALYLgc4YnO8zsJS\nIWUv4Pt2CMBU+tteoxtC0YN8wUdEV1eItMHCIdSagru5l0kQaZ4OdqC1wQAWhqQNnudR3PGrANu2\naGmE9FJATSxJwinhegHDr1ZRAmGk0ZHGAMYYMJB0dh0ogOVs6VNqcoGtosYv1+9lYikHERvBQsQC\nozBGCMIQ3w+rDtKjvQMAd4bfL59vFqYzQasjNoM36wi1vzvHgBFNwo4x8nKNreJOFfBHy9nSXGpy\noSPSYOGgqZCae8TJ5BkERb68zsDVZygSlD3/b0B6tPf2byempRFO127T095JQ6wJFBTcJk7VhCRj\nYItUT/mgrgxOvWtrPtLdEG8gYdcT6gDRGjERWsosrS2TKwbMP78rcth3/gX/0SEvLZFG1QAAAABJ\nRU5ErkJggg==\n"""
+		b64["Open"] = """iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0\nU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAI5SURBVBgZpcE9SFVhAMfh33vue49X85ih\n1tUI0cXbF7QkCA5BQVAtbU3VUC3O0dbHWHNQUxE0NQYREUU0BoHUYB9qVJRdLe/V+6HnnPe8/4xu\n5NIQPo+RxEbYdw/2Txa6du0yJuAvEddmPmeuOgbErGf4pTFy7LVjjTUKSjvGb+eNMSDWCIzBrX4f\nLk9e+SwQLbmwS8rS+frc0/PAPdZYnFbxSVv87QZZkoOgC2MiCgMHGRi9GiIBHuQBYYLO4vv74xeB\ne6yxpCaQT8iSEHnhVz6RNsrU55+RL/SDUvAJkgMcUelCiPwgLRajgncrJE1Q0iCtLROVTlHo2QkY\nQIAHCRDGdkMWWFosaYBt30r3zjOABwnh8ckXXPUJ04u9fFgeZGGlSHtbnp5NdQbcFkOLJZWUreKb\nr1C2hLIaclV8WmG6UuRjeoDSUCd78jnmlxIqtZjZztN2N78FxEje4dMFfLKAT8r4pIzSBabqBxne\n1kElNswtZziTY/vWiObmsRwtlkQyZMgtIldFroqyJeSWqK8khGEeFzu8IHaiYHM4Wf6wSnzFNX90\npPUwwkeBlAcfgXrpaMuTpBlpBs6LX2Sg2Wjwh9VqfG325vFRxCEMEetEI8P5WvFILmoPiTNhA8Pc\nYop+vNWjSxOnDl95fMdI4l+uP/w41GY5uaUzvOwFy43Yu/KUGe/7ahozz2uzUy/PGUn8j/uXj54t\n9hev9Q3t637z4mHTSOJ/3Z0onegf3nvLe9duJLERPwFUpzZM2BWatgAAAABJRU5ErkJggg==\n"""
+		b64["Play"] = """iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0\nU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAEdSURBVDjLY/j//z8DJZiB6gY0rH7xpW7l\ni3YKDHj1v2bli38lix61k2VA5fJn/9eeeP+/fcOL/wlT7/aRbEDegkf/Vxx/93/xobf/S5c8/u/e\ncm0eSQYkTX/4f+HBN/8nbX/xf+bul/8Tp9/9r1N0dgnRBgT33QZqfPW/YdXj/42rH//v2vjkv3fH\ntf9SScceEWWAc8u1/xO2Pv9fsvjB//IlD4CGPPrvXH/5v2Tksc1EGWBaful/+/on/4sW3gfGxsP/\n9lUX/ksEH1gj6rqdhSgDlPPO/q9b8fB/5bIH/23LL/wXD9i7kqRAlEo6+b908f3/NiXn/4t57V1E\ncjRKRB75b1145r+o684FZCUkMb8D/0Uct88euMxEKgYA7Ojrv4CgE7EAAAAASUVORK5CYII=\n"""
+		b64["Stop"] = """iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0\nU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAJOSURBVDjLpZI9T1RBFIaf3buAoBgJ8rl6\nQVBJVNDCShMLOhBj6T+wNUaDjY0WmpBIgYpAjL/AShJ+gVYYYRPIony5IETkQxZ2770zc2fGYpfl\nQy2MJzk5J5M5z/vO5ESstfxPxA4erL4Zuh4pLnoaiUZdq7XAGKzRJVbIBZ3JPLJaD9c/eCj/CFgZ\nfNl5qK5q8EhTXdxxLKgQjAFr0NK0ppOpt9n51D2gd2cmsvOElVcvOoprKvuPtriNzsY8rH+H0ECo\nQEg4WklY1czP8akZby51p6G3b6QAWBl43llSVTlUfuZE3NmYh9Vl0HkHSuVq4ENFNWFdC+uJ5JI/\n9/V2Y//rkShA1HF6yk/VxJ0f07CcgkCB7+fSC8Dzcy7mp4l9/khlUzwecaI9hT+wRrsOISylcsph\nCFLl1RXIvBMpYDZJrKYRjHELACNEgC/KCQQofWBQ5nuV64UAP8AEfrDrQEiLlJD18+p7BguwfAoB\nUmKEsLsAGZSiFWxtgWWP4gGAkuB5YDRWylKAKIDJZBa1H8Kx47C1Cdls7qLnQTZffQ+20lB7EiU1\nent7sQBQ6+vdq2PJ5dC9ABW1sJnOQbL5Qc/HpNOYehf/4lW+jY4vh2tr3fsWafrWzRtlDW5f9aVz\njUVj72FmCqzBypBQCKzbjLp8jZUPo7OZyYm7bYkvw/sAAFMd7V3lp5sGqs+fjRcZhVYKY0xupwys\nfpogk0jcb5ucffbbKu9Esv1Kl1N2+Ekk5rg2DIXRmog1Jdr3F/Tm5mO0edc6MSP/CvjX+AV0DoH1\nZ+D54gAAAABJRU5ErkJggg==\n"""
+
+
+		if icontext in b64:
+			img = base64.b64decode(b64[icontext])
+			buttonPhoto = ImageTk.PhotoImage(data=img)
+			print("get_icon: buttonPhoto:", buttonPhoto)
+
+			return buttonPhoto
 	# 	pass
 
 	#
