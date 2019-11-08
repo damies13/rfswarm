@@ -7,7 +7,7 @@ rfswarm is made up of 2 components, the [GUI / Server](rfswarm_py.md) where you 
 
 - [GUI / Server](#gui--server)
 - [Agents](#Agents)
-- [Robot File handling (transfer from GUI to Agent)](#Robot-File-handling--transfer-from-GUI-to-Agent-)
+- [Robot File handling (transfer from GUI to Agent)](#robot-file-handling-transfer-from-gui-to-agent)
 
 ### GUI / Server
 
