@@ -320,6 +320,8 @@ class RFSwarmGUI(tk.Frame):
 	display_run = {}
 
 
+	imgdata = {}
+
 	dir_path = os.path.dirname(os.path.realpath(__file__))
 	resultsdir = ""
 	run_dbthread = True
@@ -548,9 +550,12 @@ class RFSwarmGUI(tk.Frame):
 		bSave.grid(column=btnno, row=0, sticky="nsew")
 		# play
 		btnno += 1
-		self.icoPlay = self.get_icon("Play")
-		bPlay = ttk.Button(bbargrid, image=self.icoPlay, padding='3 3 3 3', command=self.ClickPlay)
-		# bPlay = ttk.Button(bbargrid, text="Play", command=self.ClickPlay)
+		# icontext = "Play"
+		# self.icoPlay = self.get_icon(icontext)
+
+		# bPlay = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.ClickPlay)
+		# bPlay = ttk.Button(bbargrid, image=self.icoPlay, padding='3 3 3 3', command=self.ClickPlay)
+		bPlay = ttk.Button(bbargrid, text="Play", command=self.ClickPlay)
 		bPlay.grid(column=btnno, row=0, sticky="nsew")
 
 
@@ -610,8 +615,8 @@ class RFSwarmGUI(tk.Frame):
 
 		self.addScriptRow()
 
-		ply = ttk.Button(p, text='Play', command=self.ClickPlay)
-		ply.grid(column=0, row=99) # , sticky="nsew")
+		# ply = ttk.Button(p, text='Play', command=self.ClickPlay)
+		# ply.grid(column=0, row=99) # , sticky="nsew")
 
 
 	def BuildRun(self, r):
@@ -1533,9 +1538,17 @@ class RFSwarmGUI(tk.Frame):
 		pass
 
 	def sr_users_validate(self, *args):
-		# print(args)
+		# print("sr_users_validate: args:",args)
 		if args:
 			r = args[0]
+			v = None
+			if len(args)>1:
+				v = args[1]
+				# print("sr_users_validate: grid_slaves:",self.scriptgrid.grid_slaves(column=self.plancolusr, row=r))
+				# print("sr_users_validate: grid_slaves[0]:",self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0])
+				self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].delete(0,'end')
+				self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].insert(0,v)
+
 			usrs = self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].get()
 			# print("Row:", r, "Users:", usrs)
 			self.scriptlist[r]["Users"] = int(usrs)
@@ -1555,6 +1568,11 @@ class RFSwarmGUI(tk.Frame):
 		# print(args)
 		if args:
 			r = args[0]
+			v = None
+			if len(args)>1:
+				v = args[1]
+				self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].delete(0,'end')
+				self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].insert(0,v)
 			dly = self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].get()
 			# print("Row:", r, "Delay:", dly)
 			if len(dly)>0:
@@ -1577,6 +1595,11 @@ class RFSwarmGUI(tk.Frame):
 		# print(args)
 		if args:
 			r = args[0]
+			v = None
+			if len(args)>1:
+				v = args[1]
+				self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].delete(0,'end')
+				self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].insert(0,v)
 			rmp = self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].get()
 			# print("Row:", r, "RampUp:", rmp)
 			self.scriptlist[r]["RampUp"] = int(rmp)
@@ -1596,6 +1619,11 @@ class RFSwarmGUI(tk.Frame):
 		# print(args)
 		if args:
 			r = args[0]
+			v = None
+			if len(args)>1:
+				v = args[1]
+				self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].delete(0,'end')
+				self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].insert(0,v)
 			run = self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].get()
 			# print("Row:", r, "Run:", run)
 			self.scriptlist[r]["Run"] = int(run)
@@ -1697,17 +1725,20 @@ class RFSwarmGUI(tk.Frame):
 						checking = True
 
 
-	def sr_file_validate(self, r):
+	def sr_file_validate(self, r, *args):
 		# print(r)
 		fg = self.scriptgrid.grid_slaves(column=self.plancolscr, row=r)[0].grid_slaves()
 		# print(fg)
 		# print(fg[1].get())
-		# root.filename = tkFileDialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
-		scriptfile = str(tkf.askopenfilename(initialdir=self.config['Plan']['ScriptDir'], title = "Select Robot Framework File", filetypes = (("Robot Framework","*.robot"),("all files","*.*"))))
+		if args:
+			scriptfile = args[0]
+		else:
+			scriptfile = str(tkf.askopenfilename(initialdir=self.config['Plan']['ScriptDir'], title = "Select Robot Framework File", filetypes = (("Robot Framework","*.robot"),("all files","*.*"))))
 		# print("scriptfile:", scriptfile)
 		if len(scriptfile)>0:
 			fg[1].configure(state='normal')
 			fg[1].select_clear()
+			fg[1].delete(0, 'end')
 			fg[1].insert(0, os.path.basename(scriptfile))
 			fg[1].configure(state='readonly')
 			self.scriptlist[r]["Script"] = scriptfile
@@ -1751,12 +1782,20 @@ class RFSwarmGUI(tk.Frame):
 		# r = int(args[0][-1:])+1
 		r = int(args[0][3:])
 		# print("sr_test_validate: r:", r)
+
 		# if 0 in self.scriptgrid.grid_slaves:
 		# print("sr_test_validate: grid_slaves:", self.scriptgrid.grid_slaves(column=self.plancoltst, row=r))
 		tol = self.scriptgrid.grid_slaves(column=self.plancoltst, row=r)[0]
-		# print(tol)
+		# print("sr_test_validate: tol:", tol)
+
+		v = None
+		if len(args)>1:
+			v = args[1]
+			# print("sr_test_validate: v:", v)
+			self.scriptlist[r]["Test"] = self.scriptlist[r]["TestVar"].set(v)
+
 		self.scriptlist[r]["Test"] = self.scriptlist[r]["TestVar"].get()
-		# print(self.scriptlist[r])
+		# print("sr_test_validate: scriptlist[r]:", self.scriptlist[r])
 		self.pln_update_graph()
 		return True
 
@@ -2395,7 +2434,7 @@ class RFSwarmGUI(tk.Frame):
 	# menu functions
 	#
 	def mnu_file_New(self, _event=None):
-		print("mnu_file_New")
+		# print("mnu_file_New")
 		if len(self.config['Plan']['ScenarioFile'])>0:
 			self.mnu_file_Close()
 
@@ -2408,19 +2447,81 @@ class RFSwarmGUI(tk.Frame):
 
 
 	def mnu_file_Open(self, _event=None):
-		print("mnu_file_Open")
-		ScenarioFile = str(tkf.askopenfilename(initialdir=self.config['Plan']['ScriptDir'], title = "Select RFSwarm Scenario File", filetypes = (("RFSwarm","*.rfs"),("all files","*.*"))))
-		print("mnu_file_Open: ScenarioFile:", ScenarioFile)
+		# print("mnu_file_Open")
+		self.mnu_file_Close()	# ensure any previous scenario is closed and saved if required
+		ScenarioFile = str(tkf.askopenfilename(initialdir=self.config['Plan']['ScenarioDir'], title = "Select RFSwarm Scenario File", filetypes = (("RFSwarm","*.rfs"),("all files","*.*"))))
+		# print("mnu_file_Open: ScenarioFile:", ScenarioFile)
+		self.config['Plan']['ScenarioDir'] = os.path.dirname(ScenarioFile)
+		self.config['Plan']['ScenarioFile'] = ScenarioFile
+		self.saveini()
+		self.updateTitle()
+
+		filedata = configparser.ConfigParser()
+		# print("mnu_file_Open: filedata: ", filedata)
+
+		if os.path.isfile(ScenarioFile):
+			# print("mnu_file_Open: ScenarioFile: ", ScenarioFile)
+			filedata.read(ScenarioFile)
+
+		# print("mnu_file_Open: filedata: ", filedata)
+
+		scriptcount = 0
+		if "Scenario" in filedata:
+			# print("mnu_file_Open: Scenario:", filedata["Scenario"])
+			if "scriptcount" in filedata["Scenario"]:
+				scriptcount = int(filedata["Scenario"]["scriptcount"])
+				# print("mnu_file_Open: scriptcount:", scriptcount)
+
+
+		# print("mnu_file_Open: self.scriptgrid:", self.scriptgrid)
+		# print("mnu_file_Open: self.scriptgrid.grid_size():", self.scriptgrid.grid_size())
+		# for r in range(self.scriptgrid.grid_size()[1]):
+
+		for i in range(scriptcount):
+			ii = i+1
+			istr = str(ii)
+			if istr in filedata:
+				# if i not in self.scriptlist:
+				# 	self.scriptlist.append({})
+				# 	self.scriptlist[ii]["Index"] = ii
+				if ii+1 > self.scriptgrid.grid_size()[1]:		# grid_size tupple: (cols, rows)
+					self.addScriptRow()
+				# users = 13
+				# print("mnu_file_Open: filedata[", istr, "][users]:", filedata[istr]["users"])
+				# self.scriptlist[ii]["users"] = filedata[istr]["users"]
+				self.sr_users_validate(ii, int(filedata[istr]["users"]))
+				# delay = 0
+				# print("mnu_file_Open: filedata[", istr, "][delay]:", filedata[istr]["delay"])
+				self.scriptlist[ii]["delay"] = filedata[istr]["delay"]
+				self.sr_delay_validate(ii, int(filedata[istr]["delay"]))
+				# rampup = 60
+				# print("mnu_file_Open: filedata[", istr, "][rampup]:", filedata[istr]["rampup"])
+				self.scriptlist[ii]["rampup"] = filedata[istr]["rampup"]
+				self.sr_rampup_validate(ii, int(filedata[istr]["rampup"]))
+				# run = 600
+				# print("mnu_file_Open: filedata[", istr, "][run]:", filedata[istr]["run"])
+				self.scriptlist[ii]["run"] = filedata[istr]["run"]
+				self.sr_run_validate(ii, int(filedata[istr]["run"]))
+				# script = /Users/dave/Documents/GitHub/rfswarm/robots/OC_Demo_2.robot
+				# print("mnu_file_Open: filedata[", istr, "][script]:", filedata[istr]["script"])
+				self.scriptlist[ii]["script"] = filedata[istr]["script"]
+				self.sr_file_validate(ii, filedata[istr]["script"])
+				# test = Browse Store Product 1
+				# print("mnu_file_Open: filedata[", istr, "][test]:", filedata[istr]["test"])
+				self.scriptlist[ii]["test"] = filedata[istr]["test"]
+				self.sr_test_validate("row{}".format(ii), filedata[istr]["test"])
+
+
 
 
 	def mnu_file_Save(self, _event=None):
-		print("mnu_file_Save")
+		# print("mnu_file_Save")
 		if len(self.config['Plan']['ScenarioFile'])<1:
 			self.mnu_file_SaveAs()
 		else:
 
-			print("mnu_file_Save: ScenarioFile:", self.config['Plan']['ScenarioFile'])
-			print("mnu_file_Save: scriptlist:", self.scriptlist)
+			# print("mnu_file_Save: ScenarioFile:", self.config['Plan']['ScenarioFile'])
+			# print("mnu_file_Save: scriptlist:", self.scriptlist)
 			filedata = configparser.ConfigParser()
 
 			if 'Scenario' not in filedata:
@@ -2465,28 +2566,28 @@ class RFSwarmGUI(tk.Frame):
 			self.updateTitle()
 
 	def mnu_file_SaveAs(self, _event=None):
-		print("mnu_file_SaveAs")
+		# print("mnu_file_SaveAs")
 		# asksaveasfilename
 		ScenarioFile = str(tkf.asksaveasfilename(\
 						initialdir=self.config['Plan']['ScenarioDir'], \
 						title = "Save RFSwarm Scenario File", \
 						filetypes = (("RFSwarm","*.rfs"),("all files","*.*"))\
 						))
-		print("mnu_file_SaveAs: ScenarioFile:", ScenarioFile)
+		# print("mnu_file_SaveAs: ScenarioFile:", ScenarioFile)
 		if ScenarioFile is not None and len(ScenarioFile)>0:
 			# ScenarioFile
 			filetupl = os.path.splitext(ScenarioFile)
-			print("mnu_file_SaveAs: filetupl:", filetupl)
+			# print("mnu_file_SaveAs: filetupl:", filetupl)
 			if filetupl != ".rfs":
 				ScenarioFile += ".rfs"
-				print("mnu_file_SaveAs: ScenarioFile:", ScenarioFile)
+				# print("mnu_file_SaveAs: ScenarioFile:", ScenarioFile)
 			self.config['Plan']['ScenarioFile'] = ScenarioFile
 			self.mnu_file_Save()
 
 	def mnu_file_Close(self, _event=None):
-		print("mnu_file_Close")
+		# print("mnu_file_Close")
 		MsgBox = tkm.askyesno('Save Scenario','Do you want to save the current scenario?')
-		print("mnu_file_Close: MsgBox:", MsgBox)
+		# print("mnu_file_Close: MsgBox:", MsgBox)
 		if MsgBox:
 			self.mnu_file_Save()
 
@@ -2506,6 +2607,7 @@ class RFSwarmGUI(tk.Frame):
 		files["Stop"] = "famfamfam_silk_icons/icons/stop.png"
 		# files["New"] = "famfamfam_silk_icons/icons/_finder.png"
 		# files["Play"] = "famfamfam_silk_icons/icons/_finder.png"
+		files["Play"] = "famfamfam_silk_icons/icons/disk_multiple.png"
 
 		if icontext in files:
 			scrdir = os.path.dirname(__file__)
@@ -2521,16 +2623,21 @@ class RFSwarmGUI(tk.Frame):
 				print("get_icon: png_raw:", png_raw)
 				b64 = base64.encodestring(png_raw)
 				png_text = 'png_b64 = \\\n"""{}"""'.format(b64)
-				print(png_text)
-				test = base64.b64decode(b64)
-				print(test)
-				buttonPhoto = ImageTk.PhotoImage(data=test)
-				return buttonPhoto
+				print("get_icon: png_text:")
+				# print("get_icon: png_text:", png_text)
+				# test = base64.b64decode(b64)
+				# print("get_icon: test:")
+				# buttonPhoto = ImageTk.PhotoImage(data=test)
+				# print("get_icon: buttonPhoto:", buttonPhoto)
+				# return buttonPhoto
 
 
 
 				buttonImage = Image.open(pngfile)
+				print("get_icon: buttonImage:", buttonImage)
 				buttonPhoto = ImageTk.PhotoImage(buttonImage)
+				print("get_icon: buttonPhoto:", buttonPhoto)
+				self.imgdata[icontext] = buttonPhoto
 				return buttonPhoto
 
 
