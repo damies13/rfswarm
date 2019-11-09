@@ -1255,6 +1255,7 @@ class RFSwarmGUI(tk.Frame):
 			sql += 		"round(max(elapsed_time),3) 'max' "
 			sql += "FROM Results "
 			sql += "WHERE result = 'PASS' "
+			sql += "AND start_time>{} ".format(self.robot_schedule["Start"])
 			if len(gblist)>0:
 				sql += "GROUP BY  "
 				sql += 		gbcols
@@ -1287,6 +1288,7 @@ class RFSwarmGUI(tk.Frame):
 			sql += 		"count(*) 'count' "
 			sql += "FROM Results "
 			sql += "WHERE result <> 'PASS' "
+			sql += "AND start_time>{} ".format(self.robot_schedule["Start"])
 			sql += "GROUP BY  "
 			sql += 		gbcols
 
@@ -1330,12 +1332,14 @@ class RFSwarmGUI(tk.Frame):
 
 			# if "RunStats_Pass" in self.dbqueue["ReadResult"]:
 			# 	print("UpdateRunStats: RunStats_Pass:", self.dbqueue["ReadResult"]["RunStats_Pass"])
+			# 	print("UpdateRunStats: len(RunStats_Pass):", len(self.dbqueue["ReadResult"]["RunStats_Pass"]))
 
 			# if "RunStats_NotPass" in self.dbqueue["ReadResult"]:
 			# 	print("UpdateRunStats: RunStats_NotPass:", self.dbqueue["ReadResult"]["RunStats_NotPass"])
 
 			colno = 0
 			if "RunStats_Pass" in self.dbqueue["ReadResult"] and len(self.dbqueue["ReadResult"]["RunStats_Pass"])>0:
+				# print("UpdateRunStats: RunStats_Pass:", self.dbqueue["ReadResult"]["RunStats_Pass"])
 				for col in self.dbqueue["ReadResult"]["RunStats_Pass"][0].keys():
 					# print("UpdateRunStats: colno:", colno, "col:", col)
 					# print("UpdateRunStats: display_run:", self.display_run)
@@ -1359,66 +1363,66 @@ class RFSwarmGUI(tk.Frame):
 
 					colno += 1
 
-				colno += -1
-				grdcols = self.rungrid.grid_size()[0]-1
-				# print("UpdateRunStats: grdcols:", grdcols, "	colno:",colno)
-				if grdcols>colno:
-					# print("UpdateRunStats: need to remove columns grdcols:", grdcols, "	colno:",colno)
-					c = grdcols
-					while c>colno:
-						# print("UpdateRunStats: need to remove rows c:", c, "	colno:",colno)
-						relmts = self.rungrid.grid_slaves(row=None, column=c)
-						# print(relmts)
-						for elmt in relmts:
-							elmt.destroy()
-						c += -1
+			colno += -1
+			grdcols = self.rungrid.grid_size()[0]-1
+			# print("UpdateRunStats: grdcols:", grdcols, "	colno:",colno)
+			if grdcols>colno:
+				# print("UpdateRunStats: need to remove columns grdcols:", grdcols, "	colno:",colno)
+				c = grdcols
+				while c>colno:
+					# print("UpdateRunStats: need to remove rows c:", c, "	colno:",colno)
+					relmts = self.rungrid.grid_slaves(row=None, column=c)
+					# print(relmts)
+					for elmt in relmts:
+						elmt.destroy()
+					c += -1
 
 
-				datarows = len(self.dbqueue["ReadResult"]["RunStats_Pass"])
-				grdrows = self.rungrid.grid_size()[1]-1
-				# print("UpdateRunStats: grdrows:", grdrows, " > datarows:",datarows)
-				if grdrows>datarows:
-					# print("UpdateRunStats: need to remove rows grdrows:", grdrows, " > datarows:",datarows)
-					r = grdrows
-					while r>datarows:
-						# print("UpdateRunStats: need to remove rows r:", r, " > datarows:",datarows)
-						relmts = self.rungrid.grid_slaves(row=r, column=None)
-						# print(relmts)
-						for elmt in relmts:
-							elmt.destroy()
-						r += -1
+			datarows = len(self.dbqueue["ReadResult"]["RunStats_Pass"])
+			grdrows = self.rungrid.grid_size()[1]-1
+			# print("UpdateRunStats: grdrows:", grdrows, " > datarows:",datarows)
+			if grdrows>datarows:
+				# print("UpdateRunStats: need to remove rows grdrows:", grdrows, " > datarows:",datarows)
+				r = grdrows
+				while r>datarows:
+					# print("UpdateRunStats: need to remove rows r:", r, " > datarows:",datarows)
+					relmts = self.rungrid.grid_slaves(row=r, column=None)
+					# print(relmts)
+					for elmt in relmts:
+						elmt.destroy()
+					r += -1
 
-				rowno = 1
-				for row in self.dbqueue["ReadResult"]["RunStats_Pass"]:
-					newrow = False
-					grdrows = self.rungrid.grid_size()[1]
-					# print("UpdateRunStats: grdrows:", grdrows)
+			rowno = 1
+			for row in self.dbqueue["ReadResult"]["RunStats_Pass"]:
+				newrow = False
+				grdrows = self.rungrid.grid_size()[1]
+				# print("UpdateRunStats: grdrows:", grdrows)
 
-					if rowno not in self.display_run["rows"]:
-						self.display_run["rows"][rowno] = {}
+				if rowno not in self.display_run["rows"]:
+					self.display_run["rows"][rowno] = {}
 
-					colno = 0
-					newcell = False
-					for col in row.keys():
-						# print("UpdateRunStats: colno:", colno, "col:", col)
-						# print("UpdateRunStats: row[col]:", row[col])
-						if colno>len(self.display_run["rows"][rowno])-1:
-							self.display_run["rows"][rowno][colno] = tk.StringVar()
+				colno = 0
+				newcell = False
+				for col in row.keys():
+					# print("UpdateRunStats: colno:", colno, "col:", col)
+					# print("UpdateRunStats: row[col]:", row[col])
+					if colno>len(self.display_run["rows"][rowno])-1:
+						self.display_run["rows"][rowno][colno] = tk.StringVar()
 
-						self.display_run["rows"][rowno][colno].set("  {}  ".format(row[col]))
+					self.display_run["rows"][rowno][colno].set("  {}  ".format(row[col]))
 
-						relmts = self.rungrid.grid_slaves(row=rowno, column=colno)
-						# print("UpdateRunStats: relmts:", relmts)
+					relmts = self.rungrid.grid_slaves(row=rowno, column=colno)
+					# print("UpdateRunStats: relmts:", relmts)
 
-						# if newrow or newcell:
-						if len(relmts) < 1:
-							usr = ttk.Label(self.rungrid, textvariable=self.display_run["rows"][rowno][colno], borderwidth=2, relief="groove")
-							usr.grid(column=colno, row=rowno, sticky="nsew")
+					# if newrow or newcell:
+					if len(relmts) < 1:
+						usr = ttk.Label(self.rungrid, textvariable=self.display_run["rows"][rowno][colno], borderwidth=2, relief="groove")
+						usr.grid(column=colno, row=rowno, sticky="nsew")
 
 
-						colno += 1
+					colno += 1
 
-					rowno += 1
+				rowno += 1
 
 
 			ut = threading.Thread(target=self.delayed_UpdateRunStats)
@@ -1430,7 +1434,7 @@ class RFSwarmGUI(tk.Frame):
 		# print(self.tabs.tabs())
 		self.tabs.select(1)
 
-		print("ClickPlay:", int(time.time()))
+		print("ClickPlay:", int(time.time()), "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
 
 		# self.tabs.select('Run')
 		# print(self.scriptlist)
@@ -1444,11 +1448,13 @@ class RFSwarmGUI(tk.Frame):
 		self.robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}}
 		t = threading.Thread(target=self.run_start_threads)
 		t.start()
+		ut = threading.Thread(target=self.delayed_UpdateRunStats)
+		ut.start()
 
 
 	def ClickStop(self, _event=None):
 		self.run_end = int(time.time()) #time now
-		print("ClickStop: run_end", self.run_end)
+		print("ClickStop: run_end", self.run_end, "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
 		self.robot_schedule["End"] = self.run_end
 
 		for agnt in self.robot_schedule["Agents"].keys():
@@ -1789,13 +1795,18 @@ class RFSwarmGUI(tk.Frame):
 		# print("sr_test_validate: tol:", tol)
 
 		v = None
-		if len(args)>1:
+		if len(args)>1 and len(args[1])>1:
 			v = args[1]
-			# print("sr_test_validate: v:", v)
-			self.scriptlist[r]["Test"] = self.scriptlist[r]["TestVar"].set(v)
+			print("sr_test_validate: v:", v)
+			self.scriptlist[r]["TestVar"].set(v)
+			self.scriptlist[r]["Test"] = v
+		else:
+			print("sr_test_validate: else")
+			print("sr_test_validate: scriptlist[r][TestVar].get():", self.scriptlist[r]["TestVar"].get())
+			self.scriptlist[r]["Test"] = self.scriptlist[r]["TestVar"].get()
 
-		self.scriptlist[r]["Test"] = self.scriptlist[r]["TestVar"].get()
-		# print("sr_test_validate: scriptlist[r]:", self.scriptlist[r])
+		print("sr_test_validate: scriptlist[r]:", self.scriptlist[r])
+		# print("sr_test_validate: scriptlist[r][TestVar].get():", self.scriptlist[r]["TestVar"].get())
 		self.pln_update_graph()
 		return True
 
@@ -2447,7 +2458,7 @@ class RFSwarmGUI(tk.Frame):
 
 
 	def mnu_file_Open(self, _event=None):
-		# print("mnu_file_Open")
+		print("mnu_file_Open")
 		self.mnu_file_Close()	# ensure any previous scenario is closed and saved if required
 		ScenarioFile = str(tkf.askopenfilename(initialdir=self.config['Plan']['ScenarioDir'], title = "Select RFSwarm Scenario File", filetypes = (("RFSwarm","*.rfs"),("all files","*.*"))))
 		# print("mnu_file_Open: ScenarioFile:", ScenarioFile)
@@ -2492,30 +2503,30 @@ class RFSwarmGUI(tk.Frame):
 				self.sr_users_validate(ii, int(filedata[istr]["users"]))
 				# delay = 0
 				# print("mnu_file_Open: filedata[", istr, "][delay]:", filedata[istr]["delay"])
-				self.scriptlist[ii]["delay"] = filedata[istr]["delay"]
+				# self.scriptlist[ii]["delay"] = filedata[istr]["delay"]
 				self.sr_delay_validate(ii, int(filedata[istr]["delay"]))
 				# rampup = 60
 				# print("mnu_file_Open: filedata[", istr, "][rampup]:", filedata[istr]["rampup"])
-				self.scriptlist[ii]["rampup"] = filedata[istr]["rampup"]
+				# self.scriptlist[ii]["rampup"] = filedata[istr]["rampup"]
 				self.sr_rampup_validate(ii, int(filedata[istr]["rampup"]))
 				# run = 600
 				# print("mnu_file_Open: filedata[", istr, "][run]:", filedata[istr]["run"])
-				self.scriptlist[ii]["run"] = filedata[istr]["run"]
+				# self.scriptlist[ii]["run"] = filedata[istr]["run"]
 				self.sr_run_validate(ii, int(filedata[istr]["run"]))
 				# script = /Users/dave/Documents/GitHub/rfswarm/robots/OC_Demo_2.robot
 				# print("mnu_file_Open: filedata[", istr, "][script]:", filedata[istr]["script"])
-				self.scriptlist[ii]["script"] = filedata[istr]["script"]
+				# self.scriptlist[ii]["script"] = filedata[istr]["script"]
 				self.sr_file_validate(ii, filedata[istr]["script"])
 				# test = Browse Store Product 1
 				# print("mnu_file_Open: filedata[", istr, "][test]:", filedata[istr]["test"])
-				self.scriptlist[ii]["test"] = filedata[istr]["test"]
+				# self.scriptlist[ii]["test"] = filedata[istr]["test"]
 				self.sr_test_validate("row{}".format(ii), filedata[istr]["test"])
 
 
 
 
 	def mnu_file_Save(self, _event=None):
-		# print("mnu_file_Save")
+		print("mnu_file_Save")
 		if len(self.config['Plan']['ScenarioFile'])<1:
 			self.mnu_file_SaveAs()
 		else:
@@ -2533,14 +2544,17 @@ class RFSwarmGUI(tk.Frame):
 				filedata['Scenario']['ScriptCount'] = scriptidx
 
 			for scrp in self.scriptlist:
+				print("mnu_file_Save: scrp:", scrp)
 				if 'Index' in scrp:
 					scriptidx = str(scrp['Index'])
 
 					if scriptidx not in filedata:
 						filedata[scriptidx] = {}
 					for key in scrp.keys():
+						print("mnu_file_Save: key:", key)
 						if key not in ['Index', 'TestVar', 'ScriptHash']:
 							filedata[scriptidx][key] = str(scrp[key])
+							print("mnu_file_Save: filedata[",scriptidx,"][",key,"]:", filedata[scriptidx][key])
 
 			filedata['Scenario']['ScriptCount'] = scriptidx
 			with open(self.config['Plan']['ScenarioFile'], 'w') as sf:    # save

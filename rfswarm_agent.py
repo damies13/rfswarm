@@ -96,6 +96,7 @@ class RFSwarmAgent():
 				# self.connectserver()
 				t = threading.Thread(target=self.connectserver)
 				t.start()
+				self.isrunning = False
 
 			if self.isconnected:
 				# self.updatestatus()
