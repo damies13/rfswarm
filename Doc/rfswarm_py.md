@@ -20,12 +20,14 @@ Some screen shots below of rfswarm in action:
 
 #### 1. Install the prerequisites
 
-TODO:
-```
-pip install <something>
-```
+The Agent machine needs to use a minimum of Python 3.7
+> timespec feature of datetime's isoformat requires Python 3.6+
 
-\*or pip3 on some systems
+Additionally the following pip command might be needed if these are not already installed on your system:
+```
+pip\* install configparser requests psutil
+```
+\*some systems might need you to use pip3 and or sudo
 
 #### 2. Run the GUI Server
 

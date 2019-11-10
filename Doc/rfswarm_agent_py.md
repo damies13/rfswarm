@@ -15,12 +15,26 @@ robot -t "test case" script.robot
 
 #### 2. Install the prerequisites
 
-TODO:
+- The Agent machine needs to use a minimum of Python 3.7
+> ThreadingHTTPServer feature of HTTPServer requires was added in Python 3.7
+
+- tkinter may need to be installed
+It may already installed on your system, if not consult the python documentation on how to install for your system.
+
+On Debian based systems this will probably work
 ```
-pip install <something>
+apt install python3-tk
 ```
 
-\*or pip3 on some systems
+Additionally the following pip command might be needed if these are not already installed on your system:
+```
+pip\* install configparser setuptools hashlib HTTPServer pillow
+```
+> setuptools (is required by hashlib and HTTPServer)
+
+\*some systems might need you to use pip3 and or sudo
+
+
 
 #### 3. Run Agent 1st time
 
