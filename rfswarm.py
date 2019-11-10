@@ -29,6 +29,7 @@ import sqlite3
 import random
 import time
 from datetime import datetime
+import re
 import threading
 import subprocess
 from operator import itemgetter
@@ -1620,12 +1621,14 @@ class RFSwarmGUI(tk.Frame):
 		# print("Script File:",self.scriptlist[r]["Script"])
 		tcsection = False
 		tclist = [""]
+		regex = "^\*{3}[\D](Test Case|Task)"
 		with open(self.scriptlist[r]["Script"]) as f:
 			for line in f:
-				# print(tcsection, line)
+				# print("sr_test_genlist: tcsection:",tcsection, "	line:", line)
 				if tcsection and line[0:3] == "***":
 					tcsection = False
-				if line[0:18] == "*** Test Cases ***":
+				if re.search(regex, line):
+					# print("sr_test_genlist: re.search(",regex, ",", line,")", re.search(regex, line))
 					tcsection = True
 				if tcsection:
 					if line[0:1] not in ('\t', ' ', '*', '#', '\n', '\r'):
