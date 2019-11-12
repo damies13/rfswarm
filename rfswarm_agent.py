@@ -57,6 +57,8 @@ class RFSwarmAgent():
 	robotcount = 0
 	status = "Ready"
 
+	rs = None
+
 	def __init__(self, master=None):
 		print("RFSwarmAgent: __init__")
 		# print("gettempdir", tempfile.gettempdir())
@@ -184,7 +186,7 @@ class RFSwarmAgent():
 			"Status": self.status
 		}
 		try:
-			r = requests.post(uri, json=payload)
+			r = self.rs.post(uri, json=payload)
 			# print(r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.isconnected = False
@@ -200,7 +202,11 @@ class RFSwarmAgent():
 			print("RFSwarmAgent: connectserver: Try connecting to", self.swarmserver)
 			# print("self.swarmserver:", self.swarmserver)
 			try:
-				r = requests.get(self.swarmserver)
+				if self.rs is None:
+					self.rs = requests.session()
+					s.config['keep_alive'] = False
+
+				r = self.rs.get(self.swarmserver)
 				# print(r.status_code, r.text)
 				if (r.status_code == requests.codes.ok):
 					self.isconnected = True
@@ -233,7 +239,7 @@ class RFSwarmAgent():
 		}
 		# print("getscripts: payload: ", payload)
 		try:
-			r = requests.post(uri, json=payload)
+			r = self.rs.post(uri, json=payload)
 			# print("getscripts: resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.isconnected = False
@@ -264,7 +270,7 @@ class RFSwarmAgent():
 			"Hash": hash
 		}
 		try:
-			r = requests.post(uri, json=payload)
+			r = self.rs.post(uri, json=payload)
 			# print("getfile: resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.isconnected = False
@@ -315,7 +321,7 @@ class RFSwarmAgent():
 		}
 		# print("getjobs: payload: ", payload)
 		try:
-			r = requests.post(uri, json=payload)
+			r = self.rs.post(uri, json=payload)
 			# print("getjobs: resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.isconnected = False
@@ -532,7 +538,7 @@ class RFSwarmAgent():
 
 				# print("run_proces_output: payload", payload)
 				try:
-					r = requests.post(uri, json=payload)
+					r = self.rs.post(uri, json=payload)
 					# print("run_proces_output: ",r.status_code, r.text)
 					if (r.status_code != requests.codes.ok):
 						self.isconnected = False
