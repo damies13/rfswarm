@@ -204,8 +204,13 @@ class RFSwarmAgent():
 			try:
 				if self.rs is None:
 					self.rs = requests.session()
-					s.config['keep_alive'] = False
+					self.rs.config['keep_alive'] = False
+					# https://laike9m.com/blog/requests-secret-pool_connections-and-pool_maxsize,89/
+					# pool_connections=10, pool_maxsize=10, max_retries=0, pool_block=False
+					a = requests.adapters.HTTPAdapter(max_retries=5, pool_connections=100, pool_maxsize=100)
+					self.rs.mount('http://', a)
 
+				# https://stackoverflow.com/questions/10115126/python-requests-close-http-connection/15511852
 				with self.rs.get(self.swarmserver) as r:
 					# print(r.status_code, r.text)
 					if (r.status_code == requests.codes.ok):
