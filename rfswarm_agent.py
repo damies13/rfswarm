@@ -186,10 +186,10 @@ class RFSwarmAgent():
 			"Status": self.status
 		}
 		try:
-			r = self.rs.post(uri, json=payload)
-			# print(r.status_code, r.text)
-			if (r.status_code != requests.codes.ok):
-				self.isconnected = False
+			with self.rs.post(uri, json=payload) as r:
+				# print(r.status_code, r.text)
+				if (r.status_code != requests.codes.ok):
+					self.isconnected = False
 		except:
 			# print(r.status_code, r.text)
 			self.isconnected = False
@@ -206,10 +206,10 @@ class RFSwarmAgent():
 					self.rs = requests.session()
 					s.config['keep_alive'] = False
 
-				r = self.rs.get(self.swarmserver)
-				# print(r.status_code, r.text)
-				if (r.status_code == requests.codes.ok):
-					self.isconnected = True
+				with self.rs.get(self.swarmserver) as r:
+					# print(r.status_code, r.text)
+					if (r.status_code == requests.codes.ok):
+						self.isconnected = True
 			except:
 				pass
 
@@ -239,22 +239,23 @@ class RFSwarmAgent():
 		}
 		# print("getscripts: payload: ", payload)
 		try:
-			r = self.rs.post(uri, json=payload)
-			# print("getscripts: resp: ", r.status_code, r.text)
-			if (r.status_code != requests.codes.ok):
-				self.isconnected = False
 
-			jsonresp = {}
-			# self.scriptlist
-			jsonresp = json.loads(r.text)
-			# print("getscripts: jsonresp:", jsonresp)
-			for s in jsonresp["Scripts"]:
-				hash = s['Hash']
-				# print("getscripts: hash:", hash)
-				if hash not in self.scriptlist:
-					self.scriptlist[hash] = {'id': hash}
-					t = threading.Thread(target=self.getfile, args=(hash,))
-					t.start()
+			with self.rs.post(uri, json=payload) as r:
+				# print("getscripts: resp: ", r.status_code, r.text)
+				if (r.status_code != requests.codes.ok):
+					self.isconnected = False
+
+				jsonresp = {}
+				# self.scriptlist
+				jsonresp = json.loads(r.text)
+				# print("getscripts: jsonresp:", jsonresp)
+				for s in jsonresp["Scripts"]:
+					hash = s['Hash']
+					# print("getscripts: hash:", hash)
+					if hash not in self.scriptlist:
+						self.scriptlist[hash] = {'id': hash}
+						t = threading.Thread(target=self.getfile, args=(hash,))
+						t.start()
 
 
 
@@ -270,45 +271,45 @@ class RFSwarmAgent():
 			"Hash": hash
 		}
 		try:
-			r = self.rs.post(uri, json=payload)
-			# print("getfile: resp: ", r.status_code, r.text)
-			if (r.status_code != requests.codes.ok):
-				self.isconnected = False
+			with self.rs.post(uri, json=payload) as r:
+				# print("getfile: resp: ", r.status_code, r.text)
+				if (r.status_code != requests.codes.ok):
+					self.isconnected = False
 
-			jsonresp = {}
-			# self.scriptlist
-			jsonresp = json.loads(r.text)
-			# print("getfile: jsonresp:", jsonresp)
+				jsonresp = {}
+				# self.scriptlist
+				jsonresp = json.loads(r.text)
+				# print("getfile: jsonresp:", jsonresp)
 
-			# print('scriptdir', self.scriptdir)
-			localfile = os.path.abspath(os.path.join(self.scriptdir, jsonresp['File']))
-			print('getfile: localfile', localfile)
-			self.scriptlist[hash]['localfile'] = localfile
-			self.scriptlist[hash]['file'] = jsonresp['File']
+				# print('scriptdir', self.scriptdir)
+				localfile = os.path.abspath(os.path.join(self.scriptdir, jsonresp['File']))
+				print('getfile: localfile', localfile)
+				self.scriptlist[hash]['localfile'] = localfile
+				self.scriptlist[hash]['file'] = jsonresp['File']
 
-			# self.scriptlist[hash][]
+				# self.scriptlist[hash][]
 
-			filedata = jsonresp['FileData']
-			# print("filedata:", filedata)
-			# print("getfile: filedata:")
+				filedata = jsonresp['FileData']
+				# print("filedata:", filedata)
+				# print("getfile: filedata:")
 
-			decoded = base64.b64decode(filedata)
-			# print("b64decode: decoded:", decoded)
-			# print("getfile: b64decode:")
+				decoded = base64.b64decode(filedata)
+				# print("b64decode: decoded:", decoded)
+				# print("getfile: b64decode:")
 
-			uncompressed = lzma.decompress(decoded)
-			# print("uncompressed:", uncompressed)
-			# print("getfile: uncompressed:")
+				uncompressed = lzma.decompress(decoded)
+				# print("uncompressed:", uncompressed)
+				# print("getfile: uncompressed:")
 
-			localfiledir = os.path.dirname(localfile)
-			# print("getfile: localfiledir:", localfiledir)
-			self.ensuredir(localfiledir)
-			# print("getfile: ensuredir:")
+				localfiledir = os.path.dirname(localfile)
+				# print("getfile: localfiledir:", localfiledir)
+				self.ensuredir(localfiledir)
+				# print("getfile: ensuredir:")
 
-			with open(localfile, 'wb') as afile:
-				# print("getfile: afile:")
-				afile.write(uncompressed)
-				# print("getfile: write:")
+				with open(localfile, 'wb') as afile:
+					# print("getfile: afile:")
+					afile.write(uncompressed)
+					# print("getfile: write:")
 
 		except Exception as e:
 			print("getfile: Exception:", e)
@@ -321,44 +322,44 @@ class RFSwarmAgent():
 		}
 		# print("getjobs: payload: ", payload)
 		try:
-			r = self.rs.post(uri, json=payload)
-			# print("getjobs: resp: ", r.status_code, r.text)
-			if (r.status_code != requests.codes.ok):
-				self.isconnected = False
+			with self.rs.post(uri, json=payload) as r:
+				# print("getjobs: resp: ", r.status_code, r.text)
+				if (r.status_code != requests.codes.ok):
+					self.isconnected = False
 
-			jsonresp = {}
-			# self.scriptlist
-			# print("getjobs: r.text:", r.text)
-			jsonresp = json.loads(r.text)
-			# print("getjobs: jsonresp:", jsonresp)
+				jsonresp = {}
+				# self.scriptlist
+				# print("getjobs: r.text:", r.text)
+				jsonresp = json.loads(r.text)
+				# print("getjobs: jsonresp:", jsonresp)
 
 
-			if jsonresp["StartTime"] < int(time.time()) < (jsonresp["EndTime"]+300):
-				self.isrunning = True
-				self.run_name = jsonresp["RunName"]
-				for s in jsonresp["Schedule"].keys():
-					# print("getjobs: s:", s)
-					if s not in self.jobs.keys():
-						self.jobs[s] = {}
-					for k in jsonresp["Schedule"][s].keys():
-						# print("getjobs: self.jobs[",s,"][",k,"]", jsonresp["Schedule"][s][k])
-						self.jobs[s][k] = jsonresp["Schedule"][s][k]
+				if jsonresp["StartTime"] < int(time.time()) < (jsonresp["EndTime"]+300):
+					self.isrunning = True
+					self.run_name = jsonresp["RunName"]
+					for s in jsonresp["Schedule"].keys():
+						# print("getjobs: s:", s)
+						if s not in self.jobs.keys():
+							self.jobs[s] = {}
+						for k in jsonresp["Schedule"][s].keys():
+							# print("getjobs: self.jobs[",s,"][",k,"]", jsonresp["Schedule"][s][k])
+							self.jobs[s][k] = jsonresp["Schedule"][s][k]
 
-				if int(time.time()) > jsonresp["EndTime"]:
-					self.isstopping = True
-				if self.isstopping and self.robotcount < 1:
-					self.jobs = {}
-					self.isrunning = False
-					self.isstopping = False
-			else:
-				if self.robotcount < 1:
-					self.isrunning = False
-					self.isstopping = False
+					if int(time.time()) > jsonresp["EndTime"]:
+						self.isstopping = True
+					if self.isstopping and self.robotcount < 1:
+						self.jobs = {}
+						self.isrunning = False
+						self.isstopping = False
 				else:
-					self.isstopping = True
+					if self.robotcount < 1:
+						self.isrunning = False
+						self.isstopping = False
+					else:
+						self.isstopping = True
 
-			# print("getjobs: isrunning:", self.isrunning, "	isstopping:", self.isstopping)
-			# print("getjobs: self.jobs:", self.jobs)
+				# print("getjobs: isrunning:", self.isrunning, "	isstopping:", self.isstopping)
+				# print("getjobs: self.jobs:", self.jobs)
 
 
 
@@ -538,10 +539,10 @@ class RFSwarmAgent():
 
 				# print("run_proces_output: payload", payload)
 				try:
-					r = self.rs.post(uri, json=payload)
-					# print("run_proces_output: ",r.status_code, r.text)
-					if (r.status_code != requests.codes.ok):
-						self.isconnected = False
+					with self.rs.post(uri, json=payload) as r:
+						# print("run_proces_output: ",r.status_code, r.text)
+						if (r.status_code != requests.codes.ok):
+							self.isconnected = False
 				except Exception as e:
 					print("run_proces_output: ",r.status_code, r.text)
 					print("run_proces_output: Exception: ", e)
