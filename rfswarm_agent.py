@@ -196,6 +196,22 @@ class RFSwarmAgent():
 
 	def connectserver(self):
 		# print("RFSwarmAgent: connectserver")
+
+		if 'Agent' not in self.config:
+			self.config['Agent'] = {}
+			self.saveini()
+
+		if 'conn_pool' not in self.config['Agent']:
+			self.config['Agent']['conn_pool'] = "10000"
+			self.saveini()
+
+		if 'retries' not in self.config['Agent']:
+			self.config['Agent']['retries'] = "100"
+			self.saveini()
+
+		poolsize = int(self.config['Agent']['conn_pool'])
+		retries = int(self.config['Agent']['retries'])
+
 		if self.swarmserver is None:
 			self.findserver()
 		if self.swarmserver is not None:
@@ -207,7 +223,8 @@ class RFSwarmAgent():
 					self.rs.config['keep_alive'] = False
 					# https://laike9m.com/blog/requests-secret-pool_connections-and-pool_maxsize,89/
 					# pool_connections=10, pool_maxsize=10, max_retries=0, pool_block=False
-					a = requests.adapters.HTTPAdapter(max_retries=5, pool_connections=100, pool_maxsize=100)
+					# pool_connections=1000,
+					a = requests.adapters.HTTPAdapter(max_retries=retries, pool_maxsize=poolsize)
 					self.rs.mount('http://', a)
 
 				# https://stackoverflow.com/questions/10115126/python-requests-close-http-connection/15511852
