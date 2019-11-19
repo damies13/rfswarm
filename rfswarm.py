@@ -58,6 +58,8 @@ __name__ = "rfswarm"
 
 
 class AgentServer(BaseHTTPRequestHandler):
+	# protocol_version = 'HTTP/1.1'
+
 	def do_HEAD(self):
 		return
 	def do_POST(self):
@@ -337,6 +339,10 @@ class RFSwarmGUI(tk.Frame):
 		# Grid.rowconfigure(root, 0, weight=1)
 		# Grid.columnconfigure(root, 0, weight=1)
 		root.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+		print("__init__: stack_size:", threading.stack_size())
+		threading.stack_size(64*1024)
+		print("__init__: stack_size:", threading.stack_size())
 
 		self.config = configparser.ConfigParser()
 		scrdir = os.path.dirname(__file__)
