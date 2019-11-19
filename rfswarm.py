@@ -580,7 +580,6 @@ class RFSwarmGUI(tk.Frame):
 		# Plan Graph
 
 		self.pln_graph = tk.Canvas(p)
-		self.pln_graph.pack(fill="both", expand=True)
 		self.pln_graph.grid(column=0, row=planrow, sticky="nsew") # sticky="wens"
 
 		planrow += 1
