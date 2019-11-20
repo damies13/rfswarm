@@ -438,7 +438,7 @@ class RFSwarmAgent():
 
 		cmd = ["robot"]
 		cmd.append("-t")
-		cmd.append("'"+test+"'")
+		cmd.append('"'+test+'"')
 		# cmd.append(testcs)
 		cmd.append("-d")
 		cmd.append(odir)
