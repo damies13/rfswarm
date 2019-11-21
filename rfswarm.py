@@ -980,6 +980,39 @@ class RFSwarmGUI(tk.Frame):
 				# create indexes?
 
  				# create views?
+
+				# CREATE VIEW "summary" AS SELECT
+				# 	r.result_name,
+				# 	min(rp.elapsed_time) "min", avg(rp.elapsed_time) "avg", max(rp.elapsed_time)  "max",
+				# 	count(rp.result) as _pass,
+				# 	count(rf.result) as _fail,
+				# 	count(ro.result) as _other
+				#
+				# FROM Results as r
+				# 	LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == "PASS"
+				# 	LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == "FAIL"
+				# 	LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> "PASS" AND ro.result <> "FAIL"
+				# GROUP BY
+				# 	r.result_name
+				# ORDER BY r.sequence
+				c.execute('''
+				CREATE VIEW "Summary" AS SELECT
+					r.result_name,
+					min(rp.elapsed_time) "min", avg(rp.elapsed_time) "avg", max(rp.elapsed_time)  "max",
+					count(rp.result) as _pass,
+					count(rf.result) as _fail,
+					count(ro.result) as _other
+
+				FROM Results as r
+					LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == "PASS"
+					LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == "FAIL"
+					LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> "PASS" AND ro.result <> "FAIL"
+				GROUP BY
+					r.result_name
+				ORDER BY r.sequence
+				''')
+
+
 				self.datadb.commit()
 
 	def delayed_UpdateAgents(self):
