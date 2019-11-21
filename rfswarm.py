@@ -55,7 +55,27 @@ import json
 
 __name__ = "rfswarm"
 
+class percentile:
+	def __init__(self):
+		self.count = 0
+		self.percent = 90
+		self.values = []
 
+	def step(self, value, percent):
+		self.count += 1
+		self.values.append(value)
+		self.percent = percent
+
+	def finalize(self):
+		# print("percentile: finalize: self.count:", self.count, "	self.percent:", self.percent, "	self.values:", self.values)
+		nth = self.count * (self.percent/100)
+		# print("percentile: finalize: nth:", nth)
+		nthi = int(nth)
+		# nthi = int(math.ceil(self.count * (self.percent/100)))
+		self.values.sort()
+		# print("percentile: finalize: nthi:", nthi, "	self.values[nthi]:", self.values[nthi], "	self.values:", self.values)
+		return self.values[nthi]
+		# return self.count
 
 class AgentServer(BaseHTTPRequestHandler):
 	def do_HEAD(self):
@@ -916,6 +936,7 @@ class RFSwarmGUI(tk.Frame):
 
 			if self.datadb is None:
 				self.datadb = sqlite3.connect(self.dbfile)
+				self.datadb.create_aggregate("percentile", 2, percentile)
 
 			if createschema:
 				c = self.datadb.cursor()
@@ -1263,6 +1284,9 @@ class RFSwarmGUI(tk.Frame):
 			# GROUP BY
 			# 	r.script_index, r.sequence, r.iteration,
 			# 	r.result_name
+			# ORDER BY r.sequence
+
+			percentile = 90
 
 			sql = "SELECT "
 			if len(gblist)>0:
@@ -1270,18 +1294,22 @@ class RFSwarmGUI(tk.Frame):
 				sql += 	", "
 			sql += 		"round(min(rp.elapsed_time),3) 'min', "
 			sql += 		"round(avg(rp.elapsed_time),3) 'avg', "
+			sql += 		"round(percentile(rp.elapsed_time, {}),3) '{}%ile', ".format(percentile, percentile)
 			sql += 		"round(max(rp.elapsed_time),3) 'max', "
 			sql += 		"count(rp.result) as _pass, "
 			sql += 		"count(rf.result) as _fail, "
 			sql += 		"count(ro.result) as _other "
 			sql += "FROM Results as r "
-			sql += "	LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == 'PASS' "
-			sql += "	LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == 'FAIL' "
-			sql += "	LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' "
+			sql += 		"LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == 'PASS' "
+			sql += 		"LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == 'FAIL' "
+			sql += 		"LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' "
 			sql += "WHERE r.start_time>{} ".format(self.robot_schedule["Start"])
 			if len(gblist)>0:
 				sql += "GROUP BY  "
 				sql += 		gbcols
+
+			sql += " ORDER BY r.sequence"
+
 
 			self.dbqueue["Read"].append({"SQL": sql, "KEY": "RunStats"})
 
@@ -1418,7 +1446,7 @@ class RFSwarmGUI(tk.Frame):
 		# print("PrettyColName: cnlst:", cnlst)
 		for word in cnlst:
 			# print("PrettyColName: word:", word)
-			if len(word)>1:
+			if len(word)>0:
 				ncnlst.append(word.capitalize())
 		# print("PrettyColName: ncnlst:", ncnlst)
 		newcolname = " ".join(ncnlst)
