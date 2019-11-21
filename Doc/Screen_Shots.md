@@ -3,11 +3,16 @@
 
 ## Screen Shots
 
+- [v0.4](#v0.4)
 - [v0.3](#v0.3)
 - [v0.1](#v0.1)
 - [Original](#Original)
 
 
+### v0.4
+
+![Image](Images/Run_v0.4.png "Run - Showing results being collected live")
+![Image](Images/Run_Start_v0.4.png "Run - Just Started")
 
 ### v0.3
 

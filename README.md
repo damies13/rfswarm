@@ -15,7 +15,7 @@ rfswarm is written completely in python, so if you are already using Robot Frame
 
 To learn more about rfswarm please refer to the [Documantation](Doc/Index.md)
 
-![Image](Doc/Images/Run_v0.3.png "Run - Showing results being collected live")
+![Image](Doc/Images/Run_v0.4.png "Run - Showing results being collected live")
 
 ## Donations
 

@@ -55,7 +55,27 @@ import json
 
 __name__ = "rfswarm"
 
+class percentile:
+	def __init__(self):
+		self.count = 0
+		self.percent = 90
+		self.values = []
 
+	def step(self, value, percent):
+		self.count += 1
+		self.values.append(value)
+		self.percent = percent
+
+	def finalize(self):
+		# print("percentile: finalize: self.count:", self.count, "	self.percent:", self.percent, "	self.values:", self.values)
+		nth = self.count * (self.percent/100)
+		# print("percentile: finalize: nth:", nth)
+		nthi = int(nth)
+		# nthi = int(math.ceil(self.count * (self.percent/100)))
+		self.values.sort()
+		# print("percentile: finalize: nthi:", nthi, "	self.values[nthi]:", self.values[nthi], "	self.values:", self.values)
+		return self.values[nthi]
+		# return self.count
 
 class AgentServer(BaseHTTPRequestHandler):
 	def do_HEAD(self):
@@ -643,6 +663,10 @@ class RFSwarmGUI(tk.Frame):
 			self.config['Run']['display_sequence'] = str(False)
 			self.saveini()
 
+		if 'display_percentile' not in self.config['Run']:
+			self.config['Run']['display_percentile'] = str(90)
+			self.saveini()
+
 
 		rg = ttk.Frame(r)
 		rg.grid(column=0, row=1, sticky="nsew")
@@ -682,6 +706,32 @@ class RFSwarmGUI(tk.Frame):
 		# chk = tk.Checkbutton(rgbar, text="Sequence", variable=self.display_run['display_sequence'], onvalue=1, offvalue=0) #, height = 2, width = 10)
 		chk = tk.Checkbutton(rgbar, variable=self.display_run['display_sequence'], onvalue=True, offvalue=False, command=self.delayed_UpdateRunStats_bg) #, height = 2, width = 10)
 		chk.grid(column=12, row=2, sticky="nsew")
+
+
+		# display_percentile
+		# if "display_percentile" not in self.display_run:
+		# 	self.display_run['display_percentile'] = tk.IntVar()
+		# 	self.display_run['display_percentile'].set(int(self.config['Run']['display_percentile']))
+		usr = ttk.Label(rgbar, text="  %ile  ") #, borderwidth=2, relief="raised")
+		usr.grid(column=13, row=1, sticky="nsew")
+
+		pct = ttk.Spinbox(rgbar, from_=1, to=99, validate="focusout", width=5, justify="right", validatecommand=self.delayed_UpdateRunStats_bg, command=self.delayed_UpdateRunStats_bg)
+		pct.grid(column=13, row=2, sticky="nsew")
+		pct.selection_clear()
+		pct.insert(0, int(self.config['Run']['display_percentile']))
+		self.display_run['display_percentile'] = pct
+
+		# # chk = tk.Checkbutton(rgbar, text="Sequence", variable=self.display_run['display_sequence'], onvalue=1, offvalue=0) #, height = 2, width = 10)
+		# chk = tk.Checkbutton(rgbar, variable=self.display_run['display_sequence'], onvalue=True, offvalue=False, command=self.delayed_UpdateRunStats_bg) #, height = 2, width = 10)
+		# chk.grid(column=12, row=2, sticky="nsew")
+		# num = "10"
+		# usr = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout")
+		# usr.config(validatecommand=lambda: self.sr_users_validate(row))
+		# usr.grid(column=self.plancolusr, row=self.scriptcount, sticky="nsew")
+		# usr.insert(0, num)
+		# self.scriptlist[self.scriptcount]["Users"] = int(num)
+
+
 
 		if "start_time" not in self.display_run:
 			self.display_run['start_time'] = tk.StringVar()
@@ -916,6 +966,7 @@ class RFSwarmGUI(tk.Frame):
 
 			if self.datadb is None:
 				self.datadb = sqlite3.connect(self.dbfile)
+				self.datadb.create_aggregate("percentile", 2, percentile)
 
 			if createschema:
 				c = self.datadb.cursor()
@@ -929,6 +980,39 @@ class RFSwarmGUI(tk.Frame):
 				# create indexes?
 
  				# create views?
+
+				# CREATE VIEW "summary" AS SELECT
+				# 	r.result_name,
+				# 	min(rp.elapsed_time) "min", avg(rp.elapsed_time) "avg", max(rp.elapsed_time)  "max",
+				# 	count(rp.result) as _pass,
+				# 	count(rf.result) as _fail,
+				# 	count(ro.result) as _other
+				#
+				# FROM Results as r
+				# 	LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == "PASS"
+				# 	LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == "FAIL"
+				# 	LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> "PASS" AND ro.result <> "FAIL"
+				# GROUP BY
+				# 	r.result_name
+				# ORDER BY r.sequence
+				c.execute('''
+				CREATE VIEW "Summary" AS SELECT
+					r.result_name,
+					min(rp.elapsed_time) "min", avg(rp.elapsed_time) "avg", max(rp.elapsed_time)  "max",
+					count(rp.result) as _pass,
+					count(rf.result) as _fail,
+					count(ro.result) as _other
+
+				FROM Results as r
+					LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == "PASS"
+					LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == "FAIL"
+					LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> "PASS" AND ro.result <> "FAIL"
+				GROUP BY
+					r.result_name
+				ORDER BY r.sequence
+				''')
+
+
 				self.datadb.commit()
 
 	def delayed_UpdateAgents(self):
@@ -1205,18 +1289,30 @@ class RFSwarmGUI(tk.Frame):
 			self.config['Run']['display_sequence'] = str(display_sequence)
 			self.saveini()
 
-		time_elapsed = int(time.time()) - self.rungridupdate
-		if (time_elapsed>5):
-			ut = threading.Thread(target=self.delayed_UpdateRunStats)
-			ut.start()
+		# self.display_run['display_percentile']
+		display_percentile = int(self.display_run['display_percentile'].get())
+		if display_percentile != int(self.config['Run']['display_percentile']):
+			self.config['Run']['display_percentile'] = str(display_percentile)
+			self.saveini()
+
+		# self.robot_schedule["Start"]
+		if "Start" in self.robot_schedule:
+			time_elapsed = int(time.time()) - self.rungridupdate
+			if (time_elapsed>5):
+				ut = threading.Thread(target=self.delayed_UpdateRunStats)
+				ut.start()
 
 	def delayed_UpdateRunStats(self):
 		time_elapsed = int(time.time()) - self.rungridupdate
 		if (time_elapsed>5):
 			# queue sqls so UpdateRunStats should have the results
 
-			# TODO: to query the percentile value we'll need to create an aggregate class
-				# https://docs.python.org/2/library/sqlite3.html#sqlite3.Connection.create_aggregate
+
+			display_percentile = int(self.display_run['display_percentile'].get())
+			if display_percentile != int(self.config['Run']['display_percentile']):
+				self.config['Run']['display_percentile'] = str(display_percentile)
+				self.saveini()
+
 
 			gblist = []
 			display_index = self.display_run['display_index'].get()
@@ -1225,97 +1321,70 @@ class RFSwarmGUI(tk.Frame):
 				self.config['Run']['display_index'] = str(display_index)
 				self.saveini()
 			if display_index:
-				gblist.append("script_index")
+				gblist.append("r.script_index")
 
 			display_iteration = self.display_run['display_iteration'].get()
 			if display_iteration != self.str2bool(self.config['Run']['display_iteration']):
 				self.config['Run']['display_iteration'] = str(display_iteration)
 				self.saveini()
 			if display_iteration:
-				gblist.append("iteration")
+				gblist.append("r.iteration")
 
 			display_sequence = self.display_run['display_sequence'].get()
 			if display_sequence != self.str2bool(self.config['Run']['display_sequence']):
 				self.config['Run']['display_sequence'] = str(display_sequence)
 				self.saveini()
 			if display_sequence:
-				gblist.append("sequence")
+				gblist.append("r.sequence")
 
-			gblist.append("result_name")
+			gblist.append("r.result_name")
 			# print("delayed_UpdateRunStats:	gblist:", gblist)
-			# gblist = ["result_name"]
-			# gblist = ["sequence", "result_name"]
-			# gblist = ["script_index", "result_name"]
-			# gblist = ["script_index", "iteration", "sequence", "result_name"]
 			gbcols = ", ".join(gblist)
 
 			# print("delayed_UpdateRunStats:	gbcols:", gbcols)
 
+			# SELECT
+			# 	r.script_index, r.sequence, r.iteration,
+			# 	r.result_name,
+			# 	count(rp.result) as _pass,
+			# 	count(rf.result) as _fail,
+			# 	count(ro.result) as _other
+			#
+			# FROM Results as r
+			# 	LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == "PASS"
+			# 	LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == "FAIL"
+			# 	LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> "PASS" AND ro.result <> "FAIL"
+			#
+			# GROUP BY
+			# 	r.script_index, r.sequence, r.iteration,
+			# 	r.result_name
+			# ORDER BY r.sequence
 
 			sql = "SELECT "
 			if len(gblist)>0:
 				sql += 	gbcols
 				sql += 	", "
-			sql += 		"result_name, "
-			sql += 		"result, "
-			sql += 		"count(*) 'count', "
-			sql += 		"round(min(elapsed_time),3) 'min', "
-			sql += 		"round(avg(elapsed_time),3) 'avg', "
-			sql += 		"round(max(elapsed_time),3) 'max' "
-			sql += "FROM Results "
-			sql += "WHERE result = 'PASS' "
-			sql += "AND start_time>{} ".format(self.robot_schedule["Start"])
+			sql += 		"round(min(rp.elapsed_time),3) 'min', "
+			sql += 		"round(avg(rp.elapsed_time),3) 'avg', "
+			sql += 		"round(percentile(rp.elapsed_time, {}),3) '{}%ile', ".format(display_percentile, display_percentile)
+			sql += 		"round(max(rp.elapsed_time),3) 'max', "
+			sql += 		"count(rp.result) as _pass, "
+			sql += 		"count(rf.result) as _fail, "
+			sql += 		"count(ro.result) as _other "
+			sql += "FROM Results as r "
+			sql += 		"LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == 'PASS' "
+			sql += 		"LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == 'FAIL' "
+			sql += 		"LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' "
+			sql += "WHERE r.start_time>{} ".format(self.robot_schedule["Start"])
 			if len(gblist)>0:
 				sql += "GROUP BY  "
 				sql += 		gbcols
 
-			# round(-4.535,2);
+			sql += " ORDER BY r.sequence"
 
-			# sql = """SELECT
-			# 			script_index,
-			# 			sequence,
-			# 			result_name,
-			# 			result,
-			# 			count(*) 'count',
-			# 			min(elapsed_time) 'min',
-			# 			avg(elapsed_time) 'avg',
-			# 			max(elapsed_time) 'max'
-			# 		FROM Results
-			# 		WHERE result = 'PASS'
-			# 		GROUP BY script_index, sequence, result_name"""
 
-			# print("delayed_UpdateRunStats:	sql:", sql)
+			self.dbqueue["Read"].append({"SQL": sql, "KEY": "RunStats"})
 
-			self.dbqueue["Read"].append({"SQL": sql, "KEY": "RunStats_Pass"})
-
-			sql = "SELECT "
-			if len(gblist)>0:
-				sql += 	gbcols
-				sql += 	", "
-			sql += 		"result_name, "
-			sql += 		"result, "
-			sql += 		"count(*) 'count' "
-			sql += "FROM Results "
-			sql += "WHERE result <> 'PASS' "
-			sql += "AND start_time>{} ".format(self.robot_schedule["Start"])
-			sql += "GROUP BY  "
-			sql += 		gbcols
-
-			# sql = """SELECT
-			# 			script_index,
-			# 			sequence,
-			# 			result_name,
-			# 			result,
-			# 			count(*) 'count'
-			# 		FROM Results
-			# 		WHERE result <> 'PASS'
-			# 		GROUP BY 	script_index,
-			# 					sequence,
-			# 					result_name"""
-
-			# print("delayed_UpdateRunStats:	sql:", sql)
-
-			self.dbqueue["Read"].append({"SQL": sql, "KEY": "RunStats_NotPass"})
 
 			time.sleep(1)
 			self.UpdateRunStats()
@@ -1339,26 +1408,25 @@ class RFSwarmGUI(tk.Frame):
 			if "rows" not in self.display_run:
 				self.display_run["rows"] = {}
 
-			# if "RunStats_Pass" in self.dbqueue["ReadResult"]:
-			# 	print("UpdateRunStats: RunStats_Pass:", self.dbqueue["ReadResult"]["RunStats_Pass"])
-			# 	print("UpdateRunStats: len(RunStats_Pass):", len(self.dbqueue["ReadResult"]["RunStats_Pass"]))
-
-			# if "RunStats_NotPass" in self.dbqueue["ReadResult"]:
-			# 	print("UpdateRunStats: RunStats_NotPass:", self.dbqueue["ReadResult"]["RunStats_NotPass"])
+			# if "RunStats" in self.dbqueue["ReadResult"] and len(self.dbqueue["ReadResult"]["RunStats"])>0:
+			# 	print("UpdateRunStats: RunStats:", self.dbqueue["ReadResult"]["RunStats"])
 
 			colno = 0
-			if "RunStats_Pass" in self.dbqueue["ReadResult"] and len(self.dbqueue["ReadResult"]["RunStats_Pass"])>0:
+			if "RunStats" in self.dbqueue["ReadResult"] and len(self.dbqueue["ReadResult"]["RunStats"])>0:
 				# print("UpdateRunStats: RunStats_Pass:", self.dbqueue["ReadResult"]["RunStats_Pass"])
-				for col in self.dbqueue["ReadResult"]["RunStats_Pass"][0].keys():
+				for col in self.dbqueue["ReadResult"]["RunStats"][0].keys():
 					# print("UpdateRunStats: colno:", colno, "col:", col)
+					colname = self.PrettyColName(col)
+					# print("UpdateRunStats: colname:", colname)
+
 					# print("UpdateRunStats: display_run:", self.display_run)
 					if colno in self.display_run["columns"]:
 						currcol = self.display_run["columns"][colno].get()
-						if col != currcol:
-							self.display_run["columns"][colno].set("  {}  ".format(col))
+						if colname != currcol:
+							self.display_run["columns"][colno].set("  {}  ".format(colname))
 					else:
 						self.display_run["columns"][colno] = tk.StringVar()
-						self.display_run["columns"][colno].set("  {}  ".format(col))
+						self.display_run["columns"][colno].set("  {}  ".format(colname))
 
 					# print("UpdateRunStats: display_run[columns][colno]:", self.display_run["columns"][colno])
 
@@ -1387,7 +1455,8 @@ class RFSwarmGUI(tk.Frame):
 					c += -1
 
 
-			datarows = len(self.dbqueue["ReadResult"]["RunStats_Pass"])
+			datarows = len(self.dbqueue["ReadResult"]["RunStats"])
+			# datarows = len(self.dbqueue["ReadResult"]["RunStats_Pass"])
 			grdrows = self.rungrid.grid_size()[1]-1
 			# print("UpdateRunStats: grdrows:", grdrows, " > datarows:",datarows)
 			if grdrows>datarows:
@@ -1402,7 +1471,7 @@ class RFSwarmGUI(tk.Frame):
 					r += -1
 
 			rowno = 1
-			for row in self.dbqueue["ReadResult"]["RunStats_Pass"]:
+			for row in self.dbqueue["ReadResult"]["RunStats"]:
 				newrow = False
 				grdrows = self.rungrid.grid_size()[1]
 				# print("UpdateRunStats: grdrows:", grdrows)
@@ -1436,6 +1505,27 @@ class RFSwarmGUI(tk.Frame):
 
 			ut = threading.Thread(target=self.delayed_UpdateRunStats)
 			ut.start()
+
+	def PrettyColName(self, colname):
+		# print("PrettyColName: colname:", colname)
+		newcolname = colname
+		# if newcolname[:1] == '_':
+		# 	newcolname = newcolname[1:]
+		# newcolname = newcolname.replace("_", " ")
+
+		cnlst = colname.split("_")
+		ncnlst = []
+		# print("PrettyColName: cnlst:", cnlst)
+		for word in cnlst:
+			# print("PrettyColName: word:", word)
+			if len(word)>0:
+				ncnlst.append(word.capitalize())
+		# print("PrettyColName: ncnlst:", ncnlst)
+		newcolname = " ".join(ncnlst)
+
+		# print("PrettyColName: newcolname:", newcolname)
+
+		return newcolname
 
 
 	def ClickPlay(self, _event=None):

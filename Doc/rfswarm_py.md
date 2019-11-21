@@ -23,8 +23,8 @@ This is where you construct your test scenario, choose your test cases and numbe
 ![Image](Images/Plan_unsaved_v0.3.png "Plan - New")
 ##### Run
 This is where you monitor your test scenario as it runs, here you will see number of robots running, how long the has been running and live updates of the test results
-![Image](Images/Run_Start_v0.3.png "Run - Just Started")
-![Image](Images/Run_v0.3.png "Run - Showing results being collected live")
+![Image](Images/Run_Start_v0.4.png "Run - Just Started")
+![Image](Images/Run_v0.4.png "Run - Showing results being collected live")
 ##### Agents
 This is where you can see which agents have connected, number of robots on each agent and monitor the performance of the agents
 ![Image](Images/Agents_ready_v0.3.png "Agents Ready")
