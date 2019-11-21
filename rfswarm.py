@@ -663,6 +663,10 @@ class RFSwarmGUI(tk.Frame):
 			self.config['Run']['display_sequence'] = str(False)
 			self.saveini()
 
+		if 'display_percentile' not in self.config['Run']:
+			self.config['Run']['display_percentile'] = str(90)
+			self.saveini()
+
 
 		rg = ttk.Frame(r)
 		rg.grid(column=0, row=1, sticky="nsew")
@@ -702,6 +706,32 @@ class RFSwarmGUI(tk.Frame):
 		# chk = tk.Checkbutton(rgbar, text="Sequence", variable=self.display_run['display_sequence'], onvalue=1, offvalue=0) #, height = 2, width = 10)
 		chk = tk.Checkbutton(rgbar, variable=self.display_run['display_sequence'], onvalue=True, offvalue=False, command=self.delayed_UpdateRunStats_bg) #, height = 2, width = 10)
 		chk.grid(column=12, row=2, sticky="nsew")
+
+
+		# display_percentile
+		# if "display_percentile" not in self.display_run:
+		# 	self.display_run['display_percentile'] = tk.IntVar()
+		# 	self.display_run['display_percentile'].set(int(self.config['Run']['display_percentile']))
+		usr = ttk.Label(rgbar, text="  %ile  ") #, borderwidth=2, relief="raised")
+		usr.grid(column=13, row=1, sticky="nsew")
+
+		pct = ttk.Spinbox(rgbar, from_=1, to=99, validate="focusout", width=5, justify="right", validatecommand=self.delayed_UpdateRunStats_bg, command=self.delayed_UpdateRunStats_bg)
+		pct.grid(column=13, row=2, sticky="nsew")
+		pct.selection_clear()
+		pct.insert(0, int(self.config['Run']['display_percentile']))
+		self.display_run['display_percentile'] = pct
+
+		# # chk = tk.Checkbutton(rgbar, text="Sequence", variable=self.display_run['display_sequence'], onvalue=1, offvalue=0) #, height = 2, width = 10)
+		# chk = tk.Checkbutton(rgbar, variable=self.display_run['display_sequence'], onvalue=True, offvalue=False, command=self.delayed_UpdateRunStats_bg) #, height = 2, width = 10)
+		# chk.grid(column=12, row=2, sticky="nsew")
+		# num = "10"
+		# usr = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout")
+		# usr.config(validatecommand=lambda: self.sr_users_validate(row))
+		# usr.grid(column=self.plancolusr, row=self.scriptcount, sticky="nsew")
+		# usr.insert(0, num)
+		# self.scriptlist[self.scriptcount]["Users"] = int(num)
+
+
 
 		if "start_time" not in self.display_run:
 			self.display_run['start_time'] = tk.StringVar()
@@ -1226,18 +1256,30 @@ class RFSwarmGUI(tk.Frame):
 			self.config['Run']['display_sequence'] = str(display_sequence)
 			self.saveini()
 
-		time_elapsed = int(time.time()) - self.rungridupdate
-		if (time_elapsed>5):
-			ut = threading.Thread(target=self.delayed_UpdateRunStats)
-			ut.start()
+		# self.display_run['display_percentile']
+		display_percentile = int(self.display_run['display_percentile'].get())
+		if display_percentile != int(self.config['Run']['display_percentile']):
+			self.config['Run']['display_percentile'] = str(display_percentile)
+			self.saveini()
+
+		# self.robot_schedule["Start"]
+		if "Start" in self.robot_schedule:
+			time_elapsed = int(time.time()) - self.rungridupdate
+			if (time_elapsed>5):
+				ut = threading.Thread(target=self.delayed_UpdateRunStats)
+				ut.start()
 
 	def delayed_UpdateRunStats(self):
 		time_elapsed = int(time.time()) - self.rungridupdate
 		if (time_elapsed>5):
 			# queue sqls so UpdateRunStats should have the results
 
-			# TODO: to query the percentile value we'll need to create an aggregate class
-				# https://docs.python.org/2/library/sqlite3.html#sqlite3.Connection.create_aggregate
+
+			display_percentile = int(self.display_run['display_percentile'].get())
+			if display_percentile != int(self.config['Run']['display_percentile']):
+				self.config['Run']['display_percentile'] = str(display_percentile)
+				self.saveini()
+
 
 			gblist = []
 			display_index = self.display_run['display_index'].get()
@@ -1268,7 +1310,6 @@ class RFSwarmGUI(tk.Frame):
 
 			# print("delayed_UpdateRunStats:	gbcols:", gbcols)
 
-
 			# SELECT
 			# 	r.script_index, r.sequence, r.iteration,
 			# 	r.result_name,
@@ -1286,15 +1327,13 @@ class RFSwarmGUI(tk.Frame):
 			# 	r.result_name
 			# ORDER BY r.sequence
 
-			percentile = 90
-
 			sql = "SELECT "
 			if len(gblist)>0:
 				sql += 	gbcols
 				sql += 	", "
 			sql += 		"round(min(rp.elapsed_time),3) 'min', "
 			sql += 		"round(avg(rp.elapsed_time),3) 'avg', "
-			sql += 		"round(percentile(rp.elapsed_time, {}),3) '{}%ile', ".format(percentile, percentile)
+			sql += 		"round(percentile(rp.elapsed_time, {}),3) '{}%ile', ".format(display_percentile, display_percentile)
 			sql += 		"round(max(rp.elapsed_time),3) 'max', "
 			sql += 		"count(rp.result) as _pass, "
 			sql += 		"count(rf.result) as _fail, "
