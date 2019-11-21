@@ -13,7 +13,7 @@ rfswarm aims to solve this problem by allowing you to take an existing functiona
 
 rfswarm is written completely in python, so if you are already using Robot Framework, then you will already have most of what you need to use rfswarm and will be familiar with pip to get any extra components you need.
 
-To learn more about rfswarm please refer to the [Documantation](Doc/Index.md)
+To learn more about rfswarm please refer to the [Documentation](Doc/Index.md)
 
 ![Image](Doc/Images/Run_v0.4.png "Run - Showing results being collected live")
 
