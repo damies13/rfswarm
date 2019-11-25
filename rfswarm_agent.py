@@ -472,7 +472,18 @@ class RFSwarmAgent():
 		outputFile = os.path.join(odir, outputFileName)
 		# print("runthread: outputFile:", outputFile)
 
-		cmd = ["robot"]
+
+		if 'Agent' not in self.config:
+			self.config['Agent'] = {}
+			self.saveini()
+
+		if 'robotcmd' not in self.config['Agent']:
+			self.config['Agent']['robotcmd'] = "robot"
+			self.saveini()
+
+		robotcmd = self.config['Agent']['robotcmd']
+
+		cmd = [robotcmd]
 		cmd.append("-t")
 		cmd.append('"'+test+'"')
 		# cmd.append(testcs)
@@ -488,7 +499,7 @@ class RFSwarmAgent():
 
 		cmd.append(localfile)
 
-		robotexe = shutil.which('robot')
+		robotexe = shutil.which(robotcmd)
 		# print("runthread: robotexe:", robotexe)
 		if robotexe is not None:
 			self.robotcount += 1
