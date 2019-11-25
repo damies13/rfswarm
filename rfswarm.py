@@ -648,6 +648,10 @@ class RFSwarmGUI(tk.Frame):
 			self.config['Run'] = {}
 			self.saveini()
 
+		if 'ResultsDir' not in self.config['Run']:
+			self.config['Run']['ResultsDir'] = os.path.join(self.dir_path, "results")
+			self.saveini()
+
 		if 'display_index' not in self.config['Run']:
 			self.config['Run']['display_index'] = str(False)
 			self.saveini()
@@ -941,7 +945,12 @@ class RFSwarmGUI(tk.Frame):
 		if len(self.run_name)>0:
 			# check if dir exists
 			# print("ensure_db: dir_path:", self.dir_path)
-			self.resultsdir = os.path.join(self.dir_path, "results")
+			# self.resultsdir = os.path.join(self.dir_path, "results")
+			if 'ResultsDir' not in self.config['Run']:
+				self.config['Run']['ResultsDir'] = os.path.join(self.dir_path, "results")
+				self.saveini()
+			self.resultsdir = self.config['Run']['ResultsDir']
+
 			if not os.path.exists(self.resultsdir):
 				os.mkdir(self.resultsdir)
 			self.datapath = os.path.join(self.resultsdir, self.run_name)
