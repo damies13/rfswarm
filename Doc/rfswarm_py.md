@@ -53,8 +53,19 @@ pip* install configparser setuptools hashlib HTTPServer pillow
 
 \*some systems might need you to use pip3 and or sudo
 
+#### 2. Adjust the Firewall
 
-#### 2. Run the GUI Server
+Check if there is a firewall on you GUI / Server machine, if so you may need to adjust the firewall to add a rule to allow communication between the GUI / Server and the Agent.
+
+| Machine | Protocol | Port Number | Direction |
+|---|---|---|---|
+| GUI / Server | TCP | 8138 | Inbound |
+| Agent | TCP | 8138 | Outbound |
+
+Most firewalls on servers and workstations don't require specific rules for outbound, so most likely you will only need to configure the Inbound rule on the GUI / Server machine if it has a firewall.
+
+
+#### 3. Run the GUI Server
 
 ```
 python* rfswarm.py
