@@ -35,6 +35,7 @@ import psutil
 import socket
 import json
 import xml.etree.ElementTree as ET
+import shutil
 
 
 class RFSwarmAgent():
@@ -481,16 +482,29 @@ class RFSwarmAgent():
 
 		cmd.append(localfile)
 
-		self.robotcount += 1
+		robotexe = shutil.which('robot')
+		# print("runthread: robotexe:", robotexe)
+		if robotexe is not None:
+			self.robotcount += 1
 
-		result = subprocess.call(" ".join(cmd), shell=True)
-		# with open(logFileName, "w") as f:
-		# 	result = subprocess.call(" ".join(cmd), shell=True, stdout=f, stderr=f)
+			# result = subprocess.call(" ".join(cmd), shell=True)
+			# https://stackoverflow.com/questions/4856583/how-do-i-pipe-a-subprocess-call-to-a-text-file
+			with open(logFileName, "w") as f:
+				# result = subprocess.call(" ".join(cmd), shell=True, stdout=f, stderr=f)
+				result = subprocess.call(" ".join(cmd), shell=True, stdout=f, stderr=subprocess.STDOUT)
+				# print("runthread: result:", result)
+				if result != 0:
+					print("Robot returned an error (", result, ") please check the log file:", logFileName)
 
-		t = threading.Thread(target=self.run_process_output, args=(outputFile, self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["VUser"], self.jobs[jobid]["Iteration"]))
-		t.start()
+			if os.path.exists(outputFile):
+				t = threading.Thread(target=self.run_process_output, args=(outputFile, self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["VUser"], self.jobs[jobid]["Iteration"]))
+				t.start()
+			else:
+				print("Robot didn't create (", outputFile, ") please check the log file:", logFileName)
 
-		self.robotcount += -1
+			self.robotcount += -1
+		else:
+			print("Could not find robot executeable:", robotexe)
 
 	def run_process_output(self, outputFile, index, vuser, iter):
 		# This should be a better way to do this
@@ -503,7 +517,10 @@ class RFSwarmAgent():
 		# .//kw[@library!='BuiltIn' and msg]/status/@status
 		# .//kw[@library!='BuiltIn' and msg]/status/@starttime
 		# .//kw[@library!='BuiltIn' and msg]/status/@endtime
-		tree = ET.parse(outputFile)
+		try:
+			tree = ET.parse(outputFile)
+		except:
+			print("Error parsing XML file:", outputFile)
 		# print("tree: '", tree)
 		root = tree.getroot()
 		# print("root: '", root)
