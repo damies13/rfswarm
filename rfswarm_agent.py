@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version Test
+#    Version v0.4.1-alpha
 #
 
 
