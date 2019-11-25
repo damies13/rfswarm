@@ -35,6 +35,7 @@ import psutil
 import socket
 import json
 import xml.etree.ElementTree as ET
+import shutil
 
 
 class RFSwarmAgent():
@@ -190,6 +191,7 @@ class RFSwarmAgent():
 				self.isconnected = False
 		except:
 			# print(r.status_code, r.text)
+			print("Server Disconected", datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 			self.isconnected = False
 
 	def connectserver(self):
@@ -238,23 +240,29 @@ class RFSwarmAgent():
 			if (r.status_code != requests.codes.ok):
 				self.isconnected = False
 
+		except Exception as e:
+			# print("getscripts: Exception:", e)
+			print("Server Disconected", datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.isconnected = False
+
+		if not self.isconnected:
+			return None
+
+		try:
 			jsonresp = {}
 			# self.scriptlist
 			jsonresp = json.loads(r.text)
 			# print("getscripts: jsonresp:", jsonresp)
-			for s in jsonresp["Scripts"]:
-				hash = s['Hash']
-				# print("getscripts: hash:", hash)
-				if hash not in self.scriptlist:
-					self.scriptlist[hash] = {'id': hash}
-					t = threading.Thread(target=self.getfile, args=(hash,))
-					t.start()
-
-
-
 		except Exception as e:
 			print("getscripts: Exception:", e)
-			self.isconnected = False
+
+		for s in jsonresp["Scripts"]:
+			hash = s['Hash']
+			# print("getscripts: hash:", hash)
+			if hash not in self.scriptlist:
+				self.scriptlist[hash] = {'id': hash}
+				t = threading.Thread(target=self.getfile, args=(hash,))
+				t.start()
 
 	def getfile(self, hash):
 		# print("getfile: hash: ", hash)
@@ -269,14 +277,30 @@ class RFSwarmAgent():
 			if (r.status_code != requests.codes.ok):
 				self.isconnected = False
 
+		except Exception as e:
+			print("Server Disconected", datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.isconnected = False
+
+		if not self.isconnected:
+			return None
+
+		try:
 			jsonresp = {}
 			# self.scriptlist
 			jsonresp = json.loads(r.text)
 			# print("getfile: jsonresp:", jsonresp)
+		except Exception as e:
+			print("getfile: Exception:", e)
 
+		try:
 			# print('scriptdir', self.scriptdir)
 			localfile = os.path.abspath(os.path.join(self.scriptdir, jsonresp['File']))
 			print('getfile: localfile', localfile)
+
+		except Exception as e:
+			print("getfile: Exception:", e)
+
+		try:
 			self.scriptlist[hash]['localfile'] = localfile
 			self.scriptlist[hash]['file'] = jsonresp['File']
 
@@ -320,6 +344,14 @@ class RFSwarmAgent():
 			if (r.status_code != requests.codes.ok):
 				self.isconnected = False
 
+		except Exception as e:
+			print("Server Disconected", datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.isconnected = False
+
+		if not self.isconnected:
+			return None
+
+		try:
 			jsonresp = {}
 			# self.scriptlist
 			# print("getjobs: r.text:", r.text)
@@ -358,8 +390,6 @@ class RFSwarmAgent():
 
 		except Exception as e:
 			print("getjobs: Exception:", e)
-			print("getjobs: resp: ", r.status_code, r.text)
-			self.isconnected = False
 
 	def runjobs(self):
 		# print("runjobs: self.jobs:", self.jobs)
@@ -391,7 +421,7 @@ class RFSwarmAgent():
 			self.jobs[jobid]["ScriptIndex"] = jobarr[0]
 			self.jobs[jobid]["VUser"] = jobarr[1]
 			self.jobs[jobid]["Iteration"] = 0
-			print("runthread: job data:", self.jobs[jobid])
+			# print("runthread: job data:", self.jobs[jobid])
 
 		self.jobs[jobid]["Iteration"] += 1
 
@@ -452,16 +482,29 @@ class RFSwarmAgent():
 
 		cmd.append(localfile)
 
-		self.robotcount += 1
+		robotexe = shutil.which('robot')
+		# print("runthread: robotexe:", robotexe)
+		if robotexe is not None:
+			self.robotcount += 1
 
-		result = subprocess.call(" ".join(cmd), shell=True)
-		# with open(logFileName, "w") as f:
-		# 	result = subprocess.call(" ".join(cmd), shell=True, stdout=f, stderr=f)
+			# result = subprocess.call(" ".join(cmd), shell=True)
+			# https://stackoverflow.com/questions/4856583/how-do-i-pipe-a-subprocess-call-to-a-text-file
+			with open(logFileName, "w") as f:
+				# result = subprocess.call(" ".join(cmd), shell=True, stdout=f, stderr=f)
+				result = subprocess.call(" ".join(cmd), shell=True, stdout=f, stderr=subprocess.STDOUT)
+				# print("runthread: result:", result)
+				if result != 0:
+					print("Robot returned an error (", result, ") please check the log file:", logFileName)
 
-		t = threading.Thread(target=self.run_process_output, args=(outputFile, self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["VUser"], self.jobs[jobid]["Iteration"]))
-		t.start()
+			if os.path.exists(outputFile):
+				t = threading.Thread(target=self.run_process_output, args=(outputFile, self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["VUser"], self.jobs[jobid]["Iteration"]))
+				t.start()
+			else:
+				print("Robot didn't create (", outputFile, ") please check the log file:", logFileName)
 
-		self.robotcount += -1
+			self.robotcount += -1
+		else:
+			print("Could not find robot executeable:", robotexe)
 
 	def run_process_output(self, outputFile, index, vuser, iter):
 		# This should be a better way to do this
@@ -474,7 +517,10 @@ class RFSwarmAgent():
 		# .//kw[@library!='BuiltIn' and msg]/status/@status
 		# .//kw[@library!='BuiltIn' and msg]/status/@starttime
 		# .//kw[@library!='BuiltIn' and msg]/status/@endtime
-		tree = ET.parse(outputFile)
+		try:
+			tree = ET.parse(outputFile)
+		except:
+			print("Error parsing XML file:", outputFile)
 		# print("tree: '", tree)
 		root = tree.getroot()
 		# print("root: '", root)
@@ -537,8 +583,9 @@ class RFSwarmAgent():
 					if (r.status_code != requests.codes.ok):
 						self.isconnected = False
 				except Exception as e:
-					print("run_proces_output: ",r.status_code, r.text)
-					print("run_proces_output: Exception: ", e)
+					# print("run_proces_output: ",r.status_code, r.text)
+					# print("run_proces_output: Exception: ", e)
+					print("Server Disconected", datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 					self.isconnected = False
 
 
@@ -569,4 +616,10 @@ class RFSwarmAgent():
 
 rfsa = RFSwarmAgent()
 print("Robot Framework Swarm: Run Agent")
-rfsa.mainloop()
+try:
+	rfsa.mainloop()
+except KeyboardInterrupt:
+	pass
+except Exception as e:
+	print("rfsa.Exception:", e)
+	pass
