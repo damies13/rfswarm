@@ -190,6 +190,7 @@ class RFSwarmAgent():
 				self.isconnected = False
 		except:
 			# print(r.status_code, r.text)
+			print("Server Disconected", datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 			self.isconnected = False
 
 	def connectserver(self):
@@ -238,23 +239,29 @@ class RFSwarmAgent():
 			if (r.status_code != requests.codes.ok):
 				self.isconnected = False
 
+		except Exception as e:
+			# print("getscripts: Exception:", e)
+			print("Server Disconected", datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.isconnected = False
+
+		if not self.isconnected:
+			return None
+
+		try:
 			jsonresp = {}
 			# self.scriptlist
 			jsonresp = json.loads(r.text)
 			# print("getscripts: jsonresp:", jsonresp)
-			for s in jsonresp["Scripts"]:
-				hash = s['Hash']
-				# print("getscripts: hash:", hash)
-				if hash not in self.scriptlist:
-					self.scriptlist[hash] = {'id': hash}
-					t = threading.Thread(target=self.getfile, args=(hash,))
-					t.start()
-
-
-
 		except Exception as e:
 			print("getscripts: Exception:", e)
-			self.isconnected = False
+
+		for s in jsonresp["Scripts"]:
+			hash = s['Hash']
+			# print("getscripts: hash:", hash)
+			if hash not in self.scriptlist:
+				self.scriptlist[hash] = {'id': hash}
+				t = threading.Thread(target=self.getfile, args=(hash,))
+				t.start()
 
 	def getfile(self, hash):
 		# print("getfile: hash: ", hash)
@@ -269,14 +276,30 @@ class RFSwarmAgent():
 			if (r.status_code != requests.codes.ok):
 				self.isconnected = False
 
+		except Exception as e:
+			print("Server Disconected", datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.isconnected = False
+
+		if not self.isconnected:
+			return None
+
+		try:
 			jsonresp = {}
 			# self.scriptlist
 			jsonresp = json.loads(r.text)
 			# print("getfile: jsonresp:", jsonresp)
+		except Exception as e:
+			print("getfile: Exception:", e)
 
+		try:
 			# print('scriptdir', self.scriptdir)
 			localfile = os.path.abspath(os.path.join(self.scriptdir, jsonresp['File']))
 			print('getfile: localfile', localfile)
+
+		except Exception as e:
+			print("getfile: Exception:", e)
+
+		try:
 			self.scriptlist[hash]['localfile'] = localfile
 			self.scriptlist[hash]['file'] = jsonresp['File']
 
@@ -320,6 +343,14 @@ class RFSwarmAgent():
 			if (r.status_code != requests.codes.ok):
 				self.isconnected = False
 
+		except Exception as e:
+			print("Server Disconected", datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.isconnected = False
+
+		if not self.isconnected:
+			return None
+
+		try:
 			jsonresp = {}
 			# self.scriptlist
 			# print("getjobs: r.text:", r.text)
@@ -358,8 +389,6 @@ class RFSwarmAgent():
 
 		except Exception as e:
 			print("getjobs: Exception:", e)
-			print("getjobs: resp: ", r.status_code, r.text)
-			self.isconnected = False
 
 	def runjobs(self):
 		# print("runjobs: self.jobs:", self.jobs)
@@ -391,7 +420,7 @@ class RFSwarmAgent():
 			self.jobs[jobid]["ScriptIndex"] = jobarr[0]
 			self.jobs[jobid]["VUser"] = jobarr[1]
 			self.jobs[jobid]["Iteration"] = 0
-			print("runthread: job data:", self.jobs[jobid])
+			# print("runthread: job data:", self.jobs[jobid])
 
 		self.jobs[jobid]["Iteration"] += 1
 
@@ -537,8 +566,9 @@ class RFSwarmAgent():
 					if (r.status_code != requests.codes.ok):
 						self.isconnected = False
 				except Exception as e:
-					print("run_proces_output: ",r.status_code, r.text)
-					print("run_proces_output: Exception: ", e)
+					# print("run_proces_output: ",r.status_code, r.text)
+					# print("run_proces_output: Exception: ", e)
+					print("Server Disconected", datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 					self.isconnected = False
 
 
@@ -569,4 +599,10 @@ class RFSwarmAgent():
 
 rfsa = RFSwarmAgent()
 print("Robot Framework Swarm: Run Agent")
-rfsa.mainloop()
+try:
+	rfsa.mainloop()
+except KeyboardInterrupt:
+	pass
+except Exception as e:
+	print("rfsa.Exception:", e)
+	pass
