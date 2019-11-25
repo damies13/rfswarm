@@ -467,9 +467,11 @@ class RFSwarmAgent():
 				if result != 0:
 					print("Robot returned an error (", result, ") please check the log file:", logFileName)
 
-
-			t = threading.Thread(target=self.run_process_output, args=(outputFile, self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["VUser"], self.jobs[jobid]["Iteration"]))
-			t.start()
+			if os.path.exists(outputFile):
+				t = threading.Thread(target=self.run_process_output, args=(outputFile, self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["VUser"], self.jobs[jobid]["Iteration"]))
+				t.start()
+			else:
+				print("Robot didn't create (", outputFile, ") please check the log file:", logFileName)
 
 			self.robotcount += -1
 		else:
@@ -486,7 +488,10 @@ class RFSwarmAgent():
 		# .//kw[@library!='BuiltIn' and msg]/status/@status
 		# .//kw[@library!='BuiltIn' and msg]/status/@starttime
 		# .//kw[@library!='BuiltIn' and msg]/status/@endtime
-		tree = ET.parse(outputFile)
+		try:
+			tree = ET.parse(outputFile)
+		except:
+			print("Error parsing XML file:", outputFile)
 		# print("tree: '", tree)
 		root = tree.getroot()
 		# print("root: '", root)
