@@ -2,11 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#   V0.1    20190912.DA     Initial Version
-#
-#
-#
-#
+#    Version v0.4.2-alpha
 #
 
 # 	Helpful links
@@ -27,6 +23,7 @@ import sqlite3
 
 # import robot
 
+import socket
 import random
 import time
 from datetime import datetime
@@ -289,6 +286,7 @@ class AgentServer(BaseHTTPRequestHandler):
 
 
 class RFSwarmGUI(tk.Frame):
+	version = "v0.4.2-alpha"
 	index = ""
 	file = ""
 	sheet = ""
@@ -651,6 +649,10 @@ class RFSwarmGUI(tk.Frame):
 			self.config['Run'] = {}
 			self.saveini()
 
+		if 'ResultsDir' not in self.config['Run']:
+			self.config['Run']['ResultsDir'] = os.path.join(self.dir_path, "results")
+			self.saveini()
+
 		if 'display_index' not in self.config['Run']:
 			self.config['Run']['display_index'] = str(False)
 			self.saveini()
@@ -944,7 +946,12 @@ class RFSwarmGUI(tk.Frame):
 		if len(self.run_name)>0:
 			# check if dir exists
 			# print("ensure_db: dir_path:", self.dir_path)
-			self.resultsdir = os.path.join(self.dir_path, "results")
+			# self.resultsdir = os.path.join(self.dir_path, "results")
+			if 'ResultsDir' not in self.config['Run']:
+				self.config['Run']['ResultsDir'] = os.path.join(self.dir_path, "results")
+				self.saveini()
+			self.resultsdir = self.config['Run']['ResultsDir']
+
 			if not os.path.exists(self.resultsdir):
 				os.mkdir(self.resultsdir)
 			self.datapath = os.path.join(self.resultsdir, self.run_name)
@@ -2486,9 +2493,30 @@ class RFSwarmGUI(tk.Frame):
 		return "{}".format(sec_in)
 
 	def run_agent_server(self):
-		server_address = ('', 8138)
+
+		if 'Server' not in self.config:
+			self.config['Server'] = {}
+			self.saveini()
+
+		if 'BindIP' not in self.config['Server']:
+			self.config['Server']['BindIP'] = ''
+			self.saveini()
+
+		if 'BindPort' not in self.config['Server']:
+			self.config['Server']['BindPort'] = "8138"
+			self.saveini()
+
+		srvip = self.config['Server']['BindIP']
+		srvport = int(self.config['Server']['BindPort'])
+		if len(srvip)>0:
+			srvdisphost = srvip
+		else:
+			srvdisphost = socket.gethostname()
+
+
+		server_address = (srvip, srvport)
 		self.agenthttpserver = ThreadingHTTPServer(server_address, AgentServer)
-		print("Starting Agent Server", server_address)
+		print("Starting Agent Server", "http://{}:{}/".format(srvdisphost, srvport))
 		self.agenthttpserver.serve_forever()
 
 	def register_agent(self, agentdata):
@@ -2778,6 +2806,8 @@ class RFSwarmGUI(tk.Frame):
 
 rfs = RFSwarmGUI()
 print("Robot Framework Swarm: Run GUI")
+print("	Version", rfs.version)
+
 # rfs.master.title('Robot Framework Swarm')
 # rfs.columnconfigure(0, weight=1)
 # rfs.rowconfigure(0, weight=1)

@@ -2,11 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#   V0.1    20190912.DA     Initial Version
-#
-#
-#
-#
+#    Version v0.4.2-alpha
 #
 
 
@@ -40,6 +36,7 @@ import shutil
 
 class RFSwarmAgent():
 
+	version = "v0.4.2-alpha"
 	config = None
 	isconnected = False
 	isrunning = False
@@ -74,7 +71,16 @@ class RFSwarmAgent():
 			self.saveini()
 
 
-		self.agentdir = os.path.join(tempfile.gettempdir(), "rfswarmagent")
+
+		if 'Agent' not in self.config:
+			self.config['Agent'] = {}
+			self.saveini()
+
+		if 'agentdir' not in self.config['Agent']:
+			self.config['Agent']['agentdir'] = os.path.join(tempfile.gettempdir(), "rfswarmagent")
+			self.saveini()
+
+		self.agentdir = self.config['Agent']['agentdir']
 		self.ensuredir(self.agentdir)
 
 		self.scriptdir = os.path.join(self.agentdir, "scripts")
@@ -466,7 +472,18 @@ class RFSwarmAgent():
 		outputFile = os.path.join(odir, outputFileName)
 		# print("runthread: outputFile:", outputFile)
 
-		cmd = ["robot"]
+
+		if 'Agent' not in self.config:
+			self.config['Agent'] = {}
+			self.saveini()
+
+		if 'robotcmd' not in self.config['Agent']:
+			self.config['Agent']['robotcmd'] = "robot"
+			self.saveini()
+
+		robotcmd = self.config['Agent']['robotcmd']
+
+		cmd = [robotcmd]
 		cmd.append("-t")
 		cmd.append('"'+test+'"')
 		# cmd.append(testcs)
@@ -482,7 +499,7 @@ class RFSwarmAgent():
 
 		cmd.append(localfile)
 
-		robotexe = shutil.which('robot')
+		robotexe = shutil.which(robotcmd)
 		# print("runthread: robotexe:", robotexe)
 		if robotexe is not None:
 			self.robotcount += 1
@@ -616,6 +633,7 @@ class RFSwarmAgent():
 
 rfsa = RFSwarmAgent()
 print("Robot Framework Swarm: Run Agent")
+print("	Version", rfsa.version)
 try:
 	rfsa.mainloop()
 except KeyboardInterrupt:
