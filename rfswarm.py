@@ -2492,7 +2492,23 @@ class RFSwarmGUI(tk.Frame):
 		return "{}".format(sec_in)
 
 	def run_agent_server(self):
-		server_address = ('', 8138)
+
+		if 'Server' not in self.config:
+			self.config['Server'] = {}
+			self.saveini()
+
+		if 'BindIP' not in self.config['Server']:
+			self.config['Server']['BindIP'] = ''
+			self.saveini()
+
+		if 'BindPort' not in self.config['Server']:
+			self.config['Server']['BindPort'] = "8138"
+			self.saveini()
+
+		srvip = self.config['Server']['BindIP']
+		srvport = int(self.config['Server']['BindPort'])
+
+		server_address = (srvip, srvport)
 		self.agenthttpserver = ThreadingHTTPServer(server_address, AgentServer)
 		print("Starting Agent Server", server_address)
 		self.agenthttpserver.serve_forever()
