@@ -74,7 +74,16 @@ class RFSwarmAgent():
 			self.saveini()
 
 
-		self.agentdir = os.path.join(tempfile.gettempdir(), "rfswarmagent")
+
+		if 'Agent' not in self.config:
+			self.config['Agent'] = {}
+			self.saveini()
+
+		if 'agentdir' not in self.config['Agent']:
+			self.config['Agent']['agentdir'] = os.path.join(tempfile.gettempdir(), "rfswarmagent")
+			self.saveini()
+
+		self.agentdir = self.config['Agent']['agentdir']
 		self.ensuredir(self.agentdir)
 
 		self.scriptdir = os.path.join(self.agentdir, "scripts")
