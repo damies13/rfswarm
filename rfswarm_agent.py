@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version v0.4.1-alpha
+#    Version v0.4.2-alpha
 #
 
 
@@ -36,7 +36,7 @@ import shutil
 
 class RFSwarmAgent():
 
-	version = "v0.4.1-alpha"
+	version = "v0.4.2-alpha"
 	config = None
 	isconnected = False
 	isrunning = False

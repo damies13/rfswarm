@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version v0.4.1-alpha
+#    Version v0.4.2-alpha
 #
 
 # 	Helpful links
@@ -286,7 +286,7 @@ class AgentServer(BaseHTTPRequestHandler):
 
 
 class RFSwarmGUI(tk.Frame):
-	version = "v0.4.1-alpha"
+	version = "v0.4.2-alpha"
 	index = ""
 	file = ""
 	sheet = ""
