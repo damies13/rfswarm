@@ -2775,6 +2775,8 @@ class RFSwarmGUI(tk.Frame):
 
 rfs = RFSwarmGUI()
 print("Robot Framework Swarm: Run GUI")
+print("	Version", rfs.version)
+
 # rfs.master.title('Robot Framework Swarm')
 # rfs.columnconfigure(0, weight=1)
 # rfs.rowconfigure(0, weight=1)

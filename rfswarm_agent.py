@@ -622,6 +622,7 @@ class RFSwarmAgent():
 
 rfsa = RFSwarmAgent()
 print("Robot Framework Swarm: Run Agent")
+print("	Version", rfsa.version)
 try:
 	rfsa.mainloop()
 except KeyboardInterrupt:
