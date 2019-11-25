@@ -23,6 +23,7 @@ import sqlite3
 
 # import robot
 
+import socket
 import random
 import time
 from datetime import datetime
@@ -2507,10 +2508,15 @@ class RFSwarmGUI(tk.Frame):
 
 		srvip = self.config['Server']['BindIP']
 		srvport = int(self.config['Server']['BindPort'])
+		if len(srvip)>0:
+			srvdisphost = srvip
+		else:
+			srvdisphost = socket.gethostname()
+
 
 		server_address = (srvip, srvport)
 		self.agenthttpserver = ThreadingHTTPServer(server_address, AgentServer)
-		print("Starting Agent Server", server_address)
+		print("Starting Agent Server", "http://{}:{}/".format(srvdisphost, srvport))
 		self.agenthttpserver.serve_forever()
 
 	def register_agent(self, agentdata):
