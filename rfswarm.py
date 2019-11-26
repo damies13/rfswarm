@@ -324,6 +324,8 @@ class RFSwarmGUI(tk.Frame):
 
 	Agents = {}
 
+	plan_scnro_chngd = False
+
 	plancolidx = 0
 	plancolusr = 1
 	plancoldly = 2
@@ -1664,6 +1666,7 @@ class RFSwarmGUI(tk.Frame):
 			usrs = self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].get()
 			# print("Row:", r, "Users:", usrs)
 			self.scriptlist[r]["Users"] = int(usrs)
+			self.plan_scnro_chngd = True
 			self.pln_update_graph()
 			return True
 		# print(self.scriptgrid.grid_size())
@@ -1673,6 +1676,7 @@ class RFSwarmGUI(tk.Frame):
 				usrs = self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].get()
 				# print("Row:", r, "Users:", usrs)
 				self.scriptlist[r]["Users"] = int(usrs)
+				self.plan_scnro_chngd = True
 		self.pln_update_graph()
 		return True
 
@@ -1689,8 +1693,10 @@ class RFSwarmGUI(tk.Frame):
 			# print("Row:", r, "Delay:", dly)
 			if len(dly)>0:
 				self.scriptlist[r]["Delay"] = int(dly)
+				self.plan_scnro_chngd = True
 			else:
 				self.scriptlist[r]["Delay"] = 0
+				self.plan_scnro_chngd = True
 			self.pln_update_graph()
 			return True
 		# print(self.scriptgrid.grid_size())
@@ -1700,6 +1706,7 @@ class RFSwarmGUI(tk.Frame):
 				dly = self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].get()
 				# print("Row:", r, "Delay:", dly)
 				self.scriptlist[r]["Delay"] = int(dly)
+				self.plan_scnro_chngd = True
 		self.pln_update_graph()
 		return True
 
@@ -1715,6 +1722,7 @@ class RFSwarmGUI(tk.Frame):
 			rmp = self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].get()
 			# print("Row:", r, "RampUp:", rmp)
 			self.scriptlist[r]["RampUp"] = int(rmp)
+			self.plan_scnro_chngd = True
 			self.pln_update_graph()
 			return True
 		# print(self.scriptgrid.grid_size())
@@ -1724,6 +1732,7 @@ class RFSwarmGUI(tk.Frame):
 				rmp = self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].get()
 				# print("Row:", r, "RampUp:", rmp)
 				self.scriptlist[r]["RampUp"] = int(rmp)
+				self.plan_scnro_chngd = True
 		self.pln_update_graph()
 		return True
 
@@ -1739,6 +1748,7 @@ class RFSwarmGUI(tk.Frame):
 			run = self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].get()
 			# print("Row:", r, "Run:", run)
 			self.scriptlist[r]["Run"] = int(run)
+			self.plan_scnro_chngd = True
 			self.pln_update_graph()
 			return True
 		# print(self.scriptgrid.grid_size())
@@ -1748,6 +1758,7 @@ class RFSwarmGUI(tk.Frame):
 				run = self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].get()
 				# print("Row:", r, "Run:", run)
 				self.scriptlist[r]["Run"] = int(run)
+				self.plan_scnro_chngd = True
 		self.pln_update_graph()
 		return True
 
@@ -1885,6 +1896,7 @@ class RFSwarmGUI(tk.Frame):
 			self.scriptlist[r]["ScriptHash"] = ''
 
 
+		self.plan_scnro_chngd = True
 		self.pln_update_graph()
 		return True
 
@@ -1913,6 +1925,9 @@ class RFSwarmGUI(tk.Frame):
 
 		# print("sr_test_validate: scriptlist[r]:", self.scriptlist[r])
 		# print("sr_test_validate: scriptlist[r][TestVar].get():", self.scriptlist[r]["TestVar"].get())
+
+		self.plan_scnro_chngd = True
+
 		self.pln_update_graph()
 		return True
 
@@ -2652,7 +2667,7 @@ class RFSwarmGUI(tk.Frame):
 				self.sr_test_validate("row{}".format(ii), filedata[istr]["test"])
 
 
-
+		self.plan_scnro_chngd = False
 
 	def mnu_file_Save(self, _event=None):
 		# print("mnu_file_Save")
@@ -2729,10 +2744,11 @@ class RFSwarmGUI(tk.Frame):
 
 	def mnu_file_Close(self, _event=None):
 		# print("mnu_file_Close")
-		MsgBox = tkm.askyesno('Save Scenario','Do you want to save the current scenario?')
-		# print("mnu_file_Close: MsgBox:", MsgBox)
-		if MsgBox:
-			self.mnu_file_Save()
+		if self.plan_scnro_chngd:
+			MsgBox = tkm.askyesno('Save Scenario','Do you want to save the current scenario?')
+			# print("mnu_file_Close: MsgBox:", MsgBox)
+			if MsgBox:
+				self.mnu_file_Save()
 
 		self.config['Plan']['ScenarioFile'] = ""
 		self.mnu_file_New()
