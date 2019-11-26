@@ -639,7 +639,10 @@ class RFSwarmGUI(tk.Frame):
 		new = ttk.Button(self.scriptgrid, text="+", command=self.addScriptRow, width=1)
 		new.grid(column=self.plancoladd, row=0, sticky="nsew")
 
-		self.addScriptRow()
+		if len(self.config['Plan']['ScenarioFile'])>0:
+			self.mnu_file_Open(self.config['Plan']['ScenarioFile'])
+		else:
+			self.addScriptRow()
 
 
 
@@ -2588,8 +2591,13 @@ class RFSwarmGUI(tk.Frame):
 
 	def mnu_file_Open(self, _event=None):
 		# print("mnu_file_Open")
-		self.mnu_file_Close()	# ensure any previous scenario is closed and saved if required
-		ScenarioFile = str(tkf.askopenfilename(initialdir=self.config['Plan']['ScenarioDir'], title = "Select RFSwarm Scenario File", filetypes = (("RFSwarm","*.rfs"),("all files","*.*"))))
+		# print("mnu_file_Open: _event:", _event, "	Type:", type(_event))
+		# if type(_event) is not "<class 'str'>":
+		if type(_event) is not type(""):
+			self.mnu_file_Close()	# ensure any previous scenario is closed and saved if required
+			ScenarioFile = str(tkf.askopenfilename(initialdir=self.config['Plan']['ScenarioDir'], title = "Select RFSwarm Scenario File", filetypes = (("RFSwarm","*.rfs"),("all files","*.*"))))
+		else:
+			ScenarioFile = _event
 		# print("mnu_file_Open: ScenarioFile:", ScenarioFile)
 		self.config['Plan']['ScenarioDir'] = os.path.dirname(ScenarioFile)
 		self.config['Plan']['ScenarioFile'] = ScenarioFile
