@@ -33,6 +33,7 @@ import json
 import xml.etree.ElementTree as ET
 import shutil
 
+import argparse
 
 class RFSwarmAgent():
 
@@ -54,11 +55,26 @@ class RFSwarmAgent():
 	jobs = {}
 	robotcount = 0
 	status = "Ready"
+	args = None
 
 	def __init__(self, master=None):
 		print("RFSwarmAgent: __init__")
 		# print("gettempdir", tempfile.gettempdir())
 		# print("tempdir", tempfile.tempdir)
+
+		parser = argparse.ArgumentParser()
+		# parser.add_argument('--foo', help='foo help')
+		parser.add_argument('-v', '--version', help='Display the version and exit', action='store_true')
+		parser.add_argument('-s', '--server', nargs='?', help='The server to connect to e.g. http://localhost:8138/')
+		parser.add_argument('-d', '--agentdir', nargs='?', help='The directory the agent should use for files')
+		parser.add_argument('-r', '--robot', nargs='?', help='The robot framework executable')
+		self.args = parser.parse_args()
+
+		if self.args.version:
+			print("Robot Framework Swarm: Run Agent")
+			print("	Version", self.version)
+			exit()
+
 
 		self.config = configparser.ConfigParser()
 		scrdir = os.path.dirname(__file__)
