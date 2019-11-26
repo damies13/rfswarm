@@ -1799,7 +1799,7 @@ class RFSwarmGUI(tk.Frame):
 					if checking:
 						# print("find_dependancies: line", line)
 						try:
-							if 'Resource' in line or 'Variables' in line or 'Metadata	File' in line:
+							if line.strip()[:1] != "#" and ('Resource' in line or 'Variables' in line or 'Metadata	File' in line):
 								linearr = line.strip().split()
 								# print("find_dependancies: linearr", linearr)
 								if len(linearr)>1:
