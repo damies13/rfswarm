@@ -54,18 +54,19 @@ class RFSwarmAgent():
 	jobs = {}
 	robotcount = 0
 	status = "Ready"
+	excludelibraries = []
 
 	def __init__(self, master=None):
-		print("RFSwarmAgent: __init__")
+		# print("RFSwarmAgent: __init__")
 		# print("gettempdir", tempfile.gettempdir())
 		# print("tempdir", tempfile.tempdir)
 
 		self.config = configparser.ConfigParser()
 		scrdir = os.path.dirname(__file__)
-		print("RFSwarmAgent: __init__: scrdir: ", scrdir)
+		# print("RFSwarmAgent: __init__: scrdir: ", scrdir)
 		self.agentini = os.path.join(scrdir, "RFSwarmAgent.ini")
 		if os.path.isfile(self.agentini):
-			print("RFSwarmAgent: __init__: agentini: ", self.agentini)
+			# print("RFSwarmAgent: __init__: agentini: ", self.agentini)
 			self.config.read(self.agentini)
 		else:
 			self.saveini()
@@ -88,6 +89,15 @@ class RFSwarmAgent():
 
 		self.logdir = os.path.join(self.agentdir, "logs")
 		self.ensuredir(self.logdir)
+
+
+		if 'excludelibraries' not in self.config['Agent']:
+			self.config['Agent']['excludelibraries'] = "BuiltIn,String,OperatingSystem,perftest"
+			self.saveini()
+
+		# self.excludelibraries = ["BuiltIn", "String", "OperatingSystem", "perftest"]
+		self.excludelibraries = self.config['Agent']['excludelibraries'].split(",")
+		# print("RFSwarmAgent: __init__: self.excludelibraries:", self.excludelibraries)
 
 	def mainloop(self):
 		# print("RFSwarmAgent: mainloop")
@@ -545,7 +555,8 @@ class RFSwarmAgent():
 		for result in root.findall(".//kw/msg/..[@library]"):
 			# print("run_process_output: result: ", result)
 			library = result.get('library')
-			if library not in ["BuiltIn", "String", "OperatingSystem", "perftest"]:
+			# if library not in ["BuiltIn", "String", "OperatingSystem", "perftest"]:
+			if library not in self.excludelibraries:
 				# print("run_process_output: library: ", library)
 				seq += 1
 				# print("result: library:", library)
