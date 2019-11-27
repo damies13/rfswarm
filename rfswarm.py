@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version v0.4.2-alpha
+#    Version v0.4.3-alpha
 #
 
 # 	Helpful links
@@ -64,15 +64,21 @@ class percentile:
 		self.percent = percent
 
 	def finalize(self):
-		# print("percentile: finalize: self.count:", self.count, "	self.percent:", self.percent, "	self.values:", self.values)
-		nth = self.count * (self.percent/100)
-		# print("percentile: finalize: nth:", nth)
-		nthi = int(nth)
-		# nthi = int(math.ceil(self.count * (self.percent/100)))
-		self.values.sort()
-		# print("percentile: finalize: nthi:", nthi, "	self.values[nthi]:", self.values[nthi], "	self.values:", self.values)
-		return self.values[nthi]
-		# return self.count
+		try:
+			if self.count <10:
+				# Need at least 10 samples to get a useful percentile
+				return None
+			# print("percentile: finalize: self.count:", self.count, "	self.percent:", self.percent, "	self.values:", self.values)
+			nth = self.count * (self.percent/100)
+			# print("percentile: finalize: nth:", nth)
+			nthi = int(nth)
+			# nthi = int(math.ceil(self.count * (self.percent/100)))
+			self.values.sort()
+			# print("percentile: finalize: nthi:", nthi, "	self.values[nthi]:", self.values[nthi], "	self.values:", self.values)
+			return self.values[nthi]
+			# return self.count
+		except:
+			return None
 
 class AgentServer(BaseHTTPRequestHandler):
 	def do_HEAD(self):
@@ -286,7 +292,7 @@ class AgentServer(BaseHTTPRequestHandler):
 
 
 class RFSwarmGUI(tk.Frame):
-	version = "v0.4.2-alpha"
+	version = "v0.4.3-alpha"
 	index = ""
 	file = ""
 	sheet = ""
@@ -323,6 +329,8 @@ class RFSwarmGUI(tk.Frame):
 	updatethread = None
 
 	Agents = {}
+
+	plan_scnro_chngd = False
 
 	plancolidx = 0
 	plancolusr = 1
@@ -639,7 +647,10 @@ class RFSwarmGUI(tk.Frame):
 		new = ttk.Button(self.scriptgrid, text="+", command=self.addScriptRow, width=1)
 		new.grid(column=self.plancoladd, row=0, sticky="nsew")
 
-		self.addScriptRow()
+		if len(self.config['Plan']['ScenarioFile'])>0:
+			self.mnu_file_Open(self.config['Plan']['ScenarioFile'])
+		else:
+			self.addScriptRow()
 
 
 
@@ -1260,7 +1271,7 @@ class RFSwarmGUI(tk.Frame):
 		for agnt in self.Agents.keys():
 			# print("get_next_agent: agnt:", agnt)
 			loadtpl.append([agnt, self.Agents[agnt]['LOAD%']])
-			robottpl.append([agnt, self.Agents[agnt]['Robots']])
+			robottpl.append([agnt, self.Agents[agnt]['AssignedRobots']])
 
 		# data.sort(key=itemgetter(1))
 		# print("get_next_agent: robottpl:", robottpl)
@@ -1664,6 +1675,7 @@ class RFSwarmGUI(tk.Frame):
 			usrs = self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].get()
 			# print("Row:", r, "Users:", usrs)
 			self.scriptlist[r]["Users"] = int(usrs)
+			self.plan_scnro_chngd = True
 			self.pln_update_graph()
 			return True
 		# print(self.scriptgrid.grid_size())
@@ -1673,6 +1685,7 @@ class RFSwarmGUI(tk.Frame):
 				usrs = self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].get()
 				# print("Row:", r, "Users:", usrs)
 				self.scriptlist[r]["Users"] = int(usrs)
+				self.plan_scnro_chngd = True
 		self.pln_update_graph()
 		return True
 
@@ -1689,8 +1702,10 @@ class RFSwarmGUI(tk.Frame):
 			# print("Row:", r, "Delay:", dly)
 			if len(dly)>0:
 				self.scriptlist[r]["Delay"] = int(dly)
+				self.plan_scnro_chngd = True
 			else:
 				self.scriptlist[r]["Delay"] = 0
+				self.plan_scnro_chngd = True
 			self.pln_update_graph()
 			return True
 		# print(self.scriptgrid.grid_size())
@@ -1700,6 +1715,7 @@ class RFSwarmGUI(tk.Frame):
 				dly = self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].get()
 				# print("Row:", r, "Delay:", dly)
 				self.scriptlist[r]["Delay"] = int(dly)
+				self.plan_scnro_chngd = True
 		self.pln_update_graph()
 		return True
 
@@ -1715,6 +1731,7 @@ class RFSwarmGUI(tk.Frame):
 			rmp = self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].get()
 			# print("Row:", r, "RampUp:", rmp)
 			self.scriptlist[r]["RampUp"] = int(rmp)
+			self.plan_scnro_chngd = True
 			self.pln_update_graph()
 			return True
 		# print(self.scriptgrid.grid_size())
@@ -1724,6 +1741,7 @@ class RFSwarmGUI(tk.Frame):
 				rmp = self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].get()
 				# print("Row:", r, "RampUp:", rmp)
 				self.scriptlist[r]["RampUp"] = int(rmp)
+				self.plan_scnro_chngd = True
 		self.pln_update_graph()
 		return True
 
@@ -1739,6 +1757,7 @@ class RFSwarmGUI(tk.Frame):
 			run = self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].get()
 			# print("Row:", r, "Run:", run)
 			self.scriptlist[r]["Run"] = int(run)
+			self.plan_scnro_chngd = True
 			self.pln_update_graph()
 			return True
 		# print(self.scriptgrid.grid_size())
@@ -1748,6 +1767,7 @@ class RFSwarmGUI(tk.Frame):
 				run = self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].get()
 				# print("Row:", r, "Run:", run)
 				self.scriptlist[r]["Run"] = int(run)
+				self.plan_scnro_chngd = True
 		self.pln_update_graph()
 		return True
 
@@ -1796,7 +1816,7 @@ class RFSwarmGUI(tk.Frame):
 					if checking:
 						# print("find_dependancies: line", line)
 						try:
-							if 'Resource' in line or 'Variables' in line or 'Metadata	File' in line:
+							if line.strip()[:1] != "#" and ('Resource' in line or 'Variables' in line or 'Metadata	File' in line):
 								linearr = line.strip().split()
 								# print("find_dependancies: linearr", linearr)
 								if len(linearr)>1:
@@ -1885,6 +1905,7 @@ class RFSwarmGUI(tk.Frame):
 			self.scriptlist[r]["ScriptHash"] = ''
 
 
+		self.plan_scnro_chngd = True
 		self.pln_update_graph()
 		return True
 
@@ -1913,6 +1934,9 @@ class RFSwarmGUI(tk.Frame):
 
 		# print("sr_test_validate: scriptlist[r]:", self.scriptlist[r])
 		# print("sr_test_validate: scriptlist[r][TestVar].get():", self.scriptlist[r]["TestVar"].get())
+
+		self.plan_scnro_chngd = True
+
 		self.pln_update_graph()
 		return True
 
@@ -2262,94 +2286,121 @@ class RFSwarmGUI(tk.Frame):
 
 
 		# print('run_start_threads: curusrs:', curusrs, "	totusrs:", totusrs, "	run_paused:", self.run_paused)
-		while curusrs < totusrs and not self.run_paused:
+		while curusrs < totusrs:
 			# print("run_start_threads: while totusrs", totusrs, " 	curusrs:", curusrs)
 			# totusrs = 0
-			for grp in self.scriptlist:
-				# print("run_start_threads: grp", grp)
-				if "Test" in grp.keys() and len(grp["Test"])>0:
-					# print("run_start_threads: while totusrs", totusrs, " 	curusrs:", curusrs)
-					# print("run_start_threads: grp[Index]", grp['Index'])
 
-					nxtagent = self.get_next_agent()
-					# print('run_start_threads: next_agent', nxtagent)
+			if "Start" not in self.robot_schedule:
+				self.robot_schedule["Start"] = 0
 
-					if nxtagent is None:
-						print('No Agents available to run Robots!')
-						print('No Agents available to run Robots!')
-						print('No Agents available to run Robots!')
-						self.run_paused = True
 
-					colour = self.line_colour(grp["Index"])
-					# print("run_start_threads: Line colour", colour)
+			if self.run_end>0 and int(time.time())>self.run_end:
+				break
 
-					if self.run_start < 1:
-						self.run_start = int(time.time()) #time now
-						self.run_name = "{}_{}".format("Scenario", self.run_start)
-						self.robot_schedule = {}
-						self.robot_schedule["RunName"] = self.run_name
-						self.robot_schedule["Agents"] = {}
-						self.robot_schedule["Scripts"] = {}
-						self.robot_schedule["Start"] = self.run_start
+			if self.run_paused and int(time.time())<self.run_end:
+				nxtagent = self.get_next_agent()
+				if nxtagent is None:
+					self.run_paused = True
+					# print('No Agents available to run Robots! (if)')
+					print('No Agents available to run Robots!')
+					time.sleep(10)
+				else:
+					self.run_paused = False
+					tkm.showinfo("RFSwarm - Info", "Agents available to run Robots, test will now resume.")
+					print('Agents available to run Robots, resuming.')
+			else:
+				for grp in self.scriptlist:
+					# print("run_start_threads: grp", grp)
+					if "Test" in grp.keys() and len(grp["Test"])>0:
+						# print("run_start_threads: while totusrs", totusrs, " 	curusrs:", curusrs)
+						# print("run_start_threads: grp[Index]", grp['Index'])
 
-						stm = time.localtime(self.robot_schedule["Start"])
-						self.display_run['start_time'].set("  {}  ".format(time.strftime("%H:%M:%S", stm)))
+						nxtagent = self.get_next_agent()
+						# print('run_start_threads: next_agent', nxtagent)
 
-						self.run_end = int(time.time()) + grp["Run"]
-						self.robot_schedule["End"] = self.run_end
+						if nxtagent is None:
+							# MsgBox = tkm.askyesno('Save Scenario','Do you want to save the current scenario?')
+							self.run_paused = True
+							tkm.showwarning("RFSwarm - Warning", "No Agents available to run Robots!\nTest run is paused, please add agents to continue or click stop to abort.")
 
-						# totusrs = 0
+							# print('No Agents available to run Robots! (else)')
+							print('No Agents available to run Robots!')
+							# print('No Agents available to run Robots!')
+							# break
 
-					gid = grp["Index"]
-					# print("run_start_threads: gid", gid, " 	robot_schedule[Scripts].keys()", self.robot_schedule["Scripts"].keys())
-					if gid not in self.robot_schedule["Scripts"].keys():
-						self.robot_schedule["Scripts"][gid] = {}
-						# print("run_start_threads: totusrs", totusrs)
-						# totusrs += int(grp["Users"])
-						# print("run_start_threads: totusrs", totusrs)
+						colour = self.line_colour(grp["Index"])
+						# print("run_start_threads: Line colour", colour)
 
-					time_elapsed = int(time.time()) - self.run_start
-					# print('run_start_threads: time_elapsed', time_elapsed, "Delay", grp["Delay"])
-					if time_elapsed > grp["Delay"] - 1:
-						uid = 0
-						nxtuid = len(self.robot_schedule["Scripts"][gid]) + 1
-						# print('run_start_threads: nxtuid', nxtuid)
-						# Determine if we should start another user?
-						if nxtuid < grp["Users"]+1:
-							rupct = (time_elapsed - grp["Delay"]) /grp["RampUp"]
-							# print('run_start_threads: rupct', rupct)
-							ruusr = int(grp["Users"] * rupct)
-							# print('run_start_threads: nxtuid', nxtuid, 'ruusr', ruusr)
-							if nxtuid < ruusr+1:
-								uid = nxtuid
-								grurid = "{}_{}".format(gid,uid)
-								# print('run_start_threads: uid', uid)
-								self.robot_schedule["Scripts"][gid][uid] = grurid
+						if self.run_start < 1:
+							self.run_start = int(time.time()) #time now
+							self.run_name = "{}_{}".format("Scenario", self.run_start)
+							self.robot_schedule = {}
+							self.robot_schedule["RunName"] = self.run_name
+							self.robot_schedule["Agents"] = {}
+							self.robot_schedule["Scripts"] = {}
+							self.robot_schedule["Start"] = self.run_start
 
-								if nxtagent not in self.robot_schedule["Agents"].keys():
-									self.robot_schedule["Agents"][nxtagent] = {}
+							stm = time.localtime(self.robot_schedule["Start"])
+							self.display_run['start_time'].set("  {}  ".format(time.strftime("%H:%M:%S", stm)))
 
-								self.robot_schedule["Agents"][nxtagent][grurid] = {
-									"ScriptHash": grp["ScriptHash"],
-									"Test": grp["Test"],
-									"StartTime": int(time.time()),
-									"EndTime": int(time.time()) + grp["Run"],
-									"id": grurid
-								}
+							self.run_end = int(time.time()) + grp["Run"]
+							self.robot_schedule["End"] = self.run_end
 
-								self.run_end = int(time.time()) + grp["Run"]
-								self.robot_schedule["End"] = self.run_end
+							# totusrs = 0
 
-								curusrs += 1
-								# print("run_start_threads: robot_schedule", self.robot_schedule)
+						gid = grp["Index"]
+						# print("run_start_threads: gid", gid, " 	robot_schedule[Scripts].keys()", self.robot_schedule["Scripts"].keys())
+						if gid not in self.robot_schedule["Scripts"].keys():
+							self.robot_schedule["Scripts"][gid] = {}
+							# print("run_start_threads: totusrs", totusrs)
+							# totusrs += int(grp["Users"])
+							# print("run_start_threads: totusrs", totusrs)
 
-					if self.run_end>0 and int(time.time())>self.run_end:
-						self.run_paused = True
-						break
+						time_elapsed = int(time.time()) - self.run_start
+						# print('run_start_threads: time_elapsed', time_elapsed, "Delay", grp["Delay"])
+						if time_elapsed > grp["Delay"] - 1:
+							uid = 0
+							nxtuid = len(self.robot_schedule["Scripts"][gid]) + 1
+							# print('run_start_threads: nxtuid', nxtuid)
+							# Determine if we should start another user?
+							if nxtuid < grp["Users"]+1:
+								rupct = (time_elapsed - grp["Delay"]) /grp["RampUp"]
+								# print('run_start_threads: rupct', rupct)
+								ruusr = int(grp["Users"] * rupct)
+								# print('run_start_threads: nxtuid', nxtuid, 'ruusr', ruusr)
+								if nxtuid < ruusr+1:
+									uid = nxtuid
+									grurid = "{}_{}".format(gid,uid)
+									# print('run_start_threads: uid', uid)
+									self.robot_schedule["Scripts"][gid][uid] = grurid
 
-					time.sleep(0.1)
-					etm = time.gmtime(int(time.time()) - self.robot_schedule["Start"])
-					self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
+									if nxtagent not in self.robot_schedule["Agents"].keys():
+										self.robot_schedule["Agents"][nxtagent] = {}
+
+									self.robot_schedule["Agents"][nxtagent][grurid] = {
+										"ScriptHash": grp["ScriptHash"],
+										"Test": grp["Test"],
+										"StartTime": int(time.time()),
+										"EndTime": int(time.time()) + grp["Run"],
+										"id": grurid
+									}
+
+									self.run_end = int(time.time()) + grp["Run"]
+									self.robot_schedule["End"] = self.run_end
+
+									self.Agents[nxtagent]["AssignedRobots"] += 1
+									# print("self.Agents[",nxtagent,"][AssignedRobots]:", self.Agents[nxtagent]["AssignedRobots"])
+
+									curusrs += 1
+									# print("run_start_threads: robot_schedule", self.robot_schedule)
+
+						if self.run_end>0 and int(time.time())>self.run_end:
+							self.run_paused = True
+							break
+
+						time.sleep(0.1)
+						etm = time.gmtime(int(time.time()) - self.robot_schedule["Start"])
+						self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
 
 
 	def run_manage_user_thread(self, gid, uid):
@@ -2521,6 +2572,16 @@ class RFSwarmGUI(tk.Frame):
 
 	def register_agent(self, agentdata):
 		# print("register_agent: agentdata:", agentdata)
+
+		# if "AssignedRobots" not in self.Agents[agnt].keys():
+		# 	print("get_next_agent: addinig AssignedRobots to ", agnt)
+		# 	print("get_next_agent: self.Agents:", self.Agents)
+		# 	self.Agents[agnt]["AssignedRobots"] = 0
+		AssignedRobots = 0
+		if agentdata["AgentName"] in self.Agents and "AssignedRobots" in self.Agents[agentdata["AgentName"]]:
+			AssignedRobots = self.Agents[agentdata["AgentName"]]["AssignedRobots"]
+		agentdata["AssignedRobots"] = AssignedRobots
+
 		agentdata["LastSeen"] = int(time.time())
 		if "Status" not in agentdata.keys():
 			agentdata["Status"] = "Unknown"
@@ -2588,8 +2649,13 @@ class RFSwarmGUI(tk.Frame):
 
 	def mnu_file_Open(self, _event=None):
 		# print("mnu_file_Open")
-		self.mnu_file_Close()	# ensure any previous scenario is closed and saved if required
-		ScenarioFile = str(tkf.askopenfilename(initialdir=self.config['Plan']['ScenarioDir'], title = "Select RFSwarm Scenario File", filetypes = (("RFSwarm","*.rfs"),("all files","*.*"))))
+		# print("mnu_file_Open: _event:", _event, "	Type:", type(_event))
+		# if type(_event) is not "<class 'str'>":
+		if type(_event) is not type(""):
+			self.mnu_file_Close()	# ensure any previous scenario is closed and saved if required
+			ScenarioFile = str(tkf.askopenfilename(initialdir=self.config['Plan']['ScenarioDir'], title = "Select RFSwarm Scenario File", filetypes = (("RFSwarm","*.rfs"),("all files","*.*"))))
+		else:
+			ScenarioFile = _event
 		# print("mnu_file_Open: ScenarioFile:", ScenarioFile)
 		self.config['Plan']['ScenarioDir'] = os.path.dirname(ScenarioFile)
 		self.config['Plan']['ScenarioFile'] = ScenarioFile
@@ -2652,7 +2718,7 @@ class RFSwarmGUI(tk.Frame):
 				self.sr_test_validate("row{}".format(ii), filedata[istr]["test"])
 
 
-
+		self.plan_scnro_chngd = False
 
 	def mnu_file_Save(self, _event=None):
 		# print("mnu_file_Save")
@@ -2729,10 +2795,11 @@ class RFSwarmGUI(tk.Frame):
 
 	def mnu_file_Close(self, _event=None):
 		# print("mnu_file_Close")
-		MsgBox = tkm.askyesno('Save Scenario','Do you want to save the current scenario?')
-		# print("mnu_file_Close: MsgBox:", MsgBox)
-		if MsgBox:
-			self.mnu_file_Save()
+		if self.plan_scnro_chngd:
+			MsgBox = tkm.askyesno('RFSwarm - Save Scenario','Do you want to save the current scenario?')
+			# print("mnu_file_Close: MsgBox:", MsgBox)
+			if MsgBox:
+				self.mnu_file_Save()
 
 		self.config['Plan']['ScenarioFile'] = ""
 		self.mnu_file_New()
