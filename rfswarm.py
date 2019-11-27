@@ -1271,7 +1271,7 @@ class RFSwarmGUI(tk.Frame):
 		for agnt in self.Agents.keys():
 			# print("get_next_agent: agnt:", agnt)
 			loadtpl.append([agnt, self.Agents[agnt]['LOAD%']])
-			robottpl.append([agnt, self.Agents[agnt]['Robots']])
+			robottpl.append([agnt, self.Agents[agnt]['AssignedRobots']])
 
 		# data.sort(key=itemgetter(1))
 		# print("get_next_agent: robottpl:", robottpl)
@@ -2388,6 +2388,9 @@ class RFSwarmGUI(tk.Frame):
 									self.run_end = int(time.time()) + grp["Run"]
 									self.robot_schedule["End"] = self.run_end
 
+									self.Agents[nxtagent]["AssignedRobots"] += 1
+									# print("self.Agents[",nxtagent,"][AssignedRobots]:", self.Agents[nxtagent]["AssignedRobots"])
+
 									curusrs += 1
 									# print("run_start_threads: robot_schedule", self.robot_schedule)
 
@@ -2569,6 +2572,16 @@ class RFSwarmGUI(tk.Frame):
 
 	def register_agent(self, agentdata):
 		# print("register_agent: agentdata:", agentdata)
+
+		# if "AssignedRobots" not in self.Agents[agnt].keys():
+		# 	print("get_next_agent: addinig AssignedRobots to ", agnt)
+		# 	print("get_next_agent: self.Agents:", self.Agents)
+		# 	self.Agents[agnt]["AssignedRobots"] = 0
+		AssignedRobots = 0
+		if agentdata["AgentName"] in self.Agents and "AssignedRobots" in self.Agents[agentdata["AgentName"]]:
+			AssignedRobots = self.Agents[agentdata["AgentName"]]["AssignedRobots"]
+		agentdata["AssignedRobots"] = AssignedRobots
+
 		agentdata["LastSeen"] = int(time.time())
 		if "Status" not in agentdata.keys():
 			agentdata["Status"] = "Unknown"
