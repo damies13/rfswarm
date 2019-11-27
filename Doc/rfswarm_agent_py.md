@@ -5,6 +5,17 @@
 
 rfswarm_agent.py is the agent component that actually runs the Robot Framework test cases and returns the results to rfswarm. The agent has no GUI
 
+- [Install and Setup](#Install-and-Setup)
+	- [Robot Framework](#1-Robot-Framework)
+	- [Install the prerequisites](#2-Install-the-prerequisites)
+	- [Run Agent 1st time](#3-Run-Agent-1st-time)
+	- [Run Agent](#4-Run-Agent)
+- [INI File Settings](#INI-File-Settings)
+	- [Swarm Server](#Swarm-Server)
+	- [Agent Directory](#Agent-Directory)
+	- [Robot Command](#Robot-Command)
+	- [Exclude Libraries](#Exclude-Libraries)
+
 ### Install and Setup
 
 #### 1. Robot Framework
@@ -62,4 +73,35 @@ RFSwarmAgent: mainloop: Running 2019-11-03 00:17:30 ( 1572704250 )isrunning: Fal
 RFSwarmAgent: mainloop: Running 2019-11-03 00:17:40 ( 1572704260 )isrunning: False isconnected: True
 ```
 
-![Image](Images/Agents_ready.png "Agents Ready")
+![Image](Images/Agents_ready_v0.3.png "Agents Ready")
+
+### INI File Settings
+
+#### [Agent]
+All of the agent settings are under the Agent section
+
+#### Swarm Server
+The swarm server setting defines the GUI/Server that controls the test and that this agent receives instructions from. The default value is localhost on port 8138. As you will normally run the agent on a different machine to the GUI/Server, this is the first ini file setting you will change.
+```
+swarmserver = http://localhost:8138/
+```
+
+#### Agent Directory
+The agent directory is the file system location where the agent will download robot files and their dependancies, this also the location the robot files are executed from.
+By default a directory called rfswarmagent is created in the logged in users temp directory.
+```
+agentdir = <TEMP>/rfswarmagent
+```
+
+#### Robot Command
+The robot command is the robot framework executable, this should normally be in your path so this setting should not require changing. However if this is not the case you may need to identify the full path to your robot executable and enter it here.
+```
+robotcmd = robot
+```
+
+#### Exclude Libraries
+In order to keep the test results focused on the application under test and avoid reporting response times for steps from support libraries, certain libraries are excluded when the agent is processing results to return to the GUI/Server. The default setting is:
+```
+excludelibraries = BuiltIn,String,OperatingSystem,perftest
+```
+You can add and remove libraries from this list to meet the requirements of your tests.
