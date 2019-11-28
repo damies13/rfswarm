@@ -15,6 +15,8 @@ rfswarm_agent.py is the agent component that actually runs the Robot Framework t
 	- [Agent Directory](#Agent-Directory)
 	- [Robot Command](#Robot-Command)
 	- [Exclude Libraries](#Exclude-Libraries)
+- [Agent polling of the GUI/Server](#Agent-polling-of-the-GUI-Server)
+
 
 ### Install and Setup
 
@@ -105,3 +107,25 @@ In order to keep the test results focused on the application under test and avoi
 excludelibraries = BuiltIn,String,OperatingSystem,perftest
 ```
 You can add and remove libraries from this list to meet the requirements of your tests.
+
+### Agent polling of the GUI/Server
+
+#### Disconnected State
+When the agent starts up, or is disconnected from the GUI/Server it is in the disconnected state, in this state the agent will attempt to connect to the GUI/Server every 10 seconds until connected (enter Connected State) or the agent is stopped.
+
+#### Connected State
+When the agent is connected to the GUI/Server but is not running a robot files it is in the connected state, in this state the agent will poll the GUI/Server every 10 seconds for the following:
+- Update the GUI/Server with the agent status
+- get a list of any script files that need to be downloaded locally
+	- if a script file in the list has not already been download, then download the file.
+- Get the assigned tests
+	- if the assigned test start time has been reached for one of the assigned tests, then the agent will switch to the running state
+
+#### Running State
+When the agent is in the running state, the polling interval is reduced to 2 seconds and the polling is reduced to:
+- Update the GUI/Server with the agent status
+- Get the assigned tests
+
+Once all the end time for all test has been reached and the tests have finished executing then the agent will return to the Connected State.
+
+Note: during the Running State, script files are not checked or download, so ensure there is enough time between loading the scenario and running the scenario so the agents can download all the required files.

@@ -17,17 +17,29 @@ rfswarm.py is the GUI and central server component of rfswarm, this is where you
 - [Credits](#Credits)
 
 ### User Interface
-
-Some screen shots below of rfswarm in action:
-##### Plan
+#### Plan
 This is where you construct your test scenario, choose your test cases and number of virtual users
+
+All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the agent polling works it's best not to use values less than 10 seconds.
+
 ![Image](Images/Plan_saved_opened_v0.3.png "Plan - Planning a performance test")
 ![Image](Images/Plan_unsaved_v0.3.png "Plan - New")
-##### Run
+![Image](Images/Linux-Plan-v0.4.3.png "Plan - Linux")
+
+While hopefully this is intuitive, the buttons are (starting top right)
+- New			- Create a new scenario
+- Open			- Open an existing scenario
+- Save			- Save the current scenario
+- Play			- Play the current scenario
+- Add (+)		- Add another test group
+- Select (...)	- Select a robot file
+- Remove (X)	- Remove this test group
+
+#### Run
 This is where you monitor your test scenario as it runs, here you will see number of robots running, how long the has been running and live updates of the test results
 ![Image](Images/Run_Start_v0.4.png "Run - Just Started")
 ![Image](Images/Run_v0.4.png "Run - Showing results being collected live")
-##### Agents
+#### Agents
 This is where you can see which agents have connected, number of robots on each agent and monitor the performance of the agents
 ![Image](Images/Agents_ready_v0.3.png "Agents Ready")
 ![Image](Images/Agents_stopping_v0.3.png "Agents Stopping")
