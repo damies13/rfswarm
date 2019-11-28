@@ -15,7 +15,10 @@ rfswarm_agent.py is the agent component that actually runs the Robot Framework t
 	- [Agent Directory](#Agent-Directory)
 	- [Robot Command](#Robot-Command)
 	- [Exclude Libraries](#Exclude-Libraries)
-- [Agent polling of the GUI/Server](#Agent-polling-of-the-GUI-Server)
+- [Agent polling of the GUI/Server](#agent-polling-of-the-guiserver)
+	- [Disconnected State](#disconnected-state)
+	- [Connected State](#Connected-state)
+	- [Running State](#Running-state)
 
 
 ### Install and Setup

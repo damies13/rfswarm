@@ -20,7 +20,7 @@ rfswarm.py is the GUI and central server component of rfswarm, this is where you
 #### Plan
 This is where you construct your test scenario, choose your test cases and number of virtual users
 
-All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the agent polling works it's best not to use values less than 10 seconds.
+All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the [agent polling](./rfswarm_agent_py.md#agent-polling-of-the-guiserver) works it's best not to use values less than 10 seconds.
 
 ![Image](Images/Plan_saved_opened_v0.3.png "Plan - Planning a performance test")
 ![Image](Images/Plan_unsaved_v0.3.png "Plan - New")
