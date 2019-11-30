@@ -2741,7 +2741,7 @@ class RFSwarmGUI(tk.Frame):
 			# ScenarioFile
 			filetupl = os.path.splitext(ScenarioFile)
 			# print("mnu_file_SaveAs: filetupl:", filetupl)
-			if filetupl != ".rfs":
+			if filetupl[1] != ".rfs":
 				ScenarioFile += ".rfs"
 				# print("mnu_file_SaveAs: ScenarioFile:", ScenarioFile)
 			self.config['Plan']['ScenarioFile'] = ScenarioFile
