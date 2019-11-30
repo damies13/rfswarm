@@ -318,6 +318,7 @@ class RFSwarmGUI(tk.Frame):
 	rungridupdate = 0
 
 	run_name = ""
+	run_name_current = ""
 	run_start = 0
 	run_end = 0
 	run_paused = False
@@ -861,9 +862,10 @@ class RFSwarmGUI(tk.Frame):
 
 	def run_db_thread(self):
 		while self.run_dbthread:
-			if self.datadb is None:
+			if (self.datadb is None) or (self.run_name != self.run_name_current):
 				# print("run_db_thread: ensure_db")
 				self.ensure_db()
+
 			if self.datadb is not None:
 
 				if len(self.dbqueue["Write"])>0:
@@ -954,9 +956,20 @@ class RFSwarmGUI(tk.Frame):
 
 	def ensure_db(self):
 		createschema = False
+		# print("ensure_db: run_name:", self.run_name)
 		if len(self.run_name)>0:
+			if self.run_name != self.run_name_current:
+				self.run_name_current = self.run_name
+				createschema = True
+
+			if createschema and self.datadb is not None:
+				print("ensure_db: Disconnect and close DB")
+				self.datadb.commit()
+				self.datadb.close()
+				self.datadb = None
+
 			# check if dir exists
-			# print("ensure_db: dir_path:", self.dir_path)
+			print("ensure_db: dir_path:", self.dir_path)
 			# self.resultsdir = os.path.join(self.dir_path, "results")
 			if 'ResultsDir' not in self.config['Run']:
 				self.config['Run']['ResultsDir'] = os.path.join(self.dir_path, "results")
@@ -976,13 +989,8 @@ class RFSwarmGUI(tk.Frame):
 			if not os.path.exists(self.dbfile):
 				createschema = True
 
-			if createschema and self.datadb is not None:
-				print("ensure_db: Disconnect and close DB")
-				self.datadb.commit()
-				self.datadb.close()
-				self.datadb = None
-
 			if self.datadb is None:
+				print("ensure_db: Connect to DB")
 				self.datadb = sqlite3.connect(self.dbfile)
 				self.datadb.create_aggregate("percentile", 2, percentile)
 
@@ -1559,6 +1567,17 @@ class RFSwarmGUI(tk.Frame):
 		# https://realpython.com/intro-to-python-threading/
 		# self.run_start_threads()
 		# x = threading.Thread(target=thread_function, args=(1,))
+
+		datafiletime = datetime.now().strftime("%Y%m%d_%H%M%S")
+		if len(self.config['Plan']['ScenarioFile'])>0:
+			filename = os.path.basename(self.config['Plan']['ScenarioFile'])
+			sname = os.path.splitext(filename)[0]
+			self.run_name = "{}_{}".format(datafiletime, sname)
+		else:
+			self.run_name = "{}_{}".format(datafiletime, "Scenario")
+		# print("run_start_threads: self.run_name:", self.run_name)
+
+
 		self.run_start = 0
 		self.run_end = 0
 		self.run_paused = False
@@ -2333,7 +2352,6 @@ class RFSwarmGUI(tk.Frame):
 
 						if self.run_start < 1:
 							self.run_start = int(time.time()) #time now
-							self.run_name = "{}_{}".format("Scenario", self.run_start)
 							self.robot_schedule = {}
 							self.robot_schedule["RunName"] = self.run_name
 							self.robot_schedule["Agents"] = {}
