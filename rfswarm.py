@@ -31,6 +31,7 @@ import re
 import threading
 import subprocess
 from operator import itemgetter
+import csv
 
 import xml.etree.ElementTree as ET
 
@@ -785,15 +786,15 @@ class RFSwarmGUI(tk.Frame):
 		rpt = ttk.Button(rgbar, image=self.imgdata[icontext], padding='3 3 3 3', text="Stop", command=self.report_text)
 		rpt.grid(column=50, row=1, sticky="nsew") # , rowspan=2
 
-		icontext = "report_html"
-		self.icoStop = self.get_icon(icontext)
-		rpt = ttk.Button(rgbar, image=self.imgdata[icontext], padding='3 3 3 3', text="Stop", command=self.report_html)
-		rpt.grid(column=51, row=1, sticky="nsew") # , rowspan=2
-
-		icontext = "report_word"
-		self.icoStop = self.get_icon(icontext)
-		rpt = ttk.Button(rgbar, image=self.imgdata[icontext], padding='3 3 3 3', text="Stop", command=self.report_word)
-		rpt.grid(column=52, row=1, sticky="nsew") # , rowspan=2
+		# icontext = "report_html"
+		# self.icoStop = self.get_icon(icontext)
+		# rpt = ttk.Button(rgbar, image=self.imgdata[icontext], padding='3 3 3 3', text="Stop", command=self.report_html)
+		# rpt.grid(column=51, row=1, sticky="nsew") # , rowspan=2
+		#
+		# icontext = "report_word"
+		# self.icoStop = self.get_icon(icontext)
+		# rpt = ttk.Button(rgbar, image=self.imgdata[icontext], padding='3 3 3 3', text="Stop", command=self.report_word)
+		# rpt.grid(column=52, row=1, sticky="nsew") # , rowspan=2
 
 
 		#
@@ -2821,13 +2822,109 @@ class RFSwarmGUI(tk.Frame):
 
 
 	def report_text(self, _event=None):
-		print("report_text")
+		# print("report_text")
+		colno = 0
+		if "RunStats" in self.dbqueue["ReadResult"] and len(self.dbqueue["ReadResult"]["RunStats"])>0:
+			# request agent data for agent report
+			sql = "SELECT * "
+			sql += "FROM Agents as a "
+			sql += "WHERE a.last_seen>{} ".format(self.robot_schedule["Start"])
+			sql += " ORDER BY a.last_seen"
+			self.dbqueue["Read"].append({"SQL": sql, "KEY": "Agents"})
+			# request agent data for agent report
+			# request raw data for agent report
+			sql = "SELECT * "
+			sql += "FROM Results as r "
+			sql += "WHERE r.start_time>{} ".format(self.robot_schedule["Start"])
+			sql += " ORDER BY r.start_time"
+			self.dbqueue["Read"].append({"SQL": sql, "KEY": "RawResults"})
+			# request raw data for agent report
+
+
+
+			fileprefix = self.run_name
+			# print("report_text: fileprefix:", fileprefix)
+			if len(fileprefix)<1:
+				fileprefix = os.path.split(self.datapath)[-1]
+				# print("report_text: fileprefix:", fileprefix)
+			txtreport = os.path.join(self.datapath, "{}_summary.csv".format(fileprefix))
+			# print("report_text: txtreport:", txtreport)
+			print("report_text: Summary File:", txtreport)
+			# print("report_text: RunStats:", self.dbqueue["ReadResult"]["RunStats"])
+			cols = []
+			for col in self.dbqueue["ReadResult"]["RunStats"][0].keys():
+				# print("UpdateRunStats: colno:", colno, "col:", col)
+				cols.append (self.PrettyColName(col))
+			# print("report_text: cols:", cols)
+			with open(txtreport, 'w', newline='') as csvfile:
+				writer = csv.writer(csvfile, dialect='excel')
+				writer.writerow(cols)
+				for row in self.dbqueue["ReadResult"]["RunStats"]:
+					rowdata = row.values()
+					writer.writerow(rowdata)
+
+			tkm.showinfo("RFSwarm - Info", "Report data saved to: {}".format(self.datapath))
+
+		while "Agents" not in self.dbqueue["ReadResult"] and len(self.dbqueue["ReadResult"]["Agents"])<1:
+			time.sleep(0.1)
+
+		if "Agents" in self.dbqueue["ReadResult"] and len(self.dbqueue["ReadResult"]["Agents"])>0:
+			fileprefix = self.run_name
+			# print("report_text: fileprefix:", fileprefix)
+			if len(fileprefix)<1:
+				fileprefix = os.path.split(self.datapath)[-1]
+				# print("report_text: fileprefix:", fileprefix)
+			txtreport = os.path.join(self.datapath, "{}_agent_data.csv".format(fileprefix))
+			# print("report_text: txtreport:", txtreport)
+			print("report_text: Agent Data:", txtreport)
+			cols = []
+			for col in self.dbqueue["ReadResult"]["Agents"][0].keys():
+				# print("UpdateRunStats: colno:", colno, "col:", col)
+				cols.append (self.PrettyColName(col))
+			# print("report_text: cols:", cols)
+			with open(txtreport, 'w', newline='') as csvfile:
+				# writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+				writer = csv.writer(csvfile, dialect='excel')
+				writer.writerow(cols)
+				for row in self.dbqueue["ReadResult"]["Agents"]:
+					rowdata = row.values()
+					writer.writerow(rowdata)
+
+
+		while "RawResults" not in self.dbqueue["ReadResult"] and len(self.dbqueue["ReadResult"]["RawResults"])<1:
+			time.sleep(0.1)
+
+		if "RawResults" in self.dbqueue["ReadResult"] and len(self.dbqueue["ReadResult"]["RawResults"])>0:
+			fileprefix = self.run_name
+			# print("report_text: fileprefix:", fileprefix)
+			if len(fileprefix)<1:
+				fileprefix = os.path.split(self.datapath)[-1]
+				# print("report_text: fileprefix:", fileprefix)
+			txtreport = os.path.join(self.datapath, "{}_raw_result_data.csv".format(fileprefix))
+			# print("report_text: txtreport:", txtreport)
+			print("report_text: Raw Result Data:", txtreport)
+			cols = []
+			for col in self.dbqueue["ReadResult"]["RawResults"][0].keys():
+				# print("UpdateRunStats: colno:", colno, "col:", col)
+				cols.append (self.PrettyColName(col))
+			# print("report_text: cols:", cols)
+			with open(txtreport, 'w', newline='') as csvfile:
+				# writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+				writer = csv.writer(csvfile, dialect='excel')
+				writer.writerow(cols)
+				for row in self.dbqueue["ReadResult"]["RawResults"]:
+					rowdata = row.values()
+					writer.writerow(rowdata)
+
+
 
 	def report_html(self, _event=None):
 		print("report_html")
+		tkm.showwarning("RFSwarm - Warning", "Generating HTML Reports not implimented yet")
 
 	def report_word(self, _event=None):
 		print("report_word")
+		tkm.showwarning("RFSwarm - Warning", "Generating Word Reports not implimented yet")
 
 
 	# # https://www.daniweb.com/programming/software-development/code/216634/jpeg-image-embedded-in-python
