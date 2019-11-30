@@ -2,9 +2,7 @@
 # rfswarm tutorial
 ---
 
-<span style="color:red">
 WARNING: This tutorial is a work in progress - it is no where near ready to be used.
-</span>
 
 ---
 
