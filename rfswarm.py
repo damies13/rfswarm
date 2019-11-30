@@ -1049,8 +1049,6 @@ class RFSwarmGUI(tk.Frame):
 			self.addScriptRow()
 
 	def ClickPlay(self, _event=None):
-		self.sr_validate()
-		# print(self.tabs.tabs())
 		self.tabs.select(1)
 
 		print("ClickPlay:", int(time.time()), "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
