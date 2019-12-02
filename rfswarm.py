@@ -215,6 +215,7 @@ class AgentServer(BaseHTTPRequestHandler):
 				message = "Unrecognised request: '{}'".format(parsed_path)
 
 		except Exception as e:
+			print("AgentServer: do_POST:", e)
 			httpcode = 500
 			message = str(e)
 		self.send_response(httpcode)
@@ -275,6 +276,7 @@ class AgentServer(BaseHTTPRequestHandler):
 				httpcode = 404
 				message = "Unrecognised request: '{}'".format(parsed_path)
 		except Exception as e:
+			print("AgentServer: do_GET:", e)
 			httpcode = 500
 			message = str(e)
 
@@ -382,40 +384,58 @@ class RFSwarmGUI(tk.Frame):
 		parser.add_argument('-r', '--run', help='Run the scenario automatically after loading', action='store_true')
 		parser.add_argument('-a', '--agents', nargs='?', help='Wait for this many agents before starting (default 1)')
 		parser.add_argument('-n', '--nogui', help='Don''t display the GUI', action='store_true')
-		parser.add_argument('-d', '--ipaddress', nargs='?', help='IP Address to bind the server to')
+		parser.add_argument('-d', '--dir', help='Results directory', action='store_true')
+		parser.add_argument('-e', '--ipaddress', nargs='?', help='IP Address to bind the server to')
 		parser.add_argument('-p', '--port', nargs='?', help='Port number to bind the server to')
 		self.args = parser.parse_args()
 
 		if self.args.version:
 			exit()
 
-
-		root = tk.Tk()
-		# Grid.rowconfigure(root, 0, weight=1)
-		# Grid.columnconfigure(root, 0, weight=1)
-		root.protocol("WM_DELETE_WINDOW", self.on_closing)
-
 		self.config = configparser.ConfigParser()
 		scrdir = os.path.dirname(__file__)
 		# print("RFSwarmGUI: __init__: scrdir: ", scrdir)
 		self.gui_ini = os.path.join(scrdir, "RFSwarmGUI.ini")
+		if self.args.ini:
+			print("RFSwarmAgent: __init__: self.args.ini: ", self.args.ini)
+			self.gui_ini = self.args.ini
 		if os.path.isfile(self.gui_ini):
 			# print("RFSwarmGUI: __init__: agentini: ", self.gui_ini)
 			self.config.read(self.gui_ini)
 		else:
 			self.saveini()
 
-		tk.Frame.__init__(self, root)
-		self.grid(row=0, column=0, sticky="nsew")
-		self.columnconfigure(0, weight=1)
-		self.rowconfigure(0, weight=1)
-		self.BuildUI()
-		# self.pln_update_graph()
+		if self.args.nogui:
+			if not self.args.run:
+				self.args.run = True
+		else:
+			root = tk.Tk()
+			# Grid.rowconfigure(root, 0, weight=1)
+			# Grid.columnconfigure(root, 0, weight=1)
+			root.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+			tk.Frame.__init__(self, root)
+			self.grid(row=0, column=0, sticky="nsew")
+			self.columnconfigure(0, weight=1)
+			self.rowconfigure(0, weight=1)
+			self.BuildUI()
+			# self.pln_update_graph()
+			ug = threading.Thread(target=self.pln_update_graph)
+			ug.start()
+
+
 		self.agentserver = threading.Thread(target=self.run_agent_server)
 		self.agentserver.start()
 		self.run_dbthread = True
 		self.dbthread = threading.Thread(target=self.run_db_thread)
 		self.dbthread.start()
+
+		if self.args.nogui:
+			self.stayrunning()
+
+	def stayrunning(self):
+		if self.run_dbthread:
+			time.sleep(10)
 
 	def updateTitle(self):
 		titletext = "{} - {}".format(self.titleprefix, "Untitled")
@@ -423,7 +443,8 @@ class RFSwarmGUI(tk.Frame):
 			if len(self.config['Plan']['ScenarioFile'])>0:
 				titletext = "{} - {}".format(self.titleprefix, self.config['Plan']['ScenarioFile'])
 
-		self.master.title(titletext)
+		if not self.args.nogui:
+			self.master.title(titletext)
 
 	def saveini(self):
 		with open(self.gui_ini, 'w') as configfile:    # save
@@ -442,8 +463,9 @@ class RFSwarmGUI(tk.Frame):
 		# 		in the ini file so the next app open loads the file
 		self.config['Plan']['ScenarioFile'] = sf
 
-		print("on_closing: self.destroy")
-		self.destroy()
+		if not self.args.nogui:
+			print("on_closing: self.destroy")
+			self.destroy()
 		print("on_closing: Shutdown Agent Server")
 		self.agenthttpserver.shutdown()
 		# print("Join Update Agent Thread")
@@ -1108,36 +1130,41 @@ class RFSwarmGUI(tk.Frame):
 
 		self.scriptlist[self.scriptcount]["Index"] = self.scriptcount
 
-		idx = ttk.Label(self.scriptgrid, text=str(self.scriptcount))
-		idx.grid(column=self.plancolidx, row=self.scriptcount, sticky="nsew")
+		if not self.args.nogui:
+			idx = ttk.Label(self.scriptgrid, text=str(self.scriptcount))
+			idx.grid(column=self.plancolidx, row=self.scriptcount, sticky="nsew")
 
 		num = "10"
-		usr = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout")
-		usr.config(validatecommand=lambda: self.sr_users_validate(row))
-		usr.grid(column=self.plancolusr, row=self.scriptcount, sticky="nsew")
-		usr.insert(0, num)
+		if not self.args.nogui:
+			usr = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout")
+			usr.config(validatecommand=lambda: self.sr_users_validate(row))
+			usr.grid(column=self.plancolusr, row=self.scriptcount, sticky="nsew")
+			usr.insert(0, num)
 		self.scriptlist[self.scriptcount]["Users"] = int(num)
 
 		num = "0"
-		dly = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout")
-		dly.config(validatecommand=lambda: self.sr_delay_validate(row))
-		dly.grid(column=self.plancoldly, row=self.scriptcount, sticky="nsew")
-		dly.insert(0, num)
+		if not self.args.nogui:
+			dly = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout")
+			dly.config(validatecommand=lambda: self.sr_delay_validate(row))
+			dly.grid(column=self.plancoldly, row=self.scriptcount, sticky="nsew")
+			dly.insert(0, num)
 		self.scriptlist[self.scriptcount]["Delay"] = int(num)
 
 		num = "1800"	# 30 minutes
-		rmp = ttk.Entry(self.scriptgrid, width=7, justify="right", validate="focusout")
-		rmp.config(validatecommand=lambda: self.sr_rampup_validate(row))
-		rmp.grid(column=self.plancolrmp, row=self.scriptcount, sticky="nsew")
-		rmp.insert(0, num)
+		if not self.args.nogui:
+			rmp = ttk.Entry(self.scriptgrid, width=7, justify="right", validate="focusout")
+			rmp.config(validatecommand=lambda: self.sr_rampup_validate(row))
+			rmp.grid(column=self.plancolrmp, row=self.scriptcount, sticky="nsew")
+			rmp.insert(0, num)
 		self.scriptlist[self.scriptcount]["RampUp"] = int(num)
 
 		# num = "18000"  # 18000 sec = 5 hours
 		num = "7200" # 3600 sec = 1hr, 7200 sec = 2 hours
-		run = ttk.Entry(self.scriptgrid, width=8, justify="right", validate="focusout")
-		run.config(validatecommand=lambda: self.sr_run_validate(row))
-		run.grid(column=self.plancolrun, row=self.scriptcount, sticky="nsew")
-		run.insert(0, num)
+		if not self.args.nogui:
+			run = ttk.Entry(self.scriptgrid, width=8, justify="right", validate="focusout")
+			run.config(validatecommand=lambda: self.sr_run_validate(row))
+			run.grid(column=self.plancolrun, row=self.scriptcount, sticky="nsew")
+			run.insert(0, num)
 		self.scriptlist[self.scriptcount]["Run"] = int(num)
 
 
@@ -1145,35 +1172,37 @@ class RFSwarmGUI(tk.Frame):
 		# nme = ttk.Label(self.scriptgrid, text="   ")
 		# nme.grid(column=self.plancolnme, row=self.scriptcount, sticky="nsew")
 
-		fgf = ttk.Frame(self.scriptgrid)
-		fgf.grid(column=self.plancolscr, row=self.scriptcount, sticky="nsew")
-		scr = ttk.Entry(fgf, state="readonly", justify="right")
-		scr.grid(column=0, row=0, sticky="nsew")
-		# scrf = ttk.Button(fgf, text="...", width=1, command=partial(self.sr_file_validate, self.scriptcount))
-		# scrf = ttk.Button(fgf, text="...", width=1, command=lambda: self.sr_file_validate(self.scriptcount))
-		scrf = ttk.Button(fgf, text="...", width=1)
-		scrf.config(command=lambda: self.sr_file_validate(row))
-		scrf.grid(column=1, row=0, sticky="nsew")
+		if not self.args.nogui:
+			fgf = ttk.Frame(self.scriptgrid)
+			fgf.grid(column=self.plancolscr, row=self.scriptcount, sticky="nsew")
+			scr = ttk.Entry(fgf, state="readonly", justify="right")
+			scr.grid(column=0, row=0, sticky="nsew")
+			# scrf = ttk.Button(fgf, text="...", width=1, command=partial(self.sr_file_validate, self.scriptcount))
+			# scrf = ttk.Button(fgf, text="...", width=1, command=lambda: self.sr_file_validate(self.scriptcount))
+			scrf = ttk.Button(fgf, text="...", width=1)
+			scrf.config(command=lambda: self.sr_file_validate(row))
+			scrf.grid(column=1, row=0, sticky="nsew")
 
 		# tst = ttk.Entry(self.scriptgrid, width=30)
 		self.scriptlist[row]["Test"] = ""
-		self.scriptlist[row]["TestVar"] = tk.StringVar(self.scriptlist[row]["Test"], name="row{}".format(row))
-		# variable.set(None)
-		# lambda: self.sr_test_validate(row)
-		# variable.trace("w", lambda _: self.sr_test_validate(row))
-		# variable.trace("w", lambda: self.sr_test_validate(row))
-		self.scriptlist[row]["TestVar"].trace("w", self.sr_test_validate)
-		tst = ttk.OptionMenu(self.scriptgrid, self.scriptlist[row]["TestVar"], None, "test")
-		# tst.config(command=lambda: self.sr_test_validate(row))
-		tst.config(width=20)
-		tst.grid(column=self.plancoltst, row=self.scriptcount, sticky="nsew")
+		if not self.args.nogui:
+			self.scriptlist[row]["TestVar"] = tk.StringVar(self.scriptlist[row]["Test"], name="row{}".format(row))
+			# variable.set(None)
+			# lambda: self.sr_test_validate(row)
+			# variable.trace("w", lambda _: self.sr_test_validate(row))
+			# variable.trace("w", lambda: self.sr_test_validate(row))
+			self.scriptlist[row]["TestVar"].trace("w", self.sr_test_validate)
+			tst = ttk.OptionMenu(self.scriptgrid, self.scriptlist[row]["TestVar"], None, "test")
+			# tst.config(command=lambda: self.sr_test_validate(row))
+			tst.config(width=20)
+			tst.grid(column=self.plancoltst, row=self.scriptcount, sticky="nsew")
 
 
-		self.scriptgrid.columnconfigure(self.plancoladd, weight=1)
-		new = ttk.Button(self.scriptgrid, text="X", command=lambda: self.sr_remove_row(row), width=1)
-		new.grid(column=self.plancoladd, row=self.scriptcount, sticky="nsew")
+			self.scriptgrid.columnconfigure(self.plancoladd, weight=1)
+			new = ttk.Button(self.scriptgrid, text="X", command=lambda: self.sr_remove_row(row), width=1)
+			new.grid(column=self.plancoladd, row=self.scriptcount, sticky="nsew")
 
-		self.pln_update_graph()
+			self.pln_update_graph()
 
 	def sr_users_validate(self, *args):
 		# print("sr_users_validate: args:",args)
@@ -2398,7 +2427,7 @@ class RFSwarmGUI(tk.Frame):
 
 			self.agenttgridupdate = int(time.time())
 			agntlst = list(self.Agents.keys())
-			# print("UpdateAgents: agntlst:", agntlst)
+			print("UpdateAgents: agntlst:", agntlst)
 			for agnt in agntlst:
 				displayagent = True
 				tm = self.Agents[agnt]["LastSeen"]
@@ -2410,41 +2439,42 @@ class RFSwarmGUI(tk.Frame):
 					# del self.Agents[agnt]
 					displayagent = False
 
-				if displayagent:
-					rnum += 1
-					dt = datetime.fromtimestamp(tm)
-					workingkeys = self.display_agents.keys()
-					if rnum not in workingkeys:
-						self.display_agents[rnum] = {}
-					if "Status" not in self.display_agents[rnum]:
-						self.display_agents[rnum]["Status"] = tk.StringVar()
-					if "Agent" not in self.display_agents[rnum]:
-						self.display_agents[rnum]["Agent"] = tk.StringVar()
-					if "LastSeen" not in self.display_agents[rnum]:
-						self.display_agents[rnum]["LastSeen"] = tk.StringVar()
-					if "Robots" not in self.display_agents[rnum]:
-						self.display_agents[rnum]["Robots"] = tk.StringVar()
-					if "LOAD%" not in self.display_agents[rnum]:
-						self.display_agents[rnum]["LOAD%"] = tk.StringVar()
-					if "CPU%" not in self.display_agents[rnum]:
-						self.display_agents[rnum]["CPU%"] = tk.StringVar()
-					if "MEM%" not in self.display_agents[rnum]:
-						self.display_agents[rnum]["MEM%"] = tk.StringVar()
-					if "NET%" not in self.display_agents[rnum]:
-						self.display_agents[rnum]["NET%"] = tk.StringVar()
-					if "AssignedRobots" not in self.display_agents[rnum]:
-						self.display_agents[rnum]["AssignedRobots"] = tk.StringVar()
+				if not self.args.nogui:
+					if displayagent:
+						rnum += 1
+						dt = datetime.fromtimestamp(tm)
+						workingkeys = self.display_agents.keys()
+						if rnum not in workingkeys:
+							self.display_agents[rnum] = {}
+						if "Status" not in self.display_agents[rnum]:
+							self.display_agents[rnum]["Status"] = tk.StringVar()
+						if "Agent" not in self.display_agents[rnum]:
+							self.display_agents[rnum]["Agent"] = tk.StringVar()
+						if "LastSeen" not in self.display_agents[rnum]:
+							self.display_agents[rnum]["LastSeen"] = tk.StringVar()
+						if "Robots" not in self.display_agents[rnum]:
+							self.display_agents[rnum]["Robots"] = tk.StringVar()
+						if "LOAD%" not in self.display_agents[rnum]:
+							self.display_agents[rnum]["LOAD%"] = tk.StringVar()
+						if "CPU%" not in self.display_agents[rnum]:
+							self.display_agents[rnum]["CPU%"] = tk.StringVar()
+						if "MEM%" not in self.display_agents[rnum]:
+							self.display_agents[rnum]["MEM%"] = tk.StringVar()
+						if "NET%" not in self.display_agents[rnum]:
+							self.display_agents[rnum]["NET%"] = tk.StringVar()
+						if "AssignedRobots" not in self.display_agents[rnum]:
+							self.display_agents[rnum]["AssignedRobots"] = tk.StringVar()
 
-					self.display_agents[rnum]["Status"].set("  {}  ".format(self.Agents[agnt]["Status"]))
-					self.display_agents[rnum]["Agent"].set("  {}  ".format(agnt))
-					self.display_agents[rnum]["LastSeen"].set("  {}  ".format(dt.isoformat(sep=' ',timespec='seconds')))
-					self.display_agents[rnum]["Robots"].set("  {}  ".format(self.Agents[agnt]["Robots"]))
-					self.display_agents[rnum]["LOAD%"].set("  {}  ".format(self.Agents[agnt]["LOAD%"]))
-					self.display_agents[rnum]["CPU%"].set("  {}  ".format(self.Agents[agnt]["CPU%"]))
-					self.display_agents[rnum]["MEM%"].set("  {}  ".format(self.Agents[agnt]["MEM%"]))
-					self.display_agents[rnum]["NET%"].set("  {}  ".format(self.Agents[agnt]["NET%"]))
-					self.display_agents[rnum]["AssignedRobots"].set("  {}  ".format(self.Agents[agnt]["AssignedRobots"]))
-					# print("UpdateAgents: display_agents:", self.display_agents)
+						self.display_agents[rnum]["Status"].set("  {}  ".format(self.Agents[agnt]["Status"]))
+						self.display_agents[rnum]["Agent"].set("  {}  ".format(agnt))
+						self.display_agents[rnum]["LastSeen"].set("  {}  ".format(dt.isoformat(sep=' ',timespec='seconds')))
+						self.display_agents[rnum]["Robots"].set("  {}  ".format(self.Agents[agnt]["Robots"]))
+						self.display_agents[rnum]["LOAD%"].set("  {}  ".format(self.Agents[agnt]["LOAD%"]))
+						self.display_agents[rnum]["CPU%"].set("  {}  ".format(self.Agents[agnt]["CPU%"]))
+						self.display_agents[rnum]["MEM%"].set("  {}  ".format(self.Agents[agnt]["MEM%"]))
+						self.display_agents[rnum]["NET%"].set("  {}  ".format(self.Agents[agnt]["NET%"]))
+						self.display_agents[rnum]["AssignedRobots"].set("  {}  ".format(self.Agents[agnt]["AssignedRobots"]))
+						# print("UpdateAgents: display_agents:", self.display_agents)
 
 					robot_count += self.Agents[agnt]["Robots"]
 
@@ -2462,21 +2492,23 @@ class RFSwarmGUI(tk.Frame):
 				self.robot_schedule["RunName"] = self.run_name
 
 			self.total_robots = robot_count
-			self.display_run['total_robots'].set("  {}  ".format(self.total_robots))
-			# print("total_robots:", self.total_robots)
-			if self.total_robots>0:
-				etm = time.gmtime(int(time.time()) - self.robot_schedule["Start"])
-				self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
 
-			grdrows = self.agenttgrid.grid_size()[1]-1
-			while grdrows>rnum:
-				# print("UpdateAgents: grdrows",grdrows)
-				try:
-					self.UA_removerow(grdrows)
-					self.display_agents[grdrows]
-				except Exception as e:
-					print("UpdateAgents: grdrows:", grdrows, "Exception:", e)
-				grdrows += -1
+			if not self.args.nogui:
+				self.display_run['total_robots'].set("  {}  ".format(self.total_robots))
+				# print("total_robots:", self.total_robots)
+				if self.total_robots>0:
+					etm = time.gmtime(int(time.time()) - self.robot_schedule["Start"])
+					self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
+
+				grdrows = self.agenttgrid.grid_size()[1]-1
+				while grdrows>rnum:
+					# print("UpdateAgents: grdrows",grdrows)
+					try:
+						self.UA_removerow(grdrows)
+						self.display_agents[grdrows]
+					except Exception as e:
+						print("UpdateAgents: grdrows:", grdrows, "Exception:", e)
+					grdrows += -1
 
 			for agnt in removeagents:
 				# this should prevent issue RuntimeError: dictionary changed size during iteration
@@ -2508,111 +2540,6 @@ class RFSwarmGUI(tk.Frame):
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["NET%"], borderwidth=2, relief="groove")
 		usr.grid(column=12, row=rnum, sticky="nsew")
 
-	def UpdateAgents_orig(self):
-		# rnum = 0
-		# removeagents = []
-		# time_elapsed = int(time.time()) - self.agenttgridupdate
-		# if (time_elapsed>5):
-		# 	self.agenttgridupdate = int(time.time())
-		# 	# print("Agents:", self.Agents)
-		# 	for agnt in self.Agents.keys():
-		# 		# print("Agent:", agnt)
-		# 		tm = self.Agents[agnt]["LastSeen"]
-		# 		agnt_elapsed = int(time.time()) - tm
-		# 		if agnt_elapsed>15:
-		# 			self.Agents[agnt]["Status"] = "Offline?"
-		# 		if agnt_elapsed>60:
-		# 			removeagents.append(agnt)
-		# 			# del self.Agents[agnt]
-		# 		else:
-		# 			rnum += 1
-		# 			dt = datetime.fromtimestamp(tm)
-		# 			self.UA_removerow(rnum)
-		# 			# style = ttk.Style()
-		# 			# style.configure("Default", foreground='#000000', background='#40E0D0')
-		# 			# style = ttk.Style()
-		# 			# style.configure("Ready", foreground='#000000', background='#00AA00')
-		# 			# style = ttk.Style()
-		# 			# style.configure("Run", foreground='#000000', background='#008800')
-		# 			# style = ttk.Style()
-		# 			# style.configure("Warn", foreground='#000000', background='#555500')
-		# 			# style = ttk.Style()
-		# 			# style.configure("Critical", foreground='#FFFFFF', background='#FF0000')
-		# 			# style = ttk.Style()
-		# 			# style.configure("Offline", foreground='#F0F0F0', background='#40E0D0')
-		# 			# row_style = "Default"
-		# 			# if self.Agents[agnt]["Status"] == "Ready":
-		# 			# 	row_style = "Ready"
-		# 			# if self.Agents[agnt]["Status"] == "Running":
-		# 			# 	row_style = "Run"
-		# 			# if self.Agents[agnt]["Status"] == "Offline?":
-		# 			# 	row_style = "Offline"
-		# 			# if self.Agents[agnt]["Status"] == "Warning":
-		# 			# 	row_style = "Warn"
-		# 			# if self.Agents[agnt]["Status"] == "Critical":
-		# 			# 	row_style = "Critical"
-		#
-		#
-		#
-		#
-		# 			txt = "  {}  ".format(self.Agents[agnt]["Status"])
-		# 			# usr = ttk.Label(self.agenttgrid, text=txt, borderwidth=2, relief="groove", style=row_style)
-		# 			usr = ttk.Label(self.agenttgrid, text=txt, borderwidth=2, relief="groove")
-		# 			usr.grid(column=0, row=rnum, sticky="nsew")
-		#
-		# 			txt = "  {}  ".format(agnt)
-		# 			# usr = ttk.Label(self.agenttgrid, text=txt, borderwidth=2, relief="groove", style=row_style)
-		# 			usr = ttk.Label(self.agenttgrid, text=txt, borderwidth=2, relief="groove")
-		# 			usr.grid(column=2, row=rnum, sticky="nsew")
-		#
-		# 			txt = "  {}  ".format(dt.isoformat(sep=' ',timespec='seconds'))
-		# 			# usr = ttk.Label(self.agenttgrid, text=txt, borderwidth=2, relief="groove", style=row_style)
-		# 			usr = ttk.Label(self.agenttgrid, text=txt, borderwidth=2, relief="groove")
-		# 			usr.grid(column=4, row=rnum, sticky="nsew")
-		#
-		# 			txt = "  {}  ".format(self.Agents[agnt]["Robots"])
-		# 			# usr = ttk.Label(self.agenttgrid, text=txt, borderwidth=2, relief="groove", style=row_style)
-		# 			usr = ttk.Label(self.agenttgrid, text=txt, borderwidth=2, relief="groove")
-		# 			usr.grid(column=5, row=rnum, sticky="nsew")
-		#
-		# 			txt = "  {}  ".format(self.Agents[agnt]["LOAD%"])
-		# 			# usr = ttk.Label(self.agenttgrid, text=txt, borderwidth=2, relief="groove", style=row_style)
-		# 			usr = ttk.Label(self.agenttgrid, text=txt, borderwidth=2, relief="groove")
-		# 			usr.grid(column=6, row=rnum, sticky="nsew")
-		#
-		# 			txt = "  {}  ".format(self.Agents[agnt]["CPU%"])
-		# 			# usr = ttk.Label(self.agenttgrid, text=txt, borderwidth=2, relief="groove", style=row_style)
-		# 			usr = ttk.Label(self.agenttgrid, text=txt, borderwidth=2, relief="groove")
-		# 			usr.grid(column=8, row=rnum, sticky="nsew")
-		#
-		# 			txt = "  {}  ".format(self.Agents[agnt]["MEM%"])
-		# 			# usr = ttk.Label(self.agenttgrid, text=txt, borderwidth=2, relief="groove", style=row_style)
-		# 			usr = ttk.Label(self.agenttgrid, text=txt, borderwidth=2, relief="groove")
-		# 			usr.grid(column=10, row=rnum, sticky="nsew")
-		#
-		# 			txt = "  {}  ".format(self.Agents[agnt]["NET%"])
-		# 			# usr = ttk.Label(self.agenttgrid, text=txt, borderwidth=2, relief="groove", style=row_style)
-		# 			usr = ttk.Label(self.agenttgrid, text=txt, borderwidth=2, relief="groove")
-		# 			usr.grid(column=12, row=rnum, sticky="nsew")
-		#
-		# 	# print("agenttgrid.grid_size (col, row)",self.agenttgrid.grid_size())
-		#
-		# 	grdrows = self.agenttgrid.grid_size()[1]
-		# 	# print("grdrows",grdrows)
-		# 	while grdrows>rnum:
-		# 		# print("grdrows",grdrows)
-		# 		self.UA_removerow(grdrows)
-		# 		grdrows += -1
-		#
-		# 	for agnt in removeagents:
-		# 		# this should prevent issue RuntimeError: dictionary changed size during iteration
-		# 		del self.Agents[agnt]
-		#
-		# 	if rnum>0:
-		# 		t = threading.Thread(target=self.delayed_UpdateAgents)
-		# 		t.start()
-		# 	# self.agenttgridupdate = int(time.time())
-			pass
 
 	def UA_removerow(self, r):
 		relmts = self.agenttgrid.grid_slaves(row=r, column=None)
@@ -2909,10 +2836,10 @@ class RFSwarmGUI(tk.Frame):
 
 rfs = RFSwarmGUI()
 
-try:
-	rfs.mainloop()
-except KeyboardInterrupt:
-	rfs.on_closing()
-except Exception as e:
-	print("rfs.Exception:", e)
-	rfs.on_closing()
+# try:
+rfs.mainloop()
+# except KeyboardInterrupt:
+# 	rfs.on_closing()
+# except Exception as e:
+# 	print("rfs.Exception:", e)
+# 	rfs.on_closing()
