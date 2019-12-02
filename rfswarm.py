@@ -2374,7 +2374,9 @@ class RFSwarmGUI(tk.Frame):
 		if (time_elapsed>5):
 
 			self.agenttgridupdate = int(time.time())
-			for agnt in self.Agents.keys():
+			agntlst = list(self.Agents.keys())
+			# print("UpdateAgents: agntlst:", agntlst)
+			for agnt in agntlst:
 				displayagent = True
 				tm = self.Agents[agnt]["LastSeen"]
 				agnt_elapsed = int(time.time()) - tm
