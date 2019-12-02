@@ -2393,14 +2393,24 @@ class RFSwarmGUI(tk.Frame):
 					workingkeys = self.display_agents.keys()
 					if rnum not in workingkeys:
 						self.display_agents[rnum] = {}
+					if "Status" not in self.display_agents[rnum]:
 						self.display_agents[rnum]["Status"] = tk.StringVar()
+					if "Agent" not in self.display_agents[rnum]:
 						self.display_agents[rnum]["Agent"] = tk.StringVar()
+					if "LastSeen" not in self.display_agents[rnum]:
 						self.display_agents[rnum]["LastSeen"] = tk.StringVar()
+					if "Robots" not in self.display_agents[rnum]:
 						self.display_agents[rnum]["Robots"] = tk.StringVar()
+					if "LOAD%" not in self.display_agents[rnum]:
 						self.display_agents[rnum]["LOAD%"] = tk.StringVar()
+					if "CPU%" not in self.display_agents[rnum]:
 						self.display_agents[rnum]["CPU%"] = tk.StringVar()
+					if "MEM%" not in self.display_agents[rnum]:
 						self.display_agents[rnum]["MEM%"] = tk.StringVar()
+					if "NET%" not in self.display_agents[rnum]:
 						self.display_agents[rnum]["NET%"] = tk.StringVar()
+					if "AssignedRobots" not in self.display_agents[rnum]:
+						self.display_agents[rnum]["AssignedRobots"] = tk.StringVar()
 
 					self.display_agents[rnum]["Status"].set("  {}  ".format(self.Agents[agnt]["Status"]))
 					self.display_agents[rnum]["Agent"].set("  {}  ".format(agnt))
@@ -2410,6 +2420,7 @@ class RFSwarmGUI(tk.Frame):
 					self.display_agents[rnum]["CPU%"].set("  {}  ".format(self.Agents[agnt]["CPU%"]))
 					self.display_agents[rnum]["MEM%"].set("  {}  ".format(self.Agents[agnt]["MEM%"]))
 					self.display_agents[rnum]["NET%"].set("  {}  ".format(self.Agents[agnt]["NET%"]))
+					self.display_agents[rnum]["AssignedRobots"].set("  {}  ".format(self.Agents[agnt]["AssignedRobots"]))
 					# print("UpdateAgents: display_agents:", self.display_agents)
 
 					robot_count += self.Agents[agnt]["Robots"]
