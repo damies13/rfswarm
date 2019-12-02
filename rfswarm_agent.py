@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version v0.4.3-alpha
+#    Version v0.4.5-alpha
 #
 
 
@@ -37,7 +37,7 @@ import argparse
 
 class RFSwarmAgent():
 
-	version = "v0.4.3-alpha"
+	version = "v0.4.5-alpha"
 	config = None
 	isconnected = False
 	isrunning = False
@@ -127,11 +127,13 @@ class RFSwarmAgent():
 
 	def mainloop(self):
 		# print("RFSwarmAgent: mainloop")
+		prev_status = self.status
 		while True:
 			print("RFSwarmAgent: mainloop: Running", datetime.now().isoformat(sep=' ',timespec='seconds'),
 				"(",int(time.time()),")"
+				"isconnected:", self.isconnected,
 				"isrunning:", self.isrunning,
-				"isconnected:", self.isconnected
+				"isstopping:", self.isstopping
 			)
 
 			if not self.isconnected:
@@ -163,6 +165,11 @@ class RFSwarmAgent():
 					t2 = threading.Thread(target=self.getscripts)
 					t2.start()
 
+			if prev_status == "Stopping" and self.status == "Ready":
+				# neet to reset something
+				# I guess we can just reset the jobs disctionary?
+				self.jobs = {}
+				# pass
 
 			time.sleep(self.mainloopinterval)
 
@@ -201,9 +208,13 @@ class RFSwarmAgent():
 				else:
 					netpctlist.append(0)
 
-		# print("netpctlist:	", netpctlist)
-		self.netpct = max(netpctlist)
-		# print("self.netpct:	", self.netpct)
+		if len(netpctlist)>0:
+			# print("netpctlist:	", netpctlist)
+			self.netpct = max(netpctlist)
+			# print("self.netpct:	", self.netpct)
+		else:
+			self.netpct = 0
+
 
 	def updatestatus(self):
 		# print("self.swarmserver:", self.swarmserver)
