@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version v0.4.4-alpha
+#    Version v0.4.5-alpha
 #
 
 # 	Helpful links
@@ -293,7 +293,7 @@ class AgentServer(BaseHTTPRequestHandler):
 
 
 class RFSwarmGUI(tk.Frame):
-	version = "v0.4.4-alpha"
+	version = "v0.4.5-alpha"
 	index = ""
 	file = ""
 	sheet = ""
@@ -1052,6 +1052,11 @@ class RFSwarmGUI(tk.Frame):
 		self.tabs.select(1)
 
 		print("ClickPlay:", int(time.time()), "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
+
+		# before we start any robots we need to make sure the assigned robot counts are zero
+		for nxtagent in self.Agents.keys():
+			self.Agents[nxtagent]["AssignedRobots"] = 0
+
 
 		datafiletime = datetime.now().strftime("%Y%m%d_%H%M%S")
 		if len(self.config['Plan']['ScenarioFile'])>0:
@@ -2283,7 +2288,7 @@ class RFSwarmGUI(tk.Frame):
 								# print('run_start_threads: nxtuid', nxtuid, 'ruusr', ruusr)
 								if nxtuid < ruusr+1:
 									uid = nxtuid
-									grurid = "{}_{}".format(gid,uid)
+									grurid = "{}_{}_{}".format(gid, uid, int(time.time()))
 									# print('run_start_threads: uid', uid)
 									self.robot_schedule["Scripts"][gid][uid] = grurid
 
@@ -2369,7 +2374,9 @@ class RFSwarmGUI(tk.Frame):
 		if (time_elapsed>5):
 
 			self.agenttgridupdate = int(time.time())
-			for agnt in self.Agents.keys():
+			agntlst = list(self.Agents.keys())
+			# print("UpdateAgents: agntlst:", agntlst)
+			for agnt in agntlst:
 				displayagent = True
 				tm = self.Agents[agnt]["LastSeen"]
 				agnt_elapsed = int(time.time()) - tm
@@ -2386,14 +2393,24 @@ class RFSwarmGUI(tk.Frame):
 					workingkeys = self.display_agents.keys()
 					if rnum not in workingkeys:
 						self.display_agents[rnum] = {}
+					if "Status" not in self.display_agents[rnum]:
 						self.display_agents[rnum]["Status"] = tk.StringVar()
+					if "Agent" not in self.display_agents[rnum]:
 						self.display_agents[rnum]["Agent"] = tk.StringVar()
+					if "LastSeen" not in self.display_agents[rnum]:
 						self.display_agents[rnum]["LastSeen"] = tk.StringVar()
+					if "Robots" not in self.display_agents[rnum]:
 						self.display_agents[rnum]["Robots"] = tk.StringVar()
+					if "LOAD%" not in self.display_agents[rnum]:
 						self.display_agents[rnum]["LOAD%"] = tk.StringVar()
+					if "CPU%" not in self.display_agents[rnum]:
 						self.display_agents[rnum]["CPU%"] = tk.StringVar()
+					if "MEM%" not in self.display_agents[rnum]:
 						self.display_agents[rnum]["MEM%"] = tk.StringVar()
+					if "NET%" not in self.display_agents[rnum]:
 						self.display_agents[rnum]["NET%"] = tk.StringVar()
+					if "AssignedRobots" not in self.display_agents[rnum]:
+						self.display_agents[rnum]["AssignedRobots"] = tk.StringVar()
 
 					self.display_agents[rnum]["Status"].set("  {}  ".format(self.Agents[agnt]["Status"]))
 					self.display_agents[rnum]["Agent"].set("  {}  ".format(agnt))
@@ -2403,6 +2420,7 @@ class RFSwarmGUI(tk.Frame):
 					self.display_agents[rnum]["CPU%"].set("  {}  ".format(self.Agents[agnt]["CPU%"]))
 					self.display_agents[rnum]["MEM%"].set("  {}  ".format(self.Agents[agnt]["MEM%"]))
 					self.display_agents[rnum]["NET%"].set("  {}  ".format(self.Agents[agnt]["NET%"]))
+					self.display_agents[rnum]["AssignedRobots"].set("  {}  ".format(self.Agents[agnt]["AssignedRobots"]))
 					# print("UpdateAgents: display_agents:", self.display_agents)
 
 					robot_count += self.Agents[agnt]["Robots"]
