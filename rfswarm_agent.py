@@ -175,9 +175,13 @@ class RFSwarmAgent():
 				else:
 					netpctlist.append(0)
 
-		# print("netpctlist:	", netpctlist)
-		self.netpct = max(netpctlist)
-		# print("self.netpct:	", self.netpct)
+		if len(netpctlist)>0:
+			# print("netpctlist:	", netpctlist)
+			self.netpct = max(netpctlist)
+			# print("self.netpct:	", self.netpct)
+		else:
+			self.netpct = 0
+
 
 	def updatestatus(self):
 		# print("self.swarmserver:", self.swarmserver)
