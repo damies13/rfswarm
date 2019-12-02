@@ -1053,6 +1053,11 @@ class RFSwarmGUI(tk.Frame):
 
 		print("ClickPlay:", int(time.time()), "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
 
+		# before we start any robots we need to make sure the assigned robot counts are zero
+		for nxtagent in self.Agents.keys():
+			self.Agents[nxtagent]["AssignedRobots"] = 0
+
+
 		datafiletime = datetime.now().strftime("%Y%m%d_%H%M%S")
 		if len(self.config['Plan']['ScenarioFile'])>0:
 			filename = os.path.basename(self.config['Plan']['ScenarioFile'])
