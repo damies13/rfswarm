@@ -1053,6 +1053,11 @@ class RFSwarmGUI(tk.Frame):
 
 		print("ClickPlay:", int(time.time()), "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
 
+		# before we start any robots we need to make sure the assigned robot counts are zero
+		for nxtagent in self.Agents.keys():
+			self.Agents[nxtagent]["AssignedRobots"] = 0
+
+
 		datafiletime = datetime.now().strftime("%Y%m%d_%H%M%S")
 		if len(self.config['Plan']['ScenarioFile'])>0:
 			filename = os.path.basename(self.config['Plan']['ScenarioFile'])
@@ -2283,7 +2288,7 @@ class RFSwarmGUI(tk.Frame):
 								# print('run_start_threads: nxtuid', nxtuid, 'ruusr', ruusr)
 								if nxtuid < ruusr+1:
 									uid = nxtuid
-									grurid = "{}_{}".format(gid,uid)
+									grurid = "{}_{}_{}".format(gid, uid, int(time.time()))
 									# print('run_start_threads: uid', uid)
 									self.robot_schedule["Scripts"][gid][uid] = grurid
 

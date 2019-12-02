@@ -101,11 +101,13 @@ class RFSwarmAgent():
 
 	def mainloop(self):
 		# print("RFSwarmAgent: mainloop")
+		prev_status = self.status
 		while True:
 			print("RFSwarmAgent: mainloop: Running", datetime.now().isoformat(sep=' ',timespec='seconds'),
 				"(",int(time.time()),")"
+				"isconnected:", self.isconnected,
 				"isrunning:", self.isrunning,
-				"isconnected:", self.isconnected
+				"isstopping:", self.isstopping
 			)
 
 			if not self.isconnected:
@@ -137,6 +139,11 @@ class RFSwarmAgent():
 					t2 = threading.Thread(target=self.getscripts)
 					t2.start()
 
+			if prev_status == "Stopping" and self.status == "Ready":
+				# neet to reset something
+				# I guess we can just reset the jobs disctionary?
+				self.jobs = {}
+				# pass
 
 			time.sleep(self.mainloopinterval)
 
