@@ -105,7 +105,7 @@ class AgentServer(BaseHTTPRequestHandler):
 							break
 
 					if httpcode == 200:
-						# print("jsonreq", jsonreq)
+						# print("do_POST: jsonreq:", jsonreq)
 						rfs.register_agent(jsonreq)
 						jsonresp["AgentName"] = jsonreq["AgentName"]
 						jsonresp["Status"] = "Updated"
@@ -418,7 +418,10 @@ class RFSwarmGUI(tk.Frame):
 			self.grid(row=0, column=0, sticky="nsew")
 			self.columnconfigure(0, weight=1)
 			self.rowconfigure(0, weight=1)
-			self.BuildUI()
+
+		self.BuildUI()
+
+		if not self.args.nogui:
 			# self.pln_update_graph()
 			ug = threading.Thread(target=self.pln_update_graph)
 			ug.start()
@@ -431,9 +434,27 @@ class RFSwarmGUI(tk.Frame):
 		self.dbthread.start()
 
 		if self.args.nogui:
-			self.stayrunning()
+			# self.stayrunning()
+			rn = threading.Thread(target=self.stayrunning)
+			rn.start()
 
 	def stayrunning(self):
+
+		if self.args.run:
+			# auto click play ?
+			neededagents = 1
+			if self.args.agents:
+				neededagents = int(self.args.agents)
+
+			print("BuildPlan: len(self.Agents):", len(self.Agents), "	neededagents:", neededagents)
+			# agntlst = list(self.Agents.keys())
+			while len(self.Agents) < neededagents:
+				print("BuildPlan: len(self.Agents):", len(self.Agents), "	neededagents:", neededagents)
+				time.sleep(10)
+
+			self.ClickPlay()
+			self.args.run = False
+
 		if self.run_dbthread:
 			time.sleep(10)
 
@@ -488,24 +509,30 @@ class RFSwarmGUI(tk.Frame):
 		exit()
 
 	def BuildUI(self):
-		minx = 500
-		miny = 200
-		self.columnconfigure(0, weight=1)
-		self.rowconfigure(0, weight=1)
+		p = None
+		r = None
+		a = None
 
-		self.tabs = ttk.Notebook(self)
-		p = ttk.Frame(self.tabs)   # first page, which would get widgets gridded into it
-		p.grid(row=0, column=0, sticky="nsew")
-		r = ttk.Frame(self.tabs)   # second page
-		r.grid(row=0, column=0, sticky="nsew")
-		a = ttk.Frame(self.tabs)   # 3rd page
-		a.grid(row=0, column=0, sticky="nsew")
-		self.tabs.add(p, text='Plan')
-		self.tabs.add(r, text='Run')
-		self.tabs.add(a, text='Agents')
-		self.tabs.grid(column=0, row=0) # , sticky="nsew")
+		if not self.args.nogui:
+			minx = 500
+			miny = 200
+			self.columnconfigure(0, weight=1)
+			self.rowconfigure(0, weight=1)
 
-		self.BuildMenu()
+			self.tabs = ttk.Notebook(self)
+			p = ttk.Frame(self.tabs)   # first page, which would get widgets gridded into it
+			p.grid(row=0, column=0, sticky="nsew")
+			r = ttk.Frame(self.tabs)   # second page
+			r.grid(row=0, column=0, sticky="nsew")
+			a = ttk.Frame(self.tabs)   # 3rd page
+			a.grid(row=0, column=0, sticky="nsew")
+			self.tabs.add(p, text='Plan')
+			self.tabs.add(r, text='Run')
+			self.tabs.add(a, text='Agents')
+			self.tabs.grid(column=0, row=0) # , sticky="nsew")
+
+			self.BuildMenu()
+
 		self.BuildPlan(p)
 		self.BuildRun(r)
 		self.BuildAgent(a)
@@ -988,105 +1015,106 @@ class RFSwarmGUI(tk.Frame):
 			self.config['Plan']['ScenarioFile'] = ""
 			self.saveini()
 
-		self.updateTitle()
+		if not self.args.nogui:
+			self.updateTitle()
 
-		planrow = 0
-		p.columnconfigure(planrow, weight=1)
-		p.rowconfigure(planrow, weight=1)
-		# Button Bar
+			planrow = 0
+			p.columnconfigure(planrow, weight=1)
+			p.rowconfigure(planrow, weight=1)
+			# Button Bar
 
-		bbar = ttk.Frame(p)
-		bbar.grid(column=0, row=planrow, sticky="nsew")
-		bbargrid = ttk.Frame(bbar)
-		bbargrid.grid(row=0, column=0, sticky="nsew")
-		# new
-		btnno = 0
-		icontext = "New"
-		self.iconew = self.get_icon(icontext)
-		bnew = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_New)
-		# bnew = ttk.Button(bbargrid, image=self.iconew, padding='3 3 3 3', command=self.mnu_file_New)
-		# bnew = ttk.Button(bbargrid, text="New", command=self.mnu_file_New)
-		bnew.grid(column=btnno, row=0, sticky="nsew")
-		# open
-		btnno += 1
+			bbar = ttk.Frame(p)
+			bbar.grid(column=0, row=planrow, sticky="nsew")
+			bbargrid = ttk.Frame(bbar)
+			bbargrid.grid(row=0, column=0, sticky="nsew")
+			# new
+			btnno = 0
+			icontext = "New"
+			self.iconew = self.get_icon(icontext)
+			bnew = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_New)
+			# bnew = ttk.Button(bbargrid, image=self.iconew, padding='3 3 3 3', command=self.mnu_file_New)
+			# bnew = ttk.Button(bbargrid, text="New", command=self.mnu_file_New)
+			bnew.grid(column=btnno, row=0, sticky="nsew")
+			# open
+			btnno += 1
 
-		icontext = "Open"
-		self.icoopen = self.get_icon(icontext)
-		bopen = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_Open)
-		# self.icoopen = self.get_icon("Open")
-		# bopen = ttk.Button(bbargrid, image=self.icoopen, padding='3 3 3 3', command=self.mnu_file_Open)
-		# bopen = ttk.Button(bbargrid, text="Open", command=self.mnu_file_Open)
-		bopen.grid(column=btnno, row=0, sticky="nsew")
-		# save
-		btnno += 1
-		icontext = "Save"
-		self.icoSave = self.get_icon(icontext)
-		bSave = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_Save)
-		# bSave = ttk.Button(bbargrid, image=self.icoSave, padding='3 3 3 3', command=self.mnu_file_Save)
-		# bSave = ttk.Button(bbargrid, text="Save", command=self.mnu_file_Save)
-		bSave.grid(column=btnno, row=0, sticky="nsew")
-		# play
-		btnno += 1
-		icontext = "Play"
-		self.icoPlay = self.get_icon(icontext)
-		bPlay = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', text="Play", command=self.ClickPlay)
-		# bPlay = ttk.Button(bbargrid, image=self.icoPlay, padding='3 3 3 3', command=self.ClickPlay)
-		# bPlay = ttk.Button(bbargrid, text="Play", command=self.ClickPlay)
-		bPlay.grid(column=btnno, row=0, sticky="nsew")
+			icontext = "Open"
+			self.icoopen = self.get_icon(icontext)
+			bopen = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_Open)
+			# self.icoopen = self.get_icon("Open")
+			# bopen = ttk.Button(bbargrid, image=self.icoopen, padding='3 3 3 3', command=self.mnu_file_Open)
+			# bopen = ttk.Button(bbargrid, text="Open", command=self.mnu_file_Open)
+			bopen.grid(column=btnno, row=0, sticky="nsew")
+			# save
+			btnno += 1
+			icontext = "Save"
+			self.icoSave = self.get_icon(icontext)
+			bSave = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_Save)
+			# bSave = ttk.Button(bbargrid, image=self.icoSave, padding='3 3 3 3', command=self.mnu_file_Save)
+			# bSave = ttk.Button(bbargrid, text="Save", command=self.mnu_file_Save)
+			bSave.grid(column=btnno, row=0, sticky="nsew")
+			# play
+			btnno += 1
+			icontext = "Play"
+			self.icoPlay = self.get_icon(icontext)
+			bPlay = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', text="Play", command=self.ClickPlay)
+			# bPlay = ttk.Button(bbargrid, image=self.icoPlay, padding='3 3 3 3', command=self.ClickPlay)
+			# bPlay = ttk.Button(bbargrid, text="Play", command=self.ClickPlay)
+			bPlay.grid(column=btnno, row=0, sticky="nsew")
 
 
-		planrow += 1
-		p.columnconfigure(planrow, weight=2)
-		p.rowconfigure(planrow, weight=1)
-		# Plan Graph
+			planrow += 1
+			p.columnconfigure(planrow, weight=2)
+			p.rowconfigure(planrow, weight=1)
+			# Plan Graph
 
-		self.pln_graph = tk.Canvas(p)
-		self.pln_graph.grid(column=0, row=planrow, sticky="nsew") # sticky="wens"
+			self.pln_graph = tk.Canvas(p)
+			self.pln_graph.grid(column=0, row=planrow, sticky="nsew") # sticky="wens"
 
-		planrow += 1
-		# Plan scripts
+			planrow += 1
+			# Plan scripts
 
-		sg = ttk.Frame(p)
-		sg.grid(column=0, row=planrow, sticky="nsew")
-		self.scriptgrid = ttk.Frame(sg)
-		self.scriptgrid.grid(row=0, column=0, sticky="nsew")
+			sg = ttk.Frame(p)
+			sg.grid(column=0, row=planrow, sticky="nsew")
+			self.scriptgrid = ttk.Frame(sg)
+			self.scriptgrid.grid(row=0, column=0, sticky="nsew")
 
-		# label row 0 of sg
-		self.scriptgrid.columnconfigure(self.plancolidx, weight=1)
-		idx = ttk.Label(self.scriptgrid, text="Index")
-		idx.grid(column=self.plancolidx, row=0, sticky="nsew")
+			# label row 0 of sg
+			self.scriptgrid.columnconfigure(self.plancolidx, weight=1)
+			idx = ttk.Label(self.scriptgrid, text="Index")
+			idx.grid(column=self.plancolidx, row=0, sticky="nsew")
 
-		self.scriptgrid.columnconfigure(self.plancolusr, weight=2)
-		usr = ttk.Label(self.scriptgrid, text="Users")
-		usr.grid(column=self.plancolusr, row=0, sticky="nsew")
+			self.scriptgrid.columnconfigure(self.plancolusr, weight=2)
+			usr = ttk.Label(self.scriptgrid, text="Users")
+			usr.grid(column=self.plancolusr, row=0, sticky="nsew")
 
-		self.scriptgrid.columnconfigure(self.plancoldly, weight=2)
-		usr = ttk.Label(self.scriptgrid, text="Delay")
-		usr.grid(column=self.plancoldly, row=0, sticky="nsew")
+			self.scriptgrid.columnconfigure(self.plancoldly, weight=2)
+			usr = ttk.Label(self.scriptgrid, text="Delay")
+			usr.grid(column=self.plancoldly, row=0, sticky="nsew")
 
-		self.scriptgrid.columnconfigure(self.plancolrmp, weight=2)
-		usr = ttk.Label(self.scriptgrid, text="Ramp Up")
-		usr.grid(column=self.plancolrmp, row=0, sticky="nsew")
+			self.scriptgrid.columnconfigure(self.plancolrmp, weight=2)
+			usr = ttk.Label(self.scriptgrid, text="Ramp Up")
+			usr.grid(column=self.plancolrmp, row=0, sticky="nsew")
 
-		self.scriptgrid.columnconfigure(self.plancolrun, weight=2)
-		usr = ttk.Label(self.scriptgrid, text="Run")
-		usr.grid(column=self.plancolrun, row=0, sticky="nsew")
+			self.scriptgrid.columnconfigure(self.plancolrun, weight=2)
+			usr = ttk.Label(self.scriptgrid, text="Run")
+			usr.grid(column=self.plancolrun, row=0, sticky="nsew")
 
-		# self.scriptgrid.columnconfigure(self.plancolnme, weight=5)
-		# nme = ttk.Label(self.scriptgrid, text="Name")
-		# nme.grid(column=self.plancolnme, row=0, sticky="nsew")
+			# self.scriptgrid.columnconfigure(self.plancolnme, weight=5)
+			# nme = ttk.Label(self.scriptgrid, text="Name")
+			# nme.grid(column=self.plancolnme, row=0, sticky="nsew")
 
-		self.scriptgrid.columnconfigure(self.plancolscr, weight=5)
-		scr = ttk.Label(self.scriptgrid, text="Script")
-		scr.grid(column=self.plancolscr, row=0, sticky="nsew")
+			self.scriptgrid.columnconfigure(self.plancolscr, weight=5)
+			scr = ttk.Label(self.scriptgrid, text="Script")
+			scr.grid(column=self.plancolscr, row=0, sticky="nsew")
 
-		self.scriptgrid.columnconfigure(self.plancoltst, weight=5)
-		tst = ttk.Label(self.scriptgrid, text="Test")
-		tst.grid(column=self.plancoltst, row=0, sticky="nsew")
+			self.scriptgrid.columnconfigure(self.plancoltst, weight=5)
+			tst = ttk.Label(self.scriptgrid, text="Test")
+			tst.grid(column=self.plancoltst, row=0, sticky="nsew")
 
-		self.scriptgrid.columnconfigure(self.plancoladd, weight=1)
-		new = ttk.Button(self.scriptgrid, text="+", command=self.addScriptRow, width=1)
-		new.grid(column=self.plancoladd, row=0, sticky="nsew")
+			self.scriptgrid.columnconfigure(self.plancoladd, weight=1)
+			new = ttk.Button(self.scriptgrid, text="+", command=self.addScriptRow, width=1)
+			new.grid(column=self.plancoladd, row=0, sticky="nsew")
 
 		if len(self.config['Plan']['ScenarioFile'])>0:
 			self.mnu_file_Open(self.config['Plan']['ScenarioFile'])
@@ -1094,7 +1122,8 @@ class RFSwarmGUI(tk.Frame):
 			self.addScriptRow()
 
 	def ClickPlay(self, _event=None):
-		self.tabs.select(1)
+		if not self.args.nogui:
+			self.tabs.select(1)
 
 		print("ClickPlay:", int(time.time()), "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
 
@@ -1110,7 +1139,7 @@ class RFSwarmGUI(tk.Frame):
 			self.run_name = "{}_{}".format(datafiletime, sname)
 		else:
 			self.run_name = "{}_{}".format(datafiletime, "Scenario")
-		# print("run_start_threads: self.run_name:", self.run_name)
+		print("run_start_threads: self.run_name:", self.run_name)
 
 
 		self.run_start = 0
@@ -1205,22 +1234,25 @@ class RFSwarmGUI(tk.Frame):
 			self.pln_update_graph()
 
 	def sr_users_validate(self, *args):
-		# print("sr_users_validate: args:",args)
+		print("sr_users_validate: args:",args)
 		if args:
 			r = args[0]
 			v = None
 			if len(args)>1:
-				v = args[1]
-				# print("sr_users_validate: grid_slaves:",self.scriptgrid.grid_slaves(column=self.plancolusr, row=r))
-				# print("sr_users_validate: grid_slaves[0]:",self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0])
-				self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].delete(0,'end')
-				self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].insert(0,v)
+				usrs = args[1]
+				if not self.args.nogui:
+					# print("sr_users_validate: grid_slaves:",self.scriptgrid.grid_slaves(column=self.plancolusr, row=r))
+					# print("sr_users_validate: grid_slaves[0]:",self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0])
+					self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].delete(0,'end')
+					self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].insert(0,usrs)
 
-			usrs = self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].get()
-			# print("Row:", r, "Users:", usrs)
+			if not self.args.nogui:
+				usrs = self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].get()
+			print("Row:", r, "Users:", usrs)
 			self.scriptlist[r]["Users"] = int(usrs)
 			self.plan_scnro_chngd = True
-			self.pln_update_graph()
+			if not self.args.nogui:
+				self.pln_update_graph()
 			return True
 		# print(self.scriptgrid.grid_size())
 		for r in range(self.scriptgrid.grid_size()[1]):
@@ -1234,23 +1266,26 @@ class RFSwarmGUI(tk.Frame):
 		return True
 
 	def sr_delay_validate(self, *args):
-		# print(args)
+		print("sr_delay_validate: args:",args)
 		if args:
 			r = args[0]
 			v = None
 			if len(args)>1:
-				v = args[1]
-				self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].delete(0,'end')
-				self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].insert(0,v)
-			dly = self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].get()
-			# print("Row:", r, "Delay:", dly)
+				dly = str(args[1])
+				if not self.args.nogui:
+					self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].delete(0,'end')
+					self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].insert(0,dly)
+			if not self.args.nogui:
+				dly = self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].get()
+			print("Row:", r, "Delay:", dly)
 			if len(dly)>0:
 				self.scriptlist[r]["Delay"] = int(dly)
 				self.plan_scnro_chngd = True
 			else:
 				self.scriptlist[r]["Delay"] = 0
 				self.plan_scnro_chngd = True
-			self.pln_update_graph()
+			if not self.args.nogui:
+				self.pln_update_graph()
 			return True
 		# print(self.scriptgrid.grid_size())
 		for r in range(self.scriptgrid.grid_size()[1]):
@@ -1260,23 +1295,27 @@ class RFSwarmGUI(tk.Frame):
 				# print("Row:", r, "Delay:", dly)
 				self.scriptlist[r]["Delay"] = int(dly)
 				self.plan_scnro_chngd = True
-		self.pln_update_graph()
+		if not self.args.nogui:
+			self.pln_update_graph()
 		return True
 
 	def sr_rampup_validate(self, *args):
-		# print(args)
+		print("sr_rampup_validate: args:",args)
 		if args:
 			r = args[0]
-			v = None
+			rmp = None
 			if len(args)>1:
-				v = args[1]
-				self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].delete(0,'end')
-				self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].insert(0,v)
-			rmp = self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].get()
-			# print("Row:", r, "RampUp:", rmp)
+				rmp = str(args[1])
+				if not self.args.nogui:
+					self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].delete(0,'end')
+					self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].insert(0,rmp)
+			if not self.args.nogui:
+				rmp = self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].get()
+			print("Row:", r, "RampUp:", rmp)
 			self.scriptlist[r]["RampUp"] = int(rmp)
 			self.plan_scnro_chngd = True
-			self.pln_update_graph()
+			if not self.args.nogui:
+				self.pln_update_graph()
 			return True
 		# print(self.scriptgrid.grid_size())
 		for r in range(self.scriptgrid.grid_size()[1]):
@@ -1286,23 +1325,27 @@ class RFSwarmGUI(tk.Frame):
 				# print("Row:", r, "RampUp:", rmp)
 				self.scriptlist[r]["RampUp"] = int(rmp)
 				self.plan_scnro_chngd = True
-		self.pln_update_graph()
+		if not self.args.nogui:
+			self.pln_update_graph()
 		return True
 
 	def sr_run_validate(self, *args):
-		# print(args)
+		print("sr_run_validate: args:",args)
 		if args:
 			r = args[0]
-			v = None
+			run = None
 			if len(args)>1:
-				v = args[1]
-				self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].delete(0,'end')
-				self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].insert(0,v)
-			run = self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].get()
-			# print("Row:", r, "Run:", run)
+				run = str(args[1])
+				if not self.args.nogui:
+					self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].delete(0,'end')
+					self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].insert(0,run)
+			if not self.args.nogui:
+				run = self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].get()
+			print("Row:", r, "Run:", run)
 			self.scriptlist[r]["Run"] = int(run)
 			self.plan_scnro_chngd = True
-			self.pln_update_graph()
+			if not self.args.nogui:
+				self.pln_update_graph()
 			return True
 		# print(self.scriptgrid.grid_size())
 		for r in range(self.scriptgrid.grid_size()[1]):
@@ -1312,7 +1355,8 @@ class RFSwarmGUI(tk.Frame):
 				# print("Row:", r, "Run:", run)
 				self.scriptlist[r]["Run"] = int(run)
 				self.plan_scnro_chngd = True
-		self.pln_update_graph()
+		if not self.args.nogui:
+			self.pln_update_graph()
 		return True
 
 	def hash_file(self, file):
@@ -1402,20 +1446,25 @@ class RFSwarmGUI(tk.Frame):
 
 	def sr_file_validate(self, r, *args):
 		# print(r)
-		fg = self.scriptgrid.grid_slaves(column=self.plancolscr, row=r)[0].grid_slaves()
+		if not self.args.nogui:
+			fg = self.scriptgrid.grid_slaves(column=self.plancolscr, row=r)[0].grid_slaves()
 		# print(fg)
 		# print(fg[1].get())
 		if args:
 			scriptfile = args[0]
 		else:
-			scriptfile = str(tkf.askopenfilename(initialdir=self.config['Plan']['ScriptDir'], title = "Select Robot Framework File", filetypes = (("Robot Framework","*.robot"),("all files","*.*"))))
+			if not self.args.nogui:
+				scriptfile = str(tkf.askopenfilename(initialdir=self.config['Plan']['ScriptDir'], title = "Select Robot Framework File", filetypes = (("Robot Framework","*.robot"),("all files","*.*"))))
+			else:
+				scriptfile = ""
 		# print("scriptfile:", scriptfile)
 		if len(scriptfile)>0:
-			fg[1].configure(state='normal')
-			fg[1].select_clear()
-			fg[1].delete(0, 'end')
-			fg[1].insert(0, os.path.basename(scriptfile))
-			fg[1].configure(state='readonly')
+			if not self.args.nogui:
+				fg[1].configure(state='normal')
+				fg[1].select_clear()
+				fg[1].delete(0, 'end')
+				fg[1].insert(0, os.path.basename(scriptfile))
+				fg[1].configure(state='readonly')
 			self.scriptlist[r]["Script"] = scriptfile
 			# print("test: ", fg[1].get())
 			script_hash = self.hash_file(scriptfile)
@@ -1449,7 +1498,8 @@ class RFSwarmGUI(tk.Frame):
 
 
 		self.plan_scnro_chngd = True
-		self.pln_update_graph()
+		if not self.args.nogui:
+			self.pln_update_graph()
 		return True
 
 	def sr_test_validate(self, *args):
@@ -1458,28 +1508,32 @@ class RFSwarmGUI(tk.Frame):
 		r = int(args[0][3:])
 		# print("sr_test_validate: r:", r)
 
-		# if 0 in self.scriptgrid.grid_slaves:
-		# print("sr_test_validate: grid_slaves:", self.scriptgrid.grid_slaves(column=self.plancoltst, row=r))
-		tol = self.scriptgrid.grid_slaves(column=self.plancoltst, row=r)[0]
-		# print("sr_test_validate: tol:", tol)
+		if not self.args.nogui:
+			# if 0 in self.scriptgrid.grid_slaves:
+			# print("sr_test_validate: grid_slaves:", self.scriptgrid.grid_slaves(column=self.plancoltst, row=r))
+			tol = self.scriptgrid.grid_slaves(column=self.plancoltst, row=r)[0]
+			# print("sr_test_validate: tol:", tol)
 
 		v = None
 		if len(args)>1 and len(args[1])>1:
 			v = args[1]
 			# print("sr_test_validate: v:", v)
-			self.scriptlist[r]["TestVar"].set(v)
+			if not self.args.nogui:
+				self.scriptlist[r]["TestVar"].set(v)
 			self.scriptlist[r]["Test"] = v
 		else:
-			# print("sr_test_validate: else")
-			# print("sr_test_validate: scriptlist[r][TestVar].get():", self.scriptlist[r]["TestVar"].get())
-			self.scriptlist[r]["Test"] = self.scriptlist[r]["TestVar"].get()
+			if not self.args.nogui:
+				# print("sr_test_validate: else")
+				# print("sr_test_validate: scriptlist[r][TestVar].get():", self.scriptlist[r]["TestVar"].get())
+				self.scriptlist[r]["Test"] = self.scriptlist[r]["TestVar"].get()
 
 		# print("sr_test_validate: scriptlist[r]:", self.scriptlist[r])
 		# print("sr_test_validate: scriptlist[r][TestVar].get():", self.scriptlist[r]["TestVar"].get())
 
 		self.plan_scnro_chngd = True
 
-		self.pln_update_graph()
+		if not self.args.nogui:
+			self.pln_update_graph()
 		return True
 
 	def sr_test_genlist(self, r):
@@ -1500,9 +1554,10 @@ class RFSwarmGUI(tk.Frame):
 						# print("", line[0:1], "")
 						tclist.append(line[0:-1])
 		# print(tclist)
-		tol = self.scriptgrid.grid_slaves(column=self.plancoltst, row=r)[0]
-		# print(tol)
-		tol.set_menu(*tclist)
+		if not self.args.nogui:
+			tol = self.scriptgrid.grid_slaves(column=self.plancoltst, row=r)[0]
+			# print(tol)
+			tol.set_menu(*tclist)
 
 	def sr_remove_row(self, r):
 		# print("sr_remove_row:", r)
@@ -2049,14 +2104,18 @@ class RFSwarmGUI(tk.Frame):
 			# queue sqls so UpdateRunStats should have the results
 
 
-			display_percentile = int(self.display_run['display_percentile'].get())
+			display_percentile = self.config['Run']['display_percentile']
+			if not self.args.nogui:
+				display_percentile = int(self.display_run['display_percentile'].get())
 			if display_percentile != int(self.config['Run']['display_percentile']):
 				self.config['Run']['display_percentile'] = str(display_percentile)
 				self.saveini()
 
 
 			gblist = []
-			display_index = self.display_run['display_index'].get()
+			display_index = self.config['Run']['display_index']
+			if not self.args.nogui:
+				display_index = self.display_run['display_index'].get()
 			# print("delayed_UpdateRunStats: display_index:", display_index, "	config[Run][display_index]:", self.config['Run']['display_index'], "	bool(config[Run][display_index]):", self.str2bool(self.config['Run']['display_index']))
 			if display_index != self.str2bool(self.config['Run']['display_index']):
 				self.config['Run']['display_index'] = str(display_index)
@@ -2064,14 +2123,18 @@ class RFSwarmGUI(tk.Frame):
 			if display_index:
 				gblist.append("r.script_index")
 
-			display_iteration = self.display_run['display_iteration'].get()
+			display_iteration = self.config['Run']['display_iteration']
+			if not self.args.nogui:
+				display_iteration = self.display_run['display_iteration'].get()
 			if display_iteration != self.str2bool(self.config['Run']['display_iteration']):
 				self.config['Run']['display_iteration'] = str(display_iteration)
 				self.saveini()
 			if display_iteration:
 				gblist.append("r.iteration")
 
-			display_sequence = self.display_run['display_sequence'].get()
+			display_sequence = self.config['Run']['display_sequence']
+			if not self.args.nogui:
+				display_sequence = self.display_run['display_sequence'].get()
 			if display_sequence != self.str2bool(self.config['Run']['display_sequence']):
 				self.config['Run']['display_sequence'] = str(display_sequence)
 				self.saveini()
@@ -2610,7 +2673,10 @@ class RFSwarmGUI(tk.Frame):
 				# if i not in self.scriptlist:
 				# 	self.scriptlist.append({})
 				# 	self.scriptlist[ii]["Index"] = ii
-				if ii+1 > self.scriptgrid.grid_size()[1]:		# grid_size tupple: (cols, rows)
+				if not self.args.nogui:
+					if ii+1 > self.scriptgrid.grid_size()[1]:		# grid_size tupple: (cols, rows)
+						self.addScriptRow()
+				else:
 					self.addScriptRow()
 				# users = 13
 				# print("mnu_file_Open: filedata[", istr, "][users]:", filedata[istr]["users"])
@@ -2836,10 +2902,10 @@ class RFSwarmGUI(tk.Frame):
 
 rfs = RFSwarmGUI()
 
-# try:
-rfs.mainloop()
-# except KeyboardInterrupt:
-# 	rfs.on_closing()
-# except Exception as e:
-# 	print("rfs.Exception:", e)
-# 	rfs.on_closing()
+try:
+	rfs.mainloop()
+except KeyboardInterrupt:
+	rfs.on_closing()
+except Exception as e:
+	print("rfs.Exception:", e)
+	rfs.on_closing()
