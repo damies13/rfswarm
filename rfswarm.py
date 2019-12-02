@@ -49,6 +49,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer, HTTPServer
 import urllib.parse
 import json
 
+import argparse
 
 
 __name__ = "rfswarm"
@@ -360,6 +361,8 @@ class RFSwarmGUI(tk.Frame):
 	datadb = None
 	dbqueue = {"Write": [], "Read": [], "ReadResult": {}, "Agents": [], "Results": []}
 
+	args = None
+
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
 	# core application
@@ -367,6 +370,26 @@ class RFSwarmGUI(tk.Frame):
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 	def __init__(self, master=None):
+		print("Robot Framework Swarm: Run GUI")
+		print("	Version", self.version)
+
+		# Check for command line args
+		parser = argparse.ArgumentParser()
+		# parser.add_argument('--foo', help='foo help')
+		parser.add_argument('-v', '--version', help='Display the version and exit', action='store_true')
+		parser.add_argument('-i', '--ini', nargs='?', help='path to alternate ini file')
+		parser.add_argument('-s', '--scenario', nargs='?', help='Loat this scenario file')
+		parser.add_argument('-r', '--run', help='Run the scenario automatically after loading', action='store_true')
+		parser.add_argument('-a', '--agents', nargs='?', help='Wait for this many agents before starting (default 1)')
+		parser.add_argument('-n', '--nogui', help='Don''t display the GUI', action='store_true')
+		parser.add_argument('-d', '--ipaddress', nargs='?', help='IP Address to bind the server to')
+		parser.add_argument('-p', '--port', nargs='?', help='Port number to bind the server to')
+		self.args = parser.parse_args()
+
+		if self.args.version:
+			exit()
+
+
 		root = tk.Tk()
 		# Grid.rowconfigure(root, 0, weight=1)
 		# Grid.columnconfigure(root, 0, weight=1)
@@ -2885,8 +2908,6 @@ class RFSwarmGUI(tk.Frame):
 
 
 rfs = RFSwarmGUI()
-print("Robot Framework Swarm: Run GUI")
-print("	Version", rfs.version)
 
 try:
 	rfs.mainloop()
