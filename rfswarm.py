@@ -989,14 +989,14 @@ class RFSwarmCore:
 		parser = argparse.ArgumentParser()
 		parser.add_argument('-g', '--debug', help='Set debug level, default level is 0')
 		parser.add_argument('-v', '--version', help='Display the version and exit', action='store_true')
-		parser.add_argument('-i', '--ini', nargs='?', help='path to alternate ini file')
-		parser.add_argument('-s', '--scenario', nargs='?', help='Load this scenario file')
+		parser.add_argument('-i', '--ini', help='path to alternate ini file') # nargs='?',
+		parser.add_argument('-s', '--scenario', help='Load this scenario file')
 		parser.add_argument('-r', '--run', help='Run the scenario automatically after loading', action='store_true')
-		parser.add_argument('-a', '--agents', nargs='?', help='Wait for this many agents before starting (default 1)')
+		parser.add_argument('-a', '--agents', help='Wait for this many agents before starting (default 1)')
 		parser.add_argument('-n', '--nogui', help='Don''t display the GUI', action='store_true')
-		parser.add_argument('-d', '--dir', help='Results directory', action='store_true')
-		parser.add_argument('-e', '--ipaddress', nargs='?', help='IP Address to bind the server to')
-		parser.add_argument('-p', '--port', nargs='?', help='Port number to bind the server to')
+		parser.add_argument('-d', '--dir', help='Results directory')
+		parser.add_argument('-e', '--ipaddress', help='IP Address to bind the server to')
+		parser.add_argument('-p', '--port', help='Port number to bind the server to')
 		base.args = parser.parse_args()
 
 		base.debugmsg(6, "base.args: ", base.args)
@@ -1025,8 +1025,19 @@ class RFSwarmCore:
 		base.debugmsg(5, "base.config: ", base.config._sections)
 		if base.args.scenario:
 			base.save_ini = False
-			scenariofile = os.path.abspath(os.path.join(scrdir, base.args.scenario))
+			base.debugmsg(5, "base.args.scenario: ", base.args.scenario)
+			scenariofile = os.path.abspath(base.args.scenario)
+			base.debugmsg(5, "scenariofile: ", scenariofile)
 			base.config['Plan']['ScenarioFile'] = scenariofile
+
+		if base.args.dir:
+			base.save_ini = False
+			base.debugmsg(5, "base.args.dir: ", base.args.dir)
+			ResultsDir = os.path.abspath(base.args.dir)
+			base.debugmsg(5, "ResultsDir: ", ResultsDir)
+			base.config['Run']['ResultsDir'] = ResultsDir
+
+
 
 		if base.args.nogui:
 			base.save_ini = False
