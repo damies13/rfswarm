@@ -24,6 +24,7 @@ import sqlite3
 # import robot
 
 import socket
+import ipaddress
 import random
 import time
 from datetime import datetime
@@ -1037,6 +1038,15 @@ class RFSwarmCore:
 			base.debugmsg(5, "ResultsDir: ", ResultsDir)
 			base.config['Run']['ResultsDir'] = ResultsDir
 
+		if base.args.ipaddress:
+			base.save_ini = False
+			base.debugmsg(5, "base.args.ipaddress: ", base.args.ipaddress)
+			base.config['Server']['BindIP'] = base.args.ipaddress
+
+		if base.args.port:
+			base.save_ini = False
+			base.debugmsg(5, "base.args.port: ", base.args.port)
+			base.config['Server']['BindPort'] = base.args.port
 
 
 		if base.args.nogui:
@@ -1106,24 +1116,40 @@ class RFSwarmCore:
 	def on_closing(self, _event=None, *args):
 		# , _event=None is required for any function that has a shortcut key bound to it
 
-		base.debugmsg(0, "Shutdown Agent Server")
-		base.agenthttpserver.shutdown()
-		base.debugmsg(3, "Join Agent Server Thread")
-		base.Agentserver.join()
+		if base.appstarted:
+			try:
+				base.debugmsg(0, "Shutdown Agent Server")
+				base.agenthttpserver.shutdown()
+			except:
+				pass
+		try:
+			base.debugmsg(3, "Join Agent Server Thread")
+			base.Agentserver.join()
+		except:
+			pass
 
-		base.run_dbthread = False
-		base.debugmsg(3, "Join DB Thread")
-		base.dbthread.join()
+		try:
+			base.run_dbthread = False
+			base.debugmsg(3, "Join DB Thread")
+			base.dbthread.join()
+		except:
+			pass
 
-		base.debugmsg(3, "Save ini File")
-		base.saveini()
+		try:
+			base.debugmsg(3, "Save ini File")
+			base.saveini()
+		except:
+			pass
 
 		time.sleep(1)
 		base.debugmsg(2, "Exit")
 		try:
 			sys.exit(0)
 		except SystemExit:
-			os._exit(0)
+			try:
+				os._exit(0)
+			except:
+				pass
 
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -1150,12 +1176,31 @@ class RFSwarmCore:
 		srvport = int(base.config['Server']['BindPort'])
 		if len(srvip)>0:
 			srvdisphost = srvip
+			ip = ipaddress.ip_address(srvip)
+			base.debugmsg(5, "ip.version:", ip.version)
+			if ip.version == 6 and sys.version_info < (3, 8):
+				base.debugmsg(0, "Python 3.8 or higher required to bind to IPv6 Addresses")
+				pyver = "{}.{}.{}".format(sys.version_info[0], sys.version_info[1], sys.version_info[2])
+				base.debugmsg(0, "Python Version:",pyver,"	IP Version:", ip.version, "	IP Address:", srvip)
+				srvip = ''
+				srvdisphost = socket.gethostname()
 		else:
 			srvdisphost = socket.gethostname()
 
 
 		server_address = (srvip, srvport)
-		base.agenthttpserver = ThreadingHTTPServer(server_address, AgentServer)
+		try:
+			base.agenthttpserver = ThreadingHTTPServer(server_address, AgentServer)
+		except PermissionError:
+			base.debugmsg(0, "Permission denied when trying :",server_address)
+			self.on_closing()
+			return False
+		except Exception as e:
+			base.debugmsg(5, "e:", e)
+			self.on_closing()
+			return False
+
+
 		base.appstarted = True
 		base.debugmsg(5, "appstarted:", base.appstarted)
 		base.debugmsg(1, "Starting Agent Server", "http://{}:{}/".format(srvdisphost, srvport))
@@ -1788,13 +1833,19 @@ class RFSwarmGUI(tk.Frame):
 
 		base.debugmsg(3, "Close Scenario")
 		sf = base.config['Plan']['ScenarioFile']
-		self.mnu_file_Close()
+		try:
+			self.mnu_file_Close()
+		except:
+			pass
 		# mnu_file_Close clears this value, need to set it back so that it is saved
 		# 		in the ini file so the next app open loads the file
 		base.config['Plan']['ScenarioFile'] = sf
 
 		base.debugmsg(3, "Close GUI")
-		self.destroy()
+		try:
+			self.destroy()
+		except:
+			pass
 		core.on_closing()
 
 

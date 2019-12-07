@@ -251,6 +251,10 @@ class RFSwarmAgent():
 		# print("RFSwarmAgent: connectserver")
 		if self.swarmserver is None:
 			self.findserver()
+			if self.args.server:
+				print("RFSwarmAgent: connectserver: self.args.server: ", self.args.server)
+				self.swarmserver = self.args.server
+
 		if self.swarmserver is not None:
 			print("RFSwarmAgent: connectserver: Try connecting to", self.swarmserver)
 			# print("self.swarmserver:", self.swarmserver)
@@ -529,6 +533,9 @@ class RFSwarmAgent():
 			self.saveini()
 
 		robotcmd = self.config['Agent']['robotcmd']
+		if self.args.robot:
+			print("RFSwarmAgent: runthread: self.args.robot: ", self.args.robot)
+			robotcmd = self.args.robot
 
 		cmd = [robotcmd]
 		cmd.append("-t")
