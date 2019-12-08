@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version v0.4.4-alpha
+#    Version v0.4.5-alpha
 #
 
 
@@ -33,10 +33,11 @@ import json
 import xml.etree.ElementTree as ET
 import shutil
 
+import argparse
 
 class RFSwarmAgent():
 
-	version = "v0.4.4-alpha"
+	version = "v0.4.5-alpha"
 	config = None
 	isconnected = False
 	isrunning = False
@@ -55,16 +56,37 @@ class RFSwarmAgent():
 	robotcount = 0
 	status = "Ready"
 	excludelibraries = []
+	args = None
 
 	def __init__(self, master=None):
+		print("Robot Framework Swarm: Run Agent")
+		print("	Version", self.version)
 		# print("RFSwarmAgent: __init__")
 		# print("gettempdir", tempfile.gettempdir())
 		# print("tempdir", tempfile.tempdir)
+
+		parser = argparse.ArgumentParser()
+		# parser.add_argument('--foo', help='foo help')
+		parser.add_argument('-v', '--version', help='Display the version and exit', action='store_true')
+		parser.add_argument('-i', '--ini', nargs='?', help='path to alternate ini file')
+		parser.add_argument('-s', '--server', nargs='?', help='The server to connect to e.g. http://localhost:8138/')
+		parser.add_argument('-d', '--agentdir', nargs='?', help='The directory the agent should use for files')
+		parser.add_argument('-r', '--robot', nargs='?', help='The robot framework executable')
+		self.args = parser.parse_args()
+
+		if self.args.version:
+			exit()
+
 
 		self.config = configparser.ConfigParser()
 		scrdir = os.path.dirname(__file__)
 		# print("RFSwarmAgent: __init__: scrdir: ", scrdir)
 		self.agentini = os.path.join(scrdir, "RFSwarmAgent.ini")
+
+		if self.args.ini:
+			print("RFSwarmAgent: __init__: self.args.ini: ", self.args.ini)
+			self.agentini = self.args.ini
+
 		if os.path.isfile(self.agentini):
 			# print("RFSwarmAgent: __init__: agentini: ", self.agentini)
 			self.config.read(self.agentini)
@@ -81,7 +103,11 @@ class RFSwarmAgent():
 			self.config['Agent']['agentdir'] = os.path.join(tempfile.gettempdir(), "rfswarmagent")
 			self.saveini()
 
+
 		self.agentdir = self.config['Agent']['agentdir']
+		if self.args.agentdir:
+			print("RFSwarmAgent: __init__: self.args.agentdir: ", self.args.agentdir)
+			self.agentdir = self.args.agentdir
 		self.ensuredir(self.agentdir)
 
 		self.scriptdir = os.path.join(self.agentdir, "scripts")
@@ -101,11 +127,13 @@ class RFSwarmAgent():
 
 	def mainloop(self):
 		# print("RFSwarmAgent: mainloop")
+		prev_status = self.status
 		while True:
 			print("RFSwarmAgent: mainloop: Running", datetime.now().isoformat(sep=' ',timespec='seconds'),
 				"(",int(time.time()),")"
+				"isconnected:", self.isconnected,
 				"isrunning:", self.isrunning,
-				"isconnected:", self.isconnected
+				"isstopping:", self.isstopping
 			)
 
 			if not self.isconnected:
@@ -137,6 +165,11 @@ class RFSwarmAgent():
 					t2 = threading.Thread(target=self.getscripts)
 					t2.start()
 
+			if prev_status == "Stopping" and self.status == "Ready":
+				# neet to reset something
+				# I guess we can just reset the jobs disctionary?
+				self.jobs = {}
+				# pass
 
 			time.sleep(self.mainloopinterval)
 
@@ -175,9 +208,13 @@ class RFSwarmAgent():
 				else:
 					netpctlist.append(0)
 
-		# print("netpctlist:	", netpctlist)
-		self.netpct = max(netpctlist)
-		# print("self.netpct:	", self.netpct)
+		if len(netpctlist)>0:
+			# print("netpctlist:	", netpctlist)
+			self.netpct = max(netpctlist)
+			# print("self.netpct:	", self.netpct)
+		else:
+			self.netpct = 0
+
 
 	def updatestatus(self):
 		# print("self.swarmserver:", self.swarmserver)
@@ -214,6 +251,10 @@ class RFSwarmAgent():
 		# print("RFSwarmAgent: connectserver")
 		if self.swarmserver is None:
 			self.findserver()
+			if self.args.server:
+				print("RFSwarmAgent: connectserver: self.args.server: ", self.args.server)
+				self.swarmserver = self.args.server
+
 		if self.swarmserver is not None:
 			print("RFSwarmAgent: connectserver: Try connecting to", self.swarmserver)
 			# print("self.swarmserver:", self.swarmserver)
@@ -492,6 +533,9 @@ class RFSwarmAgent():
 			self.saveini()
 
 		robotcmd = self.config['Agent']['robotcmd']
+		if self.args.robot:
+			print("RFSwarmAgent: runthread: self.args.robot: ", self.args.robot)
+			robotcmd = self.args.robot
 
 		cmd = [robotcmd]
 		cmd.append("-t")
@@ -643,8 +687,6 @@ class RFSwarmAgent():
 
 
 rfsa = RFSwarmAgent()
-print("Robot Framework Swarm: Run Agent")
-print("	Version", rfsa.version)
 try:
 	rfsa.mainloop()
 except KeyboardInterrupt:

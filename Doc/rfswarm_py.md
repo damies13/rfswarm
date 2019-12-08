@@ -55,10 +55,16 @@ Stop button
 Use this if you want to stop the test early. You may not notice an immediate reaction as pressing the button just changes the end time on all the test jobs assigned to the current time and stops the ramp-up if the test is still in the ramp-up phase. While there is no benefit to pressing the stop button multiple times there is no harm either, so press to your hearts content.
 Once the stop button has been pressed the agents will receive the changed end time when they [poll](./rfswarm_agent_py.md#agent-polling-of-the-guiserver) the GUI/Server next, the agent will change status to stopping which will be returned on the next poll interval and the agent will not start a new iteration for the running tests, however the ones currently running will be allowed to complete.
 
-![Image](Images/Run_Start_v0.4.png "Run - Just Started")
+CSV Report button
+Use this to generate csv files suitable for use to create reports for your test run, there will be three files generated:
+- A Summary file, this is the same data as on the run screen
+- A Raw Results file, the is every data point recorded, useful if you want create response time graphs
+- An Agents file, this is all the agent stats recorded, useful if you want to graph running robots or agent loads
+
+![Image](Images/Run_Start_v0.4.4.png "Run - Just Started")
 > _Run - Just Started_
 
-![Image](Images/Run_v0.4.png "Run - Showing results being collected live")
+![Image](Images/Run_v0.4.4.png "Run - Showing results being collected live")
 > _Run - Showing results being collected live_
 
 ![Image](Images/Linux-Run-v0.4.3-10u1hr.png "Run - Linux 10 users running for over 1 hour")
