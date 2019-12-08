@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version v0.4.5-alpha
+#    Version v0.5.0-beta
 #
 
 
@@ -37,7 +37,7 @@ import argparse
 
 class RFSwarmAgent():
 
-	version = "v0.4.5-alpha"
+	version = "v0.5.0-beta"
 	config = None
 	isconnected = False
 	isrunning = False

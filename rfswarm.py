@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version v0.4.5-alpha
+#    Version v0.5.0-beta
 #
 
 # 	Helpful links
@@ -299,7 +299,7 @@ class AgentServer(BaseHTTPRequestHandler):
 
 
 class RFSwarmBase:
-	version = "v0.4.5-alpha"
+	version = "v0.5.0-beta"
 	debuglvl = 0
 
 	config = None
