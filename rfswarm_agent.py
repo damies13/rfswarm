@@ -48,6 +48,7 @@ class RFSwarmAgent():
 	scriptdir = None
 	logdir = None
 	agentini = None
+	listenerfile = None
 	ipaddresslist = []
 	netpct = 0
 	mainloopinterval = 10
@@ -106,14 +107,13 @@ class RFSwarmAgent():
 			self.saveini()
 
 		if 'xmlmode' not in self.config['Agent']:
-			self.config['Agent']['xmlmode'] = self.xmlmode
+			self.config['Agent']['xmlmode'] = str(self.xmlmode)
 			self.saveini()
 
-		self.xmlmode = self.config['Agent']['xmlmode']
+		self.xmlmode = self.str2bool(self.config['Agent']['xmlmode'])
 		if self.args.xmlmode:
 			print("RFSwarmAgent: __init__: self.args.xmlmode: ", self.args.xmlmode)
-			self.xmlmode = self.args.xmlmode
-
+			self.xmlmode = self.str2bool(self.args.xmlmode)
 
 		self.agentdir = self.config['Agent']['agentdir']
 		if self.args.agentdir:
@@ -135,6 +135,14 @@ class RFSwarmAgent():
 		# self.excludelibraries = ["BuiltIn", "String", "OperatingSystem", "perftest"]
 		self.excludelibraries = self.config['Agent']['excludelibraries'].split(",")
 		# print("RFSwarmAgent: __init__: self.excludelibraries:", self.excludelibraries)
+
+		if not self.xmlmode:
+			print("RFSwarmAgent: __init__: self.xmlmode: ", self.xmlmode)
+			self.create_listner_file()
+
+
+	def str2bool(self, instr):
+		return str(instr).lower()  in ("yes", "true", "t", "1")
 
 	def mainloop(self):
 		# print("RFSwarmAgent: mainloop")
@@ -555,9 +563,17 @@ class RFSwarmAgent():
 		cmd.append("-d")
 		cmd.append(odir)
 
-		cmd.append("-v index:{}".format(self.jobs[jobid]["ScriptIndex"]))
-		cmd.append("-v vuser:{}".format(self.jobs[jobid]["VUser"]))
-		cmd.append("-v iteration:{}".format(self.jobs[jobid]["Iteration"]))
+		if self.xmlmode:
+			cmd.append("-v index:{}".format(self.jobs[jobid]["ScriptIndex"]))
+			cmd.append("-v vuser:{}".format(self.jobs[jobid]["VUser"]))
+			cmd.append("-v iteration:{}".format(self.jobs[jobid]["Iteration"]))
+		else:
+			cmd.append("-M index:{}".format(self.jobs[jobid]["ScriptIndex"]))
+			cmd.append("-M vuser:{}".format(self.jobs[jobid]["VUser"]))
+			cmd.append("-M iteration:{}".format(self.jobs[jobid]["Iteration"]))
+			cmd.append("-M swarmserver:{}".format(self.swarmserver))
+			cmd.append("-M excludelibraries:{}".format(",".join(self.excludelibraries)))
+			cmd.append("--listener {}".format(self.listenerfile))
 
 		cmd.append("-o")
 		cmd.append(outputFile)
@@ -579,7 +595,7 @@ class RFSwarmAgent():
 					print("Robot returned an error (", result, ") please check the log file:", logFileName)
 
 			if os.path.exists(outputFile):
-				if self.xmlmode
+				if self.xmlmode:
 					t = threading.Thread(target=self.run_process_output, args=(outputFile, self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["VUser"], self.jobs[jobid]["Iteration"]))
 					t.start()
 			else:
@@ -697,6 +713,81 @@ class RFSwarmAgent():
 			print("Directory Create failed: ", dir)
 			print("with error: ", e)
 
+	def create_listner_file(self):
+		self.listenerfile = os.path.join(self.scriptdir, "RFSListener2.py")
+
+		fd = []
+		fd.append("")
+		fd.append("import os")
+		fd.append("import tempfile")
+		fd.append("import sys")
+		fd.append("import socket")
+		fd.append("from datetime import datetime")
+		fd.append("import time")
+		fd.append("import requests")
+		fd.append("")
+		fd.append("class RFSListener2:")
+		fd.append("	ROBOT_LISTENER_API_VERSION = 2")
+		fd.append("")
+		fd.append("	msg = None")
+		fd.append("	swarmserver = \"http://localhost:8138/\"")
+		fd.append("	excludelibraries = [\"BuiltIn\",\"String\",\"OperatingSystem\",\"perftest\"]")
+		fd.append("	index = 0")
+		fd.append("	vuser = 0")
+		fd.append("	iter = 0")
+		fd.append("	seq = 0")
+		fd.append("")
+		fd.append("	def start_suite(self, name, attrs):")
+		fd.append("		if 'index' in attrs['metadata']:")
+		fd.append("			self.index = attrs['metadata']['index']")
+		fd.append("		if 'iteration' in attrs['metadata']:")
+		fd.append("			self.iter = attrs['metadata']['iteration']")
+		fd.append("		if 'vuser' in attrs['metadata']:")
+		fd.append("			self.vuser = attrs['metadata']['vuser']")
+		fd.append("		if 'swarmserver' in attrs['metadata']:")
+		fd.append("			self.swarmserver = attrs['metadata']['swarmserver']")
+		fd.append("		if 'excludelibraries' in attrs['metadata']:")
+		fd.append("			self.excludelibraries = attrs['metadata']['excludelibraries'].split(\",\")")
+		fd.append("")
+		fd.append("	def log_message(self, message):")
+		fd.append("		self.msg = message")
+		fd.append("")
+		fd.append("	def end_keyword(self, name, attrs):")
+		fd.append("		if self.msg is not None:")
+		fd.append("			if attrs['libname'] not in self.excludelibraries:")
+		fd.append("				self.seq += 1")
+		fd.append("				startdate = datetime.strptime(attrs['starttime'], '%Y%m%d %H:%M:%S.%f')")
+		fd.append("				enddate = datetime.strptime(attrs['endtime'], '%Y%m%d %H:%M:%S.%f')")
+		fd.append("				payload = {")
+		fd.append("					'AgentName': socket.gethostname(),")
+		fd.append("					'ResultName': self.msg['message'],")
+		fd.append("					'Result': attrs['status'],")
+		fd.append("					'ElapsedTime': (attrs['elapsedtime']/1000),")
+		fd.append("					'StartTime': startdate.timestamp(),")
+		fd.append("					'EndTime': enddate.timestamp(),")
+		fd.append("					'ScriptIndex': self.index,")
+		fd.append("					'VUser': self.vuser,")
+		fd.append("					'Iteration': self.iter,")
+		fd.append("					'Sequence': self.seq")
+		fd.append("				}")
+		fd.append("				self.send_result(payload)")
+		fd.append("		self.msg = None")
+		fd.append("")
+		fd.append("	def send_result(self, payload):")
+		fd.append("		uri = self.swarmserver + 'Result'")
+		fd.append("		try:")
+		fd.append("			r = requests.post(uri, json=payload)")
+		fd.append("			if (r.status_code != requests.codes.ok):")
+		fd.append("				self.isconnected = False")
+		fd.append("		except Exception as e:")
+		fd.append("			pass")
+		fd.append("")
+
+
+		# print("RFSwarmAgent: create_listner_file: listenerfile: ", self.listenerfile)
+		with open(self.listenerfile, 'w+') as lf:
+			# lf.writelines(fd)
+			lf.write('\n'.join(fd))
 
 rfsa = RFSwarmAgent()
 try:
