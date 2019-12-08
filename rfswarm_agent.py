@@ -57,6 +57,7 @@ class RFSwarmAgent():
 	status = "Ready"
 	excludelibraries = []
 	args = None
+	xmlmode = False
 
 	def __init__(self, master=None):
 		print("Robot Framework Swarm: Run Agent")
@@ -68,10 +69,11 @@ class RFSwarmAgent():
 		parser = argparse.ArgumentParser()
 		# parser.add_argument('--foo', help='foo help')
 		parser.add_argument('-v', '--version', help='Display the version and exit', action='store_true')
-		parser.add_argument('-i', '--ini', nargs='?', help='path to alternate ini file')
-		parser.add_argument('-s', '--server', nargs='?', help='The server to connect to e.g. http://localhost:8138/')
-		parser.add_argument('-d', '--agentdir', nargs='?', help='The directory the agent should use for files')
-		parser.add_argument('-r', '--robot', nargs='?', help='The robot framework executable')
+		parser.add_argument('-i', '--ini', help='path to alternate ini file')
+		parser.add_argument('-s', '--server', help='The server to connect to e.g. http://localhost:8138/')
+		parser.add_argument('-d', '--agentdir', help='The directory the agent should use for files')
+		parser.add_argument('-r', '--robot', help='The robot framework executable')
+		parser.add_argument('-x', '--xmlmode', help='XML Mode, fall back to pasing the output.xml after each iteration', action='store_true')
 		self.args = parser.parse_args()
 
 		if self.args.version:
@@ -102,6 +104,15 @@ class RFSwarmAgent():
 		if 'agentdir' not in self.config['Agent']:
 			self.config['Agent']['agentdir'] = os.path.join(tempfile.gettempdir(), "rfswarmagent")
 			self.saveini()
+
+		if 'xmlmode' not in self.config['Agent']:
+			self.config['Agent']['xmlmode'] = self.xmlmode
+			self.saveini()
+
+		self.xmlmode = self.config['Agent']['xmlmode']
+		if self.args.xmlmode:
+			print("RFSwarmAgent: __init__: self.args.xmlmode: ", self.args.xmlmode)
+			self.xmlmode = self.args.xmlmode
 
 
 		self.agentdir = self.config['Agent']['agentdir']
@@ -568,8 +579,9 @@ class RFSwarmAgent():
 					print("Robot returned an error (", result, ") please check the log file:", logFileName)
 
 			if os.path.exists(outputFile):
-				t = threading.Thread(target=self.run_process_output, args=(outputFile, self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["VUser"], self.jobs[jobid]["Iteration"]))
-				t.start()
+				if self.xmlmode
+					t = threading.Thread(target=self.run_process_output, args=(outputFile, self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["VUser"], self.jobs[jobid]["Iteration"]))
+					t.start()
 			else:
 				print("Robot didn't create (", outputFile, ") please check the log file:", logFileName)
 
