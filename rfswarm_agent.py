@@ -777,9 +777,12 @@ class RFSwarmAgent():
 		fd.append("		uri = self.swarmserver + 'Result'")
 		fd.append("		try:")
 		fd.append("			r = requests.post(uri, json=payload)")
+		# fd.append("			print('send_result: ',r.status_code, r.text)")
 		fd.append("			if (r.status_code != requests.codes.ok):")
 		fd.append("				self.isconnected = False")
 		fd.append("		except Exception as e:")
+		# fd.append("			print('send_result: ',r.status_code, r.text)")
+		# fd.append("			print('send_result: Exception:', e)")
 		fd.append("			pass")
 		fd.append("")
 
