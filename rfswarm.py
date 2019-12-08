@@ -20,6 +20,7 @@ import hashlib
 import lzma
 import base64
 import sqlite3
+import math
 
 # import robot
 
@@ -78,11 +79,37 @@ class percentile:
 			nthi = int(nth)
 			# nthi = int(math.ceil(self.count * (self.percent/100)))
 			self.values.sort()
-			base.debugmsg(9, "percentile: finalize: nthi:", nthi, "	self.values[nthi]:", self.values[nthi], "	self.values:", self.values)
+			base.debugmsg(8, "percentile: finalize: nthi:", nthi, "	self.values[nthi]:", self.values[nthi], "	self.values:", self.values)
 			return self.values[nthi]
 			# return self.count
-		except:
+		except Exception as e:
+			base.debugmsg(5, "Exception:", e)
+
+class stdevclass:
+	def __init__(self):
+		self.M = 0.0
+		self.S = 0.0
+		self.k = 1
+
+	def step(self, value):
+		if value is None:
+			return
+		tM = self.M
+		self.M += (value - tM) / self.k
+		self.S += (value - tM) * (value - self.M)
+		self.k += 1
+
+	def finalize(self):
+		base.debugmsg(9, "self.k:", self.k, "	self.S:", self.S, "	self.M:", self.M)
+		if self.k < 3:
 			return None
+		try:
+			res = math.sqrt(self.S / (self.k-2))
+			base.debugmsg(8, "res:", res)
+			return res
+		except Exception as e:
+			base.debugmsg(5, "Exception:", e)
+
 
 class AgentServer(BaseHTTPRequestHandler):
 	def do_HEAD(self):
@@ -193,6 +220,7 @@ class AgentServer(BaseHTTPRequestHandler):
 				# , "Result"
 				if (parsed_path.path == "/Result"):
 					jsonreq = json.loads(rawData)
+					base.debugmsg(5, "Result: jsonreq:", jsonreq)
 					requiredfields = ["AgentName", "ResultName", "Result", "ElapsedTime", "StartTime", "EndTime", "ScriptIndex", "VUser", "Iteration", "Sequence"]
 					for field in requiredfields:
 						if field not in jsonreq:
@@ -201,6 +229,7 @@ class AgentServer(BaseHTTPRequestHandler):
 							break
 
 					if httpcode == 200:
+						base.debugmsg(7, "Result: httpcode:", httpcode)
 						jsonresp["AgentName"] = jsonreq["AgentName"]
 
 						core.register_result(jsonreq["AgentName"], jsonreq["ResultName"], jsonreq["Result"],
@@ -209,8 +238,9 @@ class AgentServer(BaseHTTPRequestHandler):
 									jsonreq["Sequence"])
 
 						jsonresp["Result"] = "Queued"
+						base.debugmsg(7, "Result: jsonresp[\"Result\"]:", jsonresp["Result"])
 
-				base.debugmsg(9, "do_POST: jsonresp:", jsonresp)
+				base.debugmsg(8, "jsonresp:", jsonresp)
 				message = json.dumps(jsonresp)
 			else:
 				httpcode = 404
@@ -507,7 +537,7 @@ class RFSwarmBase:
 				createschema = True
 
 			if createschema and self.datadb is not None:
-				print("ensure_db: Disconnect and close DB")
+				base.debugmsg(5, "Disconnect and close DB")
 				self.datadb.commit()
 				self.datadb.close()
 				self.datadb = None
@@ -537,6 +567,7 @@ class RFSwarmBase:
 				base.debugmsg(5, "Connect to DB")
 				self.datadb = sqlite3.connect(self.dbfile)
 				self.datadb.create_aggregate("percentile", 2, percentile)
+				self.datadb.create_aggregate("stdev", 1, stdevclass)
 
 			if createschema:
 				c = self.datadb.cursor()
@@ -819,6 +850,7 @@ class RFSwarmBase:
 		sql += 		"round(avg(rp.elapsed_time),3) 'avg', "
 		sql += 		"round(percentile(rp.elapsed_time, {}),3) '{}%ile', ".format(display_percentile, display_percentile)
 		sql += 		"round(max(rp.elapsed_time),3) 'max', "
+		sql += 		"round(stdev(rp.elapsed_time),3) 'stDev', "
 		sql += 		"count(rp.result) as _pass, "
 		sql += 		"count(rf.result) as _fail, "
 		sql += 		"count(ro.result) as _other "
