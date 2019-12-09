@@ -362,34 +362,34 @@ class RFSwarmBase:
 	def debugmsg(self, lvl, *msg):
 		msglst = []
 		prefix = ""
-		try:
-			if self.debuglvl >= 4:
-				stack = inspect.stack()
-				the_class = stack[1][0].f_locals["self"].__class__.__name__
-				the_method = stack[1][0].f_code.co_name
-				# print("RFSwarmBase: debugmsg: I was called by {}.{}()".format(str(the_class), the_method))
-				prefix = "{}: {}: [{}:{}]	".format(str(the_class), the_method, self.debuglvl, lvl)
-				# <36 + 1 tab
-				# if len(prefix.strip())<36:
-				# 	prefix = "{}	".format(prefix)
-				# <32 + 1 tab
-				if len(prefix.strip())<32:
-					prefix = "{}	".format(prefix)
-				# <28 + 1 tab
-				# if len(prefix.strip())<28:
-				# 	prefix = "{}	".format(prefix)
-				# <24 + 1 tab
-				if len(prefix.strip())<24:
-					prefix = "{}	".format(prefix)
+		if self.debuglvl >= lvl:
+			try:
+				if self.debuglvl >= 4:
+					stack = inspect.stack()
+					the_class = stack[1][0].f_locals["self"].__class__.__name__
+					the_method = stack[1][0].f_code.co_name
+					# print("RFSwarmBase: debugmsg: I was called by {}.{}()".format(str(the_class), the_method))
+					prefix = "{}: {}: [{}:{}]	".format(str(the_class), the_method, self.debuglvl, lvl)
+					# <36 + 1 tab
+					# if len(prefix.strip())<36:
+					# 	prefix = "{}	".format(prefix)
+					# <32 + 1 tab
+					if len(prefix.strip())<32:
+						prefix = "{}	".format(prefix)
+					# <28 + 1 tab
+					# if len(prefix.strip())<28:
+					# 	prefix = "{}	".format(prefix)
+					# <24 + 1 tab
+					if len(prefix.strip())<24:
+						prefix = "{}	".format(prefix)
 
-				msglst.append(str(prefix))
+					msglst.append(str(prefix))
 
-			for itm in msg:
-				msglst.append(str(itm))
-			if self.debuglvl >= lvl:
+				for itm in msg:
+					msglst.append(str(itm))
 				print(" ".join(msglst))
-		except:
-			pass
+			except:
+				pass
 
 
 	def str2bool(self, instr):
