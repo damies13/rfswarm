@@ -122,7 +122,7 @@ class RFSwarmAgent():
 
 		self.xmlmode = self.str2bool(self.config['Agent']['xmlmode'])
 		if self.args.xmlmode:
-			print("RFSwarmAgent: __init__: self.args.xmlmode: ", self.args.xmlmode)
+			self.debugmsg(6, "self.args.xmlmode: ", self.args.xmlmode)
 			self.xmlmode = self.str2bool(self.args.xmlmode)
 
 		self.agentdir = self.config['Agent']['agentdir']
@@ -145,6 +145,12 @@ class RFSwarmAgent():
 		# self.excludelibraries = ["BuiltIn", "String", "OperatingSystem", "perftest"]
 		self.excludelibraries = self.config['Agent']['excludelibraries'].split(",")
 		self.debugmsg(6, "self.excludelibraries:", self.excludelibraries)
+
+		if not self.xmlmode:
+			self.debugmsg(6, "self.xmlmode: ", self.xmlmode)
+			self.create_listner_file()
+
+
 
 	def debugmsg(self, lvl, *msg):
 		msglst = []
@@ -178,12 +184,6 @@ class RFSwarmAgent():
 				print(" ".join(msglst))
 			except:
 				pass
-
-
-		if not self.xmlmode:
-			print("RFSwarmAgent: __init__: self.xmlmode: ", self.xmlmode)
-			self.create_listner_file()
-
 
 	def str2bool(self, instr):
 		return str(instr).lower()  in ("yes", "true", "t", "1")
