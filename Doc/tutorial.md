@@ -68,7 +68,7 @@ select p.name, c.name, c1.name from oc_product_description p join oc_product_to_
 ## Robot Script
 
 
-
+> While I have some test cases against the opencart demo application, i'm reluctant to provide them until the the rest of this tutorial is Completed as people might load up the demo site without first getting permission from the opencart team to do so. I do not want to encourage people to do this.
 
 ## Run the Test
 
