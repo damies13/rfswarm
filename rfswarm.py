@@ -1027,7 +1027,7 @@ class RFSwarmCore:
 		parser.add_argument('-s', '--scenario', help='Load this scenario file')
 		parser.add_argument('-r', '--run', help='Run the scenario automatically after loading', action='store_true')
 		parser.add_argument('-a', '--agents', help='Wait for this many agents before starting (default 1)')
-		parser.add_argument('-n', '--nogui', help='Don''t display the GUI', action='store_true')
+		parser.add_argument('-n', '--nogui', help='Don\'t display the GUI', action='store_true')
 		parser.add_argument('-d', '--dir', help='Results directory')
 		parser.add_argument('-e', '--ipaddress', help='IP Address to bind the server to')
 		parser.add_argument('-p', '--port', help='Port number to bind the server to')

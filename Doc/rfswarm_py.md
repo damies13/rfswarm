@@ -9,6 +9,7 @@ rfswarm.py is the GUI and central server component of rfswarm, this is where you
 	- [Plan](#Plan)
 	- [Run](#Run)
 	- [Agents](#Agents)
+- [Command Line Interface](#Command-Line-Interface)
 - [Install and Setup](#Install-and-Setup)
 	- [Install the prerequisites](#1-install-the-prerequisites)
 	- [Adjust the Firewall](#2-Adjust-the-Firewall)
@@ -84,6 +85,47 @@ This is where you can see which agents have connected, number of robots on each 
 
 ![Image](Images/Linux-Agents-v0.4.3.png "Agents - Running - Linux")
 > _Agents - Running (Linux)_
+
+### Command Line Interface
+
+These command line options allow you to override the ini file configuration but do not update the ini file.
+
+Additionally the debug (-g) levels 1-3 will give extra information on the console useful for troubleshooting your environment. debug levels above 5 are more for debugging the code and get very noisy so are not recommended for normal use.
+
+```
+$ python rfswarm.py -h
+Robot Framework Swarm: GUI/Server
+	Version v0.5.0-beta
+usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
+                  [-n] [-d DIR] [-e IPADDRESS] [-p PORT]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -g DEBUG, --debug DEBUG
+                        Set debug level, default level is 0
+  -v, --version         Display the version and exit
+  -i INI, --ini INI     path to alternate ini file
+  -s SCENARIO, --scenario SCENARIO
+                        Load this scenario file
+  -r, --run             Run the scenario automatically after loading
+  -a AGENTS, --agents AGENTS
+                        Wait for this many agents before starting (default 1)
+  -n, --nogui           Don't display the GUI
+  -d DIR, --dir DIR     Results directory
+  -e IPADDRESS, --ipaddress IPADDRESS
+                        IP Address to bind the server to
+  -p PORT, --port PORT  Port number to bind the server to
+```
+
+If you pass in an unsupported command line option, you will get this prompt:
+```
+$ python rfswarm.py -?
+Robot Framework Swarm: GUI/Server
+	Version v0.5.0-beta
+usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
+                  [-n] [-d DIR] [-e IPADDRESS] [-p PORT]
+rfswarm.py: error: unrecognized arguments: -?
+```
 
 ### Install and Setup
 
