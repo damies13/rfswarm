@@ -5,7 +5,7 @@ rfswarm is a testing tool that allows you use [Robot Framework](https://robotfra
 
 > _Swarm being the collective noun for Robots, just as Flock is for Birds and Herd for Sheep, so it made sense to use swarm for a performance testing tool using Robot Framework, hence rfswarm_
 
-![Image](Doc/Images/Plan_saved_opened_v0.3.png "Plan - Planning a performance test")
+![Image](Doc/Images/Plan_v0.5.0_3tests.png "Plan - Planning a performance test")
 
 While Robot Framework is normally used for functional or regression testing, it has long been considered the holy grail in testing for there to be synergies between the functional and performance testing scripts so that effort expended in creating test cases for one does not need to be duplicated for the other which is currently the normal case.
 
@@ -15,7 +15,7 @@ rfswarm is written completely in python, so if you are already using Robot Frame
 
 To learn more about rfswarm please refer to the [Documentation](Doc/Index.md)
 
-![Image](Doc/Images/Run_v0.4.png "Run - Showing results being collected live")
+![Image](Doc/Images/Run_v0.5.0_100u_2h.png "Run - Showing results being collected live")
 
 ## Donations
 
