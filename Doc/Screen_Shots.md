@@ -13,25 +13,51 @@
 
 ### v0.5.0
 
+A simple scenario with 100 robots running the same test case
 ![Image](Images/Plan_v0.5.0_100u.png)
-![Image](Images/Plan_v0.5.0_150u_25per10min.png)
+
+An example scenario with 2 test groups of 10 robots each running the same test case, the second group starts 420 seconds after the first.
 ![Image](Images/Plan_v0.5.0_20u_delay_example.png)
+
+A gradual ramp-up scenario (Scalability Test) with 6 test groups of 25 robots each running the same test case, each test group starts 600 seconds (10 minutes) after the previous one, until 150 users are running.
+![Image](Images/Plan_v0.5.0_150u_25per10min.png)
+
+An example scenario with 3 test groups each running a different test case, and the second group starts with a 30 second delay.
 ![Image](Images/Plan_v0.5.0_3tests.png)
 
+Less than a minute into the run starting to get results (new method of gathering results on the agent is working well)
 ![Image](Images/Run_Start_v0.5.0_39s.png)
 ![Image](Images/Run_Start_v0.5.0_54s.png)
+
+More than a minute in and getting more results, now getting Standard Deviation and Percentile results.
 ![Image](Images/Run_Start_v0.5.0_77s.png)
 ![Image](Images/Run_v0.5.0_100u_6m.png)
+
+2 hours into run, this shows that application can handle large number of samples well and sustain a run of 100 users over 2 hours
 ![Image](Images/Run_v0.5.0_98u_2h.png)
 ![Image](Images/Run_v0.5.0_100u_2h.png)
+
+Run finished sucessfully after 2 hours 20, all robots have stopped.
 ![Image](Images/Run_Finished_v0.5.0_100u_2h.png)
+
+Clicking the export button (next to stop button) a dialogue gives you the path where the results are stored
 ![Image](Images/Report_export_v0.5.0.png)
 
-![Image](Images/Agents_running_v0.5.0.png)
-![Image](Images/Save?_v0.5.0.png)
-
-![Image](Images/Run_v0.5.0_crashing_users.png)
+Results export generates 3 csv files:
+- test_summary.csv, contains the table in the run screen with the Standard Deviation and Percentile results
+- test_agent_data.csv, contains the raw agent status updates, and could be useful for creating a running robots graph.
+- test_raw_result.csv, contains the raw result data, and could be useful for creating various graphs.
+The sqlite3 database from the test run is also available to enable easy reporting of test results, the db file is retained regardless of clicking the export button or not.
 ![Image](Images/Results_v0.5.0_100u_2.5hr.png)
+
+Screen shot showing agents when running a test, here you can see one agent is in warning state as memory consumption has exceeded 80%
+![Image](Images/Agents_running_v0.5.0.png)
+
+Screen shot showing the prompt to save changes to scenario when closing the application
+![Image](Images/Save_prompt_v0.5.0.png)
+
+Screen shot showing a run failing due to an overloaded agent, similarly when the application being tested fails you will see similar error messages with pass or fail counts depending on the library your test uses.
+![Image](Images/Run_v0.5.0_crashing_users.png)
 
 ### v0.4.4
 
