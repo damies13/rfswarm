@@ -33,7 +33,7 @@ More than a minute in and getting more results, now getting Standard Deviation a
 ![Image](Images/Run_Start_v0.5.0_77s.png)
 ![Image](Images/Run_v0.5.0_100u_6m.png)
 
-2 hours into run, this shows that application can handle large number of samples well and sustain a run of 100 users over 2 hours
+2 hours into run, this shows that rfswarm can handle large number of samples well and sustain a run of 100 users over 2 hours
 ![Image](Images/Run_v0.5.0_98u_2h.png)
 ![Image](Images/Run_v0.5.0_100u_2h.png)
 
@@ -47,6 +47,7 @@ Results export generates 3 csv files:
 - test_summary.csv, contains the table in the run screen with the Standard Deviation and Percentile results
 - test_agent_data.csv, contains the raw agent status updates, and could be useful for creating a running robots graph.
 - test_raw_result.csv, contains the raw result data, and could be useful for creating various graphs.
+
 The sqlite3 database from the test run is also available to enable easy reporting of test results, the db file is retained regardless of clicking the export button or not.
 ![Image](Images/Results_v0.5.0_100u_2.5hr.png)
 
