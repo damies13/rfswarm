@@ -23,14 +23,14 @@ This is where you construct your test scenario, choose your test cases and numbe
 
 All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the [agent polling](./rfswarm_agent_py.md#agent-polling-of-the-guiserver) works it's best not to use values less than 10 seconds.
 
-![Image](Images/Plan_saved_opened_v0.3.png "Plan - Planning a performance test")
 > _Plan - Planning a performance test_
+![Image](Images/Plan_saved_opened_v0.3.png "Plan - Planning a performance test")
 
-![Image](Images/Plan_unsaved_v0.3.png "Plan - New")
 > _Plan - New_
+![Image](Images/Plan_unsaved_v0.3.png "Plan - New")
 
-![Image](Images/Linux-Plan-v0.4.3.png "Plan - Linux")
 > _Plan - Linux (Mint 19.2)_
+![Image](Images/Linux-Plan-v0.4.3.png "Plan - Linux")
 
 While hopefully this is intuitive, the buttons are (starting top right)
 - New			- Create a new scenario
@@ -62,29 +62,35 @@ Use this to generate csv files suitable for use to create reports for your test 
 - A Raw Results file, the is every data point recorded, useful if you want create response time graphs
 - An Agents file, this is all the agent stats recorded, useful if you want to graph running robots or agent loads
 
+> _Run - Just started_
 ![Image](Images/Run_Start_v0.4.4.png "Run - Just Started")
-> _Run - Just Started_
 
-![Image](Images/Run_v0.4.4.png "Run - Showing results being collected live")
+> _Run - Just started, first results coming in_
+![Image](Images/Run_Start_v0.5.0_39s.png "Run - Just started, first results coming in")
+
 > _Run - Showing results being collected live_
+![Image](Images/Run_v0.5.0_100u_2h.png "Run - Showing results being collected live")
 
-![Image](Images/Linux-Run-v0.4.3-10u1hr.png "Run - Linux 10 users running for over 1 hour")
 > _Run - Linux 10 users running for over 1 hour_
+![Image](Images/Linux-Run-v0.4.3-10u1hr.png "Run - Linux 10 users running for over 1 hour")
 
-![Image](Images/Linux-Run-v0.4.3-50u1hr.png "Run - Linux 50 users running for over 1 hour")
 > _Run - Linux 50 users running for over 1 hour_
+![Image](Images/Linux-Run-v0.4.3-50u1hr.png "Run - Linux 50 users running for over 1 hour")
 
 
 #### Agents
 This is where you can see which agents have connected, number of robots on each agent and monitor the status and performance of the agents.
-![Image](Images/Agents_ready_v0.3.png "Agents - Ready")
 > _Agents - Ready_
+![Image](Images/Agents_ready_v0.3.png "Agents - Ready")
 
-![Image](Images/Agents_stopping_v0.3.png "Agents - Stopping")
+> _Agents - Running / Warning_
+![Image](Images/Agents_running_v0.5.0.png "Agents - Running / Warning")
+
 > _Agents - Stopping_
+![Image](Images/Agents_stopping_v0.3.png "Agents - Stopping")
 
-![Image](Images/Linux-Agents-v0.4.3.png "Agents - Running - Linux")
 > _Agents - Running (Linux)_
+![Image](Images/Linux-Agents-v0.4.3.png "Agents - Running - Linux")
 
 ### Command Line Interface
 
