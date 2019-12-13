@@ -150,7 +150,7 @@ apt install python3-tk
 
 Additionally the following pip command might be needed if these are not already installed on your system:
 ```
-pip* install configparser setuptools hashlib HTTPServer pillow
+pip<sup>*</sup> install configparser setuptools hashlib HTTPServer pillow
 ```
 > setuptools (is required by hashlib and HTTPServer)
 
@@ -160,10 +160,12 @@ pip* install configparser setuptools hashlib HTTPServer pillow
 
 Check if there is a firewall on you GUI / Server machine, if so you may need to adjust the firewall to add a rule to allow communication between the GUI / Server and the Agent.
 
-| Machine | Protocol | Port Number | Direction |
+| Machine | Protocol | Port Number<sup>1</sup> | Direction |
 |---|---|---|---|
 | GUI / Server | TCP | 8138 | Inbound |
 | Agent | TCP | 8138 | Outbound |
+
+<sup>1</sup> This is the default port number, replace with the port number you used if you changed it in the ini file or used the -p command line switch.
 
 Most firewalls on servers and workstations don't require specific rules for outbound, so most likely you will only need to configure the Inbound rule on the GUI / Server machine if it has a firewall.
 
@@ -171,7 +173,7 @@ Most firewalls on servers and workstations don't require specific rules for outb
 #### 3. Run the GUI Server
 
 ```
-python* rfswarm.py
+python<sup>*</sup> rfswarm.py
 ```
 \*or python3 on some systems
 

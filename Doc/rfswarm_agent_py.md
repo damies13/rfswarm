@@ -75,14 +75,14 @@ The Agent machine needs to use a minimum of Python 3.6
 
 Additionally the following pip command might be needed if these are not already installed on your system:
 ```
-pip* install configparser requests psutil
+pip<sup>*</sup> install configparser requests psutil
 ```
 \*some systems might need you to use pip3 and or sudo
 
 #### 3. Run Agent 1st time
 
 ```
-python rfswarm_agent.py
+python<sup>*</sup> rfswarm_agent.py
 ```
 \*or python3 on some systems
 
