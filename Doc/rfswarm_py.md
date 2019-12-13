@@ -19,7 +19,7 @@ rfswarm.py is the GUI and central server component of rfswarm, this is where you
 
 ### User Interface
 #### Plan
-This is where you construct your test scenario, choose your test cases and number of virtual users
+This is where you construct your test scenario, choose your test cases and number of virtual users. The interface should be intuitive and simple to understand but still allow fairly complex scenarios to be created.
 
 All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the [agent polling](./rfswarm_agent_py.md#agent-polling-of-the-guiserver) works it's best not to use values less than 10 seconds.
 
@@ -28,6 +28,12 @@ All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the [a
 
 > _Plan - New_
 ![Image](Images/Plan_unsaved_v0.3.png "Plan - New")
+
+> _Plan - Delay example_
+![Image](Images/Plan_v0.5.0_20u_delay_example.png)
+
+> _Plan - gradual ramp-up example_
+![Image](Images/Plan_v0.5.0_150u_25per10min.png)
 
 > _Plan - Linux (Mint 19.2)_
 ![Image](Images/Linux-Plan-v0.4.3.png "Plan - Linux")
