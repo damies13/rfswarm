@@ -150,7 +150,7 @@ apt install python3-tk
 
 Additionally the following pip command might be needed if these are not already installed on your system:
 ```
-pip<sup>*</sup> install configparser setuptools hashlib HTTPServer pillow
+pip* install configparser setuptools hashlib HTTPServer pillow
 ```
 > setuptools (is required by hashlib and HTTPServer)
 
@@ -173,7 +173,7 @@ Most firewalls on servers and workstations don't require specific rules for outb
 #### 3. Run the GUI Server
 
 ```
-python<sup>*</sup> rfswarm.py
+python* rfswarm.py
 ```
 \*or python3 on some systems
 
