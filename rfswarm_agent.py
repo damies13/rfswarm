@@ -608,7 +608,7 @@ class RFSwarmAgent():
 		cmd.append('"'+test+'"')
 		# cmd.append(testcs)
 		cmd.append("-d")
-		cmd.append(odir)
+		cmd.append('"'+odir+'"')
 
 		if self.xmlmode:
 			cmd.append("-v index:{}".format(self.jobs[jobid]["ScriptIndex"]))
@@ -620,12 +620,12 @@ class RFSwarmAgent():
 			cmd.append("-M iteration:{}".format(self.jobs[jobid]["Iteration"]))
 			cmd.append("-M swarmserver:{}".format(self.swarmserver))
 			cmd.append("-M excludelibraries:{}".format(",".join(self.excludelibraries)))
-			cmd.append("--listener {}".format(self.listenerfile))
+			cmd.append("--listener {}".format('"'+self.listenerfile+'"'))
 
 		cmd.append("-o")
-		cmd.append(outputFile)
+		cmd.append('"'+outputFile+'"')
 
-		cmd.append(localfile)
+		cmd.append('"'+localfile+'"')
 
 		robotexe = shutil.which(robotcmd)
 		self.debugmsg(6, "runthread: robotexe:", robotexe)
@@ -635,18 +635,20 @@ class RFSwarmAgent():
 			# result = subprocess.call(" ".join(cmd), shell=True)
 			# https://stackoverflow.com/questions/4856583/how-do-i-pipe-a-subprocess-call-to-a-text-file
 			with open(logFileName, "w") as f:
+				self.debugmsg(3, "Robot run with command: '", " ".join(cmd), "'")
 				# result = subprocess.call(" ".join(cmd), shell=True, stdout=f, stderr=f)
 				result = subprocess.call(" ".join(cmd), shell=True, stdout=f, stderr=subprocess.STDOUT)
 				self.debugmsg(6, "runthread: result:", result)
 				if result != 0:
 					self.debugmsg(1, "Robot returned an error (", result, ") please check the log file:", logFileName)
 
-			if os.path.exists(outputFile):
-				if self.xmlmode:
-					t = threading.Thread(target=self.run_process_output, args=(outputFile, self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["VUser"], self.jobs[jobid]["Iteration"]))
-					t.start()
-			else:
-				self.debugmsg(1, "Robot didn't create (", outputFile, ") please check the log file:", logFileName)
+			if self.xmlmode:
+				if os.path.exists(outputFile):
+					if self.xmlmode:
+						t = threading.Thread(target=self.run_process_output, args=(outputFile, self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["VUser"], self.jobs[jobid]["Iteration"]))
+						t.start()
+				else:
+					self.debugmsg(1, "Robot didn't create (", outputFile, ") please check the log file:", logFileName)
 
 			self.robotcount += -1
 		else:
