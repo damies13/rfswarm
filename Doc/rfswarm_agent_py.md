@@ -5,6 +5,7 @@
 
 rfswarm_agent.py is the agent component that actually runs the Robot Framework test cases and returns the results to rfswarm. The agent has no GUI
 
+- [Command Line Interface](#Command-Line-Interface)
 - [Install and Setup](#Install-and-Setup)
 	- [Robot Framework](#1-Robot-Framework)
 	- [Install the prerequisites](#2-Install-the-prerequisites)
@@ -20,6 +21,44 @@ rfswarm_agent.py is the agent component that actually runs the Robot Framework t
 	- [Connected State](#Connected-state)
 	- [Running State](#Running-state)
 
+### Command Line Interface
+
+These command line options allow you to override the ini file configuration but do not update the ini file.
+
+Additionally the debug (-g) levels 1-3 will give extra information on the console useful for troubleshooting your environment. debug levels above 5 are more for debugging the code and get very noisy so are not recommended for normal use.
+
+```
+$ python rfswarm_agent.py -h
+Robot Framework Swarm: Run Agent
+	Version v0.5.0-beta
+usage: rfswarm_agent.py [-h] [-g DEBUG] [-v] [-i INI] [-s SERVER]
+                        [-d AGENTDIR] [-r ROBOT] [-x]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -g DEBUG, --debug DEBUG
+                        Set debug level, default level is 0
+  -v, --version         Display the version and exit
+  -i INI, --ini INI     path to alternate ini file
+  -s SERVER, --server SERVER
+                        The server to connect to e.g. http://localhost:8138/
+  -d AGENTDIR, --agentdir AGENTDIR
+                        The directory the agent should use for files
+  -r ROBOT, --robot ROBOT
+                        The robot framework executable
+  -x, --xmlmode         XML Mode, fall back to pasing the output.xml after
+                        each iteration
+```
+
+If you pass in an unsupported command line option, you will get this prompt:
+```
+$ python rfswarm_agent.py -?
+Robot Framework Swarm: Run Agent
+	Version v0.5.0-beta
+usage: rfswarm_agent.py [-h] [-g DEBUG] [-v] [-i INI] [-s SERVER]
+                        [-d AGENTDIR] [-r ROBOT] [-x]
+rfswarm_agent.py: error: unrecognized arguments: -?
+```
 
 ### Install and Setup
 
@@ -43,7 +82,7 @@ pip* install configparser requests psutil
 #### 3. Run Agent 1st time
 
 ```
-python rfswarm_agent.py
+python* rfswarm_agent.py
 ```
 \*or python3 on some systems
 

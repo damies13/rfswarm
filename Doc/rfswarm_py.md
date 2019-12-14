@@ -9,6 +9,7 @@ rfswarm.py is the GUI and central server component of rfswarm, this is where you
 	- [Plan](#Plan)
 	- [Run](#Run)
 	- [Agents](#Agents)
+- [Command Line Interface](#Command-Line-Interface)
 - [Install and Setup](#Install-and-Setup)
 	- [Install the prerequisites](#1-install-the-prerequisites)
 	- [Adjust the Firewall](#2-Adjust-the-Firewall)
@@ -18,18 +19,24 @@ rfswarm.py is the GUI and central server component of rfswarm, this is where you
 
 ### User Interface
 #### Plan
-This is where you construct your test scenario, choose your test cases and number of virtual users
+This is where you construct your test scenario, choose your test cases and number of virtual users. The interface should be intuitive and simple to understand but still allow fairly complex scenarios to be created.
 
 All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the [agent polling](./rfswarm_agent_py.md#agent-polling-of-the-guiserver) works it's best not to use values less than 10 seconds.
 
-![Image](Images/Plan_saved_opened_v0.3.png "Plan - Planning a performance test")
 > _Plan - Planning a performance test_
+![Image](Images/Plan_saved_opened_v0.3.png "Plan - Planning a performance test")
 
-![Image](Images/Plan_unsaved_v0.3.png "Plan - New")
 > _Plan - New_
+![Image](Images/Plan_unsaved_v0.3.png "Plan - New")
 
-![Image](Images/Linux-Plan-v0.4.3.png "Plan - Linux")
+> _Plan - Delay example_
+![Image](Images/Plan_v0.5.0_20u_delay_example.png)
+
+> _Plan - gradual ramp-up example_
+![Image](Images/Plan_v0.5.0_150u_25per10min.png)
+
 > _Plan - Linux (Mint 19.2)_
+![Image](Images/Linux-v0.5.0_Plan_150u_25per10min.png)
 
 While hopefully this is intuitive, the buttons are (starting top right)
 - New			- Create a new scenario
@@ -61,29 +68,76 @@ Use this to generate csv files suitable for use to create reports for your test 
 - A Raw Results file, the is every data point recorded, useful if you want create response time graphs
 - An Agents file, this is all the agent stats recorded, useful if you want to graph running robots or agent loads
 
+> _Run - Just started_
 ![Image](Images/Run_Start_v0.4.4.png "Run - Just Started")
-> _Run - Just Started_
 
-![Image](Images/Run_v0.4.4.png "Run - Showing results being collected live")
+> _Run - Just started, first results coming in_
+![Image](Images/Run_Start_v0.5.0_39s.png "Run - Just started, first results coming in")
+
 > _Run - Showing results being collected live_
+![Image](Images/Run_v0.5.0_100u_2h.png "Run - Showing results being collected live")
 
-![Image](Images/Linux-Run-v0.4.3-10u1hr.png "Run - Linux 10 users running for over 1 hour")
-> _Run - Linux 10 users running for over 1 hour_
+> _Run - Linux_
+![Image](Images/Linux-v0.5.0_Run_6min.png)
 
-![Image](Images/Linux-Run-v0.4.3-50u1hr.png "Run - Linux 50 users running for over 1 hour")
-> _Run - Linux 50 users running for over 1 hour_
+> _Run - Linux Report Saved_
+![Image](Images/Linux-v0.5.0_Run_Report_prompt.png)
 
 
 #### Agents
 This is where you can see which agents have connected, number of robots on each agent and monitor the status and performance of the agents.
-![Image](Images/Agents_ready_v0.3.png "Agents - Ready")
 > _Agents - Ready_
+![Image](Images/Agents_ready_v0.3.png "Agents - Ready")
 
-![Image](Images/Agents_stopping_v0.3.png "Agents - Stopping")
+> _Agents - Running / Warning_
+![Image](Images/Agents_running_v0.5.0.png "Agents - Running / Warning")
+
 > _Agents - Stopping_
+![Image](Images/Agents_stopping_v0.3.png "Agents - Stopping")
 
-![Image](Images/Linux-Agents-v0.4.3.png "Agents - Running - Linux")
 > _Agents - Running (Linux)_
+![Image](Images/Linux-v0.5.0_Agents_Running.png)
+
+### Command Line Interface
+
+These command line options allow you to override the ini file configuration but do not update the ini file.
+
+Additionally the debug (-g) levels 1-3 will give extra information on the console useful for troubleshooting your environment. debug levels above 5 are more for debugging the code and get very noisy so are not recommended for normal use.
+
+```
+$ python rfswarm.py -h
+Robot Framework Swarm: GUI/Server
+	Version v0.5.0-beta
+usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
+                  [-n] [-d DIR] [-e IPADDRESS] [-p PORT]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -g DEBUG, --debug DEBUG
+                        Set debug level, default level is 0
+  -v, --version         Display the version and exit
+  -i INI, --ini INI     path to alternate ini file
+  -s SCENARIO, --scenario SCENARIO
+                        Load this scenario file
+  -r, --run             Run the scenario automatically after loading
+  -a AGENTS, --agents AGENTS
+                        Wait for this many agents before starting (default 1)
+  -n, --nogui           Don't display the GUI
+  -d DIR, --dir DIR     Results directory
+  -e IPADDRESS, --ipaddress IPADDRESS
+                        IP Address to bind the server to
+  -p PORT, --port PORT  Port number to bind the server to
+```
+
+If you pass in an unsupported command line option, you will get this prompt:
+```
+$ python rfswarm.py -?
+Robot Framework Swarm: GUI/Server
+	Version v0.5.0-beta
+usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
+                  [-n] [-d DIR] [-e IPADDRESS] [-p PORT]
+rfswarm.py: error: unrecognized arguments: -?
+```
 
 ### Install and Setup
 
@@ -112,10 +166,12 @@ pip* install configparser setuptools hashlib HTTPServer pillow
 
 Check if there is a firewall on you GUI / Server machine, if so you may need to adjust the firewall to add a rule to allow communication between the GUI / Server and the Agent.
 
-| Machine | Protocol | Port Number | Direction |
+| Machine | Protocol | Port Number<sup>1</sup> | Direction |
 |---|---|---|---|
 | GUI / Server | TCP | 8138 | Inbound |
 | Agent | TCP | 8138 | Outbound |
+
+<sup>1</sup> This is the default port number, replace with the port number you used if you changed it in the ini file or used the -p command line switch.
 
 Most firewalls on servers and workstations don't require specific rules for outbound, so most likely you will only need to configure the Inbound rule on the GUI / Server machine if it has a firewall.
 

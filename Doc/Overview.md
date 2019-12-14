@@ -30,6 +30,8 @@ How many and what specifications these machines need will depend on your applica
  	* Running the agents in minimal virtual machines (e.g. 1-2 cpu cores and 2-4GB ram) and then running multiple VM's on the physical machines allocated for your agents.
 	* Install Microsoft Terminal Services (Windows Server)/ Citrix (Windows Server) / Xvnc (Linux/Unix) on your agent machine and then run an agent in each desktop session
 
+> As an example: A [2013 11" Macbook Air i5 4Gb ram](https://support.apple.com/kb/sp677?locale=en_US) is able to run 30 robot using SeleniumLibrary comfortably but struggles with 40 robots. But this was a low end machine when it was new, so far more capable machines are able to be purchased now without spending a fortune.
+
 ### Robot File handling (transfer from GUI to Agent)
 
 Firstly the assumption is made that the Agent and the GUI/Server are not necessarily the same operating system or on the same network (e.g. the GUI/Server might be in a corporate network and the Agent on vm from a cloud provider like AWS). So based on this it is assumed that the Agent and GUI/Server might not have any shared network locations etc. This key assumption drove the design for how the GUI/Server and Agent handle all files.
