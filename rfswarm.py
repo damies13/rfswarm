@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version v0.5.0-beta
+#    Version v0.5.1-beta
 #
 
 # 	Helpful links
@@ -329,7 +329,7 @@ class AgentServer(BaseHTTPRequestHandler):
 
 
 class RFSwarmBase:
-	version = "v0.5.0-beta"
+	version = "v0.5.1-beta"
 	debuglvl = 0
 
 	config = None
@@ -544,10 +544,10 @@ class RFSwarmBase:
 				self.datadb = None
 
 			# check if dir exists
-			base.debugmsg(5, "dir_path:", self.dir_path)
-			# self.resultsdir = os.path.join(self.dir_path, "results")
+			base.debugmsg(5, "dir_path:", base.dir_path)
+			# self.resultsdir = os.path.join(base.dir_path, "results")
 			if 'ResultsDir' not in base.config['Run']:
-				base.config['Run']['ResultsDir'] = os.path.join(self.dir_path, "results")
+				base.config['Run']['ResultsDir'] = os.path.join(base.dir_path, "results")
 				base.saveini()
 			self.resultsdir = base.config['Run']['ResultsDir']
 
@@ -1045,6 +1045,9 @@ class RFSwarmCore:
 		base.config = configparser.ConfigParser()
 		scrdir = os.path.dirname(__file__)
 		base.debugmsg(6, "scrdir: ", scrdir)
+		#
+		# 	ensure ini file
+		#
 		base.gui_ini = os.path.join(scrdir, "RFSwarmGUI.ini")
 		if base.args.ini:
 			base.save_ini = False
@@ -1081,6 +1084,74 @@ class RFSwarmCore:
 			base.debugmsg(5, "base.args.port: ", base.args.port)
 			base.config['Server']['BindPort'] = base.args.port
 
+		#
+		# Plan
+		#
+
+		if 'Plan' not in base.config:
+			base.config['Plan'] = {}
+			base.saveini()
+
+		if 'ScriptDir' not in base.config['Plan']:
+			base.config['Plan']['ScriptDir'] = base.dir_path
+			base.saveini()
+
+		if 'ScenarioDir' not in base.config['Plan']:
+			base.config['Plan']['ScenarioDir'] = base.dir_path
+			base.saveini()
+
+		if 'ScenarioFile' not in base.config['Plan']:
+			base.config['Plan']['ScenarioFile'] = ""
+			base.saveini()
+
+		#
+		# Run
+		#
+
+
+		if 'Run' not in base.config:
+			base.config['Run'] = {}
+			base.saveini()
+
+		if 'ResultsDir' not in base.config['Run']:
+			base.config['Run']['ResultsDir'] = os.path.join(base.dir_path, "results")
+			base.saveini()
+
+		if 'display_index' not in base.config['Run']:
+			base.config['Run']['display_index'] = str(False)
+			base.saveini()
+
+		if 'display_iteration' not in base.config['Run']:
+			base.config['Run']['display_iteration'] = str(False)
+			base.saveini()
+
+		if 'display_sequence' not in base.config['Run']:
+			base.config['Run']['display_sequence'] = str(False)
+			base.saveini()
+
+		if 'display_percentile' not in base.config['Run']:
+			base.config['Run']['display_percentile'] = str(90)
+			base.saveini()
+
+		#
+		# Server
+		#
+
+		if 'Server' not in base.config:
+			base.config['Server'] = {}
+			base.saveini()
+
+		if 'BindIP' not in base.config['Server']:
+			base.config['Server']['BindIP'] = ''
+			base.saveini()
+
+		if 'BindPort' not in base.config['Server']:
+			base.config['Server']['BindPort'] = "8138"
+			base.saveini()
+
+		#
+		# 	end ensure ini file
+		#
 
 		if base.args.nogui:
 			base.save_ini = False
@@ -1088,6 +1159,8 @@ class RFSwarmCore:
 				base.args.run = True
 		else:
 			base.gui = RFSwarmGUI()
+
+
 
 		self.BuildCore()
 
@@ -1098,6 +1171,10 @@ class RFSwarmCore:
 		base.run_dbthread = True
 		base.dbthread = threading.Thread(target=base.run_db_thread)
 		base.dbthread.start()
+
+
+
+
 
 	def BuildCore(self):
 		base.debugmsg(5, "BuildCore")
@@ -1193,17 +1270,6 @@ class RFSwarmCore:
 
 	def run_agent_server(self):
 
-		if 'Server' not in base.config:
-			base.config['Server'] = {}
-			base.saveini()
-
-		if 'BindIP' not in base.config['Server']:
-			base.config['Server']['BindIP'] = ''
-			base.saveini()
-
-		if 'BindPort' not in base.config['Server']:
-			base.config['Server']['BindPort'] = "8138"
-			base.saveini()
 
 		srvip = base.config['Server']['BindIP']
 		srvport = int(base.config['Server']['BindPort'])
@@ -1303,21 +1369,6 @@ class RFSwarmCore:
 
 	def BuildCorePlan(self):
 		base.debugmsg(5, "BuildCorePlan")
-		if 'Plan' not in base.config:
-			base.config['Plan'] = {}
-			base.saveini()
-
-		if 'ScriptDir' not in base.config['Plan']:
-			base.config['Plan']['ScriptDir'] = self.dir_path
-			base.saveini()
-
-		if 'ScenarioDir' not in base.config['Plan']:
-			base.config['Plan']['ScenarioDir'] = self.dir_path
-			base.saveini()
-
-		if 'ScenarioFile' not in base.config['Plan']:
-			base.config['Plan']['ScenarioFile'] = ""
-			base.saveini()
 
 		if len(base.config['Plan']['ScenarioFile'])>0:
 			self.OpenFile(base.config['Plan']['ScenarioFile'])
@@ -1325,6 +1376,7 @@ class RFSwarmCore:
 			base.addScriptRow()
 
 	def OpenFile(self, ScenarioFile):
+		fileok = True
 
 		base.debugmsg(6, "ScenarioFile: ", ScenarioFile)
 		base.debugmsg(6, "base.config['Plan']['ScenarioFile']: ", base.config['Plan']['ScenarioFile'])
@@ -1338,10 +1390,10 @@ class RFSwarmCore:
 		base.debugmsg(6, "filedata: ", filedata._sections)
 
 		if os.path.isfile(ScenarioFile):
-			base.debugmsg(9, "mnu_file_Open: ScenarioFile: ", ScenarioFile)
+			base.debugmsg(9, "ScenarioFile: ", ScenarioFile)
 			filedata.read(ScenarioFile)
 
-		base.debugmsg(9, "mnu_file_Open: filedata: ", filedata)
+		base.debugmsg(9, "filedata: ", filedata)
 
 		scriptcount = 0
 		if "Scenario" in filedata:
@@ -1349,6 +1401,10 @@ class RFSwarmCore:
 			if "scriptcount" in filedata["Scenario"]:
 				scriptcount = int(filedata["Scenario"]["scriptcount"])
 				base.debugmsg(9, "mnu_file_Open: scriptcount:", scriptcount)
+		else:
+			base.debugmsg(1, "File contains no scenario:", ScenarioFile)
+			return 1
+
 
 		for i in range(scriptcount):
 			ii = i+1
@@ -1363,29 +1419,52 @@ class RFSwarmCore:
 				else:
 					base.addScriptRow()
 				# users = 13
-				base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][users]:", filedata[istr]["users"])
-				# base.scriptlist[ii]["users"] = filedata[istr]["users"]
-				self.sr_users_validate(ii, int(filedata[istr]["users"]))
-				# delay = 0
-				base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][delay]:", filedata[istr]["delay"])
-				# base.scriptlist[ii]["delay"] = filedata[istr]["delay"]
-				self.sr_delay_validate(ii, int(filedata[istr]["delay"]))
-				# rampup = 60
-				base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][rampup]:", filedata[istr]["rampup"])
-				# base.scriptlist[ii]["rampup"] = filedata[istr]["rampup"]
-				self.sr_rampup_validate(ii, int(filedata[istr]["rampup"]))
-				# run = 600
-				base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][run]:", filedata[istr]["run"])
-				# base.scriptlist[ii]["run"] = filedata[istr]["run"]
-				self.sr_run_validate(ii, int(filedata[istr]["run"]))
-				# script = /Users/dave/Documents/GitHub/rfswarm/robots/OC_Demo_2.robot
-				base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][script]:", filedata[istr]["script"])
-				# base.scriptlist[ii]["script"] = filedata[istr]["script"]
-				self.sr_file_validate(ii, filedata[istr]["script"])
-				# test = Browse Store Product 1
-				base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][test]:", filedata[istr]["test"])
-				# base.scriptlist[ii]["test"] = filedata[istr]["test"]
-				self.sr_test_validate("row{}".format(ii), filedata[istr]["test"])
+				if "users" in filedata[istr]:
+					base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][users]:", filedata[istr]["users"])
+					# base.scriptlist[ii]["users"] = filedata[istr]["users"]
+					self.sr_users_validate(ii, int(filedata[istr]["users"]))
+					# delay = 0
+				else:
+					fileok = False
+				if "delay" in filedata[istr]:
+					base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][delay]:", filedata[istr]["delay"])
+					# base.scriptlist[ii]["delay"] = filedata[istr]["delay"]
+					self.sr_delay_validate(ii, int(filedata[istr]["delay"]))
+					# rampup = 60
+				else:
+					fileok = False
+				if "rampup" in filedata[istr]:
+					base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][rampup]:", filedata[istr]["rampup"])
+					# base.scriptlist[ii]["rampup"] = filedata[istr]["rampup"]
+					self.sr_rampup_validate(ii, int(filedata[istr]["rampup"]))
+					# run = 600
+				else:
+					fileok = False
+				if "run" in filedata[istr]:
+					base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][run]:", filedata[istr]["run"])
+					# base.scriptlist[ii]["run"] = filedata[istr]["run"]
+					self.sr_run_validate(ii, int(filedata[istr]["run"]))
+					# script = /Users/dave/Documents/GitHub/rfswarm/robots/OC_Demo_2.robot
+				else:
+					fileok = False
+				if "script" in filedata[istr]:
+					base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][script]:", filedata[istr]["script"])
+					# base.scriptlist[ii]["script"] = filedata[istr]["script"]
+					self.sr_file_validate(ii, filedata[istr]["script"])
+					# test = Browse Store Product 1
+				else:
+					fileok = False
+				if "test" in filedata[istr]:
+					base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][test]:", filedata[istr]["test"])
+					# base.scriptlist[ii]["test"] = filedata[istr]["test"]
+					self.sr_test_validate("row{}".format(ii), filedata[istr]["test"])
+				else:
+					fileok = False
+
+				if not fileok:
+					base.debugmsg(1, "Scenario file is damaged:", ScenarioFile)
+					return 1
+
 
 
 
@@ -1430,29 +1509,6 @@ class RFSwarmCore:
 	def BuildCoreRun(self):
 		base.debugmsg(5, "RFSwarmCore: BuildCoreRun")
 
-		if 'Run' not in base.config:
-			base.config['Run'] = {}
-			base.saveini()
-
-		if 'ResultsDir' not in base.config['Run']:
-			base.config['Run']['ResultsDir'] = os.path.join(self.dir_path, "results")
-			base.saveini()
-
-		if 'display_index' not in base.config['Run']:
-			base.config['Run']['display_index'] = str(False)
-			base.saveini()
-
-		if 'display_iteration' not in base.config['Run']:
-			base.config['Run']['display_iteration'] = str(False)
-			base.saveini()
-
-		if 'display_sequence' not in base.config['Run']:
-			base.config['Run']['display_sequence'] = str(False)
-			base.saveini()
-
-		if 'display_percentile' not in base.config['Run']:
-			base.config['Run']['display_percentile'] = str(90)
-			base.saveini()
 
 
 	def ClickStop(self, _event=None):
@@ -3783,7 +3839,7 @@ class RFSwarmGUI(tk.Frame):
 		else:
 			ScenarioFile = _event
 
-		print("mnu_file_Open: ScenarioFile:", ScenarioFile)
+		base.debugmsg(9, "mnu_file_Open: ScenarioFile:", ScenarioFile)
 
 		core.OpenFile(ScenarioFile)
 		base.gui.updateTitle()
@@ -3824,23 +3880,6 @@ class RFSwarmGUI(tk.Frame):
 			filedata['Scenario']['ScriptCount'] = scriptidx
 			with open(base.config['Plan']['ScenarioFile'], 'w') as sf:    # save
 			    filedata.write(sf)
-
-
-			# base.config = configparser.ConfigParser()
-			# scrdir = os.path.dirname(__file__)
-			# base.debugmsg(9, " scrdir: ", scrdir)
-			# base.gui_ini = os.path.join(scrdir, "RFSwarmGUI.ini")
-			# if 'Plan' not in base.config:
-			# 	base.config['Plan'] = {}
-			# 	base.saveini()
-			#
-			# if 'ScriptDir' not in base.config['Plan']:
-			# 	base.config['Plan']['ScriptDir'] = self.dir_path
-			# 	base.saveini()
-
-			# if os.path.isfile(base.gui_ini):
-			# with open(base.gui_ini, 'w') as configfile:    # save
-			#     base.config.write(configfile)
 
 			self.updateTitle()
 
