@@ -15,7 +15,7 @@ if [[ "$version" =~ v[0-9]\. ]]; then
 	# git commit -m "Update version to ${version}"
 	if ! git diff-index --quiet HEAD --; then
 		# echo "commit: Update version to $version"
-		git add .
+		git add rfswarm*.py
 	    git commit -m "Update version to ${version}"
 	fi
 # else
