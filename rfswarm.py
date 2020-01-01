@@ -3269,8 +3269,8 @@ class RFSwarmGUI(tk.Frame):
 				base.debugmsg(9, "sr_test_genlist: tcsection:",tcsection, "	line:", line)
 				if tcsection and line[0:3] == "***":
 					tcsection = False
-				if re.search(regex, line):
-					base.debugmsg(9, "sr_test_genlist: re.search(",regex, ",", line,")", re.search(regex, line))
+				if re.search(regex, line, re.IGNORECASE):
+					base.debugmsg(9, "sr_test_genlist: re.search(",regex, ",", line,")", re.search(regex, line, re.IGNORECASE))
 					tcsection = True
 				if tcsection:
 					if line[0:1] not in ('\t', ' ', '*', '#', '\n', '\r'):
