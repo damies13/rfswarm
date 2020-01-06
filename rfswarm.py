@@ -714,6 +714,7 @@ class RFSwarmBase:
 								if len(linearr)>1:
 									base.debugmsg(9, "find_dependancies: linearr[1]", linearr[1])
 									resfile = linearr[-1]
+									# here we are assuming the resfile is a relative path! should we also consider files with full local paths?
 									localrespath = os.path.abspath(os.path.join(localdir, resfile))
 									base.debugmsg(8, "find_dependancies: localrespath", localrespath)
 									if os.path.isfile(localrespath):
@@ -725,6 +726,10 @@ class RFSwarmBase:
 												'relpath': resfile,
 												'type': linearr[0]
 											}
+
+										t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
+										t.start()
+										
 									else:
 										filelst = glob.glob(localrespath)
 										for file in filelst:
