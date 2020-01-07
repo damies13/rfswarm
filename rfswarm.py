@@ -1446,71 +1446,75 @@ class RFSwarmCore:
 			base.debugmsg(9, "ScenarioFile: ", ScenarioFile)
 			filedata.read(ScenarioFile)
 
-		base.debugmsg(9, "filedata: ", filedata)
+		base.debugmsg(6, "filedata: ", filedata)
 
 		scriptcount = 0
 		if "Scenario" in filedata:
-			base.debugmsg(9, "mnu_file_Open: Scenario:", filedata["Scenario"])
+			base.debugmsg(8, "mnu_file_Open: Scenario:", filedata["Scenario"])
 			if "scriptcount" in filedata["Scenario"]:
 				scriptcount = int(filedata["Scenario"]["scriptcount"])
-				base.debugmsg(9, "mnu_file_Open: scriptcount:", scriptcount)
+				base.debugmsg(8, "mnu_file_Open: scriptcount:", scriptcount)
 		else:
 			base.debugmsg(1, "File contains no scenario:", ScenarioFile)
 			return 1
 
-
+		rowcount = 0
 		for i in range(scriptcount):
 			ii = i+1
 			istr = str(ii)
 			if istr in filedata:
+				base.debugmsg(8, "mnu_file_Open: filedata[",istr,"]:", filedata[istr])
+
 				# if i not in base.scriptlist:
 				# 	base.scriptlist.append({})
 				# 	base.scriptlist[ii]["Index"] = ii
 				if not base.args.nogui:
 					if ii+1 > base.gui.scriptgrid.grid_size()[1]:		# grid_size tupple: (cols, rows)
 						base.addScriptRow()
+						rowcount += 1
 				else:
 					base.addScriptRow()
+					rowcount += 1
 				# users = 13
 				if "users" in filedata[istr]:
-					base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][users]:", filedata[istr]["users"])
+					base.debugmsg(8, "mnu_file_Open: filedata[", istr, "][users]:", filedata[istr]["users"])
 					# base.scriptlist[ii]["users"] = filedata[istr]["users"]
-					self.sr_users_validate(ii, int(filedata[istr]["users"]))
+					self.sr_users_validate(rowcount, int(filedata[istr]["users"]))
 					# delay = 0
 				else:
 					fileok = False
 				if "delay" in filedata[istr]:
-					base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][delay]:", filedata[istr]["delay"])
+					base.debugmsg(8, "mnu_file_Open: filedata[", istr, "][delay]:", filedata[istr]["delay"])
 					# base.scriptlist[ii]["delay"] = filedata[istr]["delay"]
-					self.sr_delay_validate(ii, int(filedata[istr]["delay"]))
+					self.sr_delay_validate(rowcount, int(filedata[istr]["delay"]))
 					# rampup = 60
 				else:
 					fileok = False
 				if "rampup" in filedata[istr]:
-					base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][rampup]:", filedata[istr]["rampup"])
+					base.debugmsg(8, "mnu_file_Open: filedata[", istr, "][rampup]:", filedata[istr]["rampup"])
 					# base.scriptlist[ii]["rampup"] = filedata[istr]["rampup"]
-					self.sr_rampup_validate(ii, int(filedata[istr]["rampup"]))
+					self.sr_rampup_validate(rowcount, int(filedata[istr]["rampup"]))
 					# run = 600
 				else:
 					fileok = False
 				if "run" in filedata[istr]:
-					base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][run]:", filedata[istr]["run"])
+					base.debugmsg(8, "mnu_file_Open: filedata[", istr, "][run]:", filedata[istr]["run"])
 					# base.scriptlist[ii]["run"] = filedata[istr]["run"]
-					self.sr_run_validate(ii, int(filedata[istr]["run"]))
+					self.sr_run_validate(rowcount, int(filedata[istr]["run"]))
 					# script = /Users/dave/Documents/GitHub/rfswarm/robots/OC_Demo_2.robot
 				else:
 					fileok = False
 				if "script" in filedata[istr]:
-					base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][script]:", filedata[istr]["script"])
+					base.debugmsg(8, "mnu_file_Open: filedata[", istr, "][script]:", filedata[istr]["script"])
 					# base.scriptlist[ii]["script"] = filedata[istr]["script"]
-					self.sr_file_validate(ii, filedata[istr]["script"])
+					self.sr_file_validate(rowcount, filedata[istr]["script"])
 					# test = Browse Store Product 1
 				else:
 					fileok = False
 				if "test" in filedata[istr]:
-					base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][test]:", filedata[istr]["test"])
+					base.debugmsg(8, "mnu_file_Open: filedata[", istr, "][test]:", filedata[istr]["test"])
 					# base.scriptlist[ii]["test"] = filedata[istr]["test"]
-					self.sr_test_validate("row{}".format(ii), filedata[istr]["test"])
+					self.sr_test_validate("row{}".format(rowcount), filedata[istr]["test"])
 				else:
 					fileok = False
 
@@ -1723,6 +1727,7 @@ class RFSwarmCore:
 			if len(args)>1:
 				usrs = args[1]
 		base.debugmsg(6, "Row:", r, "Users:", usrs)
+		base.debugmsg(8, "base.scriptlist:", base.scriptlist)
 		base.scriptlist[r]["Users"] = int(usrs)
 
 		if not base.args.nogui:
@@ -2542,58 +2547,6 @@ class RFSwarmGUI(tk.Frame):
 					totusrsxy["addpct"][rdtpct] = 0
 				totusrsxy["addpct"][rdtpct] += (usrpct * -1)
 
-
-				# # totcounts = {}
-				# # totinc = 1
-				# # if mxdur > 60:
-				# totnxt = 0
-				# base.debugmsg(6, "Index", grp["Index"], 'totnxt', totnxt)
-				# base.debugmsg(8, "Index", grp["Index"], 'totcounts', totcounts)
-				# base.debugmsg(8, "Index", grp["Index"], 'totcounts.keys()', totcounts.keys())
-				# while totnxt < mxdur:
-				# 	totnxt += totinc
-				# 	base.debugmsg(6, "Index", grp["Index"], 'totnxt', totnxt)
-				# 	if totnxt not in totcounts.keys():
-				# 		totcounts[totnxt] = 0
-				# 		base.debugmsg(6, "Index", grp["Index"], 'totcounts[',totnxt,']', totcounts[totnxt])
-				# 	# if totnxt < grp["Delay"]:
-				# 	# 	totcounts[totnxt] += 0
-				# 	if totnxt > grp["Delay"] and totnxt < (grp["RampUp"] + grp["Delay"]):
-				# 		# calculate users during RampUp
-				# 		rupct = (totnxt - grp["Delay"]) /grp["RampUp"]
-				# 		base.debugmsg(9, 'rupct', rupct)
-				# 		ruusr = int(grp["Users"] * rupct)
-				# 		base.debugmsg(9, 'ruusr', ruusr)
-				# 		base.debugmsg(9, 'totcounts', totcounts)
-				# 		base.debugmsg(9, 'totcounts[totnxt]', totcounts[totnxt])
-				# 		totcounts[totnxt] = int(totcounts[totnxt] + ruusr)
-				# 		base.debugmsg(6, "Index", grp["Index"], 'totcounts[',totnxt,']', totcounts[totnxt])
-				# 		base.debugmsg(9, 'ruusr', ruusr)
-				# 		base.debugmsg(9, 'totcounts[totnxt]', totcounts[totnxt])
-				#
-				# 	if totnxt > (grp["Delay"] + grp["RampUp"] - 1) \
-				# 		and totnxt < (grp["Delay"] + grp["RampUp"] + grp["Run"] + 1):
-				# 		# all users running
-				# 		base.debugmsg(9, 'run:totnxt', totnxt)
-				# 		base.debugmsg(9, 'run:grp["Users"]', grp["Users"])
-				# 		totcounts[totnxt] += grp["Users"]
-				# 		base.debugmsg(6, "Index", grp["Index"], 'totcounts[',totnxt,']', totcounts[totnxt])
-				# 	if totnxt > (grp["RampUp"] + grp["Delay"] + grp["Run"]) \
-				# 		and totnxt < (grp["Delay"] + (grp["RampUp"] *2 ) + grp["Run"]):
-				# 		# calculate users during RampDown
-				# 		base.debugmsg(9, 'RampDown:totnxt', totnxt)
-				# 		drr = grp["Delay"] + grp["RampUp"] + grp["Run"]
-				# 		base.debugmsg(9, 'RampDown:drr', drr)
-				# 		rdsec = totnxt - drr
-				# 		base.debugmsg(9, 'RampDown:rdsec', rdsec)
-				#
-				# 		rdpct = rdsec /grp["RampUp"]
-				# 		base.debugmsg(9, 'RampDown:rdpct', rdpct)
-				# 		ruusr = int(grp["Users"] * rdpct)
-				# 		base.debugmsg(9, 'RampDown:ruusr', ruusr)
-				# 		totcounts[totnxt] += grp["Users"] - ruusr
-				# 		base.debugmsg(6, "Index", grp["Index"], 'totcounts[',totnxt,']', totcounts[totnxt])
-
 		base.debugmsg(6, "Total Users")
 		base.debugmsg(6, "totusrsxy:", totusrsxy)
 
@@ -2640,60 +2593,6 @@ class RFSwarmGUI(tk.Frame):
 			prevx = newx
 			prevy = newy
 
-
-
-		# totcolour = "#000000"
-		# # totcolour = "#0459af"
-		# sy = graphh-axissz
-		# prevkey = 0
-		# prevx = 0
-		# prevy = sy
-		# prevval = 0
-		# rampdown = False
-		# for key in totcounts.keys():
-		# 	if rampdown == False and totcounts[key] < prevval:
-		# 		rampdown = True
-		# 		base.debugmsg(6, prevkey, totcounts[prevkey])
-		#
-		# 		usrpct = prevval / (mxuser * 1.0)
-		# 		base.debugmsg(6, "Users", totcounts[key], "/ mxuser", mxuser, " = usrpct", usrpct)
-		# 		newy = sy - int(sy * usrpct)
-		#
-		# 		keypct = prevkey / (mxdur * 1.0)
-		# 		base.debugmsg(6, "key", key, "/ mxdur", mxdur, " = keypct", keypct)
-		# 		newx = int(xlen * keypct) + delx
-		#
-		# 		base.debugmsg(6, "prevx", prevx, "prevy", prevy, "newx", newx, "newy", newy)
-		#
-		# 		self.pln_graph.create_line(prevx, prevy, newx, newy, fill=totcolour)
-		#
-		# 		prevx = newx
-		# 		prevy = newy
-		#
-		# 	if totcounts[key] != prevval:
-		# 		base.debugmsg(6, key, totcounts[key])
-		# 		prevval = totcounts[key]
-		#
-		# 		usrpct = totcounts[key] / (mxuser * 1.0)
-		# 		base.debugmsg(6, "TU: Users", totcounts[key], "/ mxuser", mxuser, " = usrpct", usrpct)
-		# 		newy = sy - int(sy * usrpct)
-		#
-		# 		keypct = key / (mxdur * 1.0)
-		# 		base.debugmsg(6, "TU: key", key, "/ mxdur", mxdur, " = keypct", keypct)
-		# 		newx = int(xlen * keypct) + delx
-		#
-		# 		base.debugmsg(6, "TU: prevx", prevx, "prevy", prevy, "newx", newx, "newy", newy)
-		#
-		# 		if rampdown:
-		# 			self.pln_graph.create_line(prevx, prevy, newx, newy, fill=totcolour, dash=(4, 4))
-		# 		else:
-		# 			self.pln_graph.create_line(prevx, prevy, newx, newy, fill=totcolour)
-		#
-		# 		prevx = newx
-		# 		prevy = newy
-		#
-		#
-		# 	prevkey = key
 
 	def pln_update_graph_orig(self):
 		base.debugmsg(6, "pln_update_graph")
@@ -3906,8 +3805,8 @@ class RFSwarmGUI(tk.Frame):
 			self.mnu_file_SaveAs()
 		else:
 
-			base.debugmsg(9, "mnu_file_Save: ScenarioFile:", base.config['Plan']['ScenarioFile'])
-			base.debugmsg(9, "mnu_file_Save: scriptlist:", base.scriptlist)
+			base.debugmsg(8, "ScenarioFile:", base.config['Plan']['ScenarioFile'])
+			base.debugmsg(8, "scriptlist:", base.scriptlist)
 			filedata = configparser.ConfigParser()
 
 			if 'Scenario' not in filedata:
@@ -3918,18 +3817,20 @@ class RFSwarmGUI(tk.Frame):
 				# filedata['Scenario']['ScriptCount'] = str(len(base.scriptlist)-1)
 				filedata['Scenario']['ScriptCount'] = scriptidx
 
+			scriptcount = 0
 			for scrp in base.scriptlist:
-				base.debugmsg(9, "mnu_file_Save: scrp:", scrp)
+				base.debugmsg(8, "scrp:", scrp)
 				if 'Index' in scrp:
-					scriptidx = str(scrp['Index'])
+					scriptcount += 1
+					scriptidx = str(scriptcount)
 
 					if scriptidx not in filedata:
 						filedata[scriptidx] = {}
 					for key in scrp.keys():
-						base.debugmsg(9, "mnu_file_Save: key:", key)
+						base.debugmsg(8, "key:", key)
 						if key not in ['Index', 'TestVar', 'ScriptHash']:
 							filedata[scriptidx][key] = str(scrp[key])
-							base.debugmsg(9, "mnu_file_Save: filedata[",scriptidx,"][",key,"]:", filedata[scriptidx][key])
+							base.debugmsg(8, "filedata[",scriptidx,"][",key,"]:", filedata[scriptidx][key])
 
 			filedata['Scenario']['ScriptCount'] = scriptidx
 			with open(base.config['Plan']['ScenarioFile'], 'w') as sf:    # save
