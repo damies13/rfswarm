@@ -160,6 +160,9 @@ class AgentServer(BaseHTTPRequestHandler):
 						base.debugmsg(9, "scripts:", scripts)
 						jsonresp["Scripts"] = scripts
 
+						t = threading.Thread(target=base.check_files_changed)
+						t.start()
+
 				if (parsed_path.path == "/File"):
 					jsonreq = json.loads(rawData)
 
@@ -666,6 +669,7 @@ class RFSwarmBase:
 	def hash_file(self, file, relpath):
 		BLOCKSIZE = 65536
 		hasher = hashlib.md5()
+		hasher.update(str(os.path.getmtime(file)).encode('utf-8'))
 		hasher.update(relpath.encode('utf-8'))
 		with open(file, 'rb') as afile:
 			buf = afile.read(BLOCKSIZE)
@@ -679,8 +683,8 @@ class RFSwarmBase:
 		remove = True
 		# base.scriptlist[r]["ScriptHash"]
 		print("remove_hash: scriptlist:", base.scriptlist)
-		for scr in base.scriptlist:
-			if base.scriptlist[scr]["ScriptHash"] == hash:
+		for scr in range(len(base.scriptlist)):
+			if "ScriptHash" in base.scriptlist[scr] and base.scriptlist[scr]["ScriptHash"] == hash:
 				remove = False
 
 		if remove:
@@ -766,6 +770,36 @@ class RFSwarmBase:
 						base.debugmsg(6, "find_dependancies: match.group(0)", match.group(1))
 						if match.group(1).strip().upper() in ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD']:
 							checking = True
+
+
+	def check_files_changed(self):
+		# self.scriptfiles[hash]
+		checkhashes = list(self.scriptfiles.keys())
+		base.debugmsg(3, "checkhashes:", checkhashes)
+		for chkhash in checkhashes:
+			file_data = self.scriptfiles[chkhash]
+			script_hash = base.hash_file(file_data['localpath'], file_data['relpath'])
+			if script_hash != chkhash:
+				# file changed
+				base.debugmsg(3, "File's hash has changed: chkhash:", chkhash, "	script_hash:",script_hash, "	localpath:", file_data['localpath'])
+
+				# check if file is in script list and update it's hash
+				# base.scriptlist[r]["ScriptHash"] = script_hash
+				for iid in range(len(base.scriptlist)):
+					base.debugmsg(3, "base.scriptlist[",iid,"]:", base.scriptlist[iid])
+					if "ScriptHash" in base.scriptlist[iid] and chkhash == base.scriptlist[iid]["ScriptHash"]:
+						base.scriptlist[iid]["ScriptHash"] = script_hash
+						break;
+
+				if script_hash not in base.scriptfiles:
+					file_data['id'] = script_hash
+					base.scriptfiles[script_hash] = file_data
+
+					t = threading.Thread(target=base.find_dependancies, args=(script_hash, ))
+					t.start()
+
+					self.remove_hash(chkhash)
+
 
 	def saveini(self):
 		if self.save_ini:
