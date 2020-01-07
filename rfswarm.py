@@ -663,9 +663,10 @@ class RFSwarmBase:
 			return "{}".format(mins)
 		return "{}".format(sec_in)
 
-	def hash_file(self, file):
+	def hash_file(self, file, relpath):
 		BLOCKSIZE = 65536
 		hasher = hashlib.md5()
+		hasher.update(relpath.encode('utf-8'))
 		with open(file, 'rb') as afile:
 			buf = afile.read(BLOCKSIZE)
 			while len(buf) > 0:
@@ -727,7 +728,7 @@ class RFSwarmBase:
 									localrespath = os.path.abspath(os.path.join(localdir, resfile))
 									base.debugmsg(8, "find_dependancies: localrespath", localrespath)
 									if os.path.isfile(localrespath):
-										newhash = self.hash_file(localrespath)
+										newhash = self.hash_file(localrespath, resfile)
 										base.debugmsg(9, "find_dependancies: newhash", newhash)
 										self.scriptfiles[newhash] = {
 												'id': newhash,
@@ -745,7 +746,7 @@ class RFSwarmBase:
 											base.debugmsg(9, "find_dependancies: file", file)
 											relpath = file.replace(localdir, "")[1:]
 											base.debugmsg(9, "find_dependancies: relpath", relpath)
-											newhash = self.hash_file(file)
+											newhash = self.hash_file(file, relpath)
 											base.debugmsg(9, "find_dependancies: newhash", newhash)
 											self.scriptfiles[newhash] = {
 													'id': newhash,
@@ -1745,7 +1746,7 @@ class RFSwarmCore:
 		base.debugmsg(7, "scriptfile:", scriptfile)
 		if len(scriptfile)>0:
 			base.scriptlist[r]["Script"] = scriptfile
-			script_hash = base.hash_file(scriptfile)
+			script_hash = base.hash_file(scriptfile, os.path.basename(scriptfile))
 			base.scriptlist[r]["ScriptHash"] = script_hash
 
 			if script_hash not in base.scriptfiles:
@@ -3200,7 +3201,7 @@ class RFSwarmGUI(tk.Frame):
 
 			base.scriptlist[r]["Script"] = scriptfile
 			base.debugmsg(8, "test: ", fg[1].get())
-			script_hash = base.hash_file(scriptfile)
+			script_hash = base.hash_file(scriptfile, os.path.basename(scriptfile))
 			base.scriptlist[r]["ScriptHash"] = script_hash
 
 			if script_hash not in base.scriptfiles:
@@ -3282,7 +3283,7 @@ class RFSwarmGUI(tk.Frame):
 		tcsection = False
 		tclist = [""]
 		# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
-		regex = "^\*+[\h]*(Test Case|Task)"
+		regex = "^\*+[\s]*(Test Case|Task)"
 		with open(base.scriptlist[r]["Script"]) as f:
 			for line in f:
 				base.debugmsg(9, "sr_test_genlist: tcsection:",tcsection, "	line:", line)
