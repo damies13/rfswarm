@@ -708,12 +708,21 @@ class RFSwarmBase:
 					if checking:
 						base.debugmsg(9, "RFSwarmCore: find_dependancies: line", line)
 						try:
-							if line.strip()[:1] != "#" and ('Resource' in line or 'Variables' in line or 'Metadata	File' in line):
+							if line.strip()[:1] != "#":
 								linearr = line.strip().split()
-								base.debugmsg(9, "find_dependancies: linearr", linearr)
-								if len(linearr)>1:
+								base.debugmsg(7, "find_dependancies: linearr", linearr)
+								resfile = None;
+								if len(linearr)>1 and linearr[0].upper() in ['RESOURCE','VARIABLES','LIBRARY']:
 									base.debugmsg(9, "find_dependancies: linearr[1]", linearr[1])
-									resfile = linearr[-1]
+									resfile = linearr[1]
+								if not resfile and len(linearr)>2 and (linearr[0].upper() == 'METADATA' and linearr[1].upper() == 'FILE'):
+									base.debugmsg(9, "find_dependancies: linearr[2]", linearr[2])
+									resfile = linearr[2]
+								if not resfile and len(linearr)>2 and (linearr[0].upper() == 'IMPORT' and linearr[1].upper() == 'LIBRARY'):
+									base.debugmsg(9, "find_dependancies: linearr[2]", linearr[2])
+									resfile = linearr[2]
+								if resfile:
+									base.debugmsg(7, "find_dependancies: resfile", resfile)
 									# here we are assuming the resfile is a relative path! should we also consider files with full local paths?
 									localrespath = os.path.abspath(os.path.join(localdir, resfile))
 									base.debugmsg(8, "find_dependancies: localrespath", localrespath)
@@ -729,7 +738,7 @@ class RFSwarmBase:
 
 										t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
 										t.start()
-										
+
 									else:
 										filelst = glob.glob(localrespath)
 										for file in filelst:
@@ -750,8 +759,12 @@ class RFSwarmBase:
 							base.debugmsg(6, "find_dependancies: Exception", e)
 							base.debugmsg(6, "find_dependancies: linearr", linearr)
 
-					if '*** Settings' in line:
-						checking = True
+					# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
+					match = re.search('\*+([^*\v]+)', line)
+					if match is not None:
+						base.debugmsg(6, "find_dependancies: match.group(0)", match.group(1))
+						if match.group(1).strip().upper() in ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD']:
+							checking = True
 
 	def saveini(self):
 		if self.save_ini:
@@ -1729,7 +1742,7 @@ class RFSwarmCore:
 			scriptfile = args[0]
 		else:
 			scriptfile = ""
-		base.debugmsg(8, "scriptfile:", scriptfile)
+		base.debugmsg(7, "scriptfile:", scriptfile)
 		if len(scriptfile)>0:
 			base.scriptlist[r]["Script"] = scriptfile
 			script_hash = base.hash_file(scriptfile)
@@ -3177,7 +3190,7 @@ class RFSwarmGUI(tk.Frame):
 				scriptfile = str(tkf.askopenfilename(initialdir=base.config['Plan']['ScriptDir'], title = "Select Robot Framework File", filetypes = (("Robot Framework","*.robot"),("all files","*.*"))))
 			else:
 				scriptfile = ""
-		base.debugmsg(8, "scriptfile:", scriptfile)
+		base.debugmsg(7, "scriptfile:", scriptfile)
 		if len(scriptfile)>0:
 			fg[1].configure(state='normal')
 			fg[1].select_clear()
@@ -3268,7 +3281,8 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(8, "Script File:",base.scriptlist[r]["Script"])
 		tcsection = False
 		tclist = [""]
-		regex = "^\*{3}[\D](Test Case|Task)"
+		# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
+		regex = "^\*+[\h]*(Test Case|Task)"
 		with open(base.scriptlist[r]["Script"]) as f:
 			for line in f:
 				base.debugmsg(9, "sr_test_genlist: tcsection:",tcsection, "	line:", line)
