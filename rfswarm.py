@@ -800,6 +800,22 @@ class RFSwarmBase:
 
 					self.remove_hash(chkhash)
 
+	def get_relative_path(self, path1, path2):
+		base.debugmsg(7, "path1:", path1)
+		base.debugmsg(7, "path2:", path2)
+		# commonpath = os.path.commonpath([path1, path2])
+
+		base.debugmsg(8, "os.path.isdir(path1):", os.path.isdir(path1))
+		base.debugmsg(8, "os.path.isfile(path1):", os.path.isfile(path1))
+		# if not os.path.isdir(path1):
+		if os.path.isfile(path1) or not os.path.exists(path1):
+			path1 = os.path.dirname(path1)
+			base.debugmsg(7, "path1:", path1)
+
+		relpath = os.path.relpath(path2, start=path1)
+		# https://www.geeksforgeeks.org/python-os-path-relpath-method/
+		base.debugmsg(5, "relpath:", relpath)
+		return relpath
 
 	def saveini(self):
 		if self.save_ini:
@@ -1156,6 +1172,14 @@ class RFSwarmCore:
 		if 'ScenarioFile' not in base.config['Plan']:
 			base.config['Plan']['ScenarioFile'] = ""
 			base.saveini()
+		else:
+			# check file exists - it may have been deleted since rfswarm last ran with this ini file
+			if not os.path.exists(base.config['Plan']['ScenarioFile']):
+				base.config['Plan']['ScenarioFile'] = ""
+				base.config['Plan']['ScriptDir'] = base.dir_path
+				base.config['Plan']['ScenarioDir'] = base.dir_path
+				base.saveini()
+
 
 		#
 		# Run
@@ -1450,10 +1474,10 @@ class RFSwarmCore:
 
 		scriptcount = 0
 		if "Scenario" in filedata:
-			base.debugmsg(8, "mnu_file_Open: Scenario:", filedata["Scenario"])
+			base.debugmsg(8, "Scenario:", filedata["Scenario"])
 			if "scriptcount" in filedata["Scenario"]:
 				scriptcount = int(filedata["Scenario"]["scriptcount"])
-				base.debugmsg(8, "mnu_file_Open: scriptcount:", scriptcount)
+				base.debugmsg(8, "scriptcount:", scriptcount)
 		else:
 			base.debugmsg(1, "File contains no scenario:", ScenarioFile)
 			return 1
@@ -1463,7 +1487,8 @@ class RFSwarmCore:
 			ii = i+1
 			istr = str(ii)
 			if istr in filedata:
-				base.debugmsg(8, "mnu_file_Open: filedata[",istr,"]:", filedata[istr])
+				base.debugmsg(8, "filedata[",istr,"]:", filedata[istr])
+				rowcount += 1
 
 				# if i not in base.scriptlist:
 				# 	base.scriptlist.append({})
@@ -1471,48 +1496,51 @@ class RFSwarmCore:
 				if not base.args.nogui:
 					if ii+1 > base.gui.scriptgrid.grid_size()[1]:		# grid_size tupple: (cols, rows)
 						base.addScriptRow()
-						rowcount += 1
 				else:
 					base.addScriptRow()
-					rowcount += 1
 				# users = 13
 				if "users" in filedata[istr]:
-					base.debugmsg(8, "mnu_file_Open: filedata[", istr, "][users]:", filedata[istr]["users"])
+					base.debugmsg(8, "filedata[", istr, "][users]:", filedata[istr]["users"])
 					# base.scriptlist[ii]["users"] = filedata[istr]["users"]
 					self.sr_users_validate(rowcount, int(filedata[istr]["users"]))
 					# delay = 0
 				else:
 					fileok = False
 				if "delay" in filedata[istr]:
-					base.debugmsg(8, "mnu_file_Open: filedata[", istr, "][delay]:", filedata[istr]["delay"])
+					base.debugmsg(8, "filedata[", istr, "][delay]:", filedata[istr]["delay"])
 					# base.scriptlist[ii]["delay"] = filedata[istr]["delay"]
 					self.sr_delay_validate(rowcount, int(filedata[istr]["delay"]))
 					# rampup = 60
 				else:
 					fileok = False
 				if "rampup" in filedata[istr]:
-					base.debugmsg(8, "mnu_file_Open: filedata[", istr, "][rampup]:", filedata[istr]["rampup"])
+					base.debugmsg(8, "filedata[", istr, "][rampup]:", filedata[istr]["rampup"])
 					# base.scriptlist[ii]["rampup"] = filedata[istr]["rampup"]
 					self.sr_rampup_validate(rowcount, int(filedata[istr]["rampup"]))
 					# run = 600
 				else:
 					fileok = False
 				if "run" in filedata[istr]:
-					base.debugmsg(8, "mnu_file_Open: filedata[", istr, "][run]:", filedata[istr]["run"])
+					base.debugmsg(8, "filedata[", istr, "][run]:", filedata[istr]["run"])
 					# base.scriptlist[ii]["run"] = filedata[istr]["run"]
 					self.sr_run_validate(rowcount, int(filedata[istr]["run"]))
 					# script = /Users/dave/Documents/GitHub/rfswarm/robots/OC_Demo_2.robot
 				else:
 					fileok = False
 				if "script" in filedata[istr]:
-					base.debugmsg(8, "mnu_file_Open: filedata[", istr, "][script]:", filedata[istr]["script"])
-					# base.scriptlist[ii]["script"] = filedata[istr]["script"]
-					self.sr_file_validate(rowcount, filedata[istr]["script"])
-					# test = Browse Store Product 1
+					base.debugmsg(8, "filedata[", istr, "][script]:", filedata[istr]["script"])
+					scriptname = filedata[istr]["script"]
+					if not os.path.isabs(scriptname):
+						# relative path, need to find absolute path
+						combined = os.path.join(base.config['Plan']['ScenarioDir'], scriptname)
+						base.debugmsg(8, "combined:", combined)
+						scriptname = os.path.abspath(combined)
+					base.debugmsg(8, "scriptname:", scriptname)
+					self.sr_file_validate(rowcount, scriptname)
 				else:
 					fileok = False
 				if "test" in filedata[istr]:
-					base.debugmsg(8, "mnu_file_Open: filedata[", istr, "][test]:", filedata[istr]["test"])
+					base.debugmsg(8, "filedata[", istr, "][test]:", filedata[istr]["test"])
 					# base.scriptlist[ii]["test"] = filedata[istr]["test"]
 					self.sr_test_validate("row{}".format(rowcount), filedata[istr]["test"])
 				else:
@@ -2965,6 +2993,10 @@ class RFSwarmGUI(tk.Frame):
 			if len(args)>1:
 				usrs = args[1]
 				if not base.args.nogui:
+					base.debugmsg(8, "sr_users_validate: len(grid_slaves):",len(self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)))
+					while len(self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)) < 1:
+						base.debugmsg(8, "sr_users_validate: len(grid_slaves):",len(self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)))
+						time.sleep(0.01)
 					base.debugmsg(9, "sr_users_validate: grid_slaves:",self.scriptgrid.grid_slaves(column=self.plancolusr, row=r))
 					base.debugmsg(9, "sr_users_validate: grid_slaves[0]:",self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0])
 					self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].delete(0,'end')
@@ -3821,15 +3853,20 @@ class RFSwarmGUI(tk.Frame):
 			for scrp in base.scriptlist:
 				base.debugmsg(8, "scrp:", scrp)
 				if 'Index' in scrp:
+					scrpcopy = scrp.copy()
 					scriptcount += 1
 					scriptidx = str(scriptcount)
+					if 'Script' in scrpcopy:
+						relpath = base.get_relative_path(base.config['Plan']['ScenarioFile'], scrp['Script'])
+						base.debugmsg(8, "relpath:", relpath)
+						scrpcopy['Script'] = relpath
 
 					if scriptidx not in filedata:
 						filedata[scriptidx] = {}
-					for key in scrp.keys():
+					for key in scrpcopy.keys():
 						base.debugmsg(8, "key:", key)
 						if key not in ['Index', 'TestVar', 'ScriptHash']:
-							filedata[scriptidx][key] = str(scrp[key])
+							filedata[scriptidx][key] = str(scrpcopy[key])
 							base.debugmsg(8, "filedata[",scriptidx,"][",key,"]:", filedata[scriptidx][key])
 
 			filedata['Scenario']['ScriptCount'] = scriptidx
