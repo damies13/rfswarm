@@ -4,6 +4,8 @@
 
 Yes running the Agent and the GUI/Server on the same machine is ok for small numbers of robots (users), but if you want to run any significant load then you will probably need some separate machines for the agent.
 
+You will probably want to refer to the [Hardware Requirements](HardwareRequirements.md)
+
 ## the agent doesn't connect to the GUI/Server?
 
 There may be a firewall blocking the communication, Windows 10, Recent Mac OSX and some linux desktop distributions come with a firewall enabled by default. Consult your operating system documentation for both the agent and GUI Server machines to confirm if this is the case, if so you may need to [add a firewall rule](./rfswarm_py.md#2-adjust-the-firewall).
