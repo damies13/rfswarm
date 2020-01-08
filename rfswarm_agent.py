@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version v0.5.1-beta
+#    Version v0.5.2-beta
 #
 
 
@@ -39,7 +39,7 @@ import inspect
 
 class RFSwarmAgent():
 
-	version = "v0.5.1-beta"
+	version = "v0.5.2-beta"
 	config = None
 	isconnected = False
 	isrunning = False
@@ -162,18 +162,9 @@ class RFSwarmAgent():
 					stack = inspect.stack()
 					the_class = stack[1][0].f_locals["self"].__class__.__name__
 					the_method = stack[1][0].f_code.co_name
-					self.debugmsg(6, "RFSwarmBase: debugmsg: I was called by {}.{}()".format(str(the_class), the_method))
 					prefix = "{}: {}: [{}:{}]	".format(str(the_class), the_method, self.debuglvl, lvl)
-					# <36 + 1 tab
-					# if len(prefix.strip())<36:
-					# 	prefix = "{}	".format(prefix)
-					# <32 + 1 tab
 					if len(prefix.strip())<32:
 						prefix = "{}	".format(prefix)
-					# <28 + 1 tab
-					# if len(prefix.strip())<28:
-					# 	prefix = "{}	".format(prefix)
-					# <24 + 1 tab
 					if len(prefix.strip())<24:
 						prefix = "{}	".format(prefix)
 
@@ -615,6 +606,7 @@ class RFSwarmAgent():
 			cmd.append("-v vuser:{}".format(self.jobs[jobid]["VUser"]))
 			cmd.append("-v iteration:{}".format(self.jobs[jobid]["Iteration"]))
 		else:
+			cmd.append("-M debuglevel:{}".format(self.debuglvl))
 			cmd.append("-M index:{}".format(self.jobs[jobid]["ScriptIndex"]))
 			cmd.append("-M vuser:{}".format(self.jobs[jobid]["VUser"]))
 			cmd.append("-M iteration:{}".format(self.jobs[jobid]["Iteration"]))
@@ -632,23 +624,30 @@ class RFSwarmAgent():
 		if robotexe is not None:
 			self.robotcount += 1
 
-			# result = subprocess.call(" ".join(cmd), shell=True)
-			# https://stackoverflow.com/questions/4856583/how-do-i-pipe-a-subprocess-call-to-a-text-file
-			with open(logFileName, "w") as f:
-				self.debugmsg(3, "Robot run with command: '", " ".join(cmd), "'")
-				# result = subprocess.call(" ".join(cmd), shell=True, stdout=f, stderr=f)
-				result = subprocess.call(" ".join(cmd), shell=True, stdout=f, stderr=subprocess.STDOUT)
-				self.debugmsg(6, "runthread: result:", result)
-				if result != 0:
-					self.debugmsg(1, "Robot returned an error (", result, ") please check the log file:", logFileName)
+			try:
+				# result = subprocess.call(" ".join(cmd), shell=True)
+				# https://stackoverflow.com/questions/4856583/how-do-i-pipe-a-subprocess-call-to-a-text-file
+				with open(logFileName, "w") as f:
+					self.debugmsg(3, "Robot run with command: '", " ".join(cmd), "'")
+					# result = subprocess.call(" ".join(cmd), shell=True, stdout=f, stderr=f)
+					try:
+						result = subprocess.call(" ".join(cmd), shell=True, stdout=f, stderr=subprocess.STDOUT)
+						self.debugmsg(6, "runthread: result:", result)
+						if result != 0:
+							self.debugmsg(1, "Robot returned an error (", result, ") please check the log file:", logFileName)
+					except Exception as e:
+							self.debugmsg(1, "Robot returned an error:", e, " \nplease check the log file:", logFileName)
+					f.close()
 
-			if self.xmlmode:
-				if os.path.exists(outputFile):
-					if self.xmlmode:
-						t = threading.Thread(target=self.run_process_output, args=(outputFile, self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["VUser"], self.jobs[jobid]["Iteration"]))
-						t.start()
-				else:
-					self.debugmsg(1, "Robot didn't create (", outputFile, ") please check the log file:", logFileName)
+				if self.xmlmode:
+					if os.path.exists(outputFile):
+						if self.xmlmode:
+							t = threading.Thread(target=self.run_process_output, args=(outputFile, self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["VUser"], self.jobs[jobid]["Iteration"]))
+							t.start()
+					else:
+						self.debugmsg(1, "Robot didn't create (", outputFile, ") please check the log file:", logFileName)
+			except Exception as e:
+				self.debugmsg(7, "Robot returned an error:", e)
 
 			self.robotcount += -1
 		else:
@@ -774,6 +773,7 @@ class RFSwarmAgent():
 		fd.append("from datetime import datetime")
 		fd.append("import time")
 		fd.append("import requests")
+		fd.append("import inspect")
 		fd.append("")
 		fd.append("class RFSListener2:")
 		fd.append("	ROBOT_LISTENER_API_VERSION = 2")
@@ -781,32 +781,52 @@ class RFSwarmAgent():
 		fd.append("	msg = None")
 		fd.append("	swarmserver = \"http://localhost:8138/\"")
 		fd.append("	excludelibraries = [\"BuiltIn\",\"String\",\"OperatingSystem\",\"perftest\"]")
+		fd.append("	debuglevel = 0")
 		fd.append("	index = 0")
 		fd.append("	vuser = 0")
 		fd.append("	iter = 0")
 		fd.append("	seq = 0")
 		fd.append("")
 		fd.append("	def start_suite(self, name, attrs):")
+		fd.append("		if 'debuglevel' in attrs['metadata']:")
+		fd.append("			self.debuglevel = int(attrs['metadata']['debuglevel'])")
+		fd.append("			self.debugmsg(6, 'debuglevel: ', self.debuglevel)")
 		fd.append("		if 'index' in attrs['metadata']:")
 		fd.append("			self.index = attrs['metadata']['index']")
+		fd.append("			self.debugmsg(6, 'index: ', self.index)")
 		fd.append("		if 'iteration' in attrs['metadata']:")
 		fd.append("			self.iter = attrs['metadata']['iteration']")
+		fd.append("			self.debugmsg(6, 'iter: ', self.iter)")
 		fd.append("		if 'vuser' in attrs['metadata']:")
 		fd.append("			self.vuser = attrs['metadata']['vuser']")
+		fd.append("			self.debugmsg(6, 'vuser: ', self.vuser)")
 		fd.append("		if 'swarmserver' in attrs['metadata']:")
 		fd.append("			self.swarmserver = attrs['metadata']['swarmserver']")
+		fd.append("			self.debugmsg(6, 'swarmserver: ', self.swarmserver)")
 		fd.append("		if 'excludelibraries' in attrs['metadata']:")
 		fd.append("			self.excludelibraries = attrs['metadata']['excludelibraries'].split(\",\")")
+		fd.append("			self.debugmsg(6, 'excludelibraries: ', self.excludelibraries)")
 		fd.append("")
 		fd.append("	def log_message(self, message):")
-		fd.append("		self.msg = message")
+		# fd.append("		self.debugmsg(8, 'message[\\'message\\']: ', message['message'])")
+		# fd.append("		self.debugmsg(8, 'message[\\'message\\'][0:2]: ', message['message'][0:2])")
+		fd.append("		if message['message'][0:2] != '${':")
+		fd.append("			self.msg = None")
+		fd.append("			self.msg = message")
+		# fd.append("			self.debugmsg(6, 'message: ', message)")
+		# fd.append("			self.debugmsg(6, 'self.msg: ', self.msg)")
 		fd.append("")
 		fd.append("	def end_keyword(self, name, attrs):")
+		fd.append("		self.debugmsg(6, 'attrs[doc]: ', attrs['doc'])")
+		fd.append("		self.debugmsg(6, 'self.msg: ', self.msg)")
 		fd.append("		if self.msg is not None:")
+		fd.append("			self.debugmsg(8, 'self.msg: attrs[libname]: ', attrs['libname'], '	excludelibraries:', self.excludelibraries)")
 		fd.append("			if attrs['libname'] not in self.excludelibraries:")
 		fd.append("				self.seq += 1")
+		fd.append("				self.debugmsg(8, 'self.seq: ', self.seq)")
 		fd.append("				startdate = datetime.strptime(attrs['starttime'], '%Y%m%d %H:%M:%S.%f')")
 		fd.append("				enddate = datetime.strptime(attrs['endtime'], '%Y%m%d %H:%M:%S.%f')")
+		fd.append("				self.debugmsg(6, 'ResultName: self.msg[message]: ', self.msg['message'])")
 		fd.append("				payload = {")
 		fd.append("					'AgentName': socket.gethostname(),")
 		fd.append("					'ResultName': self.msg['message'],")
@@ -819,19 +839,66 @@ class RFSwarmAgent():
 		fd.append("					'Iteration': self.iter,")
 		fd.append("					'Sequence': self.seq")
 		fd.append("				}")
+		fd.append("				self.debugmsg(8, 'payload: ', payload)")
 		fd.append("				self.send_result(payload)")
+		# fd.append("				self.msg = None")
+		fd.append("		elif 'doc' in attrs and len(attrs['doc'])>0:")
+		fd.append("			self.debugmsg(8, 'attrs[doc]: attrs[libname]: ', attrs['libname'], '	excludelibraries:', self.excludelibraries)")
+		fd.append("			if attrs['libname'] not in self.excludelibraries:")
+		fd.append("				self.seq += 1")
+		fd.append("				self.debugmsg(8, 'self.seq: ', self.seq)")
+		fd.append("				startdate = datetime.strptime(attrs['starttime'], '%Y%m%d %H:%M:%S.%f')")
+		fd.append("				enddate = datetime.strptime(attrs['endtime'], '%Y%m%d %H:%M:%S.%f')")
+		fd.append("				self.debugmsg(8, 'attrs: ', attrs)")
+		fd.append("				self.debugmsg(6, 'ResultName: attrs[doc]: ', attrs['doc'])")
+		fd.append("				payload = {")
+		fd.append("					'AgentName': socket.gethostname(),")
+		fd.append("					'ResultName': attrs['doc'],")
+		fd.append("					'Result': attrs['status'],")
+		fd.append("					'ElapsedTime': (attrs['elapsedtime']/1000),")
+		fd.append("					'StartTime': startdate.timestamp(),")
+		fd.append("					'EndTime': enddate.timestamp(),")
+		fd.append("					'ScriptIndex': self.index,")
+		fd.append("					'VUser': self.vuser,")
+		fd.append("					'Iteration': self.iter,")
+		fd.append("					'Sequence': self.seq")
+		fd.append("				}")
+		fd.append("				self.debugmsg(8, 'payload: ', payload)")
+		fd.append("				self.send_result(payload)")
+		# fd.append("				self.msg = None")
 		fd.append("		self.msg = None")
+		fd.append("")
+		fd.append("	def debugmsg(self, lvl, *msg):")
+		fd.append("		msglst = []")
+		fd.append("		prefix = \"\"")
+		fd.append("		if self.debuglevel >= lvl:")
+		fd.append("			try:")
+		fd.append("				if self.debuglevel >= 4:")
+		fd.append("					stack = inspect.stack()")
+		fd.append("					the_class = stack[1][0].f_locals[\"self\"].__class__.__name__")
+		fd.append("					the_method = stack[1][0].f_code.co_name")
+		fd.append("					prefix = \"{}: {}: [{}:{}]	\".format(str(the_class), the_method, self.debuglevel, lvl)")
+		fd.append("					if len(prefix.strip())<32:")
+		fd.append("						prefix = \"{}	\".format(prefix)")
+		fd.append("					if len(prefix.strip())<24:")
+		fd.append("						prefix = \"{}	\".format(prefix)")
+		fd.append("					msglst.append(str(prefix))")
+		fd.append("				for itm in msg:")
+		fd.append("					msglst.append(str(itm))")
+		fd.append("				print(\" \".join(msglst))")
+		fd.append("			except:")
+		fd.append("				pass")
 		fd.append("")
 		fd.append("	def send_result(self, payload):")
 		fd.append("		uri = self.swarmserver + 'Result'")
 		fd.append("		try:")
 		fd.append("			r = requests.post(uri, json=payload)")
-		# fd.append("			print('send_result: ',r.status_code, r.text)")
+		fd.append("			self.debugmsg(7, 'send_result: ',r.status_code, r.text)")
 		fd.append("			if (r.status_code != requests.codes.ok):")
 		fd.append("				self.isconnected = False")
 		fd.append("		except Exception as e:")
-		# fd.append("			print('send_result: ',r.status_code, r.text)")
-		# fd.append("			print('send_result: Exception:', e)")
+		fd.append("			self.debugmsg(7, 'send_result: ',r.status_code, r.text)")
+		fd.append("			self.debugmsg(7, 'send_result: Exception:', e)")
 		fd.append("			pass")
 		fd.append("")
 

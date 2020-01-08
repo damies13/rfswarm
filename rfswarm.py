@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version v0.5.1-beta
+#    Version v0.5.2-beta
 #
 
 # 	Helpful links
@@ -159,6 +159,9 @@ class AgentServer(BaseHTTPRequestHandler):
 							scripts.append({'File': base.scriptfiles[hash]['relpath'], "Hash": hash})
 						base.debugmsg(9, "scripts:", scripts)
 						jsonresp["Scripts"] = scripts
+
+						t = threading.Thread(target=base.check_files_changed)
+						t.start()
 
 				if (parsed_path.path == "/File"):
 					jsonreq = json.loads(rawData)
@@ -329,7 +332,7 @@ class AgentServer(BaseHTTPRequestHandler):
 
 
 class RFSwarmBase:
-	version = "v0.5.1-beta"
+	version = "v0.5.2-beta"
 	debuglvl = 0
 
 	config = None
@@ -663,9 +666,11 @@ class RFSwarmBase:
 			return "{}".format(mins)
 		return "{}".format(sec_in)
 
-	def hash_file(self, file):
+	def hash_file(self, file, relpath):
 		BLOCKSIZE = 65536
 		hasher = hashlib.md5()
+		hasher.update(str(os.path.getmtime(file)).encode('utf-8'))
+		hasher.update(relpath.encode('utf-8'))
 		with open(file, 'rb') as afile:
 			buf = afile.read(BLOCKSIZE)
 			while len(buf) > 0:
@@ -678,8 +683,8 @@ class RFSwarmBase:
 		remove = True
 		# base.scriptlist[r]["ScriptHash"]
 		print("remove_hash: scriptlist:", base.scriptlist)
-		for scr in base.scriptlist:
-			if base.scriptlist[scr]["ScriptHash"] == hash:
+		for scr in range(len(base.scriptlist)):
+			if "ScriptHash" in base.scriptlist[scr] and base.scriptlist[scr]["ScriptHash"] == hash:
 				remove = False
 
 		if remove:
@@ -708,16 +713,26 @@ class RFSwarmBase:
 					if checking:
 						base.debugmsg(9, "RFSwarmCore: find_dependancies: line", line)
 						try:
-							if line.strip()[:1] != "#" and ('Resource' in line or 'Variables' in line or 'Metadata	File' in line):
+							if line.strip()[:1] != "#":
 								linearr = line.strip().split()
-								base.debugmsg(9, "find_dependancies: linearr", linearr)
-								if len(linearr)>1:
+								base.debugmsg(7, "find_dependancies: linearr", linearr)
+								resfile = None;
+								if len(linearr)>1 and linearr[0].upper() in ['RESOURCE','VARIABLES','LIBRARY']:
 									base.debugmsg(9, "find_dependancies: linearr[1]", linearr[1])
-									resfile = linearr[-1]
+									resfile = linearr[1]
+								if not resfile and len(linearr)>2 and (linearr[0].upper() == 'METADATA' and linearr[1].upper() == 'FILE'):
+									base.debugmsg(9, "find_dependancies: linearr[2]", linearr[2])
+									resfile = linearr[2]
+								if not resfile and len(linearr)>2 and (linearr[0].upper() == 'IMPORT' and linearr[1].upper() == 'LIBRARY'):
+									base.debugmsg(9, "find_dependancies: linearr[2]", linearr[2])
+									resfile = linearr[2]
+								if resfile:
+									base.debugmsg(7, "find_dependancies: resfile", resfile)
+									# here we are assuming the resfile is a relative path! should we also consider files with full local paths?
 									localrespath = os.path.abspath(os.path.join(localdir, resfile))
 									base.debugmsg(8, "find_dependancies: localrespath", localrespath)
 									if os.path.isfile(localrespath):
-										newhash = self.hash_file(localrespath)
+										newhash = self.hash_file(localrespath, resfile)
 										base.debugmsg(9, "find_dependancies: newhash", newhash)
 										self.scriptfiles[newhash] = {
 												'id': newhash,
@@ -725,13 +740,17 @@ class RFSwarmBase:
 												'relpath': resfile,
 												'type': linearr[0]
 											}
+
+										t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
+										t.start()
+
 									else:
 										filelst = glob.glob(localrespath)
 										for file in filelst:
 											base.debugmsg(9, "find_dependancies: file", file)
 											relpath = file.replace(localdir, "")[1:]
 											base.debugmsg(9, "find_dependancies: relpath", relpath)
-											newhash = self.hash_file(file)
+											newhash = self.hash_file(file, relpath)
 											base.debugmsg(9, "find_dependancies: newhash", newhash)
 											self.scriptfiles[newhash] = {
 													'id': newhash,
@@ -745,8 +764,58 @@ class RFSwarmBase:
 							base.debugmsg(6, "find_dependancies: Exception", e)
 							base.debugmsg(6, "find_dependancies: linearr", linearr)
 
-					if '*** Settings' in line:
-						checking = True
+					# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
+					match = re.search('\*+([^*\v]+)', line)
+					if match is not None:
+						base.debugmsg(6, "find_dependancies: match.group(0)", match.group(1))
+						if match.group(1).strip().upper() in ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD']:
+							checking = True
+
+
+	def check_files_changed(self):
+		# self.scriptfiles[hash]
+		checkhashes = list(self.scriptfiles.keys())
+		base.debugmsg(3, "checkhashes:", checkhashes)
+		for chkhash in checkhashes:
+			file_data = self.scriptfiles[chkhash]
+			script_hash = base.hash_file(file_data['localpath'], file_data['relpath'])
+			if script_hash != chkhash:
+				# file changed
+				base.debugmsg(3, "File's hash has changed: chkhash:", chkhash, "	script_hash:",script_hash, "	localpath:", file_data['localpath'])
+
+				# check if file is in script list and update it's hash
+				# base.scriptlist[r]["ScriptHash"] = script_hash
+				for iid in range(len(base.scriptlist)):
+					base.debugmsg(3, "base.scriptlist[",iid,"]:", base.scriptlist[iid])
+					if "ScriptHash" in base.scriptlist[iid] and chkhash == base.scriptlist[iid]["ScriptHash"]:
+						base.scriptlist[iid]["ScriptHash"] = script_hash
+						break;
+
+				if script_hash not in base.scriptfiles:
+					file_data['id'] = script_hash
+					base.scriptfiles[script_hash] = file_data
+
+					t = threading.Thread(target=base.find_dependancies, args=(script_hash, ))
+					t.start()
+
+					self.remove_hash(chkhash)
+
+	def get_relative_path(self, path1, path2):
+		base.debugmsg(7, "path1:", path1)
+		base.debugmsg(7, "path2:", path2)
+		# commonpath = os.path.commonpath([path1, path2])
+
+		base.debugmsg(8, "os.path.isdir(path1):", os.path.isdir(path1))
+		base.debugmsg(8, "os.path.isfile(path1):", os.path.isfile(path1))
+		# if not os.path.isdir(path1):
+		if os.path.isfile(path1) or not os.path.exists(path1):
+			path1 = os.path.dirname(path1)
+			base.debugmsg(7, "path1:", path1)
+
+		relpath = os.path.relpath(path2, start=path1)
+		# https://www.geeksforgeeks.org/python-os-path-relpath-method/
+		base.debugmsg(5, "relpath:", relpath)
+		return relpath
 
 	def saveini(self):
 		if self.save_ini:
@@ -1103,6 +1172,14 @@ class RFSwarmCore:
 		if 'ScenarioFile' not in base.config['Plan']:
 			base.config['Plan']['ScenarioFile'] = ""
 			base.saveini()
+		else:
+			# check file exists - it may have been deleted since rfswarm last ran with this ini file
+			if not os.path.exists(base.config['Plan']['ScenarioFile']):
+				base.config['Plan']['ScenarioFile'] = ""
+				base.config['Plan']['ScriptDir'] = base.dir_path
+				base.config['Plan']['ScenarioDir'] = base.dir_path
+				base.saveini()
+
 
 		#
 		# Run
@@ -1393,23 +1470,26 @@ class RFSwarmCore:
 			base.debugmsg(9, "ScenarioFile: ", ScenarioFile)
 			filedata.read(ScenarioFile)
 
-		base.debugmsg(9, "filedata: ", filedata)
+		base.debugmsg(6, "filedata: ", filedata)
 
 		scriptcount = 0
 		if "Scenario" in filedata:
-			base.debugmsg(9, "mnu_file_Open: Scenario:", filedata["Scenario"])
+			base.debugmsg(8, "Scenario:", filedata["Scenario"])
 			if "scriptcount" in filedata["Scenario"]:
 				scriptcount = int(filedata["Scenario"]["scriptcount"])
-				base.debugmsg(9, "mnu_file_Open: scriptcount:", scriptcount)
+				base.debugmsg(8, "scriptcount:", scriptcount)
 		else:
 			base.debugmsg(1, "File contains no scenario:", ScenarioFile)
 			return 1
 
-
+		rowcount = 0
 		for i in range(scriptcount):
 			ii = i+1
 			istr = str(ii)
 			if istr in filedata:
+				base.debugmsg(8, "filedata[",istr,"]:", filedata[istr])
+				rowcount += 1
+
 				# if i not in base.scriptlist:
 				# 	base.scriptlist.append({})
 				# 	base.scriptlist[ii]["Index"] = ii
@@ -1420,44 +1500,49 @@ class RFSwarmCore:
 					base.addScriptRow()
 				# users = 13
 				if "users" in filedata[istr]:
-					base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][users]:", filedata[istr]["users"])
+					base.debugmsg(8, "filedata[", istr, "][users]:", filedata[istr]["users"])
 					# base.scriptlist[ii]["users"] = filedata[istr]["users"]
-					self.sr_users_validate(ii, int(filedata[istr]["users"]))
+					self.sr_users_validate(rowcount, int(filedata[istr]["users"]))
 					# delay = 0
 				else:
 					fileok = False
 				if "delay" in filedata[istr]:
-					base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][delay]:", filedata[istr]["delay"])
+					base.debugmsg(8, "filedata[", istr, "][delay]:", filedata[istr]["delay"])
 					# base.scriptlist[ii]["delay"] = filedata[istr]["delay"]
-					self.sr_delay_validate(ii, int(filedata[istr]["delay"]))
+					self.sr_delay_validate(rowcount, int(filedata[istr]["delay"]))
 					# rampup = 60
 				else:
 					fileok = False
 				if "rampup" in filedata[istr]:
-					base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][rampup]:", filedata[istr]["rampup"])
+					base.debugmsg(8, "filedata[", istr, "][rampup]:", filedata[istr]["rampup"])
 					# base.scriptlist[ii]["rampup"] = filedata[istr]["rampup"]
-					self.sr_rampup_validate(ii, int(filedata[istr]["rampup"]))
+					self.sr_rampup_validate(rowcount, int(filedata[istr]["rampup"]))
 					# run = 600
 				else:
 					fileok = False
 				if "run" in filedata[istr]:
-					base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][run]:", filedata[istr]["run"])
+					base.debugmsg(8, "filedata[", istr, "][run]:", filedata[istr]["run"])
 					# base.scriptlist[ii]["run"] = filedata[istr]["run"]
-					self.sr_run_validate(ii, int(filedata[istr]["run"]))
+					self.sr_run_validate(rowcount, int(filedata[istr]["run"]))
 					# script = /Users/dave/Documents/GitHub/rfswarm/robots/OC_Demo_2.robot
 				else:
 					fileok = False
 				if "script" in filedata[istr]:
-					base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][script]:", filedata[istr]["script"])
-					# base.scriptlist[ii]["script"] = filedata[istr]["script"]
-					self.sr_file_validate(ii, filedata[istr]["script"])
-					# test = Browse Store Product 1
+					base.debugmsg(8, "filedata[", istr, "][script]:", filedata[istr]["script"])
+					scriptname = filedata[istr]["script"]
+					if not os.path.isabs(scriptname):
+						# relative path, need to find absolute path
+						combined = os.path.join(base.config['Plan']['ScenarioDir'], scriptname)
+						base.debugmsg(8, "combined:", combined)
+						scriptname = os.path.abspath(combined)
+					base.debugmsg(8, "scriptname:", scriptname)
+					self.sr_file_validate(rowcount, scriptname)
 				else:
 					fileok = False
 				if "test" in filedata[istr]:
-					base.debugmsg(9, "mnu_file_Open: filedata[", istr, "][test]:", filedata[istr]["test"])
+					base.debugmsg(8, "filedata[", istr, "][test]:", filedata[istr]["test"])
 					# base.scriptlist[ii]["test"] = filedata[istr]["test"]
-					self.sr_test_validate("row{}".format(ii), filedata[istr]["test"])
+					self.sr_test_validate("row{}".format(rowcount), filedata[istr]["test"])
 				else:
 					fileok = False
 
@@ -1670,6 +1755,7 @@ class RFSwarmCore:
 			if len(args)>1:
 				usrs = args[1]
 		base.debugmsg(6, "Row:", r, "Users:", usrs)
+		base.debugmsg(8, "base.scriptlist:", base.scriptlist)
 		base.scriptlist[r]["Users"] = int(usrs)
 
 		if not base.args.nogui:
@@ -1724,10 +1810,10 @@ class RFSwarmCore:
 			scriptfile = args[0]
 		else:
 			scriptfile = ""
-		base.debugmsg(8, "scriptfile:", scriptfile)
+		base.debugmsg(7, "scriptfile:", scriptfile)
 		if len(scriptfile)>0:
 			base.scriptlist[r]["Script"] = scriptfile
-			script_hash = base.hash_file(scriptfile)
+			script_hash = base.hash_file(scriptfile, os.path.basename(scriptfile))
 			base.scriptlist[r]["ScriptHash"] = script_hash
 
 			if script_hash not in base.scriptfiles:
@@ -2489,58 +2575,6 @@ class RFSwarmGUI(tk.Frame):
 					totusrsxy["addpct"][rdtpct] = 0
 				totusrsxy["addpct"][rdtpct] += (usrpct * -1)
 
-
-				# # totcounts = {}
-				# # totinc = 1
-				# # if mxdur > 60:
-				# totnxt = 0
-				# base.debugmsg(6, "Index", grp["Index"], 'totnxt', totnxt)
-				# base.debugmsg(8, "Index", grp["Index"], 'totcounts', totcounts)
-				# base.debugmsg(8, "Index", grp["Index"], 'totcounts.keys()', totcounts.keys())
-				# while totnxt < mxdur:
-				# 	totnxt += totinc
-				# 	base.debugmsg(6, "Index", grp["Index"], 'totnxt', totnxt)
-				# 	if totnxt not in totcounts.keys():
-				# 		totcounts[totnxt] = 0
-				# 		base.debugmsg(6, "Index", grp["Index"], 'totcounts[',totnxt,']', totcounts[totnxt])
-				# 	# if totnxt < grp["Delay"]:
-				# 	# 	totcounts[totnxt] += 0
-				# 	if totnxt > grp["Delay"] and totnxt < (grp["RampUp"] + grp["Delay"]):
-				# 		# calculate users during RampUp
-				# 		rupct = (totnxt - grp["Delay"]) /grp["RampUp"]
-				# 		base.debugmsg(9, 'rupct', rupct)
-				# 		ruusr = int(grp["Users"] * rupct)
-				# 		base.debugmsg(9, 'ruusr', ruusr)
-				# 		base.debugmsg(9, 'totcounts', totcounts)
-				# 		base.debugmsg(9, 'totcounts[totnxt]', totcounts[totnxt])
-				# 		totcounts[totnxt] = int(totcounts[totnxt] + ruusr)
-				# 		base.debugmsg(6, "Index", grp["Index"], 'totcounts[',totnxt,']', totcounts[totnxt])
-				# 		base.debugmsg(9, 'ruusr', ruusr)
-				# 		base.debugmsg(9, 'totcounts[totnxt]', totcounts[totnxt])
-				#
-				# 	if totnxt > (grp["Delay"] + grp["RampUp"] - 1) \
-				# 		and totnxt < (grp["Delay"] + grp["RampUp"] + grp["Run"] + 1):
-				# 		# all users running
-				# 		base.debugmsg(9, 'run:totnxt', totnxt)
-				# 		base.debugmsg(9, 'run:grp["Users"]', grp["Users"])
-				# 		totcounts[totnxt] += grp["Users"]
-				# 		base.debugmsg(6, "Index", grp["Index"], 'totcounts[',totnxt,']', totcounts[totnxt])
-				# 	if totnxt > (grp["RampUp"] + grp["Delay"] + grp["Run"]) \
-				# 		and totnxt < (grp["Delay"] + (grp["RampUp"] *2 ) + grp["Run"]):
-				# 		# calculate users during RampDown
-				# 		base.debugmsg(9, 'RampDown:totnxt', totnxt)
-				# 		drr = grp["Delay"] + grp["RampUp"] + grp["Run"]
-				# 		base.debugmsg(9, 'RampDown:drr', drr)
-				# 		rdsec = totnxt - drr
-				# 		base.debugmsg(9, 'RampDown:rdsec', rdsec)
-				#
-				# 		rdpct = rdsec /grp["RampUp"]
-				# 		base.debugmsg(9, 'RampDown:rdpct', rdpct)
-				# 		ruusr = int(grp["Users"] * rdpct)
-				# 		base.debugmsg(9, 'RampDown:ruusr', ruusr)
-				# 		totcounts[totnxt] += grp["Users"] - ruusr
-				# 		base.debugmsg(6, "Index", grp["Index"], 'totcounts[',totnxt,']', totcounts[totnxt])
-
 		base.debugmsg(6, "Total Users")
 		base.debugmsg(6, "totusrsxy:", totusrsxy)
 
@@ -2587,60 +2621,6 @@ class RFSwarmGUI(tk.Frame):
 			prevx = newx
 			prevy = newy
 
-
-
-		# totcolour = "#000000"
-		# # totcolour = "#0459af"
-		# sy = graphh-axissz
-		# prevkey = 0
-		# prevx = 0
-		# prevy = sy
-		# prevval = 0
-		# rampdown = False
-		# for key in totcounts.keys():
-		# 	if rampdown == False and totcounts[key] < prevval:
-		# 		rampdown = True
-		# 		base.debugmsg(6, prevkey, totcounts[prevkey])
-		#
-		# 		usrpct = prevval / (mxuser * 1.0)
-		# 		base.debugmsg(6, "Users", totcounts[key], "/ mxuser", mxuser, " = usrpct", usrpct)
-		# 		newy = sy - int(sy * usrpct)
-		#
-		# 		keypct = prevkey / (mxdur * 1.0)
-		# 		base.debugmsg(6, "key", key, "/ mxdur", mxdur, " = keypct", keypct)
-		# 		newx = int(xlen * keypct) + delx
-		#
-		# 		base.debugmsg(6, "prevx", prevx, "prevy", prevy, "newx", newx, "newy", newy)
-		#
-		# 		self.pln_graph.create_line(prevx, prevy, newx, newy, fill=totcolour)
-		#
-		# 		prevx = newx
-		# 		prevy = newy
-		#
-		# 	if totcounts[key] != prevval:
-		# 		base.debugmsg(6, key, totcounts[key])
-		# 		prevval = totcounts[key]
-		#
-		# 		usrpct = totcounts[key] / (mxuser * 1.0)
-		# 		base.debugmsg(6, "TU: Users", totcounts[key], "/ mxuser", mxuser, " = usrpct", usrpct)
-		# 		newy = sy - int(sy * usrpct)
-		#
-		# 		keypct = key / (mxdur * 1.0)
-		# 		base.debugmsg(6, "TU: key", key, "/ mxdur", mxdur, " = keypct", keypct)
-		# 		newx = int(xlen * keypct) + delx
-		#
-		# 		base.debugmsg(6, "TU: prevx", prevx, "prevy", prevy, "newx", newx, "newy", newy)
-		#
-		# 		if rampdown:
-		# 			self.pln_graph.create_line(prevx, prevy, newx, newy, fill=totcolour, dash=(4, 4))
-		# 		else:
-		# 			self.pln_graph.create_line(prevx, prevy, newx, newy, fill=totcolour)
-		#
-		# 		prevx = newx
-		# 		prevy = newy
-		#
-		#
-		# 	prevkey = key
 
 	def pln_update_graph_orig(self):
 		base.debugmsg(6, "pln_update_graph")
@@ -3013,6 +2993,10 @@ class RFSwarmGUI(tk.Frame):
 			if len(args)>1:
 				usrs = args[1]
 				if not base.args.nogui:
+					base.debugmsg(8, "sr_users_validate: len(grid_slaves):",len(self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)))
+					while len(self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)) < 1:
+						base.debugmsg(8, "sr_users_validate: len(grid_slaves):",len(self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)))
+						time.sleep(0.01)
 					base.debugmsg(9, "sr_users_validate: grid_slaves:",self.scriptgrid.grid_slaves(column=self.plancolusr, row=r))
 					base.debugmsg(9, "sr_users_validate: grid_slaves[0]:",self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0])
 					self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].delete(0,'end')
@@ -3172,7 +3156,7 @@ class RFSwarmGUI(tk.Frame):
 				scriptfile = str(tkf.askopenfilename(initialdir=base.config['Plan']['ScriptDir'], title = "Select Robot Framework File", filetypes = (("Robot Framework","*.robot"),("all files","*.*"))))
 			else:
 				scriptfile = ""
-		base.debugmsg(8, "scriptfile:", scriptfile)
+		base.debugmsg(7, "scriptfile:", scriptfile)
 		if len(scriptfile)>0:
 			fg[1].configure(state='normal')
 			fg[1].select_clear()
@@ -3182,7 +3166,7 @@ class RFSwarmGUI(tk.Frame):
 
 			base.scriptlist[r]["Script"] = scriptfile
 			base.debugmsg(8, "test: ", fg[1].get())
-			script_hash = base.hash_file(scriptfile)
+			script_hash = base.hash_file(scriptfile, os.path.basename(scriptfile))
 			base.scriptlist[r]["ScriptHash"] = script_hash
 
 			if script_hash not in base.scriptfiles:
@@ -3263,14 +3247,15 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(8, "Script File:",base.scriptlist[r]["Script"])
 		tcsection = False
 		tclist = [""]
-		regex = "^\*{3}[\D](Test Case|Task)"
+		# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
+		regex = "^\*+[\s]*(Test Case|Task)"
 		with open(base.scriptlist[r]["Script"]) as f:
 			for line in f:
 				base.debugmsg(9, "sr_test_genlist: tcsection:",tcsection, "	line:", line)
 				if tcsection and line[0:3] == "***":
 					tcsection = False
-				if re.search(regex, line):
-					base.debugmsg(9, "sr_test_genlist: re.search(",regex, ",", line,")", re.search(regex, line))
+				if re.search(regex, line, re.IGNORECASE):
+					base.debugmsg(9, "sr_test_genlist: re.search(",regex, ",", line,")", re.search(regex, line, re.IGNORECASE))
 					tcsection = True
 				if tcsection:
 					if line[0:1] not in ('\t', ' ', '*', '#', '\n', '\r'):
@@ -3852,8 +3837,8 @@ class RFSwarmGUI(tk.Frame):
 			self.mnu_file_SaveAs()
 		else:
 
-			base.debugmsg(9, "mnu_file_Save: ScenarioFile:", base.config['Plan']['ScenarioFile'])
-			base.debugmsg(9, "mnu_file_Save: scriptlist:", base.scriptlist)
+			base.debugmsg(8, "ScenarioFile:", base.config['Plan']['ScenarioFile'])
+			base.debugmsg(8, "scriptlist:", base.scriptlist)
 			filedata = configparser.ConfigParser()
 
 			if 'Scenario' not in filedata:
@@ -3864,18 +3849,25 @@ class RFSwarmGUI(tk.Frame):
 				# filedata['Scenario']['ScriptCount'] = str(len(base.scriptlist)-1)
 				filedata['Scenario']['ScriptCount'] = scriptidx
 
+			scriptcount = 0
 			for scrp in base.scriptlist:
-				base.debugmsg(9, "mnu_file_Save: scrp:", scrp)
+				base.debugmsg(8, "scrp:", scrp)
 				if 'Index' in scrp:
-					scriptidx = str(scrp['Index'])
+					scrpcopy = scrp.copy()
+					scriptcount += 1
+					scriptidx = str(scriptcount)
+					if 'Script' in scrpcopy:
+						relpath = base.get_relative_path(base.config['Plan']['ScenarioFile'], scrp['Script'])
+						base.debugmsg(8, "relpath:", relpath)
+						scrpcopy['Script'] = relpath
 
 					if scriptidx not in filedata:
 						filedata[scriptidx] = {}
-					for key in scrp.keys():
-						base.debugmsg(9, "mnu_file_Save: key:", key)
+					for key in scrpcopy.keys():
+						base.debugmsg(8, "key:", key)
 						if key not in ['Index', 'TestVar', 'ScriptHash']:
-							filedata[scriptidx][key] = str(scrp[key])
-							base.debugmsg(9, "mnu_file_Save: filedata[",scriptidx,"][",key,"]:", filedata[scriptidx][key])
+							filedata[scriptidx][key] = str(scrpcopy[key])
+							base.debugmsg(8, "filedata[",scriptidx,"][",key,"]:", filedata[scriptidx][key])
 
 			filedata['Scenario']['ScriptCount'] = scriptidx
 			with open(base.config['Plan']['ScenarioFile'], 'w') as sf:    # save
