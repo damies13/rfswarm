@@ -682,7 +682,7 @@ class RFSwarmBase:
 	def remove_hash(self, hash):
 		remove = True
 		# base.scriptlist[r]["ScriptHash"]
-		print("remove_hash: scriptlist:", base.scriptlist)
+		base.debugmsg(8, "scriptlist:", base.scriptlist)
 		for scr in range(len(base.scriptlist)):
 			if "ScriptHash" in base.scriptlist[scr] and base.scriptlist[scr]["ScriptHash"] == hash:
 				remove = False
