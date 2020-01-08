@@ -8,6 +8,7 @@
 The Hardware Requirements for the GUI are pretty minimal, for example to open the GUI and load a scenario takes about 70MB, running this scenario with 300 robots needed around 120MB and used ?50? threads, so a multi core CPU is a good idea.
 
 Recommended minimums:
+
 |CPU|Memory|Disk|
 |---|---|---|
 |Dual Core 1Ghz| 512MB above OS Requirements|1GB free|
