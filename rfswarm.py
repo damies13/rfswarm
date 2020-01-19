@@ -1978,26 +1978,21 @@ class RFSwarmGUI(tk.Frame):
 	#
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+
+
 	def __init__(self, master=None):
 
-
-		# base.gui = tk.Frame()
 		root = tk.Tk()
 		root.protocol("WM_DELETE_WINDOW", self.on_closing)
-		# self.master.protocol("WM_DELETE_WINDOW", core.on_closing)
-
 		tk.Frame.__init__(self, root)
-		# tk.Frame.__init__(self, self.master)
-		self.grid(row=0, column=0, sticky="nsew")
-		self.columnconfigure(0, weight=1)
-		self.rowconfigure(0, weight=1)
-
-		self.pack(side="top", fill="both", expand=True)
+		self.grid(sticky="nsew")
+		root.columnconfigure(0, weight=1)
+		root.rowconfigure(0, weight=1)
+		root.resizable(True, True)
 
 		base.debugmsg(6, "BuildUI")
 		self.BuildUI()
 
-		# self.pln_update_graph()
 		try:
 			base.debugmsg(6, "pln_update_graph")
 			ug = threading.Thread(target=self.pln_update_graph)
@@ -2124,7 +2119,7 @@ class RFSwarmGUI(tk.Frame):
 		self.tabs.add(p, text='Plan')
 		self.tabs.add(r, text='Run')
 		self.tabs.add(a, text='Agents')
-		self.tabs.grid(column=0, row=0) # , sticky="nsew")
+		self.tabs.grid(column=0, row=0, sticky="nsew")
 
 		base.debugmsg(6, "BuildMenu")
 		self.BuildMenu()
