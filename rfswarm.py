@@ -10,7 +10,6 @@
 # 	making things resize with the window	https://stackoverflow.com/questions/7591294/how-to-create-a-self-resizing-grid-of-buttons-in-tkinter
 #
 
-
 import sys
 import signal
 import os
@@ -110,6 +109,43 @@ class stdevclass:
 		except Exception as e:
 			base.debugmsg(5, "Exception:", e)
 
+class Scrollable(tk.Frame):
+	"""
+		Make a frame scrollable with scrollbar on the right.
+		After adding or removing widgets to the scrollable frame,
+		call the update() method to refresh the scrollable area.
+	"""
+
+	def __init__(self, frame, width=16):
+
+		scrollbar = tk.Scrollbar(frame, width=width)
+		scrollbar.pack(side=tk.RIGHT, fill=tk.Y, expand=False)
+
+		self.canvas = tk.Canvas(frame, yscrollcommand=scrollbar.set)
+		self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+		scrollbar.config(command=self.canvas.yview)
+
+		self.canvas.bind('<Configure>', self.__fill_canvas)
+
+		# base class initialization
+		tk.Frame.__init__(self, frame)
+
+		# assign this obj (the inner frame) to the windows item of the canvas
+		self.windows_item = self.canvas.create_window(0,0, window=self, anchor=tk.NW)
+
+
+	def __fill_canvas(self, event):
+		"Enlarge the windows item to the canvas width"
+
+		canvas_width = event.width
+		self.canvas.itemconfig(self.windows_item, width = canvas_width)
+
+	def update(self):
+		"Update the canvas and the scrollregion"
+
+		self.update_idletasks()
+		self.canvas.config(scrollregion=self.canvas.bbox(self.windows_item))
 
 class AgentServer(BaseHTTPRequestHandler):
 	def do_HEAD(self):
@@ -2202,9 +2238,13 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(6, "updateTitle")
 		self.updateTitle()
 
+
+
+
+
 		planrow = 0
 		p.columnconfigure(planrow, weight=1)
-		p.rowconfigure(planrow, weight=1)
+		p.rowconfigure(planrow, weight=0) # weight=0 means don't resize with other grid rows / keep a fixed size
 		# Button Bar
 		base.debugmsg(6, "Button Bar")
 
@@ -2268,8 +2308,10 @@ class RFSwarmGUI(tk.Frame):
 		bPlay.grid(column=btnno, row=0, sticky="nsew")
 
 
+
+
 		planrow += 1
-		p.columnconfigure(planrow, weight=2)
+		# p.columnconfigure(0, weight=1)
 		p.rowconfigure(planrow, weight=1)
 		# Plan Graph
 		base.debugmsg(6, "Plan Graph")
@@ -2277,14 +2319,28 @@ class RFSwarmGUI(tk.Frame):
 		self.pln_graph = tk.Canvas(p)
 		self.pln_graph.grid(column=0, row=planrow, sticky="nsew") # sticky="wens"
 
+		# self.pln_graph.columnconfigure(0, weight=1)
+		# self.pln_graph.rowconfigure(0, weight=1)
+
+
+
+
+
 		planrow += 1
+		# p.columnconfigure(0, weight=1)
+		p.rowconfigure(planrow, weight=1)
 		# Plan scripts
 		base.debugmsg(6, "Plan scripts")
 
 		sg = ttk.Frame(p)
 		sg.grid(column=0, row=planrow, sticky="nsew")
+		sg.columnconfigure(0, weight=1)
+		sg.rowconfigure(planrow, weight=1)
+
+
 		self.scriptgrid = ttk.Frame(sg)
 		self.scriptgrid.grid(row=0, column=0, sticky="nsew")
+
 
 		# label row 0 of sg
 		self.scriptgrid.columnconfigure(self.plancolidx, weight=1)
