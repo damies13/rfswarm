@@ -144,7 +144,7 @@ class Scrollable(tk.Frame):
 	def update(self):
 		"Update the canvas and the scrollregion"
 
-		self.update_idletasks()
+		# self.update_idletasks()
 		self.canvas.config(scrollregion=self.canvas.bbox(self.windows_item))
 
 class AgentServer(BaseHTTPRequestHandler):
@@ -1981,11 +1981,14 @@ class RFSwarmGUI(tk.Frame):
 
 	pln_graph = None
 	scriptgrid = None
+	scrollable_sg = None
 
 	agenttgrid = None
+	scrollable_ag = None
 
 	rungrid = None
 	rungridupdate = 0
+	scrollable_rg = None
 
 	plan_scnro_chngd = False
 
@@ -2322,6 +2325,7 @@ class RFSwarmGUI(tk.Frame):
 		# self.pln_graph.columnconfigure(0, weight=1)
 		# self.pln_graph.rowconfigure(0, weight=1)
 
+		self.pln_graph.bind("<Configure>", self.CanvasResize)
 
 
 
@@ -2333,33 +2337,41 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(6, "Plan scripts")
 
 		sg = ttk.Frame(p)
+		# sg = Scrollable(p, width=32)
 		sg.grid(column=0, row=planrow, sticky="nsew")
 		sg.columnconfigure(0, weight=1)
-		sg.rowconfigure(planrow, weight=1)
+		sg.rowconfigure(planrow, weight=0)
 
+		# scrollable_sg = Scrollable(sg, width=32)
+		# self.scrollable_sg = Scrollable(sg)
+		# scrollable_sg.columnconfigure(0, weight=1)
+		# scrollable_sg.rowconfigure(0, weight=1)
 
+		# self.scriptgrid = Scrollable(sg)
+		# self.scriptgrid = Scrollable(sg, width=32)
+		# self.scriptgrid = ttk.Frame(self.scrollable_sg)
 		self.scriptgrid = ttk.Frame(sg)
 		self.scriptgrid.grid(row=0, column=0, sticky="nsew")
 
 
 		# label row 0 of sg
-		self.scriptgrid.columnconfigure(self.plancolidx, weight=1)
+		self.scriptgrid.columnconfigure(self.plancolidx, weight=0)
 		idx = ttk.Label(self.scriptgrid, text="Index")
 		idx.grid(column=self.plancolidx, row=0, sticky="nsew")
 
-		self.scriptgrid.columnconfigure(self.plancolusr, weight=2)
+		self.scriptgrid.columnconfigure(self.plancolusr, weight=0)
 		usr = ttk.Label(self.scriptgrid, text="Users")
 		usr.grid(column=self.plancolusr, row=0, sticky="nsew")
 
-		self.scriptgrid.columnconfigure(self.plancoldly, weight=2)
+		self.scriptgrid.columnconfigure(self.plancoldly, weight=0)
 		usr = ttk.Label(self.scriptgrid, text="Delay")
 		usr.grid(column=self.plancoldly, row=0, sticky="nsew")
 
-		self.scriptgrid.columnconfigure(self.plancolrmp, weight=2)
+		self.scriptgrid.columnconfigure(self.plancolrmp, weight=0)
 		usr = ttk.Label(self.scriptgrid, text="Ramp Up")
 		usr.grid(column=self.plancolrmp, row=0, sticky="nsew")
 
-		self.scriptgrid.columnconfigure(self.plancolrun, weight=2)
+		self.scriptgrid.columnconfigure(self.plancolrun, weight=0)
 		usr = ttk.Label(self.scriptgrid, text="Run")
 		usr.grid(column=self.plancolrun, row=0, sticky="nsew")
 
@@ -2375,10 +2387,14 @@ class RFSwarmGUI(tk.Frame):
 		tst = ttk.Label(self.scriptgrid, text="Test")
 		tst.grid(column=self.plancoltst, row=0, sticky="nsew")
 
-		self.scriptgrid.columnconfigure(self.plancoladd, weight=1)
+		self.scriptgrid.columnconfigure(self.plancoladd, weight=0)
 		new = ttk.Button(self.scriptgrid, text="+", command=base.addScriptRow, width=1)
 		new.grid(column=self.plancoladd, row=0, sticky="nsew")
 
+		# self.scrollable_sg.update()
+
+	def CanvasResize(self, event):
+		self.pln_update_graph()
 
 	def ClickPlay(self, _event=None):
 
@@ -2980,8 +2996,13 @@ class RFSwarmGUI(tk.Frame):
 	def addScriptRow(self):
 		row = base.scriptcount
 
-		idx = ttk.Label(self.scriptgrid, text=str(base.scriptcount))
+		colour = base.line_colour(base.scriptcount)
+		base.debugmsg(8, "colour:", colour)
+
+		idx = tk.Label(self.scriptgrid, text=str(base.scriptcount))
+		idx['bg'] = colour
 		idx.grid(column=self.plancolidx, row=base.scriptcount, sticky="nsew")
+
 
 		num = base.scriptlist[base.scriptcount]["Users"]
 		usr = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout")
@@ -3015,9 +3036,12 @@ class RFSwarmGUI(tk.Frame):
 		fgf.grid(column=self.plancolscr, row=base.scriptcount, sticky="nsew")
 		scr = ttk.Entry(fgf, state="readonly", justify="right")
 		scr.grid(column=0, row=0, sticky="nsew")
+		fgf.columnconfigure(scr, weight=1)
+
 		scrf = ttk.Button(fgf, text="...", width=1)
 		scrf.config(command=lambda: self.sr_file_validate(row))
 		scrf.grid(column=1, row=0, sticky="nsew")
+		fgf.columnconfigure(scrf, weight=0)
 
 		base.scriptlist[row]["TestVar"] = tk.StringVar(base.scriptlist[row]["Test"], name="row{}".format(row))
 		base.scriptlist[row]["TestVar"].trace("w", self.sr_test_validate)
@@ -3026,10 +3050,11 @@ class RFSwarmGUI(tk.Frame):
 		tst.grid(column=self.plancoltst, row=base.scriptcount, sticky="nsew")
 
 
-		self.scriptgrid.columnconfigure(self.plancoladd, weight=1)
+		self.scriptgrid.columnconfigure(self.plancoladd, weight=0)
 		new = ttk.Button(self.scriptgrid, text="X", command=lambda: self.sr_remove_row(row), width=1)
 		new.grid(column=self.plancoladd, row=base.scriptcount, sticky="nsew")
 
+		# self.scrollable_sg.update()
 		if not base.args.nogui:
 			try:
 				self.pln_update_graph()
@@ -3458,6 +3483,14 @@ class RFSwarmGUI(tk.Frame):
 		#
 		base.debugmsg(6, "run results table")
 
+		# rungridprnt = ttk.Frame(rg)
+		# rungridprnt.grid(row=1, column=0, sticky="nsew")
+		# self.scrollable_rg = Scrollable(rungridprnt)
+		#
+		#
+		# self.rungrid = ttk.Frame(self.scrollable_rg)
+		# self.rungrid.grid(row=0, column=0, sticky="nsew")
+
 		self.rungrid = ttk.Frame(rg)
 		self.rungrid.grid(row=1, column=0, sticky="nsew")
 
@@ -3491,6 +3524,8 @@ class RFSwarmGUI(tk.Frame):
 				usr.grid(column=colno, row=0, sticky="nsew")
 
 			colno += 1
+
+		# self.scrollable_rg.update()
 
 	def delayed_UpdateRunStats_bg(self):
 
@@ -3678,6 +3713,7 @@ class RFSwarmGUI(tk.Frame):
 					rowno += 1
 
 
+			# self.scrollable_rg.update()
 			ut = threading.Thread(target=self.delayed_UpdateRunStats)
 			ut.start()
 
@@ -3699,7 +3735,13 @@ class RFSwarmGUI(tk.Frame):
 			a.columnconfigure(agentrow, weight=1)
 			a.rowconfigure(agentrow, weight=0) # weight=0 means don't resize with other grid rows / keep a fixed size
 
-			base.debugmsg(6, "Frame")
+			# base.debugmsg(6, "Frame")
+
+			# self.scrollable_ag = Scrollable(a)
+			# self.scrollable_ag.grid(column=0, row=1, sticky="nsew")
+			# self.agenttgrid = ttk.Frame(self.scrollable_ag)
+			# self.agenttgrid.grid(row=0, column=0, sticky="nsew")
+
 			ag = ttk.Frame(a)
 			ag.grid(column=0, row=1, sticky="nsew")
 			self.agenttgrid = ttk.Frame(ag)
