@@ -3346,6 +3346,10 @@ class RFSwarmGUI(tk.Frame):
 
 		base.debugmsg(6, "config")
 
+		runrow = 0
+		r.columnconfigure(runrow, weight=1)
+		r.rowconfigure(runrow, weight=0) # weight=0 means don't resize with other grid rows / keep a fixed size
+
 		base.debugmsg(6, "Frame")
 		rg = ttk.Frame(r)
 		rg.grid(column=0, row=1, sticky="nsew")
@@ -3690,6 +3694,11 @@ class RFSwarmGUI(tk.Frame):
 	def BuildAgent(self, a):
 
 		if not base.args.nogui:
+
+			agentrow = 0
+			a.columnconfigure(agentrow, weight=1)
+			a.rowconfigure(agentrow, weight=0) # weight=0 means don't resize with other grid rows / keep a fixed size
+
 			base.debugmsg(6, "Frame")
 			ag = ttk.Frame(a)
 			ag.grid(column=0, row=1, sticky="nsew")
