@@ -52,6 +52,7 @@ class RFSwarmAgent():
 	agentini = None
 	listenerfile = None
 	ipaddresslist = []
+	agentname = None
 	netpct = 0
 	mainloopinterval = 10
 	scriptlist = {}
@@ -79,6 +80,7 @@ class RFSwarmAgent():
 		parser.add_argument('-d', '--agentdir', help='The directory the agent should use for files')
 		parser.add_argument('-r', '--robot', help='The robot framework executable')
 		parser.add_argument('-x', '--xmlmode', help='XML Mode, fall back to pasing the output.xml after each iteration', action='store_true')
+		parser.add_argument('-a', '--agentname', help='Set agent name')
 		self.args = parser.parse_args()
 
 		self.debugmsg(6, "self.args: ", self.args)
@@ -106,11 +108,20 @@ class RFSwarmAgent():
 		else:
 			self.saveini()
 
+		self.agentname = socket.gethostname()
+		if self.args.agentname:
+			self.agentname = self.args.agentname
 
 
 		if 'Agent' not in self.config:
 			self.config['Agent'] = {}
 			self.saveini()
+
+		if 'agentname' not in self.config['Agent']:
+			self.config['Agent']['agentname'] = self.agentname
+			self.saveini()
+		else:
+			self.agentname = self.config['Agent']['agentname']
 
 		if 'agentdir' not in self.config['Agent']:
 			self.config['Agent']['agentdir'] = os.path.join(tempfile.gettempdir(), "rfswarmagent")
@@ -282,7 +293,7 @@ class RFSwarmAgent():
 		t2.start()
 
 		payload = {
-			"AgentName": socket.gethostname(),
+			"AgentName": self.agentname,
 			"AgentFQDN": socket.getfqdn(),
 			"AgentIPs": self.ipaddresslist,
 			"CPU%": psutil.cpu_percent(),
