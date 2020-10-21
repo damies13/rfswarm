@@ -133,6 +133,7 @@ By setting up your scripts to operate this way you can also run scripts 1 & 3 pr
 TestDataTable's regression test cases provide 2 alternate ways you can use TestDataTable with your test cases:
 - [Using Robot Framework's RequestsLibrary, JsonValidator and Collections Libraries](https://github.com/damies13/TestDataTable/blob/master/Regression_Tests/TestDataTable-API_requests.robot)
 - [Using Robot Framework's REST Library](https://github.com/damies13/TestDataTable/blob/master/Regression_Tests/TestDataTable-API_REST.robot)
+
 Both methods demonstrate TestDataTable's functionality, and for more details you can refer to [TestDataTable's documentation](https://github.com/damies13/TestDataTable/blob/master/Doc/Index.md).
 
 Why is TestDataTable a seperate project? simply because I wanted TestDataTable to be able to be used by other test tools as well, for example there is nothing stopping you to use TestDataTable with your regression test suite to make your test cases shorter and enable them to run in parallel, likewise TestDataTable could be used by other performance test tools like JMeter.
