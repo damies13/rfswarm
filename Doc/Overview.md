@@ -11,7 +11,7 @@ rfswarm is made up of 2 components, the [GUI / Server](rfswarm_py.md) where you 
 
 
 <kbd>
-<img align="right" height="500" src="Images/GUI&Agent_Example.png">
+<img align="centre" height="500" src="Images/GUI&Agent_Example.png">
 </kbd><br>
 An example of how your rfswarm setup might look.
 
