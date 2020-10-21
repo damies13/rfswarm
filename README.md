@@ -1,5 +1,7 @@
 # rfswarm (Robot Framework Swarm)
 
+
+<img align="right" src="Doc/Images/Icon_Information.png">
 ## About
 rfswarm is a testing tool that allows you use [Robot Framework](https://robotframework.org/) test cases for performance or load testing.
 
@@ -17,6 +19,13 @@ To learn more about rfswarm please refer to the [Documentation](Doc/Index.md)
 
 ![Image](Doc/Images/Run_v0.5.0_100u_2h.png "Run - Showing results being collected live")
 
+<img align="right" src="Doc/Images/Icon_Help.png">
+## Getting Help
+
+- [rfswarm Documentation](Doc/Index.md)
+- [Issues](https://github.com/damies13/rfswarm/issues)
+
+<img align="right" src="Doc/Images/Icon_Donate.png">
 ## Donations
 
 If you would like to thank me for this project please use this [PayPal.me](https://paypal.me/damies13/5) link, the $5 is a suggestion, feel free to change to any amount you would like.
