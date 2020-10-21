@@ -25,7 +25,7 @@ To learn more about rfswarm please refer to the [Documentation](Doc/Index.md)
 ## Getting Help
 
 - [rfswarm Documentation](Doc/Index.md)
-- [Issues](https://github.com/damies13/rfswarm/issues)
+- [Reporting Issues / Known Issues](https://github.com/damies13/rfswarm/issues)
 
 <kbd>
 <img align="right" height="350" src="Doc/Images/GUI&Agent_Example.png">
