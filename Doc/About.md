@@ -2,9 +2,7 @@
 [Index](Index.md)
 
 ## About
-<div align="right">
-![Image](Images/robot_framework.png)
-</div>
+<img align="right" src="Images/robot_framework.png">
 
 rfswarm is a testing tool that allows you use [Robot Framework](https://robotframework.org/) test cases for performance or load testing.
 
