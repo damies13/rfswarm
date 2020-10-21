@@ -27,6 +27,11 @@ To learn more about rfswarm please refer to the [Documentation](Doc/Index.md)
 - [rfswarm Documentation](Doc/Index.md)
 - [Issues](https://github.com/damies13/rfswarm/issues)
 
+<kbd>
+<img align="right" height="350" src="Images/GUI&Agent_Example.png">
+</kbd><br>
+An example of how your rfswarm setup might look.
+
 <img align="right" src="Doc/Images/Icon_Donate.png">
 
 ## Donations
