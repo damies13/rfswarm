@@ -9,6 +9,12 @@ rfswarm is made up of 2 components, the [GUI / Server](rfswarm_py.md) where you 
 - [Agents](#Agents)
 - [Robot File handling (transfer from GUI to Agent)](#robot-file-handling-transfer-from-gui-to-agent)
 
+
+<kbd>
+<img align="centre" height="500" src="Images/GUI&Agent_Example.png">
+</kbd><br>
+An example of how your rfswarm setup might look.
+
 ### GUI / Server
 
 This is the swarm scheduler, controller and monitor

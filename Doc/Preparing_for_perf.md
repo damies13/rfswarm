@@ -11,13 +11,20 @@ Some of the things you will need to consider when taking a functional or regress
 
 ### Think Time
 
-Because functional and regression tests are designed to run as a single user and test the functionality as quickly as possible, for performance testing we want to simulate real user behaviour so we want to put some user thinking time or pauses into the script, the easiest way to achieve this would be to simply use the Robot Framework's built in sleep command:
+Because functional and regression tests are designed to run as a single user and test the functionality as quickly as possible, for performance testing we want to simulate real user behaviour so we want to put some user thinking time or pauses into the script.
+
+Why is this is important?
+- Session Time: Users don't immediately start filling in fields the moment the page or screen has loaded, they sit and read information on the screen and then start filling in the fields, often pausing or referring to documents, emails, or paper forms for the next piece of information they need to key in. If you don't simulate this behaviour in a load test, you risk having much shorter session times that would really occur and this might lead to you missing a memory issue or session limit in your application server.
+- Background Polling: Many applications poll the server in the background while the user is idle to update dynamic data displayed on the screen, this is becoming increasingly common with web 2.0 style web applications, by not having any or sufficient user thinking time in your scripts, your robots might not trigger this polling or may trigger this polling to the same extent as a real user would, so you will end up applying a lighter load on the application server that is realistic. Never under estimate the impact of background polling, application servers have flatlined at 100% CPU from just 5 users logged in and sitting idle because of 1 poorly constructed background polling event that was taking 25% of the application server's CPU per user calling this polling event.
+- Overloading your agents: Launching and client applications or web browsers is a hardware intensive (CPU, Memory, and Disk) task for your agent machines, without sufficient user thinking time in your scripts, you will increase the workload you are placing on your agent machines without applying any load to your application under test. This will end up in limiting the number of robots you can run on a single agent machine and potentially limit the overall number of robots you can run in a test or increase significantly the number of agent machines you need to drive a specific load profile.
+
+The easiest way to simulate this user behaviour would be to simply use the Robot Framework's built in sleep command:
 
 ```
 	Sleep	30
 ```
 
-The only issue with this is that it can make the script too regular and cause cadence issues, so just like with other performance testing tools we want to have a variable think time, to do this we can import randint from python's random library to pick a time to sleep between a minimum and maximum value, e.g. 15 and 45.
+The only issue with just using Sleep like this is that it can make the script too regular and cause cadence issues, so just like with other performance testing tools we want to have a variable think time, to do this we can import randint from python's random library to pick a time to sleep between a minimum and maximum value, e.g. 15 and 45.
 
 ```
 	${number}    Evaluate    random.randint(15, 45)    random
@@ -106,6 +113,37 @@ Metadata	File    uploads/*.*
 ```
 
 rfswarm ensures all the files referenced using `Resource`, `Variables` and `Metadata    File` in the Settings section of your robot file are transferred to the agent in the same relative path to your robot file.
+
+#### TestDataTable
+
+Often when testing applications there are business processes that produce system generated data or use system generated data from a previous business process. with regression testing it's quite simple to string the business process together in one really long test case and simply pass the value along as a variable.
+
+In performance testing it's not always that simple:
+- When you string the business process together the test case may run for many hours or even days, but you want your performance test to only run for a set period like a standard day.
+- You want to ensure you hit the transaction rates required for each individual process and the processes in that set will often have different rates that need to be achieved.
+- You don't want all the users doing the first step in the process at the start of the performance test and then 2 hours none are doing that process because they are all up to the 3rd or 5th process in the sequence.
+So you really need a way to pass these values from one test to another from one robot process to another and robot process and ideally from one robot process on one agent machine to another robot process running a different agent machine.
+
+So to help with this the [TestDataTable](https://github.com/damies13/TestDataTable) project was created. It is a data table server that makes it easy for data between scripts and robot processes.
+
+Here's an example of how you might use [TestDataTable](https://github.com/damies13/TestDataTable), your application under test is an online store (shopping cart) and you have the following three scripts that all use the order number created by the application when the user places an order:
+1) Create order, User navigates to the online store selects some products and places an order. after success user receives an order number.
+2) Check order status, this script simulates the user returning to the online store to check the status of their order.
+3) Process Order, this script simulates the store owner or staff member updating the order status from new to processed and adding the shipping tracking number and link.
+
+- Script 1, would save the order number (and the username details of the user that placed the order) into a TestDataTable column called "orders"
+- Script 3, would pick up order numbers from the "orders" column in the TestDataTable, and once the order has been processed place the order number to another column called "processed" in the TestDataTable.
+- Depending on your requirements script 2 could pick up order numbers from either or both columns, order numbers picked up from the "orders" column would be returned to the "orders" and order numbers picked up from the "processed" column would be returned to the "completed" column.
+
+By setting up your scripts to operate this way you can also run scripts 1 & 3 prior to the test to ensure there is some data already available so that when you run your test all the scripts have data to work with from the start of the test, likewise system generated data from your first test doesn't need to go wasted and can be used for the next test.
+
+TestDataTable's regression test cases provide 2 alternate ways you can use TestDataTable with your test cases:
+- [Using Robot Framework's RequestsLibrary, JsonValidator and Collections Libraries](https://github.com/damies13/TestDataTable/blob/master/Regression_Tests/TestDataTable-API_requests.robot)
+- [Using Robot Framework's REST Library](https://github.com/damies13/TestDataTable/blob/master/Regression_Tests/TestDataTable-API_REST.robot)
+
+Both methods demonstrate TestDataTable's functionality, and for more details you can refer to [TestDataTable's documentation](https://github.com/damies13/TestDataTable/blob/master/Doc/Index.md).
+
+Why is TestDataTable a seperate project? simply because I wanted TestDataTable to be able to be used by other test tools as well, for example there is nothing stopping you to use TestDataTable with your regression test suite to make your test cases shorter and enable them to run in parallel, likewise TestDataTable could be used by other performance test tools like JMeter.
 
 ### Browser
 
