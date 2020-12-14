@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version v0.6.0.1607938580-beta
+#    Version v0.6.0.1607955423-beta
 #
 
 
@@ -39,7 +39,7 @@ import inspect
 
 class RFSwarmAgent():
 
-	version="0.6.0.1607938580"
+	version="0.6.0.1607955423"
 	config = None
 	isconnected = False
 	isrunning = False
@@ -107,6 +107,8 @@ class RFSwarmAgent():
 			self.config.read(self.agentini)
 		else:
 			self.saveini()
+
+		self.debugmsg(0, "	Configuration File: ", self.agentini)
 
 		self.agentname = socket.gethostname()
 		if self.args.agentname:

@@ -24,7 +24,9 @@ if [[ "$currversion" =~ v[0-9]\. ]]; then
 	sed -i '' -e "s/#    Version .*/#    Version ${txtversion}/" */rfswarm*.py
 
 	# python3 setup*.py sdist bdist_wheel
+	rm -R build/
 	python3 setup-gui.py sdist bdist_wheel
+	rm -R build/
 	python3 setup-agent.py sdist bdist_wheel
 
 	python3 -m twine upload --repository testpypi dist/*${version}*

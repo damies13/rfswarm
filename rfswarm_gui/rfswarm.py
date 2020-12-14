@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version v0.6.0.1607938580-beta
+#    Version v0.6.0.1607955423-beta
 #
 
 # 	Helpful links
@@ -507,7 +507,7 @@ class AgentServer(BaseHTTPRequestHandler):
 
 
 class RFSwarmBase:
-	version="0.6.0.1607938580"
+	version="0.6.0.1607955423"
 	debuglvl = 0
 
 	config = None
@@ -1251,6 +1251,7 @@ class RFSwarmBase:
 
 
 
+# class rfswarm:
 class RFSwarmCore:
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -1299,11 +1300,14 @@ class RFSwarmCore:
 			base.save_ini = False
 			base.debugmsg(5, "base.args.ini: ", base.args.ini)
 			base.gui_ini = base.args.ini
+
 		if os.path.isfile(base.gui_ini):
 			base.debugmsg(9, "agentini: ", base.gui_ini)
 			base.config.read(base.gui_ini)
 		else:
 			base.saveini()
+
+		base.debugmsg(0, "	Configuration File: ", base.gui_ini)
 
 		base.debugmsg(5, "base.config: ", base.config._sections)
 		if base.args.scenario:
@@ -4271,7 +4275,9 @@ class RFSwarmGUI(tk.Frame):
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 base = RFSwarmBase()
+
 core = RFSwarmCore()
+# core = rfswarm()
 
 try:
 	core.mainloop()
