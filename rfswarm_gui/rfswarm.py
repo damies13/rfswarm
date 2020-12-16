@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version v0.6.0.1607955423-beta
+#    Version v0.6.1-beta
 #
 
 # 	Helpful links
