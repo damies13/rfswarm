@@ -28,7 +28,7 @@ if [[ "$currversion" =~ v[0-9]\. ]]; then
 	rm -R build/
 	python3 setup-agent.py sdist bdist_wheel
 
-	# python3 -m twine upload --repository testpypi dist/*${version}*
+	python3 -m twine upload dist/*${version}*
 
 fi
 
