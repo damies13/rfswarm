@@ -39,7 +39,7 @@ import inspect
 
 class RFSwarmAgent():
 
-	version="0.6.1"
+	version="0.6.1-beta"
 	config = None
 	isconnected = False
 	isrunning = False
