@@ -8,9 +8,11 @@ rfswarm_agent.py is the agent component that actually runs the Robot Framework t
 - [Command Line Interface](#Command-Line-Interface)
 - [Install and Setup](#Install-and-Setup)
 	- [Robot Framework](#1-Robot-Framework)
-	- [Install the prerequisites](#2-Install-the-prerequisites)
+	- [Install Using pip](#2-Install-Using-pip)
 	- [Run Agent 1st time](#3-Run-Agent-1st-time)
 	- [Run Agent](#4-Run-Agent)
+	- [Manually install the prerequisites](#5-Manually-install-the-prerequisites)
+	- [Manually Run Agent](#6-Manually-Run-Agent)
 - [INI File Settings](#INI-File-Settings)
 	- [Swarm Server](#Swarm-Server)
 	- [Agent Directory](#Agent-Directory)
@@ -28,11 +30,10 @@ These command line options allow you to override the ini file configuration but 
 Additionally the debug (-g) levels 1-3 will give extra information on the console useful for troubleshooting your environment. debug levels above 5 are more for debugging the code and get very noisy so are not recommended for normal use.
 
 ```
-$ python rfswarm_agent.py -h
+$ rfswarm-agent -h
 Robot Framework Swarm: Run Agent
-	Version v0.5.0-beta
-usage: rfswarm_agent.py [-h] [-g DEBUG] [-v] [-i INI] [-s SERVER]
-                        [-d AGENTDIR] [-r ROBOT] [-x]
+	Version 0.6.1
+usage: rfswarm-agent [-h] [-g DEBUG] [-v] [-i INI] [-s SERVER] [-d AGENTDIR] [-r ROBOT] [-x] [-a AGENTNAME]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -46,18 +47,18 @@ optional arguments:
                         The directory the agent should use for files
   -r ROBOT, --robot ROBOT
                         The robot framework executable
-  -x, --xmlmode         XML Mode, fall back to pasing the output.xml after
-                        each iteration
+  -x, --xmlmode         XML Mode, fall back to pasing the output.xml after each iteration
+  -a AGENTNAME, --agentname AGENTNAME
+                        Set agent name
 ```
 
 If you pass in an unsupported command line option, you will get this prompt:
 ```
-$ python rfswarm_agent.py -?
+$ rfswarm-agent -?
 Robot Framework Swarm: Run Agent
-	Version v0.5.0-beta
-usage: rfswarm_agent.py [-h] [-g DEBUG] [-v] [-i INI] [-s SERVER]
-                        [-d AGENTDIR] [-r ROBOT] [-x]
-rfswarm_agent.py: error: unrecognized arguments: -?
+	Version 0.6.1
+usage: rfswarm-agent [-h] [-g DEBUG] [-v] [-i INI] [-s SERVER] [-d AGENTDIR] [-r ROBOT] [-x] [-a AGENTNAME]
+rfswarm-agent: error: unrecognized arguments: -?
 ```
 
 ### Install and Setup
@@ -68,7 +69,52 @@ Firstly ensure Robot Framework is installed with the libraries needed for your a
 robot -t "test case" script.robot
 ```
 
-#### 2. Install the prerequisites
+#### 2. Install Using pip
+
+The Agent machine needs to use a minimum of Python 3.6
+> timespec feature of datetime's isoformat requires Python 3.6+
+
+```
+pip* install rfswarm-agent
+```
+\*some systems might need you to use pip3 and or sudo
+
+#### 3. Run Agent 1st time
+
+```
+rfswarm-agent
+```
+
+when you see output like this, type CTRL+c to stop the agent:
+```
+$ rfswarm-agent
+Robot Framework Swarm: Run Agent
+	Version 0.6.1
+	Configuration File:  /home/dave/.local/lib/python3.8/site-packages/rfswarm_agent/RFSwarmAgent.ini
+```
+
+Now edit RFSwarmAgent.ini and change http://localhost:8138/ to http://\<your rfswarm server\>:8138/
+
+#### 4. Run Agent
+
+Now you agent is setup and ready to use, so run it again and wait for it to try connecting to your rfswarm server.
+```
+rfswarm-agent
+```
+
+Note if your rfswarm server is already running you should see output like this and your agent should appear in the Agents tab in the GUI:
+```
+$ rfswarm-agent
+Robot Framework Swarm: Run Agent
+	Version 0.6.1
+	Configuration File:  /home/dave/.local/lib/python3.8/site-packages/rfswarm_agent/RFSwarmAgent.ini
+Server Conected http://DavesMBPSG:8138/ 2020-12-16 19:34:44 ( 1608111284 )
+```
+
+![Image](Images/Agents_ready_v0.3.png "Agents Ready")
+
+
+#### 5. Manually install the prerequisites
 
 The Agent machine needs to use a minimum of Python 3.6
 > timespec feature of datetime's isoformat requires Python 3.6+
@@ -79,28 +125,8 @@ pip* install configparser requests psutil
 ```
 \*some systems might need you to use pip3 and or sudo
 
-#### 3. Run Agent 1st time
 
-```
-python* rfswarm_agent.py
-```
-\*or python3 on some systems
-
-when you see output like this, type CTRL+c to stop the agent:
-```
-Robot Framework Swarm: Run Agent
-RFSwarmAgent: mainloop: Running 2019-11-03 00:08:10 ( 1572703690 )isrunning: False isconnected: False
-RFSwarmAgent: mainloop: Running 2019-11-03 00:08:20 ( 1572703700 )isrunning: False isconnected: False
-RFSwarmAgent: connectserver: Try connecting to http://localhost:8138/
-RFSwarmAgent: mainloop: Running 2019-11-03 00:08:30 ( 1572703710 )isrunning: False isconnected: False
-RFSwarmAgent: connectserver: Try connecting to http://localhost:8138/
-RFSwarmAgent: mainloop: Running 2019-11-03 00:08:40 ( 1572703720 )isrunning: False isconnected: False
-RFSwarmAgent: connectserver: Try connecting to http://localhost:8138/
-```
-
-Now edit RFSwarmAgent.ini and change http://localhost:8138/ to http://\<your rfswarm server\>:8138/
-
-#### 4. Run Agent
+#### 6. Manually Run Agent
 
 Now you agent is setup and ready to use, so run it again and wait for it to try connecting to your rfswarm server.
 ```
@@ -110,14 +136,14 @@ python rfswarm_agent.py
 Note if your rfswarm server is already running you should see output like this and your agent should appear in the Agents tab in the GUI:
 ```
 Robot Framework Swarm: Run Agent
-RFSwarmAgent: mainloop: Running 2019-11-03 00:17:10 ( 1572704230 )isrunning: False isconnected: False
-RFSwarmAgent: connectserver: Try connecting to http://DavesMBPSG.local:8138/
-RFSwarmAgent: mainloop: Running 2019-11-03 00:17:20 ( 1572704240 )isrunning: False isconnected: True
-RFSwarmAgent: mainloop: Running 2019-11-03 00:17:30 ( 1572704250 )isrunning: False isconnected: True
-RFSwarmAgent: mainloop: Running 2019-11-03 00:17:40 ( 1572704260 )isrunning: False isconnected: True
+	Version 0.6.1
+	Configuration File:  /path/to/RFSwarmAgent.ini
+Server Conected http://DavesMBPSG:8138/ 2020-12-16 19:34:44 ( 1608111284 )
 ```
 
 ![Image](Images/Agents_ready_v0.3.png "Agents Ready")
+
+
 
 ### INI File Settings
 

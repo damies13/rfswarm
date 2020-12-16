@@ -11,9 +11,11 @@ rfswarm.py is the GUI and central server component of rfswarm, this is where you
 	- [Agents](#Agents)
 - [Command Line Interface](#Command-Line-Interface)
 - [Install and Setup](#Install-and-Setup)
-	- [Install the prerequisites](#1-install-the-prerequisites)
+	- [Install](#1-install)
 	- [Adjust the Firewall](#2-Adjust-the-Firewall)
 	- [Run the GUI Server](#3-Run-the-GUI-Server)
+	- [Manual Install the prerequisites](#4-Manual-Install-the-prerequisites)
+	- [Manual Run the GUI Server](#5-Manual-Run-the-GUI-Server)
 - [Agent Assignment](#Agent-Assignment)
 - [Credits](#Credits)
 
@@ -105,11 +107,10 @@ These command line options allow you to override the ini file configuration but 
 Additionally the debug (-g) levels 1-3 will give extra information on the console useful for troubleshooting your environment. debug levels above 5 are more for debugging the code and get very noisy so are not recommended for normal use.
 
 ```
-$ python rfswarm.py -h
+$ rfswarm -h
 Robot Framework Swarm: GUI/Server
-	Version v0.5.0-beta
-usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
-                  [-n] [-d DIR] [-e IPADDRESS] [-p PORT]
+	Version 0.6.1
+usage: rfswarm [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS] [-n] [-d DIR] [-e IPADDRESS] [-p PORT]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -131,34 +132,34 @@ optional arguments:
 
 If you pass in an unsupported command line option, you will get this prompt:
 ```
-$ python rfswarm.py -?
+$ rfswarm -?
 Robot Framework Swarm: GUI/Server
-	Version v0.5.0-beta
-usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
-                  [-n] [-d DIR] [-e IPADDRESS] [-p PORT]
-rfswarm.py: error: unrecognized arguments: -?
+	Version 0.6.1
+usage: rfswarm [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS] [-n] [-d DIR] [-e IPADDRESS] [-p PORT]
+rfswarm: error: unrecognized arguments: -?
 ```
 
 ### Install and Setup
 
-#### 1. Install the prerequisites
-
+#### 1. Install
+##### 1.1 Prerequisites
 - The GUI/Server machine needs to use a minimum of Python 3.7
 > ThreadingHTTPServer feature of HTTPServer requires was added in Python 3.7
 
 - tkinter may need to be installed
-It may already installed on your system, if not consult the python documentation on how to install for your system.
+It may already installed on your system, if not consult the [python documentation](https://tkdocs.com/tutorial/install.html) on how to install for your system.
 
 On Debian based systems this will probably work
 ```
 apt install python3-tk
 ```
 
-Additionally the following pip command might be needed if these are not already installed on your system:
+##### 1.2 Install
+
+Once you have the prerequisites sorted, the installation is simply
 ```
-pip* install configparser setuptools hashlib HTTPServer pillow
+pip* install rfswarm-gui
 ```
-> setuptools (is required by hashlib and HTTPServer)
 
 \*some systems might need you to use pip3 and or sudo
 
@@ -179,9 +180,39 @@ Most firewalls on servers and workstations don't require specific rules for outb
 #### 3. Run the GUI Server
 
 ```
+rfswarm
+```
+
+#### 4. Manual Install the prerequisites
+
+- The GUI/Server machine needs to use a minimum of Python 3.7
+> ThreadingHTTPServer feature of HTTPServer requires was added in Python 3.7
+
+- tkinter may need to be installed
+It may already installed on your system, if not consult the python documentation on how to install for your system.
+
+On Debian based systems this will probably work
+```
+apt install python3-tk
+```
+
+Additionally the following pip command might be needed if these are not already installed on your system:
+```
+pip* install configparser setuptools hashlib HTTPServer pillow
+```
+> setuptools (is required by hashlib and HTTPServer)
+
+\*some systems might need you to use pip3 and or sudo
+
+#### 5. Manual Run the GUI Server
+
+Use this method if you did not install using pip
+
+```
 python* rfswarm.py
 ```
 \*or python3 on some systems
+
 
 ### Agent Assignment
 
