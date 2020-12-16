@@ -22,6 +22,7 @@ if [[ "$currversion" =~ v[0-9]\. ]]; then
 	#	Version Test
 	sed -i '' -e "s/#    Version .*/#    Version ${txtversion}/" */rfswarm*.py
 
+	rm -R dist/
 	# python3 setup*.py sdist bdist_wheel
 	rm -R build/
 	python3 setup-gui.py sdist bdist_wheel
