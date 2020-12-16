@@ -9,13 +9,15 @@ version=$(git rev-parse --abbrev-ref HEAD)
 # echo "version: $version"
 if [[ "$version" =~ v[0-9]\. ]]; then
 	# echo "version: $version"
-	sed -i '' -e "s/version = \"[^\"]*\"/version = \"${version}\"/" rfswarm*.py
+	# numver=$(echo $version | sed -E 's/v(.*)/\1/')
+	numver=$(echo $version | sed -E 's/v(.*)-.*/\1/')
+	sed -i '' -e "s/version *= *\"[^\"]*\"/version=\"${numver}\"/" $(find . -name "*.py")
 	#	Version Test
-	sed -i '' -e "s/#    Version .*/#    Version ${version}/" rfswarm*.py
+	sed -i '' -e "s/#    Version .*/#    Version ${version}/" $(find . -name "*.py")
 	# git commit -m "Update version to ${version}"
 	if ! git diff-index --quiet HEAD --; then
 		# echo "commit: Update version to $version"
-		git add rfswarm*.py
+		git add $(find . -name "*.py")
 	    git commit -m "Update version to ${version}"
 	fi
 # else
