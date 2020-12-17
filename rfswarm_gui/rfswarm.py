@@ -2112,17 +2112,17 @@ class RFSwarmCore:
 					pass
 
 
-			if base.args.run:
-				base.debugmsg(5, "base.args.run:", base.args.run, "	base.args.nogui:", base.args.nogui, "	run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots)
-				if base.run_end > 0 and base.run_end < int(time.time()) and base.total_robots < 1 and not base.posttest:
-					base.debugmsg(0, "Test Completed:	", int(time.time()), "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
-					base.debugmsg(5, "run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots)
-					base.posttest = True
-					if base.args.nogui:
-						base.debugmsg(9, "report_text")
-						base.report_text()
-						base.debugmsg(6, "on_closing")
-						self.on_closing()
+			# if base.args.run:
+			base.debugmsg(5, "base.args.run:", base.args.run, "	base.args.nogui:", base.args.nogui, "	run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots)
+			if base.run_end > 0 and base.run_end < int(time.time()) and base.total_robots < 1 and not base.posttest:
+				base.debugmsg(0, "Test Completed:	", int(time.time()), "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
+				base.debugmsg(5, "run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots)
+				base.posttest = True
+				if base.args.nogui:
+					base.debugmsg(9, "report_text")
+					base.report_text()
+					base.debugmsg(6, "on_closing")
+					self.on_closing()
 
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
