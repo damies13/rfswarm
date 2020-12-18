@@ -2612,6 +2612,9 @@ class RFSwarmGUI(tk.Frame):
 
 	def ClickPlay(self, _event=None):
 
+		self.display_run['start_time'].set("  --:--:--  ")
+		self.display_run['elapsed_time'].set("  --:--:--  ")
+		self.display_run['finish_time'].set("  --:--:--  ")
 		base.debugmsg(6, "Test Started:	", int(time.time()), "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
 
 		self.tabs.select(1)
@@ -3659,7 +3662,7 @@ class RFSwarmGUI(tk.Frame):
 		if "start_time" not in self.display_run:
 			self.display_run['start_time'] = tk.StringVar()
 			# self.display_run['start_time'].set("  {}  ".format(base.total_robots))
-			self.display_run['start_time'].set("    ")
+			self.display_run['start_time'].set("  --:--:--  ")
 		usr = ttk.Label(rgbar, text="  Start Time  ") #, borderwidth=2, relief="raised")
 		usr.grid(column=20, row=1, sticky="nsew")
 		usr = ttk.Label(rgbar, textvariable=self.display_run['start_time']) #, borderwidth=2, relief="groove")
@@ -3668,7 +3671,7 @@ class RFSwarmGUI(tk.Frame):
 		if "elapsed_time" not in self.display_run:
 			self.display_run['elapsed_time'] = tk.StringVar()
 			# self.display_run['elapsed_time'].set("  {}  ".format(base.total_robots))
-			self.display_run['elapsed_time'].set("    ")
+			self.display_run['elapsed_time'].set("  --:--:--  ")
 		usr = ttk.Label(rgbar, text="  Elapsed Time  ") #, borderwidth=2, relief="raised")
 		usr.grid(column=21, row=1, sticky="nsew")
 		usr = ttk.Label(rgbar, textvariable=self.display_run['elapsed_time']) #, borderwidth=2, relief="groove")
@@ -3681,6 +3684,14 @@ class RFSwarmGUI(tk.Frame):
 		usr.grid(column=26, row=1, sticky="nsew")
 		usr = ttk.Label(rgbar, textvariable=self.display_run['total_robots']) #, borderwidth=2, relief="groove")
 		usr.grid(column=26, row=2, sticky="nsew")
+
+		if "finish_time" not in self.display_run:
+			self.display_run['finish_time'] = tk.StringVar()
+			self.display_run['finish_time'].set("  --:--:--  ")
+		usr = ttk.Label(rgbar, text="  Finish Time  ") #, borderwidth=2, relief="raised")
+		usr.grid(column=29, row=1, sticky="nsew")
+		usr = ttk.Label(rgbar, textvariable=self.display_run['finish_time']) #, borderwidth=2, relief="groove")
+		usr.grid(column=29, row=2, sticky="nsew")
 
 
 		icontext = "Stop"
@@ -3864,6 +3875,14 @@ class RFSwarmGUI(tk.Frame):
 			self.display_run['start_time'].set("  {}  ".format(time.strftime("%H:%M:%S", stm)))
 			etm = time.gmtime(int(time.time()) - base.robot_schedule["Start"])
 			self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
+
+
+		if base.posttest and base.run_finish>0:
+			ftm = time.localtime(base.run_finish)
+			self.display_run['finish_time'].set("  {}  ".format(time.strftime("%H:%M:%S", ftm)))
+			etm = time.gmtime(base.run_finish - base.robot_schedule["Start"])
+			self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
+
 
 		time_elapsed = int(time.time()) - self.rungridupdate
 		if (time_elapsed>5):
