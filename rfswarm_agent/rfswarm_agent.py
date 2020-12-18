@@ -394,6 +394,7 @@ class RFSwarmAgent():
 		uri = self.swarmserver + "File"
 		payload = {
 			"AgentName": socket.gethostname(),
+			"Action": "Download",
 			"Hash": hash
 		}
 		try:
