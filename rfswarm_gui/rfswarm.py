@@ -342,6 +342,7 @@ class AgentServer(BaseHTTPRequestHandler):
 					jsonreq = json.loads(rawData)
 
 					requiredfields = ["AgentName", "Hash"]
+					# requiredfields = ["AgentName", "Action", "Hash"]
 					for field in requiredfields:
 						if field not in jsonreq:
 							httpcode = 422
@@ -351,25 +352,53 @@ class AgentServer(BaseHTTPRequestHandler):
 					if httpcode == 200:
 
 						jsonresp["AgentName"] = jsonreq["AgentName"]
-						if "Hash" in jsonreq and len(jsonreq["Hash"])>0:
-							hash = jsonreq["Hash"]
-							jsonresp["Hash"] = jsonreq["Hash"]
-							jsonresp["File"] = base.scriptfiles[hash]['relpath']
-							localpath = base.scriptfiles[hash]['localpath']
-							buf = "\n"
-							with open(localpath, 'rb') as afile:
-							    buf = afile.read()
-							base.debugmsg(9, "buf:", buf)
-							compressed = lzma.compress(buf)
-							base.debugmsg(9, "compressed:", compressed)
-							encoded = base64.b64encode(compressed)
-							base.debugmsg(9, "encoded:", encoded)
+						#	jsonresp["POST"]["File"]["Body"]["Action"] = "<Upload/Download/Status>"
+						if "Action" in jsonreq and len(jsonreq["Action"])>0 and jsonreq["Action"] in ["Upload","Download","Status"]:
+							if jsonreq["Action"] == "Download":
+								if "Hash" in jsonreq and len(jsonreq["Hash"])>0 and jsonreq["Hash"] in base.scriptfiles:
+									hash = jsonreq["Hash"]
+									jsonresp["Hash"] = jsonreq["Hash"]
+									jsonresp["File"] = base.scriptfiles[hash]['relpath']
+									localpath = base.scriptfiles[hash]['localpath']
+									buf = "\n"
+									with open(localpath, 'rb') as afile:
+									    buf = afile.read()
+									base.debugmsg(9, "buf:", buf)
+									compressed = lzma.compress(buf)
+									base.debugmsg(9, "compressed:", compressed)
+									encoded = base64.b64encode(compressed)
+									base.debugmsg(9, "encoded:", encoded)
 
-							jsonresp["FileData"] = encoded.decode('ASCII')
+									jsonresp["FileData"] = encoded.decode('ASCII')
+
+								else:
+									httpcode = 404
+									jsonresp["Message"] = "Known File Hash required to download a file"
+
+							if jsonreq["Action"] == "Status":
+								if "Hash" in jsonreq and len(jsonreq["Hash"])>0:
+									jsonresp["Hash"] = jsonreq["Hash"]
+									if jsonreq["Hash"] in base.scriptfiles:
+										jsonresp["Exists"] = "True"
+									else:
+										jsonresp["Exists"] = "False"
+								else:
+									httpcode = 404
+									jsonresp["Message"] = "File Hash required to check file status"
+
+							if jsonreq["Action"] == "Upload":
+								#
+								# 	TODO: Upload file
+								# 
+								pass
+
+
+
 
 						else:
 							httpcode = 404
-							jsonresp["Message"] = "Known File Hash required to download a file"
+							jsonresp["Message"] = "Unknown Action"
+
 
 				if (parsed_path.path == "/Jobs"):
 					jsonreq = json.loads(rawData)
@@ -466,6 +495,7 @@ class AgentServer(BaseHTTPRequestHandler):
 				jsonresp["POST"]["File"]["URI"] = "/File"
 				jsonresp["POST"]["File"]["Body"] = {}
 				jsonresp["POST"]["File"]["Body"]["AgentName"] = "<Agent Host Name>"
+				jsonresp["POST"]["File"]["Body"]["Action"] = "<Upload/Download/Status>"
 				jsonresp["POST"]["File"]["Body"]["Hash"] = "<File Hash, provided by /Scripts>"
 
 				jsonresp["POST"]["Result"] = {}
