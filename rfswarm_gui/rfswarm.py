@@ -398,12 +398,13 @@ class AgentServer(BaseHTTPRequestHandler):
 				# , "Result"
 				if (parsed_path.path == "/Result"):
 					jsonreq = json.loads(rawData)
-					base.debugmsg(5, "Result: jsonreq:", jsonreq)
+					base.debugmsg(6, "Result: jsonreq:", jsonreq)
 					requiredfields = ["AgentName", "ResultName", "Result", "ElapsedTime", "StartTime", "EndTime", "ScriptIndex", "VUser", "Iteration", "Sequence"]
 					for field in requiredfields:
 						if field not in jsonreq:
 							httpcode = 422
 							message = "Missing required field: '{}', required fields are: {}".format(field, requiredfields)
+							base.debugmsg(5, httpcode, ":", message)
 							break
 
 					if httpcode == 200:
@@ -529,6 +530,7 @@ class RFSwarmBase:
 	run_name_current = ""
 	run_start = 0
 	run_end = 0
+	run_finish = 0
 	run_paused = False
 	run_threads = {}
 	total_robots = 0
@@ -950,7 +952,7 @@ class RFSwarmBase:
 	def check_files_changed(self):
 		# self.scriptfiles[hash]
 		checkhashes = list(self.scriptfiles.keys())
-		base.debugmsg(3, "checkhashes:", checkhashes)
+		base.debugmsg(6, "checkhashes:", checkhashes)
 		for chkhash in checkhashes:
 			file_data = self.scriptfiles[chkhash]
 			script_hash = base.hash_file(file_data['localpath'], file_data['relpath'])
@@ -1120,9 +1122,9 @@ class RFSwarmBase:
 		base.debugmsg(6, "report_text")
 		colno = 0
 		base.debugmsg(6, "RunStats")
+		base.debugmsg(6, "UpdateRunStats_SQL")
+		base.UpdateRunStats_SQL()
 		if "RunStats" not in base.dbqueue["ReadResult"]:
-			base.debugmsg(6, "UpdateRunStats_SQL")
-			base.UpdateRunStats_SQL()
 			base.debugmsg(6, "Wait for RunStats")
 			while "RunStats" not in base.dbqueue["ReadResult"]:
 				time.sleep(0.1)
@@ -1158,7 +1160,7 @@ class RFSwarmBase:
 			txtreport = os.path.join(base.datapath, "{}_summary.csv".format(fileprefix))
 			base.debugmsg(7, "txtreport:", txtreport)
 			base.debugmsg(1, "Summary File:", txtreport)
-			base.debugmsg(9, "RunStats:", base.dbqueue["ReadResult"]["RunStats"])
+			base.debugmsg(6, "RunStats:", base.dbqueue["ReadResult"]["RunStats"])
 			cols = []
 			for col in base.dbqueue["ReadResult"]["RunStats"][0].keys():
 				base.debugmsg(9, "colno:", colno, "col:", col)
@@ -1627,6 +1629,7 @@ class RFSwarmCore:
 		base.debugmsg(9, "register_result")
 		resdata = (index, vuser, iter, AgentName, sequence, result_name, result, elapsed_time, start_time, end_time)
 		base.debugmsg(9, "register_result: resdata:", resdata)
+		base.debugmsg(5, resdata)
 		base.dbqueue["Results"].append(resdata)
 		base.debugmsg(9, "register_result: dbqueue Results:", base.dbqueue["Results"])
 
@@ -1772,6 +1775,8 @@ class RFSwarmCore:
 
 		base.run_start = 0
 		base.run_end = 0
+		base.run_finish = 0
+		base.posttest = False
 		base.run_paused = False
 		base.robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}}
 		t = threading.Thread(target=core.run_start_threads)
@@ -2070,11 +2075,11 @@ class RFSwarmCore:
 		displayagent = True
 		time_elapsed = int(time.time()) - base.agenttgridupdate
 		if (time_elapsed>=5):
-			base.debugmsg(5, "time_elapsed:", time_elapsed)
+			base.debugmsg(6, "time_elapsed:", time_elapsed)
 
 			base.agenttgridupdate = int(time.time())
 			agntlst = list(base.Agents.keys())
-			base.debugmsg(5, "agntlst:", agntlst)
+			base.debugmsg(6, "agntlst:", agntlst)
 			for agnt in agntlst:
 				displayagent = True
 				tm = base.Agents[agnt]["LastSeen"]
@@ -2112,18 +2117,28 @@ class RFSwarmCore:
 					pass
 
 
+
 			# if base.args.run:
-			base.debugmsg(5, "base.args.run:", base.args.run, "	base.args.nogui:", base.args.nogui, "	run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots)
-			if base.run_end > 0 and base.run_end < int(time.time()) and base.total_robots < 1 and not base.posttest:
-				base.debugmsg(0, "Test Completed:	", int(time.time()), "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
+			base.debugmsg(5, "base.args.run:", base.args.run, "	base.args.nogui:", base.args.nogui, "	run_end:", base.run_end, "	time:", int(time.time()))
+			base.debugmsg(5, "base.posttest:", base.posttest, "	total_robots:", base.total_robots)
+			base.debugmsg(5, "run_finish:", base.run_finish, "	time:", int(time.time()))
+			if base.run_end > 0 and base.run_end < int(time.time()) and base.total_robots < 1 and not base.posttest and base.run_finish < 1:
+				base.run_finish = int(time.time())
 				base.debugmsg(5, "run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots)
+				if not base.args.nogui:
+					base.gui.delayed_UpdateRunStats()
+
+			if base.run_finish > 0 and base.run_finish + 60 < int(time.time()) and not base.posttest:
+			# if base.run_finish > 0 and base.run_end + 5 < base.run_finish and not base.posttest:
+				base.debugmsg(0, "Test Completed:	", base.run_finish, "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
 				base.posttest = True
 				if base.args.nogui:
 					base.debugmsg(9, "report_text")
 					base.report_text()
 					base.debugmsg(6, "on_closing")
 					self.on_closing()
-
+				else:
+					base.gui.delayed_UpdateRunStats()
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -4046,7 +4061,7 @@ class RFSwarmGUI(tk.Frame):
 		removeagents = []
 		robot_count = 0
 		displayagent = True
-		base.debugmsg(5, "")
+		base.debugmsg(6, "")
 
 		base.agenttgridupdate = int(time.time())
 		agntlst = list(base.Agents.keys())
