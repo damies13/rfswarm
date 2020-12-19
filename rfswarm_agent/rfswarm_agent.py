@@ -166,7 +166,6 @@ class RFSwarmAgent():
 			self.create_listner_file()
 
 
-
 	def debugmsg(self, lvl, *msg):
 		msglst = []
 		prefix = ""
@@ -177,7 +176,8 @@ class RFSwarmAgent():
 					stack = inspect.stack()
 					the_class = stack[1][0].f_locals["self"].__class__.__name__
 					the_method = stack[1][0].f_code.co_name
-					prefix = "{}: {}: [{}:{}]	".format(str(the_class), the_method, self.debuglvl, lvl)
+					the_line = stack[1][0].f_lineno
+					prefix = "{}: {}({}): [{}:{}]	".format(str(the_class), the_method, the_line, self.debuglvl, lvl)
 					if len(prefix.strip())<32:
 						prefix = "{}	".format(prefix)
 					if len(prefix.strip())<24:
@@ -728,12 +728,12 @@ class RFSwarmAgent():
 
 
 	def file_upload(self, fileobj):
-		self.debugmsg(5, "fileobj", fileobj)
+		self.debugmsg(7, "fileobj", fileobj)
 
 		# Hash file
 
 		hash = self.hash_file(fileobj['LocalFilePath'], fileobj['RelFilePath'])
-		self.debugmsg(5, "hash", hash)
+		self.debugmsg(7, "hash", hash)
 
 
 		# 	check file exists on server?
@@ -744,10 +744,10 @@ class RFSwarmAgent():
 			"Action": "Status",
 			"Hash": hash
 		}
-		self.debugmsg(5, "payload: ", payload)
+		self.debugmsg(9, "payload: ", payload)
 		try:
 			r = requests.post(uri, json=payload)
-			self.debugmsg(5, "resp: ", r.status_code, r.text)
+			self.debugmsg(7, "resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.isconnected = False
 
@@ -763,14 +763,14 @@ class RFSwarmAgent():
 		try:
 			# self.scriptlist
 			jsonresp = json.loads(r.text)
-			self.debugmsg(5, "jsonresp:", jsonresp)
+			self.debugmsg(7, "jsonresp:", jsonresp)
 		except Exception as e:
 			self.debugmsg(1, "Exception:", e)
 			return None
 
 		# 	If file not exists upload the file
 		if jsonresp["Exists"] == "False":
-			self.debugmsg(5, "file not there, so lets upload")
+			self.debugmsg(6, "file not there, so lets upload")
 
 			payload = {
 				"AgentName": socket.gethostname(),
@@ -791,11 +791,11 @@ class RFSwarmAgent():
 
 			payload["FileData"] = encoded.decode('ASCII')
 
-			self.debugmsg(5, "payload: ", payload)
+			self.debugmsg(8, "payload: ", payload)
 
 			try:
 				r = requests.post(uri, json=payload)
-				self.debugmsg(5, "resp: ", r.status_code, r.text)
+				self.debugmsg(7, "resp: ", r.status_code, r.text)
 				if (r.status_code != requests.codes.ok):
 					self.isconnected = False
 
@@ -811,7 +811,7 @@ class RFSwarmAgent():
 			try:
 				# self.scriptlist
 				jsonresp = json.loads(r.text)
-				self.debugmsg(5, "jsonresp:", jsonresp)
+				self.debugmsg(7, "jsonresp:", jsonresp)
 			except Exception as e:
 				self.debugmsg(1, "Exception:", e)
 				return None
@@ -841,9 +841,9 @@ class RFSwarmAgent():
 		# self.process_file_upload_queue
 		for fobj in self.upload_queue:
 			# probably need to make this multi-treaded
-			self.file_upload(fobj)
-			# t = threading.Thread(target=self.file_upload, args=(fobj))
-			# t.start()
+			# self.file_upload(fobj)
+			t = threading.Thread(target=self.file_upload, args=(fobj,))
+			t.start()
 
 
 	def run_process_output(self, outputFile, index, vuser, iter):
@@ -944,15 +944,22 @@ class RFSwarmAgent():
 		    self.config.write(configfile)
 
 	def ensuredir(self, dir):
+		if os.path.exists(dir):
+			return True
 		try:
+			patharr = os.path.split(dir)
+			self.debugmsg(6, "patharr: ", patharr)
+			self.ensuredir(patharr[0])
 			os.mkdir(dir, mode=0o777)
-			self.debugmsg(6, "Directory Created: ", dir)
+			self.debugmsg(5, "Directory Created: ", dir)
+			return True
 		except FileExistsError:
-			self.debugmsg(6, "Directory Exists: ", dir)
-			pass
+			self.debugmsg(5, "Directory Exists: ", dir)
+			return False
 		except Exception as e:
 			self.debugmsg(1, "Directory Create failed: ", dir)
 			self.debugmsg(1, "with error: ", e)
+			return False
 
 	def create_listner_file(self):
 		self.listenerfile = os.path.join(self.scriptdir, "RFSListener2.py")
