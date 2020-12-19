@@ -13,6 +13,7 @@ import os
 import tempfile
 import configparser
 
+import hashlib
 import lzma
 import base64
 
@@ -57,6 +58,7 @@ class RFSwarmAgent():
 	mainloopinterval = 10
 	scriptlist = {}
 	jobs = {}
+	upload_queue = []
 	robotcount = 0
 	status = "Ready"
 	excludelibraries = []
@@ -164,7 +166,6 @@ class RFSwarmAgent():
 			self.create_listner_file()
 
 
-
 	def debugmsg(self, lvl, *msg):
 		msglst = []
 		prefix = ""
@@ -175,7 +176,8 @@ class RFSwarmAgent():
 					stack = inspect.stack()
 					the_class = stack[1][0].f_locals["self"].__class__.__name__
 					the_method = stack[1][0].f_code.co_name
-					prefix = "{}: {}: [{}:{}]	".format(str(the_class), the_method, self.debuglvl, lvl)
+					the_line = stack[1][0].f_lineno
+					prefix = "{}: {}({}): [{}:{}]	".format(str(the_class), the_method, the_line, self.debuglvl, lvl)
 					if len(prefix.strip())<32:
 						prefix = "{}	".format(prefix)
 					if len(prefix.strip())<24:
@@ -231,6 +233,10 @@ class RFSwarmAgent():
 					self.mainloopinterval = 10
 					t2 = threading.Thread(target=self.getscripts)
 					t2.start()
+
+					t3 = threading.Thread(target=self.process_file_upload_queue)
+					t3.start()
+
 
 			if prev_status == "Stopping" and self.status == "Ready":
 				# neet to reset something
@@ -394,6 +400,7 @@ class RFSwarmAgent():
 		uri = self.swarmserver + "File"
 		payload = {
 			"AgentName": socket.gethostname(),
+			"Action": "Download",
 			"Hash": hash
 		}
 		try:
@@ -576,7 +583,7 @@ class RFSwarmAgent():
 		except:
 			pass
 
-		threaddirname = self.make_safe_filename("{}_{}_{}".format(farr[0], jobid, now))
+		threaddirname = self.make_safe_filename("{}_{}_{}_{}".format(farr[0], jobid, self.jobs[jobid]["Iteration"], now))
 		odir = os.path.join(self.logdir, self.run_name, threaddirname)
 		self.debugmsg(6, "runthread: odir:", odir)
 		try:
@@ -637,6 +644,7 @@ class RFSwarmAgent():
 		if robotexe is not None:
 			self.robotcount += 1
 
+			result = 0
 			try:
 				# result = subprocess.call(" ".join(cmd), shell=True)
 				# https://stackoverflow.com/questions/4856583/how-do-i-pipe-a-subprocess-call-to-a-text-file
@@ -645,11 +653,12 @@ class RFSwarmAgent():
 					# result = subprocess.call(" ".join(cmd), shell=True, stdout=f, stderr=f)
 					try:
 						result = subprocess.call(" ".join(cmd), shell=True, stdout=f, stderr=subprocess.STDOUT)
-						self.debugmsg(6, "runthread: result:", result)
+						self.debugmsg(5, "runthread: result:", result)
 						if result != 0:
 							self.debugmsg(1, "Robot returned an error (", result, ") please check the log file:", logFileName)
 					except Exception as e:
 							self.debugmsg(1, "Robot returned an error:", e, " \nplease check the log file:", logFileName)
+							result = 1
 					f.close()
 
 				if self.xmlmode:
@@ -659,12 +668,183 @@ class RFSwarmAgent():
 							t.start()
 					else:
 						self.debugmsg(1, "Robot didn't create (", outputFile, ") please check the log file:", logFileName)
+
 			except Exception as e:
-				self.debugmsg(7, "Robot returned an error:", e)
+				self.debugmsg(5, "Robot returned an error:", e)
+				result = 1
+
+			# Uplad any files found
+
+			self.queue_file_upload(result, odir)
 
 			self.robotcount += -1
 		else:
 			self.debugmsg(1, "Could not find robot executeable:", robotexe)
+
+
+	def queue_file_upload(self, retcode, filedir):
+		reldir = os.path.basename(filedir)
+		self.debugmsg(5, retcode, reldir, filedir)
+
+		filelst = self.file_upload_list(filedir)
+		self.debugmsg(5, "filelst", filelst)
+		# filelst
+		# [
+		# 	'/var/folders/7l/k7w46dm91y3gscxlswd_jm2r0000gn/T/rfswarmagent/logs/20201219_113254_11u_test_quick/OC_Demo_2_1_5_1608341588_1_1608341594/Browse_Store_Product_1.log',
+		# 	'/var/folders/7l/k7w46dm91y3gscxlswd_jm2r0000gn/T/rfswarmagent/logs/20201219_113254_11u_test_quick/OC_Demo_2_1_5_1608341588_1_1608341594/log.html',
+		# 	'/var/folders/7l/k7w46dm91y3gscxlswd_jm2r0000gn/T/rfswarmagent/logs/20201219_113254_11u_test_quick/OC_Demo_2_1_5_1608341588_1_1608341594/report.html',
+		# 	'/var/folders/7l/k7w46dm91y3gscxlswd_jm2r0000gn/T/rfswarmagent/logs/20201219_113254_11u_test_quick/OC_Demo_2_1_5_1608341588_1_1608341594/Browse_Store_Product_1_output.xml'
+		# ]
+		#
+
+		rundir = os.path.join(self.logdir, self.run_name)
+
+		for file in filelst:
+			fobj = {}
+			fobj["LocalFilePath"] = file
+			fobj["RelFilePath"] = os.path.relpath(file, start=rundir)
+			self.upload_queue.append(fobj)
+			self.debugmsg(7, "added to upload_queue", fobj)
+			if retcode > 0:
+				# upload now
+				self.file_upload(fobj)
+
+
+
+	def file_upload_list(self, filedir):
+		retlst = []
+		dirlst = os.listdir(path=filedir)
+		self.debugmsg(7, "dirlst", dirlst)
+		for item in dirlst:
+			fullpath = os.path.join(filedir, item)
+			if os.path.isfile(fullpath):
+				retlst.append(fullpath)
+			else:
+				files = self.file_upload_list(fullpath)
+				for file in files:
+					retlst.append(file)
+		return retlst
+
+
+
+	def file_upload(self, fileobj):
+		self.debugmsg(7, "fileobj", fileobj)
+
+		# Hash file
+
+		hash = self.hash_file(fileobj['LocalFilePath'], fileobj['RelFilePath'])
+		self.debugmsg(7, "hash", hash)
+
+
+		# 	check file exists on server?
+
+		uri = self.swarmserver + "File"
+		payload = {
+			"AgentName": socket.gethostname(),
+			"Action": "Status",
+			"Hash": hash
+		}
+		self.debugmsg(9, "payload: ", payload)
+		try:
+			r = requests.post(uri, json=payload)
+			self.debugmsg(7, "resp: ", r.status_code, r.text)
+			if (r.status_code != requests.codes.ok):
+				self.isconnected = False
+
+		except Exception as e:
+			self.debugmsg(8, "Exception:", e)
+			self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.isconnected = False
+
+		if not self.isconnected:
+			return None
+
+		jsonresp = {}
+		try:
+			# self.scriptlist
+			jsonresp = json.loads(r.text)
+			self.debugmsg(7, "jsonresp:", jsonresp)
+		except Exception as e:
+			self.debugmsg(1, "Exception:", e)
+			return None
+
+		# 	If file not exists upload the file
+		if jsonresp["Exists"] == "False":
+			self.debugmsg(6, "file not there, so lets upload")
+
+			payload = {
+				"AgentName": socket.gethostname(),
+				"Action": "Upload",
+				"Hash": hash,
+				"File": fileobj['RelFilePath']
+			}
+
+			localpath = fileobj['LocalFilePath']
+			buf = "\n"
+			with open(localpath, 'rb') as afile:
+			    buf = afile.read()
+			self.debugmsg(9, "buf:", buf)
+			compressed = lzma.compress(buf)
+			self.debugmsg(9, "compressed:", compressed)
+			encoded = base64.b64encode(compressed)
+			self.debugmsg(9, "encoded:", encoded)
+
+			payload["FileData"] = encoded.decode('ASCII')
+
+			self.debugmsg(8, "payload: ", payload)
+
+			try:
+				r = requests.post(uri, json=payload)
+				self.debugmsg(7, "resp: ", r.status_code, r.text)
+				if (r.status_code != requests.codes.ok):
+					self.isconnected = False
+
+			except Exception as e:
+				self.debugmsg(8, "Exception:", e)
+				self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+				self.isconnected = False
+
+			if not self.isconnected:
+				return None
+
+			jsonresp = {}
+			try:
+				# self.scriptlist
+				jsonresp = json.loads(r.text)
+				self.debugmsg(7, "jsonresp:", jsonresp)
+			except Exception as e:
+				self.debugmsg(1, "Exception:", e)
+				return None
+
+
+
+		# once sucessful remove from queue
+		self.upload_queue.remove(fileobj)
+
+
+	def hash_file(self, file, relpath):
+		BLOCKSIZE = 65536
+		hasher = hashlib.md5()
+		hasher.update(str(os.path.getmtime(file)).encode('utf-8'))
+		hasher.update(relpath.encode('utf-8'))
+		with open(file, 'rb') as afile:
+			buf = afile.read(BLOCKSIZE)
+			while len(buf) > 0:
+				hasher.update(buf)
+				buf = afile.read(BLOCKSIZE)
+		self.debugmsg(3, "file:", file, "	hash:", hasher.hexdigest())
+		return hasher.hexdigest()
+
+
+	def process_file_upload_queue(self):
+		self.debugmsg(5, "upload_queue", self.upload_queue)
+		# self.process_file_upload_queue
+		for fobj in self.upload_queue:
+			# probably need to make this multi-treaded
+			# self.file_upload(fobj)
+			t = threading.Thread(target=self.file_upload, args=(fobj,))
+			t.start()
+
 
 	def run_process_output(self, outputFile, index, vuser, iter):
 		# This should be a better way to do this
@@ -764,15 +944,22 @@ class RFSwarmAgent():
 		    self.config.write(configfile)
 
 	def ensuredir(self, dir):
+		if os.path.exists(dir):
+			return True
 		try:
+			patharr = os.path.split(dir)
+			self.debugmsg(6, "patharr: ", patharr)
+			self.ensuredir(patharr[0])
 			os.mkdir(dir, mode=0o777)
-			self.debugmsg(6, "Directory Created: ", dir)
+			self.debugmsg(5, "Directory Created: ", dir)
+			return True
 		except FileExistsError:
-			self.debugmsg(6, "Directory Exists: ", dir)
-			pass
+			self.debugmsg(5, "Directory Exists: ", dir)
+			return False
 		except Exception as e:
 			self.debugmsg(1, "Directory Create failed: ", dir)
 			self.debugmsg(1, "with error: ", e)
+			return False
 
 	def create_listner_file(self):
 		self.listenerfile = os.path.join(self.scriptdir, "RFSListener2.py")

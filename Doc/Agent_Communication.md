@@ -50,6 +50,7 @@ Response Body:
             "URI": "/File",
             "Body": {
                 "AgentName": "<Agent Host Name>",
+				"Action": "<Upload/Download/Status>",
                 "Hash": "<File Hash, provided by /Scripts>"
             }
         },
@@ -166,11 +167,28 @@ Response Body:
 ### POST /File
 HTTP POST http://guiserver:8138/File
 
-Request Body:
+Request Bodies:
 ```
 {
     "AgentName": "myagent",
+    "Action": "Download",
     "Hash": "33d193a7d30904afec4307dee7df89fa"
+}
+
+{
+    "AgentName": "myagent",
+    "Action": "Status",
+    "Hash": "33d193a7d30904afec4307dee7df89fa"
+}
+
+{
+    "AgentName": "myagent",
+    "Action": "Upload",
+    "Hash": "33d193a7d30904afec4307dee7df89fa"
+    "File": "resources/perftest.resource",
+    "FileData": <This field will contain a string that is a base64 encoded
+                lzma (7zip) compressed version of the file. The agent will
+                lzma compress, base64 encode the string>
 }
 ```
 
@@ -184,6 +202,18 @@ Response Body:
                 lzma (7zip) compressed version of the file. The agent will base64
                 decode the string, lzma decompress, then save to a file using the
                 relative file path above relative to the agents temp directory>
+}
+
+{
+    "AgentName": "myagent",
+    "Hash": "33d193a7d30904afec4307dee7df89fa",
+    "Exists": "<True/False>"
+}
+
+{
+    "AgentName": "myagent",
+    "Hash": "33d193a7d30904afec4307dee7df89fa",
+    "Result": "Saved"
 }
 ```
 

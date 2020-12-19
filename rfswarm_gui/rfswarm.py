@@ -342,6 +342,7 @@ class AgentServer(BaseHTTPRequestHandler):
 					jsonreq = json.loads(rawData)
 
 					requiredfields = ["AgentName", "Hash"]
+					# requiredfields = ["AgentName", "Action", "Hash"]
 					for field in requiredfields:
 						if field not in jsonreq:
 							httpcode = 422
@@ -351,25 +352,77 @@ class AgentServer(BaseHTTPRequestHandler):
 					if httpcode == 200:
 
 						jsonresp["AgentName"] = jsonreq["AgentName"]
-						if "Hash" in jsonreq and len(jsonreq["Hash"])>0:
-							hash = jsonreq["Hash"]
-							jsonresp["Hash"] = jsonreq["Hash"]
-							jsonresp["File"] = base.scriptfiles[hash]['relpath']
-							localpath = base.scriptfiles[hash]['localpath']
-							buf = "\n"
-							with open(localpath, 'rb') as afile:
-							    buf = afile.read()
-							base.debugmsg(9, "buf:", buf)
-							compressed = lzma.compress(buf)
-							base.debugmsg(9, "compressed:", compressed)
-							encoded = base64.b64encode(compressed)
-							base.debugmsg(9, "encoded:", encoded)
+						#	jsonresp["POST"]["File"]["Body"]["Action"] = "<Upload/Download/Status>"
+						if "Action" in jsonreq and len(jsonreq["Action"])>0 and jsonreq["Action"] in ["Upload","Download","Status"]:
+							if jsonreq["Action"] == "Download":
+								if "Hash" in jsonreq and len(jsonreq["Hash"])>0 and jsonreq["Hash"] in base.scriptfiles:
+									hash = jsonreq["Hash"]
+									jsonresp["Hash"] = jsonreq["Hash"]
+									jsonresp["File"] = base.scriptfiles[hash]['relpath']
+									localpath = base.scriptfiles[hash]['localpath']
+									buf = "\n"
+									with open(localpath, 'rb') as afile:
+									    buf = afile.read()
+									base.debugmsg(9, "buf:", buf)
+									compressed = lzma.compress(buf)
+									base.debugmsg(9, "compressed:", compressed)
+									encoded = base64.b64encode(compressed)
+									base.debugmsg(9, "encoded:", encoded)
 
-							jsonresp["FileData"] = encoded.decode('ASCII')
+									jsonresp["FileData"] = encoded.decode('ASCII')
+
+								else:
+									httpcode = 404
+									jsonresp["Message"] = "Known File Hash required to download a file"
+
+							if jsonreq["Action"] == "Status":
+								if "Hash" in jsonreq and len(jsonreq["Hash"])>0:
+									jsonresp["Hash"] = jsonreq["Hash"]
+									if jsonreq["Hash"] in base.scriptfiles or jsonreq["Hash"] in base.uploadfiles:
+										jsonresp["Exists"] = "True"
+									else:
+										jsonresp["Exists"] = "False"
+								else:
+									httpcode = 404
+									jsonresp["Message"] = "File Hash required to check file status"
+
+							if jsonreq["Action"] == "Upload":
+								#
+								# 	TODO: Receive Upload file
+								#
+								if "Hash" in jsonreq and len(jsonreq["Hash"])>0:
+									jsonresp["Hash"] = jsonreq["Hash"]
+									if jsonreq["Hash"] in base.uploadfiles:
+										jsonresp["Result"] = "Exists"
+									else:
+										# base.debugmsg(5, "jsonreq:", jsonreq)
+										# jsonreq: {
+										# 		'AgentName': 'DavesMBP',
+										# 		'Action': 'Upload',
+										# 		'Hash': 'e7b73742ee1c3d558c4d20adf639d8d8',
+										# 		'File': 'OC_Demo_2_1_3_1608352678_1_1608352681/Browse_Store_Product_1.log',
+										# 		'FileData': <filedata>
+										# 	}
+										logdir = os.path.join(base.datapath, "logs")
+										if os.path.exists(logdir) and os.path.isfile(logdir):
+											logdir = os.path.join(base.datapath, "logs"+str(int(time.time())))
+
+										base.debugmsg(7, "logdir:", logdir)
+										localpath = os.path.join(logdir, jsonreq['File'])
+										base.debugmsg(7, "localpath:", localpath)
+										jsonreq['LocalFile'] = localpath
+										base.uploadfiles[jsonreq["Hash"]] = jsonreq
+
+										t = threading.Thread(target=base.save_upload_file, args=(jsonreq["Hash"],))
+										t.start()
+
+										jsonresp["Result"] = "Saved"
+
 
 						else:
 							httpcode = 404
-							jsonresp["Message"] = "Known File Hash required to download a file"
+							jsonresp["Message"] = "Unknown Action"
+
 
 				if (parsed_path.path == "/Jobs"):
 					jsonreq = json.loads(rawData)
@@ -466,6 +519,7 @@ class AgentServer(BaseHTTPRequestHandler):
 				jsonresp["POST"]["File"]["URI"] = "/File"
 				jsonresp["POST"]["File"]["Body"] = {}
 				jsonresp["POST"]["File"]["Body"]["AgentName"] = "<Agent Host Name>"
+				jsonresp["POST"]["File"]["Body"]["Action"] = "<Upload/Download/Status>"
 				jsonresp["POST"]["File"]["Body"]["Hash"] = "<File Hash, provided by /Scripts>"
 
 				jsonresp["POST"]["Result"] = {}
@@ -519,6 +573,8 @@ class RFSwarmBase:
 	scriptcount = 0
 	scriptlist = [{}]
 	scriptfiles = {}
+
+	uploadfiles = {}
 
 	index = ""
 	file = ""
@@ -993,6 +1049,70 @@ class RFSwarmBase:
 		# https://www.geeksforgeeks.org/python-os-path-relpath-method/
 		base.debugmsg(5, "relpath:", relpath)
 		return relpath
+
+	def save_upload_file(self, hash):
+		base.debugmsg(7, "hash:", hash)
+		# base.uploadfiles[jsonreq["Hash"]] = jsonreq
+		base.debugmsg(7, "uploadfile:", self.uploadfiles[hash])
+
+		# uploadfile: {
+		# 	'AgentName': 'DavesMBP',
+		# 	'Action': 'Upload',
+		# 	'Hash': 'e60dd517d3b36ccd4aaa27286cbbaa7b',
+		# 	'File': 'OC_Demo_2_1_1_1608356330_1_1608356333/Browse_Store_Product_1_output.xml',
+		# 	'FileData': 		,
+		# 	'LocalFile': '/Users/dave/Documents/GitHub/rfswarm/results/20201219_153823_3u_test_quick/logs/OC_Demo_2_1_1_1608356330_1_1608356333/Browse_Store_Product_1_output.xml'
+		# }
+		try:
+			localfile = self.uploadfiles[hash]['LocalFile']
+			# self.uploadfiles[hash]['File'] = jsonresp['File']
+			base.debugmsg(5, "file:", localfile, "hash:", hash)
+
+			# self.scriptlist[hash][]
+
+			filedata = self.uploadfiles[hash]['FileData']
+
+			self.debugmsg(6, "filedata:", filedata)
+			self.debugmsg(6, "filedata:")
+
+			decoded = base64.b64decode(filedata)
+			self.debugmsg(6, "b64decode: decoded:", decoded)
+			self.debugmsg(6, "b64decode:")
+
+			uncompressed = lzma.decompress(decoded)
+			self.debugmsg(6, "uncompressed:", uncompressed)
+			self.debugmsg(6, "uncompressed:")
+
+			localfiledir = os.path.dirname(localfile)
+			self.debugmsg(6, "localfiledir:", localfiledir)
+			ed = self.ensuredir(localfiledir)
+			self.debugmsg(6, "ensuredir:", ed)
+
+			with open(localfile, 'wb') as afile:
+				self.debugmsg(6, "afile:")
+				afile.write(uncompressed)
+				self.debugmsg(6, "write:")
+
+		except Exception as e:
+			self.debugmsg(1, "Exception:", e)
+
+	def ensuredir(self, dir):
+		if os.path.exists(dir):
+			return True
+		try:
+			patharr = os.path.split(dir)
+			self.debugmsg(6, "patharr: ", patharr)
+			self.ensuredir(patharr[0])
+			os.mkdir(dir, mode=0o777)
+			self.debugmsg(5, "Directory Created: ", dir)
+			return True
+		except FileExistsError:
+			self.debugmsg(5, "Directory Exists: ", dir)
+			return False
+		except Exception as e:
+			self.debugmsg(1, "Directory Create failed: ", dir)
+			self.debugmsg(1, "with error: ", e)
+			return False
 
 	def saveini(self):
 		self.debugmsg(6, "save_ini:", self.save_ini)
@@ -1634,6 +1754,7 @@ class RFSwarmCore:
 		base.debugmsg(9, "register_result: dbqueue Results:", base.dbqueue["Results"])
 
 		if not base.args.nogui:
+			time.sleep(1)
 			ut = threading.Thread(target=base.gui.delayed_UpdateRunStats)
 			ut.start()
 
@@ -1782,6 +1903,7 @@ class RFSwarmCore:
 		t = threading.Thread(target=core.run_start_threads)
 		t.start()
 		if not base.args.nogui:
+			time.sleep(1)
 			ut = threading.Thread(target=base.gui.delayed_UpdateRunStats)
 			ut.start()
 
@@ -2126,6 +2248,7 @@ class RFSwarmCore:
 				base.run_finish = int(time.time())
 				base.debugmsg(5, "run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots)
 				if not base.args.nogui:
+					time.sleep(1)
 					base.gui.delayed_UpdateRunStats()
 
 			if base.run_finish > 0 and base.run_finish + 60 < int(time.time()) and not base.posttest:
@@ -2138,6 +2261,7 @@ class RFSwarmCore:
 					base.debugmsg(6, "on_closing")
 					self.on_closing()
 				else:
+					time.sleep(1)
 					base.gui.delayed_UpdateRunStats()
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
