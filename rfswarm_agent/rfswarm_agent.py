@@ -703,10 +703,10 @@ class RFSwarmAgent():
 			fobj = {}
 			fobj["LocalFilePath"] = file
 			fobj["RelFilePath"] = os.path.relpath(file, start=rundir)
-			if retcode == 0:
-				self.upload_queue.append(fobj)
-				self.debugmsg(5, "added to upload_queue", fobj)
-			else:
+			self.upload_queue.append(fobj)
+			self.debugmsg(7, "added to upload_queue", fobj)
+			if retcode > 0:
+				# upload now
 				self.file_upload(fobj)
 
 
