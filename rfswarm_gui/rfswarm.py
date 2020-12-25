@@ -440,6 +440,7 @@ class AgentServer(BaseHTTPRequestHandler):
 						jsonresp["StartTime"] = base.run_start
 						jsonresp["EndTime"] = base.run_end
 						jsonresp["RunName"] = base.robot_schedule["RunName"]
+						jsonresp["Abort"] = base.run_abort
 
 						# base.robot_schedule["Agents"]
 						if jsonresp["AgentName"] in base.robot_schedule["Agents"].keys():
@@ -581,7 +582,7 @@ class RFSwarmBase:
 	sheet = ""
 
 
-
+	run_abort = False
 	run_name = ""
 	run_name_current = ""
 	run_start = 0
