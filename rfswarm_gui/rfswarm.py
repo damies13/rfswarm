@@ -1894,7 +1894,7 @@ class RFSwarmCore:
 			base.run_name = "{}_{}".format(datafiletime, "Scenario")
 		base.debugmsg(5, "base.run_name:", base.run_name)
 
-
+		base.run_abort = False
 		base.run_start = 0
 		base.run_end = 0
 		base.run_finish = 0
@@ -1923,13 +1923,18 @@ class RFSwarmCore:
 
 
 	def ClickStop(self, _event=None):
-		base.run_end = int(time.time()) #time now
-		base.debugmsg(0, "Run Stopped:", base.run_end, "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
-		base.robot_schedule["End"] = base.run_end
 
-		for agnt in base.robot_schedule["Agents"].keys():
-			for grurid in base.robot_schedule["Agents"][agnt].keys():
-				base.robot_schedule["Agents"][agnt][grurid]["EndTime"] = base.run_end
+		if base.run_end < int(time.time()):
+			# abort run?
+			base.run_abort = True
+		else:
+			base.run_end = int(time.time()) #time now
+			base.debugmsg(0, "Run Stopped:", base.run_end, "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
+			base.robot_schedule["End"] = base.run_end
+
+			for agnt in base.robot_schedule["Agents"].keys():
+				for grurid in base.robot_schedule["Agents"][agnt].keys():
+					base.robot_schedule["Agents"][agnt][grurid]["EndTime"] = base.run_end
 
 	def run_start_threads(self):
 
@@ -2389,6 +2394,7 @@ class RFSwarmGUI(tk.Frame):
 		# files["report_text"] = "famfamfam_silk_icons/icons/report.gif"
 		# files["report_html"] = "famfamfam_silk_icons/icons/report_go.gif"
 		# files["report_word"] = "famfamfam_silk_icons/icons/report_word.gif"
+		files["Abort"] = "famfamfam_silk_icons/icons/bomb.gif"
 
 		if icontext in files:
 			base.debugmsg(6, "icontext:", icontext)
@@ -2397,15 +2403,15 @@ class RFSwarmGUI(tk.Frame):
 			imgfile = os.path.join(scrdir, files[icontext])
 			base.debugmsg(9, "imgfile:", imgfile)
 			if os.path.isfile(imgfile):
-				base.debugmsg(9, "isfile: imgfile:", imgfile)
+				base.debugmsg(0, "isfile: imgfile:", imgfile)
 				with open(imgfile,"rb") as f:
 					img_raw = f.read()
-				base.debugmsg(9, "img_raw:", img_raw)
+				base.debugmsg(0, "img_raw:", img_raw)
 				# b64 = base64.encodestring(img_raw)
 				# img_text = 'img_b64 = \\\n"""{}"""'.format(b64)
 
 				self.imgdata[icontext] = tk.PhotoImage(file=imgfile)
-				base.debugmsg(9, "imgdata[icontext]:", self.imgdata[icontext])
+				base.debugmsg(0, "imgdata[icontext]:", self.imgdata[icontext])
 
 
 				return self.imgdata[icontext]
@@ -4120,7 +4126,16 @@ class RFSwarmGUI(tk.Frame):
 			ut.start()
 
 	def ClickStop(self, _event=None):
+		if base.run_end < int(time.time()):
+			# dialog really abort run???
+			base.debugmsg(5, "dialog really abort run???")
+		else:
+			icontext = "Abort"
+			self.icoStop = self.get_icon(icontext)
+
 		core.ClickStop()
+
+
 
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
