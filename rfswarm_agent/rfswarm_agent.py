@@ -362,7 +362,7 @@ class RFSwarmAgent():
 		self.debugmsg(6, "getscripts")
 		uri = self.swarmserver + "Scripts"
 		payload = {
-			"AgentName": socket.gethostname()
+			"AgentName": self.agentname
 		}
 		self.debugmsg(6, "getscripts: payload: ", payload)
 		try:
@@ -399,7 +399,7 @@ class RFSwarmAgent():
 		self.debugmsg(6, "hash: ", hash)
 		uri = self.swarmserver + "File"
 		payload = {
-			"AgentName": socket.gethostname(),
+			"AgentName": self.agentname,
 			"Action": "Download",
 			"Hash": hash
 		}
@@ -468,7 +468,7 @@ class RFSwarmAgent():
 		self.debugmsg(6, "getjobs")
 		uri = self.swarmserver + "Jobs"
 		payload = {
-			"AgentName": socket.gethostname()
+			"AgentName": self.agentname
 		}
 		self.debugmsg(6, "getjobs: payload: ", payload)
 		try:
@@ -740,7 +740,7 @@ class RFSwarmAgent():
 
 		uri = self.swarmserver + "File"
 		payload = {
-			"AgentName": socket.gethostname(),
+			"AgentName": self.agentname,
 			"Action": "Status",
 			"Hash": hash
 		}
@@ -773,7 +773,7 @@ class RFSwarmAgent():
 			self.debugmsg(6, "file not there, so lets upload")
 
 			payload = {
-				"AgentName": socket.gethostname(),
+				"AgentName": self.agentname,
 				"Action": "Upload",
 				"Hash": hash,
 				"File": fileobj['RelFilePath']
@@ -906,7 +906,7 @@ class RFSwarmAgent():
 				# requiredfields = ["AgentName", "ResultName", "Result", "ElapsedTime", "StartTime", "EndTime"]
 
 				payload = {
-					"AgentName": socket.gethostname(),
+					"AgentName": self.agentname,
 					"ResultName": txn,
 					"Result": status,
 					"ElapsedTime": elapsedtime,
@@ -1028,7 +1028,7 @@ class RFSwarmAgent():
 		fd.append("				enddate = datetime.strptime(attrs['endtime'], '%Y%m%d %H:%M:%S.%f')")
 		fd.append("				self.debugmsg(6, 'ResultName: self.msg[message]: ', self.msg['message'])")
 		fd.append("				payload = {")
-		fd.append("					'AgentName': socket.gethostname(),")
+		fd.append("					'AgentName': "+self.agentname+",")
 		fd.append("					'ResultName': self.msg['message'],")
 		fd.append("					'Result': attrs['status'],")
 		fd.append("					'ElapsedTime': (attrs['elapsedtime']/1000),")
@@ -1052,7 +1052,7 @@ class RFSwarmAgent():
 		fd.append("				self.debugmsg(8, 'attrs: ', attrs)")
 		fd.append("				self.debugmsg(6, 'ResultName: attrs[doc]: ', attrs['doc'])")
 		fd.append("				payload = {")
-		fd.append("					'AgentName': socket.gethostname(),")
+		fd.append("					'AgentName': "+self.agentname+",")
 		fd.append("					'ResultName': attrs['doc'],")
 		fd.append("					'Result': attrs['status'],")
 		fd.append("					'ElapsedTime': (attrs['elapsedtime']/1000),")
