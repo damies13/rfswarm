@@ -490,7 +490,7 @@ class RFSwarmAgent():
 			# self.scriptlist
 			self.debugmsg(6, "getjobs: r.text:", r.text)
 			jsonresp = json.loads(r.text)
-			self.debugmsg(6, "getjobs: jsonresp:", jsonresp)
+			self.debugmsg(5, "getjobs: jsonresp:", jsonresp)
 
 
 			if jsonresp["StartTime"] < int(time.time()) < (jsonresp["EndTime"]+300):
@@ -517,13 +517,35 @@ class RFSwarmAgent():
 				else:
 					self.isstopping = True
 
-			self.debugmsg(6, "getjobs: isrunning:", self.isrunning, "	isstopping:", self.isstopping)
-			self.debugmsg(6, "getjobs: self.jobs:", self.jobs)
+			self.debugmsg(5, "jsonresp[Abort]", jsonresp["Abort"])
+			if jsonresp["Abort"]:
+				self.isstopping = True
+				self.debugmsg(5, "!!! Abort !!!")
+				self.abortjobs()
+
+
+			self.debugmsg(5, "getjobs: isrunning:", self.isrunning, "	isstopping:", self.isstopping)
+			self.debugmsg(5, "getjobs: self.jobs:", self.jobs)
 
 
 
 		except Exception as e:
 			self.debugmsg(1, "getjobs: Exception:", e)
+
+	def abortjobs(self):
+		self.debugmsg(5, "self.jobs:", self.jobs)
+		for job in self.jobs:
+			try:
+				self.debugmsg(5, "job:", job, self.jobs[job])
+				self.debugmsg(5, "job[Thread]:", self.jobs[job]["Thread"])
+				self.debugmsg(5, "is_alive()", self.jobs[job]["Thread"].is_alive())
+				self.debugmsg(5, "name:", self.jobs[job]["Thread"].name)
+				thread_id = self.jobs[job]["Thread"].ident
+				self.debugmsg(5, "thread_id:", thread_id)
+
+			except Exception as e:
+				self.debugmsg(1, "getjobs: Exception:", e)
+
 
 	def runjobs(self):
 		self.debugmsg(6, "runjobs: self.jobs:", self.jobs)
