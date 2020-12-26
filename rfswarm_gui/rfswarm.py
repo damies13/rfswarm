@@ -4034,6 +4034,16 @@ class RFSwarmGUI(tk.Frame):
 			etm = time.gmtime(base.run_finish - base.robot_schedule["Start"])
 			self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
 
+		# update stop button
+		if base.run_end < int(time.time()):
+			icontext = "Abort"
+			self.icoStop = self.get_icon(icontext)
+			self.elements["Run"]["btn_stop"]["image"] = self.icoStop
+
+		if base.run_finish > 0:
+			icontext = "Aborted"
+			self.icoStop = self.get_icon(icontext)
+			self.elements["Run"]["btn_stop"]["image"] = self.icoStop
 
 		time_elapsed = int(time.time()) - self.rungridupdate
 		if (time_elapsed>5):
@@ -4148,7 +4158,8 @@ class RFSwarmGUI(tk.Frame):
 	def ClickStop(self, _event=None):
 		if base.run_end < int(time.time()):
 			base.debugmsg(5, "Stop Clicked nth time")
-			if not base.run_abort:
+
+			if not base.run_abort and base.run_finish < 1:
 				# dialog really abort run???
 				base.debugmsg(5, "dialog really abort run???")
 				# reallyabort = True
