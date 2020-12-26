@@ -539,11 +539,16 @@ class RFSwarmAgent():
 		for job in self.jobs:
 			try:
 				self.debugmsg(5, "job:", job, self.jobs[job])
-				self.debugmsg(5, "job[Thread]:", self.jobs[job]["Thread"])
-				self.debugmsg(5, "is_alive()", self.jobs[job]["Thread"].is_alive())
-				self.debugmsg(5, "name:", self.jobs[job]["Thread"].name)
-				thread_id = self.jobs[job]["Thread"].ident
-				self.debugmsg(5, "thread_id:", thread_id)
+				# self.debugmsg(5, "job[Thread]:", self.jobs[job]["Thread"])
+				# self.debugmsg(5, "is_alive()", self.jobs[job]["Thread"].is_alive())
+				# self.debugmsg(5, "name:", self.jobs[job]["Thread"].name)
+				# thread_id = self.jobs[job]["Thread"].ident
+				# self.debugmsg(5, "thread_id:", thread_id)
+
+				self.debugmsg(5, "job[PID]:", self.jobs[job]["PID"])
+				self.debugmsg(5, "job[Process]:", self.jobs[job]["Process"])
+				p = self.jobs[job]["Process"]
+				p.terminate()
 
 			except Exception as e:
 				self.debugmsg(1, "getjobs: Exception:", e)
@@ -676,7 +681,15 @@ class RFSwarmAgent():
 					self.debugmsg(3, "Robot run with command: '", " ".join(cmd), "'")
 					# result = subprocess.call(" ".join(cmd), shell=True, stdout=f, stderr=f)
 					try:
-						result = subprocess.call(" ".join(cmd), shell=True, stdout=f, stderr=subprocess.STDOUT)
+						# result = subprocess.call(" ".join(cmd), shell=True, stdout=f, stderr=subprocess.STDOUT)
+						proc = subprocess.Popen(" ".join(cmd), shell=True, stdout=f, stderr=subprocess.STDOUT)
+						self.debugmsg(5, "runthread: proc:", proc)
+						self.jobs[jobid]["Process"] = proc
+						self.jobs[jobid]["PID"] = proc.pid
+						self.debugmsg(5, "runthread: proc.pid:", proc.pid)
+						# result = proc.poll()
+						# self.debugmsg(5, "runthread: result:", result)
+						result = proc.wait()
 						self.debugmsg(5, "runthread: result:", result)
 						if result != 0:
 							self.debugmsg(1, "Robot returned an error (", result, ") please check the log file:", logFileName)
