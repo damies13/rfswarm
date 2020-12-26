@@ -2760,6 +2760,10 @@ class RFSwarmGUI(tk.Frame):
 		self.display_run['finish_time'].set("  --:--:--  ")
 		base.debugmsg(6, "Test Started:	", int(time.time()), "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
 
+		icontext = "Stop"
+		self.icoStop = self.get_icon(icontext)
+		self.elements["Run"]["btn_stop"]["image"] = self.icoStop
+
 		self.tabs.select(1)
 
 		core.ClickPlay()
