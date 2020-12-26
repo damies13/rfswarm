@@ -4148,7 +4148,9 @@ class RFSwarmGUI(tk.Frame):
 				# dialog really abort run???
 				base.debugmsg(5, "dialog really abort run???")
 				# reallyabort = True
-				reallyabort = tkm.askyesno('RFSwarm - Abort Run','Do you want to abort this run? Clicking yes will kill all running robots!')
+				# reallyabort = tkm.askyesno('RFSwarm - Abort Run','Do you want to abort this run? Clicking yes will kill all running robots!')
+				reallyabort = tkm.askyesno('RFSwarm - Abort Run','Do you want to abort this run? Clicking yes will kill all running robots!', icon='warning')
+				# reallyabort = tkm.askyesno('RFSwarm - Abort Run','Do you want to abort this run? Clicking yes will kill all running robots!', icon='error')
 				if reallyabort:
 					icontext = "Aborted"
 					self.icoStop = self.get_icon(icontext)
