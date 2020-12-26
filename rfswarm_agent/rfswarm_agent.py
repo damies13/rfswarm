@@ -199,11 +199,13 @@ class RFSwarmAgent():
 		prev_status = self.status
 		while True:
 			self.debugmsg(2, "Running", datetime.now().isoformat(sep=' ',timespec='seconds'),
-				"(",int(time.time()),")"
+				"(",int(time.time()),")",
 				"isconnected:", self.isconnected,
 				"isrunning:", self.isrunning,
-				"isstopping:", self.isstopping
-			)
+				"isstopping:", self.isstopping,
+				"robotcount:", self.robotcount,
+				"\n"
+				)
 
 			if not self.isconnected:
 				# self.isrunning = False # Not sure if I need this?
@@ -362,7 +364,7 @@ class RFSwarmAgent():
 		self.debugmsg(6, "getscripts")
 		uri = self.swarmserver + "Scripts"
 		payload = {
-			"AgentName": socket.gethostname()
+			"AgentName": self.agentname
 		}
 		self.debugmsg(6, "getscripts: payload: ", payload)
 		try:
@@ -399,7 +401,7 @@ class RFSwarmAgent():
 		self.debugmsg(6, "hash: ", hash)
 		uri = self.swarmserver + "File"
 		payload = {
-			"AgentName": socket.gethostname(),
+			"AgentName": self.agentname,
 			"Action": "Download",
 			"Hash": hash
 		}
@@ -468,7 +470,7 @@ class RFSwarmAgent():
 		self.debugmsg(6, "getjobs")
 		uri = self.swarmserver + "Jobs"
 		payload = {
-			"AgentName": socket.gethostname()
+			"AgentName": self.agentname
 		}
 		self.debugmsg(6, "getjobs: payload: ", payload)
 		try:
@@ -490,7 +492,7 @@ class RFSwarmAgent():
 			# self.scriptlist
 			self.debugmsg(6, "getjobs: r.text:", r.text)
 			jsonresp = json.loads(r.text)
-			self.debugmsg(6, "getjobs: jsonresp:", jsonresp)
+			self.debugmsg(5, "getjobs: jsonresp:", jsonresp)
 
 
 			if jsonresp["StartTime"] < int(time.time()) < (jsonresp["EndTime"]+300):
@@ -517,13 +519,34 @@ class RFSwarmAgent():
 				else:
 					self.isstopping = True
 
-			self.debugmsg(6, "getjobs: isrunning:", self.isrunning, "	isstopping:", self.isstopping)
-			self.debugmsg(6, "getjobs: self.jobs:", self.jobs)
+			self.debugmsg(5, "jsonresp[Abort]", jsonresp["Abort"])
+			if jsonresp["Abort"]:
+				self.isstopping = True
+				self.debugmsg(5, "!!! Abort !!!")
+				self.abortjobs()
+
+
+			self.debugmsg(5, "getjobs: isrunning:", self.isrunning, "	isstopping:", self.isstopping)
+			self.debugmsg(5, "getjobs: self.jobs:", self.jobs)
 
 
 
 		except Exception as e:
 			self.debugmsg(1, "getjobs: Exception:", e)
+
+	def abortjobs(self):
+		self.debugmsg(6, "self.jobs:", self.jobs)
+		for job in self.jobs:
+			try:
+				self.debugmsg(6, "job:", job, self.jobs[job])
+				self.debugmsg(5, "job[PID]:", self.jobs[job]["PID"])
+				self.debugmsg(6, "job[Process]:", self.jobs[job]["Process"])
+				p = self.jobs[job]["Process"]
+				p.terminate()
+
+			except Exception as e:
+				self.debugmsg(1, "getjobs: Exception:", e)
+
 
 	def runjobs(self):
 		self.debugmsg(6, "runjobs: self.jobs:", self.jobs)
@@ -617,7 +640,6 @@ class RFSwarmAgent():
 		cmd = [robotcmd]
 		cmd.append("-t")
 		cmd.append('"'+test+'"')
-		# cmd.append(testcs)
 		cmd.append("-d")
 		cmd.append('"'+odir+'"')
 
@@ -646,13 +668,17 @@ class RFSwarmAgent():
 
 			result = 0
 			try:
-				# result = subprocess.call(" ".join(cmd), shell=True)
 				# https://stackoverflow.com/questions/4856583/how-do-i-pipe-a-subprocess-call-to-a-text-file
 				with open(logFileName, "w") as f:
 					self.debugmsg(3, "Robot run with command: '", " ".join(cmd), "'")
 					# result = subprocess.call(" ".join(cmd), shell=True, stdout=f, stderr=f)
 					try:
-						result = subprocess.call(" ".join(cmd), shell=True, stdout=f, stderr=subprocess.STDOUT)
+						proc = subprocess.Popen(" ".join(cmd), shell=True, stdout=f, stderr=subprocess.STDOUT)
+						self.debugmsg(5, "runthread: proc:", proc)
+						self.jobs[jobid]["Process"] = proc
+						self.jobs[jobid]["PID"] = proc.pid
+						self.debugmsg(5, "runthread: proc.pid:", proc.pid)
+						result = proc.wait()
 						self.debugmsg(5, "runthread: result:", result)
 						if result != 0:
 							self.debugmsg(1, "Robot returned an error (", result, ") please check the log file:", logFileName)
@@ -740,7 +766,7 @@ class RFSwarmAgent():
 
 		uri = self.swarmserver + "File"
 		payload = {
-			"AgentName": socket.gethostname(),
+			"AgentName": self.agentname,
 			"Action": "Status",
 			"Hash": hash
 		}
@@ -773,7 +799,7 @@ class RFSwarmAgent():
 			self.debugmsg(6, "file not there, so lets upload")
 
 			payload = {
-				"AgentName": socket.gethostname(),
+				"AgentName": self.agentname,
 				"Action": "Upload",
 				"Hash": hash,
 				"File": fileobj['RelFilePath']
@@ -906,7 +932,7 @@ class RFSwarmAgent():
 				# requiredfields = ["AgentName", "ResultName", "Result", "ElapsedTime", "StartTime", "EndTime"]
 
 				payload = {
-					"AgentName": socket.gethostname(),
+					"AgentName": self.agentname,
 					"ResultName": txn,
 					"Result": status,
 					"ElapsedTime": elapsedtime,
@@ -1028,7 +1054,7 @@ class RFSwarmAgent():
 		fd.append("				enddate = datetime.strptime(attrs['endtime'], '%Y%m%d %H:%M:%S.%f')")
 		fd.append("				self.debugmsg(6, 'ResultName: self.msg[message]: ', self.msg['message'])")
 		fd.append("				payload = {")
-		fd.append("					'AgentName': socket.gethostname(),")
+		fd.append("					'AgentName': '"+self.agentname+"',")
 		fd.append("					'ResultName': self.msg['message'],")
 		fd.append("					'Result': attrs['status'],")
 		fd.append("					'ElapsedTime': (attrs['elapsedtime']/1000),")
@@ -1052,7 +1078,7 @@ class RFSwarmAgent():
 		fd.append("				self.debugmsg(8, 'attrs: ', attrs)")
 		fd.append("				self.debugmsg(6, 'ResultName: attrs[doc]: ', attrs['doc'])")
 		fd.append("				payload = {")
-		fd.append("					'AgentName': socket.gethostname(),")
+		fd.append("					'AgentName': '"+self.agentname+"',")
 		fd.append("					'ResultName': attrs['doc'],")
 		fd.append("					'Result': attrs['status'],")
 		fd.append("					'ElapsedTime': (attrs['elapsedtime']/1000),")
