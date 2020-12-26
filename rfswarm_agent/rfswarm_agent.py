@@ -26,7 +26,6 @@ import time
 from datetime import datetime
 import threading
 import subprocess
-import multiprocessing as mp
 import requests
 import psutil
 # import platform
@@ -200,12 +199,10 @@ class RFSwarmAgent():
 		prev_status = self.status
 		while True:
 			self.debugmsg(2, "Running", datetime.now().isoformat(sep=' ',timespec='seconds'),
-				"(",int(time.time()),")",
+				"(",int(time.time()),")"
 				"isconnected:", self.isconnected,
 				"isrunning:", self.isrunning,
-				"isstopping:", self.isstopping,
-				"robotcount:", self.robotcount,
-				"\n"
+				"isstopping:", self.isstopping
 			)
 
 			if not self.isconnected:
@@ -521,7 +518,7 @@ class RFSwarmAgent():
 					self.isstopping = True
 
 			self.debugmsg(5, "jsonresp[Abort]", jsonresp["Abort"])
-			if jsonresp["Abort"] and self.robotcount > 1:
+			if jsonresp["Abort"]:
 				self.isstopping = True
 				self.debugmsg(5, "!!! Abort !!!")
 				self.abortjobs()
@@ -540,15 +537,11 @@ class RFSwarmAgent():
 		for job in self.jobs:
 			try:
 				self.debugmsg(5, "job:", job, self.jobs[job])
-				# self.debugmsg(5, "job[Thread]:", self.jobs[job]["Thread"])
-				# self.debugmsg(5, "is_alive()", self.jobs[job]["Thread"].is_alive())
-				# self.debugmsg(5, "name:", self.jobs[job]["Thread"].name)
-				# thread_id = self.jobs[job]["Thread"].ident
-				# self.debugmsg(5, "thread_id:", thread_id)
-				self.debugmsg(5, "job[Process]:", self.jobs[job]["Process"])
-				p = self.jobs[job]["Process"]
-				# p.kill()
-				p.terminate()
+				self.debugmsg(5, "job[Thread]:", self.jobs[job]["Thread"])
+				self.debugmsg(5, "is_alive()", self.jobs[job]["Thread"].is_alive())
+				self.debugmsg(5, "name:", self.jobs[job]["Thread"].name)
+				thread_id = self.jobs[job]["Thread"].ident
+				self.debugmsg(5, "thread_id:", thread_id)
 
 			except Exception as e:
 				self.debugmsg(1, "getjobs: Exception:", e)
@@ -561,22 +554,17 @@ class RFSwarmAgent():
 			if jobid in self.jobs.keys():
 				self.debugmsg(6, "runjobs: jobid:", jobid)
 				run_t = True
-				# if "Thread" in self.jobs[jobid].keys():
-				# 	if self.jobs[jobid]["Thread"].isAlive():
-				if "Process" in self.jobs[jobid].keys():
-					if self.jobs[jobid]["Process"].is_alive():
+				if "Thread" in self.jobs[jobid].keys():
+					if self.jobs[jobid]["Thread"].isAlive():
 						run_t = False
 						self.debugmsg(6, "runjobs: Thread already running run_t:", run_t)
 
 				self.debugmsg(6, "runjobs: run_t:", run_t)
 
 				if run_t and self.jobs[jobid]["StartTime"] < int(time.time()) < self.jobs[jobid]["EndTime"]:
-					# t = threading.Thread(target=self.runthread, args=(jobid, ))
-					# t.start()
-					# self.jobs[jobid]["Thread"] = t
-					p = mp.Process(target=self.runthread, args=(jobid,))
-					p.start()
-					self.jobs[jobid]["Process"] = p
+					t = threading.Thread(target=self.runthread, args=(jobid, ))
+					t.start()
+					self.jobs[jobid]["Thread"] = t
 				time.sleep(0.1)
 
 
