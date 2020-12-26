@@ -199,11 +199,13 @@ class RFSwarmAgent():
 		prev_status = self.status
 		while True:
 			self.debugmsg(2, "Running", datetime.now().isoformat(sep=' ',timespec='seconds'),
-				"(",int(time.time()),")"
+				"(",int(time.time()),")",
 				"isconnected:", self.isconnected,
 				"isrunning:", self.isrunning,
-				"isstopping:", self.isstopping
-			)
+				"isstopping:", self.isstopping,
+				"robotcount:", self.robotcount,
+				"\n"
+				)
 
 			if not self.isconnected:
 				# self.isrunning = False # Not sure if I need this?
