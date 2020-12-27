@@ -2696,7 +2696,8 @@ class RFSwarmGUI(tk.Frame):
 		# Set grid_propagate to False to allow 5-by-5 buttons resizing later
 		# sg.grid_propagate(False)
 
-		self.sg_canvas = tk.Canvas(sg, bg="yellow")
+		self.sg_canvas = tk.Canvas(sg)
+		# self.sg_canvas = tk.Canvas(sg, bg="yellow")
 		self.sg_canvas.grid(row=0, column=0, sticky="news")
 
 		# Link a scrollbar to the canvas
@@ -2710,8 +2711,8 @@ class RFSwarmGUI(tk.Frame):
 		self.sg_canvas.configure(xscrollcommand=sg_hsb.set)
 
 
-		# self.scriptgrid.grid(row=0, column=0, sticky="nsew")
-		self.scriptgrid = tk.Frame(self.sg_canvas, bg="blue")
+		self.scriptgrid = tk.Frame(self.sg_canvas)
+		# self.scriptgrid = tk.Frame(self.sg_canvas, bg="blue")
 		self.sg_canvas.create_window((0, 0), window=self.scriptgrid, anchor='nw')
 
 
@@ -3030,38 +3031,38 @@ class RFSwarmGUI(tk.Frame):
 		addzero = 0
 
 		rusy = graphh-axissz
+		if k in totusrsxy:
+			for x in sorted(totusrsxy[k].keys()):
+				newx = x
+				newy = prevy + totusrsxy[k][x]
 
-		for x in sorted(totusrsxy[k].keys()):
-			newx = x
-			newy = prevy + totusrsxy[k][x]
-
-			base.debugmsg(6, "prevx", prevx, "prevy", prevy, "newx", newx, "newy", newy)
-
-			if addzero > 1:
-				prevx = prevx2
 				base.debugmsg(6, "prevx", prevx, "prevy", prevy, "newx", newx, "newy", newy)
 
-			if newy == prevy:
-				addzero += 1
-				base.debugmsg(6, "addzero:", addzero)
-				prevx2 = prevx
-			else:
-				addzero = 0
+				if addzero > 1:
+					prevx = prevx2
+					base.debugmsg(6, "prevx", prevx, "prevy", prevy, "newx", newx, "newy", newy)
+
+				if newy == prevy:
+					addzero += 1
+					base.debugmsg(6, "addzero:", addzero)
+					prevx2 = prevx
+				else:
+					addzero = 0
 
 
 
-			x1 = int(xlen * prevx) + xm1
-			x2 = int(xlen * newx) + xm1
+				x1 = int(xlen * prevx) + xm1
+				x2 = int(xlen * newx) + xm1
 
-			y1 = rusy - int(rusy * prevy)
-			y2 = rusy - int(rusy * newy)
+				y1 = rusy - int(rusy * prevy)
+				y2 = rusy - int(rusy * newy)
 
-			base.debugmsg(6, "x1", x1, "y1", y1, "x2", x2, "y2", y2)
+				base.debugmsg(6, "x1", x1, "y1", y1, "x2", x2, "y2", y2)
 
-			self.pln_graph.create_line(x1, y1, x2, y2, fill=totcolour)
+				self.pln_graph.create_line(x1, y1, x2, y2, fill=totcolour)
 
-			prevx = newx
-			prevy = newy
+				prevx = newx
+				prevy = newy
 
 		base.debugmsg(6, "pln_update_graph done")
 
@@ -3743,6 +3744,10 @@ class RFSwarmGUI(tk.Frame):
 			elmt.destroy()
 		base.scriptlist[r] = {}
 
+		# update scrollbars
+		self.scriptgrid.update_idletasks()
+		self.sg_canvas.config(scrollregion=self.sg_canvas.bbox("all"))
+
 		try:
 			self.pln_update_graph()
 		except:
@@ -3898,37 +3903,45 @@ class RFSwarmGUI(tk.Frame):
 
 		runcanvas = tk.Canvas(rungridprnt)
 
-		# vsb = tk.Scrollbar(master, orient="vertical", command=self.yview)
-		# hsb = tk.Scrollbar(master, orient="horizontal", command=self.xview)
-		# self.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
-		#
-		# self.grid(row=0, column=0, sticky="nsew")
-		# vsb.grid(row=0, column=1, sticky="ns")
-		# hsb.grid(row=1, column=0, sticky="ew")
-		# master.grid_rowconfigure(0, weight=1)
-		# master.grid_columnconfigure(0, weight=1)
 
 		#
 		# # This partially worked but scroll bars ar behind the content making it dificult to scroll
-		rungridprnt = ttk.Frame(r)
-		rungridprnt.grid(row=1, column=0, sticky="nsew")
-		r.rowconfigure(1, weight=1)
-		self.scrollable_rg = ScrollableXY(rungridprnt)
-		self.rungrid = ttk.Frame(self.scrollable_rg)
-		self.rungrid.grid(row=0, column=0, sticky="nsew")
-		self.scrollable_rg.canvas.columnconfigure(0, weight=1)
-		self.scrollable_rg.canvas.rowconfigure(0, weight=1)
-
-
-
-		# this didn't load
-		# self.scrollable_rg = ScrollableY(rg)
+		# rungridprnt = ttk.Frame(r)
+		# rungridprnt.grid(row=1, column=0, sticky="nsew")
+		# r.rowconfigure(1, weight=1)
+		# self.scrollable_rg = ScrollableXY(rungridprnt)
 		# self.rungrid = ttk.Frame(self.scrollable_rg)
 		# self.rungrid.grid(row=0, column=0, sticky="nsew")
+		# self.scrollable_rg.canvas.columnconfigure(0, weight=1)
+		# self.scrollable_rg.canvas.rowconfigure(0, weight=1)
 
-		# this works but doesn't scroll
-		# self.rungrid = ttk.Frame(rg)
-		# self.rungrid.grid(row=1, column=0, sticky="nsew")
+		# # 2020-12-27 try again
+		rungridprnt = tk.Frame(r)
+		rungridprnt.grid(row=1, column=0, pady=(0, 0), sticky='news')
+		rungridprnt.grid_rowconfigure(0, weight=1)
+		rungridprnt.grid_columnconfigure(0, weight=1)
+		# Set grid_propagate to False to allow 5-by-5 buttons resizing later
+		# sg.grid_propagate(False)
+
+		self.run_canvas = tk.Canvas(rungridprnt)
+		# self.sg_canvas = tk.Canvas(sg, bg="yellow")
+		self.run_canvas.grid(row=0, column=0, sticky="news")
+
+		# Link a scrollbar to the canvas
+		run_vsb = tk.Scrollbar(rungridprnt, orient="vertical", command=self.run_canvas.yview)
+		run_vsb.grid(row=0, column=1, sticky='ns')
+		self.run_canvas.configure(yscrollcommand=run_vsb.set)
+
+		# Link another scrollbar to the canvas
+		run_hsb = tk.Scrollbar(rungridprnt, orient="horizontal", command=self.run_canvas.xview)
+		run_hsb.grid(row=1, column=0, sticky='ew')
+		self.run_canvas.configure(xscrollcommand=run_hsb.set)
+
+
+		self.rungrid = tk.Frame(self.run_canvas)
+		# self.scriptgrid = tk.Frame(self.sg_canvas, bg="blue")
+		self.run_canvas.create_window((0, 0), window=self.rungrid, anchor='nw')
+
 
 		# set initial columns for the results grid
 		if "columns" not in self.display_run:
@@ -3961,7 +3974,10 @@ class RFSwarmGUI(tk.Frame):
 
 			colno += 1
 
-		self.scrollable_rg.update()
+		# self.scrollable_rg.update()
+		# update scrollbars
+		self.rungrid.update_idletasks()
+		self.run_canvas.config(scrollregion=self.rungrid.bbox("all"))
 
 	def delayed_UpdateRunStats_bg(self):
 
@@ -4167,7 +4183,12 @@ class RFSwarmGUI(tk.Frame):
 					rowno += 1
 
 
-			self.scrollable_rg.update()
+			# self.scrollable_rg.update()
+			# update scrollbars
+			self.rungrid.update_idletasks()
+			self.run_canvas.config(scrollregion=self.rungrid.bbox("all"))
+
+
 			ut = threading.Thread(target=self.delayed_UpdateRunStats)
 			ut.start()
 
