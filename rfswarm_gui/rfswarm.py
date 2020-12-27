@@ -2676,38 +2676,46 @@ class RFSwarmGUI(tk.Frame):
 
 		#
 		# # This partially worked but scroll bars ar behind the content making it dificult to scroll
-		sg = ttk.Frame(p)
-		# sg = Scrollable(p, width=32)
-		sg.grid(column=0, row=planrow, sticky="nsew")
-		sg.columnconfigure(0, weight=1)
-		sg.rowconfigure(planrow, weight=0)
-		self.scrollable_sg = ScrollableXY(sg)
-		self.scriptgrid = ttk.Frame(self.scrollable_sg)
-		self.scriptgrid.grid(row=0, column=0, sticky="nsew")
-		self.scrollable_sg.canvas.columnconfigure(0, weight=1)
-		self.scrollable_sg.canvas.rowconfigure(0, weight=1)
-
-
-
 		# sg = ttk.Frame(p)
 		# # sg = Scrollable(p, width=32)
 		# sg.grid(column=0, row=planrow, sticky="nsew")
 		# sg.columnconfigure(0, weight=1)
 		# sg.rowconfigure(planrow, weight=0)
-
-
-
-
-		# scrollable_sg = Scrollable(sg, width=32)
-		# self.scrollable_sg = Scrollable(sg)
-		# scrollable_sg.columnconfigure(0, weight=1)
-		# scrollable_sg.rowconfigure(0, weight=1)
-
-		# self.scriptgrid = Scrollable(sg)
-		# self.scriptgrid = Scrollable(sg, width=32)
+		# self.scrollable_sg = ScrollableXY(sg)
 		# self.scriptgrid = ttk.Frame(self.scrollable_sg)
-		# self.scriptgrid = ttk.Frame(sg)
 		# self.scriptgrid.grid(row=0, column=0, sticky="nsew")
+		# self.scrollable_sg.canvas.columnconfigure(0, weight=1)
+		# self.scrollable_sg.canvas.rowconfigure(0, weight=1)
+
+
+		# # 2020-12-27 try again
+		sg = tk.Frame(p)
+		sg.grid(row=planrow, column=0, pady=(0, 0), sticky='news')
+		sg.grid_rowconfigure(0, weight=1)
+		sg.grid_columnconfigure(0, weight=1)
+		# Set grid_propagate to False to allow 5-by-5 buttons resizing later
+		# sg.grid_propagate(False)
+
+		self.sg_canvas = tk.Canvas(sg, bg="yellow")
+		self.sg_canvas.grid(row=0, column=0, sticky="news")
+
+		# Link a scrollbar to the canvas
+		sg_vsb = tk.Scrollbar(sg, orient="vertical", command=self.sg_canvas.yview)
+		sg_vsb.grid(row=0, column=1, sticky='ns')
+		self.sg_canvas.configure(yscrollcommand=sg_vsb.set)
+
+		# Link another scrollbar to the canvas
+		sg_hsb = tk.Scrollbar(sg, orient="horizontal", command=self.sg_canvas.xview)
+		sg_hsb.grid(row=1, column=0, sticky='ew')
+		self.sg_canvas.configure(xscrollcommand=sg_hsb.set)
+
+
+		# self.scriptgrid.grid(row=0, column=0, sticky="nsew")
+		self.scriptgrid = tk.Frame(self.sg_canvas, bg="blue")
+		self.sg_canvas.create_window((0, 0), window=self.scriptgrid, anchor='nw')
+
+
+		# sg_canvas.config(scrollregion=sg_canvas.bbox("all"))
 
 
 		# label row 0 of sg
@@ -2748,6 +2756,9 @@ class RFSwarmGUI(tk.Frame):
 		new.grid(column=self.plancoladd, row=0, sticky="nsew")
 
 		# self.scrollable_sg.update()
+		# update scrollbars
+		self.scriptgrid.update_idletasks()
+		self.sg_canvas.config(scrollregion=self.sg_canvas.bbox("all"))
 
 	def CanvasResize(self, event):
 		base.debugmsg(6, "event:", event)
@@ -3435,6 +3446,11 @@ class RFSwarmGUI(tk.Frame):
 				pass
 
 		base.debugmsg(6, "addScriptRow done")
+
+		# update scrollbars
+		self.scriptgrid.update_idletasks()
+		self.sg_canvas.config(scrollregion=self.sg_canvas.bbox("all"))
+
 
 	def sr_users_validate(self, *args):
 		base.debugmsg(5, "args:",args)
