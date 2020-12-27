@@ -109,182 +109,6 @@ class stdevclass:
 		except Exception as e:
 			base.debugmsg(5, "Exception:", e)
 
-class ScrollableY(tk.Frame):
-	"""
-		Make a frame scrollable with scrollbar on the right.
-		After adding or removing widgets to the scrollable frame,
-		call the update() method to refresh the scrollable area.
-	"""
-
-	def __init__(self, frame, width=16):
-		# tk.wm_attributes("-transparentcolor", TRANSCOLOUR)
-		scrollbar = tk.Scrollbar(frame, width=width)
-		scrollbar.pack(side=tk.RIGHT, fill=tk.Y, expand=False)
-
-		# self.canvas = tk.Canvas(frame, yscrollcommand=scrollbar.set, background="Red")
-		self.canvas = tk.Canvas(frame, yscrollcommand=scrollbar.set)
-		self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-		scrollbar.config(command=self.canvas.yview)
-
-		self.canvas.bind('<Configure>', self.__fill_canvas)
-
-		# base class initialization
-		tk.Frame.__init__(self, frame)
-
-		# assign this obj (the inner frame) to the windows item of the canvas
-		self.windows_item = self.canvas.create_window(0,0, window=self, anchor=tk.NW)
-
-
-	def __fill_canvas(self, event):
-		"Enlarge the windows item to the canvas width"
-		kids = self.winfo_children()
-		base.debugmsg(6, "kids:", kids)
-		# kids = self.canvas.winfo_children()
-		# base.debugmsg(6, "kids:", kids)
-		if len(kids)>0:
-			# base.debugmsg(6, "self.canvas.bbox(kids[0]):", self.canvas.bbox(kids[0]))
-			# base.debugmsg(6, kids[0].winfo_width(), kids[0].winfo_height())
-			canvas_width = kids[0].winfo_width()
-			base.debugmsg(6, "canvas_width:", canvas_width)
-			canvas_height = kids[0].winfo_height()
-			base.debugmsg(6, "canvas_height:", canvas_height)
-
-			self.canvas.itemconfig(self.windows_item, width = canvas_width, height = canvas_height)
-		else:
-
-			base.debugmsg(6, "event:", event)
-			canvas_width = event.width
-			base.debugmsg(6, "canvas_width:", canvas_width)
-			canvas_height = event.height
-			base.debugmsg(6, "canvas_height:", canvas_height)
-			self.canvas.itemconfig(self.windows_item, width = canvas_width, height = canvas_height)
-
-	def update(self):
-		"Update the canvas and the scrollregion"
-
-		# self.update_idletasks()
-		kids = self.winfo_children()
-		base.debugmsg(6, "kids:", kids)
-
-		# kids = self.canvas.winfo_children()
-		# base.debugmsg(6, "kids:", kids)
-		if len(kids)>0:
-			# base.debugmsg(6, "self.canvas.bbox(kids[0]):", self.canvas.bbox(kids[0]))
-			base.debugmsg(6, kids[0].winfo_width(), kids[0].winfo_height())
-
-			self.canvas.config(scrollregion=(0,0,kids[0].winfo_width(),kids[0].winfo_height()+10))
-		else:
-			base.debugmsg(6, "self.canvas.bbox(self.windows_item):", self.canvas.bbox(self.windows_item))
-			base.debugmsg(6, "self.windows_item:", self.windows_item)
-			self.canvas.config(scrollregion=self.canvas.bbox(self.windows_item))
-
-class ScrollableXY(tk.Frame):
-	"""
-		Make a frame scrollable with scrollbar on the right.
-		After adding or removing widgets to the scrollable frame,
-		call the update() method to refresh the scrollable area.
-	"""
-
-	def __init__(self, frame, width=16):
-
-		scrollbary = tk.Scrollbar(frame, orient="vertical", width=width)
-		scrollbarx = tk.Scrollbar(frame, orient="horizontal", width=width)
-		scrollbary.pack(side=tk.RIGHT, fill=tk.Y, expand=False)
-		scrollbarx.pack(side=tk.BOTTOM, fill=tk.X, expand=False)
-
-		# self.canvas = tk.Canvas(frame, yscrollcommand=scrollbary.set, xscrollcommand=scrollbarx.set)
-		self.canvas = tk.Canvas(frame, yscrollcommand=scrollbary.set)
-		self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-		# self.canvas = tk.Canvas(frame, xscrollcommand=scrollbarx.set)
-		# self.canvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-
-		scrollbary.config(command=self.canvas.yview)
-		scrollbarx.config(command=self.canvas.xview)
-
-		self.canvas.bind('<Configure>', self.__fill_canvas)
-
-		# base class initialization
-		tk.Frame.__init__(self, frame)
-
-		# assign this obj (the inner frame) to the windows item of the canvas
-		self.windows_item = self.canvas.create_window(0,0, window=self, anchor=tk.NW)
-
-
-	def __fill_canvas(self, event):
-		"Enlarge the windows item to the canvas width"
-		base.debugmsg(6, "event:", event)
-		kids = self.winfo_children()
-		base.debugmsg(6, "kids:", kids)
-		# kids = self.canvas.winfo_children()
-		# base.debugmsg(6, "kids:", kids)
-		if len(kids)>0:
-			# base.debugmsg(6, "self.canvas.bbox(kids[0]):", self.canvas.bbox(kids[0]))
-			# base.debugmsg(6, kids[0].winfo_width(), kids[0].winfo_height())
-			canvas_width = kids[0].winfo_width()
-			base.debugmsg(6, "canvas_width:", canvas_width)
-			canvas_height = kids[0].winfo_height()
-			base.debugmsg(6, "canvas_height:", canvas_height)
-
-			self.canvas.itemconfig(self.windows_item, width = canvas_width, height = canvas_height)
-		else:
-
-			base.debugmsg(6, "event:", event)
-			canvas_width = event.width
-			base.debugmsg(6, "canvas_width:", canvas_width)
-			canvas_height = event.height
-			base.debugmsg(6, "canvas_height:", canvas_height)
-			self.canvas.itemconfig(self.windows_item, width = canvas_width, height = canvas_height)
-
-	def fill_canvas(self):
-		"Enlarge the windows item to the canvas width"
-		time.sleep(.02)
-		kids = self.winfo_children()
-		base.debugmsg(6, "kids:", kids)
-		# kids = self.canvas.winfo_children()
-		# base.debugmsg(6, "kids:", kids)
-		if len(kids)>0:
-			# base.debugmsg(6, "self.canvas.bbox(kids[0]):", self.canvas.bbox(kids[0]))
-			# base.debugmsg(6, kids[0].winfo_width(), kids[0].winfo_height())
-			canvas_width = kids[0].winfo_width()
-			base.debugmsg(6, "canvas_width:", canvas_width)
-			canvas_height = kids[0].winfo_height()
-			base.debugmsg(6, "canvas_height:", canvas_height)
-
-			self.canvas.itemconfig(self.windows_item, width = canvas_width, height = canvas_height)
-		else:
-
-			base.debugmsg(6, "event:", event)
-			canvas_width = event.width
-			base.debugmsg(6, "canvas_width:", canvas_width)
-			canvas_height = event.height
-			base.debugmsg(6, "canvas_height:", canvas_height)
-			self.canvas.itemconfig(self.windows_item, width = canvas_width, height = canvas_height)
-
-
-	def update(self):
-		"Update the canvas and the scrollregion"
-
-		# self.update_idletasks()
-		kids = self.winfo_children()
-		base.debugmsg(6, "kids:", kids)
-
-		# kids = self.canvas.winfo_children()
-		# base.debugmsg(6, "kids:", kids)
-		if len(kids)>0:
-			# base.debugmsg(6, "self.canvas.bbox(kids[0]):", self.canvas.bbox(kids[0]))
-			base.debugmsg(6, kids[0].winfo_width(), kids[0].winfo_height())
-
-			self.canvas.config(scrollregion=(0,0,kids[0].winfo_width(),kids[0].winfo_height()+10))
-		else:
-			base.debugmsg(6, "self.canvas.bbox(self.windows_item):", self.canvas.bbox(self.windows_item))
-			base.debugmsg(6, "self.windows_item:", self.windows_item)
-			self.canvas.config(scrollregion=self.canvas.bbox(self.windows_item))
-
-
-
-
-
 
 class AgentServer(BaseHTTPRequestHandler):
 	def do_HEAD(self):
@@ -2674,30 +2498,14 @@ class RFSwarmGUI(tk.Frame):
 		# Plan scripts
 		base.debugmsg(6, "Plan scripts")
 
-		#
-		# # This partially worked but scroll bars ar behind the content making it dificult to scroll
-		# sg = ttk.Frame(p)
-		# # sg = Scrollable(p, width=32)
-		# sg.grid(column=0, row=planrow, sticky="nsew")
-		# sg.columnconfigure(0, weight=1)
-		# sg.rowconfigure(planrow, weight=0)
-		# self.scrollable_sg = ScrollableXY(sg)
-		# self.scriptgrid = ttk.Frame(self.scrollable_sg)
-		# self.scriptgrid.grid(row=0, column=0, sticky="nsew")
-		# self.scrollable_sg.canvas.columnconfigure(0, weight=1)
-		# self.scrollable_sg.canvas.rowconfigure(0, weight=1)
-
 
 		# # 2020-12-27 try again
 		sg = tk.Frame(p)
 		sg.grid(row=planrow, column=0, pady=(0, 0), sticky='news')
 		sg.grid_rowconfigure(0, weight=1)
 		sg.grid_columnconfigure(0, weight=1)
-		# Set grid_propagate to False to allow 5-by-5 buttons resizing later
-		# sg.grid_propagate(False)
 
 		self.sg_canvas = tk.Canvas(sg)
-		# self.sg_canvas = tk.Canvas(sg, bg="yellow")
 		self.sg_canvas.grid(row=0, column=0, sticky="news")
 
 		# Link a scrollbar to the canvas
@@ -2712,11 +2520,9 @@ class RFSwarmGUI(tk.Frame):
 
 
 		self.scriptgrid = tk.Frame(self.sg_canvas)
-		# self.scriptgrid = tk.Frame(self.sg_canvas, bg="blue")
 		self.sg_canvas.create_window((0, 0), window=self.scriptgrid, anchor='nw')
 
 
-		# sg_canvas.config(scrollregion=sg_canvas.bbox("all"))
 
 
 		# label row 0 of sg
@@ -3770,12 +3576,6 @@ class RFSwarmGUI(tk.Frame):
 		if "Run" not in self.elements:
 			self.elements["Run"] = {}
 
-		# base.debugmsg(6, "Frame")
-		# rg = ttk.Frame(r)
-		# rg.grid(column=0, row=1, sticky="nsew")
-		# r.columnconfigure(0, weight=1)
-		# r.rowconfigure(0, weight=1) # weight=0 means don't resize with other grid rows / keep a fixed size
-
 		rgbar = ttk.Frame(r)
 		rgbar.grid(row=0, column=0, sticky="nsew")
 
@@ -3889,42 +3689,20 @@ class RFSwarmGUI(tk.Frame):
 		# rpt.grid(column=52, row=1, sticky="nsew") # , rowspan=2
 
 
+
 		#
 		# run results table
 		#
 		base.debugmsg(6, "run results table")
 
-		# this scrolling method might work better, but will need to try it
-		# https://stackoverflow.com/questions/33478863/adding-x-and-y-scrollbar-to-a-canvas
-
-		rungridprnt = ttk.Frame(r)
-		rungridprnt.grid(row=1, column=0, sticky="nsew")
 		r.rowconfigure(1, weight=1)
 
-		runcanvas = tk.Canvas(rungridprnt)
-
-
-		#
-		# # This partially worked but scroll bars ar behind the content making it dificult to scroll
-		# rungridprnt = ttk.Frame(r)
-		# rungridprnt.grid(row=1, column=0, sticky="nsew")
-		# r.rowconfigure(1, weight=1)
-		# self.scrollable_rg = ScrollableXY(rungridprnt)
-		# self.rungrid = ttk.Frame(self.scrollable_rg)
-		# self.rungrid.grid(row=0, column=0, sticky="nsew")
-		# self.scrollable_rg.canvas.columnconfigure(0, weight=1)
-		# self.scrollable_rg.canvas.rowconfigure(0, weight=1)
-
-		# # 2020-12-27 try again
 		rungridprnt = tk.Frame(r)
 		rungridprnt.grid(row=1, column=0, pady=(0, 0), sticky='news')
 		rungridprnt.grid_rowconfigure(0, weight=1)
 		rungridprnt.grid_columnconfigure(0, weight=1)
-		# Set grid_propagate to False to allow 5-by-5 buttons resizing later
-		# sg.grid_propagate(False)
 
 		self.run_canvas = tk.Canvas(rungridprnt)
-		# self.sg_canvas = tk.Canvas(sg, bg="yellow")
 		self.run_canvas.grid(row=0, column=0, sticky="news")
 
 		# Link a scrollbar to the canvas
@@ -3939,8 +3717,8 @@ class RFSwarmGUI(tk.Frame):
 
 
 		self.rungrid = tk.Frame(self.run_canvas)
-		# self.scriptgrid = tk.Frame(self.sg_canvas, bg="blue")
 		self.run_canvas.create_window((0, 0), window=self.rungrid, anchor='nw')
+
 
 
 		# set initial columns for the results grid
@@ -4236,25 +4014,10 @@ class RFSwarmGUI(tk.Frame):
 			a.columnconfigure(agentrow, weight=1)
 			a.rowconfigure(agentrow, weight=1) # weight=0 means don't resize with other grid rows / keep a fixed size
 
-			#
-			# # This partially worked but scroll bars ar behind the content making it dificult to scroll
-			# ag = ttk.Frame(a)
-			# ag.grid(column=0, row=1, sticky="nsew")
-			# a.rowconfigure(1, weight=1)
-			# self.scrollable_ag = ScrollableXY(ag)
-			# self.agenttgrid = ttk.Frame(self.scrollable_ag)
-			# self.agenttgrid.grid(row=0, column=0, sticky="nsew")
-			# self.scrollable_ag.canvas.columnconfigure(0, weight=1)
-			# self.scrollable_ag.canvas.rowconfigure(0, weight=1)
-
-
-			# # 2020-12-27 try again
 			ag = tk.Frame(a)
 			ag.grid(row=agentrow, column=0, pady=(0, 0), sticky='news')
 			ag.grid_rowconfigure(0, weight=1)
 			ag.grid_columnconfigure(0, weight=1)
-			# Set grid_propagate to False to allow 5-by-5 buttons resizing later
-			# sg.grid_propagate(False)
 
 			self.ag_canvas = tk.Canvas(ag)
 			self.ag_canvas.grid(row=0, column=0, sticky="news")
@@ -4273,9 +4036,6 @@ class RFSwarmGUI(tk.Frame):
 			self.agenttgrid = tk.Frame(self.ag_canvas)
 			# self.scriptgrid = tk.Frame(self.sg_canvas, bg="blue")
 			self.ag_canvas.create_window((0, 0), window=self.agenttgrid, anchor='nw')
-
-
-
 
 
 			base.debugmsg(6, "Column Headings")
@@ -4397,6 +4157,11 @@ class RFSwarmGUI(tk.Frame):
 			except Exception as e:
 				base.debugmsg(1, "grdrows:", grdrows, "Exception:", e)
 			grdrows += -1
+
+
+		# update scrollbars
+		self.agenttgrid.update_idletasks()
+		self.ag_canvas.config(scrollregion=self.ag_canvas.bbox("all"))
 
 
 	def add_agent_row(self, rnum):
