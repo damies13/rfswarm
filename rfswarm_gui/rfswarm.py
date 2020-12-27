@@ -4234,34 +4234,47 @@ class RFSwarmGUI(tk.Frame):
 
 			agentrow = 0
 			a.columnconfigure(agentrow, weight=1)
-			a.rowconfigure(agentrow, weight=0) # weight=0 means don't resize with other grid rows / keep a fixed size
-
-			# base.debugmsg(6, "Frame")
-
-			# self.scrollable_ag = Scrollable(a)
-			# self.scrollable_ag.grid(column=0, row=1, sticky="nsew")
-			# self.agenttgrid = ttk.Frame(self.scrollable_ag)
-			# self.agenttgrid.grid(row=0, column=0, sticky="nsew")
-
-
-
-
-			# ag = ttk.Frame(a)
-			# ag.grid(column=0, row=1, sticky="nsew")
-			# self.agenttgrid = ttk.Frame(ag)
-			# self.agenttgrid.grid(row=0, column=0, sticky="nsew")
-
+			a.rowconfigure(agentrow, weight=1) # weight=0 means don't resize with other grid rows / keep a fixed size
 
 			#
 			# # This partially worked but scroll bars ar behind the content making it dificult to scroll
-			ag = ttk.Frame(a)
-			ag.grid(column=0, row=1, sticky="nsew")
-			a.rowconfigure(1, weight=1)
-			self.scrollable_ag = ScrollableXY(ag)
-			self.agenttgrid = ttk.Frame(self.scrollable_ag)
-			self.agenttgrid.grid(row=0, column=0, sticky="nsew")
-			self.scrollable_ag.canvas.columnconfigure(0, weight=1)
-			self.scrollable_ag.canvas.rowconfigure(0, weight=1)
+			# ag = ttk.Frame(a)
+			# ag.grid(column=0, row=1, sticky="nsew")
+			# a.rowconfigure(1, weight=1)
+			# self.scrollable_ag = ScrollableXY(ag)
+			# self.agenttgrid = ttk.Frame(self.scrollable_ag)
+			# self.agenttgrid.grid(row=0, column=0, sticky="nsew")
+			# self.scrollable_ag.canvas.columnconfigure(0, weight=1)
+			# self.scrollable_ag.canvas.rowconfigure(0, weight=1)
+
+
+			# # 2020-12-27 try again
+			ag = tk.Frame(a)
+			ag.grid(row=agentrow, column=0, pady=(0, 0), sticky='news')
+			ag.grid_rowconfigure(0, weight=1)
+			ag.grid_columnconfigure(0, weight=1)
+			# Set grid_propagate to False to allow 5-by-5 buttons resizing later
+			# sg.grid_propagate(False)
+
+			self.ag_canvas = tk.Canvas(ag)
+			self.ag_canvas.grid(row=0, column=0, sticky="news")
+
+			# Link a scrollbar to the canvas
+			ag_vsb = tk.Scrollbar(ag, orient="vertical", command=self.ag_canvas.yview)
+			ag_vsb.grid(row=0, column=1, sticky='ns')
+			self.ag_canvas.configure(yscrollcommand=ag_vsb.set)
+
+			# Link another scrollbar to the canvas
+			ag_hsb = tk.Scrollbar(ag, orient="horizontal", command=self.ag_canvas.xview)
+			ag_hsb.grid(row=1, column=0, sticky='ew')
+			self.ag_canvas.configure(xscrollcommand=ag_hsb.set)
+
+
+			self.agenttgrid = tk.Frame(self.ag_canvas)
+			# self.scriptgrid = tk.Frame(self.sg_canvas, bg="blue")
+			self.ag_canvas.create_window((0, 0), window=self.agenttgrid, anchor='nw')
+
+
 
 
 
@@ -4293,6 +4306,10 @@ class RFSwarmGUI(tk.Frame):
 
 			usr = ttk.Label(self.agenttgrid, text="  Assigned  ", borderwidth=2, relief="raised")
 			usr.grid(column=13, row=0, sticky="nsew")
+
+			# update scrollbars
+			self.agenttgrid.update_idletasks()
+			self.ag_canvas.config(scrollregion=self.ag_canvas.bbox("all"))
 
 
 	def delayed_UpdateAgents(self):
@@ -4406,6 +4423,9 @@ class RFSwarmGUI(tk.Frame):
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["AssignedRobots"], borderwidth=2, relief="groove")
 		usr.grid(column=13, row=rnum, sticky="nsew")
 
+		# update scrollbars
+		self.agenttgrid.update_idletasks()
+		self.ag_canvas.config(scrollregion=self.ag_canvas.bbox("all"))
 
 
 	def UA_removerow(self, r):
@@ -4414,6 +4434,9 @@ class RFSwarmGUI(tk.Frame):
 		for elmt in relmts:
 			elmt.destroy()
 
+		# update scrollbars
+		self.agenttgrid.update_idletasks()
+		self.ag_canvas.config(scrollregion=self.ag_canvas.bbox("all"))
 
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
