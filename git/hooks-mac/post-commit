@@ -10,15 +10,16 @@ version=$(git rev-parse --abbrev-ref HEAD)
 if [[ "$version" =~ v[0-9]\. ]]; then
 	# echo "version: $version"
 	# numver=$(echo $version | sed -E 's/v(.*)/\1/')
-	numver=$(echo $version | sed -E 's/v(.*)-.*/\1/')
+	# numver=$(echo $version | sed -E 's/v(.*)-.*/\1/')
+	numver=$(echo $currversion | sed -E 's/v([^-]*)/\1/')
 	sed -i '' -e "s/version *= *\"[^\"]*\"/version=\"${numver}\"/" $(find . -name "*.py")
 	#	Version Test
-	sed -i '' -e "s/#    Version .*/#    Version ${version}/" $(find . -name "*.py")
+	sed -i '' -e "s/#    Version .*/#    Version ${numver}/" $(find . -name "*.py")
 	# git commit -m "Update version to ${version}"
 	if ! git diff-index --quiet HEAD --; then
 		# echo "commit: Update version to $version"
 		git add $(find . -name "*.py")
-	    git commit -m "Update version to ${version}"
+	    git commit -m "Update version to ${numver}"
 	fi
 # else
 # 	echo "version ($version) not pattern 'v[0-9]\.'"
