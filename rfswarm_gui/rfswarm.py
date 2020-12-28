@@ -641,7 +641,26 @@ class RFSwarmBase:
 				c.execute('''CREATE TABLE Results
 					(script_index int, virtual_user int, iteration int, agent text, sequence int, result_name text, result text, elapsed_time num, start_time num, end_time num)''')
 
+				c.execute('''CREATE TABLE Metric
+					(Name TEXT NOT NULL, Type TEXT NOT NULL, PRIMARY KEY("Name"))''')
+
+				c.execute('''CREATE TABLE Metrics
+					(ParentID INTEGER NOT NULL, Time INTEGER NOT NULL, Key TEXT NOT NULL, Value TEXT)''')
+
+
 				# create indexes?
+				c.execute('''
+				CREATE INDEX "idx_metric_type" ON "Metric" ("Type"	ASC)
+				''')
+
+				c.execute('''
+				CREATE INDEX "idx_metrics_parentid_key" ON "Metrics" ( "ParentID"	ASC, "Key"	ASC)
+				''')
+
+				c.execute('''
+				CREATE INDEX "idx_metrics_parentid_time_key" ON "Metrics" ( "ParentID"	ASC, "Time"	ASC, "Key"	ASC)
+				''')
+
 
  				# create views
 
@@ -660,6 +679,48 @@ class RFSwarmBase:
 				GROUP BY
 					r.result_name
 				ORDER BY r.sequence
+				''')
+
+
+				c.execute('''
+				CREATE VIEW "AgentList" as
+				SELECT
+					a.Name "AgentName"
+					, s.Value "AgentStatus"
+					, max(s.Time) as "AgentLastSeen"
+					, r.Value "AgentRobots"
+					, l.Value "AgentLoad"
+					, c.Value "AgentCPU"
+					, m.Value "AgentMEM"
+					, n.Value "AgentNET"
+				from Metric a
+					left join Metrics s on s.ParentID = a.ROWID and s.Key = "Status"
+					left join Metrics r on r.ParentID = a.ROWID and r.Key = "Robots" and r.Time = s.Time
+					left join Metrics l on l.ParentID = a.ROWID and l.Key = "Load" and l.Time = s.Time
+					left join Metrics c on c.ParentID = a.ROWID and c.Key = "CPU" and c.Time = s.Time
+					left join Metrics m on m.ParentID = a.ROWID and m.Key = "MEM" and m.Time = s.Time
+					left join Metrics n on m.ParentID = a.ROWID and n.Key = "NET" and n.Time = s.Time
+				where a.Type = "agent"
+				GROUP by s.ParentID
+				ORDER by a.Name
+				''')
+
+				c.execute('''
+				CREATE VIEW "ResultSummary" as
+				SELECT
+					a.Name
+					, max(e.Time) as "EntryTime"
+					, mn.Value "Min"
+					, mx.Value "Max"
+					, av.Value "Average"
+				from Metric a
+					left join Metrics e on e.ParentID = a.ROWID and e.Key = "EntryTime"
+					left join Metrics mn on mn.ParentID = a.ROWID and mn.Key = "Min" and e.Time = mn.Time
+					left join Metrics mx on mx.ParentID = a.ROWID and mx.Key = "Max" and e.Time = mx.Time
+					left join Metrics av on av.ParentID = a.ROWID and av.Key = "Average" and e.Time = av.Time
+				where a.Type = "Summary"
+				GROUP by a.ROWID
+				ORDER by a.ROWID
 				''')
 
 
