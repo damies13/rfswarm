@@ -165,9 +165,6 @@ class RFSwarmAgent():
 			self.debugmsg(6, "self.xmlmode: ", self.xmlmode)
 			self.create_listner_file()
 
-		t = threading.Thread(target=self.tick_counter)
-		t.start()
-
 
 	def debugmsg(self, lvl, *msg):
 		msglst = []
@@ -361,17 +358,6 @@ class RFSwarmAgent():
 		else:
 			self.config['Agent']['swarmserver'] = "http://localhost:8138/"
 			self.saveini()
-
-	def tick_counter(self):
-
-		# t = threading.Thread(target=self.tick_counter)
-		# t.start()
-		# only tick once per day
-		# 1 day, 24 hours  = 60 * 60 * 24
-		aday = 60 * 60 * 24
-		while True:
-			self.debugmsg(9, "tick_counter")
-			time.sleep(aday)
 
 
 	def getscripts(self):
