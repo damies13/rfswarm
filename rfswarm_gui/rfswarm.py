@@ -432,7 +432,8 @@ class RFSwarmBase:
 	datapath = ""
 	dbfile = ""
 	datadb = None
-	dbqueue = {"Write": [], "Read": [], "ReadResult": {}, "Agents": [], "Results": []}
+	dbqueue = {"Write": [], "Read": [], "ReadResult": {}, "Agents": [], "Results": [], "Metric": [], "Metrics": []}
+	MetricIDs = {}
 
 	# #000000 = Black
 	defcolours = ['#000000']
@@ -506,53 +507,7 @@ class RFSwarmBase:
 
 			if self.datadb is not None:
 
-				if len(base.dbqueue["Write"])>0:
-					base.debugmsg(9, "run_db_thread: dbqueue: Write")
-					tmpq = list(base.dbqueue["Write"])
-					base.dbqueue["Write"] = []
-					base.debugmsg(9, "run_db_thread: dbqueue: Write: tmpq:", tmpq)
-					for item in tmpq:
-						if item["SQL"] and item["VALUES"]:
-							try:
-								base.debugmsg(9, "run_db_thread: dbqueue: Write: SQL:", item["SQL"], " 	VALUES:", item["VALUES"])
-								cur = self.datadb.cursor()
-								cur.execute(item["SQL"], item["VALUES"])
-								cur.close()
-								self.datadb.commit()
-							except Exception as e:
-								base.debugmsg(6, "run_db_thread: dbqueue: Write: Exception:", e)
-								base.debugmsg(6, "run_db_thread: dbqueue: Write: Item:", item)
-						else:
-							print("run_db_thread: dbqueue: Write: Item not written, missing key SQL or VALUES")
-							print("run_db_thread: dbqueue: Write: Item:", item)
-
-				if len(base.dbqueue["Read"])>0:
-					base.debugmsg(9, "run_db_thread: dbqueue: Read")
-					tmpq = list(base.dbqueue["Read"])
-					base.dbqueue["Read"] = []
-					base.debugmsg(9, "run_db_thread: dbqueue: Read: tmpq:", tmpq)
-					for item in tmpq:
-						if "SQL" in item: # and item["VALUES"]:
-							try:
-								base.debugmsg(9, "run_db_thread: dbqueue: Read: SQL:", item["SQL"])
-								self.datadb.row_factory = self.dict_factory
-								cur = self.datadb.cursor()
-								cur.execute(item["SQL"])
-								result = cur.fetchall()
-								base.debugmsg(9, "run_db_thread: dbqueue: Read: result:", result)
-								cur.close()
-								self.datadb.commit()
-
-								base.debugmsg(9, "run_db_thread: dbqueue: Read: result:", result)
-								if "KEY" in item:
-									base.dbqueue["ReadResult"][item["KEY"]] = result
-
-							except Exception as e:
-								base.debugmsg(6, "run_db_thread: dbqueue: Read: Exception:", e)
-								base.debugmsg(6, "run_db_thread: dbqueue: Read: Item:", item)
-						else:
-							print("run_db_thread: dbqueue: Read: Item not written, missing key SQL or VALUES")
-							print("run_db_thread: dbqueue: Read: Item:", item)
+				# process db queues
 
 				# Agents
 				if len(base.dbqueue["Agents"])>0:
@@ -585,6 +540,92 @@ class RFSwarmBase:
 					except Exception as e:
 						base.debugmsg(6, "run_db_thread: dbqueue: Results: Exception:", e)
 						base.debugmsg(6, "run_db_thread: dbqueue: Results: ", sql, resdata)
+
+
+				# Metric
+				if len(base.dbqueue["Metric"])>0:
+					base.debugmsg(9, "run_db_thread: dbqueue: Metric")
+					resdata = list(base.dbqueue["Metric"])
+					base.dbqueue["Metric"] = []
+					base.debugmsg(9, "run_db_thread: dbqueue: Metric: resdata:", resdata)
+					try:
+						sql = "INSERT OR IGNORE INTO Metric VALUES (?,?)"
+						cur = self.datadb.cursor()
+						cur.executemany(sql, resdata)
+						cur.close()
+						self.datadb.commit()
+					except Exception as e:
+						base.debugmsg(6, "run_db_thread: dbqueue: Metric: Exception:", e)
+						base.debugmsg(6, "run_db_thread: dbqueue: Metric: ", sql, resdata)
+
+				# Metrics
+				if len(base.dbqueue["Metrics"])>0:
+					base.debugmsg(9, "run_db_thread: dbqueue: Metrics")
+					resdata = list(base.dbqueue["Metrics"])
+					base.dbqueue["Metrics"] = []
+					base.debugmsg(9, "run_db_thread: dbqueue: Metrics: resdata:", resdata)
+					try:
+						sql = "INSERT INTO Metrics VALUES (?,?,?,?)"
+						cur = self.datadb.cursor()
+						cur.executemany(sql, resdata)
+						cur.close()
+						self.datadb.commit()
+					except Exception as e:
+						base.debugmsg(6, "run_db_thread: dbqueue: Metrics: Exception:", e)
+						base.debugmsg(6, "run_db_thread: dbqueue: Metrics: ", sql, resdata)
+
+
+				# General Write
+				if len(base.dbqueue["Write"])>0:
+					base.debugmsg(9, "run_db_thread: dbqueue: Write")
+					tmpq = list(base.dbqueue["Write"])
+					base.dbqueue["Write"] = []
+					base.debugmsg(9, "run_db_thread: dbqueue: Write: tmpq:", tmpq)
+					for item in tmpq:
+						if item["SQL"] and item["VALUES"]:
+							try:
+								base.debugmsg(9, "run_db_thread: dbqueue: Write: SQL:", item["SQL"], " 	VALUES:", item["VALUES"])
+								cur = self.datadb.cursor()
+								cur.execute(item["SQL"], item["VALUES"])
+								cur.close()
+								self.datadb.commit()
+							except Exception as e:
+								base.debugmsg(6, "run_db_thread: dbqueue: Write: Exception:", e)
+								base.debugmsg(6, "run_db_thread: dbqueue: Write: Item:", item)
+						else:
+							print("run_db_thread: dbqueue: Write: Item not written, missing key SQL or VALUES")
+							print("run_db_thread: dbqueue: Write: Item:", item)
+
+				# General Read
+				if len(base.dbqueue["Read"])>0:
+					base.debugmsg(9, "run_db_thread: dbqueue: Read")
+					tmpq = list(base.dbqueue["Read"])
+					base.dbqueue["Read"] = []
+					base.debugmsg(9, "run_db_thread: dbqueue: Read: tmpq:", tmpq)
+					for item in tmpq:
+						if "SQL" in item: # and item["VALUES"]:
+							try:
+								base.debugmsg(9, "run_db_thread: dbqueue: Read: SQL:", item["SQL"])
+								self.datadb.row_factory = self.dict_factory
+								cur = self.datadb.cursor()
+								cur.execute(item["SQL"])
+								result = cur.fetchall()
+								base.debugmsg(9, "run_db_thread: dbqueue: Read: result:", result)
+								cur.close()
+								self.datadb.commit()
+
+								base.debugmsg(9, "run_db_thread: dbqueue: Read: result:", result)
+								if "KEY" in item:
+									base.dbqueue["ReadResult"][item["KEY"]] = result
+
+							except Exception as e:
+								base.debugmsg(6, "run_db_thread: dbqueue: Read: Exception:", e)
+								base.debugmsg(6, "run_db_thread: dbqueue: Read: Item:", item)
+						else:
+							print("run_db_thread: dbqueue: Read: Item not written, missing key SQL or VALUES")
+							print("run_db_thread: dbqueue: Read: Item:", item)
+
+
 
 			time.sleep(0.1)
 		if self.datadb is not None:
