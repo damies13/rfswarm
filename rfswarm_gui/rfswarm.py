@@ -1221,6 +1221,84 @@ class RFSwarmBase:
 
 		base.dbqueue["Read"].append({"SQL": sql, "KEY": "RunStats"})
 
+		t = threading.Thread(target=self.SaveRunStats_SQL)
+		t.start()
+
+
+	def SaveRunStats_SQL(self):
+
+		base.debugmsg(7, "Wait for RunStats")
+		while "RunStats" not in base.dbqueue["ReadResult"]:
+			time.sleep(0.1)
+			base.debugmsg(9, "Wait for RunStats")
+
+		RunStats = base.dbqueue["ReadResult"]["RunStats"]
+		base.debugmsg(7, "RunStats:", RunStats)
+
+
+		# Save Metric Data
+		# 	First ensure a metric for this agent exists
+		if "Summary" not in base.MetricIDs:
+			base.MetricIDs["Summary"] = {}
+
+		for stat in RunStats:
+			base.debugmsg(7, "stat:", stat)
+			statname = stat["result_name"]
+			if statname not in base.MetricIDs["Summary"]:
+				# create the agent metric
+				base.dbqueue["Metric"].append( (statname, "Summary") )
+				# get the agent metric id
+				# safestatname = statname.replace("\"", "\"")
+				safestatname = statname.replace("\"", '\\"')
+				base.debugmsg(5, "safestatname:", safestatname)
+				sql = 'select ROWID from Metric where Name = "'+safestatname+'"'
+				base.debugmsg(5, "sql:", sql)
+				base.dbqueue["Read"].append({"SQL": sql, "KEY": "Metric_"+statname})
+
+		# Read Metric ID's
+		for stat in RunStats:
+			base.debugmsg(5, "stat:", stat)
+			statname = stat["result_name"]
+			if statname not in base.MetricIDs["Summary"]:
+				if "Read" in base.dbqueue:
+					base.debugmsg(7, "Read", base.dbqueue["Read"])
+				if "ReadResult" in base.dbqueue:
+					base.debugmsg(7, "ReadResult", base.dbqueue["ReadResult"])
+				base.debugmsg(7, "Wait for Metric_"+statname)
+				while "Metric_"+statname not in base.dbqueue["ReadResult"]:
+					time.sleep(0.1)
+					base.debugmsg(9, "Waiting for Metric_"+statname)
+				if "ReadResult" in base.dbqueue:
+					base.debugmsg(7, "ReadResult", base.dbqueue["ReadResult"])
+				base.debugmsg(7, "Wait for Metric_"+statname+">0")
+				while len(base.dbqueue["ReadResult"]["Metric_"+statname])<1:
+					time.sleep(0.1)
+					base.debugmsg(9, "Waiting for Metric_"+statname+">0")
+
+				if "Metric_"+statname in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["Metric_"+statname])>0:
+					base.debugmsg(7, "Metric_"+statname+":", base.dbqueue["ReadResult"]["Metric_"+statname])
+
+					base.MetricIDs["Summary"][statname] = base.dbqueue["ReadResult"]["Metric_"+statname][0]["rowid"]
+					base.debugmsg(5, "MetricIDs[Summary]:", base.MetricIDs["Summary"])
+
+			# Next save the Metrics
+			if statname in base.MetricIDs["Summary"]:
+				m_StatID = base.MetricIDs["Summary"][statname]
+				m_Time = int(time.time())
+				base.debugmsg(5, "m_StatID:", m_StatID, "	m_Time:", m_Time)
+
+				# stat: {'result_name': "Opening url 'http://opencart3/'", 'min': 0.411,
+				# 			'avg': 0.439, '90%ile': None, 'max': 0.467, 'stDev': 0.04,
+				# 			'_pass': 2, '_fail': 0, '_other': 0}
+
+				for stati in stat:
+					base.debugmsg(5, "stati:", stati, "	stat[stati]:", stat[stati])
+					if stati != "result_name":
+						base.dbqueue["Metrics"].append( (m_StatID, m_Time, stati, stat[stati]) )
+						base.debugmsg(5, "Saving m_StatID:", m_StatID, "	m_Time:", m_Time, "	stati:", stati, "	stat[stati]:", stat[stati])
+
+
+
 	def report_text(self, _event=None):
 		base.debugmsg(6, "report_text")
 		colno = 0
