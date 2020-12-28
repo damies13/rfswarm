@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version v0.6.1-beta
+#    Version v0.6.2
 #
 
 # 	Helpful links
@@ -31,6 +31,7 @@ from datetime import datetime
 import re
 import threading
 import subprocess
+import requests
 from operator import itemgetter
 import csv
 
@@ -109,182 +110,6 @@ class stdevclass:
 		except Exception as e:
 			base.debugmsg(5, "Exception:", e)
 
-class ScrollableY(tk.Frame):
-	"""
-		Make a frame scrollable with scrollbar on the right.
-		After adding or removing widgets to the scrollable frame,
-		call the update() method to refresh the scrollable area.
-	"""
-
-	def __init__(self, frame, width=16):
-		# tk.wm_attributes("-transparentcolor", TRANSCOLOUR)
-		scrollbar = tk.Scrollbar(frame, width=width)
-		scrollbar.pack(side=tk.RIGHT, fill=tk.Y, expand=False)
-
-		# self.canvas = tk.Canvas(frame, yscrollcommand=scrollbar.set, background="Red")
-		self.canvas = tk.Canvas(frame, yscrollcommand=scrollbar.set)
-		self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-		scrollbar.config(command=self.canvas.yview)
-
-		self.canvas.bind('<Configure>', self.__fill_canvas)
-
-		# base class initialization
-		tk.Frame.__init__(self, frame)
-
-		# assign this obj (the inner frame) to the windows item of the canvas
-		self.windows_item = self.canvas.create_window(0,0, window=self, anchor=tk.NW)
-
-
-	def __fill_canvas(self, event):
-		"Enlarge the windows item to the canvas width"
-		kids = self.winfo_children()
-		base.debugmsg(6, "kids:", kids)
-		# kids = self.canvas.winfo_children()
-		# base.debugmsg(6, "kids:", kids)
-		if len(kids)>0:
-			# base.debugmsg(6, "self.canvas.bbox(kids[0]):", self.canvas.bbox(kids[0]))
-			# base.debugmsg(6, kids[0].winfo_width(), kids[0].winfo_height())
-			canvas_width = kids[0].winfo_width()
-			base.debugmsg(6, "canvas_width:", canvas_width)
-			canvas_height = kids[0].winfo_height()
-			base.debugmsg(6, "canvas_height:", canvas_height)
-
-			self.canvas.itemconfig(self.windows_item, width = canvas_width, height = canvas_height)
-		else:
-
-			base.debugmsg(6, "event:", event)
-			canvas_width = event.width
-			base.debugmsg(6, "canvas_width:", canvas_width)
-			canvas_height = event.height
-			base.debugmsg(6, "canvas_height:", canvas_height)
-			self.canvas.itemconfig(self.windows_item, width = canvas_width, height = canvas_height)
-
-	def update(self):
-		"Update the canvas and the scrollregion"
-
-		# self.update_idletasks()
-		kids = self.winfo_children()
-		base.debugmsg(6, "kids:", kids)
-
-		# kids = self.canvas.winfo_children()
-		# base.debugmsg(6, "kids:", kids)
-		if len(kids)>0:
-			# base.debugmsg(6, "self.canvas.bbox(kids[0]):", self.canvas.bbox(kids[0]))
-			base.debugmsg(6, kids[0].winfo_width(), kids[0].winfo_height())
-
-			self.canvas.config(scrollregion=(0,0,kids[0].winfo_width(),kids[0].winfo_height()+10))
-		else:
-			base.debugmsg(6, "self.canvas.bbox(self.windows_item):", self.canvas.bbox(self.windows_item))
-			base.debugmsg(6, "self.windows_item:", self.windows_item)
-			self.canvas.config(scrollregion=self.canvas.bbox(self.windows_item))
-
-class ScrollableXY(tk.Frame):
-	"""
-		Make a frame scrollable with scrollbar on the right.
-		After adding or removing widgets to the scrollable frame,
-		call the update() method to refresh the scrollable area.
-	"""
-
-	def __init__(self, frame, width=16):
-
-		scrollbary = tk.Scrollbar(frame, orient="vertical", width=width)
-		scrollbarx = tk.Scrollbar(frame, orient="horizontal", width=width)
-		scrollbary.pack(side=tk.RIGHT, fill=tk.Y, expand=False)
-		scrollbarx.pack(side=tk.BOTTOM, fill=tk.X, expand=False)
-
-		# self.canvas = tk.Canvas(frame, yscrollcommand=scrollbary.set, xscrollcommand=scrollbarx.set)
-		self.canvas = tk.Canvas(frame, yscrollcommand=scrollbary.set)
-		self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-		# self.canvas = tk.Canvas(frame, xscrollcommand=scrollbarx.set)
-		# self.canvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-
-		scrollbary.config(command=self.canvas.yview)
-		scrollbarx.config(command=self.canvas.xview)
-
-		self.canvas.bind('<Configure>', self.__fill_canvas)
-
-		# base class initialization
-		tk.Frame.__init__(self, frame)
-
-		# assign this obj (the inner frame) to the windows item of the canvas
-		self.windows_item = self.canvas.create_window(0,0, window=self, anchor=tk.NW)
-
-
-	def __fill_canvas(self, event):
-		"Enlarge the windows item to the canvas width"
-		base.debugmsg(6, "event:", event)
-		kids = self.winfo_children()
-		base.debugmsg(6, "kids:", kids)
-		# kids = self.canvas.winfo_children()
-		# base.debugmsg(6, "kids:", kids)
-		if len(kids)>0:
-			# base.debugmsg(6, "self.canvas.bbox(kids[0]):", self.canvas.bbox(kids[0]))
-			# base.debugmsg(6, kids[0].winfo_width(), kids[0].winfo_height())
-			canvas_width = kids[0].winfo_width()
-			base.debugmsg(6, "canvas_width:", canvas_width)
-			canvas_height = kids[0].winfo_height()
-			base.debugmsg(6, "canvas_height:", canvas_height)
-
-			self.canvas.itemconfig(self.windows_item, width = canvas_width, height = canvas_height)
-		else:
-
-			base.debugmsg(6, "event:", event)
-			canvas_width = event.width
-			base.debugmsg(6, "canvas_width:", canvas_width)
-			canvas_height = event.height
-			base.debugmsg(6, "canvas_height:", canvas_height)
-			self.canvas.itemconfig(self.windows_item, width = canvas_width, height = canvas_height)
-
-	def fill_canvas(self):
-		"Enlarge the windows item to the canvas width"
-		time.sleep(.02)
-		kids = self.winfo_children()
-		base.debugmsg(6, "kids:", kids)
-		# kids = self.canvas.winfo_children()
-		# base.debugmsg(6, "kids:", kids)
-		if len(kids)>0:
-			# base.debugmsg(6, "self.canvas.bbox(kids[0]):", self.canvas.bbox(kids[0]))
-			# base.debugmsg(6, kids[0].winfo_width(), kids[0].winfo_height())
-			canvas_width = kids[0].winfo_width()
-			base.debugmsg(6, "canvas_width:", canvas_width)
-			canvas_height = kids[0].winfo_height()
-			base.debugmsg(6, "canvas_height:", canvas_height)
-
-			self.canvas.itemconfig(self.windows_item, width = canvas_width, height = canvas_height)
-		else:
-
-			base.debugmsg(6, "event:", event)
-			canvas_width = event.width
-			base.debugmsg(6, "canvas_width:", canvas_width)
-			canvas_height = event.height
-			base.debugmsg(6, "canvas_height:", canvas_height)
-			self.canvas.itemconfig(self.windows_item, width = canvas_width, height = canvas_height)
-
-
-	def update(self):
-		"Update the canvas and the scrollregion"
-
-		# self.update_idletasks()
-		kids = self.winfo_children()
-		base.debugmsg(6, "kids:", kids)
-
-		# kids = self.canvas.winfo_children()
-		# base.debugmsg(6, "kids:", kids)
-		if len(kids)>0:
-			# base.debugmsg(6, "self.canvas.bbox(kids[0]):", self.canvas.bbox(kids[0]))
-			base.debugmsg(6, kids[0].winfo_width(), kids[0].winfo_height())
-
-			self.canvas.config(scrollregion=(0,0,kids[0].winfo_width(),kids[0].winfo_height()+10))
-		else:
-			base.debugmsg(6, "self.canvas.bbox(self.windows_item):", self.canvas.bbox(self.windows_item))
-			base.debugmsg(6, "self.windows_item:", self.windows_item)
-			self.canvas.config(scrollregion=self.canvas.bbox(self.windows_item))
-
-
-
-
-
 
 class AgentServer(BaseHTTPRequestHandler):
 	def do_HEAD(self):
@@ -342,6 +167,7 @@ class AgentServer(BaseHTTPRequestHandler):
 					jsonreq = json.loads(rawData)
 
 					requiredfields = ["AgentName", "Hash"]
+					# requiredfields = ["AgentName", "Action", "Hash"]
 					for field in requiredfields:
 						if field not in jsonreq:
 							httpcode = 422
@@ -351,25 +177,77 @@ class AgentServer(BaseHTTPRequestHandler):
 					if httpcode == 200:
 
 						jsonresp["AgentName"] = jsonreq["AgentName"]
-						if "Hash" in jsonreq and len(jsonreq["Hash"])>0:
-							hash = jsonreq["Hash"]
-							jsonresp["Hash"] = jsonreq["Hash"]
-							jsonresp["File"] = base.scriptfiles[hash]['relpath']
-							localpath = base.scriptfiles[hash]['localpath']
-							buf = "\n"
-							with open(localpath, 'rb') as afile:
-							    buf = afile.read()
-							base.debugmsg(9, "buf:", buf)
-							compressed = lzma.compress(buf)
-							base.debugmsg(9, "compressed:", compressed)
-							encoded = base64.b64encode(compressed)
-							base.debugmsg(9, "encoded:", encoded)
+						#	jsonresp["POST"]["File"]["Body"]["Action"] = "<Upload/Download/Status>"
+						if "Action" in jsonreq and len(jsonreq["Action"])>0 and jsonreq["Action"] in ["Upload","Download","Status"]:
+							if jsonreq["Action"] == "Download":
+								if "Hash" in jsonreq and len(jsonreq["Hash"])>0 and jsonreq["Hash"] in base.scriptfiles:
+									hash = jsonreq["Hash"]
+									jsonresp["Hash"] = jsonreq["Hash"]
+									jsonresp["File"] = base.scriptfiles[hash]['relpath']
+									localpath = base.scriptfiles[hash]['localpath']
+									buf = "\n"
+									with open(localpath, 'rb') as afile:
+									    buf = afile.read()
+									base.debugmsg(9, "buf:", buf)
+									compressed = lzma.compress(buf)
+									base.debugmsg(9, "compressed:", compressed)
+									encoded = base64.b64encode(compressed)
+									base.debugmsg(9, "encoded:", encoded)
 
-							jsonresp["FileData"] = encoded.decode('ASCII')
+									jsonresp["FileData"] = encoded.decode('ASCII')
+
+								else:
+									httpcode = 404
+									jsonresp["Message"] = "Known File Hash required to download a file"
+
+							if jsonreq["Action"] == "Status":
+								if "Hash" in jsonreq and len(jsonreq["Hash"])>0:
+									jsonresp["Hash"] = jsonreq["Hash"]
+									if jsonreq["Hash"] in base.scriptfiles or jsonreq["Hash"] in base.uploadfiles:
+										jsonresp["Exists"] = "True"
+									else:
+										jsonresp["Exists"] = "False"
+								else:
+									httpcode = 404
+									jsonresp["Message"] = "File Hash required to check file status"
+
+							if jsonreq["Action"] == "Upload":
+								#
+								# 	TODO: Receive Upload file
+								#
+								if "Hash" in jsonreq and len(jsonreq["Hash"])>0:
+									jsonresp["Hash"] = jsonreq["Hash"]
+									if jsonreq["Hash"] in base.uploadfiles:
+										jsonresp["Result"] = "Exists"
+									else:
+										# base.debugmsg(5, "jsonreq:", jsonreq)
+										# jsonreq: {
+										# 		'AgentName': 'DavesMBP',
+										# 		'Action': 'Upload',
+										# 		'Hash': 'e7b73742ee1c3d558c4d20adf639d8d8',
+										# 		'File': 'OC_Demo_2_1_3_1608352678_1_1608352681/Browse_Store_Product_1.log',
+										# 		'FileData': <filedata>
+										# 	}
+										logdir = os.path.join(base.datapath, "logs")
+										if os.path.exists(logdir) and os.path.isfile(logdir):
+											logdir = os.path.join(base.datapath, "logs"+str(int(time.time())))
+
+										base.debugmsg(7, "logdir:", logdir)
+										localpath = os.path.join(logdir, jsonreq['File'])
+										base.debugmsg(7, "localpath:", localpath)
+										jsonreq['LocalFile'] = localpath
+										base.uploadfiles[jsonreq["Hash"]] = jsonreq
+
+										t = threading.Thread(target=base.save_upload_file, args=(jsonreq["Hash"],))
+										t.start()
+
+										jsonresp["Result"] = "Saved"
+
 
 						else:
 							httpcode = 404
-							jsonresp["Message"] = "Known File Hash required to download a file"
+							jsonresp["Message"] = "Unknown Action"
+
 
 				if (parsed_path.path == "/Jobs"):
 					jsonreq = json.loads(rawData)
@@ -387,6 +265,7 @@ class AgentServer(BaseHTTPRequestHandler):
 						jsonresp["StartTime"] = base.run_start
 						jsonresp["EndTime"] = base.run_end
 						jsonresp["RunName"] = base.robot_schedule["RunName"]
+						jsonresp["Abort"] = base.run_abort
 
 						# base.robot_schedule["Agents"]
 						if jsonresp["AgentName"] in base.robot_schedule["Agents"].keys():
@@ -398,12 +277,13 @@ class AgentServer(BaseHTTPRequestHandler):
 				# , "Result"
 				if (parsed_path.path == "/Result"):
 					jsonreq = json.loads(rawData)
-					base.debugmsg(5, "Result: jsonreq:", jsonreq)
+					base.debugmsg(6, "Result: jsonreq:", jsonreq)
 					requiredfields = ["AgentName", "ResultName", "Result", "ElapsedTime", "StartTime", "EndTime", "ScriptIndex", "VUser", "Iteration", "Sequence"]
 					for field in requiredfields:
 						if field not in jsonreq:
 							httpcode = 422
 							message = "Missing required field: '{}', required fields are: {}".format(field, requiredfields)
+							base.debugmsg(5, httpcode, ":", message)
 							break
 
 					if httpcode == 200:
@@ -465,6 +345,7 @@ class AgentServer(BaseHTTPRequestHandler):
 				jsonresp["POST"]["File"]["URI"] = "/File"
 				jsonresp["POST"]["File"]["Body"] = {}
 				jsonresp["POST"]["File"]["Body"]["AgentName"] = "<Agent Host Name>"
+				jsonresp["POST"]["File"]["Body"]["Action"] = "<Upload/Download/Status>"
 				jsonresp["POST"]["File"]["Body"]["Hash"] = "<File Hash, provided by /Scripts>"
 
 				jsonresp["POST"]["Result"] = {}
@@ -507,7 +388,7 @@ class AgentServer(BaseHTTPRequestHandler):
 
 
 class RFSwarmBase:
-	version="0.6.1"
+	version="v0.6.2"
 	debuglvl = 0
 
 	config = None
@@ -519,16 +400,19 @@ class RFSwarmBase:
 	scriptlist = [{}]
 	scriptfiles = {}
 
+	uploadfiles = {}
+
 	index = ""
 	file = ""
 	sheet = ""
 
 
-
+	run_abort = False
 	run_name = ""
 	run_name_current = ""
 	run_start = 0
 	run_end = 0
+	run_finish = 0
 	run_paused = False
 	run_threads = {}
 	total_robots = 0
@@ -865,6 +749,31 @@ class RFSwarmBase:
 		if remove:
 			del self.scriptfiles[hash]
 
+	def tick_counter(self):
+		#
+		# This function is simply a way to roughly measure the number of agents being used
+		# without collecting any other data from the user or thier machine.
+		#
+		# A simple get request on this file on startup or once a day should make it appear
+		# in the github insights if people are actually using this application.
+		#
+		# t = threading.Thread(target=self.tick_counter)
+		# t.start()
+		# only tick once per day
+		# 1 day, 24 hours  = 60 * 60 * 24
+		aday = 60 * 60 * 24
+		while True:
+			# https://github.com/damies13/rfswarm/blob/v0.6.2/Doc/Images/z_gui.txt
+			url = "https://github.com/damies13/rfswarm/blob/"+self.version+"/Doc/Images/z_gui.txt"
+			try:
+				r = requests.get(url)
+				self.debugmsg(9, "tick_counter:", r.status_code)
+			except:
+				pass
+			time.sleep(aday)
+
+
+
 	def find_dependancies(self, hash):
 		keep_going = True
 		checking = False
@@ -950,7 +859,7 @@ class RFSwarmBase:
 	def check_files_changed(self):
 		# self.scriptfiles[hash]
 		checkhashes = list(self.scriptfiles.keys())
-		base.debugmsg(3, "checkhashes:", checkhashes)
+		base.debugmsg(6, "checkhashes:", checkhashes)
 		for chkhash in checkhashes:
 			file_data = self.scriptfiles[chkhash]
 			script_hash = base.hash_file(file_data['localpath'], file_data['relpath'])
@@ -991,6 +900,72 @@ class RFSwarmBase:
 		# https://www.geeksforgeeks.org/python-os-path-relpath-method/
 		base.debugmsg(5, "relpath:", relpath)
 		return relpath
+
+	def save_upload_file(self, hash):
+		base.debugmsg(7, "hash:", hash)
+		# base.uploadfiles[jsonreq["Hash"]] = jsonreq
+		base.debugmsg(7, "uploadfile:", self.uploadfiles[hash])
+
+		# uploadfile: {
+		# 	'AgentName': 'DavesMBP',
+		# 	'Action': 'Upload',
+		# 	'Hash': 'e60dd517d3b36ccd4aaa27286cbbaa7b',
+		# 	'File': 'OC_Demo_2_1_1_1608356330_1_1608356333/Browse_Store_Product_1_output.xml',
+		# 	'FileData': 		,
+		# 	'LocalFile': '/Users/dave/Documents/GitHub/rfswarm/results/20201219_153823_3u_test_quick/logs/OC_Demo_2_1_1_1608356330_1_1608356333/Browse_Store_Product_1_output.xml'
+		# }
+		try:
+			localfile = self.uploadfiles[hash]['LocalFile']
+			# self.uploadfiles[hash]['File'] = jsonresp['File']
+			base.debugmsg(5, "file:", localfile, "hash:", hash)
+
+			# self.scriptlist[hash][]
+
+			filedata = self.uploadfiles[hash]['FileData']
+
+			self.debugmsg(6, "filedata:", filedata)
+			self.debugmsg(6, "filedata:")
+
+			decoded = base64.b64decode(filedata)
+			self.debugmsg(6, "b64decode: decoded:", decoded)
+			self.debugmsg(6, "b64decode:")
+
+			uncompressed = lzma.decompress(decoded)
+			self.debugmsg(6, "uncompressed:", uncompressed)
+			self.debugmsg(6, "uncompressed:")
+
+			localfiledir = os.path.dirname(localfile)
+			self.debugmsg(6, "localfiledir:", localfiledir)
+			ed = self.ensuredir(localfiledir)
+			self.debugmsg(6, "ensuredir:", ed)
+
+			with open(localfile, 'wb') as afile:
+				self.debugmsg(6, "afile:")
+				afile.write(uncompressed)
+				self.debugmsg(6, "write:")
+
+		except Exception as e:
+			self.debugmsg(1, "Exception:", e)
+
+	def ensuredir(self, dir):
+		if len(dir)<1:
+			return True
+		if os.path.exists(dir):
+			return True
+		try:
+			patharr = os.path.split(dir)
+			self.debugmsg(6, "patharr: ", patharr)
+			self.ensuredir(patharr[0])
+			os.mkdir(dir, mode=0o777)
+			self.debugmsg(5, "Directory Created: ", dir)
+			return True
+		except FileExistsError:
+			self.debugmsg(5, "Directory Exists: ", dir)
+			return False
+		except Exception as e:
+			self.debugmsg(1, "Directory Create failed: ", dir)
+			self.debugmsg(1, "with error: ", e)
+			return False
 
 	def saveini(self):
 		self.debugmsg(6, "save_ini:", self.save_ini)
@@ -1120,9 +1095,9 @@ class RFSwarmBase:
 		base.debugmsg(6, "report_text")
 		colno = 0
 		base.debugmsg(6, "RunStats")
+		base.debugmsg(6, "UpdateRunStats_SQL")
+		base.UpdateRunStats_SQL()
 		if "RunStats" not in base.dbqueue["ReadResult"]:
-			base.debugmsg(6, "UpdateRunStats_SQL")
-			base.UpdateRunStats_SQL()
 			base.debugmsg(6, "Wait for RunStats")
 			while "RunStats" not in base.dbqueue["ReadResult"]:
 				time.sleep(0.1)
@@ -1158,7 +1133,7 @@ class RFSwarmBase:
 			txtreport = os.path.join(base.datapath, "{}_summary.csv".format(fileprefix))
 			base.debugmsg(7, "txtreport:", txtreport)
 			base.debugmsg(1, "Summary File:", txtreport)
-			base.debugmsg(9, "RunStats:", base.dbqueue["ReadResult"]["RunStats"])
+			base.debugmsg(6, "RunStats:", base.dbqueue["ReadResult"]["RunStats"])
 			cols = []
 			for col in base.dbqueue["ReadResult"]["RunStats"][0].keys():
 				base.debugmsg(9, "colno:", colno, "col:", col)
@@ -1446,6 +1421,8 @@ class RFSwarmCore:
 		base.dbthread = threading.Thread(target=base.run_db_thread)
 		base.dbthread.start()
 
+		t = threading.Thread(target=base.tick_counter)
+		t.start()
 
 
 
@@ -1627,10 +1604,12 @@ class RFSwarmCore:
 		base.debugmsg(9, "register_result")
 		resdata = (index, vuser, iter, AgentName, sequence, result_name, result, elapsed_time, start_time, end_time)
 		base.debugmsg(9, "register_result: resdata:", resdata)
+		base.debugmsg(5, resdata)
 		base.dbqueue["Results"].append(resdata)
 		base.debugmsg(9, "register_result: dbqueue Results:", base.dbqueue["Results"])
 
 		if not base.args.nogui:
+			time.sleep(1)
 			ut = threading.Thread(target=base.gui.delayed_UpdateRunStats)
 			ut.start()
 
@@ -1769,14 +1748,17 @@ class RFSwarmCore:
 			base.run_name = "{}_{}".format(datafiletime, "Scenario")
 		base.debugmsg(5, "base.run_name:", base.run_name)
 
-
+		base.run_abort = False
 		base.run_start = 0
 		base.run_end = 0
+		base.run_finish = 0
+		base.posttest = False
 		base.run_paused = False
 		base.robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}}
 		t = threading.Thread(target=core.run_start_threads)
 		t.start()
 		if not base.args.nogui:
+			time.sleep(1)
 			ut = threading.Thread(target=base.gui.delayed_UpdateRunStats)
 			ut.start()
 
@@ -1795,13 +1777,19 @@ class RFSwarmCore:
 
 
 	def ClickStop(self, _event=None):
-		base.run_end = int(time.time()) #time now
-		base.debugmsg(0, "Run Stopped:", base.run_end, "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
-		base.robot_schedule["End"] = base.run_end
 
-		for agnt in base.robot_schedule["Agents"].keys():
-			for grurid in base.robot_schedule["Agents"][agnt].keys():
-				base.robot_schedule["Agents"][agnt][grurid]["EndTime"] = base.run_end
+		if base.run_end < int(time.time()):
+			# abort run?
+			base.run_abort = True
+			base.debugmsg(5, "base.run_abort:", base.run_abort)
+		else:
+			base.run_end = int(time.time()) #time now
+			base.debugmsg(0, "Run Stopped:", base.run_end, "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
+			base.robot_schedule["End"] = base.run_end
+
+			for agnt in base.robot_schedule["Agents"].keys():
+				for grurid in base.robot_schedule["Agents"][agnt].keys():
+					base.robot_schedule["Agents"][agnt][grurid]["EndTime"] = base.run_end
 
 	def run_start_threads(self):
 
@@ -2070,11 +2058,11 @@ class RFSwarmCore:
 		displayagent = True
 		time_elapsed = int(time.time()) - base.agenttgridupdate
 		if (time_elapsed>=5):
-			base.debugmsg(5, "time_elapsed:", time_elapsed)
+			base.debugmsg(6, "time_elapsed:", time_elapsed)
 
 			base.agenttgridupdate = int(time.time())
 			agntlst = list(base.Agents.keys())
-			base.debugmsg(5, "agntlst:", agntlst)
+			base.debugmsg(6, "agntlst:", agntlst)
 			for agnt in agntlst:
 				displayagent = True
 				tm = base.Agents[agnt]["LastSeen"]
@@ -2112,18 +2100,30 @@ class RFSwarmCore:
 					pass
 
 
-			if base.args.run:
-				base.debugmsg(5, "base.args.run:", base.args.run, "	base.args.nogui:", base.args.nogui, "	run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots)
-				if base.run_end > 0 and base.run_end < int(time.time()) and base.total_robots < 1 and not base.posttest:
-					base.debugmsg(0, "Test Completed:	", int(time.time()), "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
-					base.debugmsg(5, "run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots)
-					base.posttest = True
-					if base.args.nogui:
-						base.debugmsg(9, "report_text")
-						base.report_text()
-						base.debugmsg(6, "on_closing")
-						self.on_closing()
 
+			# if base.args.run:
+			base.debugmsg(5, "base.args.run:", base.args.run, "	base.args.nogui:", base.args.nogui, "	run_end:", base.run_end, "	time:", int(time.time()))
+			base.debugmsg(5, "base.posttest:", base.posttest, "	total_robots:", base.total_robots)
+			base.debugmsg(5, "run_finish:", base.run_finish, "	time:", int(time.time()))
+			if base.run_end > 0 and base.run_end < int(time.time()) and base.total_robots < 1 and not base.posttest and base.run_finish < 1:
+				base.run_finish = int(time.time())
+				base.debugmsg(5, "run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots)
+				if not base.args.nogui:
+					time.sleep(1)
+					base.gui.delayed_UpdateRunStats()
+
+			if base.run_finish > 0 and base.run_finish + 60 < int(time.time()) and not base.posttest:
+			# if base.run_finish > 0 and base.run_end + 5 < base.run_finish and not base.posttest:
+				base.debugmsg(0, "Test Completed:	", base.run_finish, "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
+				base.posttest = True
+				if base.args.nogui:
+					base.debugmsg(9, "report_text")
+					base.report_text()
+					base.debugmsg(6, "on_closing")
+					self.on_closing()
+				else:
+					time.sleep(1)
+					base.gui.delayed_UpdateRunStats()
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -2171,6 +2171,8 @@ class RFSwarmGUI(tk.Frame):
 
 	imgdata = {}
 	b64 = {}
+
+	elements = {}
 
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -2249,26 +2251,30 @@ class RFSwarmGUI(tk.Frame):
 		# files["report_text"] = "famfamfam_silk_icons/icons/report.gif"
 		# files["report_html"] = "famfamfam_silk_icons/icons/report_go.gif"
 		# files["report_word"] = "famfamfam_silk_icons/icons/report_word.gif"
+		# files["Abort"] = "../famfamfam_silk_icons/icons/bomb.gif"
+		# files["Aborted"] = "../famfamfam_silk_icons/icons/stop_grey.gif"
 
 		if icontext in files:
 			base.debugmsg(6, "icontext:", icontext)
 			scrdir = os.path.dirname(__file__)
-			base.debugmsg(9, "scrdir:", scrdir)
+			base.debugmsg(6, "scrdir:", scrdir)
 			imgfile = os.path.join(scrdir, files[icontext])
-			base.debugmsg(9, "imgfile:", imgfile)
+			base.debugmsg(6, "imgfile:", imgfile)
 			if os.path.isfile(imgfile):
-				base.debugmsg(9, "isfile: imgfile:", imgfile)
+				base.debugmsg(0, "isfile: imgfile:", imgfile)
 				with open(imgfile,"rb") as f:
 					img_raw = f.read()
-				base.debugmsg(9, "img_raw:", img_raw)
+				base.debugmsg(0, "img_raw:", img_raw)
 				# b64 = base64.encodestring(img_raw)
 				# img_text = 'img_b64 = \\\n"""{}"""'.format(b64)
 
 				self.imgdata[icontext] = tk.PhotoImage(file=imgfile)
-				base.debugmsg(9, "imgdata[icontext]:", self.imgdata[icontext])
+				base.debugmsg(0, "imgdata[icontext]:", self.imgdata[icontext])
 
 
 				return self.imgdata[icontext]
+			else:
+				base.debugmsg(6, "File not found imgfile:", imgfile)
 
 
 
@@ -2285,6 +2291,10 @@ class RFSwarmGUI(tk.Frame):
 		self.b64["report_text"] = b'GIF89a\x10\x00\x10\x00\xc6\\\x00~1\x18\xabB!\xacC!\xaeF"\xaeI"\xa5K,\xafK#\xb1N#\xb2Q$\xb2R%\xb4U%\xb5V&\xb7Y&\xb7[&\xaf]5\xb8^\'\xb8_\'\xbaa(\xbexI\xb3yc\xb3|d\xb5\x7fe\xb5\x82f\xb7\x83gj\x93\xd4\xb9\x87gj\x98\xd9\xc2\x8bdk\x99\xdan\x9a\xdc\xbf\x8fao\x9b\xdcr\x9c\xdcq\x9d\xdd\xc1\x92cq\x9e\xdfs\x9e\xdf\xc2\x94ds\x9f\xe0t\xa0\xe0v\xa0\xe0\xc3\x96ev\xa2\xe0w\xa3\xe1x\xa3\xe1\xc4\x99f\xc5\x9agz\xa5\xe1\xa0\xbe\xea\xa1\xbf\xea\xa2\xc0\xea\xa3\xc0\xea\xca\xc6\xc4\xcc\xc6\xc0\xc7\xc7\xc7\xcd\xc6\xc0\xca\xc7\xc4\xcd\xc7\xc0\xcd\xc7\xc1\xc9\xc9\xc9\xca\xca\xca\xcb\xcb\xcb\xcc\xcc\xcc\xcd\xcd\xcd\xd1\xd1\xd1\xd2\xd2\xd2\xd3\xd3\xd3\xd4\xd4\xd4\xd5\xd5\xd5\xd8\xd8\xd8\xdc\xdc\xdc\xe6\xe6\xe6\xe8\xe8\xe8\xe9\xe9\xe9\xea\xea\xea\xec\xec\xec\xed\xed\xed\xee\xee\xee\xf0\xf0\xf0\xf1\xf1\xf1\xf2\xf2\xf2\xf3\xf3\xf3\xf4\xf4\xf4\xf5\xf5\xf5\xf6\xf6\xf6\xf7\xf7\xf7\xf8\xf8\xf8\xf9\xf9\xf9\xfa\xfa\xfa\xfb\xfb\xfb\xfc\xfc\xfc\xfd\xfd\xfd\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff!\xfe\x11Created with GIMP\x00!\xf9\x04\x01\n\x00\x7f\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xbf\x80\x7f\x7f\x1b\x12\x11\x82\x87\x88\x87>8:\x10Z\x8f\x90\x91\x87\x19.\x0fU\x97USR\x9bPY\x82\x8b9\r\x98\x97S\xa5QX\x87\x17-\x0cVV/,+*(\'R\xa8\x7f>49\x0bWW,3210#RU\x87\x16)\nXX\xb2\'$ \x1fPT\x9f\xb9\tYX\xadVUQPNM\x87\x15%\x08\xd7&!\x1d\x1c\x1a\x18JK\xd37\x07XW\xd9T\xcaXP@\x87\x14"\x06\xbcWT\xa7\xf4;H\xa6\xd5 \xa0\xcc\x8a\x94\'Y\xa0\xf08\xa2\xe5\xd0\x04\x0f\x03\x94\xf5k\x12ea\x96\x86\xb7h\xd4\x10\xb0%\x8bA&D\x92p\x19y\xa8\x80\x83\x00F\x8a\x0c\t\x02D\x08\x90\x1e?l \x02\x90\xa8\xe6\x9f@\x00;'
 		self.b64["report_html"] = b'GIF89a\x10\x00\x10\x00\xe7\x86\x00~1\x18\xabB!\xacC!\xaeF"\xaeI"\xa5K,\xafK#\x1e{\x03!|\x00\xb1N#\xb2Q$%\x7f\x00\xb2R%\xb4U%\xb5V&\xb7Y&1\x83\x15\xb7[&2\x86\t\xaf]53\x87\x15\xb8^\'6\x88\t\xb8_\'4\x89\x18\xbaa(<\x8b\x10D\x8f\x16F\x90\x19J\x91\x1cR\x97"W\x98(\xbexI\xb3yc[\x9b)\xb3|d\xb5\x7feb\x9e1^\x9f:c\x9f1\\\xa0<e\x9f1c\x9f8\xb5\x82f\xb7\x83g_\xa1Ch\xa25b\xa3Fk\xa37\xb9\x87gn\xa49f\xa5Hh\xa5Fo\xa5=p\xa6?\xc2\x8bdn\x9a\xdc\xbf\x8fao\x9b\xdcr\x9c\xdcq\x9d\xdd\xc1\x92ct\xabOq\x9e\xdfs\x9e\xdf\xc2\x94ds\x9f\xe0t\xa0\xe0v\xa0\xe0\xc3\x96ev\xa2\xe0|\xafUw\xa3\xe1x\xa3\xe1\xc4\x99f\xc5\x9agz\xa5\xe1\x81\xb3Z\x80\xb3a\x82\xb5g\x85\xb6f\x85\xb6j\x89\xb8k\x8e\xbao\x90\xbct\x96\xc1\x80\x97\xc2\x82\x98\xc2\x83\x9e\xc5\x88\xa1\xc6\x8a\xa1\xc7\x8a\xa0\xbe\xea\xb1\xc0\xae\xa1\xbf\xea\xa5\xc8\x8d\xa2\xc0\xea\xa3\xc0\xea\xa9\xca\x90\xa8\xcb\x90\xaa\xcb\x91\xad\xcd\x94\xb0\xce\x96\xca\xc6\xc4\xcc\xc6\xc0\xc7\xc7\xc7\xcd\xc6\xc0\xca\xc7\xc4\xcd\xc7\xc0\xcd\xc7\xc1\xcc\xcc\xcc\xca\xce\xc8\xd1\xd1\xd1\xd2\xd2\xd2\xd4\xd4\xd4\xd8\xd8\xd8\xdc\xdc\xdc\xd9\xe9\xd5\xe5\xe7\xe3\xec\xec\xec\xee\xee\xee\xed\xef\xeb\xf0\xf0\xf0\xf2\xf2\xf2\xf3\xf3\xf3\xf4\xf4\xf4\xf5\xf5\xf5\xf6\xf6\xf6\xf7\xf7\xf7\xf8\xf8\xf8\xf9\xf9\xf9\xfa\xfa\xfa\xfb\xfb\xfb\xfc\xfc\xfc\xfd\xfd\xfd\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff!\xfe\x11Created with GIMP\x00!\xf9\x04\x01\n\x00\xff\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x08\xdd\x00\xff\xfd\xbb\x01"\x83\xc0\x83\x08\x0f\xb6Q\xc3\xe6\x02\xa1\x87\x10#\x1e\x8c\xb1\xa4\xc2\x9f\x8b\x7f\xfa\xf0\xd9\xa8g\x90\xc0\x85k"`\xbc\xd8\xa7\xe4\x1eA\x07Y(y\x00\x08\x10\x93$H\x8c\x10\x19\xc2\x07\xe5\xbf6f\xd68\x08\x14(\t\x98/]\xb6\xfc\xe0\xf3\xe7\xe0\x8a"\r\x04\t\x929\x04\xc8\x0e\x1dz\xfc|\xcc\xc9`\x90\xa0\x96\x80l\xa4\xc0\x93\xe7\xceA\x12A\x14\\\x15\xc2\x03\x87\x8a&\x1f\xea\xd8\x99\x9a&\x81\xa0\x1a2\\\x9482\xc6\x07\x077\x07G\xf40\x10\x08F\x192c\xc4P\xd1B\xc3\xc2\xd43\x04\x04\x9d 3E\n\x14\'O\xae\xa0X 0D\x8e\x01\x82D\x84\xf1\x92\x05K\x14+3(\x1c\x16P\xc8C\x87\r\x1aLTy\x81\x81\xce\xc1\x02\x13\x02\xcc\x91\x13\x07\xce\x1b\t- pA\x83\x10@\xc2\x7f\x08\x0e \x0c\x08\x00;'
 		self.b64["report_word"] = b'GIF89a\x10\x00\x10\x00\xe7\x8c\x00~1\x18\xabB!\xacC!\xaeF"\xaeI"\xa5K,\xafK#\xb1N#\xb2Q$\xb2R%\xb4U%\xb5V&Rg\xc1Uf\xc4Tf\xc8\xb7Y&\xb7[&Vh\xc7\xaf]5Wj\xc8\xb8^\'Xk\xc8\xb8_\'Ym\xca\xbaa([o\xcaQt\xd1[s\xca\\v\xcc[y\xd0V{\xd0^{\xceZ}\xd3X\x7f\xd0\\\x7f\xd0g|\xcfd}\xd1T\x82\xd1f~\xd0e\x7f\xd1d\x80\xd1h\x80\xd1c\x83\xd0]\x85\xd2\xbexI\xb3ych\x85\xd3c\x88\xd0\xb3|df\x88\xd0\xb5\x7feg\x8d\xd1m\x8c\xd4\xb5\x82f\xb7\x83gi\x91\xd3s\x8e\xd5n\x90\xd4d\x94\xcbv\x8e\xd4w\x8e\xd5j\x93\xd3\xb9\x87gy\x8f\xd5i\x94\xd4z\x8f\xd5k\x94\xd3o\x93\xd5x\x92\xd6p\x95\xd6k\x97\xd3k\x98\xd3x\x95\xd6\xc2\x8bd{\x95\xd7l\x9a\xd4m\x9a\xd4h\x9d\xd5\xbf\x8fam\x9c\xd4l\x9d\xd5\xc1\x92cx\x9c\xd7\x83\x9a\xd7\xc2\x94d\xc3\x96e\xc4\x99f\xc5\x9ag\x8b\xa1\xda\x90\xa5\xdb\x93\xa5\xdb\x93\xaa\xdd\xa4\xb2\xe1\xa9\xb7\xe3\xb0\xc1\xe6\xca\xc6\xc4\xcc\xc6\xc0\xc7\xc7\xc7\xcd\xc6\xc0\xca\xc7\xc4\xcd\xc7\xc0\xcd\xc7\xc1\xcb\xcb\xcb\xcc\xcc\xcc\xcd\xcd\xcd\xd1\xd1\xd1\xd2\xd2\xd2\xd3\xd3\xd3\xd4\xd4\xd4\xd5\xd5\xd5\xd8\xd8\xd8\xdc\xdc\xdc\xd9\xdf\xf2\xda\xdf\xf2\xe9\xe9\xe9\xe6\xea\xf7\xe9\xec\xf7\xe9\xed\xf8\xed\xed\xed\xec\xef\xf8\xed\xef\xf8\xed\xef\xf9\xed\xf0\xf9\xef\xf1\xf9\xf2\xf2\xf2\xf4\xf4\xf4\xf5\xf5\xf5\xf7\xf7\xf7\xf6\xf7\xfc\xf8\xf8\xf8\xf7\xf9\xfc\xf9\xf9\xf9\xfa\xfa\xfa\xfb\xfb\xfb\xfb\xfb\xfe\xfb\xfc\xfe\xfc\xfc\xfc\xfc\xfc\xfe\xfd\xfd\xfd\xfd\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff!\xfe\x11Created with GIMP\x00!\xf9\x04\x01\n\x00\xff\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x08\xde\x00\xff\xfdK\xc2\x02\x83\xc0\x83\x08\x0f\x9e\x19S\xc6\x02\xa2\x87\x10#\x1e\xf4q\x85\xc2\x9f\x8b\x7f\xfc\xf4\xd9\xc8\xa7\x90\xc0\x85d \xfci\xf2D\x07\x13#Bn\xccx\xd1@\xa0\r+\x0f\x02A\x11t\xa8\xa6\xcd:-\xcf|!\xb3`\xd0\x92DR\x80l\xc9\xa1\x04\x8b\x88\x96\xffjTQ@\xe8\xc8\xa1"C\xbc\xac\xc82\xa5C\xce\x9d\t\n\xf58\x84\x84\x06\x91\x10;HhA*\x83\n\x02B3\x0e\xe1(\x81"\x85\x06\x13p\xae\x8a9@(\x86!\x17\x1e\xba\x04\x01\xc1\xe5\x0eR\x18Q\x0c\x0cR\xb1\xe8\x04\x0f@?F\xcc\xd9s\x15\x0c\x01B\x1f\xe8\xe8\xc9\x83\xe7\x8e\xe58H[8\x19@\x88\xc3\x06\x06\x19.T\x98\x10\xc1Ac\x01\x8a\n\x05\xeac\xa7\x8d\x1cF\xb0\x0f\x16\x90\x10\xe0\x8d\x1b6j\xd2\xacIc\x06M\x18\x84\x00\x12\n\xff\x17\x10\x00;'
+
+		self.b64["Abort"] = b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00\n\n\n\x14\x14\x14\x1c\x1c\x1c###---444;;;CCCLLLQMHTTT\\\\\\bbbzgAlll\x87m8tttytf{{{\x83~r\x99~B\xb0\x7f$\x83\x80x\x83\x83\x83\x9c\x85Q\x8e\x8d\x8b\xc0\x8d\x1b\xc4\x8f \x91\x91\x91\x99\x94\x8d\xdc\x96\x06\xb3\x9d^\xbb\x9fI\xf4\x9f\x00\xf9\x9f\r\xf8\xa2\x0b\xff\xa42\xfa\xa6\x10\xf5\xab\x01\xfc\xad\x00\xb8\xaf\x99\xff\xb1<\xf9\xb3\x00\xf6\xb6\x07\xff\xb7A\xce\xbb\x87\xfd\xbb\x00\xfc\xbc"\xf8\xc1\x1b\xff\xc3K\xff\xc6\x00\xfe\xc9>\xfe\xcc@\xe7\xce\x89\xeb\xd2\x8c\xfa\xd4b\xf4\xd5\x80\xf1\xd7\x8f\xfa\xdd\x8f\xff\xdd\x99\xfb\xde\x91\xfb\xe0\x91\xff\xff\x80\xff\xff\xaa\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00B\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xb3\x80B\x82\x83\x84/\x84\x84=\x89;\x82/\x8d+\x87>\x89:78!/40+(\x88=.\x1a)9152*&\'\x84\x1e6;\x12\x0f ,0-%#\x1f\x84\x13\x147\x17\x05\x18\x14\'\'$\x1c\x05\x83\x13\x1d\t\x11\x0c\x03\x0f\x19\x15\x1b\x10\x16\n\x03\x82\xc3\r\x05\x04\r\x13\x0f\r\x0e\t\t\x0b\x02\x82\x0f\x1d\x13\xe2\x11\xd8\x0b\t\x08\x08\x0b\x01\x82\r\x18\xe4\xd8\x0c\xe6\x08\x07\x07\t\xebB\x0c\xe4\r\x0c\xf1\xe7\x07\x06\x06\x0e\xdcK\xd0\xa0\x819\x7f\xff\x02\x12\xb8\'\xc4\x80At\t\x0b\x04d(\x84\x9a\xb9\x84\x00\r\x04\x00ph\x80\x00\x03\x10\r\x10\x00\xc0\xf1\x90 \x01\x01R\x92<\x14\x08\x00;'
+
+		self.b64["Aborted"] = b'GIF87a\x10\x00\x10\x00\xd5\x00\x00\x00\x00\x00\x1b\x1b\x1c\'\'((\'(112=<=FEFGFHOMOUSU[Z[_^``_adbdigiljmompqoqtrt{z|\x7f}\x80\x80~\x81\x85\x83\x85\x89\x87\x8a\x8c\x8a\x8d\x8f\x8d\x90\x90\x8e\x91\x94\x92\x95\x97\x95\x98\x99\x96\x99\x9c\x9a\x9d\xa0\x9e\xa1\xa3\xa1\xa4\xa7\xa5\xa8\xa9\xa6\xaa\xad\xaa\xae\xb1\xae\xb1\xb5\xb3\xb6\xb8\xb6\xb9\xbb\xb9\xbc\xc4\xc2\xc5\xc8\xc6\xc9\xcc\xca\xcd\xd1\xcf\xd2\xd6\xd4\xd7\xd7\xd4\xd8\xd9\xd6\xda\xdc\xd9\xdd\xe0\xdd\xe1\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\n\x002\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x06\x98@\x99pH,\x1aA"\x10\xe8\xd31\x0eK/\xd8\xcb\xe5Z\x81\x9c\xa4\x97\xcaT"\x89L\xaaM1\x9b\xea\x8eB \xcf\x08\x85\x19zX\xa8\xd1(\xe9\xe9l0\x9eRC\xd8i\x89\xd0uw\x17\x16\x13%\x0bB\x1a*iv\x18\x83\x14\x13\x12#\tB\x17)\x1c\x82\x16\x15\x90\x11\x0f \x07B\x15l\x8e\x90\x12\x0f\x0e\x0b \x05B\x12\'\x1e\x13\xa4\xa6\r\n\x12\x1e\x01C\x85\x18\x0f\xb1\x0c\t\x11\x1e\x08E\x10#\x15\x0c\x0b\n\x08\x0e\x1d\x06N\r\x1f\x1f\x1e\x1b\x1b\x19\xcbN2\x03\x04\x02\x01\x01\x00\xd5\xddDA\x00;'
 
 		# png's
 		# b64["New"] = """iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAAK/INwWK6QAAABl0RVh0\nU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAC4SURBVCjPdZFbDsIgEEWnrsMm7oGGfZro\nhxvU+Iq1TyjU60Bf1pac4Yc5YS4ZAtGWBMk/drQBOVwJlZrWYkLhsB8UV9K0BUrPGy9cWbng2CtE\nEUmLGppPjRwpbixUKHBiZRS0p+ZGhvs4irNEvWD8heHpbsyDXznPhYFOyTjJc13olIqzZCHBouE0\nFRMUjA+s1gTjaRgVFpqRwC8mfoXPPEVPS7LbRaJL2y7bOifRCTEli3U7BMWgLzKlW/CuebZPAAAA\nAElFTkSuQmCC\n"""
@@ -2516,40 +2526,31 @@ class RFSwarmGUI(tk.Frame):
 		# Plan scripts
 		base.debugmsg(6, "Plan scripts")
 
-		#
-		# # This partially worked but scroll bars ar behind the content making it dificult to scroll
-		sg = ttk.Frame(p)
-		# sg = Scrollable(p, width=32)
-		sg.grid(column=0, row=planrow, sticky="nsew")
-		sg.columnconfigure(0, weight=1)
-		sg.rowconfigure(planrow, weight=0)
-		self.scrollable_sg = ScrollableXY(sg)
-		self.scriptgrid = ttk.Frame(self.scrollable_sg)
-		self.scriptgrid.grid(row=0, column=0, sticky="nsew")
-		self.scrollable_sg.canvas.columnconfigure(0, weight=1)
-		self.scrollable_sg.canvas.rowconfigure(0, weight=1)
+
+		# # 2020-12-27 try again
+		sg = tk.Frame(p)
+		sg.grid(row=planrow, column=0, pady=(0, 0), sticky='news')
+		sg.grid_rowconfigure(0, weight=1)
+		sg.grid_columnconfigure(0, weight=1)
+
+		self.sg_canvas = tk.Canvas(sg)
+		self.sg_canvas.grid(row=0, column=0, sticky="news")
+
+		# Link a scrollbar to the canvas
+		sg_vsb = tk.Scrollbar(sg, orient="vertical", command=self.sg_canvas.yview)
+		sg_vsb.grid(row=0, column=1, sticky='ns')
+		self.sg_canvas.configure(yscrollcommand=sg_vsb.set)
+
+		# Link another scrollbar to the canvas
+		sg_hsb = tk.Scrollbar(sg, orient="horizontal", command=self.sg_canvas.xview)
+		sg_hsb.grid(row=1, column=0, sticky='ew')
+		self.sg_canvas.configure(xscrollcommand=sg_hsb.set)
 
 
-
-		# sg = ttk.Frame(p)
-		# # sg = Scrollable(p, width=32)
-		# sg.grid(column=0, row=planrow, sticky="nsew")
-		# sg.columnconfigure(0, weight=1)
-		# sg.rowconfigure(planrow, weight=0)
+		self.scriptgrid = tk.Frame(self.sg_canvas)
+		self.sg_canvas.create_window((0, 0), window=self.scriptgrid, anchor='nw')
 
 
-
-
-		# scrollable_sg = Scrollable(sg, width=32)
-		# self.scrollable_sg = Scrollable(sg)
-		# scrollable_sg.columnconfigure(0, weight=1)
-		# scrollable_sg.rowconfigure(0, weight=1)
-
-		# self.scriptgrid = Scrollable(sg)
-		# self.scriptgrid = Scrollable(sg, width=32)
-		# self.scriptgrid = ttk.Frame(self.scrollable_sg)
-		# self.scriptgrid = ttk.Frame(sg)
-		# self.scriptgrid.grid(row=0, column=0, sticky="nsew")
 
 
 		# label row 0 of sg
@@ -2590,6 +2591,9 @@ class RFSwarmGUI(tk.Frame):
 		new.grid(column=self.plancoladd, row=0, sticky="nsew")
 
 		# self.scrollable_sg.update()
+		# update scrollbars
+		self.scriptgrid.update_idletasks()
+		self.sg_canvas.config(scrollregion=self.sg_canvas.bbox("all"))
 
 	def CanvasResize(self, event):
 		base.debugmsg(6, "event:", event)
@@ -2597,7 +2601,14 @@ class RFSwarmGUI(tk.Frame):
 
 	def ClickPlay(self, _event=None):
 
+		self.display_run['start_time'].set("  --:--:--  ")
+		self.display_run['elapsed_time'].set("  --:--:--  ")
+		self.display_run['finish_time'].set("  --:--:--  ")
 		base.debugmsg(6, "Test Started:	", int(time.time()), "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
+
+		icontext = "Stop"
+		self.icoStop = self.get_icon(icontext)
+		self.elements["Run"]["btn_stop"]["image"] = self.icoStop
 
 		self.tabs.select(1)
 
@@ -2854,38 +2865,38 @@ class RFSwarmGUI(tk.Frame):
 		addzero = 0
 
 		rusy = graphh-axissz
+		if k in totusrsxy:
+			for x in sorted(totusrsxy[k].keys()):
+				newx = x
+				newy = prevy + totusrsxy[k][x]
 
-		for x in sorted(totusrsxy[k].keys()):
-			newx = x
-			newy = prevy + totusrsxy[k][x]
-
-			base.debugmsg(6, "prevx", prevx, "prevy", prevy, "newx", newx, "newy", newy)
-
-			if addzero > 1:
-				prevx = prevx2
 				base.debugmsg(6, "prevx", prevx, "prevy", prevy, "newx", newx, "newy", newy)
 
-			if newy == prevy:
-				addzero += 1
-				base.debugmsg(6, "addzero:", addzero)
-				prevx2 = prevx
-			else:
-				addzero = 0
+				if addzero > 1:
+					prevx = prevx2
+					base.debugmsg(6, "prevx", prevx, "prevy", prevy, "newx", newx, "newy", newy)
+
+				if newy == prevy:
+					addzero += 1
+					base.debugmsg(6, "addzero:", addzero)
+					prevx2 = prevx
+				else:
+					addzero = 0
 
 
 
-			x1 = int(xlen * prevx) + xm1
-			x2 = int(xlen * newx) + xm1
+				x1 = int(xlen * prevx) + xm1
+				x2 = int(xlen * newx) + xm1
 
-			y1 = rusy - int(rusy * prevy)
-			y2 = rusy - int(rusy * newy)
+				y1 = rusy - int(rusy * prevy)
+				y2 = rusy - int(rusy * newy)
 
-			base.debugmsg(6, "x1", x1, "y1", y1, "x2", x2, "y2", y2)
+				base.debugmsg(6, "x1", x1, "y1", y1, "x2", x2, "y2", y2)
 
-			self.pln_graph.create_line(x1, y1, x2, y2, fill=totcolour)
+				self.pln_graph.create_line(x1, y1, x2, y2, fill=totcolour)
 
-			prevx = newx
-			prevy = newy
+				prevx = newx
+				prevy = newy
 
 		base.debugmsg(6, "pln_update_graph done")
 
@@ -3271,6 +3282,11 @@ class RFSwarmGUI(tk.Frame):
 
 		base.debugmsg(6, "addScriptRow done")
 
+		# update scrollbars
+		self.scriptgrid.update_idletasks()
+		self.sg_canvas.config(scrollregion=self.sg_canvas.bbox("all"))
+
+
 	def sr_users_validate(self, *args):
 		base.debugmsg(5, "args:",args)
 		if args:
@@ -3562,6 +3578,10 @@ class RFSwarmGUI(tk.Frame):
 			elmt.destroy()
 		base.scriptlist[r] = {}
 
+		# update scrollbars
+		self.scriptgrid.update_idletasks()
+		self.sg_canvas.config(scrollregion=self.sg_canvas.bbox("all"))
+
 		try:
 			self.pln_update_graph()
 		except:
@@ -3581,11 +3601,8 @@ class RFSwarmGUI(tk.Frame):
 
 		base.debugmsg(6, "config")
 
-		# base.debugmsg(6, "Frame")
-		# rg = ttk.Frame(r)
-		# rg.grid(column=0, row=1, sticky="nsew")
-		# r.columnconfigure(0, weight=1)
-		# r.rowconfigure(0, weight=1) # weight=0 means don't resize with other grid rows / keep a fixed size
+		if "Run" not in self.elements:
+			self.elements["Run"] = {}
 
 		rgbar = ttk.Frame(r)
 		rgbar.grid(row=0, column=0, sticky="nsew")
@@ -3644,7 +3661,7 @@ class RFSwarmGUI(tk.Frame):
 		if "start_time" not in self.display_run:
 			self.display_run['start_time'] = tk.StringVar()
 			# self.display_run['start_time'].set("  {}  ".format(base.total_robots))
-			self.display_run['start_time'].set("    ")
+			self.display_run['start_time'].set("  --:--:--  ")
 		usr = ttk.Label(rgbar, text="  Start Time  ") #, borderwidth=2, relief="raised")
 		usr.grid(column=20, row=1, sticky="nsew")
 		usr = ttk.Label(rgbar, textvariable=self.display_run['start_time']) #, borderwidth=2, relief="groove")
@@ -3653,7 +3670,7 @@ class RFSwarmGUI(tk.Frame):
 		if "elapsed_time" not in self.display_run:
 			self.display_run['elapsed_time'] = tk.StringVar()
 			# self.display_run['elapsed_time'].set("  {}  ".format(base.total_robots))
-			self.display_run['elapsed_time'].set("    ")
+			self.display_run['elapsed_time'].set("  --:--:--  ")
 		usr = ttk.Label(rgbar, text="  Elapsed Time  ") #, borderwidth=2, relief="raised")
 		usr.grid(column=21, row=1, sticky="nsew")
 		usr = ttk.Label(rgbar, textvariable=self.display_run['elapsed_time']) #, borderwidth=2, relief="groove")
@@ -3667,12 +3684,21 @@ class RFSwarmGUI(tk.Frame):
 		usr = ttk.Label(rgbar, textvariable=self.display_run['total_robots']) #, borderwidth=2, relief="groove")
 		usr.grid(column=26, row=2, sticky="nsew")
 
+		if "finish_time" not in self.display_run:
+			self.display_run['finish_time'] = tk.StringVar()
+			self.display_run['finish_time'].set("  --:--:--  ")
+		usr = ttk.Label(rgbar, text="  Finish Time  ") #, borderwidth=2, relief="raised")
+		usr.grid(column=29, row=1, sticky="nsew")
+		usr = ttk.Label(rgbar, textvariable=self.display_run['finish_time']) #, borderwidth=2, relief="groove")
+		usr.grid(column=29, row=2, sticky="nsew")
+
 
 		icontext = "Stop"
 		self.icoStop = self.get_icon(icontext)
-		stp = ttk.Button(rgbar, image=self.imgdata[icontext], padding='3 3 3 3', text="Stop", command=self.ClickStop)
-		# stp = ttk.Button(rgbar, text='Stop', command=self.ClickStop)
-		stp.grid(column=39, row=1, sticky="nsew") # , rowspan=2
+		# self.elements["Run"]["btn_stop"]
+		self.elements["Run"]["btn_stop"] = ttk.Button(rgbar, image=self.imgdata[icontext], padding='3 3 3 3', text="Stop", command=self.ClickStop)
+		# self.elements["Run"]["btn_stop"] = ttk.Button(rgbar, text='Stop', command=self.ClickStop)
+		self.elements["Run"]["btn_stop"].grid(column=39, row=1, sticky="nsew") # , rowspan=2
 
 
 		icontext = "report_text"
@@ -3691,51 +3717,37 @@ class RFSwarmGUI(tk.Frame):
 		# rpt.grid(column=52, row=1, sticky="nsew") # , rowspan=2
 
 
+
 		#
 		# run results table
 		#
 		base.debugmsg(6, "run results table")
 
-		# this scrolling method might work better, but will need to try it
-		# https://stackoverflow.com/questions/33478863/adding-x-and-y-scrollbar-to-a-canvas
-
-		rungridprnt = ttk.Frame(r)
-		rungridprnt.grid(row=1, column=0, sticky="nsew")
 		r.rowconfigure(1, weight=1)
 
-		runcanvas = tk.Canvas(rungridprnt)
+		rungridprnt = tk.Frame(r)
+		rungridprnt.grid(row=1, column=0, pady=(0, 0), sticky='news')
+		rungridprnt.grid_rowconfigure(0, weight=1)
+		rungridprnt.grid_columnconfigure(0, weight=1)
 
-		# vsb = tk.Scrollbar(master, orient="vertical", command=self.yview)
-		# hsb = tk.Scrollbar(master, orient="horizontal", command=self.xview)
-		# self.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
-		#
-		# self.grid(row=0, column=0, sticky="nsew")
-		# vsb.grid(row=0, column=1, sticky="ns")
-		# hsb.grid(row=1, column=0, sticky="ew")
-		# master.grid_rowconfigure(0, weight=1)
-		# master.grid_columnconfigure(0, weight=1)
+		self.run_canvas = tk.Canvas(rungridprnt)
+		self.run_canvas.grid(row=0, column=0, sticky="news")
 
-		#
-		# # This partially worked but scroll bars ar behind the content making it dificult to scroll
-		rungridprnt = ttk.Frame(r)
-		rungridprnt.grid(row=1, column=0, sticky="nsew")
-		r.rowconfigure(1, weight=1)
-		self.scrollable_rg = ScrollableXY(rungridprnt)
-		self.rungrid = ttk.Frame(self.scrollable_rg)
-		self.rungrid.grid(row=0, column=0, sticky="nsew")
-		self.scrollable_rg.canvas.columnconfigure(0, weight=1)
-		self.scrollable_rg.canvas.rowconfigure(0, weight=1)
+		# Link a scrollbar to the canvas
+		run_vsb = tk.Scrollbar(rungridprnt, orient="vertical", command=self.run_canvas.yview)
+		run_vsb.grid(row=0, column=1, sticky='ns')
+		self.run_canvas.configure(yscrollcommand=run_vsb.set)
+
+		# Link another scrollbar to the canvas
+		run_hsb = tk.Scrollbar(rungridprnt, orient="horizontal", command=self.run_canvas.xview)
+		run_hsb.grid(row=1, column=0, sticky='ew')
+		self.run_canvas.configure(xscrollcommand=run_hsb.set)
 
 
+		self.rungrid = tk.Frame(self.run_canvas)
+		self.run_canvas.create_window((0, 0), window=self.rungrid, anchor='nw')
 
-		# this didn't load
-		# self.scrollable_rg = ScrollableY(rg)
-		# self.rungrid = ttk.Frame(self.scrollable_rg)
-		# self.rungrid.grid(row=0, column=0, sticky="nsew")
 
-		# this works but doesn't scroll
-		# self.rungrid = ttk.Frame(rg)
-		# self.rungrid.grid(row=1, column=0, sticky="nsew")
 
 		# set initial columns for the results grid
 		if "columns" not in self.display_run:
@@ -3768,7 +3780,10 @@ class RFSwarmGUI(tk.Frame):
 
 			colno += 1
 
-		self.scrollable_rg.update()
+		# self.scrollable_rg.update()
+		# update scrollbars
+		self.rungrid.update_idletasks()
+		self.run_canvas.config(scrollregion=self.rungrid.bbox("all"))
 
 	def delayed_UpdateRunStats_bg(self):
 
@@ -3849,6 +3864,24 @@ class RFSwarmGUI(tk.Frame):
 			self.display_run['start_time'].set("  {}  ".format(time.strftime("%H:%M:%S", stm)))
 			etm = time.gmtime(int(time.time()) - base.robot_schedule["Start"])
 			self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
+
+
+		if base.posttest and base.run_finish>0:
+			ftm = time.localtime(base.run_finish)
+			self.display_run['finish_time'].set("  {}  ".format(time.strftime("%H:%M:%S", ftm)))
+			etm = time.gmtime(base.run_finish - base.robot_schedule["Start"])
+			self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
+
+		# update stop button
+		if base.run_end < int(time.time()):
+			icontext = "Abort"
+			self.icoStop = self.get_icon(icontext)
+			self.elements["Run"]["btn_stop"]["image"] = self.icoStop
+
+		if base.run_finish > 0:
+			icontext = "Aborted"
+			self.icoStop = self.get_icon(icontext)
+			self.elements["Run"]["btn_stop"]["image"] = self.icoStop
 
 		time_elapsed = int(time.time()) - self.rungridupdate
 		if (time_elapsed>5):
@@ -3956,12 +3989,43 @@ class RFSwarmGUI(tk.Frame):
 					rowno += 1
 
 
-			self.scrollable_rg.update()
+			# self.scrollable_rg.update()
+			# update scrollbars
+			self.rungrid.update_idletasks()
+			self.run_canvas.config(scrollregion=self.rungrid.bbox("all"))
+
+
 			ut = threading.Thread(target=self.delayed_UpdateRunStats)
 			ut.start()
 
 	def ClickStop(self, _event=None):
-		core.ClickStop()
+		if base.run_end < int(time.time()):
+			base.debugmsg(5, "Stop Clicked nth time")
+
+			if not base.run_abort and base.run_finish < 1:
+				# dialog really abort run???
+				base.debugmsg(5, "dialog really abort run???")
+				# reallyabort = True
+				# reallyabort = tkm.askyesno('RFSwarm - Abort Run','Do you want to abort this run? Clicking yes will kill all running robots!')
+				reallyabort = tkm.askyesno('RFSwarm - Abort Run','Do you want to abort this run? Clicking yes will kill all running robots!', icon='warning')
+				# reallyabort = tkm.askyesno('RFSwarm - Abort Run','Do you want to abort this run? Clicking yes will kill all running robots!', icon='error')
+				if reallyabort:
+					icontext = "Aborted"
+					self.icoStop = self.get_icon(icontext)
+					self.elements["Run"]["btn_stop"]["image"] = self.icoStop
+					core.ClickStop()
+		else:
+			base.debugmsg(5, "Stop Clicked 1st time")
+			icontext = "Abort"
+			self.icoStop = self.get_icon(icontext)
+			base.debugmsg(9, "icoStop", self.icoStop)
+			base.debugmsg(9, "btn_stop", self.elements["Run"]["btn_stop"])
+			self.elements["Run"]["btn_stop"]["image"] = self.icoStop
+			base.debugmsg(9, "btn_stop", self.elements["Run"]["btn_stop"])
+
+			core.ClickStop()
+
+
 
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -3976,35 +4040,30 @@ class RFSwarmGUI(tk.Frame):
 
 			agentrow = 0
 			a.columnconfigure(agentrow, weight=1)
-			a.rowconfigure(agentrow, weight=0) # weight=0 means don't resize with other grid rows / keep a fixed size
+			a.rowconfigure(agentrow, weight=1) # weight=0 means don't resize with other grid rows / keep a fixed size
 
-			# base.debugmsg(6, "Frame")
+			ag = tk.Frame(a)
+			ag.grid(row=agentrow, column=0, pady=(0, 0), sticky='news')
+			ag.grid_rowconfigure(0, weight=1)
+			ag.grid_columnconfigure(0, weight=1)
 
-			# self.scrollable_ag = Scrollable(a)
-			# self.scrollable_ag.grid(column=0, row=1, sticky="nsew")
-			# self.agenttgrid = ttk.Frame(self.scrollable_ag)
-			# self.agenttgrid.grid(row=0, column=0, sticky="nsew")
+			self.ag_canvas = tk.Canvas(ag)
+			self.ag_canvas.grid(row=0, column=0, sticky="news")
+
+			# Link a scrollbar to the canvas
+			ag_vsb = tk.Scrollbar(ag, orient="vertical", command=self.ag_canvas.yview)
+			ag_vsb.grid(row=0, column=1, sticky='ns')
+			self.ag_canvas.configure(yscrollcommand=ag_vsb.set)
+
+			# Link another scrollbar to the canvas
+			ag_hsb = tk.Scrollbar(ag, orient="horizontal", command=self.ag_canvas.xview)
+			ag_hsb.grid(row=1, column=0, sticky='ew')
+			self.ag_canvas.configure(xscrollcommand=ag_hsb.set)
 
 
-
-
-			# ag = ttk.Frame(a)
-			# ag.grid(column=0, row=1, sticky="nsew")
-			# self.agenttgrid = ttk.Frame(ag)
-			# self.agenttgrid.grid(row=0, column=0, sticky="nsew")
-
-
-			#
-			# # This partially worked but scroll bars ar behind the content making it dificult to scroll
-			ag = ttk.Frame(a)
-			ag.grid(column=0, row=1, sticky="nsew")
-			a.rowconfigure(1, weight=1)
-			self.scrollable_ag = ScrollableXY(ag)
-			self.agenttgrid = ttk.Frame(self.scrollable_ag)
-			self.agenttgrid.grid(row=0, column=0, sticky="nsew")
-			self.scrollable_ag.canvas.columnconfigure(0, weight=1)
-			self.scrollable_ag.canvas.rowconfigure(0, weight=1)
-
+			self.agenttgrid = tk.Frame(self.ag_canvas)
+			# self.scriptgrid = tk.Frame(self.sg_canvas, bg="blue")
+			self.ag_canvas.create_window((0, 0), window=self.agenttgrid, anchor='nw')
 
 
 			base.debugmsg(6, "Column Headings")
@@ -4036,6 +4095,10 @@ class RFSwarmGUI(tk.Frame):
 			usr = ttk.Label(self.agenttgrid, text="  Assigned  ", borderwidth=2, relief="raised")
 			usr.grid(column=13, row=0, sticky="nsew")
 
+			# update scrollbars
+			self.agenttgrid.update_idletasks()
+			self.ag_canvas.config(scrollregion=self.ag_canvas.bbox("all"))
+
 
 	def delayed_UpdateAgents(self):
 		time.sleep(10)
@@ -4046,7 +4109,7 @@ class RFSwarmGUI(tk.Frame):
 		removeagents = []
 		robot_count = 0
 		displayagent = True
-		base.debugmsg(5, "")
+		base.debugmsg(6, "")
 
 		base.agenttgridupdate = int(time.time())
 		agntlst = list(base.Agents.keys())
@@ -4124,6 +4187,11 @@ class RFSwarmGUI(tk.Frame):
 			grdrows += -1
 
 
+		# update scrollbars
+		self.agenttgrid.update_idletasks()
+		self.ag_canvas.config(scrollregion=self.ag_canvas.bbox("all"))
+
+
 	def add_agent_row(self, rnum):
 		base.debugmsg(9, "add_row: rnum:", rnum)
 		base.debugmsg(9, "add_row: Status:", self.display_agents[rnum]["Status"])
@@ -4148,6 +4216,9 @@ class RFSwarmGUI(tk.Frame):
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["AssignedRobots"], borderwidth=2, relief="groove")
 		usr.grid(column=13, row=rnum, sticky="nsew")
 
+		# update scrollbars
+		self.agenttgrid.update_idletasks()
+		self.ag_canvas.config(scrollregion=self.ag_canvas.bbox("all"))
 
 
 	def UA_removerow(self, r):
@@ -4156,6 +4227,9 @@ class RFSwarmGUI(tk.Frame):
 		for elmt in relmts:
 			elmt.destroy()
 
+		# update scrollbars
+		self.agenttgrid.update_idletasks()
+		self.ag_canvas.config(scrollregion=self.ag_canvas.bbox("all"))
 
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
