@@ -37,8 +37,6 @@ An example of how your rfswarm setup might look.
 
 ## Donations
 
-If you would like to thank me for this project please use this [PayPal.me](https://paypal.me/damies13/5) link, the $5 is a suggestion, feel free to change to any amount you would like.
-
-<iframe src="https://github.com/sponsors/damies13/card" title="Sponsor damies13" height="225" width="600" style="border: 0;"></iframe>
-
-<!-- If you do make a donation and would like me to prioritise a feature / issue send me a [quick message](mailto:damies13+rfswarm@gmail.com) and let me know. -->
+If you would like to thank me for this project please consider using one of the sponsorship methods:
+- [Github](https://github.com/sponsors/damies13/)
+- [PayPal.me](https://paypal.me/damies13/5) (the $5 is a suggestion, feel free to change to any amount you would like)
