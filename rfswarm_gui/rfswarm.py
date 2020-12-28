@@ -522,8 +522,8 @@ class RFSwarmBase:
 						cur.close()
 						self.datadb.commit()
 					except Exception as e:
-						base.debugmsg(6, "run_db_thread: dbqueue: Agents: Exception:", e)
-						base.debugmsg(6, "run_db_thread: dbqueue: Results: ", sql, agntdata)
+						base.debugmsg(1, "run_db_thread: dbqueue: Agents: Exception:", e)
+						base.debugmsg(1, "run_db_thread: dbqueue: Results: ", sql, agntdata)
 
 				# Results
 				if len(base.dbqueue["Results"])>0:
@@ -538,8 +538,8 @@ class RFSwarmBase:
 						cur.close()
 						self.datadb.commit()
 					except Exception as e:
-						base.debugmsg(6, "run_db_thread: dbqueue: Results: Exception:", e)
-						base.debugmsg(6, "run_db_thread: dbqueue: Results: ", sql, resdata)
+						base.debugmsg(1, "run_db_thread: dbqueue: Results: Exception:", e)
+						base.debugmsg(1, "run_db_thread: dbqueue: Results: ", sql, resdata)
 
 
 				# Metric
@@ -555,8 +555,8 @@ class RFSwarmBase:
 						cur.close()
 						self.datadb.commit()
 					except Exception as e:
-						base.debugmsg(6, "run_db_thread: dbqueue: Metric: Exception:", e)
-						base.debugmsg(6, "run_db_thread: dbqueue: Metric: ", sql, resdata)
+						base.debugmsg(1, "run_db_thread: dbqueue: Metric: Exception:", e)
+						base.debugmsg(1, "run_db_thread: dbqueue: Metric: ", sql, resdata)
 
 				# Metrics
 				if len(base.dbqueue["Metrics"])>0:
@@ -571,8 +571,8 @@ class RFSwarmBase:
 						cur.close()
 						self.datadb.commit()
 					except Exception as e:
-						base.debugmsg(6, "run_db_thread: dbqueue: Metrics: Exception:", e)
-						base.debugmsg(6, "run_db_thread: dbqueue: Metrics: ", sql, resdata)
+						base.debugmsg(1, "run_db_thread: dbqueue: Metrics: Exception:", e)
+						base.debugmsg(1, "run_db_thread: dbqueue: Metrics: ", sql, resdata)
 
 
 				# General Write
@@ -590,40 +590,40 @@ class RFSwarmBase:
 								cur.close()
 								self.datadb.commit()
 							except Exception as e:
-								base.debugmsg(6, "run_db_thread: dbqueue: Write: Exception:", e)
-								base.debugmsg(6, "run_db_thread: dbqueue: Write: Item:", item)
+								base.debugmsg(1, "run_db_thread: dbqueue: Write: Exception:", e)
+								base.debugmsg(1, "run_db_thread: dbqueue: Write: Item:", item)
 						else:
-							print("run_db_thread: dbqueue: Write: Item not written, missing key SQL or VALUES")
-							print("run_db_thread: dbqueue: Write: Item:", item)
+							base.debugmsg(1, "run_db_thread: dbqueue: Write: Item not written, missing key SQL or VALUES")
+							base.debugmsg(1, "run_db_thread: dbqueue: Write: Item:", item)
 
 				# General Read
 				if len(base.dbqueue["Read"])>0:
-					base.debugmsg(9, "run_db_thread: dbqueue: Read")
+					base.debugmsg(7, "run_db_thread: dbqueue: Read")
 					tmpq = list(base.dbqueue["Read"])
 					base.dbqueue["Read"] = []
-					base.debugmsg(9, "run_db_thread: dbqueue: Read: tmpq:", tmpq)
+					base.debugmsg(7, "run_db_thread: dbqueue: Read: tmpq:", tmpq)
 					for item in tmpq:
 						if "SQL" in item: # and item["VALUES"]:
 							try:
-								base.debugmsg(9, "run_db_thread: dbqueue: Read: SQL:", item["SQL"])
+								base.debugmsg(7, "run_db_thread: dbqueue: Read: SQL:", item["SQL"])
 								self.datadb.row_factory = self.dict_factory
 								cur = self.datadb.cursor()
 								cur.execute(item["SQL"])
 								result = cur.fetchall()
-								base.debugmsg(9, "run_db_thread: dbqueue: Read: result:", result)
+								base.debugmsg(7, "run_db_thread: dbqueue: Read: result:", result)
 								cur.close()
 								self.datadb.commit()
 
-								base.debugmsg(9, "run_db_thread: dbqueue: Read: result:", result)
+								base.debugmsg(7, "run_db_thread: dbqueue: Read: result:", result)
 								if "KEY" in item:
 									base.dbqueue["ReadResult"][item["KEY"]] = result
 
 							except Exception as e:
-								base.debugmsg(6, "run_db_thread: dbqueue: Read: Exception:", e)
-								base.debugmsg(6, "run_db_thread: dbqueue: Read: Item:", item)
+								base.debugmsg(1, "run_db_thread: dbqueue: Read: Exception:", e)
+								base.debugmsg(1, "run_db_thread: dbqueue: Read: Item:", item)
 						else:
-							print("run_db_thread: dbqueue: Read: Item not written, missing key SQL or VALUES")
-							print("run_db_thread: dbqueue: Read: Item:", item)
+							base.debugmsg(1, "run_db_thread: dbqueue: Read: Item not written, missing key SQL or VALUES")
+							base.debugmsg(1, "run_db_thread: dbqueue: Read: Item:", item)
 
 
 
@@ -729,6 +729,7 @@ class RFSwarmBase:
 					a.Name "AgentName"
 					, s.Value "AgentStatus"
 					, max(s.Time) as "AgentLastSeen"
+					, ra.Value "AgentAssigned"
 					, r.Value "AgentRobots"
 					, l.Value "AgentLoad"
 					, c.Value "AgentCPU"
@@ -737,14 +738,41 @@ class RFSwarmBase:
 				from Metric a
 					left join Metrics s on s.ParentID = a.ROWID and s.Key = "Status"
 					left join Metrics r on r.ParentID = a.ROWID and r.Key = "Robots" and r.Time = s.Time
+					left join Metrics ra on ra.ParentID = a.ROWID and ra.Key = "AssignedRobots" and ra.Time = s.Time
 					left join Metrics l on l.ParentID = a.ROWID and l.Key = "Load" and l.Time = s.Time
 					left join Metrics c on c.ParentID = a.ROWID and c.Key = "CPU" and c.Time = s.Time
 					left join Metrics m on m.ParentID = a.ROWID and m.Key = "MEM" and m.Time = s.Time
 					left join Metrics n on m.ParentID = a.ROWID and n.Key = "NET" and n.Time = s.Time
-				where a.Type = "agent"
+				where a.Type = "Agent"
 				GROUP by s.ParentID
 				ORDER by a.Name
 				''')
+
+				c.execute('''
+				CREATE VIEW "AgentHistory" as
+				SELECT
+					a.Name "AgentName"
+					, s.Value "AgentStatus"
+					, s.Time as "AgentLastSeen"
+					, ra.Value "AgentAssigned"
+					, r.Value "AgentRobots"
+					, l.Value "AgentLoad"
+					, c.Value "AgentCPU"
+					, m.Value "AgentMEM"
+					, n.Value "AgentNET"
+				from Metric a
+					left join Metrics s on s.ParentID = a.ROWID and s.Key = "Status"
+					left join Metrics r on r.ParentID = a.ROWID and r.Key = "Robots" and r.Time = s.Time
+					left join Metrics ra on ra.ParentID = a.ROWID and ra.Key = "AssignedRobots" and ra.Time = s.Time
+					left join Metrics l on l.ParentID = a.ROWID and l.Key = "Load" and l.Time = s.Time
+					left join Metrics c on c.ParentID = a.ROWID and c.Key = "CPU" and c.Time = s.Time
+					left join Metrics m on m.ParentID = a.ROWID and m.Key = "MEM" and m.Time = s.Time
+					left join Metrics n on m.ParentID = a.ROWID and n.Key = "NET" and n.Time = s.Time
+				where a.Type = "Agent"
+				ORDER by a.Name
+				''')
+
+
 
 				c.execute('''
 				CREATE VIEW "ResultSummary" as
@@ -1701,6 +1729,56 @@ class RFSwarmCore:
 		#
 		# base.dbqueue["Write"].append({"SQL":sqlcmd, "VALUES": agnttbldata})
 		base.dbqueue["Agents"].append(agnttbldata)
+
+		# Save Metric Data
+		# 	First ensure a metric for this agent exists
+		if "Agent" not in base.MetricIDs:
+			base.MetricIDs["Agent"] = {}
+		if agentdata["AgentName"] not in base.MetricIDs["Agent"]:
+			# create the agent metric
+			base.dbqueue["Metric"].append( (agentdata["AgentName"], "Agent") )
+			# get the agent metric id
+			sql = 'select ROWID from Metric where Name = "'+agentdata["AgentName"]+'"'
+			base.debugmsg(7, "sql:", sql)
+			base.dbqueue["Read"].append({"SQL": sql, "KEY": "Metric_"+agentdata["AgentName"]})
+
+			if "Read" in base.dbqueue:
+				base.debugmsg(7, "Read", base.dbqueue["Read"])
+			if "ReadResult" in base.dbqueue:
+				base.debugmsg(7, "ReadResult", base.dbqueue["ReadResult"])
+			base.debugmsg(7, "Wait for Metric_"+agentdata["AgentName"])
+			while "Metric_"+agentdata["AgentName"] not in base.dbqueue["ReadResult"]:
+				time.sleep(0.1)
+				base.debugmsg(9, "Waiting for Metric_"+agentdata["AgentName"])
+			if "ReadResult" in base.dbqueue:
+				base.debugmsg(7, "ReadResult", base.dbqueue["ReadResult"])
+			# base.debugmsg(5, "Metric_"+agentdata["AgentName"], base.dbqueue["ReadResult"]["Metric_"+agentdata["AgentName"]])
+			base.debugmsg(7, "Wait for Metric_"+agentdata["AgentName"]+">0")
+			while len(base.dbqueue["ReadResult"]["Metric_"+agentdata["AgentName"]])<1:
+				time.sleep(0.1)
+				base.debugmsg(9, "Waiting for Metric_"+agentdata["AgentName"]+">0")
+
+
+			if "Metric_"+agentdata["AgentName"] in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["Metric_"+agentdata["AgentName"]])>0:
+				base.debugmsg(7, "Metric_"+agentdata["AgentName"]+":", base.dbqueue["ReadResult"]["Metric_"+agentdata["AgentName"]])
+
+				base.MetricIDs["Agent"][agentdata["AgentName"]] = base.dbqueue["ReadResult"]["Metric_"+agentdata["AgentName"]][0]["rowid"]
+				base.debugmsg(5, "MetricIDs[Agent]:", base.MetricIDs["Agent"])
+
+		# Next save the Metrics
+		if agentdata["AgentName"] in base.MetricIDs["Agent"]:
+			m_AgentID = base.MetricIDs["Agent"][agentdata["AgentName"]]
+			m_Time = agentdata["LastSeen"]
+			base.debugmsg(7, "m_AgentID:", m_AgentID, "	m_Time:", m_Time)
+			base.dbqueue["Metrics"].append( (m_AgentID, m_Time, "Status", agentdata["Status"]) )
+			base.dbqueue["Metrics"].append( (m_AgentID, m_Time, "LastSeen", agentdata["LastSeen"]) )
+			base.dbqueue["Metrics"].append( (m_AgentID, m_Time, "AssignedRobots", agentdata["AssignedRobots"]) )
+			base.dbqueue["Metrics"].append( (m_AgentID, m_Time, "Robots", agentdata["Robots"]) )
+			base.dbqueue["Metrics"].append( (m_AgentID, m_Time, "Load", agentdata["LOAD%"]) )
+			base.dbqueue["Metrics"].append( (m_AgentID, m_Time, "CPU", agentdata["CPU%"]) )
+			base.dbqueue["Metrics"].append( (m_AgentID, m_Time, "MEM", agentdata["MEM%"]) )
+			base.dbqueue["Metrics"].append( (m_AgentID, m_Time, "NET", agentdata["NET%"]) )
+
 
 	def register_result(self, AgentName, result_name, result, elapsed_time, start_time, end_time, index, vuser, iter, sequence):
 		base.debugmsg(9, "register_result")
