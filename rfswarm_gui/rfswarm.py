@@ -31,6 +31,7 @@ from datetime import datetime
 import re
 import threading
 import subprocess
+import requests
 from operator import itemgetter
 import csv
 
@@ -748,6 +749,31 @@ class RFSwarmBase:
 		if remove:
 			del self.scriptfiles[hash]
 
+	def tick_counter(self):
+		#
+		# This function is simply a way to roughly measure the number of agents being used
+		# without collecting any other data from the user or thier machine.
+		#
+		# A simple get request on this file on startup or once a day should make it appear
+		# in the github insights if people are actually using this application.
+		#
+		# t = threading.Thread(target=self.tick_counter)
+		# t.start()
+		# only tick once per day
+		# 1 day, 24 hours  = 60 * 60 * 24
+		aday = 60 * 60 * 24
+		while True:
+			# https://github.com/damies13/rfswarm/blob/v0.6.2/Doc/Images/z_gui.txt
+			url = "https://github.com/damies13/rfswarm/blob/"+self.version+"/Doc/Images/z_gui.txt"
+			try:
+				r = requests.get(url)
+				self.debugmsg(9, "tick_counter:", r.status_code)
+			except:
+				pass
+			time.sleep(aday)
+
+
+
 	def find_dependancies(self, hash):
 		keep_going = True
 		checking = False
@@ -1395,6 +1421,8 @@ class RFSwarmCore:
 		base.dbthread = threading.Thread(target=base.run_db_thread)
 		base.dbthread.start()
 
+		t = threading.Thread(target=base.tick_counter)
+		t.start()
 
 
 

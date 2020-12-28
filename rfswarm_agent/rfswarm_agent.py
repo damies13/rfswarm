@@ -165,6 +165,9 @@ class RFSwarmAgent():
 			self.debugmsg(6, "self.xmlmode: ", self.xmlmode)
 			self.create_listner_file()
 
+		t = threading.Thread(target=self.tick_counter)
+		t.start()
+
 
 	def debugmsg(self, lvl, *msg):
 		msglst = []
@@ -358,6 +361,29 @@ class RFSwarmAgent():
 		else:
 			self.config['Agent']['swarmserver'] = "http://localhost:8138/"
 			self.saveini()
+
+	def tick_counter(self):
+		#
+		# This function is simply a way to roughly measure the number of agents being used
+		# without collecting any other data from the user or thier machine.
+		#
+		# A simple get request on this file on startup or once a day should make it appear
+		# in the github insights if people are actually using this application.
+		#
+		# t = threading.Thread(target=self.tick_counter)
+		# t.start()
+		# only tick once per day
+		# 1 day, 24 hours  = 60 * 60 * 24
+		aday = 60 * 60 * 24
+		while True:
+			# https://github.com/damies13/rfswarm/blob/v0.6.2/Doc/Images/z_agent.txt
+			url = "https://github.com/damies13/rfswarm/blob/"+self.version+"/Doc/Images/z_agent.txt"
+			try:
+				r = requests.get(url)
+				self.debugmsg(9, "tick_counter:", r.status_code)
+			except:
+				pass
+			time.sleep(aday)
 
 
 	def getscripts(self):
