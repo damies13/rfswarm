@@ -706,7 +706,8 @@ class RFSwarmBase:
  				# create views
 
 				c.execute('''
-				CREATE VIEW "Summary" AS SELECT
+				CREATE VIEW "Summary" AS
+				SELECT
 					r.result_name,
 					min(rp.elapsed_time) "min", avg(rp.elapsed_time) "avg", max(rp.elapsed_time)  "max",
 					count(rp.result) as _pass,
@@ -778,16 +779,27 @@ class RFSwarmBase:
 				CREATE VIEW "ResultSummary" as
 				SELECT
 					a.Name
-					, max(e.Time) as "EntryTime"
+					, max(e.Time) as "_EntryTime"
 					, mn.Value "Min"
-					, mx.Value "Max"
 					, av.Value "Average"
+					, sd.Value "StDev"
+					, pct.Key "%ile_Key"
+					, pct.Value "%ile_Value"
+					, mx.Value "Max"
+					, ps.Value "Pass"
+					, fl.Value "Fail"
+					, ot.Value "Other"
 				from Metric a
 					left join Metrics e on e.ParentID = a.ROWID and e.Key = "EntryTime"
-					left join Metrics mn on mn.ParentID = a.ROWID and mn.Key = "Min" and e.Time = mn.Time
-					left join Metrics mx on mx.ParentID = a.ROWID and mx.Key = "Max" and e.Time = mx.Time
-					left join Metrics av on av.ParentID = a.ROWID and av.Key = "Average" and e.Time = av.Time
-				where a.Type = "Summary"
+					left join Metrics mn on mn.ParentID = a.ROWID and mn.Key like "min%" and e.Time = mn.Time
+					left join Metrics av on av.ParentID = a.ROWID and av.Key = "avg" and e.Time = av.Time
+					left join Metrics sd on sd.ParentID = a.ROWID and sd.Key like "stDev%" and e.Time = sd.Time
+					left join Metrics pct on pct.ParentID = a.ROWID and pct.Key like "%ile" and e.Time = pct.Time
+					left join Metrics mx on mx.ParentID = a.ROWID and mx.Key like "max%" and e.Time = mx.Time
+					left join Metrics ps on ps.ParentID = a.ROWID and ps.Key like "_pass%" and e.Time = ps.Time
+					left join Metrics fl on fl.ParentID = a.ROWID and fl.Key like "_fail%" and e.Time = fl.Time
+					left join Metrics ot on ot.ParentID = a.ROWID and ot.Key like "_other%" and e.Time = ot.Time
+				where a.Type = "Summary" -- and a.ROWID = 9
 				GROUP by a.ROWID
 				ORDER by a.ROWID
 				''')
@@ -1247,13 +1259,14 @@ class RFSwarmBase:
 			if statname not in base.MetricIDs["Summary"]:
 				# create the agent metric
 				base.dbqueue["Metric"].append( (statname, "Summary") )
+
 				# get the agent metric id
-				# safestatname = statname.replace("\"", "\"")
-				safestatname = statname.replace("\"", '\\"')
-				base.debugmsg(5, "safestatname:", safestatname)
+				base.debugmsg(7, "statname:", statname)
+				safestatname = statname.replace('"', r'""')
 				sql = 'select ROWID from Metric where Name = "'+safestatname+'"'
-				base.debugmsg(5, "sql:", sql)
+				base.debugmsg(7, "sql:", sql)
 				base.dbqueue["Read"].append({"SQL": sql, "KEY": "Metric_"+statname})
+
 
 		# Read Metric ID's
 		for stat in RunStats:
@@ -1286,6 +1299,8 @@ class RFSwarmBase:
 				m_StatID = base.MetricIDs["Summary"][statname]
 				m_Time = int(time.time())
 				base.debugmsg(5, "m_StatID:", m_StatID, "	m_Time:", m_Time)
+
+				base.dbqueue["Metrics"].append( (m_StatID, m_Time, "EntryTime", m_Time) )
 
 				# stat: {'result_name': "Opening url 'http://opencart3/'", 'min': 0.411,
 				# 			'avg': 0.439, '90%ile': None, 'max': 0.467, 'stDev': 0.04,
@@ -2012,6 +2027,8 @@ class RFSwarmCore:
 		base.run_finish = 0
 		base.posttest = False
 		base.run_paused = False
+		base.MetricIDs = {}
+
 		base.robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}}
 		t = threading.Thread(target=core.run_start_threads)
 		t.start()
