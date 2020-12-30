@@ -732,10 +732,10 @@ class RFSwarmBase:
 					, max(s.Time) as "AgentLastSeen"
 					, ra.Value "AgentAssigned"
 					, r.Value "AgentRobots"
-					, l.Value "AgentLoad"
-					, c.Value "AgentCPU"
-					, m.Value "AgentMEM"
-					, n.Value "AgentNET"
+					, max(l.Value) "AgentLoad"
+					, max(c.Value) "AgentCPU"
+					, max(m.Value) "AgentMEM"
+					, max(n.Value) "AgentNET"
 				from Metric a
 					left join Metrics s on s.ParentID = a.ROWID and s.Key = "Status"
 					left join Metrics r on r.ParentID = a.ROWID and r.Key = "Robots" and r.Time = s.Time
@@ -754,13 +754,13 @@ class RFSwarmBase:
 				SELECT
 					a.Name "AgentName"
 					, s.Value "AgentStatus"
-					, s.Time as "AgentLastSeen"
+					, max(s.Time) as "AgentLastSeen"
 					, ra.Value "AgentAssigned"
 					, r.Value "AgentRobots"
-					, l.Value "AgentLoad"
-					, c.Value "AgentCPU"
-					, m.Value "AgentMEM"
-					, n.Value "AgentNET"
+					, max(l.Value) "AgentLoad"
+					, max(c.Value) "AgentCPU"
+					, max(m.Value) "AgentMEM"
+					, max(n.Value) "AgentNET"
 				from Metric a
 					left join Metrics s on s.ParentID = a.ROWID and s.Key = "Status"
 					left join Metrics r on r.ParentID = a.ROWID and r.Key = "Robots" and r.Time = s.Time
@@ -770,7 +770,8 @@ class RFSwarmBase:
 					left join Metrics m on m.ParentID = a.ROWID and m.Key = "MEM" and m.Time = s.Time
 					left join Metrics n on m.ParentID = a.ROWID and n.Key = "NET" and n.Time = s.Time
 				where a.Type = "Agent"
-				ORDER by a.Name
+				group by a.ROWID, s.Time
+				ORDER by a.Name, s.Time
 				''')
 
 
