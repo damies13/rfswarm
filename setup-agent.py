@@ -5,7 +5,7 @@ with open("README_PyPi.md", "r") as fh:
 
 setuptools.setup(
 	name="rfswarm-agent",
-	version="v0.6.2",
+	version="",
 	author="damies13",
 	author_email="damies13+rfswarm@gmail.com",
 	description="rfswarm Agent",
