@@ -509,22 +509,6 @@ class RFSwarmBase:
 
 				# process db queues
 
-				# Agents
-				if len(base.dbqueue["Agents"])>0:
-					base.debugmsg(9, "run_db_thread: dbqueue: Agents")
-					agntdata = list(base.dbqueue["Agents"])
-					base.dbqueue["Agents"] = []
-					base.debugmsg(9, "run_db_thread: dbqueue: Agents: agntdata:", agntdata)
-					try:
-						sql = "INSERT INTO Agents VALUES (?,?,?,?,?,?,?,?)"
-						cur = self.datadb.cursor()
-						cur.executemany(sql, agntdata)
-						cur.close()
-						self.datadb.commit()
-					except Exception as e:
-						base.debugmsg(1, "run_db_thread: dbqueue: Agents: Exception:", e)
-						base.debugmsg(1, "run_db_thread: dbqueue: Results: ", sql, agntdata)
-
 				# Results
 				if len(base.dbqueue["Results"])>0:
 					base.debugmsg(9, "run_db_thread: dbqueue: Results")
@@ -676,8 +660,6 @@ class RFSwarmBase:
 			if createschema:
 				c = self.datadb.cursor()
 				# create tables
-				c.execute('''CREATE TABLE Agents
-					(agent text, status text, last_seen date, robots int, load num, cpu num, mem num, net num)''')
 
 				c.execute('''CREATE TABLE Results
 					(script_index int, virtual_user int, iteration int, agent text, sequence int, result_name text, result text, elapsed_time num, start_time num, end_time num)''')
@@ -1271,7 +1253,7 @@ class RFSwarmBase:
 
 		# Read Metric ID's
 		for stat in RunStats:
-			base.debugmsg(5, "stat:", stat)
+			base.debugmsg(7, "stat:", stat)
 			statname = stat["result_name"]
 			if statname not in base.MetricIDs["Summary"]:
 				if "Read" in base.dbqueue:
@@ -1293,13 +1275,13 @@ class RFSwarmBase:
 					base.debugmsg(7, "Metric_"+statname+":", base.dbqueue["ReadResult"]["Metric_"+statname])
 
 					base.MetricIDs["Summary"][statname] = base.dbqueue["ReadResult"]["Metric_"+statname][0]["rowid"]
-					base.debugmsg(5, "MetricIDs[Summary]:", base.MetricIDs["Summary"])
+					base.debugmsg(7, "MetricIDs[Summary]:", base.MetricIDs["Summary"])
 
 			# Next save the Metrics
 			if statname in base.MetricIDs["Summary"]:
 				m_StatID = base.MetricIDs["Summary"][statname]
 				m_Time = int(time.time())
-				base.debugmsg(5, "m_StatID:", m_StatID, "	m_Time:", m_Time)
+				base.debugmsg(7, "m_StatID:", m_StatID, "	m_Time:", m_Time)
 
 				base.dbqueue["Metrics"].append( (m_StatID, m_Time, "EntryTime", m_Time) )
 
@@ -1308,10 +1290,10 @@ class RFSwarmBase:
 				# 			'_pass': 2, '_fail': 0, '_other': 0}
 
 				for stati in stat:
-					base.debugmsg(5, "stati:", stati, "	stat[stati]:", stat[stati])
+					base.debugmsg(7, "stati:", stati, "	stat[stati]:", stat[stati])
 					if stati != "result_name":
 						base.dbqueue["Metrics"].append( (m_StatID, m_Time, stati, stat[stati]) )
-						base.debugmsg(5, "Saving m_StatID:", m_StatID, "	m_Time:", m_Time, "	stati:", stati, "	stat[stati]:", stat[stati])
+						base.debugmsg(7, "Saving m_StatID:", m_StatID, "	m_Time:", m_Time, "	stati:", stati, "	stat[stati]:", stat[stati])
 
 
 
@@ -1335,11 +1317,12 @@ class RFSwarmBase:
 
 			# request agent data for agent report
 			sql = "SELECT * "
-			sql += "FROM Agents as a "
-			sql += "WHERE a.last_seen>{} ".format(base.robot_schedule["Start"])
-			sql += " ORDER BY a.last_seen"
+			sql += "FROM AgentHistory as a "
+			sql += "WHERE a.AgentLastSeen>{} ".format(base.robot_schedule["Start"])
+			sql += " ORDER BY a.AgentLastSeen"
 			base.dbqueue["Read"].append({"SQL": sql, "KEY": "Agents"})
 			# request agent data for agent report
+
 			# request raw data for agent report
 			sql = "SELECT * "
 			sql += "FROM Results as r "
@@ -1816,13 +1799,6 @@ class RFSwarmCore:
 		t.start()
 
 		# save data to db
-		agnttbldata = (agentdata["AgentName"], agentdata["Status"], agentdata["LastSeen"],
-						agentdata["Robots"], agentdata["LOAD%"], agentdata["CPU%"],
-						agentdata["MEM%"], agentdata["NET%"])
-		# sqlcmd = 'INSERT INTO Agents VALUES (?,?,?,?,?,?,?,?)'
-		#
-		# base.dbqueue["Write"].append({"SQL":sqlcmd, "VALUES": agnttbldata})
-		base.dbqueue["Agents"].append(agnttbldata)
 
 		# Save Metric Data
 		# 	First ensure a metric for this agent exists
