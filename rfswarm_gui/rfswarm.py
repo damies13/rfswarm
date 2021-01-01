@@ -298,6 +298,27 @@ class AgentServer(BaseHTTPRequestHandler):
 						jsonresp["Result"] = "Queued"
 						base.debugmsg(7, "Result: jsonresp[\"Result\"]:", jsonresp["Result"])
 
+
+				if (parsed_path.path == "/Metric"):
+					jsonreq = json.loads(rawData)
+					base.debugmsg(6, "Metric: jsonreq:", jsonreq)
+					requiredfields = ["PrimaryMetric", "MetricType", "MetricTime", "SecondaryMetrics"]
+					for field in requiredfields:
+						if field not in jsonreq:
+							httpcode = 422
+							message = "Missing required field: '{}', required fields are: {}".format(field, requiredfields)
+							base.debugmsg(5, httpcode, ":", message)
+							break
+
+					if httpcode == 200:
+						base.debugmsg(7, "Result: httpcode:", httpcode)
+						jsonresp["Metric"] = jsonreq["PrimaryMetric"]
+						core.register_metric(jsonreq["PrimaryMetric"], jsonreq["MetricType"], jsonreq["MetricTime"], jsonreq["SecondaryMetrics"])
+						jsonresp["Result"] = "Queued"
+						base.debugmsg(7, "Metric: jsonresp[\"Metric\"]:", jsonresp["Metric"])
+
+
+
 				base.debugmsg(8, "jsonresp:", jsonresp)
 				message = json.dumps(jsonresp)
 			else:
@@ -361,6 +382,21 @@ class AgentServer(BaseHTTPRequestHandler):
 				jsonresp["POST"]["Result"]["Body"]["VUser"] = "<user number>"
 				jsonresp["POST"]["Result"]["Body"]["Iteration"] = "<iteration number>"
 				jsonresp["POST"]["Result"]["Body"]["Sequence"] = "<sequence number that ResultName occurred in test case>"
+
+
+				jsonresp["POST"]["Metric"] = {}
+				jsonresp["POST"]["Metric"]["URI"] = "/Metric"
+				jsonresp["POST"]["Metric"]["Body"] = {}
+				jsonresp["POST"]["Metric"]["Body"]["PrimaryMetric"] = "<Primary Metric Name, e.g. AUT Hostname>"
+				jsonresp["POST"]["Metric"]["Body"]["MetricType"] = "<Metric Type, e.g. AUT Web Server>"
+				jsonresp["POST"]["Metric"]["Body"]["MetricTime"] = "<Epoch time the metric was recorded>"
+				jsonresp["POST"]["Metric"]["Body"]["SecondaryMetrics"] = {}
+				jsonresp["POST"]["Metric"]["Body"]["SecondaryMetrics"]["Secondary Metric Name, e.g. CPU%"] = "<Value, e.g. 60>"
+				jsonresp["POST"]["Metric"]["Body"]["SecondaryMetrics"]["Secondary Metric Name, e.g. MEMUser"] = "<Value, e.g. 256Mb>"
+				jsonresp["POST"]["Metric"]["Body"]["SecondaryMetrics"]["Secondary Metric Name, e.g. MEMSys"] = "<Value, e.g. 1Gb>"
+				jsonresp["POST"]["Metric"]["Body"]["SecondaryMetrics"]["Secondary Metric Name, e.g. MEMFree"] = "<Value, e.g. 2Gb>"
+				jsonresp["POST"]["Metric"]["Body"]["SecondaryMetrics"]["Secondary Metric Name, e.g. CPUCount"] = "<Value>, e.g. 4"
+
 
 				message = json.dumps(jsonresp)
 			else:
@@ -1863,6 +1899,11 @@ class RFSwarmCore:
 			ut = threading.Thread(target=base.gui.delayed_UpdateRunStats)
 			ut.start()
 
+	def register_metric(self, PrimaryMetric, MetricType, MetricTime, SecondaryMetrics):
+		# core.register_metric(jsonreq["PrimaryMetric"], jsonreq["MetricType"], jsonreq["MetricTime"], jsonreq["SecondaryMetrics"])
+		base.debugmsg(5, "PrimaryMetric:", PrimaryMetric, "	MetricType:", MetricType, "	MetricTime:", MetricTime, "	SecondaryMetrics:", SecondaryMetrics)
+
+		pass
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
