@@ -432,7 +432,7 @@ class RFSwarmBase:
 	datapath = ""
 	dbfile = ""
 	datadb = None
-	dbqueue = {"Write": [], "Read": [], "ReadResult": {}, "Agents": [], "Results": [], "Metric": [], "Metrics": []}
+	dbqueue = {"Write": [], "Read": [], "ReadResult": {}, "Results": [], "Metric": [], "Metrics": []}
 	MetricIDs = {}
 
 	# #000000 = Black
