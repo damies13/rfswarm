@@ -118,10 +118,12 @@ class AgentServer(BaseHTTPRequestHandler):
 		httpcode = 200
 		try:
 			parsed_path = urllib.parse.urlparse(self.path)
-			if (parsed_path.path in ["/AgentStatus", "/Jobs", "/Scripts", "/File", "/Result"]):
+			base.debugmsg(9, "parsed_path.path", parsed_path.path)
+			if (parsed_path.path in ["/AgentStatus", "/Jobs", "/Scripts", "/File", "/Result", "/Metric"]):
 
 				jsonresp = {}
 				rawData = (self.rfile.read(int(self.headers['content-length']))).decode('utf-8')
+				base.debugmsg(9, "rawData: ", rawData)
 				base.debugmsg(9, "parsed_path.path", parsed_path.path)
 				if (parsed_path.path == "/AgentStatus"):
 					jsonreq = json.loads(rawData)
@@ -300,20 +302,25 @@ class AgentServer(BaseHTTPRequestHandler):
 
 
 				if (parsed_path.path == "/Metric"):
+					base.debugmsg(7, "Metric")
 					jsonreq = json.loads(rawData)
-					base.debugmsg(6, "Metric: jsonreq:", jsonreq)
+					base.debugmsg(7, "Metric: jsonreq:", jsonreq)
 					requiredfields = ["PrimaryMetric", "MetricType", "MetricTime", "SecondaryMetrics"]
 					for field in requiredfields:
 						if field not in jsonreq:
 							httpcode = 422
 							message = "Missing required field: '{}', required fields are: {}".format(field, requiredfields)
-							base.debugmsg(5, httpcode, ":", message)
+							base.debugmsg(9, httpcode, ":", message)
 							break
 
 					if httpcode == 200:
 						base.debugmsg(7, "Result: httpcode:", httpcode)
 						jsonresp["Metric"] = jsonreq["PrimaryMetric"]
-						core.register_metric(jsonreq["PrimaryMetric"], jsonreq["MetricType"], jsonreq["MetricTime"], jsonreq["SecondaryMetrics"])
+
+						# core.register_metric(jsonreq["PrimaryMetric"], jsonreq["MetricType"], jsonreq["MetricTime"], jsonreq["SecondaryMetrics"])
+						t = threading.Thread(target=core.register_metric, args=(jsonreq["PrimaryMetric"], jsonreq["MetricType"], jsonreq["MetricTime"], jsonreq["SecondaryMetrics"], ))
+						t.start()
+
 						jsonresp["Result"] = "Queued"
 						base.debugmsg(7, "Metric: jsonresp[\"Metric\"]:", jsonresp["Metric"])
 
@@ -823,6 +830,19 @@ class RFSwarmBase:
 				ORDER by a.ROWID
 				''')
 
+				c.execute('''
+				CREATE VIEW "MetricData" as
+				SELECT
+					  m.Name "PrimaryMetric"
+					, m.Type "MetricType"
+					, ms.Time "MetricTime"
+					, ms.Key "SecondaryMetric"
+					, ms.Value "MetricValue"
+				FROM Metric as m
+				JOIN Metrics ms on m.ROWID = ms.ParentID
+				''')
+
+
 
 				self.datadb.commit()
 
@@ -891,11 +911,32 @@ class RFSwarmBase:
 		hasher = hashlib.md5()
 		hasher.update(str(os.path.getmtime(file)).encode('utf-8'))
 		hasher.update(relpath.encode('utf-8'))
-		with open(file, 'rb') as afile:
+		# with open(file, 'rb') as afile:
+		# 	buf = afile.read(BLOCKSIZE)
+		# 	while len(buf) > 0:
+		# 		hasher.update(buf)
+		# 		buf = afile.read(BLOCKSIZE)
+		#
+		# 	Intermittant issue : Too many open files, it seems that with open is not always closing files?
+		# 
+		# Exception in thread Thread-1413:
+		# Traceback (most recent call last):
+		#   File "/usr/local/Cellar/python/3.7.4/Frameworks/Python.framework/Versions/3.7/lib/python3.7/threading.py", line 926, in _bootstrap_inner
+		#     self.run()
+		#   File "/usr/local/Cellar/python/3.7.4/Frameworks/Python.framework/Versions/3.7/lib/python3.7/threading.py", line 870, in run
+		#     self._target(*self._args, **self._kwargs)
+		#   File "./rfswarm.py", line 1034, in check_files_changed
+		#     script_hash = base.hash_file(file_data['localpath'], file_data['relpath'])
+		#   File "./rfswarm.py", line 901, in hash_file
+		#     with open(file, 'rb') as afile:
+		# OSError: [Errno 24] Too many open files: '/Users/dave/Documents/GitHub/rfswarm/robots/OC_Demo_2.robot'
+
+		afile = open(file, 'rb')
+		buf = afile.read(BLOCKSIZE)
+		while len(buf) > 0:
+			hasher.update(buf)
 			buf = afile.read(BLOCKSIZE)
-			while len(buf) > 0:
-				hasher.update(buf)
-				buf = afile.read(BLOCKSIZE)
+		afile.close()
 		base.debugmsg(3, "file:", file, "	hash:", hasher.hexdigest())
 		return hasher.hexdigest()
 
@@ -1901,9 +1942,49 @@ class RFSwarmCore:
 
 	def register_metric(self, PrimaryMetric, MetricType, MetricTime, SecondaryMetrics):
 		# core.register_metric(jsonreq["PrimaryMetric"], jsonreq["MetricType"], jsonreq["MetricTime"], jsonreq["SecondaryMetrics"])
-		base.debugmsg(5, "PrimaryMetric:", PrimaryMetric, "	MetricType:", MetricType, "	MetricTime:", MetricTime, "	SecondaryMetrics:", SecondaryMetrics)
+		base.debugmsg(7, "PrimaryMetric:", PrimaryMetric, "	MetricType:", MetricType, "	MetricTime:", MetricTime, "	SecondaryMetrics:", SecondaryMetrics)
 
-		pass
+		# Save Metric Data
+		# 	First ensure a metric for this agent exists
+		if MetricType not in base.MetricIDs:
+			base.MetricIDs[MetricType] = {}
+		if PrimaryMetric not in base.MetricIDs[MetricType]:
+			# create the agent metric
+			base.dbqueue["Metric"].append( (PrimaryMetric, MetricType) )
+			# get the agent metric id
+			sql = 'select ROWID from Metric where Name = "'+PrimaryMetric+'"'
+			base.debugmsg(7, "sql:", sql)
+			base.dbqueue["Read"].append({"SQL": sql, "KEY": "Metric_"+PrimaryMetric})
+
+			if "Read" in base.dbqueue:
+				base.debugmsg(7, "Read", base.dbqueue["Read"])
+			if "ReadResult" in base.dbqueue:
+				base.debugmsg(5, "ReadResult", base.dbqueue["ReadResult"])
+			base.debugmsg(7, "Wait for Metric_"+PrimaryMetric)
+			while "Metric_"+PrimaryMetric not in base.dbqueue["ReadResult"]:
+				time.sleep(0.1)
+				base.debugmsg(9, "Waiting for Metric_"+PrimaryMetric)
+			if "ReadResult" in base.dbqueue:
+				base.debugmsg(5, "ReadResult", base.dbqueue["ReadResult"])
+			# base.debugmsg(5, "Metric_"+agentdata["AgentName"], base.dbqueue["ReadResult"]["Metric_"+agentdata["AgentName"]])
+			base.debugmsg(7, "Wait for Metric_"+PrimaryMetric+">0")
+			while len(base.dbqueue["ReadResult"]["Metric_"+PrimaryMetric])<1:
+				time.sleep(0.1)
+				base.debugmsg(9, "Waiting for Metric_"+PrimaryMetric+">0")
+
+
+			if "Metric_"+PrimaryMetric in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["Metric_"+PrimaryMetric])>0:
+				base.debugmsg(7, "Metric_"+PrimaryMetric+":", base.dbqueue["ReadResult"]["Metric_"+PrimaryMetric])
+
+				base.MetricIDs[MetricType][PrimaryMetric] = base.dbqueue["ReadResult"]["Metric_"+PrimaryMetric][0]["rowid"]
+				base.debugmsg(7, "MetricIDs["+MetricType+"]:", base.MetricIDs[MetricType])
+
+		# Next save the Metrics
+		MetricID = base.MetricIDs[MetricType][PrimaryMetric]
+		for key in SecondaryMetrics:
+			base.dbqueue["Metrics"].append( (MetricID, MetricTime, key, SecondaryMetrics[key]) )
+			base.debugmsg(7, MetricID, MetricTime, key, SecondaryMetrics[key])
+
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -2182,7 +2263,10 @@ class RFSwarmCore:
 								base.debugmsg(9, 'nxtuid', nxtuid)
 								# Determine if we should start another user?
 								if nxtuid < grp["Users"]+1:
-									rupct = (time_elapsed - grp["Delay"]) /grp["RampUp"]
+									if grp["RampUp"] > 0:
+										rupct = (time_elapsed - grp["Delay"]) /grp["RampUp"]
+									else:
+										rupct = 1
 									base.debugmsg(9, 'rupct', rupct)
 									ruusr = int(grp["Users"] * rupct)
 									base.debugmsg(9, 'nxtuid', nxtuid, 'ruusr', ruusr)
@@ -2210,7 +2294,7 @@ class RFSwarmCore:
 										base.debugmsg(5, "base.Agents[",nxtagent,"][AssignedRobots]:", base.Agents[nxtagent]["AssignedRobots"])
 
 										curusrs += 1
-										base.debugmsg(2, "Robot:", curusrs, "	Assigned to:", nxtagent)
+										base.debugmsg(2, "Robot:", curusrs, "	Test:", grp["Test"], "	Assigned to:", nxtagent)
 
 										base.debugmsg(9, "robot_schedule", base.robot_schedule)
 
