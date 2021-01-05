@@ -28,7 +28,7 @@ Response Body:
                     "<Agent IP Address>",
                     "<Agent IP Address>"
                 ],
-                "Robots": "<sum>,"
+                "Robots": "<sum>",
                 "CPU%": "0-100",
                 "MEM%": "0-100",
                 "NET%": "0-100"
@@ -50,7 +50,7 @@ Response Body:
             "URI": "/File",
             "Body": {
                 "AgentName": "<Agent Host Name>",
-				"Action": "<Upload/Download/Status>",
+                "Action": "<Upload/Download/Status>",
                 "Hash": "<File Hash, provided by /Scripts>"
             }
         },
@@ -60,13 +60,28 @@ Response Body:
                 "AgentName": "<Agent Host Name>",
                 "ResultName": "<A Text String>",
                 "Result": "<PASS | FAIL>",
-                "ElapsedTime": <seconds as decimal number>,
-                "StartTime": <epoch seconds as decimal number>,
-                "EndTime": <epoch seconds as decimal number>,
+                "ElapsedTime": "<seconds as decimal number>",
+                "StartTime": "<epoch seconds as decimal number>",
+                "EndTime": "<epoch seconds as decimal number>",
                 "ScriptIndex": "<Index>",
                 "VUser": "<user number>",
-                "Iteration": <iteration number>,
-                "Sequence": <sequence number that ResultName occurred in test case>
+                "Iteration": "<iteration number>",
+                "Sequence": "<sequence number that ResultName occurred in test case>"
+            }
+        },
+        "Metric": {
+            "URI": "/Metric",
+            "Body": {
+                "PrimaryMetric": "<primary metric name, e.g. AUT Hostname>",
+                "MetricType": "<metric type, e.g. AUT Web Server>",
+                "MetricTime": "<epoch time the metric was recorded>",
+                "SecondaryMetrics": {
+                    "Secondary Metric Name, e.g. CPU%": "<value, e.g. 60>",
+                    "Secondary Metric Name, e.g. MEMUser": "<value, e.g. 256Mb>",
+                    "Secondary Metric Name, e.g. MEMSys": "<value, e.g. 1Gb>",
+                    "Secondary Metric Name, e.g. MEMFree": "<value, e.g. 2Gb>",
+                    "Secondary Metric Name, e.g. CPUCount": "<value, e.g. 4>"
+                }
             }
         }
     }
