@@ -258,3 +258,48 @@ Response Body:
     "Result": "Queued"
 }
 ```
+
+### POST /Metric
+HTTP POST http://guiserver:8138/Metric
+
+Request Body:
+```
+{
+    "PrimaryMetric": "2013Air4G11",
+    "MetricType": "AUT Web",
+    "MetricTime": "1609924920",
+    "SecondaryMetrics": {
+        "vmstat: Mach Virtual Memory Statistics": "(page size of 4096 bytes)",
+        "vmstat: Pages free": "5091.",
+        "vmstat: Pages active": "269271.",
+        "vmstat: Pages inactive": "269384.",
+        "vmstat: Pages speculative": "113.",
+        "vmstat: Pages throttled": "0.",
+        "vmstat: Pages wired down": "226965.",
+        "vmstat: Pages purgeable": "2108.",
+        "vmstat: Translation faults": "12387345.",
+        "vmstat: Pages copy-on-write": "493339.",
+        "vmstat: Pages zero filled": "5337415.",
+        "vmstat: Pages reactivated": "13285594.",
+        "vmstat: Pages purged": "70090.",
+        "vmstat: File-backed pages": "104388.",
+        "vmstat: Anonymous pages": "434380.",
+        "vmstat: Pages stored in compressor": "624330.",
+        "vmstat: Pages occupied by compressor": "277482.",
+        "vmstat: Decompressions": "1351065.",
+        "vmstat: Compressions": "2174715.",
+        "vmstat: Pageins": "1582188.",
+        "vmstat: Pageouts": "166068.",
+        "vmstat: Swapins": "296166.",
+        "vmstat: Swapouts": "315460."
+    }
+}
+```
+
+Response Body:
+```
+{
+    "Metric": "2013Air4G11",
+    "Result": "Queued"
+}
+```
