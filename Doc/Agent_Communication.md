@@ -11,6 +11,7 @@ In this page the generic host names guiserver and myagent are used, replace guis
 - [POST /Scripts](#POST-Scripts)
 - [POST /File](#POST-File)
 - [POST /Result](#POST-Result)
+- [POST /Metric](#post-metric)
 
 ### Get /
 HTTP GET http://guiserver:8138/
