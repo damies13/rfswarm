@@ -373,12 +373,23 @@ class RFSwarmAgent():
 		found = 0
 		# import pkg_resources
 		installed_packages = pkg_resources.working_set
+		# self.debugmsg(5, "installed_packages:", installed_packages)
 		for i in installed_packages:
+			# self.debugmsg(5, "i:", i)
+			# self.debugmsg(5, "type(i):", type(i))
+
+			# self.debugmsg(5, "i.key:", i.key)
+			# self.debugmsg(5, "i.value:", installed_packages[i])
+			# self.debugmsg(5, "i value:", str(i).split(" ")[1])
+
+
 			if i.key.strip() == "robotframework":
 				found = 1
 			if i.key.startswith("robotframework-"):
 				# print(i.key)
-				self.agentproperties["RobotFramework: Library"] = i.key.strip()
+				keyarr = i.key.strip().split("-")
+				#  next overwrites previous
+				self.agentproperties["RobotFramework: Library: "+keyarr[1]] = str(i).split(" ")[1]
 		if not found:
 			self.debugmsg(0, "RobotFramework is not installed!!!")
 			self.debugmsg(0, "RobotFramework is required for the agent to run scripts")
@@ -606,9 +617,13 @@ class RFSwarmAgent():
 				self.debugmsg(6, "runjobs: jobid:", jobid)
 				run_t = True
 				if "Thread" in self.jobs[jobid].keys():
+					self.debugmsg(5, "jobid:", self.jobs[jobid])
+					# try:
 					if self.jobs[jobid]["Thread"].isAlive():
 						run_t = False
 						self.debugmsg(6, "runjobs: Thread already running run_t:", run_t)
+					# except:
+					# 	pass
 
 				self.debugmsg(6, "runjobs: run_t:", run_t)
 

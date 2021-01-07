@@ -1842,7 +1842,7 @@ class RFSwarmCore:
 		base.agenthttpserver.serve_forever()
 
 	def register_agent(self, agentdata):
-		base.debugmsg(9, "register_agent: agentdata:", agentdata)
+		base.debugmsg(5, "register_agent: agentdata:", agentdata)
 
 		# if "AssignedRobots" not in base.Agents[agnt].keys():
 		# 	print("get_next_agent: addinig AssignedRobots to ", agnt)
@@ -1926,6 +1926,13 @@ class RFSwarmCore:
 			base.dbqueue["Metrics"].append( (m_AgentID, m_Time, "CPU", agentdata["CPU%"]) )
 			base.dbqueue["Metrics"].append( (m_AgentID, m_Time, "MEM", agentdata["MEM%"]) )
 			base.dbqueue["Metrics"].append( (m_AgentID, m_Time, "NET", agentdata["NET%"]) )
+
+			if "AgentIPs" in agentdata:
+				for ip in agentdata["AgentIPs"]:
+					base.dbqueue["Metrics"].append( (m_AgentID, m_Time, "IPAddress", ip) )
+			if "Properties" in agentdata:
+				for prop in agentdata["Properties"]:
+					base.dbqueue["Metrics"].append( (m_AgentID, m_Time, prop, agentdata["Properties"][prop]) )
 
 
 	def register_result(self, AgentName, result_name, result, elapsed_time, start_time, end_time, index, vuser, iter, sequence):
