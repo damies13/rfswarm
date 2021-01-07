@@ -11,6 +11,7 @@
 #
 
 import sys
+import platform
 import signal
 import os
 import glob
@@ -918,7 +919,7 @@ class RFSwarmBase:
 		# 		buf = afile.read(BLOCKSIZE)
 		#
 		# 	Intermittant issue : Too many open files, it seems that with open is not always closing files?
-		# 
+		#
 		# Exception in thread Thread-1413:
 		# Traceback (most recent call last):
 		#   File "/usr/local/Cellar/python/3.7.4/Frameworks/Python.framework/Versions/3.7/lib/python3.7/threading.py", line 926, in _bootstrap_inner
@@ -2545,6 +2546,7 @@ class RFSwarmGUI(tk.Frame):
 	display_run = {}
 	# imgdata = {}
 
+	rfstheme = {}
 
 	imgdata = {}
 	b64 = {}
@@ -2565,7 +2567,8 @@ class RFSwarmGUI(tk.Frame):
 		root = tk.Tk()
 		root.protocol("WM_DELETE_WINDOW", self.on_closing)
 		tk.Frame.__init__(self, root)
-		self.grid(sticky="nsew")
+		# self.grid(sticky="nsew")
+		self.grid(sticky="news", ipadx=0, pady=0)
 		root.columnconfigure(0, weight=1)
 		root.rowconfigure(0, weight=1)
 
@@ -2574,7 +2577,27 @@ class RFSwarmGUI(tk.Frame):
 
 		root.resizable(True, True)
 
+		base.debugmsg(5, "root", root)
+		base.debugmsg(5, "root[background]", root["background"])
+		self.rootBackground = root["background"]
+
+		# for i in range(0, 16):
+		# 	val = "#"+format(i, 'x')+format(i, 'x')+format(i, 'x')
+		# 	base.debugmsg(5, "val: ",val, self.rootBackground)
+		# 	if self.rootBackground < val:
+		# 		base.debugmsg(5, "less than")
+		# 	if self.rootBackground > val:
+		# 		base.debugmsg(5, "more than")
+		# self.rootBackground.value
+
+		# bgclr = winfo rbg . systemWindowBackgroundColor
+		# base.debugmsg(5, "systemWindowBackgroundColor", systemWindowBackgroundColor())
+		# base.debugmsg(5, "bgclr", bgclr)
+		# https://github.com/tcltk/tk/blob/main/macosx/README
+
+
 		base.debugmsg(6, "BuildUI")
+
 		self.BuildUI()
 
 		try:
@@ -2698,10 +2721,18 @@ class RFSwarmGUI(tk.Frame):
 		self.bind("<Configure>", self.save_window_size)
 
 		base.debugmsg(6, "self.tabs")
-		self.tabs = ttk.Notebook(self)
+		# this removes a lot of wasted space and gives it back to the data in each tab
+		#   I tried a value of 0, but it needed something, so 5 worked nicely, I think
+		# 	the system default is ~20 on macos 11
+		self.tabs = ttk.Notebook(self, padding=5)
+		# self.tabs = ttk.Notebook(self)
+		base.debugmsg(5, "self.tabs", self.tabs)
+		# base.debugmsg(5, "self.tabs", self.tabs["background"])
+
 		base.debugmsg(6, "p")
 		p = ttk.Frame(self.tabs)   # first page, which would get widgets gridded into it
 		p.grid(row=0, column=0, sticky="nsew")
+		# p.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
 		base.debugmsg(6, "r")
 		r = ttk.Frame(self.tabs)   # second page
 		r.grid(row=0, column=0, sticky="nsew")
@@ -2712,6 +2743,10 @@ class RFSwarmGUI(tk.Frame):
 		self.tabs.add(r, text='Run')
 		self.tabs.add(a, text='Agents')
 		self.tabs.grid(column=0, row=0, sticky="nsew")
+		# self.tabs.grid(column=0, row=0, padx=0, pady=0, sticky="nsew")
+
+		self.ConfigureStyle()
+
 
 		base.debugmsg(6, "BuildMenu")
 		self.BuildMenu()
@@ -2792,6 +2827,92 @@ class RFSwarmGUI(tk.Frame):
 		except e:
 			base.debugmsg(6, "save_window_size except:", e)
 			return False
+
+	def ConfigureStyle(self):
+
+		# we really only seem to need this for MacOS 11 and up for now
+		# base.debugmsg(5, "sys.platform", sys.platform)
+		# base.debugmsg(5, "platform.system", platform.system())
+		# base.debugmsg(5, "platform.release", platform.release())
+		# base.debugmsg(5, "platform.mac_ver", platform.mac_ver())
+
+		if sys.platform.startswith('darwin'):
+			release, _, machine = platform.mac_ver()
+			split_ver = release.split('.')
+			if int(split_ver[0]) > 10:
+				# Theme settings for ttk
+				style = ttk.Style()
+				# https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/ttk-style-layer.html
+				# base.debugmsg(5, "style.layout", style.layout)
+				# # list = style.layout()
+				# # base.debugmsg(5, "list", list)
+				# base.debugmsg(5, "style.element_names", style.element_names)
+				# list = style.element_names()
+				# base.debugmsg(5, "list", list)
+				# base.debugmsg(5, "style.theme_names", style.theme_names)
+				# list = style.theme_names()
+				# base.debugmsg(5, "list", list)
+
+
+				# style.layout("rfsinput", style.layout('TEntry'))
+				# style.configure("rfsinput", **style.configure('TEntry'))
+				# style.map("rfsinput", **style.map('TEntry'))
+				# style.map("rfsinput",
+				#     fieldbackground=[(['!invalid','!disabled'], '#fff'),
+				#                      (['!invalid','disabled'], '#aaa')]
+				# )
+				# style.map("rfsinput",
+				#     fieldbackground=[(['!invalid','!disabled'], '#fff'),
+				#                      (['!invalid','disabled'], '#aaa'),
+				#                      (['invalid','!disabled'], '#ff4040'),
+				#                      (['invalid','disabled'], '#ffc0c0')]
+				# )
+				# style.configure("rfs.Entry", foreground="black")
+				# style.configure("rfs.Entry", foreground="systemControlTextColor")
+				# style.configure("rfs.Entry", foreground=self.rootBackground)	# systemWindowBackgroundColor
+				# base.debugmsg(5, "self.rootBackground", self.rootBackground)
+				# style.configure("rfs.Entry", foreground=self.rootBackground)	# systemControlTextColor
+
+				# style.configure("rfs.Entry", foreground="systemControlAccentColor")
+				# style.configure("rfs.Entry", foreground="systemControlTextColor")
+				# style.configure("rfs.Entry", foreground="systemDisabledControlTextColor")
+				# style.configure("rfs.Entry", foreground="systemLabelColor")
+				# style.configure("rfs.Entry", foreground="systemLinkColor")
+				# style.configure("rfsinput", foreground="systemPlaceholderTextColor")
+				# style.configure("rfs.Entry", foreground="systemSelectedTextBackgroundColor")
+				# style.configure("rfs.Entry", foreground="systemSelectedTextColor")
+				# style.configure("rfs.Entry", foreground="systemSeparatorColor")
+				# style.configure("rfs.Entry", foreground="systemTextBackgroundColor")
+				# style.configure("rfs.Entry", foreground="systemTextColor")
+
+				# style.layout("rfsinput", style.layout('TLabel'))
+				# style.configure("rfsinput", **style.configure('TLabel'))
+				# style.map("rfsinput", **style.map('TLabel'))
+				# style.configure("TLabel", foreground="systemPlaceholderTextColor")
+				style.configure("TLabel", foreground="#000")
+				style.configure("TEntry", foreground="systemPlaceholderTextColor")
+				# style.configure("TButton", foreground="systemPlaceholderTextColor")
+				style.configure("TButton", foreground="#000")
+				# style.configure("TCombobox", foreground="systemPlaceholderTextColor")
+				# style.configure("TCombobox", foreground="#000")
+				# style.configure("TComboBox", foreground="#000")
+				# style.configure("Combobox", foreground="#000")
+				# style.configure("ComboBox", foreground="#000")
+				#
+				# style.configure("OptionMenu", foreground="#000")
+				# style.configure("TOptionMenu", foreground="#000")
+				# style.configure("Optionmenu", foreground="#000")
+				# style.configure("TOptionmenu", foreground="#000")
+
+				# style.configure("Menubutton", foreground="#000")
+				style.configure("TMenubutton", foreground="#000")
+
+				# self.rfstheme["default"] = "systemPlaceholderTextColor"
+				# self.rfstheme["default"] = "#000"
+
+				# style.configure("Canvas", foreground="#000")
+				style.configure("Canvas", fill="#000")
+				style.configure("Canvas", activefill="#000")
 
 
 
@@ -2886,7 +3007,11 @@ class RFSwarmGUI(tk.Frame):
 		# Plan Graph
 		base.debugmsg(6, "Plan Graph")
 
+		# defaultcolour = self.rfstheme["default"]
+
 		self.pln_graph = tk.Canvas(p)
+		# self.pln_graph = tk.Canvas(p, fill="#000")
+		# self.pln_graph = tk.Canvas(p, selectforeground="#000")
 		self.pln_graph.grid(column=0, row=planrow, sticky="nsew") # sticky="wens"
 
 		# self.pln_graph.columnconfigure(0, weight=1)
@@ -2992,6 +3117,13 @@ class RFSwarmGUI(tk.Frame):
 		core.ClickPlay()
 
 	def pln_update_graph(self):
+
+		totcolour = "#000000"
+		gridcolour = "#cfcfcf"
+		defaultcolour = "#000000"
+
+
+
 		base.debugmsg(6, "pln_update_graph")
 		base.debugmsg(6, "pln_graph:", self.pln_graph)
 		base.debugmsg(6, "scriptlist:", base.scriptlist)
@@ -3071,15 +3203,21 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(5, "xm0:", xm0, "	xm1:", xm1, "	xm2:", xm2, "	xmt:",xmt)
 
 		# y-axis
-		self.pln_graph.create_line(xm1, ym1, xm1, ym2)
+		self.pln_graph.create_line(xm1, ym1, xm1, ym2, fill=defaultcolour)
+		# self.pln_graph.create_line(xm1, ym1, xm1, ym2)
+		# self.pln_graph.create_line(xm1, ym1, xm1, ym2, fill=gridcolour)
 		# x-axis
 		# base.gui.pln_graph.create_line(10, graphh-10, graphw, graphh-10, fill="blue")
-		self.pln_graph.create_line(xm1, ym1, xm2, ym1)
+		self.pln_graph.create_line(xm1, ym1, xm2, ym1, fill=defaultcolour)
+		# self.pln_graph.create_line(xm1, ym1, xm2, ym1)
 
 		# draw zero
-		self.pln_graph.create_line(xm1, ym0, xm1, ym1)
-		self.pln_graph.create_line(xm0, ym1, xm1, ym1)
-		self.pln_graph.create_text([xm0, ym0], text="0")
+		self.pln_graph.create_line(xm1, ym0, xm1, ym1, fill=defaultcolour)
+		self.pln_graph.create_line(xm0, ym1, xm1, ym1, fill=defaultcolour)
+		self.pln_graph.create_text([xm0, ym0], text="0", fill=defaultcolour)
+		# self.pln_graph.create_line(xm1, ym0, xm1, ym1)
+		# self.pln_graph.create_line(xm0, ym1, xm1, ym1)
+		# self.pln_graph.create_text([xm0, ym0], text="0")
 
 		# populate x axis	(time)
 		base.debugmsg(5, "populate x axis	(time)")
@@ -3115,13 +3253,13 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(9, "durinc", durinc)
 		durmrk = durinc
 		base.debugmsg(9, "durmrk", durmrk)
-		gridcolour = "#cfcfcf"
 		while durmrk < mxdur+1:
 			base.debugmsg(9, "x1", tmmrk, "y1", ym0, "x2", tmmrk, "y2", ym1)
 			# base.gui.pln_graph.create_line(tmmrk, ym0, tmmrk, ym1)
 			self.pln_graph.create_line(tmmrk, ym1, tmmrk, ym2, fill=gridcolour)
 			base.debugmsg(9, "format_sec({})".format(durmrk), base.format_sec(durmrk))
-			self.pln_graph.create_text([tmmrk, ym0], text=base.format_sec(durmrk))
+			self.pln_graph.create_text([tmmrk, ym0], text=base.format_sec(durmrk), fill=defaultcolour)
+			# self.pln_graph.create_text([tmmrk, ym0], text=base.format_sec(durmrk))
 
 			tmmrk += mrkinc
 			base.debugmsg(9, "tmmrk", tmmrk)
@@ -3156,7 +3294,8 @@ class RFSwarmGUI(tk.Frame):
 			# base.gui.pln_graph.create_line(xm0, mrk, xm1, mrk)
 			self.pln_graph.create_line(xm1, mrk, xm2, mrk, fill=gridcolour)
 			# base.gui.pln_graph.create_text([xm0, txtmrk], text="{}".format(usrmrk))
-			self.pln_graph.create_text([xm0, mrk], text="{}".format(usrmrk))
+			self.pln_graph.create_text([xm0, mrk], text="{}".format(usrmrk), fill=defaultcolour)
+			# self.pln_graph.create_text([xm0, mrk], text="{}".format(usrmrk))
 
 			usrmrk += usrinc
 
@@ -3232,7 +3371,6 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(6, "Total Users")
 		base.debugmsg(6, "totusrsxy:", totusrsxy)
 
-		totcolour = "#000000"
 		sy = graphh-axissz
 		prevx = 0
 		prevx2 = 0
@@ -3586,7 +3724,7 @@ class RFSwarmGUI(tk.Frame):
 		row = base.scriptcount
 
 		colour = base.line_colour(base.scriptcount)
-		base.debugmsg(8, "colour:", colour)
+		base.debugmsg(5, "colour:", colour)
 
 		idx = tk.Label(self.scriptgrid, text=str(base.scriptcount))
 		idx['bg'] = colour
@@ -3595,6 +3733,11 @@ class RFSwarmGUI(tk.Frame):
 
 		num = base.scriptlist[base.scriptcount]["Users"]
 		usr = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout")
+		# usr = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout", style="BW.TLabel")
+		# usr = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout", style="rfsinput")
+		# usr = tk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout", fg="systemControlTextColor")
+		# usr = tk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout")
+		# systemControlTextColor
 		usr.config(validatecommand=lambda: self.sr_users_validate(row))
 		usr.grid(column=self.plancolusr, row=base.scriptcount, sticky="nsew")
 		usr.insert(0, num)
