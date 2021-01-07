@@ -266,7 +266,7 @@ HTTP POST http://guiserver:8138/Metric
 Request Body:
 ```
 {
-    "PrimaryMetric": "2013Air4G11",
+    "PrimaryMetric": "my_aut_server",
     "MetricType": "AUT Web",
     "MetricTime": "1609924920",
     "SecondaryMetrics": {
@@ -300,7 +300,7 @@ Request Body:
 Response Body:
 ```
 {
-    "Metric": "2013Air4G11",
+    "Metric": "my_aut_server",
     "Result": "Queued"
 }
 ```
