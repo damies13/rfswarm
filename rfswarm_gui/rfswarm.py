@@ -119,12 +119,12 @@ class AgentServer(BaseHTTPRequestHandler):
 		httpcode = 200
 		try:
 			parsed_path = urllib.parse.urlparse(self.path)
-			base.debugmsg(9, "parsed_path.path", parsed_path.path)
+			base.debugmsg(5, "parsed_path.path", parsed_path.path)
 			if (parsed_path.path in ["/AgentStatus", "/Jobs", "/Scripts", "/File", "/Result", "/Metric"]):
 
 				jsonresp = {}
 				rawData = (self.rfile.read(int(self.headers['content-length']))).decode('utf-8')
-				base.debugmsg(9, "rawData: ", rawData)
+				base.debugmsg(5, "rawData: ", rawData)
 				base.debugmsg(9, "parsed_path.path", parsed_path.path)
 				if (parsed_path.path == "/AgentStatus"):
 					jsonreq = json.loads(rawData)
@@ -327,7 +327,7 @@ class AgentServer(BaseHTTPRequestHandler):
 
 
 
-				base.debugmsg(8, "jsonresp:", jsonresp)
+				base.debugmsg(5, "jsonresp:", jsonresp)
 				message = json.dumps(jsonresp)
 			else:
 				httpcode = 404

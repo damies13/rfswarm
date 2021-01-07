@@ -20,7 +20,7 @@ import base64
 
 
 # import robot
-
+import pkg_resources
 import random
 import time
 from datetime import datetime
@@ -54,6 +54,7 @@ class RFSwarmAgent():
 	listenerfile = None
 	ipaddresslist = []
 	agentname = None
+	agentproperties = {}
 	netpct = 0
 	mainloopinterval = 10
 	scriptlist = {}
@@ -70,6 +71,7 @@ class RFSwarmAgent():
 	def __init__(self, master=None):
 		self.debugmsg(0, "Robot Framework Swarm: Run Agent")
 		self.debugmsg(0, "	Version", self.version)
+		self.agentproperties["RFSwarmAgent: Version"] = self.version
 		self.debugmsg(6, "__init__")
 		self.debugmsg(6, "gettempdir", tempfile.gettempdir())
 		self.debugmsg(6, "tempdir", tempfile.tempdir)
@@ -167,6 +169,10 @@ class RFSwarmAgent():
 
 		t = threading.Thread(target=self.tick_counter)
 		t.start()
+
+		t = threading.Thread(target=self.findlibraries)
+		t.start()
+
 
 
 	def debugmsg(self, lvl, *msg):
@@ -313,7 +319,8 @@ class RFSwarmAgent():
 			"MEM%": dict(psutil.virtual_memory()._asdict())["percent"],
 			"NET%": self.netpct,
 			"Robots": self.robotcount,
-			"Status": self.status
+			"Status": self.status,
+			"Properties": self.agentproperties
 		}
 		try:
 			r = requests.post(uri, json=payload)
@@ -361,6 +368,23 @@ class RFSwarmAgent():
 		else:
 			self.config['Agent']['swarmserver'] = "http://localhost:8138/"
 			self.saveini()
+
+	def findlibraries(self):
+		found = 0
+		# import pkg_resources
+		installed_packages = pkg_resources.working_set
+		for i in installed_packages:
+			if i.key.strip() == "robotframework":
+				found = 1
+			if i.key.startswith("robotframework-"):
+				# print(i.key)
+				self.agentproperties["RobotFramework: Library"] = i.key.strip()
+		if not found:
+			self.debugmsg(0, "RobotFramework is not installed!!!")
+			self.debugmsg(0, "RobotFramework is required for the agent to run scripts")
+			self.debugmsg(0, "Perhaps try: 'pip install robotframework'")
+			raise Exception("RobotFramework is not installed")
+
 
 	def tick_counter(self):
 		#
