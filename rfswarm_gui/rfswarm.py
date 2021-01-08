@@ -119,12 +119,12 @@ class AgentServer(BaseHTTPRequestHandler):
 		httpcode = 200
 		try:
 			parsed_path = urllib.parse.urlparse(self.path)
-			base.debugmsg(5, "parsed_path.path", parsed_path.path)
+			base.debugmsg(7, "parsed_path.path", parsed_path.path)
 			if (parsed_path.path in ["/AgentStatus", "/Jobs", "/Scripts", "/File", "/Result", "/Metric"]):
 
 				jsonresp = {}
 				rawData = (self.rfile.read(int(self.headers['content-length']))).decode('utf-8')
-				base.debugmsg(5, "rawData: ", rawData)
+				base.debugmsg(7, "rawData: ", rawData)
 				base.debugmsg(9, "parsed_path.path", parsed_path.path)
 				if (parsed_path.path == "/AgentStatus"):
 					jsonreq = json.loads(rawData)
@@ -327,7 +327,7 @@ class AgentServer(BaseHTTPRequestHandler):
 
 
 
-				base.debugmsg(5, "jsonresp:", jsonresp)
+				base.debugmsg(7, "jsonresp:", jsonresp)
 				message = json.dumps(jsonresp)
 			else:
 				httpcode = 404
@@ -1528,7 +1528,7 @@ class RFSwarmBase:
 			self.debugmsg(5, "Wait for Metric_"+MetricName)
 			while "Metric_"+MetricName not in self.dbqueue["ReadResult"]:
 				time.sleep(0.1)
-				self.debugmsg(5, "Waiting for Metric_"+MetricName)
+				self.debugmsg(9, "Waiting for Metric_"+MetricName)
 			if "ReadResult" in self.dbqueue:
 				self.debugmsg(7, "ReadResult", self.dbqueue["ReadResult"])
 			self.debugmsg(5, "Wait for Metric_"+MetricName+">0")
@@ -1883,7 +1883,7 @@ class RFSwarmCore:
 		base.agenthttpserver.serve_forever()
 
 	def register_agent(self, agentdata):
-		base.debugmsg(5, "register_agent: agentdata:", agentdata)
+		base.debugmsg(7, "agentdata:", agentdata)
 
 		# if "AssignedRobots" not in base.Agents[agnt].keys():
 		# 	print("get_next_agent: addinig AssignedRobots to ", agnt)
