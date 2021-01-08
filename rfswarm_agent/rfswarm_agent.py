@@ -330,7 +330,7 @@ class RFSwarmAgent():
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok, r.text)
 				self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
-				self.debugmsg(5, "self.isconnected", self.isconnected)
+				self.debugmsg(7, "self.isconnected", self.isconnected)
 		except Exception as e:
 			self.debugmsg(8, "Exception:", e)
 			self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
@@ -342,7 +342,7 @@ class RFSwarmAgent():
 		if self.swarmserver is None:
 			self.findserver()
 			if self.args.server:
-				self.debugmsg(5, "self.args.server: ", self.args.server)
+				self.debugmsg(7, "self.args.server: ", self.args.server)
 				self.swarmserver = self.args.server
 
 		if self.swarmserver is not None:
@@ -350,9 +350,9 @@ class RFSwarmAgent():
 			self.debugmsg(6, "self.swarmserver:", self.swarmserver)
 			try:
 				r = requests.get(self.swarmserver)
-				self.debugmsg(5, r.status_code, r.text)
+				self.debugmsg(8, r.status_code, r.text)
 				if (r.status_code == requests.codes.ok):
-					self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok, r.text)
+					self.debugmsg(7, "r.status_code:", r.status_code, requests.codes.ok, r.text)
 					self.isconnected = True
 					self.debugmsg(0, "Server Conected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 			except:
@@ -543,12 +543,12 @@ class RFSwarmAgent():
 		payload = {
 			"AgentName": self.agentname
 		}
-		self.debugmsg(6, "getjobs: payload: ", payload)
+		self.debugmsg(7, "getjobs: payload: ", payload)
 		try:
 			r = requests.post(uri, json=payload)
-			self.debugmsg(6, "getjobs: resp: ", r.status_code, r.text)
+			self.debugmsg(7, "getjobs: resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
-				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
+				self.debugmsg(7, "r.status_code:", r.status_code, requests.codes.ok)
 				self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 
@@ -563,9 +563,9 @@ class RFSwarmAgent():
 		try:
 			jsonresp = {}
 			# self.scriptlist
-			self.debugmsg(6, "getjobs: r.text:", r.text)
+			self.debugmsg(7, "getjobs: r.text:", r.text)
 			jsonresp = json.loads(r.text)
-			self.debugmsg(5, "getjobs: jsonresp:", jsonresp)
+			self.debugmsg(7, "getjobs: jsonresp:", jsonresp)
 
 
 			if jsonresp["StartTime"] < int(time.time()) < (jsonresp["EndTime"]+300):
@@ -592,7 +592,7 @@ class RFSwarmAgent():
 				else:
 					self.isstopping = True
 
-			self.debugmsg(5, "jsonresp[Abort]", jsonresp["Abort"])
+			self.debugmsg(7, "jsonresp[Abort]", jsonresp["Abort"])
 			if jsonresp["Abort"]:
 				self.isstopping = True
 				self.debugmsg(5, "!!! Abort !!!")
@@ -600,7 +600,7 @@ class RFSwarmAgent():
 
 
 			self.debugmsg(5, "getjobs: isrunning:", self.isrunning, "	isstopping:", self.isstopping)
-			self.debugmsg(5, "getjobs: self.jobs:", self.jobs)
+			self.debugmsg(7, "getjobs: self.jobs:", self.jobs)
 
 
 
@@ -629,7 +629,7 @@ class RFSwarmAgent():
 				self.debugmsg(6, "runjobs: jobid:", jobid)
 				run_t = True
 				if "Thread" in self.jobs[jobid].keys():
-					self.debugmsg(5, "jobid:", self.jobs[jobid])
+					self.debugmsg(7, "jobid:", self.jobs[jobid])
 					try:
 						# if self.jobs[jobid]["Thread"].isAlive():
 						# The isAlive syntax above was perviously working in python < 3.7
@@ -637,7 +637,7 @@ class RFSwarmAgent():
 						# and the is_alive syntax below has been available since python version 2.6
 						if self.jobs[jobid]["Thread"].is_alive():
 							run_t = False
-							self.debugmsg(5, "Thread already running run_t:", run_t)
+							self.debugmsg(7, "Thread already running run_t:", run_t)
 					except Exception as e:
 						run_t = False
 						self.debugmsg(5, "Thread running check failed run_t:", run_t, e)
@@ -949,7 +949,7 @@ class RFSwarmAgent():
 
 
 	def process_file_upload_queue(self):
-		self.debugmsg(5, "upload_queue", self.upload_queue)
+		self.debugmsg(7, "upload_queue", self.upload_queue)
 		# self.process_file_upload_queue
 		for fobj in self.upload_queue:
 			# probably need to make this multi-treaded
