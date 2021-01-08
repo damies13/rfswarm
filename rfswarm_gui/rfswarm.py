@@ -1935,68 +1935,12 @@ class RFSwarmCore:
 			for prop in agentdata["Properties"]:
 				base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], prop, agentdata["Properties"][prop])
 
-		# # Save Metric Data
-		# # 	First ensure a metric for this agent exists
-		# if "Agent" not in base.MetricIDs:
-		# 	base.MetricIDs["Agent"] = {}
-		# if agentdata["AgentName"] not in base.MetricIDs["Agent"]:
-		# 	# create the agent metric
-		# 	base.dbqueue["Metric"].append( (agentdata["AgentName"], "Agent") )
-		# 	# get the agent metric id
-		# 	sql = 'select ROWID from Metric where Name = "'+agentdata["AgentName"]+'"'
-		# 	base.debugmsg(7, "sql:", sql)
-		# 	base.dbqueue["Read"].append({"SQL": sql, "KEY": "Metric_"+agentdata["AgentName"]})
-		#
-		# 	if "Read" in base.dbqueue:
-		# 		base.debugmsg(7, "Read", base.dbqueue["Read"])
-		# 	if "ReadResult" in base.dbqueue:
-		# 		base.debugmsg(7, "ReadResult", base.dbqueue["ReadResult"])
-		# 	base.debugmsg(7, "Wait for Metric_"+agentdata["AgentName"])
-		# 	while "Metric_"+agentdata["AgentName"] not in base.dbqueue["ReadResult"]:
-		# 		time.sleep(0.1)
-		# 		base.debugmsg(9, "Waiting for Metric_"+agentdata["AgentName"])
-		# 	if "ReadResult" in base.dbqueue:
-		# 		base.debugmsg(7, "ReadResult", base.dbqueue["ReadResult"])
-		# 	# base.debugmsg(5, "Metric_"+agentdata["AgentName"], base.dbqueue["ReadResult"]["Metric_"+agentdata["AgentName"]])
-		# 	base.debugmsg(7, "Wait for Metric_"+agentdata["AgentName"]+">0")
-		# 	while len(base.dbqueue["ReadResult"]["Metric_"+agentdata["AgentName"]])<1:
-		# 		time.sleep(0.1)
-		# 		base.debugmsg(9, "Waiting for Metric_"+agentdata["AgentName"]+">0")
-		#
-		#
-		# 	if "Metric_"+agentdata["AgentName"] in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["Metric_"+agentdata["AgentName"]])>0:
-		# 		base.debugmsg(7, "Metric_"+agentdata["AgentName"]+":", base.dbqueue["ReadResult"]["Metric_"+agentdata["AgentName"]])
-		#
-		# 		base.MetricIDs["Agent"][agentdata["AgentName"]] = base.dbqueue["ReadResult"]["Metric_"+agentdata["AgentName"]][0]["rowid"]
-		# 		base.debugmsg(5, "MetricIDs[Agent]:", base.MetricIDs["Agent"])
-		#
-		# # Next save the Metrics
-		# if agentdata["AgentName"] in base.MetricIDs["Agent"]:
-		# 	m_AgentID = base.MetricIDs["Agent"][agentdata["AgentName"]]
-		# 	m_Time = agentdata["LastSeen"]
-		# 	base.debugmsg(7, "m_AgentID:", m_AgentID, "	m_Time:", m_Time)
-		# 	base.dbqueue["Metrics"].append( (m_AgentID, m_Time, "Status", agentdata["Status"]) )
-		# 	base.dbqueue["Metrics"].append( (m_AgentID, m_Time, "LastSeen", agentdata["LastSeen"]) )
-		# 	base.dbqueue["Metrics"].append( (m_AgentID, m_Time, "AssignedRobots", agentdata["AssignedRobots"]) )
-		# 	base.dbqueue["Metrics"].append( (m_AgentID, m_Time, "Robots", agentdata["Robots"]) )
-		# 	base.dbqueue["Metrics"].append( (m_AgentID, m_Time, "Load", agentdata["LOAD%"]) )
-		# 	base.dbqueue["Metrics"].append( (m_AgentID, m_Time, "CPU", agentdata["CPU%"]) )
-		# 	base.dbqueue["Metrics"].append( (m_AgentID, m_Time, "MEM", agentdata["MEM%"]) )
-		# 	base.dbqueue["Metrics"].append( (m_AgentID, m_Time, "NET", agentdata["NET%"]) )
-		#
-		# 	if "AgentIPs" in agentdata:
-		# 		for ip in agentdata["AgentIPs"]:
-		# 			base.dbqueue["Metrics"].append( (m_AgentID, m_Time, "IPAddress", ip) )
-		# 	if "Properties" in agentdata:
-		# 		for prop in agentdata["Properties"]:
-		# 			base.dbqueue["Metrics"].append( (m_AgentID, m_Time, prop, agentdata["Properties"][prop]) )
-		#
 
 	def register_result(self, AgentName, result_name, result, elapsed_time, start_time, end_time, index, vuser, iter, sequence):
 		base.debugmsg(9, "register_result")
 		resdata = (index, vuser, iter, AgentName, sequence, result_name, result, elapsed_time, start_time, end_time)
 		base.debugmsg(9, "register_result: resdata:", resdata)
-		base.debugmsg(5, resdata)
+		base.debugmsg(7, resdata)
 		base.dbqueue["Results"].append(resdata)
 		base.debugmsg(9, "register_result: dbqueue Results:", base.dbqueue["Results"])
 
@@ -2010,45 +1954,10 @@ class RFSwarmCore:
 		base.debugmsg(7, "PrimaryMetric:", PrimaryMetric, "	MetricType:", MetricType, "	MetricTime:", MetricTime, "	SecondaryMetrics:", SecondaryMetrics)
 
 		# Save Metric Data
-		# 	First ensure a metric for this agent exists
-		if MetricType not in base.MetricIDs:
-			base.MetricIDs[MetricType] = {}
-		if PrimaryMetric not in base.MetricIDs[MetricType]:
-			# create the agent metric
-			base.dbqueue["Metric"].append( (PrimaryMetric, MetricType) )
-			# get the agent metric id
-			sql = 'select ROWID from Metric where Name = "'+PrimaryMetric+'"'
-			base.debugmsg(7, "sql:", sql)
-			base.dbqueue["Read"].append({"SQL": sql, "KEY": "Metric_"+PrimaryMetric})
 
-			if "Read" in base.dbqueue:
-				base.debugmsg(7, "Read", base.dbqueue["Read"])
-			if "ReadResult" in base.dbqueue:
-				base.debugmsg(5, "ReadResult", base.dbqueue["ReadResult"])
-			base.debugmsg(7, "Wait for Metric_"+PrimaryMetric)
-			while "Metric_"+PrimaryMetric not in base.dbqueue["ReadResult"]:
-				time.sleep(0.1)
-				base.debugmsg(9, "Waiting for Metric_"+PrimaryMetric)
-			if "ReadResult" in base.dbqueue:
-				base.debugmsg(5, "ReadResult", base.dbqueue["ReadResult"])
-			# base.debugmsg(5, "Metric_"+agentdata["AgentName"], base.dbqueue["ReadResult"]["Metric_"+agentdata["AgentName"]])
-			base.debugmsg(7, "Wait for Metric_"+PrimaryMetric+">0")
-			while len(base.dbqueue["ReadResult"]["Metric_"+PrimaryMetric])<1:
-				time.sleep(0.1)
-				base.debugmsg(9, "Waiting for Metric_"+PrimaryMetric+">0")
-
-
-			if "Metric_"+PrimaryMetric in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["Metric_"+PrimaryMetric])>0:
-				base.debugmsg(7, "Metric_"+PrimaryMetric+":", base.dbqueue["ReadResult"]["Metric_"+PrimaryMetric])
-
-				base.MetricIDs[MetricType][PrimaryMetric] = base.dbqueue["ReadResult"]["Metric_"+PrimaryMetric][0]["rowid"]
-				base.debugmsg(7, "MetricIDs["+MetricType+"]:", base.MetricIDs[MetricType])
-
-		# Next save the Metrics
-		MetricID = base.MetricIDs[MetricType][PrimaryMetric]
 		for key in SecondaryMetrics:
-			base.dbqueue["Metrics"].append( (MetricID, MetricTime, key, SecondaryMetrics[key]) )
 			base.debugmsg(7, MetricID, MetricTime, key, SecondaryMetrics[key])
+			base.save_metrics(PrimaryMetric, MetricType, MetricTime, key, SecondaryMetrics[key])
 
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
