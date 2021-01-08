@@ -2435,9 +2435,6 @@ class RFSwarmCore:
 
 			base.total_robots = robot_count
 
-			# Save Total Robots Metric
-			base.save_metrics(base.run_name, "Scenario", int(time.time()), "total_robots", base.total_robots)
-
 			for agnt in removeagents:
 				# this should prevent issue RuntimeError: dictionary changed size during iteration
 				del base.Agents[agnt]
@@ -2453,6 +2450,11 @@ class RFSwarmCore:
 				except:
 					pass
 
+			# Save Total Robots Metric
+			if len(base.run_name)>0:
+				base.save_metrics(base.run_name, "Scenario", int(time.time()), "total_robots", base.total_robots)
+			else:
+				base.save_metrics("PreRun", "Scenario", int(time.time()), "total_robots", base.total_robots)
 
 
 			# if base.args.run:
@@ -4573,11 +4575,14 @@ class RFSwarmGUI(tk.Frame):
 			usr = ttk.Label(self.agenttgrid, text="  Last Seen  ", borderwidth=2, relief="raised")
 			usr.grid(column=4, row=0, sticky="nsew")
 
-			usr = ttk.Label(self.agenttgrid, text="  Robots  ", borderwidth=2, relief="raised")
+			usr = ttk.Label(self.agenttgrid, text="  Assigned  ", borderwidth=2, relief="raised")
 			usr.grid(column=5, row=0, sticky="nsew")
 
-			usr = ttk.Label(self.agenttgrid, text="  Load  ", borderwidth=2, relief="raised")
+			usr = ttk.Label(self.agenttgrid, text="  Robots  ", borderwidth=2, relief="raised")
 			usr.grid(column=6, row=0, sticky="nsew")
+
+			usr = ttk.Label(self.agenttgrid, text="  Load  ", borderwidth=2, relief="raised")
+			usr.grid(column=7, row=0, sticky="nsew")
 
 			usr = ttk.Label(self.agenttgrid, text="  CPU %  ", borderwidth=2, relief="raised")
 			usr.grid(column=8, row=0, sticky="nsew")
@@ -4588,8 +4593,11 @@ class RFSwarmGUI(tk.Frame):
 			usr = ttk.Label(self.agenttgrid, text="  NET %  ", borderwidth=2, relief="raised")
 			usr.grid(column=12, row=0, sticky="nsew")
 
-			usr = ttk.Label(self.agenttgrid, text="  Assigned  ", borderwidth=2, relief="raised")
+			usr = ttk.Label(self.agenttgrid, text="  Version  ", borderwidth=2, relief="raised")
 			usr.grid(column=13, row=0, sticky="nsew")
+
+			usr = ttk.Label(self.agenttgrid, text="  Libraries  ", borderwidth=2, relief="raised")
+			usr.grid(column=15, row=0, sticky="nsew")
 
 			# update scrollbars
 			self.agenttgrid.update_idletasks()
@@ -4644,17 +4652,31 @@ class RFSwarmGUI(tk.Frame):
 				if "AssignedRobots" not in self.display_agents[rnum]:
 					self.display_agents[rnum]["AssignedRobots"] = tk.StringVar()
 
-				base.debugmsg(9, "UpdateAgents: base.Agents[",agnt,"]:", base.Agents[agnt])
+				if "Version" not in self.display_agents[rnum]:
+					self.display_agents[rnum]["Version"] = tk.StringVar()
+
+				if "Libraries" not in self.display_agents[rnum]:
+					self.display_agents[rnum]["Libraries"] = tk.StringVar()
+
+				base.debugmsg(5, "UpdateAgents: base.Agents[",agnt,"]:", base.Agents[agnt])
 
 				self.display_agents[rnum]["Status"].set("  {}  ".format(base.Agents[agnt]["Status"]))
 				self.display_agents[rnum]["Agent"].set("  {}  ".format(agnt))
 				self.display_agents[rnum]["LastSeen"].set("  {}  ".format(dt.isoformat(sep=' ',timespec='seconds')))
+				self.display_agents[rnum]["AssignedRobots"].set("  {}  ".format(base.Agents[agnt]["AssignedRobots"]))
 				self.display_agents[rnum]["Robots"].set("  {}  ".format(base.Agents[agnt]["Robots"]))
 				self.display_agents[rnum]["LOAD%"].set("  {}  ".format(base.Agents[agnt]["LOAD%"]))
 				self.display_agents[rnum]["CPU%"].set("  {}  ".format(base.Agents[agnt]["CPU%"]))
 				self.display_agents[rnum]["MEM%"].set("  {}  ".format(base.Agents[agnt]["MEM%"]))
 				self.display_agents[rnum]["NET%"].set("  {}  ".format(base.Agents[agnt]["NET%"]))
-				self.display_agents[rnum]["AssignedRobots"].set("  {}  ".format(base.Agents[agnt]["AssignedRobots"]))
+
+				self.display_agents[rnum]["Version"].set("    ")
+				if "Properties" in base.Agents[agnt] and "RFSwarmAgent: Version" in base.Agents[agnt]["Properties"]:
+					self.display_agents[rnum]["Version"].set("  {}  ".format(base.Agents[agnt]["Properties"]["RFSwarmAgent: Version"]))
+				self.display_agents[rnum]["Libraries"].set("    ")
+				if "Properties" in base.Agents[agnt] and "RobotFramework: Libraries" in base.Agents[agnt]["Properties"]:
+					self.display_agents[rnum]["Libraries"].set("  {}  ".format(base.Agents[agnt]["Properties"]["RobotFramework: Libraries"]))
+
 				base.debugmsg(9, "UpdateAgents: display_agents:", self.display_agents)
 
 			robot_count += base.Agents[agnt]["Robots"]
@@ -4699,18 +4721,25 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(9, "add_row: LastSeen:", self.display_agents[rnum]["LastSeen"])
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["LastSeen"], borderwidth=2, relief="groove")
 		usr.grid(column=4, row=rnum, sticky="nsew")
-		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["Robots"], borderwidth=2, relief="groove")
+		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["AssignedRobots"], borderwidth=2, relief="groove")
 		usr.grid(column=5, row=rnum, sticky="nsew")
-		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["LOAD%"], borderwidth=2, relief="groove")
+		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["Robots"], borderwidth=2, relief="groove")
 		usr.grid(column=6, row=rnum, sticky="nsew")
+		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["LOAD%"], borderwidth=2, relief="groove")
+		usr.grid(column=7, row=rnum, sticky="nsew")
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["CPU%"], borderwidth=2, relief="groove")
 		usr.grid(column=8, row=rnum, sticky="nsew")
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["MEM%"], borderwidth=2, relief="groove")
 		usr.grid(column=10, row=rnum, sticky="nsew")
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["NET%"], borderwidth=2, relief="groove")
 		usr.grid(column=12, row=rnum, sticky="nsew")
-		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["AssignedRobots"], borderwidth=2, relief="groove")
+
+		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["Version"], borderwidth=2, relief="groove")
 		usr.grid(column=13, row=rnum, sticky="nsew")
+
+		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["Libraries"], borderwidth=2, relief="groove")
+		usr.grid(column=15, row=rnum, sticky="nsew")
+
 
 		# update scrollbars
 		self.agenttgrid.update_idletasks()

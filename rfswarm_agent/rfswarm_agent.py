@@ -377,6 +377,7 @@ class RFSwarmAgent():
 
 	def findlibraries(self):
 		found = 0
+		liblst = []
 		# import pkg_resources
 		installed_packages = pkg_resources.working_set
 		# self.debugmsg(5, "installed_packages:", installed_packages)
@@ -396,6 +397,13 @@ class RFSwarmAgent():
 				keyarr = i.key.strip().split("-")
 				#  next overwrites previous
 				self.agentproperties["RobotFramework: Library: "+keyarr[1]] = str(i).split(" ")[1]
+				liblst.append(keyarr[1])
+
+		self.debugmsg(8, "liblst:", liblst, len(liblst))
+		if len(liblst)>0:
+			self.debugmsg(7, "liblst:", ", ".join(liblst))
+			self.agentproperties["RobotFramework: Libraries"] = ", ".join(liblst)
+
 		if not found:
 			self.debugmsg(0, "RobotFramework is not installed!!!")
 			self.debugmsg(0, "RobotFramework is required for the agent to run scripts")
