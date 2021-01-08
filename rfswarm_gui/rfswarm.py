@@ -2435,6 +2435,9 @@ class RFSwarmCore:
 
 			base.total_robots = robot_count
 
+			# Save Total Robots Metric
+			base.save_metrics(base.run_name, "Scenario", int(time.time()), "total_robots", base.total_robots)
+
 			for agnt in removeagents:
 				# this should prevent issue RuntimeError: dictionary changed size during iteration
 				del base.Agents[agnt]
