@@ -582,11 +582,20 @@ class RFSwarmAgent():
 				self.debugmsg(6, "runjobs: jobid:", jobid)
 				run_t = True
 				if "Thread" in self.jobs[jobid].keys():
-					if self.jobs[jobid]["Thread"].isAlive():
+					self.debugmsg(5, "jobid:", self.jobs[jobid])
+					try:
+						# if self.jobs[jobid]["Thread"].isAlive():
+						# The isAlive syntax above was perviously working in python < 3.7
+						# but appears to have been removed in 3.9.1? it was depricated in 2.x?
+						# and the is_alive syntax below has been available since python version 2.6
+						if self.jobs[jobid]["Thread"].is_alive():
+							run_t = False
+							self.debugmsg(5, "Thread already running run_t:", run_t)
+					except Exception as e:
 						run_t = False
-						self.debugmsg(6, "runjobs: Thread already running run_t:", run_t)
+						self.debugmsg(5, "Thread running check failed run_t:", run_t, e)
 
-				self.debugmsg(6, "runjobs: run_t:", run_t)
+				self.debugmsg(6, "run_t:", run_t)
 
 				if run_t and self.jobs[jobid]["StartTime"] < int(time.time()) < self.jobs[jobid]["EndTime"]:
 					t = threading.Thread(target=self.runthread, args=(jobid, ))
