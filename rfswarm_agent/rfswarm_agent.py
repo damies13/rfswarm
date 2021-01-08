@@ -223,6 +223,7 @@ class RFSwarmAgent():
 				t.start()
 				self.isrunning = False
 
+			self.debugmsg(5, "self.isconnected", self.isconnected)
 			if self.isconnected:
 				# self.updatestatus()
 				t0 = threading.Thread(target=self.updatestatus)
@@ -326,11 +327,15 @@ class RFSwarmAgent():
 			r = requests.post(uri, json=payload)
 			self.debugmsg(8, r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
+				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok, r.text)
+				self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
+				self.debugmsg(5, "self.isconnected", self.isconnected)
 		except Exception as e:
 			self.debugmsg(8, "Exception:", e)
 			self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 			self.isconnected = False
+			self.debugmsg(5, "self.isconnected", self.isconnected)
 
 	def connectserver(self):
 		self.debugmsg(6, "connectserver")
@@ -345,8 +350,9 @@ class RFSwarmAgent():
 			self.debugmsg(6, "self.swarmserver:", self.swarmserver)
 			try:
 				r = requests.get(self.swarmserver)
-				self.debugmsg(6, r.status_code, r.text)
+				self.debugmsg(5, r.status_code, r.text)
 				if (r.status_code == requests.codes.ok):
+					self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok, r.text)
 					self.isconnected = True
 					self.debugmsg(0, "Server Conected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 			except:
@@ -432,6 +438,8 @@ class RFSwarmAgent():
 			r = requests.post(uri, json=payload)
 			self.debugmsg(6, "getscripts: resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
+				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
+				self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 
 		except Exception as e:
@@ -470,6 +478,8 @@ class RFSwarmAgent():
 			r = requests.post(uri, json=payload)
 			self.debugmsg(6, "resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
+				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
+				self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 
 		except Exception as e:
@@ -538,6 +548,8 @@ class RFSwarmAgent():
 			r = requests.post(uri, json=payload)
 			self.debugmsg(6, "getjobs: resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
+				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
+				self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 
 		except Exception as e:
@@ -845,6 +857,8 @@ class RFSwarmAgent():
 			r = requests.post(uri, json=payload)
 			self.debugmsg(7, "resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
+				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
+				self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 
 		except Exception as e:
@@ -893,6 +907,8 @@ class RFSwarmAgent():
 				r = requests.post(uri, json=payload)
 				self.debugmsg(7, "resp: ", r.status_code, r.text)
 				if (r.status_code != requests.codes.ok):
+					self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
+					self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 					self.isconnected = False
 
 			except Exception as e:
@@ -1019,6 +1035,8 @@ class RFSwarmAgent():
 					r = requests.post(uri, json=payload)
 					self.debugmsg(6, "run_proces_output: ",r.status_code, r.text)
 					if (r.status_code != requests.codes.ok):
+						self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
+						self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 						self.isconnected = False
 				except Exception as e:
 					self.debugmsg(8, "Exception:", e)
