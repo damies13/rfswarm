@@ -792,10 +792,10 @@ class RFSwarmAgent():
 
 	def queue_file_upload(self, retcode, filedir):
 		reldir = os.path.basename(filedir)
-		self.debugmsg(5, retcode, reldir, filedir)
+		self.debugmsg(7, retcode, reldir, filedir)
 
 		filelst = self.file_upload_list(filedir)
-		self.debugmsg(5, "filelst", filelst)
+		self.debugmsg(7, "filelst", filelst)
 		# filelst
 		# [
 		# 	'/var/folders/7l/k7w46dm91y3gscxlswd_jm2r0000gn/T/rfswarmagent/logs/20201219_113254_11u_test_quick/OC_Demo_2_1_5_1608341588_1_1608341594/Browse_Store_Product_1.log',
