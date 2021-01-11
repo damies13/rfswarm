@@ -10,6 +10,7 @@
 
 import sys
 import os
+import platform
 import tempfile
 import configparser
 
@@ -163,6 +164,11 @@ class RFSwarmAgent():
 		self.excludelibraries = self.config['Agent']['excludelibraries'].split(",")
 		self.debugmsg(6, "self.excludelibraries:", self.excludelibraries)
 
+
+		if 'properties' not in self.config['Agent']:
+			self.config['Agent']['properties'] = ""
+			self.saveini()
+
 		if not self.xmlmode:
 			self.debugmsg(6, "self.xmlmode: ", self.xmlmode)
 			self.create_listner_file()
@@ -172,6 +178,25 @@ class RFSwarmAgent():
 
 		t = threading.Thread(target=self.findlibraries)
 		t.start()
+
+
+
+		self.agentproperties["OS: Platform"] = platform.platform()	# 'Linux-3.3.0-8.fc16.x86_64-x86_64-with-fedora-16-Verne'
+		self.agentproperties["OS: System"] = platform.system()   # 'Windows'
+		self.agentproperties["OS: Release"] = platform.release()  # 'XP'
+		self.agentproperties["OS: Version"] = platform.version()  # '5.1.2600'
+		majr, minr, rel= platform.version().split(".")
+		self.agentproperties["OS: Version: Major"] = "{}".format(majr)
+		self.agentproperties["OS: Version: Minor"] = "{}.{}".format(majr, minr)
+
+		if 'properties' in self.config['Agent'] and len(self.config['Agent']['properties'])>0:
+			if "," in self.config['Agent']['properties']:
+				proplist = self.config['Agent']['properties'].split(",")
+				for prop in proplist:
+					self.agentproperties["{}".format(prop.strip())] = True
+			else:
+				self.agentproperties["{}".format(self.config['Agent']['properties'].strip())] = True
+
 
 
 
