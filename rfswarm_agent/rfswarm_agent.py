@@ -185,9 +185,11 @@ class RFSwarmAgent():
 		self.agentproperties["OS: System"] = platform.system()   # 'Windows'
 		self.agentproperties["OS: Release"] = platform.release()  # 'XP'
 		self.agentproperties["OS: Version"] = platform.version()  # '5.1.2600'
-		majr, minr, rel= platform.version().split(".")
-		self.agentproperties["OS: Version: Major"] = "{}".format(majr)
-		self.agentproperties["OS: Version: Minor"] = "{}.{}".format(majr, minr)
+		vararr= platform.version().split(".")
+		if len(vararr)>0:
+			self.agentproperties["OS: Version: Major"] = "{}".format(vararr[0])
+		if len(vararr)>1:
+			self.agentproperties["OS: Version: Minor"] = "{}.{}".format(vararr[0], vararr[1])
 
 		if 'properties' in self.config['Agent'] and len(self.config['Agent']['properties'])>0:
 			if "," in self.config['Agent']['properties']:
