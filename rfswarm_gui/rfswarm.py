@@ -1929,11 +1929,17 @@ class RFSwarmCore:
 		# add filter options to the filter list
 		if "Properties" in agentdata:
 			filterexclude = ["RobotFramework: Libraries", "RFSwarmAgent: Version"]
+			valexclude = [True, False, "", "True", "False"]
 			for prop in agentdata["Properties"]:
 				base.debugmsg(8, "prop:", prop)
 				if prop not in filterexclude:
 					t = threading.Thread(target=base.add_scriptfilter, args=(prop, ))
 					t.start()
+					if agentdata["Properties"][prop] not in valexclude:
+						val = "{}: {}".format(prop, agentdata["Properties"][prop])
+						t = threading.Thread(target=base.add_scriptfilter, args=(val, ))
+						t.start()
+
 			if "RFSwarmAgent: Version" in agentdata["Properties"]:
 				prop = "RFSwarmAgent: Version: {}".format(agentdata["Properties"]["RFSwarmAgent: Version"])
 				t = threading.Thread(target=base.add_scriptfilter, args=(prop, ))
@@ -1980,7 +1986,7 @@ class RFSwarmCore:
 		# Save Metric Data
 
 		for key in SecondaryMetrics:
-			base.debugmsg(7, MetricID, MetricTime, key, SecondaryMetrics[key])
+			base.debugmsg(7, PrimaryMetric, MetricType, MetricTime, key, SecondaryMetrics[key])
 			base.save_metrics(PrimaryMetric, MetricType, MetricTime, key, SecondaryMetrics[key])
 
 
@@ -2021,7 +2027,7 @@ class RFSwarmCore:
 
 		scriptcount = 0
 		if "Scenario" in filedata:
-			base.debugmsg(8, "Scenario:", filedata["Scenario"])
+			base.debugmsg(6, "Scenario:", filedata["Scenario"])
 			if "scriptcount" in filedata["Scenario"]:
 				scriptcount = int(filedata["Scenario"]["scriptcount"])
 				base.debugmsg(8, "scriptcount:", scriptcount)
@@ -2092,6 +2098,18 @@ class RFSwarmCore:
 					self.sr_test_validate("row{}".format(rowcount), filedata[istr]["test"])
 				else:
 					fileok = False
+
+				if "excludelibraries" in filedata[istr]:
+					base.scriptlist[ii]["excludelibraries"] = filedata[istr]["excludelibraries"]
+
+				if "filters" in filedata[istr]:
+					base.debugmsg(9, "filedata[istr][filters]:", filedata[istr]["filters"], type(filedata[istr]["filters"]))
+					filtr = filedata[istr]["filters"].replace("'", '"')
+					base.debugmsg(9, "filtr:", filtr, type(filtr))
+					filtrs = json.loads(filtr)
+					base.debugmsg(9, "filtrs:", filtrs, type(filtrs))
+					base.scriptlist[ii]["filters"] = filtrs
+
 
 				if not fileok:
 					base.debugmsg(1, "Scenario file is damaged:", ScenarioFile)
@@ -4168,7 +4186,11 @@ class RFSwarmGUI(tk.Frame):
 		# self.root.resizable(True, True)
 
 		stgsWindow.title("Settings for row {}".format(r))
-		testname = base.scriptlist[r]["TestVar"].get()
+		testname = ""
+		try:
+			testname = base.scriptlist[r]["TestVar"].get()
+		except:
+			pass
 		base.debugmsg(5, "testname:", testname)
 		if len(testname)>0:
 			stgsWindow.title("Settings for {} ({})".format(testname, r))
@@ -4177,6 +4199,12 @@ class RFSwarmGUI(tk.Frame):
 		stgsWindow.excludelibrariesdefault = "BuiltIn,String,OperatingSystem,perftest"
 		stgsWindow.Filters = {}
 
+		base.debugmsg(5, "base.scriptlist[r]:", base.scriptlist[r])
+
+		stgsWindow.excludelibrariescurrent = stgsWindow.excludelibrariesdefault
+		if "excludelibraries" in base.scriptlist[r]:
+			stgsWindow.excludelibrariescurrent = base.scriptlist[r]["excludelibraries"]
+		base.debugmsg(5, "excludelibrariescurrent:", stgsWindow.excludelibrariescurrent)
 
 		row =0
 		stgsWindow.lblEL = ttk.Label(stgsWindow, text = "Exclude libraries:")
@@ -4186,7 +4214,7 @@ class RFSwarmGUI(tk.Frame):
 		# stgsWindow.inpEL = ttk.Entry(stgsWindow, text = excludelibrariesdefault)
 		stgsWindow.inpEL = ttk.Entry(stgsWindow)
 		stgsWindow.inpEL.delete(0,'end')
-		stgsWindow.inpEL.insert(0,stgsWindow.excludelibrariesdefault)
+		stgsWindow.inpEL.insert(0, stgsWindow.excludelibrariescurrent)
 		stgsWindow.inpEL.grid(column=0, row=row, columnspan=10, sticky="nsew")
 
 		row +=1
@@ -4205,6 +4233,14 @@ class RFSwarmGUI(tk.Frame):
 		stgsWindow.fmeFilters = tk.Frame(stgsWindow)
 		stgsWindow.fmeFilters.grid(column=0, row=row, columnspan=10, sticky="nsew")
 
+		if "filters" in base.scriptlist[r]:
+			# stgsWindow.excludelibrariescurrent = base.scriptlist[r]["excludelibraries"]
+			for f in base.scriptlist[r]["filters"]:
+				base.debugmsg(5, "f:", f)
+				base.add_scriptfilter(f['optn'])
+				self.sr_row_settings_addf(r, stgsWindow, f['rule'], f['optn'])
+
+
 
 		row +=1
 		stgsWindow.lblEL = ttk.Label(stgsWindow, text = " ")	# just a blank row as a spacer before the buttons
@@ -4219,9 +4255,39 @@ class RFSwarmGUI(tk.Frame):
 
 	def sr_row_settings_save(self, r, stgsWindow):
 		base.debugmsg(5, "r:", r)
+		base.debugmsg(5, "stgsWindow:", stgsWindow)
 		el = stgsWindow.inpEL.get()
-		base.debugmsg(5, "stgsWindow.inpEL:", el)
+		base.debugmsg(5, "el:", el)
+		if len(el)>0:
+			if el != stgsWindow.excludelibrariesdefault:
+				base.scriptlist[r]["excludelibraries"] = el
+		else:
+			del base.scriptlist[r]["excludelibraries"]
+
+		base.debugmsg(5, "stgsWindow.Filters:", stgsWindow.Filters)
+		# stgsWindow.Filters
+		if len(stgsWindow.Filters.keys())>0:
+			base.scriptlist[r]["filters"] = []
+			for fil in stgsWindow.Filters.keys():
+				filtr = {}
+				filtr["rule"] = stgsWindow.Filters[fil]["FilRule"].get()
+				filtr["optn"] = stgsWindow.Filters[fil]["FilOpt"].get()
+
+				if "filters" not in base.scriptlist[r]:
+					base.scriptlist[r]["filters"] = []
+				base.scriptlist[r]["filters"].append(filtr)
+		else:
+			del base.scriptlist[r]["filters"]
+
+		base.debugmsg(5, "base.scriptlist[r]:", base.scriptlist[r])
+
 		stgsWindow.destroy()
+
+		# MsgBox = tkm.askyesno('RFSwarm - Save Scenario','Do you want to save the current scenario?')
+		# base.debugmsg(9, "MsgBox:", MsgBox)
+		# if MsgBox:
+		# 	self.mnu_file_Save()
+
 
 	def sr_row_settings_addf(self, r, stgsWindow, *args):
 
@@ -4247,6 +4313,12 @@ class RFSwarmGUI(tk.Frame):
 		stgsWindow.btnRemFil.grid(column=9, row=fid, sticky="nsew")
 		# stgsWindow.btnRemFil.grid(column=9, row=fid, width=1)
 
+		if len(args)>0:
+			base.debugmsg(5, "args[0]:", args[0])
+			stgsWindow.Filters[fid]["FilRule"].set(args[0])
+		if len(args)>1:
+			base.debugmsg(5, "args[1]:", args[1])
+			stgsWindow.Filters[fid]["FilOpt"].set(args[1])
 
 	def sr_row_settings_remf(self, r, stgsWindow):
 		relmts = stgsWindow.fmeFilters.grid_slaves(row=r, column=None)
@@ -4959,7 +5031,7 @@ class RFSwarmGUI(tk.Frame):
 		else:
 			ScenarioFile = _event
 
-		base.debugmsg(9, "mnu_file_Open: ScenarioFile:", ScenarioFile)
+		base.debugmsg(6, "ScenarioFile:", ScenarioFile)
 
 		core.OpenFile(ScenarioFile)
 		base.gui.updateTitle()
