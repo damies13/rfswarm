@@ -4261,8 +4261,10 @@ class RFSwarmGUI(tk.Frame):
 		if len(el)>0:
 			if el != stgsWindow.excludelibrariesdefault:
 				base.scriptlist[r]["excludelibraries"] = el
+				self.plan_scnro_chngd = True
 		else:
 			del base.scriptlist[r]["excludelibraries"]
+			self.plan_scnro_chngd = True
 
 		base.debugmsg(5, "stgsWindow.Filters:", stgsWindow.Filters)
 		# stgsWindow.Filters
@@ -4276,8 +4278,10 @@ class RFSwarmGUI(tk.Frame):
 				if "filters" not in base.scriptlist[r]:
 					base.scriptlist[r]["filters"] = []
 				base.scriptlist[r]["filters"].append(filtr)
+			self.plan_scnro_chngd = True
 		else:
 			del base.scriptlist[r]["filters"]
+			self.plan_scnro_chngd = True
 
 		base.debugmsg(5, "base.scriptlist[r]:", base.scriptlist[r])
 
