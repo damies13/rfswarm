@@ -725,6 +725,15 @@ class RFSwarmAgent():
 		farr = os.path.splitext(file)
 		self.debugmsg(6, "runthread: farr:", farr)
 
+
+		excludelibraries = ",".join(self.excludelibraries)
+		if "excludelibraries" in self.jobs[jobid]:
+			# not sure if we need to do this???
+			# for safety split and join string
+			# ellst = self.jobs[jobid]['excludelibraries'].split(",")
+			# excludelibraries = ",".join(ellst)
+			excludelibraries = self.jobs[jobid]['excludelibraries']
+
 		# self.run_name
 		# scriptdir = None
 		# logdir = None
@@ -783,7 +792,7 @@ class RFSwarmAgent():
 			cmd.append("-M vuser:{}".format(self.jobs[jobid]["VUser"]))
 			cmd.append("-M iteration:{}".format(self.jobs[jobid]["Iteration"]))
 			cmd.append("-M swarmserver:{}".format(self.swarmserver))
-			cmd.append("-M excludelibraries:{}".format(",".join(self.excludelibraries)))
+			cmd.append("-M excludelibraries:{}".format(excludelibraries))
 			cmd.append("--listener {}".format('"'+self.listenerfile+'"'))
 
 		cmd.append("-o")

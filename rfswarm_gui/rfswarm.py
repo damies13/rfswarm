@@ -1540,10 +1540,10 @@ class RFSwarmBase:
 			if "Metric_"+MetricName in self.dbqueue["ReadResult"] and len(self.dbqueue["ReadResult"]["Metric_"+MetricName])>0:
 				self.debugmsg(5, "Metric_"+MetricName+":", self.dbqueue["ReadResult"]["Metric_"+MetricName])
 
-				self.MetricIDs["Agent"][MetricName] = self.dbqueue["ReadResult"]["Metric_"+MetricName][0]["rowid"]
+				self.MetricIDs[MetricType][MetricName] = self.dbqueue["ReadResult"]["Metric_"+MetricName][0]["rowid"]
 				self.debugmsg(7, "MetricIDs[Agent]:", self.MetricIDs["Agent"])
 
-		return self.MetricIDs["Agent"][MetricName]
+		return self.MetricIDs[MetricType][MetricName]
 
 	def save_metrics(self, PMetricName, MetricType, MetricTime, SMetricName, MetricValue):
 		self.debugmsg(7, PMetricName, MetricType, MetricTime, SMetricName, MetricValue)
@@ -2302,6 +2302,9 @@ class RFSwarmCore:
 											"EndTime": int(time.time()) + grp["Run"],
 											"id": grurid
 										}
+
+										if "excludelibraries" in grp:
+											base.robot_schedule["Agents"][nxtagent][grurid]["excludelibraries"] = grp["excludelibraries"]
 
 										base.run_end = int(time.time()) + grp["Run"]
 										base.robot_schedule["End"] = base.run_end
@@ -4262,6 +4265,8 @@ class RFSwarmGUI(tk.Frame):
 			if el != stgsWindow.excludelibrariesdefault:
 				base.scriptlist[r]["excludelibraries"] = el
 				self.plan_scnro_chngd = True
+			else:
+				del base.scriptlist[r]["excludelibraries"]
 		else:
 			del base.scriptlist[r]["excludelibraries"]
 			self.plan_scnro_chngd = True
