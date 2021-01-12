@@ -86,6 +86,7 @@ class RFSwarmAgent():
 		parser.add_argument('-r', '--robot', help='The robot framework executable')
 		parser.add_argument('-x', '--xmlmode', help='XML Mode, fall back to pasing the output.xml after each iteration', action='store_true')
 		parser.add_argument('-a', '--agentname', help='Set agent name')
+		parser.add_argument('-p', '--property', help='Add a custom property, if multiple properties are required use this argument for each property e.g. -p property1 -p "Property 2"', action='append')
 		self.args = parser.parse_args()
 
 		self.debugmsg(6, "self.args: ", self.args)
@@ -169,6 +170,7 @@ class RFSwarmAgent():
 			self.config['Agent']['properties'] = ""
 			self.saveini()
 
+
 		if not self.xmlmode:
 			self.debugmsg(6, "self.xmlmode: ", self.xmlmode)
 			self.create_listner_file()
@@ -205,7 +207,12 @@ class RFSwarmAgent():
 			else:
 				self.agentproperties["{}".format(self.config['Agent']['properties'].strip())] = True
 
+		if self.args.property:
+			self.debugmsg(7, "self.args.property: ", self.args.property)
+			for prop in self.args.property:
+				self.agentproperties["{}".format(prop.strip())] = True
 
+		self.debugmsg(9, "self.agentproperties: ", self.agentproperties)
 
 
 	def debugmsg(self, lvl, *msg):
