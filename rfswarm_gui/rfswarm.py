@@ -1178,7 +1178,7 @@ class RFSwarmBase:
 				base.config.write(configfile)
 				self.debugmsg(6, "File Saved:", self.gui_ini)
 
-	def get_next_agent(self):
+	def get_next_agent(self, filters):
 		base.debugmsg(9, "get_next_agent")
 		base.debugmsg(8, "get_next_agent: base.Agents:", base.Agents)
 		if len(base.Agents) <1:
@@ -1191,24 +1191,99 @@ class RFSwarmBase:
 			if len(base.Agents) < neededagents:
 				return None
 
+
+		base.debugmsg(5, "filters:", filters)
+		f_requre = []
+		f_exclude = []
+		for filt in filters:
+			if filt['rule'] == 'Require':
+				f_requre.append(filt['optn'])
+			if filt['rule'] == 'Exclude':
+				f_exclude.append(filt['optn'])
+
+
 		loadtpl = []
 		robottpl = []
 		for agnt in base.Agents.keys():
-			base.debugmsg(9, "get_next_agent: agnt:", agnt)
-			loadtpl.append([agnt, base.Agents[agnt]['LOAD%']])
-			robottpl.append([agnt, base.Agents[agnt]['AssignedRobots']])
+			base.debugmsg(5, "get_next_agent: agnt:", agnt)
+			agntnamefilter = "Agent: {}".format(agnt)
+			# check if this agent is specifically excluded
+			if agntnamefilter not in f_exclude:
+				# check if this agent is specifically required, if so no need for further evaluation
+				if agntnamefilter in f_requre:
+					base.debugmsg(5, "Agent Matched Require Filter:", agntnamefilter)
+					return agnt
 
-		base.debugmsg(9, "get_next_agent: robottpl:", robottpl)
+				# if we got this far, determine if agent meets requirements based on filter rules
+				addagnt = False
+				base.debugmsg(5, "addagnt:", addagnt)
+
+				if len(filters)<1:
+					# there are no filters applied
+					addagnt = True
+					base.debugmsg(5, "no filters applied", "addagnt:", addagnt)
+
+				# if agent has Properties, compare filters against these
+				if "Properties" in base.Agents[agnt]:
+					# if all requried filter items in properties
+					requirematch = 0
+					for fil in f_requre:
+						if fil in base.Agents[agnt]["Properties"]:
+							requirematch += 1
+							base.debugmsg(5, "Matched Required Filter:", fil)
+						else:
+							# split filter removeing last item, then try compare again
+							filarr = fil.rsplit(":", 1)
+							if len(filarr)>1:
+								if filarr[0] in base.Agents[agnt]["Properties"]:
+									if filarr[1].strip() == base.Agents[agnt]["Properties"][filarr[0]].strip():
+										requirematch += 1
+										base.debugmsg(5, "Matched Required Filter:", fil)
+
+					if requirematch == len(f_requre):
+						addagnt = True
+						base.debugmsg(5, "requirematch:", requirematch, "required:", len(f_requre), "addagnt:", addagnt)
+
+					# if any excluded filter items in properties
+					for fil in f_exclude:
+						if fil in base.Agents[agnt]["Properties"]:
+							addagnt = False
+							base.debugmsg(5, "Matched Excluded Filter:", fil, "addagnt:", addagnt)
+						else:
+							# split filter removeing last item, then try compare again
+							filarr = fil.rsplit(":", 1)
+							if len(filarr)>1:
+								if filarr[0] in base.Agents[agnt]["Properties"]:
+									if filarr[1].strip() == base.Agents[agnt]["Properties"][filarr[0]].strip():
+										addagnt = False
+										base.debugmsg(5, "Matched Excluded Filter:", fil, "addagnt:", addagnt)
+
+				base.debugmsg(5, "Final result: addagnt:", addagnt)
+				if addagnt:
+					loadtpl.append([agnt, base.Agents[agnt]['LOAD%']])
+					robottpl.append([agnt, base.Agents[agnt]['AssignedRobots']])
+
+			else:
+				base.debugmsg(5, "Agent Matched Exclude Filter:", agntnamefilter)
+
+
+
+		base.debugmsg(5, "robottpl:", robottpl)
+		if len(robottpl)<1:
+			return None
 		# Start with agent with least robots
 		robottpl.sort(key=itemgetter(1))
-		base.debugmsg(9, "get_next_agent: robottpl:", robottpl)
+		base.debugmsg(9, "robottpl:", robottpl)
 		if robottpl[0][1] < 10:
 			return robottpl[0][0]
 		else:
 			# try for agent with least load
-			base.debugmsg(9, "get_next_agent: loadtpl:", loadtpl)
+			base.debugmsg(5, "loadtpl:", loadtpl)
+			if len(loadtpl)<1:
+				# this should never happen!!!
+				return None
 			loadtpl.sort(key=itemgetter(1))
-			base.debugmsg(9, "get_next_agent: loadtpl:", loadtpl)
+			base.debugmsg(9, "loadtpl:", loadtpl)
 			if loadtpl[0][1] < 95:
 				return loadtpl[0][0]
 			else:
@@ -1540,8 +1615,11 @@ class RFSwarmBase:
 			if "Metric_"+MetricName in self.dbqueue["ReadResult"] and len(self.dbqueue["ReadResult"]["Metric_"+MetricName])>0:
 				self.debugmsg(5, "Metric_"+MetricName+":", self.dbqueue["ReadResult"]["Metric_"+MetricName])
 
+				if MetricType not in self.MetricIDs:
+					self.MetricIDs[MetricType] = {}
+
 				self.MetricIDs[MetricType][MetricName] = self.dbqueue["ReadResult"]["Metric_"+MetricName][0]["rowid"]
-				self.debugmsg(7, "MetricIDs[Agent]:", self.MetricIDs["Agent"])
+				self.debugmsg(7, "MetricIDs[MetricType]:", self.MetricIDs[MetricType])
 
 		return self.MetricIDs[MetricType][MetricName]
 
@@ -2210,7 +2288,7 @@ class RFSwarmCore:
 				break
 
 			if base.run_paused and int(time.time())<base.run_end:
-				nxtagent = base.get_next_agent()
+				nxtagent = base.get_next_agent([])
 				base.debugmsg(6, '(if) next_agent:', nxtagent)
 				if nxtagent is None:
 					base.run_paused = True
@@ -2229,7 +2307,10 @@ class RFSwarmCore:
 						base.debugmsg(6, "while totusrs", totusrs, " 	curusrs:", curusrs)
 						base.debugmsg(9, "grp[Index]", grp['Index'])
 
-						nxtagent = base.get_next_agent()
+						if 'filters' in grp:
+							nxtagent = base.get_next_agent(grp['filters'])
+						else:
+							nxtagent = base.get_next_agent([])
 						base.debugmsg(6, '(else) next_agent:', nxtagent)
 
 						if nxtagent is None:
@@ -4266,9 +4347,11 @@ class RFSwarmGUI(tk.Frame):
 				base.scriptlist[r]["excludelibraries"] = el
 				self.plan_scnro_chngd = True
 			else:
-				del base.scriptlist[r]["excludelibraries"]
+				if "excludelibraries" in base.scriptlist[r]:
+					del base.scriptlist[r]["excludelibraries"]
 		else:
-			del base.scriptlist[r]["excludelibraries"]
+			if "excludelibraries" in base.scriptlist[r]:
+				del base.scriptlist[r]["excludelibraries"]
 			self.plan_scnro_chngd = True
 
 		base.debugmsg(5, "stgsWindow.Filters:", stgsWindow.Filters)
