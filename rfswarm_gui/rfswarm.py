@@ -4347,10 +4347,10 @@ class RFSwarmGUI(tk.Frame):
 		btnCancel.grid(column=7, row=row, columnspan=3, sticky="nsew") # cols 7, 8, 9
 
 	def sr_row_settings_save(self, r, stgsWindow):
-		base.debugmsg(5, "r:", r)
-		base.debugmsg(5, "stgsWindow:", stgsWindow)
+		base.debugmsg(7, "r:", r)
+		base.debugmsg(7, "stgsWindow:", stgsWindow)
 		el = stgsWindow.inpEL.get()
-		base.debugmsg(5, "el:", el)
+		base.debugmsg(7, "el:", el)
 		if len(el)>0:
 			if el != stgsWindow.excludelibrariesdefault:
 				base.scriptlist[r]["excludelibraries"] = el
@@ -4363,7 +4363,7 @@ class RFSwarmGUI(tk.Frame):
 				del base.scriptlist[r]["excludelibraries"]
 			self.plan_scnro_chngd = True
 
-		base.debugmsg(5, "stgsWindow.Filters:", stgsWindow.Filters)
+		base.debugmsg(7, "stgsWindow.Filters:", stgsWindow.Filters)
 		# stgsWindow.Filters
 		if len(stgsWindow.Filters.keys())>0:
 			base.scriptlist[r]["filters"] = []
@@ -4377,10 +4377,11 @@ class RFSwarmGUI(tk.Frame):
 				base.scriptlist[r]["filters"].append(filtr)
 			self.plan_scnro_chngd = True
 		else:
-			del base.scriptlist[r]["filters"]
+			if "filters" in base.scriptlist[r]:
+				del base.scriptlist[r]["filters"]
 			self.plan_scnro_chngd = True
 
-		base.debugmsg(5, "base.scriptlist[r]:", base.scriptlist[r])
+		base.debugmsg(7, "base.scriptlist[r]:", base.scriptlist[r])
 
 		stgsWindow.destroy()
 
