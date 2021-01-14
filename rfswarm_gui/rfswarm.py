@@ -1182,17 +1182,17 @@ class RFSwarmBase:
 		base.debugmsg(9, "get_next_agent")
 		base.debugmsg(8, "get_next_agent: base.Agents:", base.Agents)
 		if len(base.Agents) <1:
-			base.debugmsg(5, "Agents:",len(base.Agents))
+			base.debugmsg(7, "Agents:",len(base.Agents))
 			return None
 
 		if base.args.agents:
 			neededagents = int(base.args.agents)
-			base.debugmsg(5, "Agents:",len(base.Agents),"	Agents Needed:", neededagents)
+			base.debugmsg(7, "Agents:",len(base.Agents),"	Agents Needed:", neededagents)
 			if len(base.Agents) < neededagents:
 				return None
 
 
-		base.debugmsg(5, "filters:", filters)
+		base.debugmsg(7, "filters:", filters)
 		f_requre = []
 		f_exclude = []
 		for filt in filters:
@@ -1205,23 +1205,24 @@ class RFSwarmBase:
 		loadtpl = []
 		robottpl = []
 		for agnt in base.Agents.keys():
-			base.debugmsg(5, "get_next_agent: agnt:", agnt)
+			base.debugmsg(7, "agnt:", agnt)
 			agntnamefilter = "Agent: {}".format(agnt)
 			# check if this agent is specifically excluded
+			base.debugmsg(7, "agntnamefilter:", agntnamefilter, "f_exclude:", f_exclude)
 			if agntnamefilter not in f_exclude:
 				# check if this agent is specifically required, if so no need for further evaluation
 				if agntnamefilter in f_requre:
-					base.debugmsg(5, "Agent Matched Require Filter:", agntnamefilter)
+					base.debugmsg(7, "Agent Matched Require Filter:", agntnamefilter)
 					return agnt
 
 				# if we got this far, determine if agent meets requirements based on filter rules
 				addagnt = False
-				base.debugmsg(5, "addagnt:", addagnt)
+				base.debugmsg(7, "addagnt:", addagnt)
 
 				if len(filters)<1:
 					# there are no filters applied
 					addagnt = True
-					base.debugmsg(5, "no filters applied", "addagnt:", addagnt)
+					base.debugmsg(7, "no filters applied", "addagnt:", addagnt)
 
 				# if agent has Properties, compare filters against these
 				if "Properties" in base.Agents[agnt]:
@@ -1230,7 +1231,7 @@ class RFSwarmBase:
 					for fil in f_requre:
 						if fil in base.Agents[agnt]["Properties"]:
 							requirematch += 1
-							base.debugmsg(5, "Matched Required Filter:", fil)
+							base.debugmsg(7, "Matched Required Filter:", fil)
 						else:
 							# split filter removeing last item, then try compare again
 							filarr = fil.rsplit(":", 1)
@@ -1238,17 +1239,17 @@ class RFSwarmBase:
 								if filarr[0] in base.Agents[agnt]["Properties"]:
 									if filarr[1].strip() == base.Agents[agnt]["Properties"][filarr[0]].strip():
 										requirematch += 1
-										base.debugmsg(5, "Matched Required Filter:", fil)
+										base.debugmsg(7, "Matched Required Filter:", fil)
 
 					if requirematch == len(f_requre):
 						addagnt = True
-						base.debugmsg(5, "requirematch:", requirematch, "required:", len(f_requre), "addagnt:", addagnt)
+						base.debugmsg(7, "requirematch:", requirematch, "required:", len(f_requre), "addagnt:", addagnt)
 
 					# if any excluded filter items in properties
 					for fil in f_exclude:
 						if fil in base.Agents[agnt]["Properties"]:
 							addagnt = False
-							base.debugmsg(5, "Matched Excluded Filter:", fil, "addagnt:", addagnt)
+							base.debugmsg(7, "Matched Excluded Filter:", fil, "addagnt:", addagnt)
 						else:
 							# split filter removeing last item, then try compare again
 							filarr = fil.rsplit(":", 1)
@@ -1256,21 +1257,23 @@ class RFSwarmBase:
 								if filarr[0] in base.Agents[agnt]["Properties"]:
 									if filarr[1].strip() == base.Agents[agnt]["Properties"][filarr[0]].strip():
 										addagnt = False
-										base.debugmsg(5, "Matched Excluded Filter:", fil, "addagnt:", addagnt)
+										base.debugmsg(7, "Matched Excluded Filter:", fil, "addagnt:", addagnt)
 
-				base.debugmsg(5, "Final result: addagnt:", addagnt)
+				base.debugmsg(7, "Final result: addagnt:", addagnt)
 				if addagnt:
 					loadtpl.append([agnt, base.Agents[agnt]['LOAD%']])
 					robottpl.append([agnt, base.Agents[agnt]['AssignedRobots']])
 
 			else:
-				base.debugmsg(5, "Agent Matched Exclude Filter:", agntnamefilter)
+				base.debugmsg(7, "Agent Matched Exclude Filter:", agntnamefilter)
 
 
 
-		base.debugmsg(5, "robottpl:", robottpl)
+		base.debugmsg(7, "robottpl:", robottpl)
 		if len(robottpl)<1:
+			base.debugmsg(7, "robottpl empty, return None")
 			return None
+
 		# Start with agent with least robots
 		robottpl.sort(key=itemgetter(1))
 		base.debugmsg(9, "robottpl:", robottpl)
@@ -1278,7 +1281,7 @@ class RFSwarmBase:
 			return robottpl[0][0]
 		else:
 			# try for agent with least load
-			base.debugmsg(5, "loadtpl:", loadtpl)
+			base.debugmsg(7, "loadtpl:", loadtpl)
 			if len(loadtpl)<1:
 				# this should never happen!!!
 				return None
@@ -2309,14 +2312,20 @@ class RFSwarmCore:
 
 						if 'filters' in grp:
 							nxtagent = base.get_next_agent(grp['filters'])
+							base.debugmsg(7, '(filters) next_agent:', nxtagent)
 						else:
 							nxtagent = base.get_next_agent([])
-						base.debugmsg(6, '(else) next_agent:', nxtagent)
+							base.debugmsg(9, '(filters else) next_agent:', nxtagent)
+						base.debugmsg(7, '(else) next_agent:', nxtagent)
 
 						if nxtagent is None:
+							base.debugmsg(7, 'next_agent is None !!!')
 							# MsgBox = tkm.askyesno('Save Scenario','Do you want to save the current scenario?')
 							if not base.args.nogui and not base.run_paused:
+								base.debugmsg(7, 'base.args.nogui:', base.args.nogui, "base.run_paused:", base.run_paused)
 								tkm.showwarning("RFSwarm - Warning", "Not enough Agents available to run Robots!\n\nTest run is paused, please add agents to continue or click stop to abort.")
+								# tkm.showinfo("RFSwarm - Warning", "Not enough Agents available to run Robots! Test run is paused, please add agents to continue or click stop to abort.")
+								base.debugmsg(7, 'base.args.nogui:', base.args.nogui, "base.run_paused:", base.run_paused)
 							base.run_paused = True
 
 							base.debugmsg(5, 'Not enough Agents available to run Robots! (else)')
