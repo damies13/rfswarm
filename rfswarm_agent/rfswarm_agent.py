@@ -591,7 +591,7 @@ class RFSwarmAgent():
 		payload = {
 			"AgentName": self.agentname
 		}
-		self.debugmsg(5, "getjobs: payload: ", payload)
+		self.debugmsg(9, "getjobs: payload: ", payload)
 		try:
 			r = requests.post(uri, json=payload)
 			self.debugmsg(7, "getjobs: resp: ", r.status_code, r.text)
