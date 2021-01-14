@@ -591,7 +591,7 @@ class RFSwarmAgent():
 		payload = {
 			"AgentName": self.agentname
 		}
-		self.debugmsg(7, "getjobs: payload: ", payload)
+		self.debugmsg(5, "getjobs: payload: ", payload)
 		try:
 			r = requests.post(uri, json=payload)
 			self.debugmsg(7, "getjobs: resp: ", r.status_code, r.text)
@@ -794,6 +794,9 @@ class RFSwarmAgent():
 			cmd.append("-M swarmserver:{}".format(self.swarmserver))
 			cmd.append("-M excludelibraries:{}".format(excludelibraries))
 			cmd.append("--listener {}".format('"'+self.listenerfile+'"'))
+
+		if "robotoptions" in self.jobs[jobid]:
+			cmd.append("{}".format(self.jobs[jobid]['robotoptions']))
 
 		cmd.append("-o")
 		cmd.append('"'+outputFile+'"')

@@ -2183,6 +2183,9 @@ class RFSwarmCore:
 				if "excludelibraries" in filedata[istr]:
 					base.scriptlist[ii]["excludelibraries"] = filedata[istr]["excludelibraries"]
 
+				if "robotoptions" in filedata[istr]:
+					base.scriptlist[ii]["robotoptions"] = filedata[istr]["robotoptions"]
+
 				if "filters" in filedata[istr]:
 					base.debugmsg(9, "filedata[istr][filters]:", filedata[istr]["filters"], type(filedata[istr]["filters"]))
 					filtr = filedata[istr]["filters"].replace("'", '"')
@@ -2395,6 +2398,9 @@ class RFSwarmCore:
 
 										if "excludelibraries" in grp:
 											base.robot_schedule["Agents"][nxtagent][grurid]["excludelibraries"] = grp["excludelibraries"]
+
+										if "robotoptions" in grp:
+											base.robot_schedule["Agents"][nxtagent][grurid]["robotoptions"] = grp["robotoptions"]
 
 										base.run_end = int(time.time()) + grp["Run"]
 										base.robot_schedule["End"] = base.run_end
@@ -4299,7 +4305,16 @@ class RFSwarmGUI(tk.Frame):
 			stgsWindow.excludelibrariescurrent = base.scriptlist[r]["excludelibraries"]
 		base.debugmsg(5, "excludelibrariescurrent:", stgsWindow.excludelibrariescurrent)
 
+		stgsWindow.robotoptionscurrent = ""
+		if "robotoptions" in base.scriptlist[r]:
+			stgsWindow.robotoptionscurrent = base.scriptlist[r]["robotoptions"]
+		base.debugmsg(5, "robotoptionscurrent:", stgsWindow.robotoptionscurrent)
+
 		row =0
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text = " ")	# just a blank row as a spacer before the filters
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row +=1
 		stgsWindow.lblEL = ttk.Label(stgsWindow, text = "Exclude libraries:")
 		stgsWindow.lblEL.grid(column=0, row=row, sticky="nsew")
 
@@ -4311,12 +4326,26 @@ class RFSwarmGUI(tk.Frame):
 		stgsWindow.inpEL.grid(column=0, row=row, columnspan=10, sticky="nsew")
 
 		row +=1
-		stgsWindow.lblEL = ttk.Label(stgsWindow, text = " ")	# just a blank row as a spacer before the filters
-		stgsWindow.lblEL.grid(column=0, row=row, sticky="nsew")
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text = " ")	# just a blank row as a spacer before the filters
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
 
 		row +=1
-		stgsWindow.lblEL = ttk.Label(stgsWindow, text = "Agent Filter:")
-		stgsWindow.lblEL.grid(column=0, row=row, sticky="nsew")
+		stgsWindow.lblRO = ttk.Label(stgsWindow, text = "Robot Options:")
+		stgsWindow.lblRO.grid(column=0, row=row, sticky="nsew")
+
+		row +=1
+		stgsWindow.inpRO = ttk.Entry(stgsWindow)
+		stgsWindow.inpRO.delete(0,'end')
+		stgsWindow.inpRO.insert(0, stgsWindow.robotoptionscurrent)
+		stgsWindow.inpRO.grid(column=0, row=row, columnspan=10, sticky="nsew")
+
+		row +=1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text = " ")	# just a blank row as a spacer before the filters
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row +=1
+		stgsWindow.lblAF = ttk.Label(stgsWindow, text = "Agent Filter:")
+		stgsWindow.lblAF.grid(column=0, row=row, sticky="nsew")
 
 		icontext = "AddRow"
 		stgsWindow.btnAddFil = ttk.Button(stgsWindow, image=self.imgdata[icontext], text = "+", command=lambda: self.sr_row_settings_addf(r, stgsWindow), width=1)
@@ -4327,7 +4356,6 @@ class RFSwarmGUI(tk.Frame):
 		stgsWindow.fmeFilters.grid(column=0, row=row, columnspan=10, sticky="nsew")
 
 		if "filters" in base.scriptlist[r]:
-			# stgsWindow.excludelibrariescurrent = base.scriptlist[r]["excludelibraries"]
 			for f in base.scriptlist[r]["filters"]:
 				base.debugmsg(5, "f:", f)
 				base.add_scriptfilter(f['optn'])
@@ -4336,8 +4364,8 @@ class RFSwarmGUI(tk.Frame):
 
 
 		row +=1
-		stgsWindow.lblEL = ttk.Label(stgsWindow, text = " ")	# just a blank row as a spacer before the buttons
-		stgsWindow.lblEL.grid(column=0, row=row, sticky="nsew")
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text = " ")	# just a blank row as a spacer before the buttons
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
 
 		row +=1
 		btnSave = ttk.Button(stgsWindow, text = "Save", command=lambda: self.sr_row_settings_save(r, stgsWindow))
@@ -4361,6 +4389,18 @@ class RFSwarmGUI(tk.Frame):
 		else:
 			if "excludelibraries" in base.scriptlist[r]:
 				del base.scriptlist[r]["excludelibraries"]
+			self.plan_scnro_chngd = True
+
+		# stgsWindow.inpRO
+		ro = stgsWindow.inpRO.get()
+		base.debugmsg(7, "el:", el)
+		if len(ro)>0:
+			if ro != stgsWindow.robotoptionscurrent:
+				base.scriptlist[r]["robotoptions"] = ro
+				self.plan_scnro_chngd = True
+		else:
+			if "robotoptions" in base.scriptlist[r]:
+				del base.scriptlist[r]["robotoptions"]
 			self.plan_scnro_chngd = True
 
 		base.debugmsg(7, "stgsWindow.Filters:", stgsWindow.Filters)
