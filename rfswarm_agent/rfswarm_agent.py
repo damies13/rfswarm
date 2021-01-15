@@ -782,6 +782,7 @@ class RFSwarmAgent():
 		cmd.append("-d")
 		cmd.append('"'+odir+'"')
 
+		cmd.append("-M agent:{}".format(self.agentname))
 		if self.xmlmode:
 			cmd.append("-v index:{}".format(self.jobs[jobid]["ScriptIndex"]))
 			cmd.append("-v vuser:{}".format(self.jobs[jobid]["VUser"]))
