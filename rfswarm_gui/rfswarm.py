@@ -3060,6 +3060,8 @@ class RFSwarmGUI(tk.Frame):
 				style.configure("Canvas", fill="#000")
 				style.configure("Canvas", activefill="#000")
 
+				# style.configure("Spinbox", foreground="#000")
+				style.configure("TSpinbox", foreground="#000")
 
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -4281,7 +4283,7 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(5, "r:", r)
 		stgsWindow = tk.Toplevel(self.root)
 		# self.grid(sticky="news", ipadx=0, pady=0)
-		# self.root.resizable(False, False)		# this didn't work as expected, I expected the dialog to not be resizable instaed it stopped the main window from being resizable 
+		# self.root.resizable(False, False)		# this didn't work as expected, I expected the dialog to not be resizable instaed it stopped the main window from being resizable
 		# self.root.resizable(True, True)
 
 		stgsWindow.title("Settings for row {}".format(r))
