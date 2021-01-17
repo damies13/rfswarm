@@ -4281,7 +4281,7 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(5, "r:", r)
 		stgsWindow = tk.Toplevel(self.root)
 		# self.grid(sticky="news", ipadx=0, pady=0)
-		self.root.resizable(False, False)
+		# self.root.resizable(False, False)		# this didn't work as expected, I expected the dialog to not be resizable instaed it stopped the main window from being resizable 
 		# self.root.resizable(True, True)
 
 		stgsWindow.title("Settings for row {}".format(r))
