@@ -26,16 +26,16 @@ This is where you construct your test scenario, choose your test cases and numbe
 All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the [agent polling](./rfswarm_agent_py.md#agent-polling-of-the-guiserver) works it's best not to use values less than 10 seconds.
 
 > _Plan - Planning a performance test_
-![Image](Images/Plan_saved_opened_v0.3.png "Plan - Planning a performance test")
+![Image](Images/MacOS_Plan_saved_opened_v0.6.3.png "Plan - Planning a performance test")
 
 > _Plan - New_
-![Image](Images/Plan_unsaved_v0.3.png "Plan - New")
+![Image](Images/MacOS_Plan_New_v0.6.3.png "Plan - New")
 
 > _Plan - Delay example_
-![Image](Images/Plan_v0.5.0_20u_delay_example.png)
+![Image](Images/MacOS_Plan_v0.6.3_20u_delay_example.png)
 
 > _Plan - gradual ramp-up example_
-![Image](Images/Plan_v0.5.0_150u_25per10min.png)
+![Image](Images/MacOS_Plan_v0.6.3_150u_25per10min.png)
 
 > _Plan - Linux (Mint 19.2)_
 ![Image](Images/Linux-v0.5.0_Plan_150u_25per10min.png)
@@ -71,13 +71,13 @@ Use this to generate csv files suitable for use to create reports for your test 
 - An Agents file, this is all the agent stats recorded, useful if you want to graph running robots or agent loads
 
 > _Run - Just started_
-![Image](Images/Run_Start_v0.4.4.png "Run - Just Started")
+![Image](Images/MacOS_Run_Start_v0.6.3_09s.png "Run - Just Started")
 
 > _Run - Just started, first results coming in_
-![Image](Images/Run_Start_v0.5.0_39s.png "Run - Just started, first results coming in")
+![Image](Images/MacOS_Run_Start_v0.6.3_54s.png "Run - Just started, first results coming in")
 
 > _Run - Showing results being collected live_
-![Image](Images/Run_v0.5.0_100u_2h.png "Run - Showing results being collected live")
+![Image](Images/MacOS_Run_v0.6.3_100u_2h.png "Run - Showing results being collected live")
 
 > _Run - Linux_
 ![Image](Images/Linux-v0.5.0_Run_6min.png)
@@ -89,10 +89,10 @@ Use this to generate csv files suitable for use to create reports for your test 
 #### Agents
 This is where you can see which agents have connected, number of robots on each agent and monitor the status and performance of the agents.
 > _Agents - Ready_
-![Image](Images/Agents_ready_v0.3.png "Agents - Ready")
+![Image](Images/MacOS_Agents_ready_v0.6.3.png "Agents - Ready")
 
 > _Agents - Running / Warning_
-![Image](Images/Agents_running_v0.5.0.png "Agents - Running / Warning")
+![Image](Images/MacOS_Agents_running_warning_v0.6.3.png "Agents - Running / Warning")
 
 > _Agents - Stopping_
 ![Image](Images/Agents_stopping_v0.3.png "Agents - Stopping")
@@ -109,7 +109,7 @@ Additionally the debug (-g) levels 1-3 will give extra information on the consol
 ```
 $ rfswarm -h
 Robot Framework Swarm: GUI/Server
-	Version 0.6.1
+	Version 0.6.3
 usage: rfswarm [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS] [-n] [-d DIR] [-e IPADDRESS] [-p PORT]
 
 optional arguments:
@@ -134,7 +134,7 @@ If you pass in an unsupported command line option, you will get this prompt:
 ```
 $ rfswarm -?
 Robot Framework Swarm: GUI/Server
-	Version 0.6.1
+	Version 0.6.3
 usage: rfswarm [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS] [-n] [-d DIR] [-e IPADDRESS] [-p PORT]
 rfswarm: error: unrecognized arguments: -?
 ```
