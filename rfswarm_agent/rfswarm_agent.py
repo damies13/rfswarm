@@ -66,6 +66,7 @@ class RFSwarmAgent():
 	excludelibraries = []
 	args = None
 	xmlmode = False
+	timeout=600
 
 	debuglvl = 0
 
@@ -364,7 +365,7 @@ class RFSwarmAgent():
 			"Properties": self.agentproperties
 		}
 		try:
-			r = requests.post(uri, json=payload)
+			r = requests.post(uri, json=payload, timeout=self.timeout)
 			self.debugmsg(8, r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok, r.text)
@@ -389,7 +390,7 @@ class RFSwarmAgent():
 			self.debugmsg(2, "Try connecting to", self.swarmserver)
 			self.debugmsg(6, "self.swarmserver:", self.swarmserver)
 			try:
-				r = requests.get(self.swarmserver)
+				r = requests.get(self.swarmserver, timeout=self.timeout)
 				self.debugmsg(8, r.status_code, r.text)
 				if (r.status_code == requests.codes.ok):
 					self.debugmsg(7, "r.status_code:", r.status_code, requests.codes.ok, r.text)
@@ -468,7 +469,7 @@ class RFSwarmAgent():
 			# https://github.com/damies13/rfswarm/blob/v0.6.2/Doc/Images/z_agent.txt
 			url = "https://github.com/damies13/rfswarm/blob/"+self.version+"/Doc/Images/z_agent.txt"
 			try:
-				r = requests.get(url)
+				r = requests.get(url, timeout=self.timeout)
 				self.debugmsg(9, "tick_counter:", r.status_code)
 			except:
 				pass
@@ -483,7 +484,7 @@ class RFSwarmAgent():
 		}
 		self.debugmsg(6, "getscripts: payload: ", payload)
 		try:
-			r = requests.post(uri, json=payload)
+			r = requests.post(uri, json=payload, timeout=self.timeout)
 			self.debugmsg(6, "getscripts: resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
@@ -523,7 +524,7 @@ class RFSwarmAgent():
 			"Hash": hash
 		}
 		try:
-			r = requests.post(uri, json=payload)
+			r = requests.post(uri, json=payload, timeout=self.timeout)
 			self.debugmsg(6, "resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
@@ -593,7 +594,7 @@ class RFSwarmAgent():
 		}
 		self.debugmsg(9, "getjobs: payload: ", payload)
 		try:
-			r = requests.post(uri, json=payload)
+			r = requests.post(uri, json=payload, timeout=self.timeout)
 			self.debugmsg(7, "getjobs: resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(7, "r.status_code:", r.status_code, requests.codes.ok)
@@ -915,7 +916,7 @@ class RFSwarmAgent():
 		}
 		self.debugmsg(9, "payload: ", payload)
 		try:
-			r = requests.post(uri, json=payload)
+			r = requests.post(uri, json=payload, timeout=self.timeout)
 			self.debugmsg(7, "resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
@@ -965,7 +966,7 @@ class RFSwarmAgent():
 			self.debugmsg(8, "payload: ", payload)
 
 			try:
-				r = requests.post(uri, json=payload)
+				r = requests.post(uri, json=payload, timeout=self.timeout)
 				self.debugmsg(7, "resp: ", r.status_code, r.text)
 				if (r.status_code != requests.codes.ok):
 					self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
@@ -1093,7 +1094,7 @@ class RFSwarmAgent():
 
 				self.debugmsg(6, "run_proces_output: payload", payload)
 				try:
-					r = requests.post(uri, json=payload)
+					r = requests.post(uri, json=payload, timeout=self.timeout)
 					self.debugmsg(6, "run_proces_output: ",r.status_code, r.text)
 					if (r.status_code != requests.codes.ok):
 						self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
@@ -1149,6 +1150,7 @@ class RFSwarmAgent():
 		fd.append("import time")
 		fd.append("import requests")
 		fd.append("import inspect")
+		fd.append("import threading")
 		fd.append("")
 		fd.append("class RFSListener2:")
 		fd.append("	ROBOT_LISTENER_API_VERSION = 2")
@@ -1192,8 +1194,10 @@ class RFSwarmAgent():
 		# fd.append("			self.debugmsg(6, 'self.msg: ', self.msg)")
 		fd.append("")
 		fd.append("	def end_keyword(self, name, attrs):")
-		fd.append("		self.debugmsg(6, 'attrs[doc]: ', attrs['doc'])")
-		fd.append("		self.debugmsg(6, 'self.msg: ', self.msg)")
+		fd.append("		self.debugmsg(3, 'name: ', name)")
+		fd.append("		self.debugmsg(6, 'attrs: ', attrs)")
+		fd.append("		self.debugmsg(5, 'attrs[doc]: ', attrs['doc'])")
+		fd.append("		self.debugmsg(5, 'self.msg: ', self.msg)")
 		fd.append("		if self.msg is not None:")
 		fd.append("			self.debugmsg(8, 'self.msg: attrs[libname]: ', attrs['libname'], '	excludelibraries:', self.excludelibraries)")
 		fd.append("			if attrs['libname'] not in self.excludelibraries:")
@@ -1215,8 +1219,11 @@ class RFSwarmAgent():
 		fd.append("					'Sequence': self.seq")
 		fd.append("				}")
 		fd.append("				self.debugmsg(8, 'payload: ', payload)")
-		fd.append("				self.send_result(payload)")
-		# fd.append("				self.msg = None")
+		# fd.append("				self.send_result(payload)")
+		fd.append("				t = threading.Thread(target=self.send_result, args=(payload,))")
+		fd.append("				t.start()")
+		fd.append("			else:")
+		fd.append("				self.debugmsg(5, attrs['libname'], 'is an excluded library')")
 		fd.append("		elif 'doc' in attrs and len(attrs['doc'])>0:")
 		fd.append("			self.debugmsg(8, 'attrs[doc]: attrs[libname]: ', attrs['libname'], '	excludelibraries:', self.excludelibraries)")
 		fd.append("			if attrs['libname'] not in self.excludelibraries:")
@@ -1239,8 +1246,11 @@ class RFSwarmAgent():
 		fd.append("					'Sequence': self.seq")
 		fd.append("				}")
 		fd.append("				self.debugmsg(8, 'payload: ', payload)")
-		fd.append("				self.send_result(payload)")
-		# fd.append("				self.msg = None")
+		# fd.append("				self.send_result(payload)")
+		fd.append("				t = threading.Thread(target=self.send_result, args=(payload,))")
+		fd.append("				t.start()")
+		fd.append("			else:")
+		fd.append("				self.debugmsg(5, attrs['libname'], 'is an excluded library')")
 		fd.append("		self.msg = None")
 		fd.append("")
 		fd.append("	def debugmsg(self, lvl, *msg):")
@@ -1267,13 +1277,15 @@ class RFSwarmAgent():
 		fd.append("	def send_result(self, payload):")
 		fd.append("		uri = self.swarmserver + 'Result'")
 		fd.append("		try:")
-		fd.append("			r = requests.post(uri, json=payload)")
+		fd.append("			r = requests.post(uri, json=payload, timeout=600)")
 		fd.append("			self.debugmsg(7, 'send_result: ',r.status_code, r.text)")
 		fd.append("			if (r.status_code != requests.codes.ok):")
 		fd.append("				self.isconnected = False")
 		fd.append("		except Exception as e:")
-		fd.append("			self.debugmsg(7, 'send_result: ',r.status_code, r.text)")
-		fd.append("			self.debugmsg(7, 'send_result: Exception:', e)")
+		fd.append("			self.debugmsg(0, 'send_result: while attempting to send result to',uri)")
+		fd.append("			self.debugmsg(0, 'send_result: with payload:',payload)")
+		fd.append("			self.debugmsg(0, 'send_result: ',r.status_code, r.text)")
+		fd.append("			self.debugmsg(0, 'send_result: Exception:', e)")
 		fd.append("			pass")
 		fd.append("")
 
