@@ -51,14 +51,14 @@ While hopefully this is intuitive, the buttons are (starting top right)
 | Play	|	![image](Images/GUI_btn_resultset_next.gif)	| Play the current scenario	|
 | Add	|	![image](Images/GUI_btn_add.gif)			| Add another test group	|
 | Select |	![image](Images/GUI_btn_script.gif)			| Select a robot file	|
-| Settings | ![image](Images/GUI_btn_cog.gif)			| Configure additional settings for robot	|
+| Settings | ![image](Images/GUI_btn_cog.gif)			| Configure additional settings for a test group	|
 | Remove |	![image](Images/GUI_btn_cross.gif)			| Remove this test group	|
 
-Additional settings for robot ![image](Images/GUI_btn_cog.gif)
+##### Additional settings for test group ![image](Images/GUI_btn_cog.gif)
 When clicking on this button a dialogue will be presented that allows you to configure some additional settings for the test group, by default the dialogue will look like this:
 > ![image](Images/MacOS_Plan_v0.6.3_Test_Settings.png)
 
-Exclude libraries:
+###### Exclude libraries:
 The default value is "BuiltIn,String,OperatingSystem,perftest", this is the same default value as used in the [agent settings](./rfswarm_agent_py.md#exclude-libraries) and if you leave this default but change the agent the settings set on the agent will override this setting.
 By configuring this setting you can adjust which keyword's response times are reported in the test results.
 If you change this setting here from the default, then for this particular test group the agent setting will be overridden with the settings used here
@@ -70,12 +70,12 @@ If you change this setting here from the default, then for this particular test 
 |default|configured|test group setting|
 |configured|configured|test group setting|
 
-Robot Options:
+###### Robot Options:
 By default this setting is blank and in most cases wouldnlt be used, it allows you to pass additional command line options to the robot executable, to find out what options can be passed run
 `robot -h`
 On any machine that has Robot Framework installed
 
-Agent Filter:
+###### Agent Filter:
 You can use this setting to modify the default [agent assignment](#agent-assignment) to require test cases to require agents with particular properties or to exclude agents with particular properties.
 
 By default there are no Agent filters applied, and the test group can be run on any available agent.
