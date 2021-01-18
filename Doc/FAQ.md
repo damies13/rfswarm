@@ -43,7 +43,7 @@ To get started have at least 3 machines ready, run the GUI/Server (rfswarm.py) o
 Next on machines B & C, first make sure that your test cases run on these machines by opening a command line and running robot with the -t switch for your test case (robot -h will explain what you need to do here) and, once you have confirmed that robot works properly on machines B & C then run the agent (rfswarm_agent.py) don't forget to point the agents to Machine A.
 
 Next on Machine A, in the rfswarm GUI, create a new scenario, just make it a really simple to start with, one test case, see this screen:
-![Plan New](./Images/Plan_unsaved_v0.3.png)
+![Plan New](./Images/MacOS_Plan_New_v0.6.3.png)
 The button next to the script field will let you browse for and select your robot file, once you do this the test option list will be populated with the test cases in your robot file, select the one you used above. for the initial test, set the users to 2 and the rampup to 30 (seconds) and run to 120 (seconds / 2 minutes). then click the agents tab and check that machines B & C are showing up in the agents list, if they are, your are good to go, switch back to the plan tab and click play, once you do the ui will switch to the run tab, within 15-30 seconds the test case should start up with 1 user on each machine B and C, and soon you will start seeing results appear in the run tab.
 
 If you get this far successfully then you will be well on the way to using rfswarm, from here it's just adding more users, additional test cases and more agent machines, until you get the load you need to simulate on your application.

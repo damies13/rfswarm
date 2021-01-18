@@ -38,7 +38,6 @@ All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the [a
 ![Image](Images/MacOS_Plan_v0.6.3_150u_25per10min.png)
 
 > _Plan - Linux (Mint 19.2)_
->
 > ![Image](Images/Linux-v0.5.0_Plan_150u_25per10min.png)
 
 While hopefully this is intuitive, the buttons are (starting top right)
@@ -115,6 +114,7 @@ Once the stop button has been pressed the agents will receive the changed end ti
 This button replaces the Stop button when either of the following happens:
 - You press the Stop button
 - The test reaches the rampdown period after run is complete
+
 Clicking the Abort button will present a warning dialogue like this:
 ![image](Images/MacOS_Run_v0.6.3_Abort_Run_Dialogue.png)
 Clicking yes on this dialogue will instruct the agents to send a sigterm (^C) to the running robots causing them to abort the currently running test and execute any teardown steps and exit.
@@ -142,7 +142,7 @@ Use this to generate csv files suitable for use to create reports for your test 
 ![Image](Images/MacOS_Run_v0.6.3_100u_2h.png "Run - Showing results being collected live")
 
 > _Run - Linux_
-![Image](Images/Linux-v0.5.0_Run_6min.png)
+> ![Image](Images/Linux-v0.5.0_Run_6min.png)
 
 > _Run - Linux Report Saved_
 ![Image](Images/Linux-v0.5.0_Run_Report_prompt.png)
@@ -160,7 +160,7 @@ This is where you can see which agents have connected, number of robots on each 
 ![Image](Images/Agents_stopping_v0.3.png "Agents - Stopping")
 
 > _Agents - Running (Linux)_
-![Image](Images/Linux-v0.5.0_Agents_Running.png)
+> ![Image](Images/Linux-v0.5.0_Agents_Running.png)
 
 New with v0.6.3 this screen now shows the agent's version and a list of robot framework libraries available on the agent.
 

@@ -113,7 +113,7 @@ Robot Framework Swarm: Run Agent
 Server Conected http://DavesMBPSG:8138/ 2020-12-16 19:34:44 ( 1608111284 )
 ```
 
-![Image](Images/Agents_ready_v0.3.png "Agents Ready")
+![Image](Images/MacOS_Agents_ready_v0.6.3.png "Agents Ready")
 
 
 #### 5. Manually install the prerequisites
@@ -143,7 +143,7 @@ Robot Framework Swarm: Run Agent
 Server Conected http://DavesMBPSG:8138/ 2020-12-16 19:34:44 ( 1608111284 )
 ```
 
-![Image](Images/Agents_ready_v0.3.png "Agents Ready")
+![Image](Images/MacOS_Agents_ready_v0.6.3.png "Agents Ready")
 
 
 
