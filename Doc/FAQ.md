@@ -1,3 +1,6 @@
+
+[Index](README.md)
+
 # rfswarm (Robot Framework Swarm) Frequently Asked Questions
 
 ## Can I run the Agent and the GUI/Server on the same machine?

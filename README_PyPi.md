@@ -12,12 +12,12 @@ rfswarm aims to solve this problem by allowing you to take an existing functiona
 
 rfswarm is written completely in python, so if you are already using Robot Framework, then you will already have most of what you need to use rfswarm and will be familiar with pip to get any extra components you need.
 
-To learn more about rfswarm please refer to the [Documentation](https://github.com/damies13/rfswarm/blob/master/Doc/Index.md)
+To learn more about rfswarm please refer to the [Documentation](https://github.com/damies13/rfswarm/blob/master/Doc/README.md)
 
 
 ## Getting Help
 
-- [rfswarm Documentation](https://github.com/damies13/rfswarm/blob/master/Doc/Index.md)
+- [rfswarm Documentation](https://github.com/damies13/rfswarm/blob/master/Doc/README.md)
 - [Discord](https://discord.gg/jJfCMrqCsT)
 - [Reporting Issues / Known Issues](https://github.com/damies13/rfswarm/issues)
 

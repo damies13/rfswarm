@@ -1,5 +1,5 @@
 
-[Index](Index.md)
+[Index](README.md)
 
 ## rfswarm.py (GUI / Server)
 
@@ -287,7 +287,7 @@ The scenarios rfswarm has been designed to cater for:
 1. Need to ensure each agent gets only 1 virtual user each
 2. When there is a low number of virtual user, you want them distributed evenly across all the agents
 3. When the agent machines are a variety of hardware (newer and older machines) you don't want the virtual user distributed evenly across all the agents, but rather you want the more powerful agents to take a larger share of the virtual users to avoid any agent getting overloaded.
-4. Custom filters to Require/Exclude a test group to run on specific agents or groups of agents.
+4. Sometimes you need to apply a custom filter to Require/Exclude a test group to run on specific agents or groups of agents.
 
 How the assignment algorithm works:
 - As the scenario is ready to start the next virtual user the GUI/Server calls the assignment algorithm

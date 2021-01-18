@@ -1,5 +1,5 @@
 
-[Index](Index.md)
+[Index](README.md)
 
 ## Preparing a test case for performance
 
