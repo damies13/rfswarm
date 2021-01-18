@@ -161,16 +161,24 @@ Example Keyword
 Quiet Keyword
     No Operation
 
+Match Keyword
+    [Documentation]    ${TEST NAME}
+    No Operation
+
+
 ```
 
 #### No Operation
 Would not have a timing measured by default because this keyword belongs to the builtin which is one of the default [excludeed libraries](./rfswarm_agent_py.md#exclude-libraries)
 
 #### Example Keyword
-Would have a timing measured by default, this will be reported in the GUI/Server as "TC01 My Example Keyword" along with the time taken to perform the step No Operation
+Would have a timing measured by default, this would be reported in the GUI/Server as "TC01 My Example Keyword" along with the time taken to perform the step No Operation
 
 #### Quiet Keyword
 Would not have a timing measured, because it has no [Documentation], however it will still get executed wherever it is called.
+
+#### Match Keyword
+Would have a timing measured by default, this would be reported in the GUI/Server as "Match Keyword" because the variable ${TEST NAME} gets evaluated by robot framework before being passed to rfswarm via the listener.
 
 
 ### Browser
