@@ -7,6 +7,7 @@ Some of the things you will need to consider when taking a functional or regress
 - [Think Time](#Think-Time)
 - [Useful Variables](#Useful-Variables)
 - [Data Management](#Data-Management)
+- [Keywords](#Keywords)
 - [Browser](#Browser)
 
 ### Think Time
@@ -145,8 +146,41 @@ Both methods demonstrate TestDataTable's functionality, and for more details you
 
 Why is TestDataTable a seperate project? simply because I wanted TestDataTable to be able to be used by other test tools as well, for example there is nothing stopping you to use TestDataTable with your regression test suite to make your test cases shorter and enable them to run in parallel, likewise TestDataTable could be used by other performance test tools like JMeter.
 
+### Keywords
+
+As you will most likely have built your own custom keywords for navigating your AUT, you may want to get the time taken for these keywords, so controlling which keywords are reported to the GUI/Server and which are not is as simple as including or leaving out the [keyword [Documentation]](http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#user-keyword-documentation)
+
+Consider the following keyword examples
+
+```
+*** Keywords ***
+Example Keyword
+    [Documentation]    TC01 My Example Keyword
+    No Operation
+
+Quiet Keyword
+    No Operation
+
+```
+
+#### No Operation
+Would not have a timing measured by default because this keyword belongs to the builtin which is one of the default [excludeed libraries](./rfswarm_agent_py.md#exclude-libraries)
+
+#### Example Keyword
+Would not have a timing measured by default, this will be reported in the GUI/Server as "TC01 My Example Keyword" along with the time taken to perform the step No Operation
+
+#### Quiet Keyword
+Would not have a timing measured, because it has no [Documentation], however it will still get executed wherever it is called.
+
+
 ### Browser
 
+#### [SeleniumLibrary](https://robotframework.org/SeleniumLibrary/)
 For SeleniumLibrary based scripts you will want to use one of the headless browser types as these should use less resources on the agent so this will allow more virtual users per agent machine.
 
 Refer to the [SeleniumLibrary documentation](https://robotframework.org/SeleniumLibrary/SeleniumLibrary.html#Open%20Browser) for the headless browser types, you should run a trial with each type to confirm they work with your application and what the resource cost is for each.
+
+You may also want to consider converting your scripts to run using [Browser Library](#Browser-Library), this is not required for using rfswarm but Browser Library does provide features not available in SeleniumLibrary that you may find useful.
+
+#### [Browser Library](https://robotframework-browser.org/)
+For Browser Library based scripts you will want to use the headless = True option when calling [Open Browser](https://marketsquare.github.io/robotframework-browser/Browser.html#Open%20Browser).
