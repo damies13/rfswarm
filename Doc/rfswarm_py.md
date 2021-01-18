@@ -42,7 +42,9 @@ All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the [a
 > ![Image](Images/Linux-v0.5.0_Plan_150u_25per10min.png)
 
 While hopefully this is intuitive, the buttons are (starting top right)
-|---|
+
+|	|	|	|
+|---|---|---|
 | New	|	![image](Images/GUI_btn_page_white.gif)		| Create a new scenario	|
 | Open	|	![image](Images/GUI_btn_folder_explore.gif)	| Open an existing scenario	|
 | Save	|	![image](Images/GUI_btn_disk.gif)			| Save the current scenario	|
