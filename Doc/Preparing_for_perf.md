@@ -167,7 +167,7 @@ Quiet Keyword
 Would not have a timing measured by default because this keyword belongs to the builtin which is one of the default [excludeed libraries](./rfswarm_agent_py.md#exclude-libraries)
 
 #### Example Keyword
-Would not have a timing measured by default, this will be reported in the GUI/Server as "TC01 My Example Keyword" along with the time taken to perform the step No Operation
+Would have a timing measured by default, this will be reported in the GUI/Server as "TC01 My Example Keyword" along with the time taken to perform the step No Operation
 
 #### Quiet Keyword
 Would not have a timing measured, because it has no [Documentation], however it will still get executed wherever it is called.
@@ -180,7 +180,7 @@ For SeleniumLibrary based scripts you will want to use one of the headless brows
 
 Refer to the [SeleniumLibrary documentation](https://robotframework.org/SeleniumLibrary/SeleniumLibrary.html#Open%20Browser) for the headless browser types, you should run a trial with each type to confirm they work with your application and what the resource cost is for each.
 
-You may also want to consider converting your scripts to run using [Browser Library](#Browser-Library), this is not required for using rfswarm but Browser Library does provide features not available in SeleniumLibrary that you may find useful.
+You may also want to consider converting your scripts to run using [Browser Library](https://robotframework-browser.org/), this is not required for using rfswarm but Browser Library does provide features not available in SeleniumLibrary that you may find useful.
 
 #### [Browser Library](https://robotframework-browser.org/)
 For Browser Library based scripts you will want to use the headless = True option when calling [Open Browser](https://marketsquare.github.io/robotframework-browser/Browser.html#Open%20Browser).
