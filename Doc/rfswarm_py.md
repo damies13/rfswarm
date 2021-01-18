@@ -38,17 +38,27 @@ All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the [a
 ![Image](Images/MacOS_Plan_v0.6.3_150u_25per10min.png)
 
 > _Plan - Linux (Mint 19.2)_
-![Image](Images/Linux-v0.5.0_Plan_150u_25per10min.png)
+>
+> ![Image](Images/Linux-v0.5.0_Plan_150u_25per10min.png)
 
 While hopefully this is intuitive, the buttons are (starting top right)
-- New	|	![image](Images/GUI_btn_page_white.gif)		| Create a new scenario
-- Open	|	![image](Images/GUI_btn_folder_explore.gif)	| Open an existing scenario
-- Save	|	![image](Images/GUI_btn_disk.gif)			| Save the current scenario
-- Play	|	![image](Images/GUI_btn_resultset_next.gif)	| Play the current scenario
-- Add	|	![image](Images/GUI_btn_add.gif)			| Add another test group
-- Select |	![image](Images/GUI_btn_script.gif)			| Select a robot file
-- Settings | ![image](Images/GUI_btn_cog.gif)			| Configure additional settings for robot
-- Remove |	![image](Images/GUI_btn_cross.gif)			| Remove this test group
+|---|
+| New	|	![image](Images/GUI_btn_page_white.gif)		| Create a new scenario	|
+| Open	|	![image](Images/GUI_btn_folder_explore.gif)	| Open an existing scenario	|
+| Save	|	![image](Images/GUI_btn_disk.gif)			| Save the current scenario	|
+| Play	|	![image](Images/GUI_btn_resultset_next.gif)	| Play the current scenario	|
+| Add	|	![image](Images/GUI_btn_add.gif)			| Add another test group	|
+| Select |	![image](Images/GUI_btn_script.gif)			| Select a robot file	|
+| Settings | ![image](Images/GUI_btn_cog.gif)			| Configure additional settings for robot	|
+| Remove |	![image](Images/GUI_btn_cross.gif)			| Remove this test group	|
+
+Additional settings for robot ![image](Images/GUI_btn_cog.gif)
+When clicking on this button a dialogue will be presented that allows you to configure some additional settings for the robot script, by default the dialogue will look like this:
+> ![image](Images/MacOS_Plan_v0.6.3_Test_Settings.png)
+
+Here is an example of configuring the Filter Rules and using the Robot options:
+> ![image](Images/MacOS_Plan_v0.6.3_Test_Settings_Filter_Rules.png)
+
 
 #### Run
 This is where you monitor your test scenario as it runs, here you will see number of robots running, how long the has been running and live updates of the test results.
