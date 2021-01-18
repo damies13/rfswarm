@@ -443,6 +443,7 @@ class RFSwarmBase:
 	scriptcount = 0
 	scriptlist = [{}]
 	scriptfiles = {}
+	scriptgrpend = {}
 
 	uploadfiles = {}
 
@@ -2364,6 +2365,9 @@ class RFSwarmCore:
 								# totusrs += int(grp["Users"])
 								base.debugmsg(9, "totusrs", totusrs)
 
+							if gid not in base.scriptgrpend.keys():
+								base.scriptgrpend[gid] = base.run_start + grp["Delay"] + grp["RampUp"] + grp["Run"]
+
 							time_elapsed = int(time.time()) - base.run_start
 							base.debugmsg(9, 'time_elapsed', time_elapsed, "Delay", grp["Delay"])
 							if time_elapsed > grp["Delay"] - 1:
@@ -2392,7 +2396,7 @@ class RFSwarmCore:
 											"ScriptHash": grp["ScriptHash"],
 											"Test": grp["Test"],
 											"StartTime": int(time.time()),
-											"EndTime": int(time.time()) + grp["Run"],
+											"EndTime": base.scriptgrpend[gid],
 											"id": grurid
 										}
 
