@@ -32,8 +32,8 @@ Additionally the debug (-g) levels 1-3 will give extra information on the consol
 ```
 $ rfswarm-agent -h
 Robot Framework Swarm: Run Agent
-	Version 0.6.1
-usage: rfswarm-agent [-h] [-g DEBUG] [-v] [-i INI] [-s SERVER] [-d AGENTDIR] [-r ROBOT] [-x] [-a AGENTNAME]
+	Version 0.6.3
+usage: rfswarm_agent.py [-h] [-g DEBUG] [-v] [-i INI] [-s SERVER] [-d AGENTDIR] [-r ROBOT] [-x] [-a AGENTNAME] [-p PROPERTY]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -50,15 +50,17 @@ optional arguments:
   -x, --xmlmode         XML Mode, fall back to pasing the output.xml after each iteration
   -a AGENTNAME, --agentname AGENTNAME
                         Set agent name
+  -p PROPERTY, --property PROPERTY
+                        Add a custom property, if multiple properties are required use this argument for each property e.g. -p property1 -p "Property 2"
 ```
 
 If you pass in an unsupported command line option, you will get this prompt:
 ```
 $ rfswarm-agent -?
 Robot Framework Swarm: Run Agent
-	Version 0.6.1
-usage: rfswarm-agent [-h] [-g DEBUG] [-v] [-i INI] [-s SERVER] [-d AGENTDIR] [-r ROBOT] [-x] [-a AGENTNAME]
-rfswarm-agent: error: unrecognized arguments: -?
+	Version 0.6.3
+usage: rfswarm_agent.py [-h] [-g DEBUG] [-v] [-i INI] [-s SERVER] [-d AGENTDIR] [-r ROBOT] [-x] [-a AGENTNAME] [-p PROPERTY]
+rfswarm_agent.py: error: unrecognized arguments: -?
 ```
 
 ### Install and Setup
