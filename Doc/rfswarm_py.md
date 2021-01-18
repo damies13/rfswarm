@@ -55,20 +55,20 @@ While hopefully this is intuitive, the buttons are (starting top right)
 | Remove |	![image](Images/GUI_btn_cross.gif)			| Remove this test group	|
 
 Additional settings for robot ![image](Images/GUI_btn_cog.gif)
-When clicking on this button a dialogue will be presented that allows you to configure some additional settings for the robot script, by default the dialogue will look like this:
+When clicking on this button a dialogue will be presented that allows you to configure some additional settings for the test group, by default the dialogue will look like this:
 > ![image](Images/MacOS_Plan_v0.6.3_Test_Settings.png)
 
 Exclude libraries:
 The default value is "BuiltIn,String,OperatingSystem,perftest", this is the same default value as used in the [agent settings](./rfswarm_agent_py.md#exclude-libraries) and if you leave this default but change the agent the settings set on the agent will override this setting.
 By configuring this setting you can adjust which keyword's response times are reported in the test results.
-If you change this setting here from the default, then for this particular script the agent setting will be overridden with the settings used here
+If you change this setting here from the default, then for this particular test group the agent setting will be overridden with the settings used here
 
-|Agent Exclude libraries Setting|Robot Exclude libraries Setting in scenario|Resulting Exclude libraries passed to robot|
+|agent ini setting|test group setting|result|
 |---|---|---|
 |default|default|default (BuiltIn,String,OperatingSystem,perftest)|
-|configured|default|Agent Exclude libraries Setting|
-|default|configured|Robot Exclude libraries Setting in scenario|
-|configured|configured|Robot Exclude libraries Setting in scenario|
+|configured|default|agent ini setting|
+|default|configured|test group setting|
+|configured|configured|test group setting|
 
 Robot Options:
 By default this setting is blank and in most cases wouldnlt be used, it allows you to pass additional command line options to the robot executable, to find out what options can be passed run
@@ -76,9 +76,9 @@ By default this setting is blank and in most cases wouldnlt be used, it allows y
 On any machine that has Robot Framework installed
 
 Agent Filter:
-You can use this setting to midify the default [agent assignment](#agent-assignment) to require test cases to require agents with particular properties or to exclude agents with particular properties.
+You can use this setting to modify the default [agent assignment](#agent-assignment) to require test cases to require agents with particular properties or to exclude agents with particular properties.
 
-By default there are no Agent filters applied, and the robot script can be run on any available agent.
+By default there are no Agent filters applied, and the test group can be run on any available agent.
 
 Here are some examples of when you might need this setting:
 - Your AUT has a desktop client and a web ui, the tests executed in the desktop client need an agent with Windows os and the web ui scripts can run on any agent that has SeleniumLibrary available
@@ -89,7 +89,7 @@ Here are some examples of when you might need this setting:
 	- on the internal component scripts you add a filter rule that Requires "Corp Network"
 	- on the external component scripts you add a filter rule that Requires "Internet" alternatively you could configure a rule that Excludes "Corp Network"
 
-The combination of multiple require and exclude rules, the default and custom agent properties should allow you to have the control needed to target your scripts to specific agent or groups of agents as needed.
+The combination of multiple require and exclude rules, the default and custom agent properties should allow you to have the control needed to target your test groups to specific agent or groups of agents as needed.
 
 Here is an example of configuring the Filter Rules and using the Robot options:
 > ![image](Images/MacOS_Plan_v0.6.3_Test_Settings_Filter_Rules.png)
@@ -287,11 +287,11 @@ The scenarios rfswarm has been designed to cater for:
 1. Need to ensure each agent gets only 1 virtual user each
 2. When there is a low number of virtual user, you want them distributed evenly across all the agents
 3. When the agent machines are a variety of hardware (newer and older machines) you don't want the virtual user distributed evenly across all the agents, but rather you want the more powerful agents to take a larger share of the virtual users to avoid any agent getting overloaded.
-4. Custom filters to Require/Exclude scripts running on specific agents or groups of agents.
+4. Custom filters to Require/Exclude a test group to run on specific agents or groups of agents.
 
 How the assignment algorithm works:
 - As the scenario is ready to start the next virtual user the GUI/Server calls the assignment algorithm
-- First the agents are checked against the Agent Filter rules for the test that is requiring an agent to be assigned, if the agent passes all the filter rules it is added to the list to be sorted.
+- First the agents are checked against the Agent Filter rules for the test group that is requiring an agent to be assigned, if the agent passes all the filter rules it is added to the list to be sorted.
 - Next the assignment algorithm sorts the agents list by the number of virtual users assigned to each agent
 - The agent with the lowest number of assigned virtual users is selected, there may be several agents with the equal lowest number of virtual users, e.g. at the start of the test all agents equally have zero (0) virtual users assigned, then the first agent from the list with this assigned count is selected.
 - Before returning the selected agent the assigned virtual user count is checked to see if it is greater than 10, if not the selected agent is returned from the assignment algorithm.
