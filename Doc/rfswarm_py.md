@@ -41,13 +41,14 @@ All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the [a
 ![Image](Images/Linux-v0.5.0_Plan_150u_25per10min.png)
 
 While hopefully this is intuitive, the buttons are (starting top right)
-- New			- Create a new scenario
-- Open			- Open an existing scenario
-- Save			- Save the current scenario
-- Play			- Play the current scenario
-- Add (+)		- Add another test group
-- Select (...)	- Select a robot file
-- Remove (X)	- Remove this test group
+- New	|	![image](Images/GUI_btn_page_white.gif)		| Create a new scenario
+- Open	|	![image](Images/GUI_btn_folder_explore.gif)	| Open an existing scenario
+- Save	|	![image](Images/GUI_btn_disk.gif)			| Save the current scenario
+- Play	|	![image](Images/GUI_btn_resultset_next.gif)	| Play the current scenario
+- Add	|	![image](Images/GUI_btn_add.gif)			| Add another test group
+- Select |	![image](Images/GUI_btn_script.gif)			| Select a robot file
+- Settings | ![image](Images/GUI_btn_cog.gif)			| Configure additional settings for robot
+- Remove |	![image](Images/GUI_btn_cross.gif)			| Remove this test group
 
 #### Run
 This is where you monitor your test scenario as it runs, here you will see number of robots running, how long the has been running and live updates of the test results.
@@ -60,11 +61,27 @@ Unique by check boxes:
 %ile (Percentile) field:
 The default value is 90, you can adjust the percentile value between 1% and 99% depending on your application's performance requirements.
 
-Stop button
+Stop button ![image](Images/GUI_btn_stop.gif)
 Use this if you want to stop the test early. You may not notice an immediate reaction as pressing the button just changes the end time on all the test jobs assigned to the current time and stops the ramp-up if the test is still in the ramp-up phase. While there is no benefit to pressing the stop button multiple times there is no harm either, so press to your hearts content.
+
 Once the stop button has been pressed the agents will receive the changed end time when they [poll](./rfswarm_agent_py.md#agent-polling-of-the-guiserver) the GUI/Server next, the agent will change status to stopping which will be returned on the next poll interval and the agent will not start a new iteration for the running tests, however the ones currently running will be allowed to complete.
 
-CSV Report button
+Abort button ![image](Images/GUI_btn_bomb.gif)
+This button replaces the Stop button when either of the following happens:
+- You press the Stop button
+- The test reaches the rampdown period after run is complete
+Clicking the Abort button will present a warning dialogue like this:
+![image](Images/MacOS_Run_v0.6.3_Abort_Run_Dialogue.png)
+Clicking yes on this dialogue will instruct the agents to send a sigterm (^C) to the running robots causing them to abort the currently running test and execute any teardown steps and exit.
+You would normally only use this option if your AUT has crashed and you need to stop applying load to the system.
+
+Disabled Stop button ![image](Images/GUI_btn_stop_grey.gif)
+This button replaces the Stop/Abort buttons when either of the following happens
+- You clicked yes to abort the run
+- The test completes rampdown
+Clicking this button does nothing.
+
+CSV Report button ![image](Images/GUI_btn_report.gif)
 Use this to generate csv files suitable for use to create reports for your test run, there will be three files generated:
 - A Summary file, this is the same data as on the run screen
 - A Raw Results file, the is every data point recorded, useful if you want create response time graphs
@@ -99,6 +116,8 @@ This is where you can see which agents have connected, number of robots on each 
 
 > _Agents - Running (Linux)_
 ![Image](Images/Linux-v0.5.0_Agents_Running.png)
+
+New with v0.6.3 this screen now shows the agent's version and a list of robot framework libraries available on the agent.
 
 ### Command Line Interface
 
