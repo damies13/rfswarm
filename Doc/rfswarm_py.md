@@ -106,12 +106,12 @@ Unique by check boxes:
 %ile (Percentile) field:
 The default value is 90, you can adjust the percentile value between 1% and 99% depending on your application's performance requirements.
 
-Stop button ![image](Images/GUI_btn_stop.gif)
+##### Stop button ![image](Images/GUI_btn_stop.gif)
 Use this if you want to stop the test early. You may not notice an immediate reaction as pressing the button just changes the end time on all the test jobs assigned to the current time and stops the ramp-up if the test is still in the ramp-up phase. While there is no benefit to pressing the stop button multiple times there is no harm either, so press to your hearts content.
 
 Once the stop button has been pressed the agents will receive the changed end time when they [poll](./rfswarm_agent_py.md#agent-polling-of-the-guiserver) the GUI/Server next, the agent will change status to stopping which will be returned on the next poll interval and the agent will not start a new iteration for the running tests, however the ones currently running will be allowed to complete.
 
-Abort button ![image](Images/GUI_btn_bomb.gif)
+##### Abort button ![image](Images/GUI_btn_bomb.gif)
 This button replaces the Stop button when either of the following happens:
 - You press the Stop button
 - The test reaches the rampdown period after run is complete
@@ -120,13 +120,13 @@ Clicking the Abort button will present a warning dialogue like this:
 Clicking yes on this dialogue will instruct the agents to send a sigterm (^C) to the running robots causing them to abort the currently running test and execute any teardown steps and exit.
 You would normally only use this option if your AUT has crashed and you need to stop applying load to the system.
 
-Disabled Stop button ![image](Images/GUI_btn_stop_grey.gif)
+##### Disabled Stop button ![image](Images/GUI_btn_stop_grey.gif)
 This button replaces the Stop/Abort buttons when either of the following happens
 - You clicked yes to abort the run
 - The test completes rampdown
 Clicking this button does nothing.
 
-CSV Report button ![image](Images/GUI_btn_report.gif)
+##### CSV Report button ![image](Images/GUI_btn_report.gif)
 Use this to generate csv files suitable for use to create reports for your test run, there will be three files generated:
 - A Summary file, this is the same data as on the run screen
 - A Raw Results file, the is every data point recorded, useful if you want create response time graphs
