@@ -666,6 +666,8 @@ class RFSwarmBase:
 
 
 			time.sleep(0.1)
+			# end of while base.run_dbthread
+
 		if self.datadb is not None:
 			self.datadb.close()
 			self.datadb = None
@@ -1636,10 +1638,11 @@ class RFSwarmBase:
 		return self.MetricIDs[MetricType][MetricName]
 
 	def save_metrics(self, PMetricName, MetricType, MetricTime, SMetricName, MetricValue):
-		self.debugmsg(7, PMetricName, MetricType, MetricTime, SMetricName, MetricValue)
-		metricid = self.create_metric(PMetricName, MetricType)
-		self.debugmsg(7, "metricid:", metricid, MetricTime, SMetricName, MetricValue)
-		self.dbqueue["Metrics"].append( (metricid, MetricTime, SMetricName, MetricValue) )
+		if self.datadb is not None:
+			self.debugmsg(7, PMetricName, MetricType, MetricTime, SMetricName, MetricValue)
+			metricid = self.create_metric(PMetricName, MetricType)
+			self.debugmsg(7, "metricid:", metricid, MetricTime, SMetricName, MetricValue)
+			self.dbqueue["Metrics"].append( (metricid, MetricTime, SMetricName, MetricValue) )
 
 	def add_scriptfilter(self, filtername):
 		self.debugmsg(7, "filtername:", filtername, self.scriptfilters)
