@@ -157,7 +157,7 @@ This is where you can see which agents have connected, number of robots on each 
 ![Image](Images/MacOS_Agents_running_warning_v0.6.3.png "Agents - Running / Warning")
 
 > _Agents - Stopping_
-![Image](Images/Agents_stopping_v0.3.png "Agents - Stopping")
+![Image](Images/MacOS_Agents_stopping_v0.6.3.png "Agents - Stopping")
 
 > _Agents - Running (Linux)_
 > ![Image](Images/Linux-v0.5.0_Agents_Running.png)

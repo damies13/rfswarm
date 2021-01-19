@@ -14,10 +14,6 @@
 
 ### v0.6.3
 
-![Image](Images/MacOS_Agents_ready_v0.6.3.png)
-![Image](Images/MacOS_Agents_running_v0.6.3.png)
-![Image](Images/MacOS_Agents_running_warning_v0.6.3.png)
-
 ![Image](Images/MacOS_Plan_New_v0.6.3.png)
 ![Image](Images/MacOS_Plan_saved_opened_v0.6.3.png)
 ![Image](Images/MacOS_Plan_v0.6.3_150u_25per10min.png)
@@ -34,6 +30,11 @@
 ![Image](Images/MacOS_Run_v0.6.3_Bomb_Run.png)
 ![Image](Images/MacOS_Run_v0.6.3_Finished.png)
 ![Image](Images/MacOS_Run_v0.6.3_Rampdown.png)
+
+![Image](Images/MacOS_Agents_ready_v0.6.3.png)
+![Image](Images/MacOS_Agents_running_v0.6.3.png)
+![Image](Images/MacOS_Agents_running_warning_v0.6.3.png)
+![Image](Images/MacOS_Agents_stopping_v0.6.3.png)
 
 
 ### v0.5.0
