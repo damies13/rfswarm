@@ -116,6 +116,7 @@ class AgentServer(BaseHTTPRequestHandler):
 	def do_HEAD(self):
 		return
 	def do_POST(self):
+		threadstart = time.time()
 		httpcode = 200
 		try:
 			parsed_path = urllib.parse.urlparse(self.path)
@@ -340,8 +341,12 @@ class AgentServer(BaseHTTPRequestHandler):
 		self.send_response(httpcode)
 		self.end_headers()
 		self.wfile.write(bytes(message,"utf-8"))
+		threadend = time.time()
+		# base.debugmsg(5, parsed_path.path, "	threadstart:", "%.3f" % threadstart, "threadend:", "%.3f" % threadend, "Time Taken:", "%.3f" % (threadend-threadstart))
+		base.debugmsg(5, "%.3f" % (threadend-threadstart), "seconds for ", parsed_path.path)
 		return
 	def do_GET(self):
+		threadstart = time.time()
 		httpcode = 200
 		try:
 			parsed_path = urllib.parse.urlparse(self.path)
@@ -418,6 +423,9 @@ class AgentServer(BaseHTTPRequestHandler):
 		self.send_response(httpcode)
 		self.end_headers()
 		self.wfile.write(bytes(message,"utf-8"))
+		threadend = time.time()
+		# base.debugmsg(5, parsed_path.path, "		threadstart:", "%.3f" % threadstart, "threadend:", "%.3f" % threadend, "Time Taken:", "%.3f" % (threadend-threadstart))
+		base.debugmsg(5, "%.3f" % (threadend-threadstart), "seconds for ", parsed_path.path)
 		return
 	def handle_http(self):
 		return
@@ -1122,7 +1130,7 @@ class RFSwarmBase:
 		try:
 			localfile = self.uploadfiles[hash]['LocalFile']
 			# self.uploadfiles[hash]['File'] = jsonresp['File']
-			base.debugmsg(5, "file:", localfile, "hash:", hash)
+			base.debugmsg(3, "file:", localfile, "hash:", hash)
 
 			# self.scriptlist[hash][]
 
@@ -2057,7 +2065,6 @@ class RFSwarmCore:
 		base.debugmsg(9, "register_result: dbqueue Results:", base.dbqueue["Results"])
 
 		if not base.args.nogui:
-			time.sleep(1)
 			ut = threading.Thread(target=base.gui.delayed_UpdateRunStats)
 			ut.start()
 
@@ -2365,7 +2372,7 @@ class RFSwarmCore:
 								# totusrs += int(grp["Users"])
 								base.debugmsg(9, "totusrs", totusrs)
 
-							if gid not in base.scriptgrpend.keys():
+							if gid not in base.scriptgrpend.keys() or base.scriptgrpend[gid] < base.run_start:
 								base.scriptgrpend[gid] = base.run_start + grp["Delay"] + grp["RampUp"] + grp["Run"]
 
 							time_elapsed = int(time.time()) - base.run_start

@@ -693,10 +693,15 @@ class RFSwarmAgent():
 
 				self.debugmsg(6, "run_t:", run_t)
 
-				if run_t and self.jobs[jobid]["StartTime"] < int(time.time()) < self.jobs[jobid]["EndTime"]:
-					t = threading.Thread(target=self.runthread, args=(jobid, ))
-					t.start()
-					self.jobs[jobid]["Thread"] = t
+				if run_t:
+					self.debugmsg(5, "jobid:", jobid, "run_t:", run_t, "StartTime:", self.jobs[jobid]["StartTime"], "< Now:", int(time.time()), "< EndTime:", self.jobs[jobid]["EndTime"])
+					if self.jobs[jobid]["StartTime"] < int(time.time()) < self.jobs[jobid]["EndTime"]:
+						t = threading.Thread(target=self.runthread, args=(jobid, ))
+						t.start()
+						self.jobs[jobid]["Thread"] = t
+						self.debugmsg(5, "Thread started for jobid:", jobid)
+					else:
+						self.debugmsg(5, "Thread not started for jobid:", jobid)
 				time.sleep(0.1)
 
 
