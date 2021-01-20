@@ -248,7 +248,7 @@ class RFSwarmAgent():
 		self.debugmsg(6, "mainloop")
 		prev_status = self.status
 		while True:
-			self.debugmsg(2, "Running", datetime.now().isoformat(sep=' ',timespec='seconds'),
+			self.debugmsg(2, self.status, datetime.now().isoformat(sep=' ',timespec='seconds'),
 				"(",int(time.time()),")",
 				"isconnected:", self.isconnected,
 				"isrunning:", self.isrunning,
@@ -282,16 +282,20 @@ class RFSwarmAgent():
 					t2 = threading.Thread(target=self.runjobs)
 					t2.start()
 				else:
-					self.status = "Ready"
 					self.mainloopinterval = 10
-					t2 = threading.Thread(target=self.getscripts)
-					t2.start()
+					if len(self.upload_queue)>0:
+						self.status = "Uploading ({})".format(len(self.upload_queue))
+						self.debugmsg(5, "self.status:", self.status, "len(self.upload_queue):", len(self.upload_queue))
+						t3 = threading.Thread(target=self.process_file_upload_queue)
+						t3.start()
+					else:
+						self.status = "Ready"
+						t2 = threading.Thread(target=self.getscripts)
+						t2.start()
 
-					t3 = threading.Thread(target=self.process_file_upload_queue)
-					t3.start()
 
 
-			if prev_status == "Stopping" and self.status == "Ready":
+			if (prev_status == "Stopping" or "Uploading" in prev_status) and self.status == "Ready":
 				# neet to reset something
 				# I guess we can just reset the jobs disctionary?
 				self.jobs = {}
@@ -673,35 +677,36 @@ class RFSwarmAgent():
 	def runjobs(self):
 		self.debugmsg(6, "runjobs: self.jobs:", self.jobs)
 		workingkeys = list(self.jobs.keys())
-		for jobid in workingkeys:
-			if jobid in self.jobs.keys():
-				self.debugmsg(6, "runjobs: jobid:", jobid)
-				run_t = True
-				if "Thread" in self.jobs[jobid].keys():
-					self.debugmsg(7, "jobid:", self.jobs[jobid])
-					try:
-						# if self.jobs[jobid]["Thread"].isAlive():
-						# The isAlive syntax above was perviously working in python < 3.7
-						# but appears to have been removed in 3.9.1? it was depricated in 2.x?
-						# and the is_alive syntax below has been available since python version 2.6
-						if self.jobs[jobid]["Thread"].is_alive():
+		if not self.isstopping:
+			for jobid in workingkeys:
+				if jobid in self.jobs.keys():
+					self.debugmsg(6, "runjobs: jobid:", jobid)
+					run_t = True
+					if "Thread" in self.jobs[jobid].keys():
+						self.debugmsg(7, "jobid:", self.jobs[jobid])
+						try:
+							# if self.jobs[jobid]["Thread"].isAlive():
+							# The isAlive syntax above was perviously working in python < 3.7
+							# but appears to have been removed in 3.9.1? it was depricated in 2.x?
+							# and the is_alive syntax below has been available since python version 2.6
+							if self.jobs[jobid]["Thread"].is_alive():
+								run_t = False
+								self.debugmsg(7, "Thread already running run_t:", run_t)
+						except Exception as e:
 							run_t = False
-							self.debugmsg(7, "Thread already running run_t:", run_t)
-					except Exception as e:
-						run_t = False
-						self.debugmsg(5, "Thread running check failed run_t:", run_t, e)
+							self.debugmsg(5, "Thread running check failed run_t:", run_t, e)
 
-				self.debugmsg(6, "run_t:", run_t)
+					self.debugmsg(6, "run_t:", run_t)
 
-				if run_t:
-					self.debugmsg(5, "jobid:", jobid, "run_t:", run_t, "StartTime:", self.jobs[jobid]["StartTime"], "< Now:", int(time.time()), "< EndTime:", self.jobs[jobid]["EndTime"])
-					if self.jobs[jobid]["StartTime"] < int(time.time()) < self.jobs[jobid]["EndTime"]:
-						t = threading.Thread(target=self.runthread, args=(jobid, ))
-						t.start()
-						self.jobs[jobid]["Thread"] = t
-						self.debugmsg(5, "Thread started for jobid:", jobid)
-					else:
-						self.debugmsg(5, "Thread not started for jobid:", jobid)
+					if run_t:
+						self.debugmsg(5, "jobid:", jobid, "run_t:", run_t, "StartTime:", self.jobs[jobid]["StartTime"], "< Now:", int(time.time()), "< EndTime:", self.jobs[jobid]["EndTime"])
+						if self.jobs[jobid]["StartTime"] < int(time.time()) < self.jobs[jobid]["EndTime"]:
+							t = threading.Thread(target=self.runthread, args=(jobid, ))
+							t.start()
+							self.jobs[jobid]["Thread"] = t
+							self.debugmsg(5, "Thread started for jobid:", jobid)
+						else:
+							self.debugmsg(5, "Thread not started for jobid:", jobid)
 				time.sleep(0.1)
 
 
@@ -998,7 +1003,8 @@ class RFSwarmAgent():
 
 
 		# once sucessful remove from queue
-		self.upload_queue.remove(fileobj)
+		if fileobj in self.upload_queue:
+			self.upload_queue.remove(fileobj)
 
 
 	def hash_file(self, file, relpath):
@@ -1023,6 +1029,7 @@ class RFSwarmAgent():
 			# self.file_upload(fobj)
 			t = threading.Thread(target=self.file_upload, args=(fobj,))
 			t.start()
+			time.sleep(0.5)
 
 
 	def run_process_output(self, outputFile, index, vuser, iter):
