@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version v0.6.2
+#    Version 0.6.3
 #
 
 # 	Helpful links
@@ -11,6 +11,7 @@
 #
 
 import sys
+import platform
 import signal
 import os
 import glob
@@ -115,13 +116,16 @@ class AgentServer(BaseHTTPRequestHandler):
 	def do_HEAD(self):
 		return
 	def do_POST(self):
+		threadstart = time.time()
 		httpcode = 200
 		try:
 			parsed_path = urllib.parse.urlparse(self.path)
-			if (parsed_path.path in ["/AgentStatus", "/Jobs", "/Scripts", "/File", "/Result"]):
+			base.debugmsg(7, "parsed_path.path", parsed_path.path)
+			if (parsed_path.path in ["/AgentStatus", "/Jobs", "/Scripts", "/File", "/Result", "/Metric"]):
 
 				jsonresp = {}
 				rawData = (self.rfile.read(int(self.headers['content-length']))).decode('utf-8')
+				base.debugmsg(7, "rawData: ", rawData)
 				base.debugmsg(9, "parsed_path.path", parsed_path.path)
 				if (parsed_path.path == "/AgentStatus"):
 					jsonreq = json.loads(rawData)
@@ -298,7 +302,33 @@ class AgentServer(BaseHTTPRequestHandler):
 						jsonresp["Result"] = "Queued"
 						base.debugmsg(7, "Result: jsonresp[\"Result\"]:", jsonresp["Result"])
 
-				base.debugmsg(8, "jsonresp:", jsonresp)
+
+				if (parsed_path.path == "/Metric"):
+					base.debugmsg(7, "Metric")
+					jsonreq = json.loads(rawData)
+					base.debugmsg(7, "Metric: jsonreq:", jsonreq)
+					requiredfields = ["PrimaryMetric", "MetricType", "MetricTime", "SecondaryMetrics"]
+					for field in requiredfields:
+						if field not in jsonreq:
+							httpcode = 422
+							message = "Missing required field: '{}', required fields are: {}".format(field, requiredfields)
+							base.debugmsg(9, httpcode, ":", message)
+							break
+
+					if httpcode == 200:
+						base.debugmsg(7, "Result: httpcode:", httpcode)
+						jsonresp["Metric"] = jsonreq["PrimaryMetric"]
+
+						# core.register_metric(jsonreq["PrimaryMetric"], jsonreq["MetricType"], jsonreq["MetricTime"], jsonreq["SecondaryMetrics"])
+						t = threading.Thread(target=core.register_metric, args=(jsonreq["PrimaryMetric"], jsonreq["MetricType"], jsonreq["MetricTime"], jsonreq["SecondaryMetrics"], ))
+						t.start()
+
+						jsonresp["Result"] = "Queued"
+						base.debugmsg(7, "Metric: jsonresp[\"Metric\"]:", jsonresp["Metric"])
+
+
+
+				base.debugmsg(7, "jsonresp:", jsonresp)
 				message = json.dumps(jsonresp)
 			else:
 				httpcode = 404
@@ -311,8 +341,12 @@ class AgentServer(BaseHTTPRequestHandler):
 		self.send_response(httpcode)
 		self.end_headers()
 		self.wfile.write(bytes(message,"utf-8"))
+		threadend = time.time()
+		# base.debugmsg(5, parsed_path.path, "	threadstart:", "%.3f" % threadstart, "threadend:", "%.3f" % threadend, "Time Taken:", "%.3f" % (threadend-threadstart))
+		base.debugmsg(5, "%.3f" % (threadend-threadstart), "seconds for ", parsed_path.path)
 		return
 	def do_GET(self):
+		threadstart = time.time()
 		httpcode = 200
 		try:
 			parsed_path = urllib.parse.urlparse(self.path)
@@ -362,6 +396,21 @@ class AgentServer(BaseHTTPRequestHandler):
 				jsonresp["POST"]["Result"]["Body"]["Iteration"] = "<iteration number>"
 				jsonresp["POST"]["Result"]["Body"]["Sequence"] = "<sequence number that ResultName occurred in test case>"
 
+
+				jsonresp["POST"]["Metric"] = {}
+				jsonresp["POST"]["Metric"]["URI"] = "/Metric"
+				jsonresp["POST"]["Metric"]["Body"] = {}
+				jsonresp["POST"]["Metric"]["Body"]["PrimaryMetric"] = "<Primary Metric Name, e.g. AUT Hostname>"
+				jsonresp["POST"]["Metric"]["Body"]["MetricType"] = "<Metric Type, e.g. AUT Web Server>"
+				jsonresp["POST"]["Metric"]["Body"]["MetricTime"] = "<Epoch time the metric was recorded>"
+				jsonresp["POST"]["Metric"]["Body"]["SecondaryMetrics"] = {}
+				jsonresp["POST"]["Metric"]["Body"]["SecondaryMetrics"]["Secondary Metric Name, e.g. CPU%"] = "<Value, e.g. 60>"
+				jsonresp["POST"]["Metric"]["Body"]["SecondaryMetrics"]["Secondary Metric Name, e.g. MEMUser"] = "<Value, e.g. 256Mb>"
+				jsonresp["POST"]["Metric"]["Body"]["SecondaryMetrics"]["Secondary Metric Name, e.g. MEMSys"] = "<Value, e.g. 1Gb>"
+				jsonresp["POST"]["Metric"]["Body"]["SecondaryMetrics"]["Secondary Metric Name, e.g. MEMFree"] = "<Value, e.g. 2Gb>"
+				jsonresp["POST"]["Metric"]["Body"]["SecondaryMetrics"]["Secondary Metric Name, e.g. CPUCount"] = "<Value>, e.g. 4"
+
+
 				message = json.dumps(jsonresp)
 			else:
 				httpcode = 404
@@ -374,6 +423,9 @@ class AgentServer(BaseHTTPRequestHandler):
 		self.send_response(httpcode)
 		self.end_headers()
 		self.wfile.write(bytes(message,"utf-8"))
+		threadend = time.time()
+		# base.debugmsg(5, parsed_path.path, "		threadstart:", "%.3f" % threadstart, "threadend:", "%.3f" % threadend, "Time Taken:", "%.3f" % (threadend-threadstart))
+		base.debugmsg(5, "%.3f" % (threadend-threadstart), "seconds for ", parsed_path.path)
 		return
 	def handle_http(self):
 		return
@@ -388,7 +440,7 @@ class AgentServer(BaseHTTPRequestHandler):
 
 
 class RFSwarmBase:
-	version="v0.6.2"
+	version="0.6.3"
 	debuglvl = 0
 
 	config = None
@@ -399,6 +451,7 @@ class RFSwarmBase:
 	scriptcount = 0
 	scriptlist = [{}]
 	scriptfiles = {}
+	scriptgrpend = {}
 
 	uploadfiles = {}
 
@@ -432,7 +485,9 @@ class RFSwarmBase:
 	datapath = ""
 	dbfile = ""
 	datadb = None
-	dbqueue = {"Write": [], "Read": [], "ReadResult": {}, "Agents": [], "Results": []}
+	dbqueue = {"Write": [], "Read": [], "ReadResult": {}, "Results": [], "Metric": [], "Metrics": []}
+	MetricIDs = {}
+	scriptfilters = [""]
 
 	# #000000 = Black
 	defcolours = ['#000000']
@@ -506,69 +561,7 @@ class RFSwarmBase:
 
 			if self.datadb is not None:
 
-				if len(base.dbqueue["Write"])>0:
-					base.debugmsg(9, "run_db_thread: dbqueue: Write")
-					tmpq = list(base.dbqueue["Write"])
-					base.dbqueue["Write"] = []
-					base.debugmsg(9, "run_db_thread: dbqueue: Write: tmpq:", tmpq)
-					for item in tmpq:
-						if item["SQL"] and item["VALUES"]:
-							try:
-								base.debugmsg(9, "run_db_thread: dbqueue: Write: SQL:", item["SQL"], " 	VALUES:", item["VALUES"])
-								cur = self.datadb.cursor()
-								cur.execute(item["SQL"], item["VALUES"])
-								cur.close()
-								self.datadb.commit()
-							except Exception as e:
-								base.debugmsg(6, "run_db_thread: dbqueue: Write: Exception:", e)
-								base.debugmsg(6, "run_db_thread: dbqueue: Write: Item:", item)
-						else:
-							print("run_db_thread: dbqueue: Write: Item not written, missing key SQL or VALUES")
-							print("run_db_thread: dbqueue: Write: Item:", item)
-
-				if len(base.dbqueue["Read"])>0:
-					base.debugmsg(9, "run_db_thread: dbqueue: Read")
-					tmpq = list(base.dbqueue["Read"])
-					base.dbqueue["Read"] = []
-					base.debugmsg(9, "run_db_thread: dbqueue: Read: tmpq:", tmpq)
-					for item in tmpq:
-						if "SQL" in item: # and item["VALUES"]:
-							try:
-								base.debugmsg(9, "run_db_thread: dbqueue: Read: SQL:", item["SQL"])
-								self.datadb.row_factory = self.dict_factory
-								cur = self.datadb.cursor()
-								cur.execute(item["SQL"])
-								result = cur.fetchall()
-								base.debugmsg(9, "run_db_thread: dbqueue: Read: result:", result)
-								cur.close()
-								self.datadb.commit()
-
-								base.debugmsg(9, "run_db_thread: dbqueue: Read: result:", result)
-								if "KEY" in item:
-									base.dbqueue["ReadResult"][item["KEY"]] = result
-
-							except Exception as e:
-								base.debugmsg(6, "run_db_thread: dbqueue: Read: Exception:", e)
-								base.debugmsg(6, "run_db_thread: dbqueue: Read: Item:", item)
-						else:
-							print("run_db_thread: dbqueue: Read: Item not written, missing key SQL or VALUES")
-							print("run_db_thread: dbqueue: Read: Item:", item)
-
-				# Agents
-				if len(base.dbqueue["Agents"])>0:
-					base.debugmsg(9, "run_db_thread: dbqueue: Agents")
-					agntdata = list(base.dbqueue["Agents"])
-					base.dbqueue["Agents"] = []
-					base.debugmsg(9, "run_db_thread: dbqueue: Agents: agntdata:", agntdata)
-					try:
-						sql = "INSERT INTO Agents VALUES (?,?,?,?,?,?,?,?)"
-						cur = self.datadb.cursor()
-						cur.executemany(sql, agntdata)
-						cur.close()
-						self.datadb.commit()
-					except Exception as e:
-						base.debugmsg(6, "run_db_thread: dbqueue: Agents: Exception:", e)
-						base.debugmsg(6, "run_db_thread: dbqueue: Results: ", sql, agntdata)
+				# process db queues
 
 				# Results
 				if len(base.dbqueue["Results"])>0:
@@ -583,10 +576,98 @@ class RFSwarmBase:
 						cur.close()
 						self.datadb.commit()
 					except Exception as e:
-						base.debugmsg(6, "run_db_thread: dbqueue: Results: Exception:", e)
-						base.debugmsg(6, "run_db_thread: dbqueue: Results: ", sql, resdata)
+						base.debugmsg(1, "run_db_thread: dbqueue: Results: Exception:", e)
+						base.debugmsg(1, "run_db_thread: dbqueue: Results: ", sql, resdata)
+
+
+				# Metric
+				if len(base.dbqueue["Metric"])>0:
+					base.debugmsg(9, "run_db_thread: dbqueue: Metric")
+					resdata = list(base.dbqueue["Metric"])
+					base.dbqueue["Metric"] = []
+					base.debugmsg(9, "run_db_thread: dbqueue: Metric: resdata:", resdata)
+					try:
+						sql = "INSERT OR IGNORE INTO Metric VALUES (?,?)"
+						cur = self.datadb.cursor()
+						cur.executemany(sql, resdata)
+						cur.close()
+						self.datadb.commit()
+					except Exception as e:
+						base.debugmsg(1, "run_db_thread: dbqueue: Metric: Exception:", e)
+						base.debugmsg(1, "run_db_thread: dbqueue: Metric: ", sql, resdata)
+
+				# Metrics
+				if len(base.dbqueue["Metrics"])>0:
+					base.debugmsg(9, "run_db_thread: dbqueue: Metrics")
+					resdata = list(base.dbqueue["Metrics"])
+					base.dbqueue["Metrics"] = []
+					base.debugmsg(9, "run_db_thread: dbqueue: Metrics: resdata:", resdata)
+					try:
+						sql = "INSERT INTO Metrics VALUES (?,?,?,?)"
+						cur = self.datadb.cursor()
+						cur.executemany(sql, resdata)
+						cur.close()
+						self.datadb.commit()
+					except Exception as e:
+						base.debugmsg(1, "run_db_thread: dbqueue: Metrics: Exception:", e)
+						base.debugmsg(1, "run_db_thread: dbqueue: Metrics: ", sql, resdata)
+
+
+				# General Write
+				if len(base.dbqueue["Write"])>0:
+					base.debugmsg(9, "run_db_thread: dbqueue: Write")
+					tmpq = list(base.dbqueue["Write"])
+					base.dbqueue["Write"] = []
+					base.debugmsg(9, "run_db_thread: dbqueue: Write: tmpq:", tmpq)
+					for item in tmpq:
+						if item["SQL"] and item["VALUES"]:
+							try:
+								base.debugmsg(9, "run_db_thread: dbqueue: Write: SQL:", item["SQL"], " 	VALUES:", item["VALUES"])
+								cur = self.datadb.cursor()
+								cur.execute(item["SQL"], item["VALUES"])
+								cur.close()
+								self.datadb.commit()
+							except Exception as e:
+								base.debugmsg(1, "run_db_thread: dbqueue: Write: Exception:", e)
+								base.debugmsg(1, "run_db_thread: dbqueue: Write: Item:", item)
+						else:
+							base.debugmsg(1, "run_db_thread: dbqueue: Write: Item not written, missing key SQL or VALUES")
+							base.debugmsg(1, "run_db_thread: dbqueue: Write: Item:", item)
+
+				# General Read
+				if len(base.dbqueue["Read"])>0:
+					base.debugmsg(7, "run_db_thread: dbqueue: Read")
+					tmpq = list(base.dbqueue["Read"])
+					base.dbqueue["Read"] = []
+					base.debugmsg(7, "run_db_thread: dbqueue: Read: tmpq:", tmpq)
+					for item in tmpq:
+						if "SQL" in item: # and item["VALUES"]:
+							try:
+								base.debugmsg(7, "run_db_thread: dbqueue: Read: SQL:", item["SQL"])
+								self.datadb.row_factory = self.dict_factory
+								cur = self.datadb.cursor()
+								cur.execute(item["SQL"])
+								result = cur.fetchall()
+								base.debugmsg(7, "run_db_thread: dbqueue: Read: result:", result)
+								cur.close()
+								self.datadb.commit()
+
+								base.debugmsg(7, "run_db_thread: dbqueue: Read: result:", result)
+								if "KEY" in item:
+									base.dbqueue["ReadResult"][item["KEY"]] = result
+
+							except Exception as e:
+								base.debugmsg(1, "run_db_thread: dbqueue: Read: Exception:", e)
+								base.debugmsg(1, "run_db_thread: dbqueue: Read: Item:", item)
+						else:
+							base.debugmsg(1, "run_db_thread: dbqueue: Read: Item not written, missing key SQL or VALUES")
+							base.debugmsg(1, "run_db_thread: dbqueue: Read: Item:", item)
+
+
 
 			time.sleep(0.1)
+			# end of while base.run_dbthread
+
 		if self.datadb is not None:
 			self.datadb.close()
 			self.datadb = None
@@ -635,32 +716,208 @@ class RFSwarmBase:
 			if createschema:
 				c = self.datadb.cursor()
 				# create tables
-				c.execute('''CREATE TABLE Agents
-					(agent text, status text, last_seen date, robots int, load num, cpu num, mem num, net num)''')
 
 				c.execute('''CREATE TABLE Results
 					(script_index int, virtual_user int, iteration int, agent text, sequence int, result_name text, result text, elapsed_time num, start_time num, end_time num)''')
 
+				c.execute('''CREATE TABLE Metric
+					(Name TEXT NOT NULL, Type TEXT NOT NULL, PRIMARY KEY("Name"))''')
+
+				c.execute('''CREATE TABLE Metrics
+					(ParentID INTEGER NOT NULL, Time INTEGER NOT NULL, Key TEXT NOT NULL, Value TEXT)''')
+
+
 				# create indexes?
+				c.execute('''
+				CREATE INDEX "idx_metric_type" ON "Metric" ("Type"	ASC)
+				''')
+
+				c.execute('''
+				CREATE INDEX "idx_metrics_parentid_key" ON "Metrics" ( "ParentID"	ASC, "Key"	ASC)
+				''')
+
+				c.execute('''
+				CREATE INDEX "idx_metrics_parentid_time_key" ON "Metrics" ( "ParentID"	ASC, "Time"	ASC, "Key"	ASC)
+				''')
+
 
  				# create views
 
 				c.execute('''
-				CREATE VIEW "Summary" AS SELECT
-					r.result_name,
-					min(rp.elapsed_time) "min", avg(rp.elapsed_time) "avg", max(rp.elapsed_time)  "max",
-					count(rp.result) as _pass,
-					count(rf.result) as _fail,
-					count(ro.result) as _other
-
+				CREATE VIEW "Summary" AS
+				SELECT
+					r.result_name
+					, min(rp.elapsed_time) "min", avg(rp.elapsed_time) "avg", max(rp.elapsed_time)  "max"
+					, count(rp.result) as _pass
+					, (Select count(rf.result) from Results as rf where r.rowid == rf.rowid AND rf.result == "FAIL" ) _fail
+					, (Select count(ro.result) from Results as ro where r.rowid == ro.rowid AND ro.result <> "PASS" AND ro.result <> "FAIL" ) _other
 				FROM Results as r
 					LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == "PASS"
-					LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == "FAIL"
-					LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> "PASS" AND ro.result <> "FAIL"
 				GROUP BY
 					r.result_name
 				ORDER BY r.sequence
 				''')
+
+				#
+				# SELECT
+				# 	r.result_name,
+				# 	min(rp.elapsed_time) "min", avg(rp.elapsed_time) "avg", max(rp.elapsed_time)  "max",
+				# 	count(rp.result) as _pass,
+				# 	count(rf.result) as _fail,
+				# 	count(ro.result) as _other
+				#
+				# FROM Results as r
+				# 	LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == "PASS"
+				# 	LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == "FAIL"
+				# 	LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> "PASS" AND ro.result <> "FAIL"
+				# GROUP BY
+				# 	r.result_name
+				# ORDER BY r.sequence
+
+				c.execute('''
+				CREATE VIEW "AgentList" as
+				SELECT
+					a.Name "AgentName"
+					, s.Value "AgentStatus"
+					, max(s.Time) as "AgentLastSeen"
+						, (Select ra.Value from Metrics ra where ra.ParentID = a.ROWID and ra.Key = "AssignedRobots"  and ra.Time = s.Time) "AgentAssigned"
+						, (Select r.Value from Metrics r where r.ParentID = a.ROWID and r.Key = "Robots"  and r.Time = s.Time) "AgentRobots"
+						, (Select max(l.Value) from Metrics l where l.ParentID = a.ROWID and l.Key = "Load"  and l.Time = s.Time) "AgentLoad"
+						, (Select max(c.Value) from Metrics c where c.ParentID = a.ROWID and c.Key = "CPU"  and c.Time = s.Time) "AgentCPU"
+						, (Select max(m.Value) from Metrics m where m.ParentID = a.ROWID and m.Key = "MEM"  and m.Time = s.Time) "AgentMEM"
+						, (Select max(n.Value) from Metrics n where n.ParentID = a.ROWID and n.Key = "NET"  and n.Time = s.Time) "AgentNET"
+				from Metric a
+					left join Metrics s on s.ParentID = a.ROWID and s.Key = "Status"
+				where a.Type = "Agent"
+				GROUP by s.ParentID
+				ORDER by a.Name
+				''')
+
+				#
+				# SELECT
+				# 	a.Name "AgentName"
+				# 	, s.Value "AgentStatus"
+				# 	, max(s.Time) as "AgentLastSeen"
+				# 	, ra.Value "AgentAssigned"
+				# 	, r.Value "AgentRobots"
+				# 	, max(l.Value) "AgentLoad"
+				# 	, max(c.Value) "AgentCPU"
+				# 	, max(m.Value) "AgentMEM"
+				# 	, max(n.Value) "AgentNET"
+				# from Metric a
+				# 	left join Metrics s on s.ParentID = a.ROWID and s.Key = "Status"
+				# 	left join Metrics r on r.ParentID = a.ROWID and r.Key = "Robots" and r.Time = s.Time
+				# 	left join Metrics ra on ra.ParentID = a.ROWID and ra.Key = "AssignedRobots" and ra.Time = s.Time
+				# 	left join Metrics l on l.ParentID = a.ROWID and l.Key = "Load" and l.Time = s.Time
+				# 	left join Metrics c on c.ParentID = a.ROWID and c.Key = "CPU" and c.Time = s.Time
+				# 	left join Metrics m on m.ParentID = a.ROWID and m.Key = "MEM" and m.Time = s.Time
+				# 	left join Metrics n on m.ParentID = a.ROWID and n.Key = "NET" and n.Time = s.Time
+				# where a.Type = "Agent"
+				# GROUP by s.ParentID
+				# ORDER by a.Name
+
+				c.execute('''
+				CREATE VIEW "AgentHistory" as
+				SELECT
+					a.Name "AgentName"
+					, s.Value "AgentStatus"
+					, max(s.Time) as "AgentLastSeen"
+						, (Select ra.Value from Metrics ra where ra.ParentID = a.ROWID and ra.Key = "AssignedRobots"  and ra.Time = s.Time) "AgentAssigned"
+						, (Select r.Value from Metrics r where r.ParentID = a.ROWID and r.Key = "Robots"  and r.Time = s.Time) "AgentRobots"
+						, (Select max(l.Value) from Metrics l where l.ParentID = a.ROWID and l.Key = "Load"  and l.Time = s.Time) "AgentLoad"
+						, (Select max(c.Value) from Metrics c where c.ParentID = a.ROWID and c.Key = "CPU"  and c.Time = s.Time) "AgentCPU"
+						, (Select max(m.Value) from Metrics m where m.ParentID = a.ROWID and m.Key = "MEM"  and m.Time = s.Time) "AgentMEM"
+						, (Select max(n.Value) from Metrics n where n.ParentID = a.ROWID and n.Key = "NET"  and n.Time = s.Time) "AgentNET"
+				from Metric a
+					left join Metrics s on s.ParentID = a.ROWID and s.Key = "Status"
+				where a.Type = "Agent"
+				group by a.ROWID, s.Time
+				ORDER by a.Name, s.Time
+				''')
+
+				#
+				# SELECT
+				# 	a.Name "AgentName"
+				# 	, s.Value "AgentStatus"
+				# 	, max(s.Time) as "AgentLastSeen"
+				# 	, ra.Value "AgentAssigned"
+				# 	, r.Value "AgentRobots"
+				# 	, max(l.Value) "AgentLoad"
+				# 	, max(c.Value) "AgentCPU"
+				# 	, max(m.Value) "AgentMEM"
+				# 	, max(n.Value) "AgentNET"
+				# from Metric a
+				# 	left join Metrics s on s.ParentID = a.ROWID and s.Key = "Status"
+				# 	left join Metrics r on r.ParentID = a.ROWID and r.Key = "Robots" and r.Time = s.Time
+				# 	left join Metrics ra on ra.ParentID = a.ROWID and ra.Key = "AssignedRobots" and ra.Time = s.Time
+				# 	left join Metrics l on l.ParentID = a.ROWID and l.Key = "Load" and l.Time = s.Time
+				# 	left join Metrics c on c.ParentID = a.ROWID and c.Key = "CPU" and c.Time = s.Time
+				# 	left join Metrics m on m.ParentID = a.ROWID and m.Key = "MEM" and m.Time = s.Time
+				# 	left join Metrics n on m.ParentID = a.ROWID and n.Key = "NET" and n.Time = s.Time
+				# where a.Type = "Agent"
+				# group by a.ROWID, s.Time
+				# ORDER by a.Name, s.Time
+
+
+				c.execute('''
+				CREATE VIEW "ResultSummary" as
+				SELECT
+					a.Name
+					, max(e.Time) as "_EntryTime"
+					, (Select mn.Value from Metrics mn where mn.ParentID = a.ROWID and mn.Key like "min%" and e.Time = mn.Time ) "Min"
+					, (Select av.Value from Metrics av where av.ParentID = a.ROWID and av.Key = "avg" and e.Time = av.Time ) "Average"
+					, (Select sd.Value from Metrics sd where sd.ParentID = a.ROWID and sd.Key like "stDev%" and e.Time = sd.Time ) "StDev"
+					, (Select pct.Key from Metrics pct where pct.ParentID = a.ROWID and pct.Key like "%ile" and e.Time = pct.Time ) "%ile_Key"
+					, (Select pct.Value from Metrics pct where pct.ParentID = a.ROWID and pct.Key like "%ile" and e.Time = pct.Time ) "%ile_Value"
+					, (Select mx.Value from Metrics mx where mx.ParentID = a.ROWID and mx.Key like "max%" and e.Time = mx.Time ) "Max"
+					, (Select ps.Value from Metrics ps where ps.ParentID = a.ROWID and ps.Key like "_pass%" and e.Time = ps.Time ) "Pass"
+					, (Select fl.Value from Metrics fl where fl.ParentID = a.ROWID and fl.Key like "_fail%" and e.Time = fl.Time ) "Fail"
+					, (Select ot.Value from Metrics ot where ot.ParentID = a.ROWID and ot.Key like "_other%" and e.Time = ot.Time ) "Other"
+				from Metric a
+					left join Metrics e on e.ParentID = a.ROWID and e.Key = "EntryTime"
+				where a.Type = "Summary"
+				GROUP by a.ROWID
+				ORDER by a.ROWID
+				''')
+
+				# SELECT
+				# 	a.Name
+				# 	, max(e.Time) as "_EntryTime"
+				# 	, mn.Value "Min"
+				# 	, av.Value "Average"
+				# 	, sd.Value "StDev"
+				# 	, pct.Key "%ile_Key"
+				# 	, pct.Value "%ile_Value"
+				# 	, mx.Value "Max"
+				# 	, ps.Value "Pass"
+				# 	, fl.Value "Fail"
+				# 	, ot.Value "Other"
+				# from Metric a
+				# 	left join Metrics e on e.ParentID = a.ROWID and e.Key = "EntryTime"
+				# 	left join Metrics mn on mn.ParentID = a.ROWID and mn.Key like "min%" and e.Time = mn.Time
+				# 	left join Metrics av on av.ParentID = a.ROWID and av.Key = "avg" and e.Time = av.Time
+				# 	left join Metrics sd on sd.ParentID = a.ROWID and sd.Key like "stDev%" and e.Time = sd.Time
+				# 	left join Metrics pct on pct.ParentID = a.ROWID and pct.Key like "%ile" and e.Time = pct.Time
+				# 	left join Metrics mx on mx.ParentID = a.ROWID and mx.Key like "max%" and e.Time = mx.Time
+				# 	left join Metrics ps on ps.ParentID = a.ROWID and ps.Key like "_pass%" and e.Time = ps.Time
+				# 	left join Metrics fl on fl.ParentID = a.ROWID and fl.Key like "_fail%" and e.Time = fl.Time
+				# 	left join Metrics ot on ot.ParentID = a.ROWID and ot.Key like "_other%" and e.Time = ot.Time
+				# where a.Type = "Summary" -- and a.ROWID = 9
+				# GROUP by a.ROWID
+				# ORDER by a.ROWID
+
+				c.execute('''
+				CREATE VIEW "MetricData" as
+				SELECT
+					  m.Name "PrimaryMetric"
+					, m.Type "MetricType"
+					, ms.Time "MetricTime"
+					, ms.Key "SecondaryMetric"
+					, ms.Value "MetricValue"
+				FROM Metric as m
+				JOIN Metrics ms on m.ROWID = ms.ParentID
+				''')
+
 
 
 				self.datadb.commit()
@@ -730,11 +987,32 @@ class RFSwarmBase:
 		hasher = hashlib.md5()
 		hasher.update(str(os.path.getmtime(file)).encode('utf-8'))
 		hasher.update(relpath.encode('utf-8'))
-		with open(file, 'rb') as afile:
+		# with open(file, 'rb') as afile:
+		# 	buf = afile.read(BLOCKSIZE)
+		# 	while len(buf) > 0:
+		# 		hasher.update(buf)
+		# 		buf = afile.read(BLOCKSIZE)
+		#
+		# 	Intermittant issue : Too many open files, it seems that with open is not always closing files?
+		#
+		# Exception in thread Thread-1413:
+		# Traceback (most recent call last):
+		#   File "/usr/local/Cellar/python/3.7.4/Frameworks/Python.framework/Versions/3.7/lib/python3.7/threading.py", line 926, in _bootstrap_inner
+		#     self.run()
+		#   File "/usr/local/Cellar/python/3.7.4/Frameworks/Python.framework/Versions/3.7/lib/python3.7/threading.py", line 870, in run
+		#     self._target(*self._args, **self._kwargs)
+		#   File "./rfswarm.py", line 1034, in check_files_changed
+		#     script_hash = base.hash_file(file_data['localpath'], file_data['relpath'])
+		#   File "./rfswarm.py", line 901, in hash_file
+		#     with open(file, 'rb') as afile:
+		# OSError: [Errno 24] Too many open files: '/Users/dave/Documents/GitHub/rfswarm/robots/OC_Demo_2.robot'
+
+		afile = open(file, 'rb')
+		buf = afile.read(BLOCKSIZE)
+		while len(buf) > 0:
+			hasher.update(buf)
 			buf = afile.read(BLOCKSIZE)
-			while len(buf) > 0:
-				hasher.update(buf)
-				buf = afile.read(BLOCKSIZE)
+		afile.close()
 		base.debugmsg(3, "file:", file, "	hash:", hasher.hexdigest())
 		return hasher.hexdigest()
 
@@ -917,7 +1195,7 @@ class RFSwarmBase:
 		try:
 			localfile = self.uploadfiles[hash]['LocalFile']
 			# self.uploadfiles[hash]['File'] = jsonresp['File']
-			base.debugmsg(5, "file:", localfile, "hash:", hash)
+			base.debugmsg(3, "file:", localfile, "hash:", hash)
 
 			# self.scriptlist[hash][]
 
@@ -974,37 +1252,115 @@ class RFSwarmBase:
 				base.config.write(configfile)
 				self.debugmsg(6, "File Saved:", self.gui_ini)
 
-	def get_next_agent(self):
+	def get_next_agent(self, filters):
 		base.debugmsg(9, "get_next_agent")
 		base.debugmsg(8, "get_next_agent: base.Agents:", base.Agents)
 		if len(base.Agents) <1:
-			base.debugmsg(5, "Agents:",len(base.Agents))
+			base.debugmsg(7, "Agents:",len(base.Agents))
 			return None
 
 		if base.args.agents:
 			neededagents = int(base.args.agents)
-			base.debugmsg(5, "Agents:",len(base.Agents),"	Agents Needed:", neededagents)
+			base.debugmsg(7, "Agents:",len(base.Agents),"	Agents Needed:", neededagents)
 			if len(base.Agents) < neededagents:
 				return None
+
+
+		base.debugmsg(7, "filters:", filters)
+		f_requre = []
+		f_exclude = []
+		for filt in filters:
+			if filt['rule'] == 'Require':
+				f_requre.append(filt['optn'])
+			if filt['rule'] == 'Exclude':
+				f_exclude.append(filt['optn'])
+
 
 		loadtpl = []
 		robottpl = []
 		for agnt in base.Agents.keys():
-			base.debugmsg(9, "get_next_agent: agnt:", agnt)
-			loadtpl.append([agnt, base.Agents[agnt]['LOAD%']])
-			robottpl.append([agnt, base.Agents[agnt]['AssignedRobots']])
+			base.debugmsg(7, "agnt:", agnt)
+			agntnamefilter = "Agent: {}".format(agnt)
+			# check if this agent is specifically excluded
+			base.debugmsg(7, "agntnamefilter:", agntnamefilter, "f_exclude:", f_exclude)
+			if agntnamefilter not in f_exclude:
+				# check if this agent is specifically required, if so no need for further evaluation
+				if agntnamefilter in f_requre:
+					base.debugmsg(7, "Agent Matched Require Filter:", agntnamefilter)
+					return agnt
 
-		base.debugmsg(9, "get_next_agent: robottpl:", robottpl)
+				# if we got this far, determine if agent meets requirements based on filter rules
+				addagnt = False
+				base.debugmsg(7, "addagnt:", addagnt)
+
+				if len(filters)<1:
+					# there are no filters applied
+					addagnt = True
+					base.debugmsg(7, "no filters applied", "addagnt:", addagnt)
+
+				# if agent has Properties, compare filters against these
+				if "Properties" in base.Agents[agnt]:
+					# if all requried filter items in properties
+					requirematch = 0
+					for fil in f_requre:
+						if fil in base.Agents[agnt]["Properties"]:
+							requirematch += 1
+							base.debugmsg(7, "Matched Required Filter:", fil)
+						else:
+							# split filter removeing last item, then try compare again
+							filarr = fil.rsplit(":", 1)
+							if len(filarr)>1:
+								if filarr[0] in base.Agents[agnt]["Properties"]:
+									if filarr[1].strip() == base.Agents[agnt]["Properties"][filarr[0]].strip():
+										requirematch += 1
+										base.debugmsg(7, "Matched Required Filter:", fil)
+
+					if requirematch == len(f_requre):
+						addagnt = True
+						base.debugmsg(7, "requirematch:", requirematch, "required:", len(f_requre), "addagnt:", addagnt)
+
+					# if any excluded filter items in properties
+					for fil in f_exclude:
+						if fil in base.Agents[agnt]["Properties"]:
+							addagnt = False
+							base.debugmsg(7, "Matched Excluded Filter:", fil, "addagnt:", addagnt)
+						else:
+							# split filter removeing last item, then try compare again
+							filarr = fil.rsplit(":", 1)
+							if len(filarr)>1:
+								if filarr[0] in base.Agents[agnt]["Properties"]:
+									if filarr[1].strip() == base.Agents[agnt]["Properties"][filarr[0]].strip():
+										addagnt = False
+										base.debugmsg(7, "Matched Excluded Filter:", fil, "addagnt:", addagnt)
+
+				base.debugmsg(7, "Final result: addagnt:", addagnt)
+				if addagnt:
+					loadtpl.append([agnt, base.Agents[agnt]['LOAD%']])
+					robottpl.append([agnt, base.Agents[agnt]['AssignedRobots']])
+
+			else:
+				base.debugmsg(7, "Agent Matched Exclude Filter:", agntnamefilter)
+
+
+
+		base.debugmsg(7, "robottpl:", robottpl)
+		if len(robottpl)<1:
+			base.debugmsg(7, "robottpl empty, return None")
+			return None
+
 		# Start with agent with least robots
 		robottpl.sort(key=itemgetter(1))
-		base.debugmsg(9, "get_next_agent: robottpl:", robottpl)
+		base.debugmsg(9, "robottpl:", robottpl)
 		if robottpl[0][1] < 10:
 			return robottpl[0][0]
 		else:
 			# try for agent with least load
-			base.debugmsg(9, "get_next_agent: loadtpl:", loadtpl)
+			base.debugmsg(7, "loadtpl:", loadtpl)
+			if len(loadtpl)<1:
+				# this should never happen!!!
+				return None
 			loadtpl.sort(key=itemgetter(1))
-			base.debugmsg(9, "get_next_agent: loadtpl:", loadtpl)
+			base.debugmsg(9, "loadtpl:", loadtpl)
 			if loadtpl[0][1] < 95:
 				return loadtpl[0][0]
 			else:
@@ -1091,6 +1447,87 @@ class RFSwarmBase:
 
 		base.dbqueue["Read"].append({"SQL": sql, "KEY": "RunStats"})
 
+		t = threading.Thread(target=self.SaveRunStats_SQL)
+		t.start()
+
+
+	def SaveRunStats_SQL(self):
+
+		base.debugmsg(7, "Wait for RunStats")
+		while "RunStats" not in base.dbqueue["ReadResult"]:
+			time.sleep(0.1)
+			base.debugmsg(9, "Wait for RunStats")
+
+		RunStats = base.dbqueue["ReadResult"]["RunStats"]
+		base.debugmsg(7, "RunStats:", RunStats)
+
+
+		# Save Metric Data
+		# 	First ensure a metric for this agent exists
+		if "Summary" not in base.MetricIDs:
+			base.MetricIDs["Summary"] = {}
+
+		for stat in RunStats:
+			base.debugmsg(7, "stat:", stat)
+			statname = stat["result_name"]
+			if statname not in base.MetricIDs["Summary"]:
+				# create the agent metric
+				base.dbqueue["Metric"].append( (statname, "Summary") )
+
+				# get the agent metric id
+				base.debugmsg(7, "statname:", statname)
+				safestatname = statname.replace('"', r'""')
+				sql = 'select ROWID from Metric where Name = "'+safestatname+'"'
+				base.debugmsg(7, "sql:", sql)
+				base.dbqueue["Read"].append({"SQL": sql, "KEY": "Metric_"+statname})
+
+
+		# Read Metric ID's
+		for stat in RunStats:
+			base.debugmsg(7, "stat:", stat)
+			statname = stat["result_name"]
+			if statname not in base.MetricIDs["Summary"]:
+				if "Read" in base.dbqueue:
+					base.debugmsg(7, "Read", base.dbqueue["Read"])
+				if "ReadResult" in base.dbqueue:
+					base.debugmsg(7, "ReadResult", base.dbqueue["ReadResult"])
+				base.debugmsg(7, "Wait for Metric_"+statname)
+				while "Metric_"+statname not in base.dbqueue["ReadResult"]:
+					time.sleep(0.1)
+					base.debugmsg(9, "Waiting for Metric_"+statname)
+				if "ReadResult" in base.dbqueue:
+					base.debugmsg(7, "ReadResult", base.dbqueue["ReadResult"])
+				base.debugmsg(7, "Wait for Metric_"+statname+">0")
+				while len(base.dbqueue["ReadResult"]["Metric_"+statname])<1:
+					time.sleep(0.1)
+					base.debugmsg(9, "Waiting for Metric_"+statname+">0")
+
+				if "Metric_"+statname in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["Metric_"+statname])>0:
+					base.debugmsg(7, "Metric_"+statname+":", base.dbqueue["ReadResult"]["Metric_"+statname])
+
+					base.MetricIDs["Summary"][statname] = base.dbqueue["ReadResult"]["Metric_"+statname][0]["rowid"]
+					base.debugmsg(7, "MetricIDs[Summary]:", base.MetricIDs["Summary"])
+
+			# Next save the Metrics
+			if statname in base.MetricIDs["Summary"]:
+				m_StatID = base.MetricIDs["Summary"][statname]
+				m_Time = int(time.time())
+				base.debugmsg(7, "m_StatID:", m_StatID, "	m_Time:", m_Time)
+
+				base.dbqueue["Metrics"].append( (m_StatID, m_Time, "EntryTime", m_Time) )
+
+				# stat: {'result_name': "Opening url 'http://opencart3/'", 'min': 0.411,
+				# 			'avg': 0.439, '90%ile': None, 'max': 0.467, 'stDev': 0.04,
+				# 			'_pass': 2, '_fail': 0, '_other': 0}
+
+				for stati in stat:
+					base.debugmsg(7, "stati:", stati, "	stat[stati]:", stat[stati])
+					if stati != "result_name":
+						base.dbqueue["Metrics"].append( (m_StatID, m_Time, stati, stat[stati]) )
+						base.debugmsg(7, "Saving m_StatID:", m_StatID, "	m_Time:", m_Time, "	stati:", stati, "	stat[stati]:", stat[stati])
+
+
+
 	def report_text(self, _event=None):
 		base.debugmsg(6, "report_text")
 		colno = 0
@@ -1111,11 +1548,12 @@ class RFSwarmBase:
 
 			# request agent data for agent report
 			sql = "SELECT * "
-			sql += "FROM Agents as a "
-			sql += "WHERE a.last_seen>{} ".format(base.robot_schedule["Start"])
-			sql += " ORDER BY a.last_seen"
+			sql += "FROM AgentHistory as a "
+			sql += "WHERE a.AgentLastSeen>{} ".format(base.robot_schedule["Start"])
+			sql += " ORDER BY a.AgentLastSeen"
 			base.dbqueue["Read"].append({"SQL": sql, "KEY": "Agents"})
 			# request agent data for agent report
+
 			# request raw data for agent report
 			sql = "SELECT * "
 			sql += "FROM Results as r "
@@ -1223,7 +1661,58 @@ class RFSwarmBase:
 			base.debugmsg(1, "RFSwarm - Warning", "Generating Word Reports not implimented yet")
 
 
+	def create_metric(self, MetricName, MetricType):
+		# Save Metric Data
+		# 	First ensure a metric for this agent exists
+		if MetricType not in self.MetricIDs:
+			self.MetricIDs[MetricType] = {}
+		if MetricName not in self.MetricIDs[MetricType]:
+			# create the agent metric
+			self.dbqueue["Metric"].append( (MetricName, MetricType) )
+			# get the agent metric id
+			sql = 'select ROWID from Metric where Name = "'+MetricName+'"'
+			self.debugmsg(5, "sql:", sql)
+			self.dbqueue["Read"].append({"SQL": sql, "KEY": "Metric_"+MetricName})
 
+			if "Read" in self.dbqueue:
+				self.debugmsg(9, "Read", self.dbqueue["Read"])
+			if "ReadResult" in self.dbqueue:
+				self.debugmsg(9, "ReadResult", self.dbqueue["ReadResult"])
+			self.debugmsg(5, "Wait for Metric_"+MetricName)
+			while "Metric_"+MetricName not in self.dbqueue["ReadResult"]:
+				time.sleep(0.1)
+				self.debugmsg(9, "Waiting for Metric_"+MetricName)
+			if "ReadResult" in self.dbqueue:
+				self.debugmsg(7, "ReadResult", self.dbqueue["ReadResult"])
+			self.debugmsg(5, "Wait for Metric_"+MetricName+">0")
+			while len(self.dbqueue["ReadResult"]["Metric_"+MetricName])<1:
+				time.sleep(0.1)
+				self.debugmsg(5, "Waiting for Metric_"+MetricName+">0")
+
+			if "Metric_"+MetricName in self.dbqueue["ReadResult"] and len(self.dbqueue["ReadResult"]["Metric_"+MetricName])>0:
+				self.debugmsg(5, "Metric_"+MetricName+":", self.dbqueue["ReadResult"]["Metric_"+MetricName])
+
+				if MetricType not in self.MetricIDs:
+					self.MetricIDs[MetricType] = {}
+
+				self.MetricIDs[MetricType][MetricName] = self.dbqueue["ReadResult"]["Metric_"+MetricName][0]["rowid"]
+				self.debugmsg(7, "MetricIDs[MetricType]:", self.MetricIDs[MetricType])
+
+		return self.MetricIDs[MetricType][MetricName]
+
+	def save_metrics(self, PMetricName, MetricType, MetricTime, SMetricName, MetricValue):
+		if self.datadb is not None:
+			self.debugmsg(7, PMetricName, MetricType, MetricTime, SMetricName, MetricValue)
+			metricid = self.create_metric(PMetricName, MetricType)
+			self.debugmsg(7, "metricid:", metricid, MetricTime, SMetricName, MetricValue)
+			self.dbqueue["Metrics"].append( (metricid, MetricTime, SMetricName, MetricValue) )
+
+	def add_scriptfilter(self, filtername):
+		self.debugmsg(7, "filtername:", filtername, self.scriptfilters)
+		if filtername not in self.scriptfilters:
+			self.scriptfilters.append(filtername)
+			self.scriptfilters.sort()
+		self.debugmsg(9, "filtername:", filtername, self.scriptfilters)
 
 
 # class rfswarm:
@@ -1557,7 +2046,9 @@ class RFSwarmCore:
 		base.agenthttpserver.serve_forever()
 
 	def register_agent(self, agentdata):
-		base.debugmsg(9, "register_agent: agentdata:", agentdata)
+		base.debugmsg(7, "agentdata:", agentdata)
+
+		base.add_scriptfilter("Agent: {}".format(agentdata["AgentName"]))
 
 		# if "AssignedRobots" not in base.Agents[agnt].keys():
 		# 	print("get_next_agent: addinig AssignedRobots to ", agnt)
@@ -1591,27 +2082,67 @@ class RFSwarmCore:
 		t = threading.Thread(target=self.UpdateAgents)
 		t.start()
 
+		# add filter options to the filter list
+		if "Properties" in agentdata:
+			filterexclude = ["RobotFramework: Libraries", "RFSwarmAgent: Version"]
+			valexclude = [True, False, "", "True", "False"]
+			for prop in agentdata["Properties"]:
+				base.debugmsg(8, "prop:", prop)
+				if prop not in filterexclude:
+					t = threading.Thread(target=base.add_scriptfilter, args=(prop, ))
+					t.start()
+					if agentdata["Properties"][prop] not in valexclude:
+						val = "{}: {}".format(prop, agentdata["Properties"][prop])
+						t = threading.Thread(target=base.add_scriptfilter, args=(val, ))
+						t.start()
+
+			if "RFSwarmAgent: Version" in agentdata["Properties"]:
+				prop = "RFSwarmAgent: Version: {}".format(agentdata["Properties"]["RFSwarmAgent: Version"])
+				t = threading.Thread(target=base.add_scriptfilter, args=(prop, ))
+				t.start()
+
+
+
 		# save data to db
-		agnttbldata = (agentdata["AgentName"], agentdata["Status"], agentdata["LastSeen"],
-						agentdata["Robots"], agentdata["LOAD%"], agentdata["CPU%"],
-						agentdata["MEM%"], agentdata["NET%"])
-		# sqlcmd = 'INSERT INTO Agents VALUES (?,?,?,?,?,?,?,?)'
-		#
-		# base.dbqueue["Write"].append({"SQL":sqlcmd, "VALUES": agnttbldata})
-		base.dbqueue["Agents"].append(agnttbldata)
+
+		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "Status", agentdata["Status"])
+		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "LastSeen", agentdata["LastSeen"])
+		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "AssignedRobots", agentdata["AssignedRobots"])
+		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "Robots", agentdata["Robots"])
+		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "Load", agentdata["LOAD%"])
+		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "CPU", agentdata["CPU%"])
+		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "MEM", agentdata["MEM%"])
+		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "NET", agentdata["NET%"])
+
+		if "AgentIPs" in agentdata:
+			for ip in agentdata["AgentIPs"]:
+				base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "IPAddress", ip)
+		if "Properties" in agentdata:
+			for prop in agentdata["Properties"]:
+				base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], prop, agentdata["Properties"][prop])
+
 
 	def register_result(self, AgentName, result_name, result, elapsed_time, start_time, end_time, index, vuser, iter, sequence):
 		base.debugmsg(9, "register_result")
 		resdata = (index, vuser, iter, AgentName, sequence, result_name, result, elapsed_time, start_time, end_time)
 		base.debugmsg(9, "register_result: resdata:", resdata)
-		base.debugmsg(5, resdata)
+		base.debugmsg(7, resdata)
 		base.dbqueue["Results"].append(resdata)
 		base.debugmsg(9, "register_result: dbqueue Results:", base.dbqueue["Results"])
 
 		if not base.args.nogui:
-			time.sleep(1)
 			ut = threading.Thread(target=base.gui.delayed_UpdateRunStats)
 			ut.start()
+
+	def register_metric(self, PrimaryMetric, MetricType, MetricTime, SecondaryMetrics):
+		# core.register_metric(jsonreq["PrimaryMetric"], jsonreq["MetricType"], jsonreq["MetricTime"], jsonreq["SecondaryMetrics"])
+		base.debugmsg(7, "PrimaryMetric:", PrimaryMetric, "	MetricType:", MetricType, "	MetricTime:", MetricTime, "	SecondaryMetrics:", SecondaryMetrics)
+
+		# Save Metric Data
+
+		for key in SecondaryMetrics:
+			base.debugmsg(7, PrimaryMetric, MetricType, MetricTime, key, SecondaryMetrics[key])
+			base.save_metrics(PrimaryMetric, MetricType, MetricTime, key, SecondaryMetrics[key])
 
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -1651,7 +2182,7 @@ class RFSwarmCore:
 
 		scriptcount = 0
 		if "Scenario" in filedata:
-			base.debugmsg(8, "Scenario:", filedata["Scenario"])
+			base.debugmsg(6, "Scenario:", filedata["Scenario"])
 			if "scriptcount" in filedata["Scenario"]:
 				scriptcount = int(filedata["Scenario"]["scriptcount"])
 				base.debugmsg(8, "scriptcount:", scriptcount)
@@ -1723,6 +2254,21 @@ class RFSwarmCore:
 				else:
 					fileok = False
 
+				if "excludelibraries" in filedata[istr]:
+					base.scriptlist[ii]["excludelibraries"] = filedata[istr]["excludelibraries"]
+
+				if "robotoptions" in filedata[istr]:
+					base.scriptlist[ii]["robotoptions"] = filedata[istr]["robotoptions"]
+
+				if "filters" in filedata[istr]:
+					base.debugmsg(9, "filedata[istr][filters]:", filedata[istr]["filters"], type(filedata[istr]["filters"]))
+					filtr = filedata[istr]["filters"].replace("'", '"')
+					base.debugmsg(9, "filtr:", filtr, type(filtr))
+					filtrs = json.loads(filtr)
+					base.debugmsg(9, "filtrs:", filtrs, type(filtrs))
+					base.scriptlist[ii]["filters"] = filtrs
+
+
 				if not fileok:
 					base.debugmsg(1, "Scenario file is damaged:", ScenarioFile)
 					return 1
@@ -1754,6 +2300,8 @@ class RFSwarmCore:
 		base.run_finish = 0
 		base.posttest = False
 		base.run_paused = False
+		base.MetricIDs = {}
+
 		base.robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}}
 		t = threading.Thread(target=core.run_start_threads)
 		t.start()
@@ -1820,7 +2368,7 @@ class RFSwarmCore:
 				break
 
 			if base.run_paused and int(time.time())<base.run_end:
-				nxtagent = base.get_next_agent()
+				nxtagent = base.get_next_agent([])
 				base.debugmsg(6, '(if) next_agent:', nxtagent)
 				if nxtagent is None:
 					base.run_paused = True
@@ -1839,13 +2387,22 @@ class RFSwarmCore:
 						base.debugmsg(6, "while totusrs", totusrs, " 	curusrs:", curusrs)
 						base.debugmsg(9, "grp[Index]", grp['Index'])
 
-						nxtagent = base.get_next_agent()
-						base.debugmsg(6, '(else) next_agent:', nxtagent)
+						if 'filters' in grp:
+							nxtagent = base.get_next_agent(grp['filters'])
+							base.debugmsg(7, '(filters) next_agent:', nxtagent)
+						else:
+							nxtagent = base.get_next_agent([])
+							base.debugmsg(9, '(filters else) next_agent:', nxtagent)
+						base.debugmsg(7, '(else) next_agent:', nxtagent)
 
 						if nxtagent is None:
+							base.debugmsg(7, 'next_agent is None !!!')
 							# MsgBox = tkm.askyesno('Save Scenario','Do you want to save the current scenario?')
 							if not base.args.nogui and not base.run_paused:
+								base.debugmsg(7, 'base.args.nogui:', base.args.nogui, "base.run_paused:", base.run_paused)
 								tkm.showwarning("RFSwarm - Warning", "Not enough Agents available to run Robots!\n\nTest run is paused, please add agents to continue or click stop to abort.")
+								# tkm.showinfo("RFSwarm - Warning", "Not enough Agents available to run Robots! Test run is paused, please add agents to continue or click stop to abort.")
+								base.debugmsg(7, 'base.args.nogui:', base.args.nogui, "base.run_paused:", base.run_paused)
 							base.run_paused = True
 
 							base.debugmsg(5, 'Not enough Agents available to run Robots! (else)')
@@ -1881,6 +2438,9 @@ class RFSwarmCore:
 								# totusrs += int(grp["Users"])
 								base.debugmsg(9, "totusrs", totusrs)
 
+							if gid not in base.scriptgrpend.keys() or base.scriptgrpend[gid] < base.run_start:
+								base.scriptgrpend[gid] = base.run_start + grp["Delay"] + grp["RampUp"] + grp["Run"]
+
 							time_elapsed = int(time.time()) - base.run_start
 							base.debugmsg(9, 'time_elapsed', time_elapsed, "Delay", grp["Delay"])
 							if time_elapsed > grp["Delay"] - 1:
@@ -1889,7 +2449,10 @@ class RFSwarmCore:
 								base.debugmsg(9, 'nxtuid', nxtuid)
 								# Determine if we should start another user?
 								if nxtuid < grp["Users"]+1:
-									rupct = (time_elapsed - grp["Delay"]) /grp["RampUp"]
+									if grp["RampUp"] > 0:
+										rupct = (time_elapsed - grp["Delay"]) /grp["RampUp"]
+									else:
+										rupct = 1
 									base.debugmsg(9, 'rupct', rupct)
 									ruusr = int(grp["Users"] * rupct)
 									base.debugmsg(9, 'nxtuid', nxtuid, 'ruusr', ruusr)
@@ -1906,9 +2469,15 @@ class RFSwarmCore:
 											"ScriptHash": grp["ScriptHash"],
 											"Test": grp["Test"],
 											"StartTime": int(time.time()),
-											"EndTime": int(time.time()) + grp["Run"],
+											"EndTime": base.scriptgrpend[gid],
 											"id": grurid
 										}
+
+										if "excludelibraries" in grp:
+											base.robot_schedule["Agents"][nxtagent][grurid]["excludelibraries"] = grp["excludelibraries"]
+
+										if "robotoptions" in grp:
+											base.robot_schedule["Agents"][nxtagent][grurid]["robotoptions"] = grp["robotoptions"]
 
 										base.run_end = int(time.time()) + grp["Run"]
 										base.robot_schedule["End"] = base.run_end
@@ -1917,7 +2486,7 @@ class RFSwarmCore:
 										base.debugmsg(5, "base.Agents[",nxtagent,"][AssignedRobots]:", base.Agents[nxtagent]["AssignedRobots"])
 
 										curusrs += 1
-										base.debugmsg(2, "Robot:", curusrs, "	Assigned to:", nxtagent)
+										base.debugmsg(2, "Robot:", curusrs, "	Test:", grp["Test"], "	Assigned to:", nxtagent)
 
 										base.debugmsg(9, "robot_schedule", base.robot_schedule)
 
@@ -2052,6 +2621,7 @@ class RFSwarmCore:
 
 	def UpdateAgents(self):
 
+		uploadcount = 0
 		rnum = 0
 		removeagents = []
 		robot_count = 0
@@ -2064,6 +2634,10 @@ class RFSwarmCore:
 			agntlst = list(base.Agents.keys())
 			base.debugmsg(6, "agntlst:", agntlst)
 			for agnt in agntlst:
+
+				if "Uploading" in base.Agents[agnt]["Status"]:
+					uploadcount += 1
+
 				displayagent = True
 				tm = base.Agents[agnt]["LastSeen"]
 				agnt_elapsed = int(time.time()) - tm
@@ -2099,13 +2673,18 @@ class RFSwarmCore:
 				except:
 					pass
 
+			# Save Total Robots Metric
+			if len(base.run_name)>0:
+				base.save_metrics(base.run_name, "Scenario", int(time.time()), "total_robots", base.total_robots)
+			else:
+				base.save_metrics("PreRun", "Scenario", int(time.time()), "total_robots", base.total_robots)
 
 
 			# if base.args.run:
 			base.debugmsg(5, "base.args.run:", base.args.run, "	base.args.nogui:", base.args.nogui, "	run_end:", base.run_end, "	time:", int(time.time()))
 			base.debugmsg(5, "base.posttest:", base.posttest, "	total_robots:", base.total_robots)
-			base.debugmsg(5, "run_finish:", base.run_finish, "	time:", int(time.time()))
-			if base.run_end > 0 and base.run_end < int(time.time()) and base.total_robots < 1 and not base.posttest and base.run_finish < 1:
+			base.debugmsg(5, "run_finish:", base.run_finish, "	time:", int(time.time()), "uploadcount:", uploadcount)
+			if base.run_end > 0 and base.run_end < int(time.time()) and base.total_robots < 1 and not base.posttest and base.run_finish < 1 and uploadcount < 1:
 				base.run_finish = int(time.time())
 				base.debugmsg(5, "run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots)
 				if not base.args.nogui:
@@ -2162,12 +2741,14 @@ class RFSwarmGUI(tk.Frame):
 	plancolnme = 5
 	plancolscr = 6
 	plancoltst = 7
+	plancolset = 8
 	plancoladd = 99
 
 	display_agents = {}
 	display_run = {}
 	# imgdata = {}
 
+	rfstheme = {}
 
 	imgdata = {}
 	b64 = {}
@@ -2185,19 +2766,40 @@ class RFSwarmGUI(tk.Frame):
 
 	def __init__(self, master=None):
 
-		root = tk.Tk()
-		root.protocol("WM_DELETE_WINDOW", self.on_closing)
-		tk.Frame.__init__(self, root)
-		self.grid(sticky="nsew")
-		root.columnconfigure(0, weight=1)
-		root.rowconfigure(0, weight=1)
+		self.root = tk.Tk()
+		self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+		tk.Frame.__init__(self, self.root)
+		# self.grid(sticky="nsew")
+		self.grid(sticky="news", ipadx=0, pady=0)
+		self.root.columnconfigure(0, weight=1)
+		self.root.rowconfigure(0, weight=1)
 
 		# set initial window size
-		root.geometry(base.config['GUI']['win_width'] + "x" + base.config['GUI']['win_height'])
+		self.root.geometry(base.config['GUI']['win_width'] + "x" + base.config['GUI']['win_height'])
 
-		root.resizable(True, True)
+		self.root.resizable(True, True)
+
+		base.debugmsg(5, "self.root", self.root)
+		base.debugmsg(5, "self.root[background]", self.root["background"])
+		self.rootBackground = self.root["background"]
+
+		# for i in range(0, 16):
+		# 	val = "#"+format(i, 'x')+format(i, 'x')+format(i, 'x')
+		# 	base.debugmsg(5, "val: ",val, self.rootBackground)
+		# 	if self.rootBackground < val:
+		# 		base.debugmsg(5, "less than")
+		# 	if self.rootBackground > val:
+		# 		base.debugmsg(5, "more than")
+		# self.rootBackground.value
+
+		# bgclr = winfo rbg . systemWindowBackgroundColor
+		# base.debugmsg(5, "systemWindowBackgroundColor", systemWindowBackgroundColor())
+		# base.debugmsg(5, "bgclr", bgclr)
+		# https://github.com/tcltk/tk/blob/main/macosx/README
+
 
 		base.debugmsg(6, "BuildUI")
+
 		self.BuildUI()
 
 		try:
@@ -2254,6 +2856,15 @@ class RFSwarmGUI(tk.Frame):
 		# files["Abort"] = "../famfamfam_silk_icons/icons/bomb.gif"
 		# files["Aborted"] = "../famfamfam_silk_icons/icons/stop_grey.gif"
 
+		# files["Advanced"] = "../famfamfam_silk_icons/icons/cog.gif"
+		# files["Delete"] = "../famfamfam_silk_icons/icons/cross.gif"
+		# files["Delete"] = "../famfamfam_silk_icons/icons/bin_empty.gif"
+		# files["Script"] = "../famfamfam_silk_icons/icons/script.gif"
+		# files["AddRow"] = "../famfamfam_silk_icons/icons/script_add.gif"
+		# files["AddRow"] = "../famfamfam_silk_icons/icons/add.gif"
+
+
+
 		if icontext in files:
 			base.debugmsg(6, "icontext:", icontext)
 			scrdir = os.path.dirname(__file__)
@@ -2296,6 +2907,23 @@ class RFSwarmGUI(tk.Frame):
 
 		self.b64["Aborted"] = b'GIF87a\x10\x00\x10\x00\xd5\x00\x00\x00\x00\x00\x1b\x1b\x1c\'\'((\'(112=<=FEFGFHOMOUSU[Z[_^``_adbdigiljmompqoqtrt{z|\x7f}\x80\x80~\x81\x85\x83\x85\x89\x87\x8a\x8c\x8a\x8d\x8f\x8d\x90\x90\x8e\x91\x94\x92\x95\x97\x95\x98\x99\x96\x99\x9c\x9a\x9d\xa0\x9e\xa1\xa3\xa1\xa4\xa7\xa5\xa8\xa9\xa6\xaa\xad\xaa\xae\xb1\xae\xb1\xb5\xb3\xb6\xb8\xb6\xb9\xbb\xb9\xbc\xc4\xc2\xc5\xc8\xc6\xc9\xcc\xca\xcd\xd1\xcf\xd2\xd6\xd4\xd7\xd7\xd4\xd8\xd9\xd6\xda\xdc\xd9\xdd\xe0\xdd\xe1\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\n\x002\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x06\x98@\x99pH,\x1aA"\x10\xe8\xd31\x0eK/\xd8\xcb\xe5Z\x81\x9c\xa4\x97\xcaT"\x89L\xaaM1\x9b\xea\x8eB \xcf\x08\x85\x19zX\xa8\xd1(\xe9\xe9l0\x9eRC\xd8i\x89\xd0uw\x17\x16\x13%\x0bB\x1a*iv\x18\x83\x14\x13\x12#\tB\x17)\x1c\x82\x16\x15\x90\x11\x0f \x07B\x15l\x8e\x90\x12\x0f\x0e\x0b \x05B\x12\'\x1e\x13\xa4\xa6\r\n\x12\x1e\x01C\x85\x18\x0f\xb1\x0c\t\x11\x1e\x08E\x10#\x15\x0c\x0b\n\x08\x0e\x1d\x06N\r\x1f\x1f\x1e\x1b\x1b\x19\xcbN2\x03\x04\x02\x01\x01\x00\xd5\xddDA\x00;'
 
+		# files["AddRow"] = "../famfamfam_silk_icons/icons/add.gif"
+		self.b64["AddRow"] = b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00,|\x1d+~"&\x80\x1e/\x81)0\x81\'3\x83)8\x87.=\x8a2A\x8e5E\x8f9K\x92?Q\x95CN\x9a>U\x9bE]\x9dLb\xa0Me\xa2Ri\xa5Zh\xa6Vj\xabVl\xab[f\xacRu\xacat\xad_z\xb2d~\xb3h\x83\xb5kn\xb6V\x88\xb8op\xb9W\x87\xbaqt\xbb\\}\xbbk\x8a\xbcr}\xbde\x8b\xbfzp\xc2by\xc2c\x8d\xc3{|\xc4i\x92\xc6\x80~\xc8o\x89\xc9\x7f\x86\xcbz\x99\xcc\x86\x81\xcdu\x8d\xcd\x83\x99\xcd\x8a\x93\xce\x88\xa5\xcf\x94\x8a\xd0}\xa7\xd1\x97\x8e\xd3\x83\x99\xd4\x8b\x96\xd5\x8a\xac\xd5\x9e\x9e\xd9\x92\xa1\xda\x97\xb5\xda\xa6\xb8\xdb\xab\xa6\xdc\x9c\xb5\xdd\xaa\xbb\xde\xb0\xb0\xe0\xa7\xb6\xe0\xad\xbc\xe3\xb5\xcc\xe6\xc4\xc6\xe8\xc1\xcf\xe9\xca\xd5\xeb\xd0\xd8\xee\xd3\xdd\xf1\xd9\xe1\xf2\xdd\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00K\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xb1\x80K\x82\x83\x84\x85\x86"\x1b\x1b\x19\x17\x17\x86\x82"\x1f2CFE?!\x13\x11\x85\x90?IB=:@D\'\x0f\x0f\x84\x1f<H91/775B!\x0e\x83\x1d-G:7+JJ,(*A\x0e\x0b\x82\x1b>@/,!\xba\x15  6)\n\x82\x1aB6,\xba\xd5J\x1e(8\x08\x82\x19>3.\xd6\xba\x1e#\xda\x82\x1807(%\x16\xe2\x1e -$\x06\x82\x15\x16>&\xcb\xe2\x1c ;\t\xf2\x82\x11!|,\xf3\xc0A\xdf\x8e\n\xfe\x04Ax\xd0\xad\xc5\x88\x11-vP( \xa0\x90\x03\x06\rN\xd0\xa0A\x02\x01EGK\x14$@p\xc0\x00\x01\x90(\t\x05\x02\x00;'
+
+		# files["AddRow"] = "../famfamfam_silk_icons/icons/script_add.gif"
+		# self.b64["AddRow"] = b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x003Y\x8c+Z\x90/`\x935`\x962e\x9a>h\x9b5i\x9f3j\x125k\x1b9m\xa6?oW<p\x1b@s\xa6@s\xacDw\xb3Fw\'J{,D\x82\xb8V\x84BI\x85\xbaW\x85\xb5R\x86\xb9D\x88\xbbI\x88\xbe_\x8aHQ\x8c"L\x8e\xc6S\x8e\xc4U\x8e\xaae\x8eMU\x8f(W\x8f\xd5Y\x8f\xccl\x90\xb9\\\x92\xd7O\x94\xcbS\x95\xcab\x97\xd9f\x99\xccs\x99_T\x9b\xd1l\x9e\xd9q\x9e\xd3V\xa1\xd7p\xa1\xe1\\\xa5\xdc\x85\xa5\xc8{\xa6\xda^\xa9\xdf\x81\xac`^\xad\xe2`\xad\xe4\x8c\xaf\xd6g\xb1\xe5l\xb3\xe6\x98\xb3\x88\x94\xb6\xa6w\xb8\xe8\x87\xb9\xe0\x87\xbb_\x9b\xbb\xad\xa4\xbb\xd7\x8d\xbcd\x8f\xbci\x81\xbd\xea\x8c\xc1\xea\x9b\xc7\xeb\xb4\xc7\xe0\xa3\xc8\xf7\xa7\xcc\xea\xae\xd0\xf7\xb3\xd1\xed\xb3\xd4\x94\xb7\xd5\x9d\xc4\xd5\xe7\xb6\xd6\xf9\xc2\xda\xee\xc2\xdb\xf2\xbe\xdc\xf9\xc2\xdd\xf9\xc7\xe0\xf5\xd4\xe0\xee\xcb\xe2\xfa\xd3\xe5\xfa\xd1\xe6\xbb\xd9\xe7\xf5\xd6\xe9\xfc\xda\xea\xfc\xe3\xea\xf5\xe2\xee\xfc\xe5\xf0\xfd\xed\xf3\xfc\xf0\xf6\xfe\xf6\xfa\xfd\x00\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00a\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xce\x80a\x823A:763\x89\x8943\x82a1B`\x92`^\\XTQF1.\x82.C`Z[\\\\^^\x92^N\x9ca,F`WXX\xa1[[`-`;\x82)H]SSTT\xafX`+M)\x82%NZP\xcb\xbd\xbe`!$$\x82\x1bVTOO\xcb\xcc`%\x8ea\x18\xbc\xd8\xd9PS`\x1c\xdd\x14^\xe2\xd9S^\x12\xdd\x16`\xeaP=(\x1e\x13\x10\x8e\xf0\xea92IU@\x1f\x10\x84QPcK\x91#L\xb0eH\x92\x04\xcc\x8f\x1f\x08\x0e\x1c\xa8\x00C\x85\n\x13#@DP2)\t\x82\x02/&\x9d\xea\xc2\xe0\x07\x0f0< \x0e\x10\xe1\x83\xc8\x12)YH\xe1\xd0\xf0#\xc9\x0f\r\x02\x05\xe8\xdc)\x80\x80\x81\x05\t\x10\x08\r\x13\x08\x00;'
+
+
+		self.b64["Script"] = b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x003Y\x8c,Z\x91,]\x8e/`\x935`\x962e\x994g\xa0>h\x9b5i\x9f9n\xa6@s\xa6@s\xacMt\xa4=u\xaaDw\xb3@{\xb2D\x82\xb8^\x82\xaeI\x85\xbaW\x85\xb5R\x86\xb9D\x88\xbbI\x88\xbeL\x8e\xc6S\x8e\xc4U\x8e\xaaV\x8f\xd5Y\x8f\xccl\x90\xb9\\\x92\xd7O\x94\xcbS\x95\xcab\x97\xd9f\x99\xccT\x9b\xd1h\x9e\xe3l\x9e\xd9q\x9e\xd3\x80\x9e\xc2V\xa1\xd7p\xa1\xe1\\\xa5\xdc\x85\xa5\xc8{\xa6\xda^\xa9\xdf^\xad\xe2`\xad\xe4\x86\xaf\xe5\x8c\xaf\xd6\x96\xb0\xcfg\xb1\xe5l\xb3\xe6w\xb8\xe8\x87\xb9\xe0\xa4\xbb\xd7\xa3\xbc\xd9\x81\xbd\xea\x8c\xc1\xea\x9b\xc7\xeb\xb4\xc7\xe0\xa3\xc8\xf7\xa7\xcc\xea\xbb\xcf\xe3\xae\xd0\xf7\xb3\xd1\xed\xc4\xd5\xe7\xb6\xd6\xf9\xc2\xda\xee\xc2\xdb\xf2\xbe\xdc\xf9\xc2\xdd\xf9\xce\xdd\xec\xc7\xe0\xf5\xd4\xe0\xee\xc7\xe2\xfa\xcb\xe2\xfa\xd3\xe5\xfa\xd9\xe7\xf5\xd6\xe9\xfc\xdb\xea\xfc\xe3\xec\xf5\xe2\xed\xfc\xe5\xf0\xfd\xec\xf4\xfc\xf1\xf6\xfe\xf6\xfa\xfd\x00\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00Y\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xc4\x80Y\x82.9543.\x89\x89/.\x82Y-:X\x92XVTPMI>-*\x82*;XRSTTVV\x92VE\x9cY(>XOPP\xa1SSX)X6\x82#AULLMM\xafPX&D#\x82 ERG\xcb\xbd\xbeX\x1c\x1f\x1f\x82\x18NMFF\xcb\xccX \x8eY\x17\xbc\xd8\xd9GLX\x19\xdd\x13V\xe2\xd9LV\x11\xdd\x15X\xea\xcbMQ\x10\xef\xf1\xf2PH\x0e\x8e\n1S=\x80\x0c\xc1\xb6\x84\t\x95\x1f\n\x04%H@\x81E\x89\x12!<l\xd8@\xa2\t\x8e\x03\x82\x0c\xac\x98t\xaaJ\x15\x18Pd\x18\x10D\xa0\xc3\r\x1eB\x94D!\x05J\xca\t\x01\x8e\x04\xc8\x9c)\xa0\x00\x82\x06\x12`\n\n\x04\x00;'
+
+		# files["Delete"] = "../famfamfam_silk_icons/icons/bin_empty.gif"
+		# self.b64["Delete"] =b'GIF87a\x10\x00\x10\x00\xc4\x00\x00\x00\x00\x00___dddmmmssszzz\x83\x83\x83\x8d\x8d\x8d\x93\x93\x93\x9b\x9b\x9b\xa3\xa3\xa3\xab\xab\xab\xb5\xb5\xb5\xb9\xb9\xb9\xc4\xc4\xc4\xcd\xcd\xcd\xd3\xd3\xd3\xdb\xdb\xdb\xe4\xe4\xe4\xec\xec\xec\xf3\xf3\xf3\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00\x16\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x05\x8a\xa0%\x8edi\x9e\xa88\x1c\xc8\xc1\x1e\xc3I\x1c\x8f\x14A\xd1c\xc4\xa5!Q\x13\tD2y\x14J\x0b\xc6\x82x\x8bHZ\xa3\xc5B\xa1hL\xa7T\x87A\xb4\x88L(\x12\xe5c\xec`0\x8e\x0bG\xf0;Q\xe6 \x89\xb3Ea\x8b8\'\x13\xc3;N\x98K\x1c\x108?\x05\x0e\x0f\x10\x08\x0c1\t^V\x0f\x11\x14\x04\x85\x10\x07\x89\x16\x88`v\x8f\x03\x10\x86\x07\r\x02"\x94@\x12a\x08\xa47\n\xa0"\x05]7\x02\x04\x04\x03\x02\xb3%\xb1\xb3\x01(!\x00;'
+
+		# files["Delete"] = "../famfamfam_silk_icons/icons/cross.gif"
+		self.b64["Delete"] = b'GIF87a\x10\x00\x10\x00\xd5\x00\x00\x00\x00\x00\xe4\x14\x18\xe3\x1a\x1e\xdf  \xdf @\xe7%&\xea)+\xe7**\xe9.1\xec34\xff33\xed;=\xf1<>\xef?B\xdf@@\xefCE\xefCK\xf1CE\xf4EH\xf4KM\xf3LQ\xffSV\xf6TV\xf6UZ\xffVZ\xf5Z\\\xfa]^\xf7^`\xf8^b\xff`\x80\xfcbd\xf9gi\xfbjm\xfdmp\xfert\xffwy\xffz}\xff~\x81\xff\x81\x82\xff\x87\x8a\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00)\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x06t\xc0\x94pH,\x1a\x8f\x1a\xe3hd\xf4|(\xc4Q\xa9$"r@$\xcec("\x9dH \xe1\x95\xb4\x89\x14A"\x93\xc8\x93\xc1f\xb6\xcdP\x89D\x1a\xbd\x8f\xc2\x0cI\x83\x115\xf0y#\x15\x15"fx\x19\x1e""! \x16\x0bG\x17\x89\x17\r\x0b\x13\x1e\x13\tE\x91"\x8eB\x08\x11\x1e\x12\x06C\x13\x16\x1e\x9dC\x05\x0c\x13\x06\x01C\x10\x13\x8fE\x02\xadE\xb2F\xae\x80\x80A\x00;'
+
+		self.b64["Advanced"] = b'GIF87a\x10\x00\x10\x00\xc4\x00\x00\x00\x00\x00GGGMMMTTT[[[ccclllpppyyy\x82\x82\x82\x8d\x8d\x8d\x94\x94\x94\x9c\x9c\x9c\xa5\xa5\xa5\xac\xac\xac\xb4\xb4\xb4\xbc\xbc\xbc\xc4\xc4\xc4\xcb\xcb\xcb\xd4\xd4\xd4\xdc\xdc\xdc\xe5\xe5\xe5\xeb\xeb\xeb\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00\x18\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x05\x91 &\x8e\x92\x14Ac\xaaFU\xe5\xa8\xe3Tb\x11E=\x98\xd341eQ\xa7\xc9\xe4\xe1\x90T \n\x91\x892\xb1\t\x99%\xc4a\x14\x91I \x8cFd\x8bTn)\xd7\x04"\xa1\xd8J\x14\x89D\xc4bm$D\x0c\xc7\xa9f`M"\x92\xc7B\xb4\x90C\xaa\x05\r\x0b\rw\x12\x0c\x0c\x0be\x10\x10\x05\x03\x03"rf\x0e~D\x06#:\x85V&\x10\x12\x06\x05"\r\x10\x14nj\x11\x06\x06\x84\t\x8f"\t\x9e\x18\t%\x9f\x03\x02\x010\xac\x10\x0f\x04\xb6*\x06\xb3\xab)!\x00;'
+
 		# png's
 		# b64["New"] = """iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAAK/INwWK6QAAABl0RVh0\nU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAC4SURBVCjPdZFbDsIgEEWnrsMm7oGGfZro\nhxvU+Iq1TyjU60Bf1pac4Yc5YS4ZAtGWBMk/drQBOVwJlZrWYkLhsB8UV9K0BUrPGy9cWbng2CtE\nEUmLGppPjRwpbixUKHBiZRS0p+ZGhvs4irNEvWD8heHpbsyDXznPhYFOyTjJc13olIqzZCHBouE0\nFRMUjA+s1gTjaRgVFpqRwC8mfoXPPEVPS7LbRaJL2y7bOifRCTEli3U7BMWgLzKlW/CuebZPAAAA\nAElFTkSuQmCC\n"""
 		# b64["Save"] = """iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0\nU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAH+SURBVBgZBcE9i11VGAbQtc/sO0OCkqhg\nhEREAwpWAWUg8aMVf4KFaJEqQtAipTZWViKiCGOh2Ap2gmJhlSIWFsFOxUK0EsUM3pl79n4f12qH\nb3z3Fh7D83gC95GOJsDe0ixLk5Qq/+xv/Lw9Xd+78/HLX3Y8fXTr2nWapy4eCFKxG7Fby97SnDlY\ntMbxthyfzHO//nl85fNvfvnk8MbX5xa8IHx1518Vkrj54Q+qQms2vVmWZjdiu5ZR2rT01166/NCZ\ng/2PFjwSVMU6yjoC1oq+x6Y3VbHdlXWExPd379nf7Nmejv2Os6OC2O4KLK0RNn3RNCdr2Z5GJSpU\n4o+/TkhaJ30mEk5HwNuvX7Hpi76wzvjvtIwqVUSkyjqmpHS0mki8+9mPWmuWxqYvGkbFGCUAOH/+\nQevYI9GFSqmaHr5wkUYTAlGhqiRRiaqiNes6SOkwJwnQEqBRRRJEgkRLJGVdm6R0GLMQENE0Ekmk\nSkQSVVMqopyuIaUTs0J455VLAAAAAODW0U/GiKT0pTWziEj44PZ1AAAAcPPqkTmH3QiJrlEVDXDt\n0qsAAAAAapa5BqUnyaw0Am7//gUAAAB49tEXzTmtM5KkV/y2G/X4M5fPao03n/sUAAAAwIX7y5yB\nv9vhjW/fT/IkuSp5gJKElKRISYoUiSRIyD1tufs/IXxui20QsKIAAAAASUVORK5CYII=\n"""
@@ -2321,10 +2949,18 @@ class RFSwarmGUI(tk.Frame):
 		self.bind("<Configure>", self.save_window_size)
 
 		base.debugmsg(6, "self.tabs")
-		self.tabs = ttk.Notebook(self)
+		# this removes a lot of wasted space and gives it back to the data in each tab
+		#   I tried a value of 0, but it needed something, so 5 worked nicely, I think
+		# 	the system default is ~20 on macos 11
+		self.tabs = ttk.Notebook(self, padding=5)
+		# self.tabs = ttk.Notebook(self)
+		base.debugmsg(5, "self.tabs", self.tabs)
+		# base.debugmsg(5, "self.tabs", self.tabs["background"])
+
 		base.debugmsg(6, "p")
 		p = ttk.Frame(self.tabs)   # first page, which would get widgets gridded into it
 		p.grid(row=0, column=0, sticky="nsew")
+		# p.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
 		base.debugmsg(6, "r")
 		r = ttk.Frame(self.tabs)   # second page
 		r.grid(row=0, column=0, sticky="nsew")
@@ -2335,6 +2971,10 @@ class RFSwarmGUI(tk.Frame):
 		self.tabs.add(r, text='Run')
 		self.tabs.add(a, text='Agents')
 		self.tabs.grid(column=0, row=0, sticky="nsew")
+		# self.tabs.grid(column=0, row=0, padx=0, pady=0, sticky="nsew")
+
+		self.ConfigureStyle()
+
 
 		base.debugmsg(6, "BuildMenu")
 		self.BuildMenu()
@@ -2416,6 +3056,94 @@ class RFSwarmGUI(tk.Frame):
 			base.debugmsg(6, "save_window_size except:", e)
 			return False
 
+	def ConfigureStyle(self):
+
+		# we really only seem to need this for MacOS 11 and up for now
+		# base.debugmsg(5, "sys.platform", sys.platform)
+		# base.debugmsg(5, "platform.system", platform.system())
+		# base.debugmsg(5, "platform.release", platform.release())
+		# base.debugmsg(5, "platform.mac_ver", platform.mac_ver())
+
+		if sys.platform.startswith('darwin'):
+			release, _, machine = platform.mac_ver()
+			split_ver = release.split('.')
+			if int(split_ver[0]) > 10:
+				# Theme settings for ttk
+				style = ttk.Style()
+				# https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/ttk-style-layer.html
+				# base.debugmsg(5, "style.layout", style.layout)
+				# # list = style.layout()
+				# # base.debugmsg(5, "list", list)
+				# base.debugmsg(5, "style.element_names", style.element_names)
+				# list = style.element_names()
+				# base.debugmsg(5, "list", list)
+				# base.debugmsg(5, "style.theme_names", style.theme_names)
+				# list = style.theme_names()
+				# base.debugmsg(5, "list", list)
+
+
+				# style.layout("rfsinput", style.layout('TEntry'))
+				# style.configure("rfsinput", **style.configure('TEntry'))
+				# style.map("rfsinput", **style.map('TEntry'))
+				# style.map("rfsinput",
+				#     fieldbackground=[(['!invalid','!disabled'], '#fff'),
+				#                      (['!invalid','disabled'], '#aaa')]
+				# )
+				# style.map("rfsinput",
+				#     fieldbackground=[(['!invalid','!disabled'], '#fff'),
+				#                      (['!invalid','disabled'], '#aaa'),
+				#                      (['invalid','!disabled'], '#ff4040'),
+				#                      (['invalid','disabled'], '#ffc0c0')]
+				# )
+				# style.configure("rfs.Entry", foreground="black")
+				# style.configure("rfs.Entry", foreground="systemControlTextColor")
+				# style.configure("rfs.Entry", foreground=self.rootBackground)	# systemWindowBackgroundColor
+				# base.debugmsg(5, "self.rootBackground", self.rootBackground)
+				# style.configure("rfs.Entry", foreground=self.rootBackground)	# systemControlTextColor
+
+				# style.configure("rfs.Entry", foreground="systemControlAccentColor")
+				# style.configure("rfs.Entry", foreground="systemControlTextColor")
+				# style.configure("rfs.Entry", foreground="systemDisabledControlTextColor")
+				# style.configure("rfs.Entry", foreground="systemLabelColor")
+				# style.configure("rfs.Entry", foreground="systemLinkColor")
+				# style.configure("rfsinput", foreground="systemPlaceholderTextColor")
+				# style.configure("rfs.Entry", foreground="systemSelectedTextBackgroundColor")
+				# style.configure("rfs.Entry", foreground="systemSelectedTextColor")
+				# style.configure("rfs.Entry", foreground="systemSeparatorColor")
+				# style.configure("rfs.Entry", foreground="systemTextBackgroundColor")
+				# style.configure("rfs.Entry", foreground="systemTextColor")
+
+				# style.layout("rfsinput", style.layout('TLabel'))
+				# style.configure("rfsinput", **style.configure('TLabel'))
+				# style.map("rfsinput", **style.map('TLabel'))
+				# style.configure("TLabel", foreground="systemPlaceholderTextColor")
+				style.configure("TLabel", foreground="#000")
+				style.configure("TEntry", foreground="systemPlaceholderTextColor")
+				# style.configure("TButton", foreground="systemPlaceholderTextColor")
+				style.configure("TButton", foreground="#000")
+				# style.configure("TCombobox", foreground="systemPlaceholderTextColor")
+				# style.configure("TCombobox", foreground="#000")
+				# style.configure("TComboBox", foreground="#000")
+				# style.configure("Combobox", foreground="#000")
+				# style.configure("ComboBox", foreground="#000")
+				#
+				# style.configure("OptionMenu", foreground="#000")
+				# style.configure("TOptionMenu", foreground="#000")
+				# style.configure("Optionmenu", foreground="#000")
+				# style.configure("TOptionmenu", foreground="#000")
+
+				# style.configure("Menubutton", foreground="#000")
+				style.configure("TMenubutton", foreground="#000")
+
+				# self.rfstheme["default"] = "systemPlaceholderTextColor"
+				# self.rfstheme["default"] = "#000"
+
+				# style.configure("Canvas", foreground="#000")
+				style.configure("Canvas", fill="#000")
+				style.configure("Canvas", activefill="#000")
+
+				# style.configure("Spinbox", foreground="#000")
+				style.configure("TSpinbox", foreground="#000")
 
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -2509,7 +3237,11 @@ class RFSwarmGUI(tk.Frame):
 		# Plan Graph
 		base.debugmsg(6, "Plan Graph")
 
+		# defaultcolour = self.rfstheme["default"]
+
 		self.pln_graph = tk.Canvas(p)
+		# self.pln_graph = tk.Canvas(p, fill="#000")
+		# self.pln_graph = tk.Canvas(p, selectforeground="#000")
 		self.pln_graph.grid(column=0, row=planrow, sticky="nsew") # sticky="wens"
 
 		# self.pln_graph.columnconfigure(0, weight=1)
@@ -2586,9 +3318,20 @@ class RFSwarmGUI(tk.Frame):
 		tst = ttk.Label(self.scriptgrid, text="Test")
 		tst.grid(column=self.plancoltst, row=0, sticky="nsew")
 
+		self.scriptgrid.columnconfigure(self.plancoltst, weight=5)
+		tst = ttk.Label(self.scriptgrid, text="Settings")
+		tst.grid(column=self.plancolset, row=0, sticky="nsew")
+
+		icontext = "AddRow"
+		self.icoAddRow = self.get_icon(icontext)
 		self.scriptgrid.columnconfigure(self.plancoladd, weight=0)
-		new = ttk.Button(self.scriptgrid, text="+", command=base.addScriptRow, width=1)
+		new = ttk.Button(self.scriptgrid, image=self.imgdata[icontext], padding='3 3 3 3', text="+", command=base.addScriptRow, width=1)
 		new.grid(column=self.plancoladd, row=0, sticky="nsew")
+
+
+		self.icoScript = self.get_icon("Script")
+		self.icoAdvanced = self.get_icon("Advanced")
+		self.icoDelete = self.get_icon("Delete")
 
 		# self.scrollable_sg.update()
 		# update scrollbars
@@ -2615,6 +3358,13 @@ class RFSwarmGUI(tk.Frame):
 		core.ClickPlay()
 
 	def pln_update_graph(self):
+
+		totcolour = "#000000"
+		gridcolour = "#cfcfcf"
+		defaultcolour = "#000000"
+
+
+
 		base.debugmsg(6, "pln_update_graph")
 		base.debugmsg(6, "pln_graph:", self.pln_graph)
 		base.debugmsg(6, "scriptlist:", base.scriptlist)
@@ -2694,15 +3444,21 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(5, "xm0:", xm0, "	xm1:", xm1, "	xm2:", xm2, "	xmt:",xmt)
 
 		# y-axis
-		self.pln_graph.create_line(xm1, ym1, xm1, ym2)
+		self.pln_graph.create_line(xm1, ym1, xm1, ym2, fill=defaultcolour)
+		# self.pln_graph.create_line(xm1, ym1, xm1, ym2)
+		# self.pln_graph.create_line(xm1, ym1, xm1, ym2, fill=gridcolour)
 		# x-axis
 		# base.gui.pln_graph.create_line(10, graphh-10, graphw, graphh-10, fill="blue")
-		self.pln_graph.create_line(xm1, ym1, xm2, ym1)
+		self.pln_graph.create_line(xm1, ym1, xm2, ym1, fill=defaultcolour)
+		# self.pln_graph.create_line(xm1, ym1, xm2, ym1)
 
 		# draw zero
-		self.pln_graph.create_line(xm1, ym0, xm1, ym1)
-		self.pln_graph.create_line(xm0, ym1, xm1, ym1)
-		self.pln_graph.create_text([xm0, ym0], text="0")
+		self.pln_graph.create_line(xm1, ym0, xm1, ym1, fill=defaultcolour)
+		self.pln_graph.create_line(xm0, ym1, xm1, ym1, fill=defaultcolour)
+		self.pln_graph.create_text([xm0, ym0], text="0", fill=defaultcolour)
+		# self.pln_graph.create_line(xm1, ym0, xm1, ym1)
+		# self.pln_graph.create_line(xm0, ym1, xm1, ym1)
+		# self.pln_graph.create_text([xm0, ym0], text="0")
 
 		# populate x axis	(time)
 		base.debugmsg(5, "populate x axis	(time)")
@@ -2738,13 +3494,13 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(9, "durinc", durinc)
 		durmrk = durinc
 		base.debugmsg(9, "durmrk", durmrk)
-		gridcolour = "#cfcfcf"
 		while durmrk < mxdur+1:
 			base.debugmsg(9, "x1", tmmrk, "y1", ym0, "x2", tmmrk, "y2", ym1)
 			# base.gui.pln_graph.create_line(tmmrk, ym0, tmmrk, ym1)
 			self.pln_graph.create_line(tmmrk, ym1, tmmrk, ym2, fill=gridcolour)
 			base.debugmsg(9, "format_sec({})".format(durmrk), base.format_sec(durmrk))
-			self.pln_graph.create_text([tmmrk, ym0], text=base.format_sec(durmrk))
+			self.pln_graph.create_text([tmmrk, ym0], text=base.format_sec(durmrk), fill=defaultcolour)
+			# self.pln_graph.create_text([tmmrk, ym0], text=base.format_sec(durmrk))
 
 			tmmrk += mrkinc
 			base.debugmsg(9, "tmmrk", tmmrk)
@@ -2779,7 +3535,8 @@ class RFSwarmGUI(tk.Frame):
 			# base.gui.pln_graph.create_line(xm0, mrk, xm1, mrk)
 			self.pln_graph.create_line(xm1, mrk, xm2, mrk, fill=gridcolour)
 			# base.gui.pln_graph.create_text([xm0, txtmrk], text="{}".format(usrmrk))
-			self.pln_graph.create_text([xm0, mrk], text="{}".format(usrmrk))
+			self.pln_graph.create_text([xm0, mrk], text="{}".format(usrmrk), fill=defaultcolour)
+			# self.pln_graph.create_text([xm0, mrk], text="{}".format(usrmrk))
 
 			usrmrk += usrinc
 
@@ -2855,7 +3612,6 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(6, "Total Users")
 		base.debugmsg(6, "totusrsxy:", totusrsxy)
 
-		totcolour = "#000000"
 		sy = graphh-axissz
 		prevx = 0
 		prevx2 = 0
@@ -3209,7 +3965,7 @@ class RFSwarmGUI(tk.Frame):
 		row = base.scriptcount
 
 		colour = base.line_colour(base.scriptcount)
-		base.debugmsg(8, "colour:", colour)
+		base.debugmsg(5, "colour:", colour)
 
 		idx = tk.Label(self.scriptgrid, text=str(base.scriptcount))
 		idx['bg'] = colour
@@ -3218,6 +3974,11 @@ class RFSwarmGUI(tk.Frame):
 
 		num = base.scriptlist[base.scriptcount]["Users"]
 		usr = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout")
+		# usr = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout", style="BW.TLabel")
+		# usr = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout", style="rfsinput")
+		# usr = tk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout", fg="systemControlTextColor")
+		# usr = tk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout")
+		# systemControlTextColor
 		usr.config(validatecommand=lambda: self.sr_users_validate(row))
 		usr.grid(column=self.plancolusr, row=base.scriptcount, sticky="nsew")
 		usr.insert(0, num)
@@ -3250,7 +4011,10 @@ class RFSwarmGUI(tk.Frame):
 		scr.grid(column=0, row=0, sticky="nsew")
 		fgf.columnconfigure(scr, weight=1)
 
-		scrf = ttk.Button(fgf, text="...", width=1)
+		icontext = "Script"
+		# self.icoScript = self.get_icon(icontext)
+		# scrf = ttk.Button(fgf, image=self.imgdata[icontext], padding='3 0 3 0', text="...", width=1)
+		scrf = ttk.Button(fgf, image=self.imgdata[icontext], text="...", width=1)
 		scrf.config(command=lambda: self.sr_file_validate(row))
 		scrf.grid(column=1, row=0, sticky="nsew")
 		fgf.columnconfigure(scrf, weight=0)
@@ -3262,8 +4026,17 @@ class RFSwarmGUI(tk.Frame):
 		tst.grid(column=self.plancoltst, row=base.scriptcount, sticky="nsew")
 
 
+		icontext = "Advanced"
+		# self.icoAdvanced = self.get_icon(icontext)
 		self.scriptgrid.columnconfigure(self.plancoladd, weight=0)
-		new = ttk.Button(self.scriptgrid, text="X", command=lambda: self.sr_remove_row(row), width=1)
+		new = ttk.Button(self.scriptgrid, image=self.imgdata[icontext], text="Settings", command=lambda: self.sr_row_settings(row), width=1)
+		new.grid(column=self.plancolset, row=base.scriptcount, sticky="nsew")
+
+
+		icontext = "Delete"
+		# self.icoDelete = self.get_icon(icontext)
+		self.scriptgrid.columnconfigure(self.plancoladd, weight=0)
+		new = ttk.Button(self.scriptgrid, image=self.imgdata[icontext], text="X", command=lambda: self.sr_remove_row(row), width=1)
 		new.grid(column=self.plancoladd, row=base.scriptcount, sticky="nsew")
 
 		# self.scrollable_sg.update()
@@ -3587,6 +4360,203 @@ class RFSwarmGUI(tk.Frame):
 		except:
 			pass
 		return True
+
+	def sr_row_settings(self, r):
+		base.debugmsg(5, "r:", r)
+		stgsWindow = tk.Toplevel(self.root)
+		# self.grid(sticky="news", ipadx=0, pady=0)
+		# self.root.resizable(False, False)		# this didn't work as expected, I expected the dialog to not be resizable instaed it stopped the main window from being resizable
+		# self.root.resizable(True, True)
+
+		stgsWindow.title("Settings for row {}".format(r))
+		testname = ""
+		try:
+			testname = base.scriptlist[r]["TestVar"].get()
+		except:
+			pass
+		base.debugmsg(5, "testname:", testname)
+		if len(testname)>0:
+			stgsWindow.title("Settings for {} ({})".format(testname, r))
+
+
+		stgsWindow.excludelibrariesdefault = "BuiltIn,String,OperatingSystem,perftest"
+		stgsWindow.Filters = {}
+
+		base.debugmsg(5, "base.scriptlist[r]:", base.scriptlist[r])
+
+		stgsWindow.excludelibrariescurrent = stgsWindow.excludelibrariesdefault
+		if "excludelibraries" in base.scriptlist[r]:
+			stgsWindow.excludelibrariescurrent = base.scriptlist[r]["excludelibraries"]
+		base.debugmsg(5, "excludelibrariescurrent:", stgsWindow.excludelibrariescurrent)
+
+		stgsWindow.robotoptionscurrent = ""
+		if "robotoptions" in base.scriptlist[r]:
+			stgsWindow.robotoptionscurrent = base.scriptlist[r]["robotoptions"]
+		base.debugmsg(5, "robotoptionscurrent:", stgsWindow.robotoptionscurrent)
+
+		row =0
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text = " ")	# just a blank row as a spacer before the filters
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row +=1
+		stgsWindow.lblEL = ttk.Label(stgsWindow, text = "Exclude libraries:")
+		stgsWindow.lblEL.grid(column=0, row=row, sticky="nsew")
+
+		row +=1
+		# stgsWindow.inpEL = ttk.Entry(stgsWindow, text = excludelibrariesdefault)
+		stgsWindow.inpEL = ttk.Entry(stgsWindow)
+		stgsWindow.inpEL.delete(0,'end')
+		stgsWindow.inpEL.insert(0, stgsWindow.excludelibrariescurrent)
+		stgsWindow.inpEL.grid(column=0, row=row, columnspan=10, sticky="nsew")
+
+		row +=1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text = " ")	# just a blank row as a spacer before the filters
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row +=1
+		stgsWindow.lblRO = ttk.Label(stgsWindow, text = "Robot Options:")
+		stgsWindow.lblRO.grid(column=0, row=row, sticky="nsew")
+
+		row +=1
+		stgsWindow.inpRO = ttk.Entry(stgsWindow)
+		stgsWindow.inpRO.delete(0,'end')
+		stgsWindow.inpRO.insert(0, stgsWindow.robotoptionscurrent)
+		stgsWindow.inpRO.grid(column=0, row=row, columnspan=10, sticky="nsew")
+
+		row +=1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text = " ")	# just a blank row as a spacer before the filters
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row +=1
+		stgsWindow.lblAF = ttk.Label(stgsWindow, text = "Agent Filter:")
+		stgsWindow.lblAF.grid(column=0, row=row, sticky="nsew")
+
+		icontext = "AddRow"
+		stgsWindow.btnAddFil = ttk.Button(stgsWindow, image=self.imgdata[icontext], text = "+", command=lambda: self.sr_row_settings_addf(r, stgsWindow), width=1)
+		stgsWindow.btnAddFil.grid(column=9, row=row, sticky="news")
+
+		row +=1
+		stgsWindow.fmeFilters = tk.Frame(stgsWindow)
+		stgsWindow.fmeFilters.grid(column=0, row=row, columnspan=10, sticky="nsew")
+
+		if "filters" in base.scriptlist[r]:
+			for f in base.scriptlist[r]["filters"]:
+				base.debugmsg(5, "f:", f)
+				base.add_scriptfilter(f['optn'])
+				self.sr_row_settings_addf(r, stgsWindow, f['rule'], f['optn'])
+
+
+
+		row +=1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text = " ")	# just a blank row as a spacer before the buttons
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row +=1
+		btnSave = ttk.Button(stgsWindow, text = "Save", command=lambda: self.sr_row_settings_save(r, stgsWindow))
+		btnSave.grid(column=6, row=row, sticky="nsew")
+
+		btnCancel = ttk.Button(stgsWindow, text = "Cancel", command=stgsWindow.destroy)
+		btnCancel.grid(column=7, row=row, columnspan=3, sticky="nsew") # cols 7, 8, 9
+
+	def sr_row_settings_save(self, r, stgsWindow):
+		base.debugmsg(7, "r:", r)
+		base.debugmsg(7, "stgsWindow:", stgsWindow)
+		el = stgsWindow.inpEL.get()
+		base.debugmsg(7, "el:", el)
+		if len(el)>0:
+			if el != stgsWindow.excludelibrariesdefault:
+				base.scriptlist[r]["excludelibraries"] = el
+				self.plan_scnro_chngd = True
+			else:
+				if "excludelibraries" in base.scriptlist[r]:
+					del base.scriptlist[r]["excludelibraries"]
+		else:
+			if "excludelibraries" in base.scriptlist[r]:
+				del base.scriptlist[r]["excludelibraries"]
+			self.plan_scnro_chngd = True
+
+		# stgsWindow.inpRO
+		ro = stgsWindow.inpRO.get()
+		base.debugmsg(7, "el:", el)
+		if len(ro)>0:
+			if ro != stgsWindow.robotoptionscurrent:
+				base.scriptlist[r]["robotoptions"] = ro
+				self.plan_scnro_chngd = True
+		else:
+			if "robotoptions" in base.scriptlist[r]:
+				del base.scriptlist[r]["robotoptions"]
+			self.plan_scnro_chngd = True
+
+		base.debugmsg(7, "stgsWindow.Filters:", stgsWindow.Filters)
+		# stgsWindow.Filters
+		if len(stgsWindow.Filters.keys())>0:
+			base.scriptlist[r]["filters"] = []
+			for fil in stgsWindow.Filters.keys():
+				filtr = {}
+				filtr["rule"] = stgsWindow.Filters[fil]["FilRule"].get()
+				filtr["optn"] = stgsWindow.Filters[fil]["FilOpt"].get()
+
+				if "filters" not in base.scriptlist[r]:
+					base.scriptlist[r]["filters"] = []
+				base.scriptlist[r]["filters"].append(filtr)
+			self.plan_scnro_chngd = True
+		else:
+			if "filters" in base.scriptlist[r]:
+				del base.scriptlist[r]["filters"]
+			self.plan_scnro_chngd = True
+
+		base.debugmsg(7, "base.scriptlist[r]:", base.scriptlist[r])
+
+		stgsWindow.destroy()
+
+		# MsgBox = tkm.askyesno('RFSwarm - Save Scenario','Do you want to save the current scenario?')
+		# base.debugmsg(9, "MsgBox:", MsgBox)
+		# if MsgBox:
+		# 	self.mnu_file_Save()
+
+
+	def sr_row_settings_addf(self, r, stgsWindow, *args):
+
+		FilRule = [None, "Require", "Exclude"]
+
+		base.debugmsg(5, "r:", r)
+		xy = stgsWindow.fmeFilters.grid_size()
+		base.debugmsg(5, "xy:", xy)
+		fid = xy[1]
+
+		stgsWindow.Filters[fid] = {}
+		stgsWindow.Filters[fid]["FilRule"] = tk.StringVar()
+		omfr = ttk.OptionMenu(stgsWindow.fmeFilters, stgsWindow.Filters[fid]["FilRule"], *FilRule)
+		stgsWindow.Filters[fid]["FilRule"].set(FilRule[1])
+		omfr.grid(column=0, row=fid, sticky="nsew")
+
+		stgsWindow.Filters[fid]["FilOpt"] = tk.StringVar()
+		omfo = ttk.OptionMenu(stgsWindow.fmeFilters, stgsWindow.Filters[fid]["FilOpt"], *base.scriptfilters)
+		omfo.grid(column=1, row=fid, sticky="nsew")
+
+		icontext = "Delete"
+		stgsWindow.btnRemFil = ttk.Button(stgsWindow.fmeFilters, image=self.imgdata[icontext], text = "X", command=lambda: self.sr_row_settings_remf(fid, stgsWindow), width=1)
+		stgsWindow.btnRemFil.grid(column=9, row=fid, sticky="nsew")
+		# stgsWindow.btnRemFil.grid(column=9, row=fid, width=1)
+
+		if len(args)>0:
+			base.debugmsg(5, "args[0]:", args[0])
+			stgsWindow.Filters[fid]["FilRule"].set(args[0])
+		if len(args)>1:
+			base.debugmsg(5, "args[1]:", args[1])
+			stgsWindow.Filters[fid]["FilOpt"].set(args[1])
+
+	def sr_row_settings_remf(self, r, stgsWindow):
+		relmts = stgsWindow.fmeFilters.grid_slaves(row=r, column=None)
+		base.debugmsg(5, relmts)
+
+
+		for elmt in relmts:
+			elmt.destroy()
+
+		del stgsWindow.Filters[r]
+
+		stgsWindow.update_idletasks()
 
 
 
@@ -4077,11 +5047,14 @@ class RFSwarmGUI(tk.Frame):
 			usr = ttk.Label(self.agenttgrid, text="  Last Seen  ", borderwidth=2, relief="raised")
 			usr.grid(column=4, row=0, sticky="nsew")
 
-			usr = ttk.Label(self.agenttgrid, text="  Robots  ", borderwidth=2, relief="raised")
+			usr = ttk.Label(self.agenttgrid, text="  Assigned  ", borderwidth=2, relief="raised")
 			usr.grid(column=5, row=0, sticky="nsew")
 
-			usr = ttk.Label(self.agenttgrid, text="  Load  ", borderwidth=2, relief="raised")
+			usr = ttk.Label(self.agenttgrid, text="  Robots  ", borderwidth=2, relief="raised")
 			usr.grid(column=6, row=0, sticky="nsew")
+
+			usr = ttk.Label(self.agenttgrid, text="  Load  ", borderwidth=2, relief="raised")
+			usr.grid(column=7, row=0, sticky="nsew")
 
 			usr = ttk.Label(self.agenttgrid, text="  CPU %  ", borderwidth=2, relief="raised")
 			usr.grid(column=8, row=0, sticky="nsew")
@@ -4092,8 +5065,11 @@ class RFSwarmGUI(tk.Frame):
 			usr = ttk.Label(self.agenttgrid, text="  NET %  ", borderwidth=2, relief="raised")
 			usr.grid(column=12, row=0, sticky="nsew")
 
-			usr = ttk.Label(self.agenttgrid, text="  Assigned  ", borderwidth=2, relief="raised")
+			usr = ttk.Label(self.agenttgrid, text="  Version  ", borderwidth=2, relief="raised")
 			usr.grid(column=13, row=0, sticky="nsew")
+
+			usr = ttk.Label(self.agenttgrid, text="  Libraries  ", borderwidth=2, relief="raised")
+			usr.grid(column=15, row=0, sticky="nsew")
 
 			# update scrollbars
 			self.agenttgrid.update_idletasks()
@@ -4148,17 +5124,31 @@ class RFSwarmGUI(tk.Frame):
 				if "AssignedRobots" not in self.display_agents[rnum]:
 					self.display_agents[rnum]["AssignedRobots"] = tk.StringVar()
 
-				base.debugmsg(9, "UpdateAgents: base.Agents[",agnt,"]:", base.Agents[agnt])
+				if "Version" not in self.display_agents[rnum]:
+					self.display_agents[rnum]["Version"] = tk.StringVar()
+
+				if "Libraries" not in self.display_agents[rnum]:
+					self.display_agents[rnum]["Libraries"] = tk.StringVar()
+
+				base.debugmsg(7, "UpdateAgents: base.Agents[",agnt,"]:", base.Agents[agnt])
 
 				self.display_agents[rnum]["Status"].set("  {}  ".format(base.Agents[agnt]["Status"]))
 				self.display_agents[rnum]["Agent"].set("  {}  ".format(agnt))
 				self.display_agents[rnum]["LastSeen"].set("  {}  ".format(dt.isoformat(sep=' ',timespec='seconds')))
+				self.display_agents[rnum]["AssignedRobots"].set("  {}  ".format(base.Agents[agnt]["AssignedRobots"]))
 				self.display_agents[rnum]["Robots"].set("  {}  ".format(base.Agents[agnt]["Robots"]))
 				self.display_agents[rnum]["LOAD%"].set("  {}  ".format(base.Agents[agnt]["LOAD%"]))
 				self.display_agents[rnum]["CPU%"].set("  {}  ".format(base.Agents[agnt]["CPU%"]))
 				self.display_agents[rnum]["MEM%"].set("  {}  ".format(base.Agents[agnt]["MEM%"]))
 				self.display_agents[rnum]["NET%"].set("  {}  ".format(base.Agents[agnt]["NET%"]))
-				self.display_agents[rnum]["AssignedRobots"].set("  {}  ".format(base.Agents[agnt]["AssignedRobots"]))
+
+				self.display_agents[rnum]["Version"].set("    ")
+				if "Properties" in base.Agents[agnt] and "RFSwarmAgent: Version" in base.Agents[agnt]["Properties"]:
+					self.display_agents[rnum]["Version"].set("  {}  ".format(base.Agents[agnt]["Properties"]["RFSwarmAgent: Version"]))
+				self.display_agents[rnum]["Libraries"].set("    ")
+				if "Properties" in base.Agents[agnt] and "RobotFramework: Libraries" in base.Agents[agnt]["Properties"]:
+					self.display_agents[rnum]["Libraries"].set("  {}  ".format(base.Agents[agnt]["Properties"]["RobotFramework: Libraries"]))
+
 				base.debugmsg(9, "UpdateAgents: display_agents:", self.display_agents)
 
 			robot_count += base.Agents[agnt]["Robots"]
@@ -4203,18 +5193,25 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(9, "add_row: LastSeen:", self.display_agents[rnum]["LastSeen"])
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["LastSeen"], borderwidth=2, relief="groove")
 		usr.grid(column=4, row=rnum, sticky="nsew")
-		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["Robots"], borderwidth=2, relief="groove")
+		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["AssignedRobots"], borderwidth=2, relief="groove")
 		usr.grid(column=5, row=rnum, sticky="nsew")
-		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["LOAD%"], borderwidth=2, relief="groove")
+		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["Robots"], borderwidth=2, relief="groove")
 		usr.grid(column=6, row=rnum, sticky="nsew")
+		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["LOAD%"], borderwidth=2, relief="groove")
+		usr.grid(column=7, row=rnum, sticky="nsew")
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["CPU%"], borderwidth=2, relief="groove")
 		usr.grid(column=8, row=rnum, sticky="nsew")
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["MEM%"], borderwidth=2, relief="groove")
 		usr.grid(column=10, row=rnum, sticky="nsew")
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["NET%"], borderwidth=2, relief="groove")
 		usr.grid(column=12, row=rnum, sticky="nsew")
-		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["AssignedRobots"], borderwidth=2, relief="groove")
+
+		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["Version"], borderwidth=2, relief="groove")
 		usr.grid(column=13, row=rnum, sticky="nsew")
+
+		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["Libraries"], borderwidth=2, relief="groove")
+		usr.grid(column=15, row=rnum, sticky="nsew")
+
 
 		# update scrollbars
 		self.agenttgrid.update_idletasks()
@@ -4260,7 +5257,7 @@ class RFSwarmGUI(tk.Frame):
 		else:
 			ScenarioFile = _event
 
-		base.debugmsg(9, "mnu_file_Open: ScenarioFile:", ScenarioFile)
+		base.debugmsg(6, "ScenarioFile:", ScenarioFile)
 
 		core.OpenFile(ScenarioFile)
 		base.gui.updateTitle()

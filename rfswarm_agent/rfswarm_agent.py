@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version v0.6.2
+#    Version 0.6.3
 #
 
 
@@ -10,6 +10,7 @@
 
 import sys
 import os
+import platform
 import tempfile
 import configparser
 
@@ -20,7 +21,7 @@ import base64
 
 
 # import robot
-
+import pkg_resources
 import random
 import time
 from datetime import datetime
@@ -40,7 +41,7 @@ import inspect
 
 class RFSwarmAgent():
 
-	version="v0.6.2"
+	version="0.6.3"
 	config = None
 	isconnected = False
 	isrunning = False
@@ -54,6 +55,7 @@ class RFSwarmAgent():
 	listenerfile = None
 	ipaddresslist = []
 	agentname = None
+	agentproperties = {}
 	netpct = 0
 	mainloopinterval = 10
 	scriptlist = {}
@@ -64,12 +66,14 @@ class RFSwarmAgent():
 	excludelibraries = []
 	args = None
 	xmlmode = False
+	timeout=600
 
 	debuglvl = 0
 
 	def __init__(self, master=None):
 		self.debugmsg(0, "Robot Framework Swarm: Run Agent")
 		self.debugmsg(0, "	Version", self.version)
+		self.agentproperties["RFSwarmAgent: Version"] = self.version
 		self.debugmsg(6, "__init__")
 		self.debugmsg(6, "gettempdir", tempfile.gettempdir())
 		self.debugmsg(6, "tempdir", tempfile.tempdir)
@@ -83,6 +87,7 @@ class RFSwarmAgent():
 		parser.add_argument('-r', '--robot', help='The robot framework executable')
 		parser.add_argument('-x', '--xmlmode', help='XML Mode, fall back to pasing the output.xml after each iteration', action='store_true')
 		parser.add_argument('-a', '--agentname', help='Set agent name')
+		parser.add_argument('-p', '--property', help='Add a custom property, if multiple properties are required use this argument for each property e.g. -p property1 -p "Property 2"', action='append')
 		self.args = parser.parse_args()
 
 		self.debugmsg(6, "self.args: ", self.args)
@@ -161,12 +166,54 @@ class RFSwarmAgent():
 		self.excludelibraries = self.config['Agent']['excludelibraries'].split(",")
 		self.debugmsg(6, "self.excludelibraries:", self.excludelibraries)
 
+
+		if 'properties' not in self.config['Agent']:
+			self.config['Agent']['properties'] = ""
+			self.saveini()
+
+
 		if not self.xmlmode:
 			self.debugmsg(6, "self.xmlmode: ", self.xmlmode)
 			self.create_listner_file()
 
 		t = threading.Thread(target=self.tick_counter)
 		t.start()
+
+		t = threading.Thread(target=self.findlibraries)
+		t.start()
+
+
+
+		self.agentproperties["OS: Platform"] = platform.platform()	# 'Linux-3.3.0-8.fc16.x86_64-x86_64-with-fedora-16-Verne'
+		self.agentproperties["OS: System"] = platform.system()   # 'Windows'
+		self.agentproperties["OS: Release"] = platform.release()  # 'XP'
+		self.agentproperties["OS: Version"] = platform.version()  # '5.1.2600'
+
+		if platform.system() == 'Windows':
+			vararr= platform.version().split(".")
+		else:
+			vararr= platform.release().split(".")
+
+		if len(vararr)>0:
+			self.agentproperties["OS: Version: Major"] = "{}".format(int(vararr[0]))
+		if len(vararr)>1:
+			self.agentproperties["OS: Version: Minor"] = "{}.{}".format(int(vararr[0]), int(vararr[1]))
+
+
+		if 'properties' in self.config['Agent'] and len(self.config['Agent']['properties'])>0:
+			if "," in self.config['Agent']['properties']:
+				proplist = self.config['Agent']['properties'].split(",")
+				for prop in proplist:
+					self.agentproperties["{}".format(prop.strip())] = True
+			else:
+				self.agentproperties["{}".format(self.config['Agent']['properties'].strip())] = True
+
+		if self.args.property:
+			self.debugmsg(7, "self.args.property: ", self.args.property)
+			for prop in self.args.property:
+				self.agentproperties["{}".format(prop.strip())] = True
+
+		self.debugmsg(9, "self.agentproperties: ", self.agentproperties)
 
 
 	def debugmsg(self, lvl, *msg):
@@ -201,7 +248,7 @@ class RFSwarmAgent():
 		self.debugmsg(6, "mainloop")
 		prev_status = self.status
 		while True:
-			self.debugmsg(2, "Running", datetime.now().isoformat(sep=' ',timespec='seconds'),
+			self.debugmsg(2, self.status, datetime.now().isoformat(sep=' ',timespec='seconds'),
 				"(",int(time.time()),")",
 				"isconnected:", self.isconnected,
 				"isrunning:", self.isrunning,
@@ -217,6 +264,7 @@ class RFSwarmAgent():
 				t.start()
 				self.isrunning = False
 
+			self.debugmsg(5, "self.isconnected", self.isconnected)
 			if self.isconnected:
 				# self.updatestatus()
 				t0 = threading.Thread(target=self.updatestatus)
@@ -234,16 +282,20 @@ class RFSwarmAgent():
 					t2 = threading.Thread(target=self.runjobs)
 					t2.start()
 				else:
-					self.status = "Ready"
 					self.mainloopinterval = 10
-					t2 = threading.Thread(target=self.getscripts)
-					t2.start()
+					if len(self.upload_queue)>0:
+						self.status = "Uploading ({})".format(len(self.upload_queue))
+						self.debugmsg(5, "self.status:", self.status, "len(self.upload_queue):", len(self.upload_queue))
+						t3 = threading.Thread(target=self.process_file_upload_queue)
+						t3.start()
+					else:
+						self.status = "Ready"
+						t2 = threading.Thread(target=self.getscripts)
+						t2.start()
 
-					t3 = threading.Thread(target=self.process_file_upload_queue)
-					t3.start()
 
 
-			if prev_status == "Stopping" and self.status == "Ready":
+			if (prev_status == "Stopping" or "Uploading" in prev_status) and self.status == "Ready":
 				# neet to reset something
 				# I guess we can just reset the jobs disctionary?
 				self.jobs = {}
@@ -313,33 +365,39 @@ class RFSwarmAgent():
 			"MEM%": dict(psutil.virtual_memory()._asdict())["percent"],
 			"NET%": self.netpct,
 			"Robots": self.robotcount,
-			"Status": self.status
+			"Status": self.status,
+			"Properties": self.agentproperties
 		}
 		try:
-			r = requests.post(uri, json=payload)
+			r = requests.post(uri, json=payload, timeout=self.timeout)
 			self.debugmsg(8, r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
+				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok, r.text)
+				self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
+				self.debugmsg(7, "self.isconnected", self.isconnected)
 		except Exception as e:
 			self.debugmsg(8, "Exception:", e)
 			self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 			self.isconnected = False
+			self.debugmsg(5, "self.isconnected", self.isconnected)
 
 	def connectserver(self):
 		self.debugmsg(6, "connectserver")
 		if self.swarmserver is None:
 			self.findserver()
 			if self.args.server:
-				self.debugmsg(5, "self.args.server: ", self.args.server)
+				self.debugmsg(7, "self.args.server: ", self.args.server)
 				self.swarmserver = self.args.server
 
 		if self.swarmserver is not None:
 			self.debugmsg(2, "Try connecting to", self.swarmserver)
 			self.debugmsg(6, "self.swarmserver:", self.swarmserver)
 			try:
-				r = requests.get(self.swarmserver)
-				self.debugmsg(6, r.status_code, r.text)
+				r = requests.get(self.swarmserver, timeout=self.timeout)
+				self.debugmsg(8, r.status_code, r.text)
 				if (r.status_code == requests.codes.ok):
+					self.debugmsg(7, "r.status_code:", r.status_code, requests.codes.ok, r.text)
 					self.isconnected = True
 					self.debugmsg(0, "Server Conected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 			except:
@@ -362,6 +420,42 @@ class RFSwarmAgent():
 			self.config['Agent']['swarmserver'] = "http://localhost:8138/"
 			self.saveini()
 
+	def findlibraries(self):
+		found = 0
+		liblst = []
+		# import pkg_resources
+		installed_packages = pkg_resources.working_set
+		# self.debugmsg(5, "installed_packages:", installed_packages)
+		for i in installed_packages:
+			# self.debugmsg(5, "i:", i)
+			# self.debugmsg(5, "type(i):", type(i))
+
+			# self.debugmsg(5, "i.key:", i.key)
+			# self.debugmsg(5, "i.value:", installed_packages[i])
+			# self.debugmsg(5, "i value:", str(i).split(" ")[1])
+
+
+			if i.key.strip() == "robotframework":
+				found = 1
+			if i.key.startswith("robotframework-"):
+				# print(i.key)
+				keyarr = i.key.strip().split("-")
+				#  next overwrites previous
+				self.agentproperties["RobotFramework: Library: "+keyarr[1]] = str(i).split(" ")[1]
+				liblst.append(keyarr[1])
+
+		self.debugmsg(8, "liblst:", liblst, len(liblst))
+		if len(liblst)>0:
+			self.debugmsg(7, "liblst:", ", ".join(liblst))
+			self.agentproperties["RobotFramework: Libraries"] = ", ".join(liblst)
+
+		if not found:
+			self.debugmsg(0, "RobotFramework is not installed!!!")
+			self.debugmsg(0, "RobotFramework is required for the agent to run scripts")
+			self.debugmsg(0, "Perhaps try: 'pip install robotframework'")
+			raise Exception("RobotFramework is not installed")
+
+
 	def tick_counter(self):
 		#
 		# This function is simply a way to roughly measure the number of agents being used
@@ -379,7 +473,7 @@ class RFSwarmAgent():
 			# https://github.com/damies13/rfswarm/blob/v0.6.2/Doc/Images/z_agent.txt
 			url = "https://github.com/damies13/rfswarm/blob/"+self.version+"/Doc/Images/z_agent.txt"
 			try:
-				r = requests.get(url)
+				r = requests.get(url, timeout=self.timeout)
 				self.debugmsg(9, "tick_counter:", r.status_code)
 			except:
 				pass
@@ -394,9 +488,11 @@ class RFSwarmAgent():
 		}
 		self.debugmsg(6, "getscripts: payload: ", payload)
 		try:
-			r = requests.post(uri, json=payload)
+			r = requests.post(uri, json=payload, timeout=self.timeout)
 			self.debugmsg(6, "getscripts: resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
+				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
+				self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 
 		except Exception as e:
@@ -432,9 +528,11 @@ class RFSwarmAgent():
 			"Hash": hash
 		}
 		try:
-			r = requests.post(uri, json=payload)
+			r = requests.post(uri, json=payload, timeout=self.timeout)
 			self.debugmsg(6, "resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
+				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
+				self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 
 		except Exception as e:
@@ -498,11 +596,13 @@ class RFSwarmAgent():
 		payload = {
 			"AgentName": self.agentname
 		}
-		self.debugmsg(6, "getjobs: payload: ", payload)
+		self.debugmsg(9, "getjobs: payload: ", payload)
 		try:
-			r = requests.post(uri, json=payload)
-			self.debugmsg(6, "getjobs: resp: ", r.status_code, r.text)
+			r = requests.post(uri, json=payload, timeout=self.timeout)
+			self.debugmsg(7, "getjobs: resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
+				self.debugmsg(7, "r.status_code:", r.status_code, requests.codes.ok)
+				self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 
 		except Exception as e:
@@ -516,9 +616,9 @@ class RFSwarmAgent():
 		try:
 			jsonresp = {}
 			# self.scriptlist
-			self.debugmsg(6, "getjobs: r.text:", r.text)
+			self.debugmsg(7, "getjobs: r.text:", r.text)
 			jsonresp = json.loads(r.text)
-			self.debugmsg(5, "getjobs: jsonresp:", jsonresp)
+			self.debugmsg(7, "getjobs: jsonresp:", jsonresp)
 
 
 			if jsonresp["StartTime"] < int(time.time()) < (jsonresp["EndTime"]+300):
@@ -545,7 +645,7 @@ class RFSwarmAgent():
 				else:
 					self.isstopping = True
 
-			self.debugmsg(5, "jsonresp[Abort]", jsonresp["Abort"])
+			self.debugmsg(7, "jsonresp[Abort]", jsonresp["Abort"])
 			if jsonresp["Abort"]:
 				self.isstopping = True
 				self.debugmsg(5, "!!! Abort !!!")
@@ -553,7 +653,7 @@ class RFSwarmAgent():
 
 
 			self.debugmsg(5, "getjobs: isrunning:", self.isrunning, "	isstopping:", self.isstopping)
-			self.debugmsg(5, "getjobs: self.jobs:", self.jobs)
+			self.debugmsg(7, "getjobs: self.jobs:", self.jobs)
 
 
 
@@ -577,21 +677,36 @@ class RFSwarmAgent():
 	def runjobs(self):
 		self.debugmsg(6, "runjobs: self.jobs:", self.jobs)
 		workingkeys = list(self.jobs.keys())
-		for jobid in workingkeys:
-			if jobid in self.jobs.keys():
-				self.debugmsg(6, "runjobs: jobid:", jobid)
-				run_t = True
-				if "Thread" in self.jobs[jobid].keys():
-					if self.jobs[jobid]["Thread"].isAlive():
-						run_t = False
-						self.debugmsg(6, "runjobs: Thread already running run_t:", run_t)
+		if not self.isstopping:
+			for jobid in workingkeys:
+				if jobid in self.jobs.keys():
+					self.debugmsg(6, "runjobs: jobid:", jobid)
+					run_t = True
+					if "Thread" in self.jobs[jobid].keys():
+						self.debugmsg(7, "jobid:", self.jobs[jobid])
+						try:
+							# if self.jobs[jobid]["Thread"].isAlive():
+							# The isAlive syntax above was perviously working in python < 3.7
+							# but appears to have been removed in 3.9.1? it was depricated in 2.x?
+							# and the is_alive syntax below has been available since python version 2.6
+							if self.jobs[jobid]["Thread"].is_alive():
+								run_t = False
+								self.debugmsg(7, "Thread already running run_t:", run_t)
+						except Exception as e:
+							run_t = False
+							self.debugmsg(5, "Thread running check failed run_t:", run_t, e)
 
-				self.debugmsg(6, "runjobs: run_t:", run_t)
+					self.debugmsg(6, "run_t:", run_t)
 
-				if run_t and self.jobs[jobid]["StartTime"] < int(time.time()) < self.jobs[jobid]["EndTime"]:
-					t = threading.Thread(target=self.runthread, args=(jobid, ))
-					t.start()
-					self.jobs[jobid]["Thread"] = t
+					if run_t:
+						self.debugmsg(5, "jobid:", jobid, "run_t:", run_t, "StartTime:", self.jobs[jobid]["StartTime"], "< Now:", int(time.time()), "< EndTime:", self.jobs[jobid]["EndTime"])
+						if self.jobs[jobid]["StartTime"] < int(time.time()) < self.jobs[jobid]["EndTime"]:
+							t = threading.Thread(target=self.runthread, args=(jobid, ))
+							t.start()
+							self.jobs[jobid]["Thread"] = t
+							self.debugmsg(5, "Thread started for jobid:", jobid)
+						else:
+							self.debugmsg(5, "Thread not started for jobid:", jobid)
 				time.sleep(0.1)
 
 
@@ -620,6 +735,15 @@ class RFSwarmAgent():
 
 		farr = os.path.splitext(file)
 		self.debugmsg(6, "runthread: farr:", farr)
+
+
+		excludelibraries = ",".join(self.excludelibraries)
+		if "excludelibraries" in self.jobs[jobid]:
+			# not sure if we need to do this???
+			# for safety split and join string
+			# ellst = self.jobs[jobid]['excludelibraries'].split(",")
+			# excludelibraries = ",".join(ellst)
+			excludelibraries = self.jobs[jobid]['excludelibraries']
 
 		# self.run_name
 		# scriptdir = None
@@ -669,6 +793,7 @@ class RFSwarmAgent():
 		cmd.append("-d")
 		cmd.append('"'+odir+'"')
 
+		cmd.append("-M agent:{}".format(self.agentname))
 		if self.xmlmode:
 			cmd.append("-v index:{}".format(self.jobs[jobid]["ScriptIndex"]))
 			cmd.append("-v vuser:{}".format(self.jobs[jobid]["VUser"]))
@@ -679,8 +804,11 @@ class RFSwarmAgent():
 			cmd.append("-M vuser:{}".format(self.jobs[jobid]["VUser"]))
 			cmd.append("-M iteration:{}".format(self.jobs[jobid]["Iteration"]))
 			cmd.append("-M swarmserver:{}".format(self.swarmserver))
-			cmd.append("-M excludelibraries:{}".format(",".join(self.excludelibraries)))
+			cmd.append("-M excludelibraries:{}".format(excludelibraries))
 			cmd.append("--listener {}".format('"'+self.listenerfile+'"'))
+
+		if "robotoptions" in self.jobs[jobid]:
+			cmd.append("{}".format(self.jobs[jobid]['robotoptions']))
 
 		cmd.append("-o")
 		cmd.append('"'+outputFile+'"')
@@ -736,10 +864,10 @@ class RFSwarmAgent():
 
 	def queue_file_upload(self, retcode, filedir):
 		reldir = os.path.basename(filedir)
-		self.debugmsg(5, retcode, reldir, filedir)
+		self.debugmsg(7, retcode, reldir, filedir)
 
 		filelst = self.file_upload_list(filedir)
-		self.debugmsg(5, "filelst", filelst)
+		self.debugmsg(7, "filelst", filelst)
 		# filelst
 		# [
 		# 	'/var/folders/7l/k7w46dm91y3gscxlswd_jm2r0000gn/T/rfswarmagent/logs/20201219_113254_11u_test_quick/OC_Demo_2_1_5_1608341588_1_1608341594/Browse_Store_Product_1.log',
@@ -798,9 +926,11 @@ class RFSwarmAgent():
 		}
 		self.debugmsg(9, "payload: ", payload)
 		try:
-			r = requests.post(uri, json=payload)
+			r = requests.post(uri, json=payload, timeout=self.timeout)
 			self.debugmsg(7, "resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
+				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
+				self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 
 		except Exception as e:
@@ -846,9 +976,11 @@ class RFSwarmAgent():
 			self.debugmsg(8, "payload: ", payload)
 
 			try:
-				r = requests.post(uri, json=payload)
+				r = requests.post(uri, json=payload, timeout=self.timeout)
 				self.debugmsg(7, "resp: ", r.status_code, r.text)
 				if (r.status_code != requests.codes.ok):
+					self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
+					self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 					self.isconnected = False
 
 			except Exception as e:
@@ -871,7 +1003,8 @@ class RFSwarmAgent():
 
 
 		# once sucessful remove from queue
-		self.upload_queue.remove(fileobj)
+		if fileobj in self.upload_queue:
+			self.upload_queue.remove(fileobj)
 
 
 	def hash_file(self, file, relpath):
@@ -889,13 +1022,14 @@ class RFSwarmAgent():
 
 
 	def process_file_upload_queue(self):
-		self.debugmsg(5, "upload_queue", self.upload_queue)
+		self.debugmsg(7, "upload_queue", self.upload_queue)
 		# self.process_file_upload_queue
 		for fobj in self.upload_queue:
 			# probably need to make this multi-treaded
 			# self.file_upload(fobj)
 			t = threading.Thread(target=self.file_upload, args=(fobj,))
 			t.start()
+			time.sleep(0.5)
 
 
 	def run_process_output(self, outputFile, index, vuser, iter):
@@ -972,9 +1106,11 @@ class RFSwarmAgent():
 
 				self.debugmsg(6, "run_proces_output: payload", payload)
 				try:
-					r = requests.post(uri, json=payload)
+					r = requests.post(uri, json=payload, timeout=self.timeout)
 					self.debugmsg(6, "run_proces_output: ",r.status_code, r.text)
 					if (r.status_code != requests.codes.ok):
+						self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
+						self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 						self.isconnected = False
 				except Exception as e:
 					self.debugmsg(8, "Exception:", e)
@@ -1026,6 +1162,7 @@ class RFSwarmAgent():
 		fd.append("import time")
 		fd.append("import requests")
 		fd.append("import inspect")
+		fd.append("import threading")
 		fd.append("")
 		fd.append("class RFSListener2:")
 		fd.append("	ROBOT_LISTENER_API_VERSION = 2")
@@ -1069,8 +1206,10 @@ class RFSwarmAgent():
 		# fd.append("			self.debugmsg(6, 'self.msg: ', self.msg)")
 		fd.append("")
 		fd.append("	def end_keyword(self, name, attrs):")
-		fd.append("		self.debugmsg(6, 'attrs[doc]: ', attrs['doc'])")
-		fd.append("		self.debugmsg(6, 'self.msg: ', self.msg)")
+		fd.append("		self.debugmsg(3, 'name: ', name)")
+		fd.append("		self.debugmsg(6, 'attrs: ', attrs)")
+		fd.append("		self.debugmsg(5, 'attrs[doc]: ', attrs['doc'])")
+		fd.append("		self.debugmsg(5, 'self.msg: ', self.msg)")
 		fd.append("		if self.msg is not None:")
 		fd.append("			self.debugmsg(8, 'self.msg: attrs[libname]: ', attrs['libname'], '	excludelibraries:', self.excludelibraries)")
 		fd.append("			if attrs['libname'] not in self.excludelibraries:")
@@ -1092,8 +1231,11 @@ class RFSwarmAgent():
 		fd.append("					'Sequence': self.seq")
 		fd.append("				}")
 		fd.append("				self.debugmsg(8, 'payload: ', payload)")
-		fd.append("				self.send_result(payload)")
-		# fd.append("				self.msg = None")
+		# fd.append("				self.send_result(payload)")
+		fd.append("				t = threading.Thread(target=self.send_result, args=(payload,))")
+		fd.append("				t.start()")
+		fd.append("			else:")
+		fd.append("				self.debugmsg(5, attrs['libname'], 'is an excluded library')")
 		fd.append("		elif 'doc' in attrs and len(attrs['doc'])>0:")
 		fd.append("			self.debugmsg(8, 'attrs[doc]: attrs[libname]: ', attrs['libname'], '	excludelibraries:', self.excludelibraries)")
 		fd.append("			if attrs['libname'] not in self.excludelibraries:")
@@ -1116,8 +1258,11 @@ class RFSwarmAgent():
 		fd.append("					'Sequence': self.seq")
 		fd.append("				}")
 		fd.append("				self.debugmsg(8, 'payload: ', payload)")
-		fd.append("				self.send_result(payload)")
-		# fd.append("				self.msg = None")
+		# fd.append("				self.send_result(payload)")
+		fd.append("				t = threading.Thread(target=self.send_result, args=(payload,))")
+		fd.append("				t.start()")
+		fd.append("			else:")
+		fd.append("				self.debugmsg(5, attrs['libname'], 'is an excluded library')")
 		fd.append("		self.msg = None")
 		fd.append("")
 		fd.append("	def debugmsg(self, lvl, *msg):")
@@ -1144,13 +1289,15 @@ class RFSwarmAgent():
 		fd.append("	def send_result(self, payload):")
 		fd.append("		uri = self.swarmserver + 'Result'")
 		fd.append("		try:")
-		fd.append("			r = requests.post(uri, json=payload)")
+		fd.append("			r = requests.post(uri, json=payload, timeout=600)")
 		fd.append("			self.debugmsg(7, 'send_result: ',r.status_code, r.text)")
 		fd.append("			if (r.status_code != requests.codes.ok):")
 		fd.append("				self.isconnected = False")
 		fd.append("		except Exception as e:")
-		fd.append("			self.debugmsg(7, 'send_result: ',r.status_code, r.text)")
-		fd.append("			self.debugmsg(7, 'send_result: Exception:', e)")
+		fd.append("			self.debugmsg(0, 'send_result: while attempting to send result to',uri)")
+		fd.append("			self.debugmsg(0, 'send_result: with payload:',payload)")
+		fd.append("			self.debugmsg(0, 'send_result: ',r.status_code, r.text)")
+		fd.append("			self.debugmsg(0, 'send_result: Exception:', e)")
 		fd.append("			pass")
 		fd.append("")
 

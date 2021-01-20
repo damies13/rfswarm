@@ -1,5 +1,5 @@
 
-[Index](Index.md)
+[Index](README.md)
 
 ## rfswarm_agent.py (Agent)
 
@@ -13,6 +13,7 @@ rfswarm_agent.py is the agent component that actually runs the Robot Framework t
 	- [Run Agent](#4-Run-Agent)
 	- [Manually install the prerequisites](#5-Manually-install-the-prerequisites)
 	- [Manually Run Agent](#6-Manually-Run-Agent)
+	- [Prerequisites that some systems may require](#7-Prerequisites-that-some-systems-may-require)
 - [INI File Settings](#INI-File-Settings)
 	- [Swarm Server](#Swarm-Server)
 	- [Agent Directory](#Agent-Directory)
@@ -32,8 +33,8 @@ Additionally the debug (-g) levels 1-3 will give extra information on the consol
 ```
 $ rfswarm-agent -h
 Robot Framework Swarm: Run Agent
-	Version 0.6.1
-usage: rfswarm-agent [-h] [-g DEBUG] [-v] [-i INI] [-s SERVER] [-d AGENTDIR] [-r ROBOT] [-x] [-a AGENTNAME]
+	Version 0.6.3
+usage: rfswarm_agent.py [-h] [-g DEBUG] [-v] [-i INI] [-s SERVER] [-d AGENTDIR] [-r ROBOT] [-x] [-a AGENTNAME] [-p PROPERTY]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -50,15 +51,17 @@ optional arguments:
   -x, --xmlmode         XML Mode, fall back to pasing the output.xml after each iteration
   -a AGENTNAME, --agentname AGENTNAME
                         Set agent name
+  -p PROPERTY, --property PROPERTY
+                        Add a custom property, if multiple properties are required use this argument for each property e.g. -p property1 -p "Property 2"
 ```
 
 If you pass in an unsupported command line option, you will get this prompt:
 ```
 $ rfswarm-agent -?
 Robot Framework Swarm: Run Agent
-	Version 0.6.1
-usage: rfswarm-agent [-h] [-g DEBUG] [-v] [-i INI] [-s SERVER] [-d AGENTDIR] [-r ROBOT] [-x] [-a AGENTNAME]
-rfswarm-agent: error: unrecognized arguments: -?
+	Version 0.6.3
+usage: rfswarm_agent.py [-h] [-g DEBUG] [-v] [-i INI] [-s SERVER] [-d AGENTDIR] [-r ROBOT] [-x] [-a AGENTNAME] [-p PROPERTY]
+rfswarm_agent.py: error: unrecognized arguments: -?
 ```
 
 ### Install and Setup
@@ -111,7 +114,7 @@ Robot Framework Swarm: Run Agent
 Server Conected http://DavesMBPSG:8138/ 2020-12-16 19:34:44 ( 1608111284 )
 ```
 
-![Image](Images/Agents_ready_v0.3.png "Agents Ready")
+![Image](Images/MacOS_Agents_ready_v0.6.3.png "Agents Ready")
 
 
 #### 5. Manually install the prerequisites
@@ -141,8 +144,26 @@ Robot Framework Swarm: Run Agent
 Server Conected http://DavesMBPSG:8138/ 2020-12-16 19:34:44 ( 1608111284 )
 ```
 
-![Image](Images/Agents_ready_v0.3.png "Agents Ready")
+![Image](Images/MacOS_Agents_ready_v0.6.3.png "Agents Ready")
 
+
+#### 7. Prerequisites that some systems may require
+
+So far I encountered this on a ARM Linux machine, but it may apply to others as well.
+
+On some python environments not all the pre-requisite packages are compiled for your platform, so for example on ARM Linux systems psutil needs:
+
+```
+pip* install setuptools
+```
+
+Then setuptools also required the python-dev package, so on a Debian based system I ran:
+
+```
+apt install python3-dev
+```
+
+You may need to do something similar.
 
 
 ### INI File Settings
