@@ -2621,6 +2621,7 @@ class RFSwarmCore:
 
 	def UpdateAgents(self):
 
+		uploadcount = 0
 		rnum = 0
 		removeagents = []
 		robot_count = 0
@@ -2633,6 +2634,10 @@ class RFSwarmCore:
 			agntlst = list(base.Agents.keys())
 			base.debugmsg(6, "agntlst:", agntlst)
 			for agnt in agntlst:
+
+				if "Uploading" in base.Agents[agnt]["Status"]:
+					uploadcount += 1
+
 				displayagent = True
 				tm = base.Agents[agnt]["LastSeen"]
 				agnt_elapsed = int(time.time()) - tm
@@ -2678,8 +2683,8 @@ class RFSwarmCore:
 			# if base.args.run:
 			base.debugmsg(5, "base.args.run:", base.args.run, "	base.args.nogui:", base.args.nogui, "	run_end:", base.run_end, "	time:", int(time.time()))
 			base.debugmsg(5, "base.posttest:", base.posttest, "	total_robots:", base.total_robots)
-			base.debugmsg(5, "run_finish:", base.run_finish, "	time:", int(time.time()))
-			if base.run_end > 0 and base.run_end < int(time.time()) and base.total_robots < 1 and not base.posttest and base.run_finish < 1:
+			base.debugmsg(5, "run_finish:", base.run_finish, "	time:", int(time.time()), "uploadcount:", uploadcount)
+			if base.run_end > 0 and base.run_end < int(time.time()) and base.total_robots < 1 and not base.posttest and base.run_finish < 1 and uploadcount < 1:
 				base.run_finish = int(time.time())
 				base.debugmsg(5, "run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots)
 				if not base.args.nogui:
