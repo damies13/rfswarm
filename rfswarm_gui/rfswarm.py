@@ -746,21 +746,33 @@ class RFSwarmBase:
 				c.execute('''
 				CREATE VIEW "Summary" AS
 				SELECT
-					r.result_name,
-					min(rp.elapsed_time) "min", avg(rp.elapsed_time) "avg", max(rp.elapsed_time)  "max",
-					count(rp.result) as _pass,
-					count(rf.result) as _fail,
-					count(ro.result) as _other
-
+					r.result_name
+					, min(rp.elapsed_time) "min", avg(rp.elapsed_time) "avg", max(rp.elapsed_time)  "max"
+					, count(rp.result) as _pass
+					, (Select count(rf.result) from Results as rf where r.rowid == rf.rowid AND rf.result == "FAIL" ) _fail
+					, (Select count(ro.result) from Results as ro where r.rowid == ro.rowid AND ro.result <> "PASS" AND ro.result <> "FAIL" ) _other
 				FROM Results as r
 					LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == "PASS"
-					LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == "FAIL"
-					LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> "PASS" AND ro.result <> "FAIL"
 				GROUP BY
 					r.result_name
 				ORDER BY r.sequence
 				''')
 
+				#
+				# SELECT
+				# 	r.result_name,
+				# 	min(rp.elapsed_time) "min", avg(rp.elapsed_time) "avg", max(rp.elapsed_time)  "max",
+				# 	count(rp.result) as _pass,
+				# 	count(rf.result) as _fail,
+				# 	count(ro.result) as _other
+				#
+				# FROM Results as r
+				# 	LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == "PASS"
+				# 	LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == "FAIL"
+				# 	LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> "PASS" AND ro.result <> "FAIL"
+				# GROUP BY
+				# 	r.result_name
+				# ORDER BY r.sequence
 
 				c.execute('''
 				CREATE VIEW "AgentList" as
@@ -768,24 +780,41 @@ class RFSwarmBase:
 					a.Name "AgentName"
 					, s.Value "AgentStatus"
 					, max(s.Time) as "AgentLastSeen"
-					, ra.Value "AgentAssigned"
-					, r.Value "AgentRobots"
-					, max(l.Value) "AgentLoad"
-					, max(c.Value) "AgentCPU"
-					, max(m.Value) "AgentMEM"
-					, max(n.Value) "AgentNET"
+						, (Select ra.Value from Metrics ra where ra.ParentID = a.ROWID and ra.Key = "AssignedRobots"  and ra.Time = s.Time) "AgentAssigned"
+						, (Select r.Value from Metrics r where r.ParentID = a.ROWID and r.Key = "Robots"  and r.Time = s.Time) "AgentRobots"
+						, (Select max(l.Value) from Metrics l where l.ParentID = a.ROWID and l.Key = "Load"  and l.Time = s.Time) "AgentLoad"
+						, (Select max(c.Value) from Metrics c where c.ParentID = a.ROWID and c.Key = "CPU"  and c.Time = s.Time) "AgentCPU"
+						, (Select max(m.Value) from Metrics m where m.ParentID = a.ROWID and m.Key = "MEM"  and m.Time = s.Time) "AgentMEM"
+						, (Select max(n.Value) from Metrics n where n.ParentID = a.ROWID and n.Key = "NET"  and n.Time = s.Time) "AgentNET"
 				from Metric a
 					left join Metrics s on s.ParentID = a.ROWID and s.Key = "Status"
-					left join Metrics r on r.ParentID = a.ROWID and r.Key = "Robots" and r.Time = s.Time
-					left join Metrics ra on ra.ParentID = a.ROWID and ra.Key = "AssignedRobots" and ra.Time = s.Time
-					left join Metrics l on l.ParentID = a.ROWID and l.Key = "Load" and l.Time = s.Time
-					left join Metrics c on c.ParentID = a.ROWID and c.Key = "CPU" and c.Time = s.Time
-					left join Metrics m on m.ParentID = a.ROWID and m.Key = "MEM" and m.Time = s.Time
-					left join Metrics n on m.ParentID = a.ROWID and n.Key = "NET" and n.Time = s.Time
 				where a.Type = "Agent"
 				GROUP by s.ParentID
 				ORDER by a.Name
 				''')
+
+				#
+				# SELECT
+				# 	a.Name "AgentName"
+				# 	, s.Value "AgentStatus"
+				# 	, max(s.Time) as "AgentLastSeen"
+				# 	, ra.Value "AgentAssigned"
+				# 	, r.Value "AgentRobots"
+				# 	, max(l.Value) "AgentLoad"
+				# 	, max(c.Value) "AgentCPU"
+				# 	, max(m.Value) "AgentMEM"
+				# 	, max(n.Value) "AgentNET"
+				# from Metric a
+				# 	left join Metrics s on s.ParentID = a.ROWID and s.Key = "Status"
+				# 	left join Metrics r on r.ParentID = a.ROWID and r.Key = "Robots" and r.Time = s.Time
+				# 	left join Metrics ra on ra.ParentID = a.ROWID and ra.Key = "AssignedRobots" and ra.Time = s.Time
+				# 	left join Metrics l on l.ParentID = a.ROWID and l.Key = "Load" and l.Time = s.Time
+				# 	left join Metrics c on c.ParentID = a.ROWID and c.Key = "CPU" and c.Time = s.Time
+				# 	left join Metrics m on m.ParentID = a.ROWID and m.Key = "MEM" and m.Time = s.Time
+				# 	left join Metrics n on m.ParentID = a.ROWID and n.Key = "NET" and n.Time = s.Time
+				# where a.Type = "Agent"
+				# GROUP by s.ParentID
+				# ORDER by a.Name
 
 				c.execute('''
 				CREATE VIEW "AgentHistory" as
@@ -793,25 +822,41 @@ class RFSwarmBase:
 					a.Name "AgentName"
 					, s.Value "AgentStatus"
 					, max(s.Time) as "AgentLastSeen"
-					, ra.Value "AgentAssigned"
-					, r.Value "AgentRobots"
-					, max(l.Value) "AgentLoad"
-					, max(c.Value) "AgentCPU"
-					, max(m.Value) "AgentMEM"
-					, max(n.Value) "AgentNET"
+						, (Select ra.Value from Metrics ra where ra.ParentID = a.ROWID and ra.Key = "AssignedRobots"  and ra.Time = s.Time) "AgentAssigned"
+						, (Select r.Value from Metrics r where r.ParentID = a.ROWID and r.Key = "Robots"  and r.Time = s.Time) "AgentRobots"
+						, (Select max(l.Value) from Metrics l where l.ParentID = a.ROWID and l.Key = "Load"  and l.Time = s.Time) "AgentLoad"
+						, (Select max(c.Value) from Metrics c where c.ParentID = a.ROWID and c.Key = "CPU"  and c.Time = s.Time) "AgentCPU"
+						, (Select max(m.Value) from Metrics m where m.ParentID = a.ROWID and m.Key = "MEM"  and m.Time = s.Time) "AgentMEM"
+						, (Select max(n.Value) from Metrics n where n.ParentID = a.ROWID and n.Key = "NET"  and n.Time = s.Time) "AgentNET"
 				from Metric a
 					left join Metrics s on s.ParentID = a.ROWID and s.Key = "Status"
-					left join Metrics r on r.ParentID = a.ROWID and r.Key = "Robots" and r.Time = s.Time
-					left join Metrics ra on ra.ParentID = a.ROWID and ra.Key = "AssignedRobots" and ra.Time = s.Time
-					left join Metrics l on l.ParentID = a.ROWID and l.Key = "Load" and l.Time = s.Time
-					left join Metrics c on c.ParentID = a.ROWID and c.Key = "CPU" and c.Time = s.Time
-					left join Metrics m on m.ParentID = a.ROWID and m.Key = "MEM" and m.Time = s.Time
-					left join Metrics n on m.ParentID = a.ROWID and n.Key = "NET" and n.Time = s.Time
 				where a.Type = "Agent"
 				group by a.ROWID, s.Time
 				ORDER by a.Name, s.Time
 				''')
 
+				#
+				# SELECT
+				# 	a.Name "AgentName"
+				# 	, s.Value "AgentStatus"
+				# 	, max(s.Time) as "AgentLastSeen"
+				# 	, ra.Value "AgentAssigned"
+				# 	, r.Value "AgentRobots"
+				# 	, max(l.Value) "AgentLoad"
+				# 	, max(c.Value) "AgentCPU"
+				# 	, max(m.Value) "AgentMEM"
+				# 	, max(n.Value) "AgentNET"
+				# from Metric a
+				# 	left join Metrics s on s.ParentID = a.ROWID and s.Key = "Status"
+				# 	left join Metrics r on r.ParentID = a.ROWID and r.Key = "Robots" and r.Time = s.Time
+				# 	left join Metrics ra on ra.ParentID = a.ROWID and ra.Key = "AssignedRobots" and ra.Time = s.Time
+				# 	left join Metrics l on l.ParentID = a.ROWID and l.Key = "Load" and l.Time = s.Time
+				# 	left join Metrics c on c.ParentID = a.ROWID and c.Key = "CPU" and c.Time = s.Time
+				# 	left join Metrics m on m.ParentID = a.ROWID and m.Key = "MEM" and m.Time = s.Time
+				# 	left join Metrics n on m.ParentID = a.ROWID and n.Key = "NET" and n.Time = s.Time
+				# where a.Type = "Agent"
+				# group by a.ROWID, s.Time
+				# ORDER by a.Name, s.Time
 
 
 				c.execute('''
@@ -819,29 +864,47 @@ class RFSwarmBase:
 				SELECT
 					a.Name
 					, max(e.Time) as "_EntryTime"
-					, mn.Value "Min"
-					, av.Value "Average"
-					, sd.Value "StDev"
-					, pct.Key "%ile_Key"
-					, pct.Value "%ile_Value"
-					, mx.Value "Max"
-					, ps.Value "Pass"
-					, fl.Value "Fail"
-					, ot.Value "Other"
+					, (Select mn.Value from Metrics mn where mn.ParentID = a.ROWID and mn.Key like "min%" and e.Time = mn.Time ) "Min"
+					, (Select av.Value from Metrics av where av.ParentID = a.ROWID and av.Key = "avg" and e.Time = av.Time ) "Average"
+					, (Select sd.Value from Metrics sd where sd.ParentID = a.ROWID and sd.Key like "stDev%" and e.Time = sd.Time ) "StDev"
+					, (Select pct.Key from Metrics pct where pct.ParentID = a.ROWID and pct.Key like "%ile" and e.Time = pct.Time ) "%ile_Key"
+					, (Select pct.Value from Metrics pct where pct.ParentID = a.ROWID and pct.Key like "%ile" and e.Time = pct.Time ) "%ile_Value"
+					, (Select mx.Value from Metrics mx where mx.ParentID = a.ROWID and mx.Key like "max%" and e.Time = mx.Time ) "Max"
+					, (Select ps.Value from Metrics ps where ps.ParentID = a.ROWID and ps.Key like "_pass%" and e.Time = ps.Time ) "Pass"
+					, (Select fl.Value from Metrics fl where fl.ParentID = a.ROWID and fl.Key like "_fail%" and e.Time = fl.Time ) "Fail"
+					, (Select ot.Value from Metrics ot where ot.ParentID = a.ROWID and ot.Key like "_other%" and e.Time = ot.Time ) "Other"
 				from Metric a
 					left join Metrics e on e.ParentID = a.ROWID and e.Key = "EntryTime"
-					left join Metrics mn on mn.ParentID = a.ROWID and mn.Key like "min%" and e.Time = mn.Time
-					left join Metrics av on av.ParentID = a.ROWID and av.Key = "avg" and e.Time = av.Time
-					left join Metrics sd on sd.ParentID = a.ROWID and sd.Key like "stDev%" and e.Time = sd.Time
-					left join Metrics pct on pct.ParentID = a.ROWID and pct.Key like "%ile" and e.Time = pct.Time
-					left join Metrics mx on mx.ParentID = a.ROWID and mx.Key like "max%" and e.Time = mx.Time
-					left join Metrics ps on ps.ParentID = a.ROWID and ps.Key like "_pass%" and e.Time = ps.Time
-					left join Metrics fl on fl.ParentID = a.ROWID and fl.Key like "_fail%" and e.Time = fl.Time
-					left join Metrics ot on ot.ParentID = a.ROWID and ot.Key like "_other%" and e.Time = ot.Time
-				where a.Type = "Summary" -- and a.ROWID = 9
+				where a.Type = "Summary"
 				GROUP by a.ROWID
 				ORDER by a.ROWID
 				''')
+
+				# SELECT
+				# 	a.Name
+				# 	, max(e.Time) as "_EntryTime"
+				# 	, mn.Value "Min"
+				# 	, av.Value "Average"
+				# 	, sd.Value "StDev"
+				# 	, pct.Key "%ile_Key"
+				# 	, pct.Value "%ile_Value"
+				# 	, mx.Value "Max"
+				# 	, ps.Value "Pass"
+				# 	, fl.Value "Fail"
+				# 	, ot.Value "Other"
+				# from Metric a
+				# 	left join Metrics e on e.ParentID = a.ROWID and e.Key = "EntryTime"
+				# 	left join Metrics mn on mn.ParentID = a.ROWID and mn.Key like "min%" and e.Time = mn.Time
+				# 	left join Metrics av on av.ParentID = a.ROWID and av.Key = "avg" and e.Time = av.Time
+				# 	left join Metrics sd on sd.ParentID = a.ROWID and sd.Key like "stDev%" and e.Time = sd.Time
+				# 	left join Metrics pct on pct.ParentID = a.ROWID and pct.Key like "%ile" and e.Time = pct.Time
+				# 	left join Metrics mx on mx.ParentID = a.ROWID and mx.Key like "max%" and e.Time = mx.Time
+				# 	left join Metrics ps on ps.ParentID = a.ROWID and ps.Key like "_pass%" and e.Time = ps.Time
+				# 	left join Metrics fl on fl.ParentID = a.ROWID and fl.Key like "_fail%" and e.Time = fl.Time
+				# 	left join Metrics ot on ot.ParentID = a.ROWID and ot.Key like "_other%" and e.Time = ot.Time
+				# where a.Type = "Summary" -- and a.ROWID = 9
+				# GROUP by a.ROWID
+				# ORDER by a.ROWID
 
 				c.execute('''
 				CREATE VIEW "MetricData" as
