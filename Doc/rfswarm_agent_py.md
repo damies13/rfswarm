@@ -13,6 +13,7 @@ rfswarm_agent.py is the agent component that actually runs the Robot Framework t
 	- [Run Agent](#4-Run-Agent)
 	- [Manually install the prerequisites](#5-Manually-install-the-prerequisites)
 	- [Manually Run Agent](#6-Manually-Run-Agent)
+	- [Prerequisites that some systems may require](#7-Prerequisites-that-some-systems-may-require)
 - [INI File Settings](#INI-File-Settings)
 	- [Swarm Server](#Swarm-Server)
 	- [Agent Directory](#Agent-Directory)
@@ -145,6 +146,24 @@ Server Conected http://DavesMBPSG:8138/ 2020-12-16 19:34:44 ( 1608111284 )
 
 ![Image](Images/MacOS_Agents_ready_v0.6.3.png "Agents Ready")
 
+
+#### 7. Prerequisites that some systems may require
+
+So far I encountered this on a ARM Linux machine, but it may apply to others as well.
+
+On some python environments not all the pre-requisite packages are compiled for your platform, so for example on ARM Linux systems psutil needs:
+
+```
+pip* install setuptools
+```
+
+Then setuptools also required the python-dev package, so on a Debian based system I ran:
+
+```
+apt install python3-dev
+```
+
+You may need to do something similar.
 
 
 ### INI File Settings
