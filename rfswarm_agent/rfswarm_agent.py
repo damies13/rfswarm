@@ -470,8 +470,13 @@ class RFSwarmAgent():
 		# 1 day, 24 hours  = 60 * 60 * 24
 		aday = 60 * 60 * 24
 		while True:
+
+			ver = self.version
+			if ver[0] != 'v':
+				ver = "v" + ver
+			
 			# https://github.com/damies13/rfswarm/blob/v0.6.2/Doc/Images/z_agent.txt
-			url = "https://github.com/damies13/rfswarm/blob/"+self.version+"/Doc/Images/z_agent.txt"
+			url = "https://github.com/damies13/rfswarm/blob/"+ver+"/Doc/Images/z_agent.txt"
 			try:
 				r = requests.get(url, timeout=self.timeout)
 				self.debugmsg(9, "tick_counter:", r.status_code)
