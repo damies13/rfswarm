@@ -22,6 +22,7 @@ setuptools.setup(
 	packages=setuptools.find_packages(exclude=["*fswarm_agen*", "build/*"]),
 	# package_dir = {"":"rfswarm-gui"},
 	install_requires=['configparser', 'HTTPServer', 'pillow'],
+	# sqlite3worker??
 	classifiers=[
 		"Development Status :: 4 - Beta",
 		"Topic :: Software Development :: Testing",

@@ -718,6 +718,7 @@ class RFSwarmBase:
 				self.datadb.create_aggregate("stdev", 1, stdevclass)
 
 			if createschema:
+				base.debugmsg(5, "Create Schema")
 				c = self.datadb.cursor()
 				# create tables
 
@@ -2307,10 +2308,12 @@ class RFSwarmCore:
 		base.MetricIDs = {}
 
 		base.robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}}
+		base.debugmsg(5, "core.run_start_threads")
 		t = threading.Thread(target=core.run_start_threads)
 		t.start()
 		if not base.args.nogui:
 			time.sleep(1)
+			base.debugmsg(5, "base.gui.delayed_UpdateRunStats")
 			ut = threading.Thread(target=base.gui.delayed_UpdateRunStats)
 			ut.start()
 
