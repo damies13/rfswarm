@@ -1989,12 +1989,12 @@ class RFSwarmCore:
 
 		if base.appstarted:
 			try:
-				base.debugmsg(0, "Shutdown Agent Server")
+				base.debugmsg(0, "Shutdown Agent Manager")
 				base.agenthttpserver.shutdown()
 			except:
 				pass
 		try:
-			base.debugmsg(3, "Join Agent Server Thread")
+			base.debugmsg(3, "Join Agent Manager Thread")
 			base.Agentserver.join()
 		except:
 			pass
@@ -2063,7 +2063,7 @@ class RFSwarmCore:
 
 		base.appstarted = True
 		base.debugmsg(5, "appstarted:", base.appstarted)
-		base.debugmsg(1, "Starting Agent Server", "http://{}:{}/".format(srvdisphost, srvport))
+		base.debugmsg(1, "Starting Agent Manager", "http://{}:{}/".format(srvdisphost, srvport))
 		base.agenthttpserver.serve_forever()
 
 	def register_agent(self, agentdata):
