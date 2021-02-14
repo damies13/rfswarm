@@ -1,8 +1,9 @@
-<script>
+<div><script>
 	<!-- this is an experiment -->
 	fitems = $x('//*[contains(@class, "Box-row")]')
 	for (fitem in fitems){fitems[fitem].hidden=true}
-</script>
+</script></div>
+
 # rfswarm (Robot Framework Swarm)
 
 ## Index
