@@ -3,7 +3,7 @@
 
 ## Agent Communication
 
-In this page the generic host names guiserver and myagent are used, replace guiserver with the host name of the machine that is running rfswarm.py and myagent with the host name of the machine that is running rfswarm_agent.py
+In this page the generic host names manager and myagent are used, replace manager with the host name of the machine that is running rfswarm.py and myagent with the host name of the machine that is running rfswarm_agent.py
 
 - [Get /](#Get-)
 - [POST /AgentStatus](#POST-AgentStatus)
@@ -14,7 +14,7 @@ In this page the generic host names guiserver and myagent are used, replace guis
 - [POST /Metric](#post-metric)
 
 ### Get /
-HTTP GET http://guiserver:8138/
+HTTP GET http://manager:8138/
 
 Response Body:
 ```
@@ -90,7 +90,7 @@ Response Body:
 ```
 
 ### POST /AgentStatus
-HTTP POST http://guiserver:8138/AgentStatus
+HTTP POST http://manager:8138/AgentStatus
 
 Request Body:
 ```
@@ -114,7 +114,7 @@ Response Body:
 ```
 
 ### POST /Jobs
-HTTP POST http://guiserver:8138/Jobs
+HTTP POST http://manager:8138/Jobs
 
 Request Body:
 ```
@@ -150,7 +150,7 @@ Response Body:
 ```
 
 ### POST /Scripts
-HTTP POST http://guiserver:8138/Scripts
+HTTP POST http://manager:8138/Scripts
 
 Request Body:
 ```
@@ -181,7 +181,7 @@ Response Body:
 ```
 
 ### POST /File
-HTTP POST http://guiserver:8138/File
+HTTP POST http://manager:8138/File
 
 Request Bodies:
 ```
@@ -234,7 +234,7 @@ Response Body:
 ```
 
 ### POST /Result
-HTTP POST http://guiserver:8138/Result
+HTTP POST http://manager:8138/Result
 
 Request Body:
 ```
@@ -261,7 +261,7 @@ Response Body:
 ```
 
 ### POST /Metric
-HTTP POST http://guiserver:8138/Metric
+HTTP POST http://manager:8138/Metric
 
 Request Body:
 ```

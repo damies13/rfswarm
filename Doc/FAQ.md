@@ -3,15 +3,15 @@
 
 # rfswarm (Robot Framework Swarm) Frequently Asked Questions
 
-## Can I run the Agent and the GUI/Server on the same machine?
+## Can I run the Agent and the Manager on the same machine?
 
-Yes running the Agent and the GUI/Server on the same machine is ok for small numbers of robots (users), but if you want to run any significant load then you will probably need some separate machines for the agent.
+Yes running the Agent and the Manager on the same machine is ok for small numbers of robots (users), but if you want to run any significant load then you will probably need some separate machines for the agent.
 
 You will probably want to refer to the [Hardware Requirements](HardwareRequirements.md)
 
-## the agent doesn't connect to the GUI/Server?
+## The Agent doesn't connect to the Manager?
 
-There may be a firewall blocking the communication, Windows 10, Recent Mac OSX and some linux desktop distributions come with a firewall enabled by default. Consult your operating system documentation for both the agent and GUI Server machines to confirm if this is the case, if so you may need to [add a firewall rule](./rfswarm_py.md#2-adjust-the-firewall).
+There may be a firewall blocking the communication, Windows 10, Recent Mac OSX and some linux desktop distributions come with a firewall enabled by default. Consult your operating system documentation for both the Agent and Manager machines to confirm if this is the case, if so you may need to [add a firewall rule](./rfswarm_py.md#2-adjust-the-firewall).
 
 ## I have some experience in performance testing, can you translate the terminology between rfswarm and tool xzy?
 
@@ -19,7 +19,7 @@ This should cover off the main components with the most common tools:
 
 |rfswarm|Loadrunner|JMeter|
 |-------|----------|------|
-|GUI/Server|Controller|JMeter client (JMeter GUI)|
+|Manager|Controller|JMeter client (JMeter GUI)|
 |Agents|Agent process (sometimes called Load Generators or Injectors)|JMeter servers (JMeterEngine)|
 |Scenario|Scenario|Test Plan|
 |Test Case|Script|Thread Group|
@@ -36,13 +36,13 @@ Second step is to adjust the test case for performance testing, really this is j
 
 Also people don't repetitively use the values when they enter information into the system, so, again your performance script shouldn't either, make sure for any value you are entering into the application there is plenty of data variation, for example, if you are entering a person's name, then you'll want a data sheet with several thousand names to pick from, if you have a copy of your production system then this can be quite easy to get, with a simple sql query against you database.
 
-Finally you'll need some machines to run the test, how many will depend on your application, if your application is accessed through a web browser then you can run many users on one agent machine, if it requires a desktop application to access then you may only be able to run one user per agent machine, you'll also need a machine to run the rfswarm GUI/Server
+Finally you'll need some machines to run the test, how many will depend on your application, if your application is accessed through a web browser then you can run many users on one agent machine, if it requires a desktop application to access then you may only be able to run one user per agent machine, you'll also need a machine to run the rfswarm Manager
 
-To get started have at least 3 machines ready, run the GUI/Server (rfswarm.py) on your first machine (Machine A), just make sure the GUI loads and you can browse to your robot files.
+To get started have at least 3 machines ready, run the Manager (rfswarm.py) on your first machine (Machine A), just make sure the Manager loads and you can browse to your robot files.
 
 Next on machines B & C, first make sure that your test cases run on these machines by opening a command line and running robot with the -t switch for your test case (robot -h will explain what you need to do here) and, once you have confirmed that robot works properly on machines B & C then run the agent (rfswarm_agent.py) don't forget to point the agents to Machine A.
 
-Next on Machine A, in the rfswarm GUI, create a new scenario, just make it a really simple to start with, one test case, see this screen:
+Next on Machine A, in the rfswarm Manager, create a new scenario, just make it a really simple to start with, one test case, see this screen:
 ![Plan New](./Images/MacOS_Plan_New_v0.6.3.png)
 The button next to the script field will let you browse for and select your robot file, once you do this the test option list will be populated with the test cases in your robot file, select the one you used above. for the initial test, set the users to 2 and the rampup to 30 (seconds) and run to 120 (seconds / 2 minutes). then click the agents tab and check that machines B & C are showing up in the agents list, if they are, your are good to go, switch back to the plan tab and click play, once you do the ui will switch to the run tab, within 15-30 seconds the test case should start up with 1 user on each machine B and C, and soon you will start seeing results appear in the run tab.
 
@@ -65,10 +65,10 @@ The first step in the tutorial will be to download the example opencart virtual 
 ## does rfswarm support IPv6?
 
 As far as I know all components of rfswarm work with IPv6, what I can confirm works:
-- communication between the agents and server in IPv6 only network
-- communication between the agents and server in IPv6+IPv4 dual stack network
-- binding the server to an IPv6 address
-- configuring the agent ini file with IPv6 address of the server
-- configuring the agent ini file with a server name that only resolves to an IPv6 address
+- communication between the agents and manager in IPv6 only network
+- communication between the agents and manager in IPv6+IPv4 dual stack network
+- binding the manager to an IPv6 address
+- configuring the agent ini file with IPv6 address of the manager
+- configuring the agent ini file with a manager name that only resolves to an IPv6 address
 
 rfswarm works in IPv4 only networks as well.

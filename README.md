@@ -29,7 +29,7 @@ To learn more about rfswarm please refer to the [Documentation](Doc/README.md)
 - [Reporting Issues / Known Issues](https://github.com/damies13/rfswarm/issues)
 
 <kbd align="centre">
-<img align="centre" height="350" src="Doc/Images/GUI&Agent_Example.png">
+<img align="centre" height="350" src="Doc/Images/Manager&Agent_Example.png">
 </kbd><br>
 An example of how your rfswarm setup might look.
 

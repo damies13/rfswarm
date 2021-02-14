@@ -373,12 +373,12 @@ class RFSwarmAgent():
 			self.debugmsg(8, r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok, r.text)
-				self.debugmsg(0, "Manager Disconected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 				self.debugmsg(7, "self.isconnected", self.isconnected)
 		except Exception as e:
 			self.debugmsg(8, "Exception:", e)
-			self.debugmsg(0, "Manager Disconected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 			self.isconnected = False
 			self.debugmsg(5, "self.isconnected", self.isconnected)
 
@@ -399,7 +399,7 @@ class RFSwarmAgent():
 				if (r.status_code == requests.codes.ok):
 					self.debugmsg(7, "r.status_code:", r.status_code, requests.codes.ok, r.text)
 					self.isconnected = True
-					self.debugmsg(0, "Manager Conected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+					self.debugmsg(0, "Manager Connected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 			except:
 				pass
 
@@ -503,12 +503,12 @@ class RFSwarmAgent():
 			self.debugmsg(6, "getscripts: resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
-				self.debugmsg(0, "Manager Disconected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 
 		except Exception as e:
 			self.debugmsg(8, "Exception:", e)
-			self.debugmsg(0, "Manager Disconected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 			self.isconnected = False
 
 		if not self.isconnected:
@@ -543,12 +543,12 @@ class RFSwarmAgent():
 			self.debugmsg(6, "resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
-				self.debugmsg(0, "Manager Disconected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 
 		except Exception as e:
 			self.debugmsg(8, "Exception:", e)
-			self.debugmsg(0, "Manager Disconected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 			self.isconnected = False
 
 		if not self.isconnected:
@@ -613,12 +613,12 @@ class RFSwarmAgent():
 			self.debugmsg(7, "getjobs: resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(7, "r.status_code:", r.status_code, requests.codes.ok)
-				self.debugmsg(0, "Manager Disconected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 
 		except Exception as e:
 			self.debugmsg(8, "Exception:", e)
-			self.debugmsg(0, "Manager Disconected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 			self.isconnected = False
 
 		if not self.isconnected:
@@ -941,12 +941,12 @@ class RFSwarmAgent():
 			self.debugmsg(7, "resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
-				self.debugmsg(0, "Manager Disconected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 
 		except Exception as e:
 			self.debugmsg(8, "Exception:", e)
-			self.debugmsg(0, "Manager Disconected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 			self.isconnected = False
 
 		if not self.isconnected:
@@ -991,12 +991,12 @@ class RFSwarmAgent():
 				self.debugmsg(7, "resp: ", r.status_code, r.text)
 				if (r.status_code != requests.codes.ok):
 					self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
-					self.debugmsg(0, "Manager Disconected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+					self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 					self.isconnected = False
 
 			except Exception as e:
 				self.debugmsg(8, "Exception:", e)
-				self.debugmsg(0, "Manager Disconected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 
 			if not self.isconnected:
@@ -1121,11 +1121,11 @@ class RFSwarmAgent():
 					self.debugmsg(6, "run_proces_output: ",r.status_code, r.text)
 					if (r.status_code != requests.codes.ok):
 						self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
-						self.debugmsg(0, "Manager Disconected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+						self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 						self.isconnected = False
 				except Exception as e:
 					self.debugmsg(8, "Exception:", e)
-					self.debugmsg(0, "Manager Disconected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+					self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 					self.isconnected = False
 
 
