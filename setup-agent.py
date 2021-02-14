@@ -5,7 +5,7 @@ with open("README_PyPi.md", "r") as fh:
 
 setuptools.setup(
 	name="rfswarm-agent",
-	version="0.6.3",
+	version="0.6.4",
 	author="damies13",
 	author_email="damies13+rfswarm@gmail.com",
 	description="rfswarm Agent",
@@ -17,10 +17,10 @@ setuptools.setup(
 	# packages=setuptools.find_packages(
 	# 	where = '',
 	# 	include = ['rfswarm-agent*',],
-	# 	exclude = ['rfswarm-gui',]
+	# 	exclude = ['rfswarm-manager',]
 	# ),
-	packages=setuptools.find_packages(exclude=["*rfswarm_gui*", "build/*"]),
-	# packages=setuptools.find_packages(exclude=["*rfswarm_gui*", "build"]),
+	packages=setuptools.find_packages(exclude=["*rfswarm_manager*", "build/*"]),
+	# packages=setuptools.find_packages(exclude=["*rfswarm_manager*", "build"]),
 	# package_dir = {"":"rfswarm-agent"},
 	install_requires=['configparser', 'requests', 'robotframework', 'psutil'],
 	classifiers=[

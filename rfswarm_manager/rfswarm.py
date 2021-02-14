@@ -1,13 +1,12 @@
 #!/usr/bin/python
 #
 #	Robot Framework Swarm
-#
-#    Version 0.6.3
+#		Manager
+#    Version 0.6.4
 #
 
 # 	Helpful links
 #
-# 	making things resize with the window	https://stackoverflow.com/questions/7591294/how-to-create-a-self-resizing-grid-of-buttons-in-tkinter
 #
 
 import sys
@@ -65,16 +64,20 @@ class percentile:
 		self.values = []
 
 	def step(self, value, percent):
+		base.debugmsg(9, "value:", value, "	percent:", percent)
+		if value is None:
+			return
 		self.count += 1
 		self.values.append(value)
 		self.percent = percent
 
 	def finalize(self):
 		try:
-			if self.count <10:
+			mincount = 100/(100-self.percent)
+			if self.count < mincount:
 				# Need at least 10 samples to get a useful percentile
 				return None
-			base.debugmsg(9, "percentile: finalize: self.count:", self.count, "	self.percent:", self.percent, "	self.values:", self.values)
+			base.debugmsg(9, "percentile: finalize: mincount:", mincount, "	self.count:", self.count, "	self.percent:", self.percent, "	self.values:", self.values)
 			nth = self.count * (self.percent/100)
 			base.debugmsg(9, "percentile: finalize: nth:", nth)
 			nthi = int(nth)
@@ -440,11 +443,11 @@ class AgentServer(BaseHTTPRequestHandler):
 
 
 class RFSwarmBase:
-	version="0.6.3"
+	version="0.6.4"
 	debuglvl = 0
 
 	config = None
-	gui_ini = None
+	manager_ini = None
 
 	save_ini = True
 
@@ -714,6 +717,7 @@ class RFSwarmBase:
 				self.datadb.create_aggregate("stdev", 1, stdevclass)
 
 			if createschema:
+				base.debugmsg(5, "Create Schema")
 				c = self.datadb.cursor()
 				# create tables
 
@@ -1041,8 +1045,13 @@ class RFSwarmBase:
 		# 1 day, 24 hours  = 60 * 60 * 24
 		aday = 60 * 60 * 24
 		while True:
-			# https://github.com/damies13/rfswarm/blob/v0.6.2/Doc/Images/z_gui.txt
-			url = "https://github.com/damies13/rfswarm/blob/"+self.version+"/Doc/Images/z_gui.txt"
+
+			ver = self.version
+			if ver[0] != 'v':
+				ver = "v" + ver
+
+			# https://github.com/damies13/rfswarm/blob/v0.6.2/Doc/Images/z_manager.txt
+			url = "https://github.com/damies13/rfswarm/blob/"+ver+"/Doc/Images/z_manager.txt"
 			try:
 				r = requests.get(url)
 				self.debugmsg(9, "tick_counter:", r.status_code)
@@ -1248,9 +1257,9 @@ class RFSwarmBase:
 	def saveini(self):
 		self.debugmsg(6, "save_ini:", self.save_ini)
 		if self.save_ini:
-			with open(base.gui_ini, 'w') as configfile:    # save
+			with open(base.manager_ini, 'w') as configfile:    # save
 				base.config.write(configfile)
-				self.debugmsg(6, "File Saved:", self.gui_ini)
+				self.debugmsg(6, "File Saved:", self.manager_ini)
 
 	def get_next_agent(self, filters):
 		base.debugmsg(9, "get_next_agent")
@@ -1725,7 +1734,7 @@ class RFSwarmCore:
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 	def __init__(self, master=None):
-		base.debugmsg(0, "Robot Framework Swarm: GUI/Server")
+		base.debugmsg(0, "Robot Framework Swarm: Manager")
 		base.debugmsg(0, "	Version", base.version)
 		signal.signal(signal.SIGINT, self.on_closing)
 
@@ -1759,19 +1768,31 @@ class RFSwarmCore:
 		#
 		# 	ensure ini file
 		#
+		base.manager_ini = os.path.join(scrdir, "RFSwarmManager.ini")
+
+		# rename old ini file if it exists
+		# 	this section can probably be removed in the future, but will probably need to stay for at least a few releases
 		base.gui_ini = os.path.join(scrdir, "RFSwarmGUI.ini")
+		if os.path.isfile(base.gui_ini) and not os.path.isfile(base.manager_ini):
+			try:
+				os.rename(base.gui_ini, base.manager_ini)
+			except:
+				pass
+
+		# old ini file
+
 		if base.args.ini:
 			base.save_ini = False
 			base.debugmsg(5, "base.args.ini: ", base.args.ini)
-			base.gui_ini = base.args.ini
+			base.manager_ini = base.args.ini
 
-		if os.path.isfile(base.gui_ini):
-			base.debugmsg(9, "agentini: ", base.gui_ini)
-			base.config.read(base.gui_ini)
+		if os.path.isfile(base.manager_ini):
+			base.debugmsg(9, "agentini: ", base.manager_ini)
+			base.config.read(base.manager_ini)
 		else:
 			base.saveini()
 
-		base.debugmsg(0, "	Configuration File: ", base.gui_ini)
+		base.debugmsg(0, "	Configuration File: ", base.manager_ini)
 
 		base.debugmsg(5, "base.config: ", base.config._sections)
 		if base.args.scenario:
@@ -1968,12 +1989,12 @@ class RFSwarmCore:
 
 		if base.appstarted:
 			try:
-				base.debugmsg(0, "Shutdown Agent Server")
+				base.debugmsg(0, "Shutdown Agent Manager")
 				base.agenthttpserver.shutdown()
 			except:
 				pass
 		try:
-			base.debugmsg(3, "Join Agent Server Thread")
+			base.debugmsg(3, "Join Agent Manager Thread")
 			base.Agentserver.join()
 		except:
 			pass
@@ -2042,7 +2063,7 @@ class RFSwarmCore:
 
 		base.appstarted = True
 		base.debugmsg(5, "appstarted:", base.appstarted)
-		base.debugmsg(1, "Starting Agent Server", "http://{}:{}/".format(srvdisphost, srvport))
+		base.debugmsg(1, "Starting Agent Manager", "http://{}:{}/".format(srvdisphost, srvport))
 		base.agenthttpserver.serve_forever()
 
 	def register_agent(self, agentdata):
@@ -2303,10 +2324,12 @@ class RFSwarmCore:
 		base.MetricIDs = {}
 
 		base.robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}}
+		base.debugmsg(5, "core.run_start_threads")
 		t = threading.Thread(target=core.run_start_threads)
 		t.start()
 		if not base.args.nogui:
 			time.sleep(1)
+			base.debugmsg(5, "base.gui.delayed_UpdateRunStats")
 			ut = threading.Thread(target=base.gui.delayed_UpdateRunStats)
 			ut.start()
 
