@@ -17,10 +17,10 @@ setuptools.setup(
 	# packages=setuptools.find_packages(
 	# 	where = '',
 	# 	include = ['rfswarm-agent*',],
-	# 	exclude = ['rfswarm-gui',]
+	# 	exclude = ['rfswarm-manager',]
 	# ),
-	packages=setuptools.find_packages(exclude=["*rfswarm_gui*", "build/*"]),
-	# packages=setuptools.find_packages(exclude=["*rfswarm_gui*", "build"]),
+	packages=setuptools.find_packages(exclude=["*rfswarm_manager*", "build/*"]),
+	# packages=setuptools.find_packages(exclude=["*rfswarm_manager*", "build"]),
 	# package_dir = {"":"rfswarm-agent"},
 	install_requires=['configparser', 'requests', 'robotframework', 'psutil'],
 	classifiers=[

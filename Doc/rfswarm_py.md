@@ -1,9 +1,9 @@
 
 [Index](README.md)
 
-## rfswarm.py (GUI / Server)
+## rfswarm.py (Manager)
 
-rfswarm.py is the GUI and central server component of rfswarm, this is where you plan, execute and monitor your performance test.
+rfswarm.py is the swarm Manager, or central server component of rfswarm, this is where you plan, execute and monitor your performance test.
 
 - [User Interface](#User-Interface)
 	- [Plan](#Plan)
@@ -13,9 +13,9 @@ rfswarm.py is the GUI and central server component of rfswarm, this is where you
 - [Install and Setup](#Install-and-Setup)
 	- [Install](#1-install)
 	- [Adjust the Firewall](#2-Adjust-the-Firewall)
-	- [Run the GUI Server](#3-Run-the-GUI-Server)
+	- [Run the Manager](#3-Run-the-manager)
 	- [Manual Install the prerequisites](#4-Manual-Install-the-prerequisites)
-	- [Manual Run the GUI Server](#5-Manual-Run-the-GUI-Server)
+	- [Manual Run the Manager](#5-Manual-Run-the-Manager)
 - [Agent Assignment](#Agent-Assignment)
 - [Credits](#Credits)
 
@@ -70,7 +70,7 @@ If you change this setting here from the default, then for this particular test 
 |configured|configured|test group setting|
 
 ###### Robot Options:
-By default this setting is blank and in most cases wouldnlt be used, it allows you to pass additional command line options to the robot executable, to find out what options can be passed run
+By default this setting is blank and in most cases wouldn't be used, it allows you to pass additional command line options to the robot executable, to find out what options can be passed run
 `robot -h`
 On any machine that has Robot Framework installed
 
@@ -106,24 +106,24 @@ Unique by check boxes:
 The default value is 90, you can adjust the percentile value between 1% and 99% depending on your application's performance requirements.
 
 ##### Stop button ![image](Images/GUI_btn_stop.gif)
-Use this if you want to stop the test early. You may not notice an immediate reaction as pressing the button just changes the end time on all the test jobs assigned to the current time and stops the ramp-up if the test is still in the ramp-up phase. While there is no benefit to pressing the stop button multiple times there is no harm either, so press to your hearts content.
+Use this if you want to stop the test early. You may not notice an immediate reaction as pressing the button just changes the end time on all the test jobs assigned to the current time and stops the ramp-up if the test is still in the ramp-up phase.
 
-Once the stop button has been pressed the agents will receive the changed end time when they [poll](./rfswarm_agent_py.md#agent-polling-of-the-guiserver) the GUI/Server next, the agent will change status to stopping which will be returned on the next poll interval and the agent will not start a new iteration for the running tests, however the ones currently running will be allowed to complete.
+Once the stop button has been pressed the agents will receive the changed end time when they [poll](./rfswarm_agent_py.md#agent-polling-of-the-guiserver) the Manager next, the agent will change status to stopping which will be returned on the next poll interval and the agent will not start a new iteration for the running tests, however the ones currently running will be allowed to complete.
 
 ##### Abort button ![image](Images/GUI_btn_bomb.gif)
 This button replaces the Stop button when either of the following happens:
 - You press the Stop button
-- The test reaches the rampdown period after run is complete
+- The test reaches the ramp-down period after run is complete
 
 Clicking the Abort button will present a warning dialogue like this:
 ![image](Images/MacOS_Run_v0.6.3_Abort_Run_Dialogue.png)
-Clicking yes on this dialogue will instruct the agents to send a sigterm (^C) to the running robots causing them to abort the currently running test and execute any teardown steps and exit.
+Clicking yes on this dialogue will instruct the agents to send a sigterm (^C) to the running robots causing them to abort the currently running test and execute any teardown steps then exit.
 You would normally only use this option if your AUT has crashed and you need to stop applying load to the system.
 
 ##### Disabled Stop button ![image](Images/GUI_btn_stop_grey.gif)
 This button replaces the Stop/Abort buttons when either of the following happens
 - You clicked yes to abort the run
-- The test completes rampdown
+- The test completes ramp-down
 Clicking this button does nothing.
 
 ##### CSV Report button ![image](Images/GUI_btn_report.gif)
@@ -172,8 +172,8 @@ Additionally the debug (-g) levels 1-3 will give extra information on the consol
 
 ```
 $ rfswarm -h
-Robot Framework Swarm: GUI/Server
-	Version 0.6.3
+Robot Framework Swarm: Manager
+	Version 0.6.4
 usage: rfswarm [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS] [-n] [-d DIR] [-e IPADDRESS] [-p PORT]
 
 optional arguments:
@@ -197,8 +197,8 @@ optional arguments:
 If you pass in an unsupported command line option, you will get this prompt:
 ```
 $ rfswarm -?
-Robot Framework Swarm: GUI/Server
-	Version 0.6.3
+Robot Framework Swarm: Manager
+	Version 0.6.4
 usage: rfswarm [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS] [-n] [-d DIR] [-e IPADDRESS] [-p PORT]
 rfswarm: error: unrecognized arguments: -?
 ```
@@ -207,7 +207,7 @@ rfswarm: error: unrecognized arguments: -?
 
 #### 1. Install
 ##### 1.1 Prerequisites
-- The GUI/Server machine needs to use a minimum of Python 3.7
+- The Manager machine needs to use a minimum of Python 3.7
 > ThreadingHTTPServer feature of HTTPServer requires was added in Python 3.7
 
 - tkinter may need to be installed
@@ -222,26 +222,26 @@ apt install python3-tk
 
 Once you have the prerequisites sorted, the installation is simply
 ```
-pip* install rfswarm-gui
+pip* install rfswarm-manager
 ```
 
 \*some systems might need you to use pip3 and or sudo
 
 #### 2. Adjust the Firewall
 
-Check if there is a firewall on you GUI / Server machine, if so you may need to adjust the firewall to add a rule to allow communication between the GUI / Server and the Agent.
+Check if there is a firewall on you Manager machine, if so you may need to adjust the firewall to add a rule to allow communication between the Manager and the Agent.
 
 | Machine | Protocol | Port Number<sup>1</sup> | Direction |
 |---|---|---|---|
-| GUI / Server | TCP | 8138 | Inbound |
+| Manager | TCP | 8138 | Inbound |
 | Agent | TCP | 8138 | Outbound |
 
 <sup>1</sup> This is the default port number, replace with the port number you used if you changed it in the ini file or used the -p command line switch.
 
-Most firewalls on servers and workstations don't require specific rules for outbound, so most likely you will only need to configure the Inbound rule on the GUI / Server machine if it has a firewall.
+Most firewalls on servers and workstations don't require specific rules for outbound, so most likely you will only need to configure the Inbound rule on the Manager machine if it has a firewall.
 
 
-#### 3. Run the GUI Server
+#### 3. Run the Manager
 
 ```
 rfswarm
@@ -249,7 +249,7 @@ rfswarm
 
 #### 4. Manual Install the prerequisites
 
-- The GUI/Server machine needs to use a minimum of Python 3.7
+- The Manager machine needs to use a minimum of Python 3.7
 > ThreadingHTTPServer feature of HTTPServer requires was added in Python 3.7
 
 - tkinter may need to be installed
@@ -268,7 +268,7 @@ pip* install configparser setuptools hashlib HTTPServer pillow
 
 \*some systems might need you to use pip3 and or sudo
 
-#### 5. Manual Run the GUI Server
+#### 5. Manual Run the Manager
 
 Use this method if you did not install using pip
 
@@ -290,7 +290,7 @@ The scenarios rfswarm has been designed to cater for:
 4. Sometimes you need to apply a custom filter to Require/Exclude a test group to run on specific agents or groups of agents.
 
 How the assignment algorithm works:
-- As the scenario is ready to start the next virtual user the GUI/Server calls the assignment algorithm
+- As the scenario is ready to start the next virtual user the Manager calls the assignment algorithm
 - First the agents are checked against the Agent Filter rules for the test group that is requiring an agent to be assigned, if the agent passes all the filter rules it is added to the list to be sorted.
 - Next the assignment algorithm sorts the agents list by the number of virtual users assigned to each agent
 - The agent with the lowest number of assigned virtual users is selected, there may be several agents with the equal lowest number of virtual users, e.g. at the start of the test all agents equally have zero (0) virtual users assigned, then the first agent from the list with this assigned count is selected.
@@ -302,4 +302,4 @@ How the assignment algorithm works:
 
 ### Credits
 
-The icons used for the buttons in the GUI were derived from the Creative Commons licensed (Silk icon set 1.3)[http://www.famfamfam.com/lab/icons/silk/]
+The icons used for the buttons in the Manager GUI were derived from the Creative Commons licensed (Silk icon set 1.3)[http://www.famfamfam.com/lab/icons/silk/]

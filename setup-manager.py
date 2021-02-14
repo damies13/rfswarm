@@ -4,11 +4,11 @@ with open("README_PyPi.md", "r") as fh:
 	long_description = fh.read()
 
 setuptools.setup(
-	name="rfswarm-gui",
+	name="rfswarm-manager",
 	version="0.6.4",
 	author="damies13",
 	author_email="damies13+rfswarm@gmail.com",
-	description="rfswarm GUI",
+	description="rfswarm manager",
 	long_description=long_description,
 	long_description_content_type="text/markdown",
 	url="https://github.com/damies13/rfswarm",
@@ -38,6 +38,6 @@ setuptools.setup(
 	},
 	# entry_points = {'console_scripts': ['rfswarm = rfswarm:rfswarm']},
 	# entry_points = {'console_scripts': ['rfswarm = rfswarm-gui.rfswarm:rfswarm']},
-	entry_points = {'console_scripts': ['rfswarm = rfswarm_gui.rfswarm:RFSwarmCore']},
+	entry_points = {'console_scripts': ['rfswarm = rfswarm_manager.rfswarm:RFSwarmCore', 'rfswarm-manager = rfswarm_manager.rfswarm:RFSwarmCore']},
 	# entry_points = {'console_scripts': ['rfswarm = rfswarm:RFSwarmCore']},
 )

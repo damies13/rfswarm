@@ -47,7 +47,7 @@ class RFSwarmAgent():
 	isrunning = False
 	isstopping = False
 	run_name = None
-	swarmserver = None
+	swarmmanager = None
 	agentdir = None
 	scriptdir = None
 	logdir = None
@@ -82,7 +82,7 @@ class RFSwarmAgent():
 		parser.add_argument('-g', '--debug', help='Set debug level, default level is 0')
 		parser.add_argument('-v', '--version', help='Display the version and exit', action='store_true')
 		parser.add_argument('-i', '--ini', help='path to alternate ini file')
-		parser.add_argument('-s', '--server', help='The server to connect to e.g. http://localhost:8138/')
+		parser.add_argument('-m', '--manager', help='The manager to connect to e.g. http://localhost:8138/')
 		parser.add_argument('-d', '--agentdir', help='The directory the agent should use for files')
 		parser.add_argument('-r', '--robot', help='The robot framework executable')
 		parser.add_argument('-x', '--xmlmode', help='XML Mode, fall back to pasing the output.xml after each iteration', action='store_true')
@@ -259,8 +259,8 @@ class RFSwarmAgent():
 
 			if not self.isconnected:
 				# self.isrunning = False # Not sure if I need this?
-				# self.connectserver()
-				t = threading.Thread(target=self.connectserver)
+				# self.connectmanager()
+				t = threading.Thread(target=self.connectmanager)
 				t.start()
 				self.isrunning = False
 
@@ -347,8 +347,8 @@ class RFSwarmAgent():
 
 
 	def updatestatus(self):
-		self.debugmsg(6, "self.swarmserver:", self.swarmserver)
-		uri = self.swarmserver + "AgentStatus"
+		self.debugmsg(6, "self.swarmmanager:", self.swarmmanager)
+		uri = self.swarmmanager + "AgentStatus"
 
 		# self.updateipaddresslist()
 		t1 = threading.Thread(target=self.updateipaddresslist)
@@ -373,51 +373,57 @@ class RFSwarmAgent():
 			self.debugmsg(8, r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok, r.text)
-				self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 				self.debugmsg(7, "self.isconnected", self.isconnected)
 		except Exception as e:
 			self.debugmsg(8, "Exception:", e)
-			self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 			self.isconnected = False
 			self.debugmsg(5, "self.isconnected", self.isconnected)
 
-	def connectserver(self):
-		self.debugmsg(6, "connectserver")
-		if self.swarmserver is None:
-			self.findserver()
-			if self.args.server:
-				self.debugmsg(7, "self.args.server: ", self.args.server)
-				self.swarmserver = self.args.server
+	def connectmanager(self):
+		self.debugmsg(6, "connectmanager")
+		if self.swarmmanager is None:
+			self.findmanager()
+			if self.args.manager:
+				self.debugmsg(7, "self.args.manager: ", self.args.manager)
+				self.swarmmanager = self.args.manager
 
-		if self.swarmserver is not None:
-			self.debugmsg(2, "Try connecting to", self.swarmserver)
-			self.debugmsg(6, "self.swarmserver:", self.swarmserver)
+		if self.swarmmanager is not None:
+			self.debugmsg(2, "Try connecting to", self.swarmmanager)
+			self.debugmsg(6, "self.swarmmanager:", self.swarmmanager)
 			try:
-				r = requests.get(self.swarmserver, timeout=self.timeout)
+				r = requests.get(self.swarmmanager, timeout=self.timeout)
 				self.debugmsg(8, r.status_code, r.text)
 				if (r.status_code == requests.codes.ok):
 					self.debugmsg(7, "r.status_code:", r.status_code, requests.codes.ok, r.text)
 					self.isconnected = True
-					self.debugmsg(0, "Server Conected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+					self.debugmsg(0, "Manager Connected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 			except:
 				pass
 
-	def findserver(self):
-		self.debugmsg(6, "findserver")
-		self.debugmsg(6, "findserver:", self.config)
+	def findmanager(self):
+		self.debugmsg(6, "findmanager")
+		self.debugmsg(6, "findmanager:", self.config)
 		if 'Agent' in self.config:
-			self.debugmsg(6, "findserver:", self.config['Agent'])
+			self.debugmsg(6, "findmanager:", self.config['Agent'])
 			pass
 		else:
 			self.config['Agent'] = {}
 			self.saveini()
 
 		if 'swarmserver' in self.config['Agent']:
-			self.debugmsg(6, "findserver: Agent:swarmserver =", self.config['Agent']['swarmserver'])
-			self.swarmserver = self.config['Agent']['swarmserver']
+			if 'swarmmanager' not in self.config['Agent']:
+				self.config['Agent']['swarmmanager'] = self.config['Agent']['swarmserver']
+			del self.config['Agent']['swarmserver']
+			self.saveini()
+
+		if 'swarmmanager' in self.config['Agent']:
+			self.debugmsg(6, "findmanager: Agent:swarmmanager =", self.config['Agent']['swarmmanager'])
+			self.swarmmanager = self.config['Agent']['swarmmanager']
 		else:
-			self.config['Agent']['swarmserver'] = "http://localhost:8138/"
+			self.config['Agent']['swarmmanager'] = "http://localhost:8138/"
 			self.saveini()
 
 	def findlibraries(self):
@@ -474,7 +480,7 @@ class RFSwarmAgent():
 			ver = self.version
 			if ver[0] != 'v':
 				ver = "v" + ver
-			
+
 			# https://github.com/damies13/rfswarm/blob/v0.6.2/Doc/Images/z_agent.txt
 			url = "https://github.com/damies13/rfswarm/blob/"+ver+"/Doc/Images/z_agent.txt"
 			try:
@@ -487,7 +493,7 @@ class RFSwarmAgent():
 
 	def getscripts(self):
 		self.debugmsg(6, "getscripts")
-		uri = self.swarmserver + "Scripts"
+		uri = self.swarmmanager + "Scripts"
 		payload = {
 			"AgentName": self.agentname
 		}
@@ -497,12 +503,12 @@ class RFSwarmAgent():
 			self.debugmsg(6, "getscripts: resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
-				self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 
 		except Exception as e:
 			self.debugmsg(8, "Exception:", e)
-			self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 			self.isconnected = False
 
 		if not self.isconnected:
@@ -526,7 +532,7 @@ class RFSwarmAgent():
 
 	def getfile(self, hash):
 		self.debugmsg(6, "hash: ", hash)
-		uri = self.swarmserver + "File"
+		uri = self.swarmmanager + "File"
 		payload = {
 			"AgentName": self.agentname,
 			"Action": "Download",
@@ -537,12 +543,12 @@ class RFSwarmAgent():
 			self.debugmsg(6, "resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
-				self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 
 		except Exception as e:
 			self.debugmsg(8, "Exception:", e)
-			self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 			self.isconnected = False
 
 		if not self.isconnected:
@@ -597,7 +603,7 @@ class RFSwarmAgent():
 
 	def getjobs(self):
 		self.debugmsg(6, "getjobs")
-		uri = self.swarmserver + "Jobs"
+		uri = self.swarmmanager + "Jobs"
 		payload = {
 			"AgentName": self.agentname
 		}
@@ -607,12 +613,12 @@ class RFSwarmAgent():
 			self.debugmsg(7, "getjobs: resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(7, "r.status_code:", r.status_code, requests.codes.ok)
-				self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 
 		except Exception as e:
 			self.debugmsg(8, "Exception:", e)
-			self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 			self.isconnected = False
 
 		if not self.isconnected:
@@ -808,7 +814,7 @@ class RFSwarmAgent():
 			cmd.append("-M index:{}".format(self.jobs[jobid]["ScriptIndex"]))
 			cmd.append("-M vuser:{}".format(self.jobs[jobid]["VUser"]))
 			cmd.append("-M iteration:{}".format(self.jobs[jobid]["Iteration"]))
-			cmd.append("-M swarmserver:{}".format(self.swarmserver))
+			cmd.append("-M swarmmanager:{}".format(self.swarmmanager))
 			cmd.append("-M excludelibraries:{}".format(excludelibraries))
 			cmd.append("--listener {}".format('"'+self.listenerfile+'"'))
 
@@ -921,9 +927,9 @@ class RFSwarmAgent():
 		self.debugmsg(7, "hash", hash)
 
 
-		# 	check file exists on server?
+		# 	check file exists on manager?
 
-		uri = self.swarmserver + "File"
+		uri = self.swarmmanager + "File"
 		payload = {
 			"AgentName": self.agentname,
 			"Action": "Status",
@@ -935,12 +941,12 @@ class RFSwarmAgent():
 			self.debugmsg(7, "resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
-				self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 
 		except Exception as e:
 			self.debugmsg(8, "Exception:", e)
-			self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 			self.isconnected = False
 
 		if not self.isconnected:
@@ -985,12 +991,12 @@ class RFSwarmAgent():
 				self.debugmsg(7, "resp: ", r.status_code, r.text)
 				if (r.status_code != requests.codes.ok):
 					self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
-					self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+					self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 					self.isconnected = False
 
 			except Exception as e:
 				self.debugmsg(8, "Exception:", e)
-				self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 
 			if not self.isconnected:
@@ -1089,8 +1095,8 @@ class RFSwarmAgent():
 						)
 
 
-				# Send result to server
-				uri = self.swarmserver + "Result"
+				# Send result to manager
+				uri = self.swarmmanager + "Result"
 
 				self.debugmsg(6, "run_proces_output: uri", uri)
 
@@ -1115,11 +1121,11 @@ class RFSwarmAgent():
 					self.debugmsg(6, "run_proces_output: ",r.status_code, r.text)
 					if (r.status_code != requests.codes.ok):
 						self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
-						self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+						self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 						self.isconnected = False
 				except Exception as e:
 					self.debugmsg(8, "Exception:", e)
-					self.debugmsg(0, "Server Disconected", self.swarmserver, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+					self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 					self.isconnected = False
 
 
@@ -1173,7 +1179,7 @@ class RFSwarmAgent():
 		fd.append("	ROBOT_LISTENER_API_VERSION = 2")
 		fd.append("")
 		fd.append("	msg = None")
-		fd.append("	swarmserver = \"http://localhost:8138/\"")
+		fd.append("	swarmmanager = \"http://localhost:8138/\"")
 		fd.append("	excludelibraries = [\"BuiltIn\",\"String\",\"OperatingSystem\",\"perftest\"]")
 		fd.append("	debuglevel = 0")
 		fd.append("	index = 0")
@@ -1194,9 +1200,9 @@ class RFSwarmAgent():
 		fd.append("		if 'vuser' in attrs['metadata']:")
 		fd.append("			self.vuser = attrs['metadata']['vuser']")
 		fd.append("			self.debugmsg(6, 'vuser: ', self.vuser)")
-		fd.append("		if 'swarmserver' in attrs['metadata']:")
-		fd.append("			self.swarmserver = attrs['metadata']['swarmserver']")
-		fd.append("			self.debugmsg(6, 'swarmserver: ', self.swarmserver)")
+		fd.append("		if 'swarmmanager' in attrs['metadata']:")
+		fd.append("			self.swarmmanager = attrs['metadata']['swarmmanager']")
+		fd.append("			self.debugmsg(6, 'swarmmanager: ', self.swarmmanager)")
 		fd.append("		if 'excludelibraries' in attrs['metadata']:")
 		fd.append("			self.excludelibraries = attrs['metadata']['excludelibraries'].split(\",\")")
 		fd.append("			self.debugmsg(6, 'excludelibraries: ', self.excludelibraries)")
@@ -1292,7 +1298,7 @@ class RFSwarmAgent():
 		fd.append("				pass")
 		fd.append("")
 		fd.append("	def send_result(self, payload):")
-		fd.append("		uri = self.swarmserver + 'Result'")
+		fd.append("		uri = self.swarmmanager + 'Result'")
 		fd.append("		try:")
 		fd.append("			r = requests.post(uri, json=payload, timeout=600)")
 		fd.append("			self.debugmsg(7, 'send_result: ',r.status_code, r.text)")
