@@ -2812,6 +2812,8 @@ class RFSwarmGUI(tk.Frame):
 
 	plan_scnro_chngd = False
 
+	newgraph = 0
+
 	plancolidx = 0
 	plancolusr = 1
 	plancoldly = 2
@@ -3104,13 +3106,24 @@ class RFSwarmGUI(tk.Frame):
 		file_menu.add_command(label = "Exit", command = self.on_closing, accelerator="{}-x".format(accelkey))
 		window.bind('x', self.on_closing)
 
-		# creting another sub menu
+		# creating another sub menu
 		run_menu = tk.Menu(root_menu)
 		root_menu.add_cascade(label = "Run", menu = run_menu)
 		run_menu.add_command(label = "Play", command = self.ClickPlay, accelerator="{}-p".format(accelkey))
 		window.bind('p', self.ClickPlay)
 		run_menu.add_command(label = "Stop", command = self.ClickStop, accelerator="{}-t".format(accelkey))
 		window.bind('t', self.ClickStop)
+
+
+		# creating graphs sub menu
+		gph_menu = tk.Menu(root_menu)
+		root_menu.add_cascade(label = "Graphs", menu = gph_menu)
+
+
+
+		gph_menu.add_command(label = "New Graph Window", command = self.NewGraph, accelerator="{}-g".format(accelkey))
+		window.bind('g', self.NewGraph)
+
 
 
 		window.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -3223,6 +3236,80 @@ class RFSwarmGUI(tk.Frame):
 
 				# style.configure("Spinbox", foreground="#000")
 				style.configure("TSpinbox", foreground="#000")
+
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+	#
+	# Graphs
+	#
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+	def NewGraph(self, *args):
+		base.debugmsg(6, "New Graph Window.....")
+		# base.debugmsg(7, "New Graph Window - args:", args)
+		grphWindow = tk.Toplevel(self.root)
+
+		self.newgraph += 1
+		grphWindow.graphname = "New Graph {}".format(self.newgraph)
+		base.debugmsg(6, "graphname:", grphWindow.graphname)
+
+		grphWindow.title(grphWindow.graphname)
+
+		grphWindow.lblBLNK = ttk.Label(grphWindow, text = " ")	# just a blank row as a spacer before the filters
+		grphWindow.lblBLNK.grid(column=0, row=0, sticky="nsew")
+
+		grphWindow.lblSettings = ttk.Label(grphWindow, text = "S") # this needs to be changed to a settings cog
+		grphWindow.lblSettings.grid(column=99, row=0, sticky="nsew")
+
+		grphWindow.fmeGraph = tk.Frame(grphWindow)
+		grphWindow.fmeGraph.grid(column=0, row=1, columnspan=8, sticky="nsew")
+
+		grphWindow.fmeSettings = tk.Frame(grphWindow)
+		grphWindow.fmeSettings.grid(column=9, row=1, columnspan=2, sticky="nsew")
+
+
+		row =0
+		grphWindow.fmeSettings.lblGN = ttk.Label(grphWindow.fmeSettings, text = "Graph Name:")
+		grphWindow.fmeSettings.lblGN.grid(column=0, row=row, sticky="nsew")
+
+		grphWindow.fmeSettings.inpGN = ttk.Entry(grphWindow.fmeSettings)
+		grphWindow.fmeSettings.inpGN.delete(0,'end')
+		grphWindow.fmeSettings.inpGN.insert(0, grphWindow.graphname)
+		grphWindow.fmeSettings.inpGN.grid(column=1, row=row, sticky="nsew")
+
+
+		# other settings? Metric Type, Primary metric, Secondary metric, filter?
+
+		row +=1
+		grphWindow.fmeSettings.lblGN = ttk.Label(grphWindow.fmeSettings, text = "Data Type:")
+		grphWindow.fmeSettings.lblGN.grid(column=0, row=row, sticky="nsew")
+
+		DataTypes = ["", "Metric", "Result"]
+		grphWindow.settings = {}
+		grphWindow.settings["DataType"] = tk.StringVar()
+		omfr = ttk.OptionMenu(grphWindow.fmeSettings, grphWindow.settings["DataType"], *DataTypes)
+		grphWindow.settings["DataType"].set(DataTypes[1])
+		omfr.grid(column=1, row=row, sticky="nsew")
+
+
+		# 	Metric Type
+		# 		SELECT
+		# 			m.Type
+		# 		FROM Metric as m
+		# 		GROUP BY m.Type
+		# --
+
+		#	Primary metric
+		# 				SELECT
+		# 					m.Name
+		# 					, m.ROWID
+		# 				FROM Metric as m
+		# -- 				WHERE m.Type = "Agent"
+		# -- 				WHERE m.Type = "Scenario"
+		# 				WHERE m.Type = "Summary"
+		#
+		# 				GROUP BY m.Name
+		# 				ORDER BY m.ROWID
+		#
 
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
