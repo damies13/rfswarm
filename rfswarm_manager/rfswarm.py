@@ -13,6 +13,7 @@ import sys
 import platform
 import signal
 import os
+import tempfile
 import glob
 import configparser
 import hashlib
@@ -506,6 +507,61 @@ class RFSwarmBase:
 	# base application
 	#
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+
+
+	def findiniloctaion(self):
+
+		if self.args.ini:
+			self.debugmsg(1, "self.args.ini: ", self.args.ini)
+			return self.args.ini
+
+		inilocations = []
+
+		srcdir = os.path.join(os.path.dirname(__file__))
+		self.debugmsg(7, "srcdir[-2]: ", srcdir[-2:])
+		if srcdir[-2:] == "/.":
+			srcdir = srcdir[0:-2]
+		self.debugmsg(7, "srcdir: ", srcdir)
+
+		inifilename = "RFSwarmManager.ini"
+		# default location for all previous versions
+		inilocations.append(os.path.join(srcdir, inifilename))
+		# probably best location
+		inilocations.append(os.path.join(os.path.expanduser("~"), ".rfswarm", inifilename))
+		# last resort location
+		inilocations.append(os.path.join(tempfile.gettempdir(), inifilename))
+
+		self.debugmsg(6, "inilocations: ", inilocations)
+
+
+		for iniloc in inilocations:
+			self.debugmsg(7, "iniloc: ", iniloc)
+			if os.path.isfile(iniloc):
+				self.debugmsg(7, "iniloc exists")
+				return iniloc
+			else:
+				# can we write to this location?
+				# 	if anything in the try statement fails then we can't so progress to next location
+				self.debugmsg(7, "iniloc can be created?")
+				try:
+					loc = os.path.dirname(iniloc)
+					self.debugmsg(7, "loc: ", loc)
+					self.debugmsg(7, "loc isdir:", os.path.isdir(loc))
+					if not os.path.isdir(loc):
+						self.debugmsg(7, "creating loc")
+						os.makedirs(loc)
+						self.debugmsg(7, "loc created")
+
+					self.debugmsg(7, "os.access(loc): ", os.access(loc, os.X_OK | os.W_OK))
+					if os.access(loc, os.X_OK | os.W_OK):
+						self.debugmsg(7, "iniloc can be created!")
+						return iniloc
+				except:
+					pass
+		# This should cause saveini to fail?
+		return None
 
 
 
@@ -1768,7 +1824,7 @@ class RFSwarmCore:
 		#
 		# 	ensure ini file
 		#
-		base.manager_ini = os.path.join(scrdir, "RFSwarmManager.ini")
+		base.manager_ini = base.findiniloctaion()
 
 		# rename old ini file if it exists
 		# 	this section can probably be removed in the future, but will probably need to stay for at least a few releases
@@ -1787,7 +1843,7 @@ class RFSwarmCore:
 			base.manager_ini = base.args.ini
 
 		if os.path.isfile(base.manager_ini):
-			base.debugmsg(9, "agentini: ", base.manager_ini)
+			base.debugmsg(7, "agentini: ", base.manager_ini)
 			base.config.read(base.manager_ini)
 		else:
 			base.saveini()
