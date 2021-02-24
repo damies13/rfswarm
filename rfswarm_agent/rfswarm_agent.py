@@ -101,13 +101,8 @@ class RFSwarmAgent():
 
 
 		self.config = configparser.ConfigParser()
-		scrdir = os.path.dirname(__file__)
-		self.debugmsg(6, "scrdir: ", scrdir)
-		self.agentini = os.path.join(scrdir, "RFSwarmAgent.ini")
 
-		if self.args.ini:
-			self.debugmsg(1, "self.args.ini: ", self.args.ini)
-			self.agentini = self.args.ini
+		self.agentini = self.findiniloctaion()
 
 		if os.path.isfile(self.agentini):
 			self.debugmsg(6, "agentini: ", self.agentini)
@@ -214,6 +209,59 @@ class RFSwarmAgent():
 				self.agentproperties["{}".format(prop.strip())] = True
 
 		self.debugmsg(9, "self.agentproperties: ", self.agentproperties)
+
+
+	def findiniloctaion(self):
+
+		if self.args.ini:
+			self.debugmsg(1, "self.args.ini: ", self.args.ini)
+			return self.args.ini
+
+		inilocations = []
+
+		srcdir = os.path.join(os.path.dirname(__file__))
+		self.debugmsg(7, "srcdir[-2]: ", srcdir[-2:])
+		if srcdir[-2:] == "/.":
+			srcdir = srcdir[0:-2]
+		self.debugmsg(7, "srcdir: ", srcdir)
+
+		inifilename = "RFSwarmAgent.ini"
+		# default location for all previous versions
+		inilocations.append(os.path.join(srcdir, inifilename))
+		# probably best location
+		inilocations.append(os.path.join(os.path.expanduser("~"), ".rfswarm", inifilename))
+		# last resort location
+		inilocations.append(os.path.join(tempfile.gettempdir(), inifilename))
+
+		self.debugmsg(6, "inilocations: ", inilocations)
+
+
+		for iniloc in inilocations:
+			self.debugmsg(7, "iniloc: ", iniloc)
+			if os.path.isfile(iniloc):
+				self.debugmsg(7, "iniloc exists")
+				return iniloc
+			else:
+				# can we write to this location?
+				# 	if anything in the try statement fails then we can't so progress to next location
+				self.debugmsg(7, "iniloc can be created?")
+				try:
+					loc = os.path.dirname(iniloc)
+					self.debugmsg(7, "loc: ", loc)
+					self.debugmsg(7, "loc isdir:", os.path.isdir(loc))
+					if not os.path.isdir(loc):
+						self.debugmsg(7, "creating loc")
+						os.makedirs(loc)
+						self.debugmsg(7, "loc created")
+
+					self.debugmsg(7, "os.access(loc): ", os.access(loc, os.X_OK | os.W_OK))
+					if os.access(loc, os.X_OK | os.W_OK):
+						self.debugmsg(7, "iniloc can be created!")
+						return iniloc
+				except:
+					pass
+		# This should cause saveini to fail?
+		return None
 
 
 	def debugmsg(self, lvl, *msg):
