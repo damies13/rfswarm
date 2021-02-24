@@ -225,12 +225,13 @@ class RFSwarmAgent():
 			srcdir = srcdir[0:-2]
 		self.debugmsg(7, "srcdir: ", srcdir)
 
+		inifilename = "RFSwarmAgent.ini"
 		# default location for all previous versions
-		inilocations.append(os.path.join(srcdir, "RFSwarmAgent.ini"))
+		inilocations.append(os.path.join(srcdir, inifilename))
 		# probably best location
-		inilocations.append(os.path.join(os.path.expanduser("~"), ".rfswarm", "RFSwarmAgent.ini"))
+		inilocations.append(os.path.join(os.path.expanduser("~"), ".rfswarm", inifilename))
 		# last resort location
-		inilocations.append(os.path.join(tempfile.gettempdir(), "RFSwarmAgent.ini"))
+		inilocations.append(os.path.join(tempfile.gettempdir(), inifilename))
 
 		self.debugmsg(6, "inilocations: ", inilocations)
 
