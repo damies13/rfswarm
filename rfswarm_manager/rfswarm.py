@@ -570,6 +570,7 @@ class RFSwarmBase:
 		prefix = ""
 		if self.debuglvl >= lvl:
 			try:
+				suffix = ""
 				if self.debuglvl >= 4:
 					stack = inspect.stack()
 					the_class = stack[1][0].f_locals["self"].__class__.__name__
@@ -592,8 +593,13 @@ class RFSwarmBase:
 
 					msglst.append(str(prefix))
 
+					# suffix = "	[{} @{}]".format(self.version, str(datetime.now().replace(microsecond=0).isoformat(sep=' ')))
+					suffix = "	[{} @{}]".format(self.version, str(datetime.now().isoformat(sep=' ', timespec='seconds')))
+					# suffix = "	[{} @{}]".format(self.version, "HH:mm:SS")
+
 				for itm in msg:
 					msglst.append(str(itm))
+				msglst.append(str(suffix))
 				print(" ".join(msglst))
 			except:
 				pass
@@ -2936,6 +2942,7 @@ class RFSwarmGUI(tk.Frame):
 		# files["report_word"] = "famfamfam_silk_icons/icons/report_word.gif"
 		# files["Abort"] = "../famfamfam_silk_icons/icons/bomb.gif"
 		# files["Aborted"] = "../famfamfam_silk_icons/icons/stop_grey.gif"
+		# files["Refresh"] = "../famfamfam_silk_icons/icons/arrow_refresh.gif"
 
 		# files["Advanced"] = "../famfamfam_silk_icons/icons/cog.gif"
 		# files["Delete"] = "../famfamfam_silk_icons/icons/cross.gif"
@@ -2956,12 +2963,12 @@ class RFSwarmGUI(tk.Frame):
 				base.debugmsg(0, "isfile: imgfile:", imgfile)
 				with open(imgfile,"rb") as f:
 					img_raw = f.read()
-				base.debugmsg(0, "img_raw:", img_raw)
+				base.debugmsg(0, "img_raw", icontext, ":", img_raw)
 				# b64 = base64.encodestring(img_raw)
 				# img_text = 'img_b64 = \\\n"""{}"""'.format(b64)
 
 				self.imgdata[icontext] = tk.PhotoImage(file=imgfile)
-				base.debugmsg(0, "imgdata[icontext]:", self.imgdata[icontext])
+				base.debugmsg(0, "imgdata[",icontext,"]:", self.imgdata[icontext])
 
 
 				return self.imgdata[icontext]
@@ -3004,6 +3011,9 @@ class RFSwarmGUI(tk.Frame):
 		self.b64["Delete"] = b'GIF87a\x10\x00\x10\x00\xd5\x00\x00\x00\x00\x00\xe4\x14\x18\xe3\x1a\x1e\xdf  \xdf @\xe7%&\xea)+\xe7**\xe9.1\xec34\xff33\xed;=\xf1<>\xef?B\xdf@@\xefCE\xefCK\xf1CE\xf4EH\xf4KM\xf3LQ\xffSV\xf6TV\xf6UZ\xffVZ\xf5Z\\\xfa]^\xf7^`\xf8^b\xff`\x80\xfcbd\xf9gi\xfbjm\xfdmp\xfert\xffwy\xffz}\xff~\x81\xff\x81\x82\xff\x87\x8a\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00)\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x06t\xc0\x94pH,\x1a\x8f\x1a\xe3hd\xf4|(\xc4Q\xa9$"r@$\xcec("\x9dH \xe1\x95\xb4\x89\x14A"\x93\xc8\x93\xc1f\xb6\xcdP\x89D\x1a\xbd\x8f\xc2\x0cI\x83\x115\xf0y#\x15\x15"fx\x19\x1e""! \x16\x0bG\x17\x89\x17\r\x0b\x13\x1e\x13\tE\x91"\x8eB\x08\x11\x1e\x12\x06C\x13\x16\x1e\x9dC\x05\x0c\x13\x06\x01C\x10\x13\x8fE\x02\xadE\xb2F\xae\x80\x80A\x00;'
 
 		self.b64["Advanced"] = b'GIF87a\x10\x00\x10\x00\xc4\x00\x00\x00\x00\x00GGGMMMTTT[[[ccclllpppyyy\x82\x82\x82\x8d\x8d\x8d\x94\x94\x94\x9c\x9c\x9c\xa5\xa5\xa5\xac\xac\xac\xb4\xb4\xb4\xbc\xbc\xbc\xc4\xc4\xc4\xcb\xcb\xcb\xd4\xd4\xd4\xdc\xdc\xdc\xe5\xe5\xe5\xeb\xeb\xeb\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00\x18\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x05\x91 &\x8e\x92\x14Ac\xaaFU\xe5\xa8\xe3Tb\x11E=\x98\xd341eQ\xa7\xc9\xe4\xe1\x90T \n\x91\x892\xb1\t\x99%\xc4a\x14\x91I \x8cFd\x8bTn)\xd7\x04"\xa1\xd8J\x14\x89D\xc4bm$D\x0c\xc7\xa9f`M"\x92\xc7B\xb4\x90C\xaa\x05\r\x0b\rw\x12\x0c\x0c\x0be\x10\x10\x05\x03\x03"rf\x0e~D\x06#:\x85V&\x10\x12\x06\x05"\r\x10\x14nj\x11\x06\x06\x84\t\x8f"\t\x9e\x18\t%\x9f\x03\x02\x010\xac\x10\x0f\x04\xb6*\x06\xb3\xab)!\x00;'
+
+
+		self.b64["Refresh"] = b'GIF87a\x10\x00\x10\x00\xd5\x00\x00\x00\x00\x00\x00U\x00\x1c^\x17\x1cb\x1a\x1fb\x16!e\x1d&j (m!.u\'/v)4}.7~1:\x833?\x887?\x888B\x8b7B\x8c:I\x8cCF\x91>I\x92>O\x92IK\x95CR\x96LN\x9bER\x9cJU\xa4Lb\xa4[Y\xa7Nf\xa9^U\xaaUg\xab`^\xacRk\xaecm\xb1ev\xb4oc\xb5[f\xb9\\k\xbbai\xbc^|\xbes\x81\xbfzo\xc0b~\xc0ul\xc1_\x7f\xc2yq\xc3c\x81\xc3w\x84\xc4{\x87\xc5\x80\x8b\xc6\x83\x85\xc8{\x8e\xc9\x86\x8f\xca\x88\x94\xcc\x8b\x99\xcf\x8f\x9c\xd0\x93\xa0\xd2\x97\xa3\xd4\x9a\xa8\xd8\x9f\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00<\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x06\x8c@\x9ep8\xcc\x10\x8f\xc8\xcb\x04),\x8d>\x1bL\x85\xa3Q I\xaf\xdam[\x9b\xc1,\x06"i\x96\xb3\xddj\xb5\xd8\x8b\x15\x19\x0cG\xaa\xdcm\xc6a,\x12\x956\xf1\x13KC\x18C\x05\x02G\x19\x17\x12\r\x80C\x83\x1f\x85\x13\x0f\x15\x7f\x0b\x08<-D\x85\x87\x89C)&CR14"\tD+2.\x8c\x17 131\x18aB&/:9rh//\x1a\xaeB#\'8g]( \x14\x05H\x19!\x1e\x7f\n\x08\x07\xc3L\x13\x0eL\xd0V\xd0A\x00;'
 
 		# png's
 		# b64["New"] = """iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAAK/INwWK6QAAABl0RVh0\nU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAC4SURBVCjPdZFbDsIgEEWnrsMm7oGGfZro\nhxvU+Iq1TyjU60Bf1pac4Yc5YS4ZAtGWBMk/drQBOVwJlZrWYkLhsB8UV9K0BUrPGy9cWbng2CtE\nEUmLGppPjRwpbixUKHBiZRS0p+ZGhvs4irNEvWD8heHpbsyDXznPhYFOyTjJc13olIqzZCHBouE0\nFRMUjA+s1gTjaRgVFpqRwC8mfoXPPEVPS7LbRaJL2y7bOifRCTEli3U7BMWgLzKlW/CuebZPAAAA\nAElFTkSuQmCC\n"""
@@ -3248,56 +3258,210 @@ class RFSwarmGUI(tk.Frame):
 		# base.debugmsg(7, "New Graph Window - args:", args)
 		grphWindow = tk.Toplevel(self.root)
 
-		self.newgraph += 1
-		grphWindow.graphname = "New Graph {}".format(self.newgraph)
-		base.debugmsg(6, "graphname:", grphWindow.graphname)
+		# # start threads to update option lists while building the window
+		# t = threading.Thread(target=lambda: self.gs_refresh(grphWindow))
+		# t.start()
 
-		grphWindow.title(grphWindow.graphname)
+
+
+		self.newgraph += 1
+		grphWindow.graphname=tk.StringVar()
+		grphWindow.graphname.set("New Graph {}".format(self.newgraph))
+		base.debugmsg(6, "graphname:", grphWindow.graphname.get())
+
+		grphWindow.title(grphWindow.graphname.get())
 
 		grphWindow.lblBLNK = ttk.Label(grphWindow, text = " ")	# just a blank row as a spacer before the filters
 		grphWindow.lblBLNK.grid(column=0, row=0, sticky="nsew")
 
-		grphWindow.lblSettings = ttk.Label(grphWindow, text = "S") # this needs to be changed to a settings cog
+
+		icontext = "Advanced"
+		# new = ttk.Button(self.scriptgrid, image=self.imgdata[icontext], text="Settings", command=lambda: self.sr_row_settings(row), width=1)
+		# , command=lambda: self.showhidegraphsettings(grphWindow)
+		# grphWindow.lblSettings = ttk.Label(grphWindow, image=self.imgdata[icontext], text="S", width=1)
+		# grphWindow.lblSettings = ttk.Label(grphWindow, image=self.imgdata[icontext], text="S", command=lambda: self.showhidegraphsettings(grphWindow), width=1)
+		grphWindow.lblSettings = ttk.Button(grphWindow, image=self.imgdata[icontext], text="S", command=lambda: self.gs_showhide(grphWindow), width=1)
 		grphWindow.lblSettings.grid(column=99, row=0, sticky="nsew")
+
+		icontext = "Refresh"
+		self.icoRefresh = self.get_icon(icontext)
+		grphWindow.lblSettings = ttk.Button(grphWindow, image=self.imgdata[icontext], text="R", command=lambda: self.gs_refresh(grphWindow), width=1)
+		grphWindow.lblSettings.grid(column=98, row=0, sticky="nsew")
+
+
 
 		grphWindow.fmeGraph = tk.Frame(grphWindow)
 		grphWindow.fmeGraph.grid(column=0, row=1, columnspan=8, sticky="nsew")
 
 		grphWindow.fmeSettings = tk.Frame(grphWindow)
-		grphWindow.fmeSettings.grid(column=9, row=1, columnspan=2, sticky="nsew")
+		grphWindow.fmeSettings.grid(column=90, row=1, columnspan=10, sticky="nsew")
 
+		grphWindow.fmeSettings.show = True
 
 		row =0
 		grphWindow.fmeSettings.lblGN = ttk.Label(grphWindow.fmeSettings, text = "Graph Name:")
 		grphWindow.fmeSettings.lblGN.grid(column=0, row=row, sticky="nsew")
 
-		grphWindow.fmeSettings.inpGN = ttk.Entry(grphWindow.fmeSettings)
-		grphWindow.fmeSettings.inpGN.delete(0,'end')
-		grphWindow.fmeSettings.inpGN.insert(0, grphWindow.graphname)
+		# grphWindow.fmeSettings.inpGN = ttk.Entry(grphWindow.fmeSettings, validate="focusout", validatecommand=(lambda: self.gs_updatename(grphWindow), "%P"))
+		# grphWindow.fmeSettings.inpGN = ttk.Entry(grphWindow.fmeSettings, validate="focusout", validatecommand=lambda: self.gs_updatename(grphWindow))
+		# grphWindow.fmeSettings.inpGN = ttk.Entry(grphWindow.fmeSettings, validate="all")
+		# grphWindow.fmeSettings.inpGN = ttk.Entry(grphWindow.fmeSettings, validate="focusout")
+		# grphWindow.fmeSettings.inpGN = ttk.Entry(grphWindow.fmeSettings)
+		grphWindow.fmeSettings.inpGN = ttk.Entry(grphWindow.fmeSettings, textvariable=grphWindow.graphname)
+		# grphWindow.fmeSettings.inpGN.delete(0,'end')
+		# grphWindow.fmeSettings.inpGN.insert(0, grphWindow.graphname)
+		# grphWindow.fmeSettings.inpGN.config(validatecommand=lambda: self.gs_updatename(grphWindow))
+		# vcGN = self.root.register(lambda: self.gs_updatename(grphWindow))
+		# grphWindow.fmeSettings.inpGN.config(validate="key", validatecommand=(vcGN, '%P'))
+		# grphWindow.fmeSettings.inpGN.config(validate="focusout", validatecommand=lambda: self.gs_updatename(grphWindow))
 		grphWindow.fmeSettings.inpGN.grid(column=1, row=row, sticky="nsew")
 
 
 		# other settings? Metric Type, Primary metric, Secondary metric, filter?
 
 		row +=1
-		grphWindow.fmeSettings.lblGN = ttk.Label(grphWindow.fmeSettings, text = "Data Type:")
-		grphWindow.fmeSettings.lblGN.grid(column=0, row=row, sticky="nsew")
+		grphWindow.fmeSettings.lblDT = ttk.Label(grphWindow.fmeSettings, text = "Data Type:")
+		grphWindow.fmeSettings.lblDT.grid(column=0, row=row, sticky="nsew")
 
-		DataTypes = ["", "Metric", "Result"]
+		DataTypes = [None, "Metric", "Result"]
 		grphWindow.settings = {}
 		grphWindow.settings["DataType"] = tk.StringVar()
-		omfr = ttk.OptionMenu(grphWindow.fmeSettings, grphWindow.settings["DataType"], *DataTypes)
+		# grphWindow.fmeSettings.omDT = ttk.OptionMenu(grphWindow.fmeSettings, grphWindow.settings["DataType"], *DataTypes)
+		# grphWindow.fmeSettings.omDT = ttk.OptionMenu(grphWindow.fmeSettings, grphWindow.settings["DataType"], *DataTypes, command=lambda: self.gs_refresh(grphWindow))
+		# grphWindow.fmeSettings.omDT = ttk.OptionMenu(grphWindow.fmeSettings, grphWindow.settings["DataType"], *DataTypes, command=self.gs_switchdt(grphWindow))
+		grphWindow.fmeSettings.omDT = ttk.OptionMenu(grphWindow.fmeSettings, grphWindow.settings["DataType"], command=lambda: self.gs_switchdt(grphWindow), *DataTypes)
 		grphWindow.settings["DataType"].set(DataTypes[1])
-		omfr.grid(column=1, row=row, sticky="nsew")
+		# grphWindow.fmeSettings.omDT.configure(command=lambda: self.gs_refresh(grphWindow))
+		# grphWindow.fmeSettings.omDT["Menu"].add_command(lambda: self.gs_refresh(grphWindow))
+		# grphWindow.fmeSettings.omDT["command"]=lambda: self.gs_refresh(grphWindow)
+		grphWindow.fmeSettings.omDT.grid(column=1, row=row, sticky="nsew")
 
 
+
+		row +=1
+		grphWindow.fmeMSettings = tk.Frame(grphWindow.fmeSettings)
+		grphWindow.fmeMSettings.grid(column=0, row=row, columnspan=2, sticky="nsew")
+
+		rowM =0
+		grphWindow.fmeMSettings.lblMT = ttk.Label(grphWindow.fmeMSettings, text = "Metric Type:")
+		grphWindow.fmeMSettings.lblMT.grid(column=0, row=rowM, sticky="nsew")
+
+		grphWindow.fmeMSettings.MTypes = [None, "Loading..."]
+		grphWindow.settings["MType"] = tk.StringVar()
+		grphWindow.fmeMSettings.omMT = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MType"], *grphWindow.fmeMSettings.MTypes)
+		# grphWindow.fmeMSettings.omMT = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MType"], *grphWindow.fmeMSettings.MTypes, command=lambda: self.gs_refresh(grphWindow))
+		# grphWindow.fmeMSettings.omMT = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MType"], *grphWindow.fmeMSettings.MTypes, command=self.gs_refresh(grphWindow))
+		# grphWindow.fmeMSettings.omMT = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MType"], command=self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.MTypes)
+		# grphWindow.settings["DataType"].set(grphWindow.fmeSettings.Metrics[1])
+		# grphWindow.fmeMSettings.omMT.configure(command=lambda: self.gs_refresh(grphWindow))
+		grphWindow.fmeMSettings.omMT.grid(column=1, row=rowM, sticky="nsew")
+
+		rowM +=1
+		grphWindow.fmeMSettings.lblPM = ttk.Label(grphWindow.fmeMSettings, text = "Primrary Metric:")
+		grphWindow.fmeMSettings.lblPM.grid(column=0, row=rowM, sticky="nsew")
+
+		grphWindow.fmeMSettings.PMetrics = [None, "Loading..."]
+		grphWindow.settings["PMetric"] = tk.StringVar()
+		grphWindow.fmeMSettings.omPM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["PMetric"], *grphWindow.fmeMSettings.PMetrics)
+		# grphWindow.fmeMSettings.omPM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["PMetric"], *grphWindow.fmeMSettings.PMetrics, command=lambda: self.gs_refresh(grphWindow))
+		# grphWindow.settings["DataType"].set(grphWindow.fmeSettings.Metrics[1])
+		# grphWindow.fmeMSettings.omPM.configure(command=lambda: self.gs_refresh(grphWindow))
+		grphWindow.fmeMSettings.omPM.grid(column=1, row=rowM, sticky="nsew")
+
+
+		rowM +=1
+		grphWindow.fmeMSettings.lblSM = ttk.Label(grphWindow.fmeMSettings, text = "Secondary Metric:")
+		grphWindow.fmeMSettings.lblSM.grid(column=0, row=rowM, sticky="nsew")
+
+		grphWindow.fmeMSettings.SMetrics = [None, "Loading..."]
+		grphWindow.settings["SMetric"] = tk.StringVar()
+		# grphWindow.fmeMSettings.omSM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["SMetric"], *grphWindow.fmeMSettings.SMetrics, command=lambda: self.gs_refresh(grphWindow))
+		grphWindow.fmeMSettings.omSM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["SMetric"], *grphWindow.fmeMSettings.SMetrics)
+		# grphWindow.settings["DataType"].set(grphWindow.fmeSettings.Metrics[1])
+		grphWindow.fmeMSettings.omSM.grid(column=1, row=rowM, sticky="nsew")
+
+		# start threads to update option lists
+		t = threading.Thread(target=lambda: self.gs_refresh(grphWindow))
+		t.start()
+
+
+
+	def gs_refresh(self, grphWindow):
+		tmt = threading.Thread(target=lambda: self.gs_updatemetrictypes(grphWindow))
+		tmt.start()
+		tpm = threading.Thread(target=lambda: self.gs_updateprimetrics(grphWindow))
+		tpm.start()
+		tsm = threading.Thread(target=lambda: self.gs_updatesecmetrics(grphWindow))
+		tsm.start()
+
+
+
+
+	def gs_showhide(self, grphWindow):
+		base.debugmsg(6, "graphname:", grphWindow.graphname.get())
+		grphWindow.title(grphWindow.graphname.get())
+		base.debugmsg(6, "fmeSettings.show:", grphWindow.fmeSettings.show)
+		if (grphWindow.fmeSettings.show):
+			grphWindow.fmeSettings.show = False
+			grphWindow.fmeSettings.grid_forget()
+			base.debugmsg(6, "fmeSettings.show:", grphWindow.fmeSettings.show)
+		else:
+			grphWindow.fmeSettings.show = True
+			grphWindow.fmeSettings.grid(column=90, row=1, columnspan=10, sticky="nsew")
+			base.debugmsg(6, "fmeSettings.show:", grphWindow.fmeSettings.show)
+
+	# def gs_updatename(self, grphWindow):
+	# 	base.debugmsg(6, "graphname:", grphWindow.graphname.get())
+	# 	grphWindow.title(grphWindow.graphname.get())
+
+	def gs_switchdt(self, grphWindow):
+		base.debugmsg(6, "DataType:", grphWindow.settings["DataType"].get())
+
+
+	def gs_updatemetrictypes(self, grphWindow):
+		# base.debugmsg(6, "MType:", grphWindow.settings["MType"].get())
 		# 	Metric Type
 		# 		SELECT
 		# 			m.Type
 		# 		FROM Metric as m
 		# 		GROUP BY m.Type
 		# --
+		sql  = "SELECT "
+		sql += 		"m.Type "
+		sql += 	"FROM Metric as m "
+		sql += 	"GROUP BY m.Type "
 
+		base.debugmsg(7, "sql:", sql)
+
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": "MetricTypes"})
+
+		time.sleep(0.1)
+		while "MetricTypes" not in base.dbqueue["ReadResult"]:
+			time.sleep(0.1)
+			base.debugmsg(9, "Wait for MetricTypes")
+
+		MetricTypes = base.dbqueue["ReadResult"]["MetricTypes"]
+		base.debugmsg(6, "MetricTypes:", MetricTypes)
+
+		newMTypes = [None, ""]
+		for mt in MetricTypes:
+			newMTypes.append(mt["Type"])
+
+		base.debugmsg(6, "newMTypes:", newMTypes)
+		grphWindow.fmeMSettings.MTypes = newMTypes
+
+			# tol = self.scriptgrid.grid_slaves(column=self.plancoltst, row=r)[0]
+			# base.debugmsg(9, tol)
+			# tol.set_menu(*tclist)
+		base.debugmsg(6, "grphWindow.fmeMSettings.omMT:", grphWindow.fmeMSettings.omMT)
+		grphWindow.fmeMSettings.omMT.set_menu(*grphWindow.fmeMSettings.MTypes)
+		base.debugmsg(6, "grphWindow.fmeMSettings.omMT.set_menu():", grphWindow.fmeMSettings.MTypes)
+
+
+
+	def gs_updateprimetrics(self, grphWindow):
+		MType = grphWindow.settings["MType"].get()
+		base.debugmsg(6, "MType:", MType)
 		#	Primary metric
 		# 				SELECT
 		# 					m.Name
@@ -3310,6 +3474,92 @@ class RFSwarmGUI(tk.Frame):
 		# 				GROUP BY m.Name
 		# 				ORDER BY m.ROWID
 		#
+		sql  = "SELECT "
+		sql += 		"m.Name "
+		sql += 		", m.ROWID "
+		sql += 	"FROM Metric as m "
+		if MType is not None and len(MType)>0:
+			sql += 	"WHERE m.Type = \"" + MType + "\" "
+		sql += 	"GROUP BY m.Name "
+		sql += 	"ORDER BY m.ROWID "
+
+		base.debugmsg(7, "sql:", sql)
+
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": "PMetric"})
+
+		time.sleep(0.1)
+		while "PMetric" not in base.dbqueue["ReadResult"]:
+			time.sleep(0.1)
+			base.debugmsg(9, "Wait for PMetric")
+
+		PMetric = base.dbqueue["ReadResult"]["PMetric"]
+		base.debugmsg(6, "PMetric:", PMetric)
+
+		newPMetrics = [None, ""]
+		for pm in PMetric:
+			try:
+				base.debugmsg(7, "pm:", pm)
+				newPMetrics.append(pm["Name"])
+			except:
+				pass
+
+		base.debugmsg(6, "newPMetrics:", newPMetrics)
+		grphWindow.fmeMSettings.PMetrics = newPMetrics
+		grphWindow.fmeMSettings.omPM.set_menu(*grphWindow.fmeMSettings.PMetrics)
+		base.debugmsg(6, "grphWindow.fmeMSettings.omPM.set_menu():", grphWindow.fmeMSettings.PMetrics)
+
+
+	def gs_updatesecmetrics(self, grphWindow):
+		MType = grphWindow.settings["MType"].get()
+		base.debugmsg(6, "MType:", MType)
+		PMetric = grphWindow.settings["PMetric"].get()
+		base.debugmsg(6, "PMetric:", PMetric)
+
+		# SELECT
+		# 	md.SecondaryMetric
+		# FROM MetricData as md
+		# -- WHERE md.MetricType = "Agent"
+		# -- WHERE md.PrimaryMetric = "4b15685d4b34"
+		# -- WHERE md.PrimaryMetric = "20210219_151655_100u_test"
+		# GROUP BY md.SecondaryMetric
+
+		sql  = "SELECT "
+		sql += 		"md.SecondaryMetric "
+		sql += 	"FROM MetricData as md "
+		if MType is not None and len(MType)>0:
+			sql += 	"WHERE md.MetricType = \"" + MType + "\" "
+		if PMetric is not None and len(PMetric)>0:
+			if MType is not None and len(MType)>0:
+				sql += 	"AND md.PrimaryMetric = \"" + PMetric + "\" "
+			else:
+				sql += 	"WHERE md.PrimaryMetric = \"" + PMetric + "\" "
+
+		sql += 	"GROUP BY md.SecondaryMetric "
+
+		base.debugmsg(7, "sql:", sql)
+
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": "SMetric"})
+
+		time.sleep(0.1)
+		while "SMetric" not in base.dbqueue["ReadResult"]:
+			time.sleep(0.1)
+			base.debugmsg(9, "Wait for SMetric")
+
+		SMetric = base.dbqueue["ReadResult"]["SMetric"]
+		base.debugmsg(6, "SMetric:", SMetric)
+
+		newSMetrics = [None, ""]
+		for sm in SMetric:
+			try:
+				base.debugmsg(7, "sm:", sm)
+				newSMetrics.append(sm["SecondaryMetric"])
+			except:
+				pass
+
+		base.debugmsg(6, "newSMetrics:", newSMetrics)
+		grphWindow.fmeMSettings.SMetrics = newSMetrics
+		grphWindow.fmeMSettings.omSM.set_menu(*grphWindow.fmeMSettings.SMetrics)
+		base.debugmsg(6, "grphWindow.fmeMSettings.omSM.set_menu():", grphWindow.fmeMSettings.SMetrics)
 
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -4505,7 +4755,7 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(8, tclist)
 		if not base.args.nogui:
 			tol = self.scriptgrid.grid_slaves(column=self.plancoltst, row=r)[0]
-			base.debugmsg(9, tol)
+			base.debugmsg(7, "tol: ", tol)
 			tol.set_menu(*tclist)
 
 	def sr_remove_row(self, r):
