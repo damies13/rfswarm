@@ -1,5 +1,5 @@
 
-[Index](Index.md)
+[Index](README.md)
 
 ## Preparing a test case for performance
 
@@ -7,6 +7,7 @@ Some of the things you will need to consider when taking a functional or regress
 - [Think Time](#Think-Time)
 - [Useful Variables](#Useful-Variables)
 - [Data Management](#Data-Management)
+- [Keywords](#Keywords)
 - [Browser](#Browser)
 
 ### Think Time
@@ -14,8 +15,8 @@ Some of the things you will need to consider when taking a functional or regress
 Because functional and regression tests are designed to run as a single user and test the functionality as quickly as possible, for performance testing we want to simulate real user behaviour so we want to put some user thinking time or pauses into the script.
 
 Why is this is important?
-- Session Time: Users don't immediately start filling in fields the moment the page or screen has loaded, they sit and read information on the screen and then start filling in the fields, often pausing or referring to documents, emails, or paper forms for the next piece of information they need to key in. If you don't simulate this behaviour in a load test, you risk having much shorter session times that would really occur and this might lead to you missing a memory issue or session limit in your application server.
-- Background Polling: Many applications poll the server in the background while the user is idle to update dynamic data displayed on the screen, this is becoming increasingly common with web 2.0 style web applications, by not having any or sufficient user thinking time in your scripts, your robots might not trigger this polling or may trigger this polling to the same extent as a real user would, so you will end up applying a lighter load on the application server that is realistic. Never under estimate the impact of background polling, application servers have flatlined at 100% CPU from just 5 users logged in and sitting idle because of 1 poorly constructed background polling event that was taking 25% of the application server's CPU per user calling this polling event.
+- Session Time: Users don't immediately start filling in fields the moment the page or screen has loaded, they sit and read information on the screen and then start filling in the fields, often pausing or referring to documents, emails, or paper forms for the next piece of information they need to key in. If you don't simulate this behaviour in a load test, you risk having much shorter session times that wouldn't really occur and this might lead to you missing a memory issue or session limit in your application server.
+- Background Polling: Many applications poll the server in the background while the user is idle to update dynamic data displayed on the screen, this is becoming increasingly common with web 2.0 style web applications, by not having any or sufficient user thinking time in your scripts, your robots might not trigger this polling or may not trigger this polling to the same extent as a real user would, so you will end up applying a lighter load on the application server that is realistic. Never under estimate the impact of background polling, application servers have flatlined at 100% CPU from just 5 users logged in and sitting idle because of 1 poorly constructed background polling event that was taking 25% of the application server's CPU per user calling this polling event.
 - Overloading your agents: Launching and client applications or web browsers is a hardware intensive (CPU, Memory, and Disk) task for your agent machines, without sufficient user thinking time in your scripts, you will increase the workload you are placing on your agent machines without applying any load to your application under test. This will end up in limiting the number of robots you can run on a single agent machine and potentially limit the overall number of robots you can run in a test or increase significantly the number of agent machines you need to drive a specific load profile.
 
 The easiest way to simulate this user behaviour would be to simply use the Robot Framework's built in sleep command:
@@ -57,11 +58,15 @@ Iteration should be available through the variable `${iteration}`, This is simpl
 
 ### Data Management
 
+Because functional and regression tests are designed to test specific functionality, the test data is designed to test boundary or edge cases so are limited to a small set of cases or are static. With performance testing we don't want this, rather we want hundreds or even thousands of different data values so we can better emulate user behaviour and ensure we are not constantly hitting a single cached value and reporting unrealistically fast response times.
+
+#### [Faker Library](https://github.com/guykisel/robotframework-faker)
+
+[robotframeork-faker](https://github.com/guykisel/robotframework-faker) can produce realistic locale aware generated data values for a large variety of data type including names, email and physical addresses, phone numbers etc.
+
 #### Reading Data Files
 
-Because functional and regression tests are designed to test specific functionality, the test data is designed to test boundary or edge cases so are limited to a small set of cases or static. With performance testing we don't want this, rather we want hundreds or even thousands of different data values so we can better emulate user behaviour and ensure we are not constantly hitting a single cached value and reporting unrealistically fast response times.
-
-So to make life easier in the [Robot Resources](../Robot_Resources) folder there is a [perftest.resource](../Robot_Resources/perftest.resource) file that you can include in the Settings section of your .robot file like this:
+To make life easier when reading data from files, in the [Robot Resources](../Robot_Resources) folder there is a [perftest.resource](../Robot_Resources/perftest.resource) file that you can include in the Settings section of your .robot file like this:
 
 ```
 *** Settings ***
@@ -145,8 +150,49 @@ Both methods demonstrate TestDataTable's functionality, and for more details you
 
 Why is TestDataTable a seperate project? simply because I wanted TestDataTable to be able to be used by other test tools as well, for example there is nothing stopping you to use TestDataTable with your regression test suite to make your test cases shorter and enable them to run in parallel, likewise TestDataTable could be used by other performance test tools like JMeter.
 
+### Keywords
+
+As you will most likely have built your own custom keywords for navigating your AUT, you may want to get the time taken for these keywords, so controlling which keywords are reported to the Manager and which are not is as simple as including or leaving out the [keyword [Documentation]](http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#user-keyword-documentation)
+
+Consider the following keyword examples
+
+```
+*** Keywords ***
+Example Keyword
+    [Documentation]    TC01 My Example Keyword
+    No Operation
+
+Quiet Keyword
+    No Operation
+
+Match Keyword
+    [Documentation]    ${TEST NAME}
+    No Operation
+
+
+```
+
+#### No Operation
+Would not have a timing measured by default because this keyword belongs to the builtin which is one of the default [excludeed libraries](./rfswarm_agent_py.md#exclude-libraries)
+
+#### Example Keyword
+Would have a timing measured by default, this would be reported in the Manager as "TC01 My Example Keyword" along with the time taken to perform the step No Operation
+
+#### Quiet Keyword
+Would not have a timing measured, because it has no [Documentation], however it will still get executed wherever it is called.
+
+#### Match Keyword
+Would have a timing measured by default, this would be reported in the Manager as "Match Keyword" because the variable ${TEST NAME} gets evaluated by robot framework before being passed to rfswarm via the listener.
+
+
 ### Browser
 
+#### [SeleniumLibrary](https://robotframework.org/SeleniumLibrary/)
 For SeleniumLibrary based scripts you will want to use one of the headless browser types as these should use less resources on the agent so this will allow more virtual users per agent machine.
 
 Refer to the [SeleniumLibrary documentation](https://robotframework.org/SeleniumLibrary/SeleniumLibrary.html#Open%20Browser) for the headless browser types, you should run a trial with each type to confirm they work with your application and what the resource cost is for each.
+
+You may also want to consider converting your scripts to run using [Browser Library](https://robotframework-browser.org/), this is not required for using rfswarm but Browser Library does provide features not available in SeleniumLibrary that you may find useful.
+
+#### [Browser Library](https://robotframework-browser.org/)
+For Browser Library based scripts you will want to use the headless = True option when calling [Open Browser](https://marketsquare.github.io/robotframework-browser/Browser.html#Open%20Browser).

@@ -1,9 +1,9 @@
 
-[Index](Index.md)
+[Index](README.md)
 
 ## Agent Communication
 
-In this page the generic host names guiserver and myagent are used, replace guiserver with the host name of the machine that is running rfswarm.py and myagent with the host name of the machine that is running rfswarm_agent.py
+In this page the generic host names manager and myagent are used, replace manager with the host name of the machine that is running rfswarm.py and myagent with the host name of the machine that is running rfswarm_agent.py
 
 - [Get /](#Get-)
 - [POST /AgentStatus](#POST-AgentStatus)
@@ -11,9 +11,10 @@ In this page the generic host names guiserver and myagent are used, replace guis
 - [POST /Scripts](#POST-Scripts)
 - [POST /File](#POST-File)
 - [POST /Result](#POST-Result)
+- [POST /Metric](#post-metric)
 
 ### Get /
-HTTP GET http://guiserver:8138/
+HTTP GET http://manager:8138/
 
 Response Body:
 ```
@@ -28,7 +29,7 @@ Response Body:
                     "<Agent IP Address>",
                     "<Agent IP Address>"
                 ],
-                "Robots": "<sum>,"
+                "Robots": "<sum>",
                 "CPU%": "0-100",
                 "MEM%": "0-100",
                 "NET%": "0-100"
@@ -50,6 +51,7 @@ Response Body:
             "URI": "/File",
             "Body": {
                 "AgentName": "<Agent Host Name>",
+                "Action": "<Upload/Download/Status>",
                 "Hash": "<File Hash, provided by /Scripts>"
             }
         },
@@ -59,13 +61,28 @@ Response Body:
                 "AgentName": "<Agent Host Name>",
                 "ResultName": "<A Text String>",
                 "Result": "<PASS | FAIL>",
-                "ElapsedTime": <seconds as decimal number>,
-                "StartTime": <epoch seconds as decimal number>,
-                "EndTime": <epoch seconds as decimal number>,
+                "ElapsedTime": "<seconds as decimal number>",
+                "StartTime": "<epoch seconds as decimal number>",
+                "EndTime": "<epoch seconds as decimal number>",
                 "ScriptIndex": "<Index>",
                 "VUser": "<user number>",
-                "Iteration": <iteration number>,
-                "Sequence": <sequence number that ResultName occurred in test case>
+                "Iteration": "<iteration number>",
+                "Sequence": "<sequence number that ResultName occurred in test case>"
+            }
+        },
+        "Metric": {
+            "URI": "/Metric",
+            "Body": {
+                "PrimaryMetric": "<primary metric name, e.g. AUT Hostname>",
+                "MetricType": "<metric type, e.g. AUT Web Server>",
+                "MetricTime": "<epoch time the metric was recorded>",
+                "SecondaryMetrics": {
+                    "Secondary Metric Name, e.g. CPU%": "<value, e.g. 60>",
+                    "Secondary Metric Name, e.g. MEMUser": "<value, e.g. 256Mb>",
+                    "Secondary Metric Name, e.g. MEMSys": "<value, e.g. 1Gb>",
+                    "Secondary Metric Name, e.g. MEMFree": "<value, e.g. 2Gb>",
+                    "Secondary Metric Name, e.g. CPUCount": "<value, e.g. 4>"
+                }
             }
         }
     }
@@ -73,7 +90,7 @@ Response Body:
 ```
 
 ### POST /AgentStatus
-HTTP POST http://guiserver:8138/AgentStatus
+HTTP POST http://manager:8138/AgentStatus
 
 Request Body:
 ```
@@ -97,7 +114,7 @@ Response Body:
 ```
 
 ### POST /Jobs
-HTTP POST http://guiserver:8138/Jobs
+HTTP POST http://manager:8138/Jobs
 
 Request Body:
 ```
@@ -133,7 +150,7 @@ Response Body:
 ```
 
 ### POST /Scripts
-HTTP POST http://guiserver:8138/Scripts
+HTTP POST http://manager:8138/Scripts
 
 Request Body:
 ```
@@ -164,13 +181,30 @@ Response Body:
 ```
 
 ### POST /File
-HTTP POST http://guiserver:8138/File
+HTTP POST http://manager:8138/File
 
-Request Body:
+Request Bodies:
 ```
 {
     "AgentName": "myagent",
+    "Action": "Download",
     "Hash": "33d193a7d30904afec4307dee7df89fa"
+}
+
+{
+    "AgentName": "myagent",
+    "Action": "Status",
+    "Hash": "33d193a7d30904afec4307dee7df89fa"
+}
+
+{
+    "AgentName": "myagent",
+    "Action": "Upload",
+    "Hash": "33d193a7d30904afec4307dee7df89fa"
+    "File": "resources/perftest.resource",
+    "FileData": <This field will contain a string that is a base64 encoded
+                lzma (7zip) compressed version of the file. The agent will
+                lzma compress, base64 encode the string>
 }
 ```
 
@@ -185,10 +219,22 @@ Response Body:
                 decode the string, lzma decompress, then save to a file using the
                 relative file path above relative to the agents temp directory>
 }
+
+{
+    "AgentName": "myagent",
+    "Hash": "33d193a7d30904afec4307dee7df89fa",
+    "Exists": "<True/False>"
+}
+
+{
+    "AgentName": "myagent",
+    "Hash": "33d193a7d30904afec4307dee7df89fa",
+    "Result": "Saved"
+}
 ```
 
 ### POST /Result
-HTTP POST http://guiserver:8138/Result
+HTTP POST http://manager:8138/Result
 
 Request Body:
 ```
@@ -210,6 +256,51 @@ Response Body:
 ```
 {
     "AgentName": "myagent",
+    "Result": "Queued"
+}
+```
+
+### POST /Metric
+HTTP POST http://manager:8138/Metric
+
+Request Body:
+```
+{
+    "PrimaryMetric": "my_aut_server",
+    "MetricType": "AUT Web",
+    "MetricTime": "1609924920",
+    "SecondaryMetrics": {
+        "vmstat: Mach Virtual Memory Statistics": "(page size of 4096 bytes)",
+        "vmstat: Pages free": "5091.",
+        "vmstat: Pages active": "269271.",
+        "vmstat: Pages inactive": "269384.",
+        "vmstat: Pages speculative": "113.",
+        "vmstat: Pages throttled": "0.",
+        "vmstat: Pages wired down": "226965.",
+        "vmstat: Pages purgeable": "2108.",
+        "vmstat: Translation faults": "12387345.",
+        "vmstat: Pages copy-on-write": "493339.",
+        "vmstat: Pages zero filled": "5337415.",
+        "vmstat: Pages reactivated": "13285594.",
+        "vmstat: Pages purged": "70090.",
+        "vmstat: File-backed pages": "104388.",
+        "vmstat: Anonymous pages": "434380.",
+        "vmstat: Pages stored in compressor": "624330.",
+        "vmstat: Pages occupied by compressor": "277482.",
+        "vmstat: Decompressions": "1351065.",
+        "vmstat: Compressions": "2174715.",
+        "vmstat: Pageins": "1582188.",
+        "vmstat: Pageouts": "166068.",
+        "vmstat: Swapins": "296166.",
+        "vmstat: Swapouts": "315460."
+    }
+}
+```
+
+Response Body:
+```
+{
+    "Metric": "my_aut_server",
     "Result": "Queued"
 }
 ```

@@ -1,11 +1,14 @@
+
+[Index](README.md)
+
 # rfswarm (Robot Framework Swarm) Hardware Requirements
 
-- [GUI / Server](#gui--server)
+- [Manager](#Manager)
 - [Agents](#Agents)
 
-## GUI / Server
+## Manager
 
-The Hardware Requirements for the GUI are pretty minimal, for example to open the GUI and load a scenario takes about 70MB, running this scenario with 300 robots needed around 120MB and used ?50? threads, so a multi core CPU is a good idea.
+The Hardware Requirements for the Manager are pretty minimal, for example to open the Manager and load a scenario takes about 70MB, running this scenario with 300 robots needed around 120MB and used ~50 threads, so a multi core CPU is a good idea.
 
 Recommended minimums:
 
