@@ -53,6 +53,19 @@ While hopefully this is intuitive, the buttons are (starting top right)
 | Settings | ![image](Images/GUI_btn_cog.gif)			| Configure additional settings for a test group	|
 | Remove |	![image](Images/GUI_btn_cross.gif)			| Remove this test group	|
 
+The columns under the graph
+| Column Name	| Detail |
+|---		|---	|
+| Index		| The test group's line number in the scenario, the background colour matches the line colour in the graph above |
+| Users		| The number of virtual users (robots) you are planning to run in the scenario for this test group |
+| Delay		| The ammount of time (in Seconds) to wait before starting Ramp Up |
+| Ramp Up	| The ammount of time (in Seconds) to get from 0 virtual users (robots) to the number of virtual users (robots) defined in the Users column |
+| Run		| The ammount of time (in Seconds) to keep all the virtual users (robots) defined in the Users column running after Ramp Up has finished. If a robot finishes it's test steps before the end of this time it will be restarted. After this time has ellapsed the robots will finish thier test steps and exit normally (Ramp Down) |
+| Script	| This is where you select the robot file that contains the test you want to assign to this test group |
+| Test		| This is where you select the test you want to run for this test group, this option list is auto populaed when you select a robot file in the Script column |
+| Settings	| This is where you can select additional settings for the test group |
+
+
 ##### Additional settings for test group ![image](Images/GUI_btn_cog.gif)
 When clicking on this button a dialogue will be presented that allows you to configure some additional settings for the test group, by default the dialogue will look like this:
 > ![image](Images/MacOS_Plan_v0.6.3_Test_Settings.png)
