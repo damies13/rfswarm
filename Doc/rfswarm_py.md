@@ -161,6 +161,21 @@ Use this to generate csv files suitable for use to create reports for your test 
 ![Image](Images/Linux-v0.5.0_Run_Report_prompt.png)
 
 
+The columns for the run screen
+| Column Name	| Detail |
+|---		|---	|
+| Result Name	| This is the result name as reported by robot framework, usually this will match either the documentation or full name lines for a test step in a robot framework report |
+| Min		| This is the shortest (quickest) response time reported by any robot during the test |
+| Avg		| This is the average of all the response time reported by all robots during the test |
+| nn%ile	| This is the percentile as configured by the %ile field above the run results. e.g. 90%ile is the response time that 90% of robots reported a response time less than or equal to during the test |
+| Max		| This is the longest (slowest) response time reported by any robot during the test |
+| Stdev		| This is the [Standard Deviation](https://en.wikipedia.org/wiki/Standard_deviation) of the response times for this result |
+| Pass		| This is a count of the number of times a robot reported a pass for this test step |
+| Fail		| This is a count of the number of times a robot reported a fail for this test step |
+| Other		| This is a count of the number of times a robot reported a result other than pass or fail for this result (normally this would be 0) |
+
+
+
 #### Agents
 This is where you can see which agents have connected, number of robots on each agent and monitor the status and performance of the agents.
 > _Agents - Ready_
