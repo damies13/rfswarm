@@ -174,7 +174,7 @@ The columns for the run screen
 | Fail		| This is a count of the number of times a robot reported a fail for this test step |
 | Other		| This is a count of the number of times a robot reported a result other than pass or fail for this result (normally this would be 0) |
 
-
+The columns in the CSV report should match the columns from the run screen.
 
 #### Agents
 This is where you can see which agents have connected, number of robots on each agent and monitor the status and performance of the agents.
@@ -189,6 +189,21 @@ This is where you can see which agents have connected, number of robots on each 
 
 > _Agents - Running (Linux)_
 > ![Image](Images/Linux-v0.5.0_Agents_Running.png)
+
+The columns for the agents screen
+| Column Name	| Detail |
+|---		|---	|
+| Status	| This is the last status reported by the agent, unless a agent hasn't reported for a while, then this will show "Offline?" |
+| Agent		| This is the agent's name as reported by the agent, usually this is the agent's host name but this can be configured on the agent |
+| Last Seen	| This is the time the last status update was received from the agent |
+| Assigned	| This is the number of robots assigned to the agent during ramp up |
+| Robots	| This is the number of robots that the agent reported as actually running at the last status update |
+| Load		| This is the load value used by rfswarm to assigne new robots to the agent with the lowest load, this value is the highest value of % CPU, % MEM and % NET |
+| % CPU		| This is the current percentage of CPU usage as reported by the agents opeerating system |
+| % MEM		| This is the current percentage of memory usage as reported by the agents opeerating system |
+| % NET		| This is the current percentage of network usage as reported by the agents opeerating system |
+| Version	| This is the rfswarm version number of the rfswarm agent |
+| Libraries	| This is a list of robot framework libraries installed on the agent machine as reported by the python runtime that is running the agent (only python libraries that start with "robotframework-" are reported here |
 
 New with v0.6.3 this screen now shows the agent's version and a list of robot framework libraries available on the agent.
 
