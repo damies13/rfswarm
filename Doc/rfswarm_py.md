@@ -164,6 +164,9 @@ Use this to generate csv files suitable for use to create reports for your test 
 The columns for the run screen
 | Column Name	| Detail |
 |---		|---	|
+| _Index_	| _This optional column indicates the test groups the result came from and matches the test group index from the plan screen_ |
+| _Iteration_	| _This optional column indicates iteration the result came from, the first time a robot runs a test on an agent is iteration 1, the next time that same robot runs that test is iteration 2, etc, so robot 1 may run the same _ |
+| _Sequence_	| _This optional column indicates the test groups the result came from and matches the test group index from the plan screen_ |
 | Result Name	| This is the result name as reported by robot framework, usually this will match either the documentation or full name lines for a test step in a robot framework report |
 | Min		| This is the shortest (quickest) response time reported by any robot during the test |
 | Avg		| This is the average of all the response time reported by all robots during the test |
