@@ -617,6 +617,7 @@ class RFSwarmBase:
 			if (self.datadb is None) or (base.run_name != base.run_name_current):
 				base.debugmsg(9, "run_db_thread: ensure_db")
 				self.ensure_db()
+				self.MetricIDs = {}
 
 			if self.datadb is not None:
 
