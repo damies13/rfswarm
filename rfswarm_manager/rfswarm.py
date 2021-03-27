@@ -760,7 +760,7 @@ class RFSwarmBase:
 					if not os.path.exists(self.resultsdir):
 						base.debugmsg(0, "Unable to create resultsdir:", self.resultsdir, "\n", str(e))
 						exit(1)
-						
+
 			base.datapath = os.path.join(self.resultsdir, base.run_name)
 			base.debugmsg(1, "datapath:", base.datapath)
 			if not os.path.exists(base.datapath):
@@ -1867,6 +1867,8 @@ class RFSwarmCore:
 			base.debugmsg(5, "base.args.scenario: ", base.args.scenario)
 			scenariofile = os.path.abspath(base.args.scenario)
 			base.debugmsg(5, "scenariofile: ", scenariofile)
+			if 'Plan' not in base.config:
+				base.config['Plan'] = {}
 			base.config['Plan']['ScenarioFile'] = scenariofile
 
 		if base.args.dir:
@@ -1874,16 +1876,22 @@ class RFSwarmCore:
 			base.debugmsg(5, "base.args.dir: ", base.args.dir)
 			ResultsDir = os.path.abspath(base.args.dir)
 			base.debugmsg(5, "ResultsDir: ", ResultsDir)
+			if 'Run' not in base.config:
+				base.config['Run'] = {}
 			base.config['Run']['ResultsDir'] = ResultsDir
 
 		if base.args.ipaddress:
 			base.save_ini = False
 			base.debugmsg(5, "base.args.ipaddress: ", base.args.ipaddress)
+			if 'Server' not in base.config:
+				base.config['Server'] = {}
 			base.config['Server']['BindIP'] = base.args.ipaddress
 
 		if base.args.port:
 			base.save_ini = False
 			base.debugmsg(5, "base.args.port: ", base.args.port)
+			if 'Server' not in base.config:
+				base.config['Server'] = {}
 			base.config['Server']['BindPort'] = base.args.port
 
 
