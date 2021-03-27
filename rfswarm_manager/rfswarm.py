@@ -759,7 +759,7 @@ class RFSwarmBase:
 				except Exception as e:
 					if not os.path.exists(self.resultsdir):
 						base.debugmsg(0, "Unable to create resultsdir:", self.resultsdir, "\n", str(e))
-						exit(1)
+						core.on_closing()
 
 			base.datapath = os.path.join(self.resultsdir, base.run_name)
 			base.debugmsg(1, "datapath:", base.datapath)
@@ -769,7 +769,7 @@ class RFSwarmBase:
 				except Exception as e:
 					if not os.path.exists(self.datapath):
 						base.debugmsg(0, "Unable to create datapath:", self.datapath, "\n", str(e))
-						exit(1)
+						core.on_closing()
 
 			# check if db exists
 			self.dbfile = os.path.join(base.datapath, "{}.db".format(base.run_name))
