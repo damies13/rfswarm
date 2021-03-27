@@ -617,7 +617,6 @@ class RFSwarmBase:
 			if (self.datadb is None) or (base.run_name != base.run_name_current):
 				base.debugmsg(9, "run_db_thread: ensure_db")
 				self.ensure_db()
-				self.MetricIDs = {}
 
 			if self.datadb is not None:
 
@@ -780,6 +779,7 @@ class RFSwarmBase:
 
 			if self.datadb is None:
 				base.debugmsg(5, "Connect to DB")
+				self.MetricIDs = {}
 				self.datadb = sqlite3.connect(self.dbfile)
 				self.datadb.create_aggregate("percentile", 2, percentile)
 				self.datadb.create_aggregate("stdev", 1, stdevclass)
