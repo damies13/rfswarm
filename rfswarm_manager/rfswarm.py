@@ -754,11 +754,22 @@ class RFSwarmBase:
 			self.resultsdir = base.config['Run']['ResultsDir']
 
 			if not os.path.exists(self.resultsdir):
-				os.mkdir(self.resultsdir)
+				try:
+					os.mkdir(self.resultsdir)
+				except Exception as e:
+					if not os.path.exists(self.resultsdir):
+						base.debugmsg(0, "Unable to create resultsdir:", self.resultsdir, "\n", str(e))
+						exit(1)
+						
 			base.datapath = os.path.join(self.resultsdir, base.run_name)
 			base.debugmsg(1, "datapath:", base.datapath)
 			if not os.path.exists(base.datapath):
-				os.mkdir(base.datapath)
+				try:
+					os.mkdir(base.datapath)
+				except Exception as e:
+					if not os.path.exists(self.datapath):
+						base.debugmsg(0, "Unable to create datapath:", self.datapath, "\n", str(e))
+						exit(1)
 
 			# check if db exists
 			self.dbfile = os.path.join(base.datapath, "{}.db".format(base.run_name))
