@@ -5,24 +5,15 @@ with open("README_PyPi.md", "r") as fh:
 
 setuptools.setup(
 	name="rfswarm-manager",
-	version="0.6.4",
+	version="0.6.5",
 	author="damies13",
 	author_email="damies13+rfswarm@gmail.com",
 	description="rfswarm manager",
 	long_description=long_description,
 	long_description_content_type="text/markdown",
 	url="https://github.com/damies13/rfswarm",
-	# packages = ['rfswarm-gui'],
-	# packages=setuptools.find_packages(),
-	# packages=setuptools.find_packages(
-	# 	where = '',
-	# 	include = ['rfswarm-gui',],
-	# 	exclude = ['rfswarm-agent',]
-	# ),
 	packages=setuptools.find_packages(exclude=["*fswarm_agen*", "build/*"]),
-	# package_dir = {"":"rfswarm-gui"},
 	install_requires=['configparser', 'HTTPServer', 'pillow'],
-	# sqlite3worker??
 	classifiers=[
 		"Development Status :: 4 - Beta",
 		"Topic :: Software Development :: Testing",
@@ -36,8 +27,5 @@ setuptools.setup(
 		'Say Thanks!': 'https://github.com/damies13/rfswarm#donations',
 		'Source': 'https://github.com/damies13/rfswarm',
 	},
-	# entry_points = {'console_scripts': ['rfswarm = rfswarm:rfswarm']},
-	# entry_points = {'console_scripts': ['rfswarm = rfswarm-gui.rfswarm:rfswarm']},
-	entry_points = {'console_scripts': ['rfswarm = rfswarm_manager.rfswarm:RFSwarmCore', 'rfswarm-manager = rfswarm_manager.rfswarm:RFSwarmCore']},
-	# entry_points = {'console_scripts': ['rfswarm = rfswarm:RFSwarmCore']},
+	entry_points = {'console_scripts': ['rfswarm = rfswarm_manager.rfswarm:RFSwarm', 'rfswarm-manager = rfswarm_manager.rfswarm:RFSwarm']},
 )

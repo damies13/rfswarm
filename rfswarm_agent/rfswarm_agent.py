@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version 0.6.4
+#    Version 0.6.5
 #
 
 
@@ -41,11 +41,12 @@ import inspect
 
 class RFSwarmAgent():
 
-	version="0.6.4"
+	version="0.6.5"
 	config = None
 	isconnected = False
 	isrunning = False
 	isstopping = False
+	runagent = True
 	run_name = None
 	swarmmanager = None
 	agentdir = None
@@ -60,6 +61,7 @@ class RFSwarmAgent():
 	mainloopinterval = 10
 	scriptlist = {}
 	jobs = {}
+	corethreads = {}
 	upload_queue = []
 	robotcount = 0
 	status = "Ready"
@@ -101,13 +103,8 @@ class RFSwarmAgent():
 
 
 		self.config = configparser.ConfigParser()
-		scrdir = os.path.dirname(__file__)
-		self.debugmsg(6, "scrdir: ", scrdir)
-		self.agentini = os.path.join(scrdir, "RFSwarmAgent.ini")
 
-		if self.args.ini:
-			self.debugmsg(1, "self.args.ini: ", self.args.ini)
-			self.agentini = self.args.ini
+		self.agentini = self.findiniloctaion()
 
 		if os.path.isfile(self.agentini):
 			self.debugmsg(6, "agentini: ", self.agentini)
@@ -216,6 +213,59 @@ class RFSwarmAgent():
 		self.debugmsg(9, "self.agentproperties: ", self.agentproperties)
 
 
+	def findiniloctaion(self):
+
+		if self.args.ini:
+			self.debugmsg(1, "self.args.ini: ", self.args.ini)
+			return self.args.ini
+
+		inilocations = []
+
+		srcdir = os.path.join(os.path.dirname(__file__))
+		self.debugmsg(7, "srcdir[-2]: ", srcdir[-2:])
+		if srcdir[-2:] == "/.":
+			srcdir = srcdir[0:-2]
+		self.debugmsg(7, "srcdir: ", srcdir)
+
+		inifilename = "RFSwarmAgent.ini"
+		# default location for all previous versions
+		inilocations.append(os.path.join(srcdir, inifilename))
+		# probably best location
+		inilocations.append(os.path.join(os.path.expanduser("~"), ".rfswarm", inifilename))
+		# last resort location
+		inilocations.append(os.path.join(tempfile.gettempdir(), inifilename))
+
+		self.debugmsg(6, "inilocations: ", inilocations)
+
+
+		for iniloc in inilocations:
+			self.debugmsg(7, "iniloc: ", iniloc)
+			if os.path.isfile(iniloc):
+				self.debugmsg(7, "iniloc exists")
+				return iniloc
+			else:
+				# can we write to this location?
+				# 	if anything in the try statement fails then we can't so progress to next location
+				self.debugmsg(7, "iniloc can be created?")
+				try:
+					loc = os.path.dirname(iniloc)
+					self.debugmsg(7, "loc: ", loc)
+					self.debugmsg(7, "loc isdir:", os.path.isdir(loc))
+					if not os.path.isdir(loc):
+						self.debugmsg(7, "creating loc")
+						os.makedirs(loc)
+						self.debugmsg(7, "loc created")
+
+					self.debugmsg(7, "os.access(loc): ", os.access(loc, os.X_OK | os.W_OK))
+					if os.access(loc, os.X_OK | os.W_OK):
+						self.debugmsg(7, "iniloc can be created!")
+						return iniloc
+				except:
+					pass
+		# This should cause saveini to fail?
+		return None
+
+
 	def debugmsg(self, lvl, *msg):
 		msglst = []
 		prefix = ""
@@ -247,7 +297,7 @@ class RFSwarmAgent():
 	def mainloop(self):
 		self.debugmsg(6, "mainloop")
 		prev_status = self.status
-		while True:
+		while self.runagent:
 			self.debugmsg(2, self.status, datetime.now().isoformat(sep=' ',timespec='seconds'),
 				"(",int(time.time()),")",
 				"isconnected:", self.isconnected,
@@ -267,11 +317,11 @@ class RFSwarmAgent():
 			self.debugmsg(5, "self.isconnected", self.isconnected)
 			if self.isconnected:
 				# self.updatestatus()
-				t0 = threading.Thread(target=self.updatestatus)
-				t0.start()
+				self.corethreads["status"] = threading.Thread(target=self.updatestatus)
+				self.corethreads["status"].start()
 
-				t1 = threading.Thread(target=self.getjobs)
-				t1.start()
+				self.corethreads["getjobs"] = threading.Thread(target=self.getjobs)
+				self.corethreads["getjobs"].start()
 
 				if self.isrunning:
 					self.mainloopinterval = 2
@@ -279,19 +329,19 @@ class RFSwarmAgent():
 					if self.isstopping:
 						self.status = "Stopping"
 					# else:
-					t2 = threading.Thread(target=self.runjobs)
-					t2.start()
+					self.corethreads["runjobs"] = threading.Thread(target=self.runjobs)
+					self.corethreads["runjobs"].start()
 				else:
 					self.mainloopinterval = 10
 					if len(self.upload_queue)>0:
 						self.status = "Uploading ({})".format(len(self.upload_queue))
 						self.debugmsg(5, "self.status:", self.status, "len(self.upload_queue):", len(self.upload_queue))
-						t3 = threading.Thread(target=self.process_file_upload_queue)
-						t3.start()
+						self.corethreads["uploadqueue"] = threading.Thread(target=self.process_file_upload_queue)
+						self.corethreads["uploadqueue"].start()
 					else:
 						self.status = "Ready"
-						t2 = threading.Thread(target=self.getscripts)
-						t2.start()
+						self.corethreads["getscripts"] = threading.Thread(target=self.getscripts)
+						self.corethreads["getscripts"].start()
 
 
 
@@ -1318,11 +1368,44 @@ class RFSwarmAgent():
 			# lf.writelines(fd)
 			lf.write('\n'.join(fd))
 
+	def on_closing(self, _event=None, *args):
+		self.runagent = False
+		self.debugmsg(0, "Shutting down agent")
+
+		for thread in self.corethreads:
+			self.debugmsg(3, "Join Agent Thread:", thread)
+			self.corethreads[thread].join()
+
+
+		for jobid in self.jobs:
+			# self.jobs[jobid]["Thread"]
+			# base.debugmsg(3, "Join Agent Manager Thread")
+			# base.Agentserver.join()
+
+			self.debugmsg(3, "Join Agent Thread:", jobid)
+			self.jobs[jobid]["Thread"].join()
+
+		self.debugmsg(3, "Exit")
+		try:
+			sys.exit(0)
+		except SystemExit:
+			try:
+				os._exit(0)
+			except:
+				pass
+
+
+class RFSwarm():
+	def __init__(self):
+		while rfsa.runagent:
+			time.sleep(300)
+
+
 rfsa = RFSwarmAgent()
 try:
 	rfsa.mainloop()
 except KeyboardInterrupt:
-	pass
+	rfsa.on_closing()
+
 except Exception as e:
 	self.debugmsg(1, "rfsa.Exception:", e)
-	pass
