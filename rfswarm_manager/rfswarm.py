@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #		Manager
-#    Version 0.6.5
+#    Version 0.6.4.1617327785
 #
 
 # 	Helpful links
@@ -444,7 +444,7 @@ class AgentServer(BaseHTTPRequestHandler):
 
 
 class RFSwarmBase:
-	version="0.6.5"
+	version="0.6.4.1617327785"
 	debuglvl = 0
 
 	config = None
@@ -5443,6 +5443,12 @@ class RFSwarmGUI(tk.Frame):
 	# End class RFSwarmGUI
 	#
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+class RFSwarm():
+	def __init__(self):
+		while base.run_dbthread:
+			time.sleep(1)
+
 
 base = RFSwarmBase()
 
