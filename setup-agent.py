@@ -5,7 +5,7 @@ with open("README_PyPi.md", "r") as fh:
 
 setuptools.setup(
 	name="rfswarm-agent",
-	version="0.6.5",
+	version="0.6.4.1617328342",
 	author="damies13",
 	author_email="damies13+rfswarm@gmail.com",
 	description="rfswarm Agent",
@@ -27,5 +27,5 @@ setuptools.setup(
 		'Say Thanks!': 'https://github.com/damies13/rfswarm#donations',
 		'Source': 'https://github.com/damies13/rfswarm',
 	},
-	entry_points = {'console_scripts': ['rfswarm-agent = rfswarm_agent.rfswarm_agent']},
+	entry_points = {'console_scripts': ['rfswarm-agent = rfswarm_agent.rfswarm_agent:RFSwarm']},
 )

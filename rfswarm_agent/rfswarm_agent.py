@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version 0.6.5
+#    Version 0.6.4.1617328342
 #
 
 
@@ -41,7 +41,7 @@ import inspect
 
 class RFSwarmAgent():
 
-	version="0.6.5"
+	version="0.6.4.1617328342"
 	config = None
 	isconnected = False
 	isrunning = False
@@ -1365,6 +1365,12 @@ class RFSwarmAgent():
 		with open(self.listenerfile, 'w+') as lf:
 			# lf.writelines(fd)
 			lf.write('\n'.join(fd))
+
+class RFSwarm():
+	def __init__(self):
+		while True:
+			time.sleep(1)
+
 
 rfsa = RFSwarmAgent()
 try:
