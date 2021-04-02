@@ -5,7 +5,7 @@ with open("README_PyPi.md", "r") as fh:
 
 setuptools.setup(
 	name="rfswarm-manager",
-	version="0.6.4.1617327785",
+	version="0.6.5",
 	author="damies13",
 	author_email="damies13+rfswarm@gmail.com",
 	description="rfswarm manager",
