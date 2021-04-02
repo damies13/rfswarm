@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version 0.6.4.1617328342
+#    Version 0.6.4.1617333448
 #
 
 
@@ -41,11 +41,12 @@ import inspect
 
 class RFSwarmAgent():
 
-	version="0.6.4.1617328342"
+	version="0.6.4.1617333448"
 	config = None
 	isconnected = False
 	isrunning = False
 	isstopping = False
+	runagent = True
 	run_name = None
 	swarmmanager = None
 	agentdir = None
@@ -60,6 +61,7 @@ class RFSwarmAgent():
 	mainloopinterval = 10
 	scriptlist = {}
 	jobs = {}
+	corethreads = {}
 	upload_queue = []
 	robotcount = 0
 	status = "Ready"
@@ -295,7 +297,7 @@ class RFSwarmAgent():
 	def mainloop(self):
 		self.debugmsg(6, "mainloop")
 		prev_status = self.status
-		while True:
+		while self.runagent:
 			self.debugmsg(2, self.status, datetime.now().isoformat(sep=' ',timespec='seconds'),
 				"(",int(time.time()),")",
 				"isconnected:", self.isconnected,
@@ -315,11 +317,11 @@ class RFSwarmAgent():
 			self.debugmsg(5, "self.isconnected", self.isconnected)
 			if self.isconnected:
 				# self.updatestatus()
-				t0 = threading.Thread(target=self.updatestatus)
-				t0.start()
+				self.corethreads["status"] = threading.Thread(target=self.updatestatus)
+				self.corethreads["status"].start()
 
-				t1 = threading.Thread(target=self.getjobs)
-				t1.start()
+				self.corethreads["getjobs"] = threading.Thread(target=self.getjobs)
+				self.corethreads["getjobs"].start()
 
 				if self.isrunning:
 					self.mainloopinterval = 2
@@ -327,19 +329,19 @@ class RFSwarmAgent():
 					if self.isstopping:
 						self.status = "Stopping"
 					# else:
-					t2 = threading.Thread(target=self.runjobs)
-					t2.start()
+					self.corethreads["runjobs"] = threading.Thread(target=self.runjobs)
+					self.corethreads["runjobs"].start()
 				else:
 					self.mainloopinterval = 10
 					if len(self.upload_queue)>0:
 						self.status = "Uploading ({})".format(len(self.upload_queue))
 						self.debugmsg(5, "self.status:", self.status, "len(self.upload_queue):", len(self.upload_queue))
-						t3 = threading.Thread(target=self.process_file_upload_queue)
-						t3.start()
+						self.corethreads["uploadqueue"] = threading.Thread(target=self.process_file_upload_queue)
+						self.corethreads["uploadqueue"].start()
 					else:
 						self.status = "Ready"
-						t2 = threading.Thread(target=self.getscripts)
-						t2.start()
+						self.corethreads["getscripts"] = threading.Thread(target=self.getscripts)
+						self.corethreads["getscripts"].start()
 
 
 
@@ -1366,17 +1368,44 @@ class RFSwarmAgent():
 			# lf.writelines(fd)
 			lf.write('\n'.join(fd))
 
+	def on_closing(self, _event=None, *args):
+		self.runagent = False
+		self.debugmsg(0, "Shutting down agent")
+
+		for thread in self.corethreads:
+			self.debugmsg(3, "Join Agent Thread:", thread)
+			self.corethreads[thread].join()
+
+
+		for jobid in self.jobs:
+			# self.jobs[jobid]["Thread"]
+			# base.debugmsg(3, "Join Agent Manager Thread")
+			# base.Agentserver.join()
+
+			self.debugmsg(3, "Join Agent Thread:", jobid)
+			self.jobs[jobid]["Thread"].join()
+
+		self.debugmsg(3, "Exit")
+		try:
+			sys.exit(0)
+		except SystemExit:
+			try:
+				os._exit(0)
+			except:
+				pass
+
+
 class RFSwarm():
 	def __init__(self):
-		while True:
-			time.sleep(1)
+		while rfsa.runagent:
+			time.sleep(300)
 
 
 rfsa = RFSwarmAgent()
 try:
 	rfsa.mainloop()
 except KeyboardInterrupt:
-	pass
+	rfsa.on_closing()
+
 except Exception as e:
 	self.debugmsg(1, "rfsa.Exception:", e)
-	pass
