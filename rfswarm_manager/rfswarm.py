@@ -760,11 +760,22 @@ class RFSwarmBase:
 			self.resultsdir = base.config['Run']['ResultsDir']
 
 			if not os.path.exists(self.resultsdir):
-				os.mkdir(self.resultsdir)
+				try:
+					os.mkdir(self.resultsdir)
+				except Exception as e:
+					if not os.path.exists(self.resultsdir):
+						base.debugmsg(0, "Unable to create resultsdir:", self.resultsdir, "\n", str(e))
+						core.on_closing()
+
 			base.datapath = os.path.join(self.resultsdir, base.run_name)
 			base.debugmsg(1, "datapath:", base.datapath)
 			if not os.path.exists(base.datapath):
-				os.mkdir(base.datapath)
+				try:
+					os.mkdir(base.datapath)
+				except Exception as e:
+					if not os.path.exists(self.datapath):
+						base.debugmsg(0, "Unable to create datapath:", self.datapath, "\n", str(e))
+						core.on_closing()
 
 			# check if db exists
 			self.dbfile = os.path.join(base.datapath, "{}.db".format(base.run_name))
@@ -774,6 +785,7 @@ class RFSwarmBase:
 
 			if self.datadb is None:
 				base.debugmsg(5, "Connect to DB")
+				self.MetricIDs = {}
 				self.datadb = sqlite3.connect(self.dbfile)
 				self.datadb.create_aggregate("percentile", 2, percentile)
 				self.datadb.create_aggregate("stdev", 1, stdevclass)
@@ -1862,6 +1874,8 @@ class RFSwarmCore:
 			base.debugmsg(5, "base.args.scenario: ", base.args.scenario)
 			scenariofile = os.path.abspath(base.args.scenario)
 			base.debugmsg(5, "scenariofile: ", scenariofile)
+			if 'Plan' not in base.config:
+				base.config['Plan'] = {}
 			base.config['Plan']['ScenarioFile'] = scenariofile
 
 		if base.args.dir:
@@ -1869,16 +1883,22 @@ class RFSwarmCore:
 			base.debugmsg(5, "base.args.dir: ", base.args.dir)
 			ResultsDir = os.path.abspath(base.args.dir)
 			base.debugmsg(5, "ResultsDir: ", ResultsDir)
+			if 'Run' not in base.config:
+				base.config['Run'] = {}
 			base.config['Run']['ResultsDir'] = ResultsDir
 
 		if base.args.ipaddress:
 			base.save_ini = False
 			base.debugmsg(5, "base.args.ipaddress: ", base.args.ipaddress)
+			if 'Server' not in base.config:
+				base.config['Server'] = {}
 			base.config['Server']['BindIP'] = base.args.ipaddress
 
 		if base.args.port:
 			base.save_ini = False
 			base.debugmsg(5, "base.args.port: ", base.args.port)
+			if 'Server' not in base.config:
+				base.config['Server'] = {}
 			base.config['Server']['BindPort'] = base.args.port
 
 
@@ -5760,6 +5780,12 @@ class RFSwarmGUI(tk.Frame):
 	# End class RFSwarmGUI
 	#
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+class RFSwarm():
+	def __init__(self):
+		while base.run_dbthread:
+			time.sleep(300)
+
 
 base = RFSwarmBase()
 
