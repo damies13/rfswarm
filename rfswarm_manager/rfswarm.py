@@ -3345,15 +3345,13 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(6, "start")
 		tmt = threading.Thread(target=lambda: self.gs_updatemetrictypes(grphWindow))
 		tmt.start()
-
-		# self.gs_updatemetrictypes(grphWindow)
 		base.debugmsg(6, "tmt")
-		# tpm = threading.Thread(target=lambda: self.gs_updateprimetrics(grphWindow))
-		# tpm.start()
-		# base.debugmsg(6, "tpm")
-		# tsm = threading.Thread(target=lambda: self.gs_updatesecmetrics=(grphWindow))
-		# tsm.start()
-		# base.debugmsg(6, "tsm")
+		tpm = threading.Thread(target=lambda: self.gs_updateprimetrics(grphWindow))
+		tpm.start()
+		base.debugmsg(6, "tpm")
+		tsm = threading.Thread(target=lambda: self.gs_updatesecmetrics(grphWindow))
+		tsm.start()
+		base.debugmsg(6, "tsm")
 
 
 
@@ -3382,53 +3380,16 @@ class RFSwarmGUI(tk.Frame):
 	def gs_updatemetrictypes(self, grphWindow):
 		base.debugmsg(6, "start")
 		try:
-
-			# if MetricName not in self.MetricIDs[MetricType]:
-			base.debugmsg(6, "MetricType:", self.MetricIDs.keys())
-
-			# base.debugmsg(6, "MType:", grphWindow.settings["MType"].get())
-			# 	Metric Type
-			# 		SELECT
-			# 			m.Type
-			# 		FROM Metric as m
-			# 		GROUP BY m.Type
-			# --
-			sql  = "SELECT "
-			sql += 		"m.Type "
-			sql += 	"FROM Metric as m "
-			sql += 	"GROUP BY m.Type "
-
-			base.debugmsg(6, "sql:", sql)
-
-			base.dbqueue["Read"].append({"SQL": sql, "KEY": "MetricTypes"})
-
-			base.debugmsg(6, "Read:", base.dbqueue["Read"])
-
-			counter = 600
-			time.sleep(0.1)
-			base.debugmsg(6, "ReadResult:", base.dbqueue["ReadResult"])
-			while "MetricTypes" not in base.dbqueue["ReadResult"]:
-				time.sleep(0.1)
-				# time.sleep(1)
-				base.debugmsg(6, "Wait for MetricTypes")
-				base.debugmsg(6, "ReadResult:", base.dbqueue["ReadResult"])
-				counter -= 1
-				if counter < 1:
-					return None
-
-			MetricTypes = base.dbqueue["ReadResult"]["MetricTypes"]
-			base.debugmsg(6, "MetricTypes:", MetricTypes)
+			base.debugmsg(6, "MetricType:", base.MetricIDs.keys())
 
 			newMTypes = [None, ""]
-			for mt in MetricTypes:
-				newMTypes.append(mt["Type"])
+			for mt in base.MetricIDs.keys():
+				if mt is not "MetricCount":
+					newMTypes.append(mt)
 
 			base.debugmsg(6, "newMTypes:", newMTypes)
 			grphWindow.fmeMSettings.MTypes = newMTypes
 
-				# tol = self.scriptgrid.grid_slaves(column=self.plancoltst, row=r)[0]
-				# base.debugmsg(9, tol)
-				# tol.set_menu(*tclist)
 			base.debugmsg(6, "grphWindow.fmeMSettings.omMT:", grphWindow.fmeMSettings.omMT)
 			grphWindow.fmeMSettings.omMT.set_menu(*grphWindow.fmeMSettings.MTypes)
 			base.debugmsg(6, "grphWindow.fmeMSettings.omMT.set_menu():", grphWindow.fmeMSettings.MTypes)
@@ -3440,50 +3401,17 @@ class RFSwarmGUI(tk.Frame):
 	def gs_updateprimetrics(self, grphWindow):
 		MType = grphWindow.settings["MType"].get()
 		base.debugmsg(6, "MType:", MType)
-		#	Primary metric
-		# 				SELECT
-		# 					m.Name
-		# 					, m.ROWID
-		# 				FROM Metric as m
-		# -- 				WHERE m.Type = "Agent"
-		# -- 				WHERE m.Type = "Scenario"
-		# 				WHERE m.Type = "Summary"
-		#
-		# 				GROUP BY m.Name
-		# 				ORDER BY m.ROWID
-		#
-		sql  = "SELECT "
-		sql += 		"m.Name "
-		sql += 		", m.ROWID "
-		sql += 	"FROM Metric as m "
-		if MType is not None and len(MType)>0:
-			sql += 	"WHERE m.Type = \"" + MType + "\" "
-		sql += 	"GROUP BY m.Name "
-		sql += 	"ORDER BY m.ROWID "
-
-		base.debugmsg(7, "sql:", sql)
-
-		base.dbqueue["Read"].append({"SQL": sql, "KEY": "PMetric"})
-
-		counter = 600
-		time.sleep(0.1)
-		while "PMetric" not in base.dbqueue["ReadResult"]:
-			time.sleep(0.1)
-			base.debugmsg(9, "Wait for PMetric")
-			counter -= 1
-			if counter < 1:
-				return None
-
-		PMetric = base.dbqueue["ReadResult"]["PMetric"]
-		base.debugmsg(6, "PMetric:", PMetric)
 
 		newPMetrics = [None, ""]
-		for pm in PMetric:
-			try:
-				base.debugmsg(7, "pm:", pm)
-				newPMetrics.append(pm["Name"])
-			except:
-				pass
+		if MType is not None and len(MType)>0:
+			newPMetrics = newPMetrics + list(base.MetricIDs[MType].keys())
+		else:
+			PMetric = []
+			for mtype in base.MetricIDs.keys():
+				base.debugmsg(6, "mtype:", mtype)
+				if mtype is not "MetricCount":
+					for ptype in base.MetricIDs[mtype].keys():
+						newPMetrics.append(ptype)
 
 		base.debugmsg(6, "newPMetrics:", newPMetrics)
 		grphWindow.fmeMSettings.PMetrics = newPMetrics
