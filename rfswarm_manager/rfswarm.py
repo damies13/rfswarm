@@ -3265,10 +3265,11 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeSettings.inpGN = ttk.Entry(grphWindow.fmeSettings, textvariable=grphWindow.graphname)
 		# grphWindow.fmeSettings.inpGN.delete(0,'end')
 		# grphWindow.fmeSettings.inpGN.insert(0, grphWindow.graphname)
-		# grphWindow.fmeSettings.inpGN.config(validatecommand=lambda: self.gs_updatename(grphWindow))
+		# grphWindow.fmeSettings.inpGN.config(validatecommand=lambda *args: self.gs_updatename(grphWindow))
 		# vcGN = self.root.register(lambda: self.gs_updatename(grphWindow))
 		# grphWindow.fmeSettings.inpGN.config(validate="key", validatecommand=(vcGN, '%P'))
-		# grphWindow.fmeSettings.inpGN.config(validate="focusout", validatecommand=lambda: self.gs_updatename(grphWindow))
+		# grphWindow.fmeSettings.inpGN.config(validate="focusout", validatecommand=lambda *args: self.gs_updatename(grphWindow))
+		# grphWindow.fmeSettings.inpGN.config(validate="all", validatecommand=lambda *args: self.gs_updatename(grphWindow))
 		grphWindow.fmeSettings.inpGN.grid(column=1, row=row, sticky="nsew")
 
 
@@ -3284,7 +3285,7 @@ class RFSwarmGUI(tk.Frame):
 		# grphWindow.fmeSettings.omDT = ttk.OptionMenu(grphWindow.fmeSettings, grphWindow.settings["DataType"], *DataTypes)
 		# grphWindow.fmeSettings.omDT = ttk.OptionMenu(grphWindow.fmeSettings, grphWindow.settings["DataType"], *DataTypes, command=lambda: self.gs_refresh(grphWindow))
 		# grphWindow.fmeSettings.omDT = ttk.OptionMenu(grphWindow.fmeSettings, grphWindow.settings["DataType"], *DataTypes, command=self.gs_switchdt(grphWindow))
-		grphWindow.fmeSettings.omDT = ttk.OptionMenu(grphWindow.fmeSettings, grphWindow.settings["DataType"], command=lambda: self.gs_switchdt(grphWindow), *DataTypes)
+		grphWindow.fmeSettings.omDT = ttk.OptionMenu(grphWindow.fmeSettings, grphWindow.settings["DataType"], command=lambda *args: self.gs_switchdt(grphWindow), *DataTypes)
 		grphWindow.settings["DataType"].set(DataTypes[1])
 		# grphWindow.fmeSettings.omDT.configure(command=lambda: self.gs_refresh(grphWindow))
 		# grphWindow.fmeSettings.omDT["Menu"].add_command(lambda: self.gs_refresh(grphWindow))
@@ -3294,9 +3295,26 @@ class RFSwarmGUI(tk.Frame):
 
 
 		row +=1
-		grphWindow.fmeMSettings = tk.Frame(grphWindow.fmeSettings)
-		grphWindow.fmeMSettings.grid(column=0, row=row, columnspan=2, sticky="nsew")
+		grphWindow.fmeDTRow = row
+		#
+		# 	Add DT Settings frames
+		#
+		grphWindow.fmeRSettings = tk.Frame(grphWindow.fmeSettings)
 
+		grphWindow.fmeMSettings = tk.Frame(grphWindow.fmeSettings)
+		grphWindow.fmeMSettings.grid(column=0, row=grphWindow.fmeDTRow, columnspan=2, sticky="nsew")
+
+		#
+		# 	DT Results Settings
+		#
+		rowR =0
+		# grphWindow.fmeRSettings
+		grphWindow.fmeRSettings.lblRT = ttk.Label(grphWindow.fmeRSettings, text = "Result Type:")
+		grphWindow.fmeRSettings.lblRT.grid(column=0, row=rowR, sticky="nsew")
+
+		#
+		# 	DT Metric Settings
+		#
 		rowM =0
 		grphWindow.fmeMSettings.lblMT = ttk.Label(grphWindow.fmeMSettings, text = "Metric Type:")
 		grphWindow.fmeMSettings.lblMT.grid(column=0, row=rowM, sticky="nsew")
@@ -3343,6 +3361,9 @@ class RFSwarmGUI(tk.Frame):
 
 	def gs_refresh(self, grphWindow):
 		base.debugmsg(6, "start")
+		tgn = threading.Thread(target=lambda: self.gs_updatename(grphWindow))
+		tgn.start()
+		base.debugmsg(6, "tgn")
 		tmt = threading.Thread(target=lambda: self.gs_updatemetrictypes(grphWindow))
 		tmt.start()
 		base.debugmsg(6, "tmt")
@@ -3369,12 +3390,24 @@ class RFSwarmGUI(tk.Frame):
 			grphWindow.fmeSettings.grid(column=90, row=1, columnspan=10, sticky="nsew")
 			base.debugmsg(6, "fmeSettings.show:", grphWindow.fmeSettings.show)
 
-	# def gs_updatename(self, grphWindow):
-	# 	base.debugmsg(6, "graphname:", grphWindow.graphname.get())
-	# 	grphWindow.title(grphWindow.graphname.get())
+	def gs_updatename(self, grphWindow):
+		base.debugmsg(6, "graphname:", grphWindow.graphname.get())
+		grphWindow.title(grphWindow.graphname.get())
 
-	def gs_switchdt(self, grphWindow):
-		base.debugmsg(6, "DataType:", grphWindow.settings["DataType"].get())
+	def gs_switchdt(self, grphWindow, *args):
+		datatype = grphWindow.settings["DataType"].get()
+		base.debugmsg(6, "DataType:", datatype)
+		self.gs_refresh(grphWindow)
+		# Forget
+		if datatype != "Metric":
+			grphWindow.fmeMSettings.grid_forget()
+		if datatype != "Result":
+			grphWindow.fmeRSettings.grid_forget()
+		# Show
+		if datatype == "Metric":
+			grphWindow.fmeMSettings.grid(column=0, row=grphWindow.fmeDTRow, columnspan=2, sticky="nsew")
+		if datatype == "Result":
+			grphWindow.fmeRSettings.grid(column=0, row=grphWindow.fmeDTRow, columnspan=2, sticky="nsew")
 
 
 	def gs_updatemetrictypes(self, grphWindow):
