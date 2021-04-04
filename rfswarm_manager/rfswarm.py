@@ -652,7 +652,7 @@ class RFSwarmBase:
 					base.dbqueue["Metric"] = []
 					base.debugmsg(9, "run_db_thread: dbqueue: Metric: resdata:", resdata)
 					try:
-						sql = "INSERT OR IGNORE INTO Metric VALUES (?,?)"
+						sql = "INSERT OR IGNORE INTO Metric VALUES (?,?,?)"
 						cur = self.datadb.cursor()
 						cur.executemany(sql, resdata)
 						cur.close()
@@ -799,7 +799,7 @@ class RFSwarmBase:
 					(script_index int, virtual_user int, iteration int, agent text, sequence int, result_name text, result text, elapsed_time num, start_time num, end_time num)''')
 
 				c.execute('''CREATE TABLE Metric
-					(Name TEXT NOT NULL, Type TEXT NOT NULL, PRIMARY KEY("Name"))''')
+					(ID INTEGER, Name TEXT NOT NULL, Type TEXT NOT NULL, PRIMARY KEY("ID"))''')
 
 				c.execute('''CREATE TABLE Metrics
 					(ParentID INTEGER NOT NULL, Time INTEGER NOT NULL, Key TEXT NOT NULL, Value TEXT)''')
@@ -807,7 +807,15 @@ class RFSwarmBase:
 
 				# create indexes?
 				c.execute('''
+				CREATE INDEX "idx_metric_name" ON "Metric" ("Name"	ASC)
+				''')
+
+				c.execute('''
 				CREATE INDEX "idx_metric_type" ON "Metric" ("Type"	ASC)
+				''')
+
+				c.execute('''
+				CREATE INDEX "idx_metric_name_type" ON "Metric" ("Name"	ASC, "Type"	ASC)
 				''')
 
 				c.execute('''
@@ -858,14 +866,14 @@ class RFSwarmBase:
 					a.Name "AgentName"
 					, s.Value "AgentStatus"
 					, max(s.Time) as "AgentLastSeen"
-						, (Select ra.Value from Metrics ra where ra.ParentID = a.ROWID and ra.Key = "AssignedRobots"  and ra.Time = s.Time) "AgentAssigned"
-						, (Select r.Value from Metrics r where r.ParentID = a.ROWID and r.Key = "Robots"  and r.Time = s.Time) "AgentRobots"
-						, (Select max(l.Value) from Metrics l where l.ParentID = a.ROWID and l.Key = "Load"  and l.Time = s.Time) "AgentLoad"
-						, (Select max(c.Value) from Metrics c where c.ParentID = a.ROWID and c.Key = "CPU"  and c.Time = s.Time) "AgentCPU"
-						, (Select max(m.Value) from Metrics m where m.ParentID = a.ROWID and m.Key = "MEM"  and m.Time = s.Time) "AgentMEM"
-						, (Select max(n.Value) from Metrics n where n.ParentID = a.ROWID and n.Key = "NET"  and n.Time = s.Time) "AgentNET"
+						, (Select ra.Value from Metrics ra where ra.ParentID = a.ID and ra.Key = "AssignedRobots"  and ra.Time = s.Time) "AgentAssigned"
+						, (Select r.Value from Metrics r where r.ParentID = a.ID and r.Key = "Robots"  and r.Time = s.Time) "AgentRobots"
+						, (Select max(l.Value) from Metrics l where l.ParentID = a.ID and l.Key = "Load"  and l.Time = s.Time) "AgentLoad"
+						, (Select max(c.Value) from Metrics c where c.ParentID = a.ID and c.Key = "CPU"  and c.Time = s.Time) "AgentCPU"
+						, (Select max(m.Value) from Metrics m where m.ParentID = a.ID and m.Key = "MEM"  and m.Time = s.Time) "AgentMEM"
+						, (Select max(n.Value) from Metrics n where n.ParentID = a.ID and n.Key = "NET"  and n.Time = s.Time) "AgentNET"
 				from Metric a
-					left join Metrics s on s.ParentID = a.ROWID and s.Key = "Status"
+					left join Metrics s on s.ParentID = a.ID and s.Key = "Status"
 				where a.Type = "Agent"
 				GROUP by s.ParentID
 				ORDER by a.Name
@@ -900,14 +908,14 @@ class RFSwarmBase:
 					a.Name "AgentName"
 					, s.Value "AgentStatus"
 					, max(s.Time) as "AgentLastSeen"
-						, (Select ra.Value from Metrics ra where ra.ParentID = a.ROWID and ra.Key = "AssignedRobots"  and ra.Time = s.Time) "AgentAssigned"
-						, (Select r.Value from Metrics r where r.ParentID = a.ROWID and r.Key = "Robots"  and r.Time = s.Time) "AgentRobots"
-						, (Select max(l.Value) from Metrics l where l.ParentID = a.ROWID and l.Key = "Load"  and l.Time = s.Time) "AgentLoad"
-						, (Select max(c.Value) from Metrics c where c.ParentID = a.ROWID and c.Key = "CPU"  and c.Time = s.Time) "AgentCPU"
-						, (Select max(m.Value) from Metrics m where m.ParentID = a.ROWID and m.Key = "MEM"  and m.Time = s.Time) "AgentMEM"
-						, (Select max(n.Value) from Metrics n where n.ParentID = a.ROWID and n.Key = "NET"  and n.Time = s.Time) "AgentNET"
+						, (Select ra.Value from Metrics ra where ra.ParentID = a.ID and ra.Key = "AssignedRobots"  and ra.Time = s.Time) "AgentAssigned"
+						, (Select r.Value from Metrics r where r.ParentID = a.ID and r.Key = "Robots"  and r.Time = s.Time) "AgentRobots"
+						, (Select max(l.Value) from Metrics l where l.ParentID = a.ID and l.Key = "Load"  and l.Time = s.Time) "AgentLoad"
+						, (Select max(c.Value) from Metrics c where c.ParentID = a.ID and c.Key = "CPU"  and c.Time = s.Time) "AgentCPU"
+						, (Select max(m.Value) from Metrics m where m.ParentID = a.ID and m.Key = "MEM"  and m.Time = s.Time) "AgentMEM"
+						, (Select max(n.Value) from Metrics n where n.ParentID = a.ID and n.Key = "NET"  and n.Time = s.Time) "AgentNET"
 				from Metric a
-					left join Metrics s on s.ParentID = a.ROWID and s.Key = "Status"
+					left join Metrics s on s.ParentID = a.ID and s.Key = "Status"
 				where a.Type = "Agent"
 				group by a.ROWID, s.Time
 				ORDER by a.Name, s.Time
@@ -942,17 +950,17 @@ class RFSwarmBase:
 				SELECT
 					a.Name
 					, max(e.Time) as "_EntryTime"
-					, (Select mn.Value from Metrics mn where mn.ParentID = a.ROWID and mn.Key like "min%" and e.Time = mn.Time ) "Min"
-					, (Select av.Value from Metrics av where av.ParentID = a.ROWID and av.Key = "avg" and e.Time = av.Time ) "Average"
-					, (Select sd.Value from Metrics sd where sd.ParentID = a.ROWID and sd.Key like "stDev%" and e.Time = sd.Time ) "StDev"
-					, (Select pct.Key from Metrics pct where pct.ParentID = a.ROWID and pct.Key like "%ile" and e.Time = pct.Time ) "%ile_Key"
-					, (Select pct.Value from Metrics pct where pct.ParentID = a.ROWID and pct.Key like "%ile" and e.Time = pct.Time ) "%ile_Value"
-					, (Select mx.Value from Metrics mx where mx.ParentID = a.ROWID and mx.Key like "max%" and e.Time = mx.Time ) "Max"
-					, (Select ps.Value from Metrics ps where ps.ParentID = a.ROWID and ps.Key like "_pass%" and e.Time = ps.Time ) "Pass"
-					, (Select fl.Value from Metrics fl where fl.ParentID = a.ROWID and fl.Key like "_fail%" and e.Time = fl.Time ) "Fail"
-					, (Select ot.Value from Metrics ot where ot.ParentID = a.ROWID and ot.Key like "_other%" and e.Time = ot.Time ) "Other"
+					, (Select mn.Value from Metrics mn where mn.ParentID = a.ID and mn.Key like "min%" and e.Time = mn.Time ) "Min"
+					, (Select av.Value from Metrics av where av.ParentID = a.ID and av.Key = "avg" and e.Time = av.Time ) "Average"
+					, (Select sd.Value from Metrics sd where sd.ParentID = a.ID and sd.Key like "stDev%" and e.Time = sd.Time ) "StDev"
+					, (Select pct.Key from Metrics pct where pct.ParentID = a.ID and pct.Key like "%ile" and e.Time = pct.Time ) "%ile_Key"
+					, (Select pct.Value from Metrics pct where pct.ParentID = a.ID and pct.Key like "%ile" and e.Time = pct.Time ) "%ile_Value"
+					, (Select mx.Value from Metrics mx where mx.ParentID = a.ID and mx.Key like "max%" and e.Time = mx.Time ) "Max"
+					, (Select ps.Value from Metrics ps where ps.ParentID = a.ID and ps.Key like "_pass%" and e.Time = ps.Time ) "Pass"
+					, (Select fl.Value from Metrics fl where fl.ParentID = a.ROIDWID and fl.Key like "_fail%" and e.Time = fl.Time ) "Fail"
+					, (Select ot.Value from Metrics ot where ot.ParentID = a.ROIDWID and ot.Key like "_other%" and e.Time = ot.Time ) "Other"
 				from Metric a
-					left join Metrics e on e.ParentID = a.ROWID and e.Key = "EntryTime"
+					left join Metrics e on e.ParentID = a.ID and e.Key = "EntryTime"
 				where a.Type = "Summary"
 				GROUP by a.ROWID
 				ORDER by a.ROWID
@@ -993,7 +1001,7 @@ class RFSwarmBase:
 					, ms.Key "SecondaryMetric"
 					, ms.Value "MetricValue"
 				FROM Metric as m
-				JOIN Metrics ms on m.ROWID = ms.ParentID
+				JOIN Metrics ms on m.ID = ms.ParentID
 				''')
 
 
@@ -1544,70 +1552,19 @@ class RFSwarmBase:
 		RunStats = base.dbqueue["ReadResult"]["RunStats"]
 		base.debugmsg(7, "RunStats:", RunStats)
 
-
-		# Save Metric Data
-		# 	First ensure a metric for this agent exists
-		if "Summary" not in base.MetricIDs:
-			base.MetricIDs["Summary"] = {}
-
-		for stat in RunStats:
-			base.debugmsg(7, "stat:", stat)
-			statname = stat["result_name"]
-			if statname not in base.MetricIDs["Summary"]:
-				# create the agent metric
-				base.dbqueue["Metric"].append( (statname, "Summary") )
-
-				# get the agent metric id
-				base.debugmsg(7, "statname:", statname)
-				safestatname = statname.replace('"', r'""')
-				sql = 'select ROWID from Metric where Name = "'+safestatname+'"'
-				base.debugmsg(7, "sql:", sql)
-				base.dbqueue["Read"].append({"SQL": sql, "KEY": "Metric_"+statname})
-
-
+		m_Time = int(time.time())
 		# Read Metric ID's
 		for stat in RunStats:
 			base.debugmsg(7, "stat:", stat)
 			statname = stat["result_name"]
-			if statname not in base.MetricIDs["Summary"]:
-				if "Read" in base.dbqueue:
-					base.debugmsg(7, "Read", base.dbqueue["Read"])
-				if "ReadResult" in base.dbqueue:
-					base.debugmsg(7, "ReadResult", base.dbqueue["ReadResult"])
-				base.debugmsg(7, "Wait for Metric_"+statname)
-				while "Metric_"+statname not in base.dbqueue["ReadResult"]:
-					time.sleep(0.1)
-					base.debugmsg(9, "Waiting for Metric_"+statname)
-				if "ReadResult" in base.dbqueue:
-					base.debugmsg(7, "ReadResult", base.dbqueue["ReadResult"])
-				base.debugmsg(7, "Wait for Metric_"+statname+">0")
-				while len(base.dbqueue["ReadResult"]["Metric_"+statname])<1:
-					time.sleep(0.1)
-					base.debugmsg(9, "Waiting for Metric_"+statname+">0")
 
-				if "Metric_"+statname in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["Metric_"+statname])>0:
-					base.debugmsg(7, "Metric_"+statname+":", base.dbqueue["ReadResult"]["Metric_"+statname])
+			base.save_metrics(statname, "Summary", m_Time, "EntryTime", m_Time)
 
-					base.MetricIDs["Summary"][statname] = base.dbqueue["ReadResult"]["Metric_"+statname][0]["rowid"]
-					base.debugmsg(7, "MetricIDs[Summary]:", base.MetricIDs["Summary"])
+			for stati in stat:
+				base.debugmsg(7, "stati:", stati, "	stat[stati]:", stat[stati])
+				if stati != "result_name":
+					base.save_metrics(statname, "Summary", m_Time, stati, stat[stati])
 
-			# Next save the Metrics
-			if statname in base.MetricIDs["Summary"]:
-				m_StatID = base.MetricIDs["Summary"][statname]
-				m_Time = int(time.time())
-				base.debugmsg(7, "m_StatID:", m_StatID, "	m_Time:", m_Time)
-
-				base.dbqueue["Metrics"].append( (m_StatID, m_Time, "EntryTime", m_Time) )
-
-				# stat: {'result_name': "Opening url 'http://opencart3/'", 'min': 0.411,
-				# 			'avg': 0.439, '90%ile': None, 'max': 0.467, 'stDev': 0.04,
-				# 			'_pass': 2, '_fail': 0, '_other': 0}
-
-				for stati in stat:
-					base.debugmsg(7, "stati:", stati, "	stat[stati]:", stat[stati])
-					if stati != "result_name":
-						base.dbqueue["Metrics"].append( (m_StatID, m_Time, stati, stat[stati]) )
-						base.debugmsg(7, "Saving m_StatID:", m_StatID, "	m_Time:", m_Time, "	stati:", stati, "	stat[stati]:", stat[stati])
 
 
 
@@ -1747,46 +1704,24 @@ class RFSwarmBase:
 	def create_metric(self, MetricName, MetricType):
 		# Save Metric Data
 		# 	First ensure a metric for this agent exists
+		if "MetricCount" not in self.MetricIDs:
+			self.MetricIDs["MetricCount"] = 0
 		if MetricType not in self.MetricIDs:
 			self.MetricIDs[MetricType] = {}
 		if MetricName not in self.MetricIDs[MetricType]:
+			self.MetricIDs["MetricCount"] += 1
+			MetricCount = int(self.MetricIDs["MetricCount"])
+			self.MetricIDs[MetricType][MetricName] = MetricCount
 			# create the agent metric
-			self.dbqueue["Metric"].append( (MetricName, MetricType) )
-			# get the agent metric id
-			sql = 'select ROWID from Metric where Name = "'+MetricName+'"'
-			self.debugmsg(5, "sql:", sql)
-			self.dbqueue["Read"].append({"SQL": sql, "KEY": "Metric_"+MetricName})
-
-			if "Read" in self.dbqueue:
-				self.debugmsg(9, "Read", self.dbqueue["Read"])
-			if "ReadResult" in self.dbqueue:
-				self.debugmsg(9, "ReadResult", self.dbqueue["ReadResult"])
-			self.debugmsg(5, "Wait for Metric_"+MetricName)
-			while "Metric_"+MetricName not in self.dbqueue["ReadResult"]:
-				time.sleep(0.1)
-				self.debugmsg(9, "Waiting for Metric_"+MetricName)
-			if "ReadResult" in self.dbqueue:
-				self.debugmsg(7, "ReadResult", self.dbqueue["ReadResult"])
-			self.debugmsg(5, "Wait for Metric_"+MetricName+">0")
-			while len(self.dbqueue["ReadResult"]["Metric_"+MetricName])<1:
-				time.sleep(0.1)
-				self.debugmsg(5, "Waiting for Metric_"+MetricName+">0")
-
-			if "Metric_"+MetricName in self.dbqueue["ReadResult"] and len(self.dbqueue["ReadResult"]["Metric_"+MetricName])>0:
-				self.debugmsg(5, "Metric_"+MetricName+":", self.dbqueue["ReadResult"]["Metric_"+MetricName])
-
-				if MetricType not in self.MetricIDs:
-					self.MetricIDs[MetricType] = {}
-
-				self.MetricIDs[MetricType][MetricName] = self.dbqueue["ReadResult"]["Metric_"+MetricName][0]["rowid"]
-				self.debugmsg(7, "MetricIDs[MetricType]:", self.MetricIDs[MetricType])
+			if self.datadb is not None:
+				self.dbqueue["Metric"].append( (MetricCount, MetricName, MetricType) )
 
 		return self.MetricIDs[MetricType][MetricName]
 
 	def save_metrics(self, PMetricName, MetricType, MetricTime, SMetricName, MetricValue):
+		self.debugmsg(7, PMetricName, MetricType, MetricTime, SMetricName, MetricValue)
+		metricid = self.create_metric(PMetricName, MetricType)
 		if self.datadb is not None:
-			self.debugmsg(7, PMetricName, MetricType, MetricTime, SMetricName, MetricValue)
-			metricid = self.create_metric(PMetricName, MetricType)
 			self.debugmsg(7, "metricid:", metricid, MetricTime, SMetricName, MetricValue)
 			self.dbqueue["Metrics"].append( (metricid, MetricTime, SMetricName, MetricValue) )
 
@@ -3407,12 +3342,18 @@ class RFSwarmGUI(tk.Frame):
 
 
 	def gs_refresh(self, grphWindow):
+		base.debugmsg(6, "start")
 		tmt = threading.Thread(target=lambda: self.gs_updatemetrictypes(grphWindow))
 		tmt.start()
-		tpm = threading.Thread(target=lambda: self.gs_updateprimetrics(grphWindow))
-		tpm.start()
-		tsm = threading.Thread(target=lambda: self.gs_updatesecmetrics(grphWindow))
-		tsm.start()
+
+		# self.gs_updatemetrictypes(grphWindow)
+		base.debugmsg(6, "tmt")
+		# tpm = threading.Thread(target=lambda: self.gs_updateprimetrics(grphWindow))
+		# tpm.start()
+		# base.debugmsg(6, "tpm")
+		# tsm = threading.Thread(target=lambda: self.gs_updatesecmetrics=(grphWindow))
+		# tsm.start()
+		# base.debugmsg(6, "tsm")
 
 
 
@@ -3439,43 +3380,60 @@ class RFSwarmGUI(tk.Frame):
 
 
 	def gs_updatemetrictypes(self, grphWindow):
-		# base.debugmsg(6, "MType:", grphWindow.settings["MType"].get())
-		# 	Metric Type
-		# 		SELECT
-		# 			m.Type
-		# 		FROM Metric as m
-		# 		GROUP BY m.Type
-		# --
-		sql  = "SELECT "
-		sql += 		"m.Type "
-		sql += 	"FROM Metric as m "
-		sql += 	"GROUP BY m.Type "
+		base.debugmsg(6, "start")
+		try:
 
-		base.debugmsg(7, "sql:", sql)
+			# if MetricName not in self.MetricIDs[MetricType]:
+			base.debugmsg(6, "MetricType:", self.MetricIDs.keys())
 
-		base.dbqueue["Read"].append({"SQL": sql, "KEY": "MetricTypes"})
+			# base.debugmsg(6, "MType:", grphWindow.settings["MType"].get())
+			# 	Metric Type
+			# 		SELECT
+			# 			m.Type
+			# 		FROM Metric as m
+			# 		GROUP BY m.Type
+			# --
+			sql  = "SELECT "
+			sql += 		"m.Type "
+			sql += 	"FROM Metric as m "
+			sql += 	"GROUP BY m.Type "
 
-		time.sleep(0.1)
-		while "MetricTypes" not in base.dbqueue["ReadResult"]:
+			base.debugmsg(6, "sql:", sql)
+
+			base.dbqueue["Read"].append({"SQL": sql, "KEY": "MetricTypes"})
+
+			base.debugmsg(6, "Read:", base.dbqueue["Read"])
+
+			counter = 600
 			time.sleep(0.1)
-			base.debugmsg(9, "Wait for MetricTypes")
+			base.debugmsg(6, "ReadResult:", base.dbqueue["ReadResult"])
+			while "MetricTypes" not in base.dbqueue["ReadResult"]:
+				time.sleep(0.1)
+				# time.sleep(1)
+				base.debugmsg(6, "Wait for MetricTypes")
+				base.debugmsg(6, "ReadResult:", base.dbqueue["ReadResult"])
+				counter -= 1
+				if counter < 1:
+					return None
 
-		MetricTypes = base.dbqueue["ReadResult"]["MetricTypes"]
-		base.debugmsg(6, "MetricTypes:", MetricTypes)
+			MetricTypes = base.dbqueue["ReadResult"]["MetricTypes"]
+			base.debugmsg(6, "MetricTypes:", MetricTypes)
 
-		newMTypes = [None, ""]
-		for mt in MetricTypes:
-			newMTypes.append(mt["Type"])
+			newMTypes = [None, ""]
+			for mt in MetricTypes:
+				newMTypes.append(mt["Type"])
 
-		base.debugmsg(6, "newMTypes:", newMTypes)
-		grphWindow.fmeMSettings.MTypes = newMTypes
+			base.debugmsg(6, "newMTypes:", newMTypes)
+			grphWindow.fmeMSettings.MTypes = newMTypes
 
-			# tol = self.scriptgrid.grid_slaves(column=self.plancoltst, row=r)[0]
-			# base.debugmsg(9, tol)
-			# tol.set_menu(*tclist)
-		base.debugmsg(6, "grphWindow.fmeMSettings.omMT:", grphWindow.fmeMSettings.omMT)
-		grphWindow.fmeMSettings.omMT.set_menu(*grphWindow.fmeMSettings.MTypes)
-		base.debugmsg(6, "grphWindow.fmeMSettings.omMT.set_menu():", grphWindow.fmeMSettings.MTypes)
+				# tol = self.scriptgrid.grid_slaves(column=self.plancoltst, row=r)[0]
+				# base.debugmsg(9, tol)
+				# tol.set_menu(*tclist)
+			base.debugmsg(6, "grphWindow.fmeMSettings.omMT:", grphWindow.fmeMSettings.omMT)
+			grphWindow.fmeMSettings.omMT.set_menu(*grphWindow.fmeMSettings.MTypes)
+			base.debugmsg(6, "grphWindow.fmeMSettings.omMT.set_menu():", grphWindow.fmeMSettings.MTypes)
+		except Exception as e:
+			base.debugmsg(6, "e:", e)
 
 
 
@@ -3507,10 +3465,14 @@ class RFSwarmGUI(tk.Frame):
 
 		base.dbqueue["Read"].append({"SQL": sql, "KEY": "PMetric"})
 
+		counter = 600
 		time.sleep(0.1)
 		while "PMetric" not in base.dbqueue["ReadResult"]:
 			time.sleep(0.1)
 			base.debugmsg(9, "Wait for PMetric")
+			counter -= 1
+			if counter < 1:
+				return None
 
 		PMetric = base.dbqueue["ReadResult"]["PMetric"]
 		base.debugmsg(6, "PMetric:", PMetric)
@@ -3560,10 +3522,14 @@ class RFSwarmGUI(tk.Frame):
 
 		base.dbqueue["Read"].append({"SQL": sql, "KEY": "SMetric"})
 
+		counter = 600
 		time.sleep(0.1)
 		while "SMetric" not in base.dbqueue["ReadResult"]:
 			time.sleep(0.1)
 			base.debugmsg(9, "Wait for SMetric")
+			counter -= 1
+			if counter < 1:
+				return None
 
 		SMetric = base.dbqueue["ReadResult"]["SMetric"]
 		base.debugmsg(6, "SMetric:", SMetric)
