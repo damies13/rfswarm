@@ -1711,16 +1711,24 @@ class RFSwarmBase:
 		if MetricName not in self.MetricIDs[MetricType]:
 			self.MetricIDs["MetricCount"] += 1
 			MetricCount = int(self.MetricIDs["MetricCount"])
-			self.MetricIDs[MetricType][MetricName] = MetricCount
+			self.MetricIDs[MetricType][MetricName] = {}
+			self.MetricIDs[MetricType][MetricName]["ID"] = MetricCount
 			# create the agent metric
 			if self.datadb is not None:
 				self.dbqueue["Metric"].append( (MetricCount, MetricName, MetricType) )
 
-		return self.MetricIDs[MetricType][MetricName]
+		return self.MetricIDs[MetricType][MetricName]["ID"]
 
 	def save_metrics(self, PMetricName, MetricType, MetricTime, SMetricName, MetricValue):
 		self.debugmsg(7, PMetricName, MetricType, MetricTime, SMetricName, MetricValue)
 		metricid = self.create_metric(PMetricName, MetricType)
+
+		# store in memory
+		if SMetricName not in self.MetricIDs[MetricType][PMetricName]:
+			self.MetricIDs[MetricType][PMetricName][SMetricName] = {}
+		self.MetricIDs[MetricType][PMetricName][SMetricName][MetricTime] = MetricValue
+
+		# save to db
 		if self.datadb is not None:
 			self.debugmsg(7, "metricid:", metricid, MetricTime, SMetricName, MetricValue)
 			self.dbqueue["Metrics"].append( (metricid, MetricTime, SMetricName, MetricValue) )
@@ -3321,7 +3329,8 @@ class RFSwarmGUI(tk.Frame):
 
 		grphWindow.fmeMSettings.MTypes = [None, "Loading..."]
 		grphWindow.settings["MType"] = tk.StringVar()
-		grphWindow.fmeMSettings.omMT = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MType"], *grphWindow.fmeMSettings.MTypes)
+		grphWindow.fmeMSettings.omMT = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.MTypes)
+		# grphWindow.fmeMSettings.omMT = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MType"], *grphWindow.fmeMSettings.MTypes)
 		# grphWindow.fmeMSettings.omMT = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MType"], *grphWindow.fmeMSettings.MTypes, command=lambda: self.gs_refresh(grphWindow))
 		# grphWindow.fmeMSettings.omMT = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MType"], *grphWindow.fmeMSettings.MTypes, command=self.gs_refresh(grphWindow))
 		# grphWindow.fmeMSettings.omMT = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MType"], command=self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.MTypes)
@@ -3335,7 +3344,8 @@ class RFSwarmGUI(tk.Frame):
 
 		grphWindow.fmeMSettings.PMetrics = [None, "Loading..."]
 		grphWindow.settings["PMetric"] = tk.StringVar()
-		grphWindow.fmeMSettings.omPM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["PMetric"], *grphWindow.fmeMSettings.PMetrics)
+		grphWindow.fmeMSettings.omPM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["PMetric"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.PMetrics)
+		# grphWindow.fmeMSettings.omPM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["PMetric"], *grphWindow.fmeMSettings.PMetrics)
 		# grphWindow.fmeMSettings.omPM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["PMetric"], *grphWindow.fmeMSettings.PMetrics, command=lambda: self.gs_refresh(grphWindow))
 		# grphWindow.settings["DataType"].set(grphWindow.fmeSettings.Metrics[1])
 		# grphWindow.fmeMSettings.omPM.configure(command=lambda: self.gs_refresh(grphWindow))
@@ -3349,7 +3359,8 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeMSettings.SMetrics = [None, "Loading..."]
 		grphWindow.settings["SMetric"] = tk.StringVar()
 		# grphWindow.fmeMSettings.omSM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["SMetric"], *grphWindow.fmeMSettings.SMetrics, command=lambda: self.gs_refresh(grphWindow))
-		grphWindow.fmeMSettings.omSM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["SMetric"], *grphWindow.fmeMSettings.SMetrics)
+		# grphWindow.fmeMSettings.omSM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["SMetric"], *grphWindow.fmeMSettings.SMetrics)
+		grphWindow.fmeMSettings.omSM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["SMetric"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.SMetrics)
 		# grphWindow.settings["DataType"].set(grphWindow.fmeSettings.Metrics[1])
 		grphWindow.fmeMSettings.omSM.grid(column=1, row=rowM, sticky="nsew")
 
@@ -3411,19 +3422,19 @@ class RFSwarmGUI(tk.Frame):
 
 
 	def gs_updatemetrictypes(self, grphWindow):
-		base.debugmsg(6, "start")
+		base.debugmsg(9, "start")
 		try:
-			base.debugmsg(6, "MetricType:", base.MetricIDs.keys())
+			base.debugmsg(9, "MetricType:", base.MetricIDs.keys())
 
 			newMTypes = [None, ""]
 			for mt in base.MetricIDs.keys():
 				if mt is not "MetricCount":
 					newMTypes.append(mt)
 
-			base.debugmsg(6, "newMTypes:", newMTypes)
+			base.debugmsg(9, "newMTypes:", newMTypes)
 			grphWindow.fmeMSettings.MTypes = newMTypes
 
-			base.debugmsg(6, "grphWindow.fmeMSettings.omMT:", grphWindow.fmeMSettings.omMT)
+			base.debugmsg(9, "grphWindow.fmeMSettings.omMT:", grphWindow.fmeMSettings.omMT)
 			grphWindow.fmeMSettings.omMT.set_menu(*grphWindow.fmeMSettings.MTypes)
 			base.debugmsg(6, "grphWindow.fmeMSettings.omMT.set_menu():", grphWindow.fmeMSettings.MTypes)
 		except Exception as e:
@@ -3433,7 +3444,7 @@ class RFSwarmGUI(tk.Frame):
 
 	def gs_updateprimetrics(self, grphWindow):
 		MType = grphWindow.settings["MType"].get()
-		base.debugmsg(6, "MType:", MType)
+		base.debugmsg(9, "MType:", MType)
 
 		newPMetrics = [None, ""]
 		if MType is not None and len(MType)>0:
@@ -3446,7 +3457,7 @@ class RFSwarmGUI(tk.Frame):
 					for ptype in base.MetricIDs[mtype].keys():
 						newPMetrics.append(ptype)
 
-		base.debugmsg(6, "newPMetrics:", newPMetrics)
+		base.debugmsg(9, "newPMetrics:", newPMetrics)
 		grphWindow.fmeMSettings.PMetrics = newPMetrics
 		grphWindow.fmeMSettings.omPM.set_menu(*grphWindow.fmeMSettings.PMetrics)
 		base.debugmsg(6, "grphWindow.fmeMSettings.omPM.set_menu():", grphWindow.fmeMSettings.PMetrics)
@@ -3458,52 +3469,34 @@ class RFSwarmGUI(tk.Frame):
 		PMetric = grphWindow.settings["PMetric"].get()
 		base.debugmsg(6, "PMetric:", PMetric)
 
-		# SELECT
-		# 	md.SecondaryMetric
-		# FROM MetricData as md
-		# -- WHERE md.MetricType = "Agent"
-		# -- WHERE md.PrimaryMetric = "4b15685d4b34"
-		# -- WHERE md.PrimaryMetric = "20210219_151655_100u_test"
-		# GROUP BY md.SecondaryMetric
-
-		sql  = "SELECT "
-		sql += 		"md.SecondaryMetric "
-		sql += 	"FROM MetricData as md "
-		if MType is not None and len(MType)>0:
-			sql += 	"WHERE md.MetricType = \"" + MType + "\" "
-		if PMetric is not None and len(PMetric)>0:
-			if MType is not None and len(MType)>0:
-				sql += 	"AND md.PrimaryMetric = \"" + PMetric + "\" "
-			else:
-				sql += 	"WHERE md.PrimaryMetric = \"" + PMetric + "\" "
-
-		sql += 	"GROUP BY md.SecondaryMetric "
-
-		base.debugmsg(7, "sql:", sql)
-
-		base.dbqueue["Read"].append({"SQL": sql, "KEY": "SMetric"})
-
-		counter = 600
-		time.sleep(0.1)
-		while "SMetric" not in base.dbqueue["ReadResult"]:
-			time.sleep(0.1)
-			base.debugmsg(9, "Wait for SMetric")
-			counter -= 1
-			if counter < 1:
-				return None
-
-		SMetric = base.dbqueue["ReadResult"]["SMetric"]
-		base.debugmsg(6, "SMetric:", SMetric)
-
+		# self.MetricIDs[MetricType][PMetricName][SMetricName][MetricTime] = MetricValue
 		newSMetrics = [None, ""]
-		for sm in SMetric:
-			try:
-				base.debugmsg(7, "sm:", sm)
-				newSMetrics.append(sm["SecondaryMetric"])
-			except:
-				pass
 
-		base.debugmsg(6, "newSMetrics:", newSMetrics)
+		if MType is not None and len(MType)>0:
+			MTLst = [MType]
+		else:
+			MTLst = list(base.MetricIDs.keys())
+			if "MetricCount" in MTLst:
+				MTLst.remove("MetricCount")
+		base.debugmsg(9, "MTLst:", MTLst)
+
+		if PMetric is not None and len(PMetric)>0:
+			PMLst = [PMetric]
+		else:
+			PMLst = []
+			for mt in MTLst:
+				for pm in base.MetricIDs[mt].keys():
+					PMLst.append(pm)
+		base.debugmsg(9, "PMLst:", PMLst)
+
+		for mt in MTLst:
+			for pm in PMLst:
+				if pm in base.MetricIDs[mt]:
+					for sm in base.MetricIDs[mt][pm].keys():
+						if sm != "ID" and sm not in newSMetrics:
+							newSMetrics.append(sm)
+
+		base.debugmsg(9, "newSMetrics:", newSMetrics)
 		grphWindow.fmeMSettings.SMetrics = newSMetrics
 		grphWindow.fmeMSettings.omSM.set_menu(*grphWindow.fmeMSettings.SMetrics)
 		base.debugmsg(6, "grphWindow.fmeMSettings.omSM.set_menu():", grphWindow.fmeMSettings.SMetrics)
