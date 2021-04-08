@@ -40,11 +40,8 @@ import xml.etree.ElementTree as ET
 
 import inspect
 
-# import Tkinter as tk				#python2
 import tkinter as tk				#python3
-# import ttk						#python2
 import tkinter.ttk as ttk			#python3
-# import tkFileDialog as tkf		#python2
 import tkinter.filedialog as tkf	#python3
 import tkinter.messagebox as tkm	#python3
 
@@ -54,6 +51,13 @@ import urllib.parse
 import json
 
 import argparse
+
+# required for matplot graphs
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+# required for matplot graphs
 
 
 __name__ = "rfswarm"
@@ -494,7 +498,10 @@ class RFSwarmBase:
 	scriptfilters = [""]
 
 	# #000000 = Black
-	defcolours = ['#000000']
+	# https://www.schemecolor.com/traffic-red-yellow-green.php
+	defcolours = ['#000000', '#008450', '#B81D13', '#EFB700']
+	namecolours = ['Total', 'Pass', 'Fail', 'Warning']
+
 
 	appstarted = False
 
@@ -1028,6 +1035,11 @@ class RFSwarmBase:
 		base.debugmsg(8, "PrettyColName: newcolname:", newcolname)
 
 		return newcolname
+
+	def named_colour(self, name):
+		if name not in base.namecolours:
+			base.namecolours.append(name)
+		return self.line_colour(base.namecolours.index(name))
 
 	def line_colour(self, grp):
 		if grp<len(base.defcolours):
@@ -1726,7 +1738,13 @@ class RFSwarmBase:
 		# store in memory
 		if SMetricName not in self.MetricIDs[MetricType][PMetricName]:
 			self.MetricIDs[MetricType][PMetricName][SMetricName] = {}
-		self.MetricIDs[MetricType][PMetricName][SMetricName][MetricTime] = MetricValue
+			self.MetricIDs[MetricType][PMetricName][SMetricName]["Time"] = []
+			self.MetricIDs[MetricType][PMetricName][SMetricName]["objTime"] = []
+			self.MetricIDs[MetricType][PMetricName][SMetricName]["Values"] = []
+		# self.MetricIDs[MetricType][PMetricName][SMetricName][MetricTime] = MetricValue
+		self.MetricIDs[MetricType][PMetricName][SMetricName]["Time"].append(MetricTime)
+		self.MetricIDs[MetricType][PMetricName][SMetricName]["objTime"].append(datetime.fromtimestamp(MetricTime))
+		self.MetricIDs[MetricType][PMetricName][SMetricName]["Values"].append(MetricValue)
 
 		# save to db
 		if self.datadb is not None:
@@ -2847,9 +2865,9 @@ class RFSwarmGUI(tk.Frame):
 		# base.debugmsg(5, "bgclr", bgclr)
 		# https://github.com/tcltk/tk/blob/main/macosx/README
 
+		self.load_icons()
 
 		base.debugmsg(6, "BuildUI")
-
 		self.BuildUI()
 
 		try:
@@ -2859,6 +2877,21 @@ class RFSwarmGUI(tk.Frame):
 		except:
 			pass
 
+
+	def load_icons(self):
+		self.iconew = self.get_icon("New")
+		self.icoopen = self.get_icon("Open")
+		self.icoSave = self.get_icon("Save")
+		self.icoPlay = self.get_icon("Play")
+		self.icoAddRow = self.get_icon("AddRow")
+		self.icoScript = self.get_icon("Script")
+		self.icoAdvanced = self.get_icon("Advanced")
+		self.icoDelete = self.get_icon("Delete")
+		self.icoStop = self.get_icon("Stop")
+		self.icoReport = self.get_icon("report_text")
+		self.icoAbort = self.get_icon("Abort")
+		self.icoAborted = self.get_icon("Aborted")
+		self.icoRefresh = self.get_icon("Refresh")
 
 	def on_closing(self, _event=None):
 
@@ -3222,41 +3255,66 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow = tk.Toplevel(self.root)
 
 		# # start threads to update option lists while building the window
-		# t = threading.Thread(target=lambda: self.gs_refresh(grphWindow))
-		# t.start()
+		t = threading.Thread(target=lambda: self.gs_refresh(grphWindow))
+		t.start()
 
 
 
 		self.newgraph += 1
+		grphWindow.graphid = int(self.newgraph)
 		grphWindow.graphname=tk.StringVar()
 		grphWindow.graphname.set("New Graph {}".format(self.newgraph))
 		base.debugmsg(6, "graphname:", grphWindow.graphname.get())
 
 		grphWindow.title(grphWindow.graphname.get())
 
-		grphWindow.lblBLNK = ttk.Label(grphWindow, text = " ")	# just a blank row as a spacer before the filters
+		grphWindow.fmeBBar = tk.Frame(grphWindow)
+		# grphWindow.fmeBBar.grid(column=0, row=0, sticky="nsew")
+		grphWindow.fmeBBar.grid(column=0, row=0, sticky="ne")
+		grphWindow.fmeContent = tk.Frame(grphWindow)
+		grphWindow.fmeContent.grid(column=0, row=1, sticky="nsew")
+
+		# grphWindow.columnconfigure(0, weight=1)
+		# grphWindow.rowconfigure(0, weight=1)
+		# grphWindow.rowconfigure(1, weight=1)
+
+		grphWindow.lblBLNK = ttk.Label(grphWindow.fmeBBar, text = " ")	# just a blank row as a spacer before the filters
 		grphWindow.lblBLNK.grid(column=0, row=0, sticky="nsew")
 
-
 		icontext = "Advanced"
-		# new = ttk.Button(self.scriptgrid, image=self.imgdata[icontext], text="Settings", command=lambda: self.sr_row_settings(row), width=1)
-		# , command=lambda: self.showhidegraphsettings(grphWindow)
-		# grphWindow.lblSettings = ttk.Label(grphWindow, image=self.imgdata[icontext], text="S", width=1)
-		# grphWindow.lblSettings = ttk.Label(grphWindow, image=self.imgdata[icontext], text="S", command=lambda: self.showhidegraphsettings(grphWindow), width=1)
-		grphWindow.lblSettings = ttk.Button(grphWindow, image=self.imgdata[icontext], text="S", command=lambda: self.gs_showhide(grphWindow), width=1)
+		grphWindow.lblSettings = ttk.Button(grphWindow.fmeBBar, image=self.imgdata[icontext], text="S", command=lambda: self.gs_showhide(grphWindow), width=1)
 		grphWindow.lblSettings.grid(column=99, row=0, sticky="nsew")
 
 		icontext = "Refresh"
-		self.icoRefresh = self.get_icon(icontext)
-		grphWindow.lblSettings = ttk.Button(grphWindow, image=self.imgdata[icontext], text="R", command=lambda: self.gs_refresh(grphWindow), width=1)
+		grphWindow.lblSettings = ttk.Button(grphWindow.fmeBBar, image=self.imgdata[icontext], text="R", command=lambda: self.gs_refresh(grphWindow), width=1)
 		grphWindow.lblSettings.grid(column=98, row=0, sticky="nsew")
 
 
 
-		grphWindow.fmeGraph = tk.Frame(grphWindow)
+		grphWindow.fmeGraph = tk.Frame(grphWindow.fmeContent)
 		grphWindow.fmeGraph.grid(column=0, row=1, columnspan=8, sticky="nsew")
 
-		grphWindow.fmeSettings = tk.Frame(grphWindow)
+		grphWindow.fig = Figure(dpi=100)
+		grphWindow.axis = grphWindow.fig.add_subplot(1,1,1)
+		# self.axis = self.fig.add_subplot()
+		grphWindow.axis.grid(True, 'major', 'both')
+		grphWindow.fig.tight_layout()
+
+		# self.axis.plot([],[])
+
+		# plt.gcf().autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+		grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+
+		grphWindow.canvas = FigureCanvasTkAgg(grphWindow.fig, grphWindow.fmeGraph)
+		grphWindow.canvas.draw()
+		grphWindow.canvas.get_tk_widget().grid(column=0, row=0, sticky="nsew")
+
+		#
+		# # start thread to update the graph (gph_updater)
+		t = threading.Thread(target=lambda: self.gph_updater(grphWindow))
+		t.start()
+
+		grphWindow.fmeSettings = tk.Frame(grphWindow.fmeContent)
 		grphWindow.fmeSettings.grid(column=90, row=1, columnspan=10, sticky="nsew")
 
 		grphWindow.fmeSettings.show = True
@@ -3265,19 +3323,7 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeSettings.lblGN = ttk.Label(grphWindow.fmeSettings, text = "Graph Name:")
 		grphWindow.fmeSettings.lblGN.grid(column=0, row=row, sticky="nsew")
 
-		# grphWindow.fmeSettings.inpGN = ttk.Entry(grphWindow.fmeSettings, validate="focusout", validatecommand=(lambda: self.gs_updatename(grphWindow), "%P"))
-		# grphWindow.fmeSettings.inpGN = ttk.Entry(grphWindow.fmeSettings, validate="focusout", validatecommand=lambda: self.gs_updatename(grphWindow))
-		# grphWindow.fmeSettings.inpGN = ttk.Entry(grphWindow.fmeSettings, validate="all")
-		# grphWindow.fmeSettings.inpGN = ttk.Entry(grphWindow.fmeSettings, validate="focusout")
-		# grphWindow.fmeSettings.inpGN = ttk.Entry(grphWindow.fmeSettings)
 		grphWindow.fmeSettings.inpGN = ttk.Entry(grphWindow.fmeSettings, textvariable=grphWindow.graphname)
-		# grphWindow.fmeSettings.inpGN.delete(0,'end')
-		# grphWindow.fmeSettings.inpGN.insert(0, grphWindow.graphname)
-		# grphWindow.fmeSettings.inpGN.config(validatecommand=lambda *args: self.gs_updatename(grphWindow))
-		# vcGN = self.root.register(lambda: self.gs_updatename(grphWindow))
-		# grphWindow.fmeSettings.inpGN.config(validate="key", validatecommand=(vcGN, '%P'))
-		# grphWindow.fmeSettings.inpGN.config(validate="focusout", validatecommand=lambda *args: self.gs_updatename(grphWindow))
-		# grphWindow.fmeSettings.inpGN.config(validate="all", validatecommand=lambda *args: self.gs_updatename(grphWindow))
 		grphWindow.fmeSettings.inpGN.grid(column=1, row=row, sticky="nsew")
 
 
@@ -3290,14 +3336,8 @@ class RFSwarmGUI(tk.Frame):
 		DataTypes = [None, "Metric", "Result"]
 		grphWindow.settings = {}
 		grphWindow.settings["DataType"] = tk.StringVar()
-		# grphWindow.fmeSettings.omDT = ttk.OptionMenu(grphWindow.fmeSettings, grphWindow.settings["DataType"], *DataTypes)
-		# grphWindow.fmeSettings.omDT = ttk.OptionMenu(grphWindow.fmeSettings, grphWindow.settings["DataType"], *DataTypes, command=lambda: self.gs_refresh(grphWindow))
-		# grphWindow.fmeSettings.omDT = ttk.OptionMenu(grphWindow.fmeSettings, grphWindow.settings["DataType"], *DataTypes, command=self.gs_switchdt(grphWindow))
 		grphWindow.fmeSettings.omDT = ttk.OptionMenu(grphWindow.fmeSettings, grphWindow.settings["DataType"], command=lambda *args: self.gs_switchdt(grphWindow), *DataTypes)
 		grphWindow.settings["DataType"].set(DataTypes[1])
-		# grphWindow.fmeSettings.omDT.configure(command=lambda: self.gs_refresh(grphWindow))
-		# grphWindow.fmeSettings.omDT["Menu"].add_command(lambda: self.gs_refresh(grphWindow))
-		# grphWindow.fmeSettings.omDT["command"]=lambda: self.gs_refresh(grphWindow)
 		grphWindow.fmeSettings.omDT.grid(column=1, row=row, sticky="nsew")
 
 
@@ -3330,12 +3370,6 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeMSettings.MTypes = [None, "Loading..."]
 		grphWindow.settings["MType"] = tk.StringVar()
 		grphWindow.fmeMSettings.omMT = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.MTypes)
-		# grphWindow.fmeMSettings.omMT = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MType"], *grphWindow.fmeMSettings.MTypes)
-		# grphWindow.fmeMSettings.omMT = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MType"], *grphWindow.fmeMSettings.MTypes, command=lambda: self.gs_refresh(grphWindow))
-		# grphWindow.fmeMSettings.omMT = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MType"], *grphWindow.fmeMSettings.MTypes, command=self.gs_refresh(grphWindow))
-		# grphWindow.fmeMSettings.omMT = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MType"], command=self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.MTypes)
-		# grphWindow.settings["DataType"].set(grphWindow.fmeSettings.Metrics[1])
-		# grphWindow.fmeMSettings.omMT.configure(command=lambda: self.gs_refresh(grphWindow))
 		grphWindow.fmeMSettings.omMT.grid(column=1, row=rowM, sticky="nsew")
 
 		rowM +=1
@@ -3345,10 +3379,6 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeMSettings.PMetrics = [None, "Loading..."]
 		grphWindow.settings["PMetric"] = tk.StringVar()
 		grphWindow.fmeMSettings.omPM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["PMetric"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.PMetrics)
-		# grphWindow.fmeMSettings.omPM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["PMetric"], *grphWindow.fmeMSettings.PMetrics)
-		# grphWindow.fmeMSettings.omPM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["PMetric"], *grphWindow.fmeMSettings.PMetrics, command=lambda: self.gs_refresh(grphWindow))
-		# grphWindow.settings["DataType"].set(grphWindow.fmeSettings.Metrics[1])
-		# grphWindow.fmeMSettings.omPM.configure(command=lambda: self.gs_refresh(grphWindow))
 		grphWindow.fmeMSettings.omPM.grid(column=1, row=rowM, sticky="nsew")
 
 
@@ -3358,16 +3388,89 @@ class RFSwarmGUI(tk.Frame):
 
 		grphWindow.fmeMSettings.SMetrics = [None, "Loading..."]
 		grphWindow.settings["SMetric"] = tk.StringVar()
-		# grphWindow.fmeMSettings.omSM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["SMetric"], *grphWindow.fmeMSettings.SMetrics, command=lambda: self.gs_refresh(grphWindow))
-		# grphWindow.fmeMSettings.omSM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["SMetric"], *grphWindow.fmeMSettings.SMetrics)
 		grphWindow.fmeMSettings.omSM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["SMetric"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.SMetrics)
-		# grphWindow.settings["DataType"].set(grphWindow.fmeSettings.Metrics[1])
 		grphWindow.fmeMSettings.omSM.grid(column=1, row=rowM, sticky="nsew")
 
 		# start threads to update option lists
 		t = threading.Thread(target=lambda: self.gs_refresh(grphWindow))
 		t.start()
 
+	def gph_updater(self, grphWindow):
+		try:
+			while True:
+				base.debugmsg(6, "graphname:", grphWindow.graphname.get())
+				self.gph_refresh(grphWindow)
+				time.sleep(5)
+		except:
+			pass
+
+
+	def gph_refresh(self, grphWindow):
+		base.debugmsg(6, "graphname:", grphWindow.graphname.get())
+		DataType = grphWindow.settings["DataType"].get()
+		base.debugmsg(6, "DataType:", DataType)
+		if DataType == "Metric":
+			MType = grphWindow.settings["MType"].get()
+			base.debugmsg(6, "MType:", MType)
+			PMetric = grphWindow.settings["PMetric"].get()
+			base.debugmsg(6, "PMetric:", PMetric)
+			SMetric = grphWindow.settings["SMetric"].get()
+			base.debugmsg(6, "SMetric:", SMetric)
+
+			if MType is not None and len(MType)>0:
+				MTLst = [MType]
+			else:
+				MTLst = list(base.MetricIDs.keys())
+				if "MetricCount" in MTLst:
+					MTLst.remove("MetricCount")
+			base.debugmsg(6, "MTLst:", MTLst)
+
+			if PMetric is not None and len(PMetric)>0:
+				PMLst = [PMetric]
+			else:
+				PMLst = []
+				for mt in MTLst:
+					for pm in base.MetricIDs[mt].keys():
+						PMLst.append(pm)
+			base.debugmsg(6, "PMLst:", PMLst)
+
+			if SMetric is not None and len(SMetric)>0:
+				SMLst = [SMetric]
+			else:
+				SMLst = []
+				for mt in MTLst:
+					for pm in PMLst:
+						if pm in base.MetricIDs[mt]:
+							for sm in base.MetricIDs[mt][pm].keys():
+								if sm != "ID":
+									SMLst.append(sm)
+			base.debugmsg(6, "SMLst:", SMLst)
+
+
+			grphWindow.axis.cla()
+			for mt in MTLst:
+				for pm in PMLst:
+					if pm in base.MetricIDs[mt]:
+						for sm in SMLst:
+							if sm in base.MetricIDs[mt][pm]:
+								base.debugmsg(6, "[",mt,"][",pm,"][",sm,"]:", base.MetricIDs[mt][pm][sm])
+								name = "{} {} {}".format(mt,pm,sm)
+								colour = base.named_colour(name)
+								# colour = base.line_colour(base.scriptcount)
+								base.debugmsg(6, "name:", name, "	colour:", colour)
+								# RFSwarmGUI: gph_refresh(3416): [6:6]	 [ Agent ][ 2013Air4G11.fritz.box ][ Load ]: {'Time': [1617848845, 1617848855, 1617848868, 1617848875, 1617848885, 1617848895, 1617848905], 'Values': [68.4, 68.4, 68.4, 68.4, 68.4, 68.4, 68.4]} 	[0.6.5 @2021-04-08 12:28:31]
+								grphWindow.axis.plot(base.MetricIDs[mt][pm][sm]["objTime"],base.MetricIDs[mt][pm][sm]["Values"], colour)
+
+			# self.canvas.gcf().autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+			grphWindow.axis.grid(True, 'major', 'both')
+			if SMetric in ["Load", "CPU", "MEM", "NET"]:
+				grphWindow.axis.set_ylim(0, 100)
+			grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+			grphWindow.canvas.draw()
+
+
+		if DataType == "Result":
+			pass
 
 
 	def gs_refresh(self, grphWindow):
@@ -3384,6 +3487,8 @@ class RFSwarmGUI(tk.Frame):
 		tsm = threading.Thread(target=lambda: self.gs_updatesecmetrics(grphWindow))
 		tsm.start()
 		base.debugmsg(6, "tsm")
+		tgr = threading.Thread(target=lambda: self.gph_refresh(grphWindow))
+		tgr.start()
 
 
 
@@ -3428,7 +3533,7 @@ class RFSwarmGUI(tk.Frame):
 
 			newMTypes = [None, ""]
 			for mt in base.MetricIDs.keys():
-				if mt is not "MetricCount":
+				if mt != "MetricCount":
 					newMTypes.append(mt)
 
 			base.debugmsg(9, "newMTypes:", newMTypes)
@@ -3453,7 +3558,7 @@ class RFSwarmGUI(tk.Frame):
 			PMetric = []
 			for mtype in base.MetricIDs.keys():
 				base.debugmsg(6, "mtype:", mtype)
-				if mtype is not "MetricCount":
+				if mtype != "MetricCount":
 					for ptype in base.MetricIDs[mtype].keys():
 						newPMetrics.append(ptype)
 
@@ -3535,7 +3640,6 @@ class RFSwarmGUI(tk.Frame):
 		btnno = 0
 		icontext = "New"
 		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		self.iconew = self.get_icon(icontext)
 		base.debugmsg(9, "self.imgdata:", self.imgdata)
 		base.debugmsg(9, "self.imgdata:[",icontext,"]", self.imgdata[icontext])
 		bnew = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_New)
@@ -3549,7 +3653,6 @@ class RFSwarmGUI(tk.Frame):
 
 		icontext = "Open"
 		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		self.icoopen = self.get_icon(icontext)
 		base.debugmsg(9, "self.imgdata:", self.imgdata)
 		base.debugmsg(9, "self.imgdata:[",icontext,"]", self.imgdata[icontext])
 		bopen = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_Open)
@@ -3563,7 +3666,6 @@ class RFSwarmGUI(tk.Frame):
 		btnno += 1
 		icontext = "Save"
 		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		self.icoSave = self.get_icon(icontext)
 		base.debugmsg(9, "self.imgdata:", self.imgdata)
 		base.debugmsg(9, "self.imgdata:[",icontext,"]", self.imgdata[icontext])
 		bSave = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_Save)
@@ -3576,7 +3678,6 @@ class RFSwarmGUI(tk.Frame):
 		btnno += 1
 		icontext = "Play"
 		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		self.icoPlay = self.get_icon(icontext)
 		base.debugmsg(9, "self.imgdata:", self.imgdata)
 		base.debugmsg(9, "self.imgdata:[",icontext,"]", self.imgdata[icontext])
 		bPlay = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', text="Play", command=self.ClickPlay)
@@ -3679,15 +3780,11 @@ class RFSwarmGUI(tk.Frame):
 		tst.grid(column=self.plancolset, row=0, sticky="nsew")
 
 		icontext = "AddRow"
-		self.icoAddRow = self.get_icon(icontext)
 		self.scriptgrid.columnconfigure(self.plancoladd, weight=0)
 		new = ttk.Button(self.scriptgrid, image=self.imgdata[icontext], padding='3 3 3 3', text="+", command=base.addScriptRow, width=1)
 		new.grid(column=self.plancoladd, row=0, sticky="nsew")
 
 
-		self.icoScript = self.get_icon("Script")
-		self.icoAdvanced = self.get_icon("Advanced")
-		self.icoDelete = self.get_icon("Delete")
 
 		# self.scrollable_sg.update()
 		# update scrollbars
@@ -3706,7 +3803,6 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(6, "Test Started:	", int(time.time()), "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
 
 		icontext = "Stop"
-		self.icoStop = self.get_icon(icontext)
 		self.elements["Run"]["btn_stop"]["image"] = self.icoStop
 
 		self.tabs.select(1)
@@ -5020,7 +5116,6 @@ class RFSwarmGUI(tk.Frame):
 
 
 		icontext = "Stop"
-		self.icoStop = self.get_icon(icontext)
 		# self.elements["Run"]["btn_stop"]
 		self.elements["Run"]["btn_stop"] = ttk.Button(rgbar, image=self.imgdata[icontext], padding='3 3 3 3', text="Stop", command=self.ClickStop)
 		# self.elements["Run"]["btn_stop"] = ttk.Button(rgbar, text='Stop', command=self.ClickStop)
@@ -5028,7 +5123,6 @@ class RFSwarmGUI(tk.Frame):
 
 
 		icontext = "report_text"
-		self.icoStop = self.get_icon(icontext)
 		rpt = ttk.Button(rgbar, image=self.imgdata[icontext], padding='3 3 3 3', text="Stop", command=base.report_text)
 		rpt.grid(column=50, row=1, sticky="nsew") # , rowspan=2
 
@@ -5201,12 +5295,10 @@ class RFSwarmGUI(tk.Frame):
 		# update stop button
 		if base.run_end < int(time.time()):
 			icontext = "Abort"
-			self.icoStop = self.get_icon(icontext)
 			self.elements["Run"]["btn_stop"]["image"] = self.icoStop
 
 		if base.run_finish > 0:
 			icontext = "Aborted"
-			self.icoStop = self.get_icon(icontext)
 			self.elements["Run"]["btn_stop"]["image"] = self.icoStop
 
 		time_elapsed = int(time.time()) - self.rungridupdate
@@ -5337,13 +5429,11 @@ class RFSwarmGUI(tk.Frame):
 				# reallyabort = tkm.askyesno('RFSwarm - Abort Run','Do you want to abort this run? Clicking yes will kill all running robots!', icon='error')
 				if reallyabort:
 					icontext = "Aborted"
-					self.icoStop = self.get_icon(icontext)
 					self.elements["Run"]["btn_stop"]["image"] = self.icoStop
 					core.ClickStop()
 		else:
 			base.debugmsg(5, "Stop Clicked 1st time")
 			icontext = "Abort"
-			self.icoStop = self.get_icon(icontext)
 			base.debugmsg(9, "icoStop", self.icoStop)
 			base.debugmsg(9, "btn_stop", self.elements["Run"]["btn_stop"])
 			self.elements["Run"]["btn_stop"]["image"] = self.icoStop
