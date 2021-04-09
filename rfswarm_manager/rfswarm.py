@@ -469,7 +469,7 @@ class RFSwarmBase:
 
 
 	run_abort = False
-	run_name = ""
+	run_name = "PreRun"
 	run_name_current = ""
 	run_start = 0
 	run_end = 0
@@ -789,6 +789,8 @@ class RFSwarmBase:
 			base.debugmsg(5, "dbfile:", self.dbfile)
 			if not os.path.exists(self.dbfile):
 				createschema = True
+			else:
+				createschema = False
 
 			if self.datadb is None:
 				base.debugmsg(5, "Connect to DB")
@@ -1724,10 +1726,11 @@ class RFSwarmBase:
 			self.MetricIDs["MetricCount"] += 1
 			MetricCount = int(self.MetricIDs["MetricCount"])
 			self.MetricIDs[MetricType][MetricName] = {}
-			self.MetricIDs[MetricType][MetricName]["ID"] = MetricCount
+			MetricID = int(time.time()) + MetricCount
+			self.MetricIDs[MetricType][MetricName]["ID"] = MetricID
 			# create the agent metric
 			if self.datadb is not None:
-				self.dbqueue["Metric"].append( (MetricCount, MetricName, MetricType) )
+				self.dbqueue["Metric"].append( (MetricID, MetricName, MetricType) )
 
 		return self.MetricIDs[MetricType][MetricName]["ID"]
 
@@ -3460,6 +3463,20 @@ class RFSwarmGUI(tk.Frame):
 								base.debugmsg(6, "name:", name, "	colour:", colour)
 								# RFSwarmGUI: gph_refresh(3416): [6:6]	 [ Agent ][ 2013Air4G11.fritz.box ][ Load ]: {'Time': [1617848845, 1617848855, 1617848868, 1617848875, 1617848885, 1617848895, 1617848905], 'Values': [68.4, 68.4, 68.4, 68.4, 68.4, 68.4, 68.4]} 	[0.6.5 @2021-04-08 12:28:31]
 								grphWindow.axis.plot(base.MetricIDs[mt][pm][sm]["objTime"],base.MetricIDs[mt][pm][sm]["Values"], colour)
+
+			#
+			# Not sure if I should be worrying about the memory usage storing all the metrics in memory
+			# 	If it becomes a problem will need to switch to pulling only the graph data from the db
+			# 	which will be slower, but the sql below should help. need to do some testing with lots of txns
+			# 
+			# SELECT
+			# 	*
+			# -- 	MetricTime, MetricValue
+			# FROM MetricData
+			# -- WHERE MetricType = 'Scenario'
+			# -- WHERE PrimaryMetric = 'PreRun'
+			# WHERE SecondaryMetric = 'total_robots'
+
 
 			# self.canvas.gcf().autofmt_xdate(bottom=0.2, rotation=30, ha='right')
 			grphWindow.axis.grid(True, 'major', 'both')
