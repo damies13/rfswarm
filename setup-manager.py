@@ -13,7 +13,10 @@ setuptools.setup(
 	long_description_content_type="text/markdown",
 	url="https://github.com/damies13/rfswarm",
 	packages=setuptools.find_packages(exclude=["*fswarm_agen*", "build/*"]),
-	install_requires=['configparser', 'HTTPServer', 'pillow'],
+	# I needed a recent version of pip (pip 21.0.1 worked my previous <20 version didn't) for matplotlib
+	# 	to actually install withput error
+	# https://matplotlib.org/stable/users/installing.html
+	install_requires=['configparser', 'HTTPServer', 'pillow', 'pip>=21', 'matplotlib'],
 	classifiers=[
 		"Development Status :: 4 - Beta",
 		"Topic :: Software Development :: Testing",
