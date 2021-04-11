@@ -3484,9 +3484,9 @@ class RFSwarmGUI(tk.Frame):
 									sql += 		"  MetricTime "
 									sql += 		", MetricValue "
 									sql += "FROM MetricData "
-									sql += "WHERE MetricType = '{}' ".format(mt)
-									sql += "	AND PrimaryMetric = '{}' ".format(pm)
-									sql += "	AND SecondaryMetric = '{}' ".format(sm)
+									sql += "WHERE MetricType = '{}' ".format(mt.replace("'", "''"))
+									sql += "	AND PrimaryMetric = '{}' ".format(pm.replace("'", "''"))
+									sql += "	AND SecondaryMetric = '{}' ".format(sm.replace("'", "''"))
 
 									base.debugmsg(7, "sql:", sql)
 
