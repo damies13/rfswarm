@@ -3468,6 +3468,8 @@ class RFSwarmGUI(tk.Frame):
 			# Not sure if I should be worrying about the memory usage storing all the metrics in memory
 			# 	If it becomes a problem will need to switch to pulling only the graph data from the db
 			# 	which will be slower, but the sql below should help. need to do some testing with lots of txns
+			#
+			# Ran a 10 user test for 2 hours and memory of the manager increased by 34Mb so I was right to be worried
 			# 
 			# SELECT
 			# 	*
