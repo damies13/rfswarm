@@ -169,9 +169,7 @@ class RFSwarmAgent():
 			self.saveini()
 
 
-		if not self.xmlmode:
-			self.debugmsg(6, "self.xmlmode: ", self.xmlmode)
-			self.create_listner_file()
+		self.ensure_listner_file()
 
 		t = threading.Thread(target=self.tick_counter)
 		t.start()
@@ -773,6 +771,9 @@ class RFSwarmAgent():
 
 	def runthread(self, jobid):
 		now = int(time.time())
+
+		self.ensure_listner_file()
+		
 		if "ScriptIndex" not in self.jobs[jobid]:
 			self.debugmsg(6, "runthread: jobid:", jobid)
 			self.debugmsg(6, "runthread: job data:", self.jobs[jobid])
@@ -1209,6 +1210,15 @@ class RFSwarmAgent():
 			self.debugmsg(1, "Directory Create failed: ", dir)
 			self.debugmsg(1, "with error: ", e)
 			return False
+
+	def ensure_listner_file(self):
+		if not self.xmlmode:
+			self.debugmsg(6, "self.xmlmode: ", self.xmlmode)
+			if self.listenerfile is None:
+				self.create_listner_file()
+			else:
+				if not os.path.isfile(self.listenerfile):
+					self.create_listner_file()
 
 	def create_listner_file(self):
 		self.listenerfile = os.path.join(self.scriptdir, "RFSListener2.py")

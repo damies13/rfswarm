@@ -627,7 +627,7 @@ class RFSwarmBase:
 					base.debugmsg(9, "run_db_thread: dbqueue: Results")
 					resdata = list(base.dbqueue["Results"])
 					base.dbqueue["Results"] = []
-					base.debugmsg(6, "dbqueue: Results: resdata:", resdata)
+					base.debugmsg(7, "dbqueue: Results: resdata:", resdata)
 					try:
 						sql = "INSERT INTO Results VALUES (?,?,?,?,?,?,?,?,?,?)"
 						cur = self.datadb.cursor()
@@ -2222,7 +2222,7 @@ class RFSwarmCore:
 	def register_result(self, AgentName, result_name, result, elapsed_time, start_time, end_time, index, vuser, iter, sequence):
 		base.debugmsg(9, "register_result")
 		resdata = (index, vuser, iter, AgentName, sequence, result_name, result, elapsed_time, start_time, end_time)
-		base.debugmsg(6, "resdata:", resdata)
+		base.debugmsg(7, "resdata:", resdata)
 		base.dbqueue["Results"].append(resdata)
 		base.debugmsg(9, "dbqueue Results:", base.dbqueue["Results"])
 
