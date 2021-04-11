@@ -966,8 +966,8 @@ class RFSwarmBase:
 					, (Select pct.Value from Metrics pct where pct.ParentID = a.ID and pct.Key like "%ile" and e.Time = pct.Time ) "%ile_Value"
 					, (Select mx.Value from Metrics mx where mx.ParentID = a.ID and mx.Key like "max%" and e.Time = mx.Time ) "Max"
 					, (Select ps.Value from Metrics ps where ps.ParentID = a.ID and ps.Key like "_pass%" and e.Time = ps.Time ) "Pass"
-					, (Select fl.Value from Metrics fl where fl.ParentID = a.ROIDWID and fl.Key like "_fail%" and e.Time = fl.Time ) "Fail"
-					, (Select ot.Value from Metrics ot where ot.ParentID = a.ROIDWID and ot.Key like "_other%" and e.Time = ot.Time ) "Other"
+					, (Select fl.Value from Metrics fl where fl.ParentID = a.ID and fl.Key like "_fail%" and e.Time = fl.Time ) "Fail"
+					, (Select ot.Value from Metrics ot where ot.ParentID = a.ID and ot.Key like "_other%" and e.Time = ot.Time ) "Other"
 				from Metric a
 					left join Metrics e on e.ParentID = a.ID and e.Key = "EntryTime"
 				where a.Type = "Summary"
@@ -1741,7 +1741,7 @@ class RFSwarmBase:
 		# store in memory
 		if SMetricName not in self.MetricIDs[MetricType][PMetricName]:
 			self.MetricIDs[MetricType][PMetricName][SMetricName] = {}
-		# I don't want to store all the data in memory, this can be pulled from the DB 
+		# I don't want to store all the data in memory, this can be pulled from the DB
 		# 	self.MetricIDs[MetricType][PMetricName][SMetricName]["Time"] = []
 		# 	self.MetricIDs[MetricType][PMetricName][SMetricName]["objTime"] = []
 		# 	self.MetricIDs[MetricType][PMetricName][SMetricName]["Values"] = []
