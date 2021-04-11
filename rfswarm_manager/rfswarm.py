@@ -1741,13 +1741,14 @@ class RFSwarmBase:
 		# store in memory
 		if SMetricName not in self.MetricIDs[MetricType][PMetricName]:
 			self.MetricIDs[MetricType][PMetricName][SMetricName] = {}
-			self.MetricIDs[MetricType][PMetricName][SMetricName]["Time"] = []
-			self.MetricIDs[MetricType][PMetricName][SMetricName]["objTime"] = []
-			self.MetricIDs[MetricType][PMetricName][SMetricName]["Values"] = []
-		# self.MetricIDs[MetricType][PMetricName][SMetricName][MetricTime] = MetricValue
-		self.MetricIDs[MetricType][PMetricName][SMetricName]["Time"].append(MetricTime)
-		self.MetricIDs[MetricType][PMetricName][SMetricName]["objTime"].append(datetime.fromtimestamp(MetricTime))
-		self.MetricIDs[MetricType][PMetricName][SMetricName]["Values"].append(MetricValue)
+		# I don't want to store all the data in memory, this can be pulled from the DB 
+		# 	self.MetricIDs[MetricType][PMetricName][SMetricName]["Time"] = []
+		# 	self.MetricIDs[MetricType][PMetricName][SMetricName]["objTime"] = []
+		# 	self.MetricIDs[MetricType][PMetricName][SMetricName]["Values"] = []
+		# # self.MetricIDs[MetricType][PMetricName][SMetricName][MetricTime] = MetricValue
+		# self.MetricIDs[MetricType][PMetricName][SMetricName]["Time"].append(MetricTime)
+		# self.MetricIDs[MetricType][PMetricName][SMetricName]["objTime"].append(datetime.fromtimestamp(MetricTime))
+		# self.MetricIDs[MetricType][PMetricName][SMetricName]["Values"].append(MetricValue)
 
 		# save to db
 		if self.datadb is not None:
@@ -3269,6 +3270,8 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.graphname.set("New Graph {}".format(self.newgraph))
 		base.debugmsg(6, "graphname:", grphWindow.graphname.get())
 
+		grphWindow.graphdata = {}
+
 		grphWindow.title(grphWindow.graphname.get())
 
 		grphWindow.fmeBBar = tk.Frame(grphWindow)
@@ -3329,6 +3332,13 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeSettings.inpGN = ttk.Entry(grphWindow.fmeSettings, textvariable=grphWindow.graphname)
 		grphWindow.fmeSettings.inpGN.grid(column=1, row=row, sticky="nsew")
 
+		row +=1
+		grphWindow.fmeSettings.lblLGD = ttk.Label(grphWindow.fmeSettings, text = "Show Legend:")
+		grphWindow.fmeSettings.lblLGD.grid(column=0, row=row, sticky="nsew")
+
+		grphWindow.showlegend = tk.IntVar()
+		grphWindow.fmeSettings.inpLGD = ttk.Checkbutton(grphWindow.fmeSettings, variable=grphWindow.showlegend)
+		grphWindow.fmeSettings.inpLGD.grid(column=1, row=row, sticky="nsew")
 
 		# other settings? Metric Type, Primary metric, Secondary metric, filter?
 
@@ -3420,8 +3430,10 @@ class RFSwarmGUI(tk.Frame):
 			SMetric = grphWindow.settings["SMetric"].get()
 			base.debugmsg(6, "SMetric:", SMetric)
 
+			hasfilter = False;
 			if MType is not None and len(MType)>0:
 				MTLst = [MType]
+				hasfilter = True;
 			else:
 				MTLst = list(base.MetricIDs.keys())
 				if "MetricCount" in MTLst:
@@ -3430,6 +3442,7 @@ class RFSwarmGUI(tk.Frame):
 
 			if PMetric is not None and len(PMetric)>0:
 				PMLst = [PMetric]
+				hasfilter = True;
 			else:
 				PMLst = []
 				for mt in MTLst:
@@ -3439,6 +3452,7 @@ class RFSwarmGUI(tk.Frame):
 
 			if SMetric is not None and len(SMetric)>0:
 				SMLst = [SMetric]
+				hasfilter = True;
 			else:
 				SMLst = []
 				for mt in MTLst:
@@ -3449,43 +3463,80 @@ class RFSwarmGUI(tk.Frame):
 									SMLst.append(sm)
 			base.debugmsg(6, "SMLst:", SMLst)
 
-
-			grphWindow.axis.cla()
-			for mt in MTLst:
-				for pm in PMLst:
-					if pm in base.MetricIDs[mt]:
-						for sm in SMLst:
-							if sm in base.MetricIDs[mt][pm]:
-								base.debugmsg(6, "[",mt,"][",pm,"][",sm,"]:", base.MetricIDs[mt][pm][sm])
-								name = "{} {} {}".format(mt,pm,sm)
-								colour = base.named_colour(name)
-								# colour = base.line_colour(base.scriptcount)
-								base.debugmsg(6, "name:", name, "	colour:", colour)
-								# RFSwarmGUI: gph_refresh(3416): [6:6]	 [ Agent ][ 2013Air4G11.fritz.box ][ Load ]: {'Time': [1617848845, 1617848855, 1617848868, 1617848875, 1617848885, 1617848895, 1617848905], 'Values': [68.4, 68.4, 68.4, 68.4, 68.4, 68.4, 68.4]} 	[0.6.5 @2021-04-08 12:28:31]
-								grphWindow.axis.plot(base.MetricIDs[mt][pm][sm]["objTime"],base.MetricIDs[mt][pm][sm]["Values"], colour)
-
-			#
-			# Not sure if I should be worrying about the memory usage storing all the metrics in memory
-			# 	If it becomes a problem will need to switch to pulling only the graph data from the db
-			# 	which will be slower, but the sql below should help. need to do some testing with lots of txns
-			#
-			# Ran a 10 user test for 2 hours and memory of the manager increased by 34Mb so I was right to be worried
-			# 
-			# SELECT
-			# 	*
-			# -- 	MetricTime, MetricValue
-			# FROM MetricData
-			# -- WHERE MetricType = 'Scenario'
-			# -- WHERE PrimaryMetric = 'PreRun'
-			# WHERE SecondaryMetric = 'total_robots'
+			if hasfilter:
+				grphWindow.axis.cla()
+				for mt in MTLst:
+					for pm in PMLst:
+						if pm in base.MetricIDs[mt]:
+							for sm in SMLst:
+								if sm in base.MetricIDs[mt][pm]:
+									# base.debugmsg(6, "[",mt,"][",pm,"][",sm,"]:", base.MetricIDs[mt][pm][sm])
+									name = "{} {} {}".format(mt,pm,sm)
+									colour = base.named_colour(name)
+									# colour = base.line_colour(base.scriptcount)
+									base.debugmsg(6, "name:", name, "	colour:", colour)
+									# RFSwarmGUI: gph_refresh(3416): [6:6]	 [ Agent ][ 2013Air4G11.fritz.box ][ Load ]: {'Time': [1617848845, 1617848855, 1617848868, 1617848875, 1617848885, 1617848895, 1617848905], 'Values': [68.4, 68.4, 68.4, 68.4, 68.4, 68.4, 68.4]} 	[0.6.5 @2021-04-08 12:28:31]
+									# grphWindow.axis.plot(base.MetricIDs[mt][pm][sm]["objTime"],base.MetricIDs[mt][pm][sm]["Values"], colour, label=name)	#
 
 
-			# self.canvas.gcf().autofmt_xdate(bottom=0.2, rotation=30, ha='right')
-			grphWindow.axis.grid(True, 'major', 'both')
-			if SMetric in ["Load", "CPU", "MEM", "NET"]:
-				grphWindow.axis.set_ylim(0, 100)
-			grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
-			grphWindow.canvas.draw()
+
+									sql = "SELECT "
+									sql += 		"  MetricTime "
+									sql += 		", MetricValue "
+									sql += "FROM MetricData "
+									sql += "WHERE MetricType = '{}' ".format(mt)
+									sql += "	AND PrimaryMetric = '{}' ".format(pm)
+									sql += "	AND SecondaryMetric = '{}' ".format(sm)
+
+									base.debugmsg(7, "sql:", sql)
+
+									base.dbqueue["Read"].append({"SQL": sql, "KEY": "GraphData_{}".format(name)})
+
+
+				for mt in MTLst:
+					for pm in PMLst:
+						if pm in base.MetricIDs[mt]:
+							for sm in SMLst:
+								if sm in base.MetricIDs[mt][pm]:
+									# base.debugmsg(6, "[",mt,"][",pm,"][",sm,"]:", base.MetricIDs[mt][pm][sm])
+									name = "{} {} {}".format(mt,pm,sm)
+									if name not in grphWindow.graphdata:
+										grphWindow.graphdata[name] = {}
+									colour = base.named_colour(name)
+									grphWindow.graphdata[name]["Colour"] = colour
+									# grphWindow.graphdata[name]["Time"] = []
+									grphWindow.graphdata[name]["objTime"] = []
+									grphWindow.graphdata[name]["Values"] = []
+									gdname = "GraphData_{}".format(name)
+									if gdname in base.dbqueue["ReadResult"]:
+										# base.debugmsg(6, gdname, ":", base.dbqueue["ReadResult"][gdname])
+										for ires in base.dbqueue["ReadResult"][gdname]:
+											# grphWindow.graphdata[name]["Time"].append(ires["MetricTime"])
+											grphWindow.graphdata[name]["objTime"].append(datetime.fromtimestamp(ires["MetricTime"]))
+											try:
+												grphWindow.graphdata[name]["Values"].append(float(ires["MetricValue"]))
+											except:
+												grphWindow.graphdata[name]["Values"].append(ires["MetricValue"])
+
+										base.debugmsg(9, gdname, ":", grphWindow.graphdata[name])
+										grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"],grphWindow.graphdata[name]["Values"], colour, label=name)
+
+
+
+				# self.canvas.gcf().autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+				grphWindow.axis.grid(True, 'major', 'both')
+				base.debugmsg(6, "SMetric:", SMetric)
+				if SMetric in ["Load", "CPU", "MEM", "NET"]:
+					grphWindow.axis.set_ylim(0, 100)
+
+				base.debugmsg(9, "showlegend:", grphWindow.showlegend.get())
+				if grphWindow.showlegend.get():
+					# grphWindow.axis.legend()
+					# grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),&nbsp; shadow=True, ncol=2)
+					grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
+
+				grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+				grphWindow.canvas.draw()
 
 
 		if DataType == "Result":
