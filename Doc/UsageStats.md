@@ -3,6 +3,7 @@
 # PyPi Usage Stats
 ## Manager (was previously called Server/GUI)
 [Manager](https://pypistats.org/packages/rfswarm-manager)
+
 [Server/GUI](https://pypistats.org/packages/rfswarm-gui)
 
 ## Agent
