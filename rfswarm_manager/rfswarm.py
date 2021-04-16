@@ -477,7 +477,7 @@ class RFSwarmBase:
 	run_paused = False
 	run_threads = {}
 	total_robots = 0
-	robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}}
+	robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}, "Start":0}
 	agentserver = None
 	agenthttpserver = None
 	updatethread = None
@@ -3258,12 +3258,6 @@ class RFSwarmGUI(tk.Frame):
 		# base.debugmsg(7, "New Graph Window - args:", args)
 		grphWindow = tk.Toplevel(self.root)
 
-		# # start threads to update option lists while building the window
-		t = threading.Thread(target=lambda: self.gs_refresh(grphWindow))
-		t.start()
-
-
-
 		self.newgraph += 1
 		grphWindow.graphid = int(self.newgraph)
 		grphWindow.graphname=tk.StringVar()
@@ -3417,6 +3411,11 @@ class RFSwarmGUI(tk.Frame):
 		except:
 			pass
 
+	def gph_floatval(self, value):
+		try:
+			return float(value)
+		except:
+			return value
 
 	def gph_refresh(self, grphWindow):
 		base.debugmsg(6, "graphname:", grphWindow.graphname.get())
@@ -3463,6 +3462,7 @@ class RFSwarmGUI(tk.Frame):
 									SMLst.append(sm)
 			base.debugmsg(6, "SMLst:", SMLst)
 
+			GDNames = []
 			if hasfilter:
 				grphWindow.axis.cla()
 				for mt in MTLst:
@@ -3470,15 +3470,11 @@ class RFSwarmGUI(tk.Frame):
 						if pm in base.MetricIDs[mt]:
 							for sm in SMLst:
 								if sm in base.MetricIDs[mt][pm]:
-									# base.debugmsg(6, "[",mt,"][",pm,"][",sm,"]:", base.MetricIDs[mt][pm][sm])
-									name = "{} {} {}".format(mt,pm,sm)
-									colour = base.named_colour(name)
-									# colour = base.line_colour(base.scriptcount)
-									base.debugmsg(6, "name:", name, "	colour:", colour)
-									# RFSwarmGUI: gph_refresh(3416): [6:6]	 [ Agent ][ 2013Air4G11.fritz.box ][ Load ]: {'Time': [1617848845, 1617848855, 1617848868, 1617848875, 1617848885, 1617848895, 1617848905], 'Values': [68.4, 68.4, 68.4, 68.4, 68.4, 68.4, 68.4]} 	[0.6.5 @2021-04-08 12:28:31]
-									# grphWindow.axis.plot(base.MetricIDs[mt][pm][sm]["objTime"],base.MetricIDs[mt][pm][sm]["Values"], colour, label=name)	#
+									# name = " ".join(list(set([mt,pm,sm]).symmetric_difference(set([MType, PMetric, SMetric])))).strip()
+									name = "{}|{}|{}".format(mt,pm,sm)
 
-
+									base.debugmsg(6, "name:", name)
+									GDNames.append(name)
 
 									sql = "SELECT "
 									sql += 		"  MetricTime "
@@ -3493,33 +3489,28 @@ class RFSwarmGUI(tk.Frame):
 									base.dbqueue["Read"].append({"SQL": sql, "KEY": "GraphData_{}".format(name)})
 
 
-				for mt in MTLst:
-					for pm in PMLst:
-						if pm in base.MetricIDs[mt]:
-							for sm in SMLst:
-								if sm in base.MetricIDs[mt][pm]:
-									# base.debugmsg(6, "[",mt,"][",pm,"][",sm,"]:", base.MetricIDs[mt][pm][sm])
-									name = "{} {} {}".format(mt,pm,sm)
-									if name not in grphWindow.graphdata:
-										grphWindow.graphdata[name] = {}
-									colour = base.named_colour(name)
-									grphWindow.graphdata[name]["Colour"] = colour
-									# grphWindow.graphdata[name]["Time"] = []
-									grphWindow.graphdata[name]["objTime"] = []
-									grphWindow.graphdata[name]["Values"] = []
-									gdname = "GraphData_{}".format(name)
-									if gdname in base.dbqueue["ReadResult"]:
-										# base.debugmsg(6, gdname, ":", base.dbqueue["ReadResult"][gdname])
-										for ires in base.dbqueue["ReadResult"][gdname]:
-											# grphWindow.graphdata[name]["Time"].append(ires["MetricTime"])
-											grphWindow.graphdata[name]["objTime"].append(datetime.fromtimestamp(ires["MetricTime"]))
-											try:
-												grphWindow.graphdata[name]["Values"].append(float(ires["MetricValue"]))
-											except:
-												grphWindow.graphdata[name]["Values"].append(ires["MetricValue"])
+				for name in GDNames:
 
-										base.debugmsg(9, gdname, ":", grphWindow.graphdata[name])
-										grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"],grphWindow.graphdata[name]["Values"], colour, label=name)
+					dname = " ".join(list(set(name.split("|")).symmetric_difference(set([MType, PMetric, SMetric])))).strip()
+					base.debugmsg(6, "dname:", dname)
+					if name not in grphWindow.graphdata:
+						grphWindow.graphdata[name] = {}
+					colour = base.named_colour(dname)
+					base.debugmsg(6, "name:", name, "	colour:", colour)
+					grphWindow.graphdata[name]["Colour"] = colour
+					# grphWindow.graphdata[name]["Time"] = []
+					grphWindow.graphdata[name]["objTime"] = []
+					grphWindow.graphdata[name]["Values"] = []
+					gdname = "GraphData_{}".format(name)
+					if gdname in base.dbqueue["ReadResult"]:
+						base.debugmsg(6, gdname, ":", base.dbqueue["ReadResult"][gdname])
+
+						grphWindow.graphdata[name]["objTime"] = [datetime.fromtimestamp(r['MetricTime']) for r in base.dbqueue["ReadResult"][gdname] ]
+						grphWindow.graphdata[name]["Values"] = [self.gph_floatval(r['MetricValue']) for r in base.dbqueue["ReadResult"][gdname] ]
+
+						base.debugmsg(6, gdname, ":", grphWindow.graphdata[name])
+						if len(grphWindow.graphdata[name]["Values"])>0:
+							grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"],grphWindow.graphdata[name]["Values"], colour, label=dname)
 
 
 
