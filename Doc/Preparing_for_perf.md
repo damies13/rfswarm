@@ -46,15 +46,18 @@ Then you can simply include the `Standard Think Time` keyword between each user 
 When an agent runs a robot test case it passes some variables on to the test case that might be useful to know or used to trigger variations in behaviour in you test cases. While there is no requirement to use these variables they are values that I have had to manually implement in laodrunner scripts, so knowing I would find them useful I have included them by default to make life easier.
 
 #### Index
-Index should be available through the variable `${index}`, this is the number you see in the Index column at the bottom of the plan screen
+Index should be available through the variable `${RFS_INDEX}`, this is the number you see in the Index column at the bottom of the plan screen
 
 #### VUser
-VUser should be available through the variable `${vuser}`, referring to the Users column at the bottom of the plan screen, this number is the counter of the user from one to the number in the Users column.
-While this number on it's own is not unique, it will be unique relative to the Index above, so if you need a unique string in your test you could combine them. e.g. `${index}_${vuser}`
+VUser should be available through the variable `${RFS_VUSER}`, referring to the Users column at the bottom of the plan screen, this number is the counter of the user from one to the number in the Users column.
+While this number on it's own is not unique, it will be unique relative to the Index above, so if you need a unique string in your test you could combine them. e.g. `${RFS_INDEX}_${RFS_VUSER}`
 Another way this could be useful is as a data row offset so that each test user is using data from a different section of your data file.
 
 #### Iteration
-Iteration should be available through the variable `${iteration}`, This is simply a counter of how many times this test case has been run for this virtual user. This could be useful if for example you need to walk sequentially through a data file because your data is single use.
+Iteration should be available through the variable `${RFS_ITERATION}`, This is simply a counter of how many times this test case has been run for this virtual user. This could be useful if for example you need to walk sequentially through a data file because your data is single use.
+
+#### Swarm Manager
+Swarm Manager should be available through the variable `${RFS_SWARMMANAGER}`, this will be useful for sending custom metric data back to the rfswarm manager, for example when using a robot test / task to collect statistics from the application under test.
 
 ### Data Management
 
