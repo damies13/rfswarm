@@ -3488,7 +3488,7 @@ class RFSwarmGUI(tk.Frame):
 
 									base.dbqueue["Read"].append({"SQL": sql, "KEY": "GraphData_{}".format(name)})
 
-
+				dodraw = False
 				for name in GDNames:
 
 					dname = " ".join(list(set(name.split("|")).symmetric_difference(set([MType, PMetric, SMetric])))).strip()
@@ -3511,23 +3511,24 @@ class RFSwarmGUI(tk.Frame):
 						base.debugmsg(6, gdname, ":", grphWindow.graphdata[name])
 						if len(grphWindow.graphdata[name]["Values"])>0:
 							grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"],grphWindow.graphdata[name]["Values"], colour, label=dname)
+							dodraw = True
 
 
+				if dodraw:
+					# self.canvas.gcf().autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+					grphWindow.axis.grid(True, 'major', 'both')
+					base.debugmsg(6, "SMetric:", SMetric)
+					if SMetric in ["Load", "CPU", "MEM", "NET"]:
+						grphWindow.axis.set_ylim(0, 100)
 
-				# self.canvas.gcf().autofmt_xdate(bottom=0.2, rotation=30, ha='right')
-				grphWindow.axis.grid(True, 'major', 'both')
-				base.debugmsg(6, "SMetric:", SMetric)
-				if SMetric in ["Load", "CPU", "MEM", "NET"]:
-					grphWindow.axis.set_ylim(0, 100)
+					base.debugmsg(9, "showlegend:", grphWindow.showlegend.get())
+					if grphWindow.showlegend.get():
+						# grphWindow.axis.legend()
+						# grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),&nbsp; shadow=True, ncol=2)
+						grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
 
-				base.debugmsg(9, "showlegend:", grphWindow.showlegend.get())
-				if grphWindow.showlegend.get():
-					# grphWindow.axis.legend()
-					# grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),&nbsp; shadow=True, ncol=2)
-					grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
-
-				grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
-				grphWindow.canvas.draw()
+					grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+					grphWindow.canvas.draw()
 
 
 		if DataType == "Result":
@@ -3550,6 +3551,30 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(6, "tsm")
 		tgr = threading.Thread(target=lambda: self.gph_refresh(grphWindow))
 		tgr.start()
+
+	def gs_dbolnames(self):
+
+		# metrics
+		sql = "SELECT "
+		sql += 		"MetricType, "
+		sql += 		"PrimaryMetric, "
+		sql += 		"SecondaryMetric "
+		sql += "FROM MetricData "
+		sql += "GROUP BY 	SecondaryMetric, PrimaryMetric "
+
+		base.debugmsg(7, "sql:", sql)
+
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": "MetricNames"})
+
+
+
+
+		while "MetricNames" not in base.dbqueue["ReadResult"]:
+			time.sleep(1)
+
+
+		# if gdname in base.dbqueue["ReadResult"]:
+		# 	base.debugmsg(6, gdname, ":", base.dbqueue["ReadResult"][gdname])
 
 
 
