@@ -773,7 +773,7 @@ class RFSwarmAgent():
 		now = int(time.time())
 
 		self.ensure_listner_file()
-		
+
 		if "ScriptIndex" not in self.jobs[jobid]:
 			self.debugmsg(6, "runthread: jobid:", jobid)
 			self.debugmsg(6, "runthread: job data:", self.jobs[jobid])
@@ -856,11 +856,11 @@ class RFSwarmAgent():
 		cmd.append('"'+odir+'"')
 
 		cmd.append("-M agent:{}".format(self.agentname))
-		if self.xmlmode:
-			cmd.append("-v index:{}".format(self.jobs[jobid]["ScriptIndex"]))
-			cmd.append("-v vuser:{}".format(self.jobs[jobid]["VUser"]))
-			cmd.append("-v iteration:{}".format(self.jobs[jobid]["Iteration"]))
-		else:
+		cmd.append("-v index:{}".format(self.jobs[jobid]["ScriptIndex"]))
+		cmd.append("-v vuser:{}".format(self.jobs[jobid]["VUser"]))
+		cmd.append("-v iteration:{}".format(self.jobs[jobid]["Iteration"]))
+		cmd.append("-v swarmmanager:{}".format(self.swarmmanager))
+		if not self.xmlmode:
 			cmd.append("-M debuglevel:{}".format(self.debuglvl))
 			cmd.append("-M index:{}".format(self.jobs[jobid]["ScriptIndex"]))
 			cmd.append("-M vuser:{}".format(self.jobs[jobid]["VUser"]))
