@@ -856,17 +856,18 @@ class RFSwarmAgent():
 		cmd.append('"'+odir+'"')
 
 		cmd.append("-M agent:{}".format(self.agentname))
+		cmd.append("-M agentversion:{}".format(self.version))
+		cmd.append("-M debuglevel:{}".format(self.debuglvl))
+		cmd.append("-M index:{}".format(self.jobs[jobid]["ScriptIndex"]))
 		cmd.append("-v index:{}".format(self.jobs[jobid]["ScriptIndex"]))
+		cmd.append("-M vuser:{}".format(self.jobs[jobid]["VUser"]))
 		cmd.append("-v vuser:{}".format(self.jobs[jobid]["VUser"]))
+		cmd.append("-M iteration:{}".format(self.jobs[jobid]["Iteration"]))
 		cmd.append("-v iteration:{}".format(self.jobs[jobid]["Iteration"]))
+		cmd.append("-M swarmmanager:{}".format(self.swarmmanager))
 		cmd.append("-v swarmmanager:{}".format(self.swarmmanager))
+		cmd.append("-M excludelibraries:{}".format(excludelibraries))
 		if not self.xmlmode:
-			cmd.append("-M debuglevel:{}".format(self.debuglvl))
-			cmd.append("-M index:{}".format(self.jobs[jobid]["ScriptIndex"]))
-			cmd.append("-M vuser:{}".format(self.jobs[jobid]["VUser"]))
-			cmd.append("-M iteration:{}".format(self.jobs[jobid]["Iteration"]))
-			cmd.append("-M swarmmanager:{}".format(self.swarmmanager))
-			cmd.append("-M excludelibraries:{}".format(excludelibraries))
 			cmd.append("--listener {}".format('"'+self.listenerfile+'"'))
 
 		if "robotoptions" in self.jobs[jobid]:
