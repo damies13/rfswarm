@@ -4248,6 +4248,9 @@ class RFSwarmGUI(tk.Frame):
 					self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].insert(0, base.sec2hms(idly))
 			if not base.args.nogui:
 				dly = self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].get()
+				idly = base.hms2sec(dly)
+				self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].delete(0,'end')
+				self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].insert(0, base.sec2hms(idly))
 			base.debugmsg(6, "Row:", r, "Delay:", dly)
 			if len(dly)>0:
 				base.scriptlist[r]["Delay"] = base.hms2sec(dly)
@@ -4292,6 +4295,9 @@ class RFSwarmGUI(tk.Frame):
 					self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].insert(0,base.sec2hms(irmp))
 			if not base.args.nogui:
 				rmp = self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].get()
+				irmp = base.hms2sec(rmp)
+				self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].delete(0,'end')
+				self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].insert(0,base.sec2hms(irmp))
 			base.debugmsg(6, "Row:", r, "RampUp:", rmp)
 			base.scriptlist[r]["RampUp"] = base.hms2sec(rmp)
 			self.plan_scnro_chngd = True
@@ -4329,6 +4335,9 @@ class RFSwarmGUI(tk.Frame):
 					self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].insert(0,base.sec2hms(irun))
 			if not base.args.nogui:
 				run = self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].get()
+				irun = base.hms2sec(run)
+				self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].delete(0,'end')
+				self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].insert(0,base.sec2hms(irun))
 			base.debugmsg(6, "Row:", r, "Run:", run)
 			base.scriptlist[r]["Run"] = base.hms2sec(run)
 			self.plan_scnro_chngd = True
