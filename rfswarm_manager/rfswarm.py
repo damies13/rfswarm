@@ -286,7 +286,7 @@ class AgentServer(BaseHTTPRequestHandler):
 				if (parsed_path.path == "/Result"):
 					jsonreq = json.loads(rawData)
 					base.debugmsg(6, "Result: jsonreq:", jsonreq)
-					requiredfields = ["AgentName", "ResultName", "Result", "ElapsedTime", "StartTime", "EndTime", "ScriptIndex", "VUser", "Iteration", "Sequence"]
+					requiredfields = ["AgentName", "ResultName", "Result", "ElapsedTime", "StartTime", "EndTime", "ScriptIndex", "Robot", "Iteration", "Sequence"]
 					for field in requiredfields:
 						if field not in jsonreq:
 							httpcode = 422
@@ -300,7 +300,7 @@ class AgentServer(BaseHTTPRequestHandler):
 
 						core.register_result(jsonreq["AgentName"], jsonreq["ResultName"], jsonreq["Result"],
 									jsonreq["ElapsedTime"], jsonreq["StartTime"], jsonreq["EndTime"],
-									jsonreq["ScriptIndex"], jsonreq["VUser"], jsonreq["Iteration"],
+									jsonreq["ScriptIndex"], jsonreq["Robot"], jsonreq["Iteration"],
 									jsonreq["Sequence"])
 
 						jsonresp["Result"] = "Queued"
@@ -396,7 +396,7 @@ class AgentServer(BaseHTTPRequestHandler):
 				jsonresp["POST"]["Result"]["Body"]["StartTime"] = "<epoch seconds as decimal number>"
 				jsonresp["POST"]["Result"]["Body"]["EndTime"] = "<epoch seconds as decimal number>"
 				jsonresp["POST"]["Result"]["Body"]["ScriptIndex"] = "<Index>"
-				jsonresp["POST"]["Result"]["Body"]["VUser"] = "<user number>"
+				jsonresp["POST"]["Result"]["Body"]["Robot"] = "<user number>"
 				jsonresp["POST"]["Result"]["Body"]["Iteration"] = "<iteration number>"
 				jsonresp["POST"]["Result"]["Body"]["Sequence"] = "<sequence number that ResultName occurred in test case>"
 
@@ -2249,9 +2249,9 @@ class RFSwarmCore:
 				base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], prop, agentdata["Properties"][prop])
 
 
-	def register_result(self, AgentName, result_name, result, elapsed_time, start_time, end_time, index, vuser, iter, sequence):
+	def register_result(self, AgentName, result_name, result, elapsed_time, start_time, end_time, index, robot, iter, sequence):
 		base.debugmsg(9, "register_result")
-		resdata = (index, vuser, iter, AgentName, sequence, result_name, result, elapsed_time, start_time, end_time)
+		resdata = (index, robot, iter, AgentName, sequence, result_name, result, elapsed_time, start_time, end_time)
 		base.debugmsg(7, "resdata:", resdata)
 		base.dbqueue["Results"].append(resdata)
 		base.debugmsg(9, "dbqueue Results:", base.dbqueue["Results"])
