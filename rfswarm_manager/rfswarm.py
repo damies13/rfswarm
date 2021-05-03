@@ -790,7 +790,7 @@ class RFSwarmBase:
 				# create tables
 
 				c.execute('''CREATE TABLE Results
-					(script_index int, virtual_user int, iteration int, agent text, sequence int, result_name text, result text, elapsed_time num, start_time num, end_time num)''')
+					(script_index int, robot int, iteration int, agent text, sequence int, result_name text, result text, elapsed_time num, start_time num, end_time num)''')
 
 				c.execute('''CREATE TABLE Metric
 					(Name TEXT NOT NULL, Type TEXT NOT NULL, PRIMARY KEY("Name"))''')
