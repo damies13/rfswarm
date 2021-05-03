@@ -743,12 +743,14 @@ class RFSwarmBase:
 			if base.run_name != base.run_name_current:
 				base.run_name_current = base.run_name
 				createschema = True
+				self.MetricIDs = {}
 
 			if createschema and self.datadb is not None:
 				base.debugmsg(5, "Disconnect and close DB")
 				self.datadb.commit()
 				self.datadb.close()
 				self.datadb = None
+				self.MetricIDs = {}
 
 			# check if dir exists
 			base.debugmsg(5, "dir_path:", base.dir_path)
@@ -784,10 +786,10 @@ class RFSwarmBase:
 
 			if self.datadb is None:
 				base.debugmsg(5, "Connect to DB")
-				self.MetricIDs = {}
 				self.datadb = sqlite3.connect(self.dbfile)
 				self.datadb.create_aggregate("percentile", 2, percentile)
 				self.datadb.create_aggregate("stdev", 1, stdevclass)
+				self.MetricIDs = {}
 
 			if createschema:
 				base.debugmsg(5, "Create Schema")
