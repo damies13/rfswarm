@@ -65,7 +65,7 @@ Response Body:
                 "StartTime": "<epoch seconds as decimal number>",
                 "EndTime": "<epoch seconds as decimal number>",
                 "ScriptIndex": "<Index>",
-                "VUser": "<user number>",
+                "Robot": "<user number>",
                 "Iteration": "<iteration number>",
                 "Sequence": "<sequence number that ResultName occurred in test case>"
             }
@@ -98,7 +98,7 @@ Request Body:
     "AgentName": "myagent",
     "Status": "Ready",
     "AgentIPs": ["192.168.1.150", "fe80::1c80:a965:7be5:d524"],
-    "Robots": "0,"
+    "Robots": "0",
     "CPU%": "3.4",
     "MEM%": "20.51",
     "NET%": "0.01"
@@ -246,7 +246,7 @@ Request Body:
     "StartTime": 1572435546.383,
     "EndTime": 1572435546.386,
     "ScriptIndex": "1",
-    "VUser": "1",
+    "Robot": "1",
     "Iteration": 5,
     "Sequence": 2
 }
