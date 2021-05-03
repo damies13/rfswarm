@@ -286,13 +286,18 @@ class AgentServer(BaseHTTPRequestHandler):
 				if (parsed_path.path == "/Result"):
 					jsonreq = json.loads(rawData)
 					base.debugmsg(6, "Result: jsonreq:", jsonreq)
-					requiredfields = ["AgentName", "ResultName", "Result", "ElapsedTime", "StartTime", "EndTime", "ScriptIndex", "Robot", "Iteration", "Sequence"]
+					requiredfields = ["AgentName", "ResultName", "Result", "ElapsedTime", "StartTime", "EndTime", "ScriptIndex", "Iteration", "Sequence"]
 					for field in requiredfields:
 						if field not in jsonreq:
 							httpcode = 422
 							message = "Missing required field: '{}', required fields are: {}".format(field, requiredfields)
 							base.debugmsg(5, httpcode, ":", message)
 							break
+
+					if "Robot" not in jsonreq:
+						jsonreq["Robot"] = 0
+						if "VUser" in jsonreq:
+							jsonreq["Robot"] = jsonreq["VUser"]
 
 					if httpcode == 200:
 						base.debugmsg(7, "Result: httpcode:", httpcode)
