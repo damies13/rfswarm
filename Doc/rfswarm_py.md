@@ -26,19 +26,22 @@ This is where you construct your test scenario, choose your test cases and numbe
 All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the [agent polling](./rfswarm_agent_py.md#agent-polling-of-the-guiserver) works it's best not to use values less than 10 seconds.
 
 > _Plan - Planning a performance test_
-![Image](Images/MacOS_Plan_saved_opened_v0.6.3.png "Plan - Planning a performance test")
+![Image](Images/MacOS_Plan_v0.7.0_saved_opened.png "Plan - Planning a performance test")
 
 > _Plan - New_
-![Image](Images/MacOS_Plan_New_v0.6.3.png "Plan - New")
+![Image](Images/MacOS_Plan_v0.7.0_New.png "Plan - New")
 
 > _Plan - Delay example_
-![Image](Images/MacOS_Plan_v0.6.3_20u_delay_example.png)
+![Image](Images/MacOS_Plan_v0.7.0_20u_delay_example.png)
 
 > _Plan - gradual ramp-up example_
-![Image](Images/MacOS_Plan_v0.6.3_150u_25per10min.png)
+![Image](Images/MacOS_Plan_v0.7.0_150u_25per10min.png)
 
-> _Plan - Linux (Mint 19.2)_
-> ![Image](Images/Linux-v0.5.0_Plan_150u_25per10min.png)
+> _Plan - Linux (Ubuntu 20.04)_
+> ![Image](Images/Ubuntu_Plan_v0.7.0_New.png)
+
+> _Plan - Windows 10_
+> ![Image](Images/Windows10_Plan_v0.7.0_New.png)
 
 While hopefully this is intuitive, the buttons are (starting top right)
 
@@ -57,18 +60,19 @@ The columns under the graph
 | Column Name	| Detail |
 |---		|---	|
 | Index		| The test group's line number in the scenario, the background colour matches the line colour in the graph above |
-| Users		| The number of virtual users (robots) you are planning to run in the scenario for this test group |
-| Delay		| The ammount of time (in Seconds) to wait before starting Ramp Up |
-| Ramp Up	| The ammount of time (in Seconds) to get from 0 virtual users (robots) to the number of virtual users (robots) defined in the Users column |
-| Run		| The ammount of time (in Seconds) to keep all the virtual users (robots) defined in the Users column running after Ramp Up has finished. If a robot finishes it's test steps before the end of this time it will be restarted. After this time has ellapsed the robots will finish thier test steps and exit normally (Ramp Down) |
+| Robots	| The number of robots (virtual users) you are planning to run in the scenario for this test group |
+| Delay		| The amount of time (HH:MM:SS*) to wait before starting Ramp Up |
+| Ramp Up	| The amount of time (HH:MM:SS*) to get from 0 virtual users (robots) to the number of virtual users (robots) defined in the Users column |
+| Run		| The amount of time (HH:MM:SS*) to keep all the virtual users (robots) defined in the Users column running after Ramp Up has finished. If a robot finishes it's test steps before the end of this time it will be restarted After this time has elapsed the robots will finish their test steps and exit normally (Ramp Down) |
 | Script	| This is where you select the robot file that contains the test you want to assign to this test group |
 | Test		| This is where you select the test you want to run for this test group, this option list is auto populaed when you select a robot file in the Script column |
 | Settings	| This is where you can select additional settings for the test group |
 
+* For Delay, Ramp Up and Run, you can either type the time in HH:MM:SS or just a number of seconds or MM:SS, the plan screen will auto update it to HH:MM:SS. For example if you typed 300 it will update to 00:05:00, 7200 will update to 02:00:00, also if you type 5:30 it will update to 00:05:30.
 
 ##### Additional settings for test group ![image](Images/GUI_btn_cog.gif)
 When clicking on this button a dialogue will be presented that allows you to configure some additional settings for the test group, by default the dialogue will look like this:
-> ![image](Images/MacOS_Plan_v0.6.3_Test_Settings.png)
+> ![image](Images/MacOS_Plan_v0.7.0_Test_Settings.png)
 
 ###### Exclude libraries:
 The default value is "BuiltIn,String,OperatingSystem,perftest", this is the same default value as used in the [agent settings](./rfswarm_agent_py.md#exclude-libraries) and if you leave this default but change the agent the settings set on the agent will override this setting.
@@ -104,7 +108,7 @@ Here are some examples of when you might need this setting:
 The combination of multiple require and exclude rules, the default and custom agent properties should allow you to have the control needed to target your test groups to specific agent or groups of agents as needed.
 
 Here is an example of configuring the Filter Rules and using the Robot options:
-> ![image](Images/MacOS_Plan_v0.6.3_Test_Settings_Filter_Rules.png)
+> ![image](Images/MacOS_Plan_v0.7.0_Test_Settings_Filter_Rules.png)
 
 
 #### Run
