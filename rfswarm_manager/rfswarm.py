@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #		Manager
-#    Version 0.6.5
+#    Version 0.7.0
 #
 
 # 	Helpful links
@@ -290,7 +290,7 @@ class AgentServer(BaseHTTPRequestHandler):
 				if (parsed_path.path == "/Result"):
 					jsonreq = json.loads(rawData)
 					base.debugmsg(6, "Result: jsonreq:", jsonreq)
-					requiredfields = ["AgentName", "ResultName", "Result", "ElapsedTime", "StartTime", "EndTime", "ScriptIndex", "VUser", "Iteration", "Sequence"]
+					requiredfields = ["AgentName", "ResultName", "Result", "ElapsedTime", "StartTime", "EndTime", "ScriptIndex", "Iteration", "Sequence"]
 					for field in requiredfields:
 						if field not in jsonreq:
 							httpcode = 422
@@ -298,13 +298,18 @@ class AgentServer(BaseHTTPRequestHandler):
 							base.debugmsg(5, httpcode, ":", message)
 							break
 
+					if "Robot" not in jsonreq:
+						jsonreq["Robot"] = 0
+						if "VUser" in jsonreq:
+							jsonreq["Robot"] = jsonreq["VUser"]
+
 					if httpcode == 200:
 						base.debugmsg(7, "Result: httpcode:", httpcode)
 						jsonresp["AgentName"] = jsonreq["AgentName"]
 
 						core.register_result(jsonreq["AgentName"], jsonreq["ResultName"], jsonreq["Result"],
 									jsonreq["ElapsedTime"], jsonreq["StartTime"], jsonreq["EndTime"],
-									jsonreq["ScriptIndex"], jsonreq["VUser"], jsonreq["Iteration"],
+									jsonreq["ScriptIndex"], jsonreq["Robot"], jsonreq["Iteration"],
 									jsonreq["Sequence"])
 
 						jsonresp["Result"] = "Queued"
@@ -400,7 +405,7 @@ class AgentServer(BaseHTTPRequestHandler):
 				jsonresp["POST"]["Result"]["Body"]["StartTime"] = "<epoch seconds as decimal number>"
 				jsonresp["POST"]["Result"]["Body"]["EndTime"] = "<epoch seconds as decimal number>"
 				jsonresp["POST"]["Result"]["Body"]["ScriptIndex"] = "<Index>"
-				jsonresp["POST"]["Result"]["Body"]["VUser"] = "<user number>"
+				jsonresp["POST"]["Result"]["Body"]["Robot"] = "<user number>"
 				jsonresp["POST"]["Result"]["Body"]["Iteration"] = "<iteration number>"
 				jsonresp["POST"]["Result"]["Body"]["Sequence"] = "<sequence number that ResultName occurred in test case>"
 
@@ -448,7 +453,7 @@ class AgentServer(BaseHTTPRequestHandler):
 
 
 class RFSwarmBase:
-	version="0.6.5"
+	version="0.7.0"
 	debuglvl = 0
 
 	config = None
@@ -640,7 +645,7 @@ class RFSwarmBase:
 					base.debugmsg(9, "run_db_thread: dbqueue: Results")
 					resdata = list(base.dbqueue["Results"])
 					base.dbqueue["Results"] = []
-					base.debugmsg(9, "run_db_thread: dbqueue: Results: resdata:", resdata)
+					base.debugmsg(7, "dbqueue: Results: resdata:", resdata)
 					try:
 						sql = "INSERT INTO Results VALUES (?,?,?,?,?,?,?,?,?,?)"
 						cur = self.datadb.cursor()
@@ -751,12 +756,14 @@ class RFSwarmBase:
 			if base.run_name != base.run_name_current:
 				base.run_name_current = base.run_name
 				createschema = True
+				self.MetricIDs = {}
 
 			if createschema and self.datadb is not None:
 				base.debugmsg(5, "Disconnect and close DB")
 				self.datadb.commit()
 				self.datadb.close()
 				self.datadb = None
+				self.MetricIDs = {}
 
 			# check if dir exists
 			base.debugmsg(5, "dir_path:", base.dir_path)
@@ -794,10 +801,10 @@ class RFSwarmBase:
 
 			if self.datadb is None:
 				base.debugmsg(5, "Connect to DB")
-				self.MetricIDs = {}
 				self.datadb = sqlite3.connect(self.dbfile)
 				self.datadb.create_aggregate("percentile", 2, percentile)
 				self.datadb.create_aggregate("stdev", 1, stdevclass)
+				self.MetricIDs = {}
 
 			if createschema:
 				base.debugmsg(5, "Create Schema")
@@ -805,7 +812,7 @@ class RFSwarmBase:
 				# create tables
 
 				c.execute('''CREATE TABLE Results
-					(script_index int, virtual_user int, iteration int, agent text, sequence int, result_name text, result text, elapsed_time num, start_time num, end_time num)''')
+					(script_index int, robot int, iteration int, agent text, sequence int, result_name text, result text, elapsed_time num, start_time num, end_time num)''')
 
 				c.execute('''CREATE TABLE Metric
 					(ID INTEGER, Name TEXT NOT NULL, Type TEXT NOT NULL, PRIMARY KEY("ID"))''')
@@ -1480,7 +1487,7 @@ class RFSwarmBase:
 		base.scriptlist[base.scriptcount]["Index"] = base.scriptcount
 
 		num = "10"
-		base.scriptlist[base.scriptcount]["Users"] = int(num)
+		base.scriptlist[base.scriptcount]["Robots"] = int(num)
 
 		num = "0"
 		base.scriptlist[base.scriptcount]["Delay"] = int(num)
@@ -1761,6 +1768,36 @@ class RFSwarmBase:
 			self.scriptfilters.append(filtername)
 			self.scriptfilters.sort()
 		self.debugmsg(9, "filtername:", filtername, self.scriptfilters)
+
+	def sec2hms(self, sec):
+		base.debugmsg(6, "type(sec):",type(sec), sec)
+		if (isinstance(sec, time.struct_time)):
+			sec = time.mktime(sec)
+			base.debugmsg(6, "type(sec):",type(sec), sec)
+		h = int(sec/3600)
+		m = int((sec-h*3600)/60)
+		s = int((sec-h*3600)-m*60)
+		hms = "{:02}:{:02}:{:02}".format(h,m,s)
+		return hms
+
+	def hms2sec(self, hms):
+		sec = 0
+		arrhms = str(hms).split(":")
+		base.debugmsg(6, "arrhms:",arrhms)
+		if len(arrhms)==3:
+			h = int(arrhms[0])
+			m = int(arrhms[1])
+			s = int(arrhms[2])
+			sec = (h*3600)+(m*60)+s
+		if len(arrhms)==2:
+			h = 0
+			m = int(arrhms[0])
+			s = int(arrhms[1])
+			sec = (h*3600)+(m*60)+s
+		if len(arrhms)==1:
+			sec = int(arrhms[0])
+		return sec
+
 
 
 # class rfswarm:
@@ -2190,13 +2227,12 @@ class RFSwarmCore:
 				base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], prop, agentdata["Properties"][prop])
 
 
-	def register_result(self, AgentName, result_name, result, elapsed_time, start_time, end_time, index, vuser, iter, sequence):
+	def register_result(self, AgentName, result_name, result, elapsed_time, start_time, end_time, index, robot, iter, sequence):
 		base.debugmsg(9, "register_result")
-		resdata = (index, vuser, iter, AgentName, sequence, result_name, result, elapsed_time, start_time, end_time)
-		base.debugmsg(9, "register_result: resdata:", resdata)
-		base.debugmsg(7, resdata)
+		resdata = (index, robot, iter, AgentName, sequence, result_name, result, elapsed_time, start_time, end_time)
+		base.debugmsg(7, "resdata:", resdata)
 		base.dbqueue["Results"].append(resdata)
-		base.debugmsg(9, "register_result: dbqueue Results:", base.dbqueue["Results"])
+		base.debugmsg(9, "dbqueue Results:", base.dbqueue["Results"])
 
 		if not base.args.nogui:
 			ut = threading.Thread(target=base.gui.delayed_UpdateRunStats)
@@ -2414,21 +2450,21 @@ class RFSwarmCore:
 		if base.run_end>0 and int(time.time())>base.run_end:
 			base.run_paused = True
 
-		totusrs = 0
-		curusrs = 0
+		totrbts = 0
+		currbts = 0
 
 		base.debugmsg(8, "base.scriptlist:", base.scriptlist)
 		for grp in base.scriptlist:
-			if "Users" in grp:
-				base.debugmsg(9, "run_start_threads: totusrs", totusrs, " 	grp:", grp)
-				totusrs += int(grp["Users"])
-				base.debugmsg(8, "run_start_threads: totusrs", totusrs)
+			if "Robots" in grp:
+				base.debugmsg(9, "run_start_threads: totrbts", totrbts, " 	grp:", grp)
+				totrbts += int(grp["Robots"])
+				base.debugmsg(8, "run_start_threads: totrbts", totrbts)
 
 
-		base.debugmsg(8, 'curusrs:', curusrs, "	totusrs:", totusrs, "	run_paused:", base.run_paused)
-		while curusrs < totusrs:
-			base.debugmsg(6, "while totusrs", totusrs, " 	curusrs:", curusrs)
-			# totusrs = 0
+		base.debugmsg(8, 'currbts:', currbts, "	totrbts:", totrbts, "	run_paused:", base.run_paused)
+		while currbts < totrbts:
+			base.debugmsg(6, "while totrbts", totrbts, " 	currbts:", currbts)
+			# totrbts = 0
 
 			if "Start" not in base.robot_schedule:
 				base.robot_schedule["Start"] = 0
@@ -2454,7 +2490,7 @@ class RFSwarmCore:
 				for grp in base.scriptlist:
 					base.debugmsg(9, "grp", grp)
 					if "Test" in grp.keys() and len(grp["Test"])>0:
-						base.debugmsg(6, "while totusrs", totusrs, " 	curusrs:", curusrs)
+						base.debugmsg(6, "while totrbts", totrbts, " 	currbts:", currbts)
 						base.debugmsg(9, "grp[Index]", grp['Index'])
 
 						if 'filters' in grp:
@@ -2498,15 +2534,15 @@ class RFSwarmCore:
 								base.run_end = int(time.time()) + grp["Run"]
 								base.robot_schedule["End"] = base.run_end
 
-								# totusrs = 0
+								# totrbts = 0
 
 							gid = grp["Index"]
 							base.debugmsg(9, "gid", gid, " 	robot_schedule[Scripts].keys()", base.robot_schedule["Scripts"].keys())
 							if gid not in base.robot_schedule["Scripts"].keys():
 								base.robot_schedule["Scripts"][gid] = {}
-								base.debugmsg(9, "totusrs", totusrs)
-								# totusrs += int(grp["Users"])
-								base.debugmsg(9, "totusrs", totusrs)
+								base.debugmsg(9, "totrbts", totrbts)
+								# totrbts += int(grp["Robots"])
+								base.debugmsg(9, "totrbts", totrbts)
 
 							if gid not in base.scriptgrpend.keys() or base.scriptgrpend[gid] < base.run_start:
 								base.scriptgrpend[gid] = base.run_start + grp["Delay"] + grp["RampUp"] + grp["Run"]
@@ -2518,13 +2554,13 @@ class RFSwarmCore:
 								nxtuid = len(base.robot_schedule["Scripts"][gid]) + 1
 								base.debugmsg(9, 'nxtuid', nxtuid)
 								# Determine if we should start another user?
-								if nxtuid < grp["Users"]+1:
+								if nxtuid < grp["Robots"]+1:
 									if grp["RampUp"] > 0:
 										rupct = (time_elapsed - grp["Delay"]) /grp["RampUp"]
 									else:
 										rupct = 1
 									base.debugmsg(9, 'rupct', rupct)
-									ruusr = int(grp["Users"] * rupct)
+									ruusr = int(grp["Robots"] * rupct)
 									base.debugmsg(9, 'nxtuid', nxtuid, 'ruusr', ruusr)
 									if nxtuid < ruusr+1:
 										uid = nxtuid
@@ -2555,8 +2591,8 @@ class RFSwarmCore:
 										base.Agents[nxtagent]["AssignedRobots"] += 1
 										base.debugmsg(5, "base.Agents[",nxtagent,"][AssignedRobots]:", base.Agents[nxtagent]["AssignedRobots"])
 
-										curusrs += 1
-										base.debugmsg(2, "Robot:", curusrs, "	Test:", grp["Test"], "	Assigned to:", nxtagent)
+										currbts += 1
+										base.debugmsg(2, "Robot:", currbts, "	Test:", grp["Test"], "	Assigned to:", nxtagent)
 
 										base.debugmsg(9, "robot_schedule", base.robot_schedule)
 
@@ -2579,9 +2615,9 @@ class RFSwarmCore:
 			v = None
 			if len(args)>1:
 				usrs = args[1]
-		base.debugmsg(6, "Row:", r, "Users:", usrs)
+		base.debugmsg(6, "Row:", r, "Robots:", usrs)
 		base.debugmsg(8, "base.scriptlist:", base.scriptlist)
-		base.scriptlist[r]["Users"] = int(usrs)
+		base.scriptlist[r]["Robots"] = int(usrs)
 
 		if not base.args.nogui:
 			base.gui.sr_users_validate(*args)
@@ -3834,7 +3870,7 @@ class RFSwarmGUI(tk.Frame):
 		idx.grid(column=self.plancolidx, row=0, sticky="nsew")
 
 		self.scriptgrid.columnconfigure(self.plancolusr, weight=0)
-		usr = ttk.Label(self.scriptgrid, text="Users")
+		usr = ttk.Label(self.scriptgrid, text="Robots")
 		usr.grid(column=self.plancolusr, row=0, sticky="nsew")
 
 		self.scriptgrid.columnconfigure(self.plancoldly, weight=0)
@@ -3930,9 +3966,9 @@ class RFSwarmGUI(tk.Frame):
 		mxuser = 0
 		mxusero = 0
 		for grp in base.scriptlist:
-			if "Users" in grp.keys():
-				mxuser += grp["Users"]
-				mxusero += grp["Users"]
+			if "Robots" in grp.keys():
+				mxuser += grp["Robots"]
+				mxusero += grp["Robots"]
 		base.debugmsg(6, "mxuser", mxuser)
 		if mxuser <10:
 			mxuser += 1
@@ -3944,14 +3980,14 @@ class RFSwarmGUI(tk.Frame):
 		#  work out max duration
 		mxdur = 0
 		for grp in base.scriptlist:
-			if "Users" in grp.keys():
+			if "Robots" in grp.keys():
 				dur = grp["Delay"] + (grp["RampUp"]*2) + grp["Run"]
 				dur = int(dur * 1.03)
 				if mxdur < dur:
 					mxdur = dur
 		base.debugmsg(6, "mxdur", mxdur)
 
-		totusrsxy = {}
+		totrbtsxy = {}
 		totcounts = {}
 		totcounts[0] = 0
 		base.debugmsg(6, 'totcounts', totcounts)
@@ -4047,8 +4083,8 @@ class RFSwarmGUI(tk.Frame):
 
 
 
-		# populate y axis	(Users)
-		base.debugmsg(9, "populate y axis	(Users)")
+		# populate y axis	(Robots)
+		base.debugmsg(9, "populate y axis	(Robots)")
 		usrinc = 1
 		if mxuser > 15:
 			usrinc = int((mxusero/100)+0.9)*10
@@ -4084,7 +4120,7 @@ class RFSwarmGUI(tk.Frame):
 		delx = 0
 		base.debugmsg(6, "For grp In scriptlist")
 		for grp in base.scriptlist:
-			if "Users" in grp.keys():
+			if "Robots" in grp.keys():
 				base.debugmsg(6, "Index", grp["Index"])
 				colour = base.line_colour(grp["Index"])
 				base.debugmsg(6, "Index", grp["Index"], "Line colour", colour)
@@ -4095,8 +4131,8 @@ class RFSwarmGUI(tk.Frame):
 				# ramp-up
 				rusx = delx
 				rusy = graphh-axissz
-				usrpct = grp["Users"] / (mxuser * 1.0)
-				base.debugmsg(6, "Index", grp["Index"], "RampUp:Users", grp["Users"], "/ mxuser", mxuser, " = usrpct", usrpct)
+				usrpct = grp["Robots"] / (mxuser * 1.0)
+				base.debugmsg(6, "Index", grp["Index"], "RampUp:Robots", grp["Robots"], "/ mxuser", mxuser, " = usrpct", usrpct)
 				rudpct = grp["RampUp"] / (mxdur * 1.0)
 				ruex = int(xlen * rudpct) + delx
 				base.debugmsg(6, "Index", grp["Index"], "RampUp:RampUp", grp["RampUp"], "ruex", ruex)
@@ -4105,24 +4141,24 @@ class RFSwarmGUI(tk.Frame):
 				self.pln_graph.create_line(rusx, rusy, ruex, ruey, fill=colour)
 
 				index = grp["Index"]
-				if index not in totusrsxy:
-					totusrsxy[index] = {}
-				if "addpct" not in totusrsxy:
-					totusrsxy["addpct"] = {}
+				if index not in totrbtsxy:
+					totrbtsxy[index] = {}
+				if "addpct" not in totrbtsxy:
+					totrbtsxy["addpct"] = {}
 
-				totusrsxy[index]['delaypct'] = delaypct
-				totusrsxy[index]['usrpct'] = usrpct
-				totusrsxy[index]['rudpct'] = rudpct
+				totrbtsxy[index]['delaypct'] = delaypct
+				totrbtsxy[index]['usrpct'] = usrpct
+				totrbtsxy[index]['rudpct'] = rudpct
 
-				if delaypct not in totusrsxy["addpct"]:
-					totusrsxy["addpct"][delaypct] = 0
+				if delaypct not in totrbtsxy["addpct"]:
+					totrbtsxy["addpct"][delaypct] = 0
 
-				totusrsxy["addpct"][delaypct] += 0
+				totrbtsxy["addpct"][delaypct] += 0
 
 				rutpct = delaypct + rudpct
-				if rutpct not in totusrsxy["addpct"]:
-					totusrsxy["addpct"][rutpct] = 0
-				totusrsxy["addpct"][rutpct] += usrpct
+				if rutpct not in totrbtsxy["addpct"]:
+					totrbtsxy["addpct"][rutpct] = 0
+				totrbtsxy["addpct"][rutpct] += usrpct
 
 
 				# Run
@@ -4132,9 +4168,9 @@ class RFSwarmGUI(tk.Frame):
 				self.pln_graph.create_line(ruex, ruey, rnex, ruey, fill=colour)
 
 				rntpct = delaypct + rudpct + rnpct
-				if rntpct not in totusrsxy["addpct"]:
-					totusrsxy["addpct"][rntpct] = 0
-				totusrsxy["addpct"][rntpct] += 0
+				if rntpct not in totrbtsxy["addpct"]:
+					totrbtsxy["addpct"][rntpct] = 0
+				totrbtsxy["addpct"][rntpct] += 0
 
 
 				# ramp-down
@@ -4143,12 +4179,12 @@ class RFSwarmGUI(tk.Frame):
 				self.pln_graph.create_line(rnex, ruey, rdex, rusy, fill=colour, dash=(4, 4))
 
 				rdtpct = delaypct + rudpct + rnpct + rudpct
-				if rdtpct not in totusrsxy["addpct"]:
-					totusrsxy["addpct"][rdtpct] = 0
-				totusrsxy["addpct"][rdtpct] += (usrpct * -1)
+				if rdtpct not in totrbtsxy["addpct"]:
+					totrbtsxy["addpct"][rdtpct] = 0
+				totrbtsxy["addpct"][rdtpct] += (usrpct * -1)
 
-		base.debugmsg(6, "Total Users")
-		base.debugmsg(6, "totusrsxy:", totusrsxy)
+		base.debugmsg(6, "Total Robots")
+		base.debugmsg(6, "totrbtsxy:", totrbtsxy)
 
 		sy = graphh-axissz
 		prevx = 0
@@ -4159,10 +4195,10 @@ class RFSwarmGUI(tk.Frame):
 		addzero = 0
 
 		rusy = graphh-axissz
-		if k in totusrsxy:
-			for x in sorted(totusrsxy[k].keys()):
+		if k in totrbtsxy:
+			for x in sorted(totrbtsxy[k].keys()):
 				newx = x
-				newy = prevy + totusrsxy[k][x]
+				newy = prevy + totrbtsxy[k][x]
 
 				base.debugmsg(6, "prevx", prevx, "prevy", prevy, "newx", newx, "newy", newy)
 
@@ -4218,9 +4254,9 @@ class RFSwarmGUI(tk.Frame):
 		mxuser = 0
 		mxusero = 0
 		for grp in base.scriptlist:
-			if "Users" in grp.keys():
-				mxuser += grp["Users"]
-				mxusero += grp["Users"]
+			if "Robots" in grp.keys():
+				mxuser += grp["Robots"]
+				mxusero += grp["Robots"]
 		base.debugmsg(6, "mxuser", mxuser)
 		if mxuser <10:
 			mxuser += 1
@@ -4232,7 +4268,7 @@ class RFSwarmGUI(tk.Frame):
 		#  work out max duration
 		mxdur = 0
 		for grp in base.scriptlist:
-			if "Users" in grp.keys():
+			if "Robots" in grp.keys():
 				dur = grp["Delay"] + (grp["RampUp"]*2) + grp["Run"]
 				dur = int(dur * 1.03)
 				if mxdur < dur:
@@ -4325,8 +4361,8 @@ class RFSwarmGUI(tk.Frame):
 
 
 
-		# populate y axis	(Users)
-		base.debugmsg(9, "populate y axis	(Users)")
+		# populate y axis	(Robots)
+		base.debugmsg(9, "populate y axis	(Robots)")
 		usrinc = 1
 		if mxuser > 15:
 			usrinc = int((mxusero/100)+0.9)*10
@@ -4361,7 +4397,7 @@ class RFSwarmGUI(tk.Frame):
 		delx = 0
 		base.debugmsg(6, "For grp In scriptlist")
 		for grp in base.scriptlist:
-			if "Users" in grp.keys():
+			if "Robots" in grp.keys():
 				base.debugmsg(6, "Index", grp["Index"])
 				colour = base.line_colour(grp["Index"])
 				base.debugmsg(6, "Index", grp["Index"], "Line colour", colour)
@@ -4372,8 +4408,8 @@ class RFSwarmGUI(tk.Frame):
 				# ramp-up
 				rusx = delx
 				rusy = graphh-axissz
-				usrpct = grp["Users"] / (mxuser * 1.0)
-				base.debugmsg(9, "Index", grp["Index"], "RampUp:Users", grp["Users"], "/ mxuser", mxuser, " = usrpct", usrpct)
+				usrpct = grp["Robots"] / (mxuser * 1.0)
+				base.debugmsg(9, "Index", grp["Index"], "RampUp:Robots", grp["Robots"], "/ mxuser", mxuser, " = usrpct", usrpct)
 				rudpct = grp["RampUp"] / (mxdur * 1.0)
 				ruex = int(xlen * rudpct) + delx
 				base.debugmsg(9, "Index", grp["Index"], "RampUp:RampUp", grp["RampUp"], "ruex", ruex)
@@ -4411,7 +4447,7 @@ class RFSwarmGUI(tk.Frame):
 						# calculate users during RampUp
 						rupct = (totnxt - grp["Delay"]) /grp["RampUp"]
 						base.debugmsg(9, 'rupct', rupct)
-						ruusr = int(grp["Users"] * rupct)
+						ruusr = int(grp["Robots"] * rupct)
 						base.debugmsg(9, 'ruusr', ruusr)
 						base.debugmsg(9, 'totcounts', totcounts)
 						base.debugmsg(9, 'totcounts[totnxt]', totcounts[totnxt])
@@ -4424,8 +4460,8 @@ class RFSwarmGUI(tk.Frame):
 						and totnxt < (grp["Delay"] + grp["RampUp"] + grp["Run"] + 1):
 						# all users running
 						base.debugmsg(9, 'run:totnxt', totnxt)
-						base.debugmsg(9, 'run:grp["Users"]', grp["Users"])
-						totcounts[totnxt] += grp["Users"]
+						base.debugmsg(9, 'run:grp["Robots"]', grp["Robots"])
+						totcounts[totnxt] += grp["Robots"]
 						base.debugmsg(6, "Index", grp["Index"], 'totcounts[',totnxt,']', totcounts[totnxt])
 					if totnxt > (grp["RampUp"] + grp["Delay"] + grp["Run"]) \
 						and totnxt < (grp["Delay"] + (grp["RampUp"] *2 ) + grp["Run"]):
@@ -4438,12 +4474,12 @@ class RFSwarmGUI(tk.Frame):
 
 						rdpct = rdsec /grp["RampUp"]
 						base.debugmsg(9, 'RampDown:rdpct', rdpct)
-						ruusr = int(grp["Users"] * rdpct)
+						ruusr = int(grp["Robots"] * rdpct)
 						base.debugmsg(9, 'RampDown:ruusr', ruusr)
-						totcounts[totnxt] += grp["Users"] - ruusr
+						totcounts[totnxt] += grp["Robots"] - ruusr
 						base.debugmsg(6, "Index", grp["Index"], 'totcounts[',totnxt,']', totcounts[totnxt])
 
-		base.debugmsg(6, "Total Users")
+		base.debugmsg(6, "Total Robots")
 
 		totcolour = "#000000"
 		# totcolour = "#0459af"
@@ -4459,7 +4495,7 @@ class RFSwarmGUI(tk.Frame):
 				base.debugmsg(6, prevkey, totcounts[prevkey])
 
 				usrpct = prevval / (mxuser * 1.0)
-				base.debugmsg(6, "Users", totcounts[key], "/ mxuser", mxuser, " = usrpct", usrpct)
+				base.debugmsg(6, "Robots", totcounts[key], "/ mxuser", mxuser, " = usrpct", usrpct)
 				newy = sy - int(sy * usrpct)
 
 				keypct = prevkey / (mxdur * 1.0)
@@ -4478,7 +4514,7 @@ class RFSwarmGUI(tk.Frame):
 				prevval = totcounts[key]
 
 				usrpct = totcounts[key] / (mxuser * 1.0)
-				base.debugmsg(6, "TU: Users", totcounts[key], "/ mxuser", mxuser, " = usrpct", usrpct)
+				base.debugmsg(6, "TU: Robots", totcounts[key], "/ mxuser", mxuser, " = usrpct", usrpct)
 				newy = sy - int(sy * usrpct)
 
 				keypct = key / (mxdur * 1.0)
@@ -4510,7 +4546,7 @@ class RFSwarmGUI(tk.Frame):
 		idx.grid(column=self.plancolidx, row=base.scriptcount, sticky="nsew")
 
 
-		num = base.scriptlist[base.scriptcount]["Users"]
+		num = base.scriptlist[base.scriptcount]["Robots"]
 		usr = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout")
 		# usr = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout", style="BW.TLabel")
 		# usr = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout", style="rfsinput")
@@ -4520,28 +4556,31 @@ class RFSwarmGUI(tk.Frame):
 		usr.config(validatecommand=lambda: self.sr_users_validate(row))
 		usr.grid(column=self.plancolusr, row=base.scriptcount, sticky="nsew")
 		usr.insert(0, num)
-		base.scriptlist[base.scriptcount]["Users"] = int(num)
+		base.scriptlist[base.scriptcount]["Robots"] = int(num)
 
 		num = base.scriptlist[base.scriptcount]["Delay"]
-		dly = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout")
+		# base.scriptlist[row]["TXT_Delay"] = tk.StringVar()
+		dly = ttk.Entry(self.scriptgrid, width=8, justify="right", validate="focusout")
 		dly.config(validatecommand=lambda: self.sr_delay_validate(row))
 		dly.grid(column=self.plancoldly, row=base.scriptcount, sticky="nsew")
-		dly.insert(0, num)
-		base.scriptlist[base.scriptcount]["Delay"] = int(num)
+		dly.insert(0, base.sec2hms(num))
+		base.scriptlist[base.scriptcount]["Delay"] = base.hms2sec(num)
 
 		num = base.scriptlist[base.scriptcount]["RampUp"]
-		rmp = ttk.Entry(self.scriptgrid, width=7, justify="right", validate="focusout")
+		rmp = ttk.Entry(self.scriptgrid, width=8, justify="right", validate="focusout")
 		rmp.config(validatecommand=lambda: self.sr_rampup_validate(row))
 		rmp.grid(column=self.plancolrmp, row=base.scriptcount, sticky="nsew")
-		rmp.insert(0, num)
-		base.scriptlist[base.scriptcount]["RampUp"] = int(num)
+		# rmp.insert(0, num)
+		rmp.insert(0, base.sec2hms(num))
+		base.scriptlist[base.scriptcount]["RampUp"] = base.hms2sec(num)
 
 		num = base.scriptlist[base.scriptcount]["Run"]
 		run = ttk.Entry(self.scriptgrid, width=8, justify="right", validate="focusout")
 		run.config(validatecommand=lambda: self.sr_run_validate(row))
 		run.grid(column=self.plancolrun, row=base.scriptcount, sticky="nsew")
-		run.insert(0, num)
-		base.scriptlist[base.scriptcount]["Run"] = int(num)
+		# run.insert(0, num)
+		run.insert(0, base.sec2hms(num))
+		base.scriptlist[base.scriptcount]["Run"] = base.hms2sec(num)
 
 		fgf = ttk.Frame(self.scriptgrid)
 		fgf.grid(column=self.plancolscr, row=base.scriptcount, sticky="nsew")
@@ -4617,8 +4656,8 @@ class RFSwarmGUI(tk.Frame):
 
 			if not base.args.nogui:
 				usrs = self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].get()
-			base.debugmsg(5, "Row:", r, "Users:", usrs)
-			base.scriptlist[r]["Users"] = int(usrs)
+			base.debugmsg(5, "Row:", r, "Robots:", usrs)
+			base.scriptlist[r]["Robots"] = int(usrs)
 			self.plan_scnro_chngd = True
 			if not base.args.nogui:
 				try:
@@ -4631,8 +4670,8 @@ class RFSwarmGUI(tk.Frame):
 			base.debugmsg(9, "RFSwarmGUI: r:", r)
 			if r>0:
 				usrs = self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].get()
-				base.debugmsg(9, "Row:", r, "Users:", usrs)
-				base.scriptlist[r]["Users"] = int(usrs)
+				base.debugmsg(9, "Row:", r, "Robots:", usrs)
+				base.scriptlist[r]["Robots"] = int(usrs)
 				self.plan_scnro_chngd = True
 		if not base.args.nogui:
 			try:
@@ -4648,14 +4687,19 @@ class RFSwarmGUI(tk.Frame):
 			v = None
 			if len(args)>1:
 				dly = str(args[1])
+				idly = base.hms2sec(args[1])
 				if not base.args.nogui:
+					base.debugmsg(6, "Row:", r, "Delay:", dly)
 					self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].delete(0,'end')
-					self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].insert(0,dly)
+					self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].insert(0, base.sec2hms(idly))
 			if not base.args.nogui:
 				dly = self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].get()
+				idly = base.hms2sec(dly)
+				self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].delete(0,'end')
+				self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].insert(0, base.sec2hms(idly))
 			base.debugmsg(6, "Row:", r, "Delay:", dly)
 			if len(dly)>0:
-				base.scriptlist[r]["Delay"] = int(dly)
+				base.scriptlist[r]["Delay"] = base.hms2sec(dly)
 				self.plan_scnro_chngd = True
 			else:
 				base.scriptlist[r]["Delay"] = 0
@@ -4674,7 +4718,7 @@ class RFSwarmGUI(tk.Frame):
 			if r>0:
 				dly = self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].get()
 				base.debugmsg(9, "Row:", r, "Delay:", dly)
-				base.scriptlist[r]["Delay"] = int(dly)
+				base.scriptlist[r]["Delay"] = base.hms2sec(dly)
 				self.plan_scnro_chngd = True
 		if not base.args.nogui:
 			try:
@@ -4691,13 +4735,17 @@ class RFSwarmGUI(tk.Frame):
 			rmp = None
 			if len(args)>1:
 				rmp = str(args[1])
+				irmp = base.hms2sec(args[1])
 				if not base.args.nogui:
 					self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].delete(0,'end')
-					self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].insert(0,rmp)
+					self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].insert(0,base.sec2hms(irmp))
 			if not base.args.nogui:
 				rmp = self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].get()
+				irmp = base.hms2sec(rmp)
+				self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].delete(0,'end')
+				self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].insert(0,base.sec2hms(irmp))
 			base.debugmsg(6, "Row:", r, "RampUp:", rmp)
-			base.scriptlist[r]["RampUp"] = int(rmp)
+			base.scriptlist[r]["RampUp"] = base.hms2sec(rmp)
 			self.plan_scnro_chngd = True
 			if not base.args.nogui:
 				try:
@@ -4711,7 +4759,7 @@ class RFSwarmGUI(tk.Frame):
 			if r>0:
 				rmp = self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].get()
 				base.debugmsg(9, "Row:", r, "RampUp:", rmp)
-				base.scriptlist[r]["RampUp"] = int(rmp)
+				base.scriptlist[r]["RampUp"] = base.hms2sec(rmp)
 				self.plan_scnro_chngd = True
 		if not base.args.nogui:
 			try:
@@ -4727,13 +4775,17 @@ class RFSwarmGUI(tk.Frame):
 			run = None
 			if len(args)>1:
 				run = str(args[1])
+				irun = base.hms2sec(args[1])
 				if not base.args.nogui:
 					self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].delete(0,'end')
-					self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].insert(0,run)
+					self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].insert(0,base.sec2hms(irun))
 			if not base.args.nogui:
 				run = self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].get()
+				irun = base.hms2sec(run)
+				self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].delete(0,'end')
+				self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].insert(0,base.sec2hms(irun))
 			base.debugmsg(6, "Row:", r, "Run:", run)
-			base.scriptlist[r]["Run"] = int(run)
+			base.scriptlist[r]["Run"] = base.hms2sec(run)
 			self.plan_scnro_chngd = True
 			if not base.args.nogui:
 				try:
@@ -4747,7 +4799,7 @@ class RFSwarmGUI(tk.Frame):
 			if r>0:
 				run = self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].get()
 				base.debugmsg(9, "Row:", r, "Run:", run)
-				base.scriptlist[r]["Run"] = int(run)
+				base.scriptlist[r]["Run"] = base.hms2sec(run)
 				self.plan_scnro_chngd = True
 		if not base.args.nogui:
 			try:
@@ -5368,15 +5420,19 @@ class RFSwarmGUI(tk.Frame):
 		if "Start" in base.robot_schedule:
 			stm = time.localtime(base.robot_schedule["Start"])
 			self.display_run['start_time'].set("  {}  ".format(time.strftime("%H:%M:%S", stm)))
-			etm = time.gmtime(int(time.time()) - base.robot_schedule["Start"])
-			self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
+			# etm = time.gmtime(int(time.time()) - base.robot_schedule["Start"])
+			etm = int(time.time()) - base.robot_schedule["Start"]
+			# self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
+			self.display_run['elapsed_time'].set("  {}  ".format(base.sec2hms(etm)))
 
 
 		if base.posttest and base.run_finish>0:
 			ftm = time.localtime(base.run_finish)
 			self.display_run['finish_time'].set("  {}  ".format(time.strftime("%H:%M:%S", ftm)))
-			etm = time.gmtime(base.run_finish - base.robot_schedule["Start"])
-			self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
+			# etm = time.gmtime(base.run_finish - base.robot_schedule["Start"])
+			etm = base.run_finish - base.robot_schedule["Start"]
+			# self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
+			self.display_run['elapsed_time'].set("  {}  ".format(base.sec2hms(etm)))
 
 		# update stop button
 		if base.run_end < int(time.time()):
@@ -5695,8 +5751,10 @@ class RFSwarmGUI(tk.Frame):
 		self.display_run['total_robots'].set("  {}  ".format(base.total_robots))
 		base.debugmsg(9, "total_robots:", base.total_robots)
 		if base.total_robots>0:
-			etm = time.gmtime(int(time.time()) - base.robot_schedule["Start"])
-			self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
+			# etm = time.gmtime(int(time.time()) - base.robot_schedule["Start"])
+			etm = int(time.time()) - base.robot_schedule["Start"]
+			# self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
+			self.display_run['elapsed_time'].set("  {}  ".format(base.sec2hms(etm)))
 
 		grdrows = self.agenttgrid.grid_size()[1]-1
 		while grdrows>rnum:

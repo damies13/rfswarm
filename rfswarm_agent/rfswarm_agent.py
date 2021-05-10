@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version 0.6.5
+#    Version 0.7.0
 #
 
 
@@ -41,7 +41,7 @@ import inspect
 
 class RFSwarmAgent():
 
-	version="0.6.5"
+	version="0.7.0"
 	config = None
 	isconnected = False
 	isrunning = False
@@ -169,9 +169,7 @@ class RFSwarmAgent():
 			self.saveini()
 
 
-		if not self.xmlmode:
-			self.debugmsg(6, "self.xmlmode: ", self.xmlmode)
-			self.create_listner_file()
+		self.ensure_listner_file()
 
 		t = threading.Thread(target=self.tick_counter)
 		t.start()
@@ -773,12 +771,15 @@ class RFSwarmAgent():
 
 	def runthread(self, jobid):
 		now = int(time.time())
+
+		self.ensure_listner_file()
+
 		if "ScriptIndex" not in self.jobs[jobid]:
 			self.debugmsg(6, "runthread: jobid:", jobid)
 			self.debugmsg(6, "runthread: job data:", self.jobs[jobid])
 			jobarr = jobid.split("_")
 			self.jobs[jobid]["ScriptIndex"] = jobarr[0]
-			self.jobs[jobid]["VUser"] = jobarr[1]
+			self.jobs[jobid]["Robot"] = jobarr[1]
 			self.jobs[jobid]["Iteration"] = 0
 			self.debugmsg(6, "runthread: job data:", self.jobs[jobid])
 
@@ -854,18 +855,20 @@ class RFSwarmAgent():
 		cmd.append("-d")
 		cmd.append('"'+odir+'"')
 
-		cmd.append("-M agent:{}".format(self.agentname))
-		if self.xmlmode:
-			cmd.append("-v index:{}".format(self.jobs[jobid]["ScriptIndex"]))
-			cmd.append("-v vuser:{}".format(self.jobs[jobid]["VUser"]))
-			cmd.append("-v iteration:{}".format(self.jobs[jobid]["Iteration"]))
-		else:
-			cmd.append("-M debuglevel:{}".format(self.debuglvl))
-			cmd.append("-M index:{}".format(self.jobs[jobid]["ScriptIndex"]))
-			cmd.append("-M vuser:{}".format(self.jobs[jobid]["VUser"]))
-			cmd.append("-M iteration:{}".format(self.jobs[jobid]["Iteration"]))
-			cmd.append("-M swarmmanager:{}".format(self.swarmmanager))
-			cmd.append("-M excludelibraries:{}".format(excludelibraries))
+		cmd.append("-M RFS_AGENTNAME:{}".format(self.agentname))
+		cmd.append("-M RFS_AGENTVERSION:{}".format(self.version))
+		cmd.append("-M RFS_DEBUGLEVEL:{}".format(self.debuglvl))
+		cmd.append("-M RFS_INDEX:{}".format(self.jobs[jobid]["ScriptIndex"]))
+		cmd.append("-v RFS_INDEX:{}".format(self.jobs[jobid]["ScriptIndex"]))
+		cmd.append("-M RFS_ROBOT:{}".format(self.jobs[jobid]["Robot"]))
+		cmd.append("-v RFS_ROBOT:{}".format(self.jobs[jobid]["Robot"]))
+		cmd.append("-M RFS_ITERATION:{}".format(self.jobs[jobid]["Iteration"]))
+		cmd.append("-v RFS_ITERATION:{}".format(self.jobs[jobid]["Iteration"]))
+		cmd.append("-M RFS_SWARMMANAGER:{}".format(self.swarmmanager))
+		cmd.append("-v RFS_SWARMMANAGER:{}".format(self.swarmmanager))
+		cmd.append("-M RFS_EXCLUDELIBRARIES:{}".format(excludelibraries))
+
+		if not self.xmlmode:
 			cmd.append("--listener {}".format('"'+self.listenerfile+'"'))
 
 		if "robotoptions" in self.jobs[jobid]:
@@ -905,7 +908,7 @@ class RFSwarmAgent():
 				if self.xmlmode:
 					if os.path.exists(outputFile):
 						if self.xmlmode:
-							t = threading.Thread(target=self.run_process_output, args=(outputFile, self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["VUser"], self.jobs[jobid]["Iteration"]))
+							t = threading.Thread(target=self.run_process_output, args=(outputFile, self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["Robot"], self.jobs[jobid]["Iteration"]))
 							t.start()
 					else:
 						self.debugmsg(1, "Robot didn't create (", outputFile, ") please check the log file:", logFileName)
@@ -1093,7 +1096,7 @@ class RFSwarmAgent():
 			time.sleep(0.5)
 
 
-	def run_process_output(self, outputFile, index, vuser, iter):
+	def run_process_output(self, outputFile, index, robot, iter):
 		# This should be a better way to do this
 		# https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#listener-interface
 		# https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#listener-examples
@@ -1160,7 +1163,7 @@ class RFSwarmAgent():
 					"StartTime": startdate.timestamp(),
 					"EndTime": enddate.timestamp(),
 					"ScriptIndex": index,
-					"VUser": vuser,
+					"Robot": robot,
 					"Iteration": iter,
 					"Sequence": seq
 				}
@@ -1210,6 +1213,15 @@ class RFSwarmAgent():
 			self.debugmsg(1, "with error: ", e)
 			return False
 
+	def ensure_listner_file(self):
+		if not self.xmlmode:
+			self.debugmsg(6, "self.xmlmode: ", self.xmlmode)
+			if self.listenerfile is None:
+				self.create_listner_file()
+			else:
+				if not os.path.isfile(self.listenerfile):
+					self.create_listner_file()
+
 	def create_listner_file(self):
 		self.listenerfile = os.path.join(self.scriptdir, "RFSListener2.py")
 
@@ -1233,28 +1245,28 @@ class RFSwarmAgent():
 		fd.append("	excludelibraries = [\"BuiltIn\",\"String\",\"OperatingSystem\",\"perftest\"]")
 		fd.append("	debuglevel = 0")
 		fd.append("	index = 0")
-		fd.append("	vuser = 0")
+		fd.append("	robot = 0")
 		fd.append("	iter = 0")
 		fd.append("	seq = 0")
 		fd.append("")
 		fd.append("	def start_suite(self, name, attrs):")
-		fd.append("		if 'debuglevel' in attrs['metadata']:")
-		fd.append("			self.debuglevel = int(attrs['metadata']['debuglevel'])")
+		fd.append("		if 'RFS_DEBUGLEVEL' in attrs['metadata']:")
+		fd.append("			self.debuglevel = int(attrs['metadata']['RFS_DEBUGLEVEL'])")
 		fd.append("			self.debugmsg(6, 'debuglevel: ', self.debuglevel)")
-		fd.append("		if 'index' in attrs['metadata']:")
-		fd.append("			self.index = attrs['metadata']['index']")
+		fd.append("		if 'RFS_INDEX' in attrs['metadata']:")
+		fd.append("			self.index = attrs['metadata']['RFS_INDEX']")
 		fd.append("			self.debugmsg(6, 'index: ', self.index)")
-		fd.append("		if 'iteration' in attrs['metadata']:")
-		fd.append("			self.iter = attrs['metadata']['iteration']")
+		fd.append("		if 'RFS_ITERATION' in attrs['metadata']:")
+		fd.append("			self.iter = attrs['metadata']['RFS_ITERATION']")
 		fd.append("			self.debugmsg(6, 'iter: ', self.iter)")
-		fd.append("		if 'vuser' in attrs['metadata']:")
-		fd.append("			self.vuser = attrs['metadata']['vuser']")
-		fd.append("			self.debugmsg(6, 'vuser: ', self.vuser)")
-		fd.append("		if 'swarmmanager' in attrs['metadata']:")
-		fd.append("			self.swarmmanager = attrs['metadata']['swarmmanager']")
+		fd.append("		if 'RFS_ROBOT' in attrs['metadata']:")
+		fd.append("			self.robot = attrs['metadata']['RFS_ROBOT']")
+		fd.append("			self.debugmsg(6, 'robot: ', self.robot)")
+		fd.append("		if 'RFS_SWARMMANAGER' in attrs['metadata']:")
+		fd.append("			self.swarmmanager = attrs['metadata']['RFS_SWARMMANAGER']")
 		fd.append("			self.debugmsg(6, 'swarmmanager: ', self.swarmmanager)")
-		fd.append("		if 'excludelibraries' in attrs['metadata']:")
-		fd.append("			self.excludelibraries = attrs['metadata']['excludelibraries'].split(\",\")")
+		fd.append("		if 'RFS_EXCLUDELIBRARIES' in attrs['metadata']:")
+		fd.append("			self.excludelibraries = attrs['metadata']['RFS_EXCLUDELIBRARIES'].split(\",\")")
 		fd.append("			self.debugmsg(6, 'excludelibraries: ', self.excludelibraries)")
 		fd.append("")
 		fd.append("	def log_message(self, message):")
@@ -1287,7 +1299,7 @@ class RFSwarmAgent():
 		fd.append("					'StartTime': startdate.timestamp(),")
 		fd.append("					'EndTime': enddate.timestamp(),")
 		fd.append("					'ScriptIndex': self.index,")
-		fd.append("					'VUser': self.vuser,")
+		fd.append("					'Robot': self.robot,")
 		fd.append("					'Iteration': self.iter,")
 		fd.append("					'Sequence': self.seq")
 		fd.append("				}")
@@ -1314,7 +1326,7 @@ class RFSwarmAgent():
 		fd.append("					'StartTime': startdate.timestamp(),")
 		fd.append("					'EndTime': enddate.timestamp(),")
 		fd.append("					'ScriptIndex': self.index,")
-		fd.append("					'VUser': self.vuser,")
+		fd.append("					'Robot': self.robot,")
 		fd.append("					'Iteration': self.iter,")
 		fd.append("					'Sequence': self.seq")
 		fd.append("				}")
