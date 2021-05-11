@@ -3293,6 +3293,13 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(6, "New Graph Window.....")
 		# base.debugmsg(7, "New Graph Window - args:", args)
 		grphWindow = tk.Toplevel(self.root)
+		# grphWindow.config(bg="pink")
+		grphWindow.columnconfigure(0, weight=1)
+		# grphWindow.rowconfigure(0, weight=1)
+		grphWindow.rowconfigure(1, weight=1)
+
+		# grphWindow.bind("<Configure>", self.gph_windowevent)
+		grphWindow.bind("<Configure>", lambda e: self.gph_windowevent(e, grphWindow) )
 
 		self.newgraph += 1
 		grphWindow.graphid = int(self.newgraph)
@@ -3308,33 +3315,43 @@ class RFSwarmGUI(tk.Frame):
 		# grphWindow.fmeBBar.grid(column=0, row=0, sticky="nsew")
 		grphWindow.fmeBBar.grid(column=0, row=0, sticky="ne")
 		grphWindow.fmeContent = tk.Frame(grphWindow)
+		grphWindow.fmeContent.config(bg="red")
 		grphWindow.fmeContent.grid(column=0, row=1, sticky="nsew")
 
-		# grphWindow.columnconfigure(0, weight=1)
-		# grphWindow.rowconfigure(0, weight=1)
-		# grphWindow.rowconfigure(1, weight=1)
+		grphWindow.fmeContent.columnconfigure(0, weight=1)
+		grphWindow.fmeContent.rowconfigure(0, weight=1)
+		# grphWindow.fmeContent.rowconfigure(1, weight=1)
+
 
 		grphWindow.lblBLNK = ttk.Label(grphWindow.fmeBBar, text = " ")	# just a blank row as a spacer before the filters
 		grphWindow.lblBLNK.grid(column=0, row=0, sticky="nsew")
 
 		icontext = "Advanced"
-		grphWindow.lblSettings = ttk.Button(grphWindow.fmeBBar, image=self.imgdata[icontext], text="S", command=lambda: self.gs_showhide(grphWindow), width=1)
-		grphWindow.lblSettings.grid(column=99, row=0, sticky="nsew")
+		grphWindow.btnSettings = ttk.Button(grphWindow.fmeBBar, image=self.imgdata[icontext], text="Settings", command=lambda: self.gs_showhide(grphWindow), width=1)
+		grphWindow.btnSettings.grid(column=99, row=0, sticky="nsew")
 
 		icontext = "Refresh"
-		grphWindow.lblSettings = ttk.Button(grphWindow.fmeBBar, image=self.imgdata[icontext], text="R", command=lambda: self.gs_refresh(grphWindow), width=1)
-		grphWindow.lblSettings.grid(column=98, row=0, sticky="nsew")
+		grphWindow.btnRefresh = ttk.Button(grphWindow.fmeBBar, image=self.imgdata[icontext], text="Refresh", command=lambda: self.gs_refresh(grphWindow), width=1)
+		grphWindow.btnRefresh.grid(column=98, row=0, sticky="nsew")
 
 
 
 		grphWindow.fmeGraph = tk.Frame(grphWindow.fmeContent)
-		grphWindow.fmeGraph.grid(column=0, row=1, columnspan=8, sticky="nsew")
+		grphWindow.fmeGraph.config(bg="green")
+		grphWindow.fmeGraph.grid(column=0, row=0, columnspan=8, sticky="nsew")
+		# grphWindow.fmeGraph.bind("<Configure>", self.gph_windowevent)
+		# grphWindow.fmeGraph.bind("<Configure>", lambda: self.gph_windowevent(grphWindow))
 
-		grphWindow.fig = Figure(dpi=100)
-		grphWindow.axis = grphWindow.fig.add_subplot(1,1,1)
+		grphWindow.fmeGraph.columnconfigure(0, weight=1)
+		grphWindow.fmeGraph.rowconfigure(0, weight=1)
+		# grphWindow.fmeGraph.rowconfigure(1, weight=1)
+
+		grphWindow.fig_dpi = 100
+		grphWindow.fig = Figure(dpi=grphWindow.fig_dpi, tight_layout=True, constrained_layout=True) # , constrained_layout=True??
+		grphWindow.axis = grphWindow.fig.add_subplot(1,1,1)	# , constrained_layout=True??
 		# self.axis = self.fig.add_subplot()
 		grphWindow.axis.grid(True, 'major', 'both')
-		grphWindow.fig.tight_layout()
+		# grphWindow.fig.tight_layout()
 
 		# self.axis.plot([],[])
 
@@ -3342,8 +3359,10 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
 
 		grphWindow.canvas = FigureCanvasTkAgg(grphWindow.fig, grphWindow.fmeGraph)
-		grphWindow.canvas.draw()
 		grphWindow.canvas.get_tk_widget().grid(column=0, row=0, sticky="nsew")
+		grphWindow.canvas.get_tk_widget().config(bg="blue")
+		grphWindow.canvas.draw()
+
 
 		#
 		# # start thread to update the graph (gph_updater)
@@ -3351,7 +3370,7 @@ class RFSwarmGUI(tk.Frame):
 		t.start()
 
 		grphWindow.fmeSettings = tk.Frame(grphWindow.fmeContent)
-		grphWindow.fmeSettings.grid(column=90, row=1, columnspan=10, sticky="nsew")
+		grphWindow.fmeSettings.grid(column=90, row=0, columnspan=10, sticky="nsew")
 
 		grphWindow.fmeSettings.show = True
 
@@ -3437,6 +3456,25 @@ class RFSwarmGUI(tk.Frame):
 		# start threads to update option lists
 		t = threading.Thread(target=lambda: self.gs_refresh(grphWindow))
 		t.start()
+
+	def gph_windowevent(self, event, *args):
+		base.debugmsg(6, "event:", event)
+		# base.debugmsg(6, "self:", self)
+		# base.debugmsg(6, "args:", args)
+
+		if len(args)>0:
+			grphWindow = args[0]
+			# base.debugmsg(6, "grphWindow.title:", grphWindow.graphname.get() )
+			# w = grphWindow.winfo_screenwidth()
+			# h = grphWindow.winfo_screenheight()
+			w = grphWindow.winfo_width()
+			h = grphWindow.winfo_height()
+			base.debugmsg(6, "w:", w, "	h:", h)
+			# need to save graph window settings as it changes
+
+
+
+
 
 	def gph_updater(self, grphWindow):
 		try:
@@ -3625,7 +3663,7 @@ class RFSwarmGUI(tk.Frame):
 			base.debugmsg(6, "fmeSettings.show:", grphWindow.fmeSettings.show)
 		else:
 			grphWindow.fmeSettings.show = True
-			grphWindow.fmeSettings.grid(column=90, row=1, columnspan=10, sticky="nsew")
+			grphWindow.fmeSettings.grid(column=90, row=0, columnspan=10, sticky="nsew")
 			base.debugmsg(6, "fmeSettings.show:", grphWindow.fmeSettings.show)
 
 	def gs_updatename(self, grphWindow):
