@@ -3913,6 +3913,11 @@ class RFSwarmGUI(tk.Frame):
 		self.scriptgrid.update_idletasks()
 		self.sg_canvas.config(scrollregion=self.sg_canvas.bbox("all"))
 
+		# self.pln_graph.bind("<Configure>", self.CanvasResize)
+		# May need to bind <Button-4> and <Button-5> to enable mouse scrolling
+		# https://www.python-course.eu/tkinter_events_binds.php
+
+
 	def CanvasResize(self, event):
 		base.debugmsg(6, "event:", event)
 		self.pln_update_graph()
@@ -5554,6 +5559,9 @@ class RFSwarmGUI(tk.Frame):
 			self.rungrid.update_idletasks()
 			self.run_canvas.config(scrollregion=self.rungrid.bbox("all"))
 
+			# self.pln_graph.bind("<Configure>", self.CanvasResize)
+			# May need to bind <Button-4> and <Button-5> to enable mouse scrolling
+			# https://www.python-course.eu/tkinter_events_binds.php
 
 			ut = threading.Thread(target=self.delayed_UpdateRunStats)
 			ut.start()
@@ -5771,6 +5779,9 @@ class RFSwarmGUI(tk.Frame):
 		self.agenttgrid.update_idletasks()
 		self.ag_canvas.config(scrollregion=self.ag_canvas.bbox("all"))
 
+		# self.pln_graph.bind("<Configure>", self.CanvasResize)
+		# May need to bind <Button-4> and <Button-5> to enable mouse scrolling
+		# https://www.python-course.eu/tkinter_events_binds.php
 
 	def add_agent_row(self, rnum):
 		base.debugmsg(9, "add_row: rnum:", rnum)
