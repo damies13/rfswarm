@@ -3403,15 +3403,20 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeSettings.omDT.grid(column=1, row=row, sticky="nsew")
 
 
-
 		row +=1
 		grphWindow.fmeDTRow = row
 		#
 		# 	Add DT Settings frames
 		#
+		grphWindow.fmeSettings.columnconfigure(0, weight=1)
+
 		grphWindow.fmeRSettings = tk.Frame(grphWindow.fmeSettings)
+		grphWindow.fmeRSettings.columnconfigure(0, weight=1)
+		grphWindow.fmeRSettings.columnconfigure(1, weight=1)
 
 		grphWindow.fmeMSettings = tk.Frame(grphWindow.fmeSettings)
+		grphWindow.fmeMSettings.columnconfigure(0, weight=1)
+		grphWindow.fmeMSettings.columnconfigure(1, weight=1)
 		grphWindow.fmeMSettings.grid(column=0, row=grphWindow.fmeDTRow, columnspan=2, sticky="nsew")
 
 		#
@@ -3421,6 +3426,19 @@ class RFSwarmGUI(tk.Frame):
 		# grphWindow.fmeRSettings
 		grphWindow.fmeRSettings.lblRT = ttk.Label(grphWindow.fmeRSettings, text = "Result Type:")
 		grphWindow.fmeRSettings.lblRT.grid(column=0, row=rowR, sticky="nsew")
+
+		grphWindow.fmeRSettings.RTypes = [None, "Response Time", "TPS", "Total TPS"]
+		grphWindow.settings["RType"] = tk.StringVar()
+		grphWindow.fmeRSettings.omMT = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["RType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.RTypes)
+		grphWindow.settings["RType"].set(grphWindow.fmeRSettings.RTypes[1])
+		grphWindow.fmeRSettings.omMT.grid(column=1, row=rowR, sticky="nsew")
+
+		# result filtered by PASS, FAIL, None
+		# result_name filtered by GLOB (Unix file globbing syntax for its wildcards)
+		# result_name filtered by REGEXP
+		# NOT variations of GLOB and REGEXP
+
+
 
 		#
 		# 	DT Metric Settings
@@ -3606,7 +3624,105 @@ class RFSwarmGUI(tk.Frame):
 
 
 		if DataType == "Result":
-			pass
+			RType = grphWindow.settings["RType"].get()
+			base.debugmsg(5, "RType:", RType)
+
+			sql = "SELECT "
+			sql += 		"  CAST(end_time as INTEGER) as 'endtime' "
+			if RType == "Response Time":
+				sql += 		", result_name "
+				sql += 		", elapsed_time "
+			if RType == "TPS":
+				sql += 		", count(result)  as 'count' "
+				sql += 		", result_name "
+				sql += 		", result "
+			if RType == "Total TPS":
+				sql += 		", count(result)  as 'count' "
+				sql += 		", result "
+
+			sql += "FROM Results "
+			# sql += "WHERE result == 'PASS' "
+			# sql += "WHERE result_name REGEXP 'OC3.*' "
+			# sql += "WHERE result_name GLOB 'OC3*' "
+			if RType == "Response Time":
+				sql += "WHERE result == 'PASS' "
+				sql +=  	"AND result_name NOT LIKE 'Exception in thread%' "
+			if RType == "TPS":
+				sql +=  "WHERE result_name NOT LIKE 'Exception in thread%' "
+
+
+			sql += "GROUP by CAST(end_time as INTEGER) "
+			# sql += 		", result "
+			if RType == "Response Time":
+				sql += 		", result_name "
+				sql += 		", elapsed_time "
+			if RType == "TPS":
+				sql += 		", result_name "
+				sql += 		", result "
+			if RType == "Total TPS":
+				sql += 		", result "
+
+			base.debugmsg(5, "sql:", sql)
+
+			gdname = "GraphData_{}".format(RType)
+			base.dbqueue["Read"].append({"SQL": sql, "KEY": gdname})
+
+			dodraw = False
+			if gdname in base.dbqueue["ReadResult"]:
+				base.debugmsg(5, gdname, ":", base.dbqueue["ReadResult"][gdname])
+				grphWindow.graphdata = {}
+				grphWindow.axis.cla()
+				# dodraw = True
+
+				feilds = {}
+				feilds["Name"] = "result"
+				feilds["Time"] = "endtime"
+				feilds["Value"] = "count"
+
+				if RType == "Response Time":
+					feilds["Name"] = "result_name"
+					feilds["Value"] = "elapsed_time"
+
+				if RType == "TPS":
+					feilds["Name"] = "result_name"
+
+				for res in base.dbqueue["ReadResult"][gdname]:
+
+					name = res[feilds["Name"]]
+					# base.debugmsg(5, "name:", name)
+					if name not in grphWindow.graphdata:
+						grphWindow.graphdata[name] = {}
+						colour = base.named_colour(name)
+						base.debugmsg(5, "name:", name, "	colour:", colour)
+						grphWindow.graphdata[name]["Colour"] = colour
+						grphWindow.graphdata[name]["objTime"] = []
+						grphWindow.graphdata[name]["Values"] = []
+
+					grphWindow.graphdata[name]["objTime"].append(datetime.fromtimestamp(res[feilds["Time"]]))
+					grphWindow.graphdata[name]["Values"].append(self.gph_floatval(res[feilds["Value"]]))
+
+					# if name not in grphWindow.graphdata:
+					# 	grphWindow.graphdata[name] = {}
+				base.debugmsg(5, "grphWindow.graphdata:", grphWindow.graphdata)
+
+				for name in grphWindow.graphdata:
+					if len(grphWindow.graphdata[name]["Values"])>0:
+						grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"],grphWindow.graphdata[name]["Values"], grphWindow.graphdata[name]["Colour"], label=name)
+						dodraw = True
+
+			if dodraw:
+				# self.canvas.gcf().autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+				grphWindow.axis.grid(True, 'major', 'both')
+
+				base.debugmsg(9, "showlegend:", grphWindow.showlegend.get())
+				if grphWindow.showlegend.get():
+					# grphWindow.axis.legend()
+					# grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),&nbsp; shadow=True, ncol=2)
+					grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
+
+				grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+				grphWindow.canvas.draw()
+
 
 
 	def gs_refresh(self, grphWindow):
