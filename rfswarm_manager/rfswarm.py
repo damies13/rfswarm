@@ -3165,10 +3165,23 @@ class RFSwarmGUI(tk.Frame):
 		gph_menu = tk.Menu(root_menu)
 		root_menu.add_cascade(label = "Graphs", menu = gph_menu)
 
-
-
 		gph_menu.add_command(label = "New Graph Window", command = self.NewGraph, accelerator="{}-g".format(accelkey))
 		window.bind('g', self.NewGraph)
+
+		gph_example_menu = tk.Menu(gph_menu)
+		gph_menu.add_cascade(label = "Examples", menu = gph_example_menu)
+
+		gph_example_menu.add_command(label = "Running Robots")
+		gph_example_menu.add_command(label = "Agent Load")
+		gph_example_menu.add_command(label = "Response Time")
+		gph_example_menu.add_command(label = "Passing Keywords")
+		gph_example_menu.add_command(label = "Failing Keywords")
+
+		gph_recent_menu = tk.Menu(gph_menu)
+		gph_menu.add_cascade(label = "Recent", menu = gph_recent_menu)
+
+		gph_scenario_menu = tk.Menu(gph_menu)
+		gph_menu.add_cascade(label = "Scenario", menu = gph_scenario_menu)
 
 
 
@@ -3455,7 +3468,7 @@ class RFSwarmGUI(tk.Frame):
 		# for some reason the regex patterns didn't work, when I put the generated sql with the
 		# 	regex into "DB Browser for SQLite" they did work, so perhaps the python implimentation of
 		# 	sqlite doesn't have regex included, needs more research
-		# 
+		#
 		#  Example generated sql with regex
 		# 	SELECT   CAST(end_time as INTEGER) as 'endtime' , count(result)  as 'count' , result_name , result FROM Results WHERE result == 'PASS' AND result_name NOT LIKE 'Exception in thread%' AND result_name REGEXP 'OC3.*' GROUP by CAST(end_time as INTEGER) , result_name , result
 		#
