@@ -3429,15 +3429,51 @@ class RFSwarmGUI(tk.Frame):
 
 		grphWindow.fmeRSettings.RTypes = [None, "Response Time", "TPS", "Total TPS"]
 		grphWindow.settings["RType"] = tk.StringVar()
-		grphWindow.fmeRSettings.omMT = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["RType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.RTypes)
+		grphWindow.fmeRSettings.omRT = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["RType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.RTypes)
 		grphWindow.settings["RType"].set(grphWindow.fmeRSettings.RTypes[1])
-		grphWindow.fmeRSettings.omMT.grid(column=1, row=rowR, sticky="nsew")
+		grphWindow.fmeRSettings.omRT.grid(column=1, row=rowR, sticky="nsew")
 
+		rowR +=1
 		# result filtered by PASS, FAIL, None
+		grphWindow.fmeRSettings.lblFR = ttk.Label(grphWindow.fmeRSettings, text = "Filter Result:")
+		grphWindow.fmeRSettings.lblFR.grid(column=0, row=rowR, sticky="nsew")
+
+		grphWindow.fmeRSettings.FRTypes = [None, "None", "Pass", "Fail"]
+		grphWindow.settings["FRType"] = tk.StringVar()
+		grphWindow.fmeRSettings.omFR = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["FRType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.FRTypes)
+		grphWindow.settings["FRType"].set(grphWindow.fmeRSettings.FRTypes[2])
+		grphWindow.fmeRSettings.omFR.grid(column=1, row=rowR, sticky="nsew")
+
+		rowR +=1
 		# result_name filtered by GLOB (Unix file globbing syntax for its wildcards)
 		# result_name filtered by REGEXP
 		# NOT variations of GLOB and REGEXP
 
+		grphWindow.fmeRSettings.lblFN = ttk.Label(grphWindow.fmeRSettings, text = "Filter Type:")
+		grphWindow.fmeRSettings.lblFN.grid(column=0, row=rowR, sticky="nsew")
+
+		# for some reason the regex patterns didn't work, when I put the generated sql with the
+		# 	regex into "DB Browser for SQLite" they did work, so perhaps the python implimentation of
+		# 	sqlite doesn't have regex included, needs more research
+		# 
+		#  Example generated sql with regex
+		# 	SELECT   CAST(end_time as INTEGER) as 'endtime' , count(result)  as 'count' , result_name , result FROM Results WHERE result == 'PASS' AND result_name NOT LIKE 'Exception in thread%' AND result_name REGEXP 'OC3.*' GROUP by CAST(end_time as INTEGER) , result_name , result
+		#
+		# grphWindow.fmeRSettings.FNTypes = [None, "None", "Wildcard (Unix Glob)", "Regex", "Not Wildcard (Unix Glob)", "Not Regex"]
+		grphWindow.fmeRSettings.FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
+		grphWindow.settings["FNType"] = tk.StringVar()
+		grphWindow.fmeRSettings.omFR = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["FNType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.FNTypes)
+		grphWindow.settings["FNType"].set(grphWindow.fmeRSettings.FNTypes[1])
+		grphWindow.fmeRSettings.omFR.grid(column=1, row=rowR, sticky="nsew")
+
+		rowR +=1
+		grphWindow.fmeRSettings.lblFP = ttk.Label(grphWindow.fmeRSettings, text = "Filter Pattern:")
+		grphWindow.fmeRSettings.lblFP.grid(column=0, row=rowR, sticky="nsew")
+
+		grphWindow.fmeRSettings.inpFP = ttk.Entry(grphWindow.fmeRSettings)
+		# grphWindow.fmeRSettings.inpFP.delete(0,'end')
+		# grphWindow.fmeRSettings.inpFP.insert(0, stgsWindow.excludelibrariescurrent)
+		grphWindow.fmeRSettings.inpFP.grid(column=1, row=rowR, sticky="nsew")
 
 
 		#
@@ -3666,6 +3702,15 @@ class RFSwarmGUI(tk.Frame):
 			RType = grphWindow.settings["RType"].get()
 			base.debugmsg(5, "RType:", RType)
 
+			FRType = grphWindow.settings["FRType"].get()
+			base.debugmsg(5, "FRType:", FRType)
+
+			FNType = grphWindow.settings["FNType"].get()
+			base.debugmsg(5, "FNType:", FNType)
+
+			inpFP = grphWindow.fmeRSettings.inpFP.get()
+			base.debugmsg(5, "inpFP:", inpFP)
+
 			sql = "SELECT "
 			sql += 		"  CAST(end_time as INTEGER) as 'endtime' "
 			if RType == "Response Time":
@@ -3684,14 +3729,39 @@ class RFSwarmGUI(tk.Frame):
 			# sql += "WHERE result_name REGEXP 'OC3.*' "
 			# sql += "WHERE result_name GLOB 'OC3*' "
 			lwhere = []
-			if RType == "Response Time":
+			if FRType == "Pass":
 				# sql += "WHERE result == 'PASS' "
 				lwhere.append("result == 'PASS'")
+			if FRType == "Fail":
+				# sql += "WHERE result == 'FAIL' "
+				lwhere.append("result == 'FAIL'")
+
+			if RType == "Response Time":
 				# sql +=  	"AND result_name NOT LIKE 'Exception in thread%' "
 				lwhere.append("result_name NOT LIKE 'Exception in thread%'")
 			if RType == "TPS":
 				# sql +=  "WHERE result_name NOT LIKE 'Exception in thread%' "
 				lwhere.append("result_name NOT LIKE 'Exception in thread%'")
+
+			if FNType != "None" and len(inpFP)>0:
+				# construct pattern
+				# "Wildcard (Unix Glob)",
+				if FNType == "Wildcard (Unix Glob)":
+					# -- 		WHERE result_name GLOB 'OC3*'
+					lwhere.append("result_name GLOB '{}'".format(inpFP))
+				# "Regex",
+				if FNType == "Regex":
+					# -- 		WHERE result_name GLOB 'OC3*'
+					lwhere.append("result_name REGEXP '{}'".format(inpFP))
+				# "Not Wildcard (Unix Glob)",
+				if FNType == "Not Wildcard (Unix Glob)":
+					# -- 		WHERE result_name GLOB 'OC3*'
+					lwhere.append("result_name NOT GLOB '{}'".format(inpFP))
+				# "Not Regex"
+				if FNType == "Not Regex":
+					# -- 		WHERE result_name GLOB 'OC3*'
+					lwhere.append("result_name NOT REGEXP '{}'".format(inpFP))
+
 
 			i = 0
 			for iwhere in lwhere:
@@ -3715,7 +3785,7 @@ class RFSwarmGUI(tk.Frame):
 
 			base.debugmsg(5, "sql:", sql)
 
-			gdname = "GraphData_{}".format(RType)
+			gdname = "GraphData_{}_{}_{}_{}".format(RType, FRType, FNType, inpFP)
 			base.dbqueue["Read"].append({"SQL": sql, "KEY": gdname})
 
 			dodraw = False
