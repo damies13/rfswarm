@@ -3556,7 +3556,10 @@ class RFSwarmGUI(tk.Frame):
 
 			GDNames = []
 			if hasfilter:
-				grphWindow.axis.cla()
+				try:
+					grphWindow.axis.cla()
+				except:
+					pass
 				for mt in MTLst:
 					for pm in PMLst:
 						if pm in base.MetricIDs[mt]:
@@ -3599,6 +3602,7 @@ class RFSwarmGUI(tk.Frame):
 
 						grphWindow.graphdata[name]["objTime"] = [datetime.fromtimestamp(r['MetricTime']) for r in base.dbqueue["ReadResult"][gdname] ]
 						grphWindow.graphdata[name]["Values"] = [self.gph_floatval(r['MetricValue']) for r in base.dbqueue["ReadResult"][gdname] ]
+						base.debugmsg(9, gdname, "Values:", grphWindow.graphdata[name]["Values"])
 
 						base.debugmsg(6, gdname, ":", grphWindow.graphdata[name])
 						if len(grphWindow.graphdata[name]["Values"])>0:
@@ -3607,11 +3611,20 @@ class RFSwarmGUI(tk.Frame):
 
 
 				if dodraw:
+					# ylbls = grphWindow.axis.get_yticklabels()
+					# base.debugmsg(5, "ylbls:", ylbls)
+					# base.debugmsg(5, "ylbls[0]:", ylbls[0], type(ylbls[0]))
+					# base.debugmsg(5, "ylbls[0]:", ylbls[0].get_text())
+					# base.debugmsg(5, "ylbls[0]:", ylbls[0].label())
+
+
 					# self.canvas.gcf().autofmt_xdate(bottom=0.2, rotation=30, ha='right')
 					grphWindow.axis.grid(True, 'major', 'both')
 					base.debugmsg(6, "SMetric:", SMetric)
 					if SMetric in ["Load", "CPU", "MEM", "NET"]:
 						grphWindow.axis.set_ylim(0, 100)
+					else:
+						grphWindow.axis.set_ylim(0)
 
 					base.debugmsg(9, "showlegend:", grphWindow.showlegend.get())
 					if grphWindow.showlegend.get():
@@ -3671,7 +3684,10 @@ class RFSwarmGUI(tk.Frame):
 			if gdname in base.dbqueue["ReadResult"]:
 				base.debugmsg(5, gdname, ":", base.dbqueue["ReadResult"][gdname])
 				grphWindow.graphdata = {}
-				grphWindow.axis.cla()
+				try:
+					grphWindow.axis.cla()
+				except:
+					pass
 				# dodraw = True
 
 				feilds = {}
@@ -3713,6 +3729,8 @@ class RFSwarmGUI(tk.Frame):
 			if dodraw:
 				# self.canvas.gcf().autofmt_xdate(bottom=0.2, rotation=30, ha='right')
 				grphWindow.axis.grid(True, 'major', 'both')
+
+				grphWindow.axis.set_ylim(0)
 
 				base.debugmsg(9, "showlegend:", grphWindow.showlegend.get())
 				if grphWindow.showlegend.get():
