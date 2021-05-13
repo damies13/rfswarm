@@ -3584,6 +3584,7 @@ class RFSwarmGUI(tk.Frame):
 									base.dbqueue["Read"].append({"SQL": sql, "KEY": "GraphData_{}".format(name)})
 
 				dodraw = False
+				# ylbls = []
 				for name in GDNames:
 
 					dname = " ".join(list(set(name.split("|")).symmetric_difference(set([MType, PMetric, SMetric])))).strip()
@@ -3604,6 +3605,11 @@ class RFSwarmGUI(tk.Frame):
 						grphWindow.graphdata[name]["Values"] = [self.gph_floatval(r['MetricValue']) for r in base.dbqueue["ReadResult"][gdname] ]
 						base.debugmsg(9, gdname, "Values:", grphWindow.graphdata[name]["Values"])
 
+						# for r in base.dbqueue["ReadResult"][gdname]:
+						# 	fval = self.gph_floatval(r['MetricValue'])
+						# 	if fval not in ylbls:
+						# 		ylbls.append(fval)
+
 						base.debugmsg(6, gdname, ":", grphWindow.graphdata[name])
 						if len(grphWindow.graphdata[name]["Values"])>0:
 							grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"],grphWindow.graphdata[name]["Values"], colour, label=dname)
@@ -3611,7 +3617,27 @@ class RFSwarmGUI(tk.Frame):
 
 
 				if dodraw:
-					# ylbls = grphWindow.axis.get_yticklabels()
+
+					# this attempt almost worked, it reorderd the labled and
+					# 	ticks correctly, just wasn't successfull in applying to the graph
+					#
+					# yticks = grphWindow.axis.get_yticks()
+					# base.debugmsg(5, "ylbls:", ylbls, "	yticks:", yticks)
+					# ydict = {}
+					# for i in range(len(ylbls)):
+					# 	ydict[ylbls[i]] = yticks[i]
+					#
+					# base.debugmsg(5, "ydict:", ydict)
+					# srt_ydict = dict(sorted(ydict.items(), key=lambda item: item[0]))
+					# base.debugmsg(5, "srt_ydict:", srt_ydict)
+					#
+					# syl = list(srt_ydict.keys())
+					# syt = list(srt_ydict.values())
+					# base.debugmsg(5, "syl:", syl, "	syt:", syt)
+					# grphWindow.axis.set_yticks(syt)
+					# grphWindow.axis.set_yticklabels(syl)
+
+					# Tried to get the values
 					# base.debugmsg(5, "ylbls:", ylbls)
 					# base.debugmsg(5, "ylbls[0]:", ylbls[0], type(ylbls[0]))
 					# base.debugmsg(5, "ylbls[0]:", ylbls[0].get_text())
