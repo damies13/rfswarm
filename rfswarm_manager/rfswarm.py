@@ -3683,11 +3683,23 @@ class RFSwarmGUI(tk.Frame):
 			# sql += "WHERE result == 'PASS' "
 			# sql += "WHERE result_name REGEXP 'OC3.*' "
 			# sql += "WHERE result_name GLOB 'OC3*' "
+			lwhere = []
 			if RType == "Response Time":
-				sql += "WHERE result == 'PASS' "
-				sql +=  	"AND result_name NOT LIKE 'Exception in thread%' "
+				# sql += "WHERE result == 'PASS' "
+				lwhere.append("result == 'PASS'")
+				# sql +=  	"AND result_name NOT LIKE 'Exception in thread%' "
+				lwhere.append("result_name NOT LIKE 'Exception in thread%'")
 			if RType == "TPS":
-				sql +=  "WHERE result_name NOT LIKE 'Exception in thread%' "
+				# sql +=  "WHERE result_name NOT LIKE 'Exception in thread%' "
+				lwhere.append("result_name NOT LIKE 'Exception in thread%'")
+
+			i = 0
+			for iwhere in lwhere:
+				if i == 0:
+					sql += "WHERE {} ".format(iwhere)
+				else:
+					sql += "AND {} ".format(iwhere)
+				i += 1
 
 
 			sql += "GROUP by CAST(end_time as INTEGER) "
