@@ -3171,11 +3171,12 @@ class RFSwarmGUI(tk.Frame):
 		gph_example_menu = tk.Menu(gph_menu)
 		gph_menu.add_cascade(label = "Examples", menu = gph_example_menu)
 
-		gph_example_menu.add_command(label = "Running Robots")
-		gph_example_menu.add_command(label = "Agent Load")
-		gph_example_menu.add_command(label = "Response Time")
-		gph_example_menu.add_command(label = "Passing Keywords")
-		gph_example_menu.add_command(label = "Failing Keywords")
+		gph_example_menu.add_command(label = "Running Robots", command = lambda: self.OpenGraph({'name': 'Running Robots', 'show_settings': False, 'show_legend': 0, 'data_type': 'Metric', 'metric_type': 'Scenario', 'primary_metric': '', 'secondary_metric': 'total_robots'}))
+		gph_example_menu.add_command(label = "Agent Load", command = lambda: self.OpenGraph({'name': 'Agent Load', 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Load'}))
+		gph_example_menu.add_command(label = "Response Time", command = lambda: self.OpenGraph({'name': 'Response Time', 'show_settings': False, 'show_legend': 0, 'data_type': 'Result', 'result_type': 'Response Time', 'flter_result': 'Pass', 'filter_name': 'None', 'filter_pattern': ''}))
+		gph_example_menu.add_command(label = "Passing Keywords", command = lambda: self.OpenGraph({'name': 'Passing Keywords', 'show_settings': False, 'show_legend': 0, 'data_type': 'Result', 'result_type': 'TPS', 'flter_result': 'Pass', 'filter_name': 'None', 'filter_pattern': ''}))
+		gph_example_menu.add_command(label = "Failing Keywords", command = lambda: self.OpenGraph({'name': 'Failing Keywords', 'show_settings': False, 'show_legend': 1, 'data_type': 'Result', 'result_type': 'TPS', 'flter_result': 'Fail', 'filter_name': 'None', 'filter_pattern': ''}))
+		gph_example_menu.add_command(label = "Total TPS", command = lambda: self.OpenGraph({'name': 'Total TPS', 'show_settings': False, 'show_legend': 1, 'data_type': 'Result', 'result_type': 'Total TPS', 'flter_result': 'None', 'filter_name': 'None', 'filter_pattern': ''}))
 
 		gph_recent_menu = tk.Menu(gph_menu)
 		gph_menu.add_cascade(label = "Recent", menu = gph_recent_menu)
@@ -3304,7 +3305,15 @@ class RFSwarmGUI(tk.Frame):
 
 	def NewGraph(self, *args):
 		base.debugmsg(6, "New Graph Window.....")
-		# base.debugmsg(7, "New Graph Window - args:", args)
+		base.debugmsg(5, "New Graph Window - args:", args)
+
+		self.OpenGraph({}, *args)
+
+
+	def OpenGraph(self, settings, *args):
+
+		base.debugmsg(5, "Open Graph Window - settings:", settings)
+
 		grphWindow = tk.Toplevel(self.root)
 		# grphWindow.config(bg="pink")
 		grphWindow.columnconfigure(0, weight=1)
@@ -3314,10 +3323,19 @@ class RFSwarmGUI(tk.Frame):
 		# grphWindow.bind("<Configure>", self.gph_windowevent)
 		grphWindow.bind("<Configure>", lambda e: self.gph_windowevent(e, grphWindow) )
 
-		self.newgraph += 1
-		grphWindow.graphid = int(self.newgraph)
+		if 'id' in settings and settings['id']>0:
+			grphWindow.graphid = int(settings['id'])
+			if grphWindow.graphid > self.newgraph-1:
+				self.newgraph = grphWindow.graphid+1
+		else:
+			self.newgraph += 1
+			grphWindow.graphid = int(self.newgraph)
+
 		grphWindow.graphname=tk.StringVar()
-		grphWindow.graphname.set("New Graph {}".format(self.newgraph))
+		if 'name' in settings:
+			grphWindow.graphname.set(settings['name'])
+		else:
+			grphWindow.graphname.set("New Graph {}".format(self.newgraph))
 		base.debugmsg(6, "graphname:", grphWindow.graphname.get())
 
 		grphWindow.graphdata = {}
@@ -3383,9 +3401,12 @@ class RFSwarmGUI(tk.Frame):
 		t.start()
 
 		grphWindow.fmeSettings = tk.Frame(grphWindow.fmeContent)
-		grphWindow.fmeSettings.grid(column=90, row=0, columnspan=10, sticky="nsew")
-
-		grphWindow.fmeSettings.show = True
+		# grphsettings: {'name': 'Agent Load', 'show_settings': False, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Load'}
+		if 'show_settings' in settings and settings['show_settings']:
+			grphWindow.fmeSettings.grid(column=90, row=0, columnspan=10, sticky="nsew")
+			grphWindow.fmeSettings.show = True
+		else:
+			grphWindow.fmeSettings.show = False
 
 		row =0
 		grphWindow.fmeSettings.lblGN = ttk.Label(grphWindow.fmeSettings, text = "Graph Name:")
@@ -3400,6 +3421,8 @@ class RFSwarmGUI(tk.Frame):
 
 		grphWindow.showlegend = tk.IntVar()
 		grphWindow.fmeSettings.inpLGD = ttk.Checkbutton(grphWindow.fmeSettings, variable=grphWindow.showlegend)
+		if 'show_legend' in settings:
+			grphWindow.showlegend.set(settings['show_legend'])
 		grphWindow.fmeSettings.inpLGD.grid(column=1, row=row, sticky="nsew")
 
 		# other settings? Metric Type, Primary metric, Secondary metric, filter?
@@ -3412,7 +3435,11 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.settings = {}
 		grphWindow.settings["DataType"] = tk.StringVar()
 		grphWindow.fmeSettings.omDT = ttk.OptionMenu(grphWindow.fmeSettings, grphWindow.settings["DataType"], command=lambda *args: self.gs_switchdt(grphWindow), *DataTypes)
-		grphWindow.settings["DataType"].set(DataTypes[1])
+		# grphsettings: {'name': 'Agent Load', 'show_settings': False, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Load'}
+		if 'data_type' in settings and len(settings['data_type'])>1:
+			grphWindow.settings["DataType"].set(settings['data_type'])
+		else:
+			grphWindow.settings["DataType"].set(DataTypes[1])
 		grphWindow.fmeSettings.omDT.grid(column=1, row=row, sticky="nsew")
 
 
@@ -3426,11 +3453,14 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeRSettings = tk.Frame(grphWindow.fmeSettings)
 		grphWindow.fmeRSettings.columnconfigure(0, weight=1)
 		grphWindow.fmeRSettings.columnconfigure(1, weight=1)
+		if grphWindow.settings["DataType"].get() == "Result":
+			grphWindow.fmeRSettings.grid(column=0, row=grphWindow.fmeDTRow, columnspan=2, sticky="nsew")
 
 		grphWindow.fmeMSettings = tk.Frame(grphWindow.fmeSettings)
 		grphWindow.fmeMSettings.columnconfigure(0, weight=1)
 		grphWindow.fmeMSettings.columnconfigure(1, weight=1)
-		grphWindow.fmeMSettings.grid(column=0, row=grphWindow.fmeDTRow, columnspan=2, sticky="nsew")
+		if grphWindow.settings["DataType"].get() == "Metric":
+			grphWindow.fmeMSettings.grid(column=0, row=grphWindow.fmeDTRow, columnspan=2, sticky="nsew")
 
 		#
 		# 	DT Results Settings
@@ -3443,7 +3473,10 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeRSettings.RTypes = [None, "Response Time", "TPS", "Total TPS"]
 		grphWindow.settings["RType"] = tk.StringVar()
 		grphWindow.fmeRSettings.omRT = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["RType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.RTypes)
-		grphWindow.settings["RType"].set(grphWindow.fmeRSettings.RTypes[1])
+		if 'result_type' in settings and len(settings['result_type'])>1:
+			grphWindow.settings["RType"].set(settings['result_type'])
+		else:
+			grphWindow.settings["RType"].set(grphWindow.fmeRSettings.RTypes[1])
 		grphWindow.fmeRSettings.omRT.grid(column=1, row=rowR, sticky="nsew")
 
 		rowR +=1
@@ -3454,7 +3487,10 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeRSettings.FRTypes = [None, "None", "Pass", "Fail"]
 		grphWindow.settings["FRType"] = tk.StringVar()
 		grphWindow.fmeRSettings.omFR = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["FRType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.FRTypes)
-		grphWindow.settings["FRType"].set(grphWindow.fmeRSettings.FRTypes[2])
+		if 'flter_result' in settings and len(settings['flter_result'])>1:
+			grphWindow.settings["FRType"].set(settings['flter_result'])
+		else:
+			grphWindow.settings["FRType"].set(grphWindow.fmeRSettings.FRTypes[2])
 		grphWindow.fmeRSettings.omFR.grid(column=1, row=rowR, sticky="nsew")
 
 		rowR +=1
@@ -3476,7 +3512,10 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeRSettings.FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
 		grphWindow.settings["FNType"] = tk.StringVar()
 		grphWindow.fmeRSettings.omFR = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["FNType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.FNTypes)
-		grphWindow.settings["FNType"].set(grphWindow.fmeRSettings.FNTypes[1])
+		if 'filter_name' in settings and len(settings['filter_name'])>1:
+			grphWindow.settings["FNType"].set(settings['filter_name'])
+		else:
+			grphWindow.settings["FNType"].set(grphWindow.fmeRSettings.FNTypes[1])
 		grphWindow.fmeRSettings.omFR.grid(column=1, row=rowR, sticky="nsew")
 
 		rowR +=1
@@ -3484,8 +3523,10 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeRSettings.lblFP.grid(column=0, row=rowR, sticky="nsew")
 
 		grphWindow.fmeRSettings.inpFP = ttk.Entry(grphWindow.fmeRSettings)
-		# grphWindow.fmeRSettings.inpFP.delete(0,'end')
-		# grphWindow.fmeRSettings.inpFP.insert(0, stgsWindow.excludelibrariescurrent)
+			# settings["filter_pattern"] = grphWindow.fmeRSettings.inpFP.get()
+		if 'filter_pattern' in settings and len(settings['filter_pattern'])>1:
+			grphWindow.fmeRSettings.inpFP.delete(0,'end')
+			grphWindow.fmeRSettings.inpFP.insert(0, settings['filter_pattern'])
 		grphWindow.fmeRSettings.inpFP.grid(column=1, row=rowR, sticky="nsew")
 
 
@@ -3499,6 +3540,9 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeMSettings.MTypes = [None, "Loading..."]
 		grphWindow.settings["MType"] = tk.StringVar()
 		grphWindow.fmeMSettings.omMT = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.MTypes)
+		# grphsettings: {'name': 'Agent Load', 'show_settings': False, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Load'}
+		if 'metric_type' in settings and len(settings['metric_type'])>1:
+			grphWindow.settings["MType"].set(settings['metric_type'])
 		grphWindow.fmeMSettings.omMT.grid(column=1, row=rowM, sticky="nsew")
 
 		rowM +=1
@@ -3508,6 +3552,9 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeMSettings.PMetrics = [None, "Loading..."]
 		grphWindow.settings["PMetric"] = tk.StringVar()
 		grphWindow.fmeMSettings.omPM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["PMetric"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.PMetrics)
+		# grphsettings: {'name': 'Agent Load', 'show_settings': False, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Load'}
+		if 'primary_metric' in settings and len(settings['primary_metric'])>1:
+			grphWindow.settings["PMetric"].set(settings['primary_metric'])
 		grphWindow.fmeMSettings.omPM.grid(column=1, row=rowM, sticky="nsew")
 
 
@@ -3518,6 +3565,9 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeMSettings.SMetrics = [None, "Loading..."]
 		grphWindow.settings["SMetric"] = tk.StringVar()
 		grphWindow.fmeMSettings.omSM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["SMetric"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.SMetrics)
+		# grphsettings: {'name': 'Agent Load', 'show_settings': False, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Load'}
+		if 'secondary_metric' in settings and len(settings['secondary_metric'])>1:
+			grphWindow.settings["SMetric"].set(settings['secondary_metric'])
 		grphWindow.fmeMSettings.omSM.grid(column=1, row=rowM, sticky="nsew")
 
 		# start threads to update option lists
@@ -3531,13 +3581,10 @@ class RFSwarmGUI(tk.Frame):
 
 		if len(args)>0:
 			grphWindow = args[0]
-			# base.debugmsg(6, "grphWindow.title:", grphWindow.graphname.get() )
-			# w = grphWindow.winfo_screenwidth()
-			# h = grphWindow.winfo_screenheight()
-			w = grphWindow.winfo_width()
-			h = grphWindow.winfo_height()
-			base.debugmsg(6, "w:", w, "	h:", h)
+
 			# need to save graph window settings as it changes
+			grphsettings = self.gph_settings(grphWindow)
+			base.debugmsg(5, "grphsettings:", grphsettings)
 
 
 
@@ -3557,6 +3604,37 @@ class RFSwarmGUI(tk.Frame):
 			return float(value)
 		except:
 			return value
+
+	def gph_settings(self, grphWindow):
+		settings = {}
+		settings["id"] = grphWindow.graphid
+		settings["win_width"] = grphWindow.winfo_width()
+		settings["win_height"] = grphWindow.winfo_height()
+		# position x & y
+		# winfo rootx
+		settings["win_location_rx"] = grphWindow.winfo_rootx()
+		settings["win_location_x"] = grphWindow.winfo_x()
+		# winfo rooty
+		settings["win_location_ry"] = grphWindow.winfo_rooty()
+		settings["win_location_y"] = grphWindow.winfo_y()
+		# winfo screen
+		settings["win_screen"] = grphWindow.winfo_screen()
+
+		settings["name"] = grphWindow.graphname.get()
+		settings["show_settings"] = grphWindow.fmeSettings.show
+		settings["show_legend"] = grphWindow.showlegend.get()
+
+		settings["data_type"] = grphWindow.settings["DataType"].get()
+		if settings["data_type"] == "Metric":
+			settings["metric_type"] = grphWindow.settings["MType"].get()
+			settings["primary_metric"] = grphWindow.settings["PMetric"].get()
+			settings["secondary_metric"] = grphWindow.settings["SMetric"].get()
+		if settings["data_type"] == "Result":
+			settings["result_type"] = grphWindow.settings["RType"].get()
+			settings["flter_result"] = grphWindow.settings["FRType"].get()
+			settings["filter_name"] = grphWindow.settings["FNType"].get()
+			settings["filter_pattern"] = grphWindow.fmeRSettings.inpFP.get()
+		return settings
 
 	def gph_refresh(self, grphWindow):
 		base.debugmsg(6, "graphname:", grphWindow.graphname.get())
