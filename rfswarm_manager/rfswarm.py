@@ -3173,7 +3173,10 @@ class RFSwarmGUI(tk.Frame):
 
 		gph_example_menu.add_command(label = "Running Robots", command = lambda: self.OpenGraph({'name': 'Running Robots', 'show_settings': False, 'show_legend': 0, 'data_type': 'Metric', 'metric_type': 'Scenario', 'primary_metric': '', 'secondary_metric': 'total_robots'}))
 		gph_example_menu.add_command(label = "Agent Load", command = lambda: self.OpenGraph({'name': 'Agent Load', 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Load'}))
-		gph_example_menu.add_command(label = "Response Time", command = lambda: self.OpenGraph({'name': 'Response Time', 'show_settings': False, 'show_legend': 0, 'data_type': 'Result', 'result_type': 'Response Time', 'flter_result': 'Pass', 'filter_name': 'None', 'filter_pattern': ''}))
+		gph_example_menu.add_command(label = "Agent CPU", command = lambda: self.OpenGraph({'name': 'Agent CPU', 'win_location_x': 38, 'win_location_y': 500, 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'CPU'}))
+		gph_example_menu.add_command(label = "Agent Memory", command = lambda: self.OpenGraph({'name': 'Agent Memory', 'win_location_x': 500, 'win_location_y': 500, 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'MEM'}))
+		gph_example_menu.add_command(label = "Agent Network", command = lambda: self.OpenGraph({'name': 'Agent Network', 'win_location_x': 960, 'win_location_y': 500, 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'NET'}))
+		gph_example_menu.add_command(label = "Response Time", command = lambda: self.OpenGraph({'name': 'Response Time', 'win_width': 1200, 'win_height': 600, 'show_settings': False, 'show_legend': 1, 'data_type': 'Result', 'result_type': 'Response Time', 'flter_result': 'Pass', 'filter_name': 'None', 'filter_pattern': ''}))
 		gph_example_menu.add_command(label = "Passing Keywords", command = lambda: self.OpenGraph({'name': 'Passing Keywords', 'show_settings': False, 'show_legend': 0, 'data_type': 'Result', 'result_type': 'TPS', 'flter_result': 'Pass', 'filter_name': 'None', 'filter_pattern': ''}))
 		gph_example_menu.add_command(label = "Failing Keywords", command = lambda: self.OpenGraph({'name': 'Failing Keywords', 'show_settings': False, 'show_legend': 1, 'data_type': 'Result', 'result_type': 'TPS', 'flter_result': 'Fail', 'filter_name': 'None', 'filter_pattern': ''}))
 		gph_example_menu.add_command(label = "Total TPS", command = lambda: self.OpenGraph({'name': 'Total TPS', 'show_settings': False, 'show_legend': 1, 'data_type': 'Result', 'result_type': 'Total TPS', 'flter_result': 'None', 'filter_name': 'None', 'filter_pattern': ''}))
@@ -3377,7 +3380,8 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeGraph.rowconfigure(0, weight=1)
 		# grphWindow.fmeGraph.rowconfigure(1, weight=1)
 
-		grphWindow.fig_dpi = 100
+		# grphWindow.fig_dpi = 100
+		grphWindow.fig_dpi = 72
 		grphWindow.fig = Figure(dpi=grphWindow.fig_dpi, tight_layout=True, constrained_layout=True) # , constrained_layout=True??
 		grphWindow.axis = grphWindow.fig.add_subplot(1,1,1)	# , constrained_layout=True??
 		# self.axis = self.fig.add_subplot()
@@ -3570,6 +3574,45 @@ class RFSwarmGUI(tk.Frame):
 			grphWindow.settings["SMetric"].set(settings['secondary_metric'])
 		grphWindow.fmeMSettings.omSM.grid(column=1, row=rowM, sticky="nsew")
 
+		# set default size to 600 x 450
+		ww = grphWindow.winfo_width()
+		wh = grphWindow.winfo_height()
+		swg = False
+		# 'win_width': 1200, 'win_height': 600,
+		if 'win_width' in settings and settings['win_width']>0:
+			ww = settings['win_width']
+			swg = True
+		if 'win_height' in settings and settings['win_height']>0:
+			wh = settings['win_height']
+			swg = True
+		if swg:
+			base.debugmsg(5, "ww:", ww, "wh:", wh)
+			grphWindow.geometry("%dx%d" % (ww, wh))
+
+		wx = grphWindow.winfo_x()
+		wy = grphWindow.winfo_y()
+		swg = False
+		# 'win_location_x': 38, 'win_location_y': 500,
+		# toplevel.geometry("+%d+%d" % (x + 100, y + 200)))
+		if 'win_location_x' in settings and settings['win_location_x']>0:
+			wx = settings['win_location_x']
+			swg = True
+		if 'win_location_y' in settings and settings['win_location_y']>0:
+			wy = settings['win_location_y']
+			swg = True
+		# https://stackoverflow.com/questions/36050192/how-to-position-toplevel-widget-relative-to-root-window#36055375
+		# grphWindow.geometry("+%d+%d" % (wx, wy))
+		if swg:
+			base.debugmsg(5, "wx:", wx, "wy:", wy)
+			grphWindow.geometry("+%d+%d" % (wx, wy))
+
+
+		# https://tkdocs.com/shipman/toplevel.html
+		# Not sure if I want to do this?
+		# this did not do what I expected, was hoping for a seperate doc icon for this window
+		#  instead to prevented the window displaying :(
+		# grphWindow.iconify()
+
 		# start threads to update option lists
 		t = threading.Thread(target=lambda: self.gs_refresh(grphWindow))
 		t.start()
@@ -3612,10 +3655,10 @@ class RFSwarmGUI(tk.Frame):
 		settings["win_height"] = grphWindow.winfo_height()
 		# position x & y
 		# winfo rootx
-		settings["win_location_rx"] = grphWindow.winfo_rootx()
+		# settings["win_location_rx"] = grphWindow.winfo_rootx()
 		settings["win_location_x"] = grphWindow.winfo_x()
 		# winfo rooty
-		settings["win_location_ry"] = grphWindow.winfo_rooty()
+		# settings["win_location_ry"] = grphWindow.winfo_rooty()
 		settings["win_location_y"] = grphWindow.winfo_y()
 		# winfo screen
 		settings["win_screen"] = grphWindow.winfo_screen()
@@ -5333,6 +5376,14 @@ class RFSwarmGUI(tk.Frame):
 		# self.grid(sticky="news", ipadx=0, pady=0)
 		# self.root.resizable(False, False)		# this didn't work as expected, I expected the dialog to not be resizable instaed it stopped the main window from being resizable
 		# self.root.resizable(True, True)
+
+		# https://tkdocs.com/shipman/toplevel.html
+		# I believe this should keep the settings window infront of the menager window
+		# well it didn't work on macosx but it may help, i'll leave it for now
+		# stgsWindow.transient()
+		# stgsWindow.transient(parent=self.root)
+		# Now it works :)
+		stgsWindow.transient(self.root)
 
 		stgsWindow.title("Settings for row {}".format(r))
 		testname = ""
