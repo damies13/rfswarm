@@ -3118,7 +3118,11 @@ class RFSwarmGUI(tk.Frame):
 		self.BuildRun(r)
 		base.debugmsg(6, "BuildAgent")
 		self.BuildAgent(a)
-		self.OpenINIGraphs()
+
+		if len(base.config['Plan']['ScenarioFile'])>0:
+			self.OpenScenarioGraphs()
+		else:
+			self.OpenINIGraphs()
 
 
 	def BuildMenu(self):
@@ -3344,6 +3348,11 @@ class RFSwarmGUI(tk.Frame):
 		else:
 			self.newgraph += 1
 			grphWindow.graphid = int(self.newgraph)
+
+		if grphWindow.graphid not in self.graphs:
+			self.graphs[grphWindow.graphid] = {}
+
+		self.graphs[settings["id"]]["window"] = grphWindow
 
 		grphWindow.graphname=tk.StringVar()
 		if 'name' in settings:
@@ -3634,6 +3643,8 @@ class RFSwarmGUI(tk.Frame):
 		# grphWindow.iconify()
 
 		grphWindow.saveready = True
+		self.graphs[settings["id"]]["window"] = grphWindow
+
 		# start threads to update option lists
 		t = threading.Thread(target=lambda: self.gs_refresh(grphWindow))
 		t.start()
@@ -3660,6 +3671,10 @@ class RFSwarmGUI(tk.Frame):
 					tgph[i].start()
 
 			i += 1
+
+
+	def OpenScenarioGraphs(self):
+		pass
 
 	def RefreshRecentGraphs(self):
 		i = 1
