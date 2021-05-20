@@ -2290,11 +2290,14 @@ class RFSwarmCore:
 		base.debugmsg(6, "filedata: ", filedata)
 
 		scriptcount = 0
+		graphlist = []
 		if "Scenario" in filedata:
 			base.debugmsg(6, "Scenario:", filedata["Scenario"])
 			if "scriptcount" in filedata["Scenario"]:
 				scriptcount = int(filedata["Scenario"]["scriptcount"])
 				base.debugmsg(8, "scriptcount:", scriptcount)
+			if "graphlist" in filedata["Scenario"]:
+				graphlist = filedata["Scenario"]["graphlist"].split(",")
 		else:
 			base.debugmsg(1, "File contains no scenario:", ScenarioFile)
 			return 1
@@ -2304,7 +2307,7 @@ class RFSwarmCore:
 			ii = i+1
 			istr = str(ii)
 			if istr in filedata:
-				base.debugmsg(8, "filedata[",istr,"]:", filedata[istr])
+				base.debugmsg(5, "filedata[",istr,"]:", filedata[istr])
 				rowcount += 1
 
 				# if i not in base.scriptlist:
@@ -2316,12 +2319,17 @@ class RFSwarmCore:
 				else:
 					base.addScriptRow()
 				# users = 13
-				if "users" in filedata[istr]:
-					base.debugmsg(8, "filedata[", istr, "][users]:", filedata[istr]["users"])
-					# base.scriptlist[ii]["users"] = filedata[istr]["users"]
-					self.sr_users_validate(rowcount, int(filedata[istr]["users"]))
-					# delay = 0
+				if "robots" in filedata[istr] or "users" in filedata[istr]:
+					if "robots" in filedata[istr]:
+						base.debugmsg(8, "filedata[", istr, "][robots]:", filedata[istr]["robots"])
+						self.sr_users_validate(rowcount, int(filedata[istr]["robots"]))
+					else:
+						base.debugmsg(8, "filedata[", istr, "][users]:", filedata[istr]["users"])
+						# base.scriptlist[ii]["users"] = filedata[istr]["users"]
+						self.sr_users_validate(rowcount, int(filedata[istr]["users"]))
+						# delay = 0
 				else:
+					base.debugmsg(3, "robots missing [",istr,"]")
 					fileok = False
 				if "delay" in filedata[istr]:
 					base.debugmsg(8, "filedata[", istr, "][delay]:", filedata[istr]["delay"])
@@ -2329,6 +2337,7 @@ class RFSwarmCore:
 					self.sr_delay_validate(rowcount, int(filedata[istr]["delay"]))
 					# rampup = 60
 				else:
+					base.debugmsg(3, "delay missing [",istr,"]")
 					fileok = False
 				if "rampup" in filedata[istr]:
 					base.debugmsg(8, "filedata[", istr, "][rampup]:", filedata[istr]["rampup"])
@@ -2336,6 +2345,7 @@ class RFSwarmCore:
 					self.sr_rampup_validate(rowcount, int(filedata[istr]["rampup"]))
 					# run = 600
 				else:
+					base.debugmsg(3, "rampup missing [",istr,"]")
 					fileok = False
 				if "run" in filedata[istr]:
 					base.debugmsg(8, "filedata[", istr, "][run]:", filedata[istr]["run"])
@@ -2343,6 +2353,7 @@ class RFSwarmCore:
 					self.sr_run_validate(rowcount, int(filedata[istr]["run"]))
 					# script = /Users/dave/Documents/GitHub/rfswarm/robots/OC_Demo_2.robot
 				else:
+					base.debugmsg(3, "run missing [",istr,"]")
 					fileok = False
 				if "script" in filedata[istr]:
 					base.debugmsg(8, "filedata[", istr, "][script]:", filedata[istr]["script"])
@@ -2355,12 +2366,14 @@ class RFSwarmCore:
 					base.debugmsg(8, "scriptname:", scriptname)
 					self.sr_file_validate(rowcount, scriptname)
 				else:
+					base.debugmsg(3, "script missing [",istr,"]")
 					fileok = False
 				if "test" in filedata[istr]:
 					base.debugmsg(8, "filedata[", istr, "][test]:", filedata[istr]["test"])
 					# base.scriptlist[ii]["test"] = filedata[istr]["test"]
 					self.sr_test_validate("row{}".format(rowcount), filedata[istr]["test"])
 				else:
+					base.debugmsg(3, "test missing [",istr,"]")
 					fileok = False
 
 				if "excludelibraries" in filedata[istr]:
@@ -2382,6 +2395,24 @@ class RFSwarmCore:
 					base.debugmsg(1, "Scenario file is damaged:", ScenarioFile)
 					return 1
 
+
+		base.debugmsg(5, "config graph_list: ", base.config['GUI']['graph_list'])
+
+		base.debugmsg(5, "graphlist: ", graphlist)
+		# base.config[iniid]		glist = base.config['GUI']['graph_list'].split(",")
+		iniglist = list(base.config['GUI']['graph_list'].split(","))
+		base.debugmsg(5, "iniglist: ", iniglist)
+		base.config['GUI']['graph_list'] = ",".join( set(iniglist + graphlist) )
+
+		base.debugmsg(5, "config graph_list: ", base.config['GUI']['graph_list'])
+
+		for iniid in graphlist:
+			if iniid in filedata:
+				base.debugmsg(5, "iniid: ", iniid, " 	filedata[iniid]:", filedata[iniid])
+				base.config[iniid] = filedata[iniid]
+
+		if not base.args.nogui:
+			base.gui.OpenINIGraphs()
 
 
 
@@ -3119,10 +3150,8 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(6, "BuildAgent")
 		self.BuildAgent(a)
 
-		# if len(base.config['Plan']['ScenarioFile'])>0:
-		# 	self.OpenScenarioGraphs()
-		# else:
-		self.OpenINIGraphs()
+		if len(base.config['Plan']['ScenarioFile'])<1:
+			self.OpenINIGraphs()
 
 
 	def BuildMenu(self):
@@ -3765,6 +3794,13 @@ class RFSwarmGUI(tk.Frame):
 
 
 		return settings
+
+	def CloseGraphs(self):
+
+		for iniid in self.graphs.keys():
+			if "window" in self.graphs[iniid]:
+				self.gph_close(self.graphs[iniid]["window"])
+
 
 	def gph_close(self, grphWindow, *args):
 		base.debugmsg(5, "grphWindow:", grphWindow, "	args:", args)
@@ -6480,10 +6516,15 @@ class RFSwarmGUI(tk.Frame):
 
 		base.debugmsg(6, "ScenarioFile:", ScenarioFile)
 
-		core.OpenFile(ScenarioFile)
-		base.gui.updateTitle()
+		if len(ScenarioFile)>0:
 
-		self.plan_scnro_chngd = False
+			self.CloseGraphs()
+
+			core.OpenFile(ScenarioFile)
+			base.gui.updateTitle()
+
+
+			self.plan_scnro_chngd = False
 
 	def mnu_file_Save(self, _event=None):
 		base.debugmsg(9, "mnu_file_Save")
@@ -6524,6 +6565,19 @@ class RFSwarmGUI(tk.Frame):
 							base.debugmsg(8, "filedata[",scriptidx,"][",key,"]:", filedata[scriptidx][key])
 
 			filedata['Scenario']['ScriptCount'] = scriptidx
+
+			# Save graphs
+
+			sgraphs = []
+			for iniid in self.graphs.keys():
+				if "settings" in self.graphs[iniid]:
+					if "open" in self.graphs[iniid]["settings"]:
+						if self.graphs[iniid]["settings"]["open"]:
+							sgraphs.append(iniid)
+							filedata[iniid] = self.graphs[iniid]["settings"]
+
+			filedata['Scenario']['GraphList'] = ",".join(sgraphs)
+
 			with open(base.config['Plan']['ScenarioFile'], 'w') as sf:    # save
 			    filedata.write(sf)
 
