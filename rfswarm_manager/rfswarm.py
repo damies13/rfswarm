@@ -1919,8 +1919,8 @@ class RFSwarmCore:
 			base.config['GUI']['win_height'] = "390"
 			base.saveini()
 
-		if 'graph_count' not in base.config['GUI']:
-			base.config['GUI']['graph_count'] = "0"
+		if 'graph_list' not in base.config['GUI']:
+			base.config['GUI']['graph_list'] = ""
 			base.saveini()
 
 
@@ -3119,10 +3119,10 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(6, "BuildAgent")
 		self.BuildAgent(a)
 
-		if len(base.config['Plan']['ScenarioFile'])>0:
-			self.OpenScenarioGraphs()
-		else:
-			self.OpenINIGraphs()
+		# if len(base.config['Plan']['ScenarioFile'])>0:
+		# 	self.OpenScenarioGraphs()
+		# else:
+		self.OpenINIGraphs()
 
 
 	def BuildMenu(self):
@@ -3319,11 +3319,31 @@ class RFSwarmGUI(tk.Frame):
 	#
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+	def newgraphid(self):
+		timenow = int(time.time())
+		base.debugmsg(5, "timenow:", timenow, " 	newgraph:", self.newgraph)
+		id = "{}-{}".format(hex(timenow)[2:], hex(self.newgraph)[2:])
+		base.debugmsg(5, "id:", id)
+		return id
+
+
 	def NewGraph(self, *args):
 		base.debugmsg(6, "New Graph Window.....")
 		base.debugmsg(5, "New Graph Window - args:", args)
 
 		self.OpenGraph({}, *args)
+
+	def MenuOpenGraph(self, iniid, *args):
+		base.debugmsg(5, "Menu Open Graph Window - iniid:", iniid)
+		base.debugmsg(5, "Menu Open Graph Window - args:", args)
+		settings = self.inigphsettings(base.config[iniid])
+
+		if "window" in self.graphs[iniid]:
+			base.debugmsg(5, "window:", self.graphs[iniid]["window"])
+			self.graphs[iniid]["window"].focus_set()
+		else:
+			self.OpenGraph(settings, *args)
+
 
 	def OpenGraph(self, settings, *args):
 
@@ -3341,18 +3361,16 @@ class RFSwarmGUI(tk.Frame):
 
 		grphWindow.protocol("WM_DELETE_WINDOW",  lambda: self.gph_close(grphWindow) )
 
-		if 'id' in settings and settings['id']>0:
-			grphWindow.graphid = int(settings['id'])
-			if grphWindow.graphid > self.newgraph-1:
-				self.newgraph = grphWindow.graphid
+		self.newgraph += 1
+		if 'id' in settings and len(settings['id'])>0:
+			grphWindow.graphid = settings['id']
 		else:
-			self.newgraph += 1
-			grphWindow.graphid = int(self.newgraph)
+			grphWindow.graphid = self.newgraphid()
 
 		if grphWindow.graphid not in self.graphs:
 			self.graphs[grphWindow.graphid] = {}
 
-		self.graphs[settings["id"]]["window"] = grphWindow
+		self.graphs[grphWindow.graphid]["window"] = grphWindow
 
 		grphWindow.graphname=tk.StringVar()
 		if 'name' in settings:
@@ -3420,10 +3438,10 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.canvas.draw()
 
 
-		#
-		# # start thread to update the graph (gph_updater)
-		t = threading.Thread(target=lambda: self.gph_updater(grphWindow))
-		t.start()
+		# #
+		# # # start thread to update the graph (gph_updater)
+		# t = threading.Thread(target=lambda: self.gph_updater(grphWindow))
+		# t.start()
 
 		grphWindow.fmeSettings = tk.Frame(grphWindow.fmeContent)
 		# grphsettings: {'name': 'Agent Load', 'show_settings': False, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Load'}
@@ -3643,34 +3661,46 @@ class RFSwarmGUI(tk.Frame):
 		# grphWindow.iconify()
 
 		grphWindow.saveready = True
-		self.graphs[settings["id"]]["window"] = grphWindow
+		base.debugmsg(5, "saveready:", grphWindow.saveready)
+		self.graphs[grphWindow.graphid]["window"] = grphWindow
+
+		#
+		# # start thread to update the graph (gph_updater)
+		t1 = threading.Thread(target=lambda: self.gph_updater(grphWindow))
+		t1.start()
+
+		base.debugmsg(5, "t1:", t1)
 
 		# start threads to update option lists
-		t = threading.Thread(target=lambda: self.gs_refresh(grphWindow))
-		t.start()
+		t2 = threading.Thread(target=lambda: self.gs_refresh(grphWindow))
+		t2.start()
+		base.debugmsg(5, "t2:", t2)
 
 	def OpenINIGraphs(self):
 
-		base.debugmsg(5, "graph_count:", base.config['GUI']['graph_count'])
+		base.debugmsg(5, "graph_list:", base.config['GUI']['graph_list'])
 
 		i = 1
-		count = int(base.config['GUI']['graph_count']) + 1
-		self.newgraph = int(base.config['GUI']['graph_count'])
-		tgph = {}
-		while i < count:
+		glist = base.config['GUI']['graph_list'].split(",")
+		base.debugmsg(5, "glist:", glist)
 
-			base.debugmsg(6, "i:", i)
-			iniid = "Graph_{}".format(i)
+		tgph = {}
+		for gi in glist:
+
+			base.debugmsg(5, "gi:", gi)
+			iniid = "{}".format(gi)
 			if iniid in base.config:
 				base.debugmsg(5, "iniid:", iniid, base.config[iniid])
 				settings = self.inigphsettings(base.config[iniid])
 				base.debugmsg(5, "settings:", settings)
 
 				if settings['open']:
-					tgph[i] = threading.Thread(target=lambda: self.OpenGraph(settings))
-					tgph[i].start()
-
-			i += 1
+					tgph[iniid] = threading.Thread(target=lambda: self.OpenGraph(settings))
+					tgph[iniid].start()
+				else:
+					if iniid not in self.graphs:
+						self.graphs[iniid] = {}
+					self.graphs[iniid]["settings"] = settings
 
 
 	def OpenScenarioGraphs(self):
@@ -3678,15 +3708,17 @@ class RFSwarmGUI(tk.Frame):
 
 	def RefreshRecentGraphs(self):
 		i = 1
-		count = int(base.config['GUI']['graph_count']) + 1
+		glist = base.config['GUI']['graph_list'].split(",")
+		base.debugmsg(5, "glist:", glist)
 		# first construct recent menu list
 		recent = {}
-		while i < count:
-			iniid = "Graph_{}".format(i)
+		for gi in glist:
+			iniid = "{}".format(gi)
+			base.debugmsg(5, "iniid:", iniid)
 			if iniid in base.config:
 				settings = self.inigphsettings(base.config[iniid])
-				recent[settings['name']] = settings
-			i += 1
+				base.debugmsg(5, "settings:", settings)
+				recent[settings['name']] = settings['id']
 
 		try:
 			# remove existing items if any
@@ -3698,8 +3730,15 @@ class RFSwarmGUI(tk.Frame):
 				else:
 					self.gph_recent_menu.delete(0)
 
+			base.debugmsg(5, "gph_recent_menu:", self.gph_recent_menu, self.gph_recent_menu.index("last"))
 			for menui in recent.keys():
-				self.gph_recent_menu.add_command(label = menui, command = lambda: self.OpenGraph(recent[menui]))
+				base.debugmsg(5, "menui:", menui, " 	recent[menui]:", recent[menui])
+				iniid = str(recent[menui])
+				# self.gph_recent_menu.add_command(label = menui, command = lambda: self.OpenGraph(recent["{}".format(menui)]))
+				# self.gph_recent_menu.add_command(label = menui, command = lambda: self.OpenGraph(self.inigphsettings(base.config[iniid])))
+				# self.gph_recent_menu.add_command(label = menui, command=lambda: self.MenuOpenGraph(recent[menui]))
+				self.gph_recent_menu.add_command(label = menui, command=lambda iniid=iniid: self.MenuOpenGraph(iniid))
+				base.debugmsg(5, "gph_recent_menu:", self.gph_recent_menu, self.gph_recent_menu.index("last"))
 		except:
 			pass
 
@@ -3715,7 +3754,7 @@ class RFSwarmGUI(tk.Frame):
 			base.debugmsg(8, item, ":", inidata[item])
 			settings[item] = inidata[item]
 			# interger values
-			if item in ['id', 'win_width', 'win_height', 'win_location_x', 'win_location_y', 'show_legend']:
+			if item in ['win_width', 'win_height', 'win_location_x', 'win_location_y', 'show_legend']:
 				settings[item] = int(inidata[item])
 			if item in ['open', 'show_settings']:
 				# settings[item] = json.loads(inidata[item])
@@ -3735,11 +3774,12 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(5, "settings:", settings)
 		grphWindow.destroy()
 
-		del self.graphs[settings["id"]]
+		del self.graphs[settings["id"]]["window"]
+		self.graphs[settings["id"]]["settings"] = settings
 
-		if settings["id"]>int(base.config['GUI']['graph_count']):
-			base.config['GUI']['graph_count'] = str(settings["id"])
-		iniid = "Graph_{}".format(settings["id"])
+		base.config['GUI']['graph_list'] = ",".join(self.graphs.keys())
+
+		iniid = "{}".format(settings["id"])
 		if iniid not in base.config:
 			base.config[iniid] = {}
 		base.config[iniid] = settings
@@ -3761,20 +3801,21 @@ class RFSwarmGUI(tk.Frame):
 			settings = self.gph_settings(grphWindow)
 			base.debugmsg(6, "settings:", settings)
 
-			if settings["id"] not in self.graphs:
-				self.graphs[settings["id"]] = {}
+			if settings["win_width"]>10 and settings["win_height"]>10:
+				if settings["id"] not in self.graphs:
+					self.graphs[settings["id"]] = {}
 
-			self.graphs[settings["id"]]["window"] = grphWindow
-			self.graphs[settings["id"]]["Settings"] = settings
+				self.graphs[settings["id"]]["window"] = grphWindow
+				self.graphs[settings["id"]]["settings"] = settings
 
 
-			if settings["id"]>int(base.config['GUI']['graph_count']):
-				base.config['GUI']['graph_count'] = str(settings["id"])
-			iniid = "Graph_{}".format(settings["id"])
-			if iniid not in base.config:
-				base.config[iniid] = {}
-			base.config[iniid] = settings
-			base.saveini()
+				base.config['GUI']['graph_list'] = ",".join(self.graphs.keys())
+
+				iniid = "{}".format(settings["id"])
+				if iniid not in base.config:
+					base.config[iniid] = {}
+				base.config[iniid] = settings
+				base.saveini()
 
 	def gph_updater(self, grphWindow):
 		try:
