@@ -3336,12 +3336,12 @@ class RFSwarmGUI(tk.Frame):
 	def MenuOpenGraph(self, iniid, *args):
 		base.debugmsg(5, "Menu Open Graph Window - iniid:", iniid)
 		base.debugmsg(5, "Menu Open Graph Window - args:", args)
-		settings = self.inigphsettings(base.config[iniid])
 
 		if "window" in self.graphs[iniid]:
 			base.debugmsg(5, "window:", self.graphs[iniid]["window"])
 			self.graphs[iniid]["window"].focus_set()
 		else:
+			settings = self.inigphsettings(base.config[iniid])
 			self.OpenGraph(settings, *args)
 
 
