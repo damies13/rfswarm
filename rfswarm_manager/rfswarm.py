@@ -2340,12 +2340,17 @@ class RFSwarmCore:
 				else:
 					base.addScriptRow()
 				# users = 13
-				if "users" in filedata[istr]:
-					base.debugmsg(8, "filedata[", istr, "][users]:", filedata[istr]["users"])
-					# base.scriptlist[ii]["users"] = filedata[istr]["users"]
-					self.sr_users_validate(rowcount, int(filedata[istr]["users"]))
-					# delay = 0
+				if "robots" in filedata[istr] or "users" in filedata[istr]:
+					if "robots" in filedata[istr]:
+						base.debugmsg(8, "filedata[", istr, "][robots]:", filedata[istr]["robots"])
+						self.sr_users_validate(rowcount, int(filedata[istr]["robots"]))
+					else:
+						base.debugmsg(8, "filedata[", istr, "][users]:", filedata[istr]["users"])
+						# base.scriptlist[ii]["users"] = filedata[istr]["users"]
+						self.sr_users_validate(rowcount, int(filedata[istr]["users"]))
+						# delay = 0
 				else:
+					base.debugmsg(3, "robots missing [",istr,"]")
 					fileok = False
 				if "delay" in filedata[istr]:
 					base.debugmsg(8, "filedata[", istr, "][delay]:", filedata[istr]["delay"])
