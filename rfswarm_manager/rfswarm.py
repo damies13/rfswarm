@@ -505,7 +505,7 @@ class RFSwarmBase:
 	# #000000 = Black
 	# https://www.schemecolor.com/traffic-red-yellow-green.php
 	defcolours = ['#000000', '#008450', '#B81D13', '#EFB700']
-	namecolours = ['Total', 'Pass', 'Fail', 'Warning']
+	namecolours = ['total', 'pass', 'fail', 'warning']
 
 
 	appstarted = False
@@ -1046,9 +1046,9 @@ class RFSwarmBase:
 		return newcolname
 
 	def named_colour(self, name):
-		if name not in base.namecolours:
-			base.namecolours.append(name)
-		return self.line_colour(base.namecolours.index(name))
+		if name.lower() not in base.namecolours:
+			base.namecolours.append(name.lower())
+		return self.line_colour(base.namecolours.index(name.lower()))
 
 	def line_colour(self, grp):
 		if grp<len(base.defcolours):
