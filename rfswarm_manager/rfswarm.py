@@ -504,8 +504,8 @@ class RFSwarmBase:
 
 	# #000000 = Black
 	# https://www.schemecolor.com/traffic-red-yellow-green.php
-	defcolours = ['#000000', '#008450', '#B81D13', '#EFB700']
-	namecolours = ['total', 'pass', 'fail', 'warning']
+	defcolours = ['#000000', '#008450', '#B81D13', '#EFB700', '#888888']
+	namecolours = ['total', 'pass', 'fail', 'warning', 'not run']
 
 
 	appstarted = False
@@ -2406,10 +2406,15 @@ class RFSwarmCore:
 
 		base.debugmsg(5, "config graph_list: ", base.config['GUI']['graph_list'])
 
+		if not base.args.nogui:
+			base.gui.ClearScenarioGraphs()
+
 		for iniid in graphlist:
 			if iniid in filedata:
 				base.debugmsg(5, "iniid: ", iniid, " 	filedata[iniid]:", filedata[iniid])
 				base.config[iniid] = filedata[iniid]
+				if not base.args.nogui:
+					base.gui.AddScenarioGraph(filedata[iniid]["name"], iniid)
 
 		if not base.args.nogui:
 			base.gui.OpenINIGraphs()
@@ -3732,8 +3737,23 @@ class RFSwarmGUI(tk.Frame):
 					self.graphs[iniid]["settings"] = settings
 
 
-	def OpenScenarioGraphs(self):
-		pass
+	def ClearScenarioGraphs(self):
+		try:
+			# remove existing items if any
+			base.debugmsg(5, "gph_scenario_menu:", self.gph_scenario_menu, self.gph_scenario_menu.index("last"))
+			if self.gph_scenario_menu.index("last") is not None:
+				index = self.gph_scenario_menu.index("last")
+				if index>0:
+					self.gph_scenario_menu.delete(0, index)
+				else:
+					self.gph_scenario_menu.delete(0)
+		except:
+			pass
+
+	def AddScenarioGraph(self, name, id):
+		base.debugmsg(5, "name:", name, " 	id:", id)
+		self.gph_scenario_menu.add_command(label = name, command=lambda id=id: self.MenuOpenGraph(id))
+		base.debugmsg(5, "gph_scenario_menu:", self.gph_scenario_menu, self.gph_scenario_menu.index("last"))
 
 	def RefreshRecentGraphs(self):
 		i = 1
