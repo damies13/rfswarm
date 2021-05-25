@@ -4638,6 +4638,179 @@ class RFSwarmGUI(tk.Frame):
 			graphdata["Total"]["objTime"] = []
 			graphdata["Total"]["Values"] = []
 
+			totalcalc = {}
+
+			for grp in base.scriptlist:
+				base.debugmsg(9, "grp:", grp)
+
+				if 'Test' in grp and len(grp['Test'])>0:
+					name = "{} - {}".format(grp['Index'], grp['Test'])
+					graphdata[name] = {}
+
+					# colour = base.named_colour(name)
+					colour = base.line_colour(grp["Index"])
+					base.debugmsg(8, "name:", name, "	colour:", colour)
+
+					graphdata[name]["Colour"] = colour
+					graphdata[name]["objTime"] = []
+					graphdata[name]["Values"] = []
+
+					# start
+					graphdata[name]["objTime"].append(datetime.fromtimestamp(0, timezone.utc))
+					graphdata[name]["Values"].append(0)
+					if 0 in totalcalc:
+						totalcalc[0] += 0
+					else:
+						totalcalc[0] = 0
+
+					# delay
+					graphdata[name]["objTime"].append(datetime.fromtimestamp(grp['Delay'], timezone.utc))
+					graphdata[name]["Values"].append(0)
+					if grp['Delay'] in totalcalc:
+						totalcalc[grp['Delay']] += 0
+					else:
+						totalcalc[grp['Delay']] = 0
+
+					# RampUp
+					timeru = grp['Delay'] + grp['RampUp']
+					graphdata[name]["objTime"].append(datetime.fromtimestamp(timeru, timezone.utc))
+					graphdata[name]["Values"].append(grp['Robots'])
+					if timeru in totalcalc:
+						totalcalc[timeru] += grp['Robots']*0.25
+					else:
+						totalcalc[timeru] = grp['Robots']*0.25
+
+					q = 0
+					for i in range(3):
+						q += 0.25
+						timeruq = grp['Delay'] + (grp['RampUp']*q)
+						if timeruq in totalcalc:
+							totalcalc[timeruq] += (grp['Robots']*0.25)
+						else:
+							totalcalc[timeruq] = (grp['Robots']*0.25)
+
+
+
+					# Run
+					timern = grp['Delay'] + grp['RampUp'] + grp['Run']
+					graphdata[name]["objTime"].append(datetime.fromtimestamp(timern, timezone.utc))
+					graphdata[name]["Values"].append(grp['Robots'])
+					if timern in totalcalc:
+						totalcalc[timern] += 0
+					else:
+						totalcalc[timern] = 0
+
+
+					# base.debugmsg(5, "graphdata[",name,"]:", graphdata[name])
+
+					# RampDown
+					timerd = grp['Delay'] + grp['RampUp'] + grp['Run'] + grp['RampUp']
+					graphdata[name]["objTime"].append(datetime.fromtimestamp(timerd, timezone.utc))
+					graphdata[name]["Values"].append(0)
+					if timerd in totalcalc:
+						totalcalc[timerd] += grp['Robots']*0.25*-1
+					else:
+						totalcalc[timerd] = grp['Robots']*0.25*-1
+
+
+					q = 1
+					for i in range(3):
+						q -= 0.25
+						timerdq = grp['Delay'] + grp['RampUp'] + grp['Run'] + (grp['RampUp']*q)
+						if timerdq in totalcalc:
+							totalcalc[timerdq] += (grp['Robots']*0.25*-1)
+						else:
+							totalcalc[timerdq] = (grp['Robots']*0.25*-1)
+
+
+
+					timerd += 1
+					graphdata[name]["objTime"].append(datetime.fromtimestamp(timerd, timezone.utc))
+					graphdata[name]["Values"].append(0)
+					timerd += 1
+					if timerd>totaltime:
+						totaltime = timerd
+
+					# base.debugmsg(5, "graphdata[",name,"]:", graphdata[name])
+
+					self.axis.plot(graphdata[name]["objTime"], graphdata[name]["Values"], colour, label=name)
+					dodraw = True
+
+
+
+			base.debugmsg(5, "totalcalc:", totalcalc)
+
+			rtotal = 0
+			for k in sorted(totalcalc.keys()):
+				base.debugmsg(5, "k:", k, " 	totalcalc[k]:", totalcalc[k])
+				graphdata["Total"]["objTime"].append(datetime.fromtimestamp(k, timezone.utc))
+				rtotal += totalcalc[k]
+				graphdata["Total"]["Values"].append(rtotal)
+
+
+			# graphdata["Total"]["objTime"] = [datetime.fromtimestamp(r, timezone.utc) for r in range(totaltime) ]
+			# graphdata["Total"]["Values"] = [0 for r in range(totaltime) ]
+			# base.debugmsg(8, "len(graphdata[Total][objTime]):", len(graphdata["Total"]["objTime"]))
+			# for i in range(len(graphdata["Total"]["objTime"])):
+			# 	count = 0
+			# 	# base.debugmsg(5, "i:", i)
+			# 	for name in graphdata.keys():
+			# 		if name != "Total":
+			# 			# base.debugmsg(5, "name:", name)
+			# 			if len(graphdata[name]["Values"])>i:
+			# 				count = count + graphdata[name]["Values"][i]
+			# 			# base.debugmsg(5, "graphdata[name][Values][i]:", graphdata[name]["Values"][i], " 	count:", count)
+			# 	# base.debugmsg(5, "count:", count)
+			# 	# graphdata["Total"]["Values"].append(count)
+			# 	graphdata["Total"]["Values"][i] = count
+
+			self.axis.plot(graphdata["Total"]["objTime"], graphdata["Total"]["Values"], graphdata["Total"]["Colour"], label="Total")
+
+			if dodraw:
+
+				self.axis.grid(True, 'major', 'both')
+
+
+				# grphWindow.axis.set_ylim(0, 100)
+				self.axis.set_ylim(0)
+				self.axis.set_xlim(0)
+
+				if totaltime > (60*60*24):
+					xformatter = matplotlib.dates.DateFormatter('%d %H:%M')
+				else:
+					xformatter = matplotlib.dates.DateFormatter('%H:%M:%S')
+				# plt.gcf().axes[0].xaxis.set_major_formatter(xformatter)
+				self.axis.xaxis.set_major_formatter(xformatter)
+
+				# self.axis.fmt_xdata = DateFormatter('%H:%M:%S')
+				# self.axis.fmt_xdata = matplotlib.dates.DateFormatter('%H:%M:%S')
+
+
+				self.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+
+				self.canvas.draw()
+
+			self.pln_graph_update = False
+
+
+	def pln_update_graph_newold(self):
+		base.debugmsg(6, "pln_update_graph")
+		time.sleep(0.1)
+
+		if not self.pln_graph_update:
+			self.pln_graph_update = True
+
+			graphdata = {}
+			dodraw = False
+			self.axis.cla()
+			totaltime = 0
+
+			colour = base.named_colour("Total")
+			graphdata["Total"] = {}
+			graphdata["Total"]["Colour"] = colour
+			graphdata["Total"]["objTime"] = []
+			graphdata["Total"]["Values"] = []
+
 
 			for grp in base.scriptlist:
 				base.debugmsg(9, "grp:", grp)
@@ -4763,609 +4936,6 @@ class RFSwarmGUI(tk.Frame):
 				self.canvas.draw()
 
 			self.pln_graph_update = False
-
-	def pln_update_graph_old(self):
-
-		totcolour = "#000000"
-		gridcolour = "#cfcfcf"
-		defaultcolour = "#000000"
-
-
-
-		base.debugmsg(6, "pln_update_graph")
-		base.debugmsg(6, "pln_graph:", self.pln_graph)
-		base.debugmsg(6, "scriptlist:", base.scriptlist)
-		try:
-			base.debugmsg(6, "winfo_width:", self.pln_graph.winfo_width(), "	winfo_height:",self.pln_graph.winfo_height())
-			graphh = self.pln_graph.winfo_height()
-			graphw = self.pln_graph.winfo_width()
-		except:
-			return False
-
-		base.debugmsg(6, "graphh", graphh, "graphw", graphw)
-
-
-		axissz = 10
-		if graphw > graphh:
-			# axissz = int(graphh * 0.1)
-			axissz = (graphh * 0.1)
-		else:
-			# axissz = int(graphw * 0.1)
-			axissz = (graphw * 0.1)
-
-		base.debugmsg(6, 'axissz:', axissz)
-
-		#  work out max users
-		mxuser = 0
-		mxusero = 0
-		for grp in base.scriptlist:
-			if "Robots" in grp.keys():
-				mxuser += grp["Robots"]
-				mxusero += grp["Robots"]
-		base.debugmsg(6, "mxuser", mxuser)
-		if mxuser <10:
-			mxuser += 1
-		else:
-			mxuser = int(mxuser*1.15)
-		base.debugmsg(8, "mxuser", mxuser)
-
-
-		#  work out max duration
-		mxdur = 0
-		for grp in base.scriptlist:
-			if "Robots" in grp.keys():
-				dur = grp["Delay"] + (grp["RampUp"]*2) + grp["Run"]
-				dur = int(dur * 1.03)
-				if mxdur < dur:
-					mxdur = dur
-		base.debugmsg(6, "mxdur", mxdur)
-
-		totrbtsxy = {}
-		totcounts = {}
-		totcounts[0] = 0
-		base.debugmsg(6, 'totcounts', totcounts)
-		base.debugmsg(6, 'totcounts.keys()', totcounts.keys())
-		totinc = 1
-		if mxdur > 60:
-			totinc = 10
-		if mxdur > 3600:
-			totinc = 60
-
-		self.pln_graph.delete("all")
-
-		ym0 = graphh-int(axissz/2)	# point below x axis
-		ym1 = graphh-axissz			# x axis line
-		ym2 = 0						# top of graph
-		base.debugmsg(8, "ym0:", ym0, "	ym1:", ym1, "	ym2:", ym2)
-
-		xm1 = axissz			# y axis line
-		if mxusero>99:
-			xm1 = (axissz*2)
-		if mxusero>9999:
-			xm1 = (axissz*3)
-
-		xm0 = int(xm1/2)			# point to left of y axis
-		xm2 = graphw				# right hand site of x axis
-		xmt = xm2-xm1				# total lenght of x axis
-
-		base.debugmsg(8, "xm0:", xm0, "	xm1:", xm1, "	xm2:", xm2, "	xmt:",xmt)
-
-		# y-axis
-		self.pln_graph.create_line(xm1, ym1, xm1, ym2, fill=defaultcolour)
-		# self.pln_graph.create_line(xm1, ym1, xm1, ym2)
-		# self.pln_graph.create_line(xm1, ym1, xm1, ym2, fill=gridcolour)
-		# x-axis
-		# base.gui.pln_graph.create_line(10, graphh-10, graphw, graphh-10, fill="blue")
-		self.pln_graph.create_line(xm1, ym1, xm2, ym1, fill=defaultcolour)
-		# self.pln_graph.create_line(xm1, ym1, xm2, ym1)
-
-		# draw zero
-		self.pln_graph.create_line(xm1, ym0, xm1, ym1, fill=defaultcolour)
-		self.pln_graph.create_line(xm0, ym1, xm1, ym1, fill=defaultcolour)
-		self.pln_graph.create_text([xm0, ym0], text="0", fill=defaultcolour)
-		# self.pln_graph.create_line(xm1, ym0, xm1, ym1)
-		# self.pln_graph.create_line(xm0, ym1, xm1, ym1)
-		# self.pln_graph.create_text([xm0, ym0], text="0")
-
-		# populate x axis	(time)
-		base.debugmsg(7, "populate x axis	(time)")
-		base.debugmsg(9, "mxdur", mxdur)
-		durinc = 1
-		if mxdur > 30:		# 30 sec
-			durinc = 15		# 15 sec
-		if mxdur > 120:		# 120 = 2 min
-			durinc = 60		# 1 min
-		if mxdur > 1800:	# 60 * 30 = 1800 sec = 1/2hr
-			durinc = 300	# 5 min
-		if mxdur > 3600:	# 60 * 60 = 3600 sec = 1hr
-			durinc = 600	# 10 min
-		if mxdur > 7200:	# 60 * 60 * 2 = 7200 sec = 2hr
-			durinc = 3600	# 1 hr
-		if mxdur > 36000:	# 60 * 60 * 10= 36000 sec = 10hr
-			durinc = 7200	# 2 hr
-		base.debugmsg(9, "durinc", durinc)
-
-		if mxdur>0:
-			mrkpct = durinc / (mxdur * 1.0)
-		else:
-			mrkpct = 0
-		base.debugmsg(9, "mrkpct", mrkpct)
-		base.debugmsg(9, "xm1", xm1, "xm2", xm2, "xm2-xm1", xm2-xm1)
-		mrkinc = int(xmt * mrkpct)
-		base.debugmsg(9, "mrkinc", mrkinc)
-		if mrkinc < 1:
-			mrkinc = 1
-
-		tmmrk = xm1 + mrkinc
-		base.debugmsg(9, "tmmrk", tmmrk)
-		base.debugmsg(9, "durinc", durinc)
-		durmrk = durinc
-		base.debugmsg(9, "durmrk", durmrk)
-		while durmrk < mxdur+1:
-			base.debugmsg(9, "x1", tmmrk, "y1", ym0, "x2", tmmrk, "y2", ym1)
-			# base.gui.pln_graph.create_line(tmmrk, ym0, tmmrk, ym1)
-			self.pln_graph.create_line(tmmrk, ym1, tmmrk, ym2, fill=gridcolour)
-			base.debugmsg(9, "format_sec({})".format(durmrk), base.format_sec(durmrk))
-			self.pln_graph.create_text([tmmrk, ym0], text=base.format_sec(durmrk), fill=defaultcolour)
-			# self.pln_graph.create_text([tmmrk, ym0], text=base.format_sec(durmrk))
-
-			tmmrk += mrkinc
-			base.debugmsg(9, "tmmrk", tmmrk)
-			durmrk += durinc
-			base.debugmsg(9, "durmrk", durmrk)
-
-
-
-		# populate y axis	(Robots)
-		base.debugmsg(9, "populate y axis	(Robots)")
-		usrinc = 1
-		if mxuser > 15:
-			usrinc = int((mxusero/100)+0.9)*10
-		base.debugmsg(9, "mxusero", mxusero)
-		base.debugmsg(9, "usrinc", usrinc)
-		base.debugmsg(9, "usrinc", usrinc)
-		usrmrk = usrinc
-		if mxuser>0:
-			mrkpct = usrmrk / (mxuser * 1.0)
-		else:
-			mrkpct = 0
-		base.debugmsg(9, "mrkpct", mrkpct)
-		txtmrkoffset = int(int(ym1 * mrkpct)/2)
-		base.debugmsg(9, "txtmrkoffset", txtmrkoffset)
-		while usrmrk < mxuser:
-			base.debugmsg(9, "usrmrk", usrmrk)
-			mrkpct = usrmrk / (mxuser * 1.0)
-			base.debugmsg(9, "mrkpct", mrkpct)
-			mrk = ym1 - int(ym1 * mrkpct)
-			base.debugmsg(9, "mrk", mrk)
-			txtmrk = mrk + txtmrkoffset
-			# base.gui.pln_graph.create_line(xm0, mrk, xm1, mrk)
-			self.pln_graph.create_line(xm1, mrk, xm2, mrk, fill=gridcolour)
-			# base.gui.pln_graph.create_text([xm0, txtmrk], text="{}".format(usrmrk))
-			self.pln_graph.create_text([xm0, mrk], text="{}".format(usrmrk), fill=defaultcolour)
-			# self.pln_graph.create_text([xm0, mrk], text="{}".format(usrmrk))
-
-			usrmrk += usrinc
-
-
-		xlen = xmt
-
-		delx = 0
-		base.debugmsg(6, "For grp In scriptlist")
-		for grp in base.scriptlist:
-			if "Robots" in grp.keys():
-				base.debugmsg(6, "Index", grp["Index"])
-				colour = base.line_colour(grp["Index"])
-				base.debugmsg(6, "Index", grp["Index"], "Line colour", colour)
-				# delay
-				delaypct = grp["Delay"] / (mxdur * 1.0)
-				delx = int(xlen * delaypct) + xm1
-				base.debugmsg(6, "Index", grp["Index"], "Delay:", grp["Delay"], "	(xlen:",xlen," * delaypct:", delaypct, ") + xm1:", xm1, " = delx:", delx)
-				# ramp-up
-				rusx = delx
-				rusy = graphh-axissz
-				usrpct = grp["Robots"] / (mxuser * 1.0)
-				base.debugmsg(6, "Index", grp["Index"], "RampUp:Robots", grp["Robots"], "/ mxuser", mxuser, " = usrpct", usrpct)
-				rudpct = grp["RampUp"] / (mxdur * 1.0)
-				ruex = int(xlen * rudpct) + delx
-				base.debugmsg(6, "Index", grp["Index"], "RampUp:RampUp", grp["RampUp"], "ruex", ruex)
-				ruey = rusy - int(rusy * usrpct)
-				base.debugmsg(6, "Index", grp["Index"], "RampUp:rusx", str(rusx), "rusy", str(rusy), "ruex", str(ruex), "ruey", str(ruey))
-				self.pln_graph.create_line(rusx, rusy, ruex, ruey, fill=colour)
-
-				index = grp["Index"]
-				if index not in totrbtsxy:
-					totrbtsxy[index] = {}
-				if "addpct" not in totrbtsxy:
-					totrbtsxy["addpct"] = {}
-
-				totrbtsxy[index]['delaypct'] = delaypct
-				totrbtsxy[index]['usrpct'] = usrpct
-				totrbtsxy[index]['rudpct'] = rudpct
-
-				if delaypct not in totrbtsxy["addpct"]:
-					totrbtsxy["addpct"][delaypct] = 0
-
-				totrbtsxy["addpct"][delaypct] += 0
-
-				rutpct = delaypct + rudpct
-				if rutpct not in totrbtsxy["addpct"]:
-					totrbtsxy["addpct"][rutpct] = 0
-				totrbtsxy["addpct"][rutpct] += usrpct
-
-
-				# Run
-				rnpct = grp["Run"] / (mxdur * 1.0)
-				rnex = int(xlen * rnpct) + ruex
-				base.debugmsg(6, "Index", grp["Index"], "rnex", rnex)
-				self.pln_graph.create_line(ruex, ruey, rnex, ruey, fill=colour)
-
-				rntpct = delaypct + rudpct + rnpct
-				if rntpct not in totrbtsxy["addpct"]:
-					totrbtsxy["addpct"][rntpct] = 0
-				totrbtsxy["addpct"][rntpct] += 0
-
-
-				# ramp-down
-				rdex = rnex+(ruex-rusx)
-				base.debugmsg(6, "Index", grp["Index"], "rdex", rdex)
-				self.pln_graph.create_line(rnex, ruey, rdex, rusy, fill=colour, dash=(4, 4))
-
-				rdtpct = delaypct + rudpct + rnpct + rudpct
-				if rdtpct not in totrbtsxy["addpct"]:
-					totrbtsxy["addpct"][rdtpct] = 0
-				totrbtsxy["addpct"][rdtpct] += (usrpct * -1)
-
-		base.debugmsg(6, "Total Robots")
-		base.debugmsg(6, "totrbtsxy:", totrbtsxy)
-
-		sy = graphh-axissz
-		prevx = 0
-		prevx2 = 0
-		prevy = 0
-		k = "addpct"
-
-		addzero = 0
-
-		rusy = graphh-axissz
-		if k in totrbtsxy:
-			for x in sorted(totrbtsxy[k].keys()):
-				newx = x
-				newy = prevy + totrbtsxy[k][x]
-
-				base.debugmsg(6, "prevx", prevx, "prevy", prevy, "newx", newx, "newy", newy)
-
-				if addzero > 1:
-					prevx = prevx2
-					base.debugmsg(6, "prevx", prevx, "prevy", prevy, "newx", newx, "newy", newy)
-
-				if newy == prevy:
-					addzero += 1
-					base.debugmsg(6, "addzero:", addzero)
-					prevx2 = prevx
-				else:
-					addzero = 0
-
-
-
-				x1 = int(xlen * prevx) + xm1
-				x2 = int(xlen * newx) + xm1
-
-				y1 = rusy - int(rusy * prevy)
-				y2 = rusy - int(rusy * newy)
-
-				base.debugmsg(6, "x1", x1, "y1", y1, "x2", x2, "y2", y2)
-
-				self.pln_graph.create_line(x1, y1, x2, y2, fill=totcolour)
-
-				prevx = newx
-				prevy = newy
-
-		base.debugmsg(6, "pln_update_graph done")
-
-	def pln_update_graph_orig(self):
-		base.debugmsg(6, "pln_update_graph")
-		base.debugmsg(7, "pln_graph:", self.pln_graph)
-		base.debugmsg(9, "scriptlist:", base.scriptlist)
-		try:
-			base.debugmsg(9, "winfo_width:", self.pln_graph.winfo_width(), "	winfo_height:",self.pln_graph.winfo_height())
-			graphh = self.pln_graph.winfo_height()
-			graphw = self.pln_graph.winfo_width()
-		except:
-			return False
-
-		base.debugmsg(9, "graphh", graphh, "graphw", graphw)
-
-
-		axissz = 10
-		if graphw > graphh:
-			axissz = int(graphh * 0.1)
-		else:
-			axissz = int(graphw * 0.1)
-
-		#  work out max users
-		mxuser = 0
-		mxusero = 0
-		for grp in base.scriptlist:
-			if "Robots" in grp.keys():
-				mxuser += grp["Robots"]
-				mxusero += grp["Robots"]
-		base.debugmsg(6, "mxuser", mxuser)
-		if mxuser <10:
-			mxuser += 1
-		else:
-			mxuser = int(mxuser*1.15)
-		base.debugmsg(5, "mxuser", mxuser)
-
-
-		#  work out max duration
-		mxdur = 0
-		for grp in base.scriptlist:
-			if "Robots" in grp.keys():
-				dur = grp["Delay"] + (grp["RampUp"]*2) + grp["Run"]
-				dur = int(dur * 1.03)
-				if mxdur < dur:
-					mxdur = dur
-		base.debugmsg(6, "mxdur", mxdur)
-
-		totcounts = {}
-		totcounts[0] = 0
-		base.debugmsg(6, 'totcounts', totcounts)
-		base.debugmsg(6, 'totcounts.keys()', totcounts.keys())
-		totinc = 1
-		if mxdur > 60:
-			totinc = 10
-		if mxdur > 3600:
-			totinc = 60
-
-		self.pln_graph.delete("all")
-
-		ym0 = graphh-int(axissz/2)	# point below x axis
-		ym1 = graphh-axissz			# x axis line
-		ym2 = 0						# top of graph
-
-		xm1 = axissz			# y axis line
-		if mxusero>99:
-			xm1 = (axissz*2)
-		if mxusero>9999:
-			xm1 = (axissz*3)
-
-		xm0 = int(xm1/2)			# point to left of y axis
-		xm2 = graphw				# right hand site of x axis
-		xmt = xm2-xm1				# total lenght of x axis
-
-		# y-axis
-		self.pln_graph.create_line(xm1, ym1, xm1, ym2)
-		# x-axis
-		# base.gui.pln_graph.create_line(10, graphh-10, graphw, graphh-10, fill="blue")
-		self.pln_graph.create_line(xm1, ym1, xm2, ym1)
-
-		# draw zero
-		self.pln_graph.create_line(xm1, ym0, xm1, ym1)
-		self.pln_graph.create_line(xm0, ym1, xm1, ym1)
-		self.pln_graph.create_text([xm0, ym0], text="0")
-
-		# populate x axis	(time)
-		base.debugmsg(5, "populate x axis	(time)")
-		base.debugmsg(9, "mxdur", mxdur)
-		durinc = 1
-		if mxdur > 30:		# 30 sec
-			durinc = 15		# 15 sec
-		if mxdur > 120:		# 120 = 2 min
-			durinc = 60		# 1 min
-		if mxdur > 1800:	# 60 * 30 = 1800 sec = 1/2hr
-			durinc = 300	# 5 min
-		if mxdur > 3600:	# 60 * 60 = 3600 sec = 1hr
-			durinc = 600	# 10 min
-		if mxdur > 7200:	# 60 * 60 * 2 = 7200 sec = 2hr
-			durinc = 3600	# 1 hr
-		if mxdur > 36000:	# 60 * 60 * 10= 36000 sec = 10hr
-			durinc = 7200	# 2 hr
-		base.debugmsg(9, "durinc", durinc)
-
-		if mxdur>0:
-			mrkpct = durinc / (mxdur * 1.0)
-		else:
-			mrkpct = 0
-		base.debugmsg(9, "mrkpct", mrkpct)
-		base.debugmsg(9, "xm1", xm1, "xm2", xm2, "xm2-xm1", xm2-xm1)
-		mrkinc = int(xmt * mrkpct)
-		base.debugmsg(9, "mrkinc", mrkinc)
-		if mrkinc < 1:
-			mrkinc = 1
-
-		tmmrk = xm1 + mrkinc
-		base.debugmsg(9, "tmmrk", tmmrk)
-		base.debugmsg(9, "durinc", durinc)
-		durmrk = durinc
-		base.debugmsg(9, "durmrk", durmrk)
-		gridcolour = "#cfcfcf"
-		while durmrk < mxdur+1:
-			base.debugmsg(9, "x1", tmmrk, "y1", ym0, "x2", tmmrk, "y2", ym1)
-			# base.gui.pln_graph.create_line(tmmrk, ym0, tmmrk, ym1)
-			self.pln_graph.create_line(tmmrk, ym1, tmmrk, ym2, fill=gridcolour)
-			base.debugmsg(9, "format_sec({})".format(durmrk), base.format_sec(durmrk))
-			self.pln_graph.create_text([tmmrk, ym0], text=base.format_sec(durmrk))
-
-			tmmrk += mrkinc
-			base.debugmsg(9, "tmmrk", tmmrk)
-			durmrk += durinc
-			base.debugmsg(9, "durmrk", durmrk)
-
-
-
-		# populate y axis	(Robots)
-		base.debugmsg(9, "populate y axis	(Robots)")
-		usrinc = 1
-		if mxuser > 15:
-			usrinc = int((mxusero/100)+0.9)*10
-		base.debugmsg(9, "mxusero", mxusero)
-		base.debugmsg(9, "usrinc", usrinc)
-		base.debugmsg(9, "usrinc", usrinc)
-		usrmrk = usrinc
-		if mxuser>0:
-			mrkpct = usrmrk / (mxuser * 1.0)
-		else:
-			mrkpct = 0
-		base.debugmsg(9, "mrkpct", mrkpct)
-		txtmrkoffset = int(int(ym1 * mrkpct)/2)
-		base.debugmsg(9, "txtmrkoffset", txtmrkoffset)
-		while usrmrk < mxuser:
-			base.debugmsg(9, "usrmrk", usrmrk)
-			mrkpct = usrmrk / (mxuser * 1.0)
-			base.debugmsg(9, "mrkpct", mrkpct)
-			mrk = ym1 - int(ym1 * mrkpct)
-			base.debugmsg(9, "mrk", mrk)
-			txtmrk = mrk + txtmrkoffset
-			# base.gui.pln_graph.create_line(xm0, mrk, xm1, mrk)
-			self.pln_graph.create_line(xm1, mrk, xm2, mrk, fill=gridcolour)
-			# base.gui.pln_graph.create_text([xm0, txtmrk], text="{}".format(usrmrk))
-			self.pln_graph.create_text([xm0, mrk], text="{}".format(usrmrk))
-
-			usrmrk += usrinc
-
-
-		xlen = xmt
-
-		delx = 0
-		base.debugmsg(6, "For grp In scriptlist")
-		for grp in base.scriptlist:
-			if "Robots" in grp.keys():
-				base.debugmsg(6, "Index", grp["Index"])
-				colour = base.line_colour(grp["Index"])
-				base.debugmsg(6, "Index", grp["Index"], "Line colour", colour)
-				# delay
-				delaypct = grp["Delay"] / (mxdur * 1.0)
-				delx = int(xlen * delaypct) + xm1
-				base.debugmsg(6, "Index", grp["Index"], "Delay", grp["Delay"], "delx", delx)
-				# ramp-up
-				rusx = delx
-				rusy = graphh-axissz
-				usrpct = grp["Robots"] / (mxuser * 1.0)
-				base.debugmsg(9, "Index", grp["Index"], "RampUp:Robots", grp["Robots"], "/ mxuser", mxuser, " = usrpct", usrpct)
-				rudpct = grp["RampUp"] / (mxdur * 1.0)
-				ruex = int(xlen * rudpct) + delx
-				base.debugmsg(9, "Index", grp["Index"], "RampUp:RampUp", grp["RampUp"], "ruex", ruex)
-				ruey = rusy - int(rusy * usrpct)
-				base.debugmsg(6, "Index", grp["Index"], "RampUp:rusx", rusx, "rusy", rusy, "ruex", ruex, "ruey", ruey)
-				self.pln_graph.create_line(rusx, rusy, ruex, ruey, fill=colour)
-
-				# Run
-				rnpct = grp["Run"] / (mxdur * 1.0)
-				rnex = int(xlen * rnpct) + ruex
-				base.debugmsg(6, "Index", grp["Index"], "rnex", rnex)
-				self.pln_graph.create_line(ruex, ruey, rnex, ruey, fill=colour)
-
-				# ramp-down
-				rdex = rnex+(ruex-rusx)
-				base.debugmsg(6, "Index", grp["Index"], "rdex", rdex)
-				self.pln_graph.create_line(rnex, ruey, rdex, rusy, fill=colour, dash=(4, 4))
-
-				# totcounts = {}
-				# totinc = 1
-				# if mxdur > 60:
-				totnxt = 0
-				base.debugmsg(6, "Index", grp["Index"], 'totnxt', totnxt)
-				base.debugmsg(8, "Index", grp["Index"], 'totcounts', totcounts)
-				base.debugmsg(8, "Index", grp["Index"], 'totcounts.keys()', totcounts.keys())
-				while totnxt < mxdur:
-					totnxt += totinc
-					base.debugmsg(6, "Index", grp["Index"], 'totnxt', totnxt)
-					if totnxt not in totcounts.keys():
-						totcounts[totnxt] = 0
-						base.debugmsg(6, "Index", grp["Index"], 'totcounts[',totnxt,']', totcounts[totnxt])
-					# if totnxt < grp["Delay"]:
-					# 	totcounts[totnxt] += 0
-					if totnxt > grp["Delay"] and totnxt < (grp["RampUp"] + grp["Delay"]):
-						# calculate users during RampUp
-						rupct = (totnxt - grp["Delay"]) /grp["RampUp"]
-						base.debugmsg(9, 'rupct', rupct)
-						ruusr = int(grp["Robots"] * rupct)
-						base.debugmsg(9, 'ruusr', ruusr)
-						base.debugmsg(9, 'totcounts', totcounts)
-						base.debugmsg(9, 'totcounts[totnxt]', totcounts[totnxt])
-						totcounts[totnxt] = int(totcounts[totnxt] + ruusr)
-						base.debugmsg(6, "Index", grp["Index"], 'totcounts[',totnxt,']', totcounts[totnxt])
-						base.debugmsg(9, 'ruusr', ruusr)
-						base.debugmsg(9, 'totcounts[totnxt]', totcounts[totnxt])
-
-					if totnxt > (grp["Delay"] + grp["RampUp"] - 1) \
-						and totnxt < (grp["Delay"] + grp["RampUp"] + grp["Run"] + 1):
-						# all users running
-						base.debugmsg(9, 'run:totnxt', totnxt)
-						base.debugmsg(9, 'run:grp["Robots"]', grp["Robots"])
-						totcounts[totnxt] += grp["Robots"]
-						base.debugmsg(6, "Index", grp["Index"], 'totcounts[',totnxt,']', totcounts[totnxt])
-					if totnxt > (grp["RampUp"] + grp["Delay"] + grp["Run"]) \
-						and totnxt < (grp["Delay"] + (grp["RampUp"] *2 ) + grp["Run"]):
-						# calculate users during RampDown
-						base.debugmsg(9, 'RampDown:totnxt', totnxt)
-						drr = grp["Delay"] + grp["RampUp"] + grp["Run"]
-						base.debugmsg(9, 'RampDown:drr', drr)
-						rdsec = totnxt - drr
-						base.debugmsg(9, 'RampDown:rdsec', rdsec)
-
-						rdpct = rdsec /grp["RampUp"]
-						base.debugmsg(9, 'RampDown:rdpct', rdpct)
-						ruusr = int(grp["Robots"] * rdpct)
-						base.debugmsg(9, 'RampDown:ruusr', ruusr)
-						totcounts[totnxt] += grp["Robots"] - ruusr
-						base.debugmsg(6, "Index", grp["Index"], 'totcounts[',totnxt,']', totcounts[totnxt])
-
-		base.debugmsg(6, "Total Robots")
-
-		totcolour = "#000000"
-		# totcolour = "#0459af"
-		sy = graphh-axissz
-		prevkey = 0
-		prevx = 0
-		prevy = sy
-		prevval = 0
-		rampdown = False
-		for key in totcounts.keys():
-			if rampdown == False and totcounts[key] < prevval:
-				rampdown = True
-				base.debugmsg(6, prevkey, totcounts[prevkey])
-
-				usrpct = prevval / (mxuser * 1.0)
-				base.debugmsg(6, "Robots", totcounts[key], "/ mxuser", mxuser, " = usrpct", usrpct)
-				newy = sy - int(sy * usrpct)
-
-				keypct = prevkey / (mxdur * 1.0)
-				base.debugmsg(6, "key", key, "/ mxdur", mxdur, " = keypct", keypct)
-				newx = int(xlen * keypct) + delx
-
-				base.debugmsg(6, "prevx", prevx, "prevy", prevy, "newx", newx, "newy", newy)
-
-				self.pln_graph.create_line(prevx, prevy, newx, newy, fill=totcolour)
-
-				prevx = newx
-				prevy = newy
-
-			if totcounts[key] != prevval:
-				base.debugmsg(6, key, totcounts[key])
-				prevval = totcounts[key]
-
-				usrpct = totcounts[key] / (mxuser * 1.0)
-				base.debugmsg(6, "TU: Robots", totcounts[key], "/ mxuser", mxuser, " = usrpct", usrpct)
-				newy = sy - int(sy * usrpct)
-
-				keypct = key / (mxdur * 1.0)
-				base.debugmsg(6, "TU: key", key, "/ mxdur", mxdur, " = keypct", keypct)
-				newx = int(xlen * keypct) + delx
-
-				base.debugmsg(6, "TU: prevx", prevx, "prevy", prevy, "newx", newx, "newy", newy)
-
-				if rampdown:
-					self.pln_graph.create_line(prevx, prevy, newx, newy, fill=totcolour, dash=(4, 4))
-				else:
-					self.pln_graph.create_line(prevx, prevy, newx, newy, fill=totcolour)
-
-				prevx = newx
-				prevy = newy
-
-
-			prevkey = key
 
 	def addScriptRow(self):
 		base.debugmsg(6, "addScriptRow")
