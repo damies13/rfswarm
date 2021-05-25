@@ -28,7 +28,7 @@ import socket
 import ipaddress
 import random
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 import re
 import threading
 import subprocess
@@ -2867,6 +2867,7 @@ class RFSwarmGUI(tk.Frame):
 	# GUI = None
 	tabs = None
 
+	pln_graph_update = False
 	pln_graph = None
 	scriptgrid = None
 	scrollable_sg = None
@@ -4029,7 +4030,7 @@ class RFSwarmGUI(tk.Frame):
 
 							base.debugmsg(6, gdname, ":", grphWindow.graphdata[name])
 							if len(grphWindow.graphdata[name]["Values"])>0:
-								grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"],grphWindow.graphdata[name]["Values"], colour, label=dname)
+								grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], colour, label=dname)
 								dodraw = True
 
 
@@ -4484,17 +4485,30 @@ class RFSwarmGUI(tk.Frame):
 		# Plan Graph
 		base.debugmsg(6, "Plan Graph")
 
-		# defaultcolour = self.rfstheme["default"]
 
-		self.pln_graph = tk.Canvas(p)
-		# self.pln_graph = tk.Canvas(p, fill="#000")
-		# self.pln_graph = tk.Canvas(p, selectforeground="#000")
-		self.pln_graph.grid(column=0, row=planrow, sticky="nsew") # sticky="wens"
+		# 	Old Graph using diy method
+		# self.pln_graph = tk.Canvas(p)
+		# self.pln_graph.grid(column=0, row=planrow, sticky="nsew") # sticky="wens"
+		#
+		# self.pln_graph.bind("<Configure>", self.CanvasResize)
 
-		# self.pln_graph.columnconfigure(0, weight=1)
-		# self.pln_graph.rowconfigure(0, weight=1)
+		#
+		# 	New Graph method using matplot
+		#
+		self.fig_dpi = 72
+		self.fig = Figure(dpi=self.fig_dpi, tight_layout=True)
+		self.axis = self.fig.add_subplot(1,1,1)	# , constrained_layout=True??
+		self.axis.grid(True, 'major', 'both')
 
-		self.pln_graph.bind("<Configure>", self.CanvasResize)
+		self.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+
+		self.canvas = FigureCanvasTkAgg(self.fig, p)
+		self.canvas.get_tk_widget().grid(column=0, row=planrow, sticky="nsew")
+		self.canvas.get_tk_widget().config(bg="blue")
+		self.canvas.draw()
+
+		p.bind("<Configure>", self.CanvasResize)
+
 
 
 
@@ -4588,7 +4602,9 @@ class RFSwarmGUI(tk.Frame):
 
 	def CanvasResize(self, event):
 		base.debugmsg(6, "event:", event)
-		self.pln_update_graph()
+		# self.pln_update_graph()
+		t = threading.Thread(target=self.pln_update_graph)
+		t.start()
 
 	def ClickPlay(self, _event=None):
 
@@ -4605,6 +4621,150 @@ class RFSwarmGUI(tk.Frame):
 		core.ClickPlay()
 
 	def pln_update_graph(self):
+		base.debugmsg(6, "pln_update_graph")
+		time.sleep(0.1)
+
+		if not self.pln_graph_update:
+			self.pln_graph_update = True
+
+			graphdata = {}
+			dodraw = False
+			self.axis.cla()
+			totaltime = 0
+
+			colour = base.named_colour("Total")
+			graphdata["Total"] = {}
+			graphdata["Total"]["Colour"] = colour
+			graphdata["Total"]["objTime"] = []
+			graphdata["Total"]["Values"] = []
+
+
+			for grp in base.scriptlist:
+				base.debugmsg(9, "grp:", grp)
+
+				if 'Test' in grp and len(grp['Test'])>0:
+					name = "{} - {}".format(grp['Index'], grp['Test'])
+					graphdata[name] = {}
+
+					# colour = base.named_colour(name)
+					colour = base.line_colour(grp["Index"])
+					base.debugmsg(8, "name:", name, "	colour:", colour)
+
+					graphdata[name]["Colour"] = colour
+					graphdata[name]["objTime"] = []
+					graphdata[name]["Values"] = []
+
+					# start
+					graphdata[name]["objTime"].append(datetime.fromtimestamp(0, timezone.utc))
+					graphdata[name]["Values"].append(0)
+
+					# delay
+					# graphdata[name]["objTime"].append(datetime.fromtimestamp(grp['Delay'], timezone.utc))
+					# graphdata[name]["Values"].append(0)
+					offset = 0
+					times = [datetime.fromtimestamp(offset + r, timezone.utc) for r in range(grp['Delay']) ]
+					graphdata[name]["objTime"] += times
+					vals = [0 for r in range(grp['Delay']) ]
+					graphdata[name]["Values"] += vals
+
+					# RampUp
+					# timeru = grp['Delay'] + grp['RampUp']
+					# graphdata[name]["objTime"].append(datetime.fromtimestamp(timeru, timezone.utc))
+					# graphdata[name]["Values"].append(grp['Robots'])
+					offset = grp['Delay']
+					times = [datetime.fromtimestamp(offset + r, timezone.utc) for r in range(grp['RampUp']) ]
+					graphdata[name]["objTime"] += times
+					vals = [((r/grp['RampUp'])*grp['Robots']) for r in range(grp['RampUp']) ]
+					graphdata[name]["Values"] += vals
+
+
+					# Run
+					# timern = grp['Delay'] + grp['RampUp'] + grp['Run']
+					# graphdata[name]["objTime"].append(datetime.fromtimestamp(timern, timezone.utc))
+					# graphdata[name]["Values"].append(grp['Robots'])
+					offset = grp['Delay'] + grp['RampUp']
+					times = [datetime.fromtimestamp(offset + r, timezone.utc) for r in range(grp['Run']) ]
+					graphdata[name]["objTime"] += times
+					vals = [grp['Robots'] for r in range(grp['Run']) ]
+					graphdata[name]["Values"] += vals
+
+					# base.debugmsg(5, "graphdata[",name,"]:", graphdata[name])
+
+					# RampDown
+					# timerd = grp['Delay'] + grp['RampUp'] + grp['Run'] + grp['RampUp']
+					# graphdata[name]["objTime"].append(datetime.fromtimestamp(timerd, timezone.utc))
+					# graphdata[name]["Values"].append(0)
+					offset = grp['Delay'] + grp['RampUp'] + grp['Run']
+					# base.debugmsg(5, "offset:", offset)
+					times = [datetime.fromtimestamp(offset + r, timezone.utc) for r in range(grp['RampUp']) ]
+					# base.debugmsg(5, "times:", times)
+					graphdata[name]["objTime"] += times
+					vals = [((1.0-(r/grp['RampUp']))*grp['Robots']) for r in range(grp['RampUp']) ]
+					# base.debugmsg(5, "vals:", vals)
+					graphdata[name]["Values"] += vals
+
+
+					timerd = grp['Delay'] + grp['RampUp'] + grp['Run'] + grp['RampUp']
+					graphdata[name]["objTime"].append(datetime.fromtimestamp(timerd, timezone.utc))
+					graphdata[name]["Values"].append(0)
+					timerd += 1
+					graphdata[name]["objTime"].append(datetime.fromtimestamp(timerd, timezone.utc))
+					graphdata[name]["Values"].append(0)
+					timerd += 1
+					if timerd>totaltime:
+						totaltime = timerd
+
+					# base.debugmsg(5, "graphdata[",name,"]:", graphdata[name])
+
+					self.axis.plot(graphdata[name]["objTime"], graphdata[name]["Values"], colour, label=name)
+					dodraw = True
+
+
+			graphdata["Total"]["objTime"] = [datetime.fromtimestamp(r, timezone.utc) for r in range(totaltime) ]
+			graphdata["Total"]["Values"] = [0 for r in range(totaltime) ]
+			base.debugmsg(8, "len(graphdata[Total][objTime]):", len(graphdata["Total"]["objTime"]))
+			for i in range(len(graphdata["Total"]["objTime"])):
+				count = 0
+				# base.debugmsg(5, "i:", i)
+				for name in graphdata.keys():
+					if name != "Total":
+						# base.debugmsg(5, "name:", name)
+						if len(graphdata[name]["Values"])>i:
+							count = count + graphdata[name]["Values"][i]
+						# base.debugmsg(5, "graphdata[name][Values][i]:", graphdata[name]["Values"][i], " 	count:", count)
+				# base.debugmsg(5, "count:", count)
+				# graphdata["Total"]["Values"].append(count)
+				graphdata["Total"]["Values"][i] = count
+
+			self.axis.plot(graphdata["Total"]["objTime"], graphdata["Total"]["Values"], graphdata["Total"]["Colour"], label="Total")
+
+			if dodraw:
+
+				self.axis.grid(True, 'major', 'both')
+
+
+				# grphWindow.axis.set_ylim(0, 100)
+				self.axis.set_ylim(0)
+				self.axis.set_xlim(0)
+
+				if totaltime > (60*60*24):
+					xformatter = matplotlib.dates.DateFormatter('%d %H:%M')
+				else:
+					xformatter = matplotlib.dates.DateFormatter('%H:%M:%S')
+				# plt.gcf().axes[0].xaxis.set_major_formatter(xformatter)
+				self.axis.xaxis.set_major_formatter(xformatter)
+
+				# self.axis.fmt_xdata = DateFormatter('%H:%M:%S')
+				# self.axis.fmt_xdata = matplotlib.dates.DateFormatter('%H:%M:%S')
+
+
+				self.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+
+				self.canvas.draw()
+
+			self.pln_graph_update = False
+
+	def pln_update_graph_old(self):
 
 		totcolour = "#000000"
 		gridcolour = "#cfcfcf"
@@ -5294,7 +5454,9 @@ class RFSwarmGUI(tk.Frame):
 		if not base.args.nogui:
 			try:
 				base.debugmsg(6, "call pln_update_graph")
-				self.pln_update_graph()
+				# self.pln_update_graph()
+				t = threading.Thread(target=self.pln_update_graph)
+				t.start()
 				base.debugmsg(6, "call fill_canvas")
 				# self.scrollable_sg.fill_canvas()
 				fc = threading.Thread(target=self.scrollable_sg.fill_canvas)
@@ -5334,7 +5496,9 @@ class RFSwarmGUI(tk.Frame):
 			self.plan_scnro_chngd = True
 			if not base.args.nogui:
 				try:
-					self.pln_update_graph()
+					# self.pln_update_graph()
+					t = threading.Thread(target=self.pln_update_graph)
+					t.start()
 				except:
 					pass
 			return True
@@ -5348,7 +5512,9 @@ class RFSwarmGUI(tk.Frame):
 				self.plan_scnro_chngd = True
 		if not base.args.nogui:
 			try:
-				self.pln_update_graph()
+				# self.pln_update_graph()
+				t = threading.Thread(target=self.pln_update_graph)
+				t.start()
 			except:
 				pass
 		return True
@@ -5380,7 +5546,9 @@ class RFSwarmGUI(tk.Frame):
 			if not base.args.nogui:
 				try:
 					base.debugmsg(6, "try pln_update_graph (if)")
-					self.pln_update_graph()
+					# self.pln_update_graph()
+					t = threading.Thread(target=self.pln_update_graph)
+					t.start()
 				except Exception as e:
 					# base.debugmsg(6, "try pln_update_graph (if) Exception:", e)
 					pass
@@ -5396,7 +5564,9 @@ class RFSwarmGUI(tk.Frame):
 		if not base.args.nogui:
 			try:
 				base.debugmsg(6, "try pln_update_graph (for)")
-				self.pln_update_graph()
+				# self.pln_update_graph()
+				t = threading.Thread(target=self.pln_update_graph)
+				t.start()
 			except:
 				pass
 		return True
@@ -5422,7 +5592,9 @@ class RFSwarmGUI(tk.Frame):
 			self.plan_scnro_chngd = True
 			if not base.args.nogui:
 				try:
-					self.pln_update_graph()
+					# self.pln_update_graph()
+					t = threading.Thread(target=self.pln_update_graph)
+					t.start()
 				except:
 					pass
 			return True
@@ -5436,7 +5608,9 @@ class RFSwarmGUI(tk.Frame):
 				self.plan_scnro_chngd = True
 		if not base.args.nogui:
 			try:
-				self.pln_update_graph()
+				# self.pln_update_graph()
+				t = threading.Thread(target=self.pln_update_graph)
+				t.start()
 			except:
 				pass
 		return True
@@ -5462,7 +5636,9 @@ class RFSwarmGUI(tk.Frame):
 			self.plan_scnro_chngd = True
 			if not base.args.nogui:
 				try:
-					self.pln_update_graph()
+					# self.pln_update_graph()
+					t = threading.Thread(target=self.pln_update_graph)
+					t.start()
 				except:
 					pass
 			return True
@@ -5476,7 +5652,9 @@ class RFSwarmGUI(tk.Frame):
 				self.plan_scnro_chngd = True
 		if not base.args.nogui:
 			try:
-				self.pln_update_graph()
+				# self.pln_update_graph()
+				t = threading.Thread(target=self.pln_update_graph)
+				t.start()
 			except:
 				pass
 		return True
@@ -5539,7 +5717,9 @@ class RFSwarmGUI(tk.Frame):
 
 		if not base.args.nogui:
 			try:
-				self.pln_update_graph()
+				# self.pln_update_graph()
+				t = threading.Thread(target=self.pln_update_graph)
+				t.start()
 			except:
 				pass
 		return True
@@ -5576,7 +5756,9 @@ class RFSwarmGUI(tk.Frame):
 
 		if not base.args.nogui:
 			try:
-				self.pln_update_graph()
+				# self.pln_update_graph()
+				t = threading.Thread(target=self.pln_update_graph)
+				t.start()
 			except:
 				pass
 		return True
@@ -5619,7 +5801,9 @@ class RFSwarmGUI(tk.Frame):
 		self.sg_canvas.config(scrollregion=self.sg_canvas.bbox("all"))
 
 		try:
-			self.pln_update_graph()
+			# self.pln_update_graph()
+			t = threading.Thread(target=self.pln_update_graph)
+			t.start()
 		except:
 			pass
 		return True
