@@ -44,7 +44,7 @@ import tkinter as tk				#python3
 import tkinter.ttk as ttk			#python3
 import tkinter.filedialog as tkf	#python3
 import tkinter.messagebox as tkm	#python3
-
+import webbrowser
 
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer, HTTPServer
 import urllib.parse
@@ -2862,7 +2862,8 @@ class RFSwarmCore:
 
 class RFSwarmGUI(tk.Frame):
 # class RFSwarmGUI:
-	titleprefix = 'Robot Framework Swarm'
+	# titleprefix = 'Robot Framework Swarm'
+	titleprefix = 'rfswarm'
 
 	# GUI = None
 	tabs = None
@@ -2906,6 +2907,7 @@ class RFSwarmGUI(tk.Frame):
 
 	elements = {}
 
+	style_text_colour = "#000"
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -2997,10 +2999,10 @@ class RFSwarmGUI(tk.Frame):
 
 
 	def updateTitle(self):
-		titletext = "{} - {}".format(self.titleprefix, "Untitled")
+		titletext = "{} v{} - {}".format(self.titleprefix, base.version, "Untitled")
 		if 'Plan' in base.config and 'ScenarioFile' in base.config['Plan']:
 			if len(base.config['Plan']['ScenarioFile'])>0:
-				titletext = "{} - {}".format(self.titleprefix, base.config['Plan']['ScenarioFile'])
+				titletext = "{} v{} - {}".format(self.titleprefix, base.version, base.config['Plan']['ScenarioFile'])
 
 		self.master.title(titletext)
 
@@ -3333,33 +3335,33 @@ class RFSwarmGUI(tk.Frame):
 				# style.configure("rfsinput", **style.configure('TLabel'))
 				# style.map("rfsinput", **style.map('TLabel'))
 				# style.configure("TLabel", foreground="systemPlaceholderTextColor")
-				style.configure("TLabel", foreground="#000")
+				style.configure("TLabel", foreground=self.style_text_colour)
 				style.configure("TEntry", foreground="systemPlaceholderTextColor")
 				# style.configure("TButton", foreground="systemPlaceholderTextColor")
-				style.configure("TButton", foreground="#000")
+				style.configure("TButton", foreground=self.style_text_colour)
 				# style.configure("TCombobox", foreground="systemPlaceholderTextColor")
-				# style.configure("TCombobox", foreground="#000")
-				# style.configure("TComboBox", foreground="#000")
-				# style.configure("Combobox", foreground="#000")
-				# style.configure("ComboBox", foreground="#000")
+				# style.configure("TCombobox", foreground=self.style_text_colour)
+				# style.configure("TComboBox", foreground=self.style_text_colour)
+				# style.configure("Combobox", foreground=self.style_text_colour)
+				# style.configure("ComboBox", foreground=self.style_text_colour)
 				#
-				# style.configure("OptionMenu", foreground="#000")
-				# style.configure("TOptionMenu", foreground="#000")
-				# style.configure("Optionmenu", foreground="#000")
-				# style.configure("TOptionmenu", foreground="#000")
+				# style.configure("OptionMenu", foreground=self.style_text_colour)
+				# style.configure("TOptionMenu", foreground=self.style_text_colour)
+				# style.configure("Optionmenu", foreground=self.style_text_colour)
+				# style.configure("TOptionmenu", foreground=self.style_text_colour)
 
-				# style.configure("Menubutton", foreground="#000")
-				style.configure("TMenubutton", foreground="#000")
+				# style.configure("Menubutton", foreground=self.style_text_colour)
+				style.configure("TMenubutton", foreground=self.style_text_colour)
 
 				# self.rfstheme["default"] = "systemPlaceholderTextColor"
-				# self.rfstheme["default"] = "#000"
+				# self.rfstheme["default"] = self.style_text_colour
 
-				# style.configure("Canvas", foreground="#000")
-				style.configure("Canvas", fill="#000")
-				style.configure("Canvas", activefill="#000")
+				# style.configure("Canvas", foreground=self.style_text_colour)
+				style.configure("Canvas", fill=self.style_text_colour)
+				style.configure("Canvas", activefill=self.style_text_colour)
 
-				# style.configure("Spinbox", foreground="#000")
-				style.configure("TSpinbox", foreground="#000")
+				# style.configure("Spinbox", foreground=self.style_text_colour)
+				style.configure("TSpinbox", foreground=self.style_text_colour)
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -6139,6 +6141,9 @@ class RFSwarmGUI(tk.Frame):
 	#
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+	def openweblink(self, url):
+	    webbrowser.open_new(url)
+
 	def BuildAbout(self, ab):
 
 		if not base.args.nogui:
@@ -6149,32 +6154,89 @@ class RFSwarmGUI(tk.Frame):
 			ab.columnconfigure(0, weight=1)
 			ab.columnconfigure(1, weight=1)
 			ab.columnconfigure(2, weight=1)
-			# ab.rowconfigure(aboutrow, weight=1)
+			ab.rowconfigure(aboutrow, weight=1)
 
+			aboutrow += 1
 			# rfswarm
-			base.debugmsg(5, "rfswarm")
-			name = ttk.Label(ab, text="\nrfswarm", justify=tk.CENTER, borderwidth=2, relief="raised")
-			name.grid(column=1, row=aboutrow, sticky="nsew") # , rowspan=2
+			base.debugmsg(7, "rfswarm")
+			# name = tk.Label(ab, text="\nrfswarm", justify=tk.CENTER, borderwidth=2, relief="raised", font=("Arial", 35), fg=self.style_text_colour)
+			name = tk.Label(ab, text="rfswarm", justify=tk.CENTER, font=(None, 35, "bold"), fg=self.style_text_colour)
+			name.grid(column=0, columnspan=3, row=aboutrow, sticky="nsew") # , rowspan=2
+
+			# Robot Framework Swarm
+			aboutrow += 1
+			# base.debugmsg(0, "	Version", base.version)
+			fullname = tk.Label(ab, text="(Robot Framework Swarm)", justify=tk.CENTER, fg=self.style_text_colour)
+			fullname.grid(column=0, columnspan=3, row=aboutrow, sticky="nsew") # , rowspan=2
 
 			aboutrow += 1
 			# Version
-			base.debugmsg(5, "Version")
+			base.debugmsg(7, "Version")
 			# base.debugmsg(0, "	Version", base.version)
-			name = ttk.Label(ab, text="Version {}\n".format(base.version), justify="center")
-			name.grid(column=1, row=aboutrow, sticky="nsew") # , rowspan=2
+			ver = tk.Label(ab, text="\nVersion {}".format(base.version), justify=tk.CENTER, font=(None, 13, "bold"), fg=self.style_text_colour)
+			ver.grid(column=0, columnspan=3, row=aboutrow, sticky="nsew") # , rowspan=2
 
-			# Robot Framework Swarm
 
 			# Swarm being the collective noun for Robots, just as Flock is for Birds and Herd for Sheep, so it made sense to use swarm for a performance testing tool using Robot Framework, hence rfswarm
+			swarmtext = "Swarm being the collective noun for Robots, just as Flock is for Birds and Herd for Sheep, so it made sense to use swarm for a performance testing tool using Robot Framework, hence rfswarm"
+			aboutrow += 1
+			ab.rowconfigure(aboutrow, weight=1)
+			name = tk.Label(ab, text=swarmtext, justify=tk.CENTER, font=(None, 12, "italic"), fg="#888", wraplength=380)
+			name.grid(column=0, columnspan=3, row=aboutrow, sticky="nsew") # , rowspan=2
 
+			# https://stackoverflow.com/questions/23482748/how-to-create-a-hyperlink-with-a-label-in-tkinter
+
+
+			aboutrow += 1
+			ab.rowconfigure(aboutrow, weight=1)
+
+			aboutrow += 1
 			# Getting Help
-			# rfswarm Documentation
-			# Discord
-			# Reporting Issues / Known Issues
+			base.debugmsg(7, "Getting Help")
+			# gh = tk.Label(ab, text="\nGetting Help:", justify=tk.LEFT, fg=self.style_text_colour, font=(None, 18, "bold"))
+			gh = ttk.Label(ab, text="\nGetting Help:")
+			gh.grid(column=0, row=aboutrow, sticky="nsew")
 
+			aboutrow += 1
+			# cursor="pointinghand" is a better choice bot only works on osx :(
+			# rfswarm Documentation
+			gh_doc = tk.Label(ab, text="rfswarm Documentation", fg="blue", cursor="hand2")
+			gh_doc.grid(column=0, row=aboutrow, sticky="nsew")
+			# link1.bind("<Button-1>", lambda e: callback("http://www.google.com"))
+			gh_doc.bind("<Button-1>", lambda e: self.openweblink("https://github.com/damies13/rfswarm/blob/master/Doc/README.md"))
+			# Discord
+			gh_dis = tk.Label(ab, text="Discord", fg="blue", cursor="hand2")
+			gh_dis.grid(column=1, row=aboutrow, sticky="nsew")
+			gh_dis.bind("<Button-1>", lambda e: self.openweblink("https://discord.gg/jJfCMrqCsT"))
+			# Reporting Issues / Known Issues
+			gh_iss = tk.Label(ab, text="Reporting Issues / Known Issues", fg="blue", cursor="hand2")
+			gh_iss.grid(column=2, row=aboutrow, sticky="nsew")
+			gh_iss.bind("<Button-1>", lambda e: self.openweblink("https://github.com/damies13/rfswarm/issues"))
+
+			aboutrow += 1
+			ab.rowconfigure(aboutrow, weight=1)
+
+			aboutrow += 1
 			# Donate
+			base.debugmsg(7, "Donate")
+			don = ttk.Label(ab, text="\nDonate:")
+			don.grid(column=0, row=aboutrow, sticky="nsew")
+
+			aboutrow += 1
 			# Github
+			don_gh = tk.Label(ab, text="Github", fg="blue", cursor="hand2")
+			don_gh.grid(column=0, row=aboutrow, sticky="nsew")
+			don_gh.bind("<Button-1>", lambda e: self.openweblink("https://github.com/sponsors/damies13/"))
 			# PayPal.me
+			don_pp = tk.Label(ab, text="PayPal", fg="blue", cursor="hand2")
+			don_pp.grid(column=1, row=aboutrow, sticky="nsew")
+			don_pp.bind("<Button-1>", lambda e: self.openweblink("https://paypal.me/damies13/5"))
+
+			aboutrow += 1
+			ab.rowconfigure(aboutrow, weight=1)
+			aboutrow += 1
+			ab.rowconfigure(aboutrow, weight=1)
+
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
