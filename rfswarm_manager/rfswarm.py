@@ -3127,19 +3127,30 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(5, "self.tabs", self.tabs)
 		# base.debugmsg(5, "self.tabs", self.tabs["background"])
 
+
 		base.debugmsg(6, "p")
 		p = ttk.Frame(self.tabs)   # first page, which would get widgets gridded into it
 		p.grid(row=0, column=0, sticky="nsew")
 		# p.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
+		self.tabs.add(p, text='Plan')
+
 		base.debugmsg(6, "r")
 		r = ttk.Frame(self.tabs)   # second page
 		r.grid(row=0, column=0, sticky="nsew")
+		self.tabs.add(r, text='Run')
+
 		base.debugmsg(6, "a")
 		a = ttk.Frame(self.tabs)   # 3rd page
 		a.grid(row=0, column=0, sticky="nsew")
-		self.tabs.add(p, text='Plan')
-		self.tabs.add(r, text='Run')
 		self.tabs.add(a, text='Agents')
+
+		base.debugmsg(6, "ab")
+		ab = ttk.Frame(self.tabs)   # About page
+		ab.grid(row=0, column=0, sticky="nsew")
+		self.tabs.add(ab, text='About')
+
+
+
 		self.tabs.grid(column=0, row=0, sticky="nsew")
 		# self.tabs.grid(column=0, row=0, padx=0, pady=0, sticky="nsew")
 
@@ -3155,6 +3166,8 @@ class RFSwarmGUI(tk.Frame):
 		self.BuildRun(r)
 		base.debugmsg(6, "BuildAgent")
 		self.BuildAgent(a)
+		base.debugmsg(6, "BuildAbout")
+		self.BuildAbout(ab)
 
 		if len(base.config['Plan']['ScenarioFile'])<1:
 			self.OpenINIGraphs()
@@ -6120,6 +6133,48 @@ class RFSwarmGUI(tk.Frame):
 		self.agenttgrid.update_idletasks()
 		self.ag_canvas.config(scrollregion=self.ag_canvas.bbox("all"))
 
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+	#
+	# About
+	#
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+	def BuildAbout(self, ab):
+
+		if not base.args.nogui:
+
+			aboutrow = 0
+
+			# weight=0 means don't resize with other grid rows / keep a fixed size
+			ab.columnconfigure(0, weight=1)
+			ab.columnconfigure(1, weight=1)
+			ab.columnconfigure(2, weight=1)
+			# ab.rowconfigure(aboutrow, weight=1)
+
+			# rfswarm
+			base.debugmsg(5, "rfswarm")
+			name = ttk.Label(ab, text="\nrfswarm", justify=tk.CENTER, borderwidth=2, relief="raised")
+			name.grid(column=1, row=aboutrow, sticky="nsew") # , rowspan=2
+
+			aboutrow += 1
+			# Version
+			base.debugmsg(5, "Version")
+			# base.debugmsg(0, "	Version", base.version)
+			name = ttk.Label(ab, text="Version {}\n".format(base.version), justify="center")
+			name.grid(column=1, row=aboutrow, sticky="nsew") # , rowspan=2
+
+			# Robot Framework Swarm
+
+			# Swarm being the collective noun for Robots, just as Flock is for Birds and Herd for Sheep, so it made sense to use swarm for a performance testing tool using Robot Framework, hence rfswarm
+
+			# Getting Help
+			# rfswarm Documentation
+			# Discord
+			# Reporting Issues / Known Issues
+
+			# Donate
+			# Github
+			# PayPal.me
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
