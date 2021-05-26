@@ -4672,22 +4672,27 @@ class RFSwarmGUI(tk.Frame):
 						totalcalc[grp['Delay']] = 0
 
 					# RampUp
+					# chunk = 0.25
+					chunk = 0.1
 					timeru = grp['Delay'] + grp['RampUp']
 					graphdata[name]["objTime"].append(datetime.fromtimestamp(timeru, timezone.utc))
 					graphdata[name]["Values"].append(grp['Robots'])
 					if timeru in totalcalc:
-						totalcalc[timeru] += grp['Robots']*0.25
+						totalcalc[timeru] += grp['Robots']*chunk
 					else:
-						totalcalc[timeru] = grp['Robots']*0.25
+						totalcalc[timeru] = grp['Robots']*chunk
 
 					q = 0
-					for i in range(3):
-						q += 0.25
+
+					base.debugmsg(5, "int(1/chunk)-1:", int(1/chunk)-1)
+
+					for i in range(int(1/chunk)-1):
+						q += chunk
 						timeruq = grp['Delay'] + (grp['RampUp']*q)
 						if timeruq in totalcalc:
-							totalcalc[timeruq] += (grp['Robots']*0.25)
+							totalcalc[timeruq] += (grp['Robots']*chunk)
 						else:
-							totalcalc[timeruq] = (grp['Robots']*0.25)
+							totalcalc[timeruq] = (grp['Robots']*chunk)
 
 
 
@@ -4708,19 +4713,19 @@ class RFSwarmGUI(tk.Frame):
 					graphdata[name]["objTime"].append(datetime.fromtimestamp(timerd, timezone.utc))
 					graphdata[name]["Values"].append(0)
 					if timerd in totalcalc:
-						totalcalc[timerd] += grp['Robots']*0.25*-1
+						totalcalc[timerd] += grp['Robots']*chunk*-1
 					else:
-						totalcalc[timerd] = grp['Robots']*0.25*-1
+						totalcalc[timerd] = grp['Robots']*chunk*-1
 
 
 					q = 1
-					for i in range(3):
-						q -= 0.25
+					for i in range(int(1/chunk)-1):
+						q -= chunk
 						timerdq = grp['Delay'] + grp['RampUp'] + grp['Run'] + (grp['RampUp']*q)
 						if timerdq in totalcalc:
-							totalcalc[timerdq] += (grp['Robots']*0.25*-1)
+							totalcalc[timerdq] += (grp['Robots']*chunk*-1)
 						else:
-							totalcalc[timerdq] = (grp['Robots']*0.25*-1)
+							totalcalc[timerdq] = (grp['Robots']*chunk*-1)
 
 
 
@@ -4792,150 +4797,6 @@ class RFSwarmGUI(tk.Frame):
 
 			self.pln_graph_update = False
 
-
-	def pln_update_graph_newold(self):
-		base.debugmsg(6, "pln_update_graph")
-		time.sleep(0.1)
-
-		if not self.pln_graph_update:
-			self.pln_graph_update = True
-
-			graphdata = {}
-			dodraw = False
-			self.axis.cla()
-			totaltime = 0
-
-			colour = base.named_colour("Total")
-			graphdata["Total"] = {}
-			graphdata["Total"]["Colour"] = colour
-			graphdata["Total"]["objTime"] = []
-			graphdata["Total"]["Values"] = []
-
-
-			for grp in base.scriptlist:
-				base.debugmsg(9, "grp:", grp)
-
-				if 'Test' in grp and len(grp['Test'])>0:
-					name = "{} - {}".format(grp['Index'], grp['Test'])
-					graphdata[name] = {}
-
-					# colour = base.named_colour(name)
-					colour = base.line_colour(grp["Index"])
-					base.debugmsg(8, "name:", name, "	colour:", colour)
-
-					graphdata[name]["Colour"] = colour
-					graphdata[name]["objTime"] = []
-					graphdata[name]["Values"] = []
-
-					# start
-					graphdata[name]["objTime"].append(datetime.fromtimestamp(0, timezone.utc))
-					graphdata[name]["Values"].append(0)
-
-					# delay
-					# graphdata[name]["objTime"].append(datetime.fromtimestamp(grp['Delay'], timezone.utc))
-					# graphdata[name]["Values"].append(0)
-					offset = 0
-					times = [datetime.fromtimestamp(offset + r, timezone.utc) for r in range(grp['Delay']) ]
-					graphdata[name]["objTime"] += times
-					vals = [0 for r in range(grp['Delay']) ]
-					graphdata[name]["Values"] += vals
-
-					# RampUp
-					# timeru = grp['Delay'] + grp['RampUp']
-					# graphdata[name]["objTime"].append(datetime.fromtimestamp(timeru, timezone.utc))
-					# graphdata[name]["Values"].append(grp['Robots'])
-					offset = grp['Delay']
-					times = [datetime.fromtimestamp(offset + r, timezone.utc) for r in range(grp['RampUp']) ]
-					graphdata[name]["objTime"] += times
-					vals = [((r/grp['RampUp'])*grp['Robots']) for r in range(grp['RampUp']) ]
-					graphdata[name]["Values"] += vals
-
-
-					# Run
-					# timern = grp['Delay'] + grp['RampUp'] + grp['Run']
-					# graphdata[name]["objTime"].append(datetime.fromtimestamp(timern, timezone.utc))
-					# graphdata[name]["Values"].append(grp['Robots'])
-					offset = grp['Delay'] + grp['RampUp']
-					times = [datetime.fromtimestamp(offset + r, timezone.utc) for r in range(grp['Run']) ]
-					graphdata[name]["objTime"] += times
-					vals = [grp['Robots'] for r in range(grp['Run']) ]
-					graphdata[name]["Values"] += vals
-
-					# base.debugmsg(5, "graphdata[",name,"]:", graphdata[name])
-
-					# RampDown
-					# timerd = grp['Delay'] + grp['RampUp'] + grp['Run'] + grp['RampUp']
-					# graphdata[name]["objTime"].append(datetime.fromtimestamp(timerd, timezone.utc))
-					# graphdata[name]["Values"].append(0)
-					offset = grp['Delay'] + grp['RampUp'] + grp['Run']
-					# base.debugmsg(5, "offset:", offset)
-					times = [datetime.fromtimestamp(offset + r, timezone.utc) for r in range(grp['RampUp']) ]
-					# base.debugmsg(5, "times:", times)
-					graphdata[name]["objTime"] += times
-					vals = [((1.0-(r/grp['RampUp']))*grp['Robots']) for r in range(grp['RampUp']) ]
-					# base.debugmsg(5, "vals:", vals)
-					graphdata[name]["Values"] += vals
-
-
-					timerd = grp['Delay'] + grp['RampUp'] + grp['Run'] + grp['RampUp']
-					graphdata[name]["objTime"].append(datetime.fromtimestamp(timerd, timezone.utc))
-					graphdata[name]["Values"].append(0)
-					timerd += 1
-					graphdata[name]["objTime"].append(datetime.fromtimestamp(timerd, timezone.utc))
-					graphdata[name]["Values"].append(0)
-					timerd += 1
-					if timerd>totaltime:
-						totaltime = timerd
-
-					# base.debugmsg(5, "graphdata[",name,"]:", graphdata[name])
-
-					self.axis.plot(graphdata[name]["objTime"], graphdata[name]["Values"], colour, label=name)
-					dodraw = True
-
-
-			graphdata["Total"]["objTime"] = [datetime.fromtimestamp(r, timezone.utc) for r in range(totaltime) ]
-			graphdata["Total"]["Values"] = [0 for r in range(totaltime) ]
-			base.debugmsg(8, "len(graphdata[Total][objTime]):", len(graphdata["Total"]["objTime"]))
-			for i in range(len(graphdata["Total"]["objTime"])):
-				count = 0
-				# base.debugmsg(5, "i:", i)
-				for name in graphdata.keys():
-					if name != "Total":
-						# base.debugmsg(5, "name:", name)
-						if len(graphdata[name]["Values"])>i:
-							count = count + graphdata[name]["Values"][i]
-						# base.debugmsg(5, "graphdata[name][Values][i]:", graphdata[name]["Values"][i], " 	count:", count)
-				# base.debugmsg(5, "count:", count)
-				# graphdata["Total"]["Values"].append(count)
-				graphdata["Total"]["Values"][i] = count
-
-			self.axis.plot(graphdata["Total"]["objTime"], graphdata["Total"]["Values"], graphdata["Total"]["Colour"], label="Total")
-
-			if dodraw:
-
-				self.axis.grid(True, 'major', 'both')
-
-
-				# grphWindow.axis.set_ylim(0, 100)
-				self.axis.set_ylim(0)
-				self.axis.set_xlim(0)
-
-				if totaltime > (60*60*24):
-					xformatter = matplotlib.dates.DateFormatter('%d %H:%M')
-				else:
-					xformatter = matplotlib.dates.DateFormatter('%H:%M:%S')
-				# plt.gcf().axes[0].xaxis.set_major_formatter(xformatter)
-				self.axis.xaxis.set_major_formatter(xformatter)
-
-				# self.axis.fmt_xdata = DateFormatter('%H:%M:%S')
-				# self.axis.fmt_xdata = matplotlib.dates.DateFormatter('%H:%M:%S')
-
-
-				self.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
-
-				self.canvas.draw()
-
-			self.pln_graph_update = False
 
 	def addScriptRow(self):
 		base.debugmsg(6, "addScriptRow")
