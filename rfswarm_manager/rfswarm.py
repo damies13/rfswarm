@@ -5752,11 +5752,15 @@ class RFSwarmGUI(tk.Frame):
 		# update stop button
 		if base.run_end < int(time.time()):
 			icontext = "Abort"
-			self.elements["Run"]["btn_stop"]["image"] = self.icoStop
+			self.elements["Run"]["btn_stop"]["image"] = self.icoAbort
+
+		if base.run_abort:
+			icontext = "Aborted"
+			self.elements["Run"]["btn_stop"]["image"] = self.icoAborted
 
 		if base.run_finish > 0:
 			icontext = "Aborted"
-			self.elements["Run"]["btn_stop"]["image"] = self.icoStop
+			self.elements["Run"]["btn_stop"]["image"] = self.icoAborted
 
 		time_elapsed = int(time.time()) - self.rungridupdate
 		if (time_elapsed>5):
@@ -5889,14 +5893,14 @@ class RFSwarmGUI(tk.Frame):
 				# reallyabort = tkm.askyesno('RFSwarm - Abort Run','Do you want to abort this run? Clicking yes will kill all running robots!', icon='error')
 				if reallyabort:
 					icontext = "Aborted"
-					self.elements["Run"]["btn_stop"]["image"] = self.icoStop
+					self.elements["Run"]["btn_stop"]["image"] = self.icoAborted
 					core.ClickStop()
 		else:
 			base.debugmsg(5, "Stop Clicked 1st time")
 			icontext = "Abort"
 			base.debugmsg(9, "icoStop", self.icoStop)
 			base.debugmsg(9, "btn_stop", self.elements["Run"]["btn_stop"])
-			self.elements["Run"]["btn_stop"]["image"] = self.icoStop
+			self.elements["Run"]["btn_stop"]["image"] = self.icoAbort
 			base.debugmsg(9, "btn_stop", self.elements["Run"]["btn_stop"])
 
 			core.ClickStop()
