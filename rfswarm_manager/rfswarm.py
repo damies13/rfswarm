@@ -4636,7 +4636,7 @@ class RFSwarmGUI(tk.Frame):
 		core.ClickPlay()
 
 	def pln_update_graph(self):
-		base.debugmsg(6, "pln_update_graph")
+		base.debugmsg(6, "pln_update_graph", self.pln_graph_update)
 		time.sleep(0.1)
 
 		if not self.pln_graph_update:
@@ -4656,14 +4656,18 @@ class RFSwarmGUI(tk.Frame):
 			totalcalc = {}
 
 			for grp in base.scriptlist:
-				base.debugmsg(9, "grp:", grp)
+				base.debugmsg(6, "grp:", grp)
+				if 'Index' in grp:
+					if 'Test' in grp and len(grp['Test'])>0:
+						name = "{} - {}".format(grp['Index'], grp['Test'])
+						graphdata[name] = {}
+						# colour = base.named_colour(name)
+						colour = base.line_colour(grp["Index"])
+					else:
+						name = "{}".format(grp['Index'])
+						graphdata[name] = {}
+						colour = base.line_colour(grp["Index"])
 
-				if 'Test' in grp and len(grp['Test'])>0:
-					name = "{} - {}".format(grp['Index'], grp['Test'])
-					graphdata[name] = {}
-
-					# colour = base.named_colour(name)
-					colour = base.line_colour(grp["Index"])
 					base.debugmsg(8, "name:", name, "	colour:", colour)
 
 					graphdata[name]["Colour"] = colour
@@ -5748,11 +5752,15 @@ class RFSwarmGUI(tk.Frame):
 		# update stop button
 		if base.run_end < int(time.time()):
 			icontext = "Abort"
-			self.elements["Run"]["btn_stop"]["image"] = self.icoStop
+			self.elements["Run"]["btn_stop"]["image"] = self.icoAbort
+
+		if base.run_abort:
+			icontext = "Aborted"
+			self.elements["Run"]["btn_stop"]["image"] = self.icoAborted
 
 		if base.run_finish > 0:
 			icontext = "Aborted"
-			self.elements["Run"]["btn_stop"]["image"] = self.icoStop
+			self.elements["Run"]["btn_stop"]["image"] = self.icoAborted
 
 		time_elapsed = int(time.time()) - self.rungridupdate
 		if (time_elapsed>5):
@@ -5885,14 +5893,14 @@ class RFSwarmGUI(tk.Frame):
 				# reallyabort = tkm.askyesno('RFSwarm - Abort Run','Do you want to abort this run? Clicking yes will kill all running robots!', icon='error')
 				if reallyabort:
 					icontext = "Aborted"
-					self.elements["Run"]["btn_stop"]["image"] = self.icoStop
+					self.elements["Run"]["btn_stop"]["image"] = self.icoAborted
 					core.ClickStop()
 		else:
 			base.debugmsg(5, "Stop Clicked 1st time")
 			icontext = "Abort"
 			base.debugmsg(9, "icoStop", self.icoStop)
 			base.debugmsg(9, "btn_stop", self.elements["Run"]["btn_stop"])
-			self.elements["Run"]["btn_stop"]["image"] = self.icoStop
+			self.elements["Run"]["btn_stop"]["image"] = self.icoAbort
 			base.debugmsg(9, "btn_stop", self.elements["Run"]["btn_stop"])
 
 			core.ClickStop()
@@ -6255,6 +6263,7 @@ class RFSwarmGUI(tk.Frame):
 			base.scriptcount += -1
 		base.scriptlist = [{}]
 		base.addScriptRow()
+
 
 	def mnu_file_Open(self, _event=None):
 		base.debugmsg(9, "mnu_file_Open")
