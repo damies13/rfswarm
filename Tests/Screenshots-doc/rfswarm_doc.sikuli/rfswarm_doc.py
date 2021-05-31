@@ -25,6 +25,21 @@ def click_settings():
 def click_play():
     click("1622432476336.png")
 
+def click_stop():
+    click("1622439564657.png")
+
+def click_abort():
+    click("1622439632003.png")
+
+def click_aborted():
+    click("1622439752532.png")
+
+def click_Yes():
+    click("1622439689474.png")
+
+def click_No():
+    click("1622439720128.png")
+
 def click_cancel():
     click("1622429454155.png")
 
@@ -48,7 +63,7 @@ def open_scenario(scenario):
     click_open()
 
     if has("1622429623038.png", 3):
-        click("1622429816869.png")
+        click_No()
         waitVanish("1622429623038.png")
 
     
@@ -87,7 +102,7 @@ def takess(catagory, name):
     if len(oslabel)<1:
         update_oslabel()
         print oslabel
-    wait(1) # give time for graphs and other elements to update
+    wait(5) # give time for graphs and other elements to update
     bounds = getBounds()
     print bounds
     
@@ -125,8 +140,8 @@ def gui_ss():
     open_scenario("/Users/dave/Documents/GitHub/rfswarm/Scenarios/test2.rfs")
     takess("Plan", "saved_opened")
     
-    open_scenario("/Users/dave/Documents/GitHub/rfswarm/Scenarios/test2.rfs")
-    takess("Plan", "20us_delay_example")
+    open_scenario("/Users/dave/Documents/GitHub/rfswarm/Scenarios/Simple_delay.rfs")
+    takess("Plan", "20u_delay_example")
     
     click_new()
     
@@ -152,10 +167,24 @@ def gui_run():
     takess("Run", "Start_60s")
 
     click_Agents()
-    takess("Agents", "Run")
+    takess("Agents", "Runing")
+
+    click_Run()
+    click_stop()
+    takess("Run", "Bomb_Run")
+    wait(10)
+    click_Agents()
+    takess("Agents", "Stopping")
+
+    click_Run()
+    click_abort()
+    takess("Run", "Abort_Dialogue")
+    click_Yes()
+    click_aborted()
+    takess("Run", "Aborted")
 
 make_active()
 
-# gui_ss()
+gui_ss()
 
 gui_run()
