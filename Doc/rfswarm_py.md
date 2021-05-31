@@ -26,22 +26,22 @@ This is where you construct your test scenario, choose your test cases and numbe
 All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the [agent polling](./rfswarm_agent_py.md#agent-polling-of-the-guiserver) works it's best not to use values less than 10 seconds.
 
 > _Plan - Planning a performance test_
-![Image](Images/MacOS_Plan_v0.7.0_saved_opened.png "Plan - Planning a performance test")
+![Image](Images/MacOS_Plan_v0.8.0_saved_opened.png "Plan - Planning a performance test")
 
 > _Plan - New_
-![Image](Images/MacOS_Plan_v0.7.0_New.png "Plan - New")
+![Image](Images/MacOS_Plan_v0.8.0_New.png "Plan - New")
 
 > _Plan - Delay example_
-![Image](Images/MacOS_Plan_v0.7.0_20u_delay_example.png)
+![Image](Images/MacOS_Plan_v0.8.0_20u_delay_example.png)
 
 > _Plan - gradual ramp-up example_
-![Image](Images/MacOS_Plan_v0.7.0_150u_25per10min.png)
+![Image](Images/MacOS_Plan_v0.8.0_150u_25per10min.png)
 
 > _Plan - Linux (Ubuntu 20.04)_
-> ![Image](Images/Ubuntu_Plan_v0.7.0_New.png)
+> ![Image](Images/Ubuntu_Plan_v0.8.0_New.png)
 
 > _Plan - Windows 10_
-> ![Image](Images/Windows10_Plan_v0.7.0_New.png)
+> ![Image](Images/Windows10_Plan_v0.8.0_New.png)
 
 While hopefully this is intuitive, the buttons are (starting top right)
 
@@ -108,7 +108,7 @@ Here are some examples of when you might need this setting:
 The combination of multiple require and exclude rules, the default and custom agent properties should allow you to have the control needed to target your test groups to specific agent or groups of agents as needed.
 
 Here is an example of configuring the Filter Rules and using the Robot options:
-> ![image](Images/MacOS_Plan_v0.7.0_Test_Settings_Filter_Rules.png)
+> ![image](Images/MacOS_Plan_v0.8.0_Test_Settings_Filter_Rules.png)
 
 
 #### Run
@@ -133,7 +133,7 @@ This button replaces the Stop button when either of the following happens:
 - The test reaches the ramp-down period after run is complete
 
 Clicking the Abort button will present a warning dialogue like this:
-![image](Images/MacOS_Run_v0.6.3_Abort_Run_Dialogue.png)
+![image](Images/MacOS_Run_v0.8.0_Abort_Dialogue.png)
 Clicking yes on this dialogue will instruct the agents to send a sigterm (^C) to the running robots causing them to abort the currently running test and execute any teardown steps then exit.
 You would normally only use this option if your AUT has crashed and you need to stop applying load to the system.
 
@@ -150,10 +150,10 @@ Use this to generate csv files suitable for use to create reports for your test 
 - An Agents file, this is all the agent stats recorded, useful if you want to graph running robots or agent loads
 
 > _Run - Just started_
-![Image](Images/MacOS_Run_Start_v0.6.3_09s.png "Run - Just Started")
+![Image](Images/MacOS_Run_v0.8.0_Start_5s.png "Run - Just Started")
 
 > _Run - Just started, first results coming in_
-![Image](Images/MacOS_Run_Start_v0.6.3_54s.png "Run - Just started, first results coming in")
+![Image](Images/MacOS_Run_v0.8.0_Start_60s.png "Run - Just started, first results coming in")
 
 > _Run - Showing results being collected live_
 ![Image](Images/MacOS_Run_v0.6.3_100u_2h.png "Run - Showing results being collected live")
@@ -188,13 +188,13 @@ _Note: generally the optional columns are not required, but they are available i
 #### Agents
 This is where you can see which agents have connected, number of robots on each agent and monitor the status and performance of the agents.
 > _Agents - Ready_
-![Image](Images/MacOS_Agents_ready_v0.6.3.png "Agents - Ready")
+![Image](Images/MacOS_Agents_v0.8.0_Ready.png "Agents - Ready")
 
 > _Agents - Running / Warning_
 ![Image](Images/MacOS_Agents_running_warning_v0.6.3.png "Agents - Running / Warning")
 
 > _Agents - Stopping_
-![Image](Images/MacOS_Agents_stopping_v0.6.3.png "Agents - Stopping")
+![Image](Images/MacOS_Agents_v0.8.0_Stopping.png "Agents - Stopping")
 
 > _Agents - Running (Linux)_
 > ![Image](Images/Linux-v0.5.0_Agents_Running.png)

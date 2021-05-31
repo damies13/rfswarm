@@ -3,6 +3,8 @@
 
 ## Screen Shots
 
+- [v0.8.0](#v080)
+- [v0.7.0](#v070)
 - [v0.6.3](#v063)
 - [v0.5.0](#v050)
 - [v0.4.4](#v044)
@@ -11,6 +13,36 @@
 - [v0.3](#v03)
 - [v0.1](#v01)
 - [Original](#Original)
+
+### v0.8.0
+
+![Image](Images/MacOS_About_v0.8.0_About.png)
+![Image](Images/MacOS_Agents_v0.8.0_Ready.png)
+![Image](Images/MacOS_Agents_v0.8.0_Run.png)
+![Image](Images/MacOS_Agents_v0.8.0_Runing.png)
+![Image](Images/MacOS_Agents_v0.8.0_Stopping.png)
+![Image](Images/MacOS_Plan_v0.8.0_150u_25per10min.png)
+![Image](Images/MacOS_Plan_v0.8.0_20u_delay_example.png)
+![Image](Images/MacOS_Plan_v0.8.0_New.png)
+![Image](Images/MacOS_Plan_v0.8.0_Test_Settings.png)
+![Image](Images/MacOS_Plan_v0.8.0_Test_Settings_Filter_Rules.png)
+![Image](Images/MacOS_Plan_v0.8.0_saved_opened.png)
+![Image](Images/MacOS_Run_v0.8.0_Abort_Dialogue.png)
+![Image](Images/MacOS_Run_v0.8.0_Aborted.png)
+![Image](Images/MacOS_Run_v0.8.0_Bomb_Run.png)
+![Image](Images/MacOS_Run_v0.8.0_Start_5s.png)
+![Image](Images/MacOS_Run_v0.8.0_Start_60s.png)
+
+### v0.7.0
+
+![Image](Images/MacOS_Plan_v0.7.0_150u_25per10min.png)
+![Image](Images/MacOS_Plan_v0.7.0_20u_delay_example.png)
+![Image](Images/MacOS_Plan_v0.7.0_New.png)
+![Image](Images/MacOS_Plan_v0.7.0_Test_Settings.png)
+![Image](Images/MacOS_Plan_v0.7.0_Test_Settings_Filter_Rules.png)
+![Image](Images/MacOS_Plan_v0.7.0_saved_opened.png)
+![Image](Images/Ubuntu_Plan_v0.7.0_New.png)
+![Image](Images/Windows10_Plan_v0.7.0_New.png)
 
 ### v0.6.3
 
