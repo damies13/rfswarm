@@ -36,7 +36,7 @@ Filter Rules
 	# open_scenario("/Users/dave/Documents/GitHub/rfswarm/Scenarios/150 users stepped in groups of 25.rfs")
 	# takess("Plan", "150u_25per10min")
 	Open Scenario	/Users/dave/Documents/GitHub/rfswarm/Scenarios/150 users stepped in groups of 25.rfs
-	Take SS 	Plan 	150u_25per10mins
+	Take SS 	Plan 	150u_25per10min
 
 saved opened
 	# open_scenario("/Users/dave/Documents/GitHub/rfswarm/Scenarios/test2.rfs")
