@@ -19,7 +19,7 @@
 ![Image](Images/MacOS_About_v0.8.0_About.png)
 ![Image](Images/MacOS_Agents_v0.8.0_Ready.png)
 ![Image](Images/MacOS_Agents_v0.8.0_Run.png)
-![Image](Images/MacOS_Agents_v0.8.0_Runing.png)
+![Image](Images/MacOS_Agents_v0.8.0_Running.png)
 ![Image](Images/MacOS_Agents_v0.8.0_Stopping.png)
 ![Image](Images/MacOS_Plan_v0.8.0_150u_25per10min.png)
 ![Image](Images/MacOS_Plan_v0.8.0_20u_delay_example.png)

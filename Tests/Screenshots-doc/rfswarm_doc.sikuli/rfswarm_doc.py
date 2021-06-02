@@ -66,7 +66,7 @@ def open_scenario(scenario):
         click_No()
         waitVanish("1622429623038.png")
 
-    
+
     wait("1622359588105.png")
     type("g", Key.META + Key.SHIFT)
     type(scenario)
@@ -96,7 +96,7 @@ def update_oslabel():
         if oslabel == "cygwin":
             oslabel = "Windows"
     #print oslabel
-    
+
 
 def takess(catagory, name):
     if len(oslabel)<1:
@@ -105,7 +105,7 @@ def takess(catagory, name):
     wait(5) # give time for graphs and other elements to update
     bounds = getBounds()
     print bounds
-    
+
     ss = capture(bounds)
     print ss
     nf = "{}_{}_{}_{}.png".format(oslabel, catagory, rfswarm_ver, name)
@@ -121,40 +121,40 @@ def takess(catagory, name):
     shutil.move(ss, nfp)
 
 def gui_ss():
-    
+
     click_new()
     takess("Plan", "New")
-    
+
     click_settings()
     takess("Plan", "Test_Settings")
     click_cancel()
-    
+
     open_scenario("/Users/dave/Documents/GitHub/rfswarm/Scenarios/100u_test.rfs")
     click_settings()
     takess("Plan", "Test_Settings_Filter_Rules")
     click_cancel()
-    
+
     open_scenario("/Users/dave/Documents/GitHub/rfswarm/Scenarios/150 users stepped in groups of 25.rfs")
     takess("Plan", "150u_25per10min")
-    
+
     open_scenario("/Users/dave/Documents/GitHub/rfswarm/Scenarios/test2.rfs")
     takess("Plan", "saved_opened")
-    
+
     open_scenario("/Users/dave/Documents/GitHub/rfswarm/Scenarios/Simple_delay.rfs")
     takess("Plan", "20u_delay_example")
-    
+
     click_new()
-    
+
     click_Agents()
     takess("Agents", "Ready")
-    
+
     click_About()
     takess("About", "About")
 
 def gui_run():
-    
+
     click_new()
-    
+
     open_scenario("/Users/dave/Documents/GitHub/rfswarm/Scenarios/30u5r20m.rfs")
 
     click_Agents()
@@ -183,8 +183,24 @@ def gui_run():
     click_aborted()
     takess("Run", "Aborted")
 
+def gui_2h():
+
+    click_new()
+
+    open_scenario("/Users/dave/Documents/GitHub/rfswarm/Scenarios/100u_test.rfs")
+
+    click_Agents()
+    wait("1622432336397.png", 300)
+    
+
+    click_Plan()
+    click_play()
+
+
 make_active()
 
-gui_ss()
+#gui_ss()
 
-gui_run()
+#gui_run()
+
+gui_2h()

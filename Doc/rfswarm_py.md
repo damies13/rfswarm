@@ -38,10 +38,10 @@ All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the [a
 ![Image](Images/MacOS_Plan_v0.8.0_150u_25per10min.png)
 
 > _Plan - Linux (Ubuntu 20.04)_
-> ![Image](Images/Ubuntu_Plan_v0.8.0_New.png)
+> ![Image](Images/Ubuntu_Plan_v0.7.0_New.png)
 
 > _Plan - Windows 10_
-> ![Image](Images/Windows10_Plan_v0.8.0_New.png)
+> ![Image](Images/Windows10_Plan_v0.7.0_New.png)
 
 While hopefully this is intuitive, the buttons are (starting top right)
 

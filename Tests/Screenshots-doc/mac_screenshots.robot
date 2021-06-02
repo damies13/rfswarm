@@ -33,36 +33,80 @@ Filter Rules
 	Click Cancel
 
 150 robots 25 per 10 min
-	# open_scenario("/Users/dave/Documents/GitHub/rfswarm/Scenarios/150 users stepped in groups of 25.rfs")
-	# takess("Plan", "150u_25per10min")
 	Open Scenario	/Users/dave/Documents/GitHub/rfswarm/Scenarios/150 users stepped in groups of 25.rfs
 	Take SS 	Plan 	150u_25per10min
 
 saved opened
-	# open_scenario("/Users/dave/Documents/GitHub/rfswarm/Scenarios/test2.rfs")
-	# takess("Plan", "saved_opened")
 	Open Scenario	/Users/dave/Documents/GitHub/rfswarm/Scenarios/test2.rfs
 	Take SS 	Plan 	saved_opened
 
 20 robots delay example
-	# open_scenario("/Users/dave/Documents/GitHub/rfswarm/Scenarios/Simple_delay.rfs")
-	# takess("Plan", "20u_delay_example")
 	Open Scenario	/Users/dave/Documents/GitHub/rfswarm/Scenarios/Simple_delay.rfs
 	Take SS 	Plan 	20u_delay_example
 
 Agents Ready
-	# click_new()
-	# click_Agents()
-	# takess("Agents", "Ready")
 	Click New
 	Click Agents
 	Take SS 	Agents 	Ready
 
 About Screen
-	# click_About()
-	# takess("About", "About")
 	Click About
 	Take SS 	About 	About
+
+
+
+#	def gui_run():
+#	    click_new()
+#	    open_scenario("/Users/dave/Documents/GitHub/rfswarm/Scenarios/30u5r20m.rfs")
+#	    click_Agents()
+#	    wait("1622432336397.png", 300)
+#	    click_Plan()
+#	    click_play()
+#	    wait(5)
+#	    takess("Run", "Start_5s")
+#	    wait(55)
+#	    takess("Run", "Start_60s")
+#	    click_Agents()
+#	    takess("Agents", "Runing")
+#	    click_Run()
+#	    click_stop()
+#	    takess("Run", "Bomb_Run")
+#	    wait(10)
+#	    click_Agents()
+#	    takess("Agents", "Stopping")
+#	    click_Run()
+#	    click_abort()
+#	    takess("Run", "Abort_Dialogue")
+#	    click_Yes()
+#	    click_aborted()
+#	    takess("Run", "Aborted")
+
+Aborted Run
+	Click New
+	Open Scenario	/Users/dave/Documents/GitHub/rfswarm/Scenarios/30u5r20m.rfs
+	Click Agents
+	2 Agents Ready
+	Click Plan
+	Click Play
+	Sleep 	5
+	Take SS 	Run 	Start_5s
+	Sleep 	55
+	Take SS 	Run 	Start_60s
+	Click Agents
+	Take SS 	Agents 	Running
+	Click Run
+
+
+
+#	def gui_2h():
+#	    click_new()
+#	    open_scenario("/Users/dave/Documents/GitHub/rfswarm/Scenarios/100u_test.rfs")
+#	    click_Agents()
+#	    wait("1622432336397.png", 300)
+#	    click_Plan()
+#	    click_play()
+
+
 
 
 *** Keywords ***
@@ -102,6 +146,19 @@ Click New
 	Run Keyword And Ignore Error	Click	rfwasrm_mac_No.png
 	Click Index 1
 
+Click Play
+	Click	rfwasrm_mac_Play.png
+
+Click Stop
+	Click	rfwasrm_mac_Stop.png
+
+Click Abort
+	Click	rfwasrm_mac_Abort.png
+
+Click Aborted
+	Click	rfwasrm_mac_Aborted.png
+
+
 Click Settings
 	Click	rfwasrm_mac_Settings.png
 	Wait until screen contain 	rfwasrm_mac_Save.png 	10
@@ -131,3 +188,6 @@ Open Scenario
 	Press Special Key 	ENTER
 	Wait Until Screen Not Contain 	rfwasrm_mac_OpenFile.png 	10
 	Click Index 1
+
+2 Agents Ready
+	Wait until screen contain 	rfwasrm_mac_Agents_Ready.png
