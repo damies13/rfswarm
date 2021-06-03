@@ -1369,9 +1369,7 @@ class RFSwarmAgent():
 		fd.append("		except Exception as e:")
 		fd.append("			self.debugmsg(0, 'send_result: while attempting to send result to',uri)")
 		fd.append("			self.debugmsg(0, 'send_result: with payload:',payload)")
-		fd.append("			self.debugmsg(0, 'send_result: ',r.status_code, r.text)")
 		fd.append("			self.debugmsg(0, 'send_result: Exception:', e)")
-		fd.append("			pass")
 		fd.append("")
 
 
