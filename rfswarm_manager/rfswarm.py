@@ -2572,7 +2572,7 @@ class RFSwarmCore:
 									stm = time.localtime(base.robot_schedule["Start"])
 									base.gui.display_run['start_time'].set("  {}  ".format(time.strftime("%H:%M:%S", stm)))
 
-								base.run_end = int(time.time()) + grp["Run"]
+								base.run_end = base.run_start + grp["Delay"] + grp["RampUp"] + grp["Run"]
 								base.robot_schedule["End"] = base.run_end
 
 								# totrbts = 0
