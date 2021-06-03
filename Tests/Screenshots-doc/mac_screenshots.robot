@@ -53,36 +53,8 @@ About Screen
 	Click About
 	Take SS 	About 	About
 
-
-
-#	def gui_run():
-#	    click_new()
-#	    open_scenario("/Users/dave/Documents/GitHub/rfswarm/Scenarios/30u5r20m.rfs")
-#	    click_Agents()
-#	    wait("1622432336397.png", 300)
-#	    click_Plan()
-#	    click_play()
-#	    wait(5)
-#	    takess("Run", "Start_5s")
-#	    wait(55)
-#	    takess("Run", "Start_60s")
-#	    click_Agents()
-#	    takess("Agents", "Runing")
-#	    click_Run()
-#	    click_stop()
-#	    takess("Run", "Bomb_Run")
-#	    wait(10)
-#	    click_Agents()
-#	    takess("Agents", "Stopping")
-#	    click_Run()
-#	    click_abort()
-#	    takess("Run", "Abort_Dialogue")
-#	    click_Yes()
-#	    click_aborted()
-#	    takess("Run", "Aborted")
-
 Aborted Run
-	Click Plan
+	Run Keyword And Ignore Error	Click Plan
 	Open Scenario	/Users/dave/Documents/GitHub/rfswarm/Scenarios/30u5r20m.rfs
 	Click Agents
 	2 Agents Ready
@@ -108,13 +80,51 @@ Aborted Run
 	Take SS 	Run 	Aborted
 
 
-#	def gui_2h():
-#	    click_new()
-#	    open_scenario("/Users/dave/Documents/GitHub/rfswarm/Scenarios/100u_test.rfs")
-#	    click_Agents()
-#	    wait("1622432336397.png", 300)
-#	    click_Plan()
-#	    click_play()
+2 Hour Test
+	Run Keyword And Ignore Error	Click Plan
+	Open Scenario	/Users/dave/Documents/GitHub/rfswarm/Scenarios/100u_test_nf.rfs
+	Click Agents
+	2 Agents Ready
+	Click Plan
+	Click Play
+	Sleep 	5m
+	Click Agents
+	Take SS 	Agents 	Warning_1
+	Sleep 	1m
+	Take SS 	Agents 	Warning_2
+	Sleep 	1m
+	Take SS 	Agents 	Warning_3
+	Sleep 	1m
+	Take SS 	Agents 	Warning_4
+	Sleep 	1m
+	Take SS 	Agents 	Warning_5
+	Click Run
+	Take SS 	Run 	100_Robots
+	Sleep 	1h 55m
+	Take SS 	Run 	2h
+	Sleep 	15m
+	Take SS 	Agents 	Uploading_1
+	Sleep 	1m
+	Take SS 	Agents 	Uploading_2
+	Sleep 	1m
+	Take SS 	Agents 	Uploading_3
+	Sleep 	1m
+	Take SS 	Agents 	Uploading_4
+	Sleep 	1m
+	Take SS 	Agents 	Uploading_5
+	Sleep 	1m
+	Take SS 	Agents 	Uploading_6
+	Sleep 	1m
+	Take SS 	Agents 	Uploading_7
+	Sleep 	1m
+	Take SS 	Agents 	Uploading_8
+	Sleep 	1m
+	Take SS 	Agents 	Uploading_9
+	Sleep 	1m
+	Take SS 	Agents 	Uploading_10
+	Sleep 	10m
+	Click Run
+	Take SS 	Run 	Finished
 
 
 
