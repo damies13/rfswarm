@@ -82,7 +82,7 @@ About Screen
 #	    takess("Run", "Aborted")
 
 Aborted Run
-	Click New
+	Click Plan
 	Open Scenario	/Users/dave/Documents/GitHub/rfswarm/Scenarios/30u5r20m.rfs
 	Click Agents
 	2 Agents Ready
@@ -95,7 +95,17 @@ Aborted Run
 	Click Agents
 	Take SS 	Agents 	Running
 	Click Run
-
+	Click Stop
+	Take SS 	Run 	Bomb_Run
+	Sleep 	10
+	Click Agents
+	Take SS 	Agents 	Stopping
+	Click Run
+	Click Abort
+	Take SS 	Run 	Abort_Dialogue
+	Click Yes
+	Click Aborted
+	Take SS 	Run 	Aborted
 
 
 #	def gui_2h():
@@ -127,11 +137,11 @@ Make rfswarm Active
 
 Click Plan
 	Click	rfwasrm_mac_Plan.png
-	Sleep 	1
+	Wait until screen contain 	rfwasrm_mac_Play.png	10
 
 Click Run
 	Click	rfwasrm_mac_Run.png
-	Sleep 	1
+	Wait until screen contain 	rfwasrm_mac_RunScreen.png	10
 
 Click Agents
 	Click	rfwasrm_mac_Agents.png
@@ -148,23 +158,32 @@ Click New
 
 Click Play
 	Click	rfwasrm_mac_Play.png
+	Wait until screen contain 	rfwasrm_mac_RunScreen.png	10
 
 Click Stop
 	Click	rfwasrm_mac_Stop.png
+	Sleep 	1
 
 Click Abort
 	Click	rfwasrm_mac_Abort.png
+	Wait until screen contain 	rfwasrm_mac_Abort_Dialogue.png	10
 
 Click Aborted
 	Click	rfwasrm_mac_Aborted.png
+	Sleep 	1
 
 
 Click Settings
 	Click	rfwasrm_mac_Settings.png
 	Wait until screen contain 	rfwasrm_mac_Save.png 	10
 
+Click Yes
+	Click	rfwasrm_mac_Yes.png
+	Wait Until Screen Not Contain 	rfwasrm_mac_Yes.png 	10
+
 Click Cancel
 	Click	rfwasrm_mac_Cancel.png
+	Wait Until Screen Not Contain 	rfwasrm_mac_Cancel.png 	10
 
 Click Index 1
 	Click 	rfwasrm_mac_Index_1.png
@@ -185,9 +204,10 @@ Open Scenario
 	Input Text 	${EMPTY} 	${scenario_file}
 	Press Special Key 	ENTER
 	Wait Until Screen Not Contain 	rfwasrm_mac_GoToTheFolder.png 	10
+	Sleep 	.5
 	Press Special Key 	ENTER
 	Wait Until Screen Not Contain 	rfwasrm_mac_OpenFile.png 	10
 	Click Index 1
 
 2 Agents Ready
-	Wait until screen contain 	rfwasrm_mac_Agents_Ready.png
+	Wait until screen contain 	rfwasrm_mac_Agents_Ready.png	300
