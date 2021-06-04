@@ -9,6 +9,8 @@ rfswarm.py is the swarm Manager, or central server component of rfswarm, this is
 	- [Plan](#Plan)
 	- [Run](#Run)
 	- [Agents](#Agents)
+	- [About](#About)
+	- [Graphs](#Graphs)
 - [Command Line Interface](#Command-Line-Interface)
 - [Install and Setup](#Install-and-Setup)
 	- [Install](#1-install)
@@ -215,6 +217,60 @@ The columns for the agents screen
 | Libraries	| This is a list of robot framework libraries installed on the agent machine as reported by the python runtime that is running the agent (only python libraries that start with "robotframework-" are reported here |
 
 New with v0.6.3 this screen now shows the agent's version and a list of robot framework libraries available on the agent.
+
+
+#### About
+This is where you can see the rfswarm manager version and links to the documentation as well as the donation links.
+
+> _About_
+![Image](Images/MacOS_About_v0.8.0_About.png "About")
+
+Clicking the links (blue text) will open the page in the default browser on you computer.
+
+
+#### Graphs
+New with version 0.8.0 is the ability to have live graphs during the test run displaying various data about the test.
+
+You can access the graphs through the new Graphs menu
+> _Graphs - Menu_
+![Image](Images/MacOS_Graphs_v0.8.0_Menu.png "Graphs - Menu")
+
+> _Graphs - Examples Menu_
+![Image](Images/MacOS_Graphs_v0.8.0_Menu_Examples.png "Graphs - Examples Menu")
+
+The Graphs menu has the following options
+| Menu Option		| Detail |
+|---				|---	|
+| New Graph Window	| This option opens a new un-configured graph window with the settings showing so you can configure as you need, you can also use the shortcut key top open a new graph. |
+| Examples			| Inside this menu is a list of preconfigured graphs, these will open with the settings closed as they are ready to use |
+| Recent			| This menu is dynamically generated, it contains all the graphs that have been recently opened on this computer, if you select a graph from this menu that is already open then it will be brought to the front and gain focus, otherwise it will open the graph as it was when it was closed |
+| Scenario			| This menu is dynamically generated, it contains all the graphs that were opened when the scenario was saved, if you select a graph from this menu that is already open then it will be brought to the front and gain focus, otherwise it will open the graph as it was when it was closed. If you save preconfigured graphs on one machine and then open the scenario on another machine these graphs will automatically open when you open the scenario and attempt to retain their position. |
+
+> _Graphs - New Graph - Metric_
+![Image](Images/MacOS_Graphs_v0.8.0_New_Graph_Metric.png "New Graph - Metric")
+
+> _Graphs - New Graph - Result_
+![Image](Images/MacOS_Graphs_v0.8.0_New_Graph_Result.png "New Graph - Result")
+
+|	|	|	|
+|---|---|---|
+| Refresh	|	![image](Images/GUI_btn_arrow_refresh.gif)		| Refresh the graph and the dynamic options in the graph configuration	|
+| Settings	|	![image](Images/GUI_btn_cog.gif)	| Open an existing scenario	|
+
+
+
+
+Some of the example preconfigured graphs:
+
+> _Graphs - Running Robots_
+![Image](Images/MacOS_Graphs_v0.8.0_Running_Robots.png "Graphs - Running Robots")
+
+> _Graphs - Agent Load_
+![Image](Images/MacOS_Graphs_v0.8.0_Agent_Load.png "Graphs - Agent Load")
+
+> _Graphs - Response Time_
+![Image](Images/MacOS_Graphs_v0.8.0_Response_Time.png "Graphs - Response Time")
+
 
 ### Command Line Interface
 
