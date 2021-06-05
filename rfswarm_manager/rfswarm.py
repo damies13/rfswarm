@@ -3235,6 +3235,7 @@ class RFSwarmGUI(tk.Frame):
 		self.gph_menu.add_cascade(label = "Examples", menu = gph_example_menu)
 
 		gph_example_menu.add_command(label = "Running Robots", command = lambda: self.OpenGraph({'name': 'Running Robots', 'show_settings': False, 'show_legend': 0, 'data_type': 'Metric', 'metric_type': 'Scenario', 'primary_metric': '', 'secondary_metric': 'total_robots'}))
+		gph_example_menu.add_command(label = "Agent Robots", command = lambda: self.OpenGraph({'name': 'Agent Robots', 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Robots'}))
 		gph_example_menu.add_command(label = "Agent Load", command = lambda: self.OpenGraph({'name': 'Agent Load', 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Load'}))
 		gph_example_menu.add_command(label = "Agent CPU", command = lambda: self.OpenGraph({'name': 'Agent CPU', 'win_location_x': 38, 'win_location_y': 500, 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'CPU'}))
 		gph_example_menu.add_command(label = "Agent Memory", command = lambda: self.OpenGraph({'name': 'Agent Memory', 'win_location_x': 500, 'win_location_y': 500, 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'MEM'}))
@@ -3471,7 +3472,7 @@ class RFSwarmGUI(tk.Frame):
 		# grphWindow.fig_dpi = 100
 		grphWindow.fig_dpi = 72
 		# grphWindow.fig = Figure(dpi=grphWindow.fig_dpi, tight_layout=True, constrained_layout=True) # , constrained_layout=True??
-		grphWindow.fig = Figure(dpi=grphWindow.fig_dpi, tight_layout=True)
+		grphWindow.fig = Figure(dpi=grphWindow.fig_dpi) # , tight_layout=True
 		grphWindow.axis = grphWindow.fig.add_subplot(1,1,1)	# , constrained_layout=True??
 		# self.axis = self.fig.add_subplot()
 		grphWindow.axis.grid(True, 'major', 'both')
@@ -3486,6 +3487,7 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.canvas.get_tk_widget().grid(column=0, row=0, sticky="nsew")
 		grphWindow.canvas.get_tk_widget().config(bg="blue")
 		grphWindow.canvas.draw()
+		grphWindow.fig.set_tight_layout(True)
 
 
 		# #
@@ -4044,7 +4046,7 @@ class RFSwarmGUI(tk.Frame):
 							# 		ylbls.append(fval)
 
 							base.debugmsg(6, gdname, ":", grphWindow.graphdata[name])
-							if len(grphWindow.graphdata[name]["Values"])>0:
+							if len(grphWindow.graphdata[name]["Values"])>0 and len(grphWindow.graphdata[name]["Values"])==len(grphWindow.graphdata[name]["objTime"]):
 								grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], colour, label=dname)
 								dodraw = True
 
@@ -4091,6 +4093,7 @@ class RFSwarmGUI(tk.Frame):
 							# grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),&nbsp; shadow=True, ncol=2)
 							grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
 
+						grphWindow.fig.set_tight_layout(True)
 						grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
 						grphWindow.canvas.draw()
 
@@ -4244,6 +4247,7 @@ class RFSwarmGUI(tk.Frame):
 						# grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),&nbsp; shadow=True, ncol=2)
 						grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
 
+					grphWindow.fig.set_tight_layout(True)
 					grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
 					grphWindow.canvas.draw()
 

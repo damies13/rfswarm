@@ -577,6 +577,12 @@ class RFSwarmAgent():
 				self.scriptlist[hash] = {'id': hash}
 				t = threading.Thread(target=self.getfile, args=(hash,))
 				t.start()
+			else:
+				# self.scriptlist[hash]['localfile']
+				if 'localfile' in self.scriptlist[hash]:
+					if not os.path.isfile(self.scriptlist[hash]['localfile']):
+						t = threading.Thread(target=self.getfile, args=(hash,))
+						t.start()
 
 	def getfile(self, hash):
 		self.debugmsg(6, "hash: ", hash)
