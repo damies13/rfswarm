@@ -1380,6 +1380,7 @@ class RFSwarmAgent():
 		fd.append("					retry = False")
 		fd.append("			except Exception as e:")
 		fd.append("				exceptn = e")
+		fd.append("			time.sleep(1)")
 		fd.append("			count -= 1")
 		fd.append("		if retry:")
 		fd.append("			self.debugmsg(0, 'send_result: while attempting to send result to', uri)")
