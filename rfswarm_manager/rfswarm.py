@@ -3623,7 +3623,7 @@ class RFSwarmGUI(tk.Frame):
 		if 'filter_pattern' in settings and len(settings['filter_pattern'])>1:
 			# grphWindow.fmeRSettings.inpFP.delete(0,'end')
 			# grphWindow.fmeRSettings.inpFP.insert(0, settings['filter_pattern'])
-			grphWindow.settings["FPattern"] = settings['filter_pattern']
+			grphWindow.settings["FPattern"].set(settings['filter_pattern'])
 		grphWindow.fmeRSettings.inpFP.grid(column=1, row=rowR, sticky="nsew")
 
 
@@ -4109,6 +4109,7 @@ class RFSwarmGUI(tk.Frame):
 				base.debugmsg(7, "FNType:", FNType)
 
 				# inpFP = grphWindow.fmeRSettings.inpFP.get()
+					#	grphWindow.settings["FPattern"] = tk.StringVar()
 				inpFP = grphWindow.settings["FPattern"].get()
 				base.debugmsg(7, "inpFP:", inpFP)
 
