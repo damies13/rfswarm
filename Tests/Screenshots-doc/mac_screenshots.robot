@@ -79,6 +79,28 @@ Aborted Run
 	Click Aborted
 	Take SS 	Run 	Aborted
 
+Graphs
+	Run Keyword And Ignore Error	Click Plan
+	Open Scenario	/Users/dave/Documents/GitHub/rfswarm/Scenarios/30u5r20m.rfs
+	Click Agents
+	2 Agents Ready
+	Click Plan
+
+	Open Graphs Menu
+	Take SS 	Graphs 	Menu
+	Click Index 1
+	Open Graphs Menu Examples
+	Take SS 	Graphs 	Menu_Examples
+	Click Index 1
+
+	Click Play
+	Sleep 	7m
+
+	Open SS Close New Graph
+	Open SS Close Graph 	Agent_Load
+	Open SS Close Graph 	Response_Time
+	Open SS Close Graph 	Running_Robots
+
 
 2 Hour Test
 	Run Keyword And Ignore Error	Click Plan
@@ -87,7 +109,7 @@ Aborted Run
 	2 Agents Ready
 	Click Plan
 	Click Play
-	Sleep 	5m
+	Sleep 	3m
 	Click Agents
 	Take SS 	Agents 	Warning_1
 	Sleep 	1m
@@ -100,7 +122,7 @@ Aborted Run
 	Take SS 	Agents 	Warning_5
 	Click Run
 	Take SS 	Run 	100_Robots
-	Sleep 	1h 55m
+	Sleep 	2h
 	Take SS 	Run 	2h
 	Sleep 	15m
 	Take SS 	Agents 	Uploading_1
@@ -163,7 +185,7 @@ Click About
 
 Click New
 	Click 	rfwasrm_mac_New.png
-	Run Keyword And Ignore Error	Click	rfwasrm_mac_No.png
+	Run Keyword And Ignore Error	Click No
 	Click Index 1
 
 Click Play
@@ -187,6 +209,11 @@ Click Settings
 	Click	rfwasrm_mac_Settings.png
 	Wait until screen contain 	rfwasrm_mac_Save.png 	10
 
+Click No
+	Wait until screen contain 	rfwasrm_mac_No.png 	10
+	Click	rfwasrm_mac_No.png
+	Wait Until Screen Not Contain 	rfwasrm_mac_No.png 	10
+
 Click Yes
 	Click	rfwasrm_mac_Yes.png
 	Wait Until Screen Not Contain 	rfwasrm_mac_Yes.png 	10
@@ -202,7 +229,7 @@ Click Index 1
 Open Scenario
 	[Arguments]		${scenario_file}
 	Click 	rfwasrm_mac_Open.png
-	Run Keyword And Ignore Error	Click	rfwasrm_mac_No.png
+	Run Keyword And Ignore Error	Click No
 	Wait until screen contain 	rfwasrm_mac_OpenFile.png 	10
 	# "g", Key.META + Key.SHIFT
 	# Press Special Key 	"g" 	META + SHIFT
@@ -221,3 +248,47 @@ Open Scenario
 
 2 Agents Ready
 	Wait until screen contain 	rfwasrm_mac_Agents_Ready.png	300
+
+Open Graphs Menu
+	Click 	rfwasrm_mac_Graphs_Menu.png
+	Wait until screen contain 	rfwasrm_mac_Graphs_Menu_Open.png	10
+
+Open Graphs Menu Examples
+	Open Graphs Menu
+	Mouse Move 	rfwasrm_mac_Graphs_Menu_Examples.png
+	# Sleep 	1
+	Wait until screen contain 	rfwasrm_mac_Graphs_Menu_Examples_Open_expect.png	10
+
+Close Window
+	${wndctrl}= 	Get Image Coordinates 	rfwasrm_mac_Window_Controls.png
+	Highlight Region 	${wndctrl} 	1
+	# ${score}= 	Get Match Score		rfwasrm_mac_Window_Controls.png
+	Set Min Similarity 	0.88
+	Click 	rfwasrm_mac_Window_Controls.png 	xOffset=-23 	yOffset=0
+	Set Min Similarity 	0.7
+
+Close Graph Window
+	Set Min Similarity 	0.88
+	Click 	rfwasrm_mac_GraphWindow_Controls 	xOffset=-36 	yOffset=-21
+	Set Min Similarity 	0.7
+
+Open SS Close Graph
+	[Arguments]		${GraphName}
+	Open Graphs Menu Examples
+	Click 	rfwasrm_mac_Graphs_Menu_Examples_${GraphName}.png
+	# Click Text 	${GraphName}
+	Sleep 	15
+	Take SS 	Graphs 	${GraphName}
+	Close Graph Window
+
+Open SS Close New Graph
+	Open Graphs Menu
+	Click 	rfwasrm_mac_Graphs_Menu_New.png
+	Sleep 	1
+	Take SS 	Graphs 	New_Graph_Metric
+	Click 	rfwasrm_mac_Graphs_Menu_New_DataType.png
+	Wait until screen contain 	rfwasrm_mac_Graphs_Menu_New_DataType_Result.png 	5
+	Click 	rfwasrm_mac_Graphs_Menu_New_DataType_Result.png
+	Sleep 	1
+	Take SS 	Graphs 	New_Graph_Result
+	Close Graph Window
