@@ -3485,7 +3485,7 @@ class RFSwarmGUI(tk.Frame):
 
 		grphWindow.canvas = FigureCanvasTkAgg(grphWindow.fig, grphWindow.fmeGraph)
 		grphWindow.canvas.get_tk_widget().grid(column=0, row=0, sticky="nsew")
-		grphWindow.canvas.get_tk_widget().config(bg="blue")
+		# grphWindow.canvas.get_tk_widget().config(bg="blue")
 		grphWindow.canvas.draw()
 		grphWindow.fig.set_tight_layout(True)
 
