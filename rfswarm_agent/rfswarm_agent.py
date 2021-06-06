@@ -545,17 +545,17 @@ class RFSwarmAgent():
 		payload = {
 			"AgentName": self.agentname
 		}
-		self.debugmsg(6, "getscripts: payload: ", payload)
+		self.debugmsg(6, "payload: ", payload)
 		try:
 			r = requests.post(uri, json=payload, timeout=self.timeout)
-			self.debugmsg(6, "getscripts: resp: ", r.status_code, r.text)
+			self.debugmsg(6, "resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
 				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 
 		except Exception as e:
-			self.debugmsg(8, "Exception:", e)
+			self.debugmsg(5, "Exception:", e)
 			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 			self.isconnected = False
 
@@ -566,23 +566,30 @@ class RFSwarmAgent():
 			jsonresp = {}
 			# self.scriptlist
 			jsonresp = json.loads(r.text)
-			self.debugmsg(6, "getscripts: jsonresp:", jsonresp)
+			self.debugmsg(6, "jsonresp:", jsonresp)
 		except Exception as e:
-			self.debugmsg(1, "getscripts: Exception:", e)
+			self.debugmsg(1, "Exception:", e)
 
 		for s in jsonresp["Scripts"]:
 			hash = s['Hash']
-			self.debugmsg(6, "getscripts: hash:", hash)
+			self.debugmsg(6, "hash:", hash)
 			if hash not in self.scriptlist:
+				self.debugmsg(6, "getfile")
 				self.scriptlist[hash] = {'id': hash}
 				t = threading.Thread(target=self.getfile, args=(hash,))
 				t.start()
 			else:
 				# self.scriptlist[hash]['localfile']
+				self.debugmsg(6, "Check file")
 				if 'localfile' in self.scriptlist[hash]:
 					if not os.path.isfile(self.scriptlist[hash]['localfile']):
 						t = threading.Thread(target=self.getfile, args=(hash,))
 						t.start()
+				else:
+					self.debugmsg(6, "getfile")
+					self.scriptlist[hash] = {'id': hash}
+					t = threading.Thread(target=self.getfile, args=(hash,))
+					t.start()
 
 	def getfile(self, hash):
 		self.debugmsg(6, "hash: ", hash)
