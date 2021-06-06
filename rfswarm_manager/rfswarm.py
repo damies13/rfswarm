@@ -4057,33 +4057,6 @@ class RFSwarmGUI(tk.Frame):
 
 					if dodraw:
 
-						# this attempt almost worked, it reorderd the labled and
-						# 	ticks correctly, just wasn't successfull in applying to the graph
-						#
-						# yticks = grphWindow.axis.get_yticks()
-						# base.debugmsg(5, "ylbls:", ylbls, "	yticks:", yticks)
-						# ydict = {}
-						# for i in range(len(ylbls)):
-						# 	ydict[ylbls[i]] = yticks[i]
-						#
-						# base.debugmsg(5, "ydict:", ydict)
-						# srt_ydict = dict(sorted(ydict.items(), key=lambda item: item[0]))
-						# base.debugmsg(5, "srt_ydict:", srt_ydict)
-						#
-						# syl = list(srt_ydict.keys())
-						# syt = list(srt_ydict.values())
-						# base.debugmsg(5, "syl:", syl, "	syt:", syt)
-						# grphWindow.axis.set_yticks(syt)
-						# grphWindow.axis.set_yticklabels(syl)
-
-						# Tried to get the values
-						# base.debugmsg(5, "ylbls:", ylbls)
-						# base.debugmsg(5, "ylbls[0]:", ylbls[0], type(ylbls[0]))
-						# base.debugmsg(5, "ylbls[0]:", ylbls[0].get_text())
-						# base.debugmsg(5, "ylbls[0]:", ylbls[0].label())
-
-
-						# self.canvas.gcf().autofmt_xdate(bottom=0.2, rotation=30, ha='right')
 						grphWindow.axis.grid(True, 'major', 'both')
 						base.debugmsg(6, "SMetric:", SMetric)
 						if SMetric in ["Load", "CPU", "MEM", "NET"]:
@@ -4099,7 +4072,11 @@ class RFSwarmGUI(tk.Frame):
 
 						grphWindow.fig.set_tight_layout(True)
 						grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
-						grphWindow.canvas.draw()
+						try:
+							grphWindow.canvas.draw()
+						except Exception as e:
+							base.debugmsg(5, "canvas.draw() Exception:", e)
+
 
 
 			if DataType == "Result":
@@ -4258,7 +4235,10 @@ class RFSwarmGUI(tk.Frame):
 
 					grphWindow.fig.set_tight_layout(True)
 					grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
-					grphWindow.canvas.draw()
+					try:
+						grphWindow.canvas.draw()
+					except Exception as e:
+						base.debugmsg(5, "canvas.draw() Exception:", e)
 
 			self.gph_save(grphWindow)
 
