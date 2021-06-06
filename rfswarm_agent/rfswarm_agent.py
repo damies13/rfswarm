@@ -795,6 +795,17 @@ class RFSwarmAgent():
 		self.debugmsg(6, "runthread: hash:", hash)
 		test = self.jobs[jobid]['Test']
 		self.debugmsg(6, "runthread: test:", test)
+
+		if 'localfile' not in self.scriptlist[hash]:
+			if self.corethreads["getscripts"].is_alive():
+				self.corethreads["getscripts"].join()
+			else:
+				self.corethreads["getscripts"] = threading.Thread(target=self.getscripts)
+				self.corethreads["getscripts"].start()
+				self.corethreads["getscripts"].join()
+		# while 'localfile' not in self.scriptlist[hash]:
+		# 	time.sleep(1)
+
 		localfile = self.scriptlist[hash]['localfile']
 		self.debugmsg(6, "runthread: localfile:", localfile)
 
