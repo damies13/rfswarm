@@ -4512,7 +4512,7 @@ class RFSwarmGUI(tk.Frame):
 
 		self.canvas = FigureCanvasTkAgg(self.fig, p)
 		self.canvas.get_tk_widget().grid(column=0, row=planrow, sticky="nsew")
-		self.canvas.get_tk_widget().config(bg="blue")
+		# self.canvas.get_tk_widget().config(bg="blue")
 		self.canvas.draw()
 
 		p.bind("<Configure>", self.CanvasResize)
