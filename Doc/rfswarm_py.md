@@ -257,7 +257,27 @@ The Graphs menu has the following options
 | Refresh	|	![image](Images/GUI_btn_arrow_refresh.gif)		| Refresh the graph and the dynamic options in the graph configuration	|
 | Settings	|	![image](Images/GUI_btn_cog.gif)	| Open an existing scenario	|
 
+Common Settings:
+| Setting	| Detail 	|
+|---		|---		|
+|Graph Name	| The name you want displayed on the title bar and in the graphs menus |
+|Show Legend| Enable showing a legend at the bottom of the graph |
+|Data Type	| Choose whether the data source is the results table or the metrics table |
 
+Metric Settings:
+| Setting	| Detail 	|
+|---		|---		|
+|Metric Type | Allows restricting results to specific types of metrics |
+|Primary Metric| Allows restricting results by primary metric |
+|Secondary Metric | Allows restricting results by secondary metric |
+
+Results Settings:
+| Setting	| Detail 	|
+|---		|---		|
+|Result Type | Results, TPS (transactions per second) or a Total TPS|
+|Filter Result | Optionally restrict results to Pass or Fail |
+|Filter Type | Determine if the filter pattern will limit results shown or restrict results from being shown |
+|Filter Pattern | The pattern, using [glob patterns](https://www.sqlitetutorial.net/sqlite-glob/) |
 
 
 Some of the example preconfigured graphs:
