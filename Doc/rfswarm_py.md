@@ -27,22 +27,22 @@ This is where you construct your test scenario, choose your test cases and numbe
 
 All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the [agent polling](./rfswarm_agent_py.md#agent-polling-of-the-guiserver) works it's best not to use values less than 10 seconds.
 
-> _Plan - Planning a performance test_
+> _Plan - Planning a performance test_ <br>
 > ![Image](Images/MacOS_Plan_v0.8.0_saved_opened.png "Plan - Planning a performance test")
 
-> _Plan - New_
+> _Plan - New_ <br>
 > ![Image](Images/MacOS_Plan_v0.8.0_New.png "Plan - New")
 
-> _Plan - Delay example_
+> _Plan - Delay example_ <br>
 > ![Image](Images/MacOS_Plan_v0.8.0_20u_delay_example.png)
 
-> _Plan - gradual ramp-up example_
+> _Plan - gradual ramp-up example_ <br>
 > ![Image](Images/MacOS_Plan_v0.8.0_150u_25per10min.png)
 
-> _Plan - Linux (Ubuntu 20.04)_
+> _Plan - Linux (Ubuntu 20.04)_ <br>
 > ![Image](Images/Ubuntu_Plan_v0.7.0_New.png)
 
-> _Plan - Windows 10_
+> _Plan - Windows 10_ <br>
 > ![Image](Images/Windows10_Plan_v0.7.0_New.png)
 
 While hopefully this is intuitive, the buttons are (starting top right)
@@ -151,19 +151,19 @@ Use this to generate csv files suitable for use to create reports for your test 
 - A Raw Results file, the is every data point recorded, useful if you want create response time graphs
 - An Agents file, this is all the agent stats recorded, useful if you want to graph running robots or agent loads
 
-> _Run - Just started_
+> _Run - Just started_ <br>
 > ![Image](Images/MacOS_Run_v0.8.0_Start_5s.png "Run - Just Started")
 
-> _Run - Just started, first results coming in_
+> _Run - Just started, first results coming in_ <br>
 > ![Image](Images/MacOS_Run_v0.8.0_Start_60s.png "Run - Just started, first results coming in")
 
-> _Run - Showing results being collected live_
+> _Run - Showing results being collected live_ <br>
 > ![Image](Images/MacOS_Run_v0.8.0_2h.png "Run - Showing results being collected live")
 
 > _Run - Linux_ <br>
 > ![Image](Images/Linux-v0.5.0_Run_6min.png)
 
-> _Run - Linux Report Saved_
+> _Run - Linux Report Saved_ <br>
 > ![Image](Images/Linux-v0.5.0_Run_Report_prompt.png)
 
 
@@ -189,16 +189,16 @@ _Note: generally the optional columns are not required, but they are available i
 
 #### Agents
 This is where you can see which agents have connected, number of robots on each agent and monitor the status and performance of the agents.
-> _Agents - Ready_
+> _Agents - Ready_ <br>
 > ![Image](Images/MacOS_Agents_v0.8.0_Ready.png "Agents - Ready")
 
-> _Agents - Running / Warning_
+> _Agents - Running / Warning_ <br>
 > ![Image](Images/MacOS_Agents_v0.8.0_Warning.png "Agents - Running / Warning")
 
-> _Agents - Stopping_
+> _Agents - Stopping_ <br>
 > ![Image](Images/MacOS_Agents_v0.8.0_Stopping.png "Agents - Stopping")
 
-> _Agents - Running (Linux)_
+> _Agents - Running (Linux)_ <br>
 > ![Image](Images/Linux-v0.5.0_Agents_Running.png)
 
 The columns for the agents screen
@@ -222,7 +222,7 @@ New with v0.6.3 this screen now shows the agent's version and a list of robot fr
 #### About
 This is where you can see the rfswarm manager version and links to the documentation as well as the donation links.
 
-> _About_
+> _About_ <br>
 > ![Image](Images/MacOS_About_v0.8.0_About.png "About")
 
 Clicking the links (blue text) will open the page in the default browser on you computer.
@@ -232,10 +232,10 @@ Clicking the links (blue text) will open the page in the default browser on you 
 New with version 0.8.0 is the ability to have live graphs during the test run displaying various data about the test.
 
 You can access the graphs through the new Graphs menu
-> _Graphs - Menu_
+> _Graphs - Menu_ <br>
 > ![Image](Images/MacOS_Graphs_v0.8.0_Menu.png "Graphs - Menu")
 
-> _Graphs - Examples Menu_
+> _Graphs - Examples Menu_ <br>
 > ![Image](Images/MacOS_Graphs_v0.8.0_Menu_Examples.png "Graphs - Examples Menu")
 
 The Graphs menu has the following options
@@ -246,10 +246,10 @@ The Graphs menu has the following options
 | Recent			| This menu is dynamically generated, it contains all the graphs that have been recently opened on this computer, if you select a graph from this menu that is already open then it will be brought to the front and gain focus, otherwise it will open the graph as it was when it was closed |
 | Scenario			| This menu is dynamically generated, it contains all the graphs that were opened when the scenario was saved, if you select a graph from this menu that is already open then it will be brought to the front and gain focus, otherwise it will open the graph as it was when it was closed. If you save preconfigured graphs on one machine and then open the scenario on another machine these graphs will automatically open when you open the scenario and attempt to retain their position. |
 
-> _Graphs - New Graph - Metric_
+> _Graphs - New Graph - Metric_ <br>
 > ![Image](Images/MacOS_Graphs_v0.8.0_New_Graph_Metric.png "New Graph - Metric")
 
-> _Graphs - New Graph - Result_
+> _Graphs - New Graph - Result_ <br>
 > ![Image](Images/MacOS_Graphs_v0.8.0_New_Graph_Result.png "New Graph - Result")
 
 |	|	|	|
@@ -262,13 +262,13 @@ The Graphs menu has the following options
 
 Some of the example preconfigured graphs:
 
-> _Graphs - Running Robots_
+> _Graphs - Running Robots_ <br>
 > ![Image](Images/MacOS_Graphs_v0.8.0_Running_Robots.png "Graphs - Running Robots")
 
-> _Graphs - Agent Load_
+> _Graphs - Agent Load_ <br>
 > ![Image](Images/MacOS_Graphs_v0.8.0_Agent_Load.png "Graphs - Agent Load")
 
-> _Graphs - Response Time_
+> _Graphs - Response Time_ <br>
 > ![Image](Images/MacOS_Graphs_v0.8.0_Response_Time.png "Graphs - Response Time")
 
 
