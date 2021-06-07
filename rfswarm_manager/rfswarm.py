@@ -2609,7 +2609,7 @@ class RFSwarmCore:
 									base.gui.display_run['start_time'].set("  {}  ".format(time.strftime("%H:%M:%S", stm)))
 
 								base.run_end = base.run_start + grp["Delay"] + grp["RampUp"] + grp["Run"]
-								base.debugmsg(0, grp['Index'], " 	run_start:", base.run_start, " 	Delay:", grp["Delay"], " 	RampUp:", grp["RampUp"], " 	Run:", grp["Run"], " 	run_end:", base.run_end)
+								base.debugmsg(9, grp['Index'], " 	run_start:", base.run_start, " 	Delay:", grp["Delay"], " 	RampUp:", grp["RampUp"], " 	Run:", grp["Run"], " 	run_end:", base.run_end)
 								base.robot_schedule["End"] = base.run_end
 
 								# totrbts = 0
@@ -2624,7 +2624,7 @@ class RFSwarmCore:
 
 							if gid not in base.scriptgrpend.keys() or base.scriptgrpend[gid] < base.run_start:
 								base.scriptgrpend[gid] = base.run_start + grp["Delay"] + grp["RampUp"] + grp["Run"]
-								base.debugmsg(0, "gid:", gid, " 	run_start:", base.run_start, " 	Delay:", grp["Delay"], " 	RampUp:", grp["RampUp"], " 	Run:", grp["Run"], " 	run_end:", base.run_end)
+								base.debugmsg(9, "gid:", gid, " 	run_start:", base.run_start, " 	Delay:", grp["Delay"], " 	RampUp:", grp["RampUp"], " 	Run:", grp["Run"], " 	run_end:", base.run_end)
 								if base.scriptgrpend[gid] > base.run_end:
 									base.run_end = base.scriptgrpend[gid]
 
