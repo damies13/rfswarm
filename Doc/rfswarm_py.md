@@ -158,7 +158,7 @@ Use this to generate csv files suitable for use to create reports for your test 
 ![Image](Images/MacOS_Run_v0.8.0_Start_60s.png "Run - Just started, first results coming in")
 
 > _Run - Showing results being collected live_
-![Image](Images/MacOS_Run_v0.6.3_100u_2h.png "Run - Showing results being collected live")
+![Image](Images/MacOS_Run_v0.8.0_2h.png "Run - Showing results being collected live")
 
 > _Run - Linux_
 > ![Image](Images/Linux-v0.5.0_Run_6min.png)
@@ -193,7 +193,7 @@ This is where you can see which agents have connected, number of robots on each 
 ![Image](Images/MacOS_Agents_v0.8.0_Ready.png "Agents - Ready")
 
 > _Agents - Running / Warning_
-![Image](Images/MacOS_Agents_running_warning_v0.6.3.png "Agents - Running / Warning")
+![Image](Images/MacOS_Agents_v0.8.0_Warning.png "Agents - Running / Warning")
 
 > _Agents - Stopping_
 ![Image](Images/MacOS_Agents_v0.8.0_Stopping.png "Agents - Stopping")
