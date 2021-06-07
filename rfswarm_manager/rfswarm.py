@@ -507,6 +507,7 @@ class RFSwarmBase:
 	defcolours = ['#000000', '#008450', '#B81D13', '#EFB700', '#888888']
 	namecolours = ['total', 'pass', 'fail', 'warning', 'not run']
 
+	darkmode = False
 
 	appstarted = False
 
@@ -1054,14 +1055,26 @@ class RFSwarmBase:
 		if grp<len(base.defcolours):
 			return base.defcolours[grp]
 		else:
-			newcolour = self.make_colour()
+			newcolour = self.get_colour()
 			base.debugmsg(9, "Initial newcolour:", newcolour)
 			while newcolour in base.defcolours:
 				base.debugmsg(9, base.defcolours)
-				newcolour = self.make_colour()
+				newcolour = self.get_colour()
 				base.debugmsg(9, "newcolour:", newcolour)
 			base.defcolours.append(newcolour)
 			return newcolour
+
+	def get_colour(self):
+		newcolour = self.make_colour()
+		if self.darkmode:
+			while self.dl_score(newcolour) < -300:
+				newcolour = self.make_colour()
+			return newcolour
+		else:
+			while self.dl_score(newcolour) > 300:
+				newcolour = self.make_colour()
+			return newcolour
+
 
 	def make_colour(self):
 		hexchr = ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f']
@@ -1072,6 +1085,29 @@ class RFSwarmBase:
 		b1 = hexchr[random.randrange(len(hexchr))]
 		b2 = hexchr[random.randrange(len(hexchr))]
 		return "#{}{}{}{}{}{}".format(r1,r2,g1,g2,b1,b2)
+
+	def dl_score(self, colour):
+		# darkness / lightness score
+		self.debugmsg(8, "colour:", colour)
+		m = re.search('\#(.?.?)(.?.?)(.?.?)', colour)
+		self.debugmsg(9, "m:", m)
+		self.debugmsg(9, "m 1:", m[1], int(m[1], 16))
+		self.debugmsg(9, "m 2:", m[2], int(m[2], 16))
+		self.debugmsg(9, "m 3:", m[3], int(m[3], 16))
+		r = int(m[1], 16) - 128
+		g = int(m[2], 16) - 128
+		b = int(m[3], 16) - 128
+
+		self.debugmsg(8, "r:", r, " 	g:", g, " 	b:", b)
+		score = r + g + b
+
+		# if score>300:
+		# 	self.debugmsg(7, "very light? score:", score)
+		#
+		# if score<-300:
+		# 	self.debugmsg(7, "very dark? score:", score)
+
+		return score
 
 	def format_sec(self, sec_in):
 		if sec_in>3599:
