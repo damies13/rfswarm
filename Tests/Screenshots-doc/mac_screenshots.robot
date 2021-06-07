@@ -109,7 +109,7 @@ Graphs
 	2 Agents Ready
 	Click Plan
 	Click Play
-	Sleep 	3m
+	Sleep 	18m
 	Click Agents
 	Take SS 	Agents 	Warning_1
 	Sleep 	1m
@@ -122,9 +122,9 @@ Graphs
 	Take SS 	Agents 	Warning_5
 	Click Run
 	Take SS 	Run 	100_Robots
-	Sleep 	2h
+	Sleep 	1h 55m
 	Take SS 	Run 	2h
-	Sleep 	15m
+	Wait until screen contain 	rfwasrm_mac_Agents_Uploading_1.png 	1200 	# 20m
 	Take SS 	Agents 	Uploading_1
 	Sleep 	1m
 	Take SS 	Agents 	Uploading_2
@@ -134,17 +134,7 @@ Graphs
 	Take SS 	Agents 	Uploading_4
 	Sleep 	1m
 	Take SS 	Agents 	Uploading_5
-	Sleep 	1m
-	Take SS 	Agents 	Uploading_6
-	Sleep 	1m
-	Take SS 	Agents 	Uploading_7
-	Sleep 	1m
-	Take SS 	Agents 	Uploading_8
-	Sleep 	1m
-	Take SS 	Agents 	Uploading_9
-	Sleep 	1m
-	Take SS 	Agents 	Uploading_10
-	Sleep 	10m
+	Sleep 	15m
 	Click Run
 	Take SS 	Run 	Finished
 
