@@ -209,14 +209,12 @@ The columns for the agents screen
 | Last Seen	| This is the time the last status update was received from the agent |
 | Assigned	| This is the number of robots assigned to the agent during ramp up |
 | Robots	| This is the number of robots that the agent reported as actually running at the last status update |
-| Load		| This is the load value used by rfswarm to assigne new robots to the agent with the lowest load, this value is the highest value of % CPU, % MEM and % NET |
-| % CPU		| This is the current percentage of CPU usage as reported by the agents opeerating system |
-| % MEM		| This is the current percentage of memory usage as reported by the agents opeerating system |
-| % NET		| This is the current percentage of network usage as reported by the agents opeerating system |
+| Load		| This is the load value used by rfswarm to assign new robots to the agent with the lowest load, this value is the highest value of % CPU, % MEM and % NET |
+| % CPU		| This is the current percentage of CPU usage as reported by the agents operating system |
+| % MEM		| This is the current percentage of memory usage as reported by the agents operating system |
+| % NET		| This is the current percentage of network usage as reported by the agents operating system |
 | Version	| This is the rfswarm version number of the rfswarm agent |
 | Libraries	| This is a list of robot framework libraries installed on the agent machine as reported by the python runtime that is running the agent (only python libraries that start with "robotframework-" are reported here |
-
-New with v0.6.3 this screen now shows the agent's version and a list of robot framework libraries available on the agent.
 
 
 #### About
@@ -338,8 +336,7 @@ rfswarm: error: unrecognized arguments: -?
 - The Manager machine needs to use a minimum of Python 3.7
 > ThreadingHTTPServer feature of HTTPServer requires was added in Python 3.7
 
-- tkinter may need to be installed
-It may already installed on your system, if not consult the [python documentation](https://tkdocs.com/tutorial/install.html) on how to install for your system.
+- tkinter may need to be installed, or it may already installed on your system, if it's not installed consult the [python documentation](https://tkdocs.com/tutorial/install.html) on how to install for your system.
 
 On Debian based systems this will probably work
 ```
@@ -380,8 +377,7 @@ rfswarm
 - The Manager machine needs to use a minimum of Python 3.7
 > ThreadingHTTPServer feature of HTTPServer requires was added in Python 3.7
 
-- tkinter may need to be installed
-It may already installed on your system, if not consult the python documentation on how to install for your system.
+- tkinter may need to be installed, or it may already installed on your system, if it's not installed consult the [python documentation](https://tkdocs.com/tutorial/install.html) on how to install for your system.
 
 On Debian based systems this will probably work
 ```
@@ -390,7 +386,7 @@ apt install python3-tk
 
 Additionally the following pip command might be needed if these are not already installed on your system:
 ```
-pip* install configparser setuptools hashlib HTTPServer pillow
+pip* install configparser setuptools hashlib HTTPServer pillow matplotlib
 ```
 > setuptools (is required by hashlib and HTTPServer)
 
