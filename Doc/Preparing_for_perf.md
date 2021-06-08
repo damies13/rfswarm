@@ -48,13 +48,13 @@ When an agent runs a robot test case it passes some variables on to the test cas
 #### Index
 Index should be available through the variable `${RFS_INDEX}`, this is the number you see in the Index column at the bottom of the plan screen
 
-#### VUser
-VUser should be available through the variable `${RFS_VUSER}`, referring to the Users column at the bottom of the plan screen, this number is the counter of the user from one to the number in the Users column.
-While this number on it's own is not unique, it will be unique relative to the Index above, so if you need a unique string in your test you could combine them. e.g. `${RFS_INDEX}_${RFS_VUSER}`
-Another way this could be useful is as a data row offset so that each test user is using data from a different section of your data file.
+#### Robot number
+Robot number should be available through the variable `${RFS_ROBOT}`, referring to the Robots column at the bottom of the plan screen, this number is the counter of the robot from one to the number in the Robots column.
+While this number on it's own is not unique, it will be unique relative to the Index above, so if you need a unique string in your test you could combine them. e.g. `${RFS_INDEX}_${RFS_ROBOT}`
+Another way this could be useful is as a data row offset so that each test robot is using data from a different section of your data file.
 
 #### Iteration
-Iteration should be available through the variable `${RFS_ITERATION}`, This is simply a counter of how many times this test case has been run for this virtual user. This could be useful if for example you need to walk sequentially through a data file because your data is single use.
+Iteration should be available through the variable `${RFS_ITERATION}`, This is simply a counter of how many times this test case has been run for this robot. This could be useful if for example you need to walk sequentially through a data file because your data is single use.
 
 #### Swarm Manager
 Swarm Manager should be available through the variable `${RFS_SWARMMANAGER}`, this will be useful for sending custom metric data back to the rfswarm manager, for example when using a robot test / task to collect statistics from the application under test.
@@ -176,7 +176,7 @@ Match Keyword
 ```
 
 #### No Operation
-Would not have a timing measured by default because this keyword belongs to the builtin which is one of the default [excludeed libraries](./rfswarm_agent_py.md#exclude-libraries)
+Would not have a timing measured by default because this keyword belongs to the builtin which is one of the default [excluded libraries](./rfswarm_agent_py.md#exclude-libraries)
 
 #### Example Keyword
 Would have a timing measured by default, this would be reported in the Manager as "TC01 My Example Keyword" along with the time taken to perform the step No Operation
