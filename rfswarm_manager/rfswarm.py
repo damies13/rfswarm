@@ -1208,12 +1208,33 @@ class RFSwarmBase:
 		base.debugmsg(8, "RFSwarmCore: find_dependancies", self.scriptfiles[hash])
 		localpath = self.scriptfiles[hash]['localpath']
 		localdir = os.path.dirname(localpath)
+		# look for __init__. files - Issue #90
+		initfiles = os.path.abspath(os.path.join(localdir, "__init__.*"))
+		base.debugmsg(5, "initfiles", initfiles)
+		filelst = glob.glob(initfiles)
+		for file in filelst:
+			base.debugmsg(5, "file:", file)
+			relpath = file.replace(localdir, "")[1:]
+			base.debugmsg(5, "relpath:", relpath)
+			newhash = self.hash_file(file, relpath)
+			base.debugmsg(5, "newhash:", newhash)
+			self.scriptfiles[newhash] = {
+					'id': newhash,
+					'localpath': file,
+					'relpath': relpath,
+					'type': "Initialization"
+				}
+			filename, fileext = os.path.splitext(file)
+			if fileext.lower() in ['robot', 'resource']:
+				t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
+				t.start()
+
 		base.debugmsg(9, "RFSwarmCore: find_dependancies: localdir", localdir)
 		filename, fileext = os.path.splitext(localpath)
 
 		base.debugmsg(9, "RFSwarmCore: find_dependancies: filename, fileext:", filename, fileext)
 
-		if (fileext in [".robot", ".Robot"] and keep_going):
+		if (fileext.lower() in ['robot', 'resource'] and keep_going):
 			with open(localpath, 'rb') as afile:
 				for fline in afile:
 					line = fline.decode("utf-8")
