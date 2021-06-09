@@ -18,7 +18,7 @@ rfswarm is written completely in python, so if you are already using Robot Frame
 
 To learn more about rfswarm please refer to the [Documentation](Doc/README.md)
 
-![Image](Doc/Images/MacOS_Run_v0.6.3_100u_2h.png "Run - Showing results being collected live")
+![Image](Doc/Images/MacOS_Run_v0.8.0_2h.png "Run - Showing results being collected live")
 
 <img align="right" src="Doc/Images/Icon_Help.png">
 
