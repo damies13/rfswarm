@@ -18,7 +18,7 @@ setuptools.setup(
 	# https://matplotlib.org/stable/users/installing.html
 	install_requires=['configparser', 'HTTPServer', 'pillow', 'pip>=21', 'matplotlib'],
 	classifiers=[
-		"Development Status :: 4 - Beta",
+		"Development Status :: 5 - Production/Stable",
 		"Topic :: Software Development :: Testing",
 		"Programming Language :: Python :: 3.7",
 		"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",

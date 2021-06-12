@@ -15,7 +15,7 @@ setuptools.setup(
 	packages=setuptools.find_packages(exclude=["*rfswarm_manager*", "build/*"]),
 	install_requires=['configparser', 'requests', 'robotframework', 'psutil'],
 	classifiers=[
-		"Development Status :: 4 - Beta",
+		"Development Status :: 5 - Production/Stable",
 		"Topic :: Software Development :: Testing",
 		"Programming Language :: Python :: 3.6",
 		"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
