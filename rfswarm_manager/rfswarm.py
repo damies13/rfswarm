@@ -2119,6 +2119,13 @@ class RFSwarmCore:
 		base.debugmsg(5, "BuildCoreRun")
 		self.BuildCoreRun()
 
+	def autostart_delay(self, sec):
+			base.debugmsg(5, "sec:", sec)
+			time.sleep(sec)
+			base.debugmsg(5, "autostart")
+			autostart = threading.Thread(target=self.autostart)
+			autostart.start()
+
 	def autostart(self):
 		base.debugmsg(5, "appstarted:", base.appstarted)
 		# wait for mainloops to finished
@@ -2148,14 +2155,24 @@ class RFSwarmCore:
 
 	def mainloop(self):
 
-		if base.args.run:
+		if base.args.run and base.run_starttime < 1:
 			# auto click play ?
 			# self.autostart()
 			autostart = threading.Thread(target=self.autostart)
 			autostart.start()
 
+		if base.run_starttime > 0:
+			sec2st = base.run_starttime - int(time.time())
+			if  sec2st < 0:
+				sec2st = 0
+			base.debugmsg(5, "sec2st:", sec2st)
+			autostart = threading.Thread(target=self.autostart_delay, args=(sec2st,))
+			autostart.start()
+
 		if not base.args.nogui:
 			base.gui.mainloop()
+
+
 
 
 	def on_closing(self, _event=None, *args):
