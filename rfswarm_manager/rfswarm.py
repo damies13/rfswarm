@@ -476,6 +476,7 @@ class RFSwarmBase:
 	run_abort = False
 	run_name = "PreRun"
 	run_name_current = ""
+	run_starttime = 0
 	run_start = 0
 	run_end = 0
 	run_finish = 0
@@ -1124,6 +1125,28 @@ class RFSwarmBase:
 				return "{}:{}".format(mins, secs)
 			return "{}".format(mins)
 		return "{}".format(sec_in)
+
+	def parse_time(self, stime_in):
+		base.debugmsg(9, "stime_in:", stime_in)
+		tarr = stime_in.split(":")
+		base.debugmsg(9, "tarr:", tarr)
+		n = datetime.now()
+		st = datetime(n.year, n.month, n.day, int(tarr[0]))
+		if len(tarr) == 2:
+			st = datetime(n.year, n.month, n.day, int(tarr[0]), int(tarr[1]))
+		if len(tarr) == 3:
+			st = datetime(n.year, n.month, n.day, int(tarr[0]), int(tarr[1]), int(tarr[2]))
+
+		if int(st.timestamp()) < int(n.timestamp()):
+			st = datetime(n.year, n.month, n.day+1, int(tarr[0]))
+			if len(tarr) == 2:
+				st = datetime(n.year, n.month, n.day+1, int(tarr[0]), int(tarr[1]))
+			if len(tarr) == 3:
+				st = datetime(n.year, n.month, n.day+1, int(tarr[0]), int(tarr[1]), int(tarr[2]))
+
+		base.debugmsg(8, "st:", st, "	", int(st.timestamp()))
+		return int(st.timestamp())
+
 
 	def hash_file(self, file, relpath):
 		BLOCKSIZE = 65536
@@ -1881,6 +1904,7 @@ class RFSwarmCore:
 		parser.add_argument('-r', '--run', help='Run the scenario automatically after loading', action='store_true')
 		parser.add_argument('-a', '--agents', help='Wait for this many agents before starting (default 1)')
 		parser.add_argument('-n', '--nogui', help='Don\'t display the GUI', action='store_true')
+		parser.add_argument('-t', '--starttime', help='Specify the time to start the test HH:MM or HH:MM:SS (ISO 8601)')
 		parser.add_argument('-d', '--dir', help='Results directory')
 		parser.add_argument('-e', '--ipaddress', help='IP Address to bind the server to')
 		parser.add_argument('-p', '--port', help='Port number to bind the server to')
@@ -1893,6 +1917,10 @@ class RFSwarmCore:
 
 		if base.args.version:
 			exit()
+
+		if base.args.starttime:
+			base.run_starttime = base.parse_time(base.args.starttime)
+			base.debugmsg(5, "run_starttime:", base.run_starttime)
 
 		base.debugmsg(6, "ConfigParser")
 		base.config = configparser.ConfigParser()
