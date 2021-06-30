@@ -1881,14 +1881,29 @@ class RFSwarmBase:
 		arrhms = str(hms).split(":")
 		base.debugmsg(6, "arrhms:",arrhms)
 		if len(arrhms)==3:
-			h = int(arrhms[0])
-			m = int(arrhms[1])
-			s = int(arrhms[2])
+			if len(arrhms[0])>0:
+				h = int(arrhms[0])
+			else:
+				h=0
+			if len(arrhms[1])>0:
+				m = int(arrhms[1])
+			else:
+				m=0
+			if len(arrhms[2])>0:
+				s = int(arrhms[2])
+			else:
+				s=0
 			sec = (h*3600)+(m*60)+s
 		if len(arrhms)==2:
 			h = 0
-			m = int(arrhms[0])
-			s = int(arrhms[1])
+			if len(arrhms[0])>0:
+				m = int(arrhms[0])
+			else:
+				m=0
+			if len(arrhms[1])>0:
+				s = int(arrhms[1])
+			else:
+				s=0
 			sec = (h*3600)+(m*60)+s
 		if len(arrhms)==1:
 			sec = int(arrhms[0])
@@ -1971,7 +1986,7 @@ class RFSwarmCore:
 
 		base.debugmsg(0, "	Configuration File: ", base.manager_ini)
 
-		base.debugmsg(5, "base.config: ", base.config._sections)
+		base.debugmsg(9, "base.config: ", base.config._sections)
 		if base.args.scenario:
 			base.save_ini = False
 			base.debugmsg(5, "base.args.scenario: ", base.args.scenario)
@@ -2514,15 +2529,15 @@ class RFSwarmCore:
 					return 1
 
 
-		base.debugmsg(5, "config graph_list: ", base.config['GUI']['graph_list'])
+		base.debugmsg(9, "config graph_list: ", base.config['GUI']['graph_list'])
 
-		base.debugmsg(5, "graphlist: ", graphlist)
+		base.debugmsg(9, "graphlist: ", graphlist)
 		# base.config[iniid]		glist = base.config['GUI']['graph_list'].split(",")
 		iniglist = list(base.config['GUI']['graph_list'].split(","))
-		base.debugmsg(5, "iniglist: ", iniglist)
+		base.debugmsg(9, "iniglist: ", iniglist)
 		base.config['GUI']['graph_list'] = ",".join( set(iniglist + graphlist) )
 
-		base.debugmsg(5, "config graph_list: ", base.config['GUI']['graph_list'])
+		base.debugmsg(9, "config graph_list: ", base.config['GUI']['graph_list'])
 
 		if not base.args.nogui:
 			base.gui.ClearScenarioGraphs()
@@ -3133,7 +3148,7 @@ class RFSwarmGUI(tk.Frame):
 
 	def get_icon(self, icontext):
 		# # https://www.daniweb.com/programming/software-development/code/216634/jpeg-image-embedded-in-python
-		base.debugmsg(5, "icontext:", icontext)
+		base.debugmsg(7, "icontext:", icontext)
 		# http://www.famfamfam.com/lab/icons/silk/
 		files = {}
 		# files["New"] = "famfamfam_silk_icons/icons/page_white.edt.gif"
@@ -3490,6 +3505,10 @@ class RFSwarmGUI(tk.Frame):
 
 				# style.configure("Spinbox", foreground=self.style_text_colour)
 				style.configure("TSpinbox", foreground=self.style_text_colour)
+
+				style.configure("TRadiobutton", foreground=self.style_text_colour)
+
+
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -3857,21 +3876,21 @@ class RFSwarmGUI(tk.Frame):
 
 	def OpenINIGraphs(self):
 
-		base.debugmsg(5, "graph_list:", base.config['GUI']['graph_list'])
+		base.debugmsg(8, "graph_list:", base.config['GUI']['graph_list'])
 
 		i = 1
 		glist = base.config['GUI']['graph_list'].split(",")
-		base.debugmsg(5, "glist:", glist)
+		base.debugmsg(9, "glist:", glist)
 
 		tgph = {}
 		for gi in glist:
 
-			base.debugmsg(5, "gi:", gi)
+			base.debugmsg(7, "gi:", gi)
 			iniid = "{}".format(gi)
 			if iniid in base.config:
-				base.debugmsg(5, "iniid:", iniid, base.config[iniid])
+				base.debugmsg(7, "iniid:", iniid, base.config[iniid])
 				settings = self.inigphsettings(base.config[iniid])
-				base.debugmsg(5, "settings:", settings)
+				base.debugmsg(7, "settings:", settings)
 
 				if settings['open']:
 					tgph[iniid] = threading.Thread(target=lambda: self.OpenGraph(settings))
@@ -3903,21 +3922,21 @@ class RFSwarmGUI(tk.Frame):
 	def RefreshRecentGraphs(self):
 		i = 1
 		glist = base.config['GUI']['graph_list'].split(",")
-		base.debugmsg(5, "glist:", glist)
+		base.debugmsg(9, "glist:", glist)
 		# first construct recent menu list
 		recent = {}
 		for gi in glist:
 			iniid = "{}".format(gi)
-			base.debugmsg(5, "iniid:", iniid)
+			base.debugmsg(9, "iniid:", iniid)
 			if iniid in base.config:
 				settings = self.inigphsettings(base.config[iniid])
-				base.debugmsg(5, "settings:", settings)
+				base.debugmsg(9, "settings:", settings)
 				if 'name' in settings and 'id' in settings:
 					recent[settings['name']] = settings['id']
 
 		try:
 			# remove existing items if any
-			base.debugmsg(5, "gph_recent_menu:", self.gph_recent_menu, self.gph_recent_menu.index("last"))
+			base.debugmsg(9, "gph_recent_menu:", self.gph_recent_menu, self.gph_recent_menu.index("last"))
 			if self.gph_recent_menu.index("last") is not None:
 				index = self.gph_recent_menu.index("last")
 				if index>0:
@@ -3925,15 +3944,15 @@ class RFSwarmGUI(tk.Frame):
 				else:
 					self.gph_recent_menu.delete(0)
 
-			base.debugmsg(5, "gph_recent_menu:", self.gph_recent_menu, self.gph_recent_menu.index("last"))
+			base.debugmsg(9, "gph_recent_menu:", self.gph_recent_menu, self.gph_recent_menu.index("last"))
 			for menui in recent.keys():
-				base.debugmsg(5, "menui:", menui, " 	recent[menui]:", recent[menui])
+				base.debugmsg(9, "menui:", menui, " 	recent[menui]:", recent[menui])
 				iniid = str(recent[menui])
 				# self.gph_recent_menu.add_command(label = menui, command = lambda: self.OpenGraph(recent["{}".format(menui)]))
 				# self.gph_recent_menu.add_command(label = menui, command = lambda: self.OpenGraph(self.inigphsettings(base.config[iniid])))
 				# self.gph_recent_menu.add_command(label = menui, command=lambda: self.MenuOpenGraph(recent[menui]))
 				self.gph_recent_menu.add_command(label = menui, command=lambda iniid=iniid: self.MenuOpenGraph(iniid))
-				base.debugmsg(5, "gph_recent_menu:", self.gph_recent_menu, self.gph_recent_menu.index("last"))
+				base.debugmsg(9, "gph_recent_menu:", self.gph_recent_menu, self.gph_recent_menu.index("last"))
 		except:
 			pass
 
@@ -4854,20 +4873,62 @@ class RFSwarmGUI(tk.Frame):
 		schedWindow.fmeContent.columnconfigure(0, weight=1)
 		schedWindow.fmeContent.rowconfigure(0, weight=1)
 
+		schedWindow.time = tk.StringVar()
+		schedWindow.date = tk.StringVar()
+		schedWindow.datetime = datetime(1970,1,1)
+		if base.run_starttime>0:
+			schedWindow.datetime = datetime.fromtimestamp(base.run_starttime)
+			schedWindow.time.set(schedWindow.datetime.strftime("%H:%M:%S"))
+			schedWindow.date.set(schedWindow.datetime.strftime("%Y-%m-%d"))
+
+		schedWindow.time.trace('w', lambda *args: self.ss_validate(schedWindow, args))
+
 		# https://www.tutorialspoint.com/python/tk_radiobutton.htm
 		schedWindow.enabled = tk.IntVar()
+		schedWindow.enabled.set(0)
+		if base.run_starttime>0:
+			schedWindow.enabled.set(1)
 
 		contentrow = 0
 
 		schedWindow.lblSS = ttk.Label(schedWindow.fmeContent, text = "Scheduled Start")
 		schedWindow.lblSS.grid(column=0, row=contentrow, sticky="nsew")
 
-		schedWindow.RSS1 = tk.Radiobutton(schedWindow.fmeContent, text="Disabled", variable=schedWindow.enabled, value=0, command=lambda: self.ss_selrb(schedWindow) )
+		schedWindow.RSS1 = ttk.Radiobutton(schedWindow.fmeContent, text="Disabled", variable=schedWindow.enabled, value=0, command=lambda: self.ss_selrb(schedWindow) )
 		schedWindow.RSS1.grid(column=1, row=contentrow, sticky="nsew")
 
 		contentrow += 1
-		schedWindow.RSS2 = tk.Radiobutton(schedWindow.fmeContent, text="Enabled", variable=schedWindow.enabled, value=1, command=lambda: self.ss_selrb(schedWindow) )
+		schedWindow.RSS2 = ttk.Radiobutton(schedWindow.fmeContent, text="Enabled", variable=schedWindow.enabled, value=1, command=lambda: self.ss_selrb(schedWindow) )
 		schedWindow.RSS2.grid(column=1, row=contentrow, sticky="nsew")
+
+
+		contentrow += 1
+		schedWindow.fmeTime = tk.Frame(schedWindow.fmeContent)
+		schedWindow.fmeTime.config(bg="green")
+		schedWindow.fmeTimeRow = contentrow
+		if base.run_starttime>0:
+			schedWindow.fmeTime.grid(column=0, row=schedWindow.fmeTimeRow, sticky="nsew", columnspan=3)
+
+		schedWindow.lblST = ttk.Label(schedWindow.fmeTime, text = "Schedule Time")
+		schedWindow.lblST.grid(column=0, row=0, sticky="nsew")
+
+		# schedWindow.txtST = ttk.Entry(schedWindow.fmeTime, textvariable=schedWindow.time, validate="key", validatecommand=(lambda: self.ss_validate(schedWindow), "%S") )
+		# schedWindow.txtST.config(validatecommand=lambda: self.ss_validate(schedWindow))
+		schedWindow.txtST = ttk.Entry(schedWindow.fmeTime, textvariable=schedWindow.time)
+		# schedWindow.txtST = ttk.Entry(schedWindow.fmeTime, textvariable=schedWindow.time, validate="focusout")
+		# schedWindow.txtST = ttk.Entry(schedWindow.fmeTime, textvariable=schedWindow.time, validate="focus")
+		# schedWindow.txtST.config(validatecommand=lambda: self.ss_validate(schedWindow))
+
+		schedWindow.txtST.grid(column=1, row=0, sticky="nsew")
+
+
+		schedWindow.lblSD = ttk.Label(schedWindow.fmeTime, text = "Schedule Date")
+		schedWindow.lblSD.grid(column=0, row=1, sticky="nsew")
+
+		schedWindow.txtSD = ttk.Label(schedWindow.fmeTime, textvariable=schedWindow.date)
+		schedWindow.txtSD.grid(column=1, row=1, sticky="nsew")
+
+
 
 
 		schedWindow.lblBLNK = ttk.Label(schedWindow.fmeBBar, text = " ")	# just a spacer before the buttons
@@ -4887,13 +4948,34 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(5, "schedWindow:", schedWindow, "	savesched:", savesched)
 		base.debugmsg(5, "args:", args)
 
+		if savesched:
+			sel = schedWindow.enabled.get()
+			if sel==0:
+				base.run_starttime = 0
+
 		schedWindow.destroy()
 
 	def ss_windowevent(self, e, schedWindow):
-		base.debugmsg(5, "schedWindow:", schedWindow, "	e:", e)
+		base.debugmsg(8, "schedWindow:", schedWindow, "	e:", e)
 
 	def ss_selrb(self, schedWindow):
 		base.debugmsg(5, "schedWindow:", schedWindow)
+		sel = schedWindow.enabled.get()
+		base.debugmsg(5, "sel:", sel)
+
+		if sel>0:
+			schedWindow.fmeTime.grid(column=0, row=schedWindow.fmeTimeRow, sticky="nsew", columnspan=3)
+		else:
+			schedWindow.fmeTime.grid_forget()
+
+	def ss_validate(self, schedWindow, *args):
+		base.debugmsg(5, "schedWindow:", schedWindow, "	args:", args)
+
+		stime = schedWindow.time.get()
+		if ':' in stime:
+			itime = base.hms2sec(stime)
+			base.debugmsg(5, "itime:", itime, "	", stime)
+
 
 	def ClickPlay(self, _event=None):
 
@@ -4977,7 +5059,7 @@ class RFSwarmGUI(tk.Frame):
 
 					q = 0
 
-					base.debugmsg(5, "int(1/chunk)-1:", int(1/chunk)-1)
+					base.debugmsg(7, "int(1/chunk)-1:", int(1/chunk)-1)
 
 					for i in range(int(1/chunk)-1):
 						q += chunk
@@ -5036,11 +5118,11 @@ class RFSwarmGUI(tk.Frame):
 
 
 
-			base.debugmsg(5, "totalcalc:", totalcalc)
+			base.debugmsg(7, "totalcalc:", totalcalc)
 
 			rtotal = 0
 			for k in sorted(totalcalc.keys()):
-				base.debugmsg(5, "k:", k, " 	totalcalc[k]:", totalcalc[k])
+				base.debugmsg(7, "k:", k, " 	totalcalc[k]:", totalcalc[k])
 				graphdata["Total"]["objTime"].append(datetime.fromtimestamp(k, timezone.utc))
 				rtotal += totalcalc[k]
 				graphdata["Total"]["Values"].append(rtotal)
