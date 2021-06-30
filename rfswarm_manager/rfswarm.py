@@ -4830,7 +4830,70 @@ class RFSwarmGUI(tk.Frame):
 		t.start()
 
 	def ScheduledStart(self, _event=None):
-		pass
+		base.debugmsg(5, "_event:", _event)
+		base.debugmsg(5, "run_starttime:", base.run_starttime)
+
+		schedWindow = tk.Toplevel(self.root)
+		schedWindow.config(bg="pink")
+		schedWindow.columnconfigure(0, weight=1)
+		# schedWindow.rowconfigure(0, weight=1)
+		schedWindow.rowconfigure(1, weight=1)
+
+		schedWindow.bind("<Configure>", lambda e: self.ss_windowevent(e, schedWindow) )
+
+		schedWindow.protocol("WM_DELETE_WINDOW",  lambda: self.ss_close(schedWindow, False) )
+
+
+		schedWindow.fmeBBar = tk.Frame(schedWindow)
+		schedWindow.fmeBBar.grid(column=0, row=9, sticky="nsew")
+
+		schedWindow.fmeContent = tk.Frame(schedWindow)
+		schedWindow.fmeContent.config(bg="red")
+		schedWindow.fmeContent.grid(column=0, row=1, sticky="nsew")
+
+		schedWindow.fmeContent.columnconfigure(0, weight=1)
+		schedWindow.fmeContent.rowconfigure(0, weight=1)
+
+		# https://www.tutorialspoint.com/python/tk_radiobutton.htm
+		schedWindow.enabled = tk.IntVar()
+
+		contentrow = 0
+
+		schedWindow.lblSS = ttk.Label(schedWindow.fmeContent, text = "Scheduled Start")
+		schedWindow.lblSS.grid(column=0, row=contentrow, sticky="nsew")
+
+		schedWindow.RSS1 = tk.Radiobutton(schedWindow.fmeContent, text="Disabled", variable=schedWindow.enabled, value=0, command=lambda: self.ss_selrb(schedWindow) )
+		schedWindow.RSS1.grid(column=1, row=contentrow, sticky="nsew")
+
+		contentrow += 1
+		schedWindow.RSS2 = tk.Radiobutton(schedWindow.fmeContent, text="Enabled", variable=schedWindow.enabled, value=1, command=lambda: self.ss_selrb(schedWindow) )
+		schedWindow.RSS2.grid(column=1, row=contentrow, sticky="nsew")
+
+
+		schedWindow.lblBLNK = ttk.Label(schedWindow.fmeBBar, text = " ")	# just a spacer before the buttons
+		schedWindow.lblBLNK.grid(column=0, row=0, sticky="nsew")
+		schedWindow.fmeBBar.columnconfigure(0, weight=1)
+
+		# OK
+		# schedWindow.fmeBBar
+		schedWindow.btnOK = ttk.Button(schedWindow.fmeBBar, text="OK", command=lambda: self.ss_close(schedWindow, True) ) #, width=8)
+		schedWindow.btnOK.grid(column=98, row=0, sticky="nsew")
+
+		# Cancel
+		schedWindow.btnCancel = ttk.Button(schedWindow.fmeBBar, text="Cancel", command=lambda: self.ss_close(schedWindow, False) ) #, width=8)
+		schedWindow.btnCancel.grid(column=99, row=0, sticky="nsew")
+
+	def ss_close(self, schedWindow, savesched, *args):
+		base.debugmsg(5, "schedWindow:", schedWindow, "	savesched:", savesched)
+		base.debugmsg(5, "args:", args)
+
+		schedWindow.destroy()
+
+	def ss_windowevent(self, e, schedWindow):
+		base.debugmsg(5, "schedWindow:", schedWindow, "	e:", e)
+
+	def ss_selrb(self, schedWindow):
+		base.debugmsg(5, "schedWindow:", schedWindow)
 
 	def ClickPlay(self, _event=None):
 
