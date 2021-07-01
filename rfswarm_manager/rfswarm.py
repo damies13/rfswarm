@@ -356,7 +356,7 @@ class AgentServer(BaseHTTPRequestHandler):
 		self.wfile.write(bytes(message,"utf-8"))
 		threadend = time.time()
 		# base.debugmsg(5, parsed_path.path, "	threadstart:", "%.3f" % threadstart, "threadend:", "%.3f" % threadend, "Time Taken:", "%.3f" % (threadend-threadstart))
-		base.debugmsg(5, "%.3f" % (threadend-threadstart), "seconds for ", parsed_path.path)
+		base.debugmsg(7, "%.3f" % (threadend-threadstart), "seconds for ", parsed_path.path)
 		return
 	def do_GET(self):
 		threadstart = time.time()
@@ -511,6 +511,7 @@ class RFSwarmBase:
 	darkmode = False
 
 	appstarted = False
+	keeprunning = True 		# this should only be changed by onclosing
 
 	args = None
 
@@ -1131,16 +1132,12 @@ class RFSwarmBase:
 			hrs = int(sec_in/3600)
 			mins = int(sec_in/60) - (hrs*60)
 			secs = sec_in - (((hrs*60) + mins) * 60)
-			if mins>0:
-				return "{}:{:02}:{:02}".format(hrs, mins, secs)
-			return "{}".format(hrs)
+			return "{}:{:02}:{:02}".format(hrs, mins, secs)
 		if sec_in>59:
 			mins = int(sec_in/60)
 			secs = sec_in - (mins * 60)
-			if secs>0:
-				return "{}:{:02}".format(mins, secs)
-			return "{}".format(mins)
-		return "{}".format(sec_in)
+			return "{}:{:02}".format(mins, secs)
+		return "0:{:02}".format(sec_in)
 
 	def parse_time(self, stime_in):
 		base.debugmsg(9, "stime_in:", stime_in)
@@ -2150,12 +2147,17 @@ class RFSwarmCore:
 		base.debugmsg(5, "BuildCoreRun")
 		self.BuildCoreRun()
 
-	def autostart_delay(self, sec):
-			base.debugmsg(5, "sec:", sec)
-			time.sleep(sec)
-			base.debugmsg(5, "autostart")
-			autostart = threading.Thread(target=self.autostart)
-			autostart.start()
+	def scheduled_start(self):
+		while base.keeprunning:
+			if base.run_starttime > 0:
+				sec2st = base.run_starttime - int(time.time())
+				if  sec2st < 1:
+					base.run_start = 0
+					base.run_starttime = 0
+					base.debugmsg(5, "sec2st:", sec2st)
+					autostart = threading.Thread(target=self.autostart)
+					autostart.start()
+			time.sleep(1)
 
 	def autostart(self):
 		base.debugmsg(5, "appstarted:", base.appstarted)
@@ -2186,28 +2188,29 @@ class RFSwarmCore:
 
 	def mainloop(self):
 
+		base.debugmsg(5, "mainloop start")
+
 		if base.args.run and base.run_starttime < 1:
 			# auto click play ?
 			# self.autostart()
 			autostart = threading.Thread(target=self.autostart)
 			autostart.start()
 
-		if base.run_starttime > 0:
-			sec2st = base.run_starttime - int(time.time())
-			if  sec2st < 0:
-				sec2st = 0
-			base.debugmsg(5, "sec2st:", sec2st)
-			autostart = threading.Thread(target=self.autostart_delay, args=(sec2st,))
-			autostart.start()
+
+		autostart = threading.Thread(target=self.scheduled_start)
+		autostart.start()
 
 		if not base.args.nogui:
 			base.gui.mainloop()
 
+		base.debugmsg(5, "mainloop end")
 
 
 
 	def on_closing(self, _event=None, *args):
 		# , _event=None is required for any function that has a shortcut key bound to it
+
+		base.keeprunning = False
 
 		if base.appstarted:
 			try:
@@ -2562,16 +2565,6 @@ class RFSwarmCore:
 		for nxtagent in base.Agents.keys():
 			base.Agents[nxtagent]["AssignedRobots"] = 0
 
-
-		datafiletime = datetime.now().strftime("%Y%m%d_%H%M%S")
-		if len(base.config['Plan']['ScenarioFile'])>0:
-			filename = os.path.basename(base.config['Plan']['ScenarioFile'])
-			sname = os.path.splitext(filename)[0]
-			base.run_name = "{}_{}".format(datafiletime, sname)
-		else:
-			base.run_name = "{}_{}".format(datafiletime, "Scenario")
-		base.debugmsg(5, "base.run_name:", base.run_name)
-
 		base.run_abort = False
 		base.run_start = 0
 		base.run_end = 0
@@ -2581,14 +2574,28 @@ class RFSwarmCore:
 		base.MetricIDs = {}
 
 		base.robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}}
-		base.debugmsg(5, "core.run_start_threads")
-		t = threading.Thread(target=core.run_start_threads)
-		t.start()
-		if not base.args.nogui:
-			time.sleep(1)
-			base.debugmsg(5, "base.gui.delayed_UpdateRunStats")
-			ut = threading.Thread(target=base.gui.delayed_UpdateRunStats)
-			ut.start()
+		sec2st = base.run_starttime - int(time.time())
+		if sec2st < 1:
+
+			datafiletime = datetime.now().strftime("%Y%m%d_%H%M%S")
+			if len(base.config['Plan']['ScenarioFile'])>0:
+				filename = os.path.basename(base.config['Plan']['ScenarioFile'])
+				sname = os.path.splitext(filename)[0]
+				base.run_name = "{}_{}".format(datafiletime, sname)
+			else:
+				base.run_name = "{}_{}".format(datafiletime, "Scenario")
+			base.debugmsg(5, "base.run_name:", base.run_name)
+
+			base.debugmsg(5, "core.run_start_threads")
+			t = threading.Thread(target=core.run_start_threads)
+			t.start()
+			if not base.args.nogui:
+				time.sleep(1)
+				base.debugmsg(5, "base.gui.delayed_UpdateRunStats")
+				ut = threading.Thread(target=base.gui.delayed_UpdateRunStats)
+				ut.start()
+				base.gui.tabs.select(1)
+
 
 
 
@@ -3002,8 +3009,6 @@ class RFSwarmGUI(tk.Frame):
 	# GUI = None
 	tabs = None
 
-	gui_update = True
-
 	pln_graph_update = False
 	pln_graph = None
 	scriptgrid = None
@@ -3129,7 +3134,6 @@ class RFSwarmGUI(tk.Frame):
 		base.config['Plan']['ScenarioFile'] = sf
 
 		base.debugmsg(3, "Close GUI")
-		self.gui_update = False
 		try:
 			self.destroy()
 		except:
@@ -4816,7 +4820,7 @@ class RFSwarmGUI(tk.Frame):
 
 
 	def UpdatePlanDisplay(self):
-		while self.gui_update:
+		while base.keeprunning:
 			if base.run_starttime > 0:
 				sec2st = base.run_starttime - int(time.time())
 				if  sec2st < 0:
@@ -4952,6 +4956,8 @@ class RFSwarmGUI(tk.Frame):
 			sel = schedWindow.enabled.get()
 			if sel==0:
 				base.run_starttime = 0
+			if sel==1:
+				base.run_starttime = int(schedWindow.datetime.timestamp())
 
 		schedWindow.destroy()
 
@@ -4965,6 +4971,12 @@ class RFSwarmGUI(tk.Frame):
 
 		if sel>0:
 			schedWindow.fmeTime.grid(column=0, row=schedWindow.fmeTimeRow, sticky="nsew", columnspan=3)
+			if base.run_starttime<1:
+				now = datetime.today()
+				newi = int(now.timestamp()) + 600 # +10min
+				newdt = datetime.fromtimestamp(newi)
+				newst = newdt.strftime("%H:%M:%S")
+				schedWindow.time.set(newst)
 		else:
 			schedWindow.fmeTime.grid_forget()
 
@@ -4973,9 +4985,44 @@ class RFSwarmGUI(tk.Frame):
 
 		stime = schedWindow.time.get()
 		if ':' in stime:
+			if len(stime)<6:
+				stime = "{}:00".format(stime)
+		else:
+			if len(stime)>3:
+				if len(stime)<5:
+					stime = "{}:{}:00".format(stime[0:len(stime)-2], stime[-2:])
+				else:
+					stime = "{}:{}:{}".format(stime[0:len(stime)-4], stime[len(stime)-4:len(stime)-2], stime[-2:])
+		if len(stime)>3:
+			schedWindow.time.set(stime)
 			itime = base.hms2sec(stime)
 			base.debugmsg(5, "itime:", itime, "	", stime)
 
+			newtime = self.ss_midnight(0) + itime
+			base.debugmsg(5, "newtime:", newtime)
+
+			now = datetime.today()
+			if newtime<int(now.timestamp()+60):
+				newtime = self.ss_midnight(1) + itime
+				base.debugmsg(5, "newtime:", newtime)
+
+			schedWindow.datetime = datetime.fromtimestamp(newtime)
+			schedWindow.date.set(schedWindow.datetime.strftime("%Y-%m-%d"))
+
+
+
+		base.debugmsg(5, "schedWindow.datetime:", schedWindow.datetime)
+
+
+	def ss_midnight(self, offset):
+		mn = 0
+		now = datetime.today()
+		base.debugmsg(5, "now:", now)
+		mndt = datetime(now.year, now.month, now.day)
+		offsetsec = 24 * 60 * 60 * offset
+		base.debugmsg(5, "mndt:", mndt, "	offsetsec:", offsetsec)
+		mn = int(mndt.timestamp()) + offsetsec
+		return mn
 
 	def ClickPlay(self, _event=None):
 
@@ -4987,7 +5034,9 @@ class RFSwarmGUI(tk.Frame):
 		icontext = "Stop"
 		self.elements["Run"]["btn_stop"]["image"] = self.icoStop
 
-		self.tabs.select(1)
+		# sec2st = base.run_starttime - int(time.time())
+		# if sec2st < 1:
+		# 	self.tabs.select(1)
 
 		core.ClickPlay()
 
