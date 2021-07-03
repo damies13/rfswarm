@@ -4627,6 +4627,14 @@ class RFSwarmGUI(tk.Frame):
 		# bSave = ttk.Button(bbargrid, text="Save", command=self.mnu_file_Save)
 		bSave.grid(column=btnno, row=0, sticky="nsew")
 
+		# settings
+		base.debugmsg(7, "Button Settings")
+		btnno += 1
+		icontext = "Advanced"
+		bSST = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', text="Settings", command=self.setings_open)
+		bSST.grid(column=btnno, row=0, sticky="nsew")
+
+
 		# StartTime
 		base.debugmsg(7, "Button Scheduled Start")
 		btnno += 1
@@ -4816,6 +4824,13 @@ class RFSwarmGUI(tk.Frame):
 
 		ut = threading.Thread(target=self.UpdatePlanDisplay)
 		ut.start()
+
+
+	def setings_open(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+
+	def setings_close(self, setingsWindow, save):
+		base.debugmsg(5, "setingsWindow:", setingsWindow, "	save:", save)
 
 
 
