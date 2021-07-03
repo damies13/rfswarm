@@ -4829,8 +4829,66 @@ class RFSwarmGUI(tk.Frame):
 	def setings_open(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
 
+		setingsWindow = tk.Toplevel(self.root)
+		# setingsWindow.config(bg="pink")
+		setingsWindow.columnconfigure(0, weight=1)
+		setingsWindow.rowconfigure(1, weight=1)
+
+		setingsWindow.protocol("WM_DELETE_WINDOW",  lambda: self.setings_close(setingsWindow, False) )
+
+		setingsWindow.fmeContent = tk.Frame(setingsWindow)
+		# setingsWindow.fmeContent.config(bg="red")
+		setingsWindow.fmeContent.grid(column=0, row=1, sticky="nsew")
+
+		setingsWindow.fmeContent.columnconfigure(0, weight=1)
+		setingsWindow.fmeContent.rowconfigure(99, weight=1)
+
+
+
+		setingsWindow.fmeScenario = tk.Frame(setingsWindow.fmeContent)
+		# setingsWindow.fmeScenario.config(bg="blue")
+		setingsWindow.fmeScenario.config(bd=1, relief="sunken")
+		# setingsWindow.fmeScenario.config(bd=1, relief="groove")
+		setingsWindow.fmeScenario.grid(column=0, row=1, sticky="nsew")
+
+		setingsWindow.fmeScenario.columnconfigure(1, weight=1)
+
+		setingsWindow.lblScenario = ttk.Label(setingsWindow.fmeScenario, text="Scenario:")
+		setingsWindow.lblScenario.grid(column=0, row=0, sticky="nsew")
+
+		setingsWindow.lblUpload = ttk.Label(setingsWindow.fmeScenario, text="  Upload Logs:")
+		setingsWindow.lblUpload.grid(column=0, row=1, sticky="nsew")
+
+		UploadOpt = [None, "Immediately", "On Error Only", "All Defered"]
+		setingsWindow.strUpload = tk.StringVar()
+		setingsWindow.omUpload = ttk.OptionMenu(setingsWindow.fmeScenario, setingsWindow.strUpload, *UploadOpt)
+		setingsWindow.strUpload.set(UploadOpt[2])
+		setingsWindow.omUpload.grid(column=2, row=1, sticky="nsew")
+
+
+
+		setingsWindow.fmeBBar = tk.Frame(setingsWindow)
+		setingsWindow.fmeBBar.grid(column=0, row=9, sticky="nsew")
+
+		setingsWindow.lblBLNK = ttk.Label(setingsWindow.fmeBBar, text = " ")	# just a spacer before the buttons
+		setingsWindow.lblBLNK.grid(column=0, row=0, sticky="nsew")
+		setingsWindow.fmeBBar.columnconfigure(0, weight=1)
+
+		# OK
+		# schedWindow.fmeBBar
+		setingsWindow.btnOK = ttk.Button(setingsWindow.fmeBBar, text="OK", command=lambda: self.setings_close(setingsWindow, True) ) #, width=8)
+		setingsWindow.btnOK.grid(column=98, row=0, sticky="nsew")
+
+		# Cancel
+		setingsWindow.btnCancel = ttk.Button(setingsWindow.fmeBBar, text="Cancel", command=lambda: self.setings_close(setingsWindow, False) ) #, width=8)
+		setingsWindow.btnCancel.grid(column=99, row=0, sticky="nsew")
+
+
+
 	def setings_close(self, setingsWindow, save):
 		base.debugmsg(5, "setingsWindow:", setingsWindow, "	save:", save)
+
+		setingsWindow.destroy()
 
 
 
