@@ -4981,8 +4981,10 @@ class RFSwarmGUI(tk.Frame):
 			schedWindow.fmeTime.grid_forget()
 
 	def ss_validate(self, schedWindow, *args):
+		# time.sleep(0.5)
 		base.debugmsg(5, "schedWindow:", schedWindow, "	args:", args)
 
+		otime = schedWindow.time.get()
 		stime = schedWindow.time.get()
 		if ':' in stime:
 			if len(stime)<6:
@@ -4990,11 +4992,21 @@ class RFSwarmGUI(tk.Frame):
 		else:
 			if len(stime)>3:
 				if len(stime)<5:
-					stime = "{}:{}:00".format(stime[0:len(stime)-2], stime[-2:])
+					stime = "{:02}:{:02}:00".format(int(stime[0:len(stime)-2]), int(stime[-2:]))
 				else:
-					stime = "{}:{}:{}".format(stime[0:len(stime)-4], stime[len(stime)-4:len(stime)-2], stime[-2:])
+					stime = "{:02}:{:02}:{:02}".format(int(stime[0:len(stime)-4]), int(stime[len(stime)-4:len(stime)-2]), int(stime[-2:]))
+		if stime.count(":")>1 and len(stime)!=8:
+			atime = stime.split(":")
+			stime = "{:02}:{:02}:{:02}".format(int(atime[0]),int(atime[1]),int(atime[2]))
+
+		# time.sleep(0.3)
+		if otime != schedWindow.time.get():
+			return 0
 		if len(stime)>3:
 			schedWindow.time.set(stime)
+			# atime = stime.split(":")
+			# stime = "{:02}:{:02}:{:02}".format(int(atime[0]),int(atime[1]),int(atime[2]))
+			# schedWindow.time.set(stime)
 			itime = base.hms2sec(stime)
 			base.debugmsg(5, "itime:", itime, "	", stime)
 
