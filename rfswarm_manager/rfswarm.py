@@ -466,6 +466,8 @@ class RFSwarmBase:
 	scriptfiles = {}
 	scriptgrpend = {}
 
+	uploadmodes = {'imm':"Immediately", 'err':"On Error Only", 'def':"All Defered"}
+	uploadmode = "err" 	# modes are imm, err, def
 	uploadfiles = {}
 
 	index = ""
@@ -1906,6 +1908,19 @@ class RFSwarmBase:
 			sec = int(arrhms[0])
 		return sec
 
+
+	def GetKey(self, mydict, myval):
+		# for key, value in mydict.items():
+		# 	base.debugmsg(5, "key:", key, "	value:", value)
+		# 	if myval == value:
+		# 		return key
+		# 	return "Value not found"
+		vals = list(mydict.values())
+		try:
+			id = vals.index(myval)
+			return list(mydict.keys())[id]
+		except:
+			return "Value, {} not found".format(myval)
 
 
 # class rfswarm:
@@ -4859,10 +4874,12 @@ class RFSwarmGUI(tk.Frame):
 		setingsWindow.lblUpload = ttk.Label(setingsWindow.fmeScenario, text="  Upload Logs:")
 		setingsWindow.lblUpload.grid(column=0, row=1, sticky="nsew")
 
-		UploadOpt = [None, "Immediately", "On Error Only", "All Defered"]
+
+		UploadOpt = list(base.uploadmodes.values())
 		setingsWindow.strUpload = tk.StringVar()
-		setingsWindow.omUpload = ttk.OptionMenu(setingsWindow.fmeScenario, setingsWindow.strUpload, *UploadOpt)
-		setingsWindow.strUpload.set(UploadOpt[2])
+		setingsWindow.omUpload = ttk.OptionMenu(setingsWindow.fmeScenario, setingsWindow.strUpload, None, *UploadOpt)
+		base.debugmsg(5, "uploadmode:", base.uploadmode)
+		setingsWindow.strUpload.set(base.uploadmodes[base.uploadmode])
 		setingsWindow.omUpload.grid(column=2, row=1, sticky="nsew")
 
 
@@ -4887,6 +4904,13 @@ class RFSwarmGUI(tk.Frame):
 
 	def setings_close(self, setingsWindow, save):
 		base.debugmsg(5, "setingsWindow:", setingsWindow, "	save:", save)
+
+		if save:
+			self.plan_scnro_chngd = True
+			# base.uploadmodes[base.uploadmode]
+			base.debugmsg(5, "strUpload:", setingsWindow.strUpload.get(), "	uploadmodes:", base.uploadmodes)
+			base.uploadmode = base.GetKey(base.uploadmodes, setingsWindow.strUpload.get())
+			base.debugmsg(5, "uploadmode:", base.uploadmode)
 
 		setingsWindow.destroy()
 
