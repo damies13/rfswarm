@@ -278,6 +278,7 @@ class AgentServer(BaseHTTPRequestHandler):
 						jsonresp["EndTime"] = base.run_end
 						jsonresp["RunName"] = base.robot_schedule["RunName"]
 						jsonresp["Abort"] = base.run_abort
+						jsonresp["UploadMode"] = base.uploadmode
 
 						# base.robot_schedule["Agents"]
 						if jsonresp["AgentName"] in base.robot_schedule["Agents"].keys():
@@ -2447,8 +2448,13 @@ class RFSwarmCore:
 			if "scriptcount" in filedata["Scenario"]:
 				scriptcount = int(filedata["Scenario"]["scriptcount"])
 				base.debugmsg(8, "scriptcount:", scriptcount)
+
 			if "graphlist" in filedata["Scenario"]:
 				graphlist = filedata["Scenario"]["graphlist"].split(",")
+
+			if "uploadmode" in filedata["Scenario"]:
+				base.uploadmode = filedata['Scenario']['uploadmode']
+
 		else:
 			base.debugmsg(1, "File contains no scenario:", ScenarioFile)
 			return 1
@@ -6813,6 +6819,9 @@ class RFSwarmGUI(tk.Frame):
 
 			if 'Scenario' not in filedata:
 				filedata['Scenario'] = {}
+
+			# base.uploadmode
+			filedata['Scenario']['UploadMode'] = base.uploadmode
 
 			scriptidx = str(0)
 			if 'ScriptCount' not in filedata['Scenario']:
