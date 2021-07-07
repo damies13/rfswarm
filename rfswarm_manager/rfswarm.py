@@ -1225,7 +1225,7 @@ class RFSwarmBase:
 					'type': "Initialization"
 				}
 			filename, fileext = os.path.splitext(file)
-			if fileext.lower() in ['robot', 'resource']:
+			if fileext.lower() in ['.robot', '.resource']:
 				t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
 				t.start()
 
@@ -1234,7 +1234,7 @@ class RFSwarmBase:
 
 		base.debugmsg(9, "RFSwarmCore: find_dependancies: filename, fileext:", filename, fileext)
 
-		if (fileext.lower() in ['robot', 'resource'] and keep_going):
+		if (fileext.lower() in ['.robot', '.resource'] and keep_going):
 			with open(localpath, 'rb') as afile:
 				for fline in afile:
 					line = fline.decode("utf-8")
