@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #		Manager
-#    Version 0.8.0
+#    Version 0.8.1
 #
 
 # 	Helpful links
@@ -453,7 +453,7 @@ class AgentServer(BaseHTTPRequestHandler):
 
 
 class RFSwarmBase:
-	version="0.8.0"
+	version="0.8.1"
 	debuglvl = 0
 
 	config = None
@@ -1205,36 +1205,41 @@ class RFSwarmBase:
 		checking = False
 
 		# determine if is a robot file
-		base.debugmsg(8, "RFSwarmCore: find_dependancies", self.scriptfiles[hash])
+		base.debugmsg(8, "scriptfiles[",hash,"]", self.scriptfiles[hash])
 		localpath = self.scriptfiles[hash]['localpath']
 		localdir = os.path.dirname(localpath)
 		# look for __init__. files - Issue #90
 		initfiles = os.path.abspath(os.path.join(localdir, "__init__.*"))
-		base.debugmsg(5, "initfiles", initfiles)
+		base.debugmsg(7, "initfiles", initfiles)
 		filelst = glob.glob(initfiles)
 		for file in filelst:
-			base.debugmsg(5, "file:", file)
+			base.debugmsg(7, "file:", file)
 			relpath = file.replace(localdir, "")[1:]
-			base.debugmsg(5, "relpath:", relpath)
+			base.debugmsg(7, "relpath:", relpath)
 			newhash = self.hash_file(file, relpath)
-			base.debugmsg(5, "newhash:", newhash)
-			self.scriptfiles[newhash] = {
-					'id': newhash,
-					'localpath': file,
-					'relpath': relpath,
-					'type': "Initialization"
-				}
-			filename, fileext = os.path.splitext(file)
-			if fileext.lower() in ['robot', 'resource']:
-				t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
-				t.start()
+			base.debugmsg(7, "newhash:", newhash)
+			if newhash not in self.scriptfiles:
+				self.scriptfiles[newhash] = {
+						'id': newhash,
+						'localpath': file,
+						'relpath': relpath,
+						'type': "Initialization"
+					}
+				filename, fileext = os.path.splitext(file)
+				# splitext leaves the . on the extention, the list below needs to have the extentions
+				# starting with a . - Issue #94
+				if fileext.lower() in ['.robot', '.resource']:
+					t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
+					t.start()
 
-		base.debugmsg(9, "RFSwarmCore: find_dependancies: localdir", localdir)
+		base.debugmsg(7, "localdir", localdir)
 		filename, fileext = os.path.splitext(localpath)
 
-		base.debugmsg(9, "RFSwarmCore: find_dependancies: filename, fileext:", filename, fileext)
+		base.debugmsg(7, "filename, fileext:", filename, fileext)
 
-		if (fileext.lower() in ['robot', 'resource'] and keep_going):
+		# splitext leaves the . on the extention, the list below needs to have the extentions
+		# starting with a . - Issue #94
+		if (fileext.lower() in ['.robot', '.resource'] and keep_going):
 			with open(localpath, 'rb') as afile:
 				for fline in afile:
 					line = fline.decode("utf-8")
@@ -1242,29 +1247,29 @@ class RFSwarmBase:
 						checking = False
 
 					if checking:
-						base.debugmsg(9, "RFSwarmCore: find_dependancies: line", line)
+						base.debugmsg(9, "line", line)
 						try:
 							if line.strip()[:1] != "#":
 								linearr = line.strip().split()
-								base.debugmsg(7, "find_dependancies: linearr", linearr)
+								base.debugmsg(7, "linearr", linearr)
 								resfile = None;
 								if len(linearr)>1 and linearr[0].upper() in ['RESOURCE','VARIABLES','LIBRARY']:
-									base.debugmsg(9, "find_dependancies: linearr[1]", linearr[1])
+									base.debugmsg(9, "linearr[1]", linearr[1])
 									resfile = linearr[1]
 								if not resfile and len(linearr)>2 and (linearr[0].upper() == 'METADATA' and linearr[1].upper() == 'FILE'):
-									base.debugmsg(9, "find_dependancies: linearr[2]", linearr[2])
+									base.debugmsg(9, "linearr[2]", linearr[2])
 									resfile = linearr[2]
 								if not resfile and len(linearr)>2 and (linearr[0].upper() == 'IMPORT' and linearr[1].upper() == 'LIBRARY'):
-									base.debugmsg(9, "find_dependancies: linearr[2]", linearr[2])
+									base.debugmsg(9, "linearr[2]", linearr[2])
 									resfile = linearr[2]
 								if resfile:
-									base.debugmsg(7, "find_dependancies: resfile", resfile)
+									base.debugmsg(7, "resfile", resfile)
 									# here we are assuming the resfile is a relative path! should we also consider files with full local paths?
 									localrespath = os.path.abspath(os.path.join(localdir, resfile))
-									base.debugmsg(8, "find_dependancies: localrespath", localrespath)
+									base.debugmsg(8, "localrespath", localrespath)
 									if os.path.isfile(localrespath):
 										newhash = self.hash_file(localrespath, resfile)
-										base.debugmsg(9, "find_dependancies: newhash", newhash)
+										base.debugmsg(7, "newhash", newhash)
 										self.scriptfiles[newhash] = {
 												'id': newhash,
 												'localpath': localrespath,
@@ -1278,11 +1283,11 @@ class RFSwarmBase:
 									else:
 										filelst = glob.glob(localrespath)
 										for file in filelst:
-											base.debugmsg(9, "find_dependancies: file", file)
+											base.debugmsg(9, "file", file)
 											relpath = file.replace(localdir, "")[1:]
-											base.debugmsg(9, "find_dependancies: relpath", relpath)
+											base.debugmsg(9, "relpath", relpath)
 											newhash = self.hash_file(file, relpath)
-											base.debugmsg(9, "find_dependancies: newhash", newhash)
+											base.debugmsg(9, "newhash", newhash)
 											self.scriptfiles[newhash] = {
 													'id': newhash,
 													'localpath': file,
@@ -1291,14 +1296,14 @@ class RFSwarmBase:
 												}
 
 						except Exception as e:
-							base.debugmsg(6, "find_dependancies: line", line)
-							base.debugmsg(6, "find_dependancies: Exception", e)
-							base.debugmsg(6, "find_dependancies: linearr", linearr)
+							base.debugmsg(6, "line", line)
+							base.debugmsg(6, "Exception", e)
+							base.debugmsg(6, "linearr", linearr)
 
 					# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
 					match = re.search('\*+([^*\v]+)', line)
 					if match is not None:
-						base.debugmsg(6, "find_dependancies: match.group(0)", match.group(1))
+						base.debugmsg(6, "match.group(0)", match.group(1))
 						if match.group(1).strip().upper() in ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD']:
 							checking = True
 
