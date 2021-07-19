@@ -704,6 +704,8 @@ class RFSwarmAgent():
 					for k in jsonresp["Schedule"][s].keys():
 						self.debugmsg(6, "getjobs: self.jobs[",s,"][",k,"]", jsonresp["Schedule"][s][k])
 						self.jobs[s][k] = jsonresp["Schedule"][s][k]
+					if "UploadMode" in jsonresp:
+						self.jobs[s]["UploadMode"] = jsonresp["UploadMode"]
 
 				if int(time.time()) > jsonresp["EndTime"]:
 					self.isstopping = True
@@ -944,10 +946,13 @@ class RFSwarmAgent():
 
 
 			uploadmode = self.uploadmode
+			self.debugmsg(5, "uploadmode:", uploadmode)
+			self.debugmsg(5, "self.jobs[",jobid,"]:", self.jobs[jobid])
 			if "UploadMode" in self.jobs[jobid]:
 				uploadmode = self.jobs[jobid]["UploadMode"]
-			# Uplad any files found
+				self.debugmsg(5, "uploadmode:", uploadmode)
 
+			# Uplad any files found
 			self.queue_file_upload(uploadmode, result, odir)
 
 			self.robotcount += -1
@@ -972,8 +977,9 @@ class RFSwarmAgent():
 
 		rundir = os.path.join(self.logdir, self.run_name)
 
-		self.debugmsg(7, "mode:", mode, "	retcode:", retcode)
+		self.debugmsg(5, "mode:", mode, "	retcode:", retcode)
 		# 	uploadmodes = {'imm':"Immediately", 'err':"On Error Only", 'def':"All Defered"}
+
 
 		for file in filelst:
 			fobj = {}
