@@ -69,6 +69,7 @@ class RFSwarmAgent():
 	args = None
 	xmlmode = False
 	timeout=600
+	uploadmode = "err"
 
 	debuglvl = 0
 
@@ -941,18 +942,22 @@ class RFSwarmAgent():
 				self.debugmsg(5, "Robot returned an error:", e)
 				result = 1
 
+
+			uploadmode = self.uploadmode
+			if "UploadMode" in self.jobs[jobid]:
+				uploadmode = self.jobs[jobid]["UploadMode"]
 			# Uplad any files found
 
-			self.queue_file_upload(result, odir)
+			self.queue_file_upload(uploadmode, result, odir)
 
 			self.robotcount += -1
 		else:
 			self.debugmsg(1, "Could not find robot executeable:", robotexe)
 
 
-	def queue_file_upload(self, retcode, filedir):
+	def queue_file_upload(self, mode, retcode, filedir):
 		reldir = os.path.basename(filedir)
-		self.debugmsg(7, retcode, reldir, filedir)
+		self.debugmsg(7, mode, retcode, reldir, filedir)
 
 		filelst = self.file_upload_list(filedir)
 		self.debugmsg(7, "filelst", filelst)
@@ -967,13 +972,19 @@ class RFSwarmAgent():
 
 		rundir = os.path.join(self.logdir, self.run_name)
 
+		self.debugmsg(7, "mode:", mode, "	retcode:", retcode)
+		# 	uploadmodes = {'imm':"Immediately", 'err':"On Error Only", 'def':"All Defered"}
+
 		for file in filelst:
 			fobj = {}
 			fobj["LocalFilePath"] = file
 			fobj["RelFilePath"] = os.path.relpath(file, start=rundir)
 			self.upload_queue.append(fobj)
 			self.debugmsg(7, "added to upload_queue", fobj)
-			if retcode > 0:
+			if mode == "err" and retcode > 0:
+				# upload now
+				self.file_upload(fobj)
+			if mode == "imm":
 				# upload now
 				self.file_upload(fobj)
 
