@@ -4965,7 +4965,7 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(5, "run_starttime:", base.run_starttime)
 
 		schedWindow = tk.Toplevel(self.root)
-		schedWindow.config(bg="pink")
+		# schedWindow.config(bg="pink")
 		schedWindow.columnconfigure(0, weight=1)
 		# schedWindow.rowconfigure(0, weight=1)
 		schedWindow.rowconfigure(1, weight=1)
@@ -4979,7 +4979,7 @@ class RFSwarmGUI(tk.Frame):
 		schedWindow.fmeBBar.grid(column=0, row=9, sticky="nsew")
 
 		schedWindow.fmeContent = tk.Frame(schedWindow)
-		schedWindow.fmeContent.config(bg="red")
+		# schedWindow.fmeContent.config(bg="red")
 		schedWindow.fmeContent.grid(column=0, row=1, sticky="nsew")
 
 		schedWindow.fmeContent.columnconfigure(0, weight=1)
@@ -4994,6 +4994,7 @@ class RFSwarmGUI(tk.Frame):
 			schedWindow.date.set(schedWindow.datetime.strftime("%Y-%m-%d"))
 
 		schedWindow.time.trace('w', lambda *args: self.ss_validate(schedWindow, args))
+		# schedWindow.time.trace('a', lambda *args: self.ss_validate(schedWindow, args))
 
 		# https://www.tutorialspoint.com/python/tk_radiobutton.htm
 		schedWindow.enabled = tk.IntVar()
@@ -5016,7 +5017,7 @@ class RFSwarmGUI(tk.Frame):
 
 		contentrow += 1
 		schedWindow.fmeTime = tk.Frame(schedWindow.fmeContent)
-		schedWindow.fmeTime.config(bg="green")
+		# schedWindow.fmeTime.config(bg="green")
 		schedWindow.fmeTimeRow = contentrow
 		if base.run_starttime>0:
 			schedWindow.fmeTime.grid(column=0, row=schedWindow.fmeTimeRow, sticky="nsew", columnspan=3)
@@ -5030,6 +5031,10 @@ class RFSwarmGUI(tk.Frame):
 		# schedWindow.txtST = ttk.Entry(schedWindow.fmeTime, textvariable=schedWindow.time, validate="focusout")
 		# schedWindow.txtST = ttk.Entry(schedWindow.fmeTime, textvariable=schedWindow.time, validate="focus")
 		# schedWindow.txtST.config(validatecommand=lambda: self.ss_validate(schedWindow))
+
+		# schedWindow.txtST = ttk.Entry(schedWindow.fmeTime, textvariable=schedWindow.time, validate="key")
+		# schedWindow.txtST = ttk.Entry(schedWindow.fmeTime, textvariable=schedWindow.time, validate="all")
+		# schedWindow.txtST.config(validatecommand=(lambda: self.ss_validate(schedWindow), "%P"))
 
 		schedWindow.txtST.grid(column=1, row=0, sticky="nsew")
 
@@ -5105,6 +5110,20 @@ class RFSwarmGUI(tk.Frame):
 					stime = "{:02}:{:02}:{:02}".format(int(stime[0:len(stime)-4]), int(stime[len(stime)-4:len(stime)-2]), int(stime[-2:]))
 		if stime.count(":")>1 and len(stime)!=8:
 			atime = stime.split(":")
+			base.debugmsg(5, "atime:", atime)
+			while len(atime)<2:
+				 atime.append(0)
+			for i in range(len(atime)):
+				base.debugmsg(5, "atime[",i,"]:", atime[i])
+				if len(atime[i])<1:
+					atime[i] = 0
+				elif len(atime[i])>2:
+					if int(atime[i])>60:
+						atime[i] = atime[i][0]
+					else:
+						atime[i] = int(atime[i])
+
+
 			stime = "{:02}:{:02}:{:02}".format(int(atime[0]),int(atime[1]),int(atime[2]))
 
 		# time.sleep(0.3)
