@@ -5094,7 +5094,11 @@ class RFSwarmGUI(tk.Frame):
 			schedWindow.fmeTime.grid_forget()
 
 	def ss_validate(self, schedWindow, *args):
-		# time.sleep(0.5)
+		ut = threading.Thread(target=self.ss_validate_def, args=(schedWindow,))
+		ut.start()
+
+	def ss_validate_def(self, schedWindow, *args):
+		time.sleep(0.5)
 		base.debugmsg(5, "schedWindow:", schedWindow, "	args:", args)
 
 		otime = schedWindow.time.get()
@@ -5128,6 +5132,8 @@ class RFSwarmGUI(tk.Frame):
 
 		# time.sleep(0.3)
 		if otime != schedWindow.time.get():
+			return 0
+		if otime == stime:
 			return 0
 		if len(stime)>3:
 			schedWindow.time.set(stime)
