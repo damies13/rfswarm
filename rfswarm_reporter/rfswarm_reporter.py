@@ -6,6 +6,7 @@
 #
 
 import sys
+import platform
 import os
 import signal
 
@@ -118,6 +119,8 @@ class ReporterCore:
 
 class ReporterGUI(tk.Frame):
 
+	style_text_colour = "#000"
+
 	def __init__(self, master=None):
 
 		self.root = tk.Tk()
@@ -142,12 +145,15 @@ class ReporterGUI(tk.Frame):
 
 		base.debugmsg(5, "BuildUI")
 		self.BuildUI()
+		self.BuildMenu()
 
 
 	def load_icons(self):
 		pass
 
 	def BuildUI(self):
+
+		self.ConfigureStyle()
 
 		self.bbar = tk.Frame(self)
 		self.bbar.grid(column=0, row=0, sticky="nsew")
@@ -160,8 +166,31 @@ class ReporterGUI(tk.Frame):
 		self.columnconfigure(0, weight=1)
 		self.rowconfigure(1, weight=1)
 
+		self.mainframe.rowconfigure(1, weight=1)
+
+		self.sections = tk.Frame(self.mainframe, relief=tk.SUNKEN, bd=3)
+		self.sections.grid(column=0, row=1, sticky="nsew")
+		# self.sections.config(bg="blue")
+		self.mainframe.columnconfigure(0, weight=1)
+
+		# self.btnShowHide = tk.StringVar()
+		# btnShowHide = tk.Button(self.mainframe, textvariable=self.btnShowHide, command=self.sections_show_hide, width=1, padx=0, pady=0, bd=0, relief=tk.FLAT, fg=self.style_text_colour)
+		# self.btnShowHide.set("<")
+		# btnShowHide.grid(column=1, row=1, sticky="nsew")
+		# btnShowHide.rowconfigure(1, weight=1)
 
 
+		self.content = tk.Frame(self.mainframe)
+		self.content.grid(column=2, row=1, columnspan=2, sticky="nsew")
+		# self.content.config(bg="lightblue")
+
+		self.mainframe.columnconfigure(2, weight=1)
+		self.mainframe.columnconfigure(3, weight=1)
+
+
+
+	def BuildMenu(self):
+		pass
 
 
 	def on_closing(self, _event=None, *extras):
@@ -173,6 +202,116 @@ class ReporterGUI(tk.Frame):
 			pass
 		base.debugmsg(5, "core.on_closing")
 		core.on_closing()
+
+	def ConfigureStyle(self):
+
+		# we really only seem to need this for MacOS 11 and up for now
+		# base.debugmsg(5, "sys.platform", sys.platform)
+		# base.debugmsg(5, "platform.system", platform.system())
+		# base.debugmsg(5, "platform.release", platform.release())
+		# base.debugmsg(5, "platform.mac_ver", platform.mac_ver())
+
+		if sys.platform.startswith('darwin'):
+			release, _, machine = platform.mac_ver()
+			split_ver = release.split('.')
+			if int(split_ver[0]) > 10:
+				# Theme settings for ttk
+				style = ttk.Style()
+				# https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/ttk-style-layer.html
+				# base.debugmsg(5, "style.layout", style.layout)
+				# # list = style.layout()
+				# # base.debugmsg(5, "list", list)
+				# base.debugmsg(5, "style.element_names", style.element_names)
+				# list = style.element_names()
+				# base.debugmsg(5, "list", list)
+				# base.debugmsg(5, "style.theme_names", style.theme_names)
+				# list = style.theme_names()
+				# base.debugmsg(5, "list", list)
+
+
+				# style.layout("rfsinput", style.layout('TEntry'))
+				# style.configure("rfsinput", **style.configure('TEntry'))
+				# style.map("rfsinput", **style.map('TEntry'))
+				# style.map("rfsinput",
+				#     fieldbackground=[(['!invalid','!disabled'], '#fff'),
+				#                      (['!invalid','disabled'], '#aaa')]
+				# )
+				# style.map("rfsinput",
+				#     fieldbackground=[(['!invalid','!disabled'], '#fff'),
+				#                      (['!invalid','disabled'], '#aaa'),
+				#                      (['invalid','!disabled'], '#ff4040'),
+				#                      (['invalid','disabled'], '#ffc0c0')]
+				# )
+				# style.configure("rfs.Entry", foreground="black")
+				# style.configure("rfs.Entry", foreground="systemControlTextColor")
+				# style.configure("rfs.Entry", foreground=self.rootBackground)	# systemWindowBackgroundColor
+				# base.debugmsg(5, "self.rootBackground", self.rootBackground)
+				# style.configure("rfs.Entry", foreground=self.rootBackground)	# systemControlTextColor
+
+				# style.configure("rfs.Entry", foreground="systemControlAccentColor")
+				# style.configure("rfs.Entry", foreground="systemControlTextColor")
+				# style.configure("rfs.Entry", foreground="systemDisabledControlTextColor")
+				# style.configure("rfs.Entry", foreground="systemLabelColor")
+				# style.configure("rfs.Entry", foreground="systemLinkColor")
+				# style.configure("rfsinput", foreground="systemPlaceholderTextColor")
+				# style.configure("rfs.Entry", foreground="systemSelectedTextBackgroundColor")
+				# style.configure("rfs.Entry", foreground="systemSelectedTextColor")
+				# style.configure("rfs.Entry", foreground="systemSeparatorColor")
+				# style.configure("rfs.Entry", foreground="systemTextBackgroundColor")
+				# style.configure("rfs.Entry", foreground="systemTextColor")
+
+				# style.layout("rfsinput", style.layout('TLabel'))
+				# style.configure("rfsinput", **style.configure('TLabel'))
+				# style.map("rfsinput", **style.map('TLabel'))
+				# style.configure("TLabel", foreground="systemPlaceholderTextColor")
+				style.configure("TLabel", foreground=self.style_text_colour)
+				style.configure("TEntry", foreground="systemPlaceholderTextColor")
+				# style.configure("TButton", foreground="systemPlaceholderTextColor")
+				style.configure("TButton", foreground=self.style_text_colour)
+				# style.configure("TCombobox", foreground="systemPlaceholderTextColor")
+				# style.configure("TCombobox", foreground=self.style_text_colour)
+				# style.configure("TComboBox", foreground=self.style_text_colour)
+				# style.configure("Combobox", foreground=self.style_text_colour)
+				# style.configure("ComboBox", foreground=self.style_text_colour)
+				#
+				# style.configure("OptionMenu", foreground=self.style_text_colour)
+				# style.configure("TOptionMenu", foreground=self.style_text_colour)
+				# style.configure("Optionmenu", foreground=self.style_text_colour)
+				# style.configure("TOptionmenu", foreground=self.style_text_colour)
+
+				# style.configure("Menubutton", foreground=self.style_text_colour)
+				style.configure("TMenubutton", foreground=self.style_text_colour)
+
+				# self.rfstheme["default"] = "systemPlaceholderTextColor"
+				# self.rfstheme["default"] = self.style_text_colour
+
+				# style.configure("Canvas", foreground=self.style_text_colour)
+				style.configure("Canvas", fill=self.style_text_colour)
+				style.configure("Canvas", activefill=self.style_text_colour)
+
+				# style.configure("Spinbox", foreground=self.style_text_colour)
+				style.configure("TSpinbox", foreground=self.style_text_colour)
+
+				style.configure("TRadiobutton", foreground=self.style_text_colour)
+
+
+
+	def sections_show_hide(self):
+		state = self.btnShowHide.get()
+		base.debugmsg(5, "state:", state)
+		if state == ">":
+			self.btnShowHide.set("<")
+			self.sections.grid(column=0, row=1, sticky="nsew")
+			self.mainframe.columnconfigure(0, weight=1)
+
+		else:
+			self.btnShowHide.set(">")
+			self.sections.grid_forget()
+			self.mainframe.columnconfigure(0, weight=0)
+
+
+
+
 
 
 class RFSwarm_Reporter():
