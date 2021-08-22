@@ -19,6 +19,11 @@ import threading
 
 import inspect
 
+import argparse
+import configparser
+import tempfile
+
+
 import tkinter as tk				#python3
 import tkinter.ttk as ttk			#python3
 import tkinter.filedialog as tkf	#python3
@@ -34,11 +39,15 @@ from matplotlib.figure import Figure
 
 class ReporterBase():
 	version="0.9.0"
-	debuglvl = 9
+	debuglvl = 0
 
+	save_ini = True
 	running = True
 	displaygui = True
 	gui = None
+	darkmode = False
+
+	settings = {}
 
 	def debugmsg(self, lvl, *msg):
 		msglst = []
@@ -79,6 +88,64 @@ class ReporterBase():
 			except:
 				pass
 
+	def findiniloctaion(self):
+
+		if self.args.ini:
+			self.debugmsg(1, "self.args.ini: ", self.args.ini)
+			return self.args.ini
+
+		inilocations = []
+
+		srcdir = os.path.join(os.path.dirname(__file__))
+		self.debugmsg(7, "srcdir[-2]: ", srcdir[-2:])
+		if srcdir[-2:] == "/.":
+			srcdir = srcdir[0:-2]
+		self.debugmsg(7, "srcdir: ", srcdir)
+
+		inifilename = "RFSwarmReporter.ini"
+		# default location for all previous versions
+		inilocations.append(os.path.join(srcdir, inifilename))
+		# probably best location
+		inilocations.append(os.path.join(os.path.expanduser("~"), ".rfswarm", inifilename))
+		# last resort location
+		inilocations.append(os.path.join(tempfile.gettempdir(), inifilename))
+
+		self.debugmsg(6, "inilocations: ", inilocations)
+
+
+		for iniloc in inilocations:
+			self.debugmsg(7, "iniloc: ", iniloc)
+			if os.path.isfile(iniloc):
+				self.debugmsg(7, "iniloc exists")
+				return iniloc
+			else:
+				# can we write to this location?
+				# 	if anything in the try statement fails then we can't so progress to next location
+				self.debugmsg(7, "iniloc can be created?")
+				try:
+					loc = os.path.dirname(iniloc)
+					self.debugmsg(7, "loc: ", loc)
+					self.debugmsg(7, "loc isdir:", os.path.isdir(loc))
+					if not os.path.isdir(loc):
+						self.debugmsg(7, "creating loc")
+						os.makedirs(loc)
+						self.debugmsg(7, "loc created")
+
+					self.debugmsg(7, "os.access(loc): ", os.access(loc, os.X_OK | os.W_OK))
+					if os.access(loc, os.X_OK | os.W_OK):
+						self.debugmsg(7, "iniloc can be created!")
+						return iniloc
+				except:
+					pass
+		# This should cause saveini to fail?
+		return None
+
+	def saveini(self):
+		self.debugmsg(6, "save_ini:", self.save_ini)
+		if self.save_ini:
+			with open(base.reporter_ini, 'w') as configfile:    # save
+				base.config.write(configfile)
+				self.debugmsg(6, "File Saved:", self.reporter_ini)
 
 
 class ReporterCore:
@@ -88,6 +155,53 @@ class ReporterCore:
 		base.debugmsg(0, "Robot Framework Swarm: Reporter")
 		base.debugmsg(0, "	Version", base.version)
 		signal.signal(signal.SIGINT, self.on_closing)
+
+		base.debugmsg(9, "ArgumentParser")
+		# Check for command line args
+		parser = argparse.ArgumentParser()
+		parser.add_argument('-g', '--debug', help='Set debug level, default level is 0')
+		parser.add_argument('-v', '--version', help='Display the version and exit', action='store_true')
+		parser.add_argument('-i', '--ini', help='path to alternate ini file') # nargs='?',
+		parser.add_argument('-n', '--nogui', help='Don\'t display the GUI', action='store_true')
+		parser.add_argument('-d', '--dir', help='Results directory')
+		parser.add_argument('-t', '--template', help='Specify the template')
+		base.args = parser.parse_args()
+
+
+		base.debugmsg(6, "base.args: ", base.args)
+
+		if base.args.debug:
+			base.debuglvl = int(base.args.debug)
+
+		if base.args.version:
+			exit()
+
+
+		base.debugmsg(6, "ConfigParser")
+		base.config = configparser.ConfigParser()
+
+		#
+		# 	ensure ini file
+		#
+		base.reporter_ini = base.findiniloctaion()
+
+		if base.args.ini:
+			base.save_ini = False
+			base.debugmsg(5, "base.args.ini: ", base.args.ini)
+			base.reporter_ini = base.args.ini
+
+		if os.path.isfile(base.reporter_ini):
+			base.debugmsg(7, "reporter_ini: ", base.reporter_ini)
+			base.config.read(base.reporter_ini)
+		else:
+			base.saveini()
+
+		base.debugmsg(0, "	Configuration File: ", base.reporter_ini)
+
+		base.debugmsg(9, "base.config: ", base.config._sections)
+
+
+
 
 		if base.displaygui:
 			base.gui = ReporterGUI()
@@ -123,6 +237,7 @@ class ReporterGUI(tk.Frame):
 	style_text_colour = "#000"
 	imgdata = {}
 	b64 = {}
+
 
 
 	def __init__(self, master=None):
@@ -231,6 +346,19 @@ class ReporterGUI(tk.Frame):
 		self.mainframe = tk.Frame(self)
 		self.mainframe.grid(column=0, row=1, sticky="nsew")
 		self.mainframe.config(bg="green")
+
+		self.stsbar = tk.Frame(self)
+		self.stsbar.grid(column=0, row=9, sticky="nsew")
+		self.stsbar.config(bg="pink")
+
+		# statusmsg
+		self.statusmsg = tk.StringVar()
+		self.stslbl = ttk.Label(self.stsbar, textvariable=self.statusmsg)
+		self.stslbl.grid(column=0, row=0, sticky="nsew")
+		self.stsbar.columnconfigure(0, weight=1)
+		self.stsbar.rowconfigure(0, weight=1)
+		self.statusmsg.set("test message")
+
 
 		self.columnconfigure(0, weight=1)
 		self.rowconfigure(1, weight=1)
