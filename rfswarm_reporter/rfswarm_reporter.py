@@ -47,6 +47,8 @@ class ReporterBase():
 	gui = None
 	darkmode = False
 
+	dir_path = os.path.dirname(os.path.realpath(__file__))
+
 	settings = {}
 
 	def debugmsg(self, lvl, *msg):
@@ -200,8 +202,43 @@ class ReporterCore:
 
 		base.debugmsg(9, "base.config: ", base.config._sections)
 
+		#
+		# GUI
+		#
+		if 'GUI' not in base.config:
+			base.config['GUI'] = {}
+			base.saveini()
+
+		if 'win_width' not in base.config['GUI']:
+			base.config['GUI']['win_width'] = "800"
+			base.saveini()
+
+		if 'win_height' not in base.config['GUI']:
+			base.config['GUI']['win_height'] = "390"
+			base.saveini()
+
+		#
+		# Reporter
+		#
+
+		if 'Reporter' not in base.config:
+			base.config['Reporter'] = {}
+			base.saveini()
+
+		if 'ResultDir' not in base.config['Reporter']:
+			base.config['Reporter']['ResultDir'] = base.dir_path
+			base.saveini()
+
+		if 'Results' not in base.config['Reporter']:
+			base.config['Reporter']['Results'] = ""
+			base.saveini()
+
+		if 'Template' not in base.config['Reporter']:
+			base.config['Reporter']['Template'] = ""
+			base.saveini()
 
 
+		self.selectResults(base.config['Reporter']['Results'])
 
 		if base.displaygui:
 			base.gui = ReporterGUI()
@@ -232,12 +269,27 @@ class ReporterCore:
 				pass
 
 
+	def selectResults(self, resultsfile):
+		pass
+		base.debugmsg(5, "resultsfile:", resultsfile)
+
+		if len(resultsfile)>0:
+			base.config['Reporter']['Results'] = resultsfile
+			filedir = os.path.dirname(resultsfile)
+			base.debugmsg(9, "filedir:", filedir)
+			parent = os.path.dirname(filedir)
+			base.debugmsg(9, "parent:", parent)
+			base.config['Reporter']['ResultDir'] = parent
+			base.saveini()
+
+
 class ReporterGUI(tk.Frame):
 
 	style_text_colour = "#000"
 	imgdata = {}
 	b64 = {}
 
+	titleprefix = "rfswarm Reporter"
 
 
 	def __init__(self, master=None):
@@ -249,11 +301,12 @@ class ReporterGUI(tk.Frame):
 		self.root.columnconfigure(0, weight=1)
 		self.root.rowconfigure(0, weight=1)
 
-		self.root.geometry("640" + "x" + "800")
+		self.root.geometry(base.config['GUI']['win_width'] + "x" + base.config['GUI']['win_height'])
 
 		self.root.resizable(True, True)
 
-		self.root.title("rfswarm Reporter")
+		base.debugmsg(6, "updateTitle")
+		self.updateTitle()
 
 		base.debugmsg(5, "self.root", self.root)
 		base.debugmsg(5, "self.root[background]", self.root["background"])
@@ -330,9 +383,51 @@ class ReporterGUI(tk.Frame):
 
 		self.b64["add.gif"] = b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00,|\x1d+~"&\x80\x1e/\x81)0\x81\'3\x83)8\x87.=\x8a2A\x8e5E\x8f9K\x92?Q\x95CN\x9a>U\x9bE]\x9dLb\xa0Me\xa2Ri\xa5Zh\xa6Vj\xabVl\xab[f\xacRu\xacat\xad_z\xb2d~\xb3h\x83\xb5kn\xb6V\x88\xb8op\xb9W\x87\xbaqt\xbb\\}\xbbk\x8a\xbcr}\xbde\x8b\xbfzp\xc2by\xc2c\x8d\xc3{|\xc4i\x92\xc6\x80~\xc8o\x89\xc9\x7f\x86\xcbz\x99\xcc\x86\x81\xcdu\x8d\xcd\x83\x99\xcd\x8a\x93\xce\x88\xa5\xcf\x94\x8a\xd0}\xa7\xd1\x97\x8e\xd3\x83\x99\xd4\x8b\x96\xd5\x8a\xac\xd5\x9e\x9e\xd9\x92\xa1\xda\x97\xb5\xda\xa6\xb8\xdb\xab\xa6\xdc\x9c\xb5\xdd\xaa\xbb\xde\xb0\xb0\xe0\xa7\xb6\xe0\xad\xbc\xe3\xb5\xcc\xe6\xc4\xc6\xe8\xc1\xcf\xe9\xca\xd5\xeb\xd0\xd8\xee\xd3\xdd\xf1\xd9\xe1\xf2\xdd\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00K\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xb1\x80K\x82\x83\x84\x85\x86"\x1b\x1b\x19\x17\x17\x86\x82"\x1f2CFE?!\x13\x11\x85\x90?IB=:@D\'\x0f\x0f\x84\x1f<H91/775B!\x0e\x83\x1d-G:7+JJ,(*A\x0e\x0b\x82\x1b>@/,!\xba\x15  6)\n\x82\x1aB6,\xba\xd5J\x1e(8\x08\x82\x19>3.\xd6\xba\x1e#\xda\x82\x1807(%\x16\xe2\x1e -$\x06\x82\x15\x16>&\xcb\xe2\x1c ;\t\xf2\x82\x11!|,\xf3\xc0A\xdf\x8e\n\xfe\x04Ax\xd0\xad\xc5\x88\x11-vP( \xa0\x90\x03\x06\rN\xd0\xa0A\x02\x01EGK\x14$@p\xc0\x00\x01\x90(\t\x05\x02\x00;'
 
+	def updateTitle(self):
+		titletext = "{} v{} - {}".format(self.titleprefix, base.version, "Please Select")
+		# ['Reporter']['ResultDir']
+		if 'Reporter' in base.config and 'Results' in base.config['Reporter']:
+			if len(base.config['Reporter']['Results'])>0:
+				titletext = "{} v{} - {}".format(self.titleprefix, base.version, base.config['Reporter']['Results'])
+
+		self.master.title(titletext)
+
+	def updateStatus(self):
+		newstatus = "Template: Untitled"
+		self.statusmsg.set(newstatus)
+
+
 
 	def BuildMenu(self):
-		pass
+		window = self.master
+		self.root.option_add('*tearOff', False)
+		root_menu = tk.Menu(window)
+		window.config(menu = root_menu)
+		results_menu = tk.Menu(root_menu) # it intializes a new su menu in the root menu
+		root_menu.add_cascade(label = "Results", menu = results_menu) # it creates the name of the sub menu
+
+		accelkey = "Ctrl"
+		if sys.platform.startswith('darwin'):
+			accelkey = "Command"
+
+		results_menu.add_command(label = "Open", command = self.mnu_results_Open, accelerator="{}-o".format(accelkey))
+		window.bind('o', self.mnu_results_Open)
+		results_menu.add_separator() # it adds a line after the 'Open files' option
+		results_menu.add_command(label = "Exit", command = self.on_closing, accelerator="{}-x".format(accelkey))
+		window.bind('x', self.on_closing)
+
+		self.template_menu = tk.Menu(root_menu)
+		root_menu.add_cascade(label = "Template", menu = self.template_menu)
+
+		self.template_menu.add_command(label = "New", command = self.mnu_template_New, accelerator="{}-n".format(accelkey)) # it adds a option to the sub menu 'command' parameter is used to do some action
+		window.bind('n', self.mnu_template_New)
+		self.template_menu.add_command(label = "Open", command = self.mnu_template_Open, accelerator="{}-t".format(accelkey))
+		window.bind('o', self.mnu_template_Open)
+		self.template_menu.add_command(label = "Save", command = self.mnu_template_Save, accelerator="{}-s".format(accelkey))
+		window.bind('s', self.mnu_template_Save)
+		self.template_menu.add_command(label = "Save As", command = self.mnu_template_SaveAs, accelerator="{}-a".format(accelkey))
+		window.bind('a', self.mnu_template_SaveAs)
+
 
 
 	def BuildUI(self):
@@ -357,8 +452,7 @@ class ReporterGUI(tk.Frame):
 		self.stslbl.grid(column=0, row=0, sticky="nsew")
 		self.stsbar.columnconfigure(0, weight=1)
 		self.stsbar.rowconfigure(0, weight=1)
-		self.statusmsg.set("test message")
-
+		self.updateStatus()
 
 		self.columnconfigure(0, weight=1)
 		self.rowconfigure(1, weight=1)
@@ -397,10 +491,18 @@ class ReporterGUI(tk.Frame):
 	def BuildToolBar(self):
 		btnno = 0
 
+		# Open Scenario Results
+		# 	"Open Scenario Results"	folder_table.png
+		icontext = "Open Scenario Results"
+		bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_results_Open)
+		bnew.grid(column=btnno, row=0, sticky="nsew")
+
+
+		btnno += 1
 		# New Report Template
 		#	"New Report Template"	page_add.png
 		icontext = "New Report Template"
-		bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_new_rpt_tmpl)
+		bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_template_New)
 		bnew.grid(column=btnno, row=0, sticky="nsew")
 
 
@@ -408,29 +510,22 @@ class ReporterGUI(tk.Frame):
 		# 	self.imgdata["Open Report Template"] = folder_page.png
 		btnno += 1
 		icontext = "Open Report Template"
-		bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_do_nothing)
+		bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_template_Open)
 		bnew.grid(column=btnno, row=0, sticky="nsew")
 
 		# Save Report Template
 		# 	"Save Report Template"	page_save.png
 		btnno += 1
 		icontext = "Save Report Template"
-		bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_do_nothing)
+		bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_template_Save)
 		bnew.grid(column=btnno, row=0, sticky="nsew")
 
-		# Open Scenario Results
-		# 	"Open Scenario Results"	folder_table.png
-		btnno += 1
-		icontext = "Open Scenario Results"
-		bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_do_nothing)
-		bnew.grid(column=btnno, row=0, sticky="nsew")
-
-		# Apply Report Template
-		# 	"Apply Report Template"	page_go.png
-		btnno += 1
-		icontext = "Apply Report Template"
-		bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_do_nothing)
-		bnew.grid(column=btnno, row=0, sticky="nsew")
+		# # Apply Report Template
+		# # 	"Apply Report Template"	page_go.png
+		# btnno += 1
+		# icontext = "Apply Report Template"
+		# bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_do_nothing)
+		# bnew.grid(column=btnno, row=0, sticky="nsew")
 
 		# page_excel.png
 		# page_word.png
@@ -455,8 +550,10 @@ class ReporterGUI(tk.Frame):
 		self.sectionstree.grid(column=0, row=0, sticky="nsew")
 
 
-		self.mnu_new_rpt_tmpl()
-
+		if len(base.config['Reporter']['Template']) <1:
+			self.mnu_template_New()
+		else
+			self.mnu_template_New()
 
 
 	def on_closing(self, _event=None, *extras):
@@ -596,12 +693,35 @@ class ReporterGUI(tk.Frame):
 			self.mainframe.columnconfigure(0, weight=0)
 
 
-
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+	#
+	# menu functions
+	#
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 	def mnu_do_nothing(self):
 		base.debugmsg(5, "Not implimented yet.....")
 
-	def mnu_new_rpt_tmpl(self):
+
+	def mnu_results_Open(self, _event=None):
+		base.debugmsg(9, "mnu_file_Open: _event:", _event, "	Type:", type(_event))
+
+		if type(_event) is not type(""):
+			# self.mnu_file_Close()	# ensure any previous scenario is closed and saved if required
+			ResultsFile = str(tkf.askopenfilename(initialdir=base.config['Reporter']['ResultDir'], title = "Select RFSwarm Results File", filetypes = (("RFSwarm Results","*.db"),("all files","*.*"))))
+		else:
+			ResultsFile = _event
+
+		base.debugmsg(5, "ResultsFile:", ResultsFile)
+
+		# ['Reporter']['Results']
+		if len(ResultsFile)>0:
+
+			core.selectResults(ResultsFile)
+			self.updateTitle()
+
+
+	def mnu_template_New(self, _event=None):
 		base.debugmsg(5, "New Report Template")
 
 		items = self.sectionstree.get_children("")
@@ -624,6 +744,23 @@ class ReporterGUI(tk.Frame):
 
 		# base.debugmsg(5, "New Report Template loaded")
 
+		self.updateStatus()
+
+
+	def mnu_template_Open(self, _event=None):
+		base.debugmsg(5, "Not implimented yet.....")
+		# self.updateStatus()
+
+	def mnu_template_Save(self, _event=None):
+		base.debugmsg(5, "Not implimented yet.....")
+		# self.updateStatus()
+
+	def mnu_template_SaveAs(self, _event=None):
+		base.debugmsg(5, "Not implimented yet.....")
+		# self.updateStatus()
+
+
+
 
 	def mnu_new_rpt_sect(self):
 		name = tksd.askstring(title="Test", prompt="What's your Name?:")
@@ -638,6 +775,10 @@ class ReporterGUI(tk.Frame):
 
 		items = self.sectionstree.get_children("")
 		self.sectionstree.insert("", "end", "{}".format(id), text="{}. {}".format(len(items), name))
+
+
+
+
 
 
 class RFSwarm_Reporter():
