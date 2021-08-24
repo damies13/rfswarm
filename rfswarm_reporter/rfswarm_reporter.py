@@ -47,6 +47,9 @@ class ReporterBase():
 	gui = None
 	darkmode = False
 
+	template = None
+	save_template = True
+
 	dir_path = os.path.dirname(os.path.realpath(__file__))
 
 	settings = {}
@@ -148,6 +151,38 @@ class ReporterBase():
 			with open(base.reporter_ini, 'w') as configfile:    # save
 				base.config.write(configfile)
 				self.debugmsg(6, "File Saved:", self.reporter_ini)
+
+	def template_create(self):
+		# base.template_create()
+		base.template = configparser.ConfigParser()
+		if "Template" not in base.template:
+			base.template["Template"] = {}
+		base.template["Template"]['order'] = ""
+		base.debugmsg(5, "base.template: ", base.template._sections)
+
+	def template_get_order(self):
+		if len(base.template["Template"]['order'])>0:
+			return base.template["Template"]['order'].split(',')
+		else:
+			return []
+
+	def template_set_order(self, orderlst):
+		base.debugmsg(5, "orderlst: ", orderlst)
+		base.template["Template"]['order'] = ",".join(orderlst)
+
+	def template_add_section(self, id, name):
+		if id not in base.template:
+			base.template[id] = {}
+		base.template[id]['Name'] = name
+		order = self.template_get_order()
+		base.debugmsg(5, "order: ", order)
+		order.append(id)
+		self.template_set_order(order)
+		base.debugmsg(5, "base.template: ", base.template._sections)
+
+
+		# base.template["Template"]['order'].index('ED299C2969A') # get index from list
+		# base.template["Template"]['order'].insert(1, base.template["Template"]['order'].pop(2)) # move item in list
 
 
 class ReporterCore:
@@ -552,7 +587,7 @@ class ReporterGUI(tk.Frame):
 
 		if len(base.config['Reporter']['Template']) <1:
 			self.mnu_template_New()
-		else
+		else:
 			self.mnu_template_New()
 
 
@@ -731,6 +766,7 @@ class ReporterGUI(tk.Frame):
 			for itm in items:
 				self.sectionstree.delete(itm)
 
+		base.template_create()
 		# self.reportsections = self.sectionstree.insert("", "end", "R", text="Report")
 
 		# self.sectionstree.insert(self.reportsections, "end", "0", text="Title Page")
@@ -770,9 +806,13 @@ class ReporterGUI(tk.Frame):
 	def new_rpt_sect(self, name):
 		id = "{:02X}".format(int(time.time()*10000))
 		# id = "{:02X}".format(int(time.time()*1000000))
-		# id = "{:02X}".format(time.time()) # cannot conver float
+		# id = "{:02X}".format(time.time()) # cannot convert float
 		base.debugmsg(5, "id:", id)
 
+		if base.template is None:
+			base.template_create()
+
+		base.template_add_section(id, name)
 		items = self.sectionstree.get_children("")
 		self.sectionstree.insert("", "end", "{}".format(id), text="{}. {}".format(len(items), name))
 
