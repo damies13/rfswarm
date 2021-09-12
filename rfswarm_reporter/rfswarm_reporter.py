@@ -52,6 +52,14 @@ class ReporterBase():
 
 	dir_path = os.path.dirname(os.path.realpath(__file__))
 
+	run_dbthread = True
+	dbthread = None
+	# datapath = ""
+	# dbfile = ""
+	datadb = None
+	dbqueue = {"Write": [], "Read": [], "ReadResult": {}, "Results": [], "Metric": [], "Metrics": []}
+
+
 	settings = {}
 
 	def debugmsg(self, lvl, *msg):
@@ -184,6 +192,112 @@ class ReporterBase():
 		# base.template["Template"]['order'].index('ED299C2969A') # get index from list
 		# base.template["Template"]['order'].insert(1, base.template["Template"]['order'].pop(2)) # move item in list
 
+	def open_results_db(self, dbpath):
+		self.close_results_db()
+		if self.datadb is None:
+			base.debugmsg(5, "Connect to DB")
+			self.datadb = sqlite3.connect(dbpath)
+
+	def close_results_db(self):
+		# base.config['Reporter']['Results']
+		if self.datadb is not None:
+			base.run_dbthread = False
+			base.debugmsg(5, "Disconnect and close DB")
+			self.datadb.commit()
+			self.datadb.close()
+			self.datadb = None
+
+	def run_db_thread(self):
+		while base.run_dbthread:
+			if (self.datadb is None):
+				base.debugmsg(9, "open results database")
+				# self.ensure_db()
+				# base.config['Reporter']['Results']
+				if len(base.config['Reporter']['Results'])>0:
+					self.open_results_db(base.config['Reporter']['Results'])
+				else:
+					base.run_dbthread = False
+
+			if self.datadb is not None:
+
+				# process db queues
+
+				# General Write
+				if len(base.dbqueue["Write"])>0:
+					base.debugmsg(9, "run_db_thread: dbqueue: Write")
+					tmpq = list(base.dbqueue["Write"])
+					base.dbqueue["Write"] = []
+					base.debugmsg(9, "run_db_thread: dbqueue: Write: tmpq:", tmpq)
+					for item in tmpq:
+						if item["SQL"] and item["VALUES"]:
+							try:
+								base.debugmsg(9, "run_db_thread: dbqueue: Write: SQL:", item["SQL"], " 	VALUES:", item["VALUES"])
+								cur = self.datadb.cursor()
+								cur.execute(item["SQL"], item["VALUES"])
+								cur.close()
+								self.datadb.commit()
+							except Exception as e:
+								base.debugmsg(1, "run_db_thread: dbqueue: Write: Exception:", e)
+								base.debugmsg(1, "run_db_thread: dbqueue: Write: Item:", item)
+						else:
+							base.debugmsg(1, "run_db_thread: dbqueue: Write: Item not written, missing key SQL or VALUES")
+							base.debugmsg(1, "run_db_thread: dbqueue: Write: Item:", item)
+
+				# General Read
+				if len(base.dbqueue["Read"])>0:
+					base.debugmsg(7, "run_db_thread: dbqueue: Read")
+					tmpq = list(base.dbqueue["Read"])
+					base.dbqueue["Read"] = []
+					base.debugmsg(7, "run_db_thread: dbqueue: Read: tmpq:", tmpq)
+					for item in tmpq:
+						if "SQL" in item: # and item["VALUES"]:
+							try:
+								base.debugmsg(7, "run_db_thread: dbqueue: Read: SQL:", item["SQL"])
+								self.datadb.row_factory = self.dict_factory
+								cur = self.datadb.cursor()
+								cur.execute(item["SQL"])
+								result = cur.fetchall()
+								base.debugmsg(7, "run_db_thread: dbqueue: Read: result:", result)
+								cur.close()
+								self.datadb.commit()
+
+								base.debugmsg(7, "run_db_thread: dbqueue: Read: result:", result)
+								if "KEY" in item:
+									base.dbqueue["ReadResult"][item["KEY"]] = result
+
+							except Exception as e:
+								base.debugmsg(1, "run_db_thread: dbqueue: Read: Exception:", e)
+								base.debugmsg(1, "run_db_thread: dbqueue: Read: Item:", item)
+						else:
+							base.debugmsg(1, "run_db_thread: dbqueue: Read: Item not written, missing key SQL or VALUES")
+							base.debugmsg(1, "run_db_thread: dbqueue: Read: Item:", item)
+
+
+
+			time.sleep(0.1)
+			# end of while base.run_dbthread
+
+		if self.datadb is not None:
+			# self.datadb.close()
+			# self.datadb = None
+			self.close_results_db()
+
+	def dict_factory(self, cursor, row):
+		d = {}
+		for idx, col in enumerate(cursor.description):
+			d[col[0]] = row[idx]
+		return d
+
+	def start_db(self):
+		base.run_dbthread = True
+		base.dbthread = threading.Thread(target=base.run_db_thread)
+		base.dbthread.start()
+
+	def stop_db(self):
+		base.run_dbthread = False
+		base.dbthread.join()
+		base.dbthread = None
+
 
 class ReporterCore:
 
@@ -293,6 +407,9 @@ class ReporterCore:
 		base.running = False
 		base.debugmsg(5, "base.running:", base.running)
 
+		base.debugmsg(5, "Close results db")
+		# base.close_results_db()
+		base.stop_db()
 
 		base.debugmsg(2, "Exit")
 		try:
@@ -316,6 +433,9 @@ class ReporterCore:
 			base.debugmsg(9, "parent:", parent)
 			base.config['Reporter']['ResultDir'] = parent
 			base.saveini()
+			# base.open_results_db(base.config['Reporter']['Results'])
+			base.start_db()
+
 
 
 class ReporterGUI(tk.Frame):
@@ -423,13 +543,33 @@ class ReporterGUI(tk.Frame):
 		# ['Reporter']['ResultDir']
 		if 'Reporter' in base.config and 'Results' in base.config['Reporter']:
 			if len(base.config['Reporter']['Results'])>0:
-				titletext = "{} v{} - {}".format(self.titleprefix, base.version, base.config['Reporter']['Results'])
+				path, filename= os.path.split(base.config['Reporter']['Results'])
+				basepath, dirname= os.path.split(path)
+				titletext = "{} v{} - {}".format(self.titleprefix, base.version, dirname)
 
 		self.master.title(titletext)
 
-	def updateStatus(self):
-		newstatus = "Template: Untitled"
+	def updateStatus(self, newstatus):
+		# newstatus = "Template: Untitled"
 		self.statusmsg.set(newstatus)
+
+	def updateResults(self):
+		# self.stsResults.set(base.config['Reporter']['Results'])
+		if base.config['Reporter']['Results']:
+			sres = "Results: {}".format(base.config['Reporter']['Results'])
+			self.stsResults.set(sres)
+		else:
+			sres = "Results: Please select a result file"
+			self.stsResults.set(sres)
+
+	def updateTemplate(self):
+		# self.stsTemplate.set(base.config['Reporter']['Results'])
+		if base.config['Reporter']['Template']:
+			stem = "Template: {}".format(base.config['Reporter']['Template'])
+			self.stsTemplate.set(stem)
+		else:
+			stem = "Template: Untitled"
+			self.stsTemplate.set(stem)
 
 
 
@@ -482,12 +622,23 @@ class ReporterGUI(tk.Frame):
 		self.stsbar.config(bg="pink")
 
 		# statusmsg
+		self.stsTemplate = tk.StringVar()
+		self.stsResults = tk.StringVar()
 		self.statusmsg = tk.StringVar()
+
+		self.ststmpl = ttk.Label(self.stsbar, textvariable=self.stsTemplate)
+		self.ststmpl.grid(column=0, row=0, sticky="nsew")
+		self.stsres = ttk.Label(self.stsbar, textvariable=self.stsResults)
+		self.stsres.grid(column=0, row=1, sticky="nsew")
 		self.stslbl = ttk.Label(self.stsbar, textvariable=self.statusmsg)
-		self.stslbl.grid(column=0, row=0, sticky="nsew")
+		self.stslbl.grid(column=0, row=3, sticky="nsew")
+
 		self.stsbar.columnconfigure(0, weight=1)
 		self.stsbar.rowconfigure(0, weight=1)
-		self.updateStatus()
+		self.updateStatus("")
+		self.updateResults()
+		self.updateTemplate()
+
 
 		self.columnconfigure(0, weight=1)
 		self.rowconfigure(1, weight=1)
@@ -754,6 +905,7 @@ class ReporterGUI(tk.Frame):
 
 			core.selectResults(ResultsFile)
 			self.updateTitle()
+			self.updateResults()
 
 
 	def mnu_template_New(self, _event=None):
@@ -778,29 +930,36 @@ class ReporterGUI(tk.Frame):
 		# self.sectionstree.insert("", "end", "2", text="2. Test Result Summary")
 		self.new_rpt_sect("Test Result Summary")
 
+
+		sql = "SELECT * FROM Results"
+		base.debugmsg(7, "sql:", sql)
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": "Results"})
+
+
+
 		# base.debugmsg(5, "New Report Template loaded")
 
-		self.updateStatus()
+		self.updateTemplate()
 
 
 	def mnu_template_Open(self, _event=None):
 		base.debugmsg(5, "Not implimented yet.....")
-		# self.updateStatus()
+		self.updateTemplate()
 
 	def mnu_template_Save(self, _event=None):
 		base.debugmsg(5, "Not implimented yet.....")
-		# self.updateStatus()
+		self.updateTemplate()
 
 	def mnu_template_SaveAs(self, _event=None):
 		base.debugmsg(5, "Not implimented yet.....")
-		# self.updateStatus()
+		self.updateTemplate()
 
 
 
 
 	def mnu_new_rpt_sect(self):
-		name = tksd.askstring(title="Test", prompt="What's your Name?:")
-		if len(name)>0:
+		name = tksd.askstring(title="New Section", prompt="Section Name:")
+		if name is not None and len(name)>0:
 			self.new_rpt_sect(name)
 
 	def new_rpt_sect(self, name):
