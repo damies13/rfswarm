@@ -163,20 +163,34 @@ class ReporterBase():
 	def template_create(self):
 		# base.template_create()
 		base.template = configparser.ConfigParser()
+		base.config['Reporter']['Template'] = ""
 		if "Template" not in base.template:
 			base.template["Template"] = {}
-		base.template["Template"]['order'] = ""
+		base.template["Template"]["Order"] = ""
+		# base.debugmsg(5, "template order:", base.template["Template"]["Order"])
 		base.debugmsg(5, "base.template: ", base.template._sections)
 
+		self.template_new_section("Executive Summary")
+		self.template_new_section("Test Result Summary")
+
+
 	def template_get_order(self):
-		if len(base.template["Template"]['order'])>0:
-			return base.template["Template"]['order'].split(',')
+		base.debugmsg(5, "template order:", base.template["Template"]["Order"])
+		if len(base.template["Template"]["Order"])>0:
+			return base.template["Template"]["Order"].split(',')
 		else:
 			return []
 
 	def template_set_order(self, orderlst):
 		base.debugmsg(5, "orderlst: ", orderlst)
-		base.template["Template"]['order'] = ",".join(orderlst)
+		base.template["Template"]["Order"] = ",".join(orderlst)
+
+	def template_new_section(self, name):
+		id = "{:02X}".format(int(time.time()*10000))
+		# id = "{:02X}".format(int(time.time()*1000000))
+		# id = "{:02X}".format(time.time()) # cannot convert float
+		base.debugmsg(5, "id:", id)
+		self.template_add_section(id, name)
 
 	def template_add_section(self, id, name):
 		if id not in base.template:
@@ -189,8 +203,38 @@ class ReporterBase():
 		base.debugmsg(5, "base.template: ", base.template._sections)
 
 
-		# base.template["Template"]['order'].index('ED299C2969A') # get index from list
-		# base.template["Template"]['order'].insert(1, base.template["Template"]['order'].pop(2)) # move item in list
+		# base.template["Template"]["Order"].index('ED299C2969A') # get index from list
+		# base.template["Template"]["Order"].insert(1, base.template["Template"]["Order"].pop(2)) # move item in list
+
+	def template_save(self, filename):
+		saved = False
+		if filename is None or len(filename)<1:
+			filename = base.config['Reporter']['Template']
+		with open(filename, 'w') as templatefile:    # save
+			base.template.write(templatefile)
+			self.debugmsg(6, "Template Saved:", filename)
+			saved = True
+		if saved:
+			base.config['Reporter']['Template'] = filename
+			path, file= os.path.split(base.config['Reporter']['Template'])
+			base.config['Reporter']['TemplateDir'] = path
+			base.saveini()
+
+
+	def template_open(self, filename):
+		if len(filename)>0 and os.path.isfile(filename):
+			base.debugmsg(7, "filename: ", filename)
+
+			base.config['Reporter']['Template'] = filename
+			path, file= os.path.split(base.config['Reporter']['Template'])
+			base.config['Reporter']['TemplateDir'] = path
+			base.saveini()
+
+			base.template = configparser.ConfigParser()
+			base.template.read(filename)
+		else:
+			base.template_create()
+
 
 	def open_results_db(self, dbpath):
 		self.close_results_db()
@@ -386,8 +430,14 @@ class ReporterCore:
 			base.config['Reporter']['Template'] = ""
 			base.saveini()
 
+		if 'TemplateDir' not in base.config['Reporter']:
+			base.config['Reporter']['TemplateDir'] = ""
+			base.saveini()
 
 		self.selectResults(base.config['Reporter']['Results'])
+
+		base.template_open(base.config['Reporter']['Template'])
+
 
 		if base.displaygui:
 			base.gui = ReporterGUI()
@@ -736,10 +786,26 @@ class ReporterGUI(tk.Frame):
 		self.sectionstree.grid(column=0, row=0, sticky="nsew")
 
 
-		if len(base.config['Reporter']['Template']) <1:
-			self.mnu_template_New()
-		else:
-			self.mnu_template_New()
+		# if len(base.config['Reporter']['Template']) <1:
+		# 	self.mnu_template_New()
+		# else:
+		# 	self.mnu_template_New()
+		self.LoadSections()
+
+	def LoadSections(self):
+		items = self.sectionstree.get_children("")
+		base.debugmsg(5, "items:", items)
+		if len(items)>0:
+			# self.sectionstree.delete(items)
+			for itm in items:
+				self.sectionstree.delete(itm)
+		self.sectionstree.insert("", "end", "RS", text="Report Settings")
+
+		sections = base.template_get_order()
+		base.debugmsg(5, "sections:", sections)
+		for sect in sections:
+			sect_name = "{}".format(base.template[sect]["Name"])
+			self.sectionstree.insert("", "end", sect, text=sect_name)
 
 
 	def on_closing(self, _event=None, *extras):
@@ -911,29 +977,22 @@ class ReporterGUI(tk.Frame):
 	def mnu_template_New(self, _event=None):
 		base.debugmsg(5, "New Report Template")
 
-		items = self.sectionstree.get_children("")
-		base.debugmsg(5, "items:", items)
-		if len(items)>0:
-			# self.sectionstree.delete(items)
-			for itm in items:
-				self.sectionstree.delete(itm)
-
 		base.template_create()
 		# self.reportsections = self.sectionstree.insert("", "end", "R", text="Report")
 
 		# self.sectionstree.insert(self.reportsections, "end", "0", text="Title Page")
 		# self.sectionstree.insert(self.reportsections, "end", "1", text="Executive Summary")
-		self.sectionstree.insert("", "end", "RS", text="Report Settings")
+		# self.sectionstree.insert("", "end", "RS", text="Report Settings")
 		# self.sectionstree.insert("", "end", "TC", text="Table of Contents")
 		# self.sectionstree.insert("", "end", "1", text="1. Executive Summary")
-		self.new_rpt_sect("Executive Summary")
+		# self.new_rpt_sect("Executive Summary")
 		# self.sectionstree.insert("", "end", "2", text="2. Test Result Summary")
-		self.new_rpt_sect("Test Result Summary")
+		# self.new_rpt_sect("Test Result Summary")
+		self.LoadSections()
 
-
-		sql = "SELECT * FROM Results"
-		base.debugmsg(7, "sql:", sql)
-		base.dbqueue["Read"].append({"SQL": sql, "KEY": "Results"})
+		# sql = "SELECT * FROM Results"
+		# base.debugmsg(7, "sql:", sql)
+		# base.dbqueue["Read"].append({"SQL": sql, "KEY": "Results"})
 
 
 
@@ -947,11 +1006,23 @@ class ReporterGUI(tk.Frame):
 		self.updateTemplate()
 
 	def mnu_template_Save(self, _event=None):
-		base.debugmsg(5, "Not implimented yet.....")
-		self.updateTemplate()
+		# base.debugmsg(5, "Not implimented yet.....")
+		base.debugmsg(5, "Filename:", base.config['Reporter']['Template'])
+		if len(base.config['Reporter']['Template'])>0:
+			base.template_save(base.config['Reporter']['Template'])
+			self.updateTemplate()
+		else:
+			self.mnu_template_SaveAs()
 
 	def mnu_template_SaveAs(self, _event=None):
-		base.debugmsg(5, "Not implimented yet.....")
+		base.debugmsg(5, "Prompt for filename")
+		templatefile = str(tkf.asksaveasfilename(\
+						initialdir=base.config['Reporter']['TemplateDir'], \
+						title = "Save RFSwarm Reporter Template", \
+						filetypes = (("Template","*.template"),("all files","*.*"))\
+						))
+		base.debugmsg(5, "templatefile", templatefile)
+		base.template_save(templatefile)
 		self.updateTemplate()
 
 
@@ -960,20 +1031,21 @@ class ReporterGUI(tk.Frame):
 	def mnu_new_rpt_sect(self):
 		name = tksd.askstring(title="New Section", prompt="Section Name:")
 		if name is not None and len(name)>0:
-			self.new_rpt_sect(name)
+			base.template_new_section(name)
 
-	def new_rpt_sect(self, name):
-		id = "{:02X}".format(int(time.time()*10000))
-		# id = "{:02X}".format(int(time.time()*1000000))
-		# id = "{:02X}".format(time.time()) # cannot convert float
-		base.debugmsg(5, "id:", id)
 
-		if base.template is None:
-			base.template_create()
-
-		base.template_add_section(id, name)
-		items = self.sectionstree.get_children("")
-		self.sectionstree.insert("", "end", "{}".format(id), text="{}. {}".format(len(items), name))
+	# def new_rpt_sect(self, name):
+	# 	id = "{:02X}".format(int(time.time()*10000))
+	# 	# id = "{:02X}".format(int(time.time()*1000000))
+	# 	# id = "{:02X}".format(time.time()) # cannot convert float
+	# 	base.debugmsg(5, "id:", id)
+	#
+	# 	if base.template is None:
+	# 		base.template_create()
+	#
+	# 	base.template_add_section(id, name)
+	# 	items = self.sectionstree.get_children("")
+	# 	self.sectionstree.insert("", "end", "{}".format(id), text="{}. {}".format(len(items), name))
 
 
 
