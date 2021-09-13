@@ -191,6 +191,7 @@ class ReporterBase():
 		# id = "{:02X}".format(time.time()) # cannot convert float
 		base.debugmsg(5, "id:", id)
 		self.template_add_section(id, name)
+		return id
 
 	def template_add_section(self, id, name):
 		if id not in base.template:
@@ -804,8 +805,11 @@ class ReporterGUI(tk.Frame):
 		sections = base.template_get_order()
 		base.debugmsg(5, "sections:", sections)
 		for sect in sections:
-			sect_name = "{}".format(base.template[sect]["Name"])
-			self.sectionstree.insert("", "end", sect, text=sect_name)
+			self.LoadSection(sect)
+
+	def LoadSection(self, sectionID):
+		sect_name = "{}".format(base.template[sectionID]["Name"])
+		self.sectionstree.insert("", "end", sectionID, text=sect_name)
 
 
 	def on_closing(self, _event=None, *extras):
@@ -1003,7 +1007,14 @@ class ReporterGUI(tk.Frame):
 
 	def mnu_template_Open(self, _event=None):
 		base.debugmsg(5, "Not implimented yet.....")
-		self.updateTemplate()
+		TemplateFile = str(tkf.askopenfilename(initialdir=base.config['Reporter']['TemplateDir'], title = "Select RFSwarm Reporter Template", filetypes = (("RFSwarm Reporter Template","*.template"),("all files","*.*"))))
+		base.debugmsg(5, "TemplateFile:", TemplateFile)
+
+		# ['Reporter']['Results']
+		if len(TemplateFile)>0:
+			base.template_open(TemplateFile)
+			self.LoadSections()
+			self.updateTemplate()
 
 	def mnu_template_Save(self, _event=None):
 		# base.debugmsg(5, "Not implimented yet.....")
@@ -1031,7 +1042,8 @@ class ReporterGUI(tk.Frame):
 	def mnu_new_rpt_sect(self):
 		name = tksd.askstring(title="New Section", prompt="Section Name:")
 		if name is not None and len(name)>0:
-			base.template_new_section(name)
+			id = base.template_new_section(name)
+			self.LoadSection(id)
 
 
 	# def new_rpt_sect(self, name):
