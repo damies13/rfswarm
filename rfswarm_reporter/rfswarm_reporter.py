@@ -869,17 +869,23 @@ class ReporterGUI(tk.Frame):
 			# self.sectionstree.delete(items)
 			for itm in items:
 				self.sectionstree.delete(itm)
-		self.sectionstree.insert("", "end", "RS", text="Report Settings")
+		self.sectionstree.insert("", "end", "TOP", text="Report", open=True, tags="TOP")
 
 		sections = base.template_get_order()
 		base.debugmsg(5, "sections:", sections)
 		for sect in sections:
-			self.LoadSection(sect)
+			self.LoadSection("TOP", sect)
+		# self.sectionstree.see("RS")
 
-	def LoadSection(self, sectionID):
+		# self.sectionstree.tag_bind("TOP", sequence=None, callback=self.sect_click_top)
+		# self.sectionstree.tag_bind("Sect", sequence=None, callback=self.sect_click_sect)
+		self.sectionstree.tag_bind("TOP", callback=self.sect_click_top)
+		self.sectionstree.tag_bind("Sect", callback=self.sect_click_sect)
+
+	def LoadSection(self, ParentID, sectionID):
 		sect_name = "{}".format(base.template[sectionID]["Name"])
-		self.sectionstree.insert("", "end", sectionID, text=sect_name)
-
+		self.sectionstree.insert(ParentID, "end", sectionID, text=sect_name, tags="Sect")
+		# self.sectionstree.see(sectionID)
 
 	def on_closing(self, _event=None, *extras):
 		try:
@@ -1018,6 +1024,14 @@ class ReporterGUI(tk.Frame):
 			self.mainframe.columnconfigure(0, weight=0)
 
 
+	def sect_click_top(self):
+		selected = self.sectionstree.focus()
+		base.debugmsg(5, "selected:", selected)
+
+	def sect_click_sect(self):
+		selected = self.sectionstree.focus()
+		base.debugmsg(5, "selected:", selected)
+
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
 	# menu functions
@@ -1131,7 +1145,8 @@ class ReporterGUI(tk.Frame):
 			base.debugmsg(5, "Moving", base.template[selected]["Name"], "up")
 			base.template_move_section_up(selected)
 			self.LoadSections()
-			# self.sectionstree.selection_set(selected)
+			self.sectionstree.selection_set(selected)
+			self.sectionstree.focus(selected)
 
 	def mnu_rpt_sect_down(self):
 		selected = self.sectionstree.focus()
@@ -1140,8 +1155,8 @@ class ReporterGUI(tk.Frame):
 			base.debugmsg(5, "Moving", base.template[selected]["Name"], "down")
 			base.template_move_section_down(selected)
 			self.LoadSections()
-			# self.sectionstree.selection_set(selected)
-			# self.sectionstree.selection_toggle(selected)
+			self.sectionstree.selection_set(selected)
+			self.sectionstree.focus(selected)
 
 
 
