@@ -3382,8 +3382,13 @@ class RFSwarmGUI(tk.Frame):
 		# 	file_menu.add_command(label = "Quit", command = self.on_closing, accelerator="Command-q")
 		# 	window.bind('q', self.on_closing)  # This doesn't work yet, the mac python overrides it ?
 		# else:
-		file_menu.add_command(label = "Exit", command = self.on_closing, accelerator="{}-x".format(accelkey))
-		window.bind('x', self.on_closing)
+		if sys.platform.startswith('darwin'):
+			# https://tkdocs.com/tutorial/menus.html
+			# root.createcommand('tk::mac::ShowPreferences', showMyPreferencesDialog)
+			self.root.createcommand('tk::mac::Quit', self.on_closing)
+		else:
+			file_menu.add_command(label = "Exit", command = self.on_closing, accelerator="{}-x".format(accelkey))
+			window.bind('x', self.on_closing)
 
 		# creating another sub menu
 		run_menu = tk.Menu(root_menu)

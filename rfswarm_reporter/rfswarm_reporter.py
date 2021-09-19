@@ -170,8 +170,8 @@ class ReporterBase():
 		# base.debugmsg(5, "template order:", base.template["Template"]["Order"])
 		base.debugmsg(5, "base.template: ", base.template._sections)
 
-		self.template_new_section("Executive Summary")
-		self.template_new_section("Test Result Summary")
+		self.template_new_section("TOP", "Executive Summary")
+		self.template_new_section("TOP", "Test Result Summary")
 
 
 	def template_get_order(self):
@@ -185,15 +185,16 @@ class ReporterBase():
 		base.debugmsg(5, "orderlst: ", orderlst)
 		base.template["Template"]["Order"] = ",".join(orderlst)
 
-	def template_new_section(self, name):
+	def template_new_section(self, parent, name):
 		id = "{:02X}".format(int(time.time()*10000))
 		# id = "{:02X}".format(int(time.time()*1000000))
 		# id = "{:02X}".format(time.time()) # cannot convert float
 		base.debugmsg(5, "id:", id)
-		self.template_add_section(id, name)
+		self.template_add_section(parent, id, name)
 		return id
 
-	def template_add_section(self, id, name):
+	def template_add_section(self, parent, id, name):
+		base.debugmsg(5, "parent: ", parent)
 		if id not in base.template:
 			base.template[id] = {}
 		base.template[id]['Name'] = name
@@ -674,6 +675,14 @@ class ReporterGUI(tk.Frame):
 		window = self.master
 		self.root.option_add('*tearOff', False)
 		root_menu = tk.Menu(window)
+
+		if sys.platform.startswith('darwin'):
+			appmenu = tk.Menu(root_menu, name='apple')
+			root_menu.add_cascade(menu=appmenu)
+			appmenu.add_command(label='About rfswarm Reporter')
+			appmenu.add_separator()
+			base.debugmsg(5, "appmenu:", appmenu)
+
 		window.config(menu = root_menu)
 		results_menu = tk.Menu(root_menu) # it intializes a new su menu in the root menu
 		root_menu.add_cascade(label = "Results", menu = results_menu) # it creates the name of the sub menu
@@ -685,8 +694,14 @@ class ReporterGUI(tk.Frame):
 		results_menu.add_command(label = "Open", command = self.mnu_results_Open, accelerator="{}-o".format(accelkey))
 		window.bind('o', self.mnu_results_Open)
 		results_menu.add_separator() # it adds a line after the 'Open files' option
-		results_menu.add_command(label = "Exit", command = self.on_closing, accelerator="{}-x".format(accelkey))
-		window.bind('x', self.on_closing)
+
+		if sys.platform.startswith('darwin'):
+			# https://tkdocs.com/tutorial/menus.html
+			# root.createcommand('tk::mac::ShowPreferences', showMyPreferencesDialog)
+			self.root.createcommand('tk::mac::Quit', self.on_closing)
+		else:
+			results_menu.add_command(label = "Exit", command = self.on_closing, accelerator="{}-x".format(accelkey))
+			window.bind('x', self.on_closing)
 
 		self.template_menu = tk.Menu(root_menu)
 		root_menu.add_cascade(label = "Template", menu = self.template_menu)
@@ -852,9 +867,12 @@ class ReporterGUI(tk.Frame):
 
 		#	https://pythonguides.com/python-tkinter-treeview/
 		self.sectionstree = ttk.Treeview(self.sections, selectmode='browse', show='tree')
+		# self.sectionstree = ttk.Treeview(self.sections, selectmode='extended', show='tree')
+
 		self.sectionstree.grid(column=0, row=0, sticky="nsew")
 		self.sectionstree.grid(column=0, row=0, sticky="nsew")
 
+		# self.sectionstree.bind("<Button-1>", self.sect_click_sect)
 
 		# if len(base.config['Reporter']['Template']) <1:
 		# 	self.mnu_template_New()
@@ -1024,13 +1042,29 @@ class ReporterGUI(tk.Frame):
 			self.mainframe.columnconfigure(0, weight=0)
 
 
-	def sect_click_top(self):
+	def sect_click_top(self, *args):
 		selected = self.sectionstree.focus()
 		base.debugmsg(5, "selected:", selected)
 
-	def sect_click_sect(self):
+	def sect_click_sect(self, *args):
 		selected = self.sectionstree.focus()
 		base.debugmsg(5, "selected:", selected)
+		base.debugmsg(5, "args:", args, args[0].x)
+		xmin = 0
+		xmax = 0
+		bbox = self.sectionstree.bbox(selected)
+		base.debugmsg(5, "bbox:", bbox)
+		if bbox:
+			xmin = bbox[1]
+			xmax = bbox[1]+bbox[3]
+
+		if xmin > args[0].x < xmax:
+			# unfocus
+			# self.sectionstree.selection_set(selected)
+			# self.sectionstree.selection_toggle(selected)
+			self.sectionstree.selection_remove(selected)
+			self.sectionstree.focus("")
+			pass
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -1123,10 +1157,14 @@ class ReporterGUI(tk.Frame):
 
 
 	def mnu_new_rpt_sect(self):
+		selected = self.sectionstree.focus()
+		base.debugmsg(5, "selected:", selected)
 		name = tksd.askstring(title="New Section", prompt="Section Name:")
 		if name is not None and len(name)>0:
-			id = base.template_new_section(name)
-			self.LoadSection(id)
+			if selected is None or len(selected)<1:
+				selected = "TOP"
+			id = base.template_new_section(selected, name)
+			self.LoadSection(selected, id)
 
 
 	def mnu_rem_rpt_sect(self):
