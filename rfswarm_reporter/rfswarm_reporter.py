@@ -174,16 +174,26 @@ class ReporterBase():
 		self.template_new_section("TOP", "Test Result Summary")
 
 
-	def template_get_order(self):
-		base.debugmsg(5, "template order:", base.template["Template"]["Order"])
-		if len(base.template["Template"]["Order"])>0:
-			return base.template["Template"]["Order"].split(',')
+	def template_get_order(self, parent):
+		if parent == "TOP":
+			base.debugmsg(5, "template order:", base.template["Template"]["Order"])
+			if len(base.template["Template"]["Order"])>0:
+				return base.template["Template"]["Order"].split(',')
+			else:
+				return []
 		else:
-			return []
+			base.debugmsg(5, "parent order:", base.template[parent])
+			if "Order" in base.template[parent]:
+				return base.template[parent]["Order"].split(',')
+			else:
+				return []
 
-	def template_set_order(self, orderlst):
-		base.debugmsg(5, "orderlst: ", orderlst)
-		base.template["Template"]["Order"] = ",".join(orderlst)
+	def template_set_order(self, parent, orderlst):
+		base.debugmsg(5, "parent:", parent, "	orderlst: ", orderlst)
+		if parent == "TOP":
+			base.template["Template"]["Order"] = ",".join(orderlst)
+		else:
+			base.template[parent]["Order"] = ",".join(orderlst)
 
 	def template_new_section(self, parent, name):
 		id = "{:02X}".format(int(time.time()*10000))
@@ -198,43 +208,54 @@ class ReporterBase():
 		if id not in base.template:
 			base.template[id] = {}
 		base.template[id]['Name'] = name
-		order = self.template_get_order()
+		base.template[id]['Parent'] = parent
+		order = self.template_get_order(parent)
 		base.debugmsg(5, "order: ", order)
 		order.append(id)
-		self.template_set_order(order)
+		self.template_set_order(parent, order)
 		base.debugmsg(5, "base.template: ", base.template._sections)
 
+
+	def template_item_parent(self, id):
+		if 'Parent' in base.template[id]:
+			return base.template[id]['Parent']
+		else:
+			return "TOP"
+
 	def template_remove_section(self, id):
-		order = self.template_get_order()
+		parent = self.template_item_parent(id)
+		order = self.template_get_order(parent)
 		base.debugmsg(5, "order: ", order)
 		pos = order.index(id)
 		base.debugmsg(5, "pos: ", pos)
 		order.pop(pos)
 		base.debugmsg(5, "order: ", order)
-		self.template_set_order(order)
+		self.template_set_order(parent, order)
 		base.debugmsg(5, "base.template: ", base.template._sections)
 		del base.template[id]
 		base.debugmsg(5, "base.template: ", base.template._sections)
 
 	def template_move_section_up(self, id):
-		order = self.template_get_order()
+		parent = self.template_item_parent(id)
+		order = self.template_get_order(parent)
 		base.debugmsg(5, "order: ", order)
 		pos = order.index(id)
 		base.debugmsg(5, "pos: ", pos)
 		order.pop(pos)
 		order.insert(pos -1, id)
 		base.debugmsg(5, "order: ", order)
-		self.template_set_order(order)
+		self.template_set_order(parent, order)
 
 	def template_move_section_down(self, id):
-		order = self.template_get_order()
+		parent = self.template_item_parent(id)
+		order = self.template_get_order(parent)
 		base.debugmsg(5, "order: ", order)
 		pos = order.index(id)
 		base.debugmsg(5, "pos: ", pos)
 		order.pop(pos)
 		order.insert(pos +1, id)
 		base.debugmsg(5, "order: ", order)
-		self.template_set_order(order)
+		self.template_set_order(parent, order)
 
 		# base.template["Template"]["Order"].index('ED299C2969A') # get index from list
 		# base.template["Template"]["Order"].insert(1, base.template["Template"]["Order"].pop(2)) # move item in list
@@ -878,31 +899,34 @@ class ReporterGUI(tk.Frame):
 		# 	self.mnu_template_New()
 		# else:
 		# 	self.mnu_template_New()
-		self.LoadSections()
+		self.LoadSections("TOP")
 
-	def LoadSections(self):
-		items = self.sectionstree.get_children("")
-		base.debugmsg(5, "items:", items)
-		if len(items)>0:
-			# self.sectionstree.delete(items)
-			for itm in items:
-				self.sectionstree.delete(itm)
-		self.sectionstree.insert("", "end", "TOP", text="Report", open=True, tags="TOP")
+	def LoadSections(self, ParentID):
+		if ParentID == "TOP":
+			items = self.sectionstree.get_children("")
+			base.debugmsg(5, "items:", items)
+			if len(items)>0:
+				# self.sectionstree.delete(items)
+				for itm in items:
+					self.sectionstree.delete(itm)
+			self.sectionstree.insert("", "end", ParentID, text="Report", open=True, tags=ParentID)
 
-		sections = base.template_get_order()
+		sections = base.template_get_order(ParentID)
 		base.debugmsg(5, "sections:", sections)
 		for sect in sections:
-			self.LoadSection("TOP", sect)
+			self.LoadSection(ParentID, sect)
 		# self.sectionstree.see("RS")
 
 		# self.sectionstree.tag_bind("TOP", sequence=None, callback=self.sect_click_top)
 		# self.sectionstree.tag_bind("Sect", sequence=None, callback=self.sect_click_sect)
-		self.sectionstree.tag_bind("TOP", callback=self.sect_click_top)
+		self.sectionstree.tag_bind(ParentID, callback=self.sect_click_top)
 		self.sectionstree.tag_bind("Sect", callback=self.sect_click_sect)
 
 	def LoadSection(self, ParentID, sectionID):
 		sect_name = "{}".format(base.template[sectionID]["Name"])
 		self.sectionstree.insert(ParentID, "end", sectionID, text=sect_name, tags="Sect")
+		if "Order" in base.template[sectionID]:
+			self.LoadSections(sectionID)
 		# self.sectionstree.see(sectionID)
 
 	def on_closing(self, _event=None, *extras):
@@ -1109,7 +1133,7 @@ class ReporterGUI(tk.Frame):
 		# self.new_rpt_sect("Executive Summary")
 		# self.sectionstree.insert("", "end", "2", text="2. Test Result Summary")
 		# self.new_rpt_sect("Test Result Summary")
-		self.LoadSections()
+		self.LoadSections("TOP")
 
 		# sql = "SELECT * FROM Results"
 		# base.debugmsg(7, "sql:", sql)
@@ -1130,7 +1154,7 @@ class ReporterGUI(tk.Frame):
 		# ['Reporter']['Results']
 		if len(TemplateFile)>0:
 			base.template_open(TemplateFile)
-			self.LoadSections()
+			self.LoadSections("TOP")
 			self.updateTemplate()
 
 	def mnu_template_Save(self, _event=None):
@@ -1173,7 +1197,7 @@ class ReporterGUI(tk.Frame):
 		if selected:
 			base.debugmsg(5, "Removing:", base.template[selected]["Name"])
 			base.template_remove_section(selected)
-			self.LoadSections()
+			self.LoadSections("TOP")
 
 
 	def mnu_rpt_sect_up(self):
@@ -1182,7 +1206,7 @@ class ReporterGUI(tk.Frame):
 		if selected:
 			base.debugmsg(5, "Moving", base.template[selected]["Name"], "up")
 			base.template_move_section_up(selected)
-			self.LoadSections()
+			self.LoadSections("TOP")
 			self.sectionstree.selection_set(selected)
 			self.sectionstree.focus(selected)
 
@@ -1192,7 +1216,7 @@ class ReporterGUI(tk.Frame):
 		if selected:
 			base.debugmsg(5, "Moving", base.template[selected]["Name"], "down")
 			base.template_move_section_down(selected)
-			self.LoadSections()
+			self.LoadSections("TOP")
 			self.sectionstree.selection_set(selected)
 			self.sectionstree.focus(selected)
 
