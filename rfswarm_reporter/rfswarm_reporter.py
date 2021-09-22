@@ -217,7 +217,7 @@ class ReporterBase():
 
 
 	def template_item_parent(self, id):
-		if 'Parent' in base.template[id]:
+		if id in base.template and 'Parent' in base.template[id]:
 			return base.template[id]['Parent']
 		else:
 			return "TOP"
@@ -232,6 +232,9 @@ class ReporterBase():
 		base.debugmsg(5, "order: ", order)
 		self.template_set_order(parent, order)
 		base.debugmsg(5, "base.template: ", base.template._sections)
+		subitems = self.template_get_order(id)
+		for item in subitems:
+			self.template_remove_section(item)
 		del base.template[id]
 		base.debugmsg(5, "base.template: ", base.template._sections)
 
@@ -785,8 +788,10 @@ class ReporterGUI(tk.Frame):
 
 		self.sections = tk.Frame(self.mainframe, relief=tk.SUNKEN, bd=3)
 		self.sections.grid(column=0, row=1, sticky="nsew")
-		# self.sections.config(bg="blue")
+		# self.sections.config(bg="cyan")
 		self.mainframe.columnconfigure(0, weight=1)
+		self.sections.columnconfigure(0, weight=1)
+		self.sections.rowconfigure(0, weight=1)
 
 		# self.btnShowHide = tk.StringVar()
 		# btnShowHide = tk.Button(self.mainframe, textvariable=self.btnShowHide, command=self.sections_show_hide, width=1, padx=0, pady=0, bd=0, relief=tk.FLAT, fg=self.style_text_colour)
@@ -891,7 +896,18 @@ class ReporterGUI(tk.Frame):
 		# self.sectionstree = ttk.Treeview(self.sections, selectmode='extended', show='tree')
 
 		self.sectionstree.grid(column=0, row=0, sticky="nsew")
-		self.sectionstree.grid(column=0, row=0, sticky="nsew")
+		# ttk.Style().configure("Treeview", background="pink")
+		# ttk.Style().configure("Treeview", fieldbackground="orange")
+
+		# vsb = ttk.Scrollbar(self.sections, orient=tk.VERTICAL,command=self.sectionstree.yview)
+		vsb = ttk.Scrollbar(self.sections, orient="vertical", command=self.sectionstree.yview)
+		self.sectionstree.configure(yscrollcommand=vsb.set)
+		vsb.grid(column=1, row=0, sticky="nsew")
+
+		# hsb = ttk.Scrollbar(self.sections, orient=tk.HORIZONTAL,command=self.sectionstree.xview)
+		hsb = ttk.Scrollbar(self.sections, orient="horizontal", command=self.sectionstree.xview)
+		self.sectionstree.configure(xscrollcommand=hsb.set)
+		hsb.grid(column=0, row=1, sticky="nsew")
 
 		# self.sectionstree.bind("<Button-1>", self.sect_click_sect)
 
@@ -910,6 +926,14 @@ class ReporterGUI(tk.Frame):
 				for itm in items:
 					self.sectionstree.delete(itm)
 			self.sectionstree.insert("", "end", ParentID, text="Report", open=True, tags=ParentID)
+		else:
+			items = self.sectionstree.get_children(ParentID)
+			base.debugmsg(5, "items:", items)
+			if len(items)>0:
+				# self.sectionstree.delete(items)
+				for itm in items:
+					self.sectionstree.delete(itm)
+
 
 		sections = base.template_get_order(ParentID)
 		base.debugmsg(5, "sections:", sections)
@@ -1197,7 +1221,8 @@ class ReporterGUI(tk.Frame):
 		if selected:
 			base.debugmsg(5, "Removing:", base.template[selected]["Name"])
 			base.template_remove_section(selected)
-			self.LoadSections("TOP")
+			parent = base.template_item_parent(selected)
+			self.LoadSections(parent)
 
 
 	def mnu_rpt_sect_up(self):
@@ -1206,7 +1231,8 @@ class ReporterGUI(tk.Frame):
 		if selected:
 			base.debugmsg(5, "Moving", base.template[selected]["Name"], "up")
 			base.template_move_section_up(selected)
-			self.LoadSections("TOP")
+			parent = base.template_item_parent(selected)
+			self.LoadSections(parent)
 			self.sectionstree.selection_set(selected)
 			self.sectionstree.focus(selected)
 
@@ -1216,7 +1242,8 @@ class ReporterGUI(tk.Frame):
 		if selected:
 			base.debugmsg(5, "Moving", base.template[selected]["Name"], "down")
 			base.template_move_section_down(selected)
-			self.LoadSections("TOP")
+			parent = base.template_item_parent(selected)
+			self.LoadSections(parent)
 			self.sectionstree.selection_set(selected)
 			self.sectionstree.focus(selected)
 
