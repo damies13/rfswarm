@@ -802,7 +802,7 @@ class ReporterGUI(tk.Frame):
 
 		self.content = tk.Frame(self.mainframe)
 		self.content.grid(column=2, row=1, columnspan=2, sticky="nsew")
-		# self.content.config(bg="lightblue")
+		self.content.config(bg="lightblue")
 
 		self.mainframe.columnconfigure(2, weight=1)
 		self.mainframe.columnconfigure(3, weight=1)
@@ -1120,6 +1120,24 @@ class ReporterGUI(tk.Frame):
 
 		# load section pane
 
+		self.content_settings(clicked)
+		self.content_preview(clicked)
+
+	def content_settings(self, id):
+		base.debugmsg(5, "id:", id)
+		# self.content
+		self.contentsettings = tk.Frame(self.content)
+		self.contentsettings.config(bg="linen")
+
+		self.contentsettings.grid(column=0, row=0, columnspan=2, sticky="nsew")
+		self.content.columnconfigure(0, weight=1)
+		self.content.rowconfigure(0, weight=1)
+
+	def content_preview(self, id):
+		base.debugmsg(5, "id:", id)
+		self.contentpreview = tk.Frame(self.content)
+		self.contentpreview.config(bg="salmon")
+		# self.contentpreview.grid(column=0, row=0, columnspan=2, sticky="nsew")
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
