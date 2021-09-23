@@ -183,7 +183,7 @@ class ReporterBase():
 				return []
 		else:
 			base.debugmsg(5, "parent order:", base.template[parent])
-			if "Order" in base.template[parent]:
+			if "Order" in base.template[parent] and len(base.template[parent]["Order"])>0:
 				return base.template[parent]["Order"].split(',')
 			else:
 				return []
@@ -909,7 +909,7 @@ class ReporterGUI(tk.Frame):
 		self.sectionstree.configure(xscrollcommand=hsb.set)
 		hsb.grid(column=0, row=1, sticky="nsew")
 
-		# self.sectionstree.bind("<Button-1>", self.sect_click_sect)
+		self.sectionstree.bind("<Button-1>", self.sect_click_sect)
 
 		# if len(base.config['Reporter']['Template']) <1:
 		# 	self.mnu_template_New()
@@ -943,11 +943,14 @@ class ReporterGUI(tk.Frame):
 
 		# self.sectionstree.tag_bind("TOP", sequence=None, callback=self.sect_click_top)
 		# self.sectionstree.tag_bind("Sect", sequence=None, callback=self.sect_click_sect)
-		self.sectionstree.tag_bind(ParentID, callback=self.sect_click_top)
+		# self.sectionstree.tag_bind(ParentID, callback=self.sect_click_top)
 		self.sectionstree.tag_bind("Sect", callback=self.sect_click_sect)
 
 	def LoadSection(self, ParentID, sectionID):
+		base.debugmsg(5, "ParentID:", ParentID, "	sectionID:", sectionID)
 		sect_name = "{}".format(base.template[sectionID]["Name"])
+		base.debugmsg(5, "sect_name:", sect_name)
+
 		self.sectionstree.insert(ParentID, "end", sectionID, text=sect_name, tags="Sect")
 		if "Order" in base.template[sectionID]:
 			self.LoadSections(sectionID)
@@ -1095,24 +1098,28 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "selected:", selected)
 
 	def sect_click_sect(self, *args):
-		selected = self.sectionstree.focus()
-		base.debugmsg(5, "selected:", selected)
-		base.debugmsg(5, "args:", args, args[0].x)
-		xmin = 0
-		xmax = 0
-		bbox = self.sectionstree.bbox(selected)
-		base.debugmsg(5, "bbox:", bbox)
-		if bbox:
-			xmin = bbox[1]
-			xmax = bbox[1]+bbox[3]
+		base.debugmsg(5, "args:", args, args[0].x, args[0].y)
+		# clicked = self.sectionstree.identify_element(args[0].x, args[0].y)
+		# base.debugmsg(5, "clicked:", clicked)
+		clicked = self.sectionstree.identify_row(args[0].y)
+		base.debugmsg(5, "clicked:", clicked, type(clicked), id(clicked))
+		if len(clicked)<1:
+			# unselect
+			self.sectionstree.selection_set('')
+			self.sectionstree.focus('')
+			return
+		# Seems it gets reselected after i unselected it here
+		# selected = self.sectionstree.focus()
+		# base.debugmsg(5, "selected:", selected, type(selected), id(selected))
+		# base.debugmsg(5, "clicked == selected:", clicked == selected)
+		# if clicked == selected:
+		# 	# unselect
+		# 	self.sectionstree.selection_set('')
+		# 	self.sectionstree.focus('')
+		# 	return
 
-		if xmin > args[0].x < xmax:
-			# unfocus
-			# self.sectionstree.selection_set(selected)
-			# self.sectionstree.selection_toggle(selected)
-			self.sectionstree.selection_remove(selected)
-			self.sectionstree.focus("")
-			pass
+		# load section pane
+
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
