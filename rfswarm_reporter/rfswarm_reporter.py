@@ -555,6 +555,7 @@ class ReporterGUI(tk.Frame):
 
 	titleprefix = "rfswarm Reporter"
 
+	c_preview = False
 
 	def __init__(self, master=None):
 
@@ -605,6 +606,9 @@ class ReporterGUI(tk.Frame):
 		# Move Section Down	 resultset_down.gif
 		self.imgdata["Section Down"] = self.get_icon("resultset_down.gif")
 
+		# Content pane buttons
+		self.imgdata["Preview"] = self.get_icon("report.gif")
+		self.imgdata["Settings"] = self.get_icon("cog.gif")
 
 
 	def get_icon(self, imagefile):
@@ -747,15 +751,15 @@ class ReporterGUI(tk.Frame):
 
 		self.bbar = tk.Frame(self)
 		self.bbar.grid(column=0, row=0, sticky="nsew")
-		self.bbar.config(bg="red")
+		# self.bbar.config(bg="red")
 
 		self.mainframe = tk.Frame(self)
 		self.mainframe.grid(column=0, row=1, sticky="nsew")
-		self.mainframe.config(bg="green")
+		# self.mainframe.config(bg="green")
 
 		self.stsbar = tk.Frame(self)
 		self.stsbar.grid(column=0, row=9, sticky="nsew")
-		self.stsbar.config(bg="pink")
+		# self.stsbar.config(bg="pink")
 
 		# statusmsg
 		self.stsTemplate = tk.StringVar()
@@ -784,7 +788,7 @@ class ReporterGUI(tk.Frame):
 
 		self.sbbar = tk.Frame(self.mainframe)
 		self.sbbar.grid(column=0, row=0, sticky="nsew")
-		self.sbbar.config(bg="blue")
+		# self.sbbar.config(bg="blue")
 
 		self.sections = tk.Frame(self.mainframe, relief=tk.SUNKEN, bd=3)
 		self.sections.grid(column=0, row=1, sticky="nsew")
@@ -799,6 +803,9 @@ class ReporterGUI(tk.Frame):
 		# btnShowHide.grid(column=1, row=1, sticky="nsew")
 		# btnShowHide.rowconfigure(1, weight=1)
 
+		self.cbbar = tk.Frame(self.mainframe)
+		self.cbbar.grid(column=2, row=0, columnspan=2, sticky="nsew")
+		# self.cbbar.config(bg="lavender")
 
 		self.content = tk.Frame(self.mainframe)
 		self.content.grid(column=2, row=1, columnspan=2, sticky="nsew")
@@ -809,6 +816,7 @@ class ReporterGUI(tk.Frame):
 
 		self.BuildToolBar()
 		self.BuildSections()
+		self.BuildContent()
 
 
 
@@ -1121,7 +1129,30 @@ class ReporterGUI(tk.Frame):
 		# load section pane
 
 		self.content_settings(clicked)
-		self.content_preview(clicked)
+		# self.content_preview(clicked)
+
+
+	def BuildContent(self):
+
+		# self.cbbar
+		btnno = 0
+		self.cbbar.columnconfigure(btnno, weight=1)
+		btnno += 1
+		icontext = "Preview"
+		self.cbbar.bprev = ttk.Button(self.cbbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_content_preview)
+		# self.cbbar.bprev = tk.Button(self.cbbar, image=self.imgdata[icontext], padx="3p", pady="3", text=icontext, command=self.mnu_content_preview)
+		self.cbbar.bprev.grid(column=btnno, row=0, sticky="nsew")
+		# self.cbbar.columnconfigure(btnno, weight=1)
+
+		btnno += 1
+		icontext = "Settings"
+		self.cbbar.bsett = ttk.Button(self.cbbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_content_settings)
+		# self.cbbar.bsett = tk.Button(self.cbbar, image=self.imgdata[icontext], padx="3c", pady="3m", text=icontext, command=self.mnu_content_settings)
+		self.cbbar.bsett.grid(column=btnno, row=0, sticky="nsew")
+		# self.cbbar.columnconfigure(btnno, weight=1)
+
+		# self.c_preview
+		pass
 
 	def content_settings(self, id):
 		base.debugmsg(5, "id:", id)
@@ -1272,7 +1303,22 @@ class ReporterGUI(tk.Frame):
 			self.sectionstree.selection_set(selected)
 			self.sectionstree.focus(selected)
 
+	def mnu_content_settings(self):
+		base.debugmsg(5, "Not implimented yet.....")
+		# self.button0.config(state=tk.DISABLED)
+		# self.cbbar.bprev.config(state=tk.NORMAL)
+		# self.cbbar.bsett.config(state=tk.ACTIVE)
+		# self.cbbar.bprev.config(relief=tk.RAISED)
+		# self.cbbar.bsett.config(relief=tk.FLAT)
 
+
+
+	def mnu_content_preview(self):
+		base.debugmsg(5, "Not implimented yet.....")
+		# self.cbbar.bprev.config(relief=tk.FLAT)
+		# self.cbbar.bsett.config(relief=tk.RAISED)
+		# self.cbbar.bprev.config(state=tk.ACTIVE)
+		# self.cbbar.bsett.config(state=tk.NORMAL)
 
 
 class RFSwarm_Reporter():
