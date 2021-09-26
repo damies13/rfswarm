@@ -263,7 +263,11 @@ class ReporterBase():
 		# base.template["Template"]["Order"].index('ED299C2969A') # get index from list
 		# base.template["Template"]["Order"].insert(1, base.template["Template"]["Order"].pop(2)) # move item in list
 
+	def template_item_get_name(self, id):
+		return base.template[id]['Name']
 
+	def template_item_set_name(self, id, newname):
+		base.template[id]['Name'] = newname
 
 	def template_save(self, filename):
 		saved = False
@@ -552,6 +556,7 @@ class ReporterGUI(tk.Frame):
 	style_text_colour = "#000"
 	imgdata = {}
 	b64 = {}
+	contentdata = {}
 
 	titleprefix = "rfswarm Reporter"
 
@@ -663,6 +668,10 @@ class ReporterGUI(tk.Frame):
 		self.b64["resultset_up.gif"] =  b'GIF89a\x10\x00\x10\x00\xa5\x00\x00\x00\x00\x00\x14A\xb7\x15E\xb9\x16J\xbd\x16N\xc0\x17P\xbd\x18S\xc0\x19Y\xc5\x1ab\xc6\x1ab\xc9#n\xcd,r\xcd<s\xce5w\xd2=w\xd0?z\xd0C\x7f\xd3E\x84\xd6K\x88\xd6S\x8e\xdba\x96\xddb\x97\xe1n\xa0\xe2t\xa2\xdfu\xa3\xe1y\xa7\xe3}\xa9\xe1}\xa9\xe8\x80\xab\xe9\x82\xac\xe3\x87\xb0\xe8\x8a\xb1\xe4\x90\xb5\xe7\x92\xb7\xe8\x99\xbb\xea\xa2\xc2\xed\xa8\xc7\xee\xad\xc8\xef\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\x01\n\x00?\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x06G\xc0\x9fpH,\x1a\x8f\xc8\xa4r\xc9L"\x0e\xcd\x85\x04bXF(\x9f\xce\xa3\x90\xa4`D\x1d\x8c\xc618b<\xa3P\xf8\x92a\x08\x8a\x9bM\x894\x12\x81:\x9a\x0b#@\xe4p2\x16\x15\x13\x11\r\n\t\x07\x04M\x8a\x8b\x8cHA\x00;'
 
 		self.b64["resultset_down.gif"] =  b'GIF89a\x10\x00\x10\x00\xa5\x00\x00\x00\x00\x00\x14A\xb7\x15E\xb9\x16J\xbd\x16N\xc0\x17P\xbd\x18S\xc0\x19Y\xc5\x1ab\xc6\x1ab\xc9#n\xcd,r\xcd<s\xce5w\xd2=w\xd0?z\xd0C\x7f\xd3E\x84\xd6K\x88\xd6S\x8e\xdba\x96\xddb\x97\xe1n\xa0\xe2t\xa2\xdfu\xa3\xe1y\xa7\xe3}\xa9\xe1}\xa9\xe8\x80\xab\xe9\x82\xac\xe3\x87\xb0\xe8\x8a\xb1\xe4\x90\xb5\xe7\x92\xb7\xe8\x99\xbb\xea\xa2\xc2\xed\xa8\xc7\xee\xad\xc8\xef\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xfe\x11Created with GIMP\x00!\xf9\x04\x01\n\x00?\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x06G\xc0\x9fpH,\x1a\x8f\xc8\xa4rI8$\x14\x8d\xc8\xa4b\xc9p8\xc4\x00\xe3\xa2\xe9\x80D#Ri\xb3)\n\x18\x99\x0b\xa6\x13\x1ay0\xc7\x81C\xb3\x16a(\xc9\xc2\xa3\xf3\xa1D\x96\x06\x10\x12\x0bKB\x07\x08\x85\x89\x8a\x8b\x8c\x8dA\x00;'
+
+		self.b64["report.gif"] =  b'GIF89a\x10\x00\x10\x00\xc6\\\x00~1\x18\xabB!\xacC!\xaeF"\xaeI"\xa5K,\xafK#\xb1N#\xb2Q$\xb2R%\xb4U%\xb5V&\xb7Y&\xb7[&\xaf]5\xb8^\'\xb8_\'\xbaa(\xbexI\xb3yc\xb3|d\xb5\x7fe\xb5\x82f\xb7\x83gj\x93\xd4\xb9\x87gj\x98\xd9\xc2\x8bdk\x99\xdan\x9a\xdc\xbf\x8fao\x9b\xdcr\x9c\xdcq\x9d\xdd\xc1\x92cq\x9e\xdfs\x9e\xdf\xc2\x94ds\x9f\xe0t\xa0\xe0v\xa0\xe0\xc3\x96ev\xa2\xe0w\xa3\xe1x\xa3\xe1\xc4\x99f\xc5\x9agz\xa5\xe1\xa0\xbe\xea\xa1\xbf\xea\xa2\xc0\xea\xa3\xc0\xea\xca\xc6\xc4\xcc\xc6\xc0\xc7\xc7\xc7\xcd\xc6\xc0\xca\xc7\xc4\xcd\xc7\xc0\xcd\xc7\xc1\xc9\xc9\xc9\xca\xca\xca\xcb\xcb\xcb\xcc\xcc\xcc\xcd\xcd\xcd\xd1\xd1\xd1\xd2\xd2\xd2\xd3\xd3\xd3\xd4\xd4\xd4\xd5\xd5\xd5\xd8\xd8\xd8\xdc\xdc\xdc\xe6\xe6\xe6\xe8\xe8\xe8\xe9\xe9\xe9\xea\xea\xea\xec\xec\xec\xed\xed\xed\xee\xee\xee\xf0\xf0\xf0\xf1\xf1\xf1\xf2\xf2\xf2\xf3\xf3\xf3\xf4\xf4\xf4\xf5\xf5\xf5\xf6\xf6\xf6\xf7\xf7\xf7\xf8\xf8\xf8\xf9\xf9\xf9\xfa\xfa\xfa\xfb\xfb\xfb\xfc\xfc\xfc\xfd\xfd\xfd\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff!\xfe\x11Created with GIMP\x00!\xf9\x04\x01\n\x00\x7f\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xbf\x80\x7f\x7f\x1b\x12\x11\x82\x87\x88\x87>8:\x10Z\x8f\x90\x91\x87\x19.\x0fU\x97USR\x9bPY\x82\x8b9\r\x98\x97S\xa5QX\x87\x17-\x0cVV/,+*(\'R\xa8\x7f>49\x0bWW,3210#RU\x87\x16)\nXX\xb2\'$ \x1fPT\x9f\xb9\tYX\xadVUQPNM\x87\x15%\x08\xd7&!\x1d\x1c\x1a\x18JK\xd37\x07XW\xd9T\xcaXP@\x87\x14"\x06\xbcWT\xa7\xf4;H\xa6\xd5 \xa0\xcc\x8a\x94\'Y\xa0\xf08\xa2\xe5\xd0\x04\x0f\x03\x94\xf5k\x12ea\x96\x86\xb7h\xd4\x10\xb0%\x8bA&D\x92p\x19y\xa8\x80\x83\x00F\x8a\x0c\t\x02D\x08\x90\x1e?l \x02\x90\xa8\xe6\x9f@\x00;'
+
+		self.b64["cog.gif"] =  b'GIF87a\x10\x00\x10\x00\xc4\x00\x00\x00\x00\x00GGGMMMTTT[[[ccclllpppyyy\x82\x82\x82\x8d\x8d\x8d\x94\x94\x94\x9c\x9c\x9c\xa5\xa5\xa5\xac\xac\xac\xb4\xb4\xb4\xbc\xbc\xbc\xc4\xc4\xc4\xcb\xcb\xcb\xd4\xd4\xd4\xdc\xdc\xdc\xe5\xe5\xe5\xeb\xeb\xeb\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00\x18\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x05\x91 &\x8e\x92\x14Ac\xaaFU\xe5\xa8\xe3Tb\x11E=\x98\xd341eQ\xa7\xc9\xe4\xe1\x90T \n\x91\x892\xb1\t\x99%\xc4a\x14\x91I \x8cFd\x8bTn)\xd7\x04"\xa1\xd8J\x14\x89D\xc4bm$D\x0c\xc7\xa9f`M"\x92\xc7B\xb4\x90C\xaa\x05\r\x0b\rw\x12\x0c\x0c\x0be\x10\x10\x05\x03\x03"rf\x0e~D\x06#:\x85V&\x10\x12\x06\x05"\r\x10\x14nj\x11\x06\x06\x84\t\x8f"\t\x9e\x18\t%\x9f\x03\x02\x010\xac\x10\x0f\x04\xb6*\x06\xb3\xab)!\x00;'
 
 	def updateTitle(self):
 		titletext = "{} v{} - {}".format(self.titleprefix, base.version, "Please Select")
@@ -803,10 +812,6 @@ class ReporterGUI(tk.Frame):
 		# btnShowHide.grid(column=1, row=1, sticky="nsew")
 		# btnShowHide.rowconfigure(1, weight=1)
 
-		# self.cbbar = tk.Frame(self.mainframe)
-		# self.cbbar.grid(column=2, row=0, columnspan=2, sticky="nsew")
-		# self.cbbar.config(bg="lavender")
-
 		self.content = tk.Frame(self.mainframe)
 		self.content.grid(column=2, row=0, columnspan=2, rowspan=2, sticky="nsew")
 		self.content.config(bg="lightblue")
@@ -816,9 +821,109 @@ class ReporterGUI(tk.Frame):
 		self.mainframe.columnconfigure(2, weight=1)
 		self.mainframe.columnconfigure(3, weight=1)
 
+		self.ConfigureStyle()
+
 		self.BuildToolBar()
 		self.BuildSections()
 		self.BuildContent()
+
+	def ConfigureStyle(self):
+
+		self.config["global"]["darkmode"] = False
+		self.root.config["global"]["darkmode"] = False
+
+		# Theme settings for ttk
+		style = ttk.Style()
+		# we really only seem to need this for MacOS 11 and up for now
+		# base.debugmsg(5, "sys.platform", sys.platform)
+		# base.debugmsg(5, "platform.system", platform.system())
+		# base.debugmsg(5, "platform.release", platform.release())
+		# base.debugmsg(5, "platform.mac_ver", platform.mac_ver())
+
+		style.configure("TNotebook", borderwidth=0)
+		style.configure("TNotebook.Tab", borderwidth=0)
+		style.configure("TFrame", borderwidth=0)
+
+		if sys.platform.startswith('darwin'):
+			release, _, machine = platform.mac_ver()
+			split_ver = release.split('.')
+			if int(split_ver[0]) > 10:
+				# https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/ttk-style-layer.html
+				# base.debugmsg(5, "style.layout", style.layout)
+				# # list = style.layout()
+				# # base.debugmsg(5, "list", list)
+				# base.debugmsg(5, "style.element_names", style.element_names)
+				# list = style.element_names()
+				# base.debugmsg(5, "list", list)
+				# base.debugmsg(5, "style.theme_names", style.theme_names)
+				# list = style.theme_names()
+				# base.debugmsg(5, "list", list)
+
+
+				# style.layout("rfsinput", style.layout('TEntry'))
+				# style.configure("rfsinput", **style.configure('TEntry'))
+				# style.map("rfsinput", **style.map('TEntry'))
+				# style.map("rfsinput",
+				#     fieldbackground=[(['!invalid','!disabled'], '#fff'),
+				#                      (['!invalid','disabled'], '#aaa')]
+				# )
+				# style.map("rfsinput",
+				#     fieldbackground=[(['!invalid','!disabled'], '#fff'),
+				#                      (['!invalid','disabled'], '#aaa'),
+				#                      (['invalid','!disabled'], '#ff4040'),
+				#                      (['invalid','disabled'], '#ffc0c0')]
+				# )
+				# style.configure("rfs.Entry", foreground="black")
+				# style.configure("rfs.Entry", foreground="systemControlTextColor")
+				# style.configure("rfs.Entry", foreground=self.rootBackground)	# systemWindowBackgroundColor
+				# base.debugmsg(5, "self.rootBackground", self.rootBackground)
+				# style.configure("rfs.Entry", foreground=self.rootBackground)	# systemControlTextColor
+
+				# style.configure("rfs.Entry", foreground="systemControlAccentColor")
+				# style.configure("rfs.Entry", foreground="systemControlTextColor")
+				# style.configure("rfs.Entry", foreground="systemDisabledControlTextColor")
+				# style.configure("rfs.Entry", foreground="systemLabelColor")
+				# style.configure("rfs.Entry", foreground="systemLinkColor")
+				# style.configure("rfsinput", foreground="systemPlaceholderTextColor")
+				# style.configure("rfs.Entry", foreground="systemSelectedTextBackgroundColor")
+				# style.configure("rfs.Entry", foreground="systemSelectedTextColor")
+				# style.configure("rfs.Entry", foreground="systemSeparatorColor")
+				# style.configure("rfs.Entry", foreground="systemTextBackgroundColor")
+				# style.configure("rfs.Entry", foreground="systemTextColor")
+
+				# style.layout("rfsinput", style.layout('TLabel'))
+				# style.configure("rfsinput", **style.configure('TLabel'))
+				# style.map("rfsinput", **style.map('TLabel'))
+				# style.configure("TLabel", foreground="systemPlaceholderTextColor")
+				style.configure("TLabel", foreground=self.style_text_colour)
+				style.configure("TEntry", foreground="systemPlaceholderTextColor")
+				# style.configure("TButton", foreground="systemPlaceholderTextColor")
+				style.configure("TButton", foreground=self.style_text_colour)
+				# style.configure("TCombobox", foreground="systemPlaceholderTextColor")
+				# style.configure("TCombobox", foreground=self.style_text_colour)
+				# style.configure("TComboBox", foreground=self.style_text_colour)
+				# style.configure("Combobox", foreground=self.style_text_colour)
+				# style.configure("ComboBox", foreground=self.style_text_colour)
+				#
+				# style.configure("OptionMenu", foreground=self.style_text_colour)
+				# style.configure("TOptionMenu", foreground=self.style_text_colour)
+				# style.configure("Optionmenu", foreground=self.style_text_colour)
+				# style.configure("TOptionmenu", foreground=self.style_text_colour)
+
+				# style.configure("Menubutton", foreground=self.style_text_colour)
+				style.configure("TMenubutton", foreground=self.style_text_colour)
+
+				# self.rfstheme["default"] = "systemPlaceholderTextColor"
+				# self.rfstheme["default"] = self.style_text_colour
+
+				# style.configure("Canvas", foreground=self.style_text_colour)
+				style.configure("Canvas", fill=self.style_text_colour)
+				style.configure("Canvas", activefill=self.style_text_colour)
+
+				# style.configure("Spinbox", foreground=self.style_text_colour)
+				style.configure("TSpinbox", foreground=self.style_text_colour)
+
+				style.configure("TRadiobutton", foreground=self.style_text_colour)
 
 
 
@@ -1115,6 +1220,7 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "clicked:", clicked, type(clicked), id(clicked))
 		if len(clicked)<1:
 			# unselect
+			clicked = "TOP"
 			self.sectionstree.selection_set('')
 			self.sectionstree.focus('')
 			return
@@ -1130,63 +1236,100 @@ class ReporterGUI(tk.Frame):
 
 		# load section pane
 
-		self.content_settings(clicked)
+		# self.content_settings(clicked)
 		# self.content_preview(clicked)
-
+		self.content_load(clicked)
 
 	def BuildContent(self):
-
-		# # self.cbbar
-		# btnno = 0
-		# self.cbbar.columnconfigure(btnno, weight=1)
-		# btnno += 1
-		# icontext = "Preview"
-		# self.cbbar.bprev = ttk.Button(self.cbbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_content_preview)
-		# # self.cbbar.bprev = tk.Button(self.cbbar, image=self.imgdata[icontext], padx="3p", pady="3", text=icontext, command=self.mnu_content_preview)
-		# self.cbbar.bprev.grid(column=btnno, row=0, sticky="nsew")
-		# # self.cbbar.columnconfigure(btnno, weight=1)
-		#
-		# btnno += 1
-		# icontext = "Settings"
-		# self.cbbar.bsett = ttk.Button(self.cbbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_content_settings)
-		# # self.cbbar.bsett = tk.Button(self.cbbar, image=self.imgdata[icontext], padx="3c", pady="3m", text=icontext, command=self.mnu_content_settings)
-		# self.cbbar.bsett.grid(column=btnno, row=0, sticky="nsew")
-		# # self.cbbar.columnconfigure(btnno, weight=1)
 
 		# this removes a lot of wasted space and gives it back to the data in each tab
 		# 	I think the system default is ~20 on macos 11
 		self.tabs = ttk.Notebook(self.content, padding=0)
 
+		# self.tabs['padding'] = (0,1,5,10)
+
 		# first page, which would get widgets gridded into it
 		icontext = "Preview"
 		base.debugmsg(6, icontext)
-		self.contentpreview = tk.Frame(self.tabs)
+		self.contentpreview = tk.Frame(self.tabs, padx=0, pady=0)	# , padx=0, pady=0
+		# self.contentpreview['padding'] = (0,1,5,10)
 		self.contentpreview.config(bg="salmon")
-		self.contentpreview.grid(column=0, row=0, sticky="nsew")
+		self.contentpreview.grid(column=0, row=0, sticky="nsew", padx=0, pady=0)
 		# p.grid(row=0, column=0, sticky="nsew")
 		# p.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
-		self.tabs.add(self.contentpreview, image=self.imgdata[icontext], text=icontext)
+		self.tabs.add(self.contentpreview, image=self.imgdata[icontext], text=icontext, compound=tk.LEFT, padding=0, sticky="nsew")
+
+		base.debugmsg(6, "self.tabs:", self.tabs)
+		base.debugmsg(6, "self.tabs.tab(0):", self.tabs.tab(0))
+		base.debugmsg(6, "self.contentpreview:", self.contentpreview)
+
 
 		# second page
 		icontext = "Settings"
 		base.debugmsg(6, icontext)
-		self.contentsettings = tk.Frame(self.tabs)
+		self.contentsettings = tk.Frame(self.tabs, padx=0, pady=0)
 		self.contentsettings.config(bg="linen")
-		self.contentsettings.grid(column=0, row=0, sticky="nsew")
-		self.tabs.add(self.contentsettings, image=self.imgdata[icontext], text=icontext)
+		self.contentsettings.grid(column=0, row=0, sticky="nsew", padx=0, pady=0)
+		self.tabs.add(self.contentsettings, image=self.imgdata[icontext], text=icontext, compound=tk.LEFT, padding=0, sticky="nsew")
 
 		self.tabs.grid(column=0, row=0, sticky="nsew")
-
+		self.tabs.select(1)
 		# self.c_preview
-		pass
+		self.content_load("TOP")
+
+	def content_load(self, id):
+		base.debugmsg(5, "id:", id)
+		self.content_settings(id)
+		self.content_preview(id)
 
 	def content_settings(self, id):
 		base.debugmsg(5, "id:", id)
 		# self.content
+		if id not in self.contentdata:
+			self.contentdata[id] = {}
+		if "Settings" not in self.contentdata[id]:
+			self.contentdata[id]["Settings"] = tk.Frame(self.contentsettings, padx=0, pady=0)
+			self.contentdata[id]["Settings"].config(bg="rosy brown")
+			if id=="TOP":
+				self.content_reportsettings()
+			else:
+				self.contentdata[id]["lblsettings"] = ttk.Label(self.contentdata[id]["Settings"], text="Settings for {}: {}".format(id, base.template_item_get_name(id)))
+				self.contentdata[id]["lblsettings"].grid(column=0, row=0, sticky="nsew")
+		curritem = self.contentsettings.grid_slaves(column=0, row=0)
+		base.debugmsg(5, "curritem:", curritem)
+		if len(curritem)>0:
+			curritem[0].grid_forget()
+		self.contentdata[id]["Settings"].grid(column=0, row=0, sticky="nsew")
+
+	def content_reportsettings(self):
+		rownum = 0
+		id="TOP"
+		rownum +=1
+		self.contentdata[id]["lblTitle"] = ttk.Label(self.contentdata[id]["Settings"], text="Title:")
+		self.contentdata[id]["lblTitle"].grid(column=0, row=rownum, sticky="nsew")
+
+		rownum +=1
+		self.contentdata[id]["lblFont"] = ttk.Label(self.contentdata[id]["Settings"], text="Font:")
+		self.contentdata[id]["lblFont"].grid(column=0, row=rownum, sticky="nsew")
+
 
 	def content_preview(self, id):
 		base.debugmsg(5, "id:", id)
-		# self.contentpreview.grid(column=0, row=0, columnspan=2, sticky="nsew")
+		if id not in self.contentdata:
+			self.contentdata[id] = {}
+		if "Preview" not in self.contentdata[id]:
+			self.contentdata[id]["Preview"] = tk.Frame(self.contentpreview, padx=0, pady=0)
+			self.contentdata[id]["Preview"].config(bg="gold")
+			if id=="TOP":
+				pass
+			else:
+				self.contentdata[id]["lblpreview"] = ttk.Label(self.contentdata[id]["Preview"], text = "Preview for {}: {}".format(id, base.template_item_get_name(id)))
+				self.contentdata[id]["lblpreview"].grid(column=0, row=0, sticky="nsew")
+		curritem = self.contentpreview.grid_slaves(column=0, row=0)
+		base.debugmsg(5, "curritem:", curritem)
+		if len(curritem)>0:
+			curritem[0].grid_forget()
+		self.contentdata[id]["Preview"].grid(column=0, row=0, sticky="nsew")
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
