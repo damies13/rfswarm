@@ -803,13 +803,15 @@ class ReporterGUI(tk.Frame):
 		# btnShowHide.grid(column=1, row=1, sticky="nsew")
 		# btnShowHide.rowconfigure(1, weight=1)
 
-		self.cbbar = tk.Frame(self.mainframe)
-		self.cbbar.grid(column=2, row=0, columnspan=2, sticky="nsew")
+		# self.cbbar = tk.Frame(self.mainframe)
+		# self.cbbar.grid(column=2, row=0, columnspan=2, sticky="nsew")
 		# self.cbbar.config(bg="lavender")
 
 		self.content = tk.Frame(self.mainframe)
-		self.content.grid(column=2, row=1, columnspan=2, sticky="nsew")
+		self.content.grid(column=2, row=0, columnspan=2, rowspan=2, sticky="nsew")
 		self.content.config(bg="lightblue")
+		self.content.columnconfigure(0, weight=1)
+		self.content.rowconfigure(0, weight=1)
 
 		self.mainframe.columnconfigure(2, weight=1)
 		self.mainframe.columnconfigure(3, weight=1)
@@ -1134,22 +1136,46 @@ class ReporterGUI(tk.Frame):
 
 	def BuildContent(self):
 
-		# self.cbbar
-		btnno = 0
-		self.cbbar.columnconfigure(btnno, weight=1)
-		btnno += 1
-		icontext = "Preview"
-		self.cbbar.bprev = ttk.Button(self.cbbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_content_preview)
-		# self.cbbar.bprev = tk.Button(self.cbbar, image=self.imgdata[icontext], padx="3p", pady="3", text=icontext, command=self.mnu_content_preview)
-		self.cbbar.bprev.grid(column=btnno, row=0, sticky="nsew")
+		# # self.cbbar
+		# btnno = 0
 		# self.cbbar.columnconfigure(btnno, weight=1)
+		# btnno += 1
+		# icontext = "Preview"
+		# self.cbbar.bprev = ttk.Button(self.cbbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_content_preview)
+		# # self.cbbar.bprev = tk.Button(self.cbbar, image=self.imgdata[icontext], padx="3p", pady="3", text=icontext, command=self.mnu_content_preview)
+		# self.cbbar.bprev.grid(column=btnno, row=0, sticky="nsew")
+		# # self.cbbar.columnconfigure(btnno, weight=1)
+		#
+		# btnno += 1
+		# icontext = "Settings"
+		# self.cbbar.bsett = ttk.Button(self.cbbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_content_settings)
+		# # self.cbbar.bsett = tk.Button(self.cbbar, image=self.imgdata[icontext], padx="3c", pady="3m", text=icontext, command=self.mnu_content_settings)
+		# self.cbbar.bsett.grid(column=btnno, row=0, sticky="nsew")
+		# # self.cbbar.columnconfigure(btnno, weight=1)
 
-		btnno += 1
+		# this removes a lot of wasted space and gives it back to the data in each tab
+		# 	I think the system default is ~20 on macos 11
+		self.tabs = ttk.Notebook(self.content, padding=0)
+
+		# first page, which would get widgets gridded into it
+		icontext = "Preview"
+		base.debugmsg(6, icontext)
+		self.contentpreview = tk.Frame(self.tabs)
+		self.contentpreview.config(bg="salmon")
+		self.contentpreview.grid(column=0, row=0, sticky="nsew")
+		# p.grid(row=0, column=0, sticky="nsew")
+		# p.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
+		self.tabs.add(self.contentpreview, image=self.imgdata[icontext], text=icontext)
+
+		# second page
 		icontext = "Settings"
-		self.cbbar.bsett = ttk.Button(self.cbbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_content_settings)
-		# self.cbbar.bsett = tk.Button(self.cbbar, image=self.imgdata[icontext], padx="3c", pady="3m", text=icontext, command=self.mnu_content_settings)
-		self.cbbar.bsett.grid(column=btnno, row=0, sticky="nsew")
-		# self.cbbar.columnconfigure(btnno, weight=1)
+		base.debugmsg(6, icontext)
+		self.contentsettings = tk.Frame(self.tabs)
+		self.contentsettings.config(bg="linen")
+		self.contentsettings.grid(column=0, row=0, sticky="nsew")
+		self.tabs.add(self.contentsettings, image=self.imgdata[icontext], text=icontext)
+
+		self.tabs.grid(column=0, row=0, sticky="nsew")
 
 		# self.c_preview
 		pass
@@ -1157,17 +1183,9 @@ class ReporterGUI(tk.Frame):
 	def content_settings(self, id):
 		base.debugmsg(5, "id:", id)
 		# self.content
-		self.contentsettings = tk.Frame(self.content)
-		self.contentsettings.config(bg="linen")
-
-		self.contentsettings.grid(column=0, row=0, columnspan=2, sticky="nsew")
-		self.content.columnconfigure(0, weight=1)
-		self.content.rowconfigure(0, weight=1)
 
 	def content_preview(self, id):
 		base.debugmsg(5, "id:", id)
-		self.contentpreview = tk.Frame(self.content)
-		self.contentpreview.config(bg="salmon")
 		# self.contentpreview.grid(column=0, row=0, columnspan=2, sticky="nsew")
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
