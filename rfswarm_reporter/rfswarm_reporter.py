@@ -47,7 +47,7 @@ class ReporterBase():
 	gui = None
 	darkmode = False
 
-	template = None
+	report = None
 	save_template = True
 
 	dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -160,121 +160,29 @@ class ReporterBase():
 				base.config.write(configfile)
 				self.debugmsg(6, "File Saved:", self.reporter_ini)
 
+	#
+	# Template Functions
+	#
 	def template_create(self):
-		# base.template_create()
-		base.template = configparser.ConfigParser()
+		# base.report_create()
+		base.report = configparser.ConfigParser()
 		base.config['Reporter']['Template'] = ""
-		if "Template" not in base.template:
-			base.template["Template"] = {}
-		base.template["Template"]["Order"] = ""
-		# base.debugmsg(5, "template order:", base.template["Template"]["Order"])
-		base.debugmsg(5, "base.template: ", base.template._sections)
+		if "Report" not in base.report:
+			base.report["Report"] = {}
+		base.report["Report"]["Order"] = ""
+		# base.debugmsg(5, "template order:", base.report["Report"]["Order"])
+		base.debugmsg(5, "base.report: ", base.report._sections)
 
-		self.template_new_section("TOP", "Executive Summary")
-		self.template_new_section("TOP", "Test Result Summary")
+		self.report_new_section("TOP", "Executive Summary")
+		self.report_new_section("TOP", "Test Result Summary")
 
-
-	def template_get_order(self, parent):
-		if parent == "TOP":
-			base.debugmsg(5, "template order:", base.template["Template"]["Order"])
-			if len(base.template["Template"]["Order"])>0:
-				return base.template["Template"]["Order"].split(',')
-			else:
-				return []
-		else:
-			base.debugmsg(5, "parent order:", base.template[parent])
-			if "Order" in base.template[parent] and len(base.template[parent]["Order"])>0:
-				return base.template[parent]["Order"].split(',')
-			else:
-				return []
-
-	def template_set_order(self, parent, orderlst):
-		base.debugmsg(5, "parent:", parent, "	orderlst: ", orderlst)
-		if parent == "TOP":
-			base.template["Template"]["Order"] = ",".join(orderlst)
-		else:
-			base.template[parent]["Order"] = ",".join(orderlst)
-
-	def template_new_section(self, parent, name):
-		id = "{:02X}".format(int(time.time()*10000))
-		# id = "{:02X}".format(int(time.time()*1000000))
-		# id = "{:02X}".format(time.time()) # cannot convert float
-		base.debugmsg(5, "id:", id)
-		self.template_add_section(parent, id, name)
-		return id
-
-	def template_add_section(self, parent, id, name):
-		base.debugmsg(5, "parent: ", parent)
-		if id not in base.template:
-			base.template[id] = {}
-		base.template[id]['Name'] = name
-		base.template[id]['Parent'] = parent
-		order = self.template_get_order(parent)
-		base.debugmsg(5, "order: ", order)
-		order.append(id)
-		self.template_set_order(parent, order)
-		base.debugmsg(5, "base.template: ", base.template._sections)
-
-
-	def template_item_parent(self, id):
-		if id in base.template and 'Parent' in base.template[id]:
-			return base.template[id]['Parent']
-		else:
-			return "TOP"
-
-	def template_remove_section(self, id):
-		parent = self.template_item_parent(id)
-		order = self.template_get_order(parent)
-		base.debugmsg(5, "order: ", order)
-		pos = order.index(id)
-		base.debugmsg(5, "pos: ", pos)
-		order.pop(pos)
-		base.debugmsg(5, "order: ", order)
-		self.template_set_order(parent, order)
-		base.debugmsg(5, "base.template: ", base.template._sections)
-		subitems = self.template_get_order(id)
-		for item in subitems:
-			self.template_remove_section(item)
-		del base.template[id]
-		base.debugmsg(5, "base.template: ", base.template._sections)
-
-	def template_move_section_up(self, id):
-		parent = self.template_item_parent(id)
-		order = self.template_get_order(parent)
-		base.debugmsg(5, "order: ", order)
-		pos = order.index(id)
-		base.debugmsg(5, "pos: ", pos)
-		order.pop(pos)
-		order.insert(pos -1, id)
-		base.debugmsg(5, "order: ", order)
-		self.template_set_order(parent, order)
-
-	def template_move_section_down(self, id):
-		parent = self.template_item_parent(id)
-		order = self.template_get_order(parent)
-		base.debugmsg(5, "order: ", order)
-		pos = order.index(id)
-		base.debugmsg(5, "pos: ", pos)
-		order.pop(pos)
-		order.insert(pos +1, id)
-		base.debugmsg(5, "order: ", order)
-		self.template_set_order(parent, order)
-
-		# base.template["Template"]["Order"].index('ED299C2969A') # get index from list
-		# base.template["Template"]["Order"].insert(1, base.template["Template"]["Order"].pop(2)) # move item in list
-
-	def template_item_get_name(self, id):
-		return base.template[id]['Name']
-
-	def template_item_set_name(self, id, newname):
-		base.template[id]['Name'] = newname
 
 	def template_save(self, filename):
 		saved = False
 		if filename is None or len(filename)<1:
 			filename = base.config['Reporter']['Template']
 		with open(filename, 'w') as templatefile:    # save
-			base.template.write(templatefile)
+			base.report.write(templatefile)
 			self.debugmsg(6, "Template Saved:", filename)
 			saved = True
 		if saved:
@@ -293,11 +201,143 @@ class ReporterBase():
 			base.config['Reporter']['TemplateDir'] = path
 			base.saveini()
 
-			base.template = configparser.ConfigParser()
-			base.template.read(filename)
+			base.report = configparser.ConfigParser()
+			base.report.read(filename)
+		else:
+			base.report_create()
+
+
+	#
+	# Report Functions
+	#
+
+	def report_save(self):
+		saved = False
+		filename = base.config['Reporter']['Report']
+		with open(filename, 'w') as reportfile:    # save
+			base.report.write(reportfile)
+			self.debugmsg(6, "Report Saved:", filename)
+			saved = True
+
+
+	def report_open(self):
+		filename = base.config['Reporter']['Report']
+		if len(filename)>0 and os.path.isfile(filename):
+			base.debugmsg(7, "filename: ", filename)
+
+			base.report = configparser.ConfigParser()
+			base.report.read(filename)
 		else:
 			base.template_create()
+			base.report_save()
 
+
+	def report_get_order(self, parent):
+		if parent == "TOP":
+			base.debugmsg(5, "template order:", base.report["Report"]["Order"])
+			if len(base.report["Report"]["Order"])>0:
+				return base.report["Report"]["Order"].split(',')
+			else:
+				return []
+		else:
+			base.debugmsg(5, "parent order:", base.report[parent])
+			if "Order" in base.report[parent] and len(base.report[parent]["Order"])>0:
+				return base.report[parent]["Order"].split(',')
+			else:
+				return []
+
+	def report_set_order(self, parent, orderlst):
+		base.debugmsg(5, "parent:", parent, "	orderlst: ", orderlst)
+		if parent == "TOP":
+			base.report["Report"]["Order"] = ",".join(orderlst)
+		else:
+			base.report[parent]["Order"] = ",".join(orderlst)
+		base.report_save()
+
+	def report_new_section(self, parent, name):
+		id = "{:02X}".format(int(time.time()*10000))
+		# id = "{:02X}".format(int(time.time()*1000000))
+		# id = "{:02X}".format(time.time()) # cannot convert float
+		base.debugmsg(5, "id:", id)
+		self.report_add_section(parent, id, name)
+		# base.report_save() # report_set_order in report_add_section will save
+		return id
+
+	def report_add_section(self, parent, id, name):
+		base.debugmsg(5, "parent: ", parent)
+		if id not in base.report:
+			base.report[id] = {}
+		base.report[id]['Name'] = name
+		base.report[id]['Parent'] = parent
+		order = self.report_get_order(parent)
+		base.debugmsg(5, "order: ", order)
+		order.append(id)
+		self.report_set_order(parent, order)
+		base.debugmsg(5, "base.report: ", base.report._sections)
+		# base.report_save() # report_set_order will save
+
+
+	def report_item_parent(self, id):
+		if id in base.report and 'Parent' in base.report[id]:
+			return base.report[id]['Parent']
+		else:
+			return "TOP"
+
+	def report_remove_section(self, id):
+		parent = self.report_item_parent(id)
+		order = self.report_get_order(parent)
+		base.debugmsg(5, "order: ", order)
+		pos = order.index(id)
+		base.debugmsg(5, "pos: ", pos)
+		order.pop(pos)
+		base.debugmsg(5, "order: ", order)
+		self.report_set_order(parent, order)
+		base.debugmsg(5, "base.report: ", base.report._sections)
+		subitems = self.report_get_order(id)
+		for item in subitems:
+			self.report_remove_section(item)
+		del base.report[id]
+		base.debugmsg(5, "base.report: ", base.report._sections)
+		base.report_save()
+
+	def report_move_section_up(self, id):
+		parent = self.report_item_parent(id)
+		order = self.report_get_order(parent)
+		base.debugmsg(5, "order: ", order)
+		pos = order.index(id)
+		base.debugmsg(5, "pos: ", pos)
+		order.pop(pos)
+		order.insert(pos -1, id)
+		base.debugmsg(5, "order: ", order)
+		self.report_set_order(parent, order)
+		# base.report_save() # report_set_order will save
+
+	def report_move_section_down(self, id):
+		parent = self.report_item_parent(id)
+		order = self.report_get_order(parent)
+		base.debugmsg(5, "order: ", order)
+		pos = order.index(id)
+		base.debugmsg(5, "pos: ", pos)
+		order.pop(pos)
+		order.insert(pos +1, id)
+		base.debugmsg(5, "order: ", order)
+		self.report_set_order(parent, order)
+		# base.report_save() # report_set_order will save
+
+		# base.report["Report"]["Order"].index('ED299C2969A') # get index from list
+		# base.report["Report"]["Order"].insert(1, base.report["Report"]["Order"].pop(2)) # move item in list
+
+	def report_item_get_name(self, id):
+		return base.report[id]['Name']
+
+	def report_item_set_name(self, id, newname):
+		base.report[id]['Name'] = newname
+		base.report_save()
+
+
+	#
+	# Result data db Functions
+	#
 
 	def open_results_db(self, dbpath):
 		self.close_results_db()
@@ -499,7 +539,13 @@ class ReporterCore:
 
 		self.selectResults(base.config['Reporter']['Results'])
 
-		base.template_open(base.config['Reporter']['Template'])
+		if "Report" in base.config['Reporter'] \
+			and len(base.config['Reporter']['Report']) \
+			and os.path.isfile(base.config['Reporter']['Report']):
+			base.report_open()
+		else:
+			base.template_open(base.config['Reporter']['Template'])
+			base.report_save()
 
 
 		if base.displaygui:
@@ -540,6 +586,12 @@ class ReporterCore:
 
 		if len(resultsfile)>0:
 			base.config['Reporter']['Results'] = resultsfile
+
+			tplfres = os.path.splitext(resultsfile)
+			freport = "{}.report".format(tplfres[0])
+			base.debugmsg(9, "freport:", freport)
+			base.config['Reporter']['Report'] = freport
+
 			filedir = os.path.dirname(resultsfile)
 			base.debugmsg(9, "filedir:", filedir)
 			parent = os.path.dirname(filedir)
@@ -1050,7 +1102,7 @@ class ReporterGUI(tk.Frame):
 					self.sectionstree.delete(itm)
 
 
-		sections = base.template_get_order(ParentID)
+		sections = base.report_get_order(ParentID)
 		base.debugmsg(5, "sections:", sections)
 		for sect in sections:
 			self.LoadSection(ParentID, sect)
@@ -1063,11 +1115,11 @@ class ReporterGUI(tk.Frame):
 
 	def LoadSection(self, ParentID, sectionID):
 		base.debugmsg(5, "ParentID:", ParentID, "	sectionID:", sectionID)
-		sect_name = "{}".format(base.template[sectionID]["Name"])
+		sect_name = "{}".format(base.report[sectionID]["Name"])
 		base.debugmsg(5, "sect_name:", sect_name)
 
 		self.sectionstree.insert(ParentID, "end", sectionID, text=sect_name, tags="Sect")
-		if "Order" in base.template[sectionID]:
+		if "Order" in base.report[sectionID]:
 			self.LoadSections(sectionID)
 		# self.sectionstree.see(sectionID)
 
@@ -1293,8 +1345,14 @@ class ReporterGUI(tk.Frame):
 			if id=="TOP":
 				self.content_reportsettings()
 			else:
-				self.contentdata[id]["lblsettings"] = ttk.Label(self.contentdata[id]["Settings"], text="Settings for {}: {}".format(id, base.template_item_get_name(id)))
+				self.contentdata[id]["lblsettings"] = ttk.Label(self.contentdata[id]["Settings"], text="Settings for {}: {}".format(id, base.report_item_get_name(id)))
 				self.contentdata[id]["lblsettings"].grid(column=0, row=0, sticky="nsew")
+				# Input field headding / name
+
+				# option list - heading / text / graph / table
+
+				# call function to load settings for option selected (heading doesn't need)
+
 		curritem = self.contentsettings.grid_slaves(column=0, row=0)
 		base.debugmsg(5, "curritem:", curritem)
 		if len(curritem)>0:
@@ -1304,13 +1362,31 @@ class ReporterGUI(tk.Frame):
 	def content_reportsettings(self):
 		rownum = 0
 		id="TOP"
+		# Report Title
 		rownum +=1
 		self.contentdata[id]["lblTitle"] = ttk.Label(self.contentdata[id]["Settings"], text="Title:")
 		self.contentdata[id]["lblTitle"].grid(column=0, row=rownum, sticky="nsew")
 
+		# chkbox display start and end time of test
+		# 		start time
+		# 		end time
+
+		# Table of Contents, chkbox, levels, etc
+
+		# page header text
+
+		# page footer text
+
+
+		# Logo image
+
+		# wattermark image
+
+		# report font
 		rownum +=1
 		self.contentdata[id]["lblFont"] = ttk.Label(self.contentdata[id]["Settings"], text="Font:")
 		self.contentdata[id]["lblFont"].grid(column=0, row=rownum, sticky="nsew")
+
 
 
 	def content_preview(self, id):
@@ -1323,7 +1399,7 @@ class ReporterGUI(tk.Frame):
 			if id=="TOP":
 				pass
 			else:
-				self.contentdata[id]["lblpreview"] = ttk.Label(self.contentdata[id]["Preview"], text = "Preview for {}: {}".format(id, base.template_item_get_name(id)))
+				self.contentdata[id]["lblpreview"] = ttk.Label(self.contentdata[id]["Preview"], text = "Preview for {}: {}".format(id, base.report_item_get_name(id)))
 				self.contentdata[id]["lblpreview"].grid(column=0, row=0, sticky="nsew")
 		curritem = self.contentpreview.grid_slaves(column=0, row=0)
 		base.debugmsg(5, "curritem:", curritem)
@@ -1428,7 +1504,7 @@ class ReporterGUI(tk.Frame):
 		if name is not None and len(name)>0:
 			if selected is None or len(selected)<1:
 				selected = "TOP"
-			id = base.template_new_section(selected, name)
+			id = base.report_new_section(selected, name)
 			self.LoadSection(selected, id)
 
 
@@ -1436,9 +1512,9 @@ class ReporterGUI(tk.Frame):
 		selected = self.sectionstree.focus()
 		base.debugmsg(5, "selected:", selected)
 		if selected:
-			base.debugmsg(5, "Removing:", base.template[selected]["Name"])
-			base.template_remove_section(selected)
-			parent = base.template_item_parent(selected)
+			base.debugmsg(5, "Removing:", base.report[selected]["Name"])
+			base.report_remove_section(selected)
+			parent = base.report_item_parent(selected)
 			self.LoadSections(parent)
 
 
@@ -1446,9 +1522,9 @@ class ReporterGUI(tk.Frame):
 		selected = self.sectionstree.focus()
 		base.debugmsg(5, "selected:", selected)
 		if selected:
-			base.debugmsg(5, "Moving", base.template[selected]["Name"], "up")
-			base.template_move_section_up(selected)
-			parent = base.template_item_parent(selected)
+			base.debugmsg(5, "Moving", base.report[selected]["Name"], "up")
+			base.report_move_section_up(selected)
+			parent = base.report_item_parent(selected)
 			self.LoadSections(parent)
 			self.sectionstree.selection_set(selected)
 			self.sectionstree.focus(selected)
@@ -1457,9 +1533,9 @@ class ReporterGUI(tk.Frame):
 		selected = self.sectionstree.focus()
 		base.debugmsg(5, "selected:", selected)
 		if selected:
-			base.debugmsg(5, "Moving", base.template[selected]["Name"], "down")
-			base.template_move_section_down(selected)
-			parent = base.template_item_parent(selected)
+			base.debugmsg(5, "Moving", base.report[selected]["Name"], "down")
+			base.report_move_section_down(selected)
+			parent = base.report_item_parent(selected)
 			self.LoadSections(parent)
 			self.sectionstree.selection_set(selected)
 			self.sectionstree.focus(selected)
