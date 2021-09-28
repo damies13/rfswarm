@@ -334,7 +334,20 @@ class ReporterBase():
 		base.report[id]['Name'] = newname
 		base.report_save()
 
-
+	def report_sect_number(self, id):
+		base.debugmsg(5, "id:", id)
+		parent = self.report_item_parent(id)
+		order = self.report_get_order(parent)
+		num = order.index(id)+1
+		base.debugmsg(5, "parent:", parent, "	num:", num)
+		if parent == "TOP":
+			base.debugmsg(5, "return:", num)
+			return "{}".format(num)
+		else:
+			parentnum = self.report_sect_number(parent)
+			base.debugmsg(5, "parentnum:", parentnum)
+			base.debugmsg(5, "return:", parentnum, num)
+			return "{}.{}".format(parentnum, num)
 	#
 	# Result data db Functions
 	#
@@ -781,7 +794,7 @@ class ReporterGUI(tk.Frame):
 			accelkey = "Command"
 
 		results_menu.add_command(label = "Open", command = self.mnu_results_Open, accelerator="{}-o".format(accelkey))
-		window.bind('o', self.mnu_results_Open)
+		window.bind("<{}-o>".format(accelkey), self.mnu_results_Open)
 		results_menu.add_separator() # it adds a line after the 'Open files' option
 
 		if sys.platform.startswith('darwin'):
@@ -790,19 +803,19 @@ class ReporterGUI(tk.Frame):
 			self.root.createcommand('tk::mac::Quit', self.on_closing)
 		else:
 			results_menu.add_command(label = "Exit", command = self.on_closing, accelerator="{}-x".format(accelkey))
-			window.bind('x', self.on_closing)
+			window.bind("<{}-x>".format(accelkey), self.on_closing)
 
 		self.template_menu = tk.Menu(root_menu)
 		root_menu.add_cascade(label = "Template", menu = self.template_menu)
 
 		self.template_menu.add_command(label = "New", command = self.mnu_template_New, accelerator="{}-n".format(accelkey)) # it adds a option to the sub menu 'command' parameter is used to do some action
-		window.bind('n', self.mnu_template_New)
+		window.bind("<{}-n>".format(accelkey), self.mnu_template_New)
 		self.template_menu.add_command(label = "Open", command = self.mnu_template_Open, accelerator="{}-t".format(accelkey))
-		window.bind('o', self.mnu_template_Open)
+		window.bind("<{}-t>".format(accelkey), self.mnu_template_Open)
 		self.template_menu.add_command(label = "Save", command = self.mnu_template_Save, accelerator="{}-s".format(accelkey))
-		window.bind('s', self.mnu_template_Save)
+		window.bind("<{}-s>".format(accelkey), self.mnu_template_Save)
 		self.template_menu.add_command(label = "Save As", command = self.mnu_template_SaveAs, accelerator="{}-a".format(accelkey))
-		window.bind('a', self.mnu_template_SaveAs)
+		window.bind("<{}-a>".format(accelkey), self.mnu_template_SaveAs)
 
 
 
@@ -1334,6 +1347,10 @@ class ReporterGUI(tk.Frame):
 		self.content_settings(id)
 		self.content_preview(id)
 
+	#
+	# Settings
+	#
+
 	def content_settings(self, id):
 		base.debugmsg(5, "id:", id)
 		# self.content
@@ -1343,14 +1360,29 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[id]["Settings"] = tk.Frame(self.contentsettings, padx=0, pady=0)
 			self.contentdata[id]["Settings"].config(bg="rosy brown")
 			if id=="TOP":
-				self.content_reportsettings()
+				self.cs_reportsettings()
 			else:
-				self.contentdata[id]["lblsettings"] = ttk.Label(self.contentdata[id]["Settings"], text="Settings for {}: {}".format(id, base.report_item_get_name(id)))
-				self.contentdata[id]["lblsettings"].grid(column=0, row=0, sticky="nsew")
+				rownum = 0
+				# self.contentdata[id]["lblsettings"] = ttk.Label(self.contentdata[id]["Settings"], text="Settings for {}: {}".format(id, base.report_item_get_name(id)))
+				# self.contentdata[id]["lblsettings"].grid(column=0, row=0, sticky="nsew")
 				# Input field headding / name
+				self.contentdata[id]["lblHeading"] = ttk.Label(self.contentdata[id]["Settings"], text="Heading:")
+				self.contentdata[id]["lblHeading"].grid(column=0, row=rownum, sticky="nsew")
 
+				self.contentdata[id]["Heading"]=tk.StringVar()
+				self.contentdata[id]["Heading"].set(base.report_item_get_name(id))
+				self.contentdata[id]["inpHeading"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["Heading"])
+				self.contentdata[id]["inpHeading"].grid(column=1, row=rownum, sticky="nsew")
+				# https://pysimplegui.readthedocs.io/en/latest/
+				self.contentdata[id]["inpHeading"].bind('<Leave>', self.cs_rename_heading)
+				self.contentdata[id]["inpHeading"].bind('<FocusOut>', self.cs_rename_heading)
+
+				rownum += 1
 				# option list - heading / text / graph / table
+				self.contentdata[id]["lblType"] = ttk.Label(self.contentdata[id]["Settings"], text="Type:")
+				self.contentdata[id]["lblType"].grid(column=0, row=rownum, sticky="nsew")
 
+				rownum += 1
 				# call function to load settings for option selected (heading doesn't need)
 
 		curritem = self.contentsettings.grid_slaves(column=0, row=0)
@@ -1359,7 +1391,7 @@ class ReporterGUI(tk.Frame):
 			curritem[0].grid_forget()
 		self.contentdata[id]["Settings"].grid(column=0, row=0, sticky="nsew")
 
-	def content_reportsettings(self):
+	def cs_reportsettings(self):
 		rownum = 0
 		id="TOP"
 		# Report Title
@@ -1387,9 +1419,36 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["lblFont"] = ttk.Label(self.contentdata[id]["Settings"], text="Font:")
 		self.contentdata[id]["lblFont"].grid(column=0, row=rownum, sticky="nsew")
 
+	def cs_rename_heading(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+		id = self.sectionstree.focus()
+		base.debugmsg(5, "id:", id)
+		curhead = base.report_item_get_name(id)
+		newhead = self.contentdata[id]["Heading"].get()
+		if newhead != curhead:
+			base.debugmsg(5, "rename :", curhead, "	to:", newhead)
+			base.report_item_set_name(id, newhead)
+			self.LoadSections(id)
+			self.content_preview(id)
 
+
+	#
+	# Preview
+	#
 
 	def content_preview(self, id):
+		base.debugmsg(5, "id:", id)
+		self.cp_generate_preview(id)
+		# curritem = self.contentpreview.grid_slaves(column=0, row=0)
+		# base.debugmsg(5, "curritem:", curritem)
+		# if len(curritem)>0:
+		# 	curritem[0].grid_forget()
+		curritems = self.contentpreview.grid_slaves()
+		for curritem in curritems:
+			curritem.grid_forget()
+		self.cp_display_preview(id, 0)
+
+	def cp_generate_preview(self, id):
 		base.debugmsg(5, "id:", id)
 		if id not in self.contentdata:
 			self.contentdata[id] = {}
@@ -1399,13 +1458,28 @@ class ReporterGUI(tk.Frame):
 			if id=="TOP":
 				pass
 			else:
-				self.contentdata[id]["lblpreview"] = ttk.Label(self.contentdata[id]["Preview"], text = "Preview for {}: {}".format(id, base.report_item_get_name(id)))
-				self.contentdata[id]["lblpreview"].grid(column=0, row=0, sticky="nsew")
-		curritem = self.contentpreview.grid_slaves(column=0, row=0)
-		base.debugmsg(5, "curritem:", curritem)
-		if len(curritem)>0:
-			curritem[0].grid_forget()
-		self.contentdata[id]["Preview"].grid(column=0, row=0, sticky="nsew")
+				rownum = 0
+				# self.contentdata[id]["lblpreview"] = ttk.Label(self.contentdata[id]["Preview"], text = "Preview for {}: {}".format(id, base.report_item_get_name(id)))
+				# self.contentdata[id]["lblpreview"].grid(column=0, row=0, sticky="nsew")
+
+				titlenum = base.report_sect_number(id)
+				base.debugmsg(5, "titlenum:", titlenum)
+				title = "{}	{}".format(titlenum, base.report_item_get_name(id))
+				self.contentdata[id]["lbltitle"] = ttk.Label(self.contentdata[id]["Preview"], text=title)
+				self.contentdata[id]["lbltitle"].grid(column=0, row=rownum, sticky="nsew")
+		children = base.report_get_order(id)
+		for child in children:
+			self.cp_generate_preview(child)
+
+	def cp_display_preview(self, id, row):
+		base.debugmsg(5, "id:", id)
+		self.contentdata[id]["Preview"].grid(column=0, row=row, sticky="nsew")
+		nextrow = row+1
+		base.debugmsg(5, "nextrow:", nextrow)
+		children = base.report_get_order(id)
+		for child in children:
+			nextrow = self.cp_display_preview(child, nextrow)
+		return nextrow
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -1413,7 +1487,7 @@ class ReporterGUI(tk.Frame):
 	#
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-	def mnu_do_nothing(self):
+	def mnu_do_nothing(self, _event=None):
 		base.debugmsg(5, "Not implimented yet.....")
 
 
