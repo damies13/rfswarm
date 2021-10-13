@@ -1425,10 +1425,14 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "id:", id)
 		curhead = base.report_item_get_name(id)
 		newhead = self.contentdata[id]["Heading"].get()
+		base.debugmsg(5, "curhead:", curhead, "	newhead:", newhead)
 		if newhead != curhead:
 			base.debugmsg(5, "rename :", curhead, "	to:", newhead)
 			base.report_item_set_name(id, newhead)
-			self.LoadSections(id)
+			parent = base.report_item_parent(id)
+			self.LoadSections(parent)
+			self.sectionstree.selection_set(id)
+			self.sectionstree.focus(id)
 			self.content_preview(id)
 
 
