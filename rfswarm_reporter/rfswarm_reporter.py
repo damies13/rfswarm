@@ -59,8 +59,10 @@ class ReporterBase():
 	datadb = None
 	dbqueue = {"Write": [], "Read": [], "ReadResult": {}, "Results": [], "Metric": [], "Metrics": []}
 
-
 	settings = {}
+
+	settings["ContentTypes"] = {"head":"Heading", "note":"Note", "graph":"Data Graph", "table":"Data Table"}
+
 
 	def debugmsg(self, lvl, *msg):
 		msglst = []
@@ -328,7 +330,8 @@ class ReporterBase():
 		# base.report["Report"]["Order"].insert(1, base.report["Report"]["Order"].pop(2)) # move item in list
 
 	def report_item_get_changed(self, id):
-		if id is "TOP":
+		base.debugmsg(5, "id:", id)
+		if id == 'TOP':
 			return time.time()
 		if 'Changed' not in base.report[id]:
 			base.report_item_set_changed(id)
@@ -338,6 +341,8 @@ class ReporterBase():
 		base.report[id]['Changed'] = str(time.time())
 
 	def report_item_get_name(self, id):
+		if id == "TOP":
+			return "Report"
 		return base.report[id]['Name']
 
 	def report_item_set_name(self, id, newname):
@@ -359,6 +364,33 @@ class ReporterBase():
 			base.debugmsg(5, "parentnum:", parentnum)
 			base.debugmsg(5, "return:", parentnum, num)
 			return "{}.{}".format(parentnum, num)
+
+	def report_item_get_type_lbl(self, id):
+		base.debugmsg(5, "id:", id)
+		type = base.report_item_get_type(id)
+		base.debugmsg(5, "type:", type)
+		return base.settings["ContentTypes"][type]
+
+	def report_item_get_type(self, id):
+		base.debugmsg(5, "id:", id)
+		default = list(base.settings["ContentTypes"].keys())[0]
+		base.debugmsg(5, "default:", default)
+		if id == "TOP":
+			return default
+		if 'Type' not in base.report[id]:
+			base.debugmsg(5, "Set to default:", default)
+			base.report_item_set_type(id, default)
+
+		base.debugmsg(5, "Type:", base.report[id]['Type'])
+		return base.report[id]['Type']
+
+	def report_item_set_type(self, id, newType):
+		base.debugmsg(5, "id:", id, "	newType:", newType)
+		base.report[id]['Type'] = newType
+		base.report_item_set_changed(id)
+		base.report_save()
+
+
 	#
 	# Result data db Functions
 	#
@@ -1382,16 +1414,26 @@ class ReporterGUI(tk.Frame):
 
 				self.contentdata[id]["Heading"]=tk.StringVar()
 				self.contentdata[id]["Heading"].set(base.report_item_get_name(id))
-				self.contentdata[id]["inpHeading"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["Heading"])
-				self.contentdata[id]["inpHeading"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[id]["eHeading"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["Heading"])
+				self.contentdata[id]["eHeading"].grid(column=1, row=rownum, sticky="nsew")
 				# https://pysimplegui.readthedocs.io/en/latest/
-				self.contentdata[id]["inpHeading"].bind('<Leave>', self.cs_rename_heading)
-				self.contentdata[id]["inpHeading"].bind('<FocusOut>', self.cs_rename_heading)
+				self.contentdata[id]["eHeading"].bind('<Leave>', self.cs_rename_heading)
+				self.contentdata[id]["eHeading"].bind('<FocusOut>', self.cs_rename_heading)
 
 				rownum += 1
 				# option list - heading / text / graph / table
 				self.contentdata[id]["lblType"] = ttk.Label(self.contentdata[id]["Settings"], text="Type:")
 				self.contentdata[id]["lblType"].grid(column=0, row=rownum, sticky="nsew")
+
+				ContentTypes = [None] + list(base.settings["ContentTypes"].values())
+				self.contentdata[id]["Type"]=tk.StringVar()
+				self.contentdata[id]["Type"].set(base.report_item_get_type_lbl(id))
+				self.contentdata[id]["omType"]=ttk.OptionMenu( \
+													self.contentdata[id]["Settings"], \
+													self.contentdata[id]["Type"], \
+													command=self.cs_change_type, \
+													*ContentTypes)
+				self.contentdata[id]["omType"].grid(column=1, row=rownum, sticky="nsew")
 
 				rownum += 1
 				# call function to load settings for option selected (heading doesn't need)
@@ -1446,6 +1488,20 @@ class ReporterGUI(tk.Frame):
 			self.sectionstree.focus(id)
 			self.content_preview(id)
 
+	def cs_change_type(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+		id = self.sectionstree.focus()
+		base.debugmsg(5, "id:", id)
+
+		keys = list(base.settings["ContentTypes"].keys())
+		vals = list(base.settings["ContentTypes"].values())
+		idx = 0
+		if _event in vals:
+			idx  = vals.index(_event)
+
+		type = keys[idx]
+		base.report_item_set_type(id, type)
+		self.content_load(id)
 
 	#
 	# Preview
