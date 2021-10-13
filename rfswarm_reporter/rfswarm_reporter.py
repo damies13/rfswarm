@@ -390,6 +390,33 @@ class ReporterBase():
 		base.report_item_set_changed(id)
 		base.report_save()
 
+	#
+	# Report Item Type: note
+	#
+	def rt_note_get(self, id):
+		base.debugmsg(5, "id:", id)
+		if 'note' in base.report[id]:
+			return base.report[id]['note']
+		else:
+			return ""
+
+	def rt_note_set(self, id, noteText):
+		base.debugmsg(5, "id:", id, "	noteText:", noteText)
+		base.report[id]['note'] = noteText
+		base.report_item_set_changed(id)
+		base.report_save()
+
+	#
+	# Report Item Type: graph
+	#
+
+	#
+	# Report Item Type: table
+	#
+
+
+
+
 
 	#
 	# Result data db Functions
@@ -662,6 +689,7 @@ class ReporterCore:
 class ReporterGUI(tk.Frame):
 
 	style_text_colour = "#000"
+	style_head_colour = "#00F"
 	imgdata = {}
 	b64 = {}
 	contentdata = {}
@@ -1033,6 +1061,15 @@ class ReporterGUI(tk.Frame):
 
 				style.configure("TRadiobutton", foreground=self.style_text_colour)
 
+		layout = s.layout('TLabel')
+		base.debugmsg(5, "TLabel 	layout:", layout)
+		# style.configure('TLabelHead', font =('calibri', 10, 'bold', 'underline'), foreground = 'red')
+		# style.configure('Head.TLabel', font =('calibri', 16, 'bold'), foreground = 'Blue')
+		# style.configure('Head.TLabel', foreground='blue')
+		style.configure("Head.TLabel", foreground=self.style_head_colour)
+
+		layout = s.layout('Head.TLabel')
+		base.debugmsg(5, "Head.TLabel 	layout:", layout)
 
 
 	def BuildToolBar(self):
@@ -1363,6 +1400,8 @@ class ReporterGUI(tk.Frame):
 		# self.contentpreview['padding'] = (0,1,5,10)
 		self.contentpreview.config(bg="salmon")
 		self.contentpreview.grid(column=0, row=0, sticky="nsew", padx=0, pady=0)
+		# self.contentpreview.columnconfigure(0, weight=1)
+		# self.contentpreview.rowconfigure(0, weight=1)
 		# p.grid(row=0, column=0, sticky="nsew")
 		# p.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
 		self.tabs.add(self.contentpreview, image=self.imgdata[icontext], text=icontext, compound=tk.LEFT, padding=0, sticky="nsew")
@@ -1378,6 +1417,8 @@ class ReporterGUI(tk.Frame):
 		self.contentsettings = tk.Frame(self.tabs, padx=0, pady=0)
 		self.contentsettings.config(bg="linen")
 		self.contentsettings.grid(column=0, row=0, sticky="nsew", padx=0, pady=0)
+		self.contentsettings.columnconfigure(0, weight=1)
+		self.contentsettings.rowconfigure(0, weight=1)
 		self.tabs.add(self.contentsettings, image=self.imgdata[icontext], text=icontext, compound=tk.LEFT, padding=0, sticky="nsew")
 
 		self.tabs.grid(column=0, row=0, sticky="nsew")
@@ -1420,6 +1461,12 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["eHeading"].bind('<Leave>', self.cs_rename_heading)
 				self.contentdata[id]["eHeading"].bind('<FocusOut>', self.cs_rename_heading)
 
+
+
+				self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Settings"], text="")
+				self.contentdata[id]["lblSpacer"].grid(column=9, row=rownum, sticky="nsew")
+				self.contentdata[id]["Settings"].columnconfigure(9, weight=1)
+
 				rownum += 1
 				# option list - heading / text / graph / table
 				self.contentdata[id]["lblType"] = ttk.Label(self.contentdata[id]["Settings"], text="Type:")
@@ -1436,7 +1483,16 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["omType"].grid(column=1, row=rownum, sticky="nsew")
 
 				rownum += 1
+				self.contentdata[id]["Frame"] = tk.Frame(self.contentdata[id]["Settings"], padx=0, pady=0)
+				self.contentdata[id]["Frame"].config(bg="SlateBlue2")
+				self.contentdata[id]["Frame"].grid(column=0, row=rownum, columnspan=10, sticky="nsew")
+
+				self.contentdata[id]["Settings"].rowconfigure(rownum, weight=1)
+
 				# call function to load settings for option selected (heading doesn't need)
+				type = base.report_item_get_type(id)
+				if type == 'note':
+					self.cs_note(id)
 
 		curritem = self.contentsettings.grid_slaves(column=0, row=0)
 		base.debugmsg(5, "curritem:", curritem)
@@ -1503,6 +1559,28 @@ class ReporterGUI(tk.Frame):
 		base.report_item_set_type(id, type)
 		self.content_load(id)
 
+
+	def cs_note(self, id):
+		base.debugmsg(5, "id:", id)
+		# base.rt_note_get(id)
+		self.contentdata[id]["tNote"] = tk.Text(self.contentdata[id]["Frame"])
+		data = self.contentdata[id]["tNote"].insert('0.0', base.rt_note_get(id))
+		self.contentdata[id]["tNote"].grid(column=0, row=0, sticky="nsew")
+		self.contentdata[id]["Frame"].rowconfigure(0, weight=1)
+		self.contentdata[id]["Frame"].columnconfigure(0, weight=1)
+		self.contentdata[id]["tNote"].bind('<Leave>', self.cs_note_update)
+		self.contentdata[id]["tNote"].bind('<FocusOut>', self.cs_note_update)
+
+	def cs_note_update(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+		id = self.sectionstree.focus()
+		base.debugmsg(5, "id:", id)
+		if "tNote" in self.contentdata[id]:
+			data = self.contentdata[id]["tNote"].get('0.0', tk.END)
+			base.debugmsg(5, "data:", data)
+			base.rt_note_set(id, data)
+			self.content_preview(id)
+
 	#
 	# Preview
 	#
@@ -1543,8 +1621,15 @@ class ReporterGUI(tk.Frame):
 				titlenum = base.report_sect_number(id)
 				base.debugmsg(5, "titlenum:", titlenum)
 				title = "{}	{}".format(titlenum, base.report_item_get_name(id))
-				self.contentdata[id]["lbltitle"] = ttk.Label(self.contentdata[id]["Preview"], text=title)
-				self.contentdata[id]["lbltitle"].grid(column=0, row=rownum, sticky="nsew")
+				self.contentdata[id]["lbltitle"] = ttk.Label(self.contentdata[id]["Preview"], text=title, style='Head.TLabel')
+				# self.contentdata[id]["lbltitle"] = ttk.Label(self.contentdata[id]["Preview"], text=title)
+				self.contentdata[id]["lbltitle"].grid(column=0, row=rownum, columnspan=9, sticky="nsew")
+
+				type = base.report_item_get_type(id)
+				if type == 'note':
+					self.cp_note(id)
+
+
 		children = base.report_get_order(id)
 		for child in children:
 			self.cp_generate_preview(child)
@@ -1558,6 +1643,23 @@ class ReporterGUI(tk.Frame):
 		for child in children:
 			nextrow = self.cp_display_preview(child, nextrow)
 		return nextrow
+
+
+	def cp_note(self, id):
+		base.debugmsg(5, "id:", id)
+		rownum = 1
+		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text="    ")
+		self.contentdata[id]["lblSpacer"].grid(column=0, row=rownum, sticky="nsew")
+
+		notetxt = "\r\n{}\r\n".format(base.rt_note_get(id))
+		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text=notetxt)
+		self.contentdata[id]["lblSpacer"].grid(column=1, row=rownum, sticky="nsew")
+
+	def cp_graph(self, id):
+		base.debugmsg(5, "id:", id)
+
+	def cp_table(self, id):
+		base.debugmsg(5, "id:", id)
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
