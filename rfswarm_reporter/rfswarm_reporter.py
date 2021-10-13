@@ -327,11 +327,22 @@ class ReporterBase():
 		# base.report["Report"]["Order"].index('ED299C2969A') # get index from list
 		# base.report["Report"]["Order"].insert(1, base.report["Report"]["Order"].pop(2)) # move item in list
 
+	def report_item_get_changed(self, id):
+		if id is "TOP":
+			return time.time()
+		if 'Changed' not in base.report[id]:
+			base.report_item_set_changed(id)
+		return float(base.report[id]['Changed'])
+
+	def report_item_set_changed(self, id):
+		base.report[id]['Changed'] = str(time.time())
+
 	def report_item_get_name(self, id):
 		return base.report[id]['Name']
 
 	def report_item_set_name(self, id, newname):
 		base.report[id]['Name'] = newname
+		base.report_item_set_changed(id)
 		base.report_save()
 
 	def report_sect_number(self, id):
@@ -1456,7 +1467,14 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "id:", id)
 		if id not in self.contentdata:
 			self.contentdata[id] = {}
+		gen = False
 		if "Preview" not in self.contentdata[id]:
+			gen = True
+		# if "Changed" in self.contentdata[id] and base.report_item_get_changed(id) > self.contentdata[id]["Changed"]:
+		elif base.report_item_get_changed(id) > self.contentdata[id]["Changed"]:
+			gen = True
+		if gen:
+			self.contentdata[id]["Changed"] = base.report_item_get_changed(id)
 			self.contentdata[id]["Preview"] = tk.Frame(self.contentpreview, padx=0, pady=0)
 			self.contentdata[id]["Preview"].config(bg="gold")
 			if id=="TOP":
