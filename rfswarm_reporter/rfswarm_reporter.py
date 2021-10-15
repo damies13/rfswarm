@@ -948,7 +948,7 @@ class ReporterGUI(tk.Frame):
 		# btnShowHide.grid(column=1, row=1, sticky="nsew")
 		# btnShowHide.rowconfigure(1, weight=1)
 
-		self.content = tk.Frame(self.mainframe)
+		self.content = tk.Frame(self.mainframe, bd=0)
 		self.content.grid(column=2, row=0, columnspan=2, rowspan=2, sticky="nsew")
 		self.content.config(bg="lightblue")
 		self.content.columnconfigure(0, weight=1)
@@ -978,6 +978,14 @@ class ReporterGUI(tk.Frame):
 
 		style.configure("TNotebook", borderwidth=0)
 		style.configure("TNotebook.Tab", borderwidth=0)
+		style.configure("TNotebook", highlightthickness=0)
+		style.configure("TNotebook.Tab", highlightthickness=0)
+		style.configure("TNotebook", padding=0)
+		style.configure("TNotebook.Tab", padding=0)
+		style.configure("TNotebook", tabmargins=0)
+		style.configure("TNotebook.Tab", expand=0)
+
+
 		style.configure("TFrame", borderwidth=0)
 
 		if sys.platform.startswith('darwin'):
@@ -1160,14 +1168,14 @@ class ReporterGUI(tk.Frame):
 		# ttk.Style().configure("Treeview", fieldbackground="orange")
 
 		# vsb = ttk.Scrollbar(self.sections, orient=tk.VERTICAL,command=self.sectionstree.yview)
-		vsb = ttk.Scrollbar(self.sections, orient="vertical", command=self.sectionstree.yview)
-		self.sectionstree.configure(yscrollcommand=vsb.set)
-		vsb.grid(column=1, row=0, sticky="nsew")
+		self.sections.vsb = ttk.Scrollbar(self.sections, orient="vertical", command=self.sectionstree.yview)
+		self.sectionstree.configure(yscrollcommand=self.sections.vsb.set)
+		self.sections.vsb.grid(column=1, row=0, sticky="nsew")
 
 		# hsb = ttk.Scrollbar(self.sections, orient=tk.HORIZONTAL,command=self.sectionstree.xview)
-		hsb = ttk.Scrollbar(self.sections, orient="horizontal", command=self.sectionstree.xview)
-		self.sectionstree.configure(xscrollcommand=hsb.set)
-		hsb.grid(column=0, row=1, sticky="nsew")
+		self.sections.hsb = ttk.Scrollbar(self.sections, orient="horizontal", command=self.sectionstree.xview)
+		self.sectionstree.configure(xscrollcommand=self.sections.hsb.set)
+		self.sections.hsb.grid(column=0, row=1, sticky="nsew")
 
 		self.sectionstree.bind("<Button-1>", self.sect_click_sect)
 
@@ -1396,15 +1404,48 @@ class ReporterGUI(tk.Frame):
 		# first page, which would get widgets gridded into it
 		icontext = "Preview"
 		base.debugmsg(6, icontext)
-		self.contentpreview = tk.Frame(self.tabs, padx=0, pady=0)	# , padx=0, pady=0
+
+		self.contentframe = tk.Frame(self.tabs, padx=0, pady=0, bd=0)	# , padx=0, pady=0
+		self.contentframe.config(bg="salmon")
+		self.contentframe.grid(column=0, row=0, sticky="nsew", padx=0, pady=0)
+
+		self.contentcanvas = tk.Canvas(self.contentframe)
+		self.contentcanvas.grid(column=0, row=0, sticky="nsew", padx=0, pady=0)
+		self.contentframe.columnconfigure(0, weight=1)
+		self.contentframe.rowconfigure(0, weight=1)
+		self.contentcanvas.columnconfigure(0, weight=1)
+		self.contentcanvas.rowconfigure(0, weight=1)
+
+
+		# self.contentpreview = tk.Canvas(self.contentframe, bd=0)
+		# self.contentpreview = ttk.Canvas(self.contentframe)
+		self.contentpreview = tk.Frame(self.contentcanvas, padx=0, pady=0)	# , padx=0, pady=0
 		# self.contentpreview['padding'] = (0,1,5,10)
-		self.contentpreview.config(bg="salmon")
+		self.contentpreview.config(bg="cyan")
 		self.contentpreview.grid(column=0, row=0, sticky="nsew", padx=0, pady=0)
-		# self.contentpreview.columnconfigure(0, weight=1)
-		# self.contentpreview.rowconfigure(0, weight=1)
-		# p.grid(row=0, column=0, sticky="nsew")
-		# p.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
-		self.tabs.add(self.contentpreview, image=self.imgdata[icontext], text=icontext, compound=tk.LEFT, padding=0, sticky="nsew")
+		self.contentpreview.columnconfigure(0, weight=1)
+		self.contentpreview.rowconfigure(0, weight=1)
+
+		self.contentcanvas.create_window((0, 0), window=self.contentpreview, anchor='nw')
+
+		# Vertical Scroolbar
+		self.content.vsb = ttk.Scrollbar(self.contentframe, orient="vertical", command=self.contentcanvas.yview)
+		self.contentcanvas.configure(yscrollcommand=self.content.vsb.set)
+		self.content.vsb.grid(column=1, row=0, sticky="ns")
+
+		# Horizontal Scroolbar
+		hsb = ttk.Scrollbar(self.contentframe, orient="horizontal", command=self.contentcanvas.xview)
+		self.contentcanvas.configure(xscrollcommand=hsb.set)
+		hsb.grid(column=0, row=1, sticky="ew")
+
+
+
+
+
+		self.tabs.add(self.contentframe, image=self.imgdata[icontext], text=icontext, compound=tk.LEFT, padding=0, sticky="nsew")
+
+
+
 
 		base.debugmsg(6, "self.tabs:", self.tabs)
 		base.debugmsg(6, "self.tabs.tab(0):", self.tabs.tab(0))
@@ -1414,7 +1455,7 @@ class ReporterGUI(tk.Frame):
 		# second page
 		icontext = "Settings"
 		base.debugmsg(6, icontext)
-		self.contentsettings = tk.Frame(self.tabs, padx=0, pady=0)
+		self.contentsettings = tk.Frame(self.tabs, padx=0, pady=0, bd=0)
 		self.contentsettings.config(bg="linen")
 		self.contentsettings.grid(column=0, row=0, sticky="nsew", padx=0, pady=0)
 		self.contentsettings.columnconfigure(0, weight=1)
@@ -1441,7 +1482,7 @@ class ReporterGUI(tk.Frame):
 		if id not in self.contentdata:
 			self.contentdata[id] = {}
 		if "Settings" not in self.contentdata[id]:
-			self.contentdata[id]["Settings"] = tk.Frame(self.contentsettings, padx=0, pady=0)
+			self.contentdata[id]["Settings"] = tk.Frame(self.contentsettings, padx=0, pady=0, bd=0)
 			self.contentdata[id]["Settings"].config(bg="rosy brown")
 			if id=="TOP":
 				self.cs_reportsettings()
@@ -1483,7 +1524,7 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["omType"].grid(column=1, row=rownum, sticky="nsew")
 
 				rownum += 1
-				self.contentdata[id]["Frame"] = tk.Frame(self.contentdata[id]["Settings"], padx=0, pady=0)
+				self.contentdata[id]["Frame"] = tk.Frame(self.contentdata[id]["Settings"], padx=0, pady=0, bd=0)
 				self.contentdata[id]["Frame"].config(bg="SlateBlue2")
 				self.contentdata[id]["Frame"].grid(column=0, row=rownum, columnspan=10, sticky="nsew")
 
@@ -1596,6 +1637,7 @@ class ReporterGUI(tk.Frame):
 		for curritem in curritems:
 			curritem.grid_forget()
 		self.cp_display_preview(id, 0)
+		self.contentcanvas.config(scrollregion=self.contentpreview.bbox("all"))
 
 	def cp_generate_preview(self, id):
 		base.debugmsg(5, "id:", id)
@@ -1609,7 +1651,7 @@ class ReporterGUI(tk.Frame):
 			gen = True
 		if gen:
 			self.contentdata[id]["Changed"] = base.report_item_get_changed(id)
-			self.contentdata[id]["Preview"] = tk.Frame(self.contentpreview, padx=0, pady=0)
+			self.contentdata[id]["Preview"] = tk.Frame(self.contentpreview, padx=0, pady=0, bd=0)
 			self.contentdata[id]["Preview"].config(bg="gold")
 			if id=="TOP":
 				pass
