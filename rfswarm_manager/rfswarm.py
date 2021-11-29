@@ -1240,9 +1240,8 @@ class RFSwarmBase:
 		# splitext leaves the . on the extention, the list below needs to have the extentions
 		# starting with a . - Issue #94
 		if (fileext.lower() in ['.robot', '.resource'] and keep_going):
-			with open(localpath, 'rb') as afile:
-				for fline in afile:
-					line = fline.decode("utf-8")
+			with open(localpath, 'r', encoding="utf8") as afile:
+				for line in afile:
 					if checking and '*** ' in line:
 						checking = False
 
@@ -1422,7 +1421,7 @@ class RFSwarmBase:
 	def saveini(self):
 		self.debugmsg(6, "save_ini:", self.save_ini)
 		if self.save_ini:
-			with open(base.manager_ini, 'w') as configfile:    # save
+			with open(base.manager_ini, 'w', encoding="utf8") as configfile:    # save
 				base.config.write(configfile)
 				self.debugmsg(6, "File Saved:", self.manager_ini)
 
@@ -1700,7 +1699,7 @@ class RFSwarmBase:
 				base.debugmsg(9, "colno:", colno, "col:", col)
 				cols.append (base.PrettyColName(col))
 			base.debugmsg(9, "cols:", cols)
-			with open(txtreport, 'w', newline='') as csvfile:
+			with open(txtreport, 'w', newline='', encoding="utf8") as csvfile:
 				writer = csv.writer(csvfile, dialect='excel')
 				writer.writerow(cols)
 				for row in base.dbqueue["ReadResult"]["RunStats"]:
@@ -1731,7 +1730,7 @@ class RFSwarmBase:
 				base.debugmsg(9, "UpdateRunStats: colno:", colno, "col:", col)
 				cols.append (base.PrettyColName(col))
 			base.debugmsg(9, "cols:", cols)
-			with open(txtreport, 'w', newline='') as csvfile:
+			with open(txtreport, 'w', newline='', encoding="utf8") as csvfile:
 				# writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 				writer = csv.writer(csvfile, dialect='excel')
 				writer.writerow(cols)
@@ -1761,7 +1760,7 @@ class RFSwarmBase:
 				base.debugmsg(9, "colno:", colno, "col:", col)
 				cols.append (base.PrettyColName(col))
 			base.debugmsg(9, "cols:", cols)
-			with open(txtreport, 'w', newline='') as csvfile:
+			with open(txtreport, 'w', newline='', encoding="utf8") as csvfile:
 				# writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 				writer = csv.writer(csvfile, dialect='excel')
 				writer.writerow(cols)
@@ -1926,7 +1925,7 @@ class RFSwarmCore:
 
 		if os.path.isfile(base.manager_ini):
 			base.debugmsg(7, "agentini: ", base.manager_ini)
-			base.config.read(base.manager_ini)
+			base.config.read(base.manager_ini, encoding="utf8")
 		else:
 			base.saveini()
 
@@ -2347,7 +2346,7 @@ class RFSwarmCore:
 
 		if os.path.isfile(ScenarioFile):
 			base.debugmsg(9, "ScenarioFile: ", ScenarioFile)
-			filedata.read(ScenarioFile)
+			filedata.read(ScenarioFile, encoding="utf8")
 
 		base.debugmsg(6, "filedata: ", filedata)
 
@@ -5275,7 +5274,7 @@ class RFSwarmGUI(tk.Frame):
 		tclist = [""]
 		# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
 		regex = "^\*+[\s]*(Test Case|Task)"
-		with open(base.scriptlist[r]["Script"]) as f:
+		with open(base.scriptlist[r]["Script"], 'r', encoding="utf8") as f:
 			for line in f:
 				base.debugmsg(9, "sr_test_genlist: tcsection:",tcsection, "	line:", line)
 				if tcsection and line[0:3] == "***":
@@ -6395,7 +6394,7 @@ class RFSwarmGUI(tk.Frame):
 
 			filedata['Scenario']['GraphList'] = ",".join(sgraphs)
 
-			with open(base.config['Plan']['ScenarioFile'], 'w') as sf:    # save
+			with open(base.config['Plan']['ScenarioFile'], 'w', encoding="utf8") as sf:    # save
 			    filedata.write(sf)
 
 			self.updateTitle()
