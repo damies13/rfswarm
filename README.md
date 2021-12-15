@@ -35,8 +35,8 @@ To learn more about rfswarm please refer to the [Documentation](Doc/README.md)
 </kbd><br>
 An example of how your rfswarm setup might look.
 
-### Paid Support
-- [Github](https://github.com/sponsors/damies13?frequency=recurring&sponsor=damies13)
+### Commercial Support
+- The easiest way to get commercial support is to sponsor this project on [Github](https://github.com/sponsors/damies13?frequency=recurring&sponsor=damies13)
 
 <img align="right" src="Doc/Images/Icon_Donate.png">
 
