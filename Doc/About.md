@@ -13,3 +13,5 @@ While Robot Framework is normally used for functional or regression testing, it 
 rfswarm aims to solve this problem by allowing you to take an existing functional or regression test case written in Robot Framework, [make some minor adjustments to make the test case suitable for performance testing](Preparing_for_perf.md) and then run the Robot Framework test case with as many virtual users (robots) as needed to generate load on the application under test.
 
 rfswarm is written completely in python, so if you are already using Robot Framework, then you will already have most of what you need to use rfswarm and will be familiar with pip to get any extra components you need.
+
+[See who has sponsored this project](Doc/Sponsors.md)

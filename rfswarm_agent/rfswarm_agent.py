@@ -437,7 +437,10 @@ class RFSwarmAgent():
 			self.findmanager()
 			if self.args.manager:
 				self.debugmsg(7, "self.args.manager: ", self.args.manager)
-				self.swarmmanager = self.args.manager
+				if self.args.manager[-1] != '/':
+					self.swarmmanager = "{}/".format(self.args.manager)
+				else:
+					self.swarmmanager = self.args.manager
 
 		if self.swarmmanager is not None:
 			self.debugmsg(2, "Try connecting to", self.swarmmanager)
@@ -471,6 +474,8 @@ class RFSwarmAgent():
 		if 'swarmmanager' in self.config['Agent']:
 			self.debugmsg(6, "findmanager: Agent:swarmmanager =", self.config['Agent']['swarmmanager'])
 			self.swarmmanager = self.config['Agent']['swarmmanager']
+			if self.swarmmanager[-1] != '/':
+				self.swarmmanager = "{}/".format(self.swarmmanager)
 		else:
 			self.config['Agent']['swarmmanager'] = "http://localhost:8138/"
 			self.saveini()

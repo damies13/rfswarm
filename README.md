@@ -24,6 +24,8 @@ To learn more about rfswarm please refer to the [Documentation](Doc/README.md)
 
 ## Getting Help
 
+### Community Support
+
 - [rfswarm Documentation](Doc/README.md)
 - [Discord](https://discord.gg/jJfCMrqCsT)
 - [Reporting Issues / Known Issues](https://github.com/damies13/rfswarm/issues)
@@ -33,10 +35,15 @@ To learn more about rfswarm please refer to the [Documentation](Doc/README.md)
 </kbd><br>
 An example of how your rfswarm setup might look.
 
+### Commercial Support
+- The easiest way to get commercial support is to sponsor this project on [Github](https://github.com/sponsors/damies13?frequency=recurring&sponsor=damies13)
+
 <img align="right" src="Doc/Images/Icon_Donate.png">
 
 ## Donations
 
 If you would like to thank me for this project please consider using one of the sponsorship methods:
-- [Github](https://github.com/sponsors/damies13/)
+- [Github](https://github.com/sponsors/damies13?frequency=one-time&sponsor=damies13)
 - [PayPal.me](https://paypal.me/damies13/5) (the $5 is a suggestion, feel free to change to any amount you would like)
+
+[See our sponsors](Doc/Sponsors.md)
