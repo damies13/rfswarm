@@ -204,7 +204,7 @@ This is where you can see which agents have connected, number of robots on each 
 The columns for the agents screen
 | Column Name	| Detail |
 |---		|---	|
-| Status	| This is the last status reported by the agent, unless a agent hasn't reported for a while, then this will show "Offline?" |
+| Status	| This is the last status reported by the agent, unless a agent hasn't reported for a while, then this will show "Offline?". If the agent load is over 80% then status will be "Warning", and over 95% "Critical". All other status values are reported by the agent. |
 | Agent		| This is the agent's name as reported by the agent, usually this is the agent's host name but this can be configured on the agent |
 | Last Seen	| This is the time the last status update was received from the agent |
 | Assigned	| This is the number of robots assigned to the agent during ramp up |
