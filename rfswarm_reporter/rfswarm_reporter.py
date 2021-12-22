@@ -396,26 +396,73 @@ class ReporterBase():
 	def rt_note_get(self, id):
 		base.debugmsg(5, "id:", id)
 		if 'note' in base.report[id]:
-			return base.report[id]['note']
+			return self.whitespace_get_ini_value(base.report[id]['note'])
 		else:
 			return ""
 
 	def rt_note_set(self, id, noteText):
 		base.debugmsg(5, "id:", id, "	noteText:", noteText)
-		base.report[id]['note'] = noteText
+		base.report[id]['note'] = self.whitespace_set_ini_value(noteText)
 		base.report_item_set_changed(id)
 		base.report_save()
 
 	#
 	# Report Item Type: graph
 	#
+	def rt_graph_get_sql(self, id):
+		base.debugmsg(5, "id:", id)
+		if 'SQL' in base.report[id]:
+			return self.whitespace_get_ini_value(base.report[id]['SQL'])
+		else:
+			return ""
+
+	def rt_graph_set_sql(self, id, graphSQL):
+		base.debugmsg(5, "id:", id, "	graphSQL:", graphSQL)
+		base.report[id]['SQL'] = self.whitespace_set_ini_value(graphSQL)
+		base.report_item_set_changed(id)
+		base.report_save()
 
 	#
 	# Report Item Type: table
 	#
+	def rt_table_get_sql(self, id):
+		base.debugmsg(5, "id:", id)
+		if 'SQL' in base.report[id]:
+			return self.whitespace_get_ini_value(base.report[id]['SQL'])
+		else:
+			return ""
+
+	def rt_table_set_sql(self, id, tableSQL):
+		base.debugmsg(5, "id:", id, "	tableSQL:", tableSQL)
+		base.report[id]['SQL'] = self.whitespace_set_ini_value(tableSQL)
+		base.report_item_set_changed(id)
+		base.report_save()
 
 
 
+	def whitespace_set_ini_value(self, valin):
+		base.debugmsg(9, "valin:", valin)
+		valout = valin.replace('\n', 'x12')
+		valout = valout.replace('\r', 'x15')
+		valout = valout.replace('\t', 'x11')
+		valout = valout.replace('[', 'x91')
+		valout = valout.replace(']', 'x93')
+		valout = valout.replace('%', 'x37')
+		valout = valout.replace('#', 'x35')
+		base.debugmsg(9, "valout:", valout)
+		return valout
+
+	def whitespace_get_ini_value(self, valin):
+		base.debugmsg(9, "valin:", valin)
+		valout = valin.replace('x12', '\n')
+		valout = valout.replace('x15', '\r')
+		valout = valout.replace('x11', '\t')
+		valout = valout.replace('x91', '[')
+		valout = valout.replace('x93', ']')
+		valout = valout.replace('x37', '%')
+		valout = valout.replace('x35', '#')
+		base.debugmsg(9, "valout:", valout)
+		return valout
 
 
 	#
@@ -475,23 +522,23 @@ class ReporterBase():
 
 				# General Read
 				if len(base.dbqueue["Read"])>0:
-					base.debugmsg(7, "run_db_thread: dbqueue: Read")
+					base.debugmsg(9, "run_db_thread: dbqueue: Read")
 					tmpq = list(base.dbqueue["Read"])
 					base.dbqueue["Read"] = []
-					base.debugmsg(7, "run_db_thread: dbqueue: Read: tmpq:", tmpq)
+					base.debugmsg(9, "run_db_thread: dbqueue: Read: tmpq:", tmpq)
 					for item in tmpq:
 						if "SQL" in item: # and item["VALUES"]:
 							try:
-								base.debugmsg(7, "run_db_thread: dbqueue: Read: SQL:", item["SQL"])
+								base.debugmsg(9, "run_db_thread: dbqueue: Read: SQL:", item["SQL"])
 								self.datadb.row_factory = self.dict_factory
 								cur = self.datadb.cursor()
 								cur.execute(item["SQL"])
 								result = cur.fetchall()
-								base.debugmsg(7, "run_db_thread: dbqueue: Read: result:", result)
+								base.debugmsg(9, "run_db_thread: dbqueue: Read: result:", result)
 								cur.close()
 								self.datadb.commit()
 
-								base.debugmsg(7, "run_db_thread: dbqueue: Read: result:", result)
+								base.debugmsg(9, "run_db_thread: dbqueue: Read: result:", result)
 								if "KEY" in item:
 									base.dbqueue["ReadResult"][item["KEY"]] = result
 
@@ -1532,8 +1579,13 @@ class ReporterGUI(tk.Frame):
 
 				# call function to load settings for option selected (heading doesn't need)
 				type = base.report_item_get_type(id)
+				base.debugmsg(5, "type:", type)
 				if type == 'note':
 					self.cs_note(id)
+				if type == 'table':
+					self.cs_datatable(id)
+				if type == 'graph':
+					self.cs_graph(id)
 
 		curritem = self.contentsettings.grid_slaves(column=0, row=0)
 		base.debugmsg(5, "curritem:", curritem)
@@ -1622,6 +1674,77 @@ class ReporterGUI(tk.Frame):
 			base.rt_note_set(id, data)
 			self.content_preview(id)
 
+	def cs_datatable(self, id):
+		base.debugmsg(5, "id:", id)
+		sql = base.rt_table_get_sql(id)
+		self.contentdata[id]["Frame"].columnconfigure(0, weight=1)
+		rownum = 0
+
+		# sql for getting tables and views for drop down list
+		# SELECT name FROM sqlite_master
+		# -- WHERE type IN ('table','view')
+		# -- WHERE type IN ('table')
+		# WHERE type IN ('view')
+		# 	AND name NOT LIKE 'sqlite_%'
+		#
+		#
+		# -- UNION ALL
+		# -- SELECT name FROM sqlite_temp_master
+		# -- WHERE type IN ('table','view')
+		# ORDER BY 1
+
+
+		rownum += 1
+		self.contentdata[id]["lblSQL"] = ttk.Label(self.contentdata[id]["Frame"], text="SQL:")
+		self.contentdata[id]["lblSQL"].grid(column=0, row=rownum, sticky="nsew")
+
+		rownum += 1
+		self.contentdata[id]["tSQL"] = tk.Text(self.contentdata[id]["Frame"])
+		self.contentdata[id]["tSQL"].grid(column=0, row=rownum, sticky="nsew")
+		data = self.contentdata[id]["tSQL"].insert('0.0', sql)
+		self.contentdata[id]["tSQL"].bind('<Leave>', self.cs_datatable_update)
+		self.contentdata[id]["tSQL"].bind('<FocusOut>', self.cs_datatable_update)
+
+	def cs_datatable_update(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+		id = self.sectionstree.focus()
+		base.debugmsg(5, "id:", id)
+		if "tSQL" in self.contentdata[id]:
+			data = self.contentdata[id]["tSQL"].get('0.0', tk.END)
+			base.debugmsg(5, "data:", data)
+			base.rt_table_set_sql(id, data)
+			self.content_preview(id)
+
+
+
+
+	def cs_graph(self, id):
+		base.debugmsg(5, "id:", id)
+		sql = base.rt_graph_get_sql(id)
+		self.contentdata[id]["Frame"].columnconfigure(0, weight=1)
+		rownum = 0
+
+		rownum += 1
+		self.contentdata[id]["lblSQL"] = ttk.Label(self.contentdata[id]["Frame"], text="SQL:")
+		self.contentdata[id]["lblSQL"].grid(column=0, row=rownum, sticky="nsew")
+
+		rownum += 1
+		self.contentdata[id]["tSQL"] = tk.Text(self.contentdata[id]["Frame"])
+		self.contentdata[id]["tSQL"].grid(column=0, row=rownum, sticky="nsew")
+		data = self.contentdata[id]["tSQL"].insert('0.0', sql)
+		self.contentdata[id]["tSQL"].bind('<Leave>', self.cs_graph_update)
+		self.contentdata[id]["tSQL"].bind('<FocusOut>', self.cs_graph_update)
+
+	def cs_graph_update(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+		id = self.sectionstree.focus()
+		base.debugmsg(5, "id:", id)
+		if "tSQL" in self.contentdata[id]:
+			data = self.contentdata[id]["tSQL"].get('0.0', tk.END)
+			base.debugmsg(5, "data:", data)
+			base.rt_graph_set_sql(id, data)
+			self.content_preview(id)
+
 	#
 	# Preview
 	#
@@ -1668,8 +1791,13 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["lbltitle"].grid(column=0, row=rownum, columnspan=9, sticky="nsew")
 
 				type = base.report_item_get_type(id)
+				base.debugmsg(5, "type:", type)
 				if type == 'note':
 					self.cp_note(id)
+				if type == 'table':
+					self.cp_table(id)
+				if type == 'graph':
+					self.cp_graph(id)
 
 
 		children = base.report_get_order(id)
@@ -1693,15 +1821,62 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text="    ")
 		self.contentdata[id]["lblSpacer"].grid(column=0, row=rownum, sticky="nsew")
 
-		notetxt = "\r\n{}\r\n".format(base.rt_note_get(id))
+		notetxt = "{}".format(base.rt_note_get(id))
 		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text=notetxt)
 		self.contentdata[id]["lblSpacer"].grid(column=1, row=rownum, sticky="nsew")
 
 	def cp_graph(self, id):
 		base.debugmsg(5, "id:", id)
+		sql = base.rt_graph_get_sql(id)
+		base.debugmsg(7, "sql:", sql)
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": id})
+		while id not in base.dbqueue["ReadResult"]:
+			time.sleep(0.1)
+
+		# tdata = base.dbqueue["ReadResult"][id]
+		# base.debugmsg(7, "tdata:", tdata)
 
 	def cp_table(self, id):
 		base.debugmsg(5, "id:", id)
+		sql = base.rt_table_get_sql(id)
+		rownum = 1
+		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text="    ")
+		self.contentdata[id]["lblSpacer"].grid(column=0, row=rownum, sticky="nsew")
+		if len(sql)>0:
+			base.debugmsg(8, "sql:", sql)
+			base.dbqueue["Read"].append({"SQL": sql, "KEY": id})
+			while id not in base.dbqueue["ReadResult"]:
+				time.sleep(0.1)
+
+			tdata = base.dbqueue["ReadResult"][id]
+			base.debugmsg(8, "tdata:", tdata)
+
+			# self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text=notetxt)
+			# self.contentdata[id]["lblSpacer"].grid(column=1, row=rownum, sticky="nsew")
+
+			cols = tdata[0].keys()
+			base.debugmsg(7, "cols:", cols)
+			colnum = 1
+			for col in cols:
+				cellname = "h_{}".format(col)
+				base.debugmsg(9, "cellname:", cellname)
+				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=col)
+				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+				colnum += 1
+			i = 0
+			for row in tdata:
+				i += 1
+				rownum += 1
+				colnum = 1
+				for col in cols:
+					cellname = "{}_{}".format(i, col)
+					base.debugmsg(9, "cellname:", cellname)
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(row[col]))
+					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+					colnum += 1
+
+
+
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
