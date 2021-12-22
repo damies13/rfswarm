@@ -10,6 +10,8 @@ import platform
 import os
 import signal
 
+import random
+import re
 
 import sqlite3
 
@@ -63,6 +65,8 @@ class ReporterBase():
 
 	settings["ContentTypes"] = {"head":"Heading", "note":"Note", "graph":"Data Graph", "table":"Data Table"}
 
+	defcolours = ['#000000', '#008450', '#B81D13', '#EFB700', '#888888']
+	namecolours = ['total', 'pass', 'fail', 'warning', 'not run']
 
 	def debugmsg(self, lvl, *msg):
 		msglst = []
@@ -574,6 +578,75 @@ class ReporterBase():
 		base.run_dbthread = False
 		base.dbthread.join()
 		base.dbthread = None
+
+
+	#
+	# Colour Functions
+	#
+
+	def named_colour(self, name):
+		if name.lower() not in base.namecolours:
+			base.namecolours.append(name.lower())
+		return self.line_colour(base.namecolours.index(name.lower()))
+
+	def line_colour(self, grp):
+		if grp<len(base.defcolours):
+			return base.defcolours[grp]
+		else:
+			newcolour = self.get_colour()
+			base.debugmsg(9, "Initial newcolour:", newcolour)
+			while newcolour in base.defcolours:
+				base.debugmsg(9, base.defcolours)
+				newcolour = self.get_colour()
+				base.debugmsg(9, "newcolour:", newcolour)
+			base.defcolours.append(newcolour)
+			return newcolour
+
+	def get_colour(self):
+		newcolour = self.make_colour()
+		if self.darkmode:
+			while self.dl_score(newcolour) < -300:
+				newcolour = self.make_colour()
+			return newcolour
+		else:
+			while self.dl_score(newcolour) > 300:
+				newcolour = self.make_colour()
+			return newcolour
+
+
+	def make_colour(self):
+		hexchr = ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f']
+		r1 = hexchr[random.randrange(len(hexchr))]
+		r2 = hexchr[random.randrange(len(hexchr))]
+		g1 = hexchr[random.randrange(len(hexchr))]
+		g2 = hexchr[random.randrange(len(hexchr))]
+		b1 = hexchr[random.randrange(len(hexchr))]
+		b2 = hexchr[random.randrange(len(hexchr))]
+		return "#{}{}{}{}{}{}".format(r1,r2,g1,g2,b1,b2)
+
+	def dl_score(self, colour):
+		# darkness / lightness score
+		self.debugmsg(8, "colour:", colour)
+		m = re.search('\#(.?.?)(.?.?)(.?.?)', colour)
+		self.debugmsg(9, "m:", m)
+		self.debugmsg(9, "m 1:", m[1], int(m[1], 16))
+		self.debugmsg(9, "m 2:", m[2], int(m[2], 16))
+		self.debugmsg(9, "m 3:", m[3], int(m[3], 16))
+		r = int(m[1], 16) - 128
+		g = int(m[2], 16) - 128
+		b = int(m[3], 16) - 128
+
+		self.debugmsg(8, "r:", r, " 	g:", g, " 	b:", b)
+		score = r + g + b
+
+		# if score>300:
+		# 	self.debugmsg(7, "very light? score:", score)
+		#
+		# if score<-300:
+		# 	self.debugmsg(7, "very dark? score:", score)
+
+		return score
+
 
 
 class ReporterCore:
@@ -1854,9 +1927,9 @@ class ReporterGUI(tk.Frame):
 			# self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text=notetxt)
 			# self.contentdata[id]["lblSpacer"].grid(column=1, row=rownum, sticky="nsew")
 
-			cols = tdata[0].keys()
+			cols = list(tdata[0].keys())
 			base.debugmsg(7, "cols:", cols)
-			colnum = 1
+			colnum = 2
 			for col in cols:
 				cellname = "h_{}".format(col)
 				base.debugmsg(9, "cellname:", cellname)
@@ -1868,12 +1941,26 @@ class ReporterGUI(tk.Frame):
 				i += 1
 				rownum += 1
 				colnum = 1
+				cellname = "{}_{}".format(i, "colour")
+				# self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="  ")
+				self.contentdata[id][cellname] = tk.Label(self.contentdata[id]["Preview"], text="  ")
+				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+				base.debugmsg(9, "row:", row)
+				label=row[cols[0]]
+				base.debugmsg(9, "label:", label)
+				colour = base.named_colour(label)
+				base.debugmsg(9, "colour:", colour)
+				# self.contentdata[id][cellname].config(background=colour)
+				self.contentdata[id][cellname].config(bg=colour)
+
+
 				for col in cols:
+					colnum += 1
 					cellname = "{}_{}".format(i, col)
 					base.debugmsg(9, "cellname:", cellname)
 					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(row[col]))
 					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-					colnum += 1
 
 
 
