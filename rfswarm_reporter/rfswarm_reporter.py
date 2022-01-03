@@ -442,6 +442,20 @@ class ReporterBase():
 		base.report_item_set_changed(id)
 		base.report_save()
 
+	def rt_table_get_colours(self, id):
+		base.debugmsg(5, "id:", id)
+		if 'Colours' in base.report[id]:
+			return int(base.report[id]['Colours'])
+		else:
+			self.rt_table_set_colours(id, 0)
+			return 0
+
+	def rt_table_set_colours(self, id, colours):
+		base.debugmsg(5, "id:", id, "	colours:", colours)
+		base.report[id]['Colours'] = str(colours)
+		base.report_item_set_changed(id)
+		base.report_save()
+
 
 
 	def whitespace_set_ini_value(self, valin):
@@ -1750,6 +1764,7 @@ class ReporterGUI(tk.Frame):
 	def cs_datatable(self, id):
 		base.debugmsg(5, "id:", id)
 		sql = base.rt_table_get_sql(id)
+		colours = base.rt_table_get_colours(id)
 		self.contentdata[id]["Frame"].columnconfigure(0, weight=1)
 		rownum = 0
 
@@ -1765,6 +1780,15 @@ class ReporterGUI(tk.Frame):
 		# -- SELECT name FROM sqlite_temp_master
 		# -- WHERE type IN ('table','view')
 		# ORDER BY 1
+
+		rownum += 1
+		self.contentdata[id]["lblColours"] = ttk.Label(self.contentdata[id]["Frame"], text="Show graph colours:")
+		self.contentdata[id]["lblColours"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["intColours"] = tk.IntVar()
+		self.contentdata[id]["chkColours"] = ttk.Checkbutton(self.contentdata[id]["Frame"], variable=self.contentdata[id]["intColours"], command=self.cs_datatable_update)
+		self.contentdata[id]["intColours"].set(colours)
+		self.contentdata[id]["chkColours"].grid(column=1, row=rownum, sticky="nsew")
 
 
 		rownum += 1
@@ -1782,11 +1806,15 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "_event:", _event)
 		id = self.sectionstree.focus()
 		base.debugmsg(5, "id:", id)
+		if "intColours" in self.contentdata[id]:
+			colours = self.contentdata[id]["intColours"].get()
+			base.rt_table_set_colours(id, colours)
 		if "tSQL" in self.contentdata[id]:
 			data = self.contentdata[id]["tSQL"].get('0.0', tk.END)
 			base.debugmsg(5, "data:", data)
 			base.rt_table_set_sql(id, data)
-			self.content_preview(id)
+
+		self.content_preview(id)
 
 
 
@@ -1912,6 +1940,7 @@ class ReporterGUI(tk.Frame):
 	def cp_table(self, id):
 		base.debugmsg(5, "id:", id)
 		sql = base.rt_table_get_sql(id)
+		colours = base.rt_table_get_colours(id)
 		rownum = 1
 		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text="    ")
 		self.contentdata[id]["lblSpacer"].grid(column=0, row=rownum, sticky="nsew")
@@ -1929,7 +1958,7 @@ class ReporterGUI(tk.Frame):
 
 			cols = list(tdata[0].keys())
 			base.debugmsg(7, "cols:", cols)
-			colnum = 2
+			colnum = 1 + colours
 			for col in cols:
 				cellname = "h_{}".format(col)
 				base.debugmsg(9, "cellname:", cellname)
@@ -1940,19 +1969,21 @@ class ReporterGUI(tk.Frame):
 			for row in tdata:
 				i += 1
 				rownum += 1
-				colnum = 1
-				cellname = "{}_{}".format(i, "colour")
-				# self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="  ")
-				self.contentdata[id][cellname] = tk.Label(self.contentdata[id]["Preview"], text="  ")
-				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+				colnum = 0
+				if colours:
+					colnum += 1
+					cellname = "{}_{}".format(i, "colour")
+					# self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="  ")
+					self.contentdata[id][cellname] = tk.Label(self.contentdata[id]["Preview"], text="  ")
+					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
-				base.debugmsg(9, "row:", row)
-				label=row[cols[0]]
-				base.debugmsg(9, "label:", label)
-				colour = base.named_colour(label)
-				base.debugmsg(9, "colour:", colour)
-				# self.contentdata[id][cellname].config(background=colour)
-				self.contentdata[id][cellname].config(bg=colour)
+					base.debugmsg(9, "row:", row)
+					label=row[cols[0]]
+					base.debugmsg(9, "label:", label)
+					colour = base.named_colour(label)
+					base.debugmsg(9, "colour:", colour)
+					# self.contentdata[id][cellname].config(background=colour)
+					self.contentdata[id][cellname].config(bg=colour)
 
 
 				for col in cols:
