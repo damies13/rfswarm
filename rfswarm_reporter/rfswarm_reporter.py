@@ -347,7 +347,10 @@ class ReporterBase():
 	def report_item_get_name(self, id):
 		if id == "TOP":
 			return "Report"
-		return base.report[id]['Name']
+		if id in base.report:
+			return base.report[id]['Name']
+		else:
+			return None
 
 	def report_item_set_name(self, id, newname):
 		base.report[id]['Name'] = newname
@@ -1806,7 +1809,6 @@ class ReporterGUI(tk.Frame):
 
 	def cs_datatable(self, id):
 		base.debugmsg(5, "id:", id)
-		sql = base.rt_table_get_sql(id)
 		colours = base.rt_table_get_colours(id)
 		datatype = base.rt_table_get_dt(id)
 		self.contentdata[id]["Frame"].columnconfigure(99, weight=1)
@@ -1841,25 +1843,22 @@ class ReporterGUI(tk.Frame):
 
 		DataTypes = [None, "Metric", "Result", "SQL"]
 		self.contentdata[id]["strDT"] = tk.StringVar()
-		self.contentdata[id]["omDT"] = ttk.OptionMenu(self.contentdata[id]["Frame"], self.contentdata[id]["strDT"], command=self.cs_datatable_update, *DataTypes)
+		self.contentdata[id]["omDT"] = ttk.OptionMenu(self.contentdata[id]["Frame"], self.contentdata[id]["strDT"], command=self.cs_datatable_switchdt, *DataTypes)
 		self.contentdata[id]["strDT"].set(datatype)
 		self.contentdata[id]["omDT"].grid(column=1, row=rownum, sticky="nsew")
 
-
 		rownum += 1
-		self.contentdata[id]["lblSQL"] = ttk.Label(self.contentdata[id]["Frame"], text="SQL:")
-		self.contentdata[id]["lblSQL"].grid(column=0, row=rownum, sticky="nsew")
+		self.contentdata[id]["DTFrame"] = rownum
+		self.cs_datatable_switchdt(id)
 
-		rownum += 1
-		self.contentdata[id]["tSQL"] = tk.Text(self.contentdata[id]["Frame"])
-		self.contentdata[id]["tSQL"].grid(column=0, row=rownum, columnspan=99, sticky="nsew")
-		data = self.contentdata[id]["tSQL"].insert('0.0', sql)
-		self.contentdata[id]["tSQL"].bind('<Leave>', self.cs_datatable_update)
-		self.contentdata[id]["tSQL"].bind('<FocusOut>', self.cs_datatable_update)
 
 	def cs_datatable_update(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
 		id = self.sectionstree.focus()
+		if _event is not None:
+			name = base.report_item_get_name(_event)
+			if name is not None:
+				id = _event
 		base.debugmsg(5, "id:", id)
 		if "intColours" in self.contentdata[id]:
 			colours = self.contentdata[id]["intColours"].get()
@@ -1868,7 +1867,7 @@ class ReporterGUI(tk.Frame):
 		if "strDT" in self.contentdata[id]:
 			datatype = self.contentdata[id]["strDT"].get()
 			base.rt_table_set_dt(id, datatype)
-			
+
 		if "tSQL" in self.contentdata[id]:
 			data = self.contentdata[id]["tSQL"].get('0.0', tk.END)
 			base.debugmsg(5, "data:", data)
@@ -1876,6 +1875,54 @@ class ReporterGUI(tk.Frame):
 
 		self.content_preview(id)
 
+	def cs_datatable_switchdt(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+		rownum = 0
+		id = self.sectionstree.focus()
+		if _event is not None:
+			name = base.report_item_get_name(_event)
+			if name is not None:
+				id = _event
+		base.debugmsg(5, "id:", id)
+		self.cs_datatable_update(id)
+		datatype = self.contentdata[id]["strDT"].get()
+		base.debugmsg(5, "datatype:", datatype)
+		if "Frames" not in self.contentdata[id]:
+			self.contentdata[id]["Frames"] = {}
+		# Forget
+		# if datatype != "Metric":
+		# 	grphWindow.fmeMSettings.grid_forget()
+		for frame in self.contentdata[id]["Frames"].keys():
+			self.contentdata[id]["Frames"][frame].grid_forget()
+
+		# Construct
+		if datatype not in self.contentdata[id]["Frames"]:
+			self.contentdata[id]["Frames"][datatype] = tk.Frame(self.contentdata[id]["Frame"])
+			self.contentdata[id]["Frames"][datatype].config(bg="SlateBlue3")
+			# self.contentdata[id]["Frames"][datatype].columnconfigure(0, weight=1)
+			self.contentdata[id]["Frames"][datatype].columnconfigure(99, weight=1)
+
+			if datatype == "SQL":
+				# sql = base.rt_table_get_sql(id)
+				rownum += 1
+				self.contentdata[id]["lblSQL"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="SQL:")
+				self.contentdata[id]["lblSQL"].grid(column=0, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["tSQL"] = tk.Text(self.contentdata[id]["Frames"][datatype])
+				self.contentdata[id]["tSQL"].grid(column=0, row=rownum, columnspan=100, sticky="nsew")
+				# data = self.contentdata[id]["tSQL"].insert('0.0', sql)
+				self.contentdata[id]["tSQL"].bind('<Leave>', self.cs_datatable_update)
+				self.contentdata[id]["tSQL"].bind('<FocusOut>', self.cs_datatable_update)
+
+		# Update
+		if datatype == "SQL":
+			sql = base.rt_table_get_sql(id)
+			self.contentdata[id]["tSQL"].delete('0.0', tk.END)
+			self.contentdata[id]["tSQL"].insert('0.0', sql)
+
+		# Show
+		self.contentdata[id]["Frames"][datatype].grid(column=0, row=self.contentdata[id]["DTFrame"], columnspan=100, sticky="nsew")
 
 
 
