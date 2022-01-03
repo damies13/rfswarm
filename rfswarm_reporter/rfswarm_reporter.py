@@ -422,9 +422,11 @@ class ReporterBase():
 
 	def rt_graph_set_sql(self, id, graphSQL):
 		base.debugmsg(5, "id:", id, "	graphSQL:", graphSQL)
-		base.report[id]['SQL'] = self.whitespace_set_ini_value(graphSQL)
-		base.report_item_set_changed(id)
-		base.report_save()
+		prev = self.rt_graph_get_sql(id)
+		if graphSQL != prev:
+			base.report[id]['SQL'] = self.whitespace_set_ini_value(graphSQL)
+			base.report_item_set_changed(id)
+			base.report_save()
 
 	#
 	# Report Item Type: table
@@ -438,9 +440,11 @@ class ReporterBase():
 
 	def rt_table_set_sql(self, id, tableSQL):
 		base.debugmsg(5, "id:", id, "	tableSQL:", tableSQL)
-		base.report[id]['SQL'] = self.whitespace_set_ini_value(tableSQL)
-		base.report_item_set_changed(id)
-		base.report_save()
+		prev = self.rt_table_get_sql(id)
+		if tableSQL != prev:
+			base.report[id]['SQL'] = self.whitespace_set_ini_value(tableSQL)
+			base.report_item_set_changed(id)
+			base.report_save()
 
 	def rt_table_get_colours(self, id):
 		base.debugmsg(5, "id:", id)
@@ -452,10 +456,16 @@ class ReporterBase():
 
 	def rt_table_set_colours(self, id, colours):
 		base.debugmsg(5, "id:", id, "	colours:", colours)
-		base.report[id]['Colours'] = str(colours)
-		base.report_item_set_changed(id)
-		base.report_save()
-
+		if 'Colours' not in base.report[id]:
+			base.report[id]['Colours'] = str(colours)
+			base.report_item_set_changed(id)
+			base.report_save()
+		else:
+			prev = self.rt_table_get_colours(id)
+			if colours != prev:
+				base.report[id]['Colours'] = str(colours)
+				base.report_item_set_changed(id)
+				base.report_save()
 
 
 	def whitespace_set_ini_value(self, valin):
