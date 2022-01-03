@@ -428,6 +428,23 @@ class ReporterBase():
 			base.report_item_set_changed(id)
 			base.report_save()
 
+	def rt_graph_get_dt(self, id):
+		base.debugmsg(5, "id:", id)
+		if 'DataType' in base.report[id]:
+			return base.report[id]['DataType']
+		else:
+			return None
+
+	def rt_graph_set_dt(self, id, datatype):
+		base.debugmsg(5, "id:", id, "	datatype:", datatype)
+		prev = self.rt_table_get_dt(id)
+		if datatype != prev and datatype != None:
+			base.report[id]['DataType'] = datatype
+			base.report_item_set_changed(id)
+			base.report_save()
+
+
+
 	#
 	# Report Item Type: table
 	#
@@ -466,6 +483,22 @@ class ReporterBase():
 				base.report[id]['Colours'] = str(colours)
 				base.report_item_set_changed(id)
 				base.report_save()
+
+
+	def rt_table_get_dt(self, id):
+		base.debugmsg(5, "id:", id)
+		if 'DataType' in base.report[id]:
+			return base.report[id]['DataType']
+		else:
+			return None
+
+	def rt_table_set_dt(self, id, datatype):
+		base.debugmsg(5, "id:", id, "	datatype:", datatype)
+		prev = self.rt_table_get_dt(id)
+		if datatype != prev and datatype != None:
+			base.report[id]['DataType'] = datatype
+			base.report_item_set_changed(id)
+			base.report_save()
 
 
 	def whitespace_set_ini_value(self, valin):
@@ -1775,7 +1808,8 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "id:", id)
 		sql = base.rt_table_get_sql(id)
 		colours = base.rt_table_get_colours(id)
-		self.contentdata[id]["Frame"].columnconfigure(0, weight=1)
+		datatype = base.rt_table_get_dt(id)
+		self.contentdata[id]["Frame"].columnconfigure(99, weight=1)
 		rownum = 0
 
 		# sql for getting tables and views for drop down list
@@ -1802,12 +1836,23 @@ class ReporterGUI(tk.Frame):
 
 
 		rownum += 1
+		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["Frame"], text = "Data Type:")
+		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
+
+		DataTypes = [None, "Metric", "Result", "SQL"]
+		self.contentdata[id]["strDT"] = tk.StringVar()
+		self.contentdata[id]["omDT"] = ttk.OptionMenu(self.contentdata[id]["Frame"], self.contentdata[id]["strDT"], command=self.cs_datatable_update, *DataTypes)
+		self.contentdata[id]["strDT"].set(datatype)
+		self.contentdata[id]["omDT"].grid(column=1, row=rownum, sticky="nsew")
+
+
+		rownum += 1
 		self.contentdata[id]["lblSQL"] = ttk.Label(self.contentdata[id]["Frame"], text="SQL:")
 		self.contentdata[id]["lblSQL"].grid(column=0, row=rownum, sticky="nsew")
 
 		rownum += 1
 		self.contentdata[id]["tSQL"] = tk.Text(self.contentdata[id]["Frame"])
-		self.contentdata[id]["tSQL"].grid(column=0, row=rownum, sticky="nsew")
+		self.contentdata[id]["tSQL"].grid(column=0, row=rownum, columnspan=99, sticky="nsew")
 		data = self.contentdata[id]["tSQL"].insert('0.0', sql)
 		self.contentdata[id]["tSQL"].bind('<Leave>', self.cs_datatable_update)
 		self.contentdata[id]["tSQL"].bind('<FocusOut>', self.cs_datatable_update)
@@ -1819,6 +1864,11 @@ class ReporterGUI(tk.Frame):
 		if "intColours" in self.contentdata[id]:
 			colours = self.contentdata[id]["intColours"].get()
 			base.rt_table_set_colours(id, colours)
+
+		if "strDT" in self.contentdata[id]:
+			datatype = self.contentdata[id]["strDT"].get()
+			base.rt_table_set_dt(id, datatype)
+			
 		if "tSQL" in self.contentdata[id]:
 			data = self.contentdata[id]["tSQL"].get('0.0', tk.END)
 			base.debugmsg(5, "data:", data)
