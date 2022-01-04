@@ -1902,6 +1902,21 @@ class ReporterGUI(tk.Frame):
 			# self.contentdata[id]["Frames"][datatype].columnconfigure(0, weight=1)
 			self.contentdata[id]["Frames"][datatype].columnconfigure(99, weight=1)
 
+			# "Metric", "Result", "SQL"
+
+			if datatype == "Metric":
+				pass
+
+			if datatype == "Result":
+				rownum += 1
+				self.contentdata[id]["lblRT"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Result Type:")
+				self.contentdata[id]["lblRT"].grid(column=0, row=rownum, sticky="nsew")
+
+				RTypes = [None, "Response Time", "TPS", "Total TPS"]
+				self.contentdata[id]["RType"] = tk.StringVar()
+				self.contentdata[id]["omRT"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["RType"], RTypes)	# , command=None
+				self.contentdata[id]["omRT"].grid(column=1, row=rownum, sticky="nsew")
+
 			if datatype == "SQL":
 				# sql = base.rt_table_get_sql(id)
 				rownum += 1
