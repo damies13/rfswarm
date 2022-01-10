@@ -1724,6 +1724,7 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "curritem:", curritem)
 		if len(curritem)>0:
 			curritem[0].grid_forget()
+		base.debugmsg(5, "newitem:", self.contentdata[id]["Settings"])
 		self.contentdata[id]["Settings"].grid(column=0, row=0, sticky="nsew")
 
 	def cs_reportsettings(self):
@@ -1774,6 +1775,10 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "_event:", _event)
 		id = self.sectionstree.focus()
 		base.debugmsg(5, "id:", id)
+
+		# I might need to remove this ? self.contentdata[id]["Settings"]
+		# https://www.w3schools.com/python/gloss_python_remove_dictionary_items.asp
+		del self.contentdata[id]["Settings"]
 
 		keys = list(base.settings["ContentTypes"].keys())
 		vals = list(base.settings["ContentTypes"].values())
@@ -2066,7 +2071,7 @@ class ReporterGUI(tk.Frame):
 		rownum = 1
 		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text="    ")
 		self.contentdata[id]["lblSpacer"].grid(column=0, row=rownum, sticky="nsew")
-		if len(sql)>0:
+		if len(sql.strip())>0:
 			base.debugmsg(8, "sql:", sql)
 			base.dbqueue["Read"].append({"SQL": sql, "KEY": id})
 			while id not in base.dbqueue["ReadResult"]:
