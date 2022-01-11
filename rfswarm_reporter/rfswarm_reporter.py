@@ -12,6 +12,7 @@ import signal
 
 import random
 import re
+import math
 
 import sqlite3
 
@@ -38,6 +39,65 @@ matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 # required for matplot graphs
+
+class percentile:
+	def __init__(self):
+		self.count = 0
+		self.percent = 90
+		self.values = []
+
+	def step(self, value, percent):
+		base.debugmsg(9, "value:", value, "	percent:", percent)
+		if value is None:
+			return
+		self.count += 1
+		self.values.append(value)
+		self.percent = percent
+
+	def finalize(self):
+		try:
+			mincount = 100/(100-self.percent)
+			if self.count < mincount:
+				# Need at least 10 samples to get a useful percentile
+				return None
+			base.debugmsg(9, "percentile: finalize: mincount:", mincount, "	self.count:", self.count, "	self.percent:", self.percent, "	self.values:", self.values)
+			nth = self.count * (self.percent/100)
+			base.debugmsg(9, "percentile: finalize: nth:", nth)
+			nthi = int(nth)
+			# nthi = int(math.ceil(self.count * (self.percent/100)))
+			self.values.sort()
+			base.debugmsg(8, "percentile: finalize: nthi:", nthi, "	self.values[nthi]:", self.values[nthi], "	self.values:", self.values)
+			return self.values[nthi]
+			# return self.count
+		except Exception as e:
+			base.debugmsg(5, "Exception:", e)
+
+class stdevclass:
+	def __init__(self):
+		self.M = 0.0
+		self.S = 0.0
+		self.k = 1
+
+	def step(self, value):
+		if value is None:
+			return
+		tM = self.M
+		self.M += (value - tM) / self.k
+		self.S += (value - tM) * (value - self.M)
+		self.k += 1
+
+	def finalize(self):
+		base.debugmsg(9, "self.k:", self.k, "	self.S:", self.S, "	self.M:", self.M)
+		if self.k < 3:
+			return None
+		try:
+			res = math.sqrt(self.S / (self.k-2))
+			base.debugmsg(8, "res:", res)
+			return res
+		except Exception as e:
+			base.debugmsg(5, "Exception:", e)
+
+
 
 class ReporterBase():
 	version="0.9.0"
@@ -466,6 +526,105 @@ class ReporterBase():
 			base.report_item_set_changed(id)
 			base.report_save()
 
+	def rt_table_generate_sql(self, id):
+		base.debugmsg(5, "id:", id)
+		sql = ""
+		DataType = self.rt_table_get_dt(id)
+		if DataType == "Result":
+			RType = self.rt_table_get_rt(id)
+			FRType = self.rt_table_get_fr(id)
+			FNType = self.rt_table_get_fn(id)
+			inpFP = self.rt_table_get_fp(id)
+			display_percentile = 90
+
+			sql = "SELECT "
+			if RType == "Response Time":
+				sql += 		"result_name "
+				sql += 		", round(min(elapsed_time),3) 'minium' "
+				sql += 		", round(avg(elapsed_time),3) 'average' "
+				sql += 		", round(percentile(elapsed_time, {}),3) '{}%ile' ".format(display_percentile, display_percentile)
+				sql += 		", round(max(elapsed_time),3) 'maxium' "
+				sql += 		", round(stdev(elapsed_time),3) 'stdev' "
+				sql += 		", count(result) as 'count' "
+
+				# sql += 		"round(min(rp.elapsed_time),3) 'min', "
+				# sql += 		"round(avg(rp.elapsed_time),3) 'avg', "
+				# sql += 		"round(percentile(rp.elapsed_time, {}),3) '{}%ile', ".format(display_percentile, display_percentile)
+				# sql += 		"round(max(rp.elapsed_time),3) 'max', "
+				# sql += 		"round(stdev(rp.elapsed_time),3) 'stDev', "
+				# sql += 		"count(rp.result) as _pass, "
+				# sql += 		"count(rf.result) as _fail, "
+				# sql += 		"count(ro.result) as _other "
+				# sql += "FROM Results as r "
+				# sql += 		"LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == 'PASS' "
+				# sql += 		"LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == 'FAIL' "
+				# sql += 		"LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' "
+
+			if RType == "TPS":
+				sql += 		"count(result)  as 'count' "
+				sql += 		", result_name "
+				sql += 		", result "
+			if RType == "Total TPS":
+				sql += 		"count(result)  as 'count' "
+				sql += 		", result "
+
+			sql += "FROM Results "
+
+			lwhere = []
+			if FRType == "Pass":
+				# sql += "WHERE result == 'PASS' "
+				lwhere.append("result == 'PASS'")
+			if FRType == "Fail":
+				# sql += "WHERE result == 'FAIL' "
+				lwhere.append("result == 'FAIL'")
+
+			if RType == "Response Time":
+				# sql +=  	"AND result_name NOT LIKE 'Exception in thread%' "
+				lwhere.append("result_name NOT LIKE 'Exception in thread%'")
+			if RType == "TPS":
+				# sql +=  "WHERE result_name NOT LIKE 'Exception in thread%' "
+				lwhere.append("result_name NOT LIKE 'Exception in thread%'")
+
+			if FNType != "None" and len(inpFP)>0:
+				# construct pattern
+				# "Wildcard (Unix Glob)",
+				if FNType == "Wildcard (Unix Glob)":
+					# -- 		WHERE result_name GLOB 'OC3*'
+					lwhere.append("result_name GLOB '{}'".format(inpFP))
+				# "Regex",
+				if FNType == "Regex":
+					# -- 		WHERE result_name GLOB 'OC3*'
+					lwhere.append("result_name REGEXP '{}'".format(inpFP))
+				# "Not Wildcard (Unix Glob)",
+				if FNType == "Not Wildcard (Unix Glob)":
+					# -- 		WHERE result_name GLOB 'OC3*'
+					lwhere.append("result_name NOT GLOB '{}'".format(inpFP))
+				# "Not Regex"
+				if FNType == "Not Regex":
+					# -- 		WHERE result_name GLOB 'OC3*'
+					lwhere.append("result_name NOT REGEXP '{}'".format(inpFP))
+
+			i = 0
+			for iwhere in lwhere:
+				if i == 0:
+					sql += "WHERE {} ".format(iwhere)
+				else:
+					sql += "AND {} ".format(iwhere)
+				i += 1
+
+			sql += "GROUP by "
+			# sql += 		", result "
+			if RType == "Response Time":
+				sql += 		"result_name "
+			if RType == "TPS":
+				sql += 		"result_name "
+				sql += 		", result "
+			if RType == "Total TPS":
+				sql += 		"result "
+
+			base.debugmsg(6, "sql:", sql)
+			self.rt_table_set_sql(id, sql)
+
 	def rt_table_get_colours(self, id):
 		base.debugmsg(5, "id:", id)
 		if 'Colours' in base.report[id]:
@@ -503,6 +662,68 @@ class ReporterBase():
 			base.report_item_set_changed(id)
 			base.report_save()
 
+	def rt_table_get_rt(self, id):
+		base.debugmsg(5, "id:", id)
+		if 'ResultType' in base.report[id]:
+			return base.report[id]['ResultType']
+		else:
+			return None
+
+	def rt_table_set_rt(self, id, resulttype):
+		base.debugmsg(5, "id:", id, "	resulttype:", resulttype)
+		prev = self.rt_table_get_rt(id)
+		if resulttype != prev and resulttype != None:
+			base.report[id]['ResultType'] = resulttype
+			base.report_item_set_changed(id)
+			base.report_save()
+
+	# FR FilterResult
+	def rt_table_get_fr(self, id):
+		base.debugmsg(5, "id:", id)
+		if 'FilterResult' in base.report[id]:
+			return base.report[id]['FilterResult']
+		else:
+			return None
+
+	def rt_table_set_fr(self, id, filterresult):
+		base.debugmsg(5, "id:", id, "	filterresult:", filterresult)
+		prev = self.rt_table_get_fr(id)
+		if filterresult != prev and filterresult != None:
+			base.report[id]['FilterResult'] = filterresult
+			base.report_item_set_changed(id)
+			base.report_save()
+
+	# FN FilterType
+	def rt_table_get_fn(self, id):
+		base.debugmsg(5, "id:", id)
+		if 'FilterType' in base.report[id]:
+			return base.report[id]['FilterType']
+		else:
+			return None
+
+	def rt_table_set_fn(self, id, filtertype):
+		base.debugmsg(5, "id:", id, "	filtertype:", filtertype)
+		prev = self.rt_table_get_fr(id)
+		if filtertype != prev and filtertype != None:
+			base.report[id]['FilterType'] = filtertype
+			base.report_item_set_changed(id)
+			base.report_save()
+
+	# FP FilterPattern
+	def rt_table_get_fp(self, id):
+		base.debugmsg(5, "id:", id)
+		if 'FilterPattern' in base.report[id]:
+			return base.report[id]['FilterPattern']
+		else:
+			return ""
+
+	def rt_table_set_fp(self, id, filterpattern):
+		base.debugmsg(5, "id:", id, "	filterpattern:", filterpattern)
+		prev = self.rt_table_get_fp(id)
+		if filterpattern != prev and filterpattern != None:
+			base.report[id]['FilterPattern'] = filterpattern
+			base.report_item_set_changed(id)
+			base.report_save()
 
 	def whitespace_set_ini_value(self, valin):
 		base.debugmsg(9, "valin:", valin)
@@ -538,6 +759,8 @@ class ReporterBase():
 		if self.datadb is None:
 			base.debugmsg(5, "Connect to DB")
 			self.datadb = sqlite3.connect(dbpath)
+			self.datadb.create_aggregate("percentile", 2, percentile)
+			self.datadb.create_aggregate("stdev", 1, stdevclass)
 
 	def close_results_db(self):
 		# base.config['Reporter']['Results']
@@ -1873,10 +2096,29 @@ class ReporterGUI(tk.Frame):
 			datatype = self.contentdata[id]["strDT"].get()
 			base.rt_table_set_dt(id, datatype)
 
+		# self.contentdata[id]["RType"].set(base.rt_table_get_rt(id))
+		if "RType" in self.contentdata[id]:
+			value = self.contentdata[id]["RType"].get()
+			base.rt_table_set_rt(id, value)
+		# self.contentdata[id]["FRType"].set(base.rt_table_get_fr(id))
+		if "FRType" in self.contentdata[id]:
+			value = self.contentdata[id]["FRType"].get()
+			base.rt_table_set_fr(id, value)
+		# self.contentdata[id]["FNType"].set(base.rt_table_get_fn(id))
+		if "FNType" in self.contentdata[id]:
+			value = self.contentdata[id]["FNType"].get()
+			base.rt_table_set_fn(id, value)
+		# self.contentdata[id]["FPattern"].set(base.rt_table_get_fp(id))
+		if "FPattern" in self.contentdata[id]:
+			value = self.contentdata[id]["FPattern"].get()
+			base.rt_table_set_fp(id, value)
+
 		if "tSQL" in self.contentdata[id]:
-			data = self.contentdata[id]["tSQL"].get('0.0', tk.END)
+			data = self.contentdata[id]["tSQL"].get('0.0', tk.END).strip()
 			base.debugmsg(5, "data:", data)
 			base.rt_table_set_sql(id, data)
+		else:
+			base.rt_table_generate_sql(id)
 
 		self.content_preview(id)
 
@@ -1919,8 +2161,37 @@ class ReporterGUI(tk.Frame):
 
 				RTypes = [None, "Response Time", "TPS", "Total TPS"]
 				self.contentdata[id]["RType"] = tk.StringVar()
-				self.contentdata[id]["omRT"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["RType"], RTypes)	# , command=None
+				self.contentdata[id]["omRT"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["RType"], command=self.cs_datatable_update, *RTypes)
 				self.contentdata[id]["omRT"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				# result filtered by PASS, FAIL, None
+				self.contentdata[id]["lblFR"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Filter Result:")
+				self.contentdata[id]["lblFR"].grid(column=0, row=rownum, sticky="nsew")
+
+				FRTypes = [None, "None", "Pass", "Fail"]
+				self.contentdata[id]["FRType"] = tk.StringVar()
+				self.contentdata[id]["omFR"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["FRType"], command=self.cs_datatable_update, *FRTypes)
+				self.contentdata[id]["omFR"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["lblFN"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Filter Type:")
+				self.contentdata[id]["lblFN"].grid(column=0, row=rownum, sticky="nsew")
+
+				FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
+				self.contentdata[id]["FNType"] = tk.StringVar()
+				self.contentdata[id]["omFR"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["FNType"], command=self.cs_datatable_update, *FNTypes)
+				self.contentdata[id]["omFR"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["lblFP"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Filter Pattern:")
+				self.contentdata[id]["lblFP"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["FPattern"] = tk.StringVar()
+				self.contentdata[id]["inpFP"] = ttk.Entry(self.contentdata[id]["Frames"][datatype], textvariable=self.contentdata[id]["FPattern"])
+				self.contentdata[id]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[id]["inpFP"].bind('<Leave>', self.cs_datatable_update)
+				self.contentdata[id]["inpFP"].bind('<FocusOut>', self.cs_datatable_update)
 
 			if datatype == "SQL":
 				# sql = base.rt_table_get_sql(id)
@@ -1940,6 +2211,12 @@ class ReporterGUI(tk.Frame):
 			sql = base.rt_table_get_sql(id)
 			self.contentdata[id]["tSQL"].delete('0.0', tk.END)
 			self.contentdata[id]["tSQL"].insert('0.0', sql)
+
+		if datatype == "Result":
+			self.contentdata[id]["RType"].set(base.rt_table_get_rt(id))
+			self.contentdata[id]["FRType"].set(base.rt_table_get_fr(id))
+			self.contentdata[id]["FNType"].set(base.rt_table_get_fn(id))
+			self.contentdata[id]["FPattern"].set(base.rt_table_get_fp(id))
 
 		# Show
 		self.contentdata[id]["Frames"][datatype].grid(column=0, row=self.contentdata[id]["DTFrame"], columnspan=100, sticky="nsew")
