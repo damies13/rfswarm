@@ -6,9 +6,9 @@ If you find an issue please check the [Issues](../../issues) page
 - If you found a new issue please log it with as many details as you can so we can try to resolve the issue.
 
 ## Updates
-If you would like to work on updates to the code or documentation, please create your own branch to work on your changes and then submit a pull request. In the pull request and commit comments please reference any known issues you are addressing.
+If you would like to work on updates to the code or documentation, please create your own branch to work on your changes and then submit a pull request as that branch. In the pull request and commit comments please reference any known issues you are addressing.
 
-Pull requests to master that have code changes will be regected, and should be made to a version numberd branch.
+Pull requests to master that have code changes will be rejected, and should be made to the issue branch, once verified will be merged into a release branch.
 
 Pull requests for documentation updates should be made to the branch that the documentation addresses, pull requests for documentation to master may be accepted if the documentation update relates to the current release.
 
