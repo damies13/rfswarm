@@ -561,12 +561,12 @@ class ReporterBase():
 				# sql += 		"LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' "
 
 			if RType == "TPS":
-				sql += 		"count(result)  as 'count' "
-				sql += 		", result_name "
+				sql += 		"result_name "
 				sql += 		", result "
+				sql += 		", count(result)  as 'count' "
 			if RType == "Total TPS":
-				sql += 		"count(result)  as 'count' "
-				sql += 		", result "
+				sql += 		"result "
+				sql += 		", count(result)  as 'count' "
 
 			sql += "FROM Results "
 
@@ -619,8 +619,10 @@ class ReporterBase():
 			if RType == "TPS":
 				sql += 		"result_name "
 				sql += 		", result "
+				sql += "ORDER by result DESC, count(result) DESC "
 			if RType == "Total TPS":
 				sql += 		"result "
+				sql += "ORDER by count(result) DESC "
 
 			base.debugmsg(6, "sql:", sql)
 			self.rt_table_set_sql(id, sql)
