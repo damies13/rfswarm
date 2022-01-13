@@ -5,7 +5,7 @@ with open("README_PyPi.md", "r") as fh:
 
 setuptools.setup(
 	name="rfswarm-manager",
-	version="0.8.2",
+	version="0.9.0",
 	author="damies13",
 	author_email="damies13+rfswarm@gmail.com",
 	description="rfswarm manager",
@@ -18,7 +18,7 @@ setuptools.setup(
 	# https://matplotlib.org/stable/users/installing.html
 	install_requires=['configparser', 'HTTPServer', 'pillow', 'pip>=21', 'matplotlib'],
 	classifiers=[
-		"Development Status :: 4 - Beta",
+		"Development Status :: 5 - Production/Stable",
 		"Topic :: Software Development :: Testing",
 		"Programming Language :: Python :: 3.7",
 		"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",

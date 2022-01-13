@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #		Manager
-#    Version 0.8.2
+#    Version 0.9.0
 #
 
 # 	Helpful links
@@ -278,6 +278,7 @@ class AgentServer(BaseHTTPRequestHandler):
 						jsonresp["EndTime"] = base.run_end
 						jsonresp["RunName"] = base.robot_schedule["RunName"]
 						jsonresp["Abort"] = base.run_abort
+						jsonresp["UploadMode"] = base.uploadmode
 
 						# base.robot_schedule["Agents"]
 						if jsonresp["AgentName"] in base.robot_schedule["Agents"].keys():
@@ -356,7 +357,7 @@ class AgentServer(BaseHTTPRequestHandler):
 		self.wfile.write(bytes(message,"utf-8"))
 		threadend = time.time()
 		# base.debugmsg(5, parsed_path.path, "	threadstart:", "%.3f" % threadstart, "threadend:", "%.3f" % threadend, "Time Taken:", "%.3f" % (threadend-threadstart))
-		base.debugmsg(5, "%.3f" % (threadend-threadstart), "seconds for ", parsed_path.path)
+		base.debugmsg(7, "%.3f" % (threadend-threadstart), "seconds for ", parsed_path.path)
 		return
 	def do_GET(self):
 		threadstart = time.time()
@@ -453,7 +454,7 @@ class AgentServer(BaseHTTPRequestHandler):
 
 
 class RFSwarmBase:
-	version="0.8.2"
+	version="0.9.0"
 	debuglvl = 0
 
 	config = None
@@ -466,6 +467,8 @@ class RFSwarmBase:
 	scriptfiles = {}
 	scriptgrpend = {}
 
+	uploadmodes = {'imm':"Immediately", 'err':"On Error Only", 'def':"All Defered"}
+	uploadmode = "err" 	# modes are imm, err, def
 	uploadfiles = {}
 
 	index = ""
@@ -476,6 +479,7 @@ class RFSwarmBase:
 	run_abort = False
 	run_name = "PreRun"
 	run_name_current = ""
+	run_starttime = 0
 	run_start = 0
 	run_end = 0
 	run_finish = 0
@@ -510,6 +514,7 @@ class RFSwarmBase:
 	darkmode = False
 
 	appstarted = False
+	keeprunning = True 		# this should only be changed by onclosing
 
 	args = None
 
@@ -1124,6 +1129,40 @@ class RFSwarmBase:
 				return "{}:{}".format(mins, secs)
 			return "{}".format(mins)
 		return "{}".format(sec_in)
+
+	def format_sec_remain(self, sec_in):
+		if sec_in>3599:
+			hrs = int(sec_in/3600)
+			mins = int(sec_in/60) - (hrs*60)
+			secs = sec_in - (((hrs*60) + mins) * 60)
+			return "{}:{:02}:{:02}".format(hrs, mins, secs)
+		if sec_in>59:
+			mins = int(sec_in/60)
+			secs = sec_in - (mins * 60)
+			return "{}:{:02}".format(mins, secs)
+		return "0:{:02}".format(sec_in)
+
+	def parse_time(self, stime_in):
+		base.debugmsg(9, "stime_in:", stime_in)
+		tarr = stime_in.split(":")
+		base.debugmsg(9, "tarr:", tarr)
+		n = datetime.now()
+		st = datetime(n.year, n.month, n.day, int(tarr[0]))
+		if len(tarr) == 2:
+			st = datetime(n.year, n.month, n.day, int(tarr[0]), int(tarr[1]))
+		if len(tarr) == 3:
+			st = datetime(n.year, n.month, n.day, int(tarr[0]), int(tarr[1]), int(tarr[2]))
+
+		if int(st.timestamp()) < int(n.timestamp()):
+			st = datetime(n.year, n.month, n.day+1, int(tarr[0]))
+			if len(tarr) == 2:
+				st = datetime(n.year, n.month, n.day+1, int(tarr[0]), int(tarr[1]))
+			if len(tarr) == 3:
+				st = datetime(n.year, n.month, n.day+1, int(tarr[0]), int(tarr[1]), int(tarr[2]))
+
+		base.debugmsg(8, "st:", st, "	", int(st.timestamp()))
+		return int(st.timestamp())
+
 
 	def hash_file(self, file, relpath):
 		BLOCKSIZE = 65536
@@ -1846,19 +1885,47 @@ class RFSwarmBase:
 		arrhms = str(hms).split(":")
 		base.debugmsg(6, "arrhms:",arrhms)
 		if len(arrhms)==3:
-			h = int(arrhms[0])
-			m = int(arrhms[1])
-			s = int(arrhms[2])
+			if len(arrhms[0])>0:
+				h = int(arrhms[0])
+			else:
+				h=0
+			if len(arrhms[1])>0:
+				m = int(arrhms[1])
+			else:
+				m=0
+			if len(arrhms[2])>0:
+				s = int(arrhms[2])
+			else:
+				s=0
 			sec = (h*3600)+(m*60)+s
 		if len(arrhms)==2:
 			h = 0
-			m = int(arrhms[0])
-			s = int(arrhms[1])
+			if len(arrhms[0])>0:
+				m = int(arrhms[0])
+			else:
+				m=0
+			if len(arrhms[1])>0:
+				s = int(arrhms[1])
+			else:
+				s=0
 			sec = (h*3600)+(m*60)+s
 		if len(arrhms)==1:
 			sec = int(arrhms[0])
 		return sec
 
+
+	def GetKey(self, mydict, myval):
+		# for key, value in mydict.items():
+		# 	base.debugmsg(5, "key:", key, "	value:", value)
+		# 	if myval == value:
+		# 		return key
+		# 	return "Value not found"
+		vals = list(mydict.values())
+		try:
+			id = vals.index(myval)
+			return list(mydict.keys())[id]
+		except:
+			return "Value, {} not found".format(myval)
 
 
 # class rfswarm:
@@ -1885,6 +1952,7 @@ class RFSwarmCore:
 		parser.add_argument('-r', '--run', help='Run the scenario automatically after loading', action='store_true')
 		parser.add_argument('-a', '--agents', help='Wait for this many agents before starting (default 1)')
 		parser.add_argument('-n', '--nogui', help='Don\'t display the GUI', action='store_true')
+		parser.add_argument('-t', '--starttime', help='Specify the time to start the test HH:MM or HH:MM:SS (ISO 8601)')
 		parser.add_argument('-d', '--dir', help='Results directory')
 		parser.add_argument('-e', '--ipaddress', help='IP Address to bind the server to')
 		parser.add_argument('-p', '--port', help='Port number to bind the server to')
@@ -1897,6 +1965,10 @@ class RFSwarmCore:
 
 		if base.args.version:
 			exit()
+
+		if base.args.starttime:
+			base.run_starttime = base.parse_time(base.args.starttime)
+			base.debugmsg(5, "run_starttime:", base.run_starttime)
 
 		base.debugmsg(6, "ConfigParser")
 		base.config = configparser.ConfigParser()
@@ -1931,7 +2003,7 @@ class RFSwarmCore:
 
 		base.debugmsg(0, "	Configuration File: ", base.manager_ini)
 
-		base.debugmsg(5, "base.config: ", base.config._sections)
+		base.debugmsg(9, "base.config: ", base.config._sections)
 		if base.args.scenario:
 			base.save_ini = False
 			base.debugmsg(5, "base.args.scenario: ", base.args.scenario)
@@ -2095,6 +2167,18 @@ class RFSwarmCore:
 		base.debugmsg(5, "BuildCoreRun")
 		self.BuildCoreRun()
 
+	def scheduled_start(self):
+		while base.keeprunning:
+			if base.run_starttime > 0:
+				sec2st = base.run_starttime - int(time.time())
+				if  sec2st < 1:
+					base.run_start = 0
+					base.run_starttime = 0
+					base.debugmsg(5, "sec2st:", sec2st)
+					autostart = threading.Thread(target=self.autostart)
+					autostart.start()
+			time.sleep(1)
+
 	def autostart(self):
 		base.debugmsg(5, "appstarted:", base.appstarted)
 		# wait for mainloops to finished
@@ -2124,18 +2208,29 @@ class RFSwarmCore:
 
 	def mainloop(self):
 
-		if base.args.run:
+		base.debugmsg(5, "mainloop start")
+
+		if base.args.run and base.run_starttime < 1:
 			# auto click play ?
 			# self.autostart()
 			autostart = threading.Thread(target=self.autostart)
 			autostart.start()
 
+
+		autostart = threading.Thread(target=self.scheduled_start)
+		autostart.start()
+
 		if not base.args.nogui:
 			base.gui.mainloop()
+
+		base.debugmsg(5, "mainloop end")
+
 
 
 	def on_closing(self, _event=None, *args):
 		# , _event=None is required for any function that has a shortcut key bound to it
+
+		base.keeprunning = False
 
 		if base.appstarted:
 			try:
@@ -2357,8 +2452,13 @@ class RFSwarmCore:
 			if "scriptcount" in filedata["Scenario"]:
 				scriptcount = int(filedata["Scenario"]["scriptcount"])
 				base.debugmsg(8, "scriptcount:", scriptcount)
+
 			if "graphlist" in filedata["Scenario"]:
 				graphlist = filedata["Scenario"]["graphlist"].split(",")
+
+			if "uploadmode" in filedata["Scenario"]:
+				base.uploadmode = filedata['Scenario']['uploadmode']
+
 		else:
 			base.debugmsg(1, "File contains no scenario:", ScenarioFile)
 			return 1
@@ -2457,15 +2557,15 @@ class RFSwarmCore:
 					return 1
 
 
-		base.debugmsg(5, "config graph_list: ", base.config['GUI']['graph_list'])
+		base.debugmsg(9, "config graph_list: ", base.config['GUI']['graph_list'])
 
-		base.debugmsg(5, "graphlist: ", graphlist)
+		base.debugmsg(9, "graphlist: ", graphlist)
 		# base.config[iniid]		glist = base.config['GUI']['graph_list'].split(",")
 		iniglist = list(base.config['GUI']['graph_list'].split(","))
-		base.debugmsg(5, "iniglist: ", iniglist)
+		base.debugmsg(9, "iniglist: ", iniglist)
 		base.config['GUI']['graph_list'] = ",".join( set(iniglist + graphlist) )
 
-		base.debugmsg(5, "config graph_list: ", base.config['GUI']['graph_list'])
+		base.debugmsg(9, "config graph_list: ", base.config['GUI']['graph_list'])
 
 		if not base.args.nogui:
 			base.gui.ClearScenarioGraphs()
@@ -2490,16 +2590,6 @@ class RFSwarmCore:
 		for nxtagent in base.Agents.keys():
 			base.Agents[nxtagent]["AssignedRobots"] = 0
 
-
-		datafiletime = datetime.now().strftime("%Y%m%d_%H%M%S")
-		if len(base.config['Plan']['ScenarioFile'])>0:
-			filename = os.path.basename(base.config['Plan']['ScenarioFile'])
-			sname = os.path.splitext(filename)[0]
-			base.run_name = "{}_{}".format(datafiletime, sname)
-		else:
-			base.run_name = "{}_{}".format(datafiletime, "Scenario")
-		base.debugmsg(5, "base.run_name:", base.run_name)
-
 		base.run_abort = False
 		base.run_start = 0
 		base.run_end = 0
@@ -2509,14 +2599,28 @@ class RFSwarmCore:
 		base.MetricIDs = {}
 
 		base.robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}}
-		base.debugmsg(5, "core.run_start_threads")
-		t = threading.Thread(target=core.run_start_threads)
-		t.start()
-		if not base.args.nogui:
-			time.sleep(1)
-			base.debugmsg(5, "base.gui.delayed_UpdateRunStats")
-			ut = threading.Thread(target=base.gui.delayed_UpdateRunStats)
-			ut.start()
+		sec2st = base.run_starttime - int(time.time())
+		if sec2st < 1:
+
+			datafiletime = datetime.now().strftime("%Y%m%d_%H%M%S")
+			if len(base.config['Plan']['ScenarioFile'])>0:
+				filename = os.path.basename(base.config['Plan']['ScenarioFile'])
+				sname = os.path.splitext(filename)[0]
+				base.run_name = "{}_{}".format(datafiletime, sname)
+			else:
+				base.run_name = "{}_{}".format(datafiletime, "Scenario")
+			base.debugmsg(5, "base.run_name:", base.run_name)
+
+			base.debugmsg(5, "core.run_start_threads")
+			t = threading.Thread(target=core.run_start_threads)
+			t.start()
+			if not base.args.nogui:
+				time.sleep(1)
+				base.debugmsg(5, "base.gui.delayed_UpdateRunStats")
+				ut = threading.Thread(target=base.gui.delayed_UpdateRunStats)
+				ut.start()
+				base.gui.tabs.select(1)
+
 
 
 
@@ -2959,6 +3063,7 @@ class RFSwarmGUI(tk.Frame):
 
 	display_agents = {}
 	display_run = {}
+	display_plan = {}
 	# imgdata = {}
 
 	rfstheme = {}
@@ -3029,6 +3134,7 @@ class RFSwarmGUI(tk.Frame):
 		self.iconew = self.get_icon("New")
 		self.icoopen = self.get_icon("Open")
 		self.icoSave = self.get_icon("Save")
+		self.icoTime = self.get_icon("StartTime")
 		self.icoPlay = self.get_icon("Play")
 		self.icoAddRow = self.get_icon("AddRow")
 		self.icoScript = self.get_icon("Script")
@@ -3071,7 +3177,7 @@ class RFSwarmGUI(tk.Frame):
 
 	def get_icon(self, icontext):
 		# # https://www.daniweb.com/programming/software-development/code/216634/jpeg-image-embedded-in-python
-		base.debugmsg(5, "icontext:", icontext)
+		base.debugmsg(7, "icontext:", icontext)
 		# http://www.famfamfam.com/lab/icons/silk/
 		files = {}
 		# files["New"] = "famfamfam_silk_icons/icons/page_white.edt.gif"
@@ -3094,6 +3200,8 @@ class RFSwarmGUI(tk.Frame):
 		# files["AddRow"] = "../famfamfam_silk_icons/icons/script_add.gif"
 		# files["AddRow"] = "../famfamfam_silk_icons/icons/add.gif"
 
+
+		# files["StartTime"] = "../famfamfam_silk_icons/icons/time.gif"
 
 
 		if icontext in files:
@@ -3128,6 +3236,7 @@ class RFSwarmGUI(tk.Frame):
 		self.b64["Save"] = b'GIF89a\x10\x00\x10\x00\xe7\x98\x001`\xa61`\xa71`\xa81a\xa82a\xa82a\xa92a\xaa2b\xaa2b\xab2c\xac3c\xad3d\xae3d\xaf3e\xb04e\xb14f\xb24f\xb34g\xb45h\xb55h\xb65h\xb75i\xb75i\xb85i\xb95j\xba6j\xba6j\xbb6k\xbb6k\xbc7k\xba8k\xbb8l\xbb9l\xbc:m\xbb;n\xbd>p\xbb^\x89\xc9d\x8c\xc8e\x8c\xc8e\x8d\xc9e\x8d\xcaf\x8d\xc9g\x8e\xc9i\x90\xcah\x90\xcdl\x92\xcbm\x92\xcbj\x93\xcfm\x96\xd3p\x99\xd6y\x98\xc7q\x99\xd8r\x9b\xd9|\x9a\xc8s\x9b\xd9s\x9b\xdar\x9c\xdb|\x9b\xc9t\x9c\xdat\x9d\xdct\x9e\xddu\x9e\xdev\x9f\xddv\x9f\xdew\x9f\xde\x81\x9e\xccw\xa0\xdew\xa0\xdfx\xa1\xe0x\xa2\xe0y\xa2\xe1z\xa2\xe0z\xa2\xe1z\xa2\xe2z\xa3\xe1z\xa3\xe2z\xa3\xe3{\xa3\xe1{\xa3\xe2\x84\xa3\xcez\xa4\xe3{\xa4\xe2{\xa4\xe3}\xa6\xe6}\xa7\xe7~\xa8\xe7~\xa8\xe8\x8a\xa7\xd2\x80\xaa\xe9\x8e\xab\xd5\x95\xb0\xda\x88\xc0b\x9a\xb5\xdd\x9f\xba\xe1\xa4\xbe\xe4\xa9\xc2\xe7\xad\xc5\xea\xad\xc6\xeb\xb3\xca\xed\xb6\xcc\xee\xb8\xce\xef\xba\xd0\xee\xbb\xd0\xef\xbd\xd0\xec\xbe\xd2\xf0\xc3\xd5\xef\xc2\xd5\xf2\xc2\xdc\xbf\xc5\xd8\xf2\xc7\xd9\xf4\xc9\xdc\xf4\xcc\xdd\xf5\xd0\xdf\xf6\xd1\xdf\xf6\xd1\xe0\xf6\xd1\xe0\xf7\xd8\xe5\xf6\xd9\xe5\xf7\xdb\xe6\xf7\xdb\xe7\xf7\xdb\xe7\xf8\xdd\xe8\xf8\xdf\xe9\xf8\xdf\xe9\xf9\xe1\xec\xf9\xe2\xec\xf9\xe3\xed\xf9\xe5\xed\xfa\xe8\xf0\xfa\xe9\xf0\xfa\xea\xf0\xfa\xe9\xf1\xfa\xea\xf1\xfb\xeb\xf1\xfb\xed\xf2\xfb\xee\xf3\xfb\xee\xf4\xfb\xee\xf4\xfc\xef\xf4\xfc\xf0\xf5\xfc\xf1\xf6\xfc\xf2\xf6\xfc\xf3\xf7\xfd\xf3\xf8\xfd\xf6\xf9\xfd\xf6\xfa\xfd\xf6\xfa\xfe\xf7\xfa\xfd\xf7\xfa\xfe\xf8\xfa\xfe\xf7\xfb\xfe\xf8\xfb\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff!\xfe\x11Created with GIMP\x00!\xf9\x04\x01\n\x00\xff\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x08\xfe\x00\xffq\x18\xc8a\xc3\x06\r\x1a@\x88\x08\xe1a\xc4?\x81r\xe6\\\xb2\x04i\x91 C\x90&\x15\xd2s\x86\x84\xc08X$E*q\x88P\xa3K\x8c\xfa\xe0)sf\x04\x078V\x181*1\x08\xd1$H\x80\xf2\xd8Q\x92\xa6\x02\x877U\x00\x01J\x11\xe8Q%E{\xee\xd4)\xf2e\xc2\x067T\xf8\xf0\xf1\x93h\x92\xa3?J\xe9\x08\xf1\x12aC\x9b)%N\xa8h\xe1b\x85\x89\x12hut\x81\xa0\x81\x8d\x14&P\xa28ibd\xc8\x0f\x1e8vpq\xa0A\r\x13&N\x9cD1BDH\x8f\x1d7lha\xa0\x01\xcd\x92%J\xe6\x12\x01\xe2c\x07\x8d\x191\xb2(\xc8`&\xc9\xa5\xcf\xa0C\xc3\xb8\x82\xc0\x03\x19#\x94\xb6\xa8^\xad\x1a\xd2\x8b\'\x06>\x8cABi\x8d\xed\xdb\xb6!\xb1\x08B\xa0\x83\x98#\xa9Y\xaf\x86\x84"G\x00\x0ca\xc0\x84^~\xa9\x86\x8c\x00\x19.X\xa0 !\xc2\x83\x06\x0b\x12\x1c(  \x00\x80\x01\x01\x01\x00;'
 		self.b64["SaveAs"] = b'GIF89a\x10\x00\x10\x00\xc6u\x00._\xa63h\xba:i\xaa>j\xabDm\xabDp\xb0W~\xbbQ\x7f\xc3S\x7f\xc1S\x80\xc5T\x81\xc4U\x83\xc6X\x84\xc3]\x84\xbf[\x86\xc7]\x88\xc8_\x89\xc9`\x89\xc9a\x8a\xc7a\x8b\xc9b\x8b\xc8a\x8b\xcbh\x8b\xd3e\x8d\xcae\x8d\xccl\x8b\xcdn\x8a\xd7f\x8e\xc7m\x8b\xdah\x8e\xcdl\x8d\xdci\x90\xcdp\x8f\xe1n\x93\xcco\x96\xccn\x97\xd4q\x97\xd0q\x98\xd0s\x98\xces\x99\xd1u\x99\xd1s\x9a\xd4u\x9a\xd0w\x9a\xd2w\x9b\xd2w\x9c\xd2y\x9c\xd5z\x9d\xd3{\x9c\xddw\x9e\xd9x\x9e\xd8{\x9e\xd4x\x9f\xd8y\x9f\xdby\xa0\xd9z\xa0\xd9{\xa1\xdc}\xa2\xd9|\xa3\xdb\x80\xa3\xd5}\xa3\xde\x85\xa2\xdd\x82\xa4\xd6~\xa5\xdd\x80\xa6\xdd\x81\xa7\xe1\x81\xa7\xe2\x85\xa8\xdd\x84\xbfQ\x8f\xae\xda\x84\xbfT\x8c\xaf\xe4\x96\xb2\xee\x91\xb6\xd6\x92\xb5\xe6\x97\xb6\xea\x9a\xb6\xef\x99\xb8\xea\x9c\xbc\xe0\x98\xc9o\x99\xc9q\x9e\xbc\xee\x9b\xbd\xed\xa1\xbe\xea\xa1\xbf\xea\xa1\xbf\xef\x9e\xc0\xef\xb3\xc7\xe3\xb0\xcd\xf3\xbb\xcd\xe6\xba\xce\xef\xb8\xd2\xf4\xc7\xee\x87\xc7\xee\x8c\xd7\xf4\xa2\xd7\xf6\xa2\xe6\xf0\xef\xe5\xf1\xed\xe6\xf1\xed\xe6\xf1\xef\xe8\xf3\xea\xe9\xf4\xe4\xed\xf1\xf8\xea\xf3\xf3\xed\xf5\xf3\xf2\xf6\xfb\xf1\xf8\xff\xf7\xfb\xff\xfa\xfb\xfd\xfa\xfc\xfd\xfb\xfc\xfd\xfb\xfc\xfe\xff\xff\xdd\xff\xff\xe0\xfc\xfd\xfe\xfd\xfd\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff!\xfe\x11Created with GIMP\x00!\xf9\x04\x01\n\x00\x7f\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xb2\x80\x7f\x82\x83\x84\x85\x82#3%>\x1d\x1f*\'\x14\x86\x7f\x18XuWu\x97uT\x11\x86\x0eV9/;E+,-$\x90\x84\x0fU([uYtuif\x9a\x84\x17M\x10R\x88\x8a\x8c\x8e\xa7\x7f\x13J\x15Q\x93\x95\x98\x99\x9b\x7f\nK&S\x9du!\x97kjG\x12\x82\x07L"I\xa9mosrlnC\x08\x82\x0bZ\x1bN\xb5?@:7642\r\x82\x01\x0c\tH\xbfBA<851)\x06\x84\xe4\xc9\xce\x88\x19\x03&\x0c\x1a\x17\x05\x08\xc9\xb3F\x86\xc8\x13(F\xca\xc0\x10`\x88\x1c\x1c.^\xbet\x89\xd3c\x80!y\x16@x\xe0\xa0!\x03\x01\x00\x91R\n\n\x04\x00;'
 		self.b64["Open"] = b'GIF89a\x10\x00\x10\x00\xe7\x87\x00\xb6\x83I\xba\x8aP\xd8\x87-\xbc\x8cT\xd8\x88-\xd9\x8e3\xc8\x95^\xda\x945\xc9\x98b\xda\x9a6\x97\xa3\xb6\x99\xa3\xb2\xda\xa16\xda\xa67\xd4\xa7G\xda\xaa6\xda\xab5\xda\xab6\xda\xae4\xda\xaf5\xda\xaf6\xb5\xaf\xa8\xb2\xb3\xa7\xda\xb36\x9a\xb6\xd9\xd9\xb44\xdb\xb6<\x9b\xba\xdf\x9e\xbd\xe0\xd3\xb8\x9c\xa4\xc1\xe4\xde\xb9\x92\xa8\xc2\xe0\xa7\xc4\xe5\xa8\xc4\xe5\xe1\xc2^\xa9\xc5\xe6\xb3\xc6\xc8\xaa\xc6\xe6\xe2\xc3_\xe2\xc3`\xab\xc6\xe6\xe9\xc1s\xe3\xc7k\xe4\xc7k\xe5\xcat\xb4\xcd\xe9\xed\xcaj\xea\xcbl\xba\xcf\xe2\xe6\xcdy\xb8\xd0\xeb\xb3\xd1\xf3\xd3\xd2\xa3\xee\xcfr\xee\xcfv\xee\xce\x88\xef\xd0z\xd4\xd4\xa9\xef\xd2\x80\xef\xd3\x85\xbd\xd8\xf3\xf2\xd5\x81\xef\xd4\x94\xc1\xda\xf4\xf3\xd7\x86\xf5\xdac\xf3\xd8\x8e\xc4\xdc\xf4\xc9\xdc\xf2\xc6\xdd\xf4\xc9\xdd\xf2\xc5\xde\xf5\xf3\xda\x96\xc6\xde\xf5\xf6\xder\xf6\xdev\xf4\xdc\x93\xf4\xdb\x9e\xc7\xe0\xf7\xca\xe0\xf6\xf5\xde\x91\xf5\xde\x94\xf4\xdd\xa7\xcb\xe2\xf8\xf7\xe1\x81\xcd\xe2\xf8\xcc\xe3\xf8\xf7\xe2\x85\xf5\xe0\x9f\xce\xe3\xf8\xf7\xe3\x8b\xf6\xe1\xac\xf8\xe4\x8e\xd6\xe4\xf3\xd6\xe5\xf5\xf8\xe5\x91\xd3\xe6\xf8\xf8\xe6\x95\xdb\xe7\xf5\xf9\xe8\x9c\xf9\xe9\xa1\xf9\xe9\xa4\xdc\xea\xf8\xf6\xe9\xc9\xdf\xec\xf8\xfa\xec\xac\xfa\xed\xb3\xfb\xef\xb9\xfa\xf0\xdc\xfc\xf2\xc8\xfc\xf6\xd8\xfb\xf6\xe8\xfb\xf7\xe9\xfb\xf7\xea\xfd\xfa\xf1\xfe\xfa\xef\xfd\xfa\xf2\xfe\xfb\xee\xfe\xfb\xef\xfe\xfc\xf0\xfe\xfc\xf1\xfe\xfc\xf2\xfe\xfc\xf3\xfe\xfc\xf6\xfe\xfc\xf7\xff\xfc\xf5\xfe\xfd\xf4\xff\xfd\xf6\xff\xfd\xf8\xff\xfd\xfa\xfe\xfe\xfd\xff\xfe\xfd\xff\xfe\xfe\xff\xff\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff!\xfe\x11Created with GIMP\x00!\xf9\x04\x01\n\x00\xff\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x08\xca\x00\xff\t\x1cH\xb0\xe0\xbf\x0c#P(<\xa1\xc1\xe0\xc0\x0b\x83\x0c\x15"dH\x0e\x8b\x15\x18e\xb4\x188\xa1O\x97(Y\xb8\xdc\xf9\xb3\'\xcf\x1d;\x82(\x08|0GJ\x13\x1f/`\xf0\xd8\x91\xe3\x86\x8d8\x12\x04B\x80\xf3\x03\x87\n4z\xf6\xe8\xc1s\xd2P\x04\x81\r\x0c\x05\x02\xe4g\xcf\x1b1:Jp\x08\x11\xc3\x81@\x06|\xdc\xb0QCfK\r\x17c\xd2\x1c\x99aA`\x82:k\xcc\x88\xc1\xc2\xc4\x84\x17(J\x90\x84\x01!\xf0\x00\x9d2`\xaa,\x11\xc2\xe1\x8c\x11"=\xacx\x10X\xa0\xcd\x14\'I\x86\x04\x11\xf1\x05H\x8f\x1eW0\x0c$ \x80\x80e\x02\x15\x8ahyB\x85\xc6\x02\x87\x04S\x90\xd8\xa0\xa0\x83\x01\xd0\x06\x11|\x00\x80\xba\xe0\x80\x00\xad\r\x06\x04\x00;'
+		self.b64["StartTime"] = b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00\x94sM\x8ftN\x90tS\x98tK\x8fvV\x99wD\x8fxZ\x9bxN\x9ezQ\x94{^\x94|b\x99|Xw\x7f\x81y\x80\x81\xa4\x83V\x9c\x84b\xa0\x85_\x9e\x86i\xa7\x88S\x84\x8c\x8d\xac\x8cM\xad\x8e]\xa9\x8fjl\x90\xc8u\x91\xc6\xb2\x94Vr\x96\xca\xae\x98y\xb2\x98Y\x80\x9b\xc5{\x9c\xca\xb7\x9cg\xb9\x9cf\xb9\x9cq\x96\x9f\xa0\x81\xa0\xd0\x86\xa0\xc9\xbf\xa3lz\xa4\xda\xbc\xa4\x8a\xbd\xa4u\x8a\xa6\xd2\x85\xa8\xd8\x8b\xa8\xd2\xc5\xaaq\x89\xab\xda\xc4\xab{\x93\xac\xd4\xc3\xac\x86\x99\xad\xc4\xa5\xaf\xb2\xcd\xb4t\x99\xb5\xdd\xcf\xb5z\xa6\xb8\xce\xa4\xba\xdd\xae\xba\xbf\xd2\xbaz\xcd\xbc|\xab\xbe\xdf\xcf\xbe\x84\xad\xbf\xe0\xaf\xc0\xe0\xb7\xc1\xc6\xb0\xc2\xdf\xd1\xc3\x92\xba\xc5\xc4\xd3\xc5\xa9\xbb\xc7\xcb\xd7\xc9\x97\xc0\xcb\xcd\xd4\xcb\xaa\xd9\xcd\xa3\xdd\xcd\x98\xc3\xd0\xd3\xc4\xd1\xe4\xdc\xd1\xb8\xc7\xd2\xdb\xb0\xd5\xef\xdf\xd7\xa3\xe4\xda\xc9\xcf\xdb\xe8\xc3\xdc\xf0\xe1\xdc\xc5\xd1\xe0\xef\xe3\xe0\xca\xd9\xe2\xee\xe6\xe2\xd4\xd7\xe4\xf1\xdc\xe4\xf1\xdb\xe5\xe7\xea\xe7\xde\xec\xea\xde\xed\xeb\xe2\xcd\xec\xfa\xdf\xed\xf1\xd4\xf0\xfa\xe4\xf0\xf2\xec\xf1\xf2\xf1\xf1\xed\xe3\xf4\xfd\xf3\xf5\xf5\xe9\xf6\xfc\xf3\xf6\xfa\xec\xfb\xff\xf4\xfd\xfe\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00l\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xc2\x80l\x82\x83\x84\x85\x85(/6:6-"\x86\x821:Q\\ddXD!\x17\x851J^W>008RT \x10\x844^L?ZccZ8AM\x0f\x83)MW<kc[j\xbd5L)\x0c\x82&X8Yjf#cj9S,H\t\xc3^*gik\x0e3\rEa\x1bV\xd1l!]$egb\x14\rKi_\x18T\xdf\x16M0See@`ieO\x1fB\x01\x82\x11/N.\xd2\xa4\xe9%\xf0D\x11\r\x03\x06=Hr\xc3E\x154h\xaa\xac\x90\xd1\x83\xdf \x08\x13\x8c\x1c)\x91!\x83\x87!;\x0c\x1c(\xa4\x00A\x87\x1eP\xa0\xec\xa8\x10\xa0\xc0#6\x01\x02\x10 \x10@\xc0\xcb\x9b\x84\x02\x01\x00;'
 		self.b64["Play"] = b'GIF89a\x10\x00\x10\x00\xa56\x00\x14A\xb7\x15E\xb9\x16J\xbd\x16N\xc0\x17P\xbd\x18S\xc0\x18Y\xc4\x19Y\xc6\x1ab\xc6\x1ab\xc9#n\xcd,r\xcd;q\xcc<t\xcf5w\xd2=w\xd0?z\xd0C\x7f\xd3C\x84\xd6G\x84\xd6K\x88\xd6S\x8e\xdb`\x95\xdda\x97\xddb\x97\xe1n\xa0\xe2r\xa1\xdft\xa2\xe2t\xa3\xe0u\xa3\xdfu\xa4\xe3w\xa4\xe0y\xa6\xe0y\xa7\xe6~\xa8\xe1|\xa9\xe1|\xa9\xe8~\xa9\xe8\x80\xaa\xe3\x81\xab\xe2\x81\xab\xe3\x80\xab\xe8\x80\xab\xea\x87\xaf\xe4\x87\xb0\xe8\x8a\xb1\xe4\x90\xb5\xe7\x92\xb7\xe8\x99\xbb\xe9\x99\xbb\xea\xa1\xc1\xec\xa3\xc2\xed\xa8\xc7\xee\xad\xc8\xef\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff!\xfe\x11Created with GIMP\x00!\xf9\x04\x01\n\x00?\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x06K\xc0\x9fpH,\x1a\x8f\xc8T\tiT\x916Lb\xa8\xc6\xb2D\x85\x19\xda\xcc3\xb9bd/\xd8e\x11\xad\xc4L\xa8\x16\x05\xc1\x94\xb88\x9fS\xe4\xc0t\xac4#H!\xaa\x10\x81\x1e\x04W\t\x1d\r\x02W?\x06\x0c\x01\x87?\x03\x00\x8c\x90\x91A\x00;'
 		self.b64["Stop"] = b'GIF89a\x10\x00\x10\x00\xe7\x84\x00\xd5>5\xd8G>\xd7H@\xd8H@\xfaB%\xd9KC\xd9KD\xfdF(\xdaOG\xfeI,\xffK,\xdbUM\xffO0\xffO1\xffP2\xffP3\xddYQ\xdc[S\xffU7\xde^T\xffY;\xffY<\xffZ<\xdebZ\xff\\?\xff^@\xff^A\xf9`H\xffcF\xe0jc\xffdF\xfdeJ\xe0le\xe4lc\xffgH\xffgN\xffiK\xffnO\xffnP\xffoP\xe4ul\xffpO\xe3xq\xffsU\xfftU\xfftZ\xffxY\xffyZ\xe7\x81y\xff~_\xff~`\xff\x7f_\xe5\x84}\xff\x80`\xff\x81g\xff\x83e\xe6\x8a\x85\xe8\x8b\x83\xff\x89i\xf2\x8b}\xf7\x8d}\xe7\x91\x8b\xff\x8dm\xff\x8en\xfa\x8e}\xff\x8eo\xff\x8fs\xea\x93\x8c\xff\x90o\xfc\x90\x7f\xf4\x94\x86\xff\x93s\xff\x93t\xfa\x93\x84\xff\x93x\xe9\x97\x92\xe9\x98\x92\xf6\x96\x89\xff\x95\x84\xea\x9a\x95\xfa\x97\x89\xff\x98v\xff\x98x\xff\x99x\xff\x99\x87\xea\x9e\x98\xff\x9b\x8a\xed\x9f\x98\xff\x9d|\xeb\xa0\x9b\xff\x9e|\xeb\xa2\x9d\xff\xa0}\xff\xa0~\xeb\xa3\x9e\xff\xa1\x85\xff\xa2\x81\xec\xa5\xa0\xff\xa1\x90\xff\xa5\x81\xfa\xa5\x96\xff\xa7\x84\xff\xa7\x85\xff\xaa\x86\xef\xac\xa5\xee\xad\xa6\xff\xab\x89\xff\xaa\x98\xfb\xad\x9e\xfb\xad\x9f\xff\xae\x91\xff\xaf\x8b\xf0\xb1\xa9\xfc\xb2\xa2\xfb\xba\xac\xff\xbb\x9c\xff\xbb\xa6\xff\xbf\xa0\xff\xbe\xab\xff\xc2\xa3\xfb\xc3\xb4\xff\xc4\xb1\xfc\xc8\xb7\xfc\xcd\xbc\xff\xcd\xb8\xff\xce\xb9\xff\xcf\xbb\xfc\xd1\xc1\xff\xd1\xbd\xfc\xd3\xc2\xfc\xd4\xc4\xff\xd6\xc1\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff!\xfe\x11Created with GIMP\x00!\xf9\x04\x01\n\x00\xff\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x08\xc6\x00\xff\t\x1cH\xb0\xa0A/a\xb6d\xa9\xb2\xc4\xe0@8\x81\x06\x01\xf2\xd3G\xcf\x15\x87i\x04\xddy\xa3\xa6L\x177x\x86\x14D\xf3\xa7\xce\x193`\xb0H!\xf2EN\x8e\x81O\xf6\xcc\x19\x03F\xcb\x14$At\xd4P\xc2\x06\x84@&|\xb8`\x99r\xe4\x87\x8e\x1b2\\\xa4X\xd3A`\x8f<Q\x8a\x1e\x8d\xf1bE\t\x11b.\x08\xc4a\xc7\xc7\xd4\x17,N\x90\xe0\x80\xc1J\x04\x814\xe8\xcc\xa0\xba\xc2\x04\t\x0f\x1a(4\xa0\xb2@\xa0\x8a8BR\x94x\xab\xc1\x82\x04\x05#\x92\x0c\x18\x08\xa3\x8d\x8d\x0c\x19*Hxp\xe0C\x93\t\x05Q\x90i\xe1\x80A\x02\x02\x1b\x8c@p\x18\x02\x8a\x93"@x\xec\xd8\xec\xf0\x9f\x01\x04\x05\x04\x04\x00P\xba5\xc1\x80\x00;'
 		self.b64["report_text"] = b'GIF89a\x10\x00\x10\x00\xc6\\\x00~1\x18\xabB!\xacC!\xaeF"\xaeI"\xa5K,\xafK#\xb1N#\xb2Q$\xb2R%\xb4U%\xb5V&\xb7Y&\xb7[&\xaf]5\xb8^\'\xb8_\'\xbaa(\xbexI\xb3yc\xb3|d\xb5\x7fe\xb5\x82f\xb7\x83gj\x93\xd4\xb9\x87gj\x98\xd9\xc2\x8bdk\x99\xdan\x9a\xdc\xbf\x8fao\x9b\xdcr\x9c\xdcq\x9d\xdd\xc1\x92cq\x9e\xdfs\x9e\xdf\xc2\x94ds\x9f\xe0t\xa0\xe0v\xa0\xe0\xc3\x96ev\xa2\xe0w\xa3\xe1x\xa3\xe1\xc4\x99f\xc5\x9agz\xa5\xe1\xa0\xbe\xea\xa1\xbf\xea\xa2\xc0\xea\xa3\xc0\xea\xca\xc6\xc4\xcc\xc6\xc0\xc7\xc7\xc7\xcd\xc6\xc0\xca\xc7\xc4\xcd\xc7\xc0\xcd\xc7\xc1\xc9\xc9\xc9\xca\xca\xca\xcb\xcb\xcb\xcc\xcc\xcc\xcd\xcd\xcd\xd1\xd1\xd1\xd2\xd2\xd2\xd3\xd3\xd3\xd4\xd4\xd4\xd5\xd5\xd5\xd8\xd8\xd8\xdc\xdc\xdc\xe6\xe6\xe6\xe8\xe8\xe8\xe9\xe9\xe9\xea\xea\xea\xec\xec\xec\xed\xed\xed\xee\xee\xee\xf0\xf0\xf0\xf1\xf1\xf1\xf2\xf2\xf2\xf3\xf3\xf3\xf4\xf4\xf4\xf5\xf5\xf5\xf6\xf6\xf6\xf7\xf7\xf7\xf8\xf8\xf8\xf9\xf9\xf9\xfa\xfa\xfa\xfb\xfb\xfb\xfc\xfc\xfc\xfd\xfd\xfd\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff!\xfe\x11Created with GIMP\x00!\xf9\x04\x01\n\x00\x7f\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xbf\x80\x7f\x7f\x1b\x12\x11\x82\x87\x88\x87>8:\x10Z\x8f\x90\x91\x87\x19.\x0fU\x97USR\x9bPY\x82\x8b9\r\x98\x97S\xa5QX\x87\x17-\x0cVV/,+*(\'R\xa8\x7f>49\x0bWW,3210#RU\x87\x16)\nXX\xb2\'$ \x1fPT\x9f\xb9\tYX\xadVUQPNM\x87\x15%\x08\xd7&!\x1d\x1c\x1a\x18JK\xd37\x07XW\xd9T\xcaXP@\x87\x14"\x06\xbcWT\xa7\xf4;H\xa6\xd5 \xa0\xcc\x8a\x94\'Y\xa0\xf08\xa2\xe5\xd0\x04\x0f\x03\x94\xf5k\x12ea\x96\x86\xb7h\xd4\x10\xb0%\x8bA&D\x92p\x19y\xa8\x80\x83\x00F\x8a\x0c\t\x02D\x08\x90\x1e?l \x02\x90\xa8\xe6\x9f@\x00;'
@@ -3425,6 +3534,10 @@ class RFSwarmGUI(tk.Frame):
 
 				# style.configure("Spinbox", foreground=self.style_text_colour)
 				style.configure("TSpinbox", foreground=self.style_text_colour)
+
+				style.configure("TRadiobutton", foreground=self.style_text_colour)
+
+
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -3792,21 +3905,21 @@ class RFSwarmGUI(tk.Frame):
 
 	def OpenINIGraphs(self):
 
-		base.debugmsg(5, "graph_list:", base.config['GUI']['graph_list'])
+		base.debugmsg(8, "graph_list:", base.config['GUI']['graph_list'])
 
 		i = 1
 		glist = base.config['GUI']['graph_list'].split(",")
-		base.debugmsg(5, "glist:", glist)
+		base.debugmsg(9, "glist:", glist)
 
 		tgph = {}
 		for gi in glist:
 
-			base.debugmsg(5, "gi:", gi)
+			base.debugmsg(7, "gi:", gi)
 			iniid = "{}".format(gi)
 			if iniid in base.config:
-				base.debugmsg(5, "iniid:", iniid, base.config[iniid])
+				base.debugmsg(7, "iniid:", iniid, base.config[iniid])
 				settings = self.inigphsettings(base.config[iniid])
-				base.debugmsg(5, "settings:", settings)
+				base.debugmsg(7, "settings:", settings)
 
 				if settings['open']:
 					tgph[iniid] = threading.Thread(target=lambda: self.OpenGraph(settings))
@@ -3838,21 +3951,21 @@ class RFSwarmGUI(tk.Frame):
 	def RefreshRecentGraphs(self):
 		i = 1
 		glist = base.config['GUI']['graph_list'].split(",")
-		base.debugmsg(5, "glist:", glist)
+		base.debugmsg(9, "glist:", glist)
 		# first construct recent menu list
 		recent = {}
 		for gi in glist:
 			iniid = "{}".format(gi)
-			base.debugmsg(5, "iniid:", iniid)
+			base.debugmsg(9, "iniid:", iniid)
 			if iniid in base.config:
 				settings = self.inigphsettings(base.config[iniid])
-				base.debugmsg(5, "settings:", settings)
+				base.debugmsg(9, "settings:", settings)
 				if 'name' in settings and 'id' in settings:
 					recent[settings['name']] = settings['id']
 
 		try:
 			# remove existing items if any
-			base.debugmsg(5, "gph_recent_menu:", self.gph_recent_menu, self.gph_recent_menu.index("last"))
+			base.debugmsg(9, "gph_recent_menu:", self.gph_recent_menu, self.gph_recent_menu.index("last"))
 			if self.gph_recent_menu.index("last") is not None:
 				index = self.gph_recent_menu.index("last")
 				if index>0:
@@ -3860,15 +3973,15 @@ class RFSwarmGUI(tk.Frame):
 				else:
 					self.gph_recent_menu.delete(0)
 
-			base.debugmsg(5, "gph_recent_menu:", self.gph_recent_menu, self.gph_recent_menu.index("last"))
+			base.debugmsg(9, "gph_recent_menu:", self.gph_recent_menu, self.gph_recent_menu.index("last"))
 			for menui in recent.keys():
-				base.debugmsg(5, "menui:", menui, " 	recent[menui]:", recent[menui])
+				base.debugmsg(9, "menui:", menui, " 	recent[menui]:", recent[menui])
 				iniid = str(recent[menui])
 				# self.gph_recent_menu.add_command(label = menui, command = lambda: self.OpenGraph(recent["{}".format(menui)]))
 				# self.gph_recent_menu.add_command(label = menui, command = lambda: self.OpenGraph(self.inigphsettings(base.config[iniid])))
 				# self.gph_recent_menu.add_command(label = menui, command=lambda: self.MenuOpenGraph(recent[menui]))
 				self.gph_recent_menu.add_command(label = menui, command=lambda iniid=iniid: self.MenuOpenGraph(iniid))
-				base.debugmsg(5, "gph_recent_menu:", self.gph_recent_menu, self.gph_recent_menu.index("last"))
+				base.debugmsg(9, "gph_recent_menu:", self.gph_recent_menu, self.gph_recent_menu.index("last"))
 		except:
 			pass
 
@@ -4491,10 +4604,15 @@ class RFSwarmGUI(tk.Frame):
 		# Button Bar
 		base.debugmsg(6, "Button Bar")
 
-		bbar = ttk.Frame(p)
+		bbar = tk.Frame(p)
 		bbar.grid(column=0, row=planrow, sticky="nsew")
-		bbargrid = ttk.Frame(bbar)
+		# bbar.config(bg="red")
+		bbar.columnconfigure(0, weight=1)
+
+		bbargrid = tk.Frame(bbar)
 		bbargrid.grid(row=0, column=0, sticky="nsew")
+		# bbargrid.config(bg="blue")
+		# bbargrid.columnconfigure(0, weight=1)
 
 		# new
 		base.debugmsg(7, "Button New")
@@ -4534,6 +4652,25 @@ class RFSwarmGUI(tk.Frame):
 		# bSave = ttk.Button(bbargrid, text="Save", command=self.mnu_file_Save)
 		bSave.grid(column=btnno, row=0, sticky="nsew")
 
+		# settings
+		base.debugmsg(7, "Button Settings")
+		btnno += 1
+		icontext = "Advanced"
+		bSST = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', text="Settings", command=self.setings_open)
+		bSST.grid(column=btnno, row=0, sticky="nsew")
+
+
+		# StartTime
+		base.debugmsg(7, "Button Scheduled Start")
+		btnno += 1
+		icontext = "StartTime"
+		# base.debugmsg(9, "self.imgdata:", self.imgdata)
+		# base.debugmsg(9, "self.imgdata:", self.imgdata)
+		# base.debugmsg(9, "self.imgdata:[",icontext,"]", self.imgdata[icontext])
+		bSST = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', text="StartTime", command=self.ScheduledStart)
+		bSST.grid(column=btnno, row=0, sticky="nsew")
+
+
 		# play
 		base.debugmsg(7, "Button Play")
 		btnno += 1
@@ -4546,7 +4683,48 @@ class RFSwarmGUI(tk.Frame):
 		# bPlay = ttk.Button(bbargrid, text="Play", command=self.ClickPlay)
 		bPlay.grid(column=btnno, row=0, sticky="nsew")
 
+		# spacer
+		btnno += 1
+		spcr = ttk.Label(bbargrid, text = " ")	# # just a blank column as a spacer
+		spcr.grid(column=btnno, row=0, sticky="nsew")
+		bbargrid.columnconfigure(btnno, weight=10)
 
+		# display_plan
+		if "lbl_sched_start_time" not in self.display_plan:
+			self.display_plan['lbl_sched_start_time'] = tk.StringVar()
+		if "sched_start_time" not in self.display_plan:
+			self.display_plan['sched_start_time'] = tk.StringVar()
+		if "lbl_time_remaining" not in self.display_plan:
+			self.display_plan['lbl_time_remaining'] = tk.StringVar()
+		if "time_remaining" not in self.display_plan:
+			self.display_plan['time_remaining'] = tk.StringVar()
+
+		base.debugmsg(7, "Scheduled Start Time")
+		btnno += 1
+		lblSST = ttk.Label(bbargrid, textvariable=self.display_plan['lbl_sched_start_time'])
+		lblSST.grid(column=btnno, row=0, sticky="nsew")
+		bbargrid.columnconfigure(btnno, weight=1)
+		btnno += 1
+		dspSST = ttk.Label(bbargrid, textvariable=self.display_plan['sched_start_time'])
+		dspSST.grid(column=btnno, row=0, sticky="nsew")
+		bbargrid.columnconfigure(btnno, weight=1)
+
+		base.debugmsg(7, "Time Remaining")
+		btnno += 1
+		lblSST = ttk.Label(bbargrid, textvariable=self.display_plan['lbl_time_remaining'])
+		lblSST.grid(column=btnno, row=0, sticky="nsew")
+		bbargrid.columnconfigure(btnno, weight=1)
+		btnno += 1
+		dspSST = ttk.Label(bbargrid, textvariable=self.display_plan['time_remaining'])
+		dspSST.grid(column=btnno, row=0, sticky="nsew")
+		bbargrid.columnconfigure(btnno, weight=1)
+
+
+		# # spacer
+		# btnno += 1
+		# spcr = ttk.Label(bbargrid, text = " ")	# just a blank column as a spacer
+		# spcr.grid(column=btnno, row=0, sticky="nsew")
+		# bbargrid.columnconfigure(btnno, weight=1)
 
 
 		planrow += 1
@@ -4669,12 +4847,326 @@ class RFSwarmGUI(tk.Frame):
 		# May need to bind <Button-4> and <Button-5> to enable mouse scrolling
 		# https://www.python-course.eu/tkinter_events_binds.php
 
+		ut = threading.Thread(target=self.UpdatePlanDisplay)
+		ut.start()
+
+
+	def setings_open(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+
+		setingsWindow = tk.Toplevel(self.root)
+		# setingsWindow.config(bg="pink")
+		setingsWindow.columnconfigure(0, weight=1)
+		setingsWindow.rowconfigure(1, weight=1)
+
+		setingsWindow.protocol("WM_DELETE_WINDOW",  lambda: self.setings_close(setingsWindow, False) )
+
+		setingsWindow.fmeContent = tk.Frame(setingsWindow)
+		# setingsWindow.fmeContent.config(bg="red")
+		setingsWindow.fmeContent.grid(column=0, row=1, sticky="nsew")
+
+		setingsWindow.fmeContent.columnconfigure(0, weight=1)
+		setingsWindow.fmeContent.rowconfigure(99, weight=1)
+
+
+
+		setingsWindow.fmeScenario = tk.Frame(setingsWindow.fmeContent)
+		# setingsWindow.fmeScenario.config(bg="blue")
+		setingsWindow.fmeScenario.config(bd=1, relief="sunken")
+		# setingsWindow.fmeScenario.config(bd=1, relief="groove")
+		setingsWindow.fmeScenario.grid(column=0, row=1, sticky="nsew")
+
+		setingsWindow.fmeScenario.columnconfigure(1, weight=1)
+
+		setingsWindow.lblScenario = ttk.Label(setingsWindow.fmeScenario, text="Scenario:")
+		setingsWindow.lblScenario.grid(column=0, row=0, sticky="nsew")
+
+		setingsWindow.lblUpload = ttk.Label(setingsWindow.fmeScenario, text="  Upload Logs:")
+		setingsWindow.lblUpload.grid(column=0, row=1, sticky="nsew")
+
+
+		UploadOpt = list(base.uploadmodes.values())
+		setingsWindow.strUpload = tk.StringVar()
+		setingsWindow.omUpload = ttk.OptionMenu(setingsWindow.fmeScenario, setingsWindow.strUpload, None, *UploadOpt)
+		base.debugmsg(5, "uploadmode:", base.uploadmode)
+		setingsWindow.strUpload.set(base.uploadmodes[base.uploadmode])
+		setingsWindow.omUpload.grid(column=2, row=1, sticky="nsew")
+
+
+
+		setingsWindow.fmeBBar = tk.Frame(setingsWindow)
+		setingsWindow.fmeBBar.grid(column=0, row=9, sticky="nsew")
+
+		setingsWindow.lblBLNK = ttk.Label(setingsWindow.fmeBBar, text = " ")	# just a spacer before the buttons
+		setingsWindow.lblBLNK.grid(column=0, row=0, sticky="nsew")
+		setingsWindow.fmeBBar.columnconfigure(0, weight=1)
+
+		# OK
+		# schedWindow.fmeBBar
+		setingsWindow.btnOK = ttk.Button(setingsWindow.fmeBBar, text="OK", command=lambda: self.setings_close(setingsWindow, True) ) #, width=8)
+		setingsWindow.btnOK.grid(column=98, row=0, sticky="nsew")
+
+		# Cancel
+		setingsWindow.btnCancel = ttk.Button(setingsWindow.fmeBBar, text="Cancel", command=lambda: self.setings_close(setingsWindow, False) ) #, width=8)
+		setingsWindow.btnCancel.grid(column=99, row=0, sticky="nsew")
+
+
+
+	def setings_close(self, setingsWindow, save):
+		base.debugmsg(5, "setingsWindow:", setingsWindow, "	save:", save)
+
+		if save:
+			self.plan_scnro_chngd = True
+			# base.uploadmodes[base.uploadmode]
+			base.debugmsg(5, "strUpload:", setingsWindow.strUpload.get(), "	uploadmodes:", base.uploadmodes)
+			base.uploadmode = base.GetKey(base.uploadmodes, setingsWindow.strUpload.get())
+			base.debugmsg(5, "uploadmode:", base.uploadmode)
+
+		setingsWindow.destroy()
+
+
+
+	def UpdatePlanDisplay(self):
+		while base.keeprunning:
+			if base.run_starttime > 0:
+				sec2st = base.run_starttime - int(time.time())
+				if  sec2st < 0:
+					sec2st = 0
+
+				self.display_plan['lbl_sched_start_time'].set("  Start Time  ")
+				st = datetime.fromtimestamp(base.run_starttime)
+				if sec2st > 86400:  # 24h * 60m * 60s
+					self.display_plan['sched_start_time'].set("  {}  ".format(st.strftime("%Y-%m-%d %H:%M:%S")))
+				else:
+					self.display_plan['sched_start_time'].set("  {}  ".format(st.strftime("%H:%M:%S")))
+
+				self.display_plan['lbl_time_remaining'].set("  Remaining  ")
+				self.display_plan['time_remaining'].set("  {:<10}  ".format(base.format_sec_remain(sec2st)))
+
+			else:
+				self.display_plan['lbl_sched_start_time'].set("")
+				self.display_plan['sched_start_time'].set("")
+
+				self.display_plan['lbl_time_remaining'].set("")
+				self.display_plan['time_remaining'].set("")
+
+
+			time.sleep(1)
 
 	def CanvasResize(self, event):
 		base.debugmsg(6, "event:", event)
 		# self.pln_update_graph()
 		t = threading.Thread(target=self.pln_update_graph)
 		t.start()
+
+	def ScheduledStart(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+		base.debugmsg(5, "run_starttime:", base.run_starttime)
+
+		schedWindow = tk.Toplevel(self.root)
+		# schedWindow.config(bg="pink")
+		schedWindow.columnconfigure(0, weight=1)
+		# schedWindow.rowconfigure(0, weight=1)
+		schedWindow.rowconfigure(1, weight=1)
+
+		schedWindow.bind("<Configure>", lambda e: self.ss_windowevent(e, schedWindow) )
+
+		schedWindow.protocol("WM_DELETE_WINDOW",  lambda: self.ss_close(schedWindow, False) )
+
+
+		schedWindow.fmeBBar = tk.Frame(schedWindow)
+		schedWindow.fmeBBar.grid(column=0, row=9, sticky="nsew")
+
+		schedWindow.fmeContent = tk.Frame(schedWindow)
+		# schedWindow.fmeContent.config(bg="red")
+		schedWindow.fmeContent.grid(column=0, row=1, sticky="nsew")
+
+		schedWindow.fmeContent.columnconfigure(0, weight=1)
+		schedWindow.fmeContent.rowconfigure(0, weight=1)
+
+		schedWindow.time = tk.StringVar()
+		schedWindow.date = tk.StringVar()
+		schedWindow.datetime = datetime(1970,1,1)
+		if base.run_starttime>0:
+			schedWindow.datetime = datetime.fromtimestamp(base.run_starttime)
+			schedWindow.time.set(schedWindow.datetime.strftime("%H:%M:%S"))
+			schedWindow.date.set(schedWindow.datetime.strftime("%Y-%m-%d"))
+
+		schedWindow.time.trace('w', lambda *args: self.ss_validate(schedWindow, args))
+		# schedWindow.time.trace('a', lambda *args: self.ss_validate(schedWindow, args))
+
+		# https://www.tutorialspoint.com/python/tk_radiobutton.htm
+		schedWindow.enabled = tk.IntVar()
+		schedWindow.enabled.set(0)
+		if base.run_starttime>0:
+			schedWindow.enabled.set(1)
+
+		contentrow = 0
+
+		schedWindow.lblSS = ttk.Label(schedWindow.fmeContent, text = "Scheduled Start")
+		schedWindow.lblSS.grid(column=0, row=contentrow, sticky="nsew")
+
+		schedWindow.RSS1 = ttk.Radiobutton(schedWindow.fmeContent, text="Disabled", variable=schedWindow.enabled, value=0, command=lambda: self.ss_selrb(schedWindow) )
+		schedWindow.RSS1.grid(column=1, row=contentrow, sticky="nsew")
+
+		contentrow += 1
+		schedWindow.RSS2 = ttk.Radiobutton(schedWindow.fmeContent, text="Enabled", variable=schedWindow.enabled, value=1, command=lambda: self.ss_selrb(schedWindow) )
+		schedWindow.RSS2.grid(column=1, row=contentrow, sticky="nsew")
+
+
+		contentrow += 1
+		schedWindow.fmeTime = tk.Frame(schedWindow.fmeContent)
+		# schedWindow.fmeTime.config(bg="green")
+		schedWindow.fmeTimeRow = contentrow
+		if base.run_starttime>0:
+			schedWindow.fmeTime.grid(column=0, row=schedWindow.fmeTimeRow, sticky="nsew", columnspan=3)
+
+		schedWindow.lblST = ttk.Label(schedWindow.fmeTime, text = "Schedule Time")
+		schedWindow.lblST.grid(column=0, row=0, sticky="nsew")
+
+		# schedWindow.txtST = ttk.Entry(schedWindow.fmeTime, textvariable=schedWindow.time, validate="key", validatecommand=(lambda: self.ss_validate(schedWindow), "%S") )
+		# schedWindow.txtST.config(validatecommand=lambda: self.ss_validate(schedWindow))
+		schedWindow.txtST = ttk.Entry(schedWindow.fmeTime, textvariable=schedWindow.time)
+		# schedWindow.txtST = ttk.Entry(schedWindow.fmeTime, textvariable=schedWindow.time, validate="focusout")
+		# schedWindow.txtST = ttk.Entry(schedWindow.fmeTime, textvariable=schedWindow.time, validate="focus")
+		# schedWindow.txtST.config(validatecommand=lambda: self.ss_validate(schedWindow))
+
+		# schedWindow.txtST = ttk.Entry(schedWindow.fmeTime, textvariable=schedWindow.time, validate="key")
+		# schedWindow.txtST = ttk.Entry(schedWindow.fmeTime, textvariable=schedWindow.time, validate="all")
+		# schedWindow.txtST.config(validatecommand=(lambda: self.ss_validate(schedWindow), "%P"))
+
+		schedWindow.txtST.grid(column=1, row=0, sticky="nsew")
+
+
+		schedWindow.lblSD = ttk.Label(schedWindow.fmeTime, text = "Schedule Date")
+		schedWindow.lblSD.grid(column=0, row=1, sticky="nsew")
+
+		schedWindow.txtSD = ttk.Label(schedWindow.fmeTime, textvariable=schedWindow.date)
+		schedWindow.txtSD.grid(column=1, row=1, sticky="nsew")
+
+
+
+
+		schedWindow.lblBLNK = ttk.Label(schedWindow.fmeBBar, text = " ")	# just a spacer before the buttons
+		schedWindow.lblBLNK.grid(column=0, row=0, sticky="nsew")
+		schedWindow.fmeBBar.columnconfigure(0, weight=1)
+
+		# OK
+		# schedWindow.fmeBBar
+		schedWindow.btnOK = ttk.Button(schedWindow.fmeBBar, text="OK", command=lambda: self.ss_close(schedWindow, True) ) #, width=8)
+		schedWindow.btnOK.grid(column=98, row=0, sticky="nsew")
+
+		# Cancel
+		schedWindow.btnCancel = ttk.Button(schedWindow.fmeBBar, text="Cancel", command=lambda: self.ss_close(schedWindow, False) ) #, width=8)
+		schedWindow.btnCancel.grid(column=99, row=0, sticky="nsew")
+
+	def ss_close(self, schedWindow, savesched, *args):
+		base.debugmsg(5, "schedWindow:", schedWindow, "	savesched:", savesched)
+		base.debugmsg(5, "args:", args)
+
+		if savesched:
+			sel = schedWindow.enabled.get()
+			if sel==0:
+				base.run_starttime = 0
+			if sel==1:
+				base.run_starttime = int(schedWindow.datetime.timestamp())
+
+		schedWindow.destroy()
+
+	def ss_windowevent(self, e, schedWindow):
+		base.debugmsg(8, "schedWindow:", schedWindow, "	e:", e)
+
+	def ss_selrb(self, schedWindow):
+		base.debugmsg(5, "schedWindow:", schedWindow)
+		sel = schedWindow.enabled.get()
+		base.debugmsg(5, "sel:", sel)
+
+		if sel>0:
+			schedWindow.fmeTime.grid(column=0, row=schedWindow.fmeTimeRow, sticky="nsew", columnspan=3)
+			if base.run_starttime<1:
+				now = datetime.today()
+				newi = int(now.timestamp()) + 600 # +10min
+				newdt = datetime.fromtimestamp(newi)
+				newst = newdt.strftime("%H:%M:%S")
+				schedWindow.time.set(newst)
+		else:
+			schedWindow.fmeTime.grid_forget()
+
+	def ss_validate(self, schedWindow, *args):
+		ut = threading.Thread(target=self.ss_validate_def, args=(schedWindow,))
+		ut.start()
+
+	def ss_validate_def(self, schedWindow, *args):
+		time.sleep(0.5)
+		base.debugmsg(5, "schedWindow:", schedWindow, "	args:", args)
+
+		otime = schedWindow.time.get()
+		stime = schedWindow.time.get()
+		if ':' in stime:
+			if len(stime)<6:
+				stime = "{}:00".format(stime)
+		else:
+			if len(stime)>3:
+				if len(stime)<5:
+					stime = "{:02}:{:02}:00".format(int(stime[0:len(stime)-2]), int(stime[-2:]))
+				else:
+					stime = "{:02}:{:02}:{:02}".format(int(stime[0:len(stime)-4]), int(stime[len(stime)-4:len(stime)-2]), int(stime[-2:]))
+		if stime.count(":")>1 and len(stime)!=8:
+			atime = stime.split(":")
+			base.debugmsg(5, "atime:", atime)
+			while len(atime)<2:
+				 atime.append(0)
+			for i in range(len(atime)):
+				base.debugmsg(5, "atime[",i,"]:", atime[i])
+				if len(atime[i])<1:
+					atime[i] = 0
+				elif len(atime[i])>2:
+					if int(atime[i])>60:
+						atime[i] = atime[i][0]
+					else:
+						atime[i] = int(atime[i])
+
+
+			stime = "{:02}:{:02}:{:02}".format(int(atime[0]),int(atime[1]),int(atime[2]))
+
+		# time.sleep(0.3)
+		if otime != schedWindow.time.get():
+			return 0
+		if otime == stime:
+			return 0
+		if len(stime)>3:
+			schedWindow.time.set(stime)
+			# atime = stime.split(":")
+			# stime = "{:02}:{:02}:{:02}".format(int(atime[0]),int(atime[1]),int(atime[2]))
+			# schedWindow.time.set(stime)
+			itime = base.hms2sec(stime)
+			base.debugmsg(5, "itime:", itime, "	", stime)
+
+			newtime = self.ss_midnight(0) + itime
+			base.debugmsg(5, "newtime:", newtime)
+
+			now = datetime.today()
+			if newtime<int(now.timestamp()+60):
+				newtime = self.ss_midnight(1) + itime
+				base.debugmsg(5, "newtime:", newtime)
+
+			schedWindow.datetime = datetime.fromtimestamp(newtime)
+			schedWindow.date.set(schedWindow.datetime.strftime("%Y-%m-%d"))
+
+
+
+		base.debugmsg(5, "schedWindow.datetime:", schedWindow.datetime)
+
+
+	def ss_midnight(self, offset):
+		mn = 0
+		now = datetime.today()
+		base.debugmsg(5, "now:", now)
+		mndt = datetime(now.year, now.month, now.day)
+		offsetsec = 24 * 60 * 60 * offset
+		base.debugmsg(5, "mndt:", mndt, "	offsetsec:", offsetsec)
+		mn = int(mndt.timestamp()) + offsetsec
+		return mn
 
 	def ClickPlay(self, _event=None):
 
@@ -4686,7 +5178,9 @@ class RFSwarmGUI(tk.Frame):
 		icontext = "Stop"
 		self.elements["Run"]["btn_stop"]["image"] = self.icoStop
 
-		self.tabs.select(1)
+		# sec2st = base.run_starttime - int(time.time())
+		# if sec2st < 1:
+		# 	self.tabs.select(1)
 
 		core.ClickPlay()
 
@@ -4758,7 +5252,7 @@ class RFSwarmGUI(tk.Frame):
 
 					q = 0
 
-					base.debugmsg(5, "int(1/chunk)-1:", int(1/chunk)-1)
+					base.debugmsg(7, "int(1/chunk)-1:", int(1/chunk)-1)
 
 					for i in range(int(1/chunk)-1):
 						q += chunk
@@ -4817,11 +5311,11 @@ class RFSwarmGUI(tk.Frame):
 
 
 
-			base.debugmsg(5, "totalcalc:", totalcalc)
+			base.debugmsg(7, "totalcalc:", totalcalc)
 
 			rtotal = 0
 			for k in sorted(totalcalc.keys()):
-				base.debugmsg(5, "k:", k, " 	totalcalc[k]:", totalcalc[k])
+				base.debugmsg(7, "k:", k, " 	totalcalc[k]:", totalcalc[k])
 				graphdata["Total"]["objTime"].append(datetime.fromtimestamp(k, timezone.utc))
 				rtotal += totalcalc[k]
 				graphdata["Total"]["Values"].append(rtotal)
@@ -6354,6 +6848,9 @@ class RFSwarmGUI(tk.Frame):
 
 			if 'Scenario' not in filedata:
 				filedata['Scenario'] = {}
+
+			# base.uploadmode
+			filedata['Scenario']['UploadMode'] = base.uploadmode
 
 			scriptidx = str(0)
 			if 'ScriptCount' not in filedata['Scenario']:
