@@ -567,6 +567,9 @@ class ReporterBase():
 			if RType == "Total TPS":
 				sql += 		"result "
 				sql += 		", count(result)  as 'count' "
+			if RType == None:
+				sql += 		"result_name "
+				sql += 		", * "
 
 			sql += "FROM Results "
 
@@ -612,7 +615,8 @@ class ReporterBase():
 					sql += "AND {} ".format(iwhere)
 				i += 1
 
-			sql += "GROUP by "
+			if RType != None:
+				sql += "GROUP by "
 			# sql += 		", result "
 			if RType == "Response Time":
 				sql += 		"result_name "
@@ -750,6 +754,151 @@ class ReporterBase():
 		valout = valout.replace('x35', '#')
 		base.debugmsg(9, "valout:", valout)
 		return valout
+
+
+	# mt MetricType
+	def rt_table_get_mt(self, id):
+		base.debugmsg(5, "id:", id)
+		if 'MetricType' in base.report[id]:
+			return base.report[id]['MetricType']
+		else:
+			return ""
+
+	def rt_table_set_mt(self, id, metrictype):
+		base.debugmsg(5, "id:", id, "	metrictype:", metrictype)
+		prev = self.rt_table_get_mt(id)
+		if metrictype != prev and metrictype != None:
+			base.report[id]['MetricType'] = metrictype
+			base.report_item_set_changed(id)
+			base.report_save()
+
+	def rt_table_get_mlst(self, id):
+		base.debugmsg(5, "id:", id)
+		mlst = [None, ""]
+		sql = "SELECT Type "
+		sql += "FROM Metric "
+		sql += "GROUP BY Type "
+		base.debugmsg(6, "sql:", sql)
+		key = "{}_Metrics".format(id)
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+		while key not in base.dbqueue["ReadResult"]:
+			time.sleep(0.1)
+
+		tdata = base.dbqueue["ReadResult"][key]
+		base.debugmsg(8, "tdata:", tdata)
+		for m in tdata:
+			mlst.append(m["Type"])
+
+		return mlst
+
+	# pm PrimaryMetric
+	def rt_table_get_pm(self, id):
+		base.debugmsg(5, "id:", id)
+		if 'PrimaryMetric' in base.report[id]:
+			return base.report[id]['PrimaryMetric']
+		else:
+			return ""
+
+	def rt_table_set_pm(self, id, primarymetric):
+		base.debugmsg(5, "id:", id, "	primarymetric:", primarymetric)
+		prev = self.rt_table_get_pm(id)
+		if primarymetric != prev and primarymetric != None:
+			base.report[id]['PrimaryMetric'] = primarymetric
+			base.report_item_set_changed(id)
+			base.report_save()
+
+	def rt_table_get_pmlst(self, id):
+		base.debugmsg(5, "id:", id)
+		# SELECT Name
+		# FROM Metric
+		# -- WHERE Type = 'Agent'
+		# GROUP BY Name
+		mtype = self.rt_table_get_mt(id)
+		pmlst = [None, ""]
+		sql = "SELECT Name "
+		sql += "FROM Metric "
+		if mtype is not None and len(mtype)>0:
+			sql += "WHERE Type = '{}' ".format(mtype)
+		sql += "GROUP BY Name "
+		base.debugmsg(6, "sql:", sql)
+		key = "{}_{}_PMetrics".format(id, mtype)
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+		while key not in base.dbqueue["ReadResult"]:
+			time.sleep(0.1)
+
+		tdata = base.dbqueue["ReadResult"][key]
+		base.debugmsg(8, "tdata:", tdata)
+		for m in tdata:
+			pmlst.append(m["Name"])
+
+		base.debugmsg(5, "pmlst:", pmlst)
+
+		return pmlst
+
+	# sm SecondaryMetric
+	def rt_table_get_sm(self, id):
+		base.debugmsg(5, "id:", id)
+		if 'SecondaryMetric' in base.report[id]:
+			return base.report[id]['SecondaryMetric']
+		else:
+			return ""
+
+	def rt_table_set_sm(self, id, secondarymetric):
+		base.debugmsg(5, "id:", id, "	secondarymetric:", secondarymetric)
+		prev = self.rt_table_get_sm(id)
+		if secondarymetric != prev and secondarymetric != None:
+			base.report[id]['SecondaryMetric'] = secondarymetric
+			base.report_item_set_changed(id)
+			base.report_save()
+
+	def rt_table_get_smlst(self, id):
+		base.debugmsg(5, "id:", id)
+		# SELECT SecondaryMetric
+		# FROM MetricData
+		# -- WHERE MetricType = 'Agent'
+		# -- 	AND PrimaryMetric = 'DavesMBPSG'
+		# GROUP BY SecondaryMetric
+		wherelst = []
+		mtype = self.rt_table_get_mt(id)
+		if mtype is not None and len(mtype)>0:
+			wherelst.append({"key":"MetricType", "value":mtype})
+
+		pmtype = self.rt_table_get_pm(id)
+		if pmtype is not None and len(pmtype)>0:
+			wherelst.append({"key":"PrimaryMetric", "value":pmtype})
+
+		smlst = [None, ""]
+		sql = "SELECT SecondaryMetric "
+		sql += "FROM MetricData "
+
+		# if mtype is not None and len(mtype)>0:
+		# 	sql += "WHERE Type = '{}' ".format("Agent")
+		i=0
+		for itm in wherelst:
+			if i<1:
+				sql += "WHERE {} = '{}' ".format(itm["key"], itm["value"])
+				i += 1
+			else:
+				sql += "AND {} = '{}' ".format(itm["key"], itm["value"])
+
+		sql += "GROUP BY SecondaryMetric "
+		base.debugmsg(6, "sql:", sql)
+		key = "{}_{}_{}_SMetrics".format(id, mtype, pmtype)
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+		while key not in base.dbqueue["ReadResult"]:
+			time.sleep(0.1)
+
+		tdata = base.dbqueue["ReadResult"][key]
+		base.debugmsg(8, "tdata:", tdata)
+		for m in tdata:
+			smlst.append(m["SecondaryMetric"])
+
+		base.debugmsg(5, "smlst:", smlst)
+
+
+		return smlst
+
+
 
 
 	#
@@ -2094,9 +2243,25 @@ class ReporterGUI(tk.Frame):
 			colours = self.contentdata[id]["intColours"].get()
 			base.rt_table_set_colours(id, colours)
 
+		# self.contentdata[id]["MType"].set(base.rt_table_get_mt(id))
+		if "MType" in self.contentdata[id]:
+			value = self.contentdata[id]["MType"].get()
+			base.rt_table_set_mt(id, value)
+		# self.contentdata[id]["PMetric"].set(base.rt_table_get_pm(id))
+		if "PMetric" in self.contentdata[id]:
+			value = self.contentdata[id]["PMetric"].get()
+			base.rt_table_set_pm(id, value)
+		# self.contentdata[id]["SMetric"].set(base.rt_table_get_sm(id))
+		if "SMetric" in self.contentdata[id]:
+			value = self.contentdata[id]["SMetric"].get()
+			base.rt_table_set_sm(id, value)
+
 		if "strDT" in self.contentdata[id]:
 			datatype = self.contentdata[id]["strDT"].get()
 			base.rt_table_set_dt(id, datatype)
+
+			if datatype == "Metric":
+				self.cs_datatable_update_metrics(id)
 
 		# self.contentdata[id]["RType"].set(base.rt_table_get_rt(id))
 		if "RType" in self.contentdata[id]:
@@ -2124,6 +2289,34 @@ class ReporterGUI(tk.Frame):
 
 		self.content_preview(id)
 
+	def cs_datatable_update_metrics(self, id):
+		base.debugmsg(5, "id:", id)
+		tmt = threading.Thread(target=lambda: self.cs_datatable_update_metricstype(id))
+		tmt.start()
+		base.debugmsg(6, "tmt")
+		tpm = threading.Thread(target=lambda: self.cs_datatable_update_pmetrics(id))
+		tpm.start()
+		base.debugmsg(6, "tpm")
+		tsm = threading.Thread(target=lambda: self.cs_datatable_update_smetrics(id))
+		tsm.start()
+		base.debugmsg(6, "tsm")
+
+
+	def cs_datatable_update_metricstype(self, id):
+		base.debugmsg(5, "id:", id)
+		self.contentdata[id]["Metrics"] = base.rt_table_get_mlst(id)
+		self.contentdata[id]["omMT"].set_menu(*self.contentdata[id]["Metrics"])
+
+	def cs_datatable_update_pmetrics(self, id):
+		base.debugmsg(5, "id:", id)
+		self.contentdata[id]["PMetrics"] = base.rt_table_get_pmlst(id)
+		self.contentdata[id]["omPM"].set_menu(*self.contentdata[id]["PMetrics"])
+
+	def cs_datatable_update_smetrics(self, id):
+		base.debugmsg(5, "id:", id)
+		self.contentdata[id]["SMetrics"] = base.rt_table_get_smlst(id)
+		self.contentdata[id]["omSM"].set_menu(*self.contentdata[id]["SMetrics"])
+
 	def cs_datatable_switchdt(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
 		rownum = 0
@@ -2139,8 +2332,6 @@ class ReporterGUI(tk.Frame):
 		if "Frames" not in self.contentdata[id]:
 			self.contentdata[id]["Frames"] = {}
 		# Forget
-		# if datatype != "Metric":
-		# 	grphWindow.fmeMSettings.grid_forget()
 		for frame in self.contentdata[id]["Frames"].keys():
 			self.contentdata[id]["Frames"][frame].grid_forget()
 
@@ -2154,7 +2345,32 @@ class ReporterGUI(tk.Frame):
 			# "Metric", "Result", "SQL"
 
 			if datatype == "Metric":
-				pass
+				rownum += 1
+				self.contentdata[id]["lblMT"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Metric Type:")
+				self.contentdata[id]["lblMT"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["MTypes"] = [None, "", "Loading..."]
+				self.contentdata[id]["MType"] = tk.StringVar()
+				self.contentdata[id]["omMT"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["MType"], command=self.cs_datatable_update, *self.contentdata[id]["MTypes"])
+				self.contentdata[id]["omMT"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["lblPM"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Primrary Metric:")
+				self.contentdata[id]["lblPM"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["PMetrics"] = [None, "", "Loading..."]
+				self.contentdata[id]["PMetric"] = tk.StringVar()
+				self.contentdata[id]["omPM"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["PMetric"], command=self.cs_datatable_update, *self.contentdata[id]["PMetrics"])
+				self.contentdata[id]["omPM"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["lblSM"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Secondary Metric:")
+				self.contentdata[id]["lblSM"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["SMetrics"] = [None, "", "Loading..."]
+				self.contentdata[id]["SMetric"] = tk.StringVar()
+				self.contentdata[id]["omSM"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["SMetric"], command=self.cs_datatable_update, *self.contentdata[id]["SMetrics"])
+				self.contentdata[id]["omSM"].grid(column=1, row=rownum, sticky="nsew")
 
 			if datatype == "Result":
 				rownum += 1
@@ -2219,6 +2435,14 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[id]["FRType"].set(base.rt_table_get_fr(id))
 			self.contentdata[id]["FNType"].set(base.rt_table_get_fn(id))
 			self.contentdata[id]["FPattern"].set(base.rt_table_get_fp(id))
+
+		if datatype == "Metric":
+			base.debugmsg(5, "Update Options")
+			self.cs_datatable_update_metrics(id)
+			base.debugmsg(5, "Set Options")
+			self.contentdata[id]["MType"].set(base.rt_table_get_mt(id))
+			self.contentdata[id]["PMetric"].set(base.rt_table_get_pm(id))
+			self.contentdata[id]["SMetric"].set(base.rt_table_get_sm(id))
 
 		# Show
 		self.contentdata[id]["Frames"][datatype].grid(column=0, row=self.contentdata[id]["DTFrame"], columnspan=100, sticky="nsew")
