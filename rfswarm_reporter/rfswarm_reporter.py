@@ -394,11 +394,12 @@ class ReporterBase():
 		# base.report["Report"]["Order"].insert(1, base.report["Report"]["Order"].pop(2)) # move item in list
 
 	def report_item_get_changed(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(8, "id:", id)
 		if id == 'TOP':
 			return time.time()
 		if 'Changed' not in base.report[id]:
 			base.report_item_set_changed(id)
+		base.debugmsg(8, "Changed:", base.report[id]['Changed'], float(base.report[id]['Changed']))
 		return float(base.report[id]['Changed'])
 
 	def report_item_set_changed(self, id):
@@ -479,15 +480,15 @@ class ReporterBase():
 	def rt_graph_get_sql(self, id):
 		base.debugmsg(5, "id:", id)
 		if 'SQL' in base.report[id]:
-			return self.whitespace_get_ini_value(base.report[id]['SQL'])
+			return self.whitespace_get_ini_value(base.report[id]['SQL']).strip()
 		else:
 			return ""
 
 	def rt_graph_set_sql(self, id, graphSQL):
-		base.debugmsg(5, "id:", id, "	graphSQL:", graphSQL)
+		base.debugmsg(5, "id:", id, "	graphSQL:", graphSQL.strip())
 		prev = self.rt_graph_get_sql(id)
-		if graphSQL != prev:
-			base.report[id]['SQL'] = self.whitespace_set_ini_value(graphSQL)
+		if graphSQL.strip() != prev:
+			base.report[id]['SQL'] = self.whitespace_set_ini_value(graphSQL.strip())
 			base.report_item_set_changed(id)
 			base.report_save()
 
@@ -514,20 +515,21 @@ class ReporterBase():
 	def rt_table_get_sql(self, id):
 		base.debugmsg(5, "id:", id)
 		if 'SQL' in base.report[id]:
-			return self.whitespace_get_ini_value(base.report[id]['SQL'])
+			return self.whitespace_get_ini_value(base.report[id]['SQL']).strip()
 		else:
 			return ""
 
 	def rt_table_set_sql(self, id, tableSQL):
-		base.debugmsg(5, "id:", id, "	tableSQL:", tableSQL)
+		base.debugmsg(5, "id:", id, "	tableSQL:", tableSQL.strip())
 		prev = self.rt_table_get_sql(id)
-		if tableSQL != prev:
-			base.report[id]['SQL'] = self.whitespace_set_ini_value(tableSQL)
+		if tableSQL.strip() != prev:
+			base.report[id]['SQL'] = self.whitespace_set_ini_value(tableSQL.strip())
 			base.report_item_set_changed(id)
 			base.report_save()
 
 	def rt_table_generate_sql(self, id):
 		base.debugmsg(5, "id:", id)
+		display_percentile = 90
 		sql = ""
 		DataType = self.rt_table_get_dt(id)
 		if DataType == "Result":
@@ -535,7 +537,6 @@ class ReporterBase():
 			FRType = self.rt_table_get_fr(id)
 			FNType = self.rt_table_get_fn(id)
 			inpFP = self.rt_table_get_fp(id)
-			display_percentile = 90
 
 			sql = "SELECT "
 			if RType == "Response Time":
@@ -628,8 +629,143 @@ class ReporterBase():
 				sql += 		"result "
 				sql += "ORDER by count(result) DESC "
 
-			base.debugmsg(6, "sql:", sql)
-			self.rt_table_set_sql(id, sql)
+		if DataType == "Metric":
+			MType = self.rt_table_get_mt(id)
+			PM = self.rt_table_get_pm(id)
+			SM = self.rt_table_get_sm(id)
+			isnum = self.rt_table_get_isnumeric(id)
+			sc = self.rt_table_get_showcount(id)
+			base.debugmsg(6, "MType:", MType, "	PM:", PM, "	SM:", SM)
+
+			mcolumns = ["PrimaryMetric", "MetricType", "SecondaryMetric"]
+			wherelst = []
+			grouplst = ["PrimaryMetric", "MetricType", "SecondaryMetric"]
+
+			if MType is not None and len(MType)>0:
+				if "MetricType" in mcolumns:
+					mcolumns.remove("MetricType")
+				wherelst.append("MetricType == '{}'".format(MType))
+				if "MetricType" in grouplst:
+					grouplst.remove("MetricType")
+			if PM is not None and len(PM)>0:
+				if "PrimaryMetric" in mcolumns:
+					mcolumns.remove("PrimaryMetric")
+				wherelst.append("PrimaryMetric == '{}'".format(PM))
+				if "PrimaryMetric" in grouplst:
+					grouplst.remove("PrimaryMetric")
+			if SM is not None and len(SM)>0:
+				if "SecondaryMetric" in mcolumns:
+					mcolumns.remove("SecondaryMetric")
+				wherelst.append("SecondaryMetric == '{}'".format(SM))
+				if "SecondaryMetric" in grouplst:
+					grouplst.remove("SecondaryMetric")
+
+			if isnum<1:
+				mcolumns.append("MetricValue")
+				if sc>0:
+					mcolumns.append("count(MetricTime) as 'Count'")
+					if "MetricValue" in grouplst:
+						grouplst.remove("MetricValue")
+			else:
+				mcolumns.append("min(CAST(MetricValue AS NUMERIC)) AS 'Minimum'")
+				mcolumns.append("round(avg(CAST(MetricValue AS NUMERIC)),3) AS 'Average'")
+				mcolumns.append("round(percentile(CAST(MetricValue AS NUMERIC), {}),3) AS '{}%ile'".format(display_percentile, display_percentile))
+				mcolumns.append("max(CAST(MetricValue AS NUMERIC)) AS 'Maximum'")
+				mcolumns.append("round(stdev(CAST(MetricValue AS NUMERIC)),3) AS 'StdDev'")
+
+
+			sql = "SELECT "
+
+			i=0
+			for col in mcolumns:
+				if i<1:
+					sql += 		"{} ".format(col)
+				else:
+					sql += 		", {} ".format(col)
+				i += 1
+
+			sql += "FROM MetricData "
+
+			i = 0
+			for iwhere in wherelst:
+				if i == 0:
+					sql += "WHERE {} ".format(iwhere)
+				else:
+					sql += "AND {} ".format(iwhere)
+				i += 1
+
+			if len(grouplst)>0:
+				sql += "GROUP by "
+				i=0
+				for col in grouplst:
+					if i<1:
+						sql += 		"{} ".format(col)
+					else:
+						sql += 		", {} ".format(col)
+					i += 1
+
+		if DataType == "ResultSummary":
+			# SELECT
+			# 	rs.Name
+			# 	, rs.Min
+			# 	, rs.Average
+			# 	, rs.StDev
+			# 	, rs.[%ile_Value] '90 %ile'
+			# 	, rs.Max
+			# 	, rs.Pass
+			# 	, rs.Fail
+			# 	, rs.Other
+			# FROM ResultSummary rs
+			# WHERE rs.Name not like '%<%'
+
+			FNType = self.rt_table_get_fn(id)
+			inpFP = self.rt_table_get_fp(id)
+
+			sql = "SELECT "
+			sql += 		"Name "
+			sql += 		", Min "
+			sql += 		", Average "
+			sql += 		", StDev "
+			sql += 		", [%ile_Value] '90 %ile' "
+			sql += 		", Pass "
+			sql += 		", Fail "
+			sql += 		", Other "
+			sql += "FROM ResultSummary rs "
+
+			lwhere = []
+			if FNType != "None" and len(inpFP)>0:
+				# construct pattern
+				# "Wildcard (Unix Glob)",
+				if FNType == "Wildcard (Unix Glob)":
+					# -- 		WHERE result_name GLOB 'OC3*'
+					lwhere.append("Name GLOB '{}'".format(inpFP))
+				# "Regex",
+				if FNType == "Regex":
+					# -- 		WHERE result_name GLOB 'OC3*'
+					lwhere.append("Name REGEXP '{}'".format(inpFP))
+				# "Not Wildcard (Unix Glob)",
+				if FNType == "Not Wildcard (Unix Glob)":
+					# -- 		WHERE result_name GLOB 'OC3*'
+					lwhere.append("Name NOT GLOB '{}'".format(inpFP))
+				# "Not Regex"
+				if FNType == "Not Regex":
+					# -- 		WHERE result_name GLOB 'OC3*'
+					lwhere.append("Name NOT REGEXP '{}'".format(inpFP))
+
+			i = 0
+			for iwhere in lwhere:
+				if i == 0:
+					sql += "WHERE {} ".format(iwhere)
+				else:
+					sql += "AND {} ".format(iwhere)
+				i += 1
+
+
+		base.debugmsg(6, "sql:", sql)
+		self.rt_table_set_sql(id, sql)
+		return sql
+
+
 
 	def rt_table_get_colours(self, id):
 		base.debugmsg(5, "id:", id)
@@ -898,7 +1034,35 @@ class ReporterBase():
 
 		return smlst
 
+	def rt_table_get_isnumeric(self, id):
+		base.debugmsg(5, "id:", id)
+		if 'IsNumeric' in base.report[id]:
+			return int(base.report[id]['IsNumeric'])
+		else:
+			return 0
 
+	def rt_table_set_isnumeric(self, id, value):
+		base.debugmsg(5, "id:", id, "	value:", value)
+		prev = self.rt_table_get_isnumeric(id)
+		if value != prev and value != None:
+			base.report[id]['IsNumeric'] = str(value)
+			base.report_item_set_changed(id)
+			base.report_save()
+
+	def rt_table_get_showcount(self, id):
+		base.debugmsg(5, "id:", id)
+		if 'ShowCount' in base.report[id]:
+			return int(base.report[id]['ShowCount'])
+		else:
+			return 0
+
+	def rt_table_set_showcount(self, id, value):
+		base.debugmsg(5, "id:", id, "	value:", value)
+		prev = self.rt_table_get_showcount(id)
+		if value != prev and value != None:
+			base.report[id]['ShowCount'] = str(value)
+			base.report_item_set_changed(id)
+			base.report_save()
 
 
 	#
@@ -2220,7 +2384,7 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["Frame"], text = "Data Type:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
 
-		DataTypes = [None, "Metric", "Result", "SQL"]
+		DataTypes = [None, "Metric", "Result", "ResultSummary", "SQL"]
 		self.contentdata[id]["strDT"] = tk.StringVar()
 		self.contentdata[id]["omDT"] = ttk.OptionMenu(self.contentdata[id]["Frame"], self.contentdata[id]["strDT"], command=self.cs_datatable_switchdt, *DataTypes)
 		self.contentdata[id]["strDT"].set(datatype)
@@ -2243,6 +2407,13 @@ class ReporterGUI(tk.Frame):
 			colours = self.contentdata[id]["intColours"].get()
 			base.rt_table_set_colours(id, colours)
 
+
+		if "intIsNum" in self.contentdata[id]:
+			value = self.contentdata[id]["intIsNum"].get()
+			base.rt_table_set_isnumeric(id, value)
+		if "intShCnt" in self.contentdata[id]:
+			value = self.contentdata[id]["intShCnt"].get()
+			base.rt_table_set_showcount(id, value)
 		# self.contentdata[id]["MType"].set(base.rt_table_get_mt(id))
 		if "MType" in self.contentdata[id]:
 			value = self.contentdata[id]["MType"].get()
@@ -2255,13 +2426,6 @@ class ReporterGUI(tk.Frame):
 		if "SMetric" in self.contentdata[id]:
 			value = self.contentdata[id]["SMetric"].get()
 			base.rt_table_set_sm(id, value)
-
-		if "strDT" in self.contentdata[id]:
-			datatype = self.contentdata[id]["strDT"].get()
-			base.rt_table_set_dt(id, datatype)
-
-			if datatype == "Metric":
-				self.cs_datatable_update_metrics(id)
 
 		# self.contentdata[id]["RType"].set(base.rt_table_get_rt(id))
 		if "RType" in self.contentdata[id]:
@@ -2280,13 +2444,26 @@ class ReporterGUI(tk.Frame):
 			value = self.contentdata[id]["FPattern"].get()
 			base.rt_table_set_fp(id, value)
 
+		if "strDT" in self.contentdata[id]:
+			datatype = self.contentdata[id]["strDT"].get()
+			base.rt_table_set_dt(id, datatype)
+
+			if datatype == "Metric":
+				self.cs_datatable_update_metrics(id)
+
+			if datatype != "SQL":
+				time.sleep(0.1)
+				base.rt_table_generate_sql(id)
+
 		if "tSQL" in self.contentdata[id]:
 			data = self.contentdata[id]["tSQL"].get('0.0', tk.END).strip()
 			base.debugmsg(5, "data:", data)
 			base.rt_table_set_sql(id, data)
 		else:
+			time.sleep(0.1)
 			base.rt_table_generate_sql(id)
 
+		base.debugmsg(5, "content_preview id:", id)
 		self.content_preview(id)
 
 	def cs_datatable_update_metrics(self, id):
@@ -2345,6 +2522,22 @@ class ReporterGUI(tk.Frame):
 			# "Metric", "Result", "SQL"
 
 			if datatype == "Metric":
+
+				rownum += 1
+				self.contentdata[id]["lblIsNum"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Number Value:")
+				self.contentdata[id]["lblIsNum"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["intIsNum"] = tk.IntVar()
+				self.contentdata[id]["chkIsNum"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intIsNum"], command=self.cs_datatable_update)
+				self.contentdata[id]["chkIsNum"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["lblShCnt"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Show Counts:")
+				self.contentdata[id]["lblShCnt"].grid(column=2, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["intShCnt"] = tk.IntVar()
+				self.contentdata[id]["chkShCnt"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intShCnt"], command=self.cs_datatable_update)
+				self.contentdata[id]["chkShCnt"].grid(column=3, row=rownum, sticky="nsew")
+
 				rownum += 1
 				self.contentdata[id]["lblMT"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Metric Type:")
 				self.contentdata[id]["lblMT"].grid(column=0, row=rownum, sticky="nsew")
@@ -2411,6 +2604,26 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["inpFP"].bind('<Leave>', self.cs_datatable_update)
 				self.contentdata[id]["inpFP"].bind('<FocusOut>', self.cs_datatable_update)
 
+			if datatype == "ResultSummary":
+				rownum += 1
+				self.contentdata[id]["lblFN"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Filter Type:")
+				self.contentdata[id]["lblFN"].grid(column=0, row=rownum, sticky="nsew")
+
+				FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
+				self.contentdata[id]["FNType"] = tk.StringVar()
+				self.contentdata[id]["omFR"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["FNType"], command=self.cs_datatable_update, *FNTypes)
+				self.contentdata[id]["omFR"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["lblFP"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Filter Pattern:")
+				self.contentdata[id]["lblFP"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["FPattern"] = tk.StringVar()
+				self.contentdata[id]["inpFP"] = ttk.Entry(self.contentdata[id]["Frames"][datatype], textvariable=self.contentdata[id]["FPattern"])
+				self.contentdata[id]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[id]["inpFP"].bind('<Leave>', self.cs_datatable_update)
+				self.contentdata[id]["inpFP"].bind('<FocusOut>', self.cs_datatable_update)
+
 			if datatype == "SQL":
 				# sql = base.rt_table_get_sql(id)
 				rownum += 1
@@ -2436,10 +2649,18 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[id]["FNType"].set(base.rt_table_get_fn(id))
 			self.contentdata[id]["FPattern"].set(base.rt_table_get_fp(id))
 
+		if datatype == "ResultSummary":
+			self.contentdata[id]["FNType"].set(base.rt_table_get_fn(id))
+			self.contentdata[id]["FPattern"].set(base.rt_table_get_fp(id))
+
 		if datatype == "Metric":
 			base.debugmsg(5, "Update Options")
 			self.cs_datatable_update_metrics(id)
 			base.debugmsg(5, "Set Options")
+			while "SMetric" not in self.contentdata[id]:
+				time.sleep(0.1)
+			self.contentdata[id]["intIsNum"].set(base.rt_table_get_isnumeric(id))
+			self.contentdata[id]["intShCnt"].set(base.rt_table_get_showcount(id))
 			self.contentdata[id]["MType"].set(base.rt_table_get_mt(id))
 			self.contentdata[id]["PMetric"].set(base.rt_table_get_pm(id))
 			self.contentdata[id]["SMetric"].set(base.rt_table_get_sm(id))
@@ -2503,6 +2724,12 @@ class ReporterGUI(tk.Frame):
 		# if "Changed" in self.contentdata[id] and base.report_item_get_changed(id) > self.contentdata[id]["Changed"]:
 		elif base.report_item_get_changed(id) > self.contentdata[id]["Changed"]:
 			gen = True
+
+			base.debugmsg(8, "report_item_get_changed:", base.report_item_get_changed(id), "	contentdata Changed:", self.contentdata[id]["Changed"])
+		else:
+			base.debugmsg(8, "report_item_get_changed:", base.report_item_get_changed(id), "	contentdata Changed:", self.contentdata[id]["Changed"])
+
+		base.debugmsg(5, "gen:", gen)
 		if gen:
 			self.contentdata[id]["Changed"] = base.report_item_get_changed(id)
 			self.contentdata[id]["Preview"] = tk.Frame(self.contentpreview, padx=0, pady=0, bd=0)
@@ -2560,8 +2787,9 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "id:", id)
 		sql = base.rt_graph_get_sql(id)
 		base.debugmsg(7, "sql:", sql)
-		base.dbqueue["Read"].append({"SQL": sql, "KEY": id})
-		while id not in base.dbqueue["ReadResult"]:
+		key = "{}_{}".format(id, base.report_item_get_changed(id))
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+		while key not in base.dbqueue["ReadResult"]:
 			time.sleep(0.1)
 
 		# tdata = base.dbqueue["ReadResult"][id]
@@ -2569,59 +2797,65 @@ class ReporterGUI(tk.Frame):
 
 	def cp_table(self, id):
 		base.debugmsg(5, "id:", id)
-		sql = base.rt_table_get_sql(id)
+		datatype = base.rt_table_get_dt(id)
+		if datatype == "SQL":
+			sql = base.rt_table_get_sql(id)
+		else:
+			sql = base.rt_table_generate_sql(id)
 		colours = base.rt_table_get_colours(id)
 		rownum = 1
 		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text="    ")
 		self.contentdata[id]["lblSpacer"].grid(column=0, row=rownum, sticky="nsew")
-		if len(sql.strip())>0:
+		if sql is not None and len(sql.strip())>0:
 			base.debugmsg(8, "sql:", sql)
-			base.dbqueue["Read"].append({"SQL": sql, "KEY": id})
-			while id not in base.dbqueue["ReadResult"]:
+			key = "{}_{}".format(id, base.report_item_get_changed(id))
+			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+			while key not in base.dbqueue["ReadResult"]:
 				time.sleep(0.1)
 
-			tdata = base.dbqueue["ReadResult"][id]
+			tdata = base.dbqueue["ReadResult"][key]
 			base.debugmsg(8, "tdata:", tdata)
 
 			# self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text=notetxt)
 			# self.contentdata[id]["lblSpacer"].grid(column=1, row=rownum, sticky="nsew")
 
-			cols = list(tdata[0].keys())
-			base.debugmsg(7, "cols:", cols)
-			colnum = 1 + colours
-			for col in cols:
-				cellname = "h_{}".format(col)
-				base.debugmsg(9, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=col)
-				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-				colnum += 1
-			i = 0
-			for row in tdata:
-				i += 1
-				rownum += 1
-				colnum = 0
-				if colours:
-					colnum += 1
-					cellname = "{}_{}".format(i, "colour")
-					# self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="  ")
-					self.contentdata[id][cellname] = tk.Label(self.contentdata[id]["Preview"], text="  ")
-					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-
-					base.debugmsg(9, "row:", row)
-					label=row[cols[0]]
-					base.debugmsg(9, "label:", label)
-					colour = base.named_colour(label)
-					base.debugmsg(9, "colour:", colour)
-					# self.contentdata[id][cellname].config(background=colour)
-					self.contentdata[id][cellname].config(bg=colour)
-
-
+			if len(tdata)>0:
+				cols = list(tdata[0].keys())
+				base.debugmsg(7, "cols:", cols)
+				colnum = 1 + colours
 				for col in cols:
-					colnum += 1
-					cellname = "{}_{}".format(i, col)
+					cellname = "h_{}".format(col)
 					base.debugmsg(9, "cellname:", cellname)
-					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(row[col]))
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=col)
 					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+					colnum += 1
+				i = 0
+				for row in tdata:
+					i += 1
+					rownum += 1
+					colnum = 0
+					if colours:
+						colnum += 1
+						cellname = "{}_{}".format(i, "colour")
+						# self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="  ")
+						self.contentdata[id][cellname] = tk.Label(self.contentdata[id]["Preview"], text="  ")
+						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+						base.debugmsg(9, "row:", row)
+						label=row[cols[0]]
+						base.debugmsg(9, "label:", label)
+						colour = base.named_colour(label)
+						base.debugmsg(9, "colour:", colour)
+						# self.contentdata[id][cellname].config(background=colour)
+						self.contentdata[id][cellname].config(bg=colour)
+
+
+					for col in cols:
+						colnum += 1
+						cellname = "{}_{}".format(i, col)
+						base.debugmsg(9, "cellname:", cellname)
+						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(row[col]))
+						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 
 
