@@ -634,19 +634,19 @@ class ReporterBase():
 			grouplst = []
 
 			if MType is not None and len(MType)>0:
-				if "MetricType" in mcolumns:
+				if "MetricType as 'Name'" in mcolumns:
 					mcolumns.remove("MetricType as 'Name'")
 				wherelst.append("MetricType == '{}'".format(MType))
 				if "MetricType" in grouplst:
 					grouplst.remove("MetricType")
 			if PM is not None and len(PM)>0:
-				if "PrimaryMetric" in mcolumns:
+				if "PrimaryMetric as 'Name'" in mcolumns:
 					mcolumns.remove("PrimaryMetric as 'Name'")
 				wherelst.append("PrimaryMetric == '{}'".format(PM))
 				if "PrimaryMetric" in grouplst:
 					grouplst.remove("PrimaryMetric")
 			if SM is not None and len(SM)>0:
-				if "SecondaryMetric" in mcolumns:
+				if "SecondaryMetric as 'Name'" in mcolumns:
 					mcolumns.remove("SecondaryMetric as 'Name'")
 				wherelst.append("SecondaryMetric == '{}'".format(SM))
 				if "SecondaryMetric" in grouplst:
@@ -3278,6 +3278,7 @@ class ReporterGUI(tk.Frame):
 			base.debugmsg(8, "self.contentdata[id][graphdata]:", self.contentdata[id]["graphdata"])
 
 			for name in self.contentdata[id]["graphdata"]:
+				base.debugmsg(7, "name:", name)
 				if len(self.contentdata[id]["graphdata"][name]["Values"])>1 and len(self.contentdata[id]["graphdata"][name]["Values"])==len(self.contentdata[id]["graphdata"][name]["objTime"]):
 					self.contentdata[id]["axis"].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name)
 					dodraw = True
