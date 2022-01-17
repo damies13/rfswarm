@@ -769,8 +769,10 @@ class ReporterBase():
 				sql += 		"result "
 				sql += 		", count(result)  as 'count' "
 			if RType == None:
-				sql += 		"result_name "
-				sql += 		", * "
+				# sql += 		"result_name "
+				# sql += 		", * "
+				sql = ""
+				return sql
 
 			sql += "FROM Results "
 
