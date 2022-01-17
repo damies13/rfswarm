@@ -507,6 +507,206 @@ class ReporterBase():
 			base.report_item_set_changed(id)
 			base.report_save()
 
+	def rt_graph_generate_sql(self, id):
+		base.debugmsg(5, "id:", id)
+		display_percentile = 90
+		sql = ""
+		DataType = self.rt_table_get_dt(id)
+		if DataType == "Result":
+			RType = self.rt_table_get_rt(id)
+			FRType = self.rt_table_get_fr(id)
+			FNType = self.rt_table_get_fn(id)
+			inpFP = self.rt_table_get_fp(id)
+
+			sql = "SELECT "
+			if RType == "Response Time":
+				sql += 		"end_time as 'Time' "
+				sql += 		", elapsed_time as 'Value' "
+				sql += 		", result_name as 'Name' "
+				# sql += 		", round(min(elapsed_time),3) 'minium' "
+				# sql += 		", round(avg(elapsed_time),3) 'average' "
+				# sql += 		", round(percentile(elapsed_time, {}),3) '{}%ile' ".format(display_percentile, display_percentile)
+				# sql += 		", round(max(elapsed_time),3) 'maxium' "
+				# sql += 		", round(stdev(elapsed_time),3) 'stdev' "
+				# sql += 		", count(result) as 'count' "
+
+				# sql += 		"round(min(rp.elapsed_time),3) 'min', "
+				# sql += 		"round(avg(rp.elapsed_time),3) 'avg', "
+				# sql += 		"round(percentile(rp.elapsed_time, {}),3) '{}%ile', ".format(display_percentile, display_percentile)
+				# sql += 		"round(max(rp.elapsed_time),3) 'max', "
+				# sql += 		"round(stdev(rp.elapsed_time),3) 'stDev', "
+				# sql += 		"count(rp.result) as _pass, "
+				# sql += 		"count(rf.result) as _fail, "
+				# sql += 		"count(ro.result) as _other "
+				# sql += "FROM Results as r "
+				# sql += 		"LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == 'PASS' "
+				# sql += 		"LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == 'FAIL' "
+				# sql += 		"LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' "
+
+			if RType == "TPS":
+				sql += 		"end_time as 'Time' "
+				sql += 		", count(result) as 'Value' "
+				sql += 		", result_name as 'Name' "
+			if RType == "Total TPS":
+				sql += 		"end_time as 'Time'"
+				sql += 		", count(result) as 'Value' "
+				sql += 		", result as 'Name' "
+			if RType == None:
+				sql += 		"end_time as 'Time'"
+				sql += 		", count(result) as 'Value' "
+				sql += 		", result_name as 'Name' "
+
+			sql += "FROM Results "
+
+			lwhere = []
+			if FRType == "Pass":
+				# sql += "WHERE result == 'PASS' "
+				lwhere.append("result == 'PASS'")
+			if FRType == "Fail":
+				# sql += "WHERE result == 'FAIL' "
+				lwhere.append("result == 'FAIL'")
+
+			if RType == "Response Time":
+				# sql +=  	"AND result_name NOT LIKE 'Exception in thread%' "
+				lwhere.append("result_name NOT LIKE 'Exception in thread%'")
+			if RType == "TPS":
+				# sql +=  "WHERE result_name NOT LIKE 'Exception in thread%' "
+				lwhere.append("result_name NOT LIKE 'Exception in thread%'")
+
+			if FNType != "None" and len(inpFP)>0:
+				# construct pattern
+				# "Wildcard (Unix Glob)",
+				if FNType == "Wildcard (Unix Glob)":
+					# -- 		WHERE result_name GLOB 'OC3*'
+					lwhere.append("result_name GLOB '{}'".format(inpFP))
+				# "Regex",
+				if FNType == "Regex":
+					# -- 		WHERE result_name GLOB 'OC3*'
+					lwhere.append("result_name REGEXP '{}'".format(inpFP))
+				# "Not Wildcard (Unix Glob)",
+				if FNType == "Not Wildcard (Unix Glob)":
+					# -- 		WHERE result_name GLOB 'OC3*'
+					lwhere.append("result_name NOT GLOB '{}'".format(inpFP))
+				# "Not Regex"
+				if FNType == "Not Regex":
+					# -- 		WHERE result_name GLOB 'OC3*'
+					lwhere.append("result_name NOT REGEXP '{}'".format(inpFP))
+
+			i = 0
+			for iwhere in lwhere:
+				if i == 0:
+					sql += "WHERE {} ".format(iwhere)
+				else:
+					sql += "AND {} ".format(iwhere)
+				i += 1
+
+			if RType != None:
+				# sql += "GROUP by "
+				# sql += 		", result "
+				pass
+			if RType == "Response Time":
+				# sql += 		"result_name "
+				pass
+
+			if RType == "TPS":
+				sql += "GROUP by "
+				sql += 		"end_time "
+				sql += 		", result_name "
+				sql += 		", result "
+				sql += "ORDER by result DESC, count(result) DESC "
+			if RType == "Total TPS":
+				sql += 		"end_time "
+				sql += 		", result "
+				sql += "ORDER by count(result) DESC "
+
+		if DataType == "Metric":
+			MType = self.rt_table_get_mt(id)
+			PM = self.rt_table_get_pm(id)
+			SM = self.rt_table_get_sm(id)
+
+			# isnum = self.rt_table_get_isnumeric(id)
+			# sc = self.rt_table_get_showcount(id)
+			base.debugmsg(6, "MType:", MType, "	PM:", PM, "	SM:", SM)
+
+			mcolumns = ["MetricTime as 'Time'", "MetricValue as 'Value'", "PrimaryMetric as 'Name'", "MetricType as 'Name'", "SecondaryMetric as 'Name'"]
+			wherelst = []
+			# grouplst = ["PrimaryMetric", "MetricType", "SecondaryMetric"]
+			grouplst = []
+
+			if MType is not None and len(MType)>0:
+				if "MetricType" in mcolumns:
+					mcolumns.remove("MetricType as 'Name'")
+				wherelst.append("MetricType == '{}'".format(MType))
+				if "MetricType" in grouplst:
+					grouplst.remove("MetricType")
+			if PM is not None and len(PM)>0:
+				if "PrimaryMetric" in mcolumns:
+					mcolumns.remove("PrimaryMetric as 'Name'")
+				wherelst.append("PrimaryMetric == '{}'".format(PM))
+				if "PrimaryMetric" in grouplst:
+					grouplst.remove("PrimaryMetric")
+			if SM is not None and len(SM)>0:
+				if "SecondaryMetric" in mcolumns:
+					mcolumns.remove("SecondaryMetric as 'Name'")
+				wherelst.append("SecondaryMetric == '{}'".format(SM))
+				if "SecondaryMetric" in grouplst:
+					grouplst.remove("SecondaryMetric")
+
+			# if isnum<1:
+			# 	mcolumns.append("MetricValue")
+			# 	if sc>0:
+			# 		mcolumns.append("count(MetricTime) as 'Count'")
+			# 		if "MetricValue" in grouplst:
+			# 			grouplst.remove("MetricValue")
+			# else:
+			# 	mcolumns.append("min(CAST(MetricValue AS NUMERIC)) AS 'Minimum'")
+			# 	mcolumns.append("round(avg(CAST(MetricValue AS NUMERIC)),3) AS 'Average'")
+			# 	mcolumns.append("round(percentile(CAST(MetricValue AS NUMERIC), {}),3) AS '{}%ile'".format(display_percentile, display_percentile))
+			# 	mcolumns.append("max(CAST(MetricValue AS NUMERIC)) AS 'Maximum'")
+			# 	mcolumns.append("round(stdev(CAST(MetricValue AS NUMERIC)),3) AS 'StdDev'")
+
+
+			sql = "SELECT "
+
+			i=0
+			for col in mcolumns:
+				if i<1:
+					sql += 		"{} ".format(col)
+				else:
+					sql += 		", {} ".format(col)
+				i += 1
+
+			sql += "FROM MetricData "
+
+			i = 0
+			for iwhere in wherelst:
+				if i == 0:
+					sql += "WHERE {} ".format(iwhere)
+				else:
+					sql += "AND {} ".format(iwhere)
+				i += 1
+
+			if len(grouplst)>0:
+				sql += "GROUP by "
+				i=0
+				for col in grouplst:
+					if i<1:
+						sql += 		"{} ".format(col)
+					else:
+						sql += 		", {} ".format(col)
+					i += 1
+
+
+		base.debugmsg(6, "sql:", sql)
+		self.rt_graph_set_sql(id, sql)
+		return sql
+
+	def rt_graph_floatval(self, value):
+		try:
+			return float(value)
+		except:
+			return value
+
 
 
 	#
@@ -2328,6 +2528,9 @@ class ReporterGUI(tk.Frame):
 		base.report_item_set_type(id, type)
 		self.content_load(id)
 
+	#
+	# Settings	-	Note
+	#
 
 	def cs_note(self, id):
 		base.debugmsg(5, "id:", id)
@@ -2349,6 +2552,10 @@ class ReporterGUI(tk.Frame):
 			base.debugmsg(5, "data:", data)
 			base.rt_note_set(id, data)
 			self.content_preview(id)
+
+	#
+	# Settings	-	DataTable
+	#
 
 	def cs_datatable(self, id):
 		base.debugmsg(5, "id:", id)
@@ -2669,33 +2876,251 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["Frames"][datatype].grid(column=0, row=self.contentdata[id]["DTFrame"], columnspan=100, sticky="nsew")
 
 
+	#
+	# Settings	-	Graph
+	#
 
 	def cs_graph(self, id):
 		base.debugmsg(5, "id:", id)
-		sql = base.rt_graph_get_sql(id)
-		self.contentdata[id]["Frame"].columnconfigure(0, weight=1)
+		datatype = base.rt_graph_get_dt(id)
+		self.contentdata[id]["Frame"].columnconfigure(99, weight=1)
 		rownum = 0
 
 		rownum += 1
-		self.contentdata[id]["lblSQL"] = ttk.Label(self.contentdata[id]["Frame"], text="SQL:")
-		self.contentdata[id]["lblSQL"].grid(column=0, row=rownum, sticky="nsew")
+		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["Frame"], text = "Data Type:")
+		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
+
+		DataTypes = [None, "Metric", "Result", "SQL"]
+		self.contentdata[id]["strDT"] = tk.StringVar()
+		self.contentdata[id]["omDT"] = ttk.OptionMenu(self.contentdata[id]["Frame"], self.contentdata[id]["strDT"], command=self.cs_graph_switchdt, *DataTypes)
+		self.contentdata[id]["strDT"].set(datatype)
+		self.contentdata[id]["omDT"].grid(column=1, row=rownum, sticky="nsew")
 
 		rownum += 1
-		self.contentdata[id]["tSQL"] = tk.Text(self.contentdata[id]["Frame"])
-		self.contentdata[id]["tSQL"].grid(column=0, row=rownum, sticky="nsew")
-		data = self.contentdata[id]["tSQL"].insert('0.0', sql)
-		self.contentdata[id]["tSQL"].bind('<Leave>', self.cs_graph_update)
-		self.contentdata[id]["tSQL"].bind('<FocusOut>', self.cs_graph_update)
+		self.contentdata[id]["DTFrame"] = rownum
+		self.cs_graph_switchdt(id)
 
 	def cs_graph_update(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
 		id = self.sectionstree.focus()
 		base.debugmsg(5, "id:", id)
+		# if "tSQL" in self.contentdata[id]:
+		# 	data = self.contentdata[id]["tSQL"].get('0.0', tk.END)
+		# 	base.debugmsg(5, "data:", data)
+		# 	base.rt_graph_set_sql(id, data)
+		# 	self.content_preview(id)
+
+		if "intIsNum" in self.contentdata[id]:
+			value = self.contentdata[id]["intIsNum"].get()
+			base.rt_table_set_isnumeric(id, value)
+		if "intShCnt" in self.contentdata[id]:
+			value = self.contentdata[id]["intShCnt"].get()
+			base.rt_table_set_showcount(id, value)
+		# self.contentdata[id]["MType"].set(base.rt_table_get_mt(id))
+		if "MType" in self.contentdata[id]:
+			value = self.contentdata[id]["MType"].get()
+			base.rt_table_set_mt(id, value)
+		# self.contentdata[id]["PMetric"].set(base.rt_table_get_pm(id))
+		if "PMetric" in self.contentdata[id]:
+			value = self.contentdata[id]["PMetric"].get()
+			base.rt_table_set_pm(id, value)
+		# self.contentdata[id]["SMetric"].set(base.rt_table_get_sm(id))
+		if "SMetric" in self.contentdata[id]:
+			value = self.contentdata[id]["SMetric"].get()
+			base.rt_table_set_sm(id, value)
+
+		# self.contentdata[id]["RType"].set(base.rt_table_get_rt(id))
+		if "RType" in self.contentdata[id]:
+			value = self.contentdata[id]["RType"].get()
+			base.rt_table_set_rt(id, value)
+		# self.contentdata[id]["FRType"].set(base.rt_table_get_fr(id))
+		if "FRType" in self.contentdata[id]:
+			value = self.contentdata[id]["FRType"].get()
+			base.rt_table_set_fr(id, value)
+		# self.contentdata[id]["FNType"].set(base.rt_table_get_fn(id))
+		if "FNType" in self.contentdata[id]:
+			value = self.contentdata[id]["FNType"].get()
+			base.rt_table_set_fn(id, value)
+		# self.contentdata[id]["FPattern"].set(base.rt_table_get_fp(id))
+		if "FPattern" in self.contentdata[id]:
+			value = self.contentdata[id]["FPattern"].get()
+			base.rt_table_set_fp(id, value)
+
+		if "strDT" in self.contentdata[id]:
+			datatype = self.contentdata[id]["strDT"].get()
+			base.rt_table_set_dt(id, datatype)
+
+			if datatype == "Metric":
+				self.cs_datatable_update_metrics(id)
+
+			if datatype != "SQL":
+				time.sleep(0.1)
+				base.rt_graph_generate_sql(id)
+
 		if "tSQL" in self.contentdata[id]:
-			data = self.contentdata[id]["tSQL"].get('0.0', tk.END)
+			data = self.contentdata[id]["tSQL"].get('0.0', tk.END).strip()
 			base.debugmsg(5, "data:", data)
 			base.rt_graph_set_sql(id, data)
-			self.content_preview(id)
+		else:
+			time.sleep(0.1)
+			base.rt_graph_generate_sql(id)
+
+		base.debugmsg(5, "content_preview id:", id)
+		self.content_preview(id)
+
+
+
+	def cs_graph_switchdt(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+		rownum = 0
+		id = self.sectionstree.focus()
+		if _event is not None:
+			name = base.report_item_get_name(_event)
+			if name is not None:
+				id = _event
+		base.debugmsg(5, "id:", id)
+		# self.cs_datatable_update(id)
+		datatype = self.contentdata[id]["strDT"].get()
+		base.debugmsg(5, "datatype:", datatype)
+		if "Frames" not in self.contentdata[id]:
+			self.contentdata[id]["Frames"] = {}
+		# Forget
+		for frame in self.contentdata[id]["Frames"].keys():
+			self.contentdata[id]["Frames"][frame].grid_forget()
+
+		# Construct
+		if datatype not in self.contentdata[id]["Frames"]:
+			self.contentdata[id]["Frames"][datatype] = tk.Frame(self.contentdata[id]["Frame"])
+			self.contentdata[id]["Frames"][datatype].config(bg="SlateBlue3")
+			# self.contentdata[id]["Frames"][datatype].columnconfigure(0, weight=1)
+			self.contentdata[id]["Frames"][datatype].columnconfigure(99, weight=1)
+
+			# "Metric", "Result", "SQL"
+
+			if datatype == "Metric":
+
+				rownum += 1
+				self.contentdata[id]["lblIsNum"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Number Value:")
+				self.contentdata[id]["lblIsNum"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["intIsNum"] = tk.IntVar()
+				self.contentdata[id]["chkIsNum"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intIsNum"], command=self.cs_graph_update)
+				self.contentdata[id]["chkIsNum"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["lblShCnt"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Show Counts:")
+				self.contentdata[id]["lblShCnt"].grid(column=2, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["intShCnt"] = tk.IntVar()
+				self.contentdata[id]["chkShCnt"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intShCnt"], command=self.cs_graph_update)
+				self.contentdata[id]["chkShCnt"].grid(column=3, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["lblMT"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Metric Type:")
+				self.contentdata[id]["lblMT"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["MTypes"] = [None, "", "Loading..."]
+				self.contentdata[id]["MType"] = tk.StringVar()
+				self.contentdata[id]["omMT"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["MType"], command=self.cs_graph_update, *self.contentdata[id]["MTypes"])
+				self.contentdata[id]["omMT"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["lblPM"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Primrary Metric:")
+				self.contentdata[id]["lblPM"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["PMetrics"] = [None, "", "Loading..."]
+				self.contentdata[id]["PMetric"] = tk.StringVar()
+				self.contentdata[id]["omPM"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["PMetric"], command=self.cs_graph_update, *self.contentdata[id]["PMetrics"])
+				self.contentdata[id]["omPM"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["lblSM"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Secondary Metric:")
+				self.contentdata[id]["lblSM"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["SMetrics"] = [None, "", "Loading..."]
+				self.contentdata[id]["SMetric"] = tk.StringVar()
+				self.contentdata[id]["omSM"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["SMetric"], command=self.cs_graph_update, *self.contentdata[id]["SMetrics"])
+				self.contentdata[id]["omSM"].grid(column=1, row=rownum, sticky="nsew")
+
+			if datatype == "Result":
+				rownum += 1
+				self.contentdata[id]["lblRT"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Result Type:")
+				self.contentdata[id]["lblRT"].grid(column=0, row=rownum, sticky="nsew")
+
+				RTypes = [None, "Response Time", "TPS", "Total TPS"]
+				self.contentdata[id]["RType"] = tk.StringVar()
+				self.contentdata[id]["omRT"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["RType"], command=self.cs_graph_update, *RTypes)
+				self.contentdata[id]["omRT"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				# result filtered by PASS, FAIL, None
+				self.contentdata[id]["lblFR"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Filter Result:")
+				self.contentdata[id]["lblFR"].grid(column=0, row=rownum, sticky="nsew")
+
+				FRTypes = [None, "None", "Pass", "Fail"]
+				self.contentdata[id]["FRType"] = tk.StringVar()
+				self.contentdata[id]["omFR"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["FRType"], command=self.cs_graph_update, *FRTypes)
+				self.contentdata[id]["omFR"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["lblFN"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Filter Type:")
+				self.contentdata[id]["lblFN"].grid(column=0, row=rownum, sticky="nsew")
+
+				FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
+				self.contentdata[id]["FNType"] = tk.StringVar()
+				self.contentdata[id]["omFR"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["FNType"], command=self.cs_graph_update, *FNTypes)
+				self.contentdata[id]["omFR"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["lblFP"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Filter Pattern:")
+				self.contentdata[id]["lblFP"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["FPattern"] = tk.StringVar()
+				self.contentdata[id]["inpFP"] = ttk.Entry(self.contentdata[id]["Frames"][datatype], textvariable=self.contentdata[id]["FPattern"])
+				self.contentdata[id]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[id]["inpFP"].bind('<Leave>', self.cs_graph_update)
+				self.contentdata[id]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
+
+			if datatype == "SQL":
+				# sql = base.rt_table_get_sql(id)
+				rownum += 1
+				self.contentdata[id]["lblSQL"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="SQL:")
+				self.contentdata[id]["lblSQL"].grid(column=0, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["tSQL"] = tk.Text(self.contentdata[id]["Frames"][datatype])
+				self.contentdata[id]["tSQL"].grid(column=0, row=rownum, columnspan=100, sticky="nsew")
+				# data = self.contentdata[id]["tSQL"].insert('0.0', sql)
+				self.contentdata[id]["tSQL"].bind('<Leave>', self.cs_graph_update)
+				self.contentdata[id]["tSQL"].bind('<FocusOut>', self.cs_graph_update)
+
+		# Update
+		if datatype == "SQL":
+			sql = base.rt_graph_get_sql(id)
+			self.contentdata[id]["tSQL"].delete('0.0', tk.END)
+			self.contentdata[id]["tSQL"].insert('0.0', sql)
+
+		if datatype == "Result":
+			self.contentdata[id]["RType"].set(base.rt_table_get_rt(id))
+			self.contentdata[id]["FRType"].set(base.rt_table_get_fr(id))
+			self.contentdata[id]["FNType"].set(base.rt_table_get_fn(id))
+			self.contentdata[id]["FPattern"].set(base.rt_table_get_fp(id))
+
+		if datatype == "Metric":
+			base.debugmsg(5, "Update Options")
+			self.cs_datatable_update_metrics(id)
+			base.debugmsg(5, "Set Options")
+			while "SMetric" not in self.contentdata[id]:
+				time.sleep(0.1)
+			self.contentdata[id]["intIsNum"].set(base.rt_table_get_isnumeric(id))
+			self.contentdata[id]["intShCnt"].set(base.rt_table_get_showcount(id))
+			self.contentdata[id]["MType"].set(base.rt_table_get_mt(id))
+			self.contentdata[id]["PMetric"].set(base.rt_table_get_pm(id))
+			self.contentdata[id]["SMetric"].set(base.rt_table_get_sm(id))
+
+		# Show
+		self.contentdata[id]["Frames"][datatype].grid(column=0, row=self.contentdata[id]["DTFrame"], columnspan=100, sticky="nsew")
+
+
 
 	#
 	# Preview
@@ -2785,15 +3210,108 @@ class ReporterGUI(tk.Frame):
 
 	def cp_graph(self, id):
 		base.debugmsg(5, "id:", id)
-		sql = base.rt_graph_get_sql(id)
-		base.debugmsg(7, "sql:", sql)
-		key = "{}_{}".format(id, base.report_item_get_changed(id))
-		base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
-		while key not in base.dbqueue["ReadResult"]:
-			time.sleep(0.1)
+		datatype = base.rt_graph_get_dt(id)
+		if datatype == "SQL":
+			sql = base.rt_graph_get_sql(id)
+		else:
+			sql = base.rt_graph_generate_sql(id)
 
-		# tdata = base.dbqueue["ReadResult"][id]
-		# base.debugmsg(7, "tdata:", tdata)
+		rownum = 1
+		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text="    ")
+		self.contentdata[id]["lblSpacer"].grid(column=0, row=rownum, sticky="nsew")
+		self.contentdata[id]["fmeGraph"] = tk.Frame(self.contentdata[id]["Preview"])
+		self.contentdata[id]["fmeGraph"].config(bg="green")
+		self.contentdata[id]["fmeGraph"].grid(column=1, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["fmeGraph"].columnconfigure(0, weight=1)
+		self.contentdata[id]["fmeGraph"].rowconfigure(0, weight=1)
+		self.contentdata[id]["fig_dpi"] = 72
+		self.contentdata[id]["fig"] = Figure(dpi=self.contentdata[id]["fig_dpi"]) # , tight_layout=True
+		self.contentdata[id]["axis"] = self.contentdata[id]["fig"].add_subplot(1,1,1)	# , constrained_layout=True??
+		self.contentdata[id]["axis"].grid(True, 'major', 'both')
+		self.contentdata[id]["fig"].autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+
+		self.contentdata[id]["canvas"] = FigureCanvasTkAgg(self.contentdata[id]["fig"], self.contentdata[id]["fmeGraph"])
+		self.contentdata[id]["canvas"].get_tk_widget().grid(column=0, row=0, sticky="nsew")
+		self.contentdata[id]["canvas"].get_tk_widget().config(bg="blue")
+		try:
+			self.contentdata[id]["canvas"].draw()
+		except Exception as e:
+			base.debugmsg(5, "canvas.draw() Exception:", e)
+		self.contentdata[id]["fig"].set_tight_layout(True)
+
+
+		dodraw = False
+		self.contentdata[id]["graphdata"] = {}
+
+		if sql is not None and len(sql.strip())>0:
+			base.debugmsg(7, "sql:", sql)
+			key = "{}_{}".format(id, base.report_item_get_changed(id))
+			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+			while key not in base.dbqueue["ReadResult"]:
+				time.sleep(0.1)
+
+			gdata = base.dbqueue["ReadResult"][key]
+			base.debugmsg(9, "gdata:", gdata)
+
+			for row in gdata:
+				base.debugmsg(9, "row:", row)
+				if 'Name' in row:
+					name = row['Name']
+					base.debugmsg(9, "name:", name)
+					if name not in self.contentdata[id]["graphdata"]:
+						self.contentdata[id]["graphdata"][name] = {}
+
+						colour = base.named_colour(name)
+						base.debugmsg(6, "name:", name, "	colour:", colour)
+						self.contentdata[id]["graphdata"][name]["Colour"] = colour
+						# self.contentdata[id]["graphdata"][name]["Time"] = []
+						self.contentdata[id]["graphdata"][name]["objTime"] = []
+						self.contentdata[id]["graphdata"][name]["Values"] = []
+
+					self.contentdata[id]["graphdata"][name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+					self.contentdata[id]["graphdata"][name]["Values"].append(base.rt_graph_floatval(row["Value"]))
+				else:
+					break
+
+
+			base.debugmsg(8, "self.contentdata[id][graphdata]:", self.contentdata[id]["graphdata"])
+
+			for name in self.contentdata[id]["graphdata"]:
+				if len(self.contentdata[id]["graphdata"][name]["Values"])>1 and len(self.contentdata[id]["graphdata"][name]["Values"])==len(self.contentdata[id]["graphdata"][name]["objTime"]):
+					self.contentdata[id]["axis"].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name)
+					dodraw = True
+
+				if len(self.contentdata[id]["graphdata"][name]["Values"])==1 and len(self.contentdata[id]["graphdata"][name]["Values"])==len(self.contentdata[id]["graphdata"][name]["objTime"]):
+					self.contentdata[id]["axis"].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name, marker='o')
+					dodraw = True
+
+			if dodraw:
+
+				self.contentdata[id]["axis"].grid(True, 'major', 'both')
+
+				SMetric = "Other"
+				if datatype == "Metric":
+					SMetric = base.rt_table_get_sm(id)
+				base.debugmsg(6, "SMetric:", SMetric)
+				if SMetric in ["Load", "CPU", "MEM", "NET"]:
+					self.contentdata[id]["axis"].set_ylim(0, 100)
+				else:
+					self.contentdata[id]["axis"].set_ylim(0)
+
+				# base.debugmsg(9, "showlegend:", grphWindow.showlegend.get())
+				# if grphWindow.showlegend.get():
+				# 	# self.contentdata[id]["axis"].legend()
+				# 	# self.contentdata[id]["axis"].legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),&nbsp; shadow=True, ncol=2)
+				# 	self.contentdata[id]["axis"].legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
+
+				self.contentdata[id]["fig"].set_tight_layout(True)
+				self.contentdata[id]["fig"].autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+				try:
+					self.contentdata[id]["canvas"].draw()
+				except Exception as e:
+					base.debugmsg(5, "canvas.draw() Exception:", e)
+
 
 	def cp_table(self, id):
 		base.debugmsg(5, "id:", id)

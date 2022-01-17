@@ -3619,7 +3619,7 @@ class RFSwarmGUI(tk.Frame):
 		# grphWindow.fmeBBar.grid(column=0, row=0, sticky="nsew")
 		grphWindow.fmeBBar.grid(column=0, row=0, sticky="ne")
 		grphWindow.fmeContent = tk.Frame(grphWindow)
-		grphWindow.fmeContent.config(bg="red")
+		# grphWindow.fmeContent.config(bg="red")
 		grphWindow.fmeContent.grid(column=0, row=1, sticky="nsew")
 
 		grphWindow.fmeContent.columnconfigure(0, weight=1)
@@ -3641,7 +3641,7 @@ class RFSwarmGUI(tk.Frame):
 
 
 		grphWindow.fmeGraph = tk.Frame(grphWindow.fmeContent)
-		grphWindow.fmeGraph.config(bg="green")
+		# grphWindow.fmeGraph.config(bg="green")
 		grphWindow.fmeGraph.grid(column=0, row=0, columnspan=8, sticky="nsew")
 		# grphWindow.fmeGraph.bind("<Configure>", self.gph_windowevent)
 		# grphWindow.fmeGraph.bind("<Configure>", lambda: self.gph_windowevent(grphWindow))
