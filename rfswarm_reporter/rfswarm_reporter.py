@@ -418,6 +418,15 @@ class ReporterBase():
 		base.report_item_set_changed(id)
 		base.report_save()
 
+	def report_sect_level(self, id):
+		base.debugmsg(5, "id:", id)
+		parent = self.report_item_parent(id)
+		if parent == "TOP":
+			return 1
+		else:
+			parentlvl = self.report_sect_level(parent)
+			return parentlvl + 1
+
 	def report_sect_number(self, id):
 		base.debugmsg(5, "id:", id)
 		parent = self.report_item_parent(id)
@@ -613,11 +622,11 @@ class ReporterBase():
 				sql += 		"end_time "
 				sql += 		", result_name "
 				sql += 		", result "
-				sql += "ORDER by result DESC, count(result) DESC "
+				sql += "ORDER by end_time, result DESC, count(result) DESC "
 			if RType == "Total TPS":
 				sql += 		"end_time "
 				sql += 		", result "
-				sql += "ORDER by count(result) DESC "
+				sql += "ORDER by end_time, count(result) DESC "
 
 		if DataType == "Metric":
 			MType = self.rt_table_get_mt(id)
@@ -696,6 +705,9 @@ class ReporterBase():
 						sql += 		", {} ".format(col)
 					i += 1
 
+			sql += "ORDER BY MetricTime "
+
+
 
 		base.debugmsg(6, "sql:", sql)
 		self.rt_graph_set_sql(id, sql)
@@ -740,13 +752,13 @@ class ReporterBase():
 
 			sql = "SELECT "
 			if RType == "Response Time":
-				sql += 		"result_name "
-				sql += 		", round(min(elapsed_time),3) 'minium' "
-				sql += 		", round(avg(elapsed_time),3) 'average' "
+				sql += 		"result_name 'Result Name' "
+				sql += 		", round(min(elapsed_time),3) 'Minium' "
+				sql += 		", round(avg(elapsed_time),3) 'Average' "
 				sql += 		", round(percentile(elapsed_time, {}),3) '{}%ile' ".format(display_percentile, display_percentile)
-				sql += 		", round(max(elapsed_time),3) 'maxium' "
-				sql += 		", round(stdev(elapsed_time),3) 'stdev' "
-				sql += 		", count(result) as 'count' "
+				sql += 		", round(max(elapsed_time),3) 'Maxium' "
+				sql += 		", round(stdev(elapsed_time),3) 'Std. Dev.' "
+				sql += 		", count(result) as 'Count' "
 
 				# sql += 		"round(min(rp.elapsed_time),3) 'min', "
 				# sql += 		"round(avg(rp.elapsed_time),3) 'avg', "
@@ -762,12 +774,12 @@ class ReporterBase():
 				# sql += 		"LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' "
 
 			if RType == "TPS":
-				sql += 		"result_name "
+				sql += 		"result_name 'Result Name' "
 				sql += 		", result "
-				sql += 		", count(result)  as 'count' "
+				sql += 		", count(result)  as 'Count' "
 			if RType == "Total TPS":
-				sql += 		"result "
-				sql += 		", count(result)  as 'count' "
+				sql += 		"result 'Result' "
+				sql += 		", count(result)  as 'Count' "
 			if RType == None:
 				# sql += 		"result_name "
 				# sql += 		", * "
@@ -873,7 +885,7 @@ class ReporterBase():
 				mcolumns.append("round(avg(CAST(MetricValue AS NUMERIC)),3) AS 'Average'")
 				mcolumns.append("round(percentile(CAST(MetricValue AS NUMERIC), {}),3) AS '{}%ile'".format(display_percentile, display_percentile))
 				mcolumns.append("max(CAST(MetricValue AS NUMERIC)) AS 'Maximum'")
-				mcolumns.append("round(stdev(CAST(MetricValue AS NUMERIC)),3) AS 'StdDev'")
+				mcolumns.append("round(stdev(CAST(MetricValue AS NUMERIC)),3) AS 'Std. Dev.'")
 
 
 			sql = "SELECT "
@@ -1608,6 +1620,8 @@ class ReporterCore:
 
 class ReporterGUI(tk.Frame):
 
+	style_reportbg_colour = "white"
+	style_feild_colour = "white"
 	style_text_colour = "#000"
 	style_head_colour = "#00F"
 	imgdata = {}
@@ -1870,7 +1884,7 @@ class ReporterGUI(tk.Frame):
 
 		self.content = tk.Frame(self.mainframe, bd=0)
 		self.content.grid(column=2, row=0, columnspan=2, rowspan=2, sticky="nsew")
-		self.content.config(bg="lightblue")
+		# self.content.config(bg="lightblue")
 		self.content.columnconfigure(0, weight=1)
 		self.content.rowconfigure(0, weight=1)
 
@@ -1885,119 +1899,109 @@ class ReporterGUI(tk.Frame):
 
 	def ConfigureStyle(self):
 
-		self.config["global"]["darkmode"] = False
-		self.root.config["global"]["darkmode"] = False
+		# self.config["global"]["darkmode"] = False
+		# self.root.config["global"]["darkmode"] = False
+		# try:
+		# 	base.debugmsg(5, "self.config[global]:", self.config["global"])
+		# except:
+		# 	pass
+		# try:
+		# 	base.debugmsg(5, "self.root.config[global]:", self.root.config["global"])
+		# except:
+		# 	pass
+
 
 		# Theme settings for ttk
-		style = ttk.Style()
+		self.style = ttk.Style()
 		# we really only seem to need this for MacOS 11 and up for now
 		# base.debugmsg(5, "sys.platform", sys.platform)
 		# base.debugmsg(5, "platform.system", platform.system())
 		# base.debugmsg(5, "platform.release", platform.release())
 		# base.debugmsg(5, "platform.mac_ver", platform.mac_ver())
 
-		style.configure("TNotebook", borderwidth=0)
-		style.configure("TNotebook.Tab", borderwidth=0)
-		style.configure("TNotebook", highlightthickness=0)
-		style.configure("TNotebook.Tab", highlightthickness=0)
-		style.configure("TNotebook", padding=0)
-		style.configure("TNotebook.Tab", padding=0)
-		style.configure("TNotebook", tabmargins=0)
-		style.configure("TNotebook.Tab", expand=0)
+		# self.style.configure("TNotebook", borderwidth=0)
+		# self.style.configure("TNotebook.Tab", borderwidth=0)
+		# self.style.configure("TNotebook", highlightthickness=0)
+		# self.style.configure("TNotebook.Tab", highlightthickness=0)
+		# self.style.configure("TNotebook", padding=0)
+		# self.style.configure("TNotebook.Tab", padding=0)
+		# self.style.configure("TNotebook", tabmargins=0)
+		# self.style.configure("TNotebook.Tab", expand=0)
 
 
-		style.configure("TFrame", borderwidth=0)
+		self.style.configure("TFrame", borderwidth=0)
+
 
 		if sys.platform.startswith('darwin'):
 			release, _, machine = platform.mac_ver()
 			split_ver = release.split('.')
 			if int(split_ver[0]) > 10:
 				# https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/ttk-style-layer.html
-				# base.debugmsg(5, "style.layout", style.layout)
-				# # list = style.layout()
-				# # base.debugmsg(5, "list", list)
-				# base.debugmsg(5, "style.element_names", style.element_names)
-				# list = style.element_names()
-				# base.debugmsg(5, "list", list)
-				# base.debugmsg(5, "style.theme_names", style.theme_names)
-				# list = style.theme_names()
-				# base.debugmsg(5, "list", list)
+				# https://tkdocs.com/tutorial/styles.html#usetheme
+
+				# self.root["background"] = self.style_feild_colour
+				# self.root["background"] = 'green'
+				# self.root.configure(bg='blue')
+				# self.rootBackground = self.root["background"]
+				# self.root.config()
+				# base.debugmsg(5, "self.root.config():", self.root.config())
 
 
-				# style.layout("rfsinput", style.layout('TEntry'))
-				# style.configure("rfsinput", **style.configure('TEntry'))
-				# style.map("rfsinput", **style.map('TEntry'))
-				# style.map("rfsinput",
-				#     fieldbackground=[(['!invalid','!disabled'], '#fff'),
-				#                      (['!invalid','disabled'], '#aaa')]
-				# )
-				# style.map("rfsinput",
-				#     fieldbackground=[(['!invalid','!disabled'], '#fff'),
-				#                      (['!invalid','disabled'], '#aaa'),
-				#                      (['invalid','!disabled'], '#ff4040'),
-				#                      (['invalid','disabled'], '#ffc0c0')]
-				# )
-				# style.configure("rfs.Entry", foreground="black")
-				# style.configure("rfs.Entry", foreground="systemControlTextColor")
-				# style.configure("rfs.Entry", foreground=self.rootBackground)	# systemWindowBackgroundColor
-				# base.debugmsg(5, "self.rootBackground", self.rootBackground)
-				# style.configure("rfs.Entry", foreground=self.rootBackground)	# systemControlTextColor
+				self.style.configure("TLabel", foreground=self.style_text_colour)
+				self.style.configure("TEntry", foreground="systemPlaceholderTextColor")
+				self.style.configure("TEntry", insertcolor=self.style_text_colour)
 
-				# style.configure("rfs.Entry", foreground="systemControlAccentColor")
-				# style.configure("rfs.Entry", foreground="systemControlTextColor")
-				# style.configure("rfs.Entry", foreground="systemDisabledControlTextColor")
-				# style.configure("rfs.Entry", foreground="systemLabelColor")
-				# style.configure("rfs.Entry", foreground="systemLinkColor")
-				# style.configure("rfsinput", foreground="systemPlaceholderTextColor")
-				# style.configure("rfs.Entry", foreground="systemSelectedTextBackgroundColor")
-				# style.configure("rfs.Entry", foreground="systemSelectedTextColor")
-				# style.configure("rfs.Entry", foreground="systemSeparatorColor")
-				# style.configure("rfs.Entry", foreground="systemTextBackgroundColor")
-				# style.configure("rfs.Entry", foreground="systemTextColor")
 
-				# style.layout("rfsinput", style.layout('TLabel'))
-				# style.configure("rfsinput", **style.configure('TLabel'))
-				# style.map("rfsinput", **style.map('TLabel'))
-				# style.configure("TLabel", foreground="systemPlaceholderTextColor")
-				style.configure("TLabel", foreground=self.style_text_colour)
-				style.configure("TEntry", foreground="systemPlaceholderTextColor")
-				# style.configure("TButton", foreground="systemPlaceholderTextColor")
-				style.configure("TButton", foreground=self.style_text_colour)
-				# style.configure("TCombobox", foreground="systemPlaceholderTextColor")
-				# style.configure("TCombobox", foreground=self.style_text_colour)
-				# style.configure("TComboBox", foreground=self.style_text_colour)
-				# style.configure("Combobox", foreground=self.style_text_colour)
-				# style.configure("ComboBox", foreground=self.style_text_colour)
-				#
-				# style.configure("OptionMenu", foreground=self.style_text_colour)
-				# style.configure("TOptionMenu", foreground=self.style_text_colour)
-				# style.configure("Optionmenu", foreground=self.style_text_colour)
-				# style.configure("TOptionmenu", foreground=self.style_text_colour)
+				self.style.configure("TButton", foreground=self.style_text_colour)
+				self.style.configure("TMenubutton", foreground=self.style_text_colour)
 
-				# style.configure("Menubutton", foreground=self.style_text_colour)
-				style.configure("TMenubutton", foreground=self.style_text_colour)
+				self.style.configure("Canvas", fill=self.style_text_colour)
+				self.style.configure("Canvas", activefill=self.style_text_colour)
 
-				# self.rfstheme["default"] = "systemPlaceholderTextColor"
-				# self.rfstheme["default"] = self.style_text_colour
+				self.style.configure("TSpinbox", foreground=self.style_text_colour)
 
-				# style.configure("Canvas", foreground=self.style_text_colour)
-				style.configure("Canvas", fill=self.style_text_colour)
-				style.configure("Canvas", activefill=self.style_text_colour)
+				self.style.configure("TRadiobutton", foreground=self.style_text_colour)
 
-				# style.configure("Spinbox", foreground=self.style_text_colour)
-				style.configure("TSpinbox", foreground=self.style_text_colour)
+				self.style.configure("Treeview", foreground=self.style_text_colour)
+				self.style.configure("Treeview", background=self.rootBackground)
+				self.style.configure("Treeview", fieldbackground=self.rootBackground)
 
-				style.configure("TRadiobutton", foreground=self.style_text_colour)
+				base.debugmsg(5, "self.style_text_colour:	", self.style_text_colour)
+				base.debugmsg(5, "self.rootBackground:		", self.rootBackground)
 
-		layout = s.layout('TLabel')
+
+		layout = self.style.layout('TLabel')
 		base.debugmsg(5, "TLabel 	layout:", layout)
 		# style.configure('TLabelHead', font =('calibri', 10, 'bold', 'underline'), foreground = 'red')
 		# style.configure('Head.TLabel', font =('calibri', 16, 'bold'), foreground = 'Blue')
 		# style.configure('Head.TLabel', foreground='blue')
-		style.configure("Head.TLabel", foreground=self.style_head_colour)
+		self.style.configure("Head.TLabel", foreground=self.style_head_colour)
 
-		layout = s.layout('Head.TLabel')
+
+		layout = self.style.layout('Head.TLabel')
 		base.debugmsg(5, "Head.TLabel 	layout:", layout)
+
+		# self.style.configure('Heading.TLabel', font=('Helvetica', 12))
+		# self.style.configure('Head.TLabel', font=('Helvetica', 12))
+		# style.configure('Head.TLabel', background='white')
+
+		self.style.configure("Report.H1.TLabel", foreground=self.style_head_colour)
+		# self.style.configure("Report.H1.TLabel", foreground=self.style_head_colour, background=self.style_reportbg_colour)
+		self.style.configure('Report.H1.TLabel', font=('Helvetica', 18))
+		# self.style.configure('Report.H1.TLabel', background=self.style_reportbg_colour)
+		# self.style.configure('Report.H1.TLabel', activebackground=self.style_reportbg_colour)
+
+		self.style.configure("Report.H2.TLabel", foreground=self.style_head_colour)
+		self.style.configure('Report.H2.TLabel', font=('Helvetica', 16))
+		# self.style.configure('Report.H2.TLabel', background=self.style_reportbg_colour)
+
+		self.style.configure("Report.H3.TLabel", foreground=self.style_head_colour)
+		self.style.configure('Report.H3.TLabel', font=('Helvetica', 14))
+		# self.style.configure('Report.H3.TLabel', background=self.style_reportbg_colour)
+
+
+		layout = self.style.layout('Report.H1.TLabel')
+		base.debugmsg(5, "Report.H1.TLabel 	layout:", layout)
 
 
 	def BuildToolBar(self):
@@ -2154,119 +2158,6 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "core.on_closing")
 		core.on_closing()
 
-	def ConfigureStyle(self):
-
-		# we really only seem to need this for MacOS 11 and up for now
-		# base.debugmsg(5, "sys.platform", sys.platform)
-		# base.debugmsg(5, "platform.system", platform.system())
-		# base.debugmsg(5, "platform.release", platform.release())
-		# base.debugmsg(5, "platform.mac_ver", platform.mac_ver())
-
-		if sys.platform.startswith('darwin'):
-			release, _, machine = platform.mac_ver()
-			split_ver = release.split('.')
-			if int(split_ver[0]) > 10:
-				# Theme settings for ttk
-				style = ttk.Style()
-				# https://tkdocs.com/tutorial/styles.html#usetheme
-
-				# style.theme_use()
-				# base.debugmsg(5, "style.theme_use():	", style.theme_use(), "	available:", style.theme_names())
-				# style.theme_use('default')
-				# https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/ttk-style-layer.html
-				# base.debugmsg(5, "style.layout", style.layout)
-				# # list = style.layout()
-				# # base.debugmsg(5, "list", list)
-				# base.debugmsg(5, "style.element_names", style.element_names)
-				# list = style.element_names()
-				# base.debugmsg(5, "list", list)
-				# base.debugmsg(5, "style.theme_names", style.theme_names)
-				# list = style.theme_names()
-				# base.debugmsg(5, "list", list)
-
-
-				# style.layout("rfsinput", style.layout('TEntry'))
-				# style.configure("rfsinput", **style.configure('TEntry'))
-				# style.map("rfsinput", **style.map('TEntry'))
-				# style.map("rfsinput",
-				#     fieldbackground=[(['!invalid','!disabled'], '#fff'),
-				#                      (['!invalid','disabled'], '#aaa')]
-				# )
-				# style.map("rfsinput",
-				#     fieldbackground=[(['!invalid','!disabled'], '#fff'),
-				#                      (['!invalid','disabled'], '#aaa'),
-				#                      (['invalid','!disabled'], '#ff4040'),
-				#                      (['invalid','disabled'], '#ffc0c0')]
-				# )
-				# style.configure("rfs.Entry", foreground="black")
-				# style.configure("rfs.Entry", foreground="systemControlTextColor")
-				# style.configure("rfs.Entry", foreground=self.rootBackground)	# systemWindowBackgroundColor
-				# base.debugmsg(5, "self.rootBackground", self.rootBackground)
-				# style.configure("rfs.Entry", foreground=self.rootBackground)	# systemControlTextColor
-
-				# style.configure("rfs.Entry", foreground="systemControlAccentColor")
-				# style.configure("rfs.Entry", foreground="systemControlTextColor")
-				# style.configure("rfs.Entry", foreground="systemDisabledControlTextColor")
-				# style.configure("rfs.Entry", foreground="systemLabelColor")
-				# style.configure("rfs.Entry", foreground="systemLinkColor")
-				# style.configure("rfsinput", foreground="systemPlaceholderTextColor")
-				# style.configure("rfs.Entry", foreground="systemSelectedTextBackgroundColor")
-				# style.configure("rfs.Entry", foreground="systemSelectedTextColor")
-				# style.configure("rfs.Entry", foreground="systemSeparatorColor")
-				# style.configure("rfs.Entry", foreground="systemTextBackgroundColor")
-				# style.configure("rfs.Entry", foreground="systemTextColor")
-
-				# style.layout("rfsinput", style.layout('TLabel'))
-				# style.configure("rfsinput", **style.configure('TLabel'))
-				# style.map("rfsinput", **style.map('TLabel'))
-				# style.configure("TLabel", foreground="systemPlaceholderTextColor")
-				style.configure("TLabel", foreground=self.style_text_colour)
-				style.configure("TEntry", foreground="systemPlaceholderTextColor")
-				# style.configure("TButton", foreground="systemPlaceholderTextColor")
-				style.configure("TButton", foreground=self.style_text_colour)
-				# style.configure("TCombobox", foreground="systemPlaceholderTextColor")
-				# style.configure("TCombobox", foreground=self.style_text_colour)
-				# style.configure("TComboBox", foreground=self.style_text_colour)
-				# style.configure("Combobox", foreground=self.style_text_colour)
-				# style.configure("ComboBox", foreground=self.style_text_colour)
-				#
-				# style.configure("OptionMenu", foreground=self.style_text_colour)
-				# style.configure("TOptionMenu", foreground=self.style_text_colour)
-				# style.configure("Optionmenu", foreground=self.style_text_colour)
-				# style.configure("TOptionmenu", foreground=self.style_text_colour)
-
-				# style.configure("Menubutton", foreground=self.style_text_colour)
-				style.configure("TMenubutton", foreground=self.style_text_colour)
-
-				# self.rfstheme["default"] = "systemPlaceholderTextColor"
-				# self.rfstheme["default"] = self.style_text_colour
-
-				# style.configure("Canvas", foreground=self.style_text_colour)
-				style.configure("Canvas", fill=self.style_text_colour)
-				style.configure("Canvas", activefill=self.style_text_colour)
-
-				# style.configure("Spinbox", foreground=self.style_text_colour)
-				style.configure("TSpinbox", foreground=self.style_text_colour)
-
-				style.configure("TRadiobutton", foreground=self.style_text_colour)
-
-				style.configure("Treeview", foreground=self.style_text_colour)
-				style.configure("Treeview", background=self.rootBackground)
-				style.configure("Treeview", fieldbackground=self.rootBackground)
-				# style.configure("Treeview", padding=self.rootBackground)
-
-				# style.layout('Treeview')
-				# base.debugmsg(5, "Treeview Options:	", style.layout('Treeview'))
-				# base.debugmsg(5, "Treeview.field:	", style.element_options('Treeview.field'))
-				# base.debugmsg(5, "Treeview.padding:	", style.element_options('Treeview.padding'))
-				# base.debugmsg(5, "Treeview.treearea:	", style.element_options('Treeview.treearea'))
-
-
-
-				base.debugmsg(5, "self.style_text_colour:	", self.style_text_colour)
-				base.debugmsg(5, "self.rootBackground:		", self.rootBackground)
-
-
 	def sections_show_hide(self):
 		state = self.btnShowHide.get()
 		base.debugmsg(5, "state:", state)
@@ -2326,7 +2217,7 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(6, icontext)
 
 		self.contentframe = tk.Frame(self.tabs, padx=0, pady=0, bd=0)	# , padx=0, pady=0
-		self.contentframe.config(bg="salmon")
+		# self.contentframe.config(bg="salmon")
 		self.contentframe.grid(column=0, row=0, sticky="nsew", padx=0, pady=0)
 
 		self.contentcanvas = tk.Canvas(self.contentframe)
@@ -2341,7 +2232,7 @@ class ReporterGUI(tk.Frame):
 		# self.contentpreview = ttk.Canvas(self.contentframe)
 		self.contentpreview = tk.Frame(self.contentcanvas, padx=0, pady=0)	# , padx=0, pady=0
 		# self.contentpreview['padding'] = (0,1,5,10)
-		self.contentpreview.config(bg="cyan")
+		# self.contentpreview.config(bg="cyan")
 		self.contentpreview.grid(column=0, row=0, sticky="nsew", padx=0, pady=0)
 		self.contentpreview.columnconfigure(0, weight=1)
 		self.contentpreview.rowconfigure(0, weight=1)
@@ -2376,7 +2267,7 @@ class ReporterGUI(tk.Frame):
 		icontext = "Settings"
 		base.debugmsg(6, icontext)
 		self.contentsettings = tk.Frame(self.tabs, padx=0, pady=0, bd=0)
-		self.contentsettings.config(bg="linen")
+		# self.contentsettings.config(bg="linen")
 		self.contentsettings.grid(column=0, row=0, sticky="nsew", padx=0, pady=0)
 		self.contentsettings.columnconfigure(0, weight=1)
 		self.contentsettings.rowconfigure(0, weight=1)
@@ -2403,7 +2294,7 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[id] = {}
 		if "Settings" not in self.contentdata[id]:
 			self.contentdata[id]["Settings"] = tk.Frame(self.contentsettings, padx=0, pady=0, bd=0)
-			self.contentdata[id]["Settings"].config(bg="rosy brown")
+			# self.contentdata[id]["Settings"].config(bg="rosy brown")
 			if id=="TOP":
 				self.cs_reportsettings()
 			else:
@@ -2445,7 +2336,7 @@ class ReporterGUI(tk.Frame):
 
 				rownum += 1
 				self.contentdata[id]["Frame"] = tk.Frame(self.contentdata[id]["Settings"], padx=0, pady=0, bd=0)
-				self.contentdata[id]["Frame"].config(bg="SlateBlue2")
+				# self.contentdata[id]["Frame"].config(bg="SlateBlue2")
 				self.contentdata[id]["Frame"].grid(column=0, row=rownum, columnspan=10, sticky="nsew")
 
 				self.contentdata[id]["Settings"].rowconfigure(rownum, weight=1)
@@ -2538,6 +2429,10 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "id:", id)
 		# base.rt_note_get(id)
 		self.contentdata[id]["tNote"] = tk.Text(self.contentdata[id]["Frame"])
+		# background="yellow", foreground="blue"
+		# self.contentdata[id]["tNote"].config(bg="SlateBlue2")
+		self.contentdata[id]["tNote"].config(background=self.style_feild_colour, foreground=self.style_text_colour, insertbackground=self.style_text_colour)
+
 		data = self.contentdata[id]["tNote"].insert('0.0', base.rt_note_get(id))
 		self.contentdata[id]["tNote"].grid(column=0, row=0, sticky="nsew")
 		self.contentdata[id]["Frame"].rowconfigure(0, weight=1)
@@ -2724,7 +2619,7 @@ class ReporterGUI(tk.Frame):
 		# Construct
 		if datatype not in self.contentdata[id]["Frames"]:
 			self.contentdata[id]["Frames"][datatype] = tk.Frame(self.contentdata[id]["Frame"])
-			self.contentdata[id]["Frames"][datatype].config(bg="SlateBlue3")
+			# self.contentdata[id]["Frames"][datatype].config(bg="SlateBlue3")
 			# self.contentdata[id]["Frames"][datatype].columnconfigure(0, weight=1)
 			self.contentdata[id]["Frames"][datatype].columnconfigure(99, weight=1)
 
@@ -2992,8 +2887,9 @@ class ReporterGUI(tk.Frame):
 
 		# Construct
 		if datatype not in self.contentdata[id]["Frames"]:
+			base.debugmsg(6, "datatype:", datatype)
 			self.contentdata[id]["Frames"][datatype] = tk.Frame(self.contentdata[id]["Frame"])
-			self.contentdata[id]["Frames"][datatype].config(bg="SlateBlue3")
+			# self.contentdata[id]["Frames"][datatype].config(bg="SlateBlue3")
 			# self.contentdata[id]["Frames"][datatype].columnconfigure(0, weight=1)
 			self.contentdata[id]["Frames"][datatype].columnconfigure(99, weight=1)
 
@@ -3001,6 +2897,7 @@ class ReporterGUI(tk.Frame):
 
 			if datatype == "Metric":
 
+				base.debugmsg(6, "datatype:", datatype)
 				rownum += 1
 				self.contentdata[id]["lblIsNum"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Number Value:")
 				self.contentdata[id]["lblIsNum"].grid(column=0, row=rownum, sticky="nsew")
@@ -3008,13 +2905,6 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["intIsNum"] = tk.IntVar()
 				self.contentdata[id]["chkIsNum"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intIsNum"], command=self.cs_graph_update)
 				self.contentdata[id]["chkIsNum"].grid(column=1, row=rownum, sticky="nsew")
-
-				self.contentdata[id]["lblShCnt"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Show Counts:")
-				self.contentdata[id]["lblShCnt"].grid(column=2, row=rownum, sticky="nsew")
-
-				self.contentdata[id]["intShCnt"] = tk.IntVar()
-				self.contentdata[id]["chkShCnt"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intShCnt"], command=self.cs_graph_update)
-				self.contentdata[id]["chkShCnt"].grid(column=3, row=rownum, sticky="nsew")
 
 				rownum += 1
 				self.contentdata[id]["lblMT"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Metric Type:")
@@ -3114,7 +3004,6 @@ class ReporterGUI(tk.Frame):
 			while "SMetric" not in self.contentdata[id]:
 				time.sleep(0.1)
 			self.contentdata[id]["intIsNum"].set(base.rt_table_get_isnumeric(id))
-			self.contentdata[id]["intShCnt"].set(base.rt_table_get_showcount(id))
 			self.contentdata[id]["MType"].set(base.rt_table_get_mt(id))
 			self.contentdata[id]["PMetric"].set(base.rt_table_get_pm(id))
 			self.contentdata[id]["SMetric"].set(base.rt_table_get_sm(id))
@@ -3160,7 +3049,8 @@ class ReporterGUI(tk.Frame):
 		if gen:
 			self.contentdata[id]["Changed"] = base.report_item_get_changed(id)
 			self.contentdata[id]["Preview"] = tk.Frame(self.contentpreview, padx=0, pady=0, bd=0)
-			self.contentdata[id]["Preview"].config(bg="gold")
+			# self.contentdata[id]["Preview"].config(bg="gold")
+			# self.contentdata[id]["Preview"].config(bg=self.style_reportbg_colour)
 			if id=="TOP":
 				pass
 			else:
@@ -3171,10 +3061,27 @@ class ReporterGUI(tk.Frame):
 				titlenum = base.report_sect_number(id)
 				base.debugmsg(5, "titlenum:", titlenum)
 				title = "{}	{}".format(titlenum, base.report_item_get_name(id))
-				self.contentdata[id]["lbltitle"] = ttk.Label(self.contentdata[id]["Preview"], text=title, style='Head.TLabel')
+				level = base.report_sect_level(id)
+				tstyle = 'TLabel'
+				if level == 1:
+
+					self.contentdata[id]["lblpgbrk"] = tk.Label(self.contentdata[id]["Preview"], text="	")
+					self.contentdata[id]["lblpgbrk"].config(bg="#ddd")
+					self.contentdata[id]["lblpgbrk"].grid(column=0, row=rownum, columnspan=100, sticky="nsew")
+					rownum += 1
+
+					tstyle = 'Report.H1.TLabel'
+				if level == 2:
+					tstyle = 'Report.H2.TLabel'
+				if level == 3:
+					tstyle = 'Report.H3.TLabel'
+
+				self.contentdata[id]["lbltitle"] = ttk.Label(self.contentdata[id]["Preview"], text=title, style=tstyle)
 				# self.contentdata[id]["lbltitle"] = ttk.Label(self.contentdata[id]["Preview"], text=title)
+				# self.contentdata[id]["lbltitle"].config(background=self.style_reportbg_colour)
 				self.contentdata[id]["lbltitle"].grid(column=0, row=rownum, columnspan=9, sticky="nsew")
 
+				self.contentdata[id]["rownum"] = rownum + 1
 				type = base.report_item_get_type(id)
 				base.debugmsg(5, "type:", type)
 				if type == 'note':
@@ -3202,7 +3109,7 @@ class ReporterGUI(tk.Frame):
 
 	def cp_note(self, id):
 		base.debugmsg(5, "id:", id)
-		rownum = 1
+		rownum = self.contentdata[id]["rownum"]
 		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text="    ")
 		self.contentdata[id]["lblSpacer"].grid(column=0, row=rownum, sticky="nsew")
 
@@ -3218,11 +3125,16 @@ class ReporterGUI(tk.Frame):
 		else:
 			sql = base.rt_graph_generate_sql(id)
 
-		rownum = 1
+		rownum = self.contentdata[id]["rownum"]
 		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text="    ")
 		self.contentdata[id]["lblSpacer"].grid(column=0, row=rownum, sticky="nsew")
+		# self.contentdata[id]["lblSpacer"].config(bg=self.style_reportbg_colour)
+
+		self.contentdata[id]["Preview"].columnconfigure(1, weight=1)
+		self.contentdata[id]["Preview"].rowconfigure(rownum, weight=1)
+
 		self.contentdata[id]["fmeGraph"] = tk.Frame(self.contentdata[id]["Preview"])
-		self.contentdata[id]["fmeGraph"].config(bg="green")
+		# self.contentdata[id]["fmeGraph"].config(bg="green")
 		self.contentdata[id]["fmeGraph"].grid(column=1, row=rownum, sticky="nsew")
 
 		self.contentdata[id]["fmeGraph"].columnconfigure(0, weight=1)
@@ -3235,7 +3147,7 @@ class ReporterGUI(tk.Frame):
 
 		self.contentdata[id]["canvas"] = FigureCanvasTkAgg(self.contentdata[id]["fig"], self.contentdata[id]["fmeGraph"])
 		self.contentdata[id]["canvas"].get_tk_widget().grid(column=0, row=0, sticky="nsew")
-		self.contentdata[id]["canvas"].get_tk_widget().config(bg="blue")
+		# self.contentdata[id]["canvas"].get_tk_widget().config(bg="blue")
 		try:
 			self.contentdata[id]["canvas"].draw()
 		except Exception as e:
@@ -3324,7 +3236,7 @@ class ReporterGUI(tk.Frame):
 		else:
 			sql = base.rt_table_generate_sql(id)
 		colours = base.rt_table_get_colours(id)
-		rownum = 1
+		rownum = self.contentdata[id]["rownum"]
 		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text="    ")
 		self.contentdata[id]["lblSpacer"].grid(column=0, row=rownum, sticky="nsew")
 		if sql is not None and len(sql.strip())>0:
@@ -3475,6 +3387,7 @@ class ReporterGUI(tk.Frame):
 		selected = self.sectionstree.focus()
 		base.debugmsg(5, "selected:", selected)
 		name = tksd.askstring(title="New Section", prompt="Section Name:")
+		# , bg=self.style_feild_colour	, background='green'
 		if name is not None and len(name)>0:
 			if selected is None or len(selected)<1:
 				selected = "TOP"
