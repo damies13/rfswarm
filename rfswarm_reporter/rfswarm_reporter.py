@@ -32,6 +32,7 @@ import tkinter.ttk as ttk			#python3
 import tkinter.filedialog as tkf	#python3
 import tkinter.messagebox as tkm	#python3
 import tkinter.simpledialog as tksd
+import tkinter.font as tkFont
 
 # required for matplot graphs
 import matplotlib
@@ -1620,6 +1621,8 @@ class ReporterCore:
 
 class ReporterGUI(tk.Frame):
 
+	# style_report_font = 'Helvetica'
+	style_report_font = 'Comic Sans MS'
 	style_reportbg_colour = "white"
 	style_feild_colour = "white"
 	style_text_colour = "#000"
@@ -1651,6 +1654,9 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "self.root", self.root)
 		base.debugmsg(5, "self.root[background]", self.root["background"])
 		self.rootBackground = self.root["background"]
+
+		# base.debugmsg(6, "tkFont.families()", tkFont.families())
+
 
 		self.load_icons()
 
@@ -1985,18 +1991,23 @@ class ReporterGUI(tk.Frame):
 		# self.style.configure('Head.TLabel', font=('Helvetica', 12))
 		# style.configure('Head.TLabel', background='white')
 
+		matplotlib.rcParams['font.family'] = self.style_report_font
+
+		self.style.configure('Report.TLabel', font=(self.style_report_font, 12))
+
+
 		self.style.configure("Report.H1.TLabel", foreground=self.style_head_colour)
 		# self.style.configure("Report.H1.TLabel", foreground=self.style_head_colour, background=self.style_reportbg_colour)
-		self.style.configure('Report.H1.TLabel', font=('Helvetica', 18))
+		self.style.configure('Report.H1.TLabel', font=(self.style_report_font, 18))
 		# self.style.configure('Report.H1.TLabel', background=self.style_reportbg_colour)
 		# self.style.configure('Report.H1.TLabel', activebackground=self.style_reportbg_colour)
 
 		self.style.configure("Report.H2.TLabel", foreground=self.style_head_colour)
-		self.style.configure('Report.H2.TLabel', font=('Helvetica', 16))
+		self.style.configure('Report.H2.TLabel', font=(self.style_report_font, 16))
 		# self.style.configure('Report.H2.TLabel', background=self.style_reportbg_colour)
 
 		self.style.configure("Report.H3.TLabel", foreground=self.style_head_colour)
-		self.style.configure('Report.H3.TLabel', font=('Helvetica', 14))
+		self.style.configure('Report.H3.TLabel', font=(self.style_report_font, 14))
 		# self.style.configure('Report.H3.TLabel', background=self.style_reportbg_colour)
 
 
@@ -2385,6 +2396,29 @@ class ReporterGUI(tk.Frame):
 		rownum +=1
 		self.contentdata[id]["lblFont"] = ttk.Label(self.contentdata[id]["Settings"], text="Font:")
 		self.contentdata[id]["lblFont"].grid(column=0, row=rownum, sticky="nsew")
+
+		base.debugmsg(6, "tkFont.families()", tkFont.families())
+		fontlst = list(tkFont.families())
+
+		Fonts = [None] + fontlst
+		self.contentdata[id]["strFont"] = tk.StringVar()
+		self.contentdata[id]["omFont"] = ttk.OptionMenu(self.contentdata[id]["Settings"], self.contentdata[id]["strFont"], command=self.cs_report_settings_font, *Fonts)
+		self.contentdata[id]["strFont"].set(self.style_report_font)
+		self.contentdata[id]["omFont"].grid(column=1, row=rownum, sticky="nsew")
+
+
+
+	def cs_report_settings_font(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+		# id = self.sectionstree.focus()
+		# base.debugmsg(5, "id:", id)
+		id="TOP"
+
+		newfont = _event
+		self.style_report_font = newfont
+		self.ConfigureStyle()
+		self.cp_regenerate_preview()
+
 
 	def cs_rename_heading(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
@@ -3030,6 +3064,10 @@ class ReporterGUI(tk.Frame):
 		self.cp_display_preview(id, 0)
 		self.contentcanvas.config(scrollregion=self.contentpreview.bbox("all"))
 
+	def cp_regenerate_preview(self):
+		self.contentdata = {}
+		self.content_preview("TOP")
+
 	def cp_generate_preview(self, id):
 		base.debugmsg(5, "id:", id)
 		if id not in self.contentdata:
@@ -3062,7 +3100,7 @@ class ReporterGUI(tk.Frame):
 				base.debugmsg(5, "titlenum:", titlenum)
 				title = "{}	{}".format(titlenum, base.report_item_get_name(id))
 				level = base.report_sect_level(id)
-				tstyle = 'TLabel'
+				tstyle = 'Report.TLabel'
 				if level == 1:
 
 					self.contentdata[id]["lblpgbrk"] = tk.Label(self.contentdata[id]["Preview"], text="	")
@@ -3110,11 +3148,11 @@ class ReporterGUI(tk.Frame):
 	def cp_note(self, id):
 		base.debugmsg(5, "id:", id)
 		rownum = self.contentdata[id]["rownum"]
-		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text="    ")
+		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text="    ", style='Report.TLabel')
 		self.contentdata[id]["lblSpacer"].grid(column=0, row=rownum, sticky="nsew")
 
 		notetxt = "{}".format(base.rt_note_get(id))
-		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text=notetxt)
+		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text=notetxt, style='Report.TLabel')
 		self.contentdata[id]["lblSpacer"].grid(column=1, row=rownum, sticky="nsew")
 
 	def cp_graph(self, id):
@@ -3145,9 +3183,28 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["axis"].grid(True, 'major', 'both')
 		self.contentdata[id]["fig"].autofmt_xdate(bottom=0.2, rotation=30, ha='right')
 
+		# base.debugmsg(5, "fig:", self.contentdata[id]["fig"])
+		# base.debugmsg(5, "axis:", self.contentdata[id]["axis"])
+		#
+		# base.debugmsg(5, "axis text:", self.contentdata[id]["axis"].text)
+
+
+
+
+		# sps = self.contentdata[id]["fig"].subplots()
+		# base.debugmsg(5, "sps:", sps)
+
 		self.contentdata[id]["canvas"] = FigureCanvasTkAgg(self.contentdata[id]["fig"], self.contentdata[id]["fmeGraph"])
 		self.contentdata[id]["canvas"].get_tk_widget().grid(column=0, row=0, sticky="nsew")
 		# self.contentdata[id]["canvas"].get_tk_widget().config(bg="blue")
+
+		base.debugmsg(5, "canvas:", self.contentdata[id]["canvas"])
+
+		# self.contentdata[id]["canvas"].rcParams['font.family'] = self.style_report_font
+		# self.contentdata[id]["fig"].rcParams['font.family'] = self.style_report_font
+		# self.contentdata[id]["axis"].rcParams['font.family'] = self.style_report_font
+
+
 		try:
 			self.contentdata[id]["canvas"].draw()
 		except Exception as e:
@@ -3259,7 +3316,7 @@ class ReporterGUI(tk.Frame):
 				for col in cols:
 					cellname = "h_{}".format(col)
 					base.debugmsg(9, "cellname:", cellname)
-					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=col)
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=col, style='Report.TLabel')
 					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 					colnum += 1
 				i = 0
@@ -3287,7 +3344,7 @@ class ReporterGUI(tk.Frame):
 						colnum += 1
 						cellname = "{}_{}".format(i, col)
 						base.debugmsg(9, "cellname:", cellname)
-						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(row[col]))
+						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(row[col]), style='Report.TLabel')
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 
