@@ -299,6 +299,66 @@ class ReporterBase():
 			base.report_save()
 
 
+	#
+	# Report Settings
+	#
+	def rs_setting_get(self, name):
+		base.debugmsg(5, "name:", name)
+		if name in base.report["Report"]:
+			return base.report["Report"][name]
+		else:
+			return None
+
+	def rs_setting_set(self, name, value):
+		base.debugmsg(5, "name:", name, "	value:", value)
+		base.report["Report"][name] = value
+		# base.report_item_set_changed("Report")
+		base.report_save()
+
+
+	def rs_setting_get_int(self, name):
+		value = base.rs_setting_get(name)
+		if value is None:
+			return -1
+		else:
+			return int(value)
+
+	def rs_setting_set_int(self, name, value):
+		base.rs_setting_set(name, str(value))
+
+	def rs_setting_get_title(self):
+		value = self.rs_setting_get('title')
+		if value is None:
+			return 'Report Title'
+		else:
+			return value
+
+	def rs_setting_get_font(self):
+		value = self.rs_setting_get('font')
+		if value is None:
+			return 'Helvetica'
+		else:
+			return value
+
+	def rs_setting_get_fontsize(self):
+		value = self.rs_setting_get_int('fontsize')
+		if value < 1:
+			return 12
+		else:
+			return int(value)
+
+	def rs_setting_get_pctile(self):
+		value = self.rs_setting_get_int('percentile')
+		if value < 1:
+			return 90
+		else:
+			return int(value)
+
+
+	#
+	# Report Sections
+	#
+
 	def report_get_order(self, parent):
 		if parent == "TOP":
 			base.debugmsg(5, "template order:", base.report["Report"]["Order"])
@@ -467,6 +527,7 @@ class ReporterBase():
 		base.report[id]['Type'] = newType
 		base.report_item_set_changed(id)
 		base.report_save()
+
 
 	#
 	# Report Item Type: note
@@ -742,7 +803,7 @@ class ReporterBase():
 
 	def rt_table_generate_sql(self, id):
 		base.debugmsg(5, "id:", id)
-		display_percentile = 90
+		display_percentile = base.rs_setting_get_pctile()
 		sql = ""
 		DataType = self.rt_table_get_dt(id)
 		if DataType == "Result":
@@ -776,7 +837,7 @@ class ReporterBase():
 
 			if RType == "TPS":
 				sql += 		"result_name 'Result Name' "
-				sql += 		", result "
+				sql += 		", result 'Result' "
 				sql += 		", count(result)  as 'Count' "
 			if RType == "Total TPS":
 				sql += 		"result 'Result' "
@@ -936,16 +997,46 @@ class ReporterBase():
 			FNType = self.rt_table_get_fn(id)
 			inpFP = self.rt_table_get_fp(id)
 
+			# sql = "SELECT "
+			# sql += 		"Name "
+			# sql += 		", Min "
+			# sql += 		", Average "
+			# sql += 		", StDev "
+			# sql += 		", [%ile_Value] rs.[%ile_Key] "
+			# sql += 		", Pass "
+			# sql += 		", Fail "
+			# sql += 		", Other "
+			# sql += "FROM ResultSummary rs "
+
+			sellist = []
+			gblist = []
+			sellist.append("r.result_name 'Result Name'")
+			gblist.append("r.result_name")
+			base.debugmsg(6, "gblist:", gblist)
+
+			selcols = ", ".join(sellist)
+			gbcols = ", ".join(gblist)
+
+
+			base.debugmsg(6, "gbcols:", gbcols)
+
 			sql = "SELECT "
-			sql += 		"Name "
-			sql += 		", Min "
-			sql += 		", Average "
-			sql += 		", StDev "
-			sql += 		", [%ile_Value] '90 %ile' "
-			sql += 		", Pass "
-			sql += 		", Fail "
-			sql += 		", Other "
-			sql += "FROM ResultSummary rs "
+			if len(selcols)>0:
+				sql += 	selcols
+				sql += 	", "
+			sql += 		"round(min(rp.elapsed_time),3) 'Minimum', "
+			sql += 		"round(avg(rp.elapsed_time),3) 'Average', "
+			sql += 		"round(percentile(rp.elapsed_time, {}),3) '{}%ile', ".format(display_percentile, display_percentile)
+			sql += 		"round(max(rp.elapsed_time),3) 'Maximum', "
+			sql += 		"round(stdev(rp.elapsed_time),3) 'Std. Dev.', "
+			sql += 		"count(rp.result) as 'Pass', "
+			sql += 		"count(rf.result) as 'Fail', "
+			sql += 		"count(ro.result) as 'Other' "
+			sql += "FROM Results as r "
+			sql += 		"LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == 'PASS' "
+			sql += 		"LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == 'FAIL' "
+			sql += 		"LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' "
+
 
 			lwhere = []
 			if FNType != "None" and len(inpFP)>0:
@@ -953,19 +1044,19 @@ class ReporterBase():
 				# "Wildcard (Unix Glob)",
 				if FNType == "Wildcard (Unix Glob)":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("Name GLOB '{}'".format(inpFP))
+					lwhere.append("r.result_name GLOB '{}'".format(inpFP))
 				# "Regex",
 				if FNType == "Regex":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("Name REGEXP '{}'".format(inpFP))
+					lwhere.append("r.result_name REGEXP '{}'".format(inpFP))
 				# "Not Wildcard (Unix Glob)",
 				if FNType == "Not Wildcard (Unix Glob)":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("Name NOT GLOB '{}'".format(inpFP))
+					lwhere.append("r.result_name NOT GLOB '{}'".format(inpFP))
 				# "Not Regex"
 				if FNType == "Not Regex":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("Name NOT REGEXP '{}'".format(inpFP))
+					lwhere.append("r.result_name NOT REGEXP '{}'".format(inpFP))
 
 			i = 0
 			for iwhere in lwhere:
@@ -974,6 +1065,12 @@ class ReporterBase():
 				else:
 					sql += "AND {} ".format(iwhere)
 				i += 1
+
+			if len(gblist)>0:
+				sql += "GROUP BY  "
+				sql += 		gbcols
+
+			sql += " ORDER BY r.sequence"
 
 
 		base.debugmsg(6, "sql:", sql)
@@ -1621,8 +1718,6 @@ class ReporterCore:
 
 class ReporterGUI(tk.Frame):
 
-	# style_report_font = 'Helvetica'
-	style_report_font = 'Comic Sans MS'
 	style_reportbg_colour = "white"
 	style_feild_colour = "white"
 	style_text_colour = "#000"
@@ -1654,8 +1749,6 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "self.root", self.root)
 		base.debugmsg(5, "self.root[background]", self.root["background"])
 		self.rootBackground = self.root["background"]
-
-		# base.debugmsg(6, "tkFont.families()", tkFont.families())
 
 
 		self.load_icons()
@@ -1783,6 +1876,16 @@ class ReporterGUI(tk.Frame):
 			self.stsTemplate.set(stem)
 
 
+	def save_window_size(self, event):
+		base.debugmsg(6, "save_window_size")
+		try:
+			base.debugmsg(6, "winfo_width:", self.winfo_width(), "	winfo_height:",self.winfo_height())
+			base.config['GUI']['win_width'] = str(self.winfo_width())
+			base.config['GUI']['win_height'] = str(self.winfo_height())
+			base.saveini()
+		except e:
+			base.debugmsg(6, "save_window_size except:", e)
+			return False
 
 	def BuildMenu(self):
 		window = self.master
@@ -1832,6 +1935,8 @@ class ReporterGUI(tk.Frame):
 
 	def BuildUI(self):
 
+		self.bind("<Configure>", self.save_window_size)
+
 		self.ConfigureStyle()
 
 		self.bbar = tk.Frame(self)
@@ -1878,7 +1983,7 @@ class ReporterGUI(tk.Frame):
 		self.sections = tk.Frame(self.mainframe, relief=tk.SUNKEN, bd=3)
 		self.sections.grid(column=0, row=1, sticky="nsew")
 		# self.sections.config(bg="cyan")
-		self.mainframe.columnconfigure(0, weight=1)
+		# self.mainframe.columnconfigure(0, weight=1)
 		self.sections.columnconfigure(0, weight=1)
 		self.sections.rowconfigure(0, weight=1)
 
@@ -1916,6 +2021,13 @@ class ReporterGUI(tk.Frame):
 		# except:
 		# 	pass
 
+
+		fontname = base.rs_setting_get_font()
+		fontsize = base.rs_setting_get_fontsize()
+		sizeup = int(fontsize * 0.1)
+		if sizeup < 1:
+			sizeup = int(1)
+		base.debugmsg(5, "sizeup:", sizeup)
 
 		# Theme settings for ttk
 		self.style = ttk.Style()
@@ -1991,28 +2103,48 @@ class ReporterGUI(tk.Frame):
 		# self.style.configure('Head.TLabel', font=('Helvetica', 12))
 		# style.configure('Head.TLabel', background='white')
 
-		matplotlib.rcParams['font.family'] = self.style_report_font
+		matplotlib.rcParams['font.family'] = fontname
 
-		self.style.configure('Report.TLabel', font=(self.style_report_font, 12))
+		self.style.configure('Report.TLabel', font=(fontname, fontsize))
 
+
+		base.debugmsg(5, "fontsize:", fontsize, "	sizeup:", sizeup, "	5*sizeup:", 5*sizeup, "	H1 size:", fontsize + (5*sizeup) )
 
 		self.style.configure("Report.H1.TLabel", foreground=self.style_head_colour)
 		# self.style.configure("Report.H1.TLabel", foreground=self.style_head_colour, background=self.style_reportbg_colour)
-		self.style.configure('Report.H1.TLabel', font=(self.style_report_font, 18))
+		self.style.configure('Report.H1.TLabel', font=(fontname, fontsize + (5*sizeup) ))
 		# self.style.configure('Report.H1.TLabel', background=self.style_reportbg_colour)
 		# self.style.configure('Report.H1.TLabel', activebackground=self.style_reportbg_colour)
-
-		self.style.configure("Report.H2.TLabel", foreground=self.style_head_colour)
-		self.style.configure('Report.H2.TLabel', font=(self.style_report_font, 16))
-		# self.style.configure('Report.H2.TLabel', background=self.style_reportbg_colour)
-
-		self.style.configure("Report.H3.TLabel", foreground=self.style_head_colour)
-		self.style.configure('Report.H3.TLabel', font=(self.style_report_font, 14))
-		# self.style.configure('Report.H3.TLabel', background=self.style_reportbg_colour)
-
-
 		layout = self.style.layout('Report.H1.TLabel')
 		base.debugmsg(5, "Report.H1.TLabel 	layout:", layout)
+
+		self.style.configure("Report.H2.TLabel", foreground=self.style_head_colour)
+		self.style.configure('Report.H2.TLabel', font=(fontname, fontsize + (4*sizeup) ))
+
+		self.style.configure("Report.H3.TLabel", foreground=self.style_head_colour)
+		self.style.configure('Report.H3.TLabel', font=(fontname, fontsize + (3*sizeup) ))
+
+		self.style.configure("Report.H4.TLabel", foreground=self.style_head_colour)
+		self.style.configure('Report.H4.TLabel', font=(fontname, fontsize + (2*sizeup) ))
+
+		self.style.configure("Report.H5.TLabel", foreground=self.style_head_colour)
+		self.style.configure('Report.H5.TLabel', font=(fontname, fontsize + (1*sizeup) ))
+
+		self.style.configure("Report.H6.TLabel", foreground=self.style_head_colour)
+		self.style.configure('Report.H6.TLabel', font=(fontname, fontsize))
+
+
+
+
+
+		self.style.configure('Report.THead.TLabel', font=(fontname, fontsize + (1*sizeup) ))
+		self.style.configure('Report.THead.TLabel', relief="raised")
+
+		self.style.configure('Report.TBody.TLabel', font=(fontname, fontsize))
+		# self.style.configure('Report.TBody.TLabel', relief="sunken")
+		# self.style.configure('Report.TBody.TLabel', relief="ridge")
+		self.style.configure('Report.TBody.TLabel', relief="groove")
+
 
 
 	def BuildToolBar(self):
@@ -2372,21 +2504,28 @@ class ReporterGUI(tk.Frame):
 	def cs_reportsettings(self):
 		rownum = 0
 		id="TOP"
+
+		self.contentdata[id]["lblRS"] = ttk.Label(self.contentdata[id]["Settings"], text="Report Settings:")
+		self.contentdata[id]["lblRS"].grid(column=0, row=rownum, sticky="nsew")
+
 		# Report Title
 		rownum +=1
 		self.contentdata[id]["lblTitle"] = ttk.Label(self.contentdata[id]["Settings"], text="Title:")
 		self.contentdata[id]["lblTitle"].grid(column=0, row=rownum, sticky="nsew")
 
+		self.contentdata[id]["strTitle"]=tk.StringVar()
+		self.contentdata[id]["strTitle"].set(base.rs_setting_get_title())
+		self.contentdata[id]["eTitle"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strTitle"])
+		self.contentdata[id]["eTitle"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[id]["eTitle"].bind('<Leave>', self.cs_report_settings_update)
+		self.contentdata[id]["eTitle"].bind('<FocusOut>', self.cs_report_settings_update)
+
+
+
+
 		# chkbox display start and end time of test
 		# 		start time
 		# 		end time
-
-		# Table of Contents, chkbox, levels, etc
-
-		# page header text
-
-		# page footer text
-
 
 		# Logo image
 
@@ -2402,20 +2541,84 @@ class ReporterGUI(tk.Frame):
 
 		Fonts = [None] + fontlst
 		self.contentdata[id]["strFont"] = tk.StringVar()
-		self.contentdata[id]["omFont"] = ttk.OptionMenu(self.contentdata[id]["Settings"], self.contentdata[id]["strFont"], command=self.cs_report_settings_font, *Fonts)
-		self.contentdata[id]["strFont"].set(self.style_report_font)
+		self.contentdata[id]["omFont"] = ttk.OptionMenu(self.contentdata[id]["Settings"], self.contentdata[id]["strFont"], command=self.cs_report_settings_update, *Fonts)
+		self.contentdata[id]["strFont"].set(base.rs_setting_get_font())
 		self.contentdata[id]["omFont"].grid(column=1, row=rownum, sticky="nsew")
 
+		Fontsize = [None]
+		fs = 6
+		while fs < 70:
+			Fontsize.append(fs)
+			if fs > 1:
+				fs += 1
+			if fs > 10:
+				fs += 1
+			if fs > 50:
+				fs += 2
+		self.contentdata[id]["intFontSz"] = tk.IntVar()
+		self.contentdata[id]["omFontSz"] = ttk.OptionMenu(self.contentdata[id]["Settings"], self.contentdata[id]["intFontSz"], command=self.cs_report_settings_update, *Fontsize)
+		self.contentdata[id]["intFontSz"].set(base.rs_setting_get_fontsize())
+		self.contentdata[id]["omFontSz"].grid(column=2, row=rownum, sticky="nsew")
+
+		# report %ile
+
+		rownum +=1
+		self.contentdata[id]["lblPctile"] = ttk.Label(self.contentdata[id]["Settings"], text="Percentile:")
+		self.contentdata[id]["lblPctile"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["intPctile"] = tk.IntVar()
+		self.contentdata[id]["intPctile"].set(base.rs_setting_get_pctile())
+		self.contentdata[id]["ePctile"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["intPctile"])
+		self.contentdata[id]["ePctile"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[id]["ePctile"].bind('<Leave>', self.cs_report_settings_update)
+		self.contentdata[id]["ePctile"].bind('<FocusOut>', self.cs_report_settings_update)
+
+		self.contentdata[id]["lblPctile"] = ttk.Label(self.contentdata[id]["Settings"], text="%")
+		self.contentdata[id]["lblPctile"].grid(column=2, row=rownum, sticky="nsew")
+
+		# Table of Contents, chkbox, levels, etc
+
+		# page header text
+		# page footer text
+
+		# Page Number
+
+		# Document location
+
+		# Logo image
 
 
-	def cs_report_settings_font(self, _event=None):
+		rownum +=1
+		self.contentdata[id]["lblHF"] = ttk.Label(self.contentdata[id]["Settings"], text="Headders and Footers:")
+		self.contentdata[id]["lblHF"].grid(column=0, row=rownum, sticky="nsew")
+
+
+
+
+
+	def cs_report_settings_update(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
 		# id = self.sectionstree.focus()
 		# base.debugmsg(5, "id:", id)
 		id="TOP"
 
-		newfont = _event
-		self.style_report_font = newfont
+		if "strTitle" in self.contentdata[id]:
+			base.rs_setting_set("title", self.contentdata[id]["strTitle"].get())
+
+		if "strFont" in self.contentdata[id]:
+			base.rs_setting_set("font", self.contentdata[id]["strFont"].get())
+
+		if "intFontSz" in self.contentdata[id]:
+			fsz = self.contentdata[id]["intFontSz"].get()
+			base.debugmsg(5, "fsz:", fsz, "	", type(fsz))
+			base.rs_setting_set_int("fontsize", fsz)
+
+		if "intPctile" in self.contentdata[id]:
+			pct = int(self.contentdata[id]["intPctile"].get())
+			if pct>0:
+				base.debugmsg(5, "pct:", pct, "	", type(pct))
+				base.rs_setting_set_int("percentile", pct)
+
 		self.ConfigureStyle()
 		self.cp_regenerate_preview()
 
@@ -3065,7 +3268,10 @@ class ReporterGUI(tk.Frame):
 		self.contentcanvas.config(scrollregion=self.contentpreview.bbox("all"))
 
 	def cp_regenerate_preview(self):
-		self.contentdata = {}
+		# self.contentdata = {}
+		for itm in self.contentdata.keys():
+			if "Preview" in self.contentdata[itm]:
+				del self.contentdata[itm]["Preview"]
 		self.content_preview("TOP")
 
 	def cp_generate_preview(self, id):
@@ -3098,14 +3304,22 @@ class ReporterGUI(tk.Frame):
 
 				titlenum = base.report_sect_number(id)
 				base.debugmsg(5, "titlenum:", titlenum)
-				title = "{}	{}".format(titlenum, base.report_item_get_name(id))
+				title = "{} {}".format(titlenum, base.report_item_get_name(id))
 				level = base.report_sect_level(id)
 				tstyle = 'Report.TLabel'
 				if level == 1:
 
+					self.contentdata[id]["lblpgbrk"] = tk.Label(self.contentdata[id]["Preview"], text="	--- page break --- ")
+					self.contentdata[id]["lblpgbrk"].config(bg="#ddd")
+					self.contentdata[id]["lblpgbrk"].config(fg="#bbb")
+					self.contentdata[id]["lblpgbrk"].grid(column=0, row=rownum, columnspan=998, sticky="nsew")
+
 					self.contentdata[id]["lblpgbrk"] = tk.Label(self.contentdata[id]["Preview"], text="	")
 					self.contentdata[id]["lblpgbrk"].config(bg="#ddd")
-					self.contentdata[id]["lblpgbrk"].grid(column=0, row=rownum, columnspan=100, sticky="nsew")
+					self.contentdata[id]["lblpgbrk"].grid(column=999, row=rownum, sticky="nsew")
+
+					self.contentdata[id]["Preview"].columnconfigure(999, weight=1)
+
 					rownum += 1
 
 					tstyle = 'Report.H1.TLabel'
@@ -3113,6 +3327,12 @@ class ReporterGUI(tk.Frame):
 					tstyle = 'Report.H2.TLabel'
 				if level == 3:
 					tstyle = 'Report.H3.TLabel'
+				if level == 4:
+					tstyle = 'Report.H4.TLabel'
+				if level == 5:
+					tstyle = 'Report.H5.TLabel'
+				if level == 6:
+					tstyle = 'Report.H6.TLabel'
 
 				self.contentdata[id]["lbltitle"] = ttk.Label(self.contentdata[id]["Preview"], text=title, style=tstyle)
 				# self.contentdata[id]["lbltitle"] = ttk.Label(self.contentdata[id]["Preview"], text=title)
@@ -3199,10 +3419,6 @@ class ReporterGUI(tk.Frame):
 		# self.contentdata[id]["canvas"].get_tk_widget().config(bg="blue")
 
 		base.debugmsg(5, "canvas:", self.contentdata[id]["canvas"])
-
-		# self.contentdata[id]["canvas"].rcParams['font.family'] = self.style_report_font
-		# self.contentdata[id]["fig"].rcParams['font.family'] = self.style_report_font
-		# self.contentdata[id]["axis"].rcParams['font.family'] = self.style_report_font
 
 
 		try:
@@ -3312,11 +3528,17 @@ class ReporterGUI(tk.Frame):
 			if len(tdata)>0:
 				cols = list(tdata[0].keys())
 				base.debugmsg(7, "cols:", cols)
+
+				if colours:
+					cellname = "h_{}".format("colours")
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=" ", style='Report.THead.TLabel')
+					self.contentdata[id][cellname].grid(column=1, row=rownum, sticky="nsew")
+
 				colnum = 1 + colours
 				for col in cols:
 					cellname = "h_{}".format(col)
 					base.debugmsg(9, "cellname:", cellname)
-					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=col, style='Report.TLabel')
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=col, style='Report.THead.TLabel')
 					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 					colnum += 1
 				i = 0
@@ -3344,7 +3566,7 @@ class ReporterGUI(tk.Frame):
 						colnum += 1
 						cellname = "{}_{}".format(i, col)
 						base.debugmsg(9, "cellname:", cellname)
-						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(row[col]), style='Report.TLabel')
+						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(row[col]), style='Report.TBody.TLabel')
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 
