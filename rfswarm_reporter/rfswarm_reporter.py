@@ -18,6 +18,9 @@ import sqlite3
 
 import time
 from datetime import datetime, timezone
+import zoneinfo # says Requires python 3.9, didn't work for me on python 3.9.1
+import pytz
+
 import threading
 
 import inspect
@@ -123,6 +126,7 @@ class ReporterBase():
 	dbqueue = {"Write": [], "Read": [], "ReadResult": {}, "Results": [], "Metric": [], "Metrics": []}
 
 	settings = {}
+	reportdata = {}
 
 	settings["ContentTypes"] = {"head":"Heading", "note":"Note", "graph":"Data Graph", "table":"Data Table"}
 
@@ -299,6 +303,104 @@ class ReporterBase():
 			base.report_save()
 
 
+	def report_starttime(self):
+		if "starttime" in self.reportdata:
+			return self.reportdata["starttime"]
+		else:
+			self.reportdata["starttime"] = 0
+			# SELECT MetricTime
+			# FROM MetricData
+			# WHERE MetricType = 'Scenario'
+			# 	AND PrimaryMetric <> 'PreRun'
+			#
+			# -- Start Time
+			# -- ORDER BY MetricTime ASC
+			# -- End Time
+			# ORDER BY MetricTime DESC
+			#
+			# LIMIT 1
+
+			sql =  "SELECT MetricTime "
+			sql += "FROM MetricData "
+			sql += "WHERE MetricType = 'Scenario' "
+			sql += 		"AND PrimaryMetric <> 'PreRun' "
+			sql += "ORDER BY MetricTime ASC "
+			sql += "LIMIT 1 "
+
+			key = "report starttime"
+			base.debugmsg(6, "sql:", sql)
+			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+			while key not in base.dbqueue["ReadResult"]:
+				time.sleep(0.1)
+
+			gdata = base.dbqueue["ReadResult"][key]
+			base.debugmsg(6, "gdata:", gdata)
+
+			self.reportdata["starttime"] = int(gdata[0]["MetricTime"])
+
+			base.debugmsg(6, "starttime:", self.reportdata["starttime"])
+
+			return self.reportdata["starttime"]
+
+
+	def report_endtime(self):
+		if "endtime" in self.reportdata:
+			return self.reportdata["endtime"]
+		else:
+			self.reportdata["endtime"] = 0
+
+			sql =  "SELECT MetricTime "
+			sql += "FROM MetricData "
+			sql += "WHERE MetricType = 'Scenario' "
+			sql += 		"AND PrimaryMetric <> 'PreRun' "
+			sql += "ORDER BY MetricTime DESC "
+			sql += "LIMIT 1 "
+
+			key = "report endtime"
+			base.debugmsg(6, "sql:", sql)
+			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+			while key not in base.dbqueue["ReadResult"]:
+				time.sleep(0.1)
+
+			gdata = base.dbqueue["ReadResult"][key]
+			base.debugmsg(6, "gdata:", gdata)
+
+			self.reportdata["endtime"] = int(gdata[0]["MetricTime"])
+
+			base.debugmsg(6, "endtime:", self.reportdata["endtime"])
+
+			return self.reportdata["endtime"]
+
+
+	def report_formatdate(self, itime):
+		base.debugmsg(5, "itime:", itime)
+		format = base.rs_setting_get_dateformat()
+		format = format.replace("yyyy", "%Y")
+		format = format.replace("yy", "%y")
+		format = format.replace("mm", "%m")
+		format = format.replace("dd", "%d")
+		base.debugmsg(5, "format:", format)
+		# fdate = datetime.fromtimestamp(itime, timezone.utc).strftime(format)
+		tz = zoneinfo.ZoneInfo(base.rs_setting_get_timezone())
+		fdate = datetime.fromtimestamp(itime, tz).strftime(format)
+		base.debugmsg(5, "fdate:", fdate)
+		return fdate
+
+	def report_formattime(self, itime):
+		base.debugmsg(5, "itime:", itime)
+		format = base.rs_setting_get_timeformat()
+		format = format.replace("HH", "%H")
+		format = format.replace("h", "%I")
+		format = format.replace("MM", "%M")
+		format = format.replace("SS", "%S")
+		format = format.replace("AMPM", "%p")
+
+		base.debugmsg(5, "format:", format)
+		tz = zoneinfo.ZoneInfo(base.rs_setting_get_timezone())
+		ftime = datetime.fromtimestamp(itime, tz).strftime(format)
+		base.debugmsg(5, "ftime:", ftime)
+		return ftime
+
 	#
 	# Report Settings
 	#
@@ -354,6 +456,36 @@ class ReporterBase():
 		else:
 			return int(value)
 
+
+	def rs_setting_get_dateformat(self):
+		value = self.rs_setting_get('dateformat')
+		if value is None:
+			return "yyyy-mm-dd"
+		else:
+			return value
+
+	def rs_setting_get_timeformat(self):
+		value = self.rs_setting_get('timeformat')
+		if value is None:
+			return "HH:MM"
+		else:
+			return value
+
+
+	def rs_setting_get_timezone(self):
+		value = self.rs_setting_get('timezone')
+		if value is None:
+			LOCAL_TIMEZONE = datetime.now(timezone.utc).astimezone().tzinfo
+			base.debugmsg(5, "tzname:", LOCAL_TIMEZONE)
+			return LOCAL_TIMEZONE
+		else:
+			return value
+
+	def rs_setting_get_timezone_list(self):
+		# ZI = ZoneInfo(base.rs_setting_get_timezone())
+		# ZI = ZoneInfo("UTC")
+		base.debugmsg(5, "all_timezones:", pytz.all_timezones)
+		return pytz.all_timezones
 
 	#
 	# Report Sections
@@ -1725,6 +1857,7 @@ class ReporterGUI(tk.Frame):
 	imgdata = {}
 	b64 = {}
 	contentdata = {}
+	t_preview = {}
 
 	titleprefix = "rfswarm Reporter"
 
@@ -2134,6 +2267,8 @@ class ReporterGUI(tk.Frame):
 		self.style.configure('Report.H6.TLabel', font=(fontname, fontsize))
 
 
+		self.style.configure('Report.Title1.TLabel', font=(fontname, fontsize + (10*sizeup) ))
+		self.style.configure('Report.Title2.TLabel', font=(fontname, fontsize + (5*sizeup) ))
 
 
 
@@ -2423,8 +2558,13 @@ class ReporterGUI(tk.Frame):
 
 	def content_load(self, id):
 		base.debugmsg(5, "id:", id)
-		self.content_settings(id)
-		self.content_preview(id)
+		# self.content_settings(id)
+		cs = threading.Thread(target=lambda: self.content_settings(id))
+		cs.start()
+
+		# self.content_preview(id)
+		cp = threading.Thread(target=lambda: self.content_preview(id))
+		cp.start()
 
 	#
 	# Settings
@@ -2505,6 +2645,13 @@ class ReporterGUI(tk.Frame):
 		rownum = 0
 		id="TOP"
 
+		if "Settings" in self.contentdata[id]:
+			self.contentdata[id]["Settings"].grid_forget()
+			del self.contentdata[id]["Settings"]
+			self.contentdata[id]["Settings"] = tk.Frame(self.contentsettings, padx=0, pady=0, bd=0)
+			self.contentdata[id]["Settings"].grid(column=0, row=0, sticky="nsew")
+
+
 		self.contentdata[id]["lblRS"] = ttk.Label(self.contentdata[id]["Settings"], text="Report Settings:")
 		self.contentdata[id]["lblRS"].grid(column=0, row=rownum, sticky="nsew")
 
@@ -2516,7 +2663,7 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["strTitle"]=tk.StringVar()
 		self.contentdata[id]["strTitle"].set(base.rs_setting_get_title())
 		self.contentdata[id]["eTitle"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strTitle"])
-		self.contentdata[id]["eTitle"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[id]["eTitle"].grid(column=1, columnspan=9, row=rownum, sticky="nsew")
 		self.contentdata[id]["eTitle"].bind('<Leave>', self.cs_report_settings_update)
 		self.contentdata[id]["eTitle"].bind('<FocusOut>', self.cs_report_settings_update)
 
@@ -2524,12 +2671,107 @@ class ReporterGUI(tk.Frame):
 
 
 		# chkbox display start and end time of test
+		rownum +=1
+		self.contentdata[id]["lblDF"] = ttk.Label(self.contentdata[id]["Settings"], text="Date Format")
+		self.contentdata[id]["lblDF"].grid(column=0, row=rownum, sticky="nsew")
+
+		DFormats = [None, "yyyy-mm-dd", "dd/mm/yyyy", "dd-mm-yyyy", "dd.mm.yyyy", "mm/dd/yyyy"]
+		self.contentdata[id]["strDF"]=tk.StringVar()
+		self.contentdata[id]["strDF"].set(base.rs_setting_get_dateformat())
+		self.contentdata[id]["omDF"] = ttk.OptionMenu(self.contentdata[id]["Settings"], self.contentdata[id]["strDF"], command=self.cs_report_settings_update, *DFormats)
+		self.contentdata[id]["omDF"].grid(column=1, row=rownum, sticky="nsew")
+
+
+
+
+		rownum +=1
+		self.contentdata[id]["lblTF"] = ttk.Label(self.contentdata[id]["Settings"], text="Time Format")
+		self.contentdata[id]["lblTF"].grid(column=0, row=rownum, sticky="nsew")
+
+		TFormats = [None, "HH:MM", "HH:MM:SS", "HH.MM", "HH.MM.SS", "h:MM AMPM", "h:MM:SS AMPM", "h.MM AMPM", "h.MM.SS AMPM"]
+		self.contentdata[id]["strTF"]=tk.StringVar()
+		self.contentdata[id]["strTF"].set(base.rs_setting_get_timeformat())
+		self.contentdata[id]["omTF"] = ttk.OptionMenu(self.contentdata[id]["Settings"], self.contentdata[id]["strTF"], command=self.cs_report_settings_update, *TFormats)
+		self.contentdata[id]["omTF"].grid(column=1, row=rownum, sticky="nsew")
+
+		rownum +=1
+		self.contentdata[id]["lblTZ"] = ttk.Label(self.contentdata[id]["Settings"], text="Time Zone")
+		self.contentdata[id]["lblTZ"].grid(column=0, row=rownum, sticky="nsew")
+
+		TZones = [None]
+		ZL = list(base.rs_setting_get_timezone_list())
+		LTZ = base.rs_setting_get_timezone()
+		if LTZ not in ZL:
+			TZones.append(LTZ)
+		TZones = TZones + ZL
+		self.contentdata[id]["strTZ"]=tk.StringVar()
+		self.contentdata[id]["strTZ"].set(LTZ)
+		self.contentdata[id]["omTZ"] = ttk.OptionMenu(self.contentdata[id]["Settings"], self.contentdata[id]["strTZ"], command=self.cs_report_settings_update, *TZones)
+		self.contentdata[id]["omTZ"].grid(column=1, row=rownum, sticky="nsew")
+
+
+		rownum +=1
+		col_disp = 3
+		self.contentdata[id]["lblST"] = ttk.Label(self.contentdata[id]["Settings"], text="Display")
+		self.contentdata[id]["lblST"].grid(column=col_disp, row=rownum, sticky="nsew")
+
 		# 		start time
+		rownum +=1
+		self.contentdata[id]["lblST"] = ttk.Label(self.contentdata[id]["Settings"], text="Start Time:")
+		self.contentdata[id]["lblST"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["strST"]=tk.StringVar()
+
+		iST = base.report_starttime()
+		fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
+
+		self.contentdata[id]["strST"].set(fST)
+		# self.contentdata[id]["eST"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strST"])
+		self.contentdata[id]["eST"] = ttk.Label(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strST"])
+		self.contentdata[id]["eST"].grid(column=1, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["intST"] = tk.IntVar()
+		self.contentdata[id]["intST"].set(base.rs_setting_get_int("showstarttime"))
+		self.contentdata[id]["chkST"] = ttk.Checkbutton(self.contentdata[id]["Settings"], variable=self.contentdata[id]["intST"], command=self.cs_report_settings_update)
+		self.contentdata[id]["chkST"].grid(column=col_disp, row=rownum, sticky="nsew")
+
+
 		# 		end time
+		rownum +=1
+		self.contentdata[id]["lblET"] = ttk.Label(self.contentdata[id]["Settings"], text="End Time:")
+		self.contentdata[id]["lblET"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["strET"]=tk.StringVar()
+
+		iET = base.report_endtime()
+		fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
+
+		self.contentdata[id]["strET"].set(fET)
+		self.contentdata[id]["eET"] = ttk.Label(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strET"])
+		self.contentdata[id]["eET"].grid(column=1, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["intET"] = tk.IntVar()
+		self.contentdata[id]["intET"].set(base.rs_setting_get_int("showendtime"))
+		self.contentdata[id]["chkET"] = ttk.Checkbutton(self.contentdata[id]["Settings"], variable=self.contentdata[id]["intET"], command=self.cs_report_settings_update)
+		self.contentdata[id]["chkET"].grid(column=col_disp, row=rownum, sticky="nsew")
+
+
+
 
 		# Logo image
+		rownum +=1
+		self.contentdata[id]["lblLI"] = ttk.Label(self.contentdata[id]["Settings"], text="Logo Image:")
+		self.contentdata[id]["lblLI"].grid(column=0, row=rownum, sticky="nsew")
+
+
 
 		# wattermark image
+		# rownum +=1
+		# self.contentdata[id]["lblWM"] = ttk.Label(self.contentdata[id]["Settings"], text="Watermark Image:")
+		# self.contentdata[id]["lblWM"].grid(column=0, row=rownum, sticky="nsew")
+
+
+
 
 		# report font
 		rownum +=1
@@ -2578,19 +2820,48 @@ class ReporterGUI(tk.Frame):
 
 		# Table of Contents, chkbox, levels, etc
 
-		# page header text
-		# page footer text
-
-		# Page Number
-
-		# Document location
-
-		# Logo image
-
 
 		rownum +=1
 		self.contentdata[id]["lblHF"] = ttk.Label(self.contentdata[id]["Settings"], text="Headders and Footers:")
 		self.contentdata[id]["lblHF"].grid(column=0, row=rownum, sticky="nsew")
+
+		# rownum +=1
+		col_hdisp = 3
+		self.contentdata[id]["lblHF"] = ttk.Label(self.contentdata[id]["Settings"], text="Dispaly")
+		self.contentdata[id]["lblHF"].grid(column=col_hdisp, row=rownum, sticky="nsew")
+
+		col_head = col_hdisp + 1
+		self.contentdata[id]["lblPH"] = ttk.Label(self.contentdata[id]["Settings"], text="Header")
+		self.contentdata[id]["lblPH"].grid(column=col_head, row=rownum, sticky="nsew")
+		col_foot = col_head + 1
+		self.contentdata[id]["lblPF"] = ttk.Label(self.contentdata[id]["Settings"], text="Footer")
+		self.contentdata[id]["lblPF"].grid(column=col_foot, row=rownum, sticky="nsew")
+
+		col_posl = col_foot + 1
+		self.contentdata[id]["lblPL"] = ttk.Label(self.contentdata[id]["Settings"], text="Left")
+		self.contentdata[id]["lblPL"].grid(column=col_posl, row=rownum, sticky="nsew")
+		col_posc = col_posl + 1
+		self.contentdata[id]["lblPC"] = ttk.Label(self.contentdata[id]["Settings"], text="Centre")
+		self.contentdata[id]["lblPC"].grid(column=col_posc, row=rownum, sticky="nsew")
+		col_posr = col_posc + 1
+		self.contentdata[id]["lblPC"] = ttk.Label(self.contentdata[id]["Settings"], text="Right")
+		self.contentdata[id]["lblPC"].grid(column=col_posr, row=rownum, sticky="nsew")
+
+		# page header text
+		# page footer text
+
+		# Page Number
+		rownum +=1
+		self.contentdata[id]["lblPN"] = ttk.Label(self.contentdata[id]["Settings"], text="Page Number:")
+		self.contentdata[id]["lblPN"].grid(column=0, row=rownum, sticky="nsew")
+
+		# rownum +=1
+		# self.contentdata[id]["lblTPN"] = ttk.Label(self.contentdata[id]["Settings"], text="Total Pages:")
+		# self.contentdata[id]["lblTPN"].grid(column=0, row=rownum, sticky="nsew")
+
+		# Document location
+
+		# Logo image
 
 
 
@@ -2604,6 +2875,24 @@ class ReporterGUI(tk.Frame):
 
 		if "strTitle" in self.contentdata[id]:
 			base.rs_setting_set("title", self.contentdata[id]["strTitle"].get())
+
+
+
+		if "strDF" in self.contentdata[id]:
+			base.rs_setting_set("dateformat", self.contentdata[id]["strDF"].get())
+
+		if "strTF" in self.contentdata[id]:
+			base.rs_setting_set("timeformat", self.contentdata[id]["strTF"].get())
+
+		if "strTZ" in self.contentdata[id]:
+			base.rs_setting_set("timezone", self.contentdata[id]["strTZ"].get())
+
+		if "intST" in self.contentdata[id]:
+			base.rs_setting_set_int("showstarttime", self.contentdata[id]["intST"].get())
+
+		if "intET" in self.contentdata[id]:
+			base.rs_setting_set_int("showendtime", self.contentdata[id]["intET"].get())
+
 
 		if "strFont" in self.contentdata[id]:
 			base.rs_setting_set("font", self.contentdata[id]["strFont"].get())
@@ -2619,8 +2908,18 @@ class ReporterGUI(tk.Frame):
 				base.debugmsg(5, "pct:", pct, "	", type(pct))
 				base.rs_setting_set_int("percentile", pct)
 
+
+		# if "Settings" in self.contentdata[id]:
+		# 	# force refresh
+		# 	del self.contentdata[id]["Settings"]
+		self.cs_reportsettings()
+
 		self.ConfigureStyle()
-		self.cp_regenerate_preview()
+		# self.cp_regenerate_preview()
+		regen = threading.Thread(target=self.cp_regenerate_preview)
+		regen.start()
+
+
 
 
 	def cs_rename_heading(self, _event=None):
@@ -2685,7 +2984,9 @@ class ReporterGUI(tk.Frame):
 			data = self.contentdata[id]["tNote"].get('0.0', tk.END)
 			base.debugmsg(5, "data:", data)
 			base.rt_note_set(id, data)
-			self.content_preview(id)
+			# self.content_preview(id)
+			cp = threading.Thread(target=lambda: self.content_preview(id))
+			cp.start()
 
 	#
 	# Settings	-	DataTable
@@ -2805,7 +3106,9 @@ class ReporterGUI(tk.Frame):
 			base.rt_table_generate_sql(id)
 
 		base.debugmsg(5, "content_preview id:", id)
-		self.content_preview(id)
+		# self.content_preview(id)
+		cp = threading.Thread(target=lambda: self.content_preview(id))
+		cp.start()
 
 	def cs_datatable_update_metrics(self, id):
 		base.debugmsg(5, "id:", id)
@@ -3100,7 +3403,9 @@ class ReporterGUI(tk.Frame):
 			base.rt_graph_generate_sql(id)
 
 		base.debugmsg(5, "content_preview id:", id)
-		self.content_preview(id)
+		# self.content_preview(id)
+		cp = threading.Thread(target=lambda: self.content_preview(id))
+		cp.start()
 
 
 
@@ -3257,6 +3562,9 @@ class ReporterGUI(tk.Frame):
 	def content_preview(self, id):
 		base.debugmsg(5, "id:", id)
 		self.cp_generate_preview(id)
+		# self.t_preview[id] = threading.Thread(target=lambda: self.cp_generate_preview(id))
+		# self.t_preview[id].start()
+
 		# curritem = self.contentpreview.grid_slaves(column=0, row=0)
 		# base.debugmsg(5, "curritem:", curritem)
 		# if len(curritem)>0:
@@ -3267,16 +3575,22 @@ class ReporterGUI(tk.Frame):
 		self.cp_display_preview(id, 0)
 		self.contentcanvas.config(scrollregion=self.contentpreview.bbox("all"))
 
+		# self.contentpreview.columnconfigure(0, weight=1)
+
 	def cp_regenerate_preview(self):
 		# self.contentdata = {}
 		for itm in self.contentdata.keys():
-			if "Preview" in self.contentdata[itm]:
-				del self.contentdata[itm]["Preview"]
+			# if "Preview" in self.contentdata[itm]:
+			# 	del self.contentdata[itm]["Preview"]
+			self.contentdata[itm]["Changed"] = 0
 		self.content_preview("TOP")
+
 
 	def cp_generate_preview(self, id):
 		base.debugmsg(5, "id:", id)
-		if id not in self.contentdata:
+		# if id not in self.contentdata:
+		while id not in self.contentdata:
+			time.sleep(0.1)
 			self.contentdata[id] = {}
 		gen = False
 		if "Preview" not in self.contentdata[id]:
@@ -3291,12 +3605,14 @@ class ReporterGUI(tk.Frame):
 
 		base.debugmsg(5, "gen:", gen)
 		if gen:
-			self.contentdata[id]["Changed"] = base.report_item_get_changed(id)
-			self.contentdata[id]["Preview"] = tk.Frame(self.contentpreview, padx=0, pady=0, bd=0)
+			while "Preview" not in self.contentdata[id]:
+				time.sleep(0.1)
+				self.contentdata[id]["Changed"] = base.report_item_get_changed(id)
+				self.contentdata[id]["Preview"] = tk.Frame(self.contentpreview, padx=0, pady=0, bd=0)
 			# self.contentdata[id]["Preview"].config(bg="gold")
 			# self.contentdata[id]["Preview"].config(bg=self.style_reportbg_colour)
 			if id=="TOP":
-				pass
+				self.cp_title(id)
 			else:
 				rownum = 0
 				# self.contentdata[id]["lblpreview"] = ttk.Label(self.contentdata[id]["Preview"], text = "Preview for {}: {}".format(id, base.report_item_get_name(id)))
@@ -3318,7 +3634,8 @@ class ReporterGUI(tk.Frame):
 					self.contentdata[id]["lblpgbrk"].config(bg="#ddd")
 					self.contentdata[id]["lblpgbrk"].grid(column=999, row=rownum, sticky="nsew")
 
-					self.contentdata[id]["Preview"].columnconfigure(999, weight=1)
+					self.contentdata[id]["Preview"].columnconfigure(1, weight=1)
+					# self.contentdata[id]["Preview"].columnconfigure(999, weight=1)
 
 					rownum += 1
 
@@ -3353,9 +3670,21 @@ class ReporterGUI(tk.Frame):
 		children = base.report_get_order(id)
 		for child in children:
 			self.cp_generate_preview(child)
+			# self.t_preview[child] = threading.Thread(target=lambda: self.cp_generate_preview(child))
+			# self.t_preview[child].start()
 
 	def cp_display_preview(self, id, row):
 		base.debugmsg(5, "id:", id)
+		if id in self.t_preview:
+			if self.t_preview[id].is_alive():
+				self.t_preview[id].join()
+
+		# wait for preview available
+		while id not in self.contentdata:
+			time.sleep(0.1)
+		while "Preview" not in self.contentdata[id]:
+			time.sleep(0.1)
+
 		self.contentdata[id]["Preview"].grid(column=0, row=row, sticky="nsew")
 		nextrow = row+1
 		base.debugmsg(5, "nextrow:", nextrow)
@@ -3363,6 +3692,53 @@ class ReporterGUI(tk.Frame):
 		for child in children:
 			nextrow = self.cp_display_preview(child, nextrow)
 		return nextrow
+
+	def cp_title(self, id):
+		base.debugmsg(5, "id:", id)
+		rownum = 1
+
+		self.contentdata[id]["Preview"].columnconfigure(0, weight=1)
+		self.contentdata[id]["Preview"].columnconfigure(2, weight=1)
+		colcontent = 1
+
+		# Title
+		title = "{}".format(base.rs_setting_get_title())
+		self.contentdata[id]["lblTitle"] = ttk.Label(self.contentdata[id]["Preview"], text=title, style='Report.Title1.TLabel')
+		self.contentdata[id]["lblTitle"].grid(column=colcontent, row=rownum, sticky="nsew")
+
+		# Logo
+
+		# Execution Date range
+		rownum += 1
+
+		execdr = ""
+		fSD = ""
+
+		if base.rs_setting_get_int("showstarttime"):
+			iST = base.report_starttime()
+			fSD = "{}".format(base.report_formatdate(iST))
+			fST = "{}".format(base.report_formattime(iST))
+
+			execdr = "{} {}".format(fSD, fST)
+
+		if base.rs_setting_get_int("showendtime"):
+			iET = base.report_endtime()
+			fED = "{}".format(base.report_formatdate(iET))
+			fET = "{}".format(base.report_formattime(iET))
+
+			if not base.rs_setting_get_int("showstarttime"):
+				execdr = "{} {}".format(fED, fET)
+			else:
+				if fSD == fED:
+					execdr = "{} - {}".format(execdr, fET)
+				else:
+					execdr = "{} - {} {}".format(execdr, fED, fET)
+
+		self.contentdata[id]["lblTitle"] = ttk.Label(self.contentdata[id]["Preview"], text=execdr, style='Report.Title2.TLabel')
+		self.contentdata[id]["lblTitle"].grid(column=colcontent, row=rownum, sticky="nsew")
+
+
+
 
 
 	def cp_note(self, id):
@@ -3372,8 +3748,10 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["lblSpacer"].grid(column=0, row=rownum, sticky="nsew")
 
 		notetxt = "{}".format(base.rt_note_get(id))
-		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text=notetxt, style='Report.TLabel')
-		self.contentdata[id]["lblSpacer"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[id]["lblNote"] = ttk.Label(self.contentdata[id]["Preview"], text=notetxt, style='Report.TLabel')
+		self.contentdata[id]["lblNote"].grid(column=1, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["Preview"].columnconfigure(1, weight=1)
 
 	def cp_graph(self, id):
 		base.debugmsg(5, "id:", id)
