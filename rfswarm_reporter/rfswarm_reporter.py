@@ -3612,7 +3612,7 @@ class ReporterGUI(tk.Frame):
 			# self.contentdata[id]["Preview"].config(bg="gold")
 			# self.contentdata[id]["Preview"].config(bg=self.style_reportbg_colour)
 			if id=="TOP":
-				self.cp_title(id)
+				self.cp_titlepage(id)
 			else:
 				rownum = 0
 				# self.contentdata[id]["lblpreview"] = ttk.Label(self.contentdata[id]["Preview"], text = "Preview for {}: {}".format(id, base.report_item_get_name(id)))
@@ -3693,23 +3693,27 @@ class ReporterGUI(tk.Frame):
 			nextrow = self.cp_display_preview(child, nextrow)
 		return nextrow
 
-	def cp_title(self, id):
+	def cp_titlepage(self, id):
 		base.debugmsg(5, "id:", id)
-		rownum = 1
 
 		self.contentdata[id]["Preview"].columnconfigure(0, weight=1)
 		self.contentdata[id]["Preview"].columnconfigure(2, weight=1)
 		colcontent = 1
 
 		# Title
+		#  top: 1	centre: 11	bottom:	21
+		rownum = 1
+
 		title = "{}".format(base.rs_setting_get_title())
 		self.contentdata[id]["lblTitle"] = ttk.Label(self.contentdata[id]["Preview"], text=title, style='Report.Title1.TLabel')
 		self.contentdata[id]["lblTitle"].grid(column=colcontent, row=rownum, sticky="nsew")
 
 		# Logo
+		#  top: 2	centre: 12	bottom:	22
 
 		# Execution Date range
-		rownum += 1
+		#  top: 3	centre: 13	bottom:	23
+		rownum = 23
 
 		execdr = ""
 		fSD = ""
