@@ -132,7 +132,7 @@ class ReporterBase():
 	settings = {}
 	reportdata = {}
 
-	settings["ContentTypes"] = {"head":"Heading", "note":"Note", "graph":"Data Graph", "table":"Data Table"}
+	settings["ContentTypes"] = {"head":"Heading", "contents":"Contents", "note":"Note", "graph":"Data Graph", "table":"Data Table"}
 
 	defcolours = ['#000000', '#008450', '#B81D13', '#EFB700', '#888888']
 	namecolours = ['total', 'pass', 'fail', 'warning', 'not run']
@@ -682,6 +682,36 @@ class ReporterBase():
 		base.report_item_set_changed(id)
 		base.report_save()
 
+	#
+	# Report Item Type: contents
+	#
+	def rt_contents_get_mode(self, id):
+		base.debugmsg(5, "id:", id)
+		if 'mode' in base.report[id]:
+			return base.report[id]['mode']
+		else:
+			return "Table Of Contents"
+
+	def rt_contents_set_mode(self, id, mode):
+		base.debugmsg(5, "id:", id, "	mode:", mode)
+		base.report[id]['mode'] = mode
+		base.report_item_set_changed(id)
+		base.report_save()
+
+	def rt_contents_get_level(self, id):
+		base.debugmsg(5, "id:", id)
+		if id == "TOP":
+			return 0
+		if 'level' in base.report[id]:
+			return int(base.report[id]['level'])
+		else:
+			return 1
+
+	def rt_contents_set_level(self, id, level):
+		base.debugmsg(5, "id:", id, "	level:", level)
+		base.report[id]['level'] = str(level)
+		base.report_item_set_changed(id)
+		base.report_save()
 
 	#
 	# Report Item Type: note
@@ -2650,6 +2680,8 @@ class ReporterGUI(tk.Frame):
 				# call function to load settings for option selected (heading doesn't need)
 				type = base.report_item_get_type(id)
 				base.debugmsg(5, "type:", type)
+				if type == 'contents':
+					self.cs_contents(id)
 				if type == 'note':
 					self.cs_note(id)
 				if type == 'table':
@@ -2874,48 +2906,48 @@ class ReporterGUI(tk.Frame):
 
 		# Table of Contents, chkbox, levels, etc
 
-
-		rownum +=1
-		self.contentdata[id]["lblHF"] = ttk.Label(self.contentdata[id]["Settings"], text="Headders and Footers:")
-		self.contentdata[id]["lblHF"].grid(column=0, row=rownum, sticky="nsew")
-
+		# 2022-01-25 This might have to wait for next feature version
 		# rownum +=1
-		col_hdisp = 3
-		self.contentdata[id]["lblHF"] = ttk.Label(self.contentdata[id]["Settings"], text="Dispaly")
-		self.contentdata[id]["lblHF"].grid(column=col_hdisp, row=rownum, sticky="nsew")
-
-		col_head = col_hdisp + 1
-		self.contentdata[id]["lblPH"] = ttk.Label(self.contentdata[id]["Settings"], text="Header")
-		self.contentdata[id]["lblPH"].grid(column=col_head, row=rownum, sticky="nsew")
-		col_foot = col_head + 1
-		self.contentdata[id]["lblPF"] = ttk.Label(self.contentdata[id]["Settings"], text="Footer")
-		self.contentdata[id]["lblPF"].grid(column=col_foot, row=rownum, sticky="nsew")
-
-		col_posl = col_foot + 1
-		self.contentdata[id]["lblPL"] = ttk.Label(self.contentdata[id]["Settings"], text="Left")
-		self.contentdata[id]["lblPL"].grid(column=col_posl, row=rownum, sticky="nsew")
-		col_posc = col_posl + 1
-		self.contentdata[id]["lblPC"] = ttk.Label(self.contentdata[id]["Settings"], text="Centre")
-		self.contentdata[id]["lblPC"].grid(column=col_posc, row=rownum, sticky="nsew")
-		col_posr = col_posc + 1
-		self.contentdata[id]["lblPC"] = ttk.Label(self.contentdata[id]["Settings"], text="Right")
-		self.contentdata[id]["lblPC"].grid(column=col_posr, row=rownum, sticky="nsew")
-
-		# page header text
-		# page footer text
-
-		# Page Number
-		rownum +=1
-		self.contentdata[id]["lblPN"] = ttk.Label(self.contentdata[id]["Settings"], text="Page Number:")
-		self.contentdata[id]["lblPN"].grid(column=0, row=rownum, sticky="nsew")
-
+		# self.contentdata[id]["lblHF"] = ttk.Label(self.contentdata[id]["Settings"], text="Headers and Footers:")
+		# self.contentdata[id]["lblHF"].grid(column=0, row=rownum, sticky="nsew")
+		#
+		# # rownum +=1
+		# col_hdisp = 3
+		# self.contentdata[id]["lblHF"] = ttk.Label(self.contentdata[id]["Settings"], text="Dispaly")
+		# self.contentdata[id]["lblHF"].grid(column=col_hdisp, row=rownum, sticky="nsew")
+		#
+		# col_head = col_hdisp + 1
+		# self.contentdata[id]["lblPH"] = ttk.Label(self.contentdata[id]["Settings"], text="Header")
+		# self.contentdata[id]["lblPH"].grid(column=col_head, row=rownum, sticky="nsew")
+		# col_foot = col_head + 1
+		# self.contentdata[id]["lblPF"] = ttk.Label(self.contentdata[id]["Settings"], text="Footer")
+		# self.contentdata[id]["lblPF"].grid(column=col_foot, row=rownum, sticky="nsew")
+		#
+		# col_posl = col_foot + 1
+		# self.contentdata[id]["lblPL"] = ttk.Label(self.contentdata[id]["Settings"], text="Left")
+		# self.contentdata[id]["lblPL"].grid(column=col_posl, row=rownum, sticky="nsew")
+		# col_posc = col_posl + 1
+		# self.contentdata[id]["lblPC"] = ttk.Label(self.contentdata[id]["Settings"], text="Centre")
+		# self.contentdata[id]["lblPC"].grid(column=col_posc, row=rownum, sticky="nsew")
+		# col_posr = col_posc + 1
+		# self.contentdata[id]["lblPC"] = ttk.Label(self.contentdata[id]["Settings"], text="Right")
+		# self.contentdata[id]["lblPC"].grid(column=col_posr, row=rownum, sticky="nsew")
+		#
+		# # page header text
+		# # page footer text
+		#
+		# # Page Number
 		# rownum +=1
-		# self.contentdata[id]["lblTPN"] = ttk.Label(self.contentdata[id]["Settings"], text="Total Pages:")
-		# self.contentdata[id]["lblTPN"].grid(column=0, row=rownum, sticky="nsew")
-
-		# Document location
-
-		# Logo image
+		# self.contentdata[id]["lblPN"] = ttk.Label(self.contentdata[id]["Settings"], text="Page Number:")
+		# self.contentdata[id]["lblPN"].grid(column=0, row=rownum, sticky="nsew")
+		#
+		# # rownum +=1
+		# # self.contentdata[id]["lblTPN"] = ttk.Label(self.contentdata[id]["Settings"], text="Total Pages:")
+		# # self.contentdata[id]["lblTPN"].grid(column=0, row=rownum, sticky="nsew")
+		#
+		# # Document location
+		#
+		# # Logo image
 
 
 
@@ -3043,6 +3075,55 @@ class ReporterGUI(tk.Frame):
 		type = keys[idx]
 		base.report_item_set_type(id, type)
 		self.content_load(id)
+
+
+	#
+	# Settings	-	Contents
+	#
+
+	def cs_contents(self, id):
+		base.debugmsg(5, "id:", id)
+		rownum = 0
+
+		rownum += 1
+		self.contentdata[id]["lblCM"] = ttk.Label(self.contentdata[id]["Frame"], text = "Mode:")
+		self.contentdata[id]["lblCM"].grid(column=0, row=rownum, sticky="nsew")
+
+		ContentsModes = [None, "Table Of Contents", "Table of Graphs", "Table Of Tables"]
+		self.contentdata[id]["strCM"] = tk.StringVar()
+		self.contentdata[id]["omCM"] = ttk.OptionMenu(self.contentdata[id]["Frame"], self.contentdata[id]["strCM"], command=self.cs_contents_update, *ContentsModes)
+
+		self.contentdata[id]["strCM"].set(base.rt_contents_get_mode(id))
+		self.contentdata[id]["omCM"].grid(column=1, row=rownum, sticky="nsew")
+
+		rownum += 1
+		self.contentdata[id]["lblCL"] = ttk.Label(self.contentdata[id]["Frame"], text = "Level:")
+		self.contentdata[id]["lblCL"].grid(column=0, row=rownum, sticky="nsew")
+
+		Levels = [None]
+		for i in range(6):
+			Levels.append(i+1)
+		self.contentdata[id]["intCL"] = tk.IntVar()
+		self.contentdata[id]["omCL"] = ttk.OptionMenu(self.contentdata[id]["Frame"], self.contentdata[id]["intCL"], command=self.cs_contents_update, *Levels)
+		self.contentdata[id]["intCL"].set(base.rt_contents_get_level(id))
+		self.contentdata[id]["omCL"].grid(column=1, row=rownum, sticky="nsew")
+
+	def cs_contents_update(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+		id = self.sectionstree.focus()
+		base.debugmsg(9, "id:", id)
+
+		if "strCM" in self.contentdata[id]:
+			value = self.contentdata[id]["strCM"].get()
+			base.rt_contents_set_mode(id, value)
+
+		if "intCL" in self.contentdata[id]:
+			value = self.contentdata[id]["intCL"].get()
+			base.rt_contents_set_level(id, value)
+
+		cp = threading.Thread(target=lambda: self.content_preview(id))
+		cp.start()
+
 
 	#
 	# Settings	-	Note
@@ -3748,6 +3829,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["rownum"] = rownum + 1
 				type = base.report_item_get_type(id)
 				base.debugmsg(8, "type:", type)
+				if type == 'contents':
+					self.cp_contents(id)
 				if type == 'note':
 					self.cp_note(id)
 				if type == 'table':
@@ -3860,7 +3943,59 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["lblTitle"].grid(column=colcontent, columnspan=3, row=rownum, sticky="nsew")
 
 
+	def cp_contents(self, id):
+		base.debugmsg(5, "id:", id)
+		rownum = self.contentdata[id]["rownum"]
+		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text="    ", style='Report.TLabel')
+		self.contentdata[id]["lblSpacer"].grid(column=0, row=rownum, sticky="nsew")
 
+		type = base.report_item_get_type(id)
+		mode = base.rt_contents_get_mode(id)
+		level = base.rt_contents_get_level(id)
+
+		base.debugmsg(5, "type:", type, "	mode:", mode, "	level:", level)
+
+		# notetxt = "{}".format(base.rt_note_get(id))
+		# self.contentdata[id]["lblNote"] = ttk.Label(self.contentdata[id]["Preview"], text=notetxt, style='Report.TLabel')
+		# self.contentdata[id]["lblNote"].grid(column=1, row=rownum, sticky="nsew")
+		#
+		# self.contentdata[id]["Preview"].columnconfigure(1, weight=1)
+
+		self.cp_contents_row("TOP", rownum, None, level)
+
+
+	def cp_contents_row(self, id, row, fmode, flevel):
+		base.debugmsg(5, "id:", id, "	row:", row, "	fmode:", fmode, "	flevel:", flevel)
+		display = True
+
+		if id == "TOP":
+			display = False
+
+		if display and fmode is not None:
+			display = False
+			type = base.report_item_get_type(id)
+			if fmode == type:
+				display = True
+
+		level = base.rt_contents_get_level(id)
+		base.debugmsg(5, "level:", level)
+		if display and level > flevel:
+			display = False
+
+		nextrow = row
+		if display:
+			titlenum = base.report_sect_number(id)
+			titlename = base.report_item_get_name(id)
+			titlelevel = base.report_sect_level(id)
+			base.debugmsg(5, "titlenum:", titlenum, "	titlename:", titlename, "	titlelevel:", titlelevel)
+
+			nextrow = row+1
+		base.debugmsg(9, "nextrow:", nextrow)
+		if level < flevel:
+			children = base.report_get_order(id)
+			for child in children:
+				nextrow = self.cp_contents_row(child, nextrow, fmode, flevel)
+		return nextrow
 
 
 	def cp_note(self, id):
