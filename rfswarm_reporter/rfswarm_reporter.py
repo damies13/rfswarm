@@ -37,6 +37,10 @@ import tkinter.messagebox as tkm	#python3
 import tkinter.simpledialog as tksd
 import tkinter.font as tkFont
 
+# required for company logo's (I beleive this is a depandancy of matplotlib anyway)
+from PIL import Image, ImageTk
+# required for company logo's
+
 # required for matplot graphs
 import matplotlib
 matplotlib.use("TkAgg")
@@ -328,17 +332,17 @@ class ReporterBase():
 			sql += "LIMIT 1 "
 
 			key = "report starttime"
-			base.debugmsg(6, "sql:", sql)
+			base.debugmsg(9, "sql:", sql)
 			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
 			while key not in base.dbqueue["ReadResult"]:
 				time.sleep(0.1)
 
 			gdata = base.dbqueue["ReadResult"][key]
-			base.debugmsg(6, "gdata:", gdata)
+			base.debugmsg(9, "gdata:", gdata)
 
 			self.reportdata["starttime"] = int(gdata[0]["MetricTime"])
 
-			base.debugmsg(6, "starttime:", self.reportdata["starttime"])
+			base.debugmsg(8, "starttime:", self.reportdata["starttime"])
 
 			return self.reportdata["starttime"]
 
@@ -357,37 +361,37 @@ class ReporterBase():
 			sql += "LIMIT 1 "
 
 			key = "report endtime"
-			base.debugmsg(6, "sql:", sql)
+			base.debugmsg(9, "sql:", sql)
 			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
 			while key not in base.dbqueue["ReadResult"]:
 				time.sleep(0.1)
 
 			gdata = base.dbqueue["ReadResult"][key]
-			base.debugmsg(6, "gdata:", gdata)
+			base.debugmsg(9, "gdata:", gdata)
 
 			self.reportdata["endtime"] = int(gdata[0]["MetricTime"])
 
-			base.debugmsg(6, "endtime:", self.reportdata["endtime"])
+			base.debugmsg(8, "endtime:", self.reportdata["endtime"])
 
 			return self.reportdata["endtime"]
 
 
 	def report_formatdate(self, itime):
-		base.debugmsg(5, "itime:", itime)
+		base.debugmsg(9, "itime:", itime)
 		format = base.rs_setting_get_dateformat()
 		format = format.replace("yyyy", "%Y")
 		format = format.replace("yy", "%y")
 		format = format.replace("mm", "%m")
 		format = format.replace("dd", "%d")
-		base.debugmsg(5, "format:", format)
+		base.debugmsg(9, "format:", format)
 		# fdate = datetime.fromtimestamp(itime, timezone.utc).strftime(format)
 		tz = zoneinfo.ZoneInfo(base.rs_setting_get_timezone())
 		fdate = datetime.fromtimestamp(itime, tz).strftime(format)
-		base.debugmsg(5, "fdate:", fdate)
+		base.debugmsg(9, "fdate:", fdate)
 		return fdate
 
 	def report_formattime(self, itime):
-		base.debugmsg(5, "itime:", itime)
+		base.debugmsg(9, "itime:", itime)
 		format = base.rs_setting_get_timeformat()
 		format = format.replace("HH", "%H")
 		format = format.replace("h", "%I")
@@ -395,24 +399,24 @@ class ReporterBase():
 		format = format.replace("SS", "%S")
 		format = format.replace("AMPM", "%p")
 
-		base.debugmsg(5, "format:", format)
+		base.debugmsg(9, "format:", format)
 		tz = zoneinfo.ZoneInfo(base.rs_setting_get_timezone())
 		ftime = datetime.fromtimestamp(itime, tz).strftime(format)
-		base.debugmsg(5, "ftime:", ftime)
+		base.debugmsg(9, "ftime:", ftime)
 		return ftime
 
 	#
 	# Report Settings
 	#
 	def rs_setting_get(self, name):
-		base.debugmsg(5, "name:", name)
+		base.debugmsg(9, "name:", name)
 		if name in base.report["Report"]:
 			return base.report["Report"][name]
 		else:
 			return None
 
 	def rs_setting_set(self, name, value):
-		base.debugmsg(5, "name:", name, "	value:", value)
+		base.debugmsg(9, "name:", name, "	value:", value)
 		base.report["Report"][name] = value
 		# base.report_item_set_changed("Report")
 		base.report_save()
@@ -427,6 +431,24 @@ class ReporterBase():
 
 	def rs_setting_set_int(self, name, value):
 		base.rs_setting_set(name, str(value))
+
+
+	def rs_setting_get_file(self, name):
+		value = base.rs_setting_get(name)
+		localpath = ""
+		if value is not None and len(value)>0:
+			localpath = os.path.join(base.config['Reporter']['ResultDir'], value)
+		return localpath
+
+	def rs_setting_set_file(self, name, value):
+		# determine relative path
+		# base.config['Reporter']['Report']	base.config['Reporter']['ResultDir']
+		relpath = os.path.relpath(value, start=base.config['Reporter']['ResultDir'])
+
+		base.rs_setting_set(name, relpath)
+
+
+
 
 	def rs_setting_get_title(self):
 		value = self.rs_setting_get('title')
@@ -476,7 +498,7 @@ class ReporterBase():
 		value = self.rs_setting_get('timezone')
 		if value is None:
 			LOCAL_TIMEZONE = datetime.now(timezone.utc).astimezone().tzinfo
-			base.debugmsg(5, "tzname:", LOCAL_TIMEZONE)
+			base.debugmsg(9, "tzname:", LOCAL_TIMEZONE)
 			return LOCAL_TIMEZONE
 		else:
 			return value
@@ -484,7 +506,7 @@ class ReporterBase():
 	def rs_setting_get_timezone_list(self):
 		# ZI = ZoneInfo(base.rs_setting_get_timezone())
 		# ZI = ZoneInfo("UTC")
-		base.debugmsg(5, "all_timezones:", pytz.all_timezones)
+		base.debugmsg(9, "all_timezones:", pytz.all_timezones)
 		return pytz.all_timezones
 
 	#
@@ -493,20 +515,20 @@ class ReporterBase():
 
 	def report_get_order(self, parent):
 		if parent == "TOP":
-			base.debugmsg(5, "template order:", base.report["Report"]["Order"])
+			base.debugmsg(7, "template order:", base.report["Report"]["Order"])
 			if len(base.report["Report"]["Order"])>0:
 				return base.report["Report"]["Order"].split(',')
 			else:
 				return []
 		else:
-			base.debugmsg(5, "parent order:", base.report[parent])
+			base.debugmsg(7, "parent order:", base.report[parent])
 			if "Order" in base.report[parent] and len(base.report[parent]["Order"])>0:
 				return base.report[parent]["Order"].split(',')
 			else:
 				return []
 
 	def report_set_order(self, parent, orderlst):
-		base.debugmsg(5, "parent:", parent, "	orderlst: ", orderlst)
+		base.debugmsg(7, "parent:", parent, "	orderlst: ", orderlst)
 		if parent == "TOP":
 			base.report["Report"]["Order"] = ",".join(orderlst)
 		else:
@@ -517,22 +539,22 @@ class ReporterBase():
 		id = "{:02X}".format(int(time.time()*10000))
 		# id = "{:02X}".format(int(time.time()*1000000))
 		# id = "{:02X}".format(time.time()) # cannot convert float
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(7, "id:", id)
 		self.report_add_section(parent, id, name)
 		# base.report_save() # report_set_order in report_add_section will save
 		return id
 
 	def report_add_section(self, parent, id, name):
-		base.debugmsg(5, "parent: ", parent)
+		base.debugmsg(7, "parent: ", parent)
 		if id not in base.report:
 			base.report[id] = {}
 		base.report[id]['Name'] = name
 		base.report[id]['Parent'] = parent
 		order = self.report_get_order(parent)
-		base.debugmsg(5, "order: ", order)
+		base.debugmsg(8, "order: ", order)
 		order.append(id)
 		self.report_set_order(parent, order)
-		base.debugmsg(5, "base.report: ", base.report._sections)
+		base.debugmsg(8, "base.report: ", base.report._sections)
 		# base.report_save() # report_set_order will save
 
 
@@ -545,18 +567,18 @@ class ReporterBase():
 	def report_remove_section(self, id):
 		parent = self.report_item_parent(id)
 		order = self.report_get_order(parent)
-		base.debugmsg(5, "order: ", order)
+		base.debugmsg(8, "order: ", order)
 		pos = order.index(id)
-		base.debugmsg(5, "pos: ", pos)
+		base.debugmsg(9, "pos: ", pos)
 		order.pop(pos)
-		base.debugmsg(5, "order: ", order)
+		base.debugmsg(9, "order: ", order)
 		self.report_set_order(parent, order)
-		base.debugmsg(5, "base.report: ", base.report._sections)
+		base.debugmsg(9, "base.report: ", base.report._sections)
 		subitems = self.report_get_order(id)
 		for item in subitems:
 			self.report_remove_section(item)
 		del base.report[id]
-		base.debugmsg(5, "base.report: ", base.report._sections)
+		base.debugmsg(9, "base.report: ", base.report._sections)
 		base.report_save()
 
 	def report_move_section_up(self, id):
@@ -612,7 +634,7 @@ class ReporterBase():
 		base.report_save()
 
 	def report_sect_level(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		parent = self.report_item_parent(id)
 		if parent == "TOP":
 			return 1
@@ -621,37 +643,37 @@ class ReporterBase():
 			return parentlvl + 1
 
 	def report_sect_number(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		parent = self.report_item_parent(id)
 		order = self.report_get_order(parent)
 		num = order.index(id)+1
-		base.debugmsg(5, "parent:", parent, "	num:", num)
+		base.debugmsg(9, "parent:", parent, "	num:", num)
 		if parent == "TOP":
-			base.debugmsg(5, "return:", num)
+			base.debugmsg(9, "return:", num)
 			return "{}".format(num)
 		else:
 			parentnum = self.report_sect_number(parent)
-			base.debugmsg(5, "parentnum:", parentnum)
-			base.debugmsg(5, "return:", parentnum, num)
+			base.debugmsg(9, "parentnum:", parentnum)
+			base.debugmsg(9, "return:", parentnum, num)
 			return "{}.{}".format(parentnum, num)
 
 	def report_item_get_type_lbl(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		type = base.report_item_get_type(id)
 		base.debugmsg(5, "type:", type)
 		return base.settings["ContentTypes"][type]
 
 	def report_item_get_type(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		default = list(base.settings["ContentTypes"].keys())[0]
-		base.debugmsg(5, "default:", default)
+		base.debugmsg(9, "default:", default)
 		if id == "TOP":
 			return default
 		if 'Type' not in base.report[id]:
 			base.debugmsg(5, "Set to default:", default)
 			base.report_item_set_type(id, default)
 
-		base.debugmsg(5, "Type:", base.report[id]['Type'])
+		base.debugmsg(9, "Type:", base.report[id]['Type'])
 		return base.report[id]['Type']
 
 	def report_item_set_type(self, id, newType):
@@ -665,7 +687,7 @@ class ReporterBase():
 	# Report Item Type: note
 	#
 	def rt_note_get(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		if 'note' in base.report[id]:
 			return self.whitespace_get_ini_value(base.report[id]['note'])
 		else:
@@ -681,14 +703,14 @@ class ReporterBase():
 	# Report Item Type: graph
 	#
 	def rt_graph_get_sql(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		if 'SQL' in base.report[id]:
 			return self.whitespace_get_ini_value(base.report[id]['SQL']).strip()
 		else:
 			return ""
 
 	def rt_graph_set_sql(self, id, graphSQL):
-		base.debugmsg(5, "id:", id, "	graphSQL:", graphSQL.strip())
+		base.debugmsg(9, "id:", id, "	graphSQL:", graphSQL.strip())
 		prev = self.rt_graph_get_sql(id)
 		if graphSQL.strip() != prev:
 			base.report[id]['SQL'] = self.whitespace_set_ini_value(graphSQL.strip())
@@ -696,7 +718,7 @@ class ReporterBase():
 			base.report_save()
 
 	def rt_graph_get_dt(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		if 'DataType' in base.report[id]:
 			return base.report[id]['DataType']
 		else:
@@ -711,7 +733,7 @@ class ReporterBase():
 			base.report_save()
 
 	def rt_graph_generate_sql(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(8, "id:", id)
 		display_percentile = 90
 		sql = ""
 		DataType = self.rt_table_get_dt(id)
@@ -903,7 +925,7 @@ class ReporterBase():
 
 
 
-		base.debugmsg(6, "sql:", sql)
+		base.debugmsg(8, "sql:", sql)
 		self.rt_graph_set_sql(id, sql)
 		return sql
 
@@ -919,14 +941,14 @@ class ReporterBase():
 	# Report Item Type: table
 	#
 	def rt_table_get_sql(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		if 'SQL' in base.report[id]:
 			return self.whitespace_get_ini_value(base.report[id]['SQL']).strip()
 		else:
 			return ""
 
 	def rt_table_set_sql(self, id, tableSQL):
-		base.debugmsg(5, "id:", id, "	tableSQL:", tableSQL.strip())
+		base.debugmsg(8, "id:", id, "	tableSQL:", tableSQL.strip())
 		prev = self.rt_table_get_sql(id)
 		if tableSQL.strip() != prev:
 			base.report[id]['SQL'] = self.whitespace_set_ini_value(tableSQL.strip())
@@ -934,7 +956,7 @@ class ReporterBase():
 			base.report_save()
 
 	def rt_table_generate_sql(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(8, "id:", id)
 		display_percentile = base.rs_setting_get_pctile()
 		sql = ""
 		DataType = self.rt_table_get_dt(id)
@@ -1043,7 +1065,7 @@ class ReporterBase():
 			SM = self.rt_table_get_sm(id)
 			isnum = self.rt_table_get_isnumeric(id)
 			sc = self.rt_table_get_showcount(id)
-			base.debugmsg(6, "MType:", MType, "	PM:", PM, "	SM:", SM)
+			base.debugmsg(8, "MType:", MType, "	PM:", PM, "	SM:", SM)
 
 			mcolumns = ["PrimaryMetric", "MetricType", "SecondaryMetric"]
 			wherelst = []
@@ -1144,13 +1166,13 @@ class ReporterBase():
 			gblist = []
 			sellist.append("r.result_name 'Result Name'")
 			gblist.append("r.result_name")
-			base.debugmsg(6, "gblist:", gblist)
+			base.debugmsg(8, "gblist:", gblist)
 
 			selcols = ", ".join(sellist)
 			gbcols = ", ".join(gblist)
 
 
-			base.debugmsg(6, "gbcols:", gbcols)
+			base.debugmsg(8, "gbcols:", gbcols)
 
 			sql = "SELECT "
 			if len(selcols)>0:
@@ -1205,14 +1227,14 @@ class ReporterBase():
 			sql += " ORDER BY r.sequence"
 
 
-		base.debugmsg(6, "sql:", sql)
+		base.debugmsg(8, "sql:", sql)
 		self.rt_table_set_sql(id, sql)
 		return sql
 
 
 
 	def rt_table_get_colours(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		if 'Colours' in base.report[id]:
 			return int(base.report[id]['Colours'])
 		else:
@@ -1234,14 +1256,14 @@ class ReporterBase():
 
 
 	def rt_table_get_dt(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		if 'DataType' in base.report[id]:
 			return base.report[id]['DataType']
 		else:
 			return None
 
 	def rt_table_set_dt(self, id, datatype):
-		base.debugmsg(5, "id:", id, "	datatype:", datatype)
+		base.debugmsg(9, "id:", id, "	datatype:", datatype)
 		prev = self.rt_table_get_dt(id)
 		if datatype != prev and datatype != None:
 			base.report[id]['DataType'] = datatype
@@ -1249,14 +1271,14 @@ class ReporterBase():
 			base.report_save()
 
 	def rt_table_get_rt(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		if 'ResultType' in base.report[id]:
 			return base.report[id]['ResultType']
 		else:
 			return None
 
 	def rt_table_set_rt(self, id, resulttype):
-		base.debugmsg(5, "id:", id, "	resulttype:", resulttype)
+		base.debugmsg(9, "id:", id, "	resulttype:", resulttype)
 		prev = self.rt_table_get_rt(id)
 		if resulttype != prev and resulttype != None:
 			base.report[id]['ResultType'] = resulttype
@@ -1265,14 +1287,14 @@ class ReporterBase():
 
 	# FR FilterResult
 	def rt_table_get_fr(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		if 'FilterResult' in base.report[id]:
 			return base.report[id]['FilterResult']
 		else:
 			return None
 
 	def rt_table_set_fr(self, id, filterresult):
-		base.debugmsg(5, "id:", id, "	filterresult:", filterresult)
+		base.debugmsg(9, "id:", id, "	filterresult:", filterresult)
 		prev = self.rt_table_get_fr(id)
 		if filterresult != prev and filterresult != None:
 			base.report[id]['FilterResult'] = filterresult
@@ -1281,7 +1303,7 @@ class ReporterBase():
 
 	# FN FilterType
 	def rt_table_get_fn(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		if 'FilterType' in base.report[id]:
 			return base.report[id]['FilterType']
 		else:
@@ -1297,7 +1319,7 @@ class ReporterBase():
 
 	# FP FilterPattern
 	def rt_table_get_fp(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		if 'FilterPattern' in base.report[id]:
 			return base.report[id]['FilterPattern']
 		else:
@@ -1338,7 +1360,7 @@ class ReporterBase():
 
 	# mt MetricType
 	def rt_table_get_mt(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		if 'MetricType' in base.report[id]:
 			return base.report[id]['MetricType']
 		else:
@@ -1353,7 +1375,7 @@ class ReporterBase():
 			base.report_save()
 
 	def rt_table_get_mlst(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		mlst = [None, ""]
 		sql = "SELECT Type "
 		sql += "FROM Metric "
@@ -1373,7 +1395,7 @@ class ReporterBase():
 
 	# pm PrimaryMetric
 	def rt_table_get_pm(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		if 'PrimaryMetric' in base.report[id]:
 			return base.report[id]['PrimaryMetric']
 		else:
@@ -1388,7 +1410,7 @@ class ReporterBase():
 			base.report_save()
 
 	def rt_table_get_pmlst(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		# SELECT Name
 		# FROM Metric
 		# -- WHERE Type = 'Agent'
@@ -1417,7 +1439,7 @@ class ReporterBase():
 
 	# sm SecondaryMetric
 	def rt_table_get_sm(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		if 'SecondaryMetric' in base.report[id]:
 			return base.report[id]['SecondaryMetric']
 		else:
@@ -1432,7 +1454,7 @@ class ReporterBase():
 			base.report_save()
 
 	def rt_table_get_smlst(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		# SELECT SecondaryMetric
 		# FROM MetricData
 		# -- WHERE MetricType = 'Agent'
@@ -1479,7 +1501,7 @@ class ReporterBase():
 		return smlst
 
 	def rt_table_get_isnumeric(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		if 'IsNumeric' in base.report[id]:
 			return int(base.report[id]['IsNumeric'])
 		else:
@@ -1494,7 +1516,7 @@ class ReporterBase():
 			base.report_save()
 
 	def rt_table_get_showcount(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		if 'ShowCount' in base.report[id]:
 			return int(base.report[id]['ShowCount'])
 		else:
@@ -2160,7 +2182,7 @@ class ReporterGUI(tk.Frame):
 		sizeup = int(fontsize * 0.1)
 		if sizeup < 1:
 			sizeup = int(1)
-		base.debugmsg(5, "sizeup:", sizeup)
+		base.debugmsg(8, "sizeup:", sizeup)
 
 		# Theme settings for ttk
 		self.style = ttk.Style()
@@ -2217,12 +2239,12 @@ class ReporterGUI(tk.Frame):
 				self.style.configure("Treeview", background=self.rootBackground)
 				self.style.configure("Treeview", fieldbackground=self.rootBackground)
 
-				base.debugmsg(5, "self.style_text_colour:	", self.style_text_colour)
-				base.debugmsg(5, "self.rootBackground:		", self.rootBackground)
+				base.debugmsg(9, "self.style_text_colour:	", self.style_text_colour)
+				base.debugmsg(9, "self.rootBackground:		", self.rootBackground)
 
 
 		layout = self.style.layout('TLabel')
-		base.debugmsg(5, "TLabel 	layout:", layout)
+		base.debugmsg(9, "TLabel 	layout:", layout)
 		# style.configure('TLabelHead', font =('calibri', 10, 'bold', 'underline'), foreground = 'red')
 		# style.configure('Head.TLabel', font =('calibri', 16, 'bold'), foreground = 'Blue')
 		# style.configure('Head.TLabel', foreground='blue')
@@ -2230,7 +2252,7 @@ class ReporterGUI(tk.Frame):
 
 
 		layout = self.style.layout('Head.TLabel')
-		base.debugmsg(5, "Head.TLabel 	layout:", layout)
+		base.debugmsg(9, "Head.TLabel 	layout:", layout)
 
 		# self.style.configure('Heading.TLabel', font=('Helvetica', 12))
 		# self.style.configure('Head.TLabel', font=('Helvetica', 12))
@@ -2241,7 +2263,7 @@ class ReporterGUI(tk.Frame):
 		self.style.configure('Report.TLabel', font=(fontname, fontsize))
 
 
-		base.debugmsg(5, "fontsize:", fontsize, "	sizeup:", sizeup, "	5*sizeup:", 5*sizeup, "	H1 size:", fontsize + (5*sizeup) )
+		base.debugmsg(9, "fontsize:", fontsize, "	sizeup:", sizeup, "	5*sizeup:", 5*sizeup, "	H1 size:", fontsize + (5*sizeup) )
 
 		self.style.configure("Report.H1.TLabel", foreground=self.style_head_colour)
 		# self.style.configure("Report.H1.TLabel", foreground=self.style_head_colour, background=self.style_reportbg_colour)
@@ -2249,7 +2271,7 @@ class ReporterGUI(tk.Frame):
 		# self.style.configure('Report.H1.TLabel', background=self.style_reportbg_colour)
 		# self.style.configure('Report.H1.TLabel', activebackground=self.style_reportbg_colour)
 		layout = self.style.layout('Report.H1.TLabel')
-		base.debugmsg(5, "Report.H1.TLabel 	layout:", layout)
+		base.debugmsg(9, "Report.H1.TLabel 	layout:", layout)
 
 		self.style.configure("Report.H2.TLabel", foreground=self.style_head_colour)
 		self.style.configure('Report.H2.TLabel', font=(fontname, fontsize + (4*sizeup) ))
@@ -2280,6 +2302,7 @@ class ReporterGUI(tk.Frame):
 		# self.style.configure('Report.TBody.TLabel', relief="ridge")
 		self.style.configure('Report.TBody.TLabel', relief="groove")
 
+		self.style.configure('Report.Settings.FileInput.TLabel', relief="sunken")
 
 
 	def BuildToolBar(self):
@@ -2390,7 +2413,7 @@ class ReporterGUI(tk.Frame):
 	def LoadSections(self, ParentID):
 		if ParentID == "TOP":
 			items = self.sectionstree.get_children("")
-			base.debugmsg(5, "items:", items)
+			base.debugmsg(9, "items:", items)
 			if len(items)>0:
 				# self.sectionstree.delete(items)
 				for itm in items:
@@ -2398,7 +2421,7 @@ class ReporterGUI(tk.Frame):
 			self.sectionstree.insert("", "end", ParentID, text="Report", open=True, tags=ParentID)
 		else:
 			items = self.sectionstree.get_children(ParentID)
-			base.debugmsg(5, "items:", items)
+			base.debugmsg(9, "items:", items)
 			if len(items)>0:
 				# self.sectionstree.delete(items)
 				for itm in items:
@@ -2406,7 +2429,7 @@ class ReporterGUI(tk.Frame):
 
 
 		sections = base.report_get_order(ParentID)
-		base.debugmsg(5, "sections:", sections)
+		base.debugmsg(9, "sections:", sections)
 		for sect in sections:
 			self.LoadSection(ParentID, sect)
 		# self.sectionstree.see("RS")
@@ -2417,9 +2440,9 @@ class ReporterGUI(tk.Frame):
 		self.sectionstree.tag_bind("Sect", callback=self.sect_click_sect)
 
 	def LoadSection(self, ParentID, sectionID):
-		base.debugmsg(5, "ParentID:", ParentID, "	sectionID:", sectionID)
+		base.debugmsg(9, "ParentID:", ParentID, "	sectionID:", sectionID)
 		sect_name = "{}".format(base.report[sectionID]["Name"])
-		base.debugmsg(5, "sect_name:", sect_name)
+		base.debugmsg(9, "sect_name:", sect_name)
 
 		self.sectionstree.insert(ParentID, "end", sectionID, text=sect_name, tags="Sect")
 		if "Order" in base.report[sectionID]:
@@ -2492,7 +2515,7 @@ class ReporterGUI(tk.Frame):
 
 		# first page, which would get widgets gridded into it
 		icontext = "Preview"
-		base.debugmsg(6, icontext)
+		base.debugmsg(8, icontext)
 
 		self.contentframe = tk.Frame(self.tabs, padx=0, pady=0, bd=0)	# , padx=0, pady=0
 		# self.contentframe.config(bg="salmon")
@@ -2536,9 +2559,9 @@ class ReporterGUI(tk.Frame):
 
 
 
-		base.debugmsg(6, "self.tabs:", self.tabs)
-		base.debugmsg(6, "self.tabs.tab(0):", self.tabs.tab(0))
-		base.debugmsg(6, "self.contentpreview:", self.contentpreview)
+		base.debugmsg(9, "self.tabs:", self.tabs)
+		base.debugmsg(9, "self.tabs.tab(0):", self.tabs.tab(0))
+		base.debugmsg(9, "self.contentpreview:", self.contentpreview)
 
 
 		# second page
@@ -2557,7 +2580,7 @@ class ReporterGUI(tk.Frame):
 		self.content_load("TOP")
 
 	def content_load(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(8, "id:", id)
 		# self.content_settings(id)
 		cs = threading.Thread(target=lambda: self.content_settings(id))
 		cs.start()
@@ -2571,7 +2594,7 @@ class ReporterGUI(tk.Frame):
 	#
 
 	def content_settings(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		# self.content
 		if id not in self.contentdata:
 			self.contentdata[id] = {}
@@ -2764,6 +2787,37 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["lblLI"].grid(column=0, row=rownum, sticky="nsew")
 
 
+		self.contentdata[id]["strLIPath"] = base.rs_setting_get_file("tlogo")
+		# self.contentdata[id]["strLIPath"] = '/Users/dave/Documents/GitHub/rfswarm/robots/Test_Images/yourlogohere.jpg'
+
+		self.contentdata[id]["strLIName"] = tk.StringVar()
+		self.contentdata[id]["eLIName"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strLIName"], state="readonly", justify="right", style='TEntry')
+		# Report.Settings.FileInput.TLabel
+		# self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=" ", style='Report.THead.TLabel')
+		self.contentdata[id]["eLIName"].grid(column=1, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["btnLIName"] = ttk.Button(self.contentdata[id]["Settings"], text="...", width=1) # , image=self.imgdata[icontext]
+		# self.contentdata[id]["btnLIName"].config(command=lambda: self.sr_file_validate(row))
+		self.contentdata[id]["btnLIName"].config(command=self.cs_select_logoimage)
+		self.contentdata[id]["btnLIName"].grid(column=2, row=rownum, sticky="nsew")
+
+
+		# flogo = base.rs_setting_get_file("tlogo")
+		# if flogo is not None:
+		if len(self.contentdata[id]["strLIPath"])>0:
+			base.debugmsg(5, "strLIPath:", self.contentdata[id]["strLIPath"])
+			path, filename = os.path.split(self.contentdata[id]["strLIPath"])
+			base.debugmsg(5, "filename:", filename, type(filename))
+			self.contentdata[id]["strLIName"].set(filename)
+
+
+		self.contentdata[id]["intLI"] = tk.IntVar()
+		self.contentdata[id]["intLI"].set(base.rs_setting_get_int("showtlogo"))
+		self.contentdata[id]["chkLI"] = ttk.Checkbutton(self.contentdata[id]["Settings"], variable=self.contentdata[id]["intLI"], command=self.cs_report_settings_update)
+		self.contentdata[id]["chkLI"].grid(column=col_disp, row=rownum, sticky="nsew")
+
+
+
 
 		# wattermark image
 		# rownum +=1
@@ -2778,7 +2832,7 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["lblFont"] = ttk.Label(self.contentdata[id]["Settings"], text="Font:")
 		self.contentdata[id]["lblFont"].grid(column=0, row=rownum, sticky="nsew")
 
-		base.debugmsg(6, "tkFont.families()", tkFont.families())
+		base.debugmsg(9, "tkFont.families()", tkFont.families())
 		fontlst = list(tkFont.families())
 
 		Fonts = [None] + fontlst
@@ -2870,12 +2924,20 @@ class ReporterGUI(tk.Frame):
 	def cs_report_settings_update(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
 		# id = self.sectionstree.focus()
-		# base.debugmsg(5, "id:", id)
+		# base.debugmsg(9, "id:", id)
 		id="TOP"
 
 		if "strTitle" in self.contentdata[id]:
 			base.rs_setting_set("title", self.contentdata[id]["strTitle"].get())
 
+
+		# base.rs_setting_set_file("tlogo", fpath)
+		if "strLIPath" in self.contentdata[id]:
+			base.rs_setting_set_file("tlogo", self.contentdata[id]["strLIPath"])
+
+		# showlogo
+		if "intLI" in self.contentdata[id]:
+			base.rs_setting_set_int("showtlogo", self.contentdata[id]["intLI"].get())
 
 
 		if "strDF" in self.contentdata[id]:
@@ -2919,13 +2981,38 @@ class ReporterGUI(tk.Frame):
 		regen = threading.Thread(target=self.cp_regenerate_preview)
 		regen.start()
 
+	def cs_select_logoimage(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+		id="TOP"
 
+		opendir = base.config['Reporter']['ResultDir']
+		if len(self.contentdata[id]["strLIPath"])>0:
+			opendir, filename = os.path.split(self.contentdata[id]["strLIPath"])
 
+		imagefile = str(tkf.askopenfilename(initialdir=opendir, title = "Select Logo Image", filetypes = (("JPEG","*.jpg"),("JPEG","*.jpeg"),("PNG","*.png"),("GIF","*.gif"),("Bitmap","*.bmp"),("all files","*.*"))))
+		base.debugmsg(5, "imagefile:", imagefile)
+
+		if imagefile is not None and len(imagefile)>0:
+			self.contentdata[id]["strLIPath"] = imagefile
+			base.debugmsg(5, "strLIPath:", self.contentdata[id]["strLIPath"])
+			base.rs_setting_set_file("tlogo", self.contentdata[id]["strLIPath"])
+			path, filename = os.path.split(self.contentdata[id]["strLIPath"])
+			base.debugmsg(5, "filename:", filename, type(filename))
+			self.contentdata[id]["strLIName"].set(filename)
+
+			regen = threading.Thread(target=self.cp_regenerate_preview)
+			regen.start()
+
+	def cs_select_watermarkimage(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+
+	def cs_select_hfimage(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
 
 	def cs_rename_heading(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
 		id = self.sectionstree.focus()
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		curhead = base.report_item_get_name(id)
 		newhead = self.contentdata[id]["Heading"].get()
 		base.debugmsg(5, "curhead:", curhead, "	newhead:", newhead)
@@ -2941,7 +3028,7 @@ class ReporterGUI(tk.Frame):
 	def cs_change_type(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
 		id = self.sectionstree.focus()
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 
 		# I might need to remove this ? self.contentdata[id]["Settings"]
 		# https://www.w3schools.com/python/gloss_python_remove_dictionary_items.asp
@@ -2962,7 +3049,7 @@ class ReporterGUI(tk.Frame):
 	#
 
 	def cs_note(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		# base.rt_note_get(id)
 		self.contentdata[id]["tNote"] = tk.Text(self.contentdata[id]["Frame"])
 		# background="yellow", foreground="blue"
@@ -2979,7 +3066,7 @@ class ReporterGUI(tk.Frame):
 	def cs_note_update(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
 		id = self.sectionstree.focus()
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		if "tNote" in self.contentdata[id]:
 			data = self.contentdata[id]["tNote"].get('0.0', tk.END)
 			base.debugmsg(5, "data:", data)
@@ -2993,7 +3080,7 @@ class ReporterGUI(tk.Frame):
 	#
 
 	def cs_datatable(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		colours = base.rt_table_get_colours(id)
 		datatype = base.rt_table_get_dt(id)
 		self.contentdata[id]["Frame"].columnconfigure(99, weight=1)
@@ -3044,7 +3131,7 @@ class ReporterGUI(tk.Frame):
 			name = base.report_item_get_name(_event)
 			if name is not None:
 				id = _event
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		if "intColours" in self.contentdata[id]:
 			colours = self.contentdata[id]["intColours"].get()
 			base.rt_table_set_colours(id, colours)
@@ -3111,7 +3198,7 @@ class ReporterGUI(tk.Frame):
 		cp.start()
 
 	def cs_datatable_update_metrics(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		tmt = threading.Thread(target=lambda: self.cs_datatable_update_metricstype(id))
 		tmt.start()
 		base.debugmsg(6, "tmt")
@@ -3124,17 +3211,17 @@ class ReporterGUI(tk.Frame):
 
 
 	def cs_datatable_update_metricstype(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		self.contentdata[id]["Metrics"] = base.rt_table_get_mlst(id)
 		self.contentdata[id]["omMT"].set_menu(*self.contentdata[id]["Metrics"])
 
 	def cs_datatable_update_pmetrics(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		self.contentdata[id]["PMetrics"] = base.rt_table_get_pmlst(id)
 		self.contentdata[id]["omPM"].set_menu(*self.contentdata[id]["PMetrics"])
 
 	def cs_datatable_update_smetrics(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		self.contentdata[id]["SMetrics"] = base.rt_table_get_smlst(id)
 		self.contentdata[id]["omSM"].set_menu(*self.contentdata[id]["SMetrics"])
 
@@ -3146,7 +3233,7 @@ class ReporterGUI(tk.Frame):
 			name = base.report_item_get_name(_event)
 			if name is not None:
 				id = _event
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		self.cs_datatable_update(id)
 		datatype = self.contentdata[id]["strDT"].get()
 		base.debugmsg(5, "datatype:", datatype)
@@ -3318,7 +3405,7 @@ class ReporterGUI(tk.Frame):
 	#
 
 	def cs_graph(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		datatype = base.rt_graph_get_dt(id)
 		self.contentdata[id]["Frame"].columnconfigure(99, weight=1)
 		rownum = 0
@@ -3340,7 +3427,7 @@ class ReporterGUI(tk.Frame):
 	def cs_graph_update(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
 		id = self.sectionstree.focus()
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		# if "tSQL" in self.contentdata[id]:
 		# 	data = self.contentdata[id]["tSQL"].get('0.0', tk.END)
 		# 	base.debugmsg(5, "data:", data)
@@ -3417,7 +3504,7 @@ class ReporterGUI(tk.Frame):
 			name = base.report_item_get_name(_event)
 			if name is not None:
 				id = _event
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		# self.cs_datatable_update(id)
 		datatype = self.contentdata[id]["strDT"].get()
 		base.debugmsg(5, "datatype:", datatype)
@@ -3560,7 +3647,8 @@ class ReporterGUI(tk.Frame):
 	#
 
 	def content_preview(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
+		self.updateStatus("Preview Loading.....")
 		self.cp_generate_preview(id)
 		# self.t_preview[id] = threading.Thread(target=lambda: self.cp_generate_preview(id))
 		# self.t_preview[id].start()
@@ -3576,6 +3664,7 @@ class ReporterGUI(tk.Frame):
 		self.contentcanvas.config(scrollregion=self.contentpreview.bbox("all"))
 
 		# self.contentpreview.columnconfigure(0, weight=1)
+		self.updateStatus("Preview Loaded")
 
 	def cp_regenerate_preview(self):
 		# self.contentdata = {}
@@ -3587,7 +3676,7 @@ class ReporterGUI(tk.Frame):
 
 
 	def cp_generate_preview(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(8, "id:", id)
 		# if id not in self.contentdata:
 		while id not in self.contentdata:
 			time.sleep(0.1)
@@ -3603,7 +3692,7 @@ class ReporterGUI(tk.Frame):
 		else:
 			base.debugmsg(8, "report_item_get_changed:", base.report_item_get_changed(id), "	contentdata Changed:", self.contentdata[id]["Changed"])
 
-		base.debugmsg(5, "gen:", gen)
+		base.debugmsg(7, "gen:", gen)
 		if gen:
 			while "Preview" not in self.contentdata[id]:
 				time.sleep(0.1)
@@ -3619,7 +3708,7 @@ class ReporterGUI(tk.Frame):
 				# self.contentdata[id]["lblpreview"].grid(column=0, row=0, sticky="nsew")
 
 				titlenum = base.report_sect_number(id)
-				base.debugmsg(5, "titlenum:", titlenum)
+				base.debugmsg(8, "titlenum:", titlenum)
 				title = "{} {}".format(titlenum, base.report_item_get_name(id))
 				level = base.report_sect_level(id)
 				tstyle = 'Report.TLabel'
@@ -3658,7 +3747,7 @@ class ReporterGUI(tk.Frame):
 
 				self.contentdata[id]["rownum"] = rownum + 1
 				type = base.report_item_get_type(id)
-				base.debugmsg(5, "type:", type)
+				base.debugmsg(8, "type:", type)
 				if type == 'note':
 					self.cp_note(id)
 				if type == 'table':
@@ -3674,7 +3763,7 @@ class ReporterGUI(tk.Frame):
 			# self.t_preview[child].start()
 
 	def cp_display_preview(self, id, row):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		if id in self.t_preview:
 			if self.t_preview[id].is_alive():
 				self.t_preview[id].join()
@@ -3687,18 +3776,22 @@ class ReporterGUI(tk.Frame):
 
 		self.contentdata[id]["Preview"].grid(column=0, row=row, sticky="nsew")
 		nextrow = row+1
-		base.debugmsg(5, "nextrow:", nextrow)
+		base.debugmsg(9, "nextrow:", nextrow)
 		children = base.report_get_order(id)
 		for child in children:
 			nextrow = self.cp_display_preview(child, nextrow)
 		return nextrow
 
 	def cp_titlepage(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 
 		self.contentdata[id]["Preview"].columnconfigure(0, weight=1)
+		# self.contentdata[id]["Preview"].columnconfigure(1, weight=1)
 		self.contentdata[id]["Preview"].columnconfigure(2, weight=1)
+		# self.contentdata[id]["Preview"].columnconfigure(3, weight=1)
+		self.contentdata[id]["Preview"].columnconfigure(4, weight=1)
 		colcontent = 1
+		colimg = 2
 
 		# Title
 		#  top: 1	centre: 11	bottom:	21
@@ -3706,10 +3799,35 @@ class ReporterGUI(tk.Frame):
 
 		title = "{}".format(base.rs_setting_get_title())
 		self.contentdata[id]["lblTitle"] = ttk.Label(self.contentdata[id]["Preview"], text=title, style='Report.Title1.TLabel')
-		self.contentdata[id]["lblTitle"].grid(column=colcontent, row=rownum, sticky="nsew")
+		self.contentdata[id]["lblTitle"].grid(column=colcontent, columnspan=3, row=rownum, sticky="nsew")
 
 		# Logo
 		#  top: 2	centre: 12	bottom:	22
+		rownum = 12
+
+		base.debugmsg(5, "showtlogo:", base.rs_setting_get_int("showtlogo"))
+		if base.rs_setting_get_int("showtlogo"):
+			# flogo = '/Users/dave/Documents/GitHub/rfswarm/robots/Test_Images/209-2090030_your-logo-here.png'
+			# flogo = '/Users/dave/Documents/GitHub/rfswarm/robots/Test_Images/BrandNameHere.jpg'
+			# flogo = '/Users/dave/Documents/GitHub/rfswarm/robots/Test_Images/yourlogohere.jpg'
+			# self.contentdata[id]["strLIPath"] = base.rs_setting_get_file("tlogo")
+			while "strLIPath" not in self.contentdata[id]:
+				time.sleep(0.1)
+			base.debugmsg(5, "strLIPath:", self.contentdata[id]["strLIPath"])
+			if self.contentdata[id]["strLIPath"] is not None and len(self.contentdata[id]["strLIPath"])>0:
+				self.contentdata[id]["oimg"] = Image.open(self.contentdata[id]["strLIPath"])
+				base.debugmsg(5, "oimg:", self.contentdata[id]["oimg"])
+
+				self.contentdata[id]["ologo"] = ImageTk.PhotoImage(self.contentdata[id]["oimg"])
+				base.debugmsg(5, "ologo:", self.contentdata[id]["ologo"])
+
+				# display an image label
+				# ologo = tk.PhotoImage(file=flogo)
+				self.contentdata[id]["lblLogo"] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id]["ologo"])
+				# , padding=5
+				self.contentdata[id]["lblLogo"].grid(column=colimg, row=rownum, sticky="nsew")
+
+
 
 		# Execution Date range
 		#  top: 3	centre: 13	bottom:	23
@@ -3739,14 +3857,14 @@ class ReporterGUI(tk.Frame):
 					execdr = "{} - {} {}".format(execdr, fED, fET)
 
 		self.contentdata[id]["lblTitle"] = ttk.Label(self.contentdata[id]["Preview"], text=execdr, style='Report.Title2.TLabel')
-		self.contentdata[id]["lblTitle"].grid(column=colcontent, row=rownum, sticky="nsew")
+		self.contentdata[id]["lblTitle"].grid(column=colcontent, columnspan=3, row=rownum, sticky="nsew")
 
 
 
 
 
 	def cp_note(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		rownum = self.contentdata[id]["rownum"]
 		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text="    ", style='Report.TLabel')
 		self.contentdata[id]["lblSpacer"].grid(column=0, row=rownum, sticky="nsew")
@@ -3758,7 +3876,7 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["Preview"].columnconfigure(1, weight=1)
 
 	def cp_graph(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		datatype = base.rt_graph_get_dt(id)
 		if datatype == "SQL":
 			sql = base.rt_graph_get_sql(id)
@@ -3800,7 +3918,7 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["canvas"].get_tk_widget().grid(column=0, row=0, sticky="nsew")
 		# self.contentdata[id]["canvas"].get_tk_widget().config(bg="blue")
 
-		base.debugmsg(5, "canvas:", self.contentdata[id]["canvas"])
+		base.debugmsg(8, "canvas:", self.contentdata[id]["canvas"])
 
 
 		try:
@@ -3832,7 +3950,7 @@ class ReporterGUI(tk.Frame):
 						self.contentdata[id]["graphdata"][name] = {}
 
 						colour = base.named_colour(name)
-						base.debugmsg(6, "name:", name, "	colour:", colour)
+						base.debugmsg(8, "name:", name, "	colour:", colour)
 						self.contentdata[id]["graphdata"][name]["Colour"] = colour
 						# self.contentdata[id]["graphdata"][name]["Time"] = []
 						self.contentdata[id]["graphdata"][name]["objTime"] = []
@@ -3849,12 +3967,18 @@ class ReporterGUI(tk.Frame):
 			for name in self.contentdata[id]["graphdata"]:
 				base.debugmsg(7, "name:", name)
 				if len(self.contentdata[id]["graphdata"][name]["Values"])>1 and len(self.contentdata[id]["graphdata"][name]["Values"])==len(self.contentdata[id]["graphdata"][name]["objTime"]):
-					self.contentdata[id]["axis"].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name)
-					dodraw = True
+					try:
+						self.contentdata[id]["axis"].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name)
+						dodraw = True
+					except Exception as e:
+						base.debugmsg(7, "axis.plot() Exception:", e)
 
 				if len(self.contentdata[id]["graphdata"][name]["Values"])==1 and len(self.contentdata[id]["graphdata"][name]["Values"])==len(self.contentdata[id]["graphdata"][name]["objTime"]):
-					self.contentdata[id]["axis"].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name, marker='o')
-					dodraw = True
+					try:
+						self.contentdata[id]["axis"].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name, marker='o')
+						dodraw = True
+					except Exception as e:
+						base.debugmsg(7, "axis.plot() Exception:", e)
 
 			if dodraw:
 
@@ -3863,7 +3987,7 @@ class ReporterGUI(tk.Frame):
 				SMetric = "Other"
 				if datatype == "Metric":
 					SMetric = base.rt_table_get_sm(id)
-				base.debugmsg(6, "SMetric:", SMetric)
+				base.debugmsg(8, "SMetric:", SMetric)
 				if SMetric in ["Load", "CPU", "MEM", "NET"]:
 					self.contentdata[id]["axis"].set_ylim(0, 100)
 				else:
@@ -3884,7 +4008,7 @@ class ReporterGUI(tk.Frame):
 
 
 	def cp_table(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(9, "id:", id)
 		datatype = base.rt_table_get_dt(id)
 		if datatype == "SQL":
 			sql = base.rt_table_get_sql(id)
