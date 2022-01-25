@@ -2091,6 +2091,7 @@ class ReporterGUI(tk.Frame):
 		accelkey = "Ctrl"
 		if sys.platform.startswith('darwin'):
 			accelkey = "Command"
+		shifkey = "Shift"
 
 		results_menu.add_command(label = "Open", command = self.mnu_results_Open, accelerator="{}-o".format(accelkey))
 		window.bind("<{}-o>".format(accelkey), self.mnu_results_Open)
@@ -2113,8 +2114,8 @@ class ReporterGUI(tk.Frame):
 		window.bind("<{}-t>".format(accelkey), self.mnu_template_Open)
 		self.template_menu.add_command(label = "Save", command = self.mnu_template_Save, accelerator="{}-s".format(accelkey))
 		window.bind("<{}-s>".format(accelkey), self.mnu_template_Save)
-		self.template_menu.add_command(label = "Save As", command = self.mnu_template_SaveAs, accelerator="{}-a".format(accelkey))
-		window.bind("<{}-a>".format(accelkey), self.mnu_template_SaveAs)
+		self.template_menu.add_command(label = "Save As", command = self.mnu_template_SaveAs, accelerator="{}-{}-s".format(accelkey, shifkey))
+		window.bind("<{}-S>".format(accelkey), self.mnu_template_SaveAs)
 
 
 
@@ -3739,10 +3740,12 @@ class ReporterGUI(tk.Frame):
 		# if len(curritem)>0:
 		# 	curritem[0].grid_forget()
 		curritems = self.contentpreview.grid_slaves()
+		# count = len(curritems)
 		for curritem in curritems:
 			curritem.grid_forget()
 		self.cp_display_preview(id, 0)
 		self.contentcanvas.config(scrollregion=self.contentpreview.bbox("all"))
+		# self.contentpreview.columnconfigure(0, weight=1)
 
 		# self.contentpreview.columnconfigure(0, weight=1)
 		self.updateStatus("Preview Loaded")
@@ -3857,6 +3860,8 @@ class ReporterGUI(tk.Frame):
 		while "Preview" not in self.contentdata[id]:
 			time.sleep(0.1)
 
+		self.updateStatus("Preview Loading..... ({})".format(str(row)))
+
 		self.contentdata[id]["Preview"].grid(column=0, row=row, sticky="nsew")
 		nextrow = row+1
 		base.debugmsg(9, "nextrow:", nextrow)
@@ -3949,11 +3954,23 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text="    ", style='Report.TLabel')
 		self.contentdata[id]["lblSpacer"].grid(column=0, row=rownum, sticky="nsew")
 
-		type = base.report_item_get_type(id)
+		self.contentdata[id]["fmeTOC"] = tk.Frame(self.contentdata[id]["Preview"])
+		# self.contentdata[id]["fmeGraph"].config(bg="green")
+		self.contentdata[id]["fmeTOC"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[id]["Preview"].columnconfigure(1, weight=1)
+
 		mode = base.rt_contents_get_mode(id)
 		level = base.rt_contents_get_level(id)
 
-		base.debugmsg(5, "type:", type, "	mode:", mode, "	level:", level)
+		base.debugmsg(5, "mode:", mode, "	level:", level)
+		fmode = None
+		if mode == "Table Of Contents":
+			fmode = None
+		if mode == "Table of Graphs":
+			fmode = "graph"
+		if mode == "Table Of Tables":
+			fmode = "table"
+
 
 		# notetxt = "{}".format(base.rt_note_get(id))
 		# self.contentdata[id]["lblNote"] = ttk.Label(self.contentdata[id]["Preview"], text=notetxt, style='Report.TLabel')
@@ -3961,15 +3978,18 @@ class ReporterGUI(tk.Frame):
 		#
 		# self.contentdata[id]["Preview"].columnconfigure(1, weight=1)
 
-		self.cp_contents_row("TOP", rownum, None, level)
+		self.cp_contents_row("TOP", rownum, id, fmode, level)
 
 
-	def cp_contents_row(self, id, row, fmode, flevel):
-		base.debugmsg(5, "id:", id, "	row:", row, "	fmode:", fmode, "	flevel:", flevel)
+	def cp_contents_row(self, id, rownum, fid, fmode, flevel):
+		base.debugmsg(5, "id:", id, "	rownum:", rownum, "	fmode:", fmode, "	flevel:", flevel)
 		display = True
 
+		level = base.report_sect_level(id)
 		if id == "TOP":
 			display = False
+			level = 0
+		base.debugmsg(5, "level:", level)
 
 		if display and fmode is not None:
 			display = False
@@ -3977,24 +3997,47 @@ class ReporterGUI(tk.Frame):
 			if fmode == type:
 				display = True
 
-		level = base.rt_contents_get_level(id)
-		base.debugmsg(5, "level:", level)
 		if display and level > flevel:
 			display = False
 
-		nextrow = row
+		nextrow = rownum
 		if display:
+			type = base.report_item_get_type(id)
 			titlenum = base.report_sect_number(id)
 			titlename = base.report_item_get_name(id)
 			titlelevel = base.report_sect_level(id)
-			base.debugmsg(5, "titlenum:", titlenum, "	titlename:", titlename, "	titlelevel:", titlelevel)
+			base.debugmsg(6, "type:", type, "	titlenum:", titlenum, "	titlename:", titlename, "	titlelevel:", titlelevel)
 
-			nextrow = row+1
+			numarr = titlenum.split(".")
+			base.debugmsg(5, "numarr:", numarr)
+			pagenum = int(numarr[0])+1
+			base.debugmsg(5, "pagenum:", pagenum)
+
+			colnum = 1
+			cellname = "{}_{}".format(id, colnum)
+			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(titlenum))
+			self.contentdata[fid][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+			colnum += 1
+			cellname = "{}_{}".format(id, colnum)
+			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(titlename))
+			self.contentdata[fid][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+			colnum += 1
+			self.contentdata[fid]["fmeTOC"].columnconfigure(colnum, weight=1)
+
+			colnum += 1
+			cellname = "{}_{}".format(id, colnum)
+			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(pagenum))
+			self.contentdata[fid][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+
+			nextrow = rownum+1
 		base.debugmsg(9, "nextrow:", nextrow)
 		if level < flevel:
 			children = base.report_get_order(id)
 			for child in children:
-				nextrow = self.cp_contents_row(child, nextrow, fmode, flevel)
+				nextrow = self.cp_contents_row(child, nextrow, fid, fmode, flevel)
 		return nextrow
 
 
