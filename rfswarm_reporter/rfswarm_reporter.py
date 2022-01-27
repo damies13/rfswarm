@@ -29,6 +29,14 @@ import argparse
 import configparser
 import tempfile
 
+# used for xhtml export
+# import xml.etree.ElementTree as ET
+from lxml import etree
+from lxml.builder import ElementMaker,E
+
+# used for xhtml export
+
+
 
 import tkinter as tk				#python3
 import tkinter.ttk as ttk			#python3
@@ -1754,6 +1762,7 @@ class ReporterBase():
 
 class ReporterCore:
 
+	cg_data = {}
 
 	def __init__(self, master=None):
 		base.debugmsg(0, "Robot Framework Swarm: Reporter")
@@ -1906,6 +1915,113 @@ class ReporterCore:
 			base.saveini()
 			# base.open_results_db(base.config['Reporter']['Results'])
 			base.start_db()
+
+	def display_message(self, mesage):
+		if base.displaygui:
+			base.gui.updateStatus(mesage)
+		else:
+			base.debugmsg(1, "mesage:", mesage)
+
+
+	def export_xhtml(self):
+		base.debugmsg(5, "Not implimented yet.....")
+		self.display_message("Generating XHTML Report")
+
+		sections = base.report_get_order("TOP")
+		base.debugmsg(5, "sections:", sections)
+		sectionpct = 1/(len(sections)+1)
+		base.debugmsg(5, "sectionpct:", sectionpct)
+
+		if "XHTML" in self.cg_data:
+			if "progress" in self.cg_data["XHTML"] and self.cg_data["XHTML"]["progress"]<1:
+				self.display_message("Waiting for previous XHTML report to finish")
+				while self.cg_data["XHTML"]["progress"]<1:
+					time.sleep(0.5)
+			del self.cg_data["XHTML"]
+		self.cg_data["XHTML"] = {}
+		self.cg_data["XHTML"]["progress"] = 0.0
+
+		html = self.xhtml_base_doc()
+
+		# set HTML Title
+		title = html.xpath("//head/title")[0]
+		title.text = base.rs_setting_get_title()
+
+
+
+		outfile = 'output.html'
+		self.xhtml_save(outfile, html)
+
+
+		self.cg_data["XHTML"]["progress"] = 1
+
+
+	def export_pdf(self):
+		base.debugmsg(5, "Not implimented yet.....")
+
+	def export_word(self):
+		base.debugmsg(5, "Not implimented yet.....")
+
+	def export_writer(self):
+		base.debugmsg(5, "Not implimented yet.....")
+
+	def export_excel(self):
+		base.debugmsg(5, "Not implimented yet.....")
+
+	def export_calc(self):
+		base.debugmsg(5, "Not implimented yet.....")
+
+
+	#
+	# 	XHTML
+	#
+	def xhtml_save(self, filename, html):
+		result = etree.tostring(
+			html,
+			xml_declaration=True,
+			doctype='<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">',
+			encoding='utf-8',
+			standalone=False,
+			with_tail=False,
+			method='html',
+			pretty_print=True)
+
+		with open(filename, "wb") as f:
+			f.write(result)
+
+
+
+	def xhtml_base_doc(self):
+		base.debugmsg(5, "Not implimented yet.....")
+		# https://www.w3schools.com/html/html_xhtml.asp
+
+		# <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+		# "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+		# <html xmlns="http://www.w3.org/1999/xhtml">
+		# <head>
+		#   <title>Title of document</title>
+		# </head>
+		# <body>
+		#
+		#   some content here...
+		#
+		# </body>
+		# </html>
+
+
+		M=ElementMaker(namespace=None, nsmap={None: "http://www.w3.org/1999/xhtml"})
+		# html = M.html(E.head(E.title("Test page")), E.body(E.p("Hello world")))
+		html = M.html(E.head(E.title("Test page")), E.body())
+
+		return html
+
+	#
+	# 	MS Word
+	#
+
+	#
+	# 	MS Excel
+	#
 
 
 class ReporterGUI(tk.Frame):
@@ -2434,45 +2550,51 @@ class ReporterGUI(tk.Frame):
 		# "Export HTML"		page_white_world.gif			HTML - Issue #36
 		btnno += 1
 		icontext = "Export HTML"
-		bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_do_nothing)
+		bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_export_html)
 		bnew.grid(column=btnno, row=0, sticky="nsew")
 		# https://github.com/eea/odfpy		MHT and HTML
+		# https://docs.python.org/3/library/markup.html
+		# https://github.com/CenterForOpenScience/pydocx
 
 
-		# "Export PDF"		page_white_acrobat.png
-		btnno += 1
-		icontext = "Export PDF"
-		bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_do_nothing)
-		bnew.grid(column=btnno, row=0, sticky="nsew")
+		# # "Export PDF"		page_white_acrobat.png
+		# btnno += 1
+		# icontext = "Export PDF"
+		# bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_export_pdf)
+		# bnew.grid(column=btnno, row=0, sticky="nsew")
 
-		# "Export Writer"		page_writer.gif
-		btnno += 1
-		icontext = "Export Writer"
-		bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_do_nothing)
-		bnew.grid(column=btnno, row=0, sticky="nsew")
-		# https://github.com/eea/odfpy
+		# # "Export Writer"		page_writer.gif
+		# btnno += 1
+		# icontext = "Export Writer"
+		# bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_export_writer)
+		# bnew.grid(column=btnno, row=0, sticky="nsew")
+		# # https://github.com/eea/odfpy
+		# # https://en.wikipedia.org/wiki/OpenDocument_technical_specification
+		# # https://docs.python.org/3/library/zipfile.html
 
 		# "Export Word"		page_word.png					Word - Issue #38
 		btnno += 1
 		icontext = "Export Word"
-		bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_do_nothing)
+		bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_export_word)
 		bnew.grid(column=btnno, row=0, sticky="nsew")
 		# https://python-docx.readthedocs.io/en/latest/
 		# https://github.com/python-openxml/python-docx
+		# http://officeopenxml.com/
+		# https://docs.python.org/3/library/zipfile.html
 
-		# "Export Calc"		page_calc.gif
-		btnno += 1
-		icontext = "Export Calc"
-		bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_do_nothing)
-		bnew.grid(column=btnno, row=0, sticky="nsew")
-		# https://github.com/pyexcel/pyexcel
-		# https://github.com/pyexcel/pyexcel-ods
+		# # "Export Calc"		page_calc.gif
+		# btnno += 1
+		# icontext = "Export Calc"
+		# bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_export_calc)
+		# bnew.grid(column=btnno, row=0, sticky="nsew")
+		# # https://github.com/pyexcel/pyexcel
+		# # https://github.com/pyexcel/pyexcel-ods
 
 
 		# "Export Excel"		page_excel.png				Excel - Issue #37
 		btnno += 1
 		icontext = "Export Excel"
-		bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_do_nothing)
+		bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_export_excel)
 		bnew.grid(column=btnno, row=0, sticky="nsew")
 		# https://xlsxwriter.readthedocs.io/introduction.html
 		# https://openpyxl.readthedocs.io/en/stable/index.html
@@ -4397,6 +4519,27 @@ class ReporterGUI(tk.Frame):
 						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(row[col]), style='Report.TBody.TLabel')
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
+	#
+	# Export content generation functions
+	#
+	def cg_export_xhtml(self):
+		# base.debugmsg(5, "Not implimented yet.....")
+		core.export_xhtml()
+
+	def cg_export_pdf(self):
+		base.debugmsg(5, "Not implimented yet.....")
+
+	def cg_export_writer(self):
+		base.debugmsg(5, "Not implimented yet.....")
+
+	def cg_export_word(self):
+		base.debugmsg(5, "Not implimented yet.....")
+
+	def cg_export_calc(self):
+		base.debugmsg(5, "Not implimented yet.....")
+
+	def cg_export_excel(self):
+		base.debugmsg(5, "Not implimented yet.....")
 
 
 
@@ -4550,6 +4693,40 @@ class ReporterGUI(tk.Frame):
 		# self.cbbar.bsett.config(relief=tk.RAISED)
 		# self.cbbar.bprev.config(state=tk.ACTIVE)
 		# self.cbbar.bsett.config(state=tk.NORMAL)
+
+	# Export Functions
+	def mnu_export_html(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+		cghtml = threading.Thread(target=self.cg_export_xhtml)
+		cghtml.start()
+
+	def mnu_export_pdf(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+		cgpdf = threading.Thread(target=self.cg_export_pdf)
+		cgpdf.start()
+
+	def mnu_export_writer(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+		cgwriter = threading.Thread(target=self.cg_export_writer)
+		cgwriter.start()
+
+	def mnu_export_word(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+		cgword = threading.Thread(target=self.cg_export_word)
+		cgword.start()
+
+	def mnu_export_calc(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+		cgcalc = threading.Thread(target=self.cg_export_calc)
+		cgcalc.start()
+
+	def mnu_export_excel(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+		cgxcel = threading.Thread(target=self.cg_export_excel)
+		cgxcel.start()
+
+
+
 
 
 class RFSwarm_Reporter():
