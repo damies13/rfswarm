@@ -2131,6 +2131,10 @@ class ReporterCore:
 		# a.set('href', "#{}".format(id))
 
 
+	def xhtml_sections_embedimg(self, elmt, id, imgdata):
+		base.debugmsg(5, "id:", id, "	imgdata:", imgdata)
+		# <img src="data:image/png;base64,
+
 
 	#
 	# 	MS Word
