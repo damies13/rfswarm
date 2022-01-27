@@ -1916,15 +1916,18 @@ class ReporterCore:
 			# base.open_results_db(base.config['Reporter']['Results'])
 			base.start_db()
 
-	def display_message(self, mesage):
+	def display_message(self, *mesage):
 		if base.displaygui:
-			base.gui.updateStatus(mesage)
+			msglst = []
+			for msg in mesage:
+				msglst.append(msg)
+			msgout = " ".join(msglst)
+			base.gui.updateStatus(msgout)
 		else:
 			base.debugmsg(1, "mesage:", mesage)
 
 
 	def export_xhtml(self):
-		base.debugmsg(5, "Not implimented yet.....")
 		self.display_message("Generating XHTML Report")
 
 		sections = base.report_get_order("TOP")
@@ -1941,17 +1944,46 @@ class ReporterCore:
 		self.cg_data["XHTML"] = {}
 		self.cg_data["XHTML"]["progress"] = 0.0
 
-		html = self.xhtml_base_doc()
+		self.cg_data["XHTML"]["html"] = self.xhtml_base_doc()
 
 		# set HTML Title
-		title = html.xpath("//head/title")[0]
+		title = self.cg_data["XHTML"]["html"].xpath("//head/title")[0]
 		title.text = base.rs_setting_get_title()
 
+		head = self.cg_data["XHTML"]["html"].xpath("//head")[0]
+
+		style = etree.SubElement(head, 'style')
+		highlightcolour = base.rs_setting_get_hcolour()
+
+		styledata  = ""
+		styledata += ".center { text-align: center; }"
+		styledata += ".title { font-size: 200%;}"
+		styledata += ".subtitle { font-size: 150%;}"
+		styledata += "h1	{color: "+highlightcolour+";}"
+		styledata += "h2	{color: "+highlightcolour+";}"
+		styledata += "h3	{color: "+highlightcolour+";}"
+		styledata += "h4	{color: "+highlightcolour+";}"
+		styledata += "h5	{color: "+highlightcolour+";}"
+		styledata += "h6	{color: "+highlightcolour+";}"
+
+		style.text = styledata
+
+		body = self.cg_data["XHTML"]["html"].xpath("//body")[0]
+
+		# self.cg_data["XHTML"]["html"] =
+		self.xhtml_add_sections(body, "TOP", sectionpct)
 
 
-		outfile = 'output.html'
-		self.xhtml_save(outfile, html)
 
+
+		base.debugmsg(5, "Report:", base.config['Reporter']['Report'])
+		reportbase, reportext = os.path.splitext(base.config['Reporter']['Report'])
+
+		outfile = "{}.html".format(reportbase)
+		self.xhtml_save(outfile, self.cg_data["XHTML"]["html"])
+
+		base.debugmsg(5, "outfile:", outfile)
+		self.display_message("Saved XHTML Report:",outfile)
 
 		self.cg_data["XHTML"]["progress"] = 1
 
@@ -1989,10 +2021,7 @@ class ReporterCore:
 		with open(filename, "wb") as f:
 			f.write(result)
 
-
-
 	def xhtml_base_doc(self):
-		base.debugmsg(5, "Not implimented yet.....")
 		# https://www.w3schools.com/html/html_xhtml.asp
 
 		# <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
@@ -2014,6 +2043,94 @@ class ReporterCore:
 		html = M.html(E.head(E.title("Test page")), E.body())
 
 		return html
+
+	def xhtml_add_sections(self, parent, id, sectionpct):
+		base.debugmsg(5, "id:", id, "	sectionpct:", sectionpct)
+		# SubElement(_parent, _tag, attrib=None, nsmap=None, **_extra)
+		# thiselmt = E.SubElement(parent, 'div', attrib={'id':id})
+
+
+
+		base.debugmsg(5, "parent:", parent)
+
+
+		sections = base.report_get_order(id)
+		base.debugmsg(5, "sections:", sections)
+
+		thiselmt = etree.SubElement(parent, 'div')
+		nextparent = thiselmt
+		if id == "TOP":
+			thiselmt.set("id", "TitlePage")
+			nextparent = parent
+
+			#
+			# Title
+			#
+			maintitle = etree.SubElement(thiselmt, 'div')
+			maintitle.set("class", "title center")
+			maintitle.text = base.rs_setting_get_title()
+
+			#
+			# Logo
+			#
+
+			#
+			# Execution Date range
+			#
+			subtitle = etree.SubElement(thiselmt, 'div')
+			subtitle.set("class", "subtitle center")
+			execdr = ""
+			if base.rs_setting_get_int("showstarttime"):
+				iST = base.report_starttime()
+				fSD = "{}".format(base.report_formatdate(iST))
+				fST = "{}".format(base.report_formattime(iST))
+
+				execdr = "{} {}".format(fSD, fST)
+
+			if base.rs_setting_get_int("showendtime"):
+				iET = base.report_endtime()
+				fED = "{}".format(base.report_formatdate(iET))
+				fET = "{}".format(base.report_formattime(iET))
+
+				if not base.rs_setting_get_int("showstarttime"):
+					execdr = "{} {}".format(fED, fET)
+				else:
+					if fSD == fED:
+						execdr = "{} - {}".format(execdr, fET)
+					else:
+						execdr = "{} - {} {}".format(execdr, fED, fET)
+
+			subtitle.text = execdr
+
+		else:
+			thiselmt.set("id", id)
+			newsectionpct = 1/(len(sections)+1)
+			sectionpct = newsectionpct * sectionpct
+			base.debugmsg(5, "sectionpct:", sectionpct)
+			self.xhtml_sections_addheading(thiselmt, id)
+
+		if len(sections)>0:
+			for sect in sections:
+				self.xhtml_add_sections(nextparent, sect, sectionpct)
+
+	def xhtml_sections_addheading(self, elmt, id):
+		base.debugmsg(5, "id:", id)
+		level = base.report_sect_level(id)
+		base.debugmsg(5, "level:", level)
+		number = base.report_sect_number(id)
+		base.debugmsg(5, "number:", number)
+		name = base.report_item_get_name(id)
+		base.debugmsg(5, "name:", name)
+
+		tag = "h{}".format(level)
+
+		h = etree.SubElement(elmt, tag)
+		h.text = "{} {}".format(number, name)
+		# a = etree.SubElement(h, 'a')
+		# a.text = "{} {}".format(number, name)
+		# a.set('href', "#{}".format(id))
+
+
 
 	#
 	# 	MS Word
