@@ -35,6 +35,8 @@ import tkinter.ttk as ttk			#python3
 import tkinter.filedialog as tkf	#python3
 import tkinter.messagebox as tkm	#python3
 import tkinter.simpledialog as tksd
+# from tkinter.colorchooser import askcolor
+import tkinter.colorchooser as tkac
 import tkinter.font as tkFont
 
 # required for company logo's (I beleive this is a depandancy of matplotlib anyway)
@@ -454,6 +456,13 @@ class ReporterBase():
 		value = self.rs_setting_get('title')
 		if value is None:
 			return 'Report Title'
+		else:
+			return value
+
+	def rs_setting_get_hcolour(self):
+		value = self.rs_setting_get('hcolour')
+		if value is None:
+			return "#00F" # Blue
 		else:
 			return value
 
@@ -1899,7 +1908,6 @@ class ReporterCore:
 			base.start_db()
 
 
-
 class ReporterGUI(tk.Frame):
 
 	style_reportbg_colour = "white"
@@ -1985,6 +1993,15 @@ class ReporterGUI(tk.Frame):
 		self.imgdata["Settings"] = self.get_icon("cog.gif")
 
 
+		# settings buttons
+		# "Select Image"	picture.gif
+		self.imgdata["Select Image"] = self.get_icon("picture.gif")
+		# "Select Colour"	color_swatch.gif
+		self.imgdata["Select Colour"] = self.get_icon("color_swatch.gif")
+
+
+
+
 	def get_icon(self, imagefile):
 		if len(self.b64) < 1:
 			self.load_b64()
@@ -2055,6 +2072,9 @@ class ReporterGUI(tk.Frame):
 
 		self.b64["page_writer.gif"] = b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00\x00\x00C\x00)R\x146S\x007\\\x19;X\x16?_\x00@d"Db,Ge-He7Md)On,Qo1Sl#Tu\x00UU\x00U|AUmUUUUU\xaa:^}&_\x83\x00c\x8ffff]j|Ck\x8cFk\x86Jk\x869m\x8cKo\x8cbo~ar\x84Zs\x8cOw\x96Ex\x9bVz\x94i}\x92@\x80\x80\x80\x80\x80Y\x83\xa3c\x85\x9e{\x88\x95y\x8a\x9a\x86\x98\xa9\x89\x99\xa5~\x9a\xb1\x85\x9c\xb1\x99\x9f\xa7\x8c\xa8\xbfU\xaa\xaa\x9d\xac\xb7\xa6\xb1\xbd\xaa\xb3\xbb\x92\xb6\xb6\xa0\xb6\xc8\xb1\xbb\xc4\xb9\xc6\xd1\xbe\xca\xd4\xc3\xcc\xd5\xbc\xce\xda\xc6\xd0\xdb\xcc\xd3\xda\xd1\xd3\xd6\xc5\xd7\xe4\xcc\xd7\xe0\xd1\xd7\xdc\xd2\xd9\xde\xcf\xda\xe1\xd5\xde\xe4\xcc\xe0\xef\xd6\xe1\xea\xdb\xe1\xe7\xda\xe4\xec\xe0\xe6\xea\xe3\xe9\xed\xe9\xec\xee\xe0\xed\xf8\xe7\xed\xf3\xeb\xee\xf1\xee\xf2\xf6\xf3\xf4\xf6\xf5\xf7\xf9\xf5\xfa\xfd\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00U\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xb8\x80U\x82\x16\x11BTNJQL8\x82\x8dU>A=MIDISS7)\x8e85%,<CPOCH/\x17"\x8eU!4ONE>EK9/1.\x8dIGEF@HP\xbe\xa2PCU99-\x02\x1f\xb1TRR\x97S\xca\x8e\x04\x12QT\xd4\xd5\xd5\x8e\n\x01?\xcaQ\xdd\xdd\xd4\x8e\t\x010TJ;>\xe8;\xe0\x8d\x08\x02\x19TL>C\xf3\xd7\xec\x06\x08\x8a>BB\xe8\xeb\x82\x0c\r\x0e0y\x82\x0e\x1d\x13\x7fU*Tx\xf0\x84\xe0\x90}\xd3\xa88\xd2\xa0\xc1\xc3\x13s>z\xf4\xd0A%\x8a#\x14#^4\x1bY\xce\x11\x89\x0e3\x96 Y\xc92I\x91*\x81\x00\x00;'
 
+		self.b64["picture.gif"] = b"GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00\x9b{1v\x82]\x80\x83T\xb0\x86<\x87\x8b>\x86\x8eA^\x91\x8bc\x93\x91b\x978i\x97\xa4e\x9a<i\x9a\xa6s\x9e\xc4w\x9e\xd7h\x9f\x9b\xd3\xa0R|\xa2\xd9}\xa3\xc6\x81\xa5\xdbt\xa7H\x82\xa7\xc8\x8e\xa7\xce\x84\xa8\xdd\x8e\xa8\xcew\xa9Jx\xab\xa0z\xabL\x94\xab\xcf{\xacj\x8a\xac\xdf\x94\xac\xd0\x9a\xae\xce\x8e\xaf\xe1\x9b\xaf\xd0\xd2\xb0m|\xb1x\x9b\xb1\xce\x87\xb3o\xa0\xb3\xd0\x7f\xb4\xa2\x87\xb4\xb7\x8d\xb5\xd1\x96\xb5\xe4\xa3\xb5\xce\x80\xb6\xaa\x93\xb6\xd2\x98\xb6\xe4\x80\xb7\xa4\x87\xb8\xb9\x9c\xb9\xe5z\xbbM\x87\xbc`\x8b\xbc\x83\xa0\xbc\xe7\x7f\xbeS\x87\xbek\x8a\xbed\xa2\xbe\xe8\x81\xbfQ\x87\xc2U\x8b\xc3W\x8e\xc3q\x94\xc3\x8a\x8f\xc6b\x91\xc7]\xca\xc9\x9d\x99\xcai\x9a\xcad\xa2\xcd\x93\xa1\xce}\xa7\xd1\x82\xaa\xd2\x83\xa9\xd3t\xc6\xd4\xb0\xc4\xda\xbb\xc3\xdd\xc0\xeb\xec\xec\xe6\xee\xf6\xeb\xef\xf2\xed\xf2\xf7\xef\xf3\xf8\xf1\xf4\xf8\xf3\xf5\xf7\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00U\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xb5\x80U\x82\x83\x84\x85\x82,'\x1c\x18\x8b\x8b\x16\x8e\x16\x1c%\x82'MS\x96\x97\x97PO \x82\x1cS+*-EHG?\x0f\r\x0eP\x1f\x82\x18S/1EIDDC5\x0c\x11\xaa\xacS20HDA=<>\x07\xb8\x1c\xba2(FA<;78\x07\x13N\xc6U\x18P2)?@;37$\n\x17\xd2\xacP6.\x1a&94\x1d\x08\x12\x1e\xe1\xd4P:\xe4\x02\x06\x05\x03\x15!\xed\xd3\xd5\x1b\x19\x14\x01\x10\x10\x08,X\x90\xc0\x9d\x05(L\x12*\x112bIB&\x06\x11>\x9c\x98\xd0\x1d\x87'S\xa4H\xb1\x04\xa5#\x94(OD\x08*!\x82\x83\xc9\x93(Ap2\xc4rP \x00;"
+
+		self.b64["color_swatch.gif"] = b'GIF87a\x10\x00\x10\x00\xb3\x00\x00\x00\x00\x00\xfeoj\xffw\xb2Vz\xb1\xda\x9c\xde\xff\xabs_\xb1\xebN\xcdl\xf0\xd6f\xd1\xeb\xb3\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00\x0b\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x04@p\xc9I\xab\xbd6\xe8U\xfaB`\xa5\x05\x9c\x07"\xe2\xd6\x15_\x88\xbdS"/G\xbd\x18x%\'\xb4\x8d\x1b\xbaY\xedp\xcb\xc1`\x83\xe4\x82\xc0\\\x08\x9e\x95\xe4`\xd9|\n\xa2J&\xc1\t=z\xbf\xe0\x08\x00;'
 
 
 	def updateTitle(self):
@@ -2238,6 +2258,8 @@ class ReporterGUI(tk.Frame):
 		# 	pass
 
 
+		self.style_head_colour = base.rs_setting_get_hcolour()
+
 		fontname = base.rs_setting_get_font()
 		fontsize = base.rs_setting_get_fontsize()
 		sizeup = int(fontsize * 0.1)
@@ -2355,6 +2377,7 @@ class ReporterGUI(tk.Frame):
 
 
 
+		self.style.configure("Report.THead.TLabel", foreground=self.style_head_colour)
 		self.style.configure('Report.THead.TLabel', font=(fontname, fontsize + (1*sizeup) ))
 		self.style.configure('Report.THead.TLabel', relief="raised")
 
@@ -2892,6 +2915,7 @@ class ReporterGUI(tk.Frame):
 
 
 		# Logo image
+		# picture.gif
 		rownum +=1
 		self.contentdata[id]["lblLI"] = ttk.Label(self.contentdata[id]["Settings"], text="Logo Image:")
 		self.contentdata[id]["lblLI"].grid(column=0, row=rownum, sticky="nsew")
@@ -2906,7 +2930,9 @@ class ReporterGUI(tk.Frame):
 		# self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=" ", style='Report.THead.TLabel')
 		self.contentdata[id]["eLIName"].grid(column=1, row=rownum, sticky="nsew")
 
-		self.contentdata[id]["btnLIName"] = ttk.Button(self.contentdata[id]["Settings"], text="...", width=1) # , image=self.imgdata[icontext]
+		icontext = "Select Image"
+		# "Select Image"	picture.gif
+		self.contentdata[id]["btnLIName"] = ttk.Button(self.contentdata[id]["Settings"], image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, width=1) # , image=self.imgdata[icontext]
 		# self.contentdata[id]["btnLIName"].config(command=lambda: self.sr_file_validate(row))
 		self.contentdata[id]["btnLIName"].config(command=self.cs_select_logoimage)
 		self.contentdata[id]["btnLIName"].grid(column=2, row=rownum, sticky="nsew")
@@ -2965,6 +2991,25 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["omFontSz"] = ttk.OptionMenu(self.contentdata[id]["Settings"], self.contentdata[id]["intFontSz"], command=self.cs_report_settings_update, *Fontsize)
 		self.contentdata[id]["intFontSz"].set(base.rs_setting_get_fontsize())
 		self.contentdata[id]["omFontSz"].grid(column=2, row=rownum, sticky="nsew")
+
+
+		# highlight colour
+		# color_swatch.gif
+		# https://www.pythontutorial.net/tkinter/tkinter-color-chooser/
+		rownum +=1
+		self.contentdata[id]["lblHColour"] = ttk.Label(self.contentdata[id]["Settings"], text="Highlight Colour:")
+		self.contentdata[id]["lblHColour"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["lblHColourPrev"] = tk.Label(self.contentdata[id]["Settings"], text=" ", bg=self.style_head_colour)
+		self.contentdata[id]["lblHColourPrev"].grid(column=1, row=rownum, sticky="nsew")
+
+		icontext = "Select Colour"
+		# "Select Colour"	color_swatch.gif
+		self.contentdata[id]["btnHColour"] = ttk.Button(self.contentdata[id]["Settings"], image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, width=1)
+		self.contentdata[id]["btnHColour"].config(command=self.cs_select_hcolour)
+		self.contentdata[id]["btnHColour"].grid(column=2, row=rownum, sticky="nsew")
+
+
 
 		# report %ile
 
@@ -3118,6 +3163,28 @@ class ReporterGUI(tk.Frame):
 
 	def cs_select_hfimage(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
+
+	def cs_select_hcolour(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+		id="TOP"
+		# https://www.pythontutorial.net/tkinter/tkinter-color-chooser/
+		newcolour = tkac.askcolor(self.style_head_colour, title="Tkinter Color Chooser")
+		base.debugmsg(5, "newcolour:", newcolour)
+		newcolourhx = newcolour[-1]
+		base.debugmsg(5, "newcolourhx:", newcolourhx)
+		if newcolourhx is not None:
+			self.style_head_colour = newcolourhx
+			base.rs_setting_set("hcolour", newcolourhx)
+
+
+			# refresh
+			self.cs_reportsettings()
+
+			self.ConfigureStyle()
+			# self.cp_regenerate_preview()
+			regen = threading.Thread(target=self.cp_regenerate_preview)
+			regen.start()
+
 
 	def cs_rename_heading(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
