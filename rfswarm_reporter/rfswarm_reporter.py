@@ -1780,6 +1780,12 @@ class ReporterCore:
 		parser.add_argument('-n', '--nogui', help='Don\'t display the GUI', action='store_true')
 		parser.add_argument('-d', '--dir', help='Results directory')
 		parser.add_argument('-t', '--template', help='Specify the template')
+		parser.add_argument('--html', help='Generate a HTML report', action='store_true')
+		# parser.add_argument('--pdf', help='Generate a PDF report', action='store_true')
+		parser.add_argument('--docx', help='Generate a MS Word report', action='store_true')
+		parser.add_argument('--xlsx', help='Generate a MS Excel report', action='store_true')
+		# parser.add_argument('--odt', help='Generate an OpenOffice/LibreOffice Writer report', action='store_true')
+		# parser.add_argument('--ods', help='Generate an OpenOffice/LibreOffice Calc report', action='store_true')
 		base.args = parser.parse_args()
 
 
@@ -1790,6 +1796,9 @@ class ReporterCore:
 
 		if base.args.version:
 			exit()
+
+		if base.args.nogui:
+			base.displaygui = False
 
 
 		base.debugmsg(6, "ConfigParser")
@@ -1864,9 +1873,19 @@ class ReporterCore:
 			base.template_open(base.config['Reporter']['Template'])
 			base.report_save()
 
+		if base.args.html:
+			self.export_xhtml()
+
+		if base.args.docx:
+			pass
+
+		if base.args.xlsx:
+			pass
 
 		if base.displaygui:
 			base.gui = ReporterGUI()
+		else:
+			self.on_closing()
 
 	def mainloop(self):
 
@@ -1926,7 +1945,11 @@ class ReporterCore:
 			msgout = " ".join(msglst)
 			base.gui.updateStatus(msgout)
 		else:
-			base.debugmsg(1, "mesage:", mesage)
+			msglst = []
+			for msg in mesage:
+				msglst.append(msg)
+			msgout = " ".join(msglst)
+			base.debugmsg(1, msgout)
 
 
 	def export_xhtml(self):
@@ -2004,6 +2027,7 @@ class ReporterCore:
 
 	def export_word(self):
 		base.debugmsg(5, "Not implimented yet.....")
+		# self.display_message("Generating XHTML Report")
 
 	def export_writer(self):
 		base.debugmsg(5, "Not implimented yet.....")
@@ -2142,6 +2166,8 @@ class ReporterCore:
 
 
 
+		self.cg_data["XHTML"]["progress"] += sectionpct
+		self.display_message("Generating XHTML Report {}%".format(int(round(self.cg_data["XHTML"]["progress"]*100, 0))))
 
 
 		if len(sections)>0:
@@ -2474,10 +2500,16 @@ class ReporterCore:
 	#
 	# 	MS Word
 	#
+	# https://python-docx.readthedocs.io/en/latest/
+	# https://github.com/python-openxml/python-docx
+
+
 
 	#
 	# 	MS Excel
 	#
+	# https://xlsxwriter.readthedocs.io/introduction.html
+	# https://openpyxl.readthedocs.io/en/stable/index.html
 
 
 class ReporterGUI(tk.Frame):
@@ -4984,18 +5016,23 @@ class ReporterGUI(tk.Frame):
 
 	def cg_export_pdf(self):
 		base.debugmsg(5, "Not implimented yet.....")
+		core.export_pdf()
 
 	def cg_export_writer(self):
 		base.debugmsg(5, "Not implimented yet.....")
+		core.export_writer()
 
 	def cg_export_word(self):
-		base.debugmsg(5, "Not implimented yet.....")
+		# base.debugmsg(5, "Not implimented yet.....")
+		core.export_word()
 
 	def cg_export_calc(self):
 		base.debugmsg(5, "Not implimented yet.....")
+		core.export_calc()
 
 	def cg_export_excel(self):
 		base.debugmsg(5, "Not implimented yet.....")
+		core.export_excel()
 
 
 
