@@ -1954,17 +1954,23 @@ class ReporterCore:
 
 		style = etree.SubElement(head, 'style')
 		highlightcolour = base.rs_setting_get_hcolour()
+		fontname = base.rs_setting_get_font()
+		fontsize = base.rs_setting_get_fontsize()
 
 		styledata  = ""
+		styledata += "div { font-size: "+str(fontsize)+"px; font-family: \""+fontname+"\"; }"
 		styledata += ".center { text-align: center; }"
 		styledata += ".title { font-size: 200%;}"
 		styledata += ".subtitle { font-size: 150%;}"
-		styledata += "h1	{color: "+highlightcolour+";}"
-		styledata += "h2	{color: "+highlightcolour+";}"
-		styledata += "h3	{color: "+highlightcolour+";}"
-		styledata += "h4	{color: "+highlightcolour+";}"
-		styledata += "h5	{color: "+highlightcolour+";}"
-		styledata += "h6	{color: "+highlightcolour+";}"
+		for i in range(6):
+			styledata += "h"+str(i+1)+"	{ color: "+highlightcolour+"; margin-left: "+str(i*5)+"px; }"
+
+		bodyindent = 30
+		styledata += "p { margin-left: "+str(bodyindent)+"px; }"
+		#   margin-left: 20px;
+		for i in range(6):
+			styledata += ".TOC"+str(i+1)+"	{margin-left: "+str(i*10)+"px;}"
+
 
 		style.text = styledata
 
@@ -2109,6 +2115,21 @@ class ReporterCore:
 			base.debugmsg(5, "sectionpct:", sectionpct)
 			self.xhtml_sections_addheading(thiselmt, id)
 
+			stype = base.report_item_get_type(id)
+			base.debugmsg(5, "stype:", stype)
+			if stype == "contents":
+				self.xhtml_sections_contents(thiselmt, id)
+			if stype == "note":
+				self.xhtml_sections_note(thiselmt, id)
+			if stype == "graph":
+				self.xhtml_sections_graph(thiselmt, id)
+			if stype == "table":
+				self.xhtml_sections_table(thiselmt, id)
+
+
+
+
+
 		if len(sections)>0:
 			for sect in sections:
 				self.xhtml_add_sections(nextparent, sect, sectionpct)
@@ -2134,6 +2155,105 @@ class ReporterCore:
 	def xhtml_sections_embedimg(self, elmt, id, imgdata):
 		base.debugmsg(5, "id:", id, "	imgdata:", imgdata)
 		# <img src="data:image/png;base64,
+
+
+	def xhtml_sections_contents(self, elmt, id):
+		base.debugmsg(5, "id:", id)
+		mode = base.rt_contents_get_mode(id)
+		level = base.rt_contents_get_level(id)
+
+		base.debugmsg(5, "mode:", mode, "	level:", level)
+		fmode = None
+		if mode == "Table Of Contents":
+			fmode = None
+		if mode == "Table of Graphs":
+			fmode = "graph"
+		if mode == "Table Of Tables":
+			fmode = "table"
+
+		# tbl = etree.SubElement(elmt, 'table')
+
+
+		self.xhtml_sections_contents_row(elmt, "TOP", 1, fmode, level)
+		# self.xhtml_sections_contents_row(tbl, "TOP", 1, fmode, level)
+
+	def xhtml_sections_contents_row(self, elmt, id, rownum, fmode, flevel):
+		base.debugmsg(5, "id:", id, "	rownum:", rownum, "	fmode:", fmode, "	flevel:", flevel)
+		display = True
+
+		level = base.report_sect_level(id)
+		if id == "TOP":
+			display = False
+			level = 0
+		base.debugmsg(5, "level:", level)
+
+		if display and fmode is not None:
+			display = False
+			type = base.report_item_get_type(id)
+			if fmode == type:
+				display = True
+
+		if display and level > flevel:
+			display = False
+
+		nextrow = rownum
+		if display:
+			type = base.report_item_get_type(id)
+			titlenum = base.report_sect_number(id)
+			titlename = base.report_item_get_name(id)
+			titlelevel = base.report_sect_level(id)
+
+			p = etree.SubElement(elmt, 'p')
+			# p = etree.SubElement(elmt, 'tr')
+			# spc = "&nbsp;&nbsp;"
+			# spc = '&#160;&#160;'
+			# spc = '  '
+			# p.text = spc*level
+			# for i in range(level):
+			# 	td = etree.SubElement(p, 'td')
+
+			# td = etree.SubElement(p, 'td')
+			# td.set("colspan", "10")
+			# a = etree.SubElement(td, 'a')
+			a = etree.SubElement(p, 'a')
+			a.set("class", "TOC{}".format(level))
+			a.text = "{} {}".format(titlenum, titlename)
+			if fmode is None:
+				idpre = "toc"
+			else:
+				idpre = fmode
+			a.set('id', "{}_{}".format(idpre, id))
+			a.set('href', "#{}".format(id))
+
+
+			nextrow = rownum+1
+		base.debugmsg(9, "nextrow:", nextrow)
+		if level < flevel:
+			children = base.report_get_order(id)
+			for child in children:
+				nextrow = self.xhtml_sections_contents_row(elmt, child, nextrow, fmode, flevel)
+		return nextrow
+
+
+
+	def xhtml_sections_note(self, elmt, id):
+		base.debugmsg(5, "id:", id)
+		notebody = base.rt_note_get(id)
+		notebody = notebody.replace("\r\n", "\n")
+		notebody = notebody.replace("\r", "\n")
+		notelist = notebody.split("\n")
+		base.debugmsg(5, "notebody:", notebody)
+		ndiv = etree.SubElement(elmt, "div")
+		for line in notelist:
+			p = etree.SubElement(ndiv, "p")
+			p.text = line
+
+	def xhtml_sections_graph(self, elmt, id):
+		base.debugmsg(5, "id:", id)
+
+	def xhtml_sections_table(self, elmt, id):
+		base.debugmsg(5, "id:", id)
+
 
 
 	#
