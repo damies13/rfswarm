@@ -33,7 +33,8 @@ import tempfile
 # import xml.etree.ElementTree as ET
 from lxml import etree
 from lxml.builder import ElementMaker,E
-
+import base64   		# used for embedding images
+from io import BytesIO	# used for embedding images
 # used for xhtml export
 
 
@@ -55,6 +56,7 @@ from PIL import Image, ImageTk
 import matplotlib
 matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 # required for matplot graphs
 
@@ -2082,6 +2084,15 @@ class ReporterCore:
 			#
 			# Logo
 			#
+			base.debugmsg(5, "showtlogo:", base.rs_setting_get_int("showtlogo"))
+			if base.rs_setting_get_int("showtlogo"):
+				imgtitle = etree.SubElement(thiselmt, 'div')
+				imgtitle.set("class", "center")
+
+				tlogo = base.rs_setting_get_file("tlogo")
+				base.debugmsg(5, "tlogo:", tlogo)
+
+				self.xhtml_sections_fileimg(imgtitle, id, tlogo)
 
 			#
 			# Execution Date range
@@ -2155,9 +2166,42 @@ class ReporterCore:
 		# a.set('href', "#{}".format(id))
 
 
-	def xhtml_sections_embedimg(self, elmt, id, imgdata):
-		base.debugmsg(5, "id:", id, "	imgdata:", imgdata)
+	def xhtml_sections_fileimg(self, elmt, id, imgfile):
+		base.debugmsg(5, "id:", id, "	imgfile:", imgfile)
+		# img.set("src", imgfile)
+
+		oimg = Image.open(imgfile)
+		base.debugmsg(9, "oimg:", oimg)
+		self.xhtml_sections_embedimg(elmt, id, oimg)
+
+
+	def xhtml_sections_embedimg(self, elmt, id, oimg):
+		base.debugmsg(5, "id:", id, "	oimg:", oimg)
+
+		img = etree.SubElement(elmt, 'img')
+
 		# <img src="data:image/png;base64,
+		base.debugmsg(9, "oimg format:", oimg.format)
+		# base.debugmsg(5, "oimg info:", oimg.info)
+
+
+		# <img src="data:image/png;base64,
+		srcdata = "data:image/"+oimg.format.lower()+";base64,"
+
+		# https://stackoverflow.com/questions/48229318/how-to-convert-image-pil-into-base64-without-saving
+		# srcdata += str(base64.b64encode(oimg.tobytes()))
+		# srcdata += base64.b64encode(oimg.tobytes()) # bytes
+		# srcdata += base64.b64encode(oimg.tobytes()).decode()
+
+		buffered = BytesIO()
+		oimg.save(buffered, format=oimg.format)
+		buffered.seek(0)
+		img_byte = buffered.getvalue()
+
+		srcdata += base64.b64encode(img_byte).decode()
+
+		base.debugmsg(5, "srcdata:", srcdata)
+		img.set("src", srcdata)
 
 
 	def xhtml_sections_contents(self, elmt, id):
@@ -2255,6 +2299,117 @@ class ReporterCore:
 
 	def xhtml_sections_graph(self, elmt, id):
 		base.debugmsg(5, "id:", id)
+
+		body = etree.SubElement(elmt, 'div')
+		body.set("class", "body")
+
+		datatype = base.rt_graph_get_dt(id)
+		if datatype == "SQL":
+			sql = base.rt_graph_get_sql(id)
+		else:
+			sql = base.rt_graph_generate_sql(id)
+
+		gphdpi = 72
+		# gphdpi = 100
+		fig = Figure(dpi=gphdpi) # , tight_layout=True
+		axis = fig.add_subplot(1,1,1)	# , constrained_layout=True??
+		axis.grid(True, 'major', 'both')
+		fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+
+		canvas = FigureCanvas(fig)
+
+		# https://stackoverflow.com/questions/57316491/how-to-convert-matplotlib-figure-to-pil-image-object-without-saving-image
+
+		try:
+			canvas.draw()
+		except Exception as e:
+			base.debugmsg(5, "canvas.draw() Exception:", e)
+		fig.set_tight_layout(True)
+
+
+		dodraw = False
+		graphdata = {}
+
+		if sql is not None and len(sql.strip())>0:
+			base.debugmsg(7, "sql:", sql)
+			key = "{}_{}".format(id, base.report_item_get_changed(id))
+			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+			while key not in base.dbqueue["ReadResult"]:
+				time.sleep(0.1)
+
+			gdata = base.dbqueue["ReadResult"][key]
+			base.debugmsg(9, "gdata:", gdata)
+
+			for row in gdata:
+				base.debugmsg(9, "row:", row)
+				if 'Name' in row:
+					name = row['Name']
+					base.debugmsg(9, "name:", name)
+					if name not in graphdata:
+						graphdata[name] = {}
+
+						colour = base.named_colour(name)
+						base.debugmsg(8, "name:", name, "	colour:", colour)
+						graphdata[name]["Colour"] = colour
+						# self.contentdata[id]["graphdata"][name]["Time"] = []
+						graphdata[name]["objTime"] = []
+						graphdata[name]["Values"] = []
+
+					graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+					graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
+				else:
+					break
+
+
+			base.debugmsg(9, "graphdata:", graphdata)
+
+			for name in graphdata:
+				base.debugmsg(7, "name:", name)
+				if len(graphdata[name]["Values"])>1 and len(graphdata[name]["Values"])==len(graphdata[name]["objTime"]):
+					try:
+						axis.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name)
+						dodraw = True
+					except Exception as e:
+						base.debugmsg(7, "axis.plot() Exception:", e)
+
+				if len(graphdata[name]["Values"])==1 and len(graphdata[name]["Values"])==len(graphdata[name]["objTime"]):
+					try:
+						axis.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name, marker='o')
+						dodraw = True
+					except Exception as e:
+						base.debugmsg(7, "axis.plot() Exception:", e)
+
+			if dodraw:
+
+				axis.grid(True, 'major', 'both')
+
+				SMetric = "Other"
+				if datatype == "Metric":
+					SMetric = base.rt_table_get_sm(id)
+				base.debugmsg(8, "SMetric:", SMetric)
+				if SMetric in ["Load", "CPU", "MEM", "NET"]:
+					axis.set_ylim(0, 100)
+				else:
+					axis.set_ylim(0)
+
+				fig.set_tight_layout(True)
+				fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+				try:
+					canvas.draw()
+				except Exception as e:
+					base.debugmsg(5, "canvas.draw() Exception:", e)
+
+				# works but messy createing files we then need to delete
+				# filename = "{}.png".format(id)
+				# fig.savefig(filename)
+				# self.xhtml_sections_fileimg(body, id, filename)
+
+				buf = BytesIO()
+				fig.savefig(buf)
+				buf.seek(0)
+				oimg = Image.open(buf)
+				self.xhtml_sections_embedimg(body, id, oimg)
+
 
 	def xhtml_sections_table(self, elmt, id):
 		base.debugmsg(5, "id:", id)
