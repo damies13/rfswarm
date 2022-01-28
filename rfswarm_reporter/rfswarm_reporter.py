@@ -1962,11 +1962,14 @@ class ReporterCore:
 		styledata += ".center { text-align: center; }"
 		styledata += ".title { font-size: 200%;}"
 		styledata += ".subtitle { font-size: 150%;}"
+
+		styledata += "th { color: "+highlightcolour+"; }"
+
 		for i in range(6):
 			styledata += "h"+str(i+1)+"	{ color: "+highlightcolour+"; margin-left: "+str(i*5)+"px; }"
 
 		bodyindent = 30
-		styledata += "p { margin-left: "+str(bodyindent)+"px; }"
+		styledata += ".body { margin-left: "+str(bodyindent)+"px; }"
 		#   margin-left: 20px;
 		for i in range(6):
 			styledata += ".TOC"+str(i+1)+"	{margin-left: "+str(i*10)+"px;}"
@@ -2172,9 +2175,10 @@ class ReporterCore:
 			fmode = "table"
 
 		# tbl = etree.SubElement(elmt, 'table')
+		body = etree.SubElement(elmt, 'div')
+		body.set("class", "body")
 
-
-		self.xhtml_sections_contents_row(elmt, "TOP", 1, fmode, level)
+		self.xhtml_sections_contents_row(body, "TOP", 1, fmode, level)
 		# self.xhtml_sections_contents_row(tbl, "TOP", 1, fmode, level)
 
 	def xhtml_sections_contents_row(self, elmt, id, rownum, fmode, flevel):
@@ -2243,9 +2247,10 @@ class ReporterCore:
 		notebody = notebody.replace("\r", "\n")
 		notelist = notebody.split("\n")
 		base.debugmsg(5, "notebody:", notebody)
-		ndiv = etree.SubElement(elmt, "div")
+		body = etree.SubElement(elmt, 'div')
+		body.set("class", "body")
 		for line in notelist:
-			p = etree.SubElement(ndiv, "p")
+			p = etree.SubElement(body, "p")
 			p.text = line
 
 	def xhtml_sections_graph(self, elmt, id):
@@ -2253,6 +2258,61 @@ class ReporterCore:
 
 	def xhtml_sections_table(self, elmt, id):
 		base.debugmsg(5, "id:", id)
+		body = etree.SubElement(elmt, 'div')
+		body.set("class", "body")
+		tbl = etree.SubElement(body, 'table')
+
+		datatype = base.rt_table_get_dt(id)
+		if datatype == "SQL":
+			sql = base.rt_table_get_sql(id)
+		else:
+			sql = base.rt_table_generate_sql(id)
+		colours = base.rt_table_get_colours(id)
+
+		if sql is not None and len(sql.strip())>0:
+			base.debugmsg(8, "sql:", sql)
+			key = "{}_{}".format(id, base.report_item_get_changed(id))
+			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+			while key not in base.dbqueue["ReadResult"]:
+				time.sleep(0.1)
+
+			tdata = base.dbqueue["ReadResult"][key]
+			base.debugmsg(8, "tdata:", tdata)
+
+			if len(tdata)>0:
+				# table headers
+				cols = list(tdata[0].keys())
+				base.debugmsg(7, "cols:", cols)
+				tr = etree.SubElement(tbl, 'tr')
+				if colours:
+					th = etree.SubElement(tr, 'th')
+				for col in cols:
+					th = etree.SubElement(tr, 'th')
+					th.text = col
+
+				# table rows
+				for row in tdata:
+					vals = list(row.values())
+					base.debugmsg(7, "vals:", vals)
+					tr = etree.SubElement(tbl, 'tr')
+					if colours:
+
+						base.debugmsg(9, "row:", row)
+						label=row[cols[0]]
+						base.debugmsg(9, "label:", label)
+						colour = base.named_colour(label)
+						base.debugmsg(9, "colour:", colour)
+
+						# <td style="background-color:#8888ff; color:#8888ff;">_</td>
+						td = etree.SubElement(tr, 'td')
+						td.text = "_"
+						rstyle = "background-color:{}; color:{};".format(colour, colour)
+						td.set("style", rstyle)
+
+					for val in vals:
+						td = etree.SubElement(tr, 'td')
+						td.text = str(val)
+
 
 
 
