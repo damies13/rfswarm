@@ -37,6 +37,13 @@ import base64   		# used for embedding images
 from io import BytesIO	# used for embedding images
 # used for xhtml export
 
+# used for docx export
+from docx import Document
+# from docx.shared import Inches
+from docx.shared import Pt, Cm, RGBColor
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.style import WD_STYLE_TYPE
+# used for docx export
 
 
 import tkinter as tk				#python3
@@ -1877,10 +1884,10 @@ class ReporterCore:
 			self.export_xhtml()
 
 		if base.args.docx:
-			pass
+			self.export_word()
 
 		if base.args.xlsx:
-			pass
+			self.export_excel()
 
 		if base.displaygui:
 			base.gui = ReporterGUI()
@@ -2026,8 +2033,41 @@ class ReporterCore:
 		base.debugmsg(5, "Not implimented yet.....")
 
 	def export_word(self):
-		base.debugmsg(5, "Not implimented yet.....")
-		# self.display_message("Generating XHTML Report")
+		self.display_message("Generating Word Report")
+
+		sections = base.report_get_order("TOP")
+		base.debugmsg(5, "sections:", sections)
+		sectionpct = 1/(len(sections)+1)
+		base.debugmsg(5, "sectionpct:", sectionpct)
+
+		if "docx" in self.cg_data:
+			if "progress" in self.cg_data["docx"] and self.cg_data["docx"]["progress"]<1:
+				self.display_message("Waiting for previous docx report to finish")
+				while self.cg_data["docx"]["progress"]<1:
+					time.sleep(0.5)
+			del self.cg_data["docx"]
+		self.cg_data["docx"] = {}
+		self.cg_data["docx"]["progress"] = 0.0
+
+		self.cg_data["docx"]["document"] = Document()
+
+		self.docx_configure_style()
+
+
+		self.docx_add_sections("TOP", sectionpct)
+
+		base.debugmsg(5, "Report:", base.config['Reporter']['Report'])
+		reportbase, reportext = os.path.splitext(base.config['Reporter']['Report'])
+		outfile = "{}.docx".format(reportbase)
+		self.cg_data["docx"]["document"].save(outfile)
+
+		base.debugmsg(5, "outfile:", outfile)
+		self.display_message("Saved Word Report:",outfile)
+
+		self.cg_data["docx"]["progress"] = 1
+
+
+
 
 	def export_writer(self):
 		base.debugmsg(5, "Not implimented yet.....")
@@ -2502,6 +2542,253 @@ class ReporterCore:
 	#
 	# https://python-docx.readthedocs.io/en/latest/
 	# https://github.com/python-openxml/python-docx
+
+	def docx_configure_style(self):
+		# set up document styles for this report
+		highlightcolour = base.rs_setting_get_hcolour().replace("#", "")
+		fontname = base.rs_setting_get_font()
+		fontsize = base.rs_setting_get_fontsize()
+
+		rgb_basecolour = RGBColor.from_string('000000')
+		rgb_highlightcolour = RGBColor.from_string(highlightcolour)
+		base.debugmsg(5, "rgb_highlightcolour:", rgb_highlightcolour)
+
+		base.debugmsg(5, "fontname:", fontname, "	fontsize:", fontsize, "	highlightcolour:", highlightcolour)
+
+		# styles = self.cg_data["docx"]["document"].styles
+		# for style in styles:
+		# 	print(style.name)
+
+
+		# Update Normal
+		style = self.cg_data["docx"]["document"].styles['Normal']
+		style.font.name = fontname
+		style.font.size = Pt(fontsize)
+		base.debugmsg(5, "style.paragraph_format.left_indent:", style.paragraph_format.left_indent)
+		style.paragraph_format.left_indent = Cm(0.5)
+		base.debugmsg(5, "style.paragraph_format.left_indent:", style.paragraph_format.left_indent)
+
+
+		# Update Cover Title
+		self.cg_data["docx"]["document"].styles.add_style('Cover Title', WD_STYLE_TYPE.PARAGRAPH)
+		style = self.cg_data["docx"]["document"].styles['Cover Title']
+		style.base_style = self.cg_data["docx"]["document"].styles['Normal']
+		style.font.size = Pt(int(fontsize*2))
+		style.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+		style.paragraph_format.left_indent = Cm(0)
+
+		# Update Subtitle
+		self.cg_data["docx"]["document"].styles.add_style('Cover Subtitle', WD_STYLE_TYPE.PARAGRAPH)
+		style = self.cg_data["docx"]["document"].styles['Cover Subtitle']
+		style.base_style = self.cg_data["docx"]["document"].styles['Cover Title']
+		style.font.size = Pt(int(fontsize*1.5))
+
+
+		sizeup = int(fontsize * 0.1)
+		if sizeup < 1:
+			sizeup = int(1)
+		base.debugmsg(8, "sizeup:", sizeup)
+
+		# Update Heading 1
+		style = self.cg_data["docx"]["document"].styles['Heading 1']
+		# style.base_style = self.cg_data["docx"]["document"].styles['Normal']
+		style.font.name = fontname
+		style.font.size = Pt(fontsize + (6*sizeup))
+		style.font.italic = False
+		style.font.color.rgb = rgb_highlightcolour
+		# style.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+		style.paragraph_format.page_break_before = True
+		style.paragraph_format.keep_with_next = True
+		style.paragraph_format.left_indent = Cm(0)
+
+		# Update Heading 2
+		style = self.cg_data["docx"]["document"].styles['Heading 2']
+		# style.base_style = self.cg_data["docx"]["document"].styles['Normal']
+		style.font.name = fontname
+		style.font.size = Pt(fontsize + (5*sizeup))
+		style.font.italic = False
+		style.font.color.rgb = rgb_highlightcolour
+		style.paragraph_format.page_break_before = False
+		style.paragraph_format.keep_with_next = True
+		style.paragraph_format.left_indent = Cm(0)
+
+		# Update Heading 3
+		style = self.cg_data["docx"]["document"].styles['Heading 3']
+		# style.base_style = self.cg_data["docx"]["document"].styles['Normal']
+		style.font.name = fontname
+		style.font.size = Pt(fontsize + (4*sizeup))
+		style.font.italic = False
+		style.font.color.rgb = rgb_highlightcolour
+		style.paragraph_format.page_break_before = False
+		style.paragraph_format.keep_with_next = True
+		style.paragraph_format.left_indent = Cm(0)
+
+		# Update Heading 4
+		style = self.cg_data["docx"]["document"].styles['Heading 4']
+		# style.base_style = self.cg_data["docx"]["document"].styles['Normal']
+		style.font.name = fontname
+		style.font.size = Pt(fontsize + (3*sizeup))
+		style.font.italic = False
+		style.font.color.rgb = rgb_highlightcolour
+		style.paragraph_format.page_break_before = False
+		style.paragraph_format.keep_with_next = True
+		style.paragraph_format.left_indent = Cm(0)
+
+		# Update Heading 5
+		style = self.cg_data["docx"]["document"].styles['Heading 5']
+		# style.base_style = self.cg_data["docx"]["document"].styles['Normal']
+		style.font.name = fontname
+		style.font.size = Pt(fontsize + (2*sizeup))
+		style.font.italic = False
+		style.font.color.rgb = rgb_highlightcolour
+		style.paragraph_format.page_break_before = False
+		style.paragraph_format.keep_with_next = True
+		style.paragraph_format.left_indent = Cm(0)
+
+		# Update Heading 6
+		style = self.cg_data["docx"]["document"].styles['Heading 6']
+		# style.base_style = self.cg_data["docx"]["document"].styles['Normal']
+		style.font.name = fontname
+		style.font.size = Pt(fontsize + (1*sizeup))
+		style.font.italic = False
+		style.font.color.rgb = rgb_highlightcolour
+		style.paragraph_format.page_break_before = False
+		style.paragraph_format.keep_with_next = True
+		style.paragraph_format.left_indent = Cm(0)
+
+
+		# Update Table Heading?
+
+	def docx_add_sections(self, id, sectionpct):
+		base.debugmsg(5, "id:", id, "	sectionpct:", sectionpct)
+
+		sections = base.report_get_order(id)
+		base.debugmsg(5, "sections:", sections)
+
+		document = self.cg_data["docx"]["document"]
+
+		if id == "TOP":
+
+			#
+			# Title
+			#
+			titletxt = base.rs_setting_get_title()
+			# document.add_heading(titletxt, 0)
+			document.add_paragraph("", style='Cover Title')
+			document.add_paragraph(titletxt, style='Cover Title')
+			document.add_paragraph("", style='Cover Title')
+
+			#
+			# Logo
+			#
+			base.debugmsg(5, "showtlogo:", base.rs_setting_get_int("showtlogo"))
+			if base.rs_setting_get_int("showtlogo"):
+
+				tlogo = base.rs_setting_get_file("tlogo")
+				base.debugmsg(5, "tlogo:", tlogo)
+
+			#
+			# Execution Date range
+			#
+			execdr = ""
+			if base.rs_setting_get_int("showstarttime"):
+				iST = base.report_starttime()
+				fSD = "{}".format(base.report_formatdate(iST))
+				fST = "{}".format(base.report_formattime(iST))
+
+				execdr = "{} {}".format(fSD, fST)
+
+			if base.rs_setting_get_int("showendtime"):
+				iET = base.report_endtime()
+				fED = "{}".format(base.report_formatdate(iET))
+				fET = "{}".format(base.report_formattime(iET))
+
+				if not base.rs_setting_get_int("showstarttime"):
+					execdr = "{} {}".format(fED, fET)
+				else:
+					if fSD == fED:
+						execdr = "{} - {}".format(execdr, fET)
+					else:
+						execdr = "{} - {} {}".format(execdr, fED, fET)
+
+			document.add_paragraph("", style='Cover Subtitle')
+			document.add_paragraph(execdr, style='Cover Subtitle')
+			document.add_paragraph("", style='Cover Subtitle')
+		else:
+			newsectionpct = 1/(len(sections)+1)
+			sectionpct = newsectionpct * sectionpct
+			base.debugmsg(5, "sectionpct:", sectionpct)
+			self.docx_sections_addheading(id)
+
+			stype = base.report_item_get_type(id)
+			base.debugmsg(5, "stype:", stype)
+			if stype == "contents":
+				self.docx_sections_contents(id)
+			if stype == "note":
+				self.docx_sections_note(id)
+			if stype == "graph":
+				self.docx_sections_graph(id)
+			if stype == "table":
+				self.docx_sections_table(id)
+
+
+
+		self.cg_data["docx"]["progress"] += sectionpct
+		self.display_message("Generating Word Report {}%".format(int(round(self.cg_data["docx"]["progress"]*100, 0))))
+
+
+		if len(sections)>0:
+			for sect in sections:
+				self.docx_add_sections(sect, sectionpct)
+
+
+	def docx_sections_addheading(self, id):
+		base.debugmsg(5, "id:", id)
+		document = self.cg_data["docx"]["document"]
+
+		level = base.report_sect_level(id)
+		base.debugmsg(5, "level:", level)
+		number = base.report_sect_number(id)
+		base.debugmsg(5, "number:", number)
+		name = base.report_item_get_name(id)
+		base.debugmsg(5, "name:", name)
+
+		heading_text = "{} {}".format(number, name)
+
+		document.add_heading(heading_text, level)
+		# document.add_paragraph("", style='Normal')
+
+	def docx_sections_contents(self, id):
+		base.debugmsg(5, "id:", id)
+
+		document = self.cg_data["docx"]["document"]
+		document.add_paragraph("", style='Normal')
+
+	def docx_sections_note(self, id):
+		base.debugmsg(5, "id:", id)
+
+		document = self.cg_data["docx"]["document"]
+
+		notebody = base.rt_note_get(id)
+		notebody = notebody.replace("\r\n", "\n")
+		notebody = notebody.replace("\r", "\n")
+		notelist = notebody.split("\n")
+		for line in notelist:
+			document.add_paragraph(line, style='Normal')
+
+
+	def docx_sections_graph(self, id):
+		base.debugmsg(5, "id:", id)
+
+		document = self.cg_data["docx"]["document"]
+		document.add_paragraph("", style='Normal')
+
+	def docx_sections_table(self, id):
+		base.debugmsg(5, "id:", id)
+
+		document = self.cg_data["docx"]["document"]
+		document.add_paragraph("", style='Normal')
+
 
 
 

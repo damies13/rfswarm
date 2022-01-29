@@ -4,28 +4,31 @@ with open("README_PyPi.md", "r") as fh:
 	long_description = fh.read()
 
 setuptools.setup(
-	name="rfswarm-agent",
+	name="rfswarm-reporter",
 	version="0.9.0",
 	author="damies13",
 	author_email="damies13+rfswarm@gmail.com",
-	description="rfswarm Agent",
+	description="rfswarm reporter",
 	long_description=long_description,
 	long_description_content_type="text/markdown",
 	url="https://github.com/damies13/rfswarm",
-	packages=setuptools.find_packages(exclude=["*fswarm_report*", "*rfswarm_manager*", "build/*"]),
-	install_requires=['configparser', 'requests', 'robotframework', 'psutil'],
+	packages=setuptools.find_packages(exclude=["*fswarm_manag*", "*fswarm_agen*", "build/*"]),
+	# I needed a recent version of pip (pip 21.0.1 worked my previous <20 version didn't) for matplotlib
+	# 	to actually install withput error
+	# https://matplotlib.org/stable/users/installing.html
+	install_requires=['configparser', 'pillow', 'pip>=21', 'matplotlib', 'python-docx'],
 	classifiers=[
 		"Development Status :: 5 - Production/Stable",
 		"Topic :: Software Development :: Testing",
-		"Programming Language :: Python :: 3.6",
+		"Programming Language :: Python :: 3.7",
 		"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
 		"Operating System :: OS Independent",
 	],
-	python_requires='>=3.6',
+	python_requires='>=3.7',
 	project_urls={
 		'Getting Help': 'https://github.com/damies13/rfswarm#getting-help',
 		'Say Thanks!': 'https://github.com/damies13/rfswarm#donations',
 		'Source': 'https://github.com/damies13/rfswarm',
 	},
-	entry_points = {'console_scripts': ['rfswarm-agent = rfswarm_agent.rfswarm_agent:RFSwarm']},
+	entry_points = {'console_scripts': ['rfswarm-reporter = rfswarm_reporter.rfswarm_reporter:RFSwarm_Reporter']},
 )
