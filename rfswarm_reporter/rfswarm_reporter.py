@@ -2659,6 +2659,26 @@ class ReporterCore:
 
 		# Update Table Heading?
 
+		# Table Cell
+		self.cg_data["docx"]["document"].styles.add_style('Table Cell', WD_STYLE_TYPE.PARAGRAPH)
+		style = self.cg_data["docx"]["document"].styles['Table Cell']
+		style.base_style = self.cg_data["docx"]["document"].styles['Normal']
+		style.font.size = Pt(int(fontsize*0.8))
+		style.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+		# style.paragraph_format.left_indent = Cm(0)
+		style.paragraph_format.left_indent = Cm(-0.15)
+		# style.paragraph_format.right_indent = Cm(0)
+		style.paragraph_format.right_indent = Cm(-0.15)
+		style.paragraph_format.space_after = Cm(0.1)
+
+		# Table Header
+		self.cg_data["docx"]["document"].styles.add_style('Table Header', WD_STYLE_TYPE.PARAGRAPH)
+		style = self.cg_data["docx"]["document"].styles['Table Header']
+		style.base_style = self.cg_data["docx"]["document"].styles['Table Cell']
+		style.font.bold = True
+		style.font.color.rgb = rgb_highlightcolour
+
+
 	def docx_add_sections(self, id, sectionpct):
 		base.debugmsg(5, "id:", id, "	sectionpct:", sectionpct)
 
@@ -2687,6 +2707,9 @@ class ReporterCore:
 				tlogo = base.rs_setting_get_file("tlogo")
 				base.debugmsg(5, "tlogo:", tlogo)
 
+				document.add_paragraph("", style='Cover Subtitle')
+				document.add_picture(tlogo)
+				document.add_paragraph("", style='Cover Subtitle')
 			#
 			# Execution Date range
 			#
@@ -2787,9 +2810,121 @@ class ReporterCore:
 		base.debugmsg(5, "id:", id)
 
 		document = self.cg_data["docx"]["document"]
-		document.add_paragraph("", style='Normal')
+		# document.add_paragraph("", style='Normal')
+
+		datatype = base.rt_table_get_dt(id)
+		if datatype == "SQL":
+			sql = base.rt_table_get_sql(id)
+		else:
+			sql = base.rt_table_generate_sql(id)
+		colours = base.rt_table_get_colours(id)
+
+		if sql is not None and len(sql.strip())>0:
+			base.debugmsg(8, "sql:", sql)
+			key = "{}_{}".format(id, base.report_item_get_changed(id))
+			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+			while key not in base.dbqueue["ReadResult"]:
+				time.sleep(0.1)
+
+			tdata = base.dbqueue["ReadResult"][key]
+			base.debugmsg(8, "tdata:", tdata)
+
+			if len(tdata)>0:
+				# table headers
+				cols = list(tdata[0].keys())
+				base.debugmsg(7, "cols:", cols)
+
+				numcols = len(cols)
+				cellcol = 0
+				cellrow = 0
+				if colours:
+					numcols += 1
+					cellcol += 1
+
+				table = document.add_table(rows=1, cols=numcols)
+				# table.autofit = True
+				# table.style.paragraph_format.left_indent = Cm(-0.50)
+				# table.style.paragraph_format.left_indent = Cm(-0.50)
+
+				if colours:
+					table.columns[cellcol-1].width = Cm(0.5)
+					table.rows[cellrow].cells[cellcol-1].paragraphs[0].style = "Table Header"
+
+				cw = 5
+				for col in cols:
+					# table.rows[cellrow].cells[cellcol].text = col
+					# table.rows[cellrow].cells[cellcol].add_paragraph(text=col, style="Table Header")
+					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+					table.rows[cellrow].cells[cellcol].paragraphs[0].text = col
+					table.columns[cellcol].width = Cm(cw)
+					if cw>2:
+						cw = 1.7
+					if cellcol>5:
+						cw = 1.1
+					cellcol += 1
+
+				# table rows
+				for row in tdata:
+
+					cellcol = 0
+					cellrow += 1
+
+					vals = list(row.values())
+					base.debugmsg(7, "vals:", vals)
+					table.add_row()
+					if colours:
+
+						base.debugmsg(9, "row:", row)
+						label=row[cols[0]]
+						base.debugmsg(9, "label:", label)
+						colour = base.named_colour(label)
+						base.debugmsg(9, "colour:", colour)
+
+						swatch = Image.new(mode="RGB", size=(100,100), color=colour)
 
 
+						buffered = BytesIO()
+						# swatch.save(buffered, format=swatch.format)
+						swatch.save(buffered, format="PNG")
+						buffered.seek(0)
+						# img_byte = buffered.getvalue()
+						#
+						# srcdata += base64.b64encode(img_byte).decode()
+
+						table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+
+						# table.rows[cellrow].cells[cellcol].paragraphs[0].paragraph_format.space_before = Pt(0)
+						table.rows[cellrow].cells[cellcol].paragraphs[0].paragraph_format.left_indent = Cm(-0.50)
+
+						run = table.rows[cellrow].cells[cellcol].paragraphs[0].add_run()
+						table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+						# run.add_picture(pic, width = 1400000, height = 1400000)
+						run.add_picture(buffered, width = Cm(0.5))
+						# run.add_picture(buffered)
+
+
+						# document.add_picture(buffered)
+
+
+						cellcol += 1
+
+					for val in vals:
+						# table.rows[cellrow].cells[cellcol].text = str(val)
+						# table.rows[cellrow].cells[cellcol].add_paragraph(text=str(val), style="Table Cell")
+						table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+						table.rows[cellrow].cells[cellcol].paragraphs[0].text = str(val)
+
+						tcw = int(table.columns[cellcol].width.cm) +1
+						# base.debugmsg(5, "tcw:", tcw)
+						if tcw>5:
+							table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+
+						cellcol += 1
+
+
+				table.autofit = True
+				# table.style.paragraph_format.left_indent = Cm(-0.50)
+				# table.style.paragraph_format.right_indent = Cm(-0.50)
 
 
 	#
