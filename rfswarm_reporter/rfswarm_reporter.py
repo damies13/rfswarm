@@ -43,6 +43,7 @@ from docx import Document
 from docx.shared import Pt, Cm, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.style import WD_STYLE_TYPE
+from docx.oxml.shared import OxmlElement, qn
 # used for docx export
 
 
@@ -2784,8 +2785,62 @@ class ReporterCore:
 	def docx_sections_contents(self, id):
 		base.debugmsg(5, "id:", id)
 
+		mode = base.rt_contents_get_mode(id)
+		level = base.rt_contents_get_level(id)
+
+		base.debugmsg(5, "mode:", mode, "	level:", level)
+		# fmode = None
+		# if mode == "Table Of Contents":
+		# 	fmode = None
+		# if mode == "Table of Graphs":
+		# 	fmode = "graph"
+		# if mode == "Table Of Tables":
+		# 	fmode = "table"
+
 		document = self.cg_data["docx"]["document"]
-		document.add_paragraph("", style='Normal')
+		# document.add_paragraph("", style='Normal')
+
+
+
+		paragraph = document.add_paragraph()
+		run = paragraph.add_run()
+		fldChar = OxmlElement('w:fldChar')  # creates a new element
+		fldChar.set(qn('w:fldCharType'), 'begin')  # sets attribute on element
+		instrText = OxmlElement('w:instrText')
+		instrText.set(qn('xml:space'), 'preserve')  # sets attribute on element
+		if mode == "Table Of Contents":
+			instrText.text = 'TOC \\o "1-'+str(level)+'" \\h \\z \\u'   # change 1-3 depending on heading levels you need
+
+		# \c "SEQIdentifier"
+		# Lists figures, tables, charts, or other items that are numbered by a SEQ (Sequence) field. Word uses SEQ fields to number items captioned with the Caption command (References > Insert Caption). SEQIdentifier, which corresponds to the caption label, must match the identifier in the SEQ field. For example, { TOC \c "tables" } lists all numbered tables.
+
+		if mode == "Table of Graphs":
+			instrText.text = 'TOC \\o "1-'+str(level)+'" \\c "figures"'
+
+		if mode == "Table Of Tables":
+			instrText.text = 'TOC \\o "1-'+str(level)+'" \\c "tables"'
+
+
+
+		fldChar2 = OxmlElement('w:fldChar')
+		fldChar2.set(qn('w:fldCharType'), 'separate')
+		fldChar3 = OxmlElement('w:t')
+		fldChar3.text = "Right-click to update field."
+		fldChar2.append(fldChar3)
+
+		fldChar4 = OxmlElement('w:fldChar')
+		fldChar4.set(qn('w:fldCharType'), 'end')
+
+		r_element = run._r
+		r_element.append(fldChar)
+		r_element.append(instrText)
+		r_element.append(fldChar2)
+		r_element.append(fldChar4)
+		p_element = paragraph._p
+		# print(p_element.xml)
+
+		# document.add_paragraph("", style='Normal')
+
 
 	def docx_sections_note(self, id):
 		base.debugmsg(5, "id:", id)
@@ -2910,10 +2965,10 @@ class ReporterCore:
 				buf = BytesIO()
 				fig.savefig(buf)
 				buf.seek(0)
-				document.add_picture(buf)
-				# oimg = Image.open(buf)
-				# self.xhtml_sections_embedimg(body, id, oimg)
-
+				pic = document.add_picture(buf)
+				base.debugmsg(5, "pic:", pic)
+				# base.debugmsg(5, "pic.parent:", pic.parent)
+				document.paragraphs[-1].paragraph_format.left_indent = Cm(-0.5)
 
 
 
