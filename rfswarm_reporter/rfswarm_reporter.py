@@ -721,7 +721,7 @@ class ReporterBase():
 	# Report Item Type: contents
 	#
 	def rt_contents_get_mode(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(8, "id:", id)
 		if 'mode' in base.report[id]:
 			return base.report[id]['mode']
 		else:
@@ -734,7 +734,7 @@ class ReporterBase():
 		base.report_save()
 
 	def rt_contents_get_level(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(8, "id:", id)
 		if id == "TOP":
 			return 0
 		if 'level' in base.report[id]:
@@ -1781,6 +1781,7 @@ class ReporterBase():
 class ReporterCore:
 
 	cg_data = {}
+	t_export = {}
 
 	def __init__(self, master=None):
 		base.debugmsg(0, "Robot Framework Swarm: Reporter")
@@ -1890,17 +1891,26 @@ class ReporterCore:
 			base.report_save()
 
 		if base.args.html:
-			self.export_xhtml()
+			# self.export_xhtml()
+			self.t_export["xhtml"] = threading.Thread(target=self.export_xhtml)
+			self.t_export["xhtml"].start()
 
 		if base.args.docx:
-			self.export_word()
+			# self.export_word()
+			self.t_export["docx"] = threading.Thread(target=self.export_word)
+			self.t_export["docx"].start()
 
 		if base.args.xlsx:
-			self.export_excel()
+			# self.export_excel()
+			self.t_export["xlsx"] = threading.Thread(target=self.export_excel)
+			self.t_export["xlsx"].start()
 
 		if base.displaygui:
 			base.gui = ReporterGUI()
 		else:
+			# t_export
+			for thd in self.t_export.keys():
+				self.t_export[thd].join()
 			self.on_closing()
 
 	def mainloop(self):
@@ -3177,7 +3187,7 @@ class ReporterCore:
 		title.alignment.horizontal = 'center'
 		title.alignment.wrapText = True
 		wb.add_named_style(title)
-		base.debugmsg(5, "title:", title.name, title.font.name, title.font.size)
+		base.debugmsg(9, "title:", title.name, title.font.name, title.font.size)
 
 		# subtitle = openpyxl.styles.NamedStyle(name="CoverSubTitle")
 		subtitle = copy(title)
@@ -3188,15 +3198,15 @@ class ReporterCore:
 		# subtitle.alignment.horizontal = 'center'
 		# subtitle.alignment.wrapText = True
 		wb.add_named_style(subtitle)
-		base.debugmsg(5, "subtitle:", subtitle.name, subtitle.font.name, subtitle.font.size)
-		base.debugmsg(5, "title:", title.name, title.font.name, title.font.size)
-		base.debugmsg(5, "highlight:", highlight.name, highlight.font.name, highlight.font.size)
-		base.debugmsg(5, "default:", default.name, default.font.name, default.font.size)
+		base.debugmsg(9, "subtitle:", subtitle.name, subtitle.font.name, subtitle.font.size)
+		base.debugmsg(9, "title:", title.name, title.font.name, title.font.size)
+		base.debugmsg(9, "highlight:", highlight.name, highlight.font.name, highlight.font.size)
+		base.debugmsg(9, "default:", default.name, default.font.name, default.font.size)
 
 		headings = {}
 		fm = 2
 		for i in range(6):
-			base.debugmsg(5, "i:", i, i+1)
+			base.debugmsg(7, "i:", i, i+1)
 			hnum = i+1
 			headings[hnum] = copy(highlight)
 			headings[hnum].name = "Heading "+str(hnum)
@@ -3207,17 +3217,17 @@ class ReporterCore:
 
 
 	def xlsx_add_sections(self, id, sectionpct):
-		base.debugmsg(5, "id:", id, "	sectionpct:", sectionpct)
+		base.debugmsg(7, "id:", id, "	sectionpct:", sectionpct)
 
 		wb = self.cg_data["xlsx"]["Workbook"]
 		ws = wb.active
 
-		base.debugmsg(5, "ws:", ws)
-		base.debugmsg(5, "ws.title:", ws.title)
+		base.debugmsg(9, "ws:", ws)
+		base.debugmsg(9, "ws.title:", ws.title)
 
 
 		sections = base.report_get_order(id)
-		base.debugmsg(5, "sections:", sections)
+		base.debugmsg(9, "sections:", sections)
 
 		if id == "TOP":
 
@@ -3247,11 +3257,11 @@ class ReporterCore:
 			# Logo
 			#
 			rownum = 5
-			base.debugmsg(5, "showtlogo:", base.rs_setting_get_int("showtlogo"))
+			base.debugmsg(7, "showtlogo:", base.rs_setting_get_int("showtlogo"))
 			if base.rs_setting_get_int("showtlogo"):
 
 				tlogo = base.rs_setting_get_file("tlogo")
-				base.debugmsg(5, "tlogo:", tlogo)
+				base.debugmsg(7, "tlogo:", tlogo)
 				img = openpyxl.drawing.image.Image(tlogo)
 				cellname = ws.cell(row=rownum, column=1).coordinate
 				ws.add_image(img, cellname)
@@ -3293,11 +3303,11 @@ class ReporterCore:
 		else:
 			newsectionpct = 1/(len(sections)+1)
 			sectionpct = newsectionpct * sectionpct
-			base.debugmsg(5, "sectionpct:", sectionpct)
+			base.debugmsg(8, "sectionpct:", sectionpct)
 			self.xlsx_sections_addheading(id)
 
 			stype = base.report_item_get_type(id)
-			base.debugmsg(5, "stype:", stype)
+			base.debugmsg(7, "stype:", stype)
 			if stype == "contents":
 				self.xlsx_sections_contents(id)
 				pass
@@ -3323,15 +3333,15 @@ class ReporterCore:
 
 
 	def xlsx_sections_addheading(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(8, "id:", id)
 
 		wb = self.cg_data["xlsx"]["Workbook"]
 		ws = wb.active
 
-		base.debugmsg(5, "ws:", ws)
-		base.debugmsg(5, "ws.title:", ws.title)
+		base.debugmsg(9, "ws:", ws)
+		base.debugmsg(9, "ws.title:", ws.title)
 
-		base.debugmsg(5, "ws.active_cell:", ws.active_cell, "	ws.selected_cell:", ws.selected_cell)
+		base.debugmsg(9, "ws.active_cell:", ws.active_cell, "	ws.selected_cell:", ws.selected_cell)
 
 		# acell = ws.cell(ws.active_cell)
 		acell = ws[ws.active_cell]
@@ -3339,11 +3349,11 @@ class ReporterCore:
 
 
 		level = base.report_sect_level(id)
-		base.debugmsg(5, "level:", level)
+		base.debugmsg(8, "level:", level)
 		number = base.report_sect_number(id)
-		base.debugmsg(5, "number:", number)
+		base.debugmsg(9, "number:", number)
 		name = base.report_item_get_name(id)
-		base.debugmsg(5, "name:", name)
+		base.debugmsg(9, "name:", name)
 
 		heading_text = "{} {}".format(number, name)
 
@@ -3371,7 +3381,7 @@ class ReporterCore:
 		# base.debugmsg(5, "ws.active_cell:", ws.active_cell, "	ws.selected_cell:", ws.selected_cell)
 
 	def xlsx_sections_contents(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(8, "id:", id)
 
 		wb = self.cg_data["xlsx"]["Workbook"]
 		ws = wb.active
@@ -3396,16 +3406,16 @@ class ReporterCore:
 		display = True
 
 		sections = base.report_get_order(id)
-		base.debugmsg(5, "sections:", sections)
+		base.debugmsg(9, "sections:", sections)
 		level = base.report_sect_level(id)
-		base.debugmsg(5, "level:", level)
+		base.debugmsg(8, "level:", level)
 
 		if id == "TOP":
 			display = False
 
 		if mode is not None:
 			type = base.report_item_get_type(id)
-			base.debugmsg(5, "type:", type)
+			base.debugmsg(8, "type:", type)
 			if mode != type:
 				display = False
 
@@ -3417,11 +3427,11 @@ class ReporterCore:
 
 
 			number = base.report_sect_number(id)
-			base.debugmsg(5, "number:", number)
+			base.debugmsg(9, "number:", number)
 			name = base.report_item_get_name(id)
-			base.debugmsg(5, "name:", name)
+			base.debugmsg(9, "name:", name)
 			type = base.report_item_get_type(id)
-			base.debugmsg(5, "type:", type)
+			base.debugmsg(9, "type:", type)
 
 			heading_text = "{} {}".format(number, name)
 
@@ -3429,19 +3439,19 @@ class ReporterCore:
 				parentid = base.report_item_parent(id)
 				parentlvl = base.report_sect_level(parentid)
 				while parentlvl >1:
-					base.debugmsg(5, "parentid:", parentid)
-					base.debugmsg(5, "parentlvl:", parentlvl)
+					base.debugmsg(9, "parentid:", parentid)
+					base.debugmsg(9, "parentlvl:", parentlvl)
 
 					parentid = base.report_item_parent(parentid)
 					parentlvl = base.report_sect_level(parentid)
 
-				base.debugmsg(5, "parentid:", parentid)
-				base.debugmsg(5, "parentlvl:", parentlvl)
+				base.debugmsg(9, "parentid:", parentid)
+				base.debugmsg(9, "parentlvl:", parentlvl)
 
 				pnumber = base.report_sect_number(parentid)
-				base.debugmsg(5, "pnumber:", pnumber)
+				base.debugmsg(9, "pnumber:", pnumber)
 				pname = base.report_item_get_name(parentid)
-				base.debugmsg(5, "pname:", pname)
+				base.debugmsg(9, "pname:", pname)
 
 				parent_text = "{} {}".format(pnumber, pname)
 			else:
@@ -3453,11 +3463,11 @@ class ReporterCore:
 			c = ws[ws.active_cell]
 			# =HYPERLINK(CONCAT("#'10 agents'!A",MATCH("10.8 selenium versions",'10 agents' A:A,0)),'10.8 selenium versions')
 			match = "MATCH(\""+heading_text+"\",'"+parent_text+"'!A:A,0)"
-			base.debugmsg(5, "match:", match)
+			base.debugmsg(9, "match:", match)
 			concat = "CONCATENATE(\"#'"+parent_text+"'!A\"," + match + ")"
-			base.debugmsg(5, "concat:", concat)
+			base.debugmsg(9, "concat:", concat)
 			hyper = "=HYPERLINK("+concat+ ",\""+heading_text+"\")"
-			base.debugmsg(5, "hyper:", hyper)
+			base.debugmsg(8, "hyper:", hyper)
 			c.value = hyper
 
 		if level < maxlevel:
@@ -3467,7 +3477,7 @@ class ReporterCore:
 
 
 	def xlsx_sections_note(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(8, "id:", id)
 
 		wb = self.cg_data["xlsx"]["Workbook"]
 		ws = wb.active
@@ -3496,8 +3506,122 @@ class ReporterCore:
 		rownum += 1
 		self.xlsx_select_cell(1, rownum)
 
+		datatype = base.rt_graph_get_dt(id)
+		if datatype == "SQL":
+			sql = base.rt_graph_get_sql(id)
+		else:
+			sql = base.rt_graph_generate_sql(id)
+
+		gphdpi = 72
+		# gphdpi = 100
+		fig = Figure(dpi=gphdpi) # , tight_layout=True
+		axis = fig.add_subplot(1,1,1)	# , constrained_layout=True??
+		axis.grid(True, 'major', 'both')
+		fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+
+		canvas = FigureCanvas(fig)
+
+		# https://stackoverflow.com/questions/57316491/how-to-convert-matplotlib-figure-to-pil-image-object-without-saving-image
+
+		try:
+			canvas.draw()
+		except Exception as e:
+			base.debugmsg(5, "canvas.draw() Exception:", e)
+		fig.set_tight_layout(True)
+
+
+		dodraw = False
+		graphdata = {}
+
+		if sql is not None and len(sql.strip())>0:
+			base.debugmsg(7, "sql:", sql)
+			key = "{}_{}".format(id, base.report_item_get_changed(id))
+			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+			while key not in base.dbqueue["ReadResult"]:
+				time.sleep(0.1)
+
+			gdata = base.dbqueue["ReadResult"][key]
+			base.debugmsg(9, "gdata:", gdata)
+
+			for row in gdata:
+				base.debugmsg(9, "row:", row)
+				if 'Name' in row:
+					name = row['Name']
+					base.debugmsg(9, "name:", name)
+					if name not in graphdata:
+						graphdata[name] = {}
+
+						colour = base.named_colour(name)
+						base.debugmsg(8, "name:", name, "	colour:", colour)
+						graphdata[name]["Colour"] = colour
+						# self.contentdata[id]["graphdata"][name]["Time"] = []
+						graphdata[name]["objTime"] = []
+						graphdata[name]["Values"] = []
+
+					graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+					graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
+				else:
+					break
+
+
+			base.debugmsg(9, "graphdata:", graphdata)
+
+			for name in graphdata:
+				base.debugmsg(7, "name:", name)
+				if len(graphdata[name]["Values"])>1 and len(graphdata[name]["Values"])==len(graphdata[name]["objTime"]):
+					try:
+						axis.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name)
+						dodraw = True
+					except Exception as e:
+						base.debugmsg(7, "axis.plot() Exception:", e)
+
+				if len(graphdata[name]["Values"])==1 and len(graphdata[name]["Values"])==len(graphdata[name]["objTime"]):
+					try:
+						axis.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name, marker='o')
+						dodraw = True
+					except Exception as e:
+						base.debugmsg(7, "axis.plot() Exception:", e)
+
+			if dodraw:
+
+				axis.grid(True, 'major', 'both')
+
+				SMetric = "Other"
+				if datatype == "Metric":
+					SMetric = base.rt_table_get_sm(id)
+				base.debugmsg(8, "SMetric:", SMetric)
+				if SMetric in ["Load", "CPU", "MEM", "NET"]:
+					axis.set_ylim(0, 100)
+				else:
+					axis.set_ylim(0)
+
+				fig.set_tight_layout(True)
+				fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+				try:
+					canvas.draw()
+				except Exception as e:
+					base.debugmsg(5, "canvas.draw() Exception:", e)
+
+				# works but messy createing files we then need to delete
+				# filename = "{}.png".format(id)
+				# fig.savefig(filename)
+				# self.xhtml_sections_fileimg(body, id, filename)
+
+				buf = BytesIO()
+				fig.savefig(buf)
+				buf.seek(0)
+
+				# rownum += 1
+				img = openpyxl.drawing.image.Image(buf)
+				cellname = ws.cell(row=rownum, column=2).coordinate
+				ws.add_image(img, cellname)
+
+
+				rownum += 19
+				self.xlsx_select_cell(1, rownum)
+
 	def xlsx_sections_table(self, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(8, "id:", id)
 
 		wb = self.cg_data["xlsx"]["Workbook"]
 		ws = wb.active
@@ -3540,12 +3664,12 @@ class ReporterCore:
 				cw = 5
 				for col in cols:
 
-					base.debugmsg(5, "col:", col, "	cellcol:", cellcol, "	rownum:", rownum)
+					base.debugmsg(8, "col:", col, "	cellcol:", cellcol, "	rownum:", rownum)
 					hcell = ws.cell(column=cellcol, row=rownum, value=col)
 					hcell.style="Highlight"
 
 					neww = len(str(col))*1.3
-					base.debugmsg(5, "neww:", neww)
+					base.debugmsg(9, "neww:", neww)
 					ws.column_dimensions[hcell.column_letter].width = neww
 
 					cellcol += 1
@@ -3561,11 +3685,11 @@ class ReporterCore:
 
 					if colours:
 
-						base.debugmsg(5, "row:", row)
+						base.debugmsg(9, "row:", row)
 						label=row[cols[0]]
-						base.debugmsg(5, "label:", label)
+						base.debugmsg(9, "label:", label)
 						colour = base.named_colour(label).replace("#", "")
-						base.debugmsg(5, "colour:", colour)
+						base.debugmsg(9, "colour:", colour)
 						dcell = ws.cell(column=cellcol, row=rownum)
 						dcell.fill = openpyxl.styles.PatternFill("solid", fgColor=colour)
 
@@ -3573,7 +3697,7 @@ class ReporterCore:
 
 					for val in vals:
 
-						base.debugmsg(5, "val:", val)
+						base.debugmsg(8, "val:", val)
 						dcell = ws.cell(column=cellcol, row=rownum, value=val)
 						dcell.style="Default"
 
@@ -3584,9 +3708,9 @@ class ReporterCore:
 						# ws.column_dimensions[dcell.column_letter].bestFit = True
 
 						currw = ws.column_dimensions[dcell.column_letter].width
-						base.debugmsg(5, "currw:", currw, "	len(val):", len(str(val)))
+						base.debugmsg(9, "currw:", currw, "	len(val):", len(str(val)))
 						neww = max(currw, len(str(val)))
-						base.debugmsg(5, "neww:", neww)
+						base.debugmsg(8, "neww:", neww)
 						ws.column_dimensions[dcell.column_letter].width = neww
 
 
