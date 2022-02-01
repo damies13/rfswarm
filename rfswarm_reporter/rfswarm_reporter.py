@@ -46,6 +46,14 @@ from docx.enum.style import WD_STYLE_TYPE
 from docx.oxml.shared import OxmlElement, qn
 # used for docx export
 
+# used for xlsx export
+# from openpyxl import Workbook
+# from openpyxl.drawing.image import Image as xlImage
+import openpyxl
+from copy import copy
+# used for xlsx export
+
+
 
 import tkinter as tk				#python3
 import tkinter.ttk as ttk			#python3
@@ -2043,7 +2051,7 @@ class ReporterCore:
 
 		if "docx" in self.cg_data:
 			if "progress" in self.cg_data["docx"] and self.cg_data["docx"]["progress"]<1:
-				self.display_message("Waiting for previous docx report to finish")
+				self.display_message("Waiting for previous Word report to finish")
 				while self.cg_data["docx"]["progress"]<1:
 					time.sleep(0.5)
 			del self.cg_data["docx"]
@@ -2074,7 +2082,43 @@ class ReporterCore:
 		base.debugmsg(5, "Not implimented yet.....")
 
 	def export_excel(self):
-		base.debugmsg(5, "Not implimented yet.....")
+		self.display_message("Generating Excel Report")
+
+		sections = base.report_get_order("TOP")
+		base.debugmsg(5, "sections:", sections)
+		sectionpct = 1/(len(sections)+1)
+		base.debugmsg(5, "sectionpct:", sectionpct)
+
+		if "xlsx" in self.cg_data:
+			if "progress" in self.cg_data["xlsx"] and self.cg_data["xlsx"]["progress"]<1:
+				self.display_message("Waiting for previous Excel report to finish")
+				while self.cg_data["xlsx"]["progress"]<1:
+					time.sleep(0.5)
+			del self.cg_data["xlsx"]
+		self.cg_data["xlsx"] = {}
+		self.cg_data["xlsx"]["progress"] = 0.0
+
+		self.cg_data["xlsx"]["Workbook"] = openpyxl.Workbook()
+
+
+		self.xlsx_configure_style()
+
+
+		self.xlsx_add_sections("TOP", sectionpct)
+
+
+		base.debugmsg(5, "Report:", base.config['Reporter']['Report'])
+		reportbase, reportext = os.path.splitext(base.config['Reporter']['Report'])
+		outfile = "{}.xlsx".format(reportbase)
+		self.cg_data["xlsx"]["Workbook"].save(outfile)
+
+		base.debugmsg(5, "outfile:", outfile)
+		self.display_message("Saved Excel Report:",outfile)
+
+		self.cg_data["xlsx"]["progress"] = 1
+
+
+
 
 	def export_calc(self):
 		base.debugmsg(5, "Not implimented yet.....")
@@ -3098,6 +3142,354 @@ class ReporterCore:
 	#
 	# https://xlsxwriter.readthedocs.io/introduction.html
 	# https://openpyxl.readthedocs.io/en/stable/index.html
+
+	def xlsx_configure_style(self):
+
+		basecolour = '000000'
+		highlightcolour = base.rs_setting_get_hcolour().replace("#", "")
+		fontname = base.rs_setting_get_font()
+		fontsize = base.rs_setting_get_fontsize()
+
+		wb = self.cg_data["xlsx"]["Workbook"]
+
+
+		default = openpyxl.styles.NamedStyle(name="Default")
+		default.font.name = fontname
+		default.font.size = fontsize
+		default.font.color = basecolour
+		wb.add_named_style(default)
+
+		# highlight = openpyxl.styles.NamedStyle(name="Highlight")
+		highlight = copy(default)
+		highlight.name = "Highlight"
+		# highlight.font.name = fontname
+		# highlight.font.size = fontsize
+		highlight.font.color = highlightcolour
+		wb.add_named_style(highlight)
+
+
+		# title = openpyxl.styles.NamedStyle(name="CoverTitle")
+		title = copy(default)
+		title.name = "CoverTitle"
+		# title.font.name = fontname
+		title.font.size = fontsize*2
+		# title.font.color = basecolour
+		title.alignment.horizontal = 'center'
+		title.alignment.wrapText = True
+		wb.add_named_style(title)
+		base.debugmsg(5, "title:", title.name, title.font.name, title.font.size)
+
+		# subtitle = openpyxl.styles.NamedStyle(name="CoverSubTitle")
+		subtitle = copy(title)
+		subtitle.name = "CoverSubTitle"
+		# subtitle.font.name = fontname
+		subtitle.font.size = fontsize*1.5
+		# subtitle.font.color = basecolour
+		# subtitle.alignment.horizontal = 'center'
+		# subtitle.alignment.wrapText = True
+		wb.add_named_style(subtitle)
+		base.debugmsg(5, "subtitle:", subtitle.name, subtitle.font.name, subtitle.font.size)
+		base.debugmsg(5, "title:", title.name, title.font.name, title.font.size)
+		base.debugmsg(5, "highlight:", highlight.name, highlight.font.name, highlight.font.size)
+		base.debugmsg(5, "default:", default.name, default.font.name, default.font.size)
+
+		headings = {}
+		fm = 2
+		for i in range(6):
+			base.debugmsg(5, "i:", i, i+1)
+			hnum = i+1
+			headings[hnum] = copy(highlight)
+			headings[hnum].name = "Heading "+str(hnum)
+			headings[hnum].font.size = int(fontsize*fm)
+			wb.add_named_style(headings[hnum])
+
+			fm -= 0.2
+
+
+	def xlsx_add_sections(self, id, sectionpct):
+		base.debugmsg(5, "id:", id, "	sectionpct:", sectionpct)
+
+		wb = self.cg_data["xlsx"]["Workbook"]
+		ws = wb.active
+
+		base.debugmsg(5, "ws:", ws)
+		base.debugmsg(5, "ws.title:", ws.title)
+
+
+		sections = base.report_get_order(id)
+		base.debugmsg(5, "sections:", sections)
+
+		if id == "TOP":
+
+			ws.title = "Cover"
+			# ws['D5'].style = 'highlight'
+			# ws.cells().style = 'Default'
+
+
+			rownum = 0
+
+			#
+			# Title
+			#
+			titletxt = base.rs_setting_get_title()
+			rownum = 3
+			colspan = 9
+
+			ws.merge_cells(start_row=rownum, start_column=1, end_row=rownum, end_column=colspan)
+			titlecell = ws.cell(column=1, row=rownum, value=titletxt)
+			titlecell.style = "CoverTitle"
+
+			fontsize = base.rs_setting_get_fontsize()
+			rd = ws.row_dimensions[rownum]
+			rd.height = fontsize*5
+
+			#
+			# Logo
+			#
+			rownum = 5
+			base.debugmsg(5, "showtlogo:", base.rs_setting_get_int("showtlogo"))
+			if base.rs_setting_get_int("showtlogo"):
+
+				tlogo = base.rs_setting_get_file("tlogo")
+				base.debugmsg(5, "tlogo:", tlogo)
+				img = openpyxl.drawing.image.Image(tlogo)
+				cellname = ws.cell(row=rownum, column=1).coordinate
+				ws.add_image(img, cellname)
+
+
+			#
+			# Execution Date range
+			#
+			rownum = 20
+
+			execdr = ""
+			if base.rs_setting_get_int("showstarttime"):
+				iST = base.report_starttime()
+				fSD = "{}".format(base.report_formatdate(iST))
+				fST = "{}".format(base.report_formattime(iST))
+
+				execdr = "{} {}".format(fSD, fST)
+
+			if base.rs_setting_get_int("showendtime"):
+				iET = base.report_endtime()
+				fED = "{}".format(base.report_formatdate(iET))
+				fET = "{}".format(base.report_formattime(iET))
+
+				if not base.rs_setting_get_int("showstarttime"):
+					execdr = "{} {}".format(fED, fET)
+				else:
+					if fSD == fED:
+						execdr = "{} - {}".format(execdr, fET)
+					else:
+						execdr = "{} - {} {}".format(execdr, fED, fET)
+
+			ws.merge_cells(start_row=rownum, start_column=1, end_row=rownum, end_column=colspan)
+			subtitlecell = ws.cell(column=1, row=rownum, value=execdr)
+			subtitlecell.style = "CoverSubTitle"
+
+			rd = ws.row_dimensions[rownum]
+			rd.height = fontsize*2
+
+		else:
+			newsectionpct = 1/(len(sections)+1)
+			sectionpct = newsectionpct * sectionpct
+			base.debugmsg(5, "sectionpct:", sectionpct)
+			self.xlsx_sections_addheading(id)
+
+			stype = base.report_item_get_type(id)
+			base.debugmsg(5, "stype:", stype)
+			if stype == "contents":
+				self.xlsx_sections_contents(id)
+				pass
+			if stype == "note":
+				self.xlsx_sections_note(id)
+				pass
+			if stype == "graph":
+				self.xlsx_sections_graph(id)
+				pass
+			if stype == "table":
+				self.xlsx_sections_table(id)
+				pass
+
+		self.cg_data["xlsx"]["progress"] += sectionpct
+		self.display_message("Generating Excel Report {}%".format(int(round(self.cg_data["xlsx"]["progress"]*100, 0))))
+
+
+		if len(sections)>0:
+			for sect in sections:
+				self.xlsx_add_sections(sect, sectionpct)
+
+
+
+
+	def xlsx_sections_addheading(self, id):
+		base.debugmsg(5, "id:", id)
+
+		wb = self.cg_data["xlsx"]["Workbook"]
+		ws = wb.active
+
+		base.debugmsg(5, "ws:", ws)
+		base.debugmsg(5, "ws.title:", ws.title)
+
+		base.debugmsg(5, "ws.active_cell:", ws.active_cell, "	ws.selected_cell:", ws.selected_cell)
+
+		# acell = ws.cell(ws.active_cell)
+		acell = ws[ws.active_cell]
+		rownum = acell.row
+
+
+		level = base.report_sect_level(id)
+		base.debugmsg(5, "level:", level)
+		number = base.report_sect_number(id)
+		base.debugmsg(5, "number:", number)
+		name = base.report_item_get_name(id)
+		base.debugmsg(5, "name:", name)
+
+		heading_text = "{} {}".format(number, name)
+
+		if level == 1:
+			ws = wb.create_sheet(title=heading_text)
+			for wsi in wb.worksheets:
+				if wsi.title == heading_text:
+					wb.active = wsi
+
+			rownum = 1
+
+		titlecell = ws.cell(column=1, row=rownum, value=heading_text)
+		titlecell.style = "Heading "+str(level)
+
+		if level < 5:
+			fontsize = base.rs_setting_get_fontsize()
+			rd = ws.row_dimensions[rownum]
+			rd.height = fontsize*2
+
+		# base.debugmsg(5, "ws.active_cell:", ws.active_cell, "	ws.selected_cell:", ws.selected_cell)
+
+		rownum += 1
+		self.xlsx_select_cell(1, rownum)
+
+		# base.debugmsg(5, "ws.active_cell:", ws.active_cell, "	ws.selected_cell:", ws.selected_cell)
+
+	def xlsx_sections_contents(self, id):
+		base.debugmsg(5, "id:", id)
+
+		wb = self.cg_data["xlsx"]["Workbook"]
+		ws = wb.active
+		rownum = ws[ws.active_cell].row
+
+		self.xlsx_sections_contents_row("TOP")
+
+	def xlsx_sections_contents_row(self, id):
+
+		sections = base.report_get_order(id)
+		base.debugmsg(5, "sections:", sections)
+
+		if id != "TOP":
+			wb = self.cg_data["xlsx"]["Workbook"]
+			ws = wb.active
+			rownum = ws[ws.active_cell].row
+
+
+			level = base.report_sect_level(id)
+			base.debugmsg(5, "level:", level)
+			number = base.report_sect_number(id)
+			base.debugmsg(5, "number:", number)
+			name = base.report_item_get_name(id)
+			base.debugmsg(5, "name:", name)
+
+			heading_text = "{} {}".format(number, name)
+
+			if level>1:
+				parentid = base.report_item_parent(id)
+				parentlvl = base.report_sect_level(parentid)
+				while parentlvl >1:
+					base.debugmsg(5, "parentid:", parentid)
+					base.debugmsg(5, "parentlvl:", parentlvl)
+
+					parentid = base.report_item_parent(parentid)
+					parentlvl = base.report_sect_level(parentid)
+
+				base.debugmsg(5, "parentid:", parentid)
+				base.debugmsg(5, "parentlvl:", parentlvl)
+
+				pnumber = base.report_sect_number(parentid)
+				base.debugmsg(5, "pnumber:", pnumber)
+				pname = base.report_item_get_name(parentid)
+				base.debugmsg(5, "pname:", pname)
+
+				parent_text = "{} {}".format(pnumber, pname)
+			else:
+				parent_text = heading_text
+
+
+			rownum += 1
+			self.xlsx_select_cell(1, rownum)
+			c = ws[ws.active_cell]
+			# =HYPERLINK(CONCAT("#'10 agents'!A",MATCH("10.8 selenium versions",'10 agents' A:A,0)),'10.8 selenium versions')
+			match = "MATCH(\""+heading_text+"\",'"+parent_text+"'!A:A,0)"
+			base.debugmsg(5, "match:", match)
+			concat = "CONCATENATE(\"#'"+parent_text+"'!A\"," + match + ")"
+			base.debugmsg(5, "concat:", concat)
+			hyper = "=HYPERLINK("+concat+ ",\""+heading_text+"\")"
+			base.debugmsg(5, "hyper:", hyper)
+			c.value = hyper
+
+		if len(sections)>0:
+			for sect in sections:
+				self.xlsx_sections_contents_row(sect)
+
+
+	def xlsx_sections_note(self, id):
+		base.debugmsg(5, "id:", id)
+
+		wb = self.cg_data["xlsx"]["Workbook"]
+		ws = wb.active
+		rownum = ws[ws.active_cell].row
+
+		rownum += 1
+		self.xlsx_select_cell(1, rownum)
+
+		notebody = base.rt_note_get(id)
+		notebody = notebody.replace("\r\n", "\n")
+		notebody = notebody.replace("\r", "\n")
+		notelist = notebody.split("\n")
+		for line in notelist:
+			linecell = ws.cell(column=1, row=rownum, value=line)
+			linecell.style="Default"
+			rownum += 1
+			self.xlsx_select_cell(1, rownum)
+
+	def xlsx_sections_graph(self, id):
+		base.debugmsg(5, "id:", id)
+
+		wb = self.cg_data["xlsx"]["Workbook"]
+		ws = wb.active
+		rownum = ws[ws.active_cell].row
+
+		rownum += 1
+		self.xlsx_select_cell(1, rownum)
+
+	def xlsx_sections_table(self, id):
+		base.debugmsg(5, "id:", id)
+
+		wb = self.cg_data["xlsx"]["Workbook"]
+		ws = wb.active
+		rownum = ws[ws.active_cell].row
+
+		rownum += 1
+		self.xlsx_select_cell(1, rownum)
+
+
+
+
+	def xlsx_select_cell(self, col, row):
+
+		wb = self.cg_data["xlsx"]["Workbook"]
+		ws = wb.active
+		nextcell = ws.cell(column=col, row=row)
+
+		ws.sheet_view.selection[0].activeCell = nextcell.coordinate
+		ws.sheet_view.selection[0].sqref = nextcell.coordinate
 
 
 class ReporterGUI(tk.Frame):
