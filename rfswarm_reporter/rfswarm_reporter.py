@@ -3377,25 +3377,51 @@ class ReporterCore:
 		ws = wb.active
 		rownum = ws[ws.active_cell].row
 
-		self.xlsx_sections_contents_row("TOP")
 
-	def xlsx_sections_contents_row(self, id):
+		mode = base.rt_contents_get_mode(id)
+		maxlevel = base.rt_contents_get_level(id)
+		fmode = None
+		if mode == "Table Of Contents":
+			fmode = None
+		if mode == "Table of Graphs":
+			fmode = "graph"
+		if mode == "Table Of Tables":
+			fmode = "table"
+
+
+		self.xlsx_sections_contents_row("TOP", maxlevel, fmode)
+
+	def xlsx_sections_contents_row(self, id, maxlevel, mode):
+
+		display = True
 
 		sections = base.report_get_order(id)
 		base.debugmsg(5, "sections:", sections)
+		level = base.report_sect_level(id)
+		base.debugmsg(5, "level:", level)
 
-		if id != "TOP":
+		if id == "TOP":
+			display = False
+
+		if mode is not None:
+			type = base.report_item_get_type(id)
+			base.debugmsg(5, "type:", type)
+			if mode != type:
+				display = False
+
+
+		if display:
 			wb = self.cg_data["xlsx"]["Workbook"]
 			ws = wb.active
 			rownum = ws[ws.active_cell].row
 
 
-			level = base.report_sect_level(id)
-			base.debugmsg(5, "level:", level)
 			number = base.report_sect_number(id)
 			base.debugmsg(5, "number:", number)
 			name = base.report_item_get_name(id)
 			base.debugmsg(5, "name:", name)
+			type = base.report_item_get_type(id)
+			base.debugmsg(5, "type:", type)
 
 			heading_text = "{} {}".format(number, name)
 
@@ -3434,9 +3460,10 @@ class ReporterCore:
 			base.debugmsg(5, "hyper:", hyper)
 			c.value = hyper
 
-		if len(sections)>0:
-			for sect in sections:
-				self.xlsx_sections_contents_row(sect)
+		if level < maxlevel:
+			if len(sections)>0:
+				for sect in sections:
+					self.xlsx_sections_contents_row(sect, maxlevel, mode)
 
 
 	def xlsx_sections_note(self, id):
