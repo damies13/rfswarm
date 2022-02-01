@@ -1034,10 +1034,10 @@ class ReporterBase():
 			sql = "SELECT "
 			if RType == "Response Time":
 				sql += 		"result_name 'Result Name' "
-				sql += 		", round(min(elapsed_time),3) 'Minium' "
+				sql += 		", round(min(elapsed_time),3) 'Minimum' "
 				sql += 		", round(avg(elapsed_time),3) 'Average' "
 				sql += 		", round(percentile(elapsed_time, {}),3) '{}%ile' ".format(display_percentile, display_percentile)
-				sql += 		", round(max(elapsed_time),3) 'Maxium' "
+				sql += 		", round(max(elapsed_time),3) 'Maximum' "
 				sql += 		", round(stdev(elapsed_time),3) 'Std. Dev.' "
 				sql += 		", count(result) as 'Count' "
 
@@ -3503,7 +3503,97 @@ class ReporterCore:
 		ws = wb.active
 		rownum = ws[ws.active_cell].row
 
-		rownum += 1
+		datatype = base.rt_table_get_dt(id)
+		if datatype == "SQL":
+			sql = base.rt_table_get_sql(id)
+		else:
+			sql = base.rt_table_generate_sql(id)
+		colours = base.rt_table_get_colours(id)
+
+		if sql is not None and len(sql.strip())>0:
+			base.debugmsg(8, "sql:", sql)
+			key = "{}_{}".format(id, base.report_item_get_changed(id))
+			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+			while key not in base.dbqueue["ReadResult"]:
+				time.sleep(0.1)
+
+			tdata = base.dbqueue["ReadResult"][key]
+			base.debugmsg(8, "tdata:", tdata)
+
+			if len(tdata)>0:
+				# table headers
+				cols = list(tdata[0].keys())
+				base.debugmsg(7, "cols:", cols)
+
+				rownum += 1
+				numcols = len(cols)
+				cellcol = 1
+				if colours:
+					# set first column narrow for colour swatch
+					# ws.columns[1].width = 10
+					ws.column_dimensions["A"].width = 3
+
+					numcols += 1
+					cellcol += 1
+
+
+				cw = 5
+				for col in cols:
+
+					base.debugmsg(5, "col:", col, "	cellcol:", cellcol, "	rownum:", rownum)
+					hcell = ws.cell(column=cellcol, row=rownum, value=col)
+					hcell.style="Highlight"
+
+					neww = len(str(col))*1.3
+					base.debugmsg(5, "neww:", neww)
+					ws.column_dimensions[hcell.column_letter].width = neww
+
+					cellcol += 1
+
+				# table rows
+				for row in tdata:
+
+					cellcol = 1
+					rownum += 1
+
+					vals = list(row.values())
+					base.debugmsg(7, "vals:", vals)
+
+					if colours:
+
+						base.debugmsg(5, "row:", row)
+						label=row[cols[0]]
+						base.debugmsg(5, "label:", label)
+						colour = base.named_colour(label).replace("#", "")
+						base.debugmsg(5, "colour:", colour)
+						dcell = ws.cell(column=cellcol, row=rownum)
+						dcell.fill = openpyxl.styles.PatternFill("solid", fgColor=colour)
+
+						cellcol += 1
+
+					for val in vals:
+
+						base.debugmsg(5, "val:", val)
+						dcell = ws.cell(column=cellcol, row=rownum, value=val)
+						dcell.style="Default"
+
+						# ws.columns[cellcol].width = 10
+						# ws.columns[cellcol].bestFit = True
+						# dcell.column_letter
+						# ws.column_dimensions["A"].width = 2
+						# ws.column_dimensions[dcell.column_letter].bestFit = True
+
+						currw = ws.column_dimensions[dcell.column_letter].width
+						base.debugmsg(5, "currw:", currw, "	len(val):", len(str(val)))
+						neww = max(currw, len(str(val)))
+						base.debugmsg(5, "neww:", neww)
+						ws.column_dimensions[dcell.column_letter].width = neww
+
+
+						cellcol += 1
+
+
+		rownum += 2
 		self.xlsx_select_cell(1, rownum)
 
 
