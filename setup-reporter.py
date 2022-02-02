@@ -16,15 +16,17 @@ setuptools.setup(
 	# I needed a recent version of pip (pip 21.0.1 worked my previous <20 version didn't) for matplotlib
 	# 	to actually install withput error
 	# https://matplotlib.org/stable/users/installing.html
-	install_requires=['configparser', 'pillow', 'pip>=21', 'matplotlib', 'python-docx', 'openpyxl'],
+	# zoneinfo requires python 3.9
+	# tzlocal is needed to get the local timezone in a format that zoneinfo likes
+	install_requires=['configparser', 'pillow', 'pip>=21', 'matplotlib', 'python-docx', 'openpyxl', 'tzlocal>=4.1'],
 	classifiers=[
 		"Development Status :: 5 - Production/Stable",
 		"Topic :: Software Development :: Testing",
-		"Programming Language :: Python :: 3.7",
+		"Programming Language :: Python :: 3.9",
 		"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
 		"Operating System :: OS Independent",
 	],
-	python_requires='>=3.7',
+	python_requires='>=3.9',
 	project_urls={
 		'Getting Help': 'https://github.com/damies13/rfswarm#getting-help',
 		'Say Thanks!': 'https://github.com/damies13/rfswarm#donations',

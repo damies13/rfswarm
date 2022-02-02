@@ -18,8 +18,8 @@ import sqlite3
 
 import time
 from datetime import datetime, timezone
-import zoneinfo # says Requires python 3.9, didn't work for me on python 3.9.1
-import pytz
+import zoneinfo # says Requires python 3.9
+import tzlocal
 
 import threading
 
@@ -304,8 +304,13 @@ class ReporterBase():
 			base.config['Reporter']['TemplateDir'] = path
 			base.saveini()
 
+			base.report = None
+			self.reportdata = {}
 			base.report = configparser.ConfigParser()
 			base.report.read(filename)
+
+			base.report_item_set_changed_all("TOP")
+
 		else:
 			base.report_create()
 
@@ -336,7 +341,7 @@ class ReporterBase():
 
 
 	def report_starttime(self):
-		if "starttime" in self.reportdata:
+		if "starttime" in self.reportdata and self.reportdata["starttime"] > 0:
 			return self.reportdata["starttime"]
 		else:
 			self.reportdata["starttime"] = 0
@@ -376,7 +381,7 @@ class ReporterBase():
 
 
 	def report_endtime(self):
-		if "endtime" in self.reportdata:
+		if "endtime" in self.reportdata and self.reportdata["endtime"] > 0:
 			return self.reportdata["endtime"]
 		else:
 			self.reportdata["endtime"] = 0
@@ -471,9 +476,9 @@ class ReporterBase():
 	def rs_setting_set_file(self, name, value):
 		# determine relative path
 		# base.config['Reporter']['Report']	base.config['Reporter']['ResultDir']
-		relpath = os.path.relpath(value, start=base.config['Reporter']['ResultDir'])
-
-		base.rs_setting_set(name, relpath)
+		if os.path.exists(value):
+			relpath = os.path.relpath(value, start=base.config['Reporter']['ResultDir'])
+			base.rs_setting_set(name, relpath)
 
 
 
@@ -532,17 +537,14 @@ class ReporterBase():
 	def rs_setting_get_timezone(self):
 		value = self.rs_setting_get('timezone')
 		if value is None:
-			LOCAL_TIMEZONE = datetime.now(timezone.utc).astimezone().tzinfo
-			base.debugmsg(9, "tzname:", LOCAL_TIMEZONE)
+			LOCAL_TIMEZONE = tzlocal.get_localzone_name()
 			return LOCAL_TIMEZONE
 		else:
 			return value
 
 	def rs_setting_get_timezone_list(self):
-		# ZI = ZoneInfo(base.rs_setting_get_timezone())
-		# ZI = ZoneInfo("UTC")
-		base.debugmsg(9, "all_timezones:", pytz.all_timezones)
-		return pytz.all_timezones
+		# ZI = zoneinfo.ZoneInfo(base.rs_setting_get_timezone())
+		return zoneinfo.available_timezones()
 
 	#
 	# Report Sections
@@ -655,6 +657,17 @@ class ReporterBase():
 	def report_item_set_changed(self, id):
 		base.report[id]['Changed'] = str(time.time())
 
+	def report_item_set_changed_all(self, id):
+		if id != "TOP":
+			base.report_item_set_changed(id)
+
+		sections = base.report_get_order(id)
+		for sect in sections:
+			base.report_item_set_changed_all(sect)
+
+		base.report_save()
+
+
 	def report_item_get_name(self, id):
 		if id == "TOP":
 			return "Report"
@@ -716,6 +729,8 @@ class ReporterBase():
 		base.report[id]['Type'] = newType
 		base.report_item_set_changed(id)
 		base.report_save()
+
+
 
 	#
 	# Report Item Type: contents
@@ -1705,8 +1720,9 @@ class ReporterBase():
 
 	def stop_db(self):
 		base.run_dbthread = False
-		base.dbthread.join()
-		base.dbthread = None
+		if base.dbthread is not None:
+			base.dbthread.join()
+			base.dbthread = None
 
 
 	#
@@ -1880,9 +1896,30 @@ class ReporterCore:
 			base.config['Reporter']['TemplateDir'] = ""
 			base.saveini()
 
+		usetemplate = False
+		if base.args.template:
+			usetemplate = True
+			base.config['Reporter']['Template'] = base.args.template
+
+		if base.args.dir:
+			# do some sanity checks before blindly setting
+			rdir = base.args.dir
+			base.debugmsg(5, "rdir:", rdir)
+			if os.path.exists(rdir):
+				if os.path.isfile(rdir):
+					rdir = os.path.dirname(rdir)
+					base.debugmsg(5, "rdir:", rdir)
+				dname = os.path.basename(rdir)
+				dbfile = "{}.db".format(dname)
+				dbpath = os.path.join(rdir, dbfile)
+				base.debugmsg(5, "dbpath:", dbpath)
+				if os.path.isfile(dbpath):
+					base.config['Reporter']['Results'] = dbpath
+
+
 		self.selectResults(base.config['Reporter']['Results'])
 
-		if "Report" in base.config['Reporter'] \
+		if not usetemplate and "Report" in base.config['Reporter'] \
 			and len(base.config['Reporter']['Report']) \
 			and os.path.isfile(base.config['Reporter']['Report']):
 			base.report_open()
@@ -1943,10 +1980,12 @@ class ReporterCore:
 
 
 	def selectResults(self, resultsfile):
-		pass
 		base.debugmsg(5, "resultsfile:", resultsfile)
 
 		if len(resultsfile)>0:
+
+			base.stop_db()
+
 			base.config['Reporter']['Results'] = resultsfile
 
 			tplfres = os.path.splitext(resultsfile)
@@ -2116,6 +2155,8 @@ class ReporterCore:
 
 		self.xlsx_add_sections("TOP", sectionpct)
 
+		self.cg_data["xlsx"]["Workbook"].active = self.cg_data["xlsx"]["Workbook"].worksheets[0]
+
 
 		base.debugmsg(5, "Report:", base.config['Reporter']['Report'])
 		reportbase, reportext = os.path.splitext(base.config['Reporter']['Report'])
@@ -2175,17 +2216,17 @@ class ReporterCore:
 		return html
 
 	def xhtml_add_sections(self, parent, id, sectionpct):
-		base.debugmsg(5, "id:", id, "	sectionpct:", sectionpct)
+		base.debugmsg(8, "id:", id, "	sectionpct:", sectionpct)
 		# SubElement(_parent, _tag, attrib=None, nsmap=None, **_extra)
 		# thiselmt = E.SubElement(parent, 'div', attrib={'id':id})
 
 
 
-		base.debugmsg(5, "parent:", parent)
+		base.debugmsg(9, "parent:", parent)
 
 
 		sections = base.report_get_order(id)
-		base.debugmsg(5, "sections:", sections)
+		base.debugmsg(9, "sections:", sections)
 
 		thiselmt = etree.SubElement(parent, 'div')
 		nextparent = thiselmt
@@ -2245,11 +2286,11 @@ class ReporterCore:
 			thiselmt.set("id", id)
 			newsectionpct = 1/(len(sections)+1)
 			sectionpct = newsectionpct * sectionpct
-			base.debugmsg(5, "sectionpct:", sectionpct)
+			base.debugmsg(9, "sectionpct:", sectionpct)
 			self.xhtml_sections_addheading(thiselmt, id)
 
 			stype = base.report_item_get_type(id)
-			base.debugmsg(5, "stype:", stype)
+			base.debugmsg(9, "stype:", stype)
 			if stype == "contents":
 				self.xhtml_sections_contents(thiselmt, id)
 			if stype == "note":
@@ -2270,13 +2311,13 @@ class ReporterCore:
 				self.xhtml_add_sections(nextparent, sect, sectionpct)
 
 	def xhtml_sections_addheading(self, elmt, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(8, "id:", id)
 		level = base.report_sect_level(id)
-		base.debugmsg(5, "level:", level)
+		base.debugmsg(9, "level:", level)
 		number = base.report_sect_number(id)
-		base.debugmsg(5, "number:", number)
+		base.debugmsg(9, "number:", number)
 		name = base.report_item_get_name(id)
-		base.debugmsg(5, "name:", name)
+		base.debugmsg(9, "name:", name)
 
 		tag = "h{}".format(level)
 
@@ -2297,7 +2338,7 @@ class ReporterCore:
 
 
 	def xhtml_sections_embedimg(self, elmt, id, oimg):
-		base.debugmsg(5, "id:", id, "	oimg:", oimg)
+		base.debugmsg(8, "id:", id, "	oimg:", oimg)
 
 		img = etree.SubElement(elmt, 'img')
 
@@ -2321,16 +2362,16 @@ class ReporterCore:
 
 		srcdata += base64.b64encode(img_byte).decode()
 
-		base.debugmsg(5, "srcdata:", srcdata)
+		base.debugmsg(9, "srcdata:", srcdata)
 		img.set("src", srcdata)
 
 
 	def xhtml_sections_contents(self, elmt, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(8, "id:", id)
 		mode = base.rt_contents_get_mode(id)
 		level = base.rt_contents_get_level(id)
 
-		base.debugmsg(5, "mode:", mode, "	level:", level)
+		base.debugmsg(9, "mode:", mode, "	level:", level)
 		fmode = None
 		if mode == "Table Of Contents":
 			fmode = None
@@ -2347,14 +2388,14 @@ class ReporterCore:
 		# self.xhtml_sections_contents_row(tbl, "TOP", 1, fmode, level)
 
 	def xhtml_sections_contents_row(self, elmt, id, rownum, fmode, flevel):
-		base.debugmsg(5, "id:", id, "	rownum:", rownum, "	fmode:", fmode, "	flevel:", flevel)
+		base.debugmsg(8, "id:", id, "	rownum:", rownum, "	fmode:", fmode, "	flevel:", flevel)
 		display = True
 
 		level = base.report_sect_level(id)
 		if id == "TOP":
 			display = False
 			level = 0
-		base.debugmsg(5, "level:", level)
+		base.debugmsg(9, "level:", level)
 
 		if display and fmode is not None:
 			display = False
@@ -2406,12 +2447,12 @@ class ReporterCore:
 
 
 	def xhtml_sections_note(self, elmt, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(8, "id:", id)
 		notebody = base.rt_note_get(id)
 		notebody = notebody.replace("\r\n", "\n")
 		notebody = notebody.replace("\r", "\n")
 		notelist = notebody.split("\n")
-		base.debugmsg(5, "notebody:", notebody)
+		base.debugmsg(9, "notebody:", notebody)
 		body = etree.SubElement(elmt, 'div')
 		body.set("class", "body")
 		for line in notelist:
@@ -2419,7 +2460,7 @@ class ReporterCore:
 			p.text = line
 
 	def xhtml_sections_graph(self, elmt, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(8, "id:", id)
 
 		body = etree.SubElement(elmt, 'div')
 		body.set("class", "body")
@@ -2444,7 +2485,7 @@ class ReporterCore:
 		try:
 			canvas.draw()
 		except Exception as e:
-			base.debugmsg(5, "canvas.draw() Exception:", e)
+			base.debugmsg(3, "canvas.draw() Exception:", e)
 		fig.set_tight_layout(True)
 
 
@@ -2518,7 +2559,7 @@ class ReporterCore:
 				try:
 					canvas.draw()
 				except Exception as e:
-					base.debugmsg(5, "canvas.draw() Exception:", e)
+					base.debugmsg(3, "canvas.draw() Exception:", e)
 
 				# works but messy createing files we then need to delete
 				# filename = "{}.png".format(id)
@@ -2533,7 +2574,7 @@ class ReporterCore:
 
 
 	def xhtml_sections_table(self, elmt, id):
-		base.debugmsg(5, "id:", id)
+		base.debugmsg(8, "id:", id)
 		body = etree.SubElement(elmt, 'div')
 		body.set("class", "body")
 		tbl = etree.SubElement(body, 'table')
@@ -2546,19 +2587,19 @@ class ReporterCore:
 		colours = base.rt_table_get_colours(id)
 
 		if sql is not None and len(sql.strip())>0:
-			base.debugmsg(8, "sql:", sql)
+			base.debugmsg(9, "sql:", sql)
 			key = "{}_{}".format(id, base.report_item_get_changed(id))
 			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
 			while key not in base.dbqueue["ReadResult"]:
 				time.sleep(0.1)
 
 			tdata = base.dbqueue["ReadResult"][key]
-			base.debugmsg(8, "tdata:", tdata)
+			base.debugmsg(9, "tdata:", tdata)
 
 			if len(tdata)>0:
 				# table headers
 				cols = list(tdata[0].keys())
-				base.debugmsg(7, "cols:", cols)
+				base.debugmsg(8, "cols:", cols)
 				tr = etree.SubElement(tbl, 'tr')
 				if colours:
 					th = etree.SubElement(tr, 'th')
@@ -2569,7 +2610,7 @@ class ReporterCore:
 				# table rows
 				for row in tdata:
 					vals = list(row.values())
-					base.debugmsg(7, "vals:", vals)
+					base.debugmsg(8, "vals:", vals)
 					tr = etree.SubElement(tbl, 'tr')
 					if colours:
 
@@ -4753,6 +4794,7 @@ class ReporterGUI(tk.Frame):
 
 
 		self.contentdata[id]["strLIPath"] = base.rs_setting_get_file("tlogo")
+		base.debugmsg(5, "tlogo:", self.contentdata[id]["strLIPath"])
 		# self.contentdata[id]["strLIPath"] = '/Users/dave/Documents/GitHub/rfswarm/robots/Test_Images/yourlogohere.jpg'
 
 		self.contentdata[id]["strLIName"] = tk.StringVar()
@@ -5760,7 +5802,10 @@ class ReporterGUI(tk.Frame):
 			# self.contentdata[id]["Preview"].config(bg="gold")
 			# self.contentdata[id]["Preview"].config(bg=self.style_reportbg_colour)
 			if id=="TOP":
-				self.cp_titlepage(id)
+				try:
+					self.cp_titlepage(id)
+				except:
+					pass
 			else:
 				rownum = 0
 				# self.contentdata[id]["lblpreview"] = ttk.Label(self.contentdata[id]["Preview"], text = "Preview for {}: {}".format(id, base.report_item_get_name(id)))
@@ -6281,9 +6326,16 @@ class ReporterGUI(tk.Frame):
 		# ['Reporter']['Results']
 		if len(ResultsFile)>0:
 
+			base.report = None
+			self.contentdata = {}
 			core.selectResults(ResultsFile)
+			base.report_open()
 			self.updateTitle()
 			self.updateResults()
+			base.debugmsg(5, "LoadSections")
+			self.LoadSections("TOP")
+			base.debugmsg(5, "content_load")
+			self.content_load("TOP")
 
 
 	def mnu_template_New(self, _event=None):
@@ -6314,15 +6366,26 @@ class ReporterGUI(tk.Frame):
 
 
 	def mnu_template_Open(self, _event=None):
-		base.debugmsg(5, "Not implimented yet.....")
 		TemplateFile = str(tkf.askopenfilename(initialdir=base.config['Reporter']['TemplateDir'], title = "Select RFSwarm Reporter Template", filetypes = (("RFSwarm Reporter Template","*.template"),("all files","*.*"))))
 		base.debugmsg(5, "TemplateFile:", TemplateFile)
 
 		# ['Reporter']['Results']
 		if len(TemplateFile)>0:
+			base.report = None
+			self.contentdata = {}
+			base.debugmsg(5, "template_open TemplateFile:", TemplateFile)
 			base.template_open(TemplateFile)
+			base.debugmsg(5, "report_save")
+			base.report_save()
+			base.debugmsg(5, "LoadSections")
 			self.LoadSections("TOP")
+			base.debugmsg(5, "content_load")
+			self.content_load("TOP")
+			base.debugmsg(5, "updateTemplate")
 			self.updateTemplate()
+			# base.debugmsg(5, "cp_regenerate_preview")
+			# self.cp_regenerate_preview()
+			base.debugmsg(5, "done")
 
 	def mnu_template_Save(self, _event=None):
 		# base.debugmsg(5, "Not implimented yet.....")
