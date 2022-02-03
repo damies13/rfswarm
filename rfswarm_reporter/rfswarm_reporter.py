@@ -330,13 +330,21 @@ class ReporterBase():
 
 	def report_open(self):
 		filename = base.config['Reporter']['Report']
+		base.debugmsg(7, "filename: ", filename)
+		base.reportdata = {}
+		base.report = None
 		if len(filename)>0 and os.path.isfile(filename):
-			base.debugmsg(7, "filename: ", filename)
-
+			base.debugmsg(7, "filename: ", filename, " exists, open")
 			base.report = configparser.ConfigParser()
 			base.report.read(filename)
 		else:
-			base.template_create()
+			base.debugmsg(7, "Template: ", base.config['Reporter']['Template'])
+			if len(base.config['Reporter']['Template'])>0:
+				base.template_open(base.config['Reporter']['Template'])
+			else:
+				base.debugmsg(7, "template_create")
+				base.template_create()
+			base.debugmsg(7, "report_save")
 			base.report_save()
 
 
@@ -1723,6 +1731,9 @@ class ReporterBase():
 		if base.dbthread is not None:
 			base.dbthread.join()
 			base.dbthread = None
+			# clear queue cached results
+			base.dbqueue = {"Write": [], "Read": [], "ReadResult": {}, "Results": [], "Metric": [], "Metrics": []}
+
 
 
 	#
@@ -6377,6 +6388,8 @@ class ReporterGUI(tk.Frame):
 			base.template_open(TemplateFile)
 			base.debugmsg(5, "report_save")
 			base.report_save()
+			base.debugmsg(5, "ConfigureStyle")
+			self.ConfigureStyle()
 			base.debugmsg(5, "LoadSections")
 			self.LoadSections("TOP")
 			base.debugmsg(5, "content_load")
