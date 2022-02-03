@@ -3733,6 +3733,10 @@ class ReporterCore:
 					numcols += 1
 					cellcol += 1
 
+				else:
+					ws.column_dimensions["A"].width = 3
+					numcols += 1
+					cellcol += 1
 
 				cw = 5
 				for col in cols:
@@ -3767,6 +3771,8 @@ class ReporterCore:
 						dcell.style="Table Data"
 						dcell.fill = openpyxl.styles.PatternFill("solid", fgColor=colour)
 
+						cellcol += 1
+					else:
 						cellcol += 1
 
 					for val in vals:
@@ -5345,17 +5351,20 @@ class ReporterGUI(tk.Frame):
 	def cs_datatable_update_metricstype(self, id):
 		base.debugmsg(9, "id:", id)
 		self.contentdata[id]["Metrics"] = base.rt_table_get_mlst(id)
-		self.contentdata[id]["omMT"].set_menu(*self.contentdata[id]["Metrics"])
+		if "omMT" in self.contentdata[id]:
+			self.contentdata[id]["omMT"].set_menu(*self.contentdata[id]["Metrics"])
 
 	def cs_datatable_update_pmetrics(self, id):
 		base.debugmsg(9, "id:", id)
 		self.contentdata[id]["PMetrics"] = base.rt_table_get_pmlst(id)
-		self.contentdata[id]["omPM"].set_menu(*self.contentdata[id]["PMetrics"])
+		if "omPM" in self.contentdata[id]:
+			self.contentdata[id]["omPM"].set_menu(*self.contentdata[id]["PMetrics"])
 
 	def cs_datatable_update_smetrics(self, id):
 		base.debugmsg(9, "id:", id)
 		self.contentdata[id]["SMetrics"] = base.rt_table_get_smlst(id)
-		self.contentdata[id]["omSM"].set_menu(*self.contentdata[id]["SMetrics"])
+		if "omSM" in self.contentdata[id]:
+			self.contentdata[id]["omSM"].set_menu(*self.contentdata[id]["SMetrics"])
 
 	def cs_datatable_switchdt(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
