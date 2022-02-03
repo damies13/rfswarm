@@ -5352,7 +5352,7 @@ class ReporterGUI(tk.Frame):
 		# Forget
 		for frame in self.contentdata[id]["Frames"].keys():
 			self.contentdata[id]["Frames"][frame].grid_forget()
-
+			self.contentdata[id]["Frames"] = {}
 		# Construct
 		if datatype not in self.contentdata[id]["Frames"]:
 			self.contentdata[id]["Frames"][datatype] = tk.Frame(self.contentdata[id]["Frame"])
@@ -5623,6 +5623,7 @@ class ReporterGUI(tk.Frame):
 		# Forget
 		for frame in self.contentdata[id]["Frames"].keys():
 			self.contentdata[id]["Frames"][frame].grid_forget()
+			self.contentdata[id]["Frames"] = {}
 
 		# Construct
 		if datatype not in self.contentdata[id]["Frames"]:
@@ -5806,6 +5807,8 @@ class ReporterGUI(tk.Frame):
 
 		base.debugmsg(7, "gen:", gen)
 		if gen:
+			if "Preview" in self.contentdata[id]:
+				del self.contentdata[id]["Preview"]
 			while "Preview" not in self.contentdata[id]:
 				time.sleep(0.1)
 				self.contentdata[id]["Changed"] = base.report_item_get_changed(id)
