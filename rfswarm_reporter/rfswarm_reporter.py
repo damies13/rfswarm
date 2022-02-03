@@ -2064,6 +2064,7 @@ class ReporterCore:
 		styledata += ".title { font-size: 200%;}"
 		styledata += ".subtitle { font-size: 150%;}"
 
+		styledata += "table, th, td { border: 1px solid #ccc; border-collapse: collapse; }"
 		styledata += "th { color: "+highlightcolour+"; }"
 
 		for i in range(6):
@@ -3114,6 +3115,11 @@ class ReporterCore:
 					cellcol += 1
 
 				table = document.add_table(rows=1, cols=numcols)
+				# Table Grid Light
+				# Table Grid
+				# table.style = "Table Grid Light"
+				table.style = document.styles['Table Grid']
+
 				# table.autofit = True
 				# table.style.paragraph_format.left_indent = Cm(-0.50)
 				# table.style.paragraph_format.left_indent = Cm(-0.50)
@@ -3266,6 +3272,21 @@ class ReporterCore:
 			wb.add_named_style(headings[hnum])
 
 			fm -= 0.2
+
+
+		# Table Heading
+		side = openpyxl.styles.borders.Side(style="tblside", color='CCCCCC', border_style='thin') # 'thin' 'hair' 'medium'
+		borders = openpyxl.styles.borders.Border(left=side, right=side, top=side, bottom=side)
+		tableh = copy(highlight)
+		tableh.name = "Table Heading"
+		tableh.border = borders
+		wb.add_named_style(tableh)
+
+		# Table Data
+		tabled = copy(default)
+		tabled.name = "Table Data"
+		tabled.border = borders
+		wb.add_named_style(tabled)
 
 
 	def xlsx_add_sections(self, id, sectionpct):
@@ -3718,7 +3739,7 @@ class ReporterCore:
 
 					base.debugmsg(8, "col:", col, "	cellcol:", cellcol, "	rownum:", rownum)
 					hcell = ws.cell(column=cellcol, row=rownum, value=col)
-					hcell.style="Highlight"
+					hcell.style="Table Heading"
 
 					neww = len(str(col))*1.3
 					base.debugmsg(9, "neww:", neww)
@@ -3743,6 +3764,7 @@ class ReporterCore:
 						colour = base.named_colour(label).replace("#", "")
 						base.debugmsg(9, "colour:", colour)
 						dcell = ws.cell(column=cellcol, row=rownum)
+						dcell.style="Table Data"
 						dcell.fill = openpyxl.styles.PatternFill("solid", fgColor=colour)
 
 						cellcol += 1
@@ -3751,7 +3773,7 @@ class ReporterCore:
 
 						base.debugmsg(8, "val:", val)
 						dcell = ws.cell(column=cellcol, row=rownum, value=val)
-						dcell.style="Default"
+						dcell.style="Table Data"
 
 						# ws.columns[cellcol].width = 10
 						# ws.columns[cellcol].bestFit = True
@@ -5878,9 +5900,13 @@ class ReporterGUI(tk.Frame):
 
 		children = base.report_get_order(id)
 		for child in children:
-			self.cp_generate_preview(child)
-			# self.t_preview[child] = threading.Thread(target=lambda: self.cp_generate_preview(child))
-			# self.t_preview[child].start()
+			try:
+				self.cp_generate_preview(child)
+				# self.t_preview[child] = threading.Thread(target=lambda: self.cp_generate_preview(child))
+				# self.t_preview[child].start()
+			except e:
+				base.debugmsg(5, "e:", e)
+
 
 	def cp_display_preview(self, id, row):
 		base.debugmsg(9, "id:", id)
@@ -6135,9 +6161,9 @@ class ReporterGUI(tk.Frame):
 
 		try:
 			self.contentdata[id]["canvas"].draw()
+			self.contentdata[id]["fig"].set_tight_layout(True)
 		except Exception as e:
 			base.debugmsg(5, "canvas.draw() Exception:", e)
-		self.contentdata[id]["fig"].set_tight_layout(True)
 
 
 		dodraw = False
