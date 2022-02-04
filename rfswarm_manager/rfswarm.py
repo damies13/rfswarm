@@ -4944,6 +4944,26 @@ class RFSwarmGUI(tk.Frame):
 		setingsWindow.etyBindPort = ttk.Entry(setingsWindow.fmeServer, textvariable=setingsWindow.intBindPort)
 		setingsWindow.etyBindPort.grid(column=1, row=rownum, sticky="nsew")
 
+		# resultsdir
+		rownum += 1
+		setingsWindow.lblResultsDir = ttk.Label(setingsWindow.fmeServer, text="  Results Location:")
+		setingsWindow.lblResultsDir.grid(column=0, row=rownum, sticky="nsew")
+
+		setingsWindow.strResultsDir = tk.StringVar()
+		if 'ResultsDir' not in base.config['Run']:
+			base.config['Run']['ResultsDir'] = os.path.join(base.dir_path, "results")
+			base.saveini()
+		setingsWindow.strResultsDir.set(base.config['Run']['ResultsDir'])
+
+		setingsWindow.etyResultsDir = ttk.Entry(setingsWindow.fmeServer, textvariable=setingsWindow.strResultsDir, state="readonly", justify="right")
+		setingsWindow.etyResultsDir.grid(column=1, row=rownum, sticky="nsew")
+
+		icontext = "Open"
+		setingsWindow.btnResultsDir = ttk.Button(setingsWindow.fmeServer, image=self.imgdata[icontext], text="...", width=1)
+		setingsWindow.btnResultsDir.config(command=lambda sw=setingsWindow: self.setings_select_resultsdir(sw))
+		setingsWindow.btnResultsDir.grid(column=2, row=rownum, sticky="nsew")
+
+
 
 
 		# OK / Cancel button bar
@@ -4997,6 +5017,14 @@ class RFSwarmGUI(tk.Frame):
 
 		return True
 
+	def setings_select_resultsdir(self, setingsWindow, *args):
+		base.debugmsg(5, "setingsWindow:", setingsWindow, "	args:", args)
+		curr = setingsWindow.strResultsDir.get()
+		newresultsdir = str(tkf.askdirectory(initialdir=curr, title="RFSwarm - Select Results Location"))
+		base.debugmsg(5, "newresultsdir:", newresultsdir)
+		if len(newresultsdir)>0 and os.path.isdir(newresultsdir):
+			setingsWindow.strResultsDir.set(newresultsdir)
+
 
 	def setings_close(self, setingsWindow, save):
 		base.debugmsg(5, "setingsWindow:", setingsWindow, "	save:", save)
@@ -5023,16 +5051,25 @@ class RFSwarmGUI(tk.Frame):
 
 			if len(srvip)>0 and len(newip)<1:
 				base.config['Server']['BindIP'] = newip
+				base.saveini()
 				srvrestart = True
 
 			newport = setingsWindow.intBindPort.get()
 			base.debugmsg(5, "newport:", newport)
 			if newport>0 and newport != srvport:
 				base.config['Server']['BindPort'] = str(newport)
+				base.saveini()
 				srvrestart = True
 
-			if srvrestart:
+			srvResultsDir = base.config['Run']['ResultsDir']
+			newResultsDir = setingsWindow.strResultsDir.get()
+			base.debugmsg(5, "newResultsDir:", newResultsDir)
+			if len(newResultsDir)>0 and newResultsDir != srvResultsDir:
+				base.config['Run']['ResultsDir'] = newResultsDir
 				base.saveini()
+
+
+			if srvrestart:
 				tkm.showinfo("RFSwarm - Info", "You Need to restart the rfswarm Manager for these changes to take effect.")
 
 				# I think the following might work??? but lets see if anyone asks for this or not.
