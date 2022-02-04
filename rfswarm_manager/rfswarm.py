@@ -3381,8 +3381,13 @@ class RFSwarmGUI(tk.Frame):
 		# 	file_menu.add_command(label = "Quit", command = self.on_closing, accelerator="Command-q")
 		# 	window.bind('q', self.on_closing)  # This doesn't work yet, the mac python overrides it ?
 		# else:
-		file_menu.add_command(label = "Exit", command = self.on_closing, accelerator="{}-x".format(accelkey))
-		window.bind('x', self.on_closing)
+		if sys.platform.startswith('darwin'):
+			# https://tkdocs.com/tutorial/menus.html
+			# root.createcommand('tk::mac::ShowPreferences', showMyPreferencesDialog)
+			self.root.createcommand('tk::mac::Quit', self.on_closing)
+		else:
+			file_menu.add_command(label = "Exit", command = self.on_closing, accelerator="{}-x".format(accelkey))
+			window.bind('x', self.on_closing)
 
 		# creating another sub menu
 		run_menu = tk.Menu(root_menu)
@@ -3613,7 +3618,7 @@ class RFSwarmGUI(tk.Frame):
 		# grphWindow.fmeBBar.grid(column=0, row=0, sticky="nsew")
 		grphWindow.fmeBBar.grid(column=0, row=0, sticky="ne")
 		grphWindow.fmeContent = tk.Frame(grphWindow)
-		grphWindow.fmeContent.config(bg="red")
+		# grphWindow.fmeContent.config(bg="red")
 		grphWindow.fmeContent.grid(column=0, row=1, sticky="nsew")
 
 		grphWindow.fmeContent.columnconfigure(0, weight=1)
@@ -3635,7 +3640,7 @@ class RFSwarmGUI(tk.Frame):
 
 
 		grphWindow.fmeGraph = tk.Frame(grphWindow.fmeContent)
-		grphWindow.fmeGraph.config(bg="green")
+		# grphWindow.fmeGraph.config(bg="green")
 		grphWindow.fmeGraph.grid(column=0, row=0, columnspan=8, sticky="nsew")
 		# grphWindow.fmeGraph.bind("<Configure>", self.gph_windowevent)
 		# grphWindow.fmeGraph.bind("<Configure>", lambda: self.gph_windowevent(grphWindow))
