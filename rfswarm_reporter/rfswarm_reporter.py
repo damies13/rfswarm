@@ -274,10 +274,31 @@ class ReporterBase():
 			base.report["Report"] = {}
 		base.report["Report"]["Order"] = ""
 		# base.debugmsg(5, "template order:", base.report["Report"]["Order"])
+
 		base.debugmsg(5, "base.report: ", base.report._sections)
 
-		self.report_new_section("TOP", "Executive Summary")
-		self.report_new_section("TOP", "Test Result Summary")
+		es = self.report_new_section("TOP", "Template")
+		self.report_item_set_type(es, 'note')
+		notetxt  = "Define your template by adding sections and configuring the section settings\n"
+		notetxt  += "Each section can be:\n"
+		notetxt  += " -  Note (like this) section, free text\n"
+		notetxt  += " -  Heading, usefull for grouping sections\n"
+		notetxt  += " -  Contents like a table of contents or figures\n"
+		notetxt  += " -  Data Table, with data from test results\n"
+		notetxt  += " -  Data Graph, for graphical representation of test results\n\n"
+		notetxt  += "Each section can also have sub sections\n\n"
+		notetxt  += "The cover page and overall report settings can be found on the settings pane of the Report item above\n"
+		self.rt_note_set(es, notetxt)
+
+		trs = self.report_new_section("TOP", "Test Result Summary")
+		self.report_item_set_type(trs, 'table')
+
+		# colours = 0
+		self.rt_table_set_colours(trs, 0)
+		# datatype = ResultSummary
+		self.rt_table_set_dt(trs, "ResultSummary")
+
+
 
 
 	def template_save(self, filename):
@@ -494,7 +515,25 @@ class ReporterBase():
 	def rs_setting_get_title(self):
 		value = self.rs_setting_get('title')
 		if value is None:
-			return 'Report Title'
+			reportname = 'Report Title'
+
+			if 'Reporter' in base.config and 'Results' in base.config['Reporter']:
+				results = base.config['Reporter']['Results']
+				base.debugmsg(8, "results: ", results)
+				if len(results)>0:
+					filename = os.path.basename(results)
+					base.debugmsg(9, "filename: ", filename)
+					basename, ext = os.path.splitext(filename)
+					base.debugmsg(9, "basename: ", basename)
+					basearr = basename.split('_')
+					base.debugmsg(9, "basearr: ", basearr)
+					basearr.pop(0)
+					basearr.pop(0)
+					reportname = " ".join(basearr)
+					base.debugmsg(7, "reportname: ", reportname)
+					self.rs_setting_set('title', reportname)
+
+			return reportname
 		else:
 			return value
 
@@ -5913,7 +5952,7 @@ class ReporterGUI(tk.Frame):
 				self.cp_generate_preview(child)
 				# self.t_preview[child] = threading.Thread(target=lambda: self.cp_generate_preview(child))
 				# self.t_preview[child].start()
-			except e:
+			except Exception as e:
 				base.debugmsg(5, "e:", e)
 
 
