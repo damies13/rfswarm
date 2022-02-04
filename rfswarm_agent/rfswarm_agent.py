@@ -115,7 +115,6 @@ class RFSwarmAgent():
 
 		self.debugmsg(0, "	Configuration File: ", self.agentini)
 
-		self.agentname = socket.gethostname()
 		if self.args.agentname:
 			self.agentname = self.args.agentname
 
@@ -125,9 +124,10 @@ class RFSwarmAgent():
 			self.saveini()
 
 		if 'agentname' not in self.config['Agent']:
-			self.config['Agent']['agentname'] = self.agentname
+			self.config['Agent']['agentname'] = socket.gethostname()
 			self.saveini()
-		else:
+
+		if not self.args.agentname:
 			self.agentname = self.config['Agent']['agentname']
 
 		if 'agentdir' not in self.config['Agent']:
