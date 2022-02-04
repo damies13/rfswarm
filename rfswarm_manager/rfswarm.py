@@ -13,6 +13,7 @@ import sys
 import platform
 import signal
 import os
+import errno
 import tempfile
 import glob
 import configparser
@@ -1165,6 +1166,8 @@ class RFSwarmBase:
 
 
 	def hash_file(self, file, relpath):
+		if not (os.path.exists(file) and os.path.isfile(file)):
+			raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), file)
 		BLOCKSIZE = 65536
 		hasher = hashlib.md5()
 		hasher.update(str(os.path.getmtime(file)).encode('utf-8'))
@@ -2517,14 +2520,19 @@ class RFSwarmCore:
 					base.debugmsg(3, "run missing [",istr,"]")
 					fileok = False
 				if "script" in filedata[istr]:
-					base.debugmsg(8, "filedata[", istr, "][script]:", filedata[istr]["script"])
+					base.debugmsg(7, "filedata[", istr, "][script]:", filedata[istr]["script"])
 					scriptname = filedata[istr]["script"]
+					if '\\' in scriptname:
+						scriptnamearr = scriptname.split('\\')
+						scriptname = "/".join(scriptnamearr)
+
+					base.debugmsg(7, "scriptname:", scriptname)
 					if not os.path.isabs(scriptname):
 						# relative path, need to find absolute path
 						combined = os.path.join(base.config['Plan']['ScenarioDir'], scriptname)
-						base.debugmsg(8, "combined:", combined)
+						base.debugmsg(7, "combined:", combined)
 						scriptname = os.path.abspath(combined)
-					base.debugmsg(8, "scriptname:", scriptname)
+					base.debugmsg(7, "scriptname:", scriptname)
 					self.sr_file_validate(rowcount, scriptname)
 				else:
 					base.debugmsg(3, "script missing [",istr,"]")
