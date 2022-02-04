@@ -27,6 +27,7 @@ import math
 
 import socket
 import ipaddress
+import psutil
 import random
 import time
 from datetime import datetime, timezone
@@ -1810,21 +1811,6 @@ class RFSwarmBase:
 					rowdata = row.values()
 					writer.writerow(rowdata)
 
-	def report_html(self, _event=None):
-		print("report_html")
-		if not base.args.nogui:
-			tkm.showwarning("RFSwarm - Warning", "Generating HTML Reports not implimented yet")
-		else:
-			base.debugmsg(1, "RFSwarm - Warning", "Generating HTML Reports not implimented yet")
-
-	def report_word(self, _event=None):
-		print("report_word")
-		if not base.args.nogui:
-			tkm.showwarning("RFSwarm - Warning", "Generating Word Reports not implimented yet")
-		else:
-			base.debugmsg(1, "RFSwarm - Warning", "Generating Word Reports not implimented yet")
-
-
 	def create_metric(self, MetricName, MetricType):
 		# Save Metric Data
 		# 	First ensure a metric for this agent exists
@@ -1929,6 +1915,20 @@ class RFSwarmBase:
 			return list(mydict.keys())[id]
 		except:
 			return "Value, {} not found".format(myval)
+
+
+
+	def localipaddresslist(self):
+		ipaddresslist = []
+		iflst = psutil.net_if_addrs()
+		for nic in iflst.keys():
+			self.debugmsg(6, "nic", nic)
+			for addr in iflst[nic]:
+				 # '127.0.0.1', '::1', 'fe80::1%lo0'
+				self.debugmsg(6, "addr", addr.address)
+				if addr.address not in ['127.0.0.1', '::1', 'fe80::1%lo0']:
+					ipaddresslist.append(addr.address)
+		return ipaddresslist
 
 
 # class rfswarm:
@@ -4866,7 +4866,6 @@ class RFSwarmGUI(tk.Frame):
 
 	def setings_open(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
-
 		setingsWindow = tk.Toplevel(self.root)
 		# setingsWindow.config(bg="pink")
 		setingsWindow.columnconfigure(0, weight=1)
@@ -4891,11 +4890,13 @@ class RFSwarmGUI(tk.Frame):
 
 		setingsWindow.fmeScenario.columnconfigure(1, weight=1)
 
+		rownum = 0
 		setingsWindow.lblScenario = ttk.Label(setingsWindow.fmeScenario, text="Scenario:")
-		setingsWindow.lblScenario.grid(column=0, row=0, sticky="nsew")
+		setingsWindow.lblScenario.grid(column=0, row=rownum, sticky="nsew")
 
+		rownum += 1
 		setingsWindow.lblUpload = ttk.Label(setingsWindow.fmeScenario, text="  Upload Logs:")
-		setingsWindow.lblUpload.grid(column=0, row=1, sticky="nsew")
+		setingsWindow.lblUpload.grid(column=0, row=rownum, sticky="nsew")
 
 
 		UploadOpt = list(base.uploadmodes.values())
@@ -4907,6 +4908,45 @@ class RFSwarmGUI(tk.Frame):
 
 
 
+		setingsWindow.fmeServer = tk.Frame(setingsWindow.fmeContent)
+		# setingsWindow.fmeScenario.config(bg="blue")
+		setingsWindow.fmeServer.config(bd=1, relief="sunken")
+		# setingsWindow.fmeScenario.config(bd=1, relief="groove")
+		setingsWindow.fmeServer.grid(column=0, row=2, sticky="nsew")
+
+		setingsWindow.fmeServer.columnconfigure(1, weight=1)
+
+		# [Server]
+		rownum += 0
+		setingsWindow.lblServer = ttk.Label(setingsWindow.fmeServer, text="Server:")
+		setingsWindow.lblServer.grid(column=0, row=rownum, sticky="nsew")
+
+		# bindip =
+		rownum += 1
+		setingsWindow.lblBindIP = ttk.Label(setingsWindow.fmeServer, text="  Bind IP Address:")
+		setingsWindow.lblBindIP.grid(column=0, row=rownum, sticky="nsew")
+
+		setingsWindow.strBindIP = tk.StringVar()
+		setingsWindow.strBindIP.set(base.config['Server']['BindIP'])
+		setingsWindow.etyBindIP = ttk.Entry(setingsWindow.fmeServer, textvariable=setingsWindow.strBindIP)
+		setingsWindow.etyBindIP.grid(column=1, row=rownum, sticky="nsew")
+		setingsWindow.etyBindIP.bind('<Leave>', lambda event, sw=setingsWindow: self.setings_valid_ip(sw, event) )
+		setingsWindow.etyBindIP.bind('<FocusOut>', lambda event, sw=setingsWindow: self.setings_valid_ip(sw, event) )
+
+
+		# bindport = 8138
+		rownum += 1
+		setingsWindow.lblBindPort = ttk.Label(setingsWindow.fmeServer, text="  Bind Port Number:")
+		setingsWindow.lblBindPort.grid(column=0, row=rownum, sticky="nsew")
+
+		setingsWindow.intBindPort = tk.IntVar()
+		setingsWindow.intBindPort.set(int(base.config['Server']['BindPort']))
+		setingsWindow.etyBindPort = ttk.Entry(setingsWindow.fmeServer, textvariable=setingsWindow.intBindPort)
+		setingsWindow.etyBindPort.grid(column=1, row=rownum, sticky="nsew")
+
+
+
+		# OK / Cancel button bar
 		setingsWindow.fmeBBar = tk.Frame(setingsWindow)
 		setingsWindow.fmeBBar.grid(column=0, row=9, sticky="nsew")
 
@@ -4924,6 +4964,39 @@ class RFSwarmGUI(tk.Frame):
 		setingsWindow.btnCancel.grid(column=99, row=0, sticky="nsew")
 
 
+	def setings_valid_ip(self, setingsWindow, *args):
+		base.debugmsg(5, "setingsWindow:", setingsWindow, "	args:", args)
+		ipaddr = setingsWindow.strBindIP.get()
+		base.debugmsg(5, "ipaddr:", ipaddr)
+		if ipaddr is not None and len(ipaddr)>0:
+			try:
+				ip = ipaddress.ip_address(ipaddr)
+				valid_ipaddr = str(ip)
+				base.debugmsg(5, "ip.version:", ip.version, "	valid_ipaddr:", valid_ipaddr)
+				if ip.version == 6 and sys.version_info < (3, 8):
+					msg = "Python 3.8 or higher required to bind to IPv6 Addresses\n"
+					pyver = "{}.{}.{}".format(sys.version_info[0], sys.version_info[1], sys.version_info[2])
+					msg += " ".join("Python Version:",pyver,"	IP Version:", ip.version, "	IP Address:", srvip)
+					base.debugmsg(5, msg)
+					tkm.showwarning("RFSwarm - Warning", msg)
+					setingsWindow.strBindIP.set("")
+					return False
+				lclips = base.localipaddresslist()
+				if valid_ipaddr not in lclips:
+					msg = "IP address: {} is not valid for the loacl machine.".format(ipaddr)
+					tkm.showwarning("RFSwarm - Warning", msg)
+					return False
+
+
+			except Exception as e:
+				base.debugmsg(5, "Exception:", e)
+				msg = "Invalid IP address: {}".format(ipaddr)
+				base.debugmsg(5, msg)
+				tkm.showwarning("RFSwarm - Warning", msg)
+				return False
+
+		return True
+
 
 	def setings_close(self, setingsWindow, save):
 		base.debugmsg(5, "setingsWindow:", setingsWindow, "	save:", save)
@@ -4934,6 +5007,41 @@ class RFSwarmGUI(tk.Frame):
 			base.debugmsg(5, "strUpload:", setingsWindow.strUpload.get(), "	uploadmodes:", base.uploadmodes)
 			base.uploadmode = base.GetKey(base.uploadmodes, setingsWindow.strUpload.get())
 			base.debugmsg(5, "uploadmode:", base.uploadmode)
+
+
+			srvrestart = False
+			srvip = base.config['Server']['BindIP']
+			srvport = int(base.config['Server']['BindPort'])
+
+			newip = ""
+			if self.setings_valid_ip(setingsWindow):
+				newip = setingsWindow.strBindIP.get()
+				base.debugmsg(5, "newip:", newip)
+				if len(str(newip))>0:
+					base.config['Server']['BindIP'] = newip
+					srvrestart = True
+
+			if len(srvip)>0 and len(newip)<1:
+				base.config['Server']['BindIP'] = newip
+				srvrestart = True
+
+			newport = setingsWindow.intBindPort.get()
+			base.debugmsg(5, "newport:", newport)
+			if newport>0 and newport != srvport:
+				base.config['Server']['BindPort'] = str(newport)
+				srvrestart = True
+
+			if srvrestart:
+				base.saveini()
+				tkm.showinfo("RFSwarm - Info", "You Need to restart the rfswarm Manager for these changes to take effect.")
+
+				# I think the following might work??? but lets see if anyone asks for this or not.
+				# I don't want to break stuff in the manager unnecessarily
+				# base.agenthttpserver.shutdown()
+				# base.Agentserver.join()
+				# base.Agentserver = threading.Thread(target=self.run_agent_server)
+				# base.Agentserver.start()
+
 
 		setingsWindow.destroy()
 
@@ -6140,16 +6248,6 @@ class RFSwarmGUI(tk.Frame):
 		icontext = "report_text"
 		rpt = ttk.Button(rgbar, image=self.imgdata[icontext], padding='3 3 3 3', text="Stop", command=base.report_text)
 		rpt.grid(column=50, row=1, sticky="nsew") # , rowspan=2
-
-		# icontext = "report_html"
-		# self.icoStop = self.get_icon(icontext)
-		# rpt = ttk.Button(rgbar, image=self.imgdata[icontext], padding='3 3 3 3', text="Stop", command=self.report_html)
-		# rpt.grid(column=51, row=1, sticky="nsew") # , rowspan=2
-		#
-		# icontext = "report_word"
-		# self.icoStop = self.get_icon(icontext)
-		# rpt = ttk.Button(rgbar, image=self.imgdata[icontext], padding='3 3 3 3', text="Stop", command=self.report_word)
-		# rpt.grid(column=52, row=1, sticky="nsew") # , rowspan=2
 
 
 
