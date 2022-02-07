@@ -101,20 +101,20 @@ The options are:
 The manager settings allows you to access settings that were previously only accessable from the ini file
 > ![image](Images/MacOS_Run_v0.9.0_Settings.png)
 
-*Bind IP Address*
+**Bind IP Address**
 
 This setting allows you to restrict the web server that the manager uses to communicate with the agents to a specific ip address. By default this setting is blank so the manager will listen on all IP addresses on the machine the manager is running on.
 Generally you should not need to change this setting and it should be left blank unless you know you need to restrict the manager to a specific address.
 
-** * You will need to restart the manager for this setting to take effect. **
+* * You will need to restart the manager for this setting to take effect. *
 
-*Bind Port Number*
+**Bind Port Number**
 
 The default port that the manager web server uses to communicate with the agents is 8138, however in some cases you may need to change the port number.
 
-** * You will need to restart the manager for this setting to take effect. **
+* * You will need to restart the manager for this setting to take effect. *
 
-*Results Location*
+**Results Location**
 
 This setting allows you to configure where the manager will save the test results when you run a performance test.
 
@@ -130,7 +130,7 @@ e.g. 1 - if the time now is 11:30 PM and you want your test to start at 1 AM the
 
 e.g. 2 - if the time now is 9:05 PM and you planned to start at 9:00 AM, so enter a time of 09:00:00 without realising that was already in the past, the test will not start till 9 AM tomorrow. In this case choose a new start time later today or disable the schedule and just click run.
 
-** * The manager needs to remain running in order for the schedule to work. You cannot schedule a start time and then quit the manager. **
+* * The manager needs to remain running in order for the schedule to work. You cannot schedule a start time and then quit the manager. *
 
 ##### Additional settings for test group ![image](Images/GUI_btn_cog.gif)
 When clicking on this button a dialogue will be presented that allows you to configure some additional settings for the test group, by default the dialogue will look like this:
