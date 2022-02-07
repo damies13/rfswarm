@@ -540,7 +540,7 @@ class ReporterBase():
 	def rs_setting_get_hcolour(self):
 		value = self.rs_setting_get('hcolour')
 		if value is None:
-			return "#00F" # Blue
+			return "#0000FF" # Blue
 		else:
 			return value
 
@@ -2302,8 +2302,8 @@ class ReporterCore:
 
 				tlogo = base.rs_setting_get_file("tlogo")
 				base.debugmsg(5, "tlogo:", tlogo)
-
-				self.xhtml_sections_fileimg(imgtitle, id, tlogo)
+				if len(tlogo)>0:
+					self.xhtml_sections_fileimg(imgtitle, id, tlogo)
 
 			#
 			# Execution Date range
@@ -2853,10 +2853,10 @@ class ReporterCore:
 
 				tlogo = base.rs_setting_get_file("tlogo")
 				base.debugmsg(5, "tlogo:", tlogo)
-
-				document.add_paragraph("", style='Cover Subtitle')
-				document.add_picture(tlogo)
-				document.add_paragraph("", style='Cover Subtitle')
+				if len(tlogo)>0:
+					document.add_paragraph("", style='Cover Subtitle')
+					document.add_picture(tlogo)
+					document.add_paragraph("", style='Cover Subtitle')
 			#
 			# Execution Date range
 			#
@@ -3374,9 +3374,10 @@ class ReporterCore:
 
 				tlogo = base.rs_setting_get_file("tlogo")
 				base.debugmsg(7, "tlogo:", tlogo)
-				img = openpyxl.drawing.image.Image(tlogo)
-				cellname = ws.cell(row=rownum, column=1).coordinate
-				ws.add_image(img, cellname)
+				if len(tlogo)>0:
+					img = openpyxl.drawing.image.Image(tlogo)
+					cellname = ws.cell(row=rownum, column=1).coordinate
+					ws.add_image(img, cellname)
 
 
 			#
