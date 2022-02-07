@@ -359,8 +359,8 @@ Additionally the debug (-g) levels 1-3 will give extra information on the consol
 ```
 $ rfswarm -h
 Robot Framework Swarm: Manager
-	Version 0.6.4
-usage: rfswarm [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS] [-n] [-d DIR] [-e IPADDRESS] [-p PORT]
+	Version 1.0.0
+usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS] [-n] [-t STARTTIME] [-d DIR] [-e IPADDRESS] [-p PORT]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -374,6 +374,8 @@ optional arguments:
   -a AGENTS, --agents AGENTS
                         Wait for this many agents before starting (default 1)
   -n, --nogui           Don't display the GUI
+  -t STARTTIME, --starttime STARTTIME
+                        Specify the time to start the test HH:MM or HH:MM:SS (ISO 8601)
   -d DIR, --dir DIR     Results directory
   -e IPADDRESS, --ipaddress IPADDRESS
                         IP Address to bind the server to
@@ -384,8 +386,8 @@ If you pass in an unsupported command line option, you will get this prompt:
 ```
 $ rfswarm -?
 Robot Framework Swarm: Manager
-	Version 0.6.4
-usage: rfswarm [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS] [-n] [-d DIR] [-e IPADDRESS] [-p PORT]
+	Version 1.0.0
+usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS] [-n] [-t STARTTIME] [-d DIR] [-e IPADDRESS] [-p PORT]
 rfswarm: error: unrecognized arguments: -?
 ```
 
