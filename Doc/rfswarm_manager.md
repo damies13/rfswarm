@@ -25,7 +25,7 @@ rfswarm Manager is the central server component of rfswarm, this is where you pl
 #### Plan
 This is where you construct your test scenario, choose your test cases and number of virtual users. The interface should be intuitive and simple to understand but still allow fairly complex scenarios to be created.
 
-All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the [agent polling](./rfswarm_agent_py.md#agent-polling-of-the-guiserver) works it's best not to use values less than 10 seconds.
+All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the [agent polling](./rfswarm_agent.md#agent-polling-of-the-guiserver) works it's best not to use values less than 10 seconds.
 
 > _Plan - Planning a performance test_ <br>
 > ![Image](Images/MacOS_Plan_v0.8.0_saved_opened.png "Plan - Planning a performance test")
@@ -137,7 +137,7 @@ When clicking on this button a dialogue will be presented that allows you to con
 > ![image](Images/MacOS_Plan_v0.7.0_Test_Settings.png)
 
 ###### Exclude libraries:
-The default value is "BuiltIn,String,OperatingSystem,perftest", this is the same default value as used in the [agent settings](./rfswarm_agent_py.md#exclude-libraries) and if you leave this default but change the agent the settings set on the agent will override this setting.
+The default value is "BuiltIn,String,OperatingSystem,perftest", this is the same default value as used in the [agent settings](./rfswarm_agent.md#exclude-libraries) and if you leave this default but change the agent the settings set on the agent will override this setting.
 By configuring this setting you can adjust which keyword's response times are reported in the test results.
 If you change this setting here from the default, then for this particular test group the agent setting will be overridden with the settings used here
 
@@ -187,7 +187,7 @@ The default value is 90, you can adjust the percentile value between 1% and 99% 
 ##### Stop button ![image](Images/GUI_btn_stop.gif)
 Use this if you want to stop the test early. You may not notice an immediate reaction as pressing the button just changes the end time on all the test jobs assigned to the current time and stops the ramp-up if the test is still in the ramp-up phase.
 
-Once the stop button has been pressed the agents will receive the changed end time when they [poll](./rfswarm_agent_py.md#agent-polling-of-the-guiserver) the Manager next, the agent will change status to stopping which will be returned on the next poll interval and the agent will not start a new iteration for the running tests, however the ones currently running will be allowed to complete.
+Once the stop button has been pressed the agents will receive the changed end time when they [poll](./rfswarm_agent.md#agent-polling-of-the-guiserver) the Manager next, the agent will change status to stopping which will be returned on the next poll interval and the agent will not start a new iteration for the running tests, however the ones currently running will be allowed to complete.
 
 ##### Abort button ![image](Images/GUI_btn_bomb.gif)
 This button replaces the Stop button when either of the following happens:

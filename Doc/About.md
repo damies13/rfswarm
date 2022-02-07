@@ -14,4 +14,4 @@ rfswarm aims to solve this problem by allowing you to take an existing functiona
 
 rfswarm is written completely in python, so if you are already using Robot Framework, then you will already have most of what you need to use rfswarm and will be familiar with pip to get any extra components you need.
 
-[See who has sponsored this project](Doc/Sponsors.md)
+[See who has sponsored this project](Sponsors.md)

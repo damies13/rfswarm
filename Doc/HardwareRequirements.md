@@ -28,3 +28,13 @@ A [2013 11" Macbook Air 1.3GHz dual-core i5 4Gb ram](https://support.apple.com/k
 |---				|---	|---				|---					|
 |SeleniumLibrary	|30		| Memory (Ram) ~80%	|40 					|
 |RequestsLibrary	|230	| Memory (Ram) >70%, CPU > 60% at times|240	|
+
+## Reporter
+
+The Hardware Requirements for the Reporter are a bit higher, it will depend on how many sections and subsections you have in your report and how complicated the graphs are, but these minimums should allow you to plan a reasonable report. The most memory intensive report I have built so far used around 400MB of RAM after updating the preview and while exporting the report in html, word and excel at the same time.
+
+Recommended minimums:
+
+|CPU|Memory|Disk|
+|---|---|---|
+|Dual Core 1Ghz| 1GB above OS Requirements|1GB free|
