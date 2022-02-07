@@ -469,7 +469,7 @@ class RFSwarmBase:
 	scriptfiles = {}
 	scriptgrpend = {}
 
-	uploadmodes = {'imm':"Immediately", 'err':"On Error Only", 'def':"All Defered"}
+	uploadmodes = {'imm':"Immediately", 'err':"On Error Only", 'def':"All Deferred"}
 	uploadmode = "err" 	# modes are imm, err, def
 	uploadfiles = {}
 
@@ -4918,7 +4918,7 @@ class RFSwarmGUI(tk.Frame):
 
 		# [Server]
 		rownum += 0
-		setingsWindow.lblServer = ttk.Label(setingsWindow.fmeServer, text="Server:")
+		setingsWindow.lblServer = ttk.Label(setingsWindow.fmeServer, text="Manager:")
 		setingsWindow.lblServer.grid(column=0, row=rownum, sticky="nsew")
 
 		# bindip =

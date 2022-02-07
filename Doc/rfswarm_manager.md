@@ -1,9 +1,9 @@
 
 [Index](README.md)
 
-## rfswarm.py (Manager)
+## rfswarm Manager
 
-rfswarm.py is the swarm Manager, or central server component of rfswarm, this is where you plan, execute and monitor your performance test.
+rfswarm Manager is the central server component of rfswarm, this is where you plan, execute and monitor your performance test.
 
 - [User Interface](#User-Interface)
 	- [Plan](#Plan)
@@ -45,14 +45,23 @@ All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the [a
 > _Plan - Windows 10_ <br>
 > ![Image](Images/Windows10_Plan_v0.7.0_New.png)
 
-While hopefully this is intuitive, the buttons are (starting top right)
+> _Plan - Tests in other languages_ <br>
+> ![Image](Images/MacOS_Run_v0.9.0_LanguageChecks.png)
+
+While hopefully this is intuitive, the tool bar buttons are:
 
 |	|	|	|
 |---|---|---|
 | New	|	![image](Images/GUI_btn_page_white.edt.gif)		| Create a new scenario	|
 | Open	|	![image](Images/GUI_btn_folder_explore.gif)	| Open an existing scenario	|
 | Save	|	![image](Images/GUI_btn_disk.gif)			| Save the current scenario	|
+| Settings	|	![image](Images/GUI_btn_cog.gif)			| Configure additional settings for the current scenario or rfswarm	|
+| Schedule	|	![image](Images/GUI_btn_time.gif)			| Schedule the test start time	|
 | Play	|	![image](Images/GUI_btn_resultset_next.gif)	| Play the current scenario	|
+
+The test group buttons are:
+|	|	|	|
+|---|---|---|
 | Add	|	![image](Images/GUI_btn_add.gif)			| Add another test group	|
 | Select |	![image](Images/GUI_btn_script.gif)			| Select a robot file	|
 | Settings | ![image](Images/GUI_btn_cog.gif)			| Configure additional settings for a test group	|
@@ -71,6 +80,54 @@ The columns under the graph
 | Settings	| This is where you can select additional settings for the test group |
 
 * For Delay, Ramp Up and Run, you can either type the time in HH:MM:SS or just a number of seconds or MM:SS, the plan screen will auto update it to HH:MM:SS. For example if you typed 300 it will update to 00:05:00, 7200 will update to 02:00:00, also if you type 5:30 it will update to 00:05:30.
+
+##### Settings for the scenario and rfswarm ![image](Images/GUI_btn_cog.gif)
+
+###### Scenario settings
+At the moment there is only 1 scenario setting, the upload logs setting, this allows you to control when the agent will upload the logs for the test cases being run.
+> ![image](Images/MacOS_Run_v0.9.0_Settings.png)
+> ![image](Images/MacOS_Run_v0.9.0_Settings_UploadLogs.png)
+
+The options are:
+| Option | Action |
+|---     |---     |
+| Immediately | As soon as a test case finishes it will start uploading the logs regardless of test result in parallel to starting the next iteration of that test case |
+| On Error Only (default)| As soon as a test case finishes it will start uploading the logs only if the test ended with a fail, result logs for passed tests will be deferred until the last robot has stopped on the agent |
+| All Deferred | All test result logs will be deferred until the last robot has stopped on the agent |
+
+** * In earlier releases before v0.9.0 the agent always followed the default case. **
+
+###### Manager settings
+The manager settings allows you to access settings that were previously only accessable from the ini file
+> ![image](Images/MacOS_Run_v0.9.0_Settings.png)
+
+####### Bind IP Address
+This setting allows you to restrict the web server that the manager uses to communicate with the agents to a specific ip address. By default this setting is blank so the manager will listen on all IP addresses on the machine the manager is running on.
+Generally you should not need to change this setting and it should be left blank unless you know you need to restrict the manager to a specific address.
+
+** * You will need to restart the manager for this setting to take effect. **
+
+####### Bind Port Number
+The default port that the manager web server uses to communicate with the agents is 8138, however in some cases you may need to change the port number.
+
+** * You will need to restart the manager for this setting to take effect. **
+
+####### Results Location
+This setting allows you to configure where the manager will save the test results when you run a performance test.
+
+
+##### Schedule start time ![image](Images/GUI_btn_time.gif)
+This feature allows you to schedule the start time for a test, by default it is disabled and if you press the run button the test will start immediately.
+> ![image](Images/MacOS_Run_v0.9.0_Schedule_disabled.png)
+
+If you enable this setting you can set the time that the test will start, the start time must always be in the future, by default it will be on the same day, but if you enter a time in the past, it will automatically adjust to the next day.
+> ![image](Images/MacOS_Run_v0.9.0_Schedule_enabled.png)
+
+e.g. 1 - if the time now is 11:30 PM and you want your test to start at 1 AM the next day, enter a time of 01:00:00 and tomorrows date will show in the scheduled start date
+
+e.g. 2 - if the time now is 9:05 PM and you planned to start at 9:00 AM, so enter a time of 09:00:00 without realising that was already in the past, the test will not start till 9 AM tomorrow. In this case choose a new start time later today or disable the schedule and just click run.
+
+** * The manager needs to remain running in order for the schedule to work. You cannot schedule a start time and then quit the manager. **
 
 ##### Additional settings for test group ![image](Images/GUI_btn_cog.gif)
 When clicking on this button a dialogue will be presented that allows you to configure some additional settings for the test group, by default the dialogue will look like this:
