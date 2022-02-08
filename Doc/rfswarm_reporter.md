@@ -5,11 +5,75 @@
 rfswarm Reporter is the reporting tool component, you would use this at some point after the performance test has completed.
 
 - [User Interface](#User-Interface)
+	- [Report Overview](#Report-Overview)
+	- [Report Sections](#Report-Sections)
+	- [Section Types](#Section-Types)
 - [Command Line Interface](#Command-Line-Interface)
 - [Install and Setup](#Install-and-Setup)
 - [Credits](#Credits)
 
 ### User Interface
+
+#### Report Overview
+![Image](Images/MacOS_Reporter_v1.0.0_Report_Settings.png)
+##### Report Preview
+![Image](Images/MacOS_Reporter_v1.0.0_Report_Preview.png)
+
+#### Report Sections
+![Image](Images/MacOS_Reporter_v1.0.0_NewSection.png)
+![Image](Images/MacOS_Reporter_v1.0.0_NewSubSection.png)
+![Image](Images/MacOS_Reporter_v1.0.0_SectionExpand.png)
+![Image](Images/MacOS_Reporter_v1.0.0_SectionSelect.png)
+![Image](Images/MacOS_Reporter_v1.0.0_SectionTypes.png)
+![Image](Images/MacOS_Reporter_v1.0.0_SubSectionMoveDown.png)
+![Image](Images/MacOS_Reporter_v1.0.0_SubSectionMoveUp.png)
+![Image](Images/MacOS_Reporter_v1.0.0_SubSectionSelect1.png)
+![Image](Images/MacOS_Reporter_v1.0.0_SubSectionSelect3.png)
+
+#### Section Types
+
+##### Heading Section
+![Image](Images/MacOS_Reporter_v1.0.0_Heading_Settings.png)
+
+##### Note Section
+![Image](Images/MacOS_Reporter_v1.0.0_Template_Preview.png)
+![Image](Images/MacOS_Reporter_v1.0.0_Template_Settings.png)
+
+##### Contents Section
+![Image](Images/MacOS_Reporter_v1.0.0_Contents_Settings.png)
+![Image](Images/MacOS_Reporter_v1.0.0_Contents_Settings_Level.png)
+![Image](Images/MacOS_Reporter_v1.0.0_Contents_Settings_Mode.png)
+
+##### Data Graph Section
+![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric.png)
+![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Primary.png)
+![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Secondary.png)
+![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Type.png)s
+![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result.png)
+![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_FilterResult.png)
+![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_FilterType.png)
+![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_Type.png)
+![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_SQL.png)
+![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Settings.png)
+![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Settings_Type.png)
+
+##### Data Table Section
+![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric.png)
+![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric_Primary.png)
+![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric_Secondary.png)
+![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric_Type.png)
+![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result.png)
+![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result1.png)
+![Image](Images/MacOS_Reporter_v1.0.0_DataTable_ResultSummary.png)
+![Image](Images/MacOS_Reporter_v1.0.0_DataTable_ResultSummary_FilterType.png)
+![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result_FilterResult.png)
+![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result_FilterType.png)
+![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result_Type.png)
+![Image](Images/MacOS_Reporter_v1.0.0_DataTable_SQL.png)
+![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Settings.png)
+
+
+
 
 ### Command Line Interface
 
