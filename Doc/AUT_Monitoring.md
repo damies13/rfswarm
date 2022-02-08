@@ -52,7 +52,7 @@ Monitor Linux AUT
 	# Gather the AUT Server statistics every 5 seconds
 	# 3600 / 5 = 720 - poll every 5 seconds for 1 hour
 	FOR 	${i}	IN RANGE	720
-		${epoch}=	epoch
+		${epoch}=		Get Time	epoch
 		${stats}=	Collect Stats
 		Post AUT Stats		${HOST} 	AUT Web 	${epoch}    ${stats}
 		Sleep	4
@@ -69,13 +69,6 @@ Open Connection And Log In
 	# keywords from SHH Library
 	Open Connection     ${HOST}		width=160
 	Login               ${USERNAME}        ${PASSWORD}
-
-
-
-epoch
-	${epoch}=		Evaluate		int(datetime.datetime.now().timestamp())		datetime
-	[Return]	${epoch}
-
 
 
 Collect Stats
