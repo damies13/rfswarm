@@ -79,10 +79,11 @@ When any other section is selected the preview pane will display a preview of th
 To Add a new Section
 - first select Report, then click the ![image](Images/REP_add.gif)add section button
 - A dialogue will appear where you can enter the section name, enter the section name and click OK.
+
 	_* you can change this name at anytime if you need to, so don't worry too much about getting the perfect name._
 > ![Image](Images/MacOS_Reporter_v1.0.0_NewSection.png)
 
-Like wise if you want to add a subsection;
+Likewise if you want to add a subsection;
 - Select the section that will be the parent
 > ![Image](Images/MacOS_Reporter_v1.0.0_SectionSelect.png)
 
@@ -120,6 +121,7 @@ Each section is used to display different types of information, the various sect
 
 ##### Heading Section
 The heading section is used for grouping subsections that contain related information, so the only setting here is the heading name which allows you to change the name of the section.
+
 	_* Top level sections automatically get a page break before them in word reports and a new tab in excel reports_
 > ![Image](Images/MacOS_Reporter_v1.0.0_Heading_Settings.png)
 
