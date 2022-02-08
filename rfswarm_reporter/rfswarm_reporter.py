@@ -5392,19 +5392,28 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(9, "id:", id)
 		self.contentdata[id]["Metrics"] = base.rt_table_get_mlst(id)
 		if "omMT" in self.contentdata[id]:
-			self.contentdata[id]["omMT"].set_menu(*self.contentdata[id]["Metrics"])
+			try:
+				self.contentdata[id]["omMT"].set_menu(*self.contentdata[id]["Metrics"])
+			except Exception as e:
+				base.debugmsg(5, "e:", e)
 
 	def cs_datatable_update_pmetrics(self, id):
 		base.debugmsg(9, "id:", id)
 		self.contentdata[id]["PMetrics"] = base.rt_table_get_pmlst(id)
 		if "omPM" in self.contentdata[id]:
-			self.contentdata[id]["omPM"].set_menu(*self.contentdata[id]["PMetrics"])
+			try:
+				self.contentdata[id]["omPM"].set_menu(*self.contentdata[id]["PMetrics"])
+			except Exception as e:
+				base.debugmsg(5, "e:", e)
 
 	def cs_datatable_update_smetrics(self, id):
 		base.debugmsg(9, "id:", id)
 		self.contentdata[id]["SMetrics"] = base.rt_table_get_smlst(id)
 		if "omSM" in self.contentdata[id]:
-			self.contentdata[id]["omSM"].set_menu(*self.contentdata[id]["SMetrics"])
+			try:
+				self.contentdata[id]["omSM"].set_menu(*self.contentdata[id]["SMetrics"])
+			except Exception as e:
+				base.debugmsg(5, "e:", e)
 
 	def cs_datatable_switchdt(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
@@ -5831,7 +5840,11 @@ class ReporterGUI(tk.Frame):
 	def content_preview(self, id):
 		base.debugmsg(9, "id:", id)
 		self.updateStatus("Preview Loading.....")
-		self.cp_generate_preview(id)
+		try:
+			self.cp_generate_preview(id)
+		except Exception as e:
+			base.debugmsg(5, "e:", e)
+
 		# self.t_preview[id] = threading.Thread(target=lambda: self.cp_generate_preview(id))
 		# self.t_preview[id].start()
 
