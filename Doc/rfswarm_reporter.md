@@ -5,72 +5,198 @@
 rfswarm Reporter is the reporting tool component, you would use this at some point after the performance test has completed.
 
 - [User Interface](#User-Interface)
-	- [Report Overview](#Report-Overview)
+	- [Settings Pane](#Settings-Pane)
+	- [Preview Pane](#Preview-Pane)
 	- [Report Sections](#Report-Sections)
 	- [Section Types](#Section-Types)
+		- [Heading](#Heading-Section)
+		- [Contents](#Contents-Section)
+		- [Note](#Note-Section)
+		- [Data Graph](#Data-Graph-Section)
+		- [Data Table](#Data-Table-Section)
 - [Command Line Interface](#Command-Line-Interface)
 - [Install and Setup](#Install-and-Setup)
 - [Credits](#Credits)
 
 ### User Interface
 
-#### Report Overview
-![Image](Images/MacOS_Reporter_v1.0.0_Report_Settings.png)
-##### Report Preview
-![Image](Images/MacOS_Reporter_v1.0.0_Report_Preview.png)
+The initial screen when launching the rfswarm Reporter is the top level report, on the settings pane.
+> ![Image](Images/MacOS_Reporter_v1.0.0_Report_Settings.png)
+
+Starting from the top left of the screen we have the main toolbar:
+
+|	|	|	|
+|---|---|---|
+| Open Result	|	![image](Images/REP_folder_table.gif)	| Select a result folder	|
+| New Template	|	![image](Images/REP_page_add.gif)	| Start a new default template	|
+| Open Template	|	![image](Images/REP_folder_page.gif)	| Open an existing template	|
+| Save Template	|	![image](Images/REP_page_save.gif)	| Save the current template	|
+|	|	|	|
+| Export HTML	|	![image](Images/REP_page_white_world.gif)	| Generate a html report	|
+| Export Word	|	![image](Images/REP_page_word.gif)	| Generate a Word report	|
+| Export Excel	|	![image](Images/REP_page_excel.gif)	| Generate an Excel report	|
+
+Under the main toolbar is the section toolbar:
+|	|	|	|
+|---|---|---|
+| Add Section	|	![image](Images/REP_add.gif)	| Opens the add section dialogue	|
+| Remove Section	|	![image](Images/REP_delete.gif)	| Removes the currently selected section	|
+| Move Section Up	|	![image](Images/REP_resultset_up.gif)	| Moves the currently selected section above the section currently above it	|
+| Move Section Down	|	![image](Images/REP_resultset_down.gif)	| Moves the currently selected section below the section currently below it	|
+
+To the right of the section toolbar is the ![image](Images/REP_report.gif) Preview / ![image](Images/REP_cog.gif) Settings toggle, used to switch between the [Settings Pane](#Settings-Pane) and the [Preview Pane](#Preview-Pane) (pictured below)
+
+#### Settings Pane
+
+When Report is selected, the settings pane will display settings the global report settings. when any other section is selected the settings pane will display settings specific to the selected section.
+
+##### Global Report Settings
+
+> ![Image](Images/MacOS_Reporter_v1.0.0_Report_Settings.png)
+
+|	|	|
+|---|---|
+| Title | If no template is selected the title will try to get the scenario name from the test result otherwise it will take the title that was set in the template.  |
+| Date Format | Here you can select the date format you wish to use in the report (defaults to yyyy-mm-dd) |
+| Time Format | Here you can select the time format you wish to use in the report (defaults to HH:MM) |
+| Time Zone | Times in rfswarm are stored using epoch time also known as unix timestamp, as such all times are UTC with no timezone offset. To display the expected times rfswram Reporter needs to know the timeszone to apply to the timestamp. This should default to the timezone of your local machine, however you may want to display times in your report for another timezone. |
+| Start Time | This value is extracted from the results database, to display it on the title page, enable the checkbox in the display column |
+| End Time | This value is extracted from the results database, to display it on the title page, enable the checkbox in the display column |
+| Logo Image | This setting lets you add a picture to the title page of your report, typically this would be your organisation's logo, but it can be anything you want. the field is read only but will show the file name of the file you selected. Click the ![image](Images/REP_picture.gif)Select Picture button and browse to the image you want to use. Then enable the checkbox in the display column |
+| Font | This setting allows you to choose the font and font size to be used throughout the report. Headings and titles use the same font however the font size will be scaled proportionally to the base font size. |
+| Highlight Colour | This setting allows you to choose a colour for headings and column headings, Click the ![image](Images/REP_color_swatch.gif)Colour Swatch button next to the colour preview to bring up the system colour picker and choose a colour. For best results choose the colour that matches your organisation's branding. |
+| Percentile | This setting allows the percentile value used throughout the report, it defaults to 90%. |
+
+
+#### Preview Pane
+When Report is selected, the preview pane will display a preview of the entire report.
+> ![Image](Images/MacOS_Reporter_v1.0.0_Report_Preview.png)
+
+When any other section is selected the preview pane will display a preview of the currently selected section and any subsections.
+> ![Image](Images/MacOS_Reporter_v1.0.0_Template_Preview.png)
 
 #### Report Sections
-![Image](Images/MacOS_Reporter_v1.0.0_NewSection.png)
-![Image](Images/MacOS_Reporter_v1.0.0_NewSubSection.png)
-![Image](Images/MacOS_Reporter_v1.0.0_SectionExpand.png)
-![Image](Images/MacOS_Reporter_v1.0.0_SectionSelect.png)
-![Image](Images/MacOS_Reporter_v1.0.0_SectionTypes.png)
-![Image](Images/MacOS_Reporter_v1.0.0_SubSectionMoveDown.png)
-![Image](Images/MacOS_Reporter_v1.0.0_SubSectionMoveUp.png)
-![Image](Images/MacOS_Reporter_v1.0.0_SubSectionSelect1.png)
-![Image](Images/MacOS_Reporter_v1.0.0_SubSectionSelect3.png)
+To Add a new Section
+- first select Report, then click the ![image](Images/REP_add.gif)add section button
+- A dialogue will appear where you can enter the section name, enter the section name and click OK.
+	_* you can change this name at anytime if you need to, so don't worry too much about getting the perfect name._
+> ![Image](Images/MacOS_Reporter_v1.0.0_NewSection.png)
+
+Like wise if you want to add a subsection;
+- Select the section that will be the parent
+> ![Image](Images/MacOS_Reporter_v1.0.0_SectionSelect.png)
+
+- Then click the ![image](Images/REP_add.gif)add section button and enter the name of the new sub section.
+> ![Image](Images/MacOS_Reporter_v1.0.0_NewSubSection.png)
+
+You can then click the `>` beside the section name to expand it and show the sub sections. Click the `V` beside the section name to minimise it again.
+> ![Image](Images/MacOS_Reporter_v1.0.0_SectionExpand.png)
+
+To remove a section or subsection, select it than click the ![image](Images/REP_delete.gif)Remove Section button
+
+To move a section up:
+- Select the section that you want to move
+> ![Image](Images/MacOS_Reporter_v1.0.0_SubSectionSelect3.png)
+
+- Click the ![image](Images/REP_resultset_up.gif)Move Up button
+> ![Image](Images/MacOS_Reporter_v1.0.0_SubSectionMoveUp.png)
+
+To move a section down:
+- Select the section that you want to move
+> ![Image](Images/MacOS_Reporter_v1.0.0_SubSectionSelect1.png)
+
+- Click the ![image](Images/REP_resultset_down.gif)Move Down button
+> ![Image](Images/MacOS_Reporter_v1.0.0_SubSectionMoveDown.png)
 
 #### Section Types
+> ![Image](Images/MacOS_Reporter_v1.0.0_SectionTypes.png)
+
+Each section is used to display different types of information, the various section types are:
+- [Heading](#Heading-Section)
+- [Contents](#Contents-Section)
+- [Note](#Note-Section)
+- [Data Graph](#Data-Graph-Section)
+- [Data Table](#Data-Table-Section)
 
 ##### Heading Section
-![Image](Images/MacOS_Reporter_v1.0.0_Heading_Settings.png)
-
-##### Note Section
-![Image](Images/MacOS_Reporter_v1.0.0_Template_Preview.png)
-![Image](Images/MacOS_Reporter_v1.0.0_Template_Settings.png)
+The heading section is used for grouping subsections that contain related information, so the only setting here is the heading name which allows you to change the name of the section.
+	_* Top level sections automatically get a page break before them in word reports and a new tab in excel reports_
+> ![Image](Images/MacOS_Reporter_v1.0.0_Heading_Settings.png)
 
 ##### Contents Section
-![Image](Images/MacOS_Reporter_v1.0.0_Contents_Settings.png)
-![Image](Images/MacOS_Reporter_v1.0.0_Contents_Settings_Level.png)
-![Image](Images/MacOS_Reporter_v1.0.0_Contents_Settings_Mode.png)
+The contents section is used for adding contents to a report.
+> ![Image](Images/MacOS_Reporter_v1.0.0_Contents_Settings.png)
+
+Typically this would be a "Table of contents", however you can also choose a "Table of Graphs" or "Table of Tables" where that adds value to your report.
+> ![Image](Images/MacOS_Reporter_v1.0.0_Contents_Settings_Mode.png)
+
+Additionally you can control how many levels of subsections are displayed in the contents, this defaults to 1, which will only show top level sections, however you can select up to 6 levels if needed.
+> ![Image](Images/MacOS_Reporter_v1.0.0_Contents_Settings_Level.png)
+
+##### Note Section
+The note section is used for adding free text sections to your report, some examples of what you might use this for are:
+- An Executive Summary
+- A description of the test
+- A conclusion to the test results
+- Observations relating to specific graphs or table of results
+> ![Image](Images/MacOS_Reporter_v1.0.0_Template_Settings.png)
 
 ##### Data Graph Section
-![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric.png)
-![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Primary.png)
-![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Secondary.png)
-![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Type.png)s
-![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result.png)
-![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_FilterResult.png)
-![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_FilterType.png)
-![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_Type.png)
-![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_SQL.png)
-![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Settings.png)
-![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Settings_Type.png)
+The data graph section is used for displaying graphs of test results and other metrics collected during the test.
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Settings.png)
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Settings_Type.png)
+
+The data sources for the graphs can be:
+- [Metric](#Data-Graph-Metric)
+- [Result](#Data-Graph-Result)
+- [Custom SQL](#Data-Graph-SQL)
+
+###### Data Graph Metric
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric.png)
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Primary.png)
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Secondary.png)
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Type.png)s
+
+###### Data Graph Result
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result.png)
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_FilterResult.png)
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_FilterType.png)
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_Type.png)
+
+###### Data Graph SQL
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_SQL.png)
 
 ##### Data Table Section
-![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric.png)
-![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric_Primary.png)
-![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric_Secondary.png)
-![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric_Type.png)
-![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result.png)
-![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result1.png)
-![Image](Images/MacOS_Reporter_v1.0.0_DataTable_ResultSummary.png)
-![Image](Images/MacOS_Reporter_v1.0.0_DataTable_ResultSummary_FilterType.png)
-![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result_FilterResult.png)
-![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result_FilterType.png)
-![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result_Type.png)
-![Image](Images/MacOS_Reporter_v1.0.0_DataTable_SQL.png)
-![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Settings.png)
+The data table section is used for displaying tables of test results and other metrics collected during the test.
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Settings.png)
+
+The show graph colours check box, when enabled will display a colour swatch in the first column of the table that matches the first data column to the matching data value on a related graph, this is useful for creating legend tables.
+
+The data sources for the graphs can be:
+- [Metric](#Data-Table-Metric)
+- [Result](#Data-Table-Result)
+- [ResultSummary](#Data-Table-ResultSummary)
+- [Custom SQL](#Data-Table-SQL)
+
+###### Data Table Metric
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric.png)
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric_Primary.png)
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric_Secondary.png)
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric_Type.png)
+
+###### Data Table Result
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result.png)
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result1.png)
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result_Type.png)
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result_FilterResult.png)
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result_FilterType.png)
+
+###### Data Table ResultSummary
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_ResultSummary.png)
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_ResultSummary_FilterType.png)
+
+###### Data Table SQL
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_SQL.png)
 
 
 
