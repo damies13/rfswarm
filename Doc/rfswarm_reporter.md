@@ -123,7 +123,7 @@ Each section is used to display different types of information, the various sect
 ##### Heading Section
 The heading section is used for grouping subsections that contain related information, so the only setting here is the heading name which allows you to change the name of the section.
 
-	_* Top level sections automatically get a page break before them in word reports and a new tab in excel reports._
+	_* top level sections automatically get a page break before them in word reports and a new tab in excel reports._ 
 
 > ![Image](Images/MacOS_Reporter_v1.0.0_Heading_Settings.png)
 
