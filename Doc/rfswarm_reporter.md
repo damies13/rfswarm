@@ -80,7 +80,7 @@ To Add a new Section
 - first select Report, then click the ![image](Images/REP_add.gif)add section button
 - A dialogue will appear where you can enter the section name, enter the section name and click OK.
 
-> _* you can change this name at anytime if you need to, so don't worry too much about getting the perfect name._
+> _you can change this name at anytime if you need to, so don't worry too much about getting the perfect name._
 
 > ![Image](Images/MacOS_Reporter_v1.0.0_NewSection.png)
 
@@ -157,9 +157,17 @@ The data sources for the graphs can be:
 
 ###### Data Graph Metric
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric.png)
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Primary.png)
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Secondary.png)
+
+**Number value** - All metrics are stored in the results database as strings, if you want rfswarm Reporter to treat the metric value as a numeric check this check box
+
+**Metric Type** - This option list is auto generated based on the metric types in the results, the types, Agent, Scenario and Summary will always be in the list as these are created by rfswarm Manager, Other custom types you add will also show here.
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Type.png)s
+
+**Primary Metric** - This option list is auto generated based on the primary metrics in the results, it will be updated with a filtered set based on the metric types selection
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Primary.png)
+
+**Secondary Metric** - This option list is auto generated based on the secondary metrics in the results, it will be updated with a filtered set based on the metric types or primary metrics selections.
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Secondary.png)
 
 ###### Data Graph Result
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result.png)
@@ -174,7 +182,9 @@ The data sources for the graphs can be:
 The data table section is used for displaying tables of test results and other metrics collected during the test.
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Settings.png)
 
-The show graph colours check box, when enabled will display a colour swatch in the first column of the table that matches the first data column to the matching data value on a related graph, this is useful for creating legend tables.
+**Show graph colours** - When enabled will display a colour swatch in the first column of the table that matches the first data column to the matching data value on a related graph, this is useful for creating legend tables.
+
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Settings_Type.png)
 
 The data sources for the graphs can be:
 - [Metric](#Data-Table-Metric)
@@ -184,13 +194,21 @@ The data sources for the graphs can be:
 
 ###### Data Table Metric
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric.png)
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric_Primary.png)
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric_Secondary.png)
+
+**Number value** - All metrics are stored in the results database as strings, if you want rfswarm Reporter to treat the metric value as a numeric check this check box
+**Show counts** - Use this checkbox if you want a count of the number of times this metric was recorded (do not use with number value)
+
+**Metric Type** - This option list is auto generated based on the metric types in the results, the types, Agent, Scenario and Summary will always be in the list as these are created by rfswarm Manager, Other custom types you add will also show here.
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric_Type.png)
+
+**Primary Metric** - This option list is auto generated based on the primary metrics in the results, it will be updated with a filtered set based on the metric types selection
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric_Primary.png)
+
+**Secondary Metric** - This option list is auto generated based on the secondary metrics in the results, it will be updated with a filtered set based on the metric types or primary metrics selections.
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric_Secondary.png)
 
 ###### Data Table Result
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result.png)
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result1.png)
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result_Type.png)
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result_FilterResult.png)
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result_FilterType.png)
