@@ -5146,7 +5146,10 @@ class ReporterGUI(tk.Frame):
 		id = self.sectionstree.focus()
 		base.debugmsg(9, "id:", id)
 		curhead = base.report_item_get_name(id)
-		newhead = self.contentdata[id]["Heading"].get()
+		newhead = curhead
+		if id in self.contentdata:
+			if "Heading" in self.contentdata[id]:
+				newhead = self.contentdata[id]["Heading"].get()
 		base.debugmsg(5, "curhead:", curhead, "	newhead:", newhead)
 		if newhead != curhead:
 			base.debugmsg(5, "rename :", curhead, "	to:", newhead)
