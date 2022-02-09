@@ -14,6 +14,7 @@ rfswarm Reporter is the reporting tool component, you would use this at some poi
 		- [Note](#Note-Section)
 		- [Data Graph](#Data-Graph-Section)
 		- [Data Table](#Data-Table-Section)
+	- [Example Report](#Example-Report)
 - [Command Line Interface](#Command-Line-Interface)
 - [Install and Setup](#Install-and-Setup)
 - [Credits](#Credits)
