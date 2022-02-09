@@ -161,7 +161,7 @@ The data sources for the graphs can be:
 **Number value** - All metrics are stored in the results database as strings, if you want rfswarm Reporter to treat the metric value as a numeric check this check box
 
 **Metric Type** - This option list is auto generated based on the metric types in the results, the types, Agent, Scenario and Summary will always be in the list as these are created by rfswarm Manager, Other custom types you add will also show here.
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Type.png)s
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Type.png)
 
 **Primary Metric** - This option list is auto generated based on the primary metrics in the results, it will be updated with a filtered set based on the metric types selection
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Primary.png)
@@ -171,11 +171,44 @@ The data sources for the graphs can be:
 
 ###### Data Graph Result
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result.png)
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_FilterResult.png)
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_FilterType.png)
+
+**Result Type** - This option lets you choose between the Response Time, TPS or Total TPS.
+|	|	|
+|---|---|
+| Response Time | The time the keyword took, as measured by robot framework and then reported back to the Manager by the Agent |
+| TPS (Transactions per Second) | Simply a count of the number of times each keyword recorded a result in any given second. |
+| Total TPS | Simply a count of the number of times all keywords recorded a result in any given second. |
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_Type.png)
 
+**Filter Result** - This option lets you choose between the None, Pass or Fail.
+|	|	|
+|---|---|
+| None | Does not filter results (shows all) |
+| Pass | Filters the results to only show when a keyword returned a pass state |
+| Fail | Filters the results to only show when a keyword returned a fail state |
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_FilterResult.png)
+
+**Filter Type** - This option is used in with **Filter Pattern**, if the Filter Type is None, then Filter Pattern is ignored, otherwise Filter Pattern is used to filter the results shown.
+| Filter Type | Filter Pattern | Result |
+|---|---|---|
+| None |  | Filter Pattern is ignored |
+| Wildcard (Unix Glob) | *abc* | Only results that contain 'abc' will be shown |
+| Not Wildcard (Unix Glob) | *abc* | Results that contain 'abc' will not be shown, all other results will be shown |
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_FilterType.png)
+
 ###### Data Graph SQL
+The SQL option allows you to write your own SQL statement to produce graphs that couldn't be produced with the other options.
+
+This option is intended as an option of last resort or as a stop gap while waiting for a feature to be implemented.
+
+It's recommended to use a sqlite client to test out your sql statements before putting them into here.
+
+When constructing the SQL for graphs, it's important to note that the column names should be named as "Time", "Value" and "Name" in that order.
+|	|	|
+|---|---|
+| Time | Should return an epoch time value, this will be displayed on the x axis |
+| Value | Should return a numeric value, this will be displayed on the y axis |
+| Name | Should return a string value, this used to give a unique colour to the line, it will also be used to match the colour with the first data column in a Data Table |
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_SQL.png)
 
 ##### Data Table Section
@@ -209,15 +242,52 @@ The data sources for the graphs can be:
 
 ###### Data Table Result
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result.png)
+
+**Result Type** - This option lets you choose between the Response Time, TPS or Total TPS.
+|	|	|
+|---|---|
+| Response Time | The time the keyword took, as measured by robot framework and then reported back to the Manager by the Agent |
+| TPS (Transactions per Second) | Simply a count of the number of times each keyword recorded a result in any given second. |
+| Total TPS | Simply a count of the number of times all keywords recorded a result in any given second. |
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result_Type.png)
+
+**Filter Result** - This option lets you choose between the None, Pass or Fail.
+|	|	|
+|---|---|
+| None | Does not filter results (shows all) |
+| Pass | Filters the results to only show when a keyword returned a pass state |
+| Fail | Filters the results to only show when a keyword returned a fail state |
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result_FilterResult.png)
+
+**Filter Type** - This option is used in with **Filter Pattern**, if the Filter Type is None, then Filter Pattern is ignored, otherwise Filter Pattern is used to filter the results shown.
+| Filter Type | Filter Pattern | Result |
+|---|---|---|
+| None |  | Filter Pattern is ignored |
+| Wildcard (Unix Glob) | *abc* | Only results that contain 'abc' will be shown |
+| Not Wildcard (Unix Glob) | *abc* | Results that contain 'abc' will not be shown, all other results will be shown |
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result_FilterType.png)
 
 ###### Data Table ResultSummary
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_ResultSummary.png)
+
+**Filter Type** - This option is used in with **Filter Pattern**, if the Filter Type is None, then Filter Pattern is ignored, otherwise Filter Pattern is used to filter the results shown.
+| Filter Type | Filter Pattern | Result |
+|---|---|---|
+| None |  | Filter Pattern is ignored |
+| Wildcard (Unix Glob) | *abc* | Only results that contain 'abc' will be shown |
+| Not Wildcard (Unix Glob) | *abc* | Results that contain 'abc' will not be shown, all other results will be shown |
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_ResultSummary_FilterType.png)
 
 ###### Data Table SQL
+The SQL option allows you to write your own SQL statement to produce graphs that couldn't be produced with the other options.
+
+This option is intended as an option of last resort or as a stop gap while waiting for a feature to be implemented.
+
+It's recommended to use a sqlite client to test out your sql statements before putting them into here.
+
+When constructing the SQL for graphs, it's important to note that the column names will be used as the table headings, so it's recommended in your select to use `as 'Heading Name'` to control the headings.
+
+Also note that **Show graph colours** will use values of the first data column to match the colours for each table row to the line colours on a graph.
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_SQL.png)
 
 
