@@ -46,7 +46,7 @@ All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the [a
 > ![Image](Images/Windows10_Plan_v0.7.0_New.png)
 
 > _Plan - Tests in other languages_ <br>
-> ![Image](Images/MacOS_Run_v0.9.0_LanguageChecks.png)
+> ![Image](Images/MacOS_Run_v1.0.0_LanguageChecks.png)
 
 While hopefully this is intuitive, the tool bar buttons are:
 
@@ -85,8 +85,8 @@ The columns under the graph
 
 ###### Scenario settings
 At the moment there is only one scenario setting, the upload logs setting, this allows you to control when the agent will upload the logs for the test cases being run.
-> ![image](Images/MacOS_Run_v0.9.0_Settings.png)
-> ![image](Images/MacOS_Run_v0.9.0_Settings_UploadLogs.png)
+> ![image](Images/MacOS_Run_v1.0.0_Settings.png)
+> ![image](Images/MacOS_Run_v1.0.0_Settings_UploadLogs.png)
 
 The options are:
 | Option | Action |
@@ -95,11 +95,11 @@ The options are:
 | On Error Only (default)| As soon as a test case finishes it will start uploading the logs only if the test ended with a fail, result logs for passed tests will be deferred until the last robot has stopped on the agent |
 | All Deferred | All test result logs will be deferred until the last robot has stopped on the agent |
 
-* * In earlier releases before v0.9.0 the agent always followed the default case.
+* * In earlier releases before v1.0.0 the agent always followed the default case.
 
 ###### Manager settings
 The manager settings allows you to access settings that were previously only accessable from the ini file
-> ![image](Images/MacOS_Run_v0.9.0_Settings.png)
+> ![image](Images/MacOS_Run_v1.0.0_Settings.png)
 
 **Bind IP Address**
 
@@ -121,10 +121,10 @@ This setting allows you to configure where the manager will save the test result
 
 ##### Schedule start time ![image](Images/GUI_btn_time.gif)
 This feature allows you to schedule the start time for a test, by default it is disabled and if you press the run button the test will start immediately.
-> ![image](Images/MacOS_Run_v0.9.0_Schedule_disabled.png)
+> ![image](Images/MacOS_Run_v1.0.0_Schedule_disabled.png)
 
 If you enable this setting you can set the time that the test will start, the start time must always be in the future, by default it will be on the same day, but if you enter a time in the past, it will automatically adjust to the next day.
-> ![image](Images/MacOS_Run_v0.9.0_Schedule_enabled.png)
+> ![image](Images/MacOS_Run_v1.0.0_Schedule_enabled.png)
 
 e.g. 1 - if the time now is 11:30 PM and you want your test to start at 1 AM the next day, enter a time of 01:00:00 and tomorrows date will show in the scheduled start date
 
