@@ -290,7 +290,13 @@ When constructing the SQL for graphs, it's important to note that the column nam
 Also note that **Show graph colours** will use values of the first data column to match the colours for each table row to the line colours on a graph.
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_SQL.png)
 
+#### Example Report
+This is an example of a template you could create and use for reporting your test results. It shows some of the capabilities of the reporting tool.
+> ![Image](Images/MacOS_Reporter_v1.0.0_Example_Report.png)
 
+|  |  |  |
+|---|---|---|
+| [HTML](Images/Example_20210214_204637_browseOC100.html) | [Word](Images/Example_20210214_204637_browseOC100.docx) | [Excel](Images/Example_20210214_204637_browseOC100.xlsx) |
 
 
 ### Command Line Interface
