@@ -285,7 +285,7 @@ This option is intended as an option of last resort or as a stop gap while waiti
 
 It's recommended to use a sqlite client to test out your sql statements before putting them into here.
 
-When constructing the SQL for graphs, it's important to note that the column names will be used as the table headings, so it's recommended in your select to use `as 'Heading Name'` to control the headings.
+When constructing the SQL for graphs, it's important to note that the column names will be used as the table headings, so it's recommended in your SELECT statement to use `as 'Heading Name'` to control the headings.
 
 Also note that **Show graph colours** will use values of the first data column to match the colours for each table row to the line colours on a graph.
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_SQL.png)
