@@ -504,6 +504,7 @@ class RFSwarmBase:
 	datapath = ""
 	dbfile = ""
 	datadb = None
+	dbready = False
 	dbqueue = {"Write": [], "Read": [], "ReadResult": {}, "Results": [], "Metric": [], "Metrics": []}
 	MetricIDs = {}
 	scriptfilters = [""]
@@ -764,6 +765,7 @@ class RFSwarmBase:
 			if base.run_name != base.run_name_current:
 				base.run_name_current = base.run_name
 				createschema = True
+				base.dbready = False
 				self.MetricIDs = {}
 
 			if createschema and self.datadb is not None:
@@ -804,6 +806,7 @@ class RFSwarmBase:
 			base.debugmsg(5, "dbfile:", self.dbfile)
 			if not os.path.exists(self.dbfile):
 				createschema = True
+				base.dbready = False
 			else:
 				createschema = False
 
@@ -1031,6 +1034,7 @@ class RFSwarmBase:
 
 
 				self.datadb.commit()
+				base.dbready = True
 
 	def PrettyColName(self, colname):
 		base.debugmsg(8, "PrettyColName: colname:", colname)
@@ -2609,7 +2613,7 @@ class RFSwarmCore:
 		base.robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}}
 		sec2st = base.run_starttime - int(time.time())
 		if sec2st < 1:
-
+			starttime = int(time.time())
 			datafiletime = datetime.now().strftime("%Y%m%d_%H%M%S")
 			if len(base.config['Plan']['ScenarioFile'])>0:
 				filename = os.path.basename(base.config['Plan']['ScenarioFile'])
@@ -2629,9 +2633,29 @@ class RFSwarmCore:
 				ut.start()
 				base.gui.tabs.select(1)
 
+			# wait till db has been opened
+			while base.run_name != base.run_name_current:
+				time.sleep(0.1)
+			while not base.dbready:
+				time.sleep(0.1)
 
+			# base.save_metrics(base.run_name, "Scenario", int(time.time()), "starttime", base.run_starttime)
+			base.save_metrics(base.run_name, "Scenario", starttime, "Start_Time", starttime)
 
-
+			# collect list of test cases and robot files
+			# --- save_metrics(self, PMetricName, MetricType, MetricTime, SMetricName, MetricValue):
+			for grp in base.scriptlist:
+				base.debugmsg(5, "grp", grp)
+				if "Test" in grp.keys() and len(grp["Test"])>0:
+				# 	base.debugmsg(6, "while totrbts", totrbts, " 	currbts:", currbts)
+					base.debugmsg(5, "grp[Index]", grp['Index'])
+					base.save_metrics("Local_Path_{}".format(grp['Index']), "Scenario", starttime, grp['Script'], grp['Test'])
+					relpath = base.get_relative_path(base.config['Plan']['ScenarioFile'], grp['Script'])
+					base.save_metrics("Test_{}".format(grp['Index']), "Scenario", starttime, relpath, grp['Test'])
+					base.save_metrics("Robots_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['Robots'])
+					base.save_metrics("Delay_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['Delay'])
+					base.save_metrics("Ramp_Up_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['RampUp'])
+					base.save_metrics("Run_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['Run'])
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -3008,6 +3032,9 @@ class RFSwarmCore:
 			if base.run_end > 0 and base.run_end < int(time.time()) and base.total_robots < 1 and not base.posttest and base.run_finish < 1 and uploadcount < 1:
 				base.run_finish = int(time.time())
 				base.debugmsg(5, "run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots)
+				base.save_metrics(base.run_name, "Scenario", base.run_finish, "End_Time", base.run_finish)
+
+
 				if not base.args.nogui:
 					time.sleep(1)
 					base.gui.delayed_UpdateRunStats()
