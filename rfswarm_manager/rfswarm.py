@@ -2643,6 +2643,8 @@ class RFSwarmCore:
 			base.save_metrics(base.run_name, "Scenario", starttime, "Start", starttime)
 			base.save_metrics("Time", "Scenario", starttime, "Start", starttime)
 
+			base.save_metrics("Manager", "rfswarm", starttime, "Version", base.version)
+
 			# collect list of test cases and robot files
 			# --- save_metrics(self, PMetricName, MetricType, MetricTime, SMetricName, MetricValue):
 			for grp in base.scriptlist:
@@ -3009,6 +3011,8 @@ class RFSwarmCore:
 
 			if base.total_robots>0 and robot_count <1:
 				# run finished so clear run name
+				base.save_metrics(base.run_name, "Scenario", int(time.time()), "End_Time", int(time.time()))
+				base.save_metrics("Time", "Scenario", int(time.time()), "End", int(time.time()))
 				base.run_name = ""
 				base.robot_schedule["RunName"] = base.run_name
 
@@ -3044,7 +3048,7 @@ class RFSwarmCore:
 				base.run_finish = int(time.time())
 				base.debugmsg(5, "run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots)
 				# base.save_metrics(base.run_name, "Scenario", base.run_finish, "End_Time", base.run_finish)
-				base.save_metrics("Time", "Scenario", base.run_finish, "End", base.run_finish)
+				base.save_metrics("Time", "Scenario", base.run_finish, "Upload_Finished", base.run_finish)
 
 
 				if not base.args.nogui:
