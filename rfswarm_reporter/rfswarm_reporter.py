@@ -2855,7 +2855,10 @@ class ReporterCore:
 				base.debugmsg(5, "tlogo:", tlogo)
 				if len(tlogo)>0:
 					document.add_paragraph("", style='Cover Subtitle')
-					document.add_picture(tlogo)
+					# document.add_picture(tlogo)
+					p = document.add_paragraph("", style='Cover Subtitle')
+					r = p.add_run()
+					r.add_picture(tlogo)
 					document.add_paragraph("", style='Cover Subtitle')
 			#
 			# Execution Date range
