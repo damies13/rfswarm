@@ -297,7 +297,7 @@ This is an example of a template you could create and use for reporting your tes
 
 |  |  |  |
 |---|---|---|
-| [HTML](Images/Example_20210214_204637_browseOC100.html) | [Word](Images/Example_20210214_204637_browseOC100.docx) | [Excel](Images/Example_20210214_204637_browseOC100.xlsx) |
+| [HTML](Images/Example_20210214_204637_browseOC100.md) | [Word](Images/Example_20210214_204637_browseOC100.docx) | [Excel](Images/Example_20210214_204637_browseOC100.xlsx) |
 
 
 ### Command Line Interface
