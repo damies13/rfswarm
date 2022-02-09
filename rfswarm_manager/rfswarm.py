@@ -2640,7 +2640,8 @@ class RFSwarmCore:
 				time.sleep(0.1)
 
 			# base.save_metrics(base.run_name, "Scenario", int(time.time()), "starttime", base.run_starttime)
-			base.save_metrics(base.run_name, "Scenario", starttime, "Start_Time", starttime)
+			base.save_metrics(base.run_name, "Scenario", starttime, "Start", starttime)
+			base.save_metrics("Time", "Scenario", starttime, "Start", starttime)
 
 			# collect list of test cases and robot files
 			# --- save_metrics(self, PMetricName, MetricType, MetricTime, SMetricName, MetricValue):
@@ -2650,12 +2651,22 @@ class RFSwarmCore:
 				# 	base.debugmsg(6, "while totrbts", totrbts, " 	currbts:", currbts)
 					base.debugmsg(5, "grp[Index]", grp['Index'])
 					base.save_metrics("Local_Path_{}".format(grp['Index']), "Scenario", starttime, grp['Script'], grp['Test'])
+
 					relpath = base.get_relative_path(base.config['Plan']['ScenarioFile'], grp['Script'])
 					base.save_metrics("Test_{}".format(grp['Index']), "Scenario", starttime, relpath, grp['Test'])
+					base.save_metrics(grp['Index'], "Scenario_Test", starttime, relpath, grp['Test'])
+
 					base.save_metrics("Robots_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['Robots'])
+					base.save_metrics(grp['Index'], "Scenario_Robots", starttime, grp['Test'], grp['Robots'])
+
 					base.save_metrics("Delay_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['Delay'])
+					base.save_metrics(grp['Index'], "Scenario_Delay", starttime, grp['Test'], grp['Delay'])
+
 					base.save_metrics("Ramp_Up_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['RampUp'])
+					base.save_metrics(grp['Index'], "Scenario_Ramp_Up", starttime, grp['Test'], grp['RampUp'])
+
 					base.save_metrics("Run_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['Run'])
+					base.save_metrics(grp['Index'], "Scenario_Run", starttime, grp['Test'], grp['Run'])
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -3032,7 +3043,8 @@ class RFSwarmCore:
 			if base.run_end > 0 and base.run_end < int(time.time()) and base.total_robots < 1 and not base.posttest and base.run_finish < 1 and uploadcount < 1:
 				base.run_finish = int(time.time())
 				base.debugmsg(5, "run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots)
-				base.save_metrics(base.run_name, "Scenario", base.run_finish, "End_Time", base.run_finish)
+				# base.save_metrics(base.run_name, "Scenario", base.run_finish, "End_Time", base.run_finish)
+				base.save_metrics("Time", "Scenario", base.run_finish, "End", base.run_finish)
 
 
 				if not base.args.nogui:
@@ -6018,7 +6030,7 @@ class RFSwarmGUI(tk.Frame):
 			stgsWindow.title("Settings for {} ({})".format(testname, r))
 
 
-		stgsWindow.excludelibrariesdefault = "BuiltIn,String,OperatingSystem,perftest"
+		stgsWindow.excludelibrariesdefault = "String,OperatingSystem,perftest"
 		stgsWindow.Filters = {}
 
 		base.debugmsg(5, "base.scriptlist[r]:", base.scriptlist[r])
