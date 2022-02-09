@@ -298,6 +298,7 @@ This is an example of a template you could create and use for reporting your tes
 |  |  |  |
 |---|---|---|
 | [HTML](Images/Example_20210214_204637_browseOC100.html) | [Word](Images/Example_20210214_204637_browseOC100.docx) | [Excel](Images/Example_20210214_204637_browseOC100.xlsx) |
+| You will need to use the "copy raw contents" button and save to a .html file to see this report  | You need to click the Download button to see this report | You need to click the Download button to see this report |
 
 
 ### Command Line Interface
