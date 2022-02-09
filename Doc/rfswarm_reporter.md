@@ -192,8 +192,8 @@ The data sources for the graphs can be:
 | Filter Type | Filter Pattern | Result |
 |---|---|---|
 | None |  | Filter Pattern is ignored |
-| Wildcard (Unix Glob) | *abc* | Only results that contain 'abc' will be shown |
-| Not Wildcard (Unix Glob) | *abc* | Results that contain 'abc' will not be shown, all other results will be shown |
+| Wildcard (Unix Glob) | \*abc\* | Only results that contain 'abc' will be shown |
+| Not Wildcard (Unix Glob) | \*abc\* | Results that contain 'abc' will not be shown, all other results will be shown |
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_FilterType.png)
 
 ###### Data Graph SQL
@@ -263,8 +263,8 @@ The data sources for the graphs can be:
 | Filter Type | Filter Pattern | Result |
 |---|---|---|
 | None |  | Filter Pattern is ignored |
-| Wildcard (Unix Glob) | *abc* | Only results that contain 'abc' will be shown |
-| Not Wildcard (Unix Glob) | *abc* | Results that contain 'abc' will not be shown, all other results will be shown |
+| Wildcard (Unix Glob) | \*abc\* | Only results that contain 'abc' will be shown |
+| Not Wildcard (Unix Glob) | \*abc\* | Results that contain 'abc' will not be shown, all other results will be shown |
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result_FilterType.png)
 
 ###### Data Table ResultSummary
@@ -274,8 +274,8 @@ The data sources for the graphs can be:
 | Filter Type | Filter Pattern | Result |
 |---|---|---|
 | None |  | Filter Pattern is ignored |
-| Wildcard (Unix Glob) | *abc* | Only results that contain 'abc' will be shown |
-| Not Wildcard (Unix Glob) | *abc* | Results that contain 'abc' will not be shown, all other results will be shown |
+| Wildcard (Unix Glob) | \*abc\* | Only results that contain 'abc' will be shown |
+| Not Wildcard (Unix Glob) | \*abc\* | Results that contain 'abc' will not be shown, all other results will be shown |
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_ResultSummary_FilterType.png)
 
 ###### Data Table SQL
