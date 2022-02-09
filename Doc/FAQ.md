@@ -3,6 +3,15 @@
 
 # rfswarm (Robot Framework Swarm) Frequently Asked Questions
 
+- [Can I run the Agent and the Manager on the same machine?](#can-i-run-the-agent-and-the-manager-on-the-same-machine)
+- [The Agent doesn't connect to the Manager?](#the-agent-doesnt-connect-to-the-manager)
+- [I have some experience in performance testing, can you translate the terminology between rfswarm and tool xzy?](#i-have-some-experience-in-performance-testing-can-you-translate-the-terminology-between-rfswarm-and-tool-xzy)
+- [Can you help me get started? Which test cases should I choose?](#can-you-help-me-get-started-which-test-cases-should-i-choose)
+- [Do we have any sample test cases?](#do-we-have-any-sample-test-cases)
+- [Is there a tutorial on how to use rfswarm?](#is-there-a-tutorial-on-how-to-use-rfswarm)
+- [does rfswarm support IPv6?](#does-rfswarm-support-ipv6)
+
+
 ## Can I run the Agent and the Manager on the same machine?
 
 Yes running the Agent and the Manager on the same machine is ok for small numbers of robots (users), but if you want to run any significant load then you will probably need some separate machines for the agent.
@@ -21,6 +30,7 @@ This should cover off the main components with the most common tools:
 |-------|----------|------|
 |Manager|Controller|JMeter client (JMeter GUI)|
 |Agents|Agent process (sometimes called Load Generators or Injectors)|JMeter servers (JMeterEngine)|
+|Reporter|Analysis||
 |Scenario|Scenario|Test Plan|
 |Test Case|Script|Thread Group|
 
