@@ -630,6 +630,10 @@ class ReporterBase():
 		id = "{:02X}".format(int(time.time()*10000))
 		# id = "{:02X}".format(int(time.time()*1000000))
 		# id = "{:02X}".format(time.time()) # cannot convert float
+		while id in base.report:
+			time.sleep(0.1)
+			id = "{:02X}".format(int(time.time()*10000))
+		
 		base.debugmsg(7, "id:", id)
 		self.report_add_section(parent, id, name)
 		# base.report_save() # report_set_order in report_add_section will save
