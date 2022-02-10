@@ -4093,7 +4093,8 @@ class ReporterGUI(tk.Frame):
 		results_menu = tk.Menu(root_menu) # it intializes a new su menu in the root menu
 		root_menu.add_cascade(label = "Results", menu = results_menu) # it creates the name of the sub menu
 
-		accelkey = "Ctrl"
+		# accelkey = "Ctrl"
+		accelkey = "Control"
 		if sys.platform.startswith('darwin'):
 			accelkey = "Command"
 		shifkey = "Shift"
