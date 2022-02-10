@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #		Reporter
-#    Version 1.0.0
+#    Version 0.8.2.1644458446
 #
 
 import sys
@@ -136,7 +136,7 @@ class stdevclass:
 
 
 class ReporterBase():
-	version="1.0.0"
+	version="0.8.2.1644458446"
 	debuglvl = 0
 
 	save_ini = True
@@ -333,7 +333,7 @@ class ReporterBase():
 			base.report_item_set_changed_all("TOP")
 
 		else:
-			base.report_create()
+			base.template_create()
 
 
 	#
