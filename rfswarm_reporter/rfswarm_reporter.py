@@ -342,11 +342,13 @@ class ReporterBase():
 
 	def report_save(self):
 		saved = False
-		filename = base.config['Reporter']['Report']
-		with open(filename, 'w') as reportfile:    # save
-			base.report.write(reportfile)
-			self.debugmsg(6, "Report Saved:", filename)
-			saved = True
+		if 'Reporter' in base.config:
+			if 'Report' in base.config['Reporter']:
+				filename = base.config['Reporter']['Report']
+				with open(filename, 'w') as reportfile:    # save
+					base.report.write(reportfile)
+					self.debugmsg(6, "Report Saved:", filename)
+					saved = True
 
 
 	def report_open(self):
@@ -374,68 +376,73 @@ class ReporterBase():
 			return self.reportdata["starttime"]
 		else:
 			self.reportdata["starttime"] = 0
-			# SELECT MetricTime
-			# FROM MetricData
-			# WHERE MetricType = 'Scenario'
-			# 	AND PrimaryMetric <> 'PreRun'
-			#
-			# -- Start Time
-			# -- ORDER BY MetricTime ASC
-			# -- End Time
-			# ORDER BY MetricTime DESC
-			#
-			# LIMIT 1
+			if base.datadb is not None:
+				# SELECT MetricTime
+				# FROM MetricData
+				# WHERE MetricType = 'Scenario'
+				# 	AND PrimaryMetric <> 'PreRun'
+				#
+				# -- Start Time
+				# -- ORDER BY MetricTime ASC
+				# -- End Time
+				# ORDER BY MetricTime DESC
+				#
+				# LIMIT 1
 
-			sql =  "SELECT MetricTime "
-			sql += "FROM MetricData "
-			sql += "WHERE MetricType = 'Scenario' "
-			sql += 		"AND PrimaryMetric <> 'PreRun' "
-			sql += "ORDER BY MetricTime ASC "
-			sql += "LIMIT 1 "
+				sql =  "SELECT MetricTime "
+				sql += "FROM MetricData "
+				sql += "WHERE MetricType = 'Scenario' "
+				sql += 		"AND PrimaryMetric <> 'PreRun' "
+				sql += "ORDER BY MetricTime ASC "
+				sql += "LIMIT 1 "
 
-			key = "report starttime"
-			base.debugmsg(9, "sql:", sql)
-			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
-			while key not in base.dbqueue["ReadResult"]:
-				time.sleep(0.1)
+				key = "report starttime"
+				base.debugmsg(9, "sql:", sql)
+				base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+				while key not in base.dbqueue["ReadResult"]:
+					time.sleep(0.1)
 
-			gdata = base.dbqueue["ReadResult"][key]
-			base.debugmsg(9, "gdata:", gdata)
+				gdata = base.dbqueue["ReadResult"][key]
+				base.debugmsg(9, "gdata:", gdata)
 
-			self.reportdata["starttime"] = int(gdata[0]["MetricTime"])
+				self.reportdata["starttime"] = int(gdata[0]["MetricTime"])
 
-			base.debugmsg(8, "starttime:", self.reportdata["starttime"])
+				base.debugmsg(8, "starttime:", self.reportdata["starttime"])
 
-			return self.reportdata["starttime"]
-
+				return self.reportdata["starttime"]
+			else:
+				return int(time.time())-1
 
 	def report_endtime(self):
 		if "endtime" in self.reportdata and self.reportdata["endtime"] > 0:
 			return self.reportdata["endtime"]
 		else:
 			self.reportdata["endtime"] = 0
+			if base.datadb is not None:
 
-			sql =  "SELECT MetricTime "
-			sql += "FROM MetricData "
-			sql += "WHERE MetricType = 'Scenario' "
-			sql += 		"AND PrimaryMetric <> 'PreRun' "
-			sql += "ORDER BY MetricTime DESC "
-			sql += "LIMIT 1 "
+				sql =  "SELECT MetricTime "
+				sql += "FROM MetricData "
+				sql += "WHERE MetricType = 'Scenario' "
+				sql += 		"AND PrimaryMetric <> 'PreRun' "
+				sql += "ORDER BY MetricTime DESC "
+				sql += "LIMIT 1 "
 
-			key = "report endtime"
-			base.debugmsg(9, "sql:", sql)
-			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
-			while key not in base.dbqueue["ReadResult"]:
-				time.sleep(0.1)
+				key = "report endtime"
+				base.debugmsg(9, "sql:", sql)
+				base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+				while key not in base.dbqueue["ReadResult"]:
+					time.sleep(0.1)
 
-			gdata = base.dbqueue["ReadResult"][key]
-			base.debugmsg(9, "gdata:", gdata)
+				gdata = base.dbqueue["ReadResult"][key]
+				base.debugmsg(9, "gdata:", gdata)
 
-			self.reportdata["endtime"] = int(gdata[0]["MetricTime"])
+				self.reportdata["endtime"] = int(gdata[0]["MetricTime"])
 
-			base.debugmsg(8, "endtime:", self.reportdata["endtime"])
+				base.debugmsg(8, "endtime:", self.reportdata["endtime"])
 
-			return self.reportdata["endtime"]
+				return self.reportdata["endtime"]
+			else:
+				return int(time.time())
 
 
 	def report_formatdate(self, itime):
