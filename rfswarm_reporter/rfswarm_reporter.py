@@ -4535,8 +4535,10 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(9, "ParentID:", ParentID, "	sectionID:", sectionID)
 		sect_name = "{}".format(base.report[sectionID]["Name"])
 		base.debugmsg(9, "sect_name:", sect_name)
-
-		self.sectionstree.insert(ParentID, "end", sectionID, text=sect_name, tags="Sect")
+		items = list(self.sectionstree.get_children(ParentID))
+		base.debugmsg(9, "items:", items)
+		if sectionID not in items:
+			self.sectionstree.insert(ParentID, "end", sectionID, text=sect_name, tags="Sect")
 		if "Order" in base.report[sectionID]:
 			self.LoadSections(sectionID)
 		# self.sectionstree.see(sectionID)
