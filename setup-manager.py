@@ -5,7 +5,7 @@ with open("README_PyPi.md", "r") as fh:
 
 setuptools.setup(
 	name="rfswarm-manager",
-	version="1.0.0",
+	version="0.8.2.1644451096",
 	author="damies13",
 	author_email="damies13+rfswarm@gmail.com",
 	description="rfswarm manager",
@@ -16,7 +16,7 @@ setuptools.setup(
 	# I needed a recent version of pip (pip 21.0.1 worked my previous <20 version didn't) for matplotlib
 	# 	to actually install withput error
 	# https://matplotlib.org/stable/users/installing.html
-	install_requires=['configparser', 'HTTPServer', 'pillow', 'pip>=21', 'matplotlib'],
+	install_requires=['configparser', 'HTTPServer', 'pillow', 'psutil', 'pip>=21', 'matplotlib'],
 	classifiers=[
 		"Development Status :: 5 - Production/Stable",
 		"Topic :: Software Development :: Testing",
