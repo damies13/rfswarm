@@ -6616,7 +6616,7 @@ class ReporterGUI(tk.Frame):
 
 
 
-class RFSwarm_Reporter():
+class RFSwarm():
 
 	running = True
 
