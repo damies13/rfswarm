@@ -3,11 +3,12 @@
 
 ## Overview / Concepts
 
-rfswarm is made up of 2 components, the [Manager](rfswarm_py.md) where you plan and run your test scenario and the [Agents](rfswarm_agent_py.md) which runs the Robot Framework tests.
+rfswarm is made up of 3 components, the [Manager](rfswarm_manager.md) where you plan and run your test scenario, the [Agents](rfswarm_agent.md) which runs the Robot Framework tests, and the [Reporter](rfswarm_reporter.md)
 
 - [Manager](#manager)
 - [Agents](#Agents)
 - [Robot File handling (transfer from Manager to Agent)](#robot-file-handling-transfer-from-manager-to-agent)
+- [Reporter](#Reporter)
 
 
 <kbd>
@@ -70,3 +71,8 @@ The Agent then:
 	- The Agent update it's in memory file list using the hash as the key, the relative path and the local path (this is likely very different to the local path on the Manager) as properties of the hash.
 
 It is not recommended to use fixed paths in your robot file unless you are sure that the path will be the same on the Manager and all Agents.
+
+
+### Reporter
+
+This component is used to assist you in reporting the results of your performance tests and is a completly optional component. You only need one reporter machine, and if your test schedule is not too busy this can be the same machine as the manager.

@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version 0.8.2
+#    Version 1.0.0
 #
 
 
@@ -41,7 +41,7 @@ import inspect
 
 class RFSwarmAgent():
 
-	version="0.8.2"
+	version="1.0.0"
 	config = None
 	isconnected = False
 	isrunning = False
@@ -69,6 +69,7 @@ class RFSwarmAgent():
 	args = None
 	xmlmode = False
 	timeout=600
+	uploadmode = "err"
 
 	debuglvl = 0
 
@@ -114,7 +115,6 @@ class RFSwarmAgent():
 
 		self.debugmsg(0, "	Configuration File: ", self.agentini)
 
-		self.agentname = socket.gethostname()
 		if self.args.agentname:
 			self.agentname = self.args.agentname
 
@@ -124,9 +124,10 @@ class RFSwarmAgent():
 			self.saveini()
 
 		if 'agentname' not in self.config['Agent']:
-			self.config['Agent']['agentname'] = self.agentname
+			self.config['Agent']['agentname'] = socket.gethostname()
 			self.saveini()
-		else:
+
+		if not self.args.agentname:
 			self.agentname = self.config['Agent']['agentname']
 
 		if 'agentdir' not in self.config['Agent']:
@@ -708,6 +709,8 @@ class RFSwarmAgent():
 					for k in jsonresp["Schedule"][s].keys():
 						self.debugmsg(6, "getjobs: self.jobs[",s,"][",k,"]", jsonresp["Schedule"][s][k])
 						self.jobs[s][k] = jsonresp["Schedule"][s][k]
+					if "UploadMode" in jsonresp:
+						self.jobs[s]["UploadMode"] = jsonresp["UploadMode"]
 
 				if int(time.time()) > jsonresp["EndTime"]:
 					self.isstopping = True
@@ -946,18 +949,25 @@ class RFSwarmAgent():
 				self.debugmsg(5, "Robot returned an error:", e)
 				result = 1
 
-			# Uplad any files found
 
-			self.queue_file_upload(result, odir)
+			uploadmode = self.uploadmode
+			self.debugmsg(5, "uploadmode:", uploadmode)
+			self.debugmsg(5, "self.jobs[",jobid,"]:", self.jobs[jobid])
+			if "UploadMode" in self.jobs[jobid]:
+				uploadmode = self.jobs[jobid]["UploadMode"]
+				self.debugmsg(5, "uploadmode:", uploadmode)
+
+			# Uplad any files found
+			self.queue_file_upload(uploadmode, result, odir)
 
 			self.robotcount += -1
 		else:
 			self.debugmsg(1, "Could not find robot executeable:", robotexe)
 
 
-	def queue_file_upload(self, retcode, filedir):
+	def queue_file_upload(self, mode, retcode, filedir):
 		reldir = os.path.basename(filedir)
-		self.debugmsg(7, retcode, reldir, filedir)
+		self.debugmsg(7, mode, retcode, reldir, filedir)
 
 		filelst = self.file_upload_list(filedir)
 		self.debugmsg(7, "filelst", filelst)
@@ -972,13 +982,20 @@ class RFSwarmAgent():
 
 		rundir = os.path.join(self.logdir, self.run_name)
 
+		self.debugmsg(5, "mode:", mode, "	retcode:", retcode)
+		# 	uploadmodes = {'imm':"Immediately", 'err':"On Error Only", 'def':"All Defered"}
+
+
 		for file in filelst:
 			fobj = {}
 			fobj["LocalFilePath"] = file
 			fobj["RelFilePath"] = os.path.relpath(file, start=rundir)
 			self.upload_queue.append(fobj)
 			self.debugmsg(7, "added to upload_queue", fobj)
-			if retcode > 0:
+			if mode == "err" and retcode > 0:
+				# upload now
+				self.file_upload(fobj)
+			if mode == "imm":
 				# upload now
 				self.file_upload(fobj)
 
