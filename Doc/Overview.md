@@ -1,7 +1,5 @@
-
-[Index](README.md)
-
 ## Overview / Concepts
+[Return to Index](README.md)
 
 rfswarm is made up of 3 components, the [Manager](rfswarm_manager.md) where you plan and run your test scenario, the [Agents](rfswarm_agent.md) which runs the Robot Framework tests, and the [Reporter](rfswarm_reporter.md)
 

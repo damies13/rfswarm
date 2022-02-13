@@ -1,8 +1,7 @@
 
-[Index](README.md)
-
 ## About
 <img align="right" src="Images/robot_framework.png">
+[Return to Index](README.md)
 
 rfswarm is a testing tool that allows you use [Robot Framework](https://robotframework.org/) test cases for performance or load testing.
 

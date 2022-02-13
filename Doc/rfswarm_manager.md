@@ -1,7 +1,5 @@
-
-[Index](README.md)
-
 ## rfswarm Manager
+[Return to Index](README.md)
 
 rfswarm Manager is the central server component of rfswarm, this is where you plan, execute and monitor your performance test.
 

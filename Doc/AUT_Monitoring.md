@@ -1,6 +1,5 @@
-[Index](README.md)
-
 ## AUT Monitoring
+[Return to Index](README.md)
 
 The ability to monitor your Application Under Test (AUT) servers and store the monitoring data in the test results has been available as part of the rfswarm Manager since version v0.6.3 and was introduced from feature request #72.
 
@@ -24,7 +23,7 @@ The robot file below is an example of connecting to a unix (linux) AUT server vi
 This example may work for you, or you may need to modify it to work with the OS that your AUT uses. It is not intended as a ready to use example, but rather a starting point to help you build a monitoring script for your AUT.
 
 ssh_example.robot
-```
+```.robot
 *** Settings ***
 
 Library                SSHLibrary

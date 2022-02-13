@@ -1,7 +1,6 @@
 
-[Index](README.md)
-
 # rfswarm (Robot Framework Swarm) Hardware Requirements
+[Return to Index](README.md)
 
 - [Manager](#Manager)
 - [Agents](#Agents)

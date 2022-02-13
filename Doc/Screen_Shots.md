@@ -1,7 +1,5 @@
-
-[Index](README.md)
-
 ## Screen Shots
+[Return to Index](README.md)
 
 - [v1.0.0](#v100)
 	- [Manager v1.0.0](#Manager-v100)

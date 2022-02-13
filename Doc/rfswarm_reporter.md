@@ -1,6 +1,5 @@
-[Index](README.md)
-
 ## rfswarm Reporter
+[Return to Index](README.md)
 
 rfswarm Reporter is the reporting tool component, you would use this at some point after the performance test has completed.
 

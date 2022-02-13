@@ -1,7 +1,6 @@
 
-[Index](README.md)
-
 # rfswarm (Robot Framework Swarm) Frequently Asked Questions
+[Return to Index](README.md)
 
 - [Can I run the Agent and the Manager on the same machine?](#can-i-run-the-agent-and-the-manager-on-the-same-machine)
 - [The Agent doesn't connect to the Manager?](#the-agent-doesnt-connect-to-the-manager)

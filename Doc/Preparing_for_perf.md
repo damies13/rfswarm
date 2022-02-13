@@ -1,7 +1,5 @@
-
-[Index](README.md)
-
 ## Preparing a test case for performance
+[Return to Index](README.md)
 
 Some of the things you will need to consider when taking a functional or regression test and using it for performance are:
 - [Think Time](#Think-Time)

@@ -1,7 +1,6 @@
 
-[Index](README.md)
-
 ## Agent Communication
+[Return to Index](README.md)
 
 In this page the generic host names manager and myagent are used, replace manager with the host name of the machine that is running rfswarm.py and myagent with the host name of the machine that is running rfswarm_agent.py
 
