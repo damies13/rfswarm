@@ -14,6 +14,5 @@ jobs:
         uses: github/super-linter@v4
         env:
           DEFAULT_BRANCH: main
-          FILTER_REGEX_EXCLUDE: *.sh
-          FILTER_REGEX_EXCLUDE: .git/.*
+          FILTER_REGEX_EXCLUDE: (.*sh|.git/.*|.Doc/Images/.*)
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
