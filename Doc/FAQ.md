@@ -13,7 +13,7 @@
 
 ## Can I run the Agent and the Manager on the same machine?
 
-Yes running the Agent and the Manager on the same machine is ok for small numbers of robots (users), but if you want to run any significant load then you will probably need some separate machines for the agent.
+Yes running the Agent and the Manager on the same machine is OK for small numbers of robots (users), but if you want to run any significant load then you will probably need some separate machines for the agent.
 
 You will probably want to refer to the [Hardware Requirements](HardwareRequirements.md)
 
@@ -55,7 +55,7 @@ Finally you'll need some machines to run the test, how many will depend on your 
 
 To get started have at least 3 machines ready, run the Manager (rfswarm.py) on your first machine (Machine A), just make sure the Manager loads and you can browse to your robot files.
 
-Next on machines B & C, first make sure that your test cases run on these machines by opening a command line and running robot with the -t switch for your test case (robot -h will explain what you need to do here)
+Next on machines B & C, first make sure that your test cases run on these machines by opening a command-line and running robot with the -t switch for your test case (robot -h will explain what you need to do here)
 Once you have confirmed that robot works properly on machines B & C then run the agent (rfswarm_agent.py) don't forget to point the agents to Machine A.
 
 Next on Machine A, in the rfswarm Manager, create a new scenario, just make it a really simple to start with, one test case, see this screen:
