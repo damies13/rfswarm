@@ -37,6 +37,7 @@ Starting from the top left of the screen we have the main toolbar:
 | Export Excel | ![image](Images/REP_page_excel.gif) | Generate an Excel report |
 
 Under the main toolbar is the section toolbar:
+
 |   |   |   |
 |---|---|---|
 | Add Section | ![image](Images/REP_add.gif) | Opens the add section dialogue |
@@ -244,6 +245,7 @@ The data sources for the graphs can be:
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result.png)
 
 **Result Type** - This option lets you choose between the Response Time, TPS or Total TPS.
+
 |   |   |
 |---|---|
 | Response Time | The time the keyword took, as measured by robot framework and then reported back to the Manager by the Agent |
@@ -252,6 +254,7 @@ The data sources for the graphs can be:
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result_Type.png)
 
 **Filter Result** - This option lets you choose between the None, Pass or Fail.
+
 |   |   |
 |---|---|
 | None | Does not filter results (shows all) |
@@ -260,6 +263,7 @@ The data sources for the graphs can be:
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result_FilterResult.png)
 
 **Filter Type** - This option is used in with **Filter Pattern**, if the Filter Type is None, then Filter Pattern is ignored, otherwise Filter Pattern is used to filter the results shown.
+
 | Filter Type | Filter Pattern | Result |
 |---|---|---|
 | None |  | Filter Pattern is ignored |
@@ -271,6 +275,7 @@ The data sources for the graphs can be:
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_ResultSummary.png)
 
 **Filter Type** - This option is used in with **Filter Pattern**, if the Filter Type is None, then Filter Pattern is ignored, otherwise Filter Pattern is used to filter the results shown.
+
 | Filter Type | Filter Pattern | Result |
 |---|---|---|
 | None |  | Filter Pattern is ignored |
