@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-#	Robot Framework Swarm
+# 	Robot Framework Swarm
 #
 #    Version 1.0.0
 #
@@ -18,11 +18,9 @@ import hashlib
 import lzma
 import base64
 
-
-
 # import robot
 import pkg_resources
-import random
+# import random
 import time
 from datetime import datetime
 import threading
@@ -41,7 +39,7 @@ import inspect
 
 class RFSwarmAgent():
 
-	version="1.0.0"
+	version = "1.0.0"
 	config = None
 	isconnected = False
 	isrunning = False
@@ -68,7 +66,7 @@ class RFSwarmAgent():
 	excludelibraries = []
 	args = None
 	xmlmode = False
-	timeout=600
+	timeout = 600
 	uploadmode = "err"
 
 	debuglvl = 0
@@ -98,10 +96,8 @@ class RFSwarmAgent():
 		if self.args.debug:
 			self.debuglvl = int(self.args.debug)
 
-
 		if self.args.version:
 			exit()
-
 
 		self.config = configparser.ConfigParser()
 
@@ -117,7 +113,6 @@ class RFSwarmAgent():
 
 		if self.args.agentname:
 			self.agentname = self.args.agentname
-
 
 		if 'Agent' not in self.config:
 			self.config['Agent'] = {}
@@ -155,7 +150,6 @@ class RFSwarmAgent():
 		self.logdir = os.path.join(self.agentdir, "logs")
 		self.ensuredir(self.logdir)
 
-
 		if 'excludelibraries' not in self.config['Agent']:
 			self.config['Agent']['excludelibraries'] = "BuiltIn,String,OperatingSystem,perftest"
 			self.saveini()
@@ -164,11 +158,9 @@ class RFSwarmAgent():
 		self.excludelibraries = self.config['Agent']['excludelibraries'].split(",")
 		self.debugmsg(6, "self.excludelibraries:", self.excludelibraries)
 
-
 		if 'properties' not in self.config['Agent']:
 			self.config['Agent']['properties'] = ""
 			self.saveini()
-
 
 		self.ensure_listner_file()
 
@@ -177,8 +169,6 @@ class RFSwarmAgent():
 
 		t = threading.Thread(target=self.findlibraries)
 		t.start()
-
-
 
 		self.agentproperties["OS: Platform"] = platform.platform()	# 'Linux-3.3.0-8.fc16.x86_64-x86_64-with-fedora-16-Verne'
 		self.agentproperties["OS: System"] = platform.system()   # 'Windows'
@@ -194,7 +184,6 @@ class RFSwarmAgent():
 			self.agentproperties["OS: Version: Major"] = "{}".format(int(vararr[0]))
 		if len(vararr)>1:
 			self.agentproperties["OS: Version: Minor"] = "{}.{}".format(int(vararr[0]), int(vararr[1]))
-
 
 		if 'properties' in self.config['Agent'] and len(self.config['Agent']['properties'])>0:
 			if "," in self.config['Agent']['properties']:
