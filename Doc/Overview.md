@@ -1,4 +1,4 @@
-## Overview / Concepts
+# Overview / Concepts
 [Return to Index](README.md)
 
 rfswarm is made up of 3 components, the [Manager](rfswarm_manager.md) where you plan and run your test scenario, the [Agents](rfswarm_agent.md) which runs the Robot Framework tests, and the [Reporter](rfswarm_reporter.md)
@@ -14,7 +14,7 @@ rfswarm is made up of 3 components, the [Manager](rfswarm_manager.md) where you 
 </kbd><br>
 An example of how your rfswarm setup might look.
 
-### Manager
+## Manager
 
 This is the swarm manager where you schedule and monitor your swarm of robots.
 
@@ -23,28 +23,28 @@ You only need one manager, the machine you use for this can be an ordinary deskt
 While python is required to run this component, Robot Framework is not required. However as this is most likely to be your own desktop machine you may need Robot Framework installed to develop and test your test cases in preparation for performance testing.
 
 
-### Agents
+## Agents
 
 This is the component that actually executes the tests, so Robot Framework need to be installed on these machines.
 
 How many and what specifications these machines need will depend on your application under test. Some examples of what to consider:
 
- - A web application being tested using SeleniumLibrary, My initial tests indicate that with headlessfirefox, a mid range desktop PC should be able to support around 50 virtual users, obviously this will vary depending on the amount of think time you include, how javascript heavy your application is a few short (~5 minutes) runs with 10, 30 & 50 users on one agent should give you a feel for what your agent machines are capable of. This is quite comparable to JMeter and loadrunner when using TruClient protocol.
- - An application using libraries such as SudsLibrary, RESTinstance, HTTP library (Requests), Database Library (Python), SSHLibrary, TFTPLibrary, etc should be fairly low resource usage on the agent machine and will probably let you run many more virtual users than a SeleniumLibrary based test.
- - A thick client desktop application using libraries such as AutoItLibrary, SikuliLibrary, WhiteLibrary, etc will probably limit you to 1 (one) virtual user per agent, though some possible work arounds for this might be:
- 	* Running the agents in minimal virtual machines (e.g. 1-2 cpu cores and 2-4GB ram) and then running multiple VM's on the physical machines allocated for your agents.
+- A web application being tested using SeleniumLibrary, My initial tests indicate that with headlessfirefox, a mid range desktop PC should be able to support around 50 virtual users, obviously this will vary depending on the amount of think time you include, how javascript heavy your application is a few short (~5 minutes) runs with 10, 30 & 50 users on one agent should give you a feel for what your agent machines are capable of. This is quite comparable to JMeter and loadrunner when using TruClient protocol.
+- An application using libraries such as SudsLibrary, RESTinstance, HTTP library (Requests), Database Library (Python), SSHLibrary, TFTPLibrary, etc should be fairly low resource usage on the agent machine and will probably let you run many more virtual users than a SeleniumLibrary based test.
+- A thick client desktop application using libraries such as AutoItLibrary, SikuliLibrary, WhiteLibrary, etc will probably limit you to 1 (one) virtual user per agent, though some possible work arounds for this might be:
+	* Running the agents in minimal virtual machines (e.g. 1-2 cpu cores and 2-4GB ram) and then running multiple VM's on the physical machines allocated for your agents.
 	* Install Microsoft Terminal Services (Windows Server)/ Citrix (Windows Server) / Xvnc (Linux/Unix) on your agent machine and then run an agent in each desktop session
 	* using docker images and running the desktop application and the agent with robot framework inside the docker container.
 
 Additional details can be found in the [Hardware Requirements](HardwareRequirements.md#Agents)
 
-### Robot File handling (transfer from Manager to Agent)
+## Robot File handling (transfer from Manager to Agent)
 
 Firstly the assumption is made that the Agent and the Manager are not necessarily the same operating system or on the same network (e.g. the Manager might be in a corporate network and the Agent on virtual machine from a cloud provider like AWS). So based on this it is assumed that the Agent and Manager might not have any shared network locations etc. This key assumption drove the design for how the Manager and Agent handle all files.
 
 The Manager and the Agent both internally have the concept of a file hash being the key identifier of a file, then a file also has a relative path and a local path.
 
-#### Manager side
+### Manager side
 When you select a robot script, the Manager considers the directory this robot file is in to be the base directory, so everything is relative to this robot file.
 
 So the following happens on the Manager when a robot file is selected:
@@ -56,7 +56,7 @@ So the following happens on the Manager when a robot file is selected:
 	- The Manager does a md5 hash of the support file (Again this hash is used as the key to reference this support file from now on)
 	- The the scenario file list in the Manager is updated with the the hash and the local and relative paths as properties of the hash for this support file.
 
-#### Agent side
+### Agent side
 When the request for a file list is sent from the Agent, the Manager returns a list of hash keys from the Manager's in memory scenario file list.
 
 The Agent then:
@@ -71,6 +71,6 @@ The Agent then:
 It is not recommended to use fixed paths in your robot file unless you are sure that the path will be the same on the Manager and all Agents.
 
 
-### Reporter
+## Reporter
 
 This component is used to assist you in reporting the results of your performance tests and is a completly optional component. You only need one reporter machine, and if your test schedule is not too busy this can be the same machine as the manager.
