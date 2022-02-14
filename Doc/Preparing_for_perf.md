@@ -1,4 +1,4 @@
-## Preparing a test case for performance
+# Preparing a test case for performance
 [Return to Index](README.md)
 
 Some of the things you will need to consider when taking a functional or regression test and using it for performance are:
@@ -8,7 +8,7 @@ Some of the things you will need to consider when taking a functional or regress
 - [Keywords](#Keywords)
 - [Browser](#Browser)
 
-### Think Time
+## Think Time
 
 Because functional and regression tests are designed to run as a single user and test the functionality as quickly as possible, for performance testing we want to simulate real user behaviour so we want to put some user thinking time or pauses into the script.
 
@@ -19,64 +19,64 @@ Why is this is important?
 
 The easiest way to simulate this user behaviour would be to simply use the Robot Framework's built in sleep command:
 
-```
+```robot
 	Sleep	30
 ```
 
 The only issue with just using Sleep like this is that it can make the script too regular and cause cadence issues, so just like with other performance testing tools we want to have a variable think time, to do this we can import randint from python's random library to pick a time to sleep between a minimum and maximum value, e.g. 15 and 45.
 
-```
+```robot
 	${number}    Evaluate    random.randint(15, 45)    random
 	Sleep    ${number}
 ```
 
 Adding these 2 lines many places throughout your script could become messy and also a hassle should you need to change the minimum and maximum values. So to make life easier in the [Robot Resources](../Robot_Resources) folder there is a [perftest.resource](../Robot_Resources/perftest.resource) file that you can include in the Settings section of your .robot file like this:
 
-```
+```robot
 *** Settings ***
 Resource    perftest.resource
 ```
 
 Then you can simply include the `Standard Think Time` keyword between each user action in your test cases or keywords. The default minimum is set to 15 seconds and the default maximum is set to 45 seconds. If you want to over ride these defaults for a specific test case or all the test cases in you .robot file simply set a new value to the `${STT_MIN}` and  `${STT_MAX}` variables.
 
-### Useful Variables
+## Useful Variables
 
 When an agent runs a robot test case it passes some variables on to the test case that might be useful to know or used to trigger variations in behaviour in you test cases. While there is no requirement to use these variables they are values that I have had to manually implement in laodrunner scripts, so knowing I would find them useful I have included them by default to make life easier.
 
-#### Index
+### Index
 Index should be available through the variable `${RFS_INDEX}`, this is the number you see in the Index column at the bottom of the plan screen
 
-#### Robot number
+### Robot number
 Robot number should be available through the variable `${RFS_ROBOT}`, referring to the Robots column at the bottom of the plan screen, this number is the counter of the robot from one to the number in the Robots column.
 While this number on it's own is not unique, it will be unique relative to the Index above, so if you need a unique string in your test you could combine them. e.g. `${RFS_INDEX}_${RFS_ROBOT}`
 Another way this could be useful is as a data row offset so that each test robot is using data from a different section of your data file.
 
-#### Iteration
+### Iteration
 Iteration should be available through the variable `${RFS_ITERATION}`, This is simply a counter of how many times this test case has been run for this robot. This could be useful if for example you need to walk sequentially through a data file because your data is single use.
 
-#### Swarm Manager
+### Swarm Manager
 Swarm Manager should be available through the variable `${RFS_SWARMMANAGER}`, this will be useful for sending custom metric data back to the rfswarm manager, for example when using a robot test / task to collect statistics from the application under test.
 
-### Data Management
+## Data Management
 
 Because functional and regression tests are designed to test specific functionality, the test data is designed to test boundary or edge cases so are limited to a small set of cases or are static. With performance testing we don't want this, rather we want hundreds or even thousands of different data values so we can better emulate user behaviour and ensure we are not constantly hitting a single cached value and reporting unrealistically fast response times.
 
-#### [Faker Library](https://github.com/guykisel/robotframework-faker)
+### [Faker Library](https://github.com/guykisel/robotframework-faker)
 
 [robotframeork-faker](https://github.com/guykisel/robotframework-faker) can produce realistic locale aware generated data values for a large variety of data type including names, email and physical addresses, phone numbers etc.
 
-#### Reading Data Files
+### Reading Data Files
 
 To make life easier when reading data from files, in the [Robot Resources](../Robot_Resources) folder there is a [perftest.resource](../Robot_Resources/perftest.resource) file that you can include in the Settings section of your .robot file like this:
 
-```
+```robot
 *** Settings ***
 Resource    perftest.resource
 ```
 
 For Reading Data Files [perftest.resource](../Robot_Resources/perftest.resource) provides the keywords `Get File Dir` and `Get Data Row`
 
-```
+```robot
 *** Test Cases ***
 File Test Examples
 	${FILE_DIR} = 	Get File Dir
@@ -93,11 +93,11 @@ File Test Examples
 - Sequential is only useful if you are accessing multiple rows in the same test case
 - The third option is to parse a row number directly, this could be a fixed number or a calculated value
 
-#### Support Files
+### Support Files
 
 Robot Framework only has 2 ways to include a file in your robot file, the `Resource` Setting or the `Variables` Setting.
 
-```
+```robot
 *** Settings ***
 Resource    perftest.resource
 Resource    ../Robot_Resources/perftest.resource
@@ -110,7 +110,7 @@ Likewise for some test cases you will want to have some additional support files
 
 To ensure these files get transferred to the Agent so that your test case can find them rfswarm uses the `Metadata` Setting with the name `File` to provide an additional way to include files. As a bonus when using `Metadata    File` you can also use wildcards to transfer multiple files
 
-```
+```robot
 *** Settings ***
 Metadata	File    ProductList.tsv
 Metadata	File    *.csv
@@ -120,7 +120,7 @@ Metadata	File    uploads/*.*
 
 rfswarm ensures all the files referenced using `Resource`, `Variables` and `Metadata    File` in the Settings section of your robot file are transferred to the agent in the same relative path to your robot file.
 
-#### TestDataTable
+### TestDataTable
 
 Often when testing applications there are business processes that produce system generated data or use system generated data from a previous business process. with regression testing it's quite simple to string the business process together in one really long test case and simply pass the value along as a variable.
 
@@ -151,13 +151,13 @@ Both methods demonstrate TestDataTable's functionality, and for more details you
 
 Why is TestDataTable a seperate project? simply because I wanted TestDataTable to be able to be used by other test tools as well, for example there is nothing stopping you to use TestDataTable with your regression test suite to make your test cases shorter and enable them to run in parallel, likewise TestDataTable could be used by other performance test tools like JMeter.
 
-### Keywords
+## Keywords
 
 As you will most likely have built your own custom keywords for navigating your AUT, you may want to get the time taken for these keywords, so controlling which keywords are reported to the Manager and which are not is as simple as including or leaving out the [keyword [Documentation]](http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#user-keyword-documentation)
 
 Consider the following keyword examples
 
-```
+```robot
 *** Keywords ***
 Example Keyword
     [Documentation]    TC01 My Example Keyword
@@ -173,27 +173,27 @@ Match Keyword
 
 ```
 
-#### No Operation
+### No Operation
 Would not have a timing measured by default because this keyword belongs to the builtin which is one of the default [excluded libraries](./rfswarm_agent.md#exclude-libraries)
 
-#### Example Keyword
+### Example Keyword
 Would have a timing measured by default, this would be reported in the Manager as "TC01 My Example Keyword" along with the time taken to perform the step No Operation
 
-#### Quiet Keyword
+### Quiet Keyword
 Would not have a timing measured, because it has no [Documentation], however it will still get executed wherever it is called.
 
-#### Match Keyword
+### Match Keyword
 Would have a timing measured by default, this would be reported in the Manager as "Match Keyword" because the variable ${TEST NAME} gets evaluated by robot framework before being passed to rfswarm via the listener.
 
 
-### Browser
+## Browser
 
-#### [SeleniumLibrary](https://robotframework.org/SeleniumLibrary/)
+### [SeleniumLibrary](https://robotframework.org/SeleniumLibrary/)
 For SeleniumLibrary based scripts you will want to use one of the headless browser types as these should use less resources on the agent so this will allow more virtual users per agent machine.
 
 Refer to the [SeleniumLibrary documentation](https://robotframework.org/SeleniumLibrary/SeleniumLibrary.html#Open%20Browser) for the headless browser types, you should run a trial with each type to confirm they work with your application and what the resource cost is for each.
 
 You may also want to consider converting your scripts to run using [Browser Library](https://robotframework-browser.org/), this is not required for using rfswarm but Browser Library does provide features not available in SeleniumLibrary that you may find useful.
 
-#### [Browser Library](https://robotframework-browser.org/)
+### [Browser Library](https://robotframework-browser.org/)
 For Browser Library based scripts you will want to use the headless = True option when calling [Open Browser](https://marketsquare.github.io/robotframework-browser/Browser.html#Open%20Browser).
