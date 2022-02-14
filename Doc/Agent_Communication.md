@@ -13,7 +13,7 @@ In this page the generic host names manager and myagent are used, replace manage
 - [POST /Metric](#post-metric)
 
 ## Get /
-HTTP GET http://manager:8138/
+HTTP GET `http://manager:8138/`
 
 Response Body:
 ```json
@@ -89,7 +89,7 @@ Response Body:
 ```
 
 ## POST /AgentStatus
-HTTP POST http://manager:8138/AgentStatus
+HTTP POST `http://manager:8138/AgentStatus`
 
 Request Body:
 ```json
@@ -113,7 +113,7 @@ Response Body:
 ```
 
 ## POST /Jobs
-HTTP POST http://manager:8138/Jobs
+HTTP POST `http://manager:8138/Jobs`
 
 Request Body:
 ```json
@@ -151,7 +151,7 @@ Response Body:
 ```
 
 ## POST /Scripts
-HTTP POST http://manager:8138/Scripts
+HTTP POST `http://manager:8138/Scripts`
 
 Request Body:
 ```json
@@ -182,7 +182,7 @@ Response Body:
 ```
 
 ## POST /File
-HTTP POST http://manager:8138/File
+HTTP POST `http://manager:8138/File`
 
 Request Bodies:
 ```json
@@ -235,7 +235,7 @@ Response Body:
 ```
 
 ## POST /Result
-HTTP POST http://manager:8138/Result
+HTTP POST `http://manager:8138/Result`
 
 Request Body:
 ```json
@@ -262,7 +262,7 @@ Response Body:
 ```
 
 ## POST /Metric
-HTTP POST http://manager:8138/Metric
+HTTP POST `http://manager:8138/Metric`
 
 Request Body:
 ```json
