@@ -393,4 +393,4 @@ python* rfswarm_reporter.py
 
 ## Credits
 
-The icons used for the buttons in the Manager GUI were derived from the Creative Commons licensed (Silk icon set 1.3)[http://www.famfamfam.com/lab/icons/silk/]
+The icons used for the buttons in the Manager GUI were derived from the Creative Commons licensed [Silk icon set 1.3](http://www.famfamfam.com/lab/icons/silk/)

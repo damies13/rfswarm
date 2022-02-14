@@ -28,23 +28,30 @@ All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the [a
 > _Plan - Planning a performance test_ <br>
 > ![Image](Images/MacOS_Plan_v0.8.0_saved_opened.png "Plan - Planning a performance test")
 
+
 > _Plan - New_ <br>
 > ![Image](Images/MacOS_Plan_v0.8.0_New.png "Plan - New")
+
 
 > _Plan - Delay example_ <br>
 > ![Image](Images/MacOS_Plan_v0.8.0_20u_delay_example.png)
 
+
 > _Plan - gradual ramp-up example_ <br>
 > ![Image](Images/MacOS_Plan_v0.8.0_150u_25per10min.png)
+
 
 > _Plan - Linux (Ubuntu 20.04)_ <br>
 > ![Image](Images/Ubuntu_Plan_v0.7.0_New.png)
 
+
 > _Plan - Windows 10_ <br>
 > ![Image](Images/Windows10_Plan_v0.7.0_New.png)
 
+
 > _Plan - Tests in other languages_ <br>
 > ![Image](Images/MacOS_Run_v1.0.0_LanguageChecks.png)
+
 
 While hopefully this is intuitive, the tool bar buttons are:
 
@@ -93,7 +100,7 @@ The options are:
 | On Error Only (default)| As soon as a test case finishes it will start uploading the logs only if the test ended with a fail, result logs for passed tests will be deferred until the last robot has stopped on the agent |
 | All Deferred | All test result logs will be deferred until the last robot has stopped on the agent |
 
-* * In earlier releases before v1.0.0 the agent always followed the default case.
+\* In earlier releases before v1.0.0 the agent always followed the default case.
 
 ##### Manager settings
 The manager settings allows you to access settings that were previously only accessable from the ini file
@@ -104,13 +111,13 @@ The manager settings allows you to access settings that were previously only acc
 This setting allows you to restrict the web server that the manager uses to communicate with the agents to a specific ip address. By default this setting is blank so the manager will listen on all IP addresses on the machine the manager is running on.
 Generally you should not need to change this setting and it should be left blank unless you know you need to restrict the manager to a specific address.
 
-* * You will need to restart the manager for this setting to take effect.
+\* You will need to restart the manager for this setting to take effect.
 
 **Bind Port Number**
 
 The default port that the manager web server uses to communicate with the agents is 8138, however in some cases you may need to change the port number.
 
-* * You will need to restart the manager for this setting to take effect.
+\* You will need to restart the manager for this setting to take effect.
 
 **Results Location**
 
@@ -128,13 +135,13 @@ e.g. 1 - if the time now is 11:30 PM and you want your test to start at 1 AM the
 
 e.g. 2 - if the time now is 9:05 PM and you planned to start at 9:00 AM, so enter a time of 09:00:00 without realising that was already in the past, the test will not start till 9 AM tomorrow. In this case choose a new start time later today or disable the schedule and just click run.
 
-* * The manager needs to remain running in order for the schedule to work. You cannot schedule a start time and then quit the manager.
+\* The manager needs to remain running in order for the schedule to work. You cannot schedule a start time and then quit the manager.
 
 #### Additional settings for test group ![image](Images/GUI_btn_cog.gif)
 When clicking on this button a dialogue will be presented that allows you to configure some additional settings for the test group, by default the dialogue will look like this:
 > ![image](Images/MacOS_Plan_v0.7.0_Test_Settings.png)
 
-##### Exclude libraries:
+##### Exclude libraries
 The default value is "BuiltIn,String,OperatingSystem,perftest", this is the same default value as used in the [agent settings](./rfswarm_agent.md#exclude-libraries) and if you leave this default but change the agent the settings set on the agent will override this setting.
 By configuring this setting you can adjust which keyword's response times are reported in the test results.
 If you change this setting here from the default, then for this particular test group the agent setting will be overridden with the settings used here
@@ -146,24 +153,24 @@ If you change this setting here from the default, then for this particular test 
 |default|configured|test group setting|
 |configured|configured|test group setting|
 
-##### Robot Options:
+##### Robot Options
 By default this setting is blank and in most cases wouldn't be used, it allows you to pass additional command line options to the robot executable, to find out what options can be passed run
 `robot -h`
 On any machine that has Robot Framework installed
 
-##### Agent Filter:
+##### Agent Filter
 You can use this setting to modify the default [agent assignment](#agent-assignment) to require test cases to require agents with particular properties or to exclude agents with particular properties.
 
 By default there are no Agent filters applied, and the test group can be run on any available agent.
 
 Here are some examples of when you might need this setting:
 - Your AUT has a desktop client and a web ui, the tests executed in the desktop client need an agent with Windows os and the web ui scripts can run on any agent that has SeleniumLibrary available
-	- on the desktop client scripts you add a filter rule that Requires "OS: System: windows"
-	- on the web ui scripts you add a filter rule that Requires "RobotFramework: Library: seleniumlibrary"
+  - on the desktop client scripts you add a filter rule that Requires "OS: System: windows"
+  - on the web ui scripts you add a filter rule that Requires "RobotFramework: Library: seleniumlibrary"
 - Your AUT has an internal component that can only be accessed by users in your corporate network and an external component that can only be accessed by internet users
-	- in your agents ini file you configure a custom property of "Corp Network" or "Internet" depending on which network the agent sits in.
-	- on the internal component scripts you add a filter rule that Requires "Corp Network"
-	- on the external component scripts you add a filter rule that Requires "Internet" alternatively you could configure a rule that Excludes "Corp Network"
+  - in your agents ini file you configure a custom property of "Corp Network" or "Internet" depending on which network the agent sits in.
+  - on the internal component scripts you add a filter rule that Requires "Corp Network"
+  - on the external component scripts you add a filter rule that Requires "Internet" alternatively you could configure a rule that Excludes "Corp Network"
 
 The combination of multiple require and exclude rules, the default and custom agent properties should allow you to have the control needed to target your test groups to specific agent or groups of agents as needed.
 
@@ -212,14 +219,18 @@ Use this to generate csv files suitable for use to create reports for your test 
 > _Run - Just started_ <br>
 > ![Image](Images/MacOS_Run_v0.8.0_Start_5s.png "Run - Just Started")
 
+
 > _Run - Just started, first results coming in_ <br>
 > ![Image](Images/MacOS_Run_v0.8.0_Start_60s.png "Run - Just started, first results coming in")
+
 
 > _Run - Showing results being collected live_ <br>
 > ![Image](Images/MacOS_Run_v0.8.0_2h.png "Run - Showing results being collected live")
 
+
 > _Run - Linux_ <br>
 > ![Image](Images/Linux-v0.5.0_Run_6min.png)
+
 
 > _Run - Linux Report Saved_ <br>
 > ![Image](Images/Linux-v0.5.0_Run_Report_prompt.png)
@@ -262,7 +273,8 @@ This is where you can see which agents have connected, number of robots on each 
 The columns for the agents screen
 | Column Name | Detail |
 |---|---|
-| Status | This is the last status reported by the agent, unless a agent hasn't reported for a while, then this will show "Offline?". If the agent load is over 80% then status will be "Warning", and over 95% "Critical". All other status values are reported by the agent. |
+| Status | This is the last status reported by the agent, unless a agent hasn't reported for a while, then this will show "Offline?". If the agent load is over 80% then status will be "Warning", and over 95% "Critical".
+All other status values are reported by the agent. |
 | Agent | This is the agent's name as reported by the agent, usually this is the agent's host name but this can be configured on the agent |
 | Last Seen | This is the time the last status update was received from the agent |
 | Assigned | This is the number of robots assigned to the agent during ramp up |
@@ -281,6 +293,7 @@ This is where you can see the rfswarm manager version and links to the documenta
 > _About_ <br>
 > ![Image](Images/MacOS_About_v0.8.0_About.png "About")
 
+
 Clicking the links (blue text) will open the page in the default browser on you computer.
 
 
@@ -291,8 +304,10 @@ You can access the graphs through the new Graphs menu
 > _Graphs - Menu_ <br>
 > ![Image](Images/MacOS_Graphs_v0.8.0_Menu.png "Graphs - Menu")
 
+
 > _Graphs - Examples Menu_ <br>
 > ![Image](Images/MacOS_Graphs_v0.8.0_Menu_Examples.png "Graphs - Examples Menu")
+
 
 The Graphs menu has the following options
 | Menu Option | Detail |
@@ -300,13 +315,16 @@ The Graphs menu has the following options
 | New Graph Window | This option opens a new un-configured graph window with the settings showing so you can configure as you need, you can also use the shortcut key top open a new graph. |
 | Examples | Inside this menu is a list of preconfigured graphs, these will open with the settings closed as they are ready to use |
 | Recent | This menu is dynamically generated, it contains all the graphs that have been recently opened on this computer, if you select a graph from this menu that is already open then it will be brought to the front and gain focus, otherwise it will open the graph as it was when it was closed |
-| Scenario | This menu is dynamically generated, it contains all the graphs that were opened when the scenario was saved, if you select a graph from this menu that is already open then it will be brought to the front and gain focus, otherwise it will open the graph as it was when it was closed. If you save preconfigured graphs on one machine and then open the scenario on another machine these graphs will automatically open when you open the scenario and attempt to retain their position. |
+| Scenario | This menu is dynamically generated, it contains all the graphs that were opened when the scenario was saved, if you select a graph from this menu that is already open then it will be brought to the front and gain focus, otherwise it will open the graph as it was when it was closed.
+If you save preconfigured graphs on one machine and then open the scenario on another machine these graphs will automatically open when you open the scenario and attempt to retain their position. |
 
 > _Graphs - New Graph - Metric_ <br>
 > ![Image](Images/MacOS_Graphs_v0.8.0_New_Graph_Metric.png "New Graph - Metric")
 
+
 > _Graphs - New Graph - Result_ <br>
 > ![Image](Images/MacOS_Graphs_v0.8.0_New_Graph_Result.png "New Graph - Result")
+
 
 |   |   |   |
 |---|---|---|
@@ -341,8 +359,10 @@ Some of the example preconfigured graphs:
 > _Graphs - Running Robots_ <br>
 > ![Image](Images/MacOS_Graphs_v0.8.0_Running_Robots.png "Graphs - Running Robots")
 
+
 > _Graphs - Agent Load_ <br>
 > ![Image](Images/MacOS_Graphs_v0.8.0_Agent_Load.png "Graphs - Agent Load")
+
 
 > _Graphs - Response Time_ <br>
 > ![Image](Images/MacOS_Graphs_v0.8.0_Response_Time.png "Graphs - Response Time")
@@ -486,4 +506,4 @@ How the assignment algorithm works:
 
 ## Credits
 
-The icons used for the buttons in the Manager GUI were derived from the Creative Commons licensed (Silk icon set 1.3)[http://www.famfamfam.com/lab/icons/silk/]
+The icons used for the buttons in the Manager GUI were derived from the Creative Commons licensed [Silk icon set 1.3](http://www.famfamfam.com/lab/icons/silk/)
