@@ -633,7 +633,7 @@ class ReporterBase():
 		while id in base.report:
 			time.sleep(0.1)
 			id = "{:02X}".format(int(time.time()*10000))
-		
+
 		base.debugmsg(7, "id:", id)
 		self.report_add_section(parent, id, name)
 		# base.report_save() # report_set_order in report_add_section will save
@@ -4077,7 +4077,7 @@ class ReporterGUI(tk.Frame):
 			base.config['GUI']['win_width'] = str(self.winfo_width())
 			base.config['GUI']['win_height'] = str(self.winfo_height())
 			base.saveini()
-		except e:
+		except Exception as e:
 			base.debugmsg(6, "save_window_size except:", e)
 			return False
 
@@ -4558,18 +4558,18 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "core.on_closing")
 		core.on_closing()
 
-	def sections_show_hide(self):
-		state = self.btnShowHide.get()
-		base.debugmsg(5, "state:", state)
-		if state == ">":
-			self.btnShowHide.set("<")
-			self.sections.grid(column=0, row=1, sticky="nsew")
-			self.mainframe.columnconfigure(0, weight=1)
-
-		else:
-			self.btnShowHide.set(">")
-			self.sections.grid_forget()
-			self.mainframe.columnconfigure(0, weight=0)
+	# def sections_show_hide(self):
+	# 	state = self.btnShowHide.get()
+	# 	base.debugmsg(5, "state:", state)
+	# 	if state == ">":
+	# 		self.btnShowHide.set("<")
+	# 		self.sections.grid(column=0, row=1, sticky="nsew")
+	# 		self.mainframe.columnconfigure(0, weight=1)
+	#
+	# 	else:
+	# 		self.btnShowHide.set(">")
+	# 		self.sections.grid_forget()
+	# 		self.mainframe.columnconfigure(0, weight=0)
 
 
 	def sect_click_top(self, *args):
