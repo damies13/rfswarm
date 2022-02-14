@@ -484,7 +484,7 @@ class RFSwarmAgent():
 		found = 0
 		liblst = []
 		# import pkg_resources
-		installed_packages = pkg_resources.working_set
+		installed_packages = list(pkg_resources.working_set)
 		# self.debugmsg(5, "installed_packages:", installed_packages)
 		for i in installed_packages:
 			# self.debugmsg(5, "i:", i)
@@ -1474,4 +1474,4 @@ except KeyboardInterrupt:
 	rfsa.on_closing()
 
 except Exception as e:
-	self.debugmsg(1, "rfsa.Exception:", e)
+	rfsa.debugmsg(1, "rfsa.Exception:", e)
