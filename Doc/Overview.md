@@ -29,7 +29,8 @@ This is the component that actually executes the tests, so Robot Framework need 
 
 How many and what specifications these machines need will depend on your application under test. Some examples of what to consider:
 
-- A web application being tested using SeleniumLibrary, My initial tests indicate that with headlessfirefox, a mid range desktop PC should be able to support around 50 virtual users, obviously this will vary depending on the amount of think time you include, how JavaScript heavy your application is a few short (~5 minutes) runs with 10, 30 & 50 users on one agent should give you a feel for what your agent machines are capable of. This is quite comparable to JMeter and loadrunner when using TruClient protocol.
+- A web application being tested using SeleniumLibrary, My initial tests indicate that with headlessfirefox, a mid range desktop PC should be able to support around 50 virtual users, obviously this will vary depending on the amount of think time you include, how JavaScript heavy your application is a few short (~5 minutes) runs with 10, 30 & 50 users on one agent should give you a feel for what your agent machines are capable of.
+This is quite comparable to JMeter and loadrunner when using TruClient protocol.
 - An application using libraries such as SudsLibrary, RESTinstance, HTTP library (Requests), Database Library (Python), SSHLibrary, TFTPLibrary, etc should be fairly low resource usage on the agent machine and will probably let you run many more virtual users than a SeleniumLibrary based test.
 - A thick client desktop application using libraries such as AutoItLibrary, SikuliLibrary, WhiteLibrary, etc will probably limit you to 1 (one) virtual user per agent, though some possible work arounds for this might be:
   * Running the agents in minimal virtual machines (e.g. 1-2 cpu cores and 2-4GB ram) and then running multiple VM's on the physical machines allocated for your agents.
@@ -40,7 +41,8 @@ Additional details can be found in the [Hardware Requirements](HardwareRequireme
 
 ## Robot File handling (transfer from Manager to Agent)
 
-Firstly the assumption is made that the Agent and the Manager are not necessarily the same operating system or on the same network (e.g. the Manager might be in a corporate network and the Agent on virtual machine from a cloud provider like AWS). So based on this it is assumed that the Agent and Manager might not have any shared network locations etc. This key assumption drove the design for how the Manager and Agent handle all files.
+Firstly the assumption is made that the Agent and the Manager are not necessarily the same operating system or on the same network (e.g. the Manager might be in a corporate network and the Agent on virtual machine from a cloud provider like AWS).
+So based on this it is assumed that the Agent and Manager might not have any shared network locations etc. This key assumption drove the design for how the Manager and Agent handle all files.
 
 The Manager and the Agent both internally have the concept of a file hash being the key identifier of a file, then a file also has a relative path and a local path.
 
