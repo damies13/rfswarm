@@ -284,13 +284,13 @@ class RFSwarmAgent():
 		prev_status = self.status
 		while self.runagent:
 			self.debugmsg(2, self.status, datetime.now().isoformat(sep=' ', timespec='seconds'),
-							"(", int(time.time()), ")",
-							"isconnected:", self.isconnected,
-							"isrunning:", self.isrunning,
-							"isstopping:", self.isstopping,
-							"robotcount:", self.robotcount,
-							"\n"
-			)
+						  "(", int(time.time()), ")",
+						  "isconnected:", self.isconnected,
+						  "isrunning:", self.isrunning,
+						  "isstopping:", self.isstopping,
+						  "robotcount:", self.robotcount,
+						  "\n"
+						  )
 
 			if not self.isconnected:
 				# self.isrunning = False # Not sure if I need this?
@@ -678,8 +678,7 @@ class RFSwarmAgent():
 			jsonresp = json.loads(r.text)
 			self.debugmsg(7, "getjobs: jsonresp:", jsonresp)
 
-
-			if jsonresp["StartTime"] < int(time.time()) < (jsonresp["EndTime"]+300):
+			if jsonresp["StartTime"] < int(time.time()) < (jsonresp["EndTime"] + 300):
 				self.isrunning = True
 				self.run_name = jsonresp["RunName"]
 				for s in jsonresp["Schedule"].keys():
@@ -687,7 +686,7 @@ class RFSwarmAgent():
 					if s not in self.jobs.keys():
 						self.jobs[s] = {}
 					for k in jsonresp["Schedule"][s].keys():
-						self.debugmsg(6, "getjobs: self.jobs[",s,"][",k,"]", jsonresp["Schedule"][s][k])
+						self.debugmsg(6, "getjobs: self.jobs[", s, "][", k, "]", jsonresp["Schedule"][s][k])
 						self.jobs[s][k] = jsonresp["Schedule"][s][k]
 					if "UploadMode" in jsonresp:
 						self.jobs[s]["UploadMode"] = jsonresp["UploadMode"]
@@ -711,11 +710,8 @@ class RFSwarmAgent():
 				self.debugmsg(5, "!!! Abort !!!")
 				self.abortjobs()
 
-
 			self.debugmsg(5, "getjobs: isrunning:", self.isrunning, "	isstopping:", self.isstopping)
 			self.debugmsg(7, "getjobs: self.jobs:", self.jobs)
-
-
 
 		except Exception as e:
 			self.debugmsg(1, "getjobs: Exception:", e)
@@ -732,7 +728,6 @@ class RFSwarmAgent():
 
 			except Exception as e:
 				self.debugmsg(1, "getjobs: Exception:", e)
-
 
 	def runjobs(self):
 		self.debugmsg(6, "runjobs: self.jobs:", self.jobs)
@@ -768,7 +763,6 @@ class RFSwarmAgent():
 						else:
 							self.debugmsg(5, "Thread not started for jobid:", jobid)
 				time.sleep(0.1)
-
 
 	def runthread(self, jobid):
 		now = int(time.time())
@@ -810,7 +804,6 @@ class RFSwarmAgent():
 		farr = os.path.splitext(file)
 		self.debugmsg(6, "runthread: farr:", farr)
 
-
 		excludelibraries = ",".join(self.excludelibraries)
 		if "excludelibraries" in self.jobs[jobid]:
 			# not sure if we need to do this???
@@ -827,7 +820,7 @@ class RFSwarmAgent():
 		try:
 			if not os.path.exists(rundir):
 				os.makedirs(rundir)
-		except:
+		except Exception:
 			pass
 
 		threaddirname = self.make_safe_filename("{}_{}_{}_{}".format(farr[0], jobid, self.jobs[jobid]["Iteration"], now))
@@ -836,7 +829,7 @@ class RFSwarmAgent():
 		try:
 			if not os.path.exists(odir):
 				os.makedirs(odir)
-		except:
+		except Exception:
 			pass
 
 		oprefix = self.make_safe_filename(test)
@@ -1153,11 +1146,11 @@ class RFSwarmAgent():
 				elapsedtime = enddate.timestamp() - startdate.timestamp()
 
 				self.debugmsg(6, "resultname: '", txn,
-								"' result'", status,
-								"' elapsedtime'", elapsedtime,
-								"' starttime'", starttime,
-								"' endtime'", endtime, "'"
-				)
+							  "' result'", status,
+							  "' elapsedtime'", elapsedtime,
+							  "' starttime'", starttime,
+							  "' endtime'", endtime, "'"
+							  )
 
 				# Send result to manager
 				uri = self.swarmmanager + "Result"
