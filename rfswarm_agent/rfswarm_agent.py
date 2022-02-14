@@ -170,22 +170,22 @@ class RFSwarmAgent():
 		t = threading.Thread(target=self.findlibraries)
 		t.start()
 
-		self.agentproperties["OS: Platform"] = platform.platform()	# 'Linux-3.3.0-8.fc16.x86_64-x86_64-with-fedora-16-Verne'
-		self.agentproperties["OS: System"] = platform.system()   # 'Windows'
+		self.agentproperties["OS: Platform"] = platform.platform()  # 'Linux-3.3.0-8.fc16.x86_64-x86_64-with-fedora-16-Verne'
+		self.agentproperties["OS: System"] = platform.system()  # 'Windows'
 		self.agentproperties["OS: Release"] = platform.release()  # 'XP'
 		self.agentproperties["OS: Version"] = platform.version()  # '5.1.2600'
 
 		if platform.system() == 'Windows':
-			vararr= platform.version().split(".")
+			vararr = platform.version().split(".")
 		else:
-			vararr= platform.release().split(".")
+			vararr = platform.release().split(".")
 
-		if len(vararr)>0:
+		if len(vararr) > 0:
 			self.agentproperties["OS: Version: Major"] = "{}".format(int(vararr[0]))
-		if len(vararr)>1:
+		if len(vararr) > 1:
 			self.agentproperties["OS: Version: Minor"] = "{}.{}".format(int(vararr[0]), int(vararr[1]))
 
-		if 'properties' in self.config['Agent'] and len(self.config['Agent']['properties'])>0:
+		if 'properties' in self.config['Agent'] and len(self.config['Agent']['properties']) > 0:
 			if "," in self.config['Agent']['properties']:
 				proplist = self.config['Agent']['properties'].split(",")
 				for prop in proplist:
@@ -199,7 +199,6 @@ class RFSwarmAgent():
 				self.agentproperties["{}".format(prop.strip())] = True
 
 		self.debugmsg(9, "self.agentproperties: ", self.agentproperties)
-
 
 	def findiniloctaion(self):
 
@@ -225,7 +224,6 @@ class RFSwarmAgent():
 
 		self.debugmsg(6, "inilocations: ", inilocations)
 
-
 		for iniloc in inilocations:
 			self.debugmsg(7, "iniloc: ", iniloc)
 			if os.path.isfile(iniloc):
@@ -248,11 +246,10 @@ class RFSwarmAgent():
 					if os.access(loc, os.X_OK | os.W_OK):
 						self.debugmsg(7, "iniloc can be created!")
 						return iniloc
-				except:
+				except Exception:
 					pass
 		# This should cause saveini to fail?
 		return None
-
 
 	def debugmsg(self, lvl, *msg):
 		msglst = []
@@ -266,9 +263,9 @@ class RFSwarmAgent():
 					the_method = stack[1][0].f_code.co_name
 					the_line = stack[1][0].f_lineno
 					prefix = "{}: {}({}): [{}:{}]	".format(str(the_class), the_method, the_line, self.debuglvl, lvl)
-					if len(prefix.strip())<32:
+					if len(prefix.strip()) < 32:
 						prefix = "{}	".format(prefix)
-					if len(prefix.strip())<24:
+					if len(prefix.strip()) < 24:
 						prefix = "{}	".format(prefix)
 
 					msglst.append(str(prefix))
@@ -276,24 +273,24 @@ class RFSwarmAgent():
 				for itm in msg:
 					msglst.append(str(itm))
 				print(" ".join(msglst))
-			except:
+			except Exception:
 				pass
 
 	def str2bool(self, instr):
-		return str(instr).lower()  in ("yes", "true", "t", "1")
+		return str(instr).lower() in ("yes", "true", "t", "1")
 
 	def mainloop(self):
 		self.debugmsg(6, "mainloop")
 		prev_status = self.status
 		while self.runagent:
-			self.debugmsg(2, self.status, datetime.now().isoformat(sep=' ',timespec='seconds'),
-				"(",int(time.time()),")",
-				"isconnected:", self.isconnected,
-				"isrunning:", self.isrunning,
-				"isstopping:", self.isstopping,
-				"robotcount:", self.robotcount,
-				"\n"
-				)
+			self.debugmsg(2, self.status, datetime.now().isoformat(sep=' ', timespec='seconds'),
+							"(", int(time.time()), ")",
+							"isconnected:", self.isconnected,
+							"isrunning:", self.isrunning,
+							"isstopping:", self.isstopping,
+							"robotcount:", self.robotcount,
+							"\n"
+			)
 
 			if not self.isconnected:
 				# self.isrunning = False # Not sure if I need this?
@@ -321,7 +318,7 @@ class RFSwarmAgent():
 					self.corethreads["runjobs"].start()
 				else:
 					self.mainloopinterval = 10
-					if len(self.upload_queue)>0:
+					if len(self.upload_queue) > 0:
 						self.status = "Uploading ({})".format(len(self.upload_queue))
 						self.debugmsg(5, "self.status:", self.status, "len(self.upload_queue):", len(self.upload_queue))
 						self.corethreads["uploadqueue"] = threading.Thread(target=self.process_file_upload_queue)
@@ -330,8 +327,6 @@ class RFSwarmAgent():
 						self.status = "Ready"
 						self.corethreads["getscripts"] = threading.Thread(target=self.getscripts)
 						self.corethreads["getscripts"].start()
-
-
 
 			if (prev_status == "Stopping" or "Uploading" in prev_status) and self.status == "Ready":
 				# neet to reset something
@@ -342,13 +337,13 @@ class RFSwarmAgent():
 			time.sleep(self.mainloopinterval)
 
 	def updateipaddresslist(self):
-		if len(self.ipaddresslist)<1:
+		if len(self.ipaddresslist) < 1:
 			self.ipaddresslist = []
 			iflst = psutil.net_if_addrs()
 			for nic in iflst.keys():
 				self.debugmsg(6, "nic", nic)
 				for addr in iflst[nic]:
-					 # '127.0.0.1', '::1', 'fe80::1%lo0'
+					# '127.0.0.1', '::1', 'fe80::1%lo0'
 					self.debugmsg(6, "addr", addr.address)
 					if addr.address not in ['127.0.0.1', '::1', 'fe80::1%lo0']:
 						self.ipaddresslist.append(addr.address)
@@ -361,7 +356,7 @@ class RFSwarmAgent():
 		niccounters1 = psutil.net_io_counters(pernic=True)
 		nicstats = psutil.net_if_stats()
 		for nic in nicstats.keys():
-			if nicstats[nic].speed>0:
+			if nicstats[nic].speed > 0:
 				self.debugmsg(6, "Speed:", nicstats[nic].speed)
 				bytes_speed = nicstats[nic].speed * 1024 * 1024
 				bytes_sent_sec = niccounters1[nic].bytes_sent - niccounters0[nic].bytes_sent
@@ -372,17 +367,16 @@ class RFSwarmAgent():
 				bytes_max_sec = max([bytes_sent_sec, bytes_recv_sec])
 				self.debugmsg(6, "bytes_max_sec:	", bytes_max_sec)
 				if bytes_max_sec > 0:
-					netpctlist.append((bytes_max_sec/bytes_speed)*100)
+					netpctlist.append((bytes_max_sec / bytes_speed) * 100)
 				else:
 					netpctlist.append(0)
 
-		if len(netpctlist)>0:
+		if len(netpctlist) > 0:
 			self.debugmsg(6, "netpctlist:	", netpctlist)
 			self.netpct = max(netpctlist)
 			self.debugmsg(6, "self.netpct:	", self.netpct)
 		else:
 			self.netpct = 0
-
 
 	def updatestatus(self):
 		self.debugmsg(6, "self.swarmmanager:", self.swarmmanager)
@@ -411,12 +405,12 @@ class RFSwarmAgent():
 			self.debugmsg(8, r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok, r.text)
-				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 				self.isconnected = False
 				self.debugmsg(7, "self.isconnected", self.isconnected)
 		except Exception as e:
 			self.debugmsg(8, "Exception:", e)
-			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 			self.isconnected = False
 			self.debugmsg(5, "self.isconnected", self.isconnected)
 
@@ -440,8 +434,8 @@ class RFSwarmAgent():
 				if (r.status_code == requests.codes.ok):
 					self.debugmsg(7, "r.status_code:", r.status_code, requests.codes.ok, r.text)
 					self.isconnected = True
-					self.debugmsg(0, "Manager Connected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
-			except:
+					self.debugmsg(0, "Manager Connected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
+			except Exception:
 				pass
 
 	def findmanager(self):
@@ -483,18 +477,17 @@ class RFSwarmAgent():
 			# self.debugmsg(5, "i.value:", installed_packages[i])
 			# self.debugmsg(5, "i value:", str(i).split(" ")[1])
 
-
 			if i.key.strip() == "robotframework":
 				found = 1
 			if i.key.startswith("robotframework-"):
 				# print(i.key)
 				keyarr = i.key.strip().split("-")
 				#  next overwrites previous
-				self.agentproperties["RobotFramework: Library: "+keyarr[1]] = str(i).split(" ")[1]
+				self.agentproperties["RobotFramework: Library: " + keyarr[1]] = str(i).split(" ")[1]
 				liblst.append(keyarr[1])
 
 		self.debugmsg(8, "liblst:", liblst, len(liblst))
-		if len(liblst)>0:
+		if len(liblst) > 0:
 			self.debugmsg(7, "liblst:", ", ".join(liblst))
 			self.agentproperties["RobotFramework: Libraries"] = ", ".join(liblst)
 
@@ -503,7 +496,6 @@ class RFSwarmAgent():
 			self.debugmsg(0, "RobotFramework is required for the agent to run scripts")
 			self.debugmsg(0, "Perhaps try: 'pip install robotframework'")
 			raise Exception("RobotFramework is not installed")
-
 
 	def tick_counter(self):
 		#
@@ -525,14 +517,13 @@ class RFSwarmAgent():
 				ver = "v" + ver
 
 			# https://github.com/damies13/rfswarm/blob/v0.6.2/Doc/Images/z_agent.txt
-			url = "https://github.com/damies13/rfswarm/blob/"+ver+"/Doc/Images/z_agent.txt"
+			url = "https://github.com/damies13/rfswarm/blob/" + ver + "/Doc/Images/z_agent.txt"
 			try:
 				r = requests.get(url, timeout=self.timeout)
 				self.debugmsg(9, "tick_counter:", r.status_code)
-			except:
+			except Exception:
 				pass
 			time.sleep(aday)
-
 
 	def getscripts(self):
 		self.debugmsg(6, "getscripts")
@@ -546,12 +537,12 @@ class RFSwarmAgent():
 			self.debugmsg(6, "resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
-				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 				self.isconnected = False
 
 		except Exception as e:
 			self.debugmsg(5, "Exception:", e)
-			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 			self.isconnected = False
 
 		if not self.isconnected:
@@ -599,12 +590,12 @@ class RFSwarmAgent():
 			self.debugmsg(6, "resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
-				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 				self.isconnected = False
 
 		except Exception as e:
 			self.debugmsg(8, "Exception:", e)
-			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 			self.isconnected = False
 
 		if not self.isconnected:
@@ -669,12 +660,12 @@ class RFSwarmAgent():
 			self.debugmsg(7, "getjobs: resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(7, "r.status_code:", r.status_code, requests.codes.ok)
-				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 				self.isconnected = False
 
 		except Exception as e:
 			self.debugmsg(8, "Exception:", e)
-			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 			self.isconnected = False
 
 		if not self.isconnected:
@@ -856,7 +847,6 @@ class RFSwarmAgent():
 		outputFile = os.path.join(odir, outputFileName)
 		self.debugmsg(6, "runthread: outputFile:", outputFile)
 
-
 		if 'Agent' not in self.config:
 			self.config['Agent'] = {}
 			self.saveini()
@@ -872,9 +862,9 @@ class RFSwarmAgent():
 
 		cmd = [robotcmd]
 		cmd.append("-t")
-		cmd.append('"'+test+'"')
+		cmd.append('"' + test + '"')
 		cmd.append("-d")
-		cmd.append('"'+odir+'"')
+		cmd.append('"' + odir + '"')
 
 		cmd.append("-M RFS_AGENTNAME:{}".format(self.agentname))
 		cmd.append("-M RFS_AGENTVERSION:{}".format(self.version))
@@ -890,15 +880,15 @@ class RFSwarmAgent():
 		cmd.append("-M RFS_EXCLUDELIBRARIES:{}".format(excludelibraries))
 
 		if not self.xmlmode:
-			cmd.append("--listener {}".format('"'+self.listenerfile+'"'))
+			cmd.append("--listener {}".format('"' + self.listenerfile + '"'))
 
 		if "robotoptions" in self.jobs[jobid]:
 			cmd.append("{}".format(self.jobs[jobid]['robotoptions']))
 
 		cmd.append("-o")
-		cmd.append('"'+outputFile+'"')
+		cmd.append('"' + outputFile + '"')
 
-		cmd.append('"'+localfile+'"')
+		cmd.append('"' + localfile + '"')
 
 		robotexe = shutil.which(robotcmd)
 		self.debugmsg(6, "runthread: robotexe:", robotexe)
@@ -922,8 +912,8 @@ class RFSwarmAgent():
 						if result != 0:
 							self.debugmsg(1, "Robot returned an error (", result, ") please check the log file:", logFileName)
 					except Exception as e:
-							self.debugmsg(1, "Robot returned an error:", e, " \nplease check the log file:", logFileName)
-							result = 1
+						self.debugmsg(1, "Robot returned an error:", e, " \nplease check the log file:", logFileName)
+						result = 1
 					f.close()
 
 				if self.xmlmode:
@@ -938,10 +928,9 @@ class RFSwarmAgent():
 				self.debugmsg(5, "Robot returned an error:", e)
 				result = 1
 
-
 			uploadmode = self.uploadmode
 			self.debugmsg(5, "uploadmode:", uploadmode)
-			self.debugmsg(5, "self.jobs[",jobid,"]:", self.jobs[jobid])
+			self.debugmsg(5, "self.jobs[", jobid, "]:", self.jobs[jobid])
 			if "UploadMode" in self.jobs[jobid]:
 				uploadmode = self.jobs[jobid]["UploadMode"]
 				self.debugmsg(5, "uploadmode:", uploadmode)
@@ -952,7 +941,6 @@ class RFSwarmAgent():
 			self.robotcount += -1
 		else:
 			self.debugmsg(1, "Could not find robot executeable:", robotexe)
-
 
 	def queue_file_upload(self, mode, retcode, filedir):
 		reldir = os.path.basename(filedir)
@@ -974,7 +962,6 @@ class RFSwarmAgent():
 		self.debugmsg(5, "mode:", mode, "	retcode:", retcode)
 		# 	uploadmodes = {'imm':"Immediately", 'err':"On Error Only", 'def':"All Defered"}
 
-
 		for file in filelst:
 			fobj = {}
 			fobj["LocalFilePath"] = file
@@ -987,8 +974,6 @@ class RFSwarmAgent():
 			if mode == "imm":
 				# upload now
 				self.file_upload(fobj)
-
-
 
 	def file_upload_list(self, filedir):
 		retlst = []
@@ -1004,8 +989,6 @@ class RFSwarmAgent():
 					retlst.append(file)
 		return retlst
 
-
-
 	def file_upload(self, fileobj):
 		self.debugmsg(7, "fileobj", fileobj)
 
@@ -1013,7 +996,6 @@ class RFSwarmAgent():
 
 		hash = self.hash_file(fileobj['LocalFilePath'], fileobj['RelFilePath'])
 		self.debugmsg(7, "hash", hash)
-
 
 		# 	check file exists on manager?
 
@@ -1029,12 +1011,12 @@ class RFSwarmAgent():
 			self.debugmsg(7, "resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
-				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 				self.isconnected = False
 
 		except Exception as e:
 			self.debugmsg(8, "Exception:", e)
-			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 			self.isconnected = False
 
 		if not self.isconnected:
@@ -1063,7 +1045,7 @@ class RFSwarmAgent():
 			localpath = fileobj['LocalFilePath']
 			buf = "\n"
 			with open(localpath, 'rb') as afile:
-			    buf = afile.read()
+				buf = afile.read()
 			self.debugmsg(9, "buf:", buf)
 			compressed = lzma.compress(buf)
 			self.debugmsg(9, "compressed:", compressed)
@@ -1079,12 +1061,12 @@ class RFSwarmAgent():
 				self.debugmsg(7, "resp: ", r.status_code, r.text)
 				if (r.status_code != requests.codes.ok):
 					self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
-					self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+					self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 					self.isconnected = False
 
 			except Exception as e:
 				self.debugmsg(8, "Exception:", e)
-				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 				self.isconnected = False
 
 			if not self.isconnected:
@@ -1099,12 +1081,9 @@ class RFSwarmAgent():
 				self.debugmsg(1, "Exception:", e)
 				return None
 
-
-
 		# once sucessful remove from queue
 		if fileobj in self.upload_queue:
 			self.upload_queue.remove(fileobj)
-
 
 	def hash_file(self, file, relpath):
 		BLOCKSIZE = 65536
@@ -1119,7 +1098,6 @@ class RFSwarmAgent():
 		self.debugmsg(3, "file:", file, "	hash:", hasher.hexdigest())
 		return hasher.hexdigest()
 
-
 	def process_file_upload_queue(self):
 		self.debugmsg(7, "upload_queue", self.upload_queue)
 		# self.process_file_upload_queue
@@ -1129,7 +1107,6 @@ class RFSwarmAgent():
 			t = threading.Thread(target=self.file_upload, args=(fobj,))
 			t.start()
 			time.sleep(0.5)
-
 
 	def run_process_output(self, outputFile, index, robot, iter):
 		# This should be a better way to do this
@@ -1144,7 +1121,7 @@ class RFSwarmAgent():
 		# .//kw[@library!='BuiltIn' and msg]/status/@endtime
 		try:
 			tree = ET.parse(outputFile)
-		except:
+		except Exception:
 			self.debugmsg(1, "Error parsing XML file:", outputFile)
 		self.debugmsg(6, "tree: '", tree)
 		root = tree.getroot()
@@ -1176,12 +1153,11 @@ class RFSwarmAgent():
 				elapsedtime = enddate.timestamp() - startdate.timestamp()
 
 				self.debugmsg(6, "resultname: '", txn,
-						"' result'", status,
-						"' elapsedtime'", elapsedtime,
-						"' starttime'", starttime,
-						"' endtime'", endtime, "'"
-						)
-
+								"' result'", status,
+								"' elapsedtime'", elapsedtime,
+								"' starttime'", starttime,
+								"' endtime'", endtime, "'"
+				)
 
 				# Send result to manager
 				uri = self.swarmmanager + "Result"
@@ -1206,17 +1182,15 @@ class RFSwarmAgent():
 				self.debugmsg(6, "run_proces_output: payload", payload)
 				try:
 					r = requests.post(uri, json=payload, timeout=self.timeout)
-					self.debugmsg(6, "run_proces_output: ",r.status_code, r.text)
+					self.debugmsg(6, "run_proces_output: ", r.status_code, r.text)
 					if (r.status_code != requests.codes.ok):
 						self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
-						self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+						self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 						self.isconnected = False
 				except Exception as e:
 					self.debugmsg(8, "Exception:", e)
-					self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
+					self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 					self.isconnected = False
-
-
 
 	def make_safe_filename(self, s):
 		def safe_char(c):
@@ -1228,7 +1202,7 @@ class RFSwarmAgent():
 
 	def saveini(self):
 		with open(self.agentini, 'w') as configfile:    # save
-		    self.config.write(configfile)
+			self.config.write(configfile)
 
 	def ensuredir(self, dir):
 		if os.path.exists(dir):
@@ -1327,7 +1301,7 @@ class RFSwarmAgent():
 		fd.append("				enddate = datetime.strptime(attrs['endtime'], '%Y%m%d %H:%M:%S.%f')")
 		fd.append("				self.debugmsg(6, 'ResultName: self.msg[message]: ', self.msg['message'])")
 		fd.append("				payload = {")
-		fd.append("					'AgentName': '"+self.agentname+"',")
+		fd.append("					'AgentName': '" + self.agentname + "',")
 		fd.append("					'ResultName': self.msg['message'],")
 		fd.append("					'Result': attrs['status'],")
 		fd.append("					'ElapsedTime': (attrs['elapsedtime']/1000),")
@@ -1354,7 +1328,7 @@ class RFSwarmAgent():
 		fd.append("				self.debugmsg(8, 'attrs: ', attrs)")
 		fd.append("				self.debugmsg(6, 'ResultName: attrs[doc]: ', attrs['doc'])")
 		fd.append("				payload = {")
-		fd.append("					'AgentName': '"+self.agentname+"',")
+		fd.append("					'AgentName': '" + self.agentname + "',")
 		fd.append("					'ResultName': attrs['doc'],")
 		fd.append("					'Result': attrs['status'],")
 		fd.append("					'ElapsedTime': (attrs['elapsedtime']/1000),")
@@ -1417,7 +1391,6 @@ class RFSwarmAgent():
 		fd.append("			self.debugmsg(0, 'send_result: Exception:', exceptn)")
 		fd.append("")
 
-
 		# print("RFSwarmAgent: create_listner_file: listenerfile: ", self.listenerfile)
 		with open(self.listenerfile, 'w+') as lf:
 			# lf.writelines(fd)
@@ -1430,7 +1403,6 @@ class RFSwarmAgent():
 		for thread in self.corethreads:
 			self.debugmsg(3, "Join Agent Thread:", thread)
 			self.corethreads[thread].join()
-
 
 		for jobid in self.jobs:
 			# self.jobs[jobid]["Thread"]
@@ -1446,7 +1418,7 @@ class RFSwarmAgent():
 		except SystemExit:
 			try:
 				os._exit(0)
-			except:
+			except Exception:
 				pass
 
 

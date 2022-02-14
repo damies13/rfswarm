@@ -5039,7 +5039,9 @@ class RFSwarmGUI(tk.Frame):
 				if ip.version == 6 and sys.version_info < (3, 8):
 					msg = "Python 3.8 or higher required to bind to IPv6 Addresses\n"
 					pyver = "{}.{}.{}".format(sys.version_info[0], sys.version_info[1], sys.version_info[2])
-					msg += " ".join("Python Version:",pyver,"	IP Version:", ip.version, "	IP Address:", ipaddr)
+					msg += " ".join("Python Version:", pyver)
+					msg += " ".join("	IP Version:", ip.version)
+					msg += " ".join("	IP Address:", ipaddr)
 					base.debugmsg(5, msg)
 					tkm.showwarning("RFSwarm - Warning", msg)
 					setingsWindow.strBindIP.set("")
