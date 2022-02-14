@@ -1,60 +1,60 @@
-## rfswarm Reporter
+# rfswarm Reporter
 [Return to Index](README.md)
 
 rfswarm Reporter is the reporting tool component, you would use this at some point after the performance test has completed.
 
 - [User Interface](#User-Interface)
-	- [Settings Pane](#Settings-Pane)
-	- [Preview Pane](#Preview-Pane)
-	- [Report Sections](#Report-Sections)
-	- [Section Types](#Section-Types)
-		- [Heading](#Heading-Section)
-		- [Contents](#Contents-Section)
-		- [Note](#Note-Section)
-		- [Data Graph](#Data-Graph-Section)
-		- [Data Table](#Data-Table-Section)
-	- [Example Report](#Example-Report)
+  - [Settings Pane](#Settings-Pane)
+  - [Preview Pane](#Preview-Pane)
+  - [Report Sections](#Report-Sections)
+  - [Section Types](#Section-Types)
+    - [Heading](#Heading-Section)
+    - [Contents](#Contents-Section)
+    - [Note](#Note-Section)
+    - [Data Graph](#Data-Graph-Section)
+    - [Data Table](#Data-Table-Section)
+  - [Example Report](#Example-Report)
 - [Command Line Interface](#Command-Line-Interface)
 - [Install and Setup](#Install-and-Setup)
 - [Credits](#Credits)
 
-### User Interface
+## User Interface
 
 The initial screen when launching the rfswarm Reporter is the top level report, on the settings pane.
 > ![Image](Images/MacOS_Reporter_v1.0.0_Report_Settings.png)
 
 Starting from the top left of the screen we have the main toolbar:
 
-|	|	|	|
+|   |   |   |
 |---|---|---|
-| Open Result	|	![image](Images/REP_folder_table.gif)	| Select a result folder	|
-| New Template	|	![image](Images/REP_page_add.gif)	| Start a new default template	|
-| Open Template	|	![image](Images/REP_folder_page.gif)	| Open an existing template	|
-| Save Template	|	![image](Images/REP_page_save.gif)	| Save the current template	|
-|	|	|	|
-| Export HTML	|	![image](Images/REP_page_white_world.gif)	| Generate a html report	|
-| Export Word	|	![image](Images/REP_page_word.gif)	| Generate a Word report	|
-| Export Excel	|	![image](Images/REP_page_excel.gif)	| Generate an Excel report	|
+| Open Result | ![image](Images/REP_folder_table.gif) | Select a result folder |
+| New Template | ![image](Images/REP_page_add.gif) | Start a new default template |
+| Open Template | ![image](Images/REP_folder_page.gif) | Open an existing template |
+| Save Template | ![image](Images/REP_page_save.gif) | Save the current template |
+|   |   |   |
+| Export HTML | ![image](Images/REP_page_white_world.gif) | Generate a html report |
+| Export Word | ![image](Images/REP_page_word.gif) | Generate a Word report |
+| Export Excel | ![image](Images/REP_page_excel.gif) | Generate an Excel report |
 
 Under the main toolbar is the section toolbar:
-|	|	|	|
+|   |   |   |
 |---|---|---|
-| Add Section	|	![image](Images/REP_add.gif)	| Opens the add section dialogue	|
-| Remove Section	|	![image](Images/REP_delete.gif)	| Removes the currently selected section	|
-| Move Section Up	|	![image](Images/REP_resultset_up.gif)	| Moves the currently selected section above the section currently above it	|
-| Move Section Down	|	![image](Images/REP_resultset_down.gif)	| Moves the currently selected section below the section currently below it	|
+| Add Section | ![image](Images/REP_add.gif) | Opens the add section dialogue |
+| Remove Section | ![image](Images/REP_delete.gif) | Removes the currently selected section |
+| Move Section Up | ![image](Images/REP_resultset_up.gif) | Moves the currently selected section above the section currently above it |
+| Move Section Down | ![image](Images/REP_resultset_down.gif) | Moves the currently selected section below the section currently below it |
 
 To the right of the section toolbar is the ![image](Images/REP_report.gif) Preview / ![image](Images/REP_cog.gif) Settings toggle, used to switch between the [Settings Pane](#Settings-Pane) and the [Preview Pane](#Preview-Pane) (pictured below)
 
-#### Settings Pane
+### Settings Pane
 
 When Report is selected, the settings pane will display settings the global report settings. when any other section is selected the settings pane will display settings specific to the selected section.
 
-##### Global Report Settings
+#### Global Report Settings
 
 > ![Image](Images/MacOS_Reporter_v1.0.0_Report_Settings.png)
 
-|	|	|
+|   |   |
 |---|---|
 | Title | If no template is selected the title will try to get the scenario name from the test result otherwise it will take the title that was set in the template.  |
 | Date Format | Here you can select the date format you wish to use in the report (defaults to yyyy-mm-dd) |
@@ -68,14 +68,14 @@ When Report is selected, the settings pane will display settings the global repo
 | Percentile | This setting allows the percentile value used throughout the report, it defaults to 90%. |
 
 
-#### Preview Pane
+### Preview Pane
 When Report is selected, the preview pane will display a preview of the entire report.
 > ![Image](Images/MacOS_Reporter_v1.0.0_Report_Preview.png)
 
 When any other section is selected the preview pane will display a preview of the currently selected section and any subsections.
 > ![Image](Images/MacOS_Reporter_v1.0.0_Template_Preview.png)
 
-#### Report Sections
+### Report Sections
 To Add a new Section
 - first select Report, then click the ![image](Images/REP_add.gif)add section button
 - A dialogue will appear where you can enter the section name, enter the section name and click OK.
@@ -110,7 +110,7 @@ To move a section down:
 - Click the ![image](Images/REP_resultset_down.gif)Move Down button
 > ![Image](Images/MacOS_Reporter_v1.0.0_SubSectionMoveDown.png)
 
-#### Section Types
+### Section Types
 > ![Image](Images/MacOS_Reporter_v1.0.0_SectionTypes.png)
 
 Each section is used to display different types of information, the various section types are:
@@ -120,14 +120,14 @@ Each section is used to display different types of information, the various sect
 - [Data Graph](#Data-Graph-Section)
 - [Data Table](#Data-Table-Section)
 
-##### Heading Section
+#### Heading Section
 The heading section is used for grouping subsections that contain related information, so the only setting here is the heading name which allows you to change the name of the section.
 
 > _top level sections automatically get a page break before them in word reports and a new tab in excel reports._
 
 > ![Image](Images/MacOS_Reporter_v1.0.0_Heading_Settings.png)
 
-##### Contents Section
+#### Contents Section
 The contents section is used for adding contents to a report.
 > ![Image](Images/MacOS_Reporter_v1.0.0_Contents_Settings.png)
 
@@ -137,7 +137,7 @@ Typically this would be a "Table of contents", however you can also choose a "Ta
 Additionally you can control how many levels of subsections are displayed in the contents, this defaults to 1, which will only show top level sections, however you can select up to 6 levels if needed.
 > ![Image](Images/MacOS_Reporter_v1.0.0_Contents_Settings_Level.png)
 
-##### Note Section
+#### Note Section
 The note section is used for adding free text sections to your report, some examples of what you might use this for are:
 - An Executive Summary
 - A description of the test
@@ -145,7 +145,7 @@ The note section is used for adding free text sections to your report, some exam
 - Observations relating to specific graphs or table of results
 > ![Image](Images/MacOS_Reporter_v1.0.0_Template_Settings.png)
 
-##### Data Graph Section
+#### Data Graph Section
 The data graph section is used for displaying graphs of test results and other metrics collected during the test.
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Settings.png)
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Settings_Type.png)
@@ -155,7 +155,7 @@ The data sources for the graphs can be:
 - [Result](#Data-Graph-Result)
 - [Custom SQL](#Data-Graph-SQL)
 
-###### Data Graph Metric
+##### Data Graph Metric
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric.png)
 
 **Number value** - All metrics are stored in the results database as strings, if you want rfswarm Reporter to treat the metric value as a numeric check this check box
@@ -169,7 +169,7 @@ The data sources for the graphs can be:
 **Secondary Metric** - This option list is auto generated based on the secondary metrics in the results, it will be updated with a filtered set based on the metric types or primary metrics selections.
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Secondary.png)
 
-###### Data Graph Result
+##### Data Graph Result
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result.png)
 
 **Result Type** - This option lets you choose between the Response Time, TPS or Total TPS.
@@ -196,7 +196,7 @@ The data sources for the graphs can be:
 | Not Wildcard (Unix Glob) | \*abc\* | Results that contain 'abc' will not be shown, all other results will be shown |
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_FilterType.png)
 
-###### Data Graph SQL
+##### Data Graph SQL
 The SQL option allows you to write your own SQL statement to produce graphs that couldn't be produced with the other options.
 
 This option is intended as an option of last resort or as a stop gap while waiting for a feature to be implemented.
@@ -211,7 +211,7 @@ When constructing the SQL for graphs, it's important to note that the column nam
 | Name | Should return a string value, this used to give a unique colour to the line, it will also be used to match the colour with the first data column in a Data Table |
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_SQL.png)
 
-##### Data Table Section
+#### Data Table Section
 The data table section is used for displaying tables of test results and other metrics collected during the test.
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Settings.png)
 
@@ -225,7 +225,7 @@ The data sources for the graphs can be:
 - [ResultSummary](#Data-Table-ResultSummary)
 - [Custom SQL](#Data-Table-SQL)
 
-###### Data Table Metric
+##### Data Table Metric
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric.png)
 
 **Number value** - All metrics are stored in the results database as strings, if you want rfswarm Reporter to treat the metric value as a numeric check this check box
@@ -240,7 +240,7 @@ The data sources for the graphs can be:
 **Secondary Metric** - This option list is auto generated based on the secondary metrics in the results, it will be updated with a filtered set based on the metric types or primary metrics selections.
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric_Secondary.png)
 
-###### Data Table Result
+##### Data Table Result
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result.png)
 
 **Result Type** - This option lets you choose between the Response Time, TPS or Total TPS.
@@ -267,7 +267,7 @@ The data sources for the graphs can be:
 | Not Wildcard (Unix Glob) | \*abc\* | Results that contain 'abc' will not be shown, all other results will be shown |
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Result_FilterType.png)
 
-###### Data Table ResultSummary
+##### Data Table ResultSummary
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_ResultSummary.png)
 
 **Filter Type** - This option is used in with **Filter Pattern**, if the Filter Type is None, then Filter Pattern is ignored, otherwise Filter Pattern is used to filter the results shown.
@@ -278,7 +278,7 @@ The data sources for the graphs can be:
 | Not Wildcard (Unix Glob) | \*abc\* | Results that contain 'abc' will not be shown, all other results will be shown |
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_ResultSummary_FilterType.png)
 
-###### Data Table SQL
+##### Data Table SQL
 The SQL option allows you to write your own SQL statement to produce graphs that couldn't be produced with the other options.
 
 This option is intended as an option of last resort or as a stop gap while waiting for a feature to be implemented.
@@ -290,7 +290,7 @@ When constructing the SQL for graphs, it's important to note that the column nam
 Also note that **Show graph colours** will use values of the first data column to match the colours for each table row to the line colours on a graph.
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_SQL.png)
 
-#### Example Report
+### Example Report
 This is an example of a template you could create and use for reporting your test results. It shows some of the capabilities of the reporting tool.
 > ![Image](Images/MacOS_Reporter_v1.0.0_Example_Report.png)
 
@@ -300,13 +300,13 @@ This is an example of a template you could create and use for reporting your tes
 | You will need to use the "copy raw contents" button and save to a .html file to see this report  | You need to click the Download button to see this report | You need to click the Download button to see this report |
 
 
-### Command Line Interface
+## Command Line Interface
 
 These command line options allow you to override the ini file configuration but do not update the ini file. The inclusion of the nogui option also allows for inclusion in CI/CD pipelines.
 
 Additionally the debug (-g) levels 1-3 will give extra information on the console useful for troubleshooting your environment. debug levels above 5 are more for debugging the code and get very noisy so are not recommended for normal use.
 
-```
+```console
 $ rfswarm-reporter -h
 Robot Framework Swarm: Reporter
 	Version 1.0.0
@@ -328,7 +328,7 @@ optional arguments:
 ```
 
 If you pass in an unsupported command line option, you will get this prompt:
-```
+```console
 $ rfswarm-reporter -?
 Robot Framework Swarm: Reporter
 	Version 1.0.0
@@ -336,61 +336,61 @@ usage: rfswarm_reporter.py [-h] [-g DEBUG] [-v] [-i INI] [-n] [-d DIR] [-t TEMPL
 rfswarm-reporter: error: unrecognized arguments: -?
 ```
 
-### Install and Setup
+## Install and Setup
 
-#### 1. Install
-##### 1.1 Prerequisites
+### 1. Install
+#### 1.1 Prerequisites
 - The Reporter machine needs to use a minimum of Python 3.9
 - tkinter may need to be installed, or it may already installed on your system, if it's not installed consult the [python documentation](https://tkdocs.com/tutorial/install.html) on how to install for your system.
 
 On Debian based systems this will probably work
-```
+```console
 apt install python3-tk
 ```
 
-##### 1.2 Install
+#### 1.2 Install
 
 Once you have the prerequisites sorted, the installation is simply
-```
+```console
 pip* install rfswarm-reporter
 ```
 
 \*some systems might need you to use pip3 and or sudo
 
 
-#### 3. Run the Reporter
+### 3. Run the Reporter
 
-```
+```console
 rfswarm-reporter
 ```
 
-#### 4. Manual Install the prerequisites
+### 4. Manual Install the prerequisites
 
 - The Manager machine needs to use a minimum of Python 3.9
 - tkinter may need to be installed, or it may already installed on your system, if it's not installed consult the [python documentation](https://tkdocs.com/tutorial/install.html) on how to install for your system.
 
 On Debian based systems this will probably work
-```
+```console
 apt install python3-tk
 ```
 
 Additionally the following pip command might be needed if these are not already installed on your system:
-```
+```console
 pip* install configparser pillow matplotlib python-docx openpyxl tzlocal>=4.1
 ```
 
 \*some systems might need you to use pip3 and or sudo
 
-#### 5. Manual Run the Manager
+### 5. Manual Run the Manager
 
 Use this method if you did not install using pip
 
-```
+```console
 python* rfswarm_reporter.py
 ```
 \*or python3 on some systems
 
 
-### Credits
+## Credits
 
 The icons used for the buttons in the Manager GUI were derived from the Creative Commons licensed (Silk icon set 1.3)[http://www.famfamfam.com/lab/icons/silk/]

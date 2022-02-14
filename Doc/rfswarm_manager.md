@@ -1,26 +1,26 @@
-## rfswarm Manager
+# rfswarm Manager
 [Return to Index](README.md)
 
 rfswarm Manager is the central server component of rfswarm, this is where you plan, execute and monitor your performance test.
 
 - [User Interface](#User-Interface)
-	- [Plan](#Plan)
-	- [Run](#Run)
-	- [Agents](#Agents)
-	- [About](#About)
-	- [Graphs](#Graphs)
+  - [Plan](#Plan)
+  - [Run](#Run)
+  - [Agents](#Agents)
+  - [About](#About)
+  - [Graphs](#Graphs)
 - [Command Line Interface](#Command-Line-Interface)
 - [Install and Setup](#Install-and-Setup)
-	- [Install](#1-install)
-	- [Adjust the Firewall](#2-Adjust-the-Firewall)
-	- [Run the Manager](#3-Run-the-manager)
-	- [Manual Install the prerequisites](#4-Manual-Install-the-prerequisites)
-	- [Manual Run the Manager](#5-Manual-Run-the-Manager)
+  - [Install](#1-install)
+  - [Adjust the Firewall](#2-Adjust-the-Firewall)
+  - [Run the Manager](#3-Run-the-manager)
+  - [Manual Install the prerequisites](#4-Manual-Install-the-prerequisites)
+  - [Manual Run the Manager](#5-Manual-Run-the-Manager)
 - [Agent Assignment](#Agent-Assignment)
 - [Credits](#Credits)
 
-### User Interface
-#### Plan
+## User Interface
+### Plan
 This is where you construct your test scenario, choose your test cases and number of virtual users. The interface should be intuitive and simple to understand but still allow fairly complex scenarios to be created.
 
 All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the [agent polling](./rfswarm_agent.md#agent-polling-of-the-guiserver) works it's best not to use values less than 10 seconds.
@@ -48,54 +48,54 @@ All the time fields (Delay, Ramp Up & Run) are in Seconds, due to the way the [a
 
 While hopefully this is intuitive, the tool bar buttons are:
 
-|	|	|	|
+|   |   |   |
 |---|---|---|
-| New	|	![image](Images/GUI_btn_page_white.edt.gif)		| Create a new scenario	|
-| Open	|	![image](Images/GUI_btn_folder_explore.gif)	| Open an existing scenario	|
-| Save	|	![image](Images/GUI_btn_disk.gif)			| Save the current scenario	|
-| Settings	|	![image](Images/GUI_btn_cog.gif)			| Configure additional settings for the current scenario or rfswarm	|
-| Schedule	|	![image](Images/GUI_btn_time.gif)			| Schedule the test start time	|
-| Play	|	![image](Images/GUI_btn_resultset_next.gif)	| Play the current scenario	|
+| New | ![image](Images/GUI_btn_page_white.edt.gif) | Create a new scenario |
+| Open | ![image](Images/GUI_btn_folder_explore.gif) | Open an existing scenario |
+| Save | ![image](Images/GUI_btn_disk.gif) | Save the current scenario |
+| Settings | ![image](Images/GUI_btn_cog.gif) | Configure additional settings for the current scenario or rfswarm |
+| Schedule | ![image](Images/GUI_btn_time.gif) | Schedule the test start time |
+| Play | ![image](Images/GUI_btn_resultset_next.gif) | Play the current scenario |
 
 The test group buttons are:
-|	|	|	|
+|   |   |   |
 |---|---|---|
-| Add	|	![image](Images/GUI_btn_add.gif)			| Add another test group	|
-| Select |	![image](Images/GUI_btn_script.gif)			| Select a robot file	|
-| Settings | ![image](Images/GUI_btn_cog.gif)			| Configure additional settings for a test group	|
-| Remove |	![image](Images/GUI_btn_cross.gif)			| Remove this test group	|
+| Add | ![image](Images/GUI_btn_add.gif) | Add another test group |
+| Select | ![image](Images/GUI_btn_script.gif) | Select a robot file |
+| Settings | ![image](Images/GUI_btn_cog.gif) | Configure additional settings for a test group |
+| Remove | ![image](Images/GUI_btn_cross.gif) | Remove this test group |
 
 The columns under the graph
-| Column Name	| Detail |
-|---		|---	|
-| Index		| The test group's line number in the scenario, the background colour matches the line colour in the graph above |
-| Robots	| The number of robots (virtual users) you are planning to run in the scenario for this test group |
-| Delay		| The amount of time (HH:MM:SS*) to wait before starting Ramp Up |
-| Ramp Up	| The amount of time (HH:MM:SS*) to get from 0 virtual users (robots) to the number of virtual users (robots) defined in the Users column |
-| Run		| The amount of time (HH:MM:SS*) to keep all the virtual users (robots) defined in the Users column running after Ramp Up has finished. If a robot finishes it's test steps before the end of this time it will be restarted After this time has elapsed the robots will finish their test steps and exit normally (Ramp Down) |
-| Script	| This is where you select the robot file that contains the test you want to assign to this test group |
-| Test		| This is where you select the test you want to run for this test group, this option list is auto populaed when you select a robot file in the Script column |
-| Settings	| This is where you can select additional settings for the test group |
+| Column Name | Detail |
+|---|---|
+| Index | The test group's line number in the scenario, the background colour matches the line colour in the graph above |
+| Robots | The number of robots (virtual users) you are planning to run in the scenario for this test group |
+| Delay | The amount of time (HH:MM:SS*) to wait before starting Ramp Up |
+| Ramp Up | The amount of time (HH:MM:SS*) to get from 0 virtual users (robots) to the number of virtual users (robots) defined in the Users column |
+| Run | The amount of time (HH:MM:SS*) to keep all the virtual users (robots) defined in the Users column running after Ramp Up has finished. If a robot finishes it's test steps before the end of this time it will be restarted After this time has elapsed the robots will finish their test steps and exit normally (Ramp Down) |
+| Script | This is where you select the robot file that contains the test you want to assign to this test group |
+| Test | This is where you select the test you want to run for this test group, this option list is auto populaed when you select a robot file in the Script column |
+| Settings | This is where you can select additional settings for the test group |
 
 * For Delay, Ramp Up and Run, you can either type the time in HH:MM:SS or just a number of seconds or MM:SS, the plan screen will auto update it to HH:MM:SS. For example if you typed 300 it will update to 00:05:00, 7200 will update to 02:00:00, also if you type 5:30 it will update to 00:05:30.
 
-##### Settings for the scenario and rfswarm ![image](Images/GUI_btn_cog.gif)
+#### Settings for the scenario and rfswarm ![image](Images/GUI_btn_cog.gif)
 
-###### Scenario settings
+##### Scenario settings
 At the moment there is only one scenario setting, the upload logs setting, this allows you to control when the agent will upload the logs for the test cases being run.
 > ![image](Images/MacOS_Run_v1.0.0_Settings.png)
 > ![image](Images/MacOS_Run_v1.0.0_Settings_UploadLogs.png)
 
 The options are:
 | Option | Action |
-|---     |---     |
+|---|---|
 | Immediately | As soon as a test case finishes it will start uploading the logs regardless of test result in parallel to starting the next iteration of that test case |
 | On Error Only (default)| As soon as a test case finishes it will start uploading the logs only if the test ended with a fail, result logs for passed tests will be deferred until the last robot has stopped on the agent |
 | All Deferred | All test result logs will be deferred until the last robot has stopped on the agent |
 
 * * In earlier releases before v1.0.0 the agent always followed the default case.
 
-###### Manager settings
+##### Manager settings
 The manager settings allows you to access settings that were previously only accessable from the ini file
 > ![image](Images/MacOS_Run_v1.0.0_Settings.png)
 
@@ -117,7 +117,7 @@ The default port that the manager web server uses to communicate with the agents
 This setting allows you to configure where the manager will save the test results when you run a performance test.
 
 
-##### Schedule start time ![image](Images/GUI_btn_time.gif)
+#### Schedule start time ![image](Images/GUI_btn_time.gif)
 This feature allows you to schedule the start time for a test, by default it is disabled and if you press the run button the test will start immediately.
 > ![image](Images/MacOS_Run_v1.0.0_Schedule_disabled.png)
 
@@ -130,11 +130,11 @@ e.g. 2 - if the time now is 9:05 PM and you planned to start at 9:00 AM, so ente
 
 * * The manager needs to remain running in order for the schedule to work. You cannot schedule a start time and then quit the manager.
 
-##### Additional settings for test group ![image](Images/GUI_btn_cog.gif)
+#### Additional settings for test group ![image](Images/GUI_btn_cog.gif)
 When clicking on this button a dialogue will be presented that allows you to configure some additional settings for the test group, by default the dialogue will look like this:
 > ![image](Images/MacOS_Plan_v0.7.0_Test_Settings.png)
 
-###### Exclude libraries:
+##### Exclude libraries:
 The default value is "BuiltIn,String,OperatingSystem,perftest", this is the same default value as used in the [agent settings](./rfswarm_agent.md#exclude-libraries) and if you leave this default but change the agent the settings set on the agent will override this setting.
 By configuring this setting you can adjust which keyword's response times are reported in the test results.
 If you change this setting here from the default, then for this particular test group the agent setting will be overridden with the settings used here
@@ -146,12 +146,12 @@ If you change this setting here from the default, then for this particular test 
 |default|configured|test group setting|
 |configured|configured|test group setting|
 
-###### Robot Options:
+##### Robot Options:
 By default this setting is blank and in most cases wouldn't be used, it allows you to pass additional command line options to the robot executable, to find out what options can be passed run
 `robot -h`
 On any machine that has Robot Framework installed
 
-###### Agent Filter:
+##### Agent Filter:
 You can use this setting to modify the default [agent assignment](#agent-assignment) to require test cases to require agents with particular properties or to exclude agents with particular properties.
 
 By default there are no Agent filters applied, and the test group can be run on any available agent.
@@ -171,7 +171,7 @@ Here is an example of configuring the Filter Rules and using the Robot options:
 > ![image](Images/MacOS_Plan_v0.8.0_Test_Settings_Filter_Rules.png)
 
 
-#### Run
+### Run
 This is where you monitor your test scenario as it runs, here you will see number of robots running, how long the has been running and live updates of the test results.
 
 Unique by check boxes:
@@ -182,12 +182,12 @@ Unique by check boxes:
 %ile (Percentile) field:
 The default value is 90, you can adjust the percentile value between 1% and 99% depending on your application's performance requirements.
 
-##### Stop button ![image](Images/GUI_btn_stop.gif)
+#### Stop button ![image](Images/GUI_btn_stop.gif)
 Use this if you want to stop the test early. You may not notice an immediate reaction as pressing the button just changes the end time on all the test jobs assigned to the current time and stops the ramp-up if the test is still in the ramp-up phase.
 
 Once the stop button has been pressed the agents will receive the changed end time when they [poll](./rfswarm_agent.md#agent-polling-of-the-guiserver) the Manager next, the agent will change status to stopping which will be returned on the next poll interval and the agent will not start a new iteration for the running tests, however the ones currently running will be allowed to complete.
 
-##### Abort button ![image](Images/GUI_btn_bomb.gif)
+#### Abort button ![image](Images/GUI_btn_bomb.gif)
 This button replaces the Stop button when either of the following happens:
 - You press the Stop button
 - The test reaches the ramp-down period after run is complete
@@ -197,13 +197,13 @@ Clicking the Abort button will present a warning dialogue like this:
 Clicking yes on this dialogue will instruct the agents to send a sigterm (^C) to the running robots causing them to abort the currently running test and execute any teardown steps then exit.
 You would normally only use this option if your AUT has crashed and you need to stop applying load to the system.
 
-##### Disabled Stop button ![image](Images/GUI_btn_stop_grey.gif)
+#### Disabled Stop button ![image](Images/GUI_btn_stop_grey.gif)
 This button replaces the Stop/Abort buttons when either of the following happens
 - You clicked yes to abort the run
 - The test completes ramp-down
 Clicking this button does nothing.
 
-##### CSV Report button ![image](Images/GUI_btn_report.gif)
+#### CSV Report button ![image](Images/GUI_btn_report.gif)
 Use this to generate csv files suitable for use to create reports for your test run, there will be three files generated:
 - A Summary file, this is the same data as on the run screen
 - A Raw Results file, the is every data point recorded, useful if you want create response time graphs
@@ -226,26 +226,26 @@ Use this to generate csv files suitable for use to create reports for your test 
 
 
 The columns for the run screen
-| Column Name	| Detail |
-|---		|---	|
-| _Index_	| _This optional column indicates the test groups the result came from and matches the test group index from the plan screen_ |
-| _Iteration_	| _This optional column indicates iteration the result came from, the first time a robot runs a test on an agent is iteration 1, the next time that same robot runs that test is iteration 2, etc. e.g. in a 1hr test with 50 robots in a test group robot 1 (first robot started in test group) may run 12 iterations but robot 50 (last robot started in test group) may only run 10 iterations of the same test before the end of the run period of the scenario_ |
-| _Sequence_	| _This optional column indicates sequence number (autogenerated number) of the test step within the test case_ |
-| Result Name	| This is the result name as reported by robot framework, usually this will match either the documentation or full name lines for a test step in a robot framework report |
-| Min		| This is the shortest (quickest) response time reported by any robot during the test |
-| Avg		| This is the average of all the response time reported by all robots during the test |
-| nn%ile	| This is the percentile as configured by the %ile field above the run results. e.g. 90%ile is the response time that 90% of robots reported a response time less than or equal to during the test |
-| Max		| This is the longest (slowest) response time reported by any robot during the test |
-| Stdev		| This is the [Standard Deviation](https://en.wikipedia.org/wiki/Standard_deviation) of the response times for this result |
-| Pass		| This is a count of the number of times a robot reported a pass for this test step |
-| Fail		| This is a count of the number of times a robot reported a fail for this test step |
-| Other		| This is a count of the number of times a robot reported a result other than pass or fail for this result (normally this would be 0) |
+| Column Name | Detail |
+|---|---|
+| _Index_ | _This optional column indicates the test groups the result came from and matches the test group index from the plan screen_ |
+| _Iteration_ | _This optional column indicates iteration the result came from, the first time a robot runs a test on an agent is iteration 1, the next time that same robot runs that test is iteration 2, etc. e.g. in a 1hr test with 50 robots in a test group robot 1 (first robot started in test group) may run 12 iterations but robot 50 (last robot started in test group) may only run 10 iterations of the same test before the end of the run period of the scenario_ |
+| _Sequence_ | _This optional column indicates sequence number (autogenerated number) of the test step within the test case_ |
+| Result Name | This is the result name as reported by robot framework, usually this will match either the documentation or full name lines for a test step in a robot framework report |
+| Min | This is the shortest (quickest) response time reported by any robot during the test |
+| Avg | This is the average of all the response time reported by all robots during the test |
+| nn%ile | This is the percentile as configured by the %ile field above the run results. e.g. 90%ile is the response time that 90% of robots reported a response time less than or equal to during the test |
+| Max | This is the longest (slowest) response time reported by any robot during the test |
+| Stdev | This is the [Standard Deviation](https://en.wikipedia.org/wiki/Standard_deviation) of the response times for this result |
+| Pass | This is a count of the number of times a robot reported a pass for this test step |
+| Fail | This is a count of the number of times a robot reported a fail for this test step |
+| Other | This is a count of the number of times a robot reported a result other than pass or fail for this result (normally this would be 0) |
 
 The columns in the CSV report match the columns from the run screen at the time the report is generated, so when comparing results from tests using the same scenario you need to be careful that the optional column selection is the same.
 
 _Note: generally the optional columns are not required, but they are available if they are useful to you._
 
-#### Agents
+### Agents
 This is where you can see which agents have connected, number of robots on each agent and monitor the status and performance of the agents.
 > _Agents - Ready_ <br>
 > ![Image](Images/MacOS_Agents_v0.8.0_Ready.png "Agents - Ready")
@@ -260,22 +260,22 @@ This is where you can see which agents have connected, number of robots on each 
 > ![Image](Images/Linux-v0.5.0_Agents_Running.png)
 
 The columns for the agents screen
-| Column Name	| Detail |
-|---		|---	|
-| Status	| This is the last status reported by the agent, unless a agent hasn't reported for a while, then this will show "Offline?". If the agent load is over 80% then status will be "Warning", and over 95% "Critical". All other status values are reported by the agent. |
-| Agent		| This is the agent's name as reported by the agent, usually this is the agent's host name but this can be configured on the agent |
-| Last Seen	| This is the time the last status update was received from the agent |
-| Assigned	| This is the number of robots assigned to the agent during ramp up |
-| Robots	| This is the number of robots that the agent reported as actually running at the last status update |
-| Load		| This is the load value used by rfswarm to assign new robots to the agent with the lowest load, this value is the highest value of % CPU, % MEM and % NET |
-| % CPU		| This is the current percentage of CPU usage as reported by the agents operating system |
-| % MEM		| This is the current percentage of memory usage as reported by the agents operating system |
-| % NET		| This is the current percentage of network usage as reported by the agents operating system |
-| Version	| This is the rfswarm version number of the rfswarm agent |
-| Libraries	| This is a list of robot framework libraries installed on the agent machine as reported by the python runtime that is running the agent (only python libraries that start with "robotframework-" are reported here |
+| Column Name | Detail |
+|---|---|
+| Status | This is the last status reported by the agent, unless a agent hasn't reported for a while, then this will show "Offline?". If the agent load is over 80% then status will be "Warning", and over 95% "Critical". All other status values are reported by the agent. |
+| Agent | This is the agent's name as reported by the agent, usually this is the agent's host name but this can be configured on the agent |
+| Last Seen | This is the time the last status update was received from the agent |
+| Assigned | This is the number of robots assigned to the agent during ramp up |
+| Robots | This is the number of robots that the agent reported as actually running at the last status update |
+| Load | This is the load value used by rfswarm to assign new robots to the agent with the lowest load, this value is the highest value of % CPU, % MEM and % NET |
+| % CPU | This is the current percentage of CPU usage as reported by the agents operating system |
+| % MEM | This is the current percentage of memory usage as reported by the agents operating system |
+| % NET | This is the current percentage of network usage as reported by the agents operating system |
+| Version | This is the rfswarm version number of the rfswarm agent |
+| Libraries | This is a list of robot framework libraries installed on the agent machine as reported by the python runtime that is running the agent (only python libraries that start with "robotframework-" are reported here |
 
 
-#### About
+### About
 This is where you can see the rfswarm manager version and links to the documentation as well as the donation links.
 
 > _About_ <br>
@@ -284,7 +284,7 @@ This is where you can see the rfswarm manager version and links to the documenta
 Clicking the links (blue text) will open the page in the default browser on you computer.
 
 
-#### Graphs
+### Graphs
 New with version 0.8.0 is the ability to have live graphs during the test run displaying various data about the test.
 
 You can access the graphs through the new Graphs menu
@@ -295,12 +295,12 @@ You can access the graphs through the new Graphs menu
 > ![Image](Images/MacOS_Graphs_v0.8.0_Menu_Examples.png "Graphs - Examples Menu")
 
 The Graphs menu has the following options
-| Menu Option		| Detail |
-|---				|---	|
-| New Graph Window	| This option opens a new un-configured graph window with the settings showing so you can configure as you need, you can also use the shortcut key top open a new graph. |
-| Examples			| Inside this menu is a list of preconfigured graphs, these will open with the settings closed as they are ready to use |
-| Recent			| This menu is dynamically generated, it contains all the graphs that have been recently opened on this computer, if you select a graph from this menu that is already open then it will be brought to the front and gain focus, otherwise it will open the graph as it was when it was closed |
-| Scenario			| This menu is dynamically generated, it contains all the graphs that were opened when the scenario was saved, if you select a graph from this menu that is already open then it will be brought to the front and gain focus, otherwise it will open the graph as it was when it was closed. If you save preconfigured graphs on one machine and then open the scenario on another machine these graphs will automatically open when you open the scenario and attempt to retain their position. |
+| Menu Option | Detail |
+|---|---|
+| New Graph Window | This option opens a new un-configured graph window with the settings showing so you can configure as you need, you can also use the shortcut key top open a new graph. |
+| Examples | Inside this menu is a list of preconfigured graphs, these will open with the settings closed as they are ready to use |
+| Recent | This menu is dynamically generated, it contains all the graphs that have been recently opened on this computer, if you select a graph from this menu that is already open then it will be brought to the front and gain focus, otherwise it will open the graph as it was when it was closed |
+| Scenario | This menu is dynamically generated, it contains all the graphs that were opened when the scenario was saved, if you select a graph from this menu that is already open then it will be brought to the front and gain focus, otherwise it will open the graph as it was when it was closed. If you save preconfigured graphs on one machine and then open the scenario on another machine these graphs will automatically open when you open the scenario and attempt to retain their position. |
 
 > _Graphs - New Graph - Metric_ <br>
 > ![Image](Images/MacOS_Graphs_v0.8.0_New_Graph_Metric.png "New Graph - Metric")
@@ -308,28 +308,28 @@ The Graphs menu has the following options
 > _Graphs - New Graph - Result_ <br>
 > ![Image](Images/MacOS_Graphs_v0.8.0_New_Graph_Result.png "New Graph - Result")
 
-|	|	|	|
+|   |   |   |
 |---|---|---|
-| Refresh	|	![image](Images/GUI_btn_arrow_refresh.gif)		| Refresh the graph and the dynamic options in the graph configuration	|
-| Settings	|	![image](Images/GUI_btn_cog.gif)	| Open an existing scenario	|
+| Refresh | ![image](Images/GUI_btn_arrow_refresh.gif) | Refresh the graph and the dynamic options in the graph configuration |
+| Settings | ![image](Images/GUI_btn_cog.gif) | Open an existing scenario |
 
 Common Settings:
-| Setting	| Detail 	|
-|---		|---		|
-|Graph Name	| The name you want displayed on the title bar and in the graphs menus |
-|Show Legend| Enable showing a legend at the bottom of the graph |
-|Data Type	| Choose whether the data source is the results table or the metrics table |
+| Setting | Detail |
+|---|---|
+|Graph Name | The name you want displayed on the title bar and in the graphs menus |
+|Show Legend | Enable showing a legend at the bottom of the graph |
+|Data Type | Choose whether the data source is the results table or the metrics table |
 
 Metric Settings:
-| Setting	| Detail 	|
-|---		|---		|
+| Setting | Detail |
+|---|---|
 |Metric Type | Allows restricting results to specific types of metrics |
-|Primary Metric| Allows restricting results by primary metric |
+|Primary Metric | Allows restricting results by primary metric |
 |Secondary Metric | Allows restricting results by secondary metric |
 
 Results Settings:
-| Setting	| Detail 	|
-|---		|---		|
+| Setting | Detail |
+|---|---|
 |Result Type | Results, TPS (transactions per second) or a Total TPS|
 |Filter Result | Optionally restrict results to Pass or Fail |
 |Filter Type | Determine if the filter pattern will limit results shown or restrict results from being shown |
@@ -348,13 +348,13 @@ Some of the example preconfigured graphs:
 > ![Image](Images/MacOS_Graphs_v0.8.0_Response_Time.png "Graphs - Response Time")
 
 
-### Command Line Interface
+## Command Line Interface
 
 These command line options allow you to override the ini file configuration but do not update the ini file.
 
 Additionally the debug (-g) levels 1-3 will give extra information on the console useful for troubleshooting your environment. debug levels above 5 are more for debugging the code and get very noisy so are not recommended for normal use.
 
-```
+```console
 $ rfswarm -h
 Robot Framework Swarm: Manager
 	Version 1.0.0
@@ -381,7 +381,7 @@ optional arguments:
 ```
 
 If you pass in an unsupported command line option, you will get this prompt:
-```
+```console
 $ rfswarm -?
 Robot Framework Swarm: Manager
 	Version 1.0.0
@@ -389,30 +389,30 @@ usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS] [
 rfswarm: error: unrecognized arguments: -?
 ```
 
-### Install and Setup
+## Install and Setup
 
-#### 1. Install
-##### 1.1 Prerequisites
+### 1. Install
+#### 1.1 Prerequisites
 - The Manager machine needs to use a minimum of Python 3.7
 > ThreadingHTTPServer feature of HTTPServer requires was added in Python 3.7
 
 - tkinter may need to be installed, or it may already installed on your system, if it's not installed consult the [python documentation](https://tkdocs.com/tutorial/install.html) on how to install for your system.
 
 On Debian based systems this will probably work
-```
+```console
 apt install python3-tk
 ```
 
-##### 1.2 Install
+#### 1.2 Install
 
 Once you have the prerequisites sorted, the installation is simply
-```
+```console
 pip* install rfswarm-manager
 ```
 
 \*some systems might need you to use pip3 and or sudo
 
-#### 2. Adjust the Firewall
+### 2. Adjust the Firewall
 
 Check if there is a firewall on you Manager machine, if so you may need to adjust the firewall to add a rule to allow communication between the Manager and the Agent.
 
@@ -426,13 +426,13 @@ Check if there is a firewall on you Manager machine, if so you may need to adjus
 Most firewalls on servers and workstations don't require specific rules for outbound, so most likely you will only need to configure the Inbound rule on the Manager machine if it has a firewall.
 
 
-#### 3. Run the Manager
+### 3. Run the Manager
 
-```
+```console
 rfswarm
 ```
 
-#### 4. Manual Install the prerequisites
+### 4. Manual Install the prerequisites
 
 - The Manager machine needs to use a minimum of Python 3.7
 > ThreadingHTTPServer feature of HTTPServer requires was added in Python 3.7
@@ -440,29 +440,29 @@ rfswarm
 - tkinter may need to be installed, or it may already installed on your system, if it's not installed consult the [python documentation](https://tkdocs.com/tutorial/install.html) on how to install for your system.
 
 On Debian based systems this will probably work
-```
+```console
 apt install python3-tk
 ```
 
 Additionally the following pip command might be needed if these are not already installed on your system:
-```
+```console
 pip* install configparser setuptools hashlib HTTPServer pillow matplotlib
 ```
 > setuptools (is required by hashlib and HTTPServer)
 
 \*some systems might need you to use pip3 and or sudo
 
-#### 5. Manual Run the Manager
+### 5. Manual Run the Manager
 
 Use this method if you did not install using pip
 
-```
+```console
 python* rfswarm.py
 ```
 \*or python3 on some systems
 
 
-### Agent Assignment
+## Agent Assignment
 
 As a result of experience with other load testing tools and difficulties in managing load generation machines, the agent assignment algorithm in rfswarm has been designed to switch modes to cater for several scenarios but not require manual intervention
 
@@ -480,10 +480,10 @@ How the assignment algorithm works:
 - The agent with the lowest number of assigned virtual users is selected, there may be several agents with the equal lowest number of virtual users, e.g. at the start of the test all agents equally have zero (0) virtual users assigned, then the first agent from the list with this assigned count is selected.
 - Before returning the selected agent the assigned virtual user count is checked to see if it is greater than 10, if not the selected agent is returned from the assignment algorithm.
 - If the selected agent's assigned virtual user count is greater than 10, the selection is discarded and the assignment algorithm returns to the filtered agent list.
-	- this time the agent list is sorted by the agent loads (See Load column in the screen shot of the agents tab above), where the load is simply the highest of the 3 monitored percentages (% CPU Usage, % Memory Consumption, % Network bandwidth usage)
-	- the machine with the lowest load is selected and returned from the assignment algorithm.
+  - this time the agent list is sorted by the agent loads (See Load column in the screen shot of the agents tab above), where the load is simply the highest of the 3 monitored percentages (% CPU Usage, % Memory Consumption, % Network bandwidth usage)
+  - the machine with the lowest load is selected and returned from the assignment algorithm.
 
 
-### Credits
+## Credits
 
 The icons used for the buttons in the Manager GUI were derived from the Creative Commons licensed (Silk icon set 1.3)[http://www.famfamfam.com/lab/icons/silk/]

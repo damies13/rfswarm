@@ -32,9 +32,9 @@ How many and what specifications these machines need will depend on your applica
 - A web application being tested using SeleniumLibrary, My initial tests indicate that with headlessfirefox, a mid range desktop PC should be able to support around 50 virtual users, obviously this will vary depending on the amount of think time you include, how javascript heavy your application is a few short (~5 minutes) runs with 10, 30 & 50 users on one agent should give you a feel for what your agent machines are capable of. This is quite comparable to JMeter and loadrunner when using TruClient protocol.
 - An application using libraries such as SudsLibrary, RESTinstance, HTTP library (Requests), Database Library (Python), SSHLibrary, TFTPLibrary, etc should be fairly low resource usage on the agent machine and will probably let you run many more virtual users than a SeleniumLibrary based test.
 - A thick client desktop application using libraries such as AutoItLibrary, SikuliLibrary, WhiteLibrary, etc will probably limit you to 1 (one) virtual user per agent, though some possible work arounds for this might be:
- 	* Running the agents in minimal virtual machines (e.g. 1-2 cpu cores and 2-4GB ram) and then running multiple VM's on the physical machines allocated for your agents.
- 	* Install Microsoft Terminal Services (Windows Server)/ Citrix (Windows Server) / Xvnc (Linux/Unix) on your agent machine and then run an agent in each desktop session
- 	* using docker images and running the desktop application and the agent with robot framework inside the docker container.
+  * Running the agents in minimal virtual machines (e.g. 1-2 cpu cores and 2-4GB ram) and then running multiple VM's on the physical machines allocated for your agents.
+  * Install Microsoft Terminal Services (Windows Server)/ Citrix (Windows Server) / Xvnc (Linux/Unix) on your agent machine and then run an agent in each desktop session
+  * using docker images and running the desktop application and the agent with robot framework inside the docker container.
 
 Additional details can be found in the [Hardware Requirements](HardwareRequirements.md#Agents)
 
@@ -52,9 +52,9 @@ So the following happens on the Manager when a robot file is selected:
 - The selected robot file is given a relative path of just the file name of the robot file.
 - The the scenario file list in the Manager is updated with the the hash and the local and relative paths as properties of the hash.
 - The Manager then scans the robot file looking for resource and variable files (support files), for each file found:
- 	- The support file's relative path and local paths are determined.
- 	- The Manager does a md5 hash of the support file (Again this hash is used as the key to reference this support file from now on)
- 	- The the scenario file list in the Manager is updated with the the hash and the local and relative paths as properties of the hash for this support file.
+  - The support file's relative path and local paths are determined.
+  - The Manager does a md5 hash of the support file (Again this hash is used as the key to reference this support file from now on)
+  - The the scenario file list in the Manager is updated with the the hash and the local and relative paths as properties of the hash for this support file.
 
 ### Agent side
 When the request for a file list is sent from the Agent, the Manager returns a list of hash keys from the Manager's in memory scenario file list.
@@ -63,10 +63,10 @@ The Agent then:
 - Checks it's internal list of files using the hash as a reference key
 - If the file hash is in memory on the Agents file list, then there is nothing further to do for this file, check the next one, until all checked.
 - If the file hash is not in memory on the Agents file list:
- 	- Request the file from the Manager (post to /file, with the hash as the post data)
- 	- The Manager will return the relative path and the file contents (compressed base 64 string)
- 	- The Agent the saves the file relative to the scripts directory in temp (the Agent gets temp from the os when it starts)
- 	- The Agent update it's in memory file list using the hash as the key, the relative path and the local path (this is likely very different to the local path on the Manager) as properties of the hash.
+  - Request the file from the Manager (post to /file, with the hash as the post data)
+  - The Manager will return the relative path and the file contents (compressed base 64 string)
+  - The Agent the saves the file relative to the scripts directory in temp (the Agent gets temp from the os when it starts)
+  - The Agent update it's in memory file list using the hash as the key, the relative path and the local path (this is likely very different to the local path on the Manager) as properties of the hash.
 
 It is not recommended to use fixed paths in your robot file unless you are sure that the path will be the same on the Manager and all Agents.
 
