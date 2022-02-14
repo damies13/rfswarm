@@ -1,4 +1,4 @@
-## AUT Monitoring
+# AUT Monitoring
 [Return to Index](README.md)
 
 The ability to monitor your Application Under Test (AUT) servers and store the monitoring data in the test results has been available as part of the rfswarm Manager since version v0.6.3 and was introduced from feature request #72.
@@ -8,7 +8,7 @@ With feature release v0.8.0 this became more useful as you could use the live gr
 - [Overview](#Overview)
 - [Unix AUT Example](#Unix-AUT-Example)
 
-### Overview
+## Overview
 
 While it may not be obvious at first the process for monitoring and reporting the performance data of your AUT is quite simple and quite flexible.
 
@@ -16,7 +16,7 @@ While it may not be obvious at first the process for monitoring and reporting th
 1. report the details back to the manager using the rfswarm API [POST /Metric](Agent_Communication.md#post-metric)
 1. to make this easier the variable `${RFS_SWARMMANAGER}` as documented in the [Swarm Manager](Preparing_for_perf.md#swarm-manager) section of [Useful Variables](Preparing_for_perf.md#useful-variables), can be used to avoid hard coding the manager details.
 
-### Unix (Linux) AUT Example
+## Unix (Linux) AUT Example
 
 The robot file below is an example of connecting to a unix (linux) AUT server via a SSH session using the robot framework SSH library, collecting a variety of statistics from the AUT server and then posting those details to the Manager API using the robot framework Requests Library.
 

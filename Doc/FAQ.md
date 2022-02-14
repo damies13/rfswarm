@@ -60,7 +60,7 @@ If you get this far successfully then you will be well on the way to using rfswa
 
 ## Do we have any sample test cases?
 
-At the moment I'm not providing any sample test cases, the test cases I have, run against opencart (https://www.opencart.com/), so while it would be easy for me to provide some test cases against the opencart demo site, i'm reluctant to do so, as people might load up the demo site without first getting permission to do so. I do not want to encourage this.
+At the moment I'm not providing any sample test cases, the test cases I have, run against [OpenCart](https://www.opencart.com/), so while it would be easy for me to provide some test cases against the opencart demo site, i'm reluctant to do so, as people might load up the demo site without first getting permission to do so. I do not want to encourage this.
 
 Additionally rfswarm is aimed at people / teams already using robot framework, with a performance tester looking to leverage existing functional test scripts for reuse for performance testing as well, so it's expected that rfswarm users will already have test cases, you just need to add some minor adjustments to as covered in the documentation [Preparing for performance](./Preparing_for_perf.md)
 
@@ -69,7 +69,7 @@ Additionally rfswarm is aimed at people / teams already using robot framework, w
 
 There is a tutorial planned, but it's still in the early stages, and for now I want to concentrate on fixing bugs and getting rfswarm to version 1.
 
-The first step in the tutorial will be to download the example opencart virtual machine image (https://bitnami.com/stack/opencart/virtual-machine) and set that up on a server that you own / control (this is how I test rfswarm). If you don't have an application you can run robot framework scripts on (i.e. you are trying out rfswarm at home), then this application is quite easy to write robot framework scripts for and has fairly minimal virtual machine requirements.
+The first step in the tutorial will be to download the example opencart virtual machine image [https://bitnami.com/stack/opencart/virtual-machine](https://bitnami.com/stack/opencart/virtual-machine) and set that up on a server that you own / control (this is how I test rfswarm). If you don't have an application you can run robot framework scripts on (i.e. you are trying out rfswarm at home), then this application is quite easy to write robot framework scripts for and has fairly minimal virtual machine requirements.
 
 ## does rfswarm support IPv6?
 

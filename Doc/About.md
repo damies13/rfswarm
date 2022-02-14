@@ -1,5 +1,5 @@
 
-## About
+# About
 <img align="right" src="Images/robot_framework.png">
 [Return to Index](README.md)
 
