@@ -96,7 +96,7 @@ Robot Framework Swarm: Run Agent
 	Configuration File:  /home/dave/.local/lib/python3.8/site-packages/rfswarm_agent/RFSwarmAgent.ini
 ```
 
-Now edit RFSwarmAgent.ini and change http://localhost:8138/ to http://\<your rfswarm server\>:8138/
+Now edit RFSwarmAgent.ini and change `http://localhost:8138/` to http://\<your rfswarm server\>:8138/
 
 ### 4. Run Agent
 
