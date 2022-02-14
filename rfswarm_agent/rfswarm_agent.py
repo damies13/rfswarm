@@ -283,14 +283,15 @@ class RFSwarmAgent():
 		self.debugmsg(6, "mainloop")
 		prev_status = self.status
 		while self.runagent:
-			self.debugmsg(2, self.status, datetime.now().isoformat(sep=' ', timespec='seconds'),
-						  "(", int(time.time()), ")",
-						  "isconnected:", self.isconnected,
-						  "isrunning:", self.isrunning,
-						  "isstopping:", self.isstopping,
-						  "robotcount:", self.robotcount,
-						  "\n"
-						  )
+			self.debugmsg(
+							2, self.status, datetime.now().isoformat(sep=' ', timespec='seconds'),
+							"(", int(time.time()), ")",
+							"isconnected:", self.isconnected,
+							"isrunning:", self.isrunning,
+							"isstopping:", self.isstopping,
+							"robotcount:", self.robotcount,
+							"\n"
+							)
 
 			if not self.isconnected:
 				# self.isrunning = False # Not sure if I need this?
@@ -1145,12 +1146,13 @@ class RFSwarmAgent():
 
 				elapsedtime = enddate.timestamp() - startdate.timestamp()
 
-				self.debugmsg(6, "resultname: '", txn,
-							  "' result'", status,
-							  "' elapsedtime'", elapsedtime,
-							  "' starttime'", starttime,
-							  "' endtime'", endtime, "'"
-							  )
+				self.debugmsg(
+								6, "resultname: '", txn,
+								"' result'", status,
+								"' elapsedtime'", elapsedtime,
+								"' starttime'", starttime,
+								"' endtime'", endtime, "'"
+								)
 
 				# Send result to manager
 				uri = self.swarmmanager + "Result"
