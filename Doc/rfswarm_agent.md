@@ -3,7 +3,7 @@
 
 rfswarm agent is the component that actually runs the Robot Framework test cases and returns the results to rfswarm. The agent has no GUI
 
-- [Command Line Interface](#Command-Line-Interface)
+- [Command-line Interface](#Command-Line-Interface)
 - [Install and Setup](#Install-and-Setup)
   - [Robot Framework](#1-Robot-Framework)
   - [Install Using pip](#2-Install-Using-pip)
@@ -22,9 +22,9 @@ rfswarm agent is the component that actually runs the Robot Framework test cases
   - [Connected State](#Connected-state)
   - [Running State](#Running-state)
 
-## Command Line Interface
+## Command-line Interface
 
-These command line options allow you to override the ini file configuration but do not update the ini file.
+These command-line options allow you to override the ini file configuration but do not update the ini file.
 
 Additionally the debug (-g) levels 1-3 will give extra information on the console useful for troubleshooting your environment. debug levels above 5 are more for debugging the code and get very noisy so are not recommended for normal use.
 
@@ -54,7 +54,7 @@ optional arguments:
 
 ```
 
-If you pass in an unsupported command line option, you will get this prompt:
+If you pass in an unsupported command-line option, you will get this prompt:
 ```console
 $ rfswarm-agent -?
 Robot Framework Swarm: Run Agent
@@ -67,7 +67,7 @@ rfswarm_agent.py: error: unrecognized arguments: -?
 ## Install and Setup
 
 ### 1. Robot Framework
-Firstly ensure Robot Framework is installed with the libraries needed for your application, then try running your test case from the command line of you agent machine e.g.
+Firstly ensure Robot Framework is installed with the libraries needed for your application, then try running your test case from the command-line of you agent machine e.g.
 ```console
 robot -t "test case" script.robot
 ```

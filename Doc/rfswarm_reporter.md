@@ -14,7 +14,7 @@ rfswarm Reporter is the reporting tool component, you would use this at some poi
     - [Data Graph](#Data-Graph-Section)
     - [Data Table](#Data-Table-Section)
   - [Example Report](#Example-Report)
-- [Command Line Interface](#Command-Line-Interface)
+- [Command-line Interface](#Command-Line-Interface)
 - [Install and Setup](#Install-and-Setup)
 - [Credits](#Credits)
 
@@ -32,7 +32,7 @@ Starting from the top left of the screen we have the main toolbar:
 | Open Template | ![image](Images/REP_folder_page.gif) | Open an existing template |
 | Save Template | ![image](Images/REP_page_save.gif) | Save the current template |
 |   |   |   |
-| Export HTML | ![image](Images/REP_page_white_world.gif) | Generate a html report |
+| Export HTML | ![image](Images/REP_page_white_world.gif) | Generate a HTML report |
 | Export Word | ![image](Images/REP_page_word.gif) | Generate a Word report |
 | Export Excel | ![image](Images/REP_page_excel.gif) | Generate an Excel report |
 
@@ -62,7 +62,7 @@ When Report is selected, the settings pane will display settings the global repo
 | Time Zone | Times in rfswarm are stored using epoch time also known as unix timestamp, as such all times are UTC with no timezone offset. To display the expected times rfswram Reporter needs to know the timeszone to apply to the timestamp. This should default to the timezone of your local machine, however you may want to display times in your report for another timezone. |
 | Start Time | This value is extracted from the results database, to display it on the title page, enable the checkbox in the display column |
 | End Time | This value is extracted from the results database, to display it on the title page, enable the checkbox in the display column |
-| Logo Image | This setting lets you add a picture to the title page of your report, typically this would be your organisation's logo, but it can be anything you want. the field is read only but will show the file name of the file you selected. Click the ![image](Images/REP_picture.gif)Select Picture button and browse to the image you want to use. Then enable the checkbox in the display column |
+| Logo Image | This setting lets you add a picture to the title page of your report, typically this would be your organisation's logo, but it can be anything you want. the field is read only but will show the filename of the file you selected. Click the ![image](Images/REP_picture.gif)Select Picture button and browse to the image you want to use. Then enable the checkbox in the display column |
 | Font | This setting allows you to choose the font and font size to be used throughout the report. Headings and titles use the same font however the font size will be scaled proportionally to the base font size. |
 | Highlight Colour | This setting allows you to choose a colour for headings and column headings, Click the ![image](Images/REP_color_swatch.gif)Colour Swatch button next to the colour preview to bring up the system colour picker and choose a colour. For best results choose the colour that matches your organisation's branding. |
 | Percentile | This setting allows the percentile value used throughout the report, it defaults to 90%. |
@@ -158,7 +158,7 @@ The data sources for the graphs can be:
 ##### Data Graph Metric
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric.png)
 
-**Number value** - All metrics are stored in the results database as strings, if you want rfswarm Reporter to treat the metric value as a numeric check this check box
+**Number value** - All metrics are stored in the results database as strings, if you want rfswarm Reporter to treat the metric value as a numeric check this checkbox
 
 **Metric Type** - This option list is auto generated based on the metric types in the results, the types, Agent, Scenario and Summary will always be in the list as these are created by rfswarm Manager, Other custom types you add will also show here.
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Type.png)
@@ -228,7 +228,7 @@ The data sources for the graphs can be:
 ##### Data Table Metric
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric.png)
 
-**Number value** - All metrics are stored in the results database as strings, if you want rfswarm Reporter to treat the metric value as a numeric check this check box
+**Number value** - All metrics are stored in the results database as strings, if you want rfswarm Reporter to treat the metric value as a numeric check this checkbox
 **Show counts** - Use this checkbox if you want a count of the number of times this metric was recorded (do not use with number value)
 
 **Metric Type** - This option list is auto generated based on the metric types in the results, the types, Agent, Scenario and Summary will always be in the list as these are created by rfswarm Manager, Other custom types you add will also show here.
@@ -297,12 +297,12 @@ This is an example of a template you could create and use for reporting your tes
 |  |  |  |
 |---|---|---|
 | [HTML](Images/Example_20210214_204637_browseOC100.html) | [Word](Images/Example_20210214_204637_browseOC100.docx) | [Excel](Images/Example_20210214_204637_browseOC100.xlsx) |
-| You will need to use the "copy raw contents" button and save to a .html file to see this report  | You need to click the Download button to see this report | You need to click the Download button to see this report |
+| You will need to use the "copy raw contents" button and save to a `.html` file to see this report  | You need to click the Download button to see this report | You need to click the Download button to see this report |
 
 
-## Command Line Interface
+## Command-line Interface
 
-These command line options allow you to override the ini file configuration but do not update the ini file. The inclusion of the nogui option also allows for inclusion in CI/CD pipelines.
+These command-line options allow you to override the ini file configuration but do not update the ini file. The inclusion of the nogui option also allows for inclusion in CI/CD pipelines.
 
 Additionally the debug (-g) levels 1-3 will give extra information on the console useful for troubleshooting your environment. debug levels above 5 are more for debugging the code and get very noisy so are not recommended for normal use.
 
@@ -327,7 +327,7 @@ optional arguments:
   --xlsx                Generate a MS Excel report
 ```
 
-If you pass in an unsupported command line option, you will get this prompt:
+If you pass in an unsupported command-line option, you will get this prompt:
 ```console
 $ rfswarm-reporter -?
 Robot Framework Swarm: Reporter

@@ -9,7 +9,7 @@ rfswarm Manager is the central server component of rfswarm, this is where you pl
   - [Agents](#Agents)
   - [About](#About)
   - [Graphs](#Graphs)
-- [Command Line Interface](#Command-Line-Interface)
+- [Command-line Interface](#Command-Line-Interface)
 - [Install and Setup](#Install-and-Setup)
   - [Install](#1-install)
   - [Adjust the Firewall](#2-Adjust-the-Firewall)
@@ -154,7 +154,7 @@ If you change this setting here from the default, then for this particular test 
 |configured|configured|test group setting|
 
 ##### Robot Options
-By default this setting is blank and in most cases wouldn't be used, it allows you to pass additional command line options to the robot executable, to find out what options can be passed run
+By default this setting is blank and in most cases wouldn't be used, it allows you to pass additional command-line options to the robot executable, to find out what options can be passed run
 `robot -h`
 On any machine that has Robot Framework installed
 
@@ -275,7 +275,7 @@ The columns for the agents screen
 |---|---|
 | Status | This is the last status reported by the agent, unless a agent hasn't reported for a while, then this will show "Offline?". If the agent load is over 80% then status will be "Warning", and over 95% "Critical".
 All other status values are reported by the agent. |
-| Agent | This is the agent's name as reported by the agent, usually this is the agent's host name but this can be configured on the agent |
+| Agent | This is the agent's name as reported by the agent, usually this is the agent's hostname but this can be configured on the agent |
 | Last Seen | This is the time the last status update was received from the agent |
 | Assigned | This is the number of robots assigned to the agent during ramp up |
 | Robots | This is the number of robots that the agent reported as actually running at the last status update |
@@ -368,9 +368,9 @@ Some of the example preconfigured graphs:
 > ![Image](Images/MacOS_Graphs_v0.8.0_Response_Time.png "Graphs - Response Time")
 
 
-## Command Line Interface
+## Command-line Interface
 
-These command line options allow you to override the ini file configuration but do not update the ini file.
+These command-line options allow you to override the ini file configuration but do not update the ini file.
 
 Additionally the debug (-g) levels 1-3 will give extra information on the console useful for troubleshooting your environment. debug levels above 5 are more for debugging the code and get very noisy so are not recommended for normal use.
 
@@ -400,7 +400,7 @@ optional arguments:
   -p PORT, --port PORT  Port number to bind the server to
 ```
 
-If you pass in an unsupported command line option, you will get this prompt:
+If you pass in an unsupported command-line option, you will get this prompt:
 ```console
 $ rfswarm -?
 Robot Framework Swarm: Manager
@@ -441,7 +441,7 @@ Check if there is a firewall on you Manager machine, if so you may need to adjus
 | Manager | TCP | 8138 | Inbound |
 | Agent | TCP | 8138 | Outbound |
 
-<sup>1</sup> This is the default port number, replace with the port number you used if you changed it in the ini file or used the -p command line switch.
+<sup>1</sup> This is the default port number, replace with the port number you used if you changed it in the ini file or used the -p command-line switch.
 
 Most firewalls on servers and workstations don't require specific rules for outbound, so most likely you will only need to configure the Inbound rule on the Manager machine if it has a firewall.
 
@@ -500,7 +500,7 @@ How the assignment algorithm works:
 - The agent with the lowest number of assigned virtual users is selected, there may be several agents with the equal lowest number of virtual users, e.g. at the start of the test all agents equally have zero (0) virtual users assigned, then the first agent from the list with this assigned count is selected.
 - Before returning the selected agent the assigned virtual user count is checked to see if it is greater than 10, if not the selected agent is returned from the assignment algorithm.
 - If the selected agent's assigned virtual user count is greater than 10, the selection is discarded and the assignment algorithm returns to the filtered agent list.
-  - this time the agent list is sorted by the agent loads (See Load column in the screen shot of the agents tab above), where the load is simply the highest of the 3 monitored percentages (% CPU Usage, % Memory Consumption, % Network bandwidth usage)
+  - this time the agent list is sorted by the agent loads (See Load column in the screenshot of the agents tab above), where the load is simply the highest of the 3 monitored percentages (% CPU Usage, % Memory Consumption, % Network bandwidth usage)
   - the machine with the lowest load is selected and returned from the assignment algorithm.
 
 

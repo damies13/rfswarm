@@ -21,7 +21,7 @@ Never under estimate the impact of background polling, application servers have 
 - Overloading your agents: Launching and client applications or web browsers is a hardware intensive (CPU, Memory, and Disk) task for your agent machines, without sufficient user thinking time in your scripts, you will increase the workload you are placing on your agent machines without applying any load to your application under test.
 This will end up in limiting the number of robots you can run on a single agent machine and potentially limit the overall number of robots you can run in a test or increase significantly the number of agent machines you need to drive a specific load profile.
 
-The easiest way to simulate this user behaviour would be to simply use the Robot Framework's built in sleep command:
+The easiest way to simulate this user behaviour would be to simply use the Robot Framework's built-in sleep command:
 
 ```robot
 	Sleep	30
@@ -179,7 +179,7 @@ Match Keyword
 ```
 
 ### No Operation
-Would not have a timing measured by default because this keyword belongs to the builtin which is one of the default [excluded libraries](./rfswarm_agent.md#exclude-libraries)
+Would not have a timing measured by default because this keyword belongs to the built-in which is one of the default [excluded libraries](./rfswarm_agent.md#exclude-libraries)
 
 ### Example Keyword
 Would have a timing measured by default, this would be reported in the Manager as "TC01 My Example Keyword" along with the time taken to perform the step No Operation

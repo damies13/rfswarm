@@ -1,4 +1,4 @@
-# Screen Shots
+# Screenshots
 [Return to Index](README.md)
 
 - [v1.0.0](#v100)
@@ -172,13 +172,13 @@ Results export generates 3 csv files:
 The sqlite3 database from the test run is also available to enable easy reporting of test results, the db file is retained regardless of clicking the export button or not.
 ![Image](Images/Results_v0.5.0_100u_2.5hr.png)
 
-Screen shot showing agents when running a test, here you can see one agent is in warning state as memory consumption has exceeded 80%
+Screenshot showing agents when running a test, here you can see one agent is in warning state as memory consumption has exceeded 80%
 ![Image](Images/Agents_running_v0.5.0.png)
 
-Screen shot showing the prompt to save changes to scenario when closing the application
+Screenshot showing the prompt to save changes to scenario when closing the application
 ![Image](Images/Save_prompt_v0.5.0.png)
 
-Screen shot showing a run failing due to an overloaded agent, similarly when the application being tested fails you will see similar error messages with pass or fail counts depending on the library your test uses.
+Screenshot showing a run failing due to an overloaded agent, similarly when the application being tested fails you will see similar error messages with pass or fail counts depending on the library your test uses.
 ![Image](Images/Run_v0.5.0_crashing_users.png)
 
 Linux Mint 19:

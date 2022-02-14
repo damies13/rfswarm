@@ -29,7 +29,7 @@ This is the component that actually executes the tests, so Robot Framework need 
 
 How many and what specifications these machines need will depend on your application under test. Some examples of what to consider:
 
-- A web application being tested using SeleniumLibrary, My initial tests indicate that with headlessfirefox, a mid range desktop PC should be able to support around 50 virtual users, obviously this will vary depending on the amount of think time you include, how javascript heavy your application is a few short (~5 minutes) runs with 10, 30 & 50 users on one agent should give you a feel for what your agent machines are capable of. This is quite comparable to JMeter and loadrunner when using TruClient protocol.
+- A web application being tested using SeleniumLibrary, My initial tests indicate that with headlessfirefox, a mid range desktop PC should be able to support around 50 virtual users, obviously this will vary depending on the amount of think time you include, how JavaScript heavy your application is a few short (~5 minutes) runs with 10, 30 & 50 users on one agent should give you a feel for what your agent machines are capable of. This is quite comparable to JMeter and loadrunner when using TruClient protocol.
 - An application using libraries such as SudsLibrary, RESTinstance, HTTP library (Requests), Database Library (Python), SSHLibrary, TFTPLibrary, etc should be fairly low resource usage on the agent machine and will probably let you run many more virtual users than a SeleniumLibrary based test.
 - A thick client desktop application using libraries such as AutoItLibrary, SikuliLibrary, WhiteLibrary, etc will probably limit you to 1 (one) virtual user per agent, though some possible work arounds for this might be:
   * Running the agents in minimal virtual machines (e.g. 1-2 cpu cores and 2-4GB ram) and then running multiple VM's on the physical machines allocated for your agents.
@@ -49,7 +49,7 @@ When you select a robot script, the Manager considers the directory this robot f
 
 So the following happens on the Manager when a robot file is selected:
 - The Manager does a md5 hash of the file, this hash is used as the key to reference the file from now on.
-- The selected robot file is given a relative path of just the file name of the robot file.
+- The selected robot file is given a relative path of just the filename of the robot file.
 - The the scenario file list in the Manager is updated with the the hash and the local and relative paths as properties of the hash.
 - The Manager then scans the robot file looking for resource and variable files (support files), for each file found:
   - The support file's relative path and local paths are determined.

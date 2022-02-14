@@ -23,7 +23,7 @@ If you are testing with a desktop application using libraries such as AutoItLibr
 
 Below is some examples of the number of users you can run on some pretty low end hardware:
 
-A [2013 11" Macbook Air 1.3GHz dual-core i5 4Gb ram](https://support.apple.com/kb/sp677?locale=en_US) used as a dedicated rfswarm agent is able to run about this many robots:
+A [2013 11" MacBook Air 1.3GHz dual-core i5 4Gb ram](https://support.apple.com/kb/sp677?locale=en_US) used as a dedicated rfswarm agent is able to run about this many robots:
 
 |Robot Library|Robots|Hardware Limitation|struggles with robots|
 |---|---|---|---|
