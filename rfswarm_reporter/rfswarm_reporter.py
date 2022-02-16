@@ -43,12 +43,13 @@ from docx.shared import Cm, Pt, RGBColor  # used for docx export
 from lxml import etree  # used for xhtml export
 from lxml.builder import E, ElementMaker  # used for xhtml export
 # required for matplot graphs
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-# required for matplot graphs
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+# required for matplot graphs
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure  # required for matplot graphs
 # required for company logo's (I beleive this is a depandancy of matplotlib anyway)
 from PIL import Image, ImageTk
+
 matplotlib.use("TkAgg") 	# required for matplot graphs
 
 
