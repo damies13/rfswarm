@@ -9,53 +9,46 @@
 #
 #
 
-import sys
-import platform
-import signal
-import os
-import errno
-import tempfile
-import glob
-import configparser
-import hashlib
-import lzma
+import argparse
 import base64
-import sqlite3
-import math
-
-import socket
+import configparser
+import csv
+import errno
+import glob
+import hashlib
+import inspect
 import ipaddress
+import json
+import lzma
+import math
+import matplotlib 	# required for matplot graphs
+import os
+import platform
 import psutil
 import random
-import time
-from datetime import datetime, timezone
 import re
-import threading
 import requests
-from operator import itemgetter
-import csv
-
-import inspect
-
+import signal
+import socket
+import sqlite3
+import sys
+import tempfile
 import tkinter as tk				# python3
-import tkinter.ttk as ttk			# python3
 import tkinter.filedialog as tkf 	# python3
 import tkinter.messagebox as tkm 	# python3
+import tkinter.ttk as ttk			# python3
+import threading
+import time
 import webbrowser
-
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import urllib.parse
-import json
 
-import argparse
+from datetime import datetime, timezone
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg 	# required for matplot graphs
+from matplotlib.figure import Figure 	# required for matplot graphs
+from operator import itemgetter
 
-# required for matplot graphs
-import matplotlib
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
-matplotlib.use("TkAgg")
-# required for matplot graphs
-
+matplotlib.use("TkAgg") 	# required for matplot graphs
 
 __name__ = "rfswarm"
 
