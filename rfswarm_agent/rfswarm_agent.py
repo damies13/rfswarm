@@ -8,33 +8,28 @@
 
 # https://stackoverflow.com/questions/48090535/csv-file-reading-and-find-the-value-from-nth-column-using-robot-framework
 
-import sys
-import os
-import platform
-import tempfile
-import configparser
-
-import hashlib
-import lzma
-import base64
-
-# import robot
-import pkg_resources
-# import random
-import time
-from datetime import datetime
-import threading
-import subprocess
-import requests
-import psutil
-# import platform
-import socket
-import json
-import xml.etree.ElementTree as ET
-import shutil
-
 import argparse
+import base64
+import configparser
+import hashlib
 import inspect
+import json
+import lzma
+import os
+import pkg_resources
+import platform
+import psutil
+import requests
+import shutil
+import socket
+import subprocess
+import sys
+import tempfile
+import threading
+import time
+import xml.etree.ElementTree as ET
+
+from datetime import datetime
 
 
 class RFSwarmAgent():
