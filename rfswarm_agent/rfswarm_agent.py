@@ -16,10 +16,7 @@ import inspect
 import json
 import lzma
 import os
-import pkg_resources
 import platform
-import psutil
-import requests
 import shutil
 import socket
 import subprocess
@@ -30,6 +27,10 @@ import time
 import xml.etree.ElementTree as ET
 
 from datetime import datetime
+
+import pkg_resources
+import psutil
+import requests
 
 
 class RFSwarmAgent():
