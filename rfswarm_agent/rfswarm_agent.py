@@ -25,7 +25,6 @@ import tempfile
 import threading
 import time
 import xml.etree.ElementTree as ET
-
 from datetime import datetime
 
 import pkg_resources

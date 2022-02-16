@@ -6,14 +6,14 @@
 #
 
 import argparse
-import base64  # used for embedding images 	# used for xhtml export
+import base64  # used for embedding images  # used for xhtml export
 import configparser
 import inspect
 import math
 import os
 import platform
-import re
 import random
+import re
 import signal
 import sqlite3
 import sys
@@ -28,27 +28,27 @@ import tkinter.font as tkFont
 import tkinter.simpledialog as tksd
 import tkinter.ttk as ttk  # python3
 import zoneinfo  # says Requires python 3.9
-
 from copy import copy  # used for xlsx export
-from datetime import datetime  #, timezone
+from datetime import datetime  # , timezone
 from io import BytesIO  # used for embedding images  # used for xhtml export
 
 import matplotlib  # required for matplot graphs
 import openpyxl  # used for xlsx export
 import tzlocal
-
 from docx import Document  # used for docx export
 from docx.enum.style import WD_STYLE_TYPE  # used for docx export
 from docx.enum.text import WD_ALIGN_PARAGRAPH  # used for docx export
 from docx.oxml.shared import OxmlElement, qn  # used for docx export
-from docx.shared import Pt, Cm, RGBColor  # used for docx export
+from docx.shared import Cm, Pt, RGBColor  # used for docx export
 from lxml import etree  # used for xhtml export
-from lxml.builder import ElementMaker, E  # used for xhtml export
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # required for matplot graphs
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas  # required for matplot graphs
+from lxml.builder import E, ElementMaker  # used for xhtml export
+# required for matplot graphs
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+# required for matplot graphs
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure  # required for matplot graphs
-from PIL import Image, ImageTk  # required for company logo's (I beleive this is a depandancy of matplotlib anyway)
-
+# required for company logo's (I beleive this is a depandancy of matplotlib anyway)
+from PIL import Image, ImageTk
 matplotlib.use("TkAgg") 	# required for matplot graphs
 
 
