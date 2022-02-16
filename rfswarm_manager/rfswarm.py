@@ -311,7 +311,7 @@ class AgentServer(BaseHTTPRequestHandler):
 							jsonreq["ElapsedTime"], jsonreq["StartTime"], jsonreq["EndTime"],
 							jsonreq["ScriptIndex"], jsonreq["Robot"], jsonreq["Iteration"],
 							jsonreq["Sequence"]
-							)
+						)
 
 						jsonresp["Result"] = "Queued"
 						base.debugmsg(7, "Result: jsonresp[\"Result\"]:", jsonresp["Result"])
@@ -448,6 +448,7 @@ class AgentServer(BaseHTTPRequestHandler):
 	# 		https://stackoverflow.com/questions/10651052/how-to-quiet-simplehttpserver/10651257#10651257
 	def log_request(self, code='-', size='-'):
 		pass
+
 
 class RFSwarmBase:
 	version = "1.0.0"
@@ -1748,7 +1749,7 @@ class RFSwarmBase:
 		while "RawResults" not in base.dbqueue["ReadResult"]:
 			time.sleep(0.1)
 		base.debugmsg(6, "Wait for RawResults>0")
-		while len(base.dbqueue["ReadResult"]["RawResults"]) < s1:
+		while len(base.dbqueue["ReadResult"]["RawResults"]) < 1:
 			time.sleep(0.1)
 
 		if "RawResults" in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["RawResults"]) > 0:
@@ -1888,6 +1889,7 @@ class RFSwarmBase:
 				if addr.address not in ['127.0.0.1', '::1', 'fe80::1%lo0']:
 					ipaddresslist.append(addr.address)
 		return ipaddresslist
+
 
 class RFSwarmCore:
 
@@ -2760,7 +2762,7 @@ class RFSwarmCore:
 											base.robot_schedule["Agents"][nxtagent][grurid]["robotoptions"] = grp["robotoptions"]
 
 										base.Agents[nxtagent]["AssignedRobots"] += 1
-										base.debugmsg(5, "base.Agents[", nxtagent, "][AssignedRobots]:",  base.Agents[nxtagent]["AssignedRobots"])
+										base.debugmsg(5, "base.Agents[", nxtagent, "][AssignedRobots]:", base.Agents[nxtagent]["AssignedRobots"])
 
 										currbts += 1
 										base.debugmsg(2, "Robot:", currbts, "	Test:", grp["Test"], "	Assigned to:", nxtagent)
@@ -2898,7 +2900,6 @@ class RFSwarmCore:
 		rnum = 0
 		removeagents = []
 		robot_count = 0
-		displayagent = True
 		time_elapsed = int(time.time()) - base.agenttgridupdate
 		if (time_elapsed >= 5):
 			base.debugmsg(6, "time_elapsed:", time_elapsed)
@@ -2981,6 +2982,7 @@ class RFSwarmCore:
 	# End class RFSwarmCore
 	#
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 
 class RFSwarmGUI(tk.Frame):
 	# titleprefix = 'Robot Framework Swarm'
@@ -4925,7 +4927,7 @@ class RFSwarmGUI(tk.Frame):
 
 		schedWindow.bind("<Configure>", lambda e: self.ss_windowevent(e, schedWindow))
 
-		schedWindow.protocol("WM_DELETE_WINDOW",  lambda: self.ss_close(schedWindow, False))
+		schedWindow.protocol("WM_DELETE_WINDOW", lambda: self.ss_close(schedWindow, False))
 
 		schedWindow.fmeBBar = tk.Frame(schedWindow)
 		schedWindow.fmeBBar.grid(column=0, row=9, sticky="nsew")
@@ -4994,7 +4996,7 @@ class RFSwarmGUI(tk.Frame):
 		schedWindow.btnOK.grid(column=98, row=0, sticky="nsew")
 
 		# Cancel
-		schedWindow.btnCancel = ttk.Button(schedWindow.fmeBBar, text="Cancel", command=lambda: self.ss_close(schedWindow,  False))
+		schedWindow.btnCancel = ttk.Button(schedWindow.fmeBBar, text="Cancel", command=lambda: self.ss_close(schedWindow, False))
 		schedWindow.btnCancel.grid(column=99, row=0, sticky="nsew")
 
 	def ss_close(self, schedWindow, savesched, *args):
@@ -5543,8 +5545,8 @@ class RFSwarmGUI(tk.Frame):
 						initialdir=base.config['Plan']['ScriptDir'],
 						title="Select Robot Framework File",
 						filetypes=(("Robot Framework", "*.robot"), ("all files", "*.*"))
-						)
 					)
+				)
 			else:
 				scriptfile = ""
 		base.debugmsg(7, "scriptfile:", scriptfile)
@@ -5740,7 +5742,7 @@ class RFSwarmGUI(tk.Frame):
 		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer before the filters
 		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
 
-		row +=1
+		row += 1
 		stgsWindow.lblRO = ttk.Label(stgsWindow, text="Robot Options:")
 		stgsWindow.lblRO.grid(column=0, row=row, sticky="nsew")
 
@@ -5923,7 +5925,6 @@ class RFSwarmGUI(tk.Frame):
 		chk = tk.Checkbutton(rgbar, variable=self.display_run['display_sequence'], onvalue=True, offvalue=False, command=self.delayed_UpdateRunStats_bg)
 		chk.grid(column=12, row=2, sticky="nsew")
 
-
 		# display_percentile
 		usr = ttk.Label(rgbar, text="  %ile  ")
 		usr.grid(column=13, row=1, sticky="nsew")
@@ -5933,7 +5934,6 @@ class RFSwarmGUI(tk.Frame):
 		pct.selection_clear()
 		pct.insert(0, int(base.config['Run']['display_percentile']))
 		self.display_run['display_percentile'] = pct
-
 
 		if "start_time" not in self.display_run:
 			self.display_run['start_time'] = tk.StringVar()
@@ -6128,11 +6128,9 @@ class RFSwarmGUI(tk.Frame):
 
 		# update stop button
 		if base.run_end < int(time.time()):
-			icontext = "Abort"
 			self.elements["Run"]["btn_stop"]["image"] = self.icoAbort
 
 		if base.run_abort:
-			icontext = "Aborted"
 			self.elements["Run"]["btn_stop"]["image"] = self.icoAborted
 
 		if base.run_finish > 0:
@@ -6264,7 +6262,6 @@ class RFSwarmGUI(tk.Frame):
 				reallyabort = tkm.askyesno('RFSwarm - Abort Run', 'Do you want to abort this run? Clicking yes will kill all running robots!', icon='warning')
 				# reallyabort = tkm.askyesno('RFSwarm - Abort Run','Do you want to abort this run? Clicking yes will kill all running robots!', icon='error')
 				if reallyabort:
-					icontext = "Aborted"
 					self.elements["Run"]["btn_stop"]["image"] = self.icoAborted
 					core.ClickStop()
 		else:
@@ -6632,10 +6629,10 @@ class RFSwarmGUI(tk.Frame):
 			ScenarioFile = str(
 				tkf.askopenfilename(
 					initialdir=base.config['Plan']['ScenarioDir'],
-					title = "Select RFSwarm Scenario File",
-					filetypes = (("RFSwarm", "*.rfs"), ("all files", "*.*"))
-					)
+					title="Select RFSwarm Scenario File",
+					filetypes=(("RFSwarm", "*.rfs"), ("all files", "*.*"))
 				)
+			)
 		else:
 			ScenarioFile = _event
 
@@ -6718,8 +6715,8 @@ class RFSwarmGUI(tk.Frame):
 				initialdir=base.config['Plan']['ScenarioDir'],
 				title="Save RFSwarm Scenario File",
 				filetypes=(("RFSwarm", "*.rfs"), ("all files", "*.*"))
-				)
 			)
+		)
 		base.debugmsg(9, "mnu_file_SaveAs: ScenarioFile:", ScenarioFile)
 		if ScenarioFile is not None and len(ScenarioFile) > 0:
 			# ScenarioFile
@@ -6747,6 +6744,7 @@ class RFSwarmGUI(tk.Frame):
 	# End class RFSwarmGUI
 	#
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 
 class RFSwarm():
 	def __init__(self):
