@@ -5,76 +5,49 @@
 #    Version 1.0.0
 #
 
-import sys
-import platform
-import os
-import signal
-
-import random
-import re
-import math
-
-import sqlite3
-
-import time
-from datetime import datetime  #, timezone
-import zoneinfo  # says Requires python 3.9
-import tzlocal
-
-import threading
-
-import inspect
-
 import argparse
+import base64   		# used for embedding images 	# used for xhtml export
 import configparser
+import inspect
+import math
+import matplotlib 	# required for matplot graphs
+import openpyxl 	# used for xlsx export
+import os
+import platform
+import re
+import random
+import signal
+import sqlite3
+import sys
 import tempfile
-
-# used for xhtml export
-# import xml.etree.ElementTree as ET
-from lxml import etree
-from lxml.builder import ElementMaker, E
-import base64   		# used for embedding images
-from io import BytesIO 	# used for embedding images
-# used for xhtml export
-
-# used for docx export
-from docx import Document
-# from docx.shared import Inches
-from docx.shared import Pt, Cm, RGBColor
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.style import WD_STYLE_TYPE
-from docx.oxml.shared import OxmlElement, qn
-# used for docx export
-
-# used for xlsx export
-# from openpyxl import Workbook
-# from openpyxl.drawing.image import Image as xlImage
-import openpyxl
-from copy import copy
-# used for xlsx export
-
-
-
+import threading
+import time
 import tkinter as tk				# python3
-import tkinter.ttk as ttk			# python3
+import tkinter.colorchooser as tkac
 import tkinter.filedialog as tkf	# python3
+import tkinter.font as tkFont
 # import tkinter.messagebox as tkm	# python3
 import tkinter.simpledialog as tksd
-# from tkinter.colorchooser import askcolor
-import tkinter.colorchooser as tkac
-import tkinter.font as tkFont
+import tkinter.ttk as ttk			# python3
+import tzlocal
+import zoneinfo  # says Requires python 3.9
 
-# required for company logo's (I beleive this is a depandancy of matplotlib anyway)
-from PIL import Image, ImageTk
-# required for company logo's
+from copy import copy 	# used for xlsx export
+from datetime import datetime  #, timezone
+from docx import Document 	# used for docx export
+from docx.enum.style import WD_STYLE_TYPE 	# used for docx export
+from docx.enum.text import WD_ALIGN_PARAGRAPH 	# used for docx export
+from docx.shared import Pt, Cm, RGBColor 	# used for docx export
+from docx.oxml.shared import OxmlElement, qn 	# used for docx export
+from io import BytesIO 	# used for embedding images		# used for xhtml export
+from lxml import etree 	# used for xhtml export
+from lxml.builder import ElementMaker, E 	# used for xhtml export
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg 	# required for matplot graphs
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas 	# required for matplot graphs
+from matplotlib.figure import Figure 	# required for matplot graphs
+from PIL import Image, ImageTk 	# required for company logo's (I beleive this is a depandancy of matplotlib anyway)
 
-# required for matplot graphs
-import matplotlib
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from matplotlib.figure import Figure
-matplotlib.use("TkAgg")
-# required for matplot graphs
+matplotlib.use("TkAgg") 	# required for matplot graphs
 
 
 class percentile:
