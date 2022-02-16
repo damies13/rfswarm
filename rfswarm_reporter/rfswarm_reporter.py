@@ -6,12 +6,10 @@
 #
 
 import argparse
-import base64   		# used for embedding images 	# used for xhtml export
+import base64  # used for embedding images 	# used for xhtml export
 import configparser
 import inspect
 import math
-import matplotlib 	# required for matplot graphs
-import openpyxl 	# used for xlsx export
 import os
 import platform
 import re
@@ -22,30 +20,34 @@ import sys
 import tempfile
 import threading
 import time
-import tkinter as tk				# python3
+import tkinter as tk  # python3
 import tkinter.colorchooser as tkac
-import tkinter.filedialog as tkf	# python3
+import tkinter.filedialog as tkf  # python3
 import tkinter.font as tkFont
-# import tkinter.messagebox as tkm	# python3
+# import tkinter.messagebox as tkm  # python3
 import tkinter.simpledialog as tksd
-import tkinter.ttk as ttk			# python3
-import tzlocal
+import tkinter.ttk as ttk  # python3
 import zoneinfo  # says Requires python 3.9
 
-from copy import copy 	# used for xlsx export
+from copy import copy  # used for xlsx export
 from datetime import datetime  #, timezone
-from docx import Document 	# used for docx export
-from docx.enum.style import WD_STYLE_TYPE 	# used for docx export
-from docx.enum.text import WD_ALIGN_PARAGRAPH 	# used for docx export
-from docx.shared import Pt, Cm, RGBColor 	# used for docx export
-from docx.oxml.shared import OxmlElement, qn 	# used for docx export
-from io import BytesIO 	# used for embedding images		# used for xhtml export
-from lxml import etree 	# used for xhtml export
-from lxml.builder import ElementMaker, E 	# used for xhtml export
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg 	# required for matplot graphs
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas 	# required for matplot graphs
-from matplotlib.figure import Figure 	# required for matplot graphs
-from PIL import Image, ImageTk 	# required for company logo's (I beleive this is a depandancy of matplotlib anyway)
+from io import BytesIO  # used for embedding images  # used for xhtml export
+
+import matplotlib  # required for matplot graphs
+import openpyxl  # used for xlsx export
+import tzlocal
+
+from docx import Document  # used for docx export
+from docx.enum.style import WD_STYLE_TYPE  # used for docx export
+from docx.enum.text import WD_ALIGN_PARAGRAPH  # used for docx export
+from docx.oxml.shared import OxmlElement, qn  # used for docx export
+from docx.shared import Pt, Cm, RGBColor  # used for docx export
+from lxml import etree  # used for xhtml export
+from lxml.builder import ElementMaker, E  # used for xhtml export
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # required for matplot graphs
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas  # required for matplot graphs
+from matplotlib.figure import Figure  # required for matplot graphs
+from PIL import Image, ImageTk  # required for company logo's (I beleive this is a depandancy of matplotlib anyway)
 
 matplotlib.use("TkAgg") 	# required for matplot graphs
 

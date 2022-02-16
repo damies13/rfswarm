@@ -21,34 +21,36 @@ import ipaddress
 import json
 import lzma
 import math
-import matplotlib 	# required for matplot graphs
 import os
 import platform
-import psutil
 import random
 import re
-import requests
 import signal
 import socket
 import sqlite3
 import sys
 import tempfile
+import threading
+import time
 import tkinter as tk				# python3
 import tkinter.filedialog as tkf 	# python3
 import tkinter.messagebox as tkm 	# python3
 import tkinter.ttk as ttk			# python3
-import threading
-import time
-import webbrowser
 import urllib.parse
+import webbrowser
 
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg 	# required for matplot graphs
-from matplotlib.figure import Figure 	# required for matplot graphs
 from operator import itemgetter
 
-matplotlib.use("TkAgg") 	# required for matplot graphs
+import matplotlib  # required for matplot graphs
+import psutil
+import requests
+
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # required for matplot graphs
+from matplotlib.figure import Figure  # required for matplot graphs
+
+matplotlib.use("TkAgg")  # required for matplot graphs
 
 __name__ = "rfswarm"
 
