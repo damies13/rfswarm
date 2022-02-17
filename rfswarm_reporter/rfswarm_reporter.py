@@ -31,6 +31,7 @@ import zoneinfo  # says Requires python 3.9
 from copy import copy  # used for xlsx export
 from datetime import datetime  # , timezone
 from io import BytesIO  # used for embedding images  # used for xhtml export
+from typing import Any
 
 import matplotlib  # required for matplot graphs
 import openpyxl  # used for xlsx export
@@ -132,10 +133,10 @@ class ReporterBase():
 	# datapath = ""
 	# dbfile = ""
 	datadb = None
-	dbqueue = {"Write": [], "Read": [], "ReadResult": {}, "Results": [], "Metric": [], "Metrics": []}
+	dbqueue: Any = {"Write": [], "Read": [], "ReadResult": {}, "Results": [], "Metric": [], "Metrics": []}
 
-	settings = {}
-	reportdata = {}
+	settings: Any = {}
+	reportdata: Any = {}
 
 	settings["ContentTypes"] = {"head": "Heading", "contents": "Contents", "note": "Note", "graph": "Data Graph", "table": "Data Table"}
 
@@ -1780,8 +1781,8 @@ class ReporterBase():
 
 class ReporterCore:
 
-	cg_data = {}
-	t_export = {}
+	cg_data: Any = {}
+	t_export: Any = {}
 
 	def __init__(self, master=None):
 		base.debugmsg(0, "Robot Framework Swarm: Reporter")
@@ -3655,10 +3656,10 @@ class ReporterGUI(tk.Frame):
 	style_feild_colour = "white"
 	style_text_colour = "#000"
 	style_head_colour = "#00F"
-	imgdata = {}
-	b64 = {}
-	contentdata = {}
-	t_preview = {}
+	imgdata: Any = {}
+	b64: Any = {}
+	contentdata: Any = {}
+	t_preview: Any = {}
 
 	titleprefix = "rfswarm Reporter"
 

@@ -41,6 +41,7 @@ import webbrowser
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from operator import itemgetter
+from typing import Any
 
 import matplotlib  # required for matplot graphs
 import psutil
@@ -454,13 +455,13 @@ class RFSwarmBase:
 	save_ini = True
 
 	scriptcount = 0
-	scriptlist = [{}]
-	scriptfiles = {}
-	scriptgrpend = {}
+	scriptlist: Any = [{}]
+	scriptfiles: Any = {}
+	scriptgrpend: Any = {}
 
 	uploadmodes = {'imm': "Immediately", 'err': "On Error Only", 'def': "All Deferred"}
 	uploadmode = "err" 	# modes are imm, err, def
-	uploadfiles = {}
+	uploadfiles: Any = {}
 
 	index = ""
 	file = ""
@@ -474,14 +475,14 @@ class RFSwarmBase:
 	run_end = 0
 	run_finish = 0
 	run_paused = False
-	run_threads = {}
+	run_threads: Any = {}
 	total_robots = 0
 	robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}, "Start": 0}
 	agentserver = None
 	agenthttpserver = None
 	updatethread = None
 
-	Agents = {}
+	Agents: Any = {}
 	agenttgridupdate = 0
 	posttest = False
 
@@ -493,8 +494,8 @@ class RFSwarmBase:
 	dbfile = ""
 	datadb = None
 	dbready = False
-	dbqueue = {"Write": [], "Read": [], "ReadResult": {}, "Results": [], "Metric": [], "Metrics": []}
-	MetricIDs = {}
+	dbqueue: Any = {"Write": [], "Read": [], "ReadResult": {}, "Results": [], "Metric": [], "Metrics": []}
+	MetricIDs: Any = {}
 	scriptfilters = [""]
 
 	# #000000 = Black
@@ -3012,18 +3013,18 @@ class RFSwarmGUI(tk.Frame):
 	plancolset = 8
 	plancoladd = 99
 
-	display_agents = {}
-	display_run = {}
-	display_plan = {}
+	display_agents: Any = {}
+	display_run: Any = {}
+	display_plan: Any = {}
 	# imgdata = {}
 
-	rfstheme = {}
+	rfstheme: Any = {}
 
-	imgdata = {}
-	b64 = {}
-	graphs = {}
+	imgdata: Any = {}
+	b64: Any = {}
+	graphs: Any = {}
 
-	elements = {}
+	elements: Any = {}
 
 	style_text_colour = "#000"
 
