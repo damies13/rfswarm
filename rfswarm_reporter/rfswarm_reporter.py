@@ -1762,7 +1762,7 @@ class ReporterBase():
 	def dl_score(self, colour):
 		# darkness / lightness score
 		self.debugmsg(8, "colour:", colour)
-		m = re.search('\#(.?.?)(.?.?)(.?.?)', colour)
+		m = re.search(r'\#(.?.?)(.?.?)(.?.?)', colour)
 		self.debugmsg(9, "m:", m)
 		self.debugmsg(9, "m 1:", m[1], int(m[1], 16))
 		self.debugmsg(9, "m 2:", m[2], int(m[2], 16))
@@ -1773,6 +1773,7 @@ class ReporterBase():
 
 		self.debugmsg(8, "r:", r, " 	g:", g, " 	b:", b)
 		score = r + g + b
+		self.debugmsg(8, "score:", score)
 
 		return score
 

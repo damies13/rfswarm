@@ -1068,7 +1068,7 @@ class RFSwarmBase:
 	def dl_score(self, colour):
 		# darkness / lightness score
 		self.debugmsg(8, "colour:", colour)
-		m = re.search('\#(.?.?)(.?.?)(.?.?)', colour)
+		m = re.search(r'\#(.?.?)(.?.?)(.?.?)', colour)
 		self.debugmsg(9, "m:", m)
 		self.debugmsg(9, "m 1:", m[1], int(m[1], 16))
 		self.debugmsg(9, "m 2:", m[2], int(m[2], 16))
@@ -1312,7 +1312,7 @@ class RFSwarmBase:
 							base.debugmsg(6, "linearr", linearr)
 
 					# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
-					match = re.search('\*+([^*\v]+)', line)
+					match = re.search(r'\*+([^*\v]+)', line)
 					if match is not None:
 						base.debugmsg(6, "match.group(0)", match.group(1))
 						if match.group(1).strip().upper() in ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD']:
@@ -5638,7 +5638,7 @@ class RFSwarmGUI(tk.Frame):
 		tcsection = False
 		tclist = [""]
 		# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
-		regex = "^\*+[\s]*(Test Case|Task)"
+		regex = r"^\*+[\s]*(Test Case|Task)"
 		with open(base.scriptlist[r]["Script"], 'r', encoding="utf8") as f:
 			for line in f:
 				base.debugmsg(9, "sr_test_genlist: tcsection:", tcsection, "	line:", line)
