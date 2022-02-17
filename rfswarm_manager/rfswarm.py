@@ -6618,7 +6618,9 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(9, "mnu_file_Open")
 		base.debugmsg(9, "mnu_file_Open: _event:", _event, "	Type:", type(_event))
 		# if type(_event) is not "<class 'str'>":
-		if type(_event) is not type(""):
+		# E721 do not compare types, use 'isinstance()'
+		# if type(_event) is not type(""):
+		if not isinstance(_event, str):
 			self.mnu_file_Close()  	# ensure any previous scenario is closed and saved if required
 			ScenarioFile = str(
 				tkf.askopenfilename(

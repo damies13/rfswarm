@@ -3321,8 +3321,6 @@ class ReporterCore:
 	def xlsx_sections_contents(self, id):
 		base.debugmsg(8, "id:", id)
 
-		wb = self.cg_data["xlsx"]["Workbook"]
-
 		mode = base.rt_contents_get_mode(id)
 		maxlevel = base.rt_contents_get_level(id)
 		fmode = None
@@ -3888,7 +3886,7 @@ class ReporterGUI(tk.Frame):
 			window.bind("<{}-x>".format(accelkey), self.on_closing)
 
 		self.template_menu = tk.Menu(root_menu)
-		root_menu.add_cascade(label = "Template", menu=self.template_menu)
+		root_menu.add_cascade(label="Template", menu=self.template_menu)
 
 		self.template_menu.add_command(label="New", command=self.mnu_template_New, accelerator="{}-n".format(accelkey))  # it adds a option to the sub menu 'command' parameter is used to do some action
 		window.bind("<{}-n>".format(accelkey), self.mnu_template_New)
@@ -5957,7 +5955,9 @@ class ReporterGUI(tk.Frame):
 	def mnu_results_Open(self, _event=None):
 		base.debugmsg(9, "mnu_file_Open: _event:", _event, "	Type:", type(_event))
 
-		if type(_event) is not type(""):
+		# E721 do not compare types, use 'isinstance()'
+		# if type(_event) is not type(""):
+		if not isinstance(_event, str):
 			# self.mnu_file_Close()	# ensure any previous scenario is closed and saved if required
 			ResultsFile = str(
 				tkf.askopenfilename(
