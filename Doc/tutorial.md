@@ -19,12 +19,12 @@ For this tutorial you will need at least 1 but ideally 3 or more computers, the 
 ## Application Under Test
 
 download opencart virtual machine image
-https://bitnami.com/stack/opencart/virtual-machine
+[https://bitnami.com/stack/opencart/virtual-machine](https://bitnami.com/stack/opencart/virtual-machine)
 
 
 
 
-```
+```sqlexample
 select p.name, c.name, c1.name from oc_product_description p join oc_product_to_category pc on p.product_id = pc.product_id join oc_category_description c on pc.category_id = c.category_id left join oc_category_path cp on c.category_id = cp.category_id and cp.path_id <> cp.category_id left join oc_category_description c1 on c1.category_id = cp.path_id;
 
 +--------------------------+-------------------------+------------+

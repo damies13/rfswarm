@@ -1,0 +1,26 @@
+---
+name: Super-Linter
+
+on:
+  push:
+    paths-ignore:
+      - '**.png'
+      - '**.jpg'
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  super-lint:
+    name: Lint code base
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run Super-Linter
+        uses: github/super-linter@v4
+        env:
+          DEFAULT_BRANCH: main
+          FILTER_REGEX_EXCLUDE: (.*sh|.git/.*|.Doc/Images/.*)
+          VALIDATE_PYTHON_BLACK: false
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

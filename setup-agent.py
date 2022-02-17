@@ -27,5 +27,5 @@ setuptools.setup(
 		'Say Thanks!': 'https://github.com/damies13/rfswarm#donations',
 		'Source': 'https://github.com/damies13/rfswarm',
 	},
-	entry_points = {'console_scripts': ['rfswarm-agent = rfswarm_agent.rfswarm_agent:RFSwarm']},
+	entry_points={'console_scripts': ['rfswarm-agent = rfswarm_agent.rfswarm_agent:RFSwarm']},
 )
