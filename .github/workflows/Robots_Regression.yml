@@ -2,12 +2,12 @@
 name: Run Robot Framework Tests
 
 on:
-  push:
-    paths-ignore:
-      - '**.png'
-      - '**.jpg'
-  pull_request:
-    types: [opened, reopened]
+    push:
+        paths-ignore:
+            - '**.png'
+            - '**.jpg'
+    pull_request:
+        types: [opened, reopened]
 
 jobs:
     robot_test:
