@@ -1,7 +1,13 @@
 ---
 name: Super-Linter
 
-on: push
+on:
+  push:
+    paths-ignore:
+      - '**.png'
+      - '**.jpg'
+  pull_request:
+    types: [opened, reopened]
 
 jobs:
   super-lint:
