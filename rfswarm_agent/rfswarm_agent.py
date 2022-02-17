@@ -26,6 +26,7 @@ import threading
 import time
 import xml.etree.ElementTree as ET
 from datetime import datetime
+from typing import Any
 
 import pkg_resources
 import psutil
@@ -53,12 +54,12 @@ class RFSwarmAgent():
 	netpct = 0
 	mainloopinterval = 10
 	scriptlist: Any = {}
-	jobs: Dict = {}
+	jobs: Any = {}
 	corethreads: Any = {}
-	upload_queue: List = []
+	upload_queue: Any = []
 	robotcount = 0
 	status = "Ready"
-	excludelibraries: List = []
+	excludelibraries: Any = []
 	args = None
 	xmlmode = False
 	timeout = 600
