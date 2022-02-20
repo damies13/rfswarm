@@ -1,3 +1,5 @@
+*** Settings ***
+Library           Process
 
 *** Test Cases ***
 
