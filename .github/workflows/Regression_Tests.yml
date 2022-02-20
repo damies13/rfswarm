@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
-        python: ['3.6', '3.7', '3.8', '3.9', '3.10', '3.x']
+        python: ['3.6', '3.7', '3.8', '3.9', '3.10']
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout
@@ -18,4 +18,34 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: pip install robotframework configparser requests robotframework psutil
       - name: Robot Framework
-        run: robot Tests/Regression/Agent
+        run: robot Tests/Regression/Agent -i ${{ matrix.platform }}
+  Manager:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+        python: ['3.7', '3.8', '3.9', '3.10']
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install robotframework configparser requests robotframework psutil
+      - name: Robot Framework
+        run: robot Tests/Regression/Manager -i ${{ matrix.platform }}
+  Reporter:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+        python: ['3.9', '3.10']
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install robotframework configparser requests robotframework psutil
+      - name: Robot Framework
+        run: robot Tests/Regression/Reporter -i ${{ matrix.platform }}
