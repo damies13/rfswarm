@@ -1,4 +1,5 @@
 ---
+name: Run Robot Framework Regression Tests
 
 on: push
 
@@ -7,13 +8,14 @@ jobs:
     strategy:
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
+        python: ['3.6', '3.7', '3.8', '3.9', '3.10', '3.x']
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
+          python-version: ${{ matrix.python }}
       - run: pip install robotframework
       - name: Robot Framework
         run: robot Tests/Regression
