@@ -31,7 +31,7 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
-      - run: pip install robotframework configparser requests robotframework psutil
+      - run: pip install robotframework configparser HTTPServer pillow psutil matplotlib
       - name: Robot Framework
         run: robot --include ${{ matrix.platform }} Tests/Regression/Manager
   Reporter:
@@ -46,6 +46,6 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
-      - run: pip install robotframework configparser requests robotframework psutil
+      - run: pip install robotframework configparser pillow matplotlib python-docx openpyxl tzlocal
       - name: Robot Framework
         run: robot --include ${{ matrix.platform }} Tests/Regression/Reporter
