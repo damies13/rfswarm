@@ -1,5 +1,4 @@
 *** Settings ***
-# Library 	Process
 Library 	OperatingSystem
 
 *** Test Cases ***
@@ -14,10 +13,11 @@ Check Dir
 	Log to console 	${EXECDIR}
 
 Agent Version
-	# ${result}=	Wait For Process	python3	${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py	-v
 	${result}= 	Run 	python3 ${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py -v
-	# Log to console 	${result.stdout}
-	Log to console 	${result}
+	Log to console 	${\n}${result}
+	Should Contain	${result}	Version
 
-# Agent Help
-	# ${result}=	Run Process	${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py	-v	stderr=STDOUT
+Agent Help
+	${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py	-h
+	Log to console 	${\n}${result}
+	Should Contain	${result}	AGENTNAME
