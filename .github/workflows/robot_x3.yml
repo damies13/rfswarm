@@ -16,3 +16,5 @@ jobs:
         python-version: '3.9'
         cache: 'pip'
     - run: pip install robotframework
+    - run: pwd
+    - run: robot Tests/Regression
