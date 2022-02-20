@@ -39,7 +39,7 @@ jobs:
           # Stage the file, commit and push
           git add Tests/Regression/Reporter/Logs/*
           git commit -m "${{ matrix.platform }} ${{ matrix.python }}"
-          git push
+          git push --all
   Reporter:
     strategy:
       matrix:
