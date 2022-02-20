@@ -33,7 +33,13 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: pip install -r Tests/Regression/Manager/pip_requirements.txt
       - name: Robot Framework
-        run: robot --include ${{ matrix.platform }} Tests/Regression/Manager
+        run: robot --include ${{ matrix.platform }} --log Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}_log.html Tests/Regression/Manager
+      - name: commit
+        run: |
+          # Stage the file, commit and push
+          git add Tests/Regression/Reporter/Logs/*
+          git commit -m "${{ matrix.platform }} ${{ matrix.python }}"
+          git push
   Reporter:
     strategy:
       matrix:
