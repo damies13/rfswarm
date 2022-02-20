@@ -18,7 +18,7 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: pip install robotframework configparser requests robotframework psutil
       - name: Robot Framework
-        run: robot Tests/Regression/Agent -i ${{ matrix.platform }}
+        run: robot --include ${{ matrix.platform }} Tests/Regression/Agent
   Manager:
     strategy:
       matrix:
@@ -33,7 +33,7 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: pip install robotframework configparser requests robotframework psutil
       - name: Robot Framework
-        run: robot Tests/Regression/Manager -i ${{ matrix.platform }}
+        run: robot --include ${{ matrix.platform }} Tests/Regression/Manager
   Reporter:
     strategy:
       matrix:
@@ -48,4 +48,4 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: pip install robotframework configparser requests robotframework psutil
       - name: Robot Framework
-        run: robot Tests/Regression/Reporter -i ${{ matrix.platform }}
+        run: robot --include ${{ matrix.platform }} Tests/Regression/Reporter
