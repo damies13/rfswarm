@@ -7,9 +7,10 @@ Manager Version
 	${result}= 	Run 	python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -v
 	Log to console 	${\n}${result}
 	Should Contain	${result}	Version
+	Should Contain	${result}	Manager
 
 Manager Help
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
 	${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -h
 	Log to console 	${\n}${result}
-	Should Contain	${result}	AGENTNAME
+	Should Contain	${result}	IPADDRESS

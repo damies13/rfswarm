@@ -7,9 +7,10 @@ Reporter Version
 	${result}= 	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -v
 	Log to console 	${\n}${result}
 	Should Contain	${result}	Version
+	Should Contain	${result}	Reporter
 
 Reporter Help
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
 	${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -h
 	Log to console 	${\n}${result}
-	Should Contain	${result}	AGENTNAME
+	Should Contain	${result}	Excel

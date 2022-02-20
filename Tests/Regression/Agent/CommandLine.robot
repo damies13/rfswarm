@@ -7,6 +7,7 @@ Agent Version
 	${result}= 	Run 	python3 ${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py -v
 	Log to console 	${\n}${result}
 	Should Contain	${result}	Version
+	Should Contain	${result}	Agent
 
 Agent Help
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
