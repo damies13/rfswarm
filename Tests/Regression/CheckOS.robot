@@ -8,3 +8,4 @@ Check OS
 
 Check Dir
 	Log to console 	${CURDIR}
+	Log to console 	${EXECDIR}
