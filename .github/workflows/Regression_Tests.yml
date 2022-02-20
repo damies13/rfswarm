@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
-      - run: pip install robotframework configparser requests robotframework psutil
+      - run: pip install -r Tests/Regression/Agent/pip_requirements.txt
       - name: Robot Framework
         run: robot --include ${{ matrix.platform }} Tests/Regression/Agent
   Manager:
@@ -31,7 +31,7 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
-      - run: pip install robotframework configparser requests HTTPServer pillow psutil matplotlib
+      - run: pip install -r Tests/Regression/Manager/pip_requirements.txt
       - name: Robot Framework
         run: robot --include ${{ matrix.platform }} Tests/Regression/Manager
   Reporter:
