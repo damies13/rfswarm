@@ -15,7 +15,7 @@ Check Dir
 
 Agent Version
 	# ${result}=	Wait For Process	python3	${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py	-v
-	${result}= 	Run 	python3	${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py -v
+	${result}= 	Run 	python3 ${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py -v
 	# Log to console 	${result.stdout}
 	Log to console 	${result}
 
