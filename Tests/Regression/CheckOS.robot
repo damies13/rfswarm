@@ -2,6 +2,6 @@
 *** Test Cases ***
 
 Check OS
-	${uname}= 	Evaluate 	os.uname()		os
+	${uname}= 	Evaluate 	sys.platform		sys
 	Log 	${uname}
 	Log to console 	${uname}
