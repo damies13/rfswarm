@@ -44,7 +44,7 @@ jobs:
           # Stage the file, commit and push
           git add Tests/Regression/Manager/Logs/*
           git commit -m "${{ matrix.platform }} ${{ matrix.python }}"
-          git pull -r --autostash
+          git pull --all --ff -r --autostash
           git push
   Reporter:
     strategy:
