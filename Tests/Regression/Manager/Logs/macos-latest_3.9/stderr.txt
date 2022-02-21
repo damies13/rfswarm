@@ -1,3 +1,4 @@
+Matplotlib is building the font cache; this may take a moment.
 Unable to revert mtime: /Library/Fonts
 Exception in thread Thread-3:
 Traceback (most recent call last):
@@ -9,19 +10,4 @@ Traceback (most recent call last):
     self.display_plan['lbl_sched_start_time'].set("")
   File "/Users/runner/hostedtoolcache/Python/3.9.10/x64/lib/python3.9/tkinter/__init__.py", line 377, in set
     return self._tk.globalsetvar(self._name, value)
-RuntimeError: main thread is not in main loop
-Exception in thread Thread-8:
-Traceback (most recent call last):
-  File "/Users/runner/hostedtoolcache/Python/3.9.10/x64/lib/python3.9/threading.py", line 973, in _bootstrap_inner
-    self.run()
-  File "/Users/runner/hostedtoolcache/Python/3.9.10/x64/lib/python3.9/threading.py", line 910, in run
-    self._target(*self._args, **self._kwargs)
-  File "/Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py", line 5250, in pln_update_graph
-    self.canvas.draw()
-  File "/Users/runner/hostedtoolcache/Python/3.9.10/x64/lib/python3.9/site-packages/matplotlib/backends/backend_tkagg.py", line 10, in draw
-    self.blit()
-  File "/Users/runner/hostedtoolcache/Python/3.9.10/x64/lib/python3.9/site-packages/matplotlib/backends/backend_tkagg.py", line 13, in blit
-    _backend_tk.blit(self._tkphoto, self.renderer.buffer_rgba(),
-  File "/Users/runner/hostedtoolcache/Python/3.9.10/x64/lib/python3.9/site-packages/matplotlib/backends/_backend_tk.py", line 115, in blit
-    photoimage.tk.call(_blit_tcl_name, argsid)
 RuntimeError: main thread is not in main loop
