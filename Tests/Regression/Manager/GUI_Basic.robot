@@ -26,7 +26,7 @@ Sikili Setup
 	# cleanup previous output
 	Log To Console    ${OUTPUT DIR}
 	Remove File    ${OUTPUT DIR}${/}*.txt
-	Remove Directory    ${OUTPUT DIR}${/}sikuli_captured
+	Remove File    ${OUTPUT DIR}${/}sikuli_captured${/}*.*
 
 
 Make rfswarm Active
