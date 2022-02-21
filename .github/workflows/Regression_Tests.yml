@@ -45,7 +45,7 @@ jobs:
           git add Tests/Regression/Manager/Logs/*
           git commit -m "${{ matrix.platform }} ${{ matrix.python }}"
           git pull --all --ff -r --autostash
-          git push
+          git push -f
   Reporter:
     strategy:
       matrix:
