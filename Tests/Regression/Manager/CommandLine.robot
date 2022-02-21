@@ -6,6 +6,7 @@ Suite Setup			Clean Up Old Files
 *** Test Cases ***
 Random Offset
 	[Documentation] 	This just prevents all the test runners doing git push at the same time
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
 	${random} =	Evaluate	random.randint(0, 60)
 	Sleep    ${random}
 
