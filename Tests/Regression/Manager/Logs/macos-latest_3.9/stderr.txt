@@ -1,11 +1,3 @@
 Exception in thread Thread-2:
 Traceback (most recent call last):
   File "/Users/runner/hostedtoolcache/Python/3.9.10/x64/lib/python3.9/threading.py", line 973, in _bootstrap_inner
-    self.run()
-  File "/Users/runner/hostedtoolcache/Python/3.9.10/x64/lib/python3.9/threading.py", line 910, in run
-    self._target(*self._args, **self._kwargs)
-  File "/Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py", line 4900, in UpdatePlanDisplay
-    self.display_plan['lbl_sched_start_time'].set("")
-  File "/Users/runner/hostedtoolcache/Python/3.9.10/x64/lib/python3.9/tkinter/__init__.py", line 377, in set
-    return self._tk.globalsetvar(self._name, value)
-RuntimeError: main thread is not in main loop
