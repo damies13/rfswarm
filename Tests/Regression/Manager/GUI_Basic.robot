@@ -1,5 +1,5 @@
 *** Settings ***
-Library 	OperatingSystem
+# Library 	OperatingSystem
 Library 	Process
 Library 	SikuliLibrary
 
