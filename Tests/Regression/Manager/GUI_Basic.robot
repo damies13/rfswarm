@@ -20,6 +20,17 @@ GUI Runs and Closes
 	${result}= 	Wait For Process 	Manager
 	Should Be Equal As Integers 	${result.rc} 	0
 
+GUI Runs and Closes
+	[Tags]	windows-latest
+	Start Process 	python3 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	Sleep 	60
+	Capture Screen
+
+GUI Runs and Closes
+	[Tags]	ubuntu-latest
+	Start Process 	python3 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	Sleep 	60
+	Capture Screen
 
 *** Keywords ***
 Sikili Setup
