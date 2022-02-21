@@ -35,11 +35,13 @@ jobs:
       - name: Robot Framework
         run: robot --include ${{ matrix.platform }} --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }} Tests/Regression/Manager
       - name: setup git config
+        if: always()
         run: |
           # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"        
       - name: git commit
+        if: always()
         run: |
           # Stage the file, commit and push
           git add Tests/Regression/Manager/Logs/*
