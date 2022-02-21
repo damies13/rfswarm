@@ -4897,14 +4897,17 @@ class RFSwarmGUI(tk.Frame):
 				self.display_plan['time_remaining'].set("  {:<10}  ".format(base.format_sec_remain(sec2st)))
 
 			else:
-				if 'lbl_sched_start_time' in self.display_plan:
-					self.display_plan['lbl_sched_start_time'].set("")
-				if 'sched_start_time' in self.display_plan:
-					self.display_plan['sched_start_time'].set("")
-				if 'lbl_time_remaining' in self.display_plan:
-					self.display_plan['lbl_time_remaining'].set("")
-				if 'time_remaining' in self.display_plan:
-					self.display_plan['time_remaining'].set("")
+				try:
+					if 'lbl_sched_start_time' in self.display_plan:
+						self.display_plan['lbl_sched_start_time'].set("")
+					if 'sched_start_time' in self.display_plan:
+						self.display_plan['sched_start_time'].set("")
+					if 'lbl_time_remaining' in self.display_plan:
+						self.display_plan['lbl_time_remaining'].set("")
+					if 'time_remaining' in self.display_plan:
+						self.display_plan['time_remaining'].set("")
+				except Exception:
+					pass
 
 			time.sleep(1)
 
