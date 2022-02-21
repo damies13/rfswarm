@@ -26,11 +26,11 @@ GUI Runs and Closes
 	Sleep 	60
 	Capture Screen
 
-GUI Runs and Closes
-	[Tags]	ubuntu-latest
-	Start Process 	python3 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	Sleep 	60
-	Capture Screen
+# GUI Runs and Closes
+# 	[Tags]	ubuntu-latest
+# 	Start Process 	python3 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+# 	Sleep 	60
+# 	Capture Screen
 
 *** Keywords ***
 Sikili Setup
