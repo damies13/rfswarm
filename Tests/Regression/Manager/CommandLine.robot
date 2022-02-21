@@ -24,6 +24,7 @@ Manager Help
 
 *** Test Cases ***
 Clean Up Old Files
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
 	# cleanup previous output
 	Log To Console    ${OUTPUT DIR}
 	Remove File    ${OUTPUT DIR}${/}*.txt
