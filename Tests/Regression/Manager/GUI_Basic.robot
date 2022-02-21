@@ -13,7 +13,7 @@ ${IMAGE_DIR} 	${CURDIR}/../../Screenshots-doc/img
 *** Test Cases ***
 GUI Runs and Closes
 	[Tags]	macos-latest
-	Start Process 	python3 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py    alias=Manager
+	Start Process 	python3 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Wait Until Screen Contain 	rfwasrm_mac_Window_Controls.png 	120
 	Make rfswarm Active
 	Type With Modifiers 	q 	CMD
@@ -34,6 +34,10 @@ Sikili Teardown
 	IF 	${running}
 		${result}= 	Terminate Process 	Manager
 		Log    ${result}
+		${stdout}= 	Get File 	${OUTPUT DIR}${/}stdout.txt
+		Log    ${stdout}
+		${stderr}= 	Get File 	${OUTPUT DIR}${/}stderr.txt
+		Log    ${stderr}
 	END
 
 Make rfswarm Active
