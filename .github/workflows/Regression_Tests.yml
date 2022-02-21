@@ -33,7 +33,7 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: pip install -r Tests/Regression/Manager/pip_requirements.txt
       - name: Robot Framework
-        run: robot --include ${{ matrix.platform }} --log Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}_log.html Tests/Regression/Manager
+        run: robot --include ${{ matrix.platform }} --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }} Tests/Regression/Manager
       - name: setup git config
         run: |
           # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
@@ -42,9 +42,10 @@ jobs:
       - name: git commit
         run: |
           # Stage the file, commit and push
-          git add Tests/Regression/Reporter/Logs/*
+          git add Tests/Regression/Manager/Logs/*
           git commit -m "${{ matrix.platform }} ${{ matrix.python }}"
-          git push --all
+          git pull -r --autostash
+          git push
   Reporter:
     strategy:
       matrix:
