@@ -22,7 +22,7 @@ Manager Help
 	Log to console 	${\n}${result}
 	Should Contain	${result}	IPADDRESS
 
-*** Test Cases ***
+*** Keywords ***
 Clean Up Old Files
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
 	# cleanup previous output
