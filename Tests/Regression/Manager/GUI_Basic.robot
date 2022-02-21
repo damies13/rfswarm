@@ -13,7 +13,7 @@ ${IMAGE_DIR} 	${CURDIR}/../../Screenshots-doc/img
 GUI Runs and Closes
 	[Tags]	macos-latest
 	Start Process 	python3 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py    alias=Manager
-
+	Wait Until Screen Contain 	rfwasrm_mac_Window_Controls.png 	120s
 	Make rfswarm Active
 	Type With Modifiers 	q 	CMD
 	${result}= 	Wait For Process 	First
