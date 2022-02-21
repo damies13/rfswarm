@@ -46,7 +46,7 @@ jobs:
         if: always()
         run: |
           # Stage the file, commit and push
-          git pull --ff -r merges --autostash
+          git pull --ff --autostash
           git add Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}/*
           git commit -m "${{ matrix.platform }} ${{ matrix.python }}"
           git push -f
