@@ -1,5 +1,5 @@
 *** Settings ***
-# Library 	OperatingSystem
+Library 	OperatingSystem
 Library 	Process
 Library 	SikuliLibrary
 
@@ -23,6 +23,11 @@ GUI Runs and Closes
 *** Keywords ***
 Sikili Setup
 	Add Image Path    ${IMAGE_DIR}
+	# cleanup previous output
+	Log To Console    ${OUTPUT DIR}
+	Remove File    ${OUTPUT DIR}${/}*.txt
+	Remove Directory    ${OUTPUT DIR}${/}sikuli_captured
+
 
 Make rfswarm Active
 	Click 	rfwasrm_mac_title_bg.png
