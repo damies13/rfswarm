@@ -57,7 +57,7 @@ jobs:
         run: |
           # Stage the file, commit and push
           echo "git add"
-          git add Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}/*
+          git add --ignore-errors Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}/*
           echo "git commit"
           git commit -m "${{ matrix.platform }} ${{ matrix.python }}"
       - name: Switch back to original branch
