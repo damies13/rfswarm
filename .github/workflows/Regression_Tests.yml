@@ -38,7 +38,8 @@ jobs:
         run: |
           # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
           git config user.name "GitHub Actions Bot"
-          git config user.email "<>"        
+          git config user.email "<>"
+          git config advice.addIgnoredFile false
       - name: Save Current Branch Name
         run: |
           echo "curr_branch=$(git branch --show-current)"
@@ -63,7 +64,7 @@ jobs:
           echo "git checkout ref_name: ${{ github.ref_name }}"
           git checkout -f ${{ github.ref_name }}
           echo "git pull"
-          git pull --ff --autostash
+          git pull --ff --autostash -f
       - name: Merge test results into original branch
         if: always()
         run: |
