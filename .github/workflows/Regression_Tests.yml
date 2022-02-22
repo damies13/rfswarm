@@ -33,10 +33,10 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
-      - run: pip install -r Tests/Regression/Manager/pip_requirements.txt
       - name: "Install tkinter"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
-        run: apt install python3-tk
+        run: sudo apt install python3-tk
+      - run: pip install -r Tests/Regression/Manager/pip_requirements.txt
       - name: setup git config
         run: |
           # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
