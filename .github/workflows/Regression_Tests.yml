@@ -34,6 +34,9 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: pip install -r Tests/Regression/Manager/pip_requirements.txt
+      - name: "Install tkinter"
+        if: ${{ matrix.platform == 'ubuntu-latest' }}
+        run: apt install python3-tk
       - name: setup git config
         run: |
           # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
