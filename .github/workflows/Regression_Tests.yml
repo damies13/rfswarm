@@ -61,7 +61,7 @@ jobs:
         run: |
           echo "git checkout curr_branch: ${{ env.curr_branch }}"
           echo "git checkout ref_name: ${{ github.ref_name }}"
-          git checkout ${{ github.ref_name }}
+          git checkout -f ${{ github.ref_name }}
           echo "git pull"
           git pull --ff --autostash
       - name: Merge test results into original branch
