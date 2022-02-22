@@ -45,8 +45,7 @@ jobs:
       - name: Save Current Branch Name
         if: always()
         run: |
-          echo "curr_branch=" >> $GITHUB_ENV
-          git branch --show-current >> $GITHUB_ENV
+          echo "curr_branch="$(git branch --show-current) >> $GITHUB_ENV
       - name: git commit
         if: always()
         run: |
