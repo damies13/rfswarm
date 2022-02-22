@@ -67,7 +67,7 @@ jobs:
       - name: Merge test results into original branch
         if: always()
         run: |
-          git merge Test-Result-${{ matrix.platform }}-${{ matrix.python }}
+          git merge --ff Test-Result-${{ matrix.platform }}-${{ matrix.python }}
           git push
       - name: Delete test results branch
         if: always()
