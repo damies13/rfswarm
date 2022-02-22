@@ -41,7 +41,7 @@ jobs:
           git config user.email "<>"        
       - name: Save Current Branch Name
         run: |
-          echo "curr_branch="$(git branch --show-current) >> $GITHUB_ENV
+          echo "curr_branch=$(git branch --show-current)" >> $GITHUB_ENV
       - name: create branch for test results
         run: |
           git checkout -B Test-Result-${{ matrix.platform }}-${{ matrix.python }}
