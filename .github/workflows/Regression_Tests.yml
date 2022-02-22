@@ -42,6 +42,11 @@ jobs:
           # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"        
+      - name: Save Current Branch Name
+        if: always()
+        run: |
+          echo "curr_branch=" >> $GITHUB_ENV
+          git branch --show-current >> $GITHUB_ENV
       - name: git commit
         if: always()
         run: |
@@ -50,6 +55,7 @@ jobs:
           git add Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}/*
           git commit -m "${{ matrix.platform }} ${{ matrix.python }}"
           git push -f
+          echo env.curr_branch
   Reporter:
     strategy:
       matrix:
