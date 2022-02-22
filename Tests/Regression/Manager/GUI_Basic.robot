@@ -16,11 +16,11 @@ GUI Runs and Closes
 	Start Process 	python3 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py 	-g 	5    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Sleep 	60
 	Capture Screen
-	Wait Until Screen Contain 	rfwasrm_mac_Window_Controls.png 	60
-	Make rfswarm Active
-	Type With Modifiers 	q 	CMD
-	${result}= 	Wait For Process 	Manager
-	Should Be Equal As Integers 	${result.rc} 	0
+	# Wait Until Screen Contain 	rfwasrm_mac_Window_Controls.png 	60
+	# Make rfswarm Active
+	# Type With Modifiers 	q 	CMD
+	# ${result}= 	Wait For Process 	Manager
+	# Should Be Equal As Integers 	${result.rc} 	0
 
 GUI Runs and Closes
 	[Tags]	windows-latest
@@ -28,11 +28,11 @@ GUI Runs and Closes
 	Sleep 	60
 	Capture Screen
 
-# GUI Runs and Closes
-# 	[Tags]	ubuntu-latest
-# 	Start Process 	python3 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-# 	Sleep 	60
-# 	Capture Screen
+GUI Runs and Closes
+	[Tags]	ubuntu-latest
+	Start Process 	python3 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	Sleep 	60
+	Capture Screen
 
 *** Keywords ***
 Sikili Setup
