@@ -13,7 +13,7 @@ ${IMAGE_DIR} 	${CURDIR}/../../Screenshots-doc/img
 *** Test Cases ***
 GUI Runs and Closes
 	[Tags]	macos-latest
-	Start Process 	python3 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py 	-g 5    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	Start Process 	python3 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py 	-g 	5    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Sleep 	60
 	Capture Screen
 	Wait Until Screen Contain 	rfwasrm_mac_Window_Controls.png 	60
