@@ -1,7 +1,7 @@
 *** Settings ***
 Library 	OperatingSystem
 Library 	Process
-Library 	SikuliLibrary
+Library 	SikuliLibrary 	mode=NEW
 
 Suite Setup			Sikili Setup
 Suite Teardown		Sikili Teardown
@@ -36,6 +36,7 @@ GUI Runs and Closes
 
 *** Keywords ***
 Sikili Setup
+	Start Sikuli Process
 	Add Image Path    ${IMAGE_DIR}
 
 Sikili Teardown
@@ -48,6 +49,7 @@ Sikili Teardown
 		${stderr}= 	Get File 	${OUTPUT DIR}${/}stderr.txt
 		Log    ${stderr}
 	END
+	Stop Remote Server
 
 Make rfswarm Active
 	Click 	rfwasrm_mac_title_bg.png
