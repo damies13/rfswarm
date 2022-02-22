@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 4.1.3 (Python 3.9.10 on linux)" generated="20220222 06:36:28.389" rpa="false" schemaversion="2">
+<robot generator="Robot 4.1.3 (Python 3.9.10 on linux)" generated="20220222 06:47:23.867" rpa="false" schemaversion="2">
 <suite id="s1" name="Manager" source="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager">
 <suite id="s1-s1" name="CommandLine" source="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/CommandLine.robot">
 <kw name="Clean Up Old Files" type="SETUP">
@@ -9,107 +9,107 @@
 <kw name="Log To Console" library="BuiltIn">
 <arg>${OUTPUT DIR}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20220222 06:36:28.419" endtime="20220222 06:36:28.419"/>
+<status status="PASS" starttime="20220222 06:47:23.899" endtime="20220222 06:47:23.900"/>
 </kw>
 <kw name="Remove File" library="OperatingSystem">
 <arg>${OUTPUT DIR}${/}*.txt</arg>
 <doc>Removes a file with the given path.</doc>
-<msg timestamp="20220222 06:36:28.420" level="INFO" html="true">File '&lt;a href="file:///home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.9/*.txt"&gt;/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.9/*.txt&lt;/a&gt;' does not exist.</msg>
-<status status="PASS" starttime="20220222 06:36:28.419" endtime="20220222 06:36:28.420"/>
+<msg timestamp="20220222 06:47:23.900" level="INFO" html="true">File '&lt;a href="file:///home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.9/*.txt"&gt;/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.9/*.txt&lt;/a&gt;' does not exist.</msg>
+<status status="PASS" starttime="20220222 06:47:23.900" endtime="20220222 06:47:23.901"/>
 </kw>
 <kw name="Remove File" library="OperatingSystem">
 <arg>${OUTPUT DIR}${/}sikuli_captured${/}*.*</arg>
 <doc>Removes a file with the given path.</doc>
-<msg timestamp="20220222 06:36:28.420" level="INFO" html="true">File '&lt;a href="file:///home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.9/sikuli_captured/*.*"&gt;/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.9/sikuli_captured/*.*&lt;/a&gt;' does not exist.</msg>
-<status status="PASS" starttime="20220222 06:36:28.420" endtime="20220222 06:36:28.420"/>
+<msg timestamp="20220222 06:47:23.901" level="INFO" html="true">File '&lt;a href="file:///home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.9/sikuli_captured/*.*"&gt;/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.9/sikuli_captured/*.*&lt;/a&gt;' does not exist.</msg>
+<status status="PASS" starttime="20220222 06:47:23.901" endtime="20220222 06:47:23.901"/>
 </kw>
-<status status="PASS" starttime="20220222 06:36:28.418" endtime="20220222 06:36:28.421"/>
+<status status="PASS" starttime="20220222 06:47:23.899" endtime="20220222 06:47:23.901"/>
 </kw>
 <test id="s1-s1-t1" name="Random Offset">
 <kw name="Evaluate" library="BuiltIn">
 <var>${random}</var>
 <arg>random.randint(0, 60)</arg>
 <doc>Evaluates the given expression in Python and returns the result.</doc>
-<msg timestamp="20220222 06:36:28.421" level="INFO">${random} = 42</msg>
-<status status="PASS" starttime="20220222 06:36:28.421" endtime="20220222 06:36:28.422"/>
+<msg timestamp="20220222 06:47:23.902" level="INFO">${random} = 45</msg>
+<status status="PASS" starttime="20220222 06:47:23.902" endtime="20220222 06:47:23.902"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>${random}</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<msg timestamp="20220222 06:37:10.422" level="INFO">Slept 42 seconds</msg>
-<status status="PASS" starttime="20220222 06:36:28.422" endtime="20220222 06:37:10.422"/>
+<msg timestamp="20220222 06:48:08.903" level="INFO">Slept 45 seconds</msg>
+<status status="PASS" starttime="20220222 06:47:23.902" endtime="20220222 06:48:08.903"/>
 </kw>
 <doc>This just prevents all the test runners doing git push at the same time</doc>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20220222 06:36:28.421" endtime="20220222 06:37:10.423"/>
+<status status="PASS" starttime="20220222 06:47:23.901" endtime="20220222 06:48:08.903"/>
 </test>
 <test id="s1-s1-t2" name="Manager Version">
 <kw name="Run" library="OperatingSystem">
 <var>${result}</var>
 <arg>python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -v</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<msg timestamp="20220222 06:37:10.428" level="INFO">Running command 'python3 /home/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -v 2&gt;&amp;1'.</msg>
-<msg timestamp="20220222 06:37:12.095" level="INFO">${result} = Robot Framework Swarm: Manager 
+<msg timestamp="20220222 06:48:08.909" level="INFO">Running command 'python3 /home/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -v 2&gt;&amp;1'.</msg>
+<msg timestamp="20220222 06:48:10.524" level="INFO">${result} = Robot Framework Swarm: Manager 
 	Version 1.1.0 </msg>
-<status status="PASS" starttime="20220222 06:37:10.424" endtime="20220222 06:37:12.095"/>
+<status status="PASS" starttime="20220222 06:48:08.905" endtime="20220222 06:48:10.524"/>
 </kw>
 <kw name="Log To Console" library="BuiltIn">
 <arg>${\n}${result}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20220222 06:37:12.095" endtime="20220222 06:37:12.096"/>
+<status status="PASS" starttime="20220222 06:48:10.525" endtime="20220222 06:48:10.525"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Version</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20220222 06:37:12.096" endtime="20220222 06:37:12.096"/>
+<status status="PASS" starttime="20220222 06:48:10.526" endtime="20220222 06:48:10.526"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Manager</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20220222 06:37:12.097" endtime="20220222 06:37:12.097"/>
+<status status="PASS" starttime="20220222 06:48:10.526" endtime="20220222 06:48:10.527"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20220222 06:37:10.423" endtime="20220222 06:37:12.097"/>
+<status status="PASS" starttime="20220222 06:48:08.904" endtime="20220222 06:48:10.527"/>
 </test>
 <test id="s1-s1-t3" name="Manager Help">
 <kw name="Run" library="OperatingSystem">
 <var>${result}</var>
 <arg>python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -h</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<msg timestamp="20220222 06:37:12.100" level="INFO">Running command 'python3 /home/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -h 2&gt;&amp;1'.</msg>
-<msg timestamp="20220222 06:37:13.062" level="INFO">${result} = Robot Framework Swarm: Manager 
+<msg timestamp="20220222 06:48:10.530" level="INFO">Running command 'python3 /home/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -h 2&gt;&amp;1'.</msg>
+<msg timestamp="20220222 06:48:11.509" level="INFO">${result} = Robot Framework Swarm: Manager 
 	Version 1.1.0 
 usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
                   [-n] [-t STARTTIME] [-d DIR] [-e IPADDRESS] [-p PORT]
 
 ...</msg>
-<status status="PASS" starttime="20220222 06:37:12.098" endtime="20220222 06:37:13.062"/>
+<status status="PASS" starttime="20220222 06:48:10.527" endtime="20220222 06:48:11.509"/>
 </kw>
 <kw name="Log To Console" library="BuiltIn">
 <arg>${\n}${result}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20220222 06:37:13.062" endtime="20220222 06:37:13.063"/>
+<status status="PASS" starttime="20220222 06:48:11.509" endtime="20220222 06:48:11.510"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>IPADDRESS</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20220222 06:37:13.063" endtime="20220222 06:37:13.063"/>
+<status status="PASS" starttime="20220222 06:48:11.510" endtime="20220222 06:48:11.510"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20220222 06:37:12.097" endtime="20220222 06:37:13.063"/>
+<status status="PASS" starttime="20220222 06:48:10.527" endtime="20220222 06:48:11.510"/>
 </test>
-<status status="PASS" starttime="20220222 06:36:28.410" endtime="20220222 06:37:13.064"/>
+<status status="PASS" starttime="20220222 06:47:23.888" endtime="20220222 06:48:11.511"/>
 </suite>
-<status status="PASS" starttime="20220222 06:36:28.390" endtime="20220222 06:37:13.066"/>
+<status status="PASS" starttime="20220222 06:47:23.868" endtime="20220222 06:48:11.513"/>
 </suite>
 <statistics>
 <total>
