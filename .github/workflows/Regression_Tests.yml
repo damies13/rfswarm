@@ -34,27 +34,39 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: pip install -r Tests/Regression/Manager/pip_requirements.txt
-      - name: Robot Framework
-        run: robot --include ${{ matrix.platform }} --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }} Tests/Regression/Manager
       - name: setup git config
-        if: always()
         run: |
           # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"        
       - name: Save Current Branch Name
-        if: always()
         run: |
           echo "curr_branch="$(git branch --show-current) >> $GITHUB_ENV
+      - name: create branch for test results
+        run: |
+          git checkout -B Test-Result-${{ matrix.platform }}-${{ matrix.python }}
+      - name: Robot Framework
+        run: robot --include ${{ matrix.platform }} --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }} Tests/Regression/Manager
       - name: git commit
         if: always()
         run: |
           # Stage the file, commit and push
-          git pull --ff --autostash
           git add Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}/*
           git commit -m "${{ matrix.platform }} ${{ matrix.python }}"
-          git push -f
-          echo "${{ env.curr_branch }}"
+          git push
+      - name: Switch back to original branch
+        if: always()
+        run: |
+          git checkout ${{ env.curr_branch }}
+          git pull --ff --autostash
+      - name: Merge test results into original branch
+        if: always()
+        run: |
+          git merge Test-Result-${{ matrix.platform }}-${{ matrix.python }}
+      - name: Delete test results branch
+        if: always()
+        run: |
+          git branch -d Test-Result-${{ matrix.platform }}-${{ matrix.python }}
   Reporter:
     strategy:
       matrix:
