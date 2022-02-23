@@ -35,7 +35,9 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: "Install tkinter"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
-        run: sudo apt install python3-tk
+        run: |
+          sudo apt install python3-tk
+          export DISPLAY=localhost:0.0
       - run: pip install -r Tests/Regression/Manager/pip_requirements.txt
       - name: setup git config
         run: |
