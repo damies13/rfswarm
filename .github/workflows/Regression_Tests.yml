@@ -37,41 +37,66 @@ jobs:
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: sudo apt install python3-tk
       - run: pip install -r Tests/Regression/Manager/pip_requirements.txt
-      - name: setup git config
-        run: |
-          # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
-          git config advice.addIgnoredFile false
-      - name: create branch for test results
-        run: git checkout -B Test-Result-${{ matrix.platform }}-${{ matrix.python }}
       - name: Robot Framework
         run: robot --include ${{ matrix.platform }} --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }} Tests/Regression/Manager
-      - name: git commit
-        if: always()
-        run: |
-          # Stage the file, commit and push
-          echo "git add"
-          git add Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}/
-          echo "git commit"
-          git commit -m "${{ matrix.platform }} ${{ matrix.python }}"
-      - name: Switch back to original branch
-        if: always()
-        run: |
-          echo "git checkout ref_name: ${{ github.ref_name }}"
-          git checkout -f ${{ github.ref_name }}
-          echo "git pull"
-          git pull --ff --autostash --shallow-since="1 day"
-          # --depth=1 -f 
-      - name: Merge test results into original branch
-        if: always()
-        run: |
-          git merge --ff Test-Result-${{ matrix.platform }}-${{ matrix.python }}
-          git push
-      - name: Delete test results branch
-        if: always()
-        run: |
-          git branch -d Test-Result-${{ matrix.platform }}-${{ matrix.python }}
+      - name: push
+        uses: github-actions-x/commit@v2.8
+        with:
+          push-branch: ${{ github.ref_name }}
+          commit-message: 'Test-Result-${{ matrix.platform }}-${{ matrix.python }}'
+          rebase: 'true' # pull and rebase before commit
+#   Manager:
+#     strategy:
+#       matrix:
+#         platform: [ubuntu-latest, macos-latest, windows-latest]
+#         python: ['3.7', '3.8', '3.9', '3.10']
+#       fail-fast: false
+#     runs-on: ${{ matrix.platform }}
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v2
+#       - uses: actions/setup-python@v2
+#         with:
+#           python-version: ${{ matrix.python }}
+#       - name: "Install tkinter"
+#         if: ${{ matrix.platform == 'ubuntu-latest' }}
+#         run: sudo apt install python3-tk
+#       - run: pip install -r Tests/Regression/Manager/pip_requirements.txt
+#       - name: setup git config
+#         run: |
+#           # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
+#           git config user.name "GitHub Actions Bot"
+#           git config user.email "<>"
+#           git config advice.addIgnoredFile false
+#       - name: create branch for test results
+#         run: git checkout -B Test-Result-${{ matrix.platform }}-${{ matrix.python }}
+#       - name: Robot Framework
+#         run: robot --include ${{ matrix.platform }} --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }} Tests/Regression/Manager
+#       - name: git commit
+#         if: always()
+#         run: |
+#           # Stage the file, commit and push
+#           echo "git add"
+#           git add Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}/
+#           echo "git commit"
+#           git commit -m "${{ matrix.platform }} ${{ matrix.python }}"
+#       - name: Switch back to original branch
+#         if: always()
+#         run: |
+#           echo "git checkout ref_name: ${{ github.ref_name }}"
+#           git checkout -f ${{ github.ref_name }}
+#           echo "git pull"
+#           git pull --ff --autostash --shallow-since="1 day"
+#           # --depth=1 -f 
+#       - name: Merge test results into original branch
+#         if: always()
+#         run: |
+#           git merge --ff Test-Result-${{ matrix.platform }}-${{ matrix.python }}
+#           git push
+#       - name: Delete test results branch
+#         if: always()
+#         run: |
+#           git branch -d Test-Result-${{ matrix.platform }}-${{ matrix.python }}
   Reporter:
     strategy:
       matrix:
