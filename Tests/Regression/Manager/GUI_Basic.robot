@@ -17,6 +17,7 @@ GUI Runs and Closes
 	[Tags]	macos-latest
 	Start Process 	python3 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py 	-g 	5    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Sleep 	60
+	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
 	# Wait Until Screen Contain 	rfwasrm_mac_Window_Controls.png 	60
 	# Make rfswarm Active
@@ -29,6 +30,7 @@ GUI Runs and Closes
 	Start Process 	python3 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Sleep 	60
 	# Capture Screen
+	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
 
 
@@ -37,6 +39,7 @@ GUI Runs and Closes
 	Start Process 	python3 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Sleep 	60
 	# Capture Screen
+	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
 
 *** Keywords ***
