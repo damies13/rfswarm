@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 4.1.3 (Python 3.10.2 on linux)" generated="20220223 08:33:52.501" rpa="false" schemaversion="2">
+<robot generator="Robot 4.1.3 (Python 3.10.2 on linux)" generated="20220223 08:56:18.038" rpa="false" schemaversion="2">
 <suite id="s1" name="Manager" source="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager">
 <suite id="s1-s1" name="CommandLine" source="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/CommandLine.robot">
 <kw name="Clean Up Old Files" type="SETUP">
@@ -9,200 +9,135 @@
 <kw name="Log To Console" library="BuiltIn">
 <arg>${OUTPUT DIR}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20220223 08:33:52.543" endtime="20220223 08:33:52.544"/>
+<status status="PASS" starttime="20220223 08:56:18.073" endtime="20220223 08:56:18.074"/>
 </kw>
 <kw name="Remove File" library="OperatingSystem">
 <arg>${OUTPUT DIR}${/}*.txt</arg>
 <doc>Removes a file with the given path.</doc>
-<msg timestamp="20220223 08:33:52.544" level="INFO" html="true">File '&lt;a href="file:///home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.10/*.txt"&gt;/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.10/*.txt&lt;/a&gt;' does not exist.</msg>
-<status status="PASS" starttime="20220223 08:33:52.544" endtime="20220223 08:33:52.544"/>
+<msg timestamp="20220223 08:56:18.074" level="INFO" html="true">File '&lt;a href="file:///home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.10/*.txt"&gt;/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.10/*.txt&lt;/a&gt;' does not exist.</msg>
+<status status="PASS" starttime="20220223 08:56:18.074" endtime="20220223 08:56:18.074"/>
 </kw>
 <kw name="Remove File" library="OperatingSystem">
 <arg>${OUTPUT DIR}${/}sikuli_captured${/}*.*</arg>
 <doc>Removes a file with the given path.</doc>
-<msg timestamp="20220223 08:33:52.545" level="INFO" html="true">File '&lt;a href="file:///home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.10/sikuli_captured/*.*"&gt;/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.10/sikuli_captured/*.*&lt;/a&gt;' does not exist.</msg>
-<status status="PASS" starttime="20220223 08:33:52.545" endtime="20220223 08:33:52.545"/>
+<msg timestamp="20220223 08:56:18.075" level="INFO" html="true">File '&lt;a href="file:///home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.10/sikuli_captured/*.*"&gt;/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.10/sikuli_captured/*.*&lt;/a&gt;' does not exist.</msg>
+<status status="PASS" starttime="20220223 08:56:18.074" endtime="20220223 08:56:18.075"/>
 </kw>
-<status status="PASS" starttime="20220223 08:33:52.543" endtime="20220223 08:33:52.546"/>
+<status status="PASS" starttime="20220223 08:56:18.073" endtime="20220223 08:56:18.075"/>
 </kw>
 <test id="s1-s1-t1" name="Random Offset">
 <kw name="Evaluate" library="BuiltIn">
 <var>${random}</var>
 <arg>random.randint(0, 60)</arg>
 <doc>Evaluates the given expression in Python and returns the result.</doc>
-<msg timestamp="20220223 08:33:52.547" level="INFO">${random} = 43</msg>
-<status status="PASS" starttime="20220223 08:33:52.546" endtime="20220223 08:33:52.547"/>
+<msg timestamp="20220223 08:56:18.076" level="INFO">${random} = 0</msg>
+<status status="PASS" starttime="20220223 08:56:18.076" endtime="20220223 08:56:18.076"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>${random}</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<msg timestamp="20220223 08:34:35.548" level="INFO">Slept 43 seconds</msg>
-<status status="PASS" starttime="20220223 08:33:52.547" endtime="20220223 08:34:35.548"/>
+<msg timestamp="20220223 08:56:18.076" level="INFO">Slept 0 seconds</msg>
+<status status="PASS" starttime="20220223 08:56:18.076" endtime="20220223 08:56:18.076"/>
 </kw>
 <doc>This just prevents all the test runners doing git push at the same time</doc>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20220223 08:33:52.546" endtime="20220223 08:34:35.548"/>
+<status status="PASS" starttime="20220223 08:56:18.075" endtime="20220223 08:56:18.077"/>
 </test>
 <test id="s1-s1-t2" name="Manager Version">
 <kw name="Run" library="OperatingSystem">
 <var>${result}</var>
 <arg>python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -v</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<msg timestamp="20220223 08:34:35.553" level="INFO">Running command 'python3 /home/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -v 2&gt;&amp;1'.</msg>
-<msg timestamp="20220223 08:34:37.484" level="INFO">${result} = Robot Framework Swarm: Manager 
+<msg timestamp="20220223 08:56:18.080" level="INFO">Running command 'python3 /home/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -v 2&gt;&amp;1'.</msg>
+<msg timestamp="20220223 08:56:21.507" level="INFO">${result} = Robot Framework Swarm: Manager 
 	Version 1.1.0 </msg>
-<status status="PASS" starttime="20220223 08:34:35.550" endtime="20220223 08:34:37.484"/>
+<status status="PASS" starttime="20220223 08:56:18.077" endtime="20220223 08:56:21.507"/>
 </kw>
 <kw name="Log To Console" library="BuiltIn">
 <arg>${\n}${result}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20220223 08:34:37.484" endtime="20220223 08:34:37.485"/>
+<status status="PASS" starttime="20220223 08:56:21.508" endtime="20220223 08:56:21.508"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Version</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20220223 08:34:37.485" endtime="20220223 08:34:37.485"/>
+<status status="PASS" starttime="20220223 08:56:21.508" endtime="20220223 08:56:21.508"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Manager</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20220223 08:34:37.485" endtime="20220223 08:34:37.486"/>
+<status status="PASS" starttime="20220223 08:56:21.508" endtime="20220223 08:56:21.509"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20220223 08:34:35.549" endtime="20220223 08:34:37.486"/>
+<status status="PASS" starttime="20220223 08:56:18.077" endtime="20220223 08:56:21.509"/>
 </test>
 <test id="s1-s1-t3" name="Manager Help">
 <kw name="Run" library="OperatingSystem">
 <var>${result}</var>
 <arg>python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -h</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<msg timestamp="20220223 08:34:37.488" level="INFO">Running command 'python3 /home/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -h 2&gt;&amp;1'.</msg>
-<msg timestamp="20220223 08:34:38.632" level="INFO">${result} = Robot Framework Swarm: Manager 
+<msg timestamp="20220223 08:56:21.510" level="INFO">Running command 'python3 /home/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -h 2&gt;&amp;1'.</msg>
+<msg timestamp="20220223 08:56:22.584" level="INFO">${result} = Robot Framework Swarm: Manager 
 	Version 1.1.0 
 usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
                   [-n] [-t STARTTIME] [-d DIR] [-e IPADDRESS] [-p PORT]
 
 ...</msg>
-<status status="PASS" starttime="20220223 08:34:37.487" endtime="20220223 08:34:38.632"/>
+<status status="PASS" starttime="20220223 08:56:21.509" endtime="20220223 08:56:22.584"/>
 </kw>
 <kw name="Log To Console" library="BuiltIn">
 <arg>${\n}${result}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20220223 08:34:38.632" endtime="20220223 08:34:38.632"/>
+<status status="PASS" starttime="20220223 08:56:22.584" endtime="20220223 08:56:22.585"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>IPADDRESS</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20220223 08:34:38.633" endtime="20220223 08:34:38.633"/>
+<status status="PASS" starttime="20220223 08:56:22.585" endtime="20220223 08:56:22.585"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20220223 08:34:37.486" endtime="20220223 08:34:38.633"/>
+<status status="PASS" starttime="20220223 08:56:21.509" endtime="20220223 08:56:22.585"/>
 </test>
-<status status="PASS" starttime="20220223 08:33:52.530" endtime="20220223 08:34:38.634"/>
+<status status="PASS" starttime="20220223 08:56:18.062" endtime="20220223 08:56:22.586"/>
 </suite>
 <suite id="s1-s2" name="GUI Basic" source="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/GUI_Basic.robot">
-<kw name="Sikili Setup" type="SETUP">
-<kw name="Start Sikuli Process" library="SikuliLibrary">
-<msg timestamp="20220223 08:34:38.673" level="INFO">Starting process:
-java -jar /opt/hostedtoolcache/Python/3.10.2/x64/lib/python3.10/site-packages/SikuliLibrary/lib/SikuliLibrary.jar 33059 /home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.10</msg>
-<msg timestamp="20220223 08:34:38.676" level="INFO">Start sikuli java process on port 33059</msg>
-<msg timestamp="20220223 08:34:40.748" level="INFO">Sikuli java process is started</msg>
-<msg timestamp="20220223 08:34:42.503" level="WARN">Test get_keyword_names failed! Connecting remote server at http://127.0.0.1:33059/ failed: &lt;Fault 0: 'Failed to invoke method get_keyword_names in class org.robotframework.remoteserver.servlet.ServerMethods: java.lang.RuntimeException'&gt;</msg>
-<msg timestamp="20220223 08:34:45.030" level="WARN">Test get_keyword_names failed! Connecting remote server at http://127.0.0.1:33059/ failed: &lt;Fault 0: 'Failed to invoke method get_keyword_names in class org.robotframework.remoteserver.servlet.ServerMethods: java.lang.RuntimeException'&gt;</msg>
-<msg timestamp="20220223 08:34:46.033" level="FAIL">Failed to get_keyword_names!</msg>
-<status status="FAIL" starttime="20220223 08:34:38.671" endtime="20220223 08:34:46.033"/>
-</kw>
-<kw name="Add Image Path" library="SikuliLibrary">
-<arg>${IMAGE_DIR}</arg>
-<doc>Add image path</doc>
-<status status="NOT RUN" starttime="20220223 08:34:46.033" endtime="20220223 08:34:46.034"/>
-</kw>
-<status status="FAIL" starttime="20220223 08:34:38.671" endtime="20220223 08:34:46.034"/>
-</kw>
 <test id="s1-s2-t1" name="GUI Runs and Closes">
+<kw name="Start Process" library="Process">
+<arg>python3</arg>
+<arg>${EXECDIR}${/}rfswarm_manager${/}rfswarm.py</arg>
+<arg>alias=Manager</arg>
+<arg>stdout=${OUTPUT DIR}${/}stdout.txt</arg>
+<arg>stderr=${OUTPUT DIR}${/}stderr.txt</arg>
+<doc>Starts a new process on background.</doc>
+<msg timestamp="20220223 08:56:22.596" level="INFO">Starting process:
+python3 /home/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py</msg>
+<status status="PASS" starttime="20220223 08:56:22.595" endtime="20220223 08:56:22.599"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>60</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20220223 08:57:22.601" level="INFO">Slept 1 minute</msg>
+<status status="PASS" starttime="20220223 08:56:22.600" endtime="20220223 08:57:22.601"/>
+</kw>
+<kw name="Take A Screenshot">
+<msg timestamp="20220223 08:57:22.604" level="FAIL">No keyword with name 'Take A Screenshot' found.</msg>
+<status status="FAIL" starttime="20220223 08:57:22.604" endtime="20220223 08:57:22.604"/>
+</kw>
 <tag>ubuntu-latest</tag>
-<status status="FAIL" starttime="20220223 08:34:46.034" endtime="20220223 08:34:46.035">Parent suite setup failed:
-Failed to get_keyword_names!</status>
+<status status="FAIL" starttime="20220223 08:56:22.594" endtime="20220223 08:57:22.605">No keyword with name 'Take A Screenshot' found.</status>
 </test>
-<kw name="Sikili Teardown" type="TEARDOWN">
-<kw name="Is Process Running" library="Process">
-<var>${running}</var>
-<arg>Manager</arg>
-<doc>Checks is the process running or not.</doc>
-<msg timestamp="20220223 08:34:46.037" level="INFO">${running} = None</msg>
-<msg timestamp="20220223 08:34:46.037" level="FAIL">Non-existing index or alias 'Manager'.</msg>
-<status status="FAIL" starttime="20220223 08:34:46.036" endtime="20220223 08:34:46.037"/>
-</kw>
-<if>
-<branch type="IF" condition="${running}">
-<kw name="Terminate Process" library="Process">
-<var>${result}</var>
-<arg>Manager</arg>
-<doc>Stops the process gracefully or forcefully.</doc>
-<status status="NOT RUN" starttime="20220223 08:34:46.038" endtime="20220223 08:34:46.038"/>
-</kw>
-<kw name="Log" library="BuiltIn">
-<arg>${result}</arg>
-<doc>Logs the given message with the given level.</doc>
-<status status="NOT RUN" starttime="20220223 08:34:46.038" endtime="20220223 08:34:46.038"/>
-</kw>
-<kw name="Get File" library="OperatingSystem">
-<var>${stdout}</var>
-<arg>${OUTPUT DIR}${/}stdout.txt</arg>
-<doc>Returns the contents of a specified file.</doc>
-<status status="NOT RUN" starttime="20220223 08:34:46.038" endtime="20220223 08:34:46.038"/>
-</kw>
-<kw name="Log" library="BuiltIn">
-<arg>${stdout}</arg>
-<doc>Logs the given message with the given level.</doc>
-<status status="NOT RUN" starttime="20220223 08:34:46.038" endtime="20220223 08:34:46.038"/>
-</kw>
-<kw name="Get File" library="OperatingSystem">
-<var>${stderr}</var>
-<arg>${OUTPUT DIR}${/}stderr.txt</arg>
-<doc>Returns the contents of a specified file.</doc>
-<status status="NOT RUN" starttime="20220223 08:34:46.038" endtime="20220223 08:34:46.039"/>
-</kw>
-<kw name="Log" library="BuiltIn">
-<arg>${stderr}</arg>
-<doc>Logs the given message with the given level.</doc>
-<status status="NOT RUN" starttime="20220223 08:34:46.039" endtime="20220223 08:34:46.039"/>
-</kw>
-<status status="NOT RUN" starttime="20220223 08:34:46.037" endtime="20220223 08:34:46.039"/>
-</branch>
-<status status="PASS" starttime="20220223 08:34:46.037" endtime="20220223 08:34:46.039"/>
-</if>
-<kw name="Stop Remote Server" library="SikuliLibrary">
-<doc>Stops the remote server.</doc>
-<msg timestamp="20220223 08:34:46.039" level="FAIL">AttributeError: 'NoneType' object has no attribute 'run_keyword'</msg>
-<status status="FAIL" starttime="20220223 08:34:46.039" endtime="20220223 08:34:46.039"/>
-</kw>
-<status status="FAIL" starttime="20220223 08:34:46.036" endtime="20220223 08:34:46.040">Several failures occurred:
-
-1) Non-existing index or alias 'Manager'.
-
-2) AttributeError: 'NoneType' object has no attribute 'run_keyword'</status>
-</kw>
-<status status="FAIL" starttime="20220223 08:34:38.635" endtime="20220223 08:34:46.040">Suite setup failed:
-Failed to get_keyword_names!
-
-Also suite teardown failed:
-Several failures occurred:
-
-1) Non-existing index or alias 'Manager'.
-
-2) AttributeError: 'NoneType' object has no attribute 'run_keyword'</status>
+<status status="FAIL" starttime="20220223 08:56:22.587" endtime="20220223 08:57:22.606"/>
 </suite>
-<status status="FAIL" starttime="20220223 08:33:52.502" endtime="20220223 08:34:46.041"/>
+<status status="FAIL" starttime="20220223 08:56:18.039" endtime="20220223 08:57:22.607"/>
 </suite>
 <statistics>
 <total>
@@ -220,7 +155,14 @@ Several failures occurred:
 </suite>
 </statistics>
 <errors>
-<msg timestamp="20220223 08:34:42.503" level="WARN">Test get_keyword_names failed! Connecting remote server at http://127.0.0.1:33059/ failed: &lt;Fault 0: 'Failed to invoke method get_keyword_names in class org.robotframework.remoteserver.servlet.ServerMethods: java.lang.RuntimeException'&gt;</msg>
-<msg timestamp="20220223 08:34:45.030" level="WARN">Test get_keyword_names failed! Connecting remote server at http://127.0.0.1:33059/ failed: &lt;Fault 0: 'Failed to invoke method get_keyword_names in class org.robotframework.remoteserver.servlet.ServerMethods: java.lang.RuntimeException'&gt;</msg>
+<msg timestamp="20220223 08:56:22.593" level="ERROR">Error in file '/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/GUI_Basic.robot' on line 10: Importing library 'ImageHorizonLibrary' failed: ModuleNotFoundError: No module named 'ImageHorizonLibrary'
+Traceback (most recent call last):
+  None
+PYTHONPATH:
+  /opt/hostedtoolcache/Python/3.10.2/x64/bin
+  /opt/hostedtoolcache/Python/3.10.2/x64/lib/python310.zip
+  /opt/hostedtoolcache/Python/3.10.2/x64/lib/python3.10
+  /opt/hostedtoolcache/Python/3.10.2/x64/lib/python3.10/lib-dynload
+  /opt/hostedtoolcache/Python/3.10.2/x64/lib/python3.10/site-packages</msg>
 </errors>
 </robot>
