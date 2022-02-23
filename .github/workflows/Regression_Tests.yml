@@ -61,7 +61,7 @@ jobs:
           echo "git checkout ref_name: ${{ github.ref_name }}"
           git checkout -f ${{ github.ref_name }}
           echo "git pull"
-          git pull --ff --autostash -f
+          git pull --ff --autostash -f --depth=1
       - name: Merge test results into original branch
         if: always()
         run: |
