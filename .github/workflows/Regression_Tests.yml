@@ -40,6 +40,7 @@ jobs:
       - name: Robot Framework
         run: robot --include ${{ matrix.platform }} --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }} Tests/Regression/Manager
       - name: push
+        if: always()
         uses: github-actions-x/commit@v2.8
         with:
           push-branch: ${{ github.ref_name }}
