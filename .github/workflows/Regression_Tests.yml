@@ -66,8 +66,12 @@ jobs:
       - name: Merge test results into original branch
         if: always()
         run: |
+          echo "git merge"
           git merge --ff Test-Result-${{ matrix.platform }}-${{ matrix.python }}
-          # git push
+          echo "git pull again"
+          git pull --ff --autostash --shallow-since="1 week"
+          echo "git push"
+          git push
 #   Manager:
 #     strategy:
 #       matrix:
