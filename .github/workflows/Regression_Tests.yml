@@ -36,7 +36,7 @@ jobs:
       - name: "Install tkinter"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
-          sudo apt install python3-tk python-dev python-xlib
+          sudo apt install xvfb python3-tk python-dev python-xlib
           # export DISPLAY=localhost:0.0
       - run: pip install -r Tests/Regression/Manager/pip_requirements.txt
       - name: setup git config
