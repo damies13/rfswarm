@@ -73,7 +73,7 @@ jobs:
           echo "git checkout ref_name: ${{ github.ref_name }}"
           git checkout -f ${{ github.ref_name }}
           echo "git pull"
-          git pull --ff --autostash --shallow-since="1 week"
+          git pull --ff --autostash # --shallow-since="1 week"
           # --depth=1 -f 
       - name: Merge test results into original branch
         if: always()
@@ -81,7 +81,7 @@ jobs:
           echo "git merge"
           git merge --ff Test-Result-${{ matrix.platform }}-${{ matrix.python }}
           echo "git pull again"
-          git pull --ff --autostash --shallow-since="1 week"
+          git pull --ff --autostash # --shallow-since="1 week"
           echo "git push"
           git push
 #   Manager:
