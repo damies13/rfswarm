@@ -36,7 +36,7 @@ jobs:
       - name: "Ubuntu Installs"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
-          sudo apt install python3-tk python-dev python-xlib scrot
+          sudo apt install python3-tk python-dev python-xlib scrot fluxbox
           sudo apt list --installed
       - name: "Ubuntu Xvfb"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
@@ -47,6 +47,8 @@ jobs:
           touch ~/.Xauthority
           # To view a listing of the .Xauthority file, enter the following 
           xauth list
+          # fluxbox 
+          fluxbox &
       - run: pip install -r Tests/Regression/Manager/pip_requirements.txt
       - name: setup git config
         run: |
