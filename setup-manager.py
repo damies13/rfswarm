@@ -16,7 +16,7 @@ setuptools.setup(
 	# I needed a recent version of pip (pip 21.0.1 worked my previous <20 version didn't) for matplotlib
 	# 	to actually install withput error
 	# https://matplotlib.org/stable/users/installing.html
-	install_requires=['configparser', 'HTTPServer', 'pillow', 'psutil', 'pip>=21,>=22', 'matplotlib'],
+	install_requires=['configparser', 'requests', 'HTTPServer', 'pillow', 'psutil', 'pip>=21,>=22', 'matplotlib'],
 	classifiers=[
 		"Development Status :: 5 - Production/Stable",
 		"Topic :: Software Development :: Testing",
