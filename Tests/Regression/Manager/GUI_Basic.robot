@@ -21,9 +21,9 @@ GUI Runs and Closes
 	Take A Screenshot
 	# Wait Until Screen Contain 	rfwasrm_mac_Window_Controls.png 	60
 	# Make rfswarm Active
-	# Type With Modifiers 	q 	CMD
-	# ${result}= 	Wait For Process 	Manager
-	# Should Be Equal As Integers 	${result.rc} 	0
+	Type With Modifiers 	q 	CMD
+	${result}= 	Wait For Process 	Manager
+	Should Be Equal As Integers 	${result.rc} 	0
 
 GUI Runs and Closes
 	[Tags]	windows-latest
@@ -33,6 +33,10 @@ GUI Runs and Closes
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
 
+	Type With Modifiers 	x 	CONTROL
+	${result}= 	Wait For Process 	Manager
+	Should Be Equal As Integers 	${result.rc} 	0
+
 
 GUI Runs and Closes
 	[Tags]	ubuntu-latest
@@ -41,6 +45,10 @@ GUI Runs and Closes
 	# Capture Screen
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
+
+	Type With Modifiers 	x 	CONTROL
+	${result}= 	Wait For Process 	Manager
+	Should Be Equal As Integers 	${result.rc} 	0
 
 *** Keywords ***
 # Sikili Setup
