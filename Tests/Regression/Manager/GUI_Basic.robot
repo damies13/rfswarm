@@ -7,7 +7,7 @@ Library 	Process
 # Suite Teardown		Sikili Teardown
 
 # Import Library	ImageHorizonLibrary	reference_folder=images
-Library	ImageHorizonLibrary	reference_folder=Images
+Library	ImageHorizonLibrary	reference_folder=${CURDIR}/Images
 
 *** Variables ***
 ${IMAGE_DIR} 	${CURDIR}/../../Screenshots-doc/img
