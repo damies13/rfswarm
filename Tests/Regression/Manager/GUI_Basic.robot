@@ -19,6 +19,8 @@ GUI Runs and Closes
 	Sleep 	60
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
+	Click Image 	Title Bar
+	Take A Screenshot
 	# Wait Until Screen Contain 	rfwasrm_mac_Window_Controls.png 	60
 	# Make rfswarm Active
 	Press Combination 	q 	Key.command
@@ -32,6 +34,8 @@ GUI Runs and Closes
 	# Capture Screen
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
+	Click Image 	Title Bar
+	Take A Screenshot
 
 	Press Combination 	x 	Key.ctrl
 	${result}= 	Wait For Process 	Manager
@@ -44,6 +48,8 @@ GUI Runs and Closes
 	Sleep 	60
 	# Capture Screen
 	Set Screenshot Folder 	${OUTPUT DIR}
+	Take A Screenshot
+	Click Image 	Title Bar
 	Take A Screenshot
 
 	Press Combination 	x 	Key.ctrl
