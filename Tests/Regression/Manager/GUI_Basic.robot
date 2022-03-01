@@ -7,7 +7,7 @@ Library 	Process
 # Suite Teardown		Sikili Teardown
 
 # Import Library	ImageHorizonLibrary	reference_folder=images
-Library	ImageHorizonLibrary	reference_folder=${CURDIR}/Images
+Library	ImageHorizonLibrary	reference_folder=${CURDIR}/Images 	confidence=0.9
 
 *** Variables ***
 ${IMAGE_DIR} 	${CURDIR}/../../Screenshots-doc/img
@@ -47,8 +47,8 @@ GUI Runs and Closes
 	# Capture Screen
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
-	Click Image 	Title Bar
-	Take A Screenshot
+	# Click Image 	Title Bar
+	# Take A Screenshot
 
 	Press Combination 	x 	Key.ctrl
 	${result}= 	Wait For Process 	Manager
