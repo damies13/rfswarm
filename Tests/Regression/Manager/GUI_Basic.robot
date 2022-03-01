@@ -21,7 +21,7 @@ GUI Runs and Closes
 	Take A Screenshot
 	# Wait Until Screen Contain 	rfwasrm_mac_Window_Controls.png 	60
 	# Make rfswarm Active
-	Type With Modifiers 	q 	CMD
+	Press Combination 	q 	Key.command
 	${result}= 	Wait For Process 	Manager
 	Should Be Equal As Integers 	${result.rc} 	0
 
@@ -33,7 +33,7 @@ GUI Runs and Closes
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
 
-	Type With Modifiers 	x 	CONTROL
+	Press Combination 	x 	Key.ctrl
 	${result}= 	Wait For Process 	Manager
 	Should Be Equal As Integers 	${result.rc} 	0
 
@@ -46,7 +46,7 @@ GUI Runs and Closes
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
 
-	Type With Modifiers 	x 	CONTROL
+	Press Combination 	x 	Key.ctrl
 	${result}= 	Wait For Process 	Manager
 	Should Be Equal As Integers 	${result.rc} 	0
 
