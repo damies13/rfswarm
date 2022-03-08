@@ -19,6 +19,7 @@ GUI Runs and Closes
 	Sleep 	60
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
+	Wait For 	Title Bar
 	Click Image 	Title Bar
 	Take A Screenshot
 	Press Combination 	q 	Key.command
@@ -32,6 +33,7 @@ GUI Runs and Closes
 	# Capture Screen
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
+	Wait For 	Title Bar
 	Click Image 	Title Bar
 	Take A Screenshot
 
@@ -47,6 +49,7 @@ GUI Runs and Closes
 	# Capture Screen
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
+	# Wait For 	Title Bar
 	# Click Image 	Title Bar
 	# Take A Screenshot
 
