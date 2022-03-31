@@ -443,7 +443,7 @@ rfswarm
 
 On Debian based systems this will probably work
 ```
-apt install python3-tk
+apt install python3-tk python3-pil python3-pil.imagetk
 ```
 
 Additionally the following pip command might be needed if these are not already installed on your system:
