@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #		Manager
-#    Version 0.6.4
+#    Version 1.0.0
 #
 
 # 	Helpful links
@@ -13,6 +13,8 @@ import sys
 import platform
 import signal
 import os
+import errno
+import tempfile
 import glob
 import configparser
 import hashlib
@@ -25,9 +27,10 @@ import math
 
 import socket
 import ipaddress
+import psutil
 import random
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 import re
 import threading
 import subprocess
@@ -39,20 +42,24 @@ import xml.etree.ElementTree as ET
 
 import inspect
 
-# import Tkinter as tk				#python2
 import tkinter as tk				#python3
-# import ttk						#python2
 import tkinter.ttk as ttk			#python3
-# import tkFileDialog as tkf		#python2
 import tkinter.filedialog as tkf	#python3
 import tkinter.messagebox as tkm	#python3
-
+import webbrowser
 
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer, HTTPServer
 import urllib.parse
 import json
 
 import argparse
+
+# required for matplot graphs
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+# required for matplot graphs
 
 
 __name__ = "rfswarm"
@@ -273,6 +280,7 @@ class AgentServer(BaseHTTPRequestHandler):
 						jsonresp["EndTime"] = base.run_end
 						jsonresp["RunName"] = base.robot_schedule["RunName"]
 						jsonresp["Abort"] = base.run_abort
+						jsonresp["UploadMode"] = base.uploadmode
 
 						# base.robot_schedule["Agents"]
 						if jsonresp["AgentName"] in base.robot_schedule["Agents"].keys():
@@ -285,7 +293,7 @@ class AgentServer(BaseHTTPRequestHandler):
 				if (parsed_path.path == "/Result"):
 					jsonreq = json.loads(rawData)
 					base.debugmsg(6, "Result: jsonreq:", jsonreq)
-					requiredfields = ["AgentName", "ResultName", "Result", "ElapsedTime", "StartTime", "EndTime", "ScriptIndex", "VUser", "Iteration", "Sequence"]
+					requiredfields = ["AgentName", "ResultName", "Result", "ElapsedTime", "StartTime", "EndTime", "ScriptIndex", "Iteration", "Sequence"]
 					for field in requiredfields:
 						if field not in jsonreq:
 							httpcode = 422
@@ -293,13 +301,18 @@ class AgentServer(BaseHTTPRequestHandler):
 							base.debugmsg(5, httpcode, ":", message)
 							break
 
+					if "Robot" not in jsonreq:
+						jsonreq["Robot"] = 0
+						if "VUser" in jsonreq:
+							jsonreq["Robot"] = jsonreq["VUser"]
+
 					if httpcode == 200:
 						base.debugmsg(7, "Result: httpcode:", httpcode)
 						jsonresp["AgentName"] = jsonreq["AgentName"]
 
 						core.register_result(jsonreq["AgentName"], jsonreq["ResultName"], jsonreq["Result"],
 									jsonreq["ElapsedTime"], jsonreq["StartTime"], jsonreq["EndTime"],
-									jsonreq["ScriptIndex"], jsonreq["VUser"], jsonreq["Iteration"],
+									jsonreq["ScriptIndex"], jsonreq["Robot"], jsonreq["Iteration"],
 									jsonreq["Sequence"])
 
 						jsonresp["Result"] = "Queued"
@@ -346,7 +359,7 @@ class AgentServer(BaseHTTPRequestHandler):
 		self.wfile.write(bytes(message,"utf-8"))
 		threadend = time.time()
 		# base.debugmsg(5, parsed_path.path, "	threadstart:", "%.3f" % threadstart, "threadend:", "%.3f" % threadend, "Time Taken:", "%.3f" % (threadend-threadstart))
-		base.debugmsg(5, "%.3f" % (threadend-threadstart), "seconds for ", parsed_path.path)
+		base.debugmsg(7, "%.3f" % (threadend-threadstart), "seconds for ", parsed_path.path)
 		return
 	def do_GET(self):
 		threadstart = time.time()
@@ -395,7 +408,7 @@ class AgentServer(BaseHTTPRequestHandler):
 				jsonresp["POST"]["Result"]["Body"]["StartTime"] = "<epoch seconds as decimal number>"
 				jsonresp["POST"]["Result"]["Body"]["EndTime"] = "<epoch seconds as decimal number>"
 				jsonresp["POST"]["Result"]["Body"]["ScriptIndex"] = "<Index>"
-				jsonresp["POST"]["Result"]["Body"]["VUser"] = "<user number>"
+				jsonresp["POST"]["Result"]["Body"]["Robot"] = "<user number>"
 				jsonresp["POST"]["Result"]["Body"]["Iteration"] = "<iteration number>"
 				jsonresp["POST"]["Result"]["Body"]["Sequence"] = "<sequence number that ResultName occurred in test case>"
 
@@ -443,7 +456,7 @@ class AgentServer(BaseHTTPRequestHandler):
 
 
 class RFSwarmBase:
-	version="0.6.4"
+	version="1.0.0"
 	debuglvl = 0
 
 	config = None
@@ -456,6 +469,8 @@ class RFSwarmBase:
 	scriptfiles = {}
 	scriptgrpend = {}
 
+	uploadmodes = {'imm':"Immediately", 'err':"On Error Only", 'def':"All Deferred"}
+	uploadmode = "err" 	# modes are imm, err, def
 	uploadfiles = {}
 
 	index = ""
@@ -464,15 +479,16 @@ class RFSwarmBase:
 
 
 	run_abort = False
-	run_name = ""
+	run_name = "PreRun"
 	run_name_current = ""
+	run_starttime = 0
 	run_start = 0
 	run_end = 0
 	run_finish = 0
 	run_paused = False
 	run_threads = {}
 	total_robots = 0
-	robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}}
+	robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}, "Start":0}
 	agentserver = None
 	agenthttpserver = None
 	updatethread = None
@@ -488,14 +504,20 @@ class RFSwarmBase:
 	datapath = ""
 	dbfile = ""
 	datadb = None
+	dbready = False
 	dbqueue = {"Write": [], "Read": [], "ReadResult": {}, "Results": [], "Metric": [], "Metrics": []}
 	MetricIDs = {}
 	scriptfilters = [""]
 
 	# #000000 = Black
-	defcolours = ['#000000']
+	# https://www.schemecolor.com/traffic-red-yellow-green.php
+	defcolours = ['#000000', '#008450', '#B81D13', '#EFB700', '#888888']
+	namecolours = ['total', 'pass', 'fail', 'warning', 'not run']
+
+	darkmode = False
 
 	appstarted = False
+	keeprunning = True 		# this should only be changed by onclosing
 
 	args = None
 
@@ -509,11 +531,67 @@ class RFSwarmBase:
 
 
 
+
+	def findiniloctaion(self):
+
+		if self.args.ini:
+			self.debugmsg(1, "self.args.ini: ", self.args.ini)
+			return self.args.ini
+
+		inilocations = []
+
+		srcdir = os.path.join(os.path.dirname(__file__))
+		self.debugmsg(7, "srcdir[-2]: ", srcdir[-2:])
+		if srcdir[-2:] == "/.":
+			srcdir = srcdir[0:-2]
+		self.debugmsg(7, "srcdir: ", srcdir)
+
+		inifilename = "RFSwarmManager.ini"
+		# default location for all previous versions
+		inilocations.append(os.path.join(srcdir, inifilename))
+		# probably best location
+		inilocations.append(os.path.join(os.path.expanduser("~"), ".rfswarm", inifilename))
+		# last resort location
+		inilocations.append(os.path.join(tempfile.gettempdir(), inifilename))
+
+		self.debugmsg(6, "inilocations: ", inilocations)
+
+
+		for iniloc in inilocations:
+			self.debugmsg(7, "iniloc: ", iniloc)
+			if os.path.isfile(iniloc):
+				self.debugmsg(7, "iniloc exists")
+				return iniloc
+			else:
+				# can we write to this location?
+				# 	if anything in the try statement fails then we can't so progress to next location
+				self.debugmsg(7, "iniloc can be created?")
+				try:
+					loc = os.path.dirname(iniloc)
+					self.debugmsg(7, "loc: ", loc)
+					self.debugmsg(7, "loc isdir:", os.path.isdir(loc))
+					if not os.path.isdir(loc):
+						self.debugmsg(7, "creating loc")
+						os.makedirs(loc)
+						self.debugmsg(7, "loc created")
+
+					self.debugmsg(7, "os.access(loc): ", os.access(loc, os.X_OK | os.W_OK))
+					if os.access(loc, os.X_OK | os.W_OK):
+						self.debugmsg(7, "iniloc can be created!")
+						return iniloc
+				except:
+					pass
+		# This should cause saveini to fail?
+		return None
+
+
+
 	def debugmsg(self, lvl, *msg):
 		msglst = []
 		prefix = ""
 		if self.debuglvl >= lvl:
 			try:
+				suffix = ""
 				if self.debuglvl >= 4:
 					stack = inspect.stack()
 					the_class = stack[1][0].f_locals["self"].__class__.__name__
@@ -536,8 +614,13 @@ class RFSwarmBase:
 
 					msglst.append(str(prefix))
 
+					# suffix = "	[{} @{}]".format(self.version, str(datetime.now().replace(microsecond=0).isoformat(sep=' ')))
+					suffix = "	[{} @{}]".format(self.version, str(datetime.now().isoformat(sep=' ', timespec='seconds')))
+					# suffix = "	[{} @{}]".format(self.version, "HH:mm:SS")
+
 				for itm in msg:
 					msglst.append(str(itm))
+				msglst.append(str(suffix))
 				print(" ".join(msglst))
 			except:
 				pass
@@ -571,7 +654,7 @@ class RFSwarmBase:
 					base.debugmsg(9, "run_db_thread: dbqueue: Results")
 					resdata = list(base.dbqueue["Results"])
 					base.dbqueue["Results"] = []
-					base.debugmsg(9, "run_db_thread: dbqueue: Results: resdata:", resdata)
+					base.debugmsg(7, "dbqueue: Results: resdata:", resdata)
 					try:
 						sql = "INSERT INTO Results VALUES (?,?,?,?,?,?,?,?,?,?)"
 						cur = self.datadb.cursor()
@@ -590,7 +673,7 @@ class RFSwarmBase:
 					base.dbqueue["Metric"] = []
 					base.debugmsg(9, "run_db_thread: dbqueue: Metric: resdata:", resdata)
 					try:
-						sql = "INSERT OR IGNORE INTO Metric VALUES (?,?)"
+						sql = "INSERT OR IGNORE INTO Metric VALUES (?,?,?)"
 						cur = self.datadb.cursor()
 						cur.executemany(sql, resdata)
 						cur.close()
@@ -682,12 +765,15 @@ class RFSwarmBase:
 			if base.run_name != base.run_name_current:
 				base.run_name_current = base.run_name
 				createschema = True
+				base.dbready = False
+				self.MetricIDs = {}
 
 			if createschema and self.datadb is not None:
 				base.debugmsg(5, "Disconnect and close DB")
 				self.datadb.commit()
 				self.datadb.close()
 				self.datadb = None
+				self.MetricIDs = {}
 
 			# check if dir exists
 			base.debugmsg(5, "dir_path:", base.dir_path)
@@ -698,23 +784,38 @@ class RFSwarmBase:
 			self.resultsdir = base.config['Run']['ResultsDir']
 
 			if not os.path.exists(self.resultsdir):
-				os.mkdir(self.resultsdir)
+				try:
+					os.mkdir(self.resultsdir)
+				except Exception as e:
+					if not os.path.exists(self.resultsdir):
+						base.debugmsg(0, "Unable to create resultsdir:", self.resultsdir, "\n", str(e))
+						core.on_closing()
+
 			base.datapath = os.path.join(self.resultsdir, base.run_name)
 			base.debugmsg(1, "datapath:", base.datapath)
 			if not os.path.exists(base.datapath):
-				os.mkdir(base.datapath)
+				try:
+					os.mkdir(base.datapath)
+				except Exception as e:
+					if not os.path.exists(self.datapath):
+						base.debugmsg(0, "Unable to create datapath:", self.datapath, "\n", str(e))
+						core.on_closing()
 
 			# check if db exists
 			self.dbfile = os.path.join(base.datapath, "{}.db".format(base.run_name))
 			base.debugmsg(5, "dbfile:", self.dbfile)
 			if not os.path.exists(self.dbfile):
 				createschema = True
+				base.dbready = False
+			else:
+				createschema = False
 
 			if self.datadb is None:
 				base.debugmsg(5, "Connect to DB")
 				self.datadb = sqlite3.connect(self.dbfile)
 				self.datadb.create_aggregate("percentile", 2, percentile)
 				self.datadb.create_aggregate("stdev", 1, stdevclass)
+				self.MetricIDs = {}
 
 			if createschema:
 				base.debugmsg(5, "Create Schema")
@@ -722,10 +823,10 @@ class RFSwarmBase:
 				# create tables
 
 				c.execute('''CREATE TABLE Results
-					(script_index int, virtual_user int, iteration int, agent text, sequence int, result_name text, result text, elapsed_time num, start_time num, end_time num)''')
+					(script_index int, robot int, iteration int, agent text, sequence int, result_name text, result text, elapsed_time num, start_time num, end_time num)''')
 
 				c.execute('''CREATE TABLE Metric
-					(Name TEXT NOT NULL, Type TEXT NOT NULL, PRIMARY KEY("Name"))''')
+					(ID INTEGER, Name TEXT NOT NULL, Type TEXT NOT NULL, PRIMARY KEY("ID"))''')
 
 				c.execute('''CREATE TABLE Metrics
 					(ParentID INTEGER NOT NULL, Time INTEGER NOT NULL, Key TEXT NOT NULL, Value TEXT)''')
@@ -733,7 +834,15 @@ class RFSwarmBase:
 
 				# create indexes?
 				c.execute('''
+				CREATE INDEX "idx_metric_name" ON "Metric" ("Name"	ASC)
+				''')
+
+				c.execute('''
 				CREATE INDEX "idx_metric_type" ON "Metric" ("Type"	ASC)
+				''')
+
+				c.execute('''
+				CREATE INDEX "idx_metric_name_type" ON "Metric" ("Name"	ASC, "Type"	ASC)
 				''')
 
 				c.execute('''
@@ -784,14 +893,14 @@ class RFSwarmBase:
 					a.Name "AgentName"
 					, s.Value "AgentStatus"
 					, max(s.Time) as "AgentLastSeen"
-						, (Select ra.Value from Metrics ra where ra.ParentID = a.ROWID and ra.Key = "AssignedRobots"  and ra.Time = s.Time) "AgentAssigned"
-						, (Select r.Value from Metrics r where r.ParentID = a.ROWID and r.Key = "Robots"  and r.Time = s.Time) "AgentRobots"
-						, (Select max(l.Value) from Metrics l where l.ParentID = a.ROWID and l.Key = "Load"  and l.Time = s.Time) "AgentLoad"
-						, (Select max(c.Value) from Metrics c where c.ParentID = a.ROWID and c.Key = "CPU"  and c.Time = s.Time) "AgentCPU"
-						, (Select max(m.Value) from Metrics m where m.ParentID = a.ROWID and m.Key = "MEM"  and m.Time = s.Time) "AgentMEM"
-						, (Select max(n.Value) from Metrics n where n.ParentID = a.ROWID and n.Key = "NET"  and n.Time = s.Time) "AgentNET"
+						, (Select ra.Value from Metrics ra where ra.ParentID = a.ID and ra.Key = "AssignedRobots"  and ra.Time = s.Time) "AgentAssigned"
+						, (Select r.Value from Metrics r where r.ParentID = a.ID and r.Key = "Robots"  and r.Time = s.Time) "AgentRobots"
+						, (Select max(l.Value) from Metrics l where l.ParentID = a.ID and l.Key = "Load"  and l.Time = s.Time) "AgentLoad"
+						, (Select max(c.Value) from Metrics c where c.ParentID = a.ID and c.Key = "CPU"  and c.Time = s.Time) "AgentCPU"
+						, (Select max(m.Value) from Metrics m where m.ParentID = a.ID and m.Key = "MEM"  and m.Time = s.Time) "AgentMEM"
+						, (Select max(n.Value) from Metrics n where n.ParentID = a.ID and n.Key = "NET"  and n.Time = s.Time) "AgentNET"
 				from Metric a
-					left join Metrics s on s.ParentID = a.ROWID and s.Key = "Status"
+					left join Metrics s on s.ParentID = a.ID and s.Key = "Status"
 				where a.Type = "Agent"
 				GROUP by s.ParentID
 				ORDER by a.Name
@@ -826,14 +935,14 @@ class RFSwarmBase:
 					a.Name "AgentName"
 					, s.Value "AgentStatus"
 					, max(s.Time) as "AgentLastSeen"
-						, (Select ra.Value from Metrics ra where ra.ParentID = a.ROWID and ra.Key = "AssignedRobots"  and ra.Time = s.Time) "AgentAssigned"
-						, (Select r.Value from Metrics r where r.ParentID = a.ROWID and r.Key = "Robots"  and r.Time = s.Time) "AgentRobots"
-						, (Select max(l.Value) from Metrics l where l.ParentID = a.ROWID and l.Key = "Load"  and l.Time = s.Time) "AgentLoad"
-						, (Select max(c.Value) from Metrics c where c.ParentID = a.ROWID and c.Key = "CPU"  and c.Time = s.Time) "AgentCPU"
-						, (Select max(m.Value) from Metrics m where m.ParentID = a.ROWID and m.Key = "MEM"  and m.Time = s.Time) "AgentMEM"
-						, (Select max(n.Value) from Metrics n where n.ParentID = a.ROWID and n.Key = "NET"  and n.Time = s.Time) "AgentNET"
+						, (Select ra.Value from Metrics ra where ra.ParentID = a.ID and ra.Key = "AssignedRobots"  and ra.Time = s.Time) "AgentAssigned"
+						, (Select r.Value from Metrics r where r.ParentID = a.ID and r.Key = "Robots"  and r.Time = s.Time) "AgentRobots"
+						, (Select max(l.Value) from Metrics l where l.ParentID = a.ID and l.Key = "Load"  and l.Time = s.Time) "AgentLoad"
+						, (Select max(c.Value) from Metrics c where c.ParentID = a.ID and c.Key = "CPU"  and c.Time = s.Time) "AgentCPU"
+						, (Select max(m.Value) from Metrics m where m.ParentID = a.ID and m.Key = "MEM"  and m.Time = s.Time) "AgentMEM"
+						, (Select max(n.Value) from Metrics n where n.ParentID = a.ID and n.Key = "NET"  and n.Time = s.Time) "AgentNET"
 				from Metric a
-					left join Metrics s on s.ParentID = a.ROWID and s.Key = "Status"
+					left join Metrics s on s.ParentID = a.ID and s.Key = "Status"
 				where a.Type = "Agent"
 				group by a.ROWID, s.Time
 				ORDER by a.Name, s.Time
@@ -868,17 +977,17 @@ class RFSwarmBase:
 				SELECT
 					a.Name
 					, max(e.Time) as "_EntryTime"
-					, (Select mn.Value from Metrics mn where mn.ParentID = a.ROWID and mn.Key like "min%" and e.Time = mn.Time ) "Min"
-					, (Select av.Value from Metrics av where av.ParentID = a.ROWID and av.Key = "avg" and e.Time = av.Time ) "Average"
-					, (Select sd.Value from Metrics sd where sd.ParentID = a.ROWID and sd.Key like "stDev%" and e.Time = sd.Time ) "StDev"
-					, (Select pct.Key from Metrics pct where pct.ParentID = a.ROWID and pct.Key like "%ile" and e.Time = pct.Time ) "%ile_Key"
-					, (Select pct.Value from Metrics pct where pct.ParentID = a.ROWID and pct.Key like "%ile" and e.Time = pct.Time ) "%ile_Value"
-					, (Select mx.Value from Metrics mx where mx.ParentID = a.ROWID and mx.Key like "max%" and e.Time = mx.Time ) "Max"
-					, (Select ps.Value from Metrics ps where ps.ParentID = a.ROWID and ps.Key like "_pass%" and e.Time = ps.Time ) "Pass"
-					, (Select fl.Value from Metrics fl where fl.ParentID = a.ROWID and fl.Key like "_fail%" and e.Time = fl.Time ) "Fail"
-					, (Select ot.Value from Metrics ot where ot.ParentID = a.ROWID and ot.Key like "_other%" and e.Time = ot.Time ) "Other"
+					, (Select mn.Value from Metrics mn where mn.ParentID = a.ID and mn.Key like "min%" and e.Time = mn.Time ) "Min"
+					, (Select av.Value from Metrics av where av.ParentID = a.ID and av.Key = "avg" and e.Time = av.Time ) "Average"
+					, (Select sd.Value from Metrics sd where sd.ParentID = a.ID and sd.Key like "stDev%" and e.Time = sd.Time ) "StDev"
+					, (Select pct.Key from Metrics pct where pct.ParentID = a.ID and pct.Key like "%ile" and e.Time = pct.Time ) "%ile_Key"
+					, (Select pct.Value from Metrics pct where pct.ParentID = a.ID and pct.Key like "%ile" and e.Time = pct.Time ) "%ile_Value"
+					, (Select mx.Value from Metrics mx where mx.ParentID = a.ID and mx.Key like "max%" and e.Time = mx.Time ) "Max"
+					, (Select ps.Value from Metrics ps where ps.ParentID = a.ID and ps.Key like "_pass%" and e.Time = ps.Time ) "Pass"
+					, (Select fl.Value from Metrics fl where fl.ParentID = a.ID and fl.Key like "_fail%" and e.Time = fl.Time ) "Fail"
+					, (Select ot.Value from Metrics ot where ot.ParentID = a.ID and ot.Key like "_other%" and e.Time = ot.Time ) "Other"
 				from Metric a
-					left join Metrics e on e.ParentID = a.ROWID and e.Key = "EntryTime"
+					left join Metrics e on e.ParentID = a.ID and e.Key = "EntryTime"
 				where a.Type = "Summary"
 				GROUP by a.ROWID
 				ORDER by a.ROWID
@@ -919,12 +1028,13 @@ class RFSwarmBase:
 					, ms.Key "SecondaryMetric"
 					, ms.Value "MetricValue"
 				FROM Metric as m
-				JOIN Metrics ms on m.ROWID = ms.ParentID
+				JOIN Metrics ms on m.ID = ms.ParentID
 				''')
 
 
 
 				self.datadb.commit()
+				base.dbready = True
 
 	def PrettyColName(self, colname):
 		base.debugmsg(8, "PrettyColName: colname:", colname)
@@ -947,18 +1057,35 @@ class RFSwarmBase:
 
 		return newcolname
 
+	def named_colour(self, name):
+		if name.lower() not in base.namecolours:
+			base.namecolours.append(name.lower())
+		return self.line_colour(base.namecolours.index(name.lower()))
+
 	def line_colour(self, grp):
 		if grp<len(base.defcolours):
 			return base.defcolours[grp]
 		else:
-			newcolour = self.make_colour()
+			newcolour = self.get_colour()
 			base.debugmsg(9, "Initial newcolour:", newcolour)
 			while newcolour in base.defcolours:
 				base.debugmsg(9, base.defcolours)
-				newcolour = self.make_colour()
+				newcolour = self.get_colour()
 				base.debugmsg(9, "newcolour:", newcolour)
 			base.defcolours.append(newcolour)
 			return newcolour
+
+	def get_colour(self):
+		newcolour = self.make_colour()
+		if self.darkmode:
+			while self.dl_score(newcolour) < -300:
+				newcolour = self.make_colour()
+			return newcolour
+		else:
+			while self.dl_score(newcolour) > 300:
+				newcolour = self.make_colour()
+			return newcolour
+
 
 	def make_colour(self):
 		hexchr = ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f']
@@ -969,6 +1096,29 @@ class RFSwarmBase:
 		b1 = hexchr[random.randrange(len(hexchr))]
 		b2 = hexchr[random.randrange(len(hexchr))]
 		return "#{}{}{}{}{}{}".format(r1,r2,g1,g2,b1,b2)
+
+	def dl_score(self, colour):
+		# darkness / lightness score
+		self.debugmsg(8, "colour:", colour)
+		m = re.search('\#(.?.?)(.?.?)(.?.?)', colour)
+		self.debugmsg(9, "m:", m)
+		self.debugmsg(9, "m 1:", m[1], int(m[1], 16))
+		self.debugmsg(9, "m 2:", m[2], int(m[2], 16))
+		self.debugmsg(9, "m 3:", m[3], int(m[3], 16))
+		r = int(m[1], 16) - 128
+		g = int(m[2], 16) - 128
+		b = int(m[3], 16) - 128
+
+		self.debugmsg(8, "r:", r, " 	g:", g, " 	b:", b)
+		score = r + g + b
+
+		# if score>300:
+		# 	self.debugmsg(7, "very light? score:", score)
+		#
+		# if score<-300:
+		# 	self.debugmsg(7, "very dark? score:", score)
+
+		return score
 
 	def format_sec(self, sec_in):
 		if sec_in>3599:
@@ -986,7 +1136,43 @@ class RFSwarmBase:
 			return "{}".format(mins)
 		return "{}".format(sec_in)
 
+	def format_sec_remain(self, sec_in):
+		if sec_in>3599:
+			hrs = int(sec_in/3600)
+			mins = int(sec_in/60) - (hrs*60)
+			secs = sec_in - (((hrs*60) + mins) * 60)
+			return "{}:{:02}:{:02}".format(hrs, mins, secs)
+		if sec_in>59:
+			mins = int(sec_in/60)
+			secs = sec_in - (mins * 60)
+			return "{}:{:02}".format(mins, secs)
+		return "0:{:02}".format(sec_in)
+
+	def parse_time(self, stime_in):
+		base.debugmsg(9, "stime_in:", stime_in)
+		tarr = stime_in.split(":")
+		base.debugmsg(9, "tarr:", tarr)
+		n = datetime.now()
+		st = datetime(n.year, n.month, n.day, int(tarr[0]))
+		if len(tarr) == 2:
+			st = datetime(n.year, n.month, n.day, int(tarr[0]), int(tarr[1]))
+		if len(tarr) == 3:
+			st = datetime(n.year, n.month, n.day, int(tarr[0]), int(tarr[1]), int(tarr[2]))
+
+		if int(st.timestamp()) < int(n.timestamp()):
+			st = datetime(n.year, n.month, n.day+1, int(tarr[0]))
+			if len(tarr) == 2:
+				st = datetime(n.year, n.month, n.day+1, int(tarr[0]), int(tarr[1]))
+			if len(tarr) == 3:
+				st = datetime(n.year, n.month, n.day+1, int(tarr[0]), int(tarr[1]), int(tarr[2]))
+
+		base.debugmsg(8, "st:", st, "	", int(st.timestamp()))
+		return int(st.timestamp())
+
+
 	def hash_file(self, file, relpath):
+		if not (os.path.exists(file) and os.path.isfile(file)):
+			raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), file)
 		BLOCKSIZE = 65536
 		hasher = hashlib.md5()
 		hasher.update(str(os.path.getmtime(file)).encode('utf-8'))
@@ -1066,45 +1252,70 @@ class RFSwarmBase:
 		checking = False
 
 		# determine if is a robot file
-		base.debugmsg(8, "RFSwarmCore: find_dependancies", self.scriptfiles[hash])
+		base.debugmsg(8, "scriptfiles[",hash,"]", self.scriptfiles[hash])
 		localpath = self.scriptfiles[hash]['localpath']
 		localdir = os.path.dirname(localpath)
-		base.debugmsg(9, "RFSwarmCore: find_dependancies: localdir", localdir)
+		# look for __init__. files - Issue #90
+		initfiles = os.path.abspath(os.path.join(localdir, "__init__.*"))
+		base.debugmsg(7, "initfiles", initfiles)
+		filelst = glob.glob(initfiles)
+		for file in filelst:
+			base.debugmsg(7, "file:", file)
+			relpath = file.replace(localdir, "")[1:]
+			base.debugmsg(7, "relpath:", relpath)
+			newhash = self.hash_file(file, relpath)
+			base.debugmsg(7, "newhash:", newhash)
+			if newhash not in self.scriptfiles:
+				self.scriptfiles[newhash] = {
+						'id': newhash,
+						'localpath': file,
+						'relpath': relpath,
+						'type': "Initialization"
+					}
+				filename, fileext = os.path.splitext(file)
+				# splitext leaves the . on the extention, the list below needs to have the extentions
+				# starting with a . - Issue #94
+				if fileext.lower() in ['.robot', '.resource']:
+					t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
+					t.start()
+
+		base.debugmsg(7, "localdir", localdir)
 		filename, fileext = os.path.splitext(localpath)
 
-		base.debugmsg(9, "RFSwarmCore: find_dependancies: filename, fileext:", filename, fileext)
+		base.debugmsg(7, "filename, fileext:", filename, fileext)
 
-		if (fileext in [".robot", ".Robot"] and keep_going):
-			with open(localpath, 'rb') as afile:
-				for fline in afile:
-					line = fline.decode("utf-8")
+		# splitext leaves the . on the extention, the list below needs to have the extentions
+		# starting with a . - Issue #94
+		if (fileext.lower() in ['.robot', '.resource'] and keep_going):
+			with open(localpath, 'r', encoding="utf8") as afile:
+				for line in afile:
 					if checking and '*** ' in line:
 						checking = False
 
 					if checking:
-						base.debugmsg(9, "RFSwarmCore: find_dependancies: line", line)
+						base.debugmsg(9, "line", line)
 						try:
 							if line.strip()[:1] != "#":
 								linearr = line.strip().split()
-								base.debugmsg(7, "find_dependancies: linearr", linearr)
+								base.debugmsg(7, "linearr", linearr)
 								resfile = None;
 								if len(linearr)>1 and linearr[0].upper() in ['RESOURCE','VARIABLES','LIBRARY']:
-									base.debugmsg(9, "find_dependancies: linearr[1]", linearr[1])
+									base.debugmsg(9, "linearr[1]", linearr[1])
 									resfile = linearr[1]
 								if not resfile and len(linearr)>2 and (linearr[0].upper() == 'METADATA' and linearr[1].upper() == 'FILE'):
-									base.debugmsg(9, "find_dependancies: linearr[2]", linearr[2])
+									base.debugmsg(9, "linearr[2]", linearr[2])
 									resfile = linearr[2]
 								if not resfile and len(linearr)>2 and (linearr[0].upper() == 'IMPORT' and linearr[1].upper() == 'LIBRARY'):
-									base.debugmsg(9, "find_dependancies: linearr[2]", linearr[2])
+									base.debugmsg(9, "linearr[2]", linearr[2])
 									resfile = linearr[2]
 								if resfile:
-									base.debugmsg(7, "find_dependancies: resfile", resfile)
+									base.debugmsg(7, "resfile", resfile)
 									# here we are assuming the resfile is a relative path! should we also consider files with full local paths?
 									localrespath = os.path.abspath(os.path.join(localdir, resfile))
-									base.debugmsg(8, "find_dependancies: localrespath", localrespath)
+									base.debugmsg(8, "localrespath", localrespath)
 									if os.path.isfile(localrespath):
 										newhash = self.hash_file(localrespath, resfile)
-										base.debugmsg(9, "find_dependancies: newhash", newhash)
+										base.debugmsg(7, "newhash", newhash)
 										self.scriptfiles[newhash] = {
 												'id': newhash,
 												'localpath': localrespath,
@@ -1118,11 +1329,11 @@ class RFSwarmBase:
 									else:
 										filelst = glob.glob(localrespath)
 										for file in filelst:
-											base.debugmsg(9, "find_dependancies: file", file)
+											base.debugmsg(9, "file", file)
 											relpath = file.replace(localdir, "")[1:]
-											base.debugmsg(9, "find_dependancies: relpath", relpath)
+											base.debugmsg(9, "relpath", relpath)
 											newhash = self.hash_file(file, relpath)
-											base.debugmsg(9, "find_dependancies: newhash", newhash)
+											base.debugmsg(9, "newhash", newhash)
 											self.scriptfiles[newhash] = {
 													'id': newhash,
 													'localpath': file,
@@ -1131,14 +1342,14 @@ class RFSwarmBase:
 												}
 
 						except Exception as e:
-							base.debugmsg(6, "find_dependancies: line", line)
-							base.debugmsg(6, "find_dependancies: Exception", e)
-							base.debugmsg(6, "find_dependancies: linearr", linearr)
+							base.debugmsg(6, "line", line)
+							base.debugmsg(6, "Exception", e)
+							base.debugmsg(6, "linearr", linearr)
 
 					# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
 					match = re.search('\*+([^*\v]+)', line)
 					if match is not None:
-						base.debugmsg(6, "find_dependancies: match.group(0)", match.group(1))
+						base.debugmsg(6, "match.group(0)", match.group(1))
 						if match.group(1).strip().upper() in ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD']:
 							checking = True
 
@@ -1257,7 +1468,7 @@ class RFSwarmBase:
 	def saveini(self):
 		self.debugmsg(6, "save_ini:", self.save_ini)
 		if self.save_ini:
-			with open(base.manager_ini, 'w') as configfile:    # save
+			with open(base.manager_ini, 'w', encoding="utf8") as configfile:    # save
 				base.config.write(configfile)
 				self.debugmsg(6, "File Saved:", self.manager_ini)
 
@@ -1384,7 +1595,7 @@ class RFSwarmBase:
 		base.scriptlist[base.scriptcount]["Index"] = base.scriptcount
 
 		num = "10"
-		base.scriptlist[base.scriptcount]["Users"] = int(num)
+		base.scriptlist[base.scriptcount]["Robots"] = int(num)
 
 		num = "0"
 		base.scriptlist[base.scriptcount]["Delay"] = int(num)
@@ -1470,70 +1681,19 @@ class RFSwarmBase:
 		RunStats = base.dbqueue["ReadResult"]["RunStats"]
 		base.debugmsg(7, "RunStats:", RunStats)
 
-
-		# Save Metric Data
-		# 	First ensure a metric for this agent exists
-		if "Summary" not in base.MetricIDs:
-			base.MetricIDs["Summary"] = {}
-
-		for stat in RunStats:
-			base.debugmsg(7, "stat:", stat)
-			statname = stat["result_name"]
-			if statname not in base.MetricIDs["Summary"]:
-				# create the agent metric
-				base.dbqueue["Metric"].append( (statname, "Summary") )
-
-				# get the agent metric id
-				base.debugmsg(7, "statname:", statname)
-				safestatname = statname.replace('"', r'""')
-				sql = 'select ROWID from Metric where Name = "'+safestatname+'"'
-				base.debugmsg(7, "sql:", sql)
-				base.dbqueue["Read"].append({"SQL": sql, "KEY": "Metric_"+statname})
-
-
+		m_Time = int(time.time())
 		# Read Metric ID's
 		for stat in RunStats:
 			base.debugmsg(7, "stat:", stat)
 			statname = stat["result_name"]
-			if statname not in base.MetricIDs["Summary"]:
-				if "Read" in base.dbqueue:
-					base.debugmsg(7, "Read", base.dbqueue["Read"])
-				if "ReadResult" in base.dbqueue:
-					base.debugmsg(7, "ReadResult", base.dbqueue["ReadResult"])
-				base.debugmsg(7, "Wait for Metric_"+statname)
-				while "Metric_"+statname not in base.dbqueue["ReadResult"]:
-					time.sleep(0.1)
-					base.debugmsg(9, "Waiting for Metric_"+statname)
-				if "ReadResult" in base.dbqueue:
-					base.debugmsg(7, "ReadResult", base.dbqueue["ReadResult"])
-				base.debugmsg(7, "Wait for Metric_"+statname+">0")
-				while len(base.dbqueue["ReadResult"]["Metric_"+statname])<1:
-					time.sleep(0.1)
-					base.debugmsg(9, "Waiting for Metric_"+statname+">0")
 
-				if "Metric_"+statname in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["Metric_"+statname])>0:
-					base.debugmsg(7, "Metric_"+statname+":", base.dbqueue["ReadResult"]["Metric_"+statname])
+			base.save_metrics(statname, "Summary", m_Time, "EntryTime", m_Time)
 
-					base.MetricIDs["Summary"][statname] = base.dbqueue["ReadResult"]["Metric_"+statname][0]["rowid"]
-					base.debugmsg(7, "MetricIDs[Summary]:", base.MetricIDs["Summary"])
+			for stati in stat:
+				base.debugmsg(7, "stati:", stati, "	stat[stati]:", stat[stati])
+				if stati != "result_name":
+					base.save_metrics(statname, "Summary", m_Time, stati, stat[stati])
 
-			# Next save the Metrics
-			if statname in base.MetricIDs["Summary"]:
-				m_StatID = base.MetricIDs["Summary"][statname]
-				m_Time = int(time.time())
-				base.debugmsg(7, "m_StatID:", m_StatID, "	m_Time:", m_Time)
-
-				base.dbqueue["Metrics"].append( (m_StatID, m_Time, "EntryTime", m_Time) )
-
-				# stat: {'result_name': "Opening url 'http://opencart3/'", 'min': 0.411,
-				# 			'avg': 0.439, '90%ile': None, 'max': 0.467, 'stDev': 0.04,
-				# 			'_pass': 2, '_fail': 0, '_other': 0}
-
-				for stati in stat:
-					base.debugmsg(7, "stati:", stati, "	stat[stati]:", stat[stati])
-					if stati != "result_name":
-						base.dbqueue["Metrics"].append( (m_StatID, m_Time, stati, stat[stati]) )
-						base.debugmsg(7, "Saving m_StatID:", m_StatID, "	m_Time:", m_Time, "	stati:", stati, "	stat[stati]:", stat[stati])
 
 
 
@@ -1586,7 +1746,7 @@ class RFSwarmBase:
 				base.debugmsg(9, "colno:", colno, "col:", col)
 				cols.append (base.PrettyColName(col))
 			base.debugmsg(9, "cols:", cols)
-			with open(txtreport, 'w', newline='') as csvfile:
+			with open(txtreport, 'w', newline='', encoding="utf8") as csvfile:
 				writer = csv.writer(csvfile, dialect='excel')
 				writer.writerow(cols)
 				for row in base.dbqueue["ReadResult"]["RunStats"]:
@@ -1617,7 +1777,7 @@ class RFSwarmBase:
 				base.debugmsg(9, "UpdateRunStats: colno:", colno, "col:", col)
 				cols.append (base.PrettyColName(col))
 			base.debugmsg(9, "cols:", cols)
-			with open(txtreport, 'w', newline='') as csvfile:
+			with open(txtreport, 'w', newline='', encoding="utf8") as csvfile:
 				# writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 				writer = csv.writer(csvfile, dialect='excel')
 				writer.writerow(cols)
@@ -1647,7 +1807,7 @@ class RFSwarmBase:
 				base.debugmsg(9, "colno:", colno, "col:", col)
 				cols.append (base.PrettyColName(col))
 			base.debugmsg(9, "cols:", cols)
-			with open(txtreport, 'w', newline='') as csvfile:
+			with open(txtreport, 'w', newline='', encoding="utf8") as csvfile:
 				# writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 				writer = csv.writer(csvfile, dialect='excel')
 				writer.writerow(cols)
@@ -1655,64 +1815,43 @@ class RFSwarmBase:
 					rowdata = row.values()
 					writer.writerow(rowdata)
 
-	def report_html(self, _event=None):
-		print("report_html")
-		if not base.args.nogui:
-			tkm.showwarning("RFSwarm - Warning", "Generating HTML Reports not implimented yet")
-		else:
-			base.debugmsg(1, "RFSwarm - Warning", "Generating HTML Reports not implimented yet")
-
-	def report_word(self, _event=None):
-		print("report_word")
-		if not base.args.nogui:
-			tkm.showwarning("RFSwarm - Warning", "Generating Word Reports not implimented yet")
-		else:
-			base.debugmsg(1, "RFSwarm - Warning", "Generating Word Reports not implimented yet")
-
-
 	def create_metric(self, MetricName, MetricType):
 		# Save Metric Data
 		# 	First ensure a metric for this agent exists
+		if "MetricCount" not in self.MetricIDs:
+			self.MetricIDs["MetricCount"] = 0
 		if MetricType not in self.MetricIDs:
 			self.MetricIDs[MetricType] = {}
 		if MetricName not in self.MetricIDs[MetricType]:
+			self.MetricIDs["MetricCount"] += 1
+			MetricCount = int(self.MetricIDs["MetricCount"])
+			self.MetricIDs[MetricType][MetricName] = {}
+			MetricID = int(time.time()) + MetricCount
+			self.MetricIDs[MetricType][MetricName]["ID"] = MetricID
 			# create the agent metric
-			self.dbqueue["Metric"].append( (MetricName, MetricType) )
-			# get the agent metric id
-			sql = 'select ROWID from Metric where Name = "'+MetricName+'"'
-			self.debugmsg(5, "sql:", sql)
-			self.dbqueue["Read"].append({"SQL": sql, "KEY": "Metric_"+MetricName})
+			if self.datadb is not None:
+				self.dbqueue["Metric"].append( (MetricID, MetricName, MetricType) )
 
-			if "Read" in self.dbqueue:
-				self.debugmsg(9, "Read", self.dbqueue["Read"])
-			if "ReadResult" in self.dbqueue:
-				self.debugmsg(9, "ReadResult", self.dbqueue["ReadResult"])
-			self.debugmsg(5, "Wait for Metric_"+MetricName)
-			while "Metric_"+MetricName not in self.dbqueue["ReadResult"]:
-				time.sleep(0.1)
-				self.debugmsg(9, "Waiting for Metric_"+MetricName)
-			if "ReadResult" in self.dbqueue:
-				self.debugmsg(7, "ReadResult", self.dbqueue["ReadResult"])
-			self.debugmsg(5, "Wait for Metric_"+MetricName+">0")
-			while len(self.dbqueue["ReadResult"]["Metric_"+MetricName])<1:
-				time.sleep(0.1)
-				self.debugmsg(5, "Waiting for Metric_"+MetricName+">0")
-
-			if "Metric_"+MetricName in self.dbqueue["ReadResult"] and len(self.dbqueue["ReadResult"]["Metric_"+MetricName])>0:
-				self.debugmsg(5, "Metric_"+MetricName+":", self.dbqueue["ReadResult"]["Metric_"+MetricName])
-
-				if MetricType not in self.MetricIDs:
-					self.MetricIDs[MetricType] = {}
-
-				self.MetricIDs[MetricType][MetricName] = self.dbqueue["ReadResult"]["Metric_"+MetricName][0]["rowid"]
-				self.debugmsg(7, "MetricIDs[MetricType]:", self.MetricIDs[MetricType])
-
-		return self.MetricIDs[MetricType][MetricName]
+		return self.MetricIDs[MetricType][MetricName]["ID"]
 
 	def save_metrics(self, PMetricName, MetricType, MetricTime, SMetricName, MetricValue):
+		self.debugmsg(7, PMetricName, MetricType, MetricTime, SMetricName, MetricValue)
+		metricid = self.create_metric(PMetricName, MetricType)
+
+		# store in memory
+		if SMetricName not in self.MetricIDs[MetricType][PMetricName]:
+			self.MetricIDs[MetricType][PMetricName][SMetricName] = {}
+		# I don't want to store all the data in memory, this can be pulled from the DB
+		# 	self.MetricIDs[MetricType][PMetricName][SMetricName]["Time"] = []
+		# 	self.MetricIDs[MetricType][PMetricName][SMetricName]["objTime"] = []
+		# 	self.MetricIDs[MetricType][PMetricName][SMetricName]["Values"] = []
+		# # self.MetricIDs[MetricType][PMetricName][SMetricName][MetricTime] = MetricValue
+		# self.MetricIDs[MetricType][PMetricName][SMetricName]["Time"].append(MetricTime)
+		# self.MetricIDs[MetricType][PMetricName][SMetricName]["objTime"].append(datetime.fromtimestamp(MetricTime))
+		# self.MetricIDs[MetricType][PMetricName][SMetricName]["Values"].append(MetricValue)
+
+		# save to db
 		if self.datadb is not None:
-			self.debugmsg(7, PMetricName, MetricType, MetricTime, SMetricName, MetricValue)
-			metricid = self.create_metric(PMetricName, MetricType)
 			self.debugmsg(7, "metricid:", metricid, MetricTime, SMetricName, MetricValue)
 			self.dbqueue["Metrics"].append( (metricid, MetricTime, SMetricName, MetricValue) )
 
@@ -1722,6 +1861,78 @@ class RFSwarmBase:
 			self.scriptfilters.append(filtername)
 			self.scriptfilters.sort()
 		self.debugmsg(9, "filtername:", filtername, self.scriptfilters)
+
+	def sec2hms(self, sec):
+		base.debugmsg(6, "type(sec):",type(sec), sec)
+		if (isinstance(sec, time.struct_time)):
+			sec = time.mktime(sec)
+			base.debugmsg(6, "type(sec):",type(sec), sec)
+		h = int(sec/3600)
+		m = int((sec-h*3600)/60)
+		s = int((sec-h*3600)-m*60)
+		hms = "{:02}:{:02}:{:02}".format(h,m,s)
+		return hms
+
+	def hms2sec(self, hms):
+		sec = 0
+		arrhms = str(hms).split(":")
+		base.debugmsg(6, "arrhms:",arrhms)
+		if len(arrhms)==3:
+			if len(arrhms[0])>0:
+				h = int(arrhms[0])
+			else:
+				h=0
+			if len(arrhms[1])>0:
+				m = int(arrhms[1])
+			else:
+				m=0
+			if len(arrhms[2])>0:
+				s = int(arrhms[2])
+			else:
+				s=0
+			sec = (h*3600)+(m*60)+s
+		if len(arrhms)==2:
+			h = 0
+			if len(arrhms[0])>0:
+				m = int(arrhms[0])
+			else:
+				m=0
+			if len(arrhms[1])>0:
+				s = int(arrhms[1])
+			else:
+				s=0
+			sec = (h*3600)+(m*60)+s
+		if len(arrhms)==1:
+			sec = int(arrhms[0])
+		return sec
+
+
+	def GetKey(self, mydict, myval):
+		# for key, value in mydict.items():
+		# 	base.debugmsg(5, "key:", key, "	value:", value)
+		# 	if myval == value:
+		# 		return key
+		# 	return "Value not found"
+		vals = list(mydict.values())
+		try:
+			id = vals.index(myval)
+			return list(mydict.keys())[id]
+		except:
+			return "Value, {} not found".format(myval)
+
+
+
+	def localipaddresslist(self):
+		ipaddresslist = []
+		iflst = psutil.net_if_addrs()
+		for nic in iflst.keys():
+			self.debugmsg(6, "nic", nic)
+			for addr in iflst[nic]:
+				 # '127.0.0.1', '::1', 'fe80::1%lo0'
+				self.debugmsg(6, "addr", addr.address)
+				if addr.address not in ['127.0.0.1', '::1', 'fe80::1%lo0']:
+					ipaddresslist.append(addr.address)
+		return ipaddresslist
 
 
 # class rfswarm:
@@ -1748,6 +1959,7 @@ class RFSwarmCore:
 		parser.add_argument('-r', '--run', help='Run the scenario automatically after loading', action='store_true')
 		parser.add_argument('-a', '--agents', help='Wait for this many agents before starting (default 1)')
 		parser.add_argument('-n', '--nogui', help='Don\'t display the GUI', action='store_true')
+		parser.add_argument('-t', '--starttime', help='Specify the time to start the test HH:MM or HH:MM:SS (ISO 8601)')
 		parser.add_argument('-d', '--dir', help='Results directory')
 		parser.add_argument('-e', '--ipaddress', help='IP Address to bind the server to')
 		parser.add_argument('-p', '--port', help='Port number to bind the server to')
@@ -1761,6 +1973,10 @@ class RFSwarmCore:
 		if base.args.version:
 			exit()
 
+		if base.args.starttime:
+			base.run_starttime = base.parse_time(base.args.starttime)
+			base.debugmsg(5, "run_starttime:", base.run_starttime)
+
 		base.debugmsg(6, "ConfigParser")
 		base.config = configparser.ConfigParser()
 		scrdir = os.path.dirname(__file__)
@@ -1768,7 +1984,7 @@ class RFSwarmCore:
 		#
 		# 	ensure ini file
 		#
-		base.manager_ini = os.path.join(scrdir, "RFSwarmManager.ini")
+		base.manager_ini = base.findiniloctaion()
 
 		# rename old ini file if it exists
 		# 	this section can probably be removed in the future, but will probably need to stay for at least a few releases
@@ -1787,19 +2003,21 @@ class RFSwarmCore:
 			base.manager_ini = base.args.ini
 
 		if os.path.isfile(base.manager_ini):
-			base.debugmsg(9, "agentini: ", base.manager_ini)
-			base.config.read(base.manager_ini)
+			base.debugmsg(7, "agentini: ", base.manager_ini)
+			base.config.read(base.manager_ini, encoding="utf8")
 		else:
 			base.saveini()
 
 		base.debugmsg(0, "	Configuration File: ", base.manager_ini)
 
-		base.debugmsg(5, "base.config: ", base.config._sections)
+		base.debugmsg(9, "base.config: ", base.config._sections)
 		if base.args.scenario:
 			base.save_ini = False
 			base.debugmsg(5, "base.args.scenario: ", base.args.scenario)
 			scenariofile = os.path.abspath(base.args.scenario)
 			base.debugmsg(5, "scenariofile: ", scenariofile)
+			if 'Plan' not in base.config:
+				base.config['Plan'] = {}
 			base.config['Plan']['ScenarioFile'] = scenariofile
 
 		if base.args.dir:
@@ -1807,16 +2025,22 @@ class RFSwarmCore:
 			base.debugmsg(5, "base.args.dir: ", base.args.dir)
 			ResultsDir = os.path.abspath(base.args.dir)
 			base.debugmsg(5, "ResultsDir: ", ResultsDir)
+			if 'Run' not in base.config:
+				base.config['Run'] = {}
 			base.config['Run']['ResultsDir'] = ResultsDir
 
 		if base.args.ipaddress:
 			base.save_ini = False
 			base.debugmsg(5, "base.args.ipaddress: ", base.args.ipaddress)
+			if 'Server' not in base.config:
+				base.config['Server'] = {}
 			base.config['Server']['BindIP'] = base.args.ipaddress
 
 		if base.args.port:
 			base.save_ini = False
 			base.debugmsg(5, "base.args.port: ", base.args.port)
+			if 'Server' not in base.config:
+				base.config['Server'] = {}
 			base.config['Server']['BindPort'] = base.args.port
 
 
@@ -1834,6 +2058,11 @@ class RFSwarmCore:
 		if 'win_height' not in base.config['GUI']:
 			base.config['GUI']['win_height'] = "390"
 			base.saveini()
+
+		if 'graph_list' not in base.config['GUI']:
+			base.config['GUI']['graph_list'] = ""
+			base.saveini()
+
 
 		#
 		# Plan
@@ -1945,6 +2174,18 @@ class RFSwarmCore:
 		base.debugmsg(5, "BuildCoreRun")
 		self.BuildCoreRun()
 
+	def scheduled_start(self):
+		while base.keeprunning:
+			if base.run_starttime > 0:
+				sec2st = base.run_starttime - int(time.time())
+				if  sec2st < 1:
+					base.run_start = 0
+					base.run_starttime = 0
+					base.debugmsg(5, "sec2st:", sec2st)
+					autostart = threading.Thread(target=self.autostart)
+					autostart.start()
+			time.sleep(1)
+
 	def autostart(self):
 		base.debugmsg(5, "appstarted:", base.appstarted)
 		# wait for mainloops to finished
@@ -1974,18 +2215,29 @@ class RFSwarmCore:
 
 	def mainloop(self):
 
-		if base.args.run:
+		base.debugmsg(5, "mainloop start")
+
+		if base.args.run and base.run_starttime < 1:
 			# auto click play ?
 			# self.autostart()
 			autostart = threading.Thread(target=self.autostart)
 			autostart.start()
 
+
+		autostart = threading.Thread(target=self.scheduled_start)
+		autostart.start()
+
 		if not base.args.nogui:
 			base.gui.mainloop()
+
+		base.debugmsg(5, "mainloop end")
+
 
 
 	def on_closing(self, _event=None, *args):
 		# , _event=None is required for any function that has a shortcut key bound to it
+
+		base.keeprunning = False
 
 		if base.appstarted:
 			try:
@@ -2143,13 +2395,12 @@ class RFSwarmCore:
 				base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], prop, agentdata["Properties"][prop])
 
 
-	def register_result(self, AgentName, result_name, result, elapsed_time, start_time, end_time, index, vuser, iter, sequence):
+	def register_result(self, AgentName, result_name, result, elapsed_time, start_time, end_time, index, robot, iter, sequence):
 		base.debugmsg(9, "register_result")
-		resdata = (index, vuser, iter, AgentName, sequence, result_name, result, elapsed_time, start_time, end_time)
-		base.debugmsg(9, "register_result: resdata:", resdata)
-		base.debugmsg(7, resdata)
+		resdata = (index, robot, iter, AgentName, sequence, result_name, result, elapsed_time, start_time, end_time)
+		base.debugmsg(7, "resdata:", resdata)
 		base.dbqueue["Results"].append(resdata)
-		base.debugmsg(9, "register_result: dbqueue Results:", base.dbqueue["Results"])
+		base.debugmsg(9, "dbqueue Results:", base.dbqueue["Results"])
 
 		if not base.args.nogui:
 			ut = threading.Thread(target=base.gui.delayed_UpdateRunStats)
@@ -2197,16 +2448,24 @@ class RFSwarmCore:
 
 		if os.path.isfile(ScenarioFile):
 			base.debugmsg(9, "ScenarioFile: ", ScenarioFile)
-			filedata.read(ScenarioFile)
+			filedata.read(ScenarioFile, encoding="utf8")
 
 		base.debugmsg(6, "filedata: ", filedata)
 
 		scriptcount = 0
+		graphlist = []
 		if "Scenario" in filedata:
 			base.debugmsg(6, "Scenario:", filedata["Scenario"])
 			if "scriptcount" in filedata["Scenario"]:
 				scriptcount = int(filedata["Scenario"]["scriptcount"])
 				base.debugmsg(8, "scriptcount:", scriptcount)
+
+			if "graphlist" in filedata["Scenario"]:
+				graphlist = filedata["Scenario"]["graphlist"].split(",")
+
+			if "uploadmode" in filedata["Scenario"]:
+				base.uploadmode = filedata['Scenario']['uploadmode']
+
 		else:
 			base.debugmsg(1, "File contains no scenario:", ScenarioFile)
 			return 1
@@ -2216,7 +2475,7 @@ class RFSwarmCore:
 			ii = i+1
 			istr = str(ii)
 			if istr in filedata:
-				base.debugmsg(8, "filedata[",istr,"]:", filedata[istr])
+				base.debugmsg(5, "filedata[",istr,"]:", filedata[istr])
 				rowcount += 1
 
 				# if i not in base.scriptlist:
@@ -2228,12 +2487,17 @@ class RFSwarmCore:
 				else:
 					base.addScriptRow()
 				# users = 13
-				if "users" in filedata[istr]:
-					base.debugmsg(8, "filedata[", istr, "][users]:", filedata[istr]["users"])
-					# base.scriptlist[ii]["users"] = filedata[istr]["users"]
-					self.sr_users_validate(rowcount, int(filedata[istr]["users"]))
-					# delay = 0
+				if "robots" in filedata[istr] or "users" in filedata[istr]:
+					if "robots" in filedata[istr]:
+						base.debugmsg(8, "filedata[", istr, "][robots]:", filedata[istr]["robots"])
+						self.sr_users_validate(rowcount, int(filedata[istr]["robots"]))
+					else:
+						base.debugmsg(8, "filedata[", istr, "][users]:", filedata[istr]["users"])
+						# base.scriptlist[ii]["users"] = filedata[istr]["users"]
+						self.sr_users_validate(rowcount, int(filedata[istr]["users"]))
+						# delay = 0
 				else:
+					base.debugmsg(3, "robots missing [",istr,"]")
 					fileok = False
 				if "delay" in filedata[istr]:
 					base.debugmsg(8, "filedata[", istr, "][delay]:", filedata[istr]["delay"])
@@ -2241,6 +2505,7 @@ class RFSwarmCore:
 					self.sr_delay_validate(rowcount, int(filedata[istr]["delay"]))
 					# rampup = 60
 				else:
+					base.debugmsg(3, "delay missing [",istr,"]")
 					fileok = False
 				if "rampup" in filedata[istr]:
 					base.debugmsg(8, "filedata[", istr, "][rampup]:", filedata[istr]["rampup"])
@@ -2248,6 +2513,7 @@ class RFSwarmCore:
 					self.sr_rampup_validate(rowcount, int(filedata[istr]["rampup"]))
 					# run = 600
 				else:
+					base.debugmsg(3, "rampup missing [",istr,"]")
 					fileok = False
 				if "run" in filedata[istr]:
 					base.debugmsg(8, "filedata[", istr, "][run]:", filedata[istr]["run"])
@@ -2255,24 +2521,32 @@ class RFSwarmCore:
 					self.sr_run_validate(rowcount, int(filedata[istr]["run"]))
 					# script = /Users/dave/Documents/GitHub/rfswarm/robots/OC_Demo_2.robot
 				else:
+					base.debugmsg(3, "run missing [",istr,"]")
 					fileok = False
 				if "script" in filedata[istr]:
-					base.debugmsg(8, "filedata[", istr, "][script]:", filedata[istr]["script"])
+					base.debugmsg(7, "filedata[", istr, "][script]:", filedata[istr]["script"])
 					scriptname = filedata[istr]["script"]
+					if '\\' in scriptname:
+						scriptnamearr = scriptname.split('\\')
+						scriptname = "/".join(scriptnamearr)
+
+					base.debugmsg(7, "scriptname:", scriptname)
 					if not os.path.isabs(scriptname):
 						# relative path, need to find absolute path
 						combined = os.path.join(base.config['Plan']['ScenarioDir'], scriptname)
-						base.debugmsg(8, "combined:", combined)
+						base.debugmsg(7, "combined:", combined)
 						scriptname = os.path.abspath(combined)
-					base.debugmsg(8, "scriptname:", scriptname)
+					base.debugmsg(7, "scriptname:", scriptname)
 					self.sr_file_validate(rowcount, scriptname)
 				else:
+					base.debugmsg(3, "script missing [",istr,"]")
 					fileok = False
 				if "test" in filedata[istr]:
 					base.debugmsg(8, "filedata[", istr, "][test]:", filedata[istr]["test"])
 					# base.scriptlist[ii]["test"] = filedata[istr]["test"]
 					self.sr_test_validate("row{}".format(rowcount), filedata[istr]["test"])
 				else:
+					base.debugmsg(3, "test missing [",istr,"]")
 					fileok = False
 
 				if "excludelibraries" in filedata[istr]:
@@ -2295,6 +2569,29 @@ class RFSwarmCore:
 					return 1
 
 
+		base.debugmsg(9, "config graph_list: ", base.config['GUI']['graph_list'])
+
+		base.debugmsg(9, "graphlist: ", graphlist)
+		# base.config[iniid]		glist = base.config['GUI']['graph_list'].split(",")
+		iniglist = list(base.config['GUI']['graph_list'].split(","))
+		base.debugmsg(9, "iniglist: ", iniglist)
+		base.config['GUI']['graph_list'] = ",".join( set(iniglist + graphlist) )
+
+		base.debugmsg(9, "config graph_list: ", base.config['GUI']['graph_list'])
+
+		if not base.args.nogui:
+			base.gui.ClearScenarioGraphs()
+
+		for iniid in graphlist:
+			if iniid in filedata:
+				base.debugmsg(5, "iniid: ", iniid, " 	filedata[iniid]:", filedata[iniid])
+				base.config[iniid] = filedata[iniid]
+				if not base.args.nogui:
+					base.gui.AddScenarioGraph(filedata[iniid]["name"], iniid)
+
+		if not base.args.nogui:
+			base.gui.OpenINIGraphs()
+
 
 
 	def ClickPlay(self, _event=None):
@@ -2305,16 +2602,6 @@ class RFSwarmCore:
 		for nxtagent in base.Agents.keys():
 			base.Agents[nxtagent]["AssignedRobots"] = 0
 
-
-		datafiletime = datetime.now().strftime("%Y%m%d_%H%M%S")
-		if len(base.config['Plan']['ScenarioFile'])>0:
-			filename = os.path.basename(base.config['Plan']['ScenarioFile'])
-			sname = os.path.splitext(filename)[0]
-			base.run_name = "{}_{}".format(datafiletime, sname)
-		else:
-			base.run_name = "{}_{}".format(datafiletime, "Scenario")
-		base.debugmsg(5, "base.run_name:", base.run_name)
-
 		base.run_abort = False
 		base.run_start = 0
 		base.run_end = 0
@@ -2324,17 +2611,64 @@ class RFSwarmCore:
 		base.MetricIDs = {}
 
 		base.robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}}
-		base.debugmsg(5, "core.run_start_threads")
-		t = threading.Thread(target=core.run_start_threads)
-		t.start()
-		if not base.args.nogui:
-			time.sleep(1)
-			base.debugmsg(5, "base.gui.delayed_UpdateRunStats")
-			ut = threading.Thread(target=base.gui.delayed_UpdateRunStats)
-			ut.start()
+		sec2st = base.run_starttime - int(time.time())
+		if sec2st < 1:
+			starttime = int(time.time())
+			datafiletime = datetime.now().strftime("%Y%m%d_%H%M%S")
+			if len(base.config['Plan']['ScenarioFile'])>0:
+				filename = os.path.basename(base.config['Plan']['ScenarioFile'])
+				sname = os.path.splitext(filename)[0]
+				base.run_name = "{}_{}".format(datafiletime, sname)
+			else:
+				base.run_name = "{}_{}".format(datafiletime, "Scenario")
+			base.debugmsg(5, "base.run_name:", base.run_name)
 
+			base.debugmsg(5, "core.run_start_threads")
+			t = threading.Thread(target=core.run_start_threads)
+			t.start()
+			if not base.args.nogui:
+				time.sleep(1)
+				base.debugmsg(5, "base.gui.delayed_UpdateRunStats")
+				ut = threading.Thread(target=base.gui.delayed_UpdateRunStats)
+				ut.start()
+				base.gui.tabs.select(1)
 
+			# wait till db has been opened
+			while base.run_name != base.run_name_current:
+				time.sleep(0.1)
+			while not base.dbready:
+				time.sleep(0.1)
 
+			# base.save_metrics(base.run_name, "Scenario", int(time.time()), "starttime", base.run_starttime)
+			base.save_metrics(base.run_name, "Scenario", starttime, "Start", starttime)
+			base.save_metrics("Time", "Scenario", starttime, "Start", starttime)
+
+			base.save_metrics("Manager", "rfswarm", starttime, "Version", base.version)
+
+			# collect list of test cases and robot files
+			# --- save_metrics(self, PMetricName, MetricType, MetricTime, SMetricName, MetricValue):
+			for grp in base.scriptlist:
+				base.debugmsg(5, "grp", grp)
+				if "Test" in grp.keys() and len(grp["Test"])>0:
+				# 	base.debugmsg(6, "while totrbts", totrbts, " 	currbts:", currbts)
+					base.debugmsg(5, "grp[Index]", grp['Index'])
+					base.save_metrics("Local_Path_{}".format(grp['Index']), "Scenario", starttime, grp['Script'], grp['Test'])
+
+					relpath = base.get_relative_path(base.config['Plan']['ScenarioFile'], grp['Script'])
+					base.save_metrics("Test_{}".format(grp['Index']), "Scenario", starttime, relpath, grp['Test'])
+					base.save_metrics(grp['Index'], "Scenario_Test", starttime, relpath, grp['Test'])
+
+					base.save_metrics("Robots_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['Robots'])
+					base.save_metrics(grp['Index'], "Scenario_Robots", starttime, grp['Test'], grp['Robots'])
+
+					base.save_metrics("Delay_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['Delay'])
+					base.save_metrics(grp['Index'], "Scenario_Delay", starttime, grp['Test'], grp['Delay'])
+
+					base.save_metrics("Ramp_Up_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['RampUp'])
+					base.save_metrics(grp['Index'], "Scenario_Ramp_Up", starttime, grp['Test'], grp['RampUp'])
+
+					base.save_metrics("Run_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['Run'])
+					base.save_metrics(grp['Index'], "Scenario_Run", starttime, grp['Test'], grp['Run'])
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -2367,21 +2701,21 @@ class RFSwarmCore:
 		if base.run_end>0 and int(time.time())>base.run_end:
 			base.run_paused = True
 
-		totusrs = 0
-		curusrs = 0
+		totrbts = 0
+		currbts = 0
 
 		base.debugmsg(8, "base.scriptlist:", base.scriptlist)
 		for grp in base.scriptlist:
-			if "Users" in grp:
-				base.debugmsg(9, "run_start_threads: totusrs", totusrs, " 	grp:", grp)
-				totusrs += int(grp["Users"])
-				base.debugmsg(8, "run_start_threads: totusrs", totusrs)
+			if "Robots" in grp:
+				base.debugmsg(9, "run_start_threads: totrbts", totrbts, " 	grp:", grp)
+				totrbts += int(grp["Robots"])
+				base.debugmsg(8, "run_start_threads: totrbts", totrbts)
 
 
-		base.debugmsg(8, 'curusrs:', curusrs, "	totusrs:", totusrs, "	run_paused:", base.run_paused)
-		while curusrs < totusrs:
-			base.debugmsg(6, "while totusrs", totusrs, " 	curusrs:", curusrs)
-			# totusrs = 0
+		base.debugmsg(8, 'currbts:', currbts, "	totrbts:", totrbts, "	run_paused:", base.run_paused)
+		while currbts < totrbts:
+			base.debugmsg(6, "while totrbts", totrbts, " 	currbts:", currbts)
+			# totrbts = 0
 
 			if "Start" not in base.robot_schedule:
 				base.robot_schedule["Start"] = 0
@@ -2407,7 +2741,7 @@ class RFSwarmCore:
 				for grp in base.scriptlist:
 					base.debugmsg(9, "grp", grp)
 					if "Test" in grp.keys() and len(grp["Test"])>0:
-						base.debugmsg(6, "while totusrs", totusrs, " 	curusrs:", curusrs)
+						base.debugmsg(6, "while totrbts", totrbts, " 	currbts:", currbts)
 						base.debugmsg(9, "grp[Index]", grp['Index'])
 
 						if 'filters' in grp:
@@ -2448,21 +2782,25 @@ class RFSwarmCore:
 									stm = time.localtime(base.robot_schedule["Start"])
 									base.gui.display_run['start_time'].set("  {}  ".format(time.strftime("%H:%M:%S", stm)))
 
-								base.run_end = int(time.time()) + grp["Run"]
+								base.run_end = base.run_start + grp["Delay"] + grp["RampUp"] + grp["Run"]
+								base.debugmsg(9, grp['Index'], " 	run_start:", base.run_start, " 	Delay:", grp["Delay"], " 	RampUp:", grp["RampUp"], " 	Run:", grp["Run"], " 	run_end:", base.run_end)
 								base.robot_schedule["End"] = base.run_end
 
-								# totusrs = 0
+								# totrbts = 0
 
 							gid = grp["Index"]
 							base.debugmsg(9, "gid", gid, " 	robot_schedule[Scripts].keys()", base.robot_schedule["Scripts"].keys())
 							if gid not in base.robot_schedule["Scripts"].keys():
 								base.robot_schedule["Scripts"][gid] = {}
-								base.debugmsg(9, "totusrs", totusrs)
-								# totusrs += int(grp["Users"])
-								base.debugmsg(9, "totusrs", totusrs)
+								base.debugmsg(9, "totrbts", totrbts)
+								# totrbts += int(grp["Robots"])
+								base.debugmsg(9, "totrbts", totrbts)
 
 							if gid not in base.scriptgrpend.keys() or base.scriptgrpend[gid] < base.run_start:
 								base.scriptgrpend[gid] = base.run_start + grp["Delay"] + grp["RampUp"] + grp["Run"]
+								base.debugmsg(9, "gid:", gid, " 	run_start:", base.run_start, " 	Delay:", grp["Delay"], " 	RampUp:", grp["RampUp"], " 	Run:", grp["Run"], " 	run_end:", base.run_end)
+								if base.scriptgrpend[gid] > base.run_end:
+									base.run_end = base.scriptgrpend[gid]
 
 							time_elapsed = int(time.time()) - base.run_start
 							base.debugmsg(9, 'time_elapsed', time_elapsed, "Delay", grp["Delay"])
@@ -2471,13 +2809,13 @@ class RFSwarmCore:
 								nxtuid = len(base.robot_schedule["Scripts"][gid]) + 1
 								base.debugmsg(9, 'nxtuid', nxtuid)
 								# Determine if we should start another user?
-								if nxtuid < grp["Users"]+1:
+								if nxtuid < grp["Robots"]+1:
 									if grp["RampUp"] > 0:
 										rupct = (time_elapsed - grp["Delay"]) /grp["RampUp"]
 									else:
 										rupct = 1
 									base.debugmsg(9, 'rupct', rupct)
-									ruusr = int(grp["Users"] * rupct)
+									ruusr = int(grp["Robots"] * rupct)
 									base.debugmsg(9, 'nxtuid', nxtuid, 'ruusr', ruusr)
 									if nxtuid < ruusr+1:
 										uid = nxtuid
@@ -2502,14 +2840,11 @@ class RFSwarmCore:
 										if "robotoptions" in grp:
 											base.robot_schedule["Agents"][nxtagent][grurid]["robotoptions"] = grp["robotoptions"]
 
-										base.run_end = int(time.time()) + grp["Run"]
-										base.robot_schedule["End"] = base.run_end
-
 										base.Agents[nxtagent]["AssignedRobots"] += 1
 										base.debugmsg(5, "base.Agents[",nxtagent,"][AssignedRobots]:", base.Agents[nxtagent]["AssignedRobots"])
 
-										curusrs += 1
-										base.debugmsg(2, "Robot:", curusrs, "	Test:", grp["Test"], "	Assigned to:", nxtagent)
+										currbts += 1
+										base.debugmsg(2, "Robot:", currbts, "	Test:", grp["Test"], "	Assigned to:", nxtagent)
 
 										base.debugmsg(9, "robot_schedule", base.robot_schedule)
 
@@ -2532,9 +2867,9 @@ class RFSwarmCore:
 			v = None
 			if len(args)>1:
 				usrs = args[1]
-		base.debugmsg(6, "Row:", r, "Users:", usrs)
+		base.debugmsg(6, "Row:", r, "Robots:", usrs)
 		base.debugmsg(8, "base.scriptlist:", base.scriptlist)
-		base.scriptlist[r]["Users"] = int(usrs)
+		base.scriptlist[r]["Robots"] = int(usrs)
 
 		if not base.args.nogui:
 			base.gui.sr_users_validate(*args)
@@ -2676,6 +3011,8 @@ class RFSwarmCore:
 
 			if base.total_robots>0 and robot_count <1:
 				# run finished so clear run name
+				base.save_metrics(base.run_name, "Scenario", int(time.time()), "End_Time", int(time.time()))
+				base.save_metrics("Time", "Scenario", int(time.time()), "End", int(time.time()))
 				base.run_name = ""
 				base.robot_schedule["RunName"] = base.run_name
 
@@ -2710,6 +3047,10 @@ class RFSwarmCore:
 			if base.run_end > 0 and base.run_end < int(time.time()) and base.total_robots < 1 and not base.posttest and base.run_finish < 1 and uploadcount < 1:
 				base.run_finish = int(time.time())
 				base.debugmsg(5, "run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots)
+				# base.save_metrics(base.run_name, "Scenario", base.run_finish, "End_Time", base.run_finish)
+				base.save_metrics("Time", "Scenario", base.run_finish, "Upload_Finished", base.run_finish)
+
+
 				if not base.args.nogui:
 					time.sleep(1)
 					base.gui.delayed_UpdateRunStats()
@@ -2738,11 +3079,13 @@ class RFSwarmCore:
 
 class RFSwarmGUI(tk.Frame):
 # class RFSwarmGUI:
-	titleprefix = 'Robot Framework Swarm'
+	# titleprefix = 'Robot Framework Swarm'
+	titleprefix = 'rfswarm'
 
 	# GUI = None
 	tabs = None
 
+	pln_graph_update = False
 	pln_graph = None
 	scriptgrid = None
 	scrollable_sg = None
@@ -2755,6 +3098,8 @@ class RFSwarmGUI(tk.Frame):
 	scrollable_rg = None
 
 	plan_scnro_chngd = False
+
+	newgraph = 0
 
 	plancolidx = 0
 	plancolusr = 1
@@ -2769,15 +3114,18 @@ class RFSwarmGUI(tk.Frame):
 
 	display_agents = {}
 	display_run = {}
+	display_plan = {}
 	# imgdata = {}
 
 	rfstheme = {}
 
 	imgdata = {}
 	b64 = {}
+	graphs = {}
 
 	elements = {}
 
+	style_text_colour = "#000"
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -2820,9 +3168,9 @@ class RFSwarmGUI(tk.Frame):
 		# base.debugmsg(5, "bgclr", bgclr)
 		# https://github.com/tcltk/tk/blob/main/macosx/README
 
+		self.load_icons()
 
 		base.debugmsg(6, "BuildUI")
-
 		self.BuildUI()
 
 		try:
@@ -2832,6 +3180,22 @@ class RFSwarmGUI(tk.Frame):
 		except:
 			pass
 
+
+	def load_icons(self):
+		self.iconew = self.get_icon("New")
+		self.icoopen = self.get_icon("Open")
+		self.icoSave = self.get_icon("Save")
+		self.icoTime = self.get_icon("StartTime")
+		self.icoPlay = self.get_icon("Play")
+		self.icoAddRow = self.get_icon("AddRow")
+		self.icoScript = self.get_icon("Script")
+		self.icoAdvanced = self.get_icon("Advanced")
+		self.icoDelete = self.get_icon("Delete")
+		self.icoStop = self.get_icon("Stop")
+		self.icoReport = self.get_icon("report_text")
+		self.icoAbort = self.get_icon("Abort")
+		self.icoAborted = self.get_icon("Aborted")
+		self.icoRefresh = self.get_icon("Refresh")
 
 	def on_closing(self, _event=None):
 
@@ -2854,17 +3218,17 @@ class RFSwarmGUI(tk.Frame):
 
 
 	def updateTitle(self):
-		titletext = "{} - {}".format(self.titleprefix, "Untitled")
+		titletext = "{} v{} - {}".format(self.titleprefix, base.version, "Untitled")
 		if 'Plan' in base.config and 'ScenarioFile' in base.config['Plan']:
 			if len(base.config['Plan']['ScenarioFile'])>0:
-				titletext = "{} - {}".format(self.titleprefix, base.config['Plan']['ScenarioFile'])
+				titletext = "{} v{} - {}".format(self.titleprefix, base.version, base.config['Plan']['ScenarioFile'])
 
 		self.master.title(titletext)
 
 
 	def get_icon(self, icontext):
 		# # https://www.daniweb.com/programming/software-development/code/216634/jpeg-image-embedded-in-python
-		base.debugmsg(5, "icontext:", icontext)
+		base.debugmsg(7, "icontext:", icontext)
 		# http://www.famfamfam.com/lab/icons/silk/
 		files = {}
 		# files["New"] = "famfamfam_silk_icons/icons/page_white.edt.gif"
@@ -2878,6 +3242,7 @@ class RFSwarmGUI(tk.Frame):
 		# files["report_word"] = "famfamfam_silk_icons/icons/report_word.gif"
 		# files["Abort"] = "../famfamfam_silk_icons/icons/bomb.gif"
 		# files["Aborted"] = "../famfamfam_silk_icons/icons/stop_grey.gif"
+		# files["Refresh"] = "../famfamfam_silk_icons/icons/arrow_refresh.gif"
 
 		# files["Advanced"] = "../famfamfam_silk_icons/icons/cog.gif"
 		# files["Delete"] = "../famfamfam_silk_icons/icons/cross.gif"
@@ -2886,6 +3251,8 @@ class RFSwarmGUI(tk.Frame):
 		# files["AddRow"] = "../famfamfam_silk_icons/icons/script_add.gif"
 		# files["AddRow"] = "../famfamfam_silk_icons/icons/add.gif"
 
+
+		# files["StartTime"] = "../famfamfam_silk_icons/icons/time.gif"
 
 
 		if icontext in files:
@@ -2898,12 +3265,12 @@ class RFSwarmGUI(tk.Frame):
 				base.debugmsg(0, "isfile: imgfile:", imgfile)
 				with open(imgfile,"rb") as f:
 					img_raw = f.read()
-				base.debugmsg(0, "img_raw:", img_raw)
+				base.debugmsg(0, "img_raw", icontext, ":", img_raw)
 				# b64 = base64.encodestring(img_raw)
 				# img_text = 'img_b64 = \\\n"""{}"""'.format(b64)
 
 				self.imgdata[icontext] = tk.PhotoImage(file=imgfile)
-				base.debugmsg(0, "imgdata[icontext]:", self.imgdata[icontext])
+				base.debugmsg(0, "imgdata[",icontext,"]:", self.imgdata[icontext])
 
 
 				return self.imgdata[icontext]
@@ -2920,6 +3287,7 @@ class RFSwarmGUI(tk.Frame):
 		self.b64["Save"] = b'GIF89a\x10\x00\x10\x00\xe7\x98\x001`\xa61`\xa71`\xa81a\xa82a\xa82a\xa92a\xaa2b\xaa2b\xab2c\xac3c\xad3d\xae3d\xaf3e\xb04e\xb14f\xb24f\xb34g\xb45h\xb55h\xb65h\xb75i\xb75i\xb85i\xb95j\xba6j\xba6j\xbb6k\xbb6k\xbc7k\xba8k\xbb8l\xbb9l\xbc:m\xbb;n\xbd>p\xbb^\x89\xc9d\x8c\xc8e\x8c\xc8e\x8d\xc9e\x8d\xcaf\x8d\xc9g\x8e\xc9i\x90\xcah\x90\xcdl\x92\xcbm\x92\xcbj\x93\xcfm\x96\xd3p\x99\xd6y\x98\xc7q\x99\xd8r\x9b\xd9|\x9a\xc8s\x9b\xd9s\x9b\xdar\x9c\xdb|\x9b\xc9t\x9c\xdat\x9d\xdct\x9e\xddu\x9e\xdev\x9f\xddv\x9f\xdew\x9f\xde\x81\x9e\xccw\xa0\xdew\xa0\xdfx\xa1\xe0x\xa2\xe0y\xa2\xe1z\xa2\xe0z\xa2\xe1z\xa2\xe2z\xa3\xe1z\xa3\xe2z\xa3\xe3{\xa3\xe1{\xa3\xe2\x84\xa3\xcez\xa4\xe3{\xa4\xe2{\xa4\xe3}\xa6\xe6}\xa7\xe7~\xa8\xe7~\xa8\xe8\x8a\xa7\xd2\x80\xaa\xe9\x8e\xab\xd5\x95\xb0\xda\x88\xc0b\x9a\xb5\xdd\x9f\xba\xe1\xa4\xbe\xe4\xa9\xc2\xe7\xad\xc5\xea\xad\xc6\xeb\xb3\xca\xed\xb6\xcc\xee\xb8\xce\xef\xba\xd0\xee\xbb\xd0\xef\xbd\xd0\xec\xbe\xd2\xf0\xc3\xd5\xef\xc2\xd5\xf2\xc2\xdc\xbf\xc5\xd8\xf2\xc7\xd9\xf4\xc9\xdc\xf4\xcc\xdd\xf5\xd0\xdf\xf6\xd1\xdf\xf6\xd1\xe0\xf6\xd1\xe0\xf7\xd8\xe5\xf6\xd9\xe5\xf7\xdb\xe6\xf7\xdb\xe7\xf7\xdb\xe7\xf8\xdd\xe8\xf8\xdf\xe9\xf8\xdf\xe9\xf9\xe1\xec\xf9\xe2\xec\xf9\xe3\xed\xf9\xe5\xed\xfa\xe8\xf0\xfa\xe9\xf0\xfa\xea\xf0\xfa\xe9\xf1\xfa\xea\xf1\xfb\xeb\xf1\xfb\xed\xf2\xfb\xee\xf3\xfb\xee\xf4\xfb\xee\xf4\xfc\xef\xf4\xfc\xf0\xf5\xfc\xf1\xf6\xfc\xf2\xf6\xfc\xf3\xf7\xfd\xf3\xf8\xfd\xf6\xf9\xfd\xf6\xfa\xfd\xf6\xfa\xfe\xf7\xfa\xfd\xf7\xfa\xfe\xf8\xfa\xfe\xf7\xfb\xfe\xf8\xfb\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff!\xfe\x11Created with GIMP\x00!\xf9\x04\x01\n\x00\xff\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x08\xfe\x00\xffq\x18\xc8a\xc3\x06\r\x1a@\x88\x08\xe1a\xc4?\x81r\xe6\\\xb2\x04i\x91 C\x90&\x15\xd2s\x86\x84\xc08X$E*q\x88P\xa3K\x8c\xfa\xe0)sf\x04\x078V\x181*1\x08\xd1$H\x80\xf2\xd8Q\x92\xa6\x02\x877U\x00\x01J\x11\xe8Q%E{\xee\xd4)\xf2e\xc2\x067T\xf8\xf0\xf1\x93h\x92\xa3?J\xe9\x08\xf1\x12aC\x9b)%N\xa8h\xe1b\x85\x89\x12hut\x81\xa0\x81\x8d\x14&P\xa28ibd\xc8\x0f\x1e8vpq\xa0A\r\x13&N\x9cD1BDH\x8f\x1d7lha\xa0\x01\xcd\x92%J\xe6\x12\x01\xe2c\x07\x8d\x191\xb2(\xc8`&\xc9\xa5\xcf\xa0C\xc3\xb8\x82\xc0\x03\x19#\x94\xb6\xa8^\xad\x1a\xd2\x8b\'\x06>\x8cABi\x8d\xed\xdb\xb6!\xb1\x08B\xa0\x83\x98#\xa9Y\xaf\x86\x84"G\x00\x0ca\xc0\x84^~\xa9\x86\x8c\x00\x19.X\xa0 !\xc2\x83\x06\x0b\x12\x1c(  \x00\x80\x01\x01\x01\x00;'
 		self.b64["SaveAs"] = b'GIF89a\x10\x00\x10\x00\xc6u\x00._\xa63h\xba:i\xaa>j\xabDm\xabDp\xb0W~\xbbQ\x7f\xc3S\x7f\xc1S\x80\xc5T\x81\xc4U\x83\xc6X\x84\xc3]\x84\xbf[\x86\xc7]\x88\xc8_\x89\xc9`\x89\xc9a\x8a\xc7a\x8b\xc9b\x8b\xc8a\x8b\xcbh\x8b\xd3e\x8d\xcae\x8d\xccl\x8b\xcdn\x8a\xd7f\x8e\xc7m\x8b\xdah\x8e\xcdl\x8d\xdci\x90\xcdp\x8f\xe1n\x93\xcco\x96\xccn\x97\xd4q\x97\xd0q\x98\xd0s\x98\xces\x99\xd1u\x99\xd1s\x9a\xd4u\x9a\xd0w\x9a\xd2w\x9b\xd2w\x9c\xd2y\x9c\xd5z\x9d\xd3{\x9c\xddw\x9e\xd9x\x9e\xd8{\x9e\xd4x\x9f\xd8y\x9f\xdby\xa0\xd9z\xa0\xd9{\xa1\xdc}\xa2\xd9|\xa3\xdb\x80\xa3\xd5}\xa3\xde\x85\xa2\xdd\x82\xa4\xd6~\xa5\xdd\x80\xa6\xdd\x81\xa7\xe1\x81\xa7\xe2\x85\xa8\xdd\x84\xbfQ\x8f\xae\xda\x84\xbfT\x8c\xaf\xe4\x96\xb2\xee\x91\xb6\xd6\x92\xb5\xe6\x97\xb6\xea\x9a\xb6\xef\x99\xb8\xea\x9c\xbc\xe0\x98\xc9o\x99\xc9q\x9e\xbc\xee\x9b\xbd\xed\xa1\xbe\xea\xa1\xbf\xea\xa1\xbf\xef\x9e\xc0\xef\xb3\xc7\xe3\xb0\xcd\xf3\xbb\xcd\xe6\xba\xce\xef\xb8\xd2\xf4\xc7\xee\x87\xc7\xee\x8c\xd7\xf4\xa2\xd7\xf6\xa2\xe6\xf0\xef\xe5\xf1\xed\xe6\xf1\xed\xe6\xf1\xef\xe8\xf3\xea\xe9\xf4\xe4\xed\xf1\xf8\xea\xf3\xf3\xed\xf5\xf3\xf2\xf6\xfb\xf1\xf8\xff\xf7\xfb\xff\xfa\xfb\xfd\xfa\xfc\xfd\xfb\xfc\xfd\xfb\xfc\xfe\xff\xff\xdd\xff\xff\xe0\xfc\xfd\xfe\xfd\xfd\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff!\xfe\x11Created with GIMP\x00!\xf9\x04\x01\n\x00\x7f\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xb2\x80\x7f\x82\x83\x84\x85\x82#3%>\x1d\x1f*\'\x14\x86\x7f\x18XuWu\x97uT\x11\x86\x0eV9/;E+,-$\x90\x84\x0fU([uYtuif\x9a\x84\x17M\x10R\x88\x8a\x8c\x8e\xa7\x7f\x13J\x15Q\x93\x95\x98\x99\x9b\x7f\nK&S\x9du!\x97kjG\x12\x82\x07L"I\xa9mosrlnC\x08\x82\x0bZ\x1bN\xb5?@:7642\r\x82\x01\x0c\tH\xbfBA<851)\x06\x84\xe4\xc9\xce\x88\x19\x03&\x0c\x1a\x17\x05\x08\xc9\xb3F\x86\xc8\x13(F\xca\xc0\x10`\x88\x1c\x1c.^\xbet\x89\xd3c\x80!y\x16@x\xe0\xa0!\x03\x01\x00\x91R\n\n\x04\x00;'
 		self.b64["Open"] = b'GIF89a\x10\x00\x10\x00\xe7\x87\x00\xb6\x83I\xba\x8aP\xd8\x87-\xbc\x8cT\xd8\x88-\xd9\x8e3\xc8\x95^\xda\x945\xc9\x98b\xda\x9a6\x97\xa3\xb6\x99\xa3\xb2\xda\xa16\xda\xa67\xd4\xa7G\xda\xaa6\xda\xab5\xda\xab6\xda\xae4\xda\xaf5\xda\xaf6\xb5\xaf\xa8\xb2\xb3\xa7\xda\xb36\x9a\xb6\xd9\xd9\xb44\xdb\xb6<\x9b\xba\xdf\x9e\xbd\xe0\xd3\xb8\x9c\xa4\xc1\xe4\xde\xb9\x92\xa8\xc2\xe0\xa7\xc4\xe5\xa8\xc4\xe5\xe1\xc2^\xa9\xc5\xe6\xb3\xc6\xc8\xaa\xc6\xe6\xe2\xc3_\xe2\xc3`\xab\xc6\xe6\xe9\xc1s\xe3\xc7k\xe4\xc7k\xe5\xcat\xb4\xcd\xe9\xed\xcaj\xea\xcbl\xba\xcf\xe2\xe6\xcdy\xb8\xd0\xeb\xb3\xd1\xf3\xd3\xd2\xa3\xee\xcfr\xee\xcfv\xee\xce\x88\xef\xd0z\xd4\xd4\xa9\xef\xd2\x80\xef\xd3\x85\xbd\xd8\xf3\xf2\xd5\x81\xef\xd4\x94\xc1\xda\xf4\xf3\xd7\x86\xf5\xdac\xf3\xd8\x8e\xc4\xdc\xf4\xc9\xdc\xf2\xc6\xdd\xf4\xc9\xdd\xf2\xc5\xde\xf5\xf3\xda\x96\xc6\xde\xf5\xf6\xder\xf6\xdev\xf4\xdc\x93\xf4\xdb\x9e\xc7\xe0\xf7\xca\xe0\xf6\xf5\xde\x91\xf5\xde\x94\xf4\xdd\xa7\xcb\xe2\xf8\xf7\xe1\x81\xcd\xe2\xf8\xcc\xe3\xf8\xf7\xe2\x85\xf5\xe0\x9f\xce\xe3\xf8\xf7\xe3\x8b\xf6\xe1\xac\xf8\xe4\x8e\xd6\xe4\xf3\xd6\xe5\xf5\xf8\xe5\x91\xd3\xe6\xf8\xf8\xe6\x95\xdb\xe7\xf5\xf9\xe8\x9c\xf9\xe9\xa1\xf9\xe9\xa4\xdc\xea\xf8\xf6\xe9\xc9\xdf\xec\xf8\xfa\xec\xac\xfa\xed\xb3\xfb\xef\xb9\xfa\xf0\xdc\xfc\xf2\xc8\xfc\xf6\xd8\xfb\xf6\xe8\xfb\xf7\xe9\xfb\xf7\xea\xfd\xfa\xf1\xfe\xfa\xef\xfd\xfa\xf2\xfe\xfb\xee\xfe\xfb\xef\xfe\xfc\xf0\xfe\xfc\xf1\xfe\xfc\xf2\xfe\xfc\xf3\xfe\xfc\xf6\xfe\xfc\xf7\xff\xfc\xf5\xfe\xfd\xf4\xff\xfd\xf6\xff\xfd\xf8\xff\xfd\xfa\xfe\xfe\xfd\xff\xfe\xfd\xff\xfe\xfe\xff\xff\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff!\xfe\x11Created with GIMP\x00!\xf9\x04\x01\n\x00\xff\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x08\xca\x00\xff\t\x1cH\xb0\xe0\xbf\x0c#P(<\xa1\xc1\xe0\xc0\x0b\x83\x0c\x15"dH\x0e\x8b\x15\x18e\xb4\x188\xa1O\x97(Y\xb8\xdc\xf9\xb3\'\xcf\x1d;\x82(\x08|0GJ\x13\x1f/`\xf0\xd8\x91\xe3\x86\x8d8\x12\x04B\x80\xf3\x03\x87\n4z\xf6\xe8\xc1s\xd2P\x04\x81\r\x0c\x05\x02\xe4g\xcf\x1b1:Jp\x08\x11\xc3\x81@\x06|\xdc\xb0QCfK\r\x17c\xd2\x1c\x99aA`\x82:k\xcc\x88\xc1\xc2\xc4\x84\x17(J\x90\x84\x01!\xf0\x00\x9d2`\xaa,\x11\xc2\xe1\x8c\x11"=\xacx\x10X\xa0\xcd\x14\'I\x86\x04\x11\xf1\x05H\x8f\x1eW0\x0c$ \x80\x80e\x02\x15\x8ahyB\x85\xc6\x02\x87\x04S\x90\xd8\xa0\xa0\x83\x01\xd0\x06\x11|\x00\x80\xba\xe0\x80\x00\xad\r\x06\x04\x00;'
+		self.b64["StartTime"] = b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00\x94sM\x8ftN\x90tS\x98tK\x8fvV\x99wD\x8fxZ\x9bxN\x9ezQ\x94{^\x94|b\x99|Xw\x7f\x81y\x80\x81\xa4\x83V\x9c\x84b\xa0\x85_\x9e\x86i\xa7\x88S\x84\x8c\x8d\xac\x8cM\xad\x8e]\xa9\x8fjl\x90\xc8u\x91\xc6\xb2\x94Vr\x96\xca\xae\x98y\xb2\x98Y\x80\x9b\xc5{\x9c\xca\xb7\x9cg\xb9\x9cf\xb9\x9cq\x96\x9f\xa0\x81\xa0\xd0\x86\xa0\xc9\xbf\xa3lz\xa4\xda\xbc\xa4\x8a\xbd\xa4u\x8a\xa6\xd2\x85\xa8\xd8\x8b\xa8\xd2\xc5\xaaq\x89\xab\xda\xc4\xab{\x93\xac\xd4\xc3\xac\x86\x99\xad\xc4\xa5\xaf\xb2\xcd\xb4t\x99\xb5\xdd\xcf\xb5z\xa6\xb8\xce\xa4\xba\xdd\xae\xba\xbf\xd2\xbaz\xcd\xbc|\xab\xbe\xdf\xcf\xbe\x84\xad\xbf\xe0\xaf\xc0\xe0\xb7\xc1\xc6\xb0\xc2\xdf\xd1\xc3\x92\xba\xc5\xc4\xd3\xc5\xa9\xbb\xc7\xcb\xd7\xc9\x97\xc0\xcb\xcd\xd4\xcb\xaa\xd9\xcd\xa3\xdd\xcd\x98\xc3\xd0\xd3\xc4\xd1\xe4\xdc\xd1\xb8\xc7\xd2\xdb\xb0\xd5\xef\xdf\xd7\xa3\xe4\xda\xc9\xcf\xdb\xe8\xc3\xdc\xf0\xe1\xdc\xc5\xd1\xe0\xef\xe3\xe0\xca\xd9\xe2\xee\xe6\xe2\xd4\xd7\xe4\xf1\xdc\xe4\xf1\xdb\xe5\xe7\xea\xe7\xde\xec\xea\xde\xed\xeb\xe2\xcd\xec\xfa\xdf\xed\xf1\xd4\xf0\xfa\xe4\xf0\xf2\xec\xf1\xf2\xf1\xf1\xed\xe3\xf4\xfd\xf3\xf5\xf5\xe9\xf6\xfc\xf3\xf6\xfa\xec\xfb\xff\xf4\xfd\xfe\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00l\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xc2\x80l\x82\x83\x84\x85\x85(/6:6-"\x86\x821:Q\\ddXD!\x17\x851J^W>008RT \x10\x844^L?ZccZ8AM\x0f\x83)MW<kc[j\xbd5L)\x0c\x82&X8Yjf#cj9S,H\t\xc3^*gik\x0e3\rEa\x1bV\xd1l!]$egb\x14\rKi_\x18T\xdf\x16M0See@`ieO\x1fB\x01\x82\x11/N.\xd2\xa4\xe9%\xf0D\x11\r\x03\x06=Hr\xc3E\x154h\xaa\xac\x90\xd1\x83\xdf \x08\x13\x8c\x1c)\x91!\x83\x87!;\x0c\x1c(\xa4\x00A\x87\x1eP\xa0\xec\xa8\x10\xa0\xc0#6\x01\x02\x10 \x10@\xc0\xcb\x9b\x84\x02\x01\x00;'
 		self.b64["Play"] = b'GIF89a\x10\x00\x10\x00\xa56\x00\x14A\xb7\x15E\xb9\x16J\xbd\x16N\xc0\x17P\xbd\x18S\xc0\x18Y\xc4\x19Y\xc6\x1ab\xc6\x1ab\xc9#n\xcd,r\xcd;q\xcc<t\xcf5w\xd2=w\xd0?z\xd0C\x7f\xd3C\x84\xd6G\x84\xd6K\x88\xd6S\x8e\xdb`\x95\xdda\x97\xddb\x97\xe1n\xa0\xe2r\xa1\xdft\xa2\xe2t\xa3\xe0u\xa3\xdfu\xa4\xe3w\xa4\xe0y\xa6\xe0y\xa7\xe6~\xa8\xe1|\xa9\xe1|\xa9\xe8~\xa9\xe8\x80\xaa\xe3\x81\xab\xe2\x81\xab\xe3\x80\xab\xe8\x80\xab\xea\x87\xaf\xe4\x87\xb0\xe8\x8a\xb1\xe4\x90\xb5\xe7\x92\xb7\xe8\x99\xbb\xe9\x99\xbb\xea\xa1\xc1\xec\xa3\xc2\xed\xa8\xc7\xee\xad\xc8\xef\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff!\xfe\x11Created with GIMP\x00!\xf9\x04\x01\n\x00?\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x06K\xc0\x9fpH,\x1a\x8f\xc8T\tiT\x916Lb\xa8\xc6\xb2D\x85\x19\xda\xcc3\xb9bd/\xd8e\x11\xad\xc4L\xa8\x16\x05\xc1\x94\xb88\x9fS\xe4\xc0t\xac4#H!\xaa\x10\x81\x1e\x04W\t\x1d\r\x02W?\x06\x0c\x01\x87?\x03\x00\x8c\x90\x91A\x00;'
 		self.b64["Stop"] = b'GIF89a\x10\x00\x10\x00\xe7\x84\x00\xd5>5\xd8G>\xd7H@\xd8H@\xfaB%\xd9KC\xd9KD\xfdF(\xdaOG\xfeI,\xffK,\xdbUM\xffO0\xffO1\xffP2\xffP3\xddYQ\xdc[S\xffU7\xde^T\xffY;\xffY<\xffZ<\xdebZ\xff\\?\xff^@\xff^A\xf9`H\xffcF\xe0jc\xffdF\xfdeJ\xe0le\xe4lc\xffgH\xffgN\xffiK\xffnO\xffnP\xffoP\xe4ul\xffpO\xe3xq\xffsU\xfftU\xfftZ\xffxY\xffyZ\xe7\x81y\xff~_\xff~`\xff\x7f_\xe5\x84}\xff\x80`\xff\x81g\xff\x83e\xe6\x8a\x85\xe8\x8b\x83\xff\x89i\xf2\x8b}\xf7\x8d}\xe7\x91\x8b\xff\x8dm\xff\x8en\xfa\x8e}\xff\x8eo\xff\x8fs\xea\x93\x8c\xff\x90o\xfc\x90\x7f\xf4\x94\x86\xff\x93s\xff\x93t\xfa\x93\x84\xff\x93x\xe9\x97\x92\xe9\x98\x92\xf6\x96\x89\xff\x95\x84\xea\x9a\x95\xfa\x97\x89\xff\x98v\xff\x98x\xff\x99x\xff\x99\x87\xea\x9e\x98\xff\x9b\x8a\xed\x9f\x98\xff\x9d|\xeb\xa0\x9b\xff\x9e|\xeb\xa2\x9d\xff\xa0}\xff\xa0~\xeb\xa3\x9e\xff\xa1\x85\xff\xa2\x81\xec\xa5\xa0\xff\xa1\x90\xff\xa5\x81\xfa\xa5\x96\xff\xa7\x84\xff\xa7\x85\xff\xaa\x86\xef\xac\xa5\xee\xad\xa6\xff\xab\x89\xff\xaa\x98\xfb\xad\x9e\xfb\xad\x9f\xff\xae\x91\xff\xaf\x8b\xf0\xb1\xa9\xfc\xb2\xa2\xfb\xba\xac\xff\xbb\x9c\xff\xbb\xa6\xff\xbf\xa0\xff\xbe\xab\xff\xc2\xa3\xfb\xc3\xb4\xff\xc4\xb1\xfc\xc8\xb7\xfc\xcd\xbc\xff\xcd\xb8\xff\xce\xb9\xff\xcf\xbb\xfc\xd1\xc1\xff\xd1\xbd\xfc\xd3\xc2\xfc\xd4\xc4\xff\xd6\xc1\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff!\xfe\x11Created with GIMP\x00!\xf9\x04\x01\n\x00\xff\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x08\xc6\x00\xff\t\x1cH\xb0\xa0A/a\xb6d\xa9\xb2\xc4\xe0@8\x81\x06\x01\xf2\xd3G\xcf\x15\x87i\x04\xddy\xa3\xa6L\x177x\x86\x14D\xf3\xa7\xce\x193`\xb0H!\xf2EN\x8e\x81O\xf6\xcc\x19\x03F\xcb\x14$At\xd4P\xc2\x06\x84@&|\xb8`\x99r\xe4\x87\x8e\x1b2\\\xa4X\xd3A`\x8f<Q\x8a\x1e\x8d\xf1bE\t\x11b.\x08\xc4a\xc7\xc7\xd4\x17,N\x90\xe0\x80\xc1J\x04\x814\xe8\xcc\xa0\xba\xc2\x04\t\x0f\x1a(4\xa0\xb2@\xa0\x8a8BR\x94x\xab\xc1\x82\x04\x05#\x92\x0c\x18\x08\xa3\x8d\x8d\x0c\x19*Hxp\xe0C\x93\t\x05Q\x90i\xe1\x80A\x02\x02\x1b\x8c@p\x18\x02\x8a\x93"@x\xec\xd8\xec\xf0\x9f\x01\x04\x05\x04\x04\x00P\xba5\xc1\x80\x00;'
 		self.b64["report_text"] = b'GIF89a\x10\x00\x10\x00\xc6\\\x00~1\x18\xabB!\xacC!\xaeF"\xaeI"\xa5K,\xafK#\xb1N#\xb2Q$\xb2R%\xb4U%\xb5V&\xb7Y&\xb7[&\xaf]5\xb8^\'\xb8_\'\xbaa(\xbexI\xb3yc\xb3|d\xb5\x7fe\xb5\x82f\xb7\x83gj\x93\xd4\xb9\x87gj\x98\xd9\xc2\x8bdk\x99\xdan\x9a\xdc\xbf\x8fao\x9b\xdcr\x9c\xdcq\x9d\xdd\xc1\x92cq\x9e\xdfs\x9e\xdf\xc2\x94ds\x9f\xe0t\xa0\xe0v\xa0\xe0\xc3\x96ev\xa2\xe0w\xa3\xe1x\xa3\xe1\xc4\x99f\xc5\x9agz\xa5\xe1\xa0\xbe\xea\xa1\xbf\xea\xa2\xc0\xea\xa3\xc0\xea\xca\xc6\xc4\xcc\xc6\xc0\xc7\xc7\xc7\xcd\xc6\xc0\xca\xc7\xc4\xcd\xc7\xc0\xcd\xc7\xc1\xc9\xc9\xc9\xca\xca\xca\xcb\xcb\xcb\xcc\xcc\xcc\xcd\xcd\xcd\xd1\xd1\xd1\xd2\xd2\xd2\xd3\xd3\xd3\xd4\xd4\xd4\xd5\xd5\xd5\xd8\xd8\xd8\xdc\xdc\xdc\xe6\xe6\xe6\xe8\xe8\xe8\xe9\xe9\xe9\xea\xea\xea\xec\xec\xec\xed\xed\xed\xee\xee\xee\xf0\xf0\xf0\xf1\xf1\xf1\xf2\xf2\xf2\xf3\xf3\xf3\xf4\xf4\xf4\xf5\xf5\xf5\xf6\xf6\xf6\xf7\xf7\xf7\xf8\xf8\xf8\xf9\xf9\xf9\xfa\xfa\xfa\xfb\xfb\xfb\xfc\xfc\xfc\xfd\xfd\xfd\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff!\xfe\x11Created with GIMP\x00!\xf9\x04\x01\n\x00\x7f\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xbf\x80\x7f\x7f\x1b\x12\x11\x82\x87\x88\x87>8:\x10Z\x8f\x90\x91\x87\x19.\x0fU\x97USR\x9bPY\x82\x8b9\r\x98\x97S\xa5QX\x87\x17-\x0cVV/,+*(\'R\xa8\x7f>49\x0bWW,3210#RU\x87\x16)\nXX\xb2\'$ \x1fPT\x9f\xb9\tYX\xadVUQPNM\x87\x15%\x08\xd7&!\x1d\x1c\x1a\x18JK\xd37\x07XW\xd9T\xcaXP@\x87\x14"\x06\xbcWT\xa7\xf4;H\xa6\xd5 \xa0\xcc\x8a\x94\'Y\xa0\xf08\xa2\xe5\xd0\x04\x0f\x03\x94\xf5k\x12ea\x96\x86\xb7h\xd4\x10\xb0%\x8bA&D\x92p\x19y\xa8\x80\x83\x00F\x8a\x0c\t\x02D\x08\x90\x1e?l \x02\x90\xa8\xe6\x9f@\x00;'
@@ -2946,6 +3314,9 @@ class RFSwarmGUI(tk.Frame):
 		self.b64["Delete"] = b'GIF87a\x10\x00\x10\x00\xd5\x00\x00\x00\x00\x00\xe4\x14\x18\xe3\x1a\x1e\xdf  \xdf @\xe7%&\xea)+\xe7**\xe9.1\xec34\xff33\xed;=\xf1<>\xef?B\xdf@@\xefCE\xefCK\xf1CE\xf4EH\xf4KM\xf3LQ\xffSV\xf6TV\xf6UZ\xffVZ\xf5Z\\\xfa]^\xf7^`\xf8^b\xff`\x80\xfcbd\xf9gi\xfbjm\xfdmp\xfert\xffwy\xffz}\xff~\x81\xff\x81\x82\xff\x87\x8a\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00)\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x06t\xc0\x94pH,\x1a\x8f\x1a\xe3hd\xf4|(\xc4Q\xa9$"r@$\xcec("\x9dH \xe1\x95\xb4\x89\x14A"\x93\xc8\x93\xc1f\xb6\xcdP\x89D\x1a\xbd\x8f\xc2\x0cI\x83\x115\xf0y#\x15\x15"fx\x19\x1e""! \x16\x0bG\x17\x89\x17\r\x0b\x13\x1e\x13\tE\x91"\x8eB\x08\x11\x1e\x12\x06C\x13\x16\x1e\x9dC\x05\x0c\x13\x06\x01C\x10\x13\x8fE\x02\xadE\xb2F\xae\x80\x80A\x00;'
 
 		self.b64["Advanced"] = b'GIF87a\x10\x00\x10\x00\xc4\x00\x00\x00\x00\x00GGGMMMTTT[[[ccclllpppyyy\x82\x82\x82\x8d\x8d\x8d\x94\x94\x94\x9c\x9c\x9c\xa5\xa5\xa5\xac\xac\xac\xb4\xb4\xb4\xbc\xbc\xbc\xc4\xc4\xc4\xcb\xcb\xcb\xd4\xd4\xd4\xdc\xdc\xdc\xe5\xe5\xe5\xeb\xeb\xeb\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00\x18\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x05\x91 &\x8e\x92\x14Ac\xaaFU\xe5\xa8\xe3Tb\x11E=\x98\xd341eQ\xa7\xc9\xe4\xe1\x90T \n\x91\x892\xb1\t\x99%\xc4a\x14\x91I \x8cFd\x8bTn)\xd7\x04"\xa1\xd8J\x14\x89D\xc4bm$D\x0c\xc7\xa9f`M"\x92\xc7B\xb4\x90C\xaa\x05\r\x0b\rw\x12\x0c\x0c\x0be\x10\x10\x05\x03\x03"rf\x0e~D\x06#:\x85V&\x10\x12\x06\x05"\r\x10\x14nj\x11\x06\x06\x84\t\x8f"\t\x9e\x18\t%\x9f\x03\x02\x010\xac\x10\x0f\x04\xb6*\x06\xb3\xab)!\x00;'
+
+
+		self.b64["Refresh"] = b'GIF87a\x10\x00\x10\x00\xd5\x00\x00\x00\x00\x00\x00U\x00\x1c^\x17\x1cb\x1a\x1fb\x16!e\x1d&j (m!.u\'/v)4}.7~1:\x833?\x887?\x888B\x8b7B\x8c:I\x8cCF\x91>I\x92>O\x92IK\x95CR\x96LN\x9bER\x9cJU\xa4Lb\xa4[Y\xa7Nf\xa9^U\xaaUg\xab`^\xacRk\xaecm\xb1ev\xb4oc\xb5[f\xb9\\k\xbbai\xbc^|\xbes\x81\xbfzo\xc0b~\xc0ul\xc1_\x7f\xc2yq\xc3c\x81\xc3w\x84\xc4{\x87\xc5\x80\x8b\xc6\x83\x85\xc8{\x8e\xc9\x86\x8f\xca\x88\x94\xcc\x8b\x99\xcf\x8f\x9c\xd0\x93\xa0\xd2\x97\xa3\xd4\x9a\xa8\xd8\x9f\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00<\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x06\x8c@\x9ep8\xcc\x10\x8f\xc8\xcb\x04),\x8d>\x1bL\x85\xa3Q I\xaf\xdam[\x9b\xc1,\x06"i\x96\xb3\xddj\xb5\xd8\x8b\x15\x19\x0cG\xaa\xdcm\xc6a,\x12\x956\xf1\x13KC\x18C\x05\x02G\x19\x17\x12\r\x80C\x83\x1f\x85\x13\x0f\x15\x7f\x0b\x08<-D\x85\x87\x89C)&CR14"\tD+2.\x8c\x17 131\x18aB&/:9rh//\x1a\xaeB#\'8g]( \x14\x05H\x19!\x1e\x7f\n\x08\x07\xc3L\x13\x0eL\xd0V\xd0A\x00;'
 
 		# png's
 		# b64["New"] = """iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAAK/INwWK6QAAABl0RVh0\nU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAC4SURBVCjPdZFbDsIgEEWnrsMm7oGGfZro\nhxvU+Iq1TyjU60Bf1pac4Yc5YS4ZAtGWBMk/drQBOVwJlZrWYkLhsB8UV9K0BUrPGy9cWbng2CtE\nEUmLGppPjRwpbixUKHBiZRS0p+ZGhvs4irNEvWD8heHpbsyDXznPhYFOyTjJc13olIqzZCHBouE0\nFRMUjA+s1gTjaRgVFpqRwC8mfoXPPEVPS7LbRaJL2y7bOifRCTEli3U7BMWgLzKlW/CuebZPAAAA\nAElFTkSuQmCC\n"""
@@ -2980,19 +3351,30 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(5, "self.tabs", self.tabs)
 		# base.debugmsg(5, "self.tabs", self.tabs["background"])
 
+
 		base.debugmsg(6, "p")
 		p = ttk.Frame(self.tabs)   # first page, which would get widgets gridded into it
 		p.grid(row=0, column=0, sticky="nsew")
 		# p.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
+		self.tabs.add(p, text='Plan')
+
 		base.debugmsg(6, "r")
 		r = ttk.Frame(self.tabs)   # second page
 		r.grid(row=0, column=0, sticky="nsew")
+		self.tabs.add(r, text='Run')
+
 		base.debugmsg(6, "a")
 		a = ttk.Frame(self.tabs)   # 3rd page
 		a.grid(row=0, column=0, sticky="nsew")
-		self.tabs.add(p, text='Plan')
-		self.tabs.add(r, text='Run')
 		self.tabs.add(a, text='Agents')
+
+		base.debugmsg(6, "ab")
+		ab = ttk.Frame(self.tabs)   # About page
+		ab.grid(row=0, column=0, sticky="nsew")
+		self.tabs.add(ab, text='About')
+
+
+
 		self.tabs.grid(column=0, row=0, sticky="nsew")
 		# self.tabs.grid(column=0, row=0, padx=0, pady=0, sticky="nsew")
 
@@ -3008,13 +3390,18 @@ class RFSwarmGUI(tk.Frame):
 		self.BuildRun(r)
 		base.debugmsg(6, "BuildAgent")
 		self.BuildAgent(a)
+		base.debugmsg(6, "BuildAbout")
+		self.BuildAbout(ab)
 
-
+		if len(base.config['Plan']['ScenarioFile'])<1:
+			self.OpenINIGraphs()
 
 
 	def BuildMenu(self):
 		# creating a root menu to insert all the sub menus
+		# https://tkdocs.com/tutorial/menus.html
 		window = self.master
+		self.root.option_add('*tearOff', False)
 		root_menu = tk.Menu(window)
 		window.config(menu = root_menu)
 
@@ -3045,16 +3432,52 @@ class RFSwarmGUI(tk.Frame):
 		# 	file_menu.add_command(label = "Quit", command = self.on_closing, accelerator="Command-q")
 		# 	window.bind('q', self.on_closing)  # This doesn't work yet, the mac python overrides it ?
 		# else:
-		file_menu.add_command(label = "Exit", command = self.on_closing, accelerator="{}-x".format(accelkey))
-		window.bind('x', self.on_closing)
+		if sys.platform.startswith('darwin'):
+			# https://tkdocs.com/tutorial/menus.html
+			# root.createcommand('tk::mac::ShowPreferences', showMyPreferencesDialog)
+			self.root.createcommand('tk::mac::Quit', self.on_closing)
+		else:
+			file_menu.add_command(label = "Exit", command = self.on_closing, accelerator="{}-x".format(accelkey))
+			window.bind('x', self.on_closing)
 
-		# creting another sub menu
+		# creating another sub menu
 		run_menu = tk.Menu(root_menu)
 		root_menu.add_cascade(label = "Run", menu = run_menu)
 		run_menu.add_command(label = "Play", command = self.ClickPlay, accelerator="{}-p".format(accelkey))
 		window.bind('p', self.ClickPlay)
 		run_menu.add_command(label = "Stop", command = self.ClickStop, accelerator="{}-t".format(accelkey))
 		window.bind('t', self.ClickStop)
+
+
+		# creating graphs sub menu
+		self.gph_menu = tk.Menu(root_menu)
+		root_menu.add_cascade(label = "Graphs", menu = self.gph_menu)
+
+		self.gph_menu.add_command(label = "New Graph Window", command = self.NewGraph, accelerator="{}-g".format(accelkey))
+		window.bind('g', self.NewGraph)
+
+		self.gph_menu.add_separator()
+
+		gph_example_menu = tk.Menu(self.gph_menu)
+		self.gph_menu.add_cascade(label = "Examples", menu = gph_example_menu)
+
+		gph_example_menu.add_command(label = "Running Robots", command = lambda: self.OpenGraph({'name': 'Running Robots', 'show_settings': False, 'show_legend': 0, 'data_type': 'Metric', 'metric_type': 'Scenario', 'primary_metric': '', 'secondary_metric': 'total_robots'}))
+		gph_example_menu.add_command(label = "Agent Robots", command = lambda: self.OpenGraph({'name': 'Agent Robots', 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Robots'}))
+		gph_example_menu.add_command(label = "Agent Load", command = lambda: self.OpenGraph({'name': 'Agent Load', 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Load'}))
+		gph_example_menu.add_command(label = "Agent CPU", command = lambda: self.OpenGraph({'name': 'Agent CPU', 'win_location_x': 38, 'win_location_y': 500, 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'CPU'}))
+		gph_example_menu.add_command(label = "Agent Memory", command = lambda: self.OpenGraph({'name': 'Agent Memory', 'win_location_x': 500, 'win_location_y': 500, 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'MEM'}))
+		gph_example_menu.add_command(label = "Agent Network", command = lambda: self.OpenGraph({'name': 'Agent Network', 'win_location_x': 960, 'win_location_y': 500, 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'NET'}))
+		gph_example_menu.add_command(label = "Response Time", command = lambda: self.OpenGraph({'name': 'Response Time', 'win_width': 1200, 'win_height': 600, 'show_settings': False, 'show_legend': 1, 'data_type': 'Result', 'result_type': 'Response Time', 'flter_result': 'Pass', 'filter_name': 'None', 'filter_pattern': ''}))
+		gph_example_menu.add_command(label = "Passing Keywords", command = lambda: self.OpenGraph({'name': 'Passing Keywords', 'show_settings': False, 'show_legend': 0, 'data_type': 'Result', 'result_type': 'TPS', 'flter_result': 'Pass', 'filter_name': 'None', 'filter_pattern': ''}))
+		gph_example_menu.add_command(label = "Failing Keywords", command = lambda: self.OpenGraph({'name': 'Failing Keywords', 'show_settings': False, 'show_legend': 1, 'data_type': 'Result', 'result_type': 'TPS', 'flter_result': 'Fail', 'filter_name': 'None', 'filter_pattern': ''}))
+		gph_example_menu.add_command(label = "Total TPS", command = lambda: self.OpenGraph({'name': 'Total TPS', 'show_settings': False, 'show_legend': 1, 'data_type': 'Result', 'result_type': 'Total TPS', 'flter_result': 'None', 'filter_name': 'None', 'filter_pattern': ''}))
+
+		self.gph_recent_menu = tk.Menu(self.gph_menu)
+		self.gph_menu.add_cascade(label = "Recent", menu = self.gph_recent_menu)
+		self.RefreshRecentGraphs()
+
+		self.gph_scenario_menu = tk.Menu(self.gph_menu)
+		self.gph_menu.add_cascade(label = "Scenario", menu = self.gph_scenario_menu)
 
 
 		window.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -3140,33 +3563,1078 @@ class RFSwarmGUI(tk.Frame):
 				# style.configure("rfsinput", **style.configure('TLabel'))
 				# style.map("rfsinput", **style.map('TLabel'))
 				# style.configure("TLabel", foreground="systemPlaceholderTextColor")
-				style.configure("TLabel", foreground="#000")
+				style.configure("TLabel", foreground=self.style_text_colour)
 				style.configure("TEntry", foreground="systemPlaceholderTextColor")
 				# style.configure("TButton", foreground="systemPlaceholderTextColor")
-				style.configure("TButton", foreground="#000")
+				style.configure("TButton", foreground=self.style_text_colour)
 				# style.configure("TCombobox", foreground="systemPlaceholderTextColor")
-				# style.configure("TCombobox", foreground="#000")
-				# style.configure("TComboBox", foreground="#000")
-				# style.configure("Combobox", foreground="#000")
-				# style.configure("ComboBox", foreground="#000")
+				# style.configure("TCombobox", foreground=self.style_text_colour)
+				# style.configure("TComboBox", foreground=self.style_text_colour)
+				# style.configure("Combobox", foreground=self.style_text_colour)
+				# style.configure("ComboBox", foreground=self.style_text_colour)
 				#
-				# style.configure("OptionMenu", foreground="#000")
-				# style.configure("TOptionMenu", foreground="#000")
-				# style.configure("Optionmenu", foreground="#000")
-				# style.configure("TOptionmenu", foreground="#000")
+				# style.configure("OptionMenu", foreground=self.style_text_colour)
+				# style.configure("TOptionMenu", foreground=self.style_text_colour)
+				# style.configure("Optionmenu", foreground=self.style_text_colour)
+				# style.configure("TOptionmenu", foreground=self.style_text_colour)
 
-				# style.configure("Menubutton", foreground="#000")
-				style.configure("TMenubutton", foreground="#000")
+				# style.configure("Menubutton", foreground=self.style_text_colour)
+				style.configure("TMenubutton", foreground=self.style_text_colour)
 
 				# self.rfstheme["default"] = "systemPlaceholderTextColor"
-				# self.rfstheme["default"] = "#000"
+				# self.rfstheme["default"] = self.style_text_colour
 
-				# style.configure("Canvas", foreground="#000")
-				style.configure("Canvas", fill="#000")
-				style.configure("Canvas", activefill="#000")
+				# style.configure("Canvas", foreground=self.style_text_colour)
+				style.configure("Canvas", fill=self.style_text_colour)
+				style.configure("Canvas", activefill=self.style_text_colour)
 
-				# style.configure("Spinbox", foreground="#000")
-				style.configure("TSpinbox", foreground="#000")
+				# style.configure("Spinbox", foreground=self.style_text_colour)
+				style.configure("TSpinbox", foreground=self.style_text_colour)
+
+				style.configure("TRadiobutton", foreground=self.style_text_colour)
+
+
+
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+	#
+	# Graphs
+	#
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+	def newgraphid(self):
+		timenow = int(time.time())
+		base.debugmsg(5, "timenow:", timenow, " 	newgraph:", self.newgraph)
+		id = "{}-{}".format(hex(timenow)[2:], hex(self.newgraph)[2:])
+		base.debugmsg(5, "id:", id)
+		return id
+
+
+	def NewGraph(self, *args):
+		base.debugmsg(6, "New Graph Window.....")
+		base.debugmsg(5, "New Graph Window - args:", args)
+
+		self.OpenGraph({}, *args)
+
+	def MenuOpenGraph(self, iniid, *args):
+		base.debugmsg(5, "Menu Open Graph Window - iniid:", iniid)
+		base.debugmsg(5, "Menu Open Graph Window - args:", args)
+
+		if "window" in self.graphs[iniid]:
+			base.debugmsg(5, "window:", self.graphs[iniid]["window"])
+			self.graphs[iniid]["window"].focus_set()
+		else:
+			settings = self.inigphsettings(base.config[iniid])
+			self.OpenGraph(settings, *args)
+
+
+	def OpenGraph(self, settings, *args):
+
+		base.debugmsg(5, "Open Graph Window - settings:", settings)
+
+		grphWindow = tk.Toplevel(self.root)
+		grphWindow.saveready = False
+		# grphWindow.config(bg="pink")
+		grphWindow.columnconfigure(0, weight=1)
+		# grphWindow.rowconfigure(0, weight=1)
+		grphWindow.rowconfigure(1, weight=1)
+
+		# grphWindow.bind("<Configure>", self.gph_windowevent)
+		grphWindow.bind("<Configure>", lambda e: self.gph_windowevent(e, grphWindow) )
+
+		grphWindow.protocol("WM_DELETE_WINDOW",  lambda: self.gph_close(grphWindow) )
+
+		self.newgraph += 1
+		if 'id' in settings and len(settings['id'])>0:
+			grphWindow.graphid = settings['id']
+		else:
+			grphWindow.graphid = self.newgraphid()
+
+		if grphWindow.graphid not in self.graphs:
+			self.graphs[grphWindow.graphid] = {}
+
+		self.graphs[grphWindow.graphid]["window"] = grphWindow
+
+		grphWindow.graphname=tk.StringVar()
+		if 'name' in settings:
+			grphWindow.graphname.set(settings['name'])
+		else:
+			grphWindow.graphname.set("New Graph {}".format(self.newgraph))
+		base.debugmsg(6, "graphname:", grphWindow.graphname.get())
+
+		grphWindow.graphdata = {}
+
+		grphWindow.title(grphWindow.graphname.get())
+
+		grphWindow.fmeBBar = tk.Frame(grphWindow)
+		# grphWindow.fmeBBar.grid(column=0, row=0, sticky="nsew")
+		grphWindow.fmeBBar.grid(column=0, row=0, sticky="ne")
+		grphWindow.fmeContent = tk.Frame(grphWindow)
+		# grphWindow.fmeContent.config(bg="red")
+		grphWindow.fmeContent.grid(column=0, row=1, sticky="nsew")
+
+		grphWindow.fmeContent.columnconfigure(0, weight=1)
+		grphWindow.fmeContent.rowconfigure(0, weight=1)
+		# grphWindow.fmeContent.rowconfigure(1, weight=1)
+
+
+		grphWindow.lblBLNK = ttk.Label(grphWindow.fmeBBar, text = " ")	# just a blank row as a spacer before the filters
+		grphWindow.lblBLNK.grid(column=0, row=0, sticky="nsew")
+
+		icontext = "Advanced"
+		grphWindow.btnSettings = ttk.Button(grphWindow.fmeBBar, image=self.imgdata[icontext], text="Settings", command=lambda: self.gs_showhide(grphWindow), width=1)
+		grphWindow.btnSettings.grid(column=99, row=0, sticky="nsew")
+
+		icontext = "Refresh"
+		grphWindow.btnRefresh = ttk.Button(grphWindow.fmeBBar, image=self.imgdata[icontext], text="Refresh", command=lambda: self.gs_refresh(grphWindow), width=1)
+		grphWindow.btnRefresh.grid(column=98, row=0, sticky="nsew")
+
+
+
+		grphWindow.fmeGraph = tk.Frame(grphWindow.fmeContent)
+		# grphWindow.fmeGraph.config(bg="green")
+		grphWindow.fmeGraph.grid(column=0, row=0, columnspan=8, sticky="nsew")
+		# grphWindow.fmeGraph.bind("<Configure>", self.gph_windowevent)
+		# grphWindow.fmeGraph.bind("<Configure>", lambda: self.gph_windowevent(grphWindow))
+
+		grphWindow.fmeGraph.columnconfigure(0, weight=1)
+		grphWindow.fmeGraph.rowconfigure(0, weight=1)
+		# grphWindow.fmeGraph.rowconfigure(1, weight=1)
+
+		# grphWindow.fig_dpi = 100
+		grphWindow.fig_dpi = 72
+		# grphWindow.fig = Figure(dpi=grphWindow.fig_dpi, tight_layout=True, constrained_layout=True) # , constrained_layout=True??
+		grphWindow.fig = Figure(dpi=grphWindow.fig_dpi) # , tight_layout=True
+		grphWindow.axis = grphWindow.fig.add_subplot(1,1,1)	# , constrained_layout=True??
+		# self.axis = self.fig.add_subplot()
+		grphWindow.axis.grid(True, 'major', 'both')
+		# grphWindow.fig.tight_layout()
+
+		# self.axis.plot([],[])
+
+		# plt.gcf().autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+		grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+
+		grphWindow.canvas = FigureCanvasTkAgg(grphWindow.fig, grphWindow.fmeGraph)
+		grphWindow.canvas.get_tk_widget().grid(column=0, row=0, sticky="nsew")
+		# grphWindow.canvas.get_tk_widget().config(bg="blue")
+		grphWindow.canvas.draw()
+		grphWindow.fig.set_tight_layout(True)
+
+
+		# #
+		# # # start thread to update the graph (gph_updater)
+		# t = threading.Thread(target=lambda: self.gph_updater(grphWindow))
+		# t.start()
+
+		grphWindow.fmeSettings = tk.Frame(grphWindow.fmeContent)
+		# grphsettings: {'name': 'Agent Load', 'show_settings': False, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Load'}
+		if 'show_settings' in settings and settings['show_settings'] or 'show_settings' not in settings:
+			grphWindow.fmeSettings.grid(column=90, row=0, columnspan=10, sticky="nsew")
+			grphWindow.fmeSettings.show = True
+		else:
+			grphWindow.fmeSettings.show = False
+
+		row =0
+		grphWindow.fmeSettings.lblGN = ttk.Label(grphWindow.fmeSettings, text = "Graph Name:")
+		grphWindow.fmeSettings.lblGN.grid(column=0, row=row, sticky="nsew")
+
+		grphWindow.fmeSettings.inpGN = ttk.Entry(grphWindow.fmeSettings, textvariable=grphWindow.graphname)
+		grphWindow.fmeSettings.inpGN.grid(column=1, row=row, sticky="nsew")
+
+		row +=1
+		grphWindow.fmeSettings.lblLGD = ttk.Label(grphWindow.fmeSettings, text = "Show Legend:")
+		grphWindow.fmeSettings.lblLGD.grid(column=0, row=row, sticky="nsew")
+
+		grphWindow.showlegend = tk.IntVar()
+		grphWindow.fmeSettings.inpLGD = ttk.Checkbutton(grphWindow.fmeSettings, variable=grphWindow.showlegend)
+		if 'show_legend' in settings:
+			grphWindow.showlegend.set(settings['show_legend'])
+		grphWindow.fmeSettings.inpLGD.grid(column=1, row=row, sticky="nsew")
+
+		# other settings? Metric Type, Primary metric, Secondary metric, filter?
+
+		row +=1
+		grphWindow.fmeSettings.lblDT = ttk.Label(grphWindow.fmeSettings, text = "Data Type:")
+		grphWindow.fmeSettings.lblDT.grid(column=0, row=row, sticky="nsew")
+
+		DataTypes = [None, "Metric", "Result"]
+		grphWindow.settings = {}
+		grphWindow.settings["DataType"] = tk.StringVar()
+		grphWindow.fmeSettings.omDT = ttk.OptionMenu(grphWindow.fmeSettings, grphWindow.settings["DataType"], command=lambda *args: self.gs_switchdt(grphWindow), *DataTypes)
+		# grphsettings: {'name': 'Agent Load', 'show_settings': False, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Load'}
+		if 'data_type' in settings and len(settings['data_type'])>1:
+			grphWindow.settings["DataType"].set(settings['data_type'])
+		else:
+			grphWindow.settings["DataType"].set(DataTypes[1])
+		grphWindow.fmeSettings.omDT.grid(column=1, row=row, sticky="nsew")
+
+
+		row +=1
+		grphWindow.fmeDTRow = row
+		#
+		# 	Add DT Settings frames
+		#
+		grphWindow.fmeSettings.columnconfigure(0, weight=1)
+
+		grphWindow.fmeRSettings = tk.Frame(grphWindow.fmeSettings)
+		grphWindow.fmeRSettings.columnconfigure(0, weight=1)
+		grphWindow.fmeRSettings.columnconfigure(1, weight=1)
+		if grphWindow.settings["DataType"].get() == "Result":
+			grphWindow.fmeRSettings.grid(column=0, row=grphWindow.fmeDTRow, columnspan=2, sticky="nsew")
+
+		grphWindow.fmeMSettings = tk.Frame(grphWindow.fmeSettings)
+		grphWindow.fmeMSettings.columnconfigure(0, weight=1)
+		grphWindow.fmeMSettings.columnconfigure(1, weight=1)
+		if grphWindow.settings["DataType"].get() == "Metric":
+			grphWindow.fmeMSettings.grid(column=0, row=grphWindow.fmeDTRow, columnspan=2, sticky="nsew")
+
+		#
+		# 	DT Results Settings
+		#
+		rowR =0
+		# grphWindow.fmeRSettings
+		grphWindow.fmeRSettings.lblRT = ttk.Label(grphWindow.fmeRSettings, text = "Result Type:")
+		grphWindow.fmeRSettings.lblRT.grid(column=0, row=rowR, sticky="nsew")
+
+		grphWindow.fmeRSettings.RTypes = [None, "Response Time", "TPS", "Total TPS"]
+		grphWindow.settings["RType"] = tk.StringVar()
+		grphWindow.fmeRSettings.omRT = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["RType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.RTypes)
+		if 'result_type' in settings and len(settings['result_type'])>1:
+			grphWindow.settings["RType"].set(settings['result_type'])
+		else:
+			grphWindow.settings["RType"].set(grphWindow.fmeRSettings.RTypes[1])
+		grphWindow.fmeRSettings.omRT.grid(column=1, row=rowR, sticky="nsew")
+
+		rowR +=1
+		# result filtered by PASS, FAIL, None
+		grphWindow.fmeRSettings.lblFR = ttk.Label(grphWindow.fmeRSettings, text = "Filter Result:")
+		grphWindow.fmeRSettings.lblFR.grid(column=0, row=rowR, sticky="nsew")
+
+		grphWindow.fmeRSettings.FRTypes = [None, "None", "Pass", "Fail"]
+		grphWindow.settings["FRType"] = tk.StringVar()
+		grphWindow.fmeRSettings.omFR = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["FRType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.FRTypes)
+		if 'flter_result' in settings and len(settings['flter_result'])>1:
+			grphWindow.settings["FRType"].set(settings['flter_result'])
+		else:
+			grphWindow.settings["FRType"].set(grphWindow.fmeRSettings.FRTypes[2])
+		grphWindow.fmeRSettings.omFR.grid(column=1, row=rowR, sticky="nsew")
+
+		rowR +=1
+		# result_name filtered by GLOB (Unix file globbing syntax for its wildcards)
+		# result_name filtered by REGEXP
+		# NOT variations of GLOB and REGEXP
+
+		grphWindow.fmeRSettings.lblFN = ttk.Label(grphWindow.fmeRSettings, text = "Filter Type:")
+		grphWindow.fmeRSettings.lblFN.grid(column=0, row=rowR, sticky="nsew")
+
+		# for some reason the regex patterns didn't work, when I put the generated sql with the
+		# 	regex into "DB Browser for SQLite" they did work, so perhaps the python implimentation of
+		# 	sqlite doesn't have regex included, needs more research
+		#
+		#  Example generated sql with regex
+		# 	SELECT   CAST(end_time as INTEGER) as 'endtime' , count(result)  as 'count' , result_name , result FROM Results WHERE result == 'PASS' AND result_name NOT LIKE 'Exception in thread%' AND result_name REGEXP 'OC3.*' GROUP by CAST(end_time as INTEGER) , result_name , result
+		#
+		# grphWindow.fmeRSettings.FNTypes = [None, "None", "Wildcard (Unix Glob)", "Regex", "Not Wildcard (Unix Glob)", "Not Regex"]
+		grphWindow.fmeRSettings.FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
+		grphWindow.settings["FNType"] = tk.StringVar()
+		grphWindow.fmeRSettings.omFR = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["FNType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.FNTypes)
+		if 'filter_name' in settings and len(settings['filter_name'])>1:
+			grphWindow.settings["FNType"].set(settings['filter_name'])
+		else:
+			grphWindow.settings["FNType"].set(grphWindow.fmeRSettings.FNTypes[1])
+		grphWindow.fmeRSettings.omFR.grid(column=1, row=rowR, sticky="nsew")
+
+		rowR +=1
+		grphWindow.fmeRSettings.lblFP = ttk.Label(grphWindow.fmeRSettings, text = "Filter Pattern:")
+		grphWindow.fmeRSettings.lblFP.grid(column=0, row=rowR, sticky="nsew")
+
+		grphWindow.settings["FPattern"] = tk.StringVar()
+		grphWindow.fmeRSettings.inpFP = ttk.Entry(grphWindow.fmeRSettings, textvariable=grphWindow.settings["FPattern"])
+			# settings["filter_pattern"] = grphWindow.fmeRSettings.inpFP.get()
+		if 'filter_pattern' in settings and len(settings['filter_pattern'])>1:
+			# grphWindow.fmeRSettings.inpFP.delete(0,'end')
+			# grphWindow.fmeRSettings.inpFP.insert(0, settings['filter_pattern'])
+			grphWindow.settings["FPattern"].set(settings['filter_pattern'])
+		grphWindow.fmeRSettings.inpFP.grid(column=1, row=rowR, sticky="nsew")
+
+
+		#
+		# 	DT Metric Settings
+		#
+		rowM =0
+		grphWindow.fmeMSettings.lblMT = ttk.Label(grphWindow.fmeMSettings, text = "Metric Type:")
+		grphWindow.fmeMSettings.lblMT.grid(column=0, row=rowM, sticky="nsew")
+
+		grphWindow.fmeMSettings.MTypes = [None, "Loading..."]
+		grphWindow.settings["MType"] = tk.StringVar()
+		grphWindow.fmeMSettings.omMT = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.MTypes)
+		# grphsettings: {'name': 'Agent Load', 'show_settings': False, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Load'}
+		if 'metric_type' in settings and len(settings['metric_type'])>1:
+			if settings['metric_type'] not in grphWindow.fmeMSettings.MTypes:
+				grphWindow.fmeMSettings.MTypes.append(settings['metric_type'])
+			grphWindow.settings["MType"].set(settings['metric_type'])
+		grphWindow.fmeMSettings.omMT.grid(column=1, row=rowM, sticky="nsew")
+
+		rowM +=1
+		grphWindow.fmeMSettings.lblPM = ttk.Label(grphWindow.fmeMSettings, text = "Primrary Metric:")
+		grphWindow.fmeMSettings.lblPM.grid(column=0, row=rowM, sticky="nsew")
+
+		grphWindow.fmeMSettings.PMetrics = [None, "Loading..."]
+		grphWindow.settings["PMetric"] = tk.StringVar()
+		grphWindow.fmeMSettings.omPM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["PMetric"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.PMetrics)
+		# grphsettings: {'name': 'Agent Load', 'show_settings': False, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Load'}
+		if 'primary_metric' in settings and len(settings['primary_metric'])>1:
+			if settings['primary_metric'] not in grphWindow.fmeMSettings.PMetrics:
+				grphWindow.fmeMSettings.PMetrics.append(settings['primary_metric'])
+			grphWindow.settings["PMetric"].set(settings['primary_metric'])
+		grphWindow.fmeMSettings.omPM.grid(column=1, row=rowM, sticky="nsew")
+
+
+		rowM +=1
+		grphWindow.fmeMSettings.lblSM = ttk.Label(grphWindow.fmeMSettings, text = "Secondary Metric:")
+		grphWindow.fmeMSettings.lblSM.grid(column=0, row=rowM, sticky="nsew")
+
+		grphWindow.fmeMSettings.SMetrics = [None, "Loading..."]
+		grphWindow.settings["SMetric"] = tk.StringVar()
+		grphWindow.fmeMSettings.omSM = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["SMetric"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.SMetrics)
+		# grphsettings: {'name': 'Agent Load', 'show_settings': False, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Load'}
+		if 'secondary_metric' in settings and len(settings['secondary_metric'])>1:
+			if settings['secondary_metric'] not in grphWindow.fmeMSettings.SMetrics:
+				grphWindow.fmeMSettings.SMetrics.append(settings['secondary_metric'])
+			grphWindow.settings["SMetric"].set(settings['secondary_metric'])
+		grphWindow.fmeMSettings.omSM.grid(column=1, row=rowM, sticky="nsew")
+
+		# set default size to 600 x 450
+		ww = grphWindow.winfo_width()
+		wh = grphWindow.winfo_height()
+		swg = False
+		# 'win_width': 1200, 'win_height': 600,
+		if 'win_width' in settings and settings['win_width']>0:
+			ww = settings['win_width']
+			swg = True
+		if 'win_height' in settings and settings['win_height']>0:
+			wh = settings['win_height']
+			swg = True
+		if swg:
+			base.debugmsg(5, "ww:", ww, "wh:", wh)
+			grphWindow.geometry("%dx%d" % (ww, wh))
+
+		wx = grphWindow.winfo_x()
+		wy = grphWindow.winfo_y()
+		swg = False
+		# 'win_location_x': 38, 'win_location_y': 500,
+		# toplevel.geometry("+%d+%d" % (x + 100, y + 200)))
+		if 'win_location_x' in settings and settings['win_location_x']>0:
+			wx = settings['win_location_x']
+			swg = True
+		if 'win_location_y' in settings and settings['win_location_y']>0:
+			wy = settings['win_location_y']
+			swg = True
+		# https://stackoverflow.com/questions/36050192/how-to-position-toplevel-widget-relative-to-root-window#36055375
+		# grphWindow.geometry("+%d+%d" % (wx, wy))
+		if swg:
+			base.debugmsg(5, "wx:", wx, "wy:", wy)
+			grphWindow.geometry("+%d+%d" % (wx, wy))
+
+
+		# https://tkdocs.com/shipman/toplevel.html
+		# Not sure if I want to do this?
+		# this did not do what I expected, was hoping for a seperate doc icon for this window
+		#  instead to prevented the window displaying :(
+		# grphWindow.iconify()
+
+		grphWindow.saveready = True
+		base.debugmsg(5, "saveready:", grphWindow.saveready)
+		self.graphs[grphWindow.graphid]["window"] = grphWindow
+
+		#
+		# # start thread to update the graph (gph_updater)
+		t1 = threading.Thread(target=lambda: self.gph_updater(grphWindow))
+		t1.start()
+
+		base.debugmsg(5, "t1:", t1)
+
+		# start threads to update option lists
+		t2 = threading.Thread(target=lambda: self.gs_refresh(grphWindow))
+		t2.start()
+		base.debugmsg(5, "t2:", t2)
+
+	def OpenINIGraphs(self):
+
+		base.debugmsg(8, "graph_list:", base.config['GUI']['graph_list'])
+
+		i = 1
+		glist = base.config['GUI']['graph_list'].split(",")
+		base.debugmsg(9, "glist:", glist)
+
+		tgph = {}
+		for gi in glist:
+
+			base.debugmsg(7, "gi:", gi)
+			iniid = "{}".format(gi)
+			if iniid in base.config:
+				base.debugmsg(7, "iniid:", iniid, base.config[iniid])
+				settings = self.inigphsettings(base.config[iniid])
+				base.debugmsg(7, "settings:", settings)
+
+				if settings['open']:
+					tgph[iniid] = threading.Thread(target=lambda: self.OpenGraph(settings))
+					tgph[iniid].start()
+				else:
+					if iniid not in self.graphs:
+						self.graphs[iniid] = {}
+					self.graphs[iniid]["settings"] = settings
+
+
+	def ClearScenarioGraphs(self):
+		try:
+			# remove existing items if any
+			base.debugmsg(5, "gph_scenario_menu:", self.gph_scenario_menu, self.gph_scenario_menu.index("last"))
+			if self.gph_scenario_menu.index("last") is not None:
+				index = self.gph_scenario_menu.index("last")
+				if index>0:
+					self.gph_scenario_menu.delete(0, index)
+				else:
+					self.gph_scenario_menu.delete(0)
+		except:
+			pass
+
+	def AddScenarioGraph(self, name, id):
+		base.debugmsg(5, "name:", name, " 	id:", id)
+		self.gph_scenario_menu.add_command(label = name, command=lambda id=id: self.MenuOpenGraph(id))
+		base.debugmsg(5, "gph_scenario_menu:", self.gph_scenario_menu, self.gph_scenario_menu.index("last"))
+
+	def RefreshRecentGraphs(self):
+		i = 1
+		glist = base.config['GUI']['graph_list'].split(",")
+		base.debugmsg(9, "glist:", glist)
+		# first construct recent menu list
+		recent = {}
+		for gi in glist:
+			iniid = "{}".format(gi)
+			base.debugmsg(9, "iniid:", iniid)
+			if iniid in base.config:
+				settings = self.inigphsettings(base.config[iniid])
+				base.debugmsg(9, "settings:", settings)
+				if 'name' in settings and 'id' in settings:
+					recent[settings['name']] = settings['id']
+
+		try:
+			# remove existing items if any
+			base.debugmsg(9, "gph_recent_menu:", self.gph_recent_menu, self.gph_recent_menu.index("last"))
+			if self.gph_recent_menu.index("last") is not None:
+				index = self.gph_recent_menu.index("last")
+				if index>0:
+					self.gph_recent_menu.delete(0, index)
+				else:
+					self.gph_recent_menu.delete(0)
+
+			base.debugmsg(9, "gph_recent_menu:", self.gph_recent_menu, self.gph_recent_menu.index("last"))
+			for menui in recent.keys():
+				base.debugmsg(9, "menui:", menui, " 	recent[menui]:", recent[menui])
+				iniid = str(recent[menui])
+				# self.gph_recent_menu.add_command(label = menui, command = lambda: self.OpenGraph(recent["{}".format(menui)]))
+				# self.gph_recent_menu.add_command(label = menui, command = lambda: self.OpenGraph(self.inigphsettings(base.config[iniid])))
+				# self.gph_recent_menu.add_command(label = menui, command=lambda: self.MenuOpenGraph(recent[menui]))
+				self.gph_recent_menu.add_command(label = menui, command=lambda iniid=iniid: self.MenuOpenGraph(iniid))
+				base.debugmsg(9, "gph_recent_menu:", self.gph_recent_menu, self.gph_recent_menu.index("last"))
+		except:
+			pass
+
+	def inigphsettings(self, inidata):
+		# need to translate
+		# 'Graph_1': {'id': '1', 'open': 'True', 'win_width': '1200', 'win_height': '600', 'win_location_x': '69', 'win_location_y': '59', 'win_screen': ':0.0', 'name': 'Response Time', 'show_settings': 'False', 'show_legend': '1', 'data_type': 'Result', 'result_type': 'Response Time', 'flter_result': 'Pass', 'filter_name': 'None', 'filter_pattern': ''}
+		# to
+		# settings: {'id': 1, 'open': True, 'win_width': 1200, 'win_height': 600, 'win_location_x': 69, 'win_location_y': 59, 'win_screen': ':0.0', 'name': 'Response Time', 'show_settings': False, 'show_legend': 1, 'data_type': 'Result', 'result_type': 'Response Time', 'flter_result': 'Pass', 'filter_name': 'None', 'filter_pattern': ''}
+		settings = {}
+		# settings = json.loads(inidata)
+		for item in inidata.keys():
+			# default state
+			base.debugmsg(8, item, ":", inidata[item])
+			settings[item] = inidata[item]
+			# interger values
+			if item in ['win_width', 'win_height', 'win_location_x', 'win_location_y', 'show_legend']:
+				settings[item] = int(inidata[item])
+			if item in ['open', 'show_settings']:
+				# settings[item] = json.loads(inidata[item])
+				if inidata[item].lower() in ['true', '1']:
+					settings[item] = True
+				else:
+					settings[item] = False
+
+
+		return settings
+
+	def CloseGraphs(self):
+
+		for iniid in self.graphs.keys():
+			if "window" in self.graphs[iniid]:
+				self.gph_close(self.graphs[iniid]["window"])
+
+
+	def gph_close(self, grphWindow, *args):
+		base.debugmsg(5, "grphWindow:", grphWindow, "	args:", args)
+		settings = self.gph_settings(grphWindow)
+		grphWindow.saveready = False
+		settings["open"] = False
+		base.debugmsg(5, "settings:", settings)
+		grphWindow.destroy()
+
+		del self.graphs[settings["id"]]["window"]
+		self.graphs[settings["id"]]["settings"] = settings
+
+		base.config['GUI']['graph_list'] = ",".join(self.graphs.keys())
+
+		iniid = "{}".format(settings["id"])
+		if iniid not in base.config:
+			base.config[iniid] = {}
+		base.config[iniid] = settings
+		base.saveini()
+
+	def gph_windowevent(self, event, *args):
+		base.debugmsg(6, "event:", event)
+		# base.debugmsg(6, "self:", self)
+		# base.debugmsg(6, "args:", args)
+
+		if len(args)>0:
+			grphWindow = args[0]
+
+			self.gph_save(grphWindow)
+
+	def gph_save(self, grphWindow):
+		if grphWindow.saveready:
+			# need to save graph window settings as it changes
+			settings = self.gph_settings(grphWindow)
+			base.debugmsg(6, "settings:", settings)
+
+			if settings["win_width"]>10 and settings["win_height"]>10:
+				if settings["id"] not in self.graphs:
+					self.graphs[settings["id"]] = {}
+
+				self.graphs[settings["id"]]["window"] = grphWindow
+				self.graphs[settings["id"]]["settings"] = settings
+
+
+				base.config['GUI']['graph_list'] = ",".join(self.graphs.keys())
+
+				iniid = "{}".format(settings["id"])
+				if iniid not in base.config:
+					base.config[iniid] = {}
+				base.config[iniid] = settings
+				base.saveini()
+
+	def gph_updater(self, grphWindow):
+		try:
+			while True:
+				base.debugmsg(6, "graphname:", grphWindow.graphname.get())
+				# self.gph_refresh(grphWindow)
+				tgr = threading.Thread(target=lambda: self.gph_refresh(grphWindow))
+				tgr.start()
+				time.sleep(5)
+		except:
+			pass
+
+	def gph_floatval(self, value):
+		try:
+			return float(value)
+		except:
+			return value
+
+	def gph_settings(self, grphWindow):
+		settings = {}
+		settings["id"] = grphWindow.graphid
+		settings["open"] = True
+		settings["win_width"] = grphWindow.winfo_width()
+		settings["win_height"] = grphWindow.winfo_height()
+		# position x & y
+		# winfo rootx
+		# settings["win_location_rx"] = grphWindow.winfo_rootx()
+		settings["win_location_x"] = grphWindow.winfo_x()
+		# winfo rooty
+		# settings["win_location_ry"] = grphWindow.winfo_rooty()
+		settings["win_location_y"] = grphWindow.winfo_y()
+		# winfo screen
+		settings["win_screen"] = grphWindow.winfo_screen()
+
+		settings["name"] = grphWindow.graphname.get()
+		settings["show_settings"] = grphWindow.fmeSettings.show
+		settings["show_legend"] = grphWindow.showlegend.get()
+
+		settings["data_type"] = grphWindow.settings["DataType"].get()
+		if settings["data_type"] == "Metric":
+			settings["metric_type"] = grphWindow.settings["MType"].get()
+			settings["primary_metric"] = grphWindow.settings["PMetric"].get()
+			settings["secondary_metric"] = grphWindow.settings["SMetric"].get()
+		if settings["data_type"] == "Result":
+			settings["result_type"] = grphWindow.settings["RType"].get()
+			settings["flter_result"] = grphWindow.settings["FRType"].get()
+			settings["filter_name"] = grphWindow.settings["FNType"].get()
+			# settings["filter_pattern"] = grphWindow.fmeRSettings.inpFP.get()
+			settings["filter_pattern"] = grphWindow.settings["FPattern"].get()
+		return settings
+
+	def gph_refresh(self, grphWindow):
+		if grphWindow.saveready:
+			base.debugmsg(6, "graphname:", grphWindow.graphname.get())
+			DataType = grphWindow.settings["DataType"].get()
+			base.debugmsg(7, "DataType:", DataType)
+			if DataType == "Metric":
+				MType = grphWindow.settings["MType"].get()
+				base.debugmsg(7, "MType:", MType)
+				PMetric = grphWindow.settings["PMetric"].get()
+				base.debugmsg(7, "PMetric:", PMetric)
+				SMetric = grphWindow.settings["SMetric"].get()
+				base.debugmsg(7, "SMetric:", SMetric)
+
+				hasfilter = False;
+				if MType is not None and len(MType)>0:
+					MTLst = [MType]
+					hasfilter = True;
+				else:
+					MTLst = list(base.MetricIDs.keys())
+					if "MetricCount" in MTLst:
+						MTLst.remove("MetricCount")
+				base.debugmsg(6, "MTLst:", MTLst)
+
+				if PMetric is not None and len(PMetric)>0:
+					PMLst = [PMetric]
+					hasfilter = True;
+				else:
+					PMLst = []
+					for mt in MTLst:
+						if mt in base.MetricIDs:
+							for pm in base.MetricIDs[mt].keys():
+								PMLst.append(pm)
+				base.debugmsg(6, "PMLst:", PMLst)
+
+				if SMetric is not None and len(SMetric)>0:
+					SMLst = [SMetric]
+					hasfilter = True;
+				else:
+					SMLst = []
+					for mt in MTLst:
+						if mt in base.MetricIDs:
+							for pm in PMLst:
+								if pm in base.MetricIDs[mt]:
+									for sm in base.MetricIDs[mt][pm].keys():
+										if sm != "ID":
+											SMLst.append(sm)
+				base.debugmsg(6, "SMLst:", SMLst)
+
+				GDNames = []
+				if hasfilter:
+					try:
+						grphWindow.axis.cla()
+					except:
+						pass
+					for mt in MTLst:
+						for pm in PMLst:
+							if pm in base.MetricIDs[mt]:
+								for sm in SMLst:
+									if sm in base.MetricIDs[mt][pm]:
+										# name = " ".join(list(set([mt,pm,sm]).symmetric_difference(set([MType, PMetric, SMetric])))).strip()
+										name = "{}|{}|{}".format(mt,pm,sm)
+
+										base.debugmsg(6, "name:", name)
+										GDNames.append(name)
+
+										sql = "SELECT "
+										sql += 		"  MetricTime "
+										sql += 		", MetricValue "
+										sql += "FROM MetricData "
+										sql += "WHERE MetricType = '{}' ".format(mt.replace("'", "''"))
+										sql += "	AND PrimaryMetric = '{}' ".format(pm.replace("'", "''"))
+										sql += "	AND SecondaryMetric = '{}' ".format(sm.replace("'", "''"))
+
+										base.debugmsg(7, "sql:", sql)
+
+										base.dbqueue["Read"].append({"SQL": sql, "KEY": "GraphData_{}".format(name)})
+
+					dodraw = False
+					# ylbls = []
+					for name in GDNames:
+
+						dname = " ".join(list(set(name.split("|")).symmetric_difference(set([MType, PMetric, SMetric])))).strip()
+						base.debugmsg(6, "dname:", dname)
+						if name not in grphWindow.graphdata:
+							grphWindow.graphdata[name] = {}
+						colour = base.named_colour(dname)
+						base.debugmsg(6, "name:", name, "	colour:", colour)
+						grphWindow.graphdata[name]["Colour"] = colour
+						# grphWindow.graphdata[name]["Time"] = []
+						grphWindow.graphdata[name]["objTime"] = []
+						grphWindow.graphdata[name]["Values"] = []
+						gdname = "GraphData_{}".format(name)
+						if gdname in base.dbqueue["ReadResult"]:
+							base.debugmsg(6, gdname, ":", base.dbqueue["ReadResult"][gdname])
+
+							grphWindow.graphdata[name]["objTime"] = [datetime.fromtimestamp(r['MetricTime']) for r in base.dbqueue["ReadResult"][gdname] ]
+							grphWindow.graphdata[name]["Values"] = [self.gph_floatval(r['MetricValue']) for r in base.dbqueue["ReadResult"][gdname] ]
+							base.debugmsg(9, gdname, "Values:", grphWindow.graphdata[name]["Values"])
+
+							# for r in base.dbqueue["ReadResult"][gdname]:
+							# 	fval = self.gph_floatval(r['MetricValue'])
+							# 	if fval not in ylbls:
+							# 		ylbls.append(fval)
+
+							base.debugmsg(6, gdname, ":", grphWindow.graphdata[name])
+							if len(grphWindow.graphdata[name]["Values"])>1 and len(grphWindow.graphdata[name]["Values"])==len(grphWindow.graphdata[name]["objTime"]):
+								grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], colour, label=dname)
+								dodraw = True
+							if len(grphWindow.graphdata[name]["Values"])==1 and len(grphWindow.graphdata[name]["Values"])==len(grphWindow.graphdata[name]["objTime"]):
+								grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], colour, label=dname, marker='o')
+								dodraw = True
+
+
+					if dodraw:
+
+						grphWindow.axis.grid(True, 'major', 'both')
+						base.debugmsg(6, "SMetric:", SMetric)
+						if SMetric in ["Load", "CPU", "MEM", "NET"]:
+							grphWindow.axis.set_ylim(0, 100)
+						else:
+							grphWindow.axis.set_ylim(0)
+
+						base.debugmsg(9, "showlegend:", grphWindow.showlegend.get())
+						if grphWindow.showlegend.get():
+							# grphWindow.axis.legend()
+							# grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),&nbsp; shadow=True, ncol=2)
+							grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
+
+						grphWindow.fig.set_tight_layout(True)
+						grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+						try:
+							grphWindow.canvas.draw()
+						except Exception as e:
+							base.debugmsg(5, "canvas.draw() Exception:", e)
+
+
+
+			if DataType == "Result":
+				RType = grphWindow.settings["RType"].get()
+				base.debugmsg(7, "RType:", RType)
+
+				FRType = grphWindow.settings["FRType"].get()
+				base.debugmsg(7, "FRType:", FRType)
+
+				FNType = grphWindow.settings["FNType"].get()
+				base.debugmsg(7, "FNType:", FNType)
+
+				# inpFP = grphWindow.fmeRSettings.inpFP.get()
+					#	grphWindow.settings["FPattern"] = tk.StringVar()
+				inpFP = grphWindow.settings["FPattern"].get()
+				base.debugmsg(7, "inpFP:", inpFP)
+
+				sql = "SELECT "
+				sql += 		"  CAST(end_time as INTEGER) as 'endtime' "
+				if RType == "Response Time":
+					sql += 		", result_name "
+					sql += 		", elapsed_time "
+				if RType == "TPS":
+					sql += 		", count(result)  as 'count' "
+					sql += 		", result_name "
+					sql += 		", result "
+				if RType == "Total TPS":
+					sql += 		", count(result)  as 'count' "
+					sql += 		", result "
+
+				sql += "FROM Results "
+				# sql += "WHERE result == 'PASS' "
+				# sql += "WHERE result_name REGEXP 'OC3.*' "
+				# sql += "WHERE result_name GLOB 'OC3*' "
+				lwhere = []
+				if FRType == "Pass":
+					# sql += "WHERE result == 'PASS' "
+					lwhere.append("result == 'PASS'")
+				if FRType == "Fail":
+					# sql += "WHERE result == 'FAIL' "
+					lwhere.append("result == 'FAIL'")
+
+				if RType == "Response Time":
+					# sql +=  	"AND result_name NOT LIKE 'Exception in thread%' "
+					lwhere.append("result_name NOT LIKE 'Exception in thread%'")
+				if RType == "TPS":
+					# sql +=  "WHERE result_name NOT LIKE 'Exception in thread%' "
+					lwhere.append("result_name NOT LIKE 'Exception in thread%'")
+
+				if FNType != "None" and len(inpFP)>0:
+					# construct pattern
+					# "Wildcard (Unix Glob)",
+					if FNType == "Wildcard (Unix Glob)":
+						# -- 		WHERE result_name GLOB 'OC3*'
+						lwhere.append("result_name GLOB '{}'".format(inpFP))
+					# "Regex",
+					if FNType == "Regex":
+						# -- 		WHERE result_name GLOB 'OC3*'
+						lwhere.append("result_name REGEXP '{}'".format(inpFP))
+					# "Not Wildcard (Unix Glob)",
+					if FNType == "Not Wildcard (Unix Glob)":
+						# -- 		WHERE result_name GLOB 'OC3*'
+						lwhere.append("result_name NOT GLOB '{}'".format(inpFP))
+					# "Not Regex"
+					if FNType == "Not Regex":
+						# -- 		WHERE result_name GLOB 'OC3*'
+						lwhere.append("result_name NOT REGEXP '{}'".format(inpFP))
+
+
+				i = 0
+				for iwhere in lwhere:
+					if i == 0:
+						sql += "WHERE {} ".format(iwhere)
+					else:
+						sql += "AND {} ".format(iwhere)
+					i += 1
+
+
+				sql += "GROUP by CAST(end_time as INTEGER) "
+				# sql += 		", result "
+				if RType == "Response Time":
+					sql += 		", result_name "
+					sql += 		", elapsed_time "
+				if RType == "TPS":
+					sql += 		", result_name "
+					sql += 		", result "
+				if RType == "Total TPS":
+					sql += 		", result "
+
+				base.debugmsg(6, "sql:", sql)
+
+				gdname = "GraphData_{}_{}_{}_{}".format(RType, FRType, FNType, inpFP)
+				base.dbqueue["Read"].append({"SQL": sql, "KEY": gdname})
+
+				dodraw = False
+				if gdname in base.dbqueue["ReadResult"]:
+					base.debugmsg(7, gdname, ":", base.dbqueue["ReadResult"][gdname])
+					grphWindow.graphdata = {}
+					try:
+						grphWindow.axis.cla()
+					except:
+						pass
+					# dodraw = True
+
+					feilds = {}
+					feilds["Name"] = "result"
+					feilds["Time"] = "endtime"
+					feilds["Value"] = "count"
+
+					if RType == "Response Time":
+						feilds["Name"] = "result_name"
+						feilds["Value"] = "elapsed_time"
+
+					if RType == "TPS":
+						feilds["Name"] = "result_name"
+
+					for res in base.dbqueue["ReadResult"][gdname]:
+
+						name = res[feilds["Name"]]
+						# base.debugmsg(5, "name:", name)
+						if name not in grphWindow.graphdata:
+							grphWindow.graphdata[name] = {}
+							colour = base.named_colour(name)
+							base.debugmsg(7, "name:", name, "	colour:", colour)
+							grphWindow.graphdata[name]["Colour"] = colour
+							grphWindow.graphdata[name]["objTime"] = []
+							grphWindow.graphdata[name]["Values"] = []
+
+						grphWindow.graphdata[name]["objTime"].append(datetime.fromtimestamp(res[feilds["Time"]]))
+						grphWindow.graphdata[name]["Values"].append(self.gph_floatval(res[feilds["Value"]]))
+
+						# if name not in grphWindow.graphdata:
+						# 	grphWindow.graphdata[name] = {}
+					base.debugmsg(8, "grphWindow.graphdata:", grphWindow.graphdata)
+
+					for name in grphWindow.graphdata:
+						if len(grphWindow.graphdata[name]["Values"])>1 and len(grphWindow.graphdata[name]["Values"])==len(grphWindow.graphdata[name]["objTime"]):
+							grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], grphWindow.graphdata[name]["Colour"], label=name)
+							dodraw = True
+
+						if len(grphWindow.graphdata[name]["Values"])==1 and len(grphWindow.graphdata[name]["Values"])==len(grphWindow.graphdata[name]["objTime"]):
+							grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], grphWindow.graphdata[name]["Colour"], label=name, marker='o')
+							dodraw = True
+
+				if dodraw:
+					# self.canvas.gcf().autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+					grphWindow.axis.grid(True, 'major', 'both')
+
+					grphWindow.axis.set_ylim(0)
+
+					base.debugmsg(9, "showlegend:", grphWindow.showlegend.get())
+					if grphWindow.showlegend.get():
+						# grphWindow.axis.legend()
+						# grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),&nbsp; shadow=True, ncol=2)
+						grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
+
+					grphWindow.fig.set_tight_layout(True)
+					grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+					try:
+						grphWindow.canvas.draw()
+					except Exception as e:
+						base.debugmsg(5, "canvas.draw() Exception:", e)
+
+			self.gph_save(grphWindow)
+
+			self.RefreshRecentGraphs()
+
+
+
+	def gs_refresh(self, grphWindow):
+		base.debugmsg(6, "start")
+		tgn = threading.Thread(target=lambda: self.gs_updatename(grphWindow))
+		tgn.start()
+		base.debugmsg(6, "tgn")
+		tmt = threading.Thread(target=lambda: self.gs_updatemetrictypes(grphWindow))
+		tmt.start()
+		base.debugmsg(6, "tmt")
+		tpm = threading.Thread(target=lambda: self.gs_updateprimetrics(grphWindow))
+		tpm.start()
+		base.debugmsg(6, "tpm")
+		tsm = threading.Thread(target=lambda: self.gs_updatesecmetrics(grphWindow))
+		tsm.start()
+		base.debugmsg(6, "tsm")
+		tgr = threading.Thread(target=lambda: self.gph_refresh(grphWindow))
+		tgr.start()
+
+	def gs_dbolnames(self):
+
+		# metrics
+		sql = "SELECT "
+		sql += 		"MetricType, "
+		sql += 		"PrimaryMetric, "
+		sql += 		"SecondaryMetric "
+		sql += "FROM MetricData "
+		sql += "GROUP BY 	SecondaryMetric, PrimaryMetric "
+
+		base.debugmsg(7, "sql:", sql)
+
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": "MetricNames"})
+
+
+
+
+		while "MetricNames" not in base.dbqueue["ReadResult"]:
+			time.sleep(1)
+
+
+		# if gdname in base.dbqueue["ReadResult"]:
+		# 	base.debugmsg(6, gdname, ":", base.dbqueue["ReadResult"][gdname])
+
+
+
+
+	def gs_showhide(self, grphWindow):
+		base.debugmsg(6, "graphname:", grphWindow.graphname.get())
+		grphWindow.title(grphWindow.graphname.get())
+		base.debugmsg(6, "fmeSettings.show:", grphWindow.fmeSettings.show)
+		if (grphWindow.fmeSettings.show):
+			grphWindow.fmeSettings.show = False
+			grphWindow.fmeSettings.grid_forget()
+			base.debugmsg(6, "fmeSettings.show:", grphWindow.fmeSettings.show)
+		else:
+			grphWindow.fmeSettings.show = True
+			grphWindow.fmeSettings.grid(column=90, row=0, columnspan=10, sticky="nsew")
+			base.debugmsg(6, "fmeSettings.show:", grphWindow.fmeSettings.show)
+
+	def gs_updatename(self, grphWindow):
+		base.debugmsg(6, "graphname:", grphWindow.graphname.get())
+		grphWindow.title(grphWindow.graphname.get())
+
+	def gs_switchdt(self, grphWindow, *args):
+		datatype = grphWindow.settings["DataType"].get()
+		base.debugmsg(6, "DataType:", datatype)
+		self.gs_refresh(grphWindow)
+		# Forget
+		if datatype != "Metric":
+			grphWindow.fmeMSettings.grid_forget()
+		if datatype != "Result":
+			grphWindow.fmeRSettings.grid_forget()
+		# Show
+		if datatype == "Metric":
+			grphWindow.fmeMSettings.grid(column=0, row=grphWindow.fmeDTRow, columnspan=2, sticky="nsew")
+		if datatype == "Result":
+			grphWindow.fmeRSettings.grid(column=0, row=grphWindow.fmeDTRow, columnspan=2, sticky="nsew")
+
+
+	def gs_updatemetrictypes(self, grphWindow):
+		base.debugmsg(9, "start")
+		try:
+			base.debugmsg(9, "MetricType:", base.MetricIDs.keys())
+
+			newMTypes = [None, ""]
+			for mt in base.MetricIDs.keys():
+				if mt != "MetricCount":
+					newMTypes.append(mt)
+
+			base.debugmsg(9, "newMTypes:", newMTypes)
+			grphWindow.fmeMSettings.MTypes = newMTypes
+
+			base.debugmsg(9, "grphWindow.fmeMSettings.omMT:", grphWindow.fmeMSettings.omMT)
+			grphWindow.fmeMSettings.omMT.set_menu(*grphWindow.fmeMSettings.MTypes)
+			base.debugmsg(6, "grphWindow.fmeMSettings.omMT.set_menu():", grphWindow.fmeMSettings.MTypes)
+		except Exception as e:
+			base.debugmsg(6, "e:", e)
+
+
+
+	def gs_updateprimetrics(self, grphWindow):
+		MType = grphWindow.settings["MType"].get()
+		base.debugmsg(9, "MType:", MType)
+
+		newPMetrics = [None, ""]
+		if MType is not None and len(MType)>0 and MType in base.MetricIDs:
+			newPMetrics = newPMetrics + list(base.MetricIDs[MType].keys())
+		else:
+			PMetric = []
+			for mtype in base.MetricIDs.keys():
+				base.debugmsg(6, "mtype:", mtype)
+				if mtype != "MetricCount":
+					for ptype in base.MetricIDs[mtype].keys():
+						newPMetrics.append(ptype)
+
+		base.debugmsg(9, "newPMetrics:", newPMetrics)
+		grphWindow.fmeMSettings.PMetrics = newPMetrics
+		grphWindow.fmeMSettings.omPM.set_menu(*grphWindow.fmeMSettings.PMetrics)
+		base.debugmsg(6, "grphWindow.fmeMSettings.omPM.set_menu():", grphWindow.fmeMSettings.PMetrics)
+
+
+	def gs_updatesecmetrics(self, grphWindow):
+		MType = grphWindow.settings["MType"].get()
+		base.debugmsg(6, "MType:", MType)
+		PMetric = grphWindow.settings["PMetric"].get()
+		base.debugmsg(6, "PMetric:", PMetric)
+
+		# self.MetricIDs[MetricType][PMetricName][SMetricName][MetricTime] = MetricValue
+		newSMetrics = [None, ""]
+
+		if MType is not None and len(MType)>0:
+			MTLst = [MType]
+		else:
+			MTLst = list(base.MetricIDs.keys())
+			if "MetricCount" in MTLst:
+				MTLst.remove("MetricCount")
+		base.debugmsg(9, "MTLst:", MTLst)
+
+		if PMetric is not None and len(PMetric)>0:
+			PMLst = [PMetric]
+		else:
+			PMLst = []
+			for mt in MTLst:
+				if mt in base.MetricIDs:
+					for pm in base.MetricIDs[mt].keys():
+						PMLst.append(pm)
+		base.debugmsg(9, "PMLst:", PMLst)
+
+		for mt in MTLst:
+			if mt in base.MetricIDs:
+				for pm in PMLst:
+					if pm in base.MetricIDs[mt]:
+						for sm in base.MetricIDs[mt][pm].keys():
+							if sm != "ID" and sm not in newSMetrics:
+								newSMetrics.append(sm)
+
+		base.debugmsg(9, "newSMetrics:", newSMetrics)
+		grphWindow.fmeMSettings.SMetrics = newSMetrics
+		grphWindow.fmeMSettings.omSM.set_menu(*grphWindow.fmeMSettings.SMetrics)
+		base.debugmsg(6, "grphWindow.fmeMSettings.omSM.set_menu():", grphWindow.fmeMSettings.SMetrics)
 
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -3192,17 +4660,21 @@ class RFSwarmGUI(tk.Frame):
 		# Button Bar
 		base.debugmsg(6, "Button Bar")
 
-		bbar = ttk.Frame(p)
+		bbar = tk.Frame(p)
 		bbar.grid(column=0, row=planrow, sticky="nsew")
-		bbargrid = ttk.Frame(bbar)
+		# bbar.config(bg="red")
+		bbar.columnconfigure(0, weight=1)
+
+		bbargrid = tk.Frame(bbar)
 		bbargrid.grid(row=0, column=0, sticky="nsew")
+		# bbargrid.config(bg="blue")
+		# bbargrid.columnconfigure(0, weight=1)
 
 		# new
 		base.debugmsg(7, "Button New")
 		btnno = 0
 		icontext = "New"
 		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		self.iconew = self.get_icon(icontext)
 		base.debugmsg(9, "self.imgdata:", self.imgdata)
 		base.debugmsg(9, "self.imgdata:[",icontext,"]", self.imgdata[icontext])
 		bnew = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_New)
@@ -3216,7 +4688,6 @@ class RFSwarmGUI(tk.Frame):
 
 		icontext = "Open"
 		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		self.icoopen = self.get_icon(icontext)
 		base.debugmsg(9, "self.imgdata:", self.imgdata)
 		base.debugmsg(9, "self.imgdata:[",icontext,"]", self.imgdata[icontext])
 		bopen = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_Open)
@@ -3230,7 +4701,6 @@ class RFSwarmGUI(tk.Frame):
 		btnno += 1
 		icontext = "Save"
 		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		self.icoSave = self.get_icon(icontext)
 		base.debugmsg(9, "self.imgdata:", self.imgdata)
 		base.debugmsg(9, "self.imgdata:[",icontext,"]", self.imgdata[icontext])
 		bSave = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_Save)
@@ -3238,12 +4708,30 @@ class RFSwarmGUI(tk.Frame):
 		# bSave = ttk.Button(bbargrid, text="Save", command=self.mnu_file_Save)
 		bSave.grid(column=btnno, row=0, sticky="nsew")
 
+		# settings
+		base.debugmsg(7, "Button Settings")
+		btnno += 1
+		icontext = "Advanced"
+		bSST = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', text="Settings", command=self.setings_open)
+		bSST.grid(column=btnno, row=0, sticky="nsew")
+
+
+		# StartTime
+		base.debugmsg(7, "Button Scheduled Start")
+		btnno += 1
+		icontext = "StartTime"
+		# base.debugmsg(9, "self.imgdata:", self.imgdata)
+		# base.debugmsg(9, "self.imgdata:", self.imgdata)
+		# base.debugmsg(9, "self.imgdata:[",icontext,"]", self.imgdata[icontext])
+		bSST = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', text="StartTime", command=self.ScheduledStart)
+		bSST.grid(column=btnno, row=0, sticky="nsew")
+
+
 		# play
 		base.debugmsg(7, "Button Play")
 		btnno += 1
 		icontext = "Play"
 		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		self.icoPlay = self.get_icon(icontext)
 		base.debugmsg(9, "self.imgdata:", self.imgdata)
 		base.debugmsg(9, "self.imgdata:[",icontext,"]", self.imgdata[icontext])
 		bPlay = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', text="Play", command=self.ClickPlay)
@@ -3251,7 +4739,48 @@ class RFSwarmGUI(tk.Frame):
 		# bPlay = ttk.Button(bbargrid, text="Play", command=self.ClickPlay)
 		bPlay.grid(column=btnno, row=0, sticky="nsew")
 
+		# spacer
+		btnno += 1
+		spcr = ttk.Label(bbargrid, text = " ")	# # just a blank column as a spacer
+		spcr.grid(column=btnno, row=0, sticky="nsew")
+		bbargrid.columnconfigure(btnno, weight=10)
 
+		# display_plan
+		if "lbl_sched_start_time" not in self.display_plan:
+			self.display_plan['lbl_sched_start_time'] = tk.StringVar()
+		if "sched_start_time" not in self.display_plan:
+			self.display_plan['sched_start_time'] = tk.StringVar()
+		if "lbl_time_remaining" not in self.display_plan:
+			self.display_plan['lbl_time_remaining'] = tk.StringVar()
+		if "time_remaining" not in self.display_plan:
+			self.display_plan['time_remaining'] = tk.StringVar()
+
+		base.debugmsg(7, "Scheduled Start Time")
+		btnno += 1
+		lblSST = ttk.Label(bbargrid, textvariable=self.display_plan['lbl_sched_start_time'])
+		lblSST.grid(column=btnno, row=0, sticky="nsew")
+		bbargrid.columnconfigure(btnno, weight=1)
+		btnno += 1
+		dspSST = ttk.Label(bbargrid, textvariable=self.display_plan['sched_start_time'])
+		dspSST.grid(column=btnno, row=0, sticky="nsew")
+		bbargrid.columnconfigure(btnno, weight=1)
+
+		base.debugmsg(7, "Time Remaining")
+		btnno += 1
+		lblSST = ttk.Label(bbargrid, textvariable=self.display_plan['lbl_time_remaining'])
+		lblSST.grid(column=btnno, row=0, sticky="nsew")
+		bbargrid.columnconfigure(btnno, weight=1)
+		btnno += 1
+		dspSST = ttk.Label(bbargrid, textvariable=self.display_plan['time_remaining'])
+		dspSST.grid(column=btnno, row=0, sticky="nsew")
+		bbargrid.columnconfigure(btnno, weight=1)
+
+
+		# # spacer
+		# btnno += 1
+		# spcr = ttk.Label(bbargrid, text = " ")	# just a blank column as a spacer
+		# spcr.grid(column=btnno, row=0, sticky="nsew")
+		# bbargrid.columnconfigure(btnno, weight=1)
 
 
 		planrow += 1
@@ -3260,17 +4789,30 @@ class RFSwarmGUI(tk.Frame):
 		# Plan Graph
 		base.debugmsg(6, "Plan Graph")
 
-		# defaultcolour = self.rfstheme["default"]
 
-		self.pln_graph = tk.Canvas(p)
-		# self.pln_graph = tk.Canvas(p, fill="#000")
-		# self.pln_graph = tk.Canvas(p, selectforeground="#000")
-		self.pln_graph.grid(column=0, row=planrow, sticky="nsew") # sticky="wens"
+		# 	Old Graph using diy method
+		# self.pln_graph = tk.Canvas(p)
+		# self.pln_graph.grid(column=0, row=planrow, sticky="nsew") # sticky="wens"
+		#
+		# self.pln_graph.bind("<Configure>", self.CanvasResize)
 
-		# self.pln_graph.columnconfigure(0, weight=1)
-		# self.pln_graph.rowconfigure(0, weight=1)
+		#
+		# 	New Graph method using matplot
+		#
+		self.fig_dpi = 72
+		self.fig = Figure(dpi=self.fig_dpi, tight_layout=True)
+		self.axis = self.fig.add_subplot(1,1,1)	# , constrained_layout=True??
+		self.axis.grid(True, 'major', 'both')
 
-		self.pln_graph.bind("<Configure>", self.CanvasResize)
+		self.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+
+		self.canvas = FigureCanvasTkAgg(self.fig, p)
+		self.canvas.get_tk_widget().grid(column=0, row=planrow, sticky="nsew")
+		# self.canvas.get_tk_widget().config(bg="blue")
+		self.canvas.draw()
+
+		p.bind("<Configure>", self.CanvasResize)
+
 
 
 
@@ -3314,7 +4856,7 @@ class RFSwarmGUI(tk.Frame):
 		idx.grid(column=self.plancolidx, row=0, sticky="nsew")
 
 		self.scriptgrid.columnconfigure(self.plancolusr, weight=0)
-		usr = ttk.Label(self.scriptgrid, text="Users")
+		usr = ttk.Label(self.scriptgrid, text="Robots")
 		usr.grid(column=self.plancolusr, row=0, sticky="nsew")
 
 		self.scriptgrid.columnconfigure(self.plancoldly, weight=0)
@@ -3346,24 +4888,486 @@ class RFSwarmGUI(tk.Frame):
 		tst.grid(column=self.plancolset, row=0, sticky="nsew")
 
 		icontext = "AddRow"
-		self.icoAddRow = self.get_icon(icontext)
 		self.scriptgrid.columnconfigure(self.plancoladd, weight=0)
 		new = ttk.Button(self.scriptgrid, image=self.imgdata[icontext], padding='3 3 3 3', text="+", command=base.addScriptRow, width=1)
 		new.grid(column=self.plancoladd, row=0, sticky="nsew")
 
 
-		self.icoScript = self.get_icon("Script")
-		self.icoAdvanced = self.get_icon("Advanced")
-		self.icoDelete = self.get_icon("Delete")
 
 		# self.scrollable_sg.update()
 		# update scrollbars
 		self.scriptgrid.update_idletasks()
 		self.sg_canvas.config(scrollregion=self.sg_canvas.bbox("all"))
 
+		# self.pln_graph.bind("<Configure>", self.CanvasResize)
+		# May need to bind <Button-4> and <Button-5> to enable mouse scrolling
+		# https://www.python-course.eu/tkinter_events_binds.php
+
+		ut = threading.Thread(target=self.UpdatePlanDisplay)
+		ut.start()
+
+
+	def setings_open(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+		setingsWindow = tk.Toplevel(self.root)
+		# setingsWindow.config(bg="pink")
+		setingsWindow.columnconfigure(0, weight=1)
+		setingsWindow.rowconfigure(1, weight=1)
+
+		setingsWindow.protocol("WM_DELETE_WINDOW",  lambda: self.setings_close(setingsWindow, False) )
+
+		setingsWindow.fmeContent = tk.Frame(setingsWindow)
+		# setingsWindow.fmeContent.config(bg="red")
+		setingsWindow.fmeContent.grid(column=0, row=1, sticky="nsew")
+
+		setingsWindow.fmeContent.columnconfigure(0, weight=1)
+		setingsWindow.fmeContent.rowconfigure(99, weight=1)
+
+
+
+		setingsWindow.fmeScenario = tk.Frame(setingsWindow.fmeContent)
+		# setingsWindow.fmeScenario.config(bg="blue")
+		setingsWindow.fmeScenario.config(bd=1, relief="sunken")
+		# setingsWindow.fmeScenario.config(bd=1, relief="groove")
+		setingsWindow.fmeScenario.grid(column=0, row=1, sticky="nsew")
+
+		setingsWindow.fmeScenario.columnconfigure(1, weight=1)
+
+		rownum = 0
+		setingsWindow.lblScenario = ttk.Label(setingsWindow.fmeScenario, text="Scenario:")
+		setingsWindow.lblScenario.grid(column=0, row=rownum, sticky="nsew")
+
+		rownum += 1
+		setingsWindow.lblUpload = ttk.Label(setingsWindow.fmeScenario, text="  Upload Logs:")
+		setingsWindow.lblUpload.grid(column=0, row=rownum, sticky="nsew")
+
+
+		UploadOpt = list(base.uploadmodes.values())
+		setingsWindow.strUpload = tk.StringVar()
+		setingsWindow.omUpload = ttk.OptionMenu(setingsWindow.fmeScenario, setingsWindow.strUpload, None, *UploadOpt)
+		base.debugmsg(5, "uploadmode:", base.uploadmode)
+		setingsWindow.strUpload.set(base.uploadmodes[base.uploadmode])
+		setingsWindow.omUpload.grid(column=2, row=1, sticky="nsew")
+
+
+
+		setingsWindow.fmeServer = tk.Frame(setingsWindow.fmeContent)
+		# setingsWindow.fmeScenario.config(bg="blue")
+		setingsWindow.fmeServer.config(bd=1, relief="sunken")
+		# setingsWindow.fmeScenario.config(bd=1, relief="groove")
+		setingsWindow.fmeServer.grid(column=0, row=2, sticky="nsew")
+
+		setingsWindow.fmeServer.columnconfigure(1, weight=1)
+
+		# [Server]
+		rownum += 0
+		setingsWindow.lblServer = ttk.Label(setingsWindow.fmeServer, text="Manager:")
+		setingsWindow.lblServer.grid(column=0, row=rownum, sticky="nsew")
+
+		# bindip =
+		rownum += 1
+		setingsWindow.lblBindIP = ttk.Label(setingsWindow.fmeServer, text="  Bind IP Address:")
+		setingsWindow.lblBindIP.grid(column=0, row=rownum, sticky="nsew")
+
+		setingsWindow.strBindIP = tk.StringVar()
+		setingsWindow.strBindIP.set(base.config['Server']['BindIP'])
+		setingsWindow.etyBindIP = ttk.Entry(setingsWindow.fmeServer, textvariable=setingsWindow.strBindIP)
+		setingsWindow.etyBindIP.grid(column=1, row=rownum, sticky="nsew")
+		setingsWindow.etyBindIP.bind('<Leave>', lambda event, sw=setingsWindow: self.setings_valid_ip(sw, event) )
+		setingsWindow.etyBindIP.bind('<FocusOut>', lambda event, sw=setingsWindow: self.setings_valid_ip(sw, event) )
+
+
+		# bindport = 8138
+		rownum += 1
+		setingsWindow.lblBindPort = ttk.Label(setingsWindow.fmeServer, text="  Bind Port Number:")
+		setingsWindow.lblBindPort.grid(column=0, row=rownum, sticky="nsew")
+
+		setingsWindow.intBindPort = tk.IntVar()
+		setingsWindow.intBindPort.set(int(base.config['Server']['BindPort']))
+		setingsWindow.etyBindPort = ttk.Entry(setingsWindow.fmeServer, textvariable=setingsWindow.intBindPort)
+		setingsWindow.etyBindPort.grid(column=1, row=rownum, sticky="nsew")
+
+		# resultsdir
+		rownum += 1
+		setingsWindow.lblResultsDir = ttk.Label(setingsWindow.fmeServer, text="  Results Location:")
+		setingsWindow.lblResultsDir.grid(column=0, row=rownum, sticky="nsew")
+
+		setingsWindow.strResultsDir = tk.StringVar()
+		if 'ResultsDir' not in base.config['Run']:
+			base.config['Run']['ResultsDir'] = os.path.join(base.dir_path, "results")
+			base.saveini()
+		setingsWindow.strResultsDir.set(base.config['Run']['ResultsDir'])
+
+		setingsWindow.etyResultsDir = ttk.Entry(setingsWindow.fmeServer, textvariable=setingsWindow.strResultsDir, state="readonly", justify="right")
+		setingsWindow.etyResultsDir.grid(column=1, row=rownum, sticky="nsew")
+
+		icontext = "Open"
+		setingsWindow.btnResultsDir = ttk.Button(setingsWindow.fmeServer, image=self.imgdata[icontext], text="...", width=1)
+		setingsWindow.btnResultsDir.config(command=lambda sw=setingsWindow: self.setings_select_resultsdir(sw))
+		setingsWindow.btnResultsDir.grid(column=2, row=rownum, sticky="nsew")
+
+
+
+
+		# OK / Cancel button bar
+		setingsWindow.fmeBBar = tk.Frame(setingsWindow)
+		setingsWindow.fmeBBar.grid(column=0, row=9, sticky="nsew")
+
+		setingsWindow.lblBLNK = ttk.Label(setingsWindow.fmeBBar, text = " ")	# just a spacer before the buttons
+		setingsWindow.lblBLNK.grid(column=0, row=0, sticky="nsew")
+		setingsWindow.fmeBBar.columnconfigure(0, weight=1)
+
+		# OK
+		# schedWindow.fmeBBar
+		setingsWindow.btnOK = ttk.Button(setingsWindow.fmeBBar, text="OK", command=lambda: self.setings_close(setingsWindow, True) ) #, width=8)
+		setingsWindow.btnOK.grid(column=98, row=0, sticky="nsew")
+
+		# Cancel
+		setingsWindow.btnCancel = ttk.Button(setingsWindow.fmeBBar, text="Cancel", command=lambda: self.setings_close(setingsWindow, False) ) #, width=8)
+		setingsWindow.btnCancel.grid(column=99, row=0, sticky="nsew")
+
+
+	def setings_valid_ip(self, setingsWindow, *args):
+		base.debugmsg(5, "setingsWindow:", setingsWindow, "	args:", args)
+		ipaddr = setingsWindow.strBindIP.get()
+		base.debugmsg(5, "ipaddr:", ipaddr)
+		if ipaddr is not None and len(ipaddr)>0:
+			try:
+				ip = ipaddress.ip_address(ipaddr)
+				valid_ipaddr = str(ip)
+				base.debugmsg(5, "ip.version:", ip.version, "	valid_ipaddr:", valid_ipaddr)
+				if ip.version == 6 and sys.version_info < (3, 8):
+					msg = "Python 3.8 or higher required to bind to IPv6 Addresses\n"
+					pyver = "{}.{}.{}".format(sys.version_info[0], sys.version_info[1], sys.version_info[2])
+					msg += " ".join("Python Version:",pyver,"	IP Version:", ip.version, "	IP Address:", srvip)
+					base.debugmsg(5, msg)
+					tkm.showwarning("RFSwarm - Warning", msg)
+					setingsWindow.strBindIP.set("")
+					return False
+				lclips = base.localipaddresslist()
+				if valid_ipaddr not in lclips:
+					msg = "IP address: {} is not valid for the loacl machine.".format(ipaddr)
+					tkm.showwarning("RFSwarm - Warning", msg)
+					return False
+
+
+			except Exception as e:
+				base.debugmsg(5, "Exception:", e)
+				msg = "Invalid IP address: {}".format(ipaddr)
+				base.debugmsg(5, msg)
+				tkm.showwarning("RFSwarm - Warning", msg)
+				return False
+
+		return True
+
+	def setings_select_resultsdir(self, setingsWindow, *args):
+		base.debugmsg(5, "setingsWindow:", setingsWindow, "	args:", args)
+		curr = setingsWindow.strResultsDir.get()
+		newresultsdir = str(tkf.askdirectory(initialdir=curr, title="RFSwarm - Select Results Location"))
+		base.debugmsg(5, "newresultsdir:", newresultsdir)
+		if len(newresultsdir)>0 and os.path.isdir(newresultsdir):
+			setingsWindow.strResultsDir.set(newresultsdir)
+
+
+	def setings_close(self, setingsWindow, save):
+		base.debugmsg(5, "setingsWindow:", setingsWindow, "	save:", save)
+
+		if save:
+			self.plan_scnro_chngd = True
+			# base.uploadmodes[base.uploadmode]
+			base.debugmsg(5, "strUpload:", setingsWindow.strUpload.get(), "	uploadmodes:", base.uploadmodes)
+			base.uploadmode = base.GetKey(base.uploadmodes, setingsWindow.strUpload.get())
+			base.debugmsg(5, "uploadmode:", base.uploadmode)
+
+
+			srvrestart = False
+			srvip = base.config['Server']['BindIP']
+			srvport = int(base.config['Server']['BindPort'])
+
+			newip = ""
+			if self.setings_valid_ip(setingsWindow):
+				newip = setingsWindow.strBindIP.get()
+				base.debugmsg(5, "newip:", newip)
+				if len(str(newip))>0:
+					base.config['Server']['BindIP'] = newip
+					srvrestart = True
+
+			if len(srvip)>0 and len(newip)<1:
+				base.config['Server']['BindIP'] = newip
+				base.saveini()
+				srvrestart = True
+
+			newport = setingsWindow.intBindPort.get()
+			base.debugmsg(5, "newport:", newport)
+			if newport>0 and newport != srvport:
+				base.config['Server']['BindPort'] = str(newport)
+				base.saveini()
+				srvrestart = True
+
+			srvResultsDir = base.config['Run']['ResultsDir']
+			newResultsDir = setingsWindow.strResultsDir.get()
+			base.debugmsg(5, "newResultsDir:", newResultsDir)
+			if len(newResultsDir)>0 and newResultsDir != srvResultsDir:
+				base.config['Run']['ResultsDir'] = newResultsDir
+				base.saveini()
+
+
+			if srvrestart:
+				tkm.showinfo("RFSwarm - Info", "You Need to restart the rfswarm Manager for these changes to take effect.")
+
+				# I think the following might work??? but lets see if anyone asks for this or not.
+				# I don't want to break stuff in the manager unnecessarily
+				# base.agenthttpserver.shutdown()
+				# base.Agentserver.join()
+				# base.Agentserver = threading.Thread(target=self.run_agent_server)
+				# base.Agentserver.start()
+
+
+		setingsWindow.destroy()
+
+
+
+	def UpdatePlanDisplay(self):
+		while base.keeprunning:
+			if base.run_starttime > 0:
+				sec2st = base.run_starttime - int(time.time())
+				if  sec2st < 0:
+					sec2st = 0
+
+				self.display_plan['lbl_sched_start_time'].set("  Start Time  ")
+				st = datetime.fromtimestamp(base.run_starttime)
+				if sec2st > 86400:  # 24h * 60m * 60s
+					self.display_plan['sched_start_time'].set("  {}  ".format(st.strftime("%Y-%m-%d %H:%M:%S")))
+				else:
+					self.display_plan['sched_start_time'].set("  {}  ".format(st.strftime("%H:%M:%S")))
+
+				self.display_plan['lbl_time_remaining'].set("  Remaining  ")
+				self.display_plan['time_remaining'].set("  {:<10}  ".format(base.format_sec_remain(sec2st)))
+
+			else:
+				self.display_plan['lbl_sched_start_time'].set("")
+				self.display_plan['sched_start_time'].set("")
+
+				self.display_plan['lbl_time_remaining'].set("")
+				self.display_plan['time_remaining'].set("")
+
+
+			time.sleep(1)
+
 	def CanvasResize(self, event):
 		base.debugmsg(6, "event:", event)
-		self.pln_update_graph()
+		# self.pln_update_graph()
+		t = threading.Thread(target=self.pln_update_graph)
+		t.start()
+
+	def ScheduledStart(self, _event=None):
+		base.debugmsg(5, "_event:", _event)
+		base.debugmsg(5, "run_starttime:", base.run_starttime)
+
+		schedWindow = tk.Toplevel(self.root)
+		# schedWindow.config(bg="pink")
+		schedWindow.columnconfigure(0, weight=1)
+		# schedWindow.rowconfigure(0, weight=1)
+		schedWindow.rowconfigure(1, weight=1)
+
+		schedWindow.bind("<Configure>", lambda e: self.ss_windowevent(e, schedWindow) )
+
+		schedWindow.protocol("WM_DELETE_WINDOW",  lambda: self.ss_close(schedWindow, False) )
+
+
+		schedWindow.fmeBBar = tk.Frame(schedWindow)
+		schedWindow.fmeBBar.grid(column=0, row=9, sticky="nsew")
+
+		schedWindow.fmeContent = tk.Frame(schedWindow)
+		# schedWindow.fmeContent.config(bg="red")
+		schedWindow.fmeContent.grid(column=0, row=1, sticky="nsew")
+
+		schedWindow.fmeContent.columnconfigure(0, weight=1)
+		schedWindow.fmeContent.rowconfigure(0, weight=1)
+
+		schedWindow.time = tk.StringVar()
+		schedWindow.date = tk.StringVar()
+		schedWindow.datetime = datetime(1970,1,1)
+		if base.run_starttime>0:
+			schedWindow.datetime = datetime.fromtimestamp(base.run_starttime)
+			schedWindow.time.set(schedWindow.datetime.strftime("%H:%M:%S"))
+			schedWindow.date.set(schedWindow.datetime.strftime("%Y-%m-%d"))
+
+		schedWindow.time.trace('w', lambda *args: self.ss_validate(schedWindow, args))
+		# schedWindow.time.trace('a', lambda *args: self.ss_validate(schedWindow, args))
+
+		# https://www.tutorialspoint.com/python/tk_radiobutton.htm
+		schedWindow.enabled = tk.IntVar()
+		schedWindow.enabled.set(0)
+		if base.run_starttime>0:
+			schedWindow.enabled.set(1)
+
+		contentrow = 0
+
+		schedWindow.lblSS = ttk.Label(schedWindow.fmeContent, text = "Scheduled Start")
+		schedWindow.lblSS.grid(column=0, row=contentrow, sticky="nsew")
+
+		schedWindow.RSS1 = ttk.Radiobutton(schedWindow.fmeContent, text="Disabled", variable=schedWindow.enabled, value=0, command=lambda: self.ss_selrb(schedWindow) )
+		schedWindow.RSS1.grid(column=1, row=contentrow, sticky="nsew")
+
+		contentrow += 1
+		schedWindow.RSS2 = ttk.Radiobutton(schedWindow.fmeContent, text="Enabled", variable=schedWindow.enabled, value=1, command=lambda: self.ss_selrb(schedWindow) )
+		schedWindow.RSS2.grid(column=1, row=contentrow, sticky="nsew")
+
+
+		contentrow += 1
+		schedWindow.fmeTime = tk.Frame(schedWindow.fmeContent)
+		# schedWindow.fmeTime.config(bg="green")
+		schedWindow.fmeTimeRow = contentrow
+		if base.run_starttime>0:
+			schedWindow.fmeTime.grid(column=0, row=schedWindow.fmeTimeRow, sticky="nsew", columnspan=3)
+
+		schedWindow.lblST = ttk.Label(schedWindow.fmeTime, text = "Schedule Time")
+		schedWindow.lblST.grid(column=0, row=0, sticky="nsew")
+
+		# schedWindow.txtST = ttk.Entry(schedWindow.fmeTime, textvariable=schedWindow.time, validate="key", validatecommand=(lambda: self.ss_validate(schedWindow), "%S") )
+		# schedWindow.txtST.config(validatecommand=lambda: self.ss_validate(schedWindow))
+		schedWindow.txtST = ttk.Entry(schedWindow.fmeTime, textvariable=schedWindow.time)
+		# schedWindow.txtST = ttk.Entry(schedWindow.fmeTime, textvariable=schedWindow.time, validate="focusout")
+		# schedWindow.txtST = ttk.Entry(schedWindow.fmeTime, textvariable=schedWindow.time, validate="focus")
+		# schedWindow.txtST.config(validatecommand=lambda: self.ss_validate(schedWindow))
+
+		# schedWindow.txtST = ttk.Entry(schedWindow.fmeTime, textvariable=schedWindow.time, validate="key")
+		# schedWindow.txtST = ttk.Entry(schedWindow.fmeTime, textvariable=schedWindow.time, validate="all")
+		# schedWindow.txtST.config(validatecommand=(lambda: self.ss_validate(schedWindow), "%P"))
+
+		schedWindow.txtST.grid(column=1, row=0, sticky="nsew")
+
+
+		schedWindow.lblSD = ttk.Label(schedWindow.fmeTime, text = "Schedule Date")
+		schedWindow.lblSD.grid(column=0, row=1, sticky="nsew")
+
+		schedWindow.txtSD = ttk.Label(schedWindow.fmeTime, textvariable=schedWindow.date)
+		schedWindow.txtSD.grid(column=1, row=1, sticky="nsew")
+
+
+
+
+		schedWindow.lblBLNK = ttk.Label(schedWindow.fmeBBar, text = " ")	# just a spacer before the buttons
+		schedWindow.lblBLNK.grid(column=0, row=0, sticky="nsew")
+		schedWindow.fmeBBar.columnconfigure(0, weight=1)
+
+		# OK
+		# schedWindow.fmeBBar
+		schedWindow.btnOK = ttk.Button(schedWindow.fmeBBar, text="OK", command=lambda: self.ss_close(schedWindow, True) ) #, width=8)
+		schedWindow.btnOK.grid(column=98, row=0, sticky="nsew")
+
+		# Cancel
+		schedWindow.btnCancel = ttk.Button(schedWindow.fmeBBar, text="Cancel", command=lambda: self.ss_close(schedWindow, False) ) #, width=8)
+		schedWindow.btnCancel.grid(column=99, row=0, sticky="nsew")
+
+	def ss_close(self, schedWindow, savesched, *args):
+		base.debugmsg(5, "schedWindow:", schedWindow, "	savesched:", savesched)
+		base.debugmsg(5, "args:", args)
+
+		if savesched:
+			sel = schedWindow.enabled.get()
+			if sel==0:
+				base.run_starttime = 0
+			if sel==1:
+				base.run_starttime = int(schedWindow.datetime.timestamp())
+
+		schedWindow.destroy()
+
+	def ss_windowevent(self, e, schedWindow):
+		base.debugmsg(8, "schedWindow:", schedWindow, "	e:", e)
+
+	def ss_selrb(self, schedWindow):
+		base.debugmsg(5, "schedWindow:", schedWindow)
+		sel = schedWindow.enabled.get()
+		base.debugmsg(5, "sel:", sel)
+
+		if sel>0:
+			schedWindow.fmeTime.grid(column=0, row=schedWindow.fmeTimeRow, sticky="nsew", columnspan=3)
+			if base.run_starttime<1:
+				now = datetime.today()
+				newi = int(now.timestamp()) + 600 # +10min
+				newdt = datetime.fromtimestamp(newi)
+				newst = newdt.strftime("%H:%M:%S")
+				schedWindow.time.set(newst)
+		else:
+			schedWindow.fmeTime.grid_forget()
+
+	def ss_validate(self, schedWindow, *args):
+		ut = threading.Thread(target=self.ss_validate_def, args=(schedWindow,))
+		ut.start()
+
+	def ss_validate_def(self, schedWindow, *args):
+		time.sleep(0.5)
+		base.debugmsg(5, "schedWindow:", schedWindow, "	args:", args)
+
+		otime = schedWindow.time.get()
+		stime = schedWindow.time.get()
+		if ':' in stime:
+			if len(stime)<6:
+				stime = "{}:00".format(stime)
+		else:
+			if len(stime)>3:
+				if len(stime)<5:
+					stime = "{:02}:{:02}:00".format(int(stime[0:len(stime)-2]), int(stime[-2:]))
+				else:
+					stime = "{:02}:{:02}:{:02}".format(int(stime[0:len(stime)-4]), int(stime[len(stime)-4:len(stime)-2]), int(stime[-2:]))
+		if stime.count(":")>1 and len(stime)!=8:
+			atime = stime.split(":")
+			base.debugmsg(5, "atime:", atime)
+			while len(atime)<2:
+				 atime.append(0)
+			for i in range(len(atime)):
+				base.debugmsg(5, "atime[",i,"]:", atime[i])
+				if len(atime[i])<1:
+					atime[i] = 0
+				elif len(atime[i])>2:
+					if int(atime[i])>60:
+						atime[i] = atime[i][0]
+					else:
+						atime[i] = int(atime[i])
+
+
+			stime = "{:02}:{:02}:{:02}".format(int(atime[0]),int(atime[1]),int(atime[2]))
+
+		# time.sleep(0.3)
+		if otime != schedWindow.time.get():
+			return 0
+		if otime == stime:
+			return 0
+		if len(stime)>3:
+			schedWindow.time.set(stime)
+			# atime = stime.split(":")
+			# stime = "{:02}:{:02}:{:02}".format(int(atime[0]),int(atime[1]),int(atime[2]))
+			# schedWindow.time.set(stime)
+			itime = base.hms2sec(stime)
+			base.debugmsg(5, "itime:", itime, "	", stime)
+
+			newtime = self.ss_midnight(0) + itime
+			base.debugmsg(5, "newtime:", newtime)
+
+			now = datetime.today()
+			if newtime<int(now.timestamp()+60):
+				newtime = self.ss_midnight(1) + itime
+				base.debugmsg(5, "newtime:", newtime)
+
+			schedWindow.datetime = datetime.fromtimestamp(newtime)
+			schedWindow.date.set(schedWindow.datetime.strftime("%Y-%m-%d"))
+
+
+
+		base.debugmsg(5, "schedWindow.datetime:", schedWindow.datetime)
+
+
+	def ss_midnight(self, offset):
+		mn = 0
+		now = datetime.today()
+		base.debugmsg(5, "now:", now)
+		mndt = datetime(now.year, now.month, now.day)
+		offsetsec = 24 * 60 * 60 * offset
+		base.debugmsg(5, "mndt:", mndt, "	offsetsec:", offsetsec)
+		mn = int(mndt.timestamp()) + offsetsec
+		return mn
 
 	def ClickPlay(self, _event=None):
 
@@ -3373,615 +5377,195 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(6, "Test Started:	", int(time.time()), "[",datetime.now().isoformat(sep=' ',timespec='seconds'),"]")
 
 		icontext = "Stop"
-		self.icoStop = self.get_icon(icontext)
 		self.elements["Run"]["btn_stop"]["image"] = self.icoStop
 
-		self.tabs.select(1)
+		# sec2st = base.run_starttime - int(time.time())
+		# if sec2st < 1:
+		# 	self.tabs.select(1)
 
 		core.ClickPlay()
 
 	def pln_update_graph(self):
+		base.debugmsg(6, "pln_update_graph", self.pln_graph_update)
+		time.sleep(0.1)
 
-		totcolour = "#000000"
-		gridcolour = "#cfcfcf"
-		defaultcolour = "#000000"
+		if not self.pln_graph_update:
+			self.pln_graph_update = True
 
+			graphdata = {}
+			dodraw = False
+			self.axis.cla()
+			totaltime = 0
 
+			colour = base.named_colour("Total")
+			graphdata["Total"] = {}
+			graphdata["Total"]["Colour"] = colour
+			graphdata["Total"]["objTime"] = []
+			graphdata["Total"]["Values"] = []
 
-		base.debugmsg(6, "pln_update_graph")
-		base.debugmsg(6, "pln_graph:", self.pln_graph)
-		base.debugmsg(6, "scriptlist:", base.scriptlist)
-		try:
-			base.debugmsg(6, "winfo_width:", self.pln_graph.winfo_width(), "	winfo_height:",self.pln_graph.winfo_height())
-			graphh = self.pln_graph.winfo_height()
-			graphw = self.pln_graph.winfo_width()
-		except:
-			return False
+			totalcalc = {}
 
-		base.debugmsg(6, "graphh", graphh, "graphw", graphw)
+			for grp in base.scriptlist:
+				base.debugmsg(6, "grp:", grp)
+				if 'Index' in grp:
+					if 'Test' in grp and len(grp['Test'])>0:
+						name = "{} - {}".format(grp['Index'], grp['Test'])
+						graphdata[name] = {}
+						# colour = base.named_colour(name)
+						colour = base.line_colour(grp["Index"])
+					else:
+						name = "{}".format(grp['Index'])
+						graphdata[name] = {}
+						colour = base.line_colour(grp["Index"])
 
+					base.debugmsg(8, "name:", name, "	colour:", colour)
 
-		axissz = 10
-		if graphw > graphh:
-			# axissz = int(graphh * 0.1)
-			axissz = (graphh * 0.1)
-		else:
-			# axissz = int(graphw * 0.1)
-			axissz = (graphw * 0.1)
+					graphdata[name]["Colour"] = colour
+					graphdata[name]["objTime"] = []
+					graphdata[name]["Values"] = []
 
-		base.debugmsg(6, 'axissz:', axissz)
+					# start
+					graphdata[name]["objTime"].append(datetime.fromtimestamp(0, timezone.utc))
+					graphdata[name]["Values"].append(0)
+					if 0 in totalcalc:
+						totalcalc[0] += 0
+					else:
+						totalcalc[0] = 0
 
-		#  work out max users
-		mxuser = 0
-		mxusero = 0
-		for grp in base.scriptlist:
-			if "Users" in grp.keys():
-				mxuser += grp["Users"]
-				mxusero += grp["Users"]
-		base.debugmsg(6, "mxuser", mxuser)
-		if mxuser <10:
-			mxuser += 1
-		else:
-			mxuser = int(mxuser*1.15)
-		base.debugmsg(5, "mxuser", mxuser)
+					# delay
+					graphdata[name]["objTime"].append(datetime.fromtimestamp(grp['Delay'], timezone.utc))
+					graphdata[name]["Values"].append(0)
+					if grp['Delay'] in totalcalc:
+						totalcalc[grp['Delay']] += 0
+					else:
+						totalcalc[grp['Delay']] = 0
 
+					# RampUp
+					# chunk = 0.25
+					chunk = 0.1
+					timeru = grp['Delay'] + grp['RampUp']
+					graphdata[name]["objTime"].append(datetime.fromtimestamp(timeru, timezone.utc))
+					graphdata[name]["Values"].append(grp['Robots'])
+					if timeru in totalcalc:
+						totalcalc[timeru] += grp['Robots']*chunk
+					else:
+						totalcalc[timeru] = grp['Robots']*chunk
 
-		#  work out max duration
-		mxdur = 0
-		for grp in base.scriptlist:
-			if "Users" in grp.keys():
-				dur = grp["Delay"] + (grp["RampUp"]*2) + grp["Run"]
-				dur = int(dur * 1.03)
-				if mxdur < dur:
-					mxdur = dur
-		base.debugmsg(6, "mxdur", mxdur)
+					q = 0
 
-		totusrsxy = {}
-		totcounts = {}
-		totcounts[0] = 0
-		base.debugmsg(6, 'totcounts', totcounts)
-		base.debugmsg(6, 'totcounts.keys()', totcounts.keys())
-		totinc = 1
-		if mxdur > 60:
-			totinc = 10
-		if mxdur > 3600:
-			totinc = 60
+					base.debugmsg(7, "int(1/chunk)-1:", int(1/chunk)-1)
 
-		self.pln_graph.delete("all")
-
-		ym0 = graphh-int(axissz/2)	# point below x axis
-		ym1 = graphh-axissz			# x axis line
-		ym2 = 0						# top of graph
-		base.debugmsg(5, "ym0:", ym0, "	ym1:", ym1, "	ym2:", ym2)
-
-		xm1 = axissz			# y axis line
-		if mxusero>99:
-			xm1 = (axissz*2)
-		if mxusero>9999:
-			xm1 = (axissz*3)
-
-		xm0 = int(xm1/2)			# point to left of y axis
-		xm2 = graphw				# right hand site of x axis
-		xmt = xm2-xm1				# total lenght of x axis
-
-		base.debugmsg(5, "xm0:", xm0, "	xm1:", xm1, "	xm2:", xm2, "	xmt:",xmt)
-
-		# y-axis
-		self.pln_graph.create_line(xm1, ym1, xm1, ym2, fill=defaultcolour)
-		# self.pln_graph.create_line(xm1, ym1, xm1, ym2)
-		# self.pln_graph.create_line(xm1, ym1, xm1, ym2, fill=gridcolour)
-		# x-axis
-		# base.gui.pln_graph.create_line(10, graphh-10, graphw, graphh-10, fill="blue")
-		self.pln_graph.create_line(xm1, ym1, xm2, ym1, fill=defaultcolour)
-		# self.pln_graph.create_line(xm1, ym1, xm2, ym1)
-
-		# draw zero
-		self.pln_graph.create_line(xm1, ym0, xm1, ym1, fill=defaultcolour)
-		self.pln_graph.create_line(xm0, ym1, xm1, ym1, fill=defaultcolour)
-		self.pln_graph.create_text([xm0, ym0], text="0", fill=defaultcolour)
-		# self.pln_graph.create_line(xm1, ym0, xm1, ym1)
-		# self.pln_graph.create_line(xm0, ym1, xm1, ym1)
-		# self.pln_graph.create_text([xm0, ym0], text="0")
-
-		# populate x axis	(time)
-		base.debugmsg(5, "populate x axis	(time)")
-		base.debugmsg(9, "mxdur", mxdur)
-		durinc = 1
-		if mxdur > 30:		# 30 sec
-			durinc = 15		# 15 sec
-		if mxdur > 120:		# 120 = 2 min
-			durinc = 60		# 1 min
-		if mxdur > 1800:	# 60 * 30 = 1800 sec = 1/2hr
-			durinc = 300	# 5 min
-		if mxdur > 3600:	# 60 * 60 = 3600 sec = 1hr
-			durinc = 600	# 10 min
-		if mxdur > 7200:	# 60 * 60 * 2 = 7200 sec = 2hr
-			durinc = 3600	# 1 hr
-		if mxdur > 36000:	# 60 * 60 * 10= 36000 sec = 10hr
-			durinc = 7200	# 2 hr
-		base.debugmsg(9, "durinc", durinc)
-
-		if mxdur>0:
-			mrkpct = durinc / (mxdur * 1.0)
-		else:
-			mrkpct = 0
-		base.debugmsg(9, "mrkpct", mrkpct)
-		base.debugmsg(9, "xm1", xm1, "xm2", xm2, "xm2-xm1", xm2-xm1)
-		mrkinc = int(xmt * mrkpct)
-		base.debugmsg(9, "mrkinc", mrkinc)
-		if mrkinc < 1:
-			mrkinc = 1
-
-		tmmrk = xm1 + mrkinc
-		base.debugmsg(9, "tmmrk", tmmrk)
-		base.debugmsg(9, "durinc", durinc)
-		durmrk = durinc
-		base.debugmsg(9, "durmrk", durmrk)
-		while durmrk < mxdur+1:
-			base.debugmsg(9, "x1", tmmrk, "y1", ym0, "x2", tmmrk, "y2", ym1)
-			# base.gui.pln_graph.create_line(tmmrk, ym0, tmmrk, ym1)
-			self.pln_graph.create_line(tmmrk, ym1, tmmrk, ym2, fill=gridcolour)
-			base.debugmsg(9, "format_sec({})".format(durmrk), base.format_sec(durmrk))
-			self.pln_graph.create_text([tmmrk, ym0], text=base.format_sec(durmrk), fill=defaultcolour)
-			# self.pln_graph.create_text([tmmrk, ym0], text=base.format_sec(durmrk))
-
-			tmmrk += mrkinc
-			base.debugmsg(9, "tmmrk", tmmrk)
-			durmrk += durinc
-			base.debugmsg(9, "durmrk", durmrk)
+					for i in range(int(1/chunk)-1):
+						q += chunk
+						timeruq = grp['Delay'] + (grp['RampUp']*q)
+						if timeruq in totalcalc:
+							totalcalc[timeruq] += (grp['Robots']*chunk)
+						else:
+							totalcalc[timeruq] = (grp['Robots']*chunk)
 
 
 
-		# populate y axis	(Users)
-		base.debugmsg(9, "populate y axis	(Users)")
-		usrinc = 1
-		if mxuser > 15:
-			usrinc = int((mxusero/100)+0.9)*10
-		base.debugmsg(9, "mxusero", mxusero)
-		base.debugmsg(9, "usrinc", usrinc)
-		base.debugmsg(9, "usrinc", usrinc)
-		usrmrk = usrinc
-		if mxuser>0:
-			mrkpct = usrmrk / (mxuser * 1.0)
-		else:
-			mrkpct = 0
-		base.debugmsg(9, "mrkpct", mrkpct)
-		txtmrkoffset = int(int(ym1 * mrkpct)/2)
-		base.debugmsg(9, "txtmrkoffset", txtmrkoffset)
-		while usrmrk < mxuser:
-			base.debugmsg(9, "usrmrk", usrmrk)
-			mrkpct = usrmrk / (mxuser * 1.0)
-			base.debugmsg(9, "mrkpct", mrkpct)
-			mrk = ym1 - int(ym1 * mrkpct)
-			base.debugmsg(9, "mrk", mrk)
-			txtmrk = mrk + txtmrkoffset
-			# base.gui.pln_graph.create_line(xm0, mrk, xm1, mrk)
-			self.pln_graph.create_line(xm1, mrk, xm2, mrk, fill=gridcolour)
-			# base.gui.pln_graph.create_text([xm0, txtmrk], text="{}".format(usrmrk))
-			self.pln_graph.create_text([xm0, mrk], text="{}".format(usrmrk), fill=defaultcolour)
-			# self.pln_graph.create_text([xm0, mrk], text="{}".format(usrmrk))
-
-			usrmrk += usrinc
+					# Run
+					timern = grp['Delay'] + grp['RampUp'] + grp['Run']
+					graphdata[name]["objTime"].append(datetime.fromtimestamp(timern, timezone.utc))
+					graphdata[name]["Values"].append(grp['Robots'])
+					if timern in totalcalc:
+						totalcalc[timern] += 0
+					else:
+						totalcalc[timern] = 0
 
 
-		xlen = xmt
+					# base.debugmsg(5, "graphdata[",name,"]:", graphdata[name])
 
-		delx = 0
-		base.debugmsg(6, "For grp In scriptlist")
-		for grp in base.scriptlist:
-			if "Users" in grp.keys():
-				base.debugmsg(6, "Index", grp["Index"])
-				colour = base.line_colour(grp["Index"])
-				base.debugmsg(6, "Index", grp["Index"], "Line colour", colour)
-				# delay
-				delaypct = grp["Delay"] / (mxdur * 1.0)
-				delx = int(xlen * delaypct) + xm1
-				base.debugmsg(6, "Index", grp["Index"], "Delay:", grp["Delay"], "	(xlen:",xlen," * delaypct:", delaypct, ") + xm1:", xm1, " = delx:", delx)
-				# ramp-up
-				rusx = delx
-				rusy = graphh-axissz
-				usrpct = grp["Users"] / (mxuser * 1.0)
-				base.debugmsg(6, "Index", grp["Index"], "RampUp:Users", grp["Users"], "/ mxuser", mxuser, " = usrpct", usrpct)
-				rudpct = grp["RampUp"] / (mxdur * 1.0)
-				ruex = int(xlen * rudpct) + delx
-				base.debugmsg(6, "Index", grp["Index"], "RampUp:RampUp", grp["RampUp"], "ruex", ruex)
-				ruey = rusy - int(rusy * usrpct)
-				base.debugmsg(6, "Index", grp["Index"], "RampUp:rusx", str(rusx), "rusy", str(rusy), "ruex", str(ruex), "ruey", str(ruey))
-				self.pln_graph.create_line(rusx, rusy, ruex, ruey, fill=colour)
-
-				index = grp["Index"]
-				if index not in totusrsxy:
-					totusrsxy[index] = {}
-				if "addpct" not in totusrsxy:
-					totusrsxy["addpct"] = {}
-
-				totusrsxy[index]['delaypct'] = delaypct
-				totusrsxy[index]['usrpct'] = usrpct
-				totusrsxy[index]['rudpct'] = rudpct
-
-				if delaypct not in totusrsxy["addpct"]:
-					totusrsxy["addpct"][delaypct] = 0
-
-				totusrsxy["addpct"][delaypct] += 0
-
-				rutpct = delaypct + rudpct
-				if rutpct not in totusrsxy["addpct"]:
-					totusrsxy["addpct"][rutpct] = 0
-				totusrsxy["addpct"][rutpct] += usrpct
+					# RampDown
+					timerd = grp['Delay'] + grp['RampUp'] + grp['Run'] + grp['RampUp']
+					graphdata[name]["objTime"].append(datetime.fromtimestamp(timerd, timezone.utc))
+					graphdata[name]["Values"].append(0)
+					if timerd in totalcalc:
+						totalcalc[timerd] += grp['Robots']*chunk*-1
+					else:
+						totalcalc[timerd] = grp['Robots']*chunk*-1
 
 
-				# Run
-				rnpct = grp["Run"] / (mxdur * 1.0)
-				rnex = int(xlen * rnpct) + ruex
-				base.debugmsg(6, "Index", grp["Index"], "rnex", rnex)
-				self.pln_graph.create_line(ruex, ruey, rnex, ruey, fill=colour)
-
-				rntpct = delaypct + rudpct + rnpct
-				if rntpct not in totusrsxy["addpct"]:
-					totusrsxy["addpct"][rntpct] = 0
-				totusrsxy["addpct"][rntpct] += 0
+					q = 1
+					for i in range(int(1/chunk)-1):
+						q -= chunk
+						timerdq = grp['Delay'] + grp['RampUp'] + grp['Run'] + (grp['RampUp']*q)
+						if timerdq in totalcalc:
+							totalcalc[timerdq] += (grp['Robots']*chunk*-1)
+						else:
+							totalcalc[timerdq] = (grp['Robots']*chunk*-1)
 
 
-				# ramp-down
-				rdex = rnex+(ruex-rusx)
-				base.debugmsg(6, "Index", grp["Index"], "rdex", rdex)
-				self.pln_graph.create_line(rnex, ruey, rdex, rusy, fill=colour, dash=(4, 4))
 
-				rdtpct = delaypct + rudpct + rnpct + rudpct
-				if rdtpct not in totusrsxy["addpct"]:
-					totusrsxy["addpct"][rdtpct] = 0
-				totusrsxy["addpct"][rdtpct] += (usrpct * -1)
+					timerd += 1
+					graphdata[name]["objTime"].append(datetime.fromtimestamp(timerd, timezone.utc))
+					graphdata[name]["Values"].append(0)
+					timerd += 1
+					if timerd>totaltime:
+						totaltime = timerd
 
-		base.debugmsg(6, "Total Users")
-		base.debugmsg(6, "totusrsxy:", totusrsxy)
+					# base.debugmsg(5, "graphdata[",name,"]:", graphdata[name])
 
-		sy = graphh-axissz
-		prevx = 0
-		prevx2 = 0
-		prevy = 0
-		k = "addpct"
+					self.axis.plot(graphdata[name]["objTime"], graphdata[name]["Values"], colour, label=name)
+					dodraw = True
 
-		addzero = 0
 
-		rusy = graphh-axissz
-		if k in totusrsxy:
-			for x in sorted(totusrsxy[k].keys()):
-				newx = x
-				newy = prevy + totusrsxy[k][x]
 
-				base.debugmsg(6, "prevx", prevx, "prevy", prevy, "newx", newx, "newy", newy)
+			base.debugmsg(7, "totalcalc:", totalcalc)
 
-				if addzero > 1:
-					prevx = prevx2
-					base.debugmsg(6, "prevx", prevx, "prevy", prevy, "newx", newx, "newy", newy)
+			rtotal = 0
+			for k in sorted(totalcalc.keys()):
+				base.debugmsg(7, "k:", k, " 	totalcalc[k]:", totalcalc[k])
+				graphdata["Total"]["objTime"].append(datetime.fromtimestamp(k, timezone.utc))
+				rtotal += totalcalc[k]
+				graphdata["Total"]["Values"].append(rtotal)
 
-				if newy == prevy:
-					addzero += 1
-					base.debugmsg(6, "addzero:", addzero)
-					prevx2 = prevx
+
+			# graphdata["Total"]["objTime"] = [datetime.fromtimestamp(r, timezone.utc) for r in range(totaltime) ]
+			# graphdata["Total"]["Values"] = [0 for r in range(totaltime) ]
+			# base.debugmsg(8, "len(graphdata[Total][objTime]):", len(graphdata["Total"]["objTime"]))
+			# for i in range(len(graphdata["Total"]["objTime"])):
+			# 	count = 0
+			# 	# base.debugmsg(5, "i:", i)
+			# 	for name in graphdata.keys():
+			# 		if name != "Total":
+			# 			# base.debugmsg(5, "name:", name)
+			# 			if len(graphdata[name]["Values"])>i:
+			# 				count = count + graphdata[name]["Values"][i]
+			# 			# base.debugmsg(5, "graphdata[name][Values][i]:", graphdata[name]["Values"][i], " 	count:", count)
+			# 	# base.debugmsg(5, "count:", count)
+			# 	# graphdata["Total"]["Values"].append(count)
+			# 	graphdata["Total"]["Values"][i] = count
+
+			self.axis.plot(graphdata["Total"]["objTime"], graphdata["Total"]["Values"], graphdata["Total"]["Colour"], label="Total")
+
+			if dodraw:
+
+				self.axis.grid(True, 'major', 'both')
+
+
+				# grphWindow.axis.set_ylim(0, 100)
+				self.axis.set_ylim(0)
+				self.axis.set_xlim(0)
+
+				if totaltime > (60*60*24):
+					xformatter = matplotlib.dates.DateFormatter('%d %H:%M')
 				else:
-					addzero = 0
+					xformatter = matplotlib.dates.DateFormatter('%H:%M:%S')
+				# plt.gcf().axes[0].xaxis.set_major_formatter(xformatter)
+				self.axis.xaxis.set_major_formatter(xformatter)
+
+				# self.axis.fmt_xdata = DateFormatter('%H:%M:%S')
+				# self.axis.fmt_xdata = matplotlib.dates.DateFormatter('%H:%M:%S')
 
 
+				self.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
 
-				x1 = int(xlen * prevx) + xm1
-				x2 = int(xlen * newx) + xm1
+				self.canvas.draw()
 
-				y1 = rusy - int(rusy * prevy)
-				y2 = rusy - int(rusy * newy)
+			self.pln_graph_update = False
 
-				base.debugmsg(6, "x1", x1, "y1", y1, "x2", x2, "y2", y2)
-
-				self.pln_graph.create_line(x1, y1, x2, y2, fill=totcolour)
-
-				prevx = newx
-				prevy = newy
-
-		base.debugmsg(6, "pln_update_graph done")
-
-	def pln_update_graph_orig(self):
-		base.debugmsg(6, "pln_update_graph")
-		base.debugmsg(7, "pln_graph:", self.pln_graph)
-		base.debugmsg(9, "scriptlist:", base.scriptlist)
-		try:
-			base.debugmsg(9, "winfo_width:", self.pln_graph.winfo_width(), "	winfo_height:",self.pln_graph.winfo_height())
-			graphh = self.pln_graph.winfo_height()
-			graphw = self.pln_graph.winfo_width()
-		except:
-			return False
-
-		base.debugmsg(9, "graphh", graphh, "graphw", graphw)
-
-
-		axissz = 10
-		if graphw > graphh:
-			axissz = int(graphh * 0.1)
-		else:
-			axissz = int(graphw * 0.1)
-
-		#  work out max users
-		mxuser = 0
-		mxusero = 0
-		for grp in base.scriptlist:
-			if "Users" in grp.keys():
-				mxuser += grp["Users"]
-				mxusero += grp["Users"]
-		base.debugmsg(6, "mxuser", mxuser)
-		if mxuser <10:
-			mxuser += 1
-		else:
-			mxuser = int(mxuser*1.15)
-		base.debugmsg(5, "mxuser", mxuser)
-
-
-		#  work out max duration
-		mxdur = 0
-		for grp in base.scriptlist:
-			if "Users" in grp.keys():
-				dur = grp["Delay"] + (grp["RampUp"]*2) + grp["Run"]
-				dur = int(dur * 1.03)
-				if mxdur < dur:
-					mxdur = dur
-		base.debugmsg(6, "mxdur", mxdur)
-
-		totcounts = {}
-		totcounts[0] = 0
-		base.debugmsg(6, 'totcounts', totcounts)
-		base.debugmsg(6, 'totcounts.keys()', totcounts.keys())
-		totinc = 1
-		if mxdur > 60:
-			totinc = 10
-		if mxdur > 3600:
-			totinc = 60
-
-		self.pln_graph.delete("all")
-
-		ym0 = graphh-int(axissz/2)	# point below x axis
-		ym1 = graphh-axissz			# x axis line
-		ym2 = 0						# top of graph
-
-		xm1 = axissz			# y axis line
-		if mxusero>99:
-			xm1 = (axissz*2)
-		if mxusero>9999:
-			xm1 = (axissz*3)
-
-		xm0 = int(xm1/2)			# point to left of y axis
-		xm2 = graphw				# right hand site of x axis
-		xmt = xm2-xm1				# total lenght of x axis
-
-		# y-axis
-		self.pln_graph.create_line(xm1, ym1, xm1, ym2)
-		# x-axis
-		# base.gui.pln_graph.create_line(10, graphh-10, graphw, graphh-10, fill="blue")
-		self.pln_graph.create_line(xm1, ym1, xm2, ym1)
-
-		# draw zero
-		self.pln_graph.create_line(xm1, ym0, xm1, ym1)
-		self.pln_graph.create_line(xm0, ym1, xm1, ym1)
-		self.pln_graph.create_text([xm0, ym0], text="0")
-
-		# populate x axis	(time)
-		base.debugmsg(5, "populate x axis	(time)")
-		base.debugmsg(9, "mxdur", mxdur)
-		durinc = 1
-		if mxdur > 30:		# 30 sec
-			durinc = 15		# 15 sec
-		if mxdur > 120:		# 120 = 2 min
-			durinc = 60		# 1 min
-		if mxdur > 1800:	# 60 * 30 = 1800 sec = 1/2hr
-			durinc = 300	# 5 min
-		if mxdur > 3600:	# 60 * 60 = 3600 sec = 1hr
-			durinc = 600	# 10 min
-		if mxdur > 7200:	# 60 * 60 * 2 = 7200 sec = 2hr
-			durinc = 3600	# 1 hr
-		if mxdur > 36000:	# 60 * 60 * 10= 36000 sec = 10hr
-			durinc = 7200	# 2 hr
-		base.debugmsg(9, "durinc", durinc)
-
-		if mxdur>0:
-			mrkpct = durinc / (mxdur * 1.0)
-		else:
-			mrkpct = 0
-		base.debugmsg(9, "mrkpct", mrkpct)
-		base.debugmsg(9, "xm1", xm1, "xm2", xm2, "xm2-xm1", xm2-xm1)
-		mrkinc = int(xmt * mrkpct)
-		base.debugmsg(9, "mrkinc", mrkinc)
-		if mrkinc < 1:
-			mrkinc = 1
-
-		tmmrk = xm1 + mrkinc
-		base.debugmsg(9, "tmmrk", tmmrk)
-		base.debugmsg(9, "durinc", durinc)
-		durmrk = durinc
-		base.debugmsg(9, "durmrk", durmrk)
-		gridcolour = "#cfcfcf"
-		while durmrk < mxdur+1:
-			base.debugmsg(9, "x1", tmmrk, "y1", ym0, "x2", tmmrk, "y2", ym1)
-			# base.gui.pln_graph.create_line(tmmrk, ym0, tmmrk, ym1)
-			self.pln_graph.create_line(tmmrk, ym1, tmmrk, ym2, fill=gridcolour)
-			base.debugmsg(9, "format_sec({})".format(durmrk), base.format_sec(durmrk))
-			self.pln_graph.create_text([tmmrk, ym0], text=base.format_sec(durmrk))
-
-			tmmrk += mrkinc
-			base.debugmsg(9, "tmmrk", tmmrk)
-			durmrk += durinc
-			base.debugmsg(9, "durmrk", durmrk)
-
-
-
-		# populate y axis	(Users)
-		base.debugmsg(9, "populate y axis	(Users)")
-		usrinc = 1
-		if mxuser > 15:
-			usrinc = int((mxusero/100)+0.9)*10
-		base.debugmsg(9, "mxusero", mxusero)
-		base.debugmsg(9, "usrinc", usrinc)
-		base.debugmsg(9, "usrinc", usrinc)
-		usrmrk = usrinc
-		if mxuser>0:
-			mrkpct = usrmrk / (mxuser * 1.0)
-		else:
-			mrkpct = 0
-		base.debugmsg(9, "mrkpct", mrkpct)
-		txtmrkoffset = int(int(ym1 * mrkpct)/2)
-		base.debugmsg(9, "txtmrkoffset", txtmrkoffset)
-		while usrmrk < mxuser:
-			base.debugmsg(9, "usrmrk", usrmrk)
-			mrkpct = usrmrk / (mxuser * 1.0)
-			base.debugmsg(9, "mrkpct", mrkpct)
-			mrk = ym1 - int(ym1 * mrkpct)
-			base.debugmsg(9, "mrk", mrk)
-			txtmrk = mrk + txtmrkoffset
-			# base.gui.pln_graph.create_line(xm0, mrk, xm1, mrk)
-			self.pln_graph.create_line(xm1, mrk, xm2, mrk, fill=gridcolour)
-			# base.gui.pln_graph.create_text([xm0, txtmrk], text="{}".format(usrmrk))
-			self.pln_graph.create_text([xm0, mrk], text="{}".format(usrmrk))
-
-			usrmrk += usrinc
-
-
-		xlen = xmt
-
-		delx = 0
-		base.debugmsg(6, "For grp In scriptlist")
-		for grp in base.scriptlist:
-			if "Users" in grp.keys():
-				base.debugmsg(6, "Index", grp["Index"])
-				colour = base.line_colour(grp["Index"])
-				base.debugmsg(6, "Index", grp["Index"], "Line colour", colour)
-				# delay
-				delaypct = grp["Delay"] / (mxdur * 1.0)
-				delx = int(xlen * delaypct) + xm1
-				base.debugmsg(6, "Index", grp["Index"], "Delay", grp["Delay"], "delx", delx)
-				# ramp-up
-				rusx = delx
-				rusy = graphh-axissz
-				usrpct = grp["Users"] / (mxuser * 1.0)
-				base.debugmsg(9, "Index", grp["Index"], "RampUp:Users", grp["Users"], "/ mxuser", mxuser, " = usrpct", usrpct)
-				rudpct = grp["RampUp"] / (mxdur * 1.0)
-				ruex = int(xlen * rudpct) + delx
-				base.debugmsg(9, "Index", grp["Index"], "RampUp:RampUp", grp["RampUp"], "ruex", ruex)
-				ruey = rusy - int(rusy * usrpct)
-				base.debugmsg(6, "Index", grp["Index"], "RampUp:rusx", rusx, "rusy", rusy, "ruex", ruex, "ruey", ruey)
-				self.pln_graph.create_line(rusx, rusy, ruex, ruey, fill=colour)
-
-				# Run
-				rnpct = grp["Run"] / (mxdur * 1.0)
-				rnex = int(xlen * rnpct) + ruex
-				base.debugmsg(6, "Index", grp["Index"], "rnex", rnex)
-				self.pln_graph.create_line(ruex, ruey, rnex, ruey, fill=colour)
-
-				# ramp-down
-				rdex = rnex+(ruex-rusx)
-				base.debugmsg(6, "Index", grp["Index"], "rdex", rdex)
-				self.pln_graph.create_line(rnex, ruey, rdex, rusy, fill=colour, dash=(4, 4))
-
-				# totcounts = {}
-				# totinc = 1
-				# if mxdur > 60:
-				totnxt = 0
-				base.debugmsg(6, "Index", grp["Index"], 'totnxt', totnxt)
-				base.debugmsg(8, "Index", grp["Index"], 'totcounts', totcounts)
-				base.debugmsg(8, "Index", grp["Index"], 'totcounts.keys()', totcounts.keys())
-				while totnxt < mxdur:
-					totnxt += totinc
-					base.debugmsg(6, "Index", grp["Index"], 'totnxt', totnxt)
-					if totnxt not in totcounts.keys():
-						totcounts[totnxt] = 0
-						base.debugmsg(6, "Index", grp["Index"], 'totcounts[',totnxt,']', totcounts[totnxt])
-					# if totnxt < grp["Delay"]:
-					# 	totcounts[totnxt] += 0
-					if totnxt > grp["Delay"] and totnxt < (grp["RampUp"] + grp["Delay"]):
-						# calculate users during RampUp
-						rupct = (totnxt - grp["Delay"]) /grp["RampUp"]
-						base.debugmsg(9, 'rupct', rupct)
-						ruusr = int(grp["Users"] * rupct)
-						base.debugmsg(9, 'ruusr', ruusr)
-						base.debugmsg(9, 'totcounts', totcounts)
-						base.debugmsg(9, 'totcounts[totnxt]', totcounts[totnxt])
-						totcounts[totnxt] = int(totcounts[totnxt] + ruusr)
-						base.debugmsg(6, "Index", grp["Index"], 'totcounts[',totnxt,']', totcounts[totnxt])
-						base.debugmsg(9, 'ruusr', ruusr)
-						base.debugmsg(9, 'totcounts[totnxt]', totcounts[totnxt])
-
-					if totnxt > (grp["Delay"] + grp["RampUp"] - 1) \
-						and totnxt < (grp["Delay"] + grp["RampUp"] + grp["Run"] + 1):
-						# all users running
-						base.debugmsg(9, 'run:totnxt', totnxt)
-						base.debugmsg(9, 'run:grp["Users"]', grp["Users"])
-						totcounts[totnxt] += grp["Users"]
-						base.debugmsg(6, "Index", grp["Index"], 'totcounts[',totnxt,']', totcounts[totnxt])
-					if totnxt > (grp["RampUp"] + grp["Delay"] + grp["Run"]) \
-						and totnxt < (grp["Delay"] + (grp["RampUp"] *2 ) + grp["Run"]):
-						# calculate users during RampDown
-						base.debugmsg(9, 'RampDown:totnxt', totnxt)
-						drr = grp["Delay"] + grp["RampUp"] + grp["Run"]
-						base.debugmsg(9, 'RampDown:drr', drr)
-						rdsec = totnxt - drr
-						base.debugmsg(9, 'RampDown:rdsec', rdsec)
-
-						rdpct = rdsec /grp["RampUp"]
-						base.debugmsg(9, 'RampDown:rdpct', rdpct)
-						ruusr = int(grp["Users"] * rdpct)
-						base.debugmsg(9, 'RampDown:ruusr', ruusr)
-						totcounts[totnxt] += grp["Users"] - ruusr
-						base.debugmsg(6, "Index", grp["Index"], 'totcounts[',totnxt,']', totcounts[totnxt])
-
-		base.debugmsg(6, "Total Users")
-
-		totcolour = "#000000"
-		# totcolour = "#0459af"
-		sy = graphh-axissz
-		prevkey = 0
-		prevx = 0
-		prevy = sy
-		prevval = 0
-		rampdown = False
-		for key in totcounts.keys():
-			if rampdown == False and totcounts[key] < prevval:
-				rampdown = True
-				base.debugmsg(6, prevkey, totcounts[prevkey])
-
-				usrpct = prevval / (mxuser * 1.0)
-				base.debugmsg(6, "Users", totcounts[key], "/ mxuser", mxuser, " = usrpct", usrpct)
-				newy = sy - int(sy * usrpct)
-
-				keypct = prevkey / (mxdur * 1.0)
-				base.debugmsg(6, "key", key, "/ mxdur", mxdur, " = keypct", keypct)
-				newx = int(xlen * keypct) + delx
-
-				base.debugmsg(6, "prevx", prevx, "prevy", prevy, "newx", newx, "newy", newy)
-
-				self.pln_graph.create_line(prevx, prevy, newx, newy, fill=totcolour)
-
-				prevx = newx
-				prevy = newy
-
-			if totcounts[key] != prevval:
-				base.debugmsg(6, key, totcounts[key])
-				prevval = totcounts[key]
-
-				usrpct = totcounts[key] / (mxuser * 1.0)
-				base.debugmsg(6, "TU: Users", totcounts[key], "/ mxuser", mxuser, " = usrpct", usrpct)
-				newy = sy - int(sy * usrpct)
-
-				keypct = key / (mxdur * 1.0)
-				base.debugmsg(6, "TU: key", key, "/ mxdur", mxdur, " = keypct", keypct)
-				newx = int(xlen * keypct) + delx
-
-				base.debugmsg(6, "TU: prevx", prevx, "prevy", prevy, "newx", newx, "newy", newy)
-
-				if rampdown:
-					self.pln_graph.create_line(prevx, prevy, newx, newy, fill=totcolour, dash=(4, 4))
-				else:
-					self.pln_graph.create_line(prevx, prevy, newx, newy, fill=totcolour)
-
-				prevx = newx
-				prevy = newy
-
-
-			prevkey = key
 
 	def addScriptRow(self):
 		base.debugmsg(6, "addScriptRow")
@@ -3995,7 +5579,7 @@ class RFSwarmGUI(tk.Frame):
 		idx.grid(column=self.plancolidx, row=base.scriptcount, sticky="nsew")
 
 
-		num = base.scriptlist[base.scriptcount]["Users"]
+		num = base.scriptlist[base.scriptcount]["Robots"]
 		usr = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout")
 		# usr = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout", style="BW.TLabel")
 		# usr = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout", style="rfsinput")
@@ -4005,28 +5589,31 @@ class RFSwarmGUI(tk.Frame):
 		usr.config(validatecommand=lambda: self.sr_users_validate(row))
 		usr.grid(column=self.plancolusr, row=base.scriptcount, sticky="nsew")
 		usr.insert(0, num)
-		base.scriptlist[base.scriptcount]["Users"] = int(num)
+		base.scriptlist[base.scriptcount]["Robots"] = int(num)
 
 		num = base.scriptlist[base.scriptcount]["Delay"]
-		dly = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout")
+		# base.scriptlist[row]["TXT_Delay"] = tk.StringVar()
+		dly = ttk.Entry(self.scriptgrid, width=8, justify="right", validate="focusout")
 		dly.config(validatecommand=lambda: self.sr_delay_validate(row))
 		dly.grid(column=self.plancoldly, row=base.scriptcount, sticky="nsew")
-		dly.insert(0, num)
-		base.scriptlist[base.scriptcount]["Delay"] = int(num)
+		dly.insert(0, base.sec2hms(num))
+		base.scriptlist[base.scriptcount]["Delay"] = base.hms2sec(num)
 
 		num = base.scriptlist[base.scriptcount]["RampUp"]
-		rmp = ttk.Entry(self.scriptgrid, width=7, justify="right", validate="focusout")
+		rmp = ttk.Entry(self.scriptgrid, width=8, justify="right", validate="focusout")
 		rmp.config(validatecommand=lambda: self.sr_rampup_validate(row))
 		rmp.grid(column=self.plancolrmp, row=base.scriptcount, sticky="nsew")
-		rmp.insert(0, num)
-		base.scriptlist[base.scriptcount]["RampUp"] = int(num)
+		# rmp.insert(0, num)
+		rmp.insert(0, base.sec2hms(num))
+		base.scriptlist[base.scriptcount]["RampUp"] = base.hms2sec(num)
 
 		num = base.scriptlist[base.scriptcount]["Run"]
 		run = ttk.Entry(self.scriptgrid, width=8, justify="right", validate="focusout")
 		run.config(validatecommand=lambda: self.sr_run_validate(row))
 		run.grid(column=self.plancolrun, row=base.scriptcount, sticky="nsew")
-		run.insert(0, num)
-		base.scriptlist[base.scriptcount]["Run"] = int(num)
+		# run.insert(0, num)
+		run.insert(0, base.sec2hms(num))
+		base.scriptlist[base.scriptcount]["Run"] = base.hms2sec(num)
 
 		fgf = ttk.Frame(self.scriptgrid)
 		fgf.grid(column=self.plancolscr, row=base.scriptcount, sticky="nsew")
@@ -4042,7 +5629,7 @@ class RFSwarmGUI(tk.Frame):
 		scrf.grid(column=1, row=0, sticky="nsew")
 		fgf.columnconfigure(scrf, weight=0)
 
-		base.scriptlist[row]["TestVar"] = tk.StringVar(base.scriptlist[row]["Test"], name="row{}".format(row))
+		base.scriptlist[row]["TestVar"] = tk.StringVar(value=base.scriptlist[row]["Test"], name="row{}".format(row))
 		base.scriptlist[row]["TestVar"].trace("w", self.sr_test_validate)
 		tst = ttk.OptionMenu(self.scriptgrid, base.scriptlist[row]["TestVar"], None, "test")
 		tst.config(width=20)
@@ -4067,7 +5654,9 @@ class RFSwarmGUI(tk.Frame):
 		if not base.args.nogui:
 			try:
 				base.debugmsg(6, "call pln_update_graph")
-				self.pln_update_graph()
+				# self.pln_update_graph()
+				t = threading.Thread(target=self.pln_update_graph)
+				t.start()
 				base.debugmsg(6, "call fill_canvas")
 				# self.scrollable_sg.fill_canvas()
 				fc = threading.Thread(target=self.scrollable_sg.fill_canvas)
@@ -4102,12 +5691,14 @@ class RFSwarmGUI(tk.Frame):
 
 			if not base.args.nogui:
 				usrs = self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].get()
-			base.debugmsg(5, "Row:", r, "Users:", usrs)
-			base.scriptlist[r]["Users"] = int(usrs)
+			base.debugmsg(5, "Row:", r, "Robots:", usrs)
+			base.scriptlist[r]["Robots"] = int(usrs)
 			self.plan_scnro_chngd = True
 			if not base.args.nogui:
 				try:
-					self.pln_update_graph()
+					# self.pln_update_graph()
+					t = threading.Thread(target=self.pln_update_graph)
+					t.start()
 				except:
 					pass
 			return True
@@ -4116,12 +5707,14 @@ class RFSwarmGUI(tk.Frame):
 			base.debugmsg(9, "RFSwarmGUI: r:", r)
 			if r>0:
 				usrs = self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].get()
-				base.debugmsg(9, "Row:", r, "Users:", usrs)
-				base.scriptlist[r]["Users"] = int(usrs)
+				base.debugmsg(9, "Row:", r, "Robots:", usrs)
+				base.scriptlist[r]["Robots"] = int(usrs)
 				self.plan_scnro_chngd = True
 		if not base.args.nogui:
 			try:
-				self.pln_update_graph()
+				# self.pln_update_graph()
+				t = threading.Thread(target=self.pln_update_graph)
+				t.start()
 			except:
 				pass
 		return True
@@ -4133,14 +5726,19 @@ class RFSwarmGUI(tk.Frame):
 			v = None
 			if len(args)>1:
 				dly = str(args[1])
+				idly = base.hms2sec(args[1])
 				if not base.args.nogui:
+					base.debugmsg(6, "Row:", r, "Delay:", dly)
 					self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].delete(0,'end')
-					self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].insert(0,dly)
+					self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].insert(0, base.sec2hms(idly))
 			if not base.args.nogui:
 				dly = self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].get()
+				idly = base.hms2sec(dly)
+				self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].delete(0,'end')
+				self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].insert(0, base.sec2hms(idly))
 			base.debugmsg(6, "Row:", r, "Delay:", dly)
 			if len(dly)>0:
-				base.scriptlist[r]["Delay"] = int(dly)
+				base.scriptlist[r]["Delay"] = base.hms2sec(dly)
 				self.plan_scnro_chngd = True
 			else:
 				base.scriptlist[r]["Delay"] = 0
@@ -4148,7 +5746,9 @@ class RFSwarmGUI(tk.Frame):
 			if not base.args.nogui:
 				try:
 					base.debugmsg(6, "try pln_update_graph (if)")
-					self.pln_update_graph()
+					# self.pln_update_graph()
+					t = threading.Thread(target=self.pln_update_graph)
+					t.start()
 				except Exception as e:
 					# base.debugmsg(6, "try pln_update_graph (if) Exception:", e)
 					pass
@@ -4159,12 +5759,14 @@ class RFSwarmGUI(tk.Frame):
 			if r>0:
 				dly = self.scriptgrid.grid_slaves(column=self.plancoldly, row=r)[0].get()
 				base.debugmsg(9, "Row:", r, "Delay:", dly)
-				base.scriptlist[r]["Delay"] = int(dly)
+				base.scriptlist[r]["Delay"] = base.hms2sec(dly)
 				self.plan_scnro_chngd = True
 		if not base.args.nogui:
 			try:
 				base.debugmsg(6, "try pln_update_graph (for)")
-				self.pln_update_graph()
+				# self.pln_update_graph()
+				t = threading.Thread(target=self.pln_update_graph)
+				t.start()
 			except:
 				pass
 		return True
@@ -4176,17 +5778,23 @@ class RFSwarmGUI(tk.Frame):
 			rmp = None
 			if len(args)>1:
 				rmp = str(args[1])
+				irmp = base.hms2sec(args[1])
 				if not base.args.nogui:
 					self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].delete(0,'end')
-					self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].insert(0,rmp)
+					self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].insert(0,base.sec2hms(irmp))
 			if not base.args.nogui:
 				rmp = self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].get()
+				irmp = base.hms2sec(rmp)
+				self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].delete(0,'end')
+				self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].insert(0,base.sec2hms(irmp))
 			base.debugmsg(6, "Row:", r, "RampUp:", rmp)
-			base.scriptlist[r]["RampUp"] = int(rmp)
+			base.scriptlist[r]["RampUp"] = base.hms2sec(rmp)
 			self.plan_scnro_chngd = True
 			if not base.args.nogui:
 				try:
-					self.pln_update_graph()
+					# self.pln_update_graph()
+					t = threading.Thread(target=self.pln_update_graph)
+					t.start()
 				except:
 					pass
 			return True
@@ -4196,11 +5804,13 @@ class RFSwarmGUI(tk.Frame):
 			if r>0:
 				rmp = self.scriptgrid.grid_slaves(column=self.plancolrmp, row=r)[0].get()
 				base.debugmsg(9, "Row:", r, "RampUp:", rmp)
-				base.scriptlist[r]["RampUp"] = int(rmp)
+				base.scriptlist[r]["RampUp"] = base.hms2sec(rmp)
 				self.plan_scnro_chngd = True
 		if not base.args.nogui:
 			try:
-				self.pln_update_graph()
+				# self.pln_update_graph()
+				t = threading.Thread(target=self.pln_update_graph)
+				t.start()
 			except:
 				pass
 		return True
@@ -4212,17 +5822,23 @@ class RFSwarmGUI(tk.Frame):
 			run = None
 			if len(args)>1:
 				run = str(args[1])
+				irun = base.hms2sec(args[1])
 				if not base.args.nogui:
 					self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].delete(0,'end')
-					self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].insert(0,run)
+					self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].insert(0,base.sec2hms(irun))
 			if not base.args.nogui:
 				run = self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].get()
+				irun = base.hms2sec(run)
+				self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].delete(0,'end')
+				self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].insert(0,base.sec2hms(irun))
 			base.debugmsg(6, "Row:", r, "Run:", run)
-			base.scriptlist[r]["Run"] = int(run)
+			base.scriptlist[r]["Run"] = base.hms2sec(run)
 			self.plan_scnro_chngd = True
 			if not base.args.nogui:
 				try:
-					self.pln_update_graph()
+					# self.pln_update_graph()
+					t = threading.Thread(target=self.pln_update_graph)
+					t.start()
 				except:
 					pass
 			return True
@@ -4232,11 +5848,13 @@ class RFSwarmGUI(tk.Frame):
 			if r>0:
 				run = self.scriptgrid.grid_slaves(column=self.plancolrun, row=r)[0].get()
 				base.debugmsg(9, "Row:", r, "Run:", run)
-				base.scriptlist[r]["Run"] = int(run)
+				base.scriptlist[r]["Run"] = base.hms2sec(run)
 				self.plan_scnro_chngd = True
 		if not base.args.nogui:
 			try:
-				self.pln_update_graph()
+				# self.pln_update_graph()
+				t = threading.Thread(target=self.pln_update_graph)
+				t.start()
 			except:
 				pass
 		return True
@@ -4299,7 +5917,9 @@ class RFSwarmGUI(tk.Frame):
 
 		if not base.args.nogui:
 			try:
-				self.pln_update_graph()
+				# self.pln_update_graph()
+				t = threading.Thread(target=self.pln_update_graph)
+				t.start()
 			except:
 				pass
 		return True
@@ -4336,7 +5956,9 @@ class RFSwarmGUI(tk.Frame):
 
 		if not base.args.nogui:
 			try:
-				self.pln_update_graph()
+				# self.pln_update_graph()
+				t = threading.Thread(target=self.pln_update_graph)
+				t.start()
 			except:
 				pass
 		return True
@@ -4347,7 +5969,7 @@ class RFSwarmGUI(tk.Frame):
 		tclist = [""]
 		# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
 		regex = "^\*+[\s]*(Test Case|Task)"
-		with open(base.scriptlist[r]["Script"]) as f:
+		with open(base.scriptlist[r]["Script"], 'r', encoding="utf8") as f:
 			for line in f:
 				base.debugmsg(9, "sr_test_genlist: tcsection:",tcsection, "	line:", line)
 				if tcsection and line[0:3] == "***":
@@ -4362,7 +5984,7 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(8, tclist)
 		if not base.args.nogui:
 			tol = self.scriptgrid.grid_slaves(column=self.plancoltst, row=r)[0]
-			base.debugmsg(9, tol)
+			base.debugmsg(7, "tol: ", tol)
 			tol.set_menu(*tclist)
 
 	def sr_remove_row(self, r):
@@ -4379,7 +6001,9 @@ class RFSwarmGUI(tk.Frame):
 		self.sg_canvas.config(scrollregion=self.sg_canvas.bbox("all"))
 
 		try:
-			self.pln_update_graph()
+			# self.pln_update_graph()
+			t = threading.Thread(target=self.pln_update_graph)
+			t.start()
 		except:
 			pass
 		return True
@@ -4390,6 +6014,14 @@ class RFSwarmGUI(tk.Frame):
 		# self.grid(sticky="news", ipadx=0, pady=0)
 		# self.root.resizable(False, False)		# this didn't work as expected, I expected the dialog to not be resizable instaed it stopped the main window from being resizable
 		# self.root.resizable(True, True)
+
+		# https://tkdocs.com/shipman/toplevel.html
+		# I believe this should keep the settings window infront of the menager window
+		# well it didn't work on macosx but it may help, i'll leave it for now
+		# stgsWindow.transient()
+		# stgsWindow.transient(parent=self.root)
+		# Now it works :)
+		stgsWindow.transient(self.root)
 
 		stgsWindow.title("Settings for row {}".format(r))
 		testname = ""
@@ -4402,7 +6034,7 @@ class RFSwarmGUI(tk.Frame):
 			stgsWindow.title("Settings for {} ({})".format(testname, r))
 
 
-		stgsWindow.excludelibrariesdefault = "BuiltIn,String,OperatingSystem,perftest"
+		stgsWindow.excludelibrariesdefault = "String,OperatingSystem,perftest"
 		stgsWindow.Filters = {}
 
 		base.debugmsg(5, "base.scriptlist[r]:", base.scriptlist[r])
@@ -4687,7 +6319,6 @@ class RFSwarmGUI(tk.Frame):
 
 
 		icontext = "Stop"
-		self.icoStop = self.get_icon(icontext)
 		# self.elements["Run"]["btn_stop"]
 		self.elements["Run"]["btn_stop"] = ttk.Button(rgbar, image=self.imgdata[icontext], padding='3 3 3 3', text="Stop", command=self.ClickStop)
 		# self.elements["Run"]["btn_stop"] = ttk.Button(rgbar, text='Stop', command=self.ClickStop)
@@ -4695,19 +6326,8 @@ class RFSwarmGUI(tk.Frame):
 
 
 		icontext = "report_text"
-		self.icoStop = self.get_icon(icontext)
 		rpt = ttk.Button(rgbar, image=self.imgdata[icontext], padding='3 3 3 3', text="Stop", command=base.report_text)
 		rpt.grid(column=50, row=1, sticky="nsew") # , rowspan=2
-
-		# icontext = "report_html"
-		# self.icoStop = self.get_icon(icontext)
-		# rpt = ttk.Button(rgbar, image=self.imgdata[icontext], padding='3 3 3 3', text="Stop", command=self.report_html)
-		# rpt.grid(column=51, row=1, sticky="nsew") # , rowspan=2
-		#
-		# icontext = "report_word"
-		# self.icoStop = self.get_icon(icontext)
-		# rpt = ttk.Button(rgbar, image=self.imgdata[icontext], padding='3 3 3 3', text="Stop", command=self.report_word)
-		# rpt.grid(column=52, row=1, sticky="nsew") # , rowspan=2
 
 
 
@@ -4855,26 +6475,32 @@ class RFSwarmGUI(tk.Frame):
 		if "Start" in base.robot_schedule:
 			stm = time.localtime(base.robot_schedule["Start"])
 			self.display_run['start_time'].set("  {}  ".format(time.strftime("%H:%M:%S", stm)))
-			etm = time.gmtime(int(time.time()) - base.robot_schedule["Start"])
-			self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
+			# etm = time.gmtime(int(time.time()) - base.robot_schedule["Start"])
+			etm = int(time.time()) - base.robot_schedule["Start"]
+			# self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
+			self.display_run['elapsed_time'].set("  {}  ".format(base.sec2hms(etm)))
 
 
 		if base.posttest and base.run_finish>0:
 			ftm = time.localtime(base.run_finish)
 			self.display_run['finish_time'].set("  {}  ".format(time.strftime("%H:%M:%S", ftm)))
-			etm = time.gmtime(base.run_finish - base.robot_schedule["Start"])
-			self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
+			# etm = time.gmtime(base.run_finish - base.robot_schedule["Start"])
+			etm = base.run_finish - base.robot_schedule["Start"]
+			# self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
+			self.display_run['elapsed_time'].set("  {}  ".format(base.sec2hms(etm)))
 
 		# update stop button
 		if base.run_end < int(time.time()):
 			icontext = "Abort"
-			self.icoStop = self.get_icon(icontext)
-			self.elements["Run"]["btn_stop"]["image"] = self.icoStop
+			self.elements["Run"]["btn_stop"]["image"] = self.icoAbort
+
+		if base.run_abort:
+			icontext = "Aborted"
+			self.elements["Run"]["btn_stop"]["image"] = self.icoAborted
 
 		if base.run_finish > 0:
 			icontext = "Aborted"
-			self.icoStop = self.get_icon(icontext)
-			self.elements["Run"]["btn_stop"]["image"] = self.icoStop
+			self.elements["Run"]["btn_stop"]["image"] = self.icoAborted
 
 		time_elapsed = int(time.time()) - self.rungridupdate
 		if (time_elapsed>5):
@@ -4987,6 +6613,9 @@ class RFSwarmGUI(tk.Frame):
 			self.rungrid.update_idletasks()
 			self.run_canvas.config(scrollregion=self.rungrid.bbox("all"))
 
+			# self.pln_graph.bind("<Configure>", self.CanvasResize)
+			# May need to bind <Button-4> and <Button-5> to enable mouse scrolling
+			# https://www.python-course.eu/tkinter_events_binds.php
 
 			ut = threading.Thread(target=self.delayed_UpdateRunStats)
 			ut.start()
@@ -5004,16 +6633,14 @@ class RFSwarmGUI(tk.Frame):
 				# reallyabort = tkm.askyesno('RFSwarm - Abort Run','Do you want to abort this run? Clicking yes will kill all running robots!', icon='error')
 				if reallyabort:
 					icontext = "Aborted"
-					self.icoStop = self.get_icon(icontext)
-					self.elements["Run"]["btn_stop"]["image"] = self.icoStop
+					self.elements["Run"]["btn_stop"]["image"] = self.icoAborted
 					core.ClickStop()
 		else:
 			base.debugmsg(5, "Stop Clicked 1st time")
 			icontext = "Abort"
-			self.icoStop = self.get_icon(icontext)
 			base.debugmsg(9, "icoStop", self.icoStop)
 			base.debugmsg(9, "btn_stop", self.elements["Run"]["btn_stop"])
-			self.elements["Run"]["btn_stop"]["image"] = self.icoStop
+			self.elements["Run"]["btn_stop"]["image"] = self.icoAbort
 			base.debugmsg(9, "btn_stop", self.elements["Run"]["btn_stop"])
 
 			core.ClickStop()
@@ -5186,8 +6813,10 @@ class RFSwarmGUI(tk.Frame):
 		self.display_run['total_robots'].set("  {}  ".format(base.total_robots))
 		base.debugmsg(9, "total_robots:", base.total_robots)
 		if base.total_robots>0:
-			etm = time.gmtime(int(time.time()) - base.robot_schedule["Start"])
-			self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
+			# etm = time.gmtime(int(time.time()) - base.robot_schedule["Start"])
+			etm = int(time.time()) - base.robot_schedule["Start"]
+			# self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
+			self.display_run['elapsed_time'].set("  {}  ".format(base.sec2hms(etm)))
 
 		grdrows = self.agenttgrid.grid_size()[1]-1
 		while grdrows>rnum:
@@ -5204,6 +6833,9 @@ class RFSwarmGUI(tk.Frame):
 		self.agenttgrid.update_idletasks()
 		self.ag_canvas.config(scrollregion=self.ag_canvas.bbox("all"))
 
+		# self.pln_graph.bind("<Configure>", self.CanvasResize)
+		# May need to bind <Button-4> and <Button-5> to enable mouse scrolling
+		# https://www.python-course.eu/tkinter_events_binds.php
 
 	def add_agent_row(self, rnum):
 		base.debugmsg(9, "add_row: rnum:", rnum)
@@ -5251,6 +6883,108 @@ class RFSwarmGUI(tk.Frame):
 		self.agenttgrid.update_idletasks()
 		self.ag_canvas.config(scrollregion=self.ag_canvas.bbox("all"))
 
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+	#
+	# About
+	#
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+	def openweblink(self, url):
+	    webbrowser.open_new(url)
+
+	def BuildAbout(self, ab):
+
+		if not base.args.nogui:
+
+			aboutrow = 0
+
+			# weight=0 means don't resize with other grid rows / keep a fixed size
+			ab.columnconfigure(0, weight=1)
+			ab.columnconfigure(1, weight=1)
+			ab.columnconfigure(2, weight=1)
+			ab.rowconfigure(aboutrow, weight=1)
+
+			aboutrow += 1
+			# rfswarm
+			base.debugmsg(7, "rfswarm")
+			# name = tk.Label(ab, text="\nrfswarm", justify=tk.CENTER, borderwidth=2, relief="raised", font=("Arial", 35), fg=self.style_text_colour)
+			name = tk.Label(ab, text="rfswarm", justify=tk.CENTER, font=(None, 35, "bold"), fg=self.style_text_colour)
+			name.grid(column=0, columnspan=3, row=aboutrow, sticky="nsew") # , rowspan=2
+
+			# Robot Framework Swarm
+			aboutrow += 1
+			# base.debugmsg(0, "	Version", base.version)
+			fullname = tk.Label(ab, text="(Robot Framework Swarm)", justify=tk.CENTER, fg=self.style_text_colour)
+			fullname.grid(column=0, columnspan=3, row=aboutrow, sticky="nsew") # , rowspan=2
+
+			aboutrow += 1
+			# Version
+			base.debugmsg(7, "Version")
+			# base.debugmsg(0, "	Version", base.version)
+			ver = tk.Label(ab, text="\nVersion {}".format(base.version), justify=tk.CENTER, font=(None, 13, "bold"), fg=self.style_text_colour)
+			ver.grid(column=0, columnspan=3, row=aboutrow, sticky="nsew") # , rowspan=2
+
+
+			# Swarm being the collective noun for Robots, just as Flock is for Birds and Herd for Sheep, so it made sense to use swarm for a performance testing tool using Robot Framework, hence rfswarm
+			swarmtext = "Swarm being the collective noun for Robots, just as Flock is for Birds and Herd for Sheep, so it made sense to use swarm for a performance testing tool using Robot Framework, hence rfswarm"
+			aboutrow += 1
+			ab.rowconfigure(aboutrow, weight=1)
+			name = tk.Label(ab, text=swarmtext, justify=tk.CENTER, font=(None, 12, "italic"), fg="#888", wraplength=380)
+			name.grid(column=0, columnspan=3, row=aboutrow, sticky="nsew") # , rowspan=2
+
+			# https://stackoverflow.com/questions/23482748/how-to-create-a-hyperlink-with-a-label-in-tkinter
+
+
+			aboutrow += 1
+			ab.rowconfigure(aboutrow, weight=1)
+
+			aboutrow += 1
+			# Getting Help
+			base.debugmsg(7, "Getting Help")
+			# gh = tk.Label(ab, text="\nGetting Help:", justify=tk.LEFT, fg=self.style_text_colour, font=(None, 18, "bold"))
+			gh = ttk.Label(ab, text="\nGetting Help:")
+			gh.grid(column=0, row=aboutrow, sticky="nsew")
+
+			aboutrow += 1
+			# cursor="pointinghand" is a better choice bot only works on osx :(
+			# rfswarm Documentation
+			gh_doc = tk.Label(ab, text="rfswarm Documentation", fg="blue", cursor="hand2")
+			gh_doc.grid(column=0, row=aboutrow, sticky="nsew")
+			# link1.bind("<Button-1>", lambda e: callback("http://www.google.com"))
+			gh_doc.bind("<Button-1>", lambda e: self.openweblink("https://github.com/damies13/rfswarm/blob/master/Doc/README.md"))
+			# Discord
+			gh_dis = tk.Label(ab, text="Discord", fg="blue", cursor="hand2")
+			gh_dis.grid(column=1, row=aboutrow, sticky="nsew")
+			gh_dis.bind("<Button-1>", lambda e: self.openweblink("https://discord.gg/jJfCMrqCsT"))
+			# Reporting Issues / Known Issues
+			gh_iss = tk.Label(ab, text="Reporting Issues / Known Issues", fg="blue", cursor="hand2")
+			gh_iss.grid(column=2, row=aboutrow, sticky="nsew")
+			gh_iss.bind("<Button-1>", lambda e: self.openweblink("https://github.com/damies13/rfswarm/issues"))
+
+			aboutrow += 1
+			ab.rowconfigure(aboutrow, weight=1)
+
+			aboutrow += 1
+			# Donate
+			base.debugmsg(7, "Donate")
+			don = ttk.Label(ab, text="\nDonate:")
+			don.grid(column=0, row=aboutrow, sticky="nsew")
+
+			aboutrow += 1
+			# Github
+			don_gh = tk.Label(ab, text="Github", fg="blue", cursor="hand2")
+			don_gh.grid(column=0, row=aboutrow, sticky="nsew")
+			don_gh.bind("<Button-1>", lambda e: self.openweblink("https://github.com/sponsors/damies13/"))
+			# PayPal.me
+			don_pp = tk.Label(ab, text="PayPal", fg="blue", cursor="hand2")
+			don_pp.grid(column=1, row=aboutrow, sticky="nsew")
+			don_pp.bind("<Button-1>", lambda e: self.openweblink("https://paypal.me/damies13/5"))
+
+			aboutrow += 1
+			ab.rowconfigure(aboutrow, weight=1)
+			aboutrow += 1
+			ab.rowconfigure(aboutrow, weight=1)
+
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -5270,6 +7004,7 @@ class RFSwarmGUI(tk.Frame):
 		base.scriptlist = [{}]
 		base.addScriptRow()
 
+
 	def mnu_file_Open(self, _event=None):
 		base.debugmsg(9, "mnu_file_Open")
 		base.debugmsg(9, "mnu_file_Open: _event:", _event, "	Type:", type(_event))
@@ -5282,10 +7017,15 @@ class RFSwarmGUI(tk.Frame):
 
 		base.debugmsg(6, "ScenarioFile:", ScenarioFile)
 
-		core.OpenFile(ScenarioFile)
-		base.gui.updateTitle()
+		if len(ScenarioFile)>0:
 
-		self.plan_scnro_chngd = False
+			self.CloseGraphs()
+
+			core.OpenFile(ScenarioFile)
+			base.gui.updateTitle()
+
+
+			self.plan_scnro_chngd = False
 
 	def mnu_file_Save(self, _event=None):
 		base.debugmsg(9, "mnu_file_Save")
@@ -5299,6 +7039,9 @@ class RFSwarmGUI(tk.Frame):
 
 			if 'Scenario' not in filedata:
 				filedata['Scenario'] = {}
+
+			# base.uploadmode
+			filedata['Scenario']['UploadMode'] = base.uploadmode
 
 			scriptidx = str(0)
 			if 'ScriptCount' not in filedata['Scenario']:
@@ -5326,7 +7069,20 @@ class RFSwarmGUI(tk.Frame):
 							base.debugmsg(8, "filedata[",scriptidx,"][",key,"]:", filedata[scriptidx][key])
 
 			filedata['Scenario']['ScriptCount'] = scriptidx
-			with open(base.config['Plan']['ScenarioFile'], 'w') as sf:    # save
+
+			# Save graphs
+
+			sgraphs = []
+			for iniid in self.graphs.keys():
+				if "settings" in self.graphs[iniid]:
+					if "open" in self.graphs[iniid]["settings"]:
+						if self.graphs[iniid]["settings"]["open"]:
+							sgraphs.append(iniid)
+							filedata[iniid] = self.graphs[iniid]["settings"]
+
+			filedata['Scenario']['GraphList'] = ",".join(sgraphs)
+
+			with open(base.config['Plan']['ScenarioFile'], 'w', encoding="utf8") as sf:    # save
 			    filedata.write(sf)
 
 			self.updateTitle()
@@ -5367,6 +7123,12 @@ class RFSwarmGUI(tk.Frame):
 	# End class RFSwarmGUI
 	#
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+class RFSwarm():
+	def __init__(self):
+		while base.run_dbthread:
+			time.sleep(300)
+
 
 base = RFSwarmBase()
 

@@ -1,9 +1,9 @@
 
 [Index](README.md)
 
-## rfswarm_agent.py (Agent)
+## rfswarm Agent
 
-rfswarm_agent.py is the agent component that actually runs the Robot Framework test cases and returns the results to rfswarm. The agent has no GUI
+rfswarm agent is the component that actually runs the Robot Framework test cases and returns the results to rfswarm. The agent has no GUI
 
 - [Command Line Interface](#Command-Line-Interface)
 - [Install and Setup](#Install-and-Setup)

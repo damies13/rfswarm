@@ -8,7 +8,7 @@ rfswarm is a testing tool that allows you use [Robot Framework](https://robotfra
 
 > _Swarm being the collective noun for Robots, just as Flock is for Birds and Herd for Sheep, so it made sense to use swarm for a performance testing tool using Robot Framework, hence rfswarm_
 
-![Image](Doc/Images/MacOS_Plan_saved_opened_v0.6.3.png "Plan - Planning a performance test")
+![Image](Doc/Images/MacOS_Plan_v0.8.0_saved_opened.png "Plan - Planning a performance test")
 
 While Robot Framework is normally used for functional or regression testing, it has long been considered the holy grail in testing for there to be synergies between the functional and performance testing scripts so that effort expended in creating test cases for one does not need to be duplicated for the other which is currently the normal case.
 
@@ -18,11 +18,13 @@ rfswarm is written completely in python, so if you are already using Robot Frame
 
 To learn more about rfswarm please refer to the [Documentation](Doc/README.md)
 
-![Image](Doc/Images/MacOS_Run_v0.6.3_100u_2h.png "Run - Showing results being collected live")
+![Image](Doc/Images/MacOS_Run_v0.8.0_2h.png "Run - Showing results being collected live")
 
 <img align="right" src="Doc/Images/Icon_Help.png">
 
 ## Getting Help
+
+### Community Support
 
 - [rfswarm Documentation](Doc/README.md)
 - [Discord](https://discord.gg/jJfCMrqCsT)
@@ -33,10 +35,15 @@ To learn more about rfswarm please refer to the [Documentation](Doc/README.md)
 </kbd><br>
 An example of how your rfswarm setup might look.
 
+### Commercial Support
+- The easiest way to get commercial support is to sponsor this project on [Github](https://github.com/sponsors/damies13?frequency=recurring&sponsor=damies13)
+
 <img align="right" src="Doc/Images/Icon_Donate.png">
 
 ## Donations
 
 If you would like to thank me for this project please consider using one of the sponsorship methods:
-- [Github](https://github.com/sponsors/damies13/)
+- [Github](https://github.com/sponsors/damies13?frequency=one-time&sponsor=damies13)
 - [PayPal.me](https://paypal.me/damies13/5) (the $5 is a suggestion, feel free to change to any amount you would like)
+
+[See our sponsors](Doc/Sponsors.md)

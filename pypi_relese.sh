@@ -28,6 +28,8 @@ if [[ "$currversion" =~ v[0-9]\. ]]; then
 	python3 setup-manager.py sdist bdist_wheel
 	rm -R build/
 	python3 setup-agent.py sdist bdist_wheel
+	rm -R build/
+	python3 setup-reporter.py sdist bdist_wheel
 
 	python3 -m twine upload dist/*${version}*
 

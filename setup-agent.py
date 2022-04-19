@@ -5,26 +5,17 @@ with open("README_PyPi.md", "r") as fh:
 
 setuptools.setup(
 	name="rfswarm-agent",
-	version="0.6.4",
+	version="1.0.0",
 	author="damies13",
 	author_email="damies13+rfswarm@gmail.com",
 	description="rfswarm Agent",
 	long_description=long_description,
 	long_description_content_type="text/markdown",
 	url="https://github.com/damies13/rfswarm",
-	# packages = ['rfswarm-agent'],
-	# packages=setuptools.find_packages(),
-	# packages=setuptools.find_packages(
-	# 	where = '',
-	# 	include = ['rfswarm-agent*',],
-	# 	exclude = ['rfswarm-manager',]
-	# ),
-	packages=setuptools.find_packages(exclude=["*rfswarm_manager*", "build/*"]),
-	# packages=setuptools.find_packages(exclude=["*rfswarm_manager*", "build"]),
-	# package_dir = {"":"rfswarm-agent"},
+	packages=setuptools.find_packages(exclude=["*fswarm_report*", "*rfswarm_manager*", "build/*"]),
 	install_requires=['configparser', 'requests', 'robotframework', 'psutil'],
 	classifiers=[
-		"Development Status :: 4 - Beta",
+		"Development Status :: 5 - Production/Stable",
 		"Topic :: Software Development :: Testing",
 		"Programming Language :: Python :: 3.6",
 		"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
@@ -36,5 +27,5 @@ setuptools.setup(
 		'Say Thanks!': 'https://github.com/damies13/rfswarm#donations',
 		'Source': 'https://github.com/damies13/rfswarm',
 	},
-	entry_points = {'console_scripts': ['rfswarm-agent = rfswarm_agent.rfswarm_agent:RFSwarmAgent']},
+	entry_points = {'console_scripts': ['rfswarm-agent = rfswarm_agent.rfswarm_agent:RFSwarm']},
 )

@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version 0.6.4
+#    Version 1.0.0
 #
 
 
@@ -41,11 +41,12 @@ import inspect
 
 class RFSwarmAgent():
 
-	version="0.6.4"
+	version="1.0.0"
 	config = None
 	isconnected = False
 	isrunning = False
 	isstopping = False
+	runagent = True
 	run_name = None
 	swarmmanager = None
 	agentdir = None
@@ -60,6 +61,7 @@ class RFSwarmAgent():
 	mainloopinterval = 10
 	scriptlist = {}
 	jobs = {}
+	corethreads = {}
 	upload_queue = []
 	robotcount = 0
 	status = "Ready"
@@ -67,6 +69,7 @@ class RFSwarmAgent():
 	args = None
 	xmlmode = False
 	timeout=600
+	uploadmode = "err"
 
 	debuglvl = 0
 
@@ -101,13 +104,8 @@ class RFSwarmAgent():
 
 
 		self.config = configparser.ConfigParser()
-		scrdir = os.path.dirname(__file__)
-		self.debugmsg(6, "scrdir: ", scrdir)
-		self.agentini = os.path.join(scrdir, "RFSwarmAgent.ini")
 
-		if self.args.ini:
-			self.debugmsg(1, "self.args.ini: ", self.args.ini)
-			self.agentini = self.args.ini
+		self.agentini = self.findiniloctaion()
 
 		if os.path.isfile(self.agentini):
 			self.debugmsg(6, "agentini: ", self.agentini)
@@ -117,7 +115,6 @@ class RFSwarmAgent():
 
 		self.debugmsg(0, "	Configuration File: ", self.agentini)
 
-		self.agentname = socket.gethostname()
 		if self.args.agentname:
 			self.agentname = self.args.agentname
 
@@ -127,9 +124,10 @@ class RFSwarmAgent():
 			self.saveini()
 
 		if 'agentname' not in self.config['Agent']:
-			self.config['Agent']['agentname'] = self.agentname
+			self.config['Agent']['agentname'] = socket.gethostname()
 			self.saveini()
-		else:
+
+		if not self.args.agentname:
 			self.agentname = self.config['Agent']['agentname']
 
 		if 'agentdir' not in self.config['Agent']:
@@ -172,9 +170,7 @@ class RFSwarmAgent():
 			self.saveini()
 
 
-		if not self.xmlmode:
-			self.debugmsg(6, "self.xmlmode: ", self.xmlmode)
-			self.create_listner_file()
+		self.ensure_listner_file()
 
 		t = threading.Thread(target=self.tick_counter)
 		t.start()
@@ -216,6 +212,59 @@ class RFSwarmAgent():
 		self.debugmsg(9, "self.agentproperties: ", self.agentproperties)
 
 
+	def findiniloctaion(self):
+
+		if self.args.ini:
+			self.debugmsg(1, "self.args.ini: ", self.args.ini)
+			return self.args.ini
+
+		inilocations = []
+
+		srcdir = os.path.join(os.path.dirname(__file__))
+		self.debugmsg(7, "srcdir[-2]: ", srcdir[-2:])
+		if srcdir[-2:] == "/.":
+			srcdir = srcdir[0:-2]
+		self.debugmsg(7, "srcdir: ", srcdir)
+
+		inifilename = "RFSwarmAgent.ini"
+		# default location for all previous versions
+		inilocations.append(os.path.join(srcdir, inifilename))
+		# probably best location
+		inilocations.append(os.path.join(os.path.expanduser("~"), ".rfswarm", inifilename))
+		# last resort location
+		inilocations.append(os.path.join(tempfile.gettempdir(), inifilename))
+
+		self.debugmsg(6, "inilocations: ", inilocations)
+
+
+		for iniloc in inilocations:
+			self.debugmsg(7, "iniloc: ", iniloc)
+			if os.path.isfile(iniloc):
+				self.debugmsg(7, "iniloc exists")
+				return iniloc
+			else:
+				# can we write to this location?
+				# 	if anything in the try statement fails then we can't so progress to next location
+				self.debugmsg(7, "iniloc can be created?")
+				try:
+					loc = os.path.dirname(iniloc)
+					self.debugmsg(7, "loc: ", loc)
+					self.debugmsg(7, "loc isdir:", os.path.isdir(loc))
+					if not os.path.isdir(loc):
+						self.debugmsg(7, "creating loc")
+						os.makedirs(loc)
+						self.debugmsg(7, "loc created")
+
+					self.debugmsg(7, "os.access(loc): ", os.access(loc, os.X_OK | os.W_OK))
+					if os.access(loc, os.X_OK | os.W_OK):
+						self.debugmsg(7, "iniloc can be created!")
+						return iniloc
+				except:
+					pass
+		# This should cause saveini to fail?
+		return None
+
+
 	def debugmsg(self, lvl, *msg):
 		msglst = []
 		prefix = ""
@@ -247,7 +296,7 @@ class RFSwarmAgent():
 	def mainloop(self):
 		self.debugmsg(6, "mainloop")
 		prev_status = self.status
-		while True:
+		while self.runagent:
 			self.debugmsg(2, self.status, datetime.now().isoformat(sep=' ',timespec='seconds'),
 				"(",int(time.time()),")",
 				"isconnected:", self.isconnected,
@@ -267,11 +316,11 @@ class RFSwarmAgent():
 			self.debugmsg(5, "self.isconnected", self.isconnected)
 			if self.isconnected:
 				# self.updatestatus()
-				t0 = threading.Thread(target=self.updatestatus)
-				t0.start()
+				self.corethreads["status"] = threading.Thread(target=self.updatestatus)
+				self.corethreads["status"].start()
 
-				t1 = threading.Thread(target=self.getjobs)
-				t1.start()
+				self.corethreads["getjobs"] = threading.Thread(target=self.getjobs)
+				self.corethreads["getjobs"].start()
 
 				if self.isrunning:
 					self.mainloopinterval = 2
@@ -279,19 +328,19 @@ class RFSwarmAgent():
 					if self.isstopping:
 						self.status = "Stopping"
 					# else:
-					t2 = threading.Thread(target=self.runjobs)
-					t2.start()
+					self.corethreads["runjobs"] = threading.Thread(target=self.runjobs)
+					self.corethreads["runjobs"].start()
 				else:
 					self.mainloopinterval = 10
 					if len(self.upload_queue)>0:
 						self.status = "Uploading ({})".format(len(self.upload_queue))
 						self.debugmsg(5, "self.status:", self.status, "len(self.upload_queue):", len(self.upload_queue))
-						t3 = threading.Thread(target=self.process_file_upload_queue)
-						t3.start()
+						self.corethreads["uploadqueue"] = threading.Thread(target=self.process_file_upload_queue)
+						self.corethreads["uploadqueue"].start()
 					else:
 						self.status = "Ready"
-						t2 = threading.Thread(target=self.getscripts)
-						t2.start()
+						self.corethreads["getscripts"] = threading.Thread(target=self.getscripts)
+						self.corethreads["getscripts"].start()
 
 
 
@@ -388,7 +437,10 @@ class RFSwarmAgent():
 			self.findmanager()
 			if self.args.manager:
 				self.debugmsg(7, "self.args.manager: ", self.args.manager)
-				self.swarmmanager = self.args.manager
+				if self.args.manager[-1] != '/':
+					self.swarmmanager = "{}/".format(self.args.manager)
+				else:
+					self.swarmmanager = self.args.manager
 
 		if self.swarmmanager is not None:
 			self.debugmsg(2, "Try connecting to", self.swarmmanager)
@@ -422,6 +474,8 @@ class RFSwarmAgent():
 		if 'swarmmanager' in self.config['Agent']:
 			self.debugmsg(6, "findmanager: Agent:swarmmanager =", self.config['Agent']['swarmmanager'])
 			self.swarmmanager = self.config['Agent']['swarmmanager']
+			if self.swarmmanager[-1] != '/':
+				self.swarmmanager = "{}/".format(self.swarmmanager)
 		else:
 			self.config['Agent']['swarmmanager'] = "http://localhost:8138/"
 			self.saveini()
@@ -497,17 +551,17 @@ class RFSwarmAgent():
 		payload = {
 			"AgentName": self.agentname
 		}
-		self.debugmsg(6, "getscripts: payload: ", payload)
+		self.debugmsg(6, "payload: ", payload)
 		try:
 			r = requests.post(uri, json=payload, timeout=self.timeout)
-			self.debugmsg(6, "getscripts: resp: ", r.status_code, r.text)
+			self.debugmsg(6, "resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
 				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 				self.isconnected = False
 
 		except Exception as e:
-			self.debugmsg(8, "Exception:", e)
+			self.debugmsg(5, "Exception:", e)
 			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ',timespec='seconds'), "(",int(time.time()),")")
 			self.isconnected = False
 
@@ -518,17 +572,30 @@ class RFSwarmAgent():
 			jsonresp = {}
 			# self.scriptlist
 			jsonresp = json.loads(r.text)
-			self.debugmsg(6, "getscripts: jsonresp:", jsonresp)
+			self.debugmsg(6, "jsonresp:", jsonresp)
 		except Exception as e:
-			self.debugmsg(1, "getscripts: Exception:", e)
+			self.debugmsg(1, "Exception:", e)
 
 		for s in jsonresp["Scripts"]:
 			hash = s['Hash']
-			self.debugmsg(6, "getscripts: hash:", hash)
+			self.debugmsg(6, "hash:", hash)
 			if hash not in self.scriptlist:
+				self.debugmsg(6, "getfile")
 				self.scriptlist[hash] = {'id': hash}
 				t = threading.Thread(target=self.getfile, args=(hash,))
 				t.start()
+			else:
+				# self.scriptlist[hash]['localfile']
+				self.debugmsg(6, "Check file")
+				if 'localfile' in self.scriptlist[hash]:
+					if not os.path.isfile(self.scriptlist[hash]['localfile']):
+						t = threading.Thread(target=self.getfile, args=(hash,))
+						t.start()
+				else:
+					self.debugmsg(6, "getfile")
+					self.scriptlist[hash] = {'id': hash}
+					t = threading.Thread(target=self.getfile, args=(hash,))
+					t.start()
 
 	def getfile(self, hash):
 		self.debugmsg(6, "hash: ", hash)
@@ -642,6 +709,8 @@ class RFSwarmAgent():
 					for k in jsonresp["Schedule"][s].keys():
 						self.debugmsg(6, "getjobs: self.jobs[",s,"][",k,"]", jsonresp["Schedule"][s][k])
 						self.jobs[s][k] = jsonresp["Schedule"][s][k]
+					if "UploadMode" in jsonresp:
+						self.jobs[s]["UploadMode"] = jsonresp["UploadMode"]
 
 				if int(time.time()) > jsonresp["EndTime"]:
 					self.isstopping = True
@@ -723,12 +792,15 @@ class RFSwarmAgent():
 
 	def runthread(self, jobid):
 		now = int(time.time())
+
+		self.ensure_listner_file()
+
 		if "ScriptIndex" not in self.jobs[jobid]:
 			self.debugmsg(6, "runthread: jobid:", jobid)
 			self.debugmsg(6, "runthread: job data:", self.jobs[jobid])
 			jobarr = jobid.split("_")
 			self.jobs[jobid]["ScriptIndex"] = jobarr[0]
-			self.jobs[jobid]["VUser"] = jobarr[1]
+			self.jobs[jobid]["Robot"] = jobarr[1]
 			self.jobs[jobid]["Iteration"] = 0
 			self.debugmsg(6, "runthread: job data:", self.jobs[jobid])
 
@@ -738,6 +810,17 @@ class RFSwarmAgent():
 		self.debugmsg(6, "runthread: hash:", hash)
 		test = self.jobs[jobid]['Test']
 		self.debugmsg(6, "runthread: test:", test)
+
+		if 'localfile' not in self.scriptlist[hash]:
+			if self.corethreads["getscripts"].is_alive():
+				self.corethreads["getscripts"].join()
+			else:
+				self.corethreads["getscripts"] = threading.Thread(target=self.getscripts)
+				self.corethreads["getscripts"].start()
+				self.corethreads["getscripts"].join()
+		# while 'localfile' not in self.scriptlist[hash]:
+		# 	time.sleep(1)
+
 		localfile = self.scriptlist[hash]['localfile']
 		self.debugmsg(6, "runthread: localfile:", localfile)
 
@@ -804,18 +887,20 @@ class RFSwarmAgent():
 		cmd.append("-d")
 		cmd.append('"'+odir+'"')
 
-		cmd.append("-M agent:{}".format(self.agentname))
-		if self.xmlmode:
-			cmd.append("-v index:{}".format(self.jobs[jobid]["ScriptIndex"]))
-			cmd.append("-v vuser:{}".format(self.jobs[jobid]["VUser"]))
-			cmd.append("-v iteration:{}".format(self.jobs[jobid]["Iteration"]))
-		else:
-			cmd.append("-M debuglevel:{}".format(self.debuglvl))
-			cmd.append("-M index:{}".format(self.jobs[jobid]["ScriptIndex"]))
-			cmd.append("-M vuser:{}".format(self.jobs[jobid]["VUser"]))
-			cmd.append("-M iteration:{}".format(self.jobs[jobid]["Iteration"]))
-			cmd.append("-M swarmmanager:{}".format(self.swarmmanager))
-			cmd.append("-M excludelibraries:{}".format(excludelibraries))
+		cmd.append("-M RFS_AGENTNAME:{}".format(self.agentname))
+		cmd.append("-M RFS_AGENTVERSION:{}".format(self.version))
+		cmd.append("-M RFS_DEBUGLEVEL:{}".format(self.debuglvl))
+		cmd.append("-M RFS_INDEX:{}".format(self.jobs[jobid]["ScriptIndex"]))
+		cmd.append("-v RFS_INDEX:{}".format(self.jobs[jobid]["ScriptIndex"]))
+		cmd.append("-M RFS_ROBOT:{}".format(self.jobs[jobid]["Robot"]))
+		cmd.append("-v RFS_ROBOT:{}".format(self.jobs[jobid]["Robot"]))
+		cmd.append("-M RFS_ITERATION:{}".format(self.jobs[jobid]["Iteration"]))
+		cmd.append("-v RFS_ITERATION:{}".format(self.jobs[jobid]["Iteration"]))
+		cmd.append("-M RFS_SWARMMANAGER:{}".format(self.swarmmanager))
+		cmd.append("-v RFS_SWARMMANAGER:{}".format(self.swarmmanager))
+		cmd.append("-M RFS_EXCLUDELIBRARIES:{}".format(excludelibraries))
+
+		if not self.xmlmode:
 			cmd.append("--listener {}".format('"'+self.listenerfile+'"'))
 
 		if "robotoptions" in self.jobs[jobid]:
@@ -855,7 +940,7 @@ class RFSwarmAgent():
 				if self.xmlmode:
 					if os.path.exists(outputFile):
 						if self.xmlmode:
-							t = threading.Thread(target=self.run_process_output, args=(outputFile, self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["VUser"], self.jobs[jobid]["Iteration"]))
+							t = threading.Thread(target=self.run_process_output, args=(outputFile, self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["Robot"], self.jobs[jobid]["Iteration"]))
 							t.start()
 					else:
 						self.debugmsg(1, "Robot didn't create (", outputFile, ") please check the log file:", logFileName)
@@ -864,18 +949,25 @@ class RFSwarmAgent():
 				self.debugmsg(5, "Robot returned an error:", e)
 				result = 1
 
-			# Uplad any files found
 
-			self.queue_file_upload(result, odir)
+			uploadmode = self.uploadmode
+			self.debugmsg(5, "uploadmode:", uploadmode)
+			self.debugmsg(5, "self.jobs[",jobid,"]:", self.jobs[jobid])
+			if "UploadMode" in self.jobs[jobid]:
+				uploadmode = self.jobs[jobid]["UploadMode"]
+				self.debugmsg(5, "uploadmode:", uploadmode)
+
+			# Uplad any files found
+			self.queue_file_upload(uploadmode, result, odir)
 
 			self.robotcount += -1
 		else:
 			self.debugmsg(1, "Could not find robot executeable:", robotexe)
 
 
-	def queue_file_upload(self, retcode, filedir):
+	def queue_file_upload(self, mode, retcode, filedir):
 		reldir = os.path.basename(filedir)
-		self.debugmsg(7, retcode, reldir, filedir)
+		self.debugmsg(7, mode, retcode, reldir, filedir)
 
 		filelst = self.file_upload_list(filedir)
 		self.debugmsg(7, "filelst", filelst)
@@ -890,13 +982,20 @@ class RFSwarmAgent():
 
 		rundir = os.path.join(self.logdir, self.run_name)
 
+		self.debugmsg(5, "mode:", mode, "	retcode:", retcode)
+		# 	uploadmodes = {'imm':"Immediately", 'err':"On Error Only", 'def':"All Defered"}
+
+
 		for file in filelst:
 			fobj = {}
 			fobj["LocalFilePath"] = file
 			fobj["RelFilePath"] = os.path.relpath(file, start=rundir)
 			self.upload_queue.append(fobj)
 			self.debugmsg(7, "added to upload_queue", fobj)
-			if retcode > 0:
+			if mode == "err" and retcode > 0:
+				# upload now
+				self.file_upload(fobj)
+			if mode == "imm":
 				# upload now
 				self.file_upload(fobj)
 
@@ -1043,7 +1142,7 @@ class RFSwarmAgent():
 			time.sleep(0.5)
 
 
-	def run_process_output(self, outputFile, index, vuser, iter):
+	def run_process_output(self, outputFile, index, robot, iter):
 		# This should be a better way to do this
 		# https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#listener-interface
 		# https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#listener-examples
@@ -1110,7 +1209,7 @@ class RFSwarmAgent():
 					"StartTime": startdate.timestamp(),
 					"EndTime": enddate.timestamp(),
 					"ScriptIndex": index,
-					"VUser": vuser,
+					"Robot": robot,
 					"Iteration": iter,
 					"Sequence": seq
 				}
@@ -1160,6 +1259,15 @@ class RFSwarmAgent():
 			self.debugmsg(1, "with error: ", e)
 			return False
 
+	def ensure_listner_file(self):
+		if not self.xmlmode:
+			self.debugmsg(6, "self.xmlmode: ", self.xmlmode)
+			if self.listenerfile is None:
+				self.create_listner_file()
+			else:
+				if not os.path.isfile(self.listenerfile):
+					self.create_listner_file()
+
 	def create_listner_file(self):
 		self.listenerfile = os.path.join(self.scriptdir, "RFSListener2.py")
 
@@ -1183,28 +1291,28 @@ class RFSwarmAgent():
 		fd.append("	excludelibraries = [\"BuiltIn\",\"String\",\"OperatingSystem\",\"perftest\"]")
 		fd.append("	debuglevel = 0")
 		fd.append("	index = 0")
-		fd.append("	vuser = 0")
+		fd.append("	robot = 0")
 		fd.append("	iter = 0")
 		fd.append("	seq = 0")
 		fd.append("")
 		fd.append("	def start_suite(self, name, attrs):")
-		fd.append("		if 'debuglevel' in attrs['metadata']:")
-		fd.append("			self.debuglevel = int(attrs['metadata']['debuglevel'])")
+		fd.append("		if 'RFS_DEBUGLEVEL' in attrs['metadata']:")
+		fd.append("			self.debuglevel = int(attrs['metadata']['RFS_DEBUGLEVEL'])")
 		fd.append("			self.debugmsg(6, 'debuglevel: ', self.debuglevel)")
-		fd.append("		if 'index' in attrs['metadata']:")
-		fd.append("			self.index = attrs['metadata']['index']")
+		fd.append("		if 'RFS_INDEX' in attrs['metadata']:")
+		fd.append("			self.index = attrs['metadata']['RFS_INDEX']")
 		fd.append("			self.debugmsg(6, 'index: ', self.index)")
-		fd.append("		if 'iteration' in attrs['metadata']:")
-		fd.append("			self.iter = attrs['metadata']['iteration']")
+		fd.append("		if 'RFS_ITERATION' in attrs['metadata']:")
+		fd.append("			self.iter = attrs['metadata']['RFS_ITERATION']")
 		fd.append("			self.debugmsg(6, 'iter: ', self.iter)")
-		fd.append("		if 'vuser' in attrs['metadata']:")
-		fd.append("			self.vuser = attrs['metadata']['vuser']")
-		fd.append("			self.debugmsg(6, 'vuser: ', self.vuser)")
-		fd.append("		if 'swarmmanager' in attrs['metadata']:")
-		fd.append("			self.swarmmanager = attrs['metadata']['swarmmanager']")
+		fd.append("		if 'RFS_ROBOT' in attrs['metadata']:")
+		fd.append("			self.robot = attrs['metadata']['RFS_ROBOT']")
+		fd.append("			self.debugmsg(6, 'robot: ', self.robot)")
+		fd.append("		if 'RFS_SWARMMANAGER' in attrs['metadata']:")
+		fd.append("			self.swarmmanager = attrs['metadata']['RFS_SWARMMANAGER']")
 		fd.append("			self.debugmsg(6, 'swarmmanager: ', self.swarmmanager)")
-		fd.append("		if 'excludelibraries' in attrs['metadata']:")
-		fd.append("			self.excludelibraries = attrs['metadata']['excludelibraries'].split(\",\")")
+		fd.append("		if 'RFS_EXCLUDELIBRARIES' in attrs['metadata']:")
+		fd.append("			self.excludelibraries = attrs['metadata']['RFS_EXCLUDELIBRARIES'].split(\",\")")
 		fd.append("			self.debugmsg(6, 'excludelibraries: ', self.excludelibraries)")
 		fd.append("")
 		fd.append("	def log_message(self, message):")
@@ -1237,7 +1345,7 @@ class RFSwarmAgent():
 		fd.append("					'StartTime': startdate.timestamp(),")
 		fd.append("					'EndTime': enddate.timestamp(),")
 		fd.append("					'ScriptIndex': self.index,")
-		fd.append("					'VUser': self.vuser,")
+		fd.append("					'Robot': self.robot,")
 		fd.append("					'Iteration': self.iter,")
 		fd.append("					'Sequence': self.seq")
 		fd.append("				}")
@@ -1264,7 +1372,7 @@ class RFSwarmAgent():
 		fd.append("					'StartTime': startdate.timestamp(),")
 		fd.append("					'EndTime': enddate.timestamp(),")
 		fd.append("					'ScriptIndex': self.index,")
-		fd.append("					'VUser': self.vuser,")
+		fd.append("					'Robot': self.robot,")
 		fd.append("					'Iteration': self.iter,")
 		fd.append("					'Sequence': self.seq")
 		fd.append("				}")
@@ -1298,18 +1406,26 @@ class RFSwarmAgent():
 		fd.append("				pass")
 		fd.append("")
 		fd.append("	def send_result(self, payload):")
+		fd.append("		exceptn = None")
+		fd.append("		retry = True")
+		fd.append("		count = 100")
 		fd.append("		uri = self.swarmmanager + 'Result'")
-		fd.append("		try:")
-		fd.append("			r = requests.post(uri, json=payload, timeout=600)")
-		fd.append("			self.debugmsg(7, 'send_result: ',r.status_code, r.text)")
-		fd.append("			if (r.status_code != requests.codes.ok):")
-		fd.append("				self.isconnected = False")
-		fd.append("		except Exception as e:")
-		fd.append("			self.debugmsg(0, 'send_result: while attempting to send result to',uri)")
-		fd.append("			self.debugmsg(0, 'send_result: with payload:',payload)")
-		fd.append("			self.debugmsg(0, 'send_result: ',r.status_code, r.text)")
-		fd.append("			self.debugmsg(0, 'send_result: Exception:', e)")
-		fd.append("			pass")
+		fd.append("		while retry and count>0:")
+		fd.append("			try:")
+		fd.append("				r = requests.post(uri, json=payload, timeout=600)")
+		fd.append("				self.debugmsg(7, 'send_result: ',r.status_code, r.text)")
+		fd.append("				if (r.status_code != requests.codes.ok):")
+		fd.append("					exceptn = r.status_code")
+		fd.append("				else:")
+		fd.append("					retry = False")
+		fd.append("			except Exception as e:")
+		fd.append("				exceptn = e")
+		fd.append("			time.sleep(1)")
+		fd.append("			count -= 1")
+		fd.append("		if retry:")
+		fd.append("			self.debugmsg(0, 'send_result: while attempting to send result to', uri)")
+		fd.append("			self.debugmsg(0, 'send_result: with payload:', payload)")
+		fd.append("			self.debugmsg(0, 'send_result: Exception:', exceptn)")
 		fd.append("")
 
 
@@ -1318,11 +1434,44 @@ class RFSwarmAgent():
 			# lf.writelines(fd)
 			lf.write('\n'.join(fd))
 
+	def on_closing(self, _event=None, *args):
+		self.runagent = False
+		self.debugmsg(0, "Shutting down agent")
+
+		for thread in self.corethreads:
+			self.debugmsg(3, "Join Agent Thread:", thread)
+			self.corethreads[thread].join()
+
+
+		for jobid in self.jobs:
+			# self.jobs[jobid]["Thread"]
+			# base.debugmsg(3, "Join Agent Manager Thread")
+			# base.Agentserver.join()
+
+			self.debugmsg(3, "Join Agent Thread:", jobid)
+			self.jobs[jobid]["Thread"].join()
+
+		self.debugmsg(3, "Exit")
+		try:
+			sys.exit(0)
+		except SystemExit:
+			try:
+				os._exit(0)
+			except:
+				pass
+
+
+class RFSwarm():
+	def __init__(self):
+		while rfsa.runagent:
+			time.sleep(300)
+
+
 rfsa = RFSwarmAgent()
 try:
 	rfsa.mainloop()
 except KeyboardInterrupt:
-	pass
+	rfsa.on_closing()
+
 except Exception as e:
 	self.debugmsg(1, "rfsa.Exception:", e)
-	pass

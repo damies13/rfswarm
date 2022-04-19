@@ -17,9 +17,19 @@ To learn more about rfswarm please refer to the [Documentation](https://github.c
 
 ## Getting Help
 
+### Community Support
+
 - [rfswarm Documentation](https://github.com/damies13/rfswarm/blob/master/Doc/README.md)
 - [Discord](https://discord.gg/jJfCMrqCsT)
 - [Reporting Issues / Known Issues](https://github.com/damies13/rfswarm/issues)
+
+<kbd align="centre">
+<img align="centre" height="350" src="Doc/Images/Manager&Agent_Example.png">
+</kbd><br>
+An example of how your rfswarm setup might look.
+
+### Commercial Support
+- The easiest way to get commercial support is to sponsor this project on [Github](https://github.com/sponsors/damies13?frequency=recurring&sponsor=damies13)
 
 
 ## Donations

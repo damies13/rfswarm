@@ -46,15 +46,18 @@ Then you can simply include the `Standard Think Time` keyword between each user 
 When an agent runs a robot test case it passes some variables on to the test case that might be useful to know or used to trigger variations in behaviour in you test cases. While there is no requirement to use these variables they are values that I have had to manually implement in laodrunner scripts, so knowing I would find them useful I have included them by default to make life easier.
 
 #### Index
-Index should be available through the variable `${index}`, this is the number you see in the Index column at the bottom of the plan screen
+Index should be available through the variable `${RFS_INDEX}`, this is the number you see in the Index column at the bottom of the plan screen
 
-#### VUser
-VUser should be available through the variable `${vuser}`, referring to the Users column at the bottom of the plan screen, this number is the counter of the user from one to the number in the Users column.
-While this number on it's own is not unique, it will be unique relative to the Index above, so if you need a unique string in your test you could combine them. e.g. `${index}_${vuser}`
-Another way this could be useful is as a data row offset so that each test user is using data from a different section of your data file.
+#### Robot number
+Robot number should be available through the variable `${RFS_ROBOT}`, referring to the Robots column at the bottom of the plan screen, this number is the counter of the robot from one to the number in the Robots column.
+While this number on it's own is not unique, it will be unique relative to the Index above, so if you need a unique string in your test you could combine them. e.g. `${RFS_INDEX}_${RFS_ROBOT}`
+Another way this could be useful is as a data row offset so that each test robot is using data from a different section of your data file.
 
 #### Iteration
-Iteration should be available through the variable `${iteration}`, This is simply a counter of how many times this test case has been run for this virtual user. This could be useful if for example you need to walk sequentially through a data file because your data is single use.
+Iteration should be available through the variable `${RFS_ITERATION}`, This is simply a counter of how many times this test case has been run for this robot. This could be useful if for example you need to walk sequentially through a data file because your data is single use.
+
+#### Swarm Manager
+Swarm Manager should be available through the variable `${RFS_SWARMMANAGER}`, this will be useful for sending custom metric data back to the rfswarm manager, for example when using a robot test / task to collect statistics from the application under test.
 
 ### Data Management
 
@@ -129,7 +132,7 @@ In performance testing it's not always that simple:
 - You don't want all the users doing the first step in the process at the start of the performance test and then 2 hours none are doing that process because they are all up to the 3rd or 5th process in the sequence.
 So you really need a way to pass these values from one test to another from one robot process to another and robot process and ideally from one robot process on one agent machine to another robot process running a different agent machine.
 
-So to help with this the [TestDataTable](https://github.com/damies13/TestDataTable) project was created. It is a data table server that makes it easy for data between scripts and robot processes.
+So to help with this the [TestDataTable](https://github.com/damies13/TestDataTable) project was created. It is a data table server that makes it easy to pass data between scripts and robot processes.
 
 Here's an example of how you might use [TestDataTable](https://github.com/damies13/TestDataTable), your application under test is an online store (shopping cart) and you have the following three scripts that all use the order number created by the application when the user places an order:
 1) Create order, User navigates to the online store selects some products and places an order. after success user receives an order number.
@@ -173,7 +176,7 @@ Match Keyword
 ```
 
 #### No Operation
-Would not have a timing measured by default because this keyword belongs to the builtin which is one of the default [excludeed libraries](./rfswarm_agent_py.md#exclude-libraries)
+Would not have a timing measured by default because this keyword belongs to the builtin which is one of the default [excluded libraries](./rfswarm_agent.md#exclude-libraries)
 
 #### Example Keyword
 Would have a timing measured by default, this would be reported in the Manager as "TC01 My Example Keyword" along with the time taken to perform the step No Operation

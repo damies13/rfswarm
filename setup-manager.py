@@ -5,26 +5,20 @@ with open("README_PyPi.md", "r") as fh:
 
 setuptools.setup(
 	name="rfswarm-manager",
-	version="0.6.4",
+	version="1.0.0",
 	author="damies13",
 	author_email="damies13+rfswarm@gmail.com",
 	description="rfswarm manager",
 	long_description=long_description,
 	long_description_content_type="text/markdown",
 	url="https://github.com/damies13/rfswarm",
-	# packages = ['rfswarm-gui'],
-	# packages=setuptools.find_packages(),
-	# packages=setuptools.find_packages(
-	# 	where = '',
-	# 	include = ['rfswarm-gui',],
-	# 	exclude = ['rfswarm-agent',]
-	# ),
-	packages=setuptools.find_packages(exclude=["*fswarm_agen*", "build/*"]),
-	# package_dir = {"":"rfswarm-gui"},
-	install_requires=['configparser', 'HTTPServer', 'pillow'],
-	# sqlite3worker??
+	packages=setuptools.find_packages(exclude=["*fswarm_report*", "*fswarm_agen*", "build/*"]),
+	# I needed a recent version of pip (pip 21.0.1 worked my previous <20 version didn't) for matplotlib
+	# 	to actually install withput error
+	# https://matplotlib.org/stable/users/installing.html
+	install_requires=['configparser', 'HTTPServer', 'pillow', 'psutil', 'pip>=21,>=22', 'matplotlib'],
 	classifiers=[
-		"Development Status :: 4 - Beta",
+		"Development Status :: 5 - Production/Stable",
 		"Topic :: Software Development :: Testing",
 		"Programming Language :: Python :: 3.7",
 		"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
@@ -36,8 +30,5 @@ setuptools.setup(
 		'Say Thanks!': 'https://github.com/damies13/rfswarm#donations',
 		'Source': 'https://github.com/damies13/rfswarm',
 	},
-	# entry_points = {'console_scripts': ['rfswarm = rfswarm:rfswarm']},
-	# entry_points = {'console_scripts': ['rfswarm = rfswarm-gui.rfswarm:rfswarm']},
-	entry_points = {'console_scripts': ['rfswarm = rfswarm_manager.rfswarm:RFSwarmCore', 'rfswarm-manager = rfswarm_manager.rfswarm:RFSwarmCore']},
-	# entry_points = {'console_scripts': ['rfswarm = rfswarm:RFSwarmCore']},
+	entry_points = {'console_scripts': ['rfswarm = rfswarm_manager.rfswarm:RFSwarm', 'rfswarm-manager = rfswarm_manager.rfswarm:RFSwarm']},
 )
