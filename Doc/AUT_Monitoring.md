@@ -7,7 +7,7 @@ The ability to monitor your Application Under Test (AUT) servers and store the m
 With feature release v0.8.0 this became more useful as you could use the live graphs to monitor this data during a test, and now with release 1.0.0 you can easily include this information in your test reports.
 
 - [Overview](#Overview)
-- [Unix AUT Example](#Unix-AUT-Example)
+- [Unix AUT Example](#unix-linux-aut-example)
 - [Windows AUT Example](#Windows-AUT-Example)
 
 ### Overview
