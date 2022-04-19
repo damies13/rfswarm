@@ -8,6 +8,7 @@ With feature release v0.8.0 this became more useful as you could use the live gr
 
 - [Overview](#Overview)
 - [Unix AUT Example](#Unix-AUT-Example)
+- [Windows AUT Example](#Windows-AUT-Example)
 
 ### Overview
 
@@ -24,7 +25,7 @@ The robot file below is an example of connecting to a unix (linux) AUT server vi
 This example may work for you, or you may need to modify it to work with the OS that your AUT uses. It is not intended as a ready to use example, but rather a starting point to help you build a monitoring script for your AUT.
 
 ssh_example.robot
-```
+```robotframework
 *** Settings ***
 
 Library                SSHLibrary
@@ -177,6 +178,102 @@ vmstat
 	#
 	[Return] 	${vmstat}
 
+
+
+
+Post AUT Stats
+	[Documentation]		SSH: Post AUT Stats
+	[Arguments]		${AUT}	${AUTType}	${AUTTime}    ${Stats}
+
+	# keyword from Requests Library, reuse the session rather than creating a new one if possible
+	${exists}= 	Session Exists	rfs
+	Run Keyword Unless 	${exists} 	Create Session	rfs 	${RFS_SWARMMANAGER}
+
+	${data}=	Create Dictionary
+	Set To Dictionary	${data} 	PrimaryMetric		${AUT}
+	Set To Dictionary	${data} 	MetricType			${AUTType}
+	Set To Dictionary	${data} 	MetricTime			${AUTTime}
+	Set To Dictionary	${data} 	SecondaryMetrics	${Stats}
+
+	# keyword from json Library
+	${string_json}= 	json.Dumps	${data}
+
+	# keyword from Requests Library
+	${resp}=	Post Request	rfs 	/Metric 	${string_json}
+	Log	${resp}
+	Log	${resp.content}
+	Should Be Equal As Strings	${resp.status_code}	200
+
+
+```
+
+### Windows AUT Example
+
+The robot file below is an example of connecting to a Windows AUT server via WMI to collect a variety of statistics using Windows Peformance Monitor Counters (Perfmon) from the AUT server and then posting those details to the Manager API using the robot framework Requests Library.
+
+This example may work for you, or you may need to adjust it to work with the locale that your AUT uses. It is not intended as a ready to use example, but rather a starting point to help you build a monitoring script for your AUT.
+
+perfmon_example.robot
+```robotframework
+*** Settings ***
+Library                PerfmonLibrary
+
+Library					String
+Library					Collections
+Library					RequestsLibrary
+Library					json
+
+*** Variables ***
+${HOST}                Undefined
+${USERNAME}            Undefined
+${PASSWORD}            Undefined
+
+*** Test Cases ***
+Monitor Windows AUT
+	${HOST}=	Set Variable    windowsserver
+	${USERNAME}=	Set Variable    domain\\windowsuser
+	${PASSWORD}=	Set Variable    domainpassword
+
+	# Connect to Windows AUT server
+	# ***	This is only required if you need a different username/password to connect to your AUT server than the current user logged in	***
+	Open Connection And Log In 	${HOST} 	${USERNAME} 	${PASSWORD}
+
+	# Gather the AUT Server statistics every 5 seconds
+	# 3600 / 5 = 720 - poll every 5 seconds for 1 hour
+	FOR 	${i}	IN RANGE	720
+		${epoch}=		Get Time	epoch
+		${stats}=	Collect Stats 	${HOST}
+		Post AUT Stats		${HOST} 	AUT Web 	${epoch}    ${stats}
+		Sleep	4
+	END
+
+	# at the end of the hour the test will end and disconnect the SSH session (Suite Teardown) if your test scenario is
+	# configured to run for more than an hour the agent will automatically restart the test.
+
+
+*** Keywords ***
+
+Open Connection And Log In
+	[Arguments] 	${HOST}=${HOST} 	${USERNAME}=${USERNAME} 	${PASSWORD}=${PASSWORD}
+	# keywords from PerfmonLibrary
+	Connect To 	${HOST} 	${USERNAME} 	${PASSWORD}
+
+
+Collect Stats
+	[Arguments] 	${HOST}=${HOST}
+	
+	${stats}=	Create Dictionary
+	
+	${key} 	${Value}= 	Get Counter 	Memory\\% Committed Bytes In Use 	${HOST}
+	Set To Dictionary	${stats} 	${key}		${Value}
+	
+	${key} 	${Value}= 	Get Counter 	Processor\\_Total\\% Processor Time 	${HOST}
+	Set To Dictionary	${stats} 	${key}		${Value}
+	
+	${key} 	${Value}= 	Get Counter 	System\\Processor Queue Length 	${HOST}
+	Set To Dictionary	${stats} 	${key}		${Value}
+
+	[Return]	${stats}
 
 
 
