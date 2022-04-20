@@ -7,6 +7,7 @@ The ability to monitor your Application Under Test (AUT) servers and store the m
 With feature release v0.8.0 this became more useful as you could use the live graphs to monitor this data during a test, and now with release 1.0.0 you can easily include this information in your test reports.
 
 - [Overview](#Overview)
+- [Recomendations](#Recomendations)
 - [Unix AUT Example](#unix-linux-aut-example)
 - [Windows AUT Example](#Windows-AUT-Example)
 
@@ -17,6 +18,10 @@ While it may not be obvious at first the process for monitoring and reporting th
 1. Create a robot framework test case that connects to your AUT server and gathers the performance data you are interested in collecting, as a minimum you will probably want to collect CPU, Memory and Disk IO Information, you may also want to collect network IO, and then depending on the type of server you are monitoring there may be other details you want to monitor.
 1. report the details back to the manager using the rfswarm API [POST /Metric](Agent_Communication.md#post-metric)
 1. to make this easier the variable `${RFS_SWARMMANAGER}` as documented in the [Swarm Manager](Preparing_for_perf.md#swarm-manager) section of [Useful Variables](Preparing_for_perf.md#useful-variables), can be used to avoid hard coding the manager details.
+
+### Recomendations
+
+- Set up an agent machine in your data center(s) in the same network as your AUT servers to be dedicated to the task of monitoring servers. Configure the agent with a custom property that identifys the agent e.g. "Monitor" or the <datacentre name>. when configuring your test scenario configure the [additional settings > agent filter](https://github.com/damies13/rfswarm/blob/master/Doc/rfswarm_manager.md#agent-filter) for the monitoring robots to require this property and configure the other robots to exclude this property.
 
 ### Unix (Linux) AUT Example
 
