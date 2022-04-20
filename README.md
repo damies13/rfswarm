@@ -1,7 +1,7 @@
 # rfswarm (Robot Framework Swarm)
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/damies13/rfswarm/Super-Linter?label=Linter)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/damies13/rfswarm/Regression%20Tests?label=Regression%20Tests)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/damies13/rfswarm/Super-Linter?label=Linter)](https://github.com/damies13/rfswarm/actions/workflows/Regression_Tests.yml)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/damies13/rfswarm/Regression%20Tests?label=Regression%20Tests)](https://github.com/damies13/rfswarm/actions/workflows/superlinter.yml)
 
 
 <img align="right" src="Doc/Images/Icon_Information.png">
