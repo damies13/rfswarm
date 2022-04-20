@@ -5,7 +5,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="-1">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta content="Robot Framework 4.1.3 (Python 3.7.12 on darwin)" name="Generator">
+<meta content="Robot Framework 5.0 (Python 3.7.12 on darwin)" name="Generator">
 <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKcAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAAqAAAAAAAAAAAAAAAAAAAALIAAAD/AAAA4AAAANwAAADcAAAA3AAAANwAAADcAAAA3AAAANwAAADcAAAA4AAAAP8AAACxAAAAAAAAAKYAAAD/AAAAuwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC/AAAA/wAAAKkAAAD6AAAAzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN8AAAD/AAAA+gAAAMMAAAAAAAAAAgAAAGsAAABrAAAAawAAAGsAAABrAAAAawAAAGsAAABrAAAADAAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAAIsAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAANEAAAAAAAAA2gAAAP8AAAD6AAAAwwAAAAAAAAAAAAAAMgAAADIAAAAyAAAAMgAAADIAAAAyAAAAMgAAADIAAAAFAAAAAAAAANoAAAD/AAAA+gAAAMMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAADwAAAB8AAAAAAAAAGAAAABcAAAAAAAAAH8AAABKAAAAAAAAAAAAAAAAAAAA2gAAAP8AAAD6AAAAwwAAAAAAAADCAAAA/wAAACkAAADqAAAA4QAAAAAAAAD7AAAA/wAAALAAAAAGAAAAAAAAANoAAAD/AAAA+gAAAMMAAAAAAAAAIwAAAP4AAAD/AAAA/wAAAGAAAAAAAAAAAAAAAMkAAAD/AAAAigAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAAAAAAAAIAAAAcAAAABkAAAAAAAAAAAAAAAAAAAAAAAAAEgAAAAAAAAAAAAAA2gAAAP8AAAD7AAAAywAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN4AAAD/AAAAqwAAAP8AAACvAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALIAAAD/AAAAsgAAAAAAAAC5AAAA/wAAAMoAAADAAAAAwAAAAMAAAADAAAAAwAAAAMAAAADAAAAAwAAAAMkAAAD/AAAAvAAAAAAAAAAAAAAAAAAAAKwAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAArQAAAAAAAAAAwAMAAIABAAAf+AAAP/wAAD/8AAAgBAAAP/wAAD/8AAA//AAAJIwAADHEAAA//AAAP/wAAB/4AACAAQAAwAMAAA==">
 <style media="all" type="text/css">
 /* Generic and misc styles */
@@ -318,6 +318,9 @@ th.stats-col-graph:hover {
     top: 0;
     padding: 3px;
     cursor: default;
+}
+.element-header .label {
+    margin-right: 0.5em;
 }
 .name {
     font-weight: bold;
@@ -966,6 +969,7 @@ window.model = (function () {
     }
     function Keyword(data) {
         var kw = createModelObject(data);
+        var flatTypes = ['RETURN', 'BREAK', 'CONTINUE'];
         kw.libname = data.libname;
         kw.fullName = (kw.libname ? kw.libname + '.' : '') + kw.name;
         kw.type = data.type;
@@ -1350,8 +1354,8 @@ window.testdata = function () {
     var _statistics = null;
     var LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FAIL', 'SKIP'];
     var STATUSES = ['FAIL', 'PASS', 'SKIP', 'NOT RUN'];
-    var KEYWORD_TYPES = ['KEYWORD', 'SETUP', 'TEARDOWN', 'FOR', 'VAR', 'IF', 'ELSE IF', 'ELSE'];
-    var MESSAGE_TYPE = 8;
+    var KEYWORD_TYPES = ['KEYWORD', 'SETUP', 'TEARDOWN', 'FOR', 'ITERATION', 'IF', 'ELSE IF', 'ELSE', 'RETURN',
+                         'TRY', 'EXCEPT', 'FINALLY', 'WHILE', 'CONTINUE', 'BREAK'];
     function addElement(elem) {
         if (!elem.id)
             elem.id = uniqueId();
@@ -1372,10 +1376,10 @@ window.testdata = function () {
                 elapsed];
     }
     function createMessage(element, strings) {
-        return model.Message(LEVELS[element[2]],
-                             util.timestamp(element[1]),
-                             strings.get(element[3]),
-                             strings.get(element[4]));
+        return model.Message(LEVELS[element[1]],
+                             util.timestamp(element[0]),
+                             strings.get(element[2]),
+                             strings.get(element[3]));
     }
     function parseStatus(stats) {
         return STATUSES[stats[0]];
@@ -1386,7 +1390,7 @@ window.testdata = function () {
         };
     }
     function createBodyItem(parent, element, strings, index) {
-        if (element[0] == MESSAGE_TYPE)
+        if (element.length < 5)
             return createMessage(element, strings);
         var messages = util.filter(parent.children(), function (child) {
             return child.type == 'message';
@@ -1799,25 +1803,25 @@ function stopPropagation(event) {
 window.output = {};
 </script>
 <script type="text/javascript">
-window.output["suite"] = [1,2,3,0,[],[1,0,133061],[[4,5,6,0,[],[1,29,69795],[],[[7,0,8,[9,10,11],[1,44,56021],[[0,12,13,0,14,15,16,0,[1,45,0],[[8,45,2,17]]],[0,18,13,0,19,16,0,0,[1,46,56019],[[8,56065,2,20]]]]],[21,0,0,[9,10,11],[1,56066,12048],[[0,22,23,0,24,25,26,0,[1,56066,12046],[[8,56073,2,27],[8,68112,2,28]]],[0,29,13,0,30,31,0,0,[1,68112,1],[]],[0,32,13,0,33,34,0,0,[1,68113,1],[]],[0,32,13,0,33,35,0,0,[1,68114,0],[]]]],[36,0,0,[9,10,11],[1,68115,1708],[[0,22,23,0,24,37,26,0,[1,68115,1706],[[8,68119,2,38],[8,69821,2,39]]],[0,29,13,0,30,31,0,0,[1,69822,0],[]],[0,32,13,0,33,40,0,0,[1,69822,1],[]]]]],[[1,41,0,0,0,0,0,42,[1,41,3],[[0,29,13,0,30,43,0,0,[1,41,1],[]],[0,44,23,0,45,46,0,0,[1,42,1],[[8,43,2,47],[8,43,2,48]]],[0,44,23,0,45,49,0,0,[1,43,1],[[8,44,2,50]]]]]],[3,3,0,0]],[51,52,53,0,[],[1,69826,63233],[],[[54,0,0,[9],[1,72455,60603],[[0,55,56,0,57,58,0,0,[1,72456,7],[[8,72457,2,59]]],[0,18,13,0,19,60,0,0,[1,72464,60002],[[8,132466,2,61]]],[0,62,63,0,64,43,0,0,[1,132467,283],[]],[0,65,63,0,66,0,0,0,[1,132750,308],[[8,132751,2,67]]]]]],[],[1,1,0,0]]],[],[],[4,4,0,0]];
+window.output["suite"] = [1,2,3,0,[],[1,0,121692],[[4,5,6,0,[],[1,26,57550],[],[[7,0,8,[9,10,11],[1,41,44014],[[0,12,13,0,14,15,16,0,[1,42,0],[[42,2,17]]],[0,18,13,0,19,16,0,0,[1,43,44012],[[44055,2,20]]]]],[21,0,0,[9,10,11],[1,44056,12199],[[0,22,23,0,24,25,26,0,[1,44056,12196],[[44062,2,27],[56252,2,28]]],[0,29,13,0,30,31,0,0,[1,56253,0],[]],[0,32,13,0,33,34,0,0,[1,56254,0],[]],[0,32,13,0,33,35,0,0,[1,56254,0],[]]]],[36,0,0,[9,10,11],[1,56255,1320],[[0,22,23,0,24,37,26,0,[1,56256,1317],[[56259,2,38],[57573,2,39]]],[0,29,13,0,30,31,0,0,[1,57573,1],[]],[0,32,13,0,33,40,0,0,[1,57574,0],[]]]]],[[1,41,0,0,0,0,0,42,[1,38,3],[[0,29,13,0,30,43,0,0,[1,38,1],[]],[0,44,23,0,45,46,0,0,[1,39,1],[[40,2,47],[40,2,48]]],[0,44,23,0,45,49,0,0,[1,40,1],[[41,2,50]]]]]],[3,3,0,0]],[51,52,53,0,[],[1,57577,64114],[],[[54,0,0,[9],[1,60903,60787],[[0,55,56,0,57,58,0,0,[1,60904,8],[[60906,2,59]]],[0,18,13,0,19,60,0,0,[1,60913,60017],[[120930,2,61]]],[0,62,63,0,64,43,0,0,[1,120931,420],[]],[0,65,63,0,66,0,0,0,[1,121352,337],[[121352,2,67]]]]]],[],[1,1,0,0]]],[],[],[4,4,0,0]];
 </script>
 <script type="text/javascript">
 window.output["strings"] = [];
 </script>
 <script type="text/javascript">
-window.output["strings"] = window.output["strings"].concat(["*","*Manager","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager","*../..","*CommandLine","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/CommandLine.robot","*../../CommandLine.robot","*Random Offset","*<p>This just prevents all the test runners doing git push at the same time\x3c/p>","*macos-latest","*ubuntu-latest","*windows-latest","*Evaluate","*BuiltIn","*<p>Evaluates the given expression in Python and returns the result.\x3c/p>","*random.randint(0, 60)","*${random}","*${random} = 56","*Sleep","*<p>Pauses the test executed for the given time.\x3c/p>","*Slept 56 seconds","*Manager Version","*Run","*OperatingSystem","*<p>Runs the given command in the system and returns the output.\x3c/p>","*python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -v","*${result}","*Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -v 2&gt;&amp;1'.","*${result} = Unable to revert mtime: /Library/Fonts\nRobot Framework Swarm: Manager \n\tVersion 1.1.0 ","*Log To Console","*<p>Logs the given message to the console.\x3c/p>","*${\\n}${result}","*Should Contain","*<p>Fails if <code>container\x3c/code> does not contain <code>item\x3c/code> one or more times.\x3c/p>","*${result}, Version","*${result}, Manager","*Manager Help","*python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -h","*Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -h 2&gt;&amp;1'.","*${result} = Robot Framework Swarm: Manager \n\tVersion 1.1.0 \nusage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]\n                  [-n] [-t STARTTIME] [-d DIR] [-e IPADDRESS] [-p PORT]\n\n...","*${result}, IPADDRESS","*Clean Up Old Files","*macos-latest, ubuntu-latest, windows-latest","*${OUTPUT DIR}","*Remove File","*<p>Removes a file with the given path.\x3c/p>","*${OUTPUT DIR}${/}*.txt","eNq1jDEKwkAQRa8S0qRyf2EhSMwJtAmxlsHMrsHsDsxMjMc3Nt7A6vHg8XrO8uKxitPMVdNS9VCOp/qrRwBXYzXoUgorVtEnNNpKmn8c2NzQc1I2m6TgQoXSVp8lGTLdxXYz+Vbd9uEA81EWD/72uvvnvQV1TfgAbbJRdA==","eNq1jDEKwkAQRa+ypEnl/sJCkJgTaBO0lsHMrsHsDsyMxuMbG29g9XjweAMXefEY0jRzaDsKd+V0aL66B3AxVoM+a2XFIvqAJltIy49nNjcMnJXNJqk4UaW81kfJhkI3sc1MvlbXbdzBfGTV6G9v+n/eO1Dfxg9muFFW","*${OUTPUT DIR}${/}*.png","eNrFjbEKwjAQhl8ldOmUHOIgSO3gIoIuxc5yxEsabC5yV+3rWwd9Baefj++Dv6NcXnQzIY1k6gbNIBR21Qe3ANAriYI8mUlgLnIHCTqj5N9eSCeFjqKQaioMZ2SMS30qUSGjL2pHnJbqunabr3WH/rhHTd6qFyLWoUx25R4cq/YPpw1gW7s3L+Jg6g==","*GUI Basic","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/GUI_Basic.robot","*../../GUI_Basic.robot","*GUI Runs and Closes","*Start Process","*Process","*<p>Starts a new process on background.\x3c/p>","*python3, ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py, -g, 5, alias=Manager, stdout=${OUTPUT DIR}${/}stdout.txt, stderr=${OUTPUT DIR}${/}stderr.txt","*Starting process:\npython3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -g 5","*60","*Slept 1 minute","*Set Screenshot Folder","*ImageHorizonLibrary","*<p>Sets the folder where screenshots are saved to.\x3c/p>","*Take A Screenshot","*<p>Takes a screenshot of the screen.\x3c/p>","eNrFjjEKwkAQRa+yLFgmk2AhSJLCRgRt1NQyruNmiTsrMyu5vmnMFaxe8R/8d3FCxDqkbDKOxFsDvZIoyIeZBKYkI8hTJ5S48EqaFc7khVRDYjgho5/tY/IKEV3S4oV5tm7rcvNby31/2KEGV+hyWtTlm31zF+iaEL1Rca39Q4E1U3jkobV1Va2sge4L6H1k5w=="]);
+window.output["strings"] = window.output["strings"].concat(["*","*Manager","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager","*../..","*CommandLine","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/CommandLine.robot","*../../CommandLine.robot","*Random Offset","*<p>This just prevents all the test runners doing git push at the same time\x3c/p>","*macos-latest","*ubuntu-latest","*windows-latest","*Evaluate","*BuiltIn","*<p>Evaluates the given expression in Python and returns the result.\x3c/p>","*random.randint(0, 60)","*${random}","*${random} = 44","*Sleep","*<p>Pauses the test executed for the given time.\x3c/p>","*Slept 44 seconds","*Manager Version","*Run","*OperatingSystem","*<p>Runs the given command in the system and returns the output.\x3c/p>","*python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -v","*${result}","*Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -v 2&gt;&amp;1'.","*${result} = Robot Framework Swarm: Manager \n\tVersion 1.1.0 ","*Log To Console","*<p>Logs the given message to the console.\x3c/p>","*${\\n}${result}","*Should Contain","*<p>Fails if <code>container\x3c/code> does not contain <code>item\x3c/code> one or more times.\x3c/p>","*${result}, Version","*${result}, Manager","*Manager Help","*python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -h","*Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -h 2&gt;&amp;1'.","*${result} = Robot Framework Swarm: Manager \n\tVersion 1.1.0 \nusage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]\n                  [-n] [-t STARTTIME] [-d DIR] [-e IPADDRESS] [-p PORT]\n\n...","*${result}, IPADDRESS","*Clean Up Old Files","*macos-latest, ubuntu-latest, windows-latest","*${OUTPUT DIR}","*Remove File","*<p>Removes a file with the given path.\x3c/p>","*${OUTPUT DIR}${/}*.txt","eNq1jDEKwkAQRa8S0qRyf2EhSMwJtAmxlsHMrsHsDsxMjMc3Nt7A6vHg8XrO8uKxitPMVdNS9VCOp/qrRwBXYzXoUgorVtEnNNpKmn8c2NzQc1I2m6TgQoXSVp8lGTLdxXYz+Vbd9uEA81EWD/72uvvnvQV1TfgAbbJRdA==","eNq1jDEKwkAQRa+ypEnl/sJCkJgTaBO0lsHMrsHsDsyMxuMbG29g9XjweAMXefEY0jRzaDsKd+V0aL66B3AxVoM+a2XFIvqAJltIy49nNjcMnJXNJqk4UaW81kfJhkI3sc1MvlbXbdzBfGTV6G9v+n/eO1Dfxg9muFFW","*${OUTPUT DIR}${/}*.png","eNrFjbEKwjAQhl8ldOmUHOIgSO3gIoIuxc5yxEsabC5yV+3rWwd9Baefj++Dv6NcXnQzIY1k6gbNIBR21Qe3ANAriYI8mUlgLnIHCTqj5N9eSCeFjqKQaioMZ2SMS30qUSGjL2pHnJbqunabr3WH/rhHTd6qFyLWoUx25R4cq/YPpw1gW7s3L+Jg6g==","*GUI Basic","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/GUI_Basic.robot","*../../GUI_Basic.robot","*GUI Runs and Closes","*Start Process","*Process","*<p>Starts a new process on background.\x3c/p>","*python3, ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py, -g, 5, alias=Manager, stdout=${OUTPUT DIR}${/}stdout.txt, stderr=${OUTPUT DIR}${/}stderr.txt","*Starting process:\npython3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -g 5","*60","*Slept 1 minute","*Set Screenshot Folder","*ImageHorizonLibrary","*<p>Sets the folder where screenshots are saved to.\x3c/p>","*Take A Screenshot","*<p>Takes a screenshot of the screen.\x3c/p>","eNrFjjEKwkAQRa+yLFgmk2AhSJLCRgRt1NQyruNmiTsrMyu5vmnMFaxe8R/8d3FCxDqkbDKOxFsDvZIoyIeZBKYkI8hTJ5S48EqaFc7khVRDYjgho5/tY/IKEV3S4oV5tm7rcvNby31/2KEGV+hyWtTlm31zF+iaEL1Rca39Q4E1U3jkobV1Va2sge4L6H1k5w=="]);
 </script>
 <script type="text/javascript">
-window.output["stats"] = [[{"elapsed":"00:02:10","fail":0,"label":"All Tests","pass":4,"skip":0}],[{"elapsed":"00:02:10","fail":0,"label":"macos-latest","pass":4,"skip":0},{"elapsed":"00:01:10","fail":0,"label":"ubuntu-latest","pass":3,"skip":0},{"elapsed":"00:01:10","fail":0,"label":"windows-latest","pass":3,"skip":0}],[{"elapsed":"00:02:13","fail":0,"id":"s1","label":"Manager","name":"Manager","pass":4,"skip":0},{"elapsed":"00:01:10","fail":0,"id":"s1-s1","label":"Manager.CommandLine","name":"CommandLine","pass":3,"skip":0},{"elapsed":"00:01:03","fail":0,"id":"s1-s2","label":"Manager.GUI Basic","name":"GUI Basic","pass":1,"skip":0}]];
+window.output["stats"] = [[{"elapsed":"00:01:58","fail":0,"label":"All Tests","pass":4,"skip":0}],[{"elapsed":"00:01:58","fail":0,"label":"macos-latest","pass":4,"skip":0},{"elapsed":"00:00:58","fail":0,"label":"ubuntu-latest","pass":3,"skip":0},{"elapsed":"00:00:58","fail":0,"label":"windows-latest","pass":3,"skip":0}],[{"elapsed":"00:02:02","fail":0,"id":"s1","label":"Manager","name":"Manager","pass":4,"skip":0},{"elapsed":"00:00:58","fail":0,"id":"s1-s1","label":"Manager.CommandLine","name":"CommandLine","pass":3,"skip":0},{"elapsed":"00:01:04","fail":0,"id":"s1-s2","label":"Manager.GUI Basic","name":"GUI Basic","pass":1,"skip":0}]];
 </script>
 <script type="text/javascript">
 window.output["errors"] = [];
 </script>
 <script type="text/javascript">
-window.output["baseMillis"] = 1645712238851;
+window.output["baseMillis"] = 1650432053717;
 </script>
 <script type="text/javascript">
-window.output["generated"] = 133076;
+window.output["generated"] = 121710;
 </script>
 <script type="text/javascript">
 window.output["expand_keywords"] = null;
@@ -2123,7 +2127,7 @@ function addExecutionLog(main) {
     <div class="element-header closed" onclick="toggleKeyword('${id}')">
       <div class="element-header-left" title="${type}  {{if name}}{{html fullName}}  {{/if}}[${status}]">
         <span class="elapsed" title="Elapsed time">${times.elapsedTime}</span>
-        <span class="label keyword ${status.toLowerCase()}">${type}</span>
+        <span class="label ${status.toLowerCase()}">${type}</span>
         <span>{{html assign}}</span>
         <span class="name"><span class="parent-name">{{html libname}}{{if libname}} . {{/if}}</span>{{html name}}</span>
         <span class="arg">{{html arguments}}</span>
@@ -2131,7 +2135,7 @@ function addExecutionLog(main) {
       <div class="element-header-right" onclick="stopPropagation(event)">
         <a class="expand" title="Expand all" href="javascript:expandAll('${id}')"></a>
         <a class="collapse" title="Collapse all" href="javascript:collapseAll('${id}')"></a>
-        <a class="link" title="Link to this keyword" href="#${id}" onclick="makeElementVisible('${id}')"></a>
+        <a class="link" title="Link to this item" href="#${id}" onclick="makeElementVisible('${id}')"></a>
       </div>
       <div class="element-header-toggle" title="Toggle visibility"></div>
     </div>
