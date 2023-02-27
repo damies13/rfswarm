@@ -1608,7 +1608,7 @@ class RFSwarmBase:
 		num = "7200" # 3600 sec = 1hr, 7200 sec = 2 hours
 		base.scriptlist[base.scriptcount]["Run"] = int(num)
 
-		base.scriptlist[row]["Test"] = ""
+		base.scriptlist[row]["Test"] = None
 
 		if not base.args.nogui and base.gui:
 			base.gui.addScriptRow()
