@@ -27,7 +27,6 @@ import math
 
 import socket
 import ipaddress
-import PIL			# Known issue with ImageTk - https://stackoverflow.com/questions/44835909/cannot-import-name-imagetk-python-3-5
 import psutil
 import random
 import time
@@ -1608,7 +1607,7 @@ class RFSwarmBase:
 		num = "7200" # 3600 sec = 1hr, 7200 sec = 2 hours
 		base.scriptlist[base.scriptcount]["Run"] = int(num)
 
-		base.scriptlist[row]["Test"] = None
+		base.scriptlist[row]["Test"] = ""
 
 		if not base.args.nogui and base.gui:
 			base.gui.addScriptRow()
