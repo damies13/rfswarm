@@ -1700,6 +1700,8 @@ class RFSwarmBase:
 	def report_text(self, _event=None):
 		base.debugmsg(6, "report_text")
 		colno = 0
+		while_cnt=0
+		while_max=100
 		filecount = 0
 		base.debugmsg(6, "RunStats")
 		base.debugmsg(6, "UpdateRunStats_SQL")
@@ -1707,11 +1709,15 @@ class RFSwarmBase:
 		if base.args.nogui:
 			if "RunStats" not in base.dbqueue["ReadResult"]:
 				base.debugmsg(6, "Wait for RunStats")
-				while "RunStats" not in base.dbqueue["ReadResult"]:
+				while_cnt = while_max
+				while "RunStats" not in base.dbqueue["ReadResult"] and while_cnt>0:
 					time.sleep(0.1)
+					while_cnt-=1
 				base.debugmsg(6, "Wait for RunStats>0")
-				while len(base.dbqueue["ReadResult"]["RunStats"])<1:
+				while_cnt = while_max
+				while len(base.dbqueue["ReadResult"]["RunStats"])<1 and while_cnt>0:
 					time.sleep(0.1)
+					while_cnt-=1
 
 
 		if "RunStats" in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["RunStats"])>0:
@@ -1758,12 +1764,16 @@ class RFSwarmBase:
 			filecount += 1
 
 		if base.args.nogui:
+			while_cnt = while_max
 			base.debugmsg(6, "Wait for Agents")
-			while "Agents" not in base.dbqueue["ReadResult"]:
+			while "Agents" not in base.dbqueue["ReadResult"] and while_cnt>0:
 				time.sleep(0.1)
+				while_cnt-=1
 			base.debugmsg(6, "Wait for Agents>0")
-			while len(base.dbqueue["ReadResult"]["Agents"])<1:
+			while_cnt = while_max
+			while len(base.dbqueue["ReadResult"]["Agents"])<1 and while_cnt>0:
 				time.sleep(0.1)
+				while_cnt-=1
 
 		if "Agents" in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["Agents"])>0:
 			fileprefix = base.run_name
@@ -1791,11 +1801,15 @@ class RFSwarmBase:
 
 		if base.args.nogui:
 			base.debugmsg(6, "Wait for RawResults")
-			while "RawResults" not in base.dbqueue["ReadResult"]:
+			while_cnt = while_max
+			while "RawResults" not in base.dbqueue["ReadResult"] and while_cnt>0:
 				time.sleep(0.1)
+				while_cnt-=1
 			base.debugmsg(6, "Wait for RawResults>0")
-			while len(base.dbqueue["ReadResult"]["RawResults"])<1:
+			while_cnt = while_max
+			while len(base.dbqueue["ReadResult"]["RawResults"])<1 and while_cnt>0:
 				time.sleep(0.1)
+				while_cnt-=1
 
 		if "RawResults" in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["RawResults"])>0:
 			fileprefix = base.run_name
