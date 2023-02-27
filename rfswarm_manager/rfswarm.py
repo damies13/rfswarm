@@ -1700,16 +1700,18 @@ class RFSwarmBase:
 	def report_text(self, _event=None):
 		base.debugmsg(6, "report_text")
 		colno = 0
+		filecount = 0
 		base.debugmsg(6, "RunStats")
 		base.debugmsg(6, "UpdateRunStats_SQL")
 		base.UpdateRunStats_SQL()
-		if "RunStats" not in base.dbqueue["ReadResult"]:
-			base.debugmsg(6, "Wait for RunStats")
-			while "RunStats" not in base.dbqueue["ReadResult"]:
-				time.sleep(0.1)
-			base.debugmsg(6, "Wait for RunStats>0")
-			while len(base.dbqueue["ReadResult"]["RunStats"])<1:
-				time.sleep(0.1)
+		if base.args.nogui:
+			if "RunStats" not in base.dbqueue["ReadResult"]:
+				base.debugmsg(6, "Wait for RunStats")
+				while "RunStats" not in base.dbqueue["ReadResult"]:
+					time.sleep(0.1)
+				base.debugmsg(6, "Wait for RunStats>0")
+				while len(base.dbqueue["ReadResult"]["RunStats"])<1:
+					time.sleep(0.1)
 
 
 		if "RunStats" in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["RunStats"])>0:
@@ -1753,15 +1755,15 @@ class RFSwarmBase:
 					rowdata = row.values()
 					writer.writerow(rowdata)
 
-			if not base.args.nogui:
-				tkm.showinfo("RFSwarm - Info", "Report data saved to: {}".format(base.datapath))
+			filecount += 1
 
-		base.debugmsg(6, "Wait for Agents")
-		while "Agents" not in base.dbqueue["ReadResult"]:
-			time.sleep(0.1)
-		base.debugmsg(6, "Wait for Agents>0")
-		while len(base.dbqueue["ReadResult"]["Agents"])<1:
-			time.sleep(0.1)
+		if base.args.nogui:
+			base.debugmsg(6, "Wait for Agents")
+			while "Agents" not in base.dbqueue["ReadResult"]:
+				time.sleep(0.1)
+			base.debugmsg(6, "Wait for Agents>0")
+			while len(base.dbqueue["ReadResult"]["Agents"])<1:
+				time.sleep(0.1)
 
 		if "Agents" in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["Agents"])>0:
 			fileprefix = base.run_name
@@ -1785,13 +1787,15 @@ class RFSwarmBase:
 					rowdata = row.values()
 					writer.writerow(rowdata)
 
+			filecount += 1
 
-		base.debugmsg(6, "Wait for RawResults")
-		while "RawResults" not in base.dbqueue["ReadResult"]:
-			time.sleep(0.1)
-		base.debugmsg(6, "Wait for RawResults>0")
-		while len(base.dbqueue["ReadResult"]["RawResults"])<1:
-			time.sleep(0.1)
+		if base.args.nogui:
+			base.debugmsg(6, "Wait for RawResults")
+			while "RawResults" not in base.dbqueue["ReadResult"]:
+				time.sleep(0.1)
+			base.debugmsg(6, "Wait for RawResults>0")
+			while len(base.dbqueue["ReadResult"]["RawResults"])<1:
+				time.sleep(0.1)
 
 		if "RawResults" in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["RawResults"])>0:
 			fileprefix = base.run_name
@@ -1814,6 +1818,14 @@ class RFSwarmBase:
 				for row in base.dbqueue["ReadResult"]["RawResults"]:
 					rowdata = row.values()
 					writer.writerow(rowdata)
+
+			filecount += 1
+
+		if not base.args.nogui:
+			if filecount>0:
+				tkm.showinfo("RFSwarm - Info", "Report data saved to: {}".format(base.datapath))
+			else:
+				tkm.showwarning("RFSwarm - Warning", "No report data to save.")
 
 	def create_metric(self, MetricName, MetricType):
 		# Save Metric Data
