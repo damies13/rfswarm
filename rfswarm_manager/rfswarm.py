@@ -27,6 +27,7 @@ import math
 
 import socket
 import ipaddress
+import PIL			# Known issue with ImageTk - https://stackoverflow.com/questions/44835909/cannot-import-name-imagetk-python-3-5
 import psutil
 import random
 import time

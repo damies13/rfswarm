@@ -14,6 +14,8 @@ import random
 import re
 import math
 
+import PIL			# Known issue with ImageTk - https://stackoverflow.com/questions/44835909/cannot-import-name-imagetk-python-3-5
+
 import sqlite3
 
 import time
@@ -633,7 +635,7 @@ class ReporterBase():
 		while id in base.report:
 			time.sleep(0.1)
 			id = "{:02X}".format(int(time.time()*10000))
-		
+
 		base.debugmsg(7, "id:", id)
 		self.report_add_section(parent, id, name)
 		# base.report_save() # report_set_order in report_add_section will save
