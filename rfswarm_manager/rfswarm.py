@@ -1245,7 +1245,42 @@ class RFSwarmBase:
 				pass
 			time.sleep(aday)
 
+	def replace_rf_path_variables(self, pathin, localdir):
+		pathout = pathin
 
+		# Issue #129 Handle `${CURDIR}/`
+		if pathout.find("${CURDIR}") >-1:
+			pathout = os.path.abspath(os.path.join(localdir, pathout.replace("${CURDIR}", "")))
+
+		# Built-in variables - https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#built-in-variables
+
+		# ${TEMPDIR}
+		if pathout.find("${TEMPDIR}") >-1:
+			tmpdir = tempfile.gettempdir()
+			pathout = pathout.replace("${TEMPDIR}", tmpdir)
+		# ${EXECDIR}
+		# not sure how to handle this for now
+
+		# ${/}
+		if pathout.find("${/}") >-1:
+			if pathout.find("${/}") == 0:
+				pathlst = "${rfpv}"+pathout.split("${/}")
+				pathjoin = os.path.join(*pathlst)
+				pathjoin = pathjoin.replace("${rfpv}", "")
+			else:
+				pathlst = "${rfpv}"+pathout.split("${/}")
+				pathjoin = os.path.join(*pathlst)
+
+			if os.path.isfile(pathjoin):
+				pathout = pathjoin
+			else:
+				pathout = os.path.abspath(os.path.join(localdir, pathjoin))
+
+		# ${:}
+		# ${\n}
+		# not sure whether to handle these for now
+
+		return	pathout
 
 	def find_dependancies(self, hash):
 		keep_going = True
@@ -1311,8 +1346,12 @@ class RFSwarmBase:
 								if resfile:
 									base.debugmsg(7, "resfile", resfile)
 									# here we are assuming the resfile is a relative path! should we also consider files with full local paths?
-									localrespath = os.path.abspath(os.path.join(localdir, resfile))
-									base.debugmsg(8, "localrespath", localrespath)
+									# Issue #129 Handle ``${CURDIR}/``
+									if resfile.find("${") >-1:
+										localrespath = base.replace_rf_path_variables(resfile, localdir)
+									else:
+										localrespath = os.path.abspath(os.path.join(localdir, resfile))
+									base.debugmsg(7, "localrespath", localrespath)
 									if os.path.isfile(localrespath):
 										newhash = self.hash_file(localrespath, resfile)
 										base.debugmsg(7, "newhash", newhash)
