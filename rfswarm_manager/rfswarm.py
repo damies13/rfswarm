@@ -1257,7 +1257,7 @@ class RFSwarmBase:
 			base.debugmsg(8, "pathmod:", pathmod)
 			# https://stackoverflow.com/questions/1945920/why-doesnt-os-path-join-work-in-this-case
 			if platform.system() == "Windows":
-				pathmod = pathout.replace("/", os.path.sep)
+				pathmod = pathmod.replace("/", os.path.sep)
 				base.debugmsg(8, "pathmod:", pathmod)
 				pathout = os.path.abspath(os.path.join(localdir, *pathmod.split(os.path.sep)))
 			else:
