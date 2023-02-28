@@ -1249,10 +1249,13 @@ class RFSwarmBase:
 		base.debugmsg(8, "pathin:", pathin)
 		base.debugmsg(8, "localdir:", localdir)
 		pathout = pathin
+		base.debugmsg(8, "pathout:", pathout)
 
 		# Issue #129 Handle `${CURDIR}/`
 		if pathout.find("${CURDIR}") >-1:
-			pathout = os.path.abspath(os.path.join(localdir, pathout.replace("${CURDIR}", "")))
+			pathmod = pathout.replace("${CURDIR}", "")
+			base.debugmsg(8, "pathmod:", pathmod)
+			pathout = os.path.abspath(os.path.join(localdir, pathmod))
 			base.debugmsg(8, "pathout:", pathout)
 
 		# Built-in variables - https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#built-in-variables
