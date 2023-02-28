@@ -1380,12 +1380,14 @@ class RFSwarmBase:
 											localrespath = os.path.abspath(os.path.join(os.path.sep, *localdir.split(os.path.sep), *resfile.split(os.path.sep)))
 									base.debugmsg(7, "localrespath", localrespath)
 									if os.path.isfile(localrespath):
-										newhash = self.hash_file(localrespath, resfile)
+										relfile = os.path.relpath(localrespath, start=localdir)
+										base.debugmsg(7, "relfile", relfile)
+										newhash = self.hash_file(localrespath, relfile)
 										base.debugmsg(7, "newhash", newhash)
 										self.scriptfiles[newhash] = {
 												'id': newhash,
 												'localpath': localrespath,
-												'relpath': resfile,
+												'relpath': relfile,
 												'type': linearr[0]
 											}
 
