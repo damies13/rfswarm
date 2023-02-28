@@ -1246,11 +1246,14 @@ class RFSwarmBase:
 			time.sleep(aday)
 
 	def replace_rf_path_variables(self, pathin, localdir):
+		base.debugmsg(8, "pathin:", pathin)
+		base.debugmsg(8, "localdir:", localdir)
 		pathout = pathin
 
 		# Issue #129 Handle `${CURDIR}/`
 		if pathout.find("${CURDIR}") >-1:
 			pathout = os.path.abspath(os.path.join(localdir, pathout.replace("${CURDIR}", "")))
+			base.debugmsg(8, "pathout:", pathout)
 
 		# Built-in variables - https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#built-in-variables
 
@@ -1258,6 +1261,8 @@ class RFSwarmBase:
 		if pathout.find("${TEMPDIR}") >-1:
 			tmpdir = tempfile.gettempdir()
 			pathout = pathout.replace("${TEMPDIR}", tmpdir)
+			base.debugmsg(8, "pathout:", pathout)
+
 		# ${EXECDIR}
 		# not sure how to handle this for now
 
@@ -1266,15 +1271,22 @@ class RFSwarmBase:
 			if pathout.find("${/}") == 0:
 				pathlst = "${rfpv}"+pathout.split("${/}")
 				pathjoin = os.path.join(*pathlst)
+				base.debugmsg(8, "pathlst:", pathlst)
+				base.debugmsg(8, "pathjoin:", pathjoin)
 				pathjoin = pathjoin.replace("${rfpv}", "")
+				base.debugmsg(8, "pathjoin:", pathjoin)
 			else:
 				pathlst = "${rfpv}"+pathout.split("${/}")
 				pathjoin = os.path.join(*pathlst)
+				base.debugmsg(8, "pathlst:", pathlst)
+				base.debugmsg(8, "pathjoin:", pathjoin)
 
 			if os.path.isfile(pathjoin):
 				pathout = pathjoin
+				base.debugmsg(8, "pathout:", pathout)
 			else:
 				pathout = os.path.abspath(os.path.join(localdir, pathjoin))
+				base.debugmsg(8, "pathout:", pathout)
 
 		# ${:}
 		# ${\n}
