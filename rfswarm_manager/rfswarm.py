@@ -1255,7 +1255,8 @@ class RFSwarmBase:
 		if pathout.find("${CURDIR}") >-1:
 			pathmod = pathout.replace("${CURDIR}", "")
 			base.debugmsg(8, "pathmod:", pathmod)
-			pathout = os.path.abspath(os.path.join(localdir, pathmod))
+			# https://stackoverflow.com/questions/1945920/why-doesnt-os-path-join-work-in-this-case
+			pathout = os.path.abspath(os.path.join(*localdir.split(os.path.sep), *pathmod.split(os.path.sep)))
 			base.debugmsg(8, "pathout:", pathout)
 
 		# Built-in variables - https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#built-in-variables
@@ -1288,7 +1289,8 @@ class RFSwarmBase:
 				pathout = pathjoin
 				base.debugmsg(8, "pathout:", pathout)
 			else:
-				pathout = os.path.abspath(os.path.join(localdir, pathjoin))
+				# i guess this could be affected too https://stackoverflow.com/questions/1945920/why-doesnt-os-path-join-work-in-this-case
+				pathout = os.path.abspath(os.path.join(*localdir.split(os.path.sep), *pathjoin.split(os.path.sep)))
 				base.debugmsg(8, "pathout:", pathout)
 
 		# ${:}
@@ -1365,7 +1367,8 @@ class RFSwarmBase:
 									if resfile.find("${") >-1:
 										localrespath = base.replace_rf_path_variables(resfile, localdir)
 									else:
-										localrespath = os.path.abspath(os.path.join(localdir, resfile))
+										# i guess this could be affected too https://stackoverflow.com/questions/1945920/why-doesnt-os-path-join-work-in-this-case
+										localrespath = os.path.abspath(os.path.join(*localdir.split(os.path.sep), *resfile.split(os.path.sep)))
 									base.debugmsg(7, "localrespath", localrespath)
 									if os.path.isfile(localrespath):
 										newhash = self.hash_file(localrespath, resfile)
