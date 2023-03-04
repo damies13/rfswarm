@@ -1,4 +1,3 @@
-
 #!/usr/bin/python
 #
 # 	Robot Framework Swarm
@@ -25,6 +24,7 @@ import tkinter as tk  # python3
 import tkinter.colorchooser as tkac
 import tkinter.filedialog as tkf  # python3
 import tkinter.font as tkFont
+
 # import tkinter.messagebox as tkm  # python3
 import tkinter.simpledialog as tksd
 import tkinter.ttk as ttk  # python3
@@ -44,11 +44,14 @@ from docx.oxml.shared import OxmlElement, qn  # used for docx export
 from docx.shared import Cm, Pt, RGBColor  # used for docx export
 from lxml import etree  # used for xhtml export
 from lxml.builder import E, ElementMaker  # used for xhtml export
+
 # required for matplot graphs
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+
 # required for matplot graphs
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure  # required for matplot graphs
+
 # required for company logo's (I beleive this is a depandancy of matplotlib anyway)
 from PIL import Image, ImageTk
 

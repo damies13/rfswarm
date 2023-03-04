@@ -1,4 +1,3 @@
-
 #!/usr/bin/python
 #
 # 	Robot Framework Swarm
@@ -45,12 +44,11 @@ from operator import itemgetter
 from typing import Any
 
 import matplotlib  # required for matplot graphs
+import psutil
+import requests
 # required for matplot graphs
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure  # required for matplot graphs
-
-import psutil
-import requests
 
 matplotlib.use("TkAgg")  # required for matplot graphs
 
@@ -1222,7 +1220,7 @@ class RFSwarmBase:
 		base.debugmsg(8, "pathout:", pathout)
 
 		# Issue #129 Handle `${CURDIR}/`
-		if pathout.find("${CURDIR}") >-1:
+		if pathout.find("${CURDIR}") > -1:
 			pathmod = pathout.replace("${CURDIR}", "")
 			base.debugmsg(8, "pathmod:", pathmod)
 			# https://stackoverflow.com/questions/1945920/why-doesnt-os-path-join-work-in-this-case
@@ -1237,7 +1235,7 @@ class RFSwarmBase:
 		# Built-in variables - https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#built-in-variables
 
 		# ${TEMPDIR}
-		if pathout.find("${TEMPDIR}") >-1:
+		if pathout.find("${TEMPDIR}") > -1:
 			tmpdir = tempfile.gettempdir()
 			pathout = pathout.replace("${TEMPDIR}", tmpdir)
 			base.debugmsg(8, "pathout:", pathout)
@@ -1246,17 +1244,17 @@ class RFSwarmBase:
 		# not sure how to handle this for now
 
 		# ${/}
-		if pathout.find("${/}") >-1:
+		if pathout.find("${/}") > -1:
 			if pathout.find("${/}") == 0:
 				pathlst = "${rfpv}"+pathout.split("${/}")
-				pathjoin = os.path.join(*pathlst)
+				pathjoin = os.path.join( *pathlst)
 				base.debugmsg(8, "pathlst:", pathlst)
 				base.debugmsg(8, "pathjoin:", pathjoin)
 				pathjoin = pathjoin.replace("${rfpv}", "")
 				base.debugmsg(8, "pathjoin:", pathjoin)
 			else:
 				pathlst = "${rfpv}"+pathout.split("${/}")
-				pathjoin = os.path.join(*pathlst)
+				pathjoin = os.path.join( *pathlst)
 				base.debugmsg(8, "pathlst:", pathlst)
 				base.debugmsg(8, "pathjoin:", pathjoin)
 
@@ -1275,7 +1273,7 @@ class RFSwarmBase:
 		# ${\n}
 		# not sure whether to handle these for now
 
-		return	pathout
+		return pathout
 
 	def find_dependancies(self, hash):
 		keep_going = True
@@ -1342,7 +1340,7 @@ class RFSwarmBase:
 									base.debugmsg(7, "resfile", resfile)
 									# here we are assuming the resfile is a relative path! should we also consider files with full local paths?
 									# Issue #129 Handle ``${CURDIR}/``
-									if resfile.find("${") >-1:
+									if resfile.find("${") > -1:
 										localrespath = base.replace_rf_path_variables(resfile, localdir)
 									else:
 										# i guess this could be affected too https://stackoverflow.com/questions/1945920/why-doesnt-os-path-join-work-in-this-case
@@ -1357,11 +1355,11 @@ class RFSwarmBase:
 										newhash = self.hash_file(localrespath, relfile)
 										base.debugmsg(7, "newhash", newhash)
 										self.scriptfiles[newhash] = {
-												'id': newhash,
-												'localpath': localrespath,
-												'relpath': relfile,
-												'type': linearr[0]
-											}
+											'id': newhash,
+											'localpath': localrespath,
+											'relpath': relfile,
+											'type': linearr[0]
+										}
 
 										t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
 										t.start()
@@ -1741,14 +1739,14 @@ class RFSwarmBase:
 			if "RunStats" not in base.dbqueue["ReadResult"]:
 				base.debugmsg(6, "Wait for RunStats")
 				while_cnt = while_max
-				while "RunStats" not in base.dbqueue["ReadResult"] and while_cnt>0:
+				while "RunStats" not in base.dbqueue["ReadResult"] and while_cnt > 0:
 					time.sleep(0.1)
-					while_cnt-=1
+					while_cnt -= 1
 				base.debugmsg(6, "Wait for RunStats>0")
 				while_cnt = while_max
-				while len(base.dbqueue["ReadResult"]["RunStats"])<1 and while_cnt>0:
+				while len(base.dbqueue["ReadResult"]["RunStats"]) < 1 and while_cnt > 0:
 					time.sleep(0.1)
-					while_cnt-=1
+					while_cnt -= 1
 
 		if "RunStats" in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["RunStats"]) > 0:
 			base.debugmsg(7, "RunStats:", base.dbqueue["ReadResult"]["RunStats"])
@@ -1795,14 +1793,14 @@ class RFSwarmBase:
 		if base.args.nogui:
 			while_cnt = while_max
 			base.debugmsg(6, "Wait for Agents")
-			while "Agents" not in base.dbqueue["ReadResult"] and while_cnt>0:
+			while "Agents" not in base.dbqueue["ReadResult"] and while_cnt > 0:
 				time.sleep(0.1)
-				while_cnt-=1
+				while_cnt -= 1
 			base.debugmsg(6, "Wait for Agents>0")
 			while_cnt = while_max
-			while len(base.dbqueue["ReadResult"]["Agents"])<1 and while_cnt>0:
+			while len(base.dbqueue["ReadResult"]["Agents"]) < 1 and while_cnt > 0:
 				time.sleep(0.1)
-				while_cnt-=1
+				while_cnt -= 1
 
 		if "Agents" in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["Agents"]) > 0:
 			fileprefix = base.run_name
@@ -1831,14 +1829,14 @@ class RFSwarmBase:
 		if base.args.nogui:
 			base.debugmsg(6, "Wait for RawResults")
 			while_cnt = while_max
-			while "RawResults" not in base.dbqueue["ReadResult"] and while_cnt>0:
+			while "RawResults" not in base.dbqueue["ReadResult"] and while_cnt > 0:
 				time.sleep(0.1)
-				while_cnt-=1
+				while_cnt -= 1
 			base.debugmsg(6, "Wait for RawResults>0")
 			while_cnt = while_max
-			while len(base.dbqueue["ReadResult"]["RawResults"])<1 and while_cnt>0:
+			while len(base.dbqueue["ReadResult"]["RawResults"]) < 1 and while_cnt > 0:
 				time.sleep(0.1)
-				while_cnt-=1
+				while_cnt -= 1
 
 		if "RawResults" in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["RawResults"]) > 0:
 			fileprefix = base.run_name
@@ -1865,7 +1863,7 @@ class RFSwarmBase:
 			filecount += 1
 
 		if not base.args.nogui:
-			if filecount>0:
+			if filecount > 0:
 				tkm.showinfo("RFSwarm - Info", "Report data saved to: {}".format(base.datapath))
 			else:
 				tkm.showwarning("RFSwarm - Warning", "No report data to save.")
