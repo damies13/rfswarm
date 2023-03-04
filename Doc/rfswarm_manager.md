@@ -453,8 +453,8 @@ rfswarm
 - tkinter may need to be installed, or it may already installed on your system, if it's not installed consult the [python documentation](https://tkdocs.com/tutorial/install.html) on how to install for your system.
 
 On Debian based systems this will probably work
-```console
-apt install python3-tk
+```
+apt install python3-tk python3-pil python3-pil.imagetk
 ```
 
 Additionally the following pip command might be needed if these are not already installed on your system:

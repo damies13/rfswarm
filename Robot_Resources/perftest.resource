@@ -54,3 +54,14 @@ Get Data Row
 Get File Dir
 	${FILE_DIR} = 	Evaluate	os.path.dirname("${SUITE_SOURCE}")	os
 	[Return] 	${FILE_DIR}
+
+
+Apply Pacing
+	[Arguments]    ${StartTime}    ${MaxTimesPerHour}
+	${SecPerIter}= 	Evaluate 	int(3600/${MaxTimesPerHour})
+	${NowTime}= 	Get Time 	epoch
+	${TimeTaken}= 	Evaluate 	${NowTime}-${StartTime}
+	IF 	${TimeTaken} < ${SecPerIter}
+		${TimeLeft}= 	Evaluate 	${SecPerIter}-${TimeTaken}
+		Sleep    ${TimeLeft}
+	END

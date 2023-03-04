@@ -89,7 +89,7 @@ File Test Examples
 	Get Data Row	${FILE_DIR}/ProductList.csv 	"Random"
 	Get Data Row	${FILE_DIR}/ProductList.tsv 	"Sequential"
 	Get Data Row	${FILE_DIR}/ProductList.csv 	3
-	${next_row} = 	Evaluate	${vuser} + ${iteration}
+	${next_row} = 	Evaluate	${RFS_ROBOT} + ${RFS_ITERATION}
 	Get Data Row	${FILE_DIR}/ProductList.csv 	${next_row}
 
 ```

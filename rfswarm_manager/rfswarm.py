@@ -1213,6 +1213,68 @@ class RFSwarmBase:
 				pass
 			time.sleep(aday)
 
+	def replace_rf_path_variables(self, pathin, localdir):
+		base.debugmsg(8, "pathin:", pathin)
+		base.debugmsg(8, "localdir:", localdir)
+		pathout = pathin
+		base.debugmsg(8, "pathout:", pathout)
+
+		# Issue #129 Handle `${CURDIR}/`
+		if pathout.find("${CURDIR}") >-1:
+			pathmod = pathout.replace("${CURDIR}", "")
+			base.debugmsg(8, "pathmod:", pathmod)
+			# https://stackoverflow.com/questions/1945920/why-doesnt-os-path-join-work-in-this-case
+			if platform.system() == "Windows":
+				pathmod = pathmod.replace("/", os.path.sep)
+				base.debugmsg(8, "pathmod:", pathmod)
+				pathout = os.path.abspath(os.path.join(localdir, *pathmod.split(os.path.sep)))
+			else:
+				pathout = os.path.abspath(os.path.join(os.path.sep, *localdir.split(os.path.sep), *pathmod.split(os.path.sep)))
+			base.debugmsg(8, "pathout:", pathout)
+
+		# Built-in variables - https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#built-in-variables
+
+		# ${TEMPDIR}
+		if pathout.find("${TEMPDIR}") >-1:
+			tmpdir = tempfile.gettempdir()
+			pathout = pathout.replace("${TEMPDIR}", tmpdir)
+			base.debugmsg(8, "pathout:", pathout)
+
+		# ${EXECDIR}
+		# not sure how to handle this for now
+
+		# ${/}
+		if pathout.find("${/}") >-1:
+			if pathout.find("${/}") == 0:
+				pathlst = "${rfpv}"+pathout.split("${/}")
+				pathjoin = os.path.join(*pathlst)
+				base.debugmsg(8, "pathlst:", pathlst)
+				base.debugmsg(8, "pathjoin:", pathjoin)
+				pathjoin = pathjoin.replace("${rfpv}", "")
+				base.debugmsg(8, "pathjoin:", pathjoin)
+			else:
+				pathlst = "${rfpv}"+pathout.split("${/}")
+				pathjoin = os.path.join(*pathlst)
+				base.debugmsg(8, "pathlst:", pathlst)
+				base.debugmsg(8, "pathjoin:", pathjoin)
+
+			if os.path.isfile(pathjoin):
+				pathout = pathjoin
+			else:
+				base.debugmsg(8, "pathout:", pathout)
+				# i guess this could be affected too https://stackoverflow.com/questions/1945920/why-doesnt-os-path-join-work-in-this-case
+				if platform.system() == "Windows":
+					pathout = os.path.abspath(os.path.join(*localdir.split(os.path.sep), *pathjoin.split(os.path.sep)))
+				else:
+					pathout = os.path.abspath(os.path.join(os.path.sep, *localdir.split(os.path.sep), *pathjoin.split(os.path.sep)))
+				base.debugmsg(8, "pathout:", pathout)
+
+		# ${:}
+		# ${\n}
+		# not sure whether to handle these for now
+
+		return	pathout
+
 	def find_dependancies(self, hash):
 		keep_going = True
 		checking = False
@@ -1277,17 +1339,27 @@ class RFSwarmBase:
 								if resfile:
 									base.debugmsg(7, "resfile", resfile)
 									# here we are assuming the resfile is a relative path! should we also consider files with full local paths?
-									localrespath = os.path.abspath(os.path.join(localdir, resfile))
-									base.debugmsg(8, "localrespath", localrespath)
+									# Issue #129 Handle ``${CURDIR}/``
+									if resfile.find("${") >-1:
+										localrespath = base.replace_rf_path_variables(resfile, localdir)
+									else:
+										# i guess this could be affected too https://stackoverflow.com/questions/1945920/why-doesnt-os-path-join-work-in-this-case
+										if platform.system() == "Windows":
+											localrespath = os.path.abspath(os.path.join(*localdir.split(os.path.sep), *resfile.split(os.path.sep)))
+										else:
+											localrespath = os.path.abspath(os.path.join(os.path.sep, *localdir.split(os.path.sep), *resfile.split(os.path.sep)))
+									base.debugmsg(7, "localrespath", localrespath)
 									if os.path.isfile(localrespath):
-										newhash = self.hash_file(localrespath, resfile)
+										relfile = os.path.relpath(localrespath, start=localdir)
+										base.debugmsg(7, "relfile", relfile)
+										newhash = self.hash_file(localrespath, relfile)
 										base.debugmsg(7, "newhash", newhash)
 										self.scriptfiles[newhash] = {
-											'id': newhash,
-											'localpath': localrespath,
-											'relpath': resfile,
-											'type': linearr[0]
-										}
+												'id': newhash,
+												'localpath': localrespath,
+												'relpath': relfile,
+												'type': linearr[0]
+											}
 
 										t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
 										t.start()
@@ -1657,16 +1729,24 @@ class RFSwarmBase:
 	def report_text(self, _event=None):
 		base.debugmsg(6, "report_text")
 		colno = 0
+		while_cnt=0
+		while_max=100
+		filecount = 0
 		base.debugmsg(6, "RunStats")
 		base.debugmsg(6, "UpdateRunStats_SQL")
 		base.UpdateRunStats_SQL()
-		if "RunStats" not in base.dbqueue["ReadResult"]:
-			base.debugmsg(6, "Wait for RunStats")
-			while "RunStats" not in base.dbqueue["ReadResult"]:
-				time.sleep(0.1)
-			base.debugmsg(6, "Wait for RunStats>0")
-			while len(base.dbqueue["ReadResult"]["RunStats"]) < 1:
-				time.sleep(0.1)
+		if base.args.nogui:
+			if "RunStats" not in base.dbqueue["ReadResult"]:
+				base.debugmsg(6, "Wait for RunStats")
+				while_cnt = while_max
+				while "RunStats" not in base.dbqueue["ReadResult"] and while_cnt>0:
+					time.sleep(0.1)
+					while_cnt-=1
+				base.debugmsg(6, "Wait for RunStats>0")
+				while_cnt = while_max
+				while len(base.dbqueue["ReadResult"]["RunStats"])<1 and while_cnt>0:
+					time.sleep(0.1)
+					while_cnt-=1
 
 		if "RunStats" in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["RunStats"]) > 0:
 			base.debugmsg(7, "RunStats:", base.dbqueue["ReadResult"]["RunStats"])
@@ -1708,15 +1788,19 @@ class RFSwarmBase:
 					rowdata = row.values()
 					writer.writerow(rowdata)
 
-			if not base.args.nogui:
-				tkm.showinfo("RFSwarm - Info", "Report data saved to: {}".format(base.datapath))
+			filecount += 1
 
-		base.debugmsg(6, "Wait for Agents")
-		while "Agents" not in base.dbqueue["ReadResult"]:
-			time.sleep(0.1)
-		base.debugmsg(6, "Wait for Agents>0")
-		while len(base.dbqueue["ReadResult"]["Agents"]) < 1:
-			time.sleep(0.1)
+		if base.args.nogui:
+			while_cnt = while_max
+			base.debugmsg(6, "Wait for Agents")
+			while "Agents" not in base.dbqueue["ReadResult"] and while_cnt>0:
+				time.sleep(0.1)
+				while_cnt-=1
+			base.debugmsg(6, "Wait for Agents>0")
+			while_cnt = while_max
+			while len(base.dbqueue["ReadResult"]["Agents"])<1 and while_cnt>0:
+				time.sleep(0.1)
+				while_cnt-=1
 
 		if "Agents" in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["Agents"]) > 0:
 			fileprefix = base.run_name
@@ -1740,12 +1824,19 @@ class RFSwarmBase:
 					rowdata = row.values()
 					writer.writerow(rowdata)
 
-		base.debugmsg(6, "Wait for RawResults")
-		while "RawResults" not in base.dbqueue["ReadResult"]:
-			time.sleep(0.1)
-		base.debugmsg(6, "Wait for RawResults>0")
-		while len(base.dbqueue["ReadResult"]["RawResults"]) < 1:
-			time.sleep(0.1)
+			filecount += 1
+
+		if base.args.nogui:
+			base.debugmsg(6, "Wait for RawResults")
+			while_cnt = while_max
+			while "RawResults" not in base.dbqueue["ReadResult"] and while_cnt>0:
+				time.sleep(0.1)
+				while_cnt-=1
+			base.debugmsg(6, "Wait for RawResults>0")
+			while_cnt = while_max
+			while len(base.dbqueue["ReadResult"]["RawResults"])<1 and while_cnt>0:
+				time.sleep(0.1)
+				while_cnt-=1
 
 		if "RawResults" in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["RawResults"]) > 0:
 			fileprefix = base.run_name
@@ -1768,6 +1859,14 @@ class RFSwarmBase:
 				for row in base.dbqueue["ReadResult"]["RawResults"]:
 					rowdata = row.values()
 					writer.writerow(rowdata)
+
+			filecount += 1
+
+		if not base.args.nogui:
+			if filecount>0:
+				tkm.showinfo("RFSwarm - Info", "Report data saved to: {}".format(base.datapath))
+			else:
+				tkm.showwarning("RFSwarm - Warning", "No report data to save.")
 
 	def create_metric(self, MetricName, MetricType):
 		# Save Metric Data

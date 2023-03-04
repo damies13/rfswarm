@@ -1,5 +1,8 @@
 # rfswarm (Robot Framework Swarm)
 
+|Version|Manager|Agent|Reporter|
+|---|---|---|---|
+|[![Latest PyPI version](https://img.shields.io/pypi/v/rfswarm-manager.svg)](https://pypi.python.org/pypi/rfswarm-manager/) | [![Number of Manager PyPI downloads](https://img.shields.io/pypi/dm/rfswarm-manager.svg)](https://pypi.python.org/pypi/rfswarm-manager/) | [![Number of Agent PyPI downloads](https://img.shields.io/pypi/dm/rfswarm-agent.svg)](https://pypi.python.org/pypi/rfswarm-agent/) | [![Number of Reporter PyPI downloads](https://img.shields.io/pypi/dm/rfswarm-reporter.svg)](https://pypi.python.org/pypi/rfswarm-reporter/) |
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/damies13/rfswarm/Super-Linter?label=Linter)](https://github.com/damies13/rfswarm/actions/workflows/superlinter.yml)
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/damies13/rfswarm/Regression%20Tests?label=Regression%20Tests)](https://github.com/damies13/rfswarm/actions/workflows/Regression_Tests.yml)
 
