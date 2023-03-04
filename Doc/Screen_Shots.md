@@ -2,8 +2,8 @@
 [Return to Index](README.md)
 
 - [v1.0.0](#v100)
-  - [Manager v1.0.0](#Manager-v100)
-  - [Reporter v1.0.0](#Reporter-v100)
+  - [Manager v1.0.0](#manager-v100)
+  - [Reporter v1.0.0](#reporter-v100)
 - [v0.8.0](#v080)
 - [v0.7.0](#v070)
 - [v0.6.3](#v063)
@@ -13,7 +13,7 @@
 - [v0.4](#v04)
 - [v0.3](#v03)
 - [v0.1](#v01)
-- [Original](#Original)
+- [Original](#original)
 
 ## v1.0.0
 ### Manager v1.0.0

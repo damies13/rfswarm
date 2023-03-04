@@ -3,21 +3,21 @@
 
 rfswarm Manager is the central server component of rfswarm, this is where you plan, execute and monitor your performance test.
 
-- [User Interface](#User-Interface)
-  - [Plan](#Plan)
-  - [Run](#Run)
-  - [Agents](#Agents)
-  - [About](#About)
-  - [Graphs](#Graphs)
-- [Command-line Interface](#Command-Line-Interface)
-- [Install and Setup](#Install-and-Setup)
+- [User Interface](#user-interface)
+  - [Plan](#plan)
+  - [Run](#run)
+  - [Agents](#agents)
+  - [About](#about)
+  - [Graphs](#graphs)
+- [Command-line Interface](#command-line-interface)
+- [Install and Setup](#install-and-setup)
   - [Install](#1-install)
-  - [Adjust the Firewall](#2-Adjust-the-Firewall)
-  - [Run the Manager](#3-Run-the-manager)
-  - [Manual Install the prerequisites](#4-Manual-Install-the-prerequisites)
-  - [Manual Run the Manager](#5-Manual-Run-the-Manager)
-- [Agent Assignment](#Agent-Assignment)
-- [Credits](#Credits)
+  - [Adjust the Firewall](#2-adjust-the-firewall)
+  - [Run the Manager](#3-run-the-manager)
+  - [Manual Install the prerequisites](#4-manual-install-the-prerequisites)
+  - [Manual Run the Manager](#5-manual-run-the-manager)
+- [Agent Assignment](#agent-assignment)
+- [Credits](#credits)
 
 ## User Interface
 ### Plan
@@ -453,7 +453,7 @@ rfswarm
 - tkinter may need to be installed, or it may already installed on your system, if it's not installed consult the [python documentation](https://tkdocs.com/tutorial/install.html) on how to install for your system.
 
 On Debian based systems this will probably work
-```
+```python
 apt install python3-tk python3-pil python3-pil.imagetk
 ```
 

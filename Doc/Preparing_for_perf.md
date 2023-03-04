@@ -2,11 +2,11 @@
 [Return to Index](README.md)
 
 Some of the things you will need to consider when taking a functional or regression test and using it for performance are:
-- [Think Time](#Think-Time)
-- [Useful Variables](#Useful-Variables)
-- [Data Management](#Data-Management)
-- [Keywords](#Keywords)
-- [Browser](#Browser)
+- [Think Time](#think-time)
+- [Useful Variables](#useful-variables)
+- [Data Management](#data-management)
+- [Keywords](#keywords)
+- [Browser](#browser)
 
 ## Think Time
 

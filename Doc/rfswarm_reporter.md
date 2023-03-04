@@ -3,20 +3,20 @@
 
 rfswarm Reporter is the reporting tool component, you would use this at some point after the performance test has completed.
 
-- [User Interface](#User-Interface)
-  - [Settings Pane](#Settings-Pane)
-  - [Preview Pane](#Preview-Pane)
-  - [Report Sections](#Report-Sections)
-  - [Section Types](#Section-Types)
-    - [Heading](#Heading-Section)
-    - [Contents](#Contents-Section)
-    - [Note](#Note-Section)
-    - [Data Graph](#Data-Graph-Section)
-    - [Data Table](#Data-Table-Section)
-  - [Example Report](#Example-Report)
-- [Command-line Interface](#Command-Line-Interface)
-- [Install and Setup](#Install-and-Setup)
-- [Credits](#Credits)
+- [User Interface](#user-interface)
+  - [Settings Pane](#settings-pane)
+  - [Preview Pane](#preview-pane)
+  - [Report Sections](#report-sections)
+  - [Section Types](#section-types)
+    - [Heading](#heading-section)
+    - [Contents](#contents-section)
+    - [Note](#note-section)
+    - [Data Graph](#data-graph-section)
+    - [Data Table](#data-table-section)
+  - [Example Report](#example-report)
+- [Command-line Interface](#command-line-interface)
+- [Install and Setup](#install-and-setup)
+- [Credits](#credits)
 
 ## User Interface
 
@@ -45,7 +45,7 @@ Under the main toolbar is the section toolbar:
 | Move Section Up | ![image](Images/REP_resultset_up.gif) | Moves the currently selected section above the section currently above it |
 | Move Section Down | ![image](Images/REP_resultset_down.gif) | Moves the currently selected section below the section currently below it |
 
-To the right of the section toolbar is the ![image](Images/REP_report.gif) Preview / ![image](Images/REP_cog.gif) Settings toggle, used to switch between the [Settings Pane](#Settings-Pane) and the [Preview Pane](#Preview-Pane) (pictured below)
+To the right of the section toolbar is the ![image](Images/REP_report.gif) Preview / ![image](Images/REP_cog.gif) Settings toggle, used to switch between the [Settings Pane](#settings-pane) and the [Preview Pane](#preview-pane) (pictured below)
 
 ### Settings Pane
 
@@ -115,11 +115,11 @@ To move a section down:
 > ![Image](Images/MacOS_Reporter_v1.0.0_SectionTypes.png)
 
 Each section is used to display different types of information, the various section types are:
-- [Heading](#Heading-Section)
-- [Contents](#Contents-Section)
-- [Note](#Note-Section)
-- [Data Graph](#Data-Graph-Section)
-- [Data Table](#Data-Table-Section)
+- [Heading](#heading-section)
+- [Contents](#contents-section)
+- [Note](#note-section)
+- [Data Graph](#data-graph-section)
+- [Data Table](#data-table-section)
 
 #### Heading Section
 The heading section is used for grouping subsections that contain related information, so the only setting here is the heading name which allows you to change the name of the section.
@@ -152,9 +152,9 @@ The data graph section is used for displaying graphs of test results and other m
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Settings_Type.png)
 
 The data sources for the graphs can be:
-- [Metric](#Data-Graph-Metric)
-- [Result](#Data-Graph-Result)
-- [Custom SQL](#Data-Graph-SQL)
+- [Metric](#data-graph-metric)
+- [Result](#data-graph-result)
+- [Custom SQL](#data-graph-sql)
 
 ##### Data Graph Metric
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric.png)
@@ -221,10 +221,10 @@ The data table section is used for displaying tables of test results and other m
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Settings_Type.png)
 
 The data sources for the graphs can be:
-- [Metric](#Data-Table-Metric)
-- [Result](#Data-Table-Result)
-- [ResultSummary](#Data-Table-ResultSummary)
-- [Custom SQL](#Data-Table-SQL)
+- [Metric](#data-table-metric)
+- [Result](#data-table-result)
+- [ResultSummary](#data-table-resultsummary)
+- [Custom SQL](#data-table-sql)
 
 ##### Data Table Metric
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric.png)

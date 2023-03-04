@@ -5,10 +5,10 @@ The ability to monitor your Application Under Test (AUT) servers and store the m
 
 With feature release v0.8.0 this became more useful as you could use the live graphs to monitor this data during a test, and now with release 1.0.0 you can easily include this information in your test reports.
 
-- [Overview](#Overview)
-- [Recomendations](#Recomendations)
+- [Overview](#overview)
+- [Recomendations](#recomendations)
 - [Unix AUT Example](#unix-linux-aut-example)
-- [Windows AUT Example](#Windows-AUT-Example)
+- [Windows AUT Example](#windows-aut-example)
 
 ## Overview
 
@@ -20,7 +20,8 @@ While it may not be obvious at first the process for monitoring and reporting th
 
 ### Recomendations
 
-- Set up an agent machine in your data center(s) in the same network as your AUT servers to be dedicated to the task of monitoring servers. Configure the agent with a custom property that identifys the agent e.g. "Monitor" or the <datacentre name>. when configuring your test scenario configure the [additional settings > agent filter](https://github.com/damies13/rfswarm/blob/master/Doc/rfswarm_manager.md#agent-filter) for the monitoring robots to require this property and configure the other robots to exclude this property.
+- Set up an agent machine in your data center(s) in the same network as your AUT servers to be dedicated to the task of monitoring servers.
+Configure the agent with a custom property that identifys the agent e.g. "Monitor" or the <datacentre name>. when configuring your test scenario configure the [additional settings > agent filter](https://github.com/damies13/rfswarm/blob/master/Doc/rfswarm_manager.md#agent-filter) for the monitoring robots to require this property and configure the other robots to exclude this property.
 
 ### Unix (Linux) AUT Example
 
@@ -265,15 +266,15 @@ Open Connection And Log In
 
 Collect Stats
 	[Arguments] 	${HOST}=${HOST}
-	
+
 	${stats}=	Create Dictionary
-	
+
 	${key} 	${Value}= 	Get Counter 	Memory\\% Committed Bytes In Use 	${HOST}
 	Set To Dictionary	${stats} 	${key}		${Value}
-	
+
 	${key} 	${Value}= 	Get Counter 	Processor\\_Total\\% Processor Time 	${HOST}
 	Set To Dictionary	${stats} 	${key}		${Value}
-	
+
 	${key} 	${Value}= 	Get Counter 	System\\Processor Queue Length 	${HOST}
 	Set To Dictionary	${stats} 	${key}		${Value}
 

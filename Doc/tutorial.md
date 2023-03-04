@@ -6,9 +6,9 @@ WARNING: This tutorial is a work in progress - it is no where near ready to be u
 
 ---
 
-- [Application Under Test](#Application-Under-Test)
-- [Robot Script](#Robot-Script)
-- [Run the Test](#Run-the-Test)
+- [Application Under Test](#application-under-test)
+- [Robot Script](#robot-script)
+- [Run the Test](#run-the-test)
 
 
 For this tutorial you will need at least 1 but ideally 3 or more computers, the roles of these machines are:

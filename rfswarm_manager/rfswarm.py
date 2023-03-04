@@ -1,3 +1,4 @@
+
 #!/usr/bin/python
 #
 # 	Robot Framework Swarm
@@ -44,11 +45,12 @@ from operator import itemgetter
 from typing import Any
 
 import matplotlib  # required for matplot graphs
-import psutil
-import requests
 # required for matplot graphs
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure  # required for matplot graphs
+
+import psutil
+import requests
 
 matplotlib.use("TkAgg")  # required for matplot graphs
 

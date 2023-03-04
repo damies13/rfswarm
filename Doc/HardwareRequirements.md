@@ -2,8 +2,8 @@
 # rfswarm (Robot Framework Swarm) Hardware Requirements
 [Return to Index](README.md)
 
-- [Manager](#Manager)
-- [Agents](#Agents)
+- [Manager](#manager)
+- [Agents](#agents)
 
 ## Manager
 
@@ -33,7 +33,7 @@ A [2013 11" MacBook Air 1.3GHz dual-core i5 4Gb ram](https://support.apple.com/k
 ## Reporter
 
 The Hardware Requirements for the Reporter are a bit higher, it will depend on how many sections and subsections you have in your report and how complicated the graphs are.
-These minimums should allow you to plan a reasonable report. The most memory intensive report I have built so far used around 400MB of RAM after updating the preview and while exporting the report in html, word and excel at the same time.
+These minimums should allow you to plan a reasonable report. The most memory intensive report I have built so far used around 400MB of RAM after updating the preview and while exporting the report in HTML, word and excel at the same time.
 
 Recommended minimums:
 

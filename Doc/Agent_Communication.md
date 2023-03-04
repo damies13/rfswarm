@@ -4,12 +4,12 @@
 
 In this page the generic hostnames manager and myagent are used, replace manager with the hostname of the machine that is running rfswarm.py and myagent with the hostname of the machine that is running rfswarm_agent.py
 
-- [Get /](#Get-)
-- [POST /AgentStatus](#POST-AgentStatus)
-- [POST /Jobs](#POST-Jobs)
-- [POST /Scripts](#POST-Scripts)
-- [POST /File](#POST-File)
-- [POST /Result](#POST-Result)
+- [Get /](#get-)
+- [POST /AgentStatus](#post-agentstatus)
+- [POST /Jobs](#post-jobs)
+- [POST /Scripts](#post-scripts)
+- [POST /File](#post-file)
+- [POST /Result](#post-result)
 - [POST /Metric](#post-metric)
 
 ## Get /
