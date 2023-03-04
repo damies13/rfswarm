@@ -45,9 +45,9 @@ jobs:
           Xvfb :13 -screen 0 1920x1080x24 > /dev/null 2>&1 &
           # xauth with complain unless ~/.Xauthority exists
           touch ~/.Xauthority
-          # To view a listing of the .Xauthority file, enter the following 
+          # To view a listing of the .Xauthority file, enter the following
           xauth list
-          # fluxbox 
+          # fluxbox
           fluxbox &
       - run: pip install -r Tests/Regression/Manager/pip_requirements.txt
       - name: setup git config
@@ -60,7 +60,7 @@ jobs:
         run: git checkout -B Test-Result-${{ matrix.platform }}-${{ matrix.python }}
       - name: Robot Framework
         run: robot --include ${{ matrix.platform }} --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }} Tests/Regression/Manager
-        env: 
+        env:
           DISPLAY: :13.0
       - name: git commit
         if: always()
