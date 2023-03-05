@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 6.0.2 (Python 3.11.2 on linux)" generated="20230305 10:18:07.536" rpa="false" schemaversion="3">
+<robot generator="Robot 6.0.2 (Python 3.11.2 on linux)" generated="20230305 10:34:13.917" rpa="false" schemaversion="3">
 <suite id="s1" name="Reporter" source="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter">
 <suite id="s1-s1" name="CommandLine" source="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/CommandLine.robot">
 <test id="s1-s1-t1" name="Reporter Version" line="10">
@@ -7,65 +7,65 @@
 <var>${result}</var>
 <arg>python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -v</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<msg timestamp="20230305 10:18:07.562" level="INFO">Running command 'python3 /home/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -v 2&gt;&amp;1'.</msg>
-<msg timestamp="20230305 10:18:09.071" level="INFO">${result} = Robot Framework Swarm: Reporter 
+<msg timestamp="20230305 10:34:13.948" level="INFO">Running command 'python3 /home/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -v 2&gt;&amp;1'.</msg>
+<msg timestamp="20230305 10:34:15.444" level="INFO">${result} = Robot Framework Swarm: Reporter 
 	Version 1.1.0 </msg>
-<status status="PASS" starttime="20230305 10:18:07.559" endtime="20230305 10:18:09.071"/>
+<status status="PASS" starttime="20230305 10:34:13.945" endtime="20230305 10:34:15.444"/>
 </kw>
 <kw name="Log To Console" library="BuiltIn">
 <arg>${\n}${result}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20230305 10:18:09.072" endtime="20230305 10:18:09.072"/>
+<status status="PASS" starttime="20230305 10:34:15.444" endtime="20230305 10:34:15.444"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Version</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20230305 10:18:09.072" endtime="20230305 10:18:09.072"/>
+<status status="PASS" starttime="20230305 10:34:15.445" endtime="20230305 10:34:15.445"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Reporter</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20230305 10:18:09.072" endtime="20230305 10:18:09.072"/>
+<status status="PASS" starttime="20230305 10:34:15.445" endtime="20230305 10:34:15.445"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20230305 10:18:07.559" endtime="20230305 10:18:09.073"/>
+<status status="PASS" starttime="20230305 10:34:13.945" endtime="20230305 10:34:15.445"/>
 </test>
 <test id="s1-s1-t2" name="Reporter Help" line="17">
 <kw name="Run" library="OperatingSystem">
 <var>${result}</var>
 <arg>python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -h</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<msg timestamp="20230305 10:18:09.074" level="INFO">Running command 'python3 /home/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -h 2&gt;&amp;1'.</msg>
-<msg timestamp="20230305 10:18:09.748" level="INFO">${result} = Robot Framework Swarm: Reporter 
+<msg timestamp="20230305 10:34:15.446" level="INFO">Running command 'python3 /home/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -h 2&gt;&amp;1'.</msg>
+<msg timestamp="20230305 10:34:16.310" level="INFO">${result} = Robot Framework Swarm: Reporter 
 	Version 1.1.0 
 usage: rfswarm_reporter.py [-h] [-g DEBUG] [-v] [-i INI] [-n] [-d DIR]
                            [-t TEMPLATE] [--html] [--docx] [--xlsx]
 
 options:
   ...</msg>
-<status status="PASS" starttime="20230305 10:18:09.073" endtime="20230305 10:18:09.748"/>
+<status status="PASS" starttime="20230305 10:34:15.446" endtime="20230305 10:34:16.310"/>
 </kw>
 <kw name="Log To Console" library="BuiltIn">
 <arg>${\n}${result}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20230305 10:18:09.748" endtime="20230305 10:18:09.748"/>
+<status status="PASS" starttime="20230305 10:34:16.310" endtime="20230305 10:34:16.310"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Excel</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20230305 10:18:09.748" endtime="20230305 10:18:09.748"/>
+<status status="PASS" starttime="20230305 10:34:16.310" endtime="20230305 10:34:16.311"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20230305 10:18:09.073" endtime="20230305 10:18:09.748"/>
+<status status="PASS" starttime="20230305 10:34:15.445" endtime="20230305 10:34:16.311"/>
 </test>
-<status status="PASS" starttime="20230305 10:18:07.552" endtime="20230305 10:18:09.749"/>
+<status status="PASS" starttime="20230305 10:34:13.937" endtime="20230305 10:34:16.311"/>
 </suite>
 <suite id="s1-s2" name="GUI Basic" source="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot">
 <test id="s1-s2-t1" name="GUI Runs and Closes" line="30">
@@ -73,8 +73,8 @@ options:
 <arg>${platform}</arg>
 <arg>ubuntu</arg>
 <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
-<msg timestamp="20230305 10:18:09.755" level="INFO">${platform} = ubuntu</msg>
-<status status="PASS" starttime="20230305 10:18:09.754" endtime="20230305 10:18:09.755"/>
+<msg timestamp="20230305 10:34:16.537" level="INFO">${platform} = ubuntu</msg>
+<status status="PASS" starttime="20230305 10:34:16.536" endtime="20230305 10:34:16.537"/>
 </kw>
 <kw name="Start Process" library="Process">
 <arg>python3</arg>
@@ -83,55 +83,48 @@ options:
 <arg>stdout=${OUTPUT DIR}${/}stdout.txt</arg>
 <arg>stderr=${OUTPUT DIR}${/}stderr.txt</arg>
 <doc>Starts a new process on background.</doc>
-<msg timestamp="20230305 10:18:09.756" level="INFO">Starting process:
+<msg timestamp="20230305 10:34:16.538" level="INFO">Starting process:
 python3 /home/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py</msg>
-<status status="PASS" starttime="20230305 10:18:09.755" endtime="20230305 10:18:09.759"/>
+<status status="PASS" starttime="20230305 10:34:16.537" endtime="20230305 10:34:16.543"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>60</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<msg timestamp="20230305 10:19:09.760" level="INFO">Slept 1 minute</msg>
-<status status="PASS" starttime="20230305 10:18:09.759" endtime="20230305 10:19:09.760"/>
+<msg timestamp="20230305 10:35:16.544" level="INFO">Slept 1 minute</msg>
+<status status="PASS" starttime="20230305 10:34:16.544" endtime="20230305 10:35:16.545"/>
 </kw>
-<kw name="Set Screenshot Folder">
+<kw name="Set Screenshot Folder" library="ImageHorizonLibrary">
 <arg>${OUTPUT DIR}</arg>
-<msg timestamp="20230305 10:19:09.762" level="FAIL">No keyword with name 'Set Screenshot Folder' found.</msg>
-<status status="FAIL" starttime="20230305 10:19:09.762" endtime="20230305 10:19:09.762"/>
+<doc>Sets the folder where screenshots are saved to.</doc>
+<status status="PASS" starttime="20230305 10:35:16.545" endtime="20230305 10:35:16.545"/>
 </kw>
-<kw name="Take A Screenshot">
-<status status="NOT RUN" starttime="20230305 10:19:09.764" endtime="20230305 10:19:09.764"/>
+<kw name="Take A Screenshot" library="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<msg timestamp="20230305 10:35:16.545" level="INFO" html="true">Screenshot taken: /home/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/ubuntu-latest_3.11/Reporter.GUIBasic-screenshot-1.png&lt;br/&gt;&lt;img src="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/ubuntu-latest_3.11/Reporter.GUIBasic-screenshot-1.png" width="100%" /&gt;</msg>
+<status status="PASS" starttime="20230305 10:35:16.545" endtime="20230305 10:35:16.707"/>
 </kw>
 <tag>ubuntu-latest</tag>
-<status status="FAIL" starttime="20230305 10:18:09.754" endtime="20230305 10:19:09.764">No keyword with name 'Set Screenshot Folder' found.</status>
+<status status="PASS" starttime="20230305 10:34:16.536" endtime="20230305 10:35:16.707"/>
 </test>
-<status status="FAIL" starttime="20230305 10:18:09.749" endtime="20230305 10:19:09.765"/>
+<status status="PASS" starttime="20230305 10:34:16.312" endtime="20230305 10:35:16.708"/>
 </suite>
-<status status="FAIL" starttime="20230305 10:18:07.536" endtime="20230305 10:19:09.765"/>
+<status status="PASS" starttime="20230305 10:34:13.918" endtime="20230305 10:35:16.709"/>
 </suite>
 <statistics>
 <total>
-<stat pass="2" fail="1" skip="0">All Tests</stat>
+<stat pass="3" fail="0" skip="0">All Tests</stat>
 </total>
 <tag>
 <stat pass="2" fail="0" skip="0">macos-latest</stat>
-<stat pass="2" fail="1" skip="0">ubuntu-latest</stat>
+<stat pass="3" fail="0" skip="0">ubuntu-latest</stat>
 <stat pass="2" fail="0" skip="0">windows-latest</stat>
 </tag>
 <suite>
-<stat pass="2" fail="1" skip="0" id="s1" name="Reporter">Reporter</stat>
+<stat pass="3" fail="0" skip="0" id="s1" name="Reporter">Reporter</stat>
 <stat pass="2" fail="0" skip="0" id="s1-s1" name="CommandLine">Reporter.CommandLine</stat>
-<stat pass="0" fail="1" skip="0" id="s1-s2" name="GUI Basic">Reporter.GUI Basic</stat>
+<stat pass="1" fail="0" skip="0" id="s1-s2" name="GUI Basic">Reporter.GUI Basic</stat>
 </suite>
 </statistics>
 <errors>
-<msg timestamp="20230305 10:18:09.753" level="ERROR">Error in file '/home/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot' on line 5: Importing library 'ImageHorizonLibrary' failed: ModuleNotFoundError: No module named 'ImageHorizonLibrary'
-Traceback (most recent call last):
-  None
-PYTHONPATH:
-  /opt/hostedtoolcache/Python/3.11.2/x64/bin
-  /opt/hostedtoolcache/Python/3.11.2/x64/lib/python311.zip
-  /opt/hostedtoolcache/Python/3.11.2/x64/lib/python3.11
-  /opt/hostedtoolcache/Python/3.11.2/x64/lib/python3.11/lib-dynload
-  /opt/hostedtoolcache/Python/3.11.2/x64/lib/python3.11/site-packages</msg>
 </errors>
 </robot>
