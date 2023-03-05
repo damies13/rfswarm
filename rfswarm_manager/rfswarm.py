@@ -46,6 +46,7 @@ from typing import Any
 import matplotlib  # required for matplot graphs
 import psutil
 import requests
+
 # required for matplot graphs
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure  # required for matplot graphs
@@ -1246,15 +1247,15 @@ class RFSwarmBase:
 		# ${/}
 		if pathout.find("${/}") > -1:
 			if pathout.find("${/}") == 0:
-				pathlst = "${rfpv}"+pathout.split("${/}")
-				pathjoin = os.path.join( *pathlst)
+				pathlst = "${rfpv}" + pathout.split("${/}")
+				pathjoin = os.path.join(*pathlst)
 				base.debugmsg(8, "pathlst:", pathlst)
 				base.debugmsg(8, "pathjoin:", pathjoin)
 				pathjoin = pathjoin.replace("${rfpv}", "")
 				base.debugmsg(8, "pathjoin:", pathjoin)
 			else:
-				pathlst = "${rfpv}"+pathout.split("${/}")
-				pathjoin = os.path.join( *pathlst)
+				pathlst = "${rfpv}" + pathout.split("${/}")
+				pathjoin = os.path.join(*pathlst)
 				base.debugmsg(8, "pathlst:", pathlst)
 				base.debugmsg(8, "pathjoin:", pathjoin)
 
@@ -1729,8 +1730,8 @@ class RFSwarmBase:
 	def report_text(self, _event=None):
 		base.debugmsg(6, "report_text")
 		colno = 0
-		while_cnt=0
-		while_max=100
+		while_cnt = 0
+		while_max = 100
 		filecount = 0
 		base.debugmsg(6, "RunStats")
 		base.debugmsg(6, "UpdateRunStats_SQL")
