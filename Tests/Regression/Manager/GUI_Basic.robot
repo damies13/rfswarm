@@ -5,11 +5,11 @@ Library 	Process
 Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
 *** Variables ***
-${IMAGE_DIR} 	${CURDIR}/Images
+${IMAGE_DIR} 	${CURDIR}/Images/file_method
 ${pyfile}			${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
 
 *** Test Cases ***
-GUI Runs and Closes
+Open GUI
 	[Tags]	macos-latest
 	Set Suite Variable    ${platform}    macos
 	Set Confidence		0.9
@@ -18,7 +18,7 @@ GUI Runs and Closes
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
 
-GUI Runs and Closes
+Open GUI
 	[Tags]	windows-latest
 	Set Suite Variable    ${platform}    windows
 	Set Confidence		0.9
@@ -27,12 +27,7 @@ GUI Runs and Closes
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
 
-	Press Combination 	x 	Key.ctrl
-	${result}= 	Wait For Process 	Manager
-	Should Be Equal As Integers 	${result.rc} 	0
-
-
-GUI Runs and Closes
+Open GUI
 	[Tags]	ubuntu-latest
 	Set Suite Variable    ${platform}    ubuntu
 	Set Confidence		0.9
@@ -45,9 +40,20 @@ Select Run Tab
 	[Tags]	ubuntu-latest		windows-latest		macos-latest
 	Click Run Tab
 
+Close GUI
+	[Tags]	windows-latest
+	Press Combination 	x 	Key.ctrl
+	${result}= 	Wait For Process 	Manager
+	Should Be Equal As Integers 	${result.rc} 	0
+
+
 *** Keywords ***
 Click Run Tab
-	Wait For 	Run Tab 	 timeout=10
-	@{coordinates}= 	Locate		Run Tab
-	Click Image		Run Tab
+
+	${img}=	Set Variable		manager_${platform}_run_tab.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=10
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
 	Take A Screenshot
