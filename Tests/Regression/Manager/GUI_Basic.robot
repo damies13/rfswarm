@@ -7,7 +7,7 @@ Library 	Process
 # Suite Teardown		Sikili Teardown
 
 # Import Library	ImageHorizonLibrary	reference_folder=images
-Library	ImageHorizonLibrary	reference_folder=${CURDIR}/../../Screenshots-doc/img
+Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
 *** Variables ***
 ${IMAGE_DIR} 	${CURDIR}/img
@@ -71,9 +71,9 @@ Make rfswarm Active
 	Run Keyword And Ignore Error	Click Plan
 
 Click Run Tab
-	Wait Until Screen Contain 	manager_${platform}_run_tab.png 	10
-	@{coordinates}= 	Get Screen Coordinates		manager_${platform}_run_tab.png
-	Click		manager_${platform}_run_tab.png
+	Wait For 	manager_${platform}_run_tab.png 	 timeout=10
+	@{coordinates}= 	Locate		manager_${platform}_run_tab.png
+	Click Image		manager_${platform}_run_tab.png
 	Take A Screenshot
 
 
