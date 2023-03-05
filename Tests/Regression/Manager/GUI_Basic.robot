@@ -5,7 +5,7 @@ Library 	Process
 Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
 *** Variables ***
-${IMAGE_DIR} 	${CURDIR}/img
+${IMAGE_DIR} 	${CURDIR}/Images
 ${pyfile}			${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
 
 *** Test Cases ***
@@ -47,7 +47,7 @@ Select Run Tab
 
 *** Keywords ***
 Click Run Tab
-	Wait For 	manager_${platform}_run_tab.png 	 timeout=10
-	@{coordinates}= 	Locate		manager_${platform}_run_tab.png
-	Click Image		manager_${platform}_run_tab.png
+	Wait For 	Run Tab 	 timeout=10
+	@{coordinates}= 	Locate		Run Tab
+	Click Image		Run Tab
 	Take A Screenshot

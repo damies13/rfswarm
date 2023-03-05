@@ -5,7 +5,7 @@ Library 	Process
 Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
 *** Variables ***
-${IMAGE_DIR} 	${CURDIR}/img
+${IMAGE_DIR} 	${CURDIR}/Images
 ${pyfile}			${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
 
 *** Test Cases ***
