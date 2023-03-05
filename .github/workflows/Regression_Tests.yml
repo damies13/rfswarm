@@ -69,7 +69,7 @@ jobs:
           echo "git add"
           git add Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}/
           echo "git commit"
-          git commit -m "${{ matrix.platform }} ${{ matrix.python }}"
+          git commit -m "Manager ${{ matrix.platform }} ${{ matrix.python }}"
       - name: Switch back to original branch
         if: always()
         run: |
@@ -81,7 +81,7 @@ jobs:
         if: always()
         run: |
           echo "git merge"
-          git merge --ff Test-Result-${{ matrix.platform }}-${{ matrix.python }}
+          git merge --ff Test-Result-Manager-${{ matrix.platform }}-${{ matrix.python }}
           echo "git pull again"
           git pull --ff --autostash
           echo "git push"
@@ -99,6 +99,48 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
+      - name: "Ubuntu Installs"
+        if: ${{ matrix.platform == 'ubuntu-latest' }}
+        run: |
+          sudo apt install python3-tk python3-dev python3-xlib scrot fluxbox
+          sudo apt list --installed
+      - name: "Ubuntu Xvfb"
+        if: ${{ matrix.platform == 'ubuntu-latest' }}
+        run: |
+          export DISPLAY=:13.0
+          Xvfb :13 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+          # xauth with complain unless ~/.Xauthority exists
+          touch ~/.Xauthority
+          # To view a listing of the .Xauthority file, enter the following
+          xauth list
+          # fluxbox
+          fluxbox &
       - run: pip install -r Tests/Regression/Reporter/pip_requirements.txt
       - name: Robot Framework
-        run: robot --include ${{ matrix.platform }} Tests/Regression/Reporter
+        run: robot --include ${{ matrix.platform }} --outputdir Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }} Tests/Regression/Reporter
+        env:
+          DISPLAY: :13.0
+      - name: git commit
+        if: always()
+        run: |
+          # Stage the file, commit and push
+          echo "git add"
+          git add Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/
+          echo "git commit"
+          git commit -m "Reporter ${{ matrix.platform }} ${{ matrix.python }}"
+      - name: Switch back to original branch
+        if: always()
+        run: |
+          echo "git checkout ref_name: ${{ github.ref_name }}"
+          git checkout -f ${{ github.ref_name }}
+          echo "git pull"
+          git pull --ff --autostash -f
+      - name: Merge test results into original branch
+        if: always()
+        run: |
+          echo "git merge"
+          git merge --ff Test-Result-Reporter-${{ matrix.platform }}-${{ matrix.python }}
+          echo "git pull again"
+          git pull --ff --autostash
+          echo "git push"
+          git push
