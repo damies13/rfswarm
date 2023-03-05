@@ -12,6 +12,7 @@ ${pyfile}			${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
 GUI Runs and Closes
 	[Tags]	macos-latest
 	Set Suite Variable    ${platform}    macos
+	Set Confidence		0.9
 	Start Process 	python3 	${pyfile} 	-g 	5    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Sleep 	60
 	Set Screenshot Folder 	${OUTPUT DIR}
@@ -20,6 +21,7 @@ GUI Runs and Closes
 GUI Runs and Closes
 	[Tags]	windows-latest
 	Set Suite Variable    ${platform}    windows
+	Set Confidence		0.9
 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Sleep 	60
 	# Capture Screen
@@ -30,6 +32,7 @@ GUI Runs and Closes
 GUI Runs and Closes
 	[Tags]	ubuntu-latest
 	Set Suite Variable    ${platform}    ubuntu
+	Set Confidence		0.9
 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Sleep 	60
 	# Capture Screen
