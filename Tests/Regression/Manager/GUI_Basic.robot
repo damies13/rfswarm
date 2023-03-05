@@ -24,11 +24,7 @@ GUI Runs and Closes
 	Set Confidence		0.9
 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Sleep 	60
-	# Capture Screen
 	Set Screenshot Folder 	${OUTPUT DIR}
-	Take A Screenshot
-	Wait For 	Title Bar
-	Click Image 	Title Bar
 	Take A Screenshot
 
 	Press Combination 	x 	Key.ctrl
@@ -42,12 +38,8 @@ GUI Runs and Closes
 	Set Confidence		0.9
 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Sleep 	60
-	# Capture Screen
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
-	# Wait For 	Title Bar
-	# Click Image 	Title Bar
-	# Take A Screenshot
 
 Select Run Tab
 	[Tags]	ubuntu-latest		windows-latest		macos-latest
