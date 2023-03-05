@@ -10,11 +10,12 @@ Library 	Process
 Library	ImageHorizonLibrary	reference_folder=${CURDIR}/../../Screenshots-doc/img
 
 *** Variables ***
-${IMAGE_DIR} 	${CURDIR}/../../Screenshots-doc/img
+${IMAGE_DIR} 	${CURDIR}/img
 
 *** Test Cases ***
 GUI Runs and Closes
 	[Tags]	macos-latest
+	Set Suite Variable    ${platform}    macos
 	Start Process 	python3 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py 	-g 	5    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Sleep 	60
 	Set Screenshot Folder 	${OUTPUT DIR}
@@ -27,6 +28,7 @@ GUI Runs and Closes
 
 GUI Runs and Closes
 	[Tags]	windows-latest
+	Set Suite Variable    ${platform}    windows
 	Start Process 	python3 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Sleep 	60
 	# Capture Screen
@@ -36,11 +38,16 @@ GUI Runs and Closes
 
 GUI Runs and Closes
 	[Tags]	ubuntu-latest
+	Set Suite Variable    ${platform}    ubuntu
 	Start Process 	python3 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Sleep 	60
 	# Capture Screen
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
+
+Select Run Tab
+	[Tags]	ubuntu-latest		windows-latest		macos-latest
+	Click Run Tab
 
 *** Keywords ***
 # Sikili Setup
@@ -62,6 +69,13 @@ GUI Runs and Closes
 Make rfswarm Active
 	Click 	rfwasrm_mac_title_bg.png
 	Run Keyword And Ignore Error	Click Plan
+
+Click Run Tab
+	Wait Until Screen Contain 	manager_${platform}_run_tab.png 	10
+	@{coordinates}= 	Get Screen Coordinates		manager_${platform}_run_tab.png
+	Click		manager_${platform}_run_tab.png
+	Take A Screenshot
+
 
 Click Plan
 	Click	rfwasrm_mac_Plan.png
