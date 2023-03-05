@@ -1,6 +1,8 @@
 *** Settings ***
 Library 	OperatingSystem
 
+Suite Setup			Clean Up Old Files
+
 *** Test Cases ***
 Random Offset
 	[Documentation] 	This just prevents all the test runners doing git push at the same time
@@ -19,3 +21,14 @@ Reporter Help
 	${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -h
 	Log to console 	${\n}${result}
 	Should Contain	${result}	Excel
+
+
+
+	*** Keywords ***
+	Clean Up Old Files
+		[Tags]	ubuntu-latest 	macos-latest 	windows-latest
+		# cleanup previous output
+		Log To Console    ${OUTPUT DIR}
+		Remove File    ${OUTPUT DIR}${/}*.txt
+		Remove File    ${OUTPUT DIR}${/}*.png
+		# Remove File    ${OUTPUT DIR}${/}sikuli_captured${/}*.*
