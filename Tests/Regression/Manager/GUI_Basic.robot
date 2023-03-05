@@ -26,6 +26,13 @@ GUI Runs and Closes
 	# Capture Screen
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
+	Wait For 	Title Bar
+	Click Image 	Title Bar
+	Take A Screenshot
+
+	Press Combination 	x 	Key.ctrl
+	${result}= 	Wait For Process 	Manager
+	Should Be Equal As Integers 	${result.rc} 	0
 
 
 GUI Runs and Closes
@@ -36,6 +43,9 @@ GUI Runs and Closes
 	# Capture Screen
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
+	# Wait For 	Title Bar
+	# Click Image 	Title Bar
+	# Take A Screenshot
 
 Select Run Tab
 	[Tags]	ubuntu-latest		windows-latest		macos-latest

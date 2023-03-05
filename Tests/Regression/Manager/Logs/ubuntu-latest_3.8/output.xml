@@ -147,6 +147,30 @@ python3 /home/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py</msg>
 <msg timestamp="20230305 11:36:23.425" level="INFO" html="true">Screenshot taken: /home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.8/Manager.GUIBasic-screenshot-1.png&lt;br/&gt;&lt;img src="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.8/Manager.GUIBasic-screenshot-1.png" width="100%" /&gt;</msg>
 <status status="PASS" starttime="20230305 11:36:23.424" endtime="20230305 11:36:23.546"/>
 </kw>
+<kw name="Press Combination" library="ImageHorizonLibrary">
+<arg>x</arg>
+<arg>Key.ctrl</arg>
+<doc>Press given keyboard keys.</doc>
+<status status="PASS" starttime="20220308 11:25:09.649" endtime="20220308 11:25:09.757"/>
+</kw>
+<kw name="Wait For Process" library="Process">
+<var>${result}</var>
+<arg>Manager</arg>
+<doc>Waits for the process to complete or to reach the given timeout.</doc>
+<msg timestamp="20220308 11:25:09.758" level="INFO">Waiting for process to complete.</msg>
+<msg timestamp="20220308 11:25:10.990" level="INFO">Process completed.</msg>
+<msg timestamp="20220308 11:25:10.990" level="INFO">${result} = &lt;result object with rc 0&gt;</msg>
+<status status="PASS" starttime="20220308 11:25:09.757" endtime="20220308 11:25:10.990"/>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<arg>${result.rc}</arg>
+<arg>0</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<msg timestamp="20220308 11:25:10.991" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" starttime="20220308 11:25:10.990" endtime="20220308 11:25:10.991"/>
+</kw>
 <tag>ubuntu-latest</tag>
 <status status="PASS" starttime="20230305 11:35:23.416" endtime="20230305 11:36:23.547"/>
 </test>

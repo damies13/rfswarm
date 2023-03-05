@@ -83,7 +83,7 @@ jobs:
           echo "git merge"
           git merge --ff Test-Result-Manager-${{ matrix.platform }}-${{ matrix.python }}
           echo "git pull again"
-          git pull --ff --autostash
+          git pull --ff --autostash -f
           echo "git push"
           git push
   Reporter:
