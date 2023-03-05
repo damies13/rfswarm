@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 6.0.2 (Python 3.9.16 on darwin)" generated="20230305 09:58:45.177" rpa="false" schemaversion="3">
+<robot generator="Robot 6.0.2 (Python 3.9.16 on darwin)" generated="20230305 10:18:18.723" rpa="false" schemaversion="3">
 <suite id="s1" name="Manager" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager">
 <suite id="s1-s1" name="CommandLine" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/CommandLine.robot">
 <kw name="Clean Up Old Files" type="SETUP">
@@ -9,187 +9,203 @@
 <kw name="Log To Console" library="BuiltIn">
 <arg>${OUTPUT DIR}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20230305 09:58:45.223" endtime="20230305 09:58:45.224"/>
+<status status="PASS" starttime="20230305 10:18:18.814" endtime="20230305 10:18:18.815"/>
 </kw>
 <kw name="Remove File" library="OperatingSystem">
 <arg>${OUTPUT DIR}${/}*.txt</arg>
 <doc>Removes a file with the given path.</doc>
-<msg timestamp="20230305 09:58:45.224" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/stdout.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/stdout.txt&lt;/a&gt;'.</msg>
-<msg timestamp="20230305 09:58:45.225" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/stderr.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/stderr.txt&lt;/a&gt;'.</msg>
-<status status="PASS" starttime="20230305 09:58:45.224" endtime="20230305 09:58:45.225"/>
+<msg timestamp="20230305 10:18:18.816" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/stdout.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/stdout.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230305 10:18:18.816" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/stderr.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/stderr.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230305 10:18:18.815" endtime="20230305 10:18:18.816"/>
 </kw>
 <kw name="Remove File" library="OperatingSystem">
 <arg>${OUTPUT DIR}${/}*.png</arg>
 <doc>Removes a file with the given path.</doc>
-<msg timestamp="20230305 09:58:45.225" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/Manager.GUIBasic-screenshot-1.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/Manager.GUIBasic-screenshot-1.png&lt;/a&gt;'.</msg>
-<status status="PASS" starttime="20230305 09:58:45.225" endtime="20230305 09:58:45.226"/>
+<msg timestamp="20230305 10:18:18.817" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/Manager.GUIBasic-screenshot-1.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/Manager.GUIBasic-screenshot-1.png&lt;/a&gt;'.</msg>
+<msg timestamp="20230305 10:18:18.818" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/Manager.GUIBasic-screenshot-2.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/Manager.GUIBasic-screenshot-2.png&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230305 10:18:18.816" endtime="20230305 10:18:18.818"/>
 </kw>
-<status status="PASS" starttime="20230305 09:58:45.223" endtime="20230305 09:58:45.226"/>
+<status status="PASS" starttime="20230305 10:18:18.814" endtime="20230305 10:18:18.818"/>
 </kw>
 <test id="s1-s1-t1" name="Random Offset" line="7">
 <kw name="Evaluate" library="BuiltIn">
 <var>${random}</var>
 <arg>random.randint(0, 60)</arg>
 <doc>Evaluates the given expression in Python and returns the result.</doc>
-<msg timestamp="20230305 09:58:45.227" level="INFO">${random} = 19</msg>
-<status status="PASS" starttime="20230305 09:58:45.226" endtime="20230305 09:58:45.227"/>
+<msg timestamp="20230305 10:18:18.825" level="INFO">${random} = 50</msg>
+<status status="PASS" starttime="20230305 10:18:18.824" endtime="20230305 10:18:18.825"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>${random}</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<msg timestamp="20230305 09:59:04.254" level="INFO">Slept 19 seconds</msg>
-<status status="PASS" starttime="20230305 09:58:45.227" endtime="20230305 09:59:04.254"/>
+<msg timestamp="20230305 10:19:08.841" level="INFO">Slept 50 seconds</msg>
+<status status="PASS" starttime="20230305 10:18:18.825" endtime="20230305 10:19:08.841"/>
 </kw>
 <doc>This just prevents all the test runners doing git push at the same time</doc>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20230305 09:58:45.226" endtime="20230305 09:59:04.254"/>
+<status status="PASS" starttime="20230305 10:18:18.818" endtime="20230305 10:19:08.841"/>
 </test>
 <test id="s1-s1-t2" name="Manager Version" line="13">
 <kw name="Run" library="OperatingSystem">
 <var>${result}</var>
 <arg>python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -v</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<msg timestamp="20230305 09:59:04.261" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -v 2&gt;&amp;1'.</msg>
-<msg timestamp="20230305 09:59:15.865" level="INFO">${result} = Robot Framework Swarm: Manager 
+<msg timestamp="20230305 10:19:08.850" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -v 2&gt;&amp;1'.</msg>
+<msg timestamp="20230305 10:19:21.678" level="INFO">${result} = Robot Framework Swarm: Manager 
 	Version 1.1.0 </msg>
-<status status="PASS" starttime="20230305 09:59:04.255" endtime="20230305 09:59:15.865"/>
+<status status="PASS" starttime="20230305 10:19:08.842" endtime="20230305 10:19:21.678"/>
 </kw>
 <kw name="Log To Console" library="BuiltIn">
 <arg>${\n}${result}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20230305 09:59:15.866" endtime="20230305 09:59:15.866"/>
+<status status="PASS" starttime="20230305 10:19:21.679" endtime="20230305 10:19:21.679"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Version</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20230305 09:59:15.866" endtime="20230305 09:59:15.867"/>
+<status status="PASS" starttime="20230305 10:19:21.680" endtime="20230305 10:19:21.680"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Manager</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20230305 09:59:15.867" endtime="20230305 09:59:15.867"/>
+<status status="PASS" starttime="20230305 10:19:21.680" endtime="20230305 10:19:21.680"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20230305 09:59:04.254" endtime="20230305 09:59:15.867"/>
+<status status="PASS" starttime="20230305 10:19:08.842" endtime="20230305 10:19:21.681"/>
 </test>
 <test id="s1-s1-t3" name="Manager Help" line="20">
 <kw name="Run" library="OperatingSystem">
 <var>${result}</var>
 <arg>python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -h</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<msg timestamp="20230305 09:59:15.873" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -h 2&gt;&amp;1'.</msg>
-<msg timestamp="20230305 09:59:16.770" level="INFO">${result} = Robot Framework Swarm: Manager 
+<msg timestamp="20230305 10:19:21.685" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -h 2&gt;&amp;1'.</msg>
+<msg timestamp="20230305 10:19:22.678" level="INFO">${result} = Robot Framework Swarm: Manager 
 	Version 1.1.0 
 usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
                   [-n] [-t STARTTIME] [-d DIR] [-e IPADDRESS] [-p PORT]
 
 ...</msg>
-<status status="PASS" starttime="20230305 09:59:15.868" endtime="20230305 09:59:16.770"/>
+<status status="PASS" starttime="20230305 10:19:21.682" endtime="20230305 10:19:22.678"/>
 </kw>
 <kw name="Log To Console" library="BuiltIn">
 <arg>${\n}${result}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20230305 09:59:16.770" endtime="20230305 09:59:16.771"/>
+<status status="PASS" starttime="20230305 10:19:22.679" endtime="20230305 10:19:22.680"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>IPADDRESS</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20230305 09:59:16.771" endtime="20230305 09:59:16.771"/>
+<status status="PASS" starttime="20230305 10:19:22.680" endtime="20230305 10:19:22.680"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20230305 09:59:15.868" endtime="20230305 09:59:16.771"/>
+<status status="PASS" starttime="20230305 10:19:21.681" endtime="20230305 10:19:22.681"/>
 </test>
-<status status="PASS" starttime="20230305 09:58:45.208" endtime="20230305 09:59:16.772"/>
+<status status="PASS" starttime="20230305 10:18:18.777" endtime="20230305 10:19:22.682"/>
 </suite>
 <suite id="s1-s2" name="GUI Basic" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/GUI_Basic.robot">
-<test id="s1-s2-t1" name="GUI Runs and Closes" line="16">
+<test id="s1-s2-t1" name="GUI Runs and Closes" line="17">
 <kw name="Set Suite Variable" library="BuiltIn">
 <arg>${platform}</arg>
 <arg>macos</arg>
 <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
-<msg timestamp="20230305 09:59:19.306" level="INFO">${platform} = macos</msg>
-<status status="PASS" starttime="20230305 09:59:19.305" endtime="20230305 09:59:19.306"/>
+<msg timestamp="20230305 10:19:25.198" level="INFO">${platform} = macos</msg>
+<status status="PASS" starttime="20230305 10:19:25.196" endtime="20230305 10:19:25.198"/>
+</kw>
+<kw name="Set Confidence" library="ImageHorizonLibrary">
+<arg>0.8</arg>
+<doc>Sets the accuracy when finding images.</doc>
+<status status="PASS" starttime="20230305 10:19:25.198" endtime="20230305 10:19:25.198"/>
 </kw>
 <kw name="Start Process" library="Process">
 <arg>python3</arg>
-<arg>${EXECDIR}${/}rfswarm_manager${/}rfswarm.py</arg>
+<arg>${pyfile}</arg>
 <arg>-g</arg>
 <arg>5</arg>
 <arg>alias=Manager</arg>
 <arg>stdout=${OUTPUT DIR}${/}stdout.txt</arg>
 <arg>stderr=${OUTPUT DIR}${/}stderr.txt</arg>
 <doc>Starts a new process on background.</doc>
-<msg timestamp="20230305 09:59:19.308" level="INFO">Starting process:
+<msg timestamp="20230305 10:19:25.200" level="INFO">Starting process:
 python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -g 5</msg>
-<status status="PASS" starttime="20230305 09:59:19.307" endtime="20230305 09:59:19.314"/>
+<status status="PASS" starttime="20230305 10:19:25.198" endtime="20230305 10:19:25.207"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>60</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<msg timestamp="20230305 10:00:19.357" level="INFO">Slept 1 minute</msg>
-<status status="PASS" starttime="20230305 09:59:19.314" endtime="20230305 10:00:19.357"/>
+<msg timestamp="20230305 10:20:25.243" level="INFO">Slept 1 minute</msg>
+<status status="PASS" starttime="20230305 10:19:25.207" endtime="20230305 10:20:25.243"/>
 </kw>
 <kw name="Set Screenshot Folder" library="ImageHorizonLibrary">
 <arg>${OUTPUT DIR}</arg>
 <doc>Sets the folder where screenshots are saved to.</doc>
-<status status="PASS" starttime="20230305 10:00:19.357" endtime="20230305 10:00:19.358"/>
+<status status="PASS" starttime="20230305 10:20:25.243" endtime="20230305 10:20:25.244"/>
 </kw>
 <kw name="Take A Screenshot" library="ImageHorizonLibrary">
 <doc>Takes a screenshot of the screen.</doc>
-<msg timestamp="20230305 10:00:19.359" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/Manager.GUIBasic-screenshot-1.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/Manager.GUIBasic-screenshot-1.png" width="100%" /&gt;</msg>
-<status status="PASS" starttime="20230305 10:00:19.358" endtime="20230305 10:00:19.739"/>
+<msg timestamp="20230305 10:20:25.245" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/Manager.GUIBasic-screenshot-1.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/Manager.GUIBasic-screenshot-1.png" width="100%" /&gt;</msg>
+<status status="PASS" starttime="20230305 10:20:25.244" endtime="20230305 10:20:25.613"/>
 </kw>
 <tag>macos-latest</tag>
-<status status="PASS" starttime="20230305 09:59:19.304" endtime="20230305 10:00:19.740"/>
+<status status="PASS" starttime="20230305 10:19:25.195" endtime="20230305 10:20:25.614"/>
 </test>
-<test id="s1-s2-t2" name="Select Run Tab" line="48">
+<test id="s1-s2-t2" name="Select Run Tab" line="50">
 <kw name="Click Run Tab">
 <kw name="Wait For" library="ImageHorizonLibrary">
 <arg>manager_${platform}_run_tab.png</arg>
 <arg>timeout=10</arg>
 <doc>Tries to locate given image from the screen for given time.</doc>
+<msg timestamp="20230305 10:20:25.617" level="WARN">Can't set confidence because you don't have OpenCV (python-opencv) installed or a confidence level was not given.</msg>
+<msg timestamp="20230305 10:20:26.717" level="WARN">Can't set confidence because you don't have OpenCV (python-opencv) installed or a confidence level was not given.</msg>
+<msg timestamp="20230305 10:20:27.809" level="WARN">Can't set confidence because you don't have OpenCV (python-opencv) installed or a confidence level was not given.</msg>
+<msg timestamp="20230305 10:20:28.896" level="WARN">Can't set confidence because you don't have OpenCV (python-opencv) installed or a confidence level was not given.</msg>
+<msg timestamp="20230305 10:20:29.984" level="WARN">Can't set confidence because you don't have OpenCV (python-opencv) installed or a confidence level was not given.</msg>
+<msg timestamp="20230305 10:20:31.073" level="WARN">Can't set confidence because you don't have OpenCV (python-opencv) installed or a confidence level was not given.</msg>
+<msg timestamp="20230305 10:20:32.166" level="WARN">Can't set confidence because you don't have OpenCV (python-opencv) installed or a confidence level was not given.</msg>
+<msg timestamp="20230305 10:20:33.263" level="WARN">Can't set confidence because you don't have OpenCV (python-opencv) installed or a confidence level was not given.</msg>
+<msg timestamp="20230305 10:20:34.354" level="WARN">Can't set confidence because you don't have OpenCV (python-opencv) installed or a confidence level was not given.</msg>
+<msg timestamp="20230305 10:20:35.446" level="WARN">Can't set confidence because you don't have OpenCV (python-opencv) installed or a confidence level was not given.</msg>
 <kw name="Take A Screenshot" library="ImageHorizonLibrary">
 <doc>Takes a screenshot of the screen.</doc>
-<msg timestamp="20230305 10:00:29.992" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/Manager.GUIBasic-screenshot-2.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/Manager.GUIBasic-screenshot-2.png" width="100%" /&gt;</msg>
-<status status="PASS" starttime="20230305 10:00:29.991" endtime="20230305 10:00:30.276"/>
+<msg timestamp="20230305 10:20:36.543" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/Manager.GUIBasic-screenshot-2.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/Manager.GUIBasic-screenshot-2.png" width="100%" /&gt;</msg>
+<status status="PASS" starttime="20230305 10:20:36.542" endtime="20230305 10:20:36.863"/>
 </kw>
-<msg timestamp="20230305 10:00:30.277" level="FAIL">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/img/manager_macos_run_tab.png" was not found on screen</msg>
-<status status="FAIL" starttime="20230305 10:00:19.742" endtime="20230305 10:00:30.278"/>
+<msg timestamp="20230305 10:20:36.864" level="FAIL">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/img/manager_macos_run_tab.png" was not found on screen</msg>
+<status status="FAIL" starttime="20230305 10:20:25.616" endtime="20230305 10:20:36.865"/>
 </kw>
 <kw name="Locate" library="ImageHorizonLibrary">
 <var>@{coordinates}</var>
 <arg>manager_${platform}_run_tab.png</arg>
 <doc>Locate image on screen.</doc>
-<status status="NOT RUN" starttime="20230305 10:00:30.278" endtime="20230305 10:00:30.278"/>
+<status status="NOT RUN" starttime="20230305 10:20:36.866" endtime="20230305 10:20:36.866"/>
 </kw>
 <kw name="Click Image" library="ImageHorizonLibrary">
 <arg>manager_${platform}_run_tab.png</arg>
 <doc>Finds the reference image on screen and clicks it once.</doc>
-<status status="NOT RUN" starttime="20230305 10:00:30.278" endtime="20230305 10:00:30.278"/>
+<status status="NOT RUN" starttime="20230305 10:20:36.866" endtime="20230305 10:20:36.866"/>
 </kw>
 <kw name="Take A Screenshot" library="ImageHorizonLibrary">
 <doc>Takes a screenshot of the screen.</doc>
-<status status="NOT RUN" starttime="20230305 10:00:30.279" endtime="20230305 10:00:30.279"/>
+<status status="NOT RUN" starttime="20230305 10:20:36.866" endtime="20230305 10:20:36.866"/>
 </kw>
-<status status="FAIL" starttime="20230305 10:00:19.741" endtime="20230305 10:00:30.279"/>
+<status status="FAIL" starttime="20230305 10:20:25.615" endtime="20230305 10:20:36.867"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="FAIL" starttime="20230305 10:00:19.740" endtime="20230305 10:00:30.279">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/img/manager_macos_run_tab.png" was not found on screen</status>
+<status status="FAIL" starttime="20230305 10:20:25.615" endtime="20230305 10:20:36.867">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/img/manager_macos_run_tab.png" was not found on screen</status>
 </test>
-<status status="FAIL" starttime="20230305 09:59:16.774" endtime="20230305 10:00:30.280"/>
+<status status="FAIL" starttime="20230305 10:19:22.683" endtime="20230305 10:20:36.868"/>
 </suite>
-<status status="FAIL" starttime="20230305 09:58:45.179" endtime="20230305 10:00:30.281"/>
+<status status="FAIL" starttime="20230305 10:18:18.725" endtime="20230305 10:20:36.870"/>
 </suite>
 <statistics>
 <total>
@@ -207,5 +223,15 @@ python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -g 5</msg>
 </suite>
 </statistics>
 <errors>
+<msg timestamp="20230305 10:20:25.617" level="WARN">Can't set confidence because you don't have OpenCV (python-opencv) installed or a confidence level was not given.</msg>
+<msg timestamp="20230305 10:20:26.717" level="WARN">Can't set confidence because you don't have OpenCV (python-opencv) installed or a confidence level was not given.</msg>
+<msg timestamp="20230305 10:20:27.809" level="WARN">Can't set confidence because you don't have OpenCV (python-opencv) installed or a confidence level was not given.</msg>
+<msg timestamp="20230305 10:20:28.896" level="WARN">Can't set confidence because you don't have OpenCV (python-opencv) installed or a confidence level was not given.</msg>
+<msg timestamp="20230305 10:20:29.984" level="WARN">Can't set confidence because you don't have OpenCV (python-opencv) installed or a confidence level was not given.</msg>
+<msg timestamp="20230305 10:20:31.073" level="WARN">Can't set confidence because you don't have OpenCV (python-opencv) installed or a confidence level was not given.</msg>
+<msg timestamp="20230305 10:20:32.166" level="WARN">Can't set confidence because you don't have OpenCV (python-opencv) installed or a confidence level was not given.</msg>
+<msg timestamp="20230305 10:20:33.263" level="WARN">Can't set confidence because you don't have OpenCV (python-opencv) installed or a confidence level was not given.</msg>
+<msg timestamp="20230305 10:20:34.354" level="WARN">Can't set confidence because you don't have OpenCV (python-opencv) installed or a confidence level was not given.</msg>
+<msg timestamp="20230305 10:20:35.446" level="WARN">Can't set confidence because you don't have OpenCV (python-opencv) installed or a confidence level was not given.</msg>
 </errors>
 </robot>
