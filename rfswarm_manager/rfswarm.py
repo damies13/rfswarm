@@ -2735,8 +2735,6 @@ class RFSwarmCore:
 				if "Test" not in grp.keys() or len(grp["Test"]) < 1:
 					warnings.append("Index {} has no Test".format(grp["Index"]))
 
-
-
 		# warnings.append("Debuging : Don't Run")
 		return warnings
 
