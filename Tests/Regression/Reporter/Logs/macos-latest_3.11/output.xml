@@ -1,27 +1,95 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 6.0.2 (Python 3.11.2 on darwin)" generated="20230306 08:58:33.566" rpa="false" schemaversion="3">
+<robot generator="Robot 6.0.2 (Python 3.11.2 on darwin)" generated="20230306 09:40:10.500" rpa="false" schemaversion="3">
 <suite id="s1" name="Reporter" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter">
 <suite id="s1-s1" name="CommandLine" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/CommandLine.robot">
 <kw name="Clean Up Old Files" type="SETUP">
-<msg timestamp="20230306 08:58:33.609" level="FAIL">No keyword with name 'Clean Up Old Files' found.</msg>
-<status status="FAIL" starttime="20230306 08:58:33.609" endtime="20230306 08:58:33.609"/>
+<tag>macos-latest</tag>
+<tag>ubuntu-latest</tag>
+<tag>windows-latest</tag>
+<kw name="Log To Console" library="BuiltIn">
+<arg>${OUTPUT DIR}</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" starttime="20230306 09:40:10.534" endtime="20230306 09:40:10.535"/>
+</kw>
+<kw name="Remove File" library="OperatingSystem">
+<arg>${OUTPUT DIR}${/}*.txt</arg>
+<doc>Removes a file with the given path.</doc>
+<msg timestamp="20230306 09:40:10.536" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/stdout.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/stdout.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230306 09:40:10.536" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/stderr.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/stderr.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230306 09:40:10.535" endtime="20230306 09:40:10.536"/>
+</kw>
+<kw name="Remove File" library="OperatingSystem">
+<arg>${OUTPUT DIR}${/}*.png</arg>
+<doc>Removes a file with the given path.</doc>
+<msg timestamp="20230306 09:40:10.537" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/Reporter.GUIBasic-screenshot-1.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/Reporter.GUIBasic-screenshot-1.png&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230306 09:40:10.536" endtime="20230306 09:40:10.537"/>
+</kw>
+<status status="PASS" starttime="20230306 09:40:10.534" endtime="20230306 09:40:10.537"/>
 </kw>
 <test id="s1-s1-t1" name="Reporter Version" line="12">
+<kw name="Run" library="OperatingSystem">
+<var>${result}</var>
+<arg>python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -v</arg>
+<doc>Runs the given command in the system and returns the output.</doc>
+<msg timestamp="20230306 09:40:10.543" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -v 2&gt;&amp;1'.</msg>
+<msg timestamp="20230306 09:40:20.371" level="INFO">${result} = Robot Framework Swarm: Reporter 
+	Version 1.1.0 </msg>
+<status status="PASS" starttime="20230306 09:40:10.537" endtime="20230306 09:40:20.371"/>
+</kw>
+<kw name="Log To Console" library="BuiltIn">
+<arg>${\n}${result}</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" starttime="20230306 09:40:20.371" endtime="20230306 09:40:20.372"/>
+</kw>
+<kw name="Should Contain" library="BuiltIn">
+<arg>${result}</arg>
+<arg>Version</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" starttime="20230306 09:40:20.372" endtime="20230306 09:40:20.372"/>
+</kw>
+<kw name="Should Contain" library="BuiltIn">
+<arg>${result}</arg>
+<arg>Reporter</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" starttime="20230306 09:40:20.372" endtime="20230306 09:40:20.373"/>
+</kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="FAIL" starttime="20230306 08:58:33.609" endtime="20230306 08:58:33.610">Parent suite setup failed:
-No keyword with name 'Clean Up Old Files' found.</status>
+<status status="PASS" starttime="20230306 09:40:10.537" endtime="20230306 09:40:20.373"/>
 </test>
 <test id="s1-s1-t2" name="Reporter Help" line="19">
+<kw name="Run" library="OperatingSystem">
+<var>${result}</var>
+<arg>python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -h</arg>
+<doc>Runs the given command in the system and returns the output.</doc>
+<msg timestamp="20230306 09:40:20.378" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -h 2&gt;&amp;1'.</msg>
+<msg timestamp="20230306 09:40:21.379" level="INFO">${result} = Robot Framework Swarm: Reporter 
+	Version 1.1.0 
+usage: rfswarm_reporter.py [-h] [-g DEBUG] [-v] [-i INI] [-n] [-d DIR]
+                           [-t TEMPLATE] [--html] [--docx] [--xlsx]
+
+options:
+  ...</msg>
+<status status="PASS" starttime="20230306 09:40:20.374" endtime="20230306 09:40:21.379"/>
+</kw>
+<kw name="Log To Console" library="BuiltIn">
+<arg>${\n}${result}</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" starttime="20230306 09:40:21.379" endtime="20230306 09:40:21.379"/>
+</kw>
+<kw name="Should Contain" library="BuiltIn">
+<arg>${result}</arg>
+<arg>Excel</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" starttime="20230306 09:40:21.380" endtime="20230306 09:40:21.380"/>
+</kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="FAIL" starttime="20230306 08:58:33.610" endtime="20230306 08:58:33.611">Parent suite setup failed:
-No keyword with name 'Clean Up Old Files' found.</status>
+<status status="PASS" starttime="20230306 09:40:20.373" endtime="20230306 09:40:21.380"/>
 </test>
-<status status="FAIL" starttime="20230306 08:58:33.596" endtime="20230306 08:58:33.611">Suite setup failed:
-No keyword with name 'Clean Up Old Files' found.</status>
+<status status="PASS" starttime="20230306 09:40:10.525" endtime="20230306 09:40:21.381"/>
 </suite>
 <suite id="s1-s2" name="GUI Basic" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot">
 <test id="s1-s2-t1" name="GUI Runs and Closes" line="12">
@@ -29,13 +97,13 @@ No keyword with name 'Clean Up Old Files' found.</status>
 <arg>${platform}</arg>
 <arg>macos</arg>
 <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
-<msg timestamp="20230306 08:58:48.319" level="INFO">${platform} = macos</msg>
-<status status="PASS" starttime="20230306 08:58:48.318" endtime="20230306 08:58:48.319"/>
+<msg timestamp="20230306 09:40:26.529" level="INFO">${platform} = macos</msg>
+<status status="PASS" starttime="20230306 09:40:26.528" endtime="20230306 09:40:26.529"/>
 </kw>
 <kw name="Set Confidence" library="ImageHorizonLibrary">
 <arg>0.9</arg>
 <doc>Sets the accuracy when finding images.</doc>
-<status status="PASS" starttime="20230306 08:58:48.319" endtime="20230306 08:58:48.320"/>
+<status status="PASS" starttime="20230306 09:40:26.529" endtime="20230306 09:40:26.530"/>
 </kw>
 <kw name="Start Process" library="Process">
 <arg>python3</arg>
@@ -46,49 +114,48 @@ No keyword with name 'Clean Up Old Files' found.</status>
 <arg>stdout=${OUTPUT DIR}${/}stdout.txt</arg>
 <arg>stderr=${OUTPUT DIR}${/}stderr.txt</arg>
 <doc>Starts a new process on background.</doc>
-<msg timestamp="20230306 08:58:48.321" level="INFO">Starting process:
+<msg timestamp="20230306 09:40:26.531" level="INFO">Starting process:
 python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -g 5</msg>
-<status status="PASS" starttime="20230306 08:58:48.320" endtime="20230306 08:58:48.328"/>
+<status status="PASS" starttime="20230306 09:40:26.530" endtime="20230306 09:40:26.537"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>60</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<msg timestamp="20230306 08:59:48.376" level="INFO">Slept 1 minute</msg>
-<status status="PASS" starttime="20230306 08:58:48.329" endtime="20230306 08:59:48.376"/>
+<msg timestamp="20230306 09:41:26.538" level="INFO">Slept 1 minute</msg>
+<status status="PASS" starttime="20230306 09:40:26.537" endtime="20230306 09:41:26.538"/>
 </kw>
 <kw name="Set Screenshot Folder" library="ImageHorizonLibrary">
 <arg>${OUTPUT DIR}</arg>
 <doc>Sets the folder where screenshots are saved to.</doc>
-<status status="PASS" starttime="20230306 08:59:48.376" endtime="20230306 08:59:48.377"/>
+<status status="PASS" starttime="20230306 09:41:26.538" endtime="20230306 09:41:26.539"/>
 </kw>
 <kw name="Take A Screenshot" library="ImageHorizonLibrary">
 <doc>Takes a screenshot of the screen.</doc>
-<msg timestamp="20230306 08:59:48.378" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/Reporter.GUIBasic-screenshot-1.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/Reporter.GUIBasic-screenshot-1.png" width="100%" /&gt;</msg>
-<status status="PASS" starttime="20230306 08:59:48.377" endtime="20230306 08:59:48.862"/>
+<msg timestamp="20230306 09:41:26.539" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/Reporter.GUIBasic-screenshot-1.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/Reporter.GUIBasic-screenshot-1.png" width="100%" /&gt;</msg>
+<status status="PASS" starttime="20230306 09:41:26.539" endtime="20230306 09:41:26.836"/>
 </kw>
 <tag>macos-latest</tag>
-<status status="PASS" starttime="20230306 08:58:48.317" endtime="20230306 08:59:48.863"/>
+<status status="PASS" starttime="20230306 09:40:26.528" endtime="20230306 09:41:26.836"/>
 </test>
-<status status="PASS" starttime="20230306 08:58:33.612" endtime="20230306 08:59:48.864"/>
+<status status="PASS" starttime="20230306 09:40:21.382" endtime="20230306 09:41:26.837"/>
 </suite>
-<status status="FAIL" starttime="20230306 08:58:33.568" endtime="20230306 08:59:48.865"/>
+<status status="PASS" starttime="20230306 09:40:10.502" endtime="20230306 09:41:26.838"/>
 </suite>
 <statistics>
 <total>
-<stat pass="1" fail="2" skip="0">All Tests</stat>
+<stat pass="3" fail="0" skip="0">All Tests</stat>
 </total>
 <tag>
-<stat pass="1" fail="2" skip="0">macos-latest</stat>
-<stat pass="0" fail="2" skip="0">ubuntu-latest</stat>
-<stat pass="0" fail="2" skip="0">windows-latest</stat>
+<stat pass="3" fail="0" skip="0">macos-latest</stat>
+<stat pass="2" fail="0" skip="0">ubuntu-latest</stat>
+<stat pass="2" fail="0" skip="0">windows-latest</stat>
 </tag>
 <suite>
-<stat pass="1" fail="2" skip="0" id="s1" name="Reporter">Reporter</stat>
-<stat pass="0" fail="2" skip="0" id="s1-s1" name="CommandLine">Reporter.CommandLine</stat>
+<stat pass="3" fail="0" skip="0" id="s1" name="Reporter">Reporter</stat>
+<stat pass="2" fail="0" skip="0" id="s1-s1" name="CommandLine">Reporter.CommandLine</stat>
 <stat pass="1" fail="0" skip="0" id="s1-s2" name="GUI Basic">Reporter.GUI Basic</stat>
 </suite>
 </statistics>
 <errors>
-<msg timestamp="20230306 08:58:33.558" level="ERROR">Error in file '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/CommandLine.robot' on line 29: Setting 'Tags' is allowed only once. Only the first value is used.</msg>
 </errors>
 </robot>
