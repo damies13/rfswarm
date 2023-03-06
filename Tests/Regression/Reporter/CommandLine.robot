@@ -24,8 +24,8 @@ Reporter Help
 
 
 
-	*** Keywords ***
-	Clean Up Old Files
+*** Keywords ***
+Clean Up Old Files
 		[Tags]	ubuntu-latest 	macos-latest 	windows-latest
 		# cleanup previous output
 		Log To Console    ${OUTPUT DIR}
