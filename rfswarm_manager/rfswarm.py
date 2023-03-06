@@ -2632,6 +2632,18 @@ class RFSwarmCore:
 		base.MetricIDs = {}
 
 		base.robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}}
+
+		warnings = self.Pre_Run_Checks()
+		if warnings.length > 1:
+			# report warnings and stop test from running
+			base.run_abort = False
+			base.run_end = int(time.time()) - 1
+			base.run_finish = int(time.time()) - 1
+
+			for warning in warnings:
+				base.debugmsg(0, warning)
+
+
 		sec2st = base.run_starttime - int(time.time())
 		if sec2st < 1:
 			starttime = int(time.time())
@@ -2689,6 +2701,11 @@ class RFSwarmCore:
 
 					base.save_metrics("Run_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['Run'])
 					base.save_metrics(grp['Index'], "Scenario_Run", starttime, grp['Test'], grp['Run'])
+
+	def Pre_Run_Checks(self, _event=None):
+		warnings = []
+
+		return warnings
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -5206,6 +5223,15 @@ class RFSwarmGUI(tk.Frame):
 		self.display_run['start_time'].set("  --:--:--  ")
 		self.display_run['elapsed_time'].set("  --:--:--  ")
 		self.display_run['finish_time'].set("  --:--:--  ")
+
+		warnings = core.Pre_Run_Checks()
+		if warnings.length > 1:
+			# report warnings with warning dialogue and stop test from running
+			base.run_abort = False
+			base.run_end = int(time.time()) - 1
+			base.run_finish = int(time.time()) - 1
+
+
 		base.debugmsg(6, "Test Started:	", int(time.time()), "[", datetime.now().isoformat(sep=' ', timespec='seconds'), "]")
 
 		self.elements["Run"]["btn_stop"]["image"] = self.icoStop
