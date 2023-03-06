@@ -2634,7 +2634,7 @@ class RFSwarmCore:
 		base.robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}}
 
 		warnings = self.Pre_Run_Checks()
-		if warnings.length > 1:
+		if len(warnings) > 0:
 			# report warnings and stop test from running
 			base.run_abort = False
 			base.run_end = int(time.time()) - 1
@@ -2643,6 +2643,7 @@ class RFSwarmCore:
 			for warning in warnings:
 				base.debugmsg(0, warning)
 
+			return 0
 
 		sec2st = base.run_starttime - int(time.time())
 		if sec2st < 1:
@@ -2705,6 +2706,38 @@ class RFSwarmCore:
 	def Pre_Run_Checks(self, _event=None):
 		warnings = []
 
+		# good
+		# grp {'Index': 1, 'Robots': 2, 'Delay': 0, 'RampUp': 45, 'Run': 60, 'Test': 'RFSwarm Demo Test', 'TestVar': <tkinter.StringVar object at 0x7f6a4b911ea0>, 'Script': '/home/dave/Documents/Github/rfswarm/Tests/Demo/rfswarm_demo.robot', 'ScriptHash': '03ad3be39fcfd8f37dfe1db445192728'}
+		# bad
+		# grp {'Index': 1, 'Robots': 10, 'Delay': 0, 'RampUp': 1800, 'Run': 7200, 'Test': '', 'TestVar': <tkinter.StringVar object at 0x7f7fe07dfe50>}
+
+		base.debugmsg(5, "scriptlist:", base.scriptlist)
+		for grp in base.scriptlist:
+			base.debugmsg(5, "grp", grp)
+			if "Index" in grp.keys():
+				if "Robots" not in grp.keys() or grp["Robots"] < 1:
+					warnings.append("Index {} has no Robots".format(grp["Index"]))
+
+				# RampUp	< 10
+				if "RampUp" not in grp.keys() or grp["RampUp"] < 10:
+					warnings.append("Index {} Ramp Up is < 10 sec.".format(grp["Index"]))
+
+				if "Run" not in grp.keys() or grp["Run"] < 10:
+					warnings.append("Index {} Run is < 10 sec.".format(grp["Index"]))
+
+				if "Script" not in grp.keys() or len(grp["Script"]) < 1:
+					warnings.append("Index {} has no Script".format(grp["Index"]))
+				else:
+					# ScriptHash
+					if "ScriptHash" not in grp.keys() or len(grp["ScriptHash"]) < 1:
+						warnings.append("Index {} Agents don't have Script yet".format(grp["Index"]))
+
+				if "Test" not in grp.keys() or len(grp["Test"]) < 1:
+					warnings.append("Index {} has no Test".format(grp["Index"]))
+
+
+
+		# warnings.append("Debuging : Don't Run")
 		return warnings
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -5225,12 +5258,20 @@ class RFSwarmGUI(tk.Frame):
 		self.display_run['finish_time'].set("  --:--:--  ")
 
 		warnings = core.Pre_Run_Checks()
-		if warnings.length > 1:
+		if len(warnings) > 0:
 			# report warnings with warning dialogue and stop test from running
 			base.run_abort = False
 			base.run_end = int(time.time()) - 1
 			base.run_finish = int(time.time()) - 1
 
+			warningmsg = ""
+			for warning in warnings:
+				base.debugmsg(0, warning)
+				warningmsg += warning + "\n"
+
+			tkm.showwarning("RFSwarm - Warning", warningmsg)
+
+			return 0
 
 		base.debugmsg(6, "Test Started:	", int(time.time()), "[", datetime.now().isoformat(sep=' ', timespec='seconds'), "]")
 
