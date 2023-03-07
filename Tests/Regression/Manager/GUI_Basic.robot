@@ -49,7 +49,8 @@ Close GUI
 	Press Combination 	Key.esc
 	Press Combination 	x 	Key.ctrl
 	${result}= 	Wait For Process 	${process} 	timeout=60
-	IF 	${result} is not None
+	# IF 	${result} is not None
+	IF 	'rc' in ${result}
 		Should Be Equal As Integers 	${result.rc} 	0
 	ELSE
 		Take A Screenshot
@@ -62,7 +63,8 @@ Close GUI
 	# Press Combination 	Key.esc
 	Press Combination 	q 	Key.command
 	${result}= 	Wait For Process 	${process} 	timeout=60
-	IF 	${result} is not None
+	# IF 	${result} is not None
+	IF 	'rc' in ${result}
 		Should Be Equal As Integers 	${result.rc} 	0
 	ELSE
 		Take A Screenshot
