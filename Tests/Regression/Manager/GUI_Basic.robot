@@ -16,7 +16,7 @@ Open GUI
 	Set Confidence		0.9
 	${process}= 	Start Process 	python3 	${pyfile} 	-g 	5    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Set Test Variable 	$process 	${process}
-	Sleep 	60
+	Sleep 	10
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
 
@@ -26,7 +26,7 @@ Open GUI
 	Set Confidence		0.9
 	${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Set Test Variable 	$process 	${process}
-	Sleep 	60
+	Sleep 	10
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
 
@@ -50,8 +50,8 @@ Close GUI
 	Press Combination 	Key.esc
 	Press Combination 	x 	Key.ctrl
 	${result}= 	Wait For Process 	${process} 	timeout=60
-	# IF 	${result} is not None
-	IF 	'rc' in ${result}
+	${running}= 	Is Process Running 	${process}
+	IF 	not ${running}
 		Should Be Equal As Integers 	${result.rc} 	0
 	ELSE
 		Take A Screenshot
@@ -64,8 +64,8 @@ Close GUI
 	# Press Combination 	Key.esc
 	Press Combination 	q 	Key.command
 	${result}= 	Wait For Process 	${process} 	timeout=60
-	# IF 	${result} is not None
-	IF 	'rc' in ${result}
+	${running}= 	Is Process Running 	${process}
+	IF 	not ${running}
 		Should Be Equal As Integers 	${result.rc} 	0
 	ELSE
 		Take A Screenshot
