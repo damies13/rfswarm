@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 6.0.2 (Python 3.11.2 on linux)" generated="20230306 09:37:55.804" rpa="false" schemaversion="3">
+<robot generator="Robot 6.0.2 (Python 3.11.2 on linux)" generated="20230307 07:17:22.684" rpa="false" schemaversion="3">
 <suite id="s1" name="Manager" source="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager">
 <suite id="s1-s1" name="CommandLine" source="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/CommandLine.robot">
 <kw name="Clean Up Old Files" type="SETUP">
@@ -9,224 +9,268 @@
 <kw name="Log To Console" library="BuiltIn">
 <arg>${OUTPUT DIR}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20230306 09:37:55.832" endtime="20230306 09:37:55.832"/>
+<status status="PASS" starttime="20230307 07:17:22.708" endtime="20230307 07:17:22.709"/>
 </kw>
 <kw name="Remove File" library="OperatingSystem">
 <arg>${OUTPUT DIR}${/}*.txt</arg>
 <doc>Removes a file with the given path.</doc>
-<msg timestamp="20230306 09:37:55.833" level="INFO" html="true">Removed file '&lt;a href="file:///home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/stdout.txt"&gt;/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/stdout.txt&lt;/a&gt;'.</msg>
-<msg timestamp="20230306 09:37:55.833" level="INFO" html="true">Removed file '&lt;a href="file:///home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/stderr.txt"&gt;/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/stderr.txt&lt;/a&gt;'.</msg>
-<status status="PASS" starttime="20230306 09:37:55.833" endtime="20230306 09:37:55.833"/>
+<msg timestamp="20230307 07:17:22.709" level="INFO" html="true">Removed file '&lt;a href="file:///home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/stdout.txt"&gt;/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/stdout.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230307 07:17:22.709" level="INFO" html="true">Removed file '&lt;a href="file:///home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/stderr.txt"&gt;/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/stderr.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230307 07:17:22.709" endtime="20230307 07:17:22.709"/>
 </kw>
 <kw name="Remove File" library="OperatingSystem">
 <arg>${OUTPUT DIR}${/}*.png</arg>
 <doc>Removes a file with the given path.</doc>
-<msg timestamp="20230306 09:37:55.834" level="INFO" html="true">Removed file '&lt;a href="file:///home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/Manager.GUIBasic-screenshot-2.png"&gt;/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/Manager.GUIBasic-screenshot-2.png&lt;/a&gt;'.</msg>
-<msg timestamp="20230306 09:37:55.834" level="INFO" html="true">Removed file '&lt;a href="file:///home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/Manager.GUIBasic-screenshot-1.png"&gt;/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/Manager.GUIBasic-screenshot-1.png&lt;/a&gt;'.</msg>
-<status status="PASS" starttime="20230306 09:37:55.833" endtime="20230306 09:37:55.834"/>
+<msg timestamp="20230307 07:17:22.710" level="INFO" html="true">Removed file '&lt;a href="file:///home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/Manager.GUIBasic-screenshot-2.png"&gt;/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/Manager.GUIBasic-screenshot-2.png&lt;/a&gt;'.</msg>
+<msg timestamp="20230307 07:17:22.710" level="INFO" html="true">Removed file '&lt;a href="file:///home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/Manager.GUIBasic-screenshot-1.png"&gt;/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/Manager.GUIBasic-screenshot-1.png&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230307 07:17:22.709" endtime="20230307 07:17:22.710"/>
 </kw>
-<status status="PASS" starttime="20230306 09:37:55.832" endtime="20230306 09:37:55.834"/>
+<status status="PASS" starttime="20230307 07:17:22.708" endtime="20230307 07:17:22.710"/>
 </kw>
 <test id="s1-s1-t1" name="Random Offset" line="7">
 <kw name="Evaluate" library="BuiltIn">
 <var>${random}</var>
 <arg>random.randint(0, 60)</arg>
 <doc>Evaluates the given expression in Python and returns the result.</doc>
-<msg timestamp="20230306 09:37:55.835" level="INFO">${random} = 2</msg>
-<status status="PASS" starttime="20230306 09:37:55.835" endtime="20230306 09:37:55.835"/>
+<msg timestamp="20230307 07:17:22.710" level="INFO">${random} = 4</msg>
+<status status="PASS" starttime="20230307 07:17:22.710" endtime="20230307 07:17:22.711"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>${random}</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<msg timestamp="20230306 09:37:57.835" level="INFO">Slept 2 seconds</msg>
-<status status="PASS" starttime="20230306 09:37:55.835" endtime="20230306 09:37:57.836"/>
+<msg timestamp="20230307 07:17:26.711" level="INFO">Slept 4 seconds</msg>
+<status status="PASS" starttime="20230307 07:17:22.711" endtime="20230307 07:17:26.711"/>
 </kw>
 <doc>This just prevents all the test runners doing git push at the same time</doc>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20230306 09:37:55.834" endtime="20230306 09:37:57.836"/>
+<status status="PASS" starttime="20230307 07:17:22.710" endtime="20230307 07:17:26.711"/>
 </test>
 <test id="s1-s1-t2" name="Manager Version" line="13">
 <kw name="Run" library="OperatingSystem">
 <var>${result}</var>
 <arg>python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -v</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<msg timestamp="20230306 09:37:57.839" level="INFO">Running command 'python3 /home/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -v 2&gt;&amp;1'.</msg>
-<msg timestamp="20230306 09:38:02.141" level="INFO">${result} = Robot Framework Swarm: Manager 
+<msg timestamp="20230307 07:17:26.714" level="INFO">Running command 'python3 /home/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -v 2&gt;&amp;1'.</msg>
+<msg timestamp="20230307 07:17:28.425" level="INFO">${result} = Robot Framework Swarm: Manager 
 	Version 1.1.0 </msg>
-<status status="PASS" starttime="20230306 09:37:57.837" endtime="20230306 09:38:02.141"/>
+<status status="PASS" starttime="20230307 07:17:26.712" endtime="20230307 07:17:28.425"/>
 </kw>
 <kw name="Log To Console" library="BuiltIn">
 <arg>${\n}${result}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20230306 09:38:02.142" endtime="20230306 09:38:02.142"/>
+<status status="PASS" starttime="20230307 07:17:28.425" endtime="20230307 07:17:28.425"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Version</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20230306 09:38:02.142" endtime="20230306 09:38:02.142"/>
+<status status="PASS" starttime="20230307 07:17:28.426" endtime="20230307 07:17:28.426"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Manager</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20230306 09:38:02.142" endtime="20230306 09:38:02.143"/>
+<status status="PASS" starttime="20230307 07:17:28.426" endtime="20230307 07:17:28.426"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20230306 09:37:57.836" endtime="20230306 09:38:02.143"/>
+<status status="PASS" starttime="20230307 07:17:26.712" endtime="20230307 07:17:28.426"/>
 </test>
 <test id="s1-s1-t3" name="Manager Help" line="20">
 <kw name="Run" library="OperatingSystem">
 <var>${result}</var>
 <arg>python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -h</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<msg timestamp="20230306 09:38:02.144" level="INFO">Running command 'python3 /home/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -h 2&gt;&amp;1'.</msg>
-<msg timestamp="20230306 09:38:02.928" level="INFO">${result} = Robot Framework Swarm: Manager 
+<msg timestamp="20230307 07:17:28.427" level="INFO">Running command 'python3 /home/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -h 2&gt;&amp;1'.</msg>
+<msg timestamp="20230307 07:17:29.033" level="INFO">${result} = Robot Framework Swarm: Manager 
 	Version 1.1.0 
 usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
                   [-n] [-t STARTTIME] [-d DIR] [-e IPADDRESS] [-p PORT]
 
 ...</msg>
-<status status="PASS" starttime="20230306 09:38:02.143" endtime="20230306 09:38:02.928"/>
+<status status="PASS" starttime="20230307 07:17:28.426" endtime="20230307 07:17:29.033"/>
 </kw>
 <kw name="Log To Console" library="BuiltIn">
 <arg>${\n}${result}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20230306 09:38:02.928" endtime="20230306 09:38:02.928"/>
+<status status="PASS" starttime="20230307 07:17:29.033" endtime="20230307 07:17:29.033"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>IPADDRESS</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20230306 09:38:02.928" endtime="20230306 09:38:02.929"/>
+<status status="PASS" starttime="20230307 07:17:29.033" endtime="20230307 07:17:29.034"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20230306 09:38:02.143" endtime="20230306 09:38:02.929"/>
+<status status="PASS" starttime="20230307 07:17:28.426" endtime="20230307 07:17:29.034"/>
 </test>
-<status status="PASS" starttime="20230306 09:37:55.824" endtime="20230306 09:38:02.929"/>
+<status status="PASS" starttime="20230307 07:17:22.701" endtime="20230307 07:17:29.034"/>
 </suite>
 <suite id="s1-s2" name="GUI Basic" source="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/GUI_Basic.robot">
-<test id="s1-s2-t1" name="Open GUI" line="30">
+<test id="s1-s2-t1" name="Open GUI" line="33">
 <kw name="Set Suite Variable" library="BuiltIn">
 <arg>${platform}</arg>
 <arg>ubuntu</arg>
 <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
-<msg timestamp="20230306 09:38:03.139" level="INFO">${platform} = ubuntu</msg>
-<status status="PASS" starttime="20230306 09:38:03.138" endtime="20230306 09:38:03.139"/>
+<msg timestamp="20230307 07:17:29.189" level="INFO">${platform} = ubuntu</msg>
+<status status="PASS" starttime="20230307 07:17:29.189" endtime="20230307 07:17:29.189"/>
 </kw>
 <kw name="Set Confidence" library="ImageHorizonLibrary">
 <arg>0.9</arg>
 <doc>Sets the accuracy when finding images.</doc>
-<status status="PASS" starttime="20230306 09:38:03.139" endtime="20230306 09:38:03.139"/>
+<status status="PASS" starttime="20230307 07:17:29.190" endtime="20230307 07:17:29.190"/>
 </kw>
 <kw name="Start Process" library="Process">
+<var>${process}</var>
 <arg>python3</arg>
 <arg>${pyfile}</arg>
 <arg>alias=Manager</arg>
 <arg>stdout=${OUTPUT DIR}${/}stdout.txt</arg>
 <arg>stderr=${OUTPUT DIR}${/}stderr.txt</arg>
 <doc>Starts a new process on background.</doc>
-<msg timestamp="20230306 09:38:03.140" level="INFO">Starting process:
+<msg timestamp="20230307 07:17:29.190" level="INFO">Starting process:
 python3 /home/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py</msg>
-<status status="PASS" starttime="20230306 09:38:03.139" endtime="20230306 09:38:03.145"/>
+<msg timestamp="20230307 07:17:29.194" level="INFO">${process} = &lt;Popen: returncode: None args: ['python3', '/home/runner/work/rfswarm/rfswar...&gt;</msg>
+<status status="PASS" starttime="20230307 07:17:29.190" endtime="20230307 07:17:29.194"/>
+</kw>
+<kw name="Set Test Variable" library="BuiltIn">
+<arg>$process</arg>
+<arg>${process}</arg>
+<doc>Makes a variable available everywhere within the scope of the current test.</doc>
+<msg timestamp="20230307 07:17:29.195" level="INFO">${process} = &lt;Popen: returncode: None args: ['python3', '/home/runner/work/rfswarm/rfswar...&gt;</msg>
+<status status="PASS" starttime="20230307 07:17:29.194" endtime="20230307 07:17:29.195"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>60</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<msg timestamp="20230306 09:39:03.146" level="INFO">Slept 1 minute</msg>
-<status status="PASS" starttime="20230306 09:38:03.145" endtime="20230306 09:39:03.146"/>
+<msg timestamp="20230307 07:18:29.195" level="INFO">Slept 1 minute</msg>
+<status status="PASS" starttime="20230307 07:17:29.195" endtime="20230307 07:18:29.195"/>
 </kw>
 <kw name="Set Screenshot Folder" library="ImageHorizonLibrary">
 <arg>${OUTPUT DIR}</arg>
 <doc>Sets the folder where screenshots are saved to.</doc>
-<status status="PASS" starttime="20230306 09:39:03.146" endtime="20230306 09:39:03.147"/>
+<status status="PASS" starttime="20230307 07:18:29.196" endtime="20230307 07:18:29.196"/>
 </kw>
 <kw name="Take A Screenshot" library="ImageHorizonLibrary">
 <doc>Takes a screenshot of the screen.</doc>
-<msg timestamp="20230306 09:39:03.147" level="INFO" html="true">Screenshot taken: /home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/Manager.GUIBasic-screenshot-1.png&lt;br/&gt;&lt;img src="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/Manager.GUIBasic-screenshot-1.png" width="100%" /&gt;</msg>
-<status status="PASS" starttime="20230306 09:39:03.147" endtime="20230306 09:39:03.314"/>
+<msg timestamp="20230307 07:18:29.196" level="INFO" html="true">Screenshot taken: /home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/Manager.GUIBasic-screenshot-1.png&lt;br/&gt;&lt;img src="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/Manager.GUIBasic-screenshot-1.png" width="100%" /&gt;</msg>
+<status status="PASS" starttime="20230307 07:18:29.196" endtime="20230307 07:18:29.330"/>
 </kw>
 <tag>ubuntu-latest</tag>
-<status status="PASS" starttime="20230306 09:38:03.138" endtime="20230306 09:39:03.314"/>
+<status status="PASS" starttime="20230307 07:17:29.188" endtime="20230307 07:18:29.330"/>
 </test>
-<test id="s1-s2-t2" name="Select Run Tab" line="39">
+<test id="s1-s2-t2" name="Select Run Tab" line="43">
 <kw name="Click Run Tab">
 <kw name="Set Variable" library="BuiltIn">
 <var>${img}</var>
 <arg>manager_${platform}_run_tab.png</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230306 09:39:03.316" level="INFO">${img} = manager_ubuntu_run_tab.png</msg>
-<status status="PASS" starttime="20230306 09:39:03.315" endtime="20230306 09:39:03.316"/>
+<msg timestamp="20230307 07:18:29.331" level="INFO">${img} = manager_ubuntu_run_tab.png</msg>
+<status status="PASS" starttime="20230307 07:18:29.331" endtime="20230307 07:18:29.331"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230306 09:39:03.316" level="INFO">/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
-<status status="PASS" starttime="20230306 09:39:03.316" endtime="20230306 09:39:03.316"/>
+<msg timestamp="20230307 07:18:29.331" level="INFO">/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
+<status status="PASS" starttime="20230307 07:18:29.331" endtime="20230307 07:18:29.331"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>${IMAGE_DIR}</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230306 09:39:03.316" level="INFO">/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
-<status status="PASS" starttime="20230306 09:39:03.316" endtime="20230306 09:39:03.316"/>
+<msg timestamp="20230307 07:18:29.332" level="INFO">/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
+<status status="PASS" starttime="20230307 07:18:29.331" endtime="20230307 07:18:29.332"/>
 </kw>
 <kw name="Wait For" library="ImageHorizonLibrary">
 <arg>${img}</arg>
 <arg>timeout=10</arg>
 <doc>Tries to locate given image from the screen for given time.</doc>
-<msg timestamp="20230306 09:39:03.676" level="INFO">Image "manager_ubuntu_run_tab.png" found at (67, 72)</msg>
-<status status="PASS" starttime="20230306 09:39:03.316" endtime="20230306 09:39:03.676"/>
+<msg timestamp="20230307 07:18:29.598" level="INFO">Image "manager_ubuntu_run_tab.png" found at (67, 72)</msg>
+<status status="PASS" starttime="20230307 07:18:29.332" endtime="20230307 07:18:29.598"/>
 </kw>
 <kw name="Locate" library="ImageHorizonLibrary">
 <var>@{coordinates}</var>
 <arg>${img}</arg>
 <doc>Locate image on screen.</doc>
-<msg timestamp="20230306 09:39:04.026" level="INFO">Image "/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_ubuntu_run_tab.png" found at Box(left=52, top=51, width=31, height=42)</msg>
-<msg timestamp="20230306 09:39:04.026" level="INFO">@{coordinates} = [ 67 | 72 ]</msg>
-<status status="PASS" starttime="20230306 09:39:03.677" endtime="20230306 09:39:04.026"/>
+<msg timestamp="20230307 07:18:29.847" level="INFO">Image "/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_ubuntu_run_tab.png" found at Box(left=52, top=51, width=31, height=42)</msg>
+<msg timestamp="20230307 07:18:29.847" level="INFO">@{coordinates} = [ 67 | 72 ]</msg>
+<status status="PASS" starttime="20230307 07:18:29.598" endtime="20230307 07:18:29.847"/>
 </kw>
 <kw name="Click Image" library="ImageHorizonLibrary">
 <arg>${img}</arg>
 <doc>Finds the reference image on screen and clicks it once.</doc>
-<msg timestamp="20230306 09:39:04.400" level="INFO">Image "/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_ubuntu_run_tab.png" found at Box(left=52, top=51, width=31, height=42)</msg>
-<msg timestamp="20230306 09:39:04.400" level="INFO">Clicking image "manager_ubuntu_run_tab.png" in position (67, 72)</msg>
-<status status="PASS" starttime="20230306 09:39:04.026" endtime="20230306 09:39:04.504"/>
+<msg timestamp="20230307 07:18:30.117" level="INFO">Image "/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_ubuntu_run_tab.png" found at Box(left=52, top=51, width=31, height=42)</msg>
+<msg timestamp="20230307 07:18:30.118" level="INFO">Clicking image "manager_ubuntu_run_tab.png" in position (67, 72)</msg>
+<status status="PASS" starttime="20230307 07:18:29.848" endtime="20230307 07:18:30.221"/>
 </kw>
 <kw name="Take A Screenshot" library="ImageHorizonLibrary">
 <doc>Takes a screenshot of the screen.</doc>
-<msg timestamp="20230306 09:39:04.505" level="INFO" html="true">Screenshot taken: /home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/Manager.GUIBasic-screenshot-2.png&lt;br/&gt;&lt;img src="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/Manager.GUIBasic-screenshot-2.png" width="100%" /&gt;</msg>
-<status status="PASS" starttime="20230306 09:39:04.504" endtime="20230306 09:39:04.651"/>
+<msg timestamp="20230307 07:18:30.221" level="INFO" html="true">Screenshot taken: /home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/Manager.GUIBasic-screenshot-2.png&lt;br/&gt;&lt;img src="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/ubuntu-latest_3.11/Manager.GUIBasic-screenshot-2.png" width="100%" /&gt;</msg>
+<status status="PASS" starttime="20230307 07:18:30.221" endtime="20230307 07:18:30.332"/>
 </kw>
-<status status="PASS" starttime="20230306 09:39:03.315" endtime="20230306 09:39:04.651"/>
+<status status="PASS" starttime="20230307 07:18:29.331" endtime="20230307 07:18:30.333"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20230306 09:39:03.315" endtime="20230306 09:39:04.651"/>
+<status status="PASS" starttime="20230307 07:18:29.330" endtime="20230307 07:18:30.333"/>
 </test>
-<status status="PASS" starttime="20230306 09:38:02.930" endtime="20230306 09:39:04.652"/>
+<test id="s1-s2-t3" name="Close GUI" line="47">
+<kw name="Press Combination" library="ImageHorizonLibrary">
+<arg>Key.esc</arg>
+<doc>Press given keyboard keys.</doc>
+<status status="PASS" starttime="20230307 07:18:30.334" endtime="20230307 07:18:30.437"/>
+</kw>
+<kw name="Press Combination" library="ImageHorizonLibrary">
+<arg>x</arg>
+<arg>Key.ctrl</arg>
+<doc>Press given keyboard keys.</doc>
+<status status="PASS" starttime="20230307 07:18:30.437" endtime="20230307 07:18:30.541"/>
+</kw>
+<kw name="Wait For Process" library="Process">
+<var>${result}</var>
+<arg>${process}</arg>
+<arg>timeout=60</arg>
+<doc>Waits for the process to complete or to reach the given timeout.</doc>
+<msg timestamp="20230307 07:18:30.541" level="INFO">Waiting for process to complete.</msg>
+<msg timestamp="20230307 07:18:32.043" level="INFO">Process completed.</msg>
+<msg timestamp="20230307 07:18:32.043" level="INFO">${result} = &lt;result object with rc 0&gt;</msg>
+<status status="PASS" starttime="20230307 07:18:30.541" endtime="20230307 07:18:32.043"/>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<arg>${result.rc}</arg>
+<arg>0</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<msg timestamp="20230307 07:18:32.044" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<status status="PASS" starttime="20230307 07:18:32.044" endtime="20230307 07:18:32.044"/>
+</kw>
+<tag>ubuntu-latest</tag>
+<tag>windows-latest</tag>
+<status status="PASS" starttime="20230307 07:18:30.333" endtime="20230307 07:18:32.044"/>
+</test>
+<status status="PASS" starttime="20230307 07:17:29.035" endtime="20230307 07:18:32.045"/>
 </suite>
-<status status="PASS" starttime="20230306 09:37:55.805" endtime="20230306 09:39:04.653"/>
+<status status="PASS" starttime="20230307 07:17:22.685" endtime="20230307 07:18:32.046"/>
 </suite>
 <statistics>
 <total>
-<stat pass="5" fail="0" skip="0">All Tests</stat>
+<stat pass="6" fail="0" skip="0">All Tests</stat>
 </total>
 <tag>
 <stat pass="4" fail="0" skip="0">macos-latest</stat>
-<stat pass="5" fail="0" skip="0">ubuntu-latest</stat>
-<stat pass="4" fail="0" skip="0">windows-latest</stat>
+<stat pass="6" fail="0" skip="0">ubuntu-latest</stat>
+<stat pass="5" fail="0" skip="0">windows-latest</stat>
 </tag>
 <suite>
-<stat pass="5" fail="0" skip="0" id="s1" name="Manager">Manager</stat>
+<stat pass="6" fail="0" skip="0" id="s1" name="Manager">Manager</stat>
 <stat pass="3" fail="0" skip="0" id="s1-s1" name="CommandLine">Manager.CommandLine</stat>
-<stat pass="2" fail="0" skip="0" id="s1-s2" name="GUI Basic">Manager.GUI Basic</stat>
+<stat pass="3" fail="0" skip="0" id="s1-s2" name="GUI Basic">Manager.GUI Basic</stat>
 </suite>
 </statistics>
 <errors>
