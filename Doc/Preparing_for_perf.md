@@ -189,7 +189,8 @@ Would have a timing measured by default, this would be reported in the Manager a
 
 >	#### :warning: Warning :warning:
 > It's recommended not to use `Set Log Level    Trace` in your test cases as doing so will change your result names or make the, not show at all. It's also likely to slow things down and alter your test results, so it's recommended to keep the usage of trace for only when you are debugging scripts.
-> Fixes applied as part of [Issue #119](/damies13/rfswarm/issues/119) did help to reduce this issue it's can't be resolved completely.
+>
+> Fixes applied as part of [Issue #119](https://github.com/damies13/rfswarm/issues/119) did help to reduce this issue it's can't be resolved completely.
 
 
 ### Browser
