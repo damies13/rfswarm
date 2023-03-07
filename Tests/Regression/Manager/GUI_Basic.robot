@@ -7,13 +7,15 @@ Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 *** Variables ***
 ${IMAGE_DIR} 	${CURDIR}/Images/file_method
 ${pyfile}			${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
+${process}		None
 
 *** Test Cases ***
 Open GUI
 	[Tags]	macos-latest
 	Set Suite Variable    ${platform}    macos
 	Set Confidence		0.9
-	Start Process 	python3 	${pyfile} 	-g 	5    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	${process}= 	Start Process 	python3 	${pyfile} 	-g 	5    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	Set Test Variable 	$process 	${process}
 	Sleep 	60
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
@@ -22,7 +24,8 @@ Open GUI
 	[Tags]	windows-latest
 	Set Suite Variable    ${platform}    windows
 	Set Confidence		0.9
-	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	Set Test Variable 	$process 	${process}
 	Sleep 	60
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
@@ -31,7 +34,8 @@ Open GUI
 	[Tags]	ubuntu-latest
 	Set Suite Variable    ${platform}    ubuntu
 	Set Confidence		0.9
-	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	Set Test Variable 	$process 	${process}
 	Sleep 	60
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
@@ -41,10 +45,19 @@ Select Run Tab
 	Click Run Tab
 
 Close GUI
-	[Tags]	windows-latest
+	[Tags]	windows-latest		ubuntu-latest
+	Press Combination 	Key.esc
 	Press Combination 	x 	Key.ctrl
-	${result}= 	Wait For Process 	Manager
+	${result}= 	Wait For Process 	${process} 	timeout=60
 	Should Be Equal As Integers 	${result.rc} 	0
+
+Close GUI
+	[Tags]	macos-latest
+	# Press Combination 	Key.esc
+	Press Combination 	q 	Key.command
+	${result}= 	Wait For Process 	${process} 	timeout=60
+	Should Be Equal As Integers 	${result.rc} 	0
+
 
 
 *** Keywords ***
