@@ -64,6 +64,7 @@ Close GUI
 	# Press Combination 	Key.esc
 	# Press Combination 	q 	Key.command
 	Click Image		manager_${platform}_menu_python3.png
+	Click Image		manager_${platform}_button_closewindow.png
 	Take A Screenshot
 	${result}= 	Wait For Process 	${process} 	timeout=60
 	${running}= 	Is Process Running 	${process}
