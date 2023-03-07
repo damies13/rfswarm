@@ -62,7 +62,9 @@ Close GUI
 Close GUI
 	[Tags]	macos-latest
 	# Press Combination 	Key.esc
-	Press Combination 	q 	Key.command
+	# Press Combination 	q 	Key.command
+	Click 	manager_${platform}_menu_python3.png
+	Take A Screenshot
 	${result}= 	Wait For Process 	${process} 	timeout=60
 	${running}= 	Is Process Running 	${process}
 	IF 	not ${running}
@@ -77,7 +79,7 @@ Close GUI
 *** Keywords ***
 Click Run Tab
 
-	${img}=	Set Variable		manager_${platform}_run_tab.png
+	${img}=	Set Variable		manager_${platform}_tab_run.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=10
