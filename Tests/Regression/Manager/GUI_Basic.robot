@@ -36,13 +36,14 @@ Open GUI
 	Set Confidence		0.9
 	${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Set Test Variable 	$process 	${process}
-	Sleep 	60
+	Sleep 	10
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
 
 Select Run Tab
 	[Tags]	ubuntu-latest		windows-latest		macos-latest
 	Click Run Tab
+	Sleep 	5
 
 Close GUI
 	[Tags]	windows-latest		ubuntu-latest
@@ -82,4 +83,5 @@ Click Run Tab
 	Wait For 	${img} 	 timeout=10
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
+	Sleep 	0.1
 	Take A Screenshot
