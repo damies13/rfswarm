@@ -1340,8 +1340,9 @@ class RFSwarmAgent():
 		fd.append("			ResultName = self.msg['message']")
 		fd.append("		elif 'doc' in attrs and len(attrs['doc'])>0:")
 		fd.append("			ResultName = attrs['doc']")
-		fd.append("		elif '${' not in name:")
-		fd.append("			ResultName = name")
+		# Quiet Keyword -> https://github.com/damies13/rfswarm/blob/master/Doc/Preparing_for_perf.md#keywords
+		# fd.append("		elif '${' not in name:")
+		# fd.append("			ResultName = name")
 		fd.append("		self.debugmsg(3, 'ResultName: ', ResultName, '	:', len(ResultName))")
 		fd.append("		")
 		fd.append("		if len(ResultName)>0:")
