@@ -1,6 +1,7 @@
 *** Settings ***
 Library 	OperatingSystem
 Library 	Process
+Library 	String
 
 Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
@@ -42,7 +43,22 @@ Open GUI
 
 Select Run Tab
 	[Tags]	ubuntu-latest		windows-latest		macos-latest
-	Click Run Tab
+	Click Tab 	 Run
+	Sleep 	5
+
+Select Agents Tab
+	[Tags]	ubuntu-latest		windows-latest		macos-latest
+	Click Tab 	 Agents
+	Sleep 	5
+
+Select About Tab
+	[Tags]	ubuntu-latest		windows-latest		macos-latest
+	Click Tab 	 About
+	Sleep 	5
+
+Select Plan Tab
+	[Tags]	ubuntu-latest		windows-latest		macos-latest
+	Click Tab 	 Plan
 	Sleep 	5
 
 Close GUI
@@ -78,9 +94,10 @@ Close GUI
 
 
 *** Keywords ***
-Click Run Tab
-
-	${img}=	Set Variable		manager_${platform}_tab_run.png
+Click Tab
+	[Arguments]		${tabname}
+	${tabnamel}= 	Convert To Lower Case 	${tabname}
+	${img}=	Set Variable		manager_${platform}_tab_${tabnamel}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=10
