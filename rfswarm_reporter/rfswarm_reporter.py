@@ -1989,6 +1989,8 @@ class ReporterCore:
 			for msg in mesage:
 				msglst.append(msg)
 			msgout = " ".join(msglst)
+			while base.gui is None:
+				time.sleep(0.5)
 			base.gui.updateStatus(msgout)
 		else:
 			msglst = []
