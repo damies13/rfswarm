@@ -888,8 +888,11 @@ class RFSwarmAgent():
 		cmd.append('"'+odir+'"')
 
 		cmd.append("-M RFS_AGENTNAME:{}".format(self.agentname))
+		cmd.append("-v RFS_AGENTNAME:{}".format(self.agentname))
 		cmd.append("-M RFS_AGENTVERSION:{}".format(self.version))
+		cmd.append("-v RFS_AGENTVERSION:{}".format(self.version))
 		cmd.append("-M RFS_DEBUGLEVEL:{}".format(self.debuglvl))
+		cmd.append("-v RFS_DEBUGLEVEL:{}".format(self.debuglvl))
 		cmd.append("-M RFS_INDEX:{}".format(self.jobs[jobid]["ScriptIndex"]))
 		cmd.append("-v RFS_INDEX:{}".format(self.jobs[jobid]["ScriptIndex"]))
 		cmd.append("-M RFS_ROBOT:{}".format(self.jobs[jobid]["Robot"]))
@@ -899,6 +902,7 @@ class RFSwarmAgent():
 		cmd.append("-M RFS_SWARMMANAGER:{}".format(self.swarmmanager))
 		cmd.append("-v RFS_SWARMMANAGER:{}".format(self.swarmmanager))
 		cmd.append("-M RFS_EXCLUDELIBRARIES:{}".format(excludelibraries))
+		cmd.append("-v RFS_EXCLUDELIBRARIES:{}".format(excludelibraries))
 
 		if not self.xmlmode:
 			cmd.append("--listener {}".format('"'+self.listenerfile+'"'))
