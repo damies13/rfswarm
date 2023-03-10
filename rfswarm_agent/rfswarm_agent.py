@@ -870,7 +870,6 @@ class RFSwarmAgent():
 			cmd.append("-M {}".format(metavar))
 			cmd.append("-v {}".format(metavar))
 
-
 		if not self.xmlmode:
 			cmd.append("--listener {}".format('"' + self.listenerfile + '"'))
 
