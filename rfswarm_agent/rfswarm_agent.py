@@ -887,22 +887,20 @@ class RFSwarmAgent():
 		cmd.append("-d")
 		cmd.append('"'+odir+'"')
 
-		cmd.append("-M RFS_AGENTNAME:{}".format(self.agentname))
-		cmd.append("-v RFS_AGENTNAME:{}".format(self.agentname))
-		cmd.append("-M RFS_AGENTVERSION:{}".format(self.version))
-		cmd.append("-v RFS_AGENTVERSION:{}".format(self.version))
-		cmd.append("-M RFS_DEBUGLEVEL:{}".format(self.debuglvl))
-		cmd.append("-v RFS_DEBUGLEVEL:{}".format(self.debuglvl))
-		cmd.append("-M RFS_INDEX:{}".format(self.jobs[jobid]["ScriptIndex"]))
-		cmd.append("-v RFS_INDEX:{}".format(self.jobs[jobid]["ScriptIndex"]))
-		cmd.append("-M RFS_ROBOT:{}".format(self.jobs[jobid]["Robot"]))
-		cmd.append("-v RFS_ROBOT:{}".format(self.jobs[jobid]["Robot"]))
-		cmd.append("-M RFS_ITERATION:{}".format(self.jobs[jobid]["Iteration"]))
-		cmd.append("-v RFS_ITERATION:{}".format(self.jobs[jobid]["Iteration"]))
-		cmd.append("-M RFS_SWARMMANAGER:{}".format(self.swarmmanager))
-		cmd.append("-v RFS_SWARMMANAGER:{}".format(self.swarmmanager))
-		cmd.append("-M RFS_EXCLUDELIBRARIES:{}".format(excludelibraries))
-		cmd.append("-v RFS_EXCLUDELIBRARIES:{}".format(excludelibraries))
+		metavars = []
+		metavars.append("RFS_AGENTNAME:{}".format(self.agentname))
+		metavars.append("RFS_AGENTVERSION:{}".format(self.version))
+		metavars.append("RFS_DEBUGLEVEL:{}".format(self.debuglvl))
+		metavars.append("RFS_INDEX:{}".format(self.jobs[jobid]["ScriptIndex"]))
+		metavars.append("RFS_ROBOT:{}".format(self.jobs[jobid]["Robot"]))
+		metavars.append("RFS_ITERATION:{}".format(self.jobs[jobid]["Iteration"]))
+		metavars.append("RFS_SWARMMANAGER:{}".format(self.swarmmanager))
+		metavars.append("RFS_EXCLUDELIBRARIES:{}".format(excludelibraries))
+
+		for metavar in metavars:
+			cmd.append("-M {}".format(metavar))
+			cmd.append("-v {}".format(metavar))
+
 
 		if not self.xmlmode:
 			cmd.append("--listener {}".format('"'+self.listenerfile+'"'))
