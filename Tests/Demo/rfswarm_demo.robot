@@ -27,9 +27,12 @@ RFSwarm Demo Test
 	Remove Some Files
 	Sleep    5
 
+	RFS Variables
+
+
 *** Keywords ***
 Create Some Files
-	[Documentation]	Create Some Files
+	[Documentation]		Create Some Files
 	Create Directory	${FPATH}
 	FOR	${i}	IN RANGE	100
 		Create File		${FPATH}/I${RFS_ITERATION}_i${i}_test.txt    ${alpha1k}
@@ -37,15 +40,24 @@ Create Some Files
 	Wait Until Created	${FPATH}/I${RFS_ITERATION}_i99_test.txt
 
 List Some Files
-	[Documentation]	List Some Files
+	[Documentation]		List Some Files
 	${FILS}=	List Files In Directory 	${FPATH}
 
 Remove Some Files
-	[Documentation]	Remove Some Files
+	[Documentation]		Remove Some Files
 	Remove Files	${FPATH}/I${RFS_ITERATION}_*_test.txt
 	Wait Until Removed	${FPATH}/I${RFS_ITERATION}_i99_test.txt
 
-
+RFS Variables
+	[Documentation]		Show the RFS Variables
+	Log		{RFS_AGENTNAME}
+	Log		{RFS_AGENTVERSION}
+	Log		{RFS_DEBUGLEVEL}
+	Log		{RFS_EXCLUDELIBRARIES}
+	Log		{RFS_INDEX}
+	Log		{RFS_ITERATION}
+	Log		{RFS_ROBOT}
+	Log		{RFS_SWARMMANAGER}
 
 
 #
