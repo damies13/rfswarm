@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 6.0.2 (Python 3.8.10 on win32)" generated="20230310 12:28:30.085" rpa="false" schemaversion="3">
+<suite id="s1" name="Manager" source="D:\a\rfswarm\rfswarm\Tests\Regression\Manager">
+<suite id="s1-s1" name="CommandLine" source="D:\a\rfswarm\rfswarm\Tests\Regression\Manager\CommandLine.robot">
+<kw name="Clean Up Old Files" type="SETUP">
+<tag>macos-latest</tag>
+<tag>ubuntu-latest</tag>
+<tag>windows-latest</tag>
+<kw name="Log To Console" library="BuiltIn">
+<arg>${OUTPUT DIR}</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" starttime="20230310 12:28:30.117" endtime="20230310 12:28:30.117"/>
+</kw>
+<kw name="Remove File" library="OperatingSystem">
+<arg>${OUTPUT DIR}${/}*.txt</arg>
+<doc>Removes a file with the given path.</doc>
+<msg timestamp="20230310 12:28:30.117" level="INFO" html="true">Removed file '&lt;a href="file://D:\a\rfswarm\rfswarm\Tests\Regression\Manager\Logs\windows-latest_3.8\stderr.txt"&gt;D:\a\rfswarm\rfswarm\Tests\Regression\Manager\Logs\windows-latest_3.8\stderr.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230310 12:28:30.117" level="INFO" html="true">Removed file '&lt;a href="file://D:\a\rfswarm\rfswarm\Tests\Regression\Manager\Logs\windows-latest_3.8\stdout.txt"&gt;D:\a\rfswarm\rfswarm\Tests\Regression\Manager\Logs\windows-latest_3.8\stdout.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230310 12:28:30.117" endtime="20230310 12:28:30.117"/>
+</kw>
+<kw name="Remove File" library="OperatingSystem">
+<arg>${OUTPUT DIR}${/}*.png</arg>
+<doc>Removes a file with the given path.</doc>
+<msg timestamp="20230310 12:28:30.117" level="INFO" html="true">Removed file '&lt;a href="file://D:\a\rfswarm\rfswarm\Tests\Regression\Manager\Logs\windows-latest_3.8\Manager.GUIBasic-screenshot-1.png"&gt;D:\a\rfswarm\rfswarm\Tests\Regression\Manager\Logs\windows-latest_3.8\Manager.GUIBasic-screenshot-1.png&lt;/a&gt;'.</msg>
+<msg timestamp="20230310 12:28:30.117" level="INFO" html="true">Removed file '&lt;a href="file://D:\a\rfswarm\rfswarm\Tests\Regression\Manager\Logs\windows-latest_3.8\Manager.GUIBasic-screenshot-2.png"&gt;D:\a\rfswarm\rfswarm\Tests\Regression\Manager\Logs\windows-latest_3.8\Manager.GUIBasic-screenshot-2.png&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230310 12:28:30.117" endtime="20230310 12:28:30.117"/>
+</kw>
+<status status="PASS" starttime="20230310 12:28:30.117" endtime="20230310 12:28:30.117"/>
+</kw>
+<test id="s1-s1-t1" name="Random Offset" line="7">
+<kw name="Evaluate" library="BuiltIn">
+<var>${random}</var>
+<arg>random.randint(0, 60)</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<msg timestamp="20230310 12:28:30.117" level="INFO">${random} = 28</msg>
+<status status="PASS" starttime="20230310 12:28:30.117" endtime="20230310 12:28:30.117"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>${random}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230310 12:28:58.118" level="INFO">Slept 28 seconds</msg>
+<status status="PASS" starttime="20230310 12:28:30.117" endtime="20230310 12:28:58.118"/>
+</kw>
+<doc>This just prevents all the test runners doing git push at the same time</doc>
+<tag>macos-latest</tag>
+<tag>ubuntu-latest</tag>
+<tag>windows-latest</tag>
+<status status="PASS" starttime="20230310 12:28:30.117" endtime="20230310 12:28:58.118"/>
+</test>
+<test id="s1-s1-t2" name="Manager Version" line="13">
+<kw name="Run" library="OperatingSystem">
+<var>${result}</var>
+<arg>python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -v</arg>
+<doc>Runs the given command in the system and returns the output.</doc>
+<msg timestamp="20230310 12:28:58.118" level="INFO">Running command 'python3 D:\a\rfswarm\rfswarm\rfswarm_manager\rfswarm.py -v 2&gt;&amp;1'.</msg>
+<status status="FAIL" starttime="20230310 12:28:58.118" endtime="20230310 12:29:11.594"/>
+</kw>
+<kw name="Log To Console" library="BuiltIn">
+<arg>${\n}${result}</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="NOT RUN" starttime="20230310 12:29:11.594" endtime="20230310 12:29:11.594"/>
+</kw>
+<kw name="Should Contain" library="BuiltIn">
+<arg>${result}</arg>
+<arg>Version</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="NOT RUN" starttime="20230310 12:29:11.594" endtime="20230310 12:29:11.594"/>
+</kw>
+<kw name="Should Contain" library="BuiltIn">
+<arg>${result}</arg>
+<arg>Manager</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="NOT RUN" starttime="20230310 12:29:11.594" endtime="20230310 12:29:11.594"/>
+</kw>
+<tag>macos-latest</tag>
+<tag>ubuntu-latest</tag>
+<tag>windows-latest</tag>
+<status status="FAIL" starttime="20230310 12:28:58.118" endtime="20230310 12:29:11.594">Execution terminated by signal</status>
+</test>
+<test id="s1-s1-t3" name="Manager Help" line="20">
+<tag>macos-latest</tag>
+<tag>robot:exit</tag>
+<tag>ubuntu-latest</tag>
+<tag>windows-latest</tag>
+<status status="FAIL" starttime="20230310 12:29:11.594" endtime="20230310 12:29:11.594">Test execution stopped due to a fatal error.</status>
+</test>
+<status status="FAIL" starttime="20230310 12:28:30.101" endtime="20230310 12:29:11.594"/>
+</suite>
+<suite id="s1-s2" name="GUI Basic" source="D:\a\rfswarm\rfswarm\Tests\Regression\Manager\GUI_Basic.robot">
+<test id="s1-s2-t1" name="Open GUI" line="21">
+<tag>robot:exit</tag>
+<tag>windows-latest</tag>
+<status status="FAIL" starttime="20230310 12:29:11.594" endtime="20230310 12:29:11.594">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s2-t2" name="Select Run Tab" line="39">
+<tag>macos-latest</tag>
+<tag>robot:exit</tag>
+<tag>ubuntu-latest</tag>
+<tag>windows-latest</tag>
+<status status="FAIL" starttime="20230310 12:29:11.594" endtime="20230310 12:29:11.594">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-s2-t3" name="Close GUI" line="43">
+<tag>robot:exit</tag>
+<tag>windows-latest</tag>
+<status status="FAIL" starttime="20230310 12:29:11.594" endtime="20230310 12:29:11.594">Test execution stopped due to a fatal error.</status>
+</test>
+<status status="FAIL" starttime="20230310 12:29:11.594" endtime="20230310 12:29:11.594"/>
+</suite>
+<status status="FAIL" starttime="20230310 12:28:30.085" endtime="20230310 12:29:11.594"/>
+</suite>
+<statistics>
+<total>
+<stat pass="1" fail="5" skip="0">All Tests</stat>
+</total>
+<tag>
+<stat pass="1" fail="1" skip="0" info="combined" combined="NOT robot:exit">NOT robot:exit</stat>
+<stat pass="1" fail="3" skip="0">macos-latest</stat>
+<stat pass="1" fail="3" skip="0">ubuntu-latest</stat>
+<stat pass="1" fail="5" skip="0">windows-latest</stat>
+</tag>
+<suite>
+<stat pass="1" fail="5" skip="0" id="s1" name="Manager">Manager</stat>
+<stat pass="1" fail="2" skip="0" id="s1-s1" name="CommandLine">Manager.CommandLine</stat>
+<stat pass="0" fail="3" skip="0" id="s1-s2" name="GUI Basic">Manager.GUI Basic</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
