@@ -4394,6 +4394,10 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["lblSpacer"].grid(column=9, row=rownum, sticky="nsew")
 				self.contentdata[id]["Settings"].columnconfigure(9, weight=1)
 
+				self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Settings"], text="")
+				self.contentdata[id]["lblSpacer"].grid(column=19, row=rownum, sticky="nsew")
+				self.contentdata[id]["Settings"].columnconfigure(19, weight=1)
+
 				rownum += 1
 				# option list - heading / text / graph / table
 				self.contentdata[id]["lblType"] = ttk.Label(self.contentdata[id]["Settings"], text="Type:")
@@ -4411,9 +4415,12 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["omType"].grid(column=1, row=rownum, sticky="nsew")
 
 				rownum += 1
-				self.contentdata[id]["Frame"] = tk.Frame(self.contentdata[id]["Settings"], padx=0, pady=0, bd=0)
-				# self.contentdata[id]["Frame"].config(bg="SlateBlue2")
-				self.contentdata[id]["Frame"].grid(column=0, row=rownum, columnspan=10, sticky="nsew")
+				self.contentdata[id]["LFrame"] = tk.Frame(self.contentdata[id]["Settings"], padx=0, pady=0, bd=0)
+				# self.contentdata[id]["LFrame"].config(bg="SlateBlue2")
+				self.contentdata[id]["LFrame"].grid(column=0, row=rownum, columnspan=10, sticky="nsew")
+
+				self.contentdata[id]["RFrame"] = tk.Frame(self.contentdata[id]["Settings"], padx=0, pady=0, bd=0)
+				self.contentdata[id]["RFrame"].grid(column=10, row=rownum, columnspan=10, sticky="nsew")
 
 				self.contentdata[id]["Settings"].rowconfigure(rownum, weight=1)
 
@@ -4797,25 +4804,25 @@ class ReporterGUI(tk.Frame):
 		rownum = 0
 
 		rownum += 1
-		self.contentdata[id]["lblCM"] = ttk.Label(self.contentdata[id]["Frame"], text="Mode:")
+		self.contentdata[id]["lblCM"] = ttk.Label(self.contentdata[id]["LFrame"], text="Mode:")
 		self.contentdata[id]["lblCM"].grid(column=0, row=rownum, sticky="nsew")
 
 		ContentsModes = [None, "Table Of Contents", "Table of Graphs", "Table Of Tables"]
 		self.contentdata[id]["strCM"] = tk.StringVar()
-		self.contentdata[id]["omCM"] = ttk.OptionMenu(self.contentdata[id]["Frame"], self.contentdata[id]["strCM"], command=self.cs_contents_update, *ContentsModes)
+		self.contentdata[id]["omCM"] = ttk.OptionMenu(self.contentdata[id]["LFrame"], self.contentdata[id]["strCM"], command=self.cs_contents_update, *ContentsModes)
 
 		self.contentdata[id]["strCM"].set(base.rt_contents_get_mode(id))
 		self.contentdata[id]["omCM"].grid(column=1, row=rownum, sticky="nsew")
 
 		rownum += 1
-		self.contentdata[id]["lblCL"] = ttk.Label(self.contentdata[id]["Frame"], text="Level:")
+		self.contentdata[id]["lblCL"] = ttk.Label(self.contentdata[id]["LFrame"], text="Level:")
 		self.contentdata[id]["lblCL"].grid(column=0, row=rownum, sticky="nsew")
 
 		Levels = [None]
 		for i in range(6):
 			Levels.append(i + 1)
 		self.contentdata[id]["intCL"] = tk.IntVar()
-		self.contentdata[id]["omCL"] = ttk.OptionMenu(self.contentdata[id]["Frame"], self.contentdata[id]["intCL"], command=self.cs_contents_update, *Levels)
+		self.contentdata[id]["omCL"] = ttk.OptionMenu(self.contentdata[id]["LFrame"], self.contentdata[id]["intCL"], command=self.cs_contents_update, *Levels)
 		self.contentdata[id]["intCL"].set(base.rt_contents_get_level(id))
 		self.contentdata[id]["omCL"].grid(column=1, row=rownum, sticky="nsew")
 
@@ -4842,15 +4849,15 @@ class ReporterGUI(tk.Frame):
 	def cs_note(self, id):
 		base.debugmsg(9, "id:", id)
 		# base.rt_note_get(id)
-		self.contentdata[id]["tNote"] = tk.Text(self.contentdata[id]["Frame"])
+		self.contentdata[id]["tNote"] = tk.Text(self.contentdata[id]["LFrame"])
 		# background="yellow", foreground="blue"
 		# self.contentdata[id]["tNote"].config(bg="SlateBlue2")
 		self.contentdata[id]["tNote"].config(background=self.style_feild_colour, foreground=self.style_text_colour, insertbackground=self.style_text_colour)
 
 		self.contentdata[id]["tNote"].insert('0.0', base.rt_note_get(id))
 		self.contentdata[id]["tNote"].grid(column=0, row=0, sticky="nsew")
-		self.contentdata[id]["Frame"].rowconfigure(0, weight=1)
-		self.contentdata[id]["Frame"].columnconfigure(0, weight=1)
+		self.contentdata[id]["LFrame"].rowconfigure(0, weight=1)
+		self.contentdata[id]["LFrame"].columnconfigure(0, weight=1)
 		self.contentdata[id]["tNote"].bind('<Leave>', self.cs_note_update)
 		self.contentdata[id]["tNote"].bind('<FocusOut>', self.cs_note_update)
 
@@ -4874,25 +4881,25 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(9, "id:", id)
 		colours = base.rt_table_get_colours(id)
 		datatype = base.rt_table_get_dt(id)
-		self.contentdata[id]["Frame"].columnconfigure(99, weight=1)
+		self.contentdata[id]["LFrame"].columnconfigure(99, weight=1)
 		rownum = 0
 
 		rownum += 1
-		self.contentdata[id]["lblColours"] = ttk.Label(self.contentdata[id]["Frame"], text="Show graph colours:")
+		self.contentdata[id]["lblColours"] = ttk.Label(self.contentdata[id]["LFrame"], text="Show graph colours:")
 		self.contentdata[id]["lblColours"].grid(column=0, row=rownum, sticky="nsew")
 
 		self.contentdata[id]["intColours"] = tk.IntVar()
-		self.contentdata[id]["chkColours"] = ttk.Checkbutton(self.contentdata[id]["Frame"], variable=self.contentdata[id]["intColours"], command=self.cs_datatable_update)
+		self.contentdata[id]["chkColours"] = ttk.Checkbutton(self.contentdata[id]["LFrame"], variable=self.contentdata[id]["intColours"], command=self.cs_datatable_update)
 		self.contentdata[id]["intColours"].set(colours)
 		self.contentdata[id]["chkColours"].grid(column=1, row=rownum, sticky="nsew")
 
 		rownum += 1
-		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["Frame"], text="Data Type:")
+		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["LFrame"], text="Data Type:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
 
 		DataTypes = [None, "Metric", "Result", "ResultSummary", "SQL"]
 		self.contentdata[id]["strDT"] = tk.StringVar()
-		self.contentdata[id]["omDT"] = ttk.OptionMenu(self.contentdata[id]["Frame"], self.contentdata[id]["strDT"], command=self.cs_datatable_switchdt, *DataTypes)
+		self.contentdata[id]["omDT"] = ttk.OptionMenu(self.contentdata[id]["LFrame"], self.contentdata[id]["strDT"], command=self.cs_datatable_switchdt, *DataTypes)
 		self.contentdata[id]["strDT"].set(datatype)
 		self.contentdata[id]["omDT"].grid(column=1, row=rownum, sticky="nsew")
 
@@ -5031,7 +5038,7 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[id]["Frames"] = {}
 		# Construct
 		if datatype not in self.contentdata[id]["Frames"]:
-			self.contentdata[id]["Frames"][datatype] = tk.Frame(self.contentdata[id]["Frame"])
+			self.contentdata[id]["Frames"][datatype] = tk.Frame(self.contentdata[id]["LFrame"])
 			# self.contentdata[id]["Frames"][datatype].config(bg="SlateBlue3")
 			# self.contentdata[id]["Frames"][datatype].columnconfigure(0, weight=1)
 			self.contentdata[id]["Frames"][datatype].columnconfigure(99, weight=1)
@@ -5192,49 +5199,49 @@ class ReporterGUI(tk.Frame):
 	def cs_graph(self, id):
 		base.debugmsg(9, "id:", id)
 		datatype = base.rt_graph_get_dt(id)
-		self.contentdata[id]["Frame"].columnconfigure(99, weight=1)
+		self.contentdata[id]["LFrame"].columnconfigure(99, weight=1)
 		rownum = 0
 
 		rownum += 1
-		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["Frame"], text="X-Axis:")
+		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["LFrame"], text="X-Axis:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
 
-		self.contentdata[id]["lblLeft"] = ttk.Label(self.contentdata[id]["Frame"], text="Left")
+		self.contentdata[id]["lblLeft"] = ttk.Label(self.contentdata[id]["LFrame"], text="Left")
 		self.contentdata[id]["lblLeft"].grid(column=1, row=rownum, sticky="nsew")
 
-		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Frame"], text="                        ", style='Report.TLabel')
-		self.contentdata[id]["lblSpacer"].grid(column=5, row=rownum, sticky="nsew")
+		# self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["RFrame"], text="                        ", style='Report.TLabel')
+		# self.contentdata[id]["lblSpacer"].grid(column=0, row=rownum, sticky="nsew")
 
-		self.contentdata[id]["lblRight"] = ttk.Label(self.contentdata[id]["Frame"], text="Right")
-		self.contentdata[id]["lblRight"].grid(column=10, row=rownum, sticky="nsew")
+		self.contentdata[id]["lblRight"] = ttk.Label(self.contentdata[id]["RFrame"], text="Right")
+		self.contentdata[id]["lblRight"].grid(column=1, row=rownum, sticky="nsew")
 
 		rownum += 1
-		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["Frame"], text="Enable:")
+		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["LFrame"], text="Enable:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
 
 		self.contentdata[id]["intLXAxs"] = tk.IntVar()
-		self.contentdata[id]["chkLXAxs"] = ttk.Checkbutton(self.contentdata[id]["Frame"], variable=self.contentdata[id]["intLXAxs"], command=self.cs_graph_update)
+		self.contentdata[id]["chkLXAxs"] = ttk.Checkbutton(self.contentdata[id]["LFrame"], variable=self.contentdata[id]["intLXAxs"], command=self.cs_graph_update)
 		self.contentdata[id]["chkLXAxs"].grid(column=1, row=rownum, sticky="nsew")
 
 		self.contentdata[id]["intRXAxs"] = tk.IntVar()
-		self.contentdata[id]["chkRXAxs"] = ttk.Checkbutton(self.contentdata[id]["Frame"], variable=self.contentdata[id]["intRXAxs"], command=self.cs_graph_update)
-		self.contentdata[id]["chkRXAxs"].grid(column=10, row=rownum, sticky="nsew")
+		self.contentdata[id]["chkRXAxs"] = ttk.Checkbutton(self.contentdata[id]["RFrame"], variable=self.contentdata[id]["intRXAxs"], command=self.cs_graph_update)
+		self.contentdata[id]["chkRXAxs"].grid(column=1, row=rownum, sticky="nsew")
 
 
 		rownum += 1
-		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["Frame"], text="Data Type:")
+		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["LFrame"], text="Data Type:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
 
 		DataTypes = [None, "Metric", "Result", "SQL"]
 		self.contentdata[id]["strDT"] = tk.StringVar()
-		self.contentdata[id]["omDT"] = ttk.OptionMenu(self.contentdata[id]["Frame"], self.contentdata[id]["strDT"], command=self.cs_graph_switchdt, *DataTypes)
+		self.contentdata[id]["omDT"] = ttk.OptionMenu(self.contentdata[id]["LFrame"], self.contentdata[id]["strDT"], command=self.cs_graph_switchdt, *DataTypes)
 		self.contentdata[id]["strDT"].set(datatype)
 		self.contentdata[id]["omDT"].grid(column=1, row=rownum, sticky="nsew")
 
 		self.contentdata[id]["strRDT"] = tk.StringVar()
-		self.contentdata[id]["omRDT"] = ttk.OptionMenu(self.contentdata[id]["Frame"], self.contentdata[id]["strRDT"], command=self.cs_graph_switchdt, *DataTypes)
+		self.contentdata[id]["omRDT"] = ttk.OptionMenu(self.contentdata[id]["RFrame"], self.contentdata[id]["strRDT"], command=self.cs_graph_switchdt, *DataTypes)
 		self.contentdata[id]["strRDT"].set(datatype)
-		self.contentdata[id]["omRDT"].grid(column=10, row=rownum, sticky="nsew")
+		self.contentdata[id]["omRDT"].grid(column=1, row=rownum, sticky="nsew")
 
 		rownum += 1
 		self.contentdata[id]["DTFrame"] = rownum
@@ -5327,7 +5334,7 @@ class ReporterGUI(tk.Frame):
 		# Construct
 		if datatype not in self.contentdata[id]["Frames"]:
 			base.debugmsg(6, "datatype:", datatype)
-			self.contentdata[id]["Frames"][datatype] = tk.Frame(self.contentdata[id]["Frame"])
+			self.contentdata[id]["Frames"][datatype] = tk.Frame(self.contentdata[id]["LFrame"])
 			# self.contentdata[id]["Frames"][datatype].config(bg="SlateBlue3")
 			# self.contentdata[id]["Frames"][datatype].columnconfigure(0, weight=1)
 			self.contentdata[id]["Frames"][datatype].columnconfigure(99, weight=1)
