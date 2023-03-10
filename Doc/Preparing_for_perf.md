@@ -190,7 +190,7 @@ Would not have a timing measured, because it has no [Documentation], however it 
 ### Match Keyword
 Would have a timing measured by default, this would be reported in the Manager as "Match Keyword" because the variable ${TEST NAME} gets evaluated by robot framework before being passed to rfswarm via the listener.
 
->	#### :warning: Warning :warning:
+> #### :warning: Warning :warning: <!-- this is here for super-linter -->
 > It's recommended not to use `Set Log Level    Trace` in your test cases as doing so will change your result names or make the, not show at all. It's also likely to slow things down and alter your test results, so it's recommended to keep the usage of trace for only when you are debugging scripts.
 >
 > Fixes applied as part of [Issue #119](https://github.com/damies13/rfswarm/issues/119) did help to reduce this issue it's can't be resolved completely.
