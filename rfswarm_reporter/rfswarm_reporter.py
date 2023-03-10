@@ -5196,6 +5196,32 @@ class ReporterGUI(tk.Frame):
 		rownum = 0
 
 		rownum += 1
+		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["Frame"], text="X-Axis:")
+		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["lblLeft"] = ttk.Label(self.contentdata[id]["Frame"], text="Left")
+		self.contentdata[id]["lblLeft"].grid(column=1, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Frame"], text="                        ", style='Report.TLabel')
+		self.contentdata[id]["lblSpacer"].grid(column=5, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["lblRight"] = ttk.Label(self.contentdata[id]["Frame"], text="Right")
+		self.contentdata[id]["lblRight"].grid(column=10, row=rownum, sticky="nsew")
+
+		rownum += 1
+		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["Frame"], text="Enable:")
+		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["intLXAxs"] = tk.IntVar()
+		self.contentdata[id]["chkLXAxs"] = ttk.Checkbutton(self.contentdata[id]["Frame"], variable=self.contentdata[id]["intLXAxs"], command=self.cs_graph_update)
+		self.contentdata[id]["chkLXAxs"].grid(column=1, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["intRXAxs"] = tk.IntVar()
+		self.contentdata[id]["chkRXAxs"] = ttk.Checkbutton(self.contentdata[id]["Frame"], variable=self.contentdata[id]["intRXAxs"], command=self.cs_graph_update)
+		self.contentdata[id]["chkRXAxs"].grid(column=10, row=rownum, sticky="nsew")
+
+
+		rownum += 1
 		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["Frame"], text="Data Type:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
 
@@ -5204,6 +5230,11 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["omDT"] = ttk.OptionMenu(self.contentdata[id]["Frame"], self.contentdata[id]["strDT"], command=self.cs_graph_switchdt, *DataTypes)
 		self.contentdata[id]["strDT"].set(datatype)
 		self.contentdata[id]["omDT"].grid(column=1, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["strRDT"] = tk.StringVar()
+		self.contentdata[id]["omRDT"] = ttk.OptionMenu(self.contentdata[id]["Frame"], self.contentdata[id]["strRDT"], command=self.cs_graph_switchdt, *DataTypes)
+		self.contentdata[id]["strRDT"].set(datatype)
+		self.contentdata[id]["omRDT"].grid(column=10, row=rownum, sticky="nsew")
 
 		rownum += 1
 		self.contentdata[id]["DTFrame"] = rownum
