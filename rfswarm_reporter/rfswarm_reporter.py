@@ -829,6 +829,17 @@ class ReporterBase():
 	# Report Item Type: graph
 	#
 
+	# 		pid, idl, idr = self.rt_graph_LR_Ids(id)
+	def rt_graph_LR_Ids(self, id):
+		base.debugmsg(5, "id:", id)
+		pid = base.report_subsection_parent(id)
+		idl = pid + 'L'
+		base.report_item_parent(idl)
+		idr = pid + 'R'
+		base.report_item_parent(idr)
+		return pid, idl, idr
+
+
 	def rt_graph_get_sql(self, id):
 		base.debugmsg(9, "id:", id)
 		if 'SQL' in base.report[id]:
@@ -5277,7 +5288,7 @@ class ReporterGUI(tk.Frame):
 
 	def cs_graph(self, id):
 		base.debugmsg(9, "id:", id)
-		id, idl, idr = self.cs_graph_LR_Ids(id)
+		id, idl, idr = self.rt_graph_LR_Ids(id)
 		axisenl = base.rt_graph_get_axisen(idl)
 		axisenr = base.rt_graph_get_axisen(idr)
 		datatypel = base.rt_graph_get_dt(idl)
@@ -5336,7 +5347,7 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "_event:", _event)
 		id = self.sectionstree.focus()
 		base.debugmsg(9, "id:", id)
-		pid, idl, idr = self.cs_graph_LR_Ids(id)
+		pid, idl, idr = self.rt_graph_LR_Ids(id)
 
 		# intIsNum
 		if "intIsNum" in self.contentdata[idl]:
@@ -5451,15 +5462,6 @@ class ReporterGUI(tk.Frame):
 		cp = threading.Thread(target=lambda: self.content_preview(id))
 		cp.start()
 
-	def cs_graph_LR_Ids(self, id):
-		base.debugmsg(5, "id:", id)
-		pid = base.report_subsection_parent(id)
-		idl = pid + 'L'
-		base.report_item_parent(idl)
-		idr = pid + 'R'
-		base.report_item_parent(idr)
-		return pid, idl, idr
-
 	def cs_graph_switchdt(self, _event=None):
 		base.debugmsg(5, "self:", self, "	_event:", _event)
 		rownum = 0
@@ -5471,7 +5473,7 @@ class ReporterGUI(tk.Frame):
 				id = _event
 				base.debugmsg(5, "id:", id)
 
-		pid, idl, idr = self.cs_graph_LR_Ids(id)
+		pid, idl, idr = self.rt_graph_LR_Ids(id)
 		base.debugmsg(5, "pid:", pid, "	idl:", idl, "	idr:", idr)
 
 		# self.cs_datatable_update(id)
