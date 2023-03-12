@@ -5299,7 +5299,7 @@ class ReporterGUI(tk.Frame):
 		rownum = 0
 
 		rownum += 1
-		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[pid]["LFrame"], text="X-Axis:")
+		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[pid]["LFrame"], text="Y-Axis:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
 
 		self.contentdata[id]["lblLeft"] = ttk.Label(self.contentdata[pid]["LFrame"], text="Left")
@@ -6147,10 +6147,14 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["fmeGraph"].rowconfigure(0, weight=1)
 		self.contentdata[id]["fig_dpi"] = 72
 		self.contentdata[id]["fig"] = Figure(dpi=self.contentdata[id]["fig_dpi"])
-		self.contentdata[id]["axis"] = self.contentdata[id]["fig"].add_subplot(1, 1, 1)
-		self.contentdata[id]["axis"].grid(True, 'major', 'both')
-		# self.contentdata[id]["axisR"] = self.contentdata[id]["fig"].add_subplot(1, 1, 1)
-		# self.contentdata[id]["axisR"].grid(True, 'major', 'both')
+		self.contentdata[id]["axisL"] = self.contentdata[id]["fig"].add_subplot(1, 1, 1)
+		base.debugmsg(8, "axisL:", self.contentdata[id]["axisL"])
+		self.contentdata[id]["axisL"].grid(True, 'major', 'both')
+		base.debugmsg(8, "axisL:", self.contentdata[id]["axisL"])
+		self.contentdata[id]["axisR"] = self.contentdata[id]["axisL"].twinx()
+		base.debugmsg(8, "axisR:", self.contentdata[id]["axisR"])
+		self.contentdata[id]["axisR"].grid(True, 'major', 'both')
+		base.debugmsg(8, "axisR:", self.contentdata[id]["axisR"])
 		self.contentdata[id]["fig"].autofmt_xdate(bottom=0.2, rotation=30, ha='right')
 
 		self.contentdata[id]["canvas"] = FigureCanvasTkAgg(self.contentdata[id]["fig"], self.contentdata[id]["fmeGraph"])
@@ -6158,6 +6162,7 @@ class ReporterGUI(tk.Frame):
 		# self.contentdata[id]["canvas"].get_tk_widget().config(bg="blue")
 
 		base.debugmsg(8, "canvas:", self.contentdata[id]["canvas"])
+		# base.debugmsg(8, "axis:", self.contentdata[id]["axis"])
 
 		try:
 			self.contentdata[id]["canvas"].draw()
@@ -6168,69 +6173,127 @@ class ReporterGUI(tk.Frame):
 		dodraw = False
 		self.contentdata[id]["graphdata"] = {}
 
-		# Populate Left Y Axis Data
-		if sqll is not None and len(sqll.strip()) > 0:
-			base.debugmsg(7, "sqll:", sqll)
-			key = "{}_{}".format(id, base.report_item_get_changed(idl))
-			base.debugmsg(7, "key:", key)
-			base.dbqueue["Read"].append({"SQL": sqll, "KEY": key})
-			while key not in base.dbqueue["ReadResult"]:
-				time.sleep(0.1)
-				# base.debugmsg(9, "Waiting for gdata for:", key)
+		if (sqll is not None and len(sqll.strip()) > 0) or (sqlr is not None and len(sqlr.strip()) > 0):
+			# Populate Left Y Axis Data
+			if sqll is not None and len(sqll.strip()) > 0:
+				base.debugmsg(7, "sqll:", sqll)
+				key = "{}_{}".format(id, base.report_item_get_changed(idl))
+				base.debugmsg(7, "key:", key)
+				base.dbqueue["Read"].append({"SQL": sqll, "KEY": key})
+				while key not in base.dbqueue["ReadResult"]:
+					time.sleep(0.1)
+					# base.debugmsg(9, "Waiting for gdata for:", key)
 
-			gdata = base.dbqueue["ReadResult"][key]
-			base.debugmsg(9, "gdata:", gdata)
+				gdata = base.dbqueue["ReadResult"][key]
+				base.debugmsg(9, "gdata:", gdata)
 
-			for row in gdata:
-				base.debugmsg(9, "row:", row)
-				if 'Name' in row:
-					name = row['Name']
-					base.debugmsg(9, "name:", name)
-					if name not in self.contentdata[id]["graphdata"]:
-						self.contentdata[id]["graphdata"][name] = {}
+				for row in gdata:
+					base.debugmsg(9, "row:", row)
+					if 'Name' in row:
+						name = row['Name']
+						base.debugmsg(9, "name:", name)
+						if name not in self.contentdata[id]["graphdata"]:
+							self.contentdata[id]["graphdata"][name] = {}
 
-						colour = base.named_colour(name)
-						base.debugmsg(8, "name:", name, "	colour:", colour)
-						self.contentdata[id]["graphdata"][name]["Colour"] = colour
-						# self.contentdata[id]["graphdata"][name]["Time"] = []
-						self.contentdata[id]["graphdata"][name]["objTime"] = []
-						self.contentdata[id]["graphdata"][name]["Values"] = []
+							colour = base.named_colour(name)
+							base.debugmsg(8, "name:", name, "	colour:", colour)
+							self.contentdata[id]["graphdata"][name]["Colour"] = colour
+							self.contentdata[id]["graphdata"][name]["Axis"] = "axisL"
+							# self.contentdata[id]["graphdata"][name]["Time"] = []
+							self.contentdata[id]["graphdata"][name]["objTime"] = []
+							self.contentdata[id]["graphdata"][name]["Values"] = []
 
-					self.contentdata[id]["graphdata"][name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
-					self.contentdata[id]["graphdata"][name]["Values"].append(base.rt_graph_floatval(row["Value"]))
-				else:
-					break
+						self.contentdata[id]["graphdata"][name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						self.contentdata[id]["graphdata"][name]["Values"].append(base.rt_graph_floatval(row["Value"]))
+					else:
+						break
+
+			# attempt to Populate right Y Axis Data
+			if sqlr is not None and len(sqlr.strip()) > 0:
+				base.debugmsg(7, "sqlr:", sqlr)
+				key = "{}_{}".format(id, base.report_item_get_changed(idr))
+				base.debugmsg(7, "key:", key)
+				base.dbqueue["Read"].append({"SQL": sqlr, "KEY": key})
+				while key not in base.dbqueue["ReadResult"]:
+					time.sleep(0.1)
+					# base.debugmsg(9, "Waiting for gdata for:", key)
+
+				gdata = base.dbqueue["ReadResult"][key]
+				base.debugmsg(9, "gdata:", gdata)
+
+				for row in gdata:
+					base.debugmsg(9, "row:", row)
+					if 'Name' in row:
+						name = row['Name']
+						base.debugmsg(9, "name:", name)
+						if name not in self.contentdata[id]["graphdata"]:
+							self.contentdata[id]["graphdata"][name] = {}
+
+							colour = base.named_colour(name)
+							base.debugmsg(8, "name:", name, "	colour:", colour)
+							self.contentdata[id]["graphdata"][name]["Colour"] = colour
+							self.contentdata[id]["graphdata"][name]["Axis"] = "axisR"
+							# self.contentdata[id]["graphdata"][name]["Time"] = []
+							self.contentdata[id]["graphdata"][name]["objTime"] = []
+							self.contentdata[id]["graphdata"][name]["Values"] = []
+
+						self.contentdata[id]["graphdata"][name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						self.contentdata[id]["graphdata"][name]["Values"].append(base.rt_graph_floatval(row["Value"]))
+					else:
+						break
 
 			base.debugmsg(8, "self.contentdata[id][graphdata]:", self.contentdata[id]["graphdata"])
 
 			for name in self.contentdata[id]["graphdata"]:
 				base.debugmsg(7, "name:", name)
+				axis = "axisL"
+				if "Axis" in self.contentdata[id]["graphdata"][name]:
+					axis = self.contentdata[id]["graphdata"][name]["Axis"]
+
 				if len(self.contentdata[id]["graphdata"][name]["Values"]) > 1 and len(self.contentdata[id]["graphdata"][name]["Values"]) == len(self.contentdata[id]["graphdata"][name]["objTime"]):
 					try:
-						self.contentdata[id]["axis"].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name)
+						self.contentdata[id][axis].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name)
+						# self.contentdata[id]["axis"][axis].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name)
 						dodraw = True
 					except Exception as e:
 						base.debugmsg(7, "axis.plot() Exception:", e)
 
 				if len(self.contentdata[id]["graphdata"][name]["Values"]) == 1 and len(self.contentdata[id]["graphdata"][name]["Values"]) == len(self.contentdata[id]["graphdata"][name]["objTime"]):
 					try:
-						self.contentdata[id]["axis"].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name, marker='o')
+						self.contentdata[id][axis].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name, marker='o')
+						# self.contentdata[id]["axis"][axis].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name, marker='o')
 						dodraw = True
 					except Exception as e:
 						base.debugmsg(7, "axis.plot() Exception:", e)
 
 			if dodraw:
 
-				self.contentdata[id]["axis"].grid(True, 'major', 'both')
+				self.contentdata[id]["axisL"].grid(True, 'major', 'both')
+				self.contentdata[id]["axisR"].grid(True, 'major', 'both')
+				# self.contentdata[id]["axis"][0].grid(True, 'major', 'both')
+				# self.contentdata[id]["axis"][1].grid(True, 'major', 'both')
 
+
+				# Left axis Limits
 				SMetric = "Other"
-				if datatype == "Metric":
+				if datatypel == "Metric":
 					SMetric = base.rt_table_get_sm(idl)
 				base.debugmsg(8, "SMetric:", SMetric)
 				if SMetric in ["Load", "CPU", "MEM", "NET"]:
-					self.contentdata[id]["axis"].set_ylim(0, 100)
+					self.contentdata[id]["axisL"].set_ylim(0, 100)
 				else:
-					self.contentdata[id]["axis"].set_ylim(0)
+					self.contentdata[id]["axisL"].set_ylim(0)
+
+				# Right axis Limits
+				SMetric = "Other"
+				if datatyper == "Metric":
+					SMetric = base.rt_table_get_sm(idr)
+				base.debugmsg(8, "SMetric:", SMetric)
+				if SMetric in ["Load", "CPU", "MEM", "NET"]:
+					self.contentdata[id]["axisR"].set_ylim(0, 100)
+				else:
+					self.contentdata[id]["axisR"].set_ylim(0)
+
 
 				self.contentdata[id]["fig"].set_tight_layout(True)
 				self.contentdata[id]["fig"].autofmt_xdate(bottom=0.2, rotation=30, ha='right')
@@ -6239,77 +6302,6 @@ class ReporterGUI(tk.Frame):
 				except Exception as e:
 					base.debugmsg(5, "canvas.draw() Exception:", e)
 
-
-		# attempt to Populate right Y Axis Data
-		if sqlr is not None and len(sqlr.strip()) > 0:
-			base.debugmsg(7, "sqlr:", sqlr)
-			key = "{}_{}".format(id, base.report_item_get_changed(idr))
-			base.debugmsg(7, "key:", key)
-			base.dbqueue["Read"].append({"SQL": sqlr, "KEY": key})
-			while key not in base.dbqueue["ReadResult"]:
-				time.sleep(0.1)
-				# base.debugmsg(9, "Waiting for gdata for:", key)
-
-			gdata = base.dbqueue["ReadResult"][key]
-			base.debugmsg(9, "gdata:", gdata)
-
-			for row in gdata:
-				base.debugmsg(9, "row:", row)
-				if 'Name' in row:
-					name = row['Name']
-					base.debugmsg(9, "name:", name)
-					if name not in self.contentdata[id]["graphdata"]:
-						self.contentdata[id]["graphdata"][name] = {}
-
-						colour = base.named_colour(name)
-						base.debugmsg(8, "name:", name, "	colour:", colour)
-						self.contentdata[id]["graphdata"][name]["Colour"] = colour
-						# self.contentdata[id]["graphdata"][name]["Time"] = []
-						self.contentdata[id]["graphdata"][name]["objTime"] = []
-						self.contentdata[id]["graphdata"][name]["Values"] = []
-
-					self.contentdata[id]["graphdata"][name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
-					self.contentdata[id]["graphdata"][name]["Values"].append(base.rt_graph_floatval(row["Value"]))
-				else:
-					break
-
-			base.debugmsg(8, "self.contentdata[id][graphdata]:", self.contentdata[id]["graphdata"])
-
-			# for name in self.contentdata[id]["graphdata"]:
-			# 	base.debugmsg(7, "name:", name)
-			# 	if len(self.contentdata[id]["graphdata"][name]["Values"]) > 1 and len(self.contentdata[id]["graphdata"][name]["Values"]) == len(self.contentdata[id]["graphdata"][name]["objTime"]):
-			# 		try:
-			# 			self.contentdata[id]["axisR"].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name)
-			# 			dodraw = True
-			# 		except Exception as e:
-			# 			base.debugmsg(7, "axis.plot() Exception:", e)
-			#
-			# 	if len(self.contentdata[id]["graphdata"][name]["Values"]) == 1 and len(self.contentdata[id]["graphdata"][name]["Values"]) == len(self.contentdata[id]["graphdata"][name]["objTime"]):
-			# 		try:
-			# 			self.contentdata[id]["axisR"].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name, marker='o')
-			# 			dodraw = True
-			# 		except Exception as e:
-			# 			base.debugmsg(7, "axis.plot() Exception:", e)
-			#
-			# if dodraw:
-			#
-			# 	self.contentdata[id]["axisR"].grid(True, 'major', 'both')
-			#
-			# 	SMetric = "Other"
-			# 	if datatype == "Metric":
-			# 		SMetric = base.rt_table_get_sm(idr)
-			# 	base.debugmsg(8, "SMetric:", SMetric)
-			# 	if SMetric in ["Load", "CPU", "MEM", "NET"]:
-			# 		self.contentdata[id]["axisR"].set_ylim(0, 100)
-			# 	else:
-			# 		self.contentdata[id]["axisR"].set_ylim(0)
-			#
-			# 	self.contentdata[id]["fig"].set_tight_layout(True)
-			# 	self.contentdata[id]["fig"].autofmt_xdate(bottom=0.2, rotation=30, ha='right')
-			# 	try:
-			# 		self.contentdata[id]["canvas"].draw()
-			# 	except Exception as e:
-			# 		base.debugmsg(5, "canvas.draw() Exception:", e)
 
 
 
