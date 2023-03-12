@@ -698,7 +698,7 @@ class ReporterBase():
 			return time.time()
 		if 'Changed' not in base.report[id]:
 			base.report_item_set_changed(id)
-		base.debugmsg(8, "Changed:", base.report[id]['Changed'], float(base.report[id]['Changed']))
+		base.debugmsg(8, "Changed:", base.report[id]['Changed'], "	", float(base.report[id]['Changed']))
 		return float(base.report[id]['Changed'])
 
 	def report_item_set_changed(self, id):
@@ -829,16 +829,18 @@ class ReporterBase():
 	# Report Item Type: graph
 	#
 
-	# 		pid, idl, idr = self.rt_graph_LR_Ids(id)
+	# 		pid, idl, idr = base.rt_graph_LR_Ids(id)
 	def rt_graph_LR_Ids(self, id):
-		base.debugmsg(5, "id:", id)
-		pid = base.report_subsection_parent(id)
-		idl = pid + 'L'
-		base.report_item_parent(idl)
-		idr = pid + 'R'
-		base.report_item_parent(idr)
-		return pid, idl, idr
-
+		if id != 'TOP':
+			base.debugmsg(5, "id:", id)
+			pid = base.report_subsection_parent(id)
+			idl = pid + 'L'
+			base.report_item_parent(idl)
+			idr = pid + 'R'
+			base.report_item_parent(idr)
+			return pid, idl, idr
+		else:
+			return id, id + 'L', id + 'R'
 
 	def rt_graph_get_sql(self, id):
 		base.debugmsg(9, "id:", id)
@@ -5288,54 +5290,54 @@ class ReporterGUI(tk.Frame):
 
 	def cs_graph(self, id):
 		base.debugmsg(9, "id:", id)
-		id, idl, idr = self.rt_graph_LR_Ids(id)
+		pid, idl, idr = base.rt_graph_LR_Ids(id)
 		axisenl = base.rt_graph_get_axisen(idl)
 		axisenr = base.rt_graph_get_axisen(idr)
 		datatypel = base.rt_graph_get_dt(idl)
 		datatyper = base.rt_graph_get_dt(idr)
-		self.contentdata[id]["LFrame"].columnconfigure(99, weight=1)
+		self.contentdata[pid]["LFrame"].columnconfigure(99, weight=1)
 		rownum = 0
 
 		rownum += 1
-		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["LFrame"], text="X-Axis:")
+		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[pid]["LFrame"], text="X-Axis:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
 
-		self.contentdata[id]["lblLeft"] = ttk.Label(self.contentdata[id]["LFrame"], text="Left")
+		self.contentdata[id]["lblLeft"] = ttk.Label(self.contentdata[pid]["LFrame"], text="Left")
 		self.contentdata[id]["lblLeft"].grid(column=1, row=rownum, sticky="nsew")
 
-		# self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["RFrame"], text="                        ", style='Report.TLabel')
+		# self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[pid]["RFrame"], text="                        ", style='Report.TLabel')
 		# self.contentdata[id]["lblSpacer"].grid(column=0, row=rownum, sticky="nsew")
 
-		self.contentdata[id]["lblRight"] = ttk.Label(self.contentdata[id]["RFrame"], text="Right")
+		self.contentdata[id]["lblRight"] = ttk.Label(self.contentdata[pid]["RFrame"], text="Right")
 		self.contentdata[id]["lblRight"].grid(column=1, row=rownum, sticky="nsew")
 
 		rownum += 1
-		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["LFrame"], text="Enable:")
+		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[pid]["LFrame"], text="Enable:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
 
 		self.contentdata[idl]["intAxsEn"] = tk.IntVar()
-		self.contentdata[idl]["chkAxsEn"] = ttk.Checkbutton(self.contentdata[id]["LFrame"], variable=self.contentdata[idl]["intAxsEn"], command=self.cs_graph_update)
+		self.contentdata[idl]["chkAxsEn"] = ttk.Checkbutton(self.contentdata[pid]["LFrame"], variable=self.contentdata[idl]["intAxsEn"], command=self.cs_graph_update)
 		self.contentdata[idl]["intAxsEn"].set(axisenl)
 		self.contentdata[idl]["chkAxsEn"].grid(column=1, row=rownum, sticky="nsew")
 
 		self.contentdata[idr]["intAxsEn"] = tk.IntVar()
-		self.contentdata[idr]["chkAxsEn"] = ttk.Checkbutton(self.contentdata[id]["RFrame"], variable=self.contentdata[idr]["intAxsEn"], command=self.cs_graph_update)
+		self.contentdata[idr]["chkAxsEn"] = ttk.Checkbutton(self.contentdata[pid]["RFrame"], variable=self.contentdata[idr]["intAxsEn"], command=self.cs_graph_update)
 		self.contentdata[idr]["intAxsEn"].set(axisenr)
 		self.contentdata[idr]["chkAxsEn"].grid(column=1, row=rownum, sticky="nsew")
 
 
 		rownum += 1
-		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["LFrame"], text="Data Type:")
+		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[pid]["LFrame"], text="Data Type:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
 
 		DataTypes = [None, "Metric", "Result", "SQL"]
 		self.contentdata[idl]["strDT"] = tk.StringVar()
-		self.contentdata[idl]["omDT"] = ttk.OptionMenu(self.contentdata[id]["LFrame"], self.contentdata[idl]["strDT"], command=self.cs_graph_switchdt, *DataTypes)
+		self.contentdata[idl]["omDT"] = ttk.OptionMenu(self.contentdata[pid]["LFrame"], self.contentdata[idl]["strDT"], command=self.cs_graph_switchdt, *DataTypes)
 		self.contentdata[idl]["strDT"].set(datatypel)
 		self.contentdata[idl]["omDT"].grid(column=1, row=rownum, sticky="nsew")
 
 		self.contentdata[idr]["strDT"] = tk.StringVar()
-		self.contentdata[idr]["omDT"] = ttk.OptionMenu(self.contentdata[id]["RFrame"], self.contentdata[idr]["strDT"], command=self.cs_graph_switchdt, *DataTypes)
+		self.contentdata[idr]["omDT"] = ttk.OptionMenu(self.contentdata[pid]["RFrame"], self.contentdata[idr]["strDT"], command=self.cs_graph_switchdt, *DataTypes)
 		self.contentdata[idr]["strDT"].set(datatyper)
 		self.contentdata[idr]["omDT"].grid(column=1, row=rownum, sticky="nsew")
 
@@ -5347,7 +5349,7 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "_event:", _event)
 		id = self.sectionstree.focus()
 		base.debugmsg(9, "id:", id)
-		pid, idl, idr = self.rt_graph_LR_Ids(id)
+		pid, idl, idr = base.rt_graph_LR_Ids(id)
 
 		# intIsNum
 		if "intIsNum" in self.contentdata[idl]:
@@ -5473,7 +5475,7 @@ class ReporterGUI(tk.Frame):
 				id = _event
 				base.debugmsg(5, "id:", id)
 
-		pid, idl, idr = self.rt_graph_LR_Ids(id)
+		pid, idl, idr = base.rt_graph_LR_Ids(id)
 		base.debugmsg(5, "pid:", pid, "	idl:", idl, "	idr:", idr)
 
 		# self.cs_datatable_update(id)
@@ -5786,29 +5788,72 @@ class ReporterGUI(tk.Frame):
 
 	def cp_generate_preview(self, id):
 		base.debugmsg(8, "id:", id)
+		pid, idl, idr = base.rt_graph_LR_Ids(id)
+
 		# if id not in self.contentdata:
 		while id not in self.contentdata:
 			time.sleep(0.1)
-			self.contentdata[id] = {}
+			self.contentdata[pid] = {}
+		if "Changed" not in self.contentdata[pid]:
+			self.contentdata[pid]["Changed"] = 0
+		while idl not in self.contentdata:
+			time.sleep(0.1)
+			self.contentdata[idl] = {}
+		if "Changed" not in self.contentdata[idl]:
+			self.contentdata[idl]["Changed"] = 0
+		while idr not in self.contentdata:
+			time.sleep(0.1)
+			self.contentdata[idr] = {}
+		if "Changed" not in self.contentdata[idr]:
+			self.contentdata[idr]["Changed"] = 0
+
+		type = base.report_item_get_type(pid)
+		base.debugmsg(8, "type:", type)
+		changed = False
+
+		base.debugmsg(9, "base.report_item_get_changed(pid):", base.report_item_get_changed(pid))
+		base.debugmsg(9, "self.contentdata[pid]:", self.contentdata[pid])
+		base.debugmsg(9, "self.contentdata[pid][Changed]:", self.contentdata[pid]["Changed"])
+		if base.report_item_get_changed(pid) > self.contentdata[pid]["Changed"]:
+			changed = True
+		base.debugmsg(9, "changed:", changed)
+		if type == 'graph':
+			base.debugmsg(8, "type:", type)
+			if base.report_item_get_changed(idl) > self.contentdata[idl]["Changed"]:
+				changed = True
+			if base.report_item_get_changed(idr) > self.contentdata[idr]["Changed"]:
+				changed = True
+		base.debugmsg(8, "changed:", changed)
+
+
 		gen = False
-		if "Preview" not in self.contentdata[id]:
+		if "Preview" not in self.contentdata[pid]:
 			gen = True
 		# if "Changed" in self.contentdata[id] and base.report_item_get_changed(id) > self.contentdata[id]["Changed"]:
-		elif base.report_item_get_changed(id) > self.contentdata[id]["Changed"]:
+		elif changed:
 			gen = True
 
-			base.debugmsg(8, "report_item_get_changed:", base.report_item_get_changed(id), "	contentdata Changed:", self.contentdata[id]["Changed"])
+			base.debugmsg(8, "report_item_get_changed pid:", base.report_item_get_changed(pid), "	contentdata Changed:", self.contentdata[pid]["Changed"])
+			if type == 'graph':
+				base.debugmsg(8, "report_item_get_changed idl:", base.report_item_get_changed(idl), "	contentdata Changed:", self.contentdata[idl]["Changed"])
+				base.debugmsg(8, "report_item_get_changed idr:", base.report_item_get_changed(idr), "	contentdata Changed:", self.contentdata[idr]["Changed"])
 		else:
-			base.debugmsg(8, "report_item_get_changed:", base.report_item_get_changed(id), "	contentdata Changed:", self.contentdata[id]["Changed"])
+			base.debugmsg(8, "report_item_get_changed pid:", base.report_item_get_changed(pid), "	contentdata Changed:", self.contentdata[pid]["Changed"])
+			if type == 'graph':
+				base.debugmsg(8, "report_item_get_changed idl:", base.report_item_get_changed(idl), "	contentdata Changed:", self.contentdata[idl]["Changed"])
+				base.debugmsg(8, "report_item_get_changed idr:", base.report_item_get_changed(idr), "	contentdata Changed:", self.contentdata[idr]["Changed"])
 
 		base.debugmsg(7, "gen:", gen)
 		if gen:
-			if "Preview" in self.contentdata[id]:
-				del self.contentdata[id]["Preview"]
-			while "Preview" not in self.contentdata[id]:
+			if "Preview" in self.contentdata[pid]:
+				del self.contentdata[pid]["Preview"]
+			while "Preview" not in self.contentdata[pid]:
 				time.sleep(0.1)
-				self.contentdata[id]["Changed"] = base.report_item_get_changed(id)
-				self.contentdata[id]["Preview"] = tk.Frame(self.contentpreview, padx=0, pady=0, bd=0)
+				self.contentdata[pid]["Changed"] = base.report_item_get_changed(pid)
+				if type == 'graph':
+					self.contentdata[idl]["Changed"] = base.report_item_get_changed(idl)
+					self.contentdata[idr]["Changed"] = base.report_item_get_changed(idr)
+				self.contentdata[pid]["Preview"] = tk.Frame(self.contentpreview, padx=0, pady=0, bd=0)
 			# self.contentdata[id]["Preview"].config(bg="gold")
 			# self.contentdata[id]["Preview"].config(bg=self.style_reportbg_colour)
 			if id == "TOP":
@@ -5858,7 +5903,7 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["lbltitle"].grid(column=0, row=rownum, columnspan=9, sticky="nsew")
 
 				self.contentdata[id]["rownum"] = rownum + 1
-				type = base.report_item_get_type(id)
+				# type = base.report_item_get_type(id)
 				base.debugmsg(8, "type:", type)
 				if type == 'contents':
 					self.cp_contents(id)
@@ -6068,12 +6113,23 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["Preview"].columnconfigure(1, weight=1)
 
 	def cp_graph(self, id):
-		base.debugmsg(9, "id:", id)
-		datatype = base.rt_graph_get_dt(id)
-		if datatype == "SQL":
-			sql = base.rt_graph_get_sql(id)
+		pid, idl, idr = base.rt_graph_LR_Ids(id)
+		base.debugmsg(5, "pid:", pid, "	idl:", idl, "	idr:", idr)
+
+		datatypel = base.rt_graph_get_dt(idl)
+		datatyper = base.rt_graph_get_dt(idr)
+
+		if datatypel == "SQL":
+			sqll = base.rt_graph_get_sql(idl)
 		else:
-			sql = base.rt_graph_generate_sql(id)
+			sqll = base.rt_graph_generate_sql(idl)
+		base.debugmsg(9, "sqll:", sqll)
+
+		if datatyper == "SQL":
+			sqlr = base.rt_graph_get_sql(idr)
+		else:
+			sqlr = base.rt_graph_generate_sql(idr)
+		base.debugmsg(9, "sqlr:", sqlr)
 
 		rownum = self.contentdata[id]["rownum"]
 		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text="    ")
@@ -6093,6 +6149,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["fig"] = Figure(dpi=self.contentdata[id]["fig_dpi"])
 		self.contentdata[id]["axis"] = self.contentdata[id]["fig"].add_subplot(1, 1, 1)
 		self.contentdata[id]["axis"].grid(True, 'major', 'both')
+		# self.contentdata[id]["axisR"] = self.contentdata[id]["fig"].add_subplot(1, 1, 1)
+		# self.contentdata[id]["axisR"].grid(True, 'major', 'both')
 		self.contentdata[id]["fig"].autofmt_xdate(bottom=0.2, rotation=30, ha='right')
 
 		self.contentdata[id]["canvas"] = FigureCanvasTkAgg(self.contentdata[id]["fig"], self.contentdata[id]["fmeGraph"])
@@ -6110,12 +6168,15 @@ class ReporterGUI(tk.Frame):
 		dodraw = False
 		self.contentdata[id]["graphdata"] = {}
 
-		if sql is not None and len(sql.strip()) > 0:
-			base.debugmsg(7, "sql:", sql)
-			key = "{}_{}".format(id, base.report_item_get_changed(id))
-			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+		# Populate Left Y Axis Data
+		if sqll is not None and len(sqll.strip()) > 0:
+			base.debugmsg(7, "sqll:", sqll)
+			key = "{}_{}".format(id, base.report_item_get_changed(idl))
+			base.debugmsg(7, "key:", key)
+			base.dbqueue["Read"].append({"SQL": sqll, "KEY": key})
 			while key not in base.dbqueue["ReadResult"]:
 				time.sleep(0.1)
+				# base.debugmsg(9, "Waiting for gdata for:", key)
 
 			gdata = base.dbqueue["ReadResult"][key]
 			base.debugmsg(9, "gdata:", gdata)
@@ -6164,18 +6225,12 @@ class ReporterGUI(tk.Frame):
 
 				SMetric = "Other"
 				if datatype == "Metric":
-					SMetric = base.rt_table_get_sm(id)
+					SMetric = base.rt_table_get_sm(idl)
 				base.debugmsg(8, "SMetric:", SMetric)
 				if SMetric in ["Load", "CPU", "MEM", "NET"]:
 					self.contentdata[id]["axis"].set_ylim(0, 100)
 				else:
 					self.contentdata[id]["axis"].set_ylim(0)
-
-				# base.debugmsg(9, "showlegend:", grphWindow.showlegend.get())
-				# if grphWindow.showlegend.get():
-				# 	# self.contentdata[id]["axis"].legend()
-				# 	# self.contentdata[id]["axis"].legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),&nbsp; shadow=True, ncol=2)
-				# 	self.contentdata[id]["axis"].legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
 
 				self.contentdata[id]["fig"].set_tight_layout(True)
 				self.contentdata[id]["fig"].autofmt_xdate(bottom=0.2, rotation=30, ha='right')
@@ -6183,6 +6238,81 @@ class ReporterGUI(tk.Frame):
 					self.contentdata[id]["canvas"].draw()
 				except Exception as e:
 					base.debugmsg(5, "canvas.draw() Exception:", e)
+
+
+		# attempt to Populate right Y Axis Data
+		if sqlr is not None and len(sqlr.strip()) > 0:
+			base.debugmsg(7, "sqlr:", sqlr)
+			key = "{}_{}".format(id, base.report_item_get_changed(idr))
+			base.debugmsg(7, "key:", key)
+			base.dbqueue["Read"].append({"SQL": sqlr, "KEY": key})
+			while key not in base.dbqueue["ReadResult"]:
+				time.sleep(0.1)
+				# base.debugmsg(9, "Waiting for gdata for:", key)
+
+			gdata = base.dbqueue["ReadResult"][key]
+			base.debugmsg(9, "gdata:", gdata)
+
+			for row in gdata:
+				base.debugmsg(9, "row:", row)
+				if 'Name' in row:
+					name = row['Name']
+					base.debugmsg(9, "name:", name)
+					if name not in self.contentdata[id]["graphdata"]:
+						self.contentdata[id]["graphdata"][name] = {}
+
+						colour = base.named_colour(name)
+						base.debugmsg(8, "name:", name, "	colour:", colour)
+						self.contentdata[id]["graphdata"][name]["Colour"] = colour
+						# self.contentdata[id]["graphdata"][name]["Time"] = []
+						self.contentdata[id]["graphdata"][name]["objTime"] = []
+						self.contentdata[id]["graphdata"][name]["Values"] = []
+
+					self.contentdata[id]["graphdata"][name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+					self.contentdata[id]["graphdata"][name]["Values"].append(base.rt_graph_floatval(row["Value"]))
+				else:
+					break
+
+			base.debugmsg(8, "self.contentdata[id][graphdata]:", self.contentdata[id]["graphdata"])
+
+			# for name in self.contentdata[id]["graphdata"]:
+			# 	base.debugmsg(7, "name:", name)
+			# 	if len(self.contentdata[id]["graphdata"][name]["Values"]) > 1 and len(self.contentdata[id]["graphdata"][name]["Values"]) == len(self.contentdata[id]["graphdata"][name]["objTime"]):
+			# 		try:
+			# 			self.contentdata[id]["axisR"].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name)
+			# 			dodraw = True
+			# 		except Exception as e:
+			# 			base.debugmsg(7, "axis.plot() Exception:", e)
+			#
+			# 	if len(self.contentdata[id]["graphdata"][name]["Values"]) == 1 and len(self.contentdata[id]["graphdata"][name]["Values"]) == len(self.contentdata[id]["graphdata"][name]["objTime"]):
+			# 		try:
+			# 			self.contentdata[id]["axisR"].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name, marker='o')
+			# 			dodraw = True
+			# 		except Exception as e:
+			# 			base.debugmsg(7, "axis.plot() Exception:", e)
+			#
+			# if dodraw:
+			#
+			# 	self.contentdata[id]["axisR"].grid(True, 'major', 'both')
+			#
+			# 	SMetric = "Other"
+			# 	if datatype == "Metric":
+			# 		SMetric = base.rt_table_get_sm(idr)
+			# 	base.debugmsg(8, "SMetric:", SMetric)
+			# 	if SMetric in ["Load", "CPU", "MEM", "NET"]:
+			# 		self.contentdata[id]["axisR"].set_ylim(0, 100)
+			# 	else:
+			# 		self.contentdata[id]["axisR"].set_ylim(0)
+			#
+			# 	self.contentdata[id]["fig"].set_tight_layout(True)
+			# 	self.contentdata[id]["fig"].autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+			# 	try:
+			# 		self.contentdata[id]["canvas"].draw()
+			# 	except Exception as e:
+			# 		base.debugmsg(5, "canvas.draw() Exception:", e)
+
+
+
 
 	def cp_table(self, id):
 		base.debugmsg(9, "id:", id)
