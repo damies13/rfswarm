@@ -2485,26 +2485,42 @@ class ReporterCore:
 
 	def xhtml_sections_graph(self, elmt, id):
 		base.debugmsg(8, "id:", id)
+		pid, idl, idr = base.rt_graph_LR_Ids(id)
+		base.debugmsg(5, "pid:", pid, "	idl:", idl, "	idr:", idr)
 
 		body = etree.SubElement(elmt, 'div')
 		body.set("class", "body")
 
-		datatype = base.rt_graph_get_dt(id)
-		if datatype == "SQL":
-			sql = base.rt_graph_get_sql(id)
+		axisenl = base.rt_graph_get_axisen(idl)
+		axisenr = base.rt_graph_get_axisen(idr)
+
+		datatypel = base.rt_graph_get_dt(idl)
+		datatyper = base.rt_graph_get_dt(idr)
+
+		if datatypel == "SQL":
+			sqll = base.rt_graph_get_sql(idl)
 		else:
-			sql = base.rt_graph_generate_sql(id)
+			sqll = base.rt_graph_generate_sql(idl)
+
+		if datatyper == "SQL":
+			sqlr = base.rt_graph_get_sql(idr)
+		else:
+ 			sqlr = base.rt_graph_generate_sql(idr)
 
 		gphdpi = 72
 		# gphdpi = 100
 		fig = Figure(dpi=gphdpi)
-		axis = fig.add_subplot(1, 1, 1)
-		axis.grid(True, 'major', 'both')
+		axisl = fig.add_subplot(1, 1, 1)
+		axisl.grid(True, 'major', 'x')
+		axisr = axisl.twinx()
+
 		fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
 
 		canvas = FigureCanvas(fig)
 
 		# https://stackoverflow.com/questions/57316491/how-to-convert-matplotlib-figure-to-pil-image-object-without-saving-image
+		axisl.tick_params(labelleft=False, length=0)
+		axisr.tick_params(labelright=False, length=0)
 
 		try:
 			canvas.draw()
@@ -2515,66 +2531,128 @@ class ReporterCore:
 		dodraw = False
 		graphdata = {}
 
-		if sql is not None and len(sql.strip()) > 0:
-			base.debugmsg(7, "sql:", sql)
-			key = "{}_{}".format(id, base.report_item_get_changed(id))
-			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
-			while key not in base.dbqueue["ReadResult"]:
-				time.sleep(0.1)
+		if (sqll is not None and len(sqll.strip()) > 0) or (sqlr is not None and len(sqlr.strip()) > 0):
 
-			gdata = base.dbqueue["ReadResult"][key]
-			base.debugmsg(9, "gdata:", gdata)
+			if sqll is not None and len(sqll.strip()) > 0 and axisenl > 0:
+				base.debugmsg(7, "sqll:", sqll)
+				key = "{}_{}".format(idl, base.report_item_get_changed(idl))
+				base.dbqueue["Read"].append({"SQL": sqll, "KEY": key})
+				while key not in base.dbqueue["ReadResult"]:
+					time.sleep(0.1)
 
-			for row in gdata:
-				base.debugmsg(9, "row:", row)
-				if 'Name' in row:
-					name = row['Name']
-					base.debugmsg(9, "name:", name)
-					if name not in graphdata:
-						graphdata[name] = {}
+				gdata = base.dbqueue["ReadResult"][key]
+				base.debugmsg(9, "gdata:", gdata)
 
-						colour = base.named_colour(name)
-						base.debugmsg(8, "name:", name, "	colour:", colour)
-						graphdata[name]["Colour"] = colour
-						# self.contentdata[id]["graphdata"][name]["Time"] = []
-						graphdata[name]["objTime"] = []
-						graphdata[name]["Values"] = []
+				for row in gdata:
+					base.debugmsg(9, "row:", row)
+					if 'Name' in row:
+						name = row['Name']
+						base.debugmsg(9, "name:", name)
+						if name not in graphdata:
+							graphdata[name] = {}
 
-					graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
-					graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
-				else:
-					break
+							colour = base.named_colour(name)
+							base.debugmsg(8, "name:", name, "	colour:", colour)
+							graphdata[name]["Colour"] = colour
+							graphdata[name]["Axis"] = "axisL"
+							# self.contentdata[id]["graphdata"][name]["Time"] = []
+							graphdata[name]["objTime"] = []
+							graphdata[name]["Values"] = []
+
+						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
+					else:
+						break
+
+			if sqlr is not None and len(sqlr.strip()) > 0 and axisenr > 0:
+				base.debugmsg(7, "sqlr:", sqlr)
+				key = "{}_{}".format(idr, base.report_item_get_changed(idr))
+				base.dbqueue["Read"].append({"SQL": sqlr, "KEY": key})
+				while key not in base.dbqueue["ReadResult"]:
+					time.sleep(0.1)
+
+				gdata = base.dbqueue["ReadResult"][key]
+				base.debugmsg(9, "gdata:", gdata)
+
+				for row in gdata:
+					base.debugmsg(9, "row:", row)
+					if 'Name' in row:
+						name = row['Name']
+						base.debugmsg(9, "name:", name)
+						if name not in graphdata:
+							graphdata[name] = {}
+
+							colour = base.named_colour(name)
+							base.debugmsg(8, "name:", name, "	colour:", colour)
+							graphdata[name]["Colour"] = colour
+							graphdata[name]["Axis"] = "axisR"
+							# self.contentdata[id]["graphdata"][name]["Time"] = []
+							graphdata[name]["objTime"] = []
+							graphdata[name]["Values"] = []
+
+						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
+					else:
+						break
 
 			base.debugmsg(9, "graphdata:", graphdata)
 
 			for name in graphdata:
 				base.debugmsg(7, "name:", name)
+
+				axis = "axisL"
+				if "Axis" in graphdata[name]:
+					axis = graphdata[name]["Axis"]
+
 				if len(graphdata[name]["Values"]) > 1 and len(graphdata[name]["Values"]) == len(graphdata[name]["objTime"]):
 					try:
-						axis.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name)
+						if axis == "axisL":
+							axisl.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name)
+						elif axis == "axisR":
+							axisr.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name)
 						dodraw = True
 					except Exception as e:
 						base.debugmsg(7, "axis.plot() Exception:", e)
 
 				if len(graphdata[name]["Values"]) == 1 and len(graphdata[name]["Values"]) == len(graphdata[name]["objTime"]):
 					try:
-						axis.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name, marker='o')
+						if axis == "axisL":
+							axisl.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name, marker='o')
+						elif axis == "axisR":
+							axisr.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name, marker='o')
 						dodraw = True
 					except Exception as e:
 						base.debugmsg(7, "axis.plot() Exception:", e)
 
 			if dodraw:
 
-				axis.grid(True, 'major', 'both')
+				# Left axis Limits
+				if axisenl > 0:
+					axisl.grid(True, 'major', 'y')
+					axisl.tick_params(labelleft=True, length=5)
 
-				SMetric = "Other"
-				if datatype == "Metric":
-					SMetric = base.rt_table_get_sm(id)
-				base.debugmsg(8, "SMetric:", SMetric)
-				if SMetric in ["Load", "CPU", "MEM", "NET"]:
-					axis.set_ylim(0, 100)
-				else:
-					axis.set_ylim(0)
+					SMetric = "Other"
+					if datatypel == "Metric":
+						SMetric = base.rt_table_get_sm(idl)
+					base.debugmsg(8, "SMetric:", SMetric)
+					if SMetric in ["Load", "CPU", "MEM", "NET"]:
+						axisl.set_ylim(0, 100)
+					else:
+						axisl.set_ylim(0)
+
+				# Right axis Limits
+				if axisenr > 0:
+					axisr.grid(True, 'major', 'y')
+					axisr.tick_params(labelright=True, length=5)
+
+					SMetric = "Other"
+					if datatyper == "Metric":
+						SMetric = base.rt_table_get_sm(idr)
+					base.debugmsg(8, "SMetric:", SMetric)
+					if SMetric in ["Load", "CPU", "MEM", "NET"]:
+						axisr.set_ylim(0, 100)
+					else:
+						axisr.set_ylim(0)
 
 				fig.set_tight_layout(True)
 				fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
