@@ -857,8 +857,6 @@ class ReporterBase():
 			base.report_item_set_changed(id)
 			base.report_save()
 
-
-
 	def rt_graph_get_axisen(self, id):
 		base.debugmsg(9, "id:", id)
 		if id in base.report and 'AxisEn' in base.report[id]:
@@ -876,7 +874,6 @@ class ReporterBase():
 			base.report[id]['AxisEn'] = str(value)
 			base.report_item_set_changed(id)
 			base.report_save()
-
 
 	def rt_graph_get_dt(self, id):
 		base.debugmsg(9, "id:", id)
@@ -5325,7 +5322,6 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[idr]["intAxsEn"].set(axisenr)
 		self.contentdata[idr]["chkAxsEn"].grid(column=1, row=rownum, sticky="nsew")
 
-
 		rownum += 1
 		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[pid]["LFrame"], text="Data Type:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
@@ -5440,9 +5436,6 @@ class ReporterGUI(tk.Frame):
 		if "intAxsEn" in self.contentdata[idr]:
 			value = self.contentdata[idr]["intAxsEn"].get()
 			base.rt_graph_set_axisen(idr, value)
-
-
-
 
 		if "tSQL" in self.contentdata[idl]:
 			data = self.contentdata[idl]["tSQL"].get('0.0', tk.END).strip()
@@ -5698,7 +5691,6 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idr]["tSQL"].bind('<Leave>', self.cs_graph_update)
 				self.contentdata[idr]["tSQL"].bind('<FocusOut>', self.cs_graph_update)
 
-
 		# Update
 		if datatypel == "SQL":
 			sql = base.rt_graph_get_sql(idl)
@@ -5824,7 +5816,6 @@ class ReporterGUI(tk.Frame):
 			if base.report_item_get_changed(idr) > self.contentdata[idr]["Changed"]:
 				changed = True
 		base.debugmsg(8, "changed:", changed)
-
 
 		gen = False
 		if "Preview" not in self.contentdata[pid]:
@@ -6311,17 +6302,12 @@ class ReporterGUI(tk.Frame):
 					else:
 						self.contentdata[id]["axisR"].set_ylim(0)
 
-
 				self.contentdata[id]["fig"].set_tight_layout(True)
 				self.contentdata[id]["fig"].autofmt_xdate(bottom=0.2, rotation=30, ha='right')
 				try:
 					self.contentdata[id]["canvas"].draw()
 				except Exception as e:
 					base.debugmsg(5, "canvas.draw() Exception:", e)
-
-
-
-
 
 	def cp_table(self, id):
 		base.debugmsg(9, "id:", id)
