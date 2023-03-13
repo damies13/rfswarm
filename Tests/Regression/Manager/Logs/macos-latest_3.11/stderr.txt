@@ -1,1 +1,48 @@
-2023-03-11 11:15:48.194 Python[2873:32038] Persistent UI failed to open file file:///Users/runner/Library/Saved%20Application%20State/org.python.python.savedState/window_1.data: No such file or directory (2)
+Exception in thread Thread-6 (pln_update_graph):
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/threading.py", line 1038, in _bootstrap_inner
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/threading.py", line 975, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py", line 5421, in pln_update_graph
+    self.canvas.draw()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/matplotlib/backends/backend_tkagg.py", line 11, in draw
+    self.blit()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/matplotlib/backends/backend_tkagg.py", line 14, in blit
+    _backend_tk.blit(self._tkphoto, self.renderer.buffer_rgba(),
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/matplotlib/backends/_backend_tk.py", line 116, in blit
+    photoimage.tk.call(_blit_tcl_name, argsid)
+RuntimeError: main thread is not in main loop
+Exception in Tkinter callback
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/tkinter/__init__.py", line 1948, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+  File "/Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py", line 3263, in on_closing
+    core.on_closing()
+    ^^^^
+NameError: name 'core' is not defined
+Traceback (most recent call last):
+  File "/Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py", line 6925, in <module>
+    core = RFSwarmCore()
+           ^^^^^^^^^^^^^
+  File "/Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py", line 2197, in __init__
+    self.BuildCore()
+  File "/Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py", line 2214, in BuildCore
+    self.BuildCorePlan()
+  File "/Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py", line 2457, in BuildCorePlan
+    base.addScriptRow()
+  File "/Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py", line 1647, in addScriptRow
+    base.gui.addScriptRow()
+  File "/Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py", line 5514, in addScriptRow
+    self.sg_canvas.config(scrollregion=self.sg_canvas.bbox("all"))
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/tkinter/__init__.py", line 2787, in bbox
+    self.tk.call((self._w, 'bbox') + args)) or None
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: invalid command name ".!rfswarmgui.!notebook.!frame.!frame2.!canvas"
+Exception ignored in: <module 'threading' from '/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/threading.py'>
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/threading.py", line 1583, in _shutdown
+    lock.acquire()
+TypeError: RFSwarmGUI.on_closing() takes from 1 to 2 positional arguments but 3 were given
