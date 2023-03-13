@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 6.0.2 (Python 3.11.2 on darwin)" generated="20230313 06:58:30.745" rpa="false" schemaversion="3">
+<robot generator="Robot 6.0.2 (Python 3.11.2 on darwin)" generated="20230313 10:22:59.558" rpa="false" schemaversion="3">
 <suite id="s1" name="Reporter" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter">
 <suite id="s1-s1" name="CommandLine" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/CommandLine.robot">
 <kw name="Clean Up Old Files" type="SETUP">
@@ -9,87 +9,87 @@
 <kw name="Log To Console" library="BuiltIn">
 <arg>${OUTPUT DIR}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20230313 06:58:30.779" endtime="20230313 06:58:30.779"/>
+<status status="PASS" starttime="20230313 10:22:59.602" endtime="20230313 10:22:59.603"/>
 </kw>
 <kw name="Remove File" library="OperatingSystem">
 <arg>${OUTPUT DIR}${/}*.txt</arg>
 <doc>Removes a file with the given path.</doc>
-<msg timestamp="20230313 06:58:30.780" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/stdout.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/stdout.txt&lt;/a&gt;'.</msg>
-<msg timestamp="20230313 06:58:30.780" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/stderr.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/stderr.txt&lt;/a&gt;'.</msg>
-<status status="PASS" starttime="20230313 06:58:30.779" endtime="20230313 06:58:30.780"/>
+<msg timestamp="20230313 10:22:59.608" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/stdout.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/stdout.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230313 10:22:59.608" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/stderr.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/stderr.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230313 10:22:59.607" endtime="20230313 10:22:59.609"/>
 </kw>
 <kw name="Remove File" library="OperatingSystem">
 <arg>${OUTPUT DIR}${/}*.png</arg>
 <doc>Removes a file with the given path.</doc>
-<msg timestamp="20230313 06:58:30.781" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/Reporter.GUIBasic-screenshot-1.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/Reporter.GUIBasic-screenshot-1.png&lt;/a&gt;'.</msg>
-<status status="PASS" starttime="20230313 06:58:30.780" endtime="20230313 06:58:30.781"/>
+<msg timestamp="20230313 10:22:59.609" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/Reporter.GUIBasic-screenshot-1.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/Reporter.GUIBasic-screenshot-1.png&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230313 10:22:59.609" endtime="20230313 10:22:59.609"/>
 </kw>
-<status status="PASS" starttime="20230313 06:58:30.779" endtime="20230313 06:58:30.781"/>
+<status status="PASS" starttime="20230313 10:22:59.602" endtime="20230313 10:22:59.610"/>
 </kw>
 <test id="s1-s1-t1" name="Reporter Version" line="12">
 <kw name="Run" library="OperatingSystem">
 <var>${result}</var>
 <arg>python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -v</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<msg timestamp="20230313 06:58:30.790" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -v 2&gt;&amp;1'.</msg>
-<msg timestamp="20230313 06:58:40.157" level="INFO">${result} = Robot Framework Swarm: Reporter 
+<msg timestamp="20230313 10:22:59.624" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -v 2&gt;&amp;1'.</msg>
+<msg timestamp="20230313 10:23:10.112" level="INFO">${result} = Robot Framework Swarm: Reporter 
 	Version 1.1.0 </msg>
-<status status="PASS" starttime="20230313 06:58:30.782" endtime="20230313 06:58:40.157"/>
+<status status="PASS" starttime="20230313 10:22:59.610" endtime="20230313 10:23:10.112"/>
 </kw>
 <kw name="Log To Console" library="BuiltIn">
 <arg>${\n}${result}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20230313 06:58:40.158" endtime="20230313 06:58:40.158"/>
+<status status="PASS" starttime="20230313 10:23:10.113" endtime="20230313 10:23:10.113"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Version</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20230313 06:58:40.158" endtime="20230313 06:58:40.158"/>
+<status status="PASS" starttime="20230313 10:23:10.113" endtime="20230313 10:23:10.114"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Reporter</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20230313 06:58:40.159" endtime="20230313 06:58:40.159"/>
+<status status="PASS" starttime="20230313 10:23:10.114" endtime="20230313 10:23:10.114"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20230313 06:58:30.781" endtime="20230313 06:58:40.159"/>
+<status status="PASS" starttime="20230313 10:22:59.610" endtime="20230313 10:23:10.114"/>
 </test>
 <test id="s1-s1-t2" name="Reporter Help" line="19">
 <kw name="Run" library="OperatingSystem">
 <var>${result}</var>
 <arg>python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -h</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<msg timestamp="20230313 06:58:40.163" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -h 2&gt;&amp;1'.</msg>
-<msg timestamp="20230313 06:58:41.118" level="INFO">${result} = Robot Framework Swarm: Reporter 
+<msg timestamp="20230313 10:23:10.118" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -h 2&gt;&amp;1'.</msg>
+<msg timestamp="20230313 10:23:11.469" level="INFO">${result} = Robot Framework Swarm: Reporter 
 	Version 1.1.0 
 usage: rfswarm_reporter.py [-h] [-g DEBUG] [-v] [-i INI] [-n] [-d DIR]
                            [-t TEMPLATE] [--html] [--docx] [--xlsx]
 
 options:
   ...</msg>
-<status status="PASS" starttime="20230313 06:58:40.160" endtime="20230313 06:58:41.118"/>
+<status status="PASS" starttime="20230313 10:23:10.115" endtime="20230313 10:23:11.469"/>
 </kw>
 <kw name="Log To Console" library="BuiltIn">
 <arg>${\n}${result}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20230313 06:58:41.118" endtime="20230313 06:58:41.118"/>
+<status status="PASS" starttime="20230313 10:23:11.470" endtime="20230313 10:23:11.470"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Excel</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20230313 06:58:41.119" endtime="20230313 06:58:41.119"/>
+<status status="PASS" starttime="20230313 10:23:11.470" endtime="20230313 10:23:11.470"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20230313 06:58:40.159" endtime="20230313 06:58:41.119"/>
+<status status="PASS" starttime="20230313 10:23:10.115" endtime="20230313 10:23:11.471"/>
 </test>
-<status status="PASS" starttime="20230313 06:58:30.769" endtime="20230313 06:58:41.120"/>
+<status status="PASS" starttime="20230313 10:22:59.586" endtime="20230313 10:23:11.471"/>
 </suite>
 <suite id="s1-s2" name="GUI Basic" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot">
 <test id="s1-s2-t1" name="GUI Runs and Closes" line="12">
@@ -97,13 +97,13 @@ options:
 <arg>${platform}</arg>
 <arg>macos</arg>
 <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
-<msg timestamp="20230313 06:58:46.160" level="INFO">${platform} = macos</msg>
-<status status="PASS" starttime="20230313 06:58:46.159" endtime="20230313 06:58:46.160"/>
+<msg timestamp="20230313 10:23:16.825" level="INFO">${platform} = macos</msg>
+<status status="PASS" starttime="20230313 10:23:16.824" endtime="20230313 10:23:16.825"/>
 </kw>
 <kw name="Set Confidence" library="ImageHorizonLibrary">
 <arg>0.9</arg>
 <doc>Sets the accuracy when finding images.</doc>
-<status status="PASS" starttime="20230313 06:58:46.160" endtime="20230313 06:58:46.160"/>
+<status status="PASS" starttime="20230313 10:23:16.825" endtime="20230313 10:23:16.825"/>
 </kw>
 <kw name="Start Process" library="Process">
 <arg>python3</arg>
@@ -114,32 +114,32 @@ options:
 <arg>stdout=${OUTPUT DIR}${/}stdout.txt</arg>
 <arg>stderr=${OUTPUT DIR}${/}stderr.txt</arg>
 <doc>Starts a new process on background.</doc>
-<msg timestamp="20230313 06:58:46.161" level="INFO">Starting process:
+<msg timestamp="20230313 10:23:16.826" level="INFO">Starting process:
 python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -g 5</msg>
-<status status="PASS" starttime="20230313 06:58:46.160" endtime="20230313 06:58:46.167"/>
+<status status="PASS" starttime="20230313 10:23:16.826" endtime="20230313 10:23:16.834"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>60</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<msg timestamp="20230313 06:59:46.227" level="INFO">Slept 1 minute</msg>
-<status status="PASS" starttime="20230313 06:58:46.168" endtime="20230313 06:59:46.227"/>
+<msg timestamp="20230313 10:24:16.836" level="INFO">Slept 1 minute</msg>
+<status status="PASS" starttime="20230313 10:23:16.835" endtime="20230313 10:24:16.836"/>
 </kw>
 <kw name="Set Screenshot Folder" library="ImageHorizonLibrary">
 <arg>${OUTPUT DIR}</arg>
 <doc>Sets the folder where screenshots are saved to.</doc>
-<status status="PASS" starttime="20230313 06:59:46.227" endtime="20230313 06:59:46.228"/>
+<status status="PASS" starttime="20230313 10:24:16.836" endtime="20230313 10:24:16.837"/>
 </kw>
 <kw name="Take A Screenshot" library="ImageHorizonLibrary">
 <doc>Takes a screenshot of the screen.</doc>
-<msg timestamp="20230313 06:59:46.228" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/Reporter.GUIBasic-screenshot-1.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/Reporter.GUIBasic-screenshot-1.png" width="100%" /&gt;</msg>
-<status status="PASS" starttime="20230313 06:59:46.228" endtime="20230313 06:59:46.552"/>
+<msg timestamp="20230313 10:24:16.837" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/Reporter.GUIBasic-screenshot-1.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.11/Reporter.GUIBasic-screenshot-1.png" width="100%" /&gt;</msg>
+<status status="PASS" starttime="20230313 10:24:16.837" endtime="20230313 10:24:17.161"/>
 </kw>
 <tag>macos-latest</tag>
-<status status="PASS" starttime="20230313 06:58:46.158" endtime="20230313 06:59:46.552"/>
+<status status="PASS" starttime="20230313 10:23:16.823" endtime="20230313 10:24:17.161"/>
 </test>
-<status status="PASS" starttime="20230313 06:58:41.121" endtime="20230313 06:59:46.553"/>
+<status status="PASS" starttime="20230313 10:23:11.472" endtime="20230313 10:24:17.162"/>
 </suite>
-<status status="PASS" starttime="20230313 06:58:30.746" endtime="20230313 06:59:46.554"/>
+<status status="PASS" starttime="20230313 10:22:59.560" endtime="20230313 10:24:17.163"/>
 </suite>
 <statistics>
 <total>
