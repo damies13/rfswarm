@@ -2505,7 +2505,7 @@ class ReporterCore:
 		if datatyper == "SQL":
 			sqlr = base.rt_graph_get_sql(idr)
 		else:
- 			sqlr = base.rt_graph_generate_sql(idr)
+			sqlr = base.rt_graph_generate_sql(idr)
 
 		gphdpi = 72
 		# gphdpi = 100
@@ -3047,7 +3047,7 @@ class ReporterCore:
 		if datatyper == "SQL":
 			sqlr = base.rt_graph_get_sql(idr)
 		else:
- 			sqlr = base.rt_graph_generate_sql(idr)
+			sqlr = base.rt_graph_generate_sql(idr)
 
 		gphdpi = 72
 		# gphdpi = 100
@@ -3694,7 +3694,7 @@ class ReporterCore:
 		if datatyper == "SQL":
 			sqlr = base.rt_graph_get_sql(idr)
 		else:
- 			sqlr = base.rt_graph_generate_sql(idr)
+			sqlr = base.rt_graph_generate_sql(idr)
 
 		gphdpi = 72
 		# gphdpi = 100
