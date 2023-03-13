@@ -6116,6 +6116,9 @@ class ReporterGUI(tk.Frame):
 		pid, idl, idr = base.rt_graph_LR_Ids(id)
 		base.debugmsg(5, "pid:", pid, "	idl:", idl, "	idr:", idr)
 
+		axisenl = base.rt_graph_get_axisen(idl)
+		axisenr = base.rt_graph_get_axisen(idr)
+
 		datatypel = base.rt_graph_get_dt(idl)
 		datatyper = base.rt_graph_get_dt(idr)
 
@@ -6147,14 +6150,16 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["fmeGraph"].rowconfigure(0, weight=1)
 		self.contentdata[id]["fig_dpi"] = 72
 		self.contentdata[id]["fig"] = Figure(dpi=self.contentdata[id]["fig_dpi"])
+
 		self.contentdata[id]["axisL"] = self.contentdata[id]["fig"].add_subplot(1, 1, 1)
 		base.debugmsg(8, "axisL:", self.contentdata[id]["axisL"])
-		self.contentdata[id]["axisL"].grid(True, 'major', 'both')
-		base.debugmsg(8, "axisL:", self.contentdata[id]["axisL"])
+		# self.contentdata[id]["axisL"].grid(True, 'major', 'both')
+		self.contentdata[id]["axisL"].grid(True, 'major', 'x')
+		# base.debugmsg(8, "axisL:", self.contentdata[id]["axisL"])
 		self.contentdata[id]["axisR"] = self.contentdata[id]["axisL"].twinx()
 		base.debugmsg(8, "axisR:", self.contentdata[id]["axisR"])
-		self.contentdata[id]["axisR"].grid(True, 'major', 'both')
-		base.debugmsg(8, "axisR:", self.contentdata[id]["axisR"])
+		# self.contentdata[id]["axisR"].grid(True, 'major', 'both')
+		# base.debugmsg(8, "axisR:", self.contentdata[id]["axisR"])
 		self.contentdata[id]["fig"].autofmt_xdate(bottom=0.2, rotation=30, ha='right')
 
 		self.contentdata[id]["canvas"] = FigureCanvasTkAgg(self.contentdata[id]["fig"], self.contentdata[id]["fmeGraph"])
@@ -6163,6 +6168,16 @@ class ReporterGUI(tk.Frame):
 
 		base.debugmsg(8, "canvas:", self.contentdata[id]["canvas"])
 		# base.debugmsg(8, "axis:", self.contentdata[id]["axis"])
+
+		# https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.tick_params.html
+		# self.contentdata[id]["axisL"].grid(True, 'major', 'x')
+		# https://matplotlib.org/stable/api/_as_gen/matplotlib.axis.Axis.get_ticklabels.html
+
+		# tckprms = self.contentdata[id]["axisL"].get_tick_params(which='major')
+		# base.debugmsg(5, "tckprms:", tckprms)
+
+		self.contentdata[id]["axisL"].tick_params(labelleft=False, length=0)
+		self.contentdata[id]["axisR"].tick_params(labelright=False, length=0)
 
 		try:
 			self.contentdata[id]["canvas"].draw()
@@ -6175,7 +6190,7 @@ class ReporterGUI(tk.Frame):
 
 		if (sqll is not None and len(sqll.strip()) > 0) or (sqlr is not None and len(sqlr.strip()) > 0):
 			# Populate Left Y Axis Data
-			if sqll is not None and len(sqll.strip()) > 0:
+			if sqll is not None and len(sqll.strip()) > 0 and axisenl > 0:
 				base.debugmsg(7, "sqll:", sqll)
 				key = "{}_{}".format(id, base.report_item_get_changed(idl))
 				base.debugmsg(7, "key:", key)
@@ -6209,7 +6224,7 @@ class ReporterGUI(tk.Frame):
 						break
 
 			# attempt to Populate right Y Axis Data
-			if sqlr is not None and len(sqlr.strip()) > 0:
+			if sqlr is not None and len(sqlr.strip()) > 0 and axisenr > 0:
 				base.debugmsg(7, "sqlr:", sqlr)
 				key = "{}_{}".format(id, base.report_item_get_changed(idr))
 				base.debugmsg(7, "key:", key)
@@ -6268,31 +6283,33 @@ class ReporterGUI(tk.Frame):
 
 			if dodraw:
 
-				self.contentdata[id]["axisL"].grid(True, 'major', 'both')
-				self.contentdata[id]["axisR"].grid(True, 'major', 'both')
-				# self.contentdata[id]["axis"][0].grid(True, 'major', 'both')
-				# self.contentdata[id]["axis"][1].grid(True, 'major', 'both')
-
-
 				# Left axis Limits
-				SMetric = "Other"
-				if datatypel == "Metric":
-					SMetric = base.rt_table_get_sm(idl)
-				base.debugmsg(8, "SMetric:", SMetric)
-				if SMetric in ["Load", "CPU", "MEM", "NET"]:
-					self.contentdata[id]["axisL"].set_ylim(0, 100)
-				else:
-					self.contentdata[id]["axisL"].set_ylim(0)
+				if axisenl > 0:
+					self.contentdata[id]["axisL"].grid(True, 'major', 'y')
+					self.contentdata[id]["axisL"].tick_params(labelleft=True, length=5)
+
+					SMetric = "Other"
+					if datatypel == "Metric":
+						SMetric = base.rt_table_get_sm(idl)
+					base.debugmsg(8, "SMetric:", SMetric)
+					if SMetric in ["Load", "CPU", "MEM", "NET"]:
+						self.contentdata[id]["axisL"].set_ylim(0, 100)
+					else:
+						self.contentdata[id]["axisL"].set_ylim(0)
 
 				# Right axis Limits
-				SMetric = "Other"
-				if datatyper == "Metric":
-					SMetric = base.rt_table_get_sm(idr)
-				base.debugmsg(8, "SMetric:", SMetric)
-				if SMetric in ["Load", "CPU", "MEM", "NET"]:
-					self.contentdata[id]["axisR"].set_ylim(0, 100)
-				else:
-					self.contentdata[id]["axisR"].set_ylim(0)
+				if axisenr > 0:
+					self.contentdata[id]["axisR"].grid(True, 'major', 'y')
+					self.contentdata[id]["axisR"].tick_params(labelright=True, length=5)
+
+					SMetric = "Other"
+					if datatyper == "Metric":
+						SMetric = base.rt_table_get_sm(idr)
+					base.debugmsg(8, "SMetric:", SMetric)
+					if SMetric in ["Load", "CPU", "MEM", "NET"]:
+						self.contentdata[id]["axisR"].set_ylim(0, 100)
+					else:
+						self.contentdata[id]["axisR"].set_ylim(0)
 
 
 				self.contentdata[id]["fig"].set_tight_layout(True)
