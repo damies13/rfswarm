@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #		Manager
-#    Versionv1.0.3"
+#    Version 1.0.0"
 #
 
 # 	Helpful links

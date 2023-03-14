@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #		Reporter
-#    Versionv1.0.3"
+#    Version 1.0.0"
 #
 
 import sys
