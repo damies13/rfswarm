@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version 1.0.0"
+#    Version 1.0.3"
 #
 
 
@@ -41,7 +41,7 @@ import inspect
 
 class RFSwarmAgent():
 
-	version="1.0.0"
+	version = "1.0.3"
 	config = None
 	isconnected = False
 	isrunning = False
