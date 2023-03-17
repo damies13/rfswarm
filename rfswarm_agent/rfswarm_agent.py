@@ -2,7 +2,7 @@
 #
 #	Robot Framework Swarm
 #
-#    Version 1.0.3"
+#    Version1.0.3"
 #
 
 
