@@ -1515,7 +1515,6 @@ class RFSwarmBase:
 		else:
 			return value
 
-
 	def saveini(self):
 		self.debugmsg(6, "save_ini:", self.save_ini)
 		if self.save_ini:
@@ -2611,7 +2610,7 @@ class RFSwarmCore:
 		# base.config[iniid]		glist = base.config['GUI']['graph_list'].split(",")
 		iniglist = list(base.config['GUI']['graph_list'].split(","))
 		base.debugmsg(9, "iniglist: ", iniglist)
-		base.config['GUI']['graph_list'] = base.inisafevalue(",".join( set(iniglist + graphlist) ))
+		base.config['GUI']['graph_list'] = base.inisafevalue(",".join(set(iniglist + graphlist)))
 
 		base.debugmsg(9, "config graph_list: ", base.config['GUI']['graph_list'])
 
