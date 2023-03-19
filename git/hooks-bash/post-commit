@@ -16,11 +16,18 @@ if [[ "$version" =~ v[0-9]\. ]]; then
 	# echo "numver: $numver"
 
 	if [ "$OS" == 'Darwin' ]; then
-		sed -i '' -e "s/version *= *\"[^\"]*\"/version=\"${numver}\"/" $(find . -name "*.py")
+
+		# Missing whitespace around operator (E225)	-	There should be one space before and after all operators.
+		sed -i '' -e "s/version *= *\"[^\"]*\"[^,]/version = \"${numver}\"/" $(find . -name "*.py")
+		# Unexpected spaces around keyword / parameter equals (E251)	-	There should be no spaces before or after the = in a function definition.
+		sed -i '' -e "s/version *= *\"[^\"]*\",/version=\"${numver}\",/" $(find . -name "*.py")
 		#	Version Test
 		sed -i '' -e "s/#    Version .*/#    Version ${numver}/" $(find . -name "*.py")
 	else
-		sed -i -e "s/version *= *\"[^\"]*\"/version=\"${numver}\"/" $(find . -name "*.py")
+		# Missing whitespace around operator (E225)	-	There should be one space before and after all operators.
+		sed -i -e "s/version *= *\"[^\"]*\"[^,]/version = \"${numver}\"/" $(find . -name "*.py")
+		# Unexpected spaces around keyword / parameter equals (E251)	-	There should be no spaces before or after the = in a function definition.
+		sed -i -e "s/version *= *\"[^\"]*\",/version=\"${numver}\",/" $(find . -name "*.py")
 		sed -i -e "s/#    Version .*/#    Version ${numver}/" $(find . -name "*.py")
 	fi
 
