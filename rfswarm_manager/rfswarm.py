@@ -2,7 +2,7 @@
 #
 # 	Robot Framework Swarm
 # 		Manager
-#    Version 1.1.0
+#    Version 1.1.0"
 #
 
 # 	Helpful links
@@ -755,7 +755,7 @@ class RFSwarmBase:
 			base.debugmsg(5, "dir_path:", base.dir_path)
 			# self.resultsdir = os.path.join(base.dir_path, "results")
 			if 'ResultsDir' not in base.config['Run']:
-				base.config['Run']['ResultsDir'] = os.path.join(base.dir_path, "results")
+				base.config['Run']['ResultsDir'] = base.inisafevalue(os.path.join(base.dir_path, "results"))
 				base.saveini()
 			self.resultsdir = base.config['Run']['ResultsDir']
 
@@ -1503,6 +1503,19 @@ class RFSwarmBase:
 			self.debugmsg(1, "with error: ", e)
 			return False
 
+	def inisafevalue(self, value):
+		self.debugmsg(6, "value:", value, type(value))
+		if isinstance(value, dict):
+			newval = {}
+			for key in value.keys():
+				newval[key] = base.inisafevalue(value[key])
+			return newval
+		elif isinstance(value, str):
+			return value.replace('%', '%%')
+		else:
+			return value
+
+
 	def saveini(self):
 		self.debugmsg(6, "save_ini:", self.save_ini)
 		if self.save_ini:
@@ -2068,7 +2081,7 @@ class RFSwarmCore:
 			base.debugmsg(5, "scenariofile: ", scenariofile)
 			if 'Plan' not in base.config:
 				base.config['Plan'] = {}
-			base.config['Plan']['ScenarioFile'] = scenariofile
+			base.config['Plan']['ScenarioFile'] = base.inisafevalue(scenariofile)
 
 		if base.args.dir:
 			base.save_ini = False
@@ -2077,21 +2090,21 @@ class RFSwarmCore:
 			base.debugmsg(5, "ResultsDir: ", ResultsDir)
 			if 'Run' not in base.config:
 				base.config['Run'] = {}
-			base.config['Run']['ResultsDir'] = ResultsDir
+			base.config['Run']['ResultsDir'] = base.inisafevalue(ResultsDir)
 
 		if base.args.ipaddress:
 			base.save_ini = False
 			base.debugmsg(5, "base.args.ipaddress: ", base.args.ipaddress)
 			if 'Server' not in base.config:
 				base.config['Server'] = {}
-			base.config['Server']['BindIP'] = base.args.ipaddress
+			base.config['Server']['BindIP'] = base.inisafevalue(base.args.ipaddress)
 
 		if base.args.port:
 			base.save_ini = False
 			base.debugmsg(5, "base.args.port: ", base.args.port)
 			if 'Server' not in base.config:
 				base.config['Server'] = {}
-			base.config['Server']['BindPort'] = base.args.port
+			base.config['Server']['BindPort'] = base.inisafevalue(base.args.port)
 
 		#
 		# GUI
@@ -2121,11 +2134,11 @@ class RFSwarmCore:
 			base.saveini()
 
 		if 'ScriptDir' not in base.config['Plan']:
-			base.config['Plan']['ScriptDir'] = base.dir_path
+			base.config['Plan']['ScriptDir'] = base.inisafevalue(base.dir_path)
 			base.saveini()
 
 		if 'ScenarioDir' not in base.config['Plan']:
-			base.config['Plan']['ScenarioDir'] = base.dir_path
+			base.config['Plan']['ScenarioDir'] = base.inisafevalue(base.dir_path)
 			base.saveini()
 
 		if 'ScenarioFile' not in base.config['Plan']:
@@ -2135,8 +2148,8 @@ class RFSwarmCore:
 			# check file exists - it may have been deleted since rfswarm last ran with this ini file
 			if not os.path.exists(base.config['Plan']['ScenarioFile']):
 				base.config['Plan']['ScenarioFile'] = ""
-				base.config['Plan']['ScriptDir'] = base.dir_path
-				base.config['Plan']['ScenarioDir'] = base.dir_path
+				base.config['Plan']['ScriptDir'] = base.inisafevalue(base.dir_path)
+				base.config['Plan']['ScenarioDir'] = base.inisafevalue(base.dir_path)
 				base.saveini()
 
 		#
@@ -2148,7 +2161,7 @@ class RFSwarmCore:
 			base.saveini()
 
 		if 'ResultsDir' not in base.config['Run']:
-			base.config['Run']['ResultsDir'] = os.path.join(base.dir_path, "results")
+			base.config['Run']['ResultsDir'] = base.inisafevalue(os.path.join(base.dir_path, "results"))
 			base.saveini()
 
 		if 'display_index' not in base.config['Run']:
@@ -2461,11 +2474,11 @@ class RFSwarmCore:
 
 		base.debugmsg(6, "ScenarioFile: ", ScenarioFile)
 		base.debugmsg(6, "base.config['Plan']['ScenarioFile']: ", base.config['Plan']['ScenarioFile'])
-		base.config['Plan']['ScenarioDir'] = os.path.dirname(ScenarioFile)
+		base.config['Plan']['ScenarioDir'] = base.inisafevalue(os.path.dirname(ScenarioFile))
 		base.debugmsg(6, "base.config['Plan']['ScenarioDir']: ", base.config['Plan']['ScenarioDir'])
 		if base.config['Plan']['ScenarioFile'] != ScenarioFile:
 			base.debugmsg(6, "ScenarioFile:", ScenarioFile)
-			base.config['Plan']['ScenarioFile'] = ScenarioFile
+			base.config['Plan']['ScenarioFile'] = base.inisafevalue(ScenarioFile)
 			base.saveini()
 
 		filedata = configparser.ConfigParser()
@@ -2598,7 +2611,7 @@ class RFSwarmCore:
 		# base.config[iniid]		glist = base.config['GUI']['graph_list'].split(",")
 		iniglist = list(base.config['GUI']['graph_list'].split(","))
 		base.debugmsg(9, "iniglist: ", iniglist)
-		base.config['GUI']['graph_list'] = ",".join(set(iniglist + graphlist))
+		base.config['GUI']['graph_list'] = base.inisafevalue(",".join( set(iniglist + graphlist) ))
 
 		base.debugmsg(9, "config graph_list: ", base.config['GUI']['graph_list'])
 
@@ -3003,7 +3016,7 @@ class RFSwarmCore:
 				t = threading.Thread(target=base.find_dependancies, args=(script_hash, ))
 				t.start()
 
-			base.config['Plan']['ScriptDir'] = os.path.dirname(scriptfile)
+			base.config['Plan']['ScriptDir'] = base.inisafevalue(os.path.dirname(scriptfile))
 			base.saveini()
 		else:
 			if "ScriptHash" in base.scriptlist[r]:
@@ -3253,7 +3266,7 @@ class RFSwarmGUI(tk.Frame):
 			pass
 		# mnu_file_Close clears this value, need to set it back so that it is saved
 		# 		in the ini file so the next app open loads the file
-		base.config['Plan']['ScenarioFile'] = sf
+		base.config['Plan']['ScenarioFile'] = base.inisafevalue(sf)
 
 		base.debugmsg(3, "Close GUI")
 		try:
@@ -4090,12 +4103,12 @@ class RFSwarmGUI(tk.Frame):
 		del self.graphs[settings["id"]]["window"]
 		self.graphs[settings["id"]]["settings"] = settings
 
-		base.config['GUI']['graph_list'] = ",".join(self.graphs.keys())
+		base.config['GUI']['graph_list'] = base.inisafevalue(",".join(self.graphs.keys()))
 
 		iniid = "{}".format(settings["id"])
 		if iniid not in base.config:
 			base.config[iniid] = {}
-		base.config[iniid] = settings
+		base.config[iniid] = base.inisafevalue(settings)
 		base.saveini()
 
 	def gph_windowevent(self, event, *args):
@@ -4121,12 +4134,12 @@ class RFSwarmGUI(tk.Frame):
 				self.graphs[settings["id"]]["window"] = grphWindow
 				self.graphs[settings["id"]]["settings"] = settings
 
-				base.config['GUI']['graph_list'] = ",".join(self.graphs.keys())
+				base.config['GUI']['graph_list'] = base.inisafevalue(",".join(self.graphs.keys()))
 
 				iniid = "{}".format(settings["id"])
 				if iniid not in base.config:
 					base.config[iniid] = {}
-				base.config[iniid] = settings
+				base.config[iniid] = base.inisafevalue(settings)
 				base.saveini()
 
 	def gph_updater(self, grphWindow):
@@ -4912,7 +4925,7 @@ class RFSwarmGUI(tk.Frame):
 
 		setingsWindow.strResultsDir = tk.StringVar()
 		if 'ResultsDir' not in base.config['Run']:
-			base.config['Run']['ResultsDir'] = os.path.join(base.dir_path, "results")
+			base.config['Run']['ResultsDir'] = base.inisafevalue(os.path.join(base.dir_path, "results"))
 			base.saveini()
 		setingsWindow.strResultsDir.set(base.config['Run']['ResultsDir'])
 
@@ -5000,18 +5013,18 @@ class RFSwarmGUI(tk.Frame):
 				newip = setingsWindow.strBindIP.get()
 				base.debugmsg(5, "newip:", newip)
 				if len(str(newip)) > 0:
-					base.config['Server']['BindIP'] = newip
+					base.config['Server']['BindIP'] = base.inisafevalue(newip)
 					srvrestart = True
 
 			if len(srvip) > 0 and len(newip) < 1:
-				base.config['Server']['BindIP'] = newip
+				base.config['Server']['BindIP'] = base.inisafevalue(newip)
 				base.saveini()
 				srvrestart = True
 
 			newport = setingsWindow.intBindPort.get()
 			base.debugmsg(5, "newport:", newport)
 			if newport > 0 and newport != srvport:
-				base.config['Server']['BindPort'] = str(newport)
+				base.config['Server']['BindPort'] = base.inisafevalue(str(newport))
 				base.saveini()
 				srvrestart = True
 
@@ -5019,7 +5032,7 @@ class RFSwarmGUI(tk.Frame):
 			newResultsDir = setingsWindow.strResultsDir.get()
 			base.debugmsg(5, "newResultsDir:", newResultsDir)
 			if len(newResultsDir) > 0 and newResultsDir != srvResultsDir:
-				base.config['Run']['ResultsDir'] = newResultsDir
+				base.config['Run']['ResultsDir'] = base.inisafevalue(newResultsDir)
 				base.saveini()
 
 			if srvrestart:
@@ -5739,7 +5752,7 @@ class RFSwarmGUI(tk.Frame):
 				t = threading.Thread(target=base.find_dependancies, args=(script_hash, ))
 				t.start()
 
-			base.config['Plan']['ScriptDir'] = os.path.dirname(scriptfile)
+			base.config['Plan']['ScriptDir'] = base.inisafevalue(os.path.dirname(scriptfile))
 			base.saveini()
 			self.sr_test_genlist(r)
 		else:
@@ -6209,23 +6222,23 @@ class RFSwarmGUI(tk.Frame):
 
 		display_index = self.display_run['display_index'].get()
 		if display_index != base.str2bool(base.config['Run']['display_index']):
-			base.config['Run']['display_index'] = str(display_index)
+			base.config['Run']['display_index'] = base.inisafevalue(str(display_index))
 			base.saveini()
 
 		display_iteration = self.display_run['display_iteration'].get()
 		if display_iteration != base.str2bool(base.config['Run']['display_iteration']):
-			base.config['Run']['display_iteration'] = str(display_iteration)
+			base.config['Run']['display_iteration'] = base.inisafevalue(str(display_iteration))
 			base.saveini()
 
 		display_sequence = self.display_run['display_sequence'].get()
 		if display_sequence != base.str2bool(base.config['Run']['display_sequence']):
-			base.config['Run']['display_sequence'] = str(display_sequence)
+			base.config['Run']['display_sequence'] = base.inisafevalue(str(display_sequence))
 			base.saveini()
 
 		# self.display_run['display_percentile']
 		display_percentile = int(self.display_run['display_percentile'].get())
 		if display_percentile != int(base.config['Run']['display_percentile']):
-			base.config['Run']['display_percentile'] = str(display_percentile)
+			base.config['Run']['display_percentile'] = base.inisafevalue(str(display_percentile))
 			base.saveini()
 
 		# base.robot_schedule["Start"]
@@ -6244,7 +6257,7 @@ class RFSwarmGUI(tk.Frame):
 			if not base.args.nogui:
 				display_percentile = int(self.display_run['display_percentile'].get())
 			if display_percentile != int(base.config['Run']['display_percentile']):
-				base.config['Run']['display_percentile'] = str(display_percentile)
+				base.config['Run']['display_percentile'] = base.inisafevalue(str(display_percentile))
 				base.saveini()
 
 			display_index = base.config['Run']['display_index']
@@ -6252,21 +6265,21 @@ class RFSwarmGUI(tk.Frame):
 				display_index = self.display_run['display_index'].get()
 			base.debugmsg(9, "delayed_UpdateRunStats: display_index:", display_index, "	config[Run][display_index]:", base.config['Run']['display_index'], "	bool(config[Run][display_index]):", base.str2bool(base.config['Run']['display_index']))
 			if display_index != base.str2bool(base.config['Run']['display_index']):
-				base.config['Run']['display_index'] = str(display_index)
+				base.config['Run']['display_index'] = base.inisafevalue(str(display_index))
 				base.saveini()
 
 			display_iteration = base.config['Run']['display_iteration']
 			if not base.args.nogui:
 				display_iteration = self.display_run['display_iteration'].get()
 			if display_iteration != base.str2bool(base.config['Run']['display_iteration']):
-				base.config['Run']['display_iteration'] = str(display_iteration)
+				base.config['Run']['display_iteration'] = base.inisafevalue(str(display_iteration))
 				base.saveini()
 
 			display_sequence = base.config['Run']['display_sequence']
 			if not base.args.nogui:
 				display_sequence = self.display_run['display_sequence'].get()
 			if display_sequence != base.str2bool(base.config['Run']['display_sequence']):
-				base.config['Run']['display_sequence'] = str(display_sequence)
+				base.config['Run']['display_sequence'] = base.inisafevalue(str(display_sequence))
 				base.saveini()
 
 			base.UpdateRunStats_SQL()
@@ -6829,7 +6842,7 @@ class RFSwarmGUI(tk.Frame):
 				filedata['Scenario'] = {}
 
 			# base.uploadmode
-			filedata['Scenario']['UploadMode'] = base.uploadmode
+			filedata['Scenario']['UploadMode'] = base.inisafevalue(base.uploadmode)
 
 			scriptidx = str(0)
 			if 'ScriptCount' not in filedata['Scenario']:
@@ -6853,10 +6866,10 @@ class RFSwarmGUI(tk.Frame):
 					for key in scrpcopy.keys():
 						base.debugmsg(8, "key:", key)
 						if key not in ['Index', 'TestVar', 'ScriptHash']:
-							filedata[scriptidx][key] = str(scrpcopy[key])
+							filedata[scriptidx][key] = base.inisafevalue(str(scrpcopy[key]))
 							base.debugmsg(8, "filedata[", scriptidx, "][", key, "]:", filedata[scriptidx][key])
 
-			filedata['Scenario']['ScriptCount'] = scriptidx
+			filedata['Scenario']['ScriptCount'] = base.inisafevalue(scriptidx)
 
 			# Save graphs
 
@@ -6866,9 +6879,9 @@ class RFSwarmGUI(tk.Frame):
 					if "open" in self.graphs[iniid]["settings"]:
 						if self.graphs[iniid]["settings"]["open"]:
 							sgraphs.append(iniid)
-							filedata[iniid] = self.graphs[iniid]["settings"]
+							filedata[iniid] = base.inisafevalue(self.graphs[iniid]["settings"])
 
-			filedata['Scenario']['GraphList'] = ",".join(sgraphs)
+			filedata['Scenario']['GraphList'] = base.inisafevalue(",".join(sgraphs))
 
 			with open(base.config['Plan']['ScenarioFile'], 'w', encoding="utf8") as sf:    # save
 				filedata.write(sf)
@@ -6893,7 +6906,7 @@ class RFSwarmGUI(tk.Frame):
 			if filetupl[1] != ".rfs":
 				ScenarioFile += ".rfs"
 				base.debugmsg(9, "mnu_file_SaveAs: ScenarioFile:", ScenarioFile)
-			base.config['Plan']['ScenarioFile'] = ScenarioFile
+			base.config['Plan']['ScenarioFile'] = base.inisafevalue(ScenarioFile)
 			self.mnu_file_Save()
 
 	def mnu_file_Close(self, _event=None):
