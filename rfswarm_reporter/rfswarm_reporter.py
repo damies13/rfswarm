@@ -289,7 +289,7 @@ class ReporterBase():
 			saved = True
 		if saved:
 			base.config['Reporter']['Template'] = base.whitespace_set_ini_value(filename)
-			path, file= os.path.split(base.config['Reporter']['Template'])
+			path, file = os.path.split(base.config['Reporter']['Template'])
 			base.config['Reporter']['TemplateDir'] = base.whitespace_set_ini_value(path)
 			base.saveini()
 
@@ -298,7 +298,7 @@ class ReporterBase():
 			base.debugmsg(7, "filename: ", filename)
 
 			base.config['Reporter']['Template'] = base.whitespace_set_ini_value(filename)
-			path, file= os.path.split(base.config['Reporter']['Template'])
+			path, file = os.path.split(base.config['Reporter']['Template'])
 			base.config['Reporter']['TemplateDir'] = base.whitespace_set_ini_value(path)
 			base.saveini()
 
@@ -339,7 +339,7 @@ class ReporterBase():
 		else:
 			templatefile = base.whitespace_get_ini_value(base.config['Reporter']['Template'])
 			base.debugmsg(7, "Template: ", templatefile)
-			if len(templatefile)>0:
+			if len(templatefile) > 0:
 				base.template_open(templatefile)
 			else:
 				base.debugmsg(7, "template_create")
@@ -878,17 +878,18 @@ class ReporterBase():
 
 	def rt_graph_get_dt(self, id):
 		base.debugmsg(9, "id:", id)
+		pid = base.report_subsection_parent(id)
 		if 'DataType' in base.report[id]:
 			return base.whitespace_get_ini_value(base.report[id]['DataType'])
 		elif pid in base.report and 'DataType' in base.report[pid]:
-			return base.report[pid]['DataType']
+			return base.whitespace_get_ini_value(base.report[pid]['DataType'])
 		else:
 			return None
 
 	def rt_graph_set_dt(self, id, datatype):
 		base.debugmsg(5, "id:", id, "	datatype:", datatype)
 		prev = self.rt_table_get_dt(id)
-		if datatype != prev and datatype != None:
+		if datatype != prev and datatype is not None:
 			base.report[id]['DataType'] = base.whitespace_set_ini_value(datatype)
 			base.report_item_set_changed(id)
 			base.report_save()
@@ -1412,7 +1413,7 @@ class ReporterBase():
 	def rt_table_set_dt(self, id, datatype):
 		base.debugmsg(9, "id:", id, "	datatype:", datatype)
 		prev = self.rt_table_get_dt(id)
-		if datatype != prev and datatype != None:
+		if datatype != prev and datatype is not None:
 			base.report[id]['DataType'] = base.whitespace_set_ini_value(datatype)
 			base.report_item_set_changed(id)
 			base.report_save()
@@ -1427,7 +1428,7 @@ class ReporterBase():
 	def rt_table_set_rt(self, id, resulttype):
 		base.debugmsg(9, "id:", id, "	resulttype:", resulttype)
 		prev = self.rt_table_get_rt(id)
-		if resulttype != prev and resulttype != None:
+		if resulttype != prev and resulttype is not None:
 			base.report[id]['ResultType'] = base.whitespace_set_ini_value(resulttype)
 			base.report_item_set_changed(id)
 			base.report_save()
@@ -1443,7 +1444,7 @@ class ReporterBase():
 	def rt_table_set_fr(self, id, filterresult):
 		base.debugmsg(9, "id:", id, "	filterresult:", filterresult)
 		prev = self.rt_table_get_fr(id)
-		if filterresult != prev and filterresult != None:
+		if filterresult != prev and filterresult is not None:
 			base.report[id]['FilterResult'] = base.whitespace_set_ini_value(filterresult)
 			base.report_item_set_changed(id)
 			base.report_save()
@@ -1459,7 +1460,7 @@ class ReporterBase():
 	def rt_table_set_fn(self, id, filtertype):
 		base.debugmsg(5, "id:", id, "	filtertype:", filtertype)
 		prev = self.rt_table_get_fr(id)
-		if filtertype != prev and filtertype != None:
+		if filtertype != prev and filtertype is not None:
 			base.report[id]['FilterType'] = base.whitespace_set_ini_value(filtertype)
 			base.report_item_set_changed(id)
 			base.report_save()
@@ -1475,7 +1476,7 @@ class ReporterBase():
 	def rt_table_set_fp(self, id, filterpattern):
 		base.debugmsg(5, "id:", id, "	filterpattern:", filterpattern)
 		prev = self.rt_table_get_fp(id)
-		if filterpattern != prev and filterpattern != None:
+		if filterpattern != prev and filterpattern is not None:
 			base.report[id]['FilterPattern'] = base.whitespace_set_ini_value(filterpattern)
 			base.report_item_set_changed(id)
 			base.report_save()
@@ -1509,17 +1510,18 @@ class ReporterBase():
 
 	def rt_table_get_mt(self, id):
 		base.debugmsg(9, "id:", id)
+		pid = base.report_subsection_parent(id)
 		if 'MetricType' in base.report[id]:
 			return base.whitespace_get_ini_value(base.report[id]['MetricType'])
 		elif pid in base.report and 'MetricType' in base.report[pid]:
-			return base.report[pid]['MetricType']
+			return base.whitespace_get_ini_value(base.report[pid]['MetricType'])
 		else:
 			return ""
 
 	def rt_table_set_mt(self, id, metrictype):
 		base.debugmsg(5, "id:", id, "	metrictype:", metrictype)
 		prev = self.rt_table_get_mt(id)
-		if metrictype != prev and metrictype != None:
+		if metrictype != prev and metrictype is not None:
 			base.report[id]['MetricType'] = base.whitespace_set_ini_value(metrictype)
 			base.report_item_set_changed(id)
 			base.report_save()
@@ -1546,17 +1548,18 @@ class ReporterBase():
 	# pm PrimaryMetric
 	def rt_table_get_pm(self, id):
 		base.debugmsg(9, "id:", id)
+		pid = base.report_subsection_parent(id)
 		if 'PrimaryMetric' in base.report[id]:
 			return base.whitespace_get_ini_value(base.report[id]['PrimaryMetric'])
 		elif pid in base.report and 'PrimaryMetric' in base.report[pid]:
-			return base.report[pid]['PrimaryMetric']
+			return base.whitespace_get_ini_value(base.report[pid]['PrimaryMetric'])
 		else:
 			return ""
 
 	def rt_table_set_pm(self, id, primarymetric):
 		base.debugmsg(5, "id:", id, "	primarymetric:", primarymetric)
 		prev = self.rt_table_get_pm(id)
-		if primarymetric != prev and primarymetric != None:
+		if primarymetric != prev and primarymetric is not None:
 			base.report[id]['PrimaryMetric'] = base.whitespace_set_ini_value(primarymetric)
 			base.report_item_set_changed(id)
 			base.report_save()
@@ -1592,17 +1595,18 @@ class ReporterBase():
 	# sm SecondaryMetric
 	def rt_table_get_sm(self, id):
 		base.debugmsg(9, "id:", id)
+		pid = base.report_subsection_parent(id)
 		if 'SecondaryMetric' in base.report[id]:
 			return base.whitespace_get_ini_value(base.report[id]['SecondaryMetric'])
 		elif pid in base.report and 'SecondaryMetric' in base.report[pid]:
-			return base.report[pid]['SecondaryMetric']
+			return base.whitespace_get_ini_value(base.report[pid]['SecondaryMetric'])
 		else:
 			return ""
 
 	def rt_table_set_sm(self, id, secondarymetric):
 		base.debugmsg(5, "id:", id, "	secondarymetric:", secondarymetric)
 		prev = self.rt_table_get_sm(id)
-		if secondarymetric != prev and secondarymetric != None:
+		if secondarymetric != prev and secondarymetric is not None:
 			base.report[id]['SecondaryMetric'] = base.whitespace_set_ini_value(secondarymetric)
 			base.report_item_set_changed(id)
 			base.report_save()
@@ -1659,14 +1663,14 @@ class ReporterBase():
 		if id in base.report and 'IsNumeric' in base.report[id]:
 			return int(base.report[id]['IsNumeric'])
 		elif pid in base.report and 'IsNumeric' in base.report[pid]:
-			return base.report[pid]['IsNumeric']
+			return int(base.report[pid]['IsNumeric'])
 		else:
 			return 0
 
 	def rt_table_set_isnumeric(self, id, value):
 		base.debugmsg(5, "id:", id, "	value:", value)
 		prev = self.rt_table_get_isnumeric(id)
-		if value != prev and value != None:
+		if value != prev and value is not None:
 			base.report[id]['IsNumeric'] = base.whitespace_set_ini_value(str(value))
 			base.report_item_set_changed(id)
 			base.report_save()
@@ -1677,14 +1681,14 @@ class ReporterBase():
 		if id in base.report and 'ShowCount' in base.report[id]:
 			return int(base.report[id]['ShowCount'])
 		elif pid in base.report and 'ShowCount' in base.report[pid]:
-			return base.report[pid]['ShowCount']
+			return int(base.report[pid]['ShowCount'])
 		else:
 			return 0
 
 	def rt_table_set_showcount(self, id, value):
 		base.debugmsg(5, "id:", id, "	value:", value)
 		prev = self.rt_table_get_showcount(id)
-		if value != prev and value != None:
+		if value != prev and value is not None:
 			base.report[id]['ShowCount'] = base.whitespace_set_ini_value(str(value))
 			base.report_item_set_changed(id)
 			base.report_save()
@@ -6718,7 +6722,7 @@ class ReporterGUI(tk.Frame):
 		# base.debugmsg(5, "Not implimented yet.....")
 		templatefile = base.whitespace_get_ini_value(base.config['Reporter']['Template'])
 		base.debugmsg(5, "Filename:", templatefile)
-		if len(templatefile)>0:
+		if len(templatefile) > 0:
 			base.template_save(templatefile)
 			self.updateTemplate()
 		else:
