@@ -1510,6 +1510,11 @@ class RFSwarmBase:
 			for key in value.keys():
 				newval[key] = base.inisafevalue(value[key])
 			return newval
+		elif isinstance(value, configparser.SectionProxy):
+			newval = {}
+			for key in value.keys():
+				newval[key] = base.inisafevalue(value[key])
+			return newval
 		elif isinstance(value, str):
 			return value.replace('%', '%%')
 		else:
@@ -2620,7 +2625,7 @@ class RFSwarmCore:
 		for iniid in graphlist:
 			if iniid in filedata:
 				base.debugmsg(5, "iniid: ", iniid, " 	filedata[iniid]:", filedata[iniid])
-				base.config[iniid] = filedata[iniid]
+				base.config[iniid] = base.inisafevalue(filedata[iniid])
 				if not base.args.nogui:
 					base.gui.AddScenarioGraph(filedata[iniid]["name"], iniid)
 
@@ -3078,6 +3083,7 @@ class RFSwarmCore:
 
 			if base.total_robots > 0 and robot_count < 1:
 				# run finished so clear run name
+				base.save_metrics(base.run_name, "Scenario", int(time.time()), "total_robots", robot_count)
 				base.save_metrics(base.run_name, "Scenario", int(time.time()), "End_Time", int(time.time()))
 				base.save_metrics("Time", "Scenario", int(time.time()), "End", int(time.time()))
 				base.run_name = ""
