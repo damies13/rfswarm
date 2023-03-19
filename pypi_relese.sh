@@ -2,6 +2,7 @@
 #
 #
 cd $(dirname "$0")
+OS=`uname -s`
 
 currversion=$(git rev-parse --abbrev-ref HEAD)
 echo $currversion
@@ -18,11 +19,14 @@ if [[ "$currversion" =~ v[0-9]\. ]]; then
 	version=$numver
 	echo version\: $version
 
-	# sed -i '' -e "s/version *= *\"[^\"]*\"/version = \"${version}\"/" $(find . -name "*.py")
-	sed -i '' -e "s/version = \"[^\"]*\"/version = \"${numver}\"/" $(find . -name "*.py")
-	sed -i '' -e "s/version=\"[^\"]*\"/version=\"${numver}\"/" $(find . -name "*.py")
-	#	Version Test
-	sed -i '' -e "s/#    Version .*/#    Version ${version}/" $(find . -name "*.py")
+	if [ "$OS" == 'Darwin' ]; then
+		sed -i '' -e "s/version *= *\"[^\"]*\"/version=\"${version}\"/" $(find . -name "*.py")
+		#	Version Test
+		sed -i '' -e "s/#    Version .*/#    Version ${version}/" $(find . -name "*.py")
+	else
+		sed -i -e "s/version = \"[^\"]*\"/version = \"${version}\"/" $(find . -name "*.py")
+		sed -i -e "s/#    Version .*/#    Version${version}\"/" $(find . -name "*.py")
+	fi
 
 	rm -R dist/
 	# python3 setup*.py sdist bdist_wheel
