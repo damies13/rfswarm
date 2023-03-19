@@ -21,7 +21,7 @@ if [[ "$version" =~ v[0-9]\. ]]; then
 		sed -i '' -e "s/#    Version .*/#    Version ${numver}/" $(find . -name "*.py")
 	else
 		sed -i -e "s/version *= *\"[^\"]*\"/version = \"${numver}\"/" $(find . -name "*.py")
-		sed -i -e "s/#    Version .*/#    Version ${numver}\"/" $(find . -name "*.py")
+		sed -i -e "s/#    Version .*/#    Version ${numver}/" $(find . -name "*.py")
 	fi
 
 
