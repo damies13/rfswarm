@@ -805,9 +805,7 @@ class RFSwarmBase:
 					(ID INTEGER, Name TEXT NOT NULL, Type TEXT NOT NULL, PRIMARY KEY("ID"))''')
 
 				c.execute('''CREATE TABLE Metrics
-					(ParentID INTEGER NOT NULL, Time INTEGER NOT NULL, Key TEXT NOT NULL, Value TEXT, DataSource INTEGER)''')
-					# we probably need to make DataSource not null at some point, but will leave it for now till we finish developing functions
-					# (ParentID INTEGER NOT NULL, Time INTEGER NOT NULL, Key TEXT NOT NULL, Value TEXT, DataSource INTEGER NOT NULL)''')
+					(ParentID INTEGER NOT NULL, Time INTEGER NOT NULL, Key TEXT NOT NULL, Value TEXT, DataSource INTEGER NOT NULL)''')
 
 				# create indexes?
 				c.execute('''
