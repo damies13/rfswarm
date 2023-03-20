@@ -316,7 +316,7 @@ class AgentServer(BaseHTTPRequestHandler):
 					base.debugmsg(7, "Metric")
 					jsonreq = json.loads(rawData)
 					base.debugmsg(7, "Metric: jsonreq:", jsonreq)
-					requiredfields = ["PrimaryMetric", "MetricType", "MetricTime", "SecondaryMetrics"]
+					requiredfields = ["AgentName", "PrimaryMetric", "MetricType", "MetricTime", "SecondaryMetrics"]
 					for field in requiredfields:
 						if field not in jsonreq:
 							httpcode = 422
@@ -328,8 +328,8 @@ class AgentServer(BaseHTTPRequestHandler):
 						base.debugmsg(7, "Result: httpcode:", httpcode)
 						jsonresp["Metric"] = jsonreq["PrimaryMetric"]
 
-						# core.register_metric(jsonreq["PrimaryMetric"], jsonreq["MetricType"], jsonreq["MetricTime"], jsonreq["SecondaryMetrics"])
-						t = threading.Thread(target=core.register_metric, args=(jsonreq["PrimaryMetric"], jsonreq["MetricType"], jsonreq["MetricTime"], jsonreq["SecondaryMetrics"], ))
+						# core.register_metric(jsonreq["PrimaryMetric"], jsonreq["MetricType"], jsonreq["MetricTime"], jsonreq["SecondaryMetrics"], jsonreq["AgentName"])
+						t = threading.Thread(target=core.register_metric, args=(jsonreq["PrimaryMetric"], jsonreq["MetricType"], jsonreq["MetricTime"], jsonreq["SecondaryMetrics"], jsonreq["AgentName"]))
 						t.start()
 
 						jsonresp["Result"] = "Queued"
@@ -668,7 +668,7 @@ class RFSwarmBase:
 					base.dbqueue["Metrics"] = []
 					base.debugmsg(9, "run_db_thread: dbqueue: Metrics: resdata:", resdata)
 					try:
-						sql = "INSERT INTO Metrics VALUES (?,?,?,?)"
+						sql = "INSERT INTO Metrics VALUES (?,?,?,?,?)"
 						cur = self.datadb.cursor()
 						cur.executemany(sql, resdata)
 						cur.close()
@@ -805,7 +805,9 @@ class RFSwarmBase:
 					(ID INTEGER, Name TEXT NOT NULL, Type TEXT NOT NULL, PRIMARY KEY("ID"))''')
 
 				c.execute('''CREATE TABLE Metrics
-					(ParentID INTEGER NOT NULL, Time INTEGER NOT NULL, Key TEXT NOT NULL, Value TEXT)''')
+					(ParentID INTEGER NOT NULL, Time INTEGER NOT NULL, Key TEXT NOT NULL, Value TEXT, DataSource INTEGER)''')
+					# we probably need to make DataSource not null at some point, but will leave it for now till we finish developing functions
+					# (ParentID INTEGER NOT NULL, Time INTEGER NOT NULL, Key TEXT NOT NULL, Value TEXT, DataSource INTEGER NOT NULL)''')
 
 				# create indexes?
 				c.execute('''
@@ -826,6 +828,14 @@ class RFSwarmBase:
 
 				c.execute('''
 				CREATE INDEX "idx_metrics_parentid_time_key" ON "Metrics" ( "ParentID"	ASC, "Time"	ASC, "Key"	ASC)
+				''')
+
+				c.execute('''
+				CREATE INDEX "idx_metrics_datasource_key" ON "Metrics" ( "DataSource"	ASC, "Key"	ASC)
+				''')
+
+				c.execute('''
+				CREATE INDEX "idx_metrics_datasource" ON "Metrics" ( "DataSource"	ASC)
 				''')
 
 				# create views
@@ -1000,8 +1010,10 @@ class RFSwarmBase:
 					, ms.Time "MetricTime"
 					, ms.Key "SecondaryMetric"
 					, ms.Value "MetricValue"
+					, ds.Name "DataSource"
 				FROM Metric as m
 				JOIN Metrics ms on m.ID = ms.ParentID
+				JOIN Metric ds on ms.DataSource = ds.ID
 				''')
 
 				self.datadb.commit()
@@ -1737,12 +1749,12 @@ class RFSwarmBase:
 			base.debugmsg(7, "stat:", stat)
 			statname = stat["result_name"]
 
-			base.save_metrics(statname, "Summary", m_Time, "EntryTime", m_Time)
+			base.save_metrics(statname, "Summary", m_Time, "EntryTime", m_Time, base.srvdisphost)
 
 			for stati in stat:
 				base.debugmsg(7, "stati:", stati, "	stat[stati]:", stat[stati])
 				if stati != "result_name":
-					base.save_metrics(statname, "Summary", m_Time, stati, stat[stati])
+					base.save_metrics(statname, "Summary", m_Time, stati, stat[stati], base.srvdisphost)
 
 	def report_text(self, _event=None):
 		base.debugmsg(6, "report_text")
@@ -1905,9 +1917,10 @@ class RFSwarmBase:
 
 		return self.MetricIDs[MetricType][MetricName]["ID"]
 
-	def save_metrics(self, PMetricName, MetricType, MetricTime, SMetricName, MetricValue):
+	def save_metrics(self, PMetricName, MetricType, MetricTime, SMetricName, MetricValue, DataSource):
 		self.debugmsg(7, PMetricName, MetricType, MetricTime, SMetricName, MetricValue)
 		metricid = self.create_metric(PMetricName, MetricType)
+		dsid = self.create_metric(DataSource, "DataSource")
 
 		# store in memory
 		if SMetricName not in self.MetricIDs[MetricType][PMetricName]:
@@ -1923,8 +1936,8 @@ class RFSwarmBase:
 
 		# save to db
 		if self.datadb is not None:
-			self.debugmsg(7, "metricid:", metricid, MetricTime, SMetricName, MetricValue)
-			self.dbqueue["Metrics"].append((metricid, MetricTime, SMetricName, MetricValue))
+			self.debugmsg(7, "metricid:", metricid, MetricTime, SMetricName, MetricValue, DataSource)
+			self.dbqueue["Metrics"].append((metricid, MetricTime, SMetricName, MetricValue, dsid))
 
 	def add_scriptfilter(self, filtername):
 		self.debugmsg(7, "filtername:", filtername, self.scriptfilters)
@@ -2339,7 +2352,7 @@ class RFSwarmCore:
 		srvip = base.config['Server']['BindIP']
 		srvport = int(base.config['Server']['BindPort'])
 		if len(srvip) > 0:
-			srvdisphost = srvip
+			base.srvdisphost = srvip
 			ip = ipaddress.ip_address(srvip)
 			base.debugmsg(5, "ip.version:", ip.version)
 			if ip.version == 6 and sys.version_info < (3, 8):
@@ -2347,9 +2360,9 @@ class RFSwarmCore:
 				pyver = "{}.{}.{}".format(sys.version_info[0], sys.version_info[1], sys.version_info[2])
 				base.debugmsg(0, "Python Version:", pyver, "	IP Version:", ip.version, "	IP Address:", srvip)
 				srvip = ''
-				srvdisphost = socket.gethostname()
+				base.srvdisphost = socket.gethostname()
 		else:
-			srvdisphost = socket.gethostname()
+			base.srvdisphost = socket.gethostname()
 
 		server_address = (srvip, srvport)
 		try:
@@ -2365,7 +2378,7 @@ class RFSwarmCore:
 
 		base.appstarted = True
 		base.debugmsg(5, "appstarted:", base.appstarted)
-		base.debugmsg(1, "Starting Agent Manager", "http://{}:{}/".format(srvdisphost, srvport))
+		base.debugmsg(1, "Starting Agent Manager", "http://{}:{}/".format(base.srvdisphost, srvport))
 		base.agenthttpserver.serve_forever()
 
 	def register_agent(self, agentdata):
@@ -2422,21 +2435,21 @@ class RFSwarmCore:
 
 		# save data to db
 
-		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "Status", agentdata["Status"])
-		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "LastSeen", agentdata["LastSeen"])
-		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "AssignedRobots", agentdata["AssignedRobots"])
-		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "Robots", agentdata["Robots"])
-		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "Load", agentdata["LOAD%"])
-		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "CPU", agentdata["CPU%"])
-		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "MEM", agentdata["MEM%"])
-		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "NET", agentdata["NET%"])
+		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "Status", agentdata["Status"], agentdata["AgentName"])
+		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "LastSeen", agentdata["LastSeen"], agentdata["AgentName"])
+		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "AssignedRobots", agentdata["AssignedRobots"], agentdata["AgentName"])
+		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "Robots", agentdata["Robots"], agentdata["AgentName"])
+		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "Load", agentdata["LOAD%"], agentdata["AgentName"])
+		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "CPU", agentdata["CPU%"], agentdata["AgentName"])
+		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "MEM", agentdata["MEM%"], agentdata["AgentName"])
+		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "NET", agentdata["NET%"], agentdata["AgentName"])
 
 		if "AgentIPs" in agentdata:
 			for ip in agentdata["AgentIPs"]:
-				base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "IPAddress", ip)
+				base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "IPAddress", ip, agentdata["AgentName"])
 		if "Properties" in agentdata:
 			for prop in agentdata["Properties"]:
-				base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], prop, agentdata["Properties"][prop])
+				base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], prop, agentdata["Properties"][prop], agentdata["AgentName"])
 
 	def register_result(self, AgentName, result_name, result, elapsed_time, start_time, end_time, index, robot, iter, sequence):
 		base.debugmsg(9, "register_result")
@@ -2449,15 +2462,15 @@ class RFSwarmCore:
 			ut = threading.Thread(target=base.gui.delayed_UpdateRunStats)
 			ut.start()
 
-	def register_metric(self, PrimaryMetric, MetricType, MetricTime, SecondaryMetrics):
-		# core.register_metric(jsonreq["PrimaryMetric"], jsonreq["MetricType"], jsonreq["MetricTime"], jsonreq["SecondaryMetrics"])
-		base.debugmsg(7, "PrimaryMetric:", PrimaryMetric, "	MetricType:", MetricType, "	MetricTime:", MetricTime, "	SecondaryMetrics:", SecondaryMetrics)
+	def register_metric(self, PrimaryMetric, MetricType, MetricTime, SecondaryMetrics, DataSource):
+		# core.register_metric(jsonreq["PrimaryMetric"], jsonreq["MetricType"], jsonreq["MetricTime"], jsonreq["SecondaryMetrics"], jsonreq["AgentName"])
+		base.debugmsg(7, "PrimaryMetric:", PrimaryMetric, "	MetricType:", MetricType, "	MetricTime:", MetricTime, "	SecondaryMetrics:", SecondaryMetrics, "	DataSource:", DataSource)
 
 		# Save Metric Data
 
 		for key in SecondaryMetrics:
-			base.debugmsg(7, PrimaryMetric, MetricType, MetricTime, key, SecondaryMetrics[key])
-			base.save_metrics(PrimaryMetric, MetricType, MetricTime, key, SecondaryMetrics[key])
+			base.debugmsg(7, PrimaryMetric, MetricType, MetricTime, key, SecondaryMetrics[key], DataSource)
+			base.save_metrics(PrimaryMetric, MetricType, MetricTime, key, SecondaryMetrics[key], DataSource)
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -2690,11 +2703,11 @@ class RFSwarmCore:
 			while not base.dbready:
 				time.sleep(0.1)
 
-			# base.save_metrics(base.run_name, "Scenario", int(time.time()), "starttime", base.run_starttime)
-			base.save_metrics(base.run_name, "Scenario", starttime, "Start", starttime)
-			base.save_metrics("Time", "Scenario", starttime, "Start", starttime)
+			# base.save_metrics(base.run_name, "Scenario", int(time.time()), "starttime", base.run_starttime, base.srvdisphost)
+			base.save_metrics(base.run_name, "Scenario", starttime, "Start", starttime, base.srvdisphost)
+			base.save_metrics("Time", "Scenario", starttime, "Start", starttime, base.srvdisphost)
 
-			base.save_metrics("Manager", "rfswarm", starttime, "Version", base.version)
+			base.save_metrics("Manager", "rfswarm", starttime, "Version", base.version, base.srvdisphost)
 
 			# collect list of test cases and robot files
 			# --- save_metrics(self, PMetricName, MetricType, MetricTime, SMetricName, MetricValue):
@@ -2702,23 +2715,23 @@ class RFSwarmCore:
 				base.debugmsg(5, "grp", grp)
 				if "Test" in grp.keys() and len(grp["Test"]) > 0:
 					base.debugmsg(5, "grp[Index]", grp['Index'])
-					base.save_metrics("Local_Path_{}".format(grp['Index']), "Scenario", starttime, grp['Script'], grp['Test'])
+					base.save_metrics("Local_Path_{}".format(grp['Index']), "Scenario", starttime, grp['Script'], grp['Test'], base.srvdisphost)
 
 					relpath = base.get_relative_path(base.config['Plan']['ScenarioFile'], grp['Script'])
-					base.save_metrics("Test_{}".format(grp['Index']), "Scenario", starttime, relpath, grp['Test'])
-					base.save_metrics(grp['Index'], "Scenario_Test", starttime, relpath, grp['Test'])
+					base.save_metrics("Test_{}".format(grp['Index']), "Scenario", starttime, relpath, grp['Test'], base.srvdisphost)
+					base.save_metrics(grp['Index'], "Scenario_Test", starttime, relpath, grp['Test'], base.srvdisphost)
 
-					base.save_metrics("Robots_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['Robots'])
-					base.save_metrics(grp['Index'], "Scenario_Robots", starttime, grp['Test'], grp['Robots'])
+					base.save_metrics("Robots_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['Robots'], base.srvdisphost)
+					base.save_metrics(grp['Index'], "Scenario_Robots", starttime, grp['Test'], grp['Robots'], base.srvdisphost)
 
-					base.save_metrics("Delay_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['Delay'])
-					base.save_metrics(grp['Index'], "Scenario_Delay", starttime, grp['Test'], grp['Delay'])
+					base.save_metrics("Delay_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['Delay'], base.srvdisphost)
+					base.save_metrics(grp['Index'], "Scenario_Delay", starttime, grp['Test'], grp['Delay'], base.srvdisphost)
 
-					base.save_metrics("Ramp_Up_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['RampUp'])
-					base.save_metrics(grp['Index'], "Scenario_Ramp_Up", starttime, grp['Test'], grp['RampUp'])
+					base.save_metrics("Ramp_Up_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['RampUp'], base.srvdisphost)
+					base.save_metrics(grp['Index'], "Scenario_Ramp_Up", starttime, grp['Test'], grp['RampUp'], base.srvdisphost)
 
-					base.save_metrics("Run_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['Run'])
-					base.save_metrics(grp['Index'], "Scenario_Run", starttime, grp['Test'], grp['Run'])
+					base.save_metrics("Run_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['Run'], base.srvdisphost)
+					base.save_metrics(grp['Index'], "Scenario_Run", starttime, grp['Test'], grp['Run'], base.srvdisphost)
 
 	def Pre_Run_Checks(self, _event=None):
 		warnings = []
@@ -3083,9 +3096,9 @@ class RFSwarmCore:
 
 			if base.total_robots > 0 and robot_count < 1:
 				# run finished so clear run name
-				base.save_metrics(base.run_name, "Scenario", int(time.time()), "total_robots", robot_count)
-				base.save_metrics(base.run_name, "Scenario", int(time.time()), "End_Time", int(time.time()))
-				base.save_metrics("Time", "Scenario", int(time.time()), "End", int(time.time()))
+				base.save_metrics(base.run_name, "Scenario", int(time.time()), "total_robots", robot_count, base.srvdisphost)
+				base.save_metrics(base.run_name, "Scenario", int(time.time()), "End_Time", int(time.time()), base.srvdisphost)
+				base.save_metrics("Time", "Scenario", int(time.time()), "End", int(time.time()), base.srvdisphost)
 				base.run_name = ""
 				base.robot_schedule["RunName"] = base.run_name
 
@@ -3108,9 +3121,9 @@ class RFSwarmCore:
 
 			# Save Total Robots Metric
 			if len(base.run_name) > 0:
-				base.save_metrics(base.run_name, "Scenario", int(time.time()), "total_robots", base.total_robots)
+				base.save_metrics(base.run_name, "Scenario", int(time.time()), "total_robots", base.total_robots, base.srvdisphost)
 			else:
-				base.save_metrics("PreRun", "Scenario", int(time.time()), "total_robots", base.total_robots)
+				base.save_metrics("PreRun", "Scenario", int(time.time()), "total_robots", base.total_robots, base.srvdisphost)
 
 			# if base.args.run:
 			base.debugmsg(5, "base.args.run:", base.args.run, "	base.args.nogui:", base.args.nogui, "	run_end:", base.run_end, "	time:", int(time.time()))
@@ -3119,8 +3132,8 @@ class RFSwarmCore:
 			if base.run_end > 0 and base.run_end < int(time.time()) and base.total_robots < 1 and not base.posttest and base.run_finish < 1 and uploadcount < 1:
 				base.run_finish = int(time.time())
 				base.debugmsg(5, "run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots)
-				# base.save_metrics(base.run_name, "Scenario", base.run_finish, "End_Time", base.run_finish)
-				base.save_metrics("Time", "Scenario", base.run_finish, "Upload_Finished", base.run_finish)
+				# base.save_metrics(base.run_name, "Scenario", base.run_finish, "End_Time", base.run_finish, base.srvdisphost)
+				base.save_metrics("Time", "Scenario", base.run_finish, "Upload_Finished", base.run_finish, base.srvdisphost)
 
 				if not base.args.nogui:
 					time.sleep(1)
