@@ -1119,13 +1119,22 @@ class ReporterBase():
 		DataType = self.rt_table_get_dt(id)
 		if DataType == "Result":
 			RType = self.rt_table_get_rt(id)
+			EnFR =  self.rt_table_get_enfr(id)
 			FRType = self.rt_table_get_fr(id)
+			EnFA =  self.rt_table_get_enfa(id)
+			FAType = self.rt_table_get_fa(id)
 			FNType = self.rt_table_get_fn(id)
 			inpFP = self.rt_table_get_fp(id)
+			colname = "Result Name"
 
 			sql = "SELECT "
 			if RType == "Response Time":
-				sql += "result_name 'Result Name' "
+				sql += "result_name"
+				if EnFR and FRType in [None, "", "None"]:
+					sql += " || ' - ' || result"
+				if EnFA and FAType in [None, "", "None"]:
+					sql += " || ' - ' || agent"
+				sql += " as [" + colname + "] "
 				sql += ", round(min(elapsed_time),3) 'Minimum' "
 				sql += ", round(avg(elapsed_time),3) 'Average' "
 				sql += ", round(percentile(elapsed_time, {}),3) '{}%ile' ".format(display_percentile, display_percentile)
@@ -1147,11 +1156,20 @@ class ReporterBase():
 				# sql += 		"LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' "
 
 			if RType == "TPS":
-				sql += "result_name 'Result Name' "
+				sql += "result_name"
+				if EnFR and FRType in [None, "", "None"]:
+					sql += " || ' - ' || result"
+				if EnFA and FAType in [None, "", "None"]:
+					sql += " || ' - ' || agent"
+				sql += " as [" + colname + "] "
 				sql += ", result 'Result' "
 				sql += ", count(result)  as 'Count' "
 			if RType == "Total TPS":
-				sql += "result 'Result' "
+				colname = "Result "
+				sql += "result "
+				if EnFA and FAType in [None, "", "None"]:
+					sql += " || ' - ' || agent"
+				sql += " as [" + colname + "] "
 				sql += ", count(result)  as 'Count' "
 			if RType is None:
 				sql = ""
@@ -1160,38 +1178,41 @@ class ReporterBase():
 			sql += "FROM Results "
 
 			lwhere = []
-			if FRType == "Pass":
-				# sql += "WHERE result == 'PASS' "
-				lwhere.append("result == 'PASS'")
-			if FRType == "Fail":
-				# sql += "WHERE result == 'FAIL' "
-				lwhere.append("result == 'FAIL'")
+			if EnFR:
+				if FRType == "Pass":
+					# sql += "WHERE result == 'PASS' "
+					lwhere.append("result == 'PASS'")
+				if FRType == "Fail":
+					# sql += "WHERE result == 'FAIL' "
+					lwhere.append("result == 'FAIL'")
+			if EnFA and FAType not in [None, "", "None"]:
+				lwhere.append("agent == '" + FAType + "'")
 
 			if RType == "Response Time":
 				# sql +=  	"AND result_name NOT LIKE 'Exception in thread%' "
-				lwhere.append("result_name NOT LIKE 'Exception in thread%'")
+				lwhere.append("[" + colname + "] NOT LIKE 'Exception in thread%'")
 			if RType == "TPS":
 				# sql +=  "WHERE result_name NOT LIKE 'Exception in thread%' "
-				lwhere.append("result_name NOT LIKE 'Exception in thread%'")
+				lwhere.append("[" + colname + "] NOT LIKE 'Exception in thread%'")
 
 			if FNType != "None" and len(inpFP) > 0:
 				# construct pattern
 				# "Wildcard (Unix Glob)",
 				if FNType == "Wildcard (Unix Glob)":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("result_name GLOB '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] GLOB '{}'".format(inpFP))
 				# "Regex",
 				if FNType == "Regex":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("result_name REGEXP '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] REGEXP '{}'".format(inpFP))
 				# "Not Wildcard (Unix Glob)",
 				if FNType == "Not Wildcard (Unix Glob)":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("result_name NOT GLOB '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] NOT GLOB '{}'".format(inpFP))
 				# "Not Regex"
 				if FNType == "Not Regex":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("result_name NOT REGEXP '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] NOT REGEXP '{}'".format(inpFP))
 
 			i = 0
 			for iwhere in lwhere:
@@ -1205,14 +1226,14 @@ class ReporterBase():
 				sql += "GROUP by "
 
 			if RType == "Response Time":
-				sql += "result_name "
+				sql += "[" + colname + "] "
 			if RType == "TPS":
-				sql += "result_name "
+				sql += "[" + colname + "] "
 				sql += ", result "
 				sql += "ORDER by result DESC, count(result) DESC "
 			if RType == "Total TPS":
-				sql += "result "
-				sql += "ORDER by count(result) DESC "
+				sql += " [" + colname + "] "
+				sql += "ORDER by count([" + colname + "]) DESC "
 
 		if DataType == "Metric":
 			MType = self.rt_table_get_mt(id)
@@ -1448,6 +1469,87 @@ class ReporterBase():
 			base.report[id]['FilterResult'] = base.whitespace_set_ini_value(filterresult)
 			base.report_item_set_changed(id)
 			base.report_save()
+
+	def rt_table_get_enfr(self, id):
+		base.debugmsg(5, "id:", id)
+		pid = base.report_subsection_parent(id)
+		if id in base.report and 'EnableFilterResult' in base.report[id]:
+			return int(base.report[id]['EnableFilterResult'])
+		elif pid in base.report and 'EnableFilterResult' in base.report[pid]:
+			return int(base.report[pid]['EnableFilterResult'])
+		else:
+			frv = self.rt_table_get_fr(id)
+			if frv in ["Pass", "Fail"]:
+				return 1
+			return 0
+
+	def rt_table_set_enfr(self, id, value):
+		base.debugmsg(5, "id:", id, "	value:", value)
+		prev = self.rt_table_get_enfr(id)
+		if value != prev and value is not None:
+			base.report[id]['EnableFilterResult'] = base.whitespace_set_ini_value(str(value))
+			base.report_item_set_changed(id)
+			base.report_save()
+
+	# FA FilterAgent
+	def rt_table_get_fa(self, id):
+		base.debugmsg(5, "id:", id)
+		if 'FilterAgent' in base.report[id]:
+			return base.whitespace_get_ini_value(base.report[id]['FilterAgent'])
+		else:
+			return None
+
+	def rt_table_set_fa(self, id, value):
+		base.debugmsg(5, "id:", id, "	value:", value)
+		prev = self.rt_table_get_fa(id)
+		if value != prev and value is not None:
+			base.report[id]['FilterAgent'] = base.whitespace_set_ini_value(value)
+			base.report_item_set_changed(id)
+			base.report_save()
+
+	def rt_table_get_alst(self, id):
+		base.debugmsg(9, "id:", id)
+		# SELECT agent
+		# FROM Results
+		# GROUP BY agent
+		mtype = self.rt_table_get_mt(id)
+		alst = [None, ""]
+		sql = "SELECT agent 'Name' "
+		sql += "FROM Results "
+		sql += "GROUP BY agent "
+		base.debugmsg(6, "sql:", sql)
+		key = "{}_{}_AgentList".format(id, mtype)
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+		while key not in base.dbqueue["ReadResult"]:
+			time.sleep(0.1)
+
+		adata = base.dbqueue["ReadResult"][key]
+		base.debugmsg(8, "adata:", adata)
+		for a in adata:
+			alst.append(a["Name"])
+
+		base.debugmsg(5, "alst:", alst)
+
+		return alst
+
+	def rt_table_get_enfa(self, id):
+		base.debugmsg(5, "id:", id)
+		pid = base.report_subsection_parent(id)
+		if id in base.report and 'EnableFilterAgent' in base.report[id]:
+			return int(base.report[id]['EnableFilterAgent'])
+		elif pid in base.report and 'EnableFilterAgent' in base.report[pid]:
+			return int(base.report[pid]['EnableFilterAgent'])
+		else:
+			return 0
+
+	def rt_table_set_enfa(self, id, value):
+		base.debugmsg(5, "id:", id, "	value:", value)
+		prev = self.rt_table_get_enfa(id)
+		if value != prev and value is not None:
+			base.report[id]['EnableFilterAgent'] = base.whitespace_set_ini_value(str(value))
+			base.report_item_set_changed(id)
+			base.report_save()
+
 
 	# FN FilterType
 	def rt_table_get_fn(self, id):
@@ -2701,7 +2803,7 @@ class ReporterCore:
 					th = etree.SubElement(tr, 'th')
 				for col in cols:
 					th = etree.SubElement(tr, 'th')
-					th.text = col
+					th.text = col.strip()
 
 				# table rows
 				for row in tdata:
@@ -3265,7 +3367,7 @@ class ReporterCore:
 				cw = 5
 				for col in cols:
 					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
-					table.rows[cellrow].cells[cellcol].paragraphs[0].text = col
+					table.rows[cellrow].cells[cellcol].paragraphs[0].text = col.strip()
 					table.columns[cellcol].width = Cm(cw)
 					if cw > 2:
 						cw = 1.7
@@ -3911,10 +4013,10 @@ class ReporterCore:
 				for col in cols:
 
 					base.debugmsg(8, "col:", col, "	cellcol:", cellcol, "	rownum:", rownum)
-					hcell = ws.cell(column=cellcol, row=rownum, value=col)
+					hcell = ws.cell(column=cellcol, row=rownum, value=col.strip())
 					hcell.style = "Table Heading"
 
-					neww = len(str(col)) * 1.3
+					neww = len(str(col.strip())) * 1.3
 					base.debugmsg(9, "neww:", neww)
 					ws.column_dimensions[hcell.column_letter].width = neww
 
@@ -5269,6 +5371,19 @@ class ReporterGUI(tk.Frame):
 		if "FRType" in self.contentdata[id]:
 			value = self.contentdata[id]["FRType"].get()
 			base.rt_table_set_fr(id, value)
+		# self.contentdata[id]["intFR"] = tk.IntVar()
+		if "intFR" in self.contentdata[id]:
+			value = self.contentdata[id]["intFR"].get()
+			base.rt_table_set_enfr(id, value)
+
+		if "intFA" in self.contentdata[id]:
+			value = self.contentdata[id]["intFA"].get()
+			base.rt_table_set_enfa(id, value)
+		# self.contentdata[id]["FAType"] = tk.StringVar()
+		if "FAType" in self.contentdata[id]:
+			value = self.contentdata[id]["FAType"].get()
+			base.rt_table_set_fa(id, value)
+
 		# self.contentdata[id]["FNType"].set(base.rt_table_get_fn(id))
 		if "FNType" in self.contentdata[id]:
 			value = self.contentdata[id]["FNType"].get()
@@ -5301,6 +5416,22 @@ class ReporterGUI(tk.Frame):
 		# self.content_preview(id)
 		cp = threading.Thread(target=lambda: self.content_preview(id))
 		cp.start()
+
+		# rt_table_get_alst
+
+	def cs_datatable_update_result(self, id):
+		base.debugmsg(5, "id:", id)
+		tmt = threading.Thread(target=lambda: self.cs_datatable_update_resultagents(id))
+		tmt.start()
+
+	def cs_datatable_update_resultagents(self, id):
+		base.debugmsg(5, "id:", id)
+		self.contentdata[id]["FATypes"] = base.rt_table_get_alst(id)
+		if "omFA" in self.contentdata[id]:
+			try:
+				self.contentdata[id]["omFA"].set_menu(*self.contentdata[id]["FATypes"])
+			except Exception as e:
+				base.debugmsg(5, "e:", e)
 
 	def cs_datatable_update_metrics(self, id):
 		base.debugmsg(5, "id:", id)
@@ -5414,6 +5545,10 @@ class ReporterGUI(tk.Frame):
 
 			if datatype == "Result":
 				rownum += 1
+				self.contentdata[id]["lblEnabled"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Enabled")
+				self.contentdata[id]["lblEnabled"].grid(column=2, row=rownum, sticky="nsew")
+				
+				rownum += 1
 				self.contentdata[id]["lblRT"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Result Type:")
 				self.contentdata[id]["lblRT"].grid(column=0, row=rownum, sticky="nsew")
 
@@ -5431,6 +5566,25 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["FRType"] = tk.StringVar()
 				self.contentdata[id]["omFR"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["FRType"], command=self.cs_datatable_update, *FRTypes)
 				self.contentdata[id]["omFR"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["intFR"] = tk.IntVar()
+				self.contentdata[id]["chkFR"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intFR"], command=self.cs_datatable_update)
+				self.contentdata[id]["chkFR"].grid(column=2, row=rownum, sticky="nsew")
+
+
+				rownum += 1
+				self.contentdata[id]["lblFA"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Agent:")
+				self.contentdata[id]["lblFA"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["FATypes"] = [None, "", "Loading..."]
+				self.contentdata[id]["FAType"] = tk.StringVar()
+				self.contentdata[id]["omFA"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["FAType"], command=self.cs_datatable_update, *self.contentdata[id]["FATypes"])
+				self.contentdata[id]["omFA"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["intFA"] = tk.IntVar()
+				self.contentdata[id]["chkFA"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intFA"], command=self.cs_datatable_update)
+				self.contentdata[id]["chkFA"].grid(column=2, row=rownum, sticky="nsew")
+
 
 				rownum += 1
 				self.contentdata[id]["lblFN"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Type:")
@@ -5491,8 +5645,12 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[id]["tSQL"].insert('0.0', sql)
 
 		if datatype == "Result":
+			self.cs_datatable_update_result(id)
 			self.contentdata[id]["RType"].set(base.rt_table_get_rt(id))
+			self.contentdata[id]["intFR"].set(base.rt_table_get_enfr(id))
 			self.contentdata[id]["FRType"].set(base.rt_table_get_fr(id))
+			self.contentdata[id]["intFA"].set(base.rt_table_get_enfa(id))
+			self.contentdata[id]["FAType"].set(base.rt_table_get_fa(id))
 			self.contentdata[id]["FNType"].set(base.rt_table_get_fn(id))
 			self.contentdata[id]["FPattern"].set(base.rt_table_get_fp(id))
 
@@ -6550,6 +6708,7 @@ class ReporterGUI(tk.Frame):
 			sql = base.rt_table_get_sql(id)
 		else:
 			sql = base.rt_table_generate_sql(id)
+			base.debugmsg(5, "sql:", sql)
 		colours = base.rt_table_get_colours(id)
 		rownum = self.contentdata[id]["rownum"]
 		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text="    ")
@@ -6580,7 +6739,7 @@ class ReporterGUI(tk.Frame):
 				for col in cols:
 					cellname = "h_{}".format(col)
 					base.debugmsg(9, "cellname:", cellname)
-					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=col, style='Report.THead.TLabel')
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=col.strip(), style='Report.THead.TLabel')
 					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 					colnum += 1
 				i = 0
