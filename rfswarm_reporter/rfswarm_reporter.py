@@ -1323,6 +1323,8 @@ class ReporterBase():
 			# FROM ResultSummary rs
 			# WHERE rs.Name not like '%<%'
 
+			EnFA =  self.rt_table_get_enfa(id)
+			FAType = self.rt_table_get_fa(id)
 			FNType = self.rt_table_get_fn(id)
 			inpFP = self.rt_table_get_fp(id)
 
@@ -1339,7 +1341,13 @@ class ReporterBase():
 
 			sellist = []
 			gblist = []
-			sellist.append("r.result_name 'Result Name'")
+			colname = "Result Name"
+			col0 = "r.result_name"
+			if EnFA and FAType in [None, "", "None"]:
+				col0 += " || ' - ' || r.agent"
+			col0 += " as [" + colname + "] "
+
+			sellist.append(col0)
 			gblist.append("r.result_name")
 			base.debugmsg(8, "gblist:", gblist)
 
@@ -1366,24 +1374,27 @@ class ReporterBase():
 			sql += "LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' "
 
 			lwhere = []
+			if EnFA and FAType not in [None, "", "None"]:
+				lwhere.append("r.agent == '{}'".format(FAType))
+
 			if FNType != "None" and len(inpFP) > 0:
 				# construct pattern
 				# "Wildcard (Unix Glob)",
 				if FNType == "Wildcard (Unix Glob)":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("r.result_name GLOB '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] GLOB '{}'".format(inpFP))
 				# "Regex",
 				if FNType == "Regex":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("r.result_name REGEXP '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] REGEXP '{}'".format(inpFP))
 				# "Not Wildcard (Unix Glob)",
 				if FNType == "Not Wildcard (Unix Glob)":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("r.result_name NOT GLOB '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] NOT GLOB '{}'".format(inpFP))
 				# "Not Regex"
 				if FNType == "Not Regex":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("r.result_name NOT REGEXP '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] NOT REGEXP '{}'".format(inpFP))
 
 			i = 0
 			for iwhere in lwhere:
@@ -1397,7 +1408,7 @@ class ReporterBase():
 				sql += "GROUP BY  "
 				sql += gbcols
 
-			sql += " ORDER BY r.sequence"
+			sql += " ORDER BY [" + colname + "]"
 
 		base.debugmsg(8, "sql:", sql)
 		self.rt_table_set_sql(id, sql)
@@ -5547,7 +5558,7 @@ class ReporterGUI(tk.Frame):
 				rownum += 1
 				self.contentdata[id]["lblEnabled"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Enabled")
 				self.contentdata[id]["lblEnabled"].grid(column=2, row=rownum, sticky="nsew")
-				
+
 				rownum += 1
 				self.contentdata[id]["lblRT"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Result Type:")
 				self.contentdata[id]["lblRT"].grid(column=0, row=rownum, sticky="nsew")
@@ -5571,7 +5582,6 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["chkFR"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intFR"], command=self.cs_datatable_update)
 				self.contentdata[id]["chkFR"].grid(column=2, row=rownum, sticky="nsew")
 
-
 				rownum += 1
 				self.contentdata[id]["lblFA"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Agent:")
 				self.contentdata[id]["lblFA"].grid(column=0, row=rownum, sticky="nsew")
@@ -5584,7 +5594,6 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["intFA"] = tk.IntVar()
 				self.contentdata[id]["chkFA"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intFA"], command=self.cs_datatable_update)
 				self.contentdata[id]["chkFA"].grid(column=2, row=rownum, sticky="nsew")
-
 
 				rownum += 1
 				self.contentdata[id]["lblFN"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Type:")
@@ -5606,6 +5615,23 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["inpFP"].bind('<FocusOut>', self.cs_datatable_update)
 
 			if datatype == "ResultSummary":
+				rownum += 1
+				self.contentdata[id]["lblEnabled"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Enabled")
+				self.contentdata[id]["lblEnabled"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["lblFA"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Agent:")
+				self.contentdata[id]["lblFA"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["FATypes"] = [None, "", "Loading..."]
+				self.contentdata[id]["FAType"] = tk.StringVar()
+				self.contentdata[id]["omFA"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["FAType"], command=self.cs_datatable_update, *self.contentdata[id]["FATypes"])
+				self.contentdata[id]["omFA"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["intFA"] = tk.IntVar()
+				self.contentdata[id]["chkFA"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intFA"], command=self.cs_datatable_update)
+				self.contentdata[id]["chkFA"].grid(column=2, row=rownum, sticky="nsew")
+
 				rownum += 1
 				self.contentdata[id]["lblFN"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Type:")
 				self.contentdata[id]["lblFN"].grid(column=0, row=rownum, sticky="nsew")
@@ -5655,6 +5681,7 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[id]["FPattern"].set(base.rt_table_get_fp(id))
 
 		if datatype == "ResultSummary":
+			self.cs_datatable_update_result(id)
 			self.contentdata[id]["FNType"].set(base.rt_table_get_fn(id))
 			self.contentdata[id]["FPattern"].set(base.rt_table_get_fp(id))
 
