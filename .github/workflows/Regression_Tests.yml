@@ -67,9 +67,9 @@ jobs:
         if: ${{ always() }}
         run: |
           echo "${{ steps.robottest.conclusion}}  ${{ steps.robottest.conclusion == 'failure' }}"
-          echo "failure: ${{ failure() }}"
       - name: git commit
         # if: ${{ steps.robottest.conclusion == 'failure' }}
+        # https://docs.github.com/en/actions/learn-github-actions/expressions
         if: ${{ failure() }}
         run: |
           # Stage the file, commit and push
@@ -142,7 +142,6 @@ jobs:
         if: ${{ always() }}
         run: |
           echo "${{ steps.robottest.conclusion}}  ${{ steps.robottest.conclusion == 'failure' }}"
-          echo "failure: ${{ failure() }}"
       - name: git commit
         # if: ${{ steps.robottest.conclusion == 'failure' }}
         if: ${{ failure() }}
