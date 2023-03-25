@@ -1241,11 +1241,23 @@ class ReporterBase():
 			SM = self.rt_table_get_sm(id)
 			isnum = self.rt_table_get_isnumeric(id)
 			sc = self.rt_table_get_showcount(id)
+			EnFA =  self.rt_table_get_enfa(id)
+			FAType = self.rt_table_get_fa(id)
+			FNType = self.rt_table_get_fn(id)
+			inpFP = self.rt_table_get_fp(id)
+
 			base.debugmsg(8, "MType:", MType, "	PM:", PM, "	SM:", SM)
 
 			mcolumns = ["PrimaryMetric", "MetricType", "SecondaryMetric"]
 			wherelst = []
 			grouplst = ["PrimaryMetric", "MetricType", "SecondaryMetric"]
+
+			if EnFA:
+				if FAType in [None, "", "None"]:
+					mcolumns.append("DataSource 'Agent'")
+					grouplst.append("DataSource")
+				else:
+					wherelst.append("DataSource == '{}'".format(FAType))
 
 			if MType is not None and len(MType) > 0:
 				if "MetricType" in mcolumns:
@@ -1265,6 +1277,46 @@ class ReporterBase():
 				wherelst.append("SecondaryMetric == '{}'".format(SM))
 				if "SecondaryMetric" in grouplst:
 					grouplst.remove("SecondaryMetric")
+
+			if FNType != "None" and len(inpFP) > 0:
+				# construct pattern
+				# "Wildcard (Unix Glob)",
+				if FNType == "Wildcard (Unix Glob)":
+					# AND PrimaryMetric GLOB '*_1*' OR SecondaryMetric GLOB '*_1*' OR DataSource GLOB '*_1*' OR MetricValue GLOB '*_1*'
+					fpwhere = "("
+					for dispcol in grouplst:
+						if len(fpwhere) > 1:
+							fpwhere += "OR "
+						fpwhere += "{} GLOB '{}'".format(dispcol, inpFP)
+					fpwhere += ")"
+					wherelst.append(fpwhere)
+				# "Regex",
+				if FNType == "Regex":
+					fpwhere = "("
+					for dispcol in grouplst:
+						if len(fpwhere) > 1:
+							fpwhere += "OR "
+						fpwhere += "{} REGEXP '{}'".format(dispcol, inpFP)
+					fpwhere += ")"
+					wherelst.append(fpwhere)
+				# "Not Wildcard (Unix Glob)",
+				if FNType == "Not Wildcard (Unix Glob)":
+					fpwhere = "("
+					for dispcol in grouplst:
+						if len(fpwhere) > 1:
+							fpwhere += "AND "
+						fpwhere += "{} NOT GLOB '{}'".format(dispcol, inpFP)
+					fpwhere += ")"
+					wherelst.append(fpwhere)
+				# "Not Regex"
+				if FNType == "Not Regex":
+					fpwhere = "("
+					for dispcol in grouplst:
+						if len(fpwhere) > 1:
+							fpwhere += "AND "
+						fpwhere += "{} NOT REGEXP '{}'".format(dispcol, inpFP)
+					fpwhere += ")"
+					wherelst.append(fpwhere)
 
 			if isnum < 1:
 				mcolumns.append("MetricValue")
@@ -5432,8 +5484,8 @@ class ReporterGUI(tk.Frame):
 
 	def cs_datatable_update_result(self, id):
 		base.debugmsg(5, "id:", id)
-		tmt = threading.Thread(target=lambda: self.cs_datatable_update_resultagents(id))
-		tmt.start()
+		tag = threading.Thread(target=lambda: self.cs_datatable_update_resultagents(id))
+		tag.start()
 
 	def cs_datatable_update_resultagents(self, id):
 		base.debugmsg(5, "id:", id)
@@ -5455,6 +5507,9 @@ class ReporterGUI(tk.Frame):
 		tsm = threading.Thread(target=lambda: self.cs_datatable_update_smetrics(id))
 		tsm.start()
 		base.debugmsg(6, "tsm")
+		tag = threading.Thread(target=lambda: self.cs_datatable_update_resultagents(id))
+		tag.start()
+		base.debugmsg(6, "tag")
 
 	def cs_datatable_update_metricstype(self, id):
 		base.debugmsg(5, "id:", id)
@@ -5511,7 +5566,6 @@ class ReporterGUI(tk.Frame):
 			# "Metric", "Result", "SQL"
 
 			if datatype == "Metric":
-
 				rownum += 1
 				self.contentdata[id]["lblIsNum"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Number Value:")
 				self.contentdata[id]["lblIsNum"].grid(column=0, row=rownum, sticky="nsew")
@@ -5526,6 +5580,10 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["intShCnt"] = tk.IntVar()
 				self.contentdata[id]["chkShCnt"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intShCnt"], command=self.cs_datatable_update)
 				self.contentdata[id]["chkShCnt"].grid(column=3, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["lblEnabled"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Enabled")
+				self.contentdata[id]["lblEnabled"].grid(column=2, row=rownum, sticky="nsew")
 
 				rownum += 1
 				self.contentdata[id]["lblMT"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Metric Type:")
@@ -5553,6 +5611,38 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["SMetric"] = tk.StringVar()
 				self.contentdata[id]["omSM"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["SMetric"], command=self.cs_datatable_update, *self.contentdata[id]["SMetrics"])
 				self.contentdata[id]["omSM"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["lblFA"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Agent:")
+				self.contentdata[id]["lblFA"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["FATypes"] = [None, "", "Loading..."]
+				self.contentdata[id]["FAType"] = tk.StringVar()
+				self.contentdata[id]["omFA"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["FAType"], command=self.cs_datatable_update, *self.contentdata[id]["FATypes"])
+				self.contentdata[id]["omFA"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["intFA"] = tk.IntVar()
+				self.contentdata[id]["chkFA"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intFA"], command=self.cs_datatable_update)
+				self.contentdata[id]["chkFA"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["lblFN"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Type:")
+				self.contentdata[id]["lblFN"].grid(column=0, row=rownum, sticky="nsew")
+
+				FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
+				self.contentdata[id]["FNType"] = tk.StringVar()
+				self.contentdata[id]["omFR"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["FNType"], command=self.cs_datatable_update, *FNTypes)
+				self.contentdata[id]["omFR"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["lblFP"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Pattern:")
+				self.contentdata[id]["lblFP"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["FPattern"] = tk.StringVar()
+				self.contentdata[id]["inpFP"] = ttk.Entry(self.contentdata[id]["Frames"][datatype], textvariable=self.contentdata[id]["FPattern"])
+				self.contentdata[id]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[id]["inpFP"].bind('<Leave>', self.cs_datatable_update)
+				self.contentdata[id]["inpFP"].bind('<FocusOut>', self.cs_datatable_update)
 
 			if datatype == "Result":
 				rownum += 1
