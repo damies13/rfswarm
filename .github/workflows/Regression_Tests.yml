@@ -63,6 +63,9 @@ jobs:
         run: robot --include ${{ matrix.platform }} --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }} Tests/Regression/Manager
         env:
           DISPLAY: :13.0
+      - name: echo robottest
+        run: |
+          echo "${{ steps.robottest.conclusion}}  ${{ steps.robottest.conclusion == 'failure' }}"
       - name: git commit
         if: ${{ steps.robottest.conclusion == 'failure' }}
         run: |
@@ -130,6 +133,9 @@ jobs:
         run: robot --include ${{ matrix.platform }} --outputdir Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }} Tests/Regression/Reporter
         env:
           DISPLAY: :13.0
+      - name: echo robottest
+        run: |
+          echo "${{ steps.robottest.conclusion}}  ${{ steps.robottest.conclusion == 'failure' }}"
       - name: git commit
         if: ${{ steps.robottest.conclusion == 'failure' }}
         run: |
