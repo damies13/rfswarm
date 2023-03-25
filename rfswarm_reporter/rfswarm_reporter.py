@@ -1119,9 +1119,9 @@ class ReporterBase():
 		DataType = self.rt_table_get_dt(id)
 		if DataType == "Result":
 			RType = self.rt_table_get_rt(id)
-			EnFR =  self.rt_table_get_enfr(id)
+			EnFR = self.rt_table_get_enfr(id)
 			FRType = self.rt_table_get_fr(id)
-			EnFA =  self.rt_table_get_enfa(id)
+			EnFA = self.rt_table_get_enfa(id)
 			FAType = self.rt_table_get_fa(id)
 			FNType = self.rt_table_get_fn(id)
 			inpFP = self.rt_table_get_fp(id)
@@ -1241,7 +1241,7 @@ class ReporterBase():
 			SM = self.rt_table_get_sm(id)
 			isnum = self.rt_table_get_isnumeric(id)
 			sc = self.rt_table_get_showcount(id)
-			EnFA =  self.rt_table_get_enfa(id)
+			EnFA = self.rt_table_get_enfa(id)
 			FAType = self.rt_table_get_fa(id)
 			FNType = self.rt_table_get_fn(id)
 			inpFP = self.rt_table_get_fp(id)
@@ -1375,7 +1375,7 @@ class ReporterBase():
 			# FROM ResultSummary rs
 			# WHERE rs.Name not like '%<%'
 
-			EnFA =  self.rt_table_get_enfa(id)
+			EnFA = self.rt_table_get_enfa(id)
 			FAType = self.rt_table_get_fa(id)
 			FNType = self.rt_table_get_fn(id)
 			inpFP = self.rt_table_get_fp(id)
@@ -1612,7 +1612,6 @@ class ReporterBase():
 			base.report[id]['EnableFilterAgent'] = base.whitespace_set_ini_value(str(value))
 			base.report_item_set_changed(id)
 			base.report_save()
-
 
 	# FN FilterType
 	def rt_table_get_fn(self, id):
