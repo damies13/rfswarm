@@ -1925,7 +1925,6 @@ class ReporterBase():
 			mds = threading.Thread(target=lambda: self.column_in_table("Metrics", "DataSource"))
 			mds.start()
 
-
 	def close_results_db(self):
 		# base.config['Reporter']['Results']
 		if self.datadb is not None:
