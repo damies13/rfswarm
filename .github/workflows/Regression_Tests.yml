@@ -64,6 +64,7 @@ jobs:
         env:
           DISPLAY: :13.0
       - name: echo robottest
+        if: ${{ always() }}
         run: |
           echo "${{ steps.robottest.conclusion}}  ${{ steps.robottest.conclusion == 'failure' }}"
       - name: git commit
@@ -134,6 +135,7 @@ jobs:
         env:
           DISPLAY: :13.0
       - name: echo robottest
+        if: ${{ always() }}
         run: |
           echo "${{ steps.robottest.conclusion}}  ${{ steps.robottest.conclusion == 'failure' }}"
       - name: git commit
