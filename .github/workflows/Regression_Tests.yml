@@ -67,8 +67,10 @@ jobs:
         if: ${{ always() }}
         run: |
           echo "${{ steps.robottest.conclusion}}  ${{ steps.robottest.conclusion == 'failure' }}"
+          echo "failure: ${{ failure() }}"
       - name: git commit
-        if: ${{ steps.robottest.conclusion == 'failure' }}
+        # if: ${{ steps.robottest.conclusion == 'failure' }}
+        if: ${{ failure() }}
         run: |
           # Stage the file, commit and push
           echo "git add"
@@ -76,14 +78,16 @@ jobs:
           echo "git commit"
           git commit -m "Manager ${{ matrix.platform }} ${{ matrix.python }}"
       - name: Switch back to original branch
-        if: ${{ steps.robottest.conclusion == 'failure' }}
+        # if: ${{ steps.robottest.conclusion == 'failure' }}
+        if: ${{ failure() }}
         run: |
           echo "git checkout ref_name: ${{ github.ref_name }}"
           git checkout -f ${{ github.ref_name }}
           echo "git pull"
           git pull --ff --autostash -f
       - name: Merge test results into original branch
-        if: ${{ steps.robottest.conclusion == 'failure' }}
+        # if: ${{ steps.robottest.conclusion == 'failure' }}
+        if: ${{ failure() }}
         run: |
           echo "git merge"
           git merge --ff Test-Result-Manager-${{ matrix.platform }}-${{ matrix.python }}
@@ -138,8 +142,10 @@ jobs:
         if: ${{ always() }}
         run: |
           echo "${{ steps.robottest.conclusion}}  ${{ steps.robottest.conclusion == 'failure' }}"
+          echo "failure: ${{ failure() }}"
       - name: git commit
-        if: ${{ steps.robottest.conclusion == 'failure' }}
+        # if: ${{ steps.robottest.conclusion == 'failure' }}
+        if: ${{ failure() }}
         run: |
           # Stage the file, commit and push
           echo "git add"
@@ -147,14 +153,16 @@ jobs:
           echo "git commit"
           git commit -m "Reporter ${{ matrix.platform }} ${{ matrix.python }}"
       - name: Switch back to original branch
-        if: ${{ steps.robottest.conclusion == 'failure' }}
+        # if: ${{ steps.robottest.conclusion == 'failure' }}
+        if: ${{ failure() }}
         run: |
           echo "git checkout ref_name: ${{ github.ref_name }}"
           git checkout -f ${{ github.ref_name }}
           echo "git pull"
           git pull --ff --autostash -f
       - name: Merge test results into original branch
-        if: ${{ steps.robottest.conclusion == 'failure' }}
+        # if: ${{ steps.robottest.conclusion == 'failure' }}
+        if: ${{ failure() }}
         run: |
           echo "git merge"
           git merge --ff Test-Result-Reporter-${{ matrix.platform }}-${{ matrix.python }}
