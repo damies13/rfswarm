@@ -142,6 +142,10 @@ class ReporterBase():
 	settings: Any = {}
 	reportdata: Any = {}
 
+	settings["DBTable"] = {}
+	settings["DBTable"]["Metrics"] = {}
+	settings["DBTable"]["Metrics"]["DataSource"] = 0
+
 	settings["ContentTypes"] = {"head": "Heading", "contents": "Contents", "note": "Note", "graph": "Data Graph", "table": "Data Table"}
 
 	defcolours = ['#000000', '#008450', '#B81D13', '#EFB700', '#888888']
@@ -1595,6 +1599,34 @@ class ReporterBase():
 
 		return alst
 
+	def rt_table_get_malst(self, id):
+		base.debugmsg(9, "id:", id)
+		# SELECT agent
+		# FROM Results
+		# GROUP BY agent
+		mtype = self.rt_table_get_mt(id)
+		alst = [None, ""]
+
+		sql = "SELECT ma.Name  'Name' "
+		sql += "FROM Metrics m "
+		sql += "	LEFT JOIN Metric ma ON m.DataSource = ma.ID "
+		sql += "GROUP BY m.DataSource "
+
+		base.debugmsg(6, "sql:", sql)
+		key = "{}_{}_MetricAgentList".format(id, mtype)
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+		while key not in base.dbqueue["ReadResult"]:
+			time.sleep(0.1)
+
+		adata = base.dbqueue["ReadResult"][key]
+		base.debugmsg(8, "adata:", adata)
+		for a in adata:
+			alst.append(a["Name"])
+
+		base.debugmsg(5, "alst:", alst)
+
+		return alst
+
 	def rt_table_get_enfa(self, id):
 		base.debugmsg(5, "id:", id)
 		pid = base.report_subsection_parent(id)
@@ -1860,6 +1892,28 @@ class ReporterBase():
 	#
 	# Result data db Functions
 	#
+	def column_in_table(self, table, column):
+		sql = "SELECT 1 [HasColumn] FROM pragma_table_info('{}') WHERE Name = '{}'".format(table, column)
+		base.debugmsg(8, "sql:", sql)
+		key = "HasColumn_{}_{}".format(table, column)
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+		while key not in base.dbqueue["ReadResult"]:
+			time.sleep(0.1)
+
+		tdata = base.dbqueue["ReadResult"][key]
+		base.debugmsg(8, "tdata:", tdata)
+		hascol = 0
+		if len(tdata) > 0:
+			# table headers
+			if "HasColumn" in tdata[0]:
+				hascol = tdata[0]["HasColumn"]
+
+		if "DBTable" not in base.settings:
+			base.settings["DBTable"] = {}
+		if table not in base.settings["DBTable"]:
+			base.settings["DBTable"][table] = {}
+		base.settings["DBTable"][table][column] = hascol
+		# base.settings["DBTable"]['Metrics']['DataSource']
 
 	def open_results_db(self, dbpath):
 		self.close_results_db()
@@ -1868,6 +1922,9 @@ class ReporterBase():
 			self.datadb = sqlite3.connect(dbpath)
 			self.datadb.create_aggregate("percentile", 2, percentile)
 			self.datadb.create_aggregate("stdev", 1, stdevclass)
+			mds = threading.Thread(target=lambda: self.column_in_table("Metrics", "DataSource"))
+			mds.start()
+
 
 	def close_results_db(self):
 		# base.config['Reporter']['Results']
@@ -5495,6 +5552,15 @@ class ReporterGUI(tk.Frame):
 			except Exception as e:
 				base.debugmsg(5, "e:", e)
 
+	def cs_datatable_update_metricagents(self, id):
+		base.debugmsg(5, "id:", id)
+		self.contentdata[id]["FATypes"] = base.rt_table_get_malst(id)
+		if "omFA" in self.contentdata[id]:
+			try:
+				self.contentdata[id]["omFA"].set_menu(*self.contentdata[id]["FATypes"])
+			except Exception as e:
+				base.debugmsg(5, "e:", e)
+
 	def cs_datatable_update_metrics(self, id):
 		base.debugmsg(5, "id:", id)
 		tmt = threading.Thread(target=lambda: self.cs_datatable_update_metricstype(id))
@@ -5506,9 +5572,14 @@ class ReporterGUI(tk.Frame):
 		tsm = threading.Thread(target=lambda: self.cs_datatable_update_smetrics(id))
 		tsm.start()
 		base.debugmsg(6, "tsm")
-		tag = threading.Thread(target=lambda: self.cs_datatable_update_resultagents(id))
-		tag.start()
-		base.debugmsg(6, "tag")
+
+		showmetricagents = 0
+		if "DBTable" in base.settings and "Metrics" in base.settings["DBTable"] and "DataSource" in base.settings["DBTable"]["Metrics"]:
+			showmetricagents = base.settings["DBTable"]["Metrics"]["DataSource"]
+		if showmetricagents:
+			tag = threading.Thread(target=lambda: self.cs_datatable_update_metricagents(id))
+			tag.start()
+			base.debugmsg(6, "tag")
 
 	def cs_datatable_update_metricstype(self, id):
 		base.debugmsg(5, "id:", id)
@@ -5565,6 +5636,11 @@ class ReporterGUI(tk.Frame):
 			# "Metric", "Result", "SQL"
 
 			if datatype == "Metric":
+
+				showmetricagents = 0
+				if "DBTable" in base.settings and "Metrics" in base.settings["DBTable"] and "DataSource" in base.settings["DBTable"]["Metrics"]:
+					showmetricagents = base.settings["DBTable"]["Metrics"]["DataSource"]
+
 				rownum += 1
 				self.contentdata[id]["lblIsNum"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Number Value:")
 				self.contentdata[id]["lblIsNum"].grid(column=0, row=rownum, sticky="nsew")
@@ -5580,9 +5656,10 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["chkShCnt"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intShCnt"], command=self.cs_datatable_update)
 				self.contentdata[id]["chkShCnt"].grid(column=3, row=rownum, sticky="nsew")
 
-				rownum += 1
-				self.contentdata[id]["lblEnabled"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Enabled")
-				self.contentdata[id]["lblEnabled"].grid(column=2, row=rownum, sticky="nsew")
+				if showmetricagents:
+					rownum += 1
+					self.contentdata[id]["lblEnabled"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Enabled")
+					self.contentdata[id]["lblEnabled"].grid(column=2, row=rownum, sticky="nsew")
 
 				rownum += 1
 				self.contentdata[id]["lblMT"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Metric Type:")
@@ -5611,18 +5688,19 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["omSM"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["SMetric"], command=self.cs_datatable_update, *self.contentdata[id]["SMetrics"])
 				self.contentdata[id]["omSM"].grid(column=1, row=rownum, sticky="nsew")
 
-				rownum += 1
-				self.contentdata[id]["lblFA"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Agent:")
-				self.contentdata[id]["lblFA"].grid(column=0, row=rownum, sticky="nsew")
+				if showmetricagents:
+					rownum += 1
+					self.contentdata[id]["lblFA"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Agent:")
+					self.contentdata[id]["lblFA"].grid(column=0, row=rownum, sticky="nsew")
 
-				self.contentdata[id]["FATypes"] = [None, "", "Loading..."]
-				self.contentdata[id]["FAType"] = tk.StringVar()
-				self.contentdata[id]["omFA"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["FAType"], command=self.cs_datatable_update, *self.contentdata[id]["FATypes"])
-				self.contentdata[id]["omFA"].grid(column=1, row=rownum, sticky="nsew")
+					self.contentdata[id]["FATypes"] = [None, "", "Loading..."]
+					self.contentdata[id]["FAType"] = tk.StringVar()
+					self.contentdata[id]["omFA"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["FAType"], command=self.cs_datatable_update, *self.contentdata[id]["FATypes"])
+					self.contentdata[id]["omFA"].grid(column=1, row=rownum, sticky="nsew")
 
-				self.contentdata[id]["intFA"] = tk.IntVar()
-				self.contentdata[id]["chkFA"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intFA"], command=self.cs_datatable_update)
-				self.contentdata[id]["chkFA"].grid(column=2, row=rownum, sticky="nsew")
+					self.contentdata[id]["intFA"] = tk.IntVar()
+					self.contentdata[id]["chkFA"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intFA"], command=self.cs_datatable_update)
+					self.contentdata[id]["chkFA"].grid(column=2, row=rownum, sticky="nsew")
 
 				rownum += 1
 				self.contentdata[id]["lblFN"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Type:")
