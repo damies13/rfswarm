@@ -1138,8 +1138,6 @@ class ReporterBase():
 					fpwhere += ")"
 					wherelst.append(fpwhere)
 
-
-
 			# if isnum<1:
 			# 	mcolumns.append("MetricValue")
 			# 	if sc>0:
@@ -1387,7 +1385,6 @@ class ReporterBase():
 				colourcolumn = " || ' - ' || ".join(grouplst)
 				colourcolumn += " as [Colour] "
 				mcolumns.append(colourcolumn)
-
 
 			if FNType not in [None, "", "None"] and len(inpFP) > 0:
 				# construct pattern
@@ -1791,7 +1788,7 @@ class ReporterBase():
 	def whitespace_set_ini_value(self, valin):
 		base.debugmsg(9, "valin:", valin)
 		valout = str(valin)
-		if len(valout)>0:
+		if len(valout) > 0:
 			valout = valout.replace('\n', 'x12')
 			valout = valout.replace('\r', 'x15')
 			valout = valout.replace('\t', 'x11')
@@ -1806,7 +1803,7 @@ class ReporterBase():
 	def whitespace_get_ini_value(self, valin):
 		base.debugmsg(9, "valin:", valin)
 		valout = str(valin)
-		if len(valout)>0:
+		if len(valout) > 0:
 			valout = valout.replace('x12', '\n')
 			valout = valout.replace('x15', '\r')
 			valout = valout.replace('x11', '\t')
@@ -3035,8 +3032,9 @@ class ReporterCore:
 				if colours:
 					th = etree.SubElement(tr, 'th')
 				for col in cols:
-					th = etree.SubElement(tr, 'th')
-					th.text = col.strip()
+					if col not in ["Colour"]:
+						th = etree.SubElement(tr, 'th')
+						th.text = col.strip()
 
 				# table rows
 				for row in tdata:
@@ -3046,7 +3044,10 @@ class ReporterCore:
 					if colours:
 
 						base.debugmsg(9, "row:", row)
-						label = row[cols[0]]
+						if "Colour" in row:
+							label = row["Colour"]
+						else:
+							label = row[cols[0]]
 						base.debugmsg(9, "label:", label)
 						colour = base.named_colour(label)
 						base.debugmsg(9, "colour:", colour)
@@ -3057,9 +3058,12 @@ class ReporterCore:
 						rstyle = "background-color:{}; color:{};".format(colour, colour)
 						td.set("style", rstyle)
 
-					for val in vals:
-						td = etree.SubElement(tr, 'td')
-						td.text = str(val)
+					# for val in vals:
+					for col in cols:
+						if col not in ["Colour"]:
+							val = str(row[col]).strip()
+							td = etree.SubElement(tr, 'td')
+							td.text = str(val)
 
 	#
 	# 	MS Word
@@ -3586,6 +3590,8 @@ class ReporterCore:
 				if colours:
 					numcols += 1
 					cellcol += 1
+				if "Colour" in cols:
+					numcols -= 1
 
 				table = document.add_table(rows=1, cols=numcols)
 				# Table Grid Light
@@ -3599,14 +3605,15 @@ class ReporterCore:
 
 				cw = 5
 				for col in cols:
-					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
-					table.rows[cellrow].cells[cellcol].paragraphs[0].text = col.strip()
-					table.columns[cellcol].width = Cm(cw)
-					if cw > 2:
-						cw = 1.7
-					if cellcol > 5:
-						cw = 1.1
-					cellcol += 1
+					if col not in ["Colour"]:
+						table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+						table.rows[cellrow].cells[cellcol].paragraphs[0].text = col.strip()
+						table.columns[cellcol].width = Cm(cw)
+						if cw > 2:
+							cw = 1.7
+						if cellcol > 5:
+							cw = 1.1
+						cellcol += 1
 
 				# table rows
 				for row in tdata:
@@ -3620,7 +3627,10 @@ class ReporterCore:
 					if colours:
 
 						base.debugmsg(9, "row:", row)
-						label = row[cols[0]]
+						if "Colour" in row:
+							label = row["Colour"]
+						else:
+							label = row[cols[0]]
 						base.debugmsg(9, "label:", label)
 						colour = base.named_colour(label)
 						base.debugmsg(9, "colour:", colour)
@@ -3647,18 +3657,21 @@ class ReporterCore:
 
 						cellcol += 1
 
-					for val in vals:
-						# table.rows[cellrow].cells[cellcol].text = str(val)
-						# table.rows[cellrow].cells[cellcol].add_paragraph(text=str(val), style="Table Cell")
-						table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-						table.rows[cellrow].cells[cellcol].paragraphs[0].text = str(val)
+					# for val in vals:
+					for col in cols:
+						if col not in ["Colour"]:
+							val = str(row[col]).strip()
+							# table.rows[cellrow].cells[cellcol].text = str(val)
+							# table.rows[cellrow].cells[cellcol].add_paragraph(text=str(val), style="Table Cell")
+							table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+							table.rows[cellrow].cells[cellcol].paragraphs[0].text = str(val)
 
-						tcw = int(table.columns[cellcol].width.cm) + 1
-						# base.debugmsg(5, "tcw:", tcw)
-						if tcw > 5:
-							table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+							tcw = int(table.columns[cellcol].width.cm) + 1
+							# base.debugmsg(5, "tcw:", tcw)
+							if tcw > 5:
+								table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 
-						cellcol += 1
+							cellcol += 1
 
 				table.autofit = True
 				# table.style.paragraph_format.left_indent = Cm(-0.50)
@@ -4244,16 +4257,17 @@ class ReporterCore:
 					cellcol += 1
 
 				for col in cols:
+					if col not in ["Colour"]:
 
-					base.debugmsg(8, "col:", col, "	cellcol:", cellcol, "	rownum:", rownum)
-					hcell = ws.cell(column=cellcol, row=rownum, value=col.strip())
-					hcell.style = "Table Heading"
+						base.debugmsg(8, "col:", col, "	cellcol:", cellcol, "	rownum:", rownum)
+						hcell = ws.cell(column=cellcol, row=rownum, value=col.strip())
+						hcell.style = "Table Heading"
 
-					neww = len(str(col.strip())) * 1.3
-					base.debugmsg(9, "neww:", neww)
-					ws.column_dimensions[hcell.column_letter].width = neww
+						neww = len(str(col.strip())) * 1.3
+						base.debugmsg(9, "neww:", neww)
+						ws.column_dimensions[hcell.column_letter].width = neww
 
-					cellcol += 1
+						cellcol += 1
 
 				# table rows
 				for row in tdata:
@@ -4267,7 +4281,10 @@ class ReporterCore:
 					if colours:
 
 						base.debugmsg(9, "row:", row)
-						label = row[cols[0]]
+						if "Colour" in row:
+							label = row["Colour"]
+						else:
+							label = row[cols[0]]
 						base.debugmsg(9, "label:", label)
 						colour = base.named_colour(label).replace("#", "")
 						base.debugmsg(9, "colour:", colour)
@@ -4279,19 +4296,21 @@ class ReporterCore:
 					else:
 						cellcol += 1
 
-					for val in vals:
+					# for val in vals:
+					for col in cols:
+						if col not in ["Colour"]:
+							val = str(row[col]).strip()
+							base.debugmsg(8, "val:", val)
+							dcell = ws.cell(column=cellcol, row=rownum, value=val)
+							dcell.style = "Table Data"
 
-						base.debugmsg(8, "val:", val)
-						dcell = ws.cell(column=cellcol, row=rownum, value=val)
-						dcell.style = "Table Data"
+							currw = ws.column_dimensions[dcell.column_letter].width
+							base.debugmsg(9, "currw:", currw, "	len(val):", len(str(val)))
+							neww = max(currw, len(str(val)))
+							base.debugmsg(8, "neww:", neww)
+							ws.column_dimensions[dcell.column_letter].width = neww
 
-						currw = ws.column_dimensions[dcell.column_letter].width
-						base.debugmsg(9, "currw:", currw, "	len(val):", len(str(val)))
-						neww = max(currw, len(str(val)))
-						base.debugmsg(8, "neww:", neww)
-						ws.column_dimensions[dcell.column_letter].width = neww
-
-						cellcol += 1
+							cellcol += 1
 
 		rownum += 2
 		self.xlsx_select_cell(1, rownum)
