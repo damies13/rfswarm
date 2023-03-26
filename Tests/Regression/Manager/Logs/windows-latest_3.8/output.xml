@@ -203,6 +203,9 @@ python3 D:\a\rfswarm\rfswarm\rfswarm_manager\rfswarm.py</msg>
 <msg timestamp="20230319 10:24:50.302" level="INFO">Image "manager_windows_tab_run.png" found at (113, 114)</msg>
 <status status="PASS" starttime="20230319 10:24:50.161" endtime="20230319 10:24:50.302"/>
 </kw>
+<msg timestamp="20230326 09:32:08.770" level="FAIL">ImageNotFoundException: Reference image "D:\a\rfswarm\rfswarm\Tests\Regression\Manager\Images\file_method\manager_windows_tab_run.png" was not found on screen</msg>
+<status status="FAIL" starttime="20230326 09:31:58.621" endtime="20230326 09:32:08.770"/>
+</kw>
 <kw name="Locate" library="ImageHorizonLibrary">
 <var>@{coordinates}</var>
 <arg>${img}</arg>
@@ -277,6 +280,9 @@ python3 D:\a\rfswarm\rfswarm\rfswarm_manager\rfswarm.py</msg>
 <doc>Tries to locate given image from the screen for given time.</doc>
 <msg timestamp="20230319 10:24:56.010" level="INFO">Image "manager_windows_tab_agents.png" found at (149, 115)</msg>
 <status status="PASS" starttime="20230319 10:24:55.885" endtime="20230319 10:24:56.010"/>
+</kw>
+<msg timestamp="20230326 09:32:18.901" level="FAIL">ImageNotFoundException: Reference image "D:\a\rfswarm\rfswarm\Tests\Regression\Manager\Images\file_method\manager_windows_tab_agents.png" was not found on screen</msg>
+<status status="FAIL" starttime="20230326 09:32:08.770" endtime="20230326 09:32:18.901"/>
 </kw>
 <kw name="Locate" library="ImageHorizonLibrary">
 <var>@{coordinates}</var>
@@ -353,6 +359,9 @@ python3 D:\a\rfswarm\rfswarm\rfswarm_manager\rfswarm.py</msg>
 <msg timestamp="20230319 10:25:01.788" level="INFO">Image "manager_windows_tab_about.png" found at (192, 115)</msg>
 <status status="PASS" starttime="20230319 10:25:01.632" endtime="20230319 10:25:01.788"/>
 </kw>
+<msg timestamp="20230326 09:32:29.048" level="FAIL">ImageNotFoundException: Reference image "D:\a\rfswarm\rfswarm\Tests\Regression\Manager\Images\file_method\manager_windows_tab_about.png" was not found on screen</msg>
+<status status="FAIL" starttime="20230326 09:32:18.901" endtime="20230326 09:32:29.048"/>
+</kw>
 <kw name="Locate" library="ImageHorizonLibrary">
 <var>@{coordinates}</var>
 <arg>${img}</arg>
@@ -427,6 +436,9 @@ python3 D:\a\rfswarm\rfswarm\rfswarm_manager\rfswarm.py</msg>
 <doc>Tries to locate given image from the screen for given time.</doc>
 <msg timestamp="20230319 10:25:07.537" level="INFO">Image "manager_windows_tab_plan.png" found at (82, 115)</msg>
 <status status="PASS" starttime="20230319 10:25:07.396" endtime="20230319 10:25:07.537"/>
+</kw>
+<msg timestamp="20230326 09:32:39.132" level="FAIL">ImageNotFoundException: Reference image "D:\a\rfswarm\rfswarm\Tests\Regression\Manager\Images\file_method\manager_windows_tab_plan.png" was not found on screen</msg>
+<status status="FAIL" starttime="20230326 09:32:29.048" endtime="20230326 09:32:39.132"/>
 </kw>
 <kw name="Locate" library="ImageHorizonLibrary">
 <var>@{coordinates}</var>
@@ -538,17 +550,17 @@ python3 D:\a\rfswarm\rfswarm\rfswarm_manager\rfswarm.py</msg>
 </suite>
 <statistics>
 <total>
-<stat pass="9" fail="0" skip="0">All Tests</stat>
+<stat pass="4" fail="5" skip="0">All Tests</stat>
 </total>
 <tag>
-<stat pass="7" fail="0" skip="0">macos-latest</stat>
-<stat pass="8" fail="0" skip="0">ubuntu-latest</stat>
-<stat pass="9" fail="0" skip="0">windows-latest</stat>
+<stat pass="3" fail="4" skip="0">macos-latest</stat>
+<stat pass="3" fail="5" skip="0">ubuntu-latest</stat>
+<stat pass="4" fail="5" skip="0">windows-latest</stat>
 </tag>
 <suite>
-<stat pass="9" fail="0" skip="0" id="s1" name="Manager">Manager</stat>
+<stat pass="4" fail="5" skip="0" id="s1" name="Manager">Manager</stat>
 <stat pass="3" fail="0" skip="0" id="s1-s1" name="CommandLine">Manager.CommandLine</stat>
-<stat pass="6" fail="0" skip="0" id="s1-s2" name="GUI Basic">Manager.GUI Basic</stat>
+<stat pass="1" fail="5" skip="0" id="s1-s2" name="GUI Basic">Manager.GUI Basic</stat>
 </suite>
 </statistics>
 <errors>

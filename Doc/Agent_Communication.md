@@ -267,6 +267,7 @@ HTTP POST `http://manager:8138/Metric`
 Request Body:
 ```json
 {
+    "AgentName": "myagent",
     "PrimaryMetric": "my_aut_server",
     "MetricType": "AUT Web",
     "MetricTime": "1609924920",

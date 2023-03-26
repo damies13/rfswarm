@@ -59,11 +59,18 @@ jobs:
       - name: create branch for test results
         run: git checkout -B Test-Result-Manager-${{ matrix.platform }}-${{ matrix.python }}
       - name: Robot Framework
+        id: robottest
         run: robot --include ${{ matrix.platform }} --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }} Tests/Regression/Manager
         env:
           DISPLAY: :13.0
+      - name: echo robottest
+        if: ${{ always() }}
+        run: |
+          echo "${{ steps.robottest.conclusion}}  ${{ steps.robottest.conclusion == 'failure' }}"
       - name: git commit
-        if: always()
+        # if: ${{ steps.robottest.conclusion == 'failure' }}
+        # https://docs.github.com/en/actions/learn-github-actions/expressions
+        if: ${{ failure() }}
         run: |
           # Stage the file, commit and push
           echo "git add"
@@ -71,14 +78,16 @@ jobs:
           echo "git commit"
           git commit -m "Manager ${{ matrix.platform }} ${{ matrix.python }}"
       - name: Switch back to original branch
-        if: always()
+        # if: ${{ steps.robottest.conclusion == 'failure' }}
+        if: ${{ failure() }}
         run: |
           echo "git checkout ref_name: ${{ github.ref_name }}"
           git checkout -f ${{ github.ref_name }}
           echo "git pull"
           git pull --ff --autostash -f
       - name: Merge test results into original branch
-        if: always()
+        # if: ${{ steps.robottest.conclusion == 'failure' }}
+        if: ${{ failure() }}
         run: |
           echo "git merge"
           git merge --ff Test-Result-Manager-${{ matrix.platform }}-${{ matrix.python }}
@@ -125,11 +134,17 @@ jobs:
       - name: create branch for test results
         run: git checkout -B Test-Result-Reporter-${{ matrix.platform }}-${{ matrix.python }}
       - name: Robot Framework
+        id: robottest
         run: robot --include ${{ matrix.platform }} --outputdir Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }} Tests/Regression/Reporter
         env:
           DISPLAY: :13.0
+      - name: echo robottest
+        if: ${{ always() }}
+        run: |
+          echo "${{ steps.robottest.conclusion}}  ${{ steps.robottest.conclusion == 'failure' }}"
       - name: git commit
-        if: always()
+        # if: ${{ steps.robottest.conclusion == 'failure' }}
+        if: ${{ failure() }}
         run: |
           # Stage the file, commit and push
           echo "git add"
@@ -137,14 +152,16 @@ jobs:
           echo "git commit"
           git commit -m "Reporter ${{ matrix.platform }} ${{ matrix.python }}"
       - name: Switch back to original branch
-        if: always()
+        # if: ${{ steps.robottest.conclusion == 'failure' }}
+        if: ${{ failure() }}
         run: |
           echo "git checkout ref_name: ${{ github.ref_name }}"
           git checkout -f ${{ github.ref_name }}
           echo "git pull"
           git pull --ff --autostash -f
       - name: Merge test results into original branch
-        if: always()
+        # if: ${{ steps.robottest.conclusion == 'failure' }}
+        if: ${{ failure() }}
         run: |
           echo "git merge"
           git merge --ff Test-Result-Reporter-${{ matrix.platform }}-${{ matrix.python }}
