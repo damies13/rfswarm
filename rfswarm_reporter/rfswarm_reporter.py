@@ -904,15 +904,25 @@ class ReporterBase():
 		DataType = self.rt_table_get_dt(id)
 		if DataType == "Result":
 			RType = self.rt_table_get_rt(id)
+			EnFR = self.rt_table_get_enfr(id)
 			FRType = self.rt_table_get_fr(id)
+			EnFA = self.rt_table_get_enfa(id)
+			FAType = self.rt_table_get_fa(id)
 			FNType = self.rt_table_get_fn(id)
 			inpFP = self.rt_table_get_fp(id)
+			colname = "Name"
 
 			sql = "SELECT "
 			if RType == "Response Time":
 				sql += "end_time as 'Time' "
 				sql += ", elapsed_time as 'Value' "
-				sql += ", result_name as 'Name' "
+				# sql += ", result_name as 'Name' "
+				sql += ", result_name"
+				if EnFR and FRType in [None, "", "None"]:
+					sql += " || ' - ' || result"
+				if EnFA and FAType in [None, "", "None"]:
+					sql += " || ' - ' || agent"
+				sql += " as [" + colname + "] "
 				# sql += 		", round(min(elapsed_time),3) 'minium' "
 				# sql += 		", round(avg(elapsed_time),3) 'average' "
 				# sql += 		", round(percentile(elapsed_time, {}),3) '{}%ile' ".format(display_percentile, display_percentile)
@@ -936,15 +946,33 @@ class ReporterBase():
 			if RType == "TPS":
 				sql += "end_time as 'Time' "
 				sql += ", count(result) as 'Value' "
-				sql += ", result_name as 'Name' "
+				# sql += ", result_name as 'Name' "
+				sql += ", result_name"
+				if EnFR and FRType in [None, "", "None"]:
+					sql += " || ' - ' || result"
+				if EnFA and FAType in [None, "", "None"]:
+					sql += " || ' - ' || agent"
+				sql += " as [" + colname + "] "
 			if RType == "Total TPS":
 				sql += "end_time as 'Time'"
 				sql += ", count(result) as 'Value' "
-				sql += ", result as 'Name' "
+				# sql += ", result as 'Name' "
+				sql += ", result"
+				if EnFR and FRType in [None, "", "None"]:
+					sql += " || ' - ' || result"
+				if EnFA and FAType in [None, "", "None"]:
+					sql += " || ' - ' || agent"
+				sql += " as [" + colname + "] "
 			if RType is None:
 				sql += "end_time as 'Time'"
 				sql += ", count(result) as 'Value' "
-				sql += ", result_name as 'Name' "
+				# sql += ", result_name as 'Name' "
+				sql += ", result_name"
+				if EnFR and FRType in [None, "", "None"]:
+					sql += " || ' - ' || result"
+				if EnFA and FAType in [None, "", "None"]:
+					sql += " || ' - ' || agent"
+				sql += " as [" + colname + "] "
 
 			sql += "FROM Results "
 
@@ -956,31 +984,34 @@ class ReporterBase():
 				# sql += "WHERE result == 'FAIL' "
 				lwhere.append("result == 'FAIL'")
 
+			if EnFA and FAType not in [None, "", "None"]:
+				lwhere.append("agent == '" + FAType + "'")
+
 			if RType == "Response Time":
 				# sql +=  	"AND result_name NOT LIKE 'Exception in thread%' "
-				lwhere.append("result_name NOT LIKE 'Exception in thread%'")
+				lwhere.append("[" + colname + "] NOT LIKE 'Exception in thread%'")
 			if RType == "TPS":
 				# sql +=  "WHERE result_name NOT LIKE 'Exception in thread%' "
-				lwhere.append("result_name NOT LIKE 'Exception in thread%'")
+				lwhere.append("[" + colname + "] NOT LIKE 'Exception in thread%'")
 
-			if FNType != "None" and len(inpFP) > 0:
+			if FNType not in [None, "", "None"] and len(inpFP) > 0:
 				# construct pattern
 				# "Wildcard (Unix Glob)",
 				if FNType == "Wildcard (Unix Glob)":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("result_name GLOB '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] GLOB '{}'".format(inpFP))
 				# "Regex",
 				if FNType == "Regex":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("result_name REGEXP '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] REGEXP '{}'".format(inpFP))
 				# "Not Wildcard (Unix Glob)",
 				if FNType == "Not Wildcard (Unix Glob)":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("result_name NOT GLOB '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] NOT GLOB '{}'".format(inpFP))
 				# "Not Regex"
 				if FNType == "Not Regex":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("result_name NOT REGEXP '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] NOT REGEXP '{}'".format(inpFP))
 
 			i = 0
 			for iwhere in lwhere:
@@ -1013,34 +1044,101 @@ class ReporterBase():
 			MType = self.rt_table_get_mt(id)
 			PM = self.rt_table_get_pm(id)
 			SM = self.rt_table_get_sm(id)
-
 			# isnum = self.rt_table_get_isnumeric(id)
 			# sc = self.rt_table_get_showcount(id)
+			EnFA = self.rt_table_get_enfa(id)
+			FAType = self.rt_table_get_fa(id)
+			FNType = self.rt_table_get_fn(id)
+			inpFP = self.rt_table_get_fp(id)
+			colname = "Name"
+
 			base.debugmsg(6, "MType:", MType, "	PM:", PM, "	SM:", SM)
 
-			mcolumns = ["MetricTime as 'Time'", "MetricValue as 'Value'", "PrimaryMetric as 'Name'", "MetricType as 'Name'", "SecondaryMetric as 'Name'"]
+			mnamecolumns = []
+			# mcolumns = ["MetricTime as 'Time'", "MetricValue as 'Value'", "PrimaryMetric as 'Name'", "MetricType as 'Name'", "SecondaryMetric as 'Name'"]
+			mcolumns = ["MetricTime as 'Time'", "MetricValue as 'Value'"]
 			wherelst = []
 			# grouplst = ["PrimaryMetric", "MetricType", "SecondaryMetric"]
 			grouplst = []
 
 			if MType is not None and len(MType) > 0:
-				if "MetricType as 'Name'" in mcolumns:
-					mcolumns.remove("MetricType as 'Name'")
+				# if "MetricType as 'Name'" in mcolumns:
+				# 	mcolumns.remove("MetricType as 'Name'")
 				wherelst.append("MetricType == '{}'".format(MType.replace("'", "''")))
 				if "MetricType" in grouplst:
 					grouplst.remove("MetricType")
+			else:
+				mnamecolumns.append("MetricType")
 			if PM is not None and len(PM) > 0:
-				if "PrimaryMetric as 'Name'" in mcolumns:
-					mcolumns.remove("PrimaryMetric as 'Name'")
+				# if "PrimaryMetric as 'Name'" in mcolumns:
+				# 	mcolumns.remove("PrimaryMetric as 'Name'")
 				wherelst.append("PrimaryMetric == '{}'".format(PM.replace("'", "''")))
 				if "PrimaryMetric" in grouplst:
 					grouplst.remove("PrimaryMetric")
+			else:
+				mnamecolumns.append("PrimaryMetric")
 			if SM is not None and len(SM) > 0:
-				if "SecondaryMetric as 'Name'" in mcolumns:
-					mcolumns.remove("SecondaryMetric as 'Name'")
+				# if "SecondaryMetric as 'Name'" in mcolumns:
+				# 	mcolumns.remove("SecondaryMetric as 'Name'")
 				wherelst.append("SecondaryMetric == '{}'".format(SM.replace("'", "''")))
 				if "SecondaryMetric" in grouplst:
 					grouplst.remove("SecondaryMetric")
+			else:
+				mnamecolumns.append("SecondaryMetric")
+
+			if EnFA:
+				if FAType in [None, "", "None"]:
+					mnamecolumns.append("DataSource")
+				else:
+					wherelst.append("DataSource == '{}'".format(FAType))
+
+			# Construct Name Column
+			mnamecolumn = " || ' - ' || ".join(mnamecolumns)
+			mnamecolumn += " as [" + colname + "] "
+			mcolumns.append(mnamecolumn)
+
+			if FNType not in [None, "", "None"] and len(inpFP) > 0:
+				# construct pattern
+				# "Wildcard (Unix Glob)",
+				if FNType == "Wildcard (Unix Glob)":
+					# AND PrimaryMetric GLOB '*_1*' OR SecondaryMetric GLOB '*_1*' OR DataSource GLOB '*_1*' OR MetricValue GLOB '*_1*'
+					base.debugmsg(5, "mnamecolumns:", mnamecolumns)
+					fpwhere = "("
+					for dispcol in mnamecolumns:
+						if len(fpwhere) > 1:
+							fpwhere += "OR "
+						fpwhere += "{} GLOB '{}'".format(dispcol, inpFP)
+					fpwhere += ")"
+					wherelst.append(fpwhere)
+				# "Regex",
+				if FNType == "Regex":
+					fpwhere = "("
+					for dispcol in mnamecolumns:
+						if len(fpwhere) > 1:
+							fpwhere += "OR "
+						fpwhere += "{} REGEXP '{}'".format(dispcol, inpFP)
+					fpwhere += ")"
+					wherelst.append(fpwhere)
+				# "Not Wildcard (Unix Glob)",
+				if FNType == "Not Wildcard (Unix Glob)":
+					fpwhere = "("
+					for dispcol in mnamecolumns:
+						if len(fpwhere) > 1:
+							fpwhere += "AND "
+						fpwhere += "{} NOT GLOB '{}'".format(dispcol, inpFP)
+					fpwhere += ")"
+					wherelst.append(fpwhere)
+				# "Not Regex"
+				if FNType == "Not Regex":
+					fpwhere = "("
+					for dispcol in mnamecolumns:
+						if len(fpwhere) > 1:
+							fpwhere += "AND "
+						fpwhere += "{} NOT REGEXP '{}'".format(dispcol, inpFP)
+					fpwhere += ")"
+					wherelst.append(fpwhere)
+
+
 
 			# if isnum<1:
 			# 	mcolumns.append("MetricValue")
@@ -1087,7 +1185,7 @@ class ReporterBase():
 
 			sql += "ORDER BY MetricTime "
 
-		base.debugmsg(8, "sql:", sql)
+		base.debugmsg(5, "sql:", sql)
 		self.rt_graph_set_sql(id, sql)
 		return sql
 
@@ -1189,6 +1287,7 @@ class ReporterBase():
 				if FRType == "Fail":
 					# sql += "WHERE result == 'FAIL' "
 					lwhere.append("result == 'FAIL'")
+
 			if EnFA and FAType not in [None, "", "None"]:
 				lwhere.append("agent == '" + FAType + "'")
 
@@ -1199,7 +1298,7 @@ class ReporterBase():
 				# sql +=  "WHERE result_name NOT LIKE 'Exception in thread%' "
 				lwhere.append("[" + colname + "] NOT LIKE 'Exception in thread%'")
 
-			if FNType != "None" and len(inpFP) > 0:
+			if FNType not in [None, "", "None"] and len(inpFP) > 0:
 				# construct pattern
 				# "Wildcard (Unix Glob)",
 				if FNType == "Wildcard (Unix Glob)":
@@ -1250,6 +1349,8 @@ class ReporterBase():
 			FNType = self.rt_table_get_fn(id)
 			inpFP = self.rt_table_get_fp(id)
 
+			colours = self.rt_table_get_colours(id)
+
 			base.debugmsg(8, "MType:", MType, "	PM:", PM, "	SM:", SM)
 
 			mcolumns = ["PrimaryMetric", "MetricType", "SecondaryMetric"]
@@ -1282,7 +1383,13 @@ class ReporterBase():
 				if "SecondaryMetric" in grouplst:
 					grouplst.remove("SecondaryMetric")
 
-			if FNType != "None" and len(inpFP) > 0:
+			if colours:
+				colourcolumn = " || ' - ' || ".join(grouplst)
+				colourcolumn += " as [Colour] "
+				mcolumns.append(colourcolumn)
+
+
+			if FNType not in [None, "", "None"] and len(inpFP) > 0:
 				# construct pattern
 				# "Wildcard (Unix Glob)",
 				if FNType == "Wildcard (Unix Glob)":
@@ -1656,8 +1763,12 @@ class ReporterBase():
 	def rt_table_set_fn(self, id, filtertype):
 		base.debugmsg(5, "id:", id, "	filtertype:", filtertype)
 		prev = self.rt_table_get_fr(id)
-		if filtertype != prev and filtertype is not None:
+		if filtertype != prev and filtertype not in [None, "None"]:
 			base.report[id]['FilterType'] = base.whitespace_set_ini_value(filtertype)
+			base.report_item_set_changed(id)
+			base.report_save()
+		elif filtertype in [None, "None"]:
+			base.report[id]['FilterType'] = base.whitespace_set_ini_value(None)
 			base.report_item_set_changed(id)
 			base.report_save()
 
@@ -1679,27 +1790,31 @@ class ReporterBase():
 
 	def whitespace_set_ini_value(self, valin):
 		base.debugmsg(9, "valin:", valin)
-		valout = valin.replace('\n', 'x12')
-		valout = valout.replace('\r', 'x15')
-		valout = valout.replace('\t', 'x11')
-		valout = valout.replace('[', 'x91')
-		valout = valout.replace(']', 'x93')
-		valout = valout.replace('%', 'x37')
-		# valout = valout.replace('%', '%%')
-		valout = valout.replace('#', 'x35')
-		base.debugmsg(9, "valout:", valout)
+		valout = str(valin)
+		if len(valout)>0:
+			valout = valout.replace('\n', 'x12')
+			valout = valout.replace('\r', 'x15')
+			valout = valout.replace('\t', 'x11')
+			valout = valout.replace('[', 'x91')
+			valout = valout.replace(']', 'x93')
+			valout = valout.replace('%', 'x37')
+			# valout = valout.replace('%', '%%')
+			valout = valout.replace('#', 'x35')
+			base.debugmsg(9, "valout:", valout)
 		return valout
 
 	def whitespace_get_ini_value(self, valin):
 		base.debugmsg(9, "valin:", valin)
-		valout = valin.replace('x12', '\n')
-		valout = valout.replace('x15', '\r')
-		valout = valout.replace('x11', '\t')
-		valout = valout.replace('x91', '[')
-		valout = valout.replace('x93', ']')
-		valout = valout.replace('x37', '%')
-		valout = valout.replace('x35', '#')
-		base.debugmsg(9, "valout:", valout)
+		valout = str(valin)
+		if len(valout)>0:
+			valout = valout.replace('x12', '\n')
+			valout = valout.replace('x15', '\r')
+			valout = valout.replace('x11', '\t')
+			valout = valout.replace('x91', '[')
+			valout = valout.replace('x93', ']')
+			valout = valout.replace('x37', '%')
+			valout = valout.replace('x35', '#')
+			base.debugmsg(9, "valout:", valout)
 		return valout
 
 	# mt MetricType
@@ -5862,6 +5977,10 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[id]["MType"].set(base.rt_table_get_mt(id))
 			self.contentdata[id]["PMetric"].set(base.rt_table_get_pm(id))
 			self.contentdata[id]["SMetric"].set(base.rt_table_get_sm(id))
+			self.contentdata[id]["intFA"].set(base.rt_table_get_enfa(id))
+			self.contentdata[id]["FAType"].set(base.rt_table_get_fa(id))
+			self.contentdata[id]["FNType"].set(base.rt_table_get_fn(id))
+			self.contentdata[id]["FPattern"].set(base.rt_table_get_fp(id))
 
 		# Show
 		self.contentdata[id]["Frames"][datatype].grid(column=0, row=self.contentdata[id]["DTFrame"], columnspan=100, sticky="nsew")
@@ -5983,6 +6102,27 @@ class ReporterGUI(tk.Frame):
 			value = self.contentdata[idr]["FRType"].get()
 			base.rt_table_set_fr(idr, value)
 
+		if "intFR" in self.contentdata[idl]:
+			value = self.contentdata[idl]["intFR"].get()
+			base.rt_table_set_enfr(idl, value)
+		if "intFR" in self.contentdata[idr]:
+			value = self.contentdata[idr]["intFR"].get()
+			base.rt_table_set_enfr(idr, value)
+
+		if "intFA" in self.contentdata[idl]:
+			value = self.contentdata[idl]["intFA"].get()
+			base.rt_table_set_enfa(idl, value)
+		if "intFA" in self.contentdata[idr]:
+			value = self.contentdata[idr]["intFA"].get()
+			base.rt_table_set_enfa(idr, value)
+
+		if "FAType" in self.contentdata[idl]:
+			value = self.contentdata[idl]["FAType"].get()
+			base.rt_table_set_fa(idl, value)
+		if "FAType" in self.contentdata[idr]:
+			value = self.contentdata[idr]["FAType"].get()
+			base.rt_table_set_fa(idr, value)
+
 		if "FNType" in self.contentdata[idl]:
 			value = self.contentdata[idl]["FNType"].get()
 			base.rt_table_set_fn(idl, value)
@@ -6088,6 +6228,9 @@ class ReporterGUI(tk.Frame):
 			# "Metric", "Result", "SQL"
 
 			if datatypel == "Metric":
+				showmetricagents = 0
+				if "DBTable" in base.settings and "Metrics" in base.settings["DBTable"] and "DataSource" in base.settings["DBTable"]["Metrics"]:
+					showmetricagents = base.settings["DBTable"]["Metrics"]["DataSource"]
 
 				base.debugmsg(6, "datatypel:", datatypel)
 				rownum += 1
@@ -6097,6 +6240,11 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idl]["intIsNum"] = tk.IntVar()
 				self.contentdata[idl]["chkIsNum"] = ttk.Checkbutton(self.contentdata[idl]["Frames"][datatypel], variable=self.contentdata[idl]["intIsNum"], command=self.cs_graph_update)
 				self.contentdata[idl]["chkIsNum"].grid(column=1, row=rownum, sticky="nsew")
+
+				if showmetricagents:
+					# rownum += 1
+					self.contentdata[idl]["lblEnabled"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Enabled")
+					self.contentdata[idl]["lblEnabled"].grid(column=2, row=rownum, sticky="nsew")
 
 				rownum += 1
 				self.contentdata[idl]["lblMT"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Metric Type:")
@@ -6125,6 +6273,39 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idl]["omSM"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["SMetric"], command=self.cs_graph_update, *self.contentdata[idl]["SMetrics"])
 				self.contentdata[idl]["omSM"].grid(column=1, row=rownum, sticky="nsew")
 
+				if showmetricagents:
+					rownum += 1
+					self.contentdata[idl]["lblFA"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Filter Agent:")
+					self.contentdata[idl]["lblFA"].grid(column=0, row=rownum, sticky="nsew")
+
+					self.contentdata[idl]["FATypes"] = [None, "", "Loading..."]
+					self.contentdata[idl]["FAType"] = tk.StringVar()
+					self.contentdata[idl]["omFA"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["FAType"], command=self.cs_graph_update, *self.contentdata[idl]["FATypes"])
+					self.contentdata[idl]["omFA"].grid(column=1, row=rownum, sticky="nsew")
+
+					self.contentdata[idl]["intFA"] = tk.IntVar()
+					self.contentdata[idl]["chkFA"] = ttk.Checkbutton(self.contentdata[idl]["Frames"][datatypel], variable=self.contentdata[idl]["intFA"], command=self.cs_graph_update)
+					self.contentdata[idl]["chkFA"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idl]["lblFN"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Filter Type:")
+				self.contentdata[idl]["lblFN"].grid(column=0, row=rownum, sticky="nsew")
+
+				FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
+				self.contentdata[idl]["FNType"] = tk.StringVar()
+				self.contentdata[idl]["omFR"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["FNType"], command=self.cs_graph_update, *FNTypes)
+				self.contentdata[idl]["omFR"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idl]["lblFP"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Filter Pattern:")
+				self.contentdata[idl]["lblFP"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idl]["FPattern"] = tk.StringVar()
+				self.contentdata[idl]["inpFP"] = ttk.Entry(self.contentdata[idl]["Frames"][datatypel], textvariable=self.contentdata[idl]["FPattern"])
+				self.contentdata[idl]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[idl]["inpFP"].bind('<Leave>', self.cs_graph_update)
+				self.contentdata[idl]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
+
 			if datatypel == "Result":
 				rownum += 1
 				self.contentdata[idl]["lblRT"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Result Type:")
@@ -6144,6 +6325,23 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idl]["FRType"] = tk.StringVar()
 				self.contentdata[idl]["omFR"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["FRType"], command=self.cs_graph_update, *FRTypes)
 				self.contentdata[idl]["omFR"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[idl]["intFR"] = tk.IntVar()
+				self.contentdata[idl]["chkFR"] = ttk.Checkbutton(self.contentdata[idl]["Frames"][datatypel], variable=self.contentdata[idl]["intFR"], command=self.cs_graph_update)
+				self.contentdata[idl]["chkFR"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idl]["lblFA"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Filter Agent:")
+				self.contentdata[idl]["lblFA"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idl]["FATypes"] = [None, "", "Loading..."]
+				self.contentdata[idl]["FAType"] = tk.StringVar()
+				self.contentdata[idl]["omFA"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["FAType"], command=self.cs_graph_update, *self.contentdata[idl]["FATypes"])
+				self.contentdata[idl]["omFA"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[idl]["intFA"] = tk.IntVar()
+				self.contentdata[idl]["chkFA"] = ttk.Checkbutton(self.contentdata[idl]["Frames"][datatypel], variable=self.contentdata[idl]["intFA"], command=self.cs_graph_update)
+				self.contentdata[idl]["chkFA"].grid(column=2, row=rownum, sticky="nsew")
 
 				rownum += 1
 				self.contentdata[idl]["lblFN"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Filter Type:")
@@ -6187,6 +6385,9 @@ class ReporterGUI(tk.Frame):
 			# "Metric", "Result", "SQL"
 
 			if datatyper == "Metric":
+				showmetricagents = 0
+				if "DBTable" in base.settings and "Metrics" in base.settings["DBTable"] and "DataSource" in base.settings["DBTable"]["Metrics"]:
+					showmetricagents = base.settings["DBTable"]["Metrics"]["DataSource"]
 
 				base.debugmsg(6, "datatyper:", datatyper)
 				rownum += 1
@@ -6196,6 +6397,11 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idr]["intIsNum"] = tk.IntVar()
 				self.contentdata[idr]["chkIsNum"] = ttk.Checkbutton(self.contentdata[idr]["Frames"][datatyper], variable=self.contentdata[idr]["intIsNum"], command=self.cs_graph_update)
 				self.contentdata[idr]["chkIsNum"].grid(column=1, row=rownum, sticky="nsew")
+
+				if showmetricagents:
+					# rownum += 1
+					self.contentdata[idr]["lblEnabled"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Enabled")
+					self.contentdata[idr]["lblEnabled"].grid(column=2, row=rownum, sticky="nsew")
 
 				rownum += 1
 				self.contentdata[idr]["lblMT"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Metric Type:")
@@ -6224,6 +6430,39 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idr]["omSM"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["SMetric"], command=self.cs_graph_update, *self.contentdata[idr]["SMetrics"])
 				self.contentdata[idr]["omSM"].grid(column=1, row=rownum, sticky="nsew")
 
+				if showmetricagents:
+					rownum += 1
+					self.contentdata[idr]["lblFA"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Filter Agent:")
+					self.contentdata[idr]["lblFA"].grid(column=0, row=rownum, sticky="nsew")
+
+					self.contentdata[idr]["FATypes"] = [None, "", "Loading..."]
+					self.contentdata[idr]["FAType"] = tk.StringVar()
+					self.contentdata[idr]["omFA"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["FAType"], command=self.cs_graph_update, *self.contentdata[idr]["FATypes"])
+					self.contentdata[idr]["omFA"].grid(column=1, row=rownum, sticky="nsew")
+
+					self.contentdata[idr]["intFA"] = tk.IntVar()
+					self.contentdata[idr]["chkFA"] = ttk.Checkbutton(self.contentdata[idr]["Frames"][datatyper], variable=self.contentdata[idr]["intFA"], command=self.cs_graph_update)
+					self.contentdata[idr]["chkFA"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idr]["lblFN"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Filter Type:")
+				self.contentdata[idr]["lblFN"].grid(column=0, row=rownum, sticky="nsew")
+
+				FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
+				self.contentdata[idr]["FNType"] = tk.StringVar()
+				self.contentdata[idr]["omFR"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["FNType"], command=self.cs_graph_update, *FNTypes)
+				self.contentdata[idr]["omFR"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idr]["lblFP"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Filter Pattern:")
+				self.contentdata[idr]["lblFP"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idr]["FPattern"] = tk.StringVar()
+				self.contentdata[idr]["inpFP"] = ttk.Entry(self.contentdata[idr]["Frames"][datatyper], textvariable=self.contentdata[idr]["FPattern"])
+				self.contentdata[idr]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[idr]["inpFP"].bind('<Leave>', self.cs_graph_update)
+				self.contentdata[idr]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
+
 			if datatyper == "Result":
 				rownum += 1
 				self.contentdata[idr]["lblRT"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Result Type:")
@@ -6243,6 +6482,23 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idr]["FRType"] = tk.StringVar()
 				self.contentdata[idr]["omFR"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["FRType"], command=self.cs_graph_update, *FRTypes)
 				self.contentdata[idr]["omFR"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[idr]["intFR"] = tk.IntVar()
+				self.contentdata[idr]["chkFR"] = ttk.Checkbutton(self.contentdata[idr]["Frames"][datatyper], variable=self.contentdata[idr]["intFR"], command=self.cs_graph_update)
+				self.contentdata[idr]["chkFR"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idr]["lblFA"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Filter Agent:")
+				self.contentdata[idr]["lblFA"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idr]["FATypes"] = [None, "", "Loading..."]
+				self.contentdata[idr]["FAType"] = tk.StringVar()
+				self.contentdata[idr]["omFA"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["FAType"], command=self.cs_graph_update, *self.contentdata[idr]["FATypes"])
+				self.contentdata[idr]["omFA"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[idr]["intFA"] = tk.IntVar()
+				self.contentdata[idr]["chkFA"] = ttk.Checkbutton(self.contentdata[idr]["Frames"][datatyper], variable=self.contentdata[idr]["intFA"], command=self.cs_graph_update)
+				self.contentdata[idr]["chkFA"].grid(column=2, row=rownum, sticky="nsew")
 
 				rownum += 1
 				self.contentdata[idr]["lblFN"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Filter Type:")
@@ -6288,14 +6544,22 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[idr]["tSQL"].insert('0.0', sql)
 
 		if datatypel == "Result":
+			self.cs_datatable_update_result(idl)
 			self.contentdata[idl]["RType"].set(base.rt_table_get_rt(idl))
+			self.contentdata[idl]["intFR"].set(base.rt_table_get_enfr(idl))
 			self.contentdata[idl]["FRType"].set(base.rt_table_get_fr(idl))
+			self.contentdata[idl]["intFA"].set(base.rt_table_get_enfa(idl))
+			self.contentdata[idl]["FAType"].set(base.rt_table_get_fa(idl))
 			self.contentdata[idl]["FNType"].set(base.rt_table_get_fn(idl))
 			self.contentdata[idl]["FPattern"].set(base.rt_table_get_fp(idl))
 
 		if datatyper == "Result":
+			self.cs_datatable_update_result(idr)
 			self.contentdata[idr]["RType"].set(base.rt_table_get_rt(idr))
+			self.contentdata[idr]["intFR"].set(base.rt_table_get_enfr(idr))
 			self.contentdata[idr]["FRType"].set(base.rt_table_get_fr(idr))
+			self.contentdata[idr]["intFA"].set(base.rt_table_get_enfa(idr))
+			self.contentdata[idr]["FAType"].set(base.rt_table_get_fa(idr))
 			self.contentdata[idr]["FNType"].set(base.rt_table_get_fn(idr))
 			self.contentdata[idr]["FPattern"].set(base.rt_table_get_fp(idr))
 
@@ -6309,6 +6573,10 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[idl]["MType"].set(base.rt_table_get_mt(idl))
 			self.contentdata[idl]["PMetric"].set(base.rt_table_get_pm(idl))
 			self.contentdata[idl]["SMetric"].set(base.rt_table_get_sm(idl))
+			self.contentdata[idl]["intFA"].set(base.rt_table_get_enfa(idl))
+			self.contentdata[idl]["FAType"].set(base.rt_table_get_fa(idl))
+			self.contentdata[idl]["FNType"].set(base.rt_table_get_fn(idl))
+			self.contentdata[idl]["FPattern"].set(base.rt_table_get_fp(idl))
 
 		if datatyper == "Metric":
 			base.debugmsg(5, "Update Options")
@@ -6320,6 +6588,10 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[idr]["MType"].set(base.rt_table_get_mt(idr))
 			self.contentdata[idr]["PMetric"].set(base.rt_table_get_pm(idr))
 			self.contentdata[idr]["SMetric"].set(base.rt_table_get_sm(idr))
+			self.contentdata[idr]["intFA"].set(base.rt_table_get_enfa(idr))
+			self.contentdata[idr]["FAType"].set(base.rt_table_get_fa(idr))
+			self.contentdata[idr]["FNType"].set(base.rt_table_get_fn(idr))
+			self.contentdata[idr]["FPattern"].set(base.rt_table_get_fp(idr))
 
 		# Show
 		self.contentdata[idl]["Frames"][datatypel].grid(column=0, row=self.contentdata[id]["DTFrame"], columnspan=100, sticky="nsew")
@@ -6500,7 +6772,7 @@ class ReporterGUI(tk.Frame):
 				base.debugmsg(5, "e:", e)
 
 	def cp_display_preview(self, id, row):
-		base.debugmsg(9, "id:", id)
+		base.debugmsg(5, "id:", id)
 		if id in self.t_preview:
 			if self.t_preview[id].is_alive():
 				self.t_preview[id].join()
@@ -6930,11 +7202,12 @@ class ReporterGUI(tk.Frame):
 
 				colnum = 1 + colours
 				for col in cols:
-					cellname = "h_{}".format(col)
-					base.debugmsg(9, "cellname:", cellname)
-					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=col.strip(), style='Report.THead.TLabel')
-					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-					colnum += 1
+					if col not in ["Colour"]:
+						cellname = "h_{}".format(col)
+						base.debugmsg(9, "cellname:", cellname)
+						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=col.strip(), style='Report.THead.TLabel')
+						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+						colnum += 1
 				i = 0
 				for row in tdata:
 					i += 1
@@ -6948,7 +7221,10 @@ class ReporterGUI(tk.Frame):
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 						base.debugmsg(9, "row:", row)
-						label = row[cols[0]]
+						if "Colour" in row:
+							label = row["Colour"]
+						else:
+							label = row[cols[0]]
 						base.debugmsg(9, "label:", label)
 						colour = base.named_colour(label)
 						base.debugmsg(9, "colour:", colour)
@@ -6956,11 +7232,12 @@ class ReporterGUI(tk.Frame):
 						self.contentdata[id][cellname].config(bg=colour)
 
 					for col in cols:
-						colnum += 1
-						cellname = "{}_{}".format(i, col)
-						base.debugmsg(9, "cellname:", cellname)
-						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(row[col]), style='Report.TBody.TLabel')
-						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+						if col not in ["Colour"]:
+							colnum += 1
+							cellname = "{}_{}".format(i, col)
+							base.debugmsg(9, "cellname:", cellname)
+							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(row[col]), style='Report.TBody.TLabel')
+							self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 	#
 	# Export content generation functions
