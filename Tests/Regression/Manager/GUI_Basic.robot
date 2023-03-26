@@ -92,6 +92,12 @@ Close GUI
 		Fail
 	END
 
+Intentional Fail
+	[Tags]	ubuntu-latest		windows-latest		macos-latest
+	[Documentation]		Uncomment this test if you want to trigger updating Screenshots in the git repo
+	...								Ensure this is commented out before release or pull request
+	Fail
+
 
 *** Keywords ***
 Click Tab
