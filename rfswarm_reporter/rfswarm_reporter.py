@@ -5755,12 +5755,45 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "datatype:", datatype)
 		if "Frames" not in self.contentdata[id]:
 			self.contentdata[id]["Frames"] = {}
+
 		# Forget
 		for frame in self.contentdata[id]["Frames"].keys():
 			self.contentdata[id]["Frames"][frame].grid_forget()
 			self.contentdata[id]["Frames"] = {}
+
 		# Construct
+		# if "renamecols" not in self.contentdata[id]["Frames"]:
+		base.debugmsg(5, "create renamecols frame")
+		rownum = 0
+		self.contentdata[id]["Frames"]["renamecols"] = tk.Frame(self.contentdata[id]["LFrame"])
+		self.contentdata[id]["Frames"]["renamecols"].columnconfigure(99, weight=1)
+
+		self.contentdata[id]["lblspacer"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text=" ")
+		self.contentdata[id]["lblspacer"].grid(column=0, row=rownum, sticky="nsew")
+
+		rownum += 1
+		self.contentdata[id]["lblcolren"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Rename Columns")
+		self.contentdata[id]["lblcolren"].grid(column=0, row=rownum, sticky="nsew")
+
+		rownum += 1
+		# self.contentdata[id]["rowcolnme"] = rownum
+		self.contentdata[id]["lblcolnme"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Column Name")
+		self.contentdata[id]["lblcolnme"].grid(column=0, row=rownum, sticky="nsew")
+
+		# rownum += 1
+		# self.contentdata[id]["rowdispnme"] = rownum
+		self.contentdata[id]["lbldispnme"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Display Name")
+		self.contentdata[id]["lbldispnme"].grid(column=1, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["renamecolumns"] = {}
+		# self.contentdata[id]["renamecolumns"]["columns"] = 1
+		self.contentdata[id]["renamecolumns"]["rownum"] = rownum +1
+
+		cp = threading.Thread(target=lambda: self.content_preview(id))
+		cp.start()
+
 		if datatype not in self.contentdata[id]["Frames"]:
+			rownum = 0
 			self.contentdata[id]["Frames"][datatype] = tk.Frame(self.contentdata[id]["LFrame"])
 			# self.contentdata[id]["Frames"][datatype].config(bg="SlateBlue3")
 			# self.contentdata[id]["Frames"][datatype].columnconfigure(0, weight=1)
@@ -6003,7 +6036,38 @@ class ReporterGUI(tk.Frame):
 
 		# Show
 		self.contentdata[id]["Frames"][datatype].grid(column=0, row=self.contentdata[id]["DTFrame"], columnspan=100, sticky="nsew")
+		self.contentdata[id]["Frames"]["renamecols"].grid(column=0, row=self.contentdata[id]["DTFrame"] + 1, columnspan=100, sticky="nsew")
 
+
+	def cs_datatable_add_renamecol(self, id, colname):
+		base.debugmsg(5, "id:", id, "	colname:", colname)
+
+		if "renamecolumns" in self.contentdata[id] and "renamecols" in self.contentdata[id]["Frames"]:
+		# if "renamecols" in self.contentdata[id]["Frames"]:
+			collabel = "lbl_{}".format(colname)
+			colinput = "inp_{}".format(colname)
+			rownum = self.contentdata[id]["renamecolumns"]["rownum"]
+			self.contentdata[id]["renamecolumns"]["rownum"] += 1
+			if collabel not in self.contentdata[id]["renamecolumns"]:
+				colnum = 0
+				# rownum = self.contentdata[id]["rowcolnme"]
+				# colnum = self.contentdata[id]["renamecolumns"]["columns"]
+				# self.contentdata[id]["renamecolumns"]["columns"] += 1
+				self.contentdata[id]["renamecolumns"][collabel] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text=" {} ".format(colname))
+				self.contentdata[id]["renamecolumns"][collabel].grid(column=colnum, row=rownum, sticky="nsew")
+
+				colnum = 1
+				# rownum = self.contentdata[id]["rowdispnme"]
+				# self.contentdata[id]["lbldispnme"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Display Name")
+				# self.contentdata[id]["lbldispnme"].grid(column=0, row=rownum, sticky="nsew")
+				self.contentdata[id]["renamecolumns"][colname] = tk.StringVar()
+				self.contentdata[id]["renamecolumns"][colinput] = ttk.Entry(self.contentdata[id]["Frames"]["renamecols"], textvariable=self.contentdata[id]["renamecolumns"][colname])
+				self.contentdata[id]["renamecolumns"][colinput].grid(column=colnum, row=rownum, sticky="nsew")
+				self.contentdata[id]["renamecolumns"][colinput].bind('<Leave>', self.cs_datatable_update)
+				self.contentdata[id]["renamecolumns"][colinput].bind('<FocusOut>', self.cs_datatable_update)
+		# else:
+		# 	time.sleep(0.1)
+		# 	self.cs_datatable_add_renamecol(id, colname)
 	#
 	# Settings	-	Graph
 	#
@@ -7222,6 +7286,7 @@ class ReporterGUI(tk.Frame):
 				colnum = 1 + colours
 				for col in cols:
 					if col not in ["Colour"]:
+						self.cs_datatable_add_renamecol(id, col)
 						cellname = "h_{}".format(col)
 						base.debugmsg(9, "cellname:", cellname)
 						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=col.strip(), style='Report.THead.TLabel')
