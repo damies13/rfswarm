@@ -5668,6 +5668,9 @@ class ReporterGUI(tk.Frame):
 		# self.content_preview(id)
 		cp = threading.Thread(target=lambda: self.content_preview(id))
 		cp.start()
+		self.cs_datatable_add_renamecols(id)
+		# cp = threading.Thread(target=lambda: self.cs_datatable_add_renamecols(id))
+		# cp.start()
 
 		# rt_table_get_alst
 
@@ -5762,36 +5765,6 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[id]["Frames"] = {}
 
 		# Construct
-		# if "renamecols" not in self.contentdata[id]["Frames"]:
-		base.debugmsg(5, "create renamecols frame")
-		rownum = 0
-		self.contentdata[id]["Frames"]["renamecols"] = tk.Frame(self.contentdata[id]["LFrame"])
-		self.contentdata[id]["Frames"]["renamecols"].columnconfigure(99, weight=1)
-
-		self.contentdata[id]["lblspacer"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text=" ")
-		self.contentdata[id]["lblspacer"].grid(column=0, row=rownum, sticky="nsew")
-
-		rownum += 1
-		self.contentdata[id]["lblcolren"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Rename Columns")
-		self.contentdata[id]["lblcolren"].grid(column=0, row=rownum, sticky="nsew")
-
-		rownum += 1
-		# self.contentdata[id]["rowcolnme"] = rownum
-		self.contentdata[id]["lblcolnme"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Column Name")
-		self.contentdata[id]["lblcolnme"].grid(column=0, row=rownum, sticky="nsew")
-
-		# rownum += 1
-		# self.contentdata[id]["rowdispnme"] = rownum
-		self.contentdata[id]["lbldispnme"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Display Name")
-		self.contentdata[id]["lbldispnme"].grid(column=1, row=rownum, sticky="nsew")
-
-		self.contentdata[id]["renamecolumns"] = {}
-		# self.contentdata[id]["renamecolumns"]["columns"] = 1
-		self.contentdata[id]["renamecolumns"]["rownum"] = rownum +1
-
-		cp = threading.Thread(target=lambda: self.content_preview(id))
-		cp.start()
-
 		if datatype not in self.contentdata[id]["Frames"]:
 			rownum = 0
 			self.contentdata[id]["Frames"][datatype] = tk.Frame(self.contentdata[id]["LFrame"])
@@ -5997,6 +5970,40 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["tSQL"].bind('<Leave>', self.cs_datatable_update)
 				self.contentdata[id]["tSQL"].bind('<FocusOut>', self.cs_datatable_update)
 
+		if "renamecols" not in self.contentdata[id]["Frames"] and datatype not in ["SQL"]:
+			base.debugmsg(5, "create renamecols frame")
+			rownum = 0
+			self.contentdata[id]["Frames"]["renamecols"] = tk.Frame(self.contentdata[id]["LFrame"])
+			self.contentdata[id]["Frames"]["renamecols"].columnconfigure(99, weight=1)
+
+			self.contentdata[id]["lblspacer"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text=" ")
+			self.contentdata[id]["lblspacer"].grid(column=0, row=rownum, sticky="nsew")
+
+			rownum += 1
+			self.contentdata[id]["lblcolren"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Rename Columns")
+			self.contentdata[id]["lblcolren"].grid(column=0, row=rownum, sticky="nsew")
+
+			rownum += 1
+			# self.contentdata[id]["rowcolnme"] = rownum
+			self.contentdata[id]["lblcolnme"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Column Name")
+			self.contentdata[id]["lblcolnme"].grid(column=0, row=rownum, sticky="nsew")
+
+			# rownum += 1
+			# self.contentdata[id]["rowdispnme"] = rownum
+			self.contentdata[id]["lbldispnme"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Display Name")
+			self.contentdata[id]["lbldispnme"].grid(column=1, row=rownum, sticky="nsew")
+
+			self.contentdata[id]["renamecolumns"] = {}
+			# self.contentdata[id]["renamecolumns"]["columns"] = 1
+			self.contentdata[id]["renamecolumns"]["startrow"] = rownum +1
+			self.contentdata[id]["renamecolumns"]["rownum"] = rownum +1
+
+		if datatype not in ["SQL"]:
+			self.cs_datatable_add_renamecols(id)
+			# cp = threading.Thread(target=lambda: self.cs_datatable_add_renamecols(id))
+			# cp.start()
+			self.contentdata[id]["Frames"]["renamecols"].grid(column=0, row=self.contentdata[id]["DTFrame"] + 1, columnspan=100, sticky="nsew")
+
 		# Update
 		if datatype == "SQL":
 			sql = base.rt_table_get_sql(id)
@@ -6036,8 +6043,64 @@ class ReporterGUI(tk.Frame):
 
 		# Show
 		self.contentdata[id]["Frames"][datatype].grid(column=0, row=self.contentdata[id]["DTFrame"], columnspan=100, sticky="nsew")
-		self.contentdata[id]["Frames"]["renamecols"].grid(column=0, row=self.contentdata[id]["DTFrame"] + 1, columnspan=100, sticky="nsew")
 
+	def cs_datatable_add_renamecols(self, id):
+		base.debugmsg(5, "id:", id)
+		if "renamecolumns" in self.contentdata[id]:
+			datatype = base.rt_table_get_dt(id)
+
+			if datatype == "SQL":
+				sql = base.rt_table_get_sql(id)
+			else:
+				sql = base.rt_table_generate_sql(id)
+				sql += " LIMIT 1 "
+
+			base.debugmsg(5, "sql:", sql)
+			key = "{}_{}_{}".format(id, base.report_item_get_changed(id), datetime.now().timestamp())
+			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+
+			if "colnames" not in self.contentdata[id]["renamecolumns"]:
+				self.contentdata[id]["renamecolumns"]["colnames"] = []
+			else:
+				self.cs_datatable_reset_renamecols(id)
+				self.contentdata[id]["renamecolumns"]["colnames"] = []
+			self.contentdata[id]["renamecolumns"]["rownum"] = self.contentdata[id]["renamecolumns"]["startrow"]
+
+
+			while key not in base.dbqueue["ReadResult"]:
+				time.sleep(0.1)
+
+			tdata = base.dbqueue["ReadResult"][key]
+			base.debugmsg(8, "tdata:", tdata)
+
+
+			if len(tdata) > 0:
+				cols = list(tdata[0].keys())
+				base.debugmsg(7, "cols:", cols)
+				for col in cols:
+					if col not in ["Colour"]:
+						self.cs_datatable_add_renamecol(id, col)
+
+	def cs_datatable_reset_renamecols(self, id):
+		base.debugmsg(5, "id:", id)
+		if "colnames" in self.contentdata[id]["renamecolumns"]:
+			for colname in list(self.contentdata[id]["renamecolumns"]["colnames"]):
+				base.debugmsg(5, "id:", id, "	colname:", colname)
+				collabel = "lbl_{}".format(colname)
+				colinput = "inp_{}".format(colname)
+				try:
+					self.contentdata[id]["renamecolumns"][collabel].grid_forget()
+				except: pass
+				try: self.contentdata[id]["renamecolumns"][colinput].grid_forget()
+				except: pass
+				try: del self.contentdata[id]["renamecolumns"][collabel]
+				except: pass
+				try: del self.contentdata[id]["renamecolumns"][colinput]
+				except: pass
+				try: del self.contentdata[id]["renamecolumns"][colname]
+				except: pass
+				try: del self.contentdata[id]["renamecolumns"]["colnames"]
+				except: pass
 
 	def cs_datatable_add_renamecol(self, id, colname):
 		base.debugmsg(5, "id:", id, "	colname:", colname)
@@ -6047,12 +6110,13 @@ class ReporterGUI(tk.Frame):
 			collabel = "lbl_{}".format(colname)
 			colinput = "inp_{}".format(colname)
 			rownum = self.contentdata[id]["renamecolumns"]["rownum"]
-			self.contentdata[id]["renamecolumns"]["rownum"] += 1
-			if collabel not in self.contentdata[id]["renamecolumns"]:
+			if colname not in self.contentdata[id]["renamecolumns"]["colnames"]:
+				self.contentdata[id]["renamecolumns"]["rownum"] += 1
 				colnum = 0
 				# rownum = self.contentdata[id]["rowcolnme"]
 				# colnum = self.contentdata[id]["renamecolumns"]["columns"]
 				# self.contentdata[id]["renamecolumns"]["columns"] += 1
+				self.contentdata[id]["renamecolumns"]["colnames"].append(colname)
 				self.contentdata[id]["renamecolumns"][collabel] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text=" {} ".format(colname))
 				self.contentdata[id]["renamecolumns"][collabel].grid(column=colnum, row=rownum, sticky="nsew")
 
@@ -7286,7 +7350,6 @@ class ReporterGUI(tk.Frame):
 				colnum = 1 + colours
 				for col in cols:
 					if col not in ["Colour"]:
-						self.cs_datatable_add_renamecol(id, col)
 						cellname = "h_{}".format(col)
 						base.debugmsg(9, "cellname:", cellname)
 						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=col.strip(), style='Report.THead.TLabel')
