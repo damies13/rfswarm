@@ -6186,27 +6186,27 @@ class ReporterGUI(tk.Frame):
 				try:
 					self.contentdata[id]["renamecolumns"][collabel].grid_forget()
 				except Exception as e:
-					pass
+					base.debugmsg(9, "e:", e)
 				try:
 					self.contentdata[id]["renamecolumns"][colinput].grid_forget()
 				except Exception as e:
-					pass
+					base.debugmsg(9, "e:", e)
 				try:
 					del self.contentdata[id]["renamecolumns"][collabel]
 				except Exception as e:
-					pass
+					base.debugmsg(9, "e:", e)
 				try:
 					del self.contentdata[id]["renamecolumns"][colinput]
 				except Exception as e:
-					pass
+					base.debugmsg(9, "e:", e)
 				try:
 					del self.contentdata[id]["renamecolumns"][colname]
 				except Exception as e:
-					pass
+					base.debugmsg(9, "e:", e)
 				try:
 					del self.contentdata[id]["renamecolumns"]["colnames"]
 				except Exception as e:
-					pass
+					base.debugmsg(9, "e:", e)
 
 	def cs_datatable_add_renamecol(self, id, colname):
 		base.debugmsg(5, "id:", id, "	colname:", colname)
