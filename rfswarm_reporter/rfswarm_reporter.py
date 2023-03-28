@@ -468,6 +468,7 @@ class ReporterBase():
 		base.report["Report"][name] = base.whitespace_set_ini_value(value)
 		# base.report_item_set_changed("Report")
 		base.report_save()
+		return 1
 
 	def rs_setting_get_int(self, name):
 		value = base.rs_setting_get(name)
@@ -478,6 +479,7 @@ class ReporterBase():
 
 	def rs_setting_set_int(self, name, value):
 		base.rs_setting_set(name, str(value))
+		return 1
 
 	def rs_setting_get_file(self, name):
 		value = base.rs_setting_get(name)
@@ -492,6 +494,8 @@ class ReporterBase():
 		if os.path.exists(value):
 			relpath = os.path.relpath(value, start=base.config['Reporter']['ResultDir'])
 			base.rs_setting_set(name, relpath)
+			return 1
+		return 0
 
 	def rs_setting_get_title(self):
 		value = self.rs_setting_get('title')
@@ -609,6 +613,7 @@ class ReporterBase():
 		else:
 			base.report[parent]["Order"] = ",".join(orderlst)
 		base.report_save()
+		return 1
 
 	def report_new_section(self, parent, name):
 		id = "{:02X}".format(int(time.time() * 10000))
@@ -708,6 +713,7 @@ class ReporterBase():
 
 	def report_item_set_changed(self, id):
 		base.report[id]['Changed'] = base.whitespace_set_ini_value(str(time.time()))
+		return 1
 
 	def report_item_set_changed_all(self, id):
 		if id != "TOP":
@@ -731,6 +737,7 @@ class ReporterBase():
 		base.report[id]['Name'] = base.whitespace_set_ini_value(newname)
 		base.report_item_set_changed(id)
 		base.report_save()
+		return 1
 
 	def report_sect_level(self, id):
 		base.debugmsg(9, "id:", id)
@@ -797,6 +804,7 @@ class ReporterBase():
 		base.report[id]['mode'] = base.whitespace_set_ini_value(mode)
 		base.report_item_set_changed(id)
 		base.report_save()
+		return 1
 
 	def rt_contents_get_level(self, id):
 		base.debugmsg(8, "id:", id)
@@ -812,6 +820,7 @@ class ReporterBase():
 		base.report[id]['level'] = base.whitespace_set_ini_value(str(level))
 		base.report_item_set_changed(id)
 		base.report_save()
+		return 1
 
 	#
 	# Report Item Type: note
@@ -826,10 +835,13 @@ class ReporterBase():
 
 	def rt_note_set(self, id, noteText):
 		base.debugmsg(5, "id:", id, "	noteText:", noteText)
-		base.report[id]['note'] = base.whitespace_set_ini_value(noteText)
-		base.report_item_set_changed(id)
-		base.report_save()
-
+		prev = self.rt_note_get(id)
+		if noteText != prev:
+			base.report[id]['note'] = base.whitespace_set_ini_value(noteText)
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
 	#
 	# Report Item Type: graph
 	#
@@ -861,6 +873,8 @@ class ReporterBase():
 			base.report[id]['SQL'] = base.whitespace_set_ini_value(graphSQL.strip())
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	def rt_graph_get_axisen(self, id):
 		base.debugmsg(9, "id:", id)
@@ -879,6 +893,8 @@ class ReporterBase():
 			base.report[id]['AxisEn'] = str(value)
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	def rt_graph_get_dt(self, id):
 		base.debugmsg(9, "id:", id)
@@ -897,6 +913,8 @@ class ReporterBase():
 			base.report[id]['DataType'] = base.whitespace_set_ini_value(datatype)
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	def rt_graph_generate_sql(self, id):
 		base.debugmsg(8, "id:", id)
@@ -1211,6 +1229,8 @@ class ReporterBase():
 			base.report[id]['SQL'] = base.whitespace_set_ini_value(tableSQL.strip())
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	def rt_table_generate_sql(self, id):
 		base.debugmsg(8, "id:", id)
@@ -1588,12 +1608,15 @@ class ReporterBase():
 			base.report[id]['Colours'] = base.whitespace_set_ini_value(str(colours))
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
 		else:
 			prev = self.rt_table_get_colours(id)
 			if colours != prev:
 				base.report[id]['Colours'] = base.whitespace_set_ini_value(str(colours))
 				base.report_item_set_changed(id)
 				base.report_save()
+				return 1
+		return 0
 
 	def rt_table_get_dt(self, id):
 		base.debugmsg(9, "id:", id)
@@ -1609,6 +1632,8 @@ class ReporterBase():
 			base.report[id]['DataType'] = base.whitespace_set_ini_value(datatype)
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	def rt_table_get_rt(self, id):
 		base.debugmsg(9, "id:", id)
@@ -1624,6 +1649,38 @@ class ReporterBase():
 			base.report[id]['ResultType'] = base.whitespace_set_ini_value(resulttype)
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
+
+	def rt_table_ini_colname(self, name):
+		base.debugmsg(5, "id:", id, "	name:", name)
+		colname = "col_{}".format(base.whitespace_set_ini_value(name)).replace(" ", "_").replace(".", "")
+		base.debugmsg(5, "colname:", colname)
+		return colname
+
+	def rt_table_get_colname(self, id, name):
+		base.debugmsg(5, "id:", id, "	name:", name)
+		colname = self.rt_table_ini_colname(name)
+		if colname in base.report[id]:
+			return base.whitespace_get_ini_value(base.report[id][colname])
+		else:
+			return name
+
+	def rt_table_set_colname(self, id, name, value):
+		base.debugmsg(5, "id:", id, "	name:", name, "	value:", value)
+		colname = self.rt_table_ini_colname(name)
+		prev = self.rt_table_get_colname(id, name)
+		if value != prev and value not in [None, ""]:
+			base.report[id][colname] = base.whitespace_set_ini_value(value)
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		if value in [None, ""]:
+			base.report[id][colname] = base.whitespace_set_ini_value(name)
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
 
 	# FR FilterResult
 	def rt_table_get_fr(self, id):
@@ -1640,6 +1697,8 @@ class ReporterBase():
 			base.report[id]['FilterResult'] = base.whitespace_set_ini_value(filterresult)
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	def rt_table_get_enfr(self, id):
 		base.debugmsg(5, "id:", id)
@@ -1661,6 +1720,8 @@ class ReporterBase():
 			base.report[id]['EnableFilterResult'] = base.whitespace_set_ini_value(str(value))
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	# FA FilterAgent
 	def rt_table_get_fa(self, id):
@@ -1677,6 +1738,8 @@ class ReporterBase():
 			base.report[id]['FilterAgent'] = base.whitespace_set_ini_value(value)
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	def rt_table_get_alst(self, id):
 		base.debugmsg(9, "id:", id)
@@ -1748,6 +1811,8 @@ class ReporterBase():
 			base.report[id]['EnableFilterAgent'] = base.whitespace_set_ini_value(str(value))
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	# FN FilterType
 	def rt_table_get_fn(self, id):
@@ -1764,10 +1829,13 @@ class ReporterBase():
 			base.report[id]['FilterType'] = base.whitespace_set_ini_value(filtertype)
 			base.report_item_set_changed(id)
 			base.report_save()
-		elif filtertype in [None, "None"]:
+			return 1
+		elif filtertype != prev and filtertype in [None, "None"] and prev in [None, "None"]:
 			base.report[id]['FilterType'] = base.whitespace_set_ini_value(None)
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	# FP FilterPattern
 	def rt_table_get_fp(self, id):
@@ -1784,6 +1852,8 @@ class ReporterBase():
 			base.report[id]['FilterPattern'] = base.whitespace_set_ini_value(filterpattern)
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	def whitespace_set_ini_value(self, valin):
 		base.debugmsg(9, "valin:", valin)
@@ -1833,6 +1903,8 @@ class ReporterBase():
 			base.report[id]['MetricType'] = base.whitespace_set_ini_value(metrictype)
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	def rt_table_get_mlst(self, id):
 		base.debugmsg(9, "id:", id)
@@ -1871,6 +1943,8 @@ class ReporterBase():
 			base.report[id]['PrimaryMetric'] = base.whitespace_set_ini_value(primarymetric)
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	def rt_table_get_pmlst(self, id):
 		base.debugmsg(9, "id:", id)
@@ -1918,6 +1992,8 @@ class ReporterBase():
 			base.report[id]['SecondaryMetric'] = base.whitespace_set_ini_value(secondarymetric)
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	def rt_table_get_smlst(self, id):
 		base.debugmsg(9, "id:", id)
@@ -1982,6 +2058,8 @@ class ReporterBase():
 			base.report[id]['IsNumeric'] = base.whitespace_set_ini_value(str(value))
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	def rt_table_get_showcount(self, id):
 		base.debugmsg(9, "id:", id)
@@ -2000,6 +2078,8 @@ class ReporterBase():
 			base.report[id]['ShowCount'] = base.whitespace_set_ini_value(str(value))
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	#
 	# Result data db Functions
@@ -5586,6 +5666,7 @@ class ReporterGUI(tk.Frame):
 
 	def cs_datatable_update(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
+		changes = 0
 		id = self.sectionstree.focus()
 		if _event is not None:
 			name = base.report_item_get_name(_event)
@@ -5594,60 +5675,66 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(9, "id:", id)
 		if "intColours" in self.contentdata[id]:
 			colours = self.contentdata[id]["intColours"].get()
-			base.rt_table_set_colours(id, colours)
+			changes += base.rt_table_set_colours(id, colours)
 
+		base.debugmsg(5, "changes:", changes)
 		if "intIsNum" in self.contentdata[id]:
 			value = self.contentdata[id]["intIsNum"].get()
-			base.rt_table_set_isnumeric(id, value)
+			changes += base.rt_table_set_isnumeric(id, value)
 		if "intShCnt" in self.contentdata[id]:
 			value = self.contentdata[id]["intShCnt"].get()
 			base.rt_table_set_showcount(id, value)
 		# self.contentdata[id]["MType"].set(base.rt_table_get_mt(id))
 		if "MType" in self.contentdata[id]:
 			value = self.contentdata[id]["MType"].get()
-			base.rt_table_set_mt(id, value)
+			changes += base.rt_table_set_mt(id, value)
 		# self.contentdata[id]["PMetric"].set(base.rt_table_get_pm(id))
 		if "PMetric" in self.contentdata[id]:
 			value = self.contentdata[id]["PMetric"].get()
-			base.rt_table_set_pm(id, value)
+			changes += base.rt_table_set_pm(id, value)
 		# self.contentdata[id]["SMetric"].set(base.rt_table_get_sm(id))
 		if "SMetric" in self.contentdata[id]:
 			value = self.contentdata[id]["SMetric"].get()
-			base.rt_table_set_sm(id, value)
+			changes += base.rt_table_set_sm(id, value)
 
+		base.debugmsg(5, "changes:", changes)
 		# self.contentdata[id]["RType"].set(base.rt_table_get_rt(id))
 		if "RType" in self.contentdata[id]:
 			value = self.contentdata[id]["RType"].get()
-			base.rt_table_set_rt(id, value)
+			changes += base.rt_table_set_rt(id, value)
 		# self.contentdata[id]["FRType"].set(base.rt_table_get_fr(id))
 		if "FRType" in self.contentdata[id]:
 			value = self.contentdata[id]["FRType"].get()
-			base.rt_table_set_fr(id, value)
+			changes += base.rt_table_set_fr(id, value)
 		# self.contentdata[id]["intFR"] = tk.IntVar()
 		if "intFR" in self.contentdata[id]:
 			value = self.contentdata[id]["intFR"].get()
-			base.rt_table_set_enfr(id, value)
+			changes += base.rt_table_set_enfr(id, value)
 
 		if "intFA" in self.contentdata[id]:
 			value = self.contentdata[id]["intFA"].get()
-			base.rt_table_set_enfa(id, value)
+			changes += base.rt_table_set_enfa(id, value)
 		# self.contentdata[id]["FAType"] = tk.StringVar()
 		if "FAType" in self.contentdata[id]:
 			value = self.contentdata[id]["FAType"].get()
-			base.rt_table_set_fa(id, value)
+			changes += base.rt_table_set_fa(id, value)
 
+		base.debugmsg(5, "changes:", changes)
 		# self.contentdata[id]["FNType"].set(base.rt_table_get_fn(id))
 		if "FNType" in self.contentdata[id]:
 			value = self.contentdata[id]["FNType"].get()
-			base.rt_table_set_fn(id, value)
+			changes += base.rt_table_set_fn(id, value)
+
+		base.debugmsg(5, "changes:", changes)
 		# self.contentdata[id]["FPattern"].set(base.rt_table_get_fp(id))
 		if "FPattern" in self.contentdata[id]:
 			value = self.contentdata[id]["FPattern"].get()
-			base.rt_table_set_fp(id, value)
+			changes += base.rt_table_set_fp(id, value)
 
+		base.debugmsg(5, "changes:", changes)
 		if "strDT" in self.contentdata[id]:
 			datatype = self.contentdata[id]["strDT"].get()
-			base.rt_table_set_dt(id, datatype)
+			changes += base.rt_table_set_dt(id, datatype)
 
 			if datatype == "Metric":
 				self.cs_datatable_update_metrics(id)
@@ -5656,21 +5743,31 @@ class ReporterGUI(tk.Frame):
 				time.sleep(0.1)
 				base.rt_table_generate_sql(id)
 
+		base.debugmsg(5, "changes:", changes)
 		if "tSQL" in self.contentdata[id]:
 			data = self.contentdata[id]["tSQL"].get('0.0', tk.END).strip()
 			base.debugmsg(5, "data:", data)
-			base.rt_table_set_sql(id, data)
+			changes += base.rt_table_set_sql(id, data)
 		else:
 			time.sleep(0.1)
 			base.rt_table_generate_sql(id)
 
+		base.debugmsg(5, "changes:", changes)
+		if "renamecolumns" in self.contentdata[id] and "colnames" in self.contentdata[id]["renamecolumns"]:
+			for colname in self.contentdata[id]["renamecolumns"]["colnames"]:
+				value = self.contentdata[id]["renamecolumns"][colname].get()
+				changes += base.rt_table_set_colname(id, colname, value)
+
 		base.debugmsg(5, "content_preview id:", id)
 		# self.content_preview(id)
-		cp = threading.Thread(target=lambda: self.content_preview(id))
-		cp.start()
-		self.cs_datatable_add_renamecols(id)
-		# cp = threading.Thread(target=lambda: self.cs_datatable_add_renamecols(id))
-		# cp.start()
+		base.debugmsg(5, "changes:", changes)
+		if changes > 0:
+			# this should make the UI a bit less jumpy
+			cp = threading.Thread(target=lambda: self.content_preview(id))
+			cp.start()
+			self.cs_datatable_add_renamecols(id)
+			# cp = threading.Thread(target=lambda: self.cs_datatable_add_renamecols(id))
+			# cp.start()
 
 		# rt_table_get_alst
 
@@ -6129,6 +6226,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["renamecolumns"][colinput].grid(column=colnum, row=rownum, sticky="nsew")
 				self.contentdata[id]["renamecolumns"][colinput].bind('<Leave>', self.cs_datatable_update)
 				self.contentdata[id]["renamecolumns"][colinput].bind('<FocusOut>', self.cs_datatable_update)
+
+				self.contentdata[id]["renamecolumns"][colname].set(base.rt_table_get_colname(id, colname))
 		# else:
 		# 	time.sleep(0.1)
 		# 	self.cs_datatable_add_renamecol(id, colname)
