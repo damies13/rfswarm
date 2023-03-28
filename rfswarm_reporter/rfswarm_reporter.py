@@ -3113,8 +3113,9 @@ class ReporterCore:
 					th = etree.SubElement(tr, 'th')
 				for col in cols:
 					if col not in ["Colour"]:
+						dispname = base.rt_table_get_colname(id, col)
 						th = etree.SubElement(tr, 'th')
-						th.text = col.strip()
+						th.text = dispname.strip()
 
 				# table rows
 				for row in tdata:
@@ -3686,8 +3687,9 @@ class ReporterCore:
 				cw = 5
 				for col in cols:
 					if col not in ["Colour"]:
+						dispname = base.rt_table_get_colname(id, col)
 						table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
-						table.rows[cellrow].cells[cellcol].paragraphs[0].text = col.strip()
+						table.rows[cellrow].cells[cellcol].paragraphs[0].text = dispname.strip()
 						table.columns[cellcol].width = Cm(cw)
 						if cw > 2:
 							cw = 1.7
@@ -4339,8 +4341,10 @@ class ReporterCore:
 				for col in cols:
 					if col not in ["Colour"]:
 
+						dispname = base.rt_table_get_colname(id, col)
+
 						base.debugmsg(8, "col:", col, "	cellcol:", cellcol, "	rownum:", rownum)
-						hcell = ws.cell(column=cellcol, row=rownum, value=col.strip())
+						hcell = ws.cell(column=cellcol, row=rownum, value=dispname.strip())
 						hcell.style = "Table Heading"
 
 						neww = len(str(col.strip())) * 1.3
@@ -7451,7 +7455,8 @@ class ReporterGUI(tk.Frame):
 					if col not in ["Colour"]:
 						cellname = "h_{}".format(col)
 						base.debugmsg(9, "cellname:", cellname)
-						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=col.strip(), style='Report.THead.TLabel')
+						dispname = base.rt_table_get_colname(id, col)
+						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{} ".format(dispname.strip()), style='Report.THead.TLabel')
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 						colnum += 1
 				i = 0
