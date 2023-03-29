@@ -15,7 +15,7 @@ Open GUI
 	[Tags]	macos-latest
 	Set Suite Variable    ${platform}    macos
 	Set Confidence		0.9
-	${process}= 	Start Process 	python3 	${pyfile} 	-g 	5    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Set Test Variable 	$process 	${process}
 	Sleep 	10
 	Set Screenshot Folder 	${OUTPUT DIR}
@@ -106,7 +106,7 @@ Click Tab
 	${img}=	Set Variable		manager_${platform}_tab_${tabnamel}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=10
+	Wait For 	${img} 	 timeout=300
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	0.1

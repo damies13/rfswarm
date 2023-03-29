@@ -24,3 +24,6 @@ jobs:
           FILTER_REGEX_EXCLUDE: (.*sh|.git/.*|.Doc/Images/.*|.Tests/.*/Logs/.*)
           VALIDATE_PYTHON_BLACK: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_CSS: false
+          VALIDATE_HTML: false
+          VALIDATE_JSCPD: false

@@ -6,8 +6,8 @@
 
 | Master | Branch |
 | -- | -- |
-| [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/damies13/rfswarm/superlinter.yml?branch=master&label=Linter)](https://github.com/damies13/rfswarm/actions/workflows/superlinter.yml) | ![GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/damies13/rfswarm/superlinter.yml?branch=v1.1.0&label=Linter) |
-| [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/damies13/rfswarm/Regression_Tests.yml?branch=master&label=Regression%20Tests)](https://github.com/damies13/rfswarm/actions/workflows/Regression_Tests.yml) | ![GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/damies13/rfswarm/Regression_Tests.yml?branch=v1.1.0&label=Regression%20Tests) |
+| [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/damies13/rfswarm/superlinter.yml?branch=master&label=Linter)](https://github.com/damies13/rfswarm/actions/workflows/superlinter.yml) | ![GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/damies13/rfswarm/superlinter.yml?branch=Issue-%23104-rename-columns&label=Linter) |
+| [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/damies13/rfswarm/Regression_Tests.yml?branch=master&label=Regression%20Tests)](https://github.com/damies13/rfswarm/actions/workflows/Regression_Tests.yml) | ![GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/damies13/rfswarm/Regression_Tests.yml?branch=Issue-%23104-rename-columns&label=Regression%20Tests) |
 
 <img align="right" src="Doc/Images/Icon_Information.png">
 
@@ -45,6 +45,21 @@ An example of how your rfswarm setup might look.
 
 ### Commercial Support
 - The easiest way to get commercial support is to sponsor this project on [GitHub](https://github.com/sponsors/damies13?frequency=recurring&sponsor=damies13)
+
+<img align="right" src="Doc/Images/Icon_Contribute.png">
+
+### Contribute
+If you'd like to help make rfswarm better the are a number of ways you can help (only the last two require programming skills)
+- Update the Documentation, all the documentation is written in Markdown (GitHub flavour) so is very easy to update but time consuming so help with this will be very appreciated
+- Testing
+  - Automated testing, With v1.1.0 GitHub actions were setup to run robotframework test cases from the [Tests/Regression](Tests/Regression) folder of this repository, the tests can be either command-line tests or GUI tests using ImageHorizonLibrary, and the tests will run on Windows-latest, macos-latest & ubuntu-latest for all supported versions of python.
+  The initial set of tests are very basic but gives a start point, contributing test cases will help make future versions of rfswarm more reliable and will be greatly appreciated.
+  - Manual testing, any testing that finds bugs is appreciated, but manual testing is not reliably repeatable so automation is preferred
+- Raise an Issue, yes finding a but is helpful!
+- Create a Feature Request, if you have an idea you think will make rfswarm better, please let us know.
+- Add a reaction to or comment on an Issue (especially Bugs and Feature Requests), adding a :+1: tells us you want this implemented too, and a :-1: lets us know you think it's a bad idea (please add a comment to for why). this will help for prioritising which issues get implemented next.
+- Fix a bug, please assign the issue to you self or add a comment on the issue first, to prevent duplication of effort.
+- Implement a Feature Request, please assign the issue to you self or add a comment on the issue first, to prevent duplication of effort.
 
 <img align="right" src="Doc/Images/Icon_Donate.png">
 
