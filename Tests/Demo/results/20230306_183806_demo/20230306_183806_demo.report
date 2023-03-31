@@ -1,0 +1,74 @@
+[Report]
+order = F44AE3793CA,F44AE3793D0,F44AE39D478,F46F97A3E5E
+title = quickdemo
+showtlogo = -1
+dateformat = yyyy-mm-dd
+timeformat = HH:MM
+timezone = Australia/Brisbane
+showstarttime = -1
+showendtime = -1
+font = Rasa
+fontsize = 12
+percentile = 90
+
+[F44AE3793CA]
+name = Template
+parent = TOP
+type = note
+changed = 1679750756.0186026
+note = Define your template by adding sections and configuring the section settingsx12Each section can be:x12 -  Note (like this) section, free textx12 -  Heading, usefull for grouping sectionsx12 -  Contents like a table of contents or figuresx12 -  Data Table, with data from test resultsx12 -  Data Graph, for graphical representation of test resultsx12x12Each section can also have sub sectionsx12x12The cover page and overall report settings can be found on the settings pane of the Report item abovex12
+
+[F44AE3793D0]
+name = Test Result Summary
+parent = TOP
+type = table
+changed = 1679750757.4704812
+colours = 0
+datatype = ResultSummary
+sql = SELECT r.result_name as x91Result Namex93 , round(min(rp.elapsed_time),3) 'Minimum', round(avg(rp.elapsed_time),3) 'Average', round(percentile(rp.elapsed_time, 90),3) '90x37ile', round(max(rp.elapsed_time),3) 'Maximum', round(stdev(rp.elapsed_time),3) 'Std. Dev.', count(rp.result) as 'Pass', count(rf.result) as 'Fail', count(ro.result) as 'Other' FROM Results as r LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == 'PASS' LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == 'FAIL' LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' GROUP BY  r.result_name ORDER BY x91Result Namex93
+
+[F44AE39D478]
+name = 90x37ile
+parent = TOP
+type = graph
+changed = 1679750756.0193324
+order = F44AE3B7CF7
+isnumeric = 1
+datatype = Metric
+sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric as 'Name' FROM MetricData WHERE MetricType == 'Summary' AND SecondaryMetric == '90x37ile' ORDER BY MetricTime
+metrictype = Summary
+secondarymetric = 90x37ile
+
+[F44AE3B7CF7]
+name = 90x37ile Data
+parent = F44AE39D478
+changed = 1679750756.0193927
+type = table
+colours = 1
+datatype = Metric
+sql = SELECT PrimaryMetric , min(CAST(MetricValue AS NUMERIC)) AS 'Minimum' , round(avg(CAST(MetricValue AS NUMERIC)),3) AS 'Average' , round(percentile(CAST(MetricValue AS NUMERIC), 90),3) AS '90x37ile' , max(CAST(MetricValue AS NUMERIC)) AS 'Maximum' , round(stdev(CAST(MetricValue AS NUMERIC)),3) AS 'Std. Dev.' FROM MetricData WHERE MetricType == 'Summary' AND SecondaryMetric == '90x37ile' GROUP by PrimaryMetric
+metrictype = Summary
+secondarymetric = 90x37ile
+isnumeric = 1
+
+[F44AE39D478L]
+changed = 1679750760.8392944
+
+[F44AE39D478R]
+changed = 1679750760.8393831
+
+[F46F97A3E5E]
+name = bvcxcv
+parent = TOP
+type = table
+changed = 1679750846.783627
+colours = 1
+datatype = Result
+sql = SELECT result_name || ' - ' || agent as x91Result Namex93 , round(min(elapsed_time),3) 'Minimum' , round(avg(elapsed_time),3) 'Average' , round(percentile(elapsed_time, 90),3) '90x37ile' , round(max(elapsed_time),3) 'Maximum' , round(stdev(elapsed_time),3) 'Std. Dev.' , count(result) as 'Count' FROM Results WHERE x91Result Namex93 NOT LIKE 'Exception in threadx37' GROUP by x91Result Namex93
+filtertype = Wildcard (Unix Glob)
+filterpattern = 
+resulttype = Response Time
+filterresult = None
+filteragent = 
+enablefilteragent = 1
+

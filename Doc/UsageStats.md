@@ -1,6 +1,6 @@
-[Index](README.md)
-
 # PyPi Usage Stats
+[Return to Index](README.md)
+
 ## Manager (was previously called Server/GUI)
 [Manager](https://pypistats.org/packages/rfswarm-manager)
 

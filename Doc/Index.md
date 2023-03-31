@@ -10,5 +10,5 @@
 1. [Preparing a test case for performance](Preparing_for_perf.md)
 1. [AUT Monitoring](AUT_Monitoring.md)
 1. [Agent Communication](Agent_Communication.md)
-1. [Screen Shots](Screen_Shots.md)
+1. [Screenshots](Screen_Shots.md)
 1. [FAQ](FAQ.md)

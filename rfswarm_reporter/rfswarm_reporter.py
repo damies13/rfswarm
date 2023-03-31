@@ -1,80 +1,62 @@
 #!/usr/bin/python
 #
-#	Robot Framework Swarm
-#		Reporter
-#    Version1.0.3"
+# 	Robot Framework Swarm
+# 		Reporter
+#    Version 1.1.0
 #
 
-import sys
-import platform
+import argparse
+import base64  # used for embedding images  # used for xhtml export
+import configparser
+import inspect
+import math
 import os
-import signal
-
+import platform
 import random
 import re
-import math
-
+import signal
 import sqlite3
-
-import time
-from datetime import datetime, timezone
-import zoneinfo # says Requires python 3.9
-import tzlocal
-
-import threading
-
-import inspect
-
-import argparse
-import configparser
+import sys
 import tempfile
-
-# used for xhtml export
-# import xml.etree.ElementTree as ET
-from lxml import etree
-from lxml.builder import ElementMaker,E
-import base64   		# used for embedding images
-from io import BytesIO	# used for embedding images
-# used for xhtml export
-
-# used for docx export
-from docx import Document
-# from docx.shared import Inches
-from docx.shared import Pt, Cm, RGBColor
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.style import WD_STYLE_TYPE
-from docx.oxml.shared import OxmlElement, qn
-# used for docx export
-
-# used for xlsx export
-# from openpyxl import Workbook
-# from openpyxl.drawing.image import Image as xlImage
-import openpyxl
-from copy import copy
-# used for xlsx export
-
-
-
-import tkinter as tk				#python3
-import tkinter.ttk as ttk			#python3
-import tkinter.filedialog as tkf	#python3
-import tkinter.messagebox as tkm	#python3
-import tkinter.simpledialog as tksd
-# from tkinter.colorchooser import askcolor
+import threading
+import time
+import tkinter as tk  # python3
 import tkinter.colorchooser as tkac
+import tkinter.filedialog as tkf  # python3
 import tkinter.font as tkFont
+
+# import tkinter.messagebox as tkm  # python3
+import tkinter.simpledialog as tksd
+import tkinter.ttk as ttk  # python3
+import zoneinfo  # says Requires python 3.9
+from copy import copy  # used for xlsx export
+from datetime import datetime  # , timezone
+from io import BytesIO  # used for embedding images  # used for xhtml export
+from typing import Any
+
+import matplotlib  # required for matplot graphs
+import openpyxl  # used for xlsx export
+import tzlocal
+from docx import Document  # used for docx export
+from docx.enum.style import WD_STYLE_TYPE  # used for docx export
+from docx.enum.text import WD_ALIGN_PARAGRAPH  # used for docx export
+from docx.oxml.shared import OxmlElement, qn  # used for docx export
+from docx.shared import Cm, Pt, RGBColor  # used for docx export
+from lxml import etree  # used for xhtml export
+from lxml.builder import E, ElementMaker  # used for xhtml export
+
+# required for matplot graphs
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+
+# required for matplot graphs
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure  # required for matplot graphs
 
 # required for company logo's (I beleive this is a depandancy of matplotlib anyway)
 from PIL import Image, ImageTk
-# required for company logo's
 
-# required for matplot graphs
-import matplotlib
-matplotlib.use("TkAgg")
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from matplotlib.figure import Figure
-# required for matplot graphs
+matplotlib.use("TkAgg") 	# required for matplot graphs
+
 
 class percentile:
 	def __init__(self):
@@ -92,12 +74,12 @@ class percentile:
 
 	def finalize(self):
 		try:
-			mincount = 100/(100-self.percent)
+			mincount = 100 / (100 - self.percent)
 			if self.count < mincount:
 				# Need at least 10 samples to get a useful percentile
 				return None
 			base.debugmsg(9, "percentile: finalize: mincount:", mincount, "	self.count:", self.count, "	self.percent:", self.percent, "	self.values:", self.values)
-			nth = self.count * (self.percent/100)
+			nth = self.count * (self.percent / 100)
 			base.debugmsg(9, "percentile: finalize: nth:", nth)
 			nthi = int(nth)
 			# nthi = int(math.ceil(self.count * (self.percent/100)))
@@ -107,6 +89,7 @@ class percentile:
 			# return self.count
 		except Exception as e:
 			base.debugmsg(5, "Exception:", e)
+
 
 class stdevclass:
 	def __init__(self):
@@ -127,16 +110,15 @@ class stdevclass:
 		if self.k < 3:
 			return None
 		try:
-			res = math.sqrt(self.S / (self.k-2))
+			res = math.sqrt(self.S / (self.k - 2))
 			base.debugmsg(8, "res:", res)
 			return res
 		except Exception as e:
 			base.debugmsg(5, "Exception:", e)
 
 
-
 class ReporterBase():
-	version = "1.0.3"
+	version = "1.1.0"
 	debuglvl = 0
 
 	save_ini = True
@@ -155,12 +137,16 @@ class ReporterBase():
 	# datapath = ""
 	# dbfile = ""
 	datadb = None
-	dbqueue = {"Write": [], "Read": [], "ReadResult": {}, "Results": [], "Metric": [], "Metrics": []}
+	dbqueue: Any = {"Write": [], "Read": [], "ReadResult": {}, "Results": [], "Metric": [], "Metrics": []}
 
-	settings = {}
-	reportdata = {}
+	settings: Any = {}
+	reportdata: Any = {}
 
-	settings["ContentTypes"] = {"head":"Heading", "contents":"Contents", "note":"Note", "graph":"Data Graph", "table":"Data Table"}
+	settings["DBTable"] = {}
+	settings["DBTable"]["Metrics"] = {}
+	settings["DBTable"]["Metrics"]["DataSource"] = 0
+
+	settings["ContentTypes"] = {"head": "Heading", "contents": "Contents", "note": "Note", "graph": "Data Graph", "table": "Data Table"}
 
 	defcolours = ['#000000', '#008450', '#B81D13', '#EFB700', '#888888']
 	namecolours = ['total', 'pass', 'fail', 'warning', 'not run']
@@ -182,13 +168,13 @@ class ReporterBase():
 					# if len(prefix.strip())<36:
 					# 	prefix = "{}	".format(prefix)
 					# <32 + 1 tab
-					if len(prefix.strip())<32:
+					if len(prefix.strip()) < 32:
 						prefix = "{}	".format(prefix)
 					# <28 + 1 tab
 					# if len(prefix.strip())<28:
 					# 	prefix = "{}	".format(prefix)
 					# <24 + 1 tab
-					if len(prefix.strip())<24:
+					if len(prefix.strip()) < 24:
 						prefix = "{}	".format(prefix)
 
 					msglst.append(str(prefix))
@@ -201,7 +187,7 @@ class ReporterBase():
 					msglst.append(str(itm))
 				msglst.append(str(suffix))
 				print(" ".join(msglst))
-			except:
+			except Exception:
 				pass
 
 	def findiniloctaion(self):
@@ -228,7 +214,6 @@ class ReporterBase():
 
 		self.debugmsg(6, "inilocations: ", inilocations)
 
-
 		for iniloc in inilocations:
 			self.debugmsg(7, "iniloc: ", iniloc)
 			if os.path.isfile(iniloc):
@@ -251,7 +236,7 @@ class ReporterBase():
 					if os.access(loc, os.X_OK | os.W_OK):
 						self.debugmsg(7, "iniloc can be created!")
 						return iniloc
-				except:
+				except Exception:
 					pass
 		# This should cause saveini to fail?
 		return None
@@ -279,15 +264,15 @@ class ReporterBase():
 
 		es = self.report_new_section("TOP", "Template")
 		self.report_item_set_type(es, 'note')
-		notetxt  = "Define your template by adding sections and configuring the section settings\n"
-		notetxt  += "Each section can be:\n"
-		notetxt  += " -  Note (like this) section, free text\n"
-		notetxt  += " -  Heading, usefull for grouping sections\n"
-		notetxt  += " -  Contents like a table of contents or figures\n"
-		notetxt  += " -  Data Table, with data from test results\n"
-		notetxt  += " -  Data Graph, for graphical representation of test results\n\n"
-		notetxt  += "Each section can also have sub sections\n\n"
-		notetxt  += "The cover page and overall report settings can be found on the settings pane of the Report item above\n"
+		notetxt = "Define your template by adding sections and configuring the section settings\n"
+		notetxt += "Each section can be:\n"
+		notetxt += " -  Note (like this) section, free text\n"
+		notetxt += " -  Heading, usefull for grouping sections\n"
+		notetxt += " -  Contents like a table of contents or figures\n"
+		notetxt += " -  Data Table, with data from test results\n"
+		notetxt += " -  Data Graph, for graphical representation of test results\n\n"
+		notetxt += "Each section can also have sub sections\n\n"
+		notetxt += "The cover page and overall report settings can be found on the settings pane of the Report item above\n"
 		self.rt_note_set(es, notetxt)
 
 		trs = self.report_new_section("TOP", "Test Result Summary")
@@ -298,12 +283,9 @@ class ReporterBase():
 		# datatype = ResultSummary
 		self.rt_table_set_dt(trs, "ResultSummary")
 
-
-
-
 	def template_save(self, filename):
 		saved = False
-		if filename is None or len(filename)<1:
+		if filename is None or len(filename) < 1:
 			filename = base.config['Reporter']['Template']
 		with open(filename, 'w') as templatefile:    # save
 			base.report.write(templatefile)
@@ -311,17 +293,16 @@ class ReporterBase():
 			saved = True
 		if saved:
 			base.config['Reporter']['Template'] = base.whitespace_set_ini_value(filename)
-			path, file= os.path.split(base.config['Reporter']['Template'])
+			path, file = os.path.split(base.config['Reporter']['Template'])
 			base.config['Reporter']['TemplateDir'] = base.whitespace_set_ini_value(path)
 			base.saveini()
 
-
 	def template_open(self, filename):
-		if len(filename)>0 and os.path.isfile(filename):
+		if len(filename) > 0 and os.path.isfile(filename):
 			base.debugmsg(7, "filename: ", filename)
 
 			base.config['Reporter']['Template'] = base.whitespace_set_ini_value(filename)
-			path, file= os.path.split(base.config['Reporter']['Template'])
+			path, file = os.path.split(base.config['Reporter']['Template'])
 			base.config['Reporter']['TemplateDir'] = base.whitespace_set_ini_value(path)
 			base.saveini()
 
@@ -334,7 +315,6 @@ class ReporterBase():
 
 		else:
 			base.template_create()
-
 
 	#
 	# Report Functions
@@ -349,28 +329,27 @@ class ReporterBase():
 					base.report.write(reportfile)
 					self.debugmsg(6, "Report Saved:", filename)
 					saved = True
-
+		return saved
 
 	def report_open(self):
 		filename = base.config['Reporter']['Report']
 		base.debugmsg(7, "filename: ", filename)
 		base.reportdata = {}
 		base.report = None
-		if len(filename)>0 and os.path.isfile(filename):
+		if len(filename) > 0 and os.path.isfile(filename):
 			base.debugmsg(7, "filename: ", filename, " exists, open")
 			base.report = configparser.ConfigParser()
 			base.report.read(filename)
 		else:
 			templatefile = base.whitespace_get_ini_value(base.config['Reporter']['Template'])
 			base.debugmsg(7, "Template: ", templatefile)
-			if len(templatefile)>0:
+			if len(templatefile) > 0:
 				base.template_open(templatefile)
 			else:
 				base.debugmsg(7, "template_create")
 				base.template_create()
 			base.debugmsg(7, "report_save")
 			base.report_save()
-
 
 	def report_starttime(self):
 		if "starttime" in self.reportdata and self.reportdata["starttime"] > 0:
@@ -390,10 +369,10 @@ class ReporterBase():
 				#
 				# LIMIT 1
 
-				sql =  "SELECT MetricTime "
+				sql = "SELECT MetricTime "
 				sql += "FROM MetricData "
 				sql += "WHERE MetricType = 'Scenario' "
-				sql += 		"AND PrimaryMetric <> 'PreRun' "
+				sql += "AND PrimaryMetric <> 'PreRun' "
 				sql += "ORDER BY MetricTime ASC "
 				sql += "LIMIT 1 "
 
@@ -412,7 +391,7 @@ class ReporterBase():
 
 				return self.reportdata["starttime"]
 			else:
-				return int(time.time())-1
+				return int(time.time()) - 1
 
 	def report_endtime(self):
 		if "endtime" in self.reportdata and self.reportdata["endtime"] > 0:
@@ -421,10 +400,10 @@ class ReporterBase():
 			self.reportdata["endtime"] = 0
 			if base.datadb is not None:
 
-				sql =  "SELECT MetricTime "
+				sql = "SELECT MetricTime "
 				sql += "FROM MetricData "
 				sql += "WHERE MetricType = 'Scenario' "
-				sql += 		"AND PrimaryMetric <> 'PreRun' "
+				sql += "AND PrimaryMetric <> 'PreRun' "
 				sql += "ORDER BY MetricTime DESC "
 				sql += "LIMIT 1 "
 
@@ -444,7 +423,6 @@ class ReporterBase():
 				return self.reportdata["endtime"]
 			else:
 				return int(time.time())
-
 
 	def report_formatdate(self, itime):
 		base.debugmsg(9, "itime:", itime)
@@ -490,7 +468,7 @@ class ReporterBase():
 		base.report["Report"][name] = base.whitespace_set_ini_value(value)
 		# base.report_item_set_changed("Report")
 		base.report_save()
-
+		return 1
 
 	def rs_setting_get_int(self, name):
 		value = base.rs_setting_get(name)
@@ -501,12 +479,12 @@ class ReporterBase():
 
 	def rs_setting_set_int(self, name, value):
 		base.rs_setting_set(name, str(value))
-
+		return 1
 
 	def rs_setting_get_file(self, name):
 		value = base.rs_setting_get(name)
 		localpath = ""
-		if value is not None and len(value)>0:
+		if value is not None and len(value) > 0:
 			localpath = os.path.join(base.config['Reporter']['ResultDir'], value)
 		return localpath
 
@@ -516,9 +494,8 @@ class ReporterBase():
 		if os.path.exists(value):
 			relpath = os.path.relpath(value, start=base.config['Reporter']['ResultDir'])
 			base.rs_setting_set(name, relpath)
-
-
-
+			return 1
+		return 0
 
 	def rs_setting_get_title(self):
 		value = self.rs_setting_get('title')
@@ -528,7 +505,7 @@ class ReporterBase():
 			if 'Reporter' in base.config and 'Results' in base.config['Reporter']:
 				results = base.config['Reporter']['Results']
 				base.debugmsg(8, "results: ", results)
-				if len(results)>0:
+				if len(results) > 0:
 					filename = os.path.basename(results)
 					base.debugmsg(9, "filename: ", filename)
 					basename, ext = os.path.splitext(filename)
@@ -548,14 +525,26 @@ class ReporterBase():
 	def rs_setting_get_hcolour(self):
 		value = self.rs_setting_get('hcolour')
 		if value is None:
-			return "#0000FF" # Blue
+			return "#0000FF"  # Blue
 		else:
 			return value
 
 	def rs_setting_get_font(self):
+		fontlst = list(tkFont.families())
+		base.debugmsg(9, "fontlst", fontlst)
 		value = self.rs_setting_get('font')
+		if value not in fontlst:
+			value = None
 		if value is None:
-			return 'Helvetica'
+			# Verdana, Tahoma, Arial, Helvetica, sans-serif
+			fontorder = ['Helvetica', 'Verdana', 'Tahoma', 'Arial', 'FreeSans']
+			for fnt in fontorder:
+				if fnt in fontlst:
+					return fnt
+			for fnt in fontlst:
+				if 'Sans' in fnt or 'sans' in fnt:
+					return fnt
+			return 'sans-serif'
 		else:
 			return value
 
@@ -573,7 +562,6 @@ class ReporterBase():
 		else:
 			return int(value)
 
-
 	def rs_setting_get_dateformat(self):
 		value = self.rs_setting_get('dateformat')
 		if value is None:
@@ -587,7 +575,6 @@ class ReporterBase():
 			return "HH:MM"
 		else:
 			return value
-
 
 	def rs_setting_get_timezone(self):
 		value = self.rs_setting_get('timezone')
@@ -608,13 +595,13 @@ class ReporterBase():
 	def report_get_order(self, parent):
 		if parent == "TOP":
 			base.debugmsg(7, "template order:", base.report["Report"]["Order"])
-			if len(base.report["Report"]["Order"])>0:
+			if len(base.report["Report"]["Order"]) > 0:
 				return base.report["Report"]["Order"].split(',')
 			else:
 				return []
 		else:
 			base.debugmsg(7, "parent order:", base.report[parent])
-			if "Order" in base.report[parent] and len(base.report[parent]["Order"])>0:
+			if "Order" in base.report[parent] and len(base.report[parent]["Order"]) > 0:
 				return base.report[parent]["Order"].split(',')
 			else:
 				return []
@@ -626,19 +613,30 @@ class ReporterBase():
 		else:
 			base.report[parent]["Order"] = ",".join(orderlst)
 		base.report_save()
+		return 1
 
 	def report_new_section(self, parent, name):
-		id = "{:02X}".format(int(time.time()*10000))
-		# id = "{:02X}".format(int(time.time()*1000000))
-		# id = "{:02X}".format(time.time()) # cannot convert float
+		id = "{:02X}".format(int(time.time() * 10000))
 		while id in base.report:
 			time.sleep(0.1)
-			id = "{:02X}".format(int(time.time()*10000))
+			id = "{:02X}".format(int(time.time() * 10000))
 
 		base.debugmsg(7, "id:", id)
 		self.report_add_section(parent, id, name)
-		# base.report_save() # report_set_order in report_add_section will save
 		return id
+
+	def report_add_subsection(self, id):
+		if id not in base.report:
+			base.report[id] = {}
+			base.report_save()
+
+	def report_subsection_parent(self, id):
+		pid = id
+		last = id[-1:]
+		if last in ['G', 'H', 'I', 'J', 'k', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']:
+			pid = id[0:-1]
+			self.report_add_subsection(id)
+		return pid
 
 	def report_add_section(self, parent, id, name):
 		base.debugmsg(7, "parent: ", parent)
@@ -651,8 +649,6 @@ class ReporterBase():
 		order.append(id)
 		self.report_set_order(parent, order)
 		base.debugmsg(8, "base.report: ", base.report._sections)
-		# base.report_save() # report_set_order will save
-
 
 	def report_item_parent(self, id):
 		if id in base.report and 'Parent' in base.report[id]:
@@ -674,6 +670,13 @@ class ReporterBase():
 		for item in subitems:
 			self.report_remove_section(item)
 		del base.report[id]
+		idl = id + 'L'
+		if idl in base.report:
+			del base.report[idl]
+		idr = id + 'R'
+		if idr in base.report:
+			del base.report[idr]
+
 		base.debugmsg(9, "base.report: ", base.report._sections)
 		base.report_save()
 
@@ -684,10 +687,9 @@ class ReporterBase():
 		pos = order.index(id)
 		base.debugmsg(5, "pos: ", pos)
 		order.pop(pos)
-		order.insert(pos -1, id)
+		order.insert(pos - 1, id)
 		base.debugmsg(5, "order: ", order)
 		self.report_set_order(parent, order)
-		# base.report_save() # report_set_order will save
 
 	def report_move_section_down(self, id):
 		parent = self.report_item_parent(id)
@@ -696,13 +698,9 @@ class ReporterBase():
 		pos = order.index(id)
 		base.debugmsg(5, "pos: ", pos)
 		order.pop(pos)
-		order.insert(pos +1, id)
+		order.insert(pos + 1, id)
 		base.debugmsg(5, "order: ", order)
 		self.report_set_order(parent, order)
-		# base.report_save() # report_set_order will save
-
-		# base.report["Report"]["Order"].index('ED299C2969A') # get index from list
-		# base.report["Report"]["Order"].insert(1, base.report["Report"]["Order"].pop(2)) # move item in list
 
 	def report_item_get_changed(self, id):
 		base.debugmsg(8, "id:", id)
@@ -710,11 +708,12 @@ class ReporterBase():
 			return time.time()
 		if 'Changed' not in base.report[id]:
 			base.report_item_set_changed(id)
-		base.debugmsg(8, "Changed:", base.report[id]['Changed'], float(base.report[id]['Changed']))
+		base.debugmsg(8, "Changed:", base.report[id]['Changed'], "	", float(base.report[id]['Changed']))
 		return float(base.report[id]['Changed'])
 
 	def report_item_set_changed(self, id):
 		base.report[id]['Changed'] = base.whitespace_set_ini_value(str(time.time()))
+		return 1
 
 	def report_item_set_changed_all(self, id):
 		if id != "TOP":
@@ -725,7 +724,6 @@ class ReporterBase():
 			base.report_item_set_changed_all(sect)
 
 		base.report_save()
-
 
 	def report_item_get_name(self, id):
 		if id == "TOP":
@@ -739,6 +737,7 @@ class ReporterBase():
 		base.report[id]['Name'] = base.whitespace_set_ini_value(newname)
 		base.report_item_set_changed(id)
 		base.report_save()
+		return 1
 
 	def report_sect_level(self, id):
 		base.debugmsg(9, "id:", id)
@@ -753,7 +752,7 @@ class ReporterBase():
 		base.debugmsg(9, "id:", id)
 		parent = self.report_item_parent(id)
 		order = self.report_get_order(parent)
-		num = order.index(id)+1
+		num = order.index(id) + 1
 		base.debugmsg(9, "parent:", parent, "	num:", num)
 		if parent == "TOP":
 			base.debugmsg(9, "return:", num)
@@ -789,11 +788,10 @@ class ReporterBase():
 		base.report_item_set_changed(id)
 		base.report_save()
 
-
-
 	#
 	# Report Item Type: contents
 	#
+
 	def rt_contents_get_mode(self, id):
 		base.debugmsg(8, "id:", id)
 		if 'mode' in base.report[id]:
@@ -806,6 +804,7 @@ class ReporterBase():
 		base.report[id]['mode'] = base.whitespace_set_ini_value(mode)
 		base.report_item_set_changed(id)
 		base.report_save()
+		return 1
 
 	def rt_contents_get_level(self, id):
 		base.debugmsg(8, "id:", id)
@@ -821,10 +820,12 @@ class ReporterBase():
 		base.report[id]['level'] = base.whitespace_set_ini_value(str(level))
 		base.report_item_set_changed(id)
 		base.report_save()
+		return 1
 
 	#
 	# Report Item Type: note
 	#
+
 	def rt_note_get(self, id):
 		base.debugmsg(9, "id:", id)
 		if 'note' in base.report[id]:
@@ -834,13 +835,30 @@ class ReporterBase():
 
 	def rt_note_set(self, id, noteText):
 		base.debugmsg(5, "id:", id, "	noteText:", noteText)
-		base.report[id]['note'] = base.whitespace_set_ini_value(noteText)
-		base.report_item_set_changed(id)
-		base.report_save()
-
+		prev = self.rt_note_get(id)
+		if noteText != prev:
+			base.report[id]['note'] = base.whitespace_set_ini_value(noteText)
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
 	#
 	# Report Item Type: graph
 	#
+
+	# 		pid, idl, idr = base.rt_graph_LR_Ids(id)
+	def rt_graph_LR_Ids(self, id):
+		if id != 'TOP':
+			base.debugmsg(5, "id:", id)
+			pid = base.report_subsection_parent(id)
+			idl = pid + 'L'
+			base.report_item_parent(idl)
+			idr = pid + 'R'
+			base.report_item_parent(idr)
+			return pid, idl, idr
+		else:
+			return id, id + 'L', id + 'R'
+
 	def rt_graph_get_sql(self, id):
 		base.debugmsg(9, "id:", id)
 		if 'SQL' in base.report[id]:
@@ -855,38 +873,74 @@ class ReporterBase():
 			base.report[id]['SQL'] = base.whitespace_set_ini_value(graphSQL.strip())
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
+
+	def rt_graph_get_axisen(self, id):
+		base.debugmsg(9, "id:", id)
+		if id in base.report and 'AxisEn' in base.report[id]:
+			return int(base.report[id]['AxisEn'])
+		else:
+			if id[-1:] == 'L':
+				return 1
+			else:
+				return 0
+
+	def rt_graph_set_axisen(self, id, value):
+		base.debugmsg(5, "id:", id, "	value:", value)
+		prev = self.rt_graph_get_axisen(id)
+		if value != prev and value is not None:
+			base.report[id]['AxisEn'] = str(value)
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
 
 	def rt_graph_get_dt(self, id):
 		base.debugmsg(9, "id:", id)
+		pid = base.report_subsection_parent(id)
 		if 'DataType' in base.report[id]:
 			return base.whitespace_get_ini_value(base.report[id]['DataType'])
+		elif pid in base.report and 'DataType' in base.report[pid]:
+			return base.whitespace_get_ini_value(base.report[pid]['DataType'])
 		else:
 			return None
 
 	def rt_graph_set_dt(self, id, datatype):
 		base.debugmsg(5, "id:", id, "	datatype:", datatype)
 		prev = self.rt_table_get_dt(id)
-		if datatype != prev and datatype != None:
+		if datatype != prev and datatype is not None:
 			base.report[id]['DataType'] = base.whitespace_set_ini_value(datatype)
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	def rt_graph_generate_sql(self, id):
 		base.debugmsg(8, "id:", id)
-		display_percentile = 90
 		sql = ""
 		DataType = self.rt_table_get_dt(id)
 		if DataType == "Result":
 			RType = self.rt_table_get_rt(id)
+			EnFR = self.rt_table_get_enfr(id)
 			FRType = self.rt_table_get_fr(id)
+			EnFA = self.rt_table_get_enfa(id)
+			FAType = self.rt_table_get_fa(id)
 			FNType = self.rt_table_get_fn(id)
 			inpFP = self.rt_table_get_fp(id)
+			colname = "Name"
 
 			sql = "SELECT "
 			if RType == "Response Time":
-				sql += 		"end_time as 'Time' "
-				sql += 		", elapsed_time as 'Value' "
-				sql += 		", result_name as 'Name' "
+				sql += "end_time as 'Time' "
+				sql += ", elapsed_time as 'Value' "
+				# sql += ", result_name as 'Name' "
+				sql += ", result_name"
+				if EnFR and FRType in [None, "", "None"]:
+					sql += " || ' - ' || result"
+				if EnFA and FAType in [None, "", "None"]:
+					sql += " || ' - ' || agent"
+				sql += " as [" + colname + "] "
 				# sql += 		", round(min(elapsed_time),3) 'minium' "
 				# sql += 		", round(avg(elapsed_time),3) 'average' "
 				# sql += 		", round(percentile(elapsed_time, {}),3) '{}%ile' ".format(display_percentile, display_percentile)
@@ -908,17 +962,35 @@ class ReporterBase():
 				# sql += 		"LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' "
 
 			if RType == "TPS":
-				sql += 		"end_time as 'Time' "
-				sql += 		", count(result) as 'Value' "
-				sql += 		", result_name as 'Name' "
+				sql += "end_time as 'Time' "
+				sql += ", count(result) as 'Value' "
+				# sql += ", result_name as 'Name' "
+				sql += ", result_name"
+				if EnFR and FRType in [None, "", "None"]:
+					sql += " || ' - ' || result"
+				if EnFA and FAType in [None, "", "None"]:
+					sql += " || ' - ' || agent"
+				sql += " as [" + colname + "] "
 			if RType == "Total TPS":
-				sql += 		"end_time as 'Time'"
-				sql += 		", count(result) as 'Value' "
-				sql += 		", result as 'Name' "
-			if RType == None:
-				sql += 		"end_time as 'Time'"
-				sql += 		", count(result) as 'Value' "
-				sql += 		", result_name as 'Name' "
+				sql += "end_time as 'Time'"
+				sql += ", count(result) as 'Value' "
+				# sql += ", result as 'Name' "
+				sql += ", result"
+				if EnFR and FRType in [None, "", "None"]:
+					sql += " || ' - ' || result"
+				if EnFA and FAType in [None, "", "None"]:
+					sql += " || ' - ' || agent"
+				sql += " as [" + colname + "] "
+			if RType is None:
+				sql += "end_time as 'Time'"
+				sql += ", count(result) as 'Value' "
+				# sql += ", result_name as 'Name' "
+				sql += ", result_name"
+				if EnFR and FRType in [None, "", "None"]:
+					sql += " || ' - ' || result"
+				if EnFA and FAType in [None, "", "None"]:
+					sql += " || ' - ' || agent"
+				sql += " as [" + colname + "] "
 
 			sql += "FROM Results "
 
@@ -930,31 +1002,34 @@ class ReporterBase():
 				# sql += "WHERE result == 'FAIL' "
 				lwhere.append("result == 'FAIL'")
 
+			if EnFA and FAType not in [None, "", "None"]:
+				lwhere.append("agent == '" + FAType + "'")
+
 			if RType == "Response Time":
 				# sql +=  	"AND result_name NOT LIKE 'Exception in thread%' "
-				lwhere.append("result_name NOT LIKE 'Exception in thread%'")
+				lwhere.append("[" + colname + "] NOT LIKE 'Exception in thread%'")
 			if RType == "TPS":
 				# sql +=  "WHERE result_name NOT LIKE 'Exception in thread%' "
-				lwhere.append("result_name NOT LIKE 'Exception in thread%'")
+				lwhere.append("[" + colname + "] NOT LIKE 'Exception in thread%'")
 
-			if FNType != "None" and len(inpFP)>0:
+			if FNType not in [None, "", "None"] and len(inpFP) > 0:
 				# construct pattern
 				# "Wildcard (Unix Glob)",
 				if FNType == "Wildcard (Unix Glob)":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("result_name GLOB '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] GLOB '{}'".format(inpFP))
 				# "Regex",
 				if FNType == "Regex":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("result_name REGEXP '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] REGEXP '{}'".format(inpFP))
 				# "Not Wildcard (Unix Glob)",
 				if FNType == "Not Wildcard (Unix Glob)":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("result_name NOT GLOB '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] NOT GLOB '{}'".format(inpFP))
 				# "Not Regex"
 				if FNType == "Not Regex":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("result_name NOT REGEXP '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] NOT REGEXP '{}'".format(inpFP))
 
 			i = 0
 			for iwhere in lwhere:
@@ -964,7 +1039,7 @@ class ReporterBase():
 					sql += "AND {} ".format(iwhere)
 				i += 1
 
-			if RType != None:
+			if RType is not None:
 				# sql += "GROUP by "
 				# sql += 		", result "
 				pass
@@ -974,47 +1049,112 @@ class ReporterBase():
 
 			if RType == "TPS":
 				sql += "GROUP by "
-				sql += 		"end_time "
-				sql += 		", result_name "
-				sql += 		", result "
+				sql += "end_time "
+				sql += ", result_name "
+				sql += ", result "
 				sql += "ORDER by end_time, result DESC, count(result) DESC "
 			if RType == "Total TPS":
-				sql += 		"end_time "
-				sql += 		", result "
+				sql += "end_time "
+				sql += ", result "
 				sql += "ORDER by end_time, count(result) DESC "
 
 		if DataType == "Metric":
 			MType = self.rt_table_get_mt(id)
 			PM = self.rt_table_get_pm(id)
 			SM = self.rt_table_get_sm(id)
-
 			# isnum = self.rt_table_get_isnumeric(id)
 			# sc = self.rt_table_get_showcount(id)
+			EnFA = self.rt_table_get_enfa(id)
+			FAType = self.rt_table_get_fa(id)
+			FNType = self.rt_table_get_fn(id)
+			inpFP = self.rt_table_get_fp(id)
+			colname = "Name"
+
 			base.debugmsg(6, "MType:", MType, "	PM:", PM, "	SM:", SM)
 
-			mcolumns = ["MetricTime as 'Time'", "MetricValue as 'Value'", "PrimaryMetric as 'Name'", "MetricType as 'Name'", "SecondaryMetric as 'Name'"]
+			mnamecolumns = []
+			# mcolumns = ["MetricTime as 'Time'", "MetricValue as 'Value'", "PrimaryMetric as 'Name'", "MetricType as 'Name'", "SecondaryMetric as 'Name'"]
+			mcolumns = ["MetricTime as 'Time'", "MetricValue as 'Value'"]
 			wherelst = []
 			# grouplst = ["PrimaryMetric", "MetricType", "SecondaryMetric"]
 			grouplst = []
 
-			if MType is not None and len(MType)>0:
-				if "MetricType as 'Name'" in mcolumns:
-					mcolumns.remove("MetricType as 'Name'")
+			if MType is not None and len(MType) > 0:
+				# if "MetricType as 'Name'" in mcolumns:
+				# 	mcolumns.remove("MetricType as 'Name'")
 				wherelst.append("MetricType == '{}'".format(MType.replace("'", "''")))
 				if "MetricType" in grouplst:
 					grouplst.remove("MetricType")
-			if PM is not None and len(PM)>0:
-				if "PrimaryMetric as 'Name'" in mcolumns:
-					mcolumns.remove("PrimaryMetric as 'Name'")
+			else:
+				mnamecolumns.append("MetricType")
+			if PM is not None and len(PM) > 0:
+				# if "PrimaryMetric as 'Name'" in mcolumns:
+				# 	mcolumns.remove("PrimaryMetric as 'Name'")
 				wherelst.append("PrimaryMetric == '{}'".format(PM.replace("'", "''")))
 				if "PrimaryMetric" in grouplst:
 					grouplst.remove("PrimaryMetric")
-			if SM is not None and len(SM)>0:
-				if "SecondaryMetric as 'Name'" in mcolumns:
-					mcolumns.remove("SecondaryMetric as 'Name'")
+			else:
+				mnamecolumns.append("PrimaryMetric")
+			if SM is not None and len(SM) > 0:
+				# if "SecondaryMetric as 'Name'" in mcolumns:
+				# 	mcolumns.remove("SecondaryMetric as 'Name'")
 				wherelst.append("SecondaryMetric == '{}'".format(SM.replace("'", "''")))
 				if "SecondaryMetric" in grouplst:
 					grouplst.remove("SecondaryMetric")
+			else:
+				mnamecolumns.append("SecondaryMetric")
+
+			if EnFA:
+				if FAType in [None, "", "None"]:
+					mnamecolumns.append("DataSource")
+				else:
+					wherelst.append("DataSource == '{}'".format(FAType))
+
+			# Construct Name Column
+			mnamecolumn = " || ' - ' || ".join(mnamecolumns)
+			mnamecolumn += " as [" + colname + "] "
+			mcolumns.append(mnamecolumn)
+
+			if FNType not in [None, "", "None"] and len(inpFP) > 0:
+				# construct pattern
+				# "Wildcard (Unix Glob)",
+				if FNType == "Wildcard (Unix Glob)":
+					# AND PrimaryMetric GLOB '*_1*' OR SecondaryMetric GLOB '*_1*' OR DataSource GLOB '*_1*' OR MetricValue GLOB '*_1*'
+					base.debugmsg(5, "mnamecolumns:", mnamecolumns)
+					fpwhere = "("
+					for dispcol in mnamecolumns:
+						if len(fpwhere) > 1:
+							fpwhere += "OR "
+						fpwhere += "{} GLOB '{}'".format(dispcol, inpFP)
+					fpwhere += ")"
+					wherelst.append(fpwhere)
+				# "Regex",
+				if FNType == "Regex":
+					fpwhere = "("
+					for dispcol in mnamecolumns:
+						if len(fpwhere) > 1:
+							fpwhere += "OR "
+						fpwhere += "{} REGEXP '{}'".format(dispcol, inpFP)
+					fpwhere += ")"
+					wherelst.append(fpwhere)
+				# "Not Wildcard (Unix Glob)",
+				if FNType == "Not Wildcard (Unix Glob)":
+					fpwhere = "("
+					for dispcol in mnamecolumns:
+						if len(fpwhere) > 1:
+							fpwhere += "AND "
+						fpwhere += "{} NOT GLOB '{}'".format(dispcol, inpFP)
+					fpwhere += ")"
+					wherelst.append(fpwhere)
+				# "Not Regex"
+				if FNType == "Not Regex":
+					fpwhere = "("
+					for dispcol in mnamecolumns:
+						if len(fpwhere) > 1:
+							fpwhere += "AND "
+						fpwhere += "{} NOT REGEXP '{}'".format(dispcol, inpFP)
+					fpwhere += ")"
+					wherelst.append(fpwhere)
 
 			# if isnum<1:
 			# 	mcolumns.append("MetricValue")
@@ -1029,15 +1169,14 @@ class ReporterBase():
 			# 	mcolumns.append("max(CAST(MetricValue AS NUMERIC)) AS 'Maximum'")
 			# 	mcolumns.append("round(stdev(CAST(MetricValue AS NUMERIC)),3) AS 'StdDev'")
 
-
 			sql = "SELECT "
 
-			i=0
+			i = 0
 			for col in mcolumns:
-				if i<1:
-					sql += 		"{} ".format(col)
+				if i < 1:
+					sql += "{} ".format(col)
 				else:
-					sql += 		", {} ".format(col)
+					sql += ", {} ".format(col)
 				i += 1
 
 			sql += "FROM MetricData "
@@ -1050,35 +1189,32 @@ class ReporterBase():
 					sql += "AND {} ".format(iwhere)
 				i += 1
 
-			if len(grouplst)>0:
+			if len(grouplst) > 0:
 				sql += "GROUP by "
-				i=0
+				i = 0
 				for col in grouplst:
-					if i<1:
-						sql += 		"{} ".format(col)
+					if i < 1:
+						sql += "{} ".format(col)
 					else:
-						sql += 		", {} ".format(col)
+						sql += ", {} ".format(col)
 					i += 1
 
 			sql += "ORDER BY MetricTime "
 
-
-
-		base.debugmsg(8, "sql:", sql)
+		base.debugmsg(5, "sql:", sql)
 		self.rt_graph_set_sql(id, sql)
 		return sql
 
 	def rt_graph_floatval(self, value):
 		try:
 			return float(value)
-		except:
+		except Exception:
 			return value
-
-
 
 	#
 	# Report Item Type: table
 	#
+
 	def rt_table_get_sql(self, id):
 		base.debugmsg(9, "id:", id)
 		if 'SQL' in base.report[id]:
@@ -1093,6 +1229,8 @@ class ReporterBase():
 			base.report[id]['SQL'] = base.whitespace_set_ini_value(tableSQL.strip())
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	def rt_table_generate_sql(self, id):
 		base.debugmsg(8, "id:", id)
@@ -1101,19 +1239,28 @@ class ReporterBase():
 		DataType = self.rt_table_get_dt(id)
 		if DataType == "Result":
 			RType = self.rt_table_get_rt(id)
+			EnFR = self.rt_table_get_enfr(id)
 			FRType = self.rt_table_get_fr(id)
+			EnFA = self.rt_table_get_enfa(id)
+			FAType = self.rt_table_get_fa(id)
 			FNType = self.rt_table_get_fn(id)
 			inpFP = self.rt_table_get_fp(id)
+			colname = "Result Name"
 
 			sql = "SELECT "
 			if RType == "Response Time":
-				sql += 		"result_name 'Result Name' "
-				sql += 		", round(min(elapsed_time),3) 'Minimum' "
-				sql += 		", round(avg(elapsed_time),3) 'Average' "
-				sql += 		", round(percentile(elapsed_time, {}),3) '{}%ile' ".format(display_percentile, display_percentile)
-				sql += 		", round(max(elapsed_time),3) 'Maximum' "
-				sql += 		", round(stdev(elapsed_time),3) 'Std. Dev.' "
-				sql += 		", count(result) as 'Count' "
+				sql += "result_name"
+				if EnFR and FRType in [None, "", "None"]:
+					sql += " || ' - ' || result"
+				if EnFA and FAType in [None, "", "None"]:
+					sql += " || ' - ' || agent"
+				sql += " as [" + colname + "] "
+				sql += ", round(min(elapsed_time),3) 'Minimum' "
+				sql += ", round(avg(elapsed_time),3) 'Average' "
+				sql += ", round(percentile(elapsed_time, {}),3) '{}%ile' ".format(display_percentile, display_percentile)
+				sql += ", round(max(elapsed_time),3) 'Maximum' "
+				sql += ", round(stdev(elapsed_time),3) 'Std. Dev.' "
+				sql += ", count(result) as 'Count' "
 
 				# sql += 		"round(min(rp.elapsed_time),3) 'min', "
 				# sql += 		"round(avg(rp.elapsed_time),3) 'avg', "
@@ -1129,53 +1276,64 @@ class ReporterBase():
 				# sql += 		"LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' "
 
 			if RType == "TPS":
-				sql += 		"result_name 'Result Name' "
-				sql += 		", result 'Result' "
-				sql += 		", count(result)  as 'Count' "
+				sql += "result_name"
+				if EnFR and FRType in [None, "", "None"]:
+					sql += " || ' - ' || result"
+				if EnFA and FAType in [None, "", "None"]:
+					sql += " || ' - ' || agent"
+				sql += " as [" + colname + "] "
+				sql += ", result 'Result' "
+				sql += ", count(result)  as 'Count' "
 			if RType == "Total TPS":
-				sql += 		"result 'Result' "
-				sql += 		", count(result)  as 'Count' "
-			if RType == None:
-				# sql += 		"result_name "
-				# sql += 		", * "
+				colname = "Result "
+				sql += "result "
+				if EnFA and FAType in [None, "", "None"]:
+					sql += " || ' - ' || agent"
+				sql += " as [" + colname + "] "
+				sql += ", count(result)  as 'Count' "
+			if RType is None:
 				sql = ""
 				return sql
 
 			sql += "FROM Results "
 
 			lwhere = []
-			if FRType == "Pass":
-				# sql += "WHERE result == 'PASS' "
-				lwhere.append("result == 'PASS'")
-			if FRType == "Fail":
-				# sql += "WHERE result == 'FAIL' "
-				lwhere.append("result == 'FAIL'")
+			if EnFR:
+				if FRType == "Pass":
+					# sql += "WHERE result == 'PASS' "
+					lwhere.append("result == 'PASS'")
+				if FRType == "Fail":
+					# sql += "WHERE result == 'FAIL' "
+					lwhere.append("result == 'FAIL'")
+
+			if EnFA and FAType not in [None, "", "None"]:
+				lwhere.append("agent == '" + FAType + "'")
 
 			if RType == "Response Time":
 				# sql +=  	"AND result_name NOT LIKE 'Exception in thread%' "
-				lwhere.append("result_name NOT LIKE 'Exception in thread%'")
+				lwhere.append("[" + colname + "] NOT LIKE 'Exception in thread%'")
 			if RType == "TPS":
 				# sql +=  "WHERE result_name NOT LIKE 'Exception in thread%' "
-				lwhere.append("result_name NOT LIKE 'Exception in thread%'")
+				lwhere.append("[" + colname + "] NOT LIKE 'Exception in thread%'")
 
-			if FNType != "None" and len(inpFP)>0:
+			if FNType not in [None, "", "None"] and len(inpFP) > 0:
 				# construct pattern
 				# "Wildcard (Unix Glob)",
 				if FNType == "Wildcard (Unix Glob)":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("result_name GLOB '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] GLOB '{}'".format(inpFP))
 				# "Regex",
 				if FNType == "Regex":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("result_name REGEXP '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] REGEXP '{}'".format(inpFP))
 				# "Not Wildcard (Unix Glob)",
 				if FNType == "Not Wildcard (Unix Glob)":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("result_name NOT GLOB '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] NOT GLOB '{}'".format(inpFP))
 				# "Not Regex"
 				if FNType == "Not Regex":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("result_name NOT REGEXP '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] NOT REGEXP '{}'".format(inpFP))
 
 			i = 0
 			for iwhere in lwhere:
@@ -1185,18 +1343,18 @@ class ReporterBase():
 					sql += "AND {} ".format(iwhere)
 				i += 1
 
-			if RType != None:
+			if RType is not None:
 				sql += "GROUP by "
-			# sql += 		", result "
+
 			if RType == "Response Time":
-				sql += 		"result_name "
+				sql += "[" + colname + "] "
 			if RType == "TPS":
-				sql += 		"result_name "
-				sql += 		", result "
+				sql += "[" + colname + "] "
+				sql += ", result "
 				sql += "ORDER by result DESC, count(result) DESC "
 			if RType == "Total TPS":
-				sql += 		"result "
-				sql += "ORDER by count(result) DESC "
+				sql += " [" + colname + "] "
+				sql += "ORDER by count([" + colname + "]) DESC "
 
 		if DataType == "Metric":
 			MType = self.rt_table_get_mt(id)
@@ -1204,34 +1362,93 @@ class ReporterBase():
 			SM = self.rt_table_get_sm(id)
 			isnum = self.rt_table_get_isnumeric(id)
 			sc = self.rt_table_get_showcount(id)
+			EnFA = self.rt_table_get_enfa(id)
+			FAType = self.rt_table_get_fa(id)
+			FNType = self.rt_table_get_fn(id)
+			inpFP = self.rt_table_get_fp(id)
+
+			colours = self.rt_table_get_colours(id)
+
 			base.debugmsg(8, "MType:", MType, "	PM:", PM, "	SM:", SM)
 
 			mcolumns = ["PrimaryMetric", "MetricType", "SecondaryMetric"]
 			wherelst = []
 			grouplst = ["PrimaryMetric", "MetricType", "SecondaryMetric"]
 
-			if MType is not None and len(MType)>0:
+			if EnFA:
+				if FAType in [None, "", "None"]:
+					mcolumns.append("DataSource 'Agent'")
+					grouplst.append("DataSource")
+				else:
+					wherelst.append("DataSource == '{}'".format(FAType))
+
+			if MType is not None and len(MType) > 0:
 				if "MetricType" in mcolumns:
 					mcolumns.remove("MetricType")
 				wherelst.append("MetricType == '{}'".format(MType))
 				if "MetricType" in grouplst:
 					grouplst.remove("MetricType")
-			if PM is not None and len(PM)>0:
+			if PM is not None and len(PM) > 0:
 				if "PrimaryMetric" in mcolumns:
 					mcolumns.remove("PrimaryMetric")
 				wherelst.append("PrimaryMetric == '{}'".format(PM))
 				if "PrimaryMetric" in grouplst:
 					grouplst.remove("PrimaryMetric")
-			if SM is not None and len(SM)>0:
+			if SM is not None and len(SM) > 0:
 				if "SecondaryMetric" in mcolumns:
 					mcolumns.remove("SecondaryMetric")
 				wherelst.append("SecondaryMetric == '{}'".format(SM))
 				if "SecondaryMetric" in grouplst:
 					grouplst.remove("SecondaryMetric")
 
-			if isnum<1:
+			if colours:
+				colourcolumn = " || ' - ' || ".join(grouplst)
+				colourcolumn += " as [Colour] "
+				mcolumns.append(colourcolumn)
+
+			if FNType not in [None, "", "None"] and len(inpFP) > 0:
+				# construct pattern
+				# "Wildcard (Unix Glob)",
+				if FNType == "Wildcard (Unix Glob)":
+					# AND PrimaryMetric GLOB '*_1*' OR SecondaryMetric GLOB '*_1*' OR DataSource GLOB '*_1*' OR MetricValue GLOB '*_1*'
+					fpwhere = "("
+					for dispcol in grouplst:
+						if len(fpwhere) > 1:
+							fpwhere += "OR "
+						fpwhere += "{} GLOB '{}'".format(dispcol, inpFP)
+					fpwhere += ")"
+					wherelst.append(fpwhere)
+				# "Regex",
+				if FNType == "Regex":
+					fpwhere = "("
+					for dispcol in grouplst:
+						if len(fpwhere) > 1:
+							fpwhere += "OR "
+						fpwhere += "{} REGEXP '{}'".format(dispcol, inpFP)
+					fpwhere += ")"
+					wherelst.append(fpwhere)
+				# "Not Wildcard (Unix Glob)",
+				if FNType == "Not Wildcard (Unix Glob)":
+					fpwhere = "("
+					for dispcol in grouplst:
+						if len(fpwhere) > 1:
+							fpwhere += "AND "
+						fpwhere += "{} NOT GLOB '{}'".format(dispcol, inpFP)
+					fpwhere += ")"
+					wherelst.append(fpwhere)
+				# "Not Regex"
+				if FNType == "Not Regex":
+					fpwhere = "("
+					for dispcol in grouplst:
+						if len(fpwhere) > 1:
+							fpwhere += "AND "
+						fpwhere += "{} NOT REGEXP '{}'".format(dispcol, inpFP)
+					fpwhere += ")"
+					wherelst.append(fpwhere)
+
+			if isnum < 1:
 				mcolumns.append("MetricValue")
-				if sc>0:
+				if sc > 0:
 					mcolumns.append("count(MetricTime) as 'Count'")
 					if "MetricValue" in grouplst:
 						grouplst.remove("MetricValue")
@@ -1242,15 +1459,14 @@ class ReporterBase():
 				mcolumns.append("max(CAST(MetricValue AS NUMERIC)) AS 'Maximum'")
 				mcolumns.append("round(stdev(CAST(MetricValue AS NUMERIC)),3) AS 'Std. Dev.'")
 
-
 			sql = "SELECT "
 
-			i=0
+			i = 0
 			for col in mcolumns:
-				if i<1:
-					sql += 		"{} ".format(col)
+				if i < 1:
+					sql += "{} ".format(col)
 				else:
-					sql += 		", {} ".format(col)
+					sql += ", {} ".format(col)
 				i += 1
 
 			sql += "FROM MetricData "
@@ -1263,14 +1479,14 @@ class ReporterBase():
 					sql += "AND {} ".format(iwhere)
 				i += 1
 
-			if len(grouplst)>0:
+			if len(grouplst) > 0:
 				sql += "GROUP by "
-				i=0
+				i = 0
 				for col in grouplst:
-					if i<1:
-						sql += 		"{} ".format(col)
+					if i < 1:
+						sql += "{} ".format(col)
 					else:
-						sql += 		", {} ".format(col)
+						sql += ", {} ".format(col)
 					i += 1
 
 		if DataType == "ResultSummary":
@@ -1287,6 +1503,8 @@ class ReporterBase():
 			# FROM ResultSummary rs
 			# WHERE rs.Name not like '%<%'
 
+			EnFA = self.rt_table_get_enfa(id)
+			FAType = self.rt_table_get_fa(id)
 			FNType = self.rt_table_get_fn(id)
 			inpFP = self.rt_table_get_fp(id)
 
@@ -1303,53 +1521,60 @@ class ReporterBase():
 
 			sellist = []
 			gblist = []
-			sellist.append("r.result_name 'Result Name'")
+			colname = "Result Name"
+			col0 = "r.result_name"
+			if EnFA and FAType in [None, "", "None"]:
+				col0 += " || ' - ' || r.agent"
+			col0 += " as [" + colname + "] "
+
+			sellist.append(col0)
 			gblist.append("r.result_name")
 			base.debugmsg(8, "gblist:", gblist)
 
 			selcols = ", ".join(sellist)
 			gbcols = ", ".join(gblist)
 
-
 			base.debugmsg(8, "gbcols:", gbcols)
 
 			sql = "SELECT "
-			if len(selcols)>0:
-				sql += 	selcols
-				sql += 	", "
-			sql += 		"round(min(rp.elapsed_time),3) 'Minimum', "
-			sql += 		"round(avg(rp.elapsed_time),3) 'Average', "
-			sql += 		"round(percentile(rp.elapsed_time, {}),3) '{}%ile', ".format(display_percentile, display_percentile)
-			sql += 		"round(max(rp.elapsed_time),3) 'Maximum', "
-			sql += 		"round(stdev(rp.elapsed_time),3) 'Std. Dev.', "
-			sql += 		"count(rp.result) as 'Pass', "
-			sql += 		"count(rf.result) as 'Fail', "
-			sql += 		"count(ro.result) as 'Other' "
+			if len(selcols) > 0:
+				sql += selcols
+				sql += ", "
+			sql += "round(min(rp.elapsed_time),3) 'Minimum', "
+			sql += "round(avg(rp.elapsed_time),3) 'Average', "
+			sql += "round(percentile(rp.elapsed_time, {}),3) '{}%ile', ".format(display_percentile, display_percentile)
+			sql += "round(max(rp.elapsed_time),3) 'Maximum', "
+			sql += "round(stdev(rp.elapsed_time),3) 'Std. Dev.', "
+			sql += "count(rp.result) as 'Pass', "
+			sql += "count(rf.result) as 'Fail', "
+			sql += "count(ro.result) as 'Other' "
 			sql += "FROM Results as r "
-			sql += 		"LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == 'PASS' "
-			sql += 		"LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == 'FAIL' "
-			sql += 		"LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' "
-
+			sql += "LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == 'PASS' "
+			sql += "LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == 'FAIL' "
+			sql += "LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' "
 
 			lwhere = []
-			if FNType != "None" and len(inpFP)>0:
+			if EnFA and FAType not in [None, "", "None"]:
+				lwhere.append("r.agent == '{}'".format(FAType))
+
+			if FNType != "None" and len(inpFP) > 0:
 				# construct pattern
 				# "Wildcard (Unix Glob)",
 				if FNType == "Wildcard (Unix Glob)":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("r.result_name GLOB '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] GLOB '{}'".format(inpFP))
 				# "Regex",
 				if FNType == "Regex":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("r.result_name REGEXP '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] REGEXP '{}'".format(inpFP))
 				# "Not Wildcard (Unix Glob)",
 				if FNType == "Not Wildcard (Unix Glob)":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("r.result_name NOT GLOB '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] NOT GLOB '{}'".format(inpFP))
 				# "Not Regex"
 				if FNType == "Not Regex":
 					# -- 		WHERE result_name GLOB 'OC3*'
-					lwhere.append("r.result_name NOT REGEXP '{}'".format(inpFP))
+					lwhere.append("[" + colname + "] NOT REGEXP '{}'".format(inpFP))
 
 			i = 0
 			for iwhere in lwhere:
@@ -1359,18 +1584,15 @@ class ReporterBase():
 					sql += "AND {} ".format(iwhere)
 				i += 1
 
-			if len(gblist)>0:
+			if len(gblist) > 0:
 				sql += "GROUP BY  "
-				sql += 		gbcols
+				sql += gbcols
 
-			sql += " ORDER BY r.sequence"
-
+			sql += " ORDER BY [" + colname + "]"
 
 		base.debugmsg(8, "sql:", sql)
 		self.rt_table_set_sql(id, sql)
 		return sql
-
-
 
 	def rt_table_get_colours(self, id):
 		base.debugmsg(9, "id:", id)
@@ -1386,13 +1608,15 @@ class ReporterBase():
 			base.report[id]['Colours'] = base.whitespace_set_ini_value(str(colours))
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
 		else:
 			prev = self.rt_table_get_colours(id)
 			if colours != prev:
 				base.report[id]['Colours'] = base.whitespace_set_ini_value(str(colours))
 				base.report_item_set_changed(id)
 				base.report_save()
-
+				return 1
+		return 0
 
 	def rt_table_get_dt(self, id):
 		base.debugmsg(9, "id:", id)
@@ -1404,10 +1628,12 @@ class ReporterBase():
 	def rt_table_set_dt(self, id, datatype):
 		base.debugmsg(9, "id:", id, "	datatype:", datatype)
 		prev = self.rt_table_get_dt(id)
-		if datatype != prev and datatype != None:
+		if datatype != prev and datatype is not None:
 			base.report[id]['DataType'] = base.whitespace_set_ini_value(datatype)
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	def rt_table_get_rt(self, id):
 		base.debugmsg(9, "id:", id)
@@ -1419,10 +1645,42 @@ class ReporterBase():
 	def rt_table_set_rt(self, id, resulttype):
 		base.debugmsg(9, "id:", id, "	resulttype:", resulttype)
 		prev = self.rt_table_get_rt(id)
-		if resulttype != prev and resulttype != None:
+		if resulttype != prev and resulttype is not None:
 			base.report[id]['ResultType'] = base.whitespace_set_ini_value(resulttype)
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
+
+	def rt_table_ini_colname(self, name):
+		base.debugmsg(5, "id:", id, "	name:", name)
+		colname = "col_{}".format(base.whitespace_set_ini_value(name)).replace(" ", "_").replace(".", "")
+		base.debugmsg(5, "colname:", colname)
+		return colname
+
+	def rt_table_get_colname(self, id, name):
+		base.debugmsg(5, "id:", id, "	name:", name)
+		colname = self.rt_table_ini_colname(name)
+		if colname in base.report[id]:
+			return base.whitespace_get_ini_value(base.report[id][colname])
+		else:
+			return name
+
+	def rt_table_set_colname(self, id, name, value):
+		base.debugmsg(5, "id:", id, "	name:", name, "	value:", value)
+		colname = self.rt_table_ini_colname(name)
+		prev = self.rt_table_get_colname(id, name)
+		if value != prev and value not in [None, ""]:
+			base.report[id][colname] = base.whitespace_set_ini_value(value)
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		if value in [None, ""]:
+			base.report[id][colname] = base.whitespace_set_ini_value(name)
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
 
 	# FR FilterResult
 	def rt_table_get_fr(self, id):
@@ -1435,10 +1693,126 @@ class ReporterBase():
 	def rt_table_set_fr(self, id, filterresult):
 		base.debugmsg(9, "id:", id, "	filterresult:", filterresult)
 		prev = self.rt_table_get_fr(id)
-		if filterresult != prev and filterresult != None:
+		if filterresult != prev and filterresult is not None:
 			base.report[id]['FilterResult'] = base.whitespace_set_ini_value(filterresult)
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
+
+	def rt_table_get_enfr(self, id):
+		base.debugmsg(5, "id:", id)
+		pid = base.report_subsection_parent(id)
+		if id in base.report and 'EnableFilterResult' in base.report[id]:
+			return int(base.report[id]['EnableFilterResult'])
+		elif pid in base.report and 'EnableFilterResult' in base.report[pid]:
+			return int(base.report[pid]['EnableFilterResult'])
+		else:
+			frv = self.rt_table_get_fr(id)
+			if frv in ["Pass", "Fail"]:
+				return 1
+			return 0
+
+	def rt_table_set_enfr(self, id, value):
+		base.debugmsg(5, "id:", id, "	value:", value)
+		prev = self.rt_table_get_enfr(id)
+		if value != prev and value is not None:
+			base.report[id]['EnableFilterResult'] = base.whitespace_set_ini_value(str(value))
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
+
+	# FA FilterAgent
+	def rt_table_get_fa(self, id):
+		base.debugmsg(5, "id:", id)
+		if 'FilterAgent' in base.report[id]:
+			return base.whitespace_get_ini_value(base.report[id]['FilterAgent'])
+		else:
+			return None
+
+	def rt_table_set_fa(self, id, value):
+		base.debugmsg(5, "id:", id, "	value:", value)
+		prev = self.rt_table_get_fa(id)
+		if value != prev and value is not None:
+			base.report[id]['FilterAgent'] = base.whitespace_set_ini_value(value)
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
+
+	def rt_table_get_alst(self, id):
+		base.debugmsg(9, "id:", id)
+		# SELECT agent
+		# FROM Results
+		# GROUP BY agent
+		mtype = self.rt_table_get_mt(id)
+		alst = [None, ""]
+		sql = "SELECT agent 'Name' "
+		sql += "FROM Results "
+		sql += "GROUP BY agent "
+		base.debugmsg(6, "sql:", sql)
+		key = "{}_{}_AgentList".format(id, mtype)
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+		while key not in base.dbqueue["ReadResult"]:
+			time.sleep(0.1)
+
+		adata = base.dbqueue["ReadResult"][key]
+		base.debugmsg(8, "adata:", adata)
+		for a in adata:
+			alst.append(a["Name"])
+
+		base.debugmsg(5, "alst:", alst)
+
+		return alst
+
+	def rt_table_get_malst(self, id):
+		base.debugmsg(9, "id:", id)
+		# SELECT agent
+		# FROM Results
+		# GROUP BY agent
+		mtype = self.rt_table_get_mt(id)
+		alst = [None, ""]
+
+		sql = "SELECT ma.Name  'Name' "
+		sql += "FROM Metrics m "
+		sql += "	LEFT JOIN Metric ma ON m.DataSource = ma.ID "
+		sql += "GROUP BY m.DataSource "
+
+		base.debugmsg(6, "sql:", sql)
+		key = "{}_{}_MetricAgentList".format(id, mtype)
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+		while key not in base.dbqueue["ReadResult"]:
+			time.sleep(0.1)
+
+		adata = base.dbqueue["ReadResult"][key]
+		base.debugmsg(8, "adata:", adata)
+		for a in adata:
+			alst.append(a["Name"])
+
+		base.debugmsg(5, "alst:", alst)
+
+		return alst
+
+	def rt_table_get_enfa(self, id):
+		base.debugmsg(5, "id:", id)
+		pid = base.report_subsection_parent(id)
+		if id in base.report and 'EnableFilterAgent' in base.report[id]:
+			return int(base.report[id]['EnableFilterAgent'])
+		elif pid in base.report and 'EnableFilterAgent' in base.report[pid]:
+			return int(base.report[pid]['EnableFilterAgent'])
+		else:
+			return 0
+
+	def rt_table_set_enfa(self, id, value):
+		base.debugmsg(5, "id:", id, "	value:", value)
+		prev = self.rt_table_get_enfa(id)
+		if value != prev and value is not None:
+			base.report[id]['EnableFilterAgent'] = base.whitespace_set_ini_value(str(value))
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
 
 	# FN FilterType
 	def rt_table_get_fn(self, id):
@@ -1451,10 +1825,17 @@ class ReporterBase():
 	def rt_table_set_fn(self, id, filtertype):
 		base.debugmsg(5, "id:", id, "	filtertype:", filtertype)
 		prev = self.rt_table_get_fr(id)
-		if filtertype != prev and filtertype != None:
+		if filtertype != prev and filtertype not in [None, "None"]:
 			base.report[id]['FilterType'] = base.whitespace_set_ini_value(filtertype)
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		elif filtertype != prev and filtertype in [None, "None"] and prev in [None, "None"]:
+			base.report[id]['FilterType'] = base.whitespace_set_ini_value(None)
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
 
 	# FP FilterPattern
 	def rt_table_get_fp(self, id):
@@ -1467,52 +1848,63 @@ class ReporterBase():
 	def rt_table_set_fp(self, id, filterpattern):
 		base.debugmsg(5, "id:", id, "	filterpattern:", filterpattern)
 		prev = self.rt_table_get_fp(id)
-		if filterpattern != prev and filterpattern != None:
+		if filterpattern != prev and filterpattern is not None:
 			base.report[id]['FilterPattern'] = base.whitespace_set_ini_value(filterpattern)
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	def whitespace_set_ini_value(self, valin):
 		base.debugmsg(9, "valin:", valin)
-		valout = valin.replace('\n', 'x12')
-		valout = valout.replace('\r', 'x15')
-		valout = valout.replace('\t', 'x11')
-		valout = valout.replace('[', 'x91')
-		valout = valout.replace(']', 'x93')
-		valout = valout.replace('%', 'x37')
-		# valout = valout.replace('%', '%%')
-		valout = valout.replace('#', 'x35')
-		base.debugmsg(9, "valout:", valout)
+		valout = str(valin)
+		if len(valout) > 0:
+			valout = valout.replace('\n', 'x12')
+			valout = valout.replace('\r', 'x15')
+			valout = valout.replace('\t', 'x11')
+			valout = valout.replace('[', 'x91')
+			valout = valout.replace(']', 'x93')
+			valout = valout.replace('%', 'x37')
+			# valout = valout.replace('%', '%%')
+			valout = valout.replace('#', 'x35')
+			base.debugmsg(9, "valout:", valout)
 		return valout
 
 	def whitespace_get_ini_value(self, valin):
 		base.debugmsg(9, "valin:", valin)
-		valout = valin.replace('x12', '\n')
-		valout = valout.replace('x15', '\r')
-		valout = valout.replace('x11', '\t')
-		valout = valout.replace('x91', '[')
-		valout = valout.replace('x93', ']')
-		valout = valout.replace('x37', '%')
-		valout = valout.replace('x35', '#')
-		base.debugmsg(9, "valout:", valout)
+		valout = str(valin)
+		if len(valout) > 0:
+			valout = valout.replace('x12', '\n')
+			valout = valout.replace('x15', '\r')
+			valout = valout.replace('x11', '\t')
+			valout = valout.replace('x91', '[')
+			valout = valout.replace('x93', ']')
+			valout = valout.replace('x37', '%')
+			valout = valout.replace('x35', '#')
+			base.debugmsg(9, "valout:", valout)
 		return valout
 
-
 	# mt MetricType
+
 	def rt_table_get_mt(self, id):
 		base.debugmsg(9, "id:", id)
+		pid = base.report_subsection_parent(id)
 		if 'MetricType' in base.report[id]:
 			return base.whitespace_get_ini_value(base.report[id]['MetricType'])
+		elif pid in base.report and 'MetricType' in base.report[pid]:
+			return base.whitespace_get_ini_value(base.report[pid]['MetricType'])
 		else:
 			return ""
 
 	def rt_table_set_mt(self, id, metrictype):
 		base.debugmsg(5, "id:", id, "	metrictype:", metrictype)
 		prev = self.rt_table_get_mt(id)
-		if metrictype != prev and metrictype != None:
+		if metrictype != prev and metrictype is not None:
 			base.report[id]['MetricType'] = base.whitespace_set_ini_value(metrictype)
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	def rt_table_get_mlst(self, id):
 		base.debugmsg(9, "id:", id)
@@ -1536,18 +1928,23 @@ class ReporterBase():
 	# pm PrimaryMetric
 	def rt_table_get_pm(self, id):
 		base.debugmsg(9, "id:", id)
+		pid = base.report_subsection_parent(id)
 		if 'PrimaryMetric' in base.report[id]:
 			return base.whitespace_get_ini_value(base.report[id]['PrimaryMetric'])
+		elif pid in base.report and 'PrimaryMetric' in base.report[pid]:
+			return base.whitespace_get_ini_value(base.report[pid]['PrimaryMetric'])
 		else:
 			return ""
 
 	def rt_table_set_pm(self, id, primarymetric):
 		base.debugmsg(5, "id:", id, "	primarymetric:", primarymetric)
 		prev = self.rt_table_get_pm(id)
-		if primarymetric != prev and primarymetric != None:
+		if primarymetric != prev and primarymetric is not None:
 			base.report[id]['PrimaryMetric'] = base.whitespace_set_ini_value(primarymetric)
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	def rt_table_get_pmlst(self, id):
 		base.debugmsg(9, "id:", id)
@@ -1559,7 +1956,7 @@ class ReporterBase():
 		pmlst = [None, ""]
 		sql = "SELECT Name "
 		sql += "FROM Metric "
-		if mtype is not None and len(mtype)>0:
+		if mtype is not None and len(mtype) > 0:
 			sql += "WHERE Type = '{}' ".format(mtype)
 		sql += "GROUP BY Name "
 		base.debugmsg(6, "sql:", sql)
@@ -1580,18 +1977,23 @@ class ReporterBase():
 	# sm SecondaryMetric
 	def rt_table_get_sm(self, id):
 		base.debugmsg(9, "id:", id)
+		pid = base.report_subsection_parent(id)
 		if 'SecondaryMetric' in base.report[id]:
 			return base.whitespace_get_ini_value(base.report[id]['SecondaryMetric'])
+		elif pid in base.report and 'SecondaryMetric' in base.report[pid]:
+			return base.whitespace_get_ini_value(base.report[pid]['SecondaryMetric'])
 		else:
 			return ""
 
 	def rt_table_set_sm(self, id, secondarymetric):
 		base.debugmsg(5, "id:", id, "	secondarymetric:", secondarymetric)
 		prev = self.rt_table_get_sm(id)
-		if secondarymetric != prev and secondarymetric != None:
+		if secondarymetric != prev and secondarymetric is not None:
 			base.report[id]['SecondaryMetric'] = base.whitespace_set_ini_value(secondarymetric)
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	def rt_table_get_smlst(self, id):
 		base.debugmsg(9, "id:", id)
@@ -1602,12 +2004,12 @@ class ReporterBase():
 		# GROUP BY SecondaryMetric
 		wherelst = []
 		mtype = self.rt_table_get_mt(id)
-		if mtype is not None and len(mtype)>0:
-			wherelst.append({"key":"MetricType", "value":mtype})
+		if mtype is not None and len(mtype) > 0:
+			wherelst.append({"key": "MetricType", "value": mtype})
 
 		pmtype = self.rt_table_get_pm(id)
-		if pmtype is not None and len(pmtype)>0:
-			wherelst.append({"key":"PrimaryMetric", "value":pmtype})
+		if pmtype is not None and len(pmtype) > 0:
+			wherelst.append({"key": "PrimaryMetric", "value": pmtype})
 
 		smlst = [None, ""]
 		sql = "SELECT SecondaryMetric "
@@ -1615,9 +2017,9 @@ class ReporterBase():
 
 		# if mtype is not None and len(mtype)>0:
 		# 	sql += "WHERE Type = '{}' ".format("Agent")
-		i=0
+		i = 0
 		for itm in wherelst:
-			if i<1:
+			if i < 1:
 				sql += "WHERE {} = '{}' ".format(itm["key"], itm["value"])
 				i += 1
 			else:
@@ -1637,43 +2039,73 @@ class ReporterBase():
 
 		base.debugmsg(5, "smlst:", smlst)
 
-
 		return smlst
 
 	def rt_table_get_isnumeric(self, id):
 		base.debugmsg(9, "id:", id)
-		if 'IsNumeric' in base.report[id]:
+		pid = base.report_subsection_parent(id)
+		if id in base.report and 'IsNumeric' in base.report[id]:
 			return int(base.report[id]['IsNumeric'])
+		elif pid in base.report and 'IsNumeric' in base.report[pid]:
+			return int(base.report[pid]['IsNumeric'])
 		else:
 			return 0
 
 	def rt_table_set_isnumeric(self, id, value):
 		base.debugmsg(5, "id:", id, "	value:", value)
 		prev = self.rt_table_get_isnumeric(id)
-		if value != prev and value != None:
+		if value != prev and value is not None:
 			base.report[id]['IsNumeric'] = base.whitespace_set_ini_value(str(value))
 			base.report_item_set_changed(id)
 			base.report_save()
+			return 1
+		return 0
 
 	def rt_table_get_showcount(self, id):
 		base.debugmsg(9, "id:", id)
-		if 'ShowCount' in base.report[id]:
+		pid = base.report_subsection_parent(id)
+		if id in base.report and 'ShowCount' in base.report[id]:
 			return int(base.report[id]['ShowCount'])
+		elif pid in base.report and 'ShowCount' in base.report[pid]:
+			return int(base.report[pid]['ShowCount'])
 		else:
 			return 0
 
 	def rt_table_set_showcount(self, id, value):
 		base.debugmsg(5, "id:", id, "	value:", value)
 		prev = self.rt_table_get_showcount(id)
-		if value != prev and value != None:
+		if value != prev and value is not None:
 			base.report[id]['ShowCount'] = base.whitespace_set_ini_value(str(value))
 			base.report_item_set_changed(id)
 			base.report_save()
-
+			return 1
+		return 0
 
 	#
 	# Result data db Functions
 	#
+	def column_in_table(self, table, column):
+		sql = "SELECT 1 [HasColumn] FROM pragma_table_info('{}') WHERE Name = '{}'".format(table, column)
+		base.debugmsg(8, "sql:", sql)
+		key = "HasColumn_{}_{}".format(table, column)
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+		while key not in base.dbqueue["ReadResult"]:
+			time.sleep(0.1)
+
+		tdata = base.dbqueue["ReadResult"][key]
+		base.debugmsg(8, "tdata:", tdata)
+		hascol = 0
+		if len(tdata) > 0:
+			# table headers
+			if "HasColumn" in tdata[0]:
+				hascol = tdata[0]["HasColumn"]
+
+		if "DBTable" not in base.settings:
+			base.settings["DBTable"] = {}
+		if table not in base.settings["DBTable"]:
+			base.settings["DBTable"][table] = {}
+		base.settings["DBTable"][table][column] = hascol
+		# base.settings["DBTable"]['Metrics']['DataSource']
 
 	def open_results_db(self, dbpath):
 		self.close_results_db()
@@ -1682,6 +2114,8 @@ class ReporterBase():
 			self.datadb = sqlite3.connect(dbpath)
 			self.datadb.create_aggregate("percentile", 2, percentile)
 			self.datadb.create_aggregate("stdev", 1, stdevclass)
+			mds = threading.Thread(target=lambda: self.column_in_table("Metrics", "DataSource"))
+			mds.start()
 
 	def close_results_db(self):
 		# base.config['Reporter']['Results']
@@ -1696,9 +2130,7 @@ class ReporterBase():
 		while base.run_dbthread:
 			if (self.datadb is None):
 				base.debugmsg(9, "open results database")
-				# self.ensure_db()
-				# base.config['Reporter']['Results']
-				if len(base.config['Reporter']['Results'])>0:
+				if len(base.config['Reporter']['Results']) > 0:
 					self.open_results_db(base.config['Reporter']['Results'])
 				else:
 					base.run_dbthread = False
@@ -1708,7 +2140,7 @@ class ReporterBase():
 				# process db queues
 
 				# General Write
-				if len(base.dbqueue["Write"])>0:
+				if len(base.dbqueue["Write"]) > 0:
 					base.debugmsg(9, "run_db_thread: dbqueue: Write")
 					tmpq = list(base.dbqueue["Write"])
 					base.dbqueue["Write"] = []
@@ -1729,13 +2161,13 @@ class ReporterBase():
 							base.debugmsg(1, "run_db_thread: dbqueue: Write: Item:", item)
 
 				# General Read
-				if len(base.dbqueue["Read"])>0:
+				if len(base.dbqueue["Read"]) > 0:
 					base.debugmsg(9, "run_db_thread: dbqueue: Read")
 					tmpq = list(base.dbqueue["Read"])
 					base.dbqueue["Read"] = []
 					base.debugmsg(9, "run_db_thread: dbqueue: Read: tmpq:", tmpq)
 					for item in tmpq:
-						if "SQL" in item: # and item["VALUES"]:
+						if "SQL" in item:
 							try:
 								base.debugmsg(9, "run_db_thread: dbqueue: Read: SQL:", item["SQL"])
 								self.datadb.row_factory = self.dict_factory
@@ -1756,8 +2188,6 @@ class ReporterBase():
 						else:
 							base.debugmsg(1, "run_db_thread: dbqueue: Read: Item not written, missing key SQL or VALUES")
 							base.debugmsg(1, "run_db_thread: dbqueue: Read: Item:", item)
-
-
 
 			time.sleep(0.1)
 			# end of while base.run_dbthread
@@ -1786,8 +2216,6 @@ class ReporterBase():
 			# clear queue cached results
 			base.dbqueue = {"Write": [], "Read": [], "ReadResult": {}, "Results": [], "Metric": [], "Metrics": []}
 
-
-
 	#
 	# Colour Functions
 	#
@@ -1798,7 +2226,7 @@ class ReporterBase():
 		return self.line_colour(base.namecolours.index(name.lower()))
 
 	def line_colour(self, grp):
-		if grp<len(base.defcolours):
+		if grp < len(base.defcolours):
 			return base.defcolours[grp]
 		else:
 			newcolour = self.get_colour()
@@ -1821,21 +2249,20 @@ class ReporterBase():
 				newcolour = self.make_colour()
 			return newcolour
 
-
 	def make_colour(self):
-		hexchr = ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f']
+		hexchr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f']
 		r1 = hexchr[random.randrange(len(hexchr))]
 		r2 = hexchr[random.randrange(len(hexchr))]
 		g1 = hexchr[random.randrange(len(hexchr))]
 		g2 = hexchr[random.randrange(len(hexchr))]
 		b1 = hexchr[random.randrange(len(hexchr))]
 		b2 = hexchr[random.randrange(len(hexchr))]
-		return "#{}{}{}{}{}{}".format(r1,r2,g1,g2,b1,b2)
+		return "#{}{}{}{}{}{}".format(r1, r2, g1, g2, b1, b2)
 
 	def dl_score(self, colour):
 		# darkness / lightness score
 		self.debugmsg(8, "colour:", colour)
-		m = re.search('\#(.?.?)(.?.?)(.?.?)', colour)
+		m = re.search(r'\#(.?.?)(.?.?)(.?.?)', colour)
 		self.debugmsg(9, "m:", m)
 		self.debugmsg(9, "m 1:", m[1], int(m[1], 16))
 		self.debugmsg(9, "m 2:", m[2], int(m[2], 16))
@@ -1846,21 +2273,15 @@ class ReporterBase():
 
 		self.debugmsg(8, "r:", r, " 	g:", g, " 	b:", b)
 		score = r + g + b
-
-		# if score>300:
-		# 	self.debugmsg(7, "very light? score:", score)
-		#
-		# if score<-300:
-		# 	self.debugmsg(7, "very dark? score:", score)
+		self.debugmsg(8, "score:", score)
 
 		return score
 
 
-
 class ReporterCore:
 
-	cg_data = {}
-	t_export = {}
+	cg_data: Any = {}
+	t_export: Any = {}
 
 	def __init__(self, master=None):
 		base.debugmsg(0, "Robot Framework Swarm: Reporter")
@@ -1872,7 +2293,7 @@ class ReporterCore:
 		parser = argparse.ArgumentParser()
 		parser.add_argument('-g', '--debug', help='Set debug level, default level is 0')
 		parser.add_argument('-v', '--version', help='Display the version and exit', action='store_true')
-		parser.add_argument('-i', '--ini', help='path to alternate ini file') # nargs='?',
+		parser.add_argument('-i', '--ini', help='path to alternate ini file')
 		parser.add_argument('-n', '--nogui', help='Don\'t display the GUI', action='store_true')
 		parser.add_argument('-d', '--dir', help='Results directory')
 		parser.add_argument('-t', '--template', help='Specify the template')
@@ -1884,7 +2305,6 @@ class ReporterCore:
 		# parser.add_argument('--ods', help='Generate an OpenOffice/LibreOffice Calc report', action='store_true')
 		base.args = parser.parse_args()
 
-
 		base.debugmsg(6, "base.args: ", base.args)
 
 		if base.args.debug:
@@ -1895,7 +2315,6 @@ class ReporterCore:
 
 		if base.args.nogui:
 			base.displaygui = False
-
 
 		base.debugmsg(6, "ConfigParser")
 		base.config = configparser.ConfigParser()
@@ -1979,7 +2398,6 @@ class ReporterCore:
 				if os.path.isfile(dbpath):
 					base.config['Reporter']['Results'] = dbpath
 
-
 		self.selectResults(base.config['Reporter']['Results'])
 
 		if not usetemplate and "Report" in base.config['Reporter'] \
@@ -2020,10 +2438,6 @@ class ReporterCore:
 		if base.displaygui:
 			base.gui.mainloop()
 
-		# while base.running:
-		# 	time.sleep(300)
-
-
 	def on_closing(self, _event=None, *extras):
 		base.running = False
 		base.debugmsg(5, "base.running:", base.running)
@@ -2038,14 +2452,13 @@ class ReporterCore:
 		except SystemExit:
 			try:
 				os._exit(0)
-			except:
+			except Exception:
 				pass
-
 
 	def selectResults(self, resultsfile):
 		base.debugmsg(5, "resultsfile:", resultsfile)
 
-		if len(resultsfile)>0:
+		if len(resultsfile) > 0:
 
 			base.stop_db()
 
@@ -2081,19 +2494,18 @@ class ReporterCore:
 			msgout = " ".join(msglst)
 			base.debugmsg(1, msgout)
 
-
 	def export_xhtml(self):
 		self.display_message("Generating XHTML Report")
 
 		sections = base.report_get_order("TOP")
 		base.debugmsg(5, "sections:", sections)
-		sectionpct = 1/(len(sections)+1)
+		sectionpct = 1 / (len(sections) + 1)
 		base.debugmsg(5, "sectionpct:", sectionpct)
 
 		if "XHTML" in self.cg_data:
-			if "progress" in self.cg_data["XHTML"] and self.cg_data["XHTML"]["progress"]<1:
+			if "progress" in self.cg_data["XHTML"] and self.cg_data["XHTML"]["progress"] < 1:
 				self.display_message("Waiting for previous XHTML report to finish")
-				while self.cg_data["XHTML"]["progress"]<1:
+				while self.cg_data["XHTML"]["progress"] < 1:
 					time.sleep(0.5)
 			del self.cg_data["XHTML"]
 		self.cg_data["XHTML"] = {}
@@ -2112,24 +2524,23 @@ class ReporterCore:
 		fontname = base.rs_setting_get_font()
 		fontsize = base.rs_setting_get_fontsize()
 
-		styledata  = ""
-		styledata += "div { font-size: "+str(fontsize)+"px; font-family: \""+fontname+"\"; }"
+		styledata = ""
+		styledata += "div { font-size: " + str(fontsize) + "px; font-family: \"" + fontname + "\"; }"
 		styledata += ".center { text-align: center; }"
 		styledata += ".title { font-size: 200%;}"
 		styledata += ".subtitle { font-size: 150%;}"
 
 		styledata += "table, th, td { border: 1px solid #ccc; border-collapse: collapse; }"
-		styledata += "th { color: "+highlightcolour+"; }"
+		styledata += "th { color: " + highlightcolour + "; }"
 
 		for i in range(6):
-			styledata += "h"+str(i+1)+"	{ color: "+highlightcolour+"; margin-left: "+str(i*5)+"px; }"
+			styledata += "h" + str(i + 1) + "	{ color: " + highlightcolour + "; margin-left: " + str(i * 5) + "px; }"
 
 		bodyindent = 30
-		styledata += ".body { margin-left: "+str(bodyindent)+"px; }"
+		styledata += ".body { margin-left: " + str(bodyindent) + "px; }"
 		#   margin-left: 20px;
 		for i in range(6):
-			styledata += ".TOC"+str(i+1)+"	{margin-left: "+str(i*10)+"px;}"
-
+			styledata += ".TOC" + str(i + 1) + "	{margin-left: " + str(i * 10) + "px;}"
 
 		style.text = styledata
 
@@ -2138,9 +2549,6 @@ class ReporterCore:
 		# self.cg_data["XHTML"]["html"] =
 		self.xhtml_add_sections(body, "TOP", sectionpct)
 
-
-
-
 		base.debugmsg(5, "Report:", base.config['Reporter']['Report'])
 		reportbase, reportext = os.path.splitext(base.config['Reporter']['Report'])
 
@@ -2148,10 +2556,9 @@ class ReporterCore:
 		self.xhtml_save(outfile, self.cg_data["XHTML"]["html"])
 
 		base.debugmsg(5, "outfile:", outfile)
-		self.display_message("Saved XHTML Report:",outfile)
+		self.display_message("Saved XHTML Report:", outfile)
 
 		self.cg_data["XHTML"]["progress"] = 1
-
 
 	def export_pdf(self):
 		base.debugmsg(5, "Not implimented yet.....")
@@ -2161,13 +2568,13 @@ class ReporterCore:
 
 		sections = base.report_get_order("TOP")
 		base.debugmsg(5, "sections:", sections)
-		sectionpct = 1/(len(sections)+1)
+		sectionpct = 1 / (len(sections) + 1)
 		base.debugmsg(5, "sectionpct:", sectionpct)
 
 		if "docx" in self.cg_data:
-			if "progress" in self.cg_data["docx"] and self.cg_data["docx"]["progress"]<1:
+			if "progress" in self.cg_data["docx"] and self.cg_data["docx"]["progress"] < 1:
 				self.display_message("Waiting for previous Word report to finish")
-				while self.cg_data["docx"]["progress"]<1:
+				while self.cg_data["docx"]["progress"] < 1:
 					time.sleep(0.5)
 			del self.cg_data["docx"]
 		self.cg_data["docx"] = {}
@@ -2177,7 +2584,6 @@ class ReporterCore:
 
 		self.docx_configure_style()
 
-
 		self.docx_add_sections("TOP", sectionpct)
 
 		base.debugmsg(5, "Report:", base.config['Reporter']['Report'])
@@ -2186,12 +2592,9 @@ class ReporterCore:
 		self.cg_data["docx"]["document"].save(outfile)
 
 		base.debugmsg(5, "outfile:", outfile)
-		self.display_message("Saved Word Report:",outfile)
+		self.display_message("Saved Word Report:", outfile)
 
 		self.cg_data["docx"]["progress"] = 1
-
-
-
 
 	def export_writer(self):
 		base.debugmsg(5, "Not implimented yet.....")
@@ -2201,13 +2604,13 @@ class ReporterCore:
 
 		sections = base.report_get_order("TOP")
 		base.debugmsg(5, "sections:", sections)
-		sectionpct = 1/(len(sections)+1)
+		sectionpct = 1 / (len(sections) + 1)
 		base.debugmsg(5, "sectionpct:", sectionpct)
 
 		if "xlsx" in self.cg_data:
-			if "progress" in self.cg_data["xlsx"] and self.cg_data["xlsx"]["progress"]<1:
+			if "progress" in self.cg_data["xlsx"] and self.cg_data["xlsx"]["progress"] < 1:
 				self.display_message("Waiting for previous Excel report to finish")
-				while self.cg_data["xlsx"]["progress"]<1:
+				while self.cg_data["xlsx"]["progress"] < 1:
 					time.sleep(0.5)
 			del self.cg_data["xlsx"]
 		self.cg_data["xlsx"] = {}
@@ -2215,14 +2618,11 @@ class ReporterCore:
 
 		self.cg_data["xlsx"]["Workbook"] = openpyxl.Workbook()
 
-
 		self.xlsx_configure_style()
-
 
 		self.xlsx_add_sections("TOP", sectionpct)
 
 		self.cg_data["xlsx"]["Workbook"].active = self.cg_data["xlsx"]["Workbook"].worksheets[0]
-
 
 		base.debugmsg(5, "Report:", base.config['Reporter']['Report'])
 		reportbase, reportext = os.path.splitext(base.config['Reporter']['Report'])
@@ -2230,20 +2630,17 @@ class ReporterCore:
 		self.cg_data["xlsx"]["Workbook"].save(outfile)
 
 		base.debugmsg(5, "outfile:", outfile)
-		self.display_message("Saved Excel Report:",outfile)
+		self.display_message("Saved Excel Report:", outfile)
 
 		self.cg_data["xlsx"]["progress"] = 1
-
-
-
 
 	def export_calc(self):
 		base.debugmsg(5, "Not implimented yet.....")
 
-
 	#
 	# 	XHTML
 	#
+
 	def xhtml_save(self, filename, html):
 		result = etree.tostring(
 			html,
@@ -2274,8 +2671,7 @@ class ReporterCore:
 		# </body>
 		# </html>
 
-
-		M=ElementMaker(namespace=None, nsmap={None: "http://www.w3.org/1999/xhtml"})
+		M = ElementMaker(namespace=None, nsmap={None: "http://www.w3.org/1999/xhtml"})
 		# html = M.html(E.head(E.title("Test page")), E.body(E.p("Hello world")))
 		html = M.html(E.head(E.title("Test page")), E.body())
 
@@ -2286,10 +2682,7 @@ class ReporterCore:
 		# SubElement(_parent, _tag, attrib=None, nsmap=None, **_extra)
 		# thiselmt = E.SubElement(parent, 'div', attrib={'id':id})
 
-
-
 		base.debugmsg(9, "parent:", parent)
-
 
 		sections = base.report_get_order(id)
 		base.debugmsg(9, "sections:", sections)
@@ -2317,7 +2710,7 @@ class ReporterCore:
 
 				tlogo = base.rs_setting_get_file("tlogo")
 				base.debugmsg(5, "tlogo:", tlogo)
-				if len(tlogo)>0:
+				if len(tlogo) > 0:
 					self.xhtml_sections_fileimg(imgtitle, id, tlogo)
 
 			#
@@ -2350,7 +2743,7 @@ class ReporterCore:
 
 		else:
 			thiselmt.set("id", id)
-			newsectionpct = 1/(len(sections)+1)
+			newsectionpct = 1 / (len(sections) + 1)
 			sectionpct = newsectionpct * sectionpct
 			base.debugmsg(9, "sectionpct:", sectionpct)
 			self.xhtml_sections_addheading(thiselmt, id)
@@ -2366,13 +2759,10 @@ class ReporterCore:
 			if stype == "table":
 				self.xhtml_sections_table(thiselmt, id)
 
-
-
 		self.cg_data["XHTML"]["progress"] += sectionpct
-		self.display_message("Generating XHTML Report {}%".format(int(round(self.cg_data["XHTML"]["progress"]*100, 0))))
+		self.display_message("Generating XHTML Report {}%".format(int(round(self.cg_data["XHTML"]["progress"] * 100, 0))))
 
-
-		if len(sections)>0:
+		if len(sections) > 0:
 			for sect in sections:
 				self.xhtml_add_sections(nextparent, sect, sectionpct)
 
@@ -2393,7 +2783,6 @@ class ReporterCore:
 		# a.text = "{} {}".format(number, name)
 		# a.set('href', "#{}".format(id))
 
-
 	def xhtml_sections_fileimg(self, elmt, id, imgfile):
 		base.debugmsg(5, "id:", id, "	imgfile:", imgfile)
 		# img.set("src", imgfile)
@@ -2401,7 +2790,6 @@ class ReporterCore:
 		oimg = Image.open(imgfile)
 		base.debugmsg(9, "oimg:", oimg)
 		self.xhtml_sections_embedimg(elmt, id, oimg)
-
 
 	def xhtml_sections_embedimg(self, elmt, id, oimg):
 		base.debugmsg(8, "id:", id, "	oimg:", oimg)
@@ -2412,9 +2800,8 @@ class ReporterCore:
 		base.debugmsg(9, "oimg format:", oimg.format)
 		# base.debugmsg(5, "oimg info:", oimg.info)
 
-
 		# <img src="data:image/png;base64,
-		srcdata = "data:image/"+oimg.format.lower()+";base64,"
+		srcdata = "data:image/" + oimg.format.lower() + ";base64,"
 
 		# https://stackoverflow.com/questions/48229318/how-to-convert-image-pil-into-base64-without-saving
 		# srcdata += str(base64.b64encode(oimg.tobytes()))
@@ -2430,7 +2817,6 @@ class ReporterCore:
 
 		base.debugmsg(9, "srcdata:", srcdata)
 		img.set("src", srcdata)
-
 
 	def xhtml_sections_contents(self, elmt, id):
 		base.debugmsg(8, "id:", id)
@@ -2477,20 +2863,9 @@ class ReporterCore:
 			type = base.report_item_get_type(id)
 			titlenum = base.report_sect_number(id)
 			titlename = base.report_item_get_name(id)
-			titlelevel = base.report_sect_level(id)
+			# titlelevel = base.report_sect_level(id)
 
 			p = etree.SubElement(elmt, 'p')
-			# p = etree.SubElement(elmt, 'tr')
-			# spc = "&nbsp;&nbsp;"
-			# spc = '&#160;&#160;'
-			# spc = '  '
-			# p.text = spc*level
-			# for i in range(level):
-			# 	td = etree.SubElement(p, 'td')
-
-			# td = etree.SubElement(p, 'td')
-			# td.set("colspan", "10")
-			# a = etree.SubElement(td, 'a')
 			a = etree.SubElement(p, 'a')
 			a.set("class", "TOC{}".format(level))
 			a.text = "{} {}".format(titlenum, titlename)
@@ -2501,16 +2876,13 @@ class ReporterCore:
 			a.set('id', "{}_{}".format(idpre, id))
 			a.set('href', "#{}".format(id))
 
-
-			nextrow = rownum+1
+			nextrow = rownum + 1
 		base.debugmsg(9, "nextrow:", nextrow)
 		if level < flevel:
 			children = base.report_get_order(id)
 			for child in children:
 				nextrow = self.xhtml_sections_contents_row(elmt, child, nextrow, fmode, flevel)
 		return nextrow
-
-
 
 	def xhtml_sections_note(self, elmt, id):
 		base.debugmsg(8, "id:", id)
@@ -2527,26 +2899,42 @@ class ReporterCore:
 
 	def xhtml_sections_graph(self, elmt, id):
 		base.debugmsg(8, "id:", id)
+		pid, idl, idr = base.rt_graph_LR_Ids(id)
+		base.debugmsg(5, "pid:", pid, "	idl:", idl, "	idr:", idr)
 
 		body = etree.SubElement(elmt, 'div')
 		body.set("class", "body")
 
-		datatype = base.rt_graph_get_dt(id)
-		if datatype == "SQL":
-			sql = base.rt_graph_get_sql(id)
+		axisenl = base.rt_graph_get_axisen(idl)
+		axisenr = base.rt_graph_get_axisen(idr)
+
+		datatypel = base.rt_graph_get_dt(idl)
+		datatyper = base.rt_graph_get_dt(idr)
+
+		if datatypel == "SQL":
+			sqll = base.rt_graph_get_sql(idl)
 		else:
-			sql = base.rt_graph_generate_sql(id)
+			sqll = base.rt_graph_generate_sql(idl)
+
+		if datatyper == "SQL":
+			sqlr = base.rt_graph_get_sql(idr)
+		else:
+			sqlr = base.rt_graph_generate_sql(idr)
 
 		gphdpi = 72
 		# gphdpi = 100
-		fig = Figure(dpi=gphdpi) # , tight_layout=True
-		axis = fig.add_subplot(1,1,1)	# , constrained_layout=True??
-		axis.grid(True, 'major', 'both')
+		fig = Figure(dpi=gphdpi)
+		axisl = fig.add_subplot(1, 1, 1)
+		axisl.grid(True, 'major', 'x')
+		axisr = axisl.twinx()
+
 		fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
 
 		canvas = FigureCanvas(fig)
 
 		# https://stackoverflow.com/questions/57316491/how-to-convert-matplotlib-figure-to-pil-image-object-without-saving-image
+		axisl.tick_params(labelleft=False, length=0)
+		axisr.tick_params(labelright=False, length=0)
 
 		try:
 			canvas.draw()
@@ -2554,71 +2942,131 @@ class ReporterCore:
 			base.debugmsg(3, "canvas.draw() Exception:", e)
 		fig.set_tight_layout(True)
 
-
 		dodraw = False
 		graphdata = {}
 
-		if sql is not None and len(sql.strip())>0:
-			base.debugmsg(7, "sql:", sql)
-			key = "{}_{}".format(id, base.report_item_get_changed(id))
-			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
-			while key not in base.dbqueue["ReadResult"]:
-				time.sleep(0.1)
+		if (sqll is not None and len(sqll.strip()) > 0) or (sqlr is not None and len(sqlr.strip()) > 0):
 
-			gdata = base.dbqueue["ReadResult"][key]
-			base.debugmsg(9, "gdata:", gdata)
+			if sqll is not None and len(sqll.strip()) > 0 and axisenl > 0:
+				base.debugmsg(7, "sqll:", sqll)
+				key = "{}_{}".format(idl, base.report_item_get_changed(idl))
+				base.dbqueue["Read"].append({"SQL": sqll, "KEY": key})
+				while key not in base.dbqueue["ReadResult"]:
+					time.sleep(0.1)
 
-			for row in gdata:
-				base.debugmsg(9, "row:", row)
-				if 'Name' in row:
-					name = row['Name']
-					base.debugmsg(9, "name:", name)
-					if name not in graphdata:
-						graphdata[name] = {}
+				gdata = base.dbqueue["ReadResult"][key]
+				base.debugmsg(9, "gdata:", gdata)
 
-						colour = base.named_colour(name)
-						base.debugmsg(8, "name:", name, "	colour:", colour)
-						graphdata[name]["Colour"] = colour
-						# self.contentdata[id]["graphdata"][name]["Time"] = []
-						graphdata[name]["objTime"] = []
-						graphdata[name]["Values"] = []
+				for row in gdata:
+					base.debugmsg(9, "row:", row)
+					if 'Name' in row:
+						name = row['Name']
+						base.debugmsg(9, "name:", name)
+						if name not in graphdata:
+							graphdata[name] = {}
 
-					graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
-					graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
-				else:
-					break
+							colour = base.named_colour(name)
+							base.debugmsg(8, "name:", name, "	colour:", colour)
+							graphdata[name]["Colour"] = colour
+							graphdata[name]["Axis"] = "axisL"
+							# self.contentdata[id]["graphdata"][name]["Time"] = []
+							graphdata[name]["objTime"] = []
+							graphdata[name]["Values"] = []
 
+						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
+					else:
+						break
+
+			if sqlr is not None and len(sqlr.strip()) > 0 and axisenr > 0:
+				base.debugmsg(7, "sqlr:", sqlr)
+				key = "{}_{}".format(idr, base.report_item_get_changed(idr))
+				base.dbqueue["Read"].append({"SQL": sqlr, "KEY": key})
+				while key not in base.dbqueue["ReadResult"]:
+					time.sleep(0.1)
+
+				gdata = base.dbqueue["ReadResult"][key]
+				base.debugmsg(9, "gdata:", gdata)
+
+				for row in gdata:
+					base.debugmsg(9, "row:", row)
+					if 'Name' in row:
+						name = row['Name']
+						base.debugmsg(9, "name:", name)
+						if name not in graphdata:
+							graphdata[name] = {}
+
+							colour = base.named_colour(name)
+							base.debugmsg(8, "name:", name, "	colour:", colour)
+							graphdata[name]["Colour"] = colour
+							graphdata[name]["Axis"] = "axisR"
+							# self.contentdata[id]["graphdata"][name]["Time"] = []
+							graphdata[name]["objTime"] = []
+							graphdata[name]["Values"] = []
+
+						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
+					else:
+						break
 
 			base.debugmsg(9, "graphdata:", graphdata)
 
 			for name in graphdata:
 				base.debugmsg(7, "name:", name)
-				if len(graphdata[name]["Values"])>1 and len(graphdata[name]["Values"])==len(graphdata[name]["objTime"]):
+
+				axis = "axisL"
+				if "Axis" in graphdata[name]:
+					axis = graphdata[name]["Axis"]
+
+				if len(graphdata[name]["Values"]) > 1 and len(graphdata[name]["Values"]) == len(graphdata[name]["objTime"]):
 					try:
-						axis.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name)
+						if axis == "axisL":
+							axisl.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name)
+						elif axis == "axisR":
+							axisr.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name)
 						dodraw = True
 					except Exception as e:
 						base.debugmsg(7, "axis.plot() Exception:", e)
 
-				if len(graphdata[name]["Values"])==1 and len(graphdata[name]["Values"])==len(graphdata[name]["objTime"]):
+				if len(graphdata[name]["Values"]) == 1 and len(graphdata[name]["Values"]) == len(graphdata[name]["objTime"]):
 					try:
-						axis.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name, marker='o')
+						if axis == "axisL":
+							axisl.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name, marker='o')
+						elif axis == "axisR":
+							axisr.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name, marker='o')
 						dodraw = True
 					except Exception as e:
 						base.debugmsg(7, "axis.plot() Exception:", e)
 
 			if dodraw:
 
-				axis.grid(True, 'major', 'both')
+				# Left axis Limits
+				if axisenl > 0:
+					axisl.grid(True, 'major', 'y')
+					axisl.tick_params(labelleft=True, length=5)
 
-				SMetric = "Other"
-				if datatype == "Metric":
-					SMetric = base.rt_table_get_sm(id)
-				base.debugmsg(8, "SMetric:", SMetric)
-				if SMetric in ["Load", "CPU", "MEM", "NET"]:
-					axis.set_ylim(0, 100)
-				else:
-					axis.set_ylim(0)
+					SMetric = "Other"
+					if datatypel == "Metric":
+						SMetric = base.rt_table_get_sm(idl)
+					base.debugmsg(8, "SMetric:", SMetric)
+					if SMetric in ["Load", "CPU", "MEM", "NET"]:
+						axisl.set_ylim(0, 100)
+					else:
+						axisl.set_ylim(0)
+
+				# Right axis Limits
+				if axisenr > 0:
+					axisr.grid(True, 'major', 'y')
+					axisr.tick_params(labelright=True, length=5)
+
+					SMetric = "Other"
+					if datatyper == "Metric":
+						SMetric = base.rt_table_get_sm(idr)
+					base.debugmsg(8, "SMetric:", SMetric)
+					if SMetric in ["Load", "CPU", "MEM", "NET"]:
+						axisr.set_ylim(0, 100)
+					else:
+						axisr.set_ylim(0)
 
 				fig.set_tight_layout(True)
 				fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
@@ -2627,17 +3075,11 @@ class ReporterCore:
 				except Exception as e:
 					base.debugmsg(3, "canvas.draw() Exception:", e)
 
-				# works but messy createing files we then need to delete
-				# filename = "{}.png".format(id)
-				# fig.savefig(filename)
-				# self.xhtml_sections_fileimg(body, id, filename)
-
 				buf = BytesIO()
 				fig.savefig(buf)
 				buf.seek(0)
 				oimg = Image.open(buf)
 				self.xhtml_sections_embedimg(body, id, oimg)
-
 
 	def xhtml_sections_table(self, elmt, id):
 		base.debugmsg(8, "id:", id)
@@ -2652,7 +3094,7 @@ class ReporterCore:
 			sql = base.rt_table_generate_sql(id)
 		colours = base.rt_table_get_colours(id)
 
-		if sql is not None and len(sql.strip())>0:
+		if sql is not None and len(sql.strip()) > 0:
 			base.debugmsg(9, "sql:", sql)
 			key = "{}_{}".format(id, base.report_item_get_changed(id))
 			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
@@ -2662,7 +3104,7 @@ class ReporterCore:
 			tdata = base.dbqueue["ReadResult"][key]
 			base.debugmsg(9, "tdata:", tdata)
 
-			if len(tdata)>0:
+			if len(tdata) > 0:
 				# table headers
 				cols = list(tdata[0].keys())
 				base.debugmsg(8, "cols:", cols)
@@ -2670,8 +3112,10 @@ class ReporterCore:
 				if colours:
 					th = etree.SubElement(tr, 'th')
 				for col in cols:
-					th = etree.SubElement(tr, 'th')
-					th.text = col
+					if col not in ["Colour"]:
+						dispname = base.rt_table_get_colname(id, col)
+						th = etree.SubElement(tr, 'th')
+						th.text = dispname.strip()
 
 				# table rows
 				for row in tdata:
@@ -2681,7 +3125,10 @@ class ReporterCore:
 					if colours:
 
 						base.debugmsg(9, "row:", row)
-						label=row[cols[0]]
+						if "Colour" in row:
+							label = row["Colour"]
+						else:
+							label = row[cols[0]]
 						base.debugmsg(9, "label:", label)
 						colour = base.named_colour(label)
 						base.debugmsg(9, "colour:", colour)
@@ -2692,12 +3139,12 @@ class ReporterCore:
 						rstyle = "background-color:{}; color:{};".format(colour, colour)
 						td.set("style", rstyle)
 
-					for val in vals:
-						td = etree.SubElement(tr, 'td')
-						td.text = str(val)
-
-
-
+					# for val in vals:
+					for col in cols:
+						if col not in ["Colour"]:
+							val = str(row[col]).strip()
+							td = etree.SubElement(tr, 'td')
+							td.text = str(val)
 
 	#
 	# 	MS Word
@@ -2711,7 +3158,7 @@ class ReporterCore:
 		fontname = base.rs_setting_get_font()
 		fontsize = base.rs_setting_get_fontsize()
 
-		rgb_basecolour = RGBColor.from_string('000000')
+		# rgb_basecolour = RGBColor.from_string('000000')
 		rgb_highlightcolour = RGBColor.from_string(highlightcolour)
 		base.debugmsg(5, "rgb_highlightcolour:", rgb_highlightcolour)
 
@@ -2721,7 +3168,6 @@ class ReporterCore:
 		# for style in styles:
 		# 	print(style.name)
 
-
 		# Update Normal
 		style = self.cg_data["docx"]["document"].styles['Normal']
 		style.font.name = fontname
@@ -2730,12 +3176,11 @@ class ReporterCore:
 		style.paragraph_format.left_indent = Cm(0.5)
 		base.debugmsg(5, "style.paragraph_format.left_indent:", style.paragraph_format.left_indent)
 
-
 		# Update Cover Title
 		self.cg_data["docx"]["document"].styles.add_style('Cover Title', WD_STYLE_TYPE.PARAGRAPH)
 		style = self.cg_data["docx"]["document"].styles['Cover Title']
 		style.base_style = self.cg_data["docx"]["document"].styles['Normal']
-		style.font.size = Pt(int(fontsize*2))
+		style.font.size = Pt(int(fontsize * 2))
 		style.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
 		style.paragraph_format.left_indent = Cm(0)
 
@@ -2743,8 +3188,7 @@ class ReporterCore:
 		self.cg_data["docx"]["document"].styles.add_style('Cover Subtitle', WD_STYLE_TYPE.PARAGRAPH)
 		style = self.cg_data["docx"]["document"].styles['Cover Subtitle']
 		style.base_style = self.cg_data["docx"]["document"].styles['Cover Title']
-		style.font.size = Pt(int(fontsize*1.5))
-
+		style.font.size = Pt(int(fontsize * 1.5))
 
 		sizeup = int(fontsize * 0.1)
 		if sizeup < 1:
@@ -2755,7 +3199,7 @@ class ReporterCore:
 		style = self.cg_data["docx"]["document"].styles['Heading 1']
 		# style.base_style = self.cg_data["docx"]["document"].styles['Normal']
 		style.font.name = fontname
-		style.font.size = Pt(fontsize + (6*sizeup))
+		style.font.size = Pt(fontsize + (6 * sizeup))
 		style.font.italic = False
 		style.font.color.rgb = rgb_highlightcolour
 		# style.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -2767,7 +3211,7 @@ class ReporterCore:
 		style = self.cg_data["docx"]["document"].styles['Heading 2']
 		# style.base_style = self.cg_data["docx"]["document"].styles['Normal']
 		style.font.name = fontname
-		style.font.size = Pt(fontsize + (5*sizeup))
+		style.font.size = Pt(fontsize + (5 * sizeup))
 		style.font.italic = False
 		style.font.color.rgb = rgb_highlightcolour
 		style.paragraph_format.page_break_before = False
@@ -2778,7 +3222,7 @@ class ReporterCore:
 		style = self.cg_data["docx"]["document"].styles['Heading 3']
 		# style.base_style = self.cg_data["docx"]["document"].styles['Normal']
 		style.font.name = fontname
-		style.font.size = Pt(fontsize + (4*sizeup))
+		style.font.size = Pt(fontsize + (4 * sizeup))
 		style.font.italic = False
 		style.font.color.rgb = rgb_highlightcolour
 		style.paragraph_format.page_break_before = False
@@ -2789,7 +3233,7 @@ class ReporterCore:
 		style = self.cg_data["docx"]["document"].styles['Heading 4']
 		# style.base_style = self.cg_data["docx"]["document"].styles['Normal']
 		style.font.name = fontname
-		style.font.size = Pt(fontsize + (3*sizeup))
+		style.font.size = Pt(fontsize + (3 * sizeup))
 		style.font.italic = False
 		style.font.color.rgb = rgb_highlightcolour
 		style.paragraph_format.page_break_before = False
@@ -2800,7 +3244,7 @@ class ReporterCore:
 		style = self.cg_data["docx"]["document"].styles['Heading 5']
 		# style.base_style = self.cg_data["docx"]["document"].styles['Normal']
 		style.font.name = fontname
-		style.font.size = Pt(fontsize + (2*sizeup))
+		style.font.size = Pt(fontsize + (2 * sizeup))
 		style.font.italic = False
 		style.font.color.rgb = rgb_highlightcolour
 		style.paragraph_format.page_break_before = False
@@ -2811,13 +3255,12 @@ class ReporterCore:
 		style = self.cg_data["docx"]["document"].styles['Heading 6']
 		# style.base_style = self.cg_data["docx"]["document"].styles['Normal']
 		style.font.name = fontname
-		style.font.size = Pt(fontsize + (1*sizeup))
+		style.font.size = Pt(fontsize + (1 * sizeup))
 		style.font.italic = False
 		style.font.color.rgb = rgb_highlightcolour
 		style.paragraph_format.page_break_before = False
 		style.paragraph_format.keep_with_next = True
 		style.paragraph_format.left_indent = Cm(0)
-
 
 		# Update Table Heading?
 
@@ -2825,7 +3268,7 @@ class ReporterCore:
 		self.cg_data["docx"]["document"].styles.add_style('Table Cell', WD_STYLE_TYPE.PARAGRAPH)
 		style = self.cg_data["docx"]["document"].styles['Table Cell']
 		style.base_style = self.cg_data["docx"]["document"].styles['Normal']
-		style.font.size = Pt(int(fontsize*0.8))
+		style.font.size = Pt(int(fontsize * 0.8))
 		style.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
 		# style.paragraph_format.left_indent = Cm(0)
 		style.paragraph_format.left_indent = Cm(-0.15)
@@ -2839,7 +3282,6 @@ class ReporterCore:
 		style.base_style = self.cg_data["docx"]["document"].styles['Table Cell']
 		style.font.bold = True
 		style.font.color.rgb = rgb_highlightcolour
-
 
 	def docx_add_sections(self, id, sectionpct):
 		base.debugmsg(5, "id:", id, "	sectionpct:", sectionpct)
@@ -2868,7 +3310,7 @@ class ReporterCore:
 
 				tlogo = base.rs_setting_get_file("tlogo")
 				base.debugmsg(5, "tlogo:", tlogo)
-				if len(tlogo)>0:
+				if len(tlogo) > 0:
 					document.add_paragraph("", style='Cover Subtitle')
 					# document.add_picture(tlogo)
 					p = document.add_paragraph("", style='Cover Subtitle')
@@ -2903,7 +3345,7 @@ class ReporterCore:
 			document.add_paragraph(execdr, style='Cover Subtitle')
 			document.add_paragraph("", style='Cover Subtitle')
 		else:
-			newsectionpct = 1/(len(sections)+1)
+			newsectionpct = 1 / (len(sections) + 1)
 			sectionpct = newsectionpct * sectionpct
 			base.debugmsg(5, "sectionpct:", sectionpct)
 			self.docx_sections_addheading(id)
@@ -2919,16 +3361,12 @@ class ReporterCore:
 			if stype == "table":
 				self.docx_sections_table(id)
 
-
-
 		self.cg_data["docx"]["progress"] += sectionpct
-		self.display_message("Generating Word Report {}%".format(int(round(self.cg_data["docx"]["progress"]*100, 0))))
+		self.display_message("Generating Word Report {}%".format(int(round(self.cg_data["docx"]["progress"] * 100, 0))))
 
-
-		if len(sections)>0:
+		if len(sections) > 0:
 			for sect in sections:
 				self.docx_add_sections(sect, sectionpct)
-
 
 	def docx_sections_addheading(self, id):
 		base.debugmsg(5, "id:", id)
@@ -2964,8 +3402,6 @@ class ReporterCore:
 		document = self.cg_data["docx"]["document"]
 		# document.add_paragraph("", style='Normal')
 
-
-
 		paragraph = document.add_paragraph()
 		run = paragraph.add_run()
 		fldChar = OxmlElement('w:fldChar')  # creates a new element
@@ -2973,18 +3409,16 @@ class ReporterCore:
 		instrText = OxmlElement('w:instrText')
 		instrText.set(qn('xml:space'), 'preserve')  # sets attribute on element
 		if mode == "Table Of Contents":
-			instrText.text = 'TOC \\o "1-'+str(level)+'" \\h \\z \\u'   # change 1-3 depending on heading levels you need
+			instrText.text = 'TOC \\o "1-' + str(level) + '" \\h \\z \\u'   # change 1-3 depending on heading levels you need
 
 		# \c "SEQIdentifier"
 		# Lists figures, tables, charts, or other items that are numbered by a SEQ (Sequence) field. Word uses SEQ fields to number items captioned with the Caption command (References > Insert Caption). SEQIdentifier, which corresponds to the caption label, must match the identifier in the SEQ field. For example, { TOC \c "tables" } lists all numbered tables.
 
 		if mode == "Table of Graphs":
-			instrText.text = 'TOC \\o "1-'+str(level)+'" \\c "figures"'
+			instrText.text = 'TOC \\o "1-' + str(level) + '" \\c "figures"'
 
 		if mode == "Table Of Tables":
-			instrText.text = 'TOC \\o "1-'+str(level)+'" \\c "tables"'
-
-
+			instrText.text = 'TOC \\o "1-' + str(level) + '" \\c "tables"'
 
 		fldChar2 = OxmlElement('w:fldChar')
 		fldChar2.set(qn('w:fldCharType'), 'separate')
@@ -3000,11 +3434,6 @@ class ReporterCore:
 		r_element.append(instrText)
 		r_element.append(fldChar2)
 		r_element.append(fldChar4)
-		p_element = paragraph._p
-		# print(p_element.xml)
-
-		# document.add_paragraph("", style='Normal')
-
 
 	def docx_sections_note(self, id):
 		base.debugmsg(5, "id:", id)
@@ -3018,29 +3447,43 @@ class ReporterCore:
 		for line in notelist:
 			document.add_paragraph(line, style='Normal')
 
-
 	def docx_sections_graph(self, id):
 		base.debugmsg(5, "id:", id)
+		pid, idl, idr = base.rt_graph_LR_Ids(id)
+		base.debugmsg(5, "pid:", pid, "	idl:", idl, "	idr:", idr)
 
 		document = self.cg_data["docx"]["document"]
 		# document.add_paragraph("", style='Normal')
 
-		datatype = base.rt_graph_get_dt(id)
-		if datatype == "SQL":
-			sql = base.rt_graph_get_sql(id)
+		axisenl = base.rt_graph_get_axisen(idl)
+		axisenr = base.rt_graph_get_axisen(idr)
+
+		datatypel = base.rt_graph_get_dt(idl)
+		datatyper = base.rt_graph_get_dt(idr)
+
+		if datatypel == "SQL":
+			sqll = base.rt_graph_get_sql(idl)
 		else:
-			sql = base.rt_graph_generate_sql(id)
+			sqll = base.rt_graph_generate_sql(idl)
+
+		if datatyper == "SQL":
+			sqlr = base.rt_graph_get_sql(idr)
+		else:
+			sqlr = base.rt_graph_generate_sql(idr)
 
 		gphdpi = 72
 		# gphdpi = 100
-		fig = Figure(dpi=gphdpi) # , tight_layout=True
-		axis = fig.add_subplot(1,1,1)	# , constrained_layout=True??
-		axis.grid(True, 'major', 'both')
+		fig = Figure(dpi=gphdpi)
+		axisl = fig.add_subplot(1, 1, 1)
+		axisl.grid(True, 'major', 'x')
+		axisr = axisl.twinx()
 		fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
 
 		canvas = FigureCanvas(fig)
 
 		# https://stackoverflow.com/questions/57316491/how-to-convert-matplotlib-figure-to-pil-image-object-without-saving-image
+		axisl.tick_params(labelleft=False, length=0)
+		axisr.tick_params(labelright=False, length=0)
 
 		try:
 			canvas.draw()
@@ -3048,71 +3491,131 @@ class ReporterCore:
 			base.debugmsg(5, "canvas.draw() Exception:", e)
 		fig.set_tight_layout(True)
 
-
 		dodraw = False
 		graphdata = {}
 
-		if sql is not None and len(sql.strip())>0:
-			base.debugmsg(7, "sql:", sql)
-			key = "{}_{}".format(id, base.report_item_get_changed(id))
-			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
-			while key not in base.dbqueue["ReadResult"]:
-				time.sleep(0.1)
+		if (sqll is not None and len(sqll.strip()) > 0) or (sqlr is not None and len(sqlr.strip()) > 0):
 
-			gdata = base.dbqueue["ReadResult"][key]
-			base.debugmsg(9, "gdata:", gdata)
+			if sqll is not None and len(sqll.strip()) > 0 and axisenl > 0:
+				base.debugmsg(7, "sqll:", sqll)
+				key = "{}_{}".format(idl, base.report_item_get_changed(idl))
+				base.dbqueue["Read"].append({"SQL": sqll, "KEY": key})
+				while key not in base.dbqueue["ReadResult"]:
+					time.sleep(0.1)
 
-			for row in gdata:
-				base.debugmsg(9, "row:", row)
-				if 'Name' in row:
-					name = row['Name']
-					base.debugmsg(9, "name:", name)
-					if name not in graphdata:
-						graphdata[name] = {}
+				gdata = base.dbqueue["ReadResult"][key]
+				base.debugmsg(9, "gdata:", gdata)
 
-						colour = base.named_colour(name)
-						base.debugmsg(8, "name:", name, "	colour:", colour)
-						graphdata[name]["Colour"] = colour
-						# self.contentdata[id]["graphdata"][name]["Time"] = []
-						graphdata[name]["objTime"] = []
-						graphdata[name]["Values"] = []
+				for row in gdata:
+					base.debugmsg(9, "row:", row)
+					if 'Name' in row:
+						name = row['Name']
+						base.debugmsg(9, "name:", name)
+						if name not in graphdata:
+							graphdata[name] = {}
 
-					graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
-					graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
-				else:
-					break
+							colour = base.named_colour(name)
+							base.debugmsg(8, "name:", name, "	colour:", colour)
+							graphdata[name]["Colour"] = colour
+							graphdata[name]["Axis"] = "axisL"
+							# self.contentdata[id]["graphdata"][name]["Time"] = []
+							graphdata[name]["objTime"] = []
+							graphdata[name]["Values"] = []
 
+						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
+					else:
+						break
+
+			if sqlr is not None and len(sqlr.strip()) > 0 and axisenr > 0:
+				base.debugmsg(7, "sqlr:", sqlr)
+				key = "{}_{}".format(idr, base.report_item_get_changed(idr))
+				base.dbqueue["Read"].append({"SQL": sqlr, "KEY": key})
+				while key not in base.dbqueue["ReadResult"]:
+					time.sleep(0.1)
+
+				gdata = base.dbqueue["ReadResult"][key]
+				base.debugmsg(9, "gdata:", gdata)
+
+				for row in gdata:
+					base.debugmsg(9, "row:", row)
+					if 'Name' in row:
+						name = row['Name']
+						base.debugmsg(9, "name:", name)
+						if name not in graphdata:
+							graphdata[name] = {}
+
+							colour = base.named_colour(name)
+							base.debugmsg(8, "name:", name, "	colour:", colour)
+							graphdata[name]["Colour"] = colour
+							graphdata[name]["Axis"] = "axisR"
+							# self.contentdata[id]["graphdata"][name]["Time"] = []
+							graphdata[name]["objTime"] = []
+							graphdata[name]["Values"] = []
+
+						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
+					else:
+						break
 
 			base.debugmsg(9, "graphdata:", graphdata)
 
 			for name in graphdata:
 				base.debugmsg(7, "name:", name)
-				if len(graphdata[name]["Values"])>1 and len(graphdata[name]["Values"])==len(graphdata[name]["objTime"]):
+
+				axis = "axisL"
+				if "Axis" in graphdata[name]:
+					axis = graphdata[name]["Axis"]
+
+				if len(graphdata[name]["Values"]) > 1 and len(graphdata[name]["Values"]) == len(graphdata[name]["objTime"]):
 					try:
-						axis.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name)
+						if axis == "axisL":
+							axisl.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name)
+						elif axis == "axisR":
+							axisr.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name)
 						dodraw = True
 					except Exception as e:
 						base.debugmsg(7, "axis.plot() Exception:", e)
 
-				if len(graphdata[name]["Values"])==1 and len(graphdata[name]["Values"])==len(graphdata[name]["objTime"]):
+				if len(graphdata[name]["Values"]) == 1 and len(graphdata[name]["Values"]) == len(graphdata[name]["objTime"]):
 					try:
-						axis.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name, marker='o')
+						if axis == "axisL":
+							axisl.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name, marker='o')
+						elif axis == "axisR":
+							axisr.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name, marker='o')
 						dodraw = True
 					except Exception as e:
 						base.debugmsg(7, "axis.plot() Exception:", e)
 
 			if dodraw:
 
-				axis.grid(True, 'major', 'both')
+				# Left axis Limits
+				if axisenl > 0:
+					axisl.grid(True, 'major', 'y')
+					axisl.tick_params(labelleft=True, length=5)
 
-				SMetric = "Other"
-				if datatype == "Metric":
-					SMetric = base.rt_table_get_sm(id)
-				base.debugmsg(8, "SMetric:", SMetric)
-				if SMetric in ["Load", "CPU", "MEM", "NET"]:
-					axis.set_ylim(0, 100)
-				else:
-					axis.set_ylim(0)
+					SMetric = "Other"
+					if datatypel == "Metric":
+						SMetric = base.rt_table_get_sm(idl)
+					base.debugmsg(8, "SMetric:", SMetric)
+					if SMetric in ["Load", "CPU", "MEM", "NET"]:
+						axisl.set_ylim(0, 100)
+					else:
+						axisl.set_ylim(0)
+
+				# Right axis Limits
+				if axisenr > 0:
+					axisr.grid(True, 'major', 'y')
+					axisr.tick_params(labelright=True, length=5)
+
+					SMetric = "Other"
+					if datatyper == "Metric":
+						SMetric = base.rt_table_get_sm(idr)
+					base.debugmsg(8, "SMetric:", SMetric)
+					if SMetric in ["Load", "CPU", "MEM", "NET"]:
+						axisr.set_ylim(0, 100)
+					else:
+						axisr.set_ylim(0)
 
 				fig.set_tight_layout(True)
 				fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
@@ -3134,8 +3637,6 @@ class ReporterCore:
 				# base.debugmsg(5, "pic.parent:", pic.parent)
 				document.paragraphs[-1].paragraph_format.left_indent = Cm(-0.5)
 
-
-
 	def docx_sections_table(self, id):
 		base.debugmsg(5, "id:", id)
 
@@ -3149,7 +3650,7 @@ class ReporterCore:
 			sql = base.rt_table_generate_sql(id)
 		colours = base.rt_table_get_colours(id)
 
-		if sql is not None and len(sql.strip())>0:
+		if sql is not None and len(sql.strip()) > 0:
 			base.debugmsg(8, "sql:", sql)
 			key = "{}_{}".format(id, base.report_item_get_changed(id))
 			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
@@ -3159,7 +3660,7 @@ class ReporterCore:
 			tdata = base.dbqueue["ReadResult"][key]
 			base.debugmsg(8, "tdata:", tdata)
 
-			if len(tdata)>0:
+			if len(tdata) > 0:
 				# table headers
 				cols = list(tdata[0].keys())
 				base.debugmsg(7, "cols:", cols)
@@ -3170,6 +3671,8 @@ class ReporterCore:
 				if colours:
 					numcols += 1
 					cellcol += 1
+				if "Colour" in cols:
+					numcols -= 1
 
 				table = document.add_table(rows=1, cols=numcols)
 				# Table Grid Light
@@ -3177,26 +3680,22 @@ class ReporterCore:
 				# table.style = "Table Grid Light"
 				table.style = document.styles['Table Grid']
 
-				# table.autofit = True
-				# table.style.paragraph_format.left_indent = Cm(-0.50)
-				# table.style.paragraph_format.left_indent = Cm(-0.50)
-
 				if colours:
-					table.columns[cellcol-1].width = Cm(0.5)
-					table.rows[cellrow].cells[cellcol-1].paragraphs[0].style = "Table Header"
+					table.columns[cellcol - 1].width = Cm(0.5)
+					table.rows[cellrow].cells[cellcol - 1].paragraphs[0].style = "Table Header"
 
 				cw = 5
 				for col in cols:
-					# table.rows[cellrow].cells[cellcol].text = col
-					# table.rows[cellrow].cells[cellcol].add_paragraph(text=col, style="Table Header")
-					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
-					table.rows[cellrow].cells[cellcol].paragraphs[0].text = col
-					table.columns[cellcol].width = Cm(cw)
-					if cw>2:
-						cw = 1.7
-					if cellcol>5:
-						cw = 1.1
-					cellcol += 1
+					if col not in ["Colour"]:
+						dispname = base.rt_table_get_colname(id, col)
+						table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+						table.rows[cellrow].cells[cellcol].paragraphs[0].text = dispname.strip()
+						table.columns[cellcol].width = Cm(cw)
+						if cw > 2:
+							cw = 1.7
+						if cellcol > 5:
+							cw = 1.1
+						cellcol += 1
 
 				# table rows
 				for row in tdata:
@@ -3210,13 +3709,15 @@ class ReporterCore:
 					if colours:
 
 						base.debugmsg(9, "row:", row)
-						label=row[cols[0]]
+						if "Colour" in row:
+							label = row["Colour"]
+						else:
+							label = row[cols[0]]
 						base.debugmsg(9, "label:", label)
 						colour = base.named_colour(label)
 						base.debugmsg(9, "colour:", colour)
 
-						swatch = Image.new(mode="RGB", size=(100,100), color=colour)
-
+						swatch = Image.new(mode="RGB", size=(100, 100), color=colour)
 
 						buffered = BytesIO()
 						# swatch.save(buffered, format=swatch.format)
@@ -3233,34 +3734,30 @@ class ReporterCore:
 
 						run = table.rows[cellrow].cells[cellcol].paragraphs[0].add_run()
 						table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-						# run.add_picture(pic, width = 1400000, height = 1400000)
-						run.add_picture(buffered, width = Cm(0.5))
-						# run.add_picture(buffered)
 
-
-						# document.add_picture(buffered)
-
+						run.add_picture(buffered, width=Cm(0.5))
 
 						cellcol += 1
 
-					for val in vals:
-						# table.rows[cellrow].cells[cellcol].text = str(val)
-						# table.rows[cellrow].cells[cellcol].add_paragraph(text=str(val), style="Table Cell")
-						table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-						table.rows[cellrow].cells[cellcol].paragraphs[0].text = str(val)
+					# for val in vals:
+					for col in cols:
+						if col not in ["Colour"]:
+							val = str(row[col]).strip()
+							# table.rows[cellrow].cells[cellcol].text = str(val)
+							# table.rows[cellrow].cells[cellcol].add_paragraph(text=str(val), style="Table Cell")
+							table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+							table.rows[cellrow].cells[cellcol].paragraphs[0].text = str(val)
 
-						tcw = int(table.columns[cellcol].width.cm) +1
-						# base.debugmsg(5, "tcw:", tcw)
-						if tcw>5:
-							table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+							tcw = int(table.columns[cellcol].width.cm) + 1
+							# base.debugmsg(5, "tcw:", tcw)
+							if tcw > 5:
+								table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 
-						cellcol += 1
-
+							cellcol += 1
 
 				table.autofit = True
 				# table.style.paragraph_format.left_indent = Cm(-0.50)
 				# table.style.paragraph_format.right_indent = Cm(-0.50)
-
 
 	#
 	# 	MS Excel
@@ -3277,7 +3774,6 @@ class ReporterCore:
 
 		wb = self.cg_data["xlsx"]["Workbook"]
 
-
 		default = openpyxl.styles.NamedStyle(name="Default")
 		default.font.name = fontname
 		default.font.size = fontsize
@@ -3292,12 +3788,11 @@ class ReporterCore:
 		highlight.font.color = highlightcolour
 		wb.add_named_style(highlight)
 
-
 		# title = openpyxl.styles.NamedStyle(name="CoverTitle")
 		title = copy(default)
 		title.name = "CoverTitle"
 		# title.font.name = fontname
-		title.font.size = fontsize*2
+		title.font.size = fontsize * 2
 		# title.font.color = basecolour
 		title.alignment.horizontal = 'center'
 		title.alignment.wrapText = True
@@ -3308,7 +3803,7 @@ class ReporterCore:
 		subtitle = copy(title)
 		subtitle.name = "CoverSubTitle"
 		# subtitle.font.name = fontname
-		subtitle.font.size = fontsize*1.5
+		subtitle.font.size = fontsize * 1.5
 		# subtitle.font.color = basecolour
 		# subtitle.alignment.horizontal = 'center'
 		# subtitle.alignment.wrapText = True
@@ -3321,18 +3816,17 @@ class ReporterCore:
 		headings = {}
 		fm = 2
 		for i in range(6):
-			base.debugmsg(7, "i:", i, i+1)
-			hnum = i+1
+			base.debugmsg(7, "i:", i, i + 1)
+			hnum = i + 1
 			headings[hnum] = copy(highlight)
-			headings[hnum].name = "Heading "+str(hnum)
-			headings[hnum].font.size = int(fontsize*fm)
+			headings[hnum].name = "Heading " + str(hnum)
+			headings[hnum].font.size = int(fontsize * fm)
 			wb.add_named_style(headings[hnum])
 
 			fm -= 0.2
 
-
 		# Table Heading
-		side = openpyxl.styles.borders.Side(style="tblside", color='CCCCCC', border_style='thin') # 'thin' 'hair' 'medium'
+		side = openpyxl.styles.borders.Side(style="tblside", color='CCCCCC', border_style='thin')  # 'thin' 'hair' 'medium'
 		borders = openpyxl.styles.borders.Border(left=side, right=side, top=side, bottom=side)
 		tableh = copy(highlight)
 		tableh.name = "Table Heading"
@@ -3345,7 +3839,6 @@ class ReporterCore:
 		tabled.border = borders
 		wb.add_named_style(tabled)
 
-
 	def xlsx_add_sections(self, id, sectionpct):
 		base.debugmsg(7, "id:", id, "	sectionpct:", sectionpct)
 
@@ -3355,16 +3848,12 @@ class ReporterCore:
 		base.debugmsg(9, "ws:", ws)
 		base.debugmsg(9, "ws.title:", ws.title)
 
-
 		sections = base.report_get_order(id)
 		base.debugmsg(9, "sections:", sections)
 
 		if id == "TOP":
 
 			ws.title = "Cover"
-			# ws['D5'].style = 'highlight'
-			# ws.cells().style = 'Default'
-
 
 			rownum = 0
 
@@ -3381,7 +3870,7 @@ class ReporterCore:
 
 			fontsize = base.rs_setting_get_fontsize()
 			rd = ws.row_dimensions[rownum]
-			rd.height = fontsize*5
+			rd.height = fontsize * 5
 
 			#
 			# Logo
@@ -3392,11 +3881,10 @@ class ReporterCore:
 
 				tlogo = base.rs_setting_get_file("tlogo")
 				base.debugmsg(7, "tlogo:", tlogo)
-				if len(tlogo)>0:
+				if len(tlogo) > 0:
 					img = openpyxl.drawing.image.Image(tlogo)
 					cellname = ws.cell(row=rownum, column=1).coordinate
 					ws.add_image(img, cellname)
-
 
 			#
 			# Execution Date range
@@ -3429,10 +3917,10 @@ class ReporterCore:
 			subtitlecell.style = "CoverSubTitle"
 
 			rd = ws.row_dimensions[rownum]
-			rd.height = fontsize*2
+			rd.height = fontsize * 2
 
 		else:
-			newsectionpct = 1/(len(sections)+1)
+			newsectionpct = 1 / (len(sections) + 1)
 			sectionpct = newsectionpct * sectionpct
 			base.debugmsg(8, "sectionpct:", sectionpct)
 			self.xlsx_sections_addheading(id)
@@ -3453,15 +3941,11 @@ class ReporterCore:
 				pass
 
 		self.cg_data["xlsx"]["progress"] += sectionpct
-		self.display_message("Generating Excel Report {}%".format(int(round(self.cg_data["xlsx"]["progress"]*100, 0))))
+		self.display_message("Generating Excel Report {}%".format(int(round(self.cg_data["xlsx"]["progress"] * 100, 0))))
 
-
-		if len(sections)>0:
+		if len(sections) > 0:
 			for sect in sections:
 				self.xlsx_add_sections(sect, sectionpct)
-
-
-
 
 	def xlsx_sections_addheading(self, id):
 		base.debugmsg(8, "id:", id)
@@ -3477,7 +3961,6 @@ class ReporterCore:
 		# acell = ws.cell(ws.active_cell)
 		acell = ws[ws.active_cell]
 		rownum = acell.row
-
 
 		level = base.report_sect_level(id)
 		base.debugmsg(8, "level:", level)
@@ -3497,12 +3980,12 @@ class ReporterCore:
 			rownum = 1
 
 		titlecell = ws.cell(column=1, row=rownum, value=heading_text)
-		titlecell.style = "Heading "+str(level)
+		titlecell.style = "Heading " + str(level)
 
 		if level < 5:
 			fontsize = base.rs_setting_get_fontsize()
 			rd = ws.row_dimensions[rownum]
-			rd.height = fontsize*2
+			rd.height = fontsize * 2
 
 		# base.debugmsg(5, "ws.active_cell:", ws.active_cell, "	ws.selected_cell:", ws.selected_cell)
 
@@ -3514,11 +3997,6 @@ class ReporterCore:
 	def xlsx_sections_contents(self, id):
 		base.debugmsg(8, "id:", id)
 
-		wb = self.cg_data["xlsx"]["Workbook"]
-		ws = wb.active
-		rownum = ws[ws.active_cell].row
-
-
 		mode = base.rt_contents_get_mode(id)
 		maxlevel = base.rt_contents_get_level(id)
 		fmode = None
@@ -3528,7 +4006,6 @@ class ReporterCore:
 			fmode = "graph"
 		if mode == "Table Of Tables":
 			fmode = "table"
-
 
 		self.xlsx_sections_contents_row("TOP", maxlevel, fmode)
 
@@ -3550,12 +4027,10 @@ class ReporterCore:
 			if mode != type:
 				display = False
 
-
 		if display:
 			wb = self.cg_data["xlsx"]["Workbook"]
 			ws = wb.active
 			rownum = ws[ws.active_cell].row
-
 
 			number = base.report_sect_number(id)
 			base.debugmsg(9, "number:", number)
@@ -3566,10 +4041,10 @@ class ReporterCore:
 
 			heading_text = "{} {}".format(number, name)
 
-			if level>1:
+			if level > 1:
 				parentid = base.report_item_parent(id)
 				parentlvl = base.report_sect_level(parentid)
-				while parentlvl >1:
+				while parentlvl > 1:
 					base.debugmsg(9, "parentid:", parentid)
 					base.debugmsg(9, "parentlvl:", parentlvl)
 
@@ -3588,24 +4063,22 @@ class ReporterCore:
 			else:
 				parent_text = heading_text
 
-
 			rownum += 1
 			self.xlsx_select_cell(1, rownum)
 			c = ws[ws.active_cell]
 			# =HYPERLINK(CONCAT("#'10 agents'!A",MATCH("10.8 selenium versions",'10 agents' A:A,0)),'10.8 selenium versions')
-			match = "MATCH(\""+heading_text+"\",'"+parent_text+"'!A:A,0)"
+			match = "MATCH(\"" + heading_text + "\",'" + parent_text + "'!A:A,0)"
 			base.debugmsg(9, "match:", match)
-			concat = "CONCATENATE(\"#'"+parent_text+"'!A\"," + match + ")"
+			concat = "CONCATENATE(\"#'" + parent_text + "'!A\"," + match + ")"
 			base.debugmsg(9, "concat:", concat)
-			hyper = "=HYPERLINK("+concat+ ",\""+heading_text+"\")"
+			hyper = "=HYPERLINK(" + concat + ",\"" + heading_text + "\")"
 			base.debugmsg(8, "hyper:", hyper)
 			c.value = hyper
 
 		if level < maxlevel:
-			if len(sections)>0:
+			if len(sections) > 0:
 				for sect in sections:
 					self.xlsx_sections_contents_row(sect, maxlevel, mode)
-
 
 	def xlsx_sections_note(self, id):
 		base.debugmsg(8, "id:", id)
@@ -3623,12 +4096,14 @@ class ReporterCore:
 		notelist = notebody.split("\n")
 		for line in notelist:
 			linecell = ws.cell(column=1, row=rownum, value=line)
-			linecell.style="Default"
+			linecell.style = "Default"
 			rownum += 1
 			self.xlsx_select_cell(1, rownum)
 
 	def xlsx_sections_graph(self, id):
 		base.debugmsg(5, "id:", id)
+		pid, idl, idr = base.rt_graph_LR_Ids(id)
+		base.debugmsg(5, "pid:", pid, "	idl:", idl, "	idr:", idr)
 
 		wb = self.cg_data["xlsx"]["Workbook"]
 		ws = wb.active
@@ -3637,22 +4112,35 @@ class ReporterCore:
 		rownum += 1
 		self.xlsx_select_cell(1, rownum)
 
-		datatype = base.rt_graph_get_dt(id)
-		if datatype == "SQL":
-			sql = base.rt_graph_get_sql(id)
+		axisenl = base.rt_graph_get_axisen(idl)
+		axisenr = base.rt_graph_get_axisen(idr)
+
+		datatypel = base.rt_graph_get_dt(idl)
+		datatyper = base.rt_graph_get_dt(idr)
+
+		if datatypel == "SQL":
+			sqll = base.rt_graph_get_sql(idl)
 		else:
-			sql = base.rt_graph_generate_sql(id)
+			sqll = base.rt_graph_generate_sql(idl)
+
+		if datatyper == "SQL":
+			sqlr = base.rt_graph_get_sql(idr)
+		else:
+			sqlr = base.rt_graph_generate_sql(idr)
 
 		gphdpi = 72
 		# gphdpi = 100
-		fig = Figure(dpi=gphdpi) # , tight_layout=True
-		axis = fig.add_subplot(1,1,1)	# , constrained_layout=True??
-		axis.grid(True, 'major', 'both')
+		fig = Figure(dpi=gphdpi)
+		axisl = fig.add_subplot(1, 1, 1)
+		axisl.grid(True, 'major', 'x')
+		axisr = axisl.twinx()
 		fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
 
 		canvas = FigureCanvas(fig)
 
 		# https://stackoverflow.com/questions/57316491/how-to-convert-matplotlib-figure-to-pil-image-object-without-saving-image
+		axisl.tick_params(labelleft=False, length=0)
+		axisr.tick_params(labelright=False, length=0)
 
 		try:
 			canvas.draw()
@@ -3660,71 +4148,131 @@ class ReporterCore:
 			base.debugmsg(5, "canvas.draw() Exception:", e)
 		fig.set_tight_layout(True)
 
-
 		dodraw = False
 		graphdata = {}
 
-		if sql is not None and len(sql.strip())>0:
-			base.debugmsg(7, "sql:", sql)
-			key = "{}_{}".format(id, base.report_item_get_changed(id))
-			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
-			while key not in base.dbqueue["ReadResult"]:
-				time.sleep(0.1)
+		if (sqll is not None and len(sqll.strip()) > 0) or (sqlr is not None and len(sqlr.strip()) > 0):
 
-			gdata = base.dbqueue["ReadResult"][key]
-			base.debugmsg(9, "gdata:", gdata)
+			if sqll is not None and len(sqll.strip()) > 0 and axisenl > 0:
+				base.debugmsg(7, "sqll:", sqll)
+				key = "{}_{}".format(idl, base.report_item_get_changed(idl))
+				base.dbqueue["Read"].append({"SQL": sqll, "KEY": key})
+				while key not in base.dbqueue["ReadResult"]:
+					time.sleep(0.1)
 
-			for row in gdata:
-				base.debugmsg(9, "row:", row)
-				if 'Name' in row:
-					name = row['Name']
-					base.debugmsg(9, "name:", name)
-					if name not in graphdata:
-						graphdata[name] = {}
+				gdata = base.dbqueue["ReadResult"][key]
+				base.debugmsg(9, "gdata:", gdata)
 
-						colour = base.named_colour(name)
-						base.debugmsg(8, "name:", name, "	colour:", colour)
-						graphdata[name]["Colour"] = colour
-						# self.contentdata[id]["graphdata"][name]["Time"] = []
-						graphdata[name]["objTime"] = []
-						graphdata[name]["Values"] = []
+				for row in gdata:
+					base.debugmsg(9, "row:", row)
+					if 'Name' in row:
+						name = row['Name']
+						base.debugmsg(9, "name:", name)
+						if name not in graphdata:
+							graphdata[name] = {}
 
-					graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
-					graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
-				else:
-					break
+							colour = base.named_colour(name)
+							base.debugmsg(8, "name:", name, "	colour:", colour)
+							graphdata[name]["Colour"] = colour
+							graphdata[name]["Axis"] = "axisL"
+							# self.contentdata[id]["graphdata"][name]["Time"] = []
+							graphdata[name]["objTime"] = []
+							graphdata[name]["Values"] = []
 
+						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
+					else:
+						break
+
+			if sqlr is not None and len(sqlr.strip()) > 0 and axisenr > 0:
+				base.debugmsg(7, "sqlr:", sqlr)
+				key = "{}_{}".format(idr, base.report_item_get_changed(idr))
+				base.dbqueue["Read"].append({"SQL": sqlr, "KEY": key})
+				while key not in base.dbqueue["ReadResult"]:
+					time.sleep(0.1)
+
+				gdata = base.dbqueue["ReadResult"][key]
+				base.debugmsg(9, "gdata:", gdata)
+
+				for row in gdata:
+					base.debugmsg(9, "row:", row)
+					if 'Name' in row:
+						name = row['Name']
+						base.debugmsg(9, "name:", name)
+						if name not in graphdata:
+							graphdata[name] = {}
+
+							colour = base.named_colour(name)
+							base.debugmsg(8, "name:", name, "	colour:", colour)
+							graphdata[name]["Colour"] = colour
+							graphdata[name]["Axis"] = "axisR"
+							# self.contentdata[id]["graphdata"][name]["Time"] = []
+							graphdata[name]["objTime"] = []
+							graphdata[name]["Values"] = []
+
+						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
+					else:
+						break
 
 			base.debugmsg(9, "graphdata:", graphdata)
 
 			for name in graphdata:
 				base.debugmsg(7, "name:", name)
-				if len(graphdata[name]["Values"])>1 and len(graphdata[name]["Values"])==len(graphdata[name]["objTime"]):
+
+				axis = "axisL"
+				if "Axis" in graphdata[name]:
+					axis = graphdata[name]["Axis"]
+
+				if len(graphdata[name]["Values"]) > 1 and len(graphdata[name]["Values"]) == len(graphdata[name]["objTime"]):
 					try:
-						axis.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name)
+						if axis == "axisL":
+							axisl.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name)
+						elif axis == "axisR":
+							axisr.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name)
 						dodraw = True
 					except Exception as e:
 						base.debugmsg(7, "axis.plot() Exception:", e)
 
-				if len(graphdata[name]["Values"])==1 and len(graphdata[name]["Values"])==len(graphdata[name]["objTime"]):
+				if len(graphdata[name]["Values"]) == 1 and len(graphdata[name]["Values"]) == len(graphdata[name]["objTime"]):
 					try:
-						axis.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name, marker='o')
+						if axis == "axisL":
+							axisl.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name, marker='o')
+						elif axis == "axisR":
+							axisr.plot(graphdata[name]["objTime"], graphdata[name]["Values"], graphdata[name]["Colour"], label=name, marker='o')
 						dodraw = True
 					except Exception as e:
 						base.debugmsg(7, "axis.plot() Exception:", e)
 
 			if dodraw:
 
-				axis.grid(True, 'major', 'both')
+				# Left axis Limits
+				if axisenl > 0:
+					axisl.grid(True, 'major', 'y')
+					axisl.tick_params(labelleft=True, length=5)
 
-				SMetric = "Other"
-				if datatype == "Metric":
-					SMetric = base.rt_table_get_sm(id)
-				base.debugmsg(8, "SMetric:", SMetric)
-				if SMetric in ["Load", "CPU", "MEM", "NET"]:
-					axis.set_ylim(0, 100)
-				else:
-					axis.set_ylim(0)
+					SMetric = "Other"
+					if datatypel == "Metric":
+						SMetric = base.rt_table_get_sm(idl)
+					base.debugmsg(8, "SMetric:", SMetric)
+					if SMetric in ["Load", "CPU", "MEM", "NET"]:
+						axisl.set_ylim(0, 100)
+					else:
+						axisl.set_ylim(0)
+
+				# Right axis Limits
+				if axisenr > 0:
+					axisr.grid(True, 'major', 'y')
+					axisr.tick_params(labelright=True, length=5)
+
+					SMetric = "Other"
+					if datatyper == "Metric":
+						SMetric = base.rt_table_get_sm(idr)
+					base.debugmsg(8, "SMetric:", SMetric)
+					if SMetric in ["Load", "CPU", "MEM", "NET"]:
+						axisr.set_ylim(0, 100)
+					else:
+						axisr.set_ylim(0)
 
 				fig.set_tight_layout(True)
 				fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
@@ -3732,11 +4280,6 @@ class ReporterCore:
 					canvas.draw()
 				except Exception as e:
 					base.debugmsg(5, "canvas.draw() Exception:", e)
-
-				# works but messy createing files we then need to delete
-				# filename = "{}.png".format(id)
-				# fig.savefig(filename)
-				# self.xhtml_sections_fileimg(body, id, filename)
 
 				buf = BytesIO()
 				fig.savefig(buf)
@@ -3746,7 +4289,6 @@ class ReporterCore:
 				img = openpyxl.drawing.image.Image(buf)
 				cellname = ws.cell(row=rownum, column=2).coordinate
 				ws.add_image(img, cellname)
-
 
 				rownum += 19
 				self.xlsx_select_cell(1, rownum)
@@ -3765,7 +4307,7 @@ class ReporterCore:
 			sql = base.rt_table_generate_sql(id)
 		colours = base.rt_table_get_colours(id)
 
-		if sql is not None and len(sql.strip())>0:
+		if sql is not None and len(sql.strip()) > 0:
 			base.debugmsg(8, "sql:", sql)
 			key = "{}_{}".format(id, base.report_item_get_changed(id))
 			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
@@ -3775,7 +4317,7 @@ class ReporterCore:
 			tdata = base.dbqueue["ReadResult"][key]
 			base.debugmsg(8, "tdata:", tdata)
 
-			if len(tdata)>0:
+			if len(tdata) > 0:
 				# table headers
 				cols = list(tdata[0].keys())
 				base.debugmsg(7, "cols:", cols)
@@ -3796,18 +4338,20 @@ class ReporterCore:
 					numcols += 1
 					cellcol += 1
 
-				cw = 5
 				for col in cols:
+					if col not in ["Colour"]:
 
-					base.debugmsg(8, "col:", col, "	cellcol:", cellcol, "	rownum:", rownum)
-					hcell = ws.cell(column=cellcol, row=rownum, value=col)
-					hcell.style="Table Heading"
+						dispname = base.rt_table_get_colname(id, col)
 
-					neww = len(str(col))*1.3
-					base.debugmsg(9, "neww:", neww)
-					ws.column_dimensions[hcell.column_letter].width = neww
+						base.debugmsg(8, "col:", col, "	cellcol:", cellcol, "	rownum:", rownum)
+						hcell = ws.cell(column=cellcol, row=rownum, value=dispname.strip())
+						hcell.style = "Table Heading"
 
-					cellcol += 1
+						neww = len(str(col.strip())) * 1.3
+						base.debugmsg(9, "neww:", neww)
+						ws.column_dimensions[hcell.column_letter].width = neww
+
+						cellcol += 1
 
 				# table rows
 				for row in tdata:
@@ -3821,45 +4365,39 @@ class ReporterCore:
 					if colours:
 
 						base.debugmsg(9, "row:", row)
-						label=row[cols[0]]
+						if "Colour" in row:
+							label = row["Colour"]
+						else:
+							label = row[cols[0]]
 						base.debugmsg(9, "label:", label)
 						colour = base.named_colour(label).replace("#", "")
 						base.debugmsg(9, "colour:", colour)
 						dcell = ws.cell(column=cellcol, row=rownum)
-						dcell.style="Table Data"
+						dcell.style = "Table Data"
 						dcell.fill = openpyxl.styles.PatternFill("solid", fgColor=colour)
 
 						cellcol += 1
 					else:
 						cellcol += 1
 
-					for val in vals:
+					# for val in vals:
+					for col in cols:
+						if col not in ["Colour"]:
+							val = str(row[col]).strip()
+							base.debugmsg(8, "val:", val)
+							dcell = ws.cell(column=cellcol, row=rownum, value=val)
+							dcell.style = "Table Data"
 
-						base.debugmsg(8, "val:", val)
-						dcell = ws.cell(column=cellcol, row=rownum, value=val)
-						dcell.style="Table Data"
+							currw = ws.column_dimensions[dcell.column_letter].width
+							base.debugmsg(9, "currw:", currw, "	len(val):", len(str(val)))
+							neww = max(currw, len(str(val)))
+							base.debugmsg(8, "neww:", neww)
+							ws.column_dimensions[dcell.column_letter].width = neww
 
-						# ws.columns[cellcol].width = 10
-						# ws.columns[cellcol].bestFit = True
-						# dcell.column_letter
-						# ws.column_dimensions["A"].width = 2
-						# ws.column_dimensions[dcell.column_letter].bestFit = True
-
-						currw = ws.column_dimensions[dcell.column_letter].width
-						base.debugmsg(9, "currw:", currw, "	len(val):", len(str(val)))
-						neww = max(currw, len(str(val)))
-						base.debugmsg(8, "neww:", neww)
-						ws.column_dimensions[dcell.column_letter].width = neww
-
-
-						cellcol += 1
-
+							cellcol += 1
 
 		rownum += 2
 		self.xlsx_select_cell(1, rownum)
-
-
-
 
 	def xlsx_select_cell(self, col, row):
 
@@ -3877,10 +4415,10 @@ class ReporterGUI(tk.Frame):
 	style_feild_colour = "white"
 	style_text_colour = "#000"
 	style_head_colour = "#00F"
-	imgdata = {}
-	b64 = {}
-	contentdata = {}
-	t_preview = {}
+	imgdata: Any = {}
+	b64: Any = {}
+	contentdata: Any = {}
+	t_preview: Any = {}
 
 	titleprefix = "rfswarm Reporter"
 
@@ -3906,17 +4444,14 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "self.root[background]", self.root["background"])
 		self.rootBackground = self.root["background"]
 
-
 		self.load_icons()
-
 
 		base.debugmsg(5, "BuildUI")
 		self.BuildUI()
 		self.BuildMenu()
 
-
 	def load_icons(self):
-		#	"New Report Template"	page_add.png
+		# 	"New Report Template"	page_add.png
 		self.imgdata["New Report Template"] = self.get_icon("page_add.gif")
 		# 	"Open Report Template"	folder_page.png
 		self.imgdata["Open Report Template"] = self.get_icon("folder_page.gif")
@@ -3941,7 +4476,6 @@ class ReporterGUI(tk.Frame):
 		# "Export Writer"		page_writer.gif
 		self.imgdata["Export Writer"] = self.get_icon("page_writer.gif")
 
-
 		# "New Section"	add.gif
 		self.imgdata["New Section"] = self.get_icon("add.gif")
 		# Remove Section	 delete.gif
@@ -3955,15 +4489,11 @@ class ReporterGUI(tk.Frame):
 		self.imgdata["Preview"] = self.get_icon("report.gif")
 		self.imgdata["Settings"] = self.get_icon("cog.gif")
 
-
 		# settings buttons
 		# "Select Image"	picture.gif
 		self.imgdata["Select Image"] = self.get_icon("picture.gif")
 		# "Select Colour"	color_swatch.gif
 		self.imgdata["Select Colour"] = self.get_icon("color_swatch.gif")
-
-
-
 
 	def get_icon(self, imagefile):
 		if len(self.b64) < 1:
@@ -3979,7 +4509,7 @@ class ReporterGUI(tk.Frame):
 			base.debugmsg(6, "imgfile:", imgfile)
 			if os.path.isfile(imgfile):
 				base.debugmsg(0, "isfile: imgfile:", imgfile)
-				with open(imgfile,"rb") as f:
+				with open(imgfile, "rb") as f:
 					img_raw = f.read()
 				# 		self.b64["page_writer.gif"] =
 				base.debugmsg(0, "img_raw:	", "self.b64[\"{}\"] =".format(imagefile), img_raw)
@@ -3997,39 +4527,38 @@ class ReporterGUI(tk.Frame):
 		else:
 			base.debugmsg(6, "File not found imagefile:", imagefile)
 
-
 	def load_b64(self):
 
 		# gif's
-		self.b64["page_add.gif"] =  b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00+U\xaa*d\xbb.ga1h>.i\xbe0i\xba3j\x124l\x1aIm\xb64q\xc18v\xc3?y\xbe;z\xc4AzzJ{,B~\xc3?\x80\xc7D\x83\xc6F\x88\xc7\\\x88HI\x89\xc7M\x8c\xc9Q\x8c"c\x8cKU\x8f(d\x93\xdcs\x99_\x81\xac`\x8e\xae\x86}\xb2\xe3R\xb4\xf8R\xb5\xf7\x84\xb7\xe3\x9c\xb9\xa7\x87\xbb_\x8d\xbcd\x8f\xbci\xa0\xbd\xaec\xbf\xfcg\xc0\xfdm\xc3\xfd\xb3\xd4\x94\xb5\xd4\xf2\xb7\xd5\x9d\x97\xd7\xff\x9c\xd7\xff\xbb\xd7\xf5\x9c\xd8\xff\xa1\xd9\xff\xb5\xd9\xf6\xbd\xda\xf6\xc3\xdd\xf8\xc7\xe0\xfa\xcb\xe3\xfb\xd1\xe6\xbb\xd4\xe6\xfd\xd8\xe6\xf2\xd8\xe7\xfe\xd7\xe8\xfe\xd9\xe8\xfe\xde\xea\xf6\xe1\xeb\xf6\xe9\xef\xf5\xe6\xf0\xf7\xec\xf2\xf7\xec\xf3\xf9\xf1\xf5\xf9\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00E\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xb9\x80E\x10\x16\x84\x85\x84\x15\x0bE\x8a\x8a\x12AB\x8f\x90A9\x1e\x1a\x8bE\x15C6\x9a654/D2\x94\x8b\x98\x9b\x9a\x9eD\x9a!\x0c\x8a\x988\xae\xa63>AC?\x10\xacC\xae\xaf6\x9e++C\x12\xacB:\xb98\xb03B\xc0E\x13B<\xcd\xb9\xa64\xc8\x8cB;<\xc4\xc5\x9cB\x11\xd3\xd7\xae&\x1b\x18\x18\x0e\x8a\x11B\xdd"\x1c*7%\x19\x07E\r@\x1f  \x1f\xf2\x14**D$$\xee\r>)1`\xb8\x80\xd1\xe2\x01\x0b"\x08U\xb8S\xe0\x03\xc5\x89\x87\x0f\x11\x90\x18Ad\x04\xbf"\x05\x84\xf8\xe8\xc1\xb1\x87\x90\x0e\x17H\xa8 q\xc1\x9d\x01\x01(S\xa2\x1c\x80\xe0\x00\x02\x02E\x02\x01\x00;'
+		self.b64["page_add.gif"] = b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00+U\xaa*d\xbb.ga1h>.i\xbe0i\xba3j\x124l\x1aIm\xb64q\xc18v\xc3?y\xbe;z\xc4AzzJ{,B~\xc3?\x80\xc7D\x83\xc6F\x88\xc7\\\x88HI\x89\xc7M\x8c\xc9Q\x8c"c\x8cKU\x8f(d\x93\xdcs\x99_\x81\xac`\x8e\xae\x86}\xb2\xe3R\xb4\xf8R\xb5\xf7\x84\xb7\xe3\x9c\xb9\xa7\x87\xbb_\x8d\xbcd\x8f\xbci\xa0\xbd\xaec\xbf\xfcg\xc0\xfdm\xc3\xfd\xb3\xd4\x94\xb5\xd4\xf2\xb7\xd5\x9d\x97\xd7\xff\x9c\xd7\xff\xbb\xd7\xf5\x9c\xd8\xff\xa1\xd9\xff\xb5\xd9\xf6\xbd\xda\xf6\xc3\xdd\xf8\xc7\xe0\xfa\xcb\xe3\xfb\xd1\xe6\xbb\xd4\xe6\xfd\xd8\xe6\xf2\xd8\xe7\xfe\xd7\xe8\xfe\xd9\xe8\xfe\xde\xea\xf6\xe1\xeb\xf6\xe9\xef\xf5\xe6\xf0\xf7\xec\xf2\xf7\xec\xf3\xf9\xf1\xf5\xf9\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00E\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xb9\x80E\x10\x16\x84\x85\x84\x15\x0bE\x8a\x8a\x12AB\x8f\x90A9\x1e\x1a\x8bE\x15C6\x9a654/D2\x94\x8b\x98\x9b\x9a\x9eD\x9a!\x0c\x8a\x988\xae\xa63>AC?\x10\xacC\xae\xaf6\x9e++C\x12\xacB:\xb98\xb03B\xc0E\x13B<\xcd\xb9\xa64\xc8\x8cB;<\xc4\xc5\x9cB\x11\xd3\xd7\xae&\x1b\x18\x18\x0e\x8a\x11B\xdd"\x1c*7%\x19\x07E\r@\x1f  \x1f\xf2\x14**D$$\xee\r>)1`\xb8\x80\xd1\xe2\x01\x0b"\x08U\xb8S\xe0\x03\xc5\x89\x87\x0f\x11\x90\x18Ad\x04\xbf"\x05\x84\xf8\xe8\xc1\xb1\x87\x90\x0e\x17H\xa8 q\xc1\x9d\x01\x01(S\xa2\x1c\x80\xe0\x00\x02\x02E\x02\x01\x00;'
 
-		self.b64["folder_page.gif"] =  b"GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00@j\xaa9q\xaaAu\xc6C{\xc3Q\x7f\xcbS\x84\xccS\x84\xd0\xd9\x86'\xd9\x87(\xd9\x89)\xdb\x941^\x97\xcd\xdb\x9b2l\x9f\xd1k\xa1\xd2\xdb\xa53\xe1\xa6K\xe3\xabS\xdb\xac2\xdb\xb22\xda\xb5/\x88\xbc\xea\x93\xbc\xe5\xe7\xbdp\xe9\xbdc\x97\xc0\xe6\x93\xc2\xec\xc7\xc2\x86\x9e\xc4\xea\xe3\xc4^\xd0\xc9\x8c\xeb\xca\x91\xd8\xcf\x90\xf2\xd2=\xb3\xd3\xf4\xdd\xd3\x93\xf3\xd5r\xf3\xd6L\xe4\xd8\x93\xf3\xd8z\xbd\xd9\xf7\xd7\xd9\xca\xf4\xda\\\xf4\xdb\x83\xe9\xdc\x93\xf5\xdcf\xf6\xddk\xc4\xde\xfa\xf5\xde\x8c\xf5\xde\x93\xf6\xdft\xf6\xe1\x94\xf7\xe1}\xcc\xe2\xfc\xf6\xe2\xad\xc5\xe3\xfa\xf5\xe3\xa0\xf7\xe3\x84\xf6\xe5\x9c\xf8\xe5\x8c\xf8\xe5\x93\xd4\xe6\xfd\xd8\xe7\xff\xdb\xe9\xff\xde\xe9\xf5\xf8\xea\xc3\xe5\xef\xfa\xe7\xf2\xfc\xe8\xf2\xef\xf9\xf2\xdc\xfb\xf2\xcc\xeb\xf4\xfc\xfb\xf6\xe8\xf1\xf7\xff\xf3\xf9\xfd\xfe\xfa\xef\xfe\xfc\xf4\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00O\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xbe\x80O\x82\x83\x1d\x1a\x17\x17\x0f\x0e\x0c\x04\x83\x8dO\x17NH\x92CD\x16\x07\x8e\x82\x17H060#K8\x1b\x8c\x8e\x17J6\xa7)AHK\x06\x98\xa5>>\x9d)#C\x06\x15\x1e\xb8\xb8\xaf\xb0\xb2D\x06\x14N\xc1\xc1\xbb\xbc0H\xbfM<297\x06J@\xd0?\xb1J\x06\x13M22\x19\x0b\xdb\xdc\xdc\xc7\x13I\x18\x12\x11 H\xc2\xc2\x0bE\x06\x10\xc1M\xee;\xf0\xf09F\x0b\xc7\x10M=\xf9=-'$!\x1f\x1cT,\x18P\xa0\x01\xbe|<t\xd4\x98\xf1b\x85\x89#\x0b\x04-`\xd2\x83G\xc2\x85.\x1c\x8a\x80(H\x81\x91\x1d4h\xc4\x88\xc1\x82\x05\x8a\x12%\x84D|\x82@A\x02\x050c\xc2|\x89@P \x00;"
+		self.b64["folder_page.gif"] = b"GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00@j\xaa9q\xaaAu\xc6C{\xc3Q\x7f\xcbS\x84\xccS\x84\xd0\xd9\x86'\xd9\x87(\xd9\x89)\xdb\x941^\x97\xcd\xdb\x9b2l\x9f\xd1k\xa1\xd2\xdb\xa53\xe1\xa6K\xe3\xabS\xdb\xac2\xdb\xb22\xda\xb5/\x88\xbc\xea\x93\xbc\xe5\xe7\xbdp\xe9\xbdc\x97\xc0\xe6\x93\xc2\xec\xc7\xc2\x86\x9e\xc4\xea\xe3\xc4^\xd0\xc9\x8c\xeb\xca\x91\xd8\xcf\x90\xf2\xd2=\xb3\xd3\xf4\xdd\xd3\x93\xf3\xd5r\xf3\xd6L\xe4\xd8\x93\xf3\xd8z\xbd\xd9\xf7\xd7\xd9\xca\xf4\xda\\\xf4\xdb\x83\xe9\xdc\x93\xf5\xdcf\xf6\xddk\xc4\xde\xfa\xf5\xde\x8c\xf5\xde\x93\xf6\xdft\xf6\xe1\x94\xf7\xe1}\xcc\xe2\xfc\xf6\xe2\xad\xc5\xe3\xfa\xf5\xe3\xa0\xf7\xe3\x84\xf6\xe5\x9c\xf8\xe5\x8c\xf8\xe5\x93\xd4\xe6\xfd\xd8\xe7\xff\xdb\xe9\xff\xde\xe9\xf5\xf8\xea\xc3\xe5\xef\xfa\xe7\xf2\xfc\xe8\xf2\xef\xf9\xf2\xdc\xfb\xf2\xcc\xeb\xf4\xfc\xfb\xf6\xe8\xf1\xf7\xff\xf3\xf9\xfd\xfe\xfa\xef\xfe\xfc\xf4\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00O\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xbe\x80O\x82\x83\x1d\x1a\x17\x17\x0f\x0e\x0c\x04\x83\x8dO\x17NH\x92CD\x16\x07\x8e\x82\x17H060#K8\x1b\x8c\x8e\x17J6\xa7)AHK\x06\x98\xa5>>\x9d)#C\x06\x15\x1e\xb8\xb8\xaf\xb0\xb2D\x06\x14N\xc1\xc1\xbb\xbc0H\xbfM<297\x06J@\xd0?\xb1J\x06\x13M22\x19\x0b\xdb\xdc\xdc\xc7\x13I\x18\x12\x11 H\xc2\xc2\x0bE\x06\x10\xc1M\xee;\xf0\xf09F\x0b\xc7\x10M=\xf9=-'$!\x1f\x1cT,\x18P\xa0\x01\xbe|<t\xd4\x98\xf1b\x85\x89#\x0b\x04-`\xd2\x83G\xc2\x85.\x1c\x8a\x80(H\x81\x91\x1d4h\xc4\x88\xc1\x82\x05\x8a\x12%\x84D|\x82@A\x02\x050c\xc2|\x89@P \x00;"
 
-		self.b64["page_save.gif"] =  b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00+U\xaa\x1cZ\xaf)^\xa7+d\xbb6h\xab/i\xbc0i\xba;i\xacAl\xacIm\xb6Ap\xb14q\xc18v\xc3?y\xbe;z\xc4B~\xc3U~\xbcO\x7f\xc4Q\x7f\xc2D\x83\xc6T\x83\xc5\\\x84\xc0Z\x86\xc8F\x88\xc7I\x89\xc7^\x89\xcag\x8b\xd4k\x8b\xcel\x8b\xdbM\x8c\xc9c\x8c\xcbp\x8f\xe2k\x92\xced\x93\xdcm\x98\xd5s\x9a\xd2z\x9e\xd6z\x9e\xdcw\x9f\xda{\xa2\xdc\x82\xa5\xd7\x83\xa5\xde\x81\xa8\xe3\x85\xa9\xde\x8c\xb0\xe5}\xb2\xe3R\xb4\xf8R\xb6\xf7\x92\xb6\xe6\x84\xb7\xe3\x9a\xb7\xed\x9a\xb9\xeac\xbf\xfcg\xc0\xfd\x84\xc0O\x84\xc0R\xa2\xc0\xed\x9f\xc1\xefm\xc3\xfd\xb4\xc8\xe4\x99\xcao\x9a\xcaq\xb1\xce\xf3\xbb\xcf\xef\xb5\xd4\xf2\x9c\xd7\xff\xbb\xd7\xf5\x9c\xd8\xff\xb5\xd9\xf6\xbd\xda\xf6\xc3\xdd\xf8\xc6\xe0\xf9\xcb\xe3\xfb\xd5\xe6\xfd\xd8\xe6\xf2\xd8\xe7\xfe\xd7\xe8\xfe\xd9\xe8\xfe\xde\xea\xf6\xe1\xeb\xf6\xc8\xee\x87\xc8\xee\x8c\xe9\xef\xf5\xe6\xf0\xf7\xe6\xf1\xee\xe8\xf3\xea\xec\xf3\xf5\xed\xf3\xf8\xe9\xf4\xe5\xd8\xf5\xa3\xf1\xf5\xf9\xf4\xfa\xff\xff\xff\xde\xff\xff\xe1\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00`\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xcd\x80\x10\x1e\x83\x84\x1e\x19\r`\x89\x8a\x14WX\x8e\x8eWK."\x8a\x89\x19[I\x99HGC_E\x93\x95\x97\x99\x99\x9c_\x992\x0e\x8a\x97JJ\xa4FPW[S\x10\xaa[\xac\xadI\x9cAA[\x14\xaaXL\xb7#%$)\x1f!$$\x1f`\x18XNN\xac\x1f?_<_\xd6_9\x1a\x14XM\xb7\x17:_!\xd6\\\\-\x1f\xdb\xb7J\x1a9\xd7\xd7,\x13\x0fT/0//\x1f4(*(\xfb(&\x16\x0fPv\x10\x11B\xe4C\x8c\x15+\xf8\x9d \x11\x81\x01\x14\x1b5"V\x98q\xa5\x8a\xc5*WJ,0\x80\x05\xca\x93\x8f\x12fX\xb9\xd1\xc3\x07\x8e,&\n\x1c \xc0\x92e\x05 ]\xa2h\xd1"\xc5\x8b\n\x04\x95\x12\x19\xa8\xb0\x01D\x87\x9f\x1c\x12\x0c\x08\x04\x00;'
+		self.b64["page_save.gif"] = b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00+U\xaa\x1cZ\xaf)^\xa7+d\xbb6h\xab/i\xbc0i\xba;i\xacAl\xacIm\xb6Ap\xb14q\xc18v\xc3?y\xbe;z\xc4B~\xc3U~\xbcO\x7f\xc4Q\x7f\xc2D\x83\xc6T\x83\xc5\\\x84\xc0Z\x86\xc8F\x88\xc7I\x89\xc7^\x89\xcag\x8b\xd4k\x8b\xcel\x8b\xdbM\x8c\xc9c\x8c\xcbp\x8f\xe2k\x92\xced\x93\xdcm\x98\xd5s\x9a\xd2z\x9e\xd6z\x9e\xdcw\x9f\xda{\xa2\xdc\x82\xa5\xd7\x83\xa5\xde\x81\xa8\xe3\x85\xa9\xde\x8c\xb0\xe5}\xb2\xe3R\xb4\xf8R\xb6\xf7\x92\xb6\xe6\x84\xb7\xe3\x9a\xb7\xed\x9a\xb9\xeac\xbf\xfcg\xc0\xfd\x84\xc0O\x84\xc0R\xa2\xc0\xed\x9f\xc1\xefm\xc3\xfd\xb4\xc8\xe4\x99\xcao\x9a\xcaq\xb1\xce\xf3\xbb\xcf\xef\xb5\xd4\xf2\x9c\xd7\xff\xbb\xd7\xf5\x9c\xd8\xff\xb5\xd9\xf6\xbd\xda\xf6\xc3\xdd\xf8\xc6\xe0\xf9\xcb\xe3\xfb\xd5\xe6\xfd\xd8\xe6\xf2\xd8\xe7\xfe\xd7\xe8\xfe\xd9\xe8\xfe\xde\xea\xf6\xe1\xeb\xf6\xc8\xee\x87\xc8\xee\x8c\xe9\xef\xf5\xe6\xf0\xf7\xe6\xf1\xee\xe8\xf3\xea\xec\xf3\xf5\xed\xf3\xf8\xe9\xf4\xe5\xd8\xf5\xa3\xf1\xf5\xf9\xf4\xfa\xff\xff\xff\xde\xff\xff\xe1\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00`\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xcd\x80\x10\x1e\x83\x84\x1e\x19\r`\x89\x8a\x14WX\x8e\x8eWK."\x8a\x89\x19[I\x99HGC_E\x93\x95\x97\x99\x99\x9c_\x992\x0e\x8a\x97JJ\xa4FPW[S\x10\xaa[\xac\xadI\x9cAA[\x14\xaaXL\xb7#%$)\x1f!$$\x1f`\x18XNN\xac\x1f?_<_\xd6_9\x1a\x14XM\xb7\x17:_!\xd6\\\\-\x1f\xdb\xb7J\x1a9\xd7\xd7,\x13\x0fT/0//\x1f4(*(\xfb(&\x16\x0fPv\x10\x11B\xe4C\x8c\x15+\xf8\x9d \x11\x81\x01\x14\x1b5"V\x98q\xa5\x8a\xc5*WJ,0\x80\x05\xca\x93\x8f\x12fX\xb9\xd1\xc3\x07\x8e,&\n\x1c \xc0\x92e\x05 ]\xa2h\xd1"\xc5\x8b\n\x04\x95\x12\x19\xa8\xb0\x01D\x87\x9f\x1c\x12\x0c\x08\x04\x00;'
 
-		self.b64["folder_table.gif"] =  b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00@w\xbcR\x85\xc5\xda\x86\'\xd9\x87(\xd9\x89)W\x8a\xc9\\\x8a\xc6^\x8f\xccc\x93\xcf\xdb\x941l\x9a\xd4\xdb\x9b2t\xa1\xd8|\xa5\xdc\xdb\xa53\xe2\xa9O\x80\xaa\xde\x98\xaa\xc1\xdb\xac2\x84\xad\xe1\xe0\xae`\xe4\xafZ\xdb\xb22\x8c\xb3\xe4\xda\xb5/\x94\xb8\xe7\xb3\xb9\x92\x9c\xbd\xea\xb6\xbd\x9c|\xbfv\x9f\xc0\xec\xe5\xc2\x91\x82\xc3|\xa6\xc3\xeb\xbe\xc4\xa5\xe3\xc4_\xc1\xc6\xa7\xea\xc6~\x89\xc7\x82\xac\xc7\xe9\xad\xc8\xe8\xb3\xcb\xe8\xc6\xcb\xae\x93\xcc\x8b\xb8\xcc\xe2\xf0\xcc \xf1\xce)\xf1\xd1j\xf2\xd15\xf1\xd3r\xf3\xd4D\xa4\xd5\x9b\xf2\xd5|\xf2\xd6\x81\xf3\xd7R\xf3\xd8\x86\xf4\xd8T\xf3\xd9\x8e\xf5\xdba\xd2\xdc\xdf\xf4\xdc\x9f\xf4\xde\x94\xf4\xde\xa8\xf6\xden\xf6\xdfr\xf5\xe1\xa0\xf7\xe1z\xf7\xe2\x82\xdb\xe5\xf1\xf8\xe5\x8c\xf8\xe6\x94\xf9\xe9\xa4\xf8\xea\xc3\xed\xeb\xe5\xfa\xec\xad\xfa\xed\xb4\xf3\xef\xe7\xfb\xef\xba\xfa\xf0\xdd\xeb\xf1\xf7\xfc\xf2\xca\xef\xf3\xf8\xf7\xf6\xed\xfb\xf6\xe8\xf4\xf7\xfb\xfd\xf8\xe7\xfe\xfa\xec\xfe\xfc\xf5\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00Z\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xc6\x80Z\x82\x82"\x85\x1c\x1a\x18\x18\x14\x11\x0e\x0e\x83\x84U\x91\x92\x92\r\x8fZ\x1fU44,\'!!\x1eU\x0b\x96\x1cUY\xa6\xa7Y\xa1\xa3U\x85\xad\x85U\t\x19$\xb3$\x1a\xacY)\xa8P\x08\x17\xa8\x18U(())*\xc5E\x06\x17XF>B\xbf\xb9\xb9\xa7E\x02\x13X>>6\x12 \n\xdb\xdc\n\xd2\x13T&\x16\x10\x15SSMJ\xe9R\xde\x07\x0f\xa6XX<+%#\x1d\x1d\x1b-\n\x02\x01\x0fXQNK\x8c\x18!2\x04\xc8\x8e\x1cV\x14\x08b\x80\x85\t\x92#D\x08\x1a\xbc1\xe3\x8aB-\n\xae<$\x12\xe4\xe0\x8c\x18/\\D\xb9X\xe0\xc9\x8f\x1e>t\xe0\xa8QC\x06\x0c\x18I\n\x08\x1aP\x80@\x81\x9b8o\xda\x1c (\x10\x00;'
+		self.b64["folder_table.gif"] = b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00@w\xbcR\x85\xc5\xda\x86\'\xd9\x87(\xd9\x89)W\x8a\xc9\\\x8a\xc6^\x8f\xccc\x93\xcf\xdb\x941l\x9a\xd4\xdb\x9b2t\xa1\xd8|\xa5\xdc\xdb\xa53\xe2\xa9O\x80\xaa\xde\x98\xaa\xc1\xdb\xac2\x84\xad\xe1\xe0\xae`\xe4\xafZ\xdb\xb22\x8c\xb3\xe4\xda\xb5/\x94\xb8\xe7\xb3\xb9\x92\x9c\xbd\xea\xb6\xbd\x9c|\xbfv\x9f\xc0\xec\xe5\xc2\x91\x82\xc3|\xa6\xc3\xeb\xbe\xc4\xa5\xe3\xc4_\xc1\xc6\xa7\xea\xc6~\x89\xc7\x82\xac\xc7\xe9\xad\xc8\xe8\xb3\xcb\xe8\xc6\xcb\xae\x93\xcc\x8b\xb8\xcc\xe2\xf0\xcc \xf1\xce)\xf1\xd1j\xf2\xd15\xf1\xd3r\xf3\xd4D\xa4\xd5\x9b\xf2\xd5|\xf2\xd6\x81\xf3\xd7R\xf3\xd8\x86\xf4\xd8T\xf3\xd9\x8e\xf5\xdba\xd2\xdc\xdf\xf4\xdc\x9f\xf4\xde\x94\xf4\xde\xa8\xf6\xden\xf6\xdfr\xf5\xe1\xa0\xf7\xe1z\xf7\xe2\x82\xdb\xe5\xf1\xf8\xe5\x8c\xf8\xe6\x94\xf9\xe9\xa4\xf8\xea\xc3\xed\xeb\xe5\xfa\xec\xad\xfa\xed\xb4\xf3\xef\xe7\xfb\xef\xba\xfa\xf0\xdd\xeb\xf1\xf7\xfc\xf2\xca\xef\xf3\xf8\xf7\xf6\xed\xfb\xf6\xe8\xf4\xf7\xfb\xfd\xf8\xe7\xfe\xfa\xec\xfe\xfc\xf5\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00Z\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xc6\x80Z\x82\x82"\x85\x1c\x1a\x18\x18\x14\x11\x0e\x0e\x83\x84U\x91\x92\x92\r\x8fZ\x1fU44,\'!!\x1eU\x0b\x96\x1cUY\xa6\xa7Y\xa1\xa3U\x85\xad\x85U\t\x19$\xb3$\x1a\xacY)\xa8P\x08\x17\xa8\x18U(())*\xc5E\x06\x17XF>B\xbf\xb9\xb9\xa7E\x02\x13X>>6\x12 \n\xdb\xdc\n\xd2\x13T&\x16\x10\x15SSMJ\xe9R\xde\x07\x0f\xa6XX<+%#\x1d\x1d\x1b-\n\x02\x01\x0fXQNK\x8c\x18!2\x04\xc8\x8e\x1cV\x14\x08b\x80\x85\t\x92#D\x08\x1a\xbc1\xe3\x8aB-\n\xae<$\x12\xe4\xe0\x8c\x18/\\D\xb9X\xe0\xc9\x8f\x1e>t\xe0\xa8QC\x06\x0c\x18I\n\x08\x1aP\x80@\x81\x9b8o\xda\x1c (\x10\x00;'
 
 		self.b64["page_go.gif"] = b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00+U\xaa$_\xb8)b\xb7\'d\xb4*d\xbb.i\xbe0i\xbaIm\xb6\x1cq\x004q\xc18v\xc3?y\xbe\x1dz\x16\x17{\x02\x1b{\x0b;{\xc4B~\xc3\x1f\x7f\x00?\x80\xc7D\x83\xc61\x87\x08F\x88\xc7I\x89\xc77\x8b\r6\x8c\x10M\x8c\xc9@\x8f\x11F\x91\x15d\x93\xdcC\x94)H\x94.O\x98\x1dU\x99"Z\x9c#b\x9f.]\xa06c\xa0,[\xa18^\xa2@k\xa44d\xa5Dm\xa6<r\xa9Ct\xacM|\xb0S}\xb2\xe3\x81\xb4YS\xb5\xf8S\xb6\xf7\x82\xb6d\x84\xb7\xe3\x85\xb7i\x8c\xbam\x90\xbdte\xbf\xfcg\xc0\xfd\x97\xc2\x80m\xc3\xfd\x99\xc3\x83\x9f\xc6\x88\xa2\xc7\x8a\xa4\xc9\x8c\xac\xcd\x92\xb1\xcf\x97\xb5\xd4\xf2\xbb\xd7\xf5\x9f\xd8\xff\xa1\xd9\xff\xb5\xd9\xf6\xbd\xda\xf6\xc3\xdd\xf8\xc6\xe0\xf9\xcc\xe3\xfb\xd4\xe6\xfd\xd8\xe6\xf2\xd8\xe7\xfe\xd7\xe8\xfe\xd9\xe8\xfe\xde\xea\xf6\xe1\xeb\xf6\xe9\xef\xf5\xe6\xf0\xf7\xec\xf2\xf7\xec\xf3\xf9\xf1\xf5\xf9\x00\xff\x00\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00X\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xc5\x80X\x11\x1a\x84\x85\x84\x17\x0bX\x8a\x8a\x14ST\x8f\x90SK.\x1d\x8bX\x17UI\x9aIHGBWE\x94\x8b\x98\x9b\x9a\x9eW\x9a3\x0c\x8a\x98J\xae\xa6FPSUQ\x11\xacU\xae\xafI\x9eAAU\x14\xacTL\xb9J\xb0FT\xc0X\x16TN\xcd\xb9I+%G\xc8\x8cTMN\xc4J*/!T\x13\xd5\xb9*((#-?,\x1c\x10\x8a\x13T\xb9(@?\xf16>)\x15\x8a\x10R011%?552\x02\xee0!\x01\x0b\x04(:\x88\x0c\x11\xf1\xc3G\x0f\x1e4v\xa4h\xa0H\x01\x14\x1c7n\x80\xe0\xb0\x01\x03\x89\x1c)<\x10Pd\x80\n\x94\'(\x9f<\xcap\xe2\xc3\x15\x01\x8a\x0e\x14\x98Is\xe6\x03\x07\x05\x06\x0c\xc0\x12\x08\x00;'
 
 		self.b64["add.gif"] = b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00,|\x1d+~"&\x80\x1e/\x81)0\x81\'3\x83)8\x87.=\x8a2A\x8e5E\x8f9K\x92?Q\x95CN\x9a>U\x9bE]\x9dLb\xa0Me\xa2Ri\xa5Zh\xa6Vj\xabVl\xab[f\xacRu\xacat\xad_z\xb2d~\xb3h\x83\xb5kn\xb6V\x88\xb8op\xb9W\x87\xbaqt\xbb\\}\xbbk\x8a\xbcr}\xbde\x8b\xbfzp\xc2by\xc2c\x8d\xc3{|\xc4i\x92\xc6\x80~\xc8o\x89\xc9\x7f\x86\xcbz\x99\xcc\x86\x81\xcdu\x8d\xcd\x83\x99\xcd\x8a\x93\xce\x88\xa5\xcf\x94\x8a\xd0}\xa7\xd1\x97\x8e\xd3\x83\x99\xd4\x8b\x96\xd5\x8a\xac\xd5\x9e\x9e\xd9\x92\xa1\xda\x97\xb5\xda\xa6\xb8\xdb\xab\xa6\xdc\x9c\xb5\xdd\xaa\xbb\xde\xb0\xb0\xe0\xa7\xb6\xe0\xad\xbc\xe3\xb5\xcc\xe6\xc4\xc6\xe8\xc1\xcf\xe9\xca\xd5\xeb\xd0\xd8\xee\xd3\xdd\xf1\xd9\xe1\xf2\xdd\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00K\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xb1\x80K\x82\x83\x84\x85\x86"\x1b\x1b\x19\x17\x17\x86\x82"\x1f2CFE?!\x13\x11\x85\x90?IB=:@D\'\x0f\x0f\x84\x1f<H91/775B!\x0e\x83\x1d-G:7+JJ,(*A\x0e\x0b\x82\x1b>@/,!\xba\x15  6)\n\x82\x1aB6,\xba\xd5J\x1e(8\x08\x82\x19>3.\xd6\xba\x1e#\xda\x82\x1807(%\x16\xe2\x1e -$\x06\x82\x15\x16>&\xcb\xe2\x1c ;\t\xf2\x82\x11!|,\xf3\xc0A\xdf\x8e\n\xfe\x04Ax\xd0\xad\xc5\x88\x11-vP( \xa0\x90\x03\x06\rN\xd0\xa0A\x02\x01EGK\x14$@p\xc0\x00\x01\x90(\t\x05\x02\x00;'
 
-		self.b64["delete.gif"] =  b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00\xb9F$\xb5G"\xb9I&\xb5J\x1e\xbcK+\xc2K.\xd1M;\xbfN2\xc5N3\xcdP8\xbfR4\xc1R6\xc2S=\xc5TB\xdcTI\xe6UL\xcaVD\xceVJ\xe9WK\xce[L\xe7[T\xea[N\xd8\\O\xd5^T\xec^R\xd1aS\xdac]\xddcb\xf0cT\xd6d\\\xe1d[\xead[\xeeeP\xe3gg\xddie\xeei]\xe1jj\xe3kb\xe3pe\xf3s\\\xf2wb\xf3yb\xe4zs\xe9{s\xe9\x7fx\xf6\x82g\xf0\x83{\xed\x84}\xf6\x84k\xf0\x85p\xf8\x86p\xee\x8au\xee\x8c\x81\xf0\x8cw\xf8\x8cv\xf1\x8ez\xf4\x8e\x81\xee\x92\x8f\xf5\x92~\xf9\x93\x7f\xfa\x9b\x87\xf1\x9e\x97\xfa\x9e\x8b\xf4\xa2\x9f\xfa\xa4\x91\xf5\xa6\xa1\xf5\xab\xa3\xfb\xab\x9e\xf2\xae\xab\xf5\xb0\xa6\xf8\xb0\xa5\xf4\xb5\xab\xf8\xb7\xa9\xf9\xba\xb0\xfa\xbb\xaf\xf8\xc4\xbf\xfc\xc8\xbb\xf9\xcc\xc5\xfb\xd5\xce\xfd\xdc\xd5\xfd\xdd\xd9\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00S\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xaf\x80S\x82\x83\x84\x85\x86%#\x1c\x1b\x1b\x1e\x86\x82%%:LONH\'\x18\x14\x85\x90EQKA?DM,\x14\x11\x84%CP=;8<<7I&\xa5\x82"0O?;41\xba1*G\x07\r\x82&FD6\x19\xc6\xc7)9-\x0c\x82#J<2R\xd2\xd3\x13$>\x08\x82\x1bC3.\xd3\xd4 >\x05\xd95;(\x13\xe7\xe8\x16/+\xe2S\x18\x0fC\x1d!\xe8\x13\x10\x15B\t\x03\x83\x1a&C\x19\x16\xf5 @\x00\x82!\x00!\t\x11>\x08\x81\x01\xa2\x02\x0c \x17\x06\x08(\x14\xc1\x81\x02\x16:t\xac0 \xd1\xd1\x94\x04\x0b\x10\x14(\xa0\xcf\xa3\xc9A\x81\x00\x00;'
+		self.b64["delete.gif"] = b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00\xb9F$\xb5G"\xb9I&\xb5J\x1e\xbcK+\xc2K.\xd1M;\xbfN2\xc5N3\xcdP8\xbfR4\xc1R6\xc2S=\xc5TB\xdcTI\xe6UL\xcaVD\xceVJ\xe9WK\xce[L\xe7[T\xea[N\xd8\\O\xd5^T\xec^R\xd1aS\xdac]\xddcb\xf0cT\xd6d\\\xe1d[\xead[\xeeeP\xe3gg\xddie\xeei]\xe1jj\xe3kb\xe3pe\xf3s\\\xf2wb\xf3yb\xe4zs\xe9{s\xe9\x7fx\xf6\x82g\xf0\x83{\xed\x84}\xf6\x84k\xf0\x85p\xf8\x86p\xee\x8au\xee\x8c\x81\xf0\x8cw\xf8\x8cv\xf1\x8ez\xf4\x8e\x81\xee\x92\x8f\xf5\x92~\xf9\x93\x7f\xfa\x9b\x87\xf1\x9e\x97\xfa\x9e\x8b\xf4\xa2\x9f\xfa\xa4\x91\xf5\xa6\xa1\xf5\xab\xa3\xfb\xab\x9e\xf2\xae\xab\xf5\xb0\xa6\xf8\xb0\xa5\xf4\xb5\xab\xf8\xb7\xa9\xf9\xba\xb0\xfa\xbb\xaf\xf8\xc4\xbf\xfc\xc8\xbb\xf9\xcc\xc5\xfb\xd5\xce\xfd\xdc\xd5\xfd\xdd\xd9\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00S\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xaf\x80S\x82\x83\x84\x85\x86%#\x1c\x1b\x1b\x1e\x86\x82%%:LONH\'\x18\x14\x85\x90EQKA?DM,\x14\x11\x84%CP=;8<<7I&\xa5\x82"0O?;41\xba1*G\x07\r\x82&FD6\x19\xc6\xc7)9-\x0c\x82#J<2R\xd2\xd3\x13$>\x08\x82\x1bC3.\xd3\xd4 >\x05\xd95;(\x13\xe7\xe8\x16/+\xe2S\x18\x0fC\x1d!\xe8\x13\x10\x15B\t\x03\x83\x1a&C\x19\x16\xf5 @\x00\x82!\x00!\t\x11>\x08\x81\x01\xa2\x02\x0c \x17\x06\x08(\x14\xc1\x81\x02\x16:t\xac0 \xd1\xd1\x94\x04\x0b\x10\x14(\xa0\xcf\xa3\xc9A\x81\x00\x00;'
 
-		self.b64["resultset_up.gif"] =  b'GIF89a\x10\x00\x10\x00\xa5\x00\x00\x00\x00\x00\x14A\xb7\x15E\xb9\x16J\xbd\x16N\xc0\x17P\xbd\x18S\xc0\x19Y\xc5\x1ab\xc6\x1ab\xc9#n\xcd,r\xcd<s\xce5w\xd2=w\xd0?z\xd0C\x7f\xd3E\x84\xd6K\x88\xd6S\x8e\xdba\x96\xddb\x97\xe1n\xa0\xe2t\xa2\xdfu\xa3\xe1y\xa7\xe3}\xa9\xe1}\xa9\xe8\x80\xab\xe9\x82\xac\xe3\x87\xb0\xe8\x8a\xb1\xe4\x90\xb5\xe7\x92\xb7\xe8\x99\xbb\xea\xa2\xc2\xed\xa8\xc7\xee\xad\xc8\xef\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\x01\n\x00?\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x06G\xc0\x9fpH,\x1a\x8f\xc8\xa4r\xc9L"\x0e\xcd\x85\x04bXF(\x9f\xce\xa3\x90\xa4`D\x1d\x8c\xc618b<\xa3P\xf8\x92a\x08\x8a\x9bM\x894\x12\x81:\x9a\x0b#@\xe4p2\x16\x15\x13\x11\r\n\t\x07\x04M\x8a\x8b\x8cHA\x00;'
+		self.b64["resultset_up.gif"] = b'GIF89a\x10\x00\x10\x00\xa5\x00\x00\x00\x00\x00\x14A\xb7\x15E\xb9\x16J\xbd\x16N\xc0\x17P\xbd\x18S\xc0\x19Y\xc5\x1ab\xc6\x1ab\xc9#n\xcd,r\xcd<s\xce5w\xd2=w\xd0?z\xd0C\x7f\xd3E\x84\xd6K\x88\xd6S\x8e\xdba\x96\xddb\x97\xe1n\xa0\xe2t\xa2\xdfu\xa3\xe1y\xa7\xe3}\xa9\xe1}\xa9\xe8\x80\xab\xe9\x82\xac\xe3\x87\xb0\xe8\x8a\xb1\xe4\x90\xb5\xe7\x92\xb7\xe8\x99\xbb\xea\xa2\xc2\xed\xa8\xc7\xee\xad\xc8\xef\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\x01\n\x00?\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x06G\xc0\x9fpH,\x1a\x8f\xc8\xa4r\xc9L"\x0e\xcd\x85\x04bXF(\x9f\xce\xa3\x90\xa4`D\x1d\x8c\xc618b<\xa3P\xf8\x92a\x08\x8a\x9bM\x894\x12\x81:\x9a\x0b#@\xe4p2\x16\x15\x13\x11\r\n\t\x07\x04M\x8a\x8b\x8cHA\x00;'
 
-		self.b64["resultset_down.gif"] =  b'GIF89a\x10\x00\x10\x00\xa5\x00\x00\x00\x00\x00\x14A\xb7\x15E\xb9\x16J\xbd\x16N\xc0\x17P\xbd\x18S\xc0\x19Y\xc5\x1ab\xc6\x1ab\xc9#n\xcd,r\xcd<s\xce5w\xd2=w\xd0?z\xd0C\x7f\xd3E\x84\xd6K\x88\xd6S\x8e\xdba\x96\xddb\x97\xe1n\xa0\xe2t\xa2\xdfu\xa3\xe1y\xa7\xe3}\xa9\xe1}\xa9\xe8\x80\xab\xe9\x82\xac\xe3\x87\xb0\xe8\x8a\xb1\xe4\x90\xb5\xe7\x92\xb7\xe8\x99\xbb\xea\xa2\xc2\xed\xa8\xc7\xee\xad\xc8\xef\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xfe\x11Created with GIMP\x00!\xf9\x04\x01\n\x00?\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x06G\xc0\x9fpH,\x1a\x8f\xc8\xa4rI8$\x14\x8d\xc8\xa4b\xc9p8\xc4\x00\xe3\xa2\xe9\x80D#Ri\xb3)\n\x18\x99\x0b\xa6\x13\x1ay0\xc7\x81C\xb3\x16a(\xc9\xc2\xa3\xf3\xa1D\x96\x06\x10\x12\x0bKB\x07\x08\x85\x89\x8a\x8b\x8c\x8dA\x00;'
+		self.b64["resultset_down.gif"] = b'GIF89a\x10\x00\x10\x00\xa5\x00\x00\x00\x00\x00\x14A\xb7\x15E\xb9\x16J\xbd\x16N\xc0\x17P\xbd\x18S\xc0\x19Y\xc5\x1ab\xc6\x1ab\xc9#n\xcd,r\xcd<s\xce5w\xd2=w\xd0?z\xd0C\x7f\xd3E\x84\xd6K\x88\xd6S\x8e\xdba\x96\xddb\x97\xe1n\xa0\xe2t\xa2\xdfu\xa3\xe1y\xa7\xe3}\xa9\xe1}\xa9\xe8\x80\xab\xe9\x82\xac\xe3\x87\xb0\xe8\x8a\xb1\xe4\x90\xb5\xe7\x92\xb7\xe8\x99\xbb\xea\xa2\xc2\xed\xa8\xc7\xee\xad\xc8\xef\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xfe\x11Created with GIMP\x00!\xf9\x04\x01\n\x00?\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x06G\xc0\x9fpH,\x1a\x8f\xc8\xa4rI8$\x14\x8d\xc8\xa4b\xc9p8\xc4\x00\xe3\xa2\xe9\x80D#Ri\xb3)\n\x18\x99\x0b\xa6\x13\x1ay0\xc7\x81C\xb3\x16a(\xc9\xc2\xa3\xf3\xa1D\x96\x06\x10\x12\x0bKB\x07\x08\x85\x89\x8a\x8b\x8c\x8dA\x00;'
 
-		self.b64["report.gif"] =  b'GIF89a\x10\x00\x10\x00\xc6\\\x00~1\x18\xabB!\xacC!\xaeF"\xaeI"\xa5K,\xafK#\xb1N#\xb2Q$\xb2R%\xb4U%\xb5V&\xb7Y&\xb7[&\xaf]5\xb8^\'\xb8_\'\xbaa(\xbexI\xb3yc\xb3|d\xb5\x7fe\xb5\x82f\xb7\x83gj\x93\xd4\xb9\x87gj\x98\xd9\xc2\x8bdk\x99\xdan\x9a\xdc\xbf\x8fao\x9b\xdcr\x9c\xdcq\x9d\xdd\xc1\x92cq\x9e\xdfs\x9e\xdf\xc2\x94ds\x9f\xe0t\xa0\xe0v\xa0\xe0\xc3\x96ev\xa2\xe0w\xa3\xe1x\xa3\xe1\xc4\x99f\xc5\x9agz\xa5\xe1\xa0\xbe\xea\xa1\xbf\xea\xa2\xc0\xea\xa3\xc0\xea\xca\xc6\xc4\xcc\xc6\xc0\xc7\xc7\xc7\xcd\xc6\xc0\xca\xc7\xc4\xcd\xc7\xc0\xcd\xc7\xc1\xc9\xc9\xc9\xca\xca\xca\xcb\xcb\xcb\xcc\xcc\xcc\xcd\xcd\xcd\xd1\xd1\xd1\xd2\xd2\xd2\xd3\xd3\xd3\xd4\xd4\xd4\xd5\xd5\xd5\xd8\xd8\xd8\xdc\xdc\xdc\xe6\xe6\xe6\xe8\xe8\xe8\xe9\xe9\xe9\xea\xea\xea\xec\xec\xec\xed\xed\xed\xee\xee\xee\xf0\xf0\xf0\xf1\xf1\xf1\xf2\xf2\xf2\xf3\xf3\xf3\xf4\xf4\xf4\xf5\xf5\xf5\xf6\xf6\xf6\xf7\xf7\xf7\xf8\xf8\xf8\xf9\xf9\xf9\xfa\xfa\xfa\xfb\xfb\xfb\xfc\xfc\xfc\xfd\xfd\xfd\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff!\xfe\x11Created with GIMP\x00!\xf9\x04\x01\n\x00\x7f\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xbf\x80\x7f\x7f\x1b\x12\x11\x82\x87\x88\x87>8:\x10Z\x8f\x90\x91\x87\x19.\x0fU\x97USR\x9bPY\x82\x8b9\r\x98\x97S\xa5QX\x87\x17-\x0cVV/,+*(\'R\xa8\x7f>49\x0bWW,3210#RU\x87\x16)\nXX\xb2\'$ \x1fPT\x9f\xb9\tYX\xadVUQPNM\x87\x15%\x08\xd7&!\x1d\x1c\x1a\x18JK\xd37\x07XW\xd9T\xcaXP@\x87\x14"\x06\xbcWT\xa7\xf4;H\xa6\xd5 \xa0\xcc\x8a\x94\'Y\xa0\xf08\xa2\xe5\xd0\x04\x0f\x03\x94\xf5k\x12ea\x96\x86\xb7h\xd4\x10\xb0%\x8bA&D\x92p\x19y\xa8\x80\x83\x00F\x8a\x0c\t\x02D\x08\x90\x1e?l \x02\x90\xa8\xe6\x9f@\x00;'
+		self.b64["report.gif"] = b'GIF89a\x10\x00\x10\x00\xc6\\\x00~1\x18\xabB!\xacC!\xaeF"\xaeI"\xa5K,\xafK#\xb1N#\xb2Q$\xb2R%\xb4U%\xb5V&\xb7Y&\xb7[&\xaf]5\xb8^\'\xb8_\'\xbaa(\xbexI\xb3yc\xb3|d\xb5\x7fe\xb5\x82f\xb7\x83gj\x93\xd4\xb9\x87gj\x98\xd9\xc2\x8bdk\x99\xdan\x9a\xdc\xbf\x8fao\x9b\xdcr\x9c\xdcq\x9d\xdd\xc1\x92cq\x9e\xdfs\x9e\xdf\xc2\x94ds\x9f\xe0t\xa0\xe0v\xa0\xe0\xc3\x96ev\xa2\xe0w\xa3\xe1x\xa3\xe1\xc4\x99f\xc5\x9agz\xa5\xe1\xa0\xbe\xea\xa1\xbf\xea\xa2\xc0\xea\xa3\xc0\xea\xca\xc6\xc4\xcc\xc6\xc0\xc7\xc7\xc7\xcd\xc6\xc0\xca\xc7\xc4\xcd\xc7\xc0\xcd\xc7\xc1\xc9\xc9\xc9\xca\xca\xca\xcb\xcb\xcb\xcc\xcc\xcc\xcd\xcd\xcd\xd1\xd1\xd1\xd2\xd2\xd2\xd3\xd3\xd3\xd4\xd4\xd4\xd5\xd5\xd5\xd8\xd8\xd8\xdc\xdc\xdc\xe6\xe6\xe6\xe8\xe8\xe8\xe9\xe9\xe9\xea\xea\xea\xec\xec\xec\xed\xed\xed\xee\xee\xee\xf0\xf0\xf0\xf1\xf1\xf1\xf2\xf2\xf2\xf3\xf3\xf3\xf4\xf4\xf4\xf5\xf5\xf5\xf6\xf6\xf6\xf7\xf7\xf7\xf8\xf8\xf8\xf9\xf9\xf9\xfa\xfa\xfa\xfb\xfb\xfb\xfc\xfc\xfc\xfd\xfd\xfd\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff!\xfe\x11Created with GIMP\x00!\xf9\x04\x01\n\x00\x7f\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xbf\x80\x7f\x7f\x1b\x12\x11\x82\x87\x88\x87>8:\x10Z\x8f\x90\x91\x87\x19.\x0fU\x97USR\x9bPY\x82\x8b9\r\x98\x97S\xa5QX\x87\x17-\x0cVV/,+*(\'R\xa8\x7f>49\x0bWW,3210#RU\x87\x16)\nXX\xb2\'$ \x1fPT\x9f\xb9\tYX\xadVUQPNM\x87\x15%\x08\xd7&!\x1d\x1c\x1a\x18JK\xd37\x07XW\xd9T\xcaXP@\x87\x14"\x06\xbcWT\xa7\xf4;H\xa6\xd5 \xa0\xcc\x8a\x94\'Y\xa0\xf08\xa2\xe5\xd0\x04\x0f\x03\x94\xf5k\x12ea\x96\x86\xb7h\xd4\x10\xb0%\x8bA&D\x92p\x19y\xa8\x80\x83\x00F\x8a\x0c\t\x02D\x08\x90\x1e?l \x02\x90\xa8\xe6\x9f@\x00;'
 
-		self.b64["cog.gif"] =  b'GIF87a\x10\x00\x10\x00\xc4\x00\x00\x00\x00\x00GGGMMMTTT[[[ccclllpppyyy\x82\x82\x82\x8d\x8d\x8d\x94\x94\x94\x9c\x9c\x9c\xa5\xa5\xa5\xac\xac\xac\xb4\xb4\xb4\xbc\xbc\xbc\xc4\xc4\xc4\xcb\xcb\xcb\xd4\xd4\xd4\xdc\xdc\xdc\xe5\xe5\xe5\xeb\xeb\xeb\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00\x18\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x05\x91 &\x8e\x92\x14Ac\xaaFU\xe5\xa8\xe3Tb\x11E=\x98\xd341eQ\xa7\xc9\xe4\xe1\x90T \n\x91\x892\xb1\t\x99%\xc4a\x14\x91I \x8cFd\x8bTn)\xd7\x04"\xa1\xd8J\x14\x89D\xc4bm$D\x0c\xc7\xa9f`M"\x92\xc7B\xb4\x90C\xaa\x05\r\x0b\rw\x12\x0c\x0c\x0be\x10\x10\x05\x03\x03"rf\x0e~D\x06#:\x85V&\x10\x12\x06\x05"\r\x10\x14nj\x11\x06\x06\x84\t\x8f"\t\x9e\x18\t%\x9f\x03\x02\x010\xac\x10\x0f\x04\xb6*\x06\xb3\xab)!\x00;'
+		self.b64["cog.gif"] = b'GIF87a\x10\x00\x10\x00\xc4\x00\x00\x00\x00\x00GGGMMMTTT[[[ccclllpppyyy\x82\x82\x82\x8d\x8d\x8d\x94\x94\x94\x9c\x9c\x9c\xa5\xa5\xa5\xac\xac\xac\xb4\xb4\xb4\xbc\xbc\xbc\xc4\xc4\xc4\xcb\xcb\xcb\xd4\xd4\xd4\xdc\xdc\xdc\xe5\xe5\xe5\xeb\xeb\xeb\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00\x18\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x05\x91 &\x8e\x92\x14Ac\xaaFU\xe5\xa8\xe3Tb\x11E=\x98\xd341eQ\xa7\xc9\xe4\xe1\x90T \n\x91\x892\xb1\t\x99%\xc4a\x14\x91I \x8cFd\x8bTn)\xd7\x04"\xa1\xd8J\x14\x89D\xc4bm$D\x0c\xc7\xa9f`M"\x92\xc7B\xb4\x90C\xaa\x05\r\x0b\rw\x12\x0c\x0c\x0be\x10\x10\x05\x03\x03"rf\x0e~D\x06#:\x85V&\x10\x12\x06\x05"\r\x10\x14nj\x11\x06\x06\x84\t\x8f"\t\x9e\x18\t%\x9f\x03\x02\x010\xac\x10\x0f\x04\xb6*\x06\xb3\xab)!\x00;'
 
-		self.b64["page_white_world.gif"] =  b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00=[0B\x89\xc1M\x91\xc1\x95\x95\x95d\x97SK\x99\xbd\x9b\x9b\x9bj\x9cVk\x9fZm\xa0Wl\xa1ZN\xa2\xd4T\xa2\x8ae\xa4\x83P\xa6cV\xa6\xd6f\xa6\xa3W\xa7\xce\x7f\xa8iT\xaa\xe2U\xac\xdc|\xactg\xad\xda\x80\xadk\x82\xadsb\xaf\xc9m\xaf\xcf\x85\xafy\x86\xb0x\x88\xb3|\x82\xb4\x84i\xb5\xcdi\xb6\xab\x8b\xb6\xa7\x8d\xb7\xbc\x8d\xb9xS\xba\x9d\x8a\xbal\x92\xbb\x91\x97\xbb{f\xbd\xb8p\xbd\xc1z\xc1\xd7\xa0\xc3\x88Z\xc4`\x84\xc4\xdb\x8c\xc4\xd2\x9b\xc4\x7f\x9c\xc4\x85\xa4\xc5\x91|\xc6t\xaa\xc6\xa0\x82\xc7\xcbw\xc9\xc6\xaa\xc9\x8f\xac\xc9\xa2\x8e\xcb\xb0\xa3\xcb\x9b\xa0\xcc\xbbk\xd0\xad\xa2\xd2\x8d\xc3\xd5\xbc\x83\xd6\xb1\x9b\xd6\xd9q\xd7\x93\xa4\xd8\x94y\xda\x96\xc8\xda\xc2B\xdb^\xbd\xdb\xbaZ\xdc}\xa0\xdc\x8f\xa4\xdc\xdc\xb6\xdd\xd5\xd3\xde\xce\x91\xe0\x8b\xd4\xe0\xd0\xc3\xe3\xaf\xbf\xe5\xd5\xdb\xe6\xd6\x8c\xe7\xa2\xe7\xe7\xe7\xbe\xea\xd6\xbb\xec\xca\xec\xec\xec\xac\xf1\xbc\xd0\xf2\xce\xf4\xf4\xf4\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00Z\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xa8\x80Z\x82\x83\x84\x85\x84Y\x88\x89\x89\x04\x86YX\x8f\x8fUUYR\x8c\x83\x018\x19\x0b\x194MX\x93\x8f\x07\x82\x08\x082FJ;\x1f\x1d>\x93\x89\x82\x0bNWOI./:\x19K\x92RYZ\n1VT@+)AL\x184\x9f\x93Z\x0bBQS 6GE-,\x19\x90\xbc\x0bHC5\x12*<%\x0f7\t\x8eX\xd8=?\x1a\x15\x0c\x02\x03\x0e(\x19\x8a\xcb$3!\x10\x14\x06\r\x1e\t8\xf1Z\x08096\\\x88`b\x02\x07(\xfd\x10\x14\xb0 b\xc4\x89\x04\x1c\x88(\xe2%\x08S\x86\x04\x19p \x9cxh\xa2GC \t\x05\x02\x00;'
+		self.b64["page_white_world.gif"] = b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00=[0B\x89\xc1M\x91\xc1\x95\x95\x95d\x97SK\x99\xbd\x9b\x9b\x9bj\x9cVk\x9fZm\xa0Wl\xa1ZN\xa2\xd4T\xa2\x8ae\xa4\x83P\xa6cV\xa6\xd6f\xa6\xa3W\xa7\xce\x7f\xa8iT\xaa\xe2U\xac\xdc|\xactg\xad\xda\x80\xadk\x82\xadsb\xaf\xc9m\xaf\xcf\x85\xafy\x86\xb0x\x88\xb3|\x82\xb4\x84i\xb5\xcdi\xb6\xab\x8b\xb6\xa7\x8d\xb7\xbc\x8d\xb9xS\xba\x9d\x8a\xbal\x92\xbb\x91\x97\xbb{f\xbd\xb8p\xbd\xc1z\xc1\xd7\xa0\xc3\x88Z\xc4`\x84\xc4\xdb\x8c\xc4\xd2\x9b\xc4\x7f\x9c\xc4\x85\xa4\xc5\x91|\xc6t\xaa\xc6\xa0\x82\xc7\xcbw\xc9\xc6\xaa\xc9\x8f\xac\xc9\xa2\x8e\xcb\xb0\xa3\xcb\x9b\xa0\xcc\xbbk\xd0\xad\xa2\xd2\x8d\xc3\xd5\xbc\x83\xd6\xb1\x9b\xd6\xd9q\xd7\x93\xa4\xd8\x94y\xda\x96\xc8\xda\xc2B\xdb^\xbd\xdb\xbaZ\xdc}\xa0\xdc\x8f\xa4\xdc\xdc\xb6\xdd\xd5\xd3\xde\xce\x91\xe0\x8b\xd4\xe0\xd0\xc3\xe3\xaf\xbf\xe5\xd5\xdb\xe6\xd6\x8c\xe7\xa2\xe7\xe7\xe7\xbe\xea\xd6\xbb\xec\xca\xec\xec\xec\xac\xf1\xbc\xd0\xf2\xce\xf4\xf4\xf4\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00Z\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xa8\x80Z\x82\x83\x84\x85\x84Y\x88\x89\x89\x04\x86YX\x8f\x8fUUYR\x8c\x83\x018\x19\x0b\x194MX\x93\x8f\x07\x82\x08\x082FJ;\x1f\x1d>\x93\x89\x82\x0bNWOI./:\x19K\x92RYZ\n1VT@+)AL\x184\x9f\x93Z\x0bBQS 6GE-,\x19\x90\xbc\x0bHC5\x12*<%\x0f7\t\x8eX\xd8=?\x1a\x15\x0c\x02\x03\x0e(\x19\x8a\xcb$3!\x10\x14\x06\r\x1e\t8\xf1Z\x08096\\\x88`b\x02\x07(\xfd\x10\x14\xb0 b\xc4\x89\x04\x1c\x88(\xe2%\x08S\x86\x04\x19p \x9cxh\xa2GC \t\x05\x02\x00;'
 
-		self.b64["page_excel.gif"] =  b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00+U\xaa$_\xb8)b\xb7*d\xbb.i\xbe0i\xbaIm\xb62o\xc06t\xc2.u\x138v\xc33x\x18?y\xbe;{\xc4<~\x80B~\xc3?\x7f)?\x80\xc7D\x834D\x83\xc6F\x88\xc3I\x89\xc6Q\x8boM\x8c\xc9T\x8cSU\x8dAI\x92I[\x93E_\x93Sd\x93\xdc_\x95Ic\x97Sc\x98Oe\x98Wd\x9adj\x9c`q\x9fdm\xa1Zs\xa1km\xa2Wt\xa5\\i\xac`u\xaff\x83\xaf\x8d}\xb2\xe3\x90\xb5\x90q\xb7\\\x82\xb7q\x84\xb7\xe3\x96\xba\xa2\x84\xbcx\x87\xbds\x84\xc1i\x8a\xc2l\xa2\xc2\xb2\x96\xc9t\x98\xcav\xb5\xd2\xe9\xa4\xd4\x82\xb5\xd4\xf2\xbf\xd4\xb6\xba\xd7\xf5\xc4\xd7\xbc\xb5\xd9\xf6\xbd\xda\xf6\xc3\xda\xe5\xb6\xdb\x9d\xcb\xdc\xc4\xc3\xdd\xf8\xc4\xdd\xf4\xce\xde\xc8\xc7\xe0\xfa\xcd\xe1\xf5\xcb\xe3\xfb\xd2\xe5\xfc\xd8\xe6\xf2\xde\xea\xf6\xe1\xec\xf6\xe9\xef\xf5\xe6\xf0\xf7\xec\xf2\xf7\xec\xf3\xf9\xf2\xf6\xfa\xf5\xf9\xfc\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00V\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xc5\x80V\x10\x18\x84\x85\x84\x16\x0bV\x8a\x8a\x14QR\x8f\x90QL-\x1e\x8bV\x16SJ\x9aJHE>U@\x94\x8b\x98\x9b\x9a\x9eU\x9a1\rV\x1a\x19  2,\x11\x11\x13\x13.QSO\x10\xac=C8 \x1f)(!#:<<S\x14\x8a\x17D;6\xc0\xc4FEAAR\xcaV\x15%D94\x1a\x1dI\xa6E\xd6\x8a\x0f\x0c\x1cG50\x1a7K\x9aHR\x12V\n\n&\x1c\xe7/+\x1a\n\x9bS\x0e\xf2\xf3\n4\x90\xf81C\x05\x88MT\x12(r\x00e\xc9\x12!%@\x888\xe1p\t\x15\x04\x0b\x9dT\xdcXq\n\x01E\t4r\xdcX\xe5\xa3\x95\x02R\x9c4Y\xd9\x04\xd2\x14*U\x04(2@\xa0\xa6\xcd\x9b\x04\x06\x0c\xb0\x12\x08\x00;'
+		self.b64["page_excel.gif"] = b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00+U\xaa$_\xb8)b\xb7*d\xbb.i\xbe0i\xbaIm\xb62o\xc06t\xc2.u\x138v\xc33x\x18?y\xbe;{\xc4<~\x80B~\xc3?\x7f)?\x80\xc7D\x834D\x83\xc6F\x88\xc3I\x89\xc6Q\x8boM\x8c\xc9T\x8cSU\x8dAI\x92I[\x93E_\x93Sd\x93\xdc_\x95Ic\x97Sc\x98Oe\x98Wd\x9adj\x9c`q\x9fdm\xa1Zs\xa1km\xa2Wt\xa5\\i\xac`u\xaff\x83\xaf\x8d}\xb2\xe3\x90\xb5\x90q\xb7\\\x82\xb7q\x84\xb7\xe3\x96\xba\xa2\x84\xbcx\x87\xbds\x84\xc1i\x8a\xc2l\xa2\xc2\xb2\x96\xc9t\x98\xcav\xb5\xd2\xe9\xa4\xd4\x82\xb5\xd4\xf2\xbf\xd4\xb6\xba\xd7\xf5\xc4\xd7\xbc\xb5\xd9\xf6\xbd\xda\xf6\xc3\xda\xe5\xb6\xdb\x9d\xcb\xdc\xc4\xc3\xdd\xf8\xc4\xdd\xf4\xce\xde\xc8\xc7\xe0\xfa\xcd\xe1\xf5\xcb\xe3\xfb\xd2\xe5\xfc\xd8\xe6\xf2\xde\xea\xf6\xe1\xec\xf6\xe9\xef\xf5\xe6\xf0\xf7\xec\xf2\xf7\xec\xf3\xf9\xf2\xf6\xfa\xf5\xf9\xfc\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00V\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xc5\x80V\x10\x18\x84\x85\x84\x16\x0bV\x8a\x8a\x14QR\x8f\x90QL-\x1e\x8bV\x16SJ\x9aJHE>U@\x94\x8b\x98\x9b\x9a\x9eU\x9a1\rV\x1a\x19  2,\x11\x11\x13\x13.QSO\x10\xac=C8 \x1f)(!#:<<S\x14\x8a\x17D;6\xc0\xc4FEAAR\xcaV\x15%D94\x1a\x1dI\xa6E\xd6\x8a\x0f\x0c\x1cG50\x1a7K\x9aHR\x12V\n\n&\x1c\xe7/+\x1a\n\x9bS\x0e\xf2\xf3\n4\x90\xf81C\x05\x88MT\x12(r\x00e\xc9\x12!%@\x888\xe1p\t\x15\x04\x0b\x9dT\xdcXq\n\x01E\t4r\xdcX\xe5\xa3\x95\x02R\x9c4Y\xd9\x04\xd2\x14*U\x04(2@\xa0\xa6\xcd\x9b\x04\x06\x0c\xb0\x12\x08\x00;'
 
 		self.b64["page_word.gif"] = b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00\x1bN\xd3\x1dS\xd4+U\xaa ^\xd3$_\xb8)b\xb7*d\xbb\x1ee\xd3!g\xd4.i\xbe0i\xbaIm\xb62o\xc0%p\xd66t\xc28v\xc3=v\xd2?y\xbe:z\xc4=z\xd2I}\xd2A~\xd2B~\xc3?\x80\xc7C\x82\xd3D\x83\xc6L\x84\xd5]\x87\xe3I\x89\xc6M\x8c\xc9l\x8c\xe5H\x8d\xe4T\x8e\xe3a\x92\xe5d\x93\xdcN\x96\xe4o\x99\xe5T\x9a\xe5f\x9d\xe6v\x9d\xe7|\x9d\xe8Z\xa1\xe5\x88\xa1\xe9c\xa2\xe6l\xa2\xe8\x85\xa2\xe9i\xa5\xe7p\xa7\xe8\x84\xa7\xe6\x8a\xac\xebq\xad\xe8}\xb2\xe3\x8e\xb3\xed\x91\xb5\xed\x9c\xb5\xef\x84\xb7\xe3\xb6\xcb\xef\xb5\xd4\xf2\xbb\xd7\xf5\xb5\xd9\xf6\xbd\xda\xf6\xc3\xdd\xf8\xc7\xe0\xfa\xd4\xe1\xf3\xcb\xe2\xfb\xd2\xe5\xfc\xd8\xe6\xf2\xd8\xe7\xfe\xde\xea\xf6\xe1\xeb\xf6\xe9\xef\xf5\xec\xf2\xf7\xec\xf3\xf9\xf2\xf6\xfa\xf5\xf9\xfc\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00M\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xc5\x80M\x17\x1e\x84\x85\x84\x1d\x10M\x8a\x8a\x1aHI\x8f\x90HC4#\x8bM\x1dJA\x9aA?>;L<\x94\x8b\x98\x9b\x9a\x9eL\x9a8\x12M\x0e**56&52\x19!FHJG\x17M\t3,B&$B%\x19=;::J\x1a\x8a,9D\x19(B\x162A>==I\xcb\x08/1\x19/" \x16B\xa6>\xd9M\x04/0\x16)-\x1b7B\xe3\x9cI\x18M\x02,\x19A.\'\x14\xf0\xf1AJ\x13\xea\xbd\xa8 \x84\xc3\x86\x15\xf0J-y\xd0$\x80\x05 B>D\xe8GqI\x03E\x13\x8cP\xdc(D\xc9\x01E\x0f4r\xec\xc7\xe4c\x13\x05I\x8c\x14YY\x04\x92\x92%L\n(Zp\xa0\xa6\xcd\x9b\x07\x0c\x18h\x12\x08\x00;'
 
-		self.b64["page_white_acrobat.gif"] =  b'GIF87a\x10\x00\x10\x00\xd5\x00\x00\x00\x00\x00\x97\n\x08\x9b\x0e\n\xc1\x10\x0e\xcc\x10\x0c\xd0\x13\r\xc3\x1e\x0f\xdb4(\xe0NC\xdcSM\xe0SJ\xe6]Q\xe3d\\\xeag\\\xe5h_\xe8i_\xe4le\xe7ul\xedvj\xe5{u\xee\x7ft\xf1\x7fs\xe5\x81z\xf1\x84x\xe6\x87\x81\x95\x95\x95\x9b\x9b\x9b\xed\x9d\x98\xe9\xa1\x9c\xeb\xa4\xa0\xf2\xa7\x9f\xed\xac\xa8\xf3\xae\xa7\xef\xb9\xb5\xf3\xc0\xba\xf1\xc4\xc1\xf2\xcc\xca\xf5\xd1\xcd\xf6\xd7\xd5\xf7\xdd\xdb\xf8\xdf\xdd\xf8\xe5\xe5\xe7\xe7\xe7\xf7\xe9\xe8\xf9\xe9\xe7\xec\xec\xec\xf9\xee\xed\xf9\xf3\xf3\xf4\xf4\xf4\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x002\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x06r@\x99pH,\x12c\xc8d2c\x8c\xc1."\x18\xac\xd5\x8a\xa9\x98GX\xa5$\x9d:a\x9acL\xe2\xe9V\x93b\n\x08)\xa5\xaab\xe2\x86$\xd9\xae\x1eQ\x8b\x87\x89.\x85\x0fc\x11\x1b\'\x0e\'|~B,\n)\'\x10\x07\x08\x0c\x13\x1fHD\x13\x16!\x1d#&\x18\x10\x13\x1c\x93B\x02\t.JH+/\x9f\x05\x03$\xa4\xac2\x04\x04\x01\xac\xad\x7f\xb2JF\xb7DA\x00;'
+		self.b64["page_white_acrobat.gif"] = b'GIF87a\x10\x00\x10\x00\xd5\x00\x00\x00\x00\x00\x97\n\x08\x9b\x0e\n\xc1\x10\x0e\xcc\x10\x0c\xd0\x13\r\xc3\x1e\x0f\xdb4(\xe0NC\xdcSM\xe0SJ\xe6]Q\xe3d\\\xeag\\\xe5h_\xe8i_\xe4le\xe7ul\xedvj\xe5{u\xee\x7ft\xf1\x7fs\xe5\x81z\xf1\x84x\xe6\x87\x81\x95\x95\x95\x9b\x9b\x9b\xed\x9d\x98\xe9\xa1\x9c\xeb\xa4\xa0\xf2\xa7\x9f\xed\xac\xa8\xf3\xae\xa7\xef\xb9\xb5\xf3\xc0\xba\xf1\xc4\xc1\xf2\xcc\xca\xf5\xd1\xcd\xf6\xd7\xd5\xf7\xdd\xdb\xf8\xdf\xdd\xf8\xe5\xe5\xe7\xe7\xe7\xf7\xe9\xe8\xf9\xe9\xe7\xec\xec\xec\xf9\xee\xed\xf9\xf3\xf3\xf4\xf4\xf4\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x002\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x06r@\x99pH,\x12c\xc8d2c\x8c\xc1."\x18\xac\xd5\x8a\xa9\x98GX\xa5$\x9d:a\x9acL\xe2\xe9V\x93b\n\x08)\xa5\xaab\xe2\x86$\xd9\xae\x1eQ\x8b\x87\x89.\x85\x0fc\x11\x1b\'\x0e\'|~B,\n)\'\x10\x07\x08\x0c\x13\x1fHD\x13\x16!\x1d#&\x18\x10\x13\x1c\x93B\x02\t.JH+/\x9f\x05\x03$\xa4\xac2\x04\x04\x01\xac\xad\x7f\xb2JF\xb7DA\x00;'
 
 		self.b64["page_calc.gif"] = b'GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00\x00\x00>\x00\x00A\x00%O\x00\'P\x146S\x007\\\x19;X\t<[!Cb,Ge-He7Md.Nt\'Ol*On?Rs\x00S{1Sl\x00UUAUmUUUUU\xaa4\\y&^\x82:_}?_\x83fff;k\x8bEk\x8bFk\x86Jk\x86bo~ir\x89Zs\x8cVt\x95Ew\x9aVz\x94i}\x92\x80\x80\x80Y\x82\xa2{\x88\x95\x86\x98\xa9\x89\x99\xa5\x82\x9b\xb1\x9f\xa3\xaf\x9a\xa9\xb6U\xaa\xaa\x9e\xb0{\xa6\xb1\xbc\xa3\xb3t\xaa\xb3\xbb\x92\xb6\xb6\xb0\xb8\xc1\x80\xbf@\xb7\xbf\x8f\xbf\xbf@\xb0\xc2m\xaf\xc5?\xac\xc6\x1f\xaf\xc7%\xba\xc7\xd1\xae\xce\x00\xbc\xce\xda\xc4\xd1\xdc\xbc\xd2\x85\xd1\xd3\xd6\xc1\xd6g\xca\xd6\x91\xcc\xd6\xe0\xcf\xd6\xdb\xc5\xd7\xe4\xd2\xd7\xda\xcc\xd8\xb4\xcf\xda\xe1\xd3\xda\xd3\xd4\xda\xdf\xd2\xde\xa6\xd5\xde\xe4\xd7\xde\xe8\xd3\xdf\xaa\xd9\xdf\xd2\xcc\xe0\xef\xd6\xe0\xae\xd6\xe1\xea\xd8\xe1\xb6\xdb\xe1\xd4\xdc\xe3\xe7\xd1\xe4\x8a\xdc\xe4\xea\xdc\xe5\xba\xde\xe5\xc3\xe0\xe6\xc6\xe1\xe6\xdc\xe1\xe7\xc9\xe1\xe7\xeb\xdf\xe8\xbd\xe4\xe9\xed\xe5\xea\xcc\xe2\xeb\xc5\xe5\xec\xf3\xe6\xec\xe5\xe7\xec\xd0\xe0\xed\xf8\xe9\xed\xd3\xe9\xee\xf3\xeb\xef\xea\xe7\xf1\xc4\xe8\xf1\xc7\xec\xf1\xf9\xed\xf2\xe7\xed\xf2\xe8\xed\xf2\xf5\xf0\xf3\xec\xf3\xf5\xf9\xf7\xf7\xf7\xf3\xf9\xfb\xfa\xfc\xf6\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00w\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xbf\x80w\x82\x18\x11Hvd_rjD\x82\x8dwFE@gYJYttX<2\x8d53&*?LpiLOA>;\x8ew"1idNFNdI9C:\x8dYTNRGWp\xbf\xaemKw==+\x04 Navr\x97\x97\xcc\x8e\x06\x14sv\xd5\xd6\xd6\x8e\x0b\x02B\xd7uv\xdev\x8e\n\x01-uUcSb\xe9lq\x8e\t\x03!nZbPhMfkn\xee\x08\x10]\xf3\xf5M\xc4\xacy\xe3\xe8\x81\x83\x06Q\xc0\xd0\xb3\'P_\xa3\x0c\x174XQ\x08\x10M>G\x1d8\x8c\xf0\xb7\x05\x8a\x17(\\\xc6\x94q\x84\x82\x04\x0bg\xce\xe0\xd8\xf9\xe2\xa8\x04\x07\x17a\xb2\xc8\x9c\x99\xc5\xc9\x9d@\x00;'
 
@@ -4039,14 +4568,13 @@ class ReporterGUI(tk.Frame):
 
 		self.b64["color_swatch.gif"] = b'GIF87a\x10\x00\x10\x00\xb3\x00\x00\x00\x00\x00\xfeoj\xffw\xb2Vz\xb1\xda\x9c\xde\xff\xabs_\xb1\xebN\xcdl\xf0\xd6f\xd1\xeb\xb3\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00\x0b\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x04@p\xc9I\xab\xbd6\xe8U\xfaB`\xa5\x05\x9c\x07"\xe2\xd6\x15_\x88\xbdS"/G\xbd\x18x%\'\xb4\x8d\x1b\xbaY\xedp\xcb\xc1`\x83\xe4\x82\xc0\\\x08\x9e\x95\xe4`\xd9|\n\xa2J&\xc1\t=z\xbf\xe0\x08\x00;'
 
-
 	def updateTitle(self):
 		titletext = "{} v{} - {}".format(self.titleprefix, base.version, "Please Select")
 		# ['Reporter']['ResultDir']
 		if 'Reporter' in base.config and 'Results' in base.config['Reporter']:
-			if len(base.config['Reporter']['Results'])>0:
-				path, filename= os.path.split(base.config['Reporter']['Results'])
-				basepath, dirname= os.path.split(path)
+			if len(base.config['Reporter']['Results']) > 0:
+				path, filename = os.path.split(base.config['Reporter']['Results'])
+				basepath, dirname = os.path.split(path)
 				titletext = "{} v{} - {}".format(self.titleprefix, base.version, dirname)
 
 		self.master.title(titletext)
@@ -4073,15 +4601,14 @@ class ReporterGUI(tk.Frame):
 			stem = "Template: Untitled"
 			self.stsTemplate.set(stem)
 
-
 	def save_window_size(self, event):
 		base.debugmsg(6, "save_window_size")
 		try:
-			base.debugmsg(6, "winfo_width:", self.winfo_width(), "	winfo_height:",self.winfo_height())
+			base.debugmsg(6, "winfo_width:", self.winfo_width(), "	winfo_height:", self.winfo_height())
 			base.config['GUI']['win_width'] = str(self.winfo_width())
 			base.config['GUI']['win_height'] = str(self.winfo_height())
 			base.saveini()
-		except e:
+		except Exception as e:
 			base.debugmsg(6, "save_window_size except:", e)
 			return False
 
@@ -4097,9 +4624,9 @@ class ReporterGUI(tk.Frame):
 			appmenu.add_separator()
 			base.debugmsg(5, "appmenu:", appmenu)
 
-		window.config(menu = root_menu)
-		results_menu = tk.Menu(root_menu) # it intializes a new su menu in the root menu
-		root_menu.add_cascade(label = "Results", menu = results_menu) # it creates the name of the sub menu
+		window.config(menu=root_menu)
+		results_menu = tk.Menu(root_menu)  # it intializes a new sub menu in the root menu
+		root_menu.add_cascade(label="Results", menu=results_menu)  # it creates the name of the sub menu
 
 		# accelkey = "Ctrl"
 		accelkey = "Control"
@@ -4107,31 +4634,29 @@ class ReporterGUI(tk.Frame):
 			accelkey = "Command"
 		shifkey = "Shift"
 
-		results_menu.add_command(label = "Open", command = self.mnu_results_Open, accelerator="{}-o".format(accelkey))
+		results_menu.add_command(label="Open", command=self.mnu_results_Open, accelerator="{}-o".format(accelkey))
 		window.bind("<{}-o>".format(accelkey), self.mnu_results_Open)
-		results_menu.add_separator() # it adds a line after the 'Open files' option
+		results_menu.add_separator()  # it adds a line after the 'Open files' option
 
 		if sys.platform.startswith('darwin'):
 			# https://tkdocs.com/tutorial/menus.html
 			# root.createcommand('tk::mac::ShowPreferences', showMyPreferencesDialog)
 			self.root.createcommand('tk::mac::Quit', self.on_closing)
 		else:
-			results_menu.add_command(label = "Exit", command = self.on_closing, accelerator="{}-x".format(accelkey))
+			results_menu.add_command(label="Exit", command=self.on_closing, accelerator="{}-x".format(accelkey))
 			window.bind("<{}-x>".format(accelkey), self.on_closing)
 
 		self.template_menu = tk.Menu(root_menu)
-		root_menu.add_cascade(label = "Template", menu = self.template_menu)
+		root_menu.add_cascade(label="Template", menu=self.template_menu)
 
-		self.template_menu.add_command(label = "New", command = self.mnu_template_New, accelerator="{}-n".format(accelkey)) # it adds a option to the sub menu 'command' parameter is used to do some action
+		self.template_menu.add_command(label="New", command=self.mnu_template_New, accelerator="{}-n".format(accelkey))  # it adds a option to the sub menu 'command' parameter is used to do some action
 		window.bind("<{}-n>".format(accelkey), self.mnu_template_New)
-		self.template_menu.add_command(label = "Open", command = self.mnu_template_Open, accelerator="{}-t".format(accelkey))
+		self.template_menu.add_command(label="Open", command=self.mnu_template_Open, accelerator="{}-t".format(accelkey))
 		window.bind("<{}-t>".format(accelkey), self.mnu_template_Open)
-		self.template_menu.add_command(label = "Save", command = self.mnu_template_Save, accelerator="{}-s".format(accelkey))
+		self.template_menu.add_command(label="Save", command=self.mnu_template_Save, accelerator="{}-s".format(accelkey))
 		window.bind("<{}-s>".format(accelkey), self.mnu_template_Save)
-		self.template_menu.add_command(label = "Save As", command = self.mnu_template_SaveAs, accelerator="{}-{}-s".format(accelkey, shifkey))
+		self.template_menu.add_command(label="Save As", command=self.mnu_template_SaveAs, accelerator="{}-{}-s".format(accelkey, shifkey))
 		window.bind("<{}-S>".format(accelkey), self.mnu_template_SaveAs)
-
-
 
 	def BuildUI(self):
 
@@ -4169,12 +4694,10 @@ class ReporterGUI(tk.Frame):
 		self.updateResults()
 		self.updateTemplate()
 
-
 		self.columnconfigure(0, weight=1)
 		self.rowconfigure(1, weight=1)
 
 		self.mainframe.rowconfigure(1, weight=1)
-
 
 		self.sbbar = tk.Frame(self.mainframe)
 		self.sbbar.grid(column=0, row=0, sticky="nsew")
@@ -4210,18 +4733,6 @@ class ReporterGUI(tk.Frame):
 
 	def ConfigureStyle(self):
 
-		# self.config["global"]["darkmode"] = False
-		# self.root.config["global"]["darkmode"] = False
-		# try:
-		# 	base.debugmsg(5, "self.config[global]:", self.config["global"])
-		# except:
-		# 	pass
-		# try:
-		# 	base.debugmsg(5, "self.root.config[global]:", self.root.config["global"])
-		# except:
-		# 	pass
-
-
 		self.style_head_colour = base.rs_setting_get_hcolour()
 
 		fontname = base.rs_setting_get_font()
@@ -4233,44 +4744,20 @@ class ReporterGUI(tk.Frame):
 
 		# Theme settings for ttk
 		self.style = ttk.Style()
-		# we really only seem to need this for MacOS 11 and up for now
-		# base.debugmsg(5, "sys.platform", sys.platform)
-		# base.debugmsg(5, "platform.system", platform.system())
-		# base.debugmsg(5, "platform.release", platform.release())
-		# base.debugmsg(5, "platform.mac_ver", platform.mac_ver())
-
-		# self.style.configure("TNotebook", borderwidth=0)
-		# self.style.configure("TNotebook.Tab", borderwidth=0)
-		# self.style.configure("TNotebook", highlightthickness=0)
-		# self.style.configure("TNotebook.Tab", highlightthickness=0)
-		# self.style.configure("TNotebook", padding=0)
-		# self.style.configure("TNotebook.Tab", padding=0)
-		# self.style.configure("TNotebook", tabmargins=0)
-		# self.style.configure("TNotebook.Tab", expand=0)
-
 
 		self.style.configure("TFrame", borderwidth=0)
-
 
 		if sys.platform.startswith('darwin'):
 			release, _, machine = platform.mac_ver()
 			split_ver = release.split('.')
 			if int(split_ver[0]) > 10:
+				# we really only seem to need this for MacOS 11 and up for now
 				# https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/ttk-style-layer.html
 				# https://tkdocs.com/tutorial/styles.html#usetheme
-
-				# self.root["background"] = self.style_feild_colour
-				# self.root["background"] = 'green'
-				# self.root.configure(bg='blue')
-				# self.rootBackground = self.root["background"]
-				# self.root.config()
-				# base.debugmsg(5, "self.root.config():", self.root.config())
-
 
 				self.style.configure("TLabel", foreground=self.style_text_colour)
 				self.style.configure("TEntry", foreground="systemPlaceholderTextColor")
 				self.style.configure("TEntry", insertcolor=self.style_text_colour)
-
 
 				self.style.configure("TButton", foreground=self.style_text_colour)
 				self.style.configure("TMenubutton", foreground=self.style_text_colour)
@@ -4289,60 +4776,47 @@ class ReporterGUI(tk.Frame):
 				base.debugmsg(9, "self.style_text_colour:	", self.style_text_colour)
 				base.debugmsg(9, "self.rootBackground:		", self.rootBackground)
 
-
 		layout = self.style.layout('TLabel')
 		base.debugmsg(9, "TLabel 	layout:", layout)
-		# style.configure('TLabelHead', font =('calibri', 10, 'bold', 'underline'), foreground = 'red')
-		# style.configure('Head.TLabel', font =('calibri', 16, 'bold'), foreground = 'Blue')
-		# style.configure('Head.TLabel', foreground='blue')
 		self.style.configure("Head.TLabel", foreground=self.style_head_colour)
-
 
 		layout = self.style.layout('Head.TLabel')
 		base.debugmsg(9, "Head.TLabel 	layout:", layout)
-
-		# self.style.configure('Heading.TLabel', font=('Helvetica', 12))
-		# self.style.configure('Head.TLabel', font=('Helvetica', 12))
-		# style.configure('Head.TLabel', background='white')
 
 		matplotlib.rcParams['font.family'] = fontname
 
 		self.style.configure('Report.TLabel', font=(fontname, fontsize))
 
-
-		base.debugmsg(9, "fontsize:", fontsize, "	sizeup:", sizeup, "	5*sizeup:", 5*sizeup, "	H1 size:", fontsize + (5*sizeup) )
+		base.debugmsg(9, "fontsize:", fontsize, "	sizeup:", sizeup, "	5*sizeup:", 5 * sizeup, "	H1 size:", fontsize + (5 * sizeup))
 
 		self.style.configure("Report.H1.TLabel", foreground=self.style_head_colour)
 		# self.style.configure("Report.H1.TLabel", foreground=self.style_head_colour, background=self.style_reportbg_colour)
-		self.style.configure('Report.H1.TLabel', font=(fontname, fontsize + (5*sizeup) ))
+		self.style.configure('Report.H1.TLabel', font=(fontname, fontsize + (5 * sizeup)))
 		# self.style.configure('Report.H1.TLabel', background=self.style_reportbg_colour)
 		# self.style.configure('Report.H1.TLabel', activebackground=self.style_reportbg_colour)
 		layout = self.style.layout('Report.H1.TLabel')
 		base.debugmsg(9, "Report.H1.TLabel 	layout:", layout)
 
 		self.style.configure("Report.H2.TLabel", foreground=self.style_head_colour)
-		self.style.configure('Report.H2.TLabel', font=(fontname, fontsize + (4*sizeup) ))
+		self.style.configure('Report.H2.TLabel', font=(fontname, fontsize + (4 * sizeup)))
 
 		self.style.configure("Report.H3.TLabel", foreground=self.style_head_colour)
-		self.style.configure('Report.H3.TLabel', font=(fontname, fontsize + (3*sizeup) ))
+		self.style.configure('Report.H3.TLabel', font=(fontname, fontsize + (3 * sizeup)))
 
 		self.style.configure("Report.H4.TLabel", foreground=self.style_head_colour)
-		self.style.configure('Report.H4.TLabel', font=(fontname, fontsize + (2*sizeup) ))
+		self.style.configure('Report.H4.TLabel', font=(fontname, fontsize + (2 * sizeup)))
 
 		self.style.configure("Report.H5.TLabel", foreground=self.style_head_colour)
-		self.style.configure('Report.H5.TLabel', font=(fontname, fontsize + (1*sizeup) ))
+		self.style.configure('Report.H5.TLabel', font=(fontname, fontsize + (1 * sizeup)))
 
 		self.style.configure("Report.H6.TLabel", foreground=self.style_head_colour)
 		self.style.configure('Report.H6.TLabel', font=(fontname, fontsize))
 
-
-		self.style.configure('Report.Title1.TLabel', font=(fontname, fontsize + (10*sizeup) ))
-		self.style.configure('Report.Title2.TLabel', font=(fontname, fontsize + (5*sizeup) ))
-
-
+		self.style.configure('Report.Title1.TLabel', font=(fontname, fontsize + (10 * sizeup)))
+		self.style.configure('Report.Title2.TLabel', font=(fontname, fontsize + (5 * sizeup)))
 
 		self.style.configure("Report.THead.TLabel", foreground=self.style_head_colour)
-		self.style.configure('Report.THead.TLabel', font=(fontname, fontsize + (1*sizeup) ))
+		self.style.configure('Report.THead.TLabel', font=(fontname, fontsize + (1 * sizeup)))
 		self.style.configure('Report.THead.TLabel', relief="raised")
 
 		self.style.configure('Report.TBody.TLabel', font=(fontname, fontsize))
@@ -4351,7 +4825,6 @@ class ReporterGUI(tk.Frame):
 		self.style.configure('Report.TBody.TLabel', relief="groove")
 
 		self.style.configure('Report.Settings.FileInput.TLabel', relief="sunken")
-
 
 	def BuildToolBar(self):
 		btnno = 0
@@ -4362,14 +4835,12 @@ class ReporterGUI(tk.Frame):
 		bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_results_Open)
 		bnew.grid(column=btnno, row=0, sticky="nsew")
 
-
 		btnno += 1
 		# New Report Template
-		#	"New Report Template"	page_add.png
+		# 	"New Report Template"	page_add.png
 		icontext = "New Report Template"
 		bnew = ttk.Button(self.bbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_template_New)
 		bnew.grid(column=btnno, row=0, sticky="nsew")
-
 
 		# Open Report Template
 		# 	self.imgdata["Open Report Template"] = folder_page.png
@@ -4404,7 +4875,6 @@ class ReporterGUI(tk.Frame):
 		# https://docs.python.org/3/library/markup.html
 		# https://github.com/CenterForOpenScience/pydocx
 
-
 		# # "Export PDF"		page_white_acrobat.png
 		# btnno += 1
 		# icontext = "Export PDF"
@@ -4438,7 +4908,6 @@ class ReporterGUI(tk.Frame):
 		# # https://github.com/pyexcel/pyexcel
 		# # https://github.com/pyexcel/pyexcel-ods
 
-
 		# "Export Excel"		page_excel.png				Excel - Issue #37
 		btnno += 1
 		icontext = "Export Excel"
@@ -4449,16 +4918,12 @@ class ReporterGUI(tk.Frame):
 		# https://github.com/pyexcel/pyexcel
 		# https://github.com/python-openxml/python-xlsx - seems doesn't exist
 
-
-
-
-
 	def BuildSections(self):
 
 		# self.sbbar
 		btnno = 0
 		# New Section
-		#	"New Section"	add.gif
+		# 	"New Section"	add.gif
 		icontext = "New Section"
 		bnew = ttk.Button(self.sbbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_new_rpt_sect)
 		bnew.grid(column=btnno, row=0, sticky="nsew")
@@ -4484,60 +4949,45 @@ class ReporterGUI(tk.Frame):
 		bdwn = ttk.Button(self.sbbar, image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, command=self.mnu_rpt_sect_down)
 		bdwn.grid(column=btnno, row=0, sticky="nsew")
 
-
-		#	https://pythonguides.com/python-tkinter-treeview/
+		# 	https://pythonguides.com/python-tkinter-treeview/
 		self.sectionstree = ttk.Treeview(self.sections, selectmode='browse', show='tree')
-		# self.sectionstree = ttk.Treeview(self.sections, selectmode='extended', show='tree')
 
 		self.sectionstree.grid(column=0, row=0, sticky="nsew")
 		# ttk.Style().configure("Treeview", background="pink")
 		# ttk.Style().configure("Treeview", fieldbackground="orange")
 
-		# vsb = ttk.Scrollbar(self.sections, orient=tk.VERTICAL,command=self.sectionstree.yview)
 		self.sections.vsb = ttk.Scrollbar(self.sections, orient="vertical", command=self.sectionstree.yview)
 		self.sectionstree.configure(yscrollcommand=self.sections.vsb.set)
 		self.sections.vsb.grid(column=1, row=0, sticky="nsew")
 
-		# hsb = ttk.Scrollbar(self.sections, orient=tk.HORIZONTAL,command=self.sectionstree.xview)
 		self.sections.hsb = ttk.Scrollbar(self.sections, orient="horizontal", command=self.sectionstree.xview)
 		self.sectionstree.configure(xscrollcommand=self.sections.hsb.set)
 		self.sections.hsb.grid(column=0, row=1, sticky="nsew")
 
 		self.sectionstree.bind("<Button-1>", self.sect_click_sect)
 
-		# if len(base.config['Reporter']['Template']) <1:
-		# 	self.mnu_template_New()
-		# else:
-		# 	self.mnu_template_New()
 		self.LoadSections("TOP")
 
 	def LoadSections(self, ParentID):
 		if ParentID == "TOP":
 			items = self.sectionstree.get_children("")
 			base.debugmsg(9, "items:", items)
-			if len(items)>0:
-				# self.sectionstree.delete(items)
+			if len(items) > 0:
 				for itm in items:
 					self.sectionstree.delete(itm)
 			self.sectionstree.insert("", "end", ParentID, text="Report", open=True, tags=ParentID)
 		else:
 			items = self.sectionstree.get_children(ParentID)
 			base.debugmsg(9, "items:", items)
-			if len(items)>0:
-				# self.sectionstree.delete(items)
+			if len(items) > 0:
 				for itm in items:
 					self.sectionstree.delete(itm)
-
 
 		sections = base.report_get_order(ParentID)
 		base.debugmsg(9, "sections:", sections)
 		for sect in sections:
 			self.LoadSection(ParentID, sect)
-		# self.sectionstree.see("RS")
 
-		# self.sectionstree.tag_bind("TOP", sequence=None, callback=self.sect_click_top)
-		# self.sectionstree.tag_bind("Sect", sequence=None, callback=self.sect_click_sect)
-		# self.sectionstree.tag_bind(ParentID, callback=self.sect_click_top)
 		self.sectionstree.tag_bind("Sect", callback=self.sect_click_sect)
 
 	def LoadSection(self, ParentID, sectionID):
@@ -4556,25 +5006,24 @@ class ReporterGUI(tk.Frame):
 		try:
 			base.debugmsg(5, "close window")
 			self.destroy()
-		except:
+		except Exception:
 			# were closing the application anyway, ignore any error
 			pass
 		base.debugmsg(5, "core.on_closing")
 		core.on_closing()
 
-	def sections_show_hide(self):
-		state = self.btnShowHide.get()
-		base.debugmsg(5, "state:", state)
-		if state == ">":
-			self.btnShowHide.set("<")
-			self.sections.grid(column=0, row=1, sticky="nsew")
-			self.mainframe.columnconfigure(0, weight=1)
-
-		else:
-			self.btnShowHide.set(">")
-			self.sections.grid_forget()
-			self.mainframe.columnconfigure(0, weight=0)
-
+	# def sections_show_hide(self):
+	# 	state = self.btnShowHide.get()
+	# 	base.debugmsg(5, "state:", state)
+	# 	if state == ">":
+	# 		self.btnShowHide.set("<")
+	# 		self.sections.grid(column=0, row=1, sticky="nsew")
+	# 		self.mainframe.columnconfigure(0, weight=1)
+	#
+	# 	else:
+	# 		self.btnShowHide.set(">")
+	# 		self.sections.grid_forget()
+	# 		self.mainframe.columnconfigure(0, weight=0)
 
 	def sect_click_top(self, *args):
 		selected = self.sectionstree.focus()
@@ -4582,30 +5031,18 @@ class ReporterGUI(tk.Frame):
 
 	def sect_click_sect(self, *args):
 		base.debugmsg(5, "args:", args, args[0].x, args[0].y)
-		# clicked = self.sectionstree.identify_element(args[0].x, args[0].y)
 		# base.debugmsg(5, "clicked:", clicked)
 		clicked = self.sectionstree.identify_row(args[0].y)
 		base.debugmsg(5, "clicked:", clicked, type(clicked), id(clicked))
-		if len(clicked)<1:
+		if len(clicked) < 1:
 			# unselect
 			clicked = "TOP"
 			self.sectionstree.selection_set('')
 			self.sectionstree.focus('')
 			return
-		# Seems it gets reselected after i unselected it here
-		# selected = self.sectionstree.focus()
-		# base.debugmsg(5, "selected:", selected, type(selected), id(selected))
-		# base.debugmsg(5, "clicked == selected:", clicked == selected)
-		# if clicked == selected:
-		# 	# unselect
-		# 	self.sectionstree.selection_set('')
-		# 	self.sectionstree.focus('')
-		# 	return
 
 		# load section pane
 
-		# self.content_settings(clicked)
-		# self.content_preview(clicked)
 		self.content_load(clicked)
 
 	def BuildContent(self):
@@ -4614,13 +5051,11 @@ class ReporterGUI(tk.Frame):
 		# 	I think the system default is ~20 on macos 11
 		self.tabs = ttk.Notebook(self.content, padding=0)
 
-		# self.tabs['padding'] = (0,1,5,10)
-
 		# first page, which would get widgets gridded into it
 		icontext = "Preview"
 		base.debugmsg(8, icontext)
 
-		self.contentframe = tk.Frame(self.tabs, padx=0, pady=0, bd=0)	# , padx=0, pady=0
+		self.contentframe = tk.Frame(self.tabs, padx=0, pady=0, bd=0)
 		# self.contentframe.config(bg="salmon")
 		self.contentframe.grid(column=0, row=0, sticky="nsew", padx=0, pady=0)
 
@@ -4631,11 +5066,7 @@ class ReporterGUI(tk.Frame):
 		self.contentcanvas.columnconfigure(0, weight=1)
 		self.contentcanvas.rowconfigure(0, weight=1)
 
-
-		# self.contentpreview = tk.Canvas(self.contentframe, bd=0)
-		# self.contentpreview = ttk.Canvas(self.contentframe)
-		self.contentpreview = tk.Frame(self.contentcanvas, padx=0, pady=0)	# , padx=0, pady=0
-		# self.contentpreview['padding'] = (0,1,5,10)
+		self.contentpreview = tk.Frame(self.contentcanvas, padx=0, pady=0)
 		# self.contentpreview.config(bg="cyan")
 		self.contentpreview.grid(column=0, row=0, sticky="nsew", padx=0, pady=0)
 		self.contentpreview.columnconfigure(0, weight=1)
@@ -4653,19 +5084,11 @@ class ReporterGUI(tk.Frame):
 		self.contentcanvas.configure(xscrollcommand=hsb.set)
 		hsb.grid(column=0, row=1, sticky="ew")
 
-
-
-
-
 		self.tabs.add(self.contentframe, image=self.imgdata[icontext], text=icontext, compound=tk.LEFT, padding=0, sticky="nsew")
-
-
-
 
 		base.debugmsg(9, "self.tabs:", self.tabs)
 		base.debugmsg(9, "self.tabs.tab(0):", self.tabs.tab(0))
 		base.debugmsg(9, "self.contentpreview:", self.contentpreview)
-
 
 		# second page
 		icontext = "Settings"
@@ -4701,20 +5124,22 @@ class ReporterGUI(tk.Frame):
 		# self.content
 		if id not in self.contentdata:
 			self.contentdata[id] = {}
+		if id + 'L' not in self.contentdata:
+			self.contentdata[id + 'L'] = {}
+		if id + 'R' not in self.contentdata:
+			self.contentdata[id + 'R'] = {}
 		if "Settings" not in self.contentdata[id]:
 			self.contentdata[id]["Settings"] = tk.Frame(self.contentsettings, padx=0, pady=0, bd=0)
 			# self.contentdata[id]["Settings"].config(bg="rosy brown")
-			if id=="TOP":
+			if id == "TOP":
 				self.cs_reportsettings()
 			else:
 				rownum = 0
-				# self.contentdata[id]["lblsettings"] = ttk.Label(self.contentdata[id]["Settings"], text="Settings for {}: {}".format(id, base.report_item_get_name(id)))
-				# self.contentdata[id]["lblsettings"].grid(column=0, row=0, sticky="nsew")
 				# Input field headding / name
 				self.contentdata[id]["lblHeading"] = ttk.Label(self.contentdata[id]["Settings"], text="Heading:")
 				self.contentdata[id]["lblHeading"].grid(column=0, row=rownum, sticky="nsew")
 
-				self.contentdata[id]["Heading"]=tk.StringVar()
+				self.contentdata[id]["Heading"] = tk.StringVar()
 				self.contentdata[id]["Heading"].set(base.report_item_get_name(id))
 				self.contentdata[id]["eHeading"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["Heading"])
 				self.contentdata[id]["eHeading"].grid(column=1, row=rownum, sticky="nsew")
@@ -4722,31 +5147,41 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["eHeading"].bind('<Leave>', self.cs_rename_heading)
 				self.contentdata[id]["eHeading"].bind('<FocusOut>', self.cs_rename_heading)
 
-
-
-				self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Settings"], text="")
-				self.contentdata[id]["lblSpacer"].grid(column=9, row=rownum, sticky="nsew")
-				self.contentdata[id]["Settings"].columnconfigure(9, weight=1)
-
 				rownum += 1
 				# option list - heading / text / graph / table
 				self.contentdata[id]["lblType"] = ttk.Label(self.contentdata[id]["Settings"], text="Type:")
 				self.contentdata[id]["lblType"].grid(column=0, row=rownum, sticky="nsew")
 
 				ContentTypes = [None] + list(base.settings["ContentTypes"].values())
-				self.contentdata[id]["Type"]=tk.StringVar()
+				self.contentdata[id]["Type"] = tk.StringVar()
 				self.contentdata[id]["Type"].set(base.report_item_get_type_lbl(id))
-				self.contentdata[id]["omType"]=ttk.OptionMenu( \
-													self.contentdata[id]["Settings"], \
-													self.contentdata[id]["Type"], \
-													command=self.cs_change_type, \
-													*ContentTypes)
+				self.contentdata[id]["omType"] = ttk.OptionMenu(
+					self.contentdata[id]["Settings"],
+					self.contentdata[id]["Type"],
+					command=self.cs_change_type,
+					*ContentTypes
+				)
 				self.contentdata[id]["omType"].grid(column=1, row=rownum, sticky="nsew")
 
 				rownum += 1
-				self.contentdata[id]["Frame"] = tk.Frame(self.contentdata[id]["Settings"], padx=0, pady=0, bd=0)
-				# self.contentdata[id]["Frame"].config(bg="SlateBlue2")
-				self.contentdata[id]["Frame"].grid(column=0, row=rownum, columnspan=10, sticky="nsew")
+				# Left and right frames
+				# Left frame
+				self.contentdata[id]["LFrame"] = tk.Frame(self.contentdata[id]["Settings"], padx=0, pady=0, bd=0)
+				self.contentdata[id]["LFrame"].grid(column=0, row=rownum, columnspan=10, sticky="nsew")
+
+				# Left frame padding
+				self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Settings"], text="")
+				self.contentdata[id]["lblSpacer"].grid(column=9, row=rownum - 1, sticky="nsew")
+				self.contentdata[id]["Settings"].columnconfigure(9, weight=1)
+
+				# Right frame
+				self.contentdata[id]["RFrame"] = tk.Frame(self.contentdata[id]["Settings"], padx=0, pady=0, bd=0)
+				self.contentdata[id]["RFrame"].grid(column=10, row=rownum, columnspan=10, sticky="nsew")
+
+				# Right frame padding
+				self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Settings"], text="")
+				self.contentdata[id]["lblSpacer"].grid(column=19, row=rownum - 1, sticky="nsew")
+				self.contentdata[id]["Settings"].columnconfigure(19, weight=1)
 
 				self.contentdata[id]["Settings"].rowconfigure(rownum, weight=1)
 
@@ -4764,14 +5199,14 @@ class ReporterGUI(tk.Frame):
 
 		curritem = self.contentsettings.grid_slaves(column=0, row=0)
 		base.debugmsg(5, "curritem:", curritem)
-		if len(curritem)>0:
+		if len(curritem) > 0:
 			curritem[0].grid_forget()
 		base.debugmsg(5, "newitem:", self.contentdata[id]["Settings"])
 		self.contentdata[id]["Settings"].grid(column=0, row=0, sticky="nsew")
 
 	def cs_reportsettings(self):
 		rownum = 0
-		id="TOP"
+		id = "TOP"
 
 		if "Settings" in self.contentdata[id]:
 			self.contentdata[id]["Settings"].grid_forget()
@@ -4779,50 +5214,43 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[id]["Settings"] = tk.Frame(self.contentsettings, padx=0, pady=0, bd=0)
 			self.contentdata[id]["Settings"].grid(column=0, row=0, sticky="nsew")
 
-
 		self.contentdata[id]["lblRS"] = ttk.Label(self.contentdata[id]["Settings"], text="Report Settings:")
 		self.contentdata[id]["lblRS"].grid(column=0, row=rownum, sticky="nsew")
 
 		# Report Title
-		rownum +=1
+		rownum += 1
 		self.contentdata[id]["lblTitle"] = ttk.Label(self.contentdata[id]["Settings"], text="Title:")
 		self.contentdata[id]["lblTitle"].grid(column=0, row=rownum, sticky="nsew")
 
-		self.contentdata[id]["strTitle"]=tk.StringVar()
+		self.contentdata[id]["strTitle"] = tk.StringVar()
 		self.contentdata[id]["strTitle"].set(base.rs_setting_get_title())
 		self.contentdata[id]["eTitle"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strTitle"])
 		self.contentdata[id]["eTitle"].grid(column=1, columnspan=9, row=rownum, sticky="nsew")
 		self.contentdata[id]["eTitle"].bind('<Leave>', self.cs_report_settings_update)
 		self.contentdata[id]["eTitle"].bind('<FocusOut>', self.cs_report_settings_update)
 
-
-
-
 		# chkbox display start and end time of test
-		rownum +=1
+		rownum += 1
 		self.contentdata[id]["lblDF"] = ttk.Label(self.contentdata[id]["Settings"], text="Date Format")
 		self.contentdata[id]["lblDF"].grid(column=0, row=rownum, sticky="nsew")
 
 		DFormats = [None, "yyyy-mm-dd", "dd/mm/yyyy", "dd-mm-yyyy", "dd.mm.yyyy", "mm/dd/yyyy"]
-		self.contentdata[id]["strDF"]=tk.StringVar()
+		self.contentdata[id]["strDF"] = tk.StringVar()
 		self.contentdata[id]["strDF"].set(base.rs_setting_get_dateformat())
 		self.contentdata[id]["omDF"] = ttk.OptionMenu(self.contentdata[id]["Settings"], self.contentdata[id]["strDF"], command=self.cs_report_settings_update, *DFormats)
 		self.contentdata[id]["omDF"].grid(column=1, row=rownum, sticky="nsew")
 
-
-
-
-		rownum +=1
+		rownum += 1
 		self.contentdata[id]["lblTF"] = ttk.Label(self.contentdata[id]["Settings"], text="Time Format")
 		self.contentdata[id]["lblTF"].grid(column=0, row=rownum, sticky="nsew")
 
 		TFormats = [None, "HH:MM", "HH:MM:SS", "HH.MM", "HH.MM.SS", "h:MM AMPM", "h:MM:SS AMPM", "h.MM AMPM", "h.MM.SS AMPM"]
-		self.contentdata[id]["strTF"]=tk.StringVar()
+		self.contentdata[id]["strTF"] = tk.StringVar()
 		self.contentdata[id]["strTF"].set(base.rs_setting_get_timeformat())
 		self.contentdata[id]["omTF"] = ttk.OptionMenu(self.contentdata[id]["Settings"], self.contentdata[id]["strTF"], command=self.cs_report_settings_update, *TFormats)
 		self.contentdata[id]["omTF"].grid(column=1, row=rownum, sticky="nsew")
 
-		rownum +=1
+		rownum += 1
 		self.contentdata[id]["lblTZ"] = ttk.Label(self.contentdata[id]["Settings"], text="Time Zone")
 		self.contentdata[id]["lblTZ"].grid(column=0, row=rownum, sticky="nsew")
 
@@ -4832,29 +5260,27 @@ class ReporterGUI(tk.Frame):
 		if LTZ not in ZL:
 			TZones.append(LTZ)
 		TZones = TZones + ZL
-		self.contentdata[id]["strTZ"]=tk.StringVar()
+		self.contentdata[id]["strTZ"] = tk.StringVar()
 		self.contentdata[id]["strTZ"].set(LTZ)
 		self.contentdata[id]["omTZ"] = ttk.OptionMenu(self.contentdata[id]["Settings"], self.contentdata[id]["strTZ"], command=self.cs_report_settings_update, *TZones)
 		self.contentdata[id]["omTZ"].grid(column=1, row=rownum, sticky="nsew")
 
-
-		rownum +=1
+		rownum += 1
 		col_disp = 3
 		self.contentdata[id]["lblST"] = ttk.Label(self.contentdata[id]["Settings"], text="Display")
 		self.contentdata[id]["lblST"].grid(column=col_disp, row=rownum, sticky="nsew")
 
 		# 		start time
-		rownum +=1
+		rownum += 1
 		self.contentdata[id]["lblST"] = ttk.Label(self.contentdata[id]["Settings"], text="Start Time:")
 		self.contentdata[id]["lblST"].grid(column=0, row=rownum, sticky="nsew")
 
-		self.contentdata[id]["strST"]=tk.StringVar()
+		self.contentdata[id]["strST"] = tk.StringVar()
 
 		iST = base.report_starttime()
 		fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
 
 		self.contentdata[id]["strST"].set(fST)
-		# self.contentdata[id]["eST"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strST"])
 		self.contentdata[id]["eST"] = ttk.Label(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strST"])
 		self.contentdata[id]["eST"].grid(column=1, row=rownum, sticky="nsew")
 
@@ -4863,13 +5289,12 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["chkST"] = ttk.Checkbutton(self.contentdata[id]["Settings"], variable=self.contentdata[id]["intST"], command=self.cs_report_settings_update)
 		self.contentdata[id]["chkST"].grid(column=col_disp, row=rownum, sticky="nsew")
 
-
 		# 		end time
-		rownum +=1
+		rownum += 1
 		self.contentdata[id]["lblET"] = ttk.Label(self.contentdata[id]["Settings"], text="End Time:")
 		self.contentdata[id]["lblET"].grid(column=0, row=rownum, sticky="nsew")
 
-		self.contentdata[id]["strET"]=tk.StringVar()
+		self.contentdata[id]["strET"] = tk.StringVar()
 
 		iET = base.report_endtime()
 		fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
@@ -4883,61 +5308,45 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["chkET"] = ttk.Checkbutton(self.contentdata[id]["Settings"], variable=self.contentdata[id]["intET"], command=self.cs_report_settings_update)
 		self.contentdata[id]["chkET"].grid(column=col_disp, row=rownum, sticky="nsew")
 
-
-
-
 		# Logo image
 		# picture.gif
-		rownum +=1
+		rownum += 1
 		self.contentdata[id]["lblLI"] = ttk.Label(self.contentdata[id]["Settings"], text="Logo Image:")
 		self.contentdata[id]["lblLI"].grid(column=0, row=rownum, sticky="nsew")
 
-
 		self.contentdata[id]["strLIPath"] = base.rs_setting_get_file("tlogo")
 		base.debugmsg(5, "tlogo:", self.contentdata[id]["strLIPath"])
-		# self.contentdata[id]["strLIPath"] = '/Users/dave/Documents/GitHub/rfswarm/robots/Test_Images/yourlogohere.jpg'
 
 		self.contentdata[id]["strLIName"] = tk.StringVar()
 		self.contentdata[id]["eLIName"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strLIName"], state="readonly", justify="right", style='TEntry')
-		# Report.Settings.FileInput.TLabel
-		# self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=" ", style='Report.THead.TLabel')
 		self.contentdata[id]["eLIName"].grid(column=1, row=rownum, sticky="nsew")
 
 		icontext = "Select Image"
 		# "Select Image"	picture.gif
-		self.contentdata[id]["btnLIName"] = ttk.Button(self.contentdata[id]["Settings"], image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, width=1) # , image=self.imgdata[icontext]
-		# self.contentdata[id]["btnLIName"].config(command=lambda: self.sr_file_validate(row))
+		self.contentdata[id]["btnLIName"] = ttk.Button(self.contentdata[id]["Settings"], image=self.imgdata[icontext], padding='3 3 3 3', text=icontext, width=1)
 		self.contentdata[id]["btnLIName"].config(command=self.cs_select_logoimage)
 		self.contentdata[id]["btnLIName"].grid(column=2, row=rownum, sticky="nsew")
 
-
 		# flogo = base.rs_setting_get_file("tlogo")
 		# if flogo is not None:
-		if len(self.contentdata[id]["strLIPath"])>0:
+		if len(self.contentdata[id]["strLIPath"]) > 0:
 			base.debugmsg(5, "strLIPath:", self.contentdata[id]["strLIPath"])
 			path, filename = os.path.split(self.contentdata[id]["strLIPath"])
 			base.debugmsg(5, "filename:", filename, type(filename))
 			self.contentdata[id]["strLIName"].set(filename)
-
 
 		self.contentdata[id]["intLI"] = tk.IntVar()
 		self.contentdata[id]["intLI"].set(base.rs_setting_get_int("showtlogo"))
 		self.contentdata[id]["chkLI"] = ttk.Checkbutton(self.contentdata[id]["Settings"], variable=self.contentdata[id]["intLI"], command=self.cs_report_settings_update)
 		self.contentdata[id]["chkLI"].grid(column=col_disp, row=rownum, sticky="nsew")
 
-
-
-
 		# wattermark image
-		# rownum +=1
+		# rownum += 1
 		# self.contentdata[id]["lblWM"] = ttk.Label(self.contentdata[id]["Settings"], text="Watermark Image:")
 		# self.contentdata[id]["lblWM"].grid(column=0, row=rownum, sticky="nsew")
 
-
-
-
 		# report font
-		rownum +=1
+		rownum += 1
 		self.contentdata[id]["lblFont"] = ttk.Label(self.contentdata[id]["Settings"], text="Font:")
 		self.contentdata[id]["lblFont"].grid(column=0, row=rownum, sticky="nsew")
 
@@ -4965,11 +5374,10 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["intFontSz"].set(base.rs_setting_get_fontsize())
 		self.contentdata[id]["omFontSz"].grid(column=2, row=rownum, sticky="nsew")
 
-
 		# highlight colour
 		# color_swatch.gif
 		# https://www.pythontutorial.net/tkinter/tkinter-color-chooser/
-		rownum +=1
+		rownum += 1
 		self.contentdata[id]["lblHColour"] = ttk.Label(self.contentdata[id]["Settings"], text="Highlight Colour:")
 		self.contentdata[id]["lblHColour"].grid(column=0, row=rownum, sticky="nsew")
 
@@ -4982,11 +5390,9 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["btnHColour"].config(command=self.cs_select_hcolour)
 		self.contentdata[id]["btnHColour"].grid(column=2, row=rownum, sticky="nsew")
 
-
-
 		# report %ile
 
-		rownum +=1
+		rownum += 1
 		self.contentdata[id]["lblPctile"] = ttk.Label(self.contentdata[id]["Settings"], text="Percentile:")
 		self.contentdata[id]["lblPctile"].grid(column=0, row=rownum, sticky="nsew")
 
@@ -5000,64 +5406,14 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["lblPctile"] = ttk.Label(self.contentdata[id]["Settings"], text="%")
 		self.contentdata[id]["lblPctile"].grid(column=2, row=rownum, sticky="nsew")
 
-		# Table of Contents, chkbox, levels, etc
-
-		# 2022-01-25 This might have to wait for next feature version
-		# rownum +=1
-		# self.contentdata[id]["lblHF"] = ttk.Label(self.contentdata[id]["Settings"], text="Headers and Footers:")
-		# self.contentdata[id]["lblHF"].grid(column=0, row=rownum, sticky="nsew")
-		#
-		# # rownum +=1
-		# col_hdisp = 3
-		# self.contentdata[id]["lblHF"] = ttk.Label(self.contentdata[id]["Settings"], text="Dispaly")
-		# self.contentdata[id]["lblHF"].grid(column=col_hdisp, row=rownum, sticky="nsew")
-		#
-		# col_head = col_hdisp + 1
-		# self.contentdata[id]["lblPH"] = ttk.Label(self.contentdata[id]["Settings"], text="Header")
-		# self.contentdata[id]["lblPH"].grid(column=col_head, row=rownum, sticky="nsew")
-		# col_foot = col_head + 1
-		# self.contentdata[id]["lblPF"] = ttk.Label(self.contentdata[id]["Settings"], text="Footer")
-		# self.contentdata[id]["lblPF"].grid(column=col_foot, row=rownum, sticky="nsew")
-		#
-		# col_posl = col_foot + 1
-		# self.contentdata[id]["lblPL"] = ttk.Label(self.contentdata[id]["Settings"], text="Left")
-		# self.contentdata[id]["lblPL"].grid(column=col_posl, row=rownum, sticky="nsew")
-		# col_posc = col_posl + 1
-		# self.contentdata[id]["lblPC"] = ttk.Label(self.contentdata[id]["Settings"], text="Centre")
-		# self.contentdata[id]["lblPC"].grid(column=col_posc, row=rownum, sticky="nsew")
-		# col_posr = col_posc + 1
-		# self.contentdata[id]["lblPC"] = ttk.Label(self.contentdata[id]["Settings"], text="Right")
-		# self.contentdata[id]["lblPC"].grid(column=col_posr, row=rownum, sticky="nsew")
-		#
-		# # page header text
-		# # page footer text
-		#
-		# # Page Number
-		# rownum +=1
-		# self.contentdata[id]["lblPN"] = ttk.Label(self.contentdata[id]["Settings"], text="Page Number:")
-		# self.contentdata[id]["lblPN"].grid(column=0, row=rownum, sticky="nsew")
-		#
-		# # rownum +=1
-		# # self.contentdata[id]["lblTPN"] = ttk.Label(self.contentdata[id]["Settings"], text="Total Pages:")
-		# # self.contentdata[id]["lblTPN"].grid(column=0, row=rownum, sticky="nsew")
-		#
-		# # Document location
-		#
-		# # Logo image
-
-
-
-
-
 	def cs_report_settings_update(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
 		# id = self.sectionstree.focus()
 		# base.debugmsg(9, "id:", id)
-		id="TOP"
+		id = "TOP"
 
 		if "strTitle" in self.contentdata[id]:
 			base.rs_setting_set("title", self.contentdata[id]["strTitle"].get())
-
 
 		# base.rs_setting_set_file("tlogo", fpath)
 		if "strLIPath" in self.contentdata[id]:
@@ -5066,7 +5422,6 @@ class ReporterGUI(tk.Frame):
 		# showlogo
 		if "intLI" in self.contentdata[id]:
 			base.rs_setting_set_int("showtlogo", self.contentdata[id]["intLI"].get())
-
 
 		if "strDF" in self.contentdata[id]:
 			base.rs_setting_set("dateformat", self.contentdata[id]["strDF"].get())
@@ -5083,7 +5438,6 @@ class ReporterGUI(tk.Frame):
 		if "intET" in self.contentdata[id]:
 			base.rs_setting_set_int("showendtime", self.contentdata[id]["intET"].get())
 
-
 		if "strFont" in self.contentdata[id]:
 			base.rs_setting_set("font", self.contentdata[id]["strFont"].get())
 
@@ -5094,33 +5448,41 @@ class ReporterGUI(tk.Frame):
 
 		if "intPctile" in self.contentdata[id]:
 			pct = int(self.contentdata[id]["intPctile"].get())
-			if pct>0:
+			if pct > 0:
 				base.debugmsg(5, "pct:", pct, "	", type(pct))
 				base.rs_setting_set_int("percentile", pct)
 
-
-		# if "Settings" in self.contentdata[id]:
-		# 	# force refresh
-		# 	del self.contentdata[id]["Settings"]
 		self.cs_reportsettings()
 
 		self.ConfigureStyle()
-		# self.cp_regenerate_preview()
 		regen = threading.Thread(target=self.cp_regenerate_preview)
 		regen.start()
 
 	def cs_select_logoimage(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
-		id="TOP"
+		id = "TOP"
 
 		opendir = base.config['Reporter']['ResultDir']
-		if len(self.contentdata[id]["strLIPath"])>0:
+		if len(self.contentdata[id]["strLIPath"]) > 0:
 			opendir, filename = os.path.split(self.contentdata[id]["strLIPath"])
 
-		imagefile = str(tkf.askopenfilename(initialdir=opendir, title = "Select Logo Image", filetypes = (("JPEG","*.jpg"),("JPEG","*.jpeg"),("PNG","*.png"),("GIF","*.gif"),("Bitmap","*.bmp"),("all files","*.*"))))
+		imagefile = str(
+			tkf.askopenfilename(
+				initialdir=opendir,
+				title="Select Logo Image",
+				filetypes=(
+					("JPEG", "*.jpg"),
+					("JPEG", "*.jpeg"),
+					("PNG", "*.png"),
+					("GIF", "*.gif"),
+					("Bitmap", "*.bmp"),
+					("all files", "*.*")
+				)
+			)
+		)
 		base.debugmsg(5, "imagefile:", imagefile)
 
-		if imagefile is not None and len(imagefile)>0:
+		if imagefile is not None and len(imagefile) > 0:
 			self.contentdata[id]["strLIPath"] = imagefile
 			base.debugmsg(5, "strLIPath:", self.contentdata[id]["strLIPath"])
 			base.rs_setting_set_file("tlogo", self.contentdata[id]["strLIPath"])
@@ -5139,7 +5501,6 @@ class ReporterGUI(tk.Frame):
 
 	def cs_select_hcolour(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
-		id="TOP"
 		# https://www.pythontutorial.net/tkinter/tkinter-color-chooser/
 		newcolour = tkac.askcolor(self.style_head_colour, title="Tkinter Color Chooser")
 		base.debugmsg(5, "newcolour:", newcolour)
@@ -5149,7 +5510,6 @@ class ReporterGUI(tk.Frame):
 			self.style_head_colour = newcolourhx
 			base.rs_setting_set("hcolour", newcolourhx)
 
-
 			# refresh
 			self.cs_reportsettings()
 
@@ -5157,7 +5517,6 @@ class ReporterGUI(tk.Frame):
 			# self.cp_regenerate_preview()
 			regen = threading.Thread(target=self.cp_regenerate_preview)
 			regen.start()
-
 
 	def cs_rename_heading(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
@@ -5191,12 +5550,11 @@ class ReporterGUI(tk.Frame):
 		vals = list(base.settings["ContentTypes"].values())
 		idx = 0
 		if _event in vals:
-			idx  = vals.index(_event)
+			idx = vals.index(_event)
 
 		type = keys[idx]
 		base.report_item_set_type(id, type)
 		self.content_load(id)
-
 
 	#
 	# Settings	-	Contents
@@ -5207,25 +5565,25 @@ class ReporterGUI(tk.Frame):
 		rownum = 0
 
 		rownum += 1
-		self.contentdata[id]["lblCM"] = ttk.Label(self.contentdata[id]["Frame"], text = "Mode:")
+		self.contentdata[id]["lblCM"] = ttk.Label(self.contentdata[id]["LFrame"], text="Mode:")
 		self.contentdata[id]["lblCM"].grid(column=0, row=rownum, sticky="nsew")
 
 		ContentsModes = [None, "Table Of Contents", "Table of Graphs", "Table Of Tables"]
 		self.contentdata[id]["strCM"] = tk.StringVar()
-		self.contentdata[id]["omCM"] = ttk.OptionMenu(self.contentdata[id]["Frame"], self.contentdata[id]["strCM"], command=self.cs_contents_update, *ContentsModes)
+		self.contentdata[id]["omCM"] = ttk.OptionMenu(self.contentdata[id]["LFrame"], self.contentdata[id]["strCM"], command=self.cs_contents_update, *ContentsModes)
 
 		self.contentdata[id]["strCM"].set(base.rt_contents_get_mode(id))
 		self.contentdata[id]["omCM"].grid(column=1, row=rownum, sticky="nsew")
 
 		rownum += 1
-		self.contentdata[id]["lblCL"] = ttk.Label(self.contentdata[id]["Frame"], text = "Level:")
+		self.contentdata[id]["lblCL"] = ttk.Label(self.contentdata[id]["LFrame"], text="Level:")
 		self.contentdata[id]["lblCL"].grid(column=0, row=rownum, sticky="nsew")
 
 		Levels = [None]
 		for i in range(6):
-			Levels.append(i+1)
+			Levels.append(i + 1)
 		self.contentdata[id]["intCL"] = tk.IntVar()
-		self.contentdata[id]["omCL"] = ttk.OptionMenu(self.contentdata[id]["Frame"], self.contentdata[id]["intCL"], command=self.cs_contents_update, *Levels)
+		self.contentdata[id]["omCL"] = ttk.OptionMenu(self.contentdata[id]["LFrame"], self.contentdata[id]["intCL"], command=self.cs_contents_update, *Levels)
 		self.contentdata[id]["intCL"].set(base.rt_contents_get_level(id))
 		self.contentdata[id]["omCL"].grid(column=1, row=rownum, sticky="nsew")
 
@@ -5245,7 +5603,6 @@ class ReporterGUI(tk.Frame):
 		cp = threading.Thread(target=lambda: self.content_preview(id))
 		cp.start()
 
-
 	#
 	# Settings	-	Note
 	#
@@ -5253,15 +5610,15 @@ class ReporterGUI(tk.Frame):
 	def cs_note(self, id):
 		base.debugmsg(9, "id:", id)
 		# base.rt_note_get(id)
-		self.contentdata[id]["tNote"] = tk.Text(self.contentdata[id]["Frame"])
+		self.contentdata[id]["tNote"] = tk.Text(self.contentdata[id]["LFrame"])
 		# background="yellow", foreground="blue"
 		# self.contentdata[id]["tNote"].config(bg="SlateBlue2")
 		self.contentdata[id]["tNote"].config(background=self.style_feild_colour, foreground=self.style_text_colour, insertbackground=self.style_text_colour)
 
-		data = self.contentdata[id]["tNote"].insert('0.0', base.rt_note_get(id))
+		self.contentdata[id]["tNote"].insert('0.0', base.rt_note_get(id))
 		self.contentdata[id]["tNote"].grid(column=0, row=0, sticky="nsew")
-		self.contentdata[id]["Frame"].rowconfigure(0, weight=1)
-		self.contentdata[id]["Frame"].columnconfigure(0, weight=1)
+		self.contentdata[id]["LFrame"].rowconfigure(0, weight=1)
+		self.contentdata[id]["LFrame"].columnconfigure(0, weight=1)
 		self.contentdata[id]["tNote"].bind('<Leave>', self.cs_note_update)
 		self.contentdata[id]["tNote"].bind('<FocusOut>', self.cs_note_update)
 
@@ -5285,39 +5642,25 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(9, "id:", id)
 		colours = base.rt_table_get_colours(id)
 		datatype = base.rt_table_get_dt(id)
-		self.contentdata[id]["Frame"].columnconfigure(99, weight=1)
+		self.contentdata[id]["LFrame"].columnconfigure(99, weight=1)
 		rownum = 0
 
-		# sql for getting tables and views for drop down list
-		# SELECT name FROM sqlite_master
-		# -- WHERE type IN ('table','view')
-		# -- WHERE type IN ('table')
-		# WHERE type IN ('view')
-		# 	AND name NOT LIKE 'sqlite_%'
-		#
-		#
-		# -- UNION ALL
-		# -- SELECT name FROM sqlite_temp_master
-		# -- WHERE type IN ('table','view')
-		# ORDER BY 1
-
 		rownum += 1
-		self.contentdata[id]["lblColours"] = ttk.Label(self.contentdata[id]["Frame"], text="Show graph colours:")
+		self.contentdata[id]["lblColours"] = ttk.Label(self.contentdata[id]["LFrame"], text="Show graph colours:")
 		self.contentdata[id]["lblColours"].grid(column=0, row=rownum, sticky="nsew")
 
 		self.contentdata[id]["intColours"] = tk.IntVar()
-		self.contentdata[id]["chkColours"] = ttk.Checkbutton(self.contentdata[id]["Frame"], variable=self.contentdata[id]["intColours"], command=self.cs_datatable_update)
+		self.contentdata[id]["chkColours"] = ttk.Checkbutton(self.contentdata[id]["LFrame"], variable=self.contentdata[id]["intColours"], command=self.cs_datatable_update)
 		self.contentdata[id]["intColours"].set(colours)
 		self.contentdata[id]["chkColours"].grid(column=1, row=rownum, sticky="nsew")
 
-
 		rownum += 1
-		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["Frame"], text = "Data Type:")
+		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["LFrame"], text="Data Type:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
 
 		DataTypes = [None, "Metric", "Result", "ResultSummary", "SQL"]
 		self.contentdata[id]["strDT"] = tk.StringVar()
-		self.contentdata[id]["omDT"] = ttk.OptionMenu(self.contentdata[id]["Frame"], self.contentdata[id]["strDT"], command=self.cs_datatable_switchdt, *DataTypes)
+		self.contentdata[id]["omDT"] = ttk.OptionMenu(self.contentdata[id]["LFrame"], self.contentdata[id]["strDT"], command=self.cs_datatable_switchdt, *DataTypes)
 		self.contentdata[id]["strDT"].set(datatype)
 		self.contentdata[id]["omDT"].grid(column=1, row=rownum, sticky="nsew")
 
@@ -5325,9 +5668,9 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["DTFrame"] = rownum
 		self.cs_datatable_switchdt(id)
 
-
 	def cs_datatable_update(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
+		changes = 0
 		id = self.sectionstree.focus()
 		if _event is not None:
 			name = base.report_item_get_name(_event)
@@ -5336,48 +5679,66 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(9, "id:", id)
 		if "intColours" in self.contentdata[id]:
 			colours = self.contentdata[id]["intColours"].get()
-			base.rt_table_set_colours(id, colours)
+			changes += base.rt_table_set_colours(id, colours)
 
-
+		base.debugmsg(5, "changes:", changes)
 		if "intIsNum" in self.contentdata[id]:
 			value = self.contentdata[id]["intIsNum"].get()
-			base.rt_table_set_isnumeric(id, value)
+			changes += base.rt_table_set_isnumeric(id, value)
 		if "intShCnt" in self.contentdata[id]:
 			value = self.contentdata[id]["intShCnt"].get()
 			base.rt_table_set_showcount(id, value)
 		# self.contentdata[id]["MType"].set(base.rt_table_get_mt(id))
 		if "MType" in self.contentdata[id]:
 			value = self.contentdata[id]["MType"].get()
-			base.rt_table_set_mt(id, value)
+			changes += base.rt_table_set_mt(id, value)
 		# self.contentdata[id]["PMetric"].set(base.rt_table_get_pm(id))
 		if "PMetric" in self.contentdata[id]:
 			value = self.contentdata[id]["PMetric"].get()
-			base.rt_table_set_pm(id, value)
+			changes += base.rt_table_set_pm(id, value)
 		# self.contentdata[id]["SMetric"].set(base.rt_table_get_sm(id))
 		if "SMetric" in self.contentdata[id]:
 			value = self.contentdata[id]["SMetric"].get()
-			base.rt_table_set_sm(id, value)
+			changes += base.rt_table_set_sm(id, value)
 
+		base.debugmsg(5, "changes:", changes)
 		# self.contentdata[id]["RType"].set(base.rt_table_get_rt(id))
 		if "RType" in self.contentdata[id]:
 			value = self.contentdata[id]["RType"].get()
-			base.rt_table_set_rt(id, value)
+			changes += base.rt_table_set_rt(id, value)
 		# self.contentdata[id]["FRType"].set(base.rt_table_get_fr(id))
 		if "FRType" in self.contentdata[id]:
 			value = self.contentdata[id]["FRType"].get()
-			base.rt_table_set_fr(id, value)
+			changes += base.rt_table_set_fr(id, value)
+		# self.contentdata[id]["intFR"] = tk.IntVar()
+		if "intFR" in self.contentdata[id]:
+			value = self.contentdata[id]["intFR"].get()
+			changes += base.rt_table_set_enfr(id, value)
+
+		if "intFA" in self.contentdata[id]:
+			value = self.contentdata[id]["intFA"].get()
+			changes += base.rt_table_set_enfa(id, value)
+		# self.contentdata[id]["FAType"] = tk.StringVar()
+		if "FAType" in self.contentdata[id]:
+			value = self.contentdata[id]["FAType"].get()
+			changes += base.rt_table_set_fa(id, value)
+
+		base.debugmsg(5, "changes:", changes)
 		# self.contentdata[id]["FNType"].set(base.rt_table_get_fn(id))
 		if "FNType" in self.contentdata[id]:
 			value = self.contentdata[id]["FNType"].get()
-			base.rt_table_set_fn(id, value)
+			changes += base.rt_table_set_fn(id, value)
+
+		base.debugmsg(5, "changes:", changes)
 		# self.contentdata[id]["FPattern"].set(base.rt_table_get_fp(id))
 		if "FPattern" in self.contentdata[id]:
 			value = self.contentdata[id]["FPattern"].get()
-			base.rt_table_set_fp(id, value)
+			changes += base.rt_table_set_fp(id, value)
 
+		base.debugmsg(5, "changes:", changes)
 		if "strDT" in self.contentdata[id]:
 			datatype = self.contentdata[id]["strDT"].get()
-			base.rt_table_set_dt(id, datatype)
+			changes += base.rt_table_set_dt(id, datatype)
 
 			if datatype == "Metric":
 				self.cs_datatable_update_metrics(id)
@@ -5386,21 +5747,59 @@ class ReporterGUI(tk.Frame):
 				time.sleep(0.1)
 				base.rt_table_generate_sql(id)
 
+		base.debugmsg(5, "changes:", changes)
 		if "tSQL" in self.contentdata[id]:
 			data = self.contentdata[id]["tSQL"].get('0.0', tk.END).strip()
 			base.debugmsg(5, "data:", data)
-			base.rt_table_set_sql(id, data)
+			changes += base.rt_table_set_sql(id, data)
 		else:
 			time.sleep(0.1)
 			base.rt_table_generate_sql(id)
 
+		base.debugmsg(5, "changes:", changes)
+		if "renamecolumns" in self.contentdata[id] and "colnames" in self.contentdata[id]["renamecolumns"]:
+			for colname in self.contentdata[id]["renamecolumns"]["colnames"]:
+				value = self.contentdata[id]["renamecolumns"][colname].get()
+				changes += base.rt_table_set_colname(id, colname, value)
+
 		base.debugmsg(5, "content_preview id:", id)
 		# self.content_preview(id)
-		cp = threading.Thread(target=lambda: self.content_preview(id))
-		cp.start()
+		base.debugmsg(5, "changes:", changes)
+		if changes > 0:
+			# this should make the UI a bit less jumpy
+			cp = threading.Thread(target=lambda: self.content_preview(id))
+			cp.start()
+			self.cs_datatable_add_renamecols(id)
+			# cp = threading.Thread(target=lambda: self.cs_datatable_add_renamecols(id))
+			# cp.start()
+
+		# rt_table_get_alst
+
+	def cs_datatable_update_result(self, id):
+		base.debugmsg(5, "id:", id)
+		tag = threading.Thread(target=lambda: self.cs_datatable_update_resultagents(id))
+		tag.start()
+
+	def cs_datatable_update_resultagents(self, id):
+		base.debugmsg(5, "id:", id)
+		self.contentdata[id]["FATypes"] = base.rt_table_get_alst(id)
+		if "omFA" in self.contentdata[id]:
+			try:
+				self.contentdata[id]["omFA"].set_menu(*self.contentdata[id]["FATypes"])
+			except Exception as e:
+				base.debugmsg(5, "e:", e)
+
+	def cs_datatable_update_metricagents(self, id):
+		base.debugmsg(5, "id:", id)
+		self.contentdata[id]["FATypes"] = base.rt_table_get_malst(id)
+		if "omFA" in self.contentdata[id]:
+			try:
+				self.contentdata[id]["omFA"].set_menu(*self.contentdata[id]["FATypes"])
+			except Exception as e:
+				base.debugmsg(5, "e:", e)
 
 	def cs_datatable_update_metrics(self, id):
-		base.debugmsg(9, "id:", id)
+		base.debugmsg(5, "id:", id)
 		tmt = threading.Thread(target=lambda: self.cs_datatable_update_metricstype(id))
 		tmt.start()
 		base.debugmsg(6, "tmt")
@@ -5411,9 +5810,16 @@ class ReporterGUI(tk.Frame):
 		tsm.start()
 		base.debugmsg(6, "tsm")
 
+		showmetricagents = 0
+		if "DBTable" in base.settings and "Metrics" in base.settings["DBTable"] and "DataSource" in base.settings["DBTable"]["Metrics"]:
+			showmetricagents = base.settings["DBTable"]["Metrics"]["DataSource"]
+		if showmetricagents:
+			tag = threading.Thread(target=lambda: self.cs_datatable_update_metricagents(id))
+			tag.start()
+			base.debugmsg(6, "tag")
 
 	def cs_datatable_update_metricstype(self, id):
-		base.debugmsg(9, "id:", id)
+		base.debugmsg(5, "id:", id)
 		self.contentdata[id]["Metrics"] = base.rt_table_get_mlst(id)
 		if "omMT" in self.contentdata[id]:
 			try:
@@ -5422,7 +5828,7 @@ class ReporterGUI(tk.Frame):
 				base.debugmsg(5, "e:", e)
 
 	def cs_datatable_update_pmetrics(self, id):
-		base.debugmsg(9, "id:", id)
+		base.debugmsg(5, "id:", id)
 		self.contentdata[id]["PMetrics"] = base.rt_table_get_pmlst(id)
 		if "omPM" in self.contentdata[id]:
 			try:
@@ -5431,7 +5837,7 @@ class ReporterGUI(tk.Frame):
 				base.debugmsg(5, "e:", e)
 
 	def cs_datatable_update_smetrics(self, id):
-		base.debugmsg(9, "id:", id)
+		base.debugmsg(5, "id:", id)
 		self.contentdata[id]["SMetrics"] = base.rt_table_get_smlst(id)
 		if "omSM" in self.contentdata[id]:
 			try:
@@ -5453,13 +5859,16 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "datatype:", datatype)
 		if "Frames" not in self.contentdata[id]:
 			self.contentdata[id]["Frames"] = {}
+
 		# Forget
 		for frame in self.contentdata[id]["Frames"].keys():
 			self.contentdata[id]["Frames"][frame].grid_forget()
 			self.contentdata[id]["Frames"] = {}
+
 		# Construct
 		if datatype not in self.contentdata[id]["Frames"]:
-			self.contentdata[id]["Frames"][datatype] = tk.Frame(self.contentdata[id]["Frame"])
+			rownum = 0
+			self.contentdata[id]["Frames"][datatype] = tk.Frame(self.contentdata[id]["LFrame"])
 			# self.contentdata[id]["Frames"][datatype].config(bg="SlateBlue3")
 			# self.contentdata[id]["Frames"][datatype].columnconfigure(0, weight=1)
 			self.contentdata[id]["Frames"][datatype].columnconfigure(99, weight=1)
@@ -5468,23 +5877,32 @@ class ReporterGUI(tk.Frame):
 
 			if datatype == "Metric":
 
+				showmetricagents = 0
+				if "DBTable" in base.settings and "Metrics" in base.settings["DBTable"] and "DataSource" in base.settings["DBTable"]["Metrics"]:
+					showmetricagents = base.settings["DBTable"]["Metrics"]["DataSource"]
+
 				rownum += 1
-				self.contentdata[id]["lblIsNum"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Number Value:")
+				self.contentdata[id]["lblIsNum"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Number Value:")
 				self.contentdata[id]["lblIsNum"].grid(column=0, row=rownum, sticky="nsew")
 
 				self.contentdata[id]["intIsNum"] = tk.IntVar()
 				self.contentdata[id]["chkIsNum"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intIsNum"], command=self.cs_datatable_update)
 				self.contentdata[id]["chkIsNum"].grid(column=1, row=rownum, sticky="nsew")
 
-				self.contentdata[id]["lblShCnt"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Show Counts:")
+				self.contentdata[id]["lblShCnt"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Show Counts:")
 				self.contentdata[id]["lblShCnt"].grid(column=2, row=rownum, sticky="nsew")
 
 				self.contentdata[id]["intShCnt"] = tk.IntVar()
 				self.contentdata[id]["chkShCnt"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intShCnt"], command=self.cs_datatable_update)
 				self.contentdata[id]["chkShCnt"].grid(column=3, row=rownum, sticky="nsew")
 
+				if showmetricagents:
+					rownum += 1
+					self.contentdata[id]["lblEnabled"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Enabled")
+					self.contentdata[id]["lblEnabled"].grid(column=2, row=rownum, sticky="nsew")
+
 				rownum += 1
-				self.contentdata[id]["lblMT"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Metric Type:")
+				self.contentdata[id]["lblMT"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Metric Type:")
 				self.contentdata[id]["lblMT"].grid(column=0, row=rownum, sticky="nsew")
 
 				self.contentdata[id]["MTypes"] = [None, "", "Loading..."]
@@ -5493,7 +5911,7 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["omMT"].grid(column=1, row=rownum, sticky="nsew")
 
 				rownum += 1
-				self.contentdata[id]["lblPM"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Primrary Metric:")
+				self.contentdata[id]["lblPM"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Primrary Metric:")
 				self.contentdata[id]["lblPM"].grid(column=0, row=rownum, sticky="nsew")
 
 				self.contentdata[id]["PMetrics"] = [None, "", "Loading..."]
@@ -5502,7 +5920,7 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["omPM"].grid(column=1, row=rownum, sticky="nsew")
 
 				rownum += 1
-				self.contentdata[id]["lblSM"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Secondary Metric:")
+				self.contentdata[id]["lblSM"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Secondary Metric:")
 				self.contentdata[id]["lblSM"].grid(column=0, row=rownum, sticky="nsew")
 
 				self.contentdata[id]["SMetrics"] = [None, "", "Loading..."]
@@ -5510,9 +5928,46 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["omSM"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["SMetric"], command=self.cs_datatable_update, *self.contentdata[id]["SMetrics"])
 				self.contentdata[id]["omSM"].grid(column=1, row=rownum, sticky="nsew")
 
+				if showmetricagents:
+					rownum += 1
+					self.contentdata[id]["lblFA"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Agent:")
+					self.contentdata[id]["lblFA"].grid(column=0, row=rownum, sticky="nsew")
+
+					self.contentdata[id]["FATypes"] = [None, "", "Loading..."]
+					self.contentdata[id]["FAType"] = tk.StringVar()
+					self.contentdata[id]["omFA"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["FAType"], command=self.cs_datatable_update, *self.contentdata[id]["FATypes"])
+					self.contentdata[id]["omFA"].grid(column=1, row=rownum, sticky="nsew")
+
+					self.contentdata[id]["intFA"] = tk.IntVar()
+					self.contentdata[id]["chkFA"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intFA"], command=self.cs_datatable_update)
+					self.contentdata[id]["chkFA"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["lblFN"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Type:")
+				self.contentdata[id]["lblFN"].grid(column=0, row=rownum, sticky="nsew")
+
+				FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
+				self.contentdata[id]["FNType"] = tk.StringVar()
+				self.contentdata[id]["omFR"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["FNType"], command=self.cs_datatable_update, *FNTypes)
+				self.contentdata[id]["omFR"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["lblFP"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Pattern:")
+				self.contentdata[id]["lblFP"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["FPattern"] = tk.StringVar()
+				self.contentdata[id]["inpFP"] = ttk.Entry(self.contentdata[id]["Frames"][datatype], textvariable=self.contentdata[id]["FPattern"])
+				self.contentdata[id]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[id]["inpFP"].bind('<Leave>', self.cs_datatable_update)
+				self.contentdata[id]["inpFP"].bind('<FocusOut>', self.cs_datatable_update)
+
 			if datatype == "Result":
 				rownum += 1
-				self.contentdata[id]["lblRT"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Result Type:")
+				self.contentdata[id]["lblEnabled"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Enabled")
+				self.contentdata[id]["lblEnabled"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["lblRT"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Result Type:")
 				self.contentdata[id]["lblRT"].grid(column=0, row=rownum, sticky="nsew")
 
 				RTypes = [None, "Response Time", "TPS", "Total TPS"]
@@ -5522,7 +5977,7 @@ class ReporterGUI(tk.Frame):
 
 				rownum += 1
 				# result filtered by PASS, FAIL, None
-				self.contentdata[id]["lblFR"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Filter Result:")
+				self.contentdata[id]["lblFR"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Result:")
 				self.contentdata[id]["lblFR"].grid(column=0, row=rownum, sticky="nsew")
 
 				FRTypes = [None, "None", "Pass", "Fail"]
@@ -5530,8 +5985,25 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["omFR"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["FRType"], command=self.cs_datatable_update, *FRTypes)
 				self.contentdata[id]["omFR"].grid(column=1, row=rownum, sticky="nsew")
 
+				self.contentdata[id]["intFR"] = tk.IntVar()
+				self.contentdata[id]["chkFR"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intFR"], command=self.cs_datatable_update)
+				self.contentdata[id]["chkFR"].grid(column=2, row=rownum, sticky="nsew")
+
 				rownum += 1
-				self.contentdata[id]["lblFN"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Filter Type:")
+				self.contentdata[id]["lblFA"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Agent:")
+				self.contentdata[id]["lblFA"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["FATypes"] = [None, "", "Loading..."]
+				self.contentdata[id]["FAType"] = tk.StringVar()
+				self.contentdata[id]["omFA"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["FAType"], command=self.cs_datatable_update, *self.contentdata[id]["FATypes"])
+				self.contentdata[id]["omFA"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["intFA"] = tk.IntVar()
+				self.contentdata[id]["chkFA"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intFA"], command=self.cs_datatable_update)
+				self.contentdata[id]["chkFA"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["lblFN"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Type:")
 				self.contentdata[id]["lblFN"].grid(column=0, row=rownum, sticky="nsew")
 
 				FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
@@ -5540,7 +6012,7 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["omFR"].grid(column=1, row=rownum, sticky="nsew")
 
 				rownum += 1
-				self.contentdata[id]["lblFP"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Filter Pattern:")
+				self.contentdata[id]["lblFP"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Pattern:")
 				self.contentdata[id]["lblFP"].grid(column=0, row=rownum, sticky="nsew")
 
 				self.contentdata[id]["FPattern"] = tk.StringVar()
@@ -5551,7 +6023,24 @@ class ReporterGUI(tk.Frame):
 
 			if datatype == "ResultSummary":
 				rownum += 1
-				self.contentdata[id]["lblFN"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Filter Type:")
+				self.contentdata[id]["lblEnabled"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Enabled")
+				self.contentdata[id]["lblEnabled"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["lblFA"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Agent:")
+				self.contentdata[id]["lblFA"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["FATypes"] = [None, "", "Loading..."]
+				self.contentdata[id]["FAType"] = tk.StringVar()
+				self.contentdata[id]["omFA"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["FAType"], command=self.cs_datatable_update, *self.contentdata[id]["FATypes"])
+				self.contentdata[id]["omFA"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[id]["intFA"] = tk.IntVar()
+				self.contentdata[id]["chkFA"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intFA"], command=self.cs_datatable_update)
+				self.contentdata[id]["chkFA"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[id]["lblFN"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Type:")
 				self.contentdata[id]["lblFN"].grid(column=0, row=rownum, sticky="nsew")
 
 				FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
@@ -5560,7 +6049,7 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["omFR"].grid(column=1, row=rownum, sticky="nsew")
 
 				rownum += 1
-				self.contentdata[id]["lblFP"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Filter Pattern:")
+				self.contentdata[id]["lblFP"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="Filter Pattern:")
 				self.contentdata[id]["lblFP"].grid(column=0, row=rownum, sticky="nsew")
 
 				self.contentdata[id]["FPattern"] = tk.StringVar()
@@ -5582,6 +6071,36 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["tSQL"].bind('<Leave>', self.cs_datatable_update)
 				self.contentdata[id]["tSQL"].bind('<FocusOut>', self.cs_datatable_update)
 
+		if "renamecols" not in self.contentdata[id]["Frames"] and datatype not in ["SQL"]:
+			base.debugmsg(5, "create renamecols frame")
+			rownum = 0
+			self.contentdata[id]["Frames"]["renamecols"] = tk.Frame(self.contentdata[id]["LFrame"])
+			self.contentdata[id]["Frames"]["renamecols"].columnconfigure(99, weight=1)
+
+			self.contentdata[id]["lblspacer"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text=" ")
+			self.contentdata[id]["lblspacer"].grid(column=0, row=rownum, sticky="nsew")
+
+			rownum += 1
+			self.contentdata[id]["lblcolren"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Rename Columns")
+			self.contentdata[id]["lblcolren"].grid(column=0, row=rownum, sticky="nsew")
+
+			rownum += 1
+			self.contentdata[id]["lblcolnme"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Column Name")
+			self.contentdata[id]["lblcolnme"].grid(column=0, row=rownum, sticky="nsew")
+
+			self.contentdata[id]["lbldispnme"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Display Name")
+			self.contentdata[id]["lbldispnme"].grid(column=1, row=rownum, sticky="nsew")
+
+			self.contentdata[id]["renamecolumns"] = {}
+			self.contentdata[id]["renamecolumns"]["startrow"] = rownum + 1
+			self.contentdata[id]["renamecolumns"]["rownum"] = rownum + 1
+
+		if datatype not in ["SQL"]:
+			self.cs_datatable_add_renamecols(id)
+			# cp = threading.Thread(target=lambda: self.cs_datatable_add_renamecols(id))
+			# cp.start()
+			self.contentdata[id]["Frames"]["renamecols"].grid(column=0, row=self.contentdata[id]["DTFrame"] + 1, columnspan=100, sticky="nsew")
+
 		# Update
 		if datatype == "SQL":
 			sql = base.rt_table_get_sql(id)
@@ -5589,12 +6108,17 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[id]["tSQL"].insert('0.0', sql)
 
 		if datatype == "Result":
+			self.cs_datatable_update_result(id)
 			self.contentdata[id]["RType"].set(base.rt_table_get_rt(id))
+			self.contentdata[id]["intFR"].set(base.rt_table_get_enfr(id))
 			self.contentdata[id]["FRType"].set(base.rt_table_get_fr(id))
+			self.contentdata[id]["intFA"].set(base.rt_table_get_enfa(id))
+			self.contentdata[id]["FAType"].set(base.rt_table_get_fa(id))
 			self.contentdata[id]["FNType"].set(base.rt_table_get_fn(id))
 			self.contentdata[id]["FPattern"].set(base.rt_table_get_fp(id))
 
 		if datatype == "ResultSummary":
+			self.cs_datatable_update_result(id)
 			self.contentdata[id]["FNType"].set(base.rt_table_get_fn(id))
 			self.contentdata[id]["FPattern"].set(base.rt_table_get_fp(id))
 
@@ -5609,10 +6133,103 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[id]["MType"].set(base.rt_table_get_mt(id))
 			self.contentdata[id]["PMetric"].set(base.rt_table_get_pm(id))
 			self.contentdata[id]["SMetric"].set(base.rt_table_get_sm(id))
+			self.contentdata[id]["intFA"].set(base.rt_table_get_enfa(id))
+			self.contentdata[id]["FAType"].set(base.rt_table_get_fa(id))
+			self.contentdata[id]["FNType"].set(base.rt_table_get_fn(id))
+			self.contentdata[id]["FPattern"].set(base.rt_table_get_fp(id))
 
 		# Show
 		self.contentdata[id]["Frames"][datatype].grid(column=0, row=self.contentdata[id]["DTFrame"], columnspan=100, sticky="nsew")
 
+	def cs_datatable_add_renamecols(self, id):
+		base.debugmsg(5, "id:", id)
+		if "renamecolumns" in self.contentdata[id]:
+			datatype = base.rt_table_get_dt(id)
+
+			if datatype == "SQL":
+				sql = base.rt_table_get_sql(id)
+			else:
+				sql = base.rt_table_generate_sql(id)
+				sql += " LIMIT 1 "
+
+			base.debugmsg(5, "sql:", sql)
+			key = "{}_{}_{}".format(id, base.report_item_get_changed(id), datetime.now().timestamp())
+			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+
+			if "colnames" not in self.contentdata[id]["renamecolumns"]:
+				self.contentdata[id]["renamecolumns"]["colnames"] = []
+			else:
+				self.cs_datatable_reset_renamecols(id)
+				self.contentdata[id]["renamecolumns"]["colnames"] = []
+			self.contentdata[id]["renamecolumns"]["rownum"] = self.contentdata[id]["renamecolumns"]["startrow"]
+
+			while key not in base.dbqueue["ReadResult"]:
+				time.sleep(0.1)
+
+			tdata = base.dbqueue["ReadResult"][key]
+			base.debugmsg(8, "tdata:", tdata)
+
+			if len(tdata) > 0:
+				cols = list(tdata[0].keys())
+				base.debugmsg(7, "cols:", cols)
+				for col in cols:
+					if col not in ["Colour"]:
+						self.cs_datatable_add_renamecol(id, col)
+
+	def cs_datatable_reset_renamecols(self, id):
+		base.debugmsg(5, "id:", id)
+		if "colnames" in self.contentdata[id]["renamecolumns"]:
+			for colname in list(self.contentdata[id]["renamecolumns"]["colnames"]):
+				base.debugmsg(5, "id:", id, "	colname:", colname)
+				collabel = "lbl_{}".format(colname)
+				colinput = "inp_{}".format(colname)
+				try:
+					self.contentdata[id]["renamecolumns"][collabel].grid_forget()
+				except Exception as e:
+					base.debugmsg(9, "e:", e)
+				try:
+					self.contentdata[id]["renamecolumns"][colinput].grid_forget()
+				except Exception as e:
+					base.debugmsg(9, "e:", e)
+				try:
+					del self.contentdata[id]["renamecolumns"][collabel]
+				except Exception as e:
+					base.debugmsg(9, "e:", e)
+				try:
+					del self.contentdata[id]["renamecolumns"][colinput]
+				except Exception as e:
+					base.debugmsg(9, "e:", e)
+				try:
+					del self.contentdata[id]["renamecolumns"][colname]
+				except Exception as e:
+					base.debugmsg(9, "e:", e)
+				try:
+					del self.contentdata[id]["renamecolumns"]["colnames"]
+				except Exception as e:
+					base.debugmsg(9, "e:", e)
+
+	def cs_datatable_add_renamecol(self, id, colname):
+		base.debugmsg(5, "id:", id, "	colname:", colname)
+
+		if "renamecolumns" in self.contentdata[id] and "renamecols" in self.contentdata[id]["Frames"]:
+			collabel = "lbl_{}".format(colname)
+			colinput = "inp_{}".format(colname)
+			rownum = self.contentdata[id]["renamecolumns"]["rownum"]
+			if colname not in self.contentdata[id]["renamecolumns"]["colnames"]:
+				self.contentdata[id]["renamecolumns"]["rownum"] += 1
+				colnum = 0
+				self.contentdata[id]["renamecolumns"]["colnames"].append(colname)
+				self.contentdata[id]["renamecolumns"][collabel] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text=" {} ".format(colname))
+				self.contentdata[id]["renamecolumns"][collabel].grid(column=colnum, row=rownum, sticky="nsew")
+
+				colnum = 1
+				self.contentdata[id]["renamecolumns"][colname] = tk.StringVar()
+				self.contentdata[id]["renamecolumns"][colinput] = ttk.Entry(self.contentdata[id]["Frames"]["renamecols"], textvariable=self.contentdata[id]["renamecolumns"][colname])
+				self.contentdata[id]["renamecolumns"][colinput].grid(column=colnum, row=rownum, sticky="nsew")
+				self.contentdata[id]["renamecolumns"][colinput].bind('<Leave>', self.cs_datatable_update)
+				self.contentdata[id]["renamecolumns"][colinput].bind('<FocusOut>', self.cs_datatable_update)
+
+				self.contentdata[id]["renamecolumns"][colname].set(base.rt_table_get_colname(id, colname))
 
 	#
 	# Settings	-	Graph
@@ -5620,19 +6237,55 @@ class ReporterGUI(tk.Frame):
 
 	def cs_graph(self, id):
 		base.debugmsg(9, "id:", id)
-		datatype = base.rt_graph_get_dt(id)
-		self.contentdata[id]["Frame"].columnconfigure(99, weight=1)
+		pid, idl, idr = base.rt_graph_LR_Ids(id)
+		axisenl = base.rt_graph_get_axisen(idl)
+		axisenr = base.rt_graph_get_axisen(idr)
+		datatypel = base.rt_graph_get_dt(idl)
+		datatyper = base.rt_graph_get_dt(idr)
+		self.contentdata[pid]["LFrame"].columnconfigure(99, weight=1)
 		rownum = 0
 
 		rownum += 1
-		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["Frame"], text = "Data Type:")
+		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[pid]["LFrame"], text="Y-Axis:")
+		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["lblLeft"] = ttk.Label(self.contentdata[pid]["LFrame"], text="Left")
+		self.contentdata[id]["lblLeft"].grid(column=1, row=rownum, sticky="nsew")
+
+		# self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[pid]["RFrame"], text="                        ", style='Report.TLabel')
+		# self.contentdata[id]["lblSpacer"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["lblRight"] = ttk.Label(self.contentdata[pid]["RFrame"], text="Right")
+		self.contentdata[id]["lblRight"].grid(column=1, row=rownum, sticky="nsew")
+
+		rownum += 1
+		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[pid]["LFrame"], text="Enable:")
+		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[idl]["intAxsEn"] = tk.IntVar()
+		self.contentdata[idl]["chkAxsEn"] = ttk.Checkbutton(self.contentdata[pid]["LFrame"], variable=self.contentdata[idl]["intAxsEn"], command=self.cs_graph_update)
+		self.contentdata[idl]["intAxsEn"].set(axisenl)
+		self.contentdata[idl]["chkAxsEn"].grid(column=1, row=rownum, sticky="nsew")
+
+		self.contentdata[idr]["intAxsEn"] = tk.IntVar()
+		self.contentdata[idr]["chkAxsEn"] = ttk.Checkbutton(self.contentdata[pid]["RFrame"], variable=self.contentdata[idr]["intAxsEn"], command=self.cs_graph_update)
+		self.contentdata[idr]["intAxsEn"].set(axisenr)
+		self.contentdata[idr]["chkAxsEn"].grid(column=1, row=rownum, sticky="nsew")
+
+		rownum += 1
+		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[pid]["LFrame"], text="Data Type:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
 
 		DataTypes = [None, "Metric", "Result", "SQL"]
-		self.contentdata[id]["strDT"] = tk.StringVar()
-		self.contentdata[id]["omDT"] = ttk.OptionMenu(self.contentdata[id]["Frame"], self.contentdata[id]["strDT"], command=self.cs_graph_switchdt, *DataTypes)
-		self.contentdata[id]["strDT"].set(datatype)
-		self.contentdata[id]["omDT"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[idl]["strDT"] = tk.StringVar()
+		self.contentdata[idl]["omDT"] = ttk.OptionMenu(self.contentdata[pid]["LFrame"], self.contentdata[idl]["strDT"], command=self.cs_graph_switchdt, *DataTypes)
+		self.contentdata[idl]["strDT"].set(datatypel)
+		self.contentdata[idl]["omDT"].grid(column=1, row=rownum, sticky="nsew")
+
+		self.contentdata[idr]["strDT"] = tk.StringVar()
+		self.contentdata[idr]["omDT"] = ttk.OptionMenu(self.contentdata[pid]["RFrame"], self.contentdata[idr]["strDT"], command=self.cs_graph_switchdt, *DataTypes)
+		self.contentdata[idr]["strDT"].set(datatyper)
+		self.contentdata[idr]["omDT"].grid(column=1, row=rownum, sticky="nsew")
 
 		rownum += 1
 		self.contentdata[id]["DTFrame"] = rownum
@@ -5642,220 +6295,553 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "_event:", _event)
 		id = self.sectionstree.focus()
 		base.debugmsg(9, "id:", id)
-		# if "tSQL" in self.contentdata[id]:
-		# 	data = self.contentdata[id]["tSQL"].get('0.0', tk.END)
-		# 	base.debugmsg(5, "data:", data)
-		# 	base.rt_graph_set_sql(id, data)
-		# 	self.content_preview(id)
+		pid, idl, idr = base.rt_graph_LR_Ids(id)
 
-		if "intIsNum" in self.contentdata[id]:
-			value = self.contentdata[id]["intIsNum"].get()
-			base.rt_table_set_isnumeric(id, value)
-		if "intShCnt" in self.contentdata[id]:
-			value = self.contentdata[id]["intShCnt"].get()
-			base.rt_table_set_showcount(id, value)
-		# self.contentdata[id]["MType"].set(base.rt_table_get_mt(id))
-		if "MType" in self.contentdata[id]:
-			value = self.contentdata[id]["MType"].get()
-			base.rt_table_set_mt(id, value)
-		# self.contentdata[id]["PMetric"].set(base.rt_table_get_pm(id))
-		if "PMetric" in self.contentdata[id]:
-			value = self.contentdata[id]["PMetric"].get()
-			base.rt_table_set_pm(id, value)
-		# self.contentdata[id]["SMetric"].set(base.rt_table_get_sm(id))
-		if "SMetric" in self.contentdata[id]:
-			value = self.contentdata[id]["SMetric"].get()
-			base.rt_table_set_sm(id, value)
+		# intIsNum
+		if "intIsNum" in self.contentdata[idl]:
+			value = self.contentdata[idl]["intIsNum"].get()
+			base.rt_table_set_isnumeric(idl, value)
+		if "intIsNum" in self.contentdata[idr]:
+			value = self.contentdata[idr]["intIsNum"].get()
+			base.rt_table_set_isnumeric(idr, value)
 
-		# self.contentdata[id]["RType"].set(base.rt_table_get_rt(id))
-		if "RType" in self.contentdata[id]:
-			value = self.contentdata[id]["RType"].get()
-			base.rt_table_set_rt(id, value)
-		# self.contentdata[id]["FRType"].set(base.rt_table_get_fr(id))
-		if "FRType" in self.contentdata[id]:
-			value = self.contentdata[id]["FRType"].get()
-			base.rt_table_set_fr(id, value)
-		# self.contentdata[id]["FNType"].set(base.rt_table_get_fn(id))
-		if "FNType" in self.contentdata[id]:
-			value = self.contentdata[id]["FNType"].get()
-			base.rt_table_set_fn(id, value)
-		# self.contentdata[id]["FPattern"].set(base.rt_table_get_fp(id))
-		if "FPattern" in self.contentdata[id]:
-			value = self.contentdata[id]["FPattern"].get()
-			base.rt_table_set_fp(id, value)
+		# intShCnt
+		if "intShCnt" in self.contentdata[idl]:
+			value = self.contentdata[idl]["intShCnt"].get()
+			base.rt_table_set_showcount(idl, value)
+		if "intShCnt" in self.contentdata[idr]:
+			value = self.contentdata[idr]["intShCnt"].get()
+			base.rt_table_set_showcount(idr, value)
 
-		if "strDT" in self.contentdata[id]:
-			datatype = self.contentdata[id]["strDT"].get()
-			base.rt_table_set_dt(id, datatype)
+		if "MType" in self.contentdata[idl]:
+			value = self.contentdata[idl]["MType"].get()
+			base.rt_table_set_mt(idl, value)
+		if "MType" in self.contentdata[idr]:
+			value = self.contentdata[idr]["MType"].get()
+			base.rt_table_set_mt(idr, value)
 
+		if "PMetric" in self.contentdata[idl]:
+			value = self.contentdata[idl]["PMetric"].get()
+			base.rt_table_set_pm(idl, value)
+		if "PMetric" in self.contentdata[idr]:
+			value = self.contentdata[idr]["PMetric"].get()
+			base.rt_table_set_pm(idr, value)
+
+		if "SMetric" in self.contentdata[idl]:
+			value = self.contentdata[idl]["SMetric"].get()
+			base.rt_table_set_sm(idl, value)
+		if "SMetric" in self.contentdata[idr]:
+			value = self.contentdata[idr]["SMetric"].get()
+			base.rt_table_set_sm(idr, value)
+
+		if "RType" in self.contentdata[idl]:
+			value = self.contentdata[idl]["RType"].get()
+			base.rt_table_set_rt(idl, value)
+		if "RType" in self.contentdata[idr]:
+			value = self.contentdata[idr]["RType"].get()
+			base.rt_table_set_rt(idr, value)
+
+		if "FRType" in self.contentdata[idl]:
+			value = self.contentdata[idl]["FRType"].get()
+			base.rt_table_set_fr(idl, value)
+		if "FRType" in self.contentdata[idr]:
+			value = self.contentdata[idr]["FRType"].get()
+			base.rt_table_set_fr(idr, value)
+
+		if "intFR" in self.contentdata[idl]:
+			value = self.contentdata[idl]["intFR"].get()
+			base.rt_table_set_enfr(idl, value)
+		if "intFR" in self.contentdata[idr]:
+			value = self.contentdata[idr]["intFR"].get()
+			base.rt_table_set_enfr(idr, value)
+
+		if "intFA" in self.contentdata[idl]:
+			value = self.contentdata[idl]["intFA"].get()
+			base.rt_table_set_enfa(idl, value)
+		if "intFA" in self.contentdata[idr]:
+			value = self.contentdata[idr]["intFA"].get()
+			base.rt_table_set_enfa(idr, value)
+
+		if "FAType" in self.contentdata[idl]:
+			value = self.contentdata[idl]["FAType"].get()
+			base.rt_table_set_fa(idl, value)
+		if "FAType" in self.contentdata[idr]:
+			value = self.contentdata[idr]["FAType"].get()
+			base.rt_table_set_fa(idr, value)
+
+		if "FNType" in self.contentdata[idl]:
+			value = self.contentdata[idl]["FNType"].get()
+			base.rt_table_set_fn(idl, value)
+		if "FNType" in self.contentdata[idr]:
+			value = self.contentdata[idr]["FNType"].get()
+			base.rt_table_set_fn(idr, value)
+
+		if "FPattern" in self.contentdata[idl]:
+			value = self.contentdata[idl]["FPattern"].get()
+			base.rt_table_set_fp(idl, value)
+		if "FPattern" in self.contentdata[idr]:
+			value = self.contentdata[idr]["FPattern"].get()
+			base.rt_table_set_fp(idr, value)
+
+		if "strDT" in self.contentdata[idl]:
+			datatype = self.contentdata[idl]["strDT"].get()
+			base.rt_table_set_dt(idl, datatype)
 			if datatype == "Metric":
-				self.cs_datatable_update_metrics(id)
-
+				self.cs_datatable_update_metrics(idl)
 			if datatype != "SQL":
 				time.sleep(0.1)
-				base.rt_graph_generate_sql(id)
+				base.rt_graph_generate_sql(idl)
+		if "strDT" in self.contentdata[idr]:
+			datatype = self.contentdata[idr]["strDT"].get()
+			base.rt_table_set_dt(idr, datatype)
+			if datatype == "Metric":
+				self.cs_datatable_update_metrics(idr)
+			if datatype != "SQL":
+				time.sleep(0.1)
+				base.rt_graph_generate_sql(idr)
 
-		if "tSQL" in self.contentdata[id]:
-			data = self.contentdata[id]["tSQL"].get('0.0', tk.END).strip()
+		# self.contentdata[idl]["intAxsEn"] = tk.IntVar()
+		if "intAxsEn" in self.contentdata[idl]:
+			value = self.contentdata[idl]["intAxsEn"].get()
+			base.rt_graph_set_axisen(idl, value)
+		if "intAxsEn" in self.contentdata[idr]:
+			value = self.contentdata[idr]["intAxsEn"].get()
+			base.rt_graph_set_axisen(idr, value)
+
+		if "tSQL" in self.contentdata[idl]:
+			data = self.contentdata[idl]["tSQL"].get('0.0', tk.END).strip()
 			base.debugmsg(5, "data:", data)
-			base.rt_graph_set_sql(id, data)
+			base.rt_graph_set_sql(idl, data)
 		else:
 			time.sleep(0.1)
-			base.rt_graph_generate_sql(id)
+			base.rt_graph_generate_sql(idl)
+		if "tSQL" in self.contentdata[idr]:
+			data = self.contentdata[idr]["tSQL"].get('0.0', tk.END).strip()
+			base.debugmsg(5, "data:", data)
+			base.rt_graph_set_sql(idr, data)
+		else:
+			time.sleep(0.1)
+			base.rt_graph_generate_sql(idr)
 
 		base.debugmsg(5, "content_preview id:", id)
 		# self.content_preview(id)
 		cp = threading.Thread(target=lambda: self.content_preview(id))
 		cp.start()
 
-
-
 	def cs_graph_switchdt(self, _event=None):
-		base.debugmsg(5, "_event:", _event)
+		base.debugmsg(5, "self:", self, "	_event:", _event)
 		rownum = 0
 		id = self.sectionstree.focus()
+		base.debugmsg(5, "id:", id)
 		if _event is not None:
 			name = base.report_item_get_name(_event)
 			if name is not None:
 				id = _event
-		base.debugmsg(9, "id:", id)
+				base.debugmsg(5, "id:", id)
+
+		pid, idl, idr = base.rt_graph_LR_Ids(id)
+		base.debugmsg(5, "pid:", pid, "	idl:", idl, "	idr:", idr)
+
 		# self.cs_datatable_update(id)
-		datatype = self.contentdata[id]["strDT"].get()
-		base.debugmsg(5, "datatype:", datatype)
+		datatypel = self.contentdata[idl]["strDT"].get()
+		datatyper = self.contentdata[idr]["strDT"].get()
+		base.debugmsg(5, "datatypel:", datatypel, "datatyper:", datatyper)
 		if "Frames" not in self.contentdata[id]:
 			self.contentdata[id]["Frames"] = {}
+		if "Frames" not in self.contentdata[idl]:
+			self.contentdata[idl]["Frames"] = {}
+		if "Frames" not in self.contentdata[idr]:
+			self.contentdata[idr]["Frames"] = {}
 		# Forget
 		for frame in self.contentdata[id]["Frames"].keys():
 			self.contentdata[id]["Frames"][frame].grid_forget()
 			self.contentdata[id]["Frames"] = {}
+		for frame in self.contentdata[idl]["Frames"].keys():
+			self.contentdata[idl]["Frames"][frame].grid_forget()
+			self.contentdata[idl]["Frames"] = {}
+		for frame in self.contentdata[idr]["Frames"].keys():
+			self.contentdata[idr]["Frames"][frame].grid_forget()
+			self.contentdata[idr]["Frames"] = {}
 
 		# Construct
-		if datatype not in self.contentdata[id]["Frames"]:
-			base.debugmsg(6, "datatype:", datatype)
-			self.contentdata[id]["Frames"][datatype] = tk.Frame(self.contentdata[id]["Frame"])
-			# self.contentdata[id]["Frames"][datatype].config(bg="SlateBlue3")
-			# self.contentdata[id]["Frames"][datatype].columnconfigure(0, weight=1)
-			self.contentdata[id]["Frames"][datatype].columnconfigure(99, weight=1)
+		if datatypel not in self.contentdata[id]["Frames"]:
+			base.debugmsg(6, "datatypel:", datatypel)
+			self.contentdata[idl]["Frames"][datatypel] = tk.Frame(self.contentdata[id]["LFrame"])
+			# self.contentdata[id]["Frames"][datatypel].config(bg="SlateBlue3")
+			# self.contentdata[id]["Frames"][datatypel].columnconfigure(0, weight=1)
+			self.contentdata[idl]["Frames"][datatypel].columnconfigure(99, weight=1)
 
 			# "Metric", "Result", "SQL"
 
-			if datatype == "Metric":
+			if datatypel == "Metric":
+				showmetricagents = 0
+				if "DBTable" in base.settings and "Metrics" in base.settings["DBTable"] and "DataSource" in base.settings["DBTable"]["Metrics"]:
+					showmetricagents = base.settings["DBTable"]["Metrics"]["DataSource"]
 
-				base.debugmsg(6, "datatype:", datatype)
+				base.debugmsg(6, "datatypel:", datatypel)
 				rownum += 1
-				self.contentdata[id]["lblIsNum"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Number Value:")
-				self.contentdata[id]["lblIsNum"].grid(column=0, row=rownum, sticky="nsew")
+				self.contentdata[idl]["lblIsNum"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Number Value:")
+				self.contentdata[idl]["lblIsNum"].grid(column=0, row=rownum, sticky="nsew")
 
-				self.contentdata[id]["intIsNum"] = tk.IntVar()
-				self.contentdata[id]["chkIsNum"] = ttk.Checkbutton(self.contentdata[id]["Frames"][datatype], variable=self.contentdata[id]["intIsNum"], command=self.cs_graph_update)
-				self.contentdata[id]["chkIsNum"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[idl]["intIsNum"] = tk.IntVar()
+				self.contentdata[idl]["chkIsNum"] = ttk.Checkbutton(self.contentdata[idl]["Frames"][datatypel], variable=self.contentdata[idl]["intIsNum"], command=self.cs_graph_update)
+				self.contentdata[idl]["chkIsNum"].grid(column=1, row=rownum, sticky="nsew")
 
-				rownum += 1
-				self.contentdata[id]["lblMT"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Metric Type:")
-				self.contentdata[id]["lblMT"].grid(column=0, row=rownum, sticky="nsew")
-
-				self.contentdata[id]["MTypes"] = [None, "", "Loading..."]
-				self.contentdata[id]["MType"] = tk.StringVar()
-				self.contentdata[id]["omMT"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["MType"], command=self.cs_graph_update, *self.contentdata[id]["MTypes"])
-				self.contentdata[id]["omMT"].grid(column=1, row=rownum, sticky="nsew")
-
-				rownum += 1
-				self.contentdata[id]["lblPM"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Primrary Metric:")
-				self.contentdata[id]["lblPM"].grid(column=0, row=rownum, sticky="nsew")
-
-				self.contentdata[id]["PMetrics"] = [None, "", "Loading..."]
-				self.contentdata[id]["PMetric"] = tk.StringVar()
-				self.contentdata[id]["omPM"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["PMetric"], command=self.cs_graph_update, *self.contentdata[id]["PMetrics"])
-				self.contentdata[id]["omPM"].grid(column=1, row=rownum, sticky="nsew")
+				if showmetricagents:
+					# rownum += 1
+					self.contentdata[idl]["lblEnabled"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Enabled")
+					self.contentdata[idl]["lblEnabled"].grid(column=2, row=rownum, sticky="nsew")
 
 				rownum += 1
-				self.contentdata[id]["lblSM"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Secondary Metric:")
-				self.contentdata[id]["lblSM"].grid(column=0, row=rownum, sticky="nsew")
+				self.contentdata[idl]["lblMT"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Metric Type:")
+				self.contentdata[idl]["lblMT"].grid(column=0, row=rownum, sticky="nsew")
 
-				self.contentdata[id]["SMetrics"] = [None, "", "Loading..."]
-				self.contentdata[id]["SMetric"] = tk.StringVar()
-				self.contentdata[id]["omSM"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["SMetric"], command=self.cs_graph_update, *self.contentdata[id]["SMetrics"])
-				self.contentdata[id]["omSM"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[idl]["MTypes"] = [None, "", "Loading..."]
+				self.contentdata[idl]["MType"] = tk.StringVar()
+				self.contentdata[idl]["omMT"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["MType"], command=self.cs_graph_update, *self.contentdata[idl]["MTypes"])
+				self.contentdata[idl]["omMT"].grid(column=1, row=rownum, sticky="nsew")
 
-			if datatype == "Result":
 				rownum += 1
-				self.contentdata[id]["lblRT"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Result Type:")
-				self.contentdata[id]["lblRT"].grid(column=0, row=rownum, sticky="nsew")
+				self.contentdata[idl]["lblPM"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Primrary Metric:")
+				self.contentdata[idl]["lblPM"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idl]["PMetrics"] = [None, "", "Loading..."]
+				self.contentdata[idl]["PMetric"] = tk.StringVar()
+				self.contentdata[idl]["omPM"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["PMetric"], command=self.cs_graph_update, *self.contentdata[idl]["PMetrics"])
+				self.contentdata[idl]["omPM"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idl]["lblSM"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Secondary Metric:")
+				self.contentdata[idl]["lblSM"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idl]["SMetrics"] = [None, "", "Loading..."]
+				self.contentdata[idl]["SMetric"] = tk.StringVar()
+				self.contentdata[idl]["omSM"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["SMetric"], command=self.cs_graph_update, *self.contentdata[idl]["SMetrics"])
+				self.contentdata[idl]["omSM"].grid(column=1, row=rownum, sticky="nsew")
+
+				if showmetricagents:
+					rownum += 1
+					self.contentdata[idl]["lblFA"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Filter Agent:")
+					self.contentdata[idl]["lblFA"].grid(column=0, row=rownum, sticky="nsew")
+
+					self.contentdata[idl]["FATypes"] = [None, "", "Loading..."]
+					self.contentdata[idl]["FAType"] = tk.StringVar()
+					self.contentdata[idl]["omFA"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["FAType"], command=self.cs_graph_update, *self.contentdata[idl]["FATypes"])
+					self.contentdata[idl]["omFA"].grid(column=1, row=rownum, sticky="nsew")
+
+					self.contentdata[idl]["intFA"] = tk.IntVar()
+					self.contentdata[idl]["chkFA"] = ttk.Checkbutton(self.contentdata[idl]["Frames"][datatypel], variable=self.contentdata[idl]["intFA"], command=self.cs_graph_update)
+					self.contentdata[idl]["chkFA"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idl]["lblFN"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Filter Type:")
+				self.contentdata[idl]["lblFN"].grid(column=0, row=rownum, sticky="nsew")
+
+				FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
+				self.contentdata[idl]["FNType"] = tk.StringVar()
+				self.contentdata[idl]["omFR"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["FNType"], command=self.cs_graph_update, *FNTypes)
+				self.contentdata[idl]["omFR"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idl]["lblFP"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Filter Pattern:")
+				self.contentdata[idl]["lblFP"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idl]["FPattern"] = tk.StringVar()
+				self.contentdata[idl]["inpFP"] = ttk.Entry(self.contentdata[idl]["Frames"][datatypel], textvariable=self.contentdata[idl]["FPattern"])
+				self.contentdata[idl]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[idl]["inpFP"].bind('<Leave>', self.cs_graph_update)
+				self.contentdata[idl]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
+
+			if datatypel == "Result":
+				rownum += 1
+				self.contentdata[idl]["lblRT"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Result Type:")
+				self.contentdata[idl]["lblRT"].grid(column=0, row=rownum, sticky="nsew")
 
 				RTypes = [None, "Response Time", "TPS", "Total TPS"]
-				self.contentdata[id]["RType"] = tk.StringVar()
-				self.contentdata[id]["omRT"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["RType"], command=self.cs_graph_update, *RTypes)
-				self.contentdata[id]["omRT"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[idl]["RType"] = tk.StringVar()
+				self.contentdata[idl]["omRT"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["RType"], command=self.cs_graph_update, *RTypes)
+				self.contentdata[idl]["omRT"].grid(column=1, row=rownum, sticky="nsew")
 
 				rownum += 1
 				# result filtered by PASS, FAIL, None
-				self.contentdata[id]["lblFR"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Filter Result:")
-				self.contentdata[id]["lblFR"].grid(column=0, row=rownum, sticky="nsew")
+				self.contentdata[idl]["lblFR"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Filter Result:")
+				self.contentdata[idl]["lblFR"].grid(column=0, row=rownum, sticky="nsew")
 
 				FRTypes = [None, "None", "Pass", "Fail"]
-				self.contentdata[id]["FRType"] = tk.StringVar()
-				self.contentdata[id]["omFR"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["FRType"], command=self.cs_graph_update, *FRTypes)
-				self.contentdata[id]["omFR"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[idl]["FRType"] = tk.StringVar()
+				self.contentdata[idl]["omFR"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["FRType"], command=self.cs_graph_update, *FRTypes)
+				self.contentdata[idl]["omFR"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[idl]["intFR"] = tk.IntVar()
+				self.contentdata[idl]["chkFR"] = ttk.Checkbutton(self.contentdata[idl]["Frames"][datatypel], variable=self.contentdata[idl]["intFR"], command=self.cs_graph_update)
+				self.contentdata[idl]["chkFR"].grid(column=2, row=rownum, sticky="nsew")
 
 				rownum += 1
-				self.contentdata[id]["lblFN"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Filter Type:")
-				self.contentdata[id]["lblFN"].grid(column=0, row=rownum, sticky="nsew")
+				self.contentdata[idl]["lblFA"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Filter Agent:")
+				self.contentdata[idl]["lblFA"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idl]["FATypes"] = [None, "", "Loading..."]
+				self.contentdata[idl]["FAType"] = tk.StringVar()
+				self.contentdata[idl]["omFA"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["FAType"], command=self.cs_graph_update, *self.contentdata[idl]["FATypes"])
+				self.contentdata[idl]["omFA"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[idl]["intFA"] = tk.IntVar()
+				self.contentdata[idl]["chkFA"] = ttk.Checkbutton(self.contentdata[idl]["Frames"][datatypel], variable=self.contentdata[idl]["intFA"], command=self.cs_graph_update)
+				self.contentdata[idl]["chkFA"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idl]["lblFN"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Filter Type:")
+				self.contentdata[idl]["lblFN"].grid(column=0, row=rownum, sticky="nsew")
 
 				FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
-				self.contentdata[id]["FNType"] = tk.StringVar()
-				self.contentdata[id]["omFR"] = ttk.OptionMenu(self.contentdata[id]["Frames"][datatype], self.contentdata[id]["FNType"], command=self.cs_graph_update, *FNTypes)
-				self.contentdata[id]["omFR"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[idl]["FNType"] = tk.StringVar()
+				self.contentdata[idl]["omFR"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["FNType"], command=self.cs_graph_update, *FNTypes)
+				self.contentdata[idl]["omFR"].grid(column=1, row=rownum, sticky="nsew")
 
 				rownum += 1
-				self.contentdata[id]["lblFP"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text = "Filter Pattern:")
-				self.contentdata[id]["lblFP"].grid(column=0, row=rownum, sticky="nsew")
+				self.contentdata[idl]["lblFP"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Filter Pattern:")
+				self.contentdata[idl]["lblFP"].grid(column=0, row=rownum, sticky="nsew")
 
-				self.contentdata[id]["FPattern"] = tk.StringVar()
-				self.contentdata[id]["inpFP"] = ttk.Entry(self.contentdata[id]["Frames"][datatype], textvariable=self.contentdata[id]["FPattern"])
-				self.contentdata[id]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
-				self.contentdata[id]["inpFP"].bind('<Leave>', self.cs_graph_update)
-				self.contentdata[id]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
+				self.contentdata[idl]["FPattern"] = tk.StringVar()
+				self.contentdata[idl]["inpFP"] = ttk.Entry(self.contentdata[idl]["Frames"][datatypel], textvariable=self.contentdata[idl]["FPattern"])
+				self.contentdata[idl]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[idl]["inpFP"].bind('<Leave>', self.cs_graph_update)
+				self.contentdata[idl]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
-			if datatype == "SQL":
+			if datatypel == "SQL":
 				# sql = base.rt_table_get_sql(id)
 				rownum += 1
-				self.contentdata[id]["lblSQL"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="SQL:")
-				self.contentdata[id]["lblSQL"].grid(column=0, row=rownum, sticky="nsew")
+				self.contentdata[idl]["lblSQL"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="SQL:")
+				self.contentdata[idl]["lblSQL"].grid(column=0, row=rownum, sticky="nsew")
 
 				rownum += 1
-				self.contentdata[id]["tSQL"] = tk.Text(self.contentdata[id]["Frames"][datatype])
-				self.contentdata[id]["tSQL"].grid(column=0, row=rownum, columnspan=100, sticky="nsew")
+				self.contentdata[idl]["tSQL"] = tk.Text(self.contentdata[idl]["Frames"][datatypel])
+				self.contentdata[idl]["tSQL"].grid(column=0, row=rownum, columnspan=100, sticky="nsew")
 				# data = self.contentdata[id]["tSQL"].insert('0.0', sql)
-				self.contentdata[id]["tSQL"].bind('<Leave>', self.cs_graph_update)
-				self.contentdata[id]["tSQL"].bind('<FocusOut>', self.cs_graph_update)
+				self.contentdata[idl]["tSQL"].bind('<Leave>', self.cs_graph_update)
+				self.contentdata[idl]["tSQL"].bind('<FocusOut>', self.cs_graph_update)
+
+		if datatyper not in self.contentdata[id]["Frames"]:
+			base.debugmsg(6, "datatyper:", datatyper)
+			self.contentdata[idr]["Frames"][datatyper] = tk.Frame(self.contentdata[id]["RFrame"])
+			# self.contentdata[id]["Frames"][datatyper].config(bg="SlateBlue3")
+			# self.contentdata[id]["Frames"][datatyper].columnconfigure(0, weight=1)
+			self.contentdata[idr]["Frames"][datatyper].columnconfigure(99, weight=1)
+
+			# "Metric", "Result", "SQL"
+
+			if datatyper == "Metric":
+				showmetricagents = 0
+				if "DBTable" in base.settings and "Metrics" in base.settings["DBTable"] and "DataSource" in base.settings["DBTable"]["Metrics"]:
+					showmetricagents = base.settings["DBTable"]["Metrics"]["DataSource"]
+
+				base.debugmsg(6, "datatyper:", datatyper)
+				rownum += 1
+				self.contentdata[idr]["lblIsNum"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Number Value:")
+				self.contentdata[idr]["lblIsNum"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idr]["intIsNum"] = tk.IntVar()
+				self.contentdata[idr]["chkIsNum"] = ttk.Checkbutton(self.contentdata[idr]["Frames"][datatyper], variable=self.contentdata[idr]["intIsNum"], command=self.cs_graph_update)
+				self.contentdata[idr]["chkIsNum"].grid(column=1, row=rownum, sticky="nsew")
+
+				if showmetricagents:
+					# rownum += 1
+					self.contentdata[idr]["lblEnabled"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Enabled")
+					self.contentdata[idr]["lblEnabled"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idr]["lblMT"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Metric Type:")
+				self.contentdata[idr]["lblMT"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idr]["MTypes"] = [None, "", "Loading..."]
+				self.contentdata[idr]["MType"] = tk.StringVar()
+				self.contentdata[idr]["omMT"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["MType"], command=self.cs_graph_update, *self.contentdata[idr]["MTypes"])
+				self.contentdata[idr]["omMT"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idr]["lblPM"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Primrary Metric:")
+				self.contentdata[idr]["lblPM"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idr]["PMetrics"] = [None, "", "Loading..."]
+				self.contentdata[idr]["PMetric"] = tk.StringVar()
+				self.contentdata[idr]["omPM"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["PMetric"], command=self.cs_graph_update, *self.contentdata[idr]["PMetrics"])
+				self.contentdata[idr]["omPM"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idr]["lblSM"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Secondary Metric:")
+				self.contentdata[idr]["lblSM"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idr]["SMetrics"] = [None, "", "Loading..."]
+				self.contentdata[idr]["SMetric"] = tk.StringVar()
+				self.contentdata[idr]["omSM"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["SMetric"], command=self.cs_graph_update, *self.contentdata[idr]["SMetrics"])
+				self.contentdata[idr]["omSM"].grid(column=1, row=rownum, sticky="nsew")
+
+				if showmetricagents:
+					rownum += 1
+					self.contentdata[idr]["lblFA"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Filter Agent:")
+					self.contentdata[idr]["lblFA"].grid(column=0, row=rownum, sticky="nsew")
+
+					self.contentdata[idr]["FATypes"] = [None, "", "Loading..."]
+					self.contentdata[idr]["FAType"] = tk.StringVar()
+					self.contentdata[idr]["omFA"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["FAType"], command=self.cs_graph_update, *self.contentdata[idr]["FATypes"])
+					self.contentdata[idr]["omFA"].grid(column=1, row=rownum, sticky="nsew")
+
+					self.contentdata[idr]["intFA"] = tk.IntVar()
+					self.contentdata[idr]["chkFA"] = ttk.Checkbutton(self.contentdata[idr]["Frames"][datatyper], variable=self.contentdata[idr]["intFA"], command=self.cs_graph_update)
+					self.contentdata[idr]["chkFA"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idr]["lblFN"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Filter Type:")
+				self.contentdata[idr]["lblFN"].grid(column=0, row=rownum, sticky="nsew")
+
+				FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
+				self.contentdata[idr]["FNType"] = tk.StringVar()
+				self.contentdata[idr]["omFR"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["FNType"], command=self.cs_graph_update, *FNTypes)
+				self.contentdata[idr]["omFR"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idr]["lblFP"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Filter Pattern:")
+				self.contentdata[idr]["lblFP"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idr]["FPattern"] = tk.StringVar()
+				self.contentdata[idr]["inpFP"] = ttk.Entry(self.contentdata[idr]["Frames"][datatyper], textvariable=self.contentdata[idr]["FPattern"])
+				self.contentdata[idr]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[idr]["inpFP"].bind('<Leave>', self.cs_graph_update)
+				self.contentdata[idr]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
+
+			if datatyper == "Result":
+				rownum += 1
+				self.contentdata[idr]["lblRT"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Result Type:")
+				self.contentdata[idr]["lblRT"].grid(column=0, row=rownum, sticky="nsew")
+
+				RTypes = [None, "Response Time", "TPS", "Total TPS"]
+				self.contentdata[idr]["RType"] = tk.StringVar()
+				self.contentdata[idr]["omRT"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["RType"], command=self.cs_graph_update, *RTypes)
+				self.contentdata[idr]["omRT"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				# result filtered by PASS, FAIL, None
+				self.contentdata[idr]["lblFR"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Filter Result:")
+				self.contentdata[idr]["lblFR"].grid(column=0, row=rownum, sticky="nsew")
+
+				FRTypes = [None, "None", "Pass", "Fail"]
+				self.contentdata[idr]["FRType"] = tk.StringVar()
+				self.contentdata[idr]["omFR"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["FRType"], command=self.cs_graph_update, *FRTypes)
+				self.contentdata[idr]["omFR"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[idr]["intFR"] = tk.IntVar()
+				self.contentdata[idr]["chkFR"] = ttk.Checkbutton(self.contentdata[idr]["Frames"][datatyper], variable=self.contentdata[idr]["intFR"], command=self.cs_graph_update)
+				self.contentdata[idr]["chkFR"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idr]["lblFA"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Filter Agent:")
+				self.contentdata[idr]["lblFA"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idr]["FATypes"] = [None, "", "Loading..."]
+				self.contentdata[idr]["FAType"] = tk.StringVar()
+				self.contentdata[idr]["omFA"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["FAType"], command=self.cs_graph_update, *self.contentdata[idr]["FATypes"])
+				self.contentdata[idr]["omFA"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[idr]["intFA"] = tk.IntVar()
+				self.contentdata[idr]["chkFA"] = ttk.Checkbutton(self.contentdata[idr]["Frames"][datatyper], variable=self.contentdata[idr]["intFA"], command=self.cs_graph_update)
+				self.contentdata[idr]["chkFA"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idr]["lblFN"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Filter Type:")
+				self.contentdata[idr]["lblFN"].grid(column=0, row=rownum, sticky="nsew")
+
+				FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
+				self.contentdata[idr]["FNType"] = tk.StringVar()
+				self.contentdata[idr]["omFR"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["FNType"], command=self.cs_graph_update, *FNTypes)
+				self.contentdata[idr]["omFR"].grid(column=1, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idr]["lblFP"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Filter Pattern:")
+				self.contentdata[idr]["lblFP"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idr]["FPattern"] = tk.StringVar()
+				self.contentdata[idr]["inpFP"] = ttk.Entry(self.contentdata[idr]["Frames"][datatyper], textvariable=self.contentdata[idr]["FPattern"])
+				self.contentdata[idr]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[idr]["inpFP"].bind('<Leave>', self.cs_graph_update)
+				self.contentdata[idr]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
+
+			if datatyper == "SQL":
+				# sql = base.rt_table_get_sql(id)
+				rownum += 1
+				self.contentdata[idr]["lblSQL"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="SQL:")
+				self.contentdata[idr]["lblSQL"].grid(column=0, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idr]["tSQL"] = tk.Text(self.contentdata[idr]["Frames"][datatyper])
+				self.contentdata[idr]["tSQL"].grid(column=0, row=rownum, columnspan=100, sticky="nsew")
+				# data = self.contentdata[idr]["tSQL"].insert('0.0', sql)
+				self.contentdata[idr]["tSQL"].bind('<Leave>', self.cs_graph_update)
+				self.contentdata[idr]["tSQL"].bind('<FocusOut>', self.cs_graph_update)
 
 		# Update
-		if datatype == "SQL":
-			sql = base.rt_graph_get_sql(id)
-			self.contentdata[id]["tSQL"].delete('0.0', tk.END)
-			self.contentdata[id]["tSQL"].insert('0.0', sql)
+		if datatypel == "SQL":
+			sql = base.rt_graph_get_sql(idl)
+			self.contentdata[idl]["tSQL"].delete('0.0', tk.END)
+			self.contentdata[idl]["tSQL"].insert('0.0', sql)
 
-		if datatype == "Result":
-			self.contentdata[id]["RType"].set(base.rt_table_get_rt(id))
-			self.contentdata[id]["FRType"].set(base.rt_table_get_fr(id))
-			self.contentdata[id]["FNType"].set(base.rt_table_get_fn(id))
-			self.contentdata[id]["FPattern"].set(base.rt_table_get_fp(id))
+		if datatyper == "SQL":
+			sql = base.rt_graph_get_sql(idr)
+			self.contentdata[idr]["tSQL"].delete('0.0', tk.END)
+			self.contentdata[idr]["tSQL"].insert('0.0', sql)
 
-		if datatype == "Metric":
+		if datatypel == "Result":
+			self.cs_datatable_update_result(idl)
+			self.contentdata[idl]["RType"].set(base.rt_table_get_rt(idl))
+			self.contentdata[idl]["intFR"].set(base.rt_table_get_enfr(idl))
+			self.contentdata[idl]["FRType"].set(base.rt_table_get_fr(idl))
+			self.contentdata[idl]["intFA"].set(base.rt_table_get_enfa(idl))
+			self.contentdata[idl]["FAType"].set(base.rt_table_get_fa(idl))
+			self.contentdata[idl]["FNType"].set(base.rt_table_get_fn(idl))
+			self.contentdata[idl]["FPattern"].set(base.rt_table_get_fp(idl))
+
+		if datatyper == "Result":
+			self.cs_datatable_update_result(idr)
+			self.contentdata[idr]["RType"].set(base.rt_table_get_rt(idr))
+			self.contentdata[idr]["intFR"].set(base.rt_table_get_enfr(idr))
+			self.contentdata[idr]["FRType"].set(base.rt_table_get_fr(idr))
+			self.contentdata[idr]["intFA"].set(base.rt_table_get_enfa(idr))
+			self.contentdata[idr]["FAType"].set(base.rt_table_get_fa(idr))
+			self.contentdata[idr]["FNType"].set(base.rt_table_get_fn(idr))
+			self.contentdata[idr]["FPattern"].set(base.rt_table_get_fp(idr))
+
+		if datatypel == "Metric":
 			base.debugmsg(5, "Update Options")
-			self.cs_datatable_update_metrics(id)
+			self.cs_datatable_update_metrics(idl)
 			base.debugmsg(5, "Set Options")
-			while "SMetric" not in self.contentdata[id]:
+			while "SMetric" not in self.contentdata[idl]:
 				time.sleep(0.1)
-			self.contentdata[id]["intIsNum"].set(base.rt_table_get_isnumeric(id))
-			self.contentdata[id]["MType"].set(base.rt_table_get_mt(id))
-			self.contentdata[id]["PMetric"].set(base.rt_table_get_pm(id))
-			self.contentdata[id]["SMetric"].set(base.rt_table_get_sm(id))
+			self.contentdata[idl]["intIsNum"].set(base.rt_table_get_isnumeric(idl))
+			self.contentdata[idl]["MType"].set(base.rt_table_get_mt(idl))
+			self.contentdata[idl]["PMetric"].set(base.rt_table_get_pm(idl))
+			self.contentdata[idl]["SMetric"].set(base.rt_table_get_sm(idl))
+			self.contentdata[idl]["intFA"].set(base.rt_table_get_enfa(idl))
+			self.contentdata[idl]["FAType"].set(base.rt_table_get_fa(idl))
+			self.contentdata[idl]["FNType"].set(base.rt_table_get_fn(idl))
+			self.contentdata[idl]["FPattern"].set(base.rt_table_get_fp(idl))
+
+		if datatyper == "Metric":
+			base.debugmsg(5, "Update Options")
+			self.cs_datatable_update_metrics(idr)
+			base.debugmsg(5, "Set Options")
+			while "SMetric" not in self.contentdata[idr]:
+				time.sleep(0.1)
+			self.contentdata[idr]["intIsNum"].set(base.rt_table_get_isnumeric(idr))
+			self.contentdata[idr]["MType"].set(base.rt_table_get_mt(idr))
+			self.contentdata[idr]["PMetric"].set(base.rt_table_get_pm(idr))
+			self.contentdata[idr]["SMetric"].set(base.rt_table_get_sm(idr))
+			self.contentdata[idr]["intFA"].set(base.rt_table_get_enfa(idr))
+			self.contentdata[idr]["FAType"].set(base.rt_table_get_fa(idr))
+			self.contentdata[idr]["FNType"].set(base.rt_table_get_fn(idr))
+			self.contentdata[idr]["FPattern"].set(base.rt_table_get_fp(idr))
 
 		# Show
-		self.contentdata[id]["Frames"][datatype].grid(column=0, row=self.contentdata[id]["DTFrame"], columnspan=100, sticky="nsew")
-
-
+		self.contentdata[idl]["Frames"][datatypel].grid(column=0, row=self.contentdata[id]["DTFrame"], columnspan=100, sticky="nsew")
+		self.contentdata[idr]["Frames"][datatyper].grid(column=0, row=self.contentdata[id]["DTFrame"], columnspan=100, sticky="nsew")
 
 	#
 	# Preview
@@ -5895,43 +6881,82 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[itm]["Changed"] = 0
 		self.content_preview("TOP")
 
-
 	def cp_generate_preview(self, id):
 		base.debugmsg(8, "id:", id)
+		pid, idl, idr = base.rt_graph_LR_Ids(id)
+
 		# if id not in self.contentdata:
 		while id not in self.contentdata:
 			time.sleep(0.1)
-			self.contentdata[id] = {}
+			self.contentdata[pid] = {}
+		if "Changed" not in self.contentdata[pid]:
+			self.contentdata[pid]["Changed"] = 0
+		while idl not in self.contentdata:
+			time.sleep(0.1)
+			self.contentdata[idl] = {}
+		if "Changed" not in self.contentdata[idl]:
+			self.contentdata[idl]["Changed"] = 0
+		while idr not in self.contentdata:
+			time.sleep(0.1)
+			self.contentdata[idr] = {}
+		if "Changed" not in self.contentdata[idr]:
+			self.contentdata[idr]["Changed"] = 0
+
+		type = base.report_item_get_type(pid)
+		base.debugmsg(8, "type:", type)
+		changed = False
+
+		base.debugmsg(9, "base.report_item_get_changed(pid):", base.report_item_get_changed(pid))
+		base.debugmsg(9, "self.contentdata[pid]:", self.contentdata[pid])
+		base.debugmsg(9, "self.contentdata[pid][Changed]:", self.contentdata[pid]["Changed"])
+		if base.report_item_get_changed(pid) > self.contentdata[pid]["Changed"]:
+			changed = True
+		base.debugmsg(9, "changed:", changed)
+		if type == 'graph':
+			base.debugmsg(8, "type:", type)
+			if base.report_item_get_changed(idl) > self.contentdata[idl]["Changed"]:
+				changed = True
+			if base.report_item_get_changed(idr) > self.contentdata[idr]["Changed"]:
+				changed = True
+		base.debugmsg(8, "changed:", changed)
+
 		gen = False
-		if "Preview" not in self.contentdata[id]:
+		if "Preview" not in self.contentdata[pid]:
 			gen = True
 		# if "Changed" in self.contentdata[id] and base.report_item_get_changed(id) > self.contentdata[id]["Changed"]:
-		elif base.report_item_get_changed(id) > self.contentdata[id]["Changed"]:
+		elif changed:
 			gen = True
 
-			base.debugmsg(8, "report_item_get_changed:", base.report_item_get_changed(id), "	contentdata Changed:", self.contentdata[id]["Changed"])
+			base.debugmsg(8, "report_item_get_changed pid:", base.report_item_get_changed(pid), "	contentdata Changed:", self.contentdata[pid]["Changed"])
+			if type == 'graph':
+				base.debugmsg(8, "report_item_get_changed idl:", base.report_item_get_changed(idl), "	contentdata Changed:", self.contentdata[idl]["Changed"])
+				base.debugmsg(8, "report_item_get_changed idr:", base.report_item_get_changed(idr), "	contentdata Changed:", self.contentdata[idr]["Changed"])
 		else:
-			base.debugmsg(8, "report_item_get_changed:", base.report_item_get_changed(id), "	contentdata Changed:", self.contentdata[id]["Changed"])
+			base.debugmsg(8, "report_item_get_changed pid:", base.report_item_get_changed(pid), "	contentdata Changed:", self.contentdata[pid]["Changed"])
+			if type == 'graph':
+				base.debugmsg(8, "report_item_get_changed idl:", base.report_item_get_changed(idl), "	contentdata Changed:", self.contentdata[idl]["Changed"])
+				base.debugmsg(8, "report_item_get_changed idr:", base.report_item_get_changed(idr), "	contentdata Changed:", self.contentdata[idr]["Changed"])
 
 		base.debugmsg(7, "gen:", gen)
 		if gen:
-			if "Preview" in self.contentdata[id]:
-				del self.contentdata[id]["Preview"]
-			while "Preview" not in self.contentdata[id]:
+			if "Preview" in self.contentdata[pid]:
+				del self.contentdata[pid]["Preview"]
+			while "Preview" not in self.contentdata[pid]:
 				time.sleep(0.1)
-				self.contentdata[id]["Changed"] = base.report_item_get_changed(id)
-				self.contentdata[id]["Preview"] = tk.Frame(self.contentpreview, padx=0, pady=0, bd=0)
+				self.contentdata[pid]["Changed"] = base.report_item_get_changed(pid)
+				if type == 'graph':
+					self.contentdata[idl]["Changed"] = base.report_item_get_changed(idl)
+					self.contentdata[idr]["Changed"] = base.report_item_get_changed(idr)
+				self.contentdata[pid]["Preview"] = tk.Frame(self.contentpreview, padx=0, pady=0, bd=0)
 			# self.contentdata[id]["Preview"].config(bg="gold")
 			# self.contentdata[id]["Preview"].config(bg=self.style_reportbg_colour)
-			if id=="TOP":
+			if id == "TOP":
 				try:
 					self.cp_titlepage(id)
-				except:
+				except Exception:
 					pass
 			else:
 				rownum = 0
-				# self.contentdata[id]["lblpreview"] = ttk.Label(self.contentdata[id]["Preview"], text = "Preview for {}: {}".format(id, base.report_item_get_name(id)))
-				# self.contentdata[id]["lblpreview"].grid(column=0, row=0, sticky="nsew")
 
 				titlenum = base.report_sect_number(id)
 				base.debugmsg(8, "titlenum:", titlenum)
@@ -5972,7 +6997,7 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["lbltitle"].grid(column=0, row=rownum, columnspan=9, sticky="nsew")
 
 				self.contentdata[id]["rownum"] = rownum + 1
-				type = base.report_item_get_type(id)
+				# type = base.report_item_get_type(id)
 				base.debugmsg(8, "type:", type)
 				if type == 'contents':
 					self.cp_contents(id)
@@ -5983,7 +7008,6 @@ class ReporterGUI(tk.Frame):
 				if type == 'graph':
 					self.cp_graph(id)
 
-
 		children = base.report_get_order(id)
 		for child in children:
 			try:
@@ -5993,9 +7017,8 @@ class ReporterGUI(tk.Frame):
 			except Exception as e:
 				base.debugmsg(5, "e:", e)
 
-
 	def cp_display_preview(self, id, row):
-		base.debugmsg(9, "id:", id)
+		base.debugmsg(5, "id:", id)
 		if id in self.t_preview:
 			if self.t_preview[id].is_alive():
 				self.t_preview[id].join()
@@ -6009,7 +7032,7 @@ class ReporterGUI(tk.Frame):
 		self.updateStatus("Preview Loading..... ({})".format(str(row)))
 
 		self.contentdata[id]["Preview"].grid(column=0, row=row, sticky="nsew")
-		nextrow = row+1
+		nextrow = row + 1
 		base.debugmsg(9, "nextrow:", nextrow)
 		children = base.report_get_order(id)
 		for child in children:
@@ -6041,14 +7064,10 @@ class ReporterGUI(tk.Frame):
 
 		base.debugmsg(5, "showtlogo:", base.rs_setting_get_int("showtlogo"))
 		if base.rs_setting_get_int("showtlogo"):
-			# flogo = '/Users/dave/Documents/GitHub/rfswarm/robots/Test_Images/209-2090030_your-logo-here.png'
-			# flogo = '/Users/dave/Documents/GitHub/rfswarm/robots/Test_Images/BrandNameHere.jpg'
-			# flogo = '/Users/dave/Documents/GitHub/rfswarm/robots/Test_Images/yourlogohere.jpg'
-			# self.contentdata[id]["strLIPath"] = base.rs_setting_get_file("tlogo")
 			while "strLIPath" not in self.contentdata[id]:
 				time.sleep(0.1)
 			base.debugmsg(5, "strLIPath:", self.contentdata[id]["strLIPath"])
-			if self.contentdata[id]["strLIPath"] is not None and len(self.contentdata[id]["strLIPath"])>0:
+			if self.contentdata[id]["strLIPath"] is not None and len(self.contentdata[id]["strLIPath"]) > 0:
 				self.contentdata[id]["oimg"] = Image.open(self.contentdata[id]["strLIPath"])
 				base.debugmsg(5, "oimg:", self.contentdata[id]["oimg"])
 
@@ -6060,8 +7079,6 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["lblLogo"] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id]["ologo"])
 				# , padding=5
 				self.contentdata[id]["lblLogo"].grid(column=colimg, row=rownum, sticky="nsew")
-
-
 
 		# Execution Date range
 		#  top: 3	centre: 13	bottom:	23
@@ -6093,7 +7110,6 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["lblTitle"] = ttk.Label(self.contentdata[id]["Preview"], text=execdr, style='Report.Title2.TLabel')
 		self.contentdata[id]["lblTitle"].grid(column=colcontent, columnspan=3, row=rownum, sticky="nsew")
 
-
 	def cp_contents(self, id):
 		base.debugmsg(5, "id:", id)
 		rownum = self.contentdata[id]["rownum"]
@@ -6117,15 +7133,7 @@ class ReporterGUI(tk.Frame):
 		if mode == "Table Of Tables":
 			fmode = "table"
 
-
-		# notetxt = "{}".format(base.rt_note_get(id))
-		# self.contentdata[id]["lblNote"] = ttk.Label(self.contentdata[id]["Preview"], text=notetxt, style='Report.TLabel')
-		# self.contentdata[id]["lblNote"].grid(column=1, row=rownum, sticky="nsew")
-		#
-		# self.contentdata[id]["Preview"].columnconfigure(1, weight=1)
-
 		self.cp_contents_row("TOP", rownum, id, fmode, level)
-
 
 	def cp_contents_row(self, id, rownum, fid, fmode, flevel):
 		base.debugmsg(5, "id:", id, "	rownum:", rownum, "	fmode:", fmode, "	flevel:", flevel)
@@ -6156,7 +7164,7 @@ class ReporterGUI(tk.Frame):
 
 			numarr = titlenum.split(".")
 			base.debugmsg(5, "numarr:", numarr)
-			pagenum = int(numarr[0])+1
+			pagenum = int(numarr[0]) + 1
 			base.debugmsg(5, "pagenum:", pagenum)
 
 			colnum = 1
@@ -6177,15 +7185,14 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(pagenum))
 			self.contentdata[fid][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
+			nextrow = rownum + 1
 
-			nextrow = rownum+1
 		base.debugmsg(9, "nextrow:", nextrow)
 		if level < flevel:
 			children = base.report_get_order(id)
 			for child in children:
 				nextrow = self.cp_contents_row(child, nextrow, fid, fmode, flevel)
 		return nextrow
-
 
 	def cp_note(self, id):
 		base.debugmsg(9, "id:", id)
@@ -6200,12 +7207,26 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["Preview"].columnconfigure(1, weight=1)
 
 	def cp_graph(self, id):
-		base.debugmsg(9, "id:", id)
-		datatype = base.rt_graph_get_dt(id)
-		if datatype == "SQL":
-			sql = base.rt_graph_get_sql(id)
+		pid, idl, idr = base.rt_graph_LR_Ids(id)
+		base.debugmsg(5, "pid:", pid, "	idl:", idl, "	idr:", idr)
+
+		axisenl = base.rt_graph_get_axisen(idl)
+		axisenr = base.rt_graph_get_axisen(idr)
+
+		datatypel = base.rt_graph_get_dt(idl)
+		datatyper = base.rt_graph_get_dt(idr)
+
+		if datatypel == "SQL":
+			sqll = base.rt_graph_get_sql(idl)
 		else:
-			sql = base.rt_graph_generate_sql(id)
+			sqll = base.rt_graph_generate_sql(idl)
+		base.debugmsg(9, "sqll:", sqll)
+
+		if datatyper == "SQL":
+			sqlr = base.rt_graph_get_sql(idr)
+		else:
+			sqlr = base.rt_graph_generate_sql(idr)
+		base.debugmsg(9, "sqlr:", sqlr)
 
 		rownum = self.contentdata[id]["rownum"]
 		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text="    ")
@@ -6222,28 +7243,35 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["fmeGraph"].columnconfigure(0, weight=1)
 		self.contentdata[id]["fmeGraph"].rowconfigure(0, weight=1)
 		self.contentdata[id]["fig_dpi"] = 72
-		self.contentdata[id]["fig"] = Figure(dpi=self.contentdata[id]["fig_dpi"]) # , tight_layout=True
-		self.contentdata[id]["axis"] = self.contentdata[id]["fig"].add_subplot(1,1,1)	# , constrained_layout=True??
-		self.contentdata[id]["axis"].grid(True, 'major', 'both')
+		self.contentdata[id]["fig"] = Figure(dpi=self.contentdata[id]["fig_dpi"])
+
+		self.contentdata[id]["axisL"] = self.contentdata[id]["fig"].add_subplot(1, 1, 1)
+		base.debugmsg(8, "axisL:", self.contentdata[id]["axisL"])
+		# self.contentdata[id]["axisL"].grid(True, 'major', 'both')
+		self.contentdata[id]["axisL"].grid(True, 'major', 'x')
+		# base.debugmsg(8, "axisL:", self.contentdata[id]["axisL"])
+		self.contentdata[id]["axisR"] = self.contentdata[id]["axisL"].twinx()
+		base.debugmsg(8, "axisR:", self.contentdata[id]["axisR"])
+		# self.contentdata[id]["axisR"].grid(True, 'major', 'both')
+		# base.debugmsg(8, "axisR:", self.contentdata[id]["axisR"])
 		self.contentdata[id]["fig"].autofmt_xdate(bottom=0.2, rotation=30, ha='right')
-
-		# base.debugmsg(5, "fig:", self.contentdata[id]["fig"])
-		# base.debugmsg(5, "axis:", self.contentdata[id]["axis"])
-		#
-		# base.debugmsg(5, "axis text:", self.contentdata[id]["axis"].text)
-
-
-
-
-		# sps = self.contentdata[id]["fig"].subplots()
-		# base.debugmsg(5, "sps:", sps)
 
 		self.contentdata[id]["canvas"] = FigureCanvasTkAgg(self.contentdata[id]["fig"], self.contentdata[id]["fmeGraph"])
 		self.contentdata[id]["canvas"].get_tk_widget().grid(column=0, row=0, sticky="nsew")
 		# self.contentdata[id]["canvas"].get_tk_widget().config(bg="blue")
 
 		base.debugmsg(8, "canvas:", self.contentdata[id]["canvas"])
+		# base.debugmsg(8, "axis:", self.contentdata[id]["axis"])
 
+		# https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.tick_params.html
+		# self.contentdata[id]["axisL"].grid(True, 'major', 'x')
+		# https://matplotlib.org/stable/api/_as_gen/matplotlib.axis.Axis.get_ticklabels.html
+
+		# tckprms = self.contentdata[id]["axisL"].get_tick_params(which='major')
+		# base.debugmsg(5, "tckprms:", tckprms)
+
+		self.contentdata[id]["axisL"].tick_params(labelleft=False, length=0)
+		self.contentdata[id]["axisR"].tick_params(labelright=False, length=0)
 
 		try:
 			self.contentdata[id]["canvas"].draw()
@@ -6251,77 +7279,131 @@ class ReporterGUI(tk.Frame):
 		except Exception as e:
 			base.debugmsg(5, "canvas.draw() Exception:", e)
 
-
 		dodraw = False
 		self.contentdata[id]["graphdata"] = {}
 
-		if sql is not None and len(sql.strip())>0:
-			base.debugmsg(7, "sql:", sql)
-			key = "{}_{}".format(id, base.report_item_get_changed(id))
-			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
-			while key not in base.dbqueue["ReadResult"]:
-				time.sleep(0.1)
+		if (sqll is not None and len(sqll.strip()) > 0) or (sqlr is not None and len(sqlr.strip()) > 0):
+			# Populate Left Y Axis Data
+			if sqll is not None and len(sqll.strip()) > 0 and axisenl > 0:
+				base.debugmsg(7, "sqll:", sqll)
+				key = "{}_{}".format(id, base.report_item_get_changed(idl))
+				base.debugmsg(7, "key:", key)
+				base.dbqueue["Read"].append({"SQL": sqll, "KEY": key})
+				while key not in base.dbqueue["ReadResult"]:
+					time.sleep(0.1)
+					# base.debugmsg(9, "Waiting for gdata for:", key)
 
-			gdata = base.dbqueue["ReadResult"][key]
-			base.debugmsg(9, "gdata:", gdata)
+				gdata = base.dbqueue["ReadResult"][key]
+				base.debugmsg(9, "gdata:", gdata)
 
-			for row in gdata:
-				base.debugmsg(9, "row:", row)
-				if 'Name' in row:
-					name = row['Name']
-					base.debugmsg(9, "name:", name)
-					if name not in self.contentdata[id]["graphdata"]:
-						self.contentdata[id]["graphdata"][name] = {}
+				for row in gdata:
+					base.debugmsg(9, "row:", row)
+					if 'Name' in row:
+						name = row['Name']
+						base.debugmsg(9, "name:", name)
+						if name not in self.contentdata[id]["graphdata"]:
+							self.contentdata[id]["graphdata"][name] = {}
 
-						colour = base.named_colour(name)
-						base.debugmsg(8, "name:", name, "	colour:", colour)
-						self.contentdata[id]["graphdata"][name]["Colour"] = colour
-						# self.contentdata[id]["graphdata"][name]["Time"] = []
-						self.contentdata[id]["graphdata"][name]["objTime"] = []
-						self.contentdata[id]["graphdata"][name]["Values"] = []
+							colour = base.named_colour(name)
+							base.debugmsg(8, "name:", name, "	colour:", colour)
+							self.contentdata[id]["graphdata"][name]["Colour"] = colour
+							self.contentdata[id]["graphdata"][name]["Axis"] = "axisL"
+							# self.contentdata[id]["graphdata"][name]["Time"] = []
+							self.contentdata[id]["graphdata"][name]["objTime"] = []
+							self.contentdata[id]["graphdata"][name]["Values"] = []
 
-					self.contentdata[id]["graphdata"][name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
-					self.contentdata[id]["graphdata"][name]["Values"].append(base.rt_graph_floatval(row["Value"]))
-				else:
-					break
+						self.contentdata[id]["graphdata"][name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						self.contentdata[id]["graphdata"][name]["Values"].append(base.rt_graph_floatval(row["Value"]))
+					else:
+						break
 
+			# attempt to Populate right Y Axis Data
+			if sqlr is not None and len(sqlr.strip()) > 0 and axisenr > 0:
+				base.debugmsg(7, "sqlr:", sqlr)
+				key = "{}_{}".format(id, base.report_item_get_changed(idr))
+				base.debugmsg(7, "key:", key)
+				base.dbqueue["Read"].append({"SQL": sqlr, "KEY": key})
+				while key not in base.dbqueue["ReadResult"]:
+					time.sleep(0.1)
+					# base.debugmsg(9, "Waiting for gdata for:", key)
+
+				gdata = base.dbqueue["ReadResult"][key]
+				base.debugmsg(9, "gdata:", gdata)
+
+				for row in gdata:
+					base.debugmsg(9, "row:", row)
+					if 'Name' in row:
+						name = row['Name']
+						base.debugmsg(9, "name:", name)
+						if name not in self.contentdata[id]["graphdata"]:
+							self.contentdata[id]["graphdata"][name] = {}
+
+							colour = base.named_colour(name)
+							base.debugmsg(8, "name:", name, "	colour:", colour)
+							self.contentdata[id]["graphdata"][name]["Colour"] = colour
+							self.contentdata[id]["graphdata"][name]["Axis"] = "axisR"
+							# self.contentdata[id]["graphdata"][name]["Time"] = []
+							self.contentdata[id]["graphdata"][name]["objTime"] = []
+							self.contentdata[id]["graphdata"][name]["Values"] = []
+
+						self.contentdata[id]["graphdata"][name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						self.contentdata[id]["graphdata"][name]["Values"].append(base.rt_graph_floatval(row["Value"]))
+					else:
+						break
 
 			base.debugmsg(8, "self.contentdata[id][graphdata]:", self.contentdata[id]["graphdata"])
 
 			for name in self.contentdata[id]["graphdata"]:
 				base.debugmsg(7, "name:", name)
-				if len(self.contentdata[id]["graphdata"][name]["Values"])>1 and len(self.contentdata[id]["graphdata"][name]["Values"])==len(self.contentdata[id]["graphdata"][name]["objTime"]):
+				axis = "axisL"
+				if "Axis" in self.contentdata[id]["graphdata"][name]:
+					axis = self.contentdata[id]["graphdata"][name]["Axis"]
+
+				if len(self.contentdata[id]["graphdata"][name]["Values"]) > 1 and len(self.contentdata[id]["graphdata"][name]["Values"]) == len(self.contentdata[id]["graphdata"][name]["objTime"]):
 					try:
-						self.contentdata[id]["axis"].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name)
+						self.contentdata[id][axis].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name)
+						# self.contentdata[id]["axis"][axis].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name)
 						dodraw = True
 					except Exception as e:
 						base.debugmsg(7, "axis.plot() Exception:", e)
 
-				if len(self.contentdata[id]["graphdata"][name]["Values"])==1 and len(self.contentdata[id]["graphdata"][name]["Values"])==len(self.contentdata[id]["graphdata"][name]["objTime"]):
+				if len(self.contentdata[id]["graphdata"][name]["Values"]) == 1 and len(self.contentdata[id]["graphdata"][name]["Values"]) == len(self.contentdata[id]["graphdata"][name]["objTime"]):
 					try:
-						self.contentdata[id]["axis"].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name, marker='o')
+						self.contentdata[id][axis].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name, marker='o')
+						# self.contentdata[id]["axis"][axis].plot(self.contentdata[id]["graphdata"][name]["objTime"], self.contentdata[id]["graphdata"][name]["Values"], self.contentdata[id]["graphdata"][name]["Colour"], label=name, marker='o')
 						dodraw = True
 					except Exception as e:
 						base.debugmsg(7, "axis.plot() Exception:", e)
 
 			if dodraw:
 
-				self.contentdata[id]["axis"].grid(True, 'major', 'both')
+				# Left axis Limits
+				if axisenl > 0:
+					self.contentdata[id]["axisL"].grid(True, 'major', 'y')
+					self.contentdata[id]["axisL"].tick_params(labelleft=True, length=5)
 
-				SMetric = "Other"
-				if datatype == "Metric":
-					SMetric = base.rt_table_get_sm(id)
-				base.debugmsg(8, "SMetric:", SMetric)
-				if SMetric in ["Load", "CPU", "MEM", "NET"]:
-					self.contentdata[id]["axis"].set_ylim(0, 100)
-				else:
-					self.contentdata[id]["axis"].set_ylim(0)
+					SMetric = "Other"
+					if datatypel == "Metric":
+						SMetric = base.rt_table_get_sm(idl)
+					base.debugmsg(8, "SMetric:", SMetric)
+					if SMetric in ["Load", "CPU", "MEM", "NET"]:
+						self.contentdata[id]["axisL"].set_ylim(0, 100)
+					else:
+						self.contentdata[id]["axisL"].set_ylim(0)
 
-				# base.debugmsg(9, "showlegend:", grphWindow.showlegend.get())
-				# if grphWindow.showlegend.get():
-				# 	# self.contentdata[id]["axis"].legend()
-				# 	# self.contentdata[id]["axis"].legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),&nbsp; shadow=True, ncol=2)
-				# 	self.contentdata[id]["axis"].legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
+				# Right axis Limits
+				if axisenr > 0:
+					self.contentdata[id]["axisR"].grid(True, 'major', 'y')
+					self.contentdata[id]["axisR"].tick_params(labelright=True, length=5)
+
+					SMetric = "Other"
+					if datatyper == "Metric":
+						SMetric = base.rt_table_get_sm(idr)
+					base.debugmsg(8, "SMetric:", SMetric)
+					if SMetric in ["Load", "CPU", "MEM", "NET"]:
+						self.contentdata[id]["axisR"].set_ylim(0, 100)
+					else:
+						self.contentdata[id]["axisR"].set_ylim(0)
 
 				self.contentdata[id]["fig"].set_tight_layout(True)
 				self.contentdata[id]["fig"].autofmt_xdate(bottom=0.2, rotation=30, ha='right')
@@ -6330,7 +7412,6 @@ class ReporterGUI(tk.Frame):
 				except Exception as e:
 					base.debugmsg(5, "canvas.draw() Exception:", e)
 
-
 	def cp_table(self, id):
 		base.debugmsg(9, "id:", id)
 		datatype = base.rt_table_get_dt(id)
@@ -6338,11 +7419,12 @@ class ReporterGUI(tk.Frame):
 			sql = base.rt_table_get_sql(id)
 		else:
 			sql = base.rt_table_generate_sql(id)
+			base.debugmsg(5, "sql:", sql)
 		colours = base.rt_table_get_colours(id)
 		rownum = self.contentdata[id]["rownum"]
 		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text="    ")
 		self.contentdata[id]["lblSpacer"].grid(column=0, row=rownum, sticky="nsew")
-		if sql is not None and len(sql.strip())>0:
+		if sql is not None and len(sql.strip()) > 0:
 			base.debugmsg(8, "sql:", sql)
 			key = "{}_{}".format(id, base.report_item_get_changed(id))
 			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
@@ -6355,7 +7437,7 @@ class ReporterGUI(tk.Frame):
 			# self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text=notetxt)
 			# self.contentdata[id]["lblSpacer"].grid(column=1, row=rownum, sticky="nsew")
 
-			if len(tdata)>0:
+			if len(tdata) > 0:
 				cols = list(tdata[0].keys())
 				base.debugmsg(7, "cols:", cols)
 
@@ -6366,11 +7448,13 @@ class ReporterGUI(tk.Frame):
 
 				colnum = 1 + colours
 				for col in cols:
-					cellname = "h_{}".format(col)
-					base.debugmsg(9, "cellname:", cellname)
-					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=col, style='Report.THead.TLabel')
-					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-					colnum += 1
+					if col not in ["Colour"]:
+						cellname = "h_{}".format(col)
+						base.debugmsg(9, "cellname:", cellname)
+						dispname = base.rt_table_get_colname(id, col)
+						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{} ".format(dispname.strip()), style='Report.THead.TLabel')
+						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+						colnum += 1
 				i = 0
 				for row in tdata:
 					i += 1
@@ -6384,20 +7468,23 @@ class ReporterGUI(tk.Frame):
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 						base.debugmsg(9, "row:", row)
-						label=row[cols[0]]
+						if "Colour" in row:
+							label = row["Colour"]
+						else:
+							label = row[cols[0]]
 						base.debugmsg(9, "label:", label)
 						colour = base.named_colour(label)
 						base.debugmsg(9, "colour:", colour)
 						# self.contentdata[id][cellname].config(background=colour)
 						self.contentdata[id][cellname].config(bg=colour)
 
-
 					for col in cols:
-						colnum += 1
-						cellname = "{}_{}".format(i, col)
-						base.debugmsg(9, "cellname:", cellname)
-						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(row[col]), style='Report.TBody.TLabel')
-						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+						if col not in ["Colour"]:
+							colnum += 1
+							cellname = "{}_{}".format(i, col)
+							base.debugmsg(9, "cellname:", cellname)
+							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(row[col]), style='Report.TBody.TLabel')
+							self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 	#
 	# Export content generation functions
@@ -6426,8 +7513,6 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "Not implimented yet.....")
 		core.export_excel()
 
-
-
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
 	# menu functions
@@ -6437,20 +7522,27 @@ class ReporterGUI(tk.Frame):
 	def mnu_do_nothing(self, _event=None):
 		base.debugmsg(5, "Not implimented yet.....")
 
-
 	def mnu_results_Open(self, _event=None):
 		base.debugmsg(9, "mnu_file_Open: _event:", _event, "	Type:", type(_event))
 
-		if type(_event) is not type(""):
+		# E721 do not compare types, use 'isinstance()'
+		# if type(_event) is not type(""):
+		if not isinstance(_event, str):
 			# self.mnu_file_Close()	# ensure any previous scenario is closed and saved if required
-			ResultsFile = str(tkf.askopenfilename(initialdir=base.config['Reporter']['ResultDir'], title = "Select RFSwarm Results File", filetypes = (("RFSwarm Results","*.db"),("all files","*.*"))))
+			ResultsFile = str(
+				tkf.askopenfilename(
+					initialdir=base.config['Reporter']['ResultDir'],
+					title="Select RFSwarm Results File",
+					filetypes=(("RFSwarm Results", "*.db"), ("all files", "*.*"))
+				)
+			)
 		else:
 			ResultsFile = _event
 
 		base.debugmsg(5, "ResultsFile:", ResultsFile)
 
 		# ['Reporter']['Results']
-		if len(ResultsFile)>0:
+		if len(ResultsFile) > 0:
 
 			base.report = None
 			self.contentdata = {}
@@ -6463,40 +7555,27 @@ class ReporterGUI(tk.Frame):
 			base.debugmsg(5, "content_load")
 			self.content_load("TOP")
 
-
 	def mnu_template_New(self, _event=None):
 		base.debugmsg(5, "New Report Template")
 
 		base.template_create()
-		# self.reportsections = self.sectionstree.insert("", "end", "R", text="Report")
 
-		# self.sectionstree.insert(self.reportsections, "end", "0", text="Title Page")
-		# self.sectionstree.insert(self.reportsections, "end", "1", text="Executive Summary")
-		# self.sectionstree.insert("", "end", "RS", text="Report Settings")
-		# self.sectionstree.insert("", "end", "TC", text="Table of Contents")
-		# self.sectionstree.insert("", "end", "1", text="1. Executive Summary")
-		# self.new_rpt_sect("Executive Summary")
-		# self.sectionstree.insert("", "end", "2", text="2. Test Result Summary")
-		# self.new_rpt_sect("Test Result Summary")
 		self.LoadSections("TOP")
-
-		# sql = "SELECT * FROM Results"
-		# base.debugmsg(7, "sql:", sql)
-		# base.dbqueue["Read"].append({"SQL": sql, "KEY": "Results"})
-
-
-
-		# base.debugmsg(5, "New Report Template loaded")
 
 		self.updateTemplate()
 
-
 	def mnu_template_Open(self, _event=None):
-		TemplateFile = str(tkf.askopenfilename(initialdir=base.config['Reporter']['TemplateDir'], title = "Select RFSwarm Reporter Template", filetypes = (("RFSwarm Reporter Template","*.template"),("all files","*.*"))))
+		TemplateFile = str(
+			tkf.askopenfilename(
+				initialdir=base.config['Reporter']['TemplateDir'],
+				title="Select RFSwarm Reporter Template",
+				filetypes=(("RFSwarm Reporter Template", "*.template"), ("all files", "*.*"))
+			)
+		)
 		base.debugmsg(5, "TemplateFile:", TemplateFile)
 
 		# ['Reporter']['Results']
-		if len(TemplateFile)>0:
+		if len(TemplateFile) > 0:
 			base.report = None
 			self.contentdata = {}
 			base.debugmsg(5, "template_open TemplateFile:", TemplateFile)
@@ -6519,7 +7598,7 @@ class ReporterGUI(tk.Frame):
 		# base.debugmsg(5, "Not implimented yet.....")
 		templatefile = base.whitespace_get_ini_value(base.config['Reporter']['Template'])
 		base.debugmsg(5, "Filename:", templatefile)
-		if len(templatefile)>0:
+		if len(templatefile) > 0:
 			base.template_save(templatefile)
 			self.updateTemplate()
 		else:
@@ -6527,29 +7606,27 @@ class ReporterGUI(tk.Frame):
 
 	def mnu_template_SaveAs(self, _event=None):
 		base.debugmsg(5, "Prompt for filename")
-		templatefile = str(tkf.asksaveasfilename(\
-						initialdir=base.config['Reporter']['TemplateDir'], \
-						title = "Save RFSwarm Reporter Template", \
-						filetypes = (("Template","*.template"),("all files","*.*"))\
-						))
+		templatefile = str(
+			tkf.asksaveasfilename(
+				initialdir=base.config['Reporter']['TemplateDir'],
+				title="Save RFSwarm Reporter Template",
+				filetypes=(("Template", "*.template"), ("all files", "*.*"))
+			)
+		)
 		base.debugmsg(5, "templatefile", templatefile)
 		base.template_save(templatefile)
 		self.updateTemplate()
-
-
-
 
 	def mnu_new_rpt_sect(self):
 		selected = self.sectionstree.focus()
 		base.debugmsg(5, "selected:", selected)
 		name = tksd.askstring(title="New Section", prompt="Section Name:")
 		# , bg=self.style_feild_colour	, background='green'
-		if name is not None and len(name)>0:
-			if selected is None or len(selected)<1:
+		if name is not None and len(name) > 0:
+			if selected is None or len(selected) < 1:
 				selected = "TOP"
 			id = base.report_new_section(selected, name)
 			self.LoadSection(selected, id)
-
 
 	def mnu_rem_rpt_sect(self):
 		selected = self.sectionstree.focus()
@@ -6559,7 +7636,6 @@ class ReporterGUI(tk.Frame):
 			base.report_remove_section(selected)
 			parent = base.report_item_parent(selected)
 			self.LoadSections(parent)
-
 
 	def mnu_rpt_sect_up(self):
 		selected = self.sectionstree.focus()
@@ -6590,8 +7666,6 @@ class ReporterGUI(tk.Frame):
 		# self.cbbar.bsett.config(state=tk.ACTIVE)
 		# self.cbbar.bprev.config(relief=tk.RAISED)
 		# self.cbbar.bsett.config(relief=tk.FLAT)
-
-
 
 	def mnu_content_preview(self):
 		base.debugmsg(5, "Not implimented yet.....")
@@ -6630,9 +7704,6 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "_event:", _event)
 		cgxcel = threading.Thread(target=self.cg_export_excel)
 		cgxcel.start()
-
-
-
 
 
 class RFSwarm():

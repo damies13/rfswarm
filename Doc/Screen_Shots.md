@@ -1,11 +1,9 @@
-
-[Index](README.md)
-
-## Screen Shots
+# Screenshots
+[Return to Index](README.md)
 
 - [v1.0.0](#v100)
-	- [Manager v1.0.0](#Manager-v100)
-	- [Reporter v1.0.0](#Reporter-v100)
+  - [Manager v1.0.0](#manager-v100)
+  - [Reporter v1.0.0](#reporter-v100)
 - [v0.8.0](#v080)
 - [v0.7.0](#v070)
 - [v0.6.3](#v063)
@@ -15,17 +13,17 @@
 - [v0.4](#v04)
 - [v0.3](#v03)
 - [v0.1](#v01)
-- [Original](#Original)
+- [Original](#original)
 
-### v1.0.0
-#### Manager v1.0.0
+## v1.0.0
+### Manager v1.0.0
 ![Image](Images/MacOS_Run_v1.0.0_LanguageChecks.png)
 ![Image](Images/MacOS_Run_v1.0.0_Schedule_disabled.png)
 ![Image](Images/MacOS_Run_v1.0.0_Schedule_enabled.png)
 ![Image](Images/MacOS_Run_v1.0.0_Settings.png)
 ![Image](Images/MacOS_Run_v1.0.0_Settings_UploadLogs.png)
 
-#### Reporter v1.0.0
+### Reporter v1.0.0
 ![Image](Images/MacOS_Reporter_v1.0.0_Contents_Settings.png)
 ![Image](Images/MacOS_Reporter_v1.0.0_Contents_Settings_Level.png)
 ![Image](Images/MacOS_Reporter_v1.0.0_Contents_Settings_Mode.png)
@@ -70,7 +68,7 @@
 ![Image](Images/MacOS_Reporter_v1.0.0_Template_Settings.png)
 ![Image](Images/MacOS_Reporter_v1.0.0_TestSummary_Settings.png)
 
-### v0.8.0
+## v0.8.0
 
 ![Image](Images/MacOS_About_v0.8.0_About.png)
 ![Image](Images/MacOS_Agents_v0.8.0_Ready.png)
@@ -98,7 +96,7 @@
 ![Image](Images/MacOS_Run_v0.8.0_Start_5s.png)
 ![Image](Images/MacOS_Run_v0.8.0_Start_60s.png)
 
-### v0.7.0
+## v0.7.0
 
 ![Image](Images/MacOS_Plan_v0.7.0_150u_25per10min.png)
 ![Image](Images/MacOS_Plan_v0.7.0_20u_delay_example.png)
@@ -109,7 +107,7 @@
 ![Image](Images/Ubuntu_Plan_v0.7.0_New.png)
 ![Image](Images/Windows10_Plan_v0.7.0_New.png)
 
-### v0.6.3
+## v0.6.3
 
 ![Image](Images/MacOS_Plan_New_v0.6.3.png)
 ![Image](Images/MacOS_Plan_saved_opened_v0.6.3.png)
@@ -134,7 +132,7 @@
 ![Image](Images/MacOS_Agents_stopping_v0.6.3.png)
 
 
-### v0.5.0
+## v0.5.0
 
 A simple scenario with 100 robots running the same test case
 ![Image](Images/Plan_v0.5.0_100u.png)
@@ -174,13 +172,13 @@ Results export generates 3 csv files:
 The sqlite3 database from the test run is also available to enable easy reporting of test results, the db file is retained regardless of clicking the export button or not.
 ![Image](Images/Results_v0.5.0_100u_2.5hr.png)
 
-Screen shot showing agents when running a test, here you can see one agent is in warning state as memory consumption has exceeded 80%
+Screenshot showing agents when running a test, here you can see one agent is in warning state as memory consumption has exceeded 80%
 ![Image](Images/Agents_running_v0.5.0.png)
 
-Screen shot showing the prompt to save changes to scenario when closing the application
+Screenshot showing the prompt to save changes to scenario when closing the application
 ![Image](Images/Save_prompt_v0.5.0.png)
 
-Screen shot showing a run failing due to an overloaded agent, similarly when the application being tested fails you will see similar error messages with pass or fail counts depending on the library your test uses.
+Screenshot showing a run failing due to an overloaded agent, similarly when the application being tested fails you will see similar error messages with pass or fail counts depending on the library your test uses.
 ![Image](Images/Run_v0.5.0_crashing_users.png)
 
 Linux Mint 19:
@@ -204,7 +202,7 @@ Linux Mint 19:
 
 
 
-### v0.4.4
+## v0.4.4
 
 ![Image](Images/Plan_v0.4.4.png)
 ![Image](Images/Run_Start_v0.4.4.png)
@@ -212,7 +210,7 @@ Linux Mint 19:
 ![Image](Images/Run_v0.4.4_100u_25min.png)
 ![Image](Images/Agents_running_v0.4.4.png)
 
-### v0.4.3
+## v0.4.3
 
 ![Image](Images/Linux-Plan-v0.4.3.png)
 ![Image](Images/Linux-Run-v0.4.3-10u1hr.png)
@@ -222,12 +220,12 @@ Linux Mint 19:
 ![Image](Images/Linux-Agents-v0.4.3-Overloaded-Agents.png)
 
 
-### v0.4
+## v0.4
 
 ![Image](Images/Run_v0.4.png "Run - Showing results being collected live")
 ![Image](Images/Run_Start_v0.4.png "Run - Just Started")
 
-### v0.3
+## v0.3
 
 ![Image](Images/Plan_unsaved_v0.3.png "Plan - New")
 ![Image](Images/Plan_saved_opened_v0.3.png "Plan - Planning a performance test")
@@ -236,13 +234,13 @@ Linux Mint 19:
 ![Image](Images/Agents_ready_v0.3.png "Agents Ready")
 ![Image](Images/Agents_stopping_v0.3.png "Agents Stopping")
 
-### v0.1
+## v0.1
 
 ![Image](Images/Plan_v0.1.png "Plan - Planning a performance test")
 ![Image](Images/Run_v0.1.png "Run - Showing results being collected live")
 ![Image](Images/Agents_ready_v0.1.png "Agents Ready")
 ![Image](Images/Agents_running_v0.1.png "Agents Running")
 
-### Original
+## Original
 
 ![Image](Images/Run_Orig.png "Run - Showing results being collected live")

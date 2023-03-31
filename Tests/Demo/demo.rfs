@@ -1,0 +1,62 @@
+[Scenario]
+uploadmode = err
+scriptcount = 1
+graphlist = 640fd044-2,640fe552-3,640fd035-1
+
+[1]
+robots = 10
+delay = 0
+rampup = 45
+run = 75
+test = RFSwarm Demo Test
+script = rfswarm_demo.robot
+
+[640fd044-2]
+id = 640fd044-2
+open = True
+win_width = 1200
+win_height = 600
+win_location_x = 1100
+win_location_y = 840
+win_screen = :0.0
+name = Response Time
+show_settings = False
+show_legend = 1
+data_type = Result
+result_type = Response Time
+flter_result = Pass
+filter_name = None
+filter_pattern = 
+
+[640fe552-3]
+id = 640fe552-3
+open = True
+win_width = 716
+win_height = 372
+win_location_x = 1655
+win_location_y = 629
+win_screen = :0.0
+name = 90 %%ile
+show_settings = False
+show_legend = 1
+data_type = Metric
+metric_type = Summary
+primary_metric = 
+secondary_metric = 90%%ile
+
+[640fd035-1]
+id = 640fd035-1
+open = True
+win_width = 460
+win_height = 372
+win_location_x = 1925
+win_location_y = 222
+win_screen = :0.0
+name = Running Robots
+show_settings = False
+show_legend = 1
+data_type = Metric
+metric_type = Scenario
+primary_metric = 
+secondary_metric = total_robots
+

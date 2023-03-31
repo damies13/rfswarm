@@ -13,7 +13,8 @@ if [[ "$version" =~ v[0-9]\. ]]; then
 	# numver=$(echo $version | sed -E 's/v(.*)-.*/\1/')
 	numver=$(echo $version | sed -E 's/v([^-]*)/\1/')
 	# echo "numver: $numver"
-	sed -i '' -e "s/version *= *\"[^\"]*\"/version=\"${numver}\"/" $(find . -name "*.py")
+	sed -i '' -e "s/version = \"[^\"]*\"/version = \"${numver}\"/" $(find . -name "*.py")
+	sed -i '' -e "s/version=\"[^\"]*\"/version=\"${numver}\"/" $(find . -name "*.py")
 	#	Version Test
 	sed -i '' -e "s/#    Version .*/#    Version ${numver}/" $(find . -name "*.py")
 	# git commit -m "Update version to ${version}"

@@ -3,11 +3,13 @@
 # A hook script to update the version numbers
 #  post-commit
 OS=`uname -s`
+# echo "OS: $OS"
 
 # git rev-parse --abbrev-ref HEAD
 version=$(git rev-parse --abbrev-ref HEAD)
+versionurl="$(echo $version | sed 's/#/%23/g')"
 # version=$(git tag -l v* |tail -1)
-# echo "version: $version"
+# echo "branch: $version"
 if [[ "$version" =~ v[0-9]\. ]]; then
 	# echo "version: $version"
 	# numver=$(echo $version | sed -E 's/v(.*)/\1/')
@@ -16,24 +18,49 @@ if [[ "$version" =~ v[0-9]\. ]]; then
 	# echo "numver: $numver"
 
 	if [ "$OS" == 'Darwin' ]; then
-		sed -i '' -e "s/version *= *\"[^\"]*\"/version = \"${numver}\"/" $(find . -name "*.py")
+
+		# Missing whitespace around operator (E225)	-	There should be one space before and after all operators.
+		sed -i '' -e "s/version *= *\"[^\"]*\"[^,]/version = \"${numver}\"/" $(find . -name "*.py")
+		# Unexpected spaces around keyword / parameter equals (E251)	-	There should be no spaces before or after the = in a function definition.
+		sed -i '' -e "s/version *= *\"[^\"]*\",/version=\"${numver}\",/" $(find . -name "*.py")
 		#	Version Test
 		sed -i '' -e "s/#    Version .*/#    Version ${numver}/" $(find . -name "*.py")
+		sed -i '' -e "s/\(.*\)branch=[^&]*/\1branch=${versionurl}/" README.md
 	else
-		sed -i -e "s/version *= *\"[^\"]*\"/version = \"${numver}\"/" $(find . -name "*.py")
-		sed -i -e "s/#    Version .*/#    Version ${numver}\"/" $(find . -name "*.py")
+		# Missing whitespace around operator (E225)	-	There should be one space before and after all operators.
+		sed -i -e "s/version *= *\"[^\"]*\"[^,]/version = \"${numver}\"/" $(find . -name "*.py")
+		# Unexpected spaces around keyword / parameter equals (E251)	-	There should be no spaces before or after the = in a function definition.
+		sed -i -e "s/version *= *\"[^\"]*\",/version=\"${numver}\",/" $(find . -name "*.py")
+		sed -i -e "s/#    Version .*/#    Version ${numver}/" $(find . -name "*.py")
+		sed -i -e "s/\(.*\)branch=[^&]*/\1branch=${versionurl}/" README.md
 	fi
 
 
 	# git commit -m "Update version to ${version}"
 	if ! git diff-index --quiet HEAD --; then
 		# echo "commit: Update version to $version"
+		git add README.md
 		git add $(find . -name "*.py")
-	    git commit -m "Update version to ${numver}"
+		git commit -m "Update version to ${numver}"
 	fi
-# else
-# 	echo "version ($version) not pattern 'v[0-9]\.'"
+else
+	echo "version ($version) not pattern 'v[0-9]\.'"
+	echo "OS: $OS"
+	if [ "$OS" == 'Darwin' ]; then
+		echo sed -i '' -e '"s/\(.*\)branch=[^&]*/\1branch=${versionurl}/"' README.md
+		sed -i '' -e "s/\(.*\)branch=[^&]*/\1branch=${versionurl}/" README.md
+	else
+		echo sed -i -e '"s/\(.*\)branch=[^&]*/\1branch=${versionurl}/"' README.md
+		sed -i -e "s/\(.*\)branch=[^&]*/\1branch=${versionurl}/" README.md
+	fi
+
+	if ! git diff-index --quiet HEAD --; then
+		# echo "commit: Update version to $version"
+		git add README.md
+		git commit -m "Update version to ${version}"
+	fi
 fi
+
 
 
 

@@ -5,7 +5,7 @@ with open("README_PyPi.md", "r") as fh:
 
 setuptools.setup(
 	name="rfswarm-reporter",
-	version = "1.0.3",
+	version="1.1.0",
 	author="damies13",
 	author_email="damies13+rfswarm@gmail.com",
 	description="rfswarm reporter",
@@ -32,5 +32,5 @@ setuptools.setup(
 		'Say Thanks!': 'https://github.com/damies13/rfswarm#donations',
 		'Source': 'https://github.com/damies13/rfswarm',
 	},
-	entry_points = {'console_scripts': ['rfswarm-reporter = rfswarm_reporter.rfswarm_reporter:RFSwarm']},
+	entry_points={'console_scripts': ['rfswarm-reporter = rfswarm_reporter.rfswarm_reporter:RFSwarm']},
 )

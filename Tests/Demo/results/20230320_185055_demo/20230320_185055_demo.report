@@ -1,0 +1,277 @@
+[Report]
+order = F478ABD5B1B,F44AE3793CA,F44AE3793D0,F44AE39D478,F462764D669,F47236A0128,F4745242320
+title = quickdemo
+showtlogo = -1
+dateformat = yyyy-mm-dd
+timeformat = HH:MM
+timezone = Australia/Brisbane
+showstarttime = -1
+showendtime = -1
+font = Rasa
+fontsize = 12
+percentile = 90
+
+[F44AE3793CA]
+name = Template
+parent = TOP
+type = note
+changed = 1679398297.448555
+note = Define your template by adding sections and configuring the section settingsx12Each section can be:x12 -  Note (like this) section, free textx12 -  Heading, usefull for grouping sectionsx12 -  Contents like a table of contents or figuresx12 -  Data Table, with data from test resultsx12 -  Data Graph, for graphical representation of test resultsx12x12Each section can also have sub sectionsx12x12The cover page and overall report settings can be found on the settings pane of the Report item abovex12
+
+[F44AE3793D0]
+name = Test Result Summary
+parent = TOP
+type = table
+changed = 1679705389.273401
+colours = 0
+datatype = ResultSummary
+sql = SELECT r.result_name as x91Result Namex93 , round(min(rp.elapsed_time),3) 'Minimum', round(avg(rp.elapsed_time),3) 'Average', round(percentile(rp.elapsed_time, 90),3) '90x37ile', round(max(rp.elapsed_time),3) 'Maximum', round(stdev(rp.elapsed_time),3) 'Std. Dev.', count(rp.result) as 'Pass', count(rf.result) as 'Fail', count(ro.result) as 'Other' FROM Results as r LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == 'PASS' LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == 'FAIL' LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' GROUP BY  r.result_name ORDER BY x91Result Namex93
+
+[F44AE39D478]
+name = 90x37ile
+parent = TOP
+type = graph
+changed = 1679398297.4503162
+order = F44AE3B7CF7
+isnumeric = 1
+datatype = Metric
+sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric as 'Name' FROM MetricData WHERE MetricType == 'Summary' AND SecondaryMetric == '90x37ile' ORDER BY MetricTime
+metrictype = Summary
+secondarymetric = 90x37ile
+
+[F44AE3B7CF7]
+name = 90x37ile Data
+parent = F44AE39D478
+changed = 1679807308.5220404
+type = table
+colours = 1
+datatype = Metric
+sql = SELECT PrimaryMetric , PrimaryMetric as x91Colourx93  , min(CAST(MetricValue AS NUMERIC)) AS 'Minimum' , round(avg(CAST(MetricValue AS NUMERIC)),3) AS 'Average' , round(percentile(CAST(MetricValue AS NUMERIC), 90),3) AS '90x37ile' , max(CAST(MetricValue AS NUMERIC)) AS 'Maximum' , round(stdev(CAST(MetricValue AS NUMERIC)),3) AS 'Std. Dev.' FROM MetricData WHERE MetricType == 'Summary' AND SecondaryMetric == '90x37ile' GROUP by PrimaryMetric
+metrictype = Summary
+secondarymetric = 90x37ile
+isnumeric = 1
+
+[F44AE39D478L]
+changed = 1679821007.8978171
+filteragent = None
+filtertype = None
+datatype = Metric
+sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric as x91Namex93  FROM MetricData WHERE MetricType == 'Summary' AND SecondaryMetric == '90x37ile' ORDER BY MetricTime
+
+[F44AE39D478R]
+changed = 1679821008.1213388
+filteragent = None
+filtertype = None
+datatype = Metric
+sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric as x91Namex93  FROM MetricData WHERE MetricType == 'Summary' AND SecondaryMetric == '90x37ile' ORDER BY MetricTime
+axisen = 0
+
+[F462764D669]
+name = test
+parent = TOP
+type = graph
+changed = 1679398311.1186056
+order = F472325D80C,F46276AF2B8
+
+[F462764D669L]
+resulttype = Response Time
+changed = 1679871507.577957
+filterresult = None
+datatype = Result
+sql = SELECT end_time as 'Time' , elapsed_time as 'Value' , result_name || ' - ' || agent as x91Namex93 FROM Results WHERE x91Namex93 NOT LIKE 'Exception in threadx37' AND x91Namex93 GLOB '*File*'
+filtertype = Wildcard (Unix Glob)
+filterpattern = *File*
+axisen = 1
+filteragent = 
+enablefilteragent = 1
+enablefilterresult = 0
+
+[F462764D669R]
+datatype = Metric
+changed = 1679871507.5802388
+sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric || ' - ' || DataSource as x91Namex93  FROM MetricData WHERE MetricType == 'Summary' AND SecondaryMetric == '90x37ile' AND (PrimaryMetric GLOB '*File*'OR DataSource GLOB '*File*') ORDER BY MetricTime
+metrictype = Summary
+filtertype = Wildcard (Unix Glob)
+axisen = 1
+isnumeric = 1
+filterpattern = *File*
+secondarymetric = 90x37ile
+filteragent = 
+enablefilteragent = 1
+
+[F46276AF2B8]
+name = data right
+parent = F462764D669
+type = table
+changed = 1679820667.5189872
+colours = 1
+datatype = Metric
+resulttype = Total TPS
+filterresult = None
+sql = SELECT PrimaryMetric , DataSource 'Agent' , PrimaryMetric || ' - ' || DataSource as x91Colourx93  , MetricValue , count(MetricTime) as 'Count' FROM MetricData WHERE MetricType == 'Summary' AND SecondaryMetric == '90x37ile' AND (PrimaryMetric GLOB '*File*'OR DataSource GLOB '*File*') GROUP by PrimaryMetric , DataSource
+filterpattern = *File*
+filtertype = Wildcard (Unix Glob)
+enablefilterresult = 0
+enablefilteragent = 1
+filteragent = 
+metrictype = Summary
+secondarymetric = 90x37ile
+isnumeric = 0
+showcount = 1
+primarymetric = 
+
+[F472325D80C]
+name = data left
+parent = F462764D669
+type = table
+changed = 1679820745.546464
+colours = 1
+datatype = Result
+resulttype = Response Time
+filterresult = None
+filteragent = None
+filtertype = Wildcard (Unix Glob)
+sql = SELECT result_name || ' - ' || agent as x91Result Namex93 , round(min(elapsed_time),3) 'Minimum' , round(avg(elapsed_time),3) 'Average' , round(percentile(elapsed_time, 90),3) '90x37ile' , round(max(elapsed_time),3) 'Maximum' , round(stdev(elapsed_time),3) 'Std. Dev.' , count(result) as 'Count' FROM Results WHERE x91Result Namex93 NOT LIKE 'Exception in threadx37' AND x91Result Namex93 GLOB '*File*' GROUP by x91Result Namex93
+enablefilteragent = 1
+filterpattern = *File*
+
+[F47236A0128]
+name = Response vs Robots
+parent = TOP
+type = graph
+changed = 1679821130.134405
+order = F472378A7DA,F472377239F
+
+[F47236A0128L]
+resulttype = Response Time
+changed = 1679821193.6277926
+filterresult = None
+filteragent = None
+filtertype = None
+datatype = Result
+sql = SELECT end_time as 'Time' , elapsed_time as 'Value' , result_name || ' - ' || agent as x91Namex93 FROM Results WHERE x91Namex93 NOT LIKE 'Exception in threadx37'
+enablefilteragent = 1
+
+[F47236A0128R]
+datatype = Metric
+changed = 1679821193.629547
+axisen = 1
+metrictype = Scenario
+filteragent = None
+filtertype = None
+sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric || ' - ' || DataSource as x91Namex93  FROM MetricData WHERE MetricType == 'Scenario' AND SecondaryMetric == 'total_robots' ORDER BY MetricTime
+secondarymetric = total_robots
+enablefilteragent = 1
+isnumeric = 1
+
+[F472377239F]
+name = Response
+parent = F47236A0128
+type = table
+changed = 1679821258.1299343
+colours = 1
+datatype = Result
+resulttype = Response Time
+filterresult = None
+filteragent = None
+filtertype = None
+sql = SELECT result_name || ' - ' || agent as x91Result Namex93 , round(min(elapsed_time),3) 'Minimum' , round(avg(elapsed_time),3) 'Average' , round(percentile(elapsed_time, 90),3) '90x37ile' , round(max(elapsed_time),3) 'Maximum' , round(stdev(elapsed_time),3) 'Std. Dev.' , count(result) as 'Count' FROM Results WHERE x91Result Namex93 NOT LIKE 'Exception in threadx37' GROUP by x91Result Namex93
+enablefilteragent = 1
+
+[F472378A7DA]
+name = Robots
+parent = F47236A0128
+type = table
+changed = 1679821240.6163566
+colours = 1
+datatype = Metric
+sql = SELECT PrimaryMetric , DataSource 'Agent' , PrimaryMetric || ' - ' || DataSource as x91Colourx93  , min(CAST(MetricValue AS NUMERIC)) AS 'Minimum' , round(avg(CAST(MetricValue AS NUMERIC)),3) AS 'Average' , round(percentile(CAST(MetricValue AS NUMERIC), 90),3) AS '90x37ile' , max(CAST(MetricValue AS NUMERIC)) AS 'Maximum' , round(stdev(CAST(MetricValue AS NUMERIC)),3) AS 'Std. Dev.' FROM MetricData WHERE MetricType == 'Scenario' AND SecondaryMetric == 'total_robots' GROUP by PrimaryMetric , DataSource
+metrictype = Scenario
+filteragent = None
+filtertype = None
+secondarymetric = total_robots
+enablefilteragent = 1
+isnumeric = 1
+
+[F4745242320]
+name = DataTables
+parent = TOP
+type = head
+changed = 1679877710.9617457
+order = F4745252C47,F4745261A83,F47453218D3,F476441C50B
+
+[F4745252C47]
+name = Metric
+parent = F4745242320
+type = table
+changed = 1679992490.2003098
+colours = 1
+datatype = Metric
+sql = SELECT PrimaryMetric , DataSource 'Agent' , PrimaryMetric || ' - ' || DataSource as x91Colourx93  , min(CAST(MetricValue AS NUMERIC)) AS 'Minimum' , round(avg(CAST(MetricValue AS NUMERIC)),3) AS 'Average' , round(percentile(CAST(MetricValue AS NUMERIC), 90),3) AS '90x37ile' , max(CAST(MetricValue AS NUMERIC)) AS 'Maximum' , round(stdev(CAST(MetricValue AS NUMERIC)),3) AS 'Std. Dev.' FROM MetricData WHERE MetricType == 'Summary' AND SecondaryMetric == '90x37ile' GROUP by PrimaryMetric , DataSource
+metrictype = Summary
+filteragent = None
+filtertype = None
+secondarymetric = 90x37ile
+showcount = 0
+isnumeric = 1
+enablefilteragent = 1
+resulttype = None
+filterresult = None
+col_90x37ile = เปอร์เซ็นไทล์ที่ 90
+col_primarymetric = เมตริกหลัก
+col_agent = ชื่อตัวแทน
+col_std_dev = ส่วนเบี่ยงเบนมาตรฐาน
+col_minimum = ขั้นต่ำ
+col_average = เฉลี่ย
+col_maximum = ขีดสุด
+
+[F4745261A83]
+name = ผลลัพธ์
+parent = F4745242320
+type = table
+changed = 1679992788.446511
+colours = 1
+datatype = Result
+resulttype = Response Time
+filterresult = 
+filteragent = 
+filtertype = None
+sql = SELECT result_name as x91Result Namex93 , round(min(elapsed_time),3) 'Minimum' , round(avg(elapsed_time),3) 'Average' , round(percentile(elapsed_time, 90),3) '90x37ile' , round(max(elapsed_time),3) 'Maximum' , round(stdev(elapsed_time),3) 'Std. Dev.' , count(result) as 'Count' FROM Results WHERE x91Result Namex93 NOT LIKE 'Exception in threadx37' GROUP by x91Result Namex93
+enablefilteragent = 0
+enablefilterresult = 0
+col_90x37ile = เปอร์เซ็นไทล์ที่ 90
+col_std_dev = ส่วนเบี่ยงเบนมาตรฐาน
+col_result_name = ชื่อผลลัพธ์
+col_minimum = ขั้นต่ำ
+col_average = เฉลี่ย
+col_maximum = ขีดสุด
+col_count = นับ
+
+[F47453218D3]
+name = Result Summary
+parent = F4745242320
+type = table
+changed = 1679983282.1897438
+colours = 1
+datatype = ResultSummary
+sql = SELECT r.result_name as x91Result Namex93 , round(min(rp.elapsed_time),3) 'Minimum', round(avg(rp.elapsed_time),3) 'Average', round(percentile(rp.elapsed_time, 90),3) '90x37ile', round(max(rp.elapsed_time),3) 'Maximum', round(stdev(rp.elapsed_time),3) 'Std. Dev.', count(rp.result) as 'Pass', count(rf.result) as 'Fail', count(ro.result) as 'Other' FROM Results as r LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == 'PASS' LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == 'FAIL' LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' GROUP BY  r.result_name ORDER BY x91Result Namex93
+filteragent = 
+filtertype = None
+enablefilteragent = 0
+
+[F476441C50B]
+name = SQL
+parent = F4745242320
+type = table
+changed = 1679929924.8744755
+colours = 0
+datatype = SQL
+
+[F478ABD5B1B]
+name = toc
+parent = TOP
+type = contents
+changed = 1679994502.9486916
+mode = Table Of Contents
+level = 2
+
