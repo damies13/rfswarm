@@ -447,7 +447,7 @@ class AgentServer(BaseHTTPRequestHandler):
 
 
 class RFSwarmBase:
-	version = "1.1.0"
+	version = "v1.2.0"
 	debuglvl = 0
 
 	config = None
