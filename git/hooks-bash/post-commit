@@ -21,6 +21,7 @@ if [[ "$version" =~ v[0-9]\. ]]; then
 
 		# Missing whitespace around operator (E225)	-	There should be one space before and after all operators.
 		sed -i '' -e "s/version *= *\"[^\"]*\"[^,]/version = \"${numver}\"/" $(find . -name "*.py")
+		sed -i '' -e "s/version = \"[^\"]*\"/version = \"${version}\"/" $(find . -name "*.py")
 		# Unexpected spaces around keyword / parameter equals (E251)	-	There should be no spaces before or after the = in a function definition.
 		sed -i '' -e "s/version *= *\"[^\"]*\",/version=\"${numver}\",/" $(find . -name "*.py")
 		#	Version Test
@@ -29,6 +30,7 @@ if [[ "$version" =~ v[0-9]\. ]]; then
 	else
 		# Missing whitespace around operator (E225)	-	There should be one space before and after all operators.
 		sed -i -e "s/version *= *\"[^\"]*\"[^,]/version = \"${numver}\"/" $(find . -name "*.py")
+		sed -i -e "s/version = \"[^\"]*\"/version = \"${version}\"/" $(find . -name "*.py")
 		# Unexpected spaces around keyword / parameter equals (E251)	-	There should be no spaces before or after the = in a function definition.
 		sed -i -e "s/version *= *\"[^\"]*\",/version=\"${numver}\",/" $(find . -name "*.py")
 		sed -i -e "s/#    Version .*/#    Version ${numver}/" $(find . -name "*.py")
