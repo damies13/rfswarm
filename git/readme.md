@@ -6,4 +6,5 @@ e.g. if you are contributing to this project you should link the git hooks on yo
 cd <rfswarm>/.git/hooks
 ln -s ../../git/hooks-bash/post-commit
 ln -s ../../git/hooks-bash/post-commit post-merge
+ln -s ../../git/hooks-bash/post-commit post-checkout
 ```
