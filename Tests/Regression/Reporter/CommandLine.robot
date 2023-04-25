@@ -26,7 +26,7 @@ Command Line Generate HTML
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	HTML
 	${testdata}= 	Set Variable    Issue-#144
 	${resultdata}= 	Set Variable    20230320_185055_demo
-	${basefolder}= 	Set Variable    ${CURDIR}${/}${testdata}
+	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	Should Exist	${resultfolder}
@@ -40,7 +40,7 @@ Command Line Generate Docx
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	DOCX
 	${testdata}= 	Set Variable    Issue-#144
 	${resultdata}= 	Set Variable    20230320_185055_demo
-	${basefolder}= 	Set Variable    ${CURDIR}${/}${testdata}
+	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	Should Exist	${resultfolder}
@@ -54,7 +54,7 @@ Command Line Generate Xlsx
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	XLSX
 	${testdata}= 	Set Variable    Issue-#144
 	${resultdata}= 	Set Variable    20230320_185055_demo
-	${basefolder}= 	Set Variable    ${CURDIR}${/}${testdata}
+	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	Should Exist	${resultfolder}
