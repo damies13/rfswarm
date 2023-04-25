@@ -36,7 +36,7 @@ Command Line Generate HTML
 	Should Exist	${resultfolder}
 	${template}= 	Set Variable    ${basefolder}${/}90%ileTemplate.template
 	Should Exist	${template}
-	${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -n -d ${resultfolder} -t ${template} --html
+	${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --html
 	Log 	${\n}${result} 	console=True
 	Should Not Contain 	${result} 	Traceback
 	Should Exist	${resultfolder}${/}${resultdata}.html
@@ -51,7 +51,7 @@ Command Line Generate Docx
 	Should Exist	${resultfolder}
 	${template}= 	Set Variable    ${basefolder}${/}90%ileTemplate.template
 	Should Exist	${template}
-	${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -n -g 1 -d ${resultfolder} -t ${template} --docx
+	${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --docx
 	Log to console 	${\n}${result} 	console=True
 	Should Not Contain 	${result} 	Traceback
 	Should Exist	${resultfolder}${/}${resultdata}.docx
@@ -66,7 +66,7 @@ Command Line Generate Xlsx
 	Should Exist	${resultfolder}
 	${template}= 	Set Variable    ${basefolder}${/}90%ileTemplate.template
 	Should Exist	${template}
-	${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -n -g 1 -d ${resultfolder} -t ${template} --xlsx
+	${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --xlsx
 	Log to console 	${\n}${result} 	console=True
 	Should Not Contain 	${result} 	Traceback
 	Should Exist	${resultfolder}${/}${resultdata}.xlsx
