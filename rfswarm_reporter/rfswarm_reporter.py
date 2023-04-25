@@ -2384,7 +2384,7 @@ class ReporterCore:
 		usetemplate = False
 		if base.args.template:
 			usetemplate = True
-			base.config['Reporter']['Template'] = base.args.template
+			base.config['Reporter']['Template'] = base.whitespace_set_ini_value(base.args.template)
 
 		if base.args.dir:
 			# do some sanity checks before blindly setting
