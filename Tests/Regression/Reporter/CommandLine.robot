@@ -34,7 +34,9 @@ Command Line Generate HTML
 	Should Exist	${template}
 	${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -n -d ${resultfolder} -t ${template} --html
 	Log to console 	${\n}${result}
-	Should Contain	${result}	Excel
+	Should Not Contain 	${result} 	Traceback
+	Should Contain	${result}	html
+	Should Exist	${resultfolder}${/}${resultdata}.html
 
 Command Line Generate Docx
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	DOCX
@@ -48,7 +50,9 @@ Command Line Generate Docx
 	Should Exist	${template}
 	${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -n -d ${resultfolder} -t ${template} --docx
 	Log to console 	${\n}${result}
-	Should Contain	${result}	Excel
+	Should Not Contain 	${result} 	Traceback
+	Should Contain	${result}	docx
+	Should Exist	${resultfolder}${/}${resultdata}.docx
 
 Command Line Generate Xlsx
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	XLSX
@@ -62,7 +66,9 @@ Command Line Generate Xlsx
 	Should Exist	${template}
 	${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -n -d ${resultfolder} -t ${template} --xlsx
 	Log to console 	${\n}${result}
-	Should Contain	${result}	Excel
+	Should Not Contain 	${result} 	Traceback
+	Should Contain	${result}	xlsx
+	Should Exist	${resultfolder}${/}${resultdata}.xlsx
 
 *** Keywords ***
 Clean Up Old Files
