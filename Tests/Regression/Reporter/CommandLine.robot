@@ -22,7 +22,47 @@ Reporter Help
 	Log to console 	${\n}${result}
 	Should Contain	${result}	Excel
 
+Command Line Generate HTML
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	HTML
+	${testdata}= 	Set Variable    Issue-#144
+	${resultdata}= 	Set Variable    20230320_185055_demo
+	${basefolder}= 	Set Variable    ${CURDIR}${/}${testdata}
+	Should Exist	${basefolder}
+	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
+	Should Exist	${resultfolder}
+	${template}= 	Set Variable    ${basefolder}${/}90%ileTemplate.template
+	Should Exist	${template}
+	${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -n -d ${resultfolder} -t ${template} --html
+	Log to console 	${\n}${result}
+	Should Contain	${result}	Excel
 
+Command Line Generate Docx
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	DOCX
+	${testdata}= 	Set Variable    Issue-#144
+	${resultdata}= 	Set Variable    20230320_185055_demo
+	${basefolder}= 	Set Variable    ${CURDIR}${/}${testdata}
+	Should Exist	${basefolder}
+	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
+	Should Exist	${resultfolder}
+	${template}= 	Set Variable    ${basefolder}${/}90%ileTemplate.template
+	Should Exist	${template}
+	${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -n -d ${resultfolder} -t ${template} --docx
+	Log to console 	${\n}${result}
+	Should Contain	${result}	Excel
+
+Command Line Generate Xlsx
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	XLSX
+	${testdata}= 	Set Variable    Issue-#144
+	${resultdata}= 	Set Variable    20230320_185055_demo
+	${basefolder}= 	Set Variable    ${CURDIR}${/}${testdata}
+	Should Exist	${basefolder}
+	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
+	Should Exist	${resultfolder}
+	${template}= 	Set Variable    ${basefolder}${/}90%ileTemplate.template
+	Should Exist	${template}
+	${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -n -d ${resultfolder} -t ${template} --xlsx
+	Log to console 	${\n}${result}
+	Should Contain	${result}	Excel
 
 *** Keywords ***
 Clean Up Old Files
