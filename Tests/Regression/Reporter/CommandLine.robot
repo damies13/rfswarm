@@ -32,10 +32,10 @@ Command Line Generate HTML
 	Should Exist	${resultfolder}
 	${template}= 	Set Variable    ${basefolder}${/}90%ileTemplate.template
 	Should Exist	${template}
-	${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -n -d ${resultfolder} -t ${template} --html
+	${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -n -g 1 -d ${resultfolder} -t ${template} --html
 	Log to console 	${\n}${result}
 	Should Not Contain 	${result} 	Traceback
-	Should Contain	${result}	html
+	Should Contain	${result}	${resultdata}.html
 	Should Exist	${resultfolder}${/}${resultdata}.html
 
 Command Line Generate Docx
@@ -48,10 +48,10 @@ Command Line Generate Docx
 	Should Exist	${resultfolder}
 	${template}= 	Set Variable    ${basefolder}${/}90%ileTemplate.template
 	Should Exist	${template}
-	${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -n -d ${resultfolder} -t ${template} --docx
+	${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -n -g 1 -d ${resultfolder} -t ${template} --docx
 	Log to console 	${\n}${result}
 	Should Not Contain 	${result} 	Traceback
-	Should Contain	${result}	docx
+	Should Contain	${result}	${resultdata}.docx
 	Should Exist	${resultfolder}${/}${resultdata}.docx
 
 Command Line Generate Xlsx
@@ -64,10 +64,10 @@ Command Line Generate Xlsx
 	Should Exist	${resultfolder}
 	${template}= 	Set Variable    ${basefolder}${/}90%ileTemplate.template
 	Should Exist	${template}
-	${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -n -d ${resultfolder} -t ${template} --xlsx
+	${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -n -g 1 -d ${resultfolder} -t ${template} --xlsx
 	Log to console 	${\n}${result}
 	Should Not Contain 	${result} 	Traceback
-	Should Contain	${result}	xlsx
+	Should Contain	${result}	${resultdata}.xlsx
 	Should Exist	${resultfolder}${/}${resultdata}.xlsx
 
 *** Keywords ***
