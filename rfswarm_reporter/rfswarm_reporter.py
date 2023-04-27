@@ -244,7 +244,7 @@ class ReporterBase():
 	def saveini(self):
 		self.debugmsg(6, "save_ini:", self.save_ini)
 		if self.save_ini:
-			with open(base.reporter_ini, 'w') as configfile:    # save
+			with open(base.reporter_ini, 'w', encoding="utf8") as configfile:    # save
 				base.config.write(configfile)
 				self.debugmsg(6, "File Saved:", self.reporter_ini)
 
@@ -287,7 +287,7 @@ class ReporterBase():
 		saved = False
 		if filename is None or len(filename) < 1:
 			filename = base.config['Reporter']['Template']
-		with open(filename, 'w') as templatefile:    # save
+		with open(filename, 'w', encoding="utf8") as templatefile:    # save
 			base.report.write(templatefile)
 			self.debugmsg(6, "Template Saved:", filename)
 			saved = True
@@ -309,7 +309,7 @@ class ReporterBase():
 			base.report = None
 			self.reportdata = {}
 			base.report = configparser.ConfigParser()
-			base.report.read(filename)
+			base.report.read(filename, encoding="utf8")
 
 			base.report_item_set_changed_all("TOP")
 
@@ -325,7 +325,7 @@ class ReporterBase():
 		if 'Reporter' in base.config:
 			if 'Report' in base.config['Reporter']:
 				filename = base.config['Reporter']['Report']
-				with open(filename, 'w') as reportfile:    # save
+				with open(filename, 'w', encoding="utf8") as reportfile:    # save
 					base.report.write(reportfile)
 					self.debugmsg(6, "Report Saved:", filename)
 					saved = True
@@ -339,7 +339,7 @@ class ReporterBase():
 		if len(filename) > 0 and os.path.isfile(filename):
 			base.debugmsg(7, "filename: ", filename, " exists, open")
 			base.report = configparser.ConfigParser()
-			base.report.read(filename)
+			base.report.read(filename, encoding="utf8")
 		else:
 			templatefile = base.whitespace_get_ini_value(base.config['Reporter']['Template'])
 			base.debugmsg(7, "Template: ", templatefile)
@@ -530,23 +530,26 @@ class ReporterBase():
 			return value
 
 	def rs_setting_get_font(self):
-		fontlst = list(tkFont.families())
-		base.debugmsg(9, "fontlst", fontlst)
 		value = self.rs_setting_get('font')
-		if value not in fontlst:
-			value = None
-		if value is None:
-			# Verdana, Tahoma, Arial, Helvetica, sans-serif
-			fontorder = ['Helvetica', 'Verdana', 'Tahoma', 'Arial', 'FreeSans']
-			for fnt in fontorder:
-				if fnt in fontlst:
-					return fnt
-			for fnt in fontlst:
-				if 'Sans' in fnt or 'sans' in fnt:
-					return fnt
-			return 'sans-serif'
-		else:
+		if not self.gui:
 			return value
+		else:
+			fontlst = list(tkFont.families())
+			base.debugmsg(9, "fontlst", fontlst)
+			if value not in fontlst:
+				value = None
+			if value is None:
+				# Verdana, Tahoma, Arial, Helvetica, sans-serif
+				fontorder = ['Helvetica', 'Verdana', 'Tahoma', 'Arial', 'FreeSans']
+				for fnt in fontorder:
+					if fnt in fontlst:
+						return fnt
+				for fnt in fontlst:
+					if 'Sans' in fnt or 'sans' in fnt:
+						return fnt
+				return 'sans-serif'
+			else:
+				return value
 
 	def rs_setting_get_fontsize(self):
 		value = self.rs_setting_get_int('fontsize')
@@ -2331,7 +2334,7 @@ class ReporterCore:
 
 		if os.path.isfile(base.reporter_ini):
 			base.debugmsg(7, "reporter_ini: ", base.reporter_ini)
-			base.config.read(base.reporter_ini)
+			base.config.read(base.reporter_ini, encoding="utf8")
 		else:
 			base.saveini()
 
@@ -2381,7 +2384,7 @@ class ReporterCore:
 		usetemplate = False
 		if base.args.template:
 			usetemplate = True
-			base.config['Reporter']['Template'] = base.args.template
+			base.config['Reporter']['Template'] = base.whitespace_set_ini_value(base.args.template)
 
 		if base.args.dir:
 			# do some sanity checks before blindly setting
