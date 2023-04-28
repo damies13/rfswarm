@@ -25,7 +25,7 @@ if [[ "$currversion" =~ v[0-9]\. ]]; then
 		sed -i '' -e "s/#    Version .*/#    Version ${version}/" $(find . -name "*.py")
 	else
 		sed -i -e "s/version = \"[^\"]*\"/version = \"${version}\"/" $(find . -name "*.py")
-		sed -i -e "s/#    Version .*/#    Version${version}\"/" $(find . -name "*.py")
+		sed -i -e "s/#    Version .*/#    Version ${version}/" $(find . -name "*.py")
 	fi
 
 	rm -R dist/

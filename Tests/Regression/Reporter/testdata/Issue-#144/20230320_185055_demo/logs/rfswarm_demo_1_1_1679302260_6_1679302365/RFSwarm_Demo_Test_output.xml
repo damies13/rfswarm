@@ -1,0 +1,1451 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 6.0.2 (Python 3.10.6 on linux)" generated="20230320 18:52:45.562" rpa="false" schemaversion="3">
+<suite id="s1" name="Rfswarm Demo" source="/tmp/rfswarmagent/scripts/rfswarm_demo.robot">
+<test id="s1-t1" name="RFSwarm Demo Test" line="17">
+<kw name="Create Some Files">
+<doc>Create Some Files</doc>
+<kw name="Create Directory" library="OperatingSystem">
+<arg>${FPATH}</arg>
+<doc>Creates the specified directory.</doc>
+<msg timestamp="20230320 18:52:45.644" level="INFO" html="true">Directory '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1"&gt;/tmp/rfswarmagent/scripts/Robot_1&lt;/a&gt;' already exists.</msg>
+<status status="PASS" starttime="20230320 18:52:45.643" endtime="20230320 18:52:45.644"/>
+</kw>
+<for flavor="IN RANGE">
+<var>${i}</var>
+<value>100</value>
+<iter>
+<var name="${i}">0</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.645" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i0_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i0_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.644" endtime="20230320 18:52:45.645"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.644" endtime="20230320 18:52:45.645"/>
+</iter>
+<iter>
+<var name="${i}">1</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.645" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i1_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i1_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.645" endtime="20230320 18:52:45.645"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.645" endtime="20230320 18:52:45.645"/>
+</iter>
+<iter>
+<var name="${i}">2</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.646" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i2_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i2_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.646" endtime="20230320 18:52:45.646"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.646" endtime="20230320 18:52:45.646"/>
+</iter>
+<iter>
+<var name="${i}">3</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.647" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i3_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i3_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.646" endtime="20230320 18:52:45.647"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.646" endtime="20230320 18:52:45.647"/>
+</iter>
+<iter>
+<var name="${i}">4</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.648" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i4_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i4_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.647" endtime="20230320 18:52:45.648"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.647" endtime="20230320 18:52:45.648"/>
+</iter>
+<iter>
+<var name="${i}">5</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.648" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i5_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i5_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.648" endtime="20230320 18:52:45.648"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.648" endtime="20230320 18:52:45.648"/>
+</iter>
+<iter>
+<var name="${i}">6</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.649" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i6_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i6_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.649" endtime="20230320 18:52:45.649"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.649" endtime="20230320 18:52:45.649"/>
+</iter>
+<iter>
+<var name="${i}">7</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.650" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i7_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i7_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.650" endtime="20230320 18:52:45.650"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.649" endtime="20230320 18:52:45.650"/>
+</iter>
+<iter>
+<var name="${i}">8</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.651" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i8_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i8_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.651" endtime="20230320 18:52:45.651"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.650" endtime="20230320 18:52:45.651"/>
+</iter>
+<iter>
+<var name="${i}">9</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.652" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i9_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i9_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.652" endtime="20230320 18:52:45.652"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.651" endtime="20230320 18:52:45.652"/>
+</iter>
+<iter>
+<var name="${i}">10</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.653" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i10_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i10_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.652" endtime="20230320 18:52:45.653"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.652" endtime="20230320 18:52:45.653"/>
+</iter>
+<iter>
+<var name="${i}">11</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.654" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i11_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i11_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.653" endtime="20230320 18:52:45.654"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.653" endtime="20230320 18:52:45.654"/>
+</iter>
+<iter>
+<var name="${i}">12</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.655" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i12_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i12_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.654" endtime="20230320 18:52:45.655"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.654" endtime="20230320 18:52:45.655"/>
+</iter>
+<iter>
+<var name="${i}">13</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.656" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i13_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i13_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.655" endtime="20230320 18:52:45.656"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.655" endtime="20230320 18:52:45.656"/>
+</iter>
+<iter>
+<var name="${i}">14</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.656" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i14_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i14_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.656" endtime="20230320 18:52:45.656"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.656" endtime="20230320 18:52:45.656"/>
+</iter>
+<iter>
+<var name="${i}">15</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.657" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i15_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i15_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.657" endtime="20230320 18:52:45.657"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.657" endtime="20230320 18:52:45.657"/>
+</iter>
+<iter>
+<var name="${i}">16</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.658" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i16_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i16_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.657" endtime="20230320 18:52:45.658"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.657" endtime="20230320 18:52:45.658"/>
+</iter>
+<iter>
+<var name="${i}">17</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.659" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i17_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i17_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.658" endtime="20230320 18:52:45.659"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.658" endtime="20230320 18:52:45.659"/>
+</iter>
+<iter>
+<var name="${i}">18</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.659" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i18_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i18_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.659" endtime="20230320 18:52:45.660"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.659" endtime="20230320 18:52:45.660"/>
+</iter>
+<iter>
+<var name="${i}">19</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.660" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i19_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i19_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.660" endtime="20230320 18:52:45.660"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.660" endtime="20230320 18:52:45.660"/>
+</iter>
+<iter>
+<var name="${i}">20</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.661" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i20_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i20_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.661" endtime="20230320 18:52:45.661"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.661" endtime="20230320 18:52:45.661"/>
+</iter>
+<iter>
+<var name="${i}">21</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.662" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i21_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i21_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.661" endtime="20230320 18:52:45.662"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.661" endtime="20230320 18:52:45.662"/>
+</iter>
+<iter>
+<var name="${i}">22</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.663" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i22_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i22_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.662" endtime="20230320 18:52:45.663"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.662" endtime="20230320 18:52:45.663"/>
+</iter>
+<iter>
+<var name="${i}">23</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.663" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i23_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i23_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.663" endtime="20230320 18:52:45.663"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.663" endtime="20230320 18:52:45.663"/>
+</iter>
+<iter>
+<var name="${i}">24</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.664" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i24_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i24_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.664" endtime="20230320 18:52:45.664"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.664" endtime="20230320 18:52:45.664"/>
+</iter>
+<iter>
+<var name="${i}">25</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.665" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i25_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i25_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.664" endtime="20230320 18:52:45.665"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.664" endtime="20230320 18:52:45.665"/>
+</iter>
+<iter>
+<var name="${i}">26</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.666" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i26_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i26_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.665" endtime="20230320 18:52:45.666"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.665" endtime="20230320 18:52:45.666"/>
+</iter>
+<iter>
+<var name="${i}">27</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.666" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i27_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i27_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.666" endtime="20230320 18:52:45.667"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.666" endtime="20230320 18:52:45.667"/>
+</iter>
+<iter>
+<var name="${i}">28</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.668" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i28_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i28_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.667" endtime="20230320 18:52:45.668"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.667" endtime="20230320 18:52:45.668"/>
+</iter>
+<iter>
+<var name="${i}">29</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.669" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i29_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i29_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.668" endtime="20230320 18:52:45.669"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.668" endtime="20230320 18:52:45.669"/>
+</iter>
+<iter>
+<var name="${i}">30</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.670" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i30_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i30_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.669" endtime="20230320 18:52:45.670"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.669" endtime="20230320 18:52:45.670"/>
+</iter>
+<iter>
+<var name="${i}">31</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.671" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i31_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i31_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.670" endtime="20230320 18:52:45.671"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.670" endtime="20230320 18:52:45.671"/>
+</iter>
+<iter>
+<var name="${i}">32</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.672" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i32_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i32_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.671" endtime="20230320 18:52:45.672"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.671" endtime="20230320 18:52:45.672"/>
+</iter>
+<iter>
+<var name="${i}">33</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.673" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i33_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i33_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.672" endtime="20230320 18:52:45.673"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.672" endtime="20230320 18:52:45.673"/>
+</iter>
+<iter>
+<var name="${i}">34</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.673" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i34_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i34_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.673" endtime="20230320 18:52:45.673"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.673" endtime="20230320 18:52:45.674"/>
+</iter>
+<iter>
+<var name="${i}">35</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.674" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i35_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i35_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.674" endtime="20230320 18:52:45.674"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.674" endtime="20230320 18:52:45.674"/>
+</iter>
+<iter>
+<var name="${i}">36</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.675" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i36_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i36_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.675" endtime="20230320 18:52:45.675"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.675" endtime="20230320 18:52:45.675"/>
+</iter>
+<iter>
+<var name="${i}">37</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.676" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i37_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i37_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.675" endtime="20230320 18:52:45.676"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.675" endtime="20230320 18:52:45.676"/>
+</iter>
+<iter>
+<var name="${i}">38</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.677" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i38_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i38_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.676" endtime="20230320 18:52:45.677"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.676" endtime="20230320 18:52:45.677"/>
+</iter>
+<iter>
+<var name="${i}">39</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.678" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i39_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i39_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.677" endtime="20230320 18:52:45.678"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.677" endtime="20230320 18:52:45.678"/>
+</iter>
+<iter>
+<var name="${i}">40</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.678" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i40_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i40_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.678" endtime="20230320 18:52:45.678"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.678" endtime="20230320 18:52:45.678"/>
+</iter>
+<iter>
+<var name="${i}">41</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.679" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i41_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i41_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.679" endtime="20230320 18:52:45.679"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.679" endtime="20230320 18:52:45.679"/>
+</iter>
+<iter>
+<var name="${i}">42</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.680" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i42_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i42_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.680" endtime="20230320 18:52:45.680"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.679" endtime="20230320 18:52:45.680"/>
+</iter>
+<iter>
+<var name="${i}">43</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.681" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i43_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i43_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.680" endtime="20230320 18:52:45.681"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.680" endtime="20230320 18:52:45.681"/>
+</iter>
+<iter>
+<var name="${i}">44</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.682" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i44_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i44_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.681" endtime="20230320 18:52:45.682"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.681" endtime="20230320 18:52:45.682"/>
+</iter>
+<iter>
+<var name="${i}">45</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.682" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i45_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i45_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.682" endtime="20230320 18:52:45.682"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.682" endtime="20230320 18:52:45.683"/>
+</iter>
+<iter>
+<var name="${i}">46</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.683" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i46_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i46_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.683" endtime="20230320 18:52:45.683"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.683" endtime="20230320 18:52:45.683"/>
+</iter>
+<iter>
+<var name="${i}">47</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.684" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i47_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i47_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.684" endtime="20230320 18:52:45.684"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.684" endtime="20230320 18:52:45.684"/>
+</iter>
+<iter>
+<var name="${i}">48</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.685" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i48_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i48_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.685" endtime="20230320 18:52:45.685"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.685" endtime="20230320 18:52:45.686"/>
+</iter>
+<iter>
+<var name="${i}">49</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.686" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i49_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i49_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.686" endtime="20230320 18:52:45.686"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.686" endtime="20230320 18:52:45.687"/>
+</iter>
+<iter>
+<var name="${i}">50</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.687" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i50_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i50_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.687" endtime="20230320 18:52:45.687"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.687" endtime="20230320 18:52:45.687"/>
+</iter>
+<iter>
+<var name="${i}">51</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.688" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i51_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i51_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.688" endtime="20230320 18:52:45.688"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.688" endtime="20230320 18:52:45.688"/>
+</iter>
+<iter>
+<var name="${i}">52</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.689" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i52_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i52_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.688" endtime="20230320 18:52:45.689"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.688" endtime="20230320 18:52:45.689"/>
+</iter>
+<iter>
+<var name="${i}">53</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.690" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i53_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i53_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.689" endtime="20230320 18:52:45.690"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.689" endtime="20230320 18:52:45.690"/>
+</iter>
+<iter>
+<var name="${i}">54</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.690" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i54_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i54_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.690" endtime="20230320 18:52:45.690"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.690" endtime="20230320 18:52:45.691"/>
+</iter>
+<iter>
+<var name="${i}">55</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.691" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i55_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i55_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.691" endtime="20230320 18:52:45.691"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.691" endtime="20230320 18:52:45.691"/>
+</iter>
+<iter>
+<var name="${i}">56</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.692" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i56_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i56_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.692" endtime="20230320 18:52:45.692"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.691" endtime="20230320 18:52:45.692"/>
+</iter>
+<iter>
+<var name="${i}">57</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.693" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i57_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i57_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.692" endtime="20230320 18:52:45.693"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.692" endtime="20230320 18:52:45.693"/>
+</iter>
+<iter>
+<var name="${i}">58</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.694" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i58_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i58_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.693" endtime="20230320 18:52:45.694"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.693" endtime="20230320 18:52:45.694"/>
+</iter>
+<iter>
+<var name="${i}">59</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.694" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i59_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i59_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.694" endtime="20230320 18:52:45.694"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.694" endtime="20230320 18:52:45.695"/>
+</iter>
+<iter>
+<var name="${i}">60</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.695" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i60_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i60_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.695" endtime="20230320 18:52:45.695"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.695" endtime="20230320 18:52:45.695"/>
+</iter>
+<iter>
+<var name="${i}">61</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.696" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i61_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i61_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.696" endtime="20230320 18:52:45.696"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.695" endtime="20230320 18:52:45.696"/>
+</iter>
+<iter>
+<var name="${i}">62</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.697" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i62_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i62_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.696" endtime="20230320 18:52:45.697"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.696" endtime="20230320 18:52:45.697"/>
+</iter>
+<iter>
+<var name="${i}">63</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.697" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i63_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i63_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.697" endtime="20230320 18:52:45.697"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.697" endtime="20230320 18:52:45.698"/>
+</iter>
+<iter>
+<var name="${i}">64</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.698" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i64_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i64_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.698" endtime="20230320 18:52:45.698"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.698" endtime="20230320 18:52:45.698"/>
+</iter>
+<iter>
+<var name="${i}">65</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.699" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i65_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i65_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.699" endtime="20230320 18:52:45.699"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.698" endtime="20230320 18:52:45.699"/>
+</iter>
+<iter>
+<var name="${i}">66</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.700" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i66_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i66_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.699" endtime="20230320 18:52:45.700"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.699" endtime="20230320 18:52:45.700"/>
+</iter>
+<iter>
+<var name="${i}">67</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.701" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i67_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i67_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.700" endtime="20230320 18:52:45.701"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.700" endtime="20230320 18:52:45.701"/>
+</iter>
+<iter>
+<var name="${i}">68</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.702" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i68_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i68_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.701" endtime="20230320 18:52:45.702"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.701" endtime="20230320 18:52:45.702"/>
+</iter>
+<iter>
+<var name="${i}">69</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.703" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i69_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i69_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.702" endtime="20230320 18:52:45.703"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.702" endtime="20230320 18:52:45.703"/>
+</iter>
+<iter>
+<var name="${i}">70</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.704" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i70_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i70_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.703" endtime="20230320 18:52:45.704"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.703" endtime="20230320 18:52:45.704"/>
+</iter>
+<iter>
+<var name="${i}">71</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.705" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i71_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i71_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.704" endtime="20230320 18:52:45.705"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.704" endtime="20230320 18:52:45.705"/>
+</iter>
+<iter>
+<var name="${i}">72</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.705" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i72_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i72_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.705" endtime="20230320 18:52:45.705"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.705" endtime="20230320 18:52:45.706"/>
+</iter>
+<iter>
+<var name="${i}">73</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.706" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i73_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i73_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.706" endtime="20230320 18:52:45.706"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.706" endtime="20230320 18:52:45.706"/>
+</iter>
+<iter>
+<var name="${i}">74</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.707" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i74_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i74_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.707" endtime="20230320 18:52:45.707"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.706" endtime="20230320 18:52:45.707"/>
+</iter>
+<iter>
+<var name="${i}">75</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.708" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i75_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i75_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.707" endtime="20230320 18:52:45.708"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.707" endtime="20230320 18:52:45.708"/>
+</iter>
+<iter>
+<var name="${i}">76</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.709" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i76_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i76_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.708" endtime="20230320 18:52:45.709"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.708" endtime="20230320 18:52:45.709"/>
+</iter>
+<iter>
+<var name="${i}">77</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.709" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i77_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i77_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.709" endtime="20230320 18:52:45.709"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.709" endtime="20230320 18:52:45.709"/>
+</iter>
+<iter>
+<var name="${i}">78</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.710" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i78_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i78_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.710" endtime="20230320 18:52:45.710"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.710" endtime="20230320 18:52:45.710"/>
+</iter>
+<iter>
+<var name="${i}">79</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.711" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i79_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i79_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.710" endtime="20230320 18:52:45.711"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.710" endtime="20230320 18:52:45.711"/>
+</iter>
+<iter>
+<var name="${i}">80</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.711" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i80_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i80_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.711" endtime="20230320 18:52:45.712"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.711" endtime="20230320 18:52:45.712"/>
+</iter>
+<iter>
+<var name="${i}">81</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.712" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i81_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i81_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.712" endtime="20230320 18:52:45.712"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.712" endtime="20230320 18:52:45.712"/>
+</iter>
+<iter>
+<var name="${i}">82</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.713" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i82_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i82_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.713" endtime="20230320 18:52:45.713"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.712" endtime="20230320 18:52:45.713"/>
+</iter>
+<iter>
+<var name="${i}">83</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.714" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i83_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i83_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.713" endtime="20230320 18:52:45.714"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.713" endtime="20230320 18:52:45.714"/>
+</iter>
+<iter>
+<var name="${i}">84</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.714" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i84_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i84_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.714" endtime="20230320 18:52:45.714"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.714" endtime="20230320 18:52:45.714"/>
+</iter>
+<iter>
+<var name="${i}">85</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.715" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i85_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i85_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.715" endtime="20230320 18:52:45.715"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.715" endtime="20230320 18:52:45.715"/>
+</iter>
+<iter>
+<var name="${i}">86</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.716" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i86_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i86_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.715" endtime="20230320 18:52:45.716"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.715" endtime="20230320 18:52:45.716"/>
+</iter>
+<iter>
+<var name="${i}">87</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.717" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i87_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i87_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.716" endtime="20230320 18:52:45.717"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.716" endtime="20230320 18:52:45.717"/>
+</iter>
+<iter>
+<var name="${i}">88</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.718" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i88_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i88_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.717" endtime="20230320 18:52:45.718"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.717" endtime="20230320 18:52:45.718"/>
+</iter>
+<iter>
+<var name="${i}">89</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.719" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i89_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i89_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.718" endtime="20230320 18:52:45.719"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.718" endtime="20230320 18:52:45.719"/>
+</iter>
+<iter>
+<var name="${i}">90</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.720" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i90_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i90_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.719" endtime="20230320 18:52:45.720"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.719" endtime="20230320 18:52:45.720"/>
+</iter>
+<iter>
+<var name="${i}">91</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.721" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i91_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i91_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.720" endtime="20230320 18:52:45.721"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.720" endtime="20230320 18:52:45.721"/>
+</iter>
+<iter>
+<var name="${i}">92</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.722" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i92_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i92_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.721" endtime="20230320 18:52:45.722"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.721" endtime="20230320 18:52:45.722"/>
+</iter>
+<iter>
+<var name="${i}">93</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.722" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i93_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i93_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.722" endtime="20230320 18:52:45.722"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.722" endtime="20230320 18:52:45.722"/>
+</iter>
+<iter>
+<var name="${i}">94</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.723" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i94_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i94_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.723" endtime="20230320 18:52:45.723"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.723" endtime="20230320 18:52:45.723"/>
+</iter>
+<iter>
+<var name="${i}">95</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.724" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i95_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i95_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.723" endtime="20230320 18:52:45.724"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.723" endtime="20230320 18:52:45.724"/>
+</iter>
+<iter>
+<var name="${i}">96</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.724" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i96_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i96_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.724" endtime="20230320 18:52:45.725"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.724" endtime="20230320 18:52:45.725"/>
+</iter>
+<iter>
+<var name="${i}">97</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.725" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i97_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i97_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.725" endtime="20230320 18:52:45.725"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.725" endtime="20230320 18:52:45.725"/>
+</iter>
+<iter>
+<var name="${i}">98</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.726" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i98_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i98_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.726" endtime="20230320 18:52:45.729"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.726" endtime="20230320 18:52:45.729"/>
+</iter>
+<iter>
+<var name="${i}">99</var>
+<kw name="Create File" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i${i}_test.txt</arg>
+<arg>${alpha1k}</arg>
+<doc>Creates a file with the given content and encoding.</doc>
+<msg timestamp="20230320 18:52:45.730" level="INFO" html="true">Created file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i99_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i99_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:45.729" endtime="20230320 18:52:45.730"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.729" endtime="20230320 18:52:45.730"/>
+</iter>
+<status status="PASS" starttime="20230320 18:52:45.644" endtime="20230320 18:52:45.730"/>
+</for>
+<kw name="Wait Until Created" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i99_test.txt</arg>
+<doc>Waits until the given file or directory is created.</doc>
+<msg timestamp="20230320 18:52:45.730" level="INFO" html="true">'&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i99_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i99_test.txt&lt;/a&gt;' was created.</msg>
+<status status="PASS" starttime="20230320 18:52:45.730" endtime="20230320 18:52:45.731"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.643" endtime="20230320 18:52:45.731"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>5</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230320 18:52:50.736" level="INFO">Slept 5 seconds</msg>
+<status status="PASS" starttime="20230320 18:52:45.735" endtime="20230320 18:52:50.736"/>
+</kw>
+<kw name="List Some Files">
+<doc>List Some Files</doc>
+<kw name="List Files In Directory" library="OperatingSystem">
+<var>${FILS}</var>
+<arg>${FPATH}</arg>
+<doc>Wrapper for `List Directory` that returns only files.</doc>
+<msg timestamp="20230320 18:52:50.739" level="INFO" html="true">Listing contents of directory '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1"&gt;/tmp/rfswarmagent/scripts/Robot_1&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:50.742" level="INFO">100 files:
+I6_i0_test.txt
+I6_i10_test.txt
+I6_i11_test.txt
+I6_i12_test.txt
+I6_i13_test.txt
+I6_i14_test.txt
+I6_i15_test.txt
+I6_i16_test.txt
+I6_i17_test.txt
+I6_i18_test.txt
+I6_i19_test.txt
+I6_i1_test.txt
+I6_i20_test.txt
+I6_i21_test.txt
+I6_i22_test.txt
+I6_i23_test.txt
+I6_i24_test.txt
+I6_i25_test.txt
+I6_i26_test.txt
+I6_i27_test.txt
+I6_i28_test.txt
+I6_i29_test.txt
+I6_i2_test.txt
+I6_i30_test.txt
+I6_i31_test.txt
+I6_i32_test.txt
+I6_i33_test.txt
+I6_i34_test.txt
+I6_i35_test.txt
+I6_i36_test.txt
+I6_i37_test.txt
+I6_i38_test.txt
+I6_i39_test.txt
+I6_i3_test.txt
+I6_i40_test.txt
+I6_i41_test.txt
+I6_i42_test.txt
+I6_i43_test.txt
+I6_i44_test.txt
+I6_i45_test.txt
+I6_i46_test.txt
+I6_i47_test.txt
+I6_i48_test.txt
+I6_i49_test.txt
+I6_i4_test.txt
+I6_i50_test.txt
+I6_i51_test.txt
+I6_i52_test.txt
+I6_i53_test.txt
+I6_i54_test.txt
+I6_i55_test.txt
+I6_i56_test.txt
+I6_i57_test.txt
+I6_i58_test.txt
+I6_i59_test.txt
+I6_i5_test.txt
+I6_i60_test.txt
+I6_i61_test.txt
+I6_i62_test.txt
+I6_i63_test.txt
+I6_i64_test.txt
+I6_i65_test.txt
+I6_i66_test.txt
+I6_i67_test.txt
+I6_i68_test.txt
+I6_i69_test.txt
+I6_i6_test.txt
+I6_i70_test.txt
+I6_i71_test.txt
+I6_i72_test.txt
+I6_i73_test.txt
+I6_i74_test.txt
+I6_i75_test.txt
+I6_i76_test.txt
+I6_i77_test.txt
+I6_i78_test.txt
+I6_i79_test.txt
+I6_i7_test.txt
+I6_i80_test.txt
+I6_i81_test.txt
+I6_i82_test.txt
+I6_i83_test.txt
+I6_i84_test.txt
+I6_i85_test.txt
+I6_i86_test.txt
+I6_i87_test.txt
+I6_i88_test.txt
+I6_i89_test.txt
+I6_i8_test.txt
+I6_i90_test.txt
+I6_i91_test.txt
+I6_i92_test.txt
+I6_i93_test.txt
+I6_i94_test.txt
+I6_i95_test.txt
+I6_i96_test.txt
+I6_i97_test.txt
+I6_i98_test.txt
+I6_i99_test.txt
+I6_i9_test.txt</msg>
+<msg timestamp="20230320 18:52:50.742" level="INFO">${FILS} = ['I6_i0_test.txt', 'I6_i10_test.txt', 'I6_i11_test.txt', 'I6_i12_test.txt', 'I6_i13_test.txt', 'I6_i14_test.txt', 'I6_i15_test.txt', 'I6_i16_test.txt', 'I6_i17_test.txt', 'I6_i18_test.txt', 'I6_i19_te...</msg>
+<status status="PASS" starttime="20230320 18:52:50.738" endtime="20230320 18:52:50.742"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:50.737" endtime="20230320 18:52:50.743"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>5</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230320 18:52:55.745" level="INFO">Slept 5 seconds</msg>
+<status status="PASS" starttime="20230320 18:52:50.744" endtime="20230320 18:52:55.745"/>
+</kw>
+<kw name="Remove Some Files">
+<doc>Remove Some Files</doc>
+<kw name="Remove Files" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_*_test.txt</arg>
+<doc>Uses `Remove File` to remove multiple files one-by-one.</doc>
+<msg timestamp="20230320 18:52:55.747" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i95_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i95_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.747" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i44_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i44_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.747" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i84_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i84_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.747" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i75_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i75_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.747" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i36_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i36_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.747" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i5_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i5_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.747" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i61_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i61_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.747" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i42_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i42_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.747" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i66_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i66_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.747" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i41_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i41_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.747" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i98_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i98_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.747" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i45_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i45_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.748" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i58_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i58_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.748" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i85_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i85_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.748" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i71_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i71_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.748" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i51_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i51_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.748" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i94_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i94_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.748" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i63_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i63_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.748" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i87_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i87_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.748" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i12_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i12_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.748" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i2_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i2_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.748" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i21_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i21_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.748" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i69_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i69_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.748" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i82_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i82_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.748" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i27_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i27_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.748" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i72_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i72_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.748" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i52_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i52_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.749" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i80_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i80_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.749" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i50_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i50_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.749" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i24_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i24_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.749" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i93_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i93_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.749" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i31_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i31_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.749" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i8_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i8_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.749" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i33_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i33_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.749" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i18_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i18_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.749" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i67_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i67_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.749" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i92_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i92_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.749" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i74_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i74_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.749" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i0_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i0_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.749" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i23_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i23_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.749" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i47_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i47_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.749" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i97_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i97_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.749" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i6_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i6_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.750" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i28_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i28_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.750" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i22_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i22_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.750" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i39_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i39_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.750" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i3_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i3_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.750" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i15_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i15_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.750" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i40_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i40_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.750" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i1_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i1_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.750" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i49_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i49_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.750" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i34_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i34_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.750" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i64_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i64_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.750" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i65_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i65_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.750" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i16_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i16_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.750" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i59_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i59_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.750" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i70_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i70_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.750" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i78_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i78_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.750" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i57_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i57_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.751" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i48_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i48_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.751" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i35_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i35_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.751" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i43_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i43_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.751" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i79_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i79_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.751" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i4_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i4_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.751" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i62_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i62_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.751" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i38_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i38_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.751" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i68_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i68_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.751" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i25_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i25_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.751" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i96_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i96_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.751" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i88_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i88_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.751" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i37_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i37_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.751" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i30_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i30_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.751" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i76_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i76_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.751" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i10_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i10_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.752" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i7_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i7_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.752" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i11_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i11_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.752" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i9_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i9_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.752" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i56_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i56_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.752" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i20_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i20_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.752" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i77_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i77_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.752" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i26_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i26_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.752" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i54_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i54_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.752" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i19_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i19_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.752" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i83_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i83_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.752" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i91_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i91_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.752" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i17_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i17_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.752" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i89_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i89_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.752" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i55_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i55_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.752" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i73_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i73_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.752" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i53_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i53_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.753" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i46_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i46_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.753" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i14_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i14_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.753" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i81_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i81_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.753" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i32_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i32_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.753" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i29_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i29_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.753" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i90_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i90_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.753" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i13_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i13_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.753" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i86_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i86_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.753" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i60_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i60_test.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230320 18:52:55.753" level="INFO" html="true">Removed file '&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i99_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i99_test.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230320 18:52:55.746" endtime="20230320 18:52:55.753"/>
+</kw>
+<kw name="Wait Until Removed" library="OperatingSystem">
+<arg>${FPATH}/I${RFS_ITERATION}_i99_test.txt</arg>
+<doc>Waits until the given file or directory is removed.</doc>
+<msg timestamp="20230320 18:52:55.754" level="INFO" html="true">'&lt;a href="file:///tmp/rfswarmagent/scripts/Robot_1/I6_i99_test.txt"&gt;/tmp/rfswarmagent/scripts/Robot_1/I6_i99_test.txt&lt;/a&gt;' was removed.</msg>
+<status status="PASS" starttime="20230320 18:52:55.753" endtime="20230320 18:52:55.754"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:55.746" endtime="20230320 18:52:55.754"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>5</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230320 18:53:00.756" level="INFO">Slept 5 seconds</msg>
+<status status="PASS" starttime="20230320 18:52:55.755" endtime="20230320 18:53:00.756"/>
+</kw>
+<kw name="RFS Variables">
+<doc>Show the RFS Variables</doc>
+<kw name="Log" library="BuiltIn">
+<arg>{RFS_AGENTNAME}</arg>
+<doc>Logs the given message with the given level.</doc>
+<msg timestamp="20230320 18:53:00.758" level="INFO">{RFS_AGENTNAME}</msg>
+<status status="PASS" starttime="20230320 18:53:00.758" endtime="20230320 18:53:00.759"/>
+</kw>
+<kw name="Log" library="BuiltIn">
+<arg>{RFS_AGENTVERSION}</arg>
+<doc>Logs the given message with the given level.</doc>
+<msg timestamp="20230320 18:53:00.759" level="INFO">{RFS_AGENTVERSION}</msg>
+<status status="PASS" starttime="20230320 18:53:00.759" endtime="20230320 18:53:00.760"/>
+</kw>
+<kw name="Log" library="BuiltIn">
+<arg>{RFS_DEBUGLEVEL}</arg>
+<doc>Logs the given message with the given level.</doc>
+<msg timestamp="20230320 18:53:00.760" level="INFO">{RFS_DEBUGLEVEL}</msg>
+<status status="PASS" starttime="20230320 18:53:00.760" endtime="20230320 18:53:00.761"/>
+</kw>
+<kw name="Log" library="BuiltIn">
+<arg>{RFS_EXCLUDELIBRARIES}</arg>
+<doc>Logs the given message with the given level.</doc>
+<msg timestamp="20230320 18:53:00.761" level="INFO">{RFS_EXCLUDELIBRARIES}</msg>
+<status status="PASS" starttime="20230320 18:53:00.761" endtime="20230320 18:53:00.762"/>
+</kw>
+<kw name="Log" library="BuiltIn">
+<arg>{RFS_INDEX}</arg>
+<doc>Logs the given message with the given level.</doc>
+<msg timestamp="20230320 18:53:00.762" level="INFO">{RFS_INDEX}</msg>
+<status status="PASS" starttime="20230320 18:53:00.762" endtime="20230320 18:53:00.763"/>
+</kw>
+<kw name="Log" library="BuiltIn">
+<arg>{RFS_ITERATION}</arg>
+<doc>Logs the given message with the given level.</doc>
+<msg timestamp="20230320 18:53:00.763" level="INFO">{RFS_ITERATION}</msg>
+<status status="PASS" starttime="20230320 18:53:00.763" endtime="20230320 18:53:00.763"/>
+</kw>
+<kw name="Log" library="BuiltIn">
+<arg>{RFS_ROBOT}</arg>
+<doc>Logs the given message with the given level.</doc>
+<msg timestamp="20230320 18:53:00.764" level="INFO">{RFS_ROBOT}</msg>
+<status status="PASS" starttime="20230320 18:53:00.764" endtime="20230320 18:53:00.765"/>
+</kw>
+<kw name="Log" library="BuiltIn">
+<arg>{RFS_SWARMMANAGER}</arg>
+<doc>Logs the given message with the given level.</doc>
+<msg timestamp="20230320 18:53:00.766" level="INFO">{RFS_SWARMMANAGER}</msg>
+<status status="PASS" starttime="20230320 18:53:00.765" endtime="20230320 18:53:00.766"/>
+</kw>
+<status status="PASS" starttime="20230320 18:53:00.757" endtime="20230320 18:53:00.767"/>
+</kw>
+<status status="PASS" starttime="20230320 18:52:45.643" endtime="20230320 18:53:00.768"/>
+</test>
+<doc>This Demo Test is for demonstrating and troubleshooting RFSwarm,
+It's known to work on any OS and only requires robot framework installed, no other libraries
+It also demonstrates the custom variables created by RFSwarm</doc>
+<meta name="RFS_AGENTNAME">hp-elite-desk-800-g3</meta>
+<meta name="RFS_AGENTVERSION">1.1.0</meta>
+<meta name="RFS_DEBUGLEVEL">0</meta>
+<meta name="RFS_EXCLUDELIBRARIES">BuiltIn,String,OperatingSystem,perftest</meta>
+<meta name="RFS_INDEX">1</meta>
+<meta name="RFS_ITERATION">6</meta>
+<meta name="RFS_ROBOT">1</meta>
+<meta name="RFS_SWARMMANAGER">http://localhost:8138/</meta>
+<status status="PASS" starttime="20230320 18:52:45.614" endtime="20230320 18:53:00.772"/>
+</suite>
+<statistics>
+<total>
+<stat pass="1" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat pass="1" fail="0" skip="0" id="s1" name="Rfswarm Demo">Rfswarm Demo</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
