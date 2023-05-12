@@ -129,7 +129,7 @@ Check Result
 	Should Be Equal As Integers 	${result.rc} 	0
 
 Close GUI windows
-	Press Combination 	Key.esc
+	# Press Combination 	Key.esc
 	# Press Combination 	x 	Key.ctrl
 	# Press Combination 	Key.f4 	Key.alt
 	Click Image		reporter_${platform}_button_closewindow.png
@@ -137,8 +137,10 @@ Close GUI windows
 	End Process If Still Running
 
 Close GUI ubuntu
-	Press Combination 	Key.esc
-	Press Combination 	x 	Key.ctrl
+	# Press Combination 	Key.esc
+	# Press Combination 	x 	Key.ctrl
+	Click Image		reporter_${platform}_button_closewindow.png
+	Take A Screenshot
 	End Process If Still Running
 
 Close GUI macos
