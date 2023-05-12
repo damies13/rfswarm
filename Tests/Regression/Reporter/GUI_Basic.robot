@@ -102,7 +102,7 @@ Open GUI ubuntu
 	Take A Screenshot
 
 Open GUI macos
-	[Arguments]		${appargs}=${EMPTY}
+	[Arguments]		@{appargs}
 	Set Suite Variable    ${platform}    macos
 	Set Confidence		0.9
 	Start Process 	python3 	${pyfile} 	-g 	5 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
