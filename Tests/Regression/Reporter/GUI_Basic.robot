@@ -39,10 +39,42 @@ GUI Runs and Closes
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
 
-# Intentional Fail
-# 	[Tags]	ubuntu-latest		windows-latest		macos-latest
-# 	[Documentation]		Uncomment this test if you want to trigger updating Screenshots in the git repo
-# 	...								Ensure this is commented out before release or pull request
-# 	Fail
+Close GUI
+	[Tags]	windows-latest		ubuntu-latest
+	Press Combination 	Key.esc
+	Press Combination 	x 	Key.ctrl
+	${result}= 	Wait For Process 	${process} 	timeout=60
+	${running}= 	Is Process Running 	${process}
+	IF 	not ${running}
+		Should Be Equal As Integers 	${result.rc} 	0
+	ELSE
+		Take A Screenshot
+		${result} = 	Terminate Process		${process}
+		Fail
+	END
+
+Close GUI
+	[Tags]	macos-latest
+	# Press Combination 	Key.esc
+	# Press Combination 	q 	Key.command
+	# Click Image		manager_${platform}_menu_python3.png
+	Click Image		manager_${platform}_button_closewindow.png
+	Take A Screenshot
+	${result}= 	Wait For Process 	${process} 	timeout=60
+	${running}= 	Is Process Running 	${process}
+	IF 	not ${running}
+		Should Be Equal As Integers 	${result.rc} 	0
+	ELSE
+		Take A Screenshot
+		${result} = 	Terminate Process		${process}
+		Fail
+	END
+
+
+Intentional Fail
+	[Tags]	ubuntu-latest		windows-latest		macos-latest
+	[Documentation]		Uncomment this test if you want to trigger updating Screenshots in the git repo
+	...								Ensure this is commented out before release or pull request
+	Fail
 
 *** Keywords ***
