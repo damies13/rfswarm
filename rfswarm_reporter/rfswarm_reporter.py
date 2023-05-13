@@ -531,7 +531,7 @@ class ReporterBase():
 
 	def rs_setting_get_font(self):
 		value = self.rs_setting_get('font')
-		if not self.gui:
+		if not base.displaygui:
 			return value
 		else:
 			fontlst = list(tkFont.families())
