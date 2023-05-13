@@ -28,7 +28,8 @@ First Run
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #147
 	${epoch}=	Get Time	epoch
 	Open GUI	-i 	blank_${epoch}.ini
-	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	60
+	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 	Close GUI
 
 # Intentional Fail
