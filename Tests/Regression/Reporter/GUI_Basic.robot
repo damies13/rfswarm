@@ -29,7 +29,7 @@ First Run
 	${epoch}=	Get Time	epoch
 	Open GUI	-i 	blank_${epoch}.ini
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
-	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	600
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 	Close GUI
 
 # Intentional Fail
@@ -83,7 +83,7 @@ Open GUI windows
 	${args}= 	Evaluate 	" \t".join(@{appargs})
 	Set Confidence		0.9
 	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	python 	${pyfile} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	${process}= 	Start Process 	python 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Set Suite Variable 	$process 	${process}
 	# reporter_windows_status_previewloaded
 	# Wait For Status 	PreviewLoaded
@@ -96,7 +96,7 @@ Open GUI ubuntu
 	[Arguments]		@{appargs}
 	Set Suite Variable    ${platform}    ubuntu
 	Set Confidence		0.9
-	Start Process 	python3 	${pyfile} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	Start Process 	python3 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	# Sleep 	60
 	# Capture Screen
 	Set Screenshot Folder 	${OUTPUT DIR}
@@ -122,6 +122,7 @@ Close GUI
 		${result}= 	Wait For Process 	${process} 	timeout=60
 		Check Result 	${result}
 	END
+	Sleep 	0.5
 
 Check Result
 	[Arguments]		${result}
