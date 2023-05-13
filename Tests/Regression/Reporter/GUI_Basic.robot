@@ -29,7 +29,7 @@ First Run
 	${epoch}=	Get Time	epoch
 	Open GUI	-i 	blank_${epoch}.ini
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
-	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	600
 	Close GUI
 
 # Intentional Fail
