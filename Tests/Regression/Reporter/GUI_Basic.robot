@@ -144,6 +144,7 @@ Close GUI windows
 	# Press Combination 	Key.f4 	Key.alt
 	Click Image		reporter_${platform}_button_closewindow.png
 	Take A Screenshot
+	Sleep 	0.5
 	End Process If Still Running
 
 Close GUI ubuntu
@@ -151,6 +152,7 @@ Close GUI ubuntu
 	# Press Combination 	x 	Key.ctrl
 	Click Image		reporter_${platform}_button_closewindow.png
 	Take A Screenshot
+	Sleep 	0.5
 	End Process If Still Running
 
 Close GUI macos
@@ -159,6 +161,7 @@ Close GUI macos
 	# Click Image		reporter_${platform}_menu_python3.png
 	Click Image		reporter_${platform}_button_closewindow.png
 	Take A Screenshot
+	Sleep 	0.5
 	End Process If Still Running
 
 End Process If Still Running
