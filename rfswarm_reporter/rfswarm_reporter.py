@@ -532,7 +532,7 @@ class ReporterBase():
 	def rs_setting_get_font(self):
 		value = self.rs_setting_get('font')
 		base.debugmsg(6, "value", value)
-		if not base.displaygui :
+		if not base.displaygui:
 			base.debugmsg(6, "value", value)
 			return value
 		else:
