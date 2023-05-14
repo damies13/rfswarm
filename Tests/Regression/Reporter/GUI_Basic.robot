@@ -26,8 +26,16 @@ Select Preview Tab
 
 First Run
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #147
+	${testdata}= 	Set Variable    Issue-#147
+	${resultdata}= 	Set Variable    20230320_185055_demo
+	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
+	Should Exist	${basefolder}
+	Log to console 	basefolder: ${basefolder} 	console=True
+	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
+	Should Exist	${resultfolder}
+	Log 	resultfolder: ${resultfolder} 	console=True
 	${epoch}=	Get Time	epoch
-	Open GUI	-i 	blank_${epoch}.ini
+	Open GUI	-i 	blank_${epoch}.ini 	-d 	${resultfolder}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 	Close GUI
