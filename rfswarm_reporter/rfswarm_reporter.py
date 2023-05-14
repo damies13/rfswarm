@@ -531,24 +531,32 @@ class ReporterBase():
 
 	def rs_setting_get_font(self):
 		value = self.rs_setting_get('font')
-		if not base.displaygui:
+		base.debugmsg(6, "value", value)
+		if not base.displaygui :
+			base.debugmsg(6, "value", value)
 			return value
 		else:
 			fontlst = list(tkFont.families())
 			base.debugmsg(9, "fontlst", fontlst)
 			if value not in fontlst:
 				value = None
+				base.debugmsg(6, "value", value)
 			if value is None:
 				# Verdana, Tahoma, Arial, Helvetica, sans-serif
 				fontorder = ['Helvetica', 'Verdana', 'Tahoma', 'Arial', 'FreeSans']
+				base.debugmsg(6, "fontorder", fontorder)
 				for fnt in fontorder:
 					if fnt in fontlst:
+						base.debugmsg(6, "fnt", fnt)
 						return fnt
 				for fnt in fontlst:
 					if 'Sans' in fnt or 'sans' in fnt:
+						base.debugmsg(6, "fnt", fnt)
 						return fnt
+				base.debugmsg(6, "sans-serif")
 				return 'sans-serif'
 			else:
+				base.debugmsg(6, "value", value)
 				return value
 
 	def rs_setting_get_fontsize(self):
