@@ -3392,7 +3392,11 @@ class ReporterCore:
 
 		heading_text = "{} {}".format(number, name)
 
-		document.add_heading(heading_text, level)
+		base.debugmsg(5, "heading_text:", heading_text, "	level:", level)
+		hdpg = document.add_heading(heading_text, level)
+		stylename = "Heading {}".format(level)
+		base.debugmsg(5, "stylename:", stylename)
+		hdpg.style = stylename
 		# document.add_paragraph("", style='Normal')
 
 	def docx_sections_contents(self, id):
@@ -3413,7 +3417,7 @@ class ReporterCore:
 		document = self.cg_data["docx"]["document"]
 		# document.add_paragraph("", style='Normal')
 
-		paragraph = document.add_paragraph()
+		paragraph = document.add_paragraph(style='Normal')
 		run = paragraph.add_run()
 		fldChar = OxmlElement('w:fldChar')  # creates a new element
 		fldChar.set(qn('w:fldCharType'), 'begin')  # sets attribute on element
@@ -4084,6 +4088,7 @@ class ReporterCore:
 			base.debugmsg(9, "concat:", concat)
 			hyper = "=HYPERLINK(" + concat + ",\"" + heading_text + "\")"
 			base.debugmsg(8, "hyper:", hyper)
+			c.style = "Default"
 			c.value = hyper
 
 		if level < maxlevel:
@@ -7180,12 +7185,12 @@ class ReporterGUI(tk.Frame):
 
 			colnum = 1
 			cellname = "{}_{}".format(id, colnum)
-			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(titlenum))
+			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(titlenum), style='Report.TLabel')
 			self.contentdata[fid][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 			colnum += 1
 			cellname = "{}_{}".format(id, colnum)
-			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(titlename))
+			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(titlename), style='Report.TLabel')
 			self.contentdata[fid][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 			colnum += 1
@@ -7193,7 +7198,7 @@ class ReporterGUI(tk.Frame):
 
 			colnum += 1
 			cellname = "{}_{}".format(id, colnum)
-			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(pagenum))
+			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(pagenum), style='Report.TLabel')
 			self.contentdata[fid][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 			nextrow = rownum + 1
