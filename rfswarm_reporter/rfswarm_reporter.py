@@ -2,7 +2,7 @@
 #
 # 	Robot Framework Swarm
 # 		Reporter
-#    Version 1.1.1
+#    Version 1.1.2
 #
 
 import argparse
@@ -118,7 +118,7 @@ class stdevclass:
 
 
 class ReporterBase():
-	version = "1.1.1"
+	version = "1.1.2"
 	debuglvl = 0
 
 	save_ini = True
@@ -531,24 +531,32 @@ class ReporterBase():
 
 	def rs_setting_get_font(self):
 		value = self.rs_setting_get('font')
-		if not self.gui:
+		base.debugmsg(6, "value", value)
+		if not base.displaygui:
+			base.debugmsg(6, "value", value)
 			return value
 		else:
 			fontlst = list(tkFont.families())
 			base.debugmsg(9, "fontlst", fontlst)
 			if value not in fontlst:
 				value = None
+				base.debugmsg(6, "value", value)
 			if value is None:
 				# Verdana, Tahoma, Arial, Helvetica, sans-serif
 				fontorder = ['Helvetica', 'Verdana', 'Tahoma', 'Arial', 'FreeSans']
+				base.debugmsg(6, "fontorder", fontorder)
 				for fnt in fontorder:
 					if fnt in fontlst:
+						base.debugmsg(6, "fnt", fnt)
 						return fnt
 				for fnt in fontlst:
 					if 'Sans' in fnt or 'sans' in fnt:
+						base.debugmsg(6, "fnt", fnt)
 						return fnt
+				base.debugmsg(6, "sans-serif")
 				return 'sans-serif'
 			else:
+				base.debugmsg(6, "value", value)
 				return value
 
 	def rs_setting_get_fontsize(self):
@@ -3384,7 +3392,11 @@ class ReporterCore:
 
 		heading_text = "{} {}".format(number, name)
 
-		document.add_heading(heading_text, level)
+		base.debugmsg(5, "heading_text:", heading_text, "	level:", level)
+		hdpg = document.add_heading(heading_text, level)
+		stylename = "Heading {}".format(level)
+		base.debugmsg(5, "stylename:", stylename)
+		hdpg.style = stylename
 		# document.add_paragraph("", style='Normal')
 
 	def docx_sections_contents(self, id):
@@ -3405,7 +3417,7 @@ class ReporterCore:
 		document = self.cg_data["docx"]["document"]
 		# document.add_paragraph("", style='Normal')
 
-		paragraph = document.add_paragraph()
+		paragraph = document.add_paragraph(style='Normal')
 		run = paragraph.add_run()
 		fldChar = OxmlElement('w:fldChar')  # creates a new element
 		fldChar.set(qn('w:fldCharType'), 'begin')  # sets attribute on element
@@ -4076,6 +4088,7 @@ class ReporterCore:
 			base.debugmsg(9, "concat:", concat)
 			hyper = "=HYPERLINK(" + concat + ",\"" + heading_text + "\")"
 			base.debugmsg(8, "hyper:", hyper)
+			c.style = "Default"
 			c.value = hyper
 
 		if level < maxlevel:
@@ -7172,12 +7185,12 @@ class ReporterGUI(tk.Frame):
 
 			colnum = 1
 			cellname = "{}_{}".format(id, colnum)
-			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(titlenum))
+			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(titlenum), style='Report.TLabel')
 			self.contentdata[fid][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 			colnum += 1
 			cellname = "{}_{}".format(id, colnum)
-			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(titlename))
+			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(titlename), style='Report.TLabel')
 			self.contentdata[fid][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 			colnum += 1
@@ -7185,7 +7198,7 @@ class ReporterGUI(tk.Frame):
 
 			colnum += 1
 			cellname = "{}_{}".format(id, colnum)
-			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(pagenum))
+			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(pagenum), style='Report.TLabel')
 			self.contentdata[fid][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 			nextrow = rownum + 1
