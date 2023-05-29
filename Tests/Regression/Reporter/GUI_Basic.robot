@@ -96,12 +96,13 @@ Click Text
 	Log 	${x} 	${y}
 	Move To 	${x} 	${y}
 	Click
+	Take A Screenshot
 
 Get Last Screenshot
 	Log 	${OUTPUT FILE}
 	${path} 	${file}= 	Split Path 	${OUTPUT FILE}
 	@{files}= 	List Files In Directory 	${path} 	*.png 	absolute
-	${files}= 	Sort List 	${files}
+	Sort List 	${files}
 	RETURN 	${files}[-1]
 
 Click Button
