@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 6.0.2 (Python 3.9.16 on darwin)" generated="20230529 03:25:06.416" rpa="false" schemaversion="3">
+<robot generator="Robot 6.0.2 (Python 3.9.16 on darwin)" generated="20230529 03:40:52.523" rpa="false" schemaversion="3">
 <suite id="s1" name="Manager" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager">
 <suite id="s1-s1" name="CommandLine" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/CommandLine.robot">
 <kw name="Clean Up Old Files" type="SETUP">
@@ -9,106 +9,106 @@
 <kw name="Log To Console" library="BuiltIn">
 <arg>${OUTPUT DIR}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20230529 03:25:06.509" endtime="20230529 03:25:06.509"/>
+<status status="PASS" starttime="20230529 03:40:52.569" endtime="20230529 03:40:52.569"/>
 </kw>
 <kw name="Remove File" library="OperatingSystem">
 <arg>${OUTPUT DIR}${/}*.txt</arg>
 <doc>Removes a file with the given path.</doc>
-<msg timestamp="20230529 03:25:06.510" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/stdout.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/stdout.txt&lt;/a&gt;'.</msg>
-<msg timestamp="20230529 03:25:06.510" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/stderr.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/stderr.txt&lt;/a&gt;'.</msg>
-<status status="PASS" starttime="20230529 03:25:06.509" endtime="20230529 03:25:06.510"/>
+<msg timestamp="20230529 03:40:52.570" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/stdout.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/stdout.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230529 03:40:52.570" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/stderr.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/stderr.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230529 03:40:52.569" endtime="20230529 03:40:52.570"/>
 </kw>
 <kw name="Remove File" library="OperatingSystem">
 <arg>${OUTPUT DIR}${/}*.png</arg>
 <doc>Removes a file with the given path.</doc>
-<msg timestamp="20230529 03:25:06.511" level="INFO" html="true">File '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/*.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/*.png&lt;/a&gt;' does not exist.</msg>
-<status status="PASS" starttime="20230529 03:25:06.511" endtime="20230529 03:25:06.511"/>
+<msg timestamp="20230529 03:40:52.571" level="INFO" html="true">File '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/*.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/*.png&lt;/a&gt;' does not exist.</msg>
+<status status="PASS" starttime="20230529 03:40:52.570" endtime="20230529 03:40:52.571"/>
 </kw>
-<status status="PASS" starttime="20230529 03:25:06.508" endtime="20230529 03:25:06.511"/>
+<status status="PASS" starttime="20230529 03:40:52.568" endtime="20230529 03:40:52.571"/>
 </kw>
 <test id="s1-s1-t1" name="Random Offset" line="7">
 <kw name="Evaluate" library="BuiltIn">
 <var>${random}</var>
 <arg>random.randint(0, 60)</arg>
 <doc>Evaluates the given expression in Python and returns the result.</doc>
-<msg timestamp="20230529 03:25:06.512" level="INFO">${random} = 9</msg>
-<status status="PASS" starttime="20230529 03:25:06.512" endtime="20230529 03:25:06.512"/>
+<msg timestamp="20230529 03:40:52.572" level="INFO">${random} = 25</msg>
+<status status="PASS" starttime="20230529 03:40:52.572" endtime="20230529 03:40:52.572"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>${random}</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<msg timestamp="20230529 03:25:15.514" level="INFO">Slept 9 seconds</msg>
-<status status="PASS" starttime="20230529 03:25:06.513" endtime="20230529 03:25:15.514"/>
+<msg timestamp="20230529 03:41:17.593" level="INFO">Slept 25 seconds</msg>
+<status status="PASS" starttime="20230529 03:40:52.573" endtime="20230529 03:41:17.593"/>
 </kw>
 <doc>This just prevents all the test runners doing git push at the same time</doc>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20230529 03:25:06.512" endtime="20230529 03:25:15.514"/>
+<status status="PASS" starttime="20230529 03:40:52.571" endtime="20230529 03:41:17.593"/>
 </test>
 <test id="s1-s1-t2" name="Manager Version" line="13">
 <kw name="Run" library="OperatingSystem">
 <var>${result}</var>
 <arg>python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -v</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<msg timestamp="20230529 03:25:15.524" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -v 2&gt;&amp;1'.</msg>
-<msg timestamp="20230529 03:25:27.932" level="INFO">${result} = Robot Framework Swarm: Manager 
+<msg timestamp="20230529 03:41:17.600" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -v 2&gt;&amp;1'.</msg>
+<msg timestamp="20230529 03:41:29.269" level="INFO">${result} = Robot Framework Swarm: Manager 
 	Version 1.1.3 </msg>
-<status status="PASS" starttime="20230529 03:25:15.515" endtime="20230529 03:25:27.932"/>
+<status status="PASS" starttime="20230529 03:41:17.594" endtime="20230529 03:41:29.270"/>
 </kw>
 <kw name="Log To Console" library="BuiltIn">
 <arg>${\n}${result}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20230529 03:25:27.932" endtime="20230529 03:25:27.933"/>
+<status status="PASS" starttime="20230529 03:41:29.270" endtime="20230529 03:41:29.271"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Version</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20230529 03:25:27.933" endtime="20230529 03:25:27.933"/>
+<status status="PASS" starttime="20230529 03:41:29.271" endtime="20230529 03:41:29.271"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Manager</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20230529 03:25:27.933" endtime="20230529 03:25:27.934"/>
+<status status="PASS" starttime="20230529 03:41:29.271" endtime="20230529 03:41:29.271"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20230529 03:25:15.515" endtime="20230529 03:25:27.934"/>
+<status status="PASS" starttime="20230529 03:41:17.594" endtime="20230529 03:41:29.272"/>
 </test>
 <test id="s1-s1-t3" name="Manager Help" line="20">
 <kw name="Run" library="OperatingSystem">
 <var>${result}</var>
 <arg>python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -h</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<msg timestamp="20230529 03:25:27.939" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -h 2&gt;&amp;1'.</msg>
-<msg timestamp="20230529 03:25:28.812" level="INFO">${result} = Robot Framework Swarm: Manager 
+<msg timestamp="20230529 03:41:29.276" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -h 2&gt;&amp;1'.</msg>
+<msg timestamp="20230529 03:41:30.137" level="INFO">${result} = Robot Framework Swarm: Manager 
 	Version 1.1.3 
 usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
                   [-n] [-t STARTTIME] [-d DIR] [-e IPADDRESS] [-p PORT]
 
 ...</msg>
-<status status="PASS" starttime="20230529 03:25:27.935" endtime="20230529 03:25:28.812"/>
+<status status="PASS" starttime="20230529 03:41:29.272" endtime="20230529 03:41:30.137"/>
 </kw>
 <kw name="Log To Console" library="BuiltIn">
 <arg>${\n}${result}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20230529 03:25:28.813" endtime="20230529 03:25:28.813"/>
+<status status="PASS" starttime="20230529 03:41:30.138" endtime="20230529 03:41:30.138"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>IPADDRESS</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20230529 03:25:28.814" endtime="20230529 03:25:28.814"/>
+<status status="PASS" starttime="20230529 03:41:30.139" endtime="20230529 03:41:30.139"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20230529 03:25:27.934" endtime="20230529 03:25:28.814"/>
+<status status="PASS" starttime="20230529 03:41:29.272" endtime="20230529 03:41:30.139"/>
 </test>
-<status status="PASS" starttime="20230529 03:25:06.495" endtime="20230529 03:25:28.815"/>
+<status status="PASS" starttime="20230529 03:40:52.556" endtime="20230529 03:41:30.140"/>
 </suite>
 <suite id="s1-s2" name="GUI Basic" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/GUI_Basic.robot">
 <test id="s1-s2-t1" name="Open GUI" line="14">
@@ -116,13 +116,13 @@ usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
 <arg>${platform}</arg>
 <arg>macos</arg>
 <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
-<msg timestamp="20230529 03:25:38.264" level="INFO">${platform} = macos</msg>
-<status status="PASS" starttime="20230529 03:25:38.263" endtime="20230529 03:25:38.264"/>
+<msg timestamp="20230529 03:41:39.795" level="INFO">${platform} = macos</msg>
+<status status="PASS" starttime="20230529 03:41:39.794" endtime="20230529 03:41:39.795"/>
 </kw>
 <kw name="Set Confidence" library="ImageHorizonLibrary">
 <arg>0.9</arg>
 <doc>Sets the accuracy when finding images.</doc>
-<status status="PASS" starttime="20230529 03:25:38.264" endtime="20230529 03:25:38.265"/>
+<status status="PASS" starttime="20230529 03:41:39.795" endtime="20230529 03:41:39.796"/>
 </kw>
 <kw name="Start Process" library="Process">
 <var>${process}</var>
@@ -132,37 +132,37 @@ usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
 <arg>stdout=${OUTPUT DIR}${/}stdout.txt</arg>
 <arg>stderr=${OUTPUT DIR}${/}stderr.txt</arg>
 <doc>Starts a new process on background.</doc>
-<msg timestamp="20230529 03:25:38.266" level="INFO">Starting process:
+<msg timestamp="20230529 03:41:39.797" level="INFO">Starting process:
 python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py</msg>
-<msg timestamp="20230529 03:25:38.273" level="INFO">${process} = &lt;Popen: returncode: None args: ['python3', '/Users/runner/work/rfswarm/rfswa...&gt;</msg>
-<status status="PASS" starttime="20230529 03:25:38.265" endtime="20230529 03:25:38.273"/>
+<msg timestamp="20230529 03:41:39.804" level="INFO">${process} = &lt;Popen: returncode: None args: ['python3', '/Users/runner/work/rfswarm/rfswa...&gt;</msg>
+<status status="PASS" starttime="20230529 03:41:39.796" endtime="20230529 03:41:39.805"/>
 </kw>
 <kw name="Set Test Variable" library="BuiltIn">
 <arg>$process</arg>
 <arg>${process}</arg>
 <doc>Makes a variable available everywhere within the scope of the current test.</doc>
-<msg timestamp="20230529 03:25:38.274" level="INFO">${process} = &lt;Popen: returncode: None args: ['python3', '/Users/runner/work/rfswarm/rfswa...&gt;</msg>
-<status status="PASS" starttime="20230529 03:25:38.273" endtime="20230529 03:25:38.274"/>
+<msg timestamp="20230529 03:41:39.806" level="INFO">${process} = &lt;Popen: returncode: None args: ['python3', '/Users/runner/work/rfswarm/rfswa...&gt;</msg>
+<status status="PASS" starttime="20230529 03:41:39.805" endtime="20230529 03:41:39.806"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>10</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<msg timestamp="20230529 03:25:48.284" level="INFO">Slept 10 seconds</msg>
-<status status="PASS" starttime="20230529 03:25:38.274" endtime="20230529 03:25:48.284"/>
+<msg timestamp="20230529 03:41:49.812" level="INFO">Slept 10 seconds</msg>
+<status status="PASS" starttime="20230529 03:41:39.806" endtime="20230529 03:41:49.812"/>
 </kw>
 <kw name="Set Screenshot Folder" library="ImageHorizonLibrary">
 <arg>${OUTPUT DIR}</arg>
 <doc>Sets the folder where screenshots are saved to.</doc>
-<status status="PASS" starttime="20230529 03:25:48.285" endtime="20230529 03:25:48.285"/>
+<status status="PASS" starttime="20230529 03:41:49.812" endtime="20230529 03:41:49.813"/>
 </kw>
 <kw name="Take A Screenshot" library="ImageHorizonLibrary">
 <doc>Takes a screenshot of the screen.</doc>
-<msg timestamp="20230529 03:25:48.286" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/Manager.GUIBasic-screenshot-1.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/Manager.GUIBasic-screenshot-1.png" width="100%" /&gt;</msg>
-<msg timestamp="20230529 03:25:48.286" level="FAIL">TypeError: '&lt;' not supported between instances of 'str' and 'int'</msg>
-<status status="FAIL" starttime="20230529 03:25:48.285" endtime="20230529 03:25:48.287"/>
+<msg timestamp="20230529 03:41:49.813" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/Manager.GUIBasic-screenshot-1.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.9/Manager.GUIBasic-screenshot-1.png" width="100%" /&gt;</msg>
+<msg timestamp="20230529 03:41:49.814" level="FAIL">TypeError: '&lt;' not supported between instances of 'str' and 'int'</msg>
+<status status="FAIL" starttime="20230529 03:41:49.813" endtime="20230529 03:41:49.815"/>
 </kw>
 <tag>macos-latest</tag>
-<status status="FAIL" starttime="20230529 03:25:38.262" endtime="20230529 03:25:48.287">TypeError: '&lt;' not supported between instances of 'str' and 'int'</status>
+<status status="FAIL" starttime="20230529 03:41:39.793" endtime="20230529 03:41:49.815">TypeError: '&lt;' not supported between instances of 'str' and 'int'</status>
 </test>
 <test id="s1-s2-t2" name="Select Run Tab" line="44">
 <kw name="Click Tab">
@@ -171,66 +171,66 @@ python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py</msg>
 <var>${tabnamel}</var>
 <arg>${tabname}</arg>
 <doc>Converts string to lower case.</doc>
-<msg timestamp="20230529 03:25:48.290" level="INFO">${tabnamel} = run</msg>
-<status status="PASS" starttime="20230529 03:25:48.289" endtime="20230529 03:25:48.290"/>
+<msg timestamp="20230529 03:41:49.818" level="INFO">${tabnamel} = run</msg>
+<status status="PASS" starttime="20230529 03:41:49.818" endtime="20230529 03:41:49.818"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${img}</var>
 <arg>manager_${platform}_tab_${tabnamel}.png</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:25:48.290" level="INFO">${img} = manager_macos_tab_run.png</msg>
-<status status="PASS" starttime="20230529 03:25:48.290" endtime="20230529 03:25:48.290"/>
+<msg timestamp="20230529 03:41:49.818" level="INFO">${img} = manager_macos_tab_run.png</msg>
+<status status="PASS" starttime="20230529 03:41:49.818" endtime="20230529 03:41:49.818"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:25:48.291" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
-<status status="PASS" starttime="20230529 03:25:48.290" endtime="20230529 03:25:48.291"/>
+<msg timestamp="20230529 03:41:49.819" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
+<status status="PASS" starttime="20230529 03:41:49.819" endtime="20230529 03:41:49.819"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>${IMAGE_DIR}</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:25:48.291" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
-<status status="PASS" starttime="20230529 03:25:48.291" endtime="20230529 03:25:48.291"/>
+<msg timestamp="20230529 03:41:49.819" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
+<status status="PASS" starttime="20230529 03:41:49.819" endtime="20230529 03:41:49.819"/>
 </kw>
 <kw name="Wait For" library="ImageHorizonLibrary">
 <arg>${img}</arg>
 <arg>timeout=300</arg>
 <doc>Tries to locate given image from the screen for given time.</doc>
-<msg timestamp="20230529 03:25:48.292" level="FAIL">TypeError: '&lt;' not supported between instances of 'str' and 'int'</msg>
-<status status="FAIL" starttime="20230529 03:25:48.291" endtime="20230529 03:25:48.293"/>
+<msg timestamp="20230529 03:41:49.820" level="FAIL">TypeError: '&lt;' not supported between instances of 'str' and 'int'</msg>
+<status status="FAIL" starttime="20230529 03:41:49.819" endtime="20230529 03:41:49.821"/>
 </kw>
 <kw name="Locate" library="ImageHorizonLibrary">
 <var>@{coordinates}</var>
 <arg>${img}</arg>
 <doc>Locate image on screen.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.293" endtime="20230529 03:25:48.293"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.821" endtime="20230529 03:41:49.821"/>
 </kw>
 <kw name="Click Image" library="ImageHorizonLibrary">
 <arg>${img}</arg>
 <doc>Finds the reference image on screen and clicks it once.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.293" endtime="20230529 03:25:48.294"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.821" endtime="20230529 03:41:49.821"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>0.1</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.294" endtime="20230529 03:25:48.294"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.822" endtime="20230529 03:41:49.822"/>
 </kw>
 <kw name="Take A Screenshot" library="ImageHorizonLibrary">
 <doc>Takes a screenshot of the screen.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.294" endtime="20230529 03:25:48.294"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.822" endtime="20230529 03:41:49.822"/>
 </kw>
-<status status="FAIL" starttime="20230529 03:25:48.289" endtime="20230529 03:25:48.294"/>
+<status status="FAIL" starttime="20230529 03:41:49.817" endtime="20230529 03:41:49.822"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>5</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.294" endtime="20230529 03:25:48.294"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.822" endtime="20230529 03:41:49.822"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="FAIL" starttime="20230529 03:25:48.288" endtime="20230529 03:25:48.295">TypeError: '&lt;' not supported between instances of 'str' and 'int'</status>
+<status status="FAIL" starttime="20230529 03:41:49.816" endtime="20230529 03:41:49.823">TypeError: '&lt;' not supported between instances of 'str' and 'int'</status>
 </test>
 <test id="s1-s2-t3" name="Select Agents Tab" line="49">
 <kw name="Click Tab">
@@ -239,66 +239,66 @@ python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py</msg>
 <var>${tabnamel}</var>
 <arg>${tabname}</arg>
 <doc>Converts string to lower case.</doc>
-<msg timestamp="20230529 03:25:48.297" level="INFO">${tabnamel} = agents</msg>
-<status status="PASS" starttime="20230529 03:25:48.296" endtime="20230529 03:25:48.297"/>
+<msg timestamp="20230529 03:41:49.824" level="INFO">${tabnamel} = agents</msg>
+<status status="PASS" starttime="20230529 03:41:49.824" endtime="20230529 03:41:49.824"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${img}</var>
 <arg>manager_${platform}_tab_${tabnamel}.png</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:25:48.297" level="INFO">${img} = manager_macos_tab_agents.png</msg>
-<status status="PASS" starttime="20230529 03:25:48.297" endtime="20230529 03:25:48.297"/>
+<msg timestamp="20230529 03:41:49.824" level="INFO">${img} = manager_macos_tab_agents.png</msg>
+<status status="PASS" starttime="20230529 03:41:49.824" endtime="20230529 03:41:49.825"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:25:48.298" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
-<status status="PASS" starttime="20230529 03:25:48.297" endtime="20230529 03:25:48.298"/>
+<msg timestamp="20230529 03:41:49.825" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
+<status status="PASS" starttime="20230529 03:41:49.825" endtime="20230529 03:41:49.825"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>${IMAGE_DIR}</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:25:48.298" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
-<status status="PASS" starttime="20230529 03:25:48.298" endtime="20230529 03:25:48.298"/>
+<msg timestamp="20230529 03:41:49.825" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
+<status status="PASS" starttime="20230529 03:41:49.825" endtime="20230529 03:41:49.825"/>
 </kw>
 <kw name="Wait For" library="ImageHorizonLibrary">
 <arg>${img}</arg>
 <arg>timeout=300</arg>
 <doc>Tries to locate given image from the screen for given time.</doc>
-<msg timestamp="20230529 03:25:48.299" level="FAIL">TypeError: '&lt;' not supported between instances of 'str' and 'int'</msg>
-<status status="FAIL" starttime="20230529 03:25:48.299" endtime="20230529 03:25:48.300"/>
+<msg timestamp="20230529 03:41:49.826" level="FAIL">TypeError: '&lt;' not supported between instances of 'str' and 'int'</msg>
+<status status="FAIL" starttime="20230529 03:41:49.825" endtime="20230529 03:41:49.826"/>
 </kw>
 <kw name="Locate" library="ImageHorizonLibrary">
 <var>@{coordinates}</var>
 <arg>${img}</arg>
 <doc>Locate image on screen.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.300" endtime="20230529 03:25:48.300"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.826" endtime="20230529 03:41:49.826"/>
 </kw>
 <kw name="Click Image" library="ImageHorizonLibrary">
 <arg>${img}</arg>
 <doc>Finds the reference image on screen and clicks it once.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.300" endtime="20230529 03:25:48.300"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.826" endtime="20230529 03:41:49.826"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>0.1</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.300" endtime="20230529 03:25:48.300"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.827" endtime="20230529 03:41:49.827"/>
 </kw>
 <kw name="Take A Screenshot" library="ImageHorizonLibrary">
 <doc>Takes a screenshot of the screen.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.301" endtime="20230529 03:25:48.301"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.827" endtime="20230529 03:41:49.827"/>
 </kw>
-<status status="FAIL" starttime="20230529 03:25:48.295" endtime="20230529 03:25:48.301"/>
+<status status="FAIL" starttime="20230529 03:41:49.823" endtime="20230529 03:41:49.827"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>5</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.301" endtime="20230529 03:25:48.301"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.827" endtime="20230529 03:41:49.827"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="FAIL" starttime="20230529 03:25:48.295" endtime="20230529 03:25:48.301">TypeError: '&lt;' not supported between instances of 'str' and 'int'</status>
+<status status="FAIL" starttime="20230529 03:41:49.823" endtime="20230529 03:41:49.827">TypeError: '&lt;' not supported between instances of 'str' and 'int'</status>
 </test>
 <test id="s1-s2-t4" name="Select About Tab" line="54">
 <kw name="Click Tab">
@@ -307,66 +307,66 @@ python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py</msg>
 <var>${tabnamel}</var>
 <arg>${tabname}</arg>
 <doc>Converts string to lower case.</doc>
-<msg timestamp="20230529 03:25:48.303" level="INFO">${tabnamel} = about</msg>
-<status status="PASS" starttime="20230529 03:25:48.303" endtime="20230529 03:25:48.303"/>
+<msg timestamp="20230529 03:41:49.833" level="INFO">${tabnamel} = about</msg>
+<status status="PASS" starttime="20230529 03:41:49.832" endtime="20230529 03:41:49.833"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${img}</var>
 <arg>manager_${platform}_tab_${tabnamel}.png</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:25:48.304" level="INFO">${img} = manager_macos_tab_about.png</msg>
-<status status="PASS" starttime="20230529 03:25:48.304" endtime="20230529 03:25:48.304"/>
+<msg timestamp="20230529 03:41:49.833" level="INFO">${img} = manager_macos_tab_about.png</msg>
+<status status="PASS" starttime="20230529 03:41:49.833" endtime="20230529 03:41:49.834"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:25:48.304" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
-<status status="PASS" starttime="20230529 03:25:48.304" endtime="20230529 03:25:48.304"/>
+<msg timestamp="20230529 03:41:49.834" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
+<status status="PASS" starttime="20230529 03:41:49.834" endtime="20230529 03:41:49.834"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>${IMAGE_DIR}</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:25:48.305" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
-<status status="PASS" starttime="20230529 03:25:48.304" endtime="20230529 03:25:48.305"/>
+<msg timestamp="20230529 03:41:49.835" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
+<status status="PASS" starttime="20230529 03:41:49.834" endtime="20230529 03:41:49.835"/>
 </kw>
 <kw name="Wait For" library="ImageHorizonLibrary">
 <arg>${img}</arg>
 <arg>timeout=300</arg>
 <doc>Tries to locate given image from the screen for given time.</doc>
-<msg timestamp="20230529 03:25:48.306" level="FAIL">TypeError: '&lt;' not supported between instances of 'str' and 'int'</msg>
-<status status="FAIL" starttime="20230529 03:25:48.305" endtime="20230529 03:25:48.306"/>
+<msg timestamp="20230529 03:41:49.836" level="FAIL">TypeError: '&lt;' not supported between instances of 'str' and 'int'</msg>
+<status status="FAIL" starttime="20230529 03:41:49.835" endtime="20230529 03:41:49.836"/>
 </kw>
 <kw name="Locate" library="ImageHorizonLibrary">
 <var>@{coordinates}</var>
 <arg>${img}</arg>
 <doc>Locate image on screen.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.306" endtime="20230529 03:25:48.306"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.836" endtime="20230529 03:41:49.836"/>
 </kw>
 <kw name="Click Image" library="ImageHorizonLibrary">
 <arg>${img}</arg>
 <doc>Finds the reference image on screen and clicks it once.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.306" endtime="20230529 03:25:48.306"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.836" endtime="20230529 03:41:49.836"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>0.1</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.306" endtime="20230529 03:25:48.307"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.837" endtime="20230529 03:41:49.837"/>
 </kw>
 <kw name="Take A Screenshot" library="ImageHorizonLibrary">
 <doc>Takes a screenshot of the screen.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.307" endtime="20230529 03:25:48.307"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.837" endtime="20230529 03:41:49.837"/>
 </kw>
-<status status="FAIL" starttime="20230529 03:25:48.302" endtime="20230529 03:25:48.307"/>
+<status status="FAIL" starttime="20230529 03:41:49.829" endtime="20230529 03:41:49.837"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>5</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.307" endtime="20230529 03:25:48.307"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.837" endtime="20230529 03:41:49.837"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="FAIL" starttime="20230529 03:25:48.302" endtime="20230529 03:25:48.307">TypeError: '&lt;' not supported between instances of 'str' and 'int'</status>
+<status status="FAIL" starttime="20230529 03:41:49.828" endtime="20230529 03:41:49.837">TypeError: '&lt;' not supported between instances of 'str' and 'int'</status>
 </test>
 <test id="s1-s2-t5" name="Select Plan Tab" line="59">
 <kw name="Click Tab">
@@ -375,90 +375,90 @@ python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py</msg>
 <var>${tabnamel}</var>
 <arg>${tabname}</arg>
 <doc>Converts string to lower case.</doc>
-<msg timestamp="20230529 03:25:48.309" level="INFO">${tabnamel} = plan</msg>
-<status status="PASS" starttime="20230529 03:25:48.308" endtime="20230529 03:25:48.309"/>
+<msg timestamp="20230529 03:41:49.839" level="INFO">${tabnamel} = plan</msg>
+<status status="PASS" starttime="20230529 03:41:49.839" endtime="20230529 03:41:49.839"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${img}</var>
 <arg>manager_${platform}_tab_${tabnamel}.png</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:25:48.309" level="INFO">${img} = manager_macos_tab_plan.png</msg>
-<status status="PASS" starttime="20230529 03:25:48.309" endtime="20230529 03:25:48.309"/>
+<msg timestamp="20230529 03:41:49.839" level="INFO">${img} = manager_macos_tab_plan.png</msg>
+<status status="PASS" starttime="20230529 03:41:49.839" endtime="20230529 03:41:49.840"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:25:48.310" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
-<status status="PASS" starttime="20230529 03:25:48.309" endtime="20230529 03:25:48.310"/>
+<msg timestamp="20230529 03:41:49.840" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
+<status status="PASS" starttime="20230529 03:41:49.840" endtime="20230529 03:41:49.840"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>${IMAGE_DIR}</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:25:48.310" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
-<status status="PASS" starttime="20230529 03:25:48.310" endtime="20230529 03:25:48.310"/>
+<msg timestamp="20230529 03:41:49.840" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
+<status status="PASS" starttime="20230529 03:41:49.840" endtime="20230529 03:41:49.840"/>
 </kw>
 <kw name="Wait For" library="ImageHorizonLibrary">
 <arg>${img}</arg>
 <arg>timeout=300</arg>
 <doc>Tries to locate given image from the screen for given time.</doc>
-<msg timestamp="20230529 03:25:48.311" level="FAIL">TypeError: '&lt;' not supported between instances of 'str' and 'int'</msg>
-<status status="FAIL" starttime="20230529 03:25:48.310" endtime="20230529 03:25:48.311"/>
+<msg timestamp="20230529 03:41:49.841" level="FAIL">TypeError: '&lt;' not supported between instances of 'str' and 'int'</msg>
+<status status="FAIL" starttime="20230529 03:41:49.840" endtime="20230529 03:41:49.841"/>
 </kw>
 <kw name="Locate" library="ImageHorizonLibrary">
 <var>@{coordinates}</var>
 <arg>${img}</arg>
 <doc>Locate image on screen.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.311" endtime="20230529 03:25:48.311"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.841" endtime="20230529 03:41:49.841"/>
 </kw>
 <kw name="Click Image" library="ImageHorizonLibrary">
 <arg>${img}</arg>
 <doc>Finds the reference image on screen and clicks it once.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.311" endtime="20230529 03:25:48.311"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.841" endtime="20230529 03:41:49.842"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>0.1</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.311" endtime="20230529 03:25:48.312"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.842" endtime="20230529 03:41:49.842"/>
 </kw>
 <kw name="Take A Screenshot" library="ImageHorizonLibrary">
 <doc>Takes a screenshot of the screen.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.312" endtime="20230529 03:25:48.312"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.842" endtime="20230529 03:41:49.842"/>
 </kw>
-<status status="FAIL" starttime="20230529 03:25:48.308" endtime="20230529 03:25:48.312"/>
+<status status="FAIL" starttime="20230529 03:41:49.838" endtime="20230529 03:41:49.842"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>5</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.312" endtime="20230529 03:25:48.312"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.842" endtime="20230529 03:41:49.843"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="FAIL" starttime="20230529 03:25:48.308" endtime="20230529 03:25:48.312">TypeError: '&lt;' not supported between instances of 'str' and 'int'</status>
+<status status="FAIL" starttime="20230529 03:41:49.838" endtime="20230529 03:41:49.843">TypeError: '&lt;' not supported between instances of 'str' and 'int'</status>
 </test>
 <test id="s1-s2-t6" name="Close GUI" line="78">
 <kw name="Click Image" library="ImageHorizonLibrary">
 <arg>manager_${platform}_button_closewindow.png</arg>
 <doc>Finds the reference image on screen and clicks it once.</doc>
-<msg timestamp="20230529 03:25:48.314" level="FAIL">TypeError: '&lt;' not supported between instances of 'str' and 'int'</msg>
-<status status="FAIL" starttime="20230529 03:25:48.313" endtime="20230529 03:25:48.314"/>
+<msg timestamp="20230529 03:41:49.844" level="FAIL">TypeError: '&lt;' not supported between instances of 'str' and 'int'</msg>
+<status status="FAIL" starttime="20230529 03:41:49.844" endtime="20230529 03:41:49.845"/>
 </kw>
 <kw name="Take A Screenshot" library="ImageHorizonLibrary">
 <doc>Takes a screenshot of the screen.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.314" endtime="20230529 03:25:48.314"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.845" endtime="20230529 03:41:49.845"/>
 </kw>
 <kw name="Wait For Process" library="Process">
 <var>${result}</var>
 <arg>${process}</arg>
 <arg>timeout=60</arg>
 <doc>Waits for the process to complete or to reach the given timeout.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.314" endtime="20230529 03:25:48.314"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.845" endtime="20230529 03:41:49.845"/>
 </kw>
 <kw name="Is Process Running" library="Process">
 <var>${running}</var>
 <arg>${process}</arg>
 <doc>Checks is the process running or not.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.314" endtime="20230529 03:25:48.315"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.845" endtime="20230529 03:41:49.845"/>
 </kw>
 <if>
 <branch type="IF" condition="not ${running}">
@@ -466,35 +466,35 @@ python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py</msg>
 <arg>${result.rc}</arg>
 <arg>0</arg>
 <doc>Fails if objects are unequal after converting them to integers.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.315" endtime="20230529 03:25:48.315"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.846" endtime="20230529 03:41:49.846"/>
 </kw>
-<status status="NOT RUN" starttime="20230529 03:25:48.315" endtime="20230529 03:25:48.315"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.846" endtime="20230529 03:41:49.846"/>
 </branch>
 <branch type="ELSE">
 <kw name="Take A Screenshot" library="ImageHorizonLibrary">
 <doc>Takes a screenshot of the screen.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.315" endtime="20230529 03:25:48.315"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.846" endtime="20230529 03:41:49.846"/>
 </kw>
 <kw name="Terminate Process" library="Process">
 <var>${result}</var>
 <arg>${process}</arg>
 <doc>Stops the process gracefully or forcefully.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.315" endtime="20230529 03:25:48.316"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.846" endtime="20230529 03:41:49.846"/>
 </kw>
 <kw name="Fail" library="BuiltIn">
 <doc>Fails the test with the given message and optionally alters its tags.</doc>
-<status status="NOT RUN" starttime="20230529 03:25:48.316" endtime="20230529 03:25:48.316"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.846" endtime="20230529 03:41:49.847"/>
 </kw>
-<status status="NOT RUN" starttime="20230529 03:25:48.315" endtime="20230529 03:25:48.316"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.846" endtime="20230529 03:41:49.847"/>
 </branch>
-<status status="NOT RUN" starttime="20230529 03:25:48.315" endtime="20230529 03:25:48.316"/>
+<status status="NOT RUN" starttime="20230529 03:41:49.845" endtime="20230529 03:41:49.847"/>
 </if>
 <tag>macos-latest</tag>
-<status status="FAIL" starttime="20230529 03:25:48.313" endtime="20230529 03:25:48.316">TypeError: '&lt;' not supported between instances of 'str' and 'int'</status>
+<status status="FAIL" starttime="20230529 03:41:49.843" endtime="20230529 03:41:49.847">TypeError: '&lt;' not supported between instances of 'str' and 'int'</status>
 </test>
-<status status="FAIL" starttime="20230529 03:25:28.816" endtime="20230529 03:25:48.317"/>
+<status status="FAIL" starttime="20230529 03:41:30.141" endtime="20230529 03:41:49.848"/>
 </suite>
-<status status="FAIL" starttime="20230529 03:25:06.467" endtime="20230529 03:25:48.318"/>
+<status status="FAIL" starttime="20230529 03:40:52.528" endtime="20230529 03:41:49.849"/>
 </suite>
 <statistics>
 <total>
