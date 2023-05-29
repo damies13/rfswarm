@@ -104,7 +104,22 @@ Get Last Screenshot
 	${path} 	${file}= 	Split Path 	${OUTPUT FILE}
 	@{files}= 	List Files In Directory 	${path} 	*.png 	absolute
 	Sort List 	${files}
-	RETURN 	${files}[-1]
+	${fc}= 	Get Length 	${files}
+	IF 	${fc} > 9
+		${len0}= 	Get Length 	${files}[0]
+		WHILE    True    limit=10
+			${lenlast}= 	Get Length 	${files}[-1]
+			IF 	${lenlast} > ${len0}
+				RETURN 	${files}[-1]
+			ELSE
+				Remove From List 	${files} 	-1
+			END
+		END
+	ELSE
+		RETURN 	${files}[-1]
+	END
+
+
 
 Click Button
 	[Arguments]		${bttnname}
