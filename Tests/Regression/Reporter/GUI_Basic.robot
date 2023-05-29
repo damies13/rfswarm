@@ -86,7 +86,8 @@ Click Text
 	[Arguments]		${mytext}
 	${img}=		Take A Screenshot
 	Log 	${img}
-	${bounds}= 	Locate Text Bounds 	${img} 	${mytext}
+	${processed_img}= 	Read Image 	${img}
+	${bounds}= 	Locate Text Bounds 	${processed_img} 	${mytext}
 	Log 	${bounds}
 	${x}= 	Evaluate 	${bounds}[0]+(${bounds}[2]/2)
 	${y}= 	Evaluate 	${bounds}[1]+(${bounds}[3]/2)
