@@ -93,7 +93,6 @@ Click Text
 	Log 	${bounds}
 	${x}= 	Evaluate 	${bounds}[0]+int(${bounds}[2]/2)
 	${y}= 	Evaluate 	${bounds}[1]+int(${bounds}[3]/2)
-	Log 	${x} 	${y}
 	@{coordinates}= 	Create List 	${x} 	${y}
 	Move To 	${coordinates}
 	Click

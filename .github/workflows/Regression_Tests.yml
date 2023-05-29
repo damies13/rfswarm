@@ -156,21 +156,26 @@ jobs:
         shell: cmd
         run: |
           "%Temp%\tesseract-ocr-w64-setup-5.3.1.20230401.exe" /S
+      - name: "Windows Add Tesseract to Path"
+        if: ${{ matrix.platform == 'windows-latest' }}
+        shell: pwsh
+        run: |
+          echo "$($ENV:ProgramFiles)\Tesseract-OCR" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: "Verify tesseract"
-        if: ${{ matrix.platform != 'windows-latest' }}
+        # if: ${{ matrix.platform != 'windows-latest' }}
         run: tesseract -v
         #
-      - name: "Verify tesseract"
-        if: ${{ matrix.platform == 'windows-latest' }}
-        run: |
-          echo %PATH%
-          echo %programfiles%
-          dir "%programfiles%""
-          dir "%programfiles%\Tesseract-OCR"
-          echo %programfiles(x86)%
-          dir "%programfiles(x86)%"
-          "%programfiles%\Tesseract-OCR\tesseract.exe" -v
-        shell: cmd
+        # - name: "Verify tesseract"
+        #   if: ${{ matrix.platform == 'windows-latest' }}
+        #   run: |
+        #     echo %PATH%
+        #     echo %programfiles%
+        #     dir "%programfiles%""
+        #     dir "%programfiles%\Tesseract-OCR"
+        #     echo %programfiles(x86)%
+        #     dir "%programfiles(x86)%"
+        #     "%programfiles%\Tesseract-OCR\tesseract.exe" -v
+        #   shell: cmd
         #
       - run: pip install -r Tests/Regression/Reporter/pip_requirements.txt
       - name: setup git config
