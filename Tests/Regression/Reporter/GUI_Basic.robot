@@ -40,17 +40,51 @@ First Run
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 	Close GUI
 
-# Intentional Fail
-# 	[Tags]	ubuntu-latest		windows-latest		macos-latest
-# 	[Documentation]		Uncomment this test if you want to trigger updating Screenshots in the git repo
-# 	...								Ensure this is commented out before release or pull request
-# 	Fail
+New Data Table Section
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #149
+	Open GUI
+	Wait For Status 	PreviewLoaded
+
+	Click Button 			NewSection
+
+	Close GUI
+
+
+Intentional Fail
+	[Tags]	ubuntu-latest		windows-latest		macos-latest
+	[Documentation]		Uncomment this test if you want to trigger updating Screenshots in the git repo
+	...								Ensure this is commented out before release or pull request
+	Fail
 
 *** Keywords ***
 Click Tab
 	[Arguments]		${tabname}
 	${tabnamel}= 	Convert To Lower Case 	${tabname}
 	${img}=	Set Variable		reporter_${platform}_tab_${tabnamel}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	0.1
+	Take A Screenshot
+
+Click Section
+	[Arguments]		${sectname}
+	${sectnamel}= 	Convert To Lower Case 	${sectname}
+	${img}=	Set Variable		reporter_${platform}_button_${sectnamel}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	0.1
+	Take A Screenshot
+
+Click Button
+	[Arguments]		${bttnname}
+	${bttnnamel}= 	Convert To Lower Case 	${bttnname}
+	${img}=	Set Variable		reporter_${platform}_button_${bttnnamel}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=300
