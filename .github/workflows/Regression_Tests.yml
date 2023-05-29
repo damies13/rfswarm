@@ -150,9 +150,10 @@ jobs:
         if: ${{ matrix.platform == 'windows-latest' }}
         run: Invoke-WebRequest -Uri "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.3.1.20230401.exe" -OutFile "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe"
         shell: powershell
+
       - name: "Windows Install Tesseract"
         if: ${{ matrix.platform == 'windows-latest' }}
-        run:  & "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe" /s
+        run:  Start-Process -NoNewWindow -FilePath "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe" -ArgumentList "/s"
         shell: powershell
 
       - name: "Verify tesseract"
