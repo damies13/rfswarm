@@ -153,11 +153,20 @@ jobs:
 
       - name: "Windows Install Tesseract"
         if: ${{ matrix.platform == 'windows-latest' }}
-        run:  Start-Process -NoNewWindow -FilePath "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe" -ArgumentList "/s"
+        # run:  Start-Process -NoNewWindow -FilePath "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe" -ArgumentList "/s"
+        run:  Start-Process -FilePath "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe" -ArgumentList "/S"
         shell: powershell
 
       - name: "Verify tesseract"
+        if: ${{ matrix.platform != 'windows-latest' }}
         run: tesseract -v
+
+      - name: "Verify tesseract"
+        if: ${{ matrix.platform == 'windows-latest' }}
+        run: |
+          echo %PATH%
+          tesseract -v
+        shell: cmd
 
       - run: pip install -r Tests/Regression/Reporter/pip_requirements.txt
       - name: setup git config
