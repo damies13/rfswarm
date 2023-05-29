@@ -101,7 +101,7 @@ Get Last Screenshot
 	Log 	${OUTPUT FILE}
 	${path} 	${file}= 	Split Path 	${OUTPUT FILE}
 	@{files}= 	List Files In Directory 	${path} 	*.png 	absolute
-	@{files}= 	Sort List 	@{files}
+	${files}= 	Sort List 	${files}
 	RETURN 	${files}[-1]
 
 Click Button
