@@ -166,11 +166,11 @@ jobs:
         run: |
           echo %PATH%
           echo %programfiles%
-          dir %programfiles%
-          dir %programfiles%\Tesseract-OCR
+          dir "%programfiles%""
+          dir "%programfiles%\Tesseract-OCR"
           echo %programfiles(x86)%
-          dir %programfiles(x86)%
-          dir %programfiles(x86)%\Tesseract-OCR
+          dir "%programfiles(x86)%"
+          dir "%programfiles(x86)%\Tesseract-OCR"
           tesseract -v
         shell: cmd
 
