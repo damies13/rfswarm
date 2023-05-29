@@ -56,6 +56,11 @@ New Data Table Section
 
 	Click Button 			AddSection
 
+	Click To The Below Of Image 	reporter_${platform}_label_sectionname.png 	20
+	Type 	Issue #147
+	Click Button 			OK
+	Click Section			Issue #147
+
 	Close GUI
 
 
