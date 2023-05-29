@@ -1,5 +1,8 @@
 robotframework
 robotframework-SikuliLibrary
+# pyautogui 0.9.54 has issues on MacOS https://github.com/asweigart/pyautogui/issues/783
+# pyautogui is a prerequisite of imagehorizonlibrary
+pyautogui!=0.9.54
 robotframework-imagehorizonlibrary
 opencv-python
 configparser
