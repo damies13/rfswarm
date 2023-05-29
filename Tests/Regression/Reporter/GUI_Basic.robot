@@ -84,7 +84,8 @@ Click Section
 
 Click Text
 	[Arguments]		${mytext}
-	${img}=		Take A Screenshot
+	Take A Screenshot
+	${img}=		Get Last Screenshot
 	Log 	${img}
 	${processed_img}= 	Read Image 	${img}
 	${bounds}= 	Locate Text Bounds 	${processed_img} 	${mytext}
@@ -94,6 +95,12 @@ Click Text
 	Log 	${x} 	${y}
 	Move To 	${x} 	${y}
 	Click
+
+Get Last Screenshot
+	Log 	${OUTPUT FILE}
+	${path} 	${file}= 	Split Path 	${OUTPUT FILE}
+	@{files} = 	List Files In Directory 	${path} 	*.png 	absolute
+	RETURN 	${files}[-1]
 
 Click Button
 	[Arguments]		${bttnname}
