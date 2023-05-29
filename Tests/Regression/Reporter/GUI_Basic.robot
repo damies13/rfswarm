@@ -47,11 +47,10 @@ New Data Table Section
 	Open GUI
 	Wait For Status 	PreviewLoaded
 	# Click Section			Report
-	Click Section			toc
-
+	# Click Section			toc
 	# This should click Report
-	Click Text			toc 	0 	-20
-	# Click To The Below Of Image 	reporter_${platform}_button_removesection.png 	20
+	# Click Text			toc 	0 	-20
+	Click To The Below Of Image 	reporter_${platform}_button_removesection.png 	20
 
 	Take A Screenshot
 
