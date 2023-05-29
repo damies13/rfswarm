@@ -169,8 +169,7 @@ jobs:
           dir "%programfiles%\Tesseract-OCR"
           echo %programfiles(x86)%
           dir "%programfiles(x86)%"
-          dir "%programfiles(x86)%\Tesseract-OCR"
-          tesseract -v
+          "%programfiles%\Tesseract-OCR\tesseract.exe" -v
         shell: cmd
         #
       - run: pip install -r Tests/Regression/Reporter/pip_requirements.txt
