@@ -153,11 +153,11 @@ jobs:
 
       - name: "Windows Install Tesseract"
         if: ${{ matrix.platform == 'windows-latest' }}
+        run:  "%Temp%\tesseract-ocr-w64-setup-5.3.1.20230401.exe" /S
+        shell: cmd
         # run:  Start-Process -NoNewWindow -FilePath "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe" -ArgumentList "/s"
         # run:  Start-Process -FilePath "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe" -ArgumentList "/S"
         # shell: powershell
-        run:  "%Temp%\tesseract-ocr-w64-setup-5.3.1.20230401.exe" /S
-        shell: cmd
 
       - name: "Verify tesseract"
         if: ${{ matrix.platform != 'windows-latest' }}
