@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 6.0.2 (Python 3.9.16 on darwin)" generated="20230529 03:58:37.137" rpa="false" schemaversion="3">
+<robot generator="Robot 6.0.2 (Python 3.9.16 on darwin)" generated="20230529 04:32:17.259" rpa="false" schemaversion="3">
 <suite id="s1" name="Reporter" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter">
 <suite id="s1-s1" name="CommandLine" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/CommandLine.robot">
 <kw name="Clean Up Old Files" type="SETUP">
@@ -9,415 +9,415 @@
 <kw name="Log To Console" library="BuiltIn">
 <arg>${OUTPUT DIR}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20230529 03:58:37.271" endtime="20230529 03:58:37.271"/>
+<status status="PASS" starttime="20230529 04:32:17.305" endtime="20230529 04:32:17.305"/>
 </kw>
 <kw name="Remove File" library="OperatingSystem">
 <arg>${OUTPUT DIR}${/}*.txt</arg>
 <doc>Removes a file with the given path.</doc>
-<msg timestamp="20230529 03:58:37.272" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/stdout.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/stdout.txt&lt;/a&gt;'.</msg>
-<msg timestamp="20230529 03:58:37.272" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/stderr.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/stderr.txt&lt;/a&gt;'.</msg>
-<status status="PASS" starttime="20230529 03:58:37.271" endtime="20230529 03:58:37.272"/>
+<msg timestamp="20230529 04:32:17.306" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/stdout.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/stdout.txt&lt;/a&gt;'.</msg>
+<msg timestamp="20230529 04:32:17.306" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/stderr.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/stderr.txt&lt;/a&gt;'.</msg>
+<status status="PASS" starttime="20230529 04:32:17.305" endtime="20230529 04:32:17.306"/>
 </kw>
 <kw name="Remove File" library="OperatingSystem">
 <arg>${OUTPUT DIR}${/}*.png</arg>
 <doc>Removes a file with the given path.</doc>
-<msg timestamp="20230529 03:58:37.273" level="INFO" html="true">File '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/*.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/*.png&lt;/a&gt;' does not exist.</msg>
-<status status="PASS" starttime="20230529 03:58:37.272" endtime="20230529 03:58:37.273"/>
+<msg timestamp="20230529 04:32:17.307" level="INFO" html="true">File '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/*.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/*.png&lt;/a&gt;' does not exist.</msg>
+<status status="PASS" starttime="20230529 04:32:17.306" endtime="20230529 04:32:17.307"/>
 </kw>
-<status status="PASS" starttime="20230529 03:58:37.270" endtime="20230529 03:58:37.273"/>
+<status status="PASS" starttime="20230529 04:32:17.304" endtime="20230529 04:32:17.307"/>
 </kw>
 <test id="s1-s1-t1" name="Reporter Version" line="16">
 <kw name="Run" library="OperatingSystem">
 <var>${result}</var>
 <arg>python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -v</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<msg timestamp="20230529 03:58:37.279" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -v 2&gt;&amp;1'.</msg>
-<msg timestamp="20230529 03:58:50.017" level="INFO">${result} = Robot Framework Swarm: Reporter 
+<msg timestamp="20230529 04:32:17.311" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -v 2&gt;&amp;1'.</msg>
+<msg timestamp="20230529 04:32:29.455" level="INFO">${result} = Robot Framework Swarm: Reporter 
 	Version 1.1.3 </msg>
-<status status="PASS" starttime="20230529 03:58:37.273" endtime="20230529 03:58:50.017"/>
+<status status="PASS" starttime="20230529 04:32:17.308" endtime="20230529 04:32:29.455"/>
 </kw>
 <kw name="Log To Console" library="BuiltIn">
 <arg>${\n}${result}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20230529 03:58:50.017" endtime="20230529 03:58:50.018"/>
+<status status="PASS" starttime="20230529 04:32:29.455" endtime="20230529 04:32:29.456"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Version</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20230529 03:58:50.018" endtime="20230529 03:58:50.018"/>
+<status status="PASS" starttime="20230529 04:32:29.456" endtime="20230529 04:32:29.456"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Reporter</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20230529 03:58:50.019" endtime="20230529 03:58:50.019"/>
+<status status="PASS" starttime="20230529 04:32:29.456" endtime="20230529 04:32:29.457"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20230529 03:58:37.273" endtime="20230529 03:58:50.019"/>
+<status status="PASS" starttime="20230529 04:32:17.307" endtime="20230529 04:32:29.457"/>
 </test>
 <test id="s1-s1-t2" name="Reporter Help" line="23">
 <kw name="Run" library="OperatingSystem">
 <var>${result}</var>
 <arg>python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -h</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<msg timestamp="20230529 03:58:50.024" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -h 2&gt;&amp;1'.</msg>
-<msg timestamp="20230529 03:58:51.209" level="INFO">${result} = Robot Framework Swarm: Reporter 
+<msg timestamp="20230529 04:32:29.463" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -h 2&gt;&amp;1'.</msg>
+<msg timestamp="20230529 04:32:31.007" level="INFO">${result} = Robot Framework Swarm: Reporter 
 	Version 1.1.3 
 usage: rfswarm_reporter.py [-h] [-g DEBUG] [-v] [-i INI] [-n] [-d DIR]
                            [-t TEMPLATE] [--html] [--docx] [--xlsx]
 
 optional ar...</msg>
-<status status="PASS" starttime="20230529 03:58:50.020" endtime="20230529 03:58:51.209"/>
+<status status="PASS" starttime="20230529 04:32:29.458" endtime="20230529 04:32:31.008"/>
 </kw>
 <kw name="Log To Console" library="BuiltIn">
 <arg>${\n}${result}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20230529 03:58:51.209" endtime="20230529 03:58:51.210"/>
+<status status="PASS" starttime="20230529 04:32:31.008" endtime="20230529 04:32:31.009"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Excel</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20230529 03:58:51.210" endtime="20230529 03:58:51.210"/>
+<status status="PASS" starttime="20230529 04:32:31.009" endtime="20230529 04:32:31.009"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20230529 03:58:50.019" endtime="20230529 03:58:51.211"/>
+<status status="PASS" starttime="20230529 04:32:29.457" endtime="20230529 04:32:31.009"/>
 </test>
 <test id="s1-s1-t3" name="Command Line Generate HTML" line="29">
 <kw name="Set Variable" library="BuiltIn">
 <var>${testdata}</var>
 <arg>Issue-#144</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:58:51.212" level="INFO">${testdata} = Issue-#144</msg>
-<status status="PASS" starttime="20230529 03:58:51.212" endtime="20230529 03:58:51.212"/>
+<msg timestamp="20230529 04:32:31.011" level="INFO">${testdata} = Issue-#144</msg>
+<status status="PASS" starttime="20230529 04:32:31.010" endtime="20230529 04:32:31.011"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${resultdata}</var>
 <arg>20230320_185055_demo</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:58:51.212" level="INFO">${resultdata} = 20230320_185055_demo</msg>
-<status status="PASS" starttime="20230529 03:58:51.212" endtime="20230529 03:58:51.212"/>
+<msg timestamp="20230529 04:32:31.011" level="INFO">${resultdata} = 20230320_185055_demo</msg>
+<status status="PASS" starttime="20230529 04:32:31.011" endtime="20230529 04:32:31.011"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${basefolder}</var>
 <arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter${/}testdata${/}${testdata}</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:58:51.213" level="INFO">${basefolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144</msg>
-<status status="PASS" starttime="20230529 03:58:51.212" endtime="20230529 03:58:51.213"/>
+<msg timestamp="20230529 04:32:31.011" level="INFO">${basefolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144</msg>
+<status status="PASS" starttime="20230529 04:32:31.011" endtime="20230529 04:32:31.011"/>
 </kw>
 <kw name="Should Exist" library="OperatingSystem">
 <arg>${basefolder}</arg>
 <doc>Fails unless the given path (file or directory) exists.</doc>
-<msg timestamp="20230529 03:58:51.213" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144&lt;/a&gt;' exists.</msg>
-<status status="PASS" starttime="20230529 03:58:51.213" endtime="20230529 03:58:51.213"/>
+<msg timestamp="20230529 04:32:31.012" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144&lt;/a&gt;' exists.</msg>
+<status status="PASS" starttime="20230529 04:32:31.012" endtime="20230529 04:32:31.012"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>basefolder: ${basefolder}</arg>
 <arg>console=True</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:58:51.214" level="INFO">basefolder: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144</msg>
-<status status="PASS" starttime="20230529 03:58:51.213" endtime="20230529 03:58:51.214"/>
+<msg timestamp="20230529 04:32:31.013" level="INFO">basefolder: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144</msg>
+<status status="PASS" starttime="20230529 04:32:31.012" endtime="20230529 04:32:31.013"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${resultfolder}</var>
 <arg>${basefolder}${/}${resultdata}</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:58:51.214" level="INFO">${resultfolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo</msg>
-<status status="PASS" starttime="20230529 03:58:51.214" endtime="20230529 03:58:51.214"/>
+<msg timestamp="20230529 04:32:31.013" level="INFO">${resultfolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo</msg>
+<status status="PASS" starttime="20230529 04:32:31.013" endtime="20230529 04:32:31.013"/>
 </kw>
 <kw name="Should Exist" library="OperatingSystem">
 <arg>${resultfolder}</arg>
 <doc>Fails unless the given path (file or directory) exists.</doc>
-<msg timestamp="20230529 03:58:51.215" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo&lt;/a&gt;' exists.</msg>
-<status status="PASS" starttime="20230529 03:58:51.215" endtime="20230529 03:58:51.215"/>
+<msg timestamp="20230529 04:32:31.013" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo&lt;/a&gt;' exists.</msg>
+<status status="PASS" starttime="20230529 04:32:31.013" endtime="20230529 04:32:31.014"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>resultfolder: ${resultfolder}</arg>
 <arg>console=True</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:58:51.215" level="INFO">resultfolder: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo</msg>
-<status status="PASS" starttime="20230529 03:58:51.215" endtime="20230529 03:58:51.216"/>
+<msg timestamp="20230529 04:32:31.014" level="INFO">resultfolder: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo</msg>
+<status status="PASS" starttime="20230529 04:32:31.014" endtime="20230529 04:32:31.014"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${template}</var>
 <arg>${basefolder}${/}90%ileTemplate.template</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:58:51.216" level="INFO">${template} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template</msg>
-<status status="PASS" starttime="20230529 03:58:51.216" endtime="20230529 03:58:51.216"/>
+<msg timestamp="20230529 04:32:31.015" level="INFO">${template} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template</msg>
+<status status="PASS" starttime="20230529 04:32:31.014" endtime="20230529 04:32:31.015"/>
 </kw>
 <kw name="Should Exist" library="OperatingSystem">
 <arg>${template}</arg>
 <doc>Fails unless the given path (file or directory) exists.</doc>
-<msg timestamp="20230529 03:58:51.217" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template&lt;/a&gt;' exists.</msg>
-<status status="PASS" starttime="20230529 03:58:51.216" endtime="20230529 03:58:51.217"/>
+<msg timestamp="20230529 04:32:31.015" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template&lt;/a&gt;' exists.</msg>
+<status status="PASS" starttime="20230529 04:32:31.015" endtime="20230529 04:32:31.015"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>template: ${template}</arg>
 <arg>console=True</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:58:51.217" level="INFO">template: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template</msg>
-<status status="PASS" starttime="20230529 03:58:51.217" endtime="20230529 03:58:51.217"/>
+<msg timestamp="20230529 04:32:31.016" level="INFO">template: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template</msg>
+<status status="PASS" starttime="20230529 04:32:31.015" endtime="20230529 04:32:31.016"/>
 </kw>
 <kw name="Run" library="OperatingSystem">
 <var>${result}</var>
 <arg>python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --html</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<msg timestamp="20230529 03:58:51.220" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -n -g 1 -d /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo -t /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template --html 2&gt;&amp;1'.</msg>
-<msg timestamp="20230529 03:58:56.887" level="INFO">${result} = </msg>
-<status status="PASS" starttime="20230529 03:58:51.217" endtime="20230529 03:58:56.887"/>
+<msg timestamp="20230529 04:32:31.019" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -n -g 1 -d /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo -t /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template --html 2&gt;&amp;1'.</msg>
+<msg timestamp="20230529 04:32:36.623" level="INFO">${result} = </msg>
+<status status="PASS" starttime="20230529 04:32:31.016" endtime="20230529 04:32:36.623"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>result: ${\n}${result}</arg>
 <arg>console=True</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:58:56.888" level="INFO">result: 
+<msg timestamp="20230529 04:32:36.624" level="INFO">result: 
 </msg>
-<status status="PASS" starttime="20230529 03:58:56.888" endtime="20230529 03:58:56.888"/>
+<status status="PASS" starttime="20230529 04:32:36.624" endtime="20230529 04:32:36.624"/>
 </kw>
 <kw name="Should Not Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Traceback</arg>
 <doc>Fails if ``container`` contains ``item`` one or more times.</doc>
-<status status="PASS" starttime="20230529 03:58:56.889" endtime="20230529 03:58:56.889"/>
+<status status="PASS" starttime="20230529 04:32:36.625" endtime="20230529 04:32:36.625"/>
 </kw>
 <kw name="Should Exist" library="OperatingSystem">
 <arg>${resultfolder}${/}${resultdata}.html</arg>
 <doc>Fails unless the given path (file or directory) exists.</doc>
-<msg timestamp="20230529 03:58:56.889" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo/20230320_185055_demo.html"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo/20230320_185055_demo.html&lt;/a&gt;' exists.</msg>
-<status status="PASS" starttime="20230529 03:58:56.889" endtime="20230529 03:58:56.890"/>
+<msg timestamp="20230529 04:32:36.625" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo/20230320_185055_demo.html"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo/20230320_185055_demo.html&lt;/a&gt;' exists.</msg>
+<status status="PASS" starttime="20230529 04:32:36.625" endtime="20230529 04:32:36.626"/>
 </kw>
 <tag>HTML</tag>
 <tag>Issue #144</tag>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20230529 03:58:51.211" endtime="20230529 03:58:56.890"/>
+<status status="PASS" starttime="20230529 04:32:31.010" endtime="20230529 04:32:36.626"/>
 </test>
 <test id="s1-s1-t4" name="Command Line Generate Docx" line="47">
 <kw name="Set Variable" library="BuiltIn">
 <var>${testdata}</var>
 <arg>Issue-#144</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:58:56.891" level="INFO">${testdata} = Issue-#144</msg>
-<status status="PASS" starttime="20230529 03:58:56.891" endtime="20230529 03:58:56.891"/>
+<msg timestamp="20230529 04:32:36.627" level="INFO">${testdata} = Issue-#144</msg>
+<status status="PASS" starttime="20230529 04:32:36.627" endtime="20230529 04:32:36.627"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${resultdata}</var>
 <arg>20230320_185055_demo</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:58:56.891" level="INFO">${resultdata} = 20230320_185055_demo</msg>
-<status status="PASS" starttime="20230529 03:58:56.891" endtime="20230529 03:58:56.891"/>
+<msg timestamp="20230529 04:32:36.627" level="INFO">${resultdata} = 20230320_185055_demo</msg>
+<status status="PASS" starttime="20230529 04:32:36.627" endtime="20230529 04:32:36.627"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${basefolder}</var>
 <arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter${/}testdata${/}${testdata}</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:58:56.892" level="INFO">${basefolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144</msg>
-<status status="PASS" starttime="20230529 03:58:56.891" endtime="20230529 03:58:56.892"/>
+<msg timestamp="20230529 04:32:36.628" level="INFO">${basefolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144</msg>
+<status status="PASS" starttime="20230529 04:32:36.627" endtime="20230529 04:32:36.628"/>
 </kw>
 <kw name="Should Exist" library="OperatingSystem">
 <arg>${basefolder}</arg>
 <doc>Fails unless the given path (file or directory) exists.</doc>
-<msg timestamp="20230529 03:58:56.892" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144&lt;/a&gt;' exists.</msg>
-<status status="PASS" starttime="20230529 03:58:56.892" endtime="20230529 03:58:56.892"/>
+<msg timestamp="20230529 04:32:36.628" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144&lt;/a&gt;' exists.</msg>
+<status status="PASS" starttime="20230529 04:32:36.628" endtime="20230529 04:32:36.629"/>
 </kw>
 <kw name="Log To Console" library="BuiltIn">
 <arg>basefolder: ${basefolder}</arg>
 <arg>console=True</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20230529 03:58:56.892" endtime="20230529 03:58:56.893"/>
+<status status="PASS" starttime="20230529 04:32:36.629" endtime="20230529 04:32:36.629"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${resultfolder}</var>
 <arg>${basefolder}${/}${resultdata}</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:58:56.893" level="INFO">${resultfolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo</msg>
-<status status="PASS" starttime="20230529 03:58:56.893" endtime="20230529 03:58:56.893"/>
+<msg timestamp="20230529 04:32:36.629" level="INFO">${resultfolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo</msg>
+<status status="PASS" starttime="20230529 04:32:36.629" endtime="20230529 04:32:36.629"/>
 </kw>
 <kw name="Should Exist" library="OperatingSystem">
 <arg>${resultfolder}</arg>
 <doc>Fails unless the given path (file or directory) exists.</doc>
-<msg timestamp="20230529 03:58:56.894" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo&lt;/a&gt;' exists.</msg>
-<status status="PASS" starttime="20230529 03:58:56.893" endtime="20230529 03:58:56.894"/>
+<msg timestamp="20230529 04:32:36.630" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo&lt;/a&gt;' exists.</msg>
+<status status="PASS" starttime="20230529 04:32:36.630" endtime="20230529 04:32:36.630"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>resultfolder: ${resultfolder}</arg>
 <arg>console=True</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:58:56.894" level="INFO">resultfolder: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo</msg>
-<status status="PASS" starttime="20230529 03:58:56.894" endtime="20230529 03:58:56.894"/>
+<msg timestamp="20230529 04:32:36.630" level="INFO">resultfolder: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo</msg>
+<status status="PASS" starttime="20230529 04:32:36.630" endtime="20230529 04:32:36.630"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${template}</var>
 <arg>${basefolder}${/}90%ileTemplate.template</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:58:56.894" level="INFO">${template} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template</msg>
-<status status="PASS" starttime="20230529 03:58:56.894" endtime="20230529 03:58:56.895"/>
+<msg timestamp="20230529 04:32:36.631" level="INFO">${template} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template</msg>
+<status status="PASS" starttime="20230529 04:32:36.630" endtime="20230529 04:32:36.631"/>
 </kw>
 <kw name="Should Exist" library="OperatingSystem">
 <arg>${template}</arg>
 <doc>Fails unless the given path (file or directory) exists.</doc>
-<msg timestamp="20230529 03:58:56.895" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template&lt;/a&gt;' exists.</msg>
-<status status="PASS" starttime="20230529 03:58:56.895" endtime="20230529 03:58:56.895"/>
+<msg timestamp="20230529 04:32:36.631" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template&lt;/a&gt;' exists.</msg>
+<status status="PASS" starttime="20230529 04:32:36.631" endtime="20230529 04:32:36.631"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>template: ${template}</arg>
 <arg>console=True</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:58:56.895" level="INFO">template: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template</msg>
-<status status="PASS" starttime="20230529 03:58:56.895" endtime="20230529 03:58:56.895"/>
+<msg timestamp="20230529 04:32:36.632" level="INFO">template: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template</msg>
+<status status="PASS" starttime="20230529 04:32:36.632" endtime="20230529 04:32:36.632"/>
 </kw>
 <kw name="Run" library="OperatingSystem">
 <var>${result}</var>
 <arg>python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --docx</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<msg timestamp="20230529 03:58:56.900" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -n -g 1 -d /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo -t /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template --docx 2&gt;&amp;1'.</msg>
-<msg timestamp="20230529 03:59:04.091" level="INFO">${result} = </msg>
-<status status="PASS" starttime="20230529 03:58:56.896" endtime="20230529 03:59:04.091"/>
+<msg timestamp="20230529 04:32:36.636" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -n -g 1 -d /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo -t /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template --docx 2&gt;&amp;1'.</msg>
+<msg timestamp="20230529 04:32:43.428" level="INFO">${result} = </msg>
+<status status="PASS" starttime="20230529 04:32:36.632" endtime="20230529 04:32:43.428"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>${\n}${result}</arg>
 <arg>console=True</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:59:04.093" level="INFO">
+<msg timestamp="20230529 04:32:43.429" level="INFO">
 </msg>
-<status status="PASS" starttime="20230529 03:59:04.092" endtime="20230529 03:59:04.093"/>
+<status status="PASS" starttime="20230529 04:32:43.428" endtime="20230529 04:32:43.429"/>
 </kw>
 <kw name="Should Not Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Traceback</arg>
 <doc>Fails if ``container`` contains ``item`` one or more times.</doc>
-<status status="PASS" starttime="20230529 03:59:04.093" endtime="20230529 03:59:04.093"/>
+<status status="PASS" starttime="20230529 04:32:43.429" endtime="20230529 04:32:43.429"/>
 </kw>
 <kw name="Should Exist" library="OperatingSystem">
 <arg>${resultfolder}${/}${resultdata}.docx</arg>
 <doc>Fails unless the given path (file or directory) exists.</doc>
-<msg timestamp="20230529 03:59:04.094" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo/20230320_185055_demo.docx"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo/20230320_185055_demo.docx&lt;/a&gt;' exists.</msg>
-<status status="PASS" starttime="20230529 03:59:04.093" endtime="20230529 03:59:04.094"/>
+<msg timestamp="20230529 04:32:43.430" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo/20230320_185055_demo.docx"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo/20230320_185055_demo.docx&lt;/a&gt;' exists.</msg>
+<status status="PASS" starttime="20230529 04:32:43.430" endtime="20230529 04:32:43.430"/>
 </kw>
 <tag>DOCX</tag>
 <tag>Issue #144</tag>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20230529 03:58:56.890" endtime="20230529 03:59:04.094"/>
+<status status="PASS" starttime="20230529 04:32:36.626" endtime="20230529 04:32:43.430"/>
 </test>
 <test id="s1-s1-t5" name="Command Line Generate Xlsx" line="65">
 <kw name="Set Variable" library="BuiltIn">
 <var>${testdata}</var>
 <arg>Issue-#144</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:59:04.095" level="INFO">${testdata} = Issue-#144</msg>
-<status status="PASS" starttime="20230529 03:59:04.095" endtime="20230529 03:59:04.095"/>
+<msg timestamp="20230529 04:32:43.432" level="INFO">${testdata} = Issue-#144</msg>
+<status status="PASS" starttime="20230529 04:32:43.431" endtime="20230529 04:32:43.432"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${resultdata}</var>
 <arg>20230320_185055_demo</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:59:04.096" level="INFO">${resultdata} = 20230320_185055_demo</msg>
-<status status="PASS" starttime="20230529 03:59:04.095" endtime="20230529 03:59:04.096"/>
+<msg timestamp="20230529 04:32:43.432" level="INFO">${resultdata} = 20230320_185055_demo</msg>
+<status status="PASS" starttime="20230529 04:32:43.432" endtime="20230529 04:32:43.432"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${basefolder}</var>
 <arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter${/}testdata${/}${testdata}</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:59:04.096" level="INFO">${basefolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144</msg>
-<status status="PASS" starttime="20230529 03:59:04.096" endtime="20230529 03:59:04.096"/>
+<msg timestamp="20230529 04:32:43.432" level="INFO">${basefolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144</msg>
+<status status="PASS" starttime="20230529 04:32:43.432" endtime="20230529 04:32:43.433"/>
 </kw>
 <kw name="Should Exist" library="OperatingSystem">
 <arg>${basefolder}</arg>
 <doc>Fails unless the given path (file or directory) exists.</doc>
-<msg timestamp="20230529 03:59:04.097" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144&lt;/a&gt;' exists.</msg>
-<status status="PASS" starttime="20230529 03:59:04.096" endtime="20230529 03:59:04.097"/>
+<msg timestamp="20230529 04:32:43.433" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144&lt;/a&gt;' exists.</msg>
+<status status="PASS" starttime="20230529 04:32:43.433" endtime="20230529 04:32:43.433"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>basefolder: ${basefolder}</arg>
 <arg>console=True</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:59:04.097" level="INFO">basefolder: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144</msg>
-<status status="PASS" starttime="20230529 03:59:04.097" endtime="20230529 03:59:04.097"/>
+<msg timestamp="20230529 04:32:43.433" level="INFO">basefolder: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144</msg>
+<status status="PASS" starttime="20230529 04:32:43.433" endtime="20230529 04:32:43.434"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${resultfolder}</var>
 <arg>${basefolder}${/}${resultdata}</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:59:04.097" level="INFO">${resultfolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo</msg>
-<status status="PASS" starttime="20230529 03:59:04.097" endtime="20230529 03:59:04.098"/>
+<msg timestamp="20230529 04:32:43.434" level="INFO">${resultfolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo</msg>
+<status status="PASS" starttime="20230529 04:32:43.434" endtime="20230529 04:32:43.434"/>
 </kw>
 <kw name="Should Exist" library="OperatingSystem">
 <arg>${resultfolder}</arg>
 <doc>Fails unless the given path (file or directory) exists.</doc>
-<msg timestamp="20230529 03:59:04.098" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo&lt;/a&gt;' exists.</msg>
-<status status="PASS" starttime="20230529 03:59:04.098" endtime="20230529 03:59:04.098"/>
+<msg timestamp="20230529 04:32:43.434" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo&lt;/a&gt;' exists.</msg>
+<status status="PASS" starttime="20230529 04:32:43.434" endtime="20230529 04:32:43.434"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>resultfolder: ${resultfolder}</arg>
 <arg>console=True</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:59:04.098" level="INFO">resultfolder: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo</msg>
-<status status="PASS" starttime="20230529 03:59:04.098" endtime="20230529 03:59:04.098"/>
+<msg timestamp="20230529 04:32:43.435" level="INFO">resultfolder: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo</msg>
+<status status="PASS" starttime="20230529 04:32:43.435" endtime="20230529 04:32:43.435"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${template}</var>
 <arg>${basefolder}${/}90%ileTemplate.template</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:59:04.099" level="INFO">${template} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template</msg>
-<status status="PASS" starttime="20230529 03:59:04.099" endtime="20230529 03:59:04.099"/>
+<msg timestamp="20230529 04:32:43.435" level="INFO">${template} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template</msg>
+<status status="PASS" starttime="20230529 04:32:43.435" endtime="20230529 04:32:43.435"/>
 </kw>
 <kw name="Should Exist" library="OperatingSystem">
 <arg>${template}</arg>
 <doc>Fails unless the given path (file or directory) exists.</doc>
-<msg timestamp="20230529 03:59:04.099" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template&lt;/a&gt;' exists.</msg>
-<status status="PASS" starttime="20230529 03:59:04.099" endtime="20230529 03:59:04.099"/>
+<msg timestamp="20230529 04:32:43.436" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template&lt;/a&gt;' exists.</msg>
+<status status="PASS" starttime="20230529 04:32:43.436" endtime="20230529 04:32:43.436"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>template: ${template}</arg>
 <arg>console=True</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:59:04.100" level="INFO">template: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template</msg>
-<status status="PASS" starttime="20230529 03:59:04.099" endtime="20230529 03:59:04.100"/>
+<msg timestamp="20230529 04:32:43.436" level="INFO">template: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template</msg>
+<status status="PASS" starttime="20230529 04:32:43.436" endtime="20230529 04:32:43.436"/>
 </kw>
 <kw name="Run" library="OperatingSystem">
 <var>${result}</var>
 <arg>python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --xlsx</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<msg timestamp="20230529 03:59:04.103" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -n -g 1 -d /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo -t /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template --xlsx 2&gt;&amp;1'.</msg>
-<msg timestamp="20230529 03:59:09.663" level="INFO">${result} = </msg>
-<status status="PASS" starttime="20230529 03:59:04.100" endtime="20230529 03:59:09.663"/>
+<msg timestamp="20230529 04:32:43.440" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -n -g 1 -d /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo -t /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template --xlsx 2&gt;&amp;1'.</msg>
+<msg timestamp="20230529 04:32:48.831" level="INFO">${result} = </msg>
+<status status="PASS" starttime="20230529 04:32:43.437" endtime="20230529 04:32:48.831"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>${\n}${result}</arg>
 <arg>console=True</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:59:09.665" level="INFO">
+<msg timestamp="20230529 04:32:48.832" level="INFO">
 </msg>
-<status status="PASS" starttime="20230529 03:59:09.664" endtime="20230529 03:59:09.665"/>
+<status status="PASS" starttime="20230529 04:32:48.832" endtime="20230529 04:32:48.832"/>
 </kw>
 <kw name="Should Not Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Traceback</arg>
 <doc>Fails if ``container`` contains ``item`` one or more times.</doc>
-<status status="PASS" starttime="20230529 03:59:09.665" endtime="20230529 03:59:09.665"/>
+<status status="PASS" starttime="20230529 04:32:48.833" endtime="20230529 04:32:48.833"/>
 </kw>
 <kw name="Should Exist" library="OperatingSystem">
 <arg>${resultfolder}${/}${resultdata}.xlsx</arg>
 <doc>Fails unless the given path (file or directory) exists.</doc>
-<msg timestamp="20230529 03:59:09.666" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo/20230320_185055_demo.xlsx"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo/20230320_185055_demo.xlsx&lt;/a&gt;' exists.</msg>
-<status status="PASS" starttime="20230529 03:59:09.665" endtime="20230529 03:59:09.666"/>
+<msg timestamp="20230529 04:32:48.834" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo/20230320_185055_demo.xlsx"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo/20230320_185055_demo.xlsx&lt;/a&gt;' exists.</msg>
+<status status="PASS" starttime="20230529 04:32:48.833" endtime="20230529 04:32:48.834"/>
 </kw>
 <tag>Issue #144</tag>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
 <tag>XLSX</tag>
-<status status="PASS" starttime="20230529 03:59:04.094" endtime="20230529 03:59:09.666"/>
+<status status="PASS" starttime="20230529 04:32:43.431" endtime="20230529 04:32:48.834"/>
 </test>
-<status status="PASS" starttime="20230529 03:58:37.225" endtime="20230529 03:59:09.667"/>
+<status status="PASS" starttime="20230529 04:32:17.286" endtime="20230529 04:32:48.835"/>
 </suite>
 <suite id="s1-s2" name="GUI Basic" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot">
 <test id="s1-s2-t1" name="GUI Runs and Closes" line="14">
@@ -425,14 +425,14 @@ optional ar...</msg>
 <kw name="Get Variables" library="BuiltIn">
 <var>${var}</var>
 <doc>Returns a dictionary containing all variables in the current scope.</doc>
-<msg timestamp="20230529 03:59:19.995" level="INFO">${var} = {'${/}': '/', '${:}': ':', '${\\n}': '\n', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Reg...</msg>
-<status status="PASS" starttime="20230529 03:59:19.993" endtime="20230529 03:59:19.995"/>
+<msg timestamp="20230529 04:32:59.151" level="INFO">${var} = {'${/}': '/', '${:}': ':', '${\\n}': '\n', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Reg...</msg>
+<status status="PASS" starttime="20230529 04:32:59.150" endtime="20230529 04:32:59.151"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>${var}</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:59:19.995" level="INFO">{'${/}': '/', '${:}': ':', '${\\n}': '\n', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method', '${LOG_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/log.html', '${LOG_LEVEL}': 'INFO', '${None}': None, '${null}': None, '${OUTPUT_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9', '${OUTPUT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/output.xml', '${PREV_TEST_MESSAGE}': '', '${PREV_TEST_NAME}': 'Command Line Generate Xlsx', '${PREV_TEST_STATUS}': 'PASS', '${process}': 'None', '${pyfile}': '/Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py', '${REPORT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/report.html', '${SPACE}': ' ', '${SUITE_DOCUMENTATION}': '', '${SUITE_NAME}': 'Reporter.GUI Basic', '${SUITE_SOURCE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot', '${TEMPDIR}': '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T', '${TEST_DOCUMENTATION}': '', '${TEST_NAME}': 'GUI Runs and Closes', '${True}': True, '&amp;{OPTIONS}': {'include': ['macos-latest'], 'exclude': [], 'skip': [], 'skip_on_failure': []}, '&amp;{SUITE_METADATA}': &lt;robot.utils.normalizing.NormalizedDict object at 0x104eba3d0&gt;, '@{appargs}': [], '@{TEST_TAGS}': ['macos-latest', 'ubuntu-latest', 'windows-latest']}</msg>
-<status status="PASS" starttime="20230529 03:59:19.995" endtime="20230529 03:59:19.995"/>
+<msg timestamp="20230529 04:32:59.152" level="INFO">{'${/}': '/', '${:}': ':', '${\\n}': '\n', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method', '${LOG_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/log.html', '${LOG_LEVEL}': 'INFO', '${None}': None, '${null}': None, '${OUTPUT_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9', '${OUTPUT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/output.xml', '${PREV_TEST_MESSAGE}': '', '${PREV_TEST_NAME}': 'Command Line Generate Xlsx', '${PREV_TEST_STATUS}': 'PASS', '${process}': 'None', '${pyfile}': '/Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py', '${REPORT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/report.html', '${SPACE}': ' ', '${SUITE_DOCUMENTATION}': '', '${SUITE_NAME}': 'Reporter.GUI Basic', '${SUITE_SOURCE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot', '${TEMPDIR}': '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T', '${TEST_DOCUMENTATION}': '', '${TEST_NAME}': 'GUI Runs and Closes', '${True}': True, '&amp;{OPTIONS}': {'include': ['macos-latest'], 'exclude': [], 'skip': [], 'skip_on_failure': []}, '&amp;{SUITE_METADATA}': &lt;robot.utils.normalizing.NormalizedDict object at 0x10bb673d0&gt;, '@{appargs}': [], '@{TEST_TAGS}': ['macos-latest', 'ubuntu-latest', 'windows-latest']}</msg>
+<status status="PASS" starttime="20230529 04:32:59.151" endtime="20230529 04:32:59.152"/>
 </kw>
 <kw name="Get Platform">
 <kw name="Create Dictionary" library="BuiltIn">
@@ -442,32 +442,32 @@ optional ar...</msg>
 <arg>Java=notsupported</arg>
 <arg>Windows=windows</arg>
 <doc>Creates and returns a dictionary based on the given ``items``.</doc>
-<msg timestamp="20230529 03:59:19.996" level="INFO">&amp;{platforms} = { Linux=ubuntu | Darwin=macos | Java=notsupported | Windows=windows }</msg>
-<status status="PASS" starttime="20230529 03:59:19.996" endtime="20230529 03:59:19.996"/>
+<msg timestamp="20230529 04:32:59.153" level="INFO">&amp;{platforms} = { Linux=ubuntu | Darwin=macos | Java=notsupported | Windows=windows }</msg>
+<status status="PASS" starttime="20230529 04:32:59.152" endtime="20230529 04:32:59.153"/>
 </kw>
 <kw name="Evaluate" library="BuiltIn">
 <var>${os}</var>
 <arg>platform.system()</arg>
 <arg>platform</arg>
 <doc>Evaluates the given expression in Python and returns the result.</doc>
-<msg timestamp="20230529 03:59:19.997" level="INFO">${os} = Darwin</msg>
-<status status="PASS" starttime="20230529 03:59:19.996" endtime="20230529 03:59:19.997"/>
+<msg timestamp="20230529 04:32:59.153" level="INFO">${os} = Darwin</msg>
+<status status="PASS" starttime="20230529 04:32:59.153" endtime="20230529 04:32:59.153"/>
 </kw>
 <kw name="Set Suite Variable" library="BuiltIn">
 <arg>${platform}</arg>
 <arg>${platforms}[${os}]</arg>
 <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
-<msg timestamp="20230529 03:59:19.998" level="INFO">${platform} = macos</msg>
-<status status="PASS" starttime="20230529 03:59:19.997" endtime="20230529 03:59:19.998"/>
+<msg timestamp="20230529 04:32:59.155" level="INFO">${platform} = macos</msg>
+<status status="PASS" starttime="20230529 04:32:59.153" endtime="20230529 04:32:59.155"/>
 </kw>
-<status status="PASS" starttime="20230529 03:59:19.995" endtime="20230529 03:59:19.998"/>
+<status status="PASS" starttime="20230529 04:32:59.152" endtime="20230529 04:32:59.155"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${keyword}</var>
 <arg>Open GUI ${platform}</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:59:19.999" level="INFO">${keyword} = Open GUI macos</msg>
-<status status="PASS" starttime="20230529 03:59:19.999" endtime="20230529 03:59:19.999"/>
+<msg timestamp="20230529 04:32:59.156" level="INFO">${keyword} = Open GUI macos</msg>
+<status status="PASS" starttime="20230529 04:32:59.155" endtime="20230529 04:32:59.156"/>
 </kw>
 <kw name="Run Keyword" library="BuiltIn">
 <arg>${keyword}</arg>
@@ -479,13 +479,13 @@ optional ar...</msg>
 <arg>${platform}</arg>
 <arg>macos</arg>
 <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
-<msg timestamp="20230529 03:59:20.004" level="INFO">${platform} = macos</msg>
-<status status="PASS" starttime="20230529 03:59:20.003" endtime="20230529 03:59:20.004"/>
+<msg timestamp="20230529 04:32:59.163" level="INFO">${platform} = macos</msg>
+<status status="PASS" starttime="20230529 04:32:59.163" endtime="20230529 04:32:59.164"/>
 </kw>
 <kw name="Set Confidence" library="ImageHorizonLibrary">
 <arg>0.9</arg>
 <doc>Sets the accuracy when finding images.</doc>
-<status status="PASS" starttime="20230529 03:59:20.004" endtime="20230529 03:59:20.004"/>
+<status status="PASS" starttime="20230529 04:32:59.164" endtime="20230529 04:32:59.164"/>
 </kw>
 <kw name="Start Process" library="Process">
 <arg>python3</arg>
@@ -497,52 +497,52 @@ optional ar...</msg>
 <arg>stdout=${OUTPUT DIR}${/}stdout.txt</arg>
 <arg>stderr=${OUTPUT DIR}${/}stderr.txt</arg>
 <doc>Starts a new process on background.</doc>
-<msg timestamp="20230529 03:59:20.005" level="INFO">Starting process:
+<msg timestamp="20230529 04:32:59.166" level="INFO">Starting process:
 python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -g 5</msg>
-<status status="PASS" starttime="20230529 03:59:20.004" endtime="20230529 03:59:20.012"/>
+<status status="PASS" starttime="20230529 04:32:59.164" endtime="20230529 04:32:59.178"/>
 </kw>
 <kw name="Set Screenshot Folder" library="ImageHorizonLibrary">
 <arg>${OUTPUT DIR}</arg>
 <doc>Sets the folder where screenshots are saved to.</doc>
-<status status="PASS" starttime="20230529 03:59:20.012" endtime="20230529 03:59:20.013"/>
+<status status="PASS" starttime="20230529 04:32:59.179" endtime="20230529 04:32:59.180"/>
 </kw>
 <kw name="Take A Screenshot" library="ImageHorizonLibrary">
 <doc>Takes a screenshot of the screen.</doc>
-<msg timestamp="20230529 03:59:20.014" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/Reporter.GUIBasic-screenshot-1.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/Reporter.GUIBasic-screenshot-1.png" width="100%" /&gt;</msg>
-<msg timestamp="20230529 03:59:20.014" level="FAIL">TypeError: '&lt;' not supported between instances of 'str' and 'int'</msg>
-<status status="FAIL" starttime="20230529 03:59:20.013" endtime="20230529 03:59:20.015"/>
+<msg timestamp="20230529 04:32:59.180" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/Reporter.GUIBasic-screenshot-1.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/Reporter.GUIBasic-screenshot-1.png" width="100%" /&gt;</msg>
+<msg timestamp="20230529 04:32:59.181" level="FAIL">TypeError: '&lt;' not supported between instances of 'str' and 'int'</msg>
+<status status="FAIL" starttime="20230529 04:32:59.180" endtime="20230529 04:32:59.182"/>
 </kw>
-<status status="FAIL" starttime="20230529 03:59:20.003" endtime="20230529 03:59:20.016"/>
+<status status="FAIL" starttime="20230529 04:32:59.162" endtime="20230529 04:32:59.182"/>
 </kw>
-<status status="FAIL" starttime="20230529 03:59:19.999" endtime="20230529 03:59:20.016"/>
+<status status="FAIL" starttime="20230529 04:32:59.156" endtime="20230529 04:32:59.182"/>
 </kw>
-<status status="FAIL" starttime="20230529 03:59:19.993" endtime="20230529 03:59:20.016"/>
+<status status="FAIL" starttime="20230529 04:32:59.149" endtime="20230529 04:32:59.182"/>
 </kw>
 <kw name="Wait For Status">
 <arg>PreviewLoaded</arg>
-<status status="NOT RUN" starttime="20230529 03:59:20.016" endtime="20230529 03:59:20.016"/>
+<status status="NOT RUN" starttime="20230529 04:32:59.183" endtime="20230529 04:32:59.183"/>
 </kw>
 <kw name="Close GUI">
-<status status="NOT RUN" starttime="20230529 03:59:20.016" endtime="20230529 03:59:20.016"/>
+<status status="NOT RUN" starttime="20230529 04:32:59.183" endtime="20230529 04:32:59.183"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="FAIL" starttime="20230529 03:59:19.992" endtime="20230529 03:59:20.017">TypeError: '&lt;' not supported between instances of 'str' and 'int'</status>
+<status status="FAIL" starttime="20230529 04:32:59.148" endtime="20230529 04:32:59.183">TypeError: '&lt;' not supported between instances of 'str' and 'int'</status>
 </test>
 <test id="s1-s2-t2" name="Select Preview Tab" line="20">
 <kw name="Open GUI">
 <kw name="Get Variables" library="BuiltIn">
 <var>${var}</var>
 <doc>Returns a dictionary containing all variables in the current scope.</doc>
-<msg timestamp="20230529 03:59:20.019" level="INFO">${var} = {'${/}': '/', '${:}': ':', '${\\n}': '\n', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Reg...</msg>
-<status status="PASS" starttime="20230529 03:59:20.018" endtime="20230529 03:59:20.019"/>
+<msg timestamp="20230529 04:32:59.191" level="INFO">${var} = {'${/}': '/', '${:}': ':', '${\\n}': '\n', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Reg...</msg>
+<status status="PASS" starttime="20230529 04:32:59.185" endtime="20230529 04:32:59.191"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>${var}</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:59:20.020" level="INFO">{'${/}': '/', '${:}': ':', '${\\n}': '\n', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method', '${LOG_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/log.html', '${LOG_LEVEL}': 'INFO', '${None}': None, '${null}': None, '${OUTPUT_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9', '${OUTPUT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/output.xml', '${platform}': 'macos', '${PREV_TEST_MESSAGE}': "TypeError: '&lt;' not supported between instances of 'str' and 'int'", '${PREV_TEST_NAME}': 'GUI Runs and Closes', '${PREV_TEST_STATUS}': 'FAIL', '${process}': 'None', '${pyfile}': '/Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py', '${REPORT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/report.html', '${SPACE}': ' ', '${SUITE_DOCUMENTATION}': '', '${SUITE_NAME}': 'Reporter.GUI Basic', '${SUITE_SOURCE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot', '${TEMPDIR}': '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T', '${TEST_DOCUMENTATION}': '', '${TEST_NAME}': 'Select Preview Tab', '${True}': True, '&amp;{OPTIONS}': {'include': ['macos-latest'], 'exclude': [], 'skip': [], 'skip_on_failure': []}, '&amp;{SUITE_METADATA}': &lt;robot.utils.normalizing.NormalizedDict object at 0x104eba3d0&gt;, '@{appargs}': [], '@{TEST_TAGS}': ['macos-latest', 'ubuntu-latest', 'windows-latest']}</msg>
-<status status="PASS" starttime="20230529 03:59:20.019" endtime="20230529 03:59:20.020"/>
+<msg timestamp="20230529 04:32:59.192" level="INFO">{'${/}': '/', '${:}': ':', '${\\n}': '\n', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method', '${LOG_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/log.html', '${LOG_LEVEL}': 'INFO', '${None}': None, '${null}': None, '${OUTPUT_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9', '${OUTPUT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/output.xml', '${platform}': 'macos', '${PREV_TEST_MESSAGE}': "TypeError: '&lt;' not supported between instances of 'str' and 'int'", '${PREV_TEST_NAME}': 'GUI Runs and Closes', '${PREV_TEST_STATUS}': 'FAIL', '${process}': 'None', '${pyfile}': '/Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py', '${REPORT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/report.html', '${SPACE}': ' ', '${SUITE_DOCUMENTATION}': '', '${SUITE_NAME}': 'Reporter.GUI Basic', '${SUITE_SOURCE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot', '${TEMPDIR}': '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T', '${TEST_DOCUMENTATION}': '', '${TEST_NAME}': 'Select Preview Tab', '${True}': True, '&amp;{OPTIONS}': {'include': ['macos-latest'], 'exclude': [], 'skip': [], 'skip_on_failure': []}, '&amp;{SUITE_METADATA}': &lt;robot.utils.normalizing.NormalizedDict object at 0x10bb673d0&gt;, '@{appargs}': [], '@{TEST_TAGS}': ['macos-latest', 'ubuntu-latest', 'windows-latest']}</msg>
+<status status="PASS" starttime="20230529 04:32:59.192" endtime="20230529 04:32:59.192"/>
 </kw>
 <kw name="Get Platform">
 <kw name="Create Dictionary" library="BuiltIn">
@@ -552,32 +552,32 @@ python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py 
 <arg>Java=notsupported</arg>
 <arg>Windows=windows</arg>
 <doc>Creates and returns a dictionary based on the given ``items``.</doc>
-<msg timestamp="20230529 03:59:20.021" level="INFO">&amp;{platforms} = { Linux=ubuntu | Darwin=macos | Java=notsupported | Windows=windows }</msg>
-<status status="PASS" starttime="20230529 03:59:20.020" endtime="20230529 03:59:20.021"/>
+<msg timestamp="20230529 04:32:59.193" level="INFO">&amp;{platforms} = { Linux=ubuntu | Darwin=macos | Java=notsupported | Windows=windows }</msg>
+<status status="PASS" starttime="20230529 04:32:59.192" endtime="20230529 04:32:59.193"/>
 </kw>
 <kw name="Evaluate" library="BuiltIn">
 <var>${os}</var>
 <arg>platform.system()</arg>
 <arg>platform</arg>
 <doc>Evaluates the given expression in Python and returns the result.</doc>
-<msg timestamp="20230529 03:59:20.021" level="INFO">${os} = Darwin</msg>
-<status status="PASS" starttime="20230529 03:59:20.021" endtime="20230529 03:59:20.021"/>
+<msg timestamp="20230529 04:32:59.194" level="INFO">${os} = Darwin</msg>
+<status status="PASS" starttime="20230529 04:32:59.193" endtime="20230529 04:32:59.194"/>
 </kw>
 <kw name="Set Suite Variable" library="BuiltIn">
 <arg>${platform}</arg>
 <arg>${platforms}[${os}]</arg>
 <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
-<msg timestamp="20230529 03:59:20.022" level="INFO">${platform} = macos</msg>
-<status status="PASS" starttime="20230529 03:59:20.022" endtime="20230529 03:59:20.022"/>
+<msg timestamp="20230529 04:32:59.194" level="INFO">${platform} = macos</msg>
+<status status="PASS" starttime="20230529 04:32:59.194" endtime="20230529 04:32:59.194"/>
 </kw>
-<status status="PASS" starttime="20230529 03:59:20.020" endtime="20230529 03:59:20.022"/>
+<status status="PASS" starttime="20230529 04:32:59.192" endtime="20230529 04:32:59.194"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${keyword}</var>
 <arg>Open GUI ${platform}</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:59:20.023" level="INFO">${keyword} = Open GUI macos</msg>
-<status status="PASS" starttime="20230529 03:59:20.022" endtime="20230529 03:59:20.023"/>
+<msg timestamp="20230529 04:32:59.195" level="INFO">${keyword} = Open GUI macos</msg>
+<status status="PASS" starttime="20230529 04:32:59.194" endtime="20230529 04:32:59.195"/>
 </kw>
 <kw name="Run Keyword" library="BuiltIn">
 <arg>${keyword}</arg>
@@ -589,13 +589,13 @@ python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py 
 <arg>${platform}</arg>
 <arg>macos</arg>
 <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
-<msg timestamp="20230529 03:59:20.029" level="INFO">${platform} = macos</msg>
-<status status="PASS" starttime="20230529 03:59:20.028" endtime="20230529 03:59:20.029"/>
+<msg timestamp="20230529 04:32:59.200" level="INFO">${platform} = macos</msg>
+<status status="PASS" starttime="20230529 04:32:59.200" endtime="20230529 04:32:59.200"/>
 </kw>
 <kw name="Set Confidence" library="ImageHorizonLibrary">
 <arg>0.9</arg>
 <doc>Sets the accuracy when finding images.</doc>
-<status status="PASS" starttime="20230529 03:59:20.029" endtime="20230529 03:59:20.029"/>
+<status status="PASS" starttime="20230529 04:32:59.200" endtime="20230529 04:32:59.200"/>
 </kw>
 <kw name="Start Process" library="Process">
 <arg>python3</arg>
@@ -607,103 +607,103 @@ python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py 
 <arg>stdout=${OUTPUT DIR}${/}stdout.txt</arg>
 <arg>stderr=${OUTPUT DIR}${/}stderr.txt</arg>
 <doc>Starts a new process on background.</doc>
-<msg timestamp="20230529 03:59:20.030" level="INFO">Starting process:
+<msg timestamp="20230529 04:32:59.205" level="INFO">Starting process:
 python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -g 5</msg>
-<status status="PASS" starttime="20230529 03:59:20.029" endtime="20230529 03:59:20.038"/>
+<status status="PASS" starttime="20230529 04:32:59.200" endtime="20230529 04:32:59.214"/>
 </kw>
 <kw name="Set Screenshot Folder" library="ImageHorizonLibrary">
 <arg>${OUTPUT DIR}</arg>
 <doc>Sets the folder where screenshots are saved to.</doc>
-<status status="PASS" starttime="20230529 03:59:20.039" endtime="20230529 03:59:20.040"/>
+<status status="PASS" starttime="20230529 04:32:59.215" endtime="20230529 04:32:59.216"/>
 </kw>
 <kw name="Take A Screenshot" library="ImageHorizonLibrary">
 <doc>Takes a screenshot of the screen.</doc>
-<msg timestamp="20230529 03:59:20.040" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/Reporter.GUIBasic-screenshot-2.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/Reporter.GUIBasic-screenshot-2.png" width="100%" /&gt;</msg>
-<msg timestamp="20230529 03:59:20.040" level="FAIL">TypeError: '&lt;' not supported between instances of 'str' and 'int'</msg>
-<status status="FAIL" starttime="20230529 03:59:20.040" endtime="20230529 03:59:20.041"/>
+<msg timestamp="20230529 04:32:59.216" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/Reporter.GUIBasic-screenshot-2.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/Reporter.GUIBasic-screenshot-2.png" width="100%" /&gt;</msg>
+<msg timestamp="20230529 04:32:59.217" level="FAIL">TypeError: '&lt;' not supported between instances of 'str' and 'int'</msg>
+<status status="FAIL" starttime="20230529 04:32:59.216" endtime="20230529 04:32:59.217"/>
 </kw>
-<status status="FAIL" starttime="20230529 03:59:20.028" endtime="20230529 03:59:20.041"/>
+<status status="FAIL" starttime="20230529 04:32:59.199" endtime="20230529 04:32:59.217"/>
 </kw>
-<status status="FAIL" starttime="20230529 03:59:20.023" endtime="20230529 03:59:20.041"/>
+<status status="FAIL" starttime="20230529 04:32:59.195" endtime="20230529 04:32:59.217"/>
 </kw>
-<status status="FAIL" starttime="20230529 03:59:20.018" endtime="20230529 03:59:20.041"/>
+<status status="FAIL" starttime="20230529 04:32:59.184" endtime="20230529 04:32:59.218"/>
 </kw>
 <kw name="Wait For Status">
 <arg>PreviewLoaded</arg>
-<status status="NOT RUN" starttime="20230529 03:59:20.042" endtime="20230529 03:59:20.042"/>
+<status status="NOT RUN" starttime="20230529 04:32:59.218" endtime="20230529 04:32:59.218"/>
 </kw>
 <kw name="Click Tab">
 <arg>Preview</arg>
-<status status="NOT RUN" starttime="20230529 03:59:20.042" endtime="20230529 03:59:20.042"/>
+<status status="NOT RUN" starttime="20230529 04:32:59.218" endtime="20230529 04:32:59.218"/>
 </kw>
 <kw name="Close GUI">
-<status status="NOT RUN" starttime="20230529 03:59:20.042" endtime="20230529 03:59:20.042"/>
+<status status="NOT RUN" starttime="20230529 04:32:59.218" endtime="20230529 04:32:59.218"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="FAIL" starttime="20230529 03:59:20.017" endtime="20230529 03:59:20.042">TypeError: '&lt;' not supported between instances of 'str' and 'int'</status>
+<status status="FAIL" starttime="20230529 04:32:59.184" endtime="20230529 04:32:59.219">TypeError: '&lt;' not supported between instances of 'str' and 'int'</status>
 </test>
 <test id="s1-s2-t3" name="First Run" line="27">
 <kw name="Set Variable" library="BuiltIn">
 <var>${testdata}</var>
 <arg>Issue-#147</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:59:20.044" level="INFO">${testdata} = Issue-#147</msg>
-<status status="PASS" starttime="20230529 03:59:20.043" endtime="20230529 03:59:20.044"/>
+<msg timestamp="20230529 04:32:59.220" level="INFO">${testdata} = Issue-#147</msg>
+<status status="PASS" starttime="20230529 04:32:59.220" endtime="20230529 04:32:59.220"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${resultdata}</var>
 <arg>20230320_185055_demo</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:59:20.044" level="INFO">${resultdata} = 20230320_185055_demo</msg>
-<status status="PASS" starttime="20230529 03:59:20.044" endtime="20230529 03:59:20.044"/>
+<msg timestamp="20230529 04:32:59.220" level="INFO">${resultdata} = 20230320_185055_demo</msg>
+<status status="PASS" starttime="20230529 04:32:59.220" endtime="20230529 04:32:59.220"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${basefolder}</var>
 <arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter${/}testdata${/}${testdata}</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:59:20.044" level="INFO">${basefolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147</msg>
-<status status="PASS" starttime="20230529 03:59:20.044" endtime="20230529 03:59:20.045"/>
+<msg timestamp="20230529 04:32:59.221" level="INFO">${basefolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147</msg>
+<status status="PASS" starttime="20230529 04:32:59.220" endtime="20230529 04:32:59.221"/>
 </kw>
 <kw name="Should Exist" library="OperatingSystem">
 <arg>${basefolder}</arg>
 <doc>Fails unless the given path (file or directory) exists.</doc>
-<msg timestamp="20230529 03:59:20.045" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147&lt;/a&gt;' exists.</msg>
-<status status="PASS" starttime="20230529 03:59:20.045" endtime="20230529 03:59:20.045"/>
+<msg timestamp="20230529 04:32:59.221" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147&lt;/a&gt;' exists.</msg>
+<status status="PASS" starttime="20230529 04:32:59.221" endtime="20230529 04:32:59.221"/>
 </kw>
 <kw name="Log To Console" library="BuiltIn">
 <arg>basefolder: ${basefolder}</arg>
 <arg>console=True</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20230529 03:59:20.045" endtime="20230529 03:59:20.046"/>
+<status status="PASS" starttime="20230529 04:32:59.222" endtime="20230529 04:32:59.222"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${resultfolder}</var>
 <arg>${basefolder}${/}${resultdata}</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:59:20.046" level="INFO">${resultfolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147/20230320_185055_demo</msg>
-<status status="PASS" starttime="20230529 03:59:20.046" endtime="20230529 03:59:20.046"/>
+<msg timestamp="20230529 04:32:59.223" level="INFO">${resultfolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147/20230320_185055_demo</msg>
+<status status="PASS" starttime="20230529 04:32:59.222" endtime="20230529 04:32:59.223"/>
 </kw>
 <kw name="Should Exist" library="OperatingSystem">
 <arg>${resultfolder}</arg>
 <doc>Fails unless the given path (file or directory) exists.</doc>
-<msg timestamp="20230529 03:59:20.046" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147/20230320_185055_demo"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147/20230320_185055_demo&lt;/a&gt;' exists.</msg>
-<status status="PASS" starttime="20230529 03:59:20.046" endtime="20230529 03:59:20.047"/>
+<msg timestamp="20230529 04:32:59.223" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147/20230320_185055_demo"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147/20230320_185055_demo&lt;/a&gt;' exists.</msg>
+<status status="PASS" starttime="20230529 04:32:59.223" endtime="20230529 04:32:59.223"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>resultfolder: ${resultfolder}</arg>
 <arg>console=True</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:59:20.047" level="INFO">resultfolder: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147/20230320_185055_demo</msg>
-<status status="PASS" starttime="20230529 03:59:20.047" endtime="20230529 03:59:20.047"/>
+<msg timestamp="20230529 04:32:59.224" level="INFO">resultfolder: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147/20230320_185055_demo</msg>
+<status status="PASS" starttime="20230529 04:32:59.223" endtime="20230529 04:32:59.224"/>
 </kw>
 <kw name="Get Time" library="BuiltIn">
 <var>${epoch}</var>
 <arg>epoch</arg>
 <doc>Returns the given time in the requested format.</doc>
-<msg timestamp="20230529 03:59:20.048" level="INFO">${epoch} = 1685332760</msg>
-<status status="PASS" starttime="20230529 03:59:20.047" endtime="20230529 03:59:20.048"/>
+<msg timestamp="20230529 04:32:59.225" level="INFO">${epoch} = 1685334779</msg>
+<status status="PASS" starttime="20230529 04:32:59.224" endtime="20230529 04:32:59.225"/>
 </kw>
 <kw name="Open GUI">
 <arg>-i</arg>
@@ -713,14 +713,14 @@ python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py 
 <kw name="Get Variables" library="BuiltIn">
 <var>${var}</var>
 <doc>Returns a dictionary containing all variables in the current scope.</doc>
-<msg timestamp="20230529 03:59:20.049" level="INFO">${var} = {'${/}': '/', '${:}': ':', '${\\n}': '\n', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Reg...</msg>
-<status status="PASS" starttime="20230529 03:59:20.048" endtime="20230529 03:59:20.049"/>
+<msg timestamp="20230529 04:32:59.226" level="INFO">${var} = {'${/}': '/', '${:}': ':', '${\\n}': '\n', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Reg...</msg>
+<status status="PASS" starttime="20230529 04:32:59.225" endtime="20230529 04:32:59.226"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>${var}</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:59:20.050" level="INFO">{'${/}': '/', '${:}': ':', '${\\n}': '\n', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method', '${LOG_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/log.html', '${LOG_LEVEL}': 'INFO', '${None}': None, '${null}': None, '${OUTPUT_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9', '${OUTPUT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/output.xml', '${platform}': 'macos', '${PREV_TEST_MESSAGE}': "TypeError: '&lt;' not supported between instances of 'str' and 'int'", '${PREV_TEST_NAME}': 'Select Preview Tab', '${PREV_TEST_STATUS}': 'FAIL', '${process}': 'None', '${pyfile}': '/Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py', '${REPORT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/report.html', '${SPACE}': ' ', '${SUITE_DOCUMENTATION}': '', '${SUITE_NAME}': 'Reporter.GUI Basic', '${SUITE_SOURCE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot', '${TEMPDIR}': '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T', '${TEST_DOCUMENTATION}': '', '${TEST_NAME}': 'First Run', '${True}': True, '&amp;{OPTIONS}': {'include': ['macos-latest'], 'exclude': [], 'skip': [], 'skip_on_failure': []}, '&amp;{SUITE_METADATA}': &lt;robot.utils.normalizing.NormalizedDict object at 0x104eba3d0&gt;, '@{appargs}': ['-i', 'blank_1685332760.ini', '-d', '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147/20230320_185055_demo'], '@{TEST_TAGS}': ['Issue #147', 'macos-latest', 'ubuntu-latest', 'windows-latest']}</msg>
-<status status="PASS" starttime="20230529 03:59:20.049" endtime="20230529 03:59:20.050"/>
+<msg timestamp="20230529 04:32:59.227" level="INFO">{'${/}': '/', '${:}': ':', '${\\n}': '\n', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method', '${LOG_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/log.html', '${LOG_LEVEL}': 'INFO', '${None}': None, '${null}': None, '${OUTPUT_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9', '${OUTPUT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/output.xml', '${platform}': 'macos', '${PREV_TEST_MESSAGE}': "TypeError: '&lt;' not supported between instances of 'str' and 'int'", '${PREV_TEST_NAME}': 'Select Preview Tab', '${PREV_TEST_STATUS}': 'FAIL', '${process}': 'None', '${pyfile}': '/Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py', '${REPORT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/report.html', '${SPACE}': ' ', '${SUITE_DOCUMENTATION}': '', '${SUITE_NAME}': 'Reporter.GUI Basic', '${SUITE_SOURCE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot', '${TEMPDIR}': '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T', '${TEST_DOCUMENTATION}': '', '${TEST_NAME}': 'First Run', '${True}': True, '&amp;{OPTIONS}': {'include': ['macos-latest'], 'exclude': [], 'skip': [], 'skip_on_failure': []}, '&amp;{SUITE_METADATA}': &lt;robot.utils.normalizing.NormalizedDict object at 0x10bb673d0&gt;, '@{appargs}': ['-i', 'blank_1685334779.ini', '-d', '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147/20230320_185055_demo'], '@{TEST_TAGS}': ['Issue #147', 'macos-latest', 'ubuntu-latest', 'windows-latest']}</msg>
+<status status="PASS" starttime="20230529 04:32:59.226" endtime="20230529 04:32:59.227"/>
 </kw>
 <kw name="Get Platform">
 <kw name="Create Dictionary" library="BuiltIn">
@@ -730,32 +730,32 @@ python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py 
 <arg>Java=notsupported</arg>
 <arg>Windows=windows</arg>
 <doc>Creates and returns a dictionary based on the given ``items``.</doc>
-<msg timestamp="20230529 03:59:20.051" level="INFO">&amp;{platforms} = { Linux=ubuntu | Darwin=macos | Java=notsupported | Windows=windows }</msg>
-<status status="PASS" starttime="20230529 03:59:20.050" endtime="20230529 03:59:20.051"/>
+<msg timestamp="20230529 04:32:59.228" level="INFO">&amp;{platforms} = { Linux=ubuntu | Darwin=macos | Java=notsupported | Windows=windows }</msg>
+<status status="PASS" starttime="20230529 04:32:59.227" endtime="20230529 04:32:59.228"/>
 </kw>
 <kw name="Evaluate" library="BuiltIn">
 <var>${os}</var>
 <arg>platform.system()</arg>
 <arg>platform</arg>
 <doc>Evaluates the given expression in Python and returns the result.</doc>
-<msg timestamp="20230529 03:59:20.051" level="INFO">${os} = Darwin</msg>
-<status status="PASS" starttime="20230529 03:59:20.051" endtime="20230529 03:59:20.051"/>
+<msg timestamp="20230529 04:32:59.228" level="INFO">${os} = Darwin</msg>
+<status status="PASS" starttime="20230529 04:32:59.228" endtime="20230529 04:32:59.228"/>
 </kw>
 <kw name="Set Suite Variable" library="BuiltIn">
 <arg>${platform}</arg>
 <arg>${platforms}[${os}]</arg>
 <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
-<msg timestamp="20230529 03:59:20.052" level="INFO">${platform} = macos</msg>
-<status status="PASS" starttime="20230529 03:59:20.051" endtime="20230529 03:59:20.052"/>
+<msg timestamp="20230529 04:32:59.229" level="INFO">${platform} = macos</msg>
+<status status="PASS" starttime="20230529 04:32:59.229" endtime="20230529 04:32:59.229"/>
 </kw>
-<status status="PASS" starttime="20230529 03:59:20.050" endtime="20230529 03:59:20.052"/>
+<status status="PASS" starttime="20230529 04:32:59.227" endtime="20230529 04:32:59.229"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${keyword}</var>
 <arg>Open GUI ${platform}</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:59:20.052" level="INFO">${keyword} = Open GUI macos</msg>
-<status status="PASS" starttime="20230529 03:59:20.052" endtime="20230529 03:59:20.052"/>
+<msg timestamp="20230529 04:32:59.230" level="INFO">${keyword} = Open GUI macos</msg>
+<status status="PASS" starttime="20230529 04:32:59.229" endtime="20230529 04:32:59.230"/>
 </kw>
 <kw name="Run Keyword" library="BuiltIn">
 <arg>${keyword}</arg>
@@ -767,13 +767,13 @@ python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py 
 <arg>${platform}</arg>
 <arg>macos</arg>
 <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
-<msg timestamp="20230529 03:59:20.058" level="INFO">${platform} = macos</msg>
-<status status="PASS" starttime="20230529 03:59:20.057" endtime="20230529 03:59:20.058"/>
+<msg timestamp="20230529 04:32:59.235" level="INFO">${platform} = macos</msg>
+<status status="PASS" starttime="20230529 04:32:59.235" endtime="20230529 04:32:59.235"/>
 </kw>
 <kw name="Set Confidence" library="ImageHorizonLibrary">
 <arg>0.9</arg>
 <doc>Sets the accuracy when finding images.</doc>
-<status status="PASS" starttime="20230529 03:59:20.058" endtime="20230529 03:59:20.058"/>
+<status status="PASS" starttime="20230529 04:32:59.235" endtime="20230529 04:32:59.235"/>
 </kw>
 <kw name="Start Process" library="Process">
 <arg>python3</arg>
@@ -785,55 +785,55 @@ python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py 
 <arg>stdout=${OUTPUT DIR}${/}stdout.txt</arg>
 <arg>stderr=${OUTPUT DIR}${/}stderr.txt</arg>
 <doc>Starts a new process on background.</doc>
-<msg timestamp="20230529 03:59:20.059" level="INFO">Starting process:
-python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -g 5 -i blank_1685332760.ini -d /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147/20230320_185055_demo</msg>
-<status status="PASS" starttime="20230529 03:59:20.058" endtime="20230529 03:59:20.067"/>
+<msg timestamp="20230529 04:32:59.236" level="INFO">Starting process:
+python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -g 5 -i blank_1685334779.ini -d /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147/20230320_185055_demo</msg>
+<status status="PASS" starttime="20230529 04:32:59.235" endtime="20230529 04:32:59.247"/>
 </kw>
 <kw name="Set Screenshot Folder" library="ImageHorizonLibrary">
 <arg>${OUTPUT DIR}</arg>
 <doc>Sets the folder where screenshots are saved to.</doc>
-<status status="PASS" starttime="20230529 03:59:20.068" endtime="20230529 03:59:20.069"/>
+<status status="PASS" starttime="20230529 04:32:59.248" endtime="20230529 04:32:59.248"/>
 </kw>
 <kw name="Take A Screenshot" library="ImageHorizonLibrary">
 <doc>Takes a screenshot of the screen.</doc>
-<msg timestamp="20230529 03:59:20.070" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/Reporter.GUIBasic-screenshot-3.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/Reporter.GUIBasic-screenshot-3.png" width="100%" /&gt;</msg>
-<msg timestamp="20230529 03:59:20.070" level="FAIL">TypeError: '&lt;' not supported between instances of 'str' and 'int'</msg>
-<status status="FAIL" starttime="20230529 03:59:20.069" endtime="20230529 03:59:20.070"/>
+<msg timestamp="20230529 04:32:59.249" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/Reporter.GUIBasic-screenshot-3.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/Reporter.GUIBasic-screenshot-3.png" width="100%" /&gt;</msg>
+<msg timestamp="20230529 04:32:59.249" level="FAIL">TypeError: '&lt;' not supported between instances of 'str' and 'int'</msg>
+<status status="FAIL" starttime="20230529 04:32:59.248" endtime="20230529 04:32:59.250"/>
 </kw>
-<status status="FAIL" starttime="20230529 03:59:20.057" endtime="20230529 03:59:20.070"/>
+<status status="FAIL" starttime="20230529 04:32:59.234" endtime="20230529 04:32:59.250"/>
 </kw>
-<status status="FAIL" starttime="20230529 03:59:20.053" endtime="20230529 03:59:20.070"/>
+<status status="FAIL" starttime="20230529 04:32:59.230" endtime="20230529 04:32:59.250"/>
 </kw>
-<status status="FAIL" starttime="20230529 03:59:20.048" endtime="20230529 03:59:20.071"/>
+<status status="FAIL" starttime="20230529 04:32:59.225" endtime="20230529 04:32:59.250"/>
 </kw>
 <kw name="Run Keyword And Continue On Failure" library="BuiltIn">
 <arg>Wait For Status</arg>
 <arg>PreviewLoaded</arg>
 <doc>Runs the keyword and continues execution even if a failure occurs.</doc>
-<status status="NOT RUN" starttime="20230529 03:59:20.071" endtime="20230529 03:59:20.071"/>
+<status status="NOT RUN" starttime="20230529 04:32:59.250" endtime="20230529 04:32:59.250"/>
 </kw>
 <kw name="Close GUI">
-<status status="NOT RUN" starttime="20230529 03:59:20.071" endtime="20230529 03:59:20.071"/>
+<status status="NOT RUN" starttime="20230529 04:32:59.251" endtime="20230529 04:32:59.251"/>
 </kw>
 <tag>Issue #147</tag>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="FAIL" starttime="20230529 03:59:20.043" endtime="20230529 03:59:20.072">TypeError: '&lt;' not supported between instances of 'str' and 'int'</status>
+<status status="FAIL" starttime="20230529 04:32:59.219" endtime="20230529 04:32:59.251">TypeError: '&lt;' not supported between instances of 'str' and 'int'</status>
 </test>
 <test id="s1-s2-t4" name="New Data Table Section" line="43">
 <kw name="Open GUI">
 <kw name="Get Variables" library="BuiltIn">
 <var>${var}</var>
 <doc>Returns a dictionary containing all variables in the current scope.</doc>
-<msg timestamp="20230529 03:59:20.074" level="INFO">${var} = {'${/}': '/', '${:}': ':', '${\\n}': '\n', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Reg...</msg>
-<status status="PASS" starttime="20230529 03:59:20.073" endtime="20230529 03:59:20.074"/>
+<msg timestamp="20230529 04:32:59.254" level="INFO">${var} = {'${/}': '/', '${:}': ':', '${\\n}': '\n', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Reg...</msg>
+<status status="PASS" starttime="20230529 04:32:59.252" endtime="20230529 04:32:59.254"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>${var}</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20230529 03:59:20.074" level="INFO">{'${/}': '/', '${:}': ':', '${\\n}': '\n', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method', '${LOG_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/log.html', '${LOG_LEVEL}': 'INFO', '${None}': None, '${null}': None, '${OUTPUT_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9', '${OUTPUT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/output.xml', '${platform}': 'macos', '${PREV_TEST_MESSAGE}': "TypeError: '&lt;' not supported between instances of 'str' and 'int'", '${PREV_TEST_NAME}': 'First Run', '${PREV_TEST_STATUS}': 'FAIL', '${process}': 'None', '${pyfile}': '/Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py', '${REPORT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/report.html', '${SPACE}': ' ', '${SUITE_DOCUMENTATION}': '', '${SUITE_NAME}': 'Reporter.GUI Basic', '${SUITE_SOURCE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot', '${TEMPDIR}': '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T', '${TEST_DOCUMENTATION}': '', '${TEST_NAME}': 'New Data Table Section', '${True}': True, '&amp;{OPTIONS}': {'include': ['macos-latest'], 'exclude': [], 'skip': [], 'skip_on_failure': []}, '&amp;{SUITE_METADATA}': &lt;robot.utils.normalizing.NormalizedDict object at 0x104eba3d0&gt;, '@{appargs}': [], '@{TEST_TAGS}': ['Issue #149', 'macos-latest', 'ubuntu-latest', 'windows-latest']}</msg>
-<status status="PASS" starttime="20230529 03:59:20.074" endtime="20230529 03:59:20.074"/>
+<msg timestamp="20230529 04:32:59.254" level="INFO">{'${/}': '/', '${:}': ':', '${\\n}': '\n', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method', '${LOG_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/log.html', '${LOG_LEVEL}': 'INFO', '${None}': None, '${null}': None, '${OUTPUT_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9', '${OUTPUT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/output.xml', '${platform}': 'macos', '${PREV_TEST_MESSAGE}': "TypeError: '&lt;' not supported between instances of 'str' and 'int'", '${PREV_TEST_NAME}': 'First Run', '${PREV_TEST_STATUS}': 'FAIL', '${process}': 'None', '${pyfile}': '/Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py', '${REPORT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/report.html', '${SPACE}': ' ', '${SUITE_DOCUMENTATION}': '', '${SUITE_NAME}': 'Reporter.GUI Basic', '${SUITE_SOURCE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot', '${TEMPDIR}': '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T', '${TEST_DOCUMENTATION}': '', '${TEST_NAME}': 'New Data Table Section', '${True}': True, '&amp;{OPTIONS}': {'include': ['macos-latest'], 'exclude': [], 'skip': [], 'skip_on_failure': []}, '&amp;{SUITE_METADATA}': &lt;robot.utils.normalizing.NormalizedDict object at 0x10bb673d0&gt;, '@{appargs}': [], '@{TEST_TAGS}': ['Issue #149', 'macos-latest', 'ubuntu-latest', 'windows-latest']}</msg>
+<status status="PASS" starttime="20230529 04:32:59.254" endtime="20230529 04:32:59.255"/>
 </kw>
 <kw name="Get Platform">
 <kw name="Create Dictionary" library="BuiltIn">
@@ -843,32 +843,32 @@ python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py 
 <arg>Java=notsupported</arg>
 <arg>Windows=windows</arg>
 <doc>Creates and returns a dictionary based on the given ``items``.</doc>
-<msg timestamp="20230529 03:59:20.075" level="INFO">&amp;{platforms} = { Linux=ubuntu | Darwin=macos | Java=notsupported | Windows=windows }</msg>
-<status status="PASS" starttime="20230529 03:59:20.075" endtime="20230529 03:59:20.075"/>
+<msg timestamp="20230529 04:32:59.255" level="INFO">&amp;{platforms} = { Linux=ubuntu | Darwin=macos | Java=notsupported | Windows=windows }</msg>
+<status status="PASS" starttime="20230529 04:32:59.255" endtime="20230529 04:32:59.256"/>
 </kw>
 <kw name="Evaluate" library="BuiltIn">
 <var>${os}</var>
 <arg>platform.system()</arg>
 <arg>platform</arg>
 <doc>Evaluates the given expression in Python and returns the result.</doc>
-<msg timestamp="20230529 03:59:20.076" level="INFO">${os} = Darwin</msg>
-<status status="PASS" starttime="20230529 03:59:20.076" endtime="20230529 03:59:20.076"/>
+<msg timestamp="20230529 04:32:59.256" level="INFO">${os} = Darwin</msg>
+<status status="PASS" starttime="20230529 04:32:59.256" endtime="20230529 04:32:59.256"/>
 </kw>
 <kw name="Set Suite Variable" library="BuiltIn">
 <arg>${platform}</arg>
 <arg>${platforms}[${os}]</arg>
 <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
-<msg timestamp="20230529 03:59:20.077" level="INFO">${platform} = macos</msg>
-<status status="PASS" starttime="20230529 03:59:20.077" endtime="20230529 03:59:20.077"/>
+<msg timestamp="20230529 04:32:59.257" level="INFO">${platform} = macos</msg>
+<status status="PASS" starttime="20230529 04:32:59.256" endtime="20230529 04:32:59.257"/>
 </kw>
-<status status="PASS" starttime="20230529 03:59:20.075" endtime="20230529 03:59:20.077"/>
+<status status="PASS" starttime="20230529 04:32:59.255" endtime="20230529 04:32:59.257"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${keyword}</var>
 <arg>Open GUI ${platform}</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20230529 03:59:20.078" level="INFO">${keyword} = Open GUI macos</msg>
-<status status="PASS" starttime="20230529 03:59:20.077" endtime="20230529 03:59:20.078"/>
+<msg timestamp="20230529 04:32:59.257" level="INFO">${keyword} = Open GUI macos</msg>
+<status status="PASS" starttime="20230529 04:32:59.257" endtime="20230529 04:32:59.257"/>
 </kw>
 <kw name="Run Keyword" library="BuiltIn">
 <arg>${keyword}</arg>
@@ -880,13 +880,13 @@ python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py 
 <arg>${platform}</arg>
 <arg>macos</arg>
 <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
-<msg timestamp="20230529 03:59:20.083" level="INFO">${platform} = macos</msg>
-<status status="PASS" starttime="20230529 03:59:20.082" endtime="20230529 03:59:20.083"/>
+<msg timestamp="20230529 04:32:59.273" level="INFO">${platform} = macos</msg>
+<status status="PASS" starttime="20230529 04:32:59.273" endtime="20230529 04:32:59.273"/>
 </kw>
 <kw name="Set Confidence" library="ImageHorizonLibrary">
 <arg>0.9</arg>
 <doc>Sets the accuracy when finding images.</doc>
-<status status="PASS" starttime="20230529 03:59:20.083" endtime="20230529 03:59:20.083"/>
+<status status="PASS" starttime="20230529 04:32:59.273" endtime="20230529 04:32:59.273"/>
 </kw>
 <kw name="Start Process" library="Process">
 <arg>python3</arg>
@@ -898,60 +898,60 @@ python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py 
 <arg>stdout=${OUTPUT DIR}${/}stdout.txt</arg>
 <arg>stderr=${OUTPUT DIR}${/}stderr.txt</arg>
 <doc>Starts a new process on background.</doc>
-<msg timestamp="20230529 03:59:20.084" level="INFO">Starting process:
+<msg timestamp="20230529 04:32:59.275" level="INFO">Starting process:
 python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py -g 5</msg>
-<status status="PASS" starttime="20230529 03:59:20.083" endtime="20230529 03:59:20.110"/>
+<status status="PASS" starttime="20230529 04:32:59.274" endtime="20230529 04:32:59.296"/>
 </kw>
 <kw name="Set Screenshot Folder" library="ImageHorizonLibrary">
 <arg>${OUTPUT DIR}</arg>
 <doc>Sets the folder where screenshots are saved to.</doc>
-<status status="PASS" starttime="20230529 03:59:20.111" endtime="20230529 03:59:20.111"/>
+<status status="PASS" starttime="20230529 04:32:59.297" endtime="20230529 04:32:59.298"/>
 </kw>
 <kw name="Take A Screenshot" library="ImageHorizonLibrary">
 <doc>Takes a screenshot of the screen.</doc>
-<msg timestamp="20230529 03:59:20.112" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/Reporter.GUIBasic-screenshot-4.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/Reporter.GUIBasic-screenshot-4.png" width="100%" /&gt;</msg>
-<msg timestamp="20230529 03:59:20.112" level="FAIL">TypeError: '&lt;' not supported between instances of 'str' and 'int'</msg>
-<status status="FAIL" starttime="20230529 03:59:20.112" endtime="20230529 03:59:20.113"/>
+<msg timestamp="20230529 04:32:59.299" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/Reporter.GUIBasic-screenshot-4.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.9/Reporter.GUIBasic-screenshot-4.png" width="100%" /&gt;</msg>
+<msg timestamp="20230529 04:32:59.299" level="FAIL">TypeError: '&lt;' not supported between instances of 'str' and 'int'</msg>
+<status status="FAIL" starttime="20230529 04:32:59.298" endtime="20230529 04:32:59.299"/>
 </kw>
-<status status="FAIL" starttime="20230529 03:59:20.082" endtime="20230529 03:59:20.113"/>
+<status status="FAIL" starttime="20230529 04:32:59.272" endtime="20230529 04:32:59.299"/>
 </kw>
-<status status="FAIL" starttime="20230529 03:59:20.078" endtime="20230529 03:59:20.113"/>
+<status status="FAIL" starttime="20230529 04:32:59.258" endtime="20230529 04:32:59.300"/>
 </kw>
-<status status="FAIL" starttime="20230529 03:59:20.073" endtime="20230529 03:59:20.113"/>
+<status status="FAIL" starttime="20230529 04:32:59.252" endtime="20230529 04:32:59.300"/>
 </kw>
 <kw name="Wait For Status">
 <arg>PreviewLoaded</arg>
-<status status="NOT RUN" starttime="20230529 03:59:20.113" endtime="20230529 03:59:20.113"/>
+<status status="NOT RUN" starttime="20230529 04:32:59.300" endtime="20230529 04:32:59.300"/>
 </kw>
 <kw name="Click Button">
 <arg>NewSection</arg>
-<status status="NOT RUN" starttime="20230529 03:59:20.113" endtime="20230529 03:59:20.114"/>
+<status status="NOT RUN" starttime="20230529 04:32:59.300" endtime="20230529 04:32:59.300"/>
 </kw>
 <kw name="Close GUI">
-<status status="NOT RUN" starttime="20230529 03:59:20.114" endtime="20230529 03:59:20.114"/>
+<status status="NOT RUN" starttime="20230529 04:32:59.300" endtime="20230529 04:32:59.300"/>
 </kw>
 <tag>Issue #149</tag>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="FAIL" starttime="20230529 03:59:20.072" endtime="20230529 03:59:20.114">TypeError: '&lt;' not supported between instances of 'str' and 'int'</status>
+<status status="FAIL" starttime="20230529 04:32:59.252" endtime="20230529 04:32:59.301">TypeError: '&lt;' not supported between instances of 'str' and 'int'</status>
 </test>
 <test id="s1-s2-t5" name="Intentional Fail" line="53">
 <kw name="Fail" library="BuiltIn">
 <doc>Fails the test with the given message and optionally alters its tags.</doc>
-<msg timestamp="20230529 03:59:20.116" level="FAIL">AssertionError</msg>
-<status status="FAIL" starttime="20230529 03:59:20.115" endtime="20230529 03:59:20.116"/>
+<msg timestamp="20230529 04:32:59.303" level="FAIL">AssertionError</msg>
+<status status="FAIL" starttime="20230529 04:32:59.302" endtime="20230529 04:32:59.303"/>
 </kw>
 <doc>Uncomment this test if you want to trigger updating Screenshots in the git repo
 Ensure this is commented out before release or pull request</doc>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="FAIL" starttime="20230529 03:59:20.114" endtime="20230529 03:59:20.116">AssertionError</status>
+<status status="FAIL" starttime="20230529 04:32:59.301" endtime="20230529 04:32:59.303">AssertionError</status>
 </test>
-<status status="FAIL" starttime="20230529 03:59:09.669" endtime="20230529 03:59:20.117"/>
+<status status="FAIL" starttime="20230529 04:32:48.837" endtime="20230529 04:32:59.421"/>
 </suite>
-<status status="FAIL" starttime="20230529 03:58:37.140" endtime="20230529 03:59:20.118"/>
+<status status="FAIL" starttime="20230529 04:32:17.262" endtime="20230529 04:32:59.424"/>
 </suite>
 <statistics>
 <total>
