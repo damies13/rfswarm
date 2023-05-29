@@ -2,6 +2,7 @@
 Library 	OperatingSystem
 Library 	Process
 Library 	String
+Library 	Collections
 
 Library 	ImageHorizonLibrary 	reference_folder=${IMAGE_DIR}
 Library 	OCRLibrary
@@ -90,8 +91,8 @@ Click Text
 	${processed_img}= 	Read Image 	${img}
 	${bounds}= 	Locate Text Bounds 	${processed_img} 	${mytext}
 	Log 	${bounds}
-	${x}= 	Evaluate 	${bounds}[0]+(${bounds}[2]/2)
-	${y}= 	Evaluate 	${bounds}[1]+(${bounds}[3]/2)
+	${x}= 	Evaluate 	${bounds}[0]+int(${bounds}[2]/2)
+	${y}= 	Evaluate 	${bounds}[1]+int(${bounds}[3]/2)
 	Log 	${x} 	${y}
 	Move To 	${x} 	${y}
 	Click
@@ -99,7 +100,8 @@ Click Text
 Get Last Screenshot
 	Log 	${OUTPUT FILE}
 	${path} 	${file}= 	Split Path 	${OUTPUT FILE}
-	@{files} = 	List Files In Directory 	${path} 	*.png 	absolute
+	@{files}= 	List Files In Directory 	${path} 	*.png 	absolute
+	@{files}= 	Sort List 	@{files}
 	RETURN 	${files}[-1]
 
 Click Button
