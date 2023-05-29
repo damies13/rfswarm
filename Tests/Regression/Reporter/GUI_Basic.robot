@@ -4,6 +4,7 @@ Library 	Process
 Library 	String
 
 Library 	ImageHorizonLibrary 	reference_folder=${IMAGE_DIR}
+Library 	OCRLibrary
 
 *** Variables ***
 ${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
@@ -44,8 +45,8 @@ New Data Table Section
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #149
 	Open GUI
 	Wait For Status 	PreviewLoaded
-
-	Click Button 			NewSection
+	Click Section			Report
+	# Click Button 			NewSection
 
 	Close GUI
 
@@ -71,15 +72,27 @@ Click Tab
 
 Click Section
 	[Arguments]		${sectname}
-	${sectnamel}= 	Convert To Lower Case 	${sectname}
-	${img}=	Set Variable		reporter_${platform}_button_${sectnamel}.png
-	Log		${CURDIR}
-	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=300
-	@{coordinates}= 	Locate		${img}
-	Click Image		${img}
-	Sleep 	0.1
-	Take A Screenshot
+	# ${sectnamel}= 	Convert To Lower Case 	${sectname}
+	# ${img}=	Set Variable		reporter_${platform}_button_${sectnamel}.png
+	# Log		${CURDIR}
+	# Log		${IMAGE_DIR}
+	# Wait For 	${img} 	 timeout=300
+	# @{coordinates}= 	Locate		${img}
+	# Click Image		${img}
+	# Sleep 	0.1
+	Click Text 	${sectname}
+
+Click Text
+	[Arguments]		${mytext}
+	${img}=		Take A Screenshot
+	Log 	${img}
+	${bounds}= 	Locate Text Bounds 	${img} 	${mytext}
+	Log 	${bounds}
+	${x}= 	Evaluate 	${bounds}[0]+(${bounds}[2]/2)
+	${y}= 	Evaluate 	${bounds}[1]+(${bounds}[3]/2)
+	Log 	${x} 	${y}
+	Move To 	${x} 	${y}
+	Click
 
 Click Button
 	[Arguments]		${bttnname}
