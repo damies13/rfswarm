@@ -46,8 +46,14 @@ New Data Table Section
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #149
 	Open GUI
 	Wait For Status 	PreviewLoaded
-	Click Section			Report
-	# Click Button 			NewSection
+	# Click Section			Report
+	Click Section			toc
+	Click Section			toc 	0 	-20
+	# Click To The Below Of Image 	reporter_${platform}_button_removesection.png 	20
+
+	Take A Screenshot
+
+	Click Button 			AddSection
 
 	Close GUI
 
@@ -84,15 +90,15 @@ Click Section
 	Click Text 	${sectname}
 
 Click Text
-	[Arguments]		${mytext}
+	[Arguments]		${mytext} 	${offsetx}=0 	${offsety}=0
 	Take A Screenshot
 	${img}=		Get Last Screenshot
 	Log 	${img}
 	${processed_img}= 	Read Image 	${img}
 	${bounds}= 	Locate Text Bounds 	${processed_img} 	${mytext}
 	Log 	${bounds}
-	${x}= 	Evaluate 	${bounds}[0]+int(${bounds}[2]/2)
-	${y}= 	Evaluate 	${bounds}[1]+int(${bounds}[3]/2)
+	${x}= 	Evaluate 	${bounds}[0]+int(${bounds}[2]/2)+${offsetx}
+	${y}= 	Evaluate 	${bounds}[1]+int(${bounds}[3]/2)+${offsety}
 	@{coordinates}= 	Create List 	${x} 	${y}
 	Move To 	${coordinates}
 	Click
