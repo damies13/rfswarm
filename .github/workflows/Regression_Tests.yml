@@ -138,19 +138,19 @@ jobs:
           xauth list
           # fluxbox
           fluxbox &
-
+        #
       - name: "MacOS Install tesseract"
         if: ${{ matrix.platform == 'macos-latest' }}
         run: |
           brew install tesseract
-          # brew update
-          # brew upgrade
-
+        # brew update
+        # brew upgrade
+        #
       - name: "Windows Download Tesseract"
         if: ${{ matrix.platform == 'windows-latest' }}
         run: Invoke-WebRequest -Uri "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.3.1.20230401.exe" -OutFile "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe"
         shell: powershell
-
+        #
       - name: "Windows Install Tesseract"
         if: ${{ matrix.platform == 'windows-latest' }}
         run:  "%Temp%\tesseract-ocr-w64-setup-5.3.1.20230401.exe" /S
@@ -158,11 +158,11 @@ jobs:
         # run:  Start-Process -NoNewWindow -FilePath "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe" -ArgumentList "/s"
         # run:  Start-Process -FilePath "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe" -ArgumentList "/S"
         # shell: powershell
-
+        #
       - name: "Verify tesseract"
         if: ${{ matrix.platform != 'windows-latest' }}
         run: tesseract -v
-
+        #
       - name: "Verify tesseract"
         if: ${{ matrix.platform == 'windows-latest' }}
         run: |
@@ -175,7 +175,7 @@ jobs:
           dir "%programfiles(x86)%\Tesseract-OCR"
           tesseract -v
         shell: cmd
-
+        #
       - run: pip install -r Tests/Regression/Reporter/pip_requirements.txt
       - name: setup git config
         run: |
