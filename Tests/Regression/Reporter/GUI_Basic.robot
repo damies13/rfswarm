@@ -46,20 +46,22 @@ New Data Table Section
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #149
 	Open GUI
 	Wait For Status 	PreviewLoaded
-	# Click Section			Report
-	# Click Section			toc
+	Click Section			toc
 	# This should click Report
+	Click Section			Report
 	# Click Text			toc 	0 	-20
-	Click To The Below Of Image 	reporter_${platform}_button_removesection.png 	20
+	# Click To The Below Of Image 	reporter_${platform}_button_removesection.png 	20
 
 	Take A Screenshot
 
 	Click Button 			AddSection
 
 	Click To The Below Of Image 	reporter_${platform}_label_sectionname.png 	20
-	Type 	Issue #147
+	Type 	Issue #149
 	Click Button 			OK
-	Click Section			Issue #147
+	Take A Screenshot
+	Click Section			Issue#149
+	Take A Screenshot
 
 	Close GUI
 
@@ -85,15 +87,15 @@ Click Tab
 
 Click Section
 	[Arguments]		${sectname}
-	# ${sectnamel}= 	Convert To Lower Case 	${sectname}
-	# ${img}=	Set Variable		reporter_${platform}_button_${sectnamel}.png
-	# Log		${CURDIR}
-	# Log		${IMAGE_DIR}
-	# Wait For 	${img} 	 timeout=300
-	# @{coordinates}= 	Locate		${img}
-	# Click Image		${img}
-	# Sleep 	0.1
-	Click Text 	${sectname}
+	${sectnamel}= 	Convert To Lower Case 	${sectname}
+	${img}=	Set Variable		reporter_${platform}_section_${sectnamel}.png
+	Log		${CURDIR}
+ 	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	0.1
+	Take A Screenshot
 
 Click Text
 	[Arguments]		${mytext} 	${offsetx}=0 	${offsety}=0
