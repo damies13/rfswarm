@@ -46,7 +46,7 @@ New Data Table Section
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #149
 	Open GUI
 	Wait For Status 	PreviewLoaded
-	Click Section			toc
+	# Click Section			toc
 	# This should click Report
 	Click Section			Report
 	# Click Text			toc 	0 	-20
