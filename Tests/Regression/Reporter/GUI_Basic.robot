@@ -103,7 +103,7 @@ Click Section
 Select Field With Label
 	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
 	${labell}= 	Convert To Lower Case 	${label}
-	${img}=	Set Variable		reporter_${platform}_section_${labell}.png
+	${img}=	Set Variable		reporter_${platform}_label_${labell}.png
 	Log		${CURDIR}
  	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=300
