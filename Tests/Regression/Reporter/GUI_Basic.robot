@@ -61,6 +61,9 @@ New Data Table Section
 	Click Button 			OK
 	Take A Screenshot
 	Click Section			Issue#149
+
+	Select Field With Label 	Type
+
 	Take A Screenshot
 
 	Close GUI
@@ -96,6 +99,25 @@ Click Section
 	Click Image		${img}
 	Sleep 	0.1
 	Take A Screenshot
+
+Select Field With Label
+	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
+	${labell}= 	Convert To Lower Case 	${label}
+	${img}=	Set Variable		reporter_${platform}_section_${labell}.png
+	Log		${CURDIR}
+ 	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+
+	${x}= 	Evaluate 	${coordinates}[0]+${offsetx}
+	${y}= 	Evaluate 	${coordinates}[1]+${offsety}
+	@{coordinates}= 	Create List 	${x} 	${y}
+	Move To 	${coordinates}
+	Click
+
+	Sleep 	0.1
+	Take A Screenshot
+
 
 Click Text
 	[Arguments]		${mytext} 	${offsetx}=0 	${offsety}=0
