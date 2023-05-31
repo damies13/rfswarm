@@ -215,7 +215,8 @@ Open GUI ubuntu
 	[Arguments]		@{appargs}
 	Set Suite Variable    ${platform}    ubuntu
 	Set Confidence		0.9
-	Start Process 	python3 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	${process}= 	Start Process 	python3 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	Set Suite Variable 	$process 	${process}
 	# Sleep 	60
 	# Capture Screen
 	Set Screenshot Folder 	${OUTPUT DIR}
@@ -225,7 +226,8 @@ Open GUI macos
 	[Arguments]		@{appargs}
 	Set Suite Variable    ${platform}    macos
 	Set Confidence		0.9
-	Start Process 	python3 	${pyfile} 	-g 	5 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	${process}= 	Start Process 	python3 	${pyfile} 	-g 	5 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	Set Suite Variable 	$process 	${process}
 	# Sleep 	60
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
@@ -233,14 +235,17 @@ Open GUI macos
 
 Close GUI
 	${keyword}= 	Set Variable 	Close GUI ${platform}
-	${running}= 	Is Process Running 	${process}
-	IF 	${running}
-		Run Keyword 	${keyword}
-	ELSE
-		# ${result}= 	Get Process Result 	${process}
-		${result}= 	Wait For Process 	${process} 	timeout=60
-		Check Result 	${result}
+	IF 	${process}
+		${running}= 	Is Process Running 	${process}
+		IF 	${running}
+			Run Keyword 	${keyword}
+		ELSE
+			# ${result}= 	Get Process Result 	${process}
+			${result}= 	Wait For Process 	${process} 	timeout=60
+			Check Result 	${result}
+		END
 	END
+	Set Suite Variable 	$process 	None
 	Sleep 	0.5
 
 Check Result
