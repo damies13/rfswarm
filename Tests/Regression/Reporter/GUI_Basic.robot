@@ -13,6 +13,7 @@ Test Teardown 	Close GUI
 ${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
 ${pyfile}			${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
 ${process}		None
+${sssleep}		0.5
 
 *** Test Cases ***
 GUI Runs and Closes
@@ -90,7 +91,7 @@ Click Tab
 	Wait For 	${img} 	 timeout=300
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Sleep 	0.1
+	Sleep 	${sssleep}
 	Take A Screenshot
 
 Click Section
@@ -102,7 +103,7 @@ Click Section
 	Wait For 	${img} 	 timeout=300
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Sleep 	0.1
+	Sleep 	${sssleep}
 	Take A Screenshot
 
 Select Option
@@ -114,7 +115,7 @@ Select Option
 	Wait For 	${img} 	 timeout=300
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Sleep 	0.1
+	Sleep 	${sssleep}
 	Take A Screenshot
 
 Select Field With Label
@@ -132,7 +133,7 @@ Select Field With Label
 	Move To 	${coordinates}
 	Click
 
-	Sleep 	0.1
+	Sleep 	${sssleep}
 	Take A Screenshot
 
 
@@ -182,7 +183,7 @@ Click Button
 	Wait For 	${img} 	 timeout=300
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Sleep 	0.1
+	Sleep 	${sssleep}
 	Take A Screenshot
 
 Wait For Status
@@ -194,7 +195,7 @@ Wait For Status
 	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Sleep 	0.1
+	Sleep 	${sssleep}
 	Take A Screenshot
 
 Open GUI
