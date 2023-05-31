@@ -7,6 +7,8 @@ Library 	Collections
 Library 	ImageHorizonLibrary 	reference_folder=${IMAGE_DIR}
 Library 	OCRLibrary
 
+Test Teardown 	Close GUI
+
 *** Variables ***
 ${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
 ${pyfile}			${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
@@ -17,14 +19,14 @@ GUI Runs and Closes
 	[Tags]	macos-latest		windows-latest		ubuntu-latest
 	Open GUI
 	Wait For Status 	PreviewLoaded
-	Close GUI
+	# Close GUI
 
 Select Preview Tab
 	[Tags]	ubuntu-latest		windows-latest		macos-latest
 	Open GUI
 	Wait For Status 	PreviewLoaded
 	Click Tab 	 Preview
-	Close GUI
+	# Close GUI
 
 First Run
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #147
@@ -40,7 +42,7 @@ First Run
 	Open GUI	-i 	blank_${epoch}.ini 	-d 	${resultfolder}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
-	Close GUI
+	# Close GUI
 
 New Data Table Section
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #149
@@ -66,7 +68,7 @@ New Data Table Section
 
 	Take A Screenshot
 
-	Close GUI
+	# Close GUI
 
 
 Intentional Fail
