@@ -69,8 +69,15 @@ New Data Table Section
 
 	Select Option 	DataTable
 
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
+
+	# data table screen didn't load try to click Generate HTML
+
+	Click Button 	GenerateHTML
+
 	Sleep 	10
 	Take A Screenshot
+
 
 	# Close GUI
 
