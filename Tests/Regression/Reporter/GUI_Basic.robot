@@ -68,6 +68,7 @@ New Data Table Section
 
 	Select Option 	DataTable
 
+	Sleep 	10
 	Take A Screenshot
 
 	# Close GUI
