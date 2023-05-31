@@ -66,6 +66,8 @@ New Data Table Section
 
 	Select Field With Label 	Type
 
+	Select Option 	DataTable
+
 	Take A Screenshot
 
 	# Close GUI
@@ -94,6 +96,18 @@ Click Section
 	[Arguments]		${sectname}
 	${sectnamel}= 	Convert To Lower Case 	${sectname}
 	${img}=	Set Variable		reporter_${platform}_section_${sectnamel}.png
+	Log		${CURDIR}
+ 	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	0.1
+	Take A Screenshot
+
+Select Option
+	[Arguments]		${optname}
+	${optnamel}= 	Convert To Lower Case 	${optname}
+	${img}=	Set Variable		reporter_${platform}_option_${optnamel}.png
 	Log		${CURDIR}
  	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=300
