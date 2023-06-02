@@ -357,7 +357,7 @@ End Process If Still Running
 Get Image Size
 	[Arguments] 	${imgfile}
 	# ahrrrg windows paths, PIL.Image.open doesn't like them, need to escape / replace \\
-	${imgfile}= 	Evaluate    "${imgfile}".replace('\' '/')
+	${imgfile}= 	Evaluate    "${imgfile}".replace('\\' '/')
 	${img}= 	Evaluate    PIL.Image.open("${imgfile}") 	PIL.Image
 	${imgsize}= 	Set Variable    ${img.size}
 	# Evaluate    ${img.close()}
