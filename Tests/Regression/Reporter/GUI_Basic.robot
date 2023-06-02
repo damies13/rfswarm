@@ -160,7 +160,7 @@ Find Text
 	IF 	${bounds}
 		RETURN 	${bounds}
 	ELSE
-		Fail
+		Fail		${mytext} Not Found
 	END
 
 Click Text
