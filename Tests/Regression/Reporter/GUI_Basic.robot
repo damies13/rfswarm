@@ -71,6 +71,12 @@ New Data Table Section
 
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 
+	Find Text 	Data Type:
+
+	Find Text 	Filter Type:
+
+	Find Text 	Result Name
+
 	# data table screen didn't load try to click Generate HTML
 
 	Click Button 	GenerateHTML
@@ -143,15 +149,23 @@ Select Field With Label
 	Sleep 	${sssleep}
 	Take A Screenshot
 
-
-Click Text
-	[Arguments]		${mytext} 	${offsetx}=0 	${offsety}=0
+Find Text
+	[Arguments]		${mytext}
 	Take A Screenshot
 	${img}=		Get Last Screenshot
 	Log 	${img}
 	${processed_img}= 	Read Image 	${img}
 	${bounds}= 	Locate Text Bounds 	${processed_img} 	${mytext}
 	Log 	${bounds}
+	IF 	${bounds}
+		RETURN 	${bounds}
+	ELSE
+		Fail
+	END
+
+Click Text
+	[Arguments]		${mytext} 	${offsetx}=0 	${offsety}=0
+	${bounds}= 	Find Text		${mytext}
 	${x}= 	Evaluate 	${bounds}[0]+int(${bounds}[2]/2)+${offsetx}
 	${y}= 	Evaluate 	${bounds}[1]+int(${bounds}[3]/2)+${offsety}
 	@{coordinates}= 	Create List 	${x} 	${y}
