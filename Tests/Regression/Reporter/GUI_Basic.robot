@@ -71,7 +71,11 @@ New Data Table Section
 
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 
-	Find Text 	Data Type:
+	Select Field With Label 	ShowGraphColours 	60
+
+	Select Field With Label 	DataType 	60
+
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 
 	Find Text 	Filter Type:
 
@@ -79,7 +83,7 @@ New Data Table Section
 
 	# data table screen didn't load try to click Generate HTML
 
-	Click Button 	GenerateHTML
+	# Click Button 	GenerateHTML
 
 	Sleep 	10
 	Take A Screenshot
