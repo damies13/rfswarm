@@ -139,8 +139,25 @@ Select Field With Label
 	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
 	${labell}= 	Convert To Lower Case 	${label}
 	${img}=	Set Variable		reporter_${platform}_label_${labell}.png
-	${imgsize}= 	Get Image Size 	${img}
+	${imgsize}= 	Get Image Size 	${IMAGE_DIR}${/}${img}
 	Log		${imgsize}
+
+	# FOR    ${index}    IN RANGE    5    26    5
+	# 	${offsetx}= 	Evaluate 	int(${imgsize}[0]/2)+${index}
+	# 	Log		${offsetx}
+	# 	Log		${CURDIR}
+	#  	Log		${IMAGE_DIR}
+	# 	Wait For 	${img} 	 timeout=300
+	# 	@{coordinates}= 	Locate		${img}
+	# 	${x}= 	Evaluate 	${coordinates}[0]+${offsetx}
+	# 	${y}= 	Evaluate 	${coordinates}[1]+${offsety}
+	# 	@{coordinates}= 	Create List 	${x} 	${y}
+	# 	Move To 	${coordinates}
+	# 	Click
+	# 	Sleep 	${sssleep}
+	# 	Take A Screenshot
+	# END
+
 	${offsetx}= 	Evaluate 	int(${imgsize}[0]/2)+10
 	Log		${offsetx}
 	Log		${CURDIR}
@@ -152,7 +169,6 @@ Select Field With Label
 	@{coordinates}= 	Create List 	${x} 	${y}
 	Move To 	${coordinates}
 	Click
-
 	Sleep 	${sssleep}
 	Take A Screenshot
 
