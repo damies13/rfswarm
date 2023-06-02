@@ -141,7 +141,8 @@ Select Field With Label
 	${img}=	Set Variable		reporter_${platform}_label_${labell}.png
 	${imgsize}= 	Get Image Size 	${img}
 	Log		${imgsize}
-	${offsetx}= 	Evaluate 	int(${imgsize}[0]/2)+15
+	${offsetx}= 	Evaluate 	int(${imgsize}[0]/2)+10
+	Log		${offsetx}
 	Log		${CURDIR}
  	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=300
