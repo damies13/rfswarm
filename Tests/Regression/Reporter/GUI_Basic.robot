@@ -222,8 +222,6 @@ Wait For Status
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=${timeout}
-	@{coordinates}= 	Locate		${img}
-	Click Image		${img}
 	Sleep 	${sssleep}
 	Take A Screenshot
 
