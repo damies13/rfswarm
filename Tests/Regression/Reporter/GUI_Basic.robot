@@ -75,6 +75,8 @@ New Data Table Section
 
 	Select Field With Label 	DataType
 
+	Select Option 	Result
+
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 
 	Find Text 	Filter Type:
@@ -158,7 +160,7 @@ Select Field With Label
 	# 	Take A Screenshot
 	# END
 
-	${offsetx}= 	Evaluate 	int(${imgsize}[0]/2)+10
+	${offsetx}= 	Evaluate 	int(${imgsize}[0]/2)+5
 	Log		${offsetx}
 	Log		${CURDIR}
  	Log		${IMAGE_DIR}
