@@ -77,6 +77,10 @@ New Data Table Section
 
 	Select Option 	Result
 
+	Select Field With Label 	ResultType
+
+	Select Option 	ResponseTime
+
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 
 	Find Text 	Filter Type:
@@ -143,7 +147,6 @@ Select Field With Label
 	${img}=	Set Variable		reporter_${platform}_label_${labell}.png
 	${imgsize}= 	Get Image Size 	${IMAGE_DIR}${/}${img}
 	Log		${imgsize}
-
 	${offsetx}= 	Evaluate 	int(${imgsize}[0]/2)+5
 	Log		${offsetx}
 	Log		${CURDIR}
