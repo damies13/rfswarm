@@ -71,9 +71,9 @@ New Data Table Section
 
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 
-	Select Field With Label 	ShowGraphColours 	60
+	Select Field With Label 	ShowGraphColours
 
-	Select Field With Label 	DataType 	60
+	Select Field With Label 	DataType
 
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 
@@ -139,11 +139,13 @@ Select Field With Label
 	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
 	${labell}= 	Convert To Lower Case 	${label}
 	${img}=	Set Variable		reporter_${platform}_label_${labell}.png
+	${imgsize}= 	Get Image Size 	${img}
+	Log		${imgsize}
+	${offsetx}= 	Evaluate 	int(${imgsize}[0]/2)+5
 	Log		${CURDIR}
  	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=300
 	@{coordinates}= 	Locate		${img}
-
 	${x}= 	Evaluate 	${coordinates}[0]+${offsetx}
 	${y}= 	Evaluate 	${coordinates}[1]+${offsety}
 	@{coordinates}= 	Create List 	${x} 	${y}
@@ -332,3 +334,10 @@ End Process If Still Running
 		Check Result 	${result}
 		Fail 	Had to Terminate Process
 	END
+
+Get Image Size
+	[Arguments] 	${imgfile}
+	${img}= 	Evaluate    PIL.Image.open("${imgfile}") 	PIL.Image
+	${imgsize}= 	Set Variable    ${img.size}
+	# Evaluate    ${img.close()}
+	RETURN 	${imgsize}
