@@ -83,10 +83,6 @@ New Data Table Section
 
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 
-	Find Text 	Filter Type:
-
-	Find Text 	Result Name
-
 	# data table screen didn't load try to click Generate HTML
 
 	# Click Button 	GenerateHTML
