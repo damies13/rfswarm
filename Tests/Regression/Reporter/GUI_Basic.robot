@@ -85,7 +85,10 @@ New Data Table Section
 
 	# data table screen didn't load try to click Generate HTML
 
-	# Click Button 	GenerateHTML
+	Click Button 	GenerateHTML
+
+	Sleep 	0.1
+	Take A Screenshot
 
 	Sleep 	10
 	Take A Screenshot
@@ -94,11 +97,11 @@ New Data Table Section
 	# Close GUI
 
 
-# Intentional Fail
-# 	[Tags]	ubuntu-latest		windows-latest		macos-latest
-# 	[Documentation]		Uncomment this test if you want to trigger updating Screenshots in the git repo
-# 	...								Ensure this is commented out before release or pull request
-# 	Fail
+Intentional Fail
+	[Tags]	ubuntu-latest		windows-latest		macos-latest
+	[Documentation]		Uncomment this test if you want to trigger updating Screenshots in the git repo
+	...								Ensure this is commented out before release or pull request
+	Fail
 
 *** Keywords ***
 Click Tab
