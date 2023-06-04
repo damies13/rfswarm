@@ -943,6 +943,9 @@ class ReporterBase():
 			colname = "Name"
 
 			sql = "SELECT "
+
+			base.debugmsg(8, "RType:", RType, "sql:", sql)
+
 			if RType == "Response Time":
 				sql += "end_time as 'Time' "
 				sql += ", elapsed_time as 'Value' "
@@ -993,7 +996,9 @@ class ReporterBase():
 				if EnFA and FAType in [None, "", "None"]:
 					sql += " || ' - ' || agent"
 				sql += " as [" + colname + "] "
-			if RType is None:
+
+			if RType in [None, "", "None"]:
+				base.debugmsg(8, "RType:", RType, "sql:", sql)
 				sql += "end_time as 'Time'"
 				sql += ", count(result) as 'Value' "
 				# sql += ", result_name as 'Name' "
@@ -1003,6 +1008,8 @@ class ReporterBase():
 				if EnFA and FAType in [None, "", "None"]:
 					sql += " || ' - ' || agent"
 				sql += " as [" + colname + "] "
+
+			base.debugmsg(8, "RType:", RType, "sql:", sql)
 
 			sql += "FROM Results "
 
@@ -1051,7 +1058,7 @@ class ReporterBase():
 					sql += "AND {} ".format(iwhere)
 				i += 1
 
-			if RType is not None:
+			if RType not in [None, "", "None"]:
 				# sql += "GROUP by "
 				# sql += 		", result "
 				pass
@@ -1091,7 +1098,7 @@ class ReporterBase():
 			# grouplst = ["PrimaryMetric", "MetricType", "SecondaryMetric"]
 			grouplst = []
 
-			if MType is not None and len(MType) > 0:
+			if MType not in [None, "", "None"] and len(MType) > 0:
 				# if "MetricType as 'Name'" in mcolumns:
 				# 	mcolumns.remove("MetricType as 'Name'")
 				wherelst.append("MetricType == '{}'".format(MType.replace("'", "''")))
@@ -1099,7 +1106,7 @@ class ReporterBase():
 					grouplst.remove("MetricType")
 			else:
 				mnamecolumns.append("MetricType")
-			if PM is not None and len(PM) > 0:
+			if PM not in [None, "", "None"] and len(PM) > 0:
 				# if "PrimaryMetric as 'Name'" in mcolumns:
 				# 	mcolumns.remove("PrimaryMetric as 'Name'")
 				wherelst.append("PrimaryMetric == '{}'".format(PM.replace("'", "''")))
@@ -1107,7 +1114,7 @@ class ReporterBase():
 					grouplst.remove("PrimaryMetric")
 			else:
 				mnamecolumns.append("PrimaryMetric")
-			if SM is not None and len(SM) > 0:
+			if SM not in [None, "", "None"] and len(SM) > 0:
 				# if "SecondaryMetric as 'Name'" in mcolumns:
 				# 	mcolumns.remove("SecondaryMetric as 'Name'")
 				wherelst.append("SecondaryMetric == '{}'".format(SM.replace("'", "''")))
@@ -1121,6 +1128,9 @@ class ReporterBase():
 					mnamecolumns.append("DataSource")
 				else:
 					wherelst.append("DataSource == '{}'".format(FAType))
+
+			if len(mnamecolumns) < 1:
+				mnamecolumns.append("'" + SM + "'")
 
 			# Construct Name Column
 			mnamecolumn = " || ' - ' || ".join(mnamecolumns)
@@ -1303,7 +1313,7 @@ class ReporterBase():
 					sql += " || ' - ' || agent"
 				sql += " as [" + colname + "] "
 				sql += ", count(result)  as 'Count' "
-			if RType is None:
+			if RType in [None, "", "None"]:
 				sql = ""
 				return sql
 
@@ -1355,7 +1365,7 @@ class ReporterBase():
 					sql += "AND {} ".format(iwhere)
 				i += 1
 
-			if RType is not None:
+			if RType not in [None, "", "None"]:
 				sql += "GROUP by "
 
 			if RType == "Response Time":
@@ -1394,24 +1404,30 @@ class ReporterBase():
 				else:
 					wherelst.append("DataSource == '{}'".format(FAType))
 
-			if MType is not None and len(MType) > 0:
+			if MType not in [None, "", "None"] and len(MType) > 0:
 				if "MetricType" in mcolumns:
 					mcolumns.remove("MetricType")
 				wherelst.append("MetricType == '{}'".format(MType))
 				if "MetricType" in grouplst:
 					grouplst.remove("MetricType")
-			if PM is not None and len(PM) > 0:
+			if PM not in [None, "", "None"] and len(PM) > 0:
 				if "PrimaryMetric" in mcolumns:
 					mcolumns.remove("PrimaryMetric")
 				wherelst.append("PrimaryMetric == '{}'".format(PM))
 				if "PrimaryMetric" in grouplst:
 					grouplst.remove("PrimaryMetric")
-			if SM is not None and len(SM) > 0:
+			if SM not in [None, "", "None"] and len(SM) > 0:
 				if "SecondaryMetric" in mcolumns:
 					mcolumns.remove("SecondaryMetric")
 				wherelst.append("SecondaryMetric == '{}'".format(SM))
 				if "SecondaryMetric" in grouplst:
 					grouplst.remove("SecondaryMetric")
+
+
+			if len(mcolumns) < 1:
+				# mcolumns.append("'" + SM + "'")
+				mcolumns.append("SecondaryMetric")
+				grouplst.append("SecondaryMetric")
 
 			if colours:
 				colourcolumn = " || ' - ' || ".join(grouplst)
@@ -5769,8 +5785,8 @@ class ReporterGUI(tk.Frame):
 				time.sleep(0.1)
 				base.rt_table_generate_sql(id)
 
-			if changes > 0:
-				self.cs_datatable_switchdt(id)
+			# if changes > 0:
+			# 	self.cs_datatable_switchdt(id)
 
 		base.debugmsg(5, "changes:", changes)
 		if "tSQL" in self.contentdata[id]:

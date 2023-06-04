@@ -46,7 +46,7 @@ First Run
 	# Close GUI
 
 New Data Table Section
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #149
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #149 	Issue #150
 	Open GUI
 	Wait For Status 	PreviewLoaded
 	# Click Section			toc
@@ -83,13 +83,12 @@ New Data Table Section
 
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 
-	# data table screen didn't load try to click Generate HTML
+	# click Generate HTML as partial regression test for Issue #150
+	Click Button 	GenerateHTML
 
-	# Click Button 	GenerateHTML
+	# Wait For Status 	GeneratingXHTMLReport
 
-	Sleep 	10
-	Take A Screenshot
-
+	Wait For Status 	SavedXHTMLReport
 
 	# Close GUI
 
