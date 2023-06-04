@@ -1,0 +1,15 @@
+Exception in thread Thread-6:
+Traceback (most recent call last):
+  File "/Users/runner/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/threading.py", line 980, in _bootstrap_inner
+    self.run()
+  File "/Users/runner/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/threading.py", line 917, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py", line 5148, in <lambda>
+    cp = threading.Thread(target=lambda: self.content_preview(id))
+  File "/Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py", line 6926, in content_preview
+    self.cp_display_preview(id, 0)
+  File "/Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py", line 7097, in cp_display_preview
+    nextrow = self.cp_display_preview(child, nextrow)
+  File "/Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py", line 7092, in cp_display_preview
+    self.contentdata[id]["Preview"].grid(column=0, row=row, sticky="nsew")
+KeyError: 'Preview'
