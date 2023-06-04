@@ -2,27 +2,32 @@
 Library 	OperatingSystem
 Library 	Process
 Library 	String
+Library 	Collections
 
 Library 	ImageHorizonLibrary 	reference_folder=${IMAGE_DIR}
+Library 	OCRLibrary
+
+Test Teardown 	Close GUI
 
 *** Variables ***
 ${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
 ${pyfile}			${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
 ${process}		None
+${sssleep}		0.5
 
 *** Test Cases ***
 GUI Runs and Closes
 	[Tags]	macos-latest		windows-latest		ubuntu-latest
 	Open GUI
 	Wait For Status 	PreviewLoaded
-	Close GUI
+	# Close GUI
 
 Select Preview Tab
 	[Tags]	ubuntu-latest		windows-latest		macos-latest
 	Open GUI
 	Wait For Status 	PreviewLoaded
 	Click Tab 	 Preview
-	Close GUI
+	# Close GUI
 
 First Run
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #147
@@ -38,7 +43,55 @@ First Run
 	Open GUI	-i 	blank_${epoch}.ini 	-d 	${resultfolder}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
-	Close GUI
+	# Close GUI
+
+New Data Table Section
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #149 	Issue #150
+	Open GUI
+	Wait For Status 	PreviewLoaded
+	# Click Section			toc
+	# This should click Report
+	Click Section			Report
+	# Click Text			toc 	0 	-20
+	# Click To The Below Of Image 	reporter_${platform}_button_removesection.png 	20
+
+	Take A Screenshot
+
+	Click Button 			AddSection
+
+	Click To The Below Of Image 	reporter_${platform}_label_sectionname.png 	20
+	Type 	Issue #149
+	Click Button 			OK
+	Take A Screenshot
+	Click Section			Issue#149
+
+	Select Field With Label 	Type
+
+	Select Option 	DataTable
+
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
+
+	Select Field With Label 	ShowGraphColours
+
+	Select Field With Label 	DataType
+
+	Select Option 	Result
+
+	Select Field With Label 	ResultType
+
+	Select Option 	ResponseTime
+
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
+
+	# click Generate HTML as partial regression test for Issue #150
+	Click Button 	GenerateHTML
+
+	# Wait For Status 	GeneratingXHTMLReport
+
+	Wait For Status 	SavedXHTMLReport
+
+	# Close GUI
+
 
 # Intentional Fail
 # 	[Tags]	ubuntu-latest		windows-latest		macos-latest
@@ -56,7 +109,109 @@ Click Tab
 	Wait For 	${img} 	 timeout=300
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Sleep 	0.1
+	Sleep 	${sssleep}
+	Take A Screenshot
+
+Click Section
+	[Arguments]		${sectname}
+	${sectnamel}= 	Convert To Lower Case 	${sectname}
+	${img}=	Set Variable		reporter_${platform}_section_${sectnamel}.png
+	Log		${CURDIR}
+ 	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	${sssleep}
+	Take A Screenshot
+
+Select Option
+	[Arguments]		${optname}
+	${optnamel}= 	Convert To Lower Case 	${optname}
+	${img}=	Set Variable		reporter_${platform}_option_${optnamel}.png
+	Log		${CURDIR}
+ 	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	${sssleep}
+	Take A Screenshot
+
+Select Field With Label
+	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
+	${labell}= 	Convert To Lower Case 	${label}
+	${img}=	Set Variable		reporter_${platform}_label_${labell}.png
+	${imgsize}= 	Get Image Size 	${IMAGE_DIR}${/}${img}
+	Log		${imgsize}
+	${offsetx}= 	Evaluate 	int(${imgsize}[0]/2)+5
+	Log		${offsetx}
+	Log		${CURDIR}
+ 	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+	${x}= 	Evaluate 	${coordinates}[0]+${offsetx}
+	${y}= 	Evaluate 	${coordinates}[1]+${offsety}
+	@{coordinates}= 	Create List 	${x} 	${y}
+	Move To 	${coordinates}
+	Click
+	Sleep 	${sssleep}
+	Take A Screenshot
+
+Find Text
+	[Arguments]		${mytext}
+	Take A Screenshot
+	${img}=		Get Last Screenshot
+	Log 	${img}
+	${processed_img}= 	Read Image 	${img}
+	${bounds}= 	Locate Text Bounds 	${processed_img} 	${mytext}
+	Log 	${bounds}
+	IF 	${bounds}
+		RETURN 	${bounds}
+	ELSE
+		Fail		${mytext} Not Found
+	END
+
+Click Text
+	[Arguments]		${mytext} 	${offsetx}=0 	${offsety}=0
+	${bounds}= 	Find Text		${mytext}
+	${x}= 	Evaluate 	${bounds}[0]+int(${bounds}[2]/2)+${offsetx}
+	${y}= 	Evaluate 	${bounds}[1]+int(${bounds}[3]/2)+${offsety}
+	@{coordinates}= 	Create List 	${x} 	${y}
+	Move To 	${coordinates}
+	Click
+	Take A Screenshot
+
+Get Last Screenshot
+	Log 	${OUTPUT FILE}
+	${path} 	${file}= 	Split Path 	${OUTPUT FILE}
+	@{files}= 	List Files In Directory 	${path} 	*.png 	absolute
+	Sort List 	${files}
+	${fc}= 	Get Length 	${files}
+	IF 	${fc} > 9
+		${len0}= 	Get Length 	${files}[0]
+		WHILE    True    limit=10
+			${lenlast}= 	Get Length 	${files}[-1]
+			IF 	${lenlast} > ${len0}
+				RETURN 	${files}[-1]
+			ELSE
+				Remove From List 	${files} 	-1
+			END
+		END
+	ELSE
+		RETURN 	${files}[-1]
+	END
+
+
+
+Click Button
+	[Arguments]		${bttnname}
+	${bttnnamel}= 	Convert To Lower Case 	${bttnname}
+	${img}=	Set Variable		reporter_${platform}_button_${bttnnamel}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	${sssleep}
 	Take A Screenshot
 
 Wait For Status
@@ -66,9 +221,7 @@ Wait For Status
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=${timeout}
-	@{coordinates}= 	Locate		${img}
-	Click Image		${img}
-	Sleep 	0.1
+	Sleep 	${sssleep}
 	Take A Screenshot
 
 Open GUI
@@ -104,7 +257,8 @@ Open GUI ubuntu
 	[Arguments]		@{appargs}
 	Set Suite Variable    ${platform}    ubuntu
 	Set Confidence		0.9
-	Start Process 	python3 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	${process}= 	Start Process 	python3 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	Set Suite Variable 	$process 	${process}
 	# Sleep 	60
 	# Capture Screen
 	Set Screenshot Folder 	${OUTPUT DIR}
@@ -114,7 +268,8 @@ Open GUI macos
 	[Arguments]		@{appargs}
 	Set Suite Variable    ${platform}    macos
 	Set Confidence		0.9
-	Start Process 	python3 	${pyfile} 	-g 	5 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	${process}= 	Start Process 	python3 	${pyfile} 	-g 	5 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	Set Suite Variable 	$process 	${process}
 	# Sleep 	60
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
@@ -122,14 +277,17 @@ Open GUI macos
 
 Close GUI
 	${keyword}= 	Set Variable 	Close GUI ${platform}
-	${running}= 	Is Process Running 	${process}
-	IF 	${running}
-		Run Keyword 	${keyword}
-	ELSE
-		# ${result}= 	Get Process Result 	${process}
-		${result}= 	Wait For Process 	${process} 	timeout=60
-		Check Result 	${result}
+	IF 	${process}
+		${running}= 	Is Process Running 	${process}
+		IF 	${running}
+			Run Keyword 	${keyword}
+		ELSE
+			# ${result}= 	Get Process Result 	${process}
+			${result}= 	Wait For Process 	${process} 	timeout=60
+			Check Result 	${result}
+		END
 	END
+	Set Suite Variable 	$process 	None
 	Sleep 	0.5
 
 Check Result
@@ -175,3 +333,12 @@ End Process If Still Running
 		Check Result 	${result}
 		Fail 	Had to Terminate Process
 	END
+
+Get Image Size
+	[Arguments] 	${imgfile}
+	# ahrrrg windows paths, PIL.Image.open doesn't like them, need to escape / replace \\
+	# ${imgfile}= 	Evaluate    "${imgfile}".replace('\\' '/')
+	${img}= 	Evaluate    PIL.Image.open(r'${imgfile}') 	PIL.Image
+	${imgsize}= 	Set Variable    ${img.size}
+	# Evaluate    ${img.close()}
+	RETURN 	${imgsize}
