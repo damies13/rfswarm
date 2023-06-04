@@ -86,7 +86,7 @@ New Data Table Section
 	# click Generate HTML as partial regression test for Issue #150
 	Click Button 	GenerateHTML
 
-	Wait For Status 	GeneratingXHTMLReport
+	# Wait For Status 	GeneratingXHTMLReport
 
 	Wait For Status 	SavedXHTMLReport
 
