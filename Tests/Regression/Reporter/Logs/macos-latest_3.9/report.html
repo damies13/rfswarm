@@ -5,7 +5,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="-1">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta content="Robot Framework 6.0.2 (Python 3.9.16 on darwin)" name="Generator">
+<meta content="Robot Framework 6.1 (Python 3.9.17 on darwin)" name="Generator">
 <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKcAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAAqAAAAAAAAAAAAAAAAAAAALIAAAD/AAAA4AAAANwAAADcAAAA3AAAANwAAADcAAAA3AAAANwAAADcAAAA4AAAAP8AAACxAAAAAAAAAKYAAAD/AAAAuwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC/AAAA/wAAAKkAAAD6AAAAzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN8AAAD/AAAA+gAAAMMAAAAAAAAAAgAAAGsAAABrAAAAawAAAGsAAABrAAAAawAAAGsAAABrAAAADAAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAAIsAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAANEAAAAAAAAA2gAAAP8AAAD6AAAAwwAAAAAAAAAAAAAAMgAAADIAAAAyAAAAMgAAADIAAAAyAAAAMgAAADIAAAAFAAAAAAAAANoAAAD/AAAA+gAAAMMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAADwAAAB8AAAAAAAAAGAAAABcAAAAAAAAAH8AAABKAAAAAAAAAAAAAAAAAAAA2gAAAP8AAAD6AAAAwwAAAAAAAADCAAAA/wAAACkAAADqAAAA4QAAAAAAAAD7AAAA/wAAALAAAAAGAAAAAAAAANoAAAD/AAAA+gAAAMMAAAAAAAAAIwAAAP4AAAD/AAAA/wAAAGAAAAAAAAAAAAAAAMkAAAD/AAAAigAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAAAAAAAAIAAAAcAAAABkAAAAAAAAAAAAAAAAAAAAAAAAAEgAAAAAAAAAAAAAA2gAAAP8AAAD7AAAAywAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN4AAAD/AAAAqwAAAP8AAACvAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALIAAAD/AAAAsgAAAAAAAAC5AAAA/wAAAMoAAADAAAAAwAAAAMAAAADAAAAAwAAAAMAAAADAAAAAwAAAAMkAAAD/AAAAvAAAAAAAAAAAAAAAAAAAAKwAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAArQAAAAAAAAAAwAMAAIABAAAf+AAAP/wAAD/8AAAgBAAAP/wAAD/8AAA//AAAJIwAADHEAAA//AAAP/wAAB/4AACAAQAAwAMAAA==">
 <style media="all" type="text/css">
 /* Generic and misc styles */
@@ -1150,7 +1150,7 @@ window.testdata = function () {
     var LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FAIL', 'SKIP'];
     var STATUSES = ['FAIL', 'PASS', 'SKIP', 'NOT RUN'];
     var KEYWORD_TYPES = ['KEYWORD', 'SETUP', 'TEARDOWN', 'FOR', 'ITERATION', 'IF', 'ELSE IF', 'ELSE', 'RETURN',
-                         'TRY', 'EXCEPT', 'FINALLY', 'WHILE', 'CONTINUE', 'BREAK'];
+                         'TRY', 'EXCEPT', 'FINALLY', 'WHILE', 'CONTINUE', 'BREAK', 'ERROR'];
     function addElement(elem) {
         if (!elem.id)
             elem.id = uniqueId();
@@ -1629,22 +1629,22 @@ storage = function () {
 window.output = {};
 </script>
 <script type="text/javascript">
-window.output["suite"] = [1,2,3,0,[],[0,0,113315],[[4,5,6,0,[],[1,29,35136],[],[[7,0,0,[8,9,10],[1,60,13248],[]],[11,0,0,[8,9,10],[1,13309,1105],[]],[12,0,0,[13,14,8,9,10],[1,14414,6509],[]],[15,0,0,[16,14,8,9,10],[1,20923,8015],[]],[17,0,0,[14,8,9,10,18],[1,28939,6225],[]]],[],[5,5,0,0]],[19,20,21,0,[],[0,35166,78146],[],[[22,0,0,[8,9,10],[1,44953,6792],[]],[23,0,0,[8,9,10],[1,51746,7932],[]],[24,0,0,[25,8,9,10],[1,59679,5597],[]],[26,0,0,[27,28,8,9,10],[0,65276,48035,29],[]]],[],[4,3,1,0]]],[],[],[9,8,1,0]];
+window.output["suite"] = [1,2,3,0,[],[0,0,1500316],[[4,5,6,0,[],[1,27,36952],[],[[7,0,0,[8,9,10],[1,52,15453],[]],[11,0,0,[8,9,10],[1,15506,1714],[]],[12,0,0,[13,14,8,9,10],[1,17220,6088],[]],[15,0,0,[16,14,8,9,10],[1,23308,7202],[]],[17,0,0,[14,8,9,10,18],[1,30511,6467],[]]],[],[5,5,0,0]],[19,20,21,0,[],[0,36980,1463334],[],[[22,0,0,[8,9,10],[0,46329,363522,23],[]],[24,0,0,[8,9,10],[0,409851,363534,23],[]],[25,0,0,[26,8,9,10],[0,773386,363398,23],[]],[27,0,0,[28,29,8,9,10],[0,1136785,363527,23],[]]],[],[4,0,4,0]]],[],[],[9,5,4,0]];
 </script>
 <script type="text/javascript">
 window.output["strings"] = [];
 </script>
 <script type="text/javascript">
-window.output["strings"] = window.output["strings"].concat(["*","*Reporter","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter","*../..","*CommandLine","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/CommandLine.robot","*../../CommandLine.robot","*Reporter Version","*macos-latest","*ubuntu-latest","*windows-latest","*Reporter Help","*Command Line Generate HTML","*HTML","*Issue #144","*Command Line Generate Docx","*DOCX","*Command Line Generate Xlsx","*XLSX","*GUI Basic","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot","*../../GUI_Basic.robot","*GUI Runs and Closes","*Select Preview Tab","*First Run","*Issue #147","*New Data Table Section","*Issue #149","*Issue #150","eNq1lEFv4jAQhe/8ilEOTaiyMXTbtKTKsXvZSw/sqaoiYw/EwtjW2N2Qf78mQQWxam8cImtGz/M++8lZIidpOwNrrjTKapK+7AW6oKwBZSC0hFzCclh+lNVkSVzgiostZDvrAxAKNAEE1xo092FaTQB+xVGQsD8eyTP6MAaJtVGNMlirBRctstc+tNawn8WimJdsX94zrVbMDd3YZKOzMpvC9UkOWhmExdMsP1A1K2uDD8Rdow7DoyWAR70uolk2vSbB/HEgiCNPpk3gtMGQ3Y5VLHwOt8dq2x3qr5g6S1tGax9Fu8u1IXSWQlRdNs6AHub3TwPRjQ7Pmu9Wkt9swvMAJxzUcDrFGGI2wtajthpPIKwJMcbGEf5V2GVKTq9GXC7uyoH4wvR0n8I1UnmneX8GlMPsakiPs8UY6//OA5XBfSDbxdv8ik+0SkfEo/CaoHffgZ6HKXngb0q+vyWvoyJ5LzakZCas/tiZOj6liFrHLwcflNj2dWJ8lE0nv7F/IbJUQXrcm6ZDXFwZD+nnPyD9BwckfK0="]);
+window.output["strings"] = window.output["strings"].concat(["*","*Reporter","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter","*../..","*CommandLine","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/CommandLine.robot","*../../CommandLine.robot","*Reporter Version","*macos-latest","*ubuntu-latest","*windows-latest","*Reporter Help","*Command Line Generate HTML","*HTML","*Issue #144","*Command Line Generate Docx","*DOCX","*Command Line Generate Xlsx","*XLSX","*GUI Basic","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot","*../../GUI_Basic.robot","*GUI Runs and Closes","eNrNk01v2zAMhu/+FVyANTFQWEuar6bIYRjaLZehyNKzoch0IkQWA4qu238/OW2GFEXRXTrsJIkiXj6k9C4qvcGfJDdU++L6weBeLPkZLLFERm8QbJsBHXUXkIPi2ntk1RDvFJeh0Vz9WVcYJKglbhhDiCpxuyeWmL5oNYIqrcO8QtlSofj5Lq+0oZAH0VKHfM94b7FxpAsssr3fdKDRATwJlC0hkIdgGNEnyVcXCAQ1F9R4KHUUL2bJL7xH1u5wriMIkDE1c3uV9FNY/Cf9rmsR8rlxFLCxPrbwTreDFLor1gbX2uygV1EQYDToBYx2DpwOks4SgJtY9K/wn9f8SPYqkO0fO+fgrEeYTCaX52A9nDm5qqioHZ5t5CqWAzDECHM4Nv8tHnvpR4EMhqPRASTPrbeS5weEtQ6YbWp7gvH9bvFxFMPhePCaIqArM6b4enOQXbbavQmwja+HhRA5o80W1e1j/CNeXWSXWX+iHsZD5exa7Q/RGFSys75FOpY7Hchg8hZK3tpI/hHFdPpE8VTzAMHaBoRl7cVWeM1M3OvEuWwhOrT1C/Q+hxQKwuC7ApUWs41q65iiX6R0klONGbzUmGajd0Wm2Tjtxo/qRVsfTozUTZKLFPrwaQ5fkmSYwg9dgBCskCvrtSDcMplo79+Qgs0B","*Select Preview Tab","*First Run","*Issue #147","*New Data Table Section","*Issue #149","*Issue #150"]);
 </script>
 <script type="text/javascript">
-window.output["stats"] = [[{"elapsed":"00:01:43","fail":1,"label":"All Tests","pass":8,"skip":0}],[{"elapsed":"00:00:08","fail":0,"label":"DOCX","pass":1,"skip":0},{"elapsed":"00:00:07","fail":0,"label":"HTML","pass":1,"skip":0},{"elapsed":"00:00:21","fail":0,"label":"Issue #144","pass":3,"skip":0},{"elapsed":"00:00:06","fail":0,"label":"Issue #147","pass":1,"skip":0},{"elapsed":"00:00:48","fail":1,"label":"Issue #149","pass":0,"skip":0},{"elapsed":"00:00:48","fail":1,"label":"Issue #150","pass":0,"skip":0},{"elapsed":"00:01:43","fail":1,"label":"macos-latest","pass":8,"skip":0},{"elapsed":"00:01:43","fail":1,"label":"ubuntu-latest","pass":8,"skip":0},{"elapsed":"00:01:43","fail":1,"label":"windows-latest","pass":8,"skip":0},{"elapsed":"00:00:06","fail":0,"label":"XLSX","pass":1,"skip":0}],[{"elapsed":"00:01:53","fail":1,"id":"s1","label":"Reporter","name":"Reporter","pass":8,"skip":0},{"elapsed":"00:00:35","fail":0,"id":"s1-s1","label":"Reporter.CommandLine","name":"CommandLine","pass":5,"skip":0},{"elapsed":"00:01:18","fail":1,"id":"s1-s2","label":"Reporter.GUI Basic","name":"GUI Basic","pass":3,"skip":0}]];
+window.output["stats"] = [[{"elapsed":"00:24:51","fail":4,"label":"All Tests","pass":5,"skip":0}],[{"elapsed":"00:00:07","fail":0,"label":"DOCX","pass":1,"skip":0},{"elapsed":"00:00:06","fail":0,"label":"HTML","pass":1,"skip":0},{"elapsed":"00:00:20","fail":0,"label":"Issue #144","pass":3,"skip":0},{"elapsed":"00:06:03","fail":1,"label":"Issue #147","pass":0,"skip":0},{"elapsed":"00:06:04","fail":1,"label":"Issue #149","pass":0,"skip":0},{"elapsed":"00:06:04","fail":1,"label":"Issue #150","pass":0,"skip":0},{"elapsed":"00:24:51","fail":4,"label":"macos-latest","pass":5,"skip":0},{"elapsed":"00:24:51","fail":4,"label":"ubuntu-latest","pass":5,"skip":0},{"elapsed":"00:24:51","fail":4,"label":"windows-latest","pass":5,"skip":0},{"elapsed":"00:00:06","fail":0,"label":"XLSX","pass":1,"skip":0}],[{"elapsed":"00:25:00","fail":4,"id":"s1","label":"Reporter","name":"Reporter","pass":5,"skip":0},{"elapsed":"00:00:37","fail":0,"id":"s1-s1","label":"Reporter.CommandLine","name":"CommandLine","pass":5,"skip":0},{"elapsed":"00:24:23","fail":4,"id":"s1-s2","label":"Reporter.GUI Basic","name":"GUI Basic","pass":0,"skip":0}]];
 </script>
 <script type="text/javascript">
-window.output["baseMillis"] = 1685850121728;
+window.output["baseMillis"] = 1688980673547;
 </script>
 <script type="text/javascript">
-window.output["generated"] = 113389;
+window.output["generated"] = 1500376;
 </script>
 <script type="text/javascript">
 window.output["expand_keywords"] = null;
@@ -1894,8 +1894,8 @@ function searchTests(suitePattern, testPattern, includePattern, excludePattern) 
 function scrollToSelector(base, query) {
     $('#test-details-container').css('min-height', $(window).height());
     var anchor = query ? base + '?' + encodeURIComponent(query) : base;
-    window.location.hash = '';
     window.location.hash = window.prevLocationHash = anchor;
+    document.getElementById('test-details-container').scrollIntoView();
 }
 
 function renderSelector(args, template, stats) {
