@@ -1256,33 +1256,54 @@ class RFSwarmBase:
 
 		# ${/}
 		if pathout.find("${/}") > -1:
+			base.debugmsg(8, "Found ${/} in", pathout)
 			if pathout.find("${/}") == 0:
-				pathlst = "${rfpv}" + pathout.split("${/}")
-				pathjoin = os.path.join(*pathlst)
+				pathlst = ["${rfpv}"] + pathout.split("${/}")
 				base.debugmsg(8, "pathlst:", pathlst)
+				pathjoin = os.path.join(*pathlst)
 				base.debugmsg(8, "pathjoin:", pathjoin)
 				pathjoin = pathjoin.replace("${rfpv}", "")
 				base.debugmsg(8, "pathjoin:", pathjoin)
 			else:
-				pathlst = "${rfpv}" + pathout.split("${/}")
-				pathjoin = os.path.join(*pathlst)
+				pathlst = pathout.split("${/}")
 				base.debugmsg(8, "pathlst:", pathlst)
+				pathjoin = os.path.join(*pathlst)
 				base.debugmsg(8, "pathjoin:", pathjoin)
 
 			if os.path.isfile(pathjoin):
+				base.debugmsg(8, "pathjoin:", pathjoin)
 				pathout = pathjoin
-			else:
 				base.debugmsg(8, "pathout:", pathout)
-				# i guess this could be affected too https://stackoverflow.com/questions/1945920/why-doesnt-os-path-join-work-in-this-case
-				if platform.system() == "Windows":
-					pathout = os.path.abspath(os.path.join(*localdir.split(os.path.sep), *pathjoin.split(os.path.sep)))
-				else:
-					pathout = os.path.abspath(os.path.join(os.path.sep, *localdir.split(os.path.sep), *pathjoin.split(os.path.sep)))
+			else:
+				base.debugmsg(8, "pathjoin:", pathjoin)
+				pathout = self.localrespath(localdir, pathjoin)
 				base.debugmsg(8, "pathout:", pathout)
 
 		# ${:}
 		# ${\n}
 		# not sure whether to handle these for now
+		base.debugmsg(8, "pathout:", pathout)
+
+		return pathout
+
+	def localrespath(self, localdir, resfile):
+		base.debugmsg(5, "localdir:", localdir)
+		base.debugmsg(5, "resfile:", resfile)
+		llocaldir = re.findall(r"[^\/\\]+", localdir)
+		lresfile = re.findall(r"[^\/\\]+", resfile)
+
+		base.debugmsg(5, "llocaldir:", llocaldir)
+		base.debugmsg(5, "lresfile:", lresfile)
+
+		# i guess this could be affected too https://stackoverflow.com/questions/1945920/why-doesnt-os-path-join-work-in-this-case
+		if platform.system() == "Windows":
+			joindpath = os.path.join(*llocaldir, *lresfile)
+		else:
+			joindpath = os.path.join(os.path.sep, *llocaldir, *lresfile)
+		base.debugmsg(5, "joindpath:", joindpath)
+
+		pathout = os.path.abspath(joindpath)
+		base.debugmsg(5, "pathout:", pathout)
 
 		return pathout
 
@@ -1354,11 +1375,8 @@ class RFSwarmBase:
 									if resfile.find("${") > -1:
 										localrespath = base.replace_rf_path_variables(resfile, localdir)
 									else:
-										# i guess this could be affected too https://stackoverflow.com/questions/1945920/why-doesnt-os-path-join-work-in-this-case
-										if platform.system() == "Windows":
-											localrespath = os.path.abspath(os.path.join(*localdir.split(os.path.sep), *resfile.split(os.path.sep)))
-										else:
-											localrespath = os.path.abspath(os.path.join(os.path.sep, *localdir.split(os.path.sep), *resfile.split(os.path.sep)))
+										localrespath = self.localrespath(localdir, resfile)
+
 									base.debugmsg(7, "localrespath", localrespath)
 									if os.path.isfile(localrespath):
 										relfile = os.path.relpath(localrespath, start=localdir)
