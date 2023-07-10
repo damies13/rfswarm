@@ -1315,19 +1315,26 @@ class RFSwarmBase:
 		base.debugmsg(8, "scriptfiles[", hash, "]", self.scriptfiles[hash])
 		localpath = self.scriptfiles[hash]['localpath']
 		localdir = os.path.dirname(localpath)
+
+		if 'basedir' in self.scriptfiles[hash]:
+			basedir = self.scriptfiles[hash]['basedir']
+		else:
+			basedir = localdir
+
 		# look for __init__. files - Issue #90
 		initfiles = os.path.abspath(os.path.join(localdir, "__init__.*"))
 		base.debugmsg(7, "initfiles", initfiles)
 		filelst = glob.glob(initfiles)
 		for file in filelst:
 			base.debugmsg(7, "file:", file)
-			relpath = file.replace(localdir, "")[1:]
+			relfile = os.path.relpath(file, start=basedir)
 			base.debugmsg(7, "relpath:", relpath)
 			newhash = self.hash_file(file, relpath)
 			base.debugmsg(7, "newhash:", newhash)
 			if newhash not in self.scriptfiles:
 				self.scriptfiles[newhash] = {
 					'id': newhash,
+					'basedir': basedir,
 					'localpath': file,
 					'relpath': relpath,
 					'type': "Initialization"
@@ -1379,12 +1386,13 @@ class RFSwarmBase:
 
 									base.debugmsg(7, "localrespath", localrespath)
 									if os.path.isfile(localrespath):
-										relfile = os.path.relpath(localrespath, start=localdir)
+										relfile = os.path.relpath(localrespath, start=basedir)
 										base.debugmsg(7, "relfile", relfile)
 										newhash = self.hash_file(localrespath, relfile)
 										base.debugmsg(7, "newhash", newhash)
 										self.scriptfiles[newhash] = {
 											'id': newhash,
+											'basedir': basedir,
 											'localpath': localrespath,
 											'relpath': relfile,
 											'type': linearr[0]
