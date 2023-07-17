@@ -4371,7 +4371,7 @@ class RFSwarmGUI(tk.Frame):
 				base.debugmsg(7, "inpFP:", inpFP)
 
 				sql = "SELECT "
-				sql += "  CAST(end_time as INTEGER) as 'endtime' "
+				sql += "  floor(end_time) as 'endtime' "
 				if RType == "Response Time":
 					sql += ", result_name "
 					sql += ", elapsed_time "
@@ -4418,7 +4418,7 @@ class RFSwarmGUI(tk.Frame):
 						sql += "AND {} ".format(iwhere)
 					i += 1
 
-				sql += "GROUP by CAST(end_time as INTEGER) "
+				sql += "GROUP by floor(end_time) "
 				if RType == "Response Time":
 					sql += ", result_name "
 					sql += ", elapsed_time "
