@@ -60,7 +60,8 @@ jobs:
       # - name: "Windows Installs"
       #   if: ${{ matrix.platform == 'windows-latest' }}
       #   run: |
-      #     Invoke-WebRequest -Uri "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.3.1.20230401.exe" -OutFile "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe"
+      #     Invoke-WebRequest -Uri "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.3.1.20230401.exe"
+      #       -OutFile "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe"
       #     & "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe" /s
       #   shell: powershell
       #
@@ -78,7 +79,10 @@ jobs:
         run: git checkout -B Test-Result-Manager-${{ matrix.platform }}-${{ matrix.python }}
       - name: Robot Framework
         id: robottest
-        run: robot --include ${{ matrix.platform }} --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }} Tests/Regression/Manager
+        run: >
+          robot --include ${{ matrix.platform }}
+          --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          Tests/Regression/Manager
         env:
           DISPLAY: :13.0
       - name: git commit
@@ -149,8 +153,10 @@ jobs:
       - name: "Windows Download Tesseract"
         if: ${{ matrix.platform == 'windows-latest' }}
         shell: pwsh
-        run: |
-          Invoke-WebRequest -Uri "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.3.1.20230401.exe" -OutFile "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe"
+        run: >
+          Invoke-WebRequest
+          -Uri "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.3.1.20230401.exe"
+          -OutFile "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe"
       - name: "Windows Install Tesseract"
         if: ${{ matrix.platform == 'windows-latest' }}
         shell: cmd
@@ -188,7 +194,10 @@ jobs:
         run: git checkout -B Test-Result-Reporter-${{ matrix.platform }}-${{ matrix.python }}
       - name: Robot Framework
         id: robottest
-        run: robot --include ${{ matrix.platform }} --outputdir Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }} Tests/Regression/Reporter
+        run: >
+          robot --include ${{ matrix.platform }}
+          --outputdir Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          Tests/Regression/Reporter
         env:
           DISPLAY: :13.0
       - name: git commit
