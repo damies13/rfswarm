@@ -1068,20 +1068,20 @@ class ReporterBase():
 
 			if RType == "TPS":
 				sql += "GROUP by "
-				sql += 		"floor(end_time) "
-				sql += 		", result_name "
-				sql += 		", result "
+				sql += "floor(end_time) "
+				sql += ", result_name "
+				sql += ", result "
 				sql += "ORDER by "
-				sql +=  	"floor(end_time)"
-				sql +=  	", result DESC"
-				sql +=  	", count(result) DESC "
+				sql += "floor(end_time)"
+				sql += ", result DESC"
+				sql += ", count(result) DESC "
 			if RType == "Total TPS":
 				sql += "GROUP by "
-				sql +=  	"floor(end_time) "
-				sql +=  	", result "
+				sql += "floor(end_time) "
+				sql += ", result "
 				sql += "ORDER by "
-				sql +=  	"floor(end_time)"
-				sql +=  	", count(result) DESC "
+				sql += "floor(end_time)"
+				sql += ", count(result) DESC "
 
 		if DataType == "Metric":
 			MType = self.rt_table_get_mt(id)
@@ -1377,15 +1377,15 @@ class ReporterBase():
 			if RType == "Response Time":
 				sql += "[" + colname + "] "
 			if RType == "TPS":
-				sql +=  	"[" + colname + "] "
-				sql +=  	", result "
+				sql += "[" + colname + "] "
+				sql += ", result "
 				sql += "ORDER BY "
-				sql +=  	"result DESC"
-				sql +=  	", count(result) DESC "
+				sql += "result DESC"
+				sql += ", count(result) DESC "
 			if RType == "Total TPS":
-				sql +=  	" [" + colname + "] "
+				sql += " [" + colname + "] "
 				sql += "ORDER BY "
-				sql +=  	"count([" + colname + "]) DESC "
+				sql += "count([" + colname + "]) DESC "
 
 		if DataType == "Metric":
 			MType = self.rt_table_get_mt(id)
@@ -1431,7 +1431,6 @@ class ReporterBase():
 				wherelst.append("SecondaryMetric == '{}'".format(SM))
 				if "SecondaryMetric" in grouplst:
 					grouplst.remove("SecondaryMetric")
-
 
 			if len(mcolumns) < 1:
 				# mcolumns.append("'" + SM + "'")

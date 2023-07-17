@@ -1328,15 +1328,15 @@ class RFSwarmBase:
 		for file in filelst:
 			base.debugmsg(7, "file:", file)
 			relfile = os.path.relpath(file, start=basedir)
-			base.debugmsg(7, "relpath:", relpath)
-			newhash = self.hash_file(file, relpath)
+			base.debugmsg(7, "relfile:", relfile)
+			newhash = self.hash_file(file, relfile)
 			base.debugmsg(7, "newhash:", newhash)
 			if newhash not in self.scriptfiles:
 				self.scriptfiles[newhash] = {
 					'id': newhash,
 					'basedir': basedir,
 					'localpath': file,
-					'relpath': relpath,
+					'relpath': relfile,
 					'type': "Initialization"
 				}
 				filename, fileext = os.path.splitext(file)
