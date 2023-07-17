@@ -977,7 +977,7 @@ class ReporterBase():
 				# sql += 		"LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' "
 
 			if RType == "TPS":
-				sql += "end_time as 'Time' "
+				sql += "floor(end_time) as 'Time' "
 				sql += ", count(result) as 'Value' "
 				# sql += ", result_name as 'Name' "
 				sql += ", result_name"
@@ -987,7 +987,7 @@ class ReporterBase():
 					sql += " || ' - ' || agent"
 				sql += " as [" + colname + "] "
 			if RType == "Total TPS":
-				sql += "end_time as 'Time'"
+				sql += "floor(end_time) as 'Time'"
 				sql += ", count(result) as 'Value' "
 				# sql += ", result as 'Name' "
 				sql += ", result"
@@ -1068,14 +1068,20 @@ class ReporterBase():
 
 			if RType == "TPS":
 				sql += "GROUP by "
-				sql += "end_time "
-				sql += ", result_name "
-				sql += ", result "
-				sql += "ORDER by end_time, result DESC, count(result) DESC "
+				sql += 		"floor(end_time) "
+				sql += 		", result_name "
+				sql += 		", result "
+				sql += "ORDER by "
+				sql +=  	"floor(end_time)"
+				sql +=  	", result DESC"
+				sql +=  	", count(result) DESC "
 			if RType == "Total TPS":
-				sql += "end_time "
-				sql += ", result "
-				sql += "ORDER by end_time, count(result) DESC "
+				sql += "GROUP by "
+				sql +=  	"floor(end_time) "
+				sql +=  	", result "
+				sql += "ORDER by "
+				sql +=  	"floor(end_time)"
+				sql +=  	", count(result) DESC "
 
 		if DataType == "Metric":
 			MType = self.rt_table_get_mt(id)
@@ -1371,12 +1377,15 @@ class ReporterBase():
 			if RType == "Response Time":
 				sql += "[" + colname + "] "
 			if RType == "TPS":
-				sql += "[" + colname + "] "
-				sql += ", result "
-				sql += "ORDER by result DESC, count(result) DESC "
+				sql +=  	"[" + colname + "] "
+				sql +=  	", result "
+				sql += "ORDER BY "
+				sql +=  	"result DESC"
+				sql +=  	", count(result) DESC "
 			if RType == "Total TPS":
-				sql += " [" + colname + "] "
-				sql += "ORDER by count([" + colname + "]) DESC "
+				sql +=  	" [" + colname + "] "
+				sql += "ORDER BY "
+				sql +=  	"count([" + colname + "]) DESC "
 
 		if DataType == "Metric":
 			MType = self.rt_table_get_mt(id)
