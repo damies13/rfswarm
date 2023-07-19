@@ -782,7 +782,7 @@ class RFSwarmAgent():
 		test = self.jobs[jobid]['Test']
 		self.debugmsg(6, "runthread: test:", test)
 		if platform.system() != 'Windows':
-			test = test.replace("${", "\${")
+			test = test.replace(r'${', r'\${')
 			self.debugmsg(6, "runthread: test:", test)
 
 		if 'localfile' not in self.scriptlist[hash]:
