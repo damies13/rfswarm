@@ -167,7 +167,7 @@ class RFSwarmAgent():
 		t.start()
 
 		self.agentproperties["OS: Platform"] = platform.platform()  # 'Linux-3.3.0-8.fc16.x86_64-x86_64-with-fedora-16-Verne'
-		self.agentproperties["OS: System"] = platform.system()  # 'Windows'
+		self.agentproperties["OS: System"] = platform.system()  # 'Windows'		Returns the system/OS name, such as 'Linux', 'Darwin', 'Java', 'Windows'
 		self.agentproperties["OS: Release"] = platform.release()  # 'XP'
 		self.agentproperties["OS: Version"] = platform.version()  # '5.1.2600'
 
@@ -781,6 +781,9 @@ class RFSwarmAgent():
 		self.debugmsg(6, "runthread: hash:", hash)
 		test = self.jobs[jobid]['Test']
 		self.debugmsg(6, "runthread: test:", test)
+		if platform.system() != 'Windows':
+			test = test.replace("${", "\${")
+			self.debugmsg(6, "runthread: test:", test)
 
 		if 'localfile' not in self.scriptlist[hash]:
 			if self.corethreads["getscripts"].is_alive():
