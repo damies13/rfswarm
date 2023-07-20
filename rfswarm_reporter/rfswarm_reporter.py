@@ -2401,18 +2401,34 @@ class ReporterCore:
 		if 'ResultDir' not in base.config['Reporter']:
 			base.config['Reporter']['ResultDir'] = base.dir_path
 			base.saveini()
+		else:
+			if not os.path.isdir(base.config['Reporter']['ResultDir']):
+				base.config['Reporter']['ResultDir'] = base.dir_path
+				base.saveini()
 
 		if 'Results' not in base.config['Reporter']:
 			base.config['Reporter']['Results'] = ""
 			base.saveini()
+		else:
+			if not os.path.isfile(base.config['Reporter']['Results']):
+				base.config['Reporter']['Results'] = ""
+				base.saveini()
 
 		if 'Template' not in base.config['Reporter']:
 			base.config['Reporter']['Template'] = ""
 			base.saveini()
+		else:
+			if not os.path.isfile(base.config['Reporter']['Template']):
+				base.config['Reporter']['Template'] = ""
+				base.saveini()
 
 		if 'TemplateDir' not in base.config['Reporter']:
 			base.config['Reporter']['TemplateDir'] = ""
 			base.saveini()
+		else:
+			if not os.path.isdir(base.config['Reporter']['TemplateDir']):
+				base.config['Reporter']['TemplateDir'] = ""
+				base.saveini()
 
 		usetemplate = False
 		if base.args.template:
