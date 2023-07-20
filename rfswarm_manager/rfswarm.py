@@ -2177,10 +2177,18 @@ class RFSwarmCore:
 		if 'ScriptDir' not in base.config['Plan']:
 			base.config['Plan']['ScriptDir'] = base.inisafevalue(base.dir_path)
 			base.saveini()
+		else:
+			if not os.path.isdir(base.config['Plan']['ScriptDir']):
+				base.config['Plan']['ScriptDir'] = base.inisafevalue(base.dir_path)
+				base.saveini()
 
 		if 'ScenarioDir' not in base.config['Plan']:
 			base.config['Plan']['ScenarioDir'] = base.inisafevalue(base.dir_path)
 			base.saveini()
+		else:
+			if not os.path.isdir(base.config['Plan']['ScenarioDir']):
+				base.config['Plan']['ScenarioDir'] = base.inisafevalue(base.dir_path)
+				base.saveini()
 
 		if 'ScenarioFile' not in base.config['Plan']:
 			base.config['Plan']['ScenarioFile'] = ""
@@ -2204,6 +2212,10 @@ class RFSwarmCore:
 		if 'ResultsDir' not in base.config['Run']:
 			base.config['Run']['ResultsDir'] = base.inisafevalue(os.path.join(base.dir_path, "results"))
 			base.saveini()
+		else:
+			if not os.path.isdir(base.config['Run']['ResultsDir']):
+				base.config['Run']['ResultsDir'] = base.inisafevalue(base.dir_path)
+				base.saveini()
 
 		if 'display_index' not in base.config['Run']:
 			base.config['Run']['display_index'] = str(False)
