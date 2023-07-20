@@ -323,12 +323,14 @@ class ReporterBase():
 	def report_save(self):
 		saved = False
 		if 'Reporter' in base.config:
-			if 'Report' in base.config['Reporter']:
+			if 'Report' in base.config['Reporter'] and len(base.config['Reporter']['Report']) > 0:
 				filename = base.config['Reporter']['Report']
-				with open(filename, 'w', encoding="utf8") as reportfile:    # save
-					base.report.write(reportfile)
-					self.debugmsg(6, "Report Saved:", filename)
-					saved = True
+				filedir = os.path.dirname(filename)
+				if os.path.isdir(filedir):
+					with open(filename, 'w', encoding="utf8") as reportfile:    # save
+						base.report.write(reportfile)
+						self.debugmsg(6, "Report Saved:", filename)
+						saved = True
 		return saved
 
 	def report_open(self):
@@ -2412,6 +2414,14 @@ class ReporterCore:
 		else:
 			if not os.path.isfile(base.config['Reporter']['Results']):
 				base.config['Reporter']['Results'] = ""
+				base.saveini()
+
+		if 'Report' not in base.config['Reporter']:
+			base.config['Reporter']['Report'] = ""
+			base.saveini()
+		else:
+			if not os.path.isfile(base.config['Reporter']['Report']):
+				base.config['Reporter']['Report'] = ""
 				base.saveini()
 
 		if 'Template' not in base.config['Reporter']:
@@ -6930,7 +6940,13 @@ class ReporterGUI(tk.Frame):
 
 	def content_preview(self, id):
 		base.debugmsg(9, "id:", id)
-		self.updateStatus("Preview Loading.....")
+
+		if base.config['Reporter']['Results']:
+			self.updateStatus("Preview Loading.....")
+		else:
+			sres = "Please select a result file"
+			self.updateStatus(sres)
+			return None
 		try:
 			self.cp_generate_preview(id)
 		except Exception as e:
