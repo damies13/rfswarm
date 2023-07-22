@@ -58,6 +58,7 @@ jobs:
           # Install necessary system packages:
           # brew update
           # brew upgrade
+          brew install pyenv
           brew install tcl-tk openssl readline sqlite3 xz zlib
           # Uninstall the current version
           export PY_VER=$(python --version | cut -d " " -f 2)
@@ -169,6 +170,7 @@ jobs:
           # Install necessary system packages:
           # brew update
           # brew upgrade
+          brew install pyenv
           brew install tcl-tk openssl readline sqlite3 xz zlib
           # Uninstall the current version
           export PY_VER=$(python --version | cut -d " " -f 2)
