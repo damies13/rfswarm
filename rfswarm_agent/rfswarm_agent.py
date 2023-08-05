@@ -11,6 +11,7 @@
 import argparse
 import base64
 import configparser
+import gc
 import hashlib
 import inspect
 import json
@@ -1125,6 +1126,7 @@ class RFSwarmAgent():
 				self.upload_threads[key].join()
 			if key in self.upload_threads:
 				del self.upload_threads[key]
+		gc.collect()
 
 	def run_process_output(self, outputFile, index, robot, iter):
 		# This should be a better way to do this
