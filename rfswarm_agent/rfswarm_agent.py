@@ -1097,7 +1097,7 @@ class RFSwarmAgent():
 
 	def process_file_upload_queue(self):
 		corecount = psutil.cpu_count()
-		threadcount = corecount * 8
+		threadcount = corecount * 4
 		self.debugmsg(7, "upload_queue", self.upload_queue)
 		self.debugmsg(5, "corecount", corecount, "	threadcount:", threadcount)
 		# self.process_file_upload_queue
