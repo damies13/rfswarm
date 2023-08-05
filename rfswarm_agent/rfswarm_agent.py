@@ -1097,7 +1097,7 @@ class RFSwarmAgent():
 
 	def process_file_upload_queue(self):
 		corecount = psutil.cpu_count()
-		threadcount = corecount * 4
+		threadcount = corecount * 3
 		self.debugmsg(7, "upload_queue", self.upload_queue)
 		self.debugmsg(5, "corecount", corecount, "	threadcount:", threadcount)
 		# self.process_file_upload_queue
@@ -1121,7 +1121,7 @@ class RFSwarmAgent():
 			time.sleep(0.5)
 		for key in list(self.upload_threads.keys()):
 			self.debugmsg(5, "key:", key)
-			if  self.upload_threads[key].is_alive():
+			if key in self.upload_threads and self.upload_threads[key].is_alive():
 				self.upload_threads[key].join()
 			if key in self.upload_threads:
 				del self.upload_threads[key]
