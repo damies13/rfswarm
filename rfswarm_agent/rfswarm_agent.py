@@ -1106,7 +1106,7 @@ class RFSwarmAgent():
 			# limit the number of upload threads so we don't max out the agent and cause it
 			# to go into critical/offline? mode
 			self.debugmsg(5, "upload_threads count:", len(list(self.upload_threads.keys())))
-			while len(list(self.upload_threads.keys())) > threadcount-1:
+			while len(list(self.upload_threads.keys())) > threadcount - 1:
 				self.debugmsg(5, "upload_threads count:", len(list(self.upload_threads.keys())))
 				# key = list(self.upload_threads.keys())[0]
 				key = random.choice(list(self.upload_threads.keys()))
