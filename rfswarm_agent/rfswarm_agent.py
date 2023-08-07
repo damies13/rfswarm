@@ -788,6 +788,7 @@ class RFSwarmAgent():
 		if platform.system() != 'Windows':
 			test = test.replace(r'${', r'\${')
 			self.debugmsg(6, "runthread: test:", test)
+		test = test.replace(r'"', r'\"')
 
 		if 'localfile' not in self.scriptlist[hash]:
 			if self.corethreads["getscripts"].is_alive():
