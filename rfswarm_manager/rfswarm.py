@@ -1798,7 +1798,9 @@ class RFSwarmBase:
 					while_cnt -= 1
 				base.debugmsg(6, "Wait for RunStats>0")
 				while_cnt = while_max
-				while len(base.dbqueue["ReadResult"]["RunStats"]) < 1 and while_cnt > 0:
+				while "RunStats" not in base.dbqueue["ReadResult"] \
+					and len(base.dbqueue["ReadResult"]["RunStats"]) < 1 \
+					and while_cnt > 0:
 					time.sleep(0.1)
 					while_cnt -= 1
 
@@ -1852,7 +1854,9 @@ class RFSwarmBase:
 				while_cnt -= 1
 			base.debugmsg(6, "Wait for Agents>0")
 			while_cnt = while_max
-			while len(base.dbqueue["ReadResult"]["Agents"]) < 1 and while_cnt > 0:
+			while "Agents" not in base.dbqueue["ReadResult"] \
+				and len(base.dbqueue["ReadResult"]["Agents"]) < 1 \
+				and while_cnt > 0:
 				time.sleep(0.1)
 				while_cnt -= 1
 
@@ -1888,7 +1892,9 @@ class RFSwarmBase:
 				while_cnt -= 1
 			base.debugmsg(6, "Wait for RawResults>0")
 			while_cnt = while_max
-			while len(base.dbqueue["ReadResult"]["RawResults"]) < 1 and while_cnt > 0:
+			while "RawResults" not in base.dbqueue["ReadResult"] \
+				and len(base.dbqueue["ReadResult"]["RawResults"]) < 1 \
+				and while_cnt > 0:
 				time.sleep(0.1)
 				while_cnt -= 1
 
