@@ -1748,7 +1748,7 @@ class RFSwarmBase:
 			sql += "GROUP BY  "
 			sql += gbcols
 
-		sql += " ORDER BY r.sequence"
+		sql += " ORDER BY min(r.script_index), min(r.sequence)"
 
 		base.debugmsg(7, "sql:", sql)
 
@@ -2443,10 +2443,11 @@ class RFSwarmCore:
 
 		load = max([agentdata["CPU%"], agentdata["MEM%"], agentdata["NET%"]])
 		agentdata["LOAD%"] = load
-		if load > 80:
-			agentdata["Status"] = "Warning"
-		if load > 95:
-			agentdata["Status"] = "Critical"
+		if "Uploading" not in agentdata["Status"]:
+			if load > 80:
+				agentdata["Status"] = "Warning"
+			if load > 95:
+				agentdata["Status"] = "Critical"
 
 		base.Agents[agentdata["AgentName"]] = agentdata
 
@@ -3129,9 +3130,9 @@ class RFSwarmCore:
 
 				tm = base.Agents[agnt]["LastSeen"]
 				agnt_elapsed = int(time.time()) - tm
-				if agnt_elapsed > 15:
+				if agnt_elapsed > 30:
 					base.Agents[agnt]["Status"] = "Offline?"
-				if agnt_elapsed > 60:
+				if agnt_elapsed > 300:
 					removeagents.append(agnt)
 
 				robot_count += base.Agents[agnt]["Robots"]
