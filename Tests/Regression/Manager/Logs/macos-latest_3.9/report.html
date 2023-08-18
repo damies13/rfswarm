@@ -5,7 +5,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="-1">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta content="Robot Framework 6.0.2 (Python 3.9.16 on darwin)" name="Generator">
+<meta content="Robot Framework 6.1.1 (Python 3.9.17 on darwin)" name="Generator">
 <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKcAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAAqAAAAAAAAAAAAAAAAAAAALIAAAD/AAAA4AAAANwAAADcAAAA3AAAANwAAADcAAAA3AAAANwAAADcAAAA4AAAAP8AAACxAAAAAAAAAKYAAAD/AAAAuwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC/AAAA/wAAAKkAAAD6AAAAzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN8AAAD/AAAA+gAAAMMAAAAAAAAAAgAAAGsAAABrAAAAawAAAGsAAABrAAAAawAAAGsAAABrAAAADAAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAAIsAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAANEAAAAAAAAA2gAAAP8AAAD6AAAAwwAAAAAAAAAAAAAAMgAAADIAAAAyAAAAMgAAADIAAAAyAAAAMgAAADIAAAAFAAAAAAAAANoAAAD/AAAA+gAAAMMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAADwAAAB8AAAAAAAAAGAAAABcAAAAAAAAAH8AAABKAAAAAAAAAAAAAAAAAAAA2gAAAP8AAAD6AAAAwwAAAAAAAADCAAAA/wAAACkAAADqAAAA4QAAAAAAAAD7AAAA/wAAALAAAAAGAAAAAAAAANoAAAD/AAAA+gAAAMMAAAAAAAAAIwAAAP4AAAD/AAAA/wAAAGAAAAAAAAAAAAAAAMkAAAD/AAAAigAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAAAAAAAAIAAAAcAAAABkAAAAAAAAAAAAAAAAAAAAAAAAAEgAAAAAAAAAAAAAA2gAAAP8AAAD7AAAAywAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN4AAAD/AAAAqwAAAP8AAACvAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALIAAAD/AAAAsgAAAAAAAAC5AAAA/wAAAMoAAADAAAAAwAAAAMAAAADAAAAAwAAAAMAAAADAAAAAwAAAAMkAAAD/AAAAvAAAAAAAAAAAAAAAAAAAAKwAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAArQAAAAAAAAAAwAMAAIABAAAf+AAAP/wAAD/8AAAgBAAAP/wAAD/8AAA//AAAJIwAADHEAAA//AAAP/wAAB/4AACAAQAAwAMAAA==">
 <style media="all" type="text/css">
 /* Generic and misc styles */
@@ -1150,7 +1150,7 @@ window.testdata = function () {
     var LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FAIL', 'SKIP'];
     var STATUSES = ['FAIL', 'PASS', 'SKIP', 'NOT RUN'];
     var KEYWORD_TYPES = ['KEYWORD', 'SETUP', 'TEARDOWN', 'FOR', 'ITERATION', 'IF', 'ELSE IF', 'ELSE', 'RETURN',
-                         'TRY', 'EXCEPT', 'FINALLY', 'WHILE', 'CONTINUE', 'BREAK'];
+                         'TRY', 'EXCEPT', 'FINALLY', 'WHILE', 'CONTINUE', 'BREAK', 'ERROR'];
     function addElement(elem) {
         if (!elem.id)
             elem.id = uniqueId();
@@ -1629,22 +1629,22 @@ storage = function () {
 window.output = {};
 </script>
 <script type="text/javascript">
-window.output["suite"] = [1,2,3,0,[],[0,0,116651],[[4,5,6,0,[],[1,25,66919],[],[[7,0,8,[9,10,11],[1,40,54011],[]],[12,0,0,[9,10,11],[1,54051,12017],[]],[13,0,0,[9,10,11],[1,66068,875],[]]],[],[3,3,0,0]],[14,15,16,0,[],[0,66945,49700],[],[[17,0,0,[9],[1,77329,10377],[]],[18,0,0,[9,10,11],[1,87707,6805],[]],[19,0,0,[9,10,11],[1,94512,6710],[]],[20,0,0,[9,10,11],[1,101222,6721],[]],[21,0,0,[9,10,11],[1,107943,6733],[]],[22,0,0,[9],[1,114676,1960],[]],[23,0,24,[9,10,11],[0,116638,4,25],[]]],[],[7,6,1,0]]],[],[],[10,9,1,0]];
+window.output["suite"] = [1,2,3,0,[],[0,0,1289077],[[4,5,6,0,[],[1,46,63984],[],[[7,0,8,[9,10,11],[1,80,50013],[]],[12,0,0,[9,10,11],[1,50093,12752],[]],[13,0,0,[9,10,11],[1,62845,1184],[]]],[],[3,3,0,0]],[14,15,16,0,[],[0,64032,1225043],[],[[17,0,0,[9],[1,75999,10376],[]],[18,0,0,[9,10,11],[0,86375,300652,19],[]],[20,0,0,[9,10,11],[0,387028,300421,21],[]],[22,0,0,[9,10,11],[0,687449,300597,23],[]],[24,0,0,[9,10,11],[0,988047,300340,25],[]],[26,0,0,[9],[0,1288387,687,27],[]]],[],[6,1,5,0]]],[],[],[9,4,5,0]];
 </script>
 <script type="text/javascript">
 window.output["strings"] = [];
 </script>
 <script type="text/javascript">
-window.output["strings"] = window.output["strings"].concat(["*","*Manager","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager","*../..","*CommandLine","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/CommandLine.robot","*../../CommandLine.robot","*Random Offset","*<p>This just prevents all the test runners doing git push at the same time\x3c/p>","*macos-latest","*ubuntu-latest","*windows-latest","*Manager Version","*Manager Help","*GUI Basic","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/GUI_Basic.robot","*../../GUI_Basic.robot","*Open GUI","*Select Run Tab","*Select Agents Tab","*Select About Tab","*Select Plan Tab","*Close GUI","*Intentional Fail","*<p>Uncomment this test if you want to trigger updating Screenshots in the git repo Ensure this is commented out before release or pull request\x3c/p>","*AssertionError"]);
+window.output["strings"] = window.output["strings"].concat(["*","*Manager","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager","*../..","*CommandLine","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/CommandLine.robot","*../../CommandLine.robot","*Random Offset","*<p>This just prevents all the test runners doing git push at the same time\x3c/p>","*macos-latest","*ubuntu-latest","*windows-latest","*Manager Version","*Manager Help","*GUI Basic","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/GUI_Basic.robot","*../../GUI_Basic.robot","*Open GUI","*Select Run Tab","*ImageNotFoundException: Reference image \"/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_run.png\" was not found on screen","*Select Agents Tab","*ImageNotFoundException: Reference image \"/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_agents.png\" was not found on screen","*Select About Tab","*ImageNotFoundException: Reference image \"/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_about.png\" was not found on screen","*Select Plan Tab","*ImageNotFoundException: Reference image \"/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_plan.png\" was not found on screen","*Close GUI","*ImageNotFoundException: Reference image \"/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_button_closewindow.png\" was not found on screen"]);
 </script>
 <script type="text/javascript">
-window.output["stats"] = [[{"elapsed":"00:01:46","fail":1,"label":"All Tests","pass":9,"skip":0}],[{"elapsed":"00:01:46","fail":1,"label":"macos-latest","pass":9,"skip":0},{"elapsed":"00:01:34","fail":1,"label":"ubuntu-latest","pass":7,"skip":0},{"elapsed":"00:01:34","fail":1,"label":"windows-latest","pass":7,"skip":0}],[{"elapsed":"00:01:57","fail":1,"id":"s1","label":"Manager","name":"Manager","pass":9,"skip":0},{"elapsed":"00:01:07","fail":0,"id":"s1-s1","label":"Manager.CommandLine","name":"CommandLine","pass":3,"skip":0},{"elapsed":"00:00:50","fail":1,"id":"s1-s2","label":"Manager.GUI Basic","name":"GUI Basic","pass":6,"skip":0}]];
+window.output["stats"] = [[{"elapsed":"00:21:17","fail":5,"label":"All Tests","pass":4,"skip":0}],[{"elapsed":"00:21:17","fail":5,"label":"macos-latest","pass":4,"skip":0},{"elapsed":"00:21:06","fail":4,"label":"ubuntu-latest","pass":3,"skip":0},{"elapsed":"00:21:06","fail":4,"label":"windows-latest","pass":3,"skip":0}],[{"elapsed":"00:21:29","fail":5,"id":"s1","label":"Manager","name":"Manager","pass":4,"skip":0},{"elapsed":"00:01:04","fail":0,"id":"s1-s1","label":"Manager.CommandLine","name":"CommandLine","pass":3,"skip":0},{"elapsed":"00:20:25","fail":5,"id":"s1-s2","label":"Manager.GUI Basic","name":"GUI Basic","pass":1,"skip":0}]];
 </script>
 <script type="text/javascript">
-window.output["baseMillis"] = 1679834946315;
+window.output["baseMillis"] = 1691738199956;
 </script>
 <script type="text/javascript">
-window.output["generated"] = 116692;
+window.output["generated"] = 1289101;
 </script>
 <script type="text/javascript">
 window.output["expand_keywords"] = null;
@@ -1894,8 +1894,8 @@ function searchTests(suitePattern, testPattern, includePattern, excludePattern) 
 function scrollToSelector(base, query) {
     $('#test-details-container').css('min-height', $(window).height());
     var anchor = query ? base + '?' + encodeURIComponent(query) : base;
-    window.location.hash = '';
     window.location.hash = window.prevLocationHash = anchor;
+    document.getElementById('test-details-container').scrollIntoView();
 }
 
 function renderSelector(args, template, stats) {

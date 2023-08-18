@@ -33,10 +33,14 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
+      - name: "Apt Update"
+        if: ${{ matrix.platform == 'ubuntu-latest' }}
+        run: |
+          sudo apt update -y
       - name: "Ubuntu Installs"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
-          sudo apt install python3-tk python3-dev python3-xlib scrot fluxbox
+          sudo apt install -y python3-tk python3-dev python3-xlib scrot fluxbox # tesseract-ocr
           sudo apt list --installed
       - name: "Ubuntu Xvfb"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
@@ -47,8 +51,28 @@ jobs:
           touch ~/.Xauthority
           # To view a listing of the .Xauthority file, enter the following
           xauth list
+          sleep 1
           # fluxbox
           fluxbox &
+
+      # - name: "MacOS Installs"
+      #   if: ${{ matrix.platform == 'macos-latest' }}
+      #   run: |
+      #     brew update
+      #     brew install tesseract
+      #     brew upgrade
+      #
+      # - name: "Windows Installs"
+      #   if: ${{ matrix.platform == 'windows-latest' }}
+      #   run: |
+      #     Invoke-WebRequest -Uri "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.3.1.20230401.exe"
+      #       -OutFile "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe"
+      #     & "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe" /s
+      #   shell: powershell
+      #
+      # - name: "Verify tesseract"
+      #   run: tesseract -v
+
       - run: pip install -r Tests/Regression/Manager/pip_requirements.txt
       - name: setup git config
         run: |
@@ -60,7 +84,10 @@ jobs:
         run: git checkout -B Test-Result-Manager-${{ matrix.platform }}-${{ matrix.python }}
       - name: Robot Framework
         id: robottest
-        run: robot --include ${{ matrix.platform }} --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }} Tests/Regression/Manager
+        run: >
+          robot --include ${{ matrix.platform }}
+          --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          Tests/Regression/Manager
         env:
           DISPLAY: :13.0
       - name: git commit
@@ -104,10 +131,14 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
+      - name: "Apt Update"
+        if: ${{ matrix.platform == 'ubuntu-latest' }}
+        run: |
+          sudo apt update -y
       - name: "Ubuntu Installs"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
-          sudo apt install python3-tk python3-dev python3-xlib scrot fluxbox
+          sudo apt -y install python3-tk python3-dev python3-xlib scrot fluxbox tesseract-ocr
           sudo apt list --installed
       - name: "Ubuntu Xvfb"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
@@ -118,8 +149,50 @@ jobs:
           touch ~/.Xauthority
           # To view a listing of the .Xauthority file, enter the following
           xauth list
+          sleep 1
           # fluxbox
           fluxbox &
+        #
+      - name: "MacOS Install tesseract"
+        if: ${{ matrix.platform == 'macos-latest' }}
+        run: |
+          brew install tesseract
+        # brew update
+        # brew upgrade
+        #
+      - name: "Windows Download Tesseract"
+        if: ${{ matrix.platform == 'windows-latest' }}
+        shell: pwsh
+        run: >
+          Invoke-WebRequest
+          -Uri "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.3.1.20230401.exe"
+          -OutFile "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe"
+      - name: "Windows Install Tesseract"
+        if: ${{ matrix.platform == 'windows-latest' }}
+        shell: cmd
+        run: |
+          "%Temp%\tesseract-ocr-w64-setup-5.3.1.20230401.exe" /S
+      - name: "Windows Add Tesseract to Path"
+        if: ${{ matrix.platform == 'windows-latest' }}
+        shell: pwsh
+        run: |
+          echo "$($ENV:ProgramFiles)\Tesseract-OCR" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: "Verify tesseract"
+        # if: ${{ matrix.platform != 'windows-latest' }}
+        run: tesseract -v
+        #
+        # - name: "Verify tesseract"
+        #   if: ${{ matrix.platform == 'windows-latest' }}
+        #   run: |
+        #     echo %PATH%
+        #     echo %programfiles%
+        #     dir "%programfiles%""
+        #     dir "%programfiles%\Tesseract-OCR"
+        #     echo %programfiles(x86)%
+        #     dir "%programfiles(x86)%"
+        #     "%programfiles%\Tesseract-OCR\tesseract.exe" -v
+        #   shell: cmd
+        #
       - run: pip install -r Tests/Regression/Reporter/pip_requirements.txt
       - name: setup git config
         run: |
@@ -131,7 +204,10 @@ jobs:
         run: git checkout -B Test-Result-Reporter-${{ matrix.platform }}-${{ matrix.python }}
       - name: Robot Framework
         id: robottest
-        run: robot --include ${{ matrix.platform }} --outputdir Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }} Tests/Regression/Reporter
+        run: >
+          robot --include ${{ matrix.platform }}
+          --outputdir Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          Tests/Regression/Reporter
         env:
           DISPLAY: :13.0
       - name: git commit

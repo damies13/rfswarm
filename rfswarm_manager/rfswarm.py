@@ -1256,33 +1256,54 @@ class RFSwarmBase:
 
 		# ${/}
 		if pathout.find("${/}") > -1:
+			base.debugmsg(8, "Found ${/} in", pathout)
 			if pathout.find("${/}") == 0:
-				pathlst = "${rfpv}" + pathout.split("${/}")
-				pathjoin = os.path.join(*pathlst)
+				pathlst = ["${rfpv}"] + pathout.split("${/}")
 				base.debugmsg(8, "pathlst:", pathlst)
+				pathjoin = os.path.join(*pathlst)
 				base.debugmsg(8, "pathjoin:", pathjoin)
 				pathjoin = pathjoin.replace("${rfpv}", "")
 				base.debugmsg(8, "pathjoin:", pathjoin)
 			else:
-				pathlst = "${rfpv}" + pathout.split("${/}")
-				pathjoin = os.path.join(*pathlst)
+				pathlst = pathout.split("${/}")
 				base.debugmsg(8, "pathlst:", pathlst)
+				pathjoin = os.path.join(*pathlst)
 				base.debugmsg(8, "pathjoin:", pathjoin)
 
 			if os.path.isfile(pathjoin):
+				base.debugmsg(8, "pathjoin:", pathjoin)
 				pathout = pathjoin
-			else:
 				base.debugmsg(8, "pathout:", pathout)
-				# i guess this could be affected too https://stackoverflow.com/questions/1945920/why-doesnt-os-path-join-work-in-this-case
-				if platform.system() == "Windows":
-					pathout = os.path.abspath(os.path.join(*localdir.split(os.path.sep), *pathjoin.split(os.path.sep)))
-				else:
-					pathout = os.path.abspath(os.path.join(os.path.sep, *localdir.split(os.path.sep), *pathjoin.split(os.path.sep)))
+			else:
+				base.debugmsg(8, "pathjoin:", pathjoin)
+				pathout = self.localrespath(localdir, pathjoin)
 				base.debugmsg(8, "pathout:", pathout)
 
 		# ${:}
 		# ${\n}
 		# not sure whether to handle these for now
+		base.debugmsg(8, "pathout:", pathout)
+
+		return pathout
+
+	def localrespath(self, localdir, resfile):
+		base.debugmsg(5, "localdir:", localdir)
+		base.debugmsg(5, "resfile:", resfile)
+		llocaldir = re.findall(r"[^\/\\]+", localdir)
+		lresfile = re.findall(r"[^\/\\]+", resfile)
+
+		base.debugmsg(5, "llocaldir:", llocaldir)
+		base.debugmsg(5, "lresfile:", lresfile)
+
+		# i guess this could be affected too https://stackoverflow.com/questions/1945920/why-doesnt-os-path-join-work-in-this-case
+		if platform.system() == "Windows":
+			joindpath = os.path.join(*llocaldir, *lresfile)
+		else:
+			joindpath = os.path.join(os.path.sep, *llocaldir, *lresfile)
+		base.debugmsg(5, "joindpath:", joindpath)
+
+		pathout = os.path.abspath(joindpath)
+		base.debugmsg(5, "pathout:", pathout)
 
 		return pathout
 
@@ -1294,21 +1315,28 @@ class RFSwarmBase:
 		base.debugmsg(8, "scriptfiles[", hash, "]", self.scriptfiles[hash])
 		localpath = self.scriptfiles[hash]['localpath']
 		localdir = os.path.dirname(localpath)
+
+		if 'basedir' in self.scriptfiles[hash]:
+			basedir = self.scriptfiles[hash]['basedir']
+		else:
+			basedir = localdir
+
 		# look for __init__. files - Issue #90
 		initfiles = os.path.abspath(os.path.join(localdir, "__init__.*"))
 		base.debugmsg(7, "initfiles", initfiles)
 		filelst = glob.glob(initfiles)
 		for file in filelst:
 			base.debugmsg(7, "file:", file)
-			relpath = file.replace(localdir, "")[1:]
-			base.debugmsg(7, "relpath:", relpath)
-			newhash = self.hash_file(file, relpath)
+			relfile = os.path.relpath(file, start=basedir)
+			base.debugmsg(7, "relfile:", relfile)
+			newhash = self.hash_file(file, relfile)
 			base.debugmsg(7, "newhash:", newhash)
 			if newhash not in self.scriptfiles:
 				self.scriptfiles[newhash] = {
 					'id': newhash,
+					'basedir': basedir,
 					'localpath': file,
-					'relpath': relpath,
+					'relpath': relfile,
 					'type': "Initialization"
 				}
 				filename, fileext = os.path.splitext(file)
@@ -1354,19 +1382,17 @@ class RFSwarmBase:
 									if resfile.find("${") > -1:
 										localrespath = base.replace_rf_path_variables(resfile, localdir)
 									else:
-										# i guess this could be affected too https://stackoverflow.com/questions/1945920/why-doesnt-os-path-join-work-in-this-case
-										if platform.system() == "Windows":
-											localrespath = os.path.abspath(os.path.join(*localdir.split(os.path.sep), *resfile.split(os.path.sep)))
-										else:
-											localrespath = os.path.abspath(os.path.join(os.path.sep, *localdir.split(os.path.sep), *resfile.split(os.path.sep)))
+										localrespath = self.localrespath(localdir, resfile)
+
 									base.debugmsg(7, "localrespath", localrespath)
 									if os.path.isfile(localrespath):
-										relfile = os.path.relpath(localrespath, start=localdir)
+										relfile = os.path.relpath(localrespath, start=basedir)
 										base.debugmsg(7, "relfile", relfile)
 										newhash = self.hash_file(localrespath, relfile)
 										base.debugmsg(7, "newhash", newhash)
 										self.scriptfiles[newhash] = {
 											'id': newhash,
+											'basedir': basedir,
 											'localpath': localrespath,
 											'relpath': relfile,
 											'type': linearr[0]
@@ -1722,7 +1748,7 @@ class RFSwarmBase:
 			sql += "GROUP BY  "
 			sql += gbcols
 
-		sql += " ORDER BY r.sequence"
+		sql += " ORDER BY min(r.script_index), min(r.sequence)"
 
 		base.debugmsg(7, "sql:", sql)
 
@@ -1772,7 +1798,9 @@ class RFSwarmBase:
 					while_cnt -= 1
 				base.debugmsg(6, "Wait for RunStats>0")
 				while_cnt = while_max
-				while len(base.dbqueue["ReadResult"]["RunStats"]) < 1 and while_cnt > 0:
+				while "RunStats" not in base.dbqueue["ReadResult"] \
+					and len(base.dbqueue["ReadResult"]["RunStats"]) < 1 \
+					and while_cnt > 0:
 					time.sleep(0.1)
 					while_cnt -= 1
 
@@ -1826,7 +1854,9 @@ class RFSwarmBase:
 				while_cnt -= 1
 			base.debugmsg(6, "Wait for Agents>0")
 			while_cnt = while_max
-			while len(base.dbqueue["ReadResult"]["Agents"]) < 1 and while_cnt > 0:
+			while "Agents" not in base.dbqueue["ReadResult"] \
+				and len(base.dbqueue["ReadResult"]["Agents"]) < 1 \
+				and while_cnt > 0:
 				time.sleep(0.1)
 				while_cnt -= 1
 
@@ -1862,7 +1892,9 @@ class RFSwarmBase:
 				while_cnt -= 1
 			base.debugmsg(6, "Wait for RawResults>0")
 			while_cnt = while_max
-			while len(base.dbqueue["ReadResult"]["RawResults"]) < 1 and while_cnt > 0:
+			while "RawResults" not in base.dbqueue["ReadResult"] \
+				and len(base.dbqueue["ReadResult"]["RawResults"]) < 1 \
+				and while_cnt > 0:
 				time.sleep(0.1)
 				while_cnt -= 1
 
@@ -2151,10 +2183,18 @@ class RFSwarmCore:
 		if 'ScriptDir' not in base.config['Plan']:
 			base.config['Plan']['ScriptDir'] = base.inisafevalue(base.dir_path)
 			base.saveini()
+		else:
+			if not os.path.isdir(base.config['Plan']['ScriptDir']):
+				base.config['Plan']['ScriptDir'] = base.inisafevalue(base.dir_path)
+				base.saveini()
 
 		if 'ScenarioDir' not in base.config['Plan']:
 			base.config['Plan']['ScenarioDir'] = base.inisafevalue(base.dir_path)
 			base.saveini()
+		else:
+			if not os.path.isdir(base.config['Plan']['ScenarioDir']):
+				base.config['Plan']['ScenarioDir'] = base.inisafevalue(base.dir_path)
+				base.saveini()
 
 		if 'ScenarioFile' not in base.config['Plan']:
 			base.config['Plan']['ScenarioFile'] = ""
@@ -2178,6 +2218,10 @@ class RFSwarmCore:
 		if 'ResultsDir' not in base.config['Run']:
 			base.config['Run']['ResultsDir'] = base.inisafevalue(os.path.join(base.dir_path, "results"))
 			base.saveini()
+		else:
+			if not os.path.isdir(base.config['Run']['ResultsDir']):
+				base.config['Run']['ResultsDir'] = base.inisafevalue(base.dir_path)
+				base.saveini()
 
 		if 'display_index' not in base.config['Run']:
 			base.config['Run']['display_index'] = str(False)
@@ -2399,10 +2443,11 @@ class RFSwarmCore:
 
 		load = max([agentdata["CPU%"], agentdata["MEM%"], agentdata["NET%"]])
 		agentdata["LOAD%"] = load
-		if load > 80:
-			agentdata["Status"] = "Warning"
-		if load > 95:
-			agentdata["Status"] = "Critical"
+		if "Uploading" not in agentdata["Status"]:
+			if load > 80:
+				agentdata["Status"] = "Warning"
+			if load > 95:
+				agentdata["Status"] = "Critical"
 
 		base.Agents[agentdata["AgentName"]] = agentdata
 
@@ -3085,9 +3130,9 @@ class RFSwarmCore:
 
 				tm = base.Agents[agnt]["LastSeen"]
 				agnt_elapsed = int(time.time()) - tm
-				if agnt_elapsed > 15:
+				if agnt_elapsed > 30:
 					base.Agents[agnt]["Status"] = "Offline?"
-				if agnt_elapsed > 60:
+				if agnt_elapsed > 300:
 					removeagents.append(agnt)
 
 				robot_count += base.Agents[agnt]["Robots"]
@@ -4345,7 +4390,7 @@ class RFSwarmGUI(tk.Frame):
 				base.debugmsg(7, "inpFP:", inpFP)
 
 				sql = "SELECT "
-				sql += "  CAST(end_time as INTEGER) as 'endtime' "
+				sql += "  floor(end_time) as 'endtime' "
 				if RType == "Response Time":
 					sql += ", result_name "
 					sql += ", elapsed_time "
@@ -4392,7 +4437,7 @@ class RFSwarmGUI(tk.Frame):
 						sql += "AND {} ".format(iwhere)
 					i += 1
 
-				sql += "GROUP by CAST(end_time as INTEGER) "
+				sql += "GROUP by floor(end_time) "
 				if RType == "Response Time":
 					sql += ", result_name "
 					sql += ", elapsed_time "

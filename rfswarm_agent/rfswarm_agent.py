@@ -11,12 +11,14 @@
 import argparse
 import base64
 import configparser
+import gc
 import hashlib
 import inspect
 import json
 import lzma
 import os
 import platform
+import random
 import shutil
 import socket
 import subprocess
@@ -24,6 +26,7 @@ import sys
 import tempfile
 import threading
 import time
+import uuid
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from typing import Any
@@ -57,6 +60,7 @@ class RFSwarmAgent():
 	jobs: Any = {}
 	corethreads: Any = {}
 	upload_queue: Any = []
+	upload_threads: Any = {}
 	robotcount = 0
 	status = "Ready"
 	excludelibraries: Any = []
@@ -167,7 +171,7 @@ class RFSwarmAgent():
 		t.start()
 
 		self.agentproperties["OS: Platform"] = platform.platform()  # 'Linux-3.3.0-8.fc16.x86_64-x86_64-with-fedora-16-Verne'
-		self.agentproperties["OS: System"] = platform.system()  # 'Windows'
+		self.agentproperties["OS: System"] = platform.system()  # 'Windows'		Returns the system/OS name, such as 'Linux', 'Darwin', 'Java', 'Windows'
 		self.agentproperties["OS: Release"] = platform.release()  # 'XP'
 		self.agentproperties["OS: Version"] = platform.version()  # '5.1.2600'
 
@@ -781,6 +785,10 @@ class RFSwarmAgent():
 		self.debugmsg(6, "runthread: hash:", hash)
 		test = self.jobs[jobid]['Test']
 		self.debugmsg(6, "runthread: test:", test)
+		if platform.system() != 'Windows':
+			test = test.replace(r'${', r'\${')
+			self.debugmsg(6, "runthread: test:", test)
+		test = test.replace(r'"', r'\"')
 
 		if 'localfile' not in self.scriptlist[hash]:
 			if self.corethreads["getscripts"].is_alive():
@@ -1090,14 +1098,36 @@ class RFSwarmAgent():
 		return hasher.hexdigest()
 
 	def process_file_upload_queue(self):
+		corecount = psutil.cpu_count()
+		threadcount = corecount * 3
 		self.debugmsg(7, "upload_queue", self.upload_queue)
+		self.debugmsg(5, "corecount", corecount, "	threadcount:", threadcount)
 		# self.process_file_upload_queue
 		for fobj in self.upload_queue:
-			# probably need to make this multi-treaded
-			# self.file_upload(fobj)
-			t = threading.Thread(target=self.file_upload, args=(fobj,))
-			t.start()
+			# limit the number of upload threads so we don't max out the agent and cause it
+			# to go into critical/offline? mode
+			self.debugmsg(5, "upload_threads count:", len(list(self.upload_threads.keys())))
+			while len(list(self.upload_threads.keys())) > threadcount - 1:
+				self.debugmsg(5, "upload_threads count:", len(list(self.upload_threads.keys())))
+				# key = list(self.upload_threads.keys())[0]
+				key = random.choice(list(self.upload_threads.keys()))
+				self.debugmsg(5, "key:", key)
+				if key in self.upload_threads and self.upload_threads[key].is_alive():
+					self.upload_threads[key].join()
+				if key in self.upload_threads:
+					del self.upload_threads[key]
+			key = str(uuid.uuid4())
+			self.debugmsg(5, "key:", key)
+			self.upload_threads[key] = threading.Thread(target=self.file_upload, args=(fobj,))
+			self.upload_threads[key].start()
 			time.sleep(0.5)
+		for key in list(self.upload_threads.keys()):
+			self.debugmsg(5, "key:", key)
+			if key in self.upload_threads and self.upload_threads[key].is_alive():
+				self.upload_threads[key].join()
+			if key in self.upload_threads:
+				del self.upload_threads[key]
+		gc.collect()
 
 	def run_process_output(self, outputFile, index, robot, iter):
 		# This should be a better way to do this

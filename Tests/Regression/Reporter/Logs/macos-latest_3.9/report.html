@@ -5,7 +5,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="-1">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta content="Robot Framework 6.0.2 (Python 3.9.16 on darwin)" name="Generator">
+<meta content="Robot Framework 6.1.1 (Python 3.9.17 on darwin)" name="Generator">
 <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKcAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAAqAAAAAAAAAAAAAAAAAAAALIAAAD/AAAA4AAAANwAAADcAAAA3AAAANwAAADcAAAA3AAAANwAAADcAAAA4AAAAP8AAACxAAAAAAAAAKYAAAD/AAAAuwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC/AAAA/wAAAKkAAAD6AAAAzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN8AAAD/AAAA+gAAAMMAAAAAAAAAAgAAAGsAAABrAAAAawAAAGsAAABrAAAAawAAAGsAAABrAAAADAAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAAIsAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAANEAAAAAAAAA2gAAAP8AAAD6AAAAwwAAAAAAAAAAAAAAMgAAADIAAAAyAAAAMgAAADIAAAAyAAAAMgAAADIAAAAFAAAAAAAAANoAAAD/AAAA+gAAAMMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAADwAAAB8AAAAAAAAAGAAAABcAAAAAAAAAH8AAABKAAAAAAAAAAAAAAAAAAAA2gAAAP8AAAD6AAAAwwAAAAAAAADCAAAA/wAAACkAAADqAAAA4QAAAAAAAAD7AAAA/wAAALAAAAAGAAAAAAAAANoAAAD/AAAA+gAAAMMAAAAAAAAAIwAAAP4AAAD/AAAA/wAAAGAAAAAAAAAAAAAAAMkAAAD/AAAAigAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAAAAAAAAIAAAAcAAAABkAAAAAAAAAAAAAAAAAAAAAAAAAEgAAAAAAAAAAAAAA2gAAAP8AAAD7AAAAywAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN4AAAD/AAAAqwAAAP8AAACvAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALIAAAD/AAAAsgAAAAAAAAC5AAAA/wAAAMoAAADAAAAAwAAAAMAAAADAAAAAwAAAAMAAAADAAAAAwAAAAMkAAAD/AAAAvAAAAAAAAAAAAAAAAAAAAKwAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAArQAAAAAAAAAAwAMAAIABAAAf+AAAP/wAAD/8AAAgBAAAP/wAAD/8AAA//AAAJIwAADHEAAA//AAAP/wAAB/4AACAAQAAwAMAAA==">
 <style media="all" type="text/css">
 /* Generic and misc styles */
@@ -1150,7 +1150,7 @@ window.testdata = function () {
     var LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FAIL', 'SKIP'];
     var STATUSES = ['FAIL', 'PASS', 'SKIP', 'NOT RUN'];
     var KEYWORD_TYPES = ['KEYWORD', 'SETUP', 'TEARDOWN', 'FOR', 'ITERATION', 'IF', 'ELSE IF', 'ELSE', 'RETURN',
-                         'TRY', 'EXCEPT', 'FINALLY', 'WHILE', 'CONTINUE', 'BREAK'];
+                         'TRY', 'EXCEPT', 'FINALLY', 'WHILE', 'CONTINUE', 'BREAK', 'ERROR'];
     function addElement(elem) {
         if (!elem.id)
             elem.id = uniqueId();
@@ -1629,22 +1629,22 @@ storage = function () {
 window.output = {};
 </script>
 <script type="text/javascript">
-window.output["suite"] = [1,2,3,0,[],[0,0,81937],[[4,5,6,0,[],[1,30,12842],[],[[7,0,0,[8,9,10],[1,45,11867],[]],[11,0,0,[8,9,10],[1,11912,959],[]]],[],[2,2,0,0]],[12,13,14,0,[],[0,12873,69063],[],[[15,0,0,[8],[1,21576,60357],[]],[16,0,17,[8,9,10],[0,81934,1,18],[]]],[],[2,1,1,0]]],[],[],[4,3,1,0]];
+window.output["suite"] = [1,2,3,0,[],[0,0,1496166],[[4,5,6,0,[],[1,28,32901],[],[[7,0,0,[8,9,10],[1,87,12692],[]],[11,0,0,[8,9,10],[1,12779,1020],[]],[12,0,0,[13,14,8,9,10],[1,13799,6206],[]],[15,0,0,[16,14,8,9,10],[1,20006,7225],[]],[17,0,0,[14,8,9,10,18],[1,27232,5696],[]]],[],[5,5,0,0]],[19,20,21,0,[],[0,32931,1463233],[],[[22,0,0,[8,9,10],[0,42094,363629,23],[]],[24,0,0,[8,9,10],[0,405725,363423,23],[]],[25,0,0,[26,8,9,10],[0,769150,363506,23],[]],[27,0,0,[28,29,8,9,10],[0,1132657,363506,23],[]]],[],[4,0,4,0]]],[],[],[9,5,4,0]];
 </script>
 <script type="text/javascript">
 window.output["strings"] = [];
 </script>
 <script type="text/javascript">
-window.output["strings"] = window.output["strings"].concat(["*","*Reporter","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter","*../..","*CommandLine","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/CommandLine.robot","*../../CommandLine.robot","*Reporter Version","*macos-latest","*ubuntu-latest","*windows-latest","*Reporter Help","*GUI Basic","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot","*../../GUI_Basic.robot","*GUI Runs and Closes","*Intentional Fail","*<p>Uncomment this test if you want to trigger updating Screenshots in the git repo Ensure this is commented out before release or pull request\x3c/p>","*AssertionError"]);
+window.output["strings"] = window.output["strings"].concat(["*","*Reporter","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter","*../..","*CommandLine","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/CommandLine.robot","*../../CommandLine.robot","*Reporter Version","*macos-latest","*ubuntu-latest","*windows-latest","*Reporter Help","*Command Line Generate HTML","*HTML","*Issue #144","*Command Line Generate Docx","*DOCX","*Command Line Generate Xlsx","*XLSX","*GUI Basic","*/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot","*../../GUI_Basic.robot","*GUI Runs and Closes","eNrNk01v2zAMhu/+FVyANTFQWEua5avIYRjaLZeiyNKzochMIkQWDYqu238/OWmHFEXRXTrsJIkiXj6k9C5KvcUbkmuqfXH1YLASS34GS9wgozcIts2AjroLyEFx7T2yaoj3ijeh0Vz+WVcYJKglbhlDiCpxWxFLTF+0GkFtrMO8RNlRofjpLi+1oZAH0VKHvGK8t9g40gUWWeW3HWh0AE8Cm5YQyEMwjOiT5JsLBIKaC2o8bHQUL2bJL7xH1u5wriMIkDE1c3uV9FNY/Cf9rmsR8rlxFLCxPrbwTreDFLor1gbX2uyhV1IQYDToBYx2DpwOks4SgOtY9K/wn9b8mexVIKseO+fgrEcYT/rTc7AezpxcllTUDs+2chnLARhihDk8N/89HnvpR4EMhpMjSJ5bbyXPDwhrHTDb1vYE48fd4uMohsPp6DVFQLfJmOLrzUH22Wr/JsAuvh4WQuSMNjtUt4/xj3h1kU2z/lg9jIbK2bWqDtEYVLK3vkV6Lnc6kMF48AZK3tpI/hHFZHKkONY8QLC2AWFZe7ElXjET9zpxLjuIDm39Ar3PIYWCMPiuQKnF7KLaOqboFymd5FRjBi81JtnXd0Um2Sjtxo/qRVsfTozUTZKLFPrwaQ5fkmSYwk9dgBCskEvrtSDcMplo79+gSs0K","*Select Preview Tab","*First Run","*Issue #147","*New Data Table Section","*Issue #149","*Issue #150"]);
 </script>
 <script type="text/javascript">
-window.output["stats"] = [[{"elapsed":"00:01:13","fail":1,"label":"All Tests","pass":3,"skip":0}],[{"elapsed":"00:01:13","fail":1,"label":"macos-latest","pass":3,"skip":0},{"elapsed":"00:00:13","fail":1,"label":"ubuntu-latest","pass":2,"skip":0},{"elapsed":"00:00:13","fail":1,"label":"windows-latest","pass":2,"skip":0}],[{"elapsed":"00:01:22","fail":1,"id":"s1","label":"Reporter","name":"Reporter","pass":3,"skip":0},{"elapsed":"00:00:13","fail":0,"id":"s1-s1","label":"Reporter.CommandLine","name":"CommandLine","pass":2,"skip":0},{"elapsed":"00:01:09","fail":1,"id":"s1-s2","label":"Reporter.GUI Basic","name":"GUI Basic","pass":1,"skip":0}]];
+window.output["stats"] = [[{"elapsed":"00:24:47","fail":4,"label":"All Tests","pass":5,"skip":0}],[{"elapsed":"00:00:07","fail":0,"label":"DOCX","pass":1,"skip":0},{"elapsed":"00:00:06","fail":0,"label":"HTML","pass":1,"skip":0},{"elapsed":"00:00:19","fail":0,"label":"Issue #144","pass":3,"skip":0},{"elapsed":"00:06:04","fail":1,"label":"Issue #147","pass":0,"skip":0},{"elapsed":"00:06:04","fail":1,"label":"Issue #149","pass":0,"skip":0},{"elapsed":"00:06:04","fail":1,"label":"Issue #150","pass":0,"skip":0},{"elapsed":"00:24:47","fail":4,"label":"macos-latest","pass":5,"skip":0},{"elapsed":"00:24:47","fail":4,"label":"ubuntu-latest","pass":5,"skip":0},{"elapsed":"00:24:47","fail":4,"label":"windows-latest","pass":5,"skip":0},{"elapsed":"00:00:06","fail":0,"label":"XLSX","pass":1,"skip":0}],[{"elapsed":"00:24:56","fail":4,"id":"s1","label":"Reporter","name":"Reporter","pass":5,"skip":0},{"elapsed":"00:00:33","fail":0,"id":"s1-s1","label":"Reporter.CommandLine","name":"CommandLine","pass":5,"skip":0},{"elapsed":"00:24:23","fail":4,"id":"s1-s2","label":"Reporter.GUI Basic","name":"GUI Basic","pass":0,"skip":0}]];
 </script>
 <script type="text/javascript">
-window.output["baseMillis"] = 1679834638420;
+window.output["baseMillis"] = 1691739688894;
 </script>
 <script type="text/javascript">
-window.output["generated"] = 81948;
+window.output["generated"] = 1496223;
 </script>
 <script type="text/javascript">
 window.output["expand_keywords"] = null;
@@ -1894,8 +1894,8 @@ function searchTests(suitePattern, testPattern, includePattern, excludePattern) 
 function scrollToSelector(base, query) {
     $('#test-details-container').css('min-height', $(window).height());
     var anchor = query ? base + '?' + encodeURIComponent(query) : base;
-    window.location.hash = '';
     window.location.hash = window.prevLocationHash = anchor;
+    document.getElementById('test-details-container').scrollIntoView();
 }
 
 function renderSelector(args, template, stats) {

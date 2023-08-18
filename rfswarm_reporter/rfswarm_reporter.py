@@ -244,7 +244,7 @@ class ReporterBase():
 	def saveini(self):
 		self.debugmsg(6, "save_ini:", self.save_ini)
 		if self.save_ini:
-			with open(base.reporter_ini, 'w') as configfile:    # save
+			with open(base.reporter_ini, 'w', encoding="utf8") as configfile:    # save
 				base.config.write(configfile)
 				self.debugmsg(6, "File Saved:", self.reporter_ini)
 
@@ -287,7 +287,7 @@ class ReporterBase():
 		saved = False
 		if filename is None or len(filename) < 1:
 			filename = base.config['Reporter']['Template']
-		with open(filename, 'w') as templatefile:    # save
+		with open(filename, 'w', encoding="utf8") as templatefile:    # save
 			base.report.write(templatefile)
 			self.debugmsg(6, "Template Saved:", filename)
 			saved = True
@@ -309,7 +309,7 @@ class ReporterBase():
 			base.report = None
 			self.reportdata = {}
 			base.report = configparser.ConfigParser()
-			base.report.read(filename)
+			base.report.read(filename, encoding="utf8")
 
 			base.report_item_set_changed_all("TOP")
 
@@ -323,12 +323,14 @@ class ReporterBase():
 	def report_save(self):
 		saved = False
 		if 'Reporter' in base.config:
-			if 'Report' in base.config['Reporter']:
+			if 'Report' in base.config['Reporter'] and len(base.config['Reporter']['Report']) > 0:
 				filename = base.config['Reporter']['Report']
-				with open(filename, 'w') as reportfile:    # save
-					base.report.write(reportfile)
-					self.debugmsg(6, "Report Saved:", filename)
-					saved = True
+				filedir = os.path.dirname(filename)
+				if os.path.isdir(filedir):
+					with open(filename, 'w', encoding="utf8") as reportfile:    # save
+						base.report.write(reportfile)
+						self.debugmsg(6, "Report Saved:", filename)
+						saved = True
 		return saved
 
 	def report_open(self):
@@ -339,7 +341,7 @@ class ReporterBase():
 		if len(filename) > 0 and os.path.isfile(filename):
 			base.debugmsg(7, "filename: ", filename, " exists, open")
 			base.report = configparser.ConfigParser()
-			base.report.read(filename)
+			base.report.read(filename, encoding="utf8")
 		else:
 			templatefile = base.whitespace_get_ini_value(base.config['Reporter']['Template'])
 			base.debugmsg(7, "Template: ", templatefile)
@@ -530,23 +532,34 @@ class ReporterBase():
 			return value
 
 	def rs_setting_get_font(self):
-		fontlst = list(tkFont.families())
-		base.debugmsg(9, "fontlst", fontlst)
 		value = self.rs_setting_get('font')
-		if value not in fontlst:
-			value = None
-		if value is None:
-			# Verdana, Tahoma, Arial, Helvetica, sans-serif
-			fontorder = ['Helvetica', 'Verdana', 'Tahoma', 'Arial', 'FreeSans']
-			for fnt in fontorder:
-				if fnt in fontlst:
-					return fnt
-			for fnt in fontlst:
-				if 'Sans' in fnt or 'sans' in fnt:
-					return fnt
-			return 'sans-serif'
-		else:
+		base.debugmsg(6, "value", value)
+		if not base.displaygui:
+			base.debugmsg(6, "value", value)
 			return value
+		else:
+			fontlst = list(tkFont.families())
+			base.debugmsg(9, "fontlst", fontlst)
+			if value not in fontlst:
+				value = None
+				base.debugmsg(6, "value", value)
+			if value is None:
+				# Verdana, Tahoma, Arial, Helvetica, sans-serif
+				fontorder = ['Helvetica', 'Verdana', 'Tahoma', 'Arial', 'FreeSans']
+				base.debugmsg(6, "fontorder", fontorder)
+				for fnt in fontorder:
+					if fnt in fontlst:
+						base.debugmsg(6, "fnt", fnt)
+						return fnt
+				for fnt in fontlst:
+					if 'Sans' in fnt or 'sans' in fnt:
+						base.debugmsg(6, "fnt", fnt)
+						return fnt
+				base.debugmsg(6, "sans-serif")
+				return 'sans-serif'
+			else:
+				base.debugmsg(6, "value", value)
+				return value
 
 	def rs_setting_get_fontsize(self):
 		value = self.rs_setting_get_int('fontsize')
@@ -636,6 +649,7 @@ class ReporterBase():
 		if last in ['G', 'H', 'I', 'J', 'k', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']:
 			pid = id[0:-1]
 			self.report_add_subsection(id)
+		base.debugmsg(8, "id:", id, "	pid:", pid)
 		return pid
 
 	def report_add_section(self, parent, id, name):
@@ -931,6 +945,9 @@ class ReporterBase():
 			colname = "Name"
 
 			sql = "SELECT "
+
+			base.debugmsg(8, "RType:", RType, "sql:", sql)
+
 			if RType == "Response Time":
 				sql += "end_time as 'Time' "
 				sql += ", elapsed_time as 'Value' "
@@ -962,7 +979,7 @@ class ReporterBase():
 				# sql += 		"LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' "
 
 			if RType == "TPS":
-				sql += "end_time as 'Time' "
+				sql += "floor(end_time) as 'Time' "
 				sql += ", count(result) as 'Value' "
 				# sql += ", result_name as 'Name' "
 				sql += ", result_name"
@@ -972,7 +989,7 @@ class ReporterBase():
 					sql += " || ' - ' || agent"
 				sql += " as [" + colname + "] "
 			if RType == "Total TPS":
-				sql += "end_time as 'Time'"
+				sql += "floor(end_time) as 'Time'"
 				sql += ", count(result) as 'Value' "
 				# sql += ", result as 'Name' "
 				sql += ", result"
@@ -981,7 +998,9 @@ class ReporterBase():
 				if EnFA and FAType in [None, "", "None"]:
 					sql += " || ' - ' || agent"
 				sql += " as [" + colname + "] "
-			if RType is None:
+
+			if RType in [None, "", "None"]:
+				base.debugmsg(8, "RType:", RType, "sql:", sql)
 				sql += "end_time as 'Time'"
 				sql += ", count(result) as 'Value' "
 				# sql += ", result_name as 'Name' "
@@ -991,6 +1010,8 @@ class ReporterBase():
 				if EnFA and FAType in [None, "", "None"]:
 					sql += " || ' - ' || agent"
 				sql += " as [" + colname + "] "
+
+			base.debugmsg(8, "RType:", RType, "sql:", sql)
 
 			sql += "FROM Results "
 
@@ -1039,7 +1060,7 @@ class ReporterBase():
 					sql += "AND {} ".format(iwhere)
 				i += 1
 
-			if RType is not None:
+			if RType not in [None, "", "None"]:
 				# sql += "GROUP by "
 				# sql += 		", result "
 				pass
@@ -1049,14 +1070,20 @@ class ReporterBase():
 
 			if RType == "TPS":
 				sql += "GROUP by "
-				sql += "end_time "
+				sql += "floor(end_time) "
 				sql += ", result_name "
 				sql += ", result "
-				sql += "ORDER by end_time, result DESC, count(result) DESC "
+				sql += "ORDER by "
+				sql += "floor(end_time)"
+				sql += ", result DESC"
+				sql += ", count(result) DESC "
 			if RType == "Total TPS":
-				sql += "end_time "
+				sql += "GROUP by "
+				sql += "floor(end_time) "
 				sql += ", result "
-				sql += "ORDER by end_time, count(result) DESC "
+				sql += "ORDER by "
+				sql += "floor(end_time)"
+				sql += ", count(result) DESC "
 
 		if DataType == "Metric":
 			MType = self.rt_table_get_mt(id)
@@ -1079,7 +1106,7 @@ class ReporterBase():
 			# grouplst = ["PrimaryMetric", "MetricType", "SecondaryMetric"]
 			grouplst = []
 
-			if MType is not None and len(MType) > 0:
+			if MType not in [None, "", "None"] and len(MType) > 0:
 				# if "MetricType as 'Name'" in mcolumns:
 				# 	mcolumns.remove("MetricType as 'Name'")
 				wherelst.append("MetricType == '{}'".format(MType.replace("'", "''")))
@@ -1087,7 +1114,7 @@ class ReporterBase():
 					grouplst.remove("MetricType")
 			else:
 				mnamecolumns.append("MetricType")
-			if PM is not None and len(PM) > 0:
+			if PM not in [None, "", "None"] and len(PM) > 0:
 				# if "PrimaryMetric as 'Name'" in mcolumns:
 				# 	mcolumns.remove("PrimaryMetric as 'Name'")
 				wherelst.append("PrimaryMetric == '{}'".format(PM.replace("'", "''")))
@@ -1095,7 +1122,7 @@ class ReporterBase():
 					grouplst.remove("PrimaryMetric")
 			else:
 				mnamecolumns.append("PrimaryMetric")
-			if SM is not None and len(SM) > 0:
+			if SM not in [None, "", "None"] and len(SM) > 0:
 				# if "SecondaryMetric as 'Name'" in mcolumns:
 				# 	mcolumns.remove("SecondaryMetric as 'Name'")
 				wherelst.append("SecondaryMetric == '{}'".format(SM.replace("'", "''")))
@@ -1109,6 +1136,9 @@ class ReporterBase():
 					mnamecolumns.append("DataSource")
 				else:
 					wherelst.append("DataSource == '{}'".format(FAType))
+
+			if len(mnamecolumns) < 1:
+				mnamecolumns.append("'" + SM + "'")
 
 			# Construct Name Column
 			mnamecolumn = " || ' - ' || ".join(mnamecolumns)
@@ -1291,7 +1321,7 @@ class ReporterBase():
 					sql += " || ' - ' || agent"
 				sql += " as [" + colname + "] "
 				sql += ", count(result)  as 'Count' "
-			if RType is None:
+			if RType in [None, "", "None"]:
 				sql = ""
 				return sql
 
@@ -1343,7 +1373,7 @@ class ReporterBase():
 					sql += "AND {} ".format(iwhere)
 				i += 1
 
-			if RType is not None:
+			if RType not in [None, "", "None"]:
 				sql += "GROUP by "
 
 			if RType == "Response Time":
@@ -1351,10 +1381,13 @@ class ReporterBase():
 			if RType == "TPS":
 				sql += "[" + colname + "] "
 				sql += ", result "
-				sql += "ORDER by result DESC, count(result) DESC "
+				sql += "ORDER BY "
+				sql += "result DESC"
+				sql += ", count(result) DESC "
 			if RType == "Total TPS":
 				sql += " [" + colname + "] "
-				sql += "ORDER by count([" + colname + "]) DESC "
+				sql += "ORDER BY "
+				sql += "count([" + colname + "]) DESC "
 
 		if DataType == "Metric":
 			MType = self.rt_table_get_mt(id)
@@ -1382,24 +1415,29 @@ class ReporterBase():
 				else:
 					wherelst.append("DataSource == '{}'".format(FAType))
 
-			if MType is not None and len(MType) > 0:
+			if MType not in [None, "", "None"] and len(MType) > 0:
 				if "MetricType" in mcolumns:
 					mcolumns.remove("MetricType")
 				wherelst.append("MetricType == '{}'".format(MType))
 				if "MetricType" in grouplst:
 					grouplst.remove("MetricType")
-			if PM is not None and len(PM) > 0:
+			if PM not in [None, "", "None"] and len(PM) > 0:
 				if "PrimaryMetric" in mcolumns:
 					mcolumns.remove("PrimaryMetric")
 				wherelst.append("PrimaryMetric == '{}'".format(PM))
 				if "PrimaryMetric" in grouplst:
 					grouplst.remove("PrimaryMetric")
-			if SM is not None and len(SM) > 0:
+			if SM not in [None, "", "None"] and len(SM) > 0:
 				if "SecondaryMetric" in mcolumns:
 					mcolumns.remove("SecondaryMetric")
 				wherelst.append("SecondaryMetric == '{}'".format(SM))
 				if "SecondaryMetric" in grouplst:
 					grouplst.remove("SecondaryMetric")
+
+			if len(mcolumns) < 1:
+				# mcolumns.append("'" + SM + "'")
+				mcolumns.append("SecondaryMetric")
+				grouplst.append("SecondaryMetric")
 
 			if colours:
 				colourcolumn = " || ' - ' || ".join(grouplst)
@@ -2331,7 +2369,7 @@ class ReporterCore:
 
 		if os.path.isfile(base.reporter_ini):
 			base.debugmsg(7, "reporter_ini: ", base.reporter_ini)
-			base.config.read(base.reporter_ini)
+			base.config.read(base.reporter_ini, encoding="utf8")
 		else:
 			base.saveini()
 
@@ -2365,23 +2403,47 @@ class ReporterCore:
 		if 'ResultDir' not in base.config['Reporter']:
 			base.config['Reporter']['ResultDir'] = base.dir_path
 			base.saveini()
+		else:
+			if not os.path.isdir(base.config['Reporter']['ResultDir']):
+				base.config['Reporter']['ResultDir'] = base.dir_path
+				base.saveini()
 
 		if 'Results' not in base.config['Reporter']:
 			base.config['Reporter']['Results'] = ""
 			base.saveini()
+		else:
+			if not os.path.isfile(base.config['Reporter']['Results']):
+				base.config['Reporter']['Results'] = ""
+				base.saveini()
+
+		if 'Report' not in base.config['Reporter']:
+			base.config['Reporter']['Report'] = ""
+			base.saveini()
+		else:
+			if not os.path.isfile(base.config['Reporter']['Report']):
+				base.config['Reporter']['Report'] = ""
+				base.saveini()
 
 		if 'Template' not in base.config['Reporter']:
 			base.config['Reporter']['Template'] = ""
 			base.saveini()
+		else:
+			if not os.path.isfile(base.config['Reporter']['Template']):
+				base.config['Reporter']['Template'] = ""
+				base.saveini()
 
 		if 'TemplateDir' not in base.config['Reporter']:
 			base.config['Reporter']['TemplateDir'] = ""
 			base.saveini()
+		else:
+			if not os.path.isdir(base.config['Reporter']['TemplateDir']):
+				base.config['Reporter']['TemplateDir'] = ""
+				base.saveini()
 
 		usetemplate = False
 		if base.args.template:
 			usetemplate = True
-			base.config['Reporter']['Template'] = base.args.template
+			base.config['Reporter']['Template'] = base.whitespace_set_ini_value(base.args.template)
 
 		if base.args.dir:
 			# do some sanity checks before blindly setting
@@ -3381,7 +3443,11 @@ class ReporterCore:
 
 		heading_text = "{} {}".format(number, name)
 
-		document.add_heading(heading_text, level)
+		base.debugmsg(5, "heading_text:", heading_text, "	level:", level)
+		hdpg = document.add_heading(heading_text, level)
+		stylename = "Heading {}".format(level)
+		base.debugmsg(5, "stylename:", stylename)
+		hdpg.style = stylename
 		# document.add_paragraph("", style='Normal')
 
 	def docx_sections_contents(self, id):
@@ -3402,7 +3468,7 @@ class ReporterCore:
 		document = self.cg_data["docx"]["document"]
 		# document.add_paragraph("", style='Normal')
 
-		paragraph = document.add_paragraph()
+		paragraph = document.add_paragraph(style='Normal')
 		run = paragraph.add_run()
 		fldChar = OxmlElement('w:fldChar')  # creates a new element
 		fldChar.set(qn('w:fldCharType'), 'begin')  # sets attribute on element
@@ -4073,6 +4139,7 @@ class ReporterCore:
 			base.debugmsg(9, "concat:", concat)
 			hyper = "=HYPERLINK(" + concat + ",\"" + heading_text + "\")"
 			base.debugmsg(8, "hyper:", hyper)
+			c.style = "Default"
 			c.value = hyper
 
 		if level < maxlevel:
@@ -5639,7 +5706,7 @@ class ReporterGUI(tk.Frame):
 	#
 
 	def cs_datatable(self, id):
-		base.debugmsg(9, "id:", id)
+		base.debugmsg(8, "id:", id)
 		colours = base.rt_table_get_colours(id)
 		datatype = base.rt_table_get_dt(id)
 		self.contentdata[id]["LFrame"].columnconfigure(99, weight=1)
@@ -5668,9 +5735,12 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["DTFrame"] = rownum
 		self.cs_datatable_switchdt(id)
 
-	def cs_datatable_update(self, _event=None):
-		base.debugmsg(5, "_event:", _event)
+	def cs_datatable_update(self, _event=None, *args):
+		base.debugmsg(5, "_event:", _event, "	args:", args)
 		changes = 0
+		# if len(args) > 0:
+		# 	base.debugmsg(8, "args[0]:", args[0])
+		# 	changes += args[0]
 		id = self.sectionstree.focus()
 		if _event is not None:
 			name = base.report_item_get_name(_event)
@@ -5740,12 +5810,17 @@ class ReporterGUI(tk.Frame):
 			datatype = self.contentdata[id]["strDT"].get()
 			changes += base.rt_table_set_dt(id, datatype)
 
+			base.debugmsg(8, "datatype:", datatype)
+
 			if datatype == "Metric":
 				self.cs_datatable_update_metrics(id)
 
 			if datatype != "SQL":
 				time.sleep(0.1)
 				base.rt_table_generate_sql(id)
+
+			# if changes > 0:
+			# 	self.cs_datatable_switchdt(id)
 
 		base.debugmsg(5, "changes:", changes)
 		if "tSQL" in self.contentdata[id]:
@@ -5853,7 +5928,8 @@ class ReporterGUI(tk.Frame):
 			name = base.report_item_get_name(_event)
 			if name is not None:
 				id = _event
-		base.debugmsg(9, "id:", id)
+		base.debugmsg(8, "id:", id)
+		# self.cs_datatable_update(id, 1)
 		self.cs_datatable_update(id)
 		datatype = self.contentdata[id]["strDT"].get()
 		base.debugmsg(5, "datatype:", datatype)
@@ -5863,8 +5939,13 @@ class ReporterGUI(tk.Frame):
 		# Forget
 		for frame in self.contentdata[id]["Frames"].keys():
 			self.contentdata[id]["Frames"][frame].grid_forget()
-			self.contentdata[id]["Frames"] = {}
+			# self.contentdata[id]["Frames"] = {}
+			# del self.contentdata[id]["Frames"][frame]
+		self.contentdata[id]["Frames"] = {}
 
+		base.debugmsg(8, "id:", id, "Frames:", self.contentdata[id]["Frames"])
+
+		base.debugmsg(8, "id:", id, "Construct")
 		# Construct
 		if datatype not in self.contentdata[id]["Frames"]:
 			rownum = 0
@@ -5873,7 +5954,7 @@ class ReporterGUI(tk.Frame):
 			# self.contentdata[id]["Frames"][datatype].columnconfigure(0, weight=1)
 			self.contentdata[id]["Frames"][datatype].columnconfigure(99, weight=1)
 
-			# "Metric", "Result", "SQL"
+			base.debugmsg(8, "datatype:", datatype)
 
 			if datatype == "Metric":
 
@@ -6071,6 +6152,7 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["tSQL"].bind('<Leave>', self.cs_datatable_update)
 				self.contentdata[id]["tSQL"].bind('<FocusOut>', self.cs_datatable_update)
 
+		base.debugmsg(8, "id:", id, "renamecols 1")
 		if "renamecols" not in self.contentdata[id]["Frames"] and datatype not in ["SQL"]:
 			base.debugmsg(5, "create renamecols frame")
 			rownum = 0
@@ -6095,12 +6177,16 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[id]["renamecolumns"]["startrow"] = rownum + 1
 			self.contentdata[id]["renamecolumns"]["rownum"] = rownum + 1
 
+		base.debugmsg(8, "id:", id, "renamecols 2")
 		if datatype not in ["SQL"]:
 			self.cs_datatable_add_renamecols(id)
+			base.debugmsg(8, "id:", id, "renamecols 2 debug 1")
 			# cp = threading.Thread(target=lambda: self.cs_datatable_add_renamecols(id))
 			# cp.start()
 			self.contentdata[id]["Frames"]["renamecols"].grid(column=0, row=self.contentdata[id]["DTFrame"] + 1, columnspan=100, sticky="nsew")
+			base.debugmsg(8, "id:", id, "renamecols 2 debug 2")
 
+		base.debugmsg(8, "id:", id, "Update")
 		# Update
 		if datatype == "SQL":
 			sql = base.rt_table_get_sql(id)
@@ -6138,6 +6224,7 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[id]["FNType"].set(base.rt_table_get_fn(id))
 			self.contentdata[id]["FPattern"].set(base.rt_table_get_fp(id))
 
+		base.debugmsg(8, "id:", id, "Show")
 		# Show
 		self.contentdata[id]["Frames"][datatype].grid(column=0, row=self.contentdata[id]["DTFrame"], columnspan=100, sticky="nsew")
 
@@ -6148,8 +6235,12 @@ class ReporterGUI(tk.Frame):
 
 			if datatype == "SQL":
 				sql = base.rt_table_get_sql(id)
+				if len(sql.strip()) < 1:
+					return None
 			else:
 				sql = base.rt_table_generate_sql(id)
+				if len(sql.strip()) < 1:
+					return None
 				sql += " LIMIT 1 "
 
 			base.debugmsg(5, "sql:", sql)
@@ -6849,7 +6940,13 @@ class ReporterGUI(tk.Frame):
 
 	def content_preview(self, id):
 		base.debugmsg(9, "id:", id)
-		self.updateStatus("Preview Loading.....")
+
+		if base.config['Reporter']['Results']:
+			self.updateStatus("Preview Loading.....")
+		else:
+			sres = "Please select a result file"
+			self.updateStatus(sres)
+			return None
 		try:
 			self.cp_generate_preview(id)
 		except Exception as e:
@@ -6885,6 +6982,7 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(8, "id:", id)
 		pid, idl, idr = base.rt_graph_LR_Ids(id)
 
+		base.debugmsg(8, "pid:", pid, "	idl:", idl, "	idr:", idr)
 		# if id not in self.contentdata:
 		while id not in self.contentdata:
 			time.sleep(0.1)
@@ -7169,12 +7267,12 @@ class ReporterGUI(tk.Frame):
 
 			colnum = 1
 			cellname = "{}_{}".format(id, colnum)
-			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(titlenum))
+			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(titlenum), style='Report.TLabel')
 			self.contentdata[fid][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 			colnum += 1
 			cellname = "{}_{}".format(id, colnum)
-			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(titlename))
+			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(titlename), style='Report.TLabel')
 			self.contentdata[fid][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 			colnum += 1
@@ -7182,7 +7280,7 @@ class ReporterGUI(tk.Frame):
 
 			colnum += 1
 			cellname = "{}_{}".format(id, colnum)
-			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(pagenum))
+			self.contentdata[fid][cellname] = ttk.Label(self.contentdata[fid]["fmeTOC"], text=str(pagenum), style='Report.TLabel')
 			self.contentdata[fid][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 			nextrow = rownum + 1
