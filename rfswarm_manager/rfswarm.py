@@ -5001,7 +5001,6 @@ class RFSwarmGUI(tk.Frame):
 		setingsWindow.inpEL.insert(0, setingsWindow.excludelibrariescurrent)
 		setingsWindow.inpEL.grid(column=1, row=rownum, columnspan=10, sticky="nsew")
 
-
 		rownum += 1
 		setingsWindow.lblRO = ttk.Label(setingsWindow.fmeTestDefaults, text="Robot Options:")
 		setingsWindow.lblRO.grid(column=0, row=rownum, sticky="nsew")
