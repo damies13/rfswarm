@@ -455,10 +455,13 @@ class RFSwarmBase:
 
 	save_ini = True
 
+	excludelibrariesdefault = "String,OperatingSystem,perftest"
+
 	scriptcount = 0
 	scriptlist: Any = [{}]
 	scriptfiles: Any = {}
 	scriptgrpend: Any = {}
+	scriptdefaults: Any = {}
 
 	uploadmodes = {'imm': "Immediately", 'err': "On Error Only", 'def': "All Deferred"}
 	uploadmode = "err" 	# modes are imm, err, def
@@ -2563,6 +2566,9 @@ class RFSwarmCore:
 
 			if "uploadmode" in filedata["Scenario"]:
 				base.uploadmode = filedata['Scenario']['uploadmode']
+
+		if "Script Defaults" in filedata:
+			base.scriptdefaults = filedata['Script Defaults']
 
 		else:
 			base.debugmsg(1, "File contains no scenario:", ScenarioFile)
@@ -4921,6 +4927,27 @@ class RFSwarmGUI(tk.Frame):
 		setingsWindow.fmeContent.columnconfigure(0, weight=1)
 		setingsWindow.fmeContent.rowconfigure(99, weight=1)
 
+
+		# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+		# Field Data
+		#
+
+		setingsWindow.excludelibrariesdefault = base.excludelibrariesdefault
+
+		base.debugmsg(5, "base.scriptdefaults:", base.scriptdefaults)
+
+		setingsWindow.excludelibrariescurrent = setingsWindow.excludelibrariesdefault
+		base.scriptdefaults
+		if "excludelibraries" in base.scriptdefaults:
+			setingsWindow.excludelibrariescurrent = base.scriptdefaults["excludelibraries"]
+		base.debugmsg(5, "excludelibrariescurrent:", setingsWindow.excludelibrariescurrent)
+
+		setingsWindow.robotoptionscurrent = ""
+		if "robotoptions" in base.scriptdefaults:
+			setingsWindow.robotoptionscurrent = base.scriptdefaults["robotoptions"]
+		base.debugmsg(5, "robotoptionscurrent:", setingsWindow.robotoptionscurrent)
+
+
 		# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 		# Scenario
 		#
@@ -4973,7 +5000,7 @@ class RFSwarmGUI(tk.Frame):
 
 		setingsWindow.inpEL = ttk.Entry(setingsWindow.fmeTestDefaults)
 		setingsWindow.inpEL.delete(0, 'end')
-		# setingsWindow.inpEL.insert(0, setingsWindow.excludelibrariescurrent)
+		setingsWindow.inpEL.insert(0, setingsWindow.excludelibrariescurrent)
 		setingsWindow.inpEL.grid(column=1, row=rownum, columnspan=10, sticky="nsew")
 
 
@@ -4983,7 +5010,7 @@ class RFSwarmGUI(tk.Frame):
 
 		setingsWindow.inpRO = ttk.Entry(setingsWindow.fmeTestDefaults)
 		setingsWindow.inpRO.delete(0, 'end')
-		# stgsWindow.inpRO.insert(0, stgsWindow.robotoptionscurrent)
+		setingsWindow.inpRO.insert(0, setingsWindow.robotoptionscurrent)
 		setingsWindow.inpRO.grid(column=1, row=rownum, columnspan=10, sticky="nsew")
 
 
@@ -5109,11 +5136,48 @@ class RFSwarmGUI(tk.Frame):
 
 		if save:
 			self.plan_scnro_chngd = True
+
+
+			# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+			# Scenario
+			#
 			# base.uploadmodes[base.uploadmode]
 			base.debugmsg(5, "strUpload:", setingsWindow.strUpload.get(), "	uploadmodes:", base.uploadmodes)
 			base.uploadmode = base.GetKey(base.uploadmodes, setingsWindow.strUpload.get())
 			base.debugmsg(5, "uploadmode:", base.uploadmode)
 
+
+			# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+			# Test Defaults
+			#
+			el = setingsWindow.inpEL.get()
+			base.debugmsg(7, "el:", el)
+			if len(el) > 0:
+				if el != setingsWindow.excludelibrariesdefault:
+					base.scriptdefaults["excludelibraries"] = el
+					self.plan_scnro_chngd = True
+				else:
+					if "excludelibraries" in base.scriptdefaults:
+						del base.scriptdefaults["excludelibraries"]
+			else:
+				if "excludelibraries" in base.scriptdefaults:
+					del base.scriptdefaults["excludelibraries"]
+					self.plan_scnro_chngd = True
+
+			ro = setingsWindow.inpRO.get()
+			base.debugmsg(7, "ro:", ro)
+			if len(ro) > 0:
+				if ro != setingsWindow.robotoptionscurrent:
+					base.scriptdefaults["robotoptions"] = ro
+					self.plan_scnro_chngd = True
+			else:
+				if "robotoptions" in base.scriptdefaults:
+					del base.scriptdefaults["robotoptions"]
+					self.plan_scnro_chngd = True
+
+			# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+			# Manager
+			#
 			srvrestart = False
 			srvip = base.config['Server']['BindIP']
 			srvport = int(base.config['Server']['BindPort'])
@@ -6003,7 +6067,10 @@ class RFSwarmGUI(tk.Frame):
 		if len(testname) > 0:
 			stgsWindow.title("Settings for {} ({})".format(testname, r))
 
-		stgsWindow.excludelibrariesdefault = "String,OperatingSystem,perftest"
+		stgsWindow.excludelibrariesdefault = base.excludelibrariesdefault
+		if "excludelibraries" in base.scriptdefaults:
+			stgsWindow.excludelibrariesdefault = base.scriptdefaults["excludelibraries"]
+
 		stgsWindow.Filters = {}
 
 		base.debugmsg(5, "base.scriptlist[r]:", base.scriptlist[r])
@@ -6014,6 +6081,8 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(5, "excludelibrariescurrent:", stgsWindow.excludelibrariescurrent)
 
 		stgsWindow.robotoptionscurrent = ""
+		if "robotoptions" in base.scriptdefaults:
+			stgsWindow.robotoptionscurrent = base.scriptdefaults["robotoptions"]
 		if "robotoptions" in base.scriptlist[r]:
 			stgsWindow.robotoptionscurrent = base.scriptlist[r]["robotoptions"]
 		base.debugmsg(5, "robotoptionscurrent:", stgsWindow.robotoptionscurrent)
@@ -6962,6 +7031,9 @@ class RFSwarmGUI(tk.Frame):
 
 			# base.uploadmode
 			filedata['Scenario']['UploadMode'] = base.inisafevalue(base.uploadmode)
+
+			if len(base.scriptdefaults) > 0:
+				filedata['Script Defaults'] = base.scriptdefaults
 
 			scriptidx = str(0)
 			if 'ScriptCount' not in filedata['Scenario']:
