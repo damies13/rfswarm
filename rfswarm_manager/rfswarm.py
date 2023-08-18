@@ -4927,7 +4927,6 @@ class RFSwarmGUI(tk.Frame):
 		setingsWindow.fmeContent.columnconfigure(0, weight=1)
 		setingsWindow.fmeContent.rowconfigure(99, weight=1)
 
-
 		# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 		# Field Data
 		#
@@ -4946,7 +4945,6 @@ class RFSwarmGUI(tk.Frame):
 		if "robotoptions" in base.scriptdefaults:
 			setingsWindow.robotoptionscurrent = base.scriptdefaults["robotoptions"]
 		base.debugmsg(5, "robotoptionscurrent:", setingsWindow.robotoptionscurrent)
-
 
 		# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 		# Scenario
@@ -5012,8 +5010,6 @@ class RFSwarmGUI(tk.Frame):
 		setingsWindow.inpRO.delete(0, 'end')
 		setingsWindow.inpRO.insert(0, setingsWindow.robotoptionscurrent)
 		setingsWindow.inpRO.grid(column=1, row=rownum, columnspan=10, sticky="nsew")
-
-
 
 		# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 		# Manager
@@ -5137,7 +5133,6 @@ class RFSwarmGUI(tk.Frame):
 		if save:
 			self.plan_scnro_chngd = True
 
-
 			# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 			# Scenario
 			#
@@ -5145,7 +5140,6 @@ class RFSwarmGUI(tk.Frame):
 			base.debugmsg(5, "strUpload:", setingsWindow.strUpload.get(), "	uploadmodes:", base.uploadmodes)
 			base.uploadmode = base.GetKey(base.uploadmodes, setingsWindow.strUpload.get())
 			base.debugmsg(5, "uploadmode:", base.uploadmode)
-
 
 			# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 			# Test Defaults
@@ -6055,8 +6049,6 @@ class RFSwarmGUI(tk.Frame):
 		stgsWindow.columnconfigure(0, weight=1)
 		# stgsWindow.rowconfigure(1, weight=1)
 
-
-
 		stgsWindow.title("Settings for row {}".format(r))
 		testname = ""
 		try:
@@ -6140,7 +6132,6 @@ class RFSwarmGUI(tk.Frame):
 		row += 1
 		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer before the buttons
 		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
-
 
 		row += 1
 		stgsWindow.rowconfigure(row, weight=1)
