@@ -455,7 +455,9 @@ class RFSwarmBase:
 
 	save_ini = True
 
-	excludelibrariesdefault = "String,OperatingSystem,perftest"
+	# https://github.com/damies13/rfswarm/blob/master/Doc/rfswarm_manager.md#exclude-libraries
+	# default (BuiltIn,String,OperatingSystem,perftest)
+	excludelibrariesdefault = "BuiltIn,String,OperatingSystem,perftest"
 
 	scriptcount = 0
 	scriptlist: Any = [{}]
@@ -2979,9 +2981,17 @@ class RFSwarmCore:
 
 										if "excludelibraries" in grp:
 											base.robot_schedule["Agents"][nxtagent][grurid]["excludelibraries"] = grp["excludelibraries"]
+										else:
+											if "excludelibraries" in base.scriptdefaults:
+												base.robot_schedule["Agents"][nxtagent][grurid]["excludelibraries"] = base.scriptdefaults["excludelibraries"]
+											else:
+												base.robot_schedule["Agents"][nxtagent][grurid]["excludelibraries"] = base.excludelibrariesdefault
 
 										if "robotoptions" in grp:
 											base.robot_schedule["Agents"][nxtagent][grurid]["robotoptions"] = grp["robotoptions"]
+										else:
+											if "robotoptions" in base.scriptdefaults:
+												base.robot_schedule["Agents"][nxtagent][grurid]["robotoptions"] = base.scriptdefaults["robotoptions"]
 
 										base.Agents[nxtagent]["AssignedRobots"] += 1
 										base.debugmsg(5, "base.Agents[", nxtagent, "][AssignedRobots]:", base.Agents[nxtagent]["AssignedRobots"])
