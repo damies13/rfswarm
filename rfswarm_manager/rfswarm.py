@@ -2567,12 +2567,12 @@ class RFSwarmCore:
 			if "uploadmode" in filedata["Scenario"]:
 				base.uploadmode = filedata['Scenario']['uploadmode']
 
-		if "Script Defaults" in filedata:
-			base.scriptdefaults = filedata['Script Defaults']
-
 		else:
 			base.debugmsg(1, "File contains no scenario:", ScenarioFile)
 			return 1
+
+		if "Script Defaults" in filedata:
+			base.scriptdefaults = filedata['Script Defaults']
 
 		rowcount = 0
 		for i in range(scriptcount):
