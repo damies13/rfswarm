@@ -4921,11 +4921,16 @@ class RFSwarmGUI(tk.Frame):
 		setingsWindow.fmeContent.columnconfigure(0, weight=1)
 		setingsWindow.fmeContent.rowconfigure(99, weight=1)
 
+		# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+		# Scenario
+		#
+		fmerow = 0
+
 		setingsWindow.fmeScenario = tk.Frame(setingsWindow.fmeContent)
 		# setingsWindow.fmeScenario.config(bg="blue")
 		setingsWindow.fmeScenario.config(bd=1, relief="sunken")
 		# setingsWindow.fmeScenario.config(bd=1, relief="groove")
-		setingsWindow.fmeScenario.grid(column=0, row=1, sticky="nsew")
+		setingsWindow.fmeScenario.grid(column=0, row=fmerow, sticky="nsew")
 
 		setingsWindow.fmeScenario.columnconfigure(1, weight=1)
 
@@ -4944,11 +4949,55 @@ class RFSwarmGUI(tk.Frame):
 		setingsWindow.strUpload.set(base.uploadmodes[base.uploadmode])
 		setingsWindow.omUpload.grid(column=2, row=1, sticky="nsew")
 
+		# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+		# Test Defaults
+		#
+		fmerow += 1
+
+		setingsWindow.fmeTestDefaults = tk.Frame(setingsWindow.fmeContent)
+		# setingsWindow.fmeScenario.config(bg="blue")
+		setingsWindow.fmeTestDefaults.config(bd=1, relief="sunken")
+		# setingsWindow.fmeScenario.config(bd=1, relief="groove")
+		setingsWindow.fmeTestDefaults.grid(column=0, row=fmerow, sticky="nsew")
+
+		setingsWindow.fmeTestDefaults.columnconfigure(1, weight=1)
+
+		# [Server]
+		rownum += 0
+		setingsWindow.lblTestDefaults = ttk.Label(setingsWindow.fmeTestDefaults, text="Test Defaults:")
+		setingsWindow.lblTestDefaults.grid(column=0, row=rownum, sticky="nsew")
+
+		rownum += 1
+		setingsWindow.lblEL = ttk.Label(setingsWindow.fmeTestDefaults, text="Exclude libraries:")
+		setingsWindow.lblEL.grid(column=0, row=rownum, sticky="nsew")
+
+		setingsWindow.inpEL = ttk.Entry(setingsWindow.fmeTestDefaults)
+		setingsWindow.inpEL.delete(0, 'end')
+		# setingsWindow.inpEL.insert(0, setingsWindow.excludelibrariescurrent)
+		setingsWindow.inpEL.grid(column=1, row=rownum, columnspan=10, sticky="nsew")
+
+
+		rownum += 1
+		setingsWindow.lblRO = ttk.Label(setingsWindow.fmeTestDefaults, text="Robot Options:")
+		setingsWindow.lblRO.grid(column=0, row=rownum, sticky="nsew")
+
+		setingsWindow.inpRO = ttk.Entry(setingsWindow.fmeTestDefaults)
+		setingsWindow.inpRO.delete(0, 'end')
+		# stgsWindow.inpRO.insert(0, stgsWindow.robotoptionscurrent)
+		setingsWindow.inpRO.grid(column=1, row=rownum, columnspan=10, sticky="nsew")
+
+
+
+		# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+		# Manager
+		#
+		fmerow += 1
+
 		setingsWindow.fmeServer = tk.Frame(setingsWindow.fmeContent)
 		# setingsWindow.fmeScenario.config(bg="blue")
 		setingsWindow.fmeServer.config(bd=1, relief="sunken")
 		# setingsWindow.fmeScenario.config(bd=1, relief="groove")
-		setingsWindow.fmeServer.grid(column=0, row=2, sticky="nsew")
+		setingsWindow.fmeServer.grid(column=0, row=fmerow, sticky="nsew")
 
 		setingsWindow.fmeServer.columnconfigure(1, weight=1)
 
@@ -5939,6 +5988,11 @@ class RFSwarmGUI(tk.Frame):
 		# Now it works :)
 		stgsWindow.transient(self.root)
 
+		stgsWindow.columnconfigure(0, weight=1)
+		# stgsWindow.rowconfigure(1, weight=1)
+
+
+
 		stgsWindow.title("Settings for row {}".format(r))
 		testname = ""
 		try:
@@ -6017,6 +6071,10 @@ class RFSwarmGUI(tk.Frame):
 		row += 1
 		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer before the buttons
 		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+
+		row += 1
+		stgsWindow.rowconfigure(row, weight=1)
 
 		row += 1
 		btnSave = ttk.Button(stgsWindow, text="Save", command=lambda: self.sr_row_settings_save(r, stgsWindow))
