@@ -51,6 +51,7 @@ class RFSwarmAgent():
 	logdir = None
 	agentini = None
 	listenerfile = None
+	repeaterfile = None
 	ipaddresslist: Any = []
 	agentname = None
 	agentproperties: Any = {}
@@ -163,6 +164,7 @@ class RFSwarmAgent():
 			self.saveini()
 
 		self.ensure_listner_file()
+		self.ensure_repeater_listner_file()
 
 		t = threading.Thread(target=self.tick_counter)
 		t.start()
@@ -769,6 +771,7 @@ class RFSwarmAgent():
 		now = int(time.time())
 
 		self.ensure_listner_file()
+		self.ensure_repeater_listner_file()
 
 		if "ScriptIndex" not in self.jobs[jobid]:
 			self.debugmsg(6, "runthread: jobid:", jobid)
@@ -784,7 +787,7 @@ class RFSwarmAgent():
 		self.debugmsg(9, "self.jobs[jobid]:", self.jobs[jobid])
 
 		# jobfile = os.path.join(self.scriptdir, "job_{}.json".format(jobid))
-		jobfile = os.path.join(self.scriptdir, "job_{}_{}.json".format(self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["Robot"]))
+		jobfile = os.path.join(self.scriptdir, "RFS_Job_{}_{}.json".format(self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["Robot"]))
 
 		jobdata = {}
 		jobdata["StartTime"] = self.jobs[jobid]["StartTime"]
@@ -1274,6 +1277,10 @@ class RFSwarmAgent():
 				if not os.path.isfile(self.listenerfile):
 					self.create_listner_file()
 
+	def ensure_repeater_listner_file(self):
+		if self.repeaterfile is None:
+			self.create_repeater_listner_file()
+
 	def create_listner_file(self):
 		self.listenerfile = os.path.join(self.scriptdir, "RFSListener2.py")
 
@@ -1430,6 +1437,69 @@ class RFSwarmAgent():
 
 		# print("RFSwarmAgent: create_listner_file: listenerfile: ", self.listenerfile)
 		with open(self.listenerfile, 'w+') as lf:
+			# lf.writelines(fd)
+			lf.write('\n'.join(fd))
+
+	def create_repeater_listner_file(self):
+		self.repeaterfile = os.path.join(self.scriptdir, "RFSTestRepeater.py")
+
+		fd = []
+		fd.append("")
+		fd.append("from robot.api import SuiteVisitor")
+		fd.append("")
+		fd.append("from robot.libraries.BuiltIn import BuiltIn")
+		fd.append("")
+		fd.append("import time")
+		fd.append("import os")
+		fd.append("import json")
+		fd.append("")
+		fd.append("class RFSTestRepeater(SuiteVisitor):")
+		fd.append("	ROBOT_LISTENER_API_VERSION = 3")
+		fd.append("")
+		fd.append("	testname = None")
+		fd.append("	count = 0")
+		fd.append("")
+		fd.append("	def end_test(self, test, result):")
+		fd.append("")
+		fd.append("		jobdata = {}")
+		fd.append("		index = test.parent.metadata['RFS_INDEX']")
+		fd.append("		robot = test.parent.metadata['RFS_ROBOT']")
+		fd.append("		scriptdir = os.path.dirname(__file__)")
+		fd.append("		jobfile = os.path.join(scriptdir, \"RFS_Job_{}_{}.json\".format(index, robot))")
+		fd.append("")
+		fd.append("		if os.path.exists(jobfile):")
+		fd.append("			with open(jobfile, 'r') as f:")
+		fd.append("				jobdata = json.load(f)")
+		fd.append("")
+		fd.append("		self.count += 1")
+		fd.append("		newiteration = \"{}.{}\".format(test.parent.metadata['RFS_ITERATION'], self.count)")
+		fd.append("		BuiltIn().set_suite_variable(\"${RFS_ITERATION}\", newiteration)")
+		fd.append("")
+		fd.append("		if int(time.time()) < jobdata[\"EndTime\"]:")
+		fd.append("			if self.testname is None:")
+		fd.append("				self.testname = test.name")
+		fd.append("			newname = \"{} {}\".format(self.testname, newiteration)")
+		fd.append("			copy = test.copy(name=newname)")
+		fd.append("			test.parent.tests.append(copy)")
+		fd.append("")
+		fd.append("	def end_suite(self, suite, result):")
+		fd.append("		# This prevents the error:")
+		fd.append("		# [ ERROR ] Calling method 'end_suite' of listener 'TestRepeater.py' failed: TypeError: end_suite() takes 2 positional arguments but 3 were given")
+		fd.append("		pass")
+		fd.append("")
+		fd.append("	def start_suite(self, suite, result):")
+		fd.append("		# This prevents the error:")
+		fd.append("		# [ ERROR ] Calling method 'start_suite' of listener 'TestRepeater.py' failed: TypeError: start_suite() takes 2 positional arguments but 3 were given")
+		fd.append("		pass")
+		fd.append("")
+		fd.append("	def start_test(self, test, result):")
+		fd.append("		# This prevents the error:")
+		fd.append("		# [ ERROR ] Calling method 'start_test' of listener 'TestRepeater.py' failed: TypeError: start_test() takes 2 positional arguments but 3 were given")
+		fd.append("		pass")
+		fd.append("")
+
+		# print("RFSwarmAgent: create_listner_file: listenerfile: ", self.listenerfile)
+		with open(self.repeaterfile, 'w+') as lf:
 			# lf.writelines(fd)
 			lf.write('\n'.join(fd))
 
