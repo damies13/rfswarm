@@ -781,6 +781,23 @@ class RFSwarmAgent():
 
 		self.jobs[jobid]["Iteration"] += 1
 
+		self.debugmsg(9, "self.jobs[jobid]:", self.jobs[jobid])
+
+		# jobfile = os.path.join(self.scriptdir, "job_{}.json".format(jobid))
+		jobfile = os.path.join(self.scriptdir, "job_{}_{}.json".format(self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["Robot"]))
+
+		jobdata = {}
+		jobdata["StartTime"] = self.jobs[jobid]["StartTime"]
+		jobdata["EndTime"] = self.jobs[jobid]["EndTime"]
+		jobdata["Iteration"] = self.jobs[jobid]["Iteration"]
+		jobdata["Index"] = self.jobs[jobid]["ScriptIndex"]
+		jobdata["Robot"] = self.jobs[jobid]["Robot"]
+		jobdata["jobid"] = jobid
+		jobdata["Test"] = self.jobs[jobid]["Test"]
+
+		with open(jobfile, 'w') as jfile:
+			jfile.write(json.dumps(jobdata))
+
 		hash = self.jobs[jobid]['ScriptHash']
 		self.debugmsg(6, "runthread: hash:", hash)
 		test = self.jobs[jobid]['Test']
@@ -896,6 +913,7 @@ class RFSwarmAgent():
 
 			result = 0
 			try:
+				os.chdir(self.scriptdir)
 				# https://stackoverflow.com/questions/4856583/how-do-i-pipe-a-subprocess-call-to-a-text-file
 				with open(logFileName, "w") as f:
 					self.debugmsg(3, "Robot run with command: '", " ".join(cmd), "'")
@@ -914,6 +932,9 @@ class RFSwarmAgent():
 						self.debugmsg(1, "Robot returned an error:", e, " \nplease check the log file:", logFileName)
 						result = 1
 					f.close()
+
+				if os.path.exists(jobfile):
+					os.remove(jobfile)
 
 				if self.xmlmode:
 					if os.path.exists(outputFile):
