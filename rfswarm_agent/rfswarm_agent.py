@@ -901,6 +901,10 @@ class RFSwarmAgent():
 		if not self.xmlmode:
 			cmd.append("--listener {}".format('"' + self.listenerfile + '"'))
 
+		if "TestRepeater" in self.jobs[jobid]:
+			if self.str2bool(self.jobs[jobid]["TestRepeater"]):
+				cmd.append("--listener {}".format('"' + self.repeaterfile + '"'))
+
 		if "robotoptions" in self.jobs[jobid]:
 			cmd.append("{}".format(self.jobs[jobid]['robotoptions']))
 

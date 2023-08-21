@@ -458,6 +458,7 @@ class RFSwarmBase:
 	# https://github.com/damies13/rfswarm/blob/master/Doc/rfswarm_manager.md#exclude-libraries
 	# default (BuiltIn,String,OperatingSystem,perftest)
 	excludelibrariesdefault = "BuiltIn,String,OperatingSystem,perftest"
+	testrepeaterdefault = False
 
 	scriptcount = 0
 	scriptlist: Any = [{}]
@@ -804,7 +805,7 @@ class RFSwarmBase:
 				# create tables
 
 				c.execute('''CREATE TABLE Results
-					(script_index int, robot int, iteration int, agent text, sequence int, result_name text, result text, elapsed_time num, start_time num, end_time num)''')
+					(script_index int, robot int, iteration real, agent text, sequence int, result_name text, result text, elapsed_time num, start_time num, end_time num)''')
 
 				c.execute('''CREATE TABLE Metric
 					(ID INTEGER, Name TEXT NOT NULL, Type TEXT NOT NULL, PRIMARY KEY("ID"))''')
@@ -2993,6 +2994,13 @@ class RFSwarmCore:
 											if "robotoptions" in base.scriptdefaults:
 												base.robot_schedule["Agents"][nxtagent][grurid]["robotoptions"] = base.scriptdefaults["robotoptions"]
 
+										tr = base.testrepeaterdefault
+										if "testrepeater" in base.scriptdefaults:
+											tr = base.scriptdefaults["testrepeater"]
+										if "testrepeater" in grp:
+											tr = grp["testrepeater"]
+										base.robot_schedule["Agents"][nxtagent][grurid]["robotoptions"] = str(tr)
+
 										base.Agents[nxtagent]["AssignedRobots"] += 1
 										base.debugmsg(5, "base.Agents[", nxtagent, "][AssignedRobots]:", base.Agents[nxtagent]["AssignedRobots"])
 
@@ -4956,6 +4964,13 @@ class RFSwarmGUI(tk.Frame):
 			setingsWindow.robotoptionscurrent = base.scriptdefaults["robotoptions"]
 		base.debugmsg(5, "robotoptionscurrent:", setingsWindow.robotoptionscurrent)
 
+		setingsWindow.testrepeaterdefault = base.testrepeaterdefault
+		setingsWindow.testrepeatercurrent = setingsWindow.testrepeaterdefault
+		if "testrepeater" in base.scriptdefaults:
+			setingsWindow.testrepeatercurrent = base.str2bool(base.scriptdefaults["testrepeater"])
+		base.debugmsg(5, "testrepeatercurrent:", setingsWindow.testrepeatercurrent)
+
+
 		# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 		# Scenario
 		#
@@ -5019,6 +5034,15 @@ class RFSwarmGUI(tk.Frame):
 		setingsWindow.inpRO.delete(0, 'end')
 		setingsWindow.inpRO.insert(0, setingsWindow.robotoptionscurrent)
 		setingsWindow.inpRO.grid(column=1, row=rownum, columnspan=10, sticky="nsew")
+
+		rownum += 1
+		setingsWindow.lblTR = ttk.Label(setingsWindow.fmeTestDefaults, text="Test Repeater:")
+		setingsWindow.lblTR.grid(column=0, row=rownum, sticky="nsew")
+
+		setingsWindow.boolTR = tk.BooleanVar()
+		setingsWindow.boolTR.set(setingsWindow.testrepeatercurrent)
+		setingsWindow.inpTR = tk.Checkbutton(setingsWindow.fmeTestDefaults, variable=setingsWindow.boolTR, onvalue=True, offvalue=False)
+		setingsWindow.inpTR.grid(column=1, row=rownum, sticky="nsew")
 
 		# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 		# Manager
@@ -5176,6 +5200,18 @@ class RFSwarmGUI(tk.Frame):
 			else:
 				if "robotoptions" in base.scriptdefaults:
 					del base.scriptdefaults["robotoptions"]
+					self.plan_scnro_chngd = True
+
+			# base.scriptdefaults["testrepeater"]
+			tr = setingsWindow.boolTR.get()
+			base.debugmsg(7, "tr:", tr)
+			# setingsWindow.testrepeatercurrent = setingsWindow.testrepeaterdefault
+			if tr != setingsWindow.testrepeaterdefault:
+				base.scriptdefaults["testrepeater"] = str(tr)
+				self.plan_scnro_chngd = True
+			else:
+				if "testrepeater" in base.scriptdefaults:
+					del base.scriptdefaults["testrepeater"]
 					self.plan_scnro_chngd = True
 
 			# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -6088,6 +6124,15 @@ class RFSwarmGUI(tk.Frame):
 			stgsWindow.robotoptionscurrent = base.scriptlist[r]["robotoptions"]
 		base.debugmsg(5, "robotoptionscurrent:", stgsWindow.robotoptionscurrent)
 
+		stgsWindow.testrepeaterdefault = base.testrepeaterdefault
+		if "testrepeater" in base.scriptdefaults:
+			stgsWindow.testrepeaterdefault = base.str2bool(base.scriptdefaults["testrepeater"])
+
+		stgsWindow.testrepeatercurrent = stgsWindow.testrepeaterdefault
+		if "testrepeater" in base.scriptlist[r]:
+			stgsWindow.testrepeatercurrent = base.str2bool(base.scriptlist[r]["testrepeater"])
+		base.debugmsg(5, "testrepeatercurrent:", stgsWindow.testrepeatercurrent)
+
 		row = 0
 		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer before the filters
 		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
@@ -6115,6 +6160,19 @@ class RFSwarmGUI(tk.Frame):
 		stgsWindow.inpRO.delete(0, 'end')
 		stgsWindow.inpRO.insert(0, stgsWindow.robotoptionscurrent)
 		stgsWindow.inpRO.grid(column=0, row=row, columnspan=10, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer before the filters
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblTR = ttk.Label(stgsWindow, text="Test Repeater:")
+		stgsWindow.lblTR.grid(column=0, row=row, sticky="nsew")
+
+		stgsWindow.boolTR = tk.BooleanVar()
+		stgsWindow.boolTR.set(stgsWindow.testrepeatercurrent)
+		stgsWindow.inpTR = tk.Checkbutton(stgsWindow, variable=stgsWindow.boolTR, onvalue=True, offvalue=False)
+		stgsWindow.inpTR.grid(column=1, row=row, sticky="nsew")
 
 		row += 1
 		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer before the filters
@@ -6179,6 +6237,19 @@ class RFSwarmGUI(tk.Frame):
 			if "robotoptions" in base.scriptlist[r]:
 				del base.scriptlist[r]["robotoptions"]
 			self.plan_scnro_chngd = True
+
+
+		tr = stgsWindow.boolTR.get()
+		base.debugmsg(7, "tr:", tr)
+		if tr != stgsWindow.testrepeaterdefault:
+			base.scriptlist[r]["testrepeater"] = str(tr)
+			self.plan_scnro_chngd = True
+		else:
+			if "testrepeater" in base.scriptlist[r]:
+				del base.scriptlist[r]["testrepeater"]
+				self.plan_scnro_chngd = True
+
+
 
 		base.debugmsg(7, "stgsWindow.Filters:", stgsWindow.Filters)
 		if len(stgsWindow.Filters.keys()) > 0:
