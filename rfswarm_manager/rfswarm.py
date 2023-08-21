@@ -2999,7 +2999,7 @@ class RFSwarmCore:
 											tr = base.scriptdefaults["testrepeater"]
 										if "testrepeater" in grp:
 											tr = grp["testrepeater"]
-										base.robot_schedule["Agents"][nxtagent][grurid]["robotoptions"] = str(tr)
+										base.robot_schedule["Agents"][nxtagent][grurid]["testrepeater"] = str(tr)
 
 										base.Agents[nxtagent]["AssignedRobots"] += 1
 										base.debugmsg(5, "base.Agents[", nxtagent, "][AssignedRobots]:", base.Agents[nxtagent]["AssignedRobots"])
