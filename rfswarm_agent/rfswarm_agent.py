@@ -901,12 +901,21 @@ class RFSwarmAgent():
 		if not self.xmlmode:
 			cmd.append("--listener {}".format('"' + self.listenerfile + '"'))
 
-		if "TestRepeater" in self.jobs[jobid]:
-			if self.str2bool(self.jobs[jobid]["TestRepeater"]):
+		self.debugmsg(9, "runthread: cmd:", cmd)
+
+		self.debugmsg(9, "Check for runthread: robotexe")
+		if "testrepeater" in self.jobs[jobid]:
+			self.debugmsg(7, "runthread: self.jobs[jobid][testrepeater]:", self.jobs[jobid]["testrepeater"])
+			self.debugmsg(9, "runthread: self.jobs[jobid][testrepeater]:", self.str2bool(self.jobs[jobid]["testrepeater"]), type(self.str2bool(self.jobs[jobid]["testrepeater"])))
+			if self.str2bool(self.jobs[jobid]["testrepeater"]):
 				cmd.append("--listener {}".format('"' + self.repeaterfile + '"'))
+
+		self.debugmsg(9, "runthread: cmd:", cmd)
 
 		if "robotoptions" in self.jobs[jobid]:
 			cmd.append("{}".format(self.jobs[jobid]['robotoptions']))
+
+		self.debugmsg(9, "runthread: cmd:", cmd)
 
 		cmd.append("-o")
 		cmd.append('"' + outputFile + '"')
