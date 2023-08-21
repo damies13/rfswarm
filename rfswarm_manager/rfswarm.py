@@ -4970,7 +4970,6 @@ class RFSwarmGUI(tk.Frame):
 			setingsWindow.testrepeatercurrent = base.str2bool(base.scriptdefaults["testrepeater"])
 		base.debugmsg(5, "testrepeatercurrent:", setingsWindow.testrepeatercurrent)
 
-
 		# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 		# Scenario
 		#
@@ -6238,7 +6237,6 @@ class RFSwarmGUI(tk.Frame):
 				del base.scriptlist[r]["robotoptions"]
 			self.plan_scnro_chngd = True
 
-
 		tr = stgsWindow.boolTR.get()
 		base.debugmsg(7, "tr:", tr)
 		if tr != stgsWindow.testrepeaterdefault:
@@ -6248,8 +6246,6 @@ class RFSwarmGUI(tk.Frame):
 			if "testrepeater" in base.scriptlist[r]:
 				del base.scriptlist[r]["testrepeater"]
 				self.plan_scnro_chngd = True
-
-
 
 		base.debugmsg(7, "stgsWindow.Filters:", stgsWindow.Filters)
 		if len(stgsWindow.Filters.keys()) > 0:
