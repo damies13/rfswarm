@@ -1485,7 +1485,7 @@ class RFSwarmAgent():
 		fd.append("				jobdata = json.load(f)")
 		fd.append("")
 		fd.append("		self.count += 1")
-		fd.append("		newiteration = \"{}.{}\".format(test.parent.metadata['RFS_ITERATION'], self.count)")
+		fd.append("		newiteration = \"{}_{}\".format(test.parent.metadata['RFS_ITERATION'], self.count)")
 		fd.append("		BuiltIn().set_suite_variable(\"${RFS_ITERATION}\", newiteration)")
 		fd.append("")
 		fd.append("		if int(time.time()) < jobdata[\"EndTime\"]:")
