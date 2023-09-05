@@ -146,7 +146,7 @@ class ReporterBase():
 	settings["DBTable"]["Metrics"] = {}
 	settings["DBTable"]["Metrics"]["DataSource"] = 0
 
-	settings["ContentTypes"] = {"head": "Heading", "contents": "Contents", "note": "Note", "graph": "Data Graph", "table": "Data Table"}
+	settings["ContentTypes"] = {"head": "Heading", "contents": "Contents", "note": "Note", "graph": "Data Graph", "table": "Data Table", "errors": "Error Details"}
 
 	defcolours = ['#000000', '#008450', '#B81D13', '#EFB700', '#888888']
 	namecolours = ['total', 'pass', 'fail', 'warning', 'not run']
@@ -1719,6 +1719,96 @@ class ReporterBase():
 			base.report_save()
 			return 1
 		return 0
+
+	#
+	# Report Item Type: errors
+	#
+
+	def rt_errors_get_sql(self, id):
+		base.debugmsg(9, "id:", id)
+		if 'SQL' in base.report[id]:
+			return self.whitespace_get_ini_value(base.report[id]['SQL']).strip()
+		else:
+			return ""
+
+	def rt_errors_set_sql(self, id, tableSQL):
+		base.debugmsg(8, "id:", id, "	tableSQL:", tableSQL.strip())
+		prev = self.rt_table_get_sql(id)
+		if tableSQL.strip() != prev:
+			base.report[id]['SQL'] = base.whitespace_set_ini_value(tableSQL.strip())
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
+
+	def rt_errors_generate_sql(self, id):
+		base.debugmsg(8, "id:", id)
+		display_percentile = base.rs_setting_get_pctile()
+		sql = ""
+
+		sql = "SELECT "
+		sql = "result_name "
+		sql = ", script_index "
+		sql = ", robot "
+		sql = ", iteration "
+		sql = ", sequence "
+		sql = "FROM Results "
+		sql = "WHERE Results.result = 'FAIL' "
+		sql = "ORDER BY script_index, sequence "
+
+		base.debugmsg(8, "sql:", sql)
+		self.rt_errors_set_sql(id, sql)
+		return sql
+
+	def rt_errors_get_images(self, id):
+		base.debugmsg(9, "id:", id)
+		if 'Images' in base.report[id]:
+			return int(base.report[id]['Images'])
+		else:
+			self.rt_errors_set_images(id, 1)
+			return 1
+
+	def rt_errors_set_images(self, id, images):
+		base.debugmsg(5, "id:", id, "	images:", images)
+		if 'Images' not in base.report[id]:
+			base.report[id]['Images'] = base.whitespace_set_ini_value(str(images))
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		else:
+			prev = self.rt_errors_get_images(id)
+			if images != prev:
+				base.report[id]['Images'] = base.whitespace_set_ini_value(str(images))
+				base.report_item_set_changed(id)
+				base.report_save()
+				return 1
+		return 0
+
+	# rt_errors_set_group
+	def rt_errors_get_group(self, id):
+		base.debugmsg(9, "id:", id)
+		if 'Group' in base.report[id]:
+			return int(base.report[id]['Group'])
+		else:
+			self.rt_errors_set_group(id, 1)
+			return 1
+
+	def rt_errors_set_group(self, id, group):
+		base.debugmsg(5, "id:", id, "	group:", group)
+		if 'Group' not in base.report[id]:
+			base.report[id]['Group'] = base.whitespace_set_ini_value(str(group))
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		else:
+			prev = self.rt_errors_get_group(id)
+			if images != prev:
+				base.report[id]['Group'] = base.whitespace_set_ini_value(str(group))
+				base.report_item_set_changed(id)
+				base.report_save()
+				return 1
+		return 0
+
 
 	# FR FilterResult
 	def rt_table_get_fr(self, id):
@@ -5263,6 +5353,8 @@ class ReporterGUI(tk.Frame):
 					self.cs_datatable(id)
 				if type == 'graph':
 					self.cs_graph(id)
+				if type == 'errors':
+					self.cs_errors(id)
 
 		curritem = self.contentsettings.grid_slaves(column=0, row=0)
 		base.debugmsg(5, "curritem:", curritem)
@@ -6933,6 +7025,60 @@ class ReporterGUI(tk.Frame):
 		# Show
 		self.contentdata[idl]["Frames"][datatypel].grid(column=0, row=self.contentdata[id]["DTFrame"], columnspan=100, sticky="nsew")
 		self.contentdata[idr]["Frames"][datatyper].grid(column=0, row=self.contentdata[id]["DTFrame"], columnspan=100, sticky="nsew")
+
+
+	#
+	# Settings	-	Error Details
+	#
+
+	def cs_errors(self, id):
+		base.debugmsg(9, "id:", id)
+		images = base.rt_errors_get_images(id)
+		group = base.rt_errors_get_group(id)
+
+		self.contentdata[id]["LFrame"].columnconfigure(99, weight=1)
+		rownum = 0
+
+		rownum += 1
+		self.contentdata[id]["lblImages"] = ttk.Label(self.contentdata[id]["LFrame"], text="Show screenshots:")
+		self.contentdata[id]["lblImages"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["intImages"] = tk.IntVar()
+		self.contentdata[id]["chkImages"] = ttk.Checkbutton(self.contentdata[id]["LFrame"], variable=self.contentdata[id]["intImages"], command=self.cs_errors_update)
+		self.contentdata[id]["intImages"].set(images)
+		self.contentdata[id]["chkImages"].grid(column=1, row=rownum, sticky="nsew")
+
+		rownum += 1
+		self.contentdata[id]["lblGroup"] = ttk.Label(self.contentdata[id]["LFrame"], text="Group errors:")
+		self.contentdata[id]["lblGroup"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["intGroup"] = tk.IntVar()
+		self.contentdata[id]["chkGroup"] = ttk.Checkbutton(self.contentdata[id]["LFrame"], variable=self.contentdata[id]["intGroup"], command=self.cs_errors_update)
+		self.contentdata[id]["intGroup"].set(group)
+		self.contentdata[id]["chkGroup"].grid(column=1, row=rownum, sticky="nsew")
+
+
+	def cs_errors_update(self, _event=None, *args):
+		base.debugmsg(5, "_event:", _event, "	args:", args)
+		changes = 0
+		# if len(args) > 0:
+		# 	base.debugmsg(8, "args[0]:", args[0])
+		# 	changes += args[0]
+		id = self.sectionstree.focus()
+		if _event is not None:
+			name = base.report_item_get_name(_event)
+			if name is not None:
+				id = _event
+		base.debugmsg(9, "id:", id)
+		if "intImages" in self.contentdata[id]:
+			images = self.contentdata[id]["intImages"].get()
+			changes += base.rt_errors_set_images(id, images)
+
+		if "intGroup" in self.contentdata[id]:
+			group = self.contentdata[id]["intGroup"].get()
+			changes += base.rt_errors_set_group(id, group)
+
+
 
 	#
 	# Preview
