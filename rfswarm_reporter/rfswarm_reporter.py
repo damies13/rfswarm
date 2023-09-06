@@ -8,6 +8,7 @@
 import argparse
 import base64  # used for embedding images  # used for xhtml export
 import configparser
+import glob
 import inspect
 import math
 import os
@@ -1746,15 +1747,22 @@ class ReporterBase():
 		display_percentile = base.rs_setting_get_pctile()
 		sql = ""
 
-		sql = "SELECT "
-		sql = "result_name "
-		sql = ", script_index "
-		sql = ", robot "
-		sql = ", iteration "
-		sql = ", sequence "
-		sql = "FROM Results "
-		sql = "WHERE Results.result = 'FAIL' "
-		sql = "ORDER BY script_index, sequence "
+		sql += "SELECT "
+		sql += "r.script_index || '_' || r.robot || '_' || r.iteration || '_' || r.sequence 'id' "
+		sql += ", r.result_name "
+		sql += ", r.script_index "
+		sql += ", r.robot "
+		sql += ", r.iteration "
+		sql += ", r.sequence "
+		# sql += ", r.* "
+		sql += ", mt.SecondaryMetric 'script' "
+		sql += ", mt.MetricValue 'test_name' "
+		# sql += ", mt.* "
+		sql += "FROM Results r "
+		sql += "LEFT JOIN MetricData mt on mt.PrimaryMetric = r.script_index AND mt.MetricType = 'Scenario_Test' "
+		sql += "WHERE r.result = 'FAIL' "
+		# sql += "ORDER BY r.script_index, r.sequence "
+		sql += "ORDER BY [id] ASC "
 
 		base.debugmsg(8, "sql:", sql)
 		self.rt_errors_set_sql(id, sql)
@@ -1784,7 +1792,6 @@ class ReporterBase():
 				return 1
 		return 0
 
-	# rt_errors_set_group
 	def rt_errors_get_group(self, id):
 		base.debugmsg(9, "id:", id)
 		if 'Group' in base.report[id]:
@@ -1802,12 +1809,126 @@ class ReporterBase():
 			return 1
 		else:
 			prev = self.rt_errors_get_group(id)
-			if images != prev:
+			if group != prev:
 				base.report[id]['Group'] = base.whitespace_set_ini_value(str(group))
 				base.report_item_set_changed(id)
 				base.report_save()
 				return 1
 		return 0
+
+	def rt_errors_get_data(self, id):
+		base.debugmsg(5, "id:", id)
+
+		if id not in base.reportdata:
+			base.reportdata[id] = {}
+
+		sql = base.rt_errors_generate_sql(id)
+		base.debugmsg(5, "sql:", sql)
+		# colours = base.rt_table_get_colours(id)
+		if sql is not None and len(sql.strip()) > 0:
+			base.debugmsg(5, "sql:", sql)
+			key = "{}_{}".format(id, base.report_item_get_changed(id))
+			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+			while key not in base.dbqueue["ReadResult"]:
+				time.sleep(0.1)
+
+			tdata = base.dbqueue["ReadResult"][key]
+			base.debugmsg(5, "tdata:", tdata)
+
+			if len(tdata) > 0:
+				cols = list(tdata[0].keys())
+				base.debugmsg(5, "cols:", cols)
+
+				for rowi in tdata:
+					base.debugmsg(9, "rowi:", rowi)
+					rid = rowi['id']
+					base.debugmsg(8, "rid:", rid)
+					if rid not in base.reportdata[id]:
+						base.reportdata[id][rid] = rowi
+					if rid in base.reportdata[id] and "error" not in base.reportdata[id][rid]:
+						base.rt_errors_parse_xml(id, rid)
+				base.debugmsg(5, "base.reportdata[",id,"]:", base.reportdata[id])
+		return base.reportdata[id]
+
+	def rt_errors_parse_xml(self, id, rid):
+		base.debugmsg(5, "id:", id, "	rid:", rid)
+		if id in base.reportdata and rid in base.reportdata[id]:
+			rdata = base.reportdata[id][rid]
+			base.debugmsg(8, "rdata:", rdata)
+
+			# rdir = base.config['Reporter']['ResultDir']
+			# base.debugmsg(5, "rdir:", rdir)
+			dbfile = base.config['Reporter']['Results']
+			base.debugmsg(9, "dbfile:", dbfile)
+
+			ldir = os.path.join(os.path.dirname(dbfile), "logs")
+			base.debugmsg(8, "ldir:", ldir)
+
+			# 		opencart_1_1_1690876686_1_1690876693
+			gpatt = os.path.join(ldir, "{}_{}_{}_*_{}*".format(rdata['script'].split('.')[0], rdata['script_index'], rdata['robot'], rdata['iteration']))
+			base.debugmsg(9, "gpatt:", gpatt)
+
+			lfol = glob.glob(gpatt, recursive=True)[0]
+			base.debugmsg(9, "lfol:", lfol)
+
+			# 		opencart_1_1_1690876686_1_1690876693/Opencart_Sales_output.xml
+			gxpatt = os.path.join(ldir, "{}_{}_{}_*_{}*".format(rdata['script'].split('.')[0], rdata['script_index'], rdata['robot'], rdata['iteration']), "*_output.xml")
+			base.debugmsg(9, "gxpatt:", gxpatt)
+
+			xmlf = glob.glob(gxpatt, recursive=True)[0]
+			base.debugmsg(5, "xmlf:", xmlf)
+
+			if os.path.isfile(xmlf):
+				base.reportdata[id][rid]['xml_file'] = xmlf
+
+				# tree = etree.parse(xmlf)
+				with open(xmlf, 'rb') as xml_file:
+				    tree = etree.parse(xml_file)
+				root = tree.getroot()
+				base.debugmsg(9, "root:", root)
+
+				# //suite/@source	--> 	/tmp/rfswarmagent/scripts/opencart.robot
+				suites = root.findall(".//suite")
+				base.debugmsg(9, "suites:", suites)
+				source = suites[0].get('source')
+				base.debugmsg(8, "source:", source)
+
+
+				# //kw/status[@status='FAIL']/../msg[@level='FAIL']
+				# failmsgs = root.findall(".//kw/status[@status='FAIL']/../msg[@level='FAIL']")
+				# base.debugmsg(5, "failmsgs:", failmsgs)
+				# failmsg = failmsgs[-1]
+				# base.debugmsg(5, "failmsg:", failmsg, failmsg.text)
+
+				failkws = root.findall(".//kw/status[@status='FAIL']/..")
+				base.debugmsg(9, "failkws:", failkws)
+
+				failkw = failkws[-1]
+				failmsg = failkw.find("msg[@level='FAIL']")
+				base.debugmsg(5, "failmsg:", failmsg, failmsg.text)
+
+				base.reportdata[id][rid]['error'] = failmsg.text
+
+				# //kw/status[@status='FAIL']/../msg[@level='INFO'] --> html decode for img tag
+				# //kw/status[@status='FAIL']/../msg[@level='INFO' and @html='true']
+				# </td></tr><tr><td colspan="3"><a href="selenium-screenshot-1.png"><img src="selenium-screenshot-1.png" width="800px"></a>
+				# infomsg = failkw.find("msg[@level='INFO' and @html='true']")
+				infomsg = failkw.find("msg[@html='true']")
+				if infomsg is not None:
+					base.debugmsg(5, "infomsg:", infomsg, infomsg.text)
+
+					# <a[^>]*href="([^"]*)
+					m = re.search(r'<a[^>]*href="([^"]*)', infomsg.text)
+					image = m.group(1)
+					base.debugmsg(5, "image:", image)
+					if image is not None:
+						imgdir = os.path.dirname(xmlf)
+						imagef = os.path.join(imgdir, image)
+
+						if os.path.isfile(imagef):
+							base.debugmsg(5, "imagef:", imagef)
+							base.reportdata[id][rid]['image'] = image
+							base.reportdata[id][rid]['image_file'] = imagef
 
 
 	# FR FilterResult
@@ -7078,6 +7199,10 @@ class ReporterGUI(tk.Frame):
 			group = self.contentdata[id]["intGroup"].get()
 			changes += base.rt_errors_set_group(id, group)
 
+		base.debugmsg(5, "content_preview id:", id)
+		# self.content_preview(id)
+		cp = threading.Thread(target=lambda: self.content_preview(id))
+		cp.start()
 
 
 	#
@@ -7251,6 +7376,8 @@ class ReporterGUI(tk.Frame):
 					self.cp_table(id)
 				if type == 'graph':
 					self.cp_graph(id)
+				if type == 'errors':
+					self.cp_errors(id)
 
 		children = base.report_get_order(id)
 		for child in children:
@@ -7729,6 +7856,19 @@ class ReporterGUI(tk.Frame):
 							base.debugmsg(9, "cellname:", cellname)
 							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(row[col]), style='Report.TBody.TLabel')
 							self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+	def cp_errors(self, id):
+		base.debugmsg(5, "id:", id)
+
+		if 'data' not in self.contentdata[id]:
+			edata = base.rt_errors_get_data(id)
+			self.contentdata[id]['data'] = edata
+
+		base.debugmsg(5, "self.contentdata[",id,"]['data']:", self.contentdata[id]['data'])
+
+
+
+
 
 	#
 	# Export content generation functions
