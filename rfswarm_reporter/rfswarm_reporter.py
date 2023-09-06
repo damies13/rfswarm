@@ -1744,7 +1744,6 @@ class ReporterBase():
 
 	def rt_errors_generate_sql(self, id):
 		base.debugmsg(8, "id:", id)
-		display_percentile = base.rs_setting_get_pctile()
 		sql = ""
 
 		sql += "SELECT "
@@ -1847,7 +1846,7 @@ class ReporterBase():
 						base.reportdata[id][rid] = rowi
 					if rid in base.reportdata[id] and "error" not in base.reportdata[id][rid]:
 						base.rt_errors_parse_xml(id, rid)
-				base.debugmsg(5, "base.reportdata[",id,"]:", base.reportdata[id])
+				base.debugmsg(5, "base.reportdata[", id, "]:", base.reportdata[id])
 		return base.reportdata[id]
 
 	def rt_errors_parse_xml(self, id, rid):
@@ -1883,7 +1882,7 @@ class ReporterBase():
 
 				# tree = etree.parse(xmlf)
 				with open(xmlf, 'rb') as xml_file:
-				    tree = etree.parse(xml_file)
+					tree = etree.parse(xml_file)
 				root = tree.getroot()
 				base.debugmsg(9, "root:", root)
 
@@ -1893,12 +1892,7 @@ class ReporterBase():
 				source = suites[0].get('source')
 				base.debugmsg(8, "source:", source)
 
-
 				# //kw/status[@status='FAIL']/../msg[@level='FAIL']
-				# failmsgs = root.findall(".//kw/status[@status='FAIL']/../msg[@level='FAIL']")
-				# base.debugmsg(5, "failmsgs:", failmsgs)
-				# failmsg = failmsgs[-1]
-				# base.debugmsg(5, "failmsg:", failmsg, failmsg.text)
 
 				failkws = root.findall(".//kw/status[@status='FAIL']/..")
 				base.debugmsg(9, "failkws:", failkws)
@@ -1913,6 +1907,7 @@ class ReporterBase():
 				# //kw/status[@status='FAIL']/../msg[@level='INFO' and @html='true']
 				# </td></tr><tr><td colspan="3"><a href="selenium-screenshot-1.png"><img src="selenium-screenshot-1.png" width="800px"></a>
 				# infomsg = failkw.find("msg[@level='INFO' and @html='true']")
+
 				infomsg = failkw.find("msg[@html='true']")
 				if infomsg is not None:
 					base.debugmsg(5, "infomsg:", infomsg, infomsg.text)
@@ -1930,8 +1925,6 @@ class ReporterBase():
 							base.reportdata[id][rid]['image'] = image
 							base.reportdata[id][rid]['image_file'] = imagef
 
-
-	# FR FilterResult
 	def rt_table_get_fr(self, id):
 		base.debugmsg(9, "id:", id)
 		if 'FilterResult' in base.report[id]:
@@ -7147,7 +7140,6 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[idl]["Frames"][datatypel].grid(column=0, row=self.contentdata[id]["DTFrame"], columnspan=100, sticky="nsew")
 		self.contentdata[idr]["Frames"][datatyper].grid(column=0, row=self.contentdata[id]["DTFrame"], columnspan=100, sticky="nsew")
 
-
 	#
 	# Settings	-	Error Details
 	#
@@ -7178,7 +7170,6 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["intGroup"].set(group)
 		self.contentdata[id]["chkGroup"].grid(column=1, row=rownum, sticky="nsew")
 
-
 	def cs_errors_update(self, _event=None, *args):
 		base.debugmsg(5, "_event:", _event, "	args:", args)
 		changes = 0
@@ -7203,7 +7194,6 @@ class ReporterGUI(tk.Frame):
 		# self.content_preview(id)
 		cp = threading.Thread(target=lambda: self.content_preview(id))
 		cp.start()
-
 
 	#
 	# Preview
@@ -7864,15 +7854,12 @@ class ReporterGUI(tk.Frame):
 			edata = base.rt_errors_get_data(id)
 			self.contentdata[id]['data'] = edata
 
-		base.debugmsg(5, "self.contentdata[",id,"]['data']:", self.contentdata[id]['data'])
-
-
-
-
+		base.debugmsg(5, "self.contentdata[", id, "]['data']:", self.contentdata[id]['data'])
 
 	#
 	# Export content generation functions
 	#
+
 	def cg_export_xhtml(self):
 		# base.debugmsg(5, "Not implimented yet.....")
 		core.export_xhtml()
