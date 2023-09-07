@@ -249,6 +249,36 @@ class ReporterBase():
 				base.config.write(configfile)
 				self.debugmsg(6, "File Saved:", self.reporter_ini)
 
+	def whitespace_set_ini_value(self, valin):
+		base.debugmsg(9, "valin:", valin)
+		valout = str(valin)
+		if len(valout) > 0:
+			valout = valout.replace('\n', 'x12')
+			valout = valout.replace('\r', 'x15')
+			valout = valout.replace('\t', 'x11')
+			valout = valout.replace('[', 'x91')
+			valout = valout.replace(']', 'x93')
+			valout = valout.replace('%', 'x37')
+			# valout = valout.replace('%', '%%')
+			valout = valout.replace('#', 'x35')
+			base.debugmsg(9, "valout:", valout)
+		return valout
+
+	def whitespace_get_ini_value(self, valin):
+		base.debugmsg(9, "valin:", valin)
+		valout = str(valin)
+		if len(valout) > 0:
+			valout = valout.replace('x12', '\n')
+			valout = valout.replace('x15', '\r')
+			valout = valout.replace('x11', '\t')
+			valout = valout.replace('x91', '[')
+			valout = valout.replace('x93', ']')
+			valout = valout.replace('x37', '%')
+			valout = valout.replace('x35', '#')
+			base.debugmsg(9, "valout:", valout)
+		return valout
+
+
 	#
 	# Template Functions
 	#
@@ -1721,6 +1751,374 @@ class ReporterBase():
 			return 1
 		return 0
 
+	def rt_table_get_fr(self, id):
+		base.debugmsg(9, "id:", id)
+		if 'FilterResult' in base.report[id]:
+			return base.whitespace_get_ini_value(base.report[id]['FilterResult'])
+		else:
+			return None
+
+	def rt_table_set_fr(self, id, filterresult):
+		base.debugmsg(9, "id:", id, "	filterresult:", filterresult)
+		prev = self.rt_table_get_fr(id)
+		if filterresult != prev and filterresult is not None:
+			base.report[id]['FilterResult'] = base.whitespace_set_ini_value(filterresult)
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
+
+	def rt_table_get_enfr(self, id):
+		base.debugmsg(5, "id:", id)
+		pid = base.report_subsection_parent(id)
+		if id in base.report and 'EnableFilterResult' in base.report[id]:
+			return int(base.report[id]['EnableFilterResult'])
+		elif pid in base.report and 'EnableFilterResult' in base.report[pid]:
+			return int(base.report[pid]['EnableFilterResult'])
+		else:
+			frv = self.rt_table_get_fr(id)
+			if frv in ["Pass", "Fail"]:
+				return 1
+			return 0
+
+	def rt_table_set_enfr(self, id, value):
+		base.debugmsg(5, "id:", id, "	value:", value)
+		prev = self.rt_table_get_enfr(id)
+		if value != prev and value is not None:
+			base.report[id]['EnableFilterResult'] = base.whitespace_set_ini_value(str(value))
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
+
+	# FA FilterAgent
+	def rt_table_get_fa(self, id):
+		base.debugmsg(5, "id:", id)
+		if 'FilterAgent' in base.report[id]:
+			return base.whitespace_get_ini_value(base.report[id]['FilterAgent'])
+		else:
+			return None
+
+	def rt_table_set_fa(self, id, value):
+		base.debugmsg(5, "id:", id, "	value:", value)
+		prev = self.rt_table_get_fa(id)
+		if value != prev and value is not None:
+			base.report[id]['FilterAgent'] = base.whitespace_set_ini_value(value)
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
+
+	def rt_table_get_alst(self, id):
+		base.debugmsg(9, "id:", id)
+		# SELECT agent
+		# FROM Results
+		# GROUP BY agent
+		mtype = self.rt_table_get_mt(id)
+		alst = [None, ""]
+		sql = "SELECT agent 'Name' "
+		sql += "FROM Results "
+		sql += "GROUP BY agent "
+		base.debugmsg(6, "sql:", sql)
+		key = "{}_{}_AgentList".format(id, mtype)
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+		while key not in base.dbqueue["ReadResult"]:
+			time.sleep(0.1)
+
+		adata = base.dbqueue["ReadResult"][key]
+		base.debugmsg(8, "adata:", adata)
+		for a in adata:
+			alst.append(a["Name"])
+
+		base.debugmsg(5, "alst:", alst)
+
+		return alst
+
+	def rt_table_get_malst(self, id):
+		base.debugmsg(9, "id:", id)
+		# SELECT agent
+		# FROM Results
+		# GROUP BY agent
+		mtype = self.rt_table_get_mt(id)
+		alst = [None, ""]
+
+		sql = "SELECT ma.Name  'Name' "
+		sql += "FROM Metrics m "
+		sql += "	LEFT JOIN Metric ma ON m.DataSource = ma.ID "
+		sql += "GROUP BY m.DataSource "
+
+		base.debugmsg(6, "sql:", sql)
+		key = "{}_{}_MetricAgentList".format(id, mtype)
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+		while key not in base.dbqueue["ReadResult"]:
+			time.sleep(0.1)
+
+		adata = base.dbqueue["ReadResult"][key]
+		base.debugmsg(8, "adata:", adata)
+		for a in adata:
+			alst.append(a["Name"])
+
+		base.debugmsg(5, "alst:", alst)
+
+		return alst
+
+	def rt_table_get_enfa(self, id):
+		base.debugmsg(5, "id:", id)
+		pid = base.report_subsection_parent(id)
+		if id in base.report and 'EnableFilterAgent' in base.report[id]:
+			return int(base.report[id]['EnableFilterAgent'])
+		elif pid in base.report and 'EnableFilterAgent' in base.report[pid]:
+			return int(base.report[pid]['EnableFilterAgent'])
+		else:
+			return 0
+
+	def rt_table_set_enfa(self, id, value):
+		base.debugmsg(5, "id:", id, "	value:", value)
+		prev = self.rt_table_get_enfa(id)
+		if value != prev and value is not None:
+			base.report[id]['EnableFilterAgent'] = base.whitespace_set_ini_value(str(value))
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
+
+	# FN FilterType
+	def rt_table_get_fn(self, id):
+		base.debugmsg(9, "id:", id)
+		if 'FilterType' in base.report[id]:
+			return base.whitespace_get_ini_value(base.report[id]['FilterType'])
+		else:
+			return None
+
+	def rt_table_set_fn(self, id, filtertype):
+		base.debugmsg(5, "id:", id, "	filtertype:", filtertype)
+		prev = self.rt_table_get_fr(id)
+		if filtertype != prev and filtertype not in [None, "None"]:
+			base.report[id]['FilterType'] = base.whitespace_set_ini_value(filtertype)
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		elif filtertype != prev and filtertype in [None, "None"] and prev in [None, "None"]:
+			base.report[id]['FilterType'] = base.whitespace_set_ini_value(None)
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
+
+	# FP FilterPattern
+	def rt_table_get_fp(self, id):
+		base.debugmsg(9, "id:", id)
+		if 'FilterPattern' in base.report[id]:
+			return base.whitespace_get_ini_value(base.report[id]['FilterPattern'])
+		else:
+			return ""
+
+	def rt_table_set_fp(self, id, filterpattern):
+		base.debugmsg(5, "id:", id, "	filterpattern:", filterpattern)
+		prev = self.rt_table_get_fp(id)
+		if filterpattern != prev and filterpattern is not None:
+			base.report[id]['FilterPattern'] = base.whitespace_set_ini_value(filterpattern)
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
+
+	# mt MetricType
+	def rt_table_get_mt(self, id):
+		base.debugmsg(9, "id:", id)
+		pid = base.report_subsection_parent(id)
+		if 'MetricType' in base.report[id]:
+			return base.whitespace_get_ini_value(base.report[id]['MetricType'])
+		elif pid in base.report and 'MetricType' in base.report[pid]:
+			return base.whitespace_get_ini_value(base.report[pid]['MetricType'])
+		else:
+			return ""
+
+	def rt_table_set_mt(self, id, metrictype):
+		base.debugmsg(5, "id:", id, "	metrictype:", metrictype)
+		prev = self.rt_table_get_mt(id)
+		if metrictype != prev and metrictype is not None:
+			base.report[id]['MetricType'] = base.whitespace_set_ini_value(metrictype)
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
+
+	def rt_table_get_mlst(self, id):
+		base.debugmsg(9, "id:", id)
+		mlst = [None, ""]
+		sql = "SELECT Type "
+		sql += "FROM Metric "
+		sql += "GROUP BY Type "
+		base.debugmsg(6, "sql:", sql)
+		key = "{}_Metrics".format(id)
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+		while key not in base.dbqueue["ReadResult"]:
+			time.sleep(0.1)
+
+		tdata = base.dbqueue["ReadResult"][key]
+		base.debugmsg(8, "tdata:", tdata)
+		for m in tdata:
+			mlst.append(m["Type"])
+
+		return mlst
+
+	# pm PrimaryMetric
+	def rt_table_get_pm(self, id):
+		base.debugmsg(9, "id:", id)
+		pid = base.report_subsection_parent(id)
+		if 'PrimaryMetric' in base.report[id]:
+			return base.whitespace_get_ini_value(base.report[id]['PrimaryMetric'])
+		elif pid in base.report and 'PrimaryMetric' in base.report[pid]:
+			return base.whitespace_get_ini_value(base.report[pid]['PrimaryMetric'])
+		else:
+			return ""
+
+	def rt_table_set_pm(self, id, primarymetric):
+		base.debugmsg(5, "id:", id, "	primarymetric:", primarymetric)
+		prev = self.rt_table_get_pm(id)
+		if primarymetric != prev and primarymetric is not None:
+			base.report[id]['PrimaryMetric'] = base.whitespace_set_ini_value(primarymetric)
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
+
+	def rt_table_get_pmlst(self, id):
+		base.debugmsg(9, "id:", id)
+		# SELECT Name
+		# FROM Metric
+		# -- WHERE Type = 'Agent'
+		# GROUP BY Name
+		mtype = self.rt_table_get_mt(id)
+		pmlst = [None, ""]
+		sql = "SELECT Name "
+		sql += "FROM Metric "
+		if mtype is not None and len(mtype) > 0:
+			sql += "WHERE Type = '{}' ".format(mtype)
+		sql += "GROUP BY Name "
+		base.debugmsg(6, "sql:", sql)
+		key = "{}_{}_PMetrics".format(id, mtype)
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+		while key not in base.dbqueue["ReadResult"]:
+			time.sleep(0.1)
+
+		tdata = base.dbqueue["ReadResult"][key]
+		base.debugmsg(8, "tdata:", tdata)
+		for m in tdata:
+			pmlst.append(m["Name"])
+
+		base.debugmsg(5, "pmlst:", pmlst)
+
+		return pmlst
+
+	# sm SecondaryMetric
+	def rt_table_get_sm(self, id):
+		base.debugmsg(9, "id:", id)
+		pid = base.report_subsection_parent(id)
+		if 'SecondaryMetric' in base.report[id]:
+			return base.whitespace_get_ini_value(base.report[id]['SecondaryMetric'])
+		elif pid in base.report and 'SecondaryMetric' in base.report[pid]:
+			return base.whitespace_get_ini_value(base.report[pid]['SecondaryMetric'])
+		else:
+			return ""
+
+	def rt_table_set_sm(self, id, secondarymetric):
+		base.debugmsg(5, "id:", id, "	secondarymetric:", secondarymetric)
+		prev = self.rt_table_get_sm(id)
+		if secondarymetric != prev and secondarymetric is not None:
+			base.report[id]['SecondaryMetric'] = base.whitespace_set_ini_value(secondarymetric)
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
+
+	def rt_table_get_smlst(self, id):
+		base.debugmsg(9, "id:", id)
+		# SELECT SecondaryMetric
+		# FROM MetricData
+		# -- WHERE MetricType = 'Agent'
+		# -- 	AND PrimaryMetric = 'DavesMBPSG'
+		# GROUP BY SecondaryMetric
+		wherelst = []
+		mtype = self.rt_table_get_mt(id)
+		if mtype is not None and len(mtype) > 0:
+			wherelst.append({"key": "MetricType", "value": mtype})
+
+		pmtype = self.rt_table_get_pm(id)
+		if pmtype is not None and len(pmtype) > 0:
+			wherelst.append({"key": "PrimaryMetric", "value": pmtype})
+
+		smlst = [None, ""]
+		sql = "SELECT SecondaryMetric "
+		sql += "FROM MetricData "
+
+		# if mtype is not None and len(mtype)>0:
+		# 	sql += "WHERE Type = '{}' ".format("Agent")
+		i = 0
+		for itm in wherelst:
+			if i < 1:
+				sql += "WHERE {} = '{}' ".format(itm["key"], itm["value"])
+				i += 1
+			else:
+				sql += "AND {} = '{}' ".format(itm["key"], itm["value"])
+
+		sql += "GROUP BY SecondaryMetric "
+		base.debugmsg(6, "sql:", sql)
+		key = "{}_{}_{}_SMetrics".format(id, mtype, pmtype)
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+		while key not in base.dbqueue["ReadResult"]:
+			time.sleep(0.1)
+
+		tdata = base.dbqueue["ReadResult"][key]
+		base.debugmsg(8, "tdata:", tdata)
+		for m in tdata:
+			smlst.append(m["SecondaryMetric"])
+
+		base.debugmsg(5, "smlst:", smlst)
+
+		return smlst
+
+	def rt_table_get_isnumeric(self, id):
+		base.debugmsg(9, "id:", id)
+		pid = base.report_subsection_parent(id)
+		if id in base.report and 'IsNumeric' in base.report[id]:
+			return int(base.report[id]['IsNumeric'])
+		elif pid in base.report and 'IsNumeric' in base.report[pid]:
+			return int(base.report[pid]['IsNumeric'])
+		else:
+			return 0
+
+	def rt_table_set_isnumeric(self, id, value):
+		base.debugmsg(5, "id:", id, "	value:", value)
+		prev = self.rt_table_get_isnumeric(id)
+		if value != prev and value is not None:
+			base.report[id]['IsNumeric'] = base.whitespace_set_ini_value(str(value))
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
+
+	def rt_table_get_showcount(self, id):
+		base.debugmsg(9, "id:", id)
+		pid = base.report_subsection_parent(id)
+		if id in base.report and 'ShowCount' in base.report[id]:
+			return int(base.report[id]['ShowCount'])
+		elif pid in base.report and 'ShowCount' in base.report[pid]:
+			return int(base.report[pid]['ShowCount'])
+		else:
+			return 0
+
+	def rt_table_set_showcount(self, id, value):
+		base.debugmsg(5, "id:", id, "	value:", value)
+		prev = self.rt_table_get_showcount(id)
+		if value != prev and value is not None:
+			base.report[id]['ShowCount'] = base.whitespace_set_ini_value(str(value))
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
+
 	#
 	# Report Item Type: errors
 	#
@@ -1925,404 +2323,6 @@ class ReporterBase():
 							base.debugmsg(5, "imagef:", imagef)
 							base.reportdata[id][rid]['image'] = image
 							base.reportdata[id][rid]['image_file'] = imagef
-
-	def rt_table_get_fr(self, id):
-		base.debugmsg(9, "id:", id)
-		if 'FilterResult' in base.report[id]:
-			return base.whitespace_get_ini_value(base.report[id]['FilterResult'])
-		else:
-			return None
-
-	def rt_table_set_fr(self, id, filterresult):
-		base.debugmsg(9, "id:", id, "	filterresult:", filterresult)
-		prev = self.rt_table_get_fr(id)
-		if filterresult != prev and filterresult is not None:
-			base.report[id]['FilterResult'] = base.whitespace_set_ini_value(filterresult)
-			base.report_item_set_changed(id)
-			base.report_save()
-			return 1
-		return 0
-
-	def rt_table_get_enfr(self, id):
-		base.debugmsg(5, "id:", id)
-		pid = base.report_subsection_parent(id)
-		if id in base.report and 'EnableFilterResult' in base.report[id]:
-			return int(base.report[id]['EnableFilterResult'])
-		elif pid in base.report and 'EnableFilterResult' in base.report[pid]:
-			return int(base.report[pid]['EnableFilterResult'])
-		else:
-			frv = self.rt_table_get_fr(id)
-			if frv in ["Pass", "Fail"]:
-				return 1
-			return 0
-
-	def rt_table_set_enfr(self, id, value):
-		base.debugmsg(5, "id:", id, "	value:", value)
-		prev = self.rt_table_get_enfr(id)
-		if value != prev and value is not None:
-			base.report[id]['EnableFilterResult'] = base.whitespace_set_ini_value(str(value))
-			base.report_item_set_changed(id)
-			base.report_save()
-			return 1
-		return 0
-
-	# FA FilterAgent
-	def rt_table_get_fa(self, id):
-		base.debugmsg(5, "id:", id)
-		if 'FilterAgent' in base.report[id]:
-			return base.whitespace_get_ini_value(base.report[id]['FilterAgent'])
-		else:
-			return None
-
-	def rt_table_set_fa(self, id, value):
-		base.debugmsg(5, "id:", id, "	value:", value)
-		prev = self.rt_table_get_fa(id)
-		if value != prev and value is not None:
-			base.report[id]['FilterAgent'] = base.whitespace_set_ini_value(value)
-			base.report_item_set_changed(id)
-			base.report_save()
-			return 1
-		return 0
-
-	def rt_table_get_alst(self, id):
-		base.debugmsg(9, "id:", id)
-		# SELECT agent
-		# FROM Results
-		# GROUP BY agent
-		mtype = self.rt_table_get_mt(id)
-		alst = [None, ""]
-		sql = "SELECT agent 'Name' "
-		sql += "FROM Results "
-		sql += "GROUP BY agent "
-		base.debugmsg(6, "sql:", sql)
-		key = "{}_{}_AgentList".format(id, mtype)
-		base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
-		while key not in base.dbqueue["ReadResult"]:
-			time.sleep(0.1)
-
-		adata = base.dbqueue["ReadResult"][key]
-		base.debugmsg(8, "adata:", adata)
-		for a in adata:
-			alst.append(a["Name"])
-
-		base.debugmsg(5, "alst:", alst)
-
-		return alst
-
-	def rt_table_get_malst(self, id):
-		base.debugmsg(9, "id:", id)
-		# SELECT agent
-		# FROM Results
-		# GROUP BY agent
-		mtype = self.rt_table_get_mt(id)
-		alst = [None, ""]
-
-		sql = "SELECT ma.Name  'Name' "
-		sql += "FROM Metrics m "
-		sql += "	LEFT JOIN Metric ma ON m.DataSource = ma.ID "
-		sql += "GROUP BY m.DataSource "
-
-		base.debugmsg(6, "sql:", sql)
-		key = "{}_{}_MetricAgentList".format(id, mtype)
-		base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
-		while key not in base.dbqueue["ReadResult"]:
-			time.sleep(0.1)
-
-		adata = base.dbqueue["ReadResult"][key]
-		base.debugmsg(8, "adata:", adata)
-		for a in adata:
-			alst.append(a["Name"])
-
-		base.debugmsg(5, "alst:", alst)
-
-		return alst
-
-	def rt_table_get_enfa(self, id):
-		base.debugmsg(5, "id:", id)
-		pid = base.report_subsection_parent(id)
-		if id in base.report and 'EnableFilterAgent' in base.report[id]:
-			return int(base.report[id]['EnableFilterAgent'])
-		elif pid in base.report and 'EnableFilterAgent' in base.report[pid]:
-			return int(base.report[pid]['EnableFilterAgent'])
-		else:
-			return 0
-
-	def rt_table_set_enfa(self, id, value):
-		base.debugmsg(5, "id:", id, "	value:", value)
-		prev = self.rt_table_get_enfa(id)
-		if value != prev and value is not None:
-			base.report[id]['EnableFilterAgent'] = base.whitespace_set_ini_value(str(value))
-			base.report_item_set_changed(id)
-			base.report_save()
-			return 1
-		return 0
-
-	# FN FilterType
-	def rt_table_get_fn(self, id):
-		base.debugmsg(9, "id:", id)
-		if 'FilterType' in base.report[id]:
-			return base.whitespace_get_ini_value(base.report[id]['FilterType'])
-		else:
-			return None
-
-	def rt_table_set_fn(self, id, filtertype):
-		base.debugmsg(5, "id:", id, "	filtertype:", filtertype)
-		prev = self.rt_table_get_fr(id)
-		if filtertype != prev and filtertype not in [None, "None"]:
-			base.report[id]['FilterType'] = base.whitespace_set_ini_value(filtertype)
-			base.report_item_set_changed(id)
-			base.report_save()
-			return 1
-		elif filtertype != prev and filtertype in [None, "None"] and prev in [None, "None"]:
-			base.report[id]['FilterType'] = base.whitespace_set_ini_value(None)
-			base.report_item_set_changed(id)
-			base.report_save()
-			return 1
-		return 0
-
-	# FP FilterPattern
-	def rt_table_get_fp(self, id):
-		base.debugmsg(9, "id:", id)
-		if 'FilterPattern' in base.report[id]:
-			return base.whitespace_get_ini_value(base.report[id]['FilterPattern'])
-		else:
-			return ""
-
-	def rt_table_set_fp(self, id, filterpattern):
-		base.debugmsg(5, "id:", id, "	filterpattern:", filterpattern)
-		prev = self.rt_table_get_fp(id)
-		if filterpattern != prev and filterpattern is not None:
-			base.report[id]['FilterPattern'] = base.whitespace_set_ini_value(filterpattern)
-			base.report_item_set_changed(id)
-			base.report_save()
-			return 1
-		return 0
-
-	def whitespace_set_ini_value(self, valin):
-		base.debugmsg(9, "valin:", valin)
-		valout = str(valin)
-		if len(valout) > 0:
-			valout = valout.replace('\n', 'x12')
-			valout = valout.replace('\r', 'x15')
-			valout = valout.replace('\t', 'x11')
-			valout = valout.replace('[', 'x91')
-			valout = valout.replace(']', 'x93')
-			valout = valout.replace('%', 'x37')
-			# valout = valout.replace('%', '%%')
-			valout = valout.replace('#', 'x35')
-			base.debugmsg(9, "valout:", valout)
-		return valout
-
-	def whitespace_get_ini_value(self, valin):
-		base.debugmsg(9, "valin:", valin)
-		valout = str(valin)
-		if len(valout) > 0:
-			valout = valout.replace('x12', '\n')
-			valout = valout.replace('x15', '\r')
-			valout = valout.replace('x11', '\t')
-			valout = valout.replace('x91', '[')
-			valout = valout.replace('x93', ']')
-			valout = valout.replace('x37', '%')
-			valout = valout.replace('x35', '#')
-			base.debugmsg(9, "valout:", valout)
-		return valout
-
-	# mt MetricType
-
-	def rt_table_get_mt(self, id):
-		base.debugmsg(9, "id:", id)
-		pid = base.report_subsection_parent(id)
-		if 'MetricType' in base.report[id]:
-			return base.whitespace_get_ini_value(base.report[id]['MetricType'])
-		elif pid in base.report and 'MetricType' in base.report[pid]:
-			return base.whitespace_get_ini_value(base.report[pid]['MetricType'])
-		else:
-			return ""
-
-	def rt_table_set_mt(self, id, metrictype):
-		base.debugmsg(5, "id:", id, "	metrictype:", metrictype)
-		prev = self.rt_table_get_mt(id)
-		if metrictype != prev and metrictype is not None:
-			base.report[id]['MetricType'] = base.whitespace_set_ini_value(metrictype)
-			base.report_item_set_changed(id)
-			base.report_save()
-			return 1
-		return 0
-
-	def rt_table_get_mlst(self, id):
-		base.debugmsg(9, "id:", id)
-		mlst = [None, ""]
-		sql = "SELECT Type "
-		sql += "FROM Metric "
-		sql += "GROUP BY Type "
-		base.debugmsg(6, "sql:", sql)
-		key = "{}_Metrics".format(id)
-		base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
-		while key not in base.dbqueue["ReadResult"]:
-			time.sleep(0.1)
-
-		tdata = base.dbqueue["ReadResult"][key]
-		base.debugmsg(8, "tdata:", tdata)
-		for m in tdata:
-			mlst.append(m["Type"])
-
-		return mlst
-
-	# pm PrimaryMetric
-	def rt_table_get_pm(self, id):
-		base.debugmsg(9, "id:", id)
-		pid = base.report_subsection_parent(id)
-		if 'PrimaryMetric' in base.report[id]:
-			return base.whitespace_get_ini_value(base.report[id]['PrimaryMetric'])
-		elif pid in base.report and 'PrimaryMetric' in base.report[pid]:
-			return base.whitespace_get_ini_value(base.report[pid]['PrimaryMetric'])
-		else:
-			return ""
-
-	def rt_table_set_pm(self, id, primarymetric):
-		base.debugmsg(5, "id:", id, "	primarymetric:", primarymetric)
-		prev = self.rt_table_get_pm(id)
-		if primarymetric != prev and primarymetric is not None:
-			base.report[id]['PrimaryMetric'] = base.whitespace_set_ini_value(primarymetric)
-			base.report_item_set_changed(id)
-			base.report_save()
-			return 1
-		return 0
-
-	def rt_table_get_pmlst(self, id):
-		base.debugmsg(9, "id:", id)
-		# SELECT Name
-		# FROM Metric
-		# -- WHERE Type = 'Agent'
-		# GROUP BY Name
-		mtype = self.rt_table_get_mt(id)
-		pmlst = [None, ""]
-		sql = "SELECT Name "
-		sql += "FROM Metric "
-		if mtype is not None and len(mtype) > 0:
-			sql += "WHERE Type = '{}' ".format(mtype)
-		sql += "GROUP BY Name "
-		base.debugmsg(6, "sql:", sql)
-		key = "{}_{}_PMetrics".format(id, mtype)
-		base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
-		while key not in base.dbqueue["ReadResult"]:
-			time.sleep(0.1)
-
-		tdata = base.dbqueue["ReadResult"][key]
-		base.debugmsg(8, "tdata:", tdata)
-		for m in tdata:
-			pmlst.append(m["Name"])
-
-		base.debugmsg(5, "pmlst:", pmlst)
-
-		return pmlst
-
-	# sm SecondaryMetric
-	def rt_table_get_sm(self, id):
-		base.debugmsg(9, "id:", id)
-		pid = base.report_subsection_parent(id)
-		if 'SecondaryMetric' in base.report[id]:
-			return base.whitespace_get_ini_value(base.report[id]['SecondaryMetric'])
-		elif pid in base.report and 'SecondaryMetric' in base.report[pid]:
-			return base.whitespace_get_ini_value(base.report[pid]['SecondaryMetric'])
-		else:
-			return ""
-
-	def rt_table_set_sm(self, id, secondarymetric):
-		base.debugmsg(5, "id:", id, "	secondarymetric:", secondarymetric)
-		prev = self.rt_table_get_sm(id)
-		if secondarymetric != prev and secondarymetric is not None:
-			base.report[id]['SecondaryMetric'] = base.whitespace_set_ini_value(secondarymetric)
-			base.report_item_set_changed(id)
-			base.report_save()
-			return 1
-		return 0
-
-	def rt_table_get_smlst(self, id):
-		base.debugmsg(9, "id:", id)
-		# SELECT SecondaryMetric
-		# FROM MetricData
-		# -- WHERE MetricType = 'Agent'
-		# -- 	AND PrimaryMetric = 'DavesMBPSG'
-		# GROUP BY SecondaryMetric
-		wherelst = []
-		mtype = self.rt_table_get_mt(id)
-		if mtype is not None and len(mtype) > 0:
-			wherelst.append({"key": "MetricType", "value": mtype})
-
-		pmtype = self.rt_table_get_pm(id)
-		if pmtype is not None and len(pmtype) > 0:
-			wherelst.append({"key": "PrimaryMetric", "value": pmtype})
-
-		smlst = [None, ""]
-		sql = "SELECT SecondaryMetric "
-		sql += "FROM MetricData "
-
-		# if mtype is not None and len(mtype)>0:
-		# 	sql += "WHERE Type = '{}' ".format("Agent")
-		i = 0
-		for itm in wherelst:
-			if i < 1:
-				sql += "WHERE {} = '{}' ".format(itm["key"], itm["value"])
-				i += 1
-			else:
-				sql += "AND {} = '{}' ".format(itm["key"], itm["value"])
-
-		sql += "GROUP BY SecondaryMetric "
-		base.debugmsg(6, "sql:", sql)
-		key = "{}_{}_{}_SMetrics".format(id, mtype, pmtype)
-		base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
-		while key not in base.dbqueue["ReadResult"]:
-			time.sleep(0.1)
-
-		tdata = base.dbqueue["ReadResult"][key]
-		base.debugmsg(8, "tdata:", tdata)
-		for m in tdata:
-			smlst.append(m["SecondaryMetric"])
-
-		base.debugmsg(5, "smlst:", smlst)
-
-		return smlst
-
-	def rt_table_get_isnumeric(self, id):
-		base.debugmsg(9, "id:", id)
-		pid = base.report_subsection_parent(id)
-		if id in base.report and 'IsNumeric' in base.report[id]:
-			return int(base.report[id]['IsNumeric'])
-		elif pid in base.report and 'IsNumeric' in base.report[pid]:
-			return int(base.report[pid]['IsNumeric'])
-		else:
-			return 0
-
-	def rt_table_set_isnumeric(self, id, value):
-		base.debugmsg(5, "id:", id, "	value:", value)
-		prev = self.rt_table_get_isnumeric(id)
-		if value != prev and value is not None:
-			base.report[id]['IsNumeric'] = base.whitespace_set_ini_value(str(value))
-			base.report_item_set_changed(id)
-			base.report_save()
-			return 1
-		return 0
-
-	def rt_table_get_showcount(self, id):
-		base.debugmsg(9, "id:", id)
-		pid = base.report_subsection_parent(id)
-		if id in base.report and 'ShowCount' in base.report[id]:
-			return int(base.report[id]['ShowCount'])
-		elif pid in base.report and 'ShowCount' in base.report[pid]:
-			return int(base.report[pid]['ShowCount'])
-		else:
-			return 0
-
-	def rt_table_set_showcount(self, id, value):
-		base.debugmsg(5, "id:", id, "	value:", value)
-		prev = self.rt_table_get_showcount(id)
-		if value != prev and value is not None:
-			base.report[id]['ShowCount'] = base.whitespace_set_ini_value(str(value))
-			base.report_item_set_changed(id)
-			base.report_save()
-			return 1
-		return 0
 
 	#
 	# Result data db Functions
@@ -7903,9 +7903,11 @@ class ReporterGUI(tk.Frame):
 				rownum += 1
 				colnum = 0
 				cellname = "{}_{}".format("image_file", key)
+				cellimg = "{}_{}".format("image", key)
 				base.debugmsg(5, "cellname:", cellname)
 				if 'image_file' in rdata:
-					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['image_file']), style='Report.TBody.TLabel')
+					self.contentdata[id][cellimg] = tk.PhotoImage(file=rdata['image_file'])
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id][cellimg], style='Report.TBody.TLabel')
 					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 3)
 				else:
 					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="No Screenshot", style='Report.TBody.TLabel')
