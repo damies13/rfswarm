@@ -1846,7 +1846,7 @@ class ReporterBase():
 						base.reportdata[id][rid] = rowi
 					if rid in base.reportdata[id] and "error" not in base.reportdata[id][rid]:
 						base.rt_errors_parse_xml(id, rid)
-				base.debugmsg(5, "base.reportdata[", id, "]:", base.reportdata[id])
+				base.debugmsg(9, "base.reportdata[", id, "]:", base.reportdata[id])
 		return base.reportdata[id]
 
 	def rt_errors_parse_xml(self, id, rid):
@@ -1913,7 +1913,8 @@ class ReporterBase():
 					base.debugmsg(5, "infomsg:", infomsg, infomsg.text)
 
 					# <a[^>]*href="([^"]*)
-					m = re.search(r'<a[^>]*href="([^"]*)', infomsg.text)
+					# m = re.search(r'<a[^>]*href="([^"]*)', infomsg.text)
+					m = re.search(r'<img[^>]*src="([^"]*)', infomsg.text)
 					image = m.group(1)
 					base.debugmsg(5, "image:", image)
 					if image is not None:
@@ -7849,12 +7850,66 @@ class ReporterGUI(tk.Frame):
 
 	def cp_errors(self, id):
 		base.debugmsg(5, "id:", id)
+		showimages = base.rt_errors_get_images(id)
+		base.debugmsg(5, "showimages:", showimages)
 
+		base.rt_errors_get_data(id)
 		if 'data' not in self.contentdata[id]:
-			edata = base.rt_errors_get_data(id)
-			self.contentdata[id]['data'] = edata
+			# edata = base.rt_errors_get_data(id)
+			# self.contentdata[id]['data'] = edata
+			self.contentdata[id]['data'] = {}
 
 		base.debugmsg(5, "self.contentdata[", id, "]['data']:", self.contentdata[id]['data'])
+		base.debugmsg(5, "base.reportdata[", id, "]:", base.reportdata[id])
+
+		rownum = self.contentdata[id]["rownum"]
+		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text="    ")
+		self.contentdata[id]["lblSpacer"].grid(column=0, row=rownum, sticky="nsew")
+
+		i = 0
+		keys = list(base.reportdata[id].keys())
+		for key in keys:
+			base.debugmsg(5, "key:", key)
+			i += 1
+			rownum += 1
+			rdata = base.reportdata[id][key]
+
+			colnum = 0
+			cellname = "{}_{}".format("result_name", key)
+			base.debugmsg(5, "cellname:", cellname)
+			self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['result_name']), style='Report.TBody.TLabel')
+			self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+			colnum += 1
+			cellname = "{}_{}".format("script", key)
+			base.debugmsg(5, "cellname:", cellname)
+			self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['script']), style='Report.TBody.TLabel')
+			self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+			colnum += 1
+			cellname = "{}_{}".format("test_name", key)
+			base.debugmsg(5, "cellname:", cellname)
+			self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['test_name']), style='Report.TBody.TLabel')
+			self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+			rownum += 1
+			colnum = 0
+			cellname = "{}_{}".format("error", key)
+			base.debugmsg(5, "cellname:", cellname)
+			self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
+			self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 3)
+
+			if showimages:
+				rownum += 1
+				colnum = 0
+				cellname = "{}_{}".format("image_file", key)
+				base.debugmsg(5, "cellname:", cellname)
+				if 'image_file' in rdata:
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['image_file']), style='Report.TBody.TLabel')
+					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 3)
+				else:
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="No Screenshot", style='Report.TBody.TLabel')
+					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 3)
 
 	#
 	# Export content generation functions
