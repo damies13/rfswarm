@@ -141,6 +141,8 @@ class ReporterBase():
 	datadb = None
 	dbqueue: Any = {"Write": [], "Read": [], "ReadResult": {}, "Results": [], "Metric": [], "Metrics": []}
 
+	defaultlabels = {"lbl_Result": "Result", "lbl_Test": "Test", "lbl_Script": "Script", "lbl_Error": "Error", "lbl_Count": "Count", "lbl_Screenshot": "Screenshot", "lbl_NoScreenshot": "No Screenshot"}
+
 	settings: Any = {}
 	reportdata: Any = {}
 
@@ -2348,6 +2350,28 @@ class ReporterBase():
 							base.debugmsg(5, "imagef:", imagef)
 							base.reportdata[id][rid]['image'] = image
 							base.reportdata[id][rid]['image_file'] = imagef
+
+	def rt_errors_get_label(self, id, lblname):
+		base.debugmsg(5, "id:", id, "	lblname:", lblname)
+		if lblname in base.report[id]:
+			return base.whitespace_get_ini_value(base.report[id][lblname])
+		else:
+			return base.defaultlabels[lblname]
+
+	def rt_errors_set_label(self, id, lblname, lblvalue):
+		base.debugmsg(5, "id:", id, "	lblname:", lblname, "	lblvalue:", lblvalue)
+		prev = self.rt_table_get_colname(id, lblname)
+		if lblvalue != prev and lblvalue not in [None, ""]:
+			base.report[id][lblname] = base.whitespace_set_ini_value(lblvalue)
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		if lblvalue in [None, ""]:
+			base.report[id][lblname] = base.whitespace_set_ini_value(lblname)
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		return 0
 
 	#
 	# Result data db Functions
@@ -7179,6 +7203,14 @@ class ReporterGUI(tk.Frame):
 		groupet = base.rt_errors_get_group_et(id)
 		base.debugmsg(5, "groupet:", groupet)
 
+		lbl_Result = base.rt_errors_get_label(id, "lbl_Result")
+		lbl_Test = base.rt_errors_get_label(id, "lbl_Test")
+		lbl_Script = base.rt_errors_get_label(id, "lbl_Script")
+		lbl_Error = base.rt_errors_get_label(id, "lbl_Error")
+		lbl_Count = base.rt_errors_get_label(id, "lbl_Count")
+		lbl_Screenshot = base.rt_errors_get_label(id, "lbl_Screenshot")
+		lbl_NoScreenshot = base.rt_errors_get_label(id, "lbl_NoScreenshot")
+
 		self.contentdata[id]["LFrame"].columnconfigure(99, weight=1)
 		rownum = 0
 
@@ -7210,29 +7242,96 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["chkGroupET"].grid(column=1, row=rownum, sticky="nsew")
 
 		rownum += 1
-		self.contentdata[id]["lblGroupET"] = ttk.Label(self.contentdata[id]["LFrame"], text="Label Text:")
-		self.contentdata[id]["lblGroupET"].grid(column=0, row=rownum, sticky="nsew")
+		self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["LFrame"], text=" ")
+		self.contentdata[id]["lblSpacer"].grid(column=0, row=rownum, sticky="nsew")
 
 		rownum += 1
-		self.contentdata[id]["lblGroupET"] = ttk.Label(self.contentdata[id]["LFrame"], text="Result Name:")
-		self.contentdata[id]["lblGroupET"].grid(column=0, row=rownum, sticky="nsew")
+		self.contentdata[id]["lblRename"] = ttk.Label(self.contentdata[id]["LFrame"], text="Rename Labels")
+		self.contentdata[id]["lblRename"].grid(column=0, row=rownum, sticky="nsew")
 
 		rownum += 1
-		self.contentdata[id]["lblGroupET"] = ttk.Label(self.contentdata[id]["LFrame"], text="Test:")
-		self.contentdata[id]["lblGroupET"].grid(column=0, row=rownum, sticky="nsew")
+		self.contentdata[id]["lblLabelName"] = ttk.Label(self.contentdata[id]["LFrame"], text="Label Name")
+		self.contentdata[id]["lblLabelName"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["lblDispName"] = ttk.Label(self.contentdata[id]["LFrame"], text="Display Name")
+		self.contentdata[id]["lblDispName"].grid(column=1, row=rownum, sticky="nsew")
 
 		rownum += 1
-		self.contentdata[id]["lblGroupET"] = ttk.Label(self.contentdata[id]["LFrame"], text="Script:")
-		self.contentdata[id]["lblGroupET"].grid(column=0, row=rownum, sticky="nsew")
+		self.contentdata[id]["lblResult"] = ttk.Label(self.contentdata[id]["LFrame"], text="Result Name")
+		self.contentdata[id]["lblResult"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["varResult"] = tk.StringVar()
+		self.contentdata[id]["varResult"].set(lbl_Result)
+		self.contentdata[id]["inpResult"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["varResult"])
+		self.contentdata[id]["inpResult"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[id]["inpResult"].bind('<Leave>', self.cs_errors_update)
+		self.contentdata[id]["inpResult"].bind('<FocusOut>', self.cs_errors_update)
 
 		rownum += 1
-		self.contentdata[id]["lblGroupET"] = ttk.Label(self.contentdata[id]["LFrame"], text="Error:")
-		self.contentdata[id]["lblGroupET"].grid(column=0, row=rownum, sticky="nsew")
+		self.contentdata[id]["lblTest"] = ttk.Label(self.contentdata[id]["LFrame"], text="Test")
+		self.contentdata[id]["lblTest"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["varTest"] = tk.StringVar()
+		self.contentdata[id]["varTest"].set(lbl_Test)
+		self.contentdata[id]["inpTest"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["varTest"])
+		self.contentdata[id]["inpTest"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[id]["inpTest"].bind('<Leave>', self.cs_errors_update)
+		self.contentdata[id]["inpTest"].bind('<FocusOut>', self.cs_errors_update)
 
 		rownum += 1
-		self.contentdata[id]["lblGroupET"] = ttk.Label(self.contentdata[id]["LFrame"], text="Screenshot:")
-		self.contentdata[id]["lblGroupET"].grid(column=0, row=rownum, sticky="nsew")
+		self.contentdata[id]["lblScript"] = ttk.Label(self.contentdata[id]["LFrame"], text="Script")
+		self.contentdata[id]["lblScript"].grid(column=0, row=rownum, sticky="nsew")
 
+		self.contentdata[id]["varScript"] = tk.StringVar()
+		self.contentdata[id]["varScript"].set(lbl_Script)
+		self.contentdata[id]["inpScript"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["varScript"])
+		self.contentdata[id]["inpScript"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[id]["inpScript"].bind('<Leave>', self.cs_errors_update)
+		self.contentdata[id]["inpScript"].bind('<FocusOut>', self.cs_errors_update)
+
+		rownum += 1
+		self.contentdata[id]["lblError"] = ttk.Label(self.contentdata[id]["LFrame"], text="Error")
+		self.contentdata[id]["lblError"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["varError"] = tk.StringVar()
+		self.contentdata[id]["varError"].set(lbl_Error)
+		self.contentdata[id]["inpError"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["varError"])
+		self.contentdata[id]["inpError"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[id]["inpError"].bind('<Leave>', self.cs_errors_update)
+		self.contentdata[id]["inpError"].bind('<FocusOut>', self.cs_errors_update)
+
+		rownum += 1
+		self.contentdata[id]["lblCount"] = ttk.Label(self.contentdata[id]["LFrame"], text="Count")
+		self.contentdata[id]["lblCount"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["varCount"] = tk.StringVar()
+		self.contentdata[id]["varCount"].set(lbl_Count)
+		self.contentdata[id]["inpCount"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["varCount"])
+		self.contentdata[id]["inpCount"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[id]["inpCount"].bind('<Leave>', self.cs_errors_update)
+		self.contentdata[id]["inpCount"].bind('<FocusOut>', self.cs_errors_update)
+
+		rownum += 1
+		self.contentdata[id]["lblScreenshot"] = ttk.Label(self.contentdata[id]["LFrame"], text="Screenshot")
+		self.contentdata[id]["lblScreenshot"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["varScreenshot"] = tk.StringVar()
+		self.contentdata[id]["varScreenshot"].set(lbl_Screenshot)
+		self.contentdata[id]["inpScreenshot"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["varScreenshot"])
+		self.contentdata[id]["inpScreenshot"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[id]["inpScreenshot"].bind('<Leave>', self.cs_errors_update)
+		self.contentdata[id]["inpScreenshot"].bind('<FocusOut>', self.cs_errors_update)
+
+		rownum += 1
+		self.contentdata[id]["lblNoScreenshot"] = ttk.Label(self.contentdata[id]["LFrame"], text="No Screenshot")
+		self.contentdata[id]["lblNoScreenshot"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["varNoScreenshot"] = tk.StringVar()
+		self.contentdata[id]["varNoScreenshot"].set(lbl_NoScreenshot)
+		self.contentdata[id]["inpNoScreenshot"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["varNoScreenshot"])
+		self.contentdata[id]["inpNoScreenshot"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[id]["inpNoScreenshot"].bind('<Leave>', self.cs_errors_update)
+		self.contentdata[id]["inpNoScreenshot"].bind('<FocusOut>', self.cs_errors_update)
 
 	def cs_errors_update(self, _event=None, *args):
 		base.debugmsg(5, "_event:", _event, "	args:", args)
@@ -7257,6 +7356,34 @@ class ReporterGUI(tk.Frame):
 		if "intGroupET" in self.contentdata[id]:
 			group = self.contentdata[id]["intGroupET"].get()
 			changes += base.rt_errors_set_group_et(id, group)
+
+		if "varResult" in self.contentdata[id]:
+			lbl_Result = self.contentdata[id]["varResult"].get()
+			changes += base.rt_errors_set_label(id, "lbl_Result", lbl_Result)
+
+		if "varTest" in self.contentdata[id]:
+			lbl_Test = self.contentdata[id]["varTest"].get()
+			changes += base.rt_errors_set_label(id, "lbl_Test", lbl_Test)
+
+		if "varScript" in self.contentdata[id]:
+			lbl_Script = self.contentdata[id]["varScript"].get()
+			changes += base.rt_errors_set_label(id, "lbl_Script", lbl_Script)
+
+		if "varError" in self.contentdata[id]:
+			lbl_Error = self.contentdata[id]["varError"].get()
+			changes += base.rt_errors_set_label(id, "lbl_Error", lbl_Error)
+
+		if "varCount" in self.contentdata[id]:
+			lbl_Count = self.contentdata[id]["varCount"].get()
+			changes += base.rt_errors_set_label(id, "lbl_Count", lbl_Count)
+
+		if "varScreenshot" in self.contentdata[id]:
+			lbl_Screenshot = self.contentdata[id]["varScreenshot"].get()
+			changes += base.rt_errors_set_label(id, "lbl_Screenshot", lbl_Screenshot)
+
+		if "varNoScreenshot" in self.contentdata[id]:
+			lbl_NoScreenshot = self.contentdata[id]["varNoScreenshot"].get()
+			changes += base.rt_errors_set_label(id, "lbl_NoScreenshot", lbl_NoScreenshot)
 
 		base.debugmsg(5, "content_preview id:", id)
 		# self.content_preview(id)
@@ -7924,6 +8051,14 @@ class ReporterGUI(tk.Frame):
 		groupet = base.rt_errors_get_group_et(id)
 		base.debugmsg(5, "groupet:", groupet)
 
+		lbl_Result = base.rt_errors_get_label(id, "lbl_Result")
+		lbl_Test = base.rt_errors_get_label(id, "lbl_Test")
+		lbl_Script = base.rt_errors_get_label(id, "lbl_Script")
+		lbl_Error = base.rt_errors_get_label(id, "lbl_Error")
+		lbl_Count = base.rt_errors_get_label(id, "lbl_Count")
+		lbl_Screenshot = base.rt_errors_get_label(id, "lbl_Screenshot")
+		lbl_NoScreenshot = base.rt_errors_get_label(id, "lbl_NoScreenshot")
+
 		pctalike = 0.80
 		base.debugmsg(5, "pctalike:", pctalike)
 
@@ -8031,7 +8166,7 @@ class ReporterGUI(tk.Frame):
 				colnum = 0
 				cellname = "{}_{}".format("result_name_lbl", basekey)
 				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="Result Name:", style='Report.TBody.TLabel')
+				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Result), style='Report.TBody.TLabel')
 				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 				colnum += 1
@@ -8043,7 +8178,7 @@ class ReporterGUI(tk.Frame):
 				colnum += 1
 				cellname = "{}_{}".format("test_name_lbl", basekey)
 				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="Test:", style='Report.TBody.TLabel')
+				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Test), style='Report.TBody.TLabel')
 				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 				colnum += 1
@@ -8055,7 +8190,7 @@ class ReporterGUI(tk.Frame):
 				colnum += 1
 				cellname = "{}_{}".format("script_lbl", basekey)
 				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="Script:", style='Report.TBody.TLabel')
+				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Script), style='Report.TBody.TLabel')
 				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 				colnum += 1
@@ -8067,7 +8202,7 @@ class ReporterGUI(tk.Frame):
 				colnum += 1
 				cellname = "{}_{}".format("count_lbl", basekey)
 				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="Count:", style='Report.TBody.TLabel')
+				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Count), style='Report.TBody.TLabel')
 				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 				colnum += 1
@@ -8088,7 +8223,7 @@ class ReporterGUI(tk.Frame):
 						colnum = 0
 						cellname = "{}_{}".format("error_lbl", basekey)
 						base.debugmsg(5, "cellname:", cellname)
-						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="Error:", style='Report.TBody.TLabel')
+						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Error), style='Report.TBody.TLabel')
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 						colnum += 1
@@ -8100,7 +8235,7 @@ class ReporterGUI(tk.Frame):
 						colnum += 5
 						cellname = "{}_{}".format("ecount_lbl", basekey)
 						base.debugmsg(5, "cellname:", cellname)
-						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="Count:", style='Report.TBody.TLabel')
+						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Count), style='Report.TBody.TLabel')
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 						colnum += 1
@@ -8117,7 +8252,7 @@ class ReporterGUI(tk.Frame):
 							colnum = 0
 							cellname = "{}_{}".format("screenshot_lbl", basekey)
 							base.debugmsg(5, "cellname:", cellname)
-							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="Screenshot:", style='Report.TBody.TLabel')
+							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Screenshot), style='Report.TBody.TLabel')
 							self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 							colnum += 1
@@ -8129,7 +8264,7 @@ class ReporterGUI(tk.Frame):
 								self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id][cellimg], style='Report.TBody.TLabel')
 								self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 7)
 							else:
-								self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="No Screenshot", style='Report.TBody.TLabel')
+								self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}".format(lbl_NoScreenshot), style='Report.TBody.TLabel')
 								self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 7)
 
 				else:
@@ -8140,7 +8275,7 @@ class ReporterGUI(tk.Frame):
 						colnum = 0
 						cellname = "{}_{}".format("error_lbl", keyi)
 						base.debugmsg(5, "cellname:", cellname)
-						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="Error:", style='Report.TBody.TLabel')
+						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Error), style='Report.TBody.TLabel')
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 						colnum += 1
@@ -8154,7 +8289,7 @@ class ReporterGUI(tk.Frame):
 							colnum = 0
 							cellname = "{}_{}".format("screenshot_lbl", keyi)
 							base.debugmsg(5, "cellname:", cellname)
-							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="Screenshot:", style='Report.TBody.TLabel')
+							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Screenshot), style='Report.TBody.TLabel')
 							self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 							colnum += 1
@@ -8166,7 +8301,7 @@ class ReporterGUI(tk.Frame):
 								self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id][cellimg], style='Report.TBody.TLabel')
 								self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 7)
 							else:
-								self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="No Screenshot", style='Report.TBody.TLabel')
+								self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}".format(lbl_NoScreenshot), style='Report.TBody.TLabel')
 								self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 7)
 
 
@@ -8181,7 +8316,7 @@ class ReporterGUI(tk.Frame):
 				colnum = 0
 				cellname = "{}_{}".format("error_lbl", basekey)
 				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="Error:", style='Report.TBody.TLabel')
+				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Error), style='Report.TBody.TLabel')
 				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 				colnum += 1
@@ -8193,7 +8328,7 @@ class ReporterGUI(tk.Frame):
 				colnum += 5
 				cellname = "{}_{}".format("ecount_lbl", basekey)
 				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="Count:", style='Report.TBody.TLabel')
+				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Count), style='Report.TBody.TLabel')
 				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 				colnum += 1
@@ -8210,7 +8345,7 @@ class ReporterGUI(tk.Frame):
 					colnum = 0
 					cellname = "{}_{}".format("screenshot_lbl", basekey)
 					base.debugmsg(5, "cellname:", cellname)
-					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="Screenshot:", style='Report.TBody.TLabel')
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Screenshot), style='Report.TBody.TLabel')
 					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 					colnum += 1
@@ -8222,7 +8357,7 @@ class ReporterGUI(tk.Frame):
 						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id][cellimg], style='Report.TBody.TLabel')
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 7)
 					else:
-						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="No Screenshot", style='Report.TBody.TLabel')
+						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}".format(lbl_NoScreenshot), style='Report.TBody.TLabel')
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 7)
 
 		if not grouprn and not groupet:
@@ -8235,9 +8370,9 @@ class ReporterGUI(tk.Frame):
 				rdata = base.reportdata[id][key]
 
 				colnum = 0
-				cellname = "{}_{}".format("result_name", key)
+				cellname = "{}_{}".format("lbl_result_name", key)
 				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="Result Name:", style='Report.TBody.TLabel')
+				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Result), style='Report.TBody.TLabel')
 				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 				colnum += 1
@@ -8248,9 +8383,9 @@ class ReporterGUI(tk.Frame):
 
 
 				colnum += 1
-				cellname = "{}_{}".format("result_name", key)
+				cellname = "{}_{}".format("lbl_test_name", key)
 				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="Test:", style='Report.TBody.TLabel')
+				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Test), style='Report.TBody.TLabel')
 				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 				colnum += 1
@@ -8260,9 +8395,9 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 				colnum += 1
-				cellname = "{}_{}".format("result_name", key)
+				cellname = "{}_{}".format("lbl_script", key)
 				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="Script:", style='Report.TBody.TLabel')
+				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Script), style='Report.TBody.TLabel')
 				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 				colnum += 1
@@ -8273,9 +8408,9 @@ class ReporterGUI(tk.Frame):
 
 				rownum += 1
 				colnum = 0
-				cellname = "{}_{}".format("result_name", key)
+				cellname = "{}_{}".format("lbl_error", key)
 				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="Error:", style='Report.TBody.TLabel')
+				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Error), style='Report.TBody.TLabel')
 				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 				colnum += 1
@@ -8287,9 +8422,9 @@ class ReporterGUI(tk.Frame):
 				if showimages:
 					rownum += 1
 					colnum = 0
-					cellname = "{}_{}".format("result_name", key)
+					cellname = "{}_{}".format("lbl_image", key)
 					base.debugmsg(5, "cellname:", cellname)
-					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="Screenshot:", style='Report.TBody.TLabel')
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Screenshot), style='Report.TBody.TLabel')
 					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 					colnum += 1
@@ -8301,7 +8436,7 @@ class ReporterGUI(tk.Frame):
 						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id][cellimg], style='Report.TBody.TLabel')
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 5)
 					else:
-						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="No Screenshot", style='Report.TBody.TLabel')
+						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}".format(lbl_NoScreenshot), style='Report.TBody.TLabel')
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 5)
 
 	#
