@@ -3566,209 +3566,137 @@ class ReporterCore:
 			base.debugmsg(5, "errortexts:", errortexts)
 
 		if grouprn:
-			pass
-			# for result_name in list(self.contentdata[id]["grpdata"]["resultnames"].keys()):
-			# 	basekey = self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"][0]
-			# 	base.debugmsg(5, "basekey:", basekey)
-			# 	rdata = base.reportdata[id][basekey]
-			# 	rownum += 1
-			#
-			# 	colnum = 0
-			# 	cellname = "{}_{}".format("result_name_lbl", basekey)
-			# 	base.debugmsg(5, "cellname:", cellname)
-			# 	self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Result), style='Report.TBody.TLabel')
-			# 	self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-			#
-			# 	colnum += 1
-			# 	cellname = "{}_{}".format("result_name", basekey)
-			# 	base.debugmsg(5, "cellname:", cellname)
-			# 	self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(result_name), style='Report.TBody.TLabel')
-			# 	self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-			#
-			# 	colnum += 1
-			# 	cellname = "{}_{}".format("test_name_lbl", basekey)
-			# 	base.debugmsg(5, "cellname:", cellname)
-			# 	self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Test), style='Report.TBody.TLabel')
-			# 	self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-			#
-			# 	colnum += 1
-			# 	cellname = "{}_{}".format("test_name", basekey)
-			# 	base.debugmsg(5, "cellname:", cellname)
-			# 	self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['test_name']), style='Report.TBody.TLabel')
-			# 	self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-			#
-			# 	colnum += 1
-			# 	cellname = "{}_{}".format("script_lbl", basekey)
-			# 	base.debugmsg(5, "cellname:", cellname)
-			# 	self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Script), style='Report.TBody.TLabel')
-			# 	self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-			#
-			# 	colnum += 1
-			# 	cellname = "{}_{}".format("script", basekey)
-			# 	base.debugmsg(5, "cellname:", cellname)
-			# 	self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['script']), style='Report.TBody.TLabel')
-			# 	self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-			#
-			# 	colnum += 1
-			# 	cellname = "{}_{}".format("count_lbl", basekey)
-			# 	base.debugmsg(5, "cellname:", cellname)
-			# 	self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Count), style='Report.TBody.TLabel')
-			# 	self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-			#
-			# 	colnum += 1
-			# 	cellname = "{}_{}".format("countdisp", basekey)
-			# 	base.debugmsg(5, "cellname:", cellname)
-			# 	count = len(self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"])
-			# 	base.debugmsg(5, "count:", count)
-			# 	self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(count), style='Report.TBody.TLabel')
-			# 	self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-			#
-			# 	if groupet:
-			# 		# self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext]["keys"]
-			# 		for errortext in list(self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"].keys()):
-			# 			basekey = self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext]["keys"][0]
-			# 			base.debugmsg(5, "basekey:", basekey)
-			# 			rdata = base.reportdata[id][basekey]
-			# 			rownum += 1
-			# 			colnum = 0
-			# 			cellname = "{}_{}".format("error_lbl", basekey)
-			# 			base.debugmsg(5, "cellname:", cellname)
-			# 			self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Error), style='Report.TBody.TLabel')
-			# 			self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-			#
-			# 			colnum += 1
-			# 			cellname = "{}_{}".format("error", basekey)
-			# 			base.debugmsg(5, "cellname:", cellname)
-			# 			self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
-			# 			self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 5)
-			#
-			# 			colnum += 5
-			# 			cellname = "{}_{}".format("ecount_lbl", basekey)
-			# 			base.debugmsg(5, "cellname:", cellname)
-			# 			self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Count), style='Report.TBody.TLabel')
-			# 			self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-			#
-			# 			colnum += 1
-			# 			cellname = "{}_{}".format("ecountdisp", basekey)
-			# 			base.debugmsg(5, "cellname:", cellname)
-			# 			count = len(self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext]["keys"])
-			# 			base.debugmsg(5, "count:", count)
-			# 			self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(count), style='Report.TBody.TLabel')
-			# 			self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-			#
-			#
-			# 			if showimages:
-			# 				rownum += 1
-			# 				colnum = 0
-			# 				cellname = "{}_{}".format("screenshot_lbl", basekey)
-			# 				base.debugmsg(5, "cellname:", cellname)
-			# 				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Screenshot), style='Report.TBody.TLabel')
-			# 				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-			#
-			# 				colnum += 1
-			# 				cellname = "{}_{}".format("screenshot", basekey)
-			# 				cellimg = "{}_{}".format("image", basekey)
-			# 				base.debugmsg(5, "cellname:", cellname)
-			# 				if 'image_file' in rdata:
-			# 					self.contentdata[id][cellimg] = tk.PhotoImage(file=rdata['image_file'])
-			# 					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id][cellimg], style='Report.TBody.TLabel')
-			# 					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 7)
-			# 				else:
-			# 					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}".format(lbl_NoScreenshot), style='Report.TBody.TLabel')
-			# 					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 7)
-			#
-			# 	else:
-			# 		for keyi in self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"]:
-			# 			rdata = base.reportdata[id][keyi]
-			#
-			# 			rownum += 1
-			# 			colnum = 0
-			# 			cellname = "{}_{}".format("error_lbl", keyi)
-			# 			base.debugmsg(5, "cellname:", cellname)
-			# 			self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Error), style='Report.TBody.TLabel')
-			# 			self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-			#
-			# 			colnum += 1
-			# 			cellname = "{}_{}".format("error", keyi)
-			# 			base.debugmsg(5, "cellname:", cellname)
-			# 			self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
-			# 			self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 7)
-			#
-			# 			if showimages:
-			# 				rownum += 1
-			# 				colnum = 0
-			# 				cellname = "{}_{}".format("screenshot_lbl", keyi)
-			# 				base.debugmsg(5, "cellname:", cellname)
-			# 				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Screenshot), style='Report.TBody.TLabel')
-			# 				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-			#
-			# 				colnum += 1
-			# 				cellname = "{}_{}".format("screenshot", keyi)
-			# 				cellimg = "{}_{}".format("image", keyi)
-			# 				base.debugmsg(5, "cellname:", cellname)
-			# 				if 'image_file' in rdata:
-			# 					self.contentdata[id][cellimg] = tk.PhotoImage(file=rdata['image_file'])
-			# 					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id][cellimg], style='Report.TBody.TLabel')
-			# 					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 7)
-			# 				else:
-			# 					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}".format(lbl_NoScreenshot), style='Report.TBody.TLabel')
-			# 					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 7)
+			for result_name in list(grpdata["resultnames"].keys()):
+				basekey = grpdata["resultnames"][result_name]["keys"][0]
+				base.debugmsg(5, "basekey:", basekey)
+				rdata = base.reportdata[id][basekey]
+				tr = etree.SubElement(tbl, 'tr')
 
+				th = etree.SubElement(tr, 'th')
+				th.text = "{}:".format(lbl_Result)
+				td = etree.SubElement(tr, 'td')
+				td.text = result_name
+
+				th = etree.SubElement(tr, 'th')
+				th.text = "{}:".format(lbl_Test)
+				td = etree.SubElement(tr, 'td')
+				td.text = rdata['test_name']
+
+				th = etree.SubElement(tr, 'th')
+				th.text = "{}:".format(lbl_Script)
+				td = etree.SubElement(tr, 'td')
+				td.text = rdata['script']
+
+				th = etree.SubElement(tr, 'th')
+				th.text = "{}:".format(lbl_Count)
+				count = len(grpdata["resultnames"][result_name]["keys"])
+				base.debugmsg(5, "count:", count)
+				td = etree.SubElement(tr, 'td')
+				td.text = str(count)
+
+				if groupet:
+					for errortext in list(grpdata["resultnames"][result_name]["errortexts"].keys()):
+						basekey = grpdata["resultnames"][result_name]["errortexts"][errortext]["keys"][0]
+						base.debugmsg(5, "basekey:", basekey)
+						rdata = base.reportdata[id][basekey]
+
+						tr = etree.SubElement(tbl, 'tr')
+
+						th = etree.SubElement(tr, 'th')
+						th.text = "{}:".format(lbl_Error)
+						td = etree.SubElement(tr, 'td')
+						pre = etree.SubElement(td, 'pre')
+						pre.text = rdata['error']
+						td.set('colspan', '5')
+
+						th = etree.SubElement(tr, 'th')
+						th.text = "{}:".format(lbl_Count)
+						td = etree.SubElement(tr, 'td')
+						count = len(grpdata["resultnames"][result_name]["errortexts"][errortext]["keys"])
+						base.debugmsg(5, "count:", count)
+						td.text = str(count)
+
+						if showimages:
+							tr = etree.SubElement(tbl, 'tr')
+
+							th = etree.SubElement(tr, 'th')
+							th.text = "{}:".format(lbl_Screenshot)
+
+							td = etree.SubElement(tr, 'td')
+							td.set('colspan', '7')
+							if 'image_file' in rdata:
+								# td.text = rdata['image_file']
+								oimg = Image.open(rdata['image_file'])
+								self.xhtml_sections_embedimg(td, basekey, oimg)
+							else:
+								td.text = lbl_NoScreenshot
+
+				else:
+					for keyi in grpdata["resultnames"][result_name]["keys"]:
+						rdata = base.reportdata[id][keyi]
+
+						tr = etree.SubElement(tbl, 'tr')
+
+						th = etree.SubElement(tr, 'th')
+						th.text = "{}:".format(lbl_Error)
+
+						td = etree.SubElement(tr, 'td')
+						pre = etree.SubElement(td, 'pre')
+						pre.text = rdata['error']
+						td.set('colspan', '7')
+
+						if showimages:
+							tr = etree.SubElement(tbl, 'tr')
+
+							th = etree.SubElement(tr, 'th')
+							th.text = "{}:".format(lbl_Screenshot)
+
+							td = etree.SubElement(tr, 'td')
+							td.set('colspan', '7')
+							if 'image_file' in rdata:
+								# td.text = rdata['image_file']
+								oimg = Image.open(rdata['image_file'])
+								self.xhtml_sections_embedimg(td, keyi, oimg)
+							else:
+								td.text = lbl_NoScreenshot
 
 		if groupet and not grouprn:
-			pass
-			# # baseid = self.contentdata[id]["grpdata"]["errortexts"][errortext]["keys"][0]
-			# for errortext in list(self.contentdata[id]["grpdata"]["errortexts"].keys()):
-			# 	basekey = self.contentdata[id]["grpdata"]["errortexts"][errortext]["keys"][0]
-			# 	base.debugmsg(5, "basekey:", basekey)
-			# 	rdata = base.reportdata[id][basekey]
-			# 	rownum += 1
-			# 	colnum = 0
-			# 	cellname = "{}_{}".format("error_lbl", basekey)
-			# 	base.debugmsg(5, "cellname:", cellname)
-			# 	self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Error), style='Report.TBody.TLabel')
-			# 	self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-			#
-			# 	colnum += 1
-			# 	cellname = "{}_{}".format("error", basekey)
-			# 	base.debugmsg(5, "cellname:", cellname)
-			# 	self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
-			# 	self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 5)
-			#
-			# 	colnum += 5
-			# 	cellname = "{}_{}".format("ecount_lbl", basekey)
-			# 	base.debugmsg(5, "cellname:", cellname)
-			# 	self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Count), style='Report.TBody.TLabel')
-			# 	self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-			#
-			# 	colnum += 1
-			# 	cellname = "{}_{}".format("ecountdisp", basekey)
-			# 	base.debugmsg(5, "cellname:", cellname)
-			# 	count = len(self.contentdata[id]["grpdata"]["errortexts"][errortext]["keys"])
-			# 	base.debugmsg(5, "count:", count)
-			# 	self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(count), style='Report.TBody.TLabel')
-			# 	self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-			#
-			#
-			# 	if showimages:
-			# 		rownum += 1
-			# 		colnum = 0
-			# 		cellname = "{}_{}".format("screenshot_lbl", basekey)
-			# 		base.debugmsg(5, "cellname:", cellname)
-			# 		self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Screenshot), style='Report.TBody.TLabel')
-			# 		self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-			#
-			# 		colnum += 1
-			# 		cellname = "{}_{}".format("screenshot", basekey)
-			# 		cellimg = "{}_{}".format("image", basekey)
-			# 		base.debugmsg(5, "cellname:", cellname)
-			# 		if 'image_file' in rdata:
-			# 			self.contentdata[id][cellimg] = tk.PhotoImage(file=rdata['image_file'])
-			# 			self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id][cellimg], style='Report.TBody.TLabel')
-			# 			self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 7)
-			# 		else:
-			# 			self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}".format(lbl_NoScreenshot), style='Report.TBody.TLabel')
-			# 			self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 7)
+			for errortext in list(grpdata["errortexts"].keys()):
+				basekey = grpdata["errortexts"][errortext]["keys"][0]
+				base.debugmsg(5, "basekey:", basekey)
+				rdata = base.reportdata[id][basekey]
+
+				tr = etree.SubElement(tbl, 'tr')
+
+				th = etree.SubElement(tr, 'th')
+				th.text = "{}:".format(lbl_Error)
+
+				td = etree.SubElement(tr, 'td')
+				pre = etree.SubElement(td, 'pre')
+				pre.text = rdata['error']
+				td.set('colspan', '5')
+
+				th = etree.SubElement(tr, 'th')
+				th.text = "{}:".format(lbl_Count)
+				count = len(grpdata["errortexts"][errortext]["keys"])
+				base.debugmsg(5, "count:", count)
+				td = etree.SubElement(tr, 'td')
+				td.text = str(count)
+
+				if showimages:
+					tr = etree.SubElement(tbl, 'tr')
+
+					th = etree.SubElement(tr, 'th')
+					th.text = "{}:".format(lbl_Screenshot)
+
+					td = etree.SubElement(tr, 'td')
+					td.set('colspan', '7')
+					if 'image_file' in rdata:
+						# td.text = rdata['image_file']
+						oimg = Image.open(rdata['image_file'])
+						self.xhtml_sections_embedimg(td, basekey, oimg)
+					else:
+						td.text = lbl_NoScreenshot
 
 		if not grouprn and not groupet:
 			keys = list(base.reportdata[id].keys())
@@ -3797,10 +3725,9 @@ class ReporterCore:
 
 				th = etree.SubElement(tr, 'th')
 				th.text = "{}:".format(lbl_Error)
-				# <td colspan="2">
 				td = etree.SubElement(tr, 'td')
-				# td.text = "<br>".join(rdata['error'].splitlines())
-				td.text = rdata['error']
+				pre = etree.SubElement(td, 'pre')
+				pre.text = rdata['error']
 				td.set('colspan', '5')
 
 				if showimages:
@@ -3809,22 +3736,14 @@ class ReporterCore:
 					th = etree.SubElement(tr, 'th')
 					th.text = "{}:".format(lbl_Screenshot)
 
+					td = etree.SubElement(tr, 'td')
+					td.set('colspan', '5')
 					if 'image_file' in rdata:
-						# self.contentdata[id][cellimg] = tk.PhotoImage(file=rdata['image_file'])
-						# self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id][cellimg], style='Report.TBody.TLabel')
-						# self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 5)
-						td = etree.SubElement(tr, 'td')
-						td.text = rdata['image_file']
-						td.set('colspan', '5')
-
+						# td.text = rdata['image_file']
+						oimg = Image.open(rdata['image_file'])
+						self.xhtml_sections_embedimg(td, key, oimg)
 					else:
-						td = etree.SubElement(tr, 'td')
 						td.text = lbl_NoScreenshot
-						td.set('colspan', '5')
-
-
-
-
 
 	#
 	# 	MS Word
