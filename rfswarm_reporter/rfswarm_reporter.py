@@ -4643,7 +4643,7 @@ class ReporterCore:
 			# add 2 columns for count
 			table.add_column(Cm(1.8))
 			table.add_column(Cm(0.8))
-			
+
 			for errortext in list(grpdata["errortexts"].keys()):
 				basekey = grpdata["errortexts"][errortext]["keys"][0]
 				base.debugmsg(5, "basekey:", basekey)
@@ -4859,12 +4859,14 @@ class ReporterCore:
 		tableh = copy(highlight)
 		tableh.name = "Table Heading"
 		tableh.border = borders
+		tableh.alignment.vertical = "top"
 		wb.add_named_style(tableh)
 
 		# Table Data
 		tabled = copy(default)
 		tabled.name = "Table Data"
 		tabled.border = borders
+		tabled.alignment.vertical = "top"
 		wb.add_named_style(tabled)
 
 	def xlsx_add_sections(self, id, sectionpct):
@@ -4967,6 +4969,9 @@ class ReporterCore:
 			if stype == "table":
 				self.xlsx_sections_table(id)
 				pass
+			if stype == "errors":
+				self.xlsx_sections_errors(id)
+				pass
 
 		self.cg_data["xlsx"]["progress"] += sectionpct
 		self.display_message("Generating Excel Report {}%".format(int(round(self.cg_data["xlsx"]["progress"] * 100, 0))))
@@ -5021,6 +5026,15 @@ class ReporterCore:
 		self.xlsx_select_cell(1, rownum)
 
 		# base.debugmsg(5, "ws.active_cell:", ws.active_cell, "	ws.selected_cell:", ws.selected_cell)
+
+	def xlsx_select_cell(self, col, row):
+
+		wb = self.cg_data["xlsx"]["Workbook"]
+		ws = wb.active
+		nextcell = ws.cell(column=col, row=row)
+
+		ws.sheet_view.selection[0].activeCell = nextcell.coordinate
+		ws.sheet_view.selection[0].sqref = nextcell.coordinate
 
 	def xlsx_sections_contents(self, id):
 		base.debugmsg(8, "id:", id)
@@ -5428,14 +5442,433 @@ class ReporterCore:
 		rownum += 2
 		self.xlsx_select_cell(1, rownum)
 
-	def xlsx_select_cell(self, col, row):
+	def xlsx_sections_errors(self, id):
+		base.debugmsg(8, "id:", id)
 
 		wb = self.cg_data["xlsx"]["Workbook"]
 		ws = wb.active
-		nextcell = ws.cell(column=col, row=row)
+		rownum = ws[ws.active_cell].row
 
-		ws.sheet_view.selection[0].activeCell = nextcell.coordinate
-		ws.sheet_view.selection[0].sqref = nextcell.coordinate
+		# imgsizew = 1400000
+		imgsizew = 1400000 * 3
+
+		cellcol = 1
+		ws.column_dimensions["A"].width = 3
+		cellcol += 1
+		cw = 5
+
+		showimages = base.rt_errors_get_images(id)
+		base.debugmsg(5, "showimages:", showimages)
+		grouprn = base.rt_errors_get_group_rn(id)
+		base.debugmsg(5, "grouprn:", grouprn)
+		groupet = base.rt_errors_get_group_et(id)
+		base.debugmsg(5, "groupet:", groupet)
+
+		lbl_Result = base.rt_errors_get_label(id, "lbl_Result")
+		lbl_Test = base.rt_errors_get_label(id, "lbl_Test")
+		lbl_Script = base.rt_errors_get_label(id, "lbl_Script")
+		lbl_Error = base.rt_errors_get_label(id, "lbl_Error")
+		lbl_Count = base.rt_errors_get_label(id, "lbl_Count")
+		lbl_Screenshot = base.rt_errors_get_label(id, "lbl_Screenshot")
+		lbl_NoScreenshot = base.rt_errors_get_label(id, "lbl_NoScreenshot")
+
+		pctalike = 0.80
+		base.debugmsg(5, "pctalike:", pctalike)
+
+		base.rt_errors_get_data(id)
+
+		grpdata = {}
+		if grouprn or groupet:
+			grpdata = {}
+			grpdata["resultnames"] = {}
+			grpdata["errortexts"] = {}
+
+			keys = list(base.reportdata[id].keys())
+			for key in keys:
+				base.debugmsg(5, "key:", key)
+				rdata = base.reportdata[id][key]
+
+				if grouprn:
+					result_name = rdata['result_name']
+					matches = difflib.get_close_matches(result_name, list(grpdata["resultnames"].keys()), cutoff=pctalike)
+					base.debugmsg(5, "matches:", matches)
+					if len(matches)>0:
+						result_name = matches[0]
+						basekey = grpdata["resultnames"][result_name]["keys"][0]
+						base.debugmsg(5, "basekey:", basekey)
+
+						grpdata["resultnames"][result_name]["keys"].append(key)
+
+					else:
+						grpdata["resultnames"][result_name] = {}
+						grpdata["resultnames"][result_name]["keys"] = []
+						grpdata["resultnames"][result_name]["keys"].append(key)
+						grpdata["resultnames"][result_name]["errortexts"] = {}
+
+					if groupet:
+						errortext = rdata['error']
+						# errortext_sub = errortext.split(r'\n')[0]
+						errortext_sub = errortext.splitlines()[0]
+						base.debugmsg(5, "errortext_sub:", errortext_sub)
+						matcheset = difflib.get_close_matches(errortext_sub, list(grpdata["resultnames"][result_name]["errortexts"].keys()), cutoff=pctalike)
+						base.debugmsg(5, "matcheset:", matcheset)
+						if len(matcheset)>0:
+							errortext = matcheset[0]
+							baseid = grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"][0]
+							base.debugmsg(5, "baseid:", baseid)
+
+							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+
+						else:
+							grpdata["resultnames"][result_name]["errortexts"][errortext_sub] = {}
+							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
+							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+
+
+				if groupet:
+					errortext = rdata['error']
+					errortext_sub = errortext.splitlines()[0]
+					base.debugmsg(5, "errortext_sub:", errortext_sub)
+					matches = difflib.get_close_matches(errortext_sub, list(grpdata["errortexts"].keys()), cutoff=pctalike)
+					base.debugmsg(5, "matches:", matches)
+					if len(matches)>0:
+						base.debugmsg(5, "errortext_sub:", errortext_sub)
+						errortext = matches[0]
+						base.debugmsg(5, "errortext:", errortext)
+						baseid = grpdata["errortexts"][errortext]["keys"][0]
+						base.debugmsg(5, "baseid:", baseid)
+
+						grpdata["errortexts"][errortext]["keys"].append(key)
+
+					else:
+						base.debugmsg(5, "errortext_sub:", errortext_sub)
+						grpdata["errortexts"][errortext_sub] = {}
+						grpdata["errortexts"][errortext_sub]["keys"] = []
+						grpdata["errortexts"][errortext_sub]["keys"].append(key)
+
+
+			resultnames = grpdata["resultnames"]
+			base.debugmsg(5, "resultnames:", resultnames)
+			errortexts = grpdata["errortexts"]
+			base.debugmsg(5, "errortexts:", errortexts)
+
+		if grouprn:
+			# add 2 columns for count
+			table.add_column(Cm(1.8))
+			table.add_column(Cm(0.8))
+
+			for result_name in list(grpdata["resultnames"].keys()):
+				basekey = grpdata["resultnames"][result_name]["keys"][0]
+				base.debugmsg(5, "basekey:", basekey)
+				rdata = base.reportdata[id][basekey]
+
+				cellcol = 0
+				cellrow += 1
+
+				# if cellrow > 0:
+				# 	table.add_row()
+				#
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Result)
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+				#
+				# cellcol += 1
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+				# a = table.cell(cellrow, cellcol)
+				# b = table.cell(cellrow, cellcol + 1)
+				# A = a.merge(b)
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['result_name']
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].FitText = True
+				#
+				# cellcol += 2
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Test)
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+				#
+				# cellcol += 1
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['test_name']
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+				#
+				# cellcol += 1
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Script)
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+				# # table.columns[cellcol].width = Cm(1.8)
+				#
+				# cellcol += 1
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['script']
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+				#
+				# cellcol += 1
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Count)
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+				# # table.columns[cellcol].width = Cm(1.8)
+				#
+				# count = len(grpdata["resultnames"][result_name]["keys"])
+				# base.debugmsg(5, "count:", count)
+				# cellcol += 1
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].text = str(count)
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+
+				if groupet:
+					for errortext in list(grpdata["resultnames"][result_name]["errortexts"].keys()):
+						basekey = grpdata["resultnames"][result_name]["errortexts"][errortext]["keys"][0]
+						base.debugmsg(5, "basekey:", basekey)
+						rdata = base.reportdata[id][basekey]
+
+						cellcol = 0
+						cellrow += 1
+						# table.add_row()
+						#
+						# table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+						# table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Error)
+						# table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+						#
+						# cellcol += 1
+						# a = table.cell(cellrow, cellcol)
+						# b = table.cell(cellrow, cellcol + 5)
+						# A = a.merge(b)
+						#
+						# table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+						# table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
+						# table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+						#
+						# cellcol += 6
+						# table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+						# table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Count)
+						# table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+						# # table.columns[cellcol].width = Cm(1.8)
+						#
+						# count = len(grpdata["resultnames"][result_name]["errortexts"][errortext]["keys"])
+						# base.debugmsg(5, "count:", count)
+						# cellcol += 1
+						# table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+						# table.rows[cellrow].cells[cellcol].paragraphs[0].text = str(count)
+						# table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+						#
+						# if showimages:
+						# 	cellcol = 0
+						# 	cellrow += 1
+						# 	table.add_row()
+						#
+						# 	table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+						# 	table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Screenshot)
+						# 	table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+						#
+						# 	cellcol += 1
+						# 	a = table.cell(cellrow, cellcol)
+						# 	b = table.cell(cellrow, cellcol + 7)
+						# 	A = a.merge(b)
+						# 	table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+						# 	if 'image_file' in rdata:
+						# 		run = table.rows[cellrow].cells[cellcol].paragraphs[0].add_run()
+						# 		run.add_picture(rdata['image_file'], width = imgsizew)
+						# 	else:
+						# 		table.rows[cellrow].cells[cellcol].paragraphs[0].text = lbl_NoScreenshot
+						# 		table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+
+				else:
+					for keyi in grpdata["resultnames"][result_name]["keys"]:
+						rdata = base.reportdata[id][keyi]
+
+						cellcol = 0
+						cellrow += 1
+						# table.add_row()
+						#
+						# table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+						# table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Error)
+						# table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+						#
+						# cellcol += 1
+						# a = table.cell(cellrow, cellcol)
+						# b = table.cell(cellrow, cellcol + 7)
+						# A = a.merge(b)
+						#
+						# table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+						# table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
+						# table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+						#
+						# if showimages:
+						# 	cellcol = 0
+						# 	cellrow += 1
+						# 	table.add_row()
+						#
+						# 	table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+						# 	table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Screenshot)
+						# 	table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+						#
+						# 	cellcol += 1
+						# 	a = table.cell(cellrow, cellcol)
+						# 	b = table.cell(cellrow, cellcol + 7)
+						# 	A = a.merge(b)
+						# 	table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+						# 	if 'image_file' in rdata:
+						# 		run = table.rows[cellrow].cells[cellcol].paragraphs[0].add_run()
+						# 		run.add_picture(rdata['image_file'], width = imgsizew)
+						# 	else:
+						# 		table.rows[cellrow].cells[cellcol].paragraphs[0].text = lbl_NoScreenshot
+						# 		table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+
+		if groupet and not grouprn:
+			# add 2 columns for count
+			table.add_column(Cm(1.8))
+			table.add_column(Cm(0.8))
+
+			for errortext in list(grpdata["errortexts"].keys()):
+				basekey = grpdata["errortexts"][errortext]["keys"][0]
+				base.debugmsg(5, "basekey:", basekey)
+				rdata = base.reportdata[id][basekey]
+
+				cellcol = 0
+				cellrow += 1
+
+				# if cellrow > 0:
+				# 	table.add_row()
+				#
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Error)
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+				#
+				# cellcol += 1
+				# a = table.cell(cellrow, cellcol)
+				# b = table.cell(cellrow, cellcol + 5)
+				# A = a.merge(b)
+				#
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+				#
+				# cellcol += 6
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Count)
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+				#
+				# count = len(grpdata["errortexts"][errortext]["keys"])
+				# base.debugmsg(5, "count:", count)
+				# cellcol += 1
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].text = str(count)
+				# table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+				#
+				# if showimages:
+				# 	cellcol = 0
+				# 	cellrow += 1
+				# 	table.add_row()
+				#
+				# 	table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+				# 	table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Screenshot)
+				# 	table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+				#
+				# 	cellcol += 1
+				# 	a = table.cell(cellrow, cellcol)
+				# 	b = table.cell(cellrow, cellcol + 7)
+				# 	A = a.merge(b)
+				# 	table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+				# 	if 'image_file' in rdata:
+				# 		run = table.rows[cellrow].cells[cellcol].paragraphs[0].add_run()
+				# 		run.add_picture(rdata['image_file'], width = imgsizew)
+				# 	else:
+				# 		table.rows[cellrow].cells[cellcol].paragraphs[0].text = lbl_NoScreenshot
+				# 		table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+
+		if not grouprn and not groupet:
+			keys = list(base.reportdata[id].keys())
+			for key in keys:
+				base.debugmsg(5, "key:", key)
+				rdata = base.reportdata[id][key]
+
+				cellcol = 1
+				rownum += 1
+
+				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Result), "Table Heading", 0)
+				cellcol += 1
+				self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['result_name'], "Table Data", 0)
+
+				cellcol += 1
+				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Test), "Table Heading", 0)
+				cellcol += 1
+				self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['test_name'], "Table Data", 0)
+
+
+				cellcol += 1
+				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Script), "Table Heading", 0)
+				cellcol += 1
+				self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['script'], "Table Data", 0)
+
+				cellcol = 1
+				rownum += 1
+				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Error), "Table Heading", 0)
+				cellcol += 1
+				self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['error'], "Table Data", 4)
+
+				if showimages:
+					cellcol = 1
+					rownum += 1
+					self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Screenshot), "Table Heading", 0)
+
+					cellcol += 1
+
+					if 'image_file' in rdata:
+						self.xlsx_sections_errors_fill_cell(cellcol, rownum, " ", "Table Data", 4)
+						img = openpyxl.drawing.image.Image(rdata['image_file'])
+						cellname = ws.cell(row=rownum, column=cellcol).coordinate
+
+						base.debugmsg(5, "img.width:", img.width, "	img.height:", img.height)	#, "	img.info:", img.info)
+														# 31.75					32.60
+														# 22.23					22.82	==> 70%
+						newiw = 850
+						ratio = newiw / img.width
+						base.debugmsg(5, "ratio:", ratio)
+						newih = img.height * ratio
+						base.debugmsg(5, "newih:", newih)
+						img.width = newiw
+						img.height = newih
+
+						newh = newih * 0.76
+						# 43.44 cm ==> 32.95 cm	==>	76%
+						base.debugmsg(5, "newh:", newh)
+						ws.row_dimensions[rownum].height = newh
+
+						ws.add_image(img, cellname)
+					else:
+						self.xlsx_sections_errors_fill_cell(cellcol, rownum, lbl_NoScreenshot, "Table Data", 4)
+
+	def xlsx_sections_errors_fill_cell(self, cellcol, rownum, val, style, span):
+		base.debugmsg(7, "cellcol:", cellcol, "	rownum:", rownum, "	val:", val, "	style:", style)
+		wb = self.cg_data["xlsx"]["Workbook"]
+		ws = wb.active
+
+		cell = ws.cell(column=cellcol, row=rownum, value=val)
+		lines = str(val).splitlines()
+
+		if span > 0:
+			ws.merge_cells(start_row=rownum, start_column=cellcol, end_row=rownum, end_column=cellcol + span)
+		else:
+			currw = ws.column_dimensions[cell.column_letter].width
+			valw = 0
+			for line in lines:
+				valw = max(valw, len(line))
+			base.debugmsg(9, "currw:", currw, "	valw:", valw)
+			neww = max(currw, valw)
+			base.debugmsg(8, "neww:", neww)
+			ws.column_dimensions[cell.column_letter].width = neww
+
+		if len(lines) > 1:
+			base.debugmsg(8, "len(lines):", len(lines))
+			# currh = ws.row_dimensions[rownum].height
+			# https://stackoverflow.com/questions/32855656/column-and-row-dimensions-in-openpyxl-are-always-none
+			currh = 13
+			base.debugmsg(8, "currh:", currh)
+			newh = currh * len(lines)
+			base.debugmsg(8, "newh:", newh)
+			ws.row_dimensions[rownum].height = newh
+
+		cell.style = style
 
 
 class ReporterGUI(tk.Frame):
