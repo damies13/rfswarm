@@ -4481,7 +4481,7 @@ class ReporterCore:
 				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
 				a = table.cell(cellrow, cellcol)
 				b = table.cell(cellrow, cellcol + 1)
-				A = a.merge(b)
+				a.merge(b)
 				table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['result_name']
 				table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 				table.rows[cellrow].cells[cellcol].paragraphs[0].FitText = True
