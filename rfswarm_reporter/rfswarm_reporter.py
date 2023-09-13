@@ -41,7 +41,6 @@ import openpyxl  # used for xlsx export
 import tzlocal
 from docx import Document  # used for docx export
 from docx.enum.style import WD_STYLE_TYPE  # used for docx export
-from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH  # used for docx export
 from docx.oxml.shared import OxmlElement, qn  # used for docx export
 from docx.shared import Cm, Pt, RGBColor  # used for docx export
@@ -282,10 +281,10 @@ class ReporterBase():
 			base.debugmsg(9, "valout:", valout)
 		return valout
 
-
 	#
 	# Template Functions
 	#
+
 	def template_create(self):
 		# base.report_create()
 		base.report = configparser.ConfigParser()
@@ -3506,13 +3505,11 @@ class ReporterCore:
 					result_name = rdata['result_name']
 					matches = difflib.get_close_matches(result_name, list(grpdata["resultnames"].keys()), cutoff=pctalike)
 					base.debugmsg(5, "matches:", matches)
-					if len(matches)>0:
+					if len(matches) > 0:
 						result_name = matches[0]
 						basekey = grpdata["resultnames"][result_name]["keys"][0]
 						base.debugmsg(5, "basekey:", basekey)
-
 						grpdata["resultnames"][result_name]["keys"].append(key)
-
 					else:
 						grpdata["resultnames"][result_name] = {}
 						grpdata["resultnames"][result_name]["keys"] = []
@@ -3526,18 +3523,15 @@ class ReporterCore:
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
 						matcheset = difflib.get_close_matches(errortext_sub, list(grpdata["resultnames"][result_name]["errortexts"].keys()), cutoff=pctalike)
 						base.debugmsg(5, "matcheset:", matcheset)
-						if len(matcheset)>0:
+						if len(matcheset) > 0:
 							errortext = matcheset[0]
 							baseid = grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"][0]
 							base.debugmsg(5, "baseid:", baseid)
-
 							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
-
 						else:
 							grpdata["resultnames"][result_name]["errortexts"][errortext_sub] = {}
 							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
 							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
-
 
 				if groupet:
 					errortext = rdata['error']
@@ -3545,21 +3539,18 @@ class ReporterCore:
 					base.debugmsg(5, "errortext_sub:", errortext_sub)
 					matches = difflib.get_close_matches(errortext_sub, list(grpdata["errortexts"].keys()), cutoff=pctalike)
 					base.debugmsg(5, "matches:", matches)
-					if len(matches)>0:
+					if len(matches) > 0:
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
 						errortext = matches[0]
 						base.debugmsg(5, "errortext:", errortext)
 						baseid = grpdata["errortexts"][errortext]["keys"][0]
 						base.debugmsg(5, "baseid:", baseid)
-
 						grpdata["errortexts"][errortext]["keys"].append(key)
-
 					else:
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
 						grpdata["errortexts"][errortext_sub] = {}
 						grpdata["errortexts"][errortext_sub]["keys"] = []
 						grpdata["errortexts"][errortext_sub]["keys"].append(key)
-
 
 			resultnames = grpdata["resultnames"]
 			base.debugmsg(5, "resultnames:", resultnames)
@@ -4370,12 +4361,9 @@ class ReporterCore:
 
 		document = self.cg_data["docx"]["document"]
 
-		# imgsizew = 1400000
 		imgsizew = 1400000 * 3
-
 		cellcol = 0
 		cellrow = -1
-		cw = 5
 
 		table = document.add_table(rows=1, cols=7)
 		table.style = document.styles['Table Grid']
@@ -4417,13 +4405,11 @@ class ReporterCore:
 					result_name = rdata['result_name']
 					matches = difflib.get_close_matches(result_name, list(grpdata["resultnames"].keys()), cutoff=pctalike)
 					base.debugmsg(5, "matches:", matches)
-					if len(matches)>0:
+					if len(matches) > 0:
 						result_name = matches[0]
 						basekey = grpdata["resultnames"][result_name]["keys"][0]
 						base.debugmsg(5, "basekey:", basekey)
-
 						grpdata["resultnames"][result_name]["keys"].append(key)
-
 					else:
 						grpdata["resultnames"][result_name] = {}
 						grpdata["resultnames"][result_name]["keys"] = []
@@ -4437,18 +4423,15 @@ class ReporterCore:
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
 						matcheset = difflib.get_close_matches(errortext_sub, list(grpdata["resultnames"][result_name]["errortexts"].keys()), cutoff=pctalike)
 						base.debugmsg(5, "matcheset:", matcheset)
-						if len(matcheset)>0:
+						if len(matcheset) > 0:
 							errortext = matcheset[0]
 							baseid = grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"][0]
 							base.debugmsg(5, "baseid:", baseid)
-
 							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
-
 						else:
 							grpdata["resultnames"][result_name]["errortexts"][errortext_sub] = {}
 							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
 							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
-
 
 				if groupet:
 					errortext = rdata['error']
@@ -4456,21 +4439,18 @@ class ReporterCore:
 					base.debugmsg(5, "errortext_sub:", errortext_sub)
 					matches = difflib.get_close_matches(errortext_sub, list(grpdata["errortexts"].keys()), cutoff=pctalike)
 					base.debugmsg(5, "matches:", matches)
-					if len(matches)>0:
+					if len(matches) > 0:
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
 						errortext = matches[0]
 						base.debugmsg(5, "errortext:", errortext)
 						baseid = grpdata["errortexts"][errortext]["keys"][0]
 						base.debugmsg(5, "baseid:", baseid)
-
 						grpdata["errortexts"][errortext]["keys"].append(key)
-
 					else:
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
 						grpdata["errortexts"][errortext_sub] = {}
 						grpdata["errortexts"][errortext_sub]["keys"] = []
 						grpdata["errortexts"][errortext_sub]["keys"].append(key)
-
 
 			resultnames = grpdata["resultnames"]
 			base.debugmsg(5, "resultnames:", resultnames)
@@ -4557,7 +4537,7 @@ class ReporterCore:
 						cellcol += 1
 						a = table.cell(cellrow, cellcol)
 						b = table.cell(cellrow, cellcol + 5)
-						A = a.merge(b)
+						a.merge(b)
 
 						table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
 						table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
@@ -4588,11 +4568,11 @@ class ReporterCore:
 							cellcol += 1
 							a = table.cell(cellrow, cellcol)
 							b = table.cell(cellrow, cellcol + 7)
-							A = a.merge(b)
+							a.merge(b)
 							table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
 							if 'image_file' in rdata:
 								run = table.rows[cellrow].cells[cellcol].paragraphs[0].add_run()
-								run.add_picture(rdata['image_file'], width = imgsizew)
+								run.add_picture(rdata['image_file'], width=imgsizew)
 							else:
 								table.rows[cellrow].cells[cellcol].paragraphs[0].text = lbl_NoScreenshot
 								table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
@@ -4612,7 +4592,7 @@ class ReporterCore:
 						cellcol += 1
 						a = table.cell(cellrow, cellcol)
 						b = table.cell(cellrow, cellcol + 7)
-						A = a.merge(b)
+						a.merge(b)
 
 						table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
 						table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
@@ -4630,11 +4610,11 @@ class ReporterCore:
 							cellcol += 1
 							a = table.cell(cellrow, cellcol)
 							b = table.cell(cellrow, cellcol + 7)
-							A = a.merge(b)
+							a.merge(b)
 							table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
 							if 'image_file' in rdata:
 								run = table.rows[cellrow].cells[cellcol].paragraphs[0].add_run()
-								run.add_picture(rdata['image_file'], width = imgsizew)
+								run.add_picture(rdata['image_file'], width=imgsizew)
 							else:
 								table.rows[cellrow].cells[cellcol].paragraphs[0].text = lbl_NoScreenshot
 								table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
@@ -4662,7 +4642,7 @@ class ReporterCore:
 				cellcol += 1
 				a = table.cell(cellrow, cellcol)
 				b = table.cell(cellrow, cellcol + 5)
-				A = a.merge(b)
+				a.merge(b)
 
 				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
 				table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
@@ -4692,11 +4672,11 @@ class ReporterCore:
 					cellcol += 1
 					a = table.cell(cellrow, cellcol)
 					b = table.cell(cellrow, cellcol + 7)
-					A = a.merge(b)
+					a.merge(b)
 					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
 					if 'image_file' in rdata:
 						run = table.rows[cellrow].cells[cellcol].paragraphs[0].add_run()
-						run.add_picture(rdata['image_file'], width = imgsizew)
+						run.add_picture(rdata['image_file'], width=imgsizew)
 					else:
 						table.rows[cellrow].cells[cellcol].paragraphs[0].text = lbl_NoScreenshot
 						table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
@@ -4722,7 +4702,7 @@ class ReporterCore:
 				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
 				a = table.cell(cellrow, cellcol)
 				b = table.cell(cellrow, cellcol + 1)
-				A = a.merge(b)
+				a.merge(b)
 				table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['result_name']
 				table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 				table.rows[cellrow].cells[cellcol].paragraphs[0].FitText = True
@@ -4760,7 +4740,7 @@ class ReporterCore:
 				cellcol += 1
 				a = table.cell(cellrow, cellcol)
 				b = table.cell(cellrow, cellcol + 5)
-				A = a.merge(b)
+				a.merge(b)
 
 				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
 				table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
@@ -4778,11 +4758,11 @@ class ReporterCore:
 					cellcol += 1
 					a = table.cell(cellrow, cellcol)
 					b = table.cell(cellrow, cellcol + 5)
-					A = a.merge(b)
+					a.merge(b)
 					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
 					if 'image_file' in rdata:
 						run = table.rows[cellrow].cells[cellcol].paragraphs[0].add_run()
-						run.add_picture(rdata['image_file'], width = imgsizew)
+						run.add_picture(rdata['image_file'], width=imgsizew)
 					else:
 						table.rows[cellrow].cells[cellcol].paragraphs[0].text = lbl_NoScreenshot
 						table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
@@ -5449,13 +5429,9 @@ class ReporterCore:
 		ws = wb.active
 		rownum = ws[ws.active_cell].row
 
-		# imgsizew = 1400000
-		imgsizew = 1400000 * 3
-
 		cellcol = 1
 		ws.column_dimensions["A"].width = 3
 		cellcol += 1
-		cw = 5
 
 		showimages = base.rt_errors_get_images(id)
 		base.debugmsg(5, "showimages:", showimages)
@@ -5492,13 +5468,11 @@ class ReporterCore:
 					result_name = rdata['result_name']
 					matches = difflib.get_close_matches(result_name, list(grpdata["resultnames"].keys()), cutoff=pctalike)
 					base.debugmsg(5, "matches:", matches)
-					if len(matches)>0:
+					if len(matches) > 0:
 						result_name = matches[0]
 						basekey = grpdata["resultnames"][result_name]["keys"][0]
 						base.debugmsg(5, "basekey:", basekey)
-
 						grpdata["resultnames"][result_name]["keys"].append(key)
-
 					else:
 						grpdata["resultnames"][result_name] = {}
 						grpdata["resultnames"][result_name]["keys"] = []
@@ -5512,18 +5486,15 @@ class ReporterCore:
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
 						matcheset = difflib.get_close_matches(errortext_sub, list(grpdata["resultnames"][result_name]["errortexts"].keys()), cutoff=pctalike)
 						base.debugmsg(5, "matcheset:", matcheset)
-						if len(matcheset)>0:
+						if len(matcheset) > 0:
 							errortext = matcheset[0]
 							baseid = grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"][0]
 							base.debugmsg(5, "baseid:", baseid)
-
 							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
-
 						else:
 							grpdata["resultnames"][result_name]["errortexts"][errortext_sub] = {}
 							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
 							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
-
 
 				if groupet:
 					errortext = rdata['error']
@@ -5531,21 +5502,18 @@ class ReporterCore:
 					base.debugmsg(5, "errortext_sub:", errortext_sub)
 					matches = difflib.get_close_matches(errortext_sub, list(grpdata["errortexts"].keys()), cutoff=pctalike)
 					base.debugmsg(5, "matches:", matches)
-					if len(matches)>0:
+					if len(matches) > 0:
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
 						errortext = matches[0]
 						base.debugmsg(5, "errortext:", errortext)
 						baseid = grpdata["errortexts"][errortext]["keys"][0]
 						base.debugmsg(5, "baseid:", baseid)
-
 						grpdata["errortexts"][errortext]["keys"].append(key)
-
 					else:
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
 						grpdata["errortexts"][errortext_sub] = {}
 						grpdata["errortexts"][errortext_sub]["keys"] = []
 						grpdata["errortexts"][errortext_sub]["keys"].append(key)
-
 
 			resultnames = grpdata["resultnames"]
 			base.debugmsg(5, "resultnames:", resultnames)
@@ -5612,9 +5580,9 @@ class ReporterCore:
 								img = openpyxl.drawing.image.Image(rdata['image_file'])
 								cellname = ws.cell(row=rownum, column=cellcol).coordinate
 
-								base.debugmsg(5, "img.width:", img.width, "	img.height:", img.height)	#, "	img.info:", img.info)
-																# 31.75					32.60
-																# 22.23					22.82	==> 70%
+								base.debugmsg(5, "img.width:", img.width, "	img.height:", img.height)
+								# 								31.75					32.60
+								# 								22.23					22.82	==> 70%
 								newiw = 850
 								ratio = newiw / img.width
 								base.debugmsg(5, "ratio:", ratio)
@@ -5655,9 +5623,9 @@ class ReporterCore:
 								img = openpyxl.drawing.image.Image(rdata['image_file'])
 								cellname = ws.cell(row=rownum, column=cellcol).coordinate
 
-								base.debugmsg(5, "img.width:", img.width, "	img.height:", img.height)	#, "	img.info:", img.info)
-																# 31.75					32.60
-																# 22.23					22.82	==> 70%
+								base.debugmsg(5, "img.width:", img.width, "	img.height:", img.height)
+								# 								31.75					32.60
+								# 								22.23					22.82	==> 70%
 								newiw = 850
 								ratio = newiw / img.width
 								base.debugmsg(5, "ratio:", ratio)
@@ -5708,9 +5676,9 @@ class ReporterCore:
 						img = openpyxl.drawing.image.Image(rdata['image_file'])
 						cellname = ws.cell(row=rownum, column=cellcol).coordinate
 
-						base.debugmsg(5, "img.width:", img.width, "	img.height:", img.height)	#, "	img.info:", img.info)
-														# 31.75					32.60
-														# 22.23					22.82	==> 70%
+						base.debugmsg(5, "img.width:", img.width, "	img.height:", img.height)
+						# 									31.75					32.60
+						# 									22.23					22.82	==> 70%
 						newiw = 850
 						ratio = newiw / img.width
 						base.debugmsg(5, "ratio:", ratio)
@@ -5746,7 +5714,6 @@ class ReporterCore:
 				cellcol += 1
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['test_name'], "Table Data", 0)
 
-
 				cellcol += 1
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Script), "Table Heading", 0)
 				cellcol += 1
@@ -5770,9 +5737,9 @@ class ReporterCore:
 						img = openpyxl.drawing.image.Image(rdata['image_file'])
 						cellname = ws.cell(row=rownum, column=cellcol).coordinate
 
-						base.debugmsg(5, "img.width:", img.width, "	img.height:", img.height)	#, "	img.info:", img.info)
-														# 31.75					32.60
-														# 22.23					22.82	==> 70%
+						base.debugmsg(5, "img.width:", img.width, "	img.height:", img.height)
+						# 								31.75					32.60
+						# 								22.23					22.82	==> 70%
 						newiw = 850
 						ratio = newiw / img.width
 						base.debugmsg(5, "ratio:", ratio)
@@ -9169,13 +9136,11 @@ class ReporterGUI(tk.Frame):
 					result_name = rdata['result_name']
 					matches = difflib.get_close_matches(result_name, list(self.contentdata[id]["grpdata"]["resultnames"].keys()), cutoff=pctalike)
 					base.debugmsg(5, "matches:", matches)
-					if len(matches)>0:
+					if len(matches) > 0:
 						result_name = matches[0]
 						basekey = self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"][0]
 						base.debugmsg(5, "basekey:", basekey)
-
 						self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"].append(key)
-
 					else:
 						self.contentdata[id]["grpdata"]["resultnames"][result_name] = {}
 						self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"] = []
@@ -9189,18 +9154,15 @@ class ReporterGUI(tk.Frame):
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
 						matcheset = difflib.get_close_matches(errortext_sub, list(self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"].keys()), cutoff=pctalike)
 						base.debugmsg(5, "matcheset:", matcheset)
-						if len(matcheset)>0:
+						if len(matcheset) > 0:
 							errortext = matcheset[0]
 							baseid = self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"][0]
 							base.debugmsg(5, "baseid:", baseid)
-
 							self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
-
 						else:
 							self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub] = {}
 							self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
 							self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
-
 
 				if groupet:
 					errortext = rdata['error']
@@ -9208,21 +9170,18 @@ class ReporterGUI(tk.Frame):
 					base.debugmsg(5, "errortext_sub:", errortext_sub)
 					matches = difflib.get_close_matches(errortext_sub, list(self.contentdata[id]["grpdata"]["errortexts"].keys()), cutoff=pctalike)
 					base.debugmsg(5, "matches:", matches)
-					if len(matches)>0:
+					if len(matches) > 0:
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
 						errortext = matches[0]
 						base.debugmsg(5, "errortext:", errortext)
 						baseid = self.contentdata[id]["grpdata"]["errortexts"][errortext]["keys"][0]
 						base.debugmsg(5, "baseid:", baseid)
-
 						self.contentdata[id]["grpdata"]["errortexts"][errortext]["keys"].append(key)
-
 					else:
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
 						self.contentdata[id]["grpdata"]["errortexts"][errortext_sub] = {}
 						self.contentdata[id]["grpdata"]["errortexts"][errortext_sub]["keys"] = []
 						self.contentdata[id]["grpdata"]["errortexts"][errortext_sub]["keys"].append(key)
-
 
 			resultnames = self.contentdata[id]["grpdata"]["resultnames"]
 			base.debugmsg(5, "resultnames:", resultnames)
@@ -9304,7 +9263,7 @@ class ReporterGUI(tk.Frame):
 						cellname = "{}_{}".format("error", basekey)
 						base.debugmsg(5, "cellname:", cellname)
 						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
-						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 5)
+						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
 
 						colnum += 5
 						cellname = "{}_{}".format("ecount_lbl", basekey)
@@ -9319,7 +9278,6 @@ class ReporterGUI(tk.Frame):
 						base.debugmsg(5, "count:", count)
 						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(count), style='Report.TBody.TLabel')
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-
 
 						if showimages:
 							rownum += 1
@@ -9336,10 +9294,10 @@ class ReporterGUI(tk.Frame):
 							if 'image_file' in rdata:
 								self.contentdata[id][cellimg] = tk.PhotoImage(file=rdata['image_file'])
 								self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id][cellimg], style='Report.TBody.TLabel')
-								self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 7)
+								self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=7)
 							else:
 								self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}".format(lbl_NoScreenshot), style='Report.TBody.TLabel')
-								self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 7)
+								self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=7)
 
 				else:
 					for keyi in self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"]:
@@ -9356,7 +9314,7 @@ class ReporterGUI(tk.Frame):
 						cellname = "{}_{}".format("error", keyi)
 						base.debugmsg(5, "cellname:", cellname)
 						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
-						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 7)
+						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=7)
 
 						if showimages:
 							rownum += 1
@@ -9373,11 +9331,10 @@ class ReporterGUI(tk.Frame):
 							if 'image_file' in rdata:
 								self.contentdata[id][cellimg] = tk.PhotoImage(file=rdata['image_file'])
 								self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id][cellimg], style='Report.TBody.TLabel')
-								self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 7)
+								self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=7)
 							else:
 								self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}".format(lbl_NoScreenshot), style='Report.TBody.TLabel')
-								self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 7)
-
+								self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=7)
 
 		if groupet and not grouprn:
 
@@ -9397,7 +9354,7 @@ class ReporterGUI(tk.Frame):
 				cellname = "{}_{}".format("error", basekey)
 				base.debugmsg(5, "cellname:", cellname)
 				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
-				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 5)
+				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
 
 				colnum += 5
 				cellname = "{}_{}".format("ecount_lbl", basekey)
@@ -9412,7 +9369,6 @@ class ReporterGUI(tk.Frame):
 				base.debugmsg(5, "count:", count)
 				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(count), style='Report.TBody.TLabel')
 				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-
 
 				if showimages:
 					rownum += 1
@@ -9429,10 +9385,10 @@ class ReporterGUI(tk.Frame):
 					if 'image_file' in rdata:
 						self.contentdata[id][cellimg] = tk.PhotoImage(file=rdata['image_file'])
 						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id][cellimg], style='Report.TBody.TLabel')
-						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 7)
+						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=7)
 					else:
 						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}".format(lbl_NoScreenshot), style='Report.TBody.TLabel')
-						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 7)
+						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=7)
 
 		if not grouprn and not groupet:
 			i = 0
@@ -9454,7 +9410,6 @@ class ReporterGUI(tk.Frame):
 				base.debugmsg(5, "cellname:", cellname)
 				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['result_name']), style='Report.TBody.TLabel')
 				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-
 
 				colnum += 1
 				cellname = "{}_{}".format("lbl_test_name", key)
@@ -9491,7 +9446,7 @@ class ReporterGUI(tk.Frame):
 				cellname = "{}_{}".format("error", key)
 				base.debugmsg(5, "cellname:", cellname)
 				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
-				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 5)
+				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
 
 				if showimages:
 					rownum += 1
@@ -9508,10 +9463,10 @@ class ReporterGUI(tk.Frame):
 					if 'image_file' in rdata:
 						self.contentdata[id][cellimg] = tk.PhotoImage(file=rdata['image_file'])
 						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id][cellimg], style='Report.TBody.TLabel')
-						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 5)
+						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
 					else:
 						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}".format(lbl_NoScreenshot), style='Report.TBody.TLabel')
-						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan = 5)
+						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
 
 	#
 	# Export content generation functions
