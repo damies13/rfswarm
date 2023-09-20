@@ -23,7 +23,7 @@ This table shows how issues are prioritised:
 | 4 | Any remaining Bugs |
 | 5 | Feature requests that multiple project sponsors have identified as needing priority |
 | 6 | Feature requests that a project sponsor has identified as needing priority |
-| 7 | Feature requests that have the most thumbs up (:+1) |
+| 7 | Feature requests that have the most thumbs up ( :+1: ) |
 | 8 | Any remaining Feature requests |
 
 ## Can I run the Agent and the Manager on the same machine?

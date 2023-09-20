@@ -13,7 +13,7 @@ rfswarm Reporter is the reporting tool component, you would use this at some poi
     - [Note](#note-section)
     - [Data Graph](#data-graph-section)
     - [Data Table](#data-table-section)
-		- [Error Details](#error-details)
+    - [Error Details](#error-details-section)
   - [Example Report](#example-report)
 - [Command-line Interface](#command-line-interface)
 - [Install and Setup](#install-and-setup)
@@ -121,7 +121,7 @@ Each section is used to display different types of information, the various sect
 - [Note](#note-section)
 - [Data Graph](#data-graph-section)
 - [Data Table](#data-table-section)
-- [Error Details](#error-details)
+- [Error Details](#error-details-section)
 
 #### Heading Section
 The heading section is used for grouping subsections that contain related information, so the only setting here is the heading name which allows you to change the name of the section.
