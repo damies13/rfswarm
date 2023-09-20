@@ -87,8 +87,8 @@ The columns under the graph:
 
 ##### Scenario settings
 At the moment there is only one scenario setting, the upload logs setting, this allows you to control when the agent will upload the logs for the test cases being run.
-> ![image](Images/MacOS_Run_v1.0.0_Settings.png)
-> ![image](Images/MacOS_Run_v1.0.0_Settings_UploadLogs.png)
+> ![image](Images/Linux_Plan_v1.2.0_Settings.png)
+> ![image](Images/Linux_Plan_v1.2.0_Settings_UploadLogs.png)
 
 The options are:
 | Option | Action |
@@ -98,10 +98,42 @@ The options are:
 | All Deferred | All test result logs will be deferred until the last robot has stopped on the agent |
 
 \* In earlier releases before v1.0.0 the agent always followed the default case.
+##### Test Defaults settings
+The test defaults settings allow you to set default default setting values for all test groups. These settings allow you to change and define what the default values are but can still be overridden for an individual test group in the [Additional settings for test group](#additional-settings-for-test-group-) screen
+> ![image](Images/Linux_Plan_v1.2.0_Settings.png)
+
+###### Exclude libraries
+The default value is "BuiltIn,String,OperatingSystem,perftest", this is the same default value as used in the [agent settings](./rfswarm_agent.md#exclude-libraries) and if you leave this default but change the agent the settings set on the agent will override this setting.
+By configuring this setting you can adjust which keyword's response times are reported in the test results.
+If you change this setting here from the default, then the agent setting will be overridden with the settings used here for all test groups.
+
+|agent ini setting|scenario setting|test group setting|result|
+|---|---|---|
+|default|default|default|default (BuiltIn,String,OperatingSystem,perftest)|
+|configured|default|default|agent ini setting|
+|default|configured|default|scenario setting|
+|default|default|configured|test group setting|
+|default|configured|configured|test group setting|
+|configured|configured|default|scenario setting|
+|configured|configured|configured|test group setting|
+
+###### Robot Options
+By default this setting is blank and in most cases wouldn't be used, it allows you to pass additional command-line options to the robot executable, to find out what options can be passed run
+`robot -h`
+On any machine that has Robot Framework installed
+
+###### Test Repeater
+This setting when enabled will cause Robot Framework to repeat the selected test case in the same test suite continually until either a the test fails or the scenario ends.
+
+This gives the ability to use the Suite Startup for steps such as open browser or app login, before running the test, have the test run many times with the same login or browser window, and then call logout or close browser at the end of the test suite
+
+By default this setting is disabled, retaining the behaviour from RFSwarm versions prior to v1.2.0, where the test case executed only once in the test suite, the suite ended and the robot exited and a new robot was started every iteration.
+
+Enabling this setting here will enable it for all test groups
 
 ##### Manager settings
-The manager settings allows you to access settings that were previously only accessable from the ini file
-> ![image](Images/MacOS_Run_v1.0.0_Settings.png)
+The manager settings allows you to access settings that were previously only accessible from the ini file
+> ![image](Images/Linux_Plan_v1.2.0_Settings.png)
 
 **Bind IP Address**
 
@@ -136,24 +168,26 @@ e.g. 2 - if the time now is 9:05 PM and you planned to start at 9:00 AM, so ente
 
 #### Additional settings for test group ![image](Images/GUI_btn_cog.gif)
 When clicking on this button a dialogue will be presented that allows you to configure some additional settings for the test group, by default the dialogue will look like this:
-> ![image](Images/MacOS_Plan_v0.7.0_Test_Settings.png)
+> ![image](Images/Linux_Plan_v1.2.0_Test_Settings.png)
 
 ##### Exclude libraries
 The default value is "BuiltIn,String,OperatingSystem,perftest", this is the same default value as used in the [agent settings](./rfswarm_agent.md#exclude-libraries) and if you leave this default but change the agent the settings set on the agent will override this setting.
 By configuring this setting you can adjust which keyword's response times are reported in the test results.
 If you change this setting here from the default, then for this particular test group the agent setting will be overridden with the settings used here
 
-|agent ini setting|test group setting|result|
-|---|---|---|
-|default|default|default (BuiltIn,String,OperatingSystem,perftest)|
-|configured|default|agent ini setting|
-|default|configured|test group setting|
-|configured|configured|test group setting|
-
 ##### Robot Options
 By default this setting is blank and in most cases wouldn't be used, it allows you to pass additional command-line options to the robot executable, to find out what options can be passed run
 `robot -h`
 On any machine that has Robot Framework installed
+
+##### Test Repeater
+This setting when enabled will cause Robot Framework to repeat the selected test case in the same test suite continually until either a the test fails or the scenario ends.
+
+This gives the ability to use the Suite Startup for steps such as open browser or app login, before running the test, have the test run many times with the same login or browser window, and then call logout or close browser at the end of the test suite
+
+By default this setting is disabled, retaining the behaviour from RFSwarm versions prior to v1.2.0, where the test case executed only once in the test suite, the suite ended and the robot exited and a new robot was started every iteration.
+
+Enabling/disabling this setting here will enable it for this test groups
 
 ##### Agent Filter
 You can use this setting to modify the default [agent assignment](#agent-assignment) to require test cases to require agents with particular properties or to exclude agents with particular properties.
@@ -172,7 +206,7 @@ Here are some examples of when you might need this setting:
 The combination of multiple require and exclude rules, the default and custom agent properties should allow you to have the control needed to target your test groups to specific agent or groups of agents as needed.
 
 Here is an example of configuring the Filter Rules and using the Robot options:
-> ![image](Images/MacOS_Plan_v0.8.0_Test_Settings_Filter_Rules.png)
+> ![image](Images/Linux_Plan_v1.2.0_Test_Settings_Filter_Rules.png)
 
 
 ### Run

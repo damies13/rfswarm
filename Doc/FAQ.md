@@ -2,6 +2,7 @@
 # rfswarm (Robot Framework Swarm) Frequently Asked Questions
 [Return to Index](README.md)
 
+- [How are issues prioritised](#how-are-issues-prioritised)
 - [Can I run the Agent and the Manager on the same machine?](#can-i-run-the-agent-and-the-manager-on-the-same-machine)
 - [The Agent doesn't connect to the Manager?](#the-agent-doesnt-connect-to-the-manager)
 - [I have some experience in performance testing, can you translate the terminology between rfswarm and tool xzy?](#i-have-some-experience-in-performance-testing-can-you-translate-the-terminology-between-rfswarm-and-tool-xzy)
@@ -10,6 +11,20 @@
 - [Is there a tutorial on how to use rfswarm?](#is-there-a-tutorial-on-how-to-use-rfswarm)
 - [does rfswarm support IPv6?](#does-rfswarm-support-ipv6)
 
+## How are issues prioritised?
+
+This table shows how issues are prioritised:
+
+| Priority | Description |
+|--|--|
+| 1 | Bugs that multiple project sponsors have identified as needing priority |
+| 2 | Bugs that a project sponsor has identified as needing priority |
+| 3 | Bugs that have the most thumbs up (:+1) |
+| 4 | Any remaining Bugs |
+| 5 | Feature requests that multiple project sponsors have identified as needing priority |
+| 6 | Feature requests that a project sponsor has identified as needing priority |
+| 7 | Feature requests that have the most thumbs up (:+1) |
+| 8 | Any remaining Feature requests |
 
 ## Can I run the Agent and the Manager on the same machine?
 

@@ -13,6 +13,7 @@ rfswarm Reporter is the reporting tool component, you would use this at some poi
     - [Note](#note-section)
     - [Data Graph](#data-graph-section)
     - [Data Table](#data-table-section)
+		- [Error Details](#error-details)
   - [Example Report](#example-report)
 - [Command-line Interface](#command-line-interface)
 - [Install and Setup](#install-and-setup)
@@ -120,6 +121,7 @@ Each section is used to display different types of information, the various sect
 - [Note](#note-section)
 - [Data Graph](#data-graph-section)
 - [Data Table](#data-table-section)
+- [Error Details](#error-details)
 
 #### Heading Section
 The heading section is used for grouping subsections that contain related information, so the only setting here is the heading name which allows you to change the name of the section.
@@ -220,6 +222,8 @@ The data table section is used for displaying tables of test results and other m
 
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Settings_Type.png)
 
+**Rename Columns** - This section allows you to change the default English column names, to another name you prefer or the equivalent in your preferred language
+
 The data sources for the graphs can be:
 - [Metric](#data-table-metric)
 - [Result](#data-table-result)
@@ -294,6 +298,18 @@ When constructing the SQL for graphs, it's important to note that the column nam
 
 Also note that **Show graph colours** will use values of the first data column to match the colours for each table row to the line colours on a graph.
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_SQL.png)
+
+#### Error Details Section
+The data table section is used for displaying error details for any failed keywords during the test. This report section queries the results database for FAIL results, then uses the test group number, the robot number and the iteration to identify the correct output.xml file, it then reads the error detail and also finds any related screenshots included in the failed keyword.
+> ![Image](Images/Linux_Reporter_v1.2.0_ErrorDetails_Settings.png)
+
+**Show screenshots** - If the test library takes screen shots of the AUT when a keyword fails, this setting will include any screenshot found in the report.
+
+**Group by result name** - This setting will group all errors related to the same result name together and provides a count of the number of total errors for this result name.
+
+**Group by error text** - This setting will group all errors with the same or similar first line, for example if you get 50 stack traces when the AUT server crashed, you may not want to see the full text of all the stack traces, you just want an example stack trace and a count of how many stack traces were received. If selected only the detail (and screenshot) of the first error will be displayed, if you want to see the detail of every error unselect this option.
+
+**Rename Labels** - This section allows you to change the default English labels, to another name you prefer or the equivalent in your preferred language
 
 ### Example Report
 This is an example of a template you could create and use for reporting your test results. It shows some of the capabilities of the reporting tool.
