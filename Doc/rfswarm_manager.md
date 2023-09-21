@@ -166,7 +166,7 @@ e.g. 2 - if the time now is 9:05 PM and you planned to start at 9:00 AM, so ente
 
 \* The manager needs to remain running in order for the schedule to work. You cannot schedule a start time and then quit the manager.
 
-<img src="Images/GUI_btn_cog.gif" style="float:left;">
+<img src="Images/GUI_btn_cog.gif" style="float:right;">
 
 #### Additional settings for test group
 
