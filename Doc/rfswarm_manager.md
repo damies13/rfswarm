@@ -99,7 +99,7 @@ The options are:
 
 \* In earlier releases before v1.0.0 the agent always followed the default case.
 ##### Test Defaults settings
-The test defaults settings allow you to set default default setting values for all test groups. These settings allow you to change and define what the default values are but can still be overridden for an individual test group in the [Additional settings for test group](#additional-settings-for-test-group-) screen
+The test defaults settings allow you to set default default setting values for all test groups. These settings allow you to change and define what the default values are but can still be overridden for an individual test group in the [Additional settings for test group](#additional-settings-for-test-group) screen
 > ![image](Images/Linux_Plan_v1.2.0_Settings.png)
 
 ###### Exclude libraries
@@ -170,17 +170,17 @@ e.g. 2 - if the time now is 9:05 PM and you planned to start at 9:00 AM, so ente
 When clicking on this button a dialogue will be presented that allows you to configure some additional settings for the test group, by default the dialogue will look like this:
 > ![image](Images/Linux_Plan_v1.2.0_Test_Settings.png)
 
-##### Exclude libraries
+##### Exclude libraries - Test Group
 The default value is "BuiltIn,String,OperatingSystem,perftest", this is the same default value as used in the [agent settings](./rfswarm_agent.md#exclude-libraries) and if you leave this default but change the agent the settings set on the agent will override this setting.
 By configuring this setting you can adjust which keyword's response times are reported in the test results.
 If you change this setting here from the default, then for this particular test group the agent setting will be overridden with the settings used here
 
-##### Robot Options
+##### Robot Options - Test Group
 By default this setting is blank and in most cases wouldn't be used, it allows you to pass additional command-line options to the robot executable, to find out what options can be passed run
 `robot -h`
 On any machine that has Robot Framework installed
 
-##### Test Repeater
+##### Test Repeater - Test Group
 This setting when enabled will cause Robot Framework to repeat the selected test case in the same test suite continually until either a the test fails or the scenario ends.
 
 This gives the ability to use the Suite Startup for steps such as open browser or app login, before running the test, have the test run many times with the same login or browser window, and then call logout or close browser at the end of the test suite

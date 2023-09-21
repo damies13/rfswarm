@@ -303,11 +303,12 @@ Also note that **Show graph colours** will use values of the first data column t
 The data table section is used for displaying error details for any failed keywords during the test. This report section queries the results database for FAIL results, then uses the test group number, the robot number and the iteration to identify the correct output.xml file, it then reads the error detail and also finds any related screenshots included in the failed keyword.
 > ![Image](Images/Linux_Reporter_v1.2.0_ErrorDetails_Settings.png)
 
-**Show screenshots** - If the test library takes screen shots of the AUT when a keyword fails, this setting will include any screenshot found in the report.
+**Show screenshots** - If the test library takes screenshots of the AUT when a keyword fails, this setting will include any screenshot found in the report.
 
 **Group by result name** - This setting will group all errors related to the same result name together and provides a count of the number of total errors for this result name.
 
-**Group by error text** - This setting will group all errors with the same or similar first line, for example if you get 50 stack traces when the AUT server crashed, you may not want to see the full text of all the stack traces, you just want an example stack trace and a count of how many stack traces were received. If selected only the detail (and screenshot) of the first error will be displayed, if you want to see the detail of every error unselect this option.
+**Group by error text** - This setting will group all errors with the same or similar first line.
+For example if you get 50 stack traces when the AUT server crashed, you may not want to see the full text of all the stack traces, you just want an example stack trace and a count of how many stack traces were received. If selected only the detail (and screenshot) of the first error will be displayed, if you want to see the detail of every error unselect this option.
 
 **Rename Labels** - This section allows you to change the default English labels, to another name you prefer or the equivalent in your preferred language
 
