@@ -166,12 +166,8 @@ e.g. 2 - if the time now is 9:05 PM and you planned to start at 9:00 AM, so ente
 
 \* The manager needs to remain running in order for the schedule to work. You cannot schedule a start time and then quit the manager.
 
-<img src="Images/GUI_btn_cog.gif" style="float:right;">
+#### Additional settings for test group		![image](Images/GUI_btn_cog.gif)
 
-#### Additional settings for test group
-
-
-![image](Images/GUI_btn_cog.gif)
 When clicking on this button a dialogue will be presented that allows you to configure some additional settings for the test group, by default the dialogue will look like this:
 > ![image](Images/Linux_Plan_v1.2.0_Test_Settings.png)
 
