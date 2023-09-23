@@ -99,7 +99,7 @@ The options are:
 
 \* In earlier releases before v1.0.0 the agent always followed the default case.
 ##### Test Defaults settings
-The test defaults settings allow you to set default default setting values for all test groups. These settings allow you to change and define what the default values are but can still be overridden for an individual test group in the [Additional settings for test group](#additional-settings-for-test-group-) screen
+The test defaults settings allow you to set default default setting values for all test groups. These settings allow you to change and define what the default values are but can still be overridden for an individual test group in the [Additional settings for test group](./rfswarm_manager.md#additional-settings-for-test-group-) screen
 > ![image](Images/Linux_Plan_v1.2.0_Settings.png)
 
 ###### Exclude libraries
