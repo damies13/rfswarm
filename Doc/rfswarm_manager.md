@@ -99,7 +99,7 @@ The options are:
 
 \* In earlier releases before v1.0.0 the agent always followed the default case.
 ##### Test Defaults settings
-The test defaults settings allow you to set default default setting values for all test groups. These settings allow you to change and define what the default values are but can still be overridden for an individual test group in the [Additional settings for test group](#additional-settings-for-test-group-) screen
+The test defaults settings allow you to set default default setting values for all test groups. These settings allow you to change and define what the default values are but can still be overridden for an individual test group in the [Additional settings for test group](#additional-settings-test-group) screen
 > ![image](Images/Linux_Plan_v1.2.0_Settings.png)
 
 ###### Exclude libraries
@@ -166,7 +166,7 @@ e.g. 2 - if the time now is 9:05 PM and you planned to start at 9:00 AM, so ente
 
 \* The manager needs to remain running in order for the schedule to work. You cannot schedule a start time and then quit the manager.
 
-#### Additional settings for test group ![image](Images/GUI_btn_cog.gif)
+#### Additional settings for test group {#additional-settings-test-group} ![image](Images/GUI_btn_cog.gif)
 
 When clicking on this button a dialogue will be presented that allows you to configure some additional settings for the test group, by default the dialogue will look like this:
 > ![image](Images/Linux_Plan_v1.2.0_Test_Settings.png)
