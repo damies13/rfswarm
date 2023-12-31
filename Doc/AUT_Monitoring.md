@@ -195,6 +195,7 @@ Post AUT Stats
 	Run Keyword Unless 	${exists} 	Create Session	rfs 	${RFS_SWARMMANAGER}
 
 	${data}=	Create Dictionary
+	Set To Dictionary	${data} 	AgentName				${RFS_AGENTNAME}
 	Set To Dictionary	${data} 	PrimaryMetric		${AUT}
 	Set To Dictionary	${data} 	MetricType			${AUTType}
 	Set To Dictionary	${data} 	MetricTime			${AUTTime}
@@ -291,6 +292,7 @@ Post AUT Stats
 	Run Keyword Unless 	${exists} 	Create Session	rfs 	${RFS_SWARMMANAGER}
 
 	${data}=	Create Dictionary
+	Set To Dictionary	${data} 	AgentName				${RFS_AGENTNAME}
 	Set To Dictionary	${data} 	PrimaryMetric		${AUT}
 	Set To Dictionary	${data} 	MetricType			${AUTType}
 	Set To Dictionary	${data} 	MetricTime			${AUTTime}
