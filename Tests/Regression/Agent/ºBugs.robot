@@ -11,6 +11,6 @@ Issue #171
 	@{mngr_options}= 	Create List 	-s 	${scenariofile} 	-n
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
-	Stop Agent
 	Show Log 	stdout_manager.txt
 	Show Log 	stdout_agent.txt
+	Stop Agent
