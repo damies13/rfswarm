@@ -32,6 +32,7 @@ Run Manager CLI
 	IF  ${options} == None
 		${options}= 	Create List
 	END
+	Log to console 	\${options}: ${options}
 	${process}= 	Start Process 	python3 	${pyfile_manager}  ${options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
 	Set Test Variable 	$process_manager 	${process}
 
