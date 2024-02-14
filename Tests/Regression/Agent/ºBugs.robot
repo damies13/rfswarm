@@ -13,5 +13,7 @@ Issue #171
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 	Show Log 	stdout_manager.txt
+	Show Log 	stderr_manager.txt
 	Show Log 	stdout_agent.txt
+	Show Log 	stderr_agent.txt
 	Stop Agent
