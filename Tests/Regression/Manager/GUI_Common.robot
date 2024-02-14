@@ -17,8 +17,9 @@ ${process_agent}		None
 Set Platform
 	# [Arguments]		${ostag}
 	Log 	${OPTIONS}
-	Log 	${OPTIONS}['include']
-	${ostag}= 	Set Variable 	${OPTIONS}['include']
+	Log 	${OPTIONS}[include]
+	Log 	${OPTIONS}[include][0]
+	${ostag}= 	Set Variable 	${OPTIONS}[include][0]
 
 	IF 	${ostag} == macos-latest
 		Set Suite Variable    ${platform}    macos
