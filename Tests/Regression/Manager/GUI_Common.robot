@@ -28,12 +28,12 @@ Set Platform
 	Set Suite Variable    ${platform}    ubuntu
 
 Open Agent
-	[Arguments]		${options}
+	# [Arguments]		${options}
 	${process}= 	Start Process 	python3 	${pyfile}    alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
 	Set Test Variable 	$process_agent 	${process}
 
 Open Manager GUI
-	[Arguments]		${options}
+	# [Arguments]		${options}
 	Set Confidence		0.9
 	${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
 	Set Test Variable 	$process_manager 	${process}
