@@ -4,7 +4,7 @@ Resource 	ºCommon.robot
 *** Test Cases ***
 Issue #171
 	[Tags]	ubuntu-latest		windows-latest		macos-latest
-	@{agnt_options}= 	Create List 	-g 	1
+	@{agnt_options}= 	Create List 	-g 	1 	-m 	http://localhost:8138
 	Run Agent 	${agnt_options}
 	Log to console 	${CURDIR}
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}..${/}..${/}Demo${/}demo.rfs
