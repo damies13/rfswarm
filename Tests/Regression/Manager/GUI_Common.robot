@@ -97,3 +97,33 @@ Click Tab
 	Click Image		${img}
 	Sleep 	0.1
 	Take A Screenshot
+
+Click Button
+	[Arguments]		${btnname}
+	${btnnamel}= 	Convert To Lower Case 	${btnname}
+	${img}=	Set Variable		manager_${platform}_button_${btnnamel}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	0.1
+	Take A Screenshot
+
+
+Resize Window
+	[Arguments]		${x}=0		${y}=0
+	# 											manager_macos_corner_resize
+	${img}=	Set Variable		manager_${platform}_corner_resize.png
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+	@{coordinates2}= 	Create List 	@{coordinates}[0]+${x} 	@{coordinates}[1]+${y}
+	Move To 	@{coordinates}
+	Mouse Down
+	Move To 	@{coordinates2}
+	Mouse Up
+
+Wait Agent Ready
+	Click Tab 	 Agents
+	${img}=	Set Variable		manager_${platform}_agents_ready.png
+	Wait For 	${img} 	 timeout=300
