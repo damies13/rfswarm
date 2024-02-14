@@ -16,4 +16,6 @@ Issue #171
 	Show Log 	stderr_manager.txt
 	Show Log 	stdout_agent.txt
 	Show Log 	stderr_agent.txt
+
+	List Directory 	${results_dir}
 	Stop Agent

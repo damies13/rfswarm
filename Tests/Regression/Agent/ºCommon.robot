@@ -9,6 +9,8 @@ ${pyfile_manager} 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
 ${process_agent} 		None
 ${process_manager} 	None
 
+# datapath: /home/runner/work/rfswarm/rfswarm/rfswarm_manager/results/PreRun
+${results_dir} 			${EXECDIR}${/}rfswarm_manager${/}results$
 
 *** Keywords ***
 
