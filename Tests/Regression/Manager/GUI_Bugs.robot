@@ -12,7 +12,7 @@ Issue #171
 	Take A Screenshot
 
 	Wait Agent Ready
-	Click Tab 	 Run
+	Click Tab 	 Plan
 
 	# manager_macos_button_runsettings
 	Click Button 	runsettings
