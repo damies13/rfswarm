@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 6.1.1 (Python 3.7.17 on darwin)" generated="20240214 03:35:57.416" rpa="false" schemaversion="4">
+<robot generator="Robot 6.1.1 (Python 3.7.17 on darwin)" generated="20240214 06:31:45.966" rpa="false" schemaversion="4">
 <suite id="s1" name="Manager" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager">
 <suite id="s1-s1" name="CommandLine" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/CommandLine.robot">
 <kw name="Clean Up Old Files" type="SETUP">
@@ -9,111 +9,105 @@
 <kw name="Log To Console" library="BuiltIn">
 <arg>${OUTPUT DIR}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20240214 03:35:57.466" endtime="20240214 03:35:57.466"/>
+<status status="PASS" starttime="20240214 06:31:46.000" endtime="20240214 06:31:46.000"/>
 </kw>
 <kw name="Remove File" library="OperatingSystem">
 <arg>${OUTPUT DIR}${/}*.txt</arg>
 <doc>Removes a file with the given path.</doc>
-<msg timestamp="20240214 03:35:57.467" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/stdout.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/stdout.txt&lt;/a&gt;'.</msg>
-<msg timestamp="20240214 03:35:57.467" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/stderr.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/stderr.txt&lt;/a&gt;'.</msg>
-<status status="PASS" starttime="20240214 03:35:57.466" endtime="20240214 03:35:57.467"/>
+<msg timestamp="20240214 06:31:46.001" level="INFO" html="true">File '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/*.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/*.txt&lt;/a&gt;' does not exist.</msg>
+<status status="PASS" starttime="20240214 06:31:46.001" endtime="20240214 06:31:46.001"/>
 </kw>
 <kw name="Remove File" library="OperatingSystem">
 <arg>${OUTPUT DIR}${/}*.png</arg>
 <doc>Removes a file with the given path.</doc>
-<msg timestamp="20240214 03:35:57.468" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-1.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-1.png&lt;/a&gt;'.</msg>
-<msg timestamp="20240214 03:35:57.468" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-2.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-2.png&lt;/a&gt;'.</msg>
-<msg timestamp="20240214 03:35:57.468" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-3.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-3.png&lt;/a&gt;'.</msg>
-<msg timestamp="20240214 03:35:57.469" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-6.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-6.png&lt;/a&gt;'.</msg>
-<msg timestamp="20240214 03:35:57.469" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-4.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-4.png&lt;/a&gt;'.</msg>
-<msg timestamp="20240214 03:35:57.469" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-5.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-5.png&lt;/a&gt;'.</msg>
-<status status="PASS" starttime="20240214 03:35:57.467" endtime="20240214 03:35:57.469"/>
+<msg timestamp="20240214 06:31:46.002" level="INFO" html="true">File '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/*.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/*.png&lt;/a&gt;' does not exist.</msg>
+<status status="PASS" starttime="20240214 06:31:46.001" endtime="20240214 06:31:46.002"/>
 </kw>
-<status status="PASS" starttime="20240214 03:35:57.465" endtime="20240214 03:35:57.469"/>
+<status status="PASS" starttime="20240214 06:31:46.000" endtime="20240214 06:31:46.002"/>
 </kw>
 <test id="s1-s1-t1" name="Random Offset" line="7">
 <kw name="Evaluate" library="BuiltIn">
 <var>${random}</var>
 <arg>random.randint(0, 60)</arg>
 <doc>Evaluates the given expression in Python and returns the result.</doc>
-<msg timestamp="20240214 03:35:57.471" level="INFO">${random} = 13</msg>
-<status status="PASS" starttime="20240214 03:35:57.470" endtime="20240214 03:35:57.471"/>
+<msg timestamp="20240214 06:31:46.003" level="INFO">${random} = 39</msg>
+<status status="PASS" starttime="20240214 06:31:46.003" endtime="20240214 06:31:46.003"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>${random}</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<msg timestamp="20240214 03:36:10.505" level="INFO">Slept 13 seconds</msg>
-<status status="PASS" starttime="20240214 03:35:57.471" endtime="20240214 03:36:10.505"/>
+<msg timestamp="20240214 06:32:25.005" level="INFO">Slept 39 seconds</msg>
+<status status="PASS" starttime="20240214 06:31:46.003" endtime="20240214 06:32:25.005"/>
 </kw>
 <doc>This just prevents all the test runners doing git push at the same time</doc>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20240214 03:35:57.469" endtime="20240214 03:36:10.505"/>
+<status status="PASS" starttime="20240214 06:31:46.002" endtime="20240214 06:32:25.006"/>
 </test>
 <test id="s1-s1-t2" name="Manager Version" line="13">
 <kw name="Run" library="OperatingSystem">
 <var>${result}</var>
 <arg>python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -v</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<msg timestamp="20240214 03:36:10.509" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -v 2&gt;&amp;1'.</msg>
-<msg timestamp="20240214 03:36:12.913" level="INFO">${result} = Robot Framework Swarm: Manager 
-	Version 1.2.0 </msg>
-<status status="PASS" starttime="20240214 03:36:10.506" endtime="20240214 03:36:12.913"/>
+<msg timestamp="20240214 06:32:25.010" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -v 2&gt;&amp;1'.</msg>
+<msg timestamp="20240214 06:32:28.078" level="INFO">${result} = Robot Framework Swarm: Manager 
+	Version 1.2.1 </msg>
+<status status="PASS" starttime="20240214 06:32:25.006" endtime="20240214 06:32:28.078"/>
 </kw>
 <kw name="Log To Console" library="BuiltIn">
 <arg>${\n}${result}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20240214 03:36:12.913" endtime="20240214 03:36:12.914"/>
+<status status="PASS" starttime="20240214 06:32:28.078" endtime="20240214 06:32:28.079"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Version</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20240214 03:36:12.914" endtime="20240214 03:36:12.914"/>
+<status status="PASS" starttime="20240214 06:32:28.079" endtime="20240214 06:32:28.079"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>Manager</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20240214 03:36:12.914" endtime="20240214 03:36:12.914"/>
+<status status="PASS" starttime="20240214 06:32:28.080" endtime="20240214 06:32:28.080"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20240214 03:36:10.506" endtime="20240214 03:36:12.914"/>
+<status status="PASS" starttime="20240214 06:32:25.006" endtime="20240214 06:32:28.080"/>
 </test>
 <test id="s1-s1-t3" name="Manager Help" line="20">
 <kw name="Run" library="OperatingSystem">
 <var>${result}</var>
 <arg>python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -h</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<msg timestamp="20240214 03:36:12.918" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -h 2&gt;&amp;1'.</msg>
-<msg timestamp="20240214 03:36:14.045" level="INFO">${result} = Robot Framework Swarm: Manager 
-	Version 1.2.0 
+<msg timestamp="20240214 06:32:28.084" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -h 2&gt;&amp;1'.</msg>
+<msg timestamp="20240214 06:32:29.116" level="INFO">${result} = Robot Framework Swarm: Manager 
+	Version 1.2.1 
 usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
                   [-n] [-t STARTTIME] [-d DIR] [-e IPADDRESS] [-p PORT]
 
 ...</msg>
-<status status="PASS" starttime="20240214 03:36:12.915" endtime="20240214 03:36:14.045"/>
+<status status="PASS" starttime="20240214 06:32:28.081" endtime="20240214 06:32:29.116"/>
 </kw>
 <kw name="Log To Console" library="BuiltIn">
 <arg>${\n}${result}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" starttime="20240214 03:36:14.046" endtime="20240214 03:36:14.046"/>
+<status status="PASS" starttime="20240214 06:32:29.116" endtime="20240214 06:32:29.117"/>
 </kw>
 <kw name="Should Contain" library="BuiltIn">
 <arg>${result}</arg>
 <arg>IPADDRESS</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" starttime="20240214 03:36:14.046" endtime="20240214 03:36:14.046"/>
+<status status="PASS" starttime="20240214 06:32:29.117" endtime="20240214 06:32:29.117"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" starttime="20240214 03:36:12.915" endtime="20240214 03:36:14.047"/>
+<status status="PASS" starttime="20240214 06:32:28.080" endtime="20240214 06:32:29.117"/>
 </test>
-<status status="PASS" starttime="20240214 03:35:57.449" endtime="20240214 03:36:14.047"/>
+<status status="PASS" starttime="20240214 06:31:45.990" endtime="20240214 06:32:29.118"/>
 </suite>
 <suite id="s1-s2" name="GUI Basic" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/GUI_Basic.robot">
 <test id="s1-s2-t1" name="Open GUI" line="14">
@@ -121,13 +115,13 @@ usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
 <arg>${platform}</arg>
 <arg>macos</arg>
 <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
-<msg timestamp="20240214 03:36:14.062" level="INFO">${platform} = macos</msg>
-<status status="PASS" starttime="20240214 03:36:14.061" endtime="20240214 03:36:14.062"/>
+<msg timestamp="20240214 06:32:30.911" level="INFO">${platform} = macos</msg>
+<status status="PASS" starttime="20240214 06:32:30.909" endtime="20240214 06:32:30.911"/>
 </kw>
-<kw name="Set Confidence">
+<kw name="Set Confidence" library="ImageHorizonLibrary">
 <arg>0.9</arg>
-<msg timestamp="20240214 03:36:14.066" level="FAIL">No keyword with name 'Set Confidence' found.</msg>
-<status status="FAIL" starttime="20240214 03:36:14.066" endtime="20240214 03:36:14.066"/>
+<doc>Sets the accuracy when finding images.</doc>
+<status status="PASS" starttime="20240214 06:32:30.911" endtime="20240214 06:32:31.233"/>
 </kw>
 <kw name="Start Process" library="Process">
 <var>${process}</var>
@@ -137,28 +131,36 @@ usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
 <arg>stdout=${OUTPUT DIR}${/}stdout.txt</arg>
 <arg>stderr=${OUTPUT DIR}${/}stderr.txt</arg>
 <doc>Starts a new process on background.</doc>
-<status status="NOT RUN" starttime="20240214 03:36:14.066" endtime="20240214 03:36:14.066"/>
+<msg timestamp="20240214 06:32:31.236" level="INFO">Starting process:
+python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py</msg>
+<msg timestamp="20240214 06:32:31.243" level="INFO">${process} = &lt;subprocess.Popen object at 0x10f008510&gt;</msg>
+<status status="PASS" starttime="20240214 06:32:31.234" endtime="20240214 06:32:31.243"/>
 </kw>
 <kw name="Set Test Variable" library="BuiltIn">
 <arg>$process</arg>
 <arg>${process}</arg>
 <doc>Makes a variable available everywhere within the scope of the current test.</doc>
-<status status="NOT RUN" starttime="20240214 03:36:14.066" endtime="20240214 03:36:14.066"/>
+<msg timestamp="20240214 06:32:31.245" level="INFO">${process} = &lt;subprocess.Popen object at 0x10f008510&gt;</msg>
+<status status="PASS" starttime="20240214 06:32:31.244" endtime="20240214 06:32:31.245"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>10</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" starttime="20240214 03:36:14.066" endtime="20240214 03:36:14.066"/>
+<msg timestamp="20240214 06:32:41.265" level="INFO">Slept 10 seconds</msg>
+<status status="PASS" starttime="20240214 06:32:31.245" endtime="20240214 06:32:41.266"/>
 </kw>
-<kw name="Set Screenshot Folder">
+<kw name="Set Screenshot Folder" library="ImageHorizonLibrary">
 <arg>${OUTPUT DIR}</arg>
-<status status="NOT RUN" starttime="20240214 03:36:14.069" endtime="20240214 03:36:14.069"/>
+<doc>Sets the folder where screenshots are saved to.</doc>
+<status status="PASS" starttime="20240214 06:32:41.266" endtime="20240214 06:32:41.266"/>
 </kw>
-<kw name="Take A Screenshot">
-<status status="NOT RUN" starttime="20240214 03:36:14.073" endtime="20240214 03:36:14.073"/>
+<kw name="Take A Screenshot" library="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<msg timestamp="20240214 06:32:41.267" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-1.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-1.png" width="100%" /&gt;</msg>
+<status status="PASS" starttime="20240214 06:32:41.266" endtime="20240214 06:32:41.698"/>
 </kw>
 <tag>macos-latest</tag>
-<status status="FAIL" starttime="20240214 03:36:14.061" endtime="20240214 03:36:14.073">No keyword with name 'Set Confidence' found.</status>
+<status status="PASS" starttime="20240214 06:32:30.907" endtime="20240214 06:32:41.699"/>
 </test>
 <test id="s1-s2-t2" name="Select Run Tab" line="44">
 <kw name="Click Tab">
@@ -167,62 +169,71 @@ usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
 <var>${tabnamel}</var>
 <arg>${tabname}</arg>
 <doc>Converts string to lower case.</doc>
-<msg timestamp="20240214 03:36:14.074" level="INFO">${tabnamel} = run</msg>
-<status status="PASS" starttime="20240214 03:36:14.074" endtime="20240214 03:36:14.074"/>
+<msg timestamp="20240214 06:32:41.701" level="INFO">${tabnamel} = run</msg>
+<status status="PASS" starttime="20240214 06:32:41.701" endtime="20240214 06:32:41.701"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${img}</var>
 <arg>manager_${platform}_tab_${tabnamel}.png</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20240214 03:36:14.074" level="INFO">${img} = manager_macos_tab_run.png</msg>
-<status status="PASS" starttime="20240214 03:36:14.074" endtime="20240214 03:36:14.074"/>
+<msg timestamp="20240214 06:32:41.702" level="INFO">${img} = manager_macos_tab_run.png</msg>
+<status status="PASS" starttime="20240214 06:32:41.701" endtime="20240214 06:32:41.702"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20240214 03:36:14.075" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
-<status status="PASS" starttime="20240214 03:36:14.075" endtime="20240214 03:36:14.075"/>
+<msg timestamp="20240214 06:32:41.702" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
+<status status="PASS" starttime="20240214 06:32:41.702" endtime="20240214 06:32:41.702"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>${IMAGE_DIR}</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20240214 03:36:14.075" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
-<status status="PASS" starttime="20240214 03:36:14.075" endtime="20240214 03:36:14.075"/>
+<msg timestamp="20240214 06:32:41.703" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
+<status status="PASS" starttime="20240214 06:32:41.702" endtime="20240214 06:32:41.703"/>
 </kw>
-<kw name="Wait For">
+<kw name="Wait For" library="ImageHorizonLibrary">
 <arg>${img}</arg>
 <arg>timeout=300</arg>
-<msg timestamp="20240214 03:36:14.078" level="FAIL">No keyword with name 'Wait For' found.</msg>
-<status status="FAIL" starttime="20240214 03:36:14.078" endtime="20240214 03:36:14.078"/>
+<doc>Tries to locate given image from the screen for given time.</doc>
+<kw name="Take A Screenshot" library="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<msg timestamp="20240214 06:37:41.954" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-2.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-2.png" width="100%" /&gt;</msg>
+<status status="PASS" starttime="20240214 06:37:41.953" endtime="20240214 06:37:42.235"/>
 </kw>
-<kw name="Locate">
+<msg timestamp="20240214 06:37:42.236" level="FAIL">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_run.png" was not found on screen</msg>
+<status status="FAIL" starttime="20240214 06:32:41.703" endtime="20240214 06:37:42.237"/>
+</kw>
+<kw name="Locate" library="ImageHorizonLibrary">
 <var>@{coordinates}</var>
 <arg>${img}</arg>
-<status status="NOT RUN" starttime="20240214 03:36:14.080" endtime="20240214 03:36:14.080"/>
+<doc>Locate image on screen.</doc>
+<status status="NOT RUN" starttime="20240214 06:37:42.237" endtime="20240214 06:37:42.237"/>
 </kw>
-<kw name="Click Image">
+<kw name="Click Image" library="ImageHorizonLibrary">
 <arg>${img}</arg>
-<status status="NOT RUN" starttime="20240214 03:36:14.083" endtime="20240214 03:36:14.083"/>
+<doc>Finds the reference image on screen and clicks it once.</doc>
+<status status="NOT RUN" starttime="20240214 06:37:42.237" endtime="20240214 06:37:42.237"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>0.1</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" starttime="20240214 03:36:14.084" endtime="20240214 03:36:14.084"/>
+<status status="NOT RUN" starttime="20240214 06:37:42.237" endtime="20240214 06:37:42.237"/>
 </kw>
-<kw name="Take A Screenshot">
-<status status="NOT RUN" starttime="20240214 03:36:14.087" endtime="20240214 03:36:14.087"/>
+<kw name="Take A Screenshot" library="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<status status="NOT RUN" starttime="20240214 06:37:42.237" endtime="20240214 06:37:42.237"/>
 </kw>
-<status status="FAIL" starttime="20240214 03:36:14.074" endtime="20240214 03:36:14.087"/>
+<status status="FAIL" starttime="20240214 06:32:41.700" endtime="20240214 06:37:42.238"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>5</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" starttime="20240214 03:36:14.087" endtime="20240214 03:36:14.087"/>
+<status status="NOT RUN" starttime="20240214 06:37:42.238" endtime="20240214 06:37:42.238"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="FAIL" starttime="20240214 03:36:14.073" endtime="20240214 03:36:14.087">No keyword with name 'Wait For' found.</status>
+<status status="FAIL" starttime="20240214 06:32:41.699" endtime="20240214 06:37:42.238">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_run.png" was not found on screen</status>
 </test>
 <test id="s1-s2-t3" name="Select Agents Tab" line="49">
 <kw name="Click Tab">
@@ -231,62 +242,71 @@ usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
 <var>${tabnamel}</var>
 <arg>${tabname}</arg>
 <doc>Converts string to lower case.</doc>
-<msg timestamp="20240214 03:36:14.088" level="INFO">${tabnamel} = agents</msg>
-<status status="PASS" starttime="20240214 03:36:14.088" endtime="20240214 03:36:14.088"/>
+<msg timestamp="20240214 06:37:42.240" level="INFO">${tabnamel} = agents</msg>
+<status status="PASS" starttime="20240214 06:37:42.240" endtime="20240214 06:37:42.240"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${img}</var>
 <arg>manager_${platform}_tab_${tabnamel}.png</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20240214 03:36:14.089" level="INFO">${img} = manager_macos_tab_agents.png</msg>
-<status status="PASS" starttime="20240214 03:36:14.088" endtime="20240214 03:36:14.089"/>
+<msg timestamp="20240214 06:37:42.240" level="INFO">${img} = manager_macos_tab_agents.png</msg>
+<status status="PASS" starttime="20240214 06:37:42.240" endtime="20240214 06:37:42.240"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20240214 03:36:14.089" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
-<status status="PASS" starttime="20240214 03:36:14.089" endtime="20240214 03:36:14.089"/>
+<msg timestamp="20240214 06:37:42.241" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
+<status status="PASS" starttime="20240214 06:37:42.240" endtime="20240214 06:37:42.241"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>${IMAGE_DIR}</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20240214 03:36:14.089" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
-<status status="PASS" starttime="20240214 03:36:14.089" endtime="20240214 03:36:14.089"/>
+<msg timestamp="20240214 06:37:42.241" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
+<status status="PASS" starttime="20240214 06:37:42.241" endtime="20240214 06:37:42.241"/>
 </kw>
-<kw name="Wait For">
+<kw name="Wait For" library="ImageHorizonLibrary">
 <arg>${img}</arg>
 <arg>timeout=300</arg>
-<msg timestamp="20240214 03:36:14.092" level="FAIL">No keyword with name 'Wait For' found.</msg>
-<status status="FAIL" starttime="20240214 03:36:14.092" endtime="20240214 03:36:14.092"/>
+<doc>Tries to locate given image from the screen for given time.</doc>
+<kw name="Take A Screenshot" library="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<msg timestamp="20240214 06:42:42.862" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-3.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-3.png" width="100%" /&gt;</msg>
+<status status="PASS" starttime="20240214 06:42:42.861" endtime="20240214 06:42:43.235"/>
 </kw>
-<kw name="Locate">
+<msg timestamp="20240214 06:42:43.236" level="FAIL">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_agents.png" was not found on screen</msg>
+<status status="FAIL" starttime="20240214 06:37:42.241" endtime="20240214 06:42:43.236"/>
+</kw>
+<kw name="Locate" library="ImageHorizonLibrary">
 <var>@{coordinates}</var>
 <arg>${img}</arg>
-<status status="NOT RUN" starttime="20240214 03:36:14.095" endtime="20240214 03:36:14.095"/>
+<doc>Locate image on screen.</doc>
+<status status="NOT RUN" starttime="20240214 06:42:43.236" endtime="20240214 06:42:43.237"/>
 </kw>
-<kw name="Click Image">
+<kw name="Click Image" library="ImageHorizonLibrary">
 <arg>${img}</arg>
-<status status="NOT RUN" starttime="20240214 03:36:14.098" endtime="20240214 03:36:14.098"/>
+<doc>Finds the reference image on screen and clicks it once.</doc>
+<status status="NOT RUN" starttime="20240214 06:42:43.237" endtime="20240214 06:42:43.237"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>0.1</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" starttime="20240214 03:36:14.098" endtime="20240214 03:36:14.098"/>
+<status status="NOT RUN" starttime="20240214 06:42:43.237" endtime="20240214 06:42:43.237"/>
 </kw>
-<kw name="Take A Screenshot">
-<status status="NOT RUN" starttime="20240214 03:36:14.101" endtime="20240214 03:36:14.101"/>
+<kw name="Take A Screenshot" library="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<status status="NOT RUN" starttime="20240214 06:42:43.237" endtime="20240214 06:42:43.237"/>
 </kw>
-<status status="FAIL" starttime="20240214 03:36:14.088" endtime="20240214 03:36:14.101"/>
+<status status="FAIL" starttime="20240214 06:37:42.239" endtime="20240214 06:42:43.238"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>5</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" starttime="20240214 03:36:14.101" endtime="20240214 03:36:14.101"/>
+<status status="NOT RUN" starttime="20240214 06:42:43.238" endtime="20240214 06:42:43.238"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="FAIL" starttime="20240214 03:36:14.087" endtime="20240214 03:36:14.101">No keyword with name 'Wait For' found.</status>
+<status status="FAIL" starttime="20240214 06:37:42.239" endtime="20240214 06:42:43.238">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_agents.png" was not found on screen</status>
 </test>
 <test id="s1-s2-t4" name="Select About Tab" line="54">
 <kw name="Click Tab">
@@ -295,62 +315,71 @@ usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
 <var>${tabnamel}</var>
 <arg>${tabname}</arg>
 <doc>Converts string to lower case.</doc>
-<msg timestamp="20240214 03:36:14.103" level="INFO">${tabnamel} = about</msg>
-<status status="PASS" starttime="20240214 03:36:14.103" endtime="20240214 03:36:14.103"/>
+<msg timestamp="20240214 06:42:43.241" level="INFO">${tabnamel} = about</msg>
+<status status="PASS" starttime="20240214 06:42:43.240" endtime="20240214 06:42:43.241"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${img}</var>
 <arg>manager_${platform}_tab_${tabnamel}.png</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20240214 03:36:14.103" level="INFO">${img} = manager_macos_tab_about.png</msg>
-<status status="PASS" starttime="20240214 03:36:14.103" endtime="20240214 03:36:14.103"/>
+<msg timestamp="20240214 06:42:43.241" level="INFO">${img} = manager_macos_tab_about.png</msg>
+<status status="PASS" starttime="20240214 06:42:43.241" endtime="20240214 06:42:43.241"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20240214 03:36:14.104" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
-<status status="PASS" starttime="20240214 03:36:14.103" endtime="20240214 03:36:14.104"/>
+<msg timestamp="20240214 06:42:43.242" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
+<status status="PASS" starttime="20240214 06:42:43.241" endtime="20240214 06:42:43.242"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>${IMAGE_DIR}</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20240214 03:36:14.104" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
-<status status="PASS" starttime="20240214 03:36:14.104" endtime="20240214 03:36:14.104"/>
+<msg timestamp="20240214 06:42:43.242" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
+<status status="PASS" starttime="20240214 06:42:43.242" endtime="20240214 06:42:43.242"/>
 </kw>
-<kw name="Wait For">
+<kw name="Wait For" library="ImageHorizonLibrary">
 <arg>${img}</arg>
 <arg>timeout=300</arg>
-<msg timestamp="20240214 03:36:14.107" level="FAIL">No keyword with name 'Wait For' found.</msg>
-<status status="FAIL" starttime="20240214 03:36:14.107" endtime="20240214 03:36:14.107"/>
+<doc>Tries to locate given image from the screen for given time.</doc>
+<kw name="Take A Screenshot" library="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<msg timestamp="20240214 06:47:43.358" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-4.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-4.png" width="100%" /&gt;</msg>
+<status status="PASS" starttime="20240214 06:47:43.356" endtime="20240214 06:47:43.641"/>
 </kw>
-<kw name="Locate">
+<msg timestamp="20240214 06:47:43.642" level="FAIL">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_about.png" was not found on screen</msg>
+<status status="FAIL" starttime="20240214 06:42:43.243" endtime="20240214 06:47:43.642"/>
+</kw>
+<kw name="Locate" library="ImageHorizonLibrary">
 <var>@{coordinates}</var>
 <arg>${img}</arg>
-<status status="NOT RUN" starttime="20240214 03:36:14.109" endtime="20240214 03:36:14.109"/>
+<doc>Locate image on screen.</doc>
+<status status="NOT RUN" starttime="20240214 06:47:43.642" endtime="20240214 06:47:43.642"/>
 </kw>
-<kw name="Click Image">
+<kw name="Click Image" library="ImageHorizonLibrary">
 <arg>${img}</arg>
-<status status="NOT RUN" starttime="20240214 03:36:14.112" endtime="20240214 03:36:14.112"/>
+<doc>Finds the reference image on screen and clicks it once.</doc>
+<status status="NOT RUN" starttime="20240214 06:47:43.643" endtime="20240214 06:47:43.643"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>0.1</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" starttime="20240214 03:36:14.112" endtime="20240214 03:36:14.112"/>
+<status status="NOT RUN" starttime="20240214 06:47:43.643" endtime="20240214 06:47:43.643"/>
 </kw>
-<kw name="Take A Screenshot">
-<status status="NOT RUN" starttime="20240214 03:36:14.116" endtime="20240214 03:36:14.116"/>
+<kw name="Take A Screenshot" library="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<status status="NOT RUN" starttime="20240214 06:47:43.643" endtime="20240214 06:47:43.643"/>
 </kw>
-<status status="FAIL" starttime="20240214 03:36:14.102" endtime="20240214 03:36:14.116"/>
+<status status="FAIL" starttime="20240214 06:42:43.240" endtime="20240214 06:47:43.643"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>5</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" starttime="20240214 03:36:14.116" endtime="20240214 03:36:14.116"/>
+<status status="NOT RUN" starttime="20240214 06:47:43.643" endtime="20240214 06:47:43.643"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="FAIL" starttime="20240214 03:36:14.102" endtime="20240214 03:36:14.116">No keyword with name 'Wait For' found.</status>
+<status status="FAIL" starttime="20240214 06:42:43.239" endtime="20240214 06:47:43.644">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_about.png" was not found on screen</status>
 </test>
 <test id="s1-s2-t5" name="Select Plan Tab" line="59">
 <kw name="Click Tab">
@@ -359,84 +388,101 @@ usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
 <var>${tabnamel}</var>
 <arg>${tabname}</arg>
 <doc>Converts string to lower case.</doc>
-<msg timestamp="20240214 03:36:14.117" level="INFO">${tabnamel} = plan</msg>
-<status status="PASS" starttime="20240214 03:36:14.117" endtime="20240214 03:36:14.117"/>
+<msg timestamp="20240214 06:47:43.646" level="INFO">${tabnamel} = plan</msg>
+<status status="PASS" starttime="20240214 06:47:43.645" endtime="20240214 06:47:43.646"/>
 </kw>
 <kw name="Set Variable" library="BuiltIn">
 <var>${img}</var>
 <arg>manager_${platform}_tab_${tabnamel}.png</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<msg timestamp="20240214 03:36:14.118" level="INFO">${img} = manager_macos_tab_plan.png</msg>
-<status status="PASS" starttime="20240214 03:36:14.117" endtime="20240214 03:36:14.118"/>
+<msg timestamp="20240214 06:47:43.646" level="INFO">${img} = manager_macos_tab_plan.png</msg>
+<status status="PASS" starttime="20240214 06:47:43.646" endtime="20240214 06:47:43.646"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20240214 03:36:14.118" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
-<status status="PASS" starttime="20240214 03:36:14.118" endtime="20240214 03:36:14.118"/>
+<msg timestamp="20240214 06:47:43.646" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
+<status status="PASS" starttime="20240214 06:47:43.646" endtime="20240214 06:47:43.646"/>
 </kw>
 <kw name="Log" library="BuiltIn">
 <arg>${IMAGE_DIR}</arg>
 <doc>Logs the given message with the given level.</doc>
-<msg timestamp="20240214 03:36:14.118" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
-<status status="PASS" starttime="20240214 03:36:14.118" endtime="20240214 03:36:14.118"/>
+<msg timestamp="20240214 06:47:43.647" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
+<status status="PASS" starttime="20240214 06:47:43.646" endtime="20240214 06:47:43.647"/>
 </kw>
-<kw name="Wait For">
+<kw name="Wait For" library="ImageHorizonLibrary">
 <arg>${img}</arg>
 <arg>timeout=300</arg>
-<msg timestamp="20240214 03:36:14.121" level="FAIL">No keyword with name 'Wait For' found.</msg>
-<status status="FAIL" starttime="20240214 03:36:14.121" endtime="20240214 03:36:14.121"/>
+<doc>Tries to locate given image from the screen for given time.</doc>
+<kw name="Take A Screenshot" library="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<msg timestamp="20240214 06:52:43.731" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-5.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-5.png" width="100%" /&gt;</msg>
+<status status="PASS" starttime="20240214 06:52:43.730" endtime="20240214 06:52:44.025"/>
 </kw>
-<kw name="Locate">
+<msg timestamp="20240214 06:52:44.026" level="FAIL">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_plan.png" was not found on screen</msg>
+<status status="FAIL" starttime="20240214 06:47:43.647" endtime="20240214 06:52:44.026"/>
+</kw>
+<kw name="Locate" library="ImageHorizonLibrary">
 <var>@{coordinates}</var>
 <arg>${img}</arg>
-<status status="NOT RUN" starttime="20240214 03:36:14.123" endtime="20240214 03:36:14.124"/>
+<doc>Locate image on screen.</doc>
+<status status="NOT RUN" starttime="20240214 06:52:44.027" endtime="20240214 06:52:44.027"/>
 </kw>
-<kw name="Click Image">
+<kw name="Click Image" library="ImageHorizonLibrary">
 <arg>${img}</arg>
-<status status="NOT RUN" starttime="20240214 03:36:14.126" endtime="20240214 03:36:14.126"/>
+<doc>Finds the reference image on screen and clicks it once.</doc>
+<status status="NOT RUN" starttime="20240214 06:52:44.027" endtime="20240214 06:52:44.027"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>0.1</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" starttime="20240214 03:36:14.127" endtime="20240214 03:36:14.127"/>
+<status status="NOT RUN" starttime="20240214 06:52:44.027" endtime="20240214 06:52:44.027"/>
 </kw>
-<kw name="Take A Screenshot">
-<status status="NOT RUN" starttime="20240214 03:36:14.130" endtime="20240214 03:36:14.130"/>
+<kw name="Take A Screenshot" library="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<status status="NOT RUN" starttime="20240214 06:52:44.027" endtime="20240214 06:52:44.027"/>
 </kw>
-<status status="FAIL" starttime="20240214 03:36:14.117" endtime="20240214 03:36:14.130"/>
+<status status="FAIL" starttime="20240214 06:47:43.645" endtime="20240214 06:52:44.027"/>
 </kw>
 <kw name="Sleep" library="BuiltIn">
 <arg>5</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" starttime="20240214 03:36:14.130" endtime="20240214 03:36:14.130"/>
+<status status="NOT RUN" starttime="20240214 06:52:44.028" endtime="20240214 06:52:44.028"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="FAIL" starttime="20240214 03:36:14.116" endtime="20240214 03:36:14.130">No keyword with name 'Wait For' found.</status>
+<status status="FAIL" starttime="20240214 06:47:43.644" endtime="20240214 06:52:44.028">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_plan.png" was not found on screen</status>
 </test>
 <test id="s1-s2-t6" name="Close GUI" line="78">
-<kw name="Click Image">
+<kw name="Click Image" library="ImageHorizonLibrary">
 <arg>manager_${platform}_button_closewindow.png</arg>
-<msg timestamp="20240214 03:36:14.134" level="FAIL">No keyword with name 'Click Image' found.</msg>
-<status status="FAIL" starttime="20240214 03:36:14.134" endtime="20240214 03:36:14.134"/>
+<doc>Finds the reference image on screen and clicks it once.</doc>
+<msg timestamp="20240214 06:52:44.478" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_button_closewindow.png" was not found on screen.</msg>
+<kw name="Take A Screenshot" library="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<msg timestamp="20240214 06:52:44.479" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-6.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBasic-screenshot-6.png" width="100%" /&gt;</msg>
+<status status="PASS" starttime="20240214 06:52:44.479" endtime="20240214 06:52:44.759"/>
 </kw>
-<kw name="Take A Screenshot">
-<status status="NOT RUN" starttime="20240214 03:36:14.137" endtime="20240214 03:36:14.137"/>
+<msg timestamp="20240214 06:52:44.760" level="FAIL">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_button_closewindow.png" was not found on screen</msg>
+<status status="FAIL" starttime="20240214 06:52:44.029" endtime="20240214 06:52:44.760"/>
+</kw>
+<kw name="Take A Screenshot" library="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<status status="NOT RUN" starttime="20240214 06:52:44.761" endtime="20240214 06:52:44.761"/>
 </kw>
 <kw name="Wait For Process" library="Process">
 <var>${result}</var>
 <arg>${process}</arg>
 <arg>timeout=60</arg>
 <doc>Waits for the process to complete or to reach the given timeout.</doc>
-<status status="NOT RUN" starttime="20240214 03:36:14.137" endtime="20240214 03:36:14.137"/>
+<status status="NOT RUN" starttime="20240214 06:52:44.761" endtime="20240214 06:52:44.761"/>
 </kw>
 <kw name="Is Process Running" library="Process">
 <var>${running}</var>
 <arg>${process}</arg>
 <doc>Checks is the process running or not.</doc>
-<status status="NOT RUN" starttime="20240214 03:36:14.137" endtime="20240214 03:36:14.137"/>
+<status status="NOT RUN" starttime="20240214 06:52:44.761" endtime="20240214 06:52:44.761"/>
 </kw>
 <if>
 <branch type="IF" condition="not ${running}">
@@ -444,60 +490,272 @@ usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
 <arg>${result.rc}</arg>
 <arg>0</arg>
 <doc>Fails if objects are unequal after converting them to integers.</doc>
-<status status="NOT RUN" starttime="20240214 03:36:14.137" endtime="20240214 03:36:14.138"/>
+<status status="NOT RUN" starttime="20240214 06:52:44.762" endtime="20240214 06:52:44.762"/>
 </kw>
-<status status="NOT RUN" starttime="20240214 03:36:14.137" endtime="20240214 03:36:14.138"/>
+<status status="NOT RUN" starttime="20240214 06:52:44.761" endtime="20240214 06:52:44.762"/>
 </branch>
 <branch type="ELSE">
-<kw name="Take A Screenshot">
-<status status="NOT RUN" starttime="20240214 03:36:14.141" endtime="20240214 03:36:14.141"/>
+<kw name="Take A Screenshot" library="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<status status="NOT RUN" starttime="20240214 06:52:44.762" endtime="20240214 06:52:44.762"/>
 </kw>
 <kw name="Terminate Process" library="Process">
 <var>${result}</var>
 <arg>${process}</arg>
 <doc>Stops the process gracefully or forcefully.</doc>
-<status status="NOT RUN" starttime="20240214 03:36:14.141" endtime="20240214 03:36:14.141"/>
+<status status="NOT RUN" starttime="20240214 06:52:44.762" endtime="20240214 06:52:44.762"/>
 </kw>
 <kw name="Fail" library="BuiltIn">
 <doc>Fails the test with the given message and optionally alters its tags.</doc>
-<status status="NOT RUN" starttime="20240214 03:36:14.141" endtime="20240214 03:36:14.141"/>
+<status status="NOT RUN" starttime="20240214 06:52:44.762" endtime="20240214 06:52:44.762"/>
 </kw>
-<status status="NOT RUN" starttime="20240214 03:36:14.138" endtime="20240214 03:36:14.141"/>
+<status status="NOT RUN" starttime="20240214 06:52:44.762" endtime="20240214 06:52:44.762"/>
 </branch>
-<status status="NOT RUN" starttime="20240214 03:36:14.137" endtime="20240214 03:36:14.141"/>
+<status status="NOT RUN" starttime="20240214 06:52:44.761" endtime="20240214 06:52:44.762"/>
 </if>
 <tag>macos-latest</tag>
-<status status="FAIL" starttime="20240214 03:36:14.131" endtime="20240214 03:36:14.141">No keyword with name 'Click Image' found.</status>
+<status status="FAIL" starttime="20240214 06:52:44.029" endtime="20240214 06:52:44.762">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_button_closewindow.png" was not found on screen</status>
 </test>
-<status status="FAIL" starttime="20240214 03:36:14.048" endtime="20240214 03:36:14.142"/>
+<status status="FAIL" starttime="20240214 06:32:29.120" endtime="20240214 06:52:44.763"/>
 </suite>
-<status status="FAIL" starttime="20240214 03:35:57.419" endtime="20240214 03:36:14.143"/>
+<suite id="s1-s3" name="GUI Bugs" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/GUI_Bugs.robot">
+<kw name="Set Platform" library="GUI_Common" type="SETUP">
+<kw name="Log" library="BuiltIn">
+<arg>${OPTIONS}</arg>
+<doc>Logs the given message with the given level.</doc>
+<msg timestamp="20240214 06:52:44.780" level="INFO">{'include': ['macos-latest'], 'exclude': [], 'skip': [], 'skip_on_failure': []}</msg>
+<status status="PASS" starttime="20240214 06:52:44.779" endtime="20240214 06:52:44.780"/>
+</kw>
+<kw name="Log" library="BuiltIn">
+<arg>${OPTIONS}[include]</arg>
+<doc>Logs the given message with the given level.</doc>
+<msg timestamp="20240214 06:52:44.780" level="INFO">[macos-latest]</msg>
+<status status="PASS" starttime="20240214 06:52:44.780" endtime="20240214 06:52:44.780"/>
+</kw>
+<kw name="Log" library="BuiltIn">
+<arg>${OPTIONS}[include][0]</arg>
+<doc>Logs the given message with the given level.</doc>
+<msg timestamp="20240214 06:52:44.780" level="INFO">macos-latest</msg>
+<status status="PASS" starttime="20240214 06:52:44.780" endtime="20240214 06:52:44.780"/>
+</kw>
+<kw name="Set Variable" library="BuiltIn">
+<var>${ostag}</var>
+<arg>${OPTIONS}[include][0]</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<msg timestamp="20240214 06:52:44.781" level="INFO">${ostag} = macos-latest</msg>
+<status status="PASS" starttime="20240214 06:52:44.781" endtime="20240214 06:52:44.781"/>
+</kw>
+<if>
+<branch type="IF" condition="&quot;${ostag}&quot; == &quot;macos-latest&quot;">
+<kw name="Set Suite Variable" library="BuiltIn">
+<arg>${platform}</arg>
+<arg>macos</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<msg timestamp="20240214 06:52:44.782" level="INFO">${platform} = macos</msg>
+<status status="PASS" starttime="20240214 06:52:44.781" endtime="20240214 06:52:44.782"/>
+</kw>
+<status status="PASS" starttime="20240214 06:52:44.781" endtime="20240214 06:52:44.782"/>
+</branch>
+<status status="PASS" starttime="20240214 06:52:44.781" endtime="20240214 06:52:44.782"/>
+</if>
+<if>
+<branch type="IF" condition="&quot;${ostag}&quot; == &quot;windows-latest&quot;">
+<kw name="Set Suite Variable" library="BuiltIn">
+<arg>${platform}</arg>
+<arg>windows</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="NOT RUN" starttime="20240214 06:52:44.783" endtime="20240214 06:52:44.783"/>
+</kw>
+<status status="NOT RUN" starttime="20240214 06:52:44.782" endtime="20240214 06:52:44.783"/>
+</branch>
+<status status="PASS" starttime="20240214 06:52:44.782" endtime="20240214 06:52:44.783"/>
+</if>
+<if>
+<branch type="IF" condition="&quot;${ostag}&quot; == &quot;ubuntu-latest&quot;">
+<kw name="Set Suite Variable" library="BuiltIn">
+<arg>${platform}</arg>
+<arg>ubuntu</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="NOT RUN" starttime="20240214 06:52:44.783" endtime="20240214 06:52:44.783"/>
+</kw>
+<status status="NOT RUN" starttime="20240214 06:52:44.783" endtime="20240214 06:52:44.783"/>
+</branch>
+<status status="PASS" starttime="20240214 06:52:44.783" endtime="20240214 06:52:44.783"/>
+</if>
+<status status="PASS" starttime="20240214 06:52:44.779" endtime="20240214 06:52:44.783"/>
+</kw>
+<test id="s1-s3-t1" name="Issue #171" line="7">
+<kw name="Open Agent" library="GUI_Common">
+<kw name="Start Process" library="Process">
+<var>${process}</var>
+<arg>python3</arg>
+<arg>${pyfile_agent}</arg>
+<arg>alias=Agent</arg>
+<arg>stdout=${OUTPUT DIR}${/}stdout_agent.txt</arg>
+<arg>stderr=${OUTPUT DIR}${/}stderr_agent.txt</arg>
+<doc>Starts a new process on background.</doc>
+<msg timestamp="20240214 06:52:44.785" level="INFO">Starting process:
+python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_agent/rfswarm_agent.py</msg>
+<msg timestamp="20240214 06:52:44.793" level="INFO">${process} = &lt;subprocess.Popen object at 0x126990690&gt;</msg>
+<status status="PASS" starttime="20240214 06:52:44.784" endtime="20240214 06:52:44.793"/>
+</kw>
+<kw name="Set Test Variable" library="BuiltIn">
+<arg>$process_agent</arg>
+<arg>${process}</arg>
+<doc>Makes a variable available everywhere within the scope of the current test.</doc>
+<msg timestamp="20240214 06:52:44.795" level="INFO">${process_agent} = &lt;subprocess.Popen object at 0x126990690&gt;</msg>
+<status status="PASS" starttime="20240214 06:52:44.794" endtime="20240214 06:52:44.795"/>
+</kw>
+<status status="PASS" starttime="20240214 06:52:44.784" endtime="20240214 06:52:44.795"/>
+</kw>
+<kw name="Open Manager GUI" library="GUI_Common">
+<kw name="Set Confidence" library="ImageHorizonLibrary">
+<arg>0.9</arg>
+<doc>Sets the accuracy when finding images.</doc>
+<status status="PASS" starttime="20240214 06:52:44.795" endtime="20240214 06:52:45.224"/>
+</kw>
+<kw name="Start Process" library="Process">
+<var>${process}</var>
+<arg>python3</arg>
+<arg>${pyfile_manager}</arg>
+<arg>alias=Manager</arg>
+<arg>stdout=${OUTPUT DIR}${/}stdout_manager.txt</arg>
+<arg>stderr=${OUTPUT DIR}${/}stderr_manager.txt</arg>
+<doc>Starts a new process on background.</doc>
+<msg timestamp="20240214 06:52:45.227" level="INFO">Starting process:
+python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py</msg>
+<msg timestamp="20240214 06:52:45.245" level="INFO">${process} = &lt;subprocess.Popen object at 0x1269ad310&gt;</msg>
+<status status="PASS" starttime="20240214 06:52:45.225" endtime="20240214 06:52:45.245"/>
+</kw>
+<kw name="Set Test Variable" library="BuiltIn">
+<arg>$process_manager</arg>
+<arg>${process}</arg>
+<doc>Makes a variable available everywhere within the scope of the current test.</doc>
+<msg timestamp="20240214 06:52:45.246" level="INFO">${process_manager} = &lt;subprocess.Popen object at 0x1269ad310&gt;</msg>
+<status status="PASS" starttime="20240214 06:52:45.246" endtime="20240214 06:52:45.247"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>10</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20240214 06:52:55.266" level="INFO">Slept 10 seconds</msg>
+<status status="PASS" starttime="20240214 06:52:45.247" endtime="20240214 06:52:55.266"/>
+</kw>
+<kw name="Set Screenshot Folder" library="ImageHorizonLibrary">
+<arg>${OUTPUT DIR}</arg>
+<doc>Sets the folder where screenshots are saved to.</doc>
+<status status="PASS" starttime="20240214 06:52:55.267" endtime="20240214 06:52:55.267"/>
+</kw>
+<kw name="Take A Screenshot" library="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<msg timestamp="20240214 06:52:55.267" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBugs-screenshot-1.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBugs-screenshot-1.png" width="100%" /&gt;</msg>
+<status status="PASS" starttime="20240214 06:52:55.267" endtime="20240214 06:52:55.581"/>
+</kw>
+<status status="PASS" starttime="20240214 06:52:44.795" endtime="20240214 06:52:55.582"/>
+</kw>
+<kw name="Click Tab" library="GUI_Common">
+<arg>Agents</arg>
+<kw name="Convert To Lower Case" library="String">
+<var>${tabnamel}</var>
+<arg>${tabname}</arg>
+<doc>Converts string to lower case.</doc>
+<msg timestamp="20240214 06:52:55.583" level="INFO">${tabnamel} = agents</msg>
+<status status="PASS" starttime="20240214 06:52:55.583" endtime="20240214 06:52:55.583"/>
+</kw>
+<kw name="Set Variable" library="BuiltIn">
+<var>${img}</var>
+<arg>manager_${platform}_tab_${tabnamel}.png</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<msg timestamp="20240214 06:52:55.584" level="INFO">${img} = manager_macos_tab_agents.png</msg>
+<status status="PASS" starttime="20240214 06:52:55.583" endtime="20240214 06:52:55.584"/>
+</kw>
+<kw name="Log" library="BuiltIn">
+<arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</arg>
+<doc>Logs the given message with the given level.</doc>
+<msg timestamp="20240214 06:52:55.584" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
+<status status="PASS" starttime="20240214 06:52:55.584" endtime="20240214 06:52:55.584"/>
+</kw>
+<kw name="Log" library="BuiltIn">
+<arg>${IMAGE_DIR}</arg>
+<doc>Logs the given message with the given level.</doc>
+<msg timestamp="20240214 06:52:55.584" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
+<status status="PASS" starttime="20240214 06:52:55.584" endtime="20240214 06:52:55.584"/>
+</kw>
+<kw name="Wait For" library="ImageHorizonLibrary">
+<arg>${img}</arg>
+<arg>timeout=300</arg>
+<doc>Tries to locate given image from the screen for given time.</doc>
+<kw name="Take A Screenshot" library="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<msg timestamp="20240214 06:57:55.957" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBugs-screenshot-2.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.7/Manager.GUIBugs-screenshot-2.png" width="100%" /&gt;</msg>
+<status status="PASS" starttime="20240214 06:57:55.956" endtime="20240214 06:57:56.238"/>
+</kw>
+<msg timestamp="20240214 06:57:56.239" level="FAIL">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_agents.png" was not found on screen</msg>
+<status status="FAIL" starttime="20240214 06:52:55.584" endtime="20240214 06:57:56.239"/>
+</kw>
+<kw name="Locate" library="ImageHorizonLibrary">
+<var>@{coordinates}</var>
+<arg>${img}</arg>
+<doc>Locate image on screen.</doc>
+<status status="NOT RUN" starttime="20240214 06:57:56.239" endtime="20240214 06:57:56.239"/>
+</kw>
+<kw name="Click Image" library="ImageHorizonLibrary">
+<arg>${img}</arg>
+<doc>Finds the reference image on screen and clicks it once.</doc>
+<status status="NOT RUN" starttime="20240214 06:57:56.239" endtime="20240214 06:57:56.239"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>0.1</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" starttime="20240214 06:57:56.240" endtime="20240214 06:57:56.240"/>
+</kw>
+<kw name="Take A Screenshot" library="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<status status="NOT RUN" starttime="20240214 06:57:56.240" endtime="20240214 06:57:56.240"/>
+</kw>
+<status status="FAIL" starttime="20240214 06:52:55.582" endtime="20240214 06:57:56.240"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>20</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" starttime="20240214 06:57:56.240" endtime="20240214 06:57:56.240"/>
+</kw>
+<kw name="Take A Screenshot" library="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<status status="NOT RUN" starttime="20240214 06:57:56.240" endtime="20240214 06:57:56.240"/>
+</kw>
+<kw name="Run Keyword" library="BuiltIn">
+<arg>Close Manager GUI ${platform}</arg>
+<doc>Executes the given keyword with the given arguments.</doc>
+<status status="NOT RUN" starttime="20240214 06:57:56.240" endtime="20240214 06:57:56.240"/>
+</kw>
+<kw name="Stop Agent" library="GUI_Common">
+<status status="NOT RUN" starttime="20240214 06:57:56.240" endtime="20240214 06:57:56.241"/>
+</kw>
+<tag>macos-latest</tag>
+<tag>ubuntu-latest</tag>
+<tag>windows-latest</tag>
+<status status="FAIL" starttime="20240214 06:52:44.783" endtime="20240214 06:57:56.241">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_agents.png" was not found on screen</status>
+</test>
+<status status="FAIL" starttime="20240214 06:52:44.765" endtime="20240214 06:57:56.241"/>
+</suite>
+<status status="FAIL" starttime="20240214 06:31:45.967" endtime="20240214 06:57:56.243"/>
 </suite>
 <statistics>
 <total>
-<stat pass="3" fail="6" skip="0">All Tests</stat>
+<stat pass="4" fail="6" skip="0">All Tests</stat>
 </total>
 <tag>
-<stat pass="3" fail="6" skip="0">macos-latest</stat>
-<stat pass="3" fail="4" skip="0">ubuntu-latest</stat>
-<stat pass="3" fail="4" skip="0">windows-latest</stat>
+<stat pass="4" fail="6" skip="0">macos-latest</stat>
+<stat pass="3" fail="5" skip="0">ubuntu-latest</stat>
+<stat pass="3" fail="5" skip="0">windows-latest</stat>
 </tag>
 <suite>
-<stat pass="3" fail="6" skip="0" id="s1" name="Manager">Manager</stat>
+<stat pass="4" fail="6" skip="0" id="s1" name="Manager">Manager</stat>
 <stat pass="3" fail="0" skip="0" id="s1-s1" name="CommandLine">Manager.CommandLine</stat>
-<stat pass="0" fail="6" skip="0" id="s1-s2" name="GUI Basic">Manager.GUI Basic</stat>
+<stat pass="1" fail="5" skip="0" id="s1-s2" name="GUI Basic">Manager.GUI Basic</stat>
+<stat pass="0" fail="1" skip="0" id="s1-s3" name="GUI Bugs">Manager.GUI Bugs</stat>
 </suite>
 </statistics>
 <errors>
-<msg timestamp="20240214 03:36:14.060" level="ERROR">Error in file '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/GUI_Basic.robot' on line 6: Importing library 'ImageHorizonLibrary' failed: ImageHorizonLibraryError: There is something wrong pyautogui or it is not installed.
-Traceback (most recent call last):
-  File "/Users/runner/hostedtoolcache/Python/3.7.17/x64/lib/python3.7/site-packages/ImageHorizonLibrary/__init__.py", line 10, in &lt;module&gt;
-    raise ImageHorizonLibraryError('There is something wrong pyautogui or '
-PYTHONPATH:
-  /Users/runner/hostedtoolcache/Python/3.7.17/x64/bin
-  /Users/runner/hostedtoolcache/Python/3.7.17/x64/lib/python37.zip
-  /Users/runner/hostedtoolcache/Python/3.7.17/x64/lib/python3.7
-  /Users/runner/hostedtoolcache/Python/3.7.17/x64/lib/python3.7/lib-dynload
-  /Users/runner/hostedtoolcache/Python/3.7.17/x64/lib/python3.7/site-packages</msg>
 </errors>
 </robot>
