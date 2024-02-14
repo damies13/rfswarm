@@ -9,8 +9,9 @@ Issue #171
 	Open Agent
 	Open Manager GUI
 	Click Tab 	 Agents
-	Sleep 	5
+	# give time for agent to start and connect to manager
+	Sleep 	20
 	Take A Screenshot
 
-	Close Manager GUI ${platform}
+	Run Keyword 	Close Manager GUI ${platform}
 	Stop Agent
