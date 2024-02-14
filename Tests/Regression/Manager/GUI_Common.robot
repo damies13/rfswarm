@@ -21,13 +21,13 @@ Set Platform
 	Log 	${OPTIONS}[include][0]
 	${ostag}= 	Set Variable 	${OPTIONS}[include][0]
 
-	IF 	${ostag} == macos-latest
+	IF 	"${ostag}" == "macos-latest"
 		Set Suite Variable    ${platform}    macos
 	END
-	IF 	${ostag} == windows-latest
+	IF 	"${ostag}" == "windows-latest"
 		Set Suite Variable    ${platform}    windows
 	END
-	IF 	${ostag} == ubuntu-latest
+	IF 	"${ostag}" == "ubuntu-latest"
 		Set Suite Variable    ${platform}    ubuntu
 	END
 
