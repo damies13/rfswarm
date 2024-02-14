@@ -117,7 +117,7 @@ Resize Window
 	${img}=	Set Variable		manager_${platform}_corner_resize.png
 	Wait For 	${img} 	 timeout=300
 	@{coordinates}= 	Locate		${img}
-	@{coordinates2}= 	Create List 	@{coordinates}[0]+${x} 	@{coordinates}[1]+${y}
+	@{coordinates2}= 	Create List 	${coordinates[0]}+${x} 	${coordinates[1]}+${y}
 	Move To 	@{coordinates}
 	Mouse Down
 	Move To 	@{coordinates2}
