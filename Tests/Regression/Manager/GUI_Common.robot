@@ -5,7 +5,6 @@ Library 	String
 
 Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
-Suite Setup 	Set Platform
 
 *** Variables ***
 ${IMAGE_DIR} 	${CURDIR}/Images/file_method
@@ -16,26 +15,26 @@ ${process_agent}		None
 
 *** Keywords ***
 Set Platform
-	[Tags]	macos-latest
-	Set Suite Variable    ${platform}    macos
-
-Set Platform
-	[Tags]	windows-latest
-	Set Suite Variable    ${platform}    windows
-
-Set Platform
-	[Tags]	ubuntu-latest
-	Set Suite Variable    ${platform}    ubuntu
+[Arguments]		${ostag}
+	IF 	${ostag} == macos-latest
+		Set Suite Variable    ${platform}    macos
+	END
+	IF 	${ostag} == windows-latest
+		Set Suite Variable    ${platform}    windows
+	END
+	IF 	${ostag} == ubuntu-latest
+		Set Suite Variable    ${platform}    ubuntu
+	END
 
 Open Agent
 	# [Arguments]		${options}
-	${process}= 	Start Process 	python3 	${pyfile}    alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
+	${process}= 	Start Process 	python3 	${pyfile_agent}    alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
 	Set Test Variable 	$process_agent 	${process}
 
 Open Manager GUI
 	# [Arguments]		${options}
 	Set Confidence		0.9
-	${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
+	${process}= 	Start Process 	python3 	${pyfile_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
 	Set Test Variable 	$process_manager 	${process}
 	Sleep 	10
 	Set Screenshot Folder 	${OUTPUT DIR}
