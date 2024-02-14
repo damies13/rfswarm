@@ -9,7 +9,7 @@ Issue #171
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}..${/}..${/}Demo${/}demo.rfs
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-s 	${scenariofile} 	-n
-	Run Manager CLI 	@{mngr_options}
+	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 	Stop Agent
 	Show Log 	stdout_manager.txt
