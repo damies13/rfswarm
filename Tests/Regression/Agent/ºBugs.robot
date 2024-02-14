@@ -5,7 +5,7 @@ Resource 	ºCommon.robot
 Issue #171
 	[Tags]	ubuntu-latest		windows-latest		macos-latest
 	@{agnt_options}= 	Create List 	-g 	1
-	Run Agent 	@{agnt_options}
+	Run Agent 	${agnt_options}
 	Log to console 	${CURDIR}
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}..${/}..${/}Demo${/}demo.rfs
 	Log to console 	${scenariofile}
