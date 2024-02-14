@@ -12,5 +12,5 @@ Issue #171
 	Sleep 	5
 	Take A Screenshot
 
-	Close Manager GUI
+	Close Manager GUI ${platform}
 	Stop Agent

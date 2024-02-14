@@ -15,7 +15,7 @@ ${process_agent}		None
 
 *** Keywords ***
 Set Platform
-[Arguments]		${ostag}
+	[Arguments]		${ostag}
 	IF 	${ostag} == macos-latest
 		Set Suite Variable    ${platform}    macos
 	END
@@ -40,6 +40,12 @@ Open Manager GUI
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
 
+Close Manager GUI ubuntu
+	Close Manager GUI
+
+Close Manager GUI windows
+	Close Manager GUI
+
 Close Manager GUI
 	[Tags]	windows-latest		ubuntu-latest
 	Press Combination 	Key.esc
@@ -54,7 +60,7 @@ Close Manager GUI
 		Fail
 	END
 
-Close Manager GUI
+Close Manager GUI macos
 	[Tags]	macos-latest
 	# Press Combination 	Key.esc
 	# Press Combination 	q 	Key.command
