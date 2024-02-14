@@ -20,12 +20,18 @@ Show Log
 	Log to console 	-----${filename}-----${\n}
 
 Run Agent
-	[Arguments]		${options}=[]
+	[Arguments]		${options}=None
+	IF  ${options} == None
+		${options}= 	Create List
+	END
 	${process}= 	Start Process 	python3 	${pyfile_agent}  ${options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
 	Set Test Variable 	$process_agent 	${process}
 
 Run Manager CLI
-	[Arguments]		@{options}=[]
+	[Arguments]		${options}=None
+	IF  ${options} == None
+		${options}= 	Create List
+	END
 	${process}= 	Start Process 	python3 	${pyfile_manager}  ${options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
 	Set Test Variable 	$process_manager 	${process}
 

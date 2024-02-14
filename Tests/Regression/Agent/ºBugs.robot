@@ -5,7 +5,10 @@ Resource 	ºCommon.robot
 Issue #171
 	[Tags]	ubuntu-latest		windows-latest		macos-latest
 	Run Agent
-	@{mngr_options}= 	Create List 	-s 	b 	-n
+	Log to console 	${CURDIR}
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}..${/}..${/}Demo${/}demo.rfs
+	Log to console 	${scenariofile}
+	@{mngr_options}= 	Create List 	-s 	${scenariofile} 	-n
 	Run Manager CLI 	@{mngr_options}
 	Wait For Manager
 	Stop Agent
