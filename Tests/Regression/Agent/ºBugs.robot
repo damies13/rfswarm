@@ -17,5 +17,5 @@ Issue #171
 	Show Log 	stdout_agent.txt
 	Show Log 	stderr_agent.txt
 
-	List Directory 	${results_dir}
+	Find Result DB
 	Stop Agent

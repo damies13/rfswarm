@@ -53,3 +53,9 @@ Stop Agent
 	${result}= 	Terminate Process		${process_agent}
 	# Should Be Equal As Integers 	${result.rc} 	0
 	Log to console 	${result.rc}
+
+Find Result DB
+	${fols}= 	List Directory 	${results_dir}
+	Log to console 	${fols}
+	${fols}= 	List Directory 	${results_dir} 	*_* 	absolute=True
+	Log to console 	${fols}
