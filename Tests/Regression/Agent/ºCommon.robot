@@ -42,7 +42,8 @@ Run Manager CLI
 	Set Test Variable 	$process_manager 	${process}
 
 Wait For Manager
-	${result}= 	Wait For Process		${process_manager}
+	[Arguments]		${timeout}=10min
+	${result}= 	Wait For Process		${process_manager} 	timeout=${timeout} 	on_timeout=kill
 	# Should Be Equal As Integers 	${result.rc} 	0
 	Log to console 	${result.rc}
 
