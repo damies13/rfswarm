@@ -59,3 +59,8 @@ Find Result DB
 	Log to console 	${fols}
 	${fols}= 	List Directory 	${results_dir} 	*_* 	absolute=True
 	Log to console 	${fols}
+	${files}= 	List Directory 	${fols[0]}
+	Log to console 	${files}
+	${file}= 	List Directory 	${fols[0]} 	*.db 	absolute=True
+	Log to console 	${file[0]}
+	Return 	${file[0]}
