@@ -65,16 +65,16 @@ Find Result DB
 	Log to console 	${files}
 	${file}= 	List Directory 	${fols[0]} 	*.db 	absolute=True
 	Log to console 	${file[0]}
-	[Return] 	${file[0]}
+	RETURN 	${file[0]}
 
 Query Result DB
 	[Arguments]		${dbfile} 	${sql}
-	Connect To Database 	sqlite3 	${dbfile}
+	Connect To Database Using Custom Params 	sqlite3 	database="${dbfile}", isolation_level=None
 	Log to console 	\${sql}: ${sql}
 	${result}= 	Query 	${sql}
 	Log to console 	\${result}: ${result}
 	Disconnect From Database
-	[Return] 	${result}
+	RETURN 	${result}
 
 
 #
