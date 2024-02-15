@@ -1,6 +1,8 @@
 *** Settings ***
 Library 	OperatingSystem
 Library 	Process
+Library 	DatabaseLibrary
+
 
 *** Variables ***
 
@@ -58,9 +60,21 @@ Find Result DB
 	${fols}= 	List Directory 	${results_dir}
 	Log to console 	${fols}
 	${fols}= 	List Directory 	${results_dir} 	*_* 	absolute=True
-	Log to console 	${fols}
+	# Log to console 	${fols}
 	${files}= 	List Directory 	${fols[0]}
 	Log to console 	${files}
 	${file}= 	List Directory 	${fols[0]} 	*.db 	absolute=True
 	Log to console 	${file[0]}
-	Return 	${file[0]}
+	[Return] 	${file[0]}
+
+Query Result DB
+	[Arguments]		${dbfile} 	${sql}
+	Connect To Database 	sqlite3 	${dbfile}
+	Log to console 	\${sql}: ${sql}
+	${result}= 	Query 	${sql}
+	Log to console 	\${result}: ${result}
+	Disconnect From Database
+	[Return] 	${result}
+
+
+#

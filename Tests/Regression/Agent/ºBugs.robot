@@ -7,7 +7,8 @@ Issue #171
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	http://localhost:8138
 	Run Agent 	${agnt_options}
 	Log to console 	${CURDIR}
-	${scenariofile}= 	Normalize Path 	${CURDIR}${/}..${/}..${/}Demo${/}demo.rfs
+	# ${scenariofile}= 	Normalize Path 	${CURDIR}${/}..${/}..${/}Demo${/}demo.rfs
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#171${/}Issue171.rfs
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
 	Run Manager CLI 	${mngr_options}
@@ -18,4 +19,10 @@ Issue #171
 	Show Log 	stderr_agent.txt
 
 	${dbfile}= 	Find Result DB
+	# Query Result DB 	${dbfile} 	Select * from Results
+	${result}= 	Query Result DB 	${dbfile} 	Select * from ResultSummary;
+	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from ResultSummary;
+	Should Be True	${result} > 0
+
 	Stop Agent
