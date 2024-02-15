@@ -70,10 +70,8 @@ Find Result DB
 Query Result DB
 	[Arguments]		${dbfile} 	${sql}
 	Log to console 	\${dbfile}: ${dbfile}
-	${dbfile2}= 	Replace String 	${dbfile} 	\\ 	/
-	Log to console 	\${dbfile2}: ${dbfile2}
 	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
-	Log to console 	\${dbfile}: ${dbfile}
+	# Log to console 	\${dbfile}: ${dbfile}
 	Connect To Database Using Custom Params 	sqlite3 	database="${dbfile}", isolation_level=None
 	Log to console 	\${sql}: ${sql}
 	${result}= 	Query 	${sql}

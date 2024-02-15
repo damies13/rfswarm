@@ -17,6 +17,7 @@ Issue #171
 	# manager_macos_button_runsettings
 	Click Button 	runsettings
 	Take A Screenshot
+	Click Button 	Cancel
 
 	Run Keyword 	Close Manager GUI ${platform}
 	Stop Agent
