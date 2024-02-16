@@ -28,27 +28,25 @@ jobs:
       fail-fast: false
     runs-on: ${{ matrix.platform }}
     steps:
+      - name: (MacOS, <3.11) Fix Python's tkinter Issue-649 (https://github.com/actions/setup-python/issues/649)
+        shell: bash
+        if: ${{ startswith(matrix.os, 'macos-') && contains('3.7;3.8;3.9;3.10', matrix.python-version) }}
+        run: |
+          brew install tcl-tk pyenv openssl readline sqlite3 xz zlib
+          env \
+            PATH="$(brew --prefix tcl-tk)/bin:$PATH" \
+            LDFLAGS="-L$(brew --prefix tcl-tk)/lib" \
+            CPPFLAGS="-I$(brew --prefix tcl-tk)/include" \
+            PKG_CONFIG_PATH="$(brew --prefix tcl-tk)/lib/pkgconfig" \
+            CFLAGS="-I$(brew --prefix tcl-tk)/include" \
+            PYTHON_CONFIGURE_OPTS="--with-tcltk-includes='-I$(brew --prefix tcl-tk)/include' --with-tcltk-libs='-L$(brew --prefix tcl-tk)/lib -ltcl8.6 -ltk8.6'" \
+            pyenv install ${{matrix.python-version}}
+          pyenv global ${{matrix.python-version}}
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Python with tkinter
-        if: ${{ startswith(matrix.os, 'macos-') && contains('3.7;3.8;3.9;3.10', matrix.python-version) }}
-          # - name: (MacOS, <3.11) Fix Python's tkinter Issue-649 (https://github.com/actions/setup-python/issues/649)
-          - shell: bash
-            run: |
-              brew install tcl-tk pyenv openssl readline sqlite3 xz zlib
-              env \
-                PATH="$(brew --prefix tcl-tk)/bin:$PATH" \
-                LDFLAGS="-L$(brew --prefix tcl-tk)/lib" \
-                CPPFLAGS="-I$(brew --prefix tcl-tk)/include" \
-                PKG_CONFIG_PATH="$(brew --prefix tcl-tk)/lib/pkgconfig" \
-                CFLAGS="-I$(brew --prefix tcl-tk)/include" \
-                PYTHON_CONFIGURE_OPTS="--with-tcltk-includes='-I$(brew --prefix tcl-tk)/include' --with-tcltk-libs='-L$(brew --prefix tcl-tk)/lib -ltcl8.6 -ltk8.6'" \
-                pyenv install ${{matrix.python-version}}
-              pyenv global ${{matrix.python-version}}
-        else:
-          - uses: actions/setup-python@v4
-            with:
-              python-version: ${{ matrix.python }}
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
       - name: "Apt Update"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
