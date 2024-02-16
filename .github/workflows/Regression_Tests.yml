@@ -30,7 +30,7 @@ jobs:
     steps:
       - name: (MacOS, <3.11) Fix Python's tkinter Issue-649 (https://github.com/actions/setup-python/issues/649)
         shell: bash
-        if: ${{ startswith(matrix.os, 'macos-') && contains('3.7;3.8;3.9;3.10', matrix.python-version) }}
+        if: ${{ startswith(matrix.os, 'macos-') && contains('3.7;3.8;3.9;3.10', matrix.python) }}
         run: |
           brew install tcl-tk pyenv openssl readline sqlite3 xz zlib
           env \
@@ -43,7 +43,7 @@ jobs:
             pyenv install ${{matrix.python-version}}
           pyenv global ${{matrix.python-version}}
       - name: setup-python
-        if: ${{ !startswith(matrix.os, 'macos-') || contains('3.11', matrix.python-version) }}
+        if: ${{ !startswith(matrix.os, 'macos-') || contains('3.11', matrix.python) }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
