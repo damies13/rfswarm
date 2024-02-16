@@ -42,11 +42,13 @@ jobs:
             PYTHON_CONFIGURE_OPTS="--with-tcltk-includes='-I$(brew --prefix tcl-tk)/include' --with-tcltk-libs='-L$(brew --prefix tcl-tk)/lib -ltcl8.6 -ltk8.6'" \
             pyenv install ${{matrix.python-version}}
           pyenv global ${{matrix.python-version}}
-      - name: Checkout
-        uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: setup-python
+        if: ${{ !startswith(matrix.os, 'macos-') || contains('3.11', matrix.python-version) }}
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: "Apt Update"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
