@@ -28,9 +28,16 @@ jobs:
       fail-fast: false
     runs-on: ${{ matrix.platform }}
     steps:
+      - name: "Echo Vars"
+        run: |
+          echo matrix.os: ${{ matrix.os }}
+          echo matrix.platform: ${{ matrix.platform }}
+          echo matrix.python: ${{ matrix.python }}
+          echo matrix.python-version: ${{ matrix.python-version }}
+
       - name: (MacOS, <3.11) Fix Python's tkinter Issue-649 (https://github.com/actions/setup-python/issues/649)
         shell: bash
-        if: ${{ startswith(matrix.os, 'macos-') && contains('3.7;3.8;3.9;3.10', matrix.python) }}
+        if: ${{ startswith(matrix.platform, 'macos-') && contains('3.7;3.8;3.9;3.10', matrix.python) }}
         run: |
           brew install tcl-tk pyenv openssl readline sqlite3 xz zlib
           env \
@@ -43,7 +50,7 @@ jobs:
             pyenv install ${{matrix.python-version}}
           pyenv global ${{matrix.python-version}}
       - name: setup-python
-        if: ${{ !startswith(matrix.os, 'macos-') || contains('3.11', matrix.python) }}
+        if: ${{ !startswith(matrix.platform, 'macos-') || contains('3.11', matrix.python) }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
@@ -142,11 +149,11 @@ jobs:
       fail-fast: false
     runs-on: ${{ matrix.platform }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: "Apt Update"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
