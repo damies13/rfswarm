@@ -34,7 +34,6 @@ jobs:
           echo matrix.platform: ${{ matrix.platform }}
           echo matrix.python: ${{ matrix.python }}
           echo matrix.python-version: ${{ matrix.python-version }}
-
       - name: (MacOS, <3.11) Fix Python's tkinter Issue-649 (https://github.com/actions/setup-python/issues/649)
         shell: bash
         if: ${{ startswith(matrix.platform, 'macos-') && contains('3.7;3.8;3.9;3.10', matrix.python) }}
@@ -47,8 +46,8 @@ jobs:
             PKG_CONFIG_PATH="$(brew --prefix tcl-tk)/lib/pkgconfig" \
             CFLAGS="-I$(brew --prefix tcl-tk)/include" \
             PYTHON_CONFIGURE_OPTS="--with-tcltk-includes='-I$(brew --prefix tcl-tk)/include' --with-tcltk-libs='-L$(brew --prefix tcl-tk)/lib -ltcl8.6 -ltk8.6'" \
-            pyenv install ${{matrix.python-version}}
-          pyenv global ${{matrix.python-version}}
+            pyenv install ${{matrix.python}}
+          pyenv global ${{matrix.python}}
       - name: setup-python
         if: ${{ !startswith(matrix.platform, 'macos-') || contains('3.11', matrix.python) }}
         uses: actions/setup-python@v4
