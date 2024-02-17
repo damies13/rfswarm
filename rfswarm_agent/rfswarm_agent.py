@@ -837,6 +837,12 @@ class RFSwarmAgent():
 			# excludelibraries = ",".join(ellst)
 			excludelibraries = self.jobs[jobid]['excludelibraries']
 
+		self.debugmsg(6, "excludelibraries:", excludelibraries)
+		excludelibrarielst = excludelibraries.split(",")
+		excludelibrarielst = map(str.strip, excludelibrarielst)
+		excludelibraries = ",".join(excludelibrarielst)
+		self.debugmsg(6, "excludelibraries:", excludelibraries)
+
 		# self.run_name
 		# scriptdir = None
 		# logdir = None
