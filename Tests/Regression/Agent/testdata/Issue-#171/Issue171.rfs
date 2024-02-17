@@ -1,0 +1,16 @@
+[Scenario]
+uploadmode = err
+scriptcount = 1
+graphlist = 
+
+[Script Defaults]
+excludelibraries = BuiltIn,String, OperatingSystem,perftest
+
+[1]
+robots = 10
+delay = 0
+rampup = 15
+run = 30
+test = RFSwarm Demo Test
+script = rfswarm_demo.robot
+

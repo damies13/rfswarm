@@ -5,16 +5,60 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="-1">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta content="Robot Framework 6.0.2 (Python 3.8.16 on linux)" name="Generator">
+<meta content="Robot Framework 7.0 (Python 3.8.18 on linux)" name="Generator">
 <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKcAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAAqAAAAAAAAAAAAAAAAAAAALIAAAD/AAAA4AAAANwAAADcAAAA3AAAANwAAADcAAAA3AAAANwAAADcAAAA4AAAAP8AAACxAAAAAAAAAKYAAAD/AAAAuwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC/AAAA/wAAAKkAAAD6AAAAzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN8AAAD/AAAA+gAAAMMAAAAAAAAAAgAAAGsAAABrAAAAawAAAGsAAABrAAAAawAAAGsAAABrAAAADAAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAAIsAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAANEAAAAAAAAA2gAAAP8AAAD6AAAAwwAAAAAAAAAAAAAAMgAAADIAAAAyAAAAMgAAADIAAAAyAAAAMgAAADIAAAAFAAAAAAAAANoAAAD/AAAA+gAAAMMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAADwAAAB8AAAAAAAAAGAAAABcAAAAAAAAAH8AAABKAAAAAAAAAAAAAAAAAAAA2gAAAP8AAAD6AAAAwwAAAAAAAADCAAAA/wAAACkAAADqAAAA4QAAAAAAAAD7AAAA/wAAALAAAAAGAAAAAAAAANoAAAD/AAAA+gAAAMMAAAAAAAAAIwAAAP4AAAD/AAAA/wAAAGAAAAAAAAAAAAAAAMkAAAD/AAAAigAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAAAAAAAAIAAAAcAAAABkAAAAAAAAAAAAAAAAAAAAAAAAAEgAAAAAAAAAAAAAA2gAAAP8AAAD7AAAAywAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN4AAAD/AAAAqwAAAP8AAACvAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALIAAAD/AAAAsgAAAAAAAAC5AAAA/wAAAMoAAADAAAAAwAAAAMAAAADAAAAAwAAAAMAAAADAAAAAwAAAAMkAAAD/AAAAvAAAAAAAAAAAAAAAAAAAAKwAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAArQAAAAAAAAAAwAMAAIABAAAf+AAAP/wAAD/8AAAgBAAAP/wAAD/8AAA//AAAJIwAADHEAAA//AAAP/wAAB/4AACAAQAAwAMAAA==">
-<style media="all" type="text/css">
+<style media="all">
+:root {
+    --text-color: black;
+    --background-color: white;
+    --primary-color: #ddd;
+    --secondary-color: #ccc;
+    --link-color: #15c;
+    --link-hover-color: #61c;
+    --highlight-color: #eee;
+    --target-color: #f9f9f9;
+    --pass-color: #97bd61;
+    --fail-color: #ce3e01;
+    --warn-color: #fed84f;
+    --pass-link-color: #098a09;
+    --warn-link-color: #927201;
+    --fail-link-color: #ce3e01;
+    --ascending-icon: url(data:image/gif;base64,R0lGODlhCwAJAKEAAAAAAH9/fwAAAAAAACH5BAEAAAIALAAAAAALAAkAAAIUlBWnFr3cnIr0WQOyBmvzp13CpxQAOw==);
+    --descending-icon: url(data:image/gif;base64,R0lGODlhCwAJAKEAAAAAAH9/fwAAAAAAACH5BAEAAAIALAAAAAALAAkAAAIUlAWnBr3cnIr0WROyDmvzp13CpxQAOw==);
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+    }
+}
+[data-theme="dark"] {
+    --text-color: #e2e1d7;
+    --background-color: #1c2227;
+    --primary-color: #26373b;
+    --secondary-color: #424f5a;
+    --link-color: #8cc4ff;
+    --link-hover-color: #bb86fc;
+    --highlight-color: #002b36;
+    --target-color: #1a252e;
+    --pass-link-color: #97bd61;
+    --warn-link-color: #fed84f;
+    --fail-link-color: #ff9b8f;
+    --ascending-icon: url(data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAJAgMAAACZCj6+AAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAlQTFRFAAAAfn5+////f/cqYgAAAAN0Uk5TAP//RFDWIQAAACdJREFUeJxjYHBgYGAMYGBgDWFgEA1lAAOtVQwMXCsYGJgWADkNDAA78QP9oKr7vwAAAABJRU5ErkJggg==);
+    --descending-icon: url(data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAJAgMAAACZCj6+AAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAlQTFRFAAAA////fn5+K6jOaAAAAAN0Uk5TAP//RFDWIQAAACdJREFUeJxjYHBgYGAMYGBgDWFgEA1lAAOtVQwMXCsYGJgWADkNDAA78QP9oKr7vwAAAABJRU5ErkJggg==);
+}
 /* Generic and misc styles */
 body {
     font-family: Helvetica, sans-serif;
     font-size: 0.8em;
-    color: black;
+    color: black; /* Fallback value */
+    color: var(--text-color);
     padding: 6px;
-    background: white;
+    background: white; /* Fallback value */
+    background: var(--background-color);
+    margin-left: 15px;
+}
+body[theme-toggled] {
+    transition: background 0.3s, background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 table {
     table-layout: fixed;
@@ -29,20 +73,37 @@ br {
     mso-data-placement: same-cell; /* maintain line breaks in Excel */
 }
 hr {
-    background: #ccc;
+    background: #ccc; /* Fallback value */
+    background: var(--secondary-color);
     height: 1px;
     border: 0;
 }
 a, a:link, a:visited {
     text-decoration: none;
-    color: #15c;
+    color: #15c; /* Fallback value */
+    color: var(--link-color);
 }
 a > img {
-    border: 1px solid #15c !important;
+    border-width: 1px !important;
+    border-style: solid !important;
+    border-color: #15c !important; /* Fallback value */
+    border-color: var(--link-color) !important;
 }
 a:hover, a:active {
     text-decoration: underline;
-    color: #61c;
+    color: #61c; /* Fallback value */
+    color: var(--link-hover-color);
+}
+select {
+    background-color: white; /* Fallback value */
+    background-color: var(--background-color);
+    color: black; /* Fallback value */
+    color: var(--text-color);
+    border-width: 2px;
+    border-style: solid;
+    border-color: #ccc; /* Fallback value */
+    border-color: var(--secondary-color);
+    border-radius: 4px;
 }
 .parent-name {
     font-size: 0.7em;
@@ -55,7 +116,7 @@ a:hover, a:active {
 #header {
     width: 65em;
     height: 3em;
-    margin: 6px 0;
+    margin: 20px 0 6px 0;
 }
 h1 {
     float: left;
@@ -83,14 +144,17 @@ h2 {
 }
 /* Status text colors -- !important allows using them in links */
 .fail {
-    color: #ce3e01 !important;
+    color: #ce3e01 !important; /* Fallback value */
+    color: var(--fail-link-color) !important;
     font-weight: bold;
 }
 .pass {
-    color: #098a09 !important;
+    color: #098a09 !important; /* Fallback value */
+    color: var(--pass-link-color) !important;
 }
 .skip {
-    color: #927201 !important;
+    color: #927201 !important; /* Fallback value */
+    color: var(--warn-link-color) !important;
     font-weight: bold;
 }
 .label {
@@ -98,8 +162,10 @@ h2 {
     font-size: 0.75em;
     letter-spacing: 1px;
     white-space: nowrap;
-    color: black;
-    background-color: #ddd;
+    color: black; /* Fallback value */
+    color: var(--text-color);
+    background-color: #ddd; /* Fallback value */
+    background-color: var(--primary-color);
     border-radius: 3px;
 }
 .label.debug, .label.trace, .label.error, .label.keyword {
@@ -109,15 +175,18 @@ h2 {
     font-weight: bold;
 }
 .label.pass {
-    background-color: #97bd61;
+    background-color: #97bd61; /* Fallback value */
+    background-color: var(--pass-color);
     color: #000 !important;
 }
 .label.fail, .label.error {
-    background-color: #ce3e01;
+    background-color: #ce3e01; /* Fallback value */
+    background-color: var(--fail-color);
     color: #fff !important;
 }
 .label.skip, .label.warn {
-    background-color: #fed84f;
+    background-color: #fed84f; /* Fallback value */
+    background-color: var(--warn-color);
     color: #000 !important;
 }
 /* Top right header */
@@ -146,7 +215,8 @@ h2 {
     padding: 0.3em 0;
     font-size: 0.9em;
     border-bottom-left-radius: 4px;
-    background: #ddd;
+    background: #ddd; /* Fallback value */
+    background: var(--primary-color);
 }
 /* Statistics table */
 .statistics {
@@ -156,15 +226,20 @@ h2 {
     margin-bottom: 1em;
 }
 .statistics tr:hover {
-    background: #f4f4f4;
+    background: #eee; /* Fallback value */
+    background: var(--highlight-color);
     cursor: pointer;
 }
 .statistics th, .statistics td {
-    border: 1px solid #ccc;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #ccc; /* Fallback value */
+    border-color: var(--secondary-color);
     padding: 0.1em 0.3em;
 }
 .statistics th {
-    background-color: #ddd;
+    background-color: #ddd; /* Fallback value */
+    background-color: var(--primary-color);
     padding: 0.2em 0.3em;
 }
 .statistics td {
@@ -200,27 +275,33 @@ th.stats-col-graph:hover {
 }
 /* Statistics graph */
 .graph, .empty-graph {
-    border: 1px solid #ccc;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #ccc; /* Fallback value */
+    border-color: var(--secondary-color);
     width: auto;
     height: 7px;
     padding: 0;
-    background: #aaa;
 }
 .empty-graph {
-    background: #eee;
+    background: #eee; /* Fallback value */
+    background: var(--highlight-color);
 }
 .pass-bar, .fail-bar, .skip-bar {
     float: left;
     height: 100%;
 }
 .fail-bar {
-    background: #ce3e01;
+    background: #ce3e01; /* Fallback value */
+    background: var(--fail-color);
 }
 .pass-bar {
-    background: #97bd61;
+    background: #97bd61; /* Fallback value */
+    background: var(--pass-color);
 }
 .skip-bar {
-    background: #fed84f;
+    background: #fed84f; /* Fallback value */
+    background: var(--warn-color);
 }
 /* Tablesorter - adapted from provided Blue Skin */
 .tablesorter-header {
@@ -230,30 +311,84 @@ th.stats-col-graph:hover {
     cursor: pointer;
 }
 .tablesorter-header:hover {
-    background-color: #ccc;
+    background-color: #ccc; /* Fallback value */
+    background-color: var(--secondary-color);
 }
 .tablesorter-headerAsc {
-    background-image: url(data:image/gif;base64,R0lGODlhCwAJAKEAAAAAAH9/fwAAAAAAACH5BAEAAAIALAAAAAALAAkAAAIUlBWnFr3cnIr0WQOyBmvzp13CpxQAOw==);
-    background-color: #ccc !important;
+    background-image: url(data:image/gif;base64,R0lGODlhCwAJAKEAAAAAAH9/fwAAAAAAACH5BAEAAAIALAAAAAALAAkAAAIUlBWnFr3cnIr0WQOyBmvzp13CpxQAOw==); /* Fallback value */
+    background-image: var(--ascending-icon);
+    background-color: #ccc !important; /* Fallback value */
+    background-color: var(--secondary-color) !important;
 }
 .tablesorter-headerDesc {
-    background-image: url(data:image/gif;base64,R0lGODlhCwAJAKEAAAAAAH9/fwAAAAAAACH5BAEAAAIALAAAAAALAAkAAAIUlAWnBr3cnIr0WROyDmvzp13CpxQAOw==);
-    background-color: #ccc !important;
+    background-image: url(data:image/gif;base64,R0lGODlhCwAJAKEAAAAAAH9/fwAAAAAAACH5BAEAAAIALAAAAAALAAkAAAIUlAWnBr3cnIr0WROyDmvzp13CpxQAOw==); /* Fallback value */
+    background-image: var(--descending-icon);
+    background-color: #ccc !important; /* Fallback value */
+    background-color: var(--secondary-color) !important;
 }
 .sorter-false {
     background-image: none;
     cursor: default;
 }
 .sorter-false:hover {
-    background-color: #ddd;
+    background-color: #ddd; /* Fallback value */
+    background-color: var(--primary-color);
+}
+#theme-toggle {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    width: 28px;
+    height: 28px;
+    border: none;
+    padding: 4px;
+    z-index: 1000;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    background: var(--highlight-color);
+}
+[data-theme="dark"] .dark-mode-icon,
+[data-theme="light"] .light-mode-icon {
+    display: none;
+}
+[data-theme="dark"] .light-mode-icon,
+[data-theme="light"] .dark-mode-icon {
+    display: block;
+}
+@keyframes highlight {
+    0% {
+        background: var(--primary-color)
+    }
+    100% {
+        background: var(--target-color);
+    }
+}
+:target {
+    background: var(--target-color);
+    transition: background 0.3s;
+    animation: highlight 4s;
 }
 </style>
-<style media="all" type="text/css">
+<style media="all">
 /* Icons are from Open Iconic <https://useiconic.com/open/>.
    Licensed under the MIT License. */
+:root {
+    --icon-filter: invert(0);
+    --icon-highlight: var(--secondary-color);
+    --elapsed-color: #666;
+}
+/* @media (prefers-color-scheme: dark) { */
+[data-theme="dark"] {
+    --icon-filter: invert(1);
+    --icon-highlight: #a39990;
+    --elapsed-color: #999;
+}
 /* Containers */
 .suite, .test, #errors {
-    border: 1px solid #ccc;
+    border-color: #ccc; /* Fallback value */
+    border-color: var(--secondary-color);
+    border-width: 1px;
+    border-style: solid;
     padding: 0.3em 0.2em;
     margin: 0.2em 0;
 }
@@ -282,8 +417,10 @@ th.stats-col-graph:hover {
 }
 .element-header:hover {
     cursor: pointer;
-    background-color: #eee;
-    border-color: #ccc;
+    background-color: #eee; /* Fallback value */
+    background-color: var(--highlight-color);
+    border-color: #ccc; /* Fallback value */
+    border-color: var(--secondary-color);
 }
 .element-header-toggle {
     position: absolute;
@@ -293,10 +430,14 @@ th.stats-col-graph:hover {
     background-position: center;
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAQAAABKxSfDAAAAAmJLR0QA/4ePzL8AAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfeCR0JChSkZz20AAAAGklEQVQI12NgQAKMDKzInP8IDhOqMk4G7AAANQwBE427PYUAAAAASUVORK5CYII=);
     background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIHZpZXdCb3g9IjAgMCA4IDgiPgogIDxwYXRoIGQ9Ik0wIDB2Mmg4di0yaC04eiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAzKSIgLz4KPC9zdmc+), none;
+    filter: var(--icon-filter);
     height: 10px;
     width: 10px;
     background-size: 6px 6px;
-    border: 1px solid #ccc;
+    border-color: #ccc; /* Fallback value */
+    border-color: var(--icon-highlight);
+    border-width: 1px;
+    border-style: solid;
     border-radius: 2px;
 }
 .closed > .element-header-toggle {
@@ -304,7 +445,8 @@ th.stats-col-graph:hover {
     background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIHZpZXdCb3g9IjAgMCA4IDgiPgogIDxwYXRoIGQ9Ik0zIDB2M2gtM3YyaDN2M2gydi0zaDN2LTJoLTN2LTNoLTJ6IiAvPgo8L3N2Zz4=), none;
 }
 .element-header:hover > .element-header-toggle {
-    background-color: #ccc;
+    background-color: #ccc; /* Fallback value */
+    background-color: var(--icon-highlight);
 }
 .element-header-right:hover ~ .element-header-toggle {
     background-color: transparent;
@@ -324,23 +466,31 @@ th.stats-col-graph:hover {
 }
 .name {
     font-weight: bold;
+    white-space: pre-wrap;
+}
+.arg, .assign {
+    white-space: pre-wrap;
 }
 .elapsed {
     float: right;
-    color: #666;
+    color: #666; /* Fallback value */
+    color: var(--elapsed-color);
     padding-left: 1em;
 }
 .link {
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAHlJREFUGJVtzrEJwmAQBtCn6ASuIKTIBhY2gmghBiJYB1udwk10B8FJbKMBcQFbtbkfJHrVwfu+4/idJR64Y9H7E3higj5O3S8Y44ApLnjhnXCNGhV2yNGggDJwiC02gavUbpDFvscRo4QdXOMKDHBufz3HLYKzNn4AbSkV3fncGQYAAAAASUVORK5CYII=);
     background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIHZpZXdCb3g9IjAgMCA4IDgiPgogIDxwYXRoIGQ9Ik01Ljg4LjAzYy0uMTguMDEtLjM2LjAzLS41My4wOS0uMjcuMS0uNTMuMjUtLjc1LjQ3YS41LjUgMCAxIDAgLjY5LjY5Yy4xMS0uMTEuMjQtLjE3LjM4LS4yMi4zNS0uMTIuNzgtLjA3IDEuMDYuMjIuMzkuMzkuMzkgMS4wNCAwIDEuNDRsLTEuNSAxLjVjLS40NC40NC0uOC40OC0xLjA2LjQ3LS4yNi0uMDEtLjQxLS4xMy0uNDEtLjEzYS41LjUgMCAxIDAtLjUuODhzLjM0LjIyLjg0LjI1Yy41LjAzIDEuMi0uMTYgMS44MS0uNzhsMS41LTEuNWMuNzgtLjc4Ljc4LTIuMDQgMC0yLjgxLS4yOC0uMjgtLjYxLS40NS0uOTctLjUzLS4xOC0uMDQtLjM4LS4wNC0uNTYtLjAzem0tMiAyLjMxYy0uNS0uMDItMS4xOS4xNS0xLjc4Ljc1bC0xLjUgMS41Yy0uNzguNzgtLjc4IDIuMDQgMCAyLjgxLjU2LjU2IDEuMzYuNzIgMi4wNi40Ny4yNy0uMS41My0uMjUuNzUtLjQ3YS41LjUgMCAxIDAtLjY5LS42OWMtLjExLjExLS4yNC4xNy0uMzguMjItLjM1LjEyLS43OC4wNy0xLjA2LS4yMi0uMzktLjM5LS4zOS0xLjA0IDAtMS40NGwxLjUtMS41Yy40LS40Ljc1LS40NSAxLjAzLS40NC4yOC4wMS40Ny4wOS40Ny4wOWEuNS41IDAgMSAwIC40NC0uODhzLS4zNC0uMi0uODQtLjIyeiIKICAvPgo8L3N2Zz4=), none;
+    filter: var(--icon-filter);
 }
 .expand {
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAADtJREFUGJVjYCACKDAwMByA0ljFDjAwMPxnYGB4ABVQgLL/Q+VQBB6gseGmIivCkERXhFUSWRFOSawAAEl7E3uv1iMcAAAAAElFTkSuQmCC);
     background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIHZpZXdCb3g9IjAgMCA4IDgiPgogIDxwYXRoIGQ9Ik0xLjUgMGwtMS41IDEuNSA0IDQgNC00LTEuNS0xLjUtMi41IDIuNS0yLjUtMi41eiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCAxKSIgLz4KPC9zdmc+), none;
+    filter: var(--icon-filter);
 }
 .collapse {
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAC5JREFUGJVjYCARNEAxTsn/UIyhCFkSQxG6ThQ+C5IpjWhG1yNb4YDFTdjEMAEACi8Q++9Y9TAAAAAASUVORK5CYII=);
     background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIHZpZXdCb3g9IjAgMCA4IDgiPgogIDxwYXRoIGQ9Ik00IDBsLTQgNCAxLjUgMS41IDIuNS0yLjUgMi41IDIuNSAxLjUtMS41LTQtNHoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgMSkiIC8+Cjwvc3ZnPg==), none;
+    filter: var(--icon-filter);
 }
 .expand, .collapse, .link {
     float: left;
@@ -352,7 +502,10 @@ th.stats-col-graph:hover {
     background-size: 8px 8px;
     background-repeat: no-repeat;
     background-position: center;
-    border: 1px solid #ccc;
+    border-color: #ccc; /* Fallback value */
+    border-color: var(--icon-highlight);
+    border-width: 1px;
+    border-style: solid;
     border-radius: 2px;
 }
 .link {
@@ -362,7 +515,8 @@ th.stats-col-graph:hover {
     visibility: visible;
 }
 .expand:hover, .collapse:hover, .link:hover {
-    background-color: #ccc;
+    background-color: #ccc; /* Fallback value */
+    background-color: var(--icon-highlight);
 }
 /* Messages and errors */
 .messages .time, .messages .message {
@@ -403,11 +557,16 @@ th.stats-col-graph:hover {
 .message-row:hover .select-message div {
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAQAAAD8fJRsAAAAAmJLR0QA/4ePzL8AAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfeCR0MOzhWKZQOAAAASUlEQVQY032PsRHAIAwDX9BkicD+W8UMEqegAQJWKZ/+3sLZJhFGQEZzNaIa4ibh66En867VNaIeoP5WppNuIGoAlOm3g5VC1AdYeQv1BZPRSgAAAABJRU5ErkJggg==);
     background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIHZpZXdCb3g9IjAgMCA4IDgiPgogIDxwYXRoIGQ9Ik0wIDB2MWg4di0xaC04em0wIDJ2MWg2di0xaC02em0wIDJ2MWg4di0xaC04em0wIDJ2MWg2di0xaC02eiIgLz4KPC9zdmc+), none;
-    border: 1px solid #ccc;
+    filter: var(--icon-filter);
+    border-color: #ccc; /* Fallback value */
+    border-color: var(--icon-highlight);
+    border-width: 1px;
+    border-style: solid;
     border-radius: 2px;
 }
 .select-message:hover div {
-    background-color: #ccc;
+    background-color: #ccc; /* Fallback value */
+    background-color: var(--icon-highlight);
     cursor: pointer;
 }
 /* Message tables - these MUST NOT be combined together because otherwise
@@ -439,7 +598,7 @@ th.stats-col-graph:hover {
     cursor: default;
 }
 </style>
-<style media="print" type="text/css">
+<style media="print">
 body {
     background: white !important;
     padding: 0;
@@ -479,7 +638,7 @@ a:link, a:visited {
     background: #ddd !important;
 }
 </style>
-<style media="all" type="text/css">
+<style media="all">
 #javascript-disabled {
     width: 600px;
     margin: 100px auto 0 auto;
@@ -502,7 +661,7 @@ a:link, a:visited {
     font-style: italic;
 }
 </style>
-<style media="all" type="text/css">
+<style media="all">
 .doc > * {
     margin: 0.7em 1em 0.1em 1em;
     padding: 0;
@@ -514,14 +673,12 @@ a:link, a:visited {
     margin-top: 0.1em;
 }
 .doc table {
-    border: 1px solid #ccc;
     background: transparent;
     border-collapse: collapse;
     empty-cells: show;
     font-size: 0.9em;
 }
 .doc table th, .doc table td {
-    border: 1px solid #ccc;
     background: transparent;
     padding: 0.1em 0.3em;
     height: 1.2em;
@@ -531,24 +688,32 @@ a:link, a:visited {
     letter-spacing: 0.1em;
 }
 .doc pre {
+    border-radius: 2px;
     font-size: 1.1em;
     letter-spacing: 0.05em;
-    background: #f4f4f4;
+    background: #eee; /* Fallback value */
+    background: var(--highlight-color);
 }
 .doc code {
+    border-radius: 2px;
     padding: 0 0.2em;
     letter-spacing: 0.05em;
-    background: #eee;
+    background: #eee; /* Fallback value */
+    background: var(--highlight-color);
 }
 .doc li {
     list-style-position: inside;
     list-style-type: square;
 }
-.doc img {
-    border: 1px solid #ccc;
+.doc img, .doc table, .doc table th, .doc table td {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #ccc; /* Fallback value */
+    border-color: var(--secondary-color);
 }
 .doc hr {
-    background: #ccc;
+    background: #ccc; /* Fallback value */
+    background: var(--secondary-color);
     height: 1px;
     border: 0;
 }
@@ -560,6 +725,9 @@ function toggleSuite(suiteId) {
 }
 function toggleTest(testId) {
     toggleElement(testId, ['keyword']);
+    var test = window.testdata.findLoaded(testId);
+    if (test.status == "FAIL" || test.status == "SKIP")
+        expandFailed(test);
 }
 function toggleKeyword(kwId) {
     toggleElement(kwId, ['keyword']);
@@ -623,7 +791,7 @@ function loadAndExpandElementIds(ids) {
     }
 }
 function expandFailed(element) {
-    if (element.status == "FAIL") {
+    if (element.status == "FAIL" || (element.type == "test" && element.status == "SKIP")) {
         window.elementsToExpand = [element];
         window.expandDecider = function (e) {
             return e.status == "FAIL";
@@ -847,7 +1015,6 @@ window.model = (function () {
         suite.populateSuites = createIterablePopulator('Suite');
         suite.childrenNames = ['keyword', 'suite', 'test'];
         suite.callWhenChildrenReady = function (callable) { callable(); };
-        suite.message = data.message;
         suite.children = function () {
             return suite.keywords().concat(suite.tests()).concat(suite.suites());
         };
@@ -938,6 +1105,7 @@ window.model = (function () {
             name: data.name,
             doc: data.doc,
             status: data.status,
+            message: data.message,
             times: data.times,
             id: data.parent ? data.parent.id + '-' + data.id : data.id
         };
@@ -958,7 +1126,6 @@ window.model = (function () {
                 return test.keywords();
         };
         test.tags = data.tags;
-        test.message = data.message;
         test.matchesTagPattern = function (pattern) {
             return containsTagPattern(test.tags, pattern);
         };
@@ -969,13 +1136,12 @@ window.model = (function () {
     }
     function Keyword(data) {
         var kw = createModelObject(data);
-        var flatTypes = ['RETURN', 'BREAK', 'CONTINUE'];
         kw.libname = data.libname;
         kw.fullName = (kw.libname ? kw.libname + '.' : '') + kw.name;
         kw.type = data.type;
         kw.template = 'keywordTemplate';
         kw.arguments = data.args;
-        kw.assign = data.assign + (data.assign ? ' =' : '');
+        kw.assign = data.assign + (data.assign ? ' =  ' : '');
         kw.tags = data.tags;
         kw.timeout = data.timeout;
         kw.populateKeywords = createIterablePopulator('Keyword');
@@ -1354,8 +1520,9 @@ window.testdata = function () {
     var _statistics = null;
     var LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FAIL', 'SKIP'];
     var STATUSES = ['FAIL', 'PASS', 'SKIP', 'NOT RUN'];
-    var KEYWORD_TYPES = ['KEYWORD', 'SETUP', 'TEARDOWN', 'FOR', 'ITERATION', 'IF', 'ELSE IF', 'ELSE', 'RETURN',
-                         'TRY', 'EXCEPT', 'FINALLY', 'WHILE', 'CONTINUE', 'BREAK'];
+    var KEYWORD_TYPES = ['KEYWORD', 'SETUP', 'TEARDOWN', 'FOR', 'ITERATION', 'IF',
+                         'ELSE IF', 'ELSE', 'RETURN', 'VAR', 'TRY', 'EXCEPT', 'FINALLY',
+                         'WHILE', 'CONTINUE', 'BREAK', 'ERROR'];
     function addElement(elem) {
         if (!elem.id)
             elem.id = uniqueId();
@@ -1398,6 +1565,7 @@ window.testdata = function () {
         return createKeyword(parent, element, strings, index - messages.length);
     }
     function createKeyword(parent, element, strings, index) {
+        var status = element[8];
         var kw = model.Keyword({
             parent: parent,
             type: KEYWORD_TYPES[element[0]],
@@ -1413,7 +1581,12 @@ window.testdata = function () {
                 this.doc = function () { return doc; };
                 return doc;
             },
-            status: parseStatus(element[8], strings),
+            status: parseStatus(status),
+            message: function () {
+                var msg = status.length == 4 ? strings.get(status[3]) : '';
+                this.message = function () { return msg; };
+                return msg;
+            },
             times: model.Times(times(element[8])),
             isChildrenLoaded: typeof(element[9]) !== 'number'
         });
@@ -1624,6 +1797,20 @@ window.testdata = function () {
 }();
 </script>
 <script type="text/javascript">
+const lightModeIcon = `
+<svg class="light-mode-icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24"
+    viewBox="0 0 24 24" fill="var(--text-color)">
+    <rect fill="none" height="24" width="24" />
+    <path
+        d="M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0 c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2 c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1 C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06 c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41 l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41 c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36 c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z" />
+</svg>`
+const darkModeIcon = `
+<svg class="dark-mode-icon" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24"
+    viewBox="0 0 24 24" fill="var(--text-color)">
+    <rect fill="none" height="24" width="24" />
+    <path
+        d="M11.01,3.05C6.51,3.54,3,7.36,3,12c0,4.97,4.03,9,9,9c4.63,0,8.45-3.5,8.95-8c0.09-0.79-0.78-1.42-1.54-0.95 c-0.84,0.54-1.84,0.85-2.91,0.85c-2.98,0-5.4-2.42-5.4-5.4c0-1.06,0.31-2.06,0.84-2.89C12.39,3.94,11.9,2.98,11.01,3.05z" />
+</svg>`
 function removeJavaScriptDisabledWarning() {
     // Not using jQuery here for maximum speed
     document.getElementById('javascript-disabled').style.display = 'none';
@@ -1659,6 +1846,10 @@ function setTitle(suiteName, type) {
 function addHeader() {
     var generated = util.timestamp(window.output.generated);
     $.tmpl('<h1>${title}</h1>' +
+           '<button id=theme-toggle>' +
+             lightModeIcon +
+             darkModeIcon +
+           '</button>' +
            '<div id="generated">' +
              '<span>Generated<br>${generated}</span><br>' +
              '<span id="generated-ago">${ago} ago</span>' +
@@ -1670,6 +1861,7 @@ function addHeader() {
         ago: util.createGeneratedAgoString(generated),
         title: document.title
     }).appendTo($('#header'));
+    document.getElementById('theme-toggle')?.addEventListener('click', theme.onClick);
 }
 function addReportOrLogLink(myType) {
     var url;
@@ -1798,30 +1990,116 @@ function stopPropagation(event) {
     if (event.stopPropagation)
         event.stopPropagation();
 }
+const theme = function () {
+    const storageKey = 'theme-preference';
+    const urlParams = new URLSearchParams(window.location.search);
+    var storage;
+    var theme;
+    function init(givenStorage) {
+        storage = givenStorage;
+        theme = { value: getPreference() };
+        document.body.setAttribute('data-theme', theme.value);
+        reflectPreference();
+        window.matchMedia('(prefers-color-scheme: dark)')
+            .addEventListener('change', ({matches:isDark}) => {
+                theme.value = isDark ? 'dark' : 'light';
+                setPreference();
+            });
+        window.addEventListener('storage', ({key, newValue}) => {
+            if (key === storage.fullKey(storageKey)) {
+                theme.value = newValue === 'dark' ? 'dark' : 'light';
+                setPreference();
+            }
+        });
+    }
+    function getPreference() {
+        if (urlParams.has('theme')) {
+            var urlTheme = urlParams.get('theme') === 'dark' ? 'dark' : 'light';
+            storage.set(storageKey, urlTheme);
+            urlParams.delete('theme');
+            return urlTheme;
+        }
+        if (storage.get(storageKey))
+            return storage.get(storageKey) === 'dark' ? 'dark' : 'light';
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    function setPreference() {
+        storage.set(storageKey, theme.value);
+        reflectPreference();
+    }
+    function reflectPreference() {
+        document.body.setAttribute('data-theme', theme.value);
+        document.querySelector('#theme-toggle')?.setAttribute('aria-label', theme.value);
+        const event = new Event('theme-change', {value: theme.value});
+        document.dispatchEvent(event);
+    }
+    function onClick() {
+        theme.value = theme.value === 'light' ? 'dark' : 'light';
+        document.body.setAttribute('theme-toggled', "");
+        setPreference();
+    }
+    return {init: init, getPreference: getPreference, setPreference: setPreference,
+        reflectPreference: reflectPreference, onClick: onClick};
+}();
+</script>
+<script type="text/javascript">
+storage = function () {
+    var prefix = 'robot-framework-';
+    var storage;
+    function init(user) {
+        if (user)
+            prefix += user + '-';
+        storage = getStorage();
+    }
+    function getStorage() {
+        // Use localStorage if it's accessible, normal object otherwise.
+        // Inspired by https://stackoverflow.com/questions/11214404
+        try {
+            localStorage.setItem(prefix, prefix);
+            localStorage.removeItem(prefix);
+            return localStorage;
+        } catch (exception) {
+            return {};
+        }
+    }
+    function get(key, defaultValue) {
+        var value = storage[fullKey(key)];
+        if (typeof value === 'undefined')
+            return defaultValue;
+        return value;
+    }
+    function set(key, value) {
+        storage[fullKey(key)] = value;
+    }
+    function fullKey(key) {
+        return prefix + key;
+    }
+    return {init: init, get: get, set: set, fullKey: fullKey};
+}();
 </script>
 <script type="text/javascript">
 window.output = {};
 </script>
 <script type="text/javascript">
-window.output["suite"] = [1,2,3,0,[],[0,0,58687],[[4,5,6,0,[],[1,20,22059],[],[[7,0,8,[9,10,11],[1,31,19002],[[0,12,13,0,14,15,16,0,[1,32,0],[[32,2,17]]],[0,18,13,0,19,16,0,0,[1,32,19001],[[19033,2,20]]]]],[21,0,0,[9,10,11],[1,19034,2303],[[0,22,23,0,24,25,26,0,[1,19034,2301],[[19039,2,27],[21335,2,28]]],[0,29,13,0,30,31,0,0,[1,21335,1],[]],[0,32,13,0,33,34,0,0,[1,21336,1],[]],[0,32,13,0,33,35,0,0,[1,21337,0],[]]]],[36,0,0,[9,10,11],[1,21337,742],[[0,22,23,0,24,37,26,0,[1,21338,739],[[21340,2,38],[22077,2,39]]],[0,29,13,0,30,31,0,0,[1,22077,1],[]],[0,32,13,0,33,40,0,0,[1,22078,0],[]]]]],[[1,41,0,0,0,0,0,42,[1,29,2],[[0,29,13,0,30,43,0,0,[1,29,1],[]],[0,44,23,0,45,46,0,0,[1,30,0],[[30,2,47],[30,2,48]]],[0,44,23,0,45,49,0,0,[1,30,1],[[31,2,50],[31,2,51],[31,2,52],[31,2,53],[31,2,54]]]]]],[3,3,0,0]],[55,56,57,0,[],[0,22080,36606],[],[[58,0,0,[10],[1,22281,10144],[[0,59,13,0,60,61,0,0,[1,22281,1],[[22282,2,62]]],[0,63,64,0,65,66,0,0,[1,22283,0],[]],[0,67,68,0,69,70,71,0,[1,22283,5],[[22284,2,72],[22288,2,73]]],[0,74,13,0,75,76,0,0,[1,22288,1],[[22288,2,73]]],[0,18,13,0,19,77,0,0,[1,22289,10000],[[32289,2,78]]],[0,79,64,0,80,43,0,0,[1,32289,1],[]],[0,81,64,0,82,0,0,0,[1,32290,135],[[32290,2,83]]]]],[84,0,0,[9,10,11],[1,32426,6187],[[0,85,0,0,0,22,0,0,[1,32427,1185],[[0,86,87,0,88,89,90,0,[1,32427,1],[[32428,2,91]]],[0,92,13,0,93,94,95,0,[1,32428,0],[[32428,2,96]]],[0,97,13,0,98,2,0,0,[1,32428,0],[[32428,2,2]]],[0,97,13,0,98,99,0,0,[1,32428,1],[[32429,2,100]]],[0,101,64,0,102,103,0,0,[1,32429,285],[[32713,2,104]]],[0,105,64,0,106,95,107,0,[1,32714,281],[[32994,2,108],[32995,2,109]]],[0,110,64,0,111,95,0,0,[1,32995,385],[[33274,2,108],[33274,2,112]]],[0,18,13,0,19,113,0,0,[1,33380,101],[[33481,2,114]]],[0,81,64,0,82,0,0,0,[1,33481,130],[[33482,2,115]]]]],[0,18,13,0,19,116,0,0,[1,33612,5001],[[38613,2,117]]]]],[118,0,0,[9,10,11],[1,38614,6181],[[0,85,0,0,0,119,0,0,[1,38615,1178],[[0,86,87,0,88,89,90,0,[1,38615,1],[[38616,2,120]]],[0,92,13,0,93,94,95,0,[1,38616,0],[[38616,2,121]]],[0,97,13,0,98,2,0,0,[1,38616,0],[[38616,2,2]]],[0,97,13,0,98,99,0,0,[1,38617,0],[[38617,2,100]]],[0,101,64,0,102,103,0,0,[1,38617,280],[[38897,2,122]]],[0,105,64,0,106,95,107,0,[1,38897,283],[[39179,2,123],[39180,2,124]]],[0,110,64,0,111,95,0,0,[1,39180,383],[[39459,2,123],[39459,2,125]]],[0,18,13,0,19,113,0,0,[1,39563,102],[[39664,2,114]]],[0,81,64,0,82,0,0,0,[1,39665,127],[[39665,2,126]]]]],[0,18,13,0,19,116,0,0,[1,39793,5001],[[44794,2,117]]]]],[127,0,0,[9,10,11],[1,44795,6190],[[0,85,0,0,0,128,0,0,[1,44796,1188],[[0,86,87,0,88,89,90,0,[1,44797,0],[[44797,2,129]]],[0,92,13,0,93,94,95,0,[1,44797,0],[[44797,2,130]]],[0,97,13,0,98,2,0,0,[1,44797,1],[[44798,2,2]]],[0,97,13,0,98,99,0,0,[1,44798,0],[[44798,2,100]]],[0,101,64,0,102,103,0,0,[1,44798,282],[[45080,2,131]]],[0,105,64,0,106,95,107,0,[1,45080,283],[[45362,2,132],[45363,2,133]]],[0,110,64,0,111,95,0,0,[1,45363,387],[[45646,2,132],[45646,2,134]]],[0,18,13,0,19,113,0,0,[1,45750,101],[[45851,2,114]]],[0,81,64,0,82,0,0,0,[1,45851,132],[[45852,2,135]]]]],[0,18,13,0,19,116,0,0,[1,45984,5001],[[50985,2,117]]]]],[136,0,0,[9,10,11],[1,50986,6181],[[0,85,0,0,0,137,0,0,[1,50987,1178],[[0,86,87,0,88,89,90,0,[1,50987,0],[[50987,2,138]]],[0,92,13,0,93,94,95,0,[1,50987,1],[[50988,2,139]]],[0,97,13,0,98,2,0,0,[1,50988,1],[[50988,2,2]]],[0,97,13,0,98,99,0,0,[1,50989,0],[[50989,2,100]]],[0,101,64,0,102,103,0,0,[1,50989,280],[[51269,2,140]]],[0,105,64,0,106,95,107,0,[1,51270,281],[[51550,2,141],[51551,2,142]]],[0,110,64,0,111,95,0,0,[1,51551,384],[[51832,2,141],[51832,2,143]]],[0,18,13,0,19,113,0,0,[1,51936,101],[[52037,2,114]]],[0,81,64,0,82,0,0,0,[1,52037,128],[[52038,2,144]]]]],[0,18,13,0,19,116,0,0,[1,52166,5000],[[57166,2,117]]]]],[145,0,0,[10,11],[1,57167,1517],[[0,146,64,0,147,148,0,0,[1,57168,105],[]],[0,146,64,0,147,149,0,0,[1,57273,102],[]],[0,150,68,0,151,152,26,0,[1,57376,1305],[[57376,2,153],[58680,2,154],[58681,2,155]]],[0,156,68,0,157,71,158,0,[1,58681,0],[[58681,2,159]]],[5,160,0,0,0,0,0,0,[1,58682,1],[[0,161,13,0,162,163,0,0,[1,58682,1],[[58683,2,164]]]]],[7,0,0,0,0,0,0,0,[3,58683,0],[[0,81,64,0,82,0,0,0,[3,58683,0],[]],[0,165,68,0,166,71,26,0,[3,58683,0],[]],[0,167,13,0,168,0,0,0,[3,58683,0],[]]]]]],[169,0,170,[9,10,11],[0,58684,1,171],[[0,167,13,0,168,0,0,0,[0,58685,0],[[58685,5,171]]]]]],[],[7,6,1,0]]],[],[],[10,9,1,0]];
+window.output["suite"] = [1,2,3,0,[],[0,0,96445],[[4,5,6,0,[],[1,20,38113],[],[[7,0,8,[9,10,11],[1,31,36002],[[0,12,13,0,14,15,16,0,[1,31,0],[[32,2,17]]],[0,18,13,0,19,16,0,0,[1,32,36000],[[36032,2,20]]]]],[21,0,0,[9,10,11],[1,36033,1505],[[0,22,23,0,24,25,26,0,[1,36034,1503],[[36036,2,27],[37536,2,28]]],[0,29,13,0,30,31,0,0,[1,37536,0],[]],[0,32,13,0,33,34,0,0,[1,37537,0],[]],[0,32,13,0,33,35,0,0,[1,37537,0],[]]]],[36,0,0,[9,10,11],[1,37538,594],[[0,22,23,0,24,37,26,0,[1,37539,592],[[37541,2,38],[38130,2,39]]],[0,29,13,0,30,31,0,0,[1,38131,0],[]],[0,32,13,0,33,40,0,0,[1,38132,0],[]]]]],[[1,41,0,0,0,0,0,42,[1,28,3],[[0,29,13,0,30,43,0,0,[1,28,0],[]],[0,44,23,0,45,46,0,0,[1,29,1],[[29,2,47],[29,2,48],[29,2,49],[29,2,50],[29,2,51],[29,2,52]]],[0,44,23,0,45,53,0,0,[1,29,1],[[30,2,54],[30,2,55],[30,2,56],[30,2,57],[30,2,58],[30,2,59],[30,2,60],[31,2,61],[31,2,62],[31,2,63],[31,2,64],[31,2,65]]]]]],[3,3,0,0]],[66,67,68,0,[],[1,38133,35591],[],[[69,0,0,[10],[1,38342,10112],[[0,70,13,0,71,72,0,0,[1,38343,1],[[38343,2,73]]],[0,74,75,0,76,77,0,0,[1,38344,0],[]],[0,78,79,0,80,81,82,0,[1,38344,5],[[38344,2,83],[38349,2,84]]],[0,85,13,0,86,87,0,0,[1,38350,0],[[38350,2,84]]],[0,18,13,0,19,88,0,0,[1,38350,10000],[[48351,2,89]]],[0,90,75,0,91,43,0,0,[1,48351,0],[]],[0,92,75,0,93,0,0,0,[1,48351,102],[[48352,2,94]]]]],[95,0,0,[9,10,11],[1,48454,5911],[[0,96,0,0,0,22,0,0,[1,48455,909],[[0,97,98,0,99,100,101,0,[1,48455,0],[[48456,2,102]]],[0,103,13,0,104,105,106,0,[1,48456,0],[[48456,2,107]]],[0,108,13,0,109,2,0,0,[1,48456,0],[[48456,2,2]]],[0,108,13,0,109,110,0,0,[1,48456,0],[[48456,2,111]]],[0,112,75,0,113,114,0,0,[1,48457,199],[[48655,2,115]]],[0,116,75,0,117,106,118,0,[1,48656,204],[[48859,2,119],[48860,2,120]]],[0,121,75,0,122,106,0,0,[1,48860,304],[[49061,2,119],[49062,2,123]]],[0,18,13,0,19,124,0,0,[1,49165,101],[[49266,2,125]]],[0,92,75,0,93,0,0,0,[1,49266,97],[[49266,2,126]]]]],[0,18,13,0,19,127,0,0,[1,49364,5001],[[54364,2,128]]]]],[129,0,0,[9,10,11],[1,54365,5916],[[0,96,0,0,0,130,0,0,[1,54366,914],[[0,97,98,0,99,100,101,0,[1,54366,0],[[54367,2,131]]],[0,103,13,0,104,105,106,0,[1,54367,0],[[54367,2,132]]],[0,108,13,0,109,2,0,0,[1,54367,0],[[54367,2,2]]],[0,108,13,0,109,110,0,0,[1,54367,0],[[54368,2,111]]],[0,112,75,0,113,114,0,0,[1,54368,203],[[54570,2,133]]],[0,116,75,0,117,106,118,0,[1,54571,204],[[54775,2,134],[54775,2,135]]],[0,121,75,0,122,106,0,0,[1,54776,305],[[54979,2,134],[54979,2,136]]],[0,18,13,0,19,124,0,0,[1,55082,101],[[55182,2,125]]],[0,92,75,0,93,0,0,0,[1,55182,97],[[55183,2,137]]]]],[0,18,13,0,19,127,0,0,[1,55280,5001],[[60281,2,128]]]]],[138,0,0,[9,10,11],[1,60282,5911],[[0,96,0,0,0,139,0,0,[1,60282,909],[[0,97,98,0,99,100,101,0,[1,60283,0],[[60283,2,140]]],[0,103,13,0,104,105,106,0,[1,60283,0],[[60283,2,141]]],[0,108,13,0,109,2,0,0,[1,60283,0],[[60283,2,2]]],[0,108,13,0,109,110,0,0,[1,60284,0],[[60284,2,111]]],[0,112,75,0,113,114,0,0,[1,60284,201],[[60485,2,142]]],[0,116,75,0,117,106,118,0,[1,60486,202],[[60687,2,143],[60688,2,144]]],[0,121,75,0,122,106,0,0,[1,60688,303],[[60889,2,143],[60889,2,145]]],[0,18,13,0,19,124,0,0,[1,60992,101],[[61092,2,125]]],[0,92,75,0,93,0,0,0,[1,61092,99],[[61093,2,146]]]]],[0,18,13,0,19,127,0,0,[1,61192,5001],[[66192,2,128]]]]],[147,0,0,[9,10,11],[1,66193,5919],[[0,96,0,0,0,148,0,0,[1,66194,917],[[0,97,98,0,99,100,101,0,[1,66194,0],[[66195,2,149]]],[0,103,13,0,104,105,106,0,[1,66195,0],[[66195,2,150]]],[0,108,13,0,109,2,0,0,[1,66195,0],[[66195,2,2]]],[0,108,13,0,109,110,0,0,[1,66195,0],[[66195,2,111]]],[0,112,75,0,113,114,0,0,[1,66196,204],[[66399,2,151]]],[0,116,75,0,117,106,118,0,[1,66400,206],[[66605,2,152],[66606,2,153]]],[0,121,75,0,122,106,0,0,[1,66606,306],[[66810,2,152],[66811,2,154]]],[0,18,13,0,19,124,0,0,[1,66913,101],[[67014,2,125]]],[0,92,75,0,93,0,0,0,[1,67014,97],[[67015,2,155]]]]],[0,18,13,0,19,127,0,0,[1,67112,5001],[[72112,2,128]]]]],[156,0,0,[10,11],[1,72113,1611],[[0,157,75,0,158,159,0,0,[1,72114,103],[]],[0,157,75,0,158,160,0,0,[1,72217,101],[]],[0,161,79,0,162,163,26,0,[1,72318,1403],[[72318,2,164],[73721,2,165],[73721,2,166]]],[0,167,79,0,168,82,169,0,[1,73721,0],[[73722,2,170]]],[5,171,0,0,0,0,0,0,[1,73722,1],[[0,172,13,0,173,174,0,0,[1,73722,1],[[73723,2,175]]]]],[7,0,0,0,0,0,0,0,[3,73723,1],[[0,92,75,0,93,0,0,0,[3,73723,0],[]],[0,176,79,0,177,82,26,0,[3,73723,0],[]],[0,178,13,0,179,0,0,0,[3,73723,0],[]]]]]]],[],[6,6,0,0]],[180,181,182,0,[],[0,73725,22720],[],[[183,0,0,[9,10,11],[0,73738,22707,184],[[0,185,186,0,0,0,0,0,[1,73738,7],[[0,78,79,0,80,187,82,0,[1,73738,5],[[73739,2,188],[73744,2,189]]],[0,85,13,0,86,190,0,0,[1,73744,0],[[73745,2,191]]]]],[0,192,186,0,0,0,0,0,[1,73745,10106],[[0,74,75,0,76,77,0,0,[1,73745,0],[]],[0,78,79,0,80,193,82,0,[1,73746,5],[[73746,2,83],[73751,2,194]]],[0,85,13,0,86,195,0,0,[1,73751,1],[[73752,2,196]]],[0,18,13,0,19,88,0,0,[1,73752,10001],[[83752,2,89]]],[0,90,75,0,91,43,0,0,[1,83753,1],[]],[0,92,75,0,93,0,0,0,[1,83754,97],[[83754,2,197]]]]],[0,198,186,0,0,199,0,0,[1,83851,813],[[0,103,13,0,104,200,106,0,[1,83852,0],[[83852,2,201]]],[0,112,75,0,113,114,0,0,[1,83852,199],[[84051,2,202]]],[0,116,75,0,117,106,118,0,[1,84051,205],[[84256,2,203],[84256,2,204]]],[0,205,13,0,206,207,208,0,[1,84257,2],[[84259,2,209]]],[0,210,75,0,211,118,0,0,[1,84259,101],[]],[0,212,75,0,213,0,0,0,[1,84360,101],[]],[0,210,75,0,211,208,0,0,[1,84462,101],[]],[0,214,75,0,215,0,0,0,[1,84563,101],[]]]],[0,92,75,0,93,0,0,0,[1,84665,97],[[84665,2,216]]],[0,217,186,0,0,0,0,0,[1,84763,9741],[[0,96,186,0,0,130,0,0,[1,84763,907],[[0,97,98,0,99,100,101,0,[1,84763,0],[[84764,2,131]]],[0,103,13,0,104,105,106,0,[1,84764,0],[[84764,2,132]]],[0,108,13,0,109,2,0,0,[1,84764,0],[[84764,2,2]]],[0,108,13,0,109,110,0,0,[1,84765,0],[[84765,2,111]]],[0,112,75,0,113,114,0,0,[1,84765,201],[[84966,2,133]]],[0,116,75,0,117,106,118,0,[1,84967,202],[[85168,2,134],[85168,2,135]]],[0,121,75,0,122,106,0,0,[1,85169,303],[[85370,2,134],[85370,2,136]]],[0,18,13,0,19,124,0,0,[1,85473,101],[[85573,2,125]]],[0,92,75,0,93,0,0,0,[1,85573,97],[[85574,2,218]]]]],[0,103,13,0,104,219,106,0,[1,85671,0],[[85671,2,220]]],[0,112,75,0,113,114,0,0,[1,85671,8832],[[94503,2,221]]]]],[0,96,186,0,0,148,0,0,[1,94504,917],[[0,97,98,0,99,100,101,0,[1,94505,0],[[94505,2,149]]],[0,103,13,0,104,105,106,0,[1,94505,0],[[94506,2,150]]],[0,108,13,0,109,2,0,0,[1,94506,0],[[94506,2,2]]],[0,108,13,0,109,110,0,0,[1,94506,0],[[94506,2,111]]],[0,112,75,0,113,114,0,0,[1,94506,203],[[94709,2,151]]],[0,116,75,0,117,106,118,0,[1,94709,204],[[94913,2,152],[94913,2,153]]],[0,121,75,0,122,106,0,0,[1,94914,307],[[95118,2,152],[95119,2,154]]],[0,18,13,0,19,124,0,0,[1,95222,101],[[95322,2,125]]],[0,92,75,0,93,0,0,0,[1,95323,98],[[95323,2,222]]]]],[0,223,186,0,0,224,0,0,[1,95422,920],[[0,97,98,0,99,225,226,0,[1,95422,0],[[95423,2,227]]],[0,103,13,0,104,228,106,0,[1,95423,0],[[95423,2,229]]],[0,108,13,0,109,2,0,0,[1,95423,0],[[95423,2,2]]],[0,108,13,0,109,110,0,0,[1,95423,0],[[95424,2,111]]],[0,112,75,0,113,114,0,0,[1,95424,205],[[95628,2,230]]],[0,116,75,0,117,106,118,0,[1,95629,205],[[95833,2,231],[95833,2,232]]],[0,121,75,0,122,106,0,0,[1,95834,306],[[96037,2,231],[96038,2,233]]],[0,18,13,0,19,124,0,0,[1,96140,101],[[96241,2,125]]],[0,92,75,0,93,0,0,0,[1,96241,100],[[96242,2,234]]]]],[0,92,75,0,93,0,0,0,[1,96342,100],[[96342,2,235]]],[0,121,75,0,122,236,0,0,[0,96443,1],[[96443,5,184]]],[0,237,13,0,238,239,0,0,[3,96444,0],[]],[0,240,186,0,0,0,0,0,[3,96444,0],[]]]]],[[1,241,186,0,0,0,0,0,[1,73735,3],[[0,108,13,0,109,242,0,0,[1,73735,0],[[73735,2,243]]],[0,108,13,0,109,244,0,0,[1,73735,0],[[73735,2,245]]],[0,108,13,0,109,246,0,0,[1,73736,0],[[73736,2,10]]],[0,103,13,0,104,246,247,0,[1,73736,0],[[73736,2,248]]],[5,249,0,0,0,0,0,0,[3,73736,0],[[0,70,13,0,71,250,0,0,[3,73736,0],[]]]],[5,251,0,0,0,0,0,0,[3,73737,0],[[0,70,13,0,71,252,0,0,[3,73737,0],[]]]],[5,253,0,0,0,0,0,0,[1,73737,1],[[0,70,13,0,71,72,0,0,[1,73737,1],[[73738,2,73]]]]]]]],[1,0,1,0]]],[],[],[10,9,1,0]];
 </script>
 <script type="text/javascript">
 window.output["strings"] = [];
 </script>
 <script type="text/javascript">
-window.output["strings"] = window.output["strings"].concat(["*","*Manager","*/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager","*../..","*CommandLine","*/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/CommandLine.robot","*../../CommandLine.robot","*Random Offset","*<p>This just prevents all the test runners doing git push at the same time\x3c/p>","*macos-latest","*ubuntu-latest","*windows-latest","*Evaluate","*BuiltIn","*<p>Evaluates the given expression in Python and returns the result.\x3c/p>","*random.randint(0, 60)","*${random}","*${random} = 19","*Sleep","*<p>Pauses the test executed for the given time.\x3c/p>","*Slept 19 seconds","*Manager Version","*Run","*OperatingSystem","*<p>Runs the given command in the system and returns the output.\x3c/p>","*python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -v","*${result}","*Running command 'python3 /home/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -v 2&gt;&amp;1'.","*${result} = Robot Framework Swarm: Manager \n\tVersion 1.1.0 ","*Log To Console","*<p>Logs the given message to the console.\x3c/p>","*${\\n}${result}","*Should Contain","*<p>Fails if <code>container\x3c/code> does not contain <code>item\x3c/code> one or more times.\x3c/p>","*${result}, Version","*${result}, Manager","*Manager Help","*python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -h","*Running command 'python3 /home/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -h 2&gt;&amp;1'.","*${result} = Robot Framework Swarm: Manager \n\tVersion 1.1.0 \nusage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]\n                  [-n] [-t STARTTIME] [-d DIR] [-e IPADDRESS] [-p PORT]\n\n...","*${result}, IPADDRESS","*Clean Up Old Files","*macos-latest, ubuntu-latest, windows-latest","*${OUTPUT DIR}","*Remove File","*<p>Removes a file with the given path.\x3c/p>","*${OUTPUT DIR}${/}*.txt","eNq1jDEOwjAMAL8SdelEPLAgVPoCWKruyKhOWtHYku1Qnk9Z+AHT6aTTDVTkRVNIy0qh7TDMSunSfPUMALMUAq3MpLCJPkGTbajlx5HMDQbKSmaLMNyQMe/1VbJBfVT2eljR9+x+jCcwn6R69Lc3/T/vHWDfxg+DYlHE","eNq1jDEOwjAQBL9ipUmFt6BBKOQF0ETp0aGcnYjYlu7OhOcTGn5ANRppNAOn8uLJhWVl13bkZuFwab56BjCXxJCaMwu2Ik9I0I0k/TiymmLgKKy6lIwbZYp7fS1RUR81Wz2sZHt2P/oT1CYW8fa2pv/nvQP1rf8AfGhRpg==","*${OUTPUT DIR}${/}*.png","eNrFjTEKwkAQRa+ypEmVnUIEkZjCRgRtgtYyxsluSHZWZnbN9Y2FXsHq83gPfkshvuhh+mEiU9ZovFC/Kz64BQAfA4FkZhKYo4wgvc4o4bcX0qTQkhNSHSLDGRndUp+iU8j3zClXE6Ylu63s5qvt4Xrcow5dpZ0QsfqYqrV9siuaP5zWgE1p31KGYUI=","eNrFjTEKwkAQRa+ypEmVHcRGJKawEUGboLWMcbIbkp2VmV1zfWOhV7D6PN6D31KIL3qYfpjIlDUaL9Tvig9uAcDHQCCZmQTmKCNIrzNK+O2FNCm05IRUh8hwRka31KfoFPI9c8rVhGnJbmu7+Wp7uB73qENXaSdErD6mamWf7IrmD6c1YFPaN1BaYTo=","eNrFjTEOwjAMRa9SdemUeOiCUOnAgpDKUsGMTHHSisZBdkKvTxngCkxfT+9Jv6cQX3Qv3DRTUTVYjEJuV35wCwBjDASSmUlgifIAcbqghN+eSZNCT15IdYoMJ2T0a91Fr5BvmVM2M6Y1u9Z289X2cDnuUafB6CBErGNMprZP9mX7h9MGsK3sG1FwYT4=","eNrFjTEKwkAQRa+ypEmVHdBGJKawEUGboLWMcbIbkp2VmV1zfWOhV7D6PN6D31KIL3qYfpjIlDUaL9Tvig9uAcDHQCCZmQTmKCNIrzNK+O2FNCm05IRUh8hwRka31KfoFPI9c8rVhGnJbmu7+Wp7uB73qENXaSdErD6mamWf7IrmD6c1YFPaN1DlYTw=","eNrFjTEOwjAMRa8SdenUeIABodKBBSHBUsGMTHGTqo2D7IRenzLAFZi+nt6Tfkshvuhh+mEiU9ZovFC/Kz64BQAfA4FkZhKYo4wgvc4o4bcX0qTQkhNSHSLDGRndUp+iU8j3zClXE6Ylu63s5qvt4Xrcow5dpZ0QsfqYqrV9siuaP5zWgE1p31H7YUA=","*GUI Basic","*/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/GUI_Basic.robot","*../../GUI_Basic.robot","*Open GUI","*Set Suite Variable","*<p>Makes a variable available everywhere within the scope of the current suite.\x3c/p>","*${platform}, ubuntu","*${platform} = ubuntu","*Set Confidence","*ImageHorizonLibrary","*<p>Sets the accuracy when finding images.\x3c/p>","*0.9","*Start Process","*Process","*<p>Starts a new process on background.\x3c/p>","*python3, ${pyfile}, alias=Manager, stdout=${OUTPUT DIR}${/}stdout.txt, stderr=${OUTPUT DIR}${/}stderr.txt","*${process}","*Starting process:\npython3 /home/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py","*${process} = &lt;subprocess.Popen object at 0x7ff2c9051f40&gt;","*Set Test Variable","*<p>Makes a variable available everywhere within the scope of the current test.\x3c/p>","*$process, ${process}","*10","*Slept 10 seconds","*Set Screenshot Folder","*<p>Sets the folder where screenshots are saved to.\x3c/p>","*Take A Screenshot","*<p>Takes a screenshot of the screen.\x3c/p>","eNrFjr0KwjAURl8lBBzT2+Ii0nZwKYIu/syS1msaam/k3oS8vl3sKzid4TvwnevAiCRjiCraCWmvYAwzAiciZMiBJ+CXZMvzyhtKFLigYxTxgeBsybrFPgUnkPpEMZm3jYv22Ba731x09+PBih+MrKemKj7k6p6hrf3slPDQ6D8UaJX9M46NrspyoxW0Xw58ZTc=","*Select Run Tab","*Click Tab","*Convert To Lower Case","*String","*<p>Converts string to lower case.\x3c/p>","*${tabname}","*${tabnamel}","*${tabnamel} = run","*Set Variable","*<p>Returns the given values which can then be assigned to a variables.\x3c/p>","*manager_${platform}_tab_${tabnamel}.png","*${img}","*${img} = manager_ubuntu_tab_run.png","*Log","*<p>Logs the given message with the given level.\x3c/p>","*${IMAGE_DIR}","*/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method","*Wait For","*<p>Tries to locate given image from the screen for given time.\x3c/p>","*${img}, timeout=10","*Image \"manager_ubuntu_tab_run.png\" found at (67, 64)","*Locate","*<p>Locate image on screen.\x3c/p>","*@{coordinates}","*Image \"/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_ubuntu_tab_run.png\" found at Box(left=46, top=45, width=43, height=39)","*@{coordinates} = [ 67 | 64 ]","*Click Image","*<p>Finds the reference image on screen and clicks it once.\x3c/p>","*Clicking image \"manager_ubuntu_tab_run.png\" in position (67, 64)","*0.1","*Slept 100 milliseconds","eNrFjjsOwjAQBa9iWaJMNkCDUJIiDUKChk+NHLM4Vsga7dry9UlDrkA1xRvpzdUyIskQoopmRNorGMKEwIkIGXLgEfgl2fC08IYSBS7oGEV8IDgbMm62T8EJpD5RTMXbxFl7bMvdby4P92NnxNtCltNiU37I1T1DW/vJKWHb6D8UaJX9Mw6NXlfVSitovw8qZTk=","*5","*Slept 5 seconds","*Select Agents Tab","*Agents","*${tabnamel} = agents","*${img} = manager_ubuntu_tab_agents.png","*Image \"manager_ubuntu_tab_agents.png\" found at (118, 67)","*Image \"/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_ubuntu_tab_agents.png\" found at Box(left=90, top=49, width=56, height=36)","*@{coordinates} = [ 118 | 67 ]","*Clicking image \"manager_ubuntu_tab_agents.png\" in position (118, 67)","eNrFjr0KwjAURl8lBBzTW+ki0nZwKYIu/syS1msaam/k3oS8vl3sKzid4TvwnevAiCRjiCraCWmvYAwzAiciZMiBJ+CXZMvzyhtKFLigYxTxgeBsybrFPgUnkPpEMZm3jYv2qIrdby66+/FgxQ9G1lNTFR9ydc/Q1n52Snho9B8KtMr+GcdGb8tyoxW0Xw/YZTs=","*Select About Tab","*About","*${tabnamel} = about","*${img} = manager_ubuntu_tab_about.png","*Image \"manager_ubuntu_tab_about.png\" found at (175, 66)","*Image \"/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_ubuntu_tab_about.png\" found at Box(left=152, top=47, width=47, height=38)","*@{coordinates} = [ 175 | 66 ]","*Clicking image \"manager_ubuntu_tab_about.png\" in position (175, 66)","eNrFjr0KwjAURl8lBBzbW9FBpO3QRQRd/Jkljdc01N7IvQl5fbvYV3A6w3fgO1fLiCRDiCqaEWmvYAgTAiciZMiBR+CXZMPTwhtKFLigYxTxgeBsyLjZPgUnkPpEMRVvE2ftsSl3v7k83I+dEW8LWU6LbfkhV/cMbe0np4Rto/9QoFX2zzg0el1VK62g/QIQhmU9","*Select Plan Tab","*Plan","*${tabnamel} = plan","*${img} = manager_ubuntu_tab_plan.png","*Image \"manager_ubuntu_tab_plan.png\" found at (26, 66)","*Image \"/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_ubuntu_tab_plan.png\" found at Box(left=9, top=48, width=35, height=37)","*@{coordinates} = [ 26 | 66 ]","*Clicking image \"manager_ubuntu_tab_plan.png\" in position (26, 66)","eNrFjssKwjAQRX8lBFy2UxFBpO2iGxF042MtaRzTUDuRmYT8vt3YX3B1FvfAPVfLiCRDiCqaEWmvYAgTAiciZMiBR+CXZMPTwhtKFLigYxTxgeBsyLjZPgUnkPpEMRVvE2ftsSl3v7k83I+dEW8LWU6LbfkhV/cMbe0np4Rto/9QoFX2zzg0el1VK62g/QIRNGU/","*Close GUI","*Press Combination","*<p>Press given keyboard keys.\x3c/p>","*Key.esc","*x, Key.ctrl","*Wait For Process","*<p>Waits for the process to complete or to reach the given timeout.\x3c/p>","*${process}, timeout=60","*Waiting for process to complete.","*Process completed.","*${result} = &lt;result object with rc 0&gt;","*Is Process Running","*<p>Checks is the process running or not.\x3c/p>","*${running}","*${running} = False","*not ${running}","*Should Be Equal As Integers","*<p>Fails if objects are unequal after converting them to integers.\x3c/p>","*${result.rc}, 0","*Argument types are:\n&lt;class 'int'&gt;\n&lt;class 'str'&gt;","*Terminate Process","*<p>Stops the process gracefully or forcefully.\x3c/p>","*Fail","*<p>Fails the test with the given message and optionally alters its tags.\x3c/p>","*Intentional Fail","*<p>Uncomment this test if you want to trigger updating Screenshots in the git repo Ensure this is commented out before release or pull request\x3c/p>","*AssertionError"]);
+window.output["strings"] = window.output["strings"].concat(["*","*Manager","*/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager","*../..","*CommandLine","*/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/CommandLine.robot","*../../CommandLine.robot","*Random Offset","*<p>This just prevents all the test runners doing git push at the same time\x3c/p>","*macos-latest","*ubuntu-latest","*windows-latest","*Evaluate","*BuiltIn","*<p>Evaluates the given expression in Python and returns the result.\x3c/p>","*random.randint(0, 60)","*${random}","*${random} = 36","*Sleep","*<p>Pauses the test executed for the given time.\x3c/p>","*Slept 36 seconds.","*Manager Version","*Run","*OperatingSystem","*<p>Runs the given command in the system and returns the output.\x3c/p>","*python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -v","*${result}","*Running command 'python3 /home/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -v 2&gt;&amp;1'.","*${result} = Robot Framework Swarm: Manager \n\tVersion 1.2.1 ","*Log To Console","*<p>Logs the given message to the console.\x3c/p>","*${\\n}${result}","*Should Contain","*<p>Fails if <code>container\x3c/code> does not contain <code>item\x3c/code> one or more times.\x3c/p>","*${result}    Version","*${result}    Manager","*Manager Help","*python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -h","*Running command 'python3 /home/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -h 2&gt;&amp;1'.","*${result} = Robot Framework Swarm: Manager \n\tVersion 1.2.1 \nusage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]\n                  [-n] [-t STARTTIME] [-d DIR] [-e IPADDRESS] [-p PORT]\n\n...","*${result}    IPADDRESS","*Clean Up Old Files","*macos-latest, ubuntu-latest, windows-latest","*${OUTPUT DIR}","*Remove File","*<p>Removes a file with the given path.\x3c/p>","*${OUTPUT DIR}${/}*.txt","eNq1zTEOwjAMheGrRF06EQ8sCJWeAJaKvXJVJ61oHMl2KMdvWLgB09MvfdIbKOU3zS6sG7m2Q7cIhVvzzSsALDkRSGEmgT3LCyTojpJ++yQ1hYGikOqaGR7IGKu+56hQpsJWThtaZePZX0BtJpGxEjZvH2v6/390gH3rD4zYVoI=","eNq9zUEKg0AMheGrDG5cdbLophTrCdqNuJcUM6PUmUCSqR5fS6FH6Orxwwevo8RvGl2YF3J1g24SCrfqk1cAmDgRSMmZBFaWF0jQFSX9tic1hY6ikOrMGR6YMR76zlGhPEu2clrQDjac/QXURi42pK/ytlnV/uOlAWxrvwP7oVg4","eNq1jDEOwjAQBL9ipUmFt6BBKOQF0ETp0aGcnYjYlu7OhOcTGn5ANRppNAOn8uLJhWVl13bkZuFwab56BjCXxJCaMwu2Ik9I0I0k/TiymmLgKKy6lIwbZYp7fS1RUR81Wz2sZHt2P/oT1CYW8fa2pv/nvQP1rf8AfGhRpg==","eNq1jDEOwjAMAL8SdelEPLAgVPoCWKruyKhOWtHYku1Qnk9Z+AHT6aTTDVTkRVNIy0qh7TDMSunSfPUMALMUAq3MpLCJPkGTbajlx5HMDQbKSmaLMNyQMe/1VbJBfVT2eljR9+x+jCcwn6R69Lc3/T/vHWDfxg+DYlHE","eNq9zTEKwkAQheGrhDSp3FfYiMScQJuQPoxkdhPM7sLMrPH4RgSPYPX44YPXc8xPniq/rFw1LVWzsL/UnzwDmHNkSEmJBVuWB8TrRhJ/O7CaoucgrLrkhBslCru+5qAo95KsHFaynY1Hd4LaxCJj/CpnL6u7f7y0oK5xb/M/WBo=","eNq1zTEOwjAMheGrVF06EQ8sCJWeAJaKvTKqk1Y0tmQ7lOMTFm7A9PRLn/RGyvKiuYnrRk3XY7MoxUv7zTMALJIJtDCTwi76BI22o+bf3sncYKSkZLYKww0ZU9VXSQblUdjLYUOvbDqGE5jPUnyqhD3429vh/x894NCFD5TgVqA=","*${OUTPUT DIR}${/}*.png","eNq9jbEKwjAQhl8ldOmU3CCISO3gIoIuRWeJekmLzZ3cJfb1rYM+gtPPx/fB32HiF95NGEY0deNNLxg21QfXANBzQpBChAITywMk6OQl/faEmhU6jIKqAxMcPfk41weOCuVaKBc7+jxnl4VbfbXbnffbEtXqTRBJe8526Z4Uq/b/nw34tnZvmA1gog==","eNq9jTEOwjAMRa8SdemUeIABodKBBSHBUsGMAjhpRWMjO6HXpwxwBKavp/ek32HiF95NGEY0deNNLxg21QfXANBzQpBChAITywMk6OQl/faEmhU6jIKqAxMcPfk41weOCuVaKBc7+jxnl4VbfbXbnffbEtXqTRBJe8526Z4Uq/b/nw34tnZvlvlgng==","eNq9jbEKwjAQhl8ldOmUHOgiUju4iKBL0VmiXtJicyd3iX1966CP4PTz8X3wd5j4hXcThhFN3XjTC4ZN9cE1APScEKQQocDE8gAJOnlJvz2hZoUOo6DqwARHTz7O9YGjQrkWysWOPs/ZZelWX+125/22RLV6E0TSnrNduCfFqv3/ZwO+rd0bleVgmg==","eNrFjTEKwkAQRa+ypEmVHdBGJKawEUGboLWMcbIbkp2VmV1zfWOhV7D6PN6D31KIL3qYfpjIlDUaL9Tvig9uAcDHQCCZmQTmKCNIrzNK+O2FNCm05IRUh8hwRka31KfoFPI9c8rVhGnJbmu7+Wp7uB73qENXaSdErD6mamWf7IrmD6c1YFPaN1DlYTw=","eNq9jbEKwjAQhl8ldOmU3CCCSO3gIoIuRWeJekmLzZ3cJfb1rYM+gtPPx/fB32HiF95NGEY0deNNLxg21QfXANBzQpBChAITywMk6OQl/faEmhU6jIKqAxMcPfk41weOCuVaKBc7+jxnl4VbfbXbnffbEtXqTRBJe8526Z4Uq/b/nw34tnZvl4NgoA==","eNrFjTEOwjAMRa8SdenUeIABodKBBSHBUsGMTHGTqo2D7IRenzLAFZi+nt6Tfkshvuhh+mEiU9ZovFC/Kz64BQAfA4FkZhKYo4wgvc4o4bcX0qTQkhNSHSLDGRndUp+iU8j3zClXE6Ylu63s5qvt4Xrcow5dpZ0QsfqYqrV9siuaP5zWgE1p31H7YUA=","eNq9jTEOwjAMRa9SdemUeOiCUOnAgpBgqWBGAZykorGRndDrUwY4AtPX03vSHzDxC++VHyesms5VUdBv6g+uASByQpBChAIzywPE6+wk/faEmhUGDIKqIxMcHbmw1AcOCuVaKBczubxkl9auvtruzvttCWr0JoikkbNp7ZNC3f//swPXN/YNlm9gnA==","eNq9jTEOwjAMRa8SdemUeGAAodKBBSHBUsGMAjhpRWMjO6HXpwxwBKavp/ek32HiF95NGEY0deNNLxg21QfXANBzQpBChAITywMk6OQl/faEmhU6jIKqAxMcPfk41weOCuVaKBc7+jxnl4VbfbXbnffbEtXqTRBJe8526Z4Uq/b/nw34tnZvmJdgpA==","eNrFjTEKwkAQRa+ypEmVHcRGJKawEUGboLWMcbIbkp2VmV1zfWOhV7D6PN6D31KIL3qYfpjIlDUaL9Tvig9uAcDHQCCZmQTmKCNIrzNK+O2FNCm05IRUh8hwRka31KfoFPI9c8rVhGnJbmu7+Wp7uB73qENXaSdErD6mamWf7IrmD6c1YFPaN1BaYTo=","eNq9jbEKwjAQhl8ldOmUHOIiUju4iKBL0VmiXtJicyd3iX1966CP4PTz8X3wd5j4hXcThhFN3XjTC4ZN9cE1APScEKQQocDE8gAJOnlJvz2hZoUOo6DqwARHTz7O9YGjQrkWysWOPs/ZZelWX+125/22RLV6E0TSnrNduCfFqv3/ZwO+rd0blVtgmA==","eNrFjTEKwkAQRa+ypEmVnUIEkZjCRgRtgtYyxsluSHZWZnbN9Y2FXsHq83gPfkshvuhh+mEiU9ZovFC/Kz64BQAfA4FkZhKYo4wgvc4o4bcX0qTQkhNSHSLDGRndUp+iU8j3zClXE6Ylu63s5qvt4Xrcow5dpZ0QsfqYqrV9siuaP5zWgE1p31KGYUI=","eNrFjTEOwjAMRa9SdemUeOiCUOnAgpDKUsGMTHHSisZBdkKvTxngCkxfT+9Jv6cQX3Qv3DRTUTVYjEJuV35wCwBjDASSmUlgifIAcbqghN+eSZNCT15IdYoMJ2T0a91Fr5BvmVM2M6Y1u9Z289X2cDnuUafB6CBErGNMprZP9mX7h9MGsK3sG1FwYT4=","*GUI Basic","*/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/GUI_Basic.robot","*../../GUI_Basic.robot","*Open GUI","*Set Suite Variable","*<p>Makes a variable available everywhere within the scope of the current suite.\x3c/p>","*${platform}    ubuntu","*${platform} = ubuntu","*Set Confidence","*ImageHorizonLibrary","*<p>Sets the accuracy when finding images.\x3c/p>","*0.9","*Start Process","*Process","*<p>Starts a new process on background.\x3c/p>","*python3    ${pyfile}    alias=Manager    stdout=${OUTPUT DIR}${/}stdout.txt    stderr=${OUTPUT DIR}${/}stderr.txt","*${process}","*Starting process:\npython3 /home/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py","*${process} = &lt;subprocess.Popen object at 0x7faeb85be820&gt;","*Set Test Variable","*<p>Makes a variable available everywhere within the scope of the current test.\x3c/p>","*$process    ${process}","*10","*Slept 10 seconds.","*Set Screenshot Folder","*<p>Sets the folder where screenshots are saved to.\x3c/p>","*Take A Screenshot","*<p>Takes a screenshot of the screen.\x3c/p>","eNrFjr0KwjAURl8lBBzT2+Ii0nZwKYIu/syS1msaam/k3oS8vl3sKzid4TvwnevAiCRjiCraCWmvYAwzAiciZMiBJ+CXZMvzyhtKFLigYxTxgeBsybrFPgUnkPpEMZm3jYv22Ba731x09+PBih+MrKemKj7k6p6hrf3slPDQ6D8UaJX9M46NrspyoxW0Xw58ZTc=","*Select Run Tab","*Click Tab","*Convert To Lower Case","*String","*<p>Converts string to lower case.\x3c/p>","*${tabname}","*${tabnamel}","*${tabnamel} = run","*Set Variable","*<p>Returns the given values which can then be assigned to a variables.\x3c/p>","*manager_${platform}_tab_${tabnamel}.png","*${img}","*${img} = manager_ubuntu_tab_run.png","*Log","*<p>Logs the given message with the given level.\x3c/p>","*${IMAGE_DIR}","*/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method","*Wait For","*<p>Tries to locate given image from the screen for given time.\x3c/p>","*${img}    timeout=300","*Image \"manager_ubuntu_tab_run.png\" found at (67, 64)","*Locate","*<p>Locate image on screen.\x3c/p>","*@{coordinates}","*Image \"/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_ubuntu_tab_run.png\" found at Box(left=46, top=45, width=43, height=39)","*@{coordinates} = [ 67 | 64 ]","*Click Image","*<p>Finds the reference image on screen and clicks it once.\x3c/p>","*Clicking image \"manager_ubuntu_tab_run.png\" in position (67, 64)","*0.1","*Slept 100 milliseconds.","eNrFjjsOwjAQBa9iWaJMNkCDUJIiDUKChk+NHLM4Vsga7dry9UlDrkA1xRvpzdUyIskQoopmRNorGMKEwIkIGXLgEfgl2fC08IYSBS7oGEV8IDgbMm62T8EJpD5RTMXbxFl7bMvdby4P92NnxNtCltNiU37I1T1DW/vJKWHb6D8UaJX9Mw6NXlfVSitovw8qZTk=","*5","*Slept 5 seconds.","*Select Agents Tab","*Agents","*${tabnamel} = agents","*${img} = manager_ubuntu_tab_agents.png","*Image \"manager_ubuntu_tab_agents.png\" found at (118, 67)","*Image \"/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_ubuntu_tab_agents.png\" found at Box(left=90, top=49, width=56, height=36)","*@{coordinates} = [ 118 | 67 ]","*Clicking image \"manager_ubuntu_tab_agents.png\" in position (118, 67)","eNrFjr0KwjAURl8lBBzTW+ki0nZwKYIu/syS1msaam/k3oS8vl3sKzid4TvwnevAiCRjiCraCWmvYAwzAiciZMiBJ+CXZMvzyhtKFLigYxTxgeBsybrFPgUnkPpEMZm3jYv2qIrdby66+/FgxQ9G1lNTFR9ydc/Q1n52Snho9B8KtMr+GcdGb8tyoxW0Xw/YZTs=","*Select About Tab","*About","*${tabnamel} = about","*${img} = manager_ubuntu_tab_about.png","*Image \"manager_ubuntu_tab_about.png\" found at (175, 66)","*Image \"/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_ubuntu_tab_about.png\" found at Box(left=152, top=47, width=47, height=38)","*@{coordinates} = [ 175 | 66 ]","*Clicking image \"manager_ubuntu_tab_about.png\" in position (175, 66)","eNrFjr0KwjAURl8lBBzbW9FBpO3QRQRd/Jkljdc01N7IvQl5fbvYV3A6w3fgO1fLiCRDiCqaEWmvYAgTAiciZMiBR+CXZMPTwhtKFLigYxTxgeBsyLjZPgUnkPpEMRVvE2ftsSl3v7k83I+dEW8LWU6LbfkhV/cMbe0np4Rto/9QoFX2zzg0el1VK62g/QIQhmU9","*Select Plan Tab","*Plan","*${tabnamel} = plan","*${img} = manager_ubuntu_tab_plan.png","*Image \"manager_ubuntu_tab_plan.png\" found at (26, 66)","*Image \"/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_ubuntu_tab_plan.png\" found at Box(left=9, top=48, width=35, height=37)","*@{coordinates} = [ 26 | 66 ]","*Clicking image \"manager_ubuntu_tab_plan.png\" in position (26, 66)","eNrFjssKwjAQRX8lBFy2UxFBpO2iGxF042MtaRzTUDuRmYT8vt3YX3B1FvfAPVfLiCRDiCqaEWmvYAgTAiciZMiBR+CXZMPTwhtKFLigYxTxgeBsyLjZPgUnkPpEMRVvE2ftsSl3v7k83I+dEW8LWU6LbfkhV/cMbe0np4Rto/9QoFX2zzg0el1VK62g/QIRNGU/","*Close GUI","*Press Combination","*<p>Press given keyboard keys.\x3c/p>","*Key.esc","*x    Key.ctrl","*Wait For Process","*<p>Waits for the process to complete or to reach the given timeout.\x3c/p>","*${process}    timeout=60","*Waiting for process to complete.","*Process completed.","*${result} = &lt;result object with rc 0&gt;","*Is Process Running","*<p>Checks is the process running or not.\x3c/p>","*${running}","*${running} = False","*not ${running}","*Should Be Equal As Integers","*<p>Fails if objects are unequal after converting them to integers.\x3c/p>","*${result.rc}    0","*Argument types are:\n&lt;class 'int'&gt;\n&lt;class 'str'&gt;","*Terminate Process","*<p>Stops the process gracefully or forcefully.\x3c/p>","*Fail","*<p>Fails the test with the given message and optionally alters its tags.\x3c/p>","*GUI Bugs","*/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/GUI_Bugs.robot","*../../GUI_Bugs.robot","*Issue #171","*InvalidImageException: Image path not found: \"/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_ubuntu_button_closewindow.png\".","*Open Agent","*GUI_Common","eNorqCzJyM8zVgACleqCyrTMnNT4xPTUvJJakFBiTmZisa0jiA/iFpek5JeW2KpU+4eGBISGKLh4BtWqVOvXQsQh+vRKKmBqU4uKsKoFiiPUAgAcgSyt","*Starting process:\npython3 /home/runner/work/rfswarm/rfswarm/rfswarm_agent/rfswarm_agent.py","*${process} = &lt;subprocess.Popen object at 0x7faeb84ea7f0&gt;","*$process_agent    ${process}","*${process_agent} = &lt;subprocess.Popen object at 0x7faeb84ea7f0&gt;","*Open Manager GUI","eNorqCzJyM8zVgACleqCyrTMnNT43MS8xPTUolqQYGJOZmKxrS9EBCRQXJKSX1piq1LtHxoSEBqi4OIZVKtSrV8LEYfp1SupKIGqTi0qwqoaKI6sGgCpqi/d","*${process} = &lt;subprocess.Popen object at 0x7faeb84f6220&gt;","*$process_manager    ${process}","*${process_manager} = &lt;subprocess.Popen object at 0x7faeb84f6220&gt;","eNq9jr0KwjAURl8lBBzb2+Ii0nZwKYIu/syS1msSam/k3oS8vl3sIzid4TvwnevIiCQuRBXNhLRX4MKMwIkIGXLgCfgl2fC88oYSBS5oGUV8IDgbMnaxT8EKpCFRTMXbxEV7bMvdby77+/GQrBSyfhZ1+SHbDAxd42erhMdW/z9Aq+yf0bW6rqqNVtB9AUpbZJU=","*Resize Window","*100    10","*manager_${platform}_corner_resize.png","*${img} = manager_ubuntu_corner_resize.png","*Image \"manager_ubuntu_corner_resize.png\" found at (790, 443)","*Image \"/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_ubuntu_corner_resize.png\" found at Box(left=778, top=435, width=25, height=16)","*@{coordinates} = [ 790 | 443 ]","*Create List","*<p>Returns a list containing given items.\x3c/p>","*${{${coordinates[0]}+${x}}}    ${{${coordinates[1]}+${y}}}","*@{coordinates2}","*@{coordinates2} = [ 890 | 453 ]","*Move To","*<p>Moves the mouse pointer to an absolute coordinates.\x3c/p>","*Mouse Down","*<p>Presses specidied mouse button down\x3c/p>","*Mouse Up","*<p>Releases specified mouse button\x3c/p>","eNq9jjsOwjAQBa9iWaKMN0CDUJIiDUKChk+NnLDYUcga7dry9UlDjkA1xRvpzbVnRBIfoop2RNor8GFC4ESEDDnwCPySbHlaeEOJAhd0jCJDIDhbsm62T8EJpC5RTMXbxll7bM3uN5vD/dgmJ4Usn8XGfMhVHUNTDZNTwn2t/x+gVR6e0dd6XZYrraD5AksIZJc=","*Wait Agent Ready","eNq9jr0KwjAURl8lBBzbW+ki0nZwKYIu/syS1msSam/k3oS8vl3sIzid4TvwnevIiCQuRBXNhLRX4MKMwIkIGXLgCfgl2fC88oYSBS5oGUV8IDgbMnaxT8EKpCFRTMXbxEV71OXuN5f9/XhIVgpZP4u6/JBtBoau8bNVwmOr/x+gVfbP6Fq9raqNVtB9AUu1ZJk=","*manager_${platform}_agents_ready.png","*${img} = manager_ubuntu_agents_ready.png","*Image \"manager_ubuntu_agents_ready.png\" found at (40, 105)","eNq9jr0KwjAURl8lBBybW9FBpO3QRQRd/Jklrdek1N7IvQl5fbvYR3A6w3fgO9eeEUl8iCraEWmvwIcJgRMRMuTAI/BLsuVp4Q0lClzQMYoMgeBsybrZPgUnkLpEMRVvG2ftsTG732wO92ObnBSyfBZb8yFXdQxNNUxOCfe1/n+AVnl4Rl/rdVmutILmC0xiZJs=","*Click Button","*runsettings","*${btnname}","*${btnnamel}","*${btnnamel} = runsettings","*manager_${platform}_button_${btnnamel}.png","*${img} = manager_ubuntu_button_runsettings.png","*Image \"manager_ubuntu_button_runsettings.png\" found at (101, 98)","*Image \"/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_ubuntu_button_runsettings.png\" found at Box(left=77, top=88, width=48, height=20)","*@{coordinates} = [ 101 | 98 ]","*Clicking image \"manager_ubuntu_button_runsettings.png\" in position (101, 98)","eNq9jssKwjAQRX8lBFw2UxFBpO2iGxF042MtaR2TUjuRmYT8vt3YT3B1FvfAPdeeEUl8iCraEWmvwIcJgRMRMuTAI/BLsuVp4Q0lClzQMYoMgeBsybrZPgUnkLpEMRVvG2ftsTG732wO92ObnBSyfBZb8yFXdQxNNUxOCfe1/n+AVnl4Rl/rdVmutILmC00PZJ0=","eNq9jssKwjAQRX8lBFw2UxFEpO2iGxF042MtaR2TUjuRmYT8vt3YT3B1FvfAPdeeEUl8iCraEWmvwIcJgRMRMuTAI/BLsuVp4Q0lClzQMYoMgeBsybrZPgUnkLpEMRVvG2ftsTG732wO92ObnBSyfBZb8yFXdQxNNUxOCfe1/n+AVnl4Rl/rdVmutILmC028ZJ8=","*manager_${platform}_button_closewindow.png","*Run Keyword","*<p>Executes the given keyword with the given arguments.\x3c/p>","*Close Manager GUI ${platform}","*Stop Agent","*Set Platform","*${OPTIONS}","*{'include': ['ubuntu-latest'], 'exclude': [], 'skip': [], 'skip_on_failure': []}","*${OPTIONS}[include]","*[ubuntu-latest]","*${OPTIONS}[include][0]","*${ostag}","*${ostag} = ubuntu-latest","*&quot;${ostag}&quot; == &quot;macos-latest&quot;","*${platform}    macos","*&quot;${ostag}&quot; == &quot;windows-latest&quot;","*${platform}    windows","*&quot;${ostag}&quot; == &quot;ubuntu-latest&quot;"]);
 </script>
 <script type="text/javascript">
-window.output["stats"] = [[{"elapsed":"00:00:58","fail":1,"label":"All Tests","pass":9,"skip":0}],[{"elapsed":"00:00:47","fail":1,"label":"macos-latest","pass":7,"skip":0},{"elapsed":"00:00:58","fail":1,"label":"ubuntu-latest","pass":9,"skip":0},{"elapsed":"00:00:48","fail":1,"label":"windows-latest","pass":8,"skip":0}],[{"elapsed":"00:00:59","fail":1,"id":"s1","label":"Manager","name":"Manager","pass":9,"skip":0},{"elapsed":"00:00:22","fail":0,"id":"s1-s1","label":"Manager.CommandLine","name":"CommandLine","pass":3,"skip":0},{"elapsed":"00:00:37","fail":1,"id":"s1-s2","label":"Manager.GUI Basic","name":"GUI Basic","pass":6,"skip":0}]];
+window.output["stats"] = [[{"elapsed":"00:01:36","fail":1,"label":"All Tests","pass":9,"skip":0}],[{"elapsed":"00:01:24","fail":1,"label":"macos-latest","pass":7,"skip":0},{"elapsed":"00:01:36","fail":1,"label":"ubuntu-latest","pass":9,"skip":0},{"elapsed":"00:01:26","fail":1,"label":"windows-latest","pass":8,"skip":0}],[{"elapsed":"00:01:36","fail":1,"id":"s1","label":"Manager","name":"Manager","pass":9,"skip":0},{"elapsed":"00:00:38","fail":0,"id":"s1-s1","label":"Manager.CommandLine","name":"CommandLine","pass":3,"skip":0},{"elapsed":"00:00:36","fail":0,"id":"s1-s2","label":"Manager.GUI Basic","name":"GUI Basic","pass":6,"skip":0},{"elapsed":"00:00:23","fail":1,"id":"s1-s3","label":"Manager.GUI Bugs","name":"GUI Bugs","pass":0,"skip":0}]];
 </script>
 <script type="text/javascript">
 window.output["errors"] = [];
 </script>
 <script type="text/javascript">
-window.output["baseMillis"] = 1679834719461;
+window.output["baseMillis"] = 1707980614981;
 </script>
 <script type="text/javascript">
-window.output["generated"] = 58704;
+window.output["generated"] = 96461;
 </script>
 <script type="text/javascript">
 window.output["expand_keywords"] = null;
@@ -1831,7 +2109,7 @@ window.settings = {"defaultLevel":"INFO","minLevel":"INFO","reportURL":"report.h
 </script>
 <title></title>
 </head>
-<body>
+<body data-theme="dark">
 <div id="javascript-disabled">
   <h1>Opening Robot Framework log failed</h1>
   <ul>
@@ -1841,12 +2119,13 @@ window.settings = {"defaultLevel":"INFO","minLevel":"INFO","reportURL":"report.h
   </ul>
 </div>
 <script type="text/javascript">removeJavaScriptDisabledWarning();</script>
-
 <div id="header"></div>
 <div id="statistics-container"></div>
 
 <script type="text/javascript">
 $(document).ready(function() {
+    storage.init();
+    theme.init(storage);
     try {
         var topsuite = window.testdata.suite();
     } catch (error) {
@@ -1854,6 +2133,7 @@ $(document).ready(function() {
         return;
     }
     initLayout(topsuite.name, 'Log');
+    theme.reflectPreference();
     addStatistics();
     addErrors();
     addExecutionLog(topsuite);
@@ -1894,25 +2174,6 @@ function drawErrorsRecursively(errors, target) {
         // Errors may have moved scroll position. Resetting location re-scrolls.
         if (window.location.hash)
             window.location.replace(window.location.hash);
-        highlightLinkTarget();
-    }
-}
-
-function highlightLinkTarget() {
-    if (window.location.hash) {
-        var target = $(window.location.hash);
-        highlight(target);
-    }
-}
-
-function highlight(element, color) {
-    if (color === undefined)
-        color = 242;
-    if (color < 255) {
-        element.css({'background-color': 'rgb('+color+','+color+','+color+')'});
-        setTimeout(function () { highlight(element, color+1); }, 300);
-    } else {
-        element.css({'background-color': ''});
     }
 }
 
@@ -1928,9 +2189,8 @@ function makeElementVisible(id) {
         util.map(ids, expandElementWithId);
         if (ids.length) {
             expandFailed(window.testdata.findLoaded(util.last(ids)));
-            window.location.hash = '';
             window.location.hash = id;
-            highlightLinkTarget();
+            document.getElementById(id).scrollIntoView();
         }
     });
 }
@@ -2128,8 +2388,9 @@ function addExecutionLog(main) {
       <div class="element-header-left" title="${type}  {{if name}}{{html fullName}}  {{/if}}[${status}]">
         <span class="elapsed" title="Elapsed time">${times.elapsedTime}</span>
         <span class="label ${status.toLowerCase()}">${type}</span>
-        <span>{{html assign}}</span>
+        <span class="assign">{{html assign}}</span>
         <span class="name"><span class="parent-name">{{html libname}}{{if libname}} . {{/if}}</span>{{html name}}</span>
+        &nbsp;
         <span class="arg">{{html arguments}}</span>
       </div>
       <div class="element-header-right" onclick="stopPropagation(event)">
@@ -2163,6 +2424,12 @@ function addExecutionLog(main) {
           <th>Start / End / Elapsed:</th>
           <td>${times.startTime} / ${times.endTime} / ${times.elapsedTime}</td>
         </tr>
+        {{if message()}}
+        <tr>
+          <th>Message:</th>
+          <td class="message">{{html message()}}</td>
+        </tr>
+        {{/if}}
       </table>
     </div>
   </div>
@@ -2185,6 +2452,7 @@ function addExecutionLog(main) {
   <div id="log-level-selector">
   Log level:
     <select onchange="logLevelSelected(this.options[selectedIndex].value)">
+      <option value="3">WARN</option>
       <option value="2">INFO</option>
       <option value="1">DEBUG</option>
       {{if showTrace()}}<option value="0">TRACE</option>{{/if}}

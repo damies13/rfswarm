@@ -5,7 +5,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="-1">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta content="Robot Framework 6.0.2 (Python 3.7.16 on linux)" name="Generator">
+<meta content="Robot Framework 6.1.1 (Python 3.7.17 on linux)" name="Generator">
 <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKcAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAAqAAAAAAAAAAAAAAAAAAAALIAAAD/AAAA4AAAANwAAADcAAAA3AAAANwAAADcAAAA3AAAANwAAADcAAAA4AAAAP8AAACxAAAAAAAAAKYAAAD/AAAAuwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC/AAAA/wAAAKkAAAD6AAAAzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN8AAAD/AAAA+gAAAMMAAAAAAAAAAgAAAGsAAABrAAAAawAAAGsAAABrAAAAawAAAGsAAABrAAAADAAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAAIsAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAANEAAAAAAAAA2gAAAP8AAAD6AAAAwwAAAAAAAAAAAAAAMgAAADIAAAAyAAAAMgAAADIAAAAyAAAAMgAAADIAAAAFAAAAAAAAANoAAAD/AAAA+gAAAMMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAADwAAAB8AAAAAAAAAGAAAABcAAAAAAAAAH8AAABKAAAAAAAAAAAAAAAAAAAA2gAAAP8AAAD6AAAAwwAAAAAAAADCAAAA/wAAACkAAADqAAAA4QAAAAAAAAD7AAAA/wAAALAAAAAGAAAAAAAAANoAAAD/AAAA+gAAAMMAAAAAAAAAIwAAAP4AAAD/AAAA/wAAAGAAAAAAAAAAAAAAAMkAAAD/AAAAigAAAAAAAADaAAAA/wAAAPoAAADDAAAAAAAAAAAAAAAIAAAAcAAAABkAAAAAAAAAAAAAAAAAAAAAAAAAEgAAAAAAAAAAAAAA2gAAAP8AAAD7AAAAywAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN4AAAD/AAAAqwAAAP8AAACvAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALIAAAD/AAAAsgAAAAAAAAC5AAAA/wAAAMoAAADAAAAAwAAAAMAAAADAAAAAwAAAAMAAAADAAAAAwAAAAMkAAAD/AAAAvAAAAAAAAAAAAAAAAAAAAKwAAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAArQAAAAAAAAAAwAMAAIABAAAf+AAAP/wAAD/8AAAgBAAAP/wAAD/8AAA//AAAJIwAADHEAAA//AAAP/wAAB/4AACAAQAAwAMAAA==">
 <style media="all" type="text/css">
 /* Generic and misc styles */
@@ -1150,7 +1150,7 @@ window.testdata = function () {
     var LEVELS = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FAIL', 'SKIP'];
     var STATUSES = ['FAIL', 'PASS', 'SKIP', 'NOT RUN'];
     var KEYWORD_TYPES = ['KEYWORD', 'SETUP', 'TEARDOWN', 'FOR', 'ITERATION', 'IF', 'ELSE IF', 'ELSE', 'RETURN',
-                         'TRY', 'EXCEPT', 'FINALLY', 'WHILE', 'CONTINUE', 'BREAK'];
+                         'TRY', 'EXCEPT', 'FINALLY', 'WHILE', 'CONTINUE', 'BREAK', 'ERROR'];
     function addElement(elem) {
         if (!elem.id)
             elem.id = uniqueId();
@@ -1629,22 +1629,22 @@ storage = function () {
 window.output = {};
 </script>
 <script type="text/javascript">
-window.output["suite"] = [1,2,3,0,[],[1,0,75671],[[4,5,6,0,[],[1,32,37148],[],[[7,0,8,[9,10,11],[1,51,32002],[]],[12,0,0,[9,10,11],[1,32054,3752],[]],[13,0,0,[9,10,11],[1,35807,1372],[]]],[],[3,3,0,0]],[14,15,16,0,[],[1,37182,38486],[],[[17,0,0,[10],[1,37553,10188],[]],[18,0,0,[9,10,11],[1,47742,6605],[]],[19,0,0,[9,10,11],[1,54348,6635],[]],[20,0,0,[9,10,11],[1,60984,6638],[]],[21,0,0,[9,10,11],[1,67623,6624],[]],[22,0,0,[10,11],[1,74248,1419],[]]],[],[6,6,0,0]]],[],[],[9,9,0,0]];
+window.output["suite"] = [1,2,3,0,[],[0,0,96035],[[4,5,6,0,[],[1,17,37629],[],[[7,0,8,[9,10,11],[1,28,35001],[]],[12,0,0,[9,10,11],[1,35030,1794],[]],[13,0,0,[9,10,11],[1,36825,820],[]]],[],[3,3,0,0]],[14,15,16,0,[],[1,37647,35635],[],[[17,0,0,[10],[1,37863,10111],[]],[18,0,0,[9,10,11],[1,47974,5959],[]],[19,0,0,[9,10,11],[1,53934,5944],[]],[20,0,0,[9,10,11],[1,59878,5947],[]],[21,0,0,[9,10,11],[1,65825,5944],[]],[22,0,0,[10,11],[1,71770,1511],[]]],[],[6,6,0,0]],[23,24,25,0,[],[0,73283,22751],[],[[26,0,0,[9,10,11],[0,73297,22736,27],[]]],[],[1,0,1,0]]],[],[],[10,9,1,0]];
 </script>
 <script type="text/javascript">
 window.output["strings"] = [];
 </script>
 <script type="text/javascript">
-window.output["strings"] = window.output["strings"].concat(["*","*Manager","*/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager","*../..","*CommandLine","*/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/CommandLine.robot","*../../CommandLine.robot","*Random Offset","*<p>This just prevents all the test runners doing git push at the same time\x3c/p>","*macos-latest","*ubuntu-latest","*windows-latest","*Manager Version","*Manager Help","*GUI Basic","*/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/GUI_Basic.robot","*../../GUI_Basic.robot","*Open GUI","*Select Run Tab","*Select Agents Tab","*Select About Tab","*Select Plan Tab","*Close GUI"]);
+window.output["strings"] = window.output["strings"].concat(["*","*Manager","*/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager","*../..","*CommandLine","*/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/CommandLine.robot","*../../CommandLine.robot","*Random Offset","*<p>This just prevents all the test runners doing git push at the same time\x3c/p>","*macos-latest","*ubuntu-latest","*windows-latest","*Manager Version","*Manager Help","*GUI Basic","*/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/GUI_Basic.robot","*../../GUI_Basic.robot","*Open GUI","*Select Run Tab","*Select Agents Tab","*Select About Tab","*Select Plan Tab","*Close GUI","*GUI Bugs","*/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/GUI_Bugs.robot","*../../GUI_Bugs.robot","*Issue #171","*InvalidImageException: Image path not found: \"/home/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_ubuntu_button_closewindow.png\"."]);
 </script>
 <script type="text/javascript">
-window.output["stats"] = [[{"elapsed":"00:01:15","fail":0,"label":"All Tests","pass":9,"skip":0}],[{"elapsed":"00:01:04","fail":0,"label":"macos-latest","pass":7,"skip":0},{"elapsed":"00:01:15","fail":0,"label":"ubuntu-latest","pass":9,"skip":0},{"elapsed":"00:01:05","fail":0,"label":"windows-latest","pass":8,"skip":0}],[{"elapsed":"00:01:16","fail":0,"id":"s1","label":"Manager","name":"Manager","pass":9,"skip":0},{"elapsed":"00:00:37","fail":0,"id":"s1-s1","label":"Manager.CommandLine","name":"CommandLine","pass":3,"skip":0},{"elapsed":"00:00:38","fail":0,"id":"s1-s2","label":"Manager.GUI Basic","name":"GUI Basic","pass":6,"skip":0}]];
+window.output["stats"] = [[{"elapsed":"00:01:36","fail":1,"label":"All Tests","pass":9,"skip":0}],[{"elapsed":"00:01:24","fail":1,"label":"macos-latest","pass":7,"skip":0},{"elapsed":"00:01:36","fail":1,"label":"ubuntu-latest","pass":9,"skip":0},{"elapsed":"00:01:26","fail":1,"label":"windows-latest","pass":8,"skip":0}],[{"elapsed":"00:01:36","fail":1,"id":"s1","label":"Manager","name":"Manager","pass":9,"skip":0},{"elapsed":"00:00:38","fail":0,"id":"s1-s1","label":"Manager.CommandLine","name":"CommandLine","pass":3,"skip":0},{"elapsed":"00:00:36","fail":0,"id":"s1-s2","label":"Manager.GUI Basic","name":"GUI Basic","pass":6,"skip":0},{"elapsed":"00:00:23","fail":1,"id":"s1-s3","label":"Manager.GUI Bugs","name":"GUI Bugs","pass":0,"skip":0}]];
 </script>
 <script type="text/javascript">
-window.output["baseMillis"] = 1679221413818;
+window.output["baseMillis"] = 1707980604729;
 </script>
 <script type="text/javascript">
-window.output["generated"] = 75696;
+window.output["generated"] = 96056;
 </script>
 <script type="text/javascript">
 window.output["expand_keywords"] = null;
@@ -1894,8 +1894,8 @@ function searchTests(suitePattern, testPattern, includePattern, excludePattern) 
 function scrollToSelector(base, query) {
     $('#test-details-container').css('min-height', $(window).height());
     var anchor = query ? base + '?' + encodeURIComponent(query) : base;
-    window.location.hash = '';
     window.location.hash = window.prevLocationHash = anchor;
+    document.getElementById('test-details-container').scrollIntoView();
 }
 
 function renderSelector(args, template, stats) {
