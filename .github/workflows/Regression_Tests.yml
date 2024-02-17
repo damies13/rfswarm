@@ -30,10 +30,8 @@ jobs:
     steps:
       - name: "Echo Vars"
         run: |
-          echo matrix.os: ${{ matrix.os }}
           echo matrix.platform: ${{ matrix.platform }}
           echo matrix.python: ${{ matrix.python }}
-          echo matrix.python-version: ${{ matrix.python-version }}
       - name: (MacOS, <3.11) Fix Python's tkinter Issue-649 (https://github.com/actions/setup-python/issues/649)
         shell: bash
         if: ${{ startswith(matrix.platform, 'macos-') && contains('3.7;3.8;3.9;3.10', matrix.python) }}
@@ -150,10 +148,8 @@ jobs:
     steps:
       - name: "Echo Vars"
         run: |
-          echo matrix.os: ${{ matrix.os }}
           echo matrix.platform: ${{ matrix.platform }}
           echo matrix.python: ${{ matrix.python }}
-          echo matrix.python-version: ${{ matrix.python-version }}
       - name: (MacOS, <3.11) Fix Python's tkinter Issue-649 (https://github.com/actions/setup-python/issues/649)
         shell: bash
         if: ${{ startswith(matrix.platform, 'macos-') && contains('3.7;3.8;3.9;3.10', matrix.python) }}
