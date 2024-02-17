@@ -31,7 +31,11 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 from typing import Any
 
-import pkg_resources
+if sys.version_info >= (3, 8):
+	import importlib.metadata
+else:
+	import pkg_resources
+
 import psutil
 import requests
 
@@ -467,6 +471,16 @@ class RFSwarmAgent():
 			self.saveini()
 
 	def findlibraries(self):
+		if sys.version_info >= (3, 8):
+			self.findlibraries_new()
+		else:
+			self.findlibraries_old()
+
+	def findlibraries_old(self):
+		# pre python 3.8 method
+		# This method works up to python 3.11 but stops working with python 3.12
+		# it is also known to have perfromance issues, so is not recomended for
+		# python versions over 3.8
 		found = 0
 		liblst = []
 		# import pkg_resources
@@ -482,9 +496,12 @@ class RFSwarmAgent():
 
 			if i.key.strip() == "robotframework":
 				found = 1
+				self.agentproperties["RobotFramework"] = str(i).split(" ")[1]
+				self.debugmsg(7, i.key.strip(), str(i).split(" ")[1])
 			if i.key.startswith("robotframework-"):
 				# print(i.key)
 				keyarr = i.key.strip().split("-")
+				self.debugmsg(7, keyarr, str(i).split(" ")[1])
 				#  next overwrites previous
 				self.agentproperties["RobotFramework: Library: " + keyarr[1]] = str(i).split(" ")[1]
 				liblst.append(keyarr[1])
@@ -499,6 +516,57 @@ class RFSwarmAgent():
 			self.debugmsg(0, "RobotFramework is required for the agent to run scripts")
 			self.debugmsg(0, "Perhaps try: 'pip install robotframework'")
 			raise Exception("RobotFramework is not installed")
+
+	def findlibraries_new(self):
+		# post python 3.8 method
+		# This method works for python 3.8 and higher
+		# It is also supposed to perfrom better than the older version
+		found = 0
+		liblst = []
+
+		installed_packages = importlib.metadata.distributions()
+		for i in installed_packages:
+			# if "robot" in i.metadata["Name"]:
+				# print(dist.metadata["Name"], dist.version)
+			if i.metadata["Name"].strip() == "robotframework":
+				found = 1
+				self.agentproperties["RobotFramework"] = i.version
+				self.debugmsg(7, i.metadata["Name"].strip(), i.version)
+			if i.metadata["Name"].startswith("robotframework-"):
+				# print(i.key)
+				keyarr = i.metadata["Name"].strip().split("-")
+				self.debugmsg(7, keyarr, i.version)
+				#  next overwrites previous
+				self.agentproperties["RobotFramework: Library: " + keyarr[1]] = i.version
+				liblst.append(keyarr[1])
+
+		self.debugmsg(8, "liblst:", liblst, len(liblst))
+		if len(liblst) > 0:
+			self.debugmsg(7, "liblst:", ", ".join(liblst))
+			self.agentproperties["RobotFramework: Libraries"] = ", ".join(liblst)
+
+		if not found:
+			self.debugmsg(0, "RobotFramework is not installed!!!")
+			self.debugmsg(0, "RobotFramework is required for the agent to run scripts")
+			self.debugmsg(0, "Perhaps try: 'pip install robotframework'")
+			raise Exception("RobotFramework is not installed")
+
+
+
+		# robotframework-sshlibrary 3.8.0
+		# robotframework-browser 11.1.1
+		# robotframework-seleniumlibrary 6.0.0
+		# robotframework-jsonvalidator 2.0.0
+		# robotframework 6.0.2
+		# robotframework-imagehorizonlibrary 1.0
+		# robotframework-listenerlibrary 1.0.3
+		# robotframework-SikuliLibrary 2.0.0
+		# robotframework-pythonlibcore 3.0.0
+		# robotframework-faker 5.0.0
+		# robotframework-datadriver 1.7.0
+		# robotframework-perfmon 0.1
+		# robotframework-requests 0.9.4
+		# robotframework-assertion-engine 0.2.0
 
 	def tick_counter(self):
 		#
