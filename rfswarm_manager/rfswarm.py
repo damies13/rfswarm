@@ -39,7 +39,7 @@ import tkinter.ttk as ttk  # python3
 import urllib.parse
 import webbrowser
 from datetime import datetime, timezone
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer, HTTPServer
 from operator import itemgetter
 from typing import Any
 
