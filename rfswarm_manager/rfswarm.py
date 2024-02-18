@@ -2347,6 +2347,9 @@ class RFSwarmCore:
 		if not base.args.nogui:
 			base.gui.mainloop()
 
+		while base.run_dbthread:
+			time.sleep(300)
+
 		base.debugmsg(5, "mainloop end")
 
 	def on_closing(self, _event=None, *args):
@@ -2414,12 +2417,7 @@ class RFSwarmCore:
 
 		server_address = (srvip, srvport)
 		try:
-			if sys.version_info >= (3, 12):
-				# not sure if this is the besst solution, may cause more
-				# problmes than it fixes, but it's an attempt
-				base.agenthttpserver = HTTPServer(server_address, AgentServer)
-			else:
-				base.agenthttpserver = ThreadingHTTPServer(server_address, AgentServer)
+			base.agenthttpserver = ThreadingHTTPServer(server_address, AgentServer)
 		except PermissionError:
 			base.debugmsg(0, "Permission denied when trying :", server_address)
 			self.on_closing()
