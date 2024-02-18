@@ -2348,7 +2348,7 @@ class RFSwarmCore:
 			base.gui.mainloop()
 
 		while base.run_dbthread:
-			time.sleep(300)
+			time.sleep(10)
 
 		base.debugmsg(5, "mainloop end")
 
