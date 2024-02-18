@@ -527,7 +527,7 @@ class RFSwarmAgent():
 		installed_packages = importlib.metadata.distributions()
 		for i in installed_packages:
 			# if "robot" in i.metadata["Name"]:
-				# print(dist.metadata["Name"], dist.version)
+			# print(dist.metadata["Name"], dist.version)
 			if i.metadata["Name"].strip() == "robotframework":
 				found = 1
 				self.agentproperties["RobotFramework"] = i.version
@@ -550,23 +550,6 @@ class RFSwarmAgent():
 			self.debugmsg(0, "RobotFramework is required for the agent to run scripts")
 			self.debugmsg(0, "Perhaps try: 'pip install robotframework'")
 			raise Exception("RobotFramework is not installed")
-
-
-
-		# robotframework-sshlibrary 3.8.0
-		# robotframework-browser 11.1.1
-		# robotframework-seleniumlibrary 6.0.0
-		# robotframework-jsonvalidator 2.0.0
-		# robotframework 6.0.2
-		# robotframework-imagehorizonlibrary 1.0
-		# robotframework-listenerlibrary 1.0.3
-		# robotframework-SikuliLibrary 2.0.0
-		# robotframework-pythonlibcore 3.0.0
-		# robotframework-faker 5.0.0
-		# robotframework-datadriver 1.7.0
-		# robotframework-perfmon 0.1
-		# robotframework-requests 0.9.4
-		# robotframework-assertion-engine 0.2.0
 
 	def tick_counter(self):
 		#
