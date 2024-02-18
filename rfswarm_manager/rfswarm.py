@@ -2414,7 +2414,12 @@ class RFSwarmCore:
 
 		server_address = (srvip, srvport)
 		try:
-			base.agenthttpserver = ThreadingHTTPServer(server_address, AgentServer)
+			if sys.version_info >= (3, 12):
+				# not sure if this is the besst solution, may cause more
+				# problmes than it fixes, but it's an attempt
+				base.agenthttpserver = HTTPServer(server_address, AgentServer)
+			else:
+				base.agenthttpserver = ThreadingHTTPServer(server_address, AgentServer)
 		except PermissionError:
 			base.debugmsg(0, "Permission denied when trying :", server_address)
 			self.on_closing()
