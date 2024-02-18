@@ -10,7 +10,7 @@ Issue #171
 	# ${scenariofile}= 	Normalize Path 	${CURDIR}${/}..${/}..${/}Demo${/}demo.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#171${/}Issue171.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	@{mngr_options}= 	Create List 	-g 	3 	-s 	${scenariofile} 	-n
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 	Show Log 	stdout_manager.txt
