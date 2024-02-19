@@ -39,9 +39,6 @@ jobs:
           fi
           echo $isrrelease
 
-      - name: Set verparts
-        run: verparts=($(echo $currversion | tr "-" "\n"))
-
       - name: Set Version Number
         run: |
           verparts=($(echo $currversion | tr "-" "\n"))
