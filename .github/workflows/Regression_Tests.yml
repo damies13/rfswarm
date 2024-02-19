@@ -1,7 +1,11 @@
 ---
 name: Regression Tests
 
-on: push
+on:
+  workflow_run:
+    workflows: [Package]
+    types:
+      - completed
 
 jobs:
   Agent:
