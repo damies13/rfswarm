@@ -24,9 +24,13 @@ jobs:
         run: |
           branchname=$(git rev-parse --abbrev-ref HEAD)
           echo $branchname
-          devcurrversion=$(git describe --abbrev=0 --tags)
-          echo $devcurrversion
-
+          currrelease=$(git describe --abbrev=0 --tags)
+          echo $currrelease
+          isrrelease=0
+          if [[ "$currversion" =~ v[0-9]\. ]]; then
+            isrrelease=1
+          fi
+          echo $isrrelease
 
       - name: Get Version Number
         run: |
