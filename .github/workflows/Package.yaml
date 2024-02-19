@@ -20,6 +20,9 @@ jobs:
         run: |
           echo matrix.platform: ${{ matrix.platform }}
           echo matrix.python: ${{ matrix.python }}
+      - name: Git fetch
+        uses: actions/checkout@v3
+        run: git fetch --prune --unshallow
       - name: Get Version Number new
         run: |
           branchname=$(git rev-parse --abbrev-ref HEAD)
