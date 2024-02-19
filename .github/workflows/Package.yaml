@@ -20,6 +20,14 @@ jobs:
         run: |
           echo matrix.platform: ${{ matrix.platform }}
           echo matrix.python: ${{ matrix.python }}
+      - name: Get Version Number new
+        run: |
+          branchname=$(git rev-parse --abbrev-ref HEAD)
+          echo $branchname
+          devcurrversion=$(git describe --abbrev=0 --tags)
+          echo $devcurrversion
+
+
       - name: Get Version Number
         run: |
           currversion=$(git rev-parse --abbrev-ref HEAD)
