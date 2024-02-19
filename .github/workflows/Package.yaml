@@ -38,6 +38,7 @@ jobs:
             currversion=$currrelease
           fi
           echo $isrrelease
+
       - name: Set Version Number
         run: |
           verparts=($(echo $currversion | tr "-" "\n"))
@@ -55,23 +56,6 @@ jobs:
           version=$numver
         	echo version\: $version
 
-      # - name: Get Version Number Old
-      #   run: |
-      #     currversion=$(git rev-parse --abbrev-ref HEAD)
-      #     echo $currversion
-      #     if [[ "$currversion" =~ v[0-9]\. ]]; then
-      #       verparts=($(echo $currversion | tr "-" "\n"))
-      #       len=${#verparts[@]}
-      #       if [ $len -gt 1 ]; then
-      #         txtversion=${verparts[0]}-${verparts[1]}
-      #       else
-      #         txtversion=${verparts[0]}
-      #       fi
-      #       numver=$(echo $currversion | sed -E 's/v([^-]*)/\1/')
-      #     	echo numver\: $numver
-      #       version=$numver
-      #     	echo version\: $version
-      #     fi
       - name: Update Version Number in python files
         run: |
           cwd
