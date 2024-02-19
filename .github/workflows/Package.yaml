@@ -52,9 +52,9 @@ jobs:
           if [ $isrrelease ]; then
             numver=$numver.dev$datestr
           fi
-        	echo numver\: $numver
+          echo numver\: $numver
           version=$numver
-        	echo version\: $version
+          echo version\: $version
 
       - name: Update Version Number in python files
         run: |
