@@ -9,6 +9,7 @@ jobs:
       matrix:
         platform: [ubuntu-latest]
         python: ['3.x']
+    runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
