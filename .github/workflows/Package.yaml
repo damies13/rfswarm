@@ -50,16 +50,16 @@ jobs:
             txtversion=${verparts[0]}
           fi
           numver=$(echo $currversion | sed -E 's/v([^-]*)/\1/')
-          numverparts=($(echo $numver | tr "." "\n"))
-          len=${#numverparts[@]}
-          if [ $len -gt 2 ]; then
-            numver=${verparts[0]}.${verparts[1]}.${verparts[2]+1}
-          elif [ $len -eq 2 ]; then
-            numver=${verparts[0]}.${verparts[1]}.1
-          else
-            numver=${verparts[0]}.1.0
-          fi
           if [ $isrrelease ]; then
+            numverparts=($(echo $numver | tr "." "\n"))
+            len=${#numverparts[@]}
+            if [ $len -gt 2 ]; then
+              numver=${numverparts[0]}.${numverparts[1]}.${numverparts[2]+1}
+            elif [ $len -eq 2 ]; then
+              numver=${numverparts[0]}.${numverparts[1]}.1
+            else
+              numver=${numverparts[0]}.1.0
+            fi
             numver=$numver.dev$datestr
           fi
           echo numver=$numver >> $GITHUB_ENV
