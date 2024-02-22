@@ -50,11 +50,20 @@ jobs:
             txtversion=${verparts[0]}
           fi
           numver=$(echo $currversion | sed -E 's/v([^-]*)/\1/')
+          numverparts=($(echo $numver | tr "." "\n"))
+          len=${#numverparts[@]}
+          if [ $len -gt 2 ]; then
+            numver=${verparts[0]}.${verparts[1]}.${verparts[2]+1}
+          elif [ $len -eq 2 ]; then
+            numver=${verparts[0]}.${verparts[1]}.1
+          else
+            numver=${verparts[0]}.1.0
+          fi
           if [ $isrrelease ]; then
             numver=$numver.dev$datestr
           fi
           echo numver=$numver >> $GITHUB_ENV
-          version=$numver
+          version=v$numver
           echo version=$version >> $GITHUB_ENV
 
       - name: Update Version Number in python files
