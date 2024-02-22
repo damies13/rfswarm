@@ -54,7 +54,7 @@ jobs:
             numverparts=($(echo $numver | tr "." "\n"))
             len=${#numverparts[@]}
             if [ $len -gt 2 ]; then
-              numver=${numverparts[0]}.${numverparts[1]}.${numverparts[2]+1}
+              numver=${numverparts[0]}.${numverparts[1]}.$((${numverparts[2]}+1))
             elif [ $len -eq 2 ]; then
               numver=${numverparts[0]}.${numverparts[1]}.1
             else
