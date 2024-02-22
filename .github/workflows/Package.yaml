@@ -24,24 +24,25 @@ jobs:
         run: git fetch --prune --unshallow
       - name: Get Version Number
         run: |
-          datestr=$(date +"%Y%m%d%H%M%S")
-          echo $datestr
+          datestr=$(date +%Y%m%d%H%M%S)
+          echo datestr=$datestr >> $GITHUB_ENV
           branchname=$(git rev-parse --abbrev-ref HEAD)
-          echo $branchname
+          echo branchname=$branchname >> $GITHUB_ENV
           currrelease=$(git describe --abbrev=0 --tags)
-          echo $currrelease
+          echo currrelease=$currrelease >> $GITHUB_ENV
           isrrelease=0
-          if [[ "$currversion" =~ v[0-9]\. ]]; then
+          if [[ $currversion =~ v[0-9]\. ]]; then
             isrrelease=1
             currversion=$branchname
           else
             currversion=$currrelease
           fi
-          echo $isrrelease
+          echo currversion=$currversion >> $GITHUB_ENV
+          echo isrrelease=$isrrelease >> $GITHUB_ENV
 
       - name: Set Version Number
         run: |
-          verparts=($(echo $currversion | tr "-" "\n"))
+          verparts=($(echo $currversion | tr - \n))
           len=${#verparts[@]}
           if [ $len -gt 1 ]; then
             txtversion=${verparts[0]}-${verparts[1]}
@@ -52,9 +53,9 @@ jobs:
           if [ $isrrelease ]; then
             numver=$numver.dev$datestr
           fi
-          echo numver\: $numver
+          echo numver=$numver >> $GITHUB_ENV
           version=$numver
-          echo version\: $version
+          echo version=$version >> $GITHUB_ENV
 
       - name: Update Version Number in python files
         run: |
