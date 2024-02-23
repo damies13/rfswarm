@@ -51,10 +51,6 @@ jobs:
         run: |
           datestr=$(date +%Y%m%d%H%M%S)
           echo "datestr=$datestr" >> "$GITHUB_ENV"
-      - name: "Echo Vars 2"
-        run: |
-          echo matrix.platform: ${{ env.branchname }}
-          echo matrix.python: ${{ env.datestr }}
 
       - name: Set Version Number to Branch Name
         if: ${{ env.isrrelease == 1 }}
@@ -80,6 +76,10 @@ jobs:
           echo "numver=$numver" >> "$GITHUB_ENV"
           version=v$numver
           echo "version=$version" >> "$GITHUB_ENV"
+      - name: "Echo Vars 2"
+        run: |
+          echo numver: ${{ env.numver }}
+          echo version: ${{ env.version }}
       #
       # - name: Update Version Number in python files
       #   run: |
