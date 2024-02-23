@@ -23,9 +23,7 @@ jobs:
       - name: Git fetch
         run: git fetch --prune --unshallow
       - name: Get Branch Name
-        run: |
-          branchname=$(git rev-parse --abbrev-ref HEAD)
-          echo branchname=$branchname >> $GITHUB_ENV
+        run: branchname=$(git rev-parse --abbrev-ref HEAD) && echo branchname=$branchname >> $GITHUB_ENV
       - name: Get Current Release Tag
         run: |
           currrelease=$(git describe --abbrev=0 --tags)
@@ -51,8 +49,8 @@ jobs:
 
       - name: "Echo Vars 2"
         run: |
-          echo matrix.platform: ${{ GITHUB_ENV.branchname }}
-          echo matrix.python: ${{ GITHUB_ENV.datestr }}
+          echo matrix.platform: ${{ env.branchname }}
+          echo matrix.python: ${{ env.datestr }}
 
 
 
