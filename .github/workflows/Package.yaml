@@ -23,62 +23,63 @@ jobs:
       - name: Git fetch
         run: git fetch --prune --unshallow
       - name: Get Branch Name
-        run: branchname=$(git rev-parse --abbrev-ref HEAD) && echo branchname=$branchname >> $GITHUB_ENV
+        run: |
+          branchname=$(git rev-parse --abbrev-ref HEAD)
+          echo "branchname=$branchname" >> "$GITHUB_ENV"
       - name: Get Current Release Tag
         run: |
           currrelease=$(git describe --abbrev=0 --tags)
-          echo currrelease=$currrelease >> $GITHUB_ENV
+          echo "currrelease=$currrelease" >> "$GITHUB_ENV"
       - name: Determine if this is a release branch
         run: |
           isrrelease=0
           if [[ $branchname =~ v[0-9]\. ]]; then
             isrrelease=1
           fi
-          echo isrrelease=$isrrelease >> $GITHUB_ENV
+          echo "isrrelease=$isrrelease" >> "$GITHUB_ENV"
       - name: Determine if this is master branch
         run: |
           ismaster=0
           if [[ $branchname == master ]]; then
             ismaster=1
           fi
-          echo ismaster=$ismaster >> $GITHUB_ENV
+          echo "ismaster=$ismaster" >> "$GITHUB_ENV"
+
+
       - name: Get Date String
+        if: ${{ env.isrrelease == 0 && env.ismaster == 0 }}
         run: |
           datestr=$(date +%Y%m%d%H%M%S)
-          echo datestr=$datestr >> $GITHUB_ENV
-
+          echo "datestr=$datestr" >> "$GITHUB_ENV"
       - name: "Echo Vars 2"
         run: |
           echo matrix.platform: ${{ env.branchname }}
           echo matrix.python: ${{ env.datestr }}
 
-
-
-      # - name: Set Version Number
-      #   run: |
-      #     verparts=($(echo $currversion | tr - \n))
-      #     len=${#verparts[@]}
-      #     if [ $len -gt 1 ]; then
-      #       txtversion=${verparts[0]}-${verparts[1]}
-      #     else
-      #       txtversion=${verparts[0]}
-      #     fi
-      #     numver=$(echo $currversion | sed -E 's/v([^-]*)/\1/')
-      #     if [ $isrrelease -lt 1 ]; then
-      #       numverparts=($(echo $numver | tr "." "\n"))
-      #       len=${#numverparts[@]}
-      #       if [ $len -gt 2 ]; then
-      #         numver=${numverparts[0]}.${numverparts[1]}.$((${numverparts[2]}+1))
-      #       elif [ $len -eq 2 ]; then
-      #         numver=${numverparts[0]}.${numverparts[1]}.1
-      #       else
-      #         numver=${numverparts[0]}.1.0
-      #       fi
-      #       numver=$numver.dev$datestr
-      #     fi
-      #     echo numver=$numver >> $GITHUB_ENV
-      #     version=v$numver
-      #     echo version=$version >> $GITHUB_ENV
+      - name: Set Version Number to Branch Name
+        if: ${{ env.isrrelease == 1 }}
+        run: |
+          numver=$(echo $branchname | sed -E 's/v([^-]*)/\1/')
+          echo "numver=$numver" >> "$GITHUB_ENV"
+          version=v$numver
+          echo "version=$version" >> "$GITHUB_ENV"
+      - name: Set New Version Number
+        if: ${{ env.isrrelease == 0 && env.ismaster == 0 }}
+        run: |
+          numver=$(echo $currrelease | sed -E 's/v([^-]*)/\1/')
+          numverparts=($(echo $numver | tr "." "\n"))
+          len=${#numverparts[@]}
+          if [ $len -gt 2 ]; then
+            numver=${numverparts[0]}.${numverparts[1]}.$((${numverparts[2]}+1))
+          elif [ $len -eq 2 ]; then
+            numver=${numverparts[0]}.${numverparts[1]}.1
+          else
+            numver=${numverparts[0]}.0.1
+          fi
+          numver=$numver.dev$datestr
+          echo "numver=$numver" >> "$GITHUB_ENV"
+          version=v$numver
+          echo "version=$version" >> "$GITHUB_ENV"
       #
       # - name: Update Version Number in python files
       #   run: |
