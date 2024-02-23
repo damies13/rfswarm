@@ -59,18 +59,18 @@ jobs:
       - name: Set Version Number to Branch Name
         if: ${{ env.isrrelease == 1 }}
         run: |
-          numver=$(echo $branchname | sed -E 's/v([^-]*)/\1/')
+          numver=$(echo "$branchname" | sed -E 's/v([^-]*)/\1/')
           echo "numver=$numver" >> "$GITHUB_ENV"
           version=v$numver
           echo "version=$version" >> "$GITHUB_ENV"
       - name: Set New Version Number
         if: ${{ env.isrrelease == 0 && env.ismaster == 0 }}
         run: |
-          numver=$(echo $currrelease | sed -E 's/v([^-]*)/\1/')
-          numverparts=($(echo $numver | tr "." "\n"))
+          numver=$(echo "$currrelease" | sed -E 's/v([^-]*)/\1/')
+          numverparts=($(echo "$numver" | tr "." "\n"))
           len=${#numverparts[@]}
           if [ $len -gt 2 ]; then
-            numver=${numverparts[0]}.${numverparts[1]}.$((${numverparts[2]}+1))
+            numver=${numverparts[0]}.${numverparts[1]}.$(( numverparts[2] + 1))
           elif [ $len -eq 2 ]; then
             numver=${numverparts[0]}.${numverparts[1]}.1
           else
