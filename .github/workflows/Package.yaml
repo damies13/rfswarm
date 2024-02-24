@@ -86,8 +86,8 @@ jobs:
           pwd
           ls -la
           echo "get files"
-          files=$(find . -name '*.py')
-          files | while IFS='' read -r file
+          # files=$(find . -name '*.py')
+          $(find . -name '*.py') | while IFS='' read -r file
           do
             sed -i -e "s/version = \"[^\"]*\"/version = \"${version}\"/" "$file"
             sed -i -e "s/version=\"[^\"]*\"/version = \"${version}\"/" "$file"
