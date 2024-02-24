@@ -5,7 +5,7 @@ on: push
 
 jobs:
   Package_For_PIP:
-    uses: .github/workflows/Package.yaml@ref
+    uses: ./.github/workflows/Package.yaml@ref
 
   Agent:
     needs:
