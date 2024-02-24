@@ -18,15 +18,15 @@ jobs:
         with:
           python-version: 3.x
       - name: "Apt Update"
-        if: ${{ matrix.platform == 'ubuntu-latest' }}
+        # if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
           sudo apt update -y
       - name: "pip install"
         run: pip install --upgrade build setuptools twine wheel
-      - name: "Echo Vars"
-        run: |
-          echo matrix.platform: ${{ matrix.platform }}
-          echo matrix.python: ${{ matrix.python }}
+      # - name: "Echo Vars"
+      #   run: |
+      #     echo matrix.platform: ${{ matrix.platform }}
+      #     echo matrix.python: ${{ matrix.python }}
       - name: Git fetch
         run: git fetch --prune --unshallow
       - name: Get Branch Name
