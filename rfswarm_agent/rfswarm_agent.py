@@ -42,7 +42,7 @@ import requests
 
 class RFSwarmAgent():
 
-	version = "1.2.1"
+	version = "v1.2.1"
 	config = None
 	isconnected = False
 	isrunning = False

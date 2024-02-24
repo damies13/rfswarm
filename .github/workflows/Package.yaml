@@ -89,8 +89,8 @@ jobs:
           sed -i -e "s/version = \"[^\"]*\"/version = \"${version}\"/" $(find . -name "*.py")
           echo "version comment"
           sed -i -e "s/#    Version .*/#    Version ${version}/" $(find . -name "*.py")
-          echo "--------------- cat rfswarm.py ---------------"
-          cat rfswarm_manager/rfswarm.py
+          echo "--------------- head rfswarm_agent.py ---------------"
+          head -50  rfswarm_agent/rfswarm_agent.py
           echo "--------------- cat setup-manager.py ---------------"
           cat setup-manager.py
 
