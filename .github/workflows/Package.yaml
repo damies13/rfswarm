@@ -86,12 +86,15 @@ jobs:
           pwd
           ls -la
           echo "get files"
-          # files=$(find . -name '*.py')
-          $(find . -name '*.py') | while IFS='' read -r file
+          files=$(find . -name '*.py')
+          # $(find . -name '*.py') | while IFS='' read -r file
+          for file in $files
           do
+            echo "version variable : $file"
             sed -i -e "s/version = \"[^\"]*\"/version = \"${version}\"/" "$file"
             sed -i -e "s/version=\"[^\"]*\"/version = \"${version}\"/" "$file"
-            sed -i -e "s/#    Version .*/#    Version ${version}/"
+            echo "version comment : $file"
+            sed -i -e "s/#    Version .*/#    Version ${version}/" "$file"
           done
           # echo "version variable"
           # sed -i -e "s/version = \"[^\"]*\"/version = \"${version}\"/" "$(find . -name '*.py')"
