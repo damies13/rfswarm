@@ -5,17 +5,18 @@ on: push
 
 jobs:
   Package_For_PIP:
-    strategy:
-      matrix:
-        platform: [ubuntu-latest]
-        python: ['3.x']
-    runs-on: ${{ matrix.platform }}
+    # strategy:
+    #   matrix:
+    #     platform: [ubuntu-latest]
+    #     python: ['3.x']
+    # runs-on: ${{ matrix.platform }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python }}
+          python-version: 3.x
       - name: "Apt Update"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
@@ -140,5 +141,13 @@ jobs:
       - name: Show Dist
         run: |
           ls -la dist
+
+      - name: Archive pip packages in dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-folder
+          path: |
+            dist
+
 
 #
