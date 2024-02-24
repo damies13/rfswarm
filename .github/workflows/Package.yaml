@@ -83,7 +83,8 @@ jobs:
 
       - name: Update Version Number in python files
         run: |
-          cwd
+          pwd
+          ls -la
           echo "version variable"
           sed -i -e "s/version = \"[^\"]*\"/version = \"${version}\"/" $(find . -name "*.py")
           echo "version comment"
