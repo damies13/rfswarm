@@ -1,7 +1,7 @@
 import setuptools
 
 with open("README_PyPi.md", "r") as fh:
-	long_description=fh.read()
+	long_description = fh.read()
 
 setuptools.setup(
 	name="rfswarm-manager",
