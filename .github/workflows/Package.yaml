@@ -80,11 +80,13 @@ jobs:
         run: |
           echo numver: ${{ env.numver }}
           echo version: ${{ env.version }}
-      #
-      # - name: Update Version Number in python files
-      #   run: |
-      #     cwd
-      #     echo sed -i -e "s/version = \"[^\"]*\"/version = \"${version}\"/" $(find . -name "*.py")
-      #     sed -i -e "s/version = \"[^\"]*\"/version = \"${version}\"/" $(find . -name "*.py")
-      #     echo sed -i -e "s/#    Version .*/#    Version ${version}/" $(find . -name "*.py")
-      #     sed -i -e "s/#    Version .*/#    Version ${version}/" $(find . -name "*.py")
+
+      - name: Update Version Number in python files
+        run: |
+          cwd
+          sed -i -e "s/version = \"[^\"]*\"/version = \"${version}\"/" $(find . -name "*.py")
+          sed -i -e "s/#    Version .*/#    Version ${version}/" $(find . -name "*.py")
+          cat setup-manager.py
+
+
+# 
