@@ -85,10 +85,18 @@ jobs:
         run: |
           pwd
           ls -la
-          echo "version variable"
-          sed -i -e "s/version = \"[^\"]*\"/version = \"${version}\"/" "$(find . -name '*.py')"
-          echo "version comment"
-          sed -i -e "s/#    Version .*/#    Version ${version}/" "$(find . -name '*.py')"
+          echo "get files"
+          files=$(find . -name '*.py')
+          files | while IFS='' read -r file
+          do
+            sed -i -e "s/version = \"[^\"]*\"/version = \"${version}\"/" "$file"
+            sed -i -e "s/version=\"[^\"]*\"/version = \"${version}\"/" "$file"
+            sed -i -e "s/#    Version .*/#    Version ${version}/"
+          done
+          # echo "version variable"
+          # sed -i -e "s/version = \"[^\"]*\"/version = \"${version}\"/" "$(find . -name '*.py')"
+          # echo "version comment"
+          # sed -i -e "s/#    Version .*/#    Version ${version}/" "$(find . -name '*.py')"
           echo "--------------- head rfswarm_agent.py ---------------"
           head -50  rfswarm_agent/rfswarm_agent.py
           echo "--------------- cat setup-manager.py ---------------"
