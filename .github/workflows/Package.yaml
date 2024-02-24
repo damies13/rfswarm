@@ -84,9 +84,10 @@ jobs:
       - name: Update Version Number in python files
         run: |
           cwd
+          ls -la
           sed -i -e "s/version = \"[^\"]*\"/version = \"${version}\"/" $(find . -name "*.py")
           sed -i -e "s/#    Version .*/#    Version ${version}/" $(find . -name "*.py")
           cat setup-manager.py
 
 
-# 
+#
