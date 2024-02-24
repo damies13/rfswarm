@@ -86,9 +86,9 @@ jobs:
           pwd
           ls -la
           echo "version variable"
-          sed -i -e "s/version = \"[^\"]*\"/version = \"${version}\"/" "$(find . -name *.py)"
+          sed -i -e "s/version = \"[^\"]*\"/version = \"${version}\"/" "$(find . -name '*.py')"
           echo "version comment"
-          sed -i -e "s/#    Version .*/#    Version ${version}/" "$(find . -name *.py)"
+          sed -i -e "s/#    Version .*/#    Version ${version}/" "$(find . -name '*.py')"
           echo "--------------- head rfswarm_agent.py ---------------"
           head -50  rfswarm_agent/rfswarm_agent.py
           echo "--------------- cat setup-manager.py ---------------"
