@@ -144,8 +144,9 @@ jobs:
 
       - name: Archive pip packages in dist
         uses: actions/upload-artifact@v4
+        # https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts#passing-data-between-jobs-in-a-workflow
         with:
-          name: dist-folder
+          name: dist
           path: |
             dist
 
