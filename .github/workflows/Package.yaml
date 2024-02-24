@@ -103,22 +103,22 @@ jobs:
 
       - name: Clear Dist
         run: |
-          rm -R dist/
+          rm -fR dist/
       - name: Clear Build for Manager
         run: |
-          rm -R build/
+          rm -fR build/
       - name: Build Manager
         run: |
           python3 setup-manager.py sdist bdist_wheel
       - name: Clear Build for Agent
         run: |
-          rm -R build/
+          rm -fR build/
       - name: Build Agent
         run: |
           python3 setup-agent.py sdist bdist_wheel
       - name: Clear Build for Reporter
         run: |
-          rm -R build/
+          rm -fR build/
       - name: Build Reporter
         run: |
           python3 setup-reporter.py sdist bdist_wheel
