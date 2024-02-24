@@ -85,49 +85,45 @@ jobs:
         run: |
           pwd
           ls -la
-          echo "get files"
+          # echo "get files"
           files=$(find . -name '*.py')
-          # $(find . -name '*.py') | while IFS='' read -r file
           for file in $files
           do
-            echo "version variable : $file"
+            # echo "version variable : $file"
             sed -i -e "s/version = \"[^\"]*\"/version = \"${version}\"/" "$file"
             sed -i -e "s/version=\"[^\"]*\"/version = \"${version}\"/" "$file"
-            echo "version comment : $file"
+            # echo "version comment : $file"
             sed -i -e "s/#    Version .*/#    Version ${version}/" "$file"
           done
-          # echo "version variable"
-          # sed -i -e "s/version = \"[^\"]*\"/version = \"${version}\"/" "$(find . -name '*.py')"
-          # echo "version comment"
-          # sed -i -e "s/#    Version .*/#    Version ${version}/" "$(find . -name '*.py')"
-          echo "--------------- head rfswarm_agent.py ---------------"
-          head -50  rfswarm_agent/rfswarm_agent.py
-          echo "--------------- cat setup-manager.py ---------------"
-          cat setup-manager.py
+          # echo "--------------- head rfswarm_agent.py ---------------"
+          # head -50  rfswarm_agent/rfswarm_agent.py
+          echo "--------------- head setup-manager.py ---------------"
+          head -10  setup-manager.py
+          echo "--------------- end head setup-manager.py ---------------"
 
-      # - name: Clear Dist
-      #   run: |
-      #     rm -R dist/
-      # - name: Clear Build for Manager
-      #   run: |
-      #     rm -R build/
-      # - name: Build Manager
-      #   run: |
-      #     python3 setup-manager.py sdist bdist_wheel
-      # - name: Clear Build for Agent
-      #   run: |
-      #     rm -R build/
-      # - name: Build Agent
-      #   run: |
-      #     python3 setup-agent.py sdist bdist_wheel
-      # - name: Clear Build for Reporter
-      #   run: |
-      #     rm -R build/
-      # - name: Build Reporter
-      #   run: |
-      #     python3 setup-reporter.py sdist bdist_wheel
-      # - name: Show Dist
-      #   run: |
-      #     ls -la dist
+      - name: Clear Dist
+        run: |
+          rm -R dist/
+      - name: Clear Build for Manager
+        run: |
+          rm -R build/
+      - name: Build Manager
+        run: |
+          python3 setup-manager.py sdist bdist_wheel
+      - name: Clear Build for Agent
+        run: |
+          rm -R build/
+      - name: Build Agent
+        run: |
+          python3 setup-agent.py sdist bdist_wheel
+      - name: Clear Build for Reporter
+        run: |
+          rm -R build/
+      - name: Build Reporter
+        run: |
+          python3 setup-reporter.py sdist bdist_wheel
+      - name: Show Dist
+        run: |
+          ls -la dist
 
 #
