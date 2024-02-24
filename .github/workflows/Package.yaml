@@ -63,11 +63,11 @@ jobs:
         if: ${{ env.isrrelease == 0 && env.ismaster == 0 }}
         run: |
           numver=$(echo "$currrelease" | sed -E 's/v([^-]*)/\1/')
-          numverparts=($(echo "$numver" | tr "." "\n"))
+          numverparts=('$(echo "$numver" | tr "." "\n")')
           len=${#numverparts[@]}
-          if [ $len -gt 2 ]; then
+          if [ "$len" -gt "2" ]; then
             numver=${numverparts[0]}.${numverparts[1]}.$(( numverparts[2] + 1))
-          elif [ $len -eq 2 ]; then
+          elif [ "$len" -eq "2" ]; then
             numver=${numverparts[0]}.${numverparts[1]}.1
           else
             numver=${numverparts[0]}.0.1
