@@ -84,9 +84,13 @@ jobs:
       - name: Update Version Number in python files
         run: |
           cwd
-          ls -la
+          echo "version variable"
           sed -i -e "s/version = \"[^\"]*\"/version = \"${version}\"/" $(find . -name "*.py")
+          echo "version comment"
           sed -i -e "s/#    Version .*/#    Version ${version}/" $(find . -name "*.py")
+          echo "--------------- cat rfswarm.py ---------------"
+          cat rfswarm_manager/rfswarm.py
+          echo "--------------- cat setup-manager.py ---------------"
           cat setup-manager.py
 
 
