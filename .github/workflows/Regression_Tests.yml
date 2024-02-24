@@ -1,14 +1,15 @@
 ---
 name: Regression Tests
 
-on:
-  workflow_run:
-    workflows: [Package]
-    types:
-      - completed
+on: push
 
 jobs:
+  Package_For_PIP:
+    uses: .github/workflows/Package.yaml@ref
+
   Agent:
+    needs:
+      - Package_For_PIP
     strategy:
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
@@ -25,6 +26,8 @@ jobs:
       - name: Robot Framework
         run: robot --include ${{ matrix.platform }} Tests/Regression/Agent
   Manager:
+    needs:
+      - Package_For_PIP
     strategy:
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
@@ -143,6 +146,8 @@ jobs:
           echo "git push"
           git push
   Reporter:
+    needs:
+      - Package_For_PIP
     strategy:
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
