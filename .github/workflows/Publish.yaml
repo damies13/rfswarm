@@ -39,13 +39,11 @@ jobs:
           name: dist
           path: dist
       - name: Show Dist UM
-        if: ${{ env.isrrelease == 1 }}
-        if: ${{ matrix.platform != 'windows-latest' }}
+        if: ${{ env.isrrelease == 1 && matrix.platform != 'windows-latest' }}
         run: |
           ls -la dist
       - name: Show Dist W
-        if: ${{ env.isrrelease == 1 }}
-        if: ${{ matrix.platform == 'windows-latest' }}
+        if: ${{ env.isrrelease == 1 && matrix.platform == 'windows-latest' }}
         run: |
           dir dist
 
