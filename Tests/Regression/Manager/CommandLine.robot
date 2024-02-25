@@ -17,7 +17,7 @@ Random Offset
 Manager Version
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
 	# ${result}= 	Run 	python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -v
-	${result}= 	Run 	${cmd_agent} -v
+	${result}= 	Run 	${cmd_manager} -v
 	Log to console 	${\n}${result}
 	Should Contain	${result}	Version
 	Should Contain	${result}	Manager
@@ -25,7 +25,7 @@ Manager Version
 Manager Help
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
 	# ${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -h
-	${result}=	Run 	${cmd_agent} -h
+	${result}=	Run 	${cmd_manager} -h
 	Log to console 	${\n}${result}
 	Should Contain	${result}	IPADDRESS
 
