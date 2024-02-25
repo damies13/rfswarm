@@ -39,8 +39,10 @@ jobs:
       - name: Install Agent from dist W
         if: ${{ matrix.platform == 'windows-latest' }}
         run: |
-          for /r %f in (dist/rfswarm_agent-*.whl) do echo %f
-          for /r %f in (dist/rfswarm_agent-*.whl) do pip install %f
+          $files = GetChildItem –Filter rfswarm_agent-*.whl –Recurse
+          echo $files
+        # for /r %f in (dist/rfswarm_agent-*.whl) do echo %f
+        # for /r %f in (dist/rfswarm_agent-*.whl) do pip install %f
 
       - name: Install Manager from dist (for testing Issues) UM
         # if: ${{ matrix.platform != 'windows-latest' }}
