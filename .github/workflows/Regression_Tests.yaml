@@ -27,7 +27,7 @@ jobs:
       - name: Show Dist UM
         if: ${{ matrix.platform != 'windows-latest' }}
         run: |
-          ls -la dist W
+          ls -la dist
       - name: Show Dist
         if: ${{ matrix.platform == 'windows-latest' }}
         run: |
