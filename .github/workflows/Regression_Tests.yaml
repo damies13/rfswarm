@@ -38,14 +38,20 @@ jobs:
         run: pip install dist/rfswarm_agent-*.whl
       - name: Install Agent from dist W
         if: ${{ matrix.platform == 'windows-latest' }}
-        run: |
-          $files = GetChildItem –Filter rfswarm_agent-*.whl –Recurse
-          echo $files
+        shell: cmd
+        run: pip install dist/rfswarm_agent-*.whl
+        # run: |
+        # $files = GetChildItem –Filter rfswarm_agent-*.whl –Recurse
+        # echo $files
         # for /r %f in (dist/rfswarm_agent-*.whl) do echo %f
         # for /r %f in (dist/rfswarm_agent-*.whl) do pip install %f
 
       - name: Install Manager from dist (for testing Issues) UM
         # if: ${{ matrix.platform != 'windows-latest' }}
+        run: pip install dist/rfswarm_manager-*.whl
+      - name: Install Manager from dist (for testing Issues) W
+        if: ${{ matrix.platform == 'windows-latest' }}
+        shell: cmd
         run: pip install dist/rfswarm_manager-*.whl
 
       # Tests will probably fail as some dependancies for testing will be missing
