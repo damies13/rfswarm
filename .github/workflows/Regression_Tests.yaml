@@ -34,15 +34,13 @@ jobs:
           dir dist
 
       - name: Install Agent from dist UM
-        # if: ${{ matrix.platform != 'windows-latest' }}
+        if: ${{ matrix.platform != 'windows-latest' }}
         run: pip install rfswarm_agent-*.whl
         working-directory: ./dist
-
-
       - name: Install Agent from dist W
         if: ${{ matrix.platform == 'windows-latest' }}
         shell: cmd
-        run: pip install rfswarm_agent-*.whl
+        run: for %%f in (dist/rfswarm_agent-*.whl) do pip install %%f
         working-directory: ./dist
         # run: |
         # $files = GetChildItem –Filter rfswarm_agent-*.whl –Recurse
