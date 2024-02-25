@@ -23,7 +23,6 @@ jobs:
         with:
           name: dist
           path: dist
-
       - name: Show Dist UM
         if: ${{ matrix.platform != 'windows-latest' }}
         run: |
@@ -32,7 +31,6 @@ jobs:
         if: ${{ matrix.platform == 'windows-latest' }}
         run: |
           dir dist
-
       - name: Install Agent from dist UM
         if: ${{ matrix.platform != 'windows-latest' }}
         run: pip install rfswarm_agent-*.whl
@@ -52,7 +50,6 @@ jobs:
         run: for %%f in (rfswarm_manager-*.whl) do pip install %%f
         working-directory: ./dist
       - run: pip install -r Tests/Regression/Agent/pip_requirements.txt
-
 
       - name: Robot Framework
         run: robot --include ${{ matrix.platform }} Tests/Regression/Agent
@@ -129,7 +126,39 @@ jobs:
       # - name: "Verify tesseract"
       #   run: tesseract -v
 
+      - name: Download packages to dist
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Show Dist UM
+        if: ${{ matrix.platform != 'windows-latest' }}
+        run: |
+          ls -la dist
+      - name: Show Dist W
+        if: ${{ matrix.platform == 'windows-latest' }}
+        run: |
+          dir dist
+      - name: Install Manager from dist UM
+        if: ${{ matrix.platform != 'windows-latest' }}
+        run: pip install rfswarm_manager-*.whl
+        working-directory: ./dist
+      - name: Install Manager from dist W
+        if: ${{ matrix.platform == 'windows-latest' }}
+        shell: cmd
+        run: for %%f in (rfswarm_manager-*.whl) do pip install %%f
+        working-directory: ./dist
+      - name: Install Agent from dist (for testing Issues) UM
+        if: ${{ matrix.platform != 'windows-latest' }}
+        run: pip install rfswarm_agent-*.whl
+        working-directory: ./dist
+      - name: Install Agent from dist (for testing Issues) W
+        if: ${{ matrix.platform == 'windows-latest' }}
+        shell: cmd
+        run: for %%f in (rfswarm_agent-*.whl) do pip install %%f
+        working-directory: ./dist
       - run: pip install -r Tests/Regression/Manager/pip_requirements.txt
+
       - name: setup git config
         run: |
           # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
@@ -146,6 +175,8 @@ jobs:
           Tests/Regression/Manager
         env:
           DISPLAY: :13.0
+
+      # This below is to save results back to git, actions/upload-artifact@v4 might be a better solution, see Issue #169
       - name: git commit
         # if: ${{ steps.robottest.conclusion == 'failure' }}
         # https://docs.github.com/en/actions/learn-github-actions/expressions
@@ -269,7 +300,31 @@ jobs:
         #     "%programfiles%\Tesseract-OCR\tesseract.exe" -v
         #   shell: cmd
         #
+
+      - name: Download packages to dist
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Show Dist UM
+        if: ${{ matrix.platform != 'windows-latest' }}
+        run: |
+          ls -la dist
+      - name: Show Dist W
+        if: ${{ matrix.platform == 'windows-latest' }}
+        run: |
+          dir dist
+      - name: Install Reporter from dist UM
+        if: ${{ matrix.platform != 'windows-latest' }}
+        run: pip install rfswarm_reporter-*.whl
+        working-directory: ./dist
+      - name: Install Reporter from dist W
+        if: ${{ matrix.platform == 'windows-latest' }}
+        shell: cmd
+        run: for %%f in (rfswarm_reporter-*.whl) do pip install %%f
+        working-directory: ./dist
       - run: pip install -r Tests/Regression/Reporter/pip_requirements.txt
+
       - name: setup git config
         run: |
           # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
@@ -278,6 +333,7 @@ jobs:
           git config advice.addIgnoredFile false
       - name: create branch for test results
         run: git checkout -B Test-Result-Reporter-${{ matrix.platform }}-${{ matrix.python }}
+
       - name: Robot Framework
         id: robottest
         run: >
@@ -286,6 +342,8 @@ jobs:
           Tests/Regression/Reporter
         env:
           DISPLAY: :13.0
+
+      # This below is to save results back to git, actions/upload-artifact@v4 might be a better solution, see Issue #169
       - name: git commit
         # if: ${{ steps.robottest.conclusion == 'failure' }}
         if: ${{ failure() }}

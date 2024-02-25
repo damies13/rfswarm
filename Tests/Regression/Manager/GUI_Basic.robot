@@ -6,6 +6,8 @@ Library 	String
 Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
 *** Variables ***
+${cmd_agent} 		rfswarm-agent
+${cmd_manager} 	rfswarm
 ${IMAGE_DIR} 	${CURDIR}/Images/file_method
 ${pyfile}			${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
 ${process}		None
@@ -15,7 +17,8 @@ Open GUI
 	[Tags]	macos-latest
 	Set Suite Variable    ${platform}    macos
 	Set Confidence		0.9
-	${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	${process}= 	Start Process 	${cmd_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Set Test Variable 	$process 	${process}
 	Sleep 	10
 	Set Screenshot Folder 	${OUTPUT DIR}
@@ -25,7 +28,8 @@ Open GUI
 	[Tags]	windows-latest
 	Set Suite Variable    ${platform}    windows
 	Set Confidence		0.9
-	${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	${process}= 	Start Process 	${cmd_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Set Test Variable 	$process 	${process}
 	Sleep 	10
 	Set Screenshot Folder 	${OUTPUT DIR}
@@ -35,7 +39,8 @@ Open GUI
 	[Tags]	ubuntu-latest
 	Set Suite Variable    ${platform}    ubuntu
 	Set Confidence		0.9
-	${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	${process}= 	Start Process 	${cmd_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Set Test Variable 	$process 	${process}
 	Sleep 	10
 	Set Screenshot Folder 	${OUTPUT DIR}

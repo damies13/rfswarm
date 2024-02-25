@@ -5,7 +5,8 @@ Library 	DatabaseLibrary
 Library 	String
 
 *** Variables ***
-
+${cmd_agent} 		rfswarm-agent
+${cmd_manager} 	rfswarm
 ${pyfile_agent} 		${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py
 ${pyfile_manager} 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
 ${process_agent} 		None
@@ -29,7 +30,8 @@ Run Agent
 		${options}= 	Create List
 	END
 	Log to console 	\${options}: ${options}
-	${process}= 	Start Process 	python3 	${pyfile_agent}  @{options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
+	# ${process}= 	Start Process 	python3 	${pyfile_agent}  @{options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
+	${process}= 	Start Process 	${cmd_agent}  @{options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
 	Set Test Variable 	$process_agent 	${process}
 
 Run Manager CLI
@@ -38,7 +40,8 @@ Run Manager CLI
 		${options}= 	Create List
 	END
 	Log to console 	\${options}: ${options}
-	${process}= 	Start Process 	python3 	${pyfile_manager}  @{options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
+	# ${process}= 	Start Process 	python3 	${pyfile_manager}  @{options}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
+	${process}= 	Start Process 	${cmd_manager}  @{options}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
 	Set Test Variable 	$process_manager 	${process}
 
 Wait For Manager

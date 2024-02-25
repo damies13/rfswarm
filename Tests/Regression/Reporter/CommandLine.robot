@@ -5,6 +5,7 @@ Library 	Process
 Suite Setup			Clean Up Old Files
 
 *** Variables ***
+${cmd_reporter} 		rfswarm-reporter
 ${pyfile}			${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
 
 *** Test Cases ***
@@ -15,14 +16,16 @@ Random Offset
 
 Reporter Version
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
-	${result}= 	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -v
+	# ${result}= 	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -v
+	${result}= 	Run 	${cmd_reporter} -v
 	Log to console 	${\n}${result}
 	Should Contain	${result}	Version
 	Should Contain	${result}	Reporter
 
 Reporter Help
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
-	${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -h
+	# ${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py -h
+	${result}= 	Run 	${cmd_reporter} -h
 	Log to console 	${\n}${result}
 	Should Contain	${result}	Excel
 
@@ -39,7 +42,8 @@ Command Line Generate HTML
 	${template}= 	Set Variable    ${basefolder}${/}90%ileTemplate.template
 	Should Exist	${template}
 	Log 	template: ${template} 	console=True
-	${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --html
+	# ${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --html
+	${result}= 	Run 	${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --html
 	Log 	result: ${\n}${result} 	console=True
 	Should Not Contain 	${result} 	Traceback
 	Should Exist	${resultfolder}${/}${resultdata}.html
@@ -57,7 +61,8 @@ Command Line Generate Docx
 	${template}= 	Set Variable    ${basefolder}${/}90%ileTemplate.template
 	Should Exist	${template}
 	Log 	template: ${template} 	console=True
-	${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --docx
+	# ${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --docx
+	${result}= 	Run 	${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --docx
 	Log 	${\n}${result} 	console=True
 	Should Not Contain 	${result} 	Traceback
 	Should Exist	${resultfolder}${/}${resultdata}.docx
@@ -75,7 +80,8 @@ Command Line Generate Xlsx
 	${template}= 	Set Variable    ${basefolder}${/}90%ileTemplate.template
 	Should Exist	${template}
 	Log 	template: ${template} 	console=True
-	${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --xlsx
+	# ${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --xlsx
+	${result}= 	Run 	${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --xlsx
 	Log 	${\n}${result} 	console=True
 	Should Not Contain 	${result} 	Traceback
 	Should Exist	${resultfolder}${/}${resultdata}.xlsx

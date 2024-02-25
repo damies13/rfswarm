@@ -7,6 +7,8 @@ Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
 
 *** Variables ***
+${cmd_agent} 		rfswarm-agent
+${cmd_manager} 	rfswarm
 ${IMAGE_DIR} 	${CURDIR}/Images/file_method
 ${pyfile_manager}			${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
 ${pyfile_agent}			${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py
@@ -33,13 +35,15 @@ Set Platform
 
 Open Agent
 	# [Arguments]		${options}
-	${process}= 	Start Process 	python3 	${pyfile_agent}    alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
+	# ${process}= 	Start Process 	python3 	${pyfile_agent}    alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
+	${process}= 	Start Process 	${cmd_agent}    alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
 	Set Test Variable 	$process_agent 	${process}
 
 Open Manager GUI
 	# [Arguments]		${options}
 	Set Confidence		0.9
-	${process}= 	Start Process 	python3 	${pyfile_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
+	# ${process}= 	Start Process 	python3 	${pyfile_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
+	${process}= 	Start Process 	${cmd_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
 	Set Test Variable 	$process_manager 	${process}
 	Sleep 	10
 	Set Screenshot Folder 	${OUTPUT DIR}
