@@ -28,15 +28,15 @@ jobs:
         if: ${{ matrix.platform != 'windows-latest' }}
         run: |
           ls -la dist
-      - name: Show Dist
+      - name: Show Dist W
         if: ${{ matrix.platform == 'windows-latest' }}
         run: |
           dir dist
 
       - name: Install Agent from dist
-        run: pip install -r dist/rfswarm-agent-*.tar.gz
+        run: pip install dist/rfswarm-agent-*.tar.gz
       - name: Install Manager from dist (for testing Issues)
-        run: pip install -r dist/rfswarm-manager-*.tar.gz
+        run: pip install dist/rfswarm-manager-*.tar.gz
 
       # Tests will probably fail as some dependancies for testing will be missing
       #   just DB library?
