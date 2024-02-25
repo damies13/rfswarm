@@ -13,6 +13,7 @@ ${process_agent} 		None
 ${process_manager} 	None
 
 # datapath: /home/runner/work/rfswarm/rfswarm/rfswarm_manager/results/PreRun
+# datapath: /opt/hostedtoolcache/Python/3.9.18/x64/lib/python3.9/site-packages/rfswarm_manager/results/PreRun -- let's control the output path rather than leaving it to chance
 ${results_dir} 			${EXECDIR}${/}rfswarm_manager${/}results
 
 *** Keywords ***
@@ -41,7 +42,7 @@ Run Manager CLI
 	END
 	Log to console 	\${options}: ${options}
 	# ${process}= 	Start Process 	python3 	${pyfile_manager}  @{options}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
-	${process}= 	Start Process 	${cmd_manager}  @{options}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
+	${process}= 	Start Process 	${cmd_manager}  @{options} 	-d 	${results_dir}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
 	Set Test Variable 	$process_manager 	${process}
 
 Wait For Manager
