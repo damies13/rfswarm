@@ -47,12 +47,13 @@ jobs:
         # for /r %f in (dist/rfswarm_agent-*.whl) do pip install %f
 
       - name: Install Manager from dist (for testing Issues) UM
+        shell: bash
         # if: ${{ matrix.platform != 'windows-latest' }}
         run: pip install dist/rfswarm_manager-*.whl
-      - name: Install Manager from dist (for testing Issues) W
-        if: ${{ matrix.platform == 'windows-latest' }}
-        shell: cmd
-        run: pip install dist/rfswarm_manager-*.whl
+      # - name: Install Manager from dist (for testing Issues) W
+      #   if: ${{ matrix.platform == 'windows-latest' }}
+      #   shell: cmd
+      #   run: pip install dist/rfswarm_manager-*.whl
 
       # Tests will probably fail as some dependancies for testing will be missing
       #   just DB library?
