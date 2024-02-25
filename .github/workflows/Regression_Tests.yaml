@@ -13,8 +13,8 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+        uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
       - run: pip install -r Tests/Regression/Agent/pip_requirements.txt
@@ -48,11 +48,11 @@ jobs:
           pyenv global ${{matrix.python}}
       - name: setup-python
         if: ${{ !startswith(matrix.platform, 'macos-') || contains('3.11;3.12;', matrix.python) }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: "Apt Update"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
@@ -166,11 +166,11 @@ jobs:
           pyenv global ${{matrix.python}}
       - name: setup-python
         if: ${{ !startswith(matrix.platform, 'macos-') || contains('3.11;3.12;', matrix.python) }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: "Apt Update"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
