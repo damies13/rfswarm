@@ -1,544 +1,629 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 7.0 (Python 3.8.18 on darwin)" generated="2024-02-16T05:15:51.584213" rpa="false" schemaversion="5">
+<robot generator="Robot 7.0 (Python 3.12.2 on darwin)" generated="2024-02-25T07:36:48.146322" rpa="false" schemaversion="5">
 <suite id="s1" name="Manager" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager">
 <suite id="s1-s1" name="CommandLine" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/CommandLine.robot">
 <kw name="Clean Up Old Files" type="SETUP">
 <kw name="Log To Console" owner="BuiltIn">
 <arg>${OUTPUT DIR}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" start="2024-02-16T05:15:51.616860" elapsed="0.000224"/>
+<status status="PASS" start="2024-02-25T07:36:48.185506" elapsed="0.000274"/>
 </kw>
 <kw name="Remove File" owner="OperatingSystem">
-<msg time="2024-02-16T05:15:51.617773" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/stdout.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/stdout.txt&lt;/a&gt;'.</msg>
-<msg time="2024-02-16T05:15:51.617901" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/stderr.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/stderr.txt&lt;/a&gt;'.</msg>
+<msg time="2024-02-25T07:36:48.186701" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/stdout.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/stdout.txt&lt;/a&gt;'.</msg>
+<msg time="2024-02-25T07:36:48.186883" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/stderr.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/stderr.txt&lt;/a&gt;'.</msg>
 <arg>${OUTPUT DIR}${/}*.txt</arg>
 <doc>Removes a file with the given path.</doc>
-<status status="PASS" start="2024-02-16T05:15:51.617239" elapsed="0.000721"/>
+<status status="PASS" start="2024-02-25T07:36:48.185946" elapsed="0.001011"/>
 </kw>
 <kw name="Remove File" owner="OperatingSystem">
-<msg time="2024-02-16T05:15:51.618575" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-1.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-1.png&lt;/a&gt;'.</msg>
-<msg time="2024-02-16T05:15:51.618725" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-2.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-2.png&lt;/a&gt;'.</msg>
-<msg time="2024-02-16T05:15:51.618866" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-3.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-3.png&lt;/a&gt;'.</msg>
-<msg time="2024-02-16T05:15:51.619013" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-6.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-6.png&lt;/a&gt;'.</msg>
-<msg time="2024-02-16T05:15:51.619149" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-4.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-4.png&lt;/a&gt;'.</msg>
-<msg time="2024-02-16T05:15:51.619282" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-5.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-5.png&lt;/a&gt;'.</msg>
+<msg time="2024-02-25T07:36:48.187731" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-1.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-1.png&lt;/a&gt;'.</msg>
+<msg time="2024-02-25T07:36:48.187981" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-2.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-2.png&lt;/a&gt;'.</msg>
+<msg time="2024-02-25T07:36:48.188238" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-3.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-3.png&lt;/a&gt;'.</msg>
+<msg time="2024-02-25T07:36:48.188513" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-6.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-6.png&lt;/a&gt;'.</msg>
+<msg time="2024-02-25T07:36:48.188762" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-4.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-4.png&lt;/a&gt;'.</msg>
+<msg time="2024-02-25T07:36:48.189016" level="INFO" html="true">Removed file '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-5.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-5.png&lt;/a&gt;'.</msg>
 <arg>${OUTPUT DIR}${/}*.png</arg>
 <doc>Removes a file with the given path.</doc>
-<status status="PASS" start="2024-02-16T05:15:51.618078" elapsed="0.001261"/>
+<status status="PASS" start="2024-02-25T07:36:48.187079" elapsed="0.002001"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" start="2024-02-16T05:15:51.616254" elapsed="0.003154"/>
+<status status="PASS" start="2024-02-25T07:36:48.184927" elapsed="0.004237"/>
 </kw>
-<test id="s1-s1-t1" name="Random Offset" line="7">
+<test id="s1-s1-t1" name="Random Offset" line="11">
 <kw name="Evaluate" owner="BuiltIn">
-<msg time="2024-02-16T05:15:51.620213" level="INFO">${random} = 18</msg>
+<msg time="2024-02-25T07:36:48.190047" level="INFO">${random} = 59</msg>
 <var>${random}</var>
 <arg>random.randint(0, 60)</arg>
 <doc>Evaluates the given expression in Python and returns the result.</doc>
-<status status="PASS" start="2024-02-16T05:15:51.620000" elapsed="0.000240"/>
+<status status="PASS" start="2024-02-25T07:36:48.189764" elapsed="0.000316"/>
 </kw>
 <kw name="Sleep" owner="BuiltIn">
-<msg time="2024-02-16T05:16:09.636944" level="INFO">Slept 18 seconds.</msg>
+<msg time="2024-02-25T07:37:47.220397" level="INFO">Slept 59 seconds.</msg>
 <arg>${random}</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="PASS" start="2024-02-16T05:15:51.620357" elapsed="18.017080"/>
+<status status="PASS" start="2024-02-25T07:36:48.190200" elapsed="59.030334"/>
 </kw>
 <doc>This just prevents all the test runners doing git push at the same time</doc>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" start="2024-02-16T05:15:51.619498" elapsed="18.018325"/>
+<status status="PASS" start="2024-02-25T07:36:48.189260" elapsed="59.031475"/>
 </test>
-<test id="s1-s1-t2" name="Manager Version" line="13">
+<test id="s1-s1-t2" name="Manager Version" line="17">
 <kw name="Run" owner="OperatingSystem">
-<msg time="2024-02-16T05:16:09.645131" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -v 2&gt;&amp;1'.</msg>
-<msg time="2024-02-16T05:16:11.733762" level="INFO">${result} = Robot Framework Swarm: Manager 
-	Version 1.2.1 </msg>
+<msg time="2024-02-25T07:37:47.224420" level="INFO">Running command 'rfswarm-agent -v 2&gt;&amp;1'.</msg>
+<msg time="2024-02-25T07:37:47.613072" level="INFO">${result} = Robot Framework Swarm: Run Agent
+	Version v1.2.2.dev20240225071703</msg>
 <var>${result}</var>
-<arg>python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -v</arg>
+<arg>${cmd_agent} -v</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<status status="PASS" start="2024-02-16T05:16:09.639129" elapsed="2.094731"/>
+<status status="PASS" start="2024-02-25T07:37:47.221510" elapsed="0.391625"/>
 </kw>
 <kw name="Log To Console" owner="BuiltIn">
 <arg>${\n}${result}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" start="2024-02-16T05:16:11.734340" elapsed="0.000463"/>
+<status status="PASS" start="2024-02-25T07:37:47.613529" elapsed="0.000484"/>
 </kw>
 <kw name="Should Contain" owner="BuiltIn">
 <arg>${result}</arg>
 <arg>Version</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" start="2024-02-16T05:16:11.734949" elapsed="0.000172"/>
+<status status="PASS" start="2024-02-25T07:37:47.614158" elapsed="0.000199"/>
 </kw>
 <kw name="Should Contain" owner="BuiltIn">
+<msg time="2024-02-25T07:37:47.614812" level="FAIL">'Robot Framework Swarm: Run Agent
+	Version v1.2.2.dev20240225071703' does not contain 'Manager'</msg>
 <arg>${result}</arg>
 <arg>Manager</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" start="2024-02-16T05:16:11.735256" elapsed="0.000161"/>
+<status status="FAIL" start="2024-02-25T07:37:47.614478" elapsed="0.000693">'Robot Framework Swarm: Run Agent
+	Version v1.2.2.dev20240225071703' does not contain 'Manager'</status>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" start="2024-02-16T05:16:09.638358" elapsed="2.097225"/>
+<status status="FAIL" start="2024-02-25T07:37:47.221088" elapsed="0.394375">'Robot Framework Swarm: Run Agent
+	Version v1.2.2.dev20240225071703' does not contain 'Manager'</status>
 </test>
-<test id="s1-s1-t3" name="Manager Help" line="20">
+<test id="s1-s1-t3" name="Manager Help" line="25">
 <kw name="Run" owner="OperatingSystem">
-<msg time="2024-02-16T05:16:11.739003" level="INFO">Running command 'python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py -h 2&gt;&amp;1'.</msg>
-<msg time="2024-02-16T05:16:12.393897" level="INFO">${result} = Robot Framework Swarm: Manager 
-	Version 1.2.1 
-usage: rfswarm.py [-h] [-g DEBUG] [-v] [-i INI] [-s SCENARIO] [-r] [-a AGENTS]
-                  [-n] [-t STARTTIME] [-d DIR] [-e IPADDRESS] [-p PORT]
-
-...</msg>
+<msg time="2024-02-25T07:37:47.618895" level="INFO">Running command 'rfswarm-agent -h 2&gt;&amp;1'.</msg>
+<msg time="2024-02-25T07:37:47.852255" level="INFO">${result} = Robot Framework Swarm: Run Agent
+	Version v1.2.2.dev20240225071703
+usage: rfswarm-agent [-h] [-g DEBUG] [-v] [-i INI] [-m MANAGER] [-d AGENTDIR]
+                     [-r ROBOT] [-x] [-a AGENTNAME] [-p...</msg>
 <var>${result}</var>
-<arg>python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -h</arg>
+<arg>${cmd_agent} -h</arg>
 <doc>Runs the given command in the system and returns the output.</doc>
-<status status="PASS" start="2024-02-16T05:16:11.736314" elapsed="0.657664"/>
+<status status="PASS" start="2024-02-25T07:37:47.616345" elapsed="0.235973"/>
 </kw>
 <kw name="Log To Console" owner="BuiltIn">
 <arg>${\n}${result}</arg>
 <doc>Logs the given message to the console.</doc>
-<status status="PASS" start="2024-02-16T05:16:12.394531" elapsed="0.000572"/>
+<status status="PASS" start="2024-02-25T07:37:47.852721" elapsed="0.000473"/>
 </kw>
 <kw name="Should Contain" owner="BuiltIn">
+<msg time="2024-02-25T07:37:47.853675" level="FAIL">'Robot Framework Swarm: Run Agent
+	Version v1.2.2.dev20240225071703
+usage: rfswarm-agent [-h] [-g DEBUG] [-v] [-i INI] [-m MANAGER] [-d AGENTDIR]
+                     [-r ROBOT] [-x] [-a AGENTNAME] [-p PROPERTY]
+
+options:
+  -h, --help            show this help message and exit
+  -g DEBUG, --debug DEBUG
+                        Set debug level, default level is 0
+  -v, --version         Display the version and exit
+  -i INI, --ini INI     path to alternate ini file
+  -m MANAGER, --manager MANAGER
+                        The manager to connect to e.g. http://localhost:8138/
+  -d AGENTDIR, --agentdir AGENTDIR
+                        The directory the agent should use for files
+  -r ROBOT, --robot ROBOT
+                        The robot framework executable
+  -x, --xmlmode         XML Mode, fall back to pasing the output.xml after
+                        each iteration
+  -a AGENTNAME, --agentname AGENTNAME
+                        Set agent name
+  -p PROPERTY, --property PROPERTY
+                        Add a custom property, if multiple properties are
+                        required use this argument for each property e.g. -p
+                        property1 -p "Property 2"' does not contain 'IPADDRESS'</msg>
 <arg>${result}</arg>
 <arg>IPADDRESS</arg>
 <doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
-<status status="PASS" start="2024-02-16T05:16:12.395251" elapsed="0.000174"/>
+<status status="FAIL" start="2024-02-25T07:37:47.853334" elapsed="0.000631">'Robot Framework Swarm: Run Agent
+	Version v1.2.2.dev20240225071703
+usage: rfswarm-agent [-h] [-g DEBUG] [-v] [-i INI] [-m MANAGER] [-d AGENTDIR]
+                     [-r ROBOT] [-x] [-a AGENTNAME] [-p PROPERTY]
+
+options:
+  -h, --help            show this help message and exit
+  -g DEBUG, --debug DEBUG
+                        Set debug level, default level is 0
+  -v, --version         Display the version and exit
+  -i INI, --ini INI     path to alternate ini file
+  -m MANAGER, --manager MANAGER
+                        The manager to connect to e.g. http://localhost:8138/
+  -d AGENTDIR, --agentdir AGENTDIR
+                        The directory the agent should use for files
+  -r ROBOT, --robot ROBOT
+                        The robot framework executable
+  -x, --xmlmode         XML Mode, fall back to pasing the output.xml after
+                        each iteration
+  -a AGENTNAME, --agentname AGENTNAME
+                        Set agent name
+  -p PROPERTY, --property PROPERTY
+                        Add a custom property, if multiple properties are
+                        required use this argument for each property e.g. -p
+                        property1 -p "Property 2"' does not contain 'IPADDRESS'</status>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="PASS" start="2024-02-16T05:16:11.735875" elapsed="0.659716"/>
+<status status="FAIL" start="2024-02-25T07:37:47.615859" elapsed="0.238406">'Robot Framework Swarm: Run Agent
+	Version v1.2.2.dev20240225071703
+usage: rfswarm-agent [-h] [-g DEBUG] [-v] [-i INI] [-m MANAGER] [-d AGENTDIR]
+                     [-r ROBOT] [-x] [-a AGENTNAME] [-p PROPERTY]
+
+options:
+  -h, --help            show this help message and exit
+  -g DEBUG, --debug DEBUG
+                        Set debug level, default level is 0
+  -v, --version         Display the version and exit
+  -i INI, --ini INI     path to alternate ini file
+  -m MANAGER, --manager MANAGER
+                        The manager to connect to e.g. http://localhost:8138/
+  -d AGENTDIR, --agentdir AGENTDIR
+                        The directory the agent should use for files
+  -r ROBOT, --robot ROBOT
+                        The robot framework executable
+  -x, --xmlmode         XML Mode, fall back to pasing the output.xml after
+                        each iteration
+  -a AGENTNAME, --agentname AGENTNAME
+                        Set agent name
+  -p PROPERTY, --property PROPERTY
+                        Add a custom property, if multiple properties are
+                        required use this argument for each property e.g. -p
+                        property1 -p "Property 2"' does not contain 'IPADDRESS'</status>
 </test>
-<status status="PASS" start="2024-02-16T05:15:51.607556" elapsed="20.788719"/>
+<status status="FAIL" start="2024-02-25T07:36:48.173446" elapsed="59.681592"/>
 </suite>
 <suite id="s1-s2" name="GUI Basic" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/GUI_Basic.robot">
-<test id="s1-s2-t1" name="Open GUI" line="14">
+<test id="s1-s2-t1" name="Open GUI" line="16">
 <kw name="Set Suite Variable" owner="BuiltIn">
-<msg time="2024-02-16T05:16:12.939815" level="INFO">${platform} = macos</msg>
+<msg time="2024-02-25T07:37:59.210225" level="INFO">${platform} = macos</msg>
 <arg>${platform}</arg>
 <arg>macos</arg>
 <doc>Makes a variable available everywhere within the scope of the current suite.</doc>
-<status status="PASS" start="2024-02-16T05:16:12.938728" elapsed="0.001167"/>
+<status status="PASS" start="2024-02-25T07:37:59.209208" elapsed="0.001105"/>
 </kw>
 <kw name="Set Confidence" owner="ImageHorizonLibrary">
 <arg>0.9</arg>
 <doc>Sets the accuracy when finding images.</doc>
-<status status="PASS" start="2024-02-16T05:16:12.940140" elapsed="0.000150"/>
+<status status="PASS" start="2024-02-25T07:37:59.210483" elapsed="0.000157"/>
 </kw>
 <kw name="Start Process" owner="Process">
-<msg time="2024-02-16T05:16:12.941121" level="INFO">Starting process:
-python3 /Users/runner/work/rfswarm/rfswarm/rfswarm_manager/rfswarm.py</msg>
-<msg time="2024-02-16T05:16:12.948915" level="INFO">${process} = &lt;subprocess.Popen object at 0x1269ddf40&gt;</msg>
+<msg time="2024-02-25T07:37:59.211704" level="INFO">Starting process:
+rfswarm</msg>
+<msg time="2024-02-25T07:37:59.218617" level="INFO">${process} = &lt;Popen: returncode: None args: ['rfswarm']&gt;</msg>
 <var>${process}</var>
-<arg>python3</arg>
-<arg>${pyfile}</arg>
+<arg>${cmd_manager}</arg>
 <arg>alias=Manager</arg>
 <arg>stdout=${OUTPUT DIR}${/}stdout.txt</arg>
 <arg>stderr=${OUTPUT DIR}${/}stderr.txt</arg>
 <doc>Starts a new process on background.</doc>
-<status status="PASS" start="2024-02-16T05:16:12.940425" elapsed="0.008630"/>
+<status status="PASS" start="2024-02-25T07:37:59.210803" elapsed="0.007999"/>
 </kw>
 <kw name="Set Test Variable" owner="BuiltIn">
-<msg time="2024-02-16T05:16:12.950101" level="INFO">${process} = &lt;subprocess.Popen object at 0x1269ddf40&gt;</msg>
+<msg time="2024-02-25T07:37:59.219835" level="INFO">${process} = &lt;Popen: returncode: None args: ['rfswarm']&gt;</msg>
 <arg>$process</arg>
 <arg>${process}</arg>
 <doc>Makes a variable available everywhere within the scope of the current test.</doc>
-<status status="PASS" start="2024-02-16T05:16:12.949648" elapsed="0.000506"/>
+<status status="PASS" start="2024-02-25T07:37:59.219434" elapsed="0.000458"/>
 </kw>
 <kw name="Sleep" owner="BuiltIn">
-<msg time="2024-02-16T05:16:22.974918" level="INFO">Slept 10 seconds.</msg>
+<msg time="2024-02-25T07:38:09.222569" level="INFO">Slept 10 seconds.</msg>
 <arg>10</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="PASS" start="2024-02-16T05:16:12.950296" elapsed="10.024825"/>
+<status status="PASS" start="2024-02-25T07:37:59.220039" elapsed="10.002659"/>
 </kw>
 <kw name="Set Screenshot Folder" owner="ImageHorizonLibrary">
 <arg>${OUTPUT DIR}</arg>
 <doc>Sets the folder where screenshots are saved to.</doc>
-<status status="PASS" start="2024-02-16T05:16:22.975489" elapsed="0.000381"/>
+<status status="PASS" start="2024-02-25T07:38:09.222963" elapsed="0.000251"/>
 </kw>
 <kw name="Take A Screenshot" owner="ImageHorizonLibrary">
-<msg time="2024-02-16T05:16:22.976578" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-1.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-1.png" width="100%" /&gt;</msg>
+<msg time="2024-02-25T07:38:09.223627" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-1.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-1.png" width="100%" /&gt;</msg>
 <doc>Takes a screenshot of the screen.</doc>
-<status status="PASS" start="2024-02-16T05:16:22.976117" elapsed="0.312030"/>
+<status status="PASS" start="2024-02-25T07:38:09.223369" elapsed="0.327137"/>
 </kw>
 <tag>macos-latest</tag>
-<status status="PASS" start="2024-02-16T05:16:12.937809" elapsed="10.350810"/>
+<status status="PASS" start="2024-02-25T07:37:59.208196" elapsed="10.342742"/>
 </test>
-<test id="s1-s2-t2" name="Select Run Tab" line="44">
+<test id="s1-s2-t2" name="Select Run Tab" line="49">
 <kw name="Click Tab">
 <kw name="Convert To Lower Case" owner="String">
-<msg time="2024-02-16T05:16:23.290568" level="INFO">${tabnamel} = run</msg>
+<msg time="2024-02-25T07:38:09.553242" level="INFO">${tabnamel} = run</msg>
 <var>${tabnamel}</var>
 <arg>${tabname}</arg>
 <doc>Converts string to lower case.</doc>
-<status status="PASS" start="2024-02-16T05:16:23.290367" elapsed="0.000228"/>
+<status status="PASS" start="2024-02-25T07:38:09.552978" elapsed="0.000308"/>
 </kw>
 <kw name="Set Variable" owner="BuiltIn">
-<msg time="2024-02-16T05:16:23.290941" level="INFO">${img} = manager_macos_tab_run.png</msg>
+<msg time="2024-02-25T07:38:09.553682" level="INFO">${img} = manager_macos_tab_run.png</msg>
 <var>${img}</var>
 <arg>manager_${platform}_tab_${tabnamel}.png</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<status status="PASS" start="2024-02-16T05:16:23.290732" elapsed="0.000234"/>
+<status status="PASS" start="2024-02-25T07:38:09.553443" elapsed="0.000269"/>
 </kw>
 <kw name="Log" owner="BuiltIn">
-<msg time="2024-02-16T05:16:23.291246" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
+<msg time="2024-02-25T07:38:09.554029" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
 <arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</arg>
 <doc>Logs the given message with the given level.</doc>
-<status status="PASS" start="2024-02-16T05:16:23.291099" elapsed="0.000205"/>
+<status status="PASS" start="2024-02-25T07:38:09.553861" elapsed="0.000225"/>
 </kw>
 <kw name="Log" owner="BuiltIn">
-<msg time="2024-02-16T05:16:23.291562" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
+<msg time="2024-02-25T07:38:09.554344" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
 <arg>${IMAGE_DIR}</arg>
 <doc>Logs the given message with the given level.</doc>
-<status status="PASS" start="2024-02-16T05:16:23.291428" elapsed="0.000177"/>
+<status status="PASS" start="2024-02-25T07:38:09.554206" elapsed="0.000191"/>
 </kw>
 <kw name="Wait For" owner="ImageHorizonLibrary">
-<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
-<msg time="2024-02-16T05:21:23.477778" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-2.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-2.png" width="100%" /&gt;</msg>
-<doc>Takes a screenshot of the screen.</doc>
-<status status="PASS" start="2024-02-16T05:21:23.477107" elapsed="0.281043"/>
-</kw>
-<msg time="2024-02-16T05:21:23.758746" level="FAIL">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_run.png" was not found on screen</msg>
+<msg time="2024-02-25T07:38:09.944443" level="INFO">Image "manager_macos_tab_run.png" found at (364, 75)</msg>
 <arg>${img}</arg>
 <arg>timeout=300</arg>
 <doc>Tries to locate given image from the screen for given time.</doc>
-<status status="FAIL" start="2024-02-16T05:16:23.291723" elapsed="300.467695">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_run.png" was not found on screen</status>
+<status status="PASS" start="2024-02-25T07:38:09.554622" elapsed="0.390157"/>
 </kw>
 <kw name="Locate" owner="ImageHorizonLibrary">
+<msg time="2024-02-25T07:38:10.332659" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_run.png" found at Box(left=342, top=62, width=44, height=26)</msg>
+<msg time="2024-02-25T07:38:10.333309" level="INFO">@{coordinates} = [ 364 | 75 ]</msg>
 <var>@{coordinates}</var>
 <arg>${img}</arg>
 <doc>Locate image on screen.</doc>
-<status status="NOT RUN" start="2024-02-16T05:21:23.759816" elapsed="0.000038"/>
+<status status="PASS" start="2024-02-25T07:38:09.945200" elapsed="0.388154"/>
 </kw>
 <kw name="Click Image" owner="ImageHorizonLibrary">
+<msg time="2024-02-25T07:38:10.713383" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_run.png" found at Box(left=342, top=62, width=44, height=26)</msg>
+<msg time="2024-02-25T07:38:10.713688" level="INFO">Clicking image "manager_macos_tab_run.png" in position (364, 75)</msg>
 <arg>${img}</arg>
 <doc>Finds the reference image on screen and clicks it once.</doc>
-<status status="NOT RUN" start="2024-02-16T05:21:23.759980" elapsed="0.000021"/>
+<status status="PASS" start="2024-02-25T07:38:10.333770" elapsed="0.742281"/>
 </kw>
 <kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-25T07:38:11.199344" level="INFO">Slept 100 milliseconds.</msg>
 <arg>0.1</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" start="2024-02-16T05:21:23.760111" elapsed="0.000018"/>
+<status status="PASS" start="2024-02-25T07:38:11.076809" elapsed="0.122661"/>
 </kw>
 <kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-25T07:38:11.200033" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-2.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-2.png" width="100%" /&gt;</msg>
 <doc>Takes a screenshot of the screen.</doc>
-<status status="NOT RUN" start="2024-02-16T05:21:23.760236" elapsed="0.000018"/>
+<status status="PASS" start="2024-02-25T07:38:11.199678" elapsed="0.257364"/>
 </kw>
 <arg>Run</arg>
-<status status="FAIL" start="2024-02-16T05:16:23.289840" elapsed="300.470661">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_run.png" was not found on screen</status>
+<status status="PASS" start="2024-02-25T07:38:09.552349" elapsed="1.905115"/>
 </kw>
 <kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-25T07:38:16.464142" level="INFO">Slept 5 seconds.</msg>
 <arg>5</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" start="2024-02-16T05:21:23.760656" elapsed="0.000020"/>
+<status status="PASS" start="2024-02-25T07:38:11.457864" elapsed="5.006733"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="FAIL" start="2024-02-16T05:16:23.289025" elapsed="300.471929">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_run.png" was not found on screen</status>
+<status status="PASS" start="2024-02-25T07:38:09.551397" elapsed="6.913843"/>
 </test>
-<test id="s1-s2-t3" name="Select Agents Tab" line="49">
+<test id="s1-s2-t3" name="Select Agents Tab" line="54">
 <kw name="Click Tab">
 <kw name="Convert To Lower Case" owner="String">
-<msg time="2024-02-16T05:21:23.762531" level="INFO">${tabnamel} = agents</msg>
+<msg time="2024-02-25T07:38:16.467656" level="INFO">${tabnamel} = agents</msg>
 <var>${tabnamel}</var>
 <arg>${tabname}</arg>
 <doc>Converts string to lower case.</doc>
-<status status="PASS" start="2024-02-16T05:21:23.762332" elapsed="0.000226"/>
+<status status="PASS" start="2024-02-25T07:38:16.467310" elapsed="0.000381"/>
 </kw>
 <kw name="Set Variable" owner="BuiltIn">
-<msg time="2024-02-16T05:21:23.762894" level="INFO">${img} = manager_macos_tab_agents.png</msg>
+<msg time="2024-02-25T07:38:16.468101" level="INFO">${img} = manager_macos_tab_agents.png</msg>
 <var>${img}</var>
 <arg>manager_${platform}_tab_${tabnamel}.png</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<status status="PASS" start="2024-02-16T05:21:23.762690" elapsed="0.000228"/>
+<status status="PASS" start="2024-02-25T07:38:16.467854" elapsed="0.000278"/>
 </kw>
 <kw name="Log" owner="BuiltIn">
-<msg time="2024-02-16T05:21:23.763199" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
+<msg time="2024-02-25T07:38:16.468424" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
 <arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</arg>
 <doc>Logs the given message with the given level.</doc>
-<status status="PASS" start="2024-02-16T05:21:23.763050" elapsed="0.000201"/>
+<status status="PASS" start="2024-02-25T07:38:16.468283" elapsed="0.000231"/>
 </kw>
 <kw name="Log" owner="BuiltIn">
-<msg time="2024-02-16T05:21:23.763511" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
+<msg time="2024-02-25T07:38:16.468852" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
 <arg>${IMAGE_DIR}</arg>
 <doc>Logs the given message with the given level.</doc>
-<status status="PASS" start="2024-02-16T05:21:23.763378" elapsed="0.000176"/>
+<status status="PASS" start="2024-02-25T07:38:16.468676" elapsed="0.000238"/>
 </kw>
 <kw name="Wait For" owner="ImageHorizonLibrary">
-<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
-<msg time="2024-02-16T05:26:24.060986" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-3.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-3.png" width="100%" /&gt;</msg>
-<doc>Takes a screenshot of the screen.</doc>
-<status status="PASS" start="2024-02-16T05:26:24.059591" elapsed="0.283351"/>
-</kw>
-<msg time="2024-02-16T05:26:24.343584" level="FAIL">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_agents.png" was not found on screen</msg>
+<msg time="2024-02-25T07:38:16.991626" level="INFO">Image "manager_macos_tab_agents.png" found at (423, 74)</msg>
 <arg>${img}</arg>
 <arg>timeout=300</arg>
 <doc>Tries to locate given image from the screen for given time.</doc>
-<status status="FAIL" start="2024-02-16T05:21:23.763671" elapsed="300.580161">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_agents.png" was not found on screen</status>
+<status status="PASS" start="2024-02-25T07:38:16.469055" elapsed="0.522917"/>
 </kw>
 <kw name="Locate" owner="ImageHorizonLibrary">
+<msg time="2024-02-25T07:38:17.475509" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_agents.png" found at Box(left=397, top=62, width=52, height=25)</msg>
+<msg time="2024-02-25T07:38:17.476166" level="INFO">@{coordinates} = [ 423 | 74 ]</msg>
 <var>@{coordinates}</var>
 <arg>${img}</arg>
 <doc>Locate image on screen.</doc>
-<status status="NOT RUN" start="2024-02-16T05:26:24.344252" elapsed="0.000043"/>
+<status status="PASS" start="2024-02-25T07:38:16.992974" elapsed="0.483235"/>
 </kw>
 <kw name="Click Image" owner="ImageHorizonLibrary">
+<msg time="2024-02-25T07:38:17.859506" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_agents.png" found at Box(left=397, top=62, width=52, height=25)</msg>
+<msg time="2024-02-25T07:38:17.859782" level="INFO">Clicking image "manager_macos_tab_agents.png" in position (423, 74)</msg>
 <arg>${img}</arg>
 <doc>Finds the reference image on screen and clicks it once.</doc>
-<status status="NOT RUN" start="2024-02-16T05:26:24.344462" elapsed="0.000024"/>
+<status status="PASS" start="2024-02-25T07:38:17.476602" elapsed="0.616810"/>
 </kw>
 <kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-25T07:38:18.197639" level="INFO">Slept 100 milliseconds.</msg>
 <arg>0.1</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" start="2024-02-16T05:26:24.344605" elapsed="0.000018"/>
+<status status="PASS" start="2024-02-25T07:38:18.093864" elapsed="0.103894"/>
 </kw>
 <kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-25T07:38:18.198329" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-3.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-3.png" width="100%" /&gt;</msg>
 <doc>Takes a screenshot of the screen.</doc>
-<status status="NOT RUN" start="2024-02-16T05:26:24.344733" elapsed="0.000019"/>
+<status status="PASS" start="2024-02-25T07:38:18.197973" elapsed="0.259637"/>
 </kw>
 <arg>Agents</arg>
-<status status="FAIL" start="2024-02-16T05:21:23.761959" elapsed="300.583071">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_agents.png" was not found on screen</status>
+<status status="PASS" start="2024-02-25T07:38:16.466833" elapsed="1.991135"/>
 </kw>
 <kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-25T07:38:23.466400" level="INFO">Slept 5 seconds.</msg>
 <arg>5</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" start="2024-02-16T05:26:24.345193" elapsed="0.000020"/>
+<status status="PASS" start="2024-02-25T07:38:18.458316" elapsed="5.008231"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="FAIL" start="2024-02-16T05:21:23.761298" elapsed="300.584264">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_agents.png" was not found on screen</status>
+<status status="PASS" start="2024-02-25T07:38:16.465737" elapsed="7.001141"/>
 </test>
-<test id="s1-s2-t4" name="Select About Tab" line="54">
+<test id="s1-s2-t4" name="Select About Tab" line="59">
 <kw name="Click Tab">
 <kw name="Convert To Lower Case" owner="String">
-<msg time="2024-02-16T05:26:24.348231" level="INFO">${tabnamel} = about</msg>
+<msg time="2024-02-25T07:38:23.468629" level="INFO">${tabnamel} = about</msg>
 <var>${tabnamel}</var>
 <arg>${tabname}</arg>
 <doc>Converts string to lower case.</doc>
-<status status="PASS" start="2024-02-16T05:26:24.347871" elapsed="0.000395"/>
+<status status="PASS" start="2024-02-25T07:38:23.468399" elapsed="0.000262"/>
 </kw>
 <kw name="Set Variable" owner="BuiltIn">
-<msg time="2024-02-16T05:26:24.348872" level="INFO">${img} = manager_macos_tab_about.png</msg>
+<msg time="2024-02-25T07:38:23.469042" level="INFO">${img} = manager_macos_tab_about.png</msg>
 <var>${img}</var>
 <arg>manager_${platform}_tab_${tabnamel}.png</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<status status="PASS" start="2024-02-16T05:26:24.348498" elapsed="0.000401"/>
+<status status="PASS" start="2024-02-25T07:38:23.468817" elapsed="0.000254"/>
 </kw>
 <kw name="Log" owner="BuiltIn">
-<msg time="2024-02-16T05:26:24.349266" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
+<msg time="2024-02-25T07:38:23.469335" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
 <arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</arg>
 <doc>Logs the given message with the given level.</doc>
-<status status="PASS" start="2024-02-16T05:26:24.349081" elapsed="0.000240"/>
+<status status="PASS" start="2024-02-25T07:38:23.469213" elapsed="0.000183"/>
 </kw>
 <kw name="Log" owner="BuiltIn">
-<msg time="2024-02-16T05:26:24.349593" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
+<msg time="2024-02-25T07:38:23.469891" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
 <arg>${IMAGE_DIR}</arg>
 <doc>Logs the given message with the given level.</doc>
-<status status="PASS" start="2024-02-16T05:26:24.349453" elapsed="0.000184"/>
+<status status="PASS" start="2024-02-25T07:38:23.469748" elapsed="0.000196"/>
 </kw>
 <kw name="Wait For" owner="ImageHorizonLibrary">
-<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
-<msg time="2024-02-16T05:31:24.567383" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-4.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-4.png" width="100%" /&gt;</msg>
-<doc>Takes a screenshot of the screen.</doc>
-<status status="PASS" start="2024-02-16T05:31:24.566324" elapsed="0.280122"/>
-</kw>
-<msg time="2024-02-16T05:31:24.847021" level="FAIL">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_about.png" was not found on screen</msg>
+<msg time="2024-02-25T07:38:23.850550" level="INFO">Image "manager_macos_tab_about.png" found at (487, 75)</msg>
 <arg>${img}</arg>
 <arg>timeout=300</arg>
 <doc>Tries to locate given image from the screen for given time.</doc>
-<status status="FAIL" start="2024-02-16T05:26:24.349778" elapsed="300.497505">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_about.png" was not found on screen</status>
+<status status="PASS" start="2024-02-25T07:38:23.470061" elapsed="0.380826"/>
 </kw>
 <kw name="Locate" owner="ImageHorizonLibrary">
+<msg time="2024-02-25T07:38:24.235802" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_about.png" found at Box(left=464, top=62, width=46, height=26)</msg>
+<msg time="2024-02-25T07:38:24.236375" level="INFO">@{coordinates} = [ 487 | 75 ]</msg>
 <var>@{coordinates}</var>
 <arg>${img}</arg>
 <doc>Locate image on screen.</doc>
-<status status="NOT RUN" start="2024-02-16T05:31:24.847755" elapsed="0.000041"/>
+<status status="PASS" start="2024-02-25T07:38:23.851382" elapsed="0.385038"/>
 </kw>
 <kw name="Click Image" owner="ImageHorizonLibrary">
+<msg time="2024-02-25T07:38:24.616108" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_about.png" found at Box(left=464, top=62, width=46, height=26)</msg>
+<msg time="2024-02-25T07:38:24.616332" level="INFO">Clicking image "manager_macos_tab_about.png" in position (487, 75)</msg>
 <arg>${img}</arg>
 <doc>Finds the reference image on screen and clicks it once.</doc>
-<status status="NOT RUN" start="2024-02-16T05:31:24.847924" elapsed="0.000019"/>
+<status status="PASS" start="2024-02-25T07:38:24.236915" elapsed="0.566192"/>
 </kw>
 <kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-25T07:38:24.906101" level="INFO">Slept 100 milliseconds.</msg>
 <arg>0.1</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" start="2024-02-16T05:31:24.848056" elapsed="0.000018"/>
+<status status="PASS" start="2024-02-25T07:38:24.803571" elapsed="0.102659"/>
 </kw>
 <kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-25T07:38:24.906815" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-4.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-4.png" width="100%" /&gt;</msg>
 <doc>Takes a screenshot of the screen.</doc>
-<status status="NOT RUN" start="2024-02-16T05:31:24.848184" elapsed="0.000018"/>
+<status status="PASS" start="2024-02-25T07:38:24.906455" elapsed="0.266262"/>
 </kw>
 <arg>About</arg>
-<status status="FAIL" start="2024-02-16T05:26:24.347337" elapsed="300.501098">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_about.png" was not found on screen</status>
+<status status="PASS" start="2024-02-25T07:38:23.468016" elapsed="1.705002"/>
 </kw>
 <kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-25T07:38:30.197137" level="INFO">Slept 5 seconds.</msg>
 <arg>5</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" start="2024-02-16T05:31:24.848644" elapsed="0.000023"/>
+<status status="PASS" start="2024-02-25T07:38:25.173344" elapsed="5.023925"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="FAIL" start="2024-02-16T05:26:24.346088" elapsed="300.502911">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_about.png" was not found on screen</status>
+<status status="PASS" start="2024-02-25T07:38:23.467287" elapsed="6.730477"/>
 </test>
-<test id="s1-s2-t5" name="Select Plan Tab" line="59">
+<test id="s1-s2-t5" name="Select Plan Tab" line="64">
 <kw name="Click Tab">
 <kw name="Convert To Lower Case" owner="String">
-<msg time="2024-02-16T05:31:24.855450" level="INFO">${tabnamel} = plan</msg>
+<msg time="2024-02-25T07:38:30.199497" level="INFO">${tabnamel} = plan</msg>
 <var>${tabnamel}</var>
 <arg>${tabname}</arg>
 <doc>Converts string to lower case.</doc>
-<status status="PASS" start="2024-02-16T05:31:24.855163" elapsed="0.000323"/>
+<status status="PASS" start="2024-02-25T07:38:30.199266" elapsed="0.000264"/>
 </kw>
 <kw name="Set Variable" owner="BuiltIn">
-<msg time="2024-02-16T05:31:24.855840" level="INFO">${img} = manager_macos_tab_plan.png</msg>
+<msg time="2024-02-25T07:38:30.199893" level="INFO">${img} = manager_macos_tab_plan.png</msg>
 <var>${img}</var>
 <arg>manager_${platform}_tab_${tabnamel}.png</arg>
 <doc>Returns the given values which can then be assigned to a variables.</doc>
-<status status="PASS" start="2024-02-16T05:31:24.855628" elapsed="0.000238"/>
+<status status="PASS" start="2024-02-25T07:38:30.199667" elapsed="0.000256"/>
 </kw>
 <kw name="Log" owner="BuiltIn">
-<msg time="2024-02-16T05:31:24.856161" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
+<msg time="2024-02-25T07:38:30.200180" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</msg>
 <arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager</arg>
 <doc>Logs the given message with the given level.</doc>
-<status status="PASS" start="2024-02-16T05:31:24.856001" elapsed="0.000213"/>
+<status status="PASS" start="2024-02-25T07:38:30.200065" elapsed="0.000167"/>
 </kw>
 <kw name="Log" owner="BuiltIn">
-<msg time="2024-02-16T05:31:24.856538" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
+<msg time="2024-02-25T07:38:30.200488" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method</msg>
 <arg>${IMAGE_DIR}</arg>
 <doc>Logs the given message with the given level.</doc>
-<status status="PASS" start="2024-02-16T05:31:24.856336" elapsed="0.000247"/>
+<status status="PASS" start="2024-02-25T07:38:30.200351" elapsed="0.000189"/>
 </kw>
 <kw name="Wait For" owner="ImageHorizonLibrary">
-<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
-<msg time="2024-02-16T05:36:24.885147" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-5.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-5.png" width="100%" /&gt;</msg>
-<doc>Takes a screenshot of the screen.</doc>
-<status status="PASS" start="2024-02-16T05:36:24.883700" elapsed="0.994579"/>
-</kw>
-<msg time="2024-02-16T05:36:25.878936" level="FAIL">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_plan.png" was not found on screen</msg>
+<msg time="2024-02-25T07:38:30.580226" level="INFO">Image "manager_macos_tab_plan.png" found at (317, 75)</msg>
 <arg>${img}</arg>
 <arg>timeout=300</arg>
 <doc>Tries to locate given image from the screen for given time.</doc>
-<status status="FAIL" start="2024-02-16T05:31:24.856700" elapsed="301.022509">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_plan.png" was not found on screen</status>
+<status status="PASS" start="2024-02-25T07:38:30.200661" elapsed="0.379890"/>
 </kw>
 <kw name="Locate" owner="ImageHorizonLibrary">
+<msg time="2024-02-25T07:38:30.964368" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_plan.png" found at Box(left=301, top=61, width=33, height=28)</msg>
+<msg time="2024-02-25T07:38:30.965025" level="INFO">@{coordinates} = [ 317 | 75 ]</msg>
 <var>@{coordinates}</var>
 <arg>${img}</arg>
 <doc>Locate image on screen.</doc>
-<status status="NOT RUN" start="2024-02-16T05:36:25.879694" elapsed="0.000042"/>
+<status status="PASS" start="2024-02-25T07:38:30.581039" elapsed="0.384033"/>
 </kw>
 <kw name="Click Image" owner="ImageHorizonLibrary">
+<msg time="2024-02-25T07:38:31.355830" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_plan.png" found at Box(left=301, top=61, width=33, height=28)</msg>
+<msg time="2024-02-25T07:38:31.356115" level="INFO">Clicking image "manager_macos_tab_plan.png" in position (317, 75)</msg>
 <arg>${img}</arg>
 <doc>Finds the reference image on screen and clicks it once.</doc>
-<status status="NOT RUN" start="2024-02-16T05:36:25.879892" elapsed="0.000025"/>
+<status status="PASS" start="2024-02-25T07:38:30.965518" elapsed="0.515720"/>
 </kw>
 <kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-25T07:38:31.597114" level="INFO">Slept 100 milliseconds.</msg>
 <arg>0.1</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" start="2024-02-16T05:36:25.880029" elapsed="0.000019"/>
+<status status="PASS" start="2024-02-25T07:38:31.481685" elapsed="0.115532"/>
 </kw>
 <kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-25T07:38:31.598075" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-5.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-5.png" width="100%" /&gt;</msg>
 <doc>Takes a screenshot of the screen.</doc>
-<status status="NOT RUN" start="2024-02-16T05:36:25.880158" elapsed="0.000018"/>
+<status status="PASS" start="2024-02-25T07:38:31.597656" elapsed="0.270058"/>
 </kw>
 <arg>Plan</arg>
-<status status="FAIL" start="2024-02-16T05:31:24.854586" elapsed="301.025847">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_plan.png" was not found on screen</status>
+<status status="PASS" start="2024-02-25T07:38:30.198882" elapsed="1.669143"/>
 </kw>
 <kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-25T07:38:36.880458" level="INFO">Slept 5 seconds.</msg>
 <arg>5</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="NOT RUN" start="2024-02-16T05:36:25.880635" elapsed="0.000022"/>
+<status status="PASS" start="2024-02-25T07:38:31.868483" elapsed="5.012153"/>
 </kw>
 <tag>macos-latest</tag>
 <tag>ubuntu-latest</tag>
 <tag>windows-latest</tag>
-<status status="FAIL" start="2024-02-16T05:31:24.849435" elapsed="301.031552">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_tab_plan.png" was not found on screen</status>
+<status status="PASS" start="2024-02-25T07:38:30.198183" elapsed="6.682970"/>
 </test>
-<test id="s1-s2-t6" name="Close GUI" line="78">
+<test id="s1-s2-t6" name="Close GUI" line="83">
 <kw name="Click Image" owner="ImageHorizonLibrary">
-<msg time="2024-02-16T05:36:26.331270" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_button_closewindow.png" was not found on screen.</msg>
-<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
-<msg time="2024-02-16T05:36:26.332730" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-6.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-6.png" width="100%" /&gt;</msg>
-<doc>Takes a screenshot of the screen.</doc>
-<status status="PASS" start="2024-02-16T05:36:26.332181" elapsed="0.275842"/>
-</kw>
-<msg time="2024-02-16T05:36:26.608477" level="FAIL">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_button_closewindow.png" was not found on screen</msg>
+<msg time="2024-02-25T07:38:37.254155" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_button_closewindow.png" found at Box(left=9, top=31, width=19, height=25)</msg>
+<msg time="2024-02-25T07:38:37.254403" level="INFO">Clicking image "manager_macos_button_closewindow.png" in position (18, 43)</msg>
 <arg>manager_${platform}_button_closewindow.png</arg>
 <doc>Finds the reference image on screen and clicks it once.</doc>
-<status status="FAIL" start="2024-02-16T05:36:25.882016" elapsed="0.726814">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_button_closewindow.png" was not found on screen</status>
+<status status="PASS" start="2024-02-25T07:38:36.882130" elapsed="0.509262"/>
 </kw>
 <kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-25T07:38:37.392450" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-6.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Logs/macos-latest_3.8/Manager.GUIBasic-screenshot-6.png" width="100%" /&gt;</msg>
 <doc>Takes a screenshot of the screen.</doc>
-<status status="NOT RUN" start="2024-02-16T05:36:26.609251" elapsed="0.000040"/>
+<status status="PASS" start="2024-02-25T07:38:37.391845" elapsed="0.270177"/>
 </kw>
 <kw name="Wait For Process" owner="Process">
+<msg time="2024-02-25T07:38:37.663115" level="INFO">Waiting for process to complete.</msg>
+<msg time="2024-02-25T07:38:38.553762" level="INFO">Process completed.</msg>
+<msg time="2024-02-25T07:38:38.554399" level="INFO">${result} = &lt;result object with rc 0&gt;</msg>
 <var>${result}</var>
 <arg>${process}</arg>
 <arg>timeout=60</arg>
 <doc>Waits for the process to complete or to reach the given timeout.</doc>
-<status status="NOT RUN" start="2024-02-16T05:36:26.609483" elapsed="0.000024"/>
+<status status="PASS" start="2024-02-25T07:38:37.662607" elapsed="0.891911"/>
 </kw>
 <kw name="Is Process Running" owner="Process">
+<msg time="2024-02-25T07:38:38.555767" level="INFO">${running} = False</msg>
 <var>${running}</var>
 <arg>${process}</arg>
 <doc>Checks is the process running or not.</doc>
-<status status="NOT RUN" start="2024-02-16T05:36:26.609644" elapsed="0.000019"/>
+<status status="PASS" start="2024-02-25T07:38:38.555110" elapsed="0.000767"/>
 </kw>
 <if>
 <branch type="IF" condition="not ${running}">
 <kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2024-02-25T07:38:38.558871" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
 <arg>${result.rc}</arg>
 <arg>0</arg>
 <doc>Fails if objects are unequal after converting them to integers.</doc>
-<status status="NOT RUN" start="2024-02-16T05:36:26.610419" elapsed="0.000023"/>
+<status status="PASS" start="2024-02-25T07:38:38.557233" elapsed="0.001735"/>
 </kw>
-<status status="NOT RUN" start="2024-02-16T05:36:26.610138" elapsed="0.000348"/>
+<status status="PASS" start="2024-02-25T07:38:38.556498" elapsed="0.002523"/>
 </branch>
 <branch type="ELSE">
 <kw name="Take A Screenshot" owner="ImageHorizonLibrary">
 <doc>Takes a screenshot of the screen.</doc>
-<status status="NOT RUN" start="2024-02-16T05:36:26.610647" elapsed="0.000019"/>
+<status status="NOT RUN" start="2024-02-25T07:38:38.559208" elapsed="0.000027"/>
 </kw>
 <kw name="Terminate Process" owner="Process">
 <var>${result}</var>
 <arg>${process}</arg>
 <doc>Stops the process gracefully or forcefully.</doc>
-<status status="NOT RUN" start="2024-02-16T05:36:26.610781" elapsed="0.000018"/>
+<status status="NOT RUN" start="2024-02-25T07:38:38.559431" elapsed="0.000027"/>
 </kw>
 <kw name="Fail" owner="BuiltIn">
 <doc>Fails the test with the given message and optionally alters its tags.</doc>
-<status status="NOT RUN" start="2024-02-16T05:36:26.610913" elapsed="0.000017"/>
+<status status="NOT RUN" start="2024-02-25T07:38:38.559588" elapsed="0.000024"/>
 </kw>
-<status status="NOT RUN" start="2024-02-16T05:36:26.610538" elapsed="0.000422"/>
+<status status="NOT RUN" start="2024-02-25T07:38:38.559079" elapsed="0.000570"/>
 </branch>
-<status status="NOT RUN" start="2024-02-16T05:36:26.609943" elapsed="0.001040"/>
+<status status="PASS" start="2024-02-25T07:38:38.556215" elapsed="0.003469"/>
 </if>
 <tag>macos-latest</tag>
-<status status="FAIL" start="2024-02-16T05:36:25.881450" elapsed="0.729796">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Manager/Images/file_method/manager_macos_button_closewindow.png" was not found on screen</status>
+<status status="PASS" start="2024-02-25T07:38:36.881559" elapsed="1.678301"/>
 </test>
-<status status="FAIL" start="2024-02-16T05:16:12.396923" elapsed="1214.215043"/>
+<status status="PASS" start="2024-02-25T07:37:47.855867" elapsed="50.704541"/>
 </suite>
-<status status="FAIL" start="2024-02-16T05:15:51.585895" elapsed="1235.026876"/>
+<status status="FAIL" start="2024-02-25T07:36:48.148211" elapsed="110.413005"/>
 </suite>
 <statistics>
 <total>
-<stat pass="4" fail="5" skip="0">All Tests</stat>
+<stat pass="7" fail="2" skip="0">All Tests</stat>
 </total>
 <tag>
-<stat pass="4" fail="5" skip="0">macos-latest</stat>
-<stat pass="3" fail="4" skip="0">ubuntu-latest</stat>
-<stat pass="3" fail="4" skip="0">windows-latest</stat>
+<stat pass="7" fail="2" skip="0">macos-latest</stat>
+<stat pass="5" fail="2" skip="0">ubuntu-latest</stat>
+<stat pass="5" fail="2" skip="0">windows-latest</stat>
 </tag>
 <suite>
-<stat pass="4" fail="5" skip="0" id="s1" name="Manager">Manager</stat>
-<stat pass="3" fail="0" skip="0" id="s1-s1" name="CommandLine">Manager.CommandLine</stat>
-<stat pass="1" fail="5" skip="0" id="s1-s2" name="GUI Basic">Manager.GUI Basic</stat>
+<stat pass="7" fail="2" skip="0" id="s1" name="Manager">Manager</stat>
+<stat pass="1" fail="2" skip="0" id="s1-s1" name="CommandLine">Manager.CommandLine</stat>
+<stat pass="6" fail="0" skip="0" id="s1-s2" name="GUI Basic">Manager.GUI Basic</stat>
 </suite>
 </statistics>
 <errors>
