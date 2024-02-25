@@ -35,14 +35,19 @@ jobs:
 
       - name: Install Agent from dist
         # run: pip install dist/rfswarm-agent-*.tar.gz
-        run: pip install dist/rfswarm_agent-*.whl
+        run: |
+          cd dist
+          pip install rfswarm_agent-*.whl
       - name: Install Manager from dist (for testing Issues)
         # run: pip install dist/rfswarm-manager-*.tar.gz
-        run: pip install dist/rfswarm_manager-*.whl
+        run: |
+          cd dist
+          pip install rfswarm_manager-*.whl
 
       # Tests will probably fail as some dependancies for testing will be missing
       #   just DB library?
       # - run: pip install -r Tests/Regression/Agent/pip_requirements.txt
+      - run: pip install -r Tests/Regression/Agent/pip_requirements.txt
 
 
       - name: Robot Framework
