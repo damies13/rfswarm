@@ -1,0 +1,56 @@
+---
+name: Publish
+
+on: workflow_call
+
+jobs:
+  Publish_PIP:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Get Branch Name
+        run: |
+          branchname=$(git rev-parse --abbrev-ref HEAD)
+          echo "branchname=$branchname" >> "$GITHUB_ENV"
+      - name: Determine if this is a release branch
+        run: |
+          isrrelease=0
+          if [[ $branchname =~ v[0-9]\. ]]; then
+            isrrelease=1
+          fi
+          echo "isrrelease=$isrrelease" >> "$GITHUB_ENV"
+      - name: Apt Update
+        if: ${{ env.isrrelease == 1 }}
+        run: |
+          sudo apt update -y
+      - name: Setup Python
+        if: ${{ env.isrrelease == 1 }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+      - name: PIP Install
+        if: ${{ env.isrrelease == 1 }}
+        run: pip install --upgrade build setuptools twine wheel
+      - name: Download packages to dist
+        if: ${{ env.isrrelease == 1 }}
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Show Dist UM
+        if: ${{ env.isrrelease == 1 }}
+        if: ${{ matrix.platform != 'windows-latest' }}
+        run: |
+          ls -la dist
+      - name: Show Dist W
+        if: ${{ env.isrrelease == 1 }}
+        if: ${{ matrix.platform == 'windows-latest' }}
+        run: |
+          dir dist
+
+      # Still need to have a check all the milestones are complete
+      # - name: Do Publish
+      #   if: ${{ env.isrrelease == 1 }}
+      #   run: |
+      #     echo python3 -m twine upload -u USERNAME -p PASSWORD dist/rfswarm*

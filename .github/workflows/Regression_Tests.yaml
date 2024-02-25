@@ -108,24 +108,6 @@ jobs:
           # fluxbox
           fluxbox &
 
-      # - name: "MacOS Installs"
-      #   if: ${{ matrix.platform == 'macos-latest' }}
-      #   run: |
-      #     brew update
-      #     brew install tesseract
-      #     brew upgrade
-      #
-      # - name: "Windows Installs"
-      #   if: ${{ matrix.platform == 'windows-latest' }}
-      #   run: |
-      #     Invoke-WebRequest -Uri "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.3.1.20230401.exe"
-      #       -OutFile "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe"
-      #     & "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe" /s
-      #   shell: powershell
-      #
-      # - name: "Verify tesseract"
-      #   run: tesseract -v
-
       - name: Download packages to dist
         uses: actions/download-artifact@v4
         with:
@@ -178,7 +160,6 @@ jobs:
 
       # This below is to save results back to git, actions/upload-artifact@v4 might be a better solution, see Issue #169
       - name: git commit
-        # if: ${{ steps.robottest.conclusion == 'failure' }}
         # https://docs.github.com/en/actions/learn-github-actions/expressions
         if: ${{ failure() }}
         run: |
@@ -188,7 +169,6 @@ jobs:
           echo "git commit"
           git commit -m "Manager ${{ matrix.platform }} ${{ matrix.python }}"
       - name: Switch back to original branch
-        # if: ${{ steps.robottest.conclusion == 'failure' }}
         if: ${{ failure() }}
         run: |
           echo "git checkout ref_name: ${{ github.ref_name }}"
@@ -196,7 +176,6 @@ jobs:
           echo "git pull"
           git pull --ff --autostash -f
       - name: Merge test results into original branch
-        # if: ${{ steps.robottest.conclusion == 'failure' }}
         if: ${{ failure() }}
         run: |
           echo "git merge"
@@ -259,14 +238,10 @@ jobs:
           sleep 1
           # fluxbox
           fluxbox &
-        #
       - name: "MacOS Install tesseract"
         if: ${{ matrix.platform == 'macos-latest' }}
         run: |
           brew install tesseract
-        # brew update
-        # brew upgrade
-        #
       - name: "Windows Download Tesseract"
         if: ${{ matrix.platform == 'windows-latest' }}
         shell: pwsh
@@ -285,21 +260,7 @@ jobs:
         run: |
           echo "$($ENV:ProgramFiles)\Tesseract-OCR" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: "Verify tesseract"
-        # if: ${{ matrix.platform != 'windows-latest' }}
         run: tesseract -v
-        #
-        # - name: "Verify tesseract"
-        #   if: ${{ matrix.platform == 'windows-latest' }}
-        #   run: |
-        #     echo %PATH%
-        #     echo %programfiles%
-        #     dir "%programfiles%""
-        #     dir "%programfiles%\Tesseract-OCR"
-        #     echo %programfiles(x86)%
-        #     dir "%programfiles(x86)%"
-        #     "%programfiles%\Tesseract-OCR\tesseract.exe" -v
-        #   shell: cmd
-        #
 
       - name: Download packages to dist
         uses: actions/download-artifact@v4
