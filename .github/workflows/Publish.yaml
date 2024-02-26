@@ -20,6 +20,34 @@ jobs:
             isrrelease=1
           fi
           echo "isrrelease=$isrrelease" >> "$GITHUB_ENV"
+      - name: Check Milestone
+        # if: ${{ env.isrrelease == 1 }}
+        shell: python
+        # https://github.com/damies13/rfswarm/milestones
+        # https://github.com/damies13/rfswarm/milestones/paginate?page=1
+        run: |
+          import requests
+          import lxml.html
+          import os
+          branchname = os.getenv("branchname")
+          print("branchname:", branchname)
+          branchname = 'v1.3.0'
+          p1 = requests.get('https://github.com/damies13/rfswarm/milestones/paginate?page=1')
+          treep1 = lxml.html.fromstring(p1.text)
+          pct = treep1.xpath('//h2[@class="milestone-title-link" and a[text()="' + branchname + '"]]/../../div[@class="table-list-cell milestone-progress"]//span[@class="progress-percent"]')
+          print("pct:", pct[0].text)
+          dopublish = 0
+          if pct[0].text == "100%":
+            dopublish = 1
+          env_file = os.getenv('GITHUB_ENV')
+          with open(env_file, "a") as myfile:
+            myfile.write("dopublish={}".format(dopublish))
+
+      - name: Echo Vars
+        run: |
+          echo numver: ${{ env.branchname }}
+          echo numver: ${{ env.isrrelease }}
+          echo version: ${{ env.dopublish }}
       - name: Apt Update
         if: ${{ env.isrrelease == 1 }}
         run: |
