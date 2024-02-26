@@ -32,6 +32,7 @@ Select Preview Tab
 
 First Run
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #147
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	${testdata}= 	Set Variable    Issue-#147
 	${resultdata}= 	Set Variable    20230320_185055_demo
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
@@ -48,6 +49,7 @@ First Run
 
 New Data Table Section
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #149 	Issue #150
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	Open GUI
 	Wait For Status 	PreviewLoaded
 	# Click Section			toc

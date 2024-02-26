@@ -31,6 +31,7 @@ Reporter Help
 
 Command Line Generate HTML
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	HTML
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	${testdata}= 	Set Variable    Issue-#144
 	${resultdata}= 	Set Variable    20230320_185055_demo
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
@@ -50,6 +51,7 @@ Command Line Generate HTML
 
 Command Line Generate Docx
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	DOCX
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	${testdata}= 	Set Variable    Issue-#144
 	${resultdata}= 	Set Variable    20230320_185055_demo
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
@@ -69,6 +71,7 @@ Command Line Generate Docx
 
 Command Line Generate Xlsx
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	XLSX
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	${testdata}= 	Set Variable    Issue-#144
 	${resultdata}= 	Set Variable    20230320_185055_demo
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
