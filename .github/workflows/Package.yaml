@@ -29,11 +29,11 @@ jobs:
           echo "currrelease=$currrelease" >> "$GITHUB_ENV"
       - name: Determine if this is a release branch
         run: |
-          isrrelease=0
+          isrelease=0
           if [[ $branchname =~ v[0-9]\. ]]; then
-            isrrelease=1
+            isrelease=1
           fi
-          echo "isrrelease=$isrrelease" >> "$GITHUB_ENV"
+          echo "isrelease=$isrelease" >> "$GITHUB_ENV"
       - name: Determine if this is master branch
         run: |
           ismaster=0
@@ -42,21 +42,59 @@ jobs:
           fi
           echo "ismaster=$ismaster" >> "$GITHUB_ENV"
 
+      - name: Check Branch for Issue Number with Milestone
+        # if: ${{ env.isrelease == 1 }}
+        shell: python
+        # https://api.github.com/repos/damies13/rfswarm/milestones
+        run: |
+          import os
+          import re
+          import requests
+          branchname = os.getenv("branchname")
+          milestonever="NotSet"
+          ismilestone=0
+          print('branchname	:', branchname)
+          m = re.search("#(\d*)", branchname)
+          if m is not None:
+            issueno = m[1]
+            print('issueno		:', issueno)
+            issueresp = requests.get("https://api.github.com/repos/damies13/rfswarm/issues/{}".format(issueno))
+            issuedata = issueresp.json()
+            # print('issuedata', issuedata)
+            if 'milestone' in issuedata:
+              milestone = issuedata['milestone']
+              if 'title' in milestone:
+                milestonever = milestone['title']
+                print('milestonever	:', milestonever)
+                ismilestone=1
+          env_file = os.getenv('GITHUB_ENV')
+          with open(env_file, "a") as myfile:
+            myfile.write("milestone={}\n".format(milestonever))
+            myfile.write("ismilestone={}\n".format(ismilestone))
+
       - name: Get Date String
-        if: ${{ env.isrrelease == 0 && env.ismaster == 0 }}
+        if: ${{ env.isrelease == 0 && env.ismaster == 0 }}
         run: |
           datestr=$(date +%Y%m%d%H%M%S)
           echo "datestr=$datestr" >> "$GITHUB_ENV"
 
       - name: Set Version Number to Branch Name
-        if: ${{ env.isrrelease == 1 }}
+        if: ${{ env.isrelease == 1 }}
         run: |
           numver=$(echo "$branchname" | sed -E 's/v([^-]*)/\1/')
           echo "numver=$numver" >> "$GITHUB_ENV"
           version=v$numver
           echo "version=$version" >> "$GITHUB_ENV"
+      - name: Set Version Number to Milestone Name
+        if: ${{ env.ismilestone == 1 }}
+        run: |
+          numver=$(echo "$milestone" | sed -E 's/v([^-]*)/\1/')
+          numver=$numver.dev$datestr
+          echo "numver=$numver" >> "$GITHUB_ENV"
+          version=v$numver
+          echo "version=$version" >> "$GITHUB_ENV"
       - name: Set New Version Number
-        if: ${{ env.isrrelease == 0 }}
+        if: ${{ env.isrelease == 0 && env.ismilestone == 0 }}
         run: |
           numver=$(echo "$currrelease" | sed -E 's/v([^-]*)/\1/')
           mapfile -d . -t numverparts < <(echo "$numver")

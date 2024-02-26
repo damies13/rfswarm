@@ -15,13 +15,13 @@ jobs:
           echo "branchname=$branchname" >> "$GITHUB_ENV"
       - name: Determine if this is a release branch
         run: |
-          isrrelease=0
+          isrelease=0
           if [[ $branchname =~ v[0-9]\. ]]; then
-            isrrelease=1
+            isrelease=1
           fi
-          echo "isrrelease=$isrrelease" >> "$GITHUB_ENV"
+          echo "isrelease=$isrelease" >> "$GITHUB_ENV"
       - name: Check Milestone
-        # if: ${{ env.isrrelease == 1 }}
+        # if: ${{ env.isrelease == 1 }}
         shell: python
         # https://api.github.com/repos/damies13/rfswarm/milestones
         run: |
@@ -29,8 +29,6 @@ jobs:
           import requests
           branchname = os.getenv("branchname")
           print("branchname:", branchname)
-          branchname = 'v1.3.0'
-
           milestones = requests.get('https://api.github.com/repos/damies13/rfswarm/milestones')
           dopublish = 0
           for ms in milestones.json():
@@ -46,45 +44,44 @@ jobs:
               if pct == 100:
                 dopublish = 1
           print('dopublish', dopublish)
-
           env_file = os.getenv('GITHUB_ENV')
           with open(env_file, "a") as myfile:
-            myfile.write("dopublish={}".format(dopublish))
+            myfile.write("dopublish={}\n".format(dopublish))
 
       - name: Echo Vars
         run: |
-          echo numver: ${{ env.branchname }}
-          echo numver: ${{ env.isrrelease }}
-          echo version: ${{ env.dopublish }}
+          echo branchname: ${{ env.branchname }}
+          echo isrelease: ${{ env.isrelease }}
+          echo dopublish : ${{ env.dopublish }}
       - name: Apt Update
-        if: ${{ env.isrrelease == 1 }}
+        if: ${{ env.isrelease == 1 }}
         run: |
           sudo apt update -y
       - name: Setup Python
-        if: ${{ env.isrrelease == 1 }}
+        if: ${{ env.isrelease == 1 }}
         uses: actions/setup-python@v5
         with:
           python-version: 3.x
       - name: PIP Install
-        if: ${{ env.isrrelease == 1 }}
+        if: ${{ env.isrelease == 1 }}
         run: pip install --upgrade build setuptools twine wheel
       - name: Download packages to dist
-        if: ${{ env.isrrelease == 1 }}
+        if: ${{ env.isrelease == 1 }}
         uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist
       - name: Show Dist UM
-        if: ${{ env.isrrelease == 1 && matrix.platform != 'windows-latest' }}
+        if: ${{ env.isrelease == 1 && matrix.platform != 'windows-latest' }}
         run: |
           ls -la dist
       - name: Show Dist W
-        if: ${{ env.isrrelease == 1 && matrix.platform == 'windows-latest' }}
+        if: ${{ env.isrelease == 1 && matrix.platform == 'windows-latest' }}
         run: |
           dir dist
 
       # Still need to have a check all the milestones are complete
       # - name: Do Publish
-      #   if: ${{ env.isrrelease == 1 }}
+      #   if: ${{ env.isrelease == 1 }}
       #   run: |
       #     echo python3 -m twine upload -u USERNAME -p PASSWORD dist/rfswarm*
