@@ -1,0 +1,2518 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.0 (Python 3.12.2 on darwin)" generated="2024-02-26T09:51:26.291186" rpa="false" schemaversion="5">
+<suite id="s1" name="Reporter" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter">
+<suite id="s1-s1" name="CommandLine" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/CommandLine.robot">
+<kw name="Clean Up Old Files" type="SETUP">
+<kw name="Log To Console" owner="BuiltIn">
+<arg>${OUTPUT DIR}</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" start="2024-02-26T09:51:26.324996" elapsed="0.000297"/>
+</kw>
+<kw name="Remove File" owner="OperatingSystem">
+<msg time="2024-02-26T09:51:26.325838" level="INFO" html="true">File '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/*.txt"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/*.txt&lt;/a&gt;' does not exist.</msg>
+<arg>${OUTPUT DIR}${/}*.txt</arg>
+<doc>Removes a file with the given path.</doc>
+<status status="PASS" start="2024-02-26T09:51:26.325432" elapsed="0.000467"/>
+</kw>
+<kw name="Remove File" owner="OperatingSystem">
+<msg time="2024-02-26T09:51:26.326299" level="INFO" html="true">File '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/*.png"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/*.png&lt;/a&gt;' does not exist.</msg>
+<arg>${OUTPUT DIR}${/}*.png</arg>
+<doc>Removes a file with the given path.</doc>
+<status status="PASS" start="2024-02-26T09:51:26.326000" elapsed="0.000350"/>
+</kw>
+<tag>macos-latest</tag>
+<tag>ubuntu-latest</tag>
+<tag>windows-latest</tag>
+<status status="PASS" start="2024-02-26T09:51:26.324411" elapsed="0.001999"/>
+</kw>
+<test id="s1-s1-t1" name="Reporter Version" line="17">
+<kw name="Run" owner="OperatingSystem">
+<msg time="2024-02-26T09:51:26.329178" level="INFO">Running command 'rfswarm-reporter -v 2&gt;&amp;1'.</msg>
+<msg time="2024-02-26T09:51:28.679549" level="INFO">${result} = Robot Framework Swarm: Reporter 
+	Version v1.2.2.dev20240226093621 </msg>
+<var>${result}</var>
+<arg>${cmd_reporter} -v</arg>
+<doc>Runs the given command in the system and returns the output.</doc>
+<status status="PASS" start="2024-02-26T09:51:26.326829" elapsed="2.352775"/>
+</kw>
+<kw name="Log To Console" owner="BuiltIn">
+<arg>${\n}${result}</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" start="2024-02-26T09:51:28.679933" elapsed="0.000367"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${result}</arg>
+<arg>Version</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2024-02-26T09:51:28.680426" elapsed="0.000153"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${result}</arg>
+<arg>Reporter</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2024-02-26T09:51:28.680680" elapsed="0.000125"/>
+</kw>
+<tag>macos-latest</tag>
+<tag>ubuntu-latest</tag>
+<tag>windows-latest</tag>
+<status status="PASS" start="2024-02-26T09:51:26.326486" elapsed="2.354470"/>
+</test>
+<test id="s1-s1-t2" name="Reporter Help" line="25">
+<kw name="Run" owner="OperatingSystem">
+<msg time="2024-02-26T09:51:28.683997" level="INFO">Running command 'rfswarm-reporter -h 2&gt;&amp;1'.</msg>
+<msg time="2024-02-26T09:51:29.507393" level="INFO">${result} = Robot Framework Swarm: Reporter 
+	Version v1.2.2.dev20240226093621 
+usage: rfswarm-reporter [-h] [-g DEBUG] [-v] [-i INI] [-n] [-d DIR]
+                        [-t TEMPLATE] [--html] [--docx] [--xlsx]...</msg>
+<var>${result}</var>
+<arg>${cmd_reporter} -h</arg>
+<doc>Runs the given command in the system and returns the output.</doc>
+<status status="PASS" start="2024-02-26T09:51:28.681873" elapsed="0.825586"/>
+</kw>
+<kw name="Log To Console" owner="BuiltIn">
+<arg>${\n}${result}</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" start="2024-02-26T09:51:29.507796" elapsed="0.000349"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${result}</arg>
+<arg>Excel</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="PASS" start="2024-02-26T09:51:29.508285" elapsed="0.000203"/>
+</kw>
+<tag>macos-latest</tag>
+<tag>ubuntu-latest</tag>
+<tag>windows-latest</tag>
+<status status="PASS" start="2024-02-26T09:51:28.681409" elapsed="0.827229"/>
+</test>
+<test id="s1-s1-t3" name="Command Line Generate HTML" line="32">
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:29.509547" level="INFO">${testdata} = Issue-#144</msg>
+<var>${testdata}</var>
+<arg>Issue-#144</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:29.509418" elapsed="0.000152"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:29.509775" level="INFO">${resultdata} = 20230320_185055_demo</msg>
+<var>${resultdata}</var>
+<arg>20230320_185055_demo</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:29.509668" elapsed="0.000128"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:29.510069" level="INFO">${basefolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144</msg>
+<var>${basefolder}</var>
+<arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter${/}testdata${/}${testdata}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:29.509890" elapsed="0.000200"/>
+</kw>
+<kw name="Should Exist" owner="OperatingSystem">
+<msg time="2024-02-26T09:51:29.510380" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144&lt;/a&gt;' exists.</msg>
+<arg>${basefolder}</arg>
+<doc>Fails unless the given path (file or directory) exists.</doc>
+<status status="PASS" start="2024-02-26T09:51:29.510189" elapsed="0.000238"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:29.510755" level="INFO">basefolder: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144</msg>
+<arg>basefolder: ${basefolder}</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:29.510527" elapsed="0.000296"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:29.511111" level="INFO">${resultfolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo</msg>
+<var>${resultfolder}</var>
+<arg>${basefolder}${/}${resultdata}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:29.510923" elapsed="0.000210"/>
+</kw>
+<kw name="Should Exist" owner="OperatingSystem">
+<msg time="2024-02-26T09:51:29.511353" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo&lt;/a&gt;' exists.</msg>
+<arg>${resultfolder}</arg>
+<doc>Fails unless the given path (file or directory) exists.</doc>
+<status status="PASS" start="2024-02-26T09:51:29.511222" elapsed="0.000175"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:29.511641" level="INFO">resultfolder: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo</msg>
+<arg>resultfolder: ${resultfolder}</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:29.511488" elapsed="0.000218"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:29.511961" level="INFO">${template} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template</msg>
+<var>${template}</var>
+<arg>${basefolder}${/}90%ileTemplate.template</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:29.511803" elapsed="0.000283"/>
+</kw>
+<kw name="Should Exist" owner="OperatingSystem">
+<msg time="2024-02-26T09:51:29.512312" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template&lt;/a&gt;' exists.</msg>
+<arg>${template}</arg>
+<doc>Fails unless the given path (file or directory) exists.</doc>
+<status status="PASS" start="2024-02-26T09:51:29.512179" elapsed="0.000177"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:29.512578" level="INFO">template: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template</msg>
+<arg>template: ${template}</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:29.512449" elapsed="0.000214"/>
+</kw>
+<kw name="Run" owner="OperatingSystem">
+<msg time="2024-02-26T09:51:29.514915" level="INFO">Running command 'rfswarm-reporter -n -g 1 -d /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo -t /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template --html 2&gt;&amp;1'.</msg>
+<msg time="2024-02-26T09:51:34.819866" level="INFO">${result} = </msg>
+<var>${result}</var>
+<arg>${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --html</arg>
+<doc>Runs the given command in the system and returns the output.</doc>
+<status status="PASS" start="2024-02-26T09:51:29.512766" elapsed="5.307143"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:34.820564" level="INFO">result: 
+</msg>
+<arg>result: ${\n}${result}</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:34.820234" elapsed="0.000422"/>
+</kw>
+<kw name="Should Not Contain" owner="BuiltIn">
+<arg>${result}</arg>
+<arg>Traceback</arg>
+<doc>Fails if ``container`` contains ``item`` one or more times.</doc>
+<status status="PASS" start="2024-02-26T09:51:34.820771" elapsed="0.000135"/>
+</kw>
+<kw name="Should Exist" owner="OperatingSystem">
+<msg time="2024-02-26T09:51:34.821217" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo/20230320_185055_demo.html"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo/20230320_185055_demo.html&lt;/a&gt;' exists.</msg>
+<arg>${resultfolder}${/}${resultdata}.html</arg>
+<doc>Fails unless the given path (file or directory) exists.</doc>
+<status status="PASS" start="2024-02-26T09:51:34.821002" elapsed="0.000266"/>
+</kw>
+<tag>HTML</tag>
+<tag>Issue #144</tag>
+<tag>macos-latest</tag>
+<tag>ubuntu-latest</tag>
+<tag>windows-latest</tag>
+<status status="PASS" start="2024-02-26T09:51:29.508953" elapsed="5.312436"/>
+</test>
+<test id="s1-s1-t4" name="Command Line Generate Docx" line="51">
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:34.822197" level="INFO">${testdata} = Issue-#144</msg>
+<var>${testdata}</var>
+<arg>Issue-#144</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:34.822084" elapsed="0.000136"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:34.822420" level="INFO">${resultdata} = 20230320_185055_demo</msg>
+<var>${resultdata}</var>
+<arg>20230320_185055_demo</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:34.822318" elapsed="0.000122"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:34.822707" level="INFO">${basefolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144</msg>
+<var>${basefolder}</var>
+<arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter${/}testdata${/}${testdata}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:34.822536" elapsed="0.000192"/>
+</kw>
+<kw name="Should Exist" owner="OperatingSystem">
+<msg time="2024-02-26T09:51:34.822939" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144&lt;/a&gt;' exists.</msg>
+<arg>${basefolder}</arg>
+<doc>Fails unless the given path (file or directory) exists.</doc>
+<status status="PASS" start="2024-02-26T09:51:34.822818" elapsed="0.000168"/>
+</kw>
+<kw name="Log To Console" owner="BuiltIn">
+<arg>basefolder: ${basefolder}</arg>
+<arg>console=True</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" start="2024-02-26T09:51:34.823078" elapsed="0.000180"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:34.823546" level="INFO">${resultfolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo</msg>
+<var>${resultfolder}</var>
+<arg>${basefolder}${/}${resultdata}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:34.823366" elapsed="0.000202"/>
+</kw>
+<kw name="Should Exist" owner="OperatingSystem">
+<msg time="2024-02-26T09:51:34.823776" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo&lt;/a&gt;' exists.</msg>
+<arg>${resultfolder}</arg>
+<doc>Fails unless the given path (file or directory) exists.</doc>
+<status status="PASS" start="2024-02-26T09:51:34.823654" elapsed="0.000169"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:34.824052" level="INFO">resultfolder: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo</msg>
+<arg>resultfolder: ${resultfolder}</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:34.823917" elapsed="0.000200"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:34.824558" level="INFO">${template} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template</msg>
+<var>${template}</var>
+<arg>${basefolder}${/}90%ileTemplate.template</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:34.824216" elapsed="0.000365"/>
+</kw>
+<kw name="Should Exist" owner="OperatingSystem">
+<msg time="2024-02-26T09:51:34.824798" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template&lt;/a&gt;' exists.</msg>
+<arg>${template}</arg>
+<doc>Fails unless the given path (file or directory) exists.</doc>
+<status status="PASS" start="2024-02-26T09:51:34.824673" elapsed="0.000171"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:34.825064" level="INFO">template: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template</msg>
+<arg>template: ${template}</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:34.824934" elapsed="0.000199"/>
+</kw>
+<kw name="Run" owner="OperatingSystem">
+<msg time="2024-02-26T09:51:34.827313" level="INFO">Running command 'rfswarm-reporter -n -g 1 -d /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo -t /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template --docx 2&gt;&amp;1'.</msg>
+<msg time="2024-02-26T09:51:41.088975" level="INFO">${result} = </msg>
+<var>${result}</var>
+<arg>${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --docx</arg>
+<doc>Runs the given command in the system and returns the output.</doc>
+<status status="PASS" start="2024-02-26T09:51:34.825235" elapsed="6.263793"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:41.089673" level="INFO">
+</msg>
+<arg>${\n}${result}</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:41.089338" elapsed="0.000430"/>
+</kw>
+<kw name="Should Not Contain" owner="BuiltIn">
+<arg>${result}</arg>
+<arg>Traceback</arg>
+<doc>Fails if ``container`` contains ``item`` one or more times.</doc>
+<status status="PASS" start="2024-02-26T09:51:41.089888" elapsed="0.000153"/>
+</kw>
+<kw name="Should Exist" owner="OperatingSystem">
+<msg time="2024-02-26T09:51:41.090371" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo/20230320_185055_demo.docx"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo/20230320_185055_demo.docx&lt;/a&gt;' exists.</msg>
+<arg>${resultfolder}${/}${resultdata}.docx</arg>
+<doc>Fails unless the given path (file or directory) exists.</doc>
+<status status="PASS" start="2024-02-26T09:51:41.090143" elapsed="0.000278"/>
+</kw>
+<tag>DOCX</tag>
+<tag>Issue #144</tag>
+<tag>macos-latest</tag>
+<tag>ubuntu-latest</tag>
+<tag>windows-latest</tag>
+<status status="PASS" start="2024-02-26T09:51:34.821657" elapsed="6.268888"/>
+</test>
+<test id="s1-s1-t5" name="Command Line Generate Xlsx" line="70">
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:41.091383" level="INFO">${testdata} = Issue-#144</msg>
+<var>${testdata}</var>
+<arg>Issue-#144</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:41.091262" elapsed="0.000143"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:41.091607" level="INFO">${resultdata} = 20230320_185055_demo</msg>
+<var>${resultdata}</var>
+<arg>20230320_185055_demo</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:41.091501" elapsed="0.000127"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:41.091897" level="INFO">${basefolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144</msg>
+<var>${basefolder}</var>
+<arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter${/}testdata${/}${testdata}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:41.091721" elapsed="0.000197"/>
+</kw>
+<kw name="Should Exist" owner="OperatingSystem">
+<msg time="2024-02-26T09:51:41.092138" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144&lt;/a&gt;' exists.</msg>
+<arg>${basefolder}</arg>
+<doc>Fails unless the given path (file or directory) exists.</doc>
+<status status="PASS" start="2024-02-26T09:51:41.092006" elapsed="0.000176"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:41.092413" level="INFO">basefolder: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144</msg>
+<arg>basefolder: ${basefolder}</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:41.092277" elapsed="0.000203"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:41.092755" level="INFO">${resultfolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo</msg>
+<var>${resultfolder}</var>
+<arg>${basefolder}${/}${resultdata}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:41.092578" elapsed="0.000198"/>
+</kw>
+<kw name="Should Exist" owner="OperatingSystem">
+<msg time="2024-02-26T09:51:41.092995" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo&lt;/a&gt;' exists.</msg>
+<arg>${resultfolder}</arg>
+<doc>Fails unless the given path (file or directory) exists.</doc>
+<status status="PASS" start="2024-02-26T09:51:41.092870" elapsed="0.000169"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:41.093258" level="INFO">resultfolder: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo</msg>
+<arg>resultfolder: ${resultfolder}</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:41.093129" elapsed="0.000195"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:41.093581" level="INFO">${template} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template</msg>
+<var>${template}</var>
+<arg>${basefolder}${/}90%ileTemplate.template</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:41.093425" elapsed="0.000177"/>
+</kw>
+<kw name="Should Exist" owner="OperatingSystem">
+<msg time="2024-02-26T09:51:41.093808" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template&lt;/a&gt;' exists.</msg>
+<arg>${template}</arg>
+<doc>Fails unless the given path (file or directory) exists.</doc>
+<status status="PASS" start="2024-02-26T09:51:41.093687" elapsed="0.000166"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:41.094080" level="INFO">template: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template</msg>
+<arg>template: ${template}</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:41.093942" elapsed="0.000206"/>
+</kw>
+<kw name="Run" owner="OperatingSystem">
+<msg time="2024-02-26T09:51:41.096431" level="INFO">Running command 'rfswarm-reporter -n -g 1 -d /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo -t /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/90%ileTemplate.template --xlsx 2&gt;&amp;1'.</msg>
+<msg time="2024-02-26T09:51:46.023851" level="INFO">${result} = </msg>
+<var>${result}</var>
+<arg>${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --xlsx</arg>
+<doc>Runs the given command in the system and returns the output.</doc>
+<status status="PASS" start="2024-02-26T09:51:41.094246" elapsed="4.929645"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:46.024492" level="INFO">
+</msg>
+<arg>${\n}${result}</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:46.024178" elapsed="0.000420"/>
+</kw>
+<kw name="Should Not Contain" owner="BuiltIn">
+<arg>${result}</arg>
+<arg>Traceback</arg>
+<doc>Fails if ``container`` contains ``item`` one or more times.</doc>
+<status status="PASS" start="2024-02-26T09:51:46.024739" elapsed="0.000159"/>
+</kw>
+<kw name="Should Exist" owner="OperatingSystem">
+<msg time="2024-02-26T09:51:46.025278" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo/20230320_185055_demo.xlsx"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#144/20230320_185055_demo/20230320_185055_demo.xlsx&lt;/a&gt;' exists.</msg>
+<arg>${resultfolder}${/}${resultdata}.xlsx</arg>
+<doc>Fails unless the given path (file or directory) exists.</doc>
+<status status="PASS" start="2024-02-26T09:51:46.025067" elapsed="0.000257"/>
+</kw>
+<tag>Issue #144</tag>
+<tag>macos-latest</tag>
+<tag>ubuntu-latest</tag>
+<tag>windows-latest</tag>
+<tag>XLSX</tag>
+<status status="PASS" start="2024-02-26T09:51:41.090822" elapsed="4.934618"/>
+</test>
+<status status="PASS" start="2024-02-26T09:51:26.313011" elapsed="19.713021"/>
+</suite>
+<suite id="s1-s2" name="GUI Basic" source="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot">
+<test id="s1-s2-t1" name="GUI Runs and Closes" line="20">
+<kw name="Open GUI">
+<kw name="Get Variables" owner="BuiltIn">
+<msg time="2024-02-26T09:51:46.575116" level="INFO">${var} = {'${/}': '/', '${:}': ':', '${\\n}': '\n', '${cmd_reporter}': 'rfswarm-reporter', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/User...</msg>
+<var>${var}</var>
+<doc>Returns a dictionary containing all variables in the current scope.</doc>
+<status status="PASS" start="2024-02-26T09:51:46.574144" elapsed="0.001012"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:46.575507" level="INFO">{'${/}': '/', '${:}': ':', '${\\n}': '\n', '${cmd_reporter}': 'rfswarm-reporter', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method', '${LOG_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/log.html', '${LOG_LEVEL}': 'INFO', '${None}': None, '${null}': None, '${OUTPUT_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12', '${OUTPUT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/output.xml', '${PREV_TEST_MESSAGE}': '', '${PREV_TEST_NAME}': 'Command Line Generate Xlsx', '${PREV_TEST_STATUS}': 'PASS', '${process}': 'None', '${pyfile}': '/Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py', '${REPORT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/report.html', '${SPACE}': ' ', '${sssleep}': '0.5', '${SUITE_DOCUMENTATION}': '', '${SUITE_NAME}': 'Reporter.GUI Basic', '${SUITE_SOURCE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot', '${TEMPDIR}': '/var/folders/h1/8hndypj13nsbj5pn4xsnv1tm0000gn/T', '${TEST_DOCUMENTATION}': '', '${TEST_NAME}': 'GUI Runs and Closes', '${True}': True, '&amp;{OPTIONS}': {'include': ['macos-latest'], 'exclude': [], 'skip': [], 'skip_on_failure': []}, '&amp;{SUITE_METADATA}': Metadata(), '@{appargs}': [], '@{TEST_TAGS}': ['macos-latest', 'ubuntu-latest', 'windows-latest']}</msg>
+<arg>${var}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:46.575286" elapsed="0.000287"/>
+</kw>
+<kw name="Get Platform">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2024-02-26T09:51:46.576181" level="INFO">&amp;{platforms} = { Linux=ubuntu | Darwin=macos | Java=notsupported | Windows=windows }</msg>
+<var>&amp;{platforms}</var>
+<arg>Linux=ubuntu</arg>
+<arg>Darwin=macos</arg>
+<arg>Java=notsupported</arg>
+<arg>Windows=windows</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2024-02-26T09:51:46.575936" elapsed="0.000269"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2024-02-26T09:51:46.576548" level="INFO">${os} = Darwin</msg>
+<var>${os}</var>
+<arg>platform.system()</arg>
+<arg>platform</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2024-02-26T09:51:46.576327" elapsed="0.000243"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:46.577630" level="INFO">${platform} = macos</msg>
+<arg>${platform}</arg>
+<arg>${platforms}[${os}]</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2024-02-26T09:51:46.576696" elapsed="0.000974"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:51:46.575697" elapsed="0.002039"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:46.577979" level="INFO">${keyword} = Open GUI macos</msg>
+<var>${keyword}</var>
+<arg>Open GUI ${platform}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:46.577838" elapsed="0.000162"/>
+</kw>
+<kw name="Run Keyword" owner="BuiltIn">
+<kw name="Open GUI macos">
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:46.578911" level="INFO">${platform} = macos</msg>
+<arg>${platform}</arg>
+<arg>macos</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2024-02-26T09:51:46.578745" elapsed="0.000202"/>
+</kw>
+<kw name="Set Confidence" owner="ImageHorizonLibrary">
+<arg>0.9</arg>
+<doc>Sets the accuracy when finding images.</doc>
+<status status="PASS" start="2024-02-26T09:51:46.579044" elapsed="0.000104"/>
+</kw>
+<kw name="Start Process" owner="Process">
+<msg time="2024-02-26T09:51:46.579850" level="INFO">Starting process:
+rfswarm-reporter -g 6</msg>
+<msg time="2024-02-26T09:51:46.584641" level="INFO">${process} = &lt;Popen: returncode: None args: ['rfswarm-reporter', '-g', '6']&gt;</msg>
+<var>${process}</var>
+<arg>${cmd_reporter}</arg>
+<arg>-g</arg>
+<arg>6</arg>
+<arg>@{appargs}</arg>
+<arg>alias=Reporter</arg>
+<arg>stdout=${OUTPUT DIR}${/}stdout.txt</arg>
+<arg>stderr=${OUTPUT DIR}${/}stderr.txt</arg>
+<doc>Starts a new process on background.</doc>
+<status status="PASS" start="2024-02-26T09:51:46.579256" elapsed="0.005498"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:46.585542" level="INFO">${process} = &lt;Popen: returncode: None args: ['rfswarm-reporter', '-g', '6']&gt;</msg>
+<arg>$process</arg>
+<arg>${process}</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2024-02-26T09:51:46.585192" elapsed="0.000391"/>
+</kw>
+<kw name="Set Screenshot Folder" owner="ImageHorizonLibrary">
+<arg>${OUTPUT DIR}</arg>
+<doc>Sets the folder where screenshots are saved to.</doc>
+<status status="PASS" start="2024-02-26T09:51:46.585740" elapsed="0.000146"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:51:46.586164" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-1.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-1.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:51:46.585987" elapsed="0.319990"/>
+</kw>
+<arg>@{appargs}</arg>
+<status status="PASS" start="2024-02-26T09:51:46.578457" elapsed="0.327747"/>
+</kw>
+<arg>${keyword}</arg>
+<arg>@{appargs}</arg>
+<doc>Executes the given keyword with the given arguments.</doc>
+<status status="PASS" start="2024-02-26T09:51:46.578109" elapsed="0.328193"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:51:46.573425" elapsed="0.332969"/>
+</kw>
+<kw name="Wait For Status">
+<kw name="Convert To Lower Case" owner="String">
+<msg time="2024-02-26T09:51:46.907408" level="INFO">${statusl} = previewloaded</msg>
+<var>${statusl}</var>
+<arg>${status}</arg>
+<doc>Converts string to lower case.</doc>
+<status status="PASS" start="2024-02-26T09:51:46.907231" elapsed="0.000201"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:46.907820" level="INFO">${img} = reporter_macos_status_previewloaded.png</msg>
+<var>${img}</var>
+<arg>reporter_${platform}_status_${statusl}.png</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:46.907642" elapsed="0.000200"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:46.908059" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</msg>
+<arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:46.907955" elapsed="0.000143"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:46.908301" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method</msg>
+<arg>${IMAGE_DIR}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:46.908197" elapsed="0.000141"/>
+</kw>
+<kw name="Wait For" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:51:49.766021" level="INFO">Image "reporter_macos_status_previewloaded.png" found at (55, 440)</msg>
+<arg>${img}</arg>
+<arg>timeout=${timeout}</arg>
+<doc>Tries to locate given image from the screen for given time.</doc>
+<status status="PASS" start="2024-02-26T09:51:46.908439" elapsed="2.857873"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-26T09:51:50.317807" level="INFO">Slept 500 milliseconds.</msg>
+<arg>${sssleep}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2024-02-26T09:51:49.766749" elapsed="0.551152"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:51:50.318345" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-2.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-2.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:51:50.318073" elapsed="0.281378"/>
+</kw>
+<arg>PreviewLoaded</arg>
+<status status="PASS" start="2024-02-26T09:51:46.906760" elapsed="3.693163"/>
+</kw>
+<kw name="Close GUI" type="TEARDOWN">
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:50.601434" level="INFO">${keyword} = Close GUI macos</msg>
+<var>${keyword}</var>
+<arg>Close GUI ${platform}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:50.601207" elapsed="0.000257"/>
+</kw>
+<if>
+<branch type="IF" condition="${process}">
+<kw name="Is Process Running" owner="Process">
+<msg time="2024-02-26T09:51:50.602152" level="INFO">${running} = True</msg>
+<var>${running}</var>
+<arg>${process}</arg>
+<doc>Checks is the process running or not.</doc>
+<status status="PASS" start="2024-02-26T09:51:50.601800" elapsed="0.000379"/>
+</kw>
+<if>
+<branch type="IF" condition="${running}">
+<kw name="Run Keyword" owner="BuiltIn">
+<kw name="Close GUI macos">
+<kw name="Click Image" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:51:51.043602" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_button_closewindow.png" found at Box(left=9, top=31, width=19, height=25)</msg>
+<msg time="2024-02-26T09:51:51.043819" level="INFO">Clicking image "reporter_macos_button_closewindow.png" in position (18, 43)</msg>
+<arg>reporter_${platform}_button_closewindow.png</arg>
+<doc>Finds the reference image on screen and clicks it once.</doc>
+<status status="PASS" start="2024-02-26T09:51:50.603095" elapsed="0.659143"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:51:51.262912" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-3.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-3.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:51:51.262584" elapsed="0.274431"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-26T09:51:52.050470" level="INFO">Slept 500 milliseconds.</msg>
+<arg>0.5</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2024-02-26T09:51:51.537480" elapsed="0.513102"/>
+</kw>
+<kw name="End Process If Still Running">
+<kw name="Wait For Process" owner="Process">
+<msg time="2024-02-26T09:51:52.052462" level="INFO">Waiting for process to complete.</msg>
+<msg time="2024-02-26T09:51:52.052936" level="INFO">Process completed.</msg>
+<msg time="2024-02-26T09:51:52.053108" level="INFO">${result} = &lt;result object with rc 0&gt;</msg>
+<var>${result}</var>
+<arg>${process}</arg>
+<arg>timeout=60</arg>
+<doc>Waits for the process to complete or to reach the given timeout.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.052116" elapsed="0.001021"/>
+</kw>
+<kw name="Is Process Running" owner="Process">
+<msg time="2024-02-26T09:51:52.053630" level="INFO">${running} = False</msg>
+<var>${running}</var>
+<arg>${process}</arg>
+<doc>Checks is the process running or not.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.053337" elapsed="0.000318"/>
+</kw>
+<if>
+<branch type="IF" condition="not ${running}">
+<kw name="Check Result">
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:52.055024" level="INFO"/>
+<arg>${result.stderr}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.054363" elapsed="0.000702"/>
+</kw>
+<kw name="Should Not Contain" owner="BuiltIn">
+<arg>${result.stderr}</arg>
+<arg>Traceback</arg>
+<doc>Fails if ``container`` contains ``item`` one or more times.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.055201" elapsed="0.000463"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2024-02-26T09:51:52.056302" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${result.rc}</arg>
+<arg>0</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.055781" elapsed="0.000586"/>
+</kw>
+<arg>${result}</arg>
+<status status="PASS" start="2024-02-26T09:51:52.054046" elapsed="0.002387"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:51:52.053768" elapsed="0.002694"/>
+</branch>
+<branch type="ELSE">
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<status status="NOT RUN" start="2024-02-26T09:51:52.056613" elapsed="0.000017"/>
+</kw>
+<kw name="Terminate Process" owner="Process">
+<var>${result}</var>
+<arg>${process}</arg>
+<doc>Stops the process gracefully or forcefully.</doc>
+<status status="NOT RUN" start="2024-02-26T09:51:52.056731" elapsed="0.000016"/>
+</kw>
+<kw name="Check Result">
+<arg>${result}</arg>
+<status status="NOT RUN" start="2024-02-26T09:51:52.056868" elapsed="0.000019"/>
+</kw>
+<kw name="Fail" owner="BuiltIn">
+<arg>Had to Terminate Process</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<status status="NOT RUN" start="2024-02-26T09:51:52.056985" elapsed="0.000016"/>
+</kw>
+<status status="NOT RUN" start="2024-02-26T09:51:52.056503" elapsed="0.000528"/>
+</branch>
+<status status="PASS" start="2024-02-26T09:51:52.053733" elapsed="0.003322"/>
+</if>
+<status status="PASS" start="2024-02-26T09:51:52.051146" elapsed="0.005965"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:51:50.602823" elapsed="1.454330"/>
+</kw>
+<arg>${keyword}</arg>
+<doc>Executes the given keyword with the given arguments.</doc>
+<status status="PASS" start="2024-02-26T09:51:50.602449" elapsed="1.454748"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:51:50.602265" elapsed="1.454969"/>
+</branch>
+<branch type="ELSE">
+<kw name="Wait For Process" owner="Process">
+<var>${result}</var>
+<arg>${process}</arg>
+<arg>timeout=60</arg>
+<doc>Waits for the process to complete or to reach the given timeout.</doc>
+<status status="NOT RUN" start="2024-02-26T09:51:52.057482" elapsed="0.000017"/>
+</kw>
+<kw name="Check Result">
+<arg>${result}</arg>
+<status status="NOT RUN" start="2024-02-26T09:51:52.057619" elapsed="0.000019"/>
+</kw>
+<status status="NOT RUN" start="2024-02-26T09:51:52.057370" elapsed="0.000294"/>
+</branch>
+<status status="PASS" start="2024-02-26T09:51:50.602246" elapsed="1.455441"/>
+</if>
+<status status="PASS" start="2024-02-26T09:51:50.601606" elapsed="1.456163"/>
+</branch>
+<status status="PASS" start="2024-02-26T09:51:50.601559" elapsed="1.456246"/>
+</if>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:52.058110" level="INFO">${process} = None</msg>
+<arg>$process</arg>
+<arg>None</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.057935" elapsed="0.000211"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-26T09:51:52.559811" level="INFO">Slept 500 milliseconds.</msg>
+<arg>0.5</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.058246" elapsed="0.502389"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:51:50.600750" elapsed="1.961544"/>
+</kw>
+<tag>macos-latest</tag>
+<tag>ubuntu-latest</tag>
+<tag>windows-latest</tag>
+<status status="PASS" start="2024-02-26T09:51:46.572645" elapsed="5.989737"/>
+</test>
+<test id="s1-s2-t2" name="Select Preview Tab" line="26">
+<kw name="Open GUI">
+<kw name="Get Variables" owner="BuiltIn">
+<msg time="2024-02-26T09:51:52.563985" level="INFO">${var} = {'${/}': '/', '${:}': ':', '${\\n}': '\n', '${cmd_reporter}': 'rfswarm-reporter', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/User...</msg>
+<var>${var}</var>
+<doc>Returns a dictionary containing all variables in the current scope.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.563512" elapsed="0.000501"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:52.564326" level="INFO">{'${/}': '/', '${:}': ':', '${\\n}': '\n', '${cmd_reporter}': 'rfswarm-reporter', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method', '${LOG_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/log.html', '${LOG_LEVEL}': 'INFO', '${None}': None, '${null}': None, '${OUTPUT_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12', '${OUTPUT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/output.xml', '${platform}': 'macos', '${PREV_TEST_MESSAGE}': '', '${PREV_TEST_NAME}': 'GUI Runs and Closes', '${PREV_TEST_STATUS}': 'PASS', '${process}': 'None', '${pyfile}': '/Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py', '${REPORT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/report.html', '${SPACE}': ' ', '${sssleep}': '0.5', '${SUITE_DOCUMENTATION}': '', '${SUITE_NAME}': 'Reporter.GUI Basic', '${SUITE_SOURCE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot', '${TEMPDIR}': '/var/folders/h1/8hndypj13nsbj5pn4xsnv1tm0000gn/T', '${TEST_DOCUMENTATION}': '', '${TEST_NAME}': 'Select Preview Tab', '${True}': True, '&amp;{OPTIONS}': {'include': ['macos-latest'], 'exclude': [], 'skip': [], 'skip_on_failure': []}, '&amp;{SUITE_METADATA}': Metadata(), '@{appargs}': [], '@{TEST_TAGS}': ['macos-latest', 'ubuntu-latest', 'windows-latest']}</msg>
+<arg>${var}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.564123" elapsed="0.000266"/>
+</kw>
+<kw name="Get Platform">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2024-02-26T09:51:52.564973" level="INFO">&amp;{platforms} = { Linux=ubuntu | Darwin=macos | Java=notsupported | Windows=windows }</msg>
+<var>&amp;{platforms}</var>
+<arg>Linux=ubuntu</arg>
+<arg>Darwin=macos</arg>
+<arg>Java=notsupported</arg>
+<arg>Windows=windows</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.564735" elapsed="0.000265"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2024-02-26T09:51:52.565336" level="INFO">${os} = Darwin</msg>
+<var>${os}</var>
+<arg>platform.system()</arg>
+<arg>platform</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.565120" elapsed="0.000237"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:52.565695" level="INFO">${platform} = macos</msg>
+<arg>${platform}</arg>
+<arg>${platforms}[${os}]</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.565474" elapsed="0.000255"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:51:52.564515" elapsed="0.001268"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:52.566015" level="INFO">${keyword} = Open GUI macos</msg>
+<var>${keyword}</var>
+<arg>Open GUI ${platform}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.565881" elapsed="0.000154"/>
+</kw>
+<kw name="Run Keyword" owner="BuiltIn">
+<kw name="Open GUI macos">
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:52.566856" level="INFO">${platform} = macos</msg>
+<arg>${platform}</arg>
+<arg>macos</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.566697" elapsed="0.000194"/>
+</kw>
+<kw name="Set Confidence" owner="ImageHorizonLibrary">
+<arg>0.9</arg>
+<doc>Sets the accuracy when finding images.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.566993" elapsed="0.000092"/>
+</kw>
+<kw name="Start Process" owner="Process">
+<msg time="2024-02-26T09:51:52.567814" level="INFO">Starting process:
+rfswarm-reporter -g 6</msg>
+<msg time="2024-02-26T09:51:52.573160" level="INFO">${process} = &lt;Popen: returncode: None args: ['rfswarm-reporter', '-g', '6']&gt;</msg>
+<var>${process}</var>
+<arg>${cmd_reporter}</arg>
+<arg>-g</arg>
+<arg>6</arg>
+<arg>@{appargs}</arg>
+<arg>alias=Reporter</arg>
+<arg>stdout=${OUTPUT DIR}${/}stdout.txt</arg>
+<arg>stderr=${OUTPUT DIR}${/}stderr.txt</arg>
+<doc>Starts a new process on background.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.567190" elapsed="0.006098"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:52.574224" level="INFO">${process} = &lt;Popen: returncode: None args: ['rfswarm-reporter', '-g', '6']&gt;</msg>
+<arg>$process</arg>
+<arg>${process}</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.573836" elapsed="0.000430"/>
+</kw>
+<kw name="Set Screenshot Folder" owner="ImageHorizonLibrary">
+<arg>${OUTPUT DIR}</arg>
+<doc>Sets the folder where screenshots are saved to.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.574433" elapsed="0.000151"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:51:52.574864" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-4.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-4.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.574693" elapsed="0.334586"/>
+</kw>
+<arg>@{appargs}</arg>
+<status status="PASS" start="2024-02-26T09:51:52.566435" elapsed="0.343212"/>
+</kw>
+<arg>${keyword}</arg>
+<arg>@{appargs}</arg>
+<doc>Executes the given keyword with the given arguments.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.566143" elapsed="0.343793"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:51:52.563248" elapsed="0.346852"/>
+</kw>
+<kw name="Wait For Status">
+<kw name="Convert To Lower Case" owner="String">
+<msg time="2024-02-26T09:51:52.911686" level="INFO">${statusl} = previewloaded</msg>
+<var>${statusl}</var>
+<arg>${status}</arg>
+<doc>Converts string to lower case.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.911437" elapsed="0.000282"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:52.912138" level="INFO">${img} = reporter_macos_status_previewloaded.png</msg>
+<var>${img}</var>
+<arg>reporter_${platform}_status_${statusl}.png</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.911892" elapsed="0.000274"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:52.912454" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</msg>
+<arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.912320" elapsed="0.000195"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:52.912776" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method</msg>
+<arg>${IMAGE_DIR}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.912638" elapsed="0.000189"/>
+</kw>
+<kw name="Wait For" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:51:54.859207" level="INFO">Image "reporter_macos_status_previewloaded.png" found at (55, 440)</msg>
+<arg>${img}</arg>
+<arg>timeout=${timeout}</arg>
+<doc>Tries to locate given image from the screen for given time.</doc>
+<status status="PASS" start="2024-02-26T09:51:52.912956" elapsed="1.946525"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-26T09:51:55.382438" level="INFO">Slept 500 milliseconds.</msg>
+<arg>${sssleep}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2024-02-26T09:51:54.859817" elapsed="0.522722"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:51:55.383229" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-5.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-5.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:51:55.382933" elapsed="0.257693"/>
+</kw>
+<arg>PreviewLoaded</arg>
+<status status="PASS" start="2024-02-26T09:51:52.910764" elapsed="2.730149"/>
+</kw>
+<kw name="Click Tab">
+<kw name="Convert To Lower Case" owner="String">
+<msg time="2024-02-26T09:51:55.642090" level="INFO">${tabnamel} = preview</msg>
+<var>${tabnamel}</var>
+<arg>${tabname}</arg>
+<doc>Converts string to lower case.</doc>
+<status status="PASS" start="2024-02-26T09:51:55.641908" elapsed="0.000206"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:55.642403" level="INFO">${img} = reporter_macos_tab_preview.png</msg>
+<var>${img}</var>
+<arg>reporter_${platform}_tab_${tabnamel}.png</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:55.642235" elapsed="0.000189"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:55.642645" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</msg>
+<arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:55.642539" elapsed="0.000143"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:55.642885" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method</msg>
+<arg>${IMAGE_DIR}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:55.642783" elapsed="0.000138"/>
+</kw>
+<kw name="Wait For" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:51:56.067128" level="INFO">Image "reporter_macos_tab_preview.png" found at (482, 103)</msg>
+<arg>${img}</arg>
+<arg>timeout=300</arg>
+<doc>Tries to locate given image from the screen for given time.</doc>
+<status status="PASS" start="2024-02-26T09:51:55.643021" elapsed="0.424373"/>
+</kw>
+<kw name="Locate" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:51:56.499943" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_tab_preview.png" found at Box(left=443, top=89, width=78, height=29)</msg>
+<msg time="2024-02-26T09:51:56.500403" level="INFO">@{coordinates} = [ 482 | 103 ]</msg>
+<var>@{coordinates}</var>
+<arg>${img}</arg>
+<doc>Locate image on screen.</doc>
+<status status="PASS" start="2024-02-26T09:51:56.067733" elapsed="0.432704"/>
+</kw>
+<kw name="Click Image" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:51:56.944862" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_tab_preview.png" found at Box(left=443, top=89, width=78, height=29)</msg>
+<msg time="2024-02-26T09:51:56.945049" level="INFO">Clicking image "reporter_macos_tab_preview.png" in position (482, 103)</msg>
+<arg>${img}</arg>
+<doc>Finds the reference image on screen and clicks it once.</doc>
+<status status="PASS" start="2024-02-26T09:51:56.500741" elapsed="0.620495"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-26T09:51:57.633181" level="INFO">Slept 500 milliseconds.</msg>
+<arg>${sssleep}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2024-02-26T09:51:57.121651" elapsed="0.511771"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:51:57.633927" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-6.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-6.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:51:57.633649" elapsed="0.305687"/>
+</kw>
+<arg>Preview</arg>
+<status status="PASS" start="2024-02-26T09:51:55.641436" elapsed="2.298247"/>
+</kw>
+<kw name="Close GUI" type="TEARDOWN">
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:57.941025" level="INFO">${keyword} = Close GUI macos</msg>
+<var>${keyword}</var>
+<arg>Close GUI ${platform}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:57.940832" elapsed="0.000218"/>
+</kw>
+<if>
+<branch type="IF" condition="${process}">
+<kw name="Is Process Running" owner="Process">
+<msg time="2024-02-26T09:51:57.941511" level="INFO">${running} = True</msg>
+<var>${running}</var>
+<arg>${process}</arg>
+<doc>Checks is the process running or not.</doc>
+<status status="PASS" start="2024-02-26T09:51:57.941288" elapsed="0.000244"/>
+</kw>
+<if>
+<branch type="IF" condition="${running}">
+<kw name="Run Keyword" owner="BuiltIn">
+<kw name="Close GUI macos">
+<kw name="Click Image" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:51:58.373721" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_button_closewindow.png" found at Box(left=9, top=31, width=19, height=25)</msg>
+<msg time="2024-02-26T09:51:58.373916" level="INFO">Clicking image "reporter_macos_button_closewindow.png" in position (18, 43)</msg>
+<arg>reporter_${platform}_button_closewindow.png</arg>
+<doc>Finds the reference image on screen and clicks it once.</doc>
+<status status="PASS" start="2024-02-26T09:51:57.942302" elapsed="0.617509"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:51:58.560666" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-7.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-7.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:51:58.560333" elapsed="0.276363"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-26T09:51:59.350130" level="INFO">Slept 500 milliseconds.</msg>
+<arg>0.5</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2024-02-26T09:51:58.837147" elapsed="0.513087"/>
+</kw>
+<kw name="End Process If Still Running">
+<kw name="Wait For Process" owner="Process">
+<msg time="2024-02-26T09:51:59.351809" level="INFO">Waiting for process to complete.</msg>
+<msg time="2024-02-26T09:51:59.352153" level="INFO">Process completed.</msg>
+<msg time="2024-02-26T09:51:59.352298" level="INFO">${result} = &lt;result object with rc 0&gt;</msg>
+<var>${result}</var>
+<arg>${process}</arg>
+<arg>timeout=60</arg>
+<doc>Waits for the process to complete or to reach the given timeout.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.351521" elapsed="0.000802"/>
+</kw>
+<kw name="Is Process Running" owner="Process">
+<msg time="2024-02-26T09:51:59.352746" level="INFO">${running} = False</msg>
+<var>${running}</var>
+<arg>${process}</arg>
+<doc>Checks is the process running or not.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.352515" elapsed="0.000255"/>
+</kw>
+<if>
+<branch type="IF" condition="not ${running}">
+<kw name="Check Result">
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:59.354219" level="INFO"/>
+<arg>${result.stderr}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.353494" elapsed="0.000766"/>
+</kw>
+<kw name="Should Not Contain" owner="BuiltIn">
+<arg>${result.stderr}</arg>
+<arg>Traceback</arg>
+<doc>Fails if ``container`` contains ``item`` one or more times.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.354379" elapsed="0.000452"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2024-02-26T09:51:59.355636" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${result.rc}</arg>
+<arg>0</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.354946" elapsed="0.000749"/>
+</kw>
+<arg>${result}</arg>
+<status status="PASS" start="2024-02-26T09:51:59.353169" elapsed="0.002589"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:51:59.352894" elapsed="0.002892"/>
+</branch>
+<branch type="ELSE">
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<status status="NOT RUN" start="2024-02-26T09:51:59.355914" elapsed="0.000018"/>
+</kw>
+<kw name="Terminate Process" owner="Process">
+<var>${result}</var>
+<arg>${process}</arg>
+<doc>Stops the process gracefully or forcefully.</doc>
+<status status="NOT RUN" start="2024-02-26T09:51:59.356026" elapsed="0.000016"/>
+</kw>
+<kw name="Check Result">
+<arg>${result}</arg>
+<status status="NOT RUN" start="2024-02-26T09:51:59.356154" elapsed="0.000017"/>
+</kw>
+<kw name="Fail" owner="BuiltIn">
+<arg>Had to Terminate Process</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<status status="NOT RUN" start="2024-02-26T09:51:59.356262" elapsed="0.000016"/>
+</kw>
+<status status="NOT RUN" start="2024-02-26T09:51:59.355815" elapsed="0.000491"/>
+</branch>
+<status status="PASS" start="2024-02-26T09:51:59.352859" elapsed="0.003474"/>
+</if>
+<status status="PASS" start="2024-02-26T09:51:59.350747" elapsed="0.005634"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:51:57.942056" elapsed="1.414365"/>
+</kw>
+<arg>${keyword}</arg>
+<doc>Executes the given keyword with the given arguments.</doc>
+<status status="PASS" start="2024-02-26T09:51:57.941737" elapsed="1.414724"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:51:57.941595" elapsed="1.414899"/>
+</branch>
+<branch type="ELSE">
+<kw name="Wait For Process" owner="Process">
+<var>${result}</var>
+<arg>${process}</arg>
+<arg>timeout=60</arg>
+<doc>Waits for the process to complete or to reach the given timeout.</doc>
+<status status="NOT RUN" start="2024-02-26T09:51:59.356613" elapsed="0.000016"/>
+</kw>
+<kw name="Check Result">
+<arg>${result}</arg>
+<status status="NOT RUN" start="2024-02-26T09:51:59.356739" elapsed="0.000017"/>
+</kw>
+<status status="NOT RUN" start="2024-02-26T09:51:59.356517" elapsed="0.000265"/>
+</branch>
+<status status="PASS" start="2024-02-26T09:51:57.941581" elapsed="1.415221"/>
+</if>
+<status status="PASS" start="2024-02-26T09:51:57.941145" elapsed="1.415688"/>
+</branch>
+<status status="PASS" start="2024-02-26T09:51:57.941117" elapsed="1.415740"/>
+</if>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:59.357132" level="INFO">${process} = None</msg>
+<arg>$process</arg>
+<arg>None</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.356969" elapsed="0.000198"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-26T09:51:59.870259" level="INFO">Slept 500 milliseconds.</msg>
+<arg>0.5</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.357263" elapsed="0.513098"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:51:57.940402" elapsed="1.930056"/>
+</kw>
+<tag>macos-latest</tag>
+<tag>ubuntu-latest</tag>
+<tag>windows-latest</tag>
+<status status="PASS" start="2024-02-26T09:51:52.562780" elapsed="7.307753"/>
+</test>
+<test id="s1-s2-t3" name="First Run" line="33">
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:59.871484" level="INFO">${testdata} = Issue-#147</msg>
+<var>${testdata}</var>
+<arg>Issue-#147</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.871352" elapsed="0.000154"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:59.871715" level="INFO">${resultdata} = 20230320_185055_demo</msg>
+<var>${resultdata}</var>
+<arg>20230320_185055_demo</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.871611" elapsed="0.000125"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:59.872014" level="INFO">${basefolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147</msg>
+<var>${basefolder}</var>
+<arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter${/}testdata${/}${testdata}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.871841" elapsed="0.000194"/>
+</kw>
+<kw name="Should Exist" owner="OperatingSystem">
+<msg time="2024-02-26T09:51:59.872336" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147&lt;/a&gt;' exists.</msg>
+<arg>${basefolder}</arg>
+<doc>Fails unless the given path (file or directory) exists.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.872144" elapsed="0.000238"/>
+</kw>
+<kw name="Log To Console" owner="BuiltIn">
+<arg>basefolder: ${basefolder}</arg>
+<arg>console=True</arg>
+<doc>Logs the given message to the console.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.872493" elapsed="0.000193"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:59.873016" level="INFO">${resultfolder} = /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147/20230320_185055_demo</msg>
+<var>${resultfolder}</var>
+<arg>${basefolder}${/}${resultdata}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.872796" elapsed="0.000365"/>
+</kw>
+<kw name="Should Exist" owner="OperatingSystem">
+<msg time="2024-02-26T09:51:59.873407" level="INFO" html="true">Path '&lt;a href="file:///Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147/20230320_185055_demo"&gt;/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147/20230320_185055_demo&lt;/a&gt;' exists.</msg>
+<arg>${resultfolder}</arg>
+<doc>Fails unless the given path (file or directory) exists.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.873274" elapsed="0.000183"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:59.873714" level="INFO">resultfolder: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147/20230320_185055_demo</msg>
+<arg>resultfolder: ${resultfolder}</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.873562" elapsed="0.000220"/>
+</kw>
+<kw name="Get Time" owner="BuiltIn">
+<msg time="2024-02-26T09:51:59.874082" level="INFO">${epoch} = 1708941119</msg>
+<var>${epoch}</var>
+<arg>epoch</arg>
+<doc>Returns the given time in the requested format.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.873906" elapsed="0.000197"/>
+</kw>
+<kw name="Open GUI">
+<kw name="Get Variables" owner="BuiltIn">
+<msg time="2024-02-26T09:51:59.875013" level="INFO">${var} = {'${/}': '/', '${:}': ':', '${\\n}': '\n', '${cmd_reporter}': 'rfswarm-reporter', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/User...</msg>
+<var>${var}</var>
+<doc>Returns a dictionary containing all variables in the current scope.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.874565" elapsed="0.000474"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:51:59.875329" level="INFO">{'${/}': '/', '${:}': ':', '${\\n}': '\n', '${cmd_reporter}': 'rfswarm-reporter', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method', '${LOG_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/log.html', '${LOG_LEVEL}': 'INFO', '${None}': None, '${null}': None, '${OUTPUT_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12', '${OUTPUT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/output.xml', '${platform}': 'macos', '${PREV_TEST_MESSAGE}': '', '${PREV_TEST_NAME}': 'Select Preview Tab', '${PREV_TEST_STATUS}': 'PASS', '${process}': 'None', '${pyfile}': '/Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py', '${REPORT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/report.html', '${SPACE}': ' ', '${sssleep}': '0.5', '${SUITE_DOCUMENTATION}': '', '${SUITE_NAME}': 'Reporter.GUI Basic', '${SUITE_SOURCE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot', '${TEMPDIR}': '/var/folders/h1/8hndypj13nsbj5pn4xsnv1tm0000gn/T', '${TEST_DOCUMENTATION}': '', '${TEST_NAME}': 'First Run', '${True}': True, '&amp;{OPTIONS}': {'include': ['macos-latest'], 'exclude': [], 'skip': [], 'skip_on_failure': []}, '&amp;{SUITE_METADATA}': Metadata(), '@{appargs}': ['-i', 'blank_1708941119.ini', '-d', '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147/20230320_185055_demo'], '@{TEST_TAGS}': ['Issue #147', 'macos-latest', 'ubuntu-latest', 'windows-latest']}</msg>
+<arg>${var}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.875141" elapsed="0.000252"/>
+</kw>
+<kw name="Get Platform">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2024-02-26T09:51:59.875973" level="INFO">&amp;{platforms} = { Linux=ubuntu | Darwin=macos | Java=notsupported | Windows=windows }</msg>
+<var>&amp;{platforms}</var>
+<arg>Linux=ubuntu</arg>
+<arg>Darwin=macos</arg>
+<arg>Java=notsupported</arg>
+<arg>Windows=windows</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.875741" elapsed="0.000256"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2024-02-26T09:51:59.876324" level="INFO">${os} = Darwin</msg>
+<var>${os}</var>
+<arg>platform.system()</arg>
+<arg>platform</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.876113" elapsed="0.000233"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:59.876674" level="INFO">${platform} = macos</msg>
+<arg>${platform}</arg>
+<arg>${platforms}[${os}]</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.876463" elapsed="0.000250"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:51:59.875523" elapsed="0.001247"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:59.877031" level="INFO">${keyword} = Open GUI macos</msg>
+<var>${keyword}</var>
+<arg>Open GUI ${platform}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.876896" elapsed="0.000156"/>
+</kw>
+<kw name="Run Keyword" owner="BuiltIn">
+<kw name="Open GUI macos">
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:59.877868" level="INFO">${platform} = macos</msg>
+<arg>${platform}</arg>
+<arg>macos</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.877709" elapsed="0.000194"/>
+</kw>
+<kw name="Set Confidence" owner="ImageHorizonLibrary">
+<arg>0.9</arg>
+<doc>Sets the accuracy when finding images.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.878005" elapsed="0.000090"/>
+</kw>
+<kw name="Start Process" owner="Process">
+<msg time="2024-02-26T09:51:59.878939" level="INFO">Starting process:
+rfswarm-reporter -g 6 -i blank_1708941119.ini -d /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/testdata/Issue-#147/20230320_185055_demo</msg>
+<msg time="2024-02-26T09:51:59.884244" level="INFO">${process} = &lt;Popen: returncode: None args: ['rfswarm-reporter', '-g', '6', '-i', 'blank_...&gt;</msg>
+<var>${process}</var>
+<arg>${cmd_reporter}</arg>
+<arg>-g</arg>
+<arg>6</arg>
+<arg>@{appargs}</arg>
+<arg>alias=Reporter</arg>
+<arg>stdout=${OUTPUT DIR}${/}stdout.txt</arg>
+<arg>stderr=${OUTPUT DIR}${/}stderr.txt</arg>
+<doc>Starts a new process on background.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.878198" elapsed="0.006155"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:51:59.885221" level="INFO">${process} = &lt;Popen: returncode: None args: ['rfswarm-reporter', '-g', '6', '-i', 'blank_...&gt;</msg>
+<arg>$process</arg>
+<arg>${process}</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.884876" elapsed="0.000387"/>
+</kw>
+<kw name="Set Screenshot Folder" owner="ImageHorizonLibrary">
+<arg>${OUTPUT DIR}</arg>
+<doc>Sets the folder where screenshots are saved to.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.885428" elapsed="0.000158"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:51:59.885920" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-8.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-8.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.885702" elapsed="0.296306"/>
+</kw>
+<arg>@{appargs}</arg>
+<status status="PASS" start="2024-02-26T09:51:59.877450" elapsed="0.304853"/>
+</kw>
+<arg>${keyword}</arg>
+<arg>@{appargs}</arg>
+<doc>Executes the given keyword with the given arguments.</doc>
+<status status="PASS" start="2024-02-26T09:51:59.877158" elapsed="0.305232"/>
+</kw>
+<arg>-i</arg>
+<arg>blank_${epoch}.ini</arg>
+<arg>-d</arg>
+<arg>${resultfolder}</arg>
+<status status="PASS" start="2024-02-26T09:51:59.874264" elapsed="0.308210"/>
+</kw>
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Wait For Status">
+<kw name="Convert To Lower Case" owner="String">
+<msg time="2024-02-26T09:52:00.183776" level="INFO">${statusl} = previewloaded</msg>
+<var>${statusl}</var>
+<arg>${status}</arg>
+<doc>Converts string to lower case.</doc>
+<status status="PASS" start="2024-02-26T09:52:00.183600" elapsed="0.000204"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:52:00.184099" level="INFO">${img} = reporter_macos_status_previewloaded.png</msg>
+<var>${img}</var>
+<arg>reporter_${platform}_status_${statusl}.png</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:52:00.183929" elapsed="0.000193"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:00.184876" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</msg>
+<arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:00.184373" elapsed="0.000566"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:00.185222" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method</msg>
+<arg>${IMAGE_DIR}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:00.185084" elapsed="0.000207"/>
+</kw>
+<kw name="Wait For" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:02.047073" level="INFO">Image "reporter_macos_status_previewloaded.png" found at (55, 440)</msg>
+<arg>${img}</arg>
+<arg>timeout=${timeout}</arg>
+<doc>Tries to locate given image from the screen for given time.</doc>
+<status status="PASS" start="2024-02-26T09:52:00.185432" elapsed="1.861965"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-26T09:52:02.550083" level="INFO">Slept 500 milliseconds.</msg>
+<arg>${sssleep}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2024-02-26T09:52:02.047759" elapsed="0.502432"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:02.550653" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-9.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-9.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:52:02.550415" elapsed="0.299543"/>
+</kw>
+<arg>PreviewLoaded</arg>
+<status status="PASS" start="2024-02-26T09:52:00.183211" elapsed="2.667040"/>
+</kw>
+<arg>Wait For Status</arg>
+<arg>PreviewLoaded</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="PASS" start="2024-02-26T09:52:00.182798" elapsed="2.667527"/>
+</kw>
+<kw name="Close GUI" type="TEARDOWN">
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:52:02.851521" level="INFO">${keyword} = Close GUI macos</msg>
+<var>${keyword}</var>
+<arg>Close GUI ${platform}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:52:02.851330" elapsed="0.000215"/>
+</kw>
+<if>
+<branch type="IF" condition="${process}">
+<kw name="Is Process Running" owner="Process">
+<msg time="2024-02-26T09:52:02.852101" level="INFO">${running} = True</msg>
+<var>${running}</var>
+<arg>${process}</arg>
+<doc>Checks is the process running or not.</doc>
+<status status="PASS" start="2024-02-26T09:52:02.851789" elapsed="0.000340"/>
+</kw>
+<if>
+<branch type="IF" condition="${running}">
+<kw name="Run Keyword" owner="BuiltIn">
+<kw name="Close GUI macos">
+<kw name="Click Image" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:03.282577" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_button_closewindow.png" found at Box(left=9, top=31, width=19, height=25)</msg>
+<msg time="2024-02-26T09:52:03.282771" level="INFO">Clicking image "reporter_macos_button_closewindow.png" in position (18, 43)</msg>
+<arg>reporter_${platform}_button_closewindow.png</arg>
+<doc>Finds the reference image on screen and clicks it once.</doc>
+<status status="PASS" start="2024-02-26T09:52:02.853221" elapsed="0.595597"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:03.449735" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-10.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-10.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:52:03.449305" elapsed="0.285527"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-26T09:52:04.242065" level="INFO">Slept 500 milliseconds.</msg>
+<arg>0.5</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2024-02-26T09:52:03.735281" elapsed="0.506880"/>
+</kw>
+<kw name="End Process If Still Running">
+<kw name="Wait For Process" owner="Process">
+<msg time="2024-02-26T09:52:04.243265" level="INFO">Waiting for process to complete.</msg>
+<msg time="2024-02-26T09:52:04.243521" level="INFO">Process completed.</msg>
+<msg time="2024-02-26T09:52:04.243666" level="INFO">${result} = &lt;result object with rc 0&gt;</msg>
+<var>${result}</var>
+<arg>${process}</arg>
+<arg>timeout=60</arg>
+<doc>Waits for the process to complete or to reach the given timeout.</doc>
+<status status="PASS" start="2024-02-26T09:52:04.243023" elapsed="0.000667"/>
+</kw>
+<kw name="Is Process Running" owner="Process">
+<msg time="2024-02-26T09:52:04.243986" level="INFO">${running} = False</msg>
+<var>${running}</var>
+<arg>${process}</arg>
+<doc>Checks is the process running or not.</doc>
+<status status="PASS" start="2024-02-26T09:52:04.243819" elapsed="0.000189"/>
+</kw>
+<if>
+<branch type="IF" condition="not ${running}">
+<kw name="Check Result">
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:04.245288" level="INFO"/>
+<arg>${result.stderr}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:04.244615" elapsed="0.000715"/>
+</kw>
+<kw name="Should Not Contain" owner="BuiltIn">
+<arg>${result.stderr}</arg>
+<arg>Traceback</arg>
+<doc>Fails if ``container`` contains ``item`` one or more times.</doc>
+<status status="PASS" start="2024-02-26T09:52:04.245445" elapsed="0.000463"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2024-02-26T09:52:04.246541" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${result.rc}</arg>
+<arg>0</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2024-02-26T09:52:04.246023" elapsed="0.000577"/>
+</kw>
+<arg>${result}</arg>
+<status status="PASS" start="2024-02-26T09:52:04.244318" elapsed="0.002345"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:52:04.244103" elapsed="0.002589"/>
+</branch>
+<branch type="ELSE">
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<status status="NOT RUN" start="2024-02-26T09:52:04.246912" elapsed="0.000018"/>
+</kw>
+<kw name="Terminate Process" owner="Process">
+<var>${result}</var>
+<arg>${process}</arg>
+<doc>Stops the process gracefully or forcefully.</doc>
+<status status="NOT RUN" start="2024-02-26T09:52:04.247029" elapsed="0.000016"/>
+</kw>
+<kw name="Check Result">
+<arg>${result}</arg>
+<status status="NOT RUN" start="2024-02-26T09:52:04.247156" elapsed="0.000018"/>
+</kw>
+<kw name="Fail" owner="BuiltIn">
+<arg>Had to Terminate Process</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<status status="NOT RUN" start="2024-02-26T09:52:04.247278" elapsed="0.000020"/>
+</kw>
+<status status="NOT RUN" start="2024-02-26T09:52:04.246806" elapsed="0.000523"/>
+</branch>
+<status status="PASS" start="2024-02-26T09:52:04.244074" elapsed="0.003282"/>
+</if>
+<status status="PASS" start="2024-02-26T09:52:04.242603" elapsed="0.004803"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:52:02.852919" elapsed="1.394531"/>
+</kw>
+<arg>${keyword}</arg>
+<doc>Executes the given keyword with the given arguments.</doc>
+<status status="PASS" start="2024-02-26T09:52:02.852390" elapsed="1.395100"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:52:02.852203" elapsed="1.395321"/>
+</branch>
+<branch type="ELSE">
+<kw name="Wait For Process" owner="Process">
+<var>${result}</var>
+<arg>${process}</arg>
+<arg>timeout=60</arg>
+<doc>Waits for the process to complete or to reach the given timeout.</doc>
+<status status="NOT RUN" start="2024-02-26T09:52:04.247647" elapsed="0.000020"/>
+</kw>
+<kw name="Check Result">
+<arg>${result}</arg>
+<status status="NOT RUN" start="2024-02-26T09:52:04.247782" elapsed="0.000017"/>
+</kw>
+<status status="NOT RUN" start="2024-02-26T09:52:04.247548" elapsed="0.000277"/>
+</branch>
+<status status="PASS" start="2024-02-26T09:52:02.852186" elapsed="1.395660"/>
+</if>
+<status status="PASS" start="2024-02-26T09:52:02.851644" elapsed="1.396235"/>
+</branch>
+<status status="PASS" start="2024-02-26T09:52:02.851616" elapsed="1.396287"/>
+</if>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:52:04.248180" level="INFO">${process} = None</msg>
+<arg>$process</arg>
+<arg>None</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2024-02-26T09:52:04.248017" elapsed="0.000198"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-26T09:52:04.753384" level="INFO">Slept 500 milliseconds.</msg>
+<arg>0.5</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2024-02-26T09:52:04.248317" elapsed="0.505161"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:52:02.850940" elapsed="1.902631"/>
+</kw>
+<tag>Issue #147</tag>
+<tag>macos-latest</tag>
+<tag>ubuntu-latest</tag>
+<tag>windows-latest</tag>
+<status status="PASS" start="2024-02-26T09:51:59.870953" elapsed="4.882681"/>
+</test>
+<test id="s1-s2-t4" name="New Data Table Section" line="49">
+<kw name="Open GUI">
+<kw name="Get Variables" owner="BuiltIn">
+<msg time="2024-02-26T09:52:04.755155" level="INFO">${var} = {'${/}': '/', '${:}': ':', '${\\n}': '\n', '${cmd_reporter}': 'rfswarm-reporter', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/User...</msg>
+<var>${var}</var>
+<doc>Returns a dictionary containing all variables in the current scope.</doc>
+<status status="PASS" start="2024-02-26T09:52:04.754693" elapsed="0.000489"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:04.755487" level="INFO">{'${/}': '/', '${:}': ':', '${\\n}': '\n', '${cmd_reporter}': 'rfswarm-reporter', '${DEBUG_FILE}': 'NONE', '${EXECDIR}': '/Users/runner/work/rfswarm/rfswarm', '${False}': False, '${IMAGE_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method', '${LOG_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/log.html', '${LOG_LEVEL}': 'INFO', '${None}': None, '${null}': None, '${OUTPUT_DIR}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12', '${OUTPUT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/output.xml', '${platform}': 'macos', '${PREV_TEST_MESSAGE}': '', '${PREV_TEST_NAME}': 'First Run', '${PREV_TEST_STATUS}': 'PASS', '${process}': 'None', '${pyfile}': '/Users/runner/work/rfswarm/rfswarm/rfswarm_reporter/rfswarm_reporter.py', '${REPORT_FILE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/report.html', '${SPACE}': ' ', '${sssleep}': '0.5', '${SUITE_DOCUMENTATION}': '', '${SUITE_NAME}': 'Reporter.GUI Basic', '${SUITE_SOURCE}': '/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/GUI_Basic.robot', '${TEMPDIR}': '/var/folders/h1/8hndypj13nsbj5pn4xsnv1tm0000gn/T', '${TEST_DOCUMENTATION}': '', '${TEST_NAME}': 'New Data Table Section', '${True}': True, '&amp;{OPTIONS}': {'include': ['macos-latest'], 'exclude': [], 'skip': [], 'skip_on_failure': []}, '&amp;{SUITE_METADATA}': Metadata(), '@{appargs}': [], '@{TEST_TAGS}': ['Issue #149', 'Issue #150', 'macos-latest', 'ubuntu-latest', 'windows-latest']}</msg>
+<arg>${var}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:04.755292" elapsed="0.000258"/>
+</kw>
+<kw name="Get Platform">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2024-02-26T09:52:04.756142" level="INFO">&amp;{platforms} = { Linux=ubuntu | Darwin=macos | Java=notsupported | Windows=windows }</msg>
+<var>&amp;{platforms}</var>
+<arg>Linux=ubuntu</arg>
+<arg>Darwin=macos</arg>
+<arg>Java=notsupported</arg>
+<arg>Windows=windows</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2024-02-26T09:52:04.755906" elapsed="0.000261"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2024-02-26T09:52:04.756495" level="INFO">${os} = Darwin</msg>
+<var>${os}</var>
+<arg>platform.system()</arg>
+<arg>platform</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2024-02-26T09:52:04.756286" elapsed="0.000231"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:52:04.756853" level="INFO">${platform} = macos</msg>
+<arg>${platform}</arg>
+<arg>${platforms}[${os}]</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2024-02-26T09:52:04.756636" elapsed="0.000253"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:52:04.755673" elapsed="0.001271"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:52:04.757179" level="INFO">${keyword} = Open GUI macos</msg>
+<var>${keyword}</var>
+<arg>Open GUI ${platform}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:52:04.757043" elapsed="0.000156"/>
+</kw>
+<kw name="Run Keyword" owner="BuiltIn">
+<kw name="Open GUI macos">
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:52:04.758271" level="INFO">${platform} = macos</msg>
+<arg>${platform}</arg>
+<arg>macos</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2024-02-26T09:52:04.757862" elapsed="0.000447"/>
+</kw>
+<kw name="Set Confidence" owner="ImageHorizonLibrary">
+<arg>0.9</arg>
+<doc>Sets the accuracy when finding images.</doc>
+<status status="PASS" start="2024-02-26T09:52:04.758419" elapsed="0.000094"/>
+</kw>
+<kw name="Start Process" owner="Process">
+<msg time="2024-02-26T09:52:04.759189" level="INFO">Starting process:
+rfswarm-reporter -g 6</msg>
+<msg time="2024-02-26T09:52:04.764167" level="INFO">${process} = &lt;Popen: returncode: None args: ['rfswarm-reporter', '-g', '6']&gt;</msg>
+<var>${process}</var>
+<arg>${cmd_reporter}</arg>
+<arg>-g</arg>
+<arg>6</arg>
+<arg>@{appargs}</arg>
+<arg>alias=Reporter</arg>
+<arg>stdout=${OUTPUT DIR}${/}stdout.txt</arg>
+<arg>stderr=${OUTPUT DIR}${/}stderr.txt</arg>
+<doc>Starts a new process on background.</doc>
+<status status="PASS" start="2024-02-26T09:52:04.758618" elapsed="0.005653"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:52:04.765236" level="INFO">${process} = &lt;Popen: returncode: None args: ['rfswarm-reporter', '-g', '6']&gt;</msg>
+<arg>$process</arg>
+<arg>${process}</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2024-02-26T09:52:04.764888" elapsed="0.000390"/>
+</kw>
+<kw name="Set Screenshot Folder" owner="ImageHorizonLibrary">
+<arg>${OUTPUT DIR}</arg>
+<doc>Sets the folder where screenshots are saved to.</doc>
+<status status="PASS" start="2024-02-26T09:52:04.765397" elapsed="0.000142"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:04.765867" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-11.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-11.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:52:04.765690" elapsed="0.274970"/>
+</kw>
+<arg>@{appargs}</arg>
+<status status="PASS" start="2024-02-26T09:52:04.757597" elapsed="0.283300"/>
+</kw>
+<arg>${keyword}</arg>
+<arg>@{appargs}</arg>
+<doc>Executes the given keyword with the given arguments.</doc>
+<status status="PASS" start="2024-02-26T09:52:04.757312" elapsed="0.283666"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:52:04.754446" elapsed="0.286611"/>
+</kw>
+<kw name="Wait For Status">
+<kw name="Convert To Lower Case" owner="String">
+<msg time="2024-02-26T09:52:05.042059" level="INFO">${statusl} = previewloaded</msg>
+<var>${statusl}</var>
+<arg>${status}</arg>
+<doc>Converts string to lower case.</doc>
+<status status="PASS" start="2024-02-26T09:52:05.041880" elapsed="0.000204"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:52:05.042378" level="INFO">${img} = reporter_macos_status_previewloaded.png</msg>
+<var>${img}</var>
+<arg>reporter_${platform}_status_${statusl}.png</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:52:05.042208" elapsed="0.000193"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:05.042627" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</msg>
+<arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:05.042522" elapsed="0.000143"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:05.042872" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method</msg>
+<arg>${IMAGE_DIR}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:05.042768" elapsed="0.000141"/>
+</kw>
+<kw name="Wait For" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:06.877569" level="INFO">Image "reporter_macos_status_previewloaded.png" found at (55, 440)</msg>
+<arg>${img}</arg>
+<arg>timeout=${timeout}</arg>
+<doc>Tries to locate given image from the screen for given time.</doc>
+<status status="PASS" start="2024-02-26T09:52:05.043018" elapsed="1.834811"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-26T09:52:07.382751" level="INFO">Slept 500 milliseconds.</msg>
+<arg>${sssleep}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2024-02-26T09:52:06.878166" elapsed="0.505142"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:07.383759" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-12.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-12.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:52:07.383502" elapsed="0.254412"/>
+</kw>
+<arg>PreviewLoaded</arg>
+<status status="PASS" start="2024-02-26T09:52:05.041404" elapsed="2.596778"/>
+</kw>
+<kw name="Click Section">
+<kw name="Convert To Lower Case" owner="String">
+<msg time="2024-02-26T09:52:07.639242" level="INFO">${sectnamel} = report</msg>
+<var>${sectnamel}</var>
+<arg>${sectname}</arg>
+<doc>Converts string to lower case.</doc>
+<status status="PASS" start="2024-02-26T09:52:07.639063" elapsed="0.000204"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:52:07.639555" level="INFO">${img} = reporter_macos_section_report.png</msg>
+<var>${img}</var>
+<arg>reporter_${platform}_section_${sectnamel}.png</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:52:07.639385" elapsed="0.000191"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:07.639799" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</msg>
+<arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:07.639691" elapsed="0.000150"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:07.640051" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method</msg>
+<arg>${IMAGE_DIR}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:07.639942" elapsed="0.000149"/>
+</kw>
+<kw name="Wait For" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:08.081484" level="INFO">Image "reporter_macos_section_report.png" found at (42, 142)</msg>
+<arg>${img}</arg>
+<arg>timeout=300</arg>
+<doc>Tries to locate given image from the screen for given time.</doc>
+<status status="PASS" start="2024-02-26T09:52:07.640195" elapsed="0.441556"/>
+</kw>
+<kw name="Locate" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:08.530279" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_section_report.png" found at Box(left=19, top=116, width=46, height=52)</msg>
+<msg time="2024-02-26T09:52:08.530768" level="INFO">@{coordinates} = [ 42 | 142 ]</msg>
+<var>@{coordinates}</var>
+<arg>${img}</arg>
+<doc>Locate image on screen.</doc>
+<status status="PASS" start="2024-02-26T09:52:08.082085" elapsed="0.448716"/>
+</kw>
+<kw name="Click Image" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:08.976098" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_section_report.png" found at Box(left=19, top=116, width=46, height=52)</msg>
+<msg time="2024-02-26T09:52:08.976287" level="INFO">Clicking image "reporter_macos_section_report.png" in position (42, 142)</msg>
+<arg>${img}</arg>
+<doc>Finds the reference image on screen and clicks it once.</doc>
+<status status="PASS" start="2024-02-26T09:52:08.531123" elapsed="0.571240"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-26T09:52:09.603540" level="INFO">Slept 500 milliseconds.</msg>
+<arg>${sssleep}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2024-02-26T09:52:09.102727" elapsed="0.500906"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:09.604025" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-13.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-13.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:52:09.603805" elapsed="0.258305"/>
+</kw>
+<arg>Report</arg>
+<status status="PASS" start="2024-02-26T09:52:07.638564" elapsed="2.224045"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:09.863307" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-14.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-14.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:52:09.862908" elapsed="0.291248"/>
+</kw>
+<kw name="Click Button">
+<kw name="Convert To Lower Case" owner="String">
+<msg time="2024-02-26T09:52:10.155505" level="INFO">${bttnnamel} = addsection</msg>
+<var>${bttnnamel}</var>
+<arg>${bttnname}</arg>
+<doc>Converts string to lower case.</doc>
+<status status="PASS" start="2024-02-26T09:52:10.155307" elapsed="0.000229"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:52:10.155917" level="INFO">${img} = reporter_macos_button_addsection.png</msg>
+<var>${img}</var>
+<arg>reporter_${platform}_button_${bttnnamel}.png</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:52:10.155663" elapsed="0.000276"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:10.156175" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</msg>
+<arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:10.156060" elapsed="0.000156"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:10.156429" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method</msg>
+<arg>${IMAGE_DIR}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:10.156318" elapsed="0.000151"/>
+</kw>
+<kw name="Wait For" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:10.593449" level="INFO">Image "reporter_macos_button_addsection.png" found at (36, 109)</msg>
+<arg>${img}</arg>
+<arg>timeout=300</arg>
+<doc>Tries to locate given image from the screen for given time.</doc>
+<status status="PASS" start="2024-02-26T09:52:10.156578" elapsed="0.437184"/>
+</kw>
+<kw name="Locate" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:11.024732" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_button_addsection.png" found at Box(left=11, top=95, width=50, height=29)</msg>
+<msg time="2024-02-26T09:52:11.025203" level="INFO">@{coordinates} = [ 36 | 109 ]</msg>
+<var>@{coordinates}</var>
+<arg>${img}</arg>
+<doc>Locate image on screen.</doc>
+<status status="PASS" start="2024-02-26T09:52:10.594157" elapsed="0.431079"/>
+</kw>
+<kw name="Click Image" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:11.456223" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_button_addsection.png" found at Box(left=11, top=95, width=50, height=29)</msg>
+<msg time="2024-02-26T09:52:11.456425" level="INFO">Clicking image "reporter_macos_button_addsection.png" in position (36, 109)</msg>
+<arg>${img}</arg>
+<doc>Finds the reference image on screen and clicks it once.</doc>
+<status status="PASS" start="2024-02-26T09:52:11.025554" elapsed="0.560441"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-26T09:52:12.090155" level="INFO">Slept 500 milliseconds.</msg>
+<arg>${sssleep}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2024-02-26T09:52:11.586465" elapsed="0.503792"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:12.090667" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-15.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-15.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:52:12.090440" elapsed="0.263411"/>
+</kw>
+<arg>AddSection</arg>
+<status status="PASS" start="2024-02-26T09:52:10.154775" elapsed="2.199373"/>
+</kw>
+<kw name="Click To The Below Of Image" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:12.806367" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_label_sectionname.png" found at Box(left=866, top=528, width=92, height=23)</msg>
+<msg time="2024-02-26T09:52:12.806581" level="INFO">Clicking 1 time(s) at (912, 559) with left mouse button at interval 0.000000</msg>
+<arg>reporter_${platform}_label_sectionname.png</arg>
+<arg>20</arg>
+<doc>Clicks below of reference image by given offset.</doc>
+<status status="PASS" start="2024-02-26T09:52:12.354669" elapsed="0.575076"/>
+</kw>
+<kw name="Type" owner="ImageHorizonLibrary">
+<arg>Issue #149</arg>
+<doc>Type text and keyboard keys.</doc>
+<status status="PASS" start="2024-02-26T09:52:12.930122" elapsed="0.753424"/>
+</kw>
+<kw name="Click Button">
+<kw name="Convert To Lower Case" owner="String">
+<msg time="2024-02-26T09:52:13.685272" level="INFO">${bttnnamel} = ok</msg>
+<var>${bttnnamel}</var>
+<arg>${bttnname}</arg>
+<doc>Converts string to lower case.</doc>
+<status status="PASS" start="2024-02-26T09:52:13.684572" elapsed="0.000737"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:52:13.685690" level="INFO">${img} = reporter_macos_button_ok.png</msg>
+<var>${img}</var>
+<arg>reporter_${platform}_button_${bttnnamel}.png</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:52:13.685483" elapsed="0.000229"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:13.685964" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</msg>
+<arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:13.685844" elapsed="0.000165"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:13.686246" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method</msg>
+<arg>${IMAGE_DIR}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:13.686120" elapsed="0.000164"/>
+</kw>
+<kw name="Wait For" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:14.120057" level="INFO">Image "reporter_macos_button_ok.png" found at (892, 600)</msg>
+<arg>${img}</arg>
+<arg>timeout=300</arg>
+<doc>Tries to locate given image from the screen for given time.</doc>
+<status status="PASS" start="2024-02-26T09:52:13.686384" elapsed="0.433939"/>
+</kw>
+<kw name="Locate" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:14.574811" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_button_ok.png" found at Box(left=878, top=589, width=28, height=22)</msg>
+<msg time="2024-02-26T09:52:14.575266" level="INFO">@{coordinates} = [ 892 | 600 ]</msg>
+<var>@{coordinates}</var>
+<arg>${img}</arg>
+<doc>Locate image on screen.</doc>
+<status status="PASS" start="2024-02-26T09:52:14.120669" elapsed="0.454629"/>
+</kw>
+<kw name="Click Image" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:15.012346" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_button_ok.png" found at Box(left=878, top=589, width=28, height=22)</msg>
+<msg time="2024-02-26T09:52:15.012553" level="INFO">Clicking image "reporter_macos_button_ok.png" in position (892, 600)</msg>
+<arg>${img}</arg>
+<doc>Finds the reference image on screen and clicks it once.</doc>
+<status status="PASS" start="2024-02-26T09:52:14.575608" elapsed="0.574427"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-26T09:52:15.660254" level="INFO">Slept 500 milliseconds.</msg>
+<arg>${sssleep}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2024-02-26T09:52:15.151316" elapsed="0.509040"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:15.660768" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-16.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-16.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:52:15.660540" elapsed="0.253638"/>
+</kw>
+<arg>OK</arg>
+<status status="PASS" start="2024-02-26T09:52:13.683928" elapsed="2.230492"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:15.915094" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-17.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-17.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:52:15.914691" elapsed="0.253343"/>
+</kw>
+<kw name="Click Section">
+<kw name="Convert To Lower Case" owner="String">
+<msg time="2024-02-26T09:52:16.169250" level="INFO">${sectnamel} = issue#149</msg>
+<var>${sectnamel}</var>
+<arg>${sectname}</arg>
+<doc>Converts string to lower case.</doc>
+<status status="PASS" start="2024-02-26T09:52:16.169065" elapsed="0.000210"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:52:16.169574" level="INFO">${img} = reporter_macos_section_issue#149.png</msg>
+<var>${img}</var>
+<arg>reporter_${platform}_section_${sectnamel}.png</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:52:16.169399" elapsed="0.000197"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:16.169831" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</msg>
+<arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:16.169718" elapsed="0.000196"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:16.170130" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method</msg>
+<arg>${IMAGE_DIR}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:16.170017" elapsed="0.000159"/>
+</kw>
+<kw name="Wait For" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:16.608428" level="INFO">Image "reporter_macos_section_issue#149.png" found at (74, 286)</msg>
+<arg>${img}</arg>
+<arg>timeout=300</arg>
+<doc>Tries to locate given image from the screen for given time.</doc>
+<status status="PASS" start="2024-02-26T09:52:16.170279" elapsed="0.438418"/>
+</kw>
+<kw name="Locate" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:17.043784" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_section_issue#149.png" found at Box(left=38, top=278, width=73, height=16)</msg>
+<msg time="2024-02-26T09:52:17.044254" level="INFO">@{coordinates} = [ 74 | 286 ]</msg>
+<var>@{coordinates}</var>
+<arg>${img}</arg>
+<doc>Locate image on screen.</doc>
+<status status="PASS" start="2024-02-26T09:52:16.609054" elapsed="0.435236"/>
+</kw>
+<kw name="Click Image" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:17.483684" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_section_issue#149.png" found at Box(left=38, top=278, width=73, height=16)</msg>
+<msg time="2024-02-26T09:52:17.484047" level="INFO">Clicking image "reporter_macos_section_issue#149.png" in position (74, 286)</msg>
+<arg>${img}</arg>
+<doc>Finds the reference image on screen and clicks it once.</doc>
+<status status="PASS" start="2024-02-26T09:52:17.044606" elapsed="0.572531"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-26T09:52:18.132002" level="INFO">Slept 500 milliseconds.</msg>
+<arg>${sssleep}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2024-02-26T09:52:17.617843" elapsed="0.514272"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:18.132551" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-18.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-18.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:52:18.132316" elapsed="0.263258"/>
+</kw>
+<arg>Issue#149</arg>
+<status status="PASS" start="2024-02-26T09:52:16.168558" elapsed="2.227301"/>
+</kw>
+<kw name="Select Field With Label">
+<kw name="Convert To Lower Case" owner="String">
+<msg time="2024-02-26T09:52:18.397051" level="INFO">${labell} = type</msg>
+<var>${labell}</var>
+<arg>${label}</arg>
+<doc>Converts string to lower case.</doc>
+<status status="PASS" start="2024-02-26T09:52:18.396871" elapsed="0.000205"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:52:18.397368" level="INFO">${img} = reporter_macos_label_type.png</msg>
+<var>${img}</var>
+<arg>reporter_${platform}_label_${labell}.png</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:52:18.397200" elapsed="0.000190"/>
+</kw>
+<kw name="Get Image Size">
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2024-02-26T09:52:18.398379" level="INFO">${img} = &lt;PIL.PngImagePlugin.PngImageFile image mode=RGBA size=64x22 at 0x10B120650&gt;</msg>
+<var>${img}</var>
+<arg>PIL.Image.open(r'${imgfile}')</arg>
+<arg>PIL.Image</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2024-02-26T09:52:18.397905" elapsed="0.000501"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:52:18.399329" level="INFO">${imgsize} = (64, 22)</msg>
+<var>${imgsize}</var>
+<arg>${img.size}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:52:18.398548" elapsed="0.000807"/>
+</kw>
+<return>
+<value>${imgsize}</value>
+<status status="PASS" start="2024-02-26T09:52:18.399431" elapsed="0.000129"/>
+</return>
+<msg time="2024-02-26T09:52:18.399704" level="INFO">${imgsize} = (64, 22)</msg>
+<var>${imgsize}</var>
+<arg>${IMAGE_DIR}${/}${img}</arg>
+<status status="PASS" start="2024-02-26T09:52:18.397561" elapsed="0.002165"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:18.400052" level="INFO">(64, 22)</msg>
+<arg>${imgsize}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:18.399842" elapsed="0.000250"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2024-02-26T09:52:18.400512" level="INFO">${offsetx} = 37</msg>
+<var>${offsetx}</var>
+<arg>int(${imgsize}[0]/2)+5</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2024-02-26T09:52:18.400200" elapsed="0.000335"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:18.400750" level="INFO">37</msg>
+<arg>${offsetx}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:18.400644" elapsed="0.000143"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:18.400967" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</msg>
+<arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:18.400892" elapsed="0.000200"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:18.401314" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method</msg>
+<arg>${IMAGE_DIR}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:18.401201" elapsed="0.000151"/>
+</kw>
+<kw name="Wait For" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:18.864884" level="INFO">Image "reporter_macos_label_type.png" found at (293, 161)</msg>
+<arg>${img}</arg>
+<arg>timeout=300</arg>
+<doc>Tries to locate given image from the screen for given time.</doc>
+<status status="PASS" start="2024-02-26T09:52:18.401458" elapsed="0.463722"/>
+</kw>
+<kw name="Locate" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:19.298219" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_label_type.png" found at Box(left=261, top=150, width=64, height=22)</msg>
+<msg time="2024-02-26T09:52:19.298739" level="INFO">@{coordinates} = [ 293 | 161 ]</msg>
+<var>@{coordinates}</var>
+<arg>${img}</arg>
+<doc>Locate image on screen.</doc>
+<status status="PASS" start="2024-02-26T09:52:18.865537" elapsed="0.433239"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2024-02-26T09:52:19.299464" level="INFO">${x} = 330</msg>
+<var>${x}</var>
+<arg>${coordinates}[0]+${offsetx}</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2024-02-26T09:52:19.299109" elapsed="0.000378"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2024-02-26T09:52:19.299794" level="INFO">${y} = 161</msg>
+<var>${y}</var>
+<arg>${coordinates}[1]+${offsety}</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2024-02-26T09:52:19.299597" elapsed="0.000223"/>
+</kw>
+<kw name="Create List" owner="BuiltIn">
+<msg time="2024-02-26T09:52:19.300110" level="INFO">@{coordinates} = [ 330 | 161 ]</msg>
+<var>@{coordinates}</var>
+<arg>${x}</arg>
+<arg>${y}</arg>
+<doc>Returns a list containing given items.</doc>
+<status status="PASS" start="2024-02-26T09:52:19.299932" elapsed="0.000202"/>
+</kw>
+<kw name="Move To" owner="ImageHorizonLibrary">
+<arg>${coordinates}</arg>
+<doc>Moves the mouse pointer to an absolute coordinates.</doc>
+<status status="PASS" start="2024-02-26T09:52:19.300244" elapsed="0.181649"/>
+</kw>
+<kw name="Click" owner="ImageHorizonLibrary">
+<doc>Clicks with the specified mouse button.</doc>
+<status status="PASS" start="2024-02-26T09:52:19.482083" elapsed="0.169267"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-26T09:52:20.156287" level="INFO">Slept 500 milliseconds.</msg>
+<arg>${sssleep}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2024-02-26T09:52:19.651555" elapsed="0.504817"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:20.156736" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-19.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-19.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:52:20.156527" elapsed="0.281602"/>
+</kw>
+<arg>Type</arg>
+<status status="PASS" start="2024-02-26T09:52:18.396340" elapsed="2.042083"/>
+</kw>
+<kw name="Select Option">
+<kw name="Convert To Lower Case" owner="String">
+<msg time="2024-02-26T09:52:20.439608" level="INFO">${optnamel} = datatable</msg>
+<var>${optnamel}</var>
+<arg>${optname}</arg>
+<doc>Converts string to lower case.</doc>
+<status status="PASS" start="2024-02-26T09:52:20.439422" elapsed="0.000210"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:52:20.439932" level="INFO">${img} = reporter_macos_option_datatable.png</msg>
+<var>${img}</var>
+<arg>reporter_${platform}_option_${optnamel}.png</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:52:20.439757" elapsed="0.000196"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:20.440182" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</msg>
+<arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:20.440072" elapsed="0.000151"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:20.440428" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method</msg>
+<arg>${IMAGE_DIR}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:20.440323" elapsed="0.000148"/>
+</kw>
+<kw name="Wait For" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:20.903684" level="INFO">Image "reporter_macos_option_datatable.png" found at (389, 276)</msg>
+<arg>${img}</arg>
+<arg>timeout=300</arg>
+<doc>Tries to locate given image from the screen for given time.</doc>
+<status status="PASS" start="2024-02-26T09:52:20.440573" elapsed="0.463389"/>
+</kw>
+<kw name="Locate" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:21.366202" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_option_datatable.png" found at Box(left=344, top=269, width=90, height=14)</msg>
+<msg time="2024-02-26T09:52:21.366731" level="INFO">@{coordinates} = [ 389 | 276 ]</msg>
+<var>@{coordinates}</var>
+<arg>${img}</arg>
+<doc>Locate image on screen.</doc>
+<status status="PASS" start="2024-02-26T09:52:20.904336" elapsed="0.462429"/>
+</kw>
+<kw name="Click Image" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:21.834060" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_option_datatable.png" found at Box(left=344, top=269, width=90, height=14)</msg>
+<msg time="2024-02-26T09:52:21.834259" level="INFO">Clicking image "reporter_macos_option_datatable.png" in position (389, 276)</msg>
+<arg>${img}</arg>
+<doc>Finds the reference image on screen and clicks it once.</doc>
+<status status="PASS" start="2024-02-26T09:52:21.367077" elapsed="0.627365"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-26T09:52:22.515778" level="INFO">Slept 500 milliseconds.</msg>
+<arg>${sssleep}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2024-02-26T09:52:21.994817" elapsed="0.521051"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:22.516592" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-20.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-20.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:52:22.516046" elapsed="0.267238"/>
+</kw>
+<arg>DataTable</arg>
+<status status="PASS" start="2024-02-26T09:52:20.438906" elapsed="2.344670"/>
+</kw>
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Wait For Status">
+<kw name="Convert To Lower Case" owner="String">
+<msg time="2024-02-26T09:52:22.785711" level="INFO">${statusl} = previewloaded</msg>
+<var>${statusl}</var>
+<arg>${status}</arg>
+<doc>Converts string to lower case.</doc>
+<status status="PASS" start="2024-02-26T09:52:22.785505" elapsed="0.000237"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:52:22.786082" level="INFO">${img} = reporter_macos_status_previewloaded.png</msg>
+<var>${img}</var>
+<arg>reporter_${platform}_status_${statusl}.png</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:52:22.785895" elapsed="0.000404"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:22.786572" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</msg>
+<arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:22.786450" elapsed="0.000166"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:22.786828" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method</msg>
+<arg>${IMAGE_DIR}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:22.786717" elapsed="0.000151"/>
+</kw>
+<kw name="Wait For" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:23.213908" level="INFO">Image "reporter_macos_status_previewloaded.png" found at (55, 440)</msg>
+<arg>${img}</arg>
+<arg>timeout=${timeout}</arg>
+<doc>Tries to locate given image from the screen for given time.</doc>
+<status status="PASS" start="2024-02-26T09:52:22.786971" elapsed="0.427200"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-26T09:52:23.728743" level="INFO">Slept 500 milliseconds.</msg>
+<arg>${sssleep}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2024-02-26T09:52:23.214515" elapsed="0.514332"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:52:23.729251" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-21.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-21.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:52:23.729026" elapsed="0.259944"/>
+</kw>
+<arg>PreviewLoaded</arg>
+<status status="PASS" start="2024-02-26T09:52:22.784980" elapsed="1.204323"/>
+</kw>
+<arg>Wait For Status</arg>
+<arg>PreviewLoaded</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="PASS" start="2024-02-26T09:52:22.784276" elapsed="1.205105"/>
+</kw>
+<kw name="Select Field With Label">
+<kw name="Convert To Lower Case" owner="String">
+<msg time="2024-02-26T09:52:23.990585" level="INFO">${labell} = showgraphcolours</msg>
+<var>${labell}</var>
+<arg>${label}</arg>
+<doc>Converts string to lower case.</doc>
+<status status="PASS" start="2024-02-26T09:52:23.990408" elapsed="0.000203"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:52:23.990895" level="INFO">${img} = reporter_macos_label_showgraphcolours.png</msg>
+<var>${img}</var>
+<arg>reporter_${platform}_label_${labell}.png</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:52:23.990731" elapsed="0.000185"/>
+</kw>
+<kw name="Get Image Size">
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2024-02-26T09:52:23.991851" level="INFO">${img} = &lt;PIL.PngImagePlugin.PngImageFile image mode=RGBA size=131x19 at 0x12613D6D0&gt;</msg>
+<var>${img}</var>
+<arg>PIL.Image.open(r'${imgfile}')</arg>
+<arg>PIL.Image</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2024-02-26T09:52:23.991406" elapsed="0.000472"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:52:23.992556" level="INFO">${imgsize} = (131, 19)</msg>
+<var>${imgsize}</var>
+<arg>${img.size}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:52:23.991994" elapsed="0.000586"/>
+</kw>
+<return>
+<value>${imgsize}</value>
+<status status="PASS" start="2024-02-26T09:52:23.992642" elapsed="0.000061"/>
+</return>
+<msg time="2024-02-26T09:52:23.992836" level="INFO">${imgsize} = (131, 19)</msg>
+<var>${imgsize}</var>
+<arg>${IMAGE_DIR}${/}${img}</arg>
+<status status="PASS" start="2024-02-26T09:52:23.991073" elapsed="0.001783"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:23.993110" level="INFO">(131, 19)</msg>
+<arg>${imgsize}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:23.992970" elapsed="0.000178"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2024-02-26T09:52:23.993477" level="INFO">${offsetx} = 70</msg>
+<var>${offsetx}</var>
+<arg>int(${imgsize}[0]/2)+5</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2024-02-26T09:52:23.993272" elapsed="0.000227"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:23.993713" level="INFO">70</msg>
+<arg>${offsetx}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:23.993606" elapsed="0.000144"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:23.993933" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</msg>
+<arg>/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:23.993856" elapsed="0.000114"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:52:23.994192" level="INFO">/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method</msg>
+<arg>${IMAGE_DIR}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:52:23.994074" elapsed="0.000155"/>
+</kw>
+<kw name="Wait For" owner="ImageHorizonLibrary">
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:57:24.081193" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-22.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-22.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:57:24.080707" elapsed="0.252302"/>
+</kw>
+<msg time="2024-02-26T09:57:24.333520" level="FAIL">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_label_showgraphcolours.png" was not found on screen</msg>
+<arg>${img}</arg>
+<arg>timeout=300</arg>
+<doc>Tries to locate given image from the screen for given time.</doc>
+<status status="FAIL" start="2024-02-26T09:52:23.994332" elapsed="300.339937">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_label_showgraphcolours.png" was not found on screen</status>
+</kw>
+<kw name="Locate" owner="ImageHorizonLibrary">
+<var>@{coordinates}</var>
+<arg>${img}</arg>
+<doc>Locate image on screen.</doc>
+<status status="NOT RUN" start="2024-02-26T09:57:24.334568" elapsed="0.000033"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<var>${x}</var>
+<arg>${coordinates}[0]+${offsetx}</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="NOT RUN" start="2024-02-26T09:57:24.334727" elapsed="0.000017"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<var>${y}</var>
+<arg>${coordinates}[1]+${offsety}</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="NOT RUN" start="2024-02-26T09:57:24.334841" elapsed="0.000016"/>
+</kw>
+<kw name="Create List" owner="BuiltIn">
+<var>@{coordinates}</var>
+<arg>${x}</arg>
+<arg>${y}</arg>
+<doc>Returns a list containing given items.</doc>
+<status status="NOT RUN" start="2024-02-26T09:57:24.334968" elapsed="0.000017"/>
+</kw>
+<kw name="Move To" owner="ImageHorizonLibrary">
+<arg>${coordinates}</arg>
+<doc>Moves the mouse pointer to an absolute coordinates.</doc>
+<status status="NOT RUN" start="2024-02-26T09:57:24.335082" elapsed="0.000016"/>
+</kw>
+<kw name="Click" owner="ImageHorizonLibrary">
+<doc>Clicks with the specified mouse button.</doc>
+<status status="NOT RUN" start="2024-02-26T09:57:24.335304" elapsed="0.000018"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>${sssleep}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2024-02-26T09:57:24.335415" elapsed="0.000017"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<status status="NOT RUN" start="2024-02-26T09:57:24.335526" elapsed="0.000017"/>
+</kw>
+<arg>ShowGraphColours</arg>
+<status status="FAIL" start="2024-02-26T09:52:23.989885" elapsed="300.345820">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_label_showgraphcolours.png" was not found on screen</status>
+</kw>
+<kw name="Select Field With Label">
+<arg>DataType</arg>
+<status status="NOT RUN" start="2024-02-26T09:57:24.336036" elapsed="0.000026"/>
+</kw>
+<kw name="Select Option">
+<arg>Result</arg>
+<status status="NOT RUN" start="2024-02-26T09:57:24.336206" elapsed="0.000019"/>
+</kw>
+<kw name="Select Field With Label">
+<arg>ResultType</arg>
+<status status="NOT RUN" start="2024-02-26T09:57:24.336410" elapsed="0.000018"/>
+</kw>
+<kw name="Select Option">
+<arg>ResponseTime</arg>
+<status status="NOT RUN" start="2024-02-26T09:57:24.336560" elapsed="0.000016"/>
+</kw>
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<arg>Wait For Status</arg>
+<arg>PreviewLoaded</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="NOT RUN" start="2024-02-26T09:57:24.336699" elapsed="0.000018"/>
+</kw>
+<kw name="Click Button">
+<arg>GenerateHTML</arg>
+<status status="NOT RUN" start="2024-02-26T09:57:24.336868" elapsed="0.000017"/>
+</kw>
+<kw name="Wait For Status">
+<arg>SavedXHTMLReport</arg>
+<status status="NOT RUN" start="2024-02-26T09:57:24.337010" elapsed="0.000016"/>
+</kw>
+<kw name="Close GUI" type="TEARDOWN">
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:57:24.338013" level="INFO">${keyword} = Close GUI macos</msg>
+<var>${keyword}</var>
+<arg>Close GUI ${platform}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-02-26T09:57:24.337833" elapsed="0.000202"/>
+</kw>
+<if>
+<branch type="IF" condition="${process}">
+<kw name="Is Process Running" owner="Process">
+<msg time="2024-02-26T09:57:24.338524" level="INFO">${running} = True</msg>
+<var>${running}</var>
+<arg>${process}</arg>
+<doc>Checks is the process running or not.</doc>
+<status status="PASS" start="2024-02-26T09:57:24.338299" elapsed="0.000247"/>
+</kw>
+<if>
+<branch type="IF" condition="${running}">
+<kw name="Run Keyword" owner="BuiltIn">
+<kw name="Close GUI macos">
+<kw name="Click Image" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:57:24.756399" level="INFO">Image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_button_closewindow.png" found at Box(left=9, top=31, width=19, height=25)</msg>
+<msg time="2024-02-26T09:57:24.756610" level="INFO">Clicking image "reporter_macos_button_closewindow.png" in position (18, 43)</msg>
+<arg>reporter_${platform}_button_closewindow.png</arg>
+<doc>Finds the reference image on screen and clicks it once.</doc>
+<status status="PASS" start="2024-02-26T09:57:24.339272" elapsed="0.547979"/>
+</kw>
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<msg time="2024-02-26T09:57:24.887977" level="INFO" html="true">Screenshot taken: /Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-23.png&lt;br/&gt;&lt;img src="/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/macos-latest_3.12/Reporter.GUIBasic-screenshot-23.png" width="100%" /&gt;</msg>
+<doc>Takes a screenshot of the screen.</doc>
+<status status="PASS" start="2024-02-26T09:57:24.887622" elapsed="0.268550"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-26T09:57:25.661871" level="INFO">Slept 500 milliseconds.</msg>
+<arg>0.5</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2024-02-26T09:57:25.156653" elapsed="0.505314"/>
+</kw>
+<kw name="End Process If Still Running">
+<kw name="Wait For Process" owner="Process">
+<msg time="2024-02-26T09:57:25.663022" level="INFO">Waiting for process to complete.</msg>
+<msg time="2024-02-26T09:57:25.663195" level="INFO">Process completed.</msg>
+<msg time="2024-02-26T09:57:25.663289" level="INFO">${result} = &lt;result object with rc 0&gt;</msg>
+<var>${result}</var>
+<arg>${process}</arg>
+<arg>timeout=60</arg>
+<doc>Waits for the process to complete or to reach the given timeout.</doc>
+<status status="PASS" start="2024-02-26T09:57:25.662776" elapsed="0.000534"/>
+</kw>
+<kw name="Is Process Running" owner="Process">
+<msg time="2024-02-26T09:57:25.663599" level="INFO">${running} = False</msg>
+<var>${running}</var>
+<arg>${process}</arg>
+<doc>Checks is the process running or not.</doc>
+<status status="PASS" start="2024-02-26T09:57:25.663432" elapsed="0.000188"/>
+</kw>
+<if>
+<branch type="IF" condition="not ${running}">
+<kw name="Check Result">
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-02-26T09:57:25.665093" level="INFO"/>
+<arg>${result.stderr}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-02-26T09:57:25.664215" elapsed="0.000917"/>
+</kw>
+<kw name="Should Not Contain" owner="BuiltIn">
+<arg>${result.stderr}</arg>
+<arg>Traceback</arg>
+<doc>Fails if ``container`` contains ``item`` one or more times.</doc>
+<status status="PASS" start="2024-02-26T09:57:25.665246" elapsed="0.000455"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2024-02-26T09:57:25.666324" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${result.rc}</arg>
+<arg>0</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2024-02-26T09:57:25.665820" elapsed="0.000561"/>
+</kw>
+<arg>${result}</arg>
+<status status="PASS" start="2024-02-26T09:57:25.663923" elapsed="0.002524"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:57:25.663714" elapsed="0.002761"/>
+</branch>
+<branch type="ELSE">
+<kw name="Take A Screenshot" owner="ImageHorizonLibrary">
+<doc>Takes a screenshot of the screen.</doc>
+<status status="NOT RUN" start="2024-02-26T09:57:25.666601" elapsed="0.000017"/>
+</kw>
+<kw name="Terminate Process" owner="Process">
+<var>${result}</var>
+<arg>${process}</arg>
+<doc>Stops the process gracefully or forcefully.</doc>
+<status status="NOT RUN" start="2024-02-26T09:57:25.666712" elapsed="0.000015"/>
+</kw>
+<kw name="Check Result">
+<arg>${result}</arg>
+<status status="NOT RUN" start="2024-02-26T09:57:25.666836" elapsed="0.000018"/>
+</kw>
+<kw name="Fail" owner="BuiltIn">
+<arg>Had to Terminate Process</arg>
+<doc>Fails the test with the given message and optionally alters its tags.</doc>
+<status status="NOT RUN" start="2024-02-26T09:57:25.666946" elapsed="0.000016"/>
+</kw>
+<status status="NOT RUN" start="2024-02-26T09:57:25.666506" elapsed="0.000484"/>
+</branch>
+<status status="PASS" start="2024-02-26T09:57:25.663685" elapsed="0.003329"/>
+</if>
+<status status="PASS" start="2024-02-26T09:57:25.662357" elapsed="0.004704"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:57:24.339035" elapsed="1.328065"/>
+</kw>
+<arg>${keyword}</arg>
+<doc>Executes the given keyword with the given arguments.</doc>
+<status status="PASS" start="2024-02-26T09:57:24.338742" elapsed="1.328398"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:57:24.338608" elapsed="1.328566"/>
+</branch>
+<branch type="ELSE">
+<kw name="Wait For Process" owner="Process">
+<var>${result}</var>
+<arg>${process}</arg>
+<arg>timeout=60</arg>
+<doc>Waits for the process to complete or to reach the given timeout.</doc>
+<status status="NOT RUN" start="2024-02-26T09:57:25.667295" elapsed="0.000016"/>
+</kw>
+<kw name="Check Result">
+<arg>${result}</arg>
+<status status="NOT RUN" start="2024-02-26T09:57:25.667422" elapsed="0.000096"/>
+</kw>
+<status status="NOT RUN" start="2024-02-26T09:57:25.667198" elapsed="0.000351"/>
+</branch>
+<status status="PASS" start="2024-02-26T09:57:24.338594" elapsed="1.328976"/>
+</if>
+<status status="PASS" start="2024-02-26T09:57:24.338127" elapsed="1.329471"/>
+</branch>
+<status status="PASS" start="2024-02-26T09:57:24.338102" elapsed="1.329522"/>
+</if>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2024-02-26T09:57:25.667908" level="INFO">${process} = None</msg>
+<arg>$process</arg>
+<arg>None</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2024-02-26T09:57:25.667743" elapsed="0.000200"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2024-02-26T09:57:26.189499" level="INFO">Slept 500 milliseconds.</msg>
+<arg>0.5</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2024-02-26T09:57:25.668041" elapsed="0.521604"/>
+</kw>
+<status status="PASS" start="2024-02-26T09:57:24.337508" elapsed="1.852257"/>
+</kw>
+<tag>Issue #149</tag>
+<tag>Issue #150</tag>
+<tag>macos-latest</tag>
+<tag>ubuntu-latest</tag>
+<tag>windows-latest</tag>
+<status status="FAIL" start="2024-02-26T09:52:04.753997" elapsed="321.435857">ImageNotFoundException: Reference image "/Users/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Images/file_method/reporter_macos_label_showgraphcolours.png" was not found on screen</status>
+</test>
+<status status="FAIL" start="2024-02-26T09:51:46.026586" elapsed="340.163891"/>
+</suite>
+<status status="FAIL" start="2024-02-26T09:51:26.293053" elapsed="359.898096"/>
+</suite>
+<statistics>
+<total>
+<stat pass="8" fail="1" skip="0">All Tests</stat>
+</total>
+<tag>
+<stat pass="1" fail="0" skip="0">DOCX</stat>
+<stat pass="1" fail="0" skip="0">HTML</stat>
+<stat pass="3" fail="0" skip="0">Issue #144</stat>
+<stat pass="1" fail="0" skip="0">Issue #147</stat>
+<stat pass="0" fail="1" skip="0">Issue #149</stat>
+<stat pass="0" fail="1" skip="0">Issue #150</stat>
+<stat pass="8" fail="1" skip="0">macos-latest</stat>
+<stat pass="8" fail="1" skip="0">ubuntu-latest</stat>
+<stat pass="8" fail="1" skip="0">windows-latest</stat>
+<stat pass="1" fail="0" skip="0">XLSX</stat>
+</tag>
+<suite>
+<stat pass="8" fail="1" skip="0" id="s1" name="Reporter">Reporter</stat>
+<stat pass="5" fail="0" skip="0" id="s1-s1" name="CommandLine">Reporter.CommandLine</stat>
+<stat pass="3" fail="1" skip="0" id="s1-s2" name="GUI Basic">Reporter.GUI Basic</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
