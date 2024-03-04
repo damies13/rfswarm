@@ -21,7 +21,7 @@ jobs:
           fi
           echo "isrelease=$isrelease" >> "$GITHUB_ENV"
       - name: Check Milestone
-        # if: ${{ env.isrelease == 1 }}
+        if: ${{ env.isrelease == 1 }}
         shell: python
         # https://api.github.com/repos/damies13/rfswarm/milestones
         run: |
@@ -54,34 +54,37 @@ jobs:
           echo isrelease: ${{ env.isrelease }}
           echo dopublish : ${{ env.dopublish }}
       - name: Apt Update
-        if: ${{ env.isrelease == 1 }}
+        if: ${{ env.dopublish == 1 }}
         run: |
           sudo apt update -y
       - name: Setup Python
-        if: ${{ env.isrelease == 1 }}
+        if: ${{ env.dopublish == 1 }}
         uses: actions/setup-python@v5
         with:
           python-version: 3.x
       - name: PIP Install
-        if: ${{ env.isrelease == 1 }}
+        if: ${{ env.dopublish == 1 }}
         run: pip install --upgrade build setuptools twine wheel
       - name: Download packages to dist
-        if: ${{ env.isrelease == 1 }}
+        if: ${{ env.dopublish == 1 }}
         uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist
       - name: Show Dist UM
-        if: ${{ env.isrelease == 1 && matrix.platform != 'windows-latest' }}
+        if: ${{ env.dopublish == 1 && matrix.platform != 'windows-latest' }}
         run: |
           ls -la dist
       - name: Show Dist W
-        if: ${{ env.isrelease == 1 && matrix.platform == 'windows-latest' }}
+        if: ${{ env.dopublish == 1 && matrix.platform == 'windows-latest' }}
         run: |
           dir dist
 
       # Still need to have a check all the milestones are complete
-      # - name: Do Publish
-      #   if: ${{ env.isrelease == 1 }}
-      #   run: |
-      #     echo python3 -m twine upload -u USERNAME -p PASSWORD dist/rfswarm*
+      - name: Do Publish
+        if: ${{ env.dopublish == 1 }}
+        env:
+          PYPI_USER: ${{ secrets.PYPI_TOKENU }}
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          echo python3 -m twine upload -u $PYPI_USER -p $PYPI_TOKEN dist/rfswarm*
