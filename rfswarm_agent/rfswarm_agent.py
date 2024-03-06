@@ -167,14 +167,14 @@ class RFSwarmAgent():
 			self.config['Agent']['properties'] = ""
 			self.saveini()
 
-		self.ensure_listner_file()
-		self.ensure_repeater_listner_file()
-
 		t = threading.Thread(target=self.tick_counter)
 		t.start()
 
 		t = threading.Thread(target=self.findlibraries)
 		t.start()
+
+		self.ensure_listner_file()
+		self.ensure_repeater_listner_file()
 
 		self.agentproperties["OS: Platform"] = platform.platform()  # 'Linux-3.3.0-8.fc16.x86_64-x86_64-with-fedora-16-Verne'
 		self.agentproperties["OS: System"] = platform.system()  # 'Windows'		Returns the system/OS name, such as 'Linux', 'Darwin', 'Java', 'Windows'
@@ -312,8 +312,9 @@ class RFSwarmAgent():
 				self.corethreads["status"] = threading.Thread(target=self.updatestatus)
 				self.corethreads["status"].start()
 
-				self.corethreads["getjobs"] = threading.Thread(target=self.getjobs)
-				self.corethreads["getjobs"].start()
+				if self.listenerfile is not None:
+					self.corethreads["getjobs"] = threading.Thread(target=self.getjobs)
+					self.corethreads["getjobs"].start()
 
 				if self.isrunning:
 					self.mainloopinterval = 2
@@ -497,7 +498,7 @@ class RFSwarmAgent():
 			if i.key.strip() == "robotframework":
 				found = 1
 				self.agentproperties["RobotFramework"] = str(i).split(" ")[1]
-				self.debugmsg(7, i.key.strip(), str(i).split(" ")[1])
+				self.debugmsg(6, i.key.strip(), str(i).split(" ")[1])
 			if i.key.startswith("robotframework-"):
 				# print(i.key)
 				keyarr = i.key.strip().split("-")
@@ -531,7 +532,7 @@ class RFSwarmAgent():
 			if i.metadata["Name"].strip() == "robotframework":
 				found = 1
 				self.agentproperties["RobotFramework"] = i.version
-				self.debugmsg(7, i.metadata["Name"].strip(), i.version)
+				self.debugmsg(6, i.metadata["Name"].strip(), i.version)
 			if i.metadata["Name"].startswith("robotframework-"):
 				# print(i.key)
 				keyarr = i.metadata["Name"].strip().split("-")
@@ -1352,7 +1353,182 @@ class RFSwarmAgent():
 			self.create_repeater_listner_file()
 
 	def create_listner_file(self):
+
+		while "RobotFramework" not in self.agentproperties:
+			time.sleep(0.1)
+		rfver = self.agentproperties["RobotFramework"]
+		self.debugmsg(5, "RobotFramework version:", rfver, " RobotFramework major version:", int(rfver[0]))
+		# lrfver = rfver.split(".")
+		if int(rfver[0]) >= 7:
+			self.create_V3_listner_file()
+		else:
+			self.create_V2_listner_file()
+
+	def create_V3_listner_file(self):
+
+		self.listenerfile = os.path.join(self.scriptdir, "RFSListener3.py")
+		self.debugmsg(5, "listenerfile", self.listenerfile)
+
+		fd = []
+		fd.append("")
+		fd.append("import os")
+		fd.append("import tempfile")
+		fd.append("import sys")
+		fd.append("import socket")
+		fd.append("from datetime import datetime")
+		fd.append("import time")
+		fd.append("import requests")
+		fd.append("import inspect")
+		fd.append("import threading")
+		fd.append("from robot.libraries.BuiltIn import BuiltIn")
+		fd.append("")
+		fd.append("class RFSListener3:")
+		fd.append("	ROBOT_LISTENER_API_VERSION = 3")
+		fd.append("")
+		fd.append("	msg = None")
+		fd.append("	swarmmanager = \"http://localhost:8138/\"")
+		fd.append("	excludelibraries = [\"BuiltIn\",\"String\",\"OperatingSystem\",\"perftest\"]")
+		fd.append("	debuglevel = 0")
+		fd.append("	index = 0")
+		fd.append("	robot = 0")
+		fd.append("	iter = 0")
+		fd.append("	seq = 0")
+		fd.append("")
+		fd.append("	def start_suite(self, name, attrs):")
+		fd.append("		if 'RFS_DEBUGLEVEL' in attrs['metadata']:")
+		fd.append("			self.debuglevel = int(attrs['metadata']['RFS_DEBUGLEVEL'])")
+		fd.append("			self.debugmsg(6, 'debuglevel: ', self.debuglevel)")
+		fd.append("		if 'RFS_INDEX' in attrs['metadata']:")
+		fd.append("			self.index = attrs['metadata']['RFS_INDEX']")
+		fd.append("			self.debugmsg(6, 'index: ', self.index)")
+		fd.append("		if 'RFS_ITERATION' in attrs['metadata']:")
+		fd.append("			self.iter = attrs['metadata']['RFS_ITERATION']")
+		fd.append("			self.debugmsg(6, 'iter: ', self.iter)")
+		fd.append("		if 'RFS_ROBOT' in attrs['metadata']:")
+		fd.append("			self.robot = attrs['metadata']['RFS_ROBOT']")
+		fd.append("			self.debugmsg(6, 'robot: ', self.robot)")
+		fd.append("		if 'RFS_SWARMMANAGER' in attrs['metadata']:")
+		fd.append("			self.swarmmanager = attrs['metadata']['RFS_SWARMMANAGER']")
+		fd.append("			self.debugmsg(6, 'swarmmanager: ', self.swarmmanager)")
+		fd.append("		if 'RFS_EXCLUDELIBRARIES' in attrs['metadata']:")
+		fd.append("			self.excludelibraries = attrs['metadata']['RFS_EXCLUDELIBRARIES'].split(\",\")")
+		fd.append("			self.debugmsg(6, 'excludelibraries: ', self.excludelibraries)")
+		fd.append("")
+		fd.append("	def log_message(self, message):")
+		# fd.append("		self.debugmsg(8, 'message[\\'message\\']: ', message['message'])")
+		# fd.append("		self.debugmsg(8, 'message[\\'message\\'][0:2]: ', message['message'][0:2])")
+		fd.append("		if message['message'][0:2] != '${':")
+		fd.append("			self.msg = None")
+		fd.append("			self.msg = message")
+		# fd.append("			self.debugmsg(6, 'message: ', message)")
+		# fd.append("			self.debugmsg(6, 'self.msg: ', self.msg)")
+		fd.append("")
+		fd.append("	def end_keyword(self, name, attrs):")
+		fd.append("		self.debugmsg(3, 'Keyword name: ', name)")
+		fd.append("		self.debugmsg(6, 'attrs: ', attrs)")
+		fd.append("		self.debugmsg(5, 'attrs[doc]: ', attrs['doc'])")
+		fd.append("		self.debugmsg(5, 'self.msg: ', self.msg)")
+		fd.append("		")
+		fd.append("		ResultName = ''")
+		# fd.append("		#	'level': 'TRACE'")
+		fd.append("		istrace = False")
+		fd.append("		if self.msg is not None and 'level' in self.msg and self.msg['level'] == 'TRACE':")
+		fd.append("			istrace = True")
+		fd.append("		")
+		fd.append("		iter = BuiltIn().get_variable_value(\"${RFS_ITERATION}\")")
+
+		fd.append("		if self.msg is not None and 'message' in self.msg and not istrace:")
+		fd.append("			ResultName = self.msg['message']")
+		fd.append("		elif 'doc' in attrs and len(attrs['doc'])>0:")
+		fd.append("			ResultName = attrs['doc']")
+		# Quiet Keyword -> https://github.com/damies13/rfswarm/blob/master/Doc/Preparing_for_perf.md#keywords
+		# fd.append("		elif '${' not in name:")
+		# fd.append("			ResultName = name")
+		fd.append("		self.debugmsg(3, 'ResultName: ', ResultName, '	:', len(ResultName))")
+		fd.append("		")
+		fd.append("		if len(ResultName)>0:")
+		fd.append("			self.debugmsg(8, 'self.msg: attrs[libname]: ', attrs['libname'], '	excludelibraries:', self.excludelibraries)")
+		fd.append("			if attrs['libname'] not in self.excludelibraries:")
+		fd.append("				self.debugmsg(5, attrs['libname'], 'library OK')")
+		fd.append("				self.seq += 1")
+		fd.append("				self.debugmsg(8, 'self.seq: ', self.seq)")
+		fd.append("				startdate = datetime.strptime(attrs['starttime'], '%Y%m%d %H:%M:%S.%f')")
+		fd.append("				enddate = datetime.strptime(attrs['endtime'], '%Y%m%d %H:%M:%S.%f')")
+		fd.append("				self.debugmsg(5, 'Send ResultName: ', ResultName)")
+		fd.append("				payload = {")
+		fd.append("					'AgentName': '" + self.agentname + "',")
+		fd.append("					'ResultName': ResultName,")
+		fd.append("					'Result': attrs['status'],")
+		fd.append("					'ElapsedTime': (attrs['elapsedtime']/1000),")
+		fd.append("					'StartTime': startdate.timestamp(),")
+		fd.append("					'EndTime': enddate.timestamp(),")
+		fd.append("					'ScriptIndex': self.index,")
+		fd.append("					'Robot': self.robot,")
+		fd.append("					'Iteration': iter,")
+		fd.append("					'Sequence': self.seq")
+		fd.append("				}")
+		fd.append("				self.debugmsg(7, 'payload: ', payload)")
+		# fd.append("				self.send_result(payload)")
+		fd.append("				t = threading.Thread(target=self.send_result, args=(payload,))")
+		fd.append("				t.start()")
+		fd.append("			else:")
+		fd.append("				self.debugmsg(5, attrs['libname'], 'is an excluded library')")
+		fd.append("		")
+		fd.append("		self.msg = None")
+		fd.append("")
+		fd.append("	def debugmsg(self, lvl, *msg):")
+		fd.append("		msglst = []")
+		fd.append("		prefix = \"\"")
+		fd.append("		if self.debuglevel >= lvl:")
+		fd.append("			try:")
+		fd.append("				if self.debuglevel >= 4:")
+		fd.append("					stack = inspect.stack()")
+		fd.append("					the_class = stack[1][0].f_locals[\"self\"].__class__.__name__")
+		fd.append("					the_method = stack[1][0].f_code.co_name")
+		fd.append("					prefix = \"{}: {}: [{}:{}]	\".format(str(the_class), the_method, self.debuglevel, lvl)")
+		fd.append("					if len(prefix.strip())<32:")
+		fd.append("						prefix = \"{}	\".format(prefix)")
+		fd.append("					if len(prefix.strip())<24:")
+		fd.append("						prefix = \"{}	\".format(prefix)")
+		fd.append("					msglst.append(str(prefix))")
+		fd.append("				for itm in msg:")
+		fd.append("					msglst.append(str(itm))")
+		fd.append("				print(\" \".join(msglst))")
+		fd.append("			except:")
+		fd.append("				pass")
+		fd.append("")
+		fd.append("	def send_result(self, payload):")
+		fd.append("		exceptn = None")
+		fd.append("		retry = True")
+		fd.append("		count = 100")
+		fd.append("		uri = self.swarmmanager + 'Result'")
+		fd.append("		while retry and count>0:")
+		fd.append("			try:")
+		fd.append("				r = requests.post(uri, json=payload, timeout=600)")
+		fd.append("				self.debugmsg(7, 'send_result: ',r.status_code, r.text)")
+		fd.append("				if (r.status_code != requests.codes.ok):")
+		fd.append("					exceptn = r.status_code")
+		fd.append("				else:")
+		fd.append("					retry = False")
+		fd.append("			except Exception as e:")
+		fd.append("				exceptn = e")
+		fd.append("			time.sleep(1)")
+		fd.append("			count -= 1")
+		fd.append("		if retry:")
+		fd.append("			self.debugmsg(0, 'send_result: while attempting to send result to', uri)")
+		fd.append("			self.debugmsg(0, 'send_result: with payload:', payload)")
+		fd.append("			self.debugmsg(0, 'send_result: Exception:', exceptn)")
+		fd.append("")
+
+		# print("RFSwarmAgent: create_listner_file: listenerfile: ", self.listenerfile)
+		with open(self.listenerfile, 'w+') as lf:
+			# lf.writelines(fd)
+			lf.write('\n'.join(fd))
+
+	def create_V2_listner_file(self):
+
 		self.listenerfile = os.path.join(self.scriptdir, "RFSListener2.py")
+		self.debugmsg(5, "listenerfile", self.listenerfile)
 
 		fd = []
 		fd.append("")
