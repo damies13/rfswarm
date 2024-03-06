@@ -3,6 +3,10 @@ Library 	OperatingSystem
 
 Suite Setup			Clean Up Old Files
 
+*** Variables ***
+${cmd_agent} 		rfswarm-agent
+${cmd_manager} 	rfswarm
+
 *** Test Cases ***
 Random Offset
 	[Documentation] 	This just prevents all the test runners doing git push at the same time
@@ -12,14 +16,16 @@ Random Offset
 
 Manager Version
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
-	${result}= 	Run 	python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -v
+	# ${result}= 	Run 	python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -v
+	${result}= 	Run 	${cmd_manager} -v
 	Log to console 	${\n}${result}
 	Should Contain	${result}	Version
 	Should Contain	${result}	Manager
 
 Manager Help
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
-	${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -h
+	# ${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -h
+	${result}=	Run 	${cmd_manager} -h
 	Log to console 	${\n}${result}
 	Should Contain	${result}	IPADDRESS
 

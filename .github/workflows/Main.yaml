@@ -1,0 +1,21 @@
+---
+name: Package Test Publish
+
+on: push
+
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+
+jobs:
+  Package_For_PIP:
+    uses: ./.github/workflows/Package.yaml
+
+  Regression_Tests:
+    needs:
+      - Package_For_PIP
+    uses: ./.github/workflows/Regression_Tests.yaml
+
+  Publish_Package:
+    needs:
+    - Package_For_PIP
+    - Regression_Tests
+    uses: ./.github/workflows/Publish.yaml

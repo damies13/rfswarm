@@ -10,6 +10,7 @@ Library 	OCRLibrary
 Test Teardown 	Close GUI
 
 *** Variables ***
+${cmd_reporter} 		rfswarm-reporter
 ${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
 ${pyfile}			${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
 ${process}		None
@@ -31,6 +32,7 @@ Select Preview Tab
 
 First Run
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #147
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	${testdata}= 	Set Variable    Issue-#147
 	${resultdata}= 	Set Variable    20230320_185055_demo
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
@@ -47,6 +49,7 @@ First Run
 
 New Data Table Section
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #149 	Issue #150
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	Open GUI
 	Wait For Status 	PreviewLoaded
 	# Click Section			toc
@@ -244,7 +247,9 @@ Open GUI windows
 	${args}= 	Evaluate 	" \t".join(@{appargs})
 	Set Confidence		0.9
 	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	python 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	# ${process}= 	Start Process 	python 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	${process}= 	Start Process 	${cmd_reporter} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+
 	Set Suite Variable 	$process 	${process}
 	# reporter_windows_status_previewloaded
 	# Wait For Status 	PreviewLoaded
@@ -257,7 +262,8 @@ Open GUI ubuntu
 	[Arguments]		@{appargs}
 	Set Suite Variable    ${platform}    ubuntu
 	Set Confidence		0.9
-	${process}= 	Start Process 	python3 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	# ${process}= 	Start Process 	python3 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	${process}= 	Start Process 	${cmd_reporter} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Set Suite Variable 	$process 	${process}
 	# Sleep 	60
 	# Capture Screen
@@ -268,7 +274,8 @@ Open GUI macos
 	[Arguments]		@{appargs}
 	Set Suite Variable    ${platform}    macos
 	Set Confidence		0.9
-	${process}= 	Start Process 	python3 	${pyfile} 	-g 	5 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	# ${process}= 	Start Process 	python3 	${pyfile} 	-g 	5 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	${process}= 	Start Process 	${cmd_reporter} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Set Suite Variable 	$process 	${process}
 	# Sleep 	60
 	Set Screenshot Folder 	${OUTPUT DIR}

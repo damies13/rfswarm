@@ -2,8 +2,9 @@
 Resource 	ºCommon.robot
 
 *** Test Cases ***
-Issue #171
-	[Tags]	ubuntu-latest		windows-latest		macos-latest
+Exclude Libraries With Spaces
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #171 	Issue #177
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	http://localhost:8138
 	Run Agent 	${agnt_options}
 	Log to console 	${CURDIR}

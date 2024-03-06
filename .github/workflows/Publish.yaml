@@ -1,0 +1,90 @@
+---
+name: Publish
+
+on: workflow_call
+
+jobs:
+  Publish_PIP:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Get Branch Name
+        run: |
+          branchname=$(git rev-parse --abbrev-ref HEAD)
+          echo "branchname=$branchname" >> "$GITHUB_ENV"
+      - name: Determine if this is a release branch
+        run: |
+          isrelease=0
+          if [[ $branchname =~ v[0-9]\. ]]; then
+            isrelease=1
+          fi
+          echo "isrelease=$isrelease" >> "$GITHUB_ENV"
+      - name: Check Milestone
+        if: ${{ env.isrelease == 1 }}
+        shell: python
+        # https://api.github.com/repos/damies13/rfswarm/milestones
+        run: |
+          import os
+          import requests
+          branchname = os.getenv("branchname")
+          print("branchname:", branchname)
+          milestones = requests.get('https://api.github.com/repos/damies13/rfswarm/milestones')
+          dopublish = 0
+          for ms in milestones.json():
+            print(ms['title'])
+            if ms['title'] == branchname:
+              print(ms)
+              open_issues = ms['open_issues']
+              closed_issues = ms['closed_issues']
+              total_issues = open_issues + closed_issues
+              print('open', open_issues, 'closed', closed_issues, 'total', total_issues)
+              pct = (closed_issues/total_issues) * 100
+              print(pct, "%")
+              if pct == 100:
+                dopublish = 1
+          print('dopublish', dopublish)
+          env_file = os.getenv('GITHUB_ENV')
+          with open(env_file, "a") as myfile:
+            myfile.write("dopublish={}\n".format(dopublish))
+
+      - name: Echo Vars
+        run: |
+          echo branchname: ${{ env.branchname }}
+          echo isrelease: ${{ env.isrelease }}
+          echo dopublish : ${{ env.dopublish }}
+      - name: Apt Update
+        if: ${{ env.dopublish == 1 }}
+        run: |
+          sudo apt update -y
+      - name: Setup Python
+        if: ${{ env.dopublish == 1 }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+      - name: PIP Install
+        if: ${{ env.dopublish == 1 }}
+        run: pip install --upgrade build setuptools twine wheel
+      - name: Download packages to dist
+        if: ${{ env.dopublish == 1 }}
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Show Dist UM
+        if: ${{ env.dopublish == 1 && matrix.platform != 'windows-latest' }}
+        run: |
+          ls -la dist
+      - name: Show Dist W
+        if: ${{ env.dopublish == 1 && matrix.platform == 'windows-latest' }}
+        run: |
+          dir dist
+
+      # Still need to have a check all the milestones are complete
+      - name: Do Publish
+        if: ${{ env.dopublish == 1 }}
+        env:
+          PYPI_USER: ${{ secrets.PYPI_TOKENU }}
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          echo python3 -m twine upload -u $PYPI_USER -p $PYPI_TOKEN dist/rfswarm*
