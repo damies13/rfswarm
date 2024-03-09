@@ -67,25 +67,25 @@ Stop Agent
 	Log to console 	${result.rc}
 
 Find Result DB
-	${fols}= 	List Directory 	${results_dir}
-	Log to console 	${fols}
+	# ${fols}= 	List Directory 	${results_dir}
+	# Log to console 	${fols}
 	${fols}= 	List Directory 	${results_dir} 	*_* 	absolute=True
 	# Log to console 	${fols}
-	${files}= 	List Directory 	${fols[0]}
-	Log to console 	${files}
+	# ${files}= 	List Directory 	${fols[0]}
+	# Log to console 	${files}
 	${file}= 	List Directory 	${fols[0]} 	*.db 	absolute=True
-	Log to console 	${file[0]}
+	Log to console 	Result DB: ${file[0]}
 	RETURN 	${file[0]}
 
 Query Result DB
 	[Arguments]		${dbfile} 	${sql}
-	Log to console 	\${dbfile}: ${dbfile}
+	Log to console 	dbfile: ${dbfile}
 	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
 	# Log to console 	\${dbfile}: ${dbfile}
 	Connect To Database Using Custom Params 	sqlite3 	database="${dbfile}", isolation_level=None
-	Log to console 	\${sql}: ${sql}
+	Log to console 	sql: ${sql}
 	${result}= 	Query 	${sql}
-	Log to console 	\${result}: ${result}
+	Log to console 	sql result: ${result}
 	Disconnect From Database
 	RETURN 	${result}
 
