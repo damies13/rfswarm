@@ -170,9 +170,7 @@ class RFSwarmAgent():
 		t = threading.Thread(target=self.tick_counter)
 		t.start()
 
-		t = threading.Thread(target=self.findlibraries)
-		t.start()
-
+		self.findlibraries() 	# Need to wait for findlibraries() to finish before calling ensure_listner_file() for RF version check
 		self.ensure_listner_file()
 		self.ensure_repeater_listner_file()
 
@@ -497,14 +495,25 @@ class RFSwarmAgent():
 
 			if i.key.strip() == "robotframework":
 				found = 1
-				self.agentproperties["RobotFramework"] = str(i).split(" ")[1]
-				self.debugmsg(6, i.key.strip(), str(i).split(" ")[1])
+				thisver = str(i).split(" ")[1]
+				if "RobotFramework" in self.agentproperties:
+					ver = self.higher_version(thisver, self.agentproperties["RobotFramework"])
+					self.agentproperties["RobotFramework"] = ver
+					self.debugmsg(6, i.key.strip(), thisver, "-->", ver)
+				else:
+					self.agentproperties["RobotFramework"] = thisver
+					self.debugmsg(6, i.key.strip(), thisver)
 			if i.key.startswith("robotframework-"):
 				# print(i.key)
 				keyarr = i.key.strip().split("-")
-				self.debugmsg(7, keyarr, str(i).split(" ")[1])
+				thisver = str(i).split(" ")[1]
+				self.debugmsg(7, keyarr, thisver)
 				#  next overwrites previous
-				self.agentproperties["RobotFramework: Library: " + keyarr[1]] = str(i).split(" ")[1]
+				if "RobotFramework: Library: " + keyarr[1] in self.agentproperties:
+					ver = self.higher_version(thisver, self.agentproperties["RobotFramework: Library: " + keyarr[1]])
+					self.agentproperties["RobotFramework: Library: " + keyarr[1]] = ver
+				else:
+					self.agentproperties["RobotFramework: Library: " + keyarr[1]] = thisver
 				liblst.append(keyarr[1])
 
 		self.debugmsg(8, "liblst:", liblst, len(liblst))
@@ -531,14 +540,23 @@ class RFSwarmAgent():
 			# print(dist.metadata["Name"], dist.version)
 			if i.metadata["Name"].strip() == "robotframework":
 				found = 1
-				self.agentproperties["RobotFramework"] = i.version
-				self.debugmsg(6, i.metadata["Name"].strip(), i.version)
+				if "RobotFramework" in self.agentproperties:
+					ver = self.higher_version(i.version, self.agentproperties["RobotFramework"])
+					self.agentproperties["RobotFramework"] = ver
+					self.debugmsg(6, i.metadata["Name"].strip(), i.version, "-->", ver)
+				else:
+					self.agentproperties["RobotFramework"] = i.version
+					self.debugmsg(6, i.metadata["Name"].strip(), i.version)
 			if i.metadata["Name"].startswith("robotframework-"):
 				# print(i.key)
 				keyarr = i.metadata["Name"].strip().split("-")
 				self.debugmsg(7, keyarr, i.version)
 				#  next overwrites previous
-				self.agentproperties["RobotFramework: Library: " + keyarr[1]] = i.version
+				if "RobotFramework: Library: " + keyarr[1] in self.agentproperties:
+					ver = self.higher_version(i.version, self.agentproperties["RobotFramework: Library: " + keyarr[1]])
+					self.agentproperties["RobotFramework: Library: " + keyarr[1]] = ver
+				else:
+					self.agentproperties["RobotFramework: Library: " + keyarr[1]] = i.version
 				liblst.append(keyarr[1])
 
 		self.debugmsg(8, "liblst:", liblst, len(liblst))
@@ -551,6 +569,18 @@ class RFSwarmAgent():
 			self.debugmsg(0, "RobotFramework is required for the agent to run scripts")
 			self.debugmsg(0, "Perhaps try: 'pip install robotframework'")
 			raise Exception("RobotFramework is not installed")
+
+	def higher_version(self, versiona, versionb):
+		lversiona = [int(v) for v in versiona.split(".")]
+		lversionb = [int(v) for v in versionb.split(".")]
+		for i in range(max(len(lversiona),len(lversionb))):
+			v1 = lversiona[i] if i < len(lversiona) else 0
+			v2 = lversionb[i] if i < len(lversionb) else 0
+			if v1 > v2:
+				return versiona
+			elif v1 <v2:
+				return versionb
+		return versiona
 
 	def tick_counter(self):
 		#
