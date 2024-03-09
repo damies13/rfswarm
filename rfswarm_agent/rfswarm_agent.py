@@ -573,12 +573,12 @@ class RFSwarmAgent():
 	def higher_version(self, versiona, versionb):
 		lversiona = [int(v) for v in versiona.split(".")]
 		lversionb = [int(v) for v in versionb.split(".")]
-		for i in range(max(len(lversiona),len(lversionb))):
+		for i in range(max(len(lversiona), len(lversionb))):
 			v1 = lversiona[i] if i < len(lversiona) else 0
 			v2 = lversionb[i] if i < len(lversionb) else 0
 			if v1 > v2:
 				return versiona
-			elif v1 <v2:
+			elif v1 < v2:
 				return versionb
 		return versiona
 
