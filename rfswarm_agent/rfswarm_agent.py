@@ -986,6 +986,17 @@ class RFSwarmAgent():
 			cmd.append("-M {}".format(metavar))
 			cmd.append("-v {}".format(metavar))
 
+		if self.xmlmode:
+			# for now this is going to be the easiest way to deal with this for RF7+
+			# Unlikely many people will use xmlmode with RF7 anyway, it's not the default
+			# and was only left in for compatability with early beta's and alphas of RFSwarm
+			# so I expect everyone has already moved on to the listener mode by now, only putting
+			# this in just in case someone is still using xmlmode.
+			rfver = self.agentproperties["RobotFramework"]
+			if int(rfver[0]) >= 7:
+				self.debugmsg(7, "Use legacyoutput mode for RF7+")
+				cmd.append("--legacyoutput")
+
 		if not self.xmlmode:
 			cmd.append("--listener {}".format('"' + self.listenerfile + '"'))
 
