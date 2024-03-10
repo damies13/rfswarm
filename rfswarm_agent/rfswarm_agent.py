@@ -1350,6 +1350,72 @@ class RFSwarmAgent():
 					self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 					self.isconnected = False
 
+		for result in root.findall(".//kw/doc/.."):
+			self.debugmsg(6, "run_process_output: result: ", result)
+			library = result.get('library')
+			# if library not in ["BuiltIn", "String", "OperatingSystem", "perftest"]:
+			if library not in self.excludelibraries:
+				self.debugmsg(6, "run_process_output: library: ", library)
+				seq += 1
+				self.debugmsg(6, "result: library:", library)
+				txn = result.find('msg').text
+				self.debugmsg(6, "result: txn:", txn)
+
+				el_status = result.find('status')
+				status = el_status.get('status')
+				self.debugmsg(6, "result: status:", status)
+				starttime = el_status.get('starttime')
+				self.debugmsg(6, "result: starttime:", starttime)
+				endtime = el_status.get('endtime')
+				self.debugmsg(6, "result: endtime:", endtime)
+
+				# 20191026 09:34:23.044
+				startdate = datetime.strptime(starttime, '%Y%m%d %H:%M:%S.%f')
+				enddate = datetime.strptime(endtime, '%Y%m%d %H:%M:%S.%f')
+
+				elapsedtime = enddate.timestamp() - startdate.timestamp()
+
+				self.debugmsg(
+					6, "resultname: '", txn,
+					"' result'", status,
+					"' elapsedtime'", elapsedtime,
+					"' starttime'", starttime,
+					"' endtime'", endtime, "'"
+				)
+
+				# Send result to manager
+				uri = self.swarmmanager + "Result"
+
+				self.debugmsg(6, "run_proces_output: uri", uri)
+
+				# requiredfields = ["AgentName", "ResultName", "Result", "ElapsedTime", "StartTime", "EndTime"]
+
+				payload = {
+					"AgentName": self.agentname,
+					"ResultName": txn,
+					"Result": status,
+					"ElapsedTime": elapsedtime,
+					"StartTime": startdate.timestamp(),
+					"EndTime": enddate.timestamp(),
+					"ScriptIndex": index,
+					"Robot": robot,
+					"Iteration": iter,
+					"Sequence": seq
+				}
+
+				self.debugmsg(6, "run_proces_output: payload", payload)
+				try:
+					r = requests.post(uri, json=payload, timeout=self.timeout)
+					self.debugmsg(6, "run_proces_output: ", r.status_code, r.text)
+					if (r.status_code != requests.codes.ok):
+						self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
+						self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
+						self.isconnected = False
+				except Exception as e:
+					self.debugmsg(8, "Exception:", e)
+					self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
+					self.isconnected = False
+
 	def make_safe_filename(self, s):
 		def safe_char(c):
 			if c.isalnum():
