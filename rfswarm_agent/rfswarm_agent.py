@@ -1358,7 +1358,7 @@ class RFSwarmAgent():
 				self.debugmsg(6, "run_process_output: library: ", library)
 				seq += 1
 				self.debugmsg(6, "result: library:", library)
-				txn = result.find('msg').text
+				txn = result.find('doc').text
 				self.debugmsg(6, "result: txn:", txn)
 
 				el_status = result.find('status')
