@@ -310,7 +310,10 @@ class RFSwarmAgent():
 				self.corethreads["status"] = threading.Thread(target=self.updatestatus)
 				self.corethreads["status"].start()
 
-				if self.listenerfile is not None:
+				if self.xmlmode:
+					self.corethreads["getjobs"] = threading.Thread(target=self.getjobs)
+					self.corethreads["getjobs"].start()
+				if not self.xmlmode and self.listenerfile is not None:
 					self.corethreads["getjobs"] = threading.Thread(target=self.getjobs)
 					self.corethreads["getjobs"].start()
 
