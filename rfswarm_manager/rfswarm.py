@@ -5705,7 +5705,7 @@ class RFSwarmGUI(tk.Frame):
 
 		base.scriptlist[row]["TestVar"] = tk.StringVar(value=base.scriptlist[row]["Test"], name="row{}".format(row))
 		base.scriptlist[row]["TestVar"].trace("w", self.sr_test_validate)
-		tst = ttk.OptionMenu(self.scriptgrid, base.scriptlist[row]["TestVar"], None, "test")
+		tst = ttk.OptionMenu(self.scriptgrid, base.scriptlist[row]["TestVar"], None, "test", command=lambda: self.sr_test_validate(row))
 		tst.config(width=20)
 		tst.grid(column=self.plancoltst, row=base.scriptcount, sticky="nsew")
 
