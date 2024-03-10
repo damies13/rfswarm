@@ -4546,7 +4546,7 @@ class RFSwarmGUI(tk.Frame):
 					try:
 						grphWindow.canvas.draw()
 					except Exception as e:
-						base.debugmsg(5, "canvas.draw() Exception:", e)
+						base.debugmsg(9, "canvas.draw() Exception:", e)
 
 			self.gph_save(grphWindow)
 
