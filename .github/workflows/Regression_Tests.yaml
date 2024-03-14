@@ -164,7 +164,6 @@ jobs:
         with:
           name: Manager-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}
-          if: ${{ !failure() }}
           retention-days: 15
 
       # # This below is to save results back to git, actions/upload-artifact@v4 might be a better solution, see Issue #169
@@ -318,7 +317,6 @@ jobs:
         with:
           name: Manager-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}
-          if: ${{ !failure() }}
           retention-days: 15
 
       # # This below is to save results back to git, actions/upload-artifact@v4 might be a better solution, see Issue #169
