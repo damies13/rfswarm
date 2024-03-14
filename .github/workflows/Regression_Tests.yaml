@@ -167,6 +167,14 @@ jobs:
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 15
 
+      - name: Archive Manager Logs (longer retention if failed)
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Manager-${{ matrix.platform }}-${{ matrix.python }}
+          path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          retention-days: 90
+
       # # This below is to save results back to git, actions/upload-artifact@v4 might be a better solution, see Issue #169
       # - name: git commit
       #   # https://docs.github.com/en/actions/learn-github-actions/expressions
@@ -329,6 +337,14 @@ jobs:
           name: Reporter-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 15
+
+      - name: Archive Reporter Logs (longer retention if failed)
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Reporter-${{ matrix.platform }}-${{ matrix.python }}
+          path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          retention-days: 90
 
       # # This below is to save results back to git, actions/upload-artifact@v4 might be a better solution, see Issue #169
       # - name: git commit
