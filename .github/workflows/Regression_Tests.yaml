@@ -330,6 +330,15 @@ jobs:
       #     replace: "img src=."
       #     include: "Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/log.html"
 
+      # Try again to fix images with relative path
+      # https://github.com/marketplace/actions/simple-replace-string-in-file
+      - name: Replace string in file
+        uses: MathieuSoysal/replace-string-in-file@v1.1.0
+        with:
+          file: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/log.html
+          old-string: img src="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          new-string: img src=".
+          
       - name: Archive Reporter Logs
         if: ${{ success() }}
         uses: actions/upload-artifact@v4
