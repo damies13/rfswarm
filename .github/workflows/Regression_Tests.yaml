@@ -141,14 +141,15 @@ jobs:
         working-directory: ./dist
       - run: pip install -r Tests/Regression/Manager/pip_requirements.txt
 
-      - name: setup git config
-        run: |
-          # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
-          git config advice.addIgnoredFile false
-      - name: create branch for test results
-        run: git checkout -B Test-Result-Manager-${{ matrix.platform }}-${{ matrix.python }}
+      # - name: setup git config
+      #   run: |
+      #     # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
+      #     git config user.name "GitHub Actions Bot"
+      #     git config user.email "<>"
+      #     git config advice.addIgnoredFile false
+      # - name: create branch for test results
+      #   run: git checkout -B Test-Result-Manager-${{ matrix.platform }}-${{ matrix.python }}
+
       - name: Robot Framework
         id: robottest
         run: >
@@ -163,34 +164,35 @@ jobs:
         with:
           name: Manager-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          if: ${{ success() }}
           retention-days: 15
 
-      # This below is to save results back to git, actions/upload-artifact@v4 might be a better solution, see Issue #169
-      - name: git commit
-        # https://docs.github.com/en/actions/learn-github-actions/expressions
-        if: ${{ failure() }}
-        run: |
-          # Stage the file, commit and push
-          echo "git add"
-          git add Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}/
-          echo "git commit"
-          git commit -m "Manager ${{ matrix.platform }} ${{ matrix.python }}"
-      - name: Switch back to original branch
-        if: ${{ failure() }}
-        run: |
-          echo "git checkout ref_name: ${{ github.ref_name }}"
-          git checkout -f ${{ github.ref_name }}
-          echo "git pull"
-          git pull --ff --autostash -f
-      - name: Merge test results into original branch
-        if: ${{ failure() }}
-        run: |
-          echo "git merge"
-          git merge --ff Test-Result-Manager-${{ matrix.platform }}-${{ matrix.python }}
-          echo "git pull again"
-          git pull --ff --autostash -f
-          echo "git push"
-          git push
+      # # This below is to save results back to git, actions/upload-artifact@v4 might be a better solution, see Issue #169
+      # - name: git commit
+      #   # https://docs.github.com/en/actions/learn-github-actions/expressions
+      #   if: ${{ failure() }}
+      #   run: |
+      #     # Stage the file, commit and push
+      #     echo "git add"
+      #     git add Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}/
+      #     echo "git commit"
+      #     git commit -m "Manager ${{ matrix.platform }} ${{ matrix.python }}"
+      # - name: Switch back to original branch
+      #   if: ${{ failure() }}
+      #   run: |
+      #     echo "git checkout ref_name: ${{ github.ref_name }}"
+      #     git checkout -f ${{ github.ref_name }}
+      #     echo "git pull"
+      #     git pull --ff --autostash -f
+      # - name: Merge test results into original branch
+      #   if: ${{ failure() }}
+      #   run: |
+      #     echo "git merge"
+      #     git merge --ff Test-Result-Manager-${{ matrix.platform }}-${{ matrix.python }}
+      #     echo "git pull again"
+      #     git pull --ff --autostash -f
+      #     echo "git push"
+      #     git push
   Reporter:
     strategy:
       matrix:
@@ -293,14 +295,14 @@ jobs:
         working-directory: ./dist
       - run: pip install -r Tests/Regression/Reporter/pip_requirements.txt
 
-      - name: setup git config
-        run: |
-          # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
-          git config advice.addIgnoredFile false
-      - name: create branch for test results
-        run: git checkout -B Test-Result-Reporter-${{ matrix.platform }}-${{ matrix.python }}
+      # - name: setup git config
+      #   run: |
+      #     # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
+      #     git config user.name "GitHub Actions Bot"
+      #     git config user.email "<>"
+      #     git config advice.addIgnoredFile false
+      # - name: create branch for test results
+      #   run: git checkout -B Test-Result-Reporter-${{ matrix.platform }}-${{ matrix.python }}
 
       - name: Robot Framework
         id: robottest
@@ -311,31 +313,39 @@ jobs:
         env:
           DISPLAY: :13.0
 
-      # This below is to save results back to git, actions/upload-artifact@v4 might be a better solution, see Issue #169
-      - name: git commit
-        # if: ${{ steps.robottest.conclusion == 'failure' }}
-        if: ${{ failure() }}
-        run: |
-          # Stage the file, commit and push
-          echo "git add"
-          git add Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/
-          echo "git commit"
-          git commit -m "Reporter ${{ matrix.platform }} ${{ matrix.python }}"
-      - name: Switch back to original branch
-        # if: ${{ steps.robottest.conclusion == 'failure' }}
-        if: ${{ failure() }}
-        run: |
-          echo "git checkout ref_name: ${{ github.ref_name }}"
-          git checkout -f ${{ github.ref_name }}
-          echo "git pull"
-          git pull --ff --autostash -f
-      - name: Merge test results into original branch
-        # if: ${{ steps.robottest.conclusion == 'failure' }}
-        if: ${{ failure() }}
-        run: |
-          echo "git merge"
-          git merge --ff Test-Result-Reporter-${{ matrix.platform }}-${{ matrix.python }}
-          echo "git pull again"
-          git pull --ff --autostash
-          echo "git push"
-          git push
+      - name: Archive Reporter Logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: Manager-${{ matrix.platform }}-${{ matrix.python }}
+          path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          if: ${{ success() }}
+          retention-days: 15
+
+      # # This below is to save results back to git, actions/upload-artifact@v4 might be a better solution, see Issue #169
+      # - name: git commit
+      #   # if: ${{ steps.robottest.conclusion == 'failure' }}
+      #   if: ${{ failure() }}
+      #   run: |
+      #     # Stage the file, commit and push
+      #     echo "git add"
+      #     git add Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/
+      #     echo "git commit"
+      #     git commit -m "Reporter ${{ matrix.platform }} ${{ matrix.python }}"
+      # - name: Switch back to original branch
+      #   # if: ${{ steps.robottest.conclusion == 'failure' }}
+      #   if: ${{ failure() }}
+      #   run: |
+      #     echo "git checkout ref_name: ${{ github.ref_name }}"
+      #     git checkout -f ${{ github.ref_name }}
+      #     echo "git pull"
+      #     git pull --ff --autostash -f
+      # - name: Merge test results into original branch
+      #   # if: ${{ steps.robottest.conclusion == 'failure' }}
+      #   if: ${{ failure() }}
+      #   run: |
+      #     echo "git merge"
+      #     git merge --ff Test-Result-Reporter-${{ matrix.platform }}-${{ matrix.python }}
+      #     echo "git pull again"
+      #     git pull --ff --autostash
+      #     echo "git push"
+      #     git push
