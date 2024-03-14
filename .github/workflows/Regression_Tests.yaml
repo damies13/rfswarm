@@ -323,12 +323,12 @@ jobs:
 
       # Try and fix images with relative path
       # <img src="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/ubuntu-latest_3.12/Reporter.GUIBasic-screenshot-2.png" width="100%">
-      - name: Find and Replace
-        uses: jacobtomlinson/gha-find-replace@v3
-        with:
-          find: "img src=\"/home/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}"
-          replace: "img src=."
-          include: "Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/log.html"
+      # - name: Find and Replace
+      #   uses: jacobtomlinson/gha-find-replace@v3
+      #   with:
+      #     find: "img src=\"/home/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}"
+      #     replace: "img src=."
+      #     include: "Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/log.html"
 
       - name: Archive Reporter Logs
         if: ${{ success() }}
