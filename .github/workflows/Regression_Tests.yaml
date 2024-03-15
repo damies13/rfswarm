@@ -338,6 +338,8 @@ jobs:
       #     file: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/log.html
       #     old-string: img src="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
       #     new-string: img src=".
+      - name: sed said
+        run: sed -h
           
       - name: Archive Reporter Logs
         if: ${{ success() }}
