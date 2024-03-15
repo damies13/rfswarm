@@ -340,8 +340,9 @@ jobs:
       #     new-string: img src=".
       - name: Try and fix images with relative path
         run: |
-          sed -i 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}/img src="./g' Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/output.xml
-          rebot Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/output.xml
+          cd Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          sed -i 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}/img src="./g' ./output.xml
+          rebot ./output.xml
 
       - name: Archive Reporter Logs
         if: ${{ success() }}
