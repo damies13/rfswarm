@@ -341,8 +341,8 @@ jobs:
       - name: Try and fix images with relative path
         run: |
           cd Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
-          sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}/img src="./g' ./output.xml
-          rebot ./output.xml
+          sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}/img src="./g' output.xml
+          rebot output.xml
 
       - name: Archive Reporter Logs
         if: ${{ success() }}
