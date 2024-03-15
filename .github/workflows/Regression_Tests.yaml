@@ -338,9 +338,11 @@ jobs:
       #     file: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/log.html
       #     old-string: img src="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
       #     new-string: img src=".
-      - name: sed said
-        run: sed -h
-          
+      - name: Try and fix images with relative path
+        run: |
+          sed -i 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}/img src="./g' Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/output.xml
+          rebot Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/output.xml
+
       - name: Archive Reporter Logs
         if: ${{ success() }}
         uses: actions/upload-artifact@v4
