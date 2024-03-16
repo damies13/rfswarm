@@ -10,7 +10,7 @@ Exclude Libraries With Spaces
 	Log to console 	${CURDIR}
 	# ${scenariofile}= 	Normalize Path 	${CURDIR}${/}..${/}..${/}Demo${/}demo.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#171${/}Issue171.rfs
-	Log to console 	${scenariofile}
+	Log to console 	scenariofile: ${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager

@@ -17,8 +17,8 @@ ${process_manager} 	None
 # datapath: /opt/hostedtoolcache/Python/3.9.18/x64/lib/python3.9/site-packages/rfswarm_manager/results/PreRun -- let's control the output path rather than leaving it to chance
 # datapath: /opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/rfswarm_manager/PreRun
 # ${results_dir} 			${EXECDIR}${/}rfswarm_manager${/}results
-${results_dir} 			${TEMPDIR}${/}rfswarm_manager${/}results
-
+# ${results_dir} 			${TEMPDIR}${/}rfswarm_manager${/}results
+${results_dir} 			${OUTPUT DIR}${/}results
 *** Keywords ***
 
 Show Log
@@ -70,12 +70,12 @@ Find Result DB
 	# ${fols}= 	List Directory 	${results_dir}
 	# Log to console 	${fols}
 	${fols}= 	List Directory 	${results_dir} 	*_* 	absolute=True
-	# Log to console 	${fols}
+	Log to console 	${fols}
 	# ${files}= 	List Directory 	${fols[0]}
 	# Log to console 	${files}
-	${file}= 	List Directory 	${fols[0]} 	*.db 	absolute=True
-	Log to console 	Result DB: ${file[0]}
-	RETURN 	${file[0]}
+	${file}= 	List Directory 	${fols[-1]} 	*.db 	absolute=True
+	Log to console 	Result DB: ${file[-1]}
+	RETURN 	${file[-1]}
 
 Query Result DB
 	[Arguments]		${dbfile} 	${sql}
