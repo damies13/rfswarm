@@ -161,15 +161,6 @@ jobs:
         working-directory: ./dist
       - run: pip install -r Tests/Regression/Manager/pip_requirements.txt
 
-      # - name: setup git config
-      #   run: |
-      #     # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
-      #     git config user.name "GitHub Actions Bot"
-      #     git config user.email "<>"
-      #     git config advice.addIgnoredFile false
-      # - name: create branch for test results
-      #   run: git checkout -B Test-Result-Manager-${{ matrix.platform }}-${{ matrix.python }}
-
       - name: Robot Framework
         id: robottest
         run: >
@@ -208,32 +199,6 @@ jobs:
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 90
 
-      # # This below is to save results back to git, actions/upload-artifact@v4 might be a better solution, see Issue #169
-      # - name: git commit
-      #   # https://docs.github.com/en/actions/learn-github-actions/expressions
-      #   if: ${{ failure() }}
-      #   run: |
-      #     # Stage the file, commit and push
-      #     echo "git add"
-      #     git add Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}/
-      #     echo "git commit"
-      #     git commit -m "Manager ${{ matrix.platform }} ${{ matrix.python }}"
-      # - name: Switch back to original branch
-      #   if: ${{ failure() }}
-      #   run: |
-      #     echo "git checkout ref_name: ${{ github.ref_name }}"
-      #     git checkout -f ${{ github.ref_name }}
-      #     echo "git pull"
-      #     git pull --ff --autostash -f
-      # - name: Merge test results into original branch
-      #   if: ${{ failure() }}
-      #   run: |
-      #     echo "git merge"
-      #     git merge --ff Test-Result-Manager-${{ matrix.platform }}-${{ matrix.python }}
-      #     echo "git pull again"
-      #     git pull --ff --autostash -f
-      #     echo "git push"
-      #     git push
   Reporter:
     strategy:
       matrix:
@@ -336,15 +301,6 @@ jobs:
         working-directory: ./dist
       - run: pip install -r Tests/Regression/Reporter/pip_requirements.txt
 
-      # - name: setup git config
-      #   run: |
-      #     # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
-      #     git config user.name "GitHub Actions Bot"
-      #     git config user.email "<>"
-      #     git config advice.addIgnoredFile false
-      # - name: create branch for test results
-      #   run: git checkout -B Test-Result-Reporter-${{ matrix.platform }}-${{ matrix.python }}
-
       - name: Robot Framework
         id: robottest
         run: >
@@ -354,23 +310,6 @@ jobs:
         env:
           DISPLAY: :13.0
 
-      # Try and fix images with relative path
-      # <img src="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/ubuntu-latest_3.12/Reporter.GUIBasic-screenshot-2.png" width="100%">
-      # - name: Find and Replace
-      #   uses: jacobtomlinson/gha-find-replace@v3
-      #   with:
-      #     find: "img src=\"/home/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}"
-      #     replace: "img src=."
-      #     include: "Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/log.html"
-
-      # Try again to fix images with relative path
-      # https://github.com/marketplace/actions/simple-replace-string-in-file
-      # - name: Replace string in file
-      #   uses: MathieuSoysal/replace-string-in-file@v1.1.0
-      #   with:
-      #     file: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/log.html
-      #     old-string: img src="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
-      #     new-string: img src=".
       - name: Try and fix images with relative path
         if: ${{ !cancelled() && matrix.platform != 'macos-latest' }}
         run: |
@@ -399,32 +338,3 @@ jobs:
           name: Reporter-${{ matrix.platform }}-${{ matrix.python }}
           path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
           retention-days: 90
-
-      # # This below is to save results back to git, actions/upload-artifact@v4 might be a better solution, see Issue #169
-      # - name: git commit
-      #   # if: ${{ steps.robottest.conclusion == 'failure' }}
-      #   if: ${{ failure() }}
-      #   run: |
-      #     # Stage the file, commit and push
-      #     echo "git add"
-      #     git add Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/
-      #     echo "git commit"
-      #     git commit -m "Reporter ${{ matrix.platform }} ${{ matrix.python }}"
-      # - name: Switch back to original branch
-      #   # if: ${{ steps.robottest.conclusion == 'failure' }}
-      #   if: ${{ failure() }}
-      #   run: |
-      #     echo "git checkout ref_name: ${{ github.ref_name }}"
-      #     git checkout -f ${{ github.ref_name }}
-      #     echo "git pull"
-      #     git pull --ff --autostash -f
-      # - name: Merge test results into original branch
-      #   # if: ${{ steps.robottest.conclusion == 'failure' }}
-      #   if: ${{ failure() }}
-      #   run: |
-      #     echo "git merge"
-      #     git merge --ff Test-Result-Reporter-${{ matrix.platform }}-${{ matrix.python }}
-      #     echo "git pull again"
-      #     git pull --ff --autostash
-      #     echo "git push"
-      #     git push
