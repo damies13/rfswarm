@@ -339,13 +339,13 @@ jobs:
       #     old-string: img src="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
       #     new-string: img src=".
       - name: Try and fix images with relative path
-        if: ${{ always() }} && ${{ matrix.platform != 'macos-latest' }}
+        if: ${{ matrix.platform != 'macos-latest' }} && ${{ success() || failure() }}
         run: |
           cd Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
           sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}/img src="./g' ./output.xml
           rebot ./output.xml
       - name: Try and fix images with relative path (macos)
-        if: ${{ always() }} && ${{ matrix.platform == 'macos-latest' }}
+        if: ${{ matrix.platform == 'macos-latest' }}  && ${{ success() || failure() }}
         run: |
           cd Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
           sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}/img src="./g' ./output.xml
