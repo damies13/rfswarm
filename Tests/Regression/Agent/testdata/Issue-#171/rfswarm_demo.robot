@@ -50,14 +50,14 @@ Remove Some Files
 
 RFS Variables
 	[Documentation]		Show the RFS Variables
-	Log		{RFS_AGENTNAME}
-	Log		{RFS_AGENTVERSION}
-	Log		{RFS_DEBUGLEVEL}
-	Log		{RFS_EXCLUDELIBRARIES}
-	Log		{RFS_INDEX}
-	Log		{RFS_ITERATION}
-	Log		{RFS_ROBOT}
-	Log		{RFS_SWARMMANAGER}
+	Log		${RFS_AGENTNAME}
+	Log		${RFS_AGENTVERSION}
+	Log		${RFS_DEBUGLEVEL}
+	Log		${RFS_EXCLUDELIBRARIES}
+	Log		${RFS_INDEX}
+	Log		${RFS_ITERATION}
+	Log		${RFS_ROBOT}
+	Log		${RFS_SWARMMANAGER}
 
 
 #
