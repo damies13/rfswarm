@@ -338,10 +338,12 @@ jobs:
       #     file: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/log.html
       #     old-string: img src="/home/runner/work/rfswarm/rfswarm/Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
       #     new-string: img src=".
+      - name: Sed Version
+        run: sed --version
       - name: Try and fix images with relative path
         run: |
           cd Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
-          sed -i .bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}/img src="./g' ./output.xml
+          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}/img src="./g' ./output.xml
           rebot ./output.xml
 
       - name: Archive Reporter Logs
