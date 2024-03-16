@@ -52,7 +52,27 @@ jobs:
       - run: pip install -r Tests/Regression/Agent/pip_requirements.txt
 
       - name: Robot Framework
-        run: robot --include ${{ matrix.platform }} Tests/Regression/Agent
+        run: >
+          robot --include ${{ matrix.platform }}
+          --outputdir Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          Tests/Regression/Agent
+
+      - name: Archive Agent Logs
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Agent-${{ matrix.platform }}-${{ matrix.python }}
+          path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          retention-days: 15
+
+      - name: Archive Agent Logs (longer retention if failed)
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Agent-${{ matrix.platform }}-${{ matrix.python }}
+          path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          retention-days: 90
+
   Manager:
     strategy:
       matrix:
@@ -158,6 +178,19 @@ jobs:
           Tests/Regression/Manager
         env:
           DISPLAY: :13.0
+
+      - name: Try and fix images with relative path
+        if: ${{ !cancelled() && matrix.platform != 'macos-latest' }}
+        run: |
+          cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}/img src="./g' ./output.xml
+          rebot ./output.xml
+      - name: Try and fix images with relative path (macos)
+        if: ${{ !cancelled() &&  matrix.platform == 'macos-latest' }}
+        run: |
+          cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}/img src="./g' ./output.xml
+          rebot ./output.xml
 
       - name: Archive Manager Logs
         if: ${{ success() }}
