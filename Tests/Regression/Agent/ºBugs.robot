@@ -14,10 +14,10 @@ Exclude Libraries With Spaces
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
-	Show Log 	stdout_manager.txt
-	Show Log 	stderr_manager.txt
-	Show Log 	stdout_agent.txt
-	Show Log 	stderr_agent.txt
+	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
 
 	${dbfile}= 	Find Result DB
 	# Query Result DB 	${dbfile} 	Select * from Results
@@ -41,10 +41,10 @@ Run agent with -x (xml mode)
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
-	Show Log 	stdout_manager.txt
-	Show Log 	stderr_manager.txt
-	Show Log 	stdout_agent.txt
-	Show Log 	stderr_agent.txt
+	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
 
 	${dbfile}= 	Find Result DB
 	# Query Result DB 	${dbfile} 	Select * from Results
