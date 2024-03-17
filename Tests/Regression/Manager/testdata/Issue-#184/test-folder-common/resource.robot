@@ -16,11 +16,15 @@ Log Vars
   Log    RFS_ITERATION: ${RFS_ITERATION}
   Log    RFS_ROBOT: ${RFS_ROBOT}
   Log    RFS_SWARMMANAGER: ${RFS_SWARMMANAGER}
-  Log    SHELL: %{SHELL}
-  Log    HOME: %{HOME}
-  Log    USER: %{USER}
-  Log    DISPLAY: %{DISPLAY}
-  Log    PWD: %{PWD}
+	# These environment variables are os specific and don't always work on github actions
+  # Log    SHELL: %{SHELL}
+  # Log    HOME: %{HOME}
+  # Log    USER: %{USER}
+  # Log    DISPLAY: %{DISPLAY}
+  # Log    PWD: %{PWD}
+	# Add environment variables that I can control
+	Log    MATRIX_PLATFORM: %{MATRIX_PLATFORM}
+	Log    MATRIX_PYTHON: %{MATRIX_PYTHON}
   # Log    RFS_STATUS: %{RFS_STATUS}
 
 Log Vars Deep

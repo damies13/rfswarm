@@ -169,6 +169,8 @@ jobs:
           Tests/Regression/Manager
         env:
           DISPLAY: :13.0
+          MATRIX_PLATFORM: ${{ matrix.platform }}
+          MATRIX_PYTHON: ${{ matrix.python }}
 
       - name: Try and fix images with relative path
         if: ${{ !cancelled() && matrix.platform != 'macos-latest' }}

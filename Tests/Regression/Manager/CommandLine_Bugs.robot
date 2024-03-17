@@ -7,6 +7,8 @@ Robbot files with same name but different folders
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	http://localhost:8138
 	Run Agent 	${agnt_options}
+	Sleep    1s
+	Check Agent Is Running
 	Log to console 	${CURDIR}
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#184${/}Issue-#184.rfs
 	Log to console 	${scenariofile}
@@ -18,11 +20,20 @@ Robbot files with same name but different folders
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
 
+	Should Not Contain 	${OUTPUT DIR}${/}stdout_agent.txt 		Robot returned an error
+	Should Not Contain 	${OUTPUT DIR}${/}stdout_agent.txt 		please check the log file
+
 	${dbfile}= 	Find Result DB
 	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from ResultSummary;
 	Should Be True	${result[0][0]} > 0
 	Should Be Equal As Numbers	${result[0][0]} 	4
+	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from ResultSummary where Pass > 0;
+	Should Be True	${result[0][0]} > 0
+	Should Be Equal As Numbers	${result[0][0]} 	4
 	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	Should Contain 	${result} 	${{ ('Folder A Log Variables AAA',) }}
+	Should Contain 	${result} 	${{ ('Folder B Log Variables BBB',) }}
+	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary  where Pass > 0;
 	Should Contain 	${result} 	${{ ('Folder A Log Variables AAA',) }}
 	Should Contain 	${result} 	${{ ('Folder B Log Variables BBB',) }}
 

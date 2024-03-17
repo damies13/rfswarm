@@ -56,6 +56,12 @@ Wait For Manager
 	# Should Be Equal As Integers 	${result.rc} 	0
 	Log to console 	${result.rc}
 
+Check Agent Is Running
+	${result}= 	Is Process Running		${process_agent}
+	# Should Be Equal As Integers 	${result.rc} 	0
+	Log 	Is Agent Running: ${result} 	console=True
+	Should Be True 	${result}
+
 Stop Manager
 	${result}= 	Terminate Process		${process_manager}
 	# Should Be Equal As Integers 	${result.rc} 	0

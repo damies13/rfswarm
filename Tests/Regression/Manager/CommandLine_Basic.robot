@@ -8,6 +8,12 @@ ${cmd_agent} 		rfswarm-agent
 ${cmd_manager} 	rfswarm
 
 *** Test Cases ***
+Robot Version
+	[Documentation] 	This just prevents all the test runners doing git push at the same time
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
+	${Robot_Version} =	Evaluate	robot.__version__ 	modules=robot
+	Log to console 	${\n}Robot Version: ${Robot_Version}
+
 Random Offset
 	[Documentation] 	This just prevents all the test runners doing git push at the same time
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
