@@ -1,5 +1,5 @@
 *** Settings ***
-Resource 	ºCommon.robot
+Resource 	CommandLine_Common.robot
 
 *** Test Cases ***
 Exclude Libraries With Spaces
