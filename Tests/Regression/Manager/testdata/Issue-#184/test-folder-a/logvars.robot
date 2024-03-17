@@ -6,13 +6,20 @@ Resource 	..${/}test-folder-common${/}resource.robot
 
 *** Test Cases ***
 Log Variables Folder A
-  Sleep   5
+  Sleep   3
   Log Vars
-	Sleep   5
+	Sleep   3
+	Log Vars Local
+	Sleep   3
 	Log Vars Deep
-	Sleep   5
+	Sleep   3
 	Log Vars
-	Sleep   5
+	Sleep   3
+
+*** Keywords ***
+Log Vars Local
+  [Documentation]   Folder A Log Variables AAA
+	No Operation
 
 
 #

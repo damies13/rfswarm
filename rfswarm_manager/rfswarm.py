@@ -1472,8 +1472,8 @@ class RFSwarmBase:
 					self.remove_hash(chkhash)
 
 	def get_relative_path(self, path1, path2):
-		base.debugmsg(7, "path1:", path1)
-		base.debugmsg(7, "path2:", path2)
+		base.debugmsg(5, "path1:", path1)
+		base.debugmsg(5, "path2:", path2)
 		# commonpath = os.path.commonpath([path1, path2])
 
 		base.debugmsg(8, "os.path.isdir(path1):", os.path.isdir(path1))
@@ -5693,7 +5693,7 @@ class RFSwarmGUI(tk.Frame):
 
 			self.pln_graph_update = False
 
-	def addScriptRow(self):
+	def addScriptRow(self, *args):
 		base.debugmsg(6, "addScriptRow")
 		row = base.scriptcount
 
@@ -5986,9 +5986,33 @@ class RFSwarmGUI(tk.Frame):
 				)
 			else:
 				scriptfile = ""
-		base.debugmsg(7, "scriptfile:", scriptfile)
+		base.debugmsg(5, "scriptfile:", scriptfile)
 		if len(scriptfile) > 0:
 			relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], scriptfile)
+			base.debugmsg(5, "relpath:", relpath)
+
+			if ".." in relpath:
+				base.debugmsg(5, "do update relpath:", relpath)
+				base.debugmsg(5, "ScriptDir:", base.config['Plan']['ScriptDir'])
+				if base.config['Plan']['ScriptDir'] == base.dir_path:
+					base.config['Plan']['ScriptDir'] = os.path.basename(scriptfile)
+					base.debugmsg(5, "ScriptDir:", base.config['Plan']['ScriptDir'])
+					relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], scriptfile)
+					base.debugmsg(5, "relpath:", relpath)
+				if len(base.scriptlist) > 1:
+					base.debugmsg(5, "base.scriptlist:", base.scriptlist)
+					filelst = [scriptfile]
+					for i in range(len(base.scriptlist)):
+						if "Script" in base.scriptlist[i]:
+							filelst.append(base.scriptlist[i]["Script"])
+					commonpath = os.path.commonpath(filelst)
+					base.debugmsg(5, "commonpath: ", commonpath)
+					base.config['Plan']['ScriptDir'] = base.inisafevalue(commonpath)
+					relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], scriptfile)
+					# base.saveini()
+					for i in range(len(base.scriptlist)):
+						if "Script" in base.scriptlist[i]:
+							self.sr_file_validate(i, base.scriptlist[i]["Script"])
 
 			fg[1].configure(state='normal')
 			fg[1].select_clear()

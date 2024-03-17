@@ -892,6 +892,9 @@ class RFSwarmAgent():
 			self.debugmsg(6, "runthread: test:", test)
 		test = test.replace(r'"', r'\"')
 
+		if hash not in self.scriptlist:
+			self.getfile(hash)
+
 		if 'localfile' not in self.scriptlist[hash]:
 			if self.corethreads["getscripts"].is_alive():
 				self.corethreads["getscripts"].join()
