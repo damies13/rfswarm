@@ -23,7 +23,7 @@ Robbot files with same name but different folders
 	Should Be True	${result[0][0]} > 0
 	Should Be Equal As Numbers	${result[0][0]} 	4
 	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
-	Should Contain 	${result} 	Folder A Log Variables AAA
-	Should Contain 	${result} 	Folder B Log Variables BBB
+	Should Contain 	${result} 	${{ ('Folder A Log Variables AAA',) }}
+	Should Contain 	${result} 	${{ ('Folder B Log Variables BBB',) }}
 
 	Stop Agent
