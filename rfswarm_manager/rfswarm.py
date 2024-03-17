@@ -1155,10 +1155,16 @@ class RFSwarmBase:
 		base.debugmsg(8, "st:", st, "	", int(st.timestamp()))
 		return int(st.timestamp())
 
-	def hash_file(self, file, relpath):
+	def hash_file(self, file, argrelpath=""):
 		if not (os.path.exists(file) and os.path.isfile(file)):
 			raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), file)
 		BLOCKSIZE = 65536
+
+		# if len(argrelpath) > 0:
+		base.debugmsg(7, "file:", file, "	ScriptDir:", base.config['Plan']['ScriptDir'])
+		relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], file)
+		base.debugmsg(7, "file:", file, "	relpath:", relpath)
+
 		hasher = hashlib.md5()
 		hasher.update(str(os.path.getmtime(file)).encode('utf-8'))
 		hasher.update(relpath.encode('utf-8'))
@@ -1333,7 +1339,8 @@ class RFSwarmBase:
 		filelst = glob.glob(initfiles)
 		for file in filelst:
 			base.debugmsg(7, "file:", file)
-			relfile = os.path.relpath(file, start=basedir)
+			# relfile = os.path.relpath(file, start=basedir)
+			relfile = base.get_relative_path(base.config['Plan']['ScriptDir'], file)
 			base.debugmsg(7, "relfile:", relfile)
 			newhash = self.hash_file(file, relfile)
 			base.debugmsg(7, "newhash:", newhash)
@@ -1392,7 +1399,8 @@ class RFSwarmBase:
 
 									base.debugmsg(7, "localrespath", localrespath)
 									if os.path.isfile(localrespath):
-										relfile = os.path.relpath(localrespath, start=basedir)
+										# relfile = os.path.relpath(localrespath, start=basedir)
+										relfile = base.get_relative_path(base.config['Plan']['ScriptDir'], localrespath)
 										base.debugmsg(7, "relfile", relfile)
 										newhash = self.hash_file(localrespath, relfile)
 										base.debugmsg(7, "newhash", newhash)
@@ -1411,7 +1419,8 @@ class RFSwarmBase:
 										filelst = glob.glob(localrespath)
 										for file in filelst:
 											base.debugmsg(9, "file", file)
-											relpath = file.replace(localdir, "")[1:]
+											# relpath = file.replace(localdir, "")[1:]
+											relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], file)
 											base.debugmsg(9, "relpath", relpath)
 											newhash = self.hash_file(file, relpath)
 											base.debugmsg(9, "newhash", newhash)
@@ -2187,10 +2196,12 @@ class RFSwarmCore:
 			base.saveini()
 
 		if 'ScriptDir' not in base.config['Plan']:
+			base.debugmsg(5, "ScriptDir: ", base.config['Plan']['ScriptDir'])
 			base.config['Plan']['ScriptDir'] = base.inisafevalue(base.dir_path)
 			base.saveini()
 		else:
 			if not os.path.isdir(base.config['Plan']['ScriptDir']):
+				base.debugmsg(5, "ScriptDir: ", base.config['Plan']['ScriptDir'])
 				base.config['Plan']['ScriptDir'] = base.inisafevalue(base.dir_path)
 				base.saveini()
 
@@ -2209,6 +2220,7 @@ class RFSwarmCore:
 			# check file exists - it may have been deleted since rfswarm last ran with this ini file
 			if not os.path.exists(base.config['Plan']['ScenarioFile']):
 				base.config['Plan']['ScenarioFile'] = ""
+				base.debugmsg(5, "ScriptDir: ", base.config['Plan']['ScriptDir'])
 				base.config['Plan']['ScriptDir'] = base.inisafevalue(base.dir_path)
 				base.config['Plan']['ScenarioDir'] = base.inisafevalue(base.dir_path)
 				base.saveini()
@@ -2579,6 +2591,39 @@ class RFSwarmCore:
 
 		if "Script Defaults" in filedata:
 			base.scriptdefaults = filedata['Script Defaults']
+
+		# Set base.config['Plan']['ScriptDir']
+		base.debugmsg(5, "scriptcount:", scriptcount)
+		filelst = []
+		for i in range(scriptcount):
+			istr = str(i + 1)
+			base.debugmsg(5, "istr:", istr)
+			if istr in filedata:
+				base.debugmsg(5, "filedata[", istr, "]:", filedata[istr])
+				if "script" in filedata[istr]:
+					base.debugmsg(5, "filedata[", istr, "][script]:", filedata[istr]["script"])
+					scriptname = filedata[istr]["script"]
+					if '\\' in scriptname:
+						scriptnamearr = scriptname.split('\\')
+						scriptname = "/".join(scriptnamearr)
+					if not os.path.isabs(scriptname):
+						# relative path, need to find absolute path
+						combined = os.path.join(base.config['Plan']['ScenarioDir'], scriptname)
+						base.debugmsg(5, "combined:", combined)
+						scriptname = os.path.abspath(combined)
+					base.debugmsg(5, "scriptname:", scriptname)
+
+					filelst.append(scriptname)
+		if len(filelst) > 0:
+			commonpath = os.path.commonpath(filelst)
+			base.debugmsg(5, "commonpath: ", commonpath)
+			base.config['Plan']['ScriptDir'] = base.inisafevalue(commonpath)
+			base.saveini()
+		else:
+			base.debugmsg(5, "ScriptDir: ", base.config['Plan']['ScriptDir'])
+			base.config['Plan']['ScriptDir'] = base.inisafevalue(base.dir_path)
+			base.saveini()
+
 
 		rowcount = 0
 		for i in range(scriptcount):
@@ -3089,22 +3134,21 @@ class RFSwarmCore:
 		base.debugmsg(7, "scriptfile:", scriptfile)
 		if len(scriptfile) > 0:
 			base.scriptlist[r]["Script"] = scriptfile
-			script_hash = base.hash_file(scriptfile, os.path.basename(scriptfile))
+			relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], scriptfile)
+			script_hash = base.hash_file(scriptfile, relpath)
 			base.scriptlist[r]["ScriptHash"] = script_hash
 
 			if script_hash not in base.scriptfiles:
 				base.scriptfiles[script_hash] = {
 					"id": script_hash,
 					"localpath": scriptfile,
-					"relpath": os.path.basename(scriptfile),
+					"relpath": relpath,
 					"type": "script"
 				}
 
 				t = threading.Thread(target=base.find_dependancies, args=(script_hash, ))
 				t.start()
 
-			base.config['Plan']['ScriptDir'] = base.inisafevalue(os.path.dirname(scriptfile))
-			base.saveini()
 		else:
 			if "ScriptHash" in base.scriptlist[r]:
 				oldhash = base.scriptlist[r]["ScriptHash"]
@@ -5945,30 +5989,30 @@ class RFSwarmGUI(tk.Frame):
 				scriptfile = ""
 		base.debugmsg(7, "scriptfile:", scriptfile)
 		if len(scriptfile) > 0:
+			relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], scriptfile)
+
 			fg[1].configure(state='normal')
 			fg[1].select_clear()
 			fg[1].delete(0, 'end')
-			fg[1].insert(0, os.path.basename(scriptfile))
+			fg[1].insert(0, relpath)
 			fg[1].configure(state='readonly')
 
 			base.scriptlist[r]["Script"] = scriptfile
 			base.debugmsg(8, "test: ", fg[1].get())
-			script_hash = base.hash_file(scriptfile, os.path.basename(scriptfile))
+			script_hash = base.hash_file(scriptfile, relpath)
 			base.scriptlist[r]["ScriptHash"] = script_hash
 
 			if script_hash not in base.scriptfiles:
 				base.scriptfiles[script_hash] = {
 					"id": script_hash,
 					"localpath": scriptfile,
-					"relpath": os.path.basename(scriptfile),
+					"relpath": relpath,
 					"type": "script"
 				}
 
 				t = threading.Thread(target=base.find_dependancies, args=(script_hash, ))
 				t.start()
 
-			base.config['Plan']['ScriptDir'] = base.inisafevalue(os.path.dirname(scriptfile))
-			base.saveini()
 			self.sr_test_genlist(r)
 		else:
 			fg[1].configure(state='normal')
