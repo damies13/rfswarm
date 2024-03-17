@@ -2624,7 +2624,6 @@ class RFSwarmCore:
 			base.config['Plan']['ScriptDir'] = base.inisafevalue(base.dir_path)
 			base.saveini()
 
-
 		rowcount = 0
 		for i in range(scriptcount):
 			ii = i + 1
