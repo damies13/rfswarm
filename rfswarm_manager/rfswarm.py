@@ -2196,13 +2196,13 @@ class RFSwarmCore:
 			base.saveini()
 
 		if 'ScriptDir' not in base.config['Plan']:
-			base.debugmsg(5, "ScriptDir: ", base.config['Plan']['ScriptDir'])
 			base.config['Plan']['ScriptDir'] = base.inisafevalue(base.dir_path)
+			base.debugmsg(5, "ScriptDir: ", base.config['Plan']['ScriptDir'])
 			base.saveini()
 		else:
 			if not os.path.isdir(base.config['Plan']['ScriptDir']):
-				base.debugmsg(5, "ScriptDir: ", base.config['Plan']['ScriptDir'])
 				base.config['Plan']['ScriptDir'] = base.inisafevalue(base.dir_path)
+				base.debugmsg(5, "ScriptDir: ", base.config['Plan']['ScriptDir'])
 				base.saveini()
 
 		if 'ScenarioDir' not in base.config['Plan']:
@@ -2220,8 +2220,8 @@ class RFSwarmCore:
 			# check file exists - it may have been deleted since rfswarm last ran with this ini file
 			if not os.path.exists(base.config['Plan']['ScenarioFile']):
 				base.config['Plan']['ScenarioFile'] = ""
-				base.debugmsg(5, "ScriptDir: ", base.config['Plan']['ScriptDir'])
 				base.config['Plan']['ScriptDir'] = base.inisafevalue(base.dir_path)
+				base.debugmsg(5, "ScriptDir: ", base.config['Plan']['ScriptDir'])
 				base.config['Plan']['ScenarioDir'] = base.inisafevalue(base.dir_path)
 				base.saveini()
 
@@ -2620,8 +2620,8 @@ class RFSwarmCore:
 			base.config['Plan']['ScriptDir'] = base.inisafevalue(commonpath)
 			base.saveini()
 		else:
-			base.debugmsg(5, "ScriptDir: ", base.config['Plan']['ScriptDir'])
 			base.config['Plan']['ScriptDir'] = base.inisafevalue(base.dir_path)
+			base.debugmsg(5, "ScriptDir: ", base.config['Plan']['ScriptDir'])
 			base.saveini()
 
 		rowcount = 0
