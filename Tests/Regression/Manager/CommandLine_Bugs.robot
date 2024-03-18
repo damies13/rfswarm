@@ -15,6 +15,7 @@ Robbot files with same name but different folders
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
+	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -36,5 +37,3 @@ Robbot files with same name but different folders
 	${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary where _pass > 0;
 	Should Contain 	${result} 	${{ ('Folder A Log Variables AAA',) }}
 	Should Contain 	${result} 	${{ ('Folder B Log Variables BBB',) }}
-
-	Stop Agent

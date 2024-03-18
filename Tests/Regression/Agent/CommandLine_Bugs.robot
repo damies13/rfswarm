@@ -14,6 +14,7 @@ Exclude Libraries With Spaces
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
+	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -27,7 +28,6 @@ Exclude Libraries With Spaces
 	Should Be True	${result[0][0]} > 0
 	Should Be Equal As Numbers	${result[0][0]} 	4
 
-	Stop Agent
 
 Run agent with -x (xml mode)
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #180
@@ -41,6 +41,7 @@ Run agent with -x (xml mode)
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
+	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -53,5 +54,3 @@ Run agent with -x (xml mode)
 	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from ResultSummary;
 	Should Be True	${result[0][0]} > 0
 	Should Be Equal As Numbers	${result[0][0]} 	4
-
-	Stop Agent
