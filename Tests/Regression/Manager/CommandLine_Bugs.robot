@@ -33,7 +33,7 @@ Robbot files with same name but different folders
 	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
 	Should Contain 	${result} 	${{ ('Folder A Log Variables AAA',) }}
 	Should Contain 	${result} 	${{ ('Folder B Log Variables BBB',) }}
-	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary  where Pass > 0;
+	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary where Pass > 0;
 	Should Contain 	${result} 	${{ ('Folder A Log Variables AAA',) }}
 	Should Contain 	${result} 	${{ ('Folder B Log Variables BBB',) }}
 
