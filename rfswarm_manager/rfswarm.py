@@ -1242,59 +1242,62 @@ class RFSwarmBase:
 		pathout = pathin
 		base.debugmsg(8, "pathout:", pathout)
 
-		# Issue #129 Handle `${CURDIR}/`
-		if pathout.find("${CURDIR}") > -1:
-			pathmod = pathout.replace("${CURDIR}", "")
-			base.debugmsg(8, "pathmod:", pathmod)
-			# https://stackoverflow.com/questions/1945920/why-doesnt-os-path-join-work-in-this-case
-			if platform.system() == "Windows":
-				pathmod = pathmod.replace("/", os.path.sep)
+		while resfile.find("${") > -1:
+			# Issue #129 Handle `${CURDIR}/`
+			if pathout.find("${CURDIR}") > -1:
+				pathmod = pathout.replace("${CURDIR}", "")
 				base.debugmsg(8, "pathmod:", pathmod)
-				pathout = os.path.abspath(os.path.join(localdir, *pathmod.split(os.path.sep)))
-			else:
-				pathout = os.path.abspath(os.path.join(os.path.sep, *localdir.split(os.path.sep), *pathmod.split(os.path.sep)))
-			base.debugmsg(8, "pathout:", pathout)
-
-		# Built-in variables - https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#built-in-variables
-
-		# ${TEMPDIR}
-		if pathout.find("${TEMPDIR}") > -1:
-			tmpdir = tempfile.gettempdir()
-			pathout = pathout.replace("${TEMPDIR}", tmpdir)
-			base.debugmsg(8, "pathout:", pathout)
-
-		# ${EXECDIR}
-		# not sure how to handle this for now
-
-		# ${/}
-		if pathout.find("${/}") > -1:
-			base.debugmsg(8, "Found ${/} in", pathout)
-			if pathout.find("${/}") == 0:
-				pathlst = ["${rfpv}"] + pathout.split("${/}")
-				base.debugmsg(8, "pathlst:", pathlst)
-				pathjoin = os.path.join(*pathlst)
-				base.debugmsg(8, "pathjoin:", pathjoin)
-				pathjoin = pathjoin.replace("${rfpv}", "")
-				base.debugmsg(8, "pathjoin:", pathjoin)
-			else:
-				pathlst = pathout.split("${/}")
-				base.debugmsg(8, "pathlst:", pathlst)
-				pathjoin = os.path.join(*pathlst)
-				base.debugmsg(8, "pathjoin:", pathjoin)
-
-			if os.path.isfile(pathjoin):
-				base.debugmsg(8, "pathjoin:", pathjoin)
-				pathout = pathjoin
-				base.debugmsg(8, "pathout:", pathout)
-			else:
-				base.debugmsg(8, "pathjoin:", pathjoin)
-				pathout = self.localrespath(localdir, pathjoin)
+				# https://stackoverflow.com/questions/1945920/why-doesnt-os-path-join-work-in-this-case
+				if platform.system() == "Windows":
+					pathmod = pathmod.replace("/", os.path.sep)
+					base.debugmsg(8, "pathmod:", pathmod)
+					pathout = os.path.abspath(os.path.join(localdir, *pathmod.split(os.path.sep)))
+					pathout = pathout.replace(r'${\}', r'${/}')
+				else:
+					pathout = os.path.abspath(os.path.join(os.path.sep, *localdir.split(os.path.sep), *pathmod.split(os.path.sep)))
 				base.debugmsg(8, "pathout:", pathout)
 
-		# ${:}
-		# ${\n}
-		# not sure whether to handle these for now
-		base.debugmsg(8, "pathout:", pathout)
+			# Built-in variables - https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#built-in-variables
+
+			# ${TEMPDIR}
+			if pathout.find("${TEMPDIR}") > -1:
+				tmpdir = tempfile.gettempdir()
+				pathout = pathout.replace("${TEMPDIR}", tmpdir)
+				base.debugmsg(8, "pathout:", pathout)
+
+			# ${EXECDIR}
+			# not sure how to handle this for now
+
+			# ${/}
+			base.debugmsg(8, "pathout.find:", pathout.find("${/}"))
+			if pathout.find("${/}") > -1:
+				base.debugmsg(8, "Found ${/} in", pathout)
+				if pathout.find("${/}") == 0:
+					pathlst = ["${rfpv}"] + pathout.split("${/}")
+					base.debugmsg(8, "pathlst:", pathlst)
+					pathjoin = os.path.join(*pathlst)
+					base.debugmsg(8, "pathjoin:", pathjoin)
+					pathjoin = pathjoin.replace("${rfpv}", "")
+					base.debugmsg(8, "pathjoin:", pathjoin)
+				else:
+					pathlst = pathout.split("${/}")
+					base.debugmsg(8, "pathlst:", pathlst)
+					pathjoin = os.path.join(*pathlst)
+					base.debugmsg(8, "pathjoin:", pathjoin)
+
+				if os.path.isfile(pathjoin):
+					base.debugmsg(8, "pathjoin:", pathjoin)
+					pathout = pathjoin
+					base.debugmsg(8, "pathout:", pathout)
+				else:
+					base.debugmsg(8, "pathjoin:", pathjoin)
+					pathout = self.localrespath(localdir, pathjoin)
+					base.debugmsg(8, "pathout:", pathout)
+
+			# ${:}
+			# ${\n}
+			# not sure whether to handle these for now
+			base.debugmsg(8, "pathout:", pathout)
 
 		return pathout
 
@@ -1335,7 +1338,7 @@ class RFSwarmBase:
 
 		# look for __init__. files - Issue #90
 		initfiles = os.path.abspath(os.path.join(localdir, "__init__.*"))
-		base.debugmsg(7, "initfiles", initfiles)
+		base.debugmsg(8, "initfiles", initfiles)
 		filelst = glob.glob(initfiles)
 		for file in filelst:
 			base.debugmsg(7, "file:", file)
@@ -1359,10 +1362,10 @@ class RFSwarmBase:
 					t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
 					t.start()
 
-		base.debugmsg(7, "localdir", localdir)
+		base.debugmsg(8, "localdir", localdir)
 		filename, fileext = os.path.splitext(localpath)
 
-		base.debugmsg(7, "filename, fileext:", filename, fileext)
+		base.debugmsg(8, "filename, fileext:", filename, fileext)
 
 		# splitext leaves the . on the extention, the list below needs to have the extentions
 		# starting with a . - Issue #94
@@ -1377,7 +1380,7 @@ class RFSwarmBase:
 						try:
 							if line.strip()[:1] != "#":
 								linearr = line.strip().split()
-								base.debugmsg(7, "linearr", linearr)
+								base.debugmsg(8, "linearr", linearr)
 								resfile = None
 								if len(linearr) > 1 and linearr[0].upper() in ['RESOURCE', 'VARIABLES', 'LIBRARY']:
 									base.debugmsg(9, "linearr[1]", linearr[1])
@@ -1389,7 +1392,7 @@ class RFSwarmBase:
 									base.debugmsg(9, "linearr[2]", linearr[2])
 									resfile = linearr[2]
 								if resfile:
-									base.debugmsg(7, "resfile", resfile)
+									base.debugmsg(8, "resfile", resfile)
 									# here we are assuming the resfile is a relative path! should we also consider files with full local paths?
 									# Issue #129 Handle ``${CURDIR}/``
 									if resfile.find("${") > -1:
@@ -1397,13 +1400,15 @@ class RFSwarmBase:
 									else:
 										localrespath = self.localrespath(localdir, resfile)
 
-									base.debugmsg(7, "localrespath", localrespath)
+									base.debugmsg(8, "localrespath", localrespath)
+									localrespath = os.path.abspath(localrespath)
+									base.debugmsg(8, "localrespath", localrespath)
 									if os.path.isfile(localrespath):
 										# relfile = os.path.relpath(localrespath, start=basedir)
 										relfile = base.get_relative_path(base.config['Plan']['ScriptDir'], localrespath)
-										base.debugmsg(7, "relfile", relfile)
+										base.debugmsg(8, "relfile", relfile)
 										newhash = self.hash_file(localrespath, relfile)
-										base.debugmsg(7, "newhash", newhash)
+										base.debugmsg(8, "newhash", newhash)
 										self.scriptfiles[newhash] = {
 											'id': newhash,
 											'basedir': basedir,
@@ -6025,6 +6030,7 @@ class RFSwarmGUI(tk.Frame):
 			script_hash = base.hash_file(scriptfile, relpath)
 			base.scriptlist[r]["ScriptHash"] = script_hash
 
+			base.debugmsg(5, "script_hash:", script_hash, " in scriptfiles?:", script_hash in base.scriptfiles)
 			if script_hash not in base.scriptfiles:
 				base.scriptfiles[script_hash] = {
 					"id": script_hash,

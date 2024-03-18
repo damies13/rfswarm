@@ -32,7 +32,7 @@ Show Log
 
 Show Dir Contents
 	[Arguments]		${dir}
-	${filesnfolders}= 	Evaluate    glob.glob("${dir}/*", recursive=True) 	modules=glob
+	${filesnfolders}= 	Evaluate    glob.glob("${dir}${/}*", recursive=True) 	modules=glob
 	FOR 	${item} 	IN 	${filesnfolders}
 		Log 	${item} 	console=True
 	END
