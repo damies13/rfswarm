@@ -19,6 +19,8 @@ ${process_manager} 	None
 # ${results_dir} 			${EXECDIR}${/}rfswarm_manager${/}results
 # ${results_dir} 			${TEMPDIR}${/}rfswarm_manager${/}results
 ${results_dir} 			${OUTPUT DIR}${/}results
+${agent_dir} 				${OUTPUT DIR}${/}rfswarm-agent
+
 *** Keywords ***
 
 Show Log
@@ -28,11 +30,20 @@ Show Log
 	Log to console 	${filedata}
 	Log to console 	-----${filename}-----${\n}
 
+Show Dir Contents
+	[Arguments]		${dir}
+	${filesnfolders}= 	Evaluate    glob.glob("${dir}/*", recursive=True) 	modules=glob
+	FOR 	${item} 	IN 	${filesnfolders}
+		Log 	${item} 	console=True
+	END
+
 Run Agent
 	[Arguments]		${options}=None
 	IF  ${options} == None
 		${options}= 	Create List
 	END
+	Append To List 	${options} 	-d 	${agent_dir}
+
 	Log to console 	${\n}\${options}: ${options}
 	# ${process}= 	Start Process 	python3 	${pyfile_agent}  @{options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
 	${process}= 	Start Process 	${cmd_agent}  @{options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
@@ -75,6 +86,7 @@ Stop Agent
 	Log 	stdout: ${result.stdout} 	console=True
 	Log 	stderr_path: ${result.stderr_path} 	console=True
 	Log 	stderr: ${result.stderr} 	console=True
+	Show Dir Contents 	${agent_dir}
 
 Find Result DB
 	# ${fols}= 	List Directory 	${results_dir}
