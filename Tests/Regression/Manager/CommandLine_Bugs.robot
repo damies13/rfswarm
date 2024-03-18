@@ -24,16 +24,16 @@ Robbot files with same name but different folders
 	Should Not Contain 	${OUTPUT DIR}${/}stdout_agent.txt 		please check the log file
 
 	${dbfile}= 	Find Result DB
-	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from ResultSummary;
+	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from Summary;
 	Should Be True	${result[0][0]} > 0
 	Should Be Equal As Numbers	${result[0][0]} 	4
-	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from ResultSummary where Pass > 0;
+	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from Summary where _pass > 0;
 	Should Be True	${result[0][0]} > 0
 	Should Be Equal As Numbers	${result[0][0]} 	4
-	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;
 	Should Contain 	${result} 	${{ ('Folder A Log Variables AAA',) }}
 	Should Contain 	${result} 	${{ ('Folder B Log Variables BBB',) }}
-	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary where Pass > 0;
+	${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary where _pass > 0;
 	Should Contain 	${result} 	${{ ('Folder A Log Variables AAA',) }}
 	Should Contain 	${result} 	${{ ('Folder B Log Variables BBB',) }}
 
