@@ -70,7 +70,11 @@ Stop Manager
 Stop Agent
 	${result}= 	Terminate Process		${process_agent}
 	# Should Be Equal As Integers 	${result.rc} 	0
-	Log to console 	Terminate Process returned: ${result.rc}
+	Log 	Terminate Process returned: ${result.rc} 	console=True
+	Log 	stdout_path: ${result.stdout_path} 	console=True
+	Log 	stdout: ${result.stdout} 	console=True
+	Log 	stderr_path: ${result.stderr_path} 	console=True
+	Log 	stderr: ${result.stderr} 	console=True
 
 Find Result DB
 	# ${fols}= 	List Directory 	${results_dir}
