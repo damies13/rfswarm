@@ -65,12 +65,12 @@ Check Agent Is Running
 Stop Manager
 	${result}= 	Terminate Process		${process_manager}
 	# Should Be Equal As Integers 	${result.rc} 	0
-	Log to console 	${result.rc}
+	Log to console 	Terminate Process returned: ${result.rc}
 
 Stop Agent
 	${result}= 	Terminate Process		${process_agent}
 	# Should Be Equal As Integers 	${result.rc} 	0
-	Log to console 	${result.rc}
+	Log to console 	Terminate Process returned: ${result.rc}
 
 Find Result DB
 	# ${fols}= 	List Directory 	${results_dir}
