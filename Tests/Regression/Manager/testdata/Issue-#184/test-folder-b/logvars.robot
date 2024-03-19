@@ -1,5 +1,5 @@
 *** Settings ***
-Resource 	${CURDIR}${/}..${/}test-folder-common${/}resource.robot
+Resource 	..${/}test-folder-common${/}resource.robot
 
 *** Variables ***
 
