@@ -3,10 +3,10 @@ Library 	OperatingSystem
 
 *** Test Cases ***
 Robot Version
-	[Documentation] 	This just prevents all the test runners doing git push at the same time
+	[Documentation] 	Logs the robot framework version used
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
 	${Robot_Version} =	Evaluate	robot.__version__ 	modules=robot
-	Log to console 	${\n}Robot Version: ${Robot_Version}
+	Log 	${\n}Robot Version: ${Robot_Version} 	console=True
 
 Random Offset
 	[Documentation] 	This just prevents all the test runners doing git push at the same time
