@@ -1242,62 +1242,61 @@ class RFSwarmBase:
 		pathout = pathin
 		base.debugmsg(8, "pathout:", pathout)
 
-		while resfile.find("${") > -1:
-			# Issue #129 Handle `${CURDIR}/`
-			if pathout.find("${CURDIR}") > -1:
-				pathmod = pathout.replace("${CURDIR}", "")
+		# Issue #129 Handle `${CURDIR}/`
+		if pathout.find("${CURDIR}") > -1:
+			pathmod = pathout.replace("${CURDIR}", "")
+			base.debugmsg(8, "pathmod:", pathmod)
+			# https://stackoverflow.com/questions/1945920/why-doesnt-os-path-join-work-in-this-case
+			if platform.system() == "Windows":
+				pathmod = pathmod.replace("/", os.path.sep)
 				base.debugmsg(8, "pathmod:", pathmod)
-				# https://stackoverflow.com/questions/1945920/why-doesnt-os-path-join-work-in-this-case
-				if platform.system() == "Windows":
-					pathmod = pathmod.replace("/", os.path.sep)
-					base.debugmsg(8, "pathmod:", pathmod)
-					pathout = os.path.abspath(os.path.join(localdir, *pathmod.split(os.path.sep)))
-					pathout = pathout.replace(r'${\}', r'${/}')
-				else:
-					pathout = os.path.abspath(os.path.join(os.path.sep, *localdir.split(os.path.sep), *pathmod.split(os.path.sep)))
-				base.debugmsg(8, "pathout:", pathout)
-
-			# Built-in variables - https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#built-in-variables
-
-			# ${TEMPDIR}
-			if pathout.find("${TEMPDIR}") > -1:
-				tmpdir = tempfile.gettempdir()
-				pathout = pathout.replace("${TEMPDIR}", tmpdir)
-				base.debugmsg(8, "pathout:", pathout)
-
-			# ${EXECDIR}
-			# not sure how to handle this for now
-
-			# ${/}
-			base.debugmsg(8, "pathout.find:", pathout.find("${/}"))
-			if pathout.find("${/}") > -1:
-				base.debugmsg(8, "Found ${/} in", pathout)
-				if pathout.find("${/}") == 0:
-					pathlst = ["${rfpv}"] + pathout.split("${/}")
-					base.debugmsg(8, "pathlst:", pathlst)
-					pathjoin = os.path.join(*pathlst)
-					base.debugmsg(8, "pathjoin:", pathjoin)
-					pathjoin = pathjoin.replace("${rfpv}", "")
-					base.debugmsg(8, "pathjoin:", pathjoin)
-				else:
-					pathlst = pathout.split("${/}")
-					base.debugmsg(8, "pathlst:", pathlst)
-					pathjoin = os.path.join(*pathlst)
-					base.debugmsg(8, "pathjoin:", pathjoin)
-
-				if os.path.isfile(pathjoin):
-					base.debugmsg(8, "pathjoin:", pathjoin)
-					pathout = pathjoin
-					base.debugmsg(8, "pathout:", pathout)
-				else:
-					base.debugmsg(8, "pathjoin:", pathjoin)
-					pathout = self.localrespath(localdir, pathjoin)
-					base.debugmsg(8, "pathout:", pathout)
-
-			# ${:}
-			# ${\n}
-			# not sure whether to handle these for now
+				pathout = os.path.abspath(os.path.join(localdir, *pathmod.split(os.path.sep)))
+				pathout = pathout.replace(r'${\}', r'${/}')
+			else:
+				pathout = os.path.abspath(os.path.join(os.path.sep, *localdir.split(os.path.sep), *pathmod.split(os.path.sep)))
 			base.debugmsg(8, "pathout:", pathout)
+
+		# Built-in variables - https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#built-in-variables
+
+		# ${TEMPDIR}
+		if pathout.find("${TEMPDIR}") > -1:
+			tmpdir = tempfile.gettempdir()
+			pathout = pathout.replace("${TEMPDIR}", tmpdir)
+			base.debugmsg(8, "pathout:", pathout)
+
+		# ${EXECDIR}
+		# not sure how to handle this for now
+
+		# ${/}
+		base.debugmsg(8, "pathout.find:", pathout.find("${/}"))
+		if pathout.find("${/}") > -1:
+			base.debugmsg(8, "Found ${/} in", pathout)
+			if pathout.find("${/}") == 0:
+				pathlst = ["${rfpv}"] + pathout.split("${/}")
+				base.debugmsg(8, "pathlst:", pathlst)
+				pathjoin = os.path.join(*pathlst)
+				base.debugmsg(8, "pathjoin:", pathjoin)
+				pathjoin = pathjoin.replace("${rfpv}", "")
+				base.debugmsg(8, "pathjoin:", pathjoin)
+			else:
+				pathlst = pathout.split("${/}")
+				base.debugmsg(8, "pathlst:", pathlst)
+				pathjoin = os.path.join(*pathlst)
+				base.debugmsg(8, "pathjoin:", pathjoin)
+
+			if os.path.isfile(pathjoin):
+				base.debugmsg(8, "pathjoin:", pathjoin)
+				pathout = pathjoin
+				base.debugmsg(8, "pathout:", pathout)
+			else:
+				base.debugmsg(8, "pathjoin:", pathjoin)
+				pathout = self.localrespath(localdir, pathjoin)
+				base.debugmsg(8, "pathout:", pathout)
+
+		# ${:}
+		# ${\n}
+		# not sure whether to handle these for now
+		base.debugmsg(8, "pathout:", pathout)
 
 		return pathout
 
