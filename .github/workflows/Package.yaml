@@ -9,6 +9,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # fetch-depth: 0
+          fetch-tags: true
       - uses: actions/setup-python@v5
         with:
           python-version: 3.x
@@ -17,8 +20,8 @@ jobs:
           sudo apt update -y
       - name: PIP Install
         run: pip install --upgrade build setuptools twine wheel
-      - name: Git fetch
-        run: git fetch --prune --unshallow
+      # - name: Git fetch
+      #   run: git fetch --prune --unshallow
       - name: Get Branch Name
         run: |
           branchname=$(git rev-parse --abbrev-ref HEAD)
