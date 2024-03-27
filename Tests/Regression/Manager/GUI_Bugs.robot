@@ -23,3 +23,23 @@ Suite Setup 	Set Platform
 #
 # 	Run Keyword 	Close Manager GUI ${platform}
 # 	Stop Agent
+
+Verify scenario file content for example robot
+	[Tags]	windows-latest	Issue #1
+	@{correct_data}		Set Variable	Example Test Case	example.robot
+	${scenario_name}	Set Variable	test_scenario
+
+	Open Manager GUI
+	Set Save Path And Filename	${correct_data}[1]
+	Create Example Robot File
+	Click Button	runscriptrow
+	Select Robot File	@{correct_data}
+	Click Button	select_test_case
+	Click Button	select_example
+	Click Menu 	 file
+	Click Menu 	 file_saveas
+	Save Scenario File	${scenario_name}
+	Verify scenario File	${scenario_name}	@{correct_data}
+	Delete Scenario File	${scenario_name}
+	Delete Example Robot File
+	Run Keyword		Close Manager GUI ${platform}

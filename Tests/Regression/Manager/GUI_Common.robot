@@ -2,6 +2,7 @@
 Library 	OperatingSystem
 Library 	Process
 Library 	String
+Library		Collections
 
 Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
@@ -45,7 +46,7 @@ Open Manager GUI
 	# ${process}= 	Start Process 	python3 	${pyfile_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
 	${process}= 	Start Process 	${cmd_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
 	Set Test Variable 	$process_manager 	${process}
-	Sleep 	10
+	Sleep 	3
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
 
@@ -59,6 +60,7 @@ Close Manager GUI
 	[Tags]	windows-latest		ubuntu-latest
 	Press Combination 	Key.esc
 	Press Combination 	x 	Key.ctrl
+	Press Combination 	n 	Key.ctrl
 	${result}= 	Wait For Process 	${process_manager} 	timeout=60
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	not ${running}
@@ -114,6 +116,29 @@ Click Button
 	Sleep 	0.1
 	Take A Screenshot
 
+Click Menu
+	[Arguments]		${menuname}
+	${menunamel}= 	Convert To Lower Case 	${menuname}
+	${img}=	Set Variable		manager_${platform}_menu_${menunamel}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	0.1
+	Take A Screenshot
+
+Click Dialog Button
+	[Arguments]		${btnname}
+	${btnnamel}= 	Convert To Lower Case 	${btnname}
+	${img}=	Set Variable		${platform}_explorer_${btnname}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	0.1
+	Take A Screenshot
 
 Resize Window
 	[Arguments]		${x}=0		${y}=0
@@ -131,3 +156,96 @@ Wait Agent Ready
 	Click Tab 	 Agents
 	${img}=	Set Variable		manager_${platform}_agents_ready.png
 	Wait For 	${img} 	 timeout=300
+
+Set Save Path And Filename
+	[Tags]	windows-latest
+	[Arguments]		${file_name}	${optional_path}=${None}
+	#TODO:	dont click any buttons to set save path in windows
+	Set Test Variable	${file_name}	${file_name}
+	Log		${file_name}
+
+	#---
+	Click Button	runopen
+	Sleep	2
+	Press Combination	Key.alt	d
+	Copy
+	Sleep	1
+	Press Combination	Key.alt	key.f4
+	Sleep	1
+	${clipboard}	Get Clipboard Content
+	Set Test Variable	${save_path}	${clipboard}
+	#---
+	#in linux/macos: [which rfswarm] command
+
+	Set Test Variable 	$file_name 	${file_name}
+	Run Keyword If	'${optional_path}' != '${None}'	
+	...	Set Test Variable	${save_path}	${optional_path}
+
+	Log		${save_path}
+
+Create Example Robot File
+	${example_robot_content}=	Set Variable	***Test Case***\nExample Test Case\n
+	Create File		${save_path}${/}${file_name}	content=${example_robot_content}
+
+Delete Example Robot File
+	Remove File		${save_path}${/}${file_name}
+	File Should Not Exist	${save_path}${/}${file_name}
+
+Select Robot File
+	[Tags]	windows-latest
+	[Arguments]		@{correct_data}
+	${robot_file_name}=		Set Variable		${correct_data}[1]
+	${robot_file_name}=		Get Substring	${robot_file_name}	0	-6
+	Log		${robot_file_name}
+
+	Sleep	1
+	TRY
+		Click Dialog Button		${file_name}
+	EXCEPT
+		Fatal Error		msg=File not found. Check directory.
+	END
+	Sleep	1
+	Click Dialog Button		open
+	Sleep	1
+
+Save Scenario File
+	[Arguments]		${scenario_name}
+	[Tags]	windows-latest
+	Sleep	1
+	Press Combination	Key.ctrl	a
+	Sleep	1
+	Type	${scenario_name}.rfs
+	Click Dialog Button		save
+	Sleep	1
+
+Delete Scenario File
+	[Arguments]		${scenario_name}
+	Remove File		${save_path}${/}${scenario_name}.rfs
+	File Should Not Exist	${save_path}${/}${scenario_name}.rfs
+
+Verify Scenario File
+	[Arguments]		${scenario_name}	@{correct_data}
+	Log	${scenario_name}.rfs
+	Log	${correct_data}
+	${scenario_content}=	Get scenario file content	${scenario_name}
+	Check scenario file content		${scenario_content}		@{correct_data}
+
+Get Scenario File Content
+	[Arguments]		${scenario_name}
+	${scenario_content}=	Get File	${save_path}${/}${scenario_name}.rfs
+	Should Not Be Empty	${scenario_content}
+	${scenario_content}=	Split String	${scenario_content}
+
+	RETURN	${scenario_content}
+
+Check Scenario File Content
+	[Arguments]		${scenario_content}		@{correct_data}
+	Log		${scenario_content}
+
+	${correct_robot_name}=	String.Split String		${correct_data}[0]
+	Log		${correct_robot_name}
+	${i}=	Collections.Get Index From List		${scenario_content}		test
+	Should Be Equal		${correct_robot_name}	${scenario_content}[${i + 2}:${i + 5}]
+
+	${i}=	Collections.Get Index From List		${scenario_content}		script
+	Should Be Equal		${correct_data}[1]	${scenario_content}[${i + 2}]
