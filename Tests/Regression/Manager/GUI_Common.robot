@@ -46,7 +46,7 @@ Open Manager GUI
 	# ${process}= 	Start Process 	python3 	${pyfile_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
 	${process}= 	Start Process 	${cmd_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
 	Set Test Variable 	$process_manager 	${process}
-	Sleep 	3
+	Sleep 	10
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
 
