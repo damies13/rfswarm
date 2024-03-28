@@ -137,7 +137,7 @@ Click Dialog Button
 	Wait For 	${img} 	 timeout=300
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Sleep 	0.1
+	Sleep 	1
 	Take A Screenshot
 
 Resize Window
@@ -157,38 +157,42 @@ Wait Agent Ready
 	${img}=	Set Variable		manager_${platform}_agents_ready.png
 	Wait For 	${img} 	 timeout=300
 
-Set Save Path And Filename
-	[Tags]	windows-latest
-	[Arguments]		${file_name}	${optional_path}=${None}
-	#TODO:	dont click any buttons to set save path in windows
-	Set Test Variable	${file_name}	${file_name}
-	Log		${file_name}
+Set Global Save Path And Filename
+	#sets global default global save path and file_name for robot
+	[Arguments]		${input_name}	${optional_path}=${None}
+	Set Test Variable	${file_name}	${input_name}
 
-	#---
-	Click Button	runopen
-	Sleep	2
-	Press Combination	Key.alt	d
-	Copy
-	Sleep	1
-	Press Combination	Key.alt	key.f4
-	Sleep	1
-	${clipboard}	Get Clipboard Content
-	Set Test Variable	${save_path}	${clipboard}
-	#---
-	#in linux/macos: [which rfswarm] command
+	${pip_data}=	Get Manager PIP Data
+	${pip_data_list}=	Split String	${pip_data}
+	${i}=	Get Index From List	${pip_data_list}	Location:
+	${location}=	Set Variable	${pip_data_list}[${i + 1}]
+
+	Set Test Variable	${save_path}	${location}${/}rfswarm_manager${/}
 
 	Set Test Variable 	$file_name 	${file_name}
 	Run Keyword If	'${optional_path}' != '${None}'	
 	...	Set Test Variable	${save_path}	${optional_path}
 
+	Log		${file_name}
 	Log		${save_path}
+
+Get Manager PIP Data
+	#manager must be installed with pip
+	Run Process	pip	show	rfswarm-manager	alias=data
+	${pip_data}	Get Process Result	data
+	Log	${pip_data.stdout}
+	RETURN		${pip_data.stdout}
 
 Create Example Robot File
 	${example_robot_content}=	Set Variable	***Test Case***\nExample Test Case\n
+	Variable Should Exist	${save_path}	msg="Global save path does not exist."
+	Variable Should Exist	${file_name}	msg="Global file name does not exist."
 	Create File		${save_path}${/}${file_name}	content=${example_robot_content}
 
 Delete Example Robot File
 	Remove File		${save_path}${/}${file_name}
+	Variable Should Exist	${save_path}	msg="Global save path does not exist."
+	Variable Should Exist	${file_name}	msg="Global file name does not exist."
 	File Should Not Exist	${save_path}${/}${file_name}
 
 Select Robot File
@@ -242,10 +246,10 @@ Check Scenario File Content
 	[Arguments]		${scenario_content}		@{correct_data}
 	Log		${scenario_content}
 
-	${correct_robot_name}=	String.Split String		${correct_data}[0]
+	${correct_robot_name}=	Split String		${correct_data}[0]
 	Log		${correct_robot_name}
-	${i}=	Collections.Get Index From List		${scenario_content}		test
+	${i}=	Get Index From List		${scenario_content}		test
 	Should Be Equal		${correct_robot_name}	${scenario_content}[${i + 2}:${i + 5}]
 
-	${i}=	Collections.Get Index From List		${scenario_content}		script
+	${i}=	Get Index From List		${scenario_content}		script
 	Should Be Equal		${correct_data}[1]	${scenario_content}[${i + 2}]
