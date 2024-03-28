@@ -131,7 +131,7 @@ Click Menu
 Click Dialog Button
 	[Arguments]		${btnname}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
-	${img}=	Set Variable		${platform}_explorer_${btnname}.png
+	${img}=	Set Variable		${platform}_dlgbtn_${btnname}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=300
