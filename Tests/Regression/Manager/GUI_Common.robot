@@ -206,7 +206,8 @@ Delete Example Robot File
 	Variable Should Exist	${file_name}	msg="Global file name does not exist."
 	File Should Not Exist	${save_path}${/}${file_name}
 
-Select Robot File
+Select Robot File windows
+	[Tags]	windows-latest
 	[Arguments]		@{correct_data}
 	${robot_file_name}=		Set Variable		${correct_data}[1]
 	${robot_file_name}=		Get Substring	${robot_file_name}	0	-6
@@ -216,6 +217,19 @@ Select Robot File
 	Click Dialog Button		${file_name}
 	Sleep	1
 	Click Dialog Button		open
+	Sleep	1
+
+Select Robot File ubuntu
+	[Tags]	ubuntu-latest
+	[Arguments]		@{correct_data}
+	${robot_file_name}=		Set Variable		${correct_data}[1]
+	${robot_file_name}=		Get Substring	${robot_file_name}	0	-6
+	Log		${robot_file_name}
+	Sleep	3
+	Take A Screenshot
+	Type	${correct_data}[1]
+	Sleep	1
+	Press Combination	Key.enter
 	Sleep	1
 
 Save Scenario File

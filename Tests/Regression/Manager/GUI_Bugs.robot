@@ -33,7 +33,7 @@ Verify scenario file content for example robot
 	Set Global Save Path And Filename	${correct_data}[1]
 	Create Example Robot File
 	Click Button	runscriptrow
-	Select Robot File	@{correct_data}
+	Run Keyword		Select Robot File ${platform}	@{correct_data}
 	Click Button	select_test_case
 	Click Button	select_example
 	Click Menu	file
