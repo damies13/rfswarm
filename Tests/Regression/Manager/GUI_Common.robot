@@ -62,7 +62,11 @@ Close Manager GUI
 	Press Combination 	x 	Key.ctrl
 	IF 	"${platform}" == "ubuntu"
 		Sleep	1
-		Click Button	close_no
+		TRY
+			Click Button	close_no
+		EXCEPT
+			No Operation 
+		END
 	ELSE
 		Press Combination 	n 	Key.ctrl
 	END
@@ -194,6 +198,7 @@ Create Example Robot File
 	Variable Should Exist	${save_path}	msg="Global save path does not exist."
 	Variable Should Exist	${file_name}	msg="Global file name does not exist."
 	Create File		${save_path}${/}${file_name}	content=${example_robot_content}
+	File Should Exist	${save_path}${/}${file_name}
 
 Delete Example Robot File
 	Remove File		${save_path}${/}${file_name}
@@ -206,13 +211,9 @@ Select Robot File
 	${robot_file_name}=		Set Variable		${correct_data}[1]
 	${robot_file_name}=		Get Substring	${robot_file_name}	0	-6
 	Log		${robot_file_name}
-
-	Sleep	1
-	TRY
-		Click Dialog Button		${file_name}
-	EXCEPT
-		Fatal Error		msg=File not found. Check directory.
-	END
+	Sleep	3
+	Take A Screenshot
+	Click Dialog Button		${file_name}
 	Sleep	1
 	Click Dialog Button		open
 	Sleep	1
