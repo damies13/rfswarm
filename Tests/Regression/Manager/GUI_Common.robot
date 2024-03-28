@@ -60,6 +60,12 @@ Close Manager GUI
 	[Tags]	windows-latest		ubuntu-latest
 	Press Combination 	Key.esc
 	Press Combination 	x 	Key.ctrl
+	IF 	"${platform}" == "ubuntu"
+		Sleep	1
+		Click Button	close_no
+	ELSE
+		Press Combination 	n 	Key.ctrl
+	END
 	Press Combination 	n 	Key.ctrl
 	${result}= 	Wait For Process 	${process_manager} 	timeout=60
 	${running}= 	Is Process Running 	${process_manager}
@@ -177,9 +183,9 @@ Set Global Save Path And Filename
 	Log		${save_path}
 
 Get Manager PIP Data
-	#manager must be installed with pip
 	Run Process	pip	show	rfswarm-manager	alias=data
 	${pip_data}	Get Process Result	data
+	Should Not Be Empty		${pip_data.stdout}		msg=Manager must be installed with pip
 	Log	${pip_data.stdout}
 	RETURN		${pip_data.stdout}
 
@@ -196,7 +202,6 @@ Delete Example Robot File
 	File Should Not Exist	${save_path}${/}${file_name}
 
 Select Robot File
-	[Tags]	windows-latest
 	[Arguments]		@{correct_data}
 	${robot_file_name}=		Set Variable		${correct_data}[1]
 	${robot_file_name}=		Get Substring	${robot_file_name}	0	-6
@@ -214,9 +219,6 @@ Select Robot File
 
 Save Scenario File
 	[Arguments]		${scenario_name}
-	[Tags]	windows-latest
-	Sleep	1
-	Press Combination	Key.ctrl	a
 	Sleep	1
 	Type	${scenario_name}.rfs
 	Click Dialog Button		save
