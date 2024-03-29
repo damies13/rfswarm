@@ -154,8 +154,8 @@ Resize Window
 	Move To 	@{coordinates}
 	Mouse Down
 	Move To 	@{coordinates2}
-	Mouse Up
 	Take A Screenshot
+	Mouse Up
 
 Wait Agent Ready
 	Click Tab 	 Agents
