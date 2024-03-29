@@ -189,12 +189,13 @@ Get Manager INI Location
 	RETURN	${location}${/}RFSwarmManager.ini
 
 Get Manager INI Data
+	${location}=	Get Manager INI Location
 	${ini_content}=	Get File	${location}
 	Log	${ini_content}
 	Should Not Be Empty	${ini_content}
 	RETURN	${ini_content}
 
-Set INI Data Windows Size
+Set INI Data Window Size
 	[Arguments]		${x_width}		${y_width}
 	${location}=	Get Manager INI Location
 	${ini_content}=		Get Manager INI Data
