@@ -211,6 +211,7 @@ Select Robot File
 	Take A Screenshot
 	Click Dialog Button		open
 	Sleep	1
+	Take A Screenshot
 
 Save Scenario File
 	[Arguments]		${scenario_name}
