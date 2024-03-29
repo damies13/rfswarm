@@ -211,7 +211,6 @@ Select Robot File
 	${robot_file_name}=		Set Variable		${correct_data}[1]
 	${robot_file_name}=		Get Substring	${robot_file_name}	0	-6
 	Log		${robot_file_name}
-	Sleep	3
 	Take A Screenshot
 	Click Dialog Button		${robot_file_name}_robot
 	Sleep	1

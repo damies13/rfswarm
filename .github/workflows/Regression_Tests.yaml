@@ -9,7 +9,7 @@ jobs:
       matrix:
         platform: [ubuntu-latest]
         python: ['3.9']
-      fail-fast: true
+      fail-fast: false
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout
@@ -206,7 +206,7 @@ jobs:
       matrix:
         platform: [ubuntu-latest]
         python: ['3.9']
-      fail-fast: true
+      fail-fast: false
     runs-on: ${{ matrix.platform }}
     steps:
       - name: "Echo Vars"
