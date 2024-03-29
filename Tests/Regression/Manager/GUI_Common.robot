@@ -138,8 +138,6 @@ Click Dialog Button
 	${img}=	Set Variable		${platform}_dlgbtn_${btnname}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
-	Sleep	20
-	Take A Screenshot
 	Wait For 	${img} 	 timeout=300
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
