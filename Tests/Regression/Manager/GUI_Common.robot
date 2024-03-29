@@ -155,6 +155,7 @@ Resize Window
 	Mouse Down
 	Move To 	@{coordinates2}
 	Mouse Up
+	Take A Screenshot
 
 Wait Agent Ready
 	Click Tab 	 Agents
