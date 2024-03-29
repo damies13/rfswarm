@@ -60,18 +60,12 @@ Close Manager GUI
 	[Tags]	windows-latest		ubuntu-latest
 	Press Combination 	Key.esc
 	Press Combination 	x 	Key.ctrl
-	IF 	"${platform}" == "ubuntu"
-		Sleep	1
-		TRY
-			Click Button	close_no
-		EXCEPT
-			No Operation 
-		END
-	ELSE
-		Press Combination 	n 	Key.ctrl
+	Sleep	10
+	${running}= 	Is Process Running 	${process_manager}
+	IF 	${running}
+		Click Dialog Button		no
 	END
-	Press Combination 	n 	Key.ctrl
-	${result}= 	Wait For Process 	${process_manager} 	timeout=60
+	${result}= 	Wait For Process 	${process_manager} 	timeout=50
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	not ${running}
 		Should Be Equal As Integers 	${result.rc} 	0
