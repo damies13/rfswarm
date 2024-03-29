@@ -167,12 +167,8 @@ Set Global Save Path And Filename
 	[Arguments]		${input_name}	${optional_path}=${None}
 	Set Test Variable	${file_name}	${input_name}
 
-	${pip_data}=	Get Manager PIP Data
-	${pip_data_list}=	Split String	${pip_data}
-	${i}=	Get Index From List	${pip_data_list}	Location:
-	${location}=	Set Variable	${pip_data_list}[${i + 1}]
-
-	Set Test Variable	${save_path}	${location}${/}rfswarm_manager${/}
+	${location}=	Get Manager Default Save Path
+	Set Test Variable	${save_path}	${location}
 
 	Set Test Variable 	$file_name 	${file_name}
 	Run Keyword If	'${optional_path}' != '${None}'	
@@ -180,6 +176,17 @@ Set Global Save Path And Filename
 
 	Log		${file_name}
 	Log		${save_path}
+
+Get Manager Default Save Path
+	${pip_data}=	Get Manager PIP Data
+	${pip_data_list}=	Split String	${pip_data}
+	${i}=	Get Index From List	${pip_data_list}	Location:
+	${location}=	Set Variable	${pip_data_list}[${i + 1}]
+	Return	${location}${/}rfswarm_manager${/}
+
+Get Manager INI Data
+	${location}=	Get Manager Default Save Path
+	RETURN	${location}${/}RFSwarmManager.ini
 
 Get Manager PIP Data
 	Run Process	pip	show	rfswarm-manager	alias=data
