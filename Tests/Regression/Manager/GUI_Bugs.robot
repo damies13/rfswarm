@@ -36,6 +36,7 @@ Verify scenario file content for example robot
 	Select Robot File	@{correct_data}
 	IF 	"${platform}" == "macos"
 		Resize Window	200
+	END
 	Click Button	select_test_case
 	Click Button	select_example
 	Click Button	runsave
