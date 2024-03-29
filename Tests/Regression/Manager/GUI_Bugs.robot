@@ -29,10 +29,8 @@ Verify scenario file content for example robot
 	@{correct_data}		Set Variable	Example Test Case	example.robot
 	${scenario_name}	Set Variable	test_scenario
 
+	Set INI Data Windows Size	900		400
 	Open Manager GUI
-	IF 	"${platform}" == "macos"
-		Resize Window	100	10
-	END
 	Set Global Save Path And Filename	${correct_data}[1]
 	Create Example Robot File
 	Click Button	runscriptrow

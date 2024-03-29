@@ -184,9 +184,31 @@ Get Manager Default Save Path
 	${location}=	Set Variable	${pip_data_list}[${i + 1}]
 	RETURN	${location}${/}rfswarm_manager${/}
 
-Get Manager INI Data
+Get Manager INI Location
 	${location}=	Get Manager Default Save Path
 	RETURN	${location}${/}RFSwarmManager.ini
+
+Get Manager INI Data
+	${ini_content}=	Get File	${location}
+	Log	${ini_content}
+	Should Not Be Empty	${ini_content}
+	RETURN	${ini_content}
+
+Set INI Data Windows Size
+	[Arguments]		${x_width}		${y_width}
+	${location}=	Get Manager INI Location
+	${ini_content}=		Get Manager INI Data
+
+	${ini_content_list}=	Split String	${ini_content}
+	${i}=	Get Index From List		${ini_content_list}		win_width
+	${j}=	Get Index From List		${ini_content_list}		win_height
+
+	Replace String	${ini_content}	${ini_content_list}[${i + 2}]		${x_width}
+	Replace String	${ini_content}	${ini_content_list}[${j + 2}]		${y_width}
+	Remove File		${location}
+	Log		${ini_content}
+	Append To File	${location}		${ini_content}
+
 
 Get Manager PIP Data
 	Run Process	pip	show	rfswarm-manager	alias=data
