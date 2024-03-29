@@ -25,7 +25,7 @@ Suite Setup 	Set Platform
 # 	Stop Agent
 
 Verify scenario file content for example robot
-	[Tags]	windows-latest	ubuntu-latest	Issue #1
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	@{correct_data}		Set Variable	Example Test Case	example.robot
 	${scenario_name}	Set Variable	test_scenario
 
