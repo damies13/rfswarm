@@ -30,13 +30,13 @@ Verify scenario file content for example robot
 	${scenario_name}	Set Variable	test_scenario
 
 	Open Manager GUI
+	IF 	"${platform}" == "macos"
+		Resize Window	300	100
+	END
 	Set Global Save Path And Filename	${correct_data}[1]
 	Create Example Robot File
 	Click Button	runscriptrow
 	Select Robot File	@{correct_data}
-	IF 	"${platform}" == "macos"
-		Resize Window	200
-	END
 	Click Button	select_test_case
 	Click Button	select_example
 	Click Button	runsave
