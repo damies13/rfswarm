@@ -182,7 +182,7 @@ Get Manager Default Save Path
 	${pip_data_list}=	Split String	${pip_data}
 	${i}=	Get Index From List	${pip_data_list}	Location:
 	${location}=	Set Variable	${pip_data_list}[${i + 1}]
-	Return	${location}${/}rfswarm_manager${/}
+	RETURN	${location}${/}rfswarm_manager${/}
 
 Get Manager INI Data
 	${location}=	Get Manager Default Save Path
