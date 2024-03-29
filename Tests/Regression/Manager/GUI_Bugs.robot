@@ -31,7 +31,7 @@ Verify scenario file content for example robot
 
 	Open Manager GUI
 	IF 	"${platform}" == "macos"
-		Resize Window	300	100
+		Resize Window	10	10
 	END
 	Set Global Save Path And Filename	${correct_data}[1]
 	Create Example Robot File
