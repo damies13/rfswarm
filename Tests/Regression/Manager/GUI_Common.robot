@@ -213,8 +213,9 @@ Select Robot File
 	Log		${robot_file_name}
 	Sleep	3
 	Take A Screenshot
-	Click Dialog Button		${file_name}
+	Click Dialog Button		${robot_file_name}_robot
 	Sleep	1
+	Take A Screenshot
 	Click Dialog Button		open
 	Sleep	1
 
