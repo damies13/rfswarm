@@ -38,7 +38,6 @@ Verify scenario file content for example robot
 	Click Button	select_example
 	Click Menu	file
 	Click Menu	file_saveas
-	Sleep	3
 	Save Scenario File	${scenario_name}
 	Verify scenario File	${scenario_name}	@{correct_data}
 	Delete Scenario File	${scenario_name}
