@@ -34,10 +34,11 @@ Verify scenario file content for example robot
 	Create Example Robot File
 	Click Button	runscriptrow
 	Select Robot File	@{correct_data}
+	IF 	"${platform}" == "macos"
+		Resize Window	200
 	Click Button	select_test_case
 	Click Button	select_example
-	Click Menu	file
-	Click Menu	file_saveas
+	Click Button	runsave
 	Save Scenario File	${scenario_name}
 	Verify scenario File	${scenario_name}	@{correct_data}
 	Delete Scenario File	${scenario_name}
