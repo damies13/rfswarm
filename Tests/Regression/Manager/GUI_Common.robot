@@ -204,8 +204,8 @@ Set INI Data Window Size
 	${i}=	Get Index From List		${ini_content_list}		win_width
 	${j}=	Get Index From List		${ini_content_list}		win_height
 
-	Replace String	${ini_content}	${ini_content_list}[${i + 2}]		${x_width}
-	Replace String	${ini_content}	${ini_content_list}[${j + 2}]		${y_width}
+	Replace String	${ini_content}	${ini_content}[${i + 2}]		${x_width}
+	Replace String	${ini_content}	${ini_content}[${j + 2}]		${y_width}
 	Remove File		${location}
 	Log		${ini_content}
 	Append To File	${location}		${ini_content}
