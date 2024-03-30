@@ -35,12 +35,11 @@ Verify scenario file content for example robot
 		Set INI Window Size		1300	400
 	END
 	Open Manager GUI
-	#Click Dialog Button		maximize_window
 	Set Global Save Path And Filename	${correct_data}[1]
 	Create Example Robot File
 	Click Button	runscriptrow
 	Select Robot File	@{correct_data}
-	Click Button	select_test_caseFAIL
+	Click Button	select_test_case
 	Click Button	select_example
 	Click Button	runsave
 	Save Scenario File	${scenario_name}

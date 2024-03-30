@@ -213,7 +213,7 @@ Set INI Window Size
 	Append To File	${location}		${ini_content}
 
 Get Manager PIP Data
-	Run Process	pip	show	rfswarm-manager	alias=data
+	Run Process	pip	show	rfswarm-manager		alias=data
 	${pip_data}	Get Process Result	data
 	Should Not Be Empty		${pip_data.stdout}		msg=Manager must be installed with pip
 	Log	${pip_data.stdout}
