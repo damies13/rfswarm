@@ -204,11 +204,12 @@ Set INI Window Size
 	${ini_content_list}=	Split String	${ini_content}
 	${i}=	Get Index From List		${ini_content_list}		win_width
 	${j}=	Get Index From List		${ini_content_list}		win_height
+
 	Log	${ini_content}
 	Log	${ini_content_list}[${i + 2}]
 	Log	${x_width}
 	Replace String	${ini_content}	${ini_content_list}[${i + 2}]		${x_width}
-	Replace String	${ini_content}	390		450
+	Replace String	${ini_content}	win_height = 390		win_height = 450
 	Remove File		${location}
 	Log		${ini_content}
 	Append To File	${location}		${ini_content}
