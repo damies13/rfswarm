@@ -202,7 +202,7 @@ Set INI Window Size
 	${ini_content_list}=	Split String	${ini_content}
 	${i}=	Get Index From List		${ini_content_list}		win_width
 	${j}=	Get Index From List		${ini_content_list}		win_height
-	IF	"${width}"" != "0"
+	IF	"${width}" != "0"
 		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${i + 2}]	${width}
 	END
 	IF	"${height}" != "0"
