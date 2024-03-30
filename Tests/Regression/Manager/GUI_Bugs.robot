@@ -32,7 +32,7 @@ Verify scenario file content for example robot
 	IF  "${platform}" == "macos"
 		Open Manager GUI
 		Run Keyword		Close Manager GUI ${platform}
-		Set INI Data Window Size	900		400
+		Set INI Window Size		900		400
 	END
 	Open Manager GUI
 	Set Global Save Path And Filename	${correct_data}[1]

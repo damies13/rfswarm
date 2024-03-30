@@ -195,7 +195,7 @@ Get Manager INI Data
 	Should Not Be Empty	${ini_content}
 	RETURN	${ini_content}
 
-Set INI Data Window Size
+Set INI Window Size
 	[Arguments]		${x_width}		${y_width}
 	${location}=	Get Manager INI Location
 	${ini_content}=		Get Manager INI Data
@@ -203,9 +203,11 @@ Set INI Data Window Size
 	${ini_content_list}=	Split String	${ini_content}
 	${i}=	Get Index From List		${ini_content_list}		win_width
 	${j}=	Get Index From List		${ini_content_list}		win_height
-
-	Replace String	${ini_content}	${ini_content}[${i + 2}]		${x_width}
-	Replace String	${ini_content}	${ini_content}[${j + 2}]		${y_width}
+	Log	${ini_content}
+	Log	${ini_content_list}[${i + 2}]
+	Log	${x_width}
+	Replace String	${ini_content}	${ini_content_list}[${i + 2}]		${x_width}
+	Replace String	${ini_content}	390		450
 	Remove File		${location}
 	Log		${ini_content}
 	Append To File	${location}		${ini_content}
