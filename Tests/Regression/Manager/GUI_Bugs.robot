@@ -33,7 +33,7 @@ Verify scenario file content for example robot
 		Set INI Window Size		1300
 	END
 	Open Manager GUI
-	Set Global Save Path And Filename	${correct_data}[1]
+	Set Global Filename And Default Save Path	${correct_data}[1]
 	Create Robot File
 	Click Button	runscriptrow
 	Select Robot File	@{correct_data}

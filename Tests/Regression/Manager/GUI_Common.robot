@@ -82,6 +82,7 @@ Close Manager GUI macos
 	# Click Image		manager_${platform}_menu_python3.png
 	Click Menu		rfswarm
 	Click Image		manager_${platform}_button_closewindow.png
+	Sleep	10
 	Take A Screenshot
 	${result}= 	Wait For Process 	${process_manager} 	timeout=60
 	${running}= 	Is Process Running 	${process_manager}
@@ -164,20 +165,20 @@ Wait Agent Ready
 	${img}=	Set Variable		manager_${platform}_agents_ready.png
 	Wait For 	${img} 	 timeout=300
 
-Set Global Save Path And Filename
+Set Global Filename And Default Save Path 
 	#sets global default global save path and file_name for robot
 	[Arguments]		${input_name}	${optional_path}=${None}
-	Set Test Variable	${file_name}	${input_name}
+	Set Test Variable	${global_name}	${input_name}
 
 	${location}=	Get Manager Default Save Path
-	Set Test Variable	${save_path}	${location}
+	Set Test Variable	${global_path}	${location}
 
-	Set Test Variable 	$file_name 	${file_name}
+	Set Test Variable 	$file_name 	${global_name}
 	Run Keyword If	'${optional_path}' != '${None}'	
-	...	Set Test Variable	${save_path}	${optional_path}
+	...	Set Test Variable	${global_path}	${optional_path}
 
-	Log		${file_name}
-	Log		${save_path}
+	Log		${global_name}
+	Log		${global_path}
 
 Get Manager Default Save Path
 	${pip_data}=	Get Manager PIP Data
@@ -229,7 +230,7 @@ Get Manager PIP Data
 	RETURN		${pip_data.stdout}
 
 Create Robot File
-	[Arguments]		${path}=${save_path}	${name}=${file_name}
+	[Arguments]		${path}=${global_path}	${name}=${global_name}
 	
 	${example_robot_content}=	Set Variable	***Test Case***\nExample Test Case\n
 	Variable Should Exist	${path}	msg="Global save path does not exist or path is not provided."
@@ -238,7 +239,7 @@ Create Robot File
 	File Should Exist	${path}${/}${name}
 
 Delete Robot File
-	[Arguments]		${path}=${save_path}	${name}=${file_name}
+	[Arguments]		${path}=${global_path}	${name}=${global_name}
 
 	Variable Should Exist	${path}	msg="Global save path does not exist or path is not provided."
 	Variable Should Exist	${name}	msg="Global file name does not exist or file name is not provided"
@@ -267,8 +268,8 @@ Save Scenario File
 
 Delete Scenario File
 	[Arguments]		${scenario_name}
-	Remove File		${save_path}${/}${scenario_name}.rfs
-	File Should Not Exist	${save_path}${/}${scenario_name}.rfs
+	Remove File		${global_path}${/}${scenario_name}.rfs
+	File Should Not Exist	${global_path}${/}${scenario_name}.rfs
 
 Verify Scenario File
 	[Arguments]		${scenario_name}	@{correct_data}
@@ -279,7 +280,7 @@ Verify Scenario File
 
 Get Scenario File Content
 	[Arguments]		${scenario_name}
-	${scenario_content}=	Get File	${save_path}${/}${scenario_name}.rfs
+	${scenario_content}=	Get File	${global_path}${/}${scenario_name}.rfs
 	Should Not Be Empty	${scenario_content}
 	${scenario_content}=	Split String	${scenario_content}
 
