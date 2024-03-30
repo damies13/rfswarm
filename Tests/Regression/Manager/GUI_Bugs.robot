@@ -32,7 +32,7 @@ Verify scenario file content for example robot
 	IF  "${platform}" == "macos"
 		Open Manager GUI
 		Run Keyword		Close Manager GUI ${platform}
-		Set INI Window Size		900		400
+		Set INI Window Size		1300	400
 	END
 	Open Manager GUI
 	#Click Dialog Button		maximize_window
@@ -40,7 +40,7 @@ Verify scenario file content for example robot
 	Create Example Robot File
 	Click Button	runscriptrow
 	Select Robot File	@{correct_data}
-	Click Button	select_test_case
+	Click Button	select_test_caseFAIL
 	Click Button	select_example
 	Click Button	runsave
 	Save Scenario File	${scenario_name}

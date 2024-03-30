@@ -196,15 +196,18 @@ Get Manager INI Data
 	RETURN	${ini_content}
 
 Set INI Window Size
-	[Arguments]		${width}		${height}
+	[Arguments]		${width}=0		${height}=0
 	${location}=	Get Manager INI Location
 	${ini_content}=		Get Manager INI Data
 	${ini_content_list}=	Split String	${ini_content}
 	${i}=	Get Index From List		${ini_content_list}		win_width
 	${j}=	Get Index From List		${ini_content_list}		win_height
-
-	${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${i + 2}]		${width}
-	${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${j + 2}]		${height}
+	IF	"${width}"" != "0"
+		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${i + 2}]	${width}
+	END
+	IF	"${height}" != "0"
+		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${j + 2}]	${height}
+	END
 	Remove File		${location}
 	Log		${ini_content}
 	Append To File	${location}		${ini_content}
