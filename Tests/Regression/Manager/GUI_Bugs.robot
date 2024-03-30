@@ -30,7 +30,7 @@ Verify scenario file content for example robot
 	${scenario_name}	Set Variable	test_scenario
 
 	IF  "${platform}" == "macos"
-		Set INI Window Size		1300	400
+		Set INI Window Size		1300
 	END
 	Open Manager GUI
 	Set Global Save Path And Filename	${correct_data}[1]
@@ -40,8 +40,6 @@ Verify scenario file content for example robot
 	Click Button	select_test_case
 	Click Button	select_example
 	Click Button	runsave
-	Sleep	3
-	Take A Screenshot
 	Save Scenario File	${scenario_name}
 	Verify scenario File	${scenario_name}	@{correct_data}
 	Delete Scenario File	${scenario_name}

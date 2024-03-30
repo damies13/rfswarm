@@ -232,15 +232,17 @@ Create Example Robot File
 	
 	${example_robot_content}=	Set Variable	***Test Case***\nExample Test Case\n
 	Variable Should Exist	${path}	msg="Global save path does not exist or path is not provided."
-	Variable Should Exist	${name}	msg="Global file name does not exist or file name id not provided."
+	Variable Should Exist	${name}	msg="Global file name does not exist or file name is not provided."
 	Create File		${path}${/}${name}	content=${example_robot_content}
 	File Should Exist	${path}${/}${name}
 
 Delete Example Robot File
-	Remove File		${save_path}${/}${file_name}
-	Variable Should Exist	${save_path}	msg="Global save path does not exist."
-	Variable Should Exist	${file_name}	msg="Global file name does not exist."
-	File Should Not Exist	${save_path}${/}${file_name}
+	[Arguments]		${path}=${save_path}	${name}=${file_name}
+
+	Remove File		${path}${/}${name}
+	Variable Should Exist	${path}	msg="Global save path does not exist or path is not provided."
+	Variable Should Exist	${name}	msg="Global file name does not exist or file name is not provided"
+	File Should Not Exist	${path}${/}${name}
 
 Select Robot File
 	[Arguments]		@{correct_data}
@@ -258,6 +260,8 @@ Save Scenario File
 	[Arguments]		${scenario_name}
 	Sleep	1
 	Type	${scenario_name}.rfs
+	Sleep	3
+	Take A Screenshot
 	Click Dialog Button		save
 	Sleep	1
 
