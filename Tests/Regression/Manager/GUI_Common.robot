@@ -228,11 +228,13 @@ Get Manager PIP Data
 	RETURN		${pip_data.stdout}
 
 Create Example Robot File
+	[Arguments]		${path}=${save_path}	${name}=${file_name}
+	
 	${example_robot_content}=	Set Variable	***Test Case***\nExample Test Case\n
-	Variable Should Exist	${save_path}	msg="Global save path does not exist."
-	Variable Should Exist	${file_name}	msg="Global file name does not exist."
-	Create File		${save_path}${/}${file_name}	content=${example_robot_content}
-	File Should Exist	${save_path}${/}${file_name}
+	Variable Should Exist	${path}	msg="Global save path does not exist or path is not provided."
+	Variable Should Exist	${name}	msg="Global file name does not exist or file name id not provided."
+	Create File		${path}${/}${name}	content=${example_robot_content}
+	File Should Exist	${path}${/}${name}
 
 Delete Example Robot File
 	Remove File		${save_path}${/}${file_name}

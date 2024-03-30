@@ -40,6 +40,8 @@ Verify scenario file content for example robot
 	Click Button	select_test_case
 	Click Button	select_example
 	Click Button	runsave
+	Sleep	3
+	Take A Screenshot
 	Save Scenario File	${scenario_name}
 	Verify scenario File	${scenario_name}	@{correct_data}
 	Delete Scenario File	${scenario_name}
