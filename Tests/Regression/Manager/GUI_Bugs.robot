@@ -35,7 +35,7 @@ Verify scenario file content for example robot
 		Set INI Window Size		900		400
 	END
 	Open Manager GUI
-	Click Dialog Button		maximize_window
+	#Click Dialog Button		maximize_window
 	Set Global Save Path And Filename	${correct_data}[1]
 	Create Example Robot File
 	Click Button	runscriptrow

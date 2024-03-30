@@ -196,24 +196,18 @@ Get Manager INI Data
 	RETURN	${ini_content}
 
 Set INI Window Size
-	[Arguments]		${x_width}		${y_width}
+	[Arguments]		${width}		${height}
 	${location}=	Get Manager INI Location
 	${ini_content}=		Get Manager INI Data
-	Convert To String	${ini_content}
-	Should Be String	${ini_content}
 	${ini_content_list}=	Split String	${ini_content}
 	${i}=	Get Index From List		${ini_content_list}		win_width
 	${j}=	Get Index From List		${ini_content_list}		win_height
 
-	Log	${ini_content}
-	Log	${ini_content_list}[${i + 2}]
-	Log	${x_width}
-	Replace String	${ini_content}	${ini_content_list}[${i + 2}]		${x_width}
-	Replace String	${ini_content}	win_height = 390		win_height = 450
+	${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${i + 2}]		${width}
+	${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${j + 2}]		${height}
 	Remove File		${location}
 	Log		${ini_content}
 	Append To File	${location}		${ini_content}
-
 
 Get Manager PIP Data
 	Run Process	pip	show	rfswarm-manager	alias=data
