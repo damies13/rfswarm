@@ -199,7 +199,8 @@ Set INI Window Size
 	[Arguments]		${x_width}		${y_width}
 	${location}=	Get Manager INI Location
 	${ini_content}=		Get Manager INI Data
-
+	Convert To String	${ini_content}
+	Should Be String	${ini_content}
 	${ini_content_list}=	Split String	${ini_content}
 	${i}=	Get Index From List		${ini_content_list}		win_width
 	${j}=	Get Index From List		${ini_content_list}		win_height
