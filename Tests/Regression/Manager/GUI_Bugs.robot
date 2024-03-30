@@ -30,8 +30,6 @@ Verify scenario file content for example robot
 	${scenario_name}	Set Variable	test_scenario
 
 	IF  "${platform}" == "macos"
-		Open Manager GUI
-		Run Keyword		Close Manager GUI ${platform}
 		Set INI Window Size		1300	400
 	END
 	Open Manager GUI

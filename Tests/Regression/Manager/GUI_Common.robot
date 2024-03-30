@@ -144,6 +144,7 @@ Click Dialog Button
 	Sleep 	1
 	Take A Screenshot
 
+#TODO: Chceck if it works
 Resize Window
 	[Arguments]		${x}=0		${y}=0
 	# 											manager_macos_corner_resize
@@ -190,6 +191,13 @@ Get Manager INI Location
 
 Get Manager INI Data
 	${location}=	Get Manager INI Location
+	TRY
+		File Should Exist	${location}
+	EXCEPT
+		Open Manager GUI
+		Run Keyword		Close Manager GUI ${platform}
+		File Should Exist	${location}
+	END
 	${ini_content}=	Get File	${location}
 	Log	${ini_content}
 	Should Not Be Empty	${ini_content}
