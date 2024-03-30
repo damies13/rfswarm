@@ -83,8 +83,11 @@ Close Manager GUI macos
 	Click Menu		rfswarm
 	Click Image		manager_${platform}_button_closewindow.png
 	Sleep	10
-	Take A Screenshot
-	${result}= 	Wait For Process 	${process_manager} 	timeout=60
+	${running}= 	Is Process Running 	${process_manager}
+	IF 	${running}
+		Click Dialog Button		no
+	END
+	${result}= 	Wait For Process 	${process_manager} 	timeout=50
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	not ${running}
 		Should Be Equal As Integers 	${result.rc} 	0
