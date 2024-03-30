@@ -80,6 +80,7 @@ Close Manager GUI macos
 	# Press Combination 	Key.esc
 	# Press Combination 	q 	Key.command
 	# Click Image		manager_${platform}_menu_python3.png
+	Click Menu		rfswarm
 	Click Image		manager_${platform}_button_closewindow.png
 	Take A Screenshot
 	${result}= 	Wait For Process 	${process_manager} 	timeout=60
