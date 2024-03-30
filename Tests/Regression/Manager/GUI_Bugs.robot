@@ -34,7 +34,7 @@ Verify scenario file content for example robot
 	END
 	Open Manager GUI
 	Set Global Save Path And Filename	${correct_data}[1]
-	Create Example Robot File
+	Create Robot File
 	Click Button	runscriptrow
 	Select Robot File	@{correct_data}
 	Click Button	select_test_case
@@ -43,5 +43,5 @@ Verify scenario file content for example robot
 	Save Scenario File	${scenario_name}
 	Verify scenario File	${scenario_name}	@{correct_data}
 	Delete Scenario File	${scenario_name}
-	Delete Example Robot File
+	Delete Robot File
 	Run Keyword		Close Manager GUI ${platform}

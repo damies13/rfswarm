@@ -227,7 +227,7 @@ Get Manager PIP Data
 	Log	${pip_data.stdout}
 	RETURN		${pip_data.stdout}
 
-Create Example Robot File
+Create Robot File
 	[Arguments]		${path}=${save_path}	${name}=${file_name}
 	
 	${example_robot_content}=	Set Variable	***Test Case***\nExample Test Case\n
@@ -236,12 +236,12 @@ Create Example Robot File
 	Create File		${path}${/}${name}	content=${example_robot_content}
 	File Should Exist	${path}${/}${name}
 
-Delete Example Robot File
+Delete Robot File
 	[Arguments]		${path}=${save_path}	${name}=${file_name}
 
-	Remove File		${path}${/}${name}
 	Variable Should Exist	${path}	msg="Global save path does not exist or path is not provided."
 	Variable Should Exist	${name}	msg="Global file name does not exist or file name is not provided"
+	Remove File		${path}${/}${name}
 	File Should Not Exist	${path}${/}${name}
 
 Select Robot File
@@ -260,7 +260,6 @@ Save Scenario File
 	[Arguments]		${scenario_name}
 	Sleep	1
 	Type	${scenario_name}.rfs
-	Sleep	3
 	Take A Screenshot
 	Click Dialog Button		save
 	Sleep	1
