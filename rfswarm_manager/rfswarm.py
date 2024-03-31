@@ -5030,16 +5030,16 @@ class RFSwarmGUI(tk.Frame):
 			setingsWindow.injectsleepenabled = base.scriptdefaults["injectsleepenabled"]
 		base.debugmsg(5, "injectsleepenabled:", setingsWindow.injectsleepenabled)
 		# injectsleepminimumdefault = 15
-		setingsWindow.injectsleepminimumdefault = base.injectsleepminimumdefault
+		setingsWindow.injectsleepminimumdefault = int(base.injectsleepminimumdefault)
 		setingsWindow.injectsleepminimum = setingsWindow.injectsleepminimumdefault
-		if "injectsleepminimum" in base.scriptdefaults:
-			setingsWindow.injectsleepminimum = base.scriptdefaults["injectsleepminimum"]
+		if "injectsleepminimum" in base.scriptdefaults and len(base.scriptdefaults["injectsleepminimum"]) > 0:
+			setingsWindow.injectsleepminimum = int(base.scriptdefaults["injectsleepminimum"])
 		base.debugmsg(5, "injectsleepminimum:", setingsWindow.injectsleepminimum)
 		# injectsleepmaximumdefault = 45
-		setingsWindow.injectsleepmaximumdefault = base.injectsleepmaximumdefault
+		setingsWindow.injectsleepmaximumdefault = int(base.injectsleepmaximumdefault)
 		setingsWindow.injectsleepmaximum = setingsWindow.injectsleepmaximumdefault
-		if "injectsleepenabled" in base.scriptdefaults:
-			setingsWindow.injectsleepmaximum = base.scriptdefaults["injectsleepmaximum"]
+		if "injectsleepmaximum" in base.scriptdefaults and len(base.scriptdefaults["injectsleepmaximum"]) > 0:
+			setingsWindow.injectsleepmaximum = int(base.scriptdefaults["injectsleepmaximum"])
 		base.debugmsg(5, "injectsleepmaximum:", setingsWindow.injectsleepmaximum)
 
 
@@ -5326,7 +5326,7 @@ class RFSwarmGUI(tk.Frame):
 			# if "injectsleepenabled" in base.scriptdefaults:
 			# 	setingsWindow.injectsleepenabled = base.scriptdefaults["injectsleepenabled"]
 			ise = setingsWindow.boolISE.get()
-			base.debugmsg(7, "ise:", ise)
+			base.debugmsg(5, "ise:", ise, "default:", setingsWindow.injectsleepenableddefault)
 			if ise != setingsWindow.injectsleepenableddefault:
 				base.scriptdefaults["injectsleepenabled"] = str(ise)
 				self.plan_scnro_chngd = True
@@ -5335,6 +5335,28 @@ class RFSwarmGUI(tk.Frame):
 					del base.scriptdefaults["injectsleepenabled"]
 					self.plan_scnro_chngd = True
 
+			ismn = int(setingsWindow.inpISMN.get())
+			base.debugmsg(5, "ismn:", ismn, "default:", setingsWindow.injectsleepminimumdefault, "type:", type(ismn), type(setingsWindow.injectsleepminimumdefault))
+			if ismn != setingsWindow.injectsleepminimumdefault:
+				base.debugmsg(5, "Save ismn:", ismn)
+				base.scriptdefaults["injectsleepminimum"] = str(ismn)
+				self.plan_scnro_chngd = True
+			else:
+				base.debugmsg(5, "remove ismn?:", ismn)
+				if "injectsleepminimum" in base.scriptdefaults:
+					base.debugmsg(5, "remove ismn:", ismn)
+					del base.scriptdefaults["injectsleepminimum"]
+					self.plan_scnro_chngd = True
+
+			ismx = int(setingsWindow.inpISMX.get())
+			base.debugmsg(5, "ismx:", ismx, "default:", setingsWindow.injectsleepmaximumdefault, "type:", type(ismx), type(setingsWindow.injectsleepmaximumdefault))
+			if ismx != setingsWindow.injectsleepmaximumdefault:
+				base.scriptdefaults["injectsleepmaximum"] = str(ismx)
+				self.plan_scnro_chngd = True
+			else:
+				if "injectsleepmaximum" in base.scriptdefaults:
+					del base.scriptdefaults["injectsleepmaximum"]
+					self.plan_scnro_chngd = True
 
 
 			# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
