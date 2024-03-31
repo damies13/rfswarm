@@ -2716,6 +2716,19 @@ class RFSwarmCore:
 				if "robotoptions" in filedata[istr]:
 					base.scriptlist[ii]["robotoptions"] = filedata[istr]["robotoptions"]
 
+				# testrepeater = True
+				if "testrepeater" in filedata[istr]:
+					base.scriptlist[ii]["testrepeater"] = base.str2bool(filedata[istr]["testrepeater"])
+				# injectsleepenabled = True
+				if "injectsleepenabled" in filedata[istr]:
+					base.scriptlist[ii]["injectsleepenabled"] = base.str2bool(filedata[istr]["injectsleepenabled"])
+				# injectsleepminimum = 18
+				if "injectsleepminimum" in filedata[istr] and len(filedata[istr]["injectsleepminimum"]) > 0:
+					base.scriptlist[ii]["injectsleepminimum"] = int(filedata[istr]["injectsleepminimum"])
+				# injectsleepmaximum = 33
+				if "injectsleepmaximum" in filedata[istr] and len(filedata[istr]["injectsleepmaximum"]) > 0:
+					base.scriptlist[ii]["injectsleepmaximum"] = int(filedata[istr]["injectsleepmaximum"])
+
 				if "filters" in filedata[istr]:
 					base.debugmsg(9, "filedata[istr][filters]:", filedata[istr]["filters"], type(filedata[istr]["filters"]))
 					filtr = filedata[istr]["filters"].replace("'", '"')
@@ -5337,7 +5350,7 @@ class RFSwarmGUI(tk.Frame):
 
 			ismn = int(setingsWindow.inpISMN.get())
 			base.debugmsg(5, "ismn:", ismn, "default:", setingsWindow.injectsleepminimumdefault, "type:", type(ismn), type(setingsWindow.injectsleepminimumdefault))
-			if ismn != setingsWindow.injectsleepminimumdefault:
+			if ismn != setingsWindow.injectsleepminimumdefault and len(ismn) > 0:
 				base.debugmsg(5, "Save ismn:", ismn)
 				base.scriptdefaults["injectsleepminimum"] = str(ismn)
 				self.plan_scnro_chngd = True
@@ -5350,7 +5363,7 @@ class RFSwarmGUI(tk.Frame):
 
 			ismx = int(setingsWindow.inpISMX.get())
 			base.debugmsg(5, "ismx:", ismx, "default:", setingsWindow.injectsleepmaximumdefault, "type:", type(ismx), type(setingsWindow.injectsleepmaximumdefault))
-			if ismx != setingsWindow.injectsleepmaximumdefault:
+			if ismx != setingsWindow.injectsleepmaximumdefault and len(ismx) > 0:
 				base.scriptdefaults["injectsleepmaximum"] = str(ismx)
 				self.plan_scnro_chngd = True
 			else:
@@ -6325,10 +6338,9 @@ class RFSwarmGUI(tk.Frame):
 			stgsWindow.injectsleepminimumdefault = int(base.scriptdefaults["injectsleepminimum"])
 		stgsWindow.injectsleepminimum = stgsWindow.injectsleepminimumdefault
 		if "injectsleepminimum" in base.scriptlist[r]:
-			stgsWindow.testrepeatercurrent = int(base.scriptlist[r]["injectsleepminimum"])
+			stgsWindow.injectsleepminimum = int(base.scriptlist[r]["injectsleepminimum"])
 		base.debugmsg(5, "injectsleepminimum:", stgsWindow.injectsleepminimum)
 
-		# setingsWindow.injectsleepmaximumdefault = int(base.injectsleepmaximumdefault)
 		stgsWindow.injectsleepmaximumdefault = base.injectsleepmaximumdefault
 		if "injectsleepmaximum" in base.scriptdefaults:
 			stgsWindow.injectsleepmaximumdefault = int(base.scriptdefaults["injectsleepmaximum"])
@@ -6338,7 +6350,7 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(5, "injectsleepmaximum:", stgsWindow.injectsleepmaximum)
 
 		row = 0
-		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer before the filters
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
 		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
 
 		row += 1
@@ -6352,7 +6364,7 @@ class RFSwarmGUI(tk.Frame):
 		stgsWindow.inpEL.grid(column=0, row=row, columnspan=10, sticky="nsew")
 
 		row += 1
-		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer before the filters
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
 		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
 
 		row += 1
@@ -6366,7 +6378,7 @@ class RFSwarmGUI(tk.Frame):
 		stgsWindow.inpRO.grid(column=0, row=row, columnspan=10, sticky="nsew")
 
 		row += 1
-		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer before the filters
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
 		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
 
 		row += 1
@@ -6377,6 +6389,10 @@ class RFSwarmGUI(tk.Frame):
 		stgsWindow.boolTR.set(stgsWindow.testrepeatercurrent)
 		stgsWindow.inpTR = tk.Checkbutton(stgsWindow, variable=stgsWindow.boolTR, onvalue=True, offvalue=False)
 		stgsWindow.inpTR.grid(column=1, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
 
 		row += 1
 		stgsWindow.lblIS = ttk.Label(stgsWindow, text="Inject Sleep:")
@@ -6478,6 +6494,38 @@ class RFSwarmGUI(tk.Frame):
 			if "testrepeater" in base.scriptlist[r]:
 				del base.scriptlist[r]["testrepeater"]
 				self.plan_scnro_chngd = True
+
+		# Inject Sleep
+		ise = stgsWindow.boolISE.get()
+		base.debugmsg(7, "ise:", ise)
+		if ise != stgsWindow.injectsleepenableddefault:
+			base.scriptlist[r]["injectsleepenabled"] = str(ise)
+			self.plan_scnro_chngd = True
+		else:
+			if "injectsleepenabled" in base.scriptlist[r]:
+				del base.scriptlist[r]["injectsleepenabled"]
+				self.plan_scnro_chngd = True
+
+		ismn = stgsWindow.inpISMN.get()
+		base.debugmsg(7, "ismn:", ismn)
+		if ismn != stgsWindow.injectsleepminimumdefault and len(ismn) > 0:
+			base.scriptlist[r]["injectsleepminimum"] = str(ismn)
+			self.plan_scnro_chngd = True
+		else:
+			if "injectsleepminimum" in base.scriptlist[r]:
+				del base.scriptlist[r]["injectsleepminimum"]
+				self.plan_scnro_chngd = True
+
+		ismx = stgsWindow.inpISMX.get()
+		base.debugmsg(7, "ismx:", ismx)
+		if ismx != stgsWindow.injectsleepmaximumdefault and len(ismx) > 0:
+			base.scriptlist[r]["injectsleepmaximum"] = str(ismx)
+			self.plan_scnro_chngd = True
+		else:
+			if "injectsleepmaximum" in base.scriptlist[r]:
+				del base.scriptlist[r]["injectsleepmaximum"]
+				self.plan_scnro_chngd = True
+
 
 		base.debugmsg(7, "stgsWindow.Filters:", stgsWindow.Filters)
 		if len(stgsWindow.Filters.keys()) > 0:
