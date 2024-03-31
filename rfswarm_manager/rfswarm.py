@@ -6262,6 +6262,15 @@ class RFSwarmGUI(tk.Frame):
 		stgsWindow.transient(self.root)
 
 		stgsWindow.columnconfigure(0, weight=1)
+		stgsWindow.columnconfigure(1, weight=1)
+		stgsWindow.columnconfigure(2, weight=1)
+		stgsWindow.columnconfigure(3, weight=1)
+		stgsWindow.columnconfigure(4, weight=1)
+		stgsWindow.columnconfigure(5, weight=1)
+		stgsWindow.columnconfigure(6, weight=1)
+		stgsWindow.columnconfigure(7, weight=1)
+		stgsWindow.columnconfigure(8, weight=1)
+		stgsWindow.columnconfigure(9, weight=1)
 		# stgsWindow.rowconfigure(1, weight=1)
 
 		stgsWindow.title("Settings for row {}".format(r))
@@ -6303,6 +6312,31 @@ class RFSwarmGUI(tk.Frame):
 			stgsWindow.testrepeatercurrent = base.str2bool(base.scriptlist[r]["testrepeater"])
 		base.debugmsg(5, "testrepeatercurrent:", stgsWindow.testrepeatercurrent)
 
+		stgsWindow.injectsleepenableddefault = base.injectsleepenableddefault
+		if "injectsleepenabled" in base.scriptdefaults:
+			stgsWindow.injectsleepenableddefault = base.str2bool(base.scriptdefaults["injectsleepenabled"])
+		stgsWindow.injectsleepenabled = stgsWindow.injectsleepenableddefault
+		if "injectsleepenabled" in base.scriptlist[r]:
+			stgsWindow.injectsleepenabled = base.str2bool(base.scriptlist[r]["injectsleepenabled"])
+		base.debugmsg(5, "injectsleepenabled:", stgsWindow.injectsleepenabled)
+
+		stgsWindow.injectsleepminimumdefault = base.injectsleepminimumdefault
+		if "injectsleepminimum" in base.scriptdefaults:
+			stgsWindow.injectsleepminimumdefault = int(base.scriptdefaults["injectsleepminimum"])
+		stgsWindow.injectsleepminimum = stgsWindow.injectsleepminimumdefault
+		if "injectsleepminimum" in base.scriptlist[r]:
+			stgsWindow.testrepeatercurrent = int(base.scriptlist[r]["injectsleepminimum"])
+		base.debugmsg(5, "injectsleepminimum:", stgsWindow.injectsleepminimum)
+
+		# setingsWindow.injectsleepmaximumdefault = int(base.injectsleepmaximumdefault)
+		stgsWindow.injectsleepmaximumdefault = base.injectsleepmaximumdefault
+		if "injectsleepmaximum" in base.scriptdefaults:
+			stgsWindow.injectsleepmaximumdefault = int(base.scriptdefaults["injectsleepmaximum"])
+		stgsWindow.injectsleepmaximum = stgsWindow.injectsleepmaximumdefault
+		if "injectsleepmaximum" in base.scriptlist[r]:
+			stgsWindow.injectsleepmaximum = int(base.scriptlist[r]["injectsleepmaximum"])
+		base.debugmsg(5, "injectsleepmaximum:", stgsWindow.injectsleepmaximum)
+
 		row = 0
 		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer before the filters
 		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
@@ -6343,6 +6377,33 @@ class RFSwarmGUI(tk.Frame):
 		stgsWindow.boolTR.set(stgsWindow.testrepeatercurrent)
 		stgsWindow.inpTR = tk.Checkbutton(stgsWindow, variable=stgsWindow.boolTR, onvalue=True, offvalue=False)
 		stgsWindow.inpTR.grid(column=1, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblIS = ttk.Label(stgsWindow, text="Inject Sleep:")
+		stgsWindow.lblIS.grid(column=0, row=row, sticky="nsew")
+
+		stgsWindow.lblISE = ttk.Label(stgsWindow, text="Enabled")
+		stgsWindow.lblISE.grid(column=1, row=row, sticky="nsew")
+		stgsWindow.lblISMN = ttk.Label(stgsWindow, text="Minimum")
+		stgsWindow.lblISMN.grid(column=2, row=row, sticky="nsew")
+		stgsWindow.lblISMX = ttk.Label(stgsWindow, text="Maximum")
+		stgsWindow.lblISMX.grid(column=3, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.boolISE = tk.BooleanVar()
+		stgsWindow.boolISE.set(stgsWindow.injectsleepenabled)
+		stgsWindow.inpISE = tk.Checkbutton(stgsWindow, variable=stgsWindow.boolISE, onvalue=True, offvalue=False)
+		stgsWindow.inpISE.grid(column=1, row=row, sticky="nsew")
+
+		stgsWindow.inpISMN = ttk.Entry(stgsWindow, width=5, justify=tk.RIGHT)
+		stgsWindow.inpISMN.delete(0, 'end')
+		stgsWindow.inpISMN.insert(0, stgsWindow.injectsleepminimum)
+		stgsWindow.inpISMN.grid(column=2, row=row, sticky="nsew")
+
+		stgsWindow.inpISMX = ttk.Entry(stgsWindow, width=5, justify=tk.RIGHT)
+		stgsWindow.inpISMX.delete(0, 'end')
+		stgsWindow.inpISMX.insert(0, stgsWindow.injectsleepmaximum)
+		stgsWindow.inpISMX.grid(column=3, row=row, sticky="nsew")
 
 		row += 1
 		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer before the filters
