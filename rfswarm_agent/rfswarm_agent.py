@@ -866,7 +866,7 @@ class RFSwarmAgent():
 
 		self.jobs[jobid]["Iteration"] += 1
 
-		self.debugmsg(9, "self.jobs[jobid]:", self.jobs[jobid])
+		self.debugmsg(5, "self.jobs[jobid]:", self.jobs[jobid])
 
 		# jobfile = os.path.join(self.scriptdir, "job_{}.json".format(jobid))
 		jobfile = os.path.join(self.scriptdir, "RFS_Job_{}_{}.json".format(self.jobs[jobid]["ScriptIndex"], self.jobs[jobid]["Robot"]))
