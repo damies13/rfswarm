@@ -989,10 +989,10 @@ class RFSwarmAgent():
 			metavars.append("RFS_INJECTSLEEP:{}".format(self.jobs[jobid]["injectsleepenabled"]))
 			if self.str2bool(self.jobs[jobid]["injectsleepenabled"]):
 				# injectsleepminimum
-				if "injectsleepminimum" in self.jobs[jobid]
+				if "injectsleepminimum" in self.jobs[jobid]:
 					metavars.append("RFS_SLEEPMINIMUM:{}".format(self.jobs[jobid]["injectsleepminimum"]))
 				# injectsleepmaximum
-				if "injectsleepmaximum" in self.jobs[jobid]
+				if "injectsleepmaximum" in self.jobs[jobid]:
 					metavars.append("RFS_SLEEPMAXIMUM:{}".format(self.jobs[jobid]["injectsleepmaximum"]))
 
 		for metavar in metavars:
@@ -1623,10 +1623,14 @@ class RFSwarmAgent():
 		fd.append("				t = threading.Thread(target=self.send_result, args=(payload,))")
 		fd.append("				t.start()")
 		fd.append("")
-		fd.append("				if str(self.injectsleep).lower in ('true', 't', 'yes', '1'):")
+		fd.append("				self.debugmsg(7, 'injectsleep: ', self.injectsleep)")
+		fd.append("				if str(self.injectsleep).lower() in ('true', 't', 'yes', '1'):")
+		fd.append("					self.debugmsg(8, 'data.to_dict(): ', data.to_dict())")
 		fd.append("					if 'lineno' in data.to_dict():")
 		fd.append("						tmeslp = self.randsleep(self.sleepminimum, self.sleepmaximum)")
-		fd.append("						index = parent.to_dict()['body'].index(data.to_dict())")
+		fd.append("						self.debugmsg(7, 'tmeslp: ', tmeslp)")
+		fd.append("						index = data.parent.to_dict()['body'].index(data.to_dict())")
+		fd.append("						self.debugmsg(7, 'index: ', index)")
 		fd.append("						data.parent.body.insert(index + 1, running.Keyword('Sleep', [tmeslp, 'Sleep added by RFSwarm']))")
 		fd.append("")
 		fd.append("			else:")
@@ -1636,7 +1640,7 @@ class RFSwarmAgent():
 		fd.append("")
 		fd.append("	def randsleep(self, min, max):")
 		fd.append("		isfloat = False")
-		fd.append("		if "." in str(min) or "." in str(max):")
+		fd.append("		if '.' in str(min) or '.' in str(max):")
 		fd.append("			isfloat = True")
 		fd.append("		if isfloat:")
 		fd.append("			return random.uniform(float(min), float(max))")
@@ -1821,8 +1825,10 @@ class RFSwarmAgent():
 		fd.append("				t = threading.Thread(target=self.send_result, args=(payload,))")
 		fd.append("				t.start()")
 		fd.append("")
-		fd.append("				if str(self.injectsleep).lower in ('true', 't', 'yes', '1'):")
+		fd.append("				self.debugmsg(7, 'injectsleep: ', self.injectsleep)")
+		fd.append("				if str(self.injectsleep).lower() in ('true', 't', 'yes', '1'):")
 		fd.append("					tmeslp = self.randsleep(self.sleepminimum, self.sleepmaximum)")
+		fd.append("					self.debugmsg(7, 'tmeslp: ', tmeslp)")
 		fd.append("					BuiltIn().run_keyword('Sleep', tmeslp, 'Sleep added by RFSwarm')")
 		fd.append("")
 		fd.append("			else:")
@@ -1832,7 +1838,7 @@ class RFSwarmAgent():
 		fd.append("")
 		fd.append("	def randsleep(self, min, max):")
 		fd.append("		isfloat = False")
-		fd.append("		if "." in str(min) or "." in str(max):")
+		fd.append("		if '.' in str(min) or '.' in str(max):")
 		fd.append("			isfloat = True")
 		fd.append("		if isfloat:")
 		fd.append("			return random.uniform(float(min), float(max))")
