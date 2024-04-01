@@ -985,6 +985,16 @@ class RFSwarmAgent():
 		metavars.append("RFS_SWARMMANAGER:{}".format(self.swarmmanager))
 		metavars.append("RFS_EXCLUDELIBRARIES:{}".format(excludelibraries))
 
+		if "injectsleepenabled" in self.jobs[jobid]:
+			metavars.append("RFS_INJECTSLEEP:{}".format(self.jobs[jobid]["injectsleepenabled"]))
+			if self.str2bool(self.jobs[jobid]["injectsleepenabled"]):
+				# injectsleepminimum
+				if "injectsleepminimum" in self.jobs[jobid]
+					metavars.append("RFS_SLEEPMINIMUM:{}".format(self.jobs[jobid]["injectsleepminimum"]))
+				# injectsleepmaximum
+				if "injectsleepmaximum" in self.jobs[jobid]
+					metavars.append("RFS_SLEEPMAXIMUM:{}".format(self.jobs[jobid]["injectsleepmaximum"]))
+
 		for metavar in metavars:
 			cmd.append("-M {}".format(metavar))
 			cmd.append("-v {}".format(metavar))
