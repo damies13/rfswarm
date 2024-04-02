@@ -60,12 +60,12 @@ Close Manager GUI
 	[Tags]	windows-latest		ubuntu-latest
 	Press Combination 	Key.esc
 	Press Combination 	x 	Key.ctrl
-	Sleep	10
+	Sleep	5
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
 		Click Dialog Button		no
 	END
-	${result}= 	Wait For Process 	${process_manager} 	timeout=50
+	${result}= 	Wait For Process 	${process_manager} 	timeout=55
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	not ${running}
 		Should Be Equal As Integers 	${result.rc} 	0
@@ -82,12 +82,12 @@ Close Manager GUI macos
 	# Click Image		manager_${platform}_menu_python3.png
 	Click Menu		rfswarm
 	Click Image		manager_${platform}_button_closewindow.png
-	Sleep	10
+	Sleep	5
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
 		Click Dialog Button		no
 	END
-	${result}= 	Wait For Process 	${process_manager} 	timeout=50
+	${result}= 	Wait For Process 	${process_manager} 	timeout=55
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	not ${running}
 		Should Be Equal As Integers 	${result.rc} 	0
@@ -149,6 +149,11 @@ Click Dialog Button
 	Sleep 	1
 	Take A Screenshot
 
+Click Tab ${n} Times
+	Sleep	0.5
+	FOR  ${i}  IN RANGE  0  ${n}
+		Press Combination 	Key.tab
+	END
 #TODO: Chceck if it works
 Resize Window
 	[Arguments]		${x}=0		${y}=0
@@ -209,16 +214,16 @@ Get Manager INI Data
 	RETURN	${ini_content}
 
 Set INI Window Size
-	[Arguments]		${width}=0		${height}=0
+	[Arguments]		${width}=${None}	${height}=${None}
 	${location}=	Get Manager INI Location
 	${ini_content}=		Get Manager INI Data
 	${ini_content_list}=	Split String	${ini_content}
 	${i}=	Get Index From List		${ini_content_list}		win_width
 	${j}=	Get Index From List		${ini_content_list}		win_height
-	IF	"${width}" != "0"
+	IF	"${width}" != "${None}"
 		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${i + 2}]	${width}
 	END
-	IF	"${height}" != "0"
+	IF	"${height}" != "${None}"
 		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${j + 2}]	${height}
 	END
 	Remove File		${location}
@@ -241,17 +246,23 @@ Create Robot File
 	Create File		${path}${/}${name}	content=${example_robot_content}
 	File Should Exist	${path}${/}${name}
 
-Delete Robot File
-	[Arguments]		${path}=${global_path}	${name}=${global_name}
-
-	Variable Should Exist	${path}	msg="Global save path does not exist or path is not provided."
-	Variable Should Exist	${name}	msg="Global file name does not exist or file name is not provided"
-	Remove File		${path}${/}${name}
-	File Should Not Exist	${path}${/}${name}
+Change Test Group Settings
+	[Arguments]		@{row_settings_data}
+	Sleep	2
+	Click Dialog Button		row_settings_frame_name
+	Click Tab 1 Times
+	Type	${row_settings_data}[0]
+	Click Tab 1 Times
+	Type	${row_settings_data}[1]
+	IF  '${row_settings_data}[2]' == '${True}'
+		Click Button	checkbox_unch
+	END
+	Click Dialog Button		save
 
 Select Robot File
-	[Arguments]		@{correct_data}
-	${robot_file_name}=		Set Variable		${correct_data}[1]
+	[Arguments]		@{robot_data}
+	Sleep	2
+	${robot_file_name}=		Set Variable		${robot_data}[1]
 	${robot_file_name}=		Get Substring	${robot_file_name}	0	-6
 	Log		${robot_file_name}
 	Take A Screenshot
@@ -263,40 +274,27 @@ Select Robot File
 
 Save Scenario File
 	[Arguments]		${scenario_name}
-	Sleep	1
+	Sleep	5
 	Type	${scenario_name}.rfs
 	Take A Screenshot
 	Click Dialog Button		save
 	Sleep	1
+
+Get Scenario File Content
+	[Arguments]		${scenario_name}
+	${scenario_content}=	Get File	${global_path}${/}${scenario_name}.rfs
+	Should Not Be Empty	${scenario_content}
+
+	RETURN	${scenario_content}
 
 Delete Scenario File
 	[Arguments]		${scenario_name}
 	Remove File		${global_path}${/}${scenario_name}.rfs
 	File Should Not Exist	${global_path}${/}${scenario_name}.rfs
 
-Verify Scenario File
-	[Arguments]		${scenario_name}	@{correct_data}
-	Log	${scenario_name}.rfs
-	Log	${correct_data}
-	${scenario_content}=	Get scenario file content	${scenario_name}
-	Check scenario file content		${scenario_content}		@{correct_data}
-
-Get Scenario File Content
-	[Arguments]		${scenario_name}
-	${scenario_content}=	Get File	${global_path}${/}${scenario_name}.rfs
-	Should Not Be Empty	${scenario_content}
-	${scenario_content}=	Split String	${scenario_content}
-
-	RETURN	${scenario_content}
-
-Check Scenario File Content
-	[Arguments]		${scenario_content}		@{correct_data}
-	Log		${scenario_content}
-
-	${correct_robot_name}=	Split String		${correct_data}[0]
-	Log		${correct_robot_name}
-	${i}=	Get Index From List		${scenario_content}		test
-	Should Be Equal		${correct_robot_name}	${scenario_content}[${i + 2}:${i + 5}]
-
-	${i}=	Get Index From List		${scenario_content}		script
-	Should Be Equal		${correct_data}[1]	${scenario_content}[${i + 2}]
+Delete Robot File
+	[Arguments]		${path}=${global_path}	${name}=${global_name}
+	Variable Should Exist	${path}	msg="Global save path does not exist or path is not provided."
+	Variable Should Exist	${name}	msg="Global file name does not exist or file name is not provided"
+	Remove File		${path}${/}${name}
+	File Should Not Exist	${path}${/}${name}
