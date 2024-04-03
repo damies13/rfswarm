@@ -41,10 +41,8 @@ Insert Example Data To Manager
 			
 		END
 		Click Tab 2 Times
-		Take A Screenshot	#delete later
 		Click Button	selected_runscriptrow
 		Select Robot File	@{robot_data}
-		Take A Screenshot	#delete later
 		Click Button	selected_select_test_case
 		Take A Screenshot	#delete later
 		Click Button	select_example
