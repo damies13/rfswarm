@@ -257,7 +257,12 @@ Change Test Group Settings
 	IF  '${row_settings_data}[2]' == '${True}'
 		Click Button	checkbox_unch
 	END
-	Click Dialog Button		save
+	IF 	"${platform}" == "macos"
+		Click Dialog Button		save_2
+	ELSE
+		Click Dialog Button		save
+	END
+	
 
 Select Robot File
 	[Arguments]		@{robot_data}
