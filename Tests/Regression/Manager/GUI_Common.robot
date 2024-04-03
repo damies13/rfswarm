@@ -249,14 +249,12 @@ Create Robot File
 Change Test Group Settings
 	[Arguments]		@{row_settings_data}
 	Sleep	2
-	Take A Screenshot	#delete later
 	Click Dialog Button		row_settings_frame_name
 	Click Tab 1 Times
 	Type	${row_settings_data}[0]
 	Click Tab 1 Times
 	Type	${row_settings_data}[1]
 	IF  '${row_settings_data}[2]' == '${True}'
-		Take A Screenshot	#delete later
 		Click Button	checkbox_unch
 	END
 	Click Dialog Button		save
