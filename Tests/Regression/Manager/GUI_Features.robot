@@ -30,7 +30,7 @@ Insert Example Data To Manager
 			Take A Screenshot	#delete later
 			IF 	"${platform}" == "macos" and '${j}' == '1'
 				Click Button	default_robots
-				Click
+				Double Click
 			ELSE
 				Click Tab 1 Times
 			END
