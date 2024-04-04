@@ -33,8 +33,8 @@ Insert Example Data To Manager
 				Append To List	${run_robots}	${i}${j}${i}
 				Type	${i}${j}${i}
 			ELSE
-				Type	00:${i}${j}:${i}${j}
 				${time_in_s}=	Evaluate	str(${i}${j} * 60 + ${i}${j})
+				Type	${time_in_s}
 				Append To List	${run_times_in_s}	${time_in_s}
 				
 			END
