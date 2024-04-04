@@ -28,12 +28,7 @@ Insert Example Data To Manager
 		Sleep	2
 		FOR  ${j}  IN RANGE  1  5
 			Take A Screenshot	#delete later
-			IF 	"${platform}" == "macos" and '${j}' == '1'
-				Click Button	default_robots
-				Take A Screenshot	#delete later
-			ELSE
-				Click Tab 1 Times
-			END
+			Click Tab 1 Times
 			IF  '${j}' == '1' 
 				Append To List	${run_robots}	${i}${j}${i}
 				Type	${i}${j}${i}
@@ -55,18 +50,18 @@ Insert Example Data To Manager
 		Click Button	select_example
 		Click Tab 2 Times
 		Take A Screenshot	#delete later
-		IF 	"${platform}" == "macos"
-			${settings_coordinates}= 	
-			...    Locate	manager_macos_button_selected_runsettingsrow.png
-		END
-		Click Button	selected_runsettingsrow
-		Change Test Group Settings		@{row_settings_data}
-		IF 	"${platform}" == "macos"
-			Click To The Above Of	${settings_coordinates}		0
-			Sleep	1
-			Take A Screenshot	#delete later
-			Click Dialog Button		cancel
-		END
+		# IF 	"${platform}" == "macos"
+		# 	${settings_coordinates}= 	
+		# 	...    Locate	manager_macos_button_selected_runsettingsrow.png
+		# END
+		# Click Button	selected_runsettingsrow
+		# Change Test Group Settings		@{row_settings_data}
+		# IF 	"${platform}" == "macos"
+		# 	Click To The Above Of	${settings_coordinates}		0
+		# 	Sleep	1
+		# 	Take A Screenshot	#delete later
+		# 	Click Dialog Button		cancel
+		# END
 		Take A Screenshot	#delete later
 		Click Tab 1 Times
 		Take A Screenshot	#delete later
