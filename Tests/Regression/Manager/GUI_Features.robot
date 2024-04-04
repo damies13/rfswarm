@@ -28,8 +28,12 @@ Insert Example Data To Manager
 		Sleep	2
 		FOR  ${j}  IN RANGE  1  5
 			Take A Screenshot	#delete later
-			Click Tab 1 Times
-			Log	${j}
+			IF 	"${platform}" == "macos" and '${j}' == '1'
+				Click Button	default_robots
+				Click
+			ELSE
+				Click Tab 1 Times
+			END
 			IF  '${j}' == '1' 
 				Append To List	${run_robots}	${i}${j}
 				Type	${i}${j}
