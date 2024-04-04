@@ -29,10 +29,7 @@ Insert Example Data To Manager
 		FOR  ${j}  IN RANGE  1  5
 			Take A Screenshot	#delete later
 			IF 	"${platform}" == "macos" and '${j}' == '1'
-				Click Button	runaddrow
 				Click Button	default_robots
-				Take A Screenshot	#delete later
-				Double Click
 				Take A Screenshot	#delete later
 			ELSE
 				Click Tab 1 Times
