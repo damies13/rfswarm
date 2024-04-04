@@ -124,9 +124,9 @@ Verify Scenario File Robot Data
 		${test_offset}		Set Variable	${i + 13}
 		Should Be Equal		test	${scenario_content_list}[${test_offset}]
 		${test_name}=	Catenate	
-		...    ${scenario_content[${test_offset + 2}]}	
-		...    ${scenario_content[${test_offset + 3}]}	
-		...    ${scenario_content[${test_offset + 4}]}
+		...    ${scenario_content_list[${test_offset + 2}]}	
+		...    ${scenario_content_list[${test_offset + 3}]}	
+		...    ${scenario_content_list[${test_offset + 4}]}
 		Should Be Equal		${robot_data}[0]	${test_name}
 
 		${script_offset}		Set Variable	${i + 18}
@@ -149,8 +149,8 @@ Verify Scenario File Settings
 		${robot_options_offset}		Set Variable	${i + 24}
 		Should Be Equal		robotoptions	${scenario_content_list}[${robot_options_offset}]
 		${robot_options}=	Catenate	
-		...    ${scenario_content[${robot_options_offset + 2}]}	
-		...    ${scenario_content[${robot_options_offset + 3}]}
+		...    ${scenario_content_list[${robot_options_offset + 2}]}	
+		...    ${scenario_content_list[${robot_options_offset + 3}]}
 		Should Be Equal		${row_settings_data}[1]		${robot_options}
 
 		${repeater_offset}		Set Variable	${i + 28}
