@@ -11,6 +11,7 @@ Suite Setup 	Set Platform
 @{row_settings_data}=	BuiltIn,String,OperatingSystem,perftest,Collections
 ...    		-v var:examplevariable
 ...    		True
+@{macos_settings_location}
 ${scenario_name}=	test_scenario
 ${scenario_content}
 
@@ -50,22 +51,27 @@ Insert Example Data To Manager
 		Click Button	select_example
 		Click Tab 2 Times
 		Take A Screenshot	#delete later
-		# IF 	"${platform}" == "macos"
-		# 	${settings_coordinates}= 	
-		# 	...    Locate	manager_macos_button_selected_runsettingsrow.png
-		# END
-		# Click Button	selected_runsettingsrow
-		# Change Test Group Settings		@{row_settings_data}
-		# IF 	"${platform}" == "macos"
-		# 	Click To The Above Of	${settings_coordinates}		0
-		# 	Sleep	1
-		# 	Take A Screenshot	#delete later
-		# 	Click Dialog Button		cancel
-		# END
+		${settings_coordinates}=	
+		...    Locate	manager_macos_button_selected_runsettingsrow.png
+		Append To List	${macos_settings_location}	${settings_coordinates}
+		IF 	"${platform}" != "macos"
+			Click Button	selected_runsettingsrow
+			Change Test Group Settings		@{row_settings_data}
+		END
 		Take A Screenshot	#delete later
 		Click Tab 1 Times
 		Take A Screenshot	#delete later
 	END
+	IF 	"${platform}" == "macos"
+		FOR  ${i}  IN RANGE  1  4
+			Take A Screenshot	#delete later
+			Click To The Above Of	${macos_settings_location}[${i}]	0
+			Take A Screenshot	#delete later
+			Change Test Group Settings		@{row_settings_data}
+			Take A Screenshot	#delete later
+		END
+	END
+	
 
 Save Example Data To Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
