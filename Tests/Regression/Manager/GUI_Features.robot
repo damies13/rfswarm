@@ -30,7 +30,9 @@ Insert Example Data To Manager
 			Take A Screenshot	#delete later
 			IF 	"${platform}" == "macos" and '${j}' == '1'
 				Click Button	default_robots
+				Take A Screenshot	#delete later
 				Double Click
+				Take A Screenshot	#delete later
 			ELSE
 				Click Tab 1 Times
 			END
@@ -57,7 +59,9 @@ Insert Example Data To Manager
 		Take A Screenshot	#delete later
 		Click Button	selected_runsettingsrow
 		Change Test Group Settings		@{row_settings_data}
+		Take A Screenshot	#delete later
 		Click Tab 1 Times
+		Take A Screenshot	#delete later
 	END
 
 Save Example Data To Scenario
