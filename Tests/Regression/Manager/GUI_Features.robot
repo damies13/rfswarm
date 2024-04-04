@@ -63,7 +63,7 @@ Insert Example Data To Manager
 		Take A Screenshot	#delete later
 	END
 	IF 	"${platform}" == "macos"
-		FOR  ${i}  IN RANGE  1  4
+		FOR  ${i}  IN RANGE  0  3
 			Take A Screenshot	#delete later
 			Click To The Above Of	${macos_settings_location}[${i}]	0
 			Take A Screenshot	#delete later
