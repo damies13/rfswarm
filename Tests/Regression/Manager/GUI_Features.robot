@@ -29,6 +29,7 @@ Insert Example Data To Manager
 		FOR  ${j}  IN RANGE  1  5
 			Take A Screenshot	#delete later
 			IF 	"${platform}" == "macos" and '${j}' == '1'
+				Click Button	runaddrow
 				Click Button	default_robots
 				Take A Screenshot	#delete later
 				Double Click
@@ -37,8 +38,8 @@ Insert Example Data To Manager
 				Click Tab 1 Times
 			END
 			IF  '${j}' == '1' 
-				Append To List	${run_robots}	${i}${j}
-				Type	${i}${j}
+				Append To List	${run_robots}	${i}${j}${i}
+				Type	${i}${j}${i}
 			ELSE
 				Type	00:${i}${j}:${i}${j}
 				${time_in_s}=	Evaluate	str(${i}${j} * 60 + ${i}${j})
