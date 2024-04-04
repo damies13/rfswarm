@@ -27,6 +27,7 @@ Insert Example Data To Manager
 	FOR  ${i}  IN RANGE  1  4
 		Sleep	2
 		FOR  ${j}  IN RANGE  1  5
+			Take A Screenshot	#delete later
 			Click Tab 1 Times
 			Log	${j}
 			IF  '${j}' == '1' 
