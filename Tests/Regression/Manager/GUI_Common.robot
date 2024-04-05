@@ -154,6 +154,39 @@ Click Tab ${n} Times
 	FOR  ${i}  IN RANGE  0  ${n}
 		Press Combination 	Key.tab
 	END
+
+Click Label With Vertical Offset
+	[Arguments]		${labelname}	${offset}
+	[Documentation]	Click the image with the offset 
+	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down]. 
+	...	Give the image a full name, for example: button_runopen.
+	${labelname}= 	Convert To Lower Case 	${labelname}
+	${img}=	Set Variable		manager_${platform}_${labelname}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+	Log	${coordinates}
+	Click To The Below Of	${coordinates}	${offset}
+	Sleep 	0.1
+	Take A Screenshot
+
+Click Label With Horizon Offset
+	[Arguments]		${labelname}	${offset}
+	[Documentation]	Click the image with the offset 
+	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right]. 
+	...	Give the image a full name, for example: button_runopen.
+	${labelname}= 	Convert To Lower Case 	${labelname}
+	${img}=	Set Variable		manager_${platform}_${labelname}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+	Log	${coordinates}
+	Click To The Right Of	${coordinates}	${offset}
+	Sleep 	0.1
+	Take A Screenshot
+
 #TODO: Chceck if it works
 Resize Window
 	[Arguments]		${x}=0		${y}=0
