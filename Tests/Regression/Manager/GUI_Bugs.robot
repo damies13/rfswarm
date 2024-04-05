@@ -1,6 +1,5 @@
 *** Settings ***
 Resource 	GUI_Common.robot
-
 Suite Setup 	Set Platform
 
 *** Test Cases ***
