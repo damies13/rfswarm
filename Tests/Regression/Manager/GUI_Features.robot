@@ -11,7 +11,7 @@ Suite Setup 	Set Platform
 @{row_settings_data}=	BuiltIn,String,OperatingSystem,perftest,Collections
 ...    		-v var:examplevariable
 ...    		True
-#@{settings_locations}
+@{settings_locations}
 ${scenario_name}=	test_scenario
 ${scenario_content}
 ${scenario_content_list}
@@ -47,13 +47,13 @@ Insert Example Data To Manager
 		Click Button	selected_select_test_case
 		Click Button	select_example
 		Click Tab 2 Times
-		# ${settings_coordinates}=	
-		# ...    Locate	manager_${platform}_button_selected_runsettingsrow.png
-		# Append To List	${settings_locations}	${settings_coordinates}
+		${settings_coordinates}=	
+		...    Locate	manager_${platform}_button_selected_runsettingsrow.png
+		Append To List	${settings_locations}	${settings_coordinates}
 		Click Tab 1 Times
 	END
-	FOR  ${i}  IN  0  15  30
-		Click Label With Vertical Offset	button_runsettingsrow	${i}
+	FOR  ${i}  IN RANGE  0  3
+		Click To The Above Of	${settings_locations}[${i}]	0
 		Change Test Group Settings		@{row_settings_data}
 	END
 
