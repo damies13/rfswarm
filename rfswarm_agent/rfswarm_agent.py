@@ -1029,8 +1029,25 @@ class RFSwarmAgent():
 
 		self.debugmsg(9, "runthread: cmd:", cmd)
 
-		cmd.append("-o")
-		cmd.append('"' + outputFile + '"')
+		# disableloglog': 'True',
+		if "disableloglog" in self.jobs[jobid]:
+			if self.str2bool(self.jobs[jobid]["disableloglog"]):
+				cmd.append("-l NONE")
+		# 'disablelogreport': 'True',
+		if "disablelogreport" in self.jobs[jobid]:
+			if self.str2bool(self.jobs[jobid]["disablelogreport"]):
+				cmd.append("-r NONE")
+		# 'disablelogoutput': 'True',
+		disablelogoutput = False
+		if "disablelogoutput" in self.jobs[jobid]:
+			disablelogoutput = self.str2bool(self.jobs[jobid]["disablelogoutput"])
+		if self.xmlmode:
+			disablelogoutput = False
+		if disablelogoutput:
+			cmd.append("-o NONE")
+		else:
+			cmd.append("-o")
+			cmd.append('"' + outputFile + '"')
 
 		cmd.append('"' + localfile + '"')
 
