@@ -2731,6 +2731,15 @@ class RFSwarmCore:
 				# injectsleepmaximum = 33
 				if "injectsleepmaximum" in filedata[istr] and len(filedata[istr]["injectsleepmaximum"]) > 0:
 					base.scriptlist[ii]["injectsleepmaximum"] = int(filedata[istr]["injectsleepmaximum"])
+				# disableloglog
+				if "disableloglog" in filedata[istr]:
+					base.scriptlist[ii]["disableloglog"] = base.str2bool(filedata[istr]["disableloglog"])
+				# disablelogreport
+				if "disablelogreport" in filedata[istr]:
+					base.scriptlist[ii]["disablelogreport"] = base.str2bool(filedata[istr]["disablelogreport"])
+				# disablelogoutput
+				if "disablelogoutput" in filedata[istr]:
+					base.scriptlist[ii]["disablelogoutput"] = base.str2bool(filedata[istr]["disablelogoutput"])
 
 				if "filters" in filedata[istr]:
 					base.debugmsg(9, "filedata[istr][filters]:", filedata[istr]["filters"], type(filedata[istr]["filters"]))
@@ -5257,7 +5266,6 @@ class RFSwarmGUI(tk.Frame):
 		setingsWindow.boolDLO.set(setingsWindow.disablelogoutput)
 		setingsWindow.inpDLO = tk.Checkbutton(setingsWindow.fmeTestDefaults, variable=setingsWindow.boolDLO, onvalue=True, offvalue=False)
 		setingsWindow.inpDLO.grid(column=3, row=rownum, sticky="nsew")
-
 
 		# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 		# Manager
