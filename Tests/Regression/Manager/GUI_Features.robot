@@ -1,6 +1,7 @@
 *** Settings ***
 Library 	Collections
 Library 	String
+
 Resource 	GUI_Common.robot
 Suite Setup 	Set Platform
 
@@ -158,7 +159,7 @@ Verify Scenario File Settings
 		Should Be Equal		${row_settings_data}[2]		${scenario_content_list}[${repeater_offset + 2}]
 	END
 
-Chceck That The Scenario File Opens Correctly
+Check That The Scenario File Opens Correctly
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	Open Manager GUI
 	Set Global Filename And Default Save Path	${robot_data}[1]

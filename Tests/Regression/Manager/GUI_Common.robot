@@ -81,7 +81,7 @@ Close Manager GUI macos
 	# Press Combination 	q 	Key.command
 	# Click Image		manager_${platform}_menu_python3.png
 	Click Menu		rfswarm
-	Click Image		manager_${platform}_button_closewindow.png
+	Click Button	closewindow
 	Sleep	5
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
@@ -140,7 +140,7 @@ Click Menu
 Click Dialog Button
 	[Arguments]		${btnname}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
-	${img}=	Set Variable		${platform}_dlgbtn_${btnname}.png
+	${img}=	Set Variable		${platform}_dlgbtn_${btnnamel}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=300
@@ -171,7 +171,7 @@ Click Label With Vertical Offset
 	Sleep 	0.1
 	Take A Screenshot
 
-Click Label With Horizon Offset
+Click Label With Horizontal Offset
 	[Arguments]		${labelname}	${offset}
 	[Documentation]	Click the image with the offset 
 	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right]. 
@@ -206,11 +206,12 @@ Wait Agent Ready
 	${img}=	Set Variable		manager_${platform}_agents_ready.png
 	Wait For 	${img} 	 timeout=300
 
-Set Global Filename And Default Save Path 
-	#sets global default global save path and file_name for robot
+Set Global Filename And Default Save Path
+	[Documentation]	Sets global default save path as Test Variable and file name for robot test. 
+	...    You can also provide optional save path.
 	[Arguments]		${input_name}	${optional_path}=${None}
-	Set Test Variable	${global_name}	${input_name}
 
+	Set Test Variable	${global_name}	${input_name}
 	${location}=	Get Manager Default Save Path
 	Set Test Variable	${global_path}	${location}
 
@@ -287,7 +288,7 @@ Change Test Group Settings
 	Type	${row_settings_data}[0]
 	Click Tab 1 Times
 	Type	${row_settings_data}[1]
-	IF  '${row_settings_data}[2]' == '${True}'
+	IF  '${row_settings_data}[2]' == 'True'
 		Click Button	checkbox_unch
 	END
 	IF 	"${platform}" == "macos"
