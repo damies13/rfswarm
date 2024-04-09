@@ -81,7 +81,7 @@ Close Manager GUI macos
 	# Press Combination 	q 	Key.command
 	# Click Image		manager_${platform}_menu_python3.png
 	Click Menu		rfswarm
-	Click Image		manager_${platform}_button_closewindow.png
+	Click Button	closewindow
 	Sleep	5
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
@@ -100,6 +100,10 @@ Close Manager GUI macos
 Stop Agent
 	${result} = 	Terminate Process		${process_agent}
 	# Should Be Equal As Integers 	${result.rc} 	0
+
+Check If The Agent Has Connected To The Manager
+	Click Tab	Agents
+	Wait For 	manager_${platform}_agents_ready.png	timeout=300
 
 Click Tab
 	[Arguments]		${tabname}
@@ -140,7 +144,7 @@ Click Menu
 Click Dialog Button
 	[Arguments]		${btnname}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
-	${img}=	Set Variable		${platform}_dlgbtn_${btnname}.png
+	${img}=	Set Variable		${platform}_dlgbtn_${btnnamel}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=300
@@ -149,10 +153,11 @@ Click Dialog Button
 	Sleep 	1
 	Take A Screenshot
 
-Click Tab ${n} Times
+Press ${key} ${n} Times
+	[Documentation]	Provide full name. For example: Key.tab
 	Sleep	0.5
 	FOR  ${i}  IN RANGE  0  ${n}
-		Press Combination 	Key.tab
+		Press Combination 	${key}
 	END
 
 Click Label With Vertical Offset
@@ -171,7 +176,7 @@ Click Label With Vertical Offset
 	Sleep 	0.1
 	Take A Screenshot
 
-Click Label With Horizon Offset
+Click Label With Horizontal Offset
 	[Arguments]		${labelname}	${offset}
 	[Documentation]	Click the image with the offset 
 	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right]. 
@@ -206,17 +211,30 @@ Wait Agent Ready
 	${img}=	Set Variable		manager_${platform}_agents_ready.png
 	Wait For 	${img} 	 timeout=300
 
-Set Global Filename And Default Save Path 
-	#sets global default global save path and file_name for robot
+Set Global Filename And Default Save Path
+	[Documentation]	Sets global default save path as Test Variable and file name for robot test. 
+	...    You can also provide optional save path.
 	[Arguments]		${input_name}	${optional_path}=${None}
-	Set Test Variable	${global_name}	${input_name}
 
+	Set Test Variable	${global_name}	${input_name}
 	${location}=	Get Manager Default Save Path
 	Set Test Variable	${global_path}	${location}
 
 	Set Test Variable 	$file_name 	${global_name}
-	Run Keyword If	'${optional_path}' != '${None}'	
-	...	Set Test Variable	${global_path}	${optional_path}
+	IF  '${optional_path}' != '${None}'	
+		Set Test Variable	${global_path}	${optional_path}
+		${location}=	Get Manager INI Location
+		${ini_content}=		Get Manager INI Data
+		${ini_content_list}=	Split String	${ini_content}
+		${scriptdir}=	Get Index From List		${ini_content_list}		scriptdir
+
+		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${scriptdir + 2}]	${optional_path}
+		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${scriptdir + 5}]	${optional_path}
+
+		Remove File		${location}
+		Log		${ini_content}
+		Append To File	${location}		${ini_content}
+	END
 
 	Log		${global_name}
 	Log		${global_path}
@@ -271,9 +289,10 @@ Get Manager PIP Data
 	RETURN		${pip_data.stdout}
 
 Create Robot File
-	[Arguments]		${path}=${global_path}	${name}=${global_name}
+	[Arguments]		${path}=${global_path}	${name}=${global_name}	
+	...    ${file_content}=***Test Case***\nExample Test Case\n
 	
-	${example_robot_content}=	Set Variable	***Test Case***\nExample Test Case\n
+	${example_robot_content}=	Set Variable	${file_content}
 	Variable Should Exist	${path}	msg="Global save path does not exist or path is not provided."
 	Variable Should Exist	${name}	msg="Global file name does not exist or file name is not provided."
 	Create File		${path}${/}${name}	content=${example_robot_content}
@@ -283,11 +302,11 @@ Change Test Group Settings
 	[Arguments]		@{row_settings_data}
 	Sleep	2
 	Click Dialog Button		row_settings_frame_name
-	Click Tab 1 Times
+	Press Key.tab 1 Times
 	Type	${row_settings_data}[0]
-	Click Tab 1 Times
+	Press Key.tab 1 Times
 	Type	${row_settings_data}[1]
-	IF  '${row_settings_data}[2]' == '${True}'
+	IF  '${row_settings_data}[2]' == 'True'
 		Click Button	checkbox_unch
 	END
 	IF 	"${platform}" == "macos"
@@ -318,6 +337,14 @@ Save Scenario File
 	Click Dialog Button		save
 	Sleep	1
 
+Open Scenario File
+	[Arguments]		${scenario_name}
+	Sleep	5
+	Type	${scenario_name}.rfs
+	Take A Screenshot
+	Click Dialog Button		open
+	Sleep	1
+
 Get Scenario File Content
 	[Arguments]		${scenario_name}
 	${scenario_content}=	Get File	${global_path}${/}${scenario_name}.rfs
@@ -336,3 +363,8 @@ Delete Robot File
 	Variable Should Exist	${name}	msg="Global file name does not exist or file name is not provided"
 	Remove File		${path}${/}${name}
 	File Should Not Exist	${path}${/}${name}
+
+Delete Directory In Default Path
+	[Arguments]	${dir_name}
+	Remove Directory	${global_path}${/}${dir_name}	recursive=${True}
+

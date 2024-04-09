@@ -2,12 +2,14 @@
 Library 	Collections
 Library 	String
 Resource 	GUI_Common.robot
+Resource 	${CURDIR}${/}..${/}Agent${/}CommandLine_Common.robot
 Suite Setup 	Set Platform
 
 *** Variables ***
 @{run_robots}
 @{run_times_in_s}	#delay,		rump-up,	time
 @{robot_data}=	Example Test Case	example.robot
+#TODO: make dictionary:
 @{row_settings_data}=	BuiltIn,String,OperatingSystem,perftest,Collections
 ...    		-v var:examplevariable
 ...    		True
@@ -17,6 +19,86 @@ ${scenario_content}
 ${scenario_content_list}
 
 *** Test Cases ***
+Preparation For Testing Of Resource Files Copied To The Agent
+ 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	Run Agent
+	Open Manager GUI
+	Set Global Filename And Default Save Path	main
+	Copy Directory	${CURDIR}${/}testdata${/}Issue-52${/}buildin	${global_path}
+	Copy File	${CURDIR}${/}testdata${/}Issue-52${/}test_scenario.rfs	${global_path}
+	Click Button	runopen
+	Open Scenario File	test_scenario
+
+	Check If The Agent Has Connected To The Manager
+
+Resource Files For The Agent In The Same Directory
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	Click Tab	Plan
+	Click Button	select_test_case
+	Press Key.down 1 Times	
+	Press Combination	Key.enter
+	Click Button	runplay
+	Wait For 	manager_${platform}_button_finished_run.png 	 timeout=300
+	Take A Screenshot
+	Run Keyword And Expect Error	*result_name.png" was not found on screen
+	...    	Locate	manager_${platform}_result_name.png
+	
+Resource Files For The Agent In The Subdirectory
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	Click Tab	Plan
+	Click Button	select_test_case
+	Press Key.down 2 Times
+	Press Combination	Key.enter
+	Click Button	runplay
+	Wait For 	manager_${platform}_button_finished_run.png 	 timeout=300
+	Take A Screenshot
+	Run Keyword And Expect Error	*result_name.png" was not found on screen
+	...    	Locate	manager_${platform}_result_name.png
+
+Resource Files For The Agent in the Subdirectory of the Subdirectory
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	Click Tab	Plan
+	Click Button	select_test_case
+	Press Key.down 3 Times
+	Press Combination	Key.enter
+	Click Button	runplay
+	Wait For 	manager_${platform}_button_finished_run.png 	 timeout=300
+	Take A Screenshot
+	Run Keyword And Expect Error	*result_name.png" was not found on screen
+	...    	Locate	manager_${platform}_result_name.png
+
+Resource Files That Use Resource File For The Agent in the Subdirectory of the Subdirectory
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	Click Tab	Plan
+	Click Button	select_test_case
+	Press Key.down 4 Times
+	Press Combination	Key.enter
+	Click Button	runplay
+	Wait For 	manager_${platform}_button_finished_run.png 	 timeout=300
+	Take A Screenshot
+	Run Keyword And Expect Error	*result_name.png" was not found on screen
+	...    	Locate	manager_${platform}_result_name.png
+
+Resource Files For The Agent in the Parent Directory
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	Click Tab	Plan
+	Click Button	select_test_case
+	Press Key.down 5 Times
+	Press Combination	Key.enter
+	Click Button	runplay
+	Wait For 	manager_${platform}_button_finished_run.png 	 timeout=300
+	Take A Screenshot
+	Run Keyword And Expect Error	*result_name.png" was not found on screen
+	...    	Locate	manager_${platform}_result_name.png
+
+Clean Files
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	Set Global Filename And Default Save Path	main
+	Delete Scenario File	test_scenario
+	Delete Directory In Default Path	buildin
+	CommandLine_Common.Stop Agent
+	CommandLine_Common.Stop Manager
+
 Insert Example Data To Manager
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	Set INI Window Size		1200	600
@@ -29,7 +111,7 @@ Insert Example Data To Manager
 	FOR  ${i}  IN RANGE  1  4
 		Sleep	2
 		FOR  ${j}  IN RANGE  1  5
-			Click Tab 1 Times
+			Press Key.tab 1 Times
 			IF  '${j}' == '1' 
 				Append To List	${run_robots}	${i}${j}${i}
 				Type	${i}${j}${i}
@@ -41,16 +123,16 @@ Insert Example Data To Manager
 			END
 			
 		END
-		Click Tab 2 Times
+		Press Key.tab 2 Times
 		Click Button	selected_runscriptrow
 		Select Robot File	@{robot_data}
 		Click Button	selected_select_test_case
 		Click Button	select_example
-		Click Tab 2 Times
+		Press Key.tab 2 Times
 		${settings_coordinates}=	
 		...    Locate	manager_${platform}_button_selected_runsettingsrow.png
 		Append To List	${settings_locations}	${settings_coordinates}
-		Click Tab 1 Times
+		Press Key.tab 1 Times
 	END
 	FOR  ${i}  IN RANGE  0  3
 		Click To The Above Of	${settings_locations}[${i}]	0
