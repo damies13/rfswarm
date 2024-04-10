@@ -7,8 +7,8 @@ ${string3}	str3
 
 *** Keywords ***
 Resource Three
-	Log 	${CURDIR}
-	Log 	${EXECDIR}
 	Resource Three Second
 	Log 	${string3second}
 	Log 	${list3second}
+
+	RETURN	${CURDIR}\n${EXECDIR}

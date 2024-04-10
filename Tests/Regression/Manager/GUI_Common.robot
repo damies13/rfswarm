@@ -105,6 +105,19 @@ Check If The Agent Has Connected To The Manager
 	Click Tab	Agents
 	Wait For 	manager_${platform}_agents_ready.png	timeout=300
 
+Check If the Robot Failed
+	[Arguments] 	${expected_time}
+	Sleep	${expected_time}
+	TRY
+		Click Image 	manager_${platform}_button_abort
+		Press Combination	Key.enter
+	EXCEPT
+		Wait For	manager_${platform}_button_finished_run.png	timeout=300
+	END
+	Take A Screenshot
+	${status}=	Run Keyword And Return Status	Locate	manager_${platform}_testfailed.png
+	Run Keyword If	${status}	Fail	msg=Test failed. Check screenshots.
+
 Click Tab
 	[Arguments]		${tabname}
 	${tabnamel}= 	Convert To Lower Case 	${tabname}
@@ -328,6 +341,11 @@ Select Robot File
 	Take A Screenshot
 	Click Dialog Button		open
 	Sleep	1
+
+Select ${n} Robot Test Case
+	Click Button	select_test_case
+	Press Key.down ${n} Times	
+	Press Combination	Key.enter
 
 Save Scenario File
 	[Arguments]		${scenario_name}

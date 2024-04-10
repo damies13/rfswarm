@@ -4,5 +4,5 @@ ${stringm}	strm
 
 *** Keywords ***
 Resource Main
-	Log 	${CURDIR}
-	Log 	${EXECDIR}
+	[Documentation]	test
+	RETURN	${CURDIR}\n${EXECDIR}

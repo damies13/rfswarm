@@ -19,77 +19,67 @@ ${scenario_content}
 ${scenario_content_list}
 
 *** Test Cases ***
-Preparation For Testing Of Resource Files Copied To The Agent
+Preparation For Testing Of Resource Files Copied To the Agent
  	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Run Agent
+	Set INI Window Size		1300	600
+	CommandLine_Common.Run Agent
 	Open Manager GUI
 	Set Global Filename And Default Save Path	main
-	Copy Directory	${CURDIR}${/}testdata${/}Issue-52${/}buildin	${global_path}
+	Copy Directory	${CURDIR}${/}testdata${/}Issue-52${/}example	${global_path}
 	Copy File	${CURDIR}${/}testdata${/}Issue-52${/}test_scenario.rfs	${global_path}
 	Click Button	runopen
 	Open Scenario File	test_scenario
 
 	Check If The Agent Has Connected To The Manager
 
-Resource Files For The Agent In The Same Directory
+Resource Files For the Agent In The Same Directory
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	Click Tab	Plan
-	Click Button	select_test_case
-	Press Key.down 1 Times	
-	Press Combination	Key.enter
+	Select 1 Robot Test Case
 	Click Button	runplay
-	Wait For 	manager_${platform}_button_finished_run.png 	 timeout=300
-	Take A Screenshot
-	Run Keyword And Expect Error	*result_name.png" was not found on screen
-	...    	Locate	manager_${platform}_result_name.png
+	Check If the Robot Failed	33
 	
-Resource Files For The Agent In The Subdirectory
+Resource Files For the Agent In The Subdirectory
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	Click Tab	Plan
-	Click Button	select_test_case
-	Press Key.down 2 Times
-	Press Combination	Key.enter
+	Select 2 Robot Test Case
 	Click Button	runplay
-	Wait For 	manager_${platform}_button_finished_run.png 	 timeout=300
-	Take A Screenshot
-	Run Keyword And Expect Error	*result_name.png" was not found on screen
-	...    	Locate	manager_${platform}_result_name.png
+	Check If the Robot Failed	33
 
-Resource Files For The Agent in the Subdirectory of the Subdirectory
+Resource Files For the Agent in the Subdirectory of the Subdirectory
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	Click Tab	Plan
-	Click Button	select_test_case
-	Press Key.down 3 Times
-	Press Combination	Key.enter
+	Select 3 Robot Test Case
 	Click Button	runplay
-	Wait For 	manager_${platform}_button_finished_run.png 	 timeout=300
-	Take A Screenshot
-	Run Keyword And Expect Error	*result_name.png" was not found on screen
-	...    	Locate	manager_${platform}_result_name.png
+	Check If the Robot Failed	33
 
-Resource Files That Use Resource File For The Agent in the Subdirectory of the Subdirectory
+Resource Files That Use Resource File For the Agent in the Subdirectory of the Subdirectory
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	Click Tab	Plan
-	Click Button	select_test_case
-	Press Key.down 4 Times
-	Press Combination	Key.enter
+	Select 4 Robot Test Case
 	Click Button	runplay
-	Wait For 	manager_${platform}_button_finished_run.png 	 timeout=300
-	Take A Screenshot
-	Run Keyword And Expect Error	*result_name.png" was not found on screen
-	...    	Locate	manager_${platform}_result_name.png
+	Check If the Robot Failed	33
 
-Resource Files For The Agent in the Parent Directory
+Resource Files For the Agent in the Parent Directory
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	Click Tab	Plan
-	Click Button	select_test_case
-	Press Key.down 5 Times
-	Press Combination	Key.enter
+	Select 5 Robot Test Case
 	Click Button	runplay
-	Wait For 	manager_${platform}_button_finished_run.png 	 timeout=300
-	Take A Screenshot
-	Run Keyword And Expect Error	*result_name.png" was not found on screen
-	...    	Locate	manager_${platform}_result_name.png
+	Check If the Robot Failed	33
+
+Variable File For the Agent
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	Click Tab	Plan
+	Select 6 Robot Test Case
+	Click Button	runplay
+	Check If the Robot Failed	33
+
+Metadata Files For the Agent
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	Click Tab	Plan
+	Select 7 Robot Test Case
+	Click Button	runplay
+	Check If the Robot Failed	33
 
 Clean Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53

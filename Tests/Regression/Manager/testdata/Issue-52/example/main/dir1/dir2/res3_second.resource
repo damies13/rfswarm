@@ -4,5 +4,4 @@ ${string3second}	str3second
 
 *** Keywords ***
 Resource Three Second
-	Log 	${CURDIR}
-	Log 	${EXECDIR}
+	RETURN	${CURDIR}\n${EXECDIR}

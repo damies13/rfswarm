@@ -4,5 +4,5 @@ ${string1}	str1
 
 *** Keywords ***
 Resource One
-	Log 	${CURDIR}
-	Log 	${EXECDIR}
+	[Documentation]	test
+	RETURN	${CURDIR}\n${EXECDIR}
