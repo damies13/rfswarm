@@ -315,7 +315,7 @@ Create Robot File
 Change Test Group Settings
 	[Arguments]		&{row_settings_data}
 	Sleep	2
-	#Click Dialog Button		row_settings_frame_name
+	Click Dialog Button		row_settings_frame_name
 	Press Key.tab 1 Times
 	IF  'excludelibraries' in ${row_settings_data}
 		Type	${row_settings_data['excludelibraries']}

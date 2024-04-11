@@ -4,5 +4,5 @@ ${string1}	str1
 
 *** Keywords ***
 Resource One
-	[Documentation]	test data
+	[Documentation] 	RESOURCE FILE PRIOVIDED
 	No Operation

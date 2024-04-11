@@ -19,77 +19,6 @@ ${scenario_content}
 ${scenario_content_list}
 
 *** Test Cases ***
-Preparation For Testing Of Resource Files Copied To the Agent
- 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Set INI Window Size		1200	600
-	CommandLine_Common.Run Agent
-	Open Manager GUI
-	Set Global Filename And Default Save Path	main
-	Copy Directory	${CURDIR}${/}testdata${/}Issue-52${/}example	${global_path}
-	Copy File	${CURDIR}${/}testdata${/}Issue-52${/}test_scenario.rfs	${global_path}
-	Click Button	runopen
-	Open Scenario File	test_scenario
-
-	Check If The Agent Has Connected To The Manager
-
-Resource Files For the Agent In The Same Directory
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Click Tab	Plan
-	Select 1 Robot Test Case
-	Click Button	runplay
-	Check If the Robot Failed	53
-	
-Resource Files For the Agent In The Subdirectory
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Click Tab	Plan
-	Select 2 Robot Test Case
-	Click Button	runplay
-	Check If the Robot Failed	33
-
-Resource Files For the Agent in the Subdirectory of the Subdirectory
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Click Tab	Plan
-	Select 3 Robot Test Case
-	Click Button	runplay
-	Check If the Robot Failed	33
-
-Resource Files That Use Resource File For the Agent in the Subdirectory of the Subdirectory
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Click Tab	Plan
-	Select 4 Robot Test Case
-	Click Button	runplay
-	Check If the Robot Failed	33
-
-Resource Files For the Agent in the Parent Directory
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Click Tab	Plan
-	Select 5 Robot Test Case
-	Click Button	runplay
-	Check If the Robot Failed	33
-
-Variable File For the Agent
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Click Tab	Plan
-	Select 6 Robot Test Case
-	Click Button	runplay
-	Check If the Robot Failed	33
-
-Metadata Files For the Agent
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Click Tab	Plan
-	Select 7 Robot Test Case
-	Click Button	runplay
-	Check If the Robot Failed	53
-	Take A Screenshot
-
-Clean Files
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Set Global Filename And Default Save Path	main
-	Delete Scenario File	test_scenario
-	Delete Directory In Default Path	example
-	CommandLine_Common.Stop Agent
-	CommandLine_Common.Stop Manager
-
 Insert Example Data To Manager
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	Set INI Window Size		1200	600
@@ -253,4 +182,74 @@ Clean Files
 	Set Global Filename And Default Save Path	${robot_data}[1]
 	Delete Robot File
 	Delete Scenario File	${scenario_name}
+
+Preparation For Testing Of Resource Files Copied To the Agent
+ 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	Set INI Window Size		1200	600
+	CommandLine_Common.Run Agent
+	Open Manager GUI
+	Set Global Filename And Default Save Path	main
+	Copy Directory	${CURDIR}${/}testdata${/}Issue-52${/}example	${global_path}
+	Copy File	${CURDIR}${/}testdata${/}Issue-52${/}test_scenario.rfs	${global_path}
+	Click Button	runopen
+	Open Scenario File	test_scenario
+
+	Check If The Agent Has Connected To The Manager
+
+Resource Files For the Agent In The Same Directory
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	Click Tab	Plan
+	Select 1 Robot Test Case
+	Click Button	runplay
+	Check If the Robot Failed	33
 	
+Resource Files For the Agent In The Subdirectory
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	Click Tab	Plan
+	Select 2 Robot Test Case
+	Click Button	runplay
+	Check If the Robot Failed	33
+
+Resource Files For the Agent in the Subdirectory of the Subdirectory
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	Click Tab	Plan
+	Select 3 Robot Test Case
+	Click Button	runplay
+	Check If the Robot Failed	33
+
+Resource Files That Use Resource File For the Agent in the Subdirectory of the Subdirectory
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	Click Tab	Plan
+	Select 4 Robot Test Case
+	Click Button	runplay
+	Check If the Robot Failed	33
+
+Resource Files For the Agent in the Parent Directory
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	Click Tab	Plan
+	Select 5 Robot Test Case
+	Click Button	runplay
+	Check If the Robot Failed	33
+
+Variable File For the Agent
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	Click Tab	Plan
+	Select 6 Robot Test Case
+	Click Button	runplay
+	Check If the Robot Failed	33
+
+Metadata Files For the Agent
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	Click Tab	Plan
+	Select 7 Robot Test Case
+	Click Button	runplay
+	Check If the Robot Failed	70
+	Take A Screenshot
+
+Clean Files
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	Set Global Filename And Default Save Path	main
+	Delete Scenario File	test_scenario
+	Delete Directory In Default Path	example
+	CommandLine_Common.Stop Agent
+	CommandLine_Common.Stop Manager
