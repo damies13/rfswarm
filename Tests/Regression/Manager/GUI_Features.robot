@@ -21,7 +21,7 @@ ${scenario_content_list}
 *** Test Cases ***
 Preparation For Testing Of Resource Files Copied To the Agent
  	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Set INI Window Size		1300	600
+	Set INI Window Size		1200	600
 	CommandLine_Common.Run Agent
 	Open Manager GUI
 	Set Global Filename And Default Save Path	main
@@ -37,7 +37,7 @@ Resource Files For the Agent In The Same Directory
 	Click Tab	Plan
 	Select 1 Robot Test Case
 	Click Button	runplay
-	Check If the Robot Failed	33
+	Check If the Robot Failed	53
 	
 Resource Files For the Agent In The Subdirectory
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
@@ -80,7 +80,7 @@ Metadata Files For the Agent
 	Click Tab	Plan
 	Select 7 Robot Test Case
 	Click Button	runplay
-	Check If the Robot Failed	33
+	Check If the Robot Failed	53
 
 Clean Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
