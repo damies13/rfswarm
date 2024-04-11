@@ -4,7 +4,5 @@ ${string1}	str1
 
 *** Keywords ***
 Resource One
-	[Documentation]	
-	...    \n${CURDIR}	
-	...    ${EXECDIR}
-	RETURN	${CURDIR}\n${EXECDIR}
+	[Documentation]	test data
+	No Operation

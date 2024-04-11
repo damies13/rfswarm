@@ -80,6 +80,7 @@ Metadata Files For the Agent
 	Select 7 Robot Test Case
 	Click Button	runplay
 	Check If the Robot Failed	53
+	Take A Screenshot
 
 Clean Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
