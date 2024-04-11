@@ -4,7 +4,5 @@ ${string3second}	str3second
 
 *** Keywords ***
 Resource Three Second
-	[Documentation]	
-	...    \n${CURDIR}	
-	...    ${EXECDIR}
+	[Documentation] 	RESOURCE FILE PRIOVIDED	
 	RETURN	${CURDIR}\n${EXECDIR}

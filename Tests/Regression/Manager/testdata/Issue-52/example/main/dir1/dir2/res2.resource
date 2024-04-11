@@ -5,6 +5,4 @@ ${string2}	str2
 *** Keywords ***
 Resource Two
 	[Documentation] 	RESOURCE FILE PRIOVIDED	
-	...    \n${CURDIR}	
-	...    ${EXECDIR}
 	RETURN	${CURDIR}\n${EXECDIR}

@@ -5,6 +5,4 @@ ${string0}	str0
 *** Keywords ***
 Resource Zero
 	[Documentation] 	RESOURCE FILE PRIOVIDED	
-	...    \n${CURDIR}	
-	...    ${EXECDIR}
 	RETURN	${CURDIR}\n${EXECDIR}

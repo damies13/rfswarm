@@ -4,7 +4,5 @@ ${stringm}	strm
 
 *** Keywords ***
 Resource Main
-	[Documentation]	
-	...    \n${CURDIR}	
-	...    ${EXECDIR}
+	[Documentation] 	RESOURCE FILE PRIOVIDED	
 	RETURN	${CURDIR}\n${EXECDIR}

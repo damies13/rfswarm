@@ -7,11 +7,5 @@ ${string3}	str3
 
 *** Keywords ***
 Resource Three
-	[Documentation]	
-	...    \n${CURDIR}	
-	...    ${EXECDIR}
-	Resource Three Second
-	Log 	${string3second}
-	Log 	${list3second}
-
+	[Documentation] 	RESOURCE FILE PRIOVIDED	
 	RETURN	${CURDIR}\n${EXECDIR}
