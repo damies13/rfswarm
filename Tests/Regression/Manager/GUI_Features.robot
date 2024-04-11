@@ -176,7 +176,7 @@ Chceck That The Scenario File Opens Correctly
 	Log		${scenario_content_reopened}
 	Should Be Equal		${scenario_content}		${scenario_content_reopened}	msg=Scenario files are not equal!
 
-Clean Files
+Clean Issue #1 Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	Run Keyword		Close Manager GUI ${platform}
 	Set Global Filename And Default Save Path	${robot_data}[1]
@@ -243,10 +243,9 @@ Metadata Files For the Agent
 	Click Tab	Plan
 	Select 7 Robot Test Case
 	Click Button	runplay
-	Check If the Robot Failed	70
-	Take A Screenshot
+	Check If the Robot Failed	33
 
-Clean Files
+Clean Issue #52 & #53 Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	Set Global Filename And Default Save Path	main
 	Delete Scenario File	test_scenario

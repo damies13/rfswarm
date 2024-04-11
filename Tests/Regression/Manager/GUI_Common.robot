@@ -108,7 +108,6 @@ Check If The Agent Has Connected To The Manager
 Check If the Robot Failed
 	[Arguments] 	${expected_time}
 	Sleep	${expected_time}
-	Take A Screenshot	#del later
 	TRY
 		Click Image 	manager_${platform}_button_abort
 		Press Combination	Key.enter
@@ -116,8 +115,8 @@ Check If the Robot Failed
 		Wait For	manager_${platform}_button_finished_run.png	timeout=300
 	END
 	Take A Screenshot
-	${status}=	Run Keyword And Return Status	Locate	manager_${platform}_testfailed.png
-	Run Keyword If	${status}	Fail	msg=Test failed. Check screenshots.
+	${status}=	Run Keyword And Return Status	Locate	manager_${platform}_resource_file_provided.png
+	Run Keyword If	not ${status}	Fail	msg=Test failed. Check screenshots for more informations.
 
 Click Tab
 	[Arguments]		${tabname}
