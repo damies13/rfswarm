@@ -9,10 +9,10 @@ Suite Setup 	Set Platform
 @{run_robots}
 @{run_times_in_s}	#delay,		rump-up,	time
 @{robot_data}=	Example Test Case	example.robot
-#TODO: make dictionary:
-@{row_settings_data}=	BuiltIn,String,OperatingSystem,perftest,Collections
-...    		-v var:examplevariable
-...    		True
+&{row_settings_data}=	
+...    excludelibraries=builtin,string,operatingsystem,perftest,collections	
+...    robot_options=-v var:examplevariable	
+...    test_repeater=True
 @{settings_locations}
 ${scenario_name}=	test_scenario
 ${scenario_content}
@@ -41,6 +41,7 @@ Resource Files For the Agent In The Same Directory
 	
 Resource Files For the Agent In The Subdirectory
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	Take A Screenshot	#del later
 	Click Tab	Plan
 	Select 2 Robot Test Case
 	Click Button	runplay
@@ -85,7 +86,7 @@ Clean Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	Set Global Filename And Default Save Path	main
 	Delete Scenario File	test_scenario
-	Delete Directory In Default Path	buildin
+	Delete Directory In Default Path	example
 	CommandLine_Common.Stop Agent
 	CommandLine_Common.Stop Manager
 
@@ -207,27 +208,33 @@ Verify Scenario File Robot Data
 	END
 
 Verify Scenario File Settings
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
+	[Tags]	windows-latest	ubuntu	latest	macos-latest	Issue #1
 
 	FOR  ${rows}  IN RANGE  1	4
 		${row}	Set Variable	[${rows}]
 		${i}=	Get Index From List		${scenario_content_list}		${row}
 		Log		${row}
 
-		${exlibraries_offset}		Set Variable	${i + 21}
-		Should Be Equal		excludelibraries	${scenario_content_list}[${exlibraries_offset}]
-		Should Be Equal		${row_settings_data}[0]		${scenario_content_list}[${exlibraries_offset + 2}]
+		IF  'excludelibraries' in ${row_settings_data}
+			${exlibraries_offset}		Set Variable	${i + 21}
+			Should Be Equal		excludelibraries	${scenario_content_list}[${exlibraries_offset}]
+			Should Be Equal		${row_settings_data['excludelibraries']}	${scenario_content_list}[${exlibraries_offset + 2}]
+		END
 
-		${robot_options_offset}		Set Variable	${i + 24}
-		Should Be Equal		robotoptions	${scenario_content_list}[${robot_options_offset}]
-		${robot_options}=	Catenate	
-		...    ${scenario_content_list[${robot_options_offset + 2}]}	
-		...    ${scenario_content_list[${robot_options_offset + 3}]}
-		Should Be Equal		${row_settings_data}[1]		${robot_options}
+		IF  'robot_options' in ${row_settings_data}
+			${robot_options_offset}		Set Variable	${i + 24}
+			Should Be Equal		robotoptions	${scenario_content_list}[${robot_options_offset}]
+			${robot_options}=	Catenate	
+			...    ${scenario_content_list[${robot_options_offset + 2}]}	
+			...    ${scenario_content_list[${robot_options_offset + 3}]}
+			Should Be Equal		${row_settings_data['robot_options']}	${robot_options}
+		END
 
+		IF  'test_repeater' in ${row_settings_data}
 		${repeater_offset}		Set Variable	${i + 28}
 		Should Be Equal		testrepeater	${scenario_content_list}[${repeater_offset}]
-		Should Be Equal		${row_settings_data}[2]		${scenario_content_list}[${repeater_offset + 2}]
+		Should Be Equal		${row_settings_data['test_repeater']}	${scenario_content_list}[${repeater_offset + 2}]
+		END
 	END
 
 Chceck That The Scenario File Opens Correctly

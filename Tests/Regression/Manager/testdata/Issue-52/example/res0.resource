@@ -4,5 +4,7 @@ ${string0}	str0
 
 *** Keywords ***
 Resource Zero
-	Log 	${CURDIR}
-	Log 	${EXECDIR}
+	[Documentation]	
+	...    \n${CURDIR}	
+	...    ${EXECDIR}
+	RETURN	${CURDIR}\n${EXECDIR}

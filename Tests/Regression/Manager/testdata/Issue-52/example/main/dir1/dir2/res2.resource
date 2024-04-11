@@ -4,4 +4,7 @@ ${string2}	str2
 
 *** Keywords ***
 Resource Two
+	[Documentation]	
+	...    \n${CURDIR}	
+	...    ${EXECDIR}
 	RETURN	${CURDIR}\n${EXECDIR}

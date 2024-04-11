@@ -108,6 +108,7 @@ Check If The Agent Has Connected To The Manager
 Check If the Robot Failed
 	[Arguments] 	${expected_time}
 	Sleep	${expected_time}
+	Take A Screenshot	#del later
 	TRY
 		Click Image 	manager_${platform}_button_abort
 		Press Combination	Key.enter

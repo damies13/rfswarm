@@ -4,4 +4,7 @@ ${string3second}	str3second
 
 *** Keywords ***
 Resource Three Second
+	[Documentation]	
+	...    \n${CURDIR}	
+	...    ${EXECDIR}
 	RETURN	${CURDIR}\n${EXECDIR}

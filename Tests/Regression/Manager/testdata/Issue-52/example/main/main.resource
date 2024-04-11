@@ -4,5 +4,7 @@ ${stringm}	strm
 
 *** Keywords ***
 Resource Main
-	[Documentation]	test
+	[Documentation]	
+	...    \n${CURDIR}	
+	...    ${EXECDIR}
 	RETURN	${CURDIR}\n${EXECDIR}
