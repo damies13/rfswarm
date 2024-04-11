@@ -313,16 +313,23 @@ Create Robot File
 	File Should Exist	${path}${/}${name}
 
 Change Test Group Settings
-	[Arguments]		@{row_settings_data}
+	[Arguments]		&{row_settings_data}
 	Sleep	2
-	Click Dialog Button		row_settings_frame_name
+	#Click Dialog Button		row_settings_frame_name
 	Press Key.tab 1 Times
-	Type	${row_settings_data}[0]
-	Press Key.tab 1 Times
-	Type	${row_settings_data}[1]
-	IF  '${row_settings_data}[2]' == 'True'
-		Click Button	checkbox_unch
+	IF  'excludelibraries' in ${row_settings_data}
+		Type	${row_settings_data['excludelibraries']}
 	END
+	Press Key.tab 1 Times
+	IF  'robot_options' in ${row_settings_data}
+		Type	${row_settings_data['robot_options']}
+	END
+	IF  'test_repeater' in ${row_settings_data}
+		IF  '${row_settings_data['test_repeater']}' == 'True'
+			Click Button	checkbox_unch
+		END
+	END
+	
 	IF 	"${platform}" == "macos"
 		Click Dialog Button		save_2
 	ELSE

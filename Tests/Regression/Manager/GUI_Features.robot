@@ -127,7 +127,7 @@ Insert Example Data To Manager
 	END
 	FOR  ${i}  IN RANGE  0  3
 		Click To The Above Of	${settings_locations}[${i}]	0
-		Change Test Group Settings		@{row_settings_data}
+		Change Test Group Settings		&{row_settings_data}
 	END
 
 Save Example Data To Scenario
@@ -231,9 +231,9 @@ Verify Scenario File Settings
 		END
 
 		IF  'test_repeater' in ${row_settings_data}
-		${repeater_offset}		Set Variable	${i + 28}
-		Should Be Equal		testrepeater	${scenario_content_list}[${repeater_offset}]
-		Should Be Equal		${row_settings_data['test_repeater']}	${scenario_content_list}[${repeater_offset + 2}]
+			${repeater_offset}		Set Variable	${i + 28}
+			Should Be Equal		testrepeater	${scenario_content_list}[${repeater_offset}]
+			Should Be Equal		${row_settings_data['test_repeater']}	${scenario_content_list}[${repeater_offset + 2}]
 		END
 	END
 
