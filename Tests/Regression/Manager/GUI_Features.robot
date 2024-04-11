@@ -41,7 +41,6 @@ Resource Files For the Agent In The Same Directory
 	
 Resource Files For the Agent In The Subdirectory
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Take A Screenshot	#del later
 	Click Tab	Plan
 	Select 2 Robot Test Case
 	Click Button	runplay
