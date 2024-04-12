@@ -5,7 +5,7 @@ Resource	${CURDIR}${/}dir1${/}dir2${/}res2.resource
 Resource	${CURDIR}${/}dir1${/}dir2${/}res3.resource
 Resource	${CURDIR}${/}..${/}res0.resource
 
-Variables	${CURDIR}${/}dir1${/}vars.py
+Variables	.${/}dir1${/}vars.py
 
 Library 	OperatingSystem
 Metadata	File	${CURDIR}${/}dir1${/}manager_windows_agents_ready.jpg

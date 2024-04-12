@@ -334,7 +334,6 @@ Change Test Group Settings
 	ELSE
 		Click Dialog Button		save
 	END
-	
 
 Select Robot File
 	[Arguments]		@{robot_data}
@@ -393,3 +392,42 @@ Delete Directory In Default Path
 	[Arguments]	${dir_name}
 	Remove Directory	${global_path}${/}${dir_name}	recursive=${True}
 
+Find Absolute Paths And Names For Files In Directory
+	[Documentation]	This algorithm analyses the specified path and returns all 
+	...    file names with their absolute paths even those that are in subdirectories
+	[Arguments]		${given_path}	@{excluded_files}
+	${example_dir}	Set Variable	${given_path}
+	@{absolute_paths}	Create List
+	@{file_names}	Create List
+
+	${dir_number}=	Count Directories In Directory	${example_dir}
+	${new_dir}		List Directories In Directory	${example_dir}	absolute=${True}
+	#=== Writing data section
+	${dir_files_number}=	Count Files In Directory	${example_dir}
+
+	@{dir_files_path}=		List Files In Directory		${example_dir}	absolute=${True}
+	@{dir_file_names}=		List Files In Directory		${example_dir}
+	
+	${length}	Get Length	${dir_files_path}
+	FOR  ${i}  IN RANGE  0  ${length}
+		IF  '${dir_file_names}[${i}]' not in ${excluded_files}
+			Append To List	${absolute_paths}	${dir_files_path}[${i}]
+			Append To List	${file_names}	${dir_file_names}[${i}]
+		END
+	END
+	#===
+	FOR  ${specific_dir}  IN  @{new_dir}
+		${next_absolute_paths}	${next_file_names}	
+		...    Find Absolute Paths And Names For Files In Directory	${specific_dir}	@{excluded_files}
+
+		${length}	Get Length	${next_absolute_paths}
+		FOR  ${i}  IN RANGE  0  ${length}
+			${bad_list}	Get Length	${next_absolute_paths}
+			IF  ${bad_list} != ${0}
+				Append To List	${absolute_paths}	${next_absolute_paths}[${i}]
+				Append To List	${file_names}	${next_file_names}[${i}]
+			END
+		END
+	END
+
+	RETURN	${absolute_paths}	${file_names}

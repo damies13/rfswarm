@@ -18,6 +18,12 @@ ${scenario_name}=	test_scenario
 ${scenario_content}
 ${scenario_content_list}
 
+@{agent_options}	-d ${TEMPDIR}${/}agent_temp_issue52
+@{manager_absolute_paths}
+@{manager_file_names}
+@{agent_absolute_paths}
+@{agent_file_names}
+
 *** Test Cases ***
 Insert Example Data To Manager
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
@@ -183,10 +189,16 @@ Clean Issue #1 Files
 	Delete Robot File
 	Delete Scenario File	${scenario_name}
 
-Preparation For Testing Of Resource Files Copied To the Agent
+Collecting Example Data for Agent And Saving it to the Agent
  	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Set INI Window Size		1200	600
-	CommandLine_Common.Run Agent
+	${absolute_paths}	${file_names}	
+	...    Find Absolute Paths And Names For Files In Directory	${CURDIR}${/}testdata${/}Issue-52${/}example
+	Log 	${absolute_paths}
+	Log 	${file_names}
+	Set Suite Variable	${manager_absolute_paths}	${absolute_paths}
+	Set Suite Variable	${manager_file_names}	${file_names}
+	
+	CommandLine_Common.Run Agent	${agent_options}
 	Open Manager GUI
 	Set Global Filename And Default Save Path	main
 	Copy Directory	${CURDIR}${/}testdata${/}Issue-52${/}example	${global_path}
@@ -195,55 +207,40 @@ Preparation For Testing Of Resource Files Copied To the Agent
 	Open Scenario File	test_scenario
 
 	Check If The Agent Has Connected To The Manager
+	Sleep	5
 
-Resource Files For the Agent In The Same Directory
+Collecting Data That Agent Copied From Manager From Temp Directory
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Click Tab	Plan
-	Select 1 Robot Test Case
-	Click Button	runplay
-	Check If the Robot Failed	33
+	@{excluded_files}=	Create List	RFSListener3.py	RFSTestRepeater.py
+	${absolute_paths}	${file_names}	
+	...    Find Absolute Paths And Names For Files In Directory	${TEMPDIR}${/}agent_temp_issue52	@{excluded_files}
+	Log 	${absolute_paths}
+	Log 	${file_names}
+	Set Suite Variable	${agent_absolute_paths}	${absolute_paths}
+	Set Suite Variable	${agent_file_names}	${file_names}
 	
-Resource Files For the Agent In The Subdirectory
+Verifying If Agent Copies Every File
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Click Tab	Plan
-	Select 2 Robot Test Case
-	Click Button	runplay
-	Check If the Robot Failed	33
+	Log To Console	\n${manager_file_names}
+	Log To Console	${agent_file_names}
+	Lists Should Be Equal	${manager_file_names}	${agent_file_names}
+	...    msg="Files are not transferred correctly! Check report for more information."
 
-Resource Files For the Agent in the Subdirectory of the Subdirectory
+Verifying If Agent Copies Every File Content Correctly
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Click Tab	Plan
-	Select 3 Robot Test Case
-	Click Button	runplay
-	Check If the Robot Failed	33
+	${test_status}	Set Variable	PASS
+	${length}	Get Length	${manager_absolute_paths}
+	FOR  ${i}  IN RANGE  0  ${length}
+		${file_extension}	Split String From Right	${manager_absolute_paths}[${i}]	separator=.
+		IF  '${file_extension}[-1]' != 'png' 
+			${M_file_content}	Get File	${manager_absolute_paths}[${i}]
+			${A_file_content}	Run Keyword And Continue On Failure	
+			...    Get File	${agent_absolute_paths}[${i}]
 
-Resource Files That Use Resource File For the Agent in the Subdirectory of the Subdirectory
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Click Tab	Plan
-	Select 4 Robot Test Case
-	Click Button	runplay
-	Check If the Robot Failed	33
-
-Resource Files For the Agent in the Parent Directory
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Click Tab	Plan
-	Select 5 Robot Test Case
-	Click Button	runplay
-	Check If the Robot Failed	33
-
-Variable File For the Agent
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Click Tab	Plan
-	Select 6 Robot Test Case
-	Click Button	runplay
-	Check If the Robot Failed	33
-
-Metadata Files For the Agent
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Click Tab	Plan
-	Select 7 Robot Test Case
-	Click Button	runplay
-	Check If the Robot Failed	33
+			Run Keyword And Continue On Failure	
+			...    Should Be Equal	${M_file_content}	${A_file_content}
+		END
+	END
 
 Clean Issue #52 & #53 Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
