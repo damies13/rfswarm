@@ -1,7 +1,7 @@
 *** Settings ***
 Resource	main.resource
 Resource	.${/}dir1${/}res1.resource
-Resource	.${/}dir1${/}dir2${/}res2.resource
+Resource	.${/}dir1/dir2${/}res2.resource
 Resource	.${/}dir1${/}dir2${/}res3.resource
 Resource	.${/}..${/}res-1.resource
 Resource	.${/}..${/}res0.resource

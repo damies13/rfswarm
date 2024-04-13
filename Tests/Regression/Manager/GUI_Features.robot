@@ -189,7 +189,8 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND	
 	...    CommandLine_Common.Run Agent	${agent_options}									AND	
 	...    Open Manager GUI																	AND	
-	...    Set Global Filename And Default Save Path	main
+	...    Set Global Filename And Default Save Path	main								AND	
+	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main1.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
 
 	${M_absolute_paths}	${M_file_names}	
 	...    Find Absolute Paths And Names For Files In Directory	${CURDIR}${/}testdata${/}Issue-52${/}example
@@ -201,7 +202,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	Click Button	runopen
 	Open Scenario File	test_scenario
 	Check If The Agent Has Connected To The Manager
-	Sleep	5
+	Sleep	10
 
 	@{excluded_files}=	Create List	RFSListener3.py	RFSTestRepeater.py
 	${A_absolute_paths}	${A_file_names}	
@@ -216,6 +217,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	...    Delete Scenario File	test_scenario										AND	
 	...    Remove Directory	${global_path}${/}example	recursive=${True}			AND	
 	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND	
+	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main1.robot	${CURDIR}${/}testdata${/}Issue-52	AND	
 	...    CommandLine_Common.Stop Agent											AND	
 	...    CommandLine_Common.Stop Manager
 
@@ -225,7 +227,8 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND	
 	...    CommandLine_Common.Run Agent	${agent_options}									AND	
 	...    Open Manager GUI																	AND	
-	...    Set Global Filename And Default Save Path	main
+	...    Set Global Filename And Default Save Path	main								AND	
+	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main2.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
 
 	${M_absolute_paths}	${M_file_names}	
 	...    Find Absolute Paths And Names For Files In Directory	${CURDIR}${/}testdata${/}Issue-52${/}example
@@ -240,7 +243,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	Click Button	runopen
 	Open Scenario File	test_scenario
 	Check If The Agent Has Connected To The Manager
-	Sleep	5
+	Sleep	10
 
 	@{excluded_files}=	Create List	RFSListener3.py	RFSTestRepeater.py
 	${A_absolute_paths}	${A_file_names}	
@@ -255,6 +258,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	...    Delete Scenario File	test_scenario										AND	
 	...    Remove Directory	${global_path}${/}example	recursive=${True}			AND	
 	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND	
+	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main2.robot	${CURDIR}${/}testdata${/}Issue-52	AND
 	...    CommandLine_Common.Stop Agent											AND	
 	...    CommandLine_Common.Stop Manager
 
@@ -264,7 +268,8 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND	
 	...    CommandLine_Common.Run Agent	${agent_options}									AND	
 	...    Open Manager GUI																	AND	
-	...    Set Global Filename And Default Save Path	main
+	...    Set Global Filename And Default Save Path	main								AND	
+	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main3.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
 
 	${M_absolute_paths}	${M_file_names}	
 	...    Find Absolute Paths And Names For Files In Directory	${CURDIR}${/}testdata${/}Issue-52${/}example
@@ -274,12 +279,12 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	Copy Directory	${CURDIR}${/}testdata${/}Issue-52${/}example	${global_path}
 	Copy File	${CURDIR}${/}testdata${/}Issue-52${/}test_scenario.rfs	${global_path}
 	${scenario_path}	Set Variable	${global_path}${/}test_scenario.rfs
-	Change main1 With main2 In ${scenario_path}
+	Change main1 With main3 In ${scenario_path}
 
 	Click Button	runopen
 	Open Scenario File	test_scenario
 	Check If The Agent Has Connected To The Manager
-	Sleep	5
+	Sleep	10
 
 	@{excluded_files}=	Create List	RFSListener3.py	RFSTestRepeater.py
 	${A_absolute_paths}	${A_file_names}	
@@ -294,6 +299,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    Delete Scenario File	test_scenario										AND	
 	...    Remove Directory	${global_path}${/}example	recursive=${True}			AND	
 	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND	
+	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main3.robot	${CURDIR}${/}testdata${/}Issue-52	AND
 	...    CommandLine_Common.Stop Agent											AND	
 	...    CommandLine_Common.Stop Manager
 
@@ -301,8 +307,8 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 Compare Manager and Agent Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Arguments]	${M_file_names}	${A_file_names}
-	Log To Console	${M_file_names}
-	Log To Console	${A_file_names}
+	Log To Console	\n${M_file_names}
+	Log To Console	${A_file_names}\n
 	Lists Should Be Equal	${M_file_names}	${A_file_names}
 	...    msg="Files are not transferred correctly! Check report for more information."
 

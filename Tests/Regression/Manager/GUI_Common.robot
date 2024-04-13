@@ -101,7 +101,7 @@ Stop Agent
 	${result} = 	Terminate Process		${process_agent}
 	# Should Be Equal As Integers 	${result.rc} 	0
 
-Stop Agents Robot Gradually
+Stop Agent Robots Gradually
 	[Arguments]	${rumup_time}
 	Sleep	${rumup_time}
 	Click Button	stoprun
