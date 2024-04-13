@@ -18,7 +18,6 @@ ${scenario_name}=	test_scenario
 ${scenario_content}
 ${scenario_content_list}
 
-@{agent_options}	-d ${TEMPDIR}${/}agent_temp_issue52
 @{manager_absolute_paths}
 @{manager_file_names}
 @{agent_absolute_paths}
@@ -198,6 +197,7 @@ Collecting Example Data for Agent And Saving it to the Agent
 	Set Suite Variable	${manager_absolute_paths}	${absolute_paths}
 	Set Suite Variable	${manager_file_names}	${file_names}
 	
+	@{agent_options}	Create List	-d	${TEMPDIR}${/}agent_temp_issue52
 	CommandLine_Common.Run Agent	${agent_options}
 	Open Manager GUI
 	Set Global Filename And Default Save Path	main
