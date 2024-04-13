@@ -335,6 +335,12 @@ Change Test Group Settings
 		Click Dialog Button		save
 	END
 
+Change ${str1} With ${str2} In ${file}
+	${file_content}	Get File	${file}
+	Remove File		${file}
+	${file_content}	Replace String	${file_content}	${str1}	${str2}
+	Create File		${file}	${file_content}
+
 Select Robot File
 	[Arguments]		@{robot_data}
 	Sleep	2
@@ -370,8 +376,8 @@ Open Scenario File
 	Sleep	1
 
 Get Scenario File Content
-	[Arguments]		${scenario_name}
-	${scenario_content}=	Get File	${global_path}${/}${scenario_name}.rfs
+	[Arguments]		${path}	${scenario_name}
+	${scenario_content}=	Get File	${path}${/}${scenario_name}.rfs
 	Should Not Be Empty	${scenario_content}
 
 	RETURN	${scenario_content}
@@ -387,10 +393,6 @@ Delete Robot File
 	Variable Should Exist	${name}	msg="Global file name does not exist or file name is not provided"
 	Remove File		${path}${/}${name}
 	File Should Not Exist	${path}${/}${name}
-
-Delete Directory In Default Path
-	[Arguments]	${dir_name}
-	Remove Directory	${global_path}${/}${dir_name}	recursive=${True}
 
 Find Absolute Paths And Names For Files In Directory
 	[Documentation]	This algorithm analyses the specified path and returns all 

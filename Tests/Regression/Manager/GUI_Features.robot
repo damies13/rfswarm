@@ -18,11 +18,6 @@ ${scenario_name}=	test_scenario
 ${scenario_content}
 ${scenario_content_list}
 
-@{manager_absolute_paths}
-@{manager_file_names}
-@{agent_absolute_paths}
-@{agent_file_names}
-
 *** Test Cases ***
 Insert Example Data To Manager
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
@@ -188,63 +183,139 @@ Clean Issue #1 Files
 	Delete Robot File
 	Delete Scenario File	${scenario_name}
 
-Collecting Example Data for Agent And Saving it to the Agent
- 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	${absolute_paths}	${file_names}	
+Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	[Setup]	Run Keywords	
+	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND	
+	...    CommandLine_Common.Run Agent	${agent_options}									AND	
+	...    Open Manager GUI																	AND	
+	...    Set Global Filename And Default Save Path	main
+
+	${M_absolute_paths}	${M_file_names}	
 	...    Find Absolute Paths And Names For Files In Directory	${CURDIR}${/}testdata${/}Issue-52${/}example
-	Log 	${absolute_paths}
-	Log 	${file_names}
-	Set Suite Variable	${manager_absolute_paths}	${absolute_paths}
-	Set Suite Variable	${manager_file_names}	${file_names}
-	
-	@{agent_options}	Create List	-d	${TEMPDIR}${/}agent_temp_issue52
-	CommandLine_Common.Run Agent	${agent_options}
-	Open Manager GUI
-	Set Global Filename And Default Save Path	main
+	Log 	${M_absolute_paths}
+	Log 	${M_file_names}
+
 	Copy Directory	${CURDIR}${/}testdata${/}Issue-52${/}example	${global_path}
 	Copy File	${CURDIR}${/}testdata${/}Issue-52${/}test_scenario.rfs	${global_path}
 	Click Button	runopen
 	Open Scenario File	test_scenario
-
 	Check If The Agent Has Connected To The Manager
 	Sleep	5
 
-Collecting Data That Agent Copied From Manager From Temp Directory
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	@{excluded_files}=	Create List	RFSListener3.py	RFSTestRepeater.py
-	${absolute_paths}	${file_names}	
+	${A_absolute_paths}	${A_file_names}	
 	...    Find Absolute Paths And Names For Files In Directory	${TEMPDIR}${/}agent_temp_issue52	@{excluded_files}
-	Log 	${absolute_paths}
-	Log 	${file_names}
-	Set Suite Variable	${agent_absolute_paths}	${absolute_paths}
-	Set Suite Variable	${agent_file_names}	${file_names}
+	Log 	${A_absolute_paths}
+	Log 	${A_file_names}
+
+	Compare Manager and Agent Files	${M_file_names}	${A_file_names}
+	Compare Manager and Agent Files Content	${M_absolute_paths}	${A_absolute_paths}
 	
-Verifying If Agent Copies Every File
+	[Teardown]	Run Keywords	
+	...    Delete Scenario File	test_scenario										AND	
+	...    Remove Directory	${global_path}${/}example	recursive=${True}			AND	
+	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND	
+	...    CommandLine_Common.Stop Agent											AND	
+	...    CommandLine_Common.Stop Manager
+
+Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Log To Console	\n${manager_file_names}
-	Log To Console	${agent_file_names}
-	Lists Should Be Equal	${manager_file_names}	${agent_file_names}
+	[Setup]	Run Keywords	
+	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND	
+	...    CommandLine_Common.Run Agent	${agent_options}									AND	
+	...    Open Manager GUI																	AND	
+	...    Set Global Filename And Default Save Path	main
+
+	${M_absolute_paths}	${M_file_names}	
+	...    Find Absolute Paths And Names For Files In Directory	${CURDIR}${/}testdata${/}Issue-52${/}example
+	Log 	${M_absolute_paths}
+	Log 	${M_file_names}
+
+	Copy Directory	${CURDIR}${/}testdata${/}Issue-52${/}example	${global_path}
+	Copy File	${CURDIR}${/}testdata${/}Issue-52${/}test_scenario.rfs	${global_path}
+	${scenario_path}	Set Variable	${global_path}${/}test_scenario.rfs
+	Change main1 With main2 In ${scenario_path}
+
+	Click Button	runopen
+	Open Scenario File	test_scenario
+	Check If The Agent Has Connected To The Manager
+	Sleep	5
+
+	@{excluded_files}=	Create List	RFSListener3.py	RFSTestRepeater.py
+	${A_absolute_paths}	${A_file_names}	
+	...    Find Absolute Paths And Names For Files In Directory	${TEMPDIR}${/}agent_temp_issue52	@{excluded_files}
+	Log 	${A_absolute_paths}
+	Log 	${A_file_names}
+
+	Compare Manager and Agent Files	${M_file_names}	${A_file_names}
+	Compare Manager and Agent Files Content	${M_absolute_paths}	${A_absolute_paths}
+	
+	[Teardown]	Run Keywords	
+	...    Delete Scenario File	test_scenario										AND	
+	...    Remove Directory	${global_path}${/}example	recursive=${True}			AND	
+	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND	
+	...    CommandLine_Common.Stop Agent											AND	
+	...    CommandLine_Common.Stop Manager
+
+Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	[Setup]	Run Keywords	
+	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND	
+	...    CommandLine_Common.Run Agent	${agent_options}									AND	
+	...    Open Manager GUI																	AND	
+	...    Set Global Filename And Default Save Path	main
+
+	${M_absolute_paths}	${M_file_names}	
+	...    Find Absolute Paths And Names For Files In Directory	${CURDIR}${/}testdata${/}Issue-52${/}example
+	Log 	${M_absolute_paths}
+	Log 	${M_file_names}
+
+	Copy Directory	${CURDIR}${/}testdata${/}Issue-52${/}example	${global_path}
+	Copy File	${CURDIR}${/}testdata${/}Issue-52${/}test_scenario.rfs	${global_path}
+	${scenario_path}	Set Variable	${global_path}${/}test_scenario.rfs
+	Change main1 With main2 In ${scenario_path}
+
+	Click Button	runopen
+	Open Scenario File	test_scenario
+	Check If The Agent Has Connected To The Manager
+	Sleep	5
+
+	@{excluded_files}=	Create List	RFSListener3.py	RFSTestRepeater.py
+	${A_absolute_paths}	${A_file_names}	
+	...    Find Absolute Paths And Names For Files In Directory	${TEMPDIR}${/}agent_temp_issue52	@{excluded_files}
+	Log 	${A_absolute_paths}
+	Log 	${A_file_names}
+
+	Compare Manager and Agent Files	${M_file_names}	${A_file_names}
+	Compare Manager and Agent Files Content	${M_absolute_paths}	${A_absolute_paths}
+	
+	[Teardown]	Run Keywords	
+	...    Delete Scenario File	test_scenario										AND	
+	...    Remove Directory	${global_path}${/}example	recursive=${True}			AND	
+	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND	
+	...    CommandLine_Common.Stop Agent											AND	
+	...    CommandLine_Common.Stop Manager
+
+*** Keywords ***
+Compare Manager and Agent Files
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	[Arguments]	${M_file_names}	${A_file_names}
+	Lists Should Be Equal	${M_file_names}	${A_file_names}
 	...    msg="Files are not transferred correctly! Check report for more information."
 
-Verifying If Agent Copies Every File Content Correctly
+Compare Manager and Agent Files Content
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	${length}	Get Length	${manager_absolute_paths}
+	[Arguments]	${M_absolute_paths}	${A_absolute_paths}
+	${length}	Get Length	${M_absolute_paths}
 	FOR  ${i}  IN RANGE  0  ${length}
-		${file_extension}	Split String From Right	${manager_absolute_paths}[${i}]	separator=.
+		${file_extension}	Split String From Right	${M_absolute_paths}[${i}]	separator=.
 		IF  '${file_extension}[-1]' != 'png' 
-			${M_file_content}	Get File	${manager_absolute_paths}[${i}]
+			${M_file_content}	Get File	${M_absolute_paths}[${i}]
 			${A_file_content}	Run Keyword And Continue On Failure	
-			...    Get File	${agent_absolute_paths}[${i}]
+			...    Get File	${A_absolute_paths}[${i}]
 
 			Run Keyword And Continue On Failure	
 			...    Should Be Equal	${M_file_content}	${A_file_content}
 		END
 	END
-
-Clean Issue #52 & #53 Files
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	Set Global Filename And Default Save Path	main
-	Delete Scenario File	test_scenario
-	Delete Directory In Default Path	example
-	CommandLine_Common.Stop Agent
-	CommandLine_Common.Stop Manager
