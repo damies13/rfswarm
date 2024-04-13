@@ -1,3 +1,6 @@
+*** Settings ***
+Library	${CURDIR}${/}dir1/dir2${/}customlibrary2.py
+
 *** Variables ***
 ${stringm}	strm
 @{listm}	listm_0	listm_1

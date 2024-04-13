@@ -402,7 +402,7 @@ Find Absolute Paths And Names For Files In Directory
 
 	${dir_number}=	Count Directories In Directory	${example_dir}
 	${new_dir}		List Directories In Directory	${example_dir}	absolute=${True}
-	#=== Writing data section
+	#=== Collecting data section
 	${dir_files_number}=	Count Files In Directory	${example_dir}
 
 	@{dir_files_path}=		List Files In Directory		${example_dir}	absolute=${True}
@@ -415,7 +415,7 @@ Find Absolute Paths And Names For Files In Directory
 			Append To List	${file_names}	${dir_file_names}[${i}]
 		END
 	END
-	#===
+	#=== Merging data section
 	FOR  ${specific_dir}  IN  @{new_dir}
 		${next_absolute_paths}	${next_file_names}	
 		...    Find Absolute Paths And Names For Files In Directory	${specific_dir}	@{excluded_files}

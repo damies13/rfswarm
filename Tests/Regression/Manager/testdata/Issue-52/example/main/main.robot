@@ -1,14 +1,16 @@
 *** Settings ***
 Resource	main.resource
 Resource	${CURDIR}${/}dir1${/}res1.resource
-Resource	${CURDIR}${/}dir1${/}dir2${/}res2.resource
-Resource	${CURDIR}${/}dir1${/}dir2${/}res3.resource
+Resource	.${/}dir1/dir2${/}res2.resource
+Resource	${CURDIR}/dir1/dir2/res3.resource
+Resource	./../res-1.resource
 Resource	${CURDIR}${/}..${/}res0.resource
 
 Variables	.${/}dir1${/}vars.py
+Variables	${CURDIR}${/}..${/}vars0.py
 
 Library 	OperatingSystem
-Metadata	File	${CURDIR}${/}dir1${/}manager_windows_agents_ready.jpg
+Metadata	File	./dir1/manager_windows_agents_ready.jpg
 Metadata	File	${CURDIR}${/}dir1${/}dir2${/}example.csv
 
 *** Test Cases ***

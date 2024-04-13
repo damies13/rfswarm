@@ -228,7 +228,6 @@ Verifying If Agent Copies Every File
 
 Verifying If Agent Copies Every File Content Correctly
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	${test_status}	Set Variable	PASS
 	${length}	Get Length	${manager_absolute_paths}
 	FOR  ${i}  IN RANGE  0  ${length}
 		${file_extension}	Split String From Right	${manager_absolute_paths}[${i}]	separator=.
