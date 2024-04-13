@@ -68,7 +68,7 @@ Save Example Data To Scenario
 Set Scenario File Content And Show Example Data
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	Set Global Filename And Default Save Path	${robot_data}[1]
-	${scenario_content}=	Get scenario file content	${scenario_name}
+	${scenario_content}=	Get scenario file content	${global_path}	${scenario_name}
 	Set Suite Variable		${scenario_content} 	${scenario_content}
 	${scenario_content_list}=	Split String	${scenario_content}
 	Set Suite Variable		${scenario_content_list} 	${scenario_content_list}
@@ -171,7 +171,7 @@ Chceck That The Scenario File Opens Correctly
 	Open Manager GUI
 	Set Global Filename And Default Save Path	${robot_data}[1]
 	Click Button	runsave
-	${scenario_content_reopened}=	Get scenario file content	${scenario_name}
+	${scenario_content_reopened}=	Get scenario file content	${global_path}	${scenario_name}
 	Log		${scenario_content}
 	Log		${scenario_content_reopened}
 	Should Be Equal		${scenario_content}		${scenario_content_reopened}	msg=Scenario files are not equal!
@@ -301,6 +301,8 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 Compare Manager and Agent Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Arguments]	${M_file_names}	${A_file_names}
+	Log To Console	${M_file_names}
+	Log To Console	${A_file_names}
 	Lists Should Be Equal	${M_file_names}	${A_file_names}
 	...    msg="Files are not transferred correctly! Check report for more information."
 

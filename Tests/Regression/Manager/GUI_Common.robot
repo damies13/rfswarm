@@ -101,6 +101,16 @@ Stop Agent
 	${result} = 	Terminate Process		${process_agent}
 	# Should Be Equal As Integers 	${result.rc} 	0
 
+Stop Agents Robot Gradually
+	[Arguments]	${rumup_time}
+	Sleep	${rumup_time}
+	Click Button	stoprun
+	Press Key.tab 1 Times
+	Move To	10	10
+	Wait For	manager_${platform}_button_finished_run.png	timeout=120
+	${status}=	Run Keyword And Return Status	Locate	manager_${platform}_robots_0.png
+	Run Keyword If	not ${status}	Fail	msg=Robots are not zero. Check screenshots for more informations.
+
 Check If The Agent Has Connected To The Manager
 	Click Tab	Agents
 	Wait For 	manager_${platform}_agents_ready.png	timeout=300
@@ -376,7 +386,7 @@ Open Scenario File
 	Sleep	1
 
 Get Scenario File Content
-	[Arguments]		${path}	${scenario_name}
+	[Arguments]		${path}		${scenario_name}
 	${scenario_content}=	Get File	${path}${/}${scenario_name}.rfs
 	Should Not Be Empty	${scenario_content}
 
