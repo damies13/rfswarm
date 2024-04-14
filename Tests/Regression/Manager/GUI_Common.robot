@@ -15,6 +15,8 @@ ${pyfile_manager}			${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
 ${pyfile_agent}			${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py
 ${process_manager}		None
 ${process_agent}		None
+${results_dir} 			${OUTPUT DIR}${/}results
+${agent_dir} 				${OUTPUT DIR}${/}rfswarm-agent
 
 *** Keywords ***
 Set Platform
@@ -35,16 +37,25 @@ Set Platform
 	END
 
 Open Agent
-	# [Arguments]		${options}
-	# ${process}= 	Start Process 	python3 	${pyfile_agent}    alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
-	${process}= 	Start Process 	${cmd_agent}    alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
+	[Arguments]		${options}=None
+	IF  ${options} == None
+		${options}= 	Create List
+		Append To List 	${options} 	-d 	${agent_dir}
+	END
+	Log to console 	${\n}\${options}: ${options}
+	${process}= 	Start Process 	${cmd_agent}  @{options}    alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
 	Set Test Variable 	$process_agent 	${process}
 
 Open Manager GUI
-	# [Arguments]		${options}
+	[Arguments]		${options}=None
+	IF  ${options} == None
+		${options}= 	Create List
+		Create Directory 	${results_dir}
+		Append To List 	${options} 	-d 	${results_dir}
+	END
+	Log to console 	${\n}\${options}: ${options}
 	Set Confidence		0.9
-	# ${process}= 	Start Process 	python3 	${pyfile_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
-	${process}= 	Start Process 	${cmd_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
+	${process}= 	Start Process 	${cmd_manager}  @{options}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
 	Set Test Variable 	$process_manager 	${process}
 	Sleep 	10
 	Set Screenshot Folder 	${OUTPUT DIR}
@@ -157,8 +168,8 @@ Click Tab ${n} Times
 
 Click Label With Vertical Offset
 	[Arguments]		${labelname}	${offset}
-	[Documentation]	Click the image with the offset 
-	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down]. 
+	[Documentation]	Click the image with the offset
+	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down].
 	...	Give the image a full name, for example: button_runopen.
 	${labelname}= 	Convert To Lower Case 	${labelname}
 	${img}=	Set Variable		manager_${platform}_${labelname}.png
@@ -173,8 +184,8 @@ Click Label With Vertical Offset
 
 Click Label With Horizon Offset
 	[Arguments]		${labelname}	${offset}
-	[Documentation]	Click the image with the offset 
-	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right]. 
+	[Documentation]	Click the image with the offset
+	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right].
 	...	Give the image a full name, for example: button_runopen.
 	${labelname}= 	Convert To Lower Case 	${labelname}
 	${img}=	Set Variable		manager_${platform}_${labelname}.png
@@ -206,7 +217,7 @@ Wait Agent Ready
 	${img}=	Set Variable		manager_${platform}_agents_ready.png
 	Wait For 	${img} 	 timeout=300
 
-Set Global Filename And Default Save Path 
+Set Global Filename And Default Save Path
 	#sets global default global save path and file_name for robot
 	[Arguments]		${input_name}	${optional_path}=${None}
 	Set Test Variable	${global_name}	${input_name}
@@ -215,7 +226,7 @@ Set Global Filename And Default Save Path
 	Set Test Variable	${global_path}	${location}
 
 	Set Test Variable 	$file_name 	${global_name}
-	Run Keyword If	'${optional_path}' != '${None}'	
+	Run Keyword If	'${optional_path}' != '${None}'
 	...	Set Test Variable	${global_path}	${optional_path}
 
 	Log		${global_name}
@@ -272,7 +283,7 @@ Get Manager PIP Data
 
 Create Robot File
 	[Arguments]		${path}=${global_path}	${name}=${global_name}
-	
+
 	${example_robot_content}=	Set Variable	***Test Case***\nExample Test Case\n
 	Variable Should Exist	${path}	msg="Global save path does not exist or path is not provided."
 	Variable Should Exist	${name}	msg="Global file name does not exist or file name is not provided."
@@ -295,7 +306,7 @@ Change Test Group Settings
 	ELSE
 		Click Dialog Button		save
 	END
-	
+
 
 Select Robot File
 	[Arguments]		@{robot_data}

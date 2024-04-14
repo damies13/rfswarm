@@ -30,16 +30,16 @@ Insert Example Data To Manager
 		Sleep	2
 		FOR  ${j}  IN RANGE  1  5
 			Click Tab 1 Times
-			IF  '${j}' == '1' 
+			IF  '${j}' == '1'
 				Append To List	${run_robots}	${i}${j}${i}
 				Type	${i}${j}${i}
 			ELSE
 				${time_in_s}=	Evaluate	str(${i}${j} * 60 + ${i}${j})
 				Type	${time_in_s}
 				Append To List	${run_times_in_s}	${time_in_s}
-				
+
 			END
-			
+
 		END
 		Click Tab 2 Times
 		Click Button	selected_runscriptrow
@@ -47,7 +47,7 @@ Insert Example Data To Manager
 		Click Button	selected_select_test_case
 		Click Button	select_example
 		Click Tab 2 Times
-		${settings_coordinates}=	
+		${settings_coordinates}=
 		...    Locate	manager_${platform}_button_selected_runsettingsrow.png
 		Append To List	${settings_locations}	${settings_coordinates}
 		Click Tab 1 Times
@@ -123,9 +123,9 @@ Verify Scenario File Robot Data
 
 		${test_offset}		Set Variable	${i + 13}
 		Should Be Equal		test	${scenario_content_list}[${test_offset}]
-		${test_name}=	Catenate	
-		...    ${scenario_content_list[${test_offset + 2}]}	
-		...    ${scenario_content_list[${test_offset + 3}]}	
+		${test_name}=		Catenate
+		...    ${scenario_content_list[${test_offset + 2}]}
+		...    ${scenario_content_list[${test_offset + 3}]}
 		...    ${scenario_content_list[${test_offset + 4}]}
 		Should Be Equal		${robot_data}[0]	${test_name}
 
@@ -148,8 +148,8 @@ Verify Scenario File Settings
 
 		${robot_options_offset}		Set Variable	${i + 24}
 		Should Be Equal		robotoptions	${scenario_content_list}[${robot_options_offset}]
-		${robot_options}=	Catenate	
-		...    ${scenario_content_list[${robot_options_offset + 2}]}	
+		${robot_options}=		Catenate
+		...    ${scenario_content_list[${robot_options_offset + 2}]}
 		...    ${scenario_content_list[${robot_options_offset + 3}]}
 		Should Be Equal		${row_settings_data}[1]		${robot_options}
 
@@ -174,4 +174,26 @@ Clean Files
 	Set Global Filename And Default Save Path	${robot_data}[1]
 	Delete Robot File
 	Delete Scenario File	${scenario_name}
-	
+
+Verify Disable log.html - Scenario
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI
+	Click Button	runsettings
+	Click Dialog Button 	cancel
+	Run Keyword		Close Manager GUI ${platform}
+
+Verify Disable report.html - Scenario
+	No Operation
+
+Verify Disable output.xml - Scenario
+	No Operation
+
+Verify Disable log.html - Test Row
+	No Operation
+
+Verify Disable report.html - Test Row
+	No Operation
+
+Verify Disable output.xml - Test Row
+	No Operation
