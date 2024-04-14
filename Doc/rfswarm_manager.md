@@ -205,14 +205,14 @@ By default this setting is disabled, retaining the behaviour from RFSwarm versio
 
 Enabling/disabling this setting here will enable it for this test group
 
-###### Inject Sleep
+###### Inject Sleep - Test Group
 This setting when enabled will add the Sleep keyword after each timed keyword, the amount of sleep time added in seconds will be randomly chosen between the minimum and maximum values.
 
 If you want the amount of sleep time to always be the same, set the minimum and maximum values to the same value.
 
 Enabling/disabling this setting here will enable it for this test group
 
-###### Disable Robot Logs
+###### Disable Robot Logs - Test Group
 These settings when enabled will disable the generation of the selected files on the agent machine by instructing robot framework not to generate these files.
 
 If you disable output.xml but leave either log.html or report.html enabled then output.xml will still get created as it's required for generating the
