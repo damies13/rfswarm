@@ -309,7 +309,7 @@ Compare Manager and Agent Files
 	[Arguments]	${M_file_names}	${A_file_names}
 	Log To Console	\n${M_file_names}
 	Log To Console	${A_file_names}\n
-	Run Keyword And Continue On Failure	Lists Should Be Equal	${M_file_names}	${A_file_names}
+	Lists Should Be Equal	${M_file_names}	${A_file_names}
 	...    msg="Files are not transferred correctly! Check report for more information."
 
 Compare Manager and Agent Files Content
