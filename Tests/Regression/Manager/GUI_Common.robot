@@ -102,13 +102,28 @@ Stop Agent
 	# Should Be Equal As Integers 	${result.rc} 	0
 
 Stop Agent Robots Gradually
-	[Arguments]	${rumup_time}
-	Sleep	${rumup_time}
+	[Arguments]	${rumup_time}	${expected_robot_test_time}
+	Sleep	${rumup_time + 10}
 	Click Button	stoprun
 	Press Key.tab 1 Times
 	Move To	10	10
-	Wait For	manager_${platform}_button_finished_run.png	timeout=120
-	${status}=	Run Keyword And Return Status	Locate	manager_${platform}_robots_0.png
+	Wait For	manager_${platform}_button_finished_run.png	timeout=${expected_robot_test_time + 10}
+	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_robots_0.png	timeout=20
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Robots are not zero. Check screenshots for more informations.
+
+Stop Agent With Terminate Signal
+	[Arguments]	${rumup_time}
+	Sleep	${rumup_time + 10}
+	Click Button	stoprun
+	Sleep	2
+	Click
+	Press Key.enter 1 Times
+	Press Key.tab 1 Times
+	Move To	10	10
+	Wait For	manager_${platform}_button_finished_run.png	timeout=50
+	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_robots_0.png	timeout=50
+	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Robots are not zero. Check screenshots for more informations.
 
 Check If The Agent Has Connected To The Manager
@@ -352,9 +367,9 @@ Change ${str1} With ${str2} In ${file}
 	Create File		${file}	${file_content}
 
 Select Robot File
-	[Arguments]		@{robot_data}
+	[Arguments]		${robot_file_name}
 	Sleep	2
-	${robot_file_name}=		Set Variable		${robot_data}[1]
+	${robot_file_name}=		Set Variable		${robot_file_name}
 	${robot_file_name}=		Get Substring	${robot_file_name}	0	-6
 	Log		${robot_file_name}
 	Take A Screenshot

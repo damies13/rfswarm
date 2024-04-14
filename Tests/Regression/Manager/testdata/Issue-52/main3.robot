@@ -10,8 +10,11 @@ Variables	dir1${/}vars.py
 Variables	..${/}vars0.py
 
 Library 	OperatingSystem
-Metadata	File	dir1${/}manager_windows_agents_ready.jpg
+Metadata	File	dir1${/}manager_windows_agents_ready.png
 Metadata	File	dir1${/}dir2${/}example.csv
+Metadata	File	dir1${/}dir2${/}dir3${/}*.jpg
+Metadata	File	..${/}dir4${/}*.*
+Metadata	File	..${/}excel_example.xlsx
 
 *** Test Cases ***
 0 Test Resource Files Keywords

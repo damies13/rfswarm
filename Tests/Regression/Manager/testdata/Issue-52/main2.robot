@@ -10,8 +10,11 @@ Variables	${CURDIR}${/}dir1${/}vars.py
 Variables	${CURDIR}${/}..${/}vars0.py
 
 Library 	OperatingSystem
-Metadata	File	${CURDIR}${/}dir1${/}manager_windows_agents_ready.jpg
+Metadata	File	${CURDIR}${/}dir1${/}manager_windows_agents_ready.png
 Metadata	File	${CURDIR}${/}dir1${/}dir2${/}example.csv
+Metadata	File	${CURDIR}${/}dir1${/}dir2${/}dir3${/}*.jpg
+Metadata	File	${CURDIR}${/}..${/}dir4${/}*.*
+Metadata	File	${CURDIR}${/}..${/}excel_example.xlsx
 
 *** Test Cases ***
 0 Test Resource Files Keywords

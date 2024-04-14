@@ -8,7 +8,7 @@ Suite Setup 	Set Platform
 *** Variables ***
 @{run_robots}
 @{run_times_in_s}	#delay,		rump-up,	time
-@{robot_data}=	Example Test Case	example.robot
+@{robot_data}=	example.robot	Example Test Case
 &{row_settings_data}=	
 ...    excludelibraries=builtin,string,operatingsystem,perftest,collections	
 ...    robot_options=-v var:examplevariable	
@@ -45,7 +45,7 @@ Insert Example Data To Manager
 		END
 		Press Key.tab 2 Times
 		Click Button	selected_runscriptrow
-		Select Robot File	@{robot_data}
+		Select Robot File	${robot_data}[0]
 		Click Button	selected_select_test_case
 		Click Button	select_example
 		Press Key.tab 2 Times
@@ -202,7 +202,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	Click Button	runopen
 	Open Scenario File	test_scenario
 	Check If The Agent Has Connected To The Manager
-	Sleep	10
+	Sleep	15
 
 	@{excluded_files}=	Create List	RFSListener3.py	RFSTestRepeater.py
 	${A_absolute_paths}	${A_file_names}	
@@ -243,7 +243,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	Click Button	runopen
 	Open Scenario File	test_scenario
 	Check If The Agent Has Connected To The Manager
-	Sleep	10
+	Sleep	15
 
 	@{excluded_files}=	Create List	RFSListener3.py	RFSTestRepeater.py
 	${A_absolute_paths}	${A_file_names}	
@@ -284,7 +284,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	Click Button	runopen
 	Open Scenario File	test_scenario
 	Check If The Agent Has Connected To The Manager
-	Sleep	10
+	Sleep	15
 
 	@{excluded_files}=	Create List	RFSListener3.py	RFSTestRepeater.py
 	${A_absolute_paths}	${A_file_names}	
