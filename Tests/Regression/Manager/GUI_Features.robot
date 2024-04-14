@@ -23,7 +23,7 @@ Insert Example Data To Manager
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	Set INI Window Size		1200	600
 	Open Manager GUI
-	Set Global Filename And Default Save Path	${robot_data}[1]
+	Set Global Filename And Default Save Path	${robot_data}[0]
 	Create Robot File
 
 	Click Button	runaddrow
@@ -67,7 +67,7 @@ Save Example Data To Scenario
 
 Set Scenario File Content And Show Example Data
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
-	Set Global Filename And Default Save Path	${robot_data}[1]
+	Set Global Filename And Default Save Path	${robot_data}[0]
 	${scenario_content}=	Get scenario file content	${global_path}	${scenario_name}
 	Set Suite Variable		${scenario_content} 	${scenario_content}
 	${scenario_content_list}=	Split String	${scenario_content}
@@ -129,11 +129,11 @@ Verify Scenario File Robot Data
 		...    ${scenario_content_list[${test_offset + 2}]}	
 		...    ${scenario_content_list[${test_offset + 3}]}	
 		...    ${scenario_content_list[${test_offset + 4}]}
-		Should Be Equal		${robot_data}[0]	${test_name}
+		Should Be Equal		${robot_data}[1]	${test_name}
 
 		${script_offset}		Set Variable	${i + 18}
 		Should Be Equal		script	${scenario_content_list}[${script_offset}]
-		Should Be Equal		${robot_data}[1]	${scenario_content_list}[${script_offset + 2}]
+		Should Be Equal		${robot_data}[0]	${scenario_content_list}[${script_offset + 2}]
 	END
 
 Verify Scenario File Settings
@@ -169,7 +169,7 @@ Verify Scenario File Settings
 Chceck That The Scenario File Opens Correctly
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	Open Manager GUI
-	Set Global Filename And Default Save Path	${robot_data}[1]
+	Set Global Filename And Default Save Path	${robot_data}[0]
 	Click Button	runsave
 	${scenario_content_reopened}=	Get scenario file content	${global_path}	${scenario_name}
 	Log		${scenario_content}
@@ -179,7 +179,7 @@ Chceck That The Scenario File Opens Correctly
 Clean Issue #1 Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	Run Keyword		Close Manager GUI ${platform}
-	Set Global Filename And Default Save Path	${robot_data}[1]
+	Set Global Filename And Default Save Path	${robot_data}[0]
 	Delete Robot File
 	Delete Scenario File	${scenario_name}
 
