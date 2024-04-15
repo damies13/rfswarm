@@ -119,6 +119,7 @@ Stop Agent With Terminate Signal
 	Sleep	2
 	Click
 	Press Key.enter 1 Times
+	Sleep	1
 	Press Key.tab 1 Times
 	Move To	10	10
 	Wait For	manager_${platform}_button_finished_run.png	timeout=50
