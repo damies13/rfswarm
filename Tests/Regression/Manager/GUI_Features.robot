@@ -19,14 +19,13 @@ ${scenario_content}
 ${scenario_content_list}
 
 *** Test Cases ***
-
 Check If Run Will Stop Gradually
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
-	[Setup]	Run Keywords	
-	...    Set INI Window Size		1000	600							AND
-	...    CommandLine_Common.Run Agent									AND	
-	...    Open Manager GUI												AND	
-	...    Set Global Filename And Default Save Path	example.robot	AND	
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600							AND
+	...    CommandLine_Common.Run Agent									AND
+	...    Open Manager GUI												AND
+	...    Set Global Filename And Default Save Path	example.robot	AND
 	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\t[Documentation]\tI am sleeping 10s\n\tSleep\t10
 
 	Press Key.tab 4 Times
@@ -41,18 +40,18 @@ Check If Run Will Stop Gradually
 	Click Button	runplay
 	Stop Agent Robots Gradually	${15}	${10}
 
-	[Teardown]	Run Keywords	
-	...    Remove File	${global_path}${/}example.robot	AND	
-	...    CommandLine_Common.Stop Agent				AND	
+	[Teardown]	Run Keywords
+	...    Remove File	${global_path}${/}example.robot	AND
+	...    CommandLine_Common.Stop Agent				AND
 	...    CommandLine_Common.Stop Manager
 
 Check If Run Will Stop With Terminate Signal (Ctrl + C)
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
-	[Setup]	Run Keywords	
-	...    Set INI Window Size		1000	600							AND
-	...    CommandLine_Common.Run Agent									AND	
-	...    Open Manager GUI												AND	
-	...    Set Global Filename And Default Save Path	example.robot	AND	
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600							AND
+	...    CommandLine_Common.Run Agent									AND
+	...    Open Manager GUI												AND
+	...    Set Global Filename And Default Save Path	example.robot	AND
 	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\t[Documentation]\tI am sleeping 300s\n\tSleep\t300
 
 	Press Key.tab 4 Times
@@ -67,9 +66,9 @@ Check If Run Will Stop With Terminate Signal (Ctrl + C)
 	Click Button	runplay
 	Stop Agent With Terminate Signal	${15}
 
-	[Teardown]	Run Keywords	
-	...    Remove File	${global_path}${/}example.robot	AND	
-	...    CommandLine_Common.Stop Agent				AND	
+	[Teardown]	Run Keywords
+	...    Remove File	${global_path}${/}example.robot	AND
+	...    CommandLine_Common.Stop Agent				AND
 	...    CommandLine_Common.Stop Manager
 
 Insert Example Data To Manager

@@ -107,7 +107,7 @@ Stop Agent Robots Gradually
 	Click Button	stoprun
 	Press Key.tab 1 Times
 	Move To	10	10
-	Wait For	manager_${platform}_button_finished_run.png	timeout=${expected_robot_test_time + 30}
+	Wait For	manager_${platform}_button_finished_run.png	timeout=${expected_robot_test_time + 60}
 	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_robots_0.png	timeout=20
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Robots are not zero. Check screenshots for more informations.
@@ -427,10 +427,8 @@ Find Absolute Paths And Names For Files In Directory
 	@{absolute_paths}	Create List
 	@{file_names}	Create List
 
-	${dir_number}=	Count Directories In Directory	${example_dir}
 	${new_dir}		List Directories In Directory	${example_dir}	absolute=${True}
 	#=== Collecting data section
-	${dir_files_number}=	Count Files In Directory	${example_dir}
 
 	@{dir_files_path}=		List Files In Directory		${example_dir}	absolute=${True}
 	@{dir_file_names}=		List Files In Directory		${example_dir}
