@@ -95,6 +95,7 @@ Close Manager GUI macos
 	Click Menu		rfswarm
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel
 	# Run Keyword And Return Status 	Click Dialog Button 	cancel
+	Click Image		manager_${platform}_titlebar_rfswarm.png
 	Click Image		manager_${platform}_button_closewindow.png
 	Sleep	5
 	${running}= 	Is Process Running 	${process_manager}
