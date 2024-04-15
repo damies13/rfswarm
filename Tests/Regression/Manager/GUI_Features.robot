@@ -23,6 +23,7 @@ ${scenario_content_list}
 Check If Run Will Stop Gradually
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
 	[Setup]	Run Keywords	
+	...    Set INI Window Size		1000	600							AND
 	...    CommandLine_Common.Run Agent									AND	
 	...    Open Manager GUI												AND	
 	...    Set Global Filename And Default Save Path	example.robot	AND	
@@ -48,6 +49,7 @@ Check If Run Will Stop Gradually
 Check If Run Will Stop With Terminate Signal (Ctrl + C)
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
 	[Setup]	Run Keywords	
+	...    Set INI Window Size		1000	600							AND
 	...    CommandLine_Common.Run Agent									AND	
 	...    Open Manager GUI												AND	
 	...    Set Global Filename And Default Save Path	example.robot	AND	
@@ -254,7 +256,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	Click Button	runopen
 	Open Scenario File	test_scenario
 	Check If The Agent Has Connected To The Manager
-	Sleep	40
+	Sleep	30
 
 	@{excluded_files}=	Create List	RFSListener3.py	RFSListener2.py	RFSTestRepeater.py
 	${A_absolute_paths}	${A_file_names}	
@@ -296,7 +298,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	Click Button	runopen
 	Open Scenario File	test_scenario
 	Check If The Agent Has Connected To The Manager
-	Sleep	40
+	Sleep	30
 
 	@{excluded_files}=	Create List	RFSListener3.py	RFSListener2.py	RFSTestRepeater.py
 	${A_absolute_paths}	${A_file_names}	
@@ -338,7 +340,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	Click Button	runopen
 	Open Scenario File	test_scenario
 	Check If The Agent Has Connected To The Manager
-	Sleep	40
+	Sleep	30
 
 	@{excluded_files}=	Create List	RFSListener3.py	RFSListener2.py	RFSTestRepeater.py
 	${A_absolute_paths}	${A_file_names}	
