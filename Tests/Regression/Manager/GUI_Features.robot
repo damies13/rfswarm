@@ -175,7 +175,7 @@ Clean Files
 	Delete Robot File
 	Delete Scenario File	${scenario_name}
 
-Verify Disable log.html - Scenario
+Verify Disable log_html - Scenario
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
 	@{mngr_options}= 	Create List 	-s 	${scenariofile}
 	Open Manager GUI
