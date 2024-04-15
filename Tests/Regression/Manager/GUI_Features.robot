@@ -182,6 +182,7 @@ Verify Disable log.html - Scenario
 
 	${scenariofilebefore}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofilebefore: ${scenariofilebefore} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
 
 	@{mngr_options}= 	Create List 	-s 	${scenariofile}
 	Open Manager GUI 		${mngr_options}
@@ -190,10 +191,26 @@ Verify Disable log.html - Scenario
 	Click Dialog Button 	ok
 	Click Button 	runsave
 
-	${scenariofileafter}= 		Read Ini File 	${scenariofile}
-	Log 	scenariofileafter: ${scenariofileafter} 	console=True
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Dictionary Should Contain Key 	${scenariofileafter1} 	Script Defaults
+	Dictionary Should Contain Key 	${scenariofileafter1}[Script Defaults] 	disableloglog
+	Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][disableloglog] 	True
+
+	Open Manager GUI 		${mngr_options}
+	Click Button	runsettings
+	Click CheckBox 	checked 	loghtml
+	Click Dialog Button 	ok
+	Click Button 	runsave
 
 	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofilebefore: ${scenariofileafter2} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
+
 
 Verify Disable report.html - Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
