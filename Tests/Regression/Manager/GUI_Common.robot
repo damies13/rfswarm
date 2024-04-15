@@ -63,9 +63,11 @@ Open Manager GUI
 	Take A Screenshot
 
 Close Manager GUI ubuntu
+	Run Keyword And Ignore Error 	Click Dialog Button 	cancel
 	Close Manager GUI
 
 Close Manager GUI windows
+	Run Keyword And Ignore Error 	Click Dialog Button 	cancel
 	Close Manager GUI
 
 Close Manager GUI
@@ -92,7 +94,7 @@ Close Manager GUI macos
 	# Press Combination 	Key.esc
 	# Press Combination 	q 	Key.command
 	# Click Image		manager_${platform}_menu_python3.png
-	Click Menu		rfswarm
+	# Click Menu		rfswarm
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel
 	# Run Keyword And Return Status 	Click Dialog Button 	cancel
 	Click Image		manager_${platform}_titlebar_rfswarm.png
