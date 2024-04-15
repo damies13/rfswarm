@@ -43,7 +43,7 @@ Check If Run Will Stop Gradually
 	[Teardown]	Run Keywords
 	...    CommandLine_Common.Stop Agent				AND
 	...    CommandLine_Common.Stop Manager				AND
-	...    Remove File	${global_path}${/}example.robot	AND
+	...    Remove File	${global_path}${/}example.robot
 
 Check If Run Will Stop With Terminate Signal (Ctrl + C)
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
