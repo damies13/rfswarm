@@ -177,7 +177,9 @@ Clean Files
 
 Verify Disable log.html - Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
-	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
+	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-sl.rfs
+	Copy File 	${sourcefile} 	${scenariofile}
 	Log 	scenariofile: ${scenariofile} 	console=True
 
 	${scenariofilebefore}= 		Read Ini File 	${scenariofile}
@@ -208,13 +210,15 @@ Verify Disable log.html - Scenario
 	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
-	Log 	scenariofilebefore: ${scenariofileafter2} 	console=True
+	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
 
 
 Verify Disable report.html - Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
-	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
+	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-sr.rfs
+	Copy File 	${sourcefile} 	${scenariofile}
 	Log 	scenariofile: ${scenariofile} 	console=True
 
 	${scenariofilebefore}= 		Read Ini File 	${scenariofile}
@@ -245,12 +249,14 @@ Verify Disable report.html - Scenario
 	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
-	Log 	scenariofilebefore: ${scenariofileafter2} 	console=True
+	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
 
 Verify Disable output.xml - Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
-	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
+	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-so.rfs
+	Copy File 	${sourcefile} 	${scenariofile}
 	Log 	scenariofile: ${scenariofile} 	console=True
 
 	${scenariofilebefore}= 		Read Ini File 	${scenariofile}
@@ -281,12 +287,46 @@ Verify Disable output.xml - Scenario
 	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
-	Log 	scenariofilebefore: ${scenariofileafter2} 	console=True
+	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
 
 Verify Disable log.html - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
-	No Operation
+	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-trl.rfs
+	Copy File 	${sourcefile} 	${scenariofile}
+	Log 	scenariofile: ${scenariofile} 	console=True
+
+	${scenariofilebefore}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofilebefore: ${scenariofilebefore} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
+
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI 		${mngr_options}
+	Click Button	trsettings
+	Click CheckBox 	unchecked 	loghtml
+	Click Dialog Button 	ok
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Dictionary Should Contain Key 	${scenariofileafter1} 	Script Defaults
+	Dictionary Should Contain Key 	${scenariofileafter1}[Script Defaults] 	disablelogoutput
+	Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][disablelogoutput] 	True
+
+	Open Manager GUI 		${mngr_options}
+	Click Button	trsettings
+	Click CheckBox 	checked 	loghtml
+	Click Dialog Button 	ok
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
 
 Verify Disable report.html - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
