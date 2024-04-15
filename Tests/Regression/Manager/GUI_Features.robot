@@ -19,6 +19,57 @@ ${scenario_content}
 ${scenario_content_list}
 
 *** Test Cases ***
+
+Check If Run Will Stop Gradually
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
+	[Setup]	Run Keywords	
+	...    CommandLine_Common.Run Agent									AND	
+	...    Open Manager GUI												AND	
+	...    Set Global Filename And Default Save Path	example.robot	AND	
+	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\t[Documentation]\tI am sleeping 10s\n\tSleep\t10
+
+	Press Key.tab 4 Times
+	Type	15
+	Press Key.tab 1 Times
+	Type	30
+	Click Button	runscriptrow
+	Select Robot File	${robot_data}[0]
+	Select 1 Robot Test Case
+	Check If The Agent Has Connected To The Manager
+	Click Tab	Plan
+	Click Button	runplay
+	Stop Agent Robots Gradually	${15}	${10}
+
+	[Teardown]	Run Keywords	
+	...    Remove File	${global_path}${/}example.robot	AND	
+	...    CommandLine_Common.Stop Agent				AND	
+	...    CommandLine_Common.Stop Manager
+
+Check If Run Will Stop With Terminate Signal (Ctrl + C)
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
+	[Setup]	Run Keywords	
+	...    CommandLine_Common.Run Agent									AND	
+	...    Open Manager GUI												AND	
+	...    Set Global Filename And Default Save Path	example.robot	AND	
+	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\t[Documentation]\tI am sleeping 300s\n\tSleep\t300
+
+	Press Key.tab 4 Times
+	Type	15
+	Press Key.tab 1 Times
+	Type	30
+	Click Button	runscriptrow
+	Select Robot File	${robot_data}[0]
+	Select 1 Robot Test Case
+	Check If The Agent Has Connected To The Manager
+	Click Tab	Plan
+	Click Button	runplay
+	Stop Agent With Terminate Signal	${15}
+
+	[Teardown]	Run Keywords	
+	...    Remove File	${global_path}${/}example.robot	AND	
+	...    CommandLine_Common.Stop Agent				AND	
+	...    CommandLine_Common.Stop Manager
+
 Insert Example Data To Manager
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	Set INI Window Size		1200	600
@@ -186,11 +237,11 @@ Clean Issue #1 Files
 Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords	
+	...    Set INI Window Size		800		600												AND	
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND	
 	...    CommandLine_Common.Run Agent	${agent_options}									AND	
 	...    Open Manager GUI																	AND	
 	...    Set Global Filename And Default Save Path	main								AND	
-	...    Set INI Window Size		800		600												AND	
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main1.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
 
 	${M_absolute_paths}	${M_file_names}	
@@ -225,11 +276,11 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords	
+	...    Set INI Window Size		800		600												AND	
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND	
 	...    CommandLine_Common.Run Agent	${agent_options}									AND	
 	...    Open Manager GUI																	AND	
 	...    Set Global Filename And Default Save Path	main								AND	
-	...    Set INI Window Size		800		600												AND	
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main2.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
 
 	${M_absolute_paths}	${M_file_names}	
@@ -267,11 +318,11 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords	
+	...    Set INI Window Size		800		600												AND	
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND	
 	...    CommandLine_Common.Run Agent	${agent_options}									AND	
 	...    Open Manager GUI																	AND	
 	...    Set Global Filename And Default Save Path	main								AND	
-	...    Set INI Window Size		800		600												AND	
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main3.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
 
 	${M_absolute_paths}	${M_file_names}	
