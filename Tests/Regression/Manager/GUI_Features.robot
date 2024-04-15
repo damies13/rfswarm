@@ -305,7 +305,7 @@ Verify Disable log.html - Test Row
 	Open Manager GUI 		${mngr_options}
 	Click Button	trsettings
 	Click CheckBox 	unchecked 	loghtml
-	Click Dialog Button 	ok
+	Click Dialog Button 	save_2
 	Click Button 	runsave
 
 	Run Keyword		Close Manager GUI ${platform}
@@ -319,7 +319,7 @@ Verify Disable log.html - Test Row
 	Open Manager GUI 		${mngr_options}
 	Click Button	trsettings
 	Click CheckBox 	checked 	loghtml
-	Click Dialog Button 	ok
+	Click Dialog Button 	save_2
 	Click Button 	runsave
 
 	Run Keyword		Close Manager GUI ${platform}
