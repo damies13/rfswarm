@@ -175,7 +175,8 @@ Clean Files
 	Delete Robot File
 	Delete Scenario File	${scenario_name}
 
-Verify Disable log_html - Scenario
+Verify Disable log.html - Scenario
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
 	@{mngr_options}= 	Create List 	-s 	${scenariofile}
 	Open Manager GUI
@@ -184,16 +185,21 @@ Verify Disable log_html - Scenario
 	Run Keyword		Close Manager GUI ${platform}
 
 Verify Disable report.html - Scenario
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	No Operation
 
 Verify Disable output.xml - Scenario
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	No Operation
 
 Verify Disable log.html - Test Row
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	No Operation
 
 Verify Disable report.html - Test Row
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	No Operation
 
 Verify Disable output.xml - Test Row
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	No Operation
