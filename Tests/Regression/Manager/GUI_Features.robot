@@ -43,7 +43,8 @@ Check If Run Will Stop Gradually
 	[Teardown]	Run Keywords
 	...    CommandLine_Common.Stop Agent				AND
 	...    CommandLine_Common.Stop Manager				AND
-	...    Remove File	${global_path}${/}example.robot
+	...    Remove File	${global_path}${/}example.robot	AND
+	...    Remove File	${global_path}${/}RFSwarmManager.ini
 
 Check If Run Will Stop With Terminate Signal (Ctrl + C)
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
@@ -69,11 +70,12 @@ Check If Run Will Stop With Terminate Signal (Ctrl + C)
 	[Teardown]	Run Keywords
 	...    CommandLine_Common.Stop Agent				AND
 	...    CommandLine_Common.Stop Manager				AND
-	...    Remove File	${global_path}${/}example.robot
+	...    Remove File	${global_path}${/}example.robot	AND
+	...    Remove File	${global_path}${/}RFSwarmManager.ini
 
 Insert Example Data To Manager
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
-	[Setup]	Remove File	${global_path}{/}RFSwarmManager.ini
+	[Setup]	Run Keywords	
 	Set INI Window Size		1200	600
 	Open Manager GUI
 	Set Global Filename And Default Save Path	${robot_data}[0]
