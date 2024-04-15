@@ -1,9 +1,7 @@
 import configparser
 
-class IniFile:
-	def __init__(self):
-		print("IniFile Loaded")
 
+class IniFile:
 	def read_ini_file(self, filename):
 		config = configparser.ConfigParser()
 		config.read(filename)
