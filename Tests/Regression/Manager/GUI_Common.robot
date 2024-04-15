@@ -81,7 +81,7 @@ Close Manager GUI macos
 	# Press Combination 	q 	Key.command
 	# Click Image		manager_${platform}_menu_python3.png
 	Click Menu		rfswarm
-	Click Image		manager_${platform}_button_closewindow.png
+	Click Button	closewindow
 	Sleep	5
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
@@ -100,6 +100,48 @@ Close Manager GUI macos
 Stop Agent
 	${result} = 	Terminate Process		${process_agent}
 	# Should Be Equal As Integers 	${result.rc} 	0
+
+Stop Agent Robots Gradually
+	[Arguments]	${rumup_time}	${expected_robot_test_time}
+	Sleep	${rumup_time + 10}
+	Click Button	stoprun
+	Press Key.tab 1 Times
+	Move To	10	10
+	Wait For	manager_${platform}_button_finished_run.png	timeout=${expected_robot_test_time + 10}
+	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_robots_0.png	timeout=20
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Robots are not zero. Check screenshots for more informations.
+
+Stop Agent With Terminate Signal
+	[Arguments]	${rumup_time}
+	Sleep	${rumup_time + 10}
+	Click Button	stoprun
+	Sleep	2
+	Click
+	Press Key.enter 1 Times
+	Press Key.tab 1 Times
+	Move To	10	10
+	Wait For	manager_${platform}_button_finished_run.png	timeout=50
+	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_robots_0.png	timeout=50
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Robots are not zero. Check screenshots for more informations.
+
+Check If The Agent Has Connected To The Manager
+	Click Tab	Agents
+	Wait For 	manager_${platform}_agents_ready.png	timeout=300
+
+Check If the Robot Failed
+	[Arguments] 	${expected_time}
+	Sleep	${expected_time}
+	TRY
+		Click Image 	manager_${platform}_button_abort
+		Press Combination	Key.enter
+	EXCEPT
+		Wait For	manager_${platform}_button_finished_run.png	timeout=300
+	END
+	Take A Screenshot
+	${status}=	Run Keyword And Return Status	Locate	manager_${platform}_resource_file_provided.png
+	Run Keyword If	not ${status}	Fail	msg=Test failed. Check screenshots for more informations.
 
 Click Tab
 	[Arguments]		${tabname}
@@ -140,7 +182,7 @@ Click Menu
 Click Dialog Button
 	[Arguments]		${btnname}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
-	${img}=	Set Variable		${platform}_dlgbtn_${btnname}.png
+	${img}=	Set Variable		${platform}_dlgbtn_${btnnamel}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=300
@@ -149,10 +191,11 @@ Click Dialog Button
 	Sleep 	1
 	Take A Screenshot
 
-Click Tab ${n} Times
+Press ${key} ${n} Times
+	[Documentation]	Provide full name. For example: Key.tab
 	Sleep	0.5
 	FOR  ${i}  IN RANGE  0  ${n}
-		Press Combination 	Key.tab
+		Press Combination 	${key}
 	END
 
 Click Label With Vertical Offset
@@ -171,7 +214,7 @@ Click Label With Vertical Offset
 	Sleep 	0.1
 	Take A Screenshot
 
-Click Label With Horizon Offset
+Click Label With Horizontal Offset
 	[Arguments]		${labelname}	${offset}
 	[Documentation]	Click the image with the offset 
 	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right]. 
@@ -206,17 +249,30 @@ Wait Agent Ready
 	${img}=	Set Variable		manager_${platform}_agents_ready.png
 	Wait For 	${img} 	 timeout=300
 
-Set Global Filename And Default Save Path 
-	#sets global default global save path and file_name for robot
+Set Global Filename And Default Save Path
+	[Documentation]	Sets global default save path as Test Variable and file name for robot test. 
+	...    You can also provide optional save path.
 	[Arguments]		${input_name}	${optional_path}=${None}
-	Set Test Variable	${global_name}	${input_name}
 
+	Set Test Variable	${global_name}	${input_name}
 	${location}=	Get Manager Default Save Path
 	Set Test Variable	${global_path}	${location}
 
 	Set Test Variable 	$file_name 	${global_name}
-	Run Keyword If	'${optional_path}' != '${None}'	
-	...	Set Test Variable	${global_path}	${optional_path}
+	IF  '${optional_path}' != '${None}'	
+		Set Test Variable	${global_path}	${optional_path}
+		${location}=	Get Manager INI Location
+		${ini_content}=		Get Manager INI Data
+		${ini_content_list}=	Split String	${ini_content}
+		${scriptdir}=	Get Index From List		${ini_content_list}		scriptdir
+
+		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${scriptdir + 2}]	${optional_path}
+		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${scriptdir + 5}]	${optional_path}
+
+		Remove File		${location}
+		Log		${ini_content}
+		Append To File	${location}		${ini_content}
+	END
 
 	Log		${global_name}
 	Log		${global_path}
@@ -271,36 +327,49 @@ Get Manager PIP Data
 	RETURN		${pip_data.stdout}
 
 Create Robot File
-	[Arguments]		${path}=${global_path}	${name}=${global_name}
+	[Arguments]		${path}=${global_path}	${name}=${global_name}	
+	...    ${file_content}=***Test Case***\nExample Test Case\n
 	
-	${example_robot_content}=	Set Variable	***Test Case***\nExample Test Case\n
+	${example_robot_content}=	Set Variable	${file_content}
 	Variable Should Exist	${path}	msg="Global save path does not exist or path is not provided."
 	Variable Should Exist	${name}	msg="Global file name does not exist or file name is not provided."
 	Create File		${path}${/}${name}	content=${example_robot_content}
 	File Should Exist	${path}${/}${name}
 
 Change Test Group Settings
-	[Arguments]		@{row_settings_data}
+	[Arguments]		&{row_settings_data}
 	Sleep	2
 	Click Dialog Button		row_settings_frame_name
-	Click Tab 1 Times
-	Type	${row_settings_data}[0]
-	Click Tab 1 Times
-	Type	${row_settings_data}[1]
-	IF  '${row_settings_data}[2]' == '${True}'
-		Click Button	checkbox_unch
+	Press Key.tab 1 Times
+	IF  'excludelibraries' in ${row_settings_data}
+		Type	${row_settings_data['excludelibraries']}
 	END
+	Press Key.tab 1 Times
+	IF  'robot_options' in ${row_settings_data}
+		Type	${row_settings_data['robot_options']}
+	END
+	IF  'test_repeater' in ${row_settings_data}
+		IF  '${row_settings_data['test_repeater']}' == 'True'
+			Click Button	checkbox_unch
+		END
+	END
+	
 	IF 	"${platform}" == "macos"
 		Click Dialog Button		save_2
 	ELSE
 		Click Dialog Button		save
 	END
-	
+
+Change ${str1} With ${str2} In ${file}
+	${file_content}	Get File	${file}
+	Remove File		${file}
+	${file_content}	Replace String	${file_content}	${str1}	${str2}
+	Create File		${file}	${file_content}
 
 Select Robot File
-	[Arguments]		@{robot_data}
+	[Arguments]		${robot_file_name}
 	Sleep	2
-	${robot_file_name}=		Set Variable		${robot_data}[1]
+	${robot_file_name}=		Set Variable		${robot_file_name}
 	${robot_file_name}=		Get Substring	${robot_file_name}	0	-6
 	Log		${robot_file_name}
 	Take A Screenshot
@@ -310,6 +379,11 @@ Select Robot File
 	Click Dialog Button		open
 	Sleep	1
 
+Select ${n} Robot Test Case
+	Click Button	select_test_case
+	Press Key.down ${n} Times	
+	Press Combination	Key.enter
+
 Save Scenario File
 	[Arguments]		${scenario_name}
 	Sleep	5
@@ -318,9 +392,17 @@ Save Scenario File
 	Click Dialog Button		save
 	Sleep	1
 
-Get Scenario File Content
+Open Scenario File
 	[Arguments]		${scenario_name}
-	${scenario_content}=	Get File	${global_path}${/}${scenario_name}.rfs
+	Sleep	5
+	Type	${scenario_name}.rfs
+	Take A Screenshot
+	Click Dialog Button		open
+	Sleep	1
+
+Get Scenario File Content
+	[Arguments]		${path}		${scenario_name}
+	${scenario_content}=	Get File	${path}${/}${scenario_name}.rfs
 	Should Not Be Empty	${scenario_content}
 
 	RETURN	${scenario_content}
@@ -336,3 +418,66 @@ Delete Robot File
 	Variable Should Exist	${name}	msg="Global file name does not exist or file name is not provided"
 	Remove File		${path}${/}${name}
 	File Should Not Exist	${path}${/}${name}
+
+Find Absolute Paths And Names For Files In Directory
+	[Documentation]	This algorithm analyses the specified path and returns all 
+	...    file names with their absolute paths even those that are in subdirectories
+	[Arguments]		${given_path}	@{excluded_files}
+	${example_dir}	Set Variable	${given_path}
+	@{absolute_paths}	Create List
+	@{file_names}	Create List
+
+	${dir_number}=	Count Directories In Directory	${example_dir}
+	${new_dir}		List Directories In Directory	${example_dir}	absolute=${True}
+	#=== Collecting data section
+	${dir_files_number}=	Count Files In Directory	${example_dir}
+
+	@{dir_files_path}=		List Files In Directory		${example_dir}	absolute=${True}
+	@{dir_file_names}=		List Files In Directory		${example_dir}
+	
+	${length}	Get Length	${dir_files_path}
+	FOR  ${i}  IN RANGE  0  ${length}
+		IF  '${dir_file_names}[${i}]' not in ${excluded_files}
+			Append To List	${absolute_paths}	${dir_files_path}[${i}]
+			Append To List	${file_names}	${dir_file_names}[${i}]
+		END
+	END
+	#=== Merging data section
+	FOR  ${specific_dir}  IN  @{new_dir}
+		${next_absolute_paths}	${next_file_names}	
+		...    Find Absolute Paths And Names For Files In Directory	${specific_dir}	@{excluded_files}
+
+		${length}	Get Length	${next_absolute_paths}
+		FOR  ${i}  IN RANGE  0  ${length}
+			${bad_list}	Get Length	${next_absolute_paths}
+			IF  ${bad_list} != ${0}
+				Append To List	${absolute_paths}	${next_absolute_paths}[${i}]
+				Append To List	${file_names}	${next_file_names}[${i}]
+			END
+		END
+	END
+
+	RETURN	${absolute_paths}	${file_names}
+
+Compare Manager and Agent Files
+	[Arguments]	${M_file_names}	${A_file_names}
+	Log To Console	\n${M_file_names}
+	Log To Console	${A_file_names}\n
+	Lists Should Be Equal	${M_file_names}	${A_file_names}
+	...    msg="Files are not transferred correctly! Check report for more information."
+
+Compare Manager and Agent Files Content
+	[Arguments]	${M_absolute_paths}	${A_absolute_paths}
+	${length}	Get Length	${M_absolute_paths}
+	@{excluded_files_format}	Create List	png		jpg		xlsx	pdf
+	FOR  ${i}  IN RANGE  0  ${length}
+		${file_extension}	Split String From Right	${M_absolute_paths}[${i}]	separator=.
+		IF  '${file_extension}[-1]' not in @{excluded_files_format}
+			${M_file_content}	Get File	${M_absolute_paths}[${i}]
+			${A_file_content}	Run Keyword And Continue On Failure	
+			...    Get File	${A_absolute_paths}[${i}]
+
+			Run Keyword And Continue On Failure	
+			...    Should Be Equal	${M_file_content}	${A_file_content}
+		END
+	END
