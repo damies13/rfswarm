@@ -204,7 +204,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	Check If The Agent Has Connected To The Manager
 	Sleep	15
 
-	@{excluded_files}=	Create List	RFSListener3.py	RFSTestRepeater.py
+	@{excluded_files}=	Create List	RFSListener3.py	RFSListener2.py	RFSTestRepeater.py
 	${A_absolute_paths}	${A_file_names}	
 	...    Find Absolute Paths And Names For Files In Directory	${TEMPDIR}${/}agent_temp_issue52	@{excluded_files}
 	Log 	${A_absolute_paths}
@@ -245,7 +245,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	Check If The Agent Has Connected To The Manager
 	Sleep	15
 
-	@{excluded_files}=	Create List	RFSListener3.py	RFSTestRepeater.py
+	@{excluded_files}=	Create List	RFSListener3.py	RFSListener2.py	RFSTestRepeater.py
 	${A_absolute_paths}	${A_file_names}	
 	...    Find Absolute Paths And Names For Files In Directory	${TEMPDIR}${/}agent_temp_issue52	@{excluded_files}
 	Log 	${A_absolute_paths}
