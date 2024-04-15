@@ -178,20 +178,22 @@ Clean Files
 Verify Disable log.html - Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
+	Log 	scenariofile: ${scenariofile} 	console=True
 
 	${scenariofilebefore}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofilebefore: ${scenariofilebefore} 	console=True
 
 	@{mngr_options}= 	Create List 	-s 	${scenariofile}
-	Open Manager GUI
+	Open Manager GUI 		${mngr_options}
 	Click Button	runsettings
 	Click CheckBox 	unchecked 	loghtml
 	Click Dialog Button 	ok
 	Click Button 	runsave
-	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter: ${scenariofileafter} 	console=True
+
+	Run Keyword		Close Manager GUI ${platform}
 
 Verify Disable report.html - Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
