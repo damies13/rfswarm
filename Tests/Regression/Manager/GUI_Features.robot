@@ -286,7 +286,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	Check If The Agent Has Connected To The Manager
 	Sleep	15
 
-	@{excluded_files}=	Create List	RFSListener3.py	RFSTestRepeater.py
+	@{excluded_files}=	Create List	RFSListener3.py	RFSListener2.py	RFSTestRepeater.py
 	${A_absolute_paths}	${A_file_names}	
 	...    Find Absolute Paths And Names For Files In Directory	${TEMPDIR}${/}agent_temp_issue52	@{excluded_files}
 	Log 	${A_absolute_paths}
@@ -302,29 +302,3 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main3.robot	${CURDIR}${/}testdata${/}Issue-52	AND
 	...    CommandLine_Common.Stop Agent											AND	
 	...    CommandLine_Common.Stop Manager
-
-*** Keywords ***
-Compare Manager and Agent Files
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	[Arguments]	${M_file_names}	${A_file_names}
-	Log To Console	\n${M_file_names}
-	Log To Console	${A_file_names}\n
-	Lists Should Be Equal	${M_file_names}	${A_file_names}
-	...    msg="Files are not transferred correctly! Check report for more information."
-
-Compare Manager and Agent Files Content
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	[Arguments]	${M_absolute_paths}	${A_absolute_paths}
-	${length}	Get Length	${M_absolute_paths}
-	@{excluded_files_format}	Create List	png		jpg		xlsx	pdf
-	FOR  ${i}  IN RANGE  0  ${length}
-		${file_extension}	Split String From Right	${M_absolute_paths}[${i}]	separator=.
-		IF  '${file_extension}[-1]' not in @{excluded_files_format}
-			${M_file_content}	Get File	${M_absolute_paths}[${i}]
-			${A_file_content}	
-			...    Get File	${A_absolute_paths}[${i}]
-
-			Run Keyword And Continue On Failure	
-			...    Should Be Equal	${M_file_content}	${A_file_content}
-		END
-	END

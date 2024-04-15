@@ -458,3 +458,26 @@ Find Absolute Paths And Names For Files In Directory
 	END
 
 	RETURN	${absolute_paths}	${file_names}
+
+Compare Manager and Agent Files
+	[Arguments]	${M_file_names}	${A_file_names}
+	Log To Console	\n${M_file_names}
+	Log To Console	${A_file_names}\n
+	Lists Should Be Equal	${M_file_names}	${A_file_names}
+	...    msg="Files are not transferred correctly! Check report for more information."
+
+Compare Manager and Agent Files Content
+	[Arguments]	${M_absolute_paths}	${A_absolute_paths}
+	${length}	Get Length	${M_absolute_paths}
+	@{excluded_files_format}	Create List	png		jpg		xlsx	pdf
+	FOR  ${i}  IN RANGE  0  ${length}
+		${file_extension}	Split String From Right	${M_absolute_paths}[${i}]	separator=.
+		IF  '${file_extension}[-1]' not in @{excluded_files_format}
+			${M_file_content}	Get File	${M_absolute_paths}[${i}]
+			${A_file_content}	Run Keyword And Continue On Failure	
+			...    Get File	${A_absolute_paths}[${i}]
+
+			Run Keyword And Continue On Failure	
+			...    Should Be Equal	${M_file_content}	${A_file_content}
+		END
+	END
