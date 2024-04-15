@@ -142,7 +142,7 @@ Enabling this setting here will enable it for all test groups
 These settings when enabled will disable the generation of the selected files on the agent machine by instructing robot framework not to generate these files.
 
 If you disable output.xml but leave either log.html or report.html enabled then output.xml will still get created as it's required for generating the
-html files. This behaviour is controlled by robot framework not RFSwarm.
+HTML files. This behaviour is controlled by robot framework not RFSwarm.
 
 Enabling these settings here will enable it for all test groups
 
@@ -216,7 +216,7 @@ Enabling/disabling this setting here will enable it for this test group
 These settings when enabled will disable the generation of the selected files on the agent machine by instructing robot framework not to generate these files.
 
 If you disable output.xml but leave either log.html or report.html enabled then output.xml will still get created as it's required for generating the
-html files. This behaviour is controlled by robot framework not RFSwarm.
+HTML files. This behaviour is controlled by robot framework not RFSwarm.
 
 Enabling/disabling these settings here will enable it for this test group
 
