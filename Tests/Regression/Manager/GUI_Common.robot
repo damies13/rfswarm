@@ -6,6 +6,7 @@ Library		Collections
 
 Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
+Library 	IniFile.py
 
 *** Variables ***
 ${cmd_agent} 		rfswarm-agent
@@ -161,6 +162,19 @@ Click Dialog Button
 	Sleep 	1
 	Take A Screenshot
 
+Click CheckBox
+	[Arguments]		${status} 		${btnname}
+	${btnnamel}= 	Convert To Lower Case 	${btnname}
+	${statusl}= 	Convert To Lower Case 	${status}
+	${img}=	Set Variable		${platform}_checkbox_${statusl}_${btnnamel}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	1
+	Take A Screenshot
+
 Click Tab ${n} Times
 	Sleep	0.5
 	FOR  ${i}  IN RANGE  0  ${n}
@@ -257,6 +271,10 @@ Get Manager INI Data
 	Log	${ini_content}
 	Should Not Be Empty	${ini_content}
 	RETURN	${ini_content}
+
+Read INI Data
+	[Arguments]		${inifile}
+
 
 Set INI Window Size
 	[Arguments]		${width}=${None}	${height}=${None}
