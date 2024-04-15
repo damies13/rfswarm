@@ -279,7 +279,7 @@ Wait Agent Ready
 	Wait For 	${img} 	 timeout=300
 
 Set Global Filename And Default Save Path
-	[Documentation]	Sets global default save path as Test Variable and file name for robot test. 
+	[Documentation]	Sets global default save path as Test Variable and file name for robot test.
 	...    You can also provide optional save path.
 	[Arguments]		${input_name}	${optional_path}=${None}
 
@@ -288,7 +288,7 @@ Set Global Filename And Default Save Path
 	Set Test Variable	${global_path}	${location}
 
 	Set Test Variable 	$file_name 	${global_name}
-	IF  '${optional_path}' != '${None}'	
+	IF  '${optional_path}' != '${None}'
 		Set Test Variable	${global_path}	${optional_path}
 		${location}=	Get Manager INI Location
 		${ini_content}=		Get Manager INI Data
@@ -360,9 +360,9 @@ Get Manager PIP Data
 	RETURN		${pip_data.stdout}
 
 Create Robot File
-	[Arguments]		${path}=${global_path}	${name}=${global_name}	
+	[Arguments]		${path}=${global_path}	${name}=${global_name}
 	...    ${file_content}=***Test Case***\nExample Test Case\n
-	
+
 	${example_robot_content}=	Set Variable	${file_content}
 	Variable Should Exist	${path}	msg="Global save path does not exist or path is not provided."
 	Variable Should Exist	${name}	msg="Global file name does not exist or file name is not provided."
@@ -386,7 +386,10 @@ Change Test Group Settings
 			Click Button	checkbox_unch
 		END
 	END
-	
+	Test Group Save Settings
+
+
+Test Group Save Settings
 	IF 	"${platform}" == "macos"
 		Click Dialog Button		save_2
 	ELSE
@@ -414,7 +417,7 @@ Select Robot File
 
 Select ${n} Robot Test Case
 	Click Button	select_test_case
-	Press Key.down ${n} Times	
+	Press Key.down ${n} Times
 	Press Combination	Key.enter
 
 Save Scenario File
@@ -453,7 +456,7 @@ Delete Robot File
 	File Should Not Exist	${path}${/}${name}
 
 Find Absolute Paths And Names For Files In Directory
-	[Documentation]	This algorithm analyses the specified path and returns all 
+	[Documentation]	This algorithm analyses the specified path and returns all
 	...    file names with their absolute paths even those that are in subdirectories
 	[Arguments]		${given_path}	@{excluded_files}
 	${example_dir}	Set Variable	${given_path}
@@ -467,7 +470,7 @@ Find Absolute Paths And Names For Files In Directory
 
 	@{dir_files_path}=		List Files In Directory		${example_dir}	absolute=${True}
 	@{dir_file_names}=		List Files In Directory		${example_dir}
-	
+
 	${length}	Get Length	${dir_files_path}
 	FOR  ${i}  IN RANGE  0  ${length}
 		IF  '${dir_file_names}[${i}]' not in ${excluded_files}
@@ -477,7 +480,7 @@ Find Absolute Paths And Names For Files In Directory
 	END
 	#=== Merging data section
 	FOR  ${specific_dir}  IN  @{new_dir}
-		${next_absolute_paths}	${next_file_names}	
+		${next_absolute_paths}	${next_file_names}
 		...    Find Absolute Paths And Names For Files In Directory	${specific_dir}	@{excluded_files}
 
 		${length}	Get Length	${next_absolute_paths}
@@ -507,10 +510,10 @@ Compare Manager and Agent Files Content
 		${file_extension}	Split String From Right	${M_absolute_paths}[${i}]	separator=.
 		IF  '${file_extension}[-1]' not in @{excluded_files_format}
 			${M_file_content}	Get File	${M_absolute_paths}[${i}]
-			${A_file_content}	Run Keyword And Continue On Failure	
+			${A_file_content}	Run Keyword And Continue On Failure
 			...    Get File	${A_absolute_paths}[${i}]
 
-			Run Keyword And Continue On Failure	
+			Run Keyword And Continue On Failure
 			...    Should Be Equal	${M_file_content}	${A_file_content}
 		END
 	END

@@ -9,9 +9,9 @@ Suite Setup 	Set Platform
 @{run_robots}
 @{run_times_in_s}	#delay,		rump-up,	time
 @{robot_data}=	example.robot	Example Test Case
-&{row_settings_data}=	
-...    excludelibraries=builtin,string,operatingsystem,perftest,collections	
-...    robot_options=-v var:examplevariable	
+&{row_settings_data}=
+...    excludelibraries=builtin,string,operatingsystem,perftest,collections
+...    robot_options=-v var:examplevariable
 ...    test_repeater=True
 @{settings_locations}
 ${scenario_name}=	test_scenario
@@ -32,7 +32,7 @@ Insert Example Data To Manager
 		Sleep	2
 		FOR  ${j}  IN RANGE  1  5
 			Press Key.tab 1 Times
-			IF  '${j}' == '1' 
+			IF  '${j}' == '1'
 				Append To List	${run_robots}	${i}${j}${i}
 				Type	${i}${j}${i}
 			ELSE
@@ -49,7 +49,7 @@ Insert Example Data To Manager
 		Click Button	selected_select_test_case
 		Click Button	select_example
 		Press Key.tab 2 Times
-		${settings_coordinates}=	
+		${settings_coordinates}=
 		...    Locate	manager_${platform}_button_selected_runsettingsrow.png
 		Append To List	${settings_locations}	${settings_coordinates}
 		Press Key.tab 1 Times
@@ -153,8 +153,8 @@ Verify Scenario File Settings
 		IF  'robot_options' in ${row_settings_data}
 			${robot_options_offset}		Set Variable	${i + 24}
 			Should Be Equal		robotoptions	${scenario_content_list}[${robot_options_offset}]
-			${robot_options}=	Catenate	
-			...    ${scenario_content_list[${robot_options_offset + 2}]}	
+			${robot_options}=	Catenate
+			...    ${scenario_content_list[${robot_options_offset + 2}]}
 			...    ${scenario_content_list[${robot_options_offset + 3}]}
 			Should Be Equal		${row_settings_data['robot_options']}	${robot_options}
 		END
@@ -313,7 +313,7 @@ Verify Disable log.html - Test Row
 	Open Manager GUI 		${mngr_options}
 	Click Button	trsettings
 	Click CheckBox 	unchecked 	loghtml
-	Click Dialog Button 	save_2
+	Test Group Save Settings
 	Click Button 	runsave
 
 	Run Keyword		Close Manager GUI ${platform}
@@ -327,7 +327,7 @@ Verify Disable log.html - Test Row
 	Open Manager GUI 		${mngr_options}
 	Click Button	trsettings
 	Click CheckBox 	checked 	loghtml
-	Click Dialog Button 	save_2
+	Test Group Save Settings
 	Click Button 	runsave
 
 	Run Keyword		Close Manager GUI ${platform}
@@ -343,17 +343,18 @@ Verify Disable report.html - Test Row
 Verify Disable output.xml - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	No Operation
+
 Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	[Setup]	Run Keywords	
-	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND	
-	...    CommandLine_Common.Run Agent	${agent_options}									AND	
-	...    Open Manager GUI																	AND	
-	...    Set Global Filename And Default Save Path	main								AND	
-	...    Set INI Window Size		800		600												AND	
+	[Setup]	Run Keywords
+	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
+	...    CommandLine_Common.Run Agent	${agent_options}									AND
+	...    Open Manager GUI																	AND
+	...    Set Global Filename And Default Save Path	main								AND
+	...    Set INI Window Size		800		600												AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main1.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
 
-	${M_absolute_paths}	${M_file_names}	
+	${M_absolute_paths}	${M_file_names}
 	...    Find Absolute Paths And Names For Files In Directory	${CURDIR}${/}testdata${/}Issue-52${/}example
 	Log 	${M_absolute_paths}
 	Log 	${M_file_names}
@@ -366,33 +367,33 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	Sleep	40
 
 	@{excluded_files}=	Create List	RFSListener3.py	RFSListener2.py	RFSTestRepeater.py
-	${A_absolute_paths}	${A_file_names}	
+	${A_absolute_paths}	${A_file_names}
 	...    Find Absolute Paths And Names For Files In Directory	${TEMPDIR}${/}agent_temp_issue52	@{excluded_files}
 	Log 	${A_absolute_paths}
 	Log 	${A_file_names}
 
 	Compare Manager and Agent Files	${M_file_names}	${A_file_names}
 	Compare Manager and Agent Files Content	${M_absolute_paths}	${A_absolute_paths}
-	
-	[Teardown]	Run Keywords	
-	...    Delete Scenario File	test_scenario										AND	
-	...    Remove Directory	${global_path}${/}example	recursive=${True}			AND	
-	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND	
-	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main1.robot	${CURDIR}${/}testdata${/}Issue-52	AND	
-	...    CommandLine_Common.Stop Agent											AND	
+
+	[Teardown]	Run Keywords
+	...    Delete Scenario File	test_scenario										AND
+	...    Remove Directory	${global_path}${/}example	recursive=${True}			AND
+	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND
+	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main1.robot	${CURDIR}${/}testdata${/}Issue-52	AND
+	...    CommandLine_Common.Stop Agent											AND
 	...    CommandLine_Common.Stop Manager
 
 Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	[Setup]	Run Keywords	
-	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND	
-	...    CommandLine_Common.Run Agent	${agent_options}									AND	
-	...    Open Manager GUI																	AND	
-	...    Set Global Filename And Default Save Path	main								AND	
-	...    Set INI Window Size		800		600												AND	
+	[Setup]	Run Keywords
+	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
+	...    CommandLine_Common.Run Agent	${agent_options}									AND
+	...    Open Manager GUI																	AND
+	...    Set Global Filename And Default Save Path	main								AND
+	...    Set INI Window Size		800		600												AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main2.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
 
-	${M_absolute_paths}	${M_file_names}	
+	${M_absolute_paths}	${M_file_names}
 	...    Find Absolute Paths And Names For Files In Directory	${CURDIR}${/}testdata${/}Issue-52${/}example
 	Log 	${M_absolute_paths}
 	Log 	${M_file_names}
@@ -408,33 +409,33 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	Sleep	40
 
 	@{excluded_files}=	Create List	RFSListener3.py	RFSListener2.py	RFSTestRepeater.py
-	${A_absolute_paths}	${A_file_names}	
+	${A_absolute_paths}	${A_file_names}
 	...    Find Absolute Paths And Names For Files In Directory	${TEMPDIR}${/}agent_temp_issue52	@{excluded_files}
 	Log 	${A_absolute_paths}
 	Log 	${A_file_names}
 
 	Compare Manager and Agent Files	${M_file_names}	${A_file_names}
 	Compare Manager and Agent Files Content	${M_absolute_paths}	${A_absolute_paths}
-	
-	[Teardown]	Run Keywords	
-	...    Delete Scenario File	test_scenario										AND	
-	...    Remove Directory	${global_path}${/}example	recursive=${True}			AND	
-	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND	
+
+	[Teardown]	Run Keywords
+	...    Delete Scenario File	test_scenario										AND
+	...    Remove Directory	${global_path}${/}example	recursive=${True}			AND
+	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main2.robot	${CURDIR}${/}testdata${/}Issue-52	AND
-	...    CommandLine_Common.Stop Agent											AND	
+	...    CommandLine_Common.Stop Agent											AND
 	...    CommandLine_Common.Stop Manager
 
 Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
-	[Setup]	Run Keywords	
-	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND	
-	...    CommandLine_Common.Run Agent	${agent_options}									AND	
-	...    Open Manager GUI																	AND	
-	...    Set Global Filename And Default Save Path	main								AND	
-	...    Set INI Window Size		800		600												AND	
+	[Setup]	Run Keywords
+	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
+	...    CommandLine_Common.Run Agent	${agent_options}									AND
+	...    Open Manager GUI																	AND
+	...    Set Global Filename And Default Save Path	main								AND
+	...    Set INI Window Size		800		600												AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main3.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
 
-	${M_absolute_paths}	${M_file_names}	
+	${M_absolute_paths}	${M_file_names}
 	...    Find Absolute Paths And Names For Files In Directory	${CURDIR}${/}testdata${/}Issue-52${/}example
 	Log 	${M_absolute_paths}
 	Log 	${M_file_names}
@@ -450,18 +451,18 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	Sleep	40
 
 	@{excluded_files}=	Create List	RFSListener3.py	RFSListener2.py	RFSTestRepeater.py
-	${A_absolute_paths}	${A_file_names}	
+	${A_absolute_paths}	${A_file_names}
 	...    Find Absolute Paths And Names For Files In Directory	${TEMPDIR}${/}agent_temp_issue52	@{excluded_files}
 	Log 	${A_absolute_paths}
 	Log 	${A_file_names}
 
 	Compare Manager and Agent Files	${M_file_names}	${A_file_names}
 	Compare Manager and Agent Files Content	${M_absolute_paths}	${A_absolute_paths}
-	
-	[Teardown]	Run Keywords	
-	...    Delete Scenario File	test_scenario										AND	
-	...    Remove Directory	${global_path}${/}example	recursive=${True}			AND	
-	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND	
+
+	[Teardown]	Run Keywords
+	...    Delete Scenario File	test_scenario										AND
+	...    Remove Directory	${global_path}${/}example	recursive=${True}			AND
+	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main3.robot	${CURDIR}${/}testdata${/}Issue-52	AND
-	...    CommandLine_Common.Stop Agent											AND	
+	...    CommandLine_Common.Stop Agent											AND
 	...    CommandLine_Common.Stop Manager
