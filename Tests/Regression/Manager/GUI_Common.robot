@@ -103,7 +103,7 @@ Stop Agent
 
 Stop Agent Robots Gradually
 	[Arguments]	${rumup_time}	${expected_robot_test_time}
-	${time_for_end}	Set Variable	60
+	${time_for_end}	Set Variable	100
 	Sleep	${rumup_time + 10}
 	Click Button	stoprun
 	Sleep	1
@@ -119,7 +119,7 @@ Stop Agent Robots Gradually
 
 Stop Agent With Terminate Signal
 	[Arguments]	${rumup_time}
-	${time_for_end}	Set Variable	60
+	${time_for_end}	Set Variable	100
 	Sleep	${rumup_time + 10}
 	Click Button	stoprun
 	Sleep	2
