@@ -34,7 +34,7 @@ Insert Example Data To Manager
 			Press Key.tab 1 Times
 			IF  '${j}' == '1' 
 				Append To List	${run_robots}	${i}${j}${i}
-				Take A Screenshot	#del later
+				Take A Screenshot
 				Type	${i}${j}${i}
 			ELSE
 				${time_in_s}=	Evaluate	str(${i}${j} * 60 + ${i}${j})
@@ -224,7 +224,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	...    CommandLine_Common.Stop Manager
 
 Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
-	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords	
 	...    Set INI Window Size		800		600												AND	
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND	

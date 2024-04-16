@@ -107,7 +107,10 @@ Stop Agent Robots Gradually
 	Click Button	stoprun
 	Press Key.tab 1 Times
 	Move To	10	10
-	Wait For	manager_${platform}_button_finished_run.png	timeout=${expected_robot_test_time + 60}
+	${status}=	Run Keyword And Return Status	
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${expected_robot_test_time + 60}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish after 60 seconds + expected robot test time. Check screenshots for more informations.
+
 	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_robots_0.png	timeout=20
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Robots are not zero. Check screenshots for more informations.
@@ -122,8 +125,10 @@ Stop Agent With Terminate Signal
 	Sleep	1
 	Press Key.tab 1 Times
 	Move To	10	10
-	Wait For	manager_${platform}_button_finished_run.png	timeout=50
-	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_robots_0.png	timeout=50
+	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_button_finished_run.png 	timeout=60
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish after 60 seconds. Check screenshots for more informations.
+
+	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_robots_0.png	timeout=20
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Robots are not zero. Check screenshots for more informations.
 
