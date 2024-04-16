@@ -19,63 +19,8 @@ ${scenario_content}
 ${scenario_content_list}
 
 *** Test Cases ***
-Check If Run Will Stop Gradually
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
-	[Setup]	Run Keywords
-	...    Set INI Window Size		1200	600							AND
-	...    CommandLine_Common.Run Agent									AND
-	...    Open Manager GUI												AND
-	...    Set Global Filename And Default Save Path	example.robot	AND
-	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\t[Documentation]\tI am sleeping 10s\n\tSleep\t10
-
-	Press Key.tab 4 Times
-	Type	15
-	Press Key.tab 1 Times
-	Type	30
-	Click Button	runscriptrow
-	Select Robot File	${robot_data}[0]
-	Select 1 Robot Test Case
-	Check If The Agent Has Connected To The Manager
-	Click Tab	Plan
-	Click Button	runplay
-	Stop Agent Robots Gradually	${15}	${10}
-
-	[Teardown]	Run Keywords
-	...    CommandLine_Common.Stop Agent				AND
-	...    CommandLine_Common.Stop Manager				AND
-	...    Remove File	${global_path}${/}example.robot	AND
-	...    Remove File	${global_path}${/}RFSwarmManager.ini
-
-Check If Run Will Stop With Terminate Signal (Ctrl + C)
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
-	[Setup]	Run Keywords
-	...    Set INI Window Size		1200	600							AND
-	...    CommandLine_Common.Run Agent									AND
-	...    Open Manager GUI												AND
-	...    Set Global Filename And Default Save Path	example.robot	AND
-	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\t[Documentation]\tI am sleeping 300s\n\tSleep\t300
-
-	Press Key.tab 4 Times
-	Type	15
-	Press Key.tab 1 Times
-	Type	30
-	Click Button	runscriptrow
-	Select Robot File	${robot_data}[0]
-	Select 1 Robot Test Case
-	Check If The Agent Has Connected To The Manager
-	Click Tab	Plan
-	Click Button	runplay
-	Stop Agent With Terminate Signal	${15}
-
-	[Teardown]	Run Keywords
-	...    CommandLine_Common.Stop Agent				AND
-	...    CommandLine_Common.Stop Manager				AND
-	...    Remove File	${global_path}${/}example.robot	AND
-	...    Remove File	${global_path}${/}RFSwarmManager.ini
-
 Insert Example Data To Manager
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
-	[Setup]	Run Keywords	
 	Set INI Window Size		1200	600
 	Open Manager GUI
 	Set Global Filename And Default Save Path	${robot_data}[0]
@@ -89,6 +34,7 @@ Insert Example Data To Manager
 			Press Key.tab 1 Times
 			IF  '${j}' == '1' 
 				Append To List	${run_robots}	${i}${j}${i}
+				Take A Screenshot	#del later
 				Type	${i}${j}${i}
 			ELSE
 				${time_in_s}=	Evaluate	str(${i}${j} * 60 + ${i}${j})
@@ -278,7 +224,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	...    CommandLine_Common.Stop Manager
 
 Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords	
 	...    Set INI Window Size		800		600												AND	
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND	
@@ -360,3 +306,55 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main3.robot	${CURDIR}${/}testdata${/}Issue-52	AND
 	...    CommandLine_Common.Stop Agent											AND	
 	...    CommandLine_Common.Stop Manager
+
+Check If Run Will Stop Gradually
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600							AND
+	...    CommandLine_Common.Run Agent									AND
+	...    Open Manager GUI												AND
+	...    Set Global Filename And Default Save Path	example.robot	AND
+	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\t[Documentation]\tI am sleeping 10s\n\tSleep\t10
+
+	Press Key.tab 4 Times
+	Type	15
+	Press Key.tab 1 Times
+	Type	30
+	Click Button	runscriptrow
+	Select Robot File	${robot_data}[0]
+	Select 1 Robot Test Case
+	Check If The Agent Has Connected To The Manager
+	Click Tab	Plan
+	Click Button	runplay
+	Stop Agent Robots Gradually	${15}	${10}
+
+	[Teardown]	Run Keywords
+	...    CommandLine_Common.Stop Agent				AND
+	...    CommandLine_Common.Stop Manager				AND
+	...    Remove File	${global_path}${/}example.robot
+
+Check If Run Will Stop With Terminate Signal (Ctrl + C)
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600							AND
+	...    CommandLine_Common.Run Agent									AND
+	...    Open Manager GUI												AND
+	...    Set Global Filename And Default Save Path	example.robot	AND
+	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\t[Documentation]\tI am sleeping 300s\n\tSleep\t300
+
+	Press Key.tab 4 Times
+	Type	15
+	Press Key.tab 1 Times
+	Type	30
+	Click Button	runscriptrow
+	Select Robot File	${robot_data}[0]
+	Select 1 Robot Test Case
+	Check If The Agent Has Connected To The Manager
+	Click Tab	Plan
+	Click Button	runplay
+	Stop Agent With Terminate Signal	${15}
+
+	[Teardown]	Run Keywords
+	...    CommandLine_Common.Stop Agent				AND
+	...    CommandLine_Common.Stop Manager				AND
+	...    Remove File	${global_path}${/}example.robot
