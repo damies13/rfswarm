@@ -340,7 +340,7 @@ Check If Run Will Stop With Terminate Signal (Ctrl + C)
 	...    CommandLine_Common.Run Agent									AND
 	...    Open Manager GUI												AND
 	...    Set Global Filename And Default Save Path	example.robot	AND
-	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\t[Documentation]\tI am sleeping 300s\n\tSleep\t300
+	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\t[Documentation]\tI am sleeping 999s\n\tSleep\t999
 
 	Press Key.tab 4 Times
 	Type	15

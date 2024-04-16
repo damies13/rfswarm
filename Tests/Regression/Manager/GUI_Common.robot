@@ -103,31 +103,34 @@ Stop Agent
 
 Stop Agent Robots Gradually
 	[Arguments]	${rumup_time}	${expected_robot_test_time}
+	${time_for_end}	Set Variable	60
 	Sleep	${rumup_time + 10}
 	Click Button	stoprun
-	Press Key.tab 1 Times
+	Sleep	1
+	Press Key.tab 2 Times
 	Move To	10	10
 	${status}=	Run Keyword And Return Status	
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${expected_robot_test_time + 60}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish after 60 seconds + expected robot test time. Check screenshots for more informations.
-
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${expected_robot_test_time + ${time_for_end}}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish after ${time_for_end} seconds + expected robot test time. Check screenshots for more informations.
+	Take A Screenshot
 	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_robots_0.png	timeout=20
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Robots are not zero. Check screenshots for more informations.
 
 Stop Agent With Terminate Signal
 	[Arguments]	${rumup_time}
+	${time_for_end}	Set Variable	60
 	Sleep	${rumup_time + 10}
 	Click Button	stoprun
 	Sleep	2
 	Click
 	Press Key.enter 1 Times
 	Sleep	1
-	Press Key.tab 1 Times
+	Press Key.tab 2 Times
 	Move To	10	10
-	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_button_finished_run.png 	timeout=60
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish after 60 seconds. Check screenshots for more informations.
-
+	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_button_finished_run.png 	timeout=${time_for_end}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish after ${time_for_end} seconds. Check screenshots for more informations.
+	Take A Screenshot
 	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_robots_0.png	timeout=20
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Robots are not zero. Check screenshots for more informations.
@@ -199,7 +202,7 @@ Click Dialog Button
 
 Press ${key} ${n} Times
 	[Documentation]	Provide full name. For example: Key.tab
-	Sleep	0.5
+	Sleep	1
 	FOR  ${i}  IN RANGE  0  ${n}
 		Press Combination 	${key}
 	END
