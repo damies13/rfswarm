@@ -34,6 +34,7 @@ Insert Example Data To Manager
 			Press Key.tab 1 Times
 			IF  '${j}' == '1' 
 				Append To List	${run_robots}	${i}${j}${i}
+				Take A Screenshot
 				Type	${i}${j}${i}
 			ELSE
 				${time_in_s}=	Evaluate	str(${i}${j} * 60 + ${i}${j})
@@ -166,7 +167,7 @@ Verify Scenario File Settings
 		END
 	END
 
-Chceck That The Scenario File Opens Correctly
+Check That The Scenario File Opens Correctly
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	Open Manager GUI
 	Set Global Filename And Default Save Path	${robot_data}[0]
@@ -186,11 +187,11 @@ Clean Issue #1 Files
 Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords	
+	...    Set INI Window Size		800		600												AND	
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND	
 	...    CommandLine_Common.Run Agent	${agent_options}									AND	
 	...    Open Manager GUI																	AND	
 	...    Set Global Filename And Default Save Path	main								AND	
-	...    Set INI Window Size		800		600												AND	
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main1.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
 
 	${M_absolute_paths}	${M_file_names}	
@@ -203,7 +204,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	Click Button	runopen
 	Open Scenario File	test_scenario
 	Check If The Agent Has Connected To The Manager
-	Sleep	40
+	Sleep	30
 
 	@{excluded_files}=	Create List	RFSListener3.py	RFSListener2.py	RFSTestRepeater.py
 	${A_absolute_paths}	${A_file_names}	
@@ -225,11 +226,11 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords	
+	...    Set INI Window Size		800		600												AND	
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND	
 	...    CommandLine_Common.Run Agent	${agent_options}									AND	
 	...    Open Manager GUI																	AND	
 	...    Set Global Filename And Default Save Path	main								AND	
-	...    Set INI Window Size		800		600												AND	
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main2.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
 
 	${M_absolute_paths}	${M_file_names}	
@@ -245,7 +246,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	Click Button	runopen
 	Open Scenario File	test_scenario
 	Check If The Agent Has Connected To The Manager
-	Sleep	40
+	Sleep	30
 
 	@{excluded_files}=	Create List	RFSListener3.py	RFSListener2.py	RFSTestRepeater.py
 	${A_absolute_paths}	${A_file_names}	
@@ -267,11 +268,11 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords	
+	...    Set INI Window Size		800		600												AND	
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND	
 	...    CommandLine_Common.Run Agent	${agent_options}									AND	
 	...    Open Manager GUI																	AND	
 	...    Set Global Filename And Default Save Path	main								AND	
-	...    Set INI Window Size		800		600												AND	
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main3.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
 
 	${M_absolute_paths}	${M_file_names}	
@@ -287,7 +288,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	Click Button	runopen
 	Open Scenario File	test_scenario
 	Check If The Agent Has Connected To The Manager
-	Sleep	40
+	Sleep	30
 
 	@{excluded_files}=	Create List	RFSListener3.py	RFSListener2.py	RFSTestRepeater.py
 	${A_absolute_paths}	${A_file_names}	
@@ -305,3 +306,56 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main3.robot	${CURDIR}${/}testdata${/}Issue-52	AND
 	...    CommandLine_Common.Stop Agent											AND	
 	...    CommandLine_Common.Stop Manager
+
+Check If Test Scenario Run Will Stop Gradually
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600							AND
+	...    CommandLine_Common.Run Agent									AND
+	...    Open Manager GUI												AND
+	...    Set Global Filename And Default Save Path	example.robot	AND
+	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\tSleep\t60
+
+	Press Key.tab 4 Times
+	Type	15
+	Press Key.tab 1 Times
+	Type	60
+	Click Button	runscriptrow
+	Select Robot File	${robot_data}[0]
+	Select 1 Robot Test Case
+	Check If The Agent Has Connected To The Manager
+	Click Tab	Plan
+	Click Button	runplay
+	Stop Test Scenario Run Gradually	${15}	${60}
+
+	[Teardown]	Run Keywords
+	...    CommandLine_Common.Stop Agent				AND
+	...    CommandLine_Common.Stop Manager				AND
+	...    Remove File	${global_path}${/}example.robot
+
+Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the robots)
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600							AND
+	...    CommandLine_Common.Run Agent									AND
+	...    Open Manager GUI												AND
+	...    Set Global Filename And Default Save Path	example.robot	AND
+	...    Create Robot File	
+	...    file_content=***Test Case***\nExample Test Case\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15
+
+	Press Key.tab 4 Times
+	Type	15
+	Press Key.tab 1 Times
+	Type	30
+	Click Button	runscriptrow
+	Select Robot File	${robot_data}[0]
+	Select 1 Robot Test Case
+	Check If The Agent Has Connected To The Manager
+	Click Tab	Plan
+	Click Button	runplay
+	Stop Test Scenario Run Quickly	${15}	${60}
+
+	[Teardown]	Run Keywords
+	...    CommandLine_Common.Stop Agent				AND
+	...    CommandLine_Common.Stop Manager				AND
+	...    Remove File	${global_path}${/}example.robot
