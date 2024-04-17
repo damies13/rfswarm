@@ -312,7 +312,6 @@ Check If Test Scenario Run Will Stop Gradually
 	...    Open Agent													AND
 	...    Open Manager GUI												AND
 	...    Set Global Filename And Default Save Path	example.robot	AND
-	...    Set Confidence	0.96										AND
 	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t60\n
 
 	Press Key.tab 4 Times
@@ -325,6 +324,7 @@ Check If Test Scenario Run Will Stop Gradually
 	Check If The Agent Has Connected To The Manager
 	Click Tab	Plan
 	Click Button	runplay
+	Set Confidence	0.96
 	Stop Test Scenario Run Gradually	${15}	${60}
 
 	[Teardown]	Run Keywords
@@ -340,7 +340,6 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	...    Open Agent													AND
 	...    Open Manager GUI												AND
 	...    Set Global Filename And Default Save Path	example.robot	AND
-	...    Set Confidence	0.96										AND
 	...    Create Robot File	
 	...    file_content=***Test Case***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n
 
@@ -354,6 +353,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	Check If The Agent Has Connected To The Manager
 	Click Tab	Plan
 	Click Button	runplay
+	Set Confidence	0.96
 	Stop Test Scenario Run Quickly	${15}	${60}
 
 	[Teardown]	Run Keywords
