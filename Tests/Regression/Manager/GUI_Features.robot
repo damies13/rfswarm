@@ -322,8 +322,8 @@ Verify Disable log.html - Test Row
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
-	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
-	Dictionary Should Contain Key 	${scenariofilebefore}[1] 	${testkey}
+	Dictionary Should Not Contain Key 	${scenariofileafter1} 	Script Defaults
+	Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
 	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	True
 
 	Open Manager GUI 		${mngr_options}
@@ -337,7 +337,7 @@ Verify Disable log.html - Test Row
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
-	Dictionary Should Not Contain Key 	${scenariofilebefore}[1] 	${testkey}
+	Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
 
 Verify Disable report.html - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
@@ -363,8 +363,8 @@ Verify Disable report.html - Test Row
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
-	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
-	Dictionary Should Contain Key 	${scenariofilebefore}[1] 	${testkey}
+	Dictionary Should Not Contain Key 	${scenariofileafter1} 	Script Defaults
+	Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
 	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	True
 
 	Open Manager GUI 		${mngr_options}
@@ -378,7 +378,7 @@ Verify Disable report.html - Test Row
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
-	Dictionary Should Not Contain Key 	${scenariofilebefore}[1] 	${testkey}
+	Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
 
 Verify Disable output.xml - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
