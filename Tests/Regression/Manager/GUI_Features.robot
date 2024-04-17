@@ -300,6 +300,7 @@ Verify Disable output.xml - Scenario
 
 Verify Disable log.html - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	VAR 	${testkey} 		disableloglog
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-trl.rfs
 	Copy File 	${sourcefile} 	${scenariofile}
@@ -308,6 +309,7 @@ Verify Disable log.html - Test Row
 	${scenariofilebefore}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofilebefore: ${scenariofilebefore} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
+	Dictionary Should Not Contain Key 	${scenariofilebefore}[1] 	${testkey}
 
 	@{mngr_options}= 	Create List 	-s 	${scenariofile}
 	Open Manager GUI 		${mngr_options}
@@ -320,9 +322,9 @@ Verify Disable log.html - Test Row
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
-	Dictionary Should Contain Key 	${scenariofileafter1} 	Script Defaults
-	Dictionary Should Contain Key 	${scenariofileafter1}[Script Defaults] 	disablelogoutput
-	Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][disablelogoutput] 	True
+	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
+	Dictionary Should Contain Key 	${scenariofilebefore}[1] 	${testkey}
+	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	True
 
 	Open Manager GUI 		${mngr_options}
 	Click Button	trsettings
@@ -335,14 +337,89 @@ Verify Disable log.html - Test Row
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
+	Dictionary Should Not Contain Key 	${scenariofilebefore}[1] 	${testkey}
 
 Verify Disable report.html - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
-	No Operation
+	VAR 	${testkey} 		disablelogreport
+	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-trl.rfs
+	Copy File 	${sourcefile} 	${scenariofile}
+	Log 	scenariofile: ${scenariofile} 	console=True
+
+	${scenariofilebefore}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofilebefore: ${scenariofilebefore} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
+	Dictionary Should Not Contain Key 	${scenariofilebefore}[1] 	${testkey}
+
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI 		${mngr_options}
+	Click Button	trsettings
+	Click CheckBox 	unchecked 	loghtml
+	Test Group Save Settings
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
+	Dictionary Should Contain Key 	${scenariofilebefore}[1] 	${testkey}
+	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	True
+
+	Open Manager GUI 		${mngr_options}
+	Click Button	trsettings
+	Click CheckBox 	checked 	loghtml
+	Test Group Save Settings
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
+	Dictionary Should Not Contain Key 	${scenariofilebefore}[1] 	${testkey}
 
 Verify Disable output.xml - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
-	No Operation
+	VAR 	${testkey} 		disablelogoutput
+	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-trl.rfs
+	Copy File 	${sourcefile} 	${scenariofile}
+	Log 	scenariofile: ${scenariofile} 	console=True
+
+	${scenariofilebefore}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofilebefore: ${scenariofilebefore} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
+	Dictionary Should Not Contain Key 	${scenariofilebefore}[1] 	${testkey}
+
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI 		${mngr_options}
+	Click Button	trsettings
+	Click CheckBox 	unchecked 	loghtml
+	Test Group Save Settings
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofileafter1} 	Script Defaults
+	Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
+	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	True
+
+	Open Manager GUI 		${mngr_options}
+	Click Button	trsettings
+	Click CheckBox 	checked 	loghtml
+	Test Group Save Settings
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
+	Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
 
 Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
