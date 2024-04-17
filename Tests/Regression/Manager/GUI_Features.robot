@@ -300,7 +300,7 @@ Verify Disable output.xml - Scenario
 
 Verify Disable log.html - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
-	VAR 	${testkey} 		disableloglog
+	${testkey}= 	Set Variable 		disableloglog
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-trl.rfs
 	Copy File 	${sourcefile} 	${scenariofile}
@@ -341,7 +341,7 @@ Verify Disable log.html - Test Row
 
 Verify Disable report.html - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
-	VAR 	${testkey} 		disablelogreport
+	${testkey}= 	Set Variable 		disablelogreport
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-trl.rfs
 	Copy File 	${sourcefile} 	${scenariofile}
@@ -382,7 +382,7 @@ Verify Disable report.html - Test Row
 
 Verify Disable output.xml - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
-	VAR 	${testkey} 		disablelogoutput
+	${testkey}= 	Set Variable 		disablelogoutput
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-trl.rfs
 	Copy File 	${sourcefile} 	${scenariofile}
