@@ -459,6 +459,9 @@ class RFSwarmBase:
 	# default (BuiltIn,String,OperatingSystem,perftest)
 	excludelibrariesdefault = "BuiltIn,String,OperatingSystem,perftest"
 	testrepeaterdefault = False
+	injectsleepenableddefault = False
+	injectsleepminimumdefault = 15
+	injectsleepmaximumdefault = 45
 
 	scriptcount = 0
 	scriptlist: Any = [{}]
@@ -2713,6 +2716,19 @@ class RFSwarmCore:
 				if "robotoptions" in filedata[istr]:
 					base.scriptlist[ii]["robotoptions"] = filedata[istr]["robotoptions"]
 
+				# testrepeater = True
+				if "testrepeater" in filedata[istr]:
+					base.scriptlist[ii]["testrepeater"] = base.str2bool(filedata[istr]["testrepeater"])
+				# injectsleepenabled = True
+				if "injectsleepenabled" in filedata[istr]:
+					base.scriptlist[ii]["injectsleepenabled"] = base.str2bool(filedata[istr]["injectsleepenabled"])
+				# injectsleepminimum = 18
+				if "injectsleepminimum" in filedata[istr] and len(filedata[istr]["injectsleepminimum"]) > 0:
+					base.scriptlist[ii]["injectsleepminimum"] = int(filedata[istr]["injectsleepminimum"])
+				# injectsleepmaximum = 33
+				if "injectsleepmaximum" in filedata[istr] and len(filedata[istr]["injectsleepmaximum"]) > 0:
+					base.scriptlist[ii]["injectsleepmaximum"] = int(filedata[istr]["injectsleepmaximum"])
+
 				if "filters" in filedata[istr]:
 					base.debugmsg(9, "filedata[istr][filters]:", filedata[istr]["filters"], type(filedata[istr]["filters"]))
 					filtr = filedata[istr]["filters"].replace("'", '"')
@@ -3051,6 +3067,29 @@ class RFSwarmCore:
 										if "testrepeater" in grp:
 											tr = grp["testrepeater"]
 										base.robot_schedule["Agents"][nxtagent][grurid]["testrepeater"] = str(tr)
+
+										# injectsleepenableddefault = False
+										ise = base.injectsleepenableddefault
+										if "injectsleepenabled" in base.scriptdefaults:
+											ise = base.scriptdefaults["injectsleepenabled"]
+										if "injectsleepenabled" in grp:
+											ise = grp["injectsleepenabled"]
+										base.robot_schedule["Agents"][nxtagent][grurid]["injectsleepenabled"] = str(ise)
+										if base.str2bool(ise):
+											# injectsleepminimumdefault = 15
+											ismn = base.injectsleepminimumdefault
+											if "injectsleepminimum" in base.scriptdefaults:
+												ismn = base.scriptdefaults["injectsleepminimum"]
+											if "injectsleepminimum" in grp:
+												ismn = grp["injectsleepminimum"]
+											base.robot_schedule["Agents"][nxtagent][grurid]["injectsleepminimum"] = str(ismn)
+											# injectsleepmaximumdefault = 45
+											ismx = base.injectsleepmaximumdefault
+											if "injectsleepmaximum" in base.scriptdefaults:
+												ismx = base.scriptdefaults["injectsleepmaximum"]
+											if "injectsleepmaximum" in grp:
+												ismx = grp["injectsleepmaximum"]
+											base.robot_schedule["Agents"][nxtagent][grurid]["injectsleepmaximum"] = str(ismx)
 
 										base.Agents[nxtagent]["AssignedRobots"] += 1
 										base.debugmsg(5, "base.Agents[", nxtagent, "][AssignedRobots]:", base.Agents[nxtagent]["AssignedRobots"])
@@ -5020,6 +5059,25 @@ class RFSwarmGUI(tk.Frame):
 			setingsWindow.testrepeatercurrent = base.str2bool(base.scriptdefaults["testrepeater"])
 		base.debugmsg(5, "testrepeatercurrent:", setingsWindow.testrepeatercurrent)
 
+		# injectsleepenableddefault = False
+		setingsWindow.injectsleepenableddefault = base.injectsleepenableddefault
+		setingsWindow.injectsleepenabled = setingsWindow.injectsleepenableddefault
+		if "injectsleepenabled" in base.scriptdefaults:
+			setingsWindow.injectsleepenabled = base.scriptdefaults["injectsleepenabled"]
+		base.debugmsg(5, "injectsleepenabled:", setingsWindow.injectsleepenabled)
+		# injectsleepminimumdefault = 15
+		setingsWindow.injectsleepminimumdefault = int(base.injectsleepminimumdefault)
+		setingsWindow.injectsleepminimum = setingsWindow.injectsleepminimumdefault
+		if "injectsleepminimum" in base.scriptdefaults and len(base.scriptdefaults["injectsleepminimum"]) > 0:
+			setingsWindow.injectsleepminimum = int(base.scriptdefaults["injectsleepminimum"])
+		base.debugmsg(5, "injectsleepminimum:", setingsWindow.injectsleepminimum)
+		# injectsleepmaximumdefault = 45
+		setingsWindow.injectsleepmaximumdefault = int(base.injectsleepmaximumdefault)
+		setingsWindow.injectsleepmaximum = setingsWindow.injectsleepmaximumdefault
+		if "injectsleepmaximum" in base.scriptdefaults and len(base.scriptdefaults["injectsleepmaximum"]) > 0:
+			setingsWindow.injectsleepmaximum = int(base.scriptdefaults["injectsleepmaximum"])
+		base.debugmsg(5, "injectsleepmaximum:", setingsWindow.injectsleepmaximum)
+
 		# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 		# Scenario
 		#
@@ -5060,6 +5118,15 @@ class RFSwarmGUI(tk.Frame):
 		setingsWindow.fmeTestDefaults.grid(column=0, row=fmerow, sticky="nsew")
 
 		setingsWindow.fmeTestDefaults.columnconfigure(1, weight=1)
+		setingsWindow.fmeTestDefaults.columnconfigure(2, weight=1)
+		setingsWindow.fmeTestDefaults.columnconfigure(3, weight=1)
+		setingsWindow.fmeTestDefaults.columnconfigure(4, weight=1)
+		setingsWindow.fmeTestDefaults.columnconfigure(5, weight=1)
+		setingsWindow.fmeTestDefaults.columnconfigure(6, weight=1)
+		setingsWindow.fmeTestDefaults.columnconfigure(7, weight=1)
+		setingsWindow.fmeTestDefaults.columnconfigure(8, weight=1)
+		setingsWindow.fmeTestDefaults.columnconfigure(9, weight=1)
+		setingsWindow.fmeTestDefaults.columnconfigure(10, weight=1)
 
 		# [Server]
 		rownum += 0
@@ -5092,6 +5159,33 @@ class RFSwarmGUI(tk.Frame):
 		setingsWindow.boolTR.set(setingsWindow.testrepeatercurrent)
 		setingsWindow.inpTR = tk.Checkbutton(setingsWindow.fmeTestDefaults, variable=setingsWindow.boolTR, onvalue=True, offvalue=False)
 		setingsWindow.inpTR.grid(column=1, row=rownum, sticky="nsew")
+
+		rownum += 1
+		setingsWindow.lblIS = ttk.Label(setingsWindow.fmeTestDefaults, text="Inject Sleep:")
+		setingsWindow.lblIS.grid(column=0, row=rownum, sticky="nsew")
+
+		setingsWindow.lblISE = ttk.Label(setingsWindow.fmeTestDefaults, text="Enabled")
+		setingsWindow.lblISE.grid(column=1, row=rownum, sticky="nsew")
+		setingsWindow.lblISMN = ttk.Label(setingsWindow.fmeTestDefaults, text="Minimum")
+		setingsWindow.lblISMN.grid(column=2, row=rownum, sticky="nsew")
+		setingsWindow.lblISMX = ttk.Label(setingsWindow.fmeTestDefaults, text="Maximum")
+		setingsWindow.lblISMX.grid(column=3, row=rownum, sticky="nsew")
+
+		rownum += 1
+		setingsWindow.boolISE = tk.BooleanVar()
+		setingsWindow.boolISE.set(setingsWindow.injectsleepenabled)
+		setingsWindow.inpISE = tk.Checkbutton(setingsWindow.fmeTestDefaults, variable=setingsWindow.boolISE, onvalue=True, offvalue=False)
+		setingsWindow.inpISE.grid(column=1, row=rownum, sticky="nsew")
+
+		setingsWindow.inpISMN = ttk.Entry(setingsWindow.fmeTestDefaults, width=5, justify=tk.RIGHT)
+		setingsWindow.inpISMN.delete(0, 'end')
+		setingsWindow.inpISMN.insert(0, setingsWindow.injectsleepminimum)
+		setingsWindow.inpISMN.grid(column=2, row=rownum, sticky="nsew")
+
+		setingsWindow.inpISMX = ttk.Entry(setingsWindow.fmeTestDefaults, width=5, justify=tk.RIGHT)
+		setingsWindow.inpISMX.delete(0, 'end')
+		setingsWindow.inpISMX.insert(0, setingsWindow.injectsleepmaximum)
+		setingsWindow.inpISMX.grid(column=3, row=rownum, sticky="nsew")
 
 		# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 		# Manager
@@ -5261,6 +5355,49 @@ class RFSwarmGUI(tk.Frame):
 			else:
 				if "testrepeater" in base.scriptdefaults:
 					del base.scriptdefaults["testrepeater"]
+					self.plan_scnro_chngd = True
+
+			# if "injectsleepenabled" in base.scriptdefaults:
+			# 	setingsWindow.injectsleepenabled = base.scriptdefaults["injectsleepenabled"]
+			ise = setingsWindow.boolISE.get()
+			base.debugmsg(5, "ise:", ise, "default:", setingsWindow.injectsleepenableddefault)
+			if ise != setingsWindow.injectsleepenableddefault:
+				base.scriptdefaults["injectsleepenabled"] = str(ise)
+				self.plan_scnro_chngd = True
+			else:
+				if "injectsleepenabled" in base.scriptdefaults:
+					del base.scriptdefaults["injectsleepenabled"]
+					self.plan_scnro_chngd = True
+
+			ismn = setingsWindow.inpISMN.get()
+			if len(ismn) > 0:
+				ismn = int(ismn)
+			else:
+				ismn = setingsWindow.injectsleepminimumdefault
+			base.debugmsg(5, "ismn:", ismn, "default:", setingsWindow.injectsleepminimumdefault, "type:", type(ismn), type(setingsWindow.injectsleepminimumdefault))
+			if ismn != setingsWindow.injectsleepminimumdefault:
+				base.debugmsg(5, "Save ismn:", ismn)
+				base.scriptdefaults["injectsleepminimum"] = str(ismn)
+				self.plan_scnro_chngd = True
+			else:
+				base.debugmsg(5, "remove ismn?:", ismn)
+				if "injectsleepminimum" in base.scriptdefaults:
+					base.debugmsg(5, "remove ismn:", ismn)
+					del base.scriptdefaults["injectsleepminimum"]
+					self.plan_scnro_chngd = True
+
+			ismx = setingsWindow.inpISMX.get()
+			if len(ismx) > 0:
+				ismx = int(ismx)
+			else:
+				ismx = setingsWindow.injectsleepmaximumdefault
+			base.debugmsg(5, "ismx:", ismx, "default:", setingsWindow.injectsleepmaximumdefault, "type:", type(ismx), type(setingsWindow.injectsleepmaximumdefault))
+			if ismx != setingsWindow.injectsleepmaximumdefault:
+				base.scriptdefaults["injectsleepmaximum"] = str(ismx)
+				self.plan_scnro_chngd = True
+			else:
+				if "injectsleepmaximum" in base.scriptdefaults:
+					del base.scriptdefaults["injectsleepmaximum"]
 					self.plan_scnro_chngd = True
 
 			# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -6166,6 +6303,15 @@ class RFSwarmGUI(tk.Frame):
 		stgsWindow.transient(self.root)
 
 		stgsWindow.columnconfigure(0, weight=1)
+		stgsWindow.columnconfigure(1, weight=1)
+		stgsWindow.columnconfigure(2, weight=1)
+		stgsWindow.columnconfigure(3, weight=1)
+		stgsWindow.columnconfigure(4, weight=1)
+		stgsWindow.columnconfigure(5, weight=1)
+		stgsWindow.columnconfigure(6, weight=1)
+		stgsWindow.columnconfigure(7, weight=1)
+		stgsWindow.columnconfigure(8, weight=1)
+		stgsWindow.columnconfigure(9, weight=1)
 		# stgsWindow.rowconfigure(1, weight=1)
 
 		stgsWindow.title("Settings for row {}".format(r))
@@ -6207,8 +6353,32 @@ class RFSwarmGUI(tk.Frame):
 			stgsWindow.testrepeatercurrent = base.str2bool(base.scriptlist[r]["testrepeater"])
 		base.debugmsg(5, "testrepeatercurrent:", stgsWindow.testrepeatercurrent)
 
+		stgsWindow.injectsleepenableddefault = base.injectsleepenableddefault
+		if "injectsleepenabled" in base.scriptdefaults:
+			stgsWindow.injectsleepenableddefault = base.str2bool(base.scriptdefaults["injectsleepenabled"])
+		stgsWindow.injectsleepenabled = stgsWindow.injectsleepenableddefault
+		if "injectsleepenabled" in base.scriptlist[r]:
+			stgsWindow.injectsleepenabled = base.str2bool(base.scriptlist[r]["injectsleepenabled"])
+		base.debugmsg(5, "injectsleepenabled:", stgsWindow.injectsleepenabled)
+
+		stgsWindow.injectsleepminimumdefault = base.injectsleepminimumdefault
+		if "injectsleepminimum" in base.scriptdefaults:
+			stgsWindow.injectsleepminimumdefault = int(base.scriptdefaults["injectsleepminimum"])
+		stgsWindow.injectsleepminimum = stgsWindow.injectsleepminimumdefault
+		if "injectsleepminimum" in base.scriptlist[r]:
+			stgsWindow.injectsleepminimum = int(base.scriptlist[r]["injectsleepminimum"])
+		base.debugmsg(5, "injectsleepminimum:", stgsWindow.injectsleepminimum)
+
+		stgsWindow.injectsleepmaximumdefault = base.injectsleepmaximumdefault
+		if "injectsleepmaximum" in base.scriptdefaults:
+			stgsWindow.injectsleepmaximumdefault = int(base.scriptdefaults["injectsleepmaximum"])
+		stgsWindow.injectsleepmaximum = stgsWindow.injectsleepmaximumdefault
+		if "injectsleepmaximum" in base.scriptlist[r]:
+			stgsWindow.injectsleepmaximum = int(base.scriptlist[r]["injectsleepmaximum"])
+		base.debugmsg(5, "injectsleepmaximum:", stgsWindow.injectsleepmaximum)
+
 		row = 0
-		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer before the filters
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
 		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
 
 		row += 1
@@ -6222,7 +6392,7 @@ class RFSwarmGUI(tk.Frame):
 		stgsWindow.inpEL.grid(column=0, row=row, columnspan=10, sticky="nsew")
 
 		row += 1
-		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer before the filters
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
 		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
 
 		row += 1
@@ -6236,7 +6406,7 @@ class RFSwarmGUI(tk.Frame):
 		stgsWindow.inpRO.grid(column=0, row=row, columnspan=10, sticky="nsew")
 
 		row += 1
-		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer before the filters
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
 		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
 
 		row += 1
@@ -6247,6 +6417,37 @@ class RFSwarmGUI(tk.Frame):
 		stgsWindow.boolTR.set(stgsWindow.testrepeatercurrent)
 		stgsWindow.inpTR = tk.Checkbutton(stgsWindow, variable=stgsWindow.boolTR, onvalue=True, offvalue=False)
 		stgsWindow.inpTR.grid(column=1, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblIS = ttk.Label(stgsWindow, text="Inject Sleep:")
+		stgsWindow.lblIS.grid(column=0, row=row, sticky="nsew")
+
+		stgsWindow.lblISE = ttk.Label(stgsWindow, text="Enabled")
+		stgsWindow.lblISE.grid(column=1, row=row, sticky="nsew")
+		stgsWindow.lblISMN = ttk.Label(stgsWindow, text="Minimum")
+		stgsWindow.lblISMN.grid(column=2, row=row, sticky="nsew")
+		stgsWindow.lblISMX = ttk.Label(stgsWindow, text="Maximum")
+		stgsWindow.lblISMX.grid(column=3, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.boolISE = tk.BooleanVar()
+		stgsWindow.boolISE.set(stgsWindow.injectsleepenabled)
+		stgsWindow.inpISE = tk.Checkbutton(stgsWindow, variable=stgsWindow.boolISE, onvalue=True, offvalue=False)
+		stgsWindow.inpISE.grid(column=1, row=row, sticky="nsew")
+
+		stgsWindow.inpISMN = ttk.Entry(stgsWindow, width=5, justify=tk.RIGHT)
+		stgsWindow.inpISMN.delete(0, 'end')
+		stgsWindow.inpISMN.insert(0, stgsWindow.injectsleepminimum)
+		stgsWindow.inpISMN.grid(column=2, row=row, sticky="nsew")
+
+		stgsWindow.inpISMX = ttk.Entry(stgsWindow, width=5, justify=tk.RIGHT)
+		stgsWindow.inpISMX.delete(0, 'end')
+		stgsWindow.inpISMX.insert(0, stgsWindow.injectsleepmaximum)
+		stgsWindow.inpISMX.grid(column=3, row=row, sticky="nsew")
 
 		row += 1
 		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer before the filters
@@ -6320,6 +6521,45 @@ class RFSwarmGUI(tk.Frame):
 		else:
 			if "testrepeater" in base.scriptlist[r]:
 				del base.scriptlist[r]["testrepeater"]
+				self.plan_scnro_chngd = True
+
+		# Inject Sleep
+		ise = stgsWindow.boolISE.get()
+		base.debugmsg(7, "ise:", ise)
+		if ise != stgsWindow.injectsleepenableddefault:
+			base.scriptlist[r]["injectsleepenabled"] = str(ise)
+			self.plan_scnro_chngd = True
+		else:
+			if "injectsleepenabled" in base.scriptlist[r]:
+				del base.scriptlist[r]["injectsleepenabled"]
+				self.plan_scnro_chngd = True
+
+		ismn = stgsWindow.inpISMN.get()
+		if len(ismn) > 0:
+			ismn = int(ismn)
+		else:
+			ismn = stgsWindow.injectsleepminimumdefault
+		base.debugmsg(7, "ismn:", ismn)
+		if ismn != stgsWindow.injectsleepminimumdefault:
+			base.scriptlist[r]["injectsleepminimum"] = str(ismn)
+			self.plan_scnro_chngd = True
+		else:
+			if "injectsleepminimum" in base.scriptlist[r]:
+				del base.scriptlist[r]["injectsleepminimum"]
+				self.plan_scnro_chngd = True
+
+		ismx = stgsWindow.inpISMX.get()
+		if len(ismx) > 0:
+			ismx = int(ismx)
+		else:
+			ismx = stgsWindow.injectsleepmaximumdefault
+		base.debugmsg(7, "ismx:", ismx)
+		if ismx != stgsWindow.injectsleepmaximumdefault:
+			base.scriptlist[r]["injectsleepmaximum"] = str(ismx)
+			self.plan_scnro_chngd = True
+		else:
+			if "injectsleepmaximum" in base.scriptlist[r]:
+				del base.scriptlist[r]["injectsleepmaximum"]
 				self.plan_scnro_chngd = True
 
 		base.debugmsg(7, "stgsWindow.Filters:", stgsWindow.Filters)

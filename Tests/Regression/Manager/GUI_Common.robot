@@ -3,6 +3,7 @@ Library 	OperatingSystem
 Library 	Process
 Library 	String
 Library		Collections
+Library		DateTime
 
 Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
@@ -101,6 +102,70 @@ Stop Agent
 	${result} = 	Terminate Process		${process_agent}
 	# Should Be Equal As Integers 	${result.rc} 	0
 
+Stop Test Scenario Run Gradually
+	[Arguments]	${rumup_time}	${robot_test_time}
+	[Setup]	Set Confidence	0.99
+	Sleep	${rumup_time}
+	Wait For	manager_${platform}_robots_10.png 	timeout=${rumup_time + 90}
+	Click Button	stoprun
+	${START_TIME}=	Get Current Date
+	Wait For	manager_${platform}_robots_0.png 	timeout=${robot_test_time + 90}
+	Take A Screenshot
+	${END_TIME}=	Get Current Date
+	${ELAPSED_TIME}=	Subtract Date From Date	${END_TIME}	${START_TIME}
+	Should Be True	${ELAPSED_TIME} >= ${robot_test_time / 2} and ${ELAPSED_TIME} <= ${robot_test_time + 90}
+
+	Press Key.tab 2 Times
+	Move To	10	10
+	Take A Screenshot
+	${status}=	Run Keyword And Return Status	
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+
+	[Teardown]	Set Confidence	0.9
+
+Stop Test Scenario Run Quickly
+	[Arguments]	${rumup_time}	${robot_test_time}
+	[Setup]	Set Confidence	0.99
+	Sleep	${rumup_time}
+	Wait For	manager_${platform}_robots_10.png 	timeout=${rumup_time + 90}
+	Click Button	stoprun
+	Sleep	2
+	Click
+	Press Key.enter 1 Times
+	${START_TIME}=	Get Current Date
+	Wait For	manager_${platform}_robots_0.png 	timeout=${robot_test_time}
+	Take A Screenshot
+	${END_TIME}=	Get Current Date
+	${ELAPSED_TIME}=	Subtract Date From Date	${END_TIME}	${START_TIME}
+	Should Be True	${ELAPSED_TIME} <= ${robot_test_time / 2}
+
+	Press Key.tab 2 Times
+	Move To	10	10
+	Take A Screenshot
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+
+	[Teardown]	Set Confidence	0.9
+
+Check If The Agent Has Connected To The Manager
+	Click Tab	Agents
+	Wait For 	manager_${platform}_agents_ready.png	timeout=300
+
+Check If the Robot Failed
+	[Arguments] 	${expected_time}
+	Sleep	${expected_time}
+	TRY
+		Click Image 	manager_${platform}_button_abort
+		Press Combination	Key.enter
+	EXCEPT
+		Wait For	manager_${platform}_button_finished_run.png	timeout=300
+	END
+	Take A Screenshot
+	${status}=	Run Keyword And Return Status	Locate	manager_${platform}_resource_file_provided.png
+	Run Keyword If	not ${status}	Fail	msg=Test failed. Check screenshots for more informations.
+
 Click Tab
 	[Arguments]		${tabname}
 	${tabnamel}= 	Convert To Lower Case 	${tabname}
@@ -149,10 +214,11 @@ Click Dialog Button
 	Sleep 	1
 	Take A Screenshot
 
-Click Tab ${n} Times
-	Sleep	0.5
+Press ${key} ${n} Times
+	[Documentation]	Provide full name. For example: Key.tab
+	Sleep	1
 	FOR  ${i}  IN RANGE  0  ${n}
-		Press Combination 	Key.tab
+		Press Combination 	${key}
 	END
 
 Click Label With Vertical Offset
@@ -216,8 +282,20 @@ Set Global Filename And Default Save Path
 	Set Test Variable	${global_path}	${location}
 
 	Set Test Variable 	$file_name 	${global_name}
-	Run Keyword If	'${optional_path}' != '${None}'	
-	...	Set Test Variable	${global_path}	${optional_path}
+	IF  '${optional_path}' != '${None}'	
+		Set Test Variable	${global_path}	${optional_path}
+		${location}=	Get Manager INI Location
+		${ini_content}=		Get Manager INI Data
+		${ini_content_list}=	Split String	${ini_content}
+		${scriptdir}=	Get Index From List		${ini_content_list}		scriptdir
+
+		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${scriptdir + 2}]	${optional_path}
+		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${scriptdir + 5}]	${optional_path}
+
+		Remove File		${location}
+		Log		${ini_content}
+		Append To File	${location}		${ini_content}
+	END
 
 	Log		${global_name}
 	Log		${global_path}
@@ -272,36 +350,49 @@ Get Manager PIP Data
 	RETURN		${pip_data.stdout}
 
 Create Robot File
-	[Arguments]		${path}=${global_path}	${name}=${global_name}
+	[Arguments]		${path}=${global_path}	${name}=${global_name}	
+	...    ${file_content}=***Test Case***\nExample Test Case\n
 	
-	${example_robot_content}=	Set Variable	***Test Case***\nExample Test Case\n
+	${example_robot_content}=	Set Variable	${file_content}
 	Variable Should Exist	${path}	msg="Global save path does not exist or path is not provided."
 	Variable Should Exist	${name}	msg="Global file name does not exist or file name is not provided."
 	Create File		${path}${/}${name}	content=${example_robot_content}
 	File Should Exist	${path}${/}${name}
 
 Change Test Group Settings
-	[Arguments]		@{row_settings_data}
+	[Arguments]		&{row_settings_data}
 	Sleep	2
 	Click Dialog Button		row_settings_frame_name
-	Click Tab 1 Times
-	Type	${row_settings_data}[0]
-	Click Tab 1 Times
-	Type	${row_settings_data}[1]
-	IF  '${row_settings_data}[2]' == 'True'
-		Click Button	checkbox_unch
+	Press Key.tab 1 Times
+	IF  'excludelibraries' in ${row_settings_data}
+		Type	${row_settings_data['excludelibraries']}
 	END
+	Press Key.tab 1 Times
+	IF  'robot_options' in ${row_settings_data}
+		Type	${row_settings_data['robot_options']}
+	END
+	IF  'test_repeater' in ${row_settings_data}
+		IF  '${row_settings_data['test_repeater']}' == 'True'
+			Click Button	checkbox_unch
+		END
+	END
+	
 	IF 	"${platform}" == "macos"
 		Click Dialog Button		save_2
 	ELSE
 		Click Dialog Button		save
 	END
-	
+
+Change ${str1} With ${str2} In ${file}
+	${file_content}	Get File	${file}
+	Remove File		${file}
+	${file_content}	Replace String	${file_content}	${str1}	${str2}
+	Create File		${file}	${file_content}
 
 Select Robot File
-	[Arguments]		@{robot_data}
+	[Arguments]		${robot_file_name}
 	Sleep	2
-	${robot_file_name}=		Set Variable		${robot_data}[1]
+	${robot_file_name}=		Set Variable		${robot_file_name}
 	${robot_file_name}=		Get Substring	${robot_file_name}	0	-6
 	Log		${robot_file_name}
 	Take A Screenshot
@@ -311,6 +402,11 @@ Select Robot File
 	Click Dialog Button		open
 	Sleep	1
 
+Select ${n} Robot Test Case
+	Click Button	select_test_case
+	Press Key.down ${n} Times	
+	Press Combination	Key.enter
+
 Save Scenario File
 	[Arguments]		${scenario_name}
 	Sleep	5
@@ -319,9 +415,17 @@ Save Scenario File
 	Click Dialog Button		save
 	Sleep	1
 
-Get Scenario File Content
+Open Scenario File
 	[Arguments]		${scenario_name}
-	${scenario_content}=	Get File	${global_path}${/}${scenario_name}.rfs
+	Sleep	5
+	Type	${scenario_name}.rfs
+	Take A Screenshot
+	Click Dialog Button		open
+	Sleep	1
+
+Get Scenario File Content
+	[Arguments]		${path}		${scenario_name}
+	${scenario_content}=	Get File	${path}${/}${scenario_name}.rfs
 	Should Not Be Empty	${scenario_content}
 
 	RETURN	${scenario_content}
@@ -337,3 +441,164 @@ Delete Robot File
 	Variable Should Exist	${name}	msg="Global file name does not exist or file name is not provided"
 	Remove File		${path}${/}${name}
 	File Should Not Exist	${path}${/}${name}
+
+Find Absolute Paths And Names For Files In Directory
+	[Documentation]	This algorithm analyses the specified path and returns all 
+	...    file names with their absolute paths even those that are in subdirectories
+	[Arguments]		${given_path}	@{excluded_files}
+	${example_dir}	Set Variable	${given_path}
+	@{absolute_paths}	Create List
+	@{file_names}	Create List
+
+	${new_dir}		List Directories In Directory	${example_dir}	absolute=${True}
+	#=== Collecting data section
+
+	@{dir_files_path}=		List Files In Directory		${example_dir}	absolute=${True}
+	@{dir_file_names}=		List Files In Directory		${example_dir}
+	
+	${length}	Get Length	${dir_files_path}
+	FOR  ${i}  IN RANGE  0  ${length}
+		IF  '${dir_file_names}[${i}]' not in ${excluded_files}
+			Append To List	${absolute_paths}	${dir_files_path}[${i}]
+			Append To List	${file_names}	${dir_file_names}[${i}]
+		END
+	END
+	#=== Merging data section
+	FOR  ${specific_dir}  IN  @{new_dir}
+		${next_absolute_paths}	${next_file_names}	
+		...    Find Absolute Paths And Names For Files In Directory	${specific_dir}	@{excluded_files}
+
+		${length}	Get Length	${next_absolute_paths}
+		FOR  ${i}  IN RANGE  0  ${length}
+			${bad_list}	Get Length	${next_absolute_paths}
+			IF  ${bad_list} != ${0}
+				Append To List	${absolute_paths}	${next_absolute_paths}[${i}]
+				Append To List	${file_names}	${next_file_names}[${i}]
+			END
+		END
+	END
+
+	RETURN	${absolute_paths}	${file_names}
+
+Compare Manager and Agent Files
+	[Arguments]	${M_file_names}	${A_file_names}
+	Log To Console	\n${M_file_names}
+	Log To Console	${A_file_names}\n
+	Lists Should Be Equal	${M_file_names}	${A_file_names}
+	...    msg="Files are not transferred correctly! Check report for more information."
+
+Compare Manager and Agent Files Content
+	[Arguments]	${M_absolute_paths}	${A_absolute_paths}
+	${length}	Get Length	${M_absolute_paths}
+	@{excluded_files_format}	Create List	png		jpg		xlsx	pdf
+	FOR  ${i}  IN RANGE  0  ${length}
+		${file_extension}	Split String From Right	${M_absolute_paths}[${i}]	separator=.
+		IF  '${file_extension}[-1]' not in @{excluded_files_format}
+			${M_file_content}	Get File	${M_absolute_paths}[${i}]
+			${A_file_content}	Run Keyword And Continue On Failure	
+			...    Get File	${A_absolute_paths}[${i}]
+
+			Run Keyword And Continue On Failure	
+			...    Should Be Equal	${M_file_content}	${A_file_content}
+		END
+	END
+
+Verify Scenario File Robots
+	[Arguments]		${scenario_content_list}	${run_robots}
+	FOR  ${rows}  IN RANGE  1	4
+		${row}	Set Variable	[${rows}]	#[1], [2], [3]
+		${i}=	Get Index From List		${scenario_content_list}		${row}
+		Log		${row}
+
+		${robots_offset}	Get Index From List 	${scenario_content_list}	robots	start=${i}
+		Should Be Equal		robots	${scenario_content_list}[${robots_offset}]
+		Should Be Equal		${run_robots}[${rows - 1}]	${scenario_content_list}[${robots_offset + 2}]
+		...    msg=Robots value did not save correctly! 
+	END
+
+Verify Scenario File Times
+	[Arguments]		${scenario_content_list}	${run_times_in_s}
+	FOR  ${rows}  IN RANGE  1	4
+		${row}	Set Variable	[${rows}]
+		${i}=	Get Index From List		${scenario_content_list}		${row}
+		Log		${row}
+		${time_indx}=	Evaluate	${rows - 1}*3
+
+		${delay_offset}		Get Index From List 	${scenario_content_list}	delay	start=${i}
+		Should Be Equal		delay	${scenario_content_list}[${delay_offset}]
+		Should Be Equal		${run_times_in_s}[${time_indx}]		${scenario_content_list}[${delay_offset + 2}]
+		...    msg=Delay time value did not save correctly! 
+
+		${rampup_offset}	Get Index From List 	${scenario_content_list}	rampup	start=${i}
+		Should Be Equal		rampup	${scenario_content_list}[${rampup_offset}]
+		Should Be Equal		${run_times_in_s}[${time_indx + 1}]		${scenario_content_list}[${rampup_offset + 2}]
+		...    msg=Rump-up time value did not save correctly! 
+
+		${run_offset}		Get Index From List 	${scenario_content_list}	run	start=${i}
+		Should Be Equal		run		${scenario_content_list}[${run_offset}]
+		Should Be Equal		${run_times_in_s}[${time_indx + 2}]		${scenario_content_list}[${run_offset + 2}]
+		...    msg=Run time value did not save correctly! 
+	END
+
+Verify Scenario File Robot Data
+	[Arguments]		${scenario_content_list}	${robot_data}
+	FOR  ${rows}  IN RANGE  1	4
+		${row}	Set Variable	[${rows}]
+		${i}=	Get Index From List		${scenario_content_list}		${row}
+		Log		${row}
+
+		${test_offset}		Get Index From List 	${scenario_content_list}	test	start=${i}
+		Should Be Equal		test	${scenario_content_list}[${test_offset}]
+		${test_name}=	Catenate	
+		...    ${scenario_content_list[${test_offset + 2}]}	
+		...    ${scenario_content_list[${test_offset + 3}]}	
+		...    ${scenario_content_list[${test_offset + 4}]}
+		Should Be Equal		${robot_data}[1]	${test_name}
+		...    msg=Robot test file name did not save correctly! 
+
+		${script_offset}		Get Index From List 	${scenario_content_list}	script	start=${i}
+		Should Be Equal		script	${scenario_content_list}[${script_offset}]
+		Should Be Equal		${robot_data}[0]	${scenario_content_list}[${script_offset + 2}]
+		...    msg=Robot script name did not save correctly! 
+	END
+
+Verify Scenario Test Row Settings
+	[Arguments]		${scenario_content_list}	${row_settings_data}
+	FOR  ${rows}  IN RANGE  1	4
+		${row}	Set Variable	[${rows}]
+		${i}=	Get Index From List		${scenario_content_list}		${row}
+		Log		${row}
+
+		IF  'excludelibraries' in ${row_settings_data}
+			${exlibraries_offset}	Get Index From List 	${scenario_content_list}	excludelibraries	start=${i}
+			Should Be Equal		excludelibraries	${scenario_content_list}[${exlibraries_offset}]
+			Should Be Equal		${row_settings_data['excludelibraries']}	${scenario_content_list}[${exlibraries_offset + 2}]
+			...    msg=Exclude Libraries did not save correctly! 
+		END
+
+		IF  'robot_options' in ${row_settings_data}
+			${robot_options_offset}		Get Index From List		${scenario_content_list}	robotoptions	start=${i}
+			Should Be Equal		robotoptions	${scenario_content_list}[${robot_options_offset}]
+			${robot_options}=	Catenate	
+			...    ${scenario_content_list[${robot_options_offset + 2}]}	
+			...    ${scenario_content_list[${robot_options_offset + 3}]}
+			Should Be Equal		${row_settings_data['robot_options']}	${robot_options}
+			...    msg=Robot options did not save correctly! 
+		END
+
+		IF  'test_repeater' in ${row_settings_data}
+			${repeater_offset}		Get Index From List		${scenario_content_list}	testrepeater	start=${i}
+			Should Be Equal		testrepeater	${scenario_content_list}[${repeater_offset}]
+			Should Be Equal		${row_settings_data['test_repeater']}	${scenario_content_list}[${repeater_offset + 2}]
+			...    msg=Test repeater did not save correctly! 
+		END
+	END
+
+Check That The Scenario File Opens Correctly
+	[Arguments]		${robot_data}	${scenario_name}	${scenario_content}
+	Set Global Filename And Default Save Path	${robot_data}[0]
+	Click Button	runsave
+	${scenario_content_reopened}=	Get scenario file content	${global_path}	${scenario_name}
+	Log		${scenario_content}
+	Log		${scenario_content_reopened}
+	Should Be Equal		${scenario_content}		${scenario_content_reopened}	msg=Scenario files are not equal!
