@@ -96,7 +96,10 @@ Close Manager GUI macos
 	# Click Image		manager_${platform}_menu_python3.png
 	# Click Menu		rfswarm
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel
+	Run Keyword And Ignore Error 	Click Dialog Button 	no
 	# Run Keyword And Return Status 	Click Dialog Button 	cancel
+	# Tests/Regression/Manager/Images/file_method/manager_macos_titlebar_rfswarm.png
+	Click Image		manager_${platform}_titlebar_rfswarm.png
 	Click Button	closewindow
 	Sleep	5
 	${running}= 	Is Process Running 	${process_manager}
