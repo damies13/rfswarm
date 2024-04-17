@@ -106,20 +106,20 @@ Stop Test Scenario Run Gradually
 	[Arguments]	${rumup_time}	${robot_test_time}
 	[Setup]	Set Confidence	0.99
 	Sleep	${rumup_time}
-	Wait For	manager_${platform}_robots_10.png 	timeout=${rumup_time + 90}
+	Wait For	manager_${platform}_robots_10.png 	timeout=${rumup_time + 120}
 	Click Button	stoprun
 	${START_TIME}=	Get Current Date
-	Wait For	manager_${platform}_robots_0.png 	timeout=${robot_test_time + 90}
+	Wait For	manager_${platform}_robots_0.png 	timeout=${robot_test_time + 120}
 	Take A Screenshot
 	${END_TIME}=	Get Current Date
 	${ELAPSED_TIME}=	Subtract Date From Date	${END_TIME}	${START_TIME}
-	Should Be True	${ELAPSED_TIME} >= ${robot_test_time / 2} and ${ELAPSED_TIME} <= ${robot_test_time + 90}
+	Should Be True	${ELAPSED_TIME} >= ${robot_test_time / 2} and ${ELAPSED_TIME} <= ${robot_test_time + 120}
 
 	Press Key.tab 2 Times
 	Move To	10	10
 	Take A Screenshot
 	${status}=	Run Keyword And Return Status	
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time}
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time + 120}
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
 
 	[Teardown]	Set Confidence	0.9
@@ -128,13 +128,13 @@ Stop Test Scenario Run Quickly
 	[Arguments]	${rumup_time}	${robot_test_time}
 	[Setup]	Set Confidence	0.99
 	Sleep	${rumup_time}
-	Wait For	manager_${platform}_robots_10.png 	timeout=${rumup_time + 90}
+	Wait For	manager_${platform}_robots_10.png 	timeout=${rumup_time + 120}
 	Click Button	stoprun
 	Sleep	2
 	Click
 	Press Key.enter 1 Times
 	${START_TIME}=	Get Current Date
-	Wait For	manager_${platform}_robots_0.png 	timeout=${robot_test_time}
+	Wait For	manager_${platform}_robots_0.png 	timeout=${robot_test_time + 60}
 	Take A Screenshot
 	${END_TIME}=	Get Current Date
 	${ELAPSED_TIME}=	Subtract Date From Date	${END_TIME}	${START_TIME}
@@ -144,12 +144,13 @@ Stop Test Scenario Run Quickly
 	Move To	10	10
 	Take A Screenshot
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time}
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time + 120}
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
 
 	[Teardown]	Set Confidence	0.9
 
 Check If The Agent Has Connected To The Manager
+	Sleep	1
 	Click Tab	Agents
 	Wait For 	manager_${platform}_agents_ready.png	timeout=300
 

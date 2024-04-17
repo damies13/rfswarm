@@ -306,6 +306,7 @@ Check If Test Scenario Run Will Stop Gradually
 	...    CommandLine_Common.Run Agent									AND
 	...    Open Manager GUI												AND
 	...    Set Global Filename And Default Save Path	example.robot	AND
+	...    Set Confidence	0.96										AND
 	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\tSleep\t60
 
 	Press Key.tab 4 Times
@@ -321,6 +322,7 @@ Check If Test Scenario Run Will Stop Gradually
 	Stop Test Scenario Run Gradually	${15}	${60}
 
 	[Teardown]	Run Keywords
+	...    Set Confidence	0.9							AND
 	...    CommandLine_Common.Stop Agent				AND
 	...    CommandLine_Common.Stop Manager				AND
 	...    Remove File	${global_path}${/}example.robot
@@ -332,6 +334,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	...    CommandLine_Common.Run Agent									AND
 	...    Open Manager GUI												AND
 	...    Set Global Filename And Default Save Path	example.robot	AND
+	...    Set Confidence	0.96										AND
 	...    Create Robot File	
 	...    file_content=***Test Case***\nExample Test Case\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15
 
@@ -348,6 +351,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	Stop Test Scenario Run Quickly	${15}	${60}
 
 	[Teardown]	Run Keywords
+	...    Set Confidence	0.9							AND
 	...    CommandLine_Common.Stop Agent				AND
 	...    CommandLine_Common.Stop Manager				AND
 	...    Remove File	${global_path}${/}example.robot
