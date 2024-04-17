@@ -3,6 +3,7 @@ Library 	OperatingSystem
 Library 	Process
 Library 	String
 Library		Collections
+Library		DateTime
 
 Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
@@ -101,39 +102,44 @@ Stop Agent
 	${result} = 	Terminate Process		${process_agent}
 	# Should Be Equal As Integers 	${result.rc} 	0
 
-Stop Agent Robots Gradually
-	[Arguments]	${rumup_time}	${expected_robot_test_time}
-	${time_for_end}	Set Variable	100
-	Sleep	${rumup_time + 10}
+Stop Test Scenario Run Gradually
+	[Arguments]	${rumup_time}	${robot_test_time}
+	Wait For	manager_${platform}_robots_10.png 	timeout=${rumup_time + 30}
 	Click Button	stoprun
-	Sleep	1
+	${START_TIME}=	Get Current Date
+	Wait For	manager_${platform}_robots_0.png 	timeout=${robot_test_time + 30}
+	Take A Screenshot
+	${END_TIME}=	Get Current Date
+	${ELAPSED_TIME}=	Subtract Date From Date	${END_TIME}	${START_TIME}
+	Should Be True	${ELAPSED_TIME} >= ${robot_test_time / 2} and ${ELAPSED_TIME} <= ${robot_test_time + 30}
+
 	Press Key.tab 2 Times
 	Move To	10	10
+	Take A Screenshot
 	${status}=	Run Keyword And Return Status	
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${expected_robot_test_time + ${time_for_end}}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish after ${time_for_end} seconds + expected robot test time. Check screenshots for more informations.
-	Take A Screenshot
-	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_robots_0.png	timeout=20
-	Take A Screenshot
-	Run Keyword If	not ${status}	Fail	msg=Robots are not zero. Check screenshots for more informations.
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
 
-Stop Agent With Terminate Signal
-	[Arguments]	${rumup_time}
-	${time_for_end}	Set Variable	100
-	Sleep	${rumup_time + 10}
+Stop Test Scenario Run Quickly
+	[Arguments]	${rumup_time}	${robot_test_time}
+	Wait For	manager_${platform}_robots_10.png 	timeout=${rumup_time + 30}
 	Click Button	stoprun
 	Sleep	2
 	Click
 	Press Key.enter 1 Times
-	Sleep	1
+	${START_TIME}=	Get Current Date
+	Wait For	manager_${platform}_robots_0.png 	timeout=${robot_test_time}
+	Take A Screenshot
+	${END_TIME}=	Get Current Date
+	${ELAPSED_TIME}=	Subtract Date From Date	${END_TIME}	${START_TIME}
+	Should Be True	${ELAPSED_TIME} <= ${robot_test_time / 2}
+
 	Press Key.tab 2 Times
 	Move To	10	10
-	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_button_finished_run.png 	timeout=${time_for_end}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish after ${time_for_end} seconds. Check screenshots for more informations.
 	Take A Screenshot
-	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_robots_0.png	timeout=20
-	Take A Screenshot
-	Run Keyword If	not ${status}	Fail	msg=Robots are not zero. Check screenshots for more informations.
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
 
 Check If The Agent Has Connected To The Manager
 	Click Tab	Agents

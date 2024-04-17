@@ -167,7 +167,7 @@ Verify Scenario File Settings
 		END
 	END
 
-Chceck That The Scenario File Opens Correctly
+Check That The Scenario File Opens Correctly
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	Open Manager GUI
 	Set Global Filename And Default Save Path	${robot_data}[0]
@@ -307,40 +307,41 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    CommandLine_Common.Stop Agent											AND	
 	...    CommandLine_Common.Stop Manager
 
-Check If Run Will Stop Gradually
+Check If Test Scenario Run Will Stop Gradually
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600							AND
 	...    CommandLine_Common.Run Agent									AND
 	...    Open Manager GUI												AND
 	...    Set Global Filename And Default Save Path	example.robot	AND
-	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\t[Documentation]\tI am sleeping 10s\n\tSleep\t10
+	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\tSleep\t60
 
 	Press Key.tab 4 Times
 	Type	15
 	Press Key.tab 1 Times
-	Type	30
+	Type	60
 	Click Button	runscriptrow
 	Select Robot File	${robot_data}[0]
 	Select 1 Robot Test Case
 	Check If The Agent Has Connected To The Manager
 	Click Tab	Plan
 	Click Button	runplay
-	Stop Agent Robots Gradually	${15}	${10}
+	Stop Test Scenario Run Gradually	${15}	${60}
 
 	[Teardown]	Run Keywords
 	...    CommandLine_Common.Stop Agent				AND
 	...    CommandLine_Common.Stop Manager				AND
 	...    Remove File	${global_path}${/}example.robot
 
-Check If Run Will Stop With Terminate Signal (Ctrl + C)
+Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the robots)
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600							AND
 	...    CommandLine_Common.Run Agent									AND
 	...    Open Manager GUI												AND
 	...    Set Global Filename And Default Save Path	example.robot	AND
-	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\t[Documentation]\tI am sleeping 333s\n\tSleep\t333
+	...    Create Robot File	
+	...    file_content=***Test Case***\nExample Test Case\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15
 
 	Press Key.tab 4 Times
 	Type	15
@@ -352,7 +353,7 @@ Check If Run Will Stop With Terminate Signal (Ctrl + C)
 	Check If The Agent Has Connected To The Manager
 	Click Tab	Plan
 	Click Button	runplay
-	Stop Agent With Terminate Signal	${15}
+	Stop Test Scenario Run Quickly	${15}	${60}
 
 	[Teardown]	Run Keywords
 	...    CommandLine_Common.Stop Agent				AND
