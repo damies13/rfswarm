@@ -304,10 +304,10 @@ Check If Test Scenario Run Will Stop Gradually
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600							AND
 	...    CommandLine_Common.Run Agent									AND
-	...    Open Manager GUI												AND
+	...    CommandLine_Common.Run Manager CLI							AND
 	...    Set Global Filename And Default Save Path	example.robot	AND
 	...    Set Confidence	0.96										AND
-	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\tSleep\t60
+	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t60\n
 
 	Press Key.tab 4 Times
 	Type	15
@@ -332,11 +332,11 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600							AND
 	...    CommandLine_Common.Run Agent									AND
-	...    Open Manager GUI												AND
+	...    CommandLine_Common.Run Manager CLI							AND
 	...    Set Global Filename And Default Save Path	example.robot	AND
 	...    Set Confidence	0.96										AND
 	...    Create Robot File	
-	...    file_content=***Test Case***\nExample Test Case\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15
+	...    file_content=***Test Case***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n
 
 	Press Key.tab 4 Times
 	Type	15
