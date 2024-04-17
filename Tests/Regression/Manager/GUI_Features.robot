@@ -355,7 +355,7 @@ Verify Disable report.html - Test Row
 	@{mngr_options}= 	Create List 	-s 	${scenariofile}
 	Open Manager GUI 		${mngr_options}
 	Click Button	trsettings
-	Click CheckBox 	unchecked 	loghtml
+	Click CheckBox 	unchecked 	reporthtml
 	Test Group Save Settings
 	Click Button 	runsave
 
@@ -369,7 +369,7 @@ Verify Disable report.html - Test Row
 
 	Open Manager GUI 		${mngr_options}
 	Click Button	trsettings
-	Click CheckBox 	checked 	loghtml
+	Click CheckBox 	checked 	reporthtml
 	Test Group Save Settings
 	Click Button 	runsave
 
@@ -396,7 +396,7 @@ Verify Disable output.xml - Test Row
 	@{mngr_options}= 	Create List 	-s 	${scenariofile}
 	Open Manager GUI 		${mngr_options}
 	Click Button	trsettings
-	Click CheckBox 	unchecked 	loghtml
+	Click CheckBox 	unchecked 	outputxml
 	Test Group Save Settings
 	Click Button 	runsave
 
@@ -410,7 +410,7 @@ Verify Disable output.xml - Test Row
 
 	Open Manager GUI 		${mngr_options}
 	Click Button	trsettings
-	Click CheckBox 	checked 	loghtml
+	Click CheckBox 	checked 	outputxml
 	Test Group Save Settings
 	Click Button 	runsave
 
