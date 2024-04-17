@@ -79,6 +79,9 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 	...    excludelibraries=builtin,string,operatingsystem,perftest,collections	
 	...    robot_options=-v var:examplevariable	
 	...    test_repeater=True
+	...    inject_sleep=True
+	...    inject_sleep_min=30
+	...    inject_sleep_max=60
 	Click Button	runaddrow
 	Click
 	FOR  ${i}  IN RANGE  1  4
@@ -130,6 +133,9 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	...    excludelibraries=builtin,string,operatingsystem,perftest,collections	
 	...    robot_options=-v var:examplevariable	
 	...    test_repeater=True
+	...    inject_sleep=True
+	...    inject_sleep_min=30
+	...    inject_sleep_max=60
 	Click Button	runaddrow
 	Click
 	FOR  ${i}  IN RANGE  1  4
@@ -303,8 +309,8 @@ Check If Test Scenario Run Will Stop Gradually
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600							AND
-	...    CommandLine_Common.Run Agent									AND
-	...    CommandLine_Common.Run Manager CLI							AND
+	...    Open Agent													AND
+	...    Open Manager GUI												AND
 	...    Set Global Filename And Default Save Path	example.robot	AND
 	...    Set Confidence	0.96										AND
 	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t60\n
@@ -322,17 +328,17 @@ Check If Test Scenario Run Will Stop Gradually
 	Stop Test Scenario Run Gradually	${15}	${60}
 
 	[Teardown]	Run Keywords
-	...    Set Confidence	0.9							AND
-	...    CommandLine_Common.Stop Agent				AND
-	...    CommandLine_Common.Stop Manager				AND
+	...    Set Confidence	0.9								AND
+	...    GUI_Common.Stop Agent							AND
+	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove File	${global_path}${/}example.robot
 
 Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the robots)
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600							AND
-	...    CommandLine_Common.Run Agent									AND
-	...    CommandLine_Common.Run Manager CLI							AND
+	...    Open Agent													AND
+	...    Open Manager GUI												AND
 	...    Set Global Filename And Default Save Path	example.robot	AND
 	...    Set Confidence	0.96										AND
 	...    Create Robot File	
@@ -351,7 +357,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	Stop Test Scenario Run Quickly	${15}	${60}
 
 	[Teardown]	Run Keywords
-	...    Set Confidence	0.9							AND
-	...    CommandLine_Common.Stop Agent				AND
-	...    CommandLine_Common.Stop Manager				AND
+	...    Set Confidence	0.9								AND
+	...    GUI_Common.Stop Agent							AND
+	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove File	${global_path}${/}example.robot

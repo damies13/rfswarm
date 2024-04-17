@@ -364,8 +364,21 @@ Change Test Group Settings
 	IF  'robot_options' in ${row_settings_data}
 		Type	${row_settings_data['robot_options']}
 	END
+	Press Key.tab 3 Times
+	IF  'inject_sleep_min' in ${row_settings_data}
+		Type	${row_settings_data['inject_sleep_min']}
+	END
+	Press Key.tab 1 Times
+	IF  'inject_sleep_max' in ${row_settings_data}
+		Type	${row_settings_data['inject_sleep_max']}
+	END
 	IF  'test_repeater' in ${row_settings_data}
 		IF  '${row_settings_data['test_repeater']}' == 'True'
+			Click Button	checkbox_unch
+		END
+	END
+	IF  'inject_sleep' in ${row_settings_data}
+		IF  '${row_settings_data['inject_sleep']}' == 'True'
 			Click Button	checkbox_unch
 		END
 	END
@@ -584,6 +597,27 @@ Verify Scenario Test Row Settings
 			Should Be Equal		testrepeater	${scenario_content_list}[${repeater_offset}]
 			Should Be Equal		${row_settings_data['test_repeater']}	${scenario_content_list}[${repeater_offset + 2}]
 			...    msg=Test repeater did not save correctly! 
+		END
+
+		IF  'inject_sleep' in ${row_settings_data}
+			${injectsleep_offset}		Get Index From List		${scenario_content_list}	injectsleepenabled	start=${i}
+			Should Be Equal		injectsleepenabled	${scenario_content_list}[${injectsleep_offset}]
+			Should Be Equal		${row_settings_data['inject_sleep']}	${scenario_content_list}[${injectsleep_offset + 2}]
+			...    msg=Inject sleep enabled did not save correctly! 
+		END
+
+		IF  'inject_sleep_min' in ${row_settings_data}
+			${injectsleep_min_offset}		Get Index From List		${scenario_content_list}	injectsleepminimum 	start=${i}
+			Should Be Equal		injectsleepminimum 	${scenario_content_list}[${injectsleep_min_offset}]
+			Should Be Equal		${row_settings_data['inject_sleep_min']}	${scenario_content_list}[${injectsleep_min_offset + 2}]
+			...    msg=Inject sleep minimum did not save correctly! 
+		END
+
+		IF  'inject_sleep_max' in ${row_settings_data}
+			${injectsleep_max_offset}		Get Index From List		${scenario_content_list}	injectsleepmaximum 	start=${i}
+			Should Be Equal		injectsleepmaximum 	${scenario_content_list}[${injectsleep_max_offset}]
+			Should Be Equal		${row_settings_data['inject_sleep_max']}	${scenario_content_list}[${injectsleep_max_offset + 2}]
+			...    msg=Inject sleep maximum did not save correctly! 
 		END
 	END
 
