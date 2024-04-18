@@ -152,7 +152,7 @@ Utilisation Stats
 	Log 	${loadavg} 	console=True
 	${mem}= 		Evaluate 	psutil.virtual_memory() 														modules=psutil
 	Log 	${mem}
-	${proc}= 		Evaluate 	list(psutil.process_iter(['pid', 'name', 'username'])) 		modules=psutil
+	${proc}= 		Evaluate 	list(psutil.process_iter(['pid', 'name', 'exe', 'cmdline', 'username'])) 		modules=psutil
 	Log 	${proc}
 
 Check If The Agent Has Connected To The Manager
@@ -322,10 +322,12 @@ Get Manager INI Data
 	${location}=	Get Manager INI Location
 	TRY
 		File Should Exist	${location}
+		File Should Not Be Empty	${location}
 	EXCEPT
 		Open Manager GUI
 		Run Keyword		Close Manager GUI ${platform}
 		File Should Exist	${location}
+		File Should Not Be Empty	${location}
 	END
 	${ini_content}=	Get File	${location}
 	Log	${ini_content}
