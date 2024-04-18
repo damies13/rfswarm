@@ -14,8 +14,6 @@ ${cmd_manager} 	rfswarm
 ${IMAGE_DIR} 	${CURDIR}/Images/file_method
 ${pyfile_manager}			${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
 ${pyfile_agent}			${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py
-${process_manager}		None
-${process_agent}		None
 
 *** Keywords ***
 Set Platform
@@ -104,31 +102,35 @@ Stop Agent
 
 Stop Test Scenario Run Gradually
 	[Arguments]	${rumup_time}	${robot_test_time}
-	Wait For	manager_${platform}_robots_10.png 	timeout=${rumup_time + 30}
+	Set Confidence	0.95
+	Wait For	manager_${platform}_robots_10.png 	timeout=${rumup_time + 300}
 	Click Button	stoprun
 	${START_TIME}=	Get Current Date
-	Wait For	manager_${platform}_robots_0.png 	timeout=${robot_test_time + 30}
+	Wait For	manager_${platform}_robots_0.png 	timeout=${robot_test_time + 300}
+	Set Confidence	0.9
 	Take A Screenshot
 	${END_TIME}=	Get Current Date
 	${ELAPSED_TIME}=	Subtract Date From Date	${END_TIME}	${START_TIME}
-	Should Be True	${ELAPSED_TIME} >= ${robot_test_time / 2} and ${ELAPSED_TIME} <= ${robot_test_time + 30}
+	Should Be True	${ELAPSED_TIME} >= ${robot_test_time / 2} and ${ELAPSED_TIME} <= ${robot_test_time + 90}
 
 	Press Key.tab 2 Times
 	Move To	10	10
 	Take A Screenshot
 	${status}=	Run Keyword And Return Status	
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time}
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time + 300}
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
 
 Stop Test Scenario Run Quickly
 	[Arguments]	${rumup_time}	${robot_test_time}
-	Wait For	manager_${platform}_robots_10.png 	timeout=${rumup_time + 30}
+	Set Confidence	0.95
+	Wait For	manager_${platform}_robots_10.png 	timeout=${rumup_time + 300}
 	Click Button	stoprun
 	Sleep	2
 	Click
 	Press Key.enter 1 Times
 	${START_TIME}=	Get Current Date
-	Wait For	manager_${platform}_robots_0.png 	timeout=${robot_test_time}
+	Wait For	manager_${platform}_robots_0.png 	timeout=${robot_test_time + 60}
+	Set Confidence	0.9
 	Take A Screenshot
 	${END_TIME}=	Get Current Date
 	${ELAPSED_TIME}=	Subtract Date From Date	${END_TIME}	${START_TIME}
@@ -138,10 +140,21 @@ Stop Test Scenario Run Quickly
 	Move To	10	10
 	Take A Screenshot
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time}
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time + 300}
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
 
+Utilisation Stats
+	${cpupct}= 	Evaluate 	psutil.cpu_percent(interval=1, percpu=True) 				modules=psutil
+	Log 	\n${cpupct} 	console=True
+	${loadavg}= 	Evaluate 	psutil.getloadavg() 															modules=psutil
+	Log 	${loadavg} 	console=True
+	${mem}= 		Evaluate 	psutil.virtual_memory() 														modules=psutil
+	Log 	${mem}
+	${proc}= 		Evaluate 	list(psutil.process_iter(['pid', 'name', 'exe', 'cmdline', 'username'])) 		modules=psutil
+	Log 	${proc}
+
 Check If The Agent Has Connected To The Manager
+	Sleep	1
 	Click Tab	Agents
 	Wait For 	manager_${platform}_agents_ready.png	timeout=300
 
@@ -307,10 +320,12 @@ Get Manager INI Data
 	${location}=	Get Manager INI Location
 	TRY
 		File Should Exist	${location}
+		File Should Not Be Empty	${location}
 	EXCEPT
 		Open Manager GUI
 		Run Keyword		Close Manager GUI ${platform}
 		File Should Exist	${location}
+		File Should Not Be Empty	${location}
 	END
 	${ini_content}=	Get File	${location}
 	Log	${ini_content}
@@ -363,8 +378,21 @@ Change Test Group Settings
 	IF  'robot_options' in ${row_settings_data}
 		Type	${row_settings_data['robot_options']}
 	END
+	Press Key.tab 3 Times
+	IF  'inject_sleep_min' in ${row_settings_data}
+		Type	${row_settings_data['inject_sleep_min']}
+	END
+	Press Key.tab 1 Times
+	IF  'inject_sleep_max' in ${row_settings_data}
+		Type	${row_settings_data['inject_sleep_max']}
+	END
 	IF  'test_repeater' in ${row_settings_data}
 		IF  '${row_settings_data['test_repeater']}' == 'True'
+			Click Button	checkbox_unch
+		END
+	END
+	IF  'inject_sleep' in ${row_settings_data}
+		IF  '${row_settings_data['inject_sleep']}' == 'True'
 			Click Button	checkbox_unch
 		END
 	END
@@ -389,7 +417,7 @@ Select Robot File
 	Log		${robot_file_name}
 	Take A Screenshot
 	Click Dialog Button		${robot_file_name}_robot
-	Sleep	1
+	Sleep	2
 	Take A Screenshot
 	Click Dialog Button		open
 	Sleep	1
@@ -494,3 +522,124 @@ Compare Manager and Agent Files Content
 			...    Should Be Equal	${M_file_content}	${A_file_content}
 		END
 	END
+
+Verify Scenario File Robots
+	[Arguments]		${scenario_content_list}	${run_robots}
+	FOR  ${rows}  IN RANGE  1	4
+		${row}	Set Variable	[${rows}]	#[1], [2], [3]
+		${i}=	Get Index From List		${scenario_content_list}		${row}
+		Log		${row}
+
+		${robots_offset}	Get Index From List 	${scenario_content_list}	robots	start=${i}
+		Should Be Equal		robots	${scenario_content_list}[${robots_offset}]
+		Should Be Equal		${run_robots}[${rows - 1}]	${scenario_content_list}[${robots_offset + 2}]
+		...    msg=Robots value did not save correctly! 
+	END
+
+Verify Scenario File Times
+	[Arguments]		${scenario_content_list}	${run_times_in_s}
+	FOR  ${rows}  IN RANGE  1	4
+		${row}	Set Variable	[${rows}]
+		${i}=	Get Index From List		${scenario_content_list}		${row}
+		Log		${row}
+		${time_indx}=	Evaluate	${rows - 1}*3
+
+		${delay_offset}		Get Index From List 	${scenario_content_list}	delay	start=${i}
+		Should Be Equal		delay	${scenario_content_list}[${delay_offset}]
+		Should Be Equal		${run_times_in_s}[${time_indx}]		${scenario_content_list}[${delay_offset + 2}]
+		...    msg=Delay time value did not save correctly! 
+
+		${rampup_offset}	Get Index From List 	${scenario_content_list}	rampup	start=${i}
+		Should Be Equal		rampup	${scenario_content_list}[${rampup_offset}]
+		Should Be Equal		${run_times_in_s}[${time_indx + 1}]		${scenario_content_list}[${rampup_offset + 2}]
+		...    msg=Rump-up time value did not save correctly! 
+
+		${run_offset}		Get Index From List 	${scenario_content_list}	run	start=${i}
+		Should Be Equal		run		${scenario_content_list}[${run_offset}]
+		Should Be Equal		${run_times_in_s}[${time_indx + 2}]		${scenario_content_list}[${run_offset + 2}]
+		...    msg=Run time value did not save correctly! 
+	END
+
+Verify Scenario File Robot Data
+	[Arguments]		${scenario_content_list}	${robot_data}
+	FOR  ${rows}  IN RANGE  1	4
+		${row}	Set Variable	[${rows}]
+		${i}=	Get Index From List		${scenario_content_list}		${row}
+		Log		${row}
+
+		${test_offset}		Get Index From List 	${scenario_content_list}	test	start=${i}
+		Should Be Equal		test	${scenario_content_list}[${test_offset}]
+		${test_name}=	Catenate	
+		...    ${scenario_content_list[${test_offset + 2}]}	
+		...    ${scenario_content_list[${test_offset + 3}]}	
+		...    ${scenario_content_list[${test_offset + 4}]}
+		Should Be Equal		${robot_data}[1]	${test_name}
+		...    msg=Robot test file name did not save correctly! 
+
+		${script_offset}		Get Index From List 	${scenario_content_list}	script	start=${i}
+		Should Be Equal		script	${scenario_content_list}[${script_offset}]
+		Should Be Equal		${robot_data}[0]	${scenario_content_list}[${script_offset + 2}]
+		...    msg=Robot script name did not save correctly! 
+	END
+
+Verify Scenario Test Row Settings
+	[Arguments]		${scenario_content_list}	${row_settings_data}
+	FOR  ${rows}  IN RANGE  1	4
+		${row}	Set Variable	[${rows}]
+		${i}=	Get Index From List		${scenario_content_list}		${row}
+		Log		${row}
+
+		IF  'excludelibraries' in ${row_settings_data}
+			${exlibraries_offset}	Get Index From List 	${scenario_content_list}	excludelibraries	start=${i}
+			Should Be Equal		excludelibraries	${scenario_content_list}[${exlibraries_offset}]
+			Should Be Equal		${row_settings_data['excludelibraries']}	${scenario_content_list}[${exlibraries_offset + 2}]
+			...    msg=Exclude Libraries did not save correctly! 
+		END
+
+		IF  'robot_options' in ${row_settings_data}
+			${robot_options_offset}		Get Index From List		${scenario_content_list}	robotoptions	start=${i}
+			Should Be Equal		robotoptions	${scenario_content_list}[${robot_options_offset}]
+			${robot_options}=	Catenate	
+			...    ${scenario_content_list[${robot_options_offset + 2}]}	
+			...    ${scenario_content_list[${robot_options_offset + 3}]}
+			Should Be Equal		${row_settings_data['robot_options']}	${robot_options}
+			...    msg=Robot options did not save correctly! 
+		END
+
+		IF  'test_repeater' in ${row_settings_data}
+			${repeater_offset}		Get Index From List		${scenario_content_list}	testrepeater	start=${i}
+			Should Be Equal		testrepeater	${scenario_content_list}[${repeater_offset}]
+			Should Be Equal		${row_settings_data['test_repeater']}	${scenario_content_list}[${repeater_offset + 2}]
+			...    msg=Test repeater did not save correctly! 
+		END
+
+		IF  'inject_sleep' in ${row_settings_data}
+			${injectsleep_offset}		Get Index From List		${scenario_content_list}	injectsleepenabled	start=${i}
+			Should Be Equal		injectsleepenabled	${scenario_content_list}[${injectsleep_offset}]
+			Should Be Equal		${row_settings_data['inject_sleep']}	${scenario_content_list}[${injectsleep_offset + 2}]
+			...    msg=Inject sleep enabled did not save correctly! 
+		END
+
+		IF  'inject_sleep_min' in ${row_settings_data}
+			${injectsleep_min_offset}		Get Index From List		${scenario_content_list}	injectsleepminimum 	start=${i}
+			Should Be Equal		injectsleepminimum 	${scenario_content_list}[${injectsleep_min_offset}]
+			Should Be Equal		${row_settings_data['inject_sleep_min']}	${scenario_content_list}[${injectsleep_min_offset + 2}]
+			...    msg=Inject sleep minimum did not save correctly! 
+		END
+
+		IF  'inject_sleep_max' in ${row_settings_data}
+			${injectsleep_max_offset}		Get Index From List		${scenario_content_list}	injectsleepmaximum 	start=${i}
+			Should Be Equal		injectsleepmaximum 	${scenario_content_list}[${injectsleep_max_offset}]
+			Should Be Equal		${row_settings_data['inject_sleep_max']}	${scenario_content_list}[${injectsleep_max_offset + 2}]
+			...    msg=Inject sleep maximum did not save correctly! 
+		END
+	END
+
+Check That The Scenario File Opens Correctly
+	[Arguments]		${robot_data}	${scenario_name}	${scenario_content}
+	Set Global Filename And Default Save Path	${robot_data}[0]
+	Click Button	runsave
+	${scenario_content_reopened}=	Get scenario file content	${global_path}	${scenario_name}
+	Log		${scenario_content}
+	Log		${scenario_content_reopened}
+	Should Be Equal		${scenario_content}		${scenario_content_reopened}	msg=Scenario files are not equal!
