@@ -333,6 +333,7 @@ Get Manager INI Data
 	EXCEPT
 		Open Manager GUI
 		Run Keyword		Close Manager GUI ${platform}
+		Sleep	5
 		File Should Exist	${location}
 		File Should Not Be Empty	${location}
 	END
