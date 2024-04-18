@@ -147,7 +147,9 @@ Stop Test Scenario Run Quickly
 
 Utilisation Stats
 	${cpupct}= 	Evaluate 	psutil.cpu_percent(interval=1, percpu=True) 				modules=psutil
-	Log 	${cpupct}
+	Log 	\n${cpupct} 	console=True
+	${loadavg}= 	Evaluate 	psutil.getloadavg() 															modules=psutil
+	Log 	${loadavg} 	console=True
 	${mem}= 		Evaluate 	psutil.virtual_memory() 														modules=psutil
 	Log 	${mem}
 	${proc}= 		Evaluate 	list(psutil.process_iter(['pid', 'name', 'username'])) 		modules=psutil
