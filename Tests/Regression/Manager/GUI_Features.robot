@@ -308,10 +308,10 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the robots)
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
 	[Setup]	Run Keywords
+	...    Set Global Filename And Default Save Path	example.robot	AND
 	...    Set INI Window Size		1200	600							AND
 	...    Open Agent													AND
 	...    Open Manager GUI												AND
-	...    Set Global Filename And Default Save Path	example.robot	AND
 	...    Create Robot File	
 	...    file_content=***Test Case***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n
 
@@ -336,10 +336,10 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 Check If Test Scenario Run Will Stop Gradually
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
 	[Setup]	Run Keywords
+	...    Set Global Filename And Default Save Path	example.robot	AND
 	...    Set INI Window Size		1200	600							AND
 	...    Open Agent													AND
 	...    Open Manager GUI												AND
-	...    Set Global Filename And Default Save Path	example.robot	AND
 	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t60\n
 
 	Utilisation Stats
