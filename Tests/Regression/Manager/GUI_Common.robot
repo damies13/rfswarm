@@ -145,6 +145,14 @@ Stop Test Scenario Run Quickly
 	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time + 300}
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
 
+Utilisation Stats
+	${cpupct}= 	Evaluate 	psutil.cpu_percent(interval=1, percpu=True) 				modules=psutil
+	Log 	${cpupct}
+	${mem}= 		Evaluate 	psutil.virtual_memory() 														modules=psutil
+	Log 	${mem}
+	${proc}= 		Evaluate 	list(psutil.process_iter(['pid', 'name', 'username'])) 		modules=psutil
+	Log 	${proc}
+
 Check If The Agent Has Connected To The Manager
 	Sleep	1
 	Click Tab	Agents

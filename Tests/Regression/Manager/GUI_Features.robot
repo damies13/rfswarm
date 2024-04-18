@@ -342,6 +342,7 @@ Check If Test Scenario Run Will Stop Gradually
 	...    Set Global Filename And Default Save Path	example.robot	AND
 	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t60\n
 
+	Utilisation Stats
 	Press Key.tab 4 Times
 	Type	15
 	Press Key.tab 1 Times
