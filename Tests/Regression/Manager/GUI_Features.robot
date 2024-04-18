@@ -305,34 +305,6 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    CommandLine_Common.Stop Agent											AND
 	...    CommandLine_Common.Stop Manager
 
-Check If Test Scenario Run Will Stop Gradually
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
-	[Setup]	Run Keywords
-	...    Set INI Window Size		1200	600							AND
-	...    Open Agent													AND
-	...    Open Manager GUI												AND
-	...    Set Global Filename And Default Save Path	example.robot	AND
-	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t60\n
-
-	Press Key.tab 4 Times
-	Type	15
-	Press Key.tab 1 Times
-	Type	60
-	Click Button	runscriptrow
-	Select Robot File	${robot_data}[0]
-	Select 1 Robot Test Case
-	Check If The Agent Has Connected To The Manager
-	Click Tab	Plan
-	Click Button	runplay
-	Stop Test Scenario Run Gradually	${15}	${60}
-
-	[Teardown]	Run Keywords
-	...    Set Confidence	0.9								AND
-	...    GUI_Common.Stop Agent							AND
-	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    Remove File		${global_path}${/}example.robot	AND
-	...    Sleep	5
-
 Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the robots)
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
 	[Setup]	Run Keywords
@@ -354,6 +326,33 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	Click Tab	Plan
 	Click Button	runplay
 	Stop Test Scenario Run Quickly	${15}	${60}
+
+	[Teardown]	Run Keywords
+	...    Set Confidence	0.9								AND
+	...    GUI_Common.Stop Agent							AND
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Remove File		${global_path}${/}example.robot
+
+Check If Test Scenario Run Will Stop Gradually
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600							AND
+	...    Open Agent													AND
+	...    Open Manager GUI												AND
+	...    Set Global Filename And Default Save Path	example.robot	AND
+	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t60\n
+
+	Press Key.tab 4 Times
+	Type	15
+	Press Key.tab 1 Times
+	Type	60
+	Click Button	runscriptrow
+	Select Robot File	${robot_data}[0]
+	Select 1 Robot Test Case
+	Check If The Agent Has Connected To The Manager
+	Click Tab	Plan
+	Click Button	runplay
+	Stop Test Scenario Run Gradually	${15}	${60}
 
 	[Teardown]	Run Keywords
 	...    Set Confidence	0.9								AND
