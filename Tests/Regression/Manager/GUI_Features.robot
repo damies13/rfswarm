@@ -11,7 +11,7 @@ ${scenario_name}=	test_scenario
 
 *** Test Cases ***
 Check If the Manager Saves Times and Robots to the Scenario with Example Robot
-	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords	
 	...    Set INI Window Size		1200	600										AND
 	...    Open Manager GUI															AND
@@ -67,7 +67,7 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	...    Delete Scenario File	${scenario_name}
 
 Check If the Manager Saves Settings on the Test Row With Example Robot
-	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords	
 	...    Set INI Window Size		1200	600										AND
 	...    Open Manager GUI															AND
@@ -121,7 +121,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 	...    Delete Scenario File	${scenario_name}
 
 Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
-	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords	
 	...    Set INI Window Size		1200	600										AND
 	...    Open Manager GUI															AND
@@ -183,7 +183,7 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	...    Delete Scenario File	${scenario_name}
 
 Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
-	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords	
 	...    Set INI Window Size		800		600												AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
@@ -222,7 +222,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	...    CommandLine_Common.Stop Manager
 
 Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
-	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords	
 	...    Set INI Window Size		800		600												AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
@@ -264,7 +264,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	...    CommandLine_Common.Stop Manager
 
 Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
-	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords	
 	...    Set INI Window Size		800		600												AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
@@ -334,7 +334,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	...    Remove File		${global_path}${/}example.robot
 
 Check If Test Scenario Run Will Stop Gradually
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot	AND
 	...    Set INI Window Size		1200	600							AND
