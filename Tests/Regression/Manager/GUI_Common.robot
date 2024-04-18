@@ -91,25 +91,20 @@ Close Manager GUI
 
 Close Manager GUI macos
 	[Tags]	macos-latest
-	# Press Combination 	Key.esc
-	# Press Combination 	q 	Key.command
-	# Click Image		manager_${platform}_menu_python3.png
-	# Click Menu		rfswarm
-	Run Keyword And Ignore Error 	Click Dialog Button 	cancel
-	Run Keyword And Ignore Error 	Click Dialog Button 	no
-	# Run Keyword And Return Status 	Click Dialog Button 	cancel
-	# Tests/Regression/Manager/Images/file_method/manager_macos_titlebar_rfswarm.png
-	Click Image		manager_${platform}_titlebar_rfswarm.png
-	Click Button	closewindow
-	Sleep	5
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
-		Click Dialog Button		no
+		Run Keyword And Ignore Error 	Click Dialog Button 	cancel
+		Run Keyword And Ignore Error 	Click Dialog Button 	no
+		Click Image		manager_${platform}_titlebar_rfswarm.png
+		Click Button	closewindow
+		# Sleep	5
+		Run Keyword And Ignore Error 	Click Dialog Button		no
 	END
 	${result}= 	Wait For Process 	${process_manager} 	timeout=55
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	not ${running}
 		Should Be Equal As Integers 	${result.rc} 	0
+		Take A Screenshot
 	ELSE
 		Take A Screenshot
 		${result} = 	Terminate Process		${process_manager}

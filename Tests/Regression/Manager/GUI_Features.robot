@@ -259,6 +259,7 @@ Verify Disable report.html - Scenario
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
+	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify Disable output.xml - Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
@@ -297,6 +298,7 @@ Verify Disable output.xml - Scenario
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
+	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify Disable log.html - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
@@ -338,6 +340,7 @@ Verify Disable log.html - Test Row
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
 	Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
+	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify Disable report.html - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
@@ -379,6 +382,7 @@ Verify Disable report.html - Test Row
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
 	Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
+	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify Disable output.xml - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
@@ -420,6 +424,7 @@ Verify Disable output.xml - Test Row
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
 	Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
+	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
