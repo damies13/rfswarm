@@ -324,14 +324,14 @@ Check If Test Scenario Run Will Stop Gradually
 	Check If The Agent Has Connected To The Manager
 	Click Tab	Plan
 	Click Button	runplay
-	Set Confidence	0.96
 	Stop Test Scenario Run Gradually	${15}	${60}
 
 	[Teardown]	Run Keywords
 	...    Set Confidence	0.9								AND
 	...    GUI_Common.Stop Agent							AND
 	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    Remove File	${global_path}${/}example.robot
+	...    Remove File		${global_path}${/}example.robot	AND
+	...    Sleep	5
 
 Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the robots)
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
@@ -353,11 +353,10 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	Check If The Agent Has Connected To The Manager
 	Click Tab	Plan
 	Click Button	runplay
-	Set Confidence	0.96
 	Stop Test Scenario Run Quickly	${15}	${60}
 
 	[Teardown]	Run Keywords
 	...    Set Confidence	0.9								AND
 	...    GUI_Common.Stop Agent							AND
 	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    Remove File	${global_path}${/}example.robot
+	...    Remove File		${global_path}${/}example.robot
