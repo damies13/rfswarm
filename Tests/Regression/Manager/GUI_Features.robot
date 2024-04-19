@@ -457,7 +457,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	# Compare Manager and Agent Files Content	${M_absolute_paths}	${A_absolute_paths}
 	${M_rel_paths}= 		Get Relative Paths 		${CURDIR}${/}testdata${/}Issue-52${/}example${/}main 		${M_absolute_paths}
 	${A_rel_paths}= 		Get Relative Paths 		${TEMPDIR}${/}agent_temp_issue52${/}scripts		${A_absolute_paths}
-	Diff Lists 		${M_rel_paths} 		${A_rel_paths} 	Files are not transferred correctly! Check report for more information.
+	Diff Lists 		${M_rel_paths} 		${A_rel_paths} 	Files are not transferred correctly! List A - Manager, List B - Agent, Check report for more information.
 
 	[Teardown]	Run Keywords
 	...    Delete Scenario File	test_scenario										AND
@@ -502,7 +502,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	# Compare Manager and Agent Files Content	${M_absolute_paths}	${A_absolute_paths}
 	${M_rel_paths}= 		Get Relative Paths 		${CURDIR}${/}testdata${/}Issue-52${/}example${/}main 		${M_absolute_paths}
 	${A_rel_paths}= 		Get Relative Paths 		${TEMPDIR}${/}agent_temp_issue52${/}scripts		${A_absolute_paths}
-	Diff Lists 		${M_rel_paths} 		${A_rel_paths} 	Files are not transferred correctly! Check report for more information.
+	Diff Lists 		${M_rel_paths} 		${A_rel_paths} 	Files are not transferred correctly! List A - Manager, List B - Agent, Check report for more information.
 
 	[Teardown]	Run Keywords
 	...    Delete Scenario File	test_scenario										AND
@@ -547,7 +547,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	# Compare Manager and Agent Files Content	${M_absolute_paths}	${A_absolute_paths}
 	${M_rel_paths}= 		Get Relative Paths 		${CURDIR}${/}testdata${/}Issue-52${/}example${/}main 		${M_absolute_paths}
 	${A_rel_paths}= 		Get Relative Paths 		${TEMPDIR}${/}agent_temp_issue52${/}scripts		${A_absolute_paths}
-	Diff Lists 		${M_rel_paths} 		${A_rel_paths} 	Files are not transferred correctly! Check report for more information.
+	Diff Lists 		${M_rel_paths} 		${A_rel_paths} 	Files are not transferred correctly! List A - Manager, List B - Agent, Check report for more information.
 
 	[Teardown]	Run Keywords
 	...    Delete Scenario File	test_scenario										AND
