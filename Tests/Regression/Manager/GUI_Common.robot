@@ -132,7 +132,7 @@ Stop Test Scenario Run Gradually
 	Press Key.tab 2 Times
 	Move To	10	10
 	Take A Screenshot
-	${status}=	Run Keyword And Return Status	
+	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time + 300}
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
 
@@ -429,7 +429,7 @@ Change Test Group Settings
 			Click Button	checkbox_unch
 		END
 	END
-	
+
 	Test Group Save Settings
 
 
@@ -560,6 +560,45 @@ Compare Manager and Agent Files Content
 		END
 	END
 
+Get Relative Paths
+	[Arguments] 	${base} 		${paths_in}
+
+	${paths_out}= 	Create List
+	FOR 	${item} 	IN 		@{paths_in}
+		${relpath}= 	Evaluate     os.path.relpath("${item}", start="${base}") 	modules=os.path
+		Append To List 	${paths_out} 	${relpath}
+	END
+	RETURN 	${paths_out}
+
+
+Diff Lists
+	[Arguments] 	${list_a} 		${list_b} 	${message}
+
+	${status}= 	Run Keyword And Return Status 	Lists Should Be Equal 	${list_a} 	${list_b}
+	IF 	not ${status}
+		Log		${list_a}
+		Log		${list_b}
+		${Missing_List_From_A}= 	Create List
+		${Missing_List_From_B}= 	Create List
+
+		FOR 	${item} 	IN 		@{list_b}
+			${status}= 	Run Keyword And Return Status 	List Should Contain Value 	${list_a} 	${item}
+			IF 	not ${status}
+				Append To List 	${Missing_List_From_A} 	${item}
+			END
+		END
+
+		FOR 	${item} 	IN 		@{list_a}
+			${status}= 	Run Keyword And Return Status 	List Should Contain Value 	${list_b} 	${item}
+			IF 	not ${status}
+				Append To List 	${Missing_List_From_B} 	${item}
+			END
+		END
+		Log 		\nItems from list B missing from list A: ${Missing_List_From_A} 	console=True
+		Log 		Items from list A missing from list B: ${Missing_List_From_B} 	console=True
+		Lists Should Be Equal 	${list_a} 	${list_b} 		msg=${message}
+	END
+
 Verify Scenario File Robots
 	[Arguments]		${scenario_content_list}	${run_robots}
 	FOR  ${rows}  IN RANGE  1	4
@@ -570,7 +609,7 @@ Verify Scenario File Robots
 		${robots_offset}	Get Index From List 	${scenario_content_list}	robots	start=${i}
 		Should Be Equal		robots	${scenario_content_list}[${robots_offset}]
 		Should Be Equal		${run_robots}[${rows - 1}]	${scenario_content_list}[${robots_offset + 2}]
-		...    msg=Robots value did not save correctly! 
+		...    msg=Robots value did not save correctly!
 	END
 
 Verify Scenario File Times
@@ -584,17 +623,17 @@ Verify Scenario File Times
 		${delay_offset}		Get Index From List 	${scenario_content_list}	delay	start=${i}
 		Should Be Equal		delay	${scenario_content_list}[${delay_offset}]
 		Should Be Equal		${run_times_in_s}[${time_indx}]		${scenario_content_list}[${delay_offset + 2}]
-		...    msg=Delay time value did not save correctly! 
+		...    msg=Delay time value did not save correctly!
 
 		${rampup_offset}	Get Index From List 	${scenario_content_list}	rampup	start=${i}
 		Should Be Equal		rampup	${scenario_content_list}[${rampup_offset}]
 		Should Be Equal		${run_times_in_s}[${time_indx + 1}]		${scenario_content_list}[${rampup_offset + 2}]
-		...    msg=Rump-up time value did not save correctly! 
+		...    msg=Rump-up time value did not save correctly!
 
 		${run_offset}		Get Index From List 	${scenario_content_list}	run	start=${i}
 		Should Be Equal		run		${scenario_content_list}[${run_offset}]
 		Should Be Equal		${run_times_in_s}[${time_indx + 2}]		${scenario_content_list}[${run_offset + 2}]
-		...    msg=Run time value did not save correctly! 
+		...    msg=Run time value did not save correctly!
 	END
 
 Verify Scenario File Robot Data
@@ -606,17 +645,17 @@ Verify Scenario File Robot Data
 
 		${test_offset}		Get Index From List 	${scenario_content_list}	test	start=${i}
 		Should Be Equal		test	${scenario_content_list}[${test_offset}]
-		${test_name}=	Catenate	
-		...    ${scenario_content_list[${test_offset + 2}]}	
-		...    ${scenario_content_list[${test_offset + 3}]}	
+		${test_name}=	Catenate
+		...    ${scenario_content_list[${test_offset + 2}]}
+		...    ${scenario_content_list[${test_offset + 3}]}
 		...    ${scenario_content_list[${test_offset + 4}]}
 		Should Be Equal		${robot_data}[1]	${test_name}
-		...    msg=Robot test file name did not save correctly! 
+		...    msg=Robot test file name did not save correctly!
 
 		${script_offset}		Get Index From List 	${scenario_content_list}	script	start=${i}
 		Should Be Equal		script	${scenario_content_list}[${script_offset}]
 		Should Be Equal		${robot_data}[0]	${scenario_content_list}[${script_offset + 2}]
-		...    msg=Robot script name did not save correctly! 
+		...    msg=Robot script name did not save correctly!
 	END
 
 Verify Scenario Test Row Settings
@@ -630,45 +669,45 @@ Verify Scenario Test Row Settings
 			${exlibraries_offset}	Get Index From List 	${scenario_content_list}	excludelibraries	start=${i}
 			Should Be Equal		excludelibraries	${scenario_content_list}[${exlibraries_offset}]
 			Should Be Equal		${row_settings_data['excludelibraries']}	${scenario_content_list}[${exlibraries_offset + 2}]
-			...    msg=Exclude Libraries did not save correctly! 
+			...    msg=Exclude Libraries did not save correctly!
 		END
 
 		IF  'robot_options' in ${row_settings_data}
 			${robot_options_offset}		Get Index From List		${scenario_content_list}	robotoptions	start=${i}
 			Should Be Equal		robotoptions	${scenario_content_list}[${robot_options_offset}]
-			${robot_options}=	Catenate	
-			...    ${scenario_content_list[${robot_options_offset + 2}]}	
+			${robot_options}=	Catenate
+			...    ${scenario_content_list[${robot_options_offset + 2}]}
 			...    ${scenario_content_list[${robot_options_offset + 3}]}
 			Should Be Equal		${row_settings_data['robot_options']}	${robot_options}
-			...    msg=Robot options did not save correctly! 
+			...    msg=Robot options did not save correctly!
 		END
 
 		IF  'test_repeater' in ${row_settings_data}
 			${repeater_offset}		Get Index From List		${scenario_content_list}	testrepeater	start=${i}
 			Should Be Equal		testrepeater	${scenario_content_list}[${repeater_offset}]
 			Should Be Equal		${row_settings_data['test_repeater']}	${scenario_content_list}[${repeater_offset + 2}]
-			...    msg=Test repeater did not save correctly! 
+			...    msg=Test repeater did not save correctly!
 		END
 
 		IF  'inject_sleep' in ${row_settings_data}
 			${injectsleep_offset}		Get Index From List		${scenario_content_list}	injectsleepenabled	start=${i}
 			Should Be Equal		injectsleepenabled	${scenario_content_list}[${injectsleep_offset}]
 			Should Be Equal		${row_settings_data['inject_sleep']}	${scenario_content_list}[${injectsleep_offset + 2}]
-			...    msg=Inject sleep enabled did not save correctly! 
+			...    msg=Inject sleep enabled did not save correctly!
 		END
 
 		IF  'inject_sleep_min' in ${row_settings_data}
 			${injectsleep_min_offset}		Get Index From List		${scenario_content_list}	injectsleepminimum 	start=${i}
 			Should Be Equal		injectsleepminimum 	${scenario_content_list}[${injectsleep_min_offset}]
 			Should Be Equal		${row_settings_data['inject_sleep_min']}	${scenario_content_list}[${injectsleep_min_offset + 2}]
-			...    msg=Inject sleep minimum did not save correctly! 
+			...    msg=Inject sleep minimum did not save correctly!
 		END
 
 		IF  'inject_sleep_max' in ${row_settings_data}
 			${injectsleep_max_offset}		Get Index From List		${scenario_content_list}	injectsleepmaximum 	start=${i}
 			Should Be Equal		injectsleepmaximum 	${scenario_content_list}[${injectsleep_max_offset}]
 			Should Be Equal		${row_settings_data['inject_sleep_max']}	${scenario_content_list}[${injectsleep_max_offset + 2}]
-			...    msg=Inject sleep maximum did not save correctly! 
+			...    msg=Inject sleep maximum did not save correctly!
 		END
 	END
 
