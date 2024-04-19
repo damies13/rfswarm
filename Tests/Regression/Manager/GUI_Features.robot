@@ -26,7 +26,7 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 		Sleep	2
 		FOR  ${j}  IN RANGE  1  5
 			Press Key.tab 1 Times
-			IF  '${j}' == '1' 
+			IF  '${j}' == '1'
 				Append To List	${run_robots}	${i}${j}${i}
 				Take A Screenshot
 				Type	${i}${j}${i}
@@ -34,9 +34,9 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 				${time_in_s}=	Evaluate	str(${i}${j} * 60 + ${i}${j})
 				Type	${time_in_s}
 				Append To List	${run_times_in_s}	${time_in_s}
-				
+
 			END
-			
+
 		END
 		Press Key.tab 2 Times
 		Click Button	selected_runscriptrow
@@ -158,7 +158,7 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 		Click Button	selected_select_test_case
 		Click Button	select_example
 		Press Key.tab 2 Times
-		${settings_coordinates}=	
+		${settings_coordinates}=
 		...    Locate	manager_${platform}_button_selected_runsettingsrow.png
 		Append To List	${settings_locations}	${settings_coordinates}
 		Press Key.tab 1 Times
@@ -182,6 +182,249 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	...    Delete Robot File								AND
 	...    Delete Scenario File	${scenario_name}
 
+Verify Disable log.html - Scenario
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-sl.rfs
+	Copy File 	${sourcefile} 	${scenariofile}
+	Log 	scenariofile: ${scenariofile} 	console=True
+
+	${scenariofilebefore}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofilebefore: ${scenariofilebefore} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
+
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI 		${mngr_options}
+	Click Button	runsettings
+	Click CheckBox 	unchecked 	loghtml
+	Click Dialog Button 	ok
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Dictionary Should Contain Key 	${scenariofileafter1} 	Script Defaults
+	Dictionary Should Contain Key 	${scenariofileafter1}[Script Defaults] 	disableloglog
+	Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][disableloglog] 	True
+
+	Open Manager GUI 		${mngr_options}
+	Click Button	runsettings
+	Click CheckBox 	checked 	loghtml
+	Click Dialog Button 	ok
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
+
+
+Verify Disable report.html - Scenario
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-sr.rfs
+	Copy File 	${sourcefile} 	${scenariofile}
+	Log 	scenariofile: ${scenariofile} 	console=True
+
+	${scenariofilebefore}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofilebefore: ${scenariofilebefore} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
+
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI 		${mngr_options}
+	Click Button	runsettings
+	Click CheckBox 	unchecked 	reporthtml
+	Click Dialog Button 	ok
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Dictionary Should Contain Key 	${scenariofileafter1} 	Script Defaults
+	Dictionary Should Contain Key 	${scenariofileafter1}[Script Defaults] 	disablelogreport
+	Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][disablelogreport] 	True
+
+	Open Manager GUI 		${mngr_options}
+	Click Button	runsettings
+	Click CheckBox 	checked 	reporthtml
+	Click Dialog Button 	ok
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
+	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
+
+Verify Disable output.xml - Scenario
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-so.rfs
+	Copy File 	${sourcefile} 	${scenariofile}
+	Log 	scenariofile: ${scenariofile} 	console=True
+
+	${scenariofilebefore}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofilebefore: ${scenariofilebefore} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
+
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI 		${mngr_options}
+	Click Button	runsettings
+	Click CheckBox 	unchecked 	outputxml
+	Click Dialog Button 	ok
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Dictionary Should Contain Key 	${scenariofileafter1} 	Script Defaults
+	Dictionary Should Contain Key 	${scenariofileafter1}[Script Defaults] 	disablelogoutput
+	Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][disablelogoutput] 	True
+
+	Open Manager GUI 		${mngr_options}
+	Click Button	runsettings
+	Click CheckBox 	checked 	outputxml
+	Click Dialog Button 	ok
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
+	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
+
+Verify Disable log.html - Test Row
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	${testkey}= 	Set Variable 		disableloglog
+	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-trl.rfs
+	Copy File 	${sourcefile} 	${scenariofile}
+	Log 	scenariofile: ${scenariofile} 	console=True
+
+	${scenariofilebefore}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofilebefore: ${scenariofilebefore} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
+	Dictionary Should Not Contain Key 	${scenariofilebefore}[1] 	${testkey}
+
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI 		${mngr_options}
+	Click Button	trsettings
+	Click CheckBox 	unchecked 	loghtml
+	Test Group Save Settings
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofileafter1} 	Script Defaults
+	Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
+	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	True
+
+	Open Manager GUI 		${mngr_options}
+	Click Button	trsettings
+	Click CheckBox 	checked 	loghtml
+	Test Group Save Settings
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
+	Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
+	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
+
+Verify Disable report.html - Test Row
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	${testkey}= 	Set Variable 		disablelogreport
+	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-trl.rfs
+	Copy File 	${sourcefile} 	${scenariofile}
+	Log 	scenariofile: ${scenariofile} 	console=True
+
+	${scenariofilebefore}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofilebefore: ${scenariofilebefore} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
+	Dictionary Should Not Contain Key 	${scenariofilebefore}[1] 	${testkey}
+
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI 		${mngr_options}
+	Click Button	trsettings
+	Click CheckBox 	unchecked 	reporthtml
+	Test Group Save Settings
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofileafter1} 	Script Defaults
+	Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
+	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	True
+
+	Open Manager GUI 		${mngr_options}
+	Click Button	trsettings
+	Click CheckBox 	checked 	reporthtml
+	Test Group Save Settings
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
+	Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
+	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
+
+Verify Disable output.xml - Test Row
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	${testkey}= 	Set Variable 		disablelogoutput
+	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-trl.rfs
+	Copy File 	${sourcefile} 	${scenariofile}
+	Log 	scenariofile: ${scenariofile} 	console=True
+
+	${scenariofilebefore}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofilebefore: ${scenariofilebefore} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
+	Dictionary Should Not Contain Key 	${scenariofilebefore}[1] 	${testkey}
+
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI 		${mngr_options}
+	Click Button	trsettings
+	Click CheckBox 	unchecked 	outputxml
+	Test Group Save Settings
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofileafter1} 	Script Defaults
+	Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
+	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	True
+
+	Open Manager GUI 		${mngr_options}
+	Click Button	trsettings
+	Click CheckBox 	checked 	outputxml
+	Test Group Save Settings
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
+	Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
+	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
+
 Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords	
@@ -192,7 +435,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	...    Set Global Filename And Default Save Path	main								AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main1.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
 
-	${M_absolute_paths}	${M_file_names}	
+	${M_absolute_paths}	${M_file_names}
 	...    Find Absolute Paths And Names For Files In Directory	${CURDIR}${/}testdata${/}Issue-52${/}example
 	Log 	${M_absolute_paths}
 	Log 	${M_file_names}
@@ -205,7 +448,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	Sleep	30
 
 	@{excluded_files}=	Create List	RFSListener3.py	RFSListener2.py	RFSTestRepeater.py
-	${A_absolute_paths}	${A_file_names}	
+	${A_absolute_paths}	${A_file_names}
 	...    Find Absolute Paths And Names For Files In Directory	${TEMPDIR}${/}agent_temp_issue52	@{excluded_files}
 	Log 	${A_absolute_paths}
 	Log 	${A_file_names}
@@ -231,7 +474,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	...    Set Global Filename And Default Save Path	main								AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main2.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
 
-	${M_absolute_paths}	${M_file_names}	
+	${M_absolute_paths}	${M_file_names}
 	...    Find Absolute Paths And Names For Files In Directory	${CURDIR}${/}testdata${/}Issue-52${/}example
 	Log 	${M_absolute_paths}
 	Log 	${M_file_names}
@@ -247,7 +490,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	Sleep	30
 
 	@{excluded_files}=	Create List	RFSListener3.py	RFSListener2.py	RFSTestRepeater.py
-	${A_absolute_paths}	${A_file_names}	
+	${A_absolute_paths}	${A_file_names}
 	...    Find Absolute Paths And Names For Files In Directory	${TEMPDIR}${/}agent_temp_issue52	@{excluded_files}
 	Log 	${A_absolute_paths}
 	Log 	${A_file_names}
@@ -273,7 +516,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    Set Global Filename And Default Save Path	main								AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main3.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
 
-	${M_absolute_paths}	${M_file_names}	
+	${M_absolute_paths}	${M_file_names}
 	...    Find Absolute Paths And Names For Files In Directory	${CURDIR}${/}testdata${/}Issue-52${/}example
 	Log 	${M_absolute_paths}
 	Log 	${M_file_names}
@@ -289,7 +532,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	Sleep	30
 
 	@{excluded_files}=	Create List	RFSListener3.py	RFSListener2.py	RFSTestRepeater.py
-	${A_absolute_paths}	${A_file_names}	
+	${A_absolute_paths}	${A_file_names}
 	...    Find Absolute Paths And Names For Files In Directory	${TEMPDIR}${/}agent_temp_issue52	@{excluded_files}
 	Log 	${A_absolute_paths}
 	Log 	${A_file_names}

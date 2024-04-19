@@ -87,8 +87,8 @@ The columns under the graph:
 
 ##### Scenario settings
 At the moment there is only one scenario setting, the upload logs setting, this allows you to control when the agent will upload the logs for the test cases being run.
-> ![image](Images/Linux_Plan_v1.2.0_Settings.png)
-> ![image](Images/Linux_Plan_v1.2.0_Settings_UploadLogs.png)
+> ![image](Images/Linux_Plan_v1.3.0_Settings.png)
+> ![image](Images/Linux_Plan_v1.3.0_Settings_UploadLogs.png)
 
 The options are:
 | Option | Action |
@@ -100,7 +100,7 @@ The options are:
 \* In earlier releases before v1.0.0 the agent always followed the default case.
 ##### Test Defaults settings
 The test defaults settings allow you to set default default setting values for all test groups. These settings allow you to change and define what the default values are but can still be overridden for an individual test group in the [Additional settings for test group](./rfswarm_manager.md#additional-settings-for-test-group-) screen
-> ![image](Images/Linux_Plan_v1.2.0_Settings.png)
+> ![image](Images/Linux_Plan_v1.3.0_Settings.png)
 
 ###### Exclude libraries
 The default value is "BuiltIn,String,OperatingSystem,perftest", this is the same default value as used in the [agent settings](./rfswarm_agent.md#exclude-libraries) and if you leave this default but change the agent the settings set on the agent will override this setting.
@@ -131,9 +131,24 @@ By default this setting is disabled, retaining the behaviour from RFSwarm versio
 
 Enabling this setting here will enable it for all test groups
 
+###### Inject Sleep
+This setting when enabled will add the Sleep keyword after each timed keyword, the amount of sleep time added in seconds will be randomly chosen between the minimum and maximum values.
+
+If you want the amount of sleep time to always be the same, set the minimum and maximum values to the same value.
+
+Enabling this setting here will enable it for all test groups
+
+###### Disable Robot Logs
+These settings when enabled will disable the generation of the selected files on the agent machine by instructing robot framework not to generate these files.
+
+If you disable output.xml but leave either log.html or report.html enabled then output.xml will still get created as it's required for generating the
+HTML files. This behaviour is controlled by robot framework not RFSwarm.
+
+Enabling these settings here will enable it for all test groups
+
 ##### Manager settings
 The manager settings allows you to access settings that were previously only accessible from the ini file
-> ![image](Images/Linux_Plan_v1.2.0_Settings.png)
+> ![image](Images/Linux_Plan_v1.3.0_Settings.png)
 
 **Bind IP Address**
 
@@ -169,7 +184,7 @@ e.g. 2 - if the time now is 9:05 PM and you planned to start at 9:00 AM, so ente
 #### Additional settings for test group ![image](Images/GUI_btn_cog.gif)
 
 When clicking on this button a dialogue will be presented that allows you to configure some additional settings for the test group, by default the dialogue will look like this:
-> ![image](Images/Linux_Plan_v1.2.0_Test_Settings.png)
+> ![image](Images/Linux_Plan_v1.3.0_Test_Settings.png)
 
 ##### Exclude libraries - Test Group
 The default value is "BuiltIn,String,OperatingSystem,perftest", this is the same default value as used in the [agent settings](./rfswarm_agent.md#exclude-libraries) and if you leave this default but change the agent the settings set on the agent will override this setting.
@@ -188,7 +203,22 @@ This gives the ability to use the Suite Startup for steps such as open browser o
 
 By default this setting is disabled, retaining the behaviour from RFSwarm versions prior to v1.2.0, where the test case executed only once in the test suite, the suite ended and the robot exited and a new robot was started every iteration.
 
-Enabling/disabling this setting here will enable it for this test groups
+Enabling/disabling this setting here will enable it for this test group
+
+###### Inject Sleep - Test Group
+This setting when enabled will add the Sleep keyword after each timed keyword, the amount of sleep time added in seconds will be randomly chosen between the minimum and maximum values.
+
+If you want the amount of sleep time to always be the same, set the minimum and maximum values to the same value.
+
+Enabling/disabling this setting here will enable it for this test group
+
+###### Disable Robot Logs - Test Group
+These settings when enabled will disable the generation of the selected files on the agent machine by instructing robot framework not to generate these files.
+
+If you disable output.xml but leave either log.html or report.html enabled then output.xml will still get created as it's required for generating the
+HTML files. This behaviour is controlled by robot framework not RFSwarm.
+
+Enabling/disabling these settings here will enable it for this test group
 
 ##### Agent Filter
 You can use this setting to modify the default [agent assignment](#agent-assignment) to require test cases to require agents with particular properties or to exclude agents with particular properties.
@@ -207,7 +237,7 @@ Here are some examples of when you might need this setting:
 The combination of multiple require and exclude rules, the default and custom agent properties should allow you to have the control needed to target your test groups to specific agent or groups of agents as needed.
 
 Here is an example of configuring the Filter Rules and using the Robot options:
-> ![image](Images/Linux_Plan_v1.2.0_Test_Settings_Filter_Rules.png)
+> ![image](Images/Linux_Plan_v1.3.0_Test_Settings_Filter_Rules.png)
 
 
 ### Run

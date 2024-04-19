@@ -7,6 +7,7 @@ Library		DateTime
 
 Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
+Library 	IniFile.py
 
 *** Variables ***
 ${cmd_agent} 		rfswarm-agent
@@ -14,6 +15,10 @@ ${cmd_manager} 	rfswarm
 ${IMAGE_DIR} 	${CURDIR}/Images/file_method
 ${pyfile_manager}			${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
 ${pyfile_agent}			${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py
+${process_manager}		None
+${process_agent}		None
+${results_dir} 			${OUTPUT DIR}${/}results
+${agent_dir} 				${OUTPUT DIR}${/}rfswarm-agent
 
 *** Keywords ***
 Set Platform
@@ -34,25 +39,36 @@ Set Platform
 	END
 
 Open Agent
-	# [Arguments]		${options}
-	# ${process}= 	Start Process 	python3 	${pyfile_agent}    alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
-	${process}= 	Start Process 	${cmd_agent}    alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
+	[Arguments]		${options}=None
+	IF  ${options} == None
+		${options}= 	Create List
+		Append To List 	${options} 	-d 	${agent_dir}
+	END
+	Log to console 	${\n}\${options}: ${options}
+	${process}= 	Start Process 	${cmd_agent}  @{options}    alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
 	Set Test Variable 	$process_agent 	${process}
 
 Open Manager GUI
-	# [Arguments]		${options}
+	[Arguments]		${options}=None
+	IF  ${options} == None
+		${options}= 	Create List
+		Create Directory 	${results_dir}
+		Append To List 	${options} 	-d 	${results_dir}
+	END
+	Log to console 	${\n}\${options}: ${options}
 	Set Confidence		0.9
-	# ${process}= 	Start Process 	python3 	${pyfile_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
-	${process}= 	Start Process 	${cmd_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
+	${process}= 	Start Process 	${cmd_manager}  @{options}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
 	Set Test Variable 	$process_manager 	${process}
 	Sleep 	10
 	Set Screenshot Folder 	${OUTPUT DIR}
 	Take A Screenshot
 
 Close Manager GUI ubuntu
+	Run Keyword And Ignore Error 	Click Dialog Button 	cancel
 	Close Manager GUI
 
 Close Manager GUI windows
+	Run Keyword And Ignore Error 	Click Dialog Button 	cancel
 	Close Manager GUI
 
 Close Manager GUI
@@ -76,20 +92,20 @@ Close Manager GUI
 
 Close Manager GUI macos
 	[Tags]	macos-latest
-	# Press Combination 	Key.esc
-	# Press Combination 	q 	Key.command
-	# Click Image		manager_${platform}_menu_python3.png
-	Click Menu		rfswarm
-	Click Button	closewindow
-	Sleep	5
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
-		Click Dialog Button		no
+		Run Keyword And Ignore Error 	Click Dialog Button 	cancel
+		Run Keyword And Ignore Error 	Click Dialog Button 	no
+		Click Image		manager_${platform}_titlebar_rfswarm.png
+		Click Button	closewindow
+		# Sleep	5
+		Run Keyword And Ignore Error 	Click Dialog Button		no
 	END
 	${result}= 	Wait For Process 	${process_manager} 	timeout=55
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	not ${running}
 		Should Be Equal As Integers 	${result.rc} 	0
+		Take A Screenshot
 	ELSE
 		Take A Screenshot
 		${result} = 	Terminate Process		${process_manager}
@@ -219,6 +235,19 @@ Click Dialog Button
 	Sleep 	1
 	Take A Screenshot
 
+Click CheckBox
+	[Arguments]		${status} 		${btnname}
+	${btnnamel}= 	Convert To Lower Case 	${btnname}
+	${statusl}= 	Convert To Lower Case 	${status}
+	${img}=	Set Variable		${platform}_checkbox_${statusl}_${btnnamel}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	1
+	Take A Screenshot
+
 Press ${key} ${n} Times
 	[Documentation]	Provide full name. For example: Key.tab
 	Sleep	1
@@ -228,8 +257,8 @@ Press ${key} ${n} Times
 
 Click Label With Vertical Offset
 	[Arguments]		${labelname}	${offset}
-	[Documentation]	Click the image with the offset 
-	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down]. 
+	[Documentation]	Click the image with the offset
+	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down].
 	...	Give the image a full name, for example: button_runopen.
 	${labelname}= 	Convert To Lower Case 	${labelname}
 	${img}=	Set Variable		manager_${platform}_${labelname}.png
@@ -244,8 +273,8 @@ Click Label With Vertical Offset
 
 Click Label With Horizontal Offset
 	[Arguments]		${labelname}	${offset}
-	[Documentation]	Click the image with the offset 
-	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right]. 
+	[Documentation]	Click the image with the offset
+	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right].
 	...	Give the image a full name, for example: button_runopen.
 	${labelname}= 	Convert To Lower Case 	${labelname}
 	${img}=	Set Variable		manager_${platform}_${labelname}.png
@@ -278,7 +307,7 @@ Wait Agent Ready
 	Wait For 	${img} 	 timeout=300
 
 Set Global Filename And Default Save Path
-	[Documentation]	Sets global default save path as Test Variable and file name for robot test. 
+	[Documentation]	Sets global default save path as Test Variable and file name for robot test.
 	...    You can also provide optional save path.
 	[Arguments]		${input_name}	${optional_path}=${None}
 
@@ -287,7 +316,7 @@ Set Global Filename And Default Save Path
 	Set Test Variable	${global_path}	${location}
 
 	Set Test Variable 	$file_name 	${global_name}
-	IF  '${optional_path}' != '${None}'	
+	IF  '${optional_path}' != '${None}'
 		Set Test Variable	${global_path}	${optional_path}
 		${location}=	Get Manager INI Location
 		${ini_content}=		Get Manager INI Data
@@ -332,6 +361,10 @@ Get Manager INI Data
 	Should Not Be Empty	${ini_content}
 	RETURN	${ini_content}
 
+Read INI Data
+	[Arguments]		${inifile}
+
+
 Set INI Window Size
 	[Arguments]		${width}=${None}	${height}=${None}
 	${location}=	Get Manager INI Location
@@ -357,9 +390,9 @@ Get Manager PIP Data
 	RETURN		${pip_data.stdout}
 
 Create Robot File
-	[Arguments]		${path}=${global_path}	${name}=${global_name}	
+	[Arguments]		${path}=${global_path}	${name}=${global_name}
 	...    ${file_content}=***Test Case***\nExample Test Case\n
-	
+
 	${example_robot_content}=	Set Variable	${file_content}
 	Variable Should Exist	${path}	msg="Global save path does not exist or path is not provided."
 	Variable Should Exist	${name}	msg="Global file name does not exist or file name is not provided."
@@ -397,6 +430,10 @@ Change Test Group Settings
 		END
 	END
 	
+	Test Group Save Settings
+
+
+Test Group Save Settings
 	IF 	"${platform}" == "macos"
 		Click Dialog Button		save_2
 	ELSE
@@ -424,7 +461,7 @@ Select Robot File
 
 Select ${n} Robot Test Case
 	Click Button	select_test_case
-	Press Key.down ${n} Times	
+	Press Key.down ${n} Times
 	Press Combination	Key.enter
 
 Save Scenario File
@@ -463,7 +500,7 @@ Delete Robot File
 	File Should Not Exist	${path}${/}${name}
 
 Find Absolute Paths And Names For Files In Directory
-	[Documentation]	This algorithm analyses the specified path and returns all 
+	[Documentation]	This algorithm analyses the specified path and returns all
 	...    file names with their absolute paths even those that are in subdirectories
 	[Arguments]		${given_path}	@{excluded_files}
 	${example_dir}	Set Variable	${given_path}
@@ -475,7 +512,7 @@ Find Absolute Paths And Names For Files In Directory
 
 	@{dir_files_path}=		List Files In Directory		${example_dir}	absolute=${True}
 	@{dir_file_names}=		List Files In Directory		${example_dir}
-	
+
 	${length}	Get Length	${dir_files_path}
 	FOR  ${i}  IN RANGE  0  ${length}
 		IF  '${dir_file_names}[${i}]' not in ${excluded_files}
@@ -485,7 +522,7 @@ Find Absolute Paths And Names For Files In Directory
 	END
 	#=== Merging data section
 	FOR  ${specific_dir}  IN  @{new_dir}
-		${next_absolute_paths}	${next_file_names}	
+		${next_absolute_paths}	${next_file_names}
 		...    Find Absolute Paths And Names For Files In Directory	${specific_dir}	@{excluded_files}
 
 		${length}	Get Length	${next_absolute_paths}
@@ -515,10 +552,10 @@ Compare Manager and Agent Files Content
 		${file_extension}	Split String From Right	${M_absolute_paths}[${i}]	separator=.
 		IF  '${file_extension}[-1]' not in @{excluded_files_format}
 			${M_file_content}	Get File	${M_absolute_paths}[${i}]
-			${A_file_content}	Run Keyword And Continue On Failure	
+			${A_file_content}	Run Keyword And Continue On Failure
 			...    Get File	${A_absolute_paths}[${i}]
 
-			Run Keyword And Continue On Failure	
+			Run Keyword And Continue On Failure
 			...    Should Be Equal	${M_file_content}	${A_file_content}
 		END
 	END

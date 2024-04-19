@@ -462,6 +462,9 @@ class RFSwarmBase:
 	injectsleepenableddefault = False
 	injectsleepminimumdefault = 15
 	injectsleepmaximumdefault = 45
+	disableloglogdefault = False
+	disablelogreportdefault = False
+	disablelogoutputdefault = False
 
 	scriptcount = 0
 	scriptlist: Any = [{}]
@@ -2728,6 +2731,15 @@ class RFSwarmCore:
 				# injectsleepmaximum = 33
 				if "injectsleepmaximum" in filedata[istr] and len(filedata[istr]["injectsleepmaximum"]) > 0:
 					base.scriptlist[ii]["injectsleepmaximum"] = int(filedata[istr]["injectsleepmaximum"])
+				# disableloglog
+				if "disableloglog" in filedata[istr]:
+					base.scriptlist[ii]["disableloglog"] = base.str2bool(filedata[istr]["disableloglog"])
+				# disablelogreport
+				if "disablelogreport" in filedata[istr]:
+					base.scriptlist[ii]["disablelogreport"] = base.str2bool(filedata[istr]["disablelogreport"])
+				# disablelogoutput
+				if "disablelogoutput" in filedata[istr]:
+					base.scriptlist[ii]["disablelogoutput"] = base.str2bool(filedata[istr]["disablelogoutput"])
 
 				if "filters" in filedata[istr]:
 					base.debugmsg(9, "filedata[istr][filters]:", filedata[istr]["filters"], type(filedata[istr]["filters"]))
@@ -3090,6 +3102,28 @@ class RFSwarmCore:
 											if "injectsleepmaximum" in grp:
 												ismx = grp["injectsleepmaximum"]
 											base.robot_schedule["Agents"][nxtagent][grurid]["injectsleepmaximum"] = str(ismx)
+
+										# disableloglogdefault = False
+										dll = base.disableloglogdefault
+										if "disableloglog" in base.scriptdefaults:
+											dll = base.scriptdefaults["disableloglog"]
+										if "disableloglog" in grp:
+											dll = grp["disableloglog"]
+										base.robot_schedule["Agents"][nxtagent][grurid]["disableloglog"] = str(dll)
+										# disablelogreportdefault = False
+										dlr = base.disablelogreportdefault
+										if "disablelogreport" in base.scriptdefaults:
+											dlr = base.scriptdefaults["disablelogreport"]
+										if "disablelogreport" in grp:
+											dlr = grp["disablelogreport"]
+										base.robot_schedule["Agents"][nxtagent][grurid]["disablelogreport"] = str(dlr)
+										# disablelogoutputdefault = False
+										dlo = base.disablelogoutputdefault
+										if "disablelogoutput" in base.scriptdefaults:
+											dlo = base.scriptdefaults["disablelogoutput"]
+										if "disablelogoutput" in grp:
+											dlo = grp["disablelogoutput"]
+										base.robot_schedule["Agents"][nxtagent][grurid]["disablelogoutput"] = str(dlo)
 
 										base.Agents[nxtagent]["AssignedRobots"] += 1
 										base.debugmsg(5, "base.Agents[", nxtagent, "][AssignedRobots]:", base.Agents[nxtagent]["AssignedRobots"])
@@ -5078,6 +5112,25 @@ class RFSwarmGUI(tk.Frame):
 			setingsWindow.injectsleepmaximum = int(base.scriptdefaults["injectsleepmaximum"])
 		base.debugmsg(5, "injectsleepmaximum:", setingsWindow.injectsleepmaximum)
 
+		# disableloglogdefault = False
+		setingsWindow.disableloglogdefault = base.disableloglogdefault
+		setingsWindow.disableloglog = setingsWindow.disableloglogdefault
+		if "disableloglog" in base.scriptdefaults:
+			setingsWindow.disableloglog = base.scriptdefaults["disableloglog"]
+		base.debugmsg(5, "disableloglog:", setingsWindow.disableloglog)
+		# disablelogreportdefault = False
+		setingsWindow.disablelogreportdefault = base.disablelogreportdefault
+		setingsWindow.disablelogreport = setingsWindow.disablelogreportdefault
+		if "disablelogreport" in base.scriptdefaults:
+			setingsWindow.disablelogreport = base.scriptdefaults["disablelogreport"]
+		base.debugmsg(5, "disablelogreport:", setingsWindow.disablelogreport)
+		# disablelogoutputdefault = False
+		setingsWindow.disablelogoutputdefault = base.disablelogoutputdefault
+		setingsWindow.disablelogoutput = setingsWindow.disablelogoutputdefault
+		if "disablelogoutput" in base.scriptdefaults:
+			setingsWindow.disablelogoutput = base.scriptdefaults["disablelogoutput"]
+		base.debugmsg(5, "disablelogoutput:", setingsWindow.disablelogoutput)
+
 		# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 		# Scenario
 		#
@@ -5186,6 +5239,33 @@ class RFSwarmGUI(tk.Frame):
 		setingsWindow.inpISMX.delete(0, 'end')
 		setingsWindow.inpISMX.insert(0, setingsWindow.injectsleepmaximum)
 		setingsWindow.inpISMX.grid(column=3, row=rownum, sticky="nsew")
+
+		rownum += 1
+		setingsWindow.lblDL = ttk.Label(setingsWindow.fmeTestDefaults, text="Disable Robot Logs:")
+		setingsWindow.lblDL.grid(column=0, row=rownum, sticky="nsew")
+
+		setingsWindow.lblDLL = ttk.Label(setingsWindow.fmeTestDefaults, text="log.html")
+		setingsWindow.lblDLL.grid(column=1, row=rownum, sticky="nsew")
+		setingsWindow.lblDLR = ttk.Label(setingsWindow.fmeTestDefaults, text="report.html")
+		setingsWindow.lblDLR.grid(column=2, row=rownum, sticky="nsew")
+		setingsWindow.lblDLO = ttk.Label(setingsWindow.fmeTestDefaults, text="output.xml")
+		setingsWindow.lblDLO.grid(column=3, row=rownum, sticky="nsew")
+
+		rownum += 1
+		setingsWindow.boolDLL = tk.BooleanVar()
+		setingsWindow.boolDLL.set(setingsWindow.disableloglog)
+		setingsWindow.inpDLL = tk.Checkbutton(setingsWindow.fmeTestDefaults, variable=setingsWindow.boolDLL, onvalue=True, offvalue=False)
+		setingsWindow.inpDLL.grid(column=1, row=rownum, sticky="nsew")
+
+		setingsWindow.boolDLR = tk.BooleanVar()
+		setingsWindow.boolDLR.set(setingsWindow.disablelogreport)
+		setingsWindow.inpDLR = tk.Checkbutton(setingsWindow.fmeTestDefaults, variable=setingsWindow.boolDLR, onvalue=True, offvalue=False)
+		setingsWindow.inpDLR.grid(column=2, row=rownum, sticky="nsew")
+
+		setingsWindow.boolDLO = tk.BooleanVar()
+		setingsWindow.boolDLO.set(setingsWindow.disablelogoutput)
+		setingsWindow.inpDLO = tk.Checkbutton(setingsWindow.fmeTestDefaults, variable=setingsWindow.boolDLO, onvalue=True, offvalue=False)
+		setingsWindow.inpDLO.grid(column=3, row=rownum, sticky="nsew")
 
 		# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 		# Manager
@@ -5398,6 +5478,37 @@ class RFSwarmGUI(tk.Frame):
 			else:
 				if "injectsleepmaximum" in base.scriptdefaults:
 					del base.scriptdefaults["injectsleepmaximum"]
+					self.plan_scnro_chngd = True
+
+			# disableloglogdefault = False
+			dll = setingsWindow.boolDLL.get()
+			base.debugmsg(5, "dll:", dll, "default:", setingsWindow.disableloglogdefault)
+			if dll != setingsWindow.disableloglogdefault:
+				base.scriptdefaults["disableloglog"] = str(dll)
+				self.plan_scnro_chngd = True
+			else:
+				if "disableloglog" in base.scriptdefaults:
+					del base.scriptdefaults["disableloglog"]
+					self.plan_scnro_chngd = True
+			# disablelogreportdefault = False
+			dlr = setingsWindow.boolDLR.get()
+			base.debugmsg(5, "dlr:", dlr, "default:", setingsWindow.disablelogreportdefault)
+			if dlr != setingsWindow.disablelogreportdefault:
+				base.scriptdefaults["disablelogreport"] = str(dlr)
+				self.plan_scnro_chngd = True
+			else:
+				if "disablelogreport" in base.scriptdefaults:
+					del base.scriptdefaults["disablelogreport"]
+					self.plan_scnro_chngd = True
+			# disablelogoutputdefault = False
+			dlo = setingsWindow.boolDLO.get()
+			base.debugmsg(5, "dlo:", dlo, "default:", setingsWindow.disablelogoutputdefault)
+			if dlo != setingsWindow.disablelogoutputdefault:
+				base.scriptdefaults["disablelogoutput"] = str(dlo)
+				self.plan_scnro_chngd = True
+			else:
+				if "disablelogoutput" in base.scriptdefaults:
+					del base.scriptdefaults["disablelogoutput"]
 					self.plan_scnro_chngd = True
 
 			# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -6377,6 +6488,33 @@ class RFSwarmGUI(tk.Frame):
 			stgsWindow.injectsleepmaximum = int(base.scriptlist[r]["injectsleepmaximum"])
 		base.debugmsg(5, "injectsleepmaximum:", stgsWindow.injectsleepmaximum)
 
+		# disableloglogdefault = False
+		stgsWindow.disableloglogdefault = base.disableloglogdefault
+		if "disableloglog" in base.scriptdefaults:
+			stgsWindow.disableloglogdefault = base.str2bool(base.scriptdefaults["disableloglog"])
+		stgsWindow.disableloglog = stgsWindow.disableloglogdefault
+		if "disableloglog" in base.scriptlist[r]:
+			stgsWindow.disableloglog = base.str2bool(base.scriptlist[r]["disableloglog"])
+		base.debugmsg(5, "disableloglog:", stgsWindow.disableloglog)
+
+		# disablelogreportdefault = False
+		stgsWindow.disablelogreportdefault = base.disablelogreportdefault
+		if "disablelogreport" in base.scriptdefaults:
+			stgsWindow.disablelogreportdefault = base.str2bool(base.scriptdefaults["disablelogreport"])
+		stgsWindow.disablelogreport = stgsWindow.disablelogreportdefault
+		if "disablelogreport" in base.scriptlist[r]:
+			stgsWindow.disablelogreport = base.str2bool(base.scriptlist[r]["disablelogreport"])
+		base.debugmsg(5, "disablelogreport:", stgsWindow.disablelogreport)
+
+		# disablelogoutputdefault = False
+		stgsWindow.disablelogoutputdefault = base.disablelogoutputdefault
+		if "disablelogoutput" in base.scriptdefaults:
+			stgsWindow.disablelogoutputdefault = base.str2bool(base.scriptdefaults["disablelogoutput"])
+		stgsWindow.disablelogoutput = stgsWindow.disablelogoutputdefault
+		if "disablelogoutput" in base.scriptlist[r]:
+			stgsWindow.disablelogoutput = base.str2bool(base.scriptlist[r]["disablelogoutput"])
+		base.debugmsg(5, "disablelogoutput:", stgsWindow.disablelogoutput)
+
 		row = 0
 		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
 		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
@@ -6448,6 +6586,37 @@ class RFSwarmGUI(tk.Frame):
 		stgsWindow.inpISMX.delete(0, 'end')
 		stgsWindow.inpISMX.insert(0, stgsWindow.injectsleepmaximum)
 		stgsWindow.inpISMX.grid(column=3, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblDL = ttk.Label(stgsWindow, text="Disable Robot Log:")
+		stgsWindow.lblDL.grid(column=0, row=row, sticky="nsew")
+
+		stgsWindow.lblDLL = ttk.Label(stgsWindow, text="log.html")
+		stgsWindow.lblDLL.grid(column=1, row=row, sticky="nsew")
+		stgsWindow.lblDLR = ttk.Label(stgsWindow, text="report.html")
+		stgsWindow.lblDLR.grid(column=2, row=row, sticky="nsew")
+		stgsWindow.lblDLO = ttk.Label(stgsWindow, text="output.xml")
+		stgsWindow.lblDLO.grid(column=3, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.boolDLL = tk.BooleanVar()
+		stgsWindow.boolDLL.set(stgsWindow.disableloglog)
+		stgsWindow.inpDLL = tk.Checkbutton(stgsWindow, variable=stgsWindow.boolDLL, onvalue=True, offvalue=False)
+		stgsWindow.inpDLL.grid(column=1, row=row, sticky="nsew")
+
+		stgsWindow.boolDLR = tk.BooleanVar()
+		stgsWindow.boolDLR.set(stgsWindow.disablelogreport)
+		stgsWindow.inpDLR = tk.Checkbutton(stgsWindow, variable=stgsWindow.boolDLR, onvalue=True, offvalue=False)
+		stgsWindow.inpDLR.grid(column=2, row=row, sticky="nsew")
+
+		stgsWindow.boolDLO = tk.BooleanVar()
+		stgsWindow.boolDLO.set(stgsWindow.disablelogoutput)
+		stgsWindow.inpDLO = tk.Checkbutton(stgsWindow, variable=stgsWindow.boolDLO, onvalue=True, offvalue=False)
+		stgsWindow.inpDLO.grid(column=3, row=row, sticky="nsew")
 
 		row += 1
 		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer before the filters
@@ -6560,6 +6729,39 @@ class RFSwarmGUI(tk.Frame):
 		else:
 			if "injectsleepmaximum" in base.scriptlist[r]:
 				del base.scriptlist[r]["injectsleepmaximum"]
+				self.plan_scnro_chngd = True
+
+		# disableloglogdefault = False
+		dll = stgsWindow.boolDLL.get()
+		base.debugmsg(7, "ise:", ise)
+		if dll != stgsWindow.disableloglogdefault:
+			base.scriptlist[r]["disableloglog"] = str(dll)
+			self.plan_scnro_chngd = True
+		else:
+			if "disableloglog" in base.scriptlist[r]:
+				del base.scriptlist[r]["disableloglog"]
+				self.plan_scnro_chngd = True
+
+		# disablelogreportdefault = False
+		dlr = stgsWindow.boolDLR.get()
+		base.debugmsg(7, "ise:", ise)
+		if dlr != stgsWindow.disablelogreportdefault:
+			base.scriptlist[r]["disablelogreport"] = str(dlr)
+			self.plan_scnro_chngd = True
+		else:
+			if "disablelogreport" in base.scriptlist[r]:
+				del base.scriptlist[r]["disablelogreport"]
+				self.plan_scnro_chngd = True
+
+		# disablelogoutputdefault = False
+		dlo = stgsWindow.boolDLO.get()
+		base.debugmsg(7, "ise:", ise)
+		if dlo != stgsWindow.disablelogoutputdefault:
+			base.scriptlist[r]["disablelogoutput"] = str(dlo)
+			self.plan_scnro_chngd = True
+		else:
+			if "disablelogoutput" in base.scriptlist[r]:
+				del base.scriptlist[r]["disablelogoutput"]
 				self.plan_scnro_chngd = True
 
 		base.debugmsg(7, "stgsWindow.Filters:", stgsWindow.Filters)
