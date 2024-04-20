@@ -1291,7 +1291,7 @@ class RFSwarmBase:
 				base.debugmsg(8, "pathjoin:", pathjoin)
 
 			filelst = glob.glob(pathjoin)
-			if os.path.isfile(pathjoin) or len(filelst)>1:
+			if os.path.isfile(pathjoin) or len(filelst) > 1:
 				base.debugmsg(8, "pathjoin:", pathjoin)
 				pathout = pathjoin
 				base.debugmsg(8, "pathout:", pathout)
