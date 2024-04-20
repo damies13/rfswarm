@@ -565,7 +565,7 @@ Get Relative Paths
 
 	${paths_out}= 	Create List
 	FOR 	${item} 	IN 		@{paths_in}
-		${relpath}= 	Evaluate     os.path.relpath("${item}", start="${base}") 	modules=os.path
+		${relpath}= 	Evaluate     os.path.relpath(r"${item}", start=r"${base}") 	modules=os.path
 		Append To List 	${paths_out} 	${relpath}
 	END
 	RETURN 	${paths_out}
