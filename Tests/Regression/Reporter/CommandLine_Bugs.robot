@@ -15,6 +15,7 @@ Check If The Not Buildin Modules Are Included In The Reporter Setup File
 	Log	${requires}
 
 	FOR  ${i}  IN  @{imports}
-		Should Contain	${requires}	${i}
-		...    msg="Some modules are not in manager setup file"
+		Run Keyword And Continue On Failure
+		...    Should Contain	${requires}	${i}
+		...    msg="Some modules are not in Reporter setup file"
 	END

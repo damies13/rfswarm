@@ -51,6 +51,7 @@ Check If The Not Buildin Modules Are Included In The Manager Setup File
 	Log	${requires}
 
 	FOR  ${i}  IN  @{imports}
-		Should Contain	${requires}	${i}
-		...    msg="Some modules are not in manager setup file"
+		Run Keyword And Continue On Failure
+		...    Should Contain	${requires}	${i}
+		...    msg="Some modules are not in Manager setup file"
 	END
