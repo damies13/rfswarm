@@ -1243,7 +1243,7 @@ class RFSwarmBase:
 			time.sleep(aday)
 
 	def replace_rf_path_variables(self, pathin, localdir):
-		base.debugmsg(8, "pathin:", pathin)
+		base.debugmsg(6, "pathin:", pathin)
 		base.debugmsg(8, "localdir:", localdir)
 		pathout = pathin
 		base.debugmsg(8, "pathout:", pathout)
@@ -1290,7 +1290,8 @@ class RFSwarmBase:
 				pathjoin = os.path.join(*pathlst)
 				base.debugmsg(8, "pathjoin:", pathjoin)
 
-			if os.path.isfile(pathjoin):
+			filelst = glob.glob(pathjoin)
+			if os.path.isfile(pathjoin) or len(filelst)>1:
 				base.debugmsg(8, "pathjoin:", pathjoin)
 				pathout = pathjoin
 				base.debugmsg(8, "pathout:", pathout)
@@ -1302,7 +1303,7 @@ class RFSwarmBase:
 		# ${:}
 		# ${\n}
 		# not sure whether to handle these for now
-		base.debugmsg(8, "pathout:", pathout)
+		base.debugmsg(6, "pathout:", pathout)
 
 		return pathout
 
@@ -1426,14 +1427,16 @@ class RFSwarmBase:
 										t.start()
 
 									else:
+										base.debugmsg(6, "localrespath", localrespath)
 										filelst = glob.glob(localrespath)
+										base.debugmsg(6, "filelst", filelst)
 										for file in filelst:
-											base.debugmsg(9, "file", file)
+											base.debugmsg(6, "file", file)
 											# relpath = file.replace(localdir, "")[1:]
 											relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], file)
-											base.debugmsg(9, "relpath", relpath)
+											base.debugmsg(6, "relpath", relpath)
 											newhash = self.hash_file(file, relpath)
-											base.debugmsg(9, "newhash", newhash)
+											base.debugmsg(6, "newhash", newhash)
 											self.scriptfiles[newhash] = {
 												'id': newhash,
 												'localpath': file,
@@ -1449,7 +1452,7 @@ class RFSwarmBase:
 					# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
 					match = re.search(r'\*+([^*\v]+)', line)
 					if match is not None:
-						base.debugmsg(6, "match.group(0)", match.group(1))
+						base.debugmsg(6, "match.group(0)", match.group(0), "match.group(1)", match.group(1))
 						if match.group(1).strip().upper() in ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD']:
 							checking = True
 
