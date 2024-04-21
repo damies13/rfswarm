@@ -37,3 +37,21 @@ Robbot files with same name but different folders
 	${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary where _pass > 0;
 	Should Contain 	${result} 	${{ ('Folder A Log Variables AAA',) }}
 	Should Contain 	${result} 	${{ ('Folder B Log Variables BBB',) }}
+
+Check If The Not Buildin Modules Are Included In The Manager Setup File
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123
+	${imports}	Get Modules From Program .py File That Are Not BuildIn
+	...    ${CURDIR}..${/}..${/}..${/}..${/}rfswarm_manager${/}rfswarm.py
+
+	Log	${imports}
+
+	${requires}	Get Install Requires From Setup File
+	...    ${CURDIR}..${/}..${/}..${/}..${/}setup-manager.py
+
+	Log	${requires}
+
+	FOR  ${i}  IN  @{imports}
+		Run Keyword And Continue On Failure
+		...    Should Contain	${requires}	${i}
+		...    msg="Some modules are not in Manager setup file"
+	END

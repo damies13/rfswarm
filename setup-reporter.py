@@ -18,7 +18,7 @@ setuptools.setup(
 	# https://matplotlib.org/stable/users/installing.html
 	# zoneinfo requires python 3.9
 	# tzlocal is needed to get the local timezone in a format that zoneinfo likes
-	install_requires=['configparser', 'pillow>=9.1.0', 'pip>=21,>=22', 'matplotlib', 'python-docx', 'openpyxl', 'tzlocal>=4.1'],
+	install_requires=['configparser', 'pillow>=9.1.0', 'pip>=21,>=22', 'matplotlib', 'python-docx', 'openpyxl', 'tzlocal>=4.1', 'lxml'],
 	classifiers=[
 		"Development Status :: 5 - Production/Stable",
 		"Topic :: Software Development :: Testing",

@@ -54,3 +54,21 @@ Run agent with -x (xml mode)
 	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from ResultSummary;
 	Should Be True	${result[0][0]} > 0
 	Should Be Equal As Numbers	${result[0][0]} 	4
+
+Check If The Not Buildin Modules Are Included In The Agent Setup File
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123
+	${imports}	Get Modules From Program .py File That Are Not BuildIn
+	...    ${CURDIR}..${/}..${/}..${/}..${/}rfswarm_agent${/}rfswarm_agent.py
+
+	Log	${imports}
+
+	${requires}	Get Install Requires From Setup File
+	...    ${CURDIR}..${/}..${/}..${/}..${/}setup-agent.py
+
+	Log	${requires}
+
+	FOR  ${i}  IN  @{imports}
+		Run Keyword And Continue On Failure
+		...    Should Contain	${requires}	${i}
+		...    msg="Some modules are not in Agent setup file"
+	END
