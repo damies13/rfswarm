@@ -113,7 +113,7 @@ Query Result DB
 
 Get Modules From Program .py File That Are Not BuildIn
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123
-	[Arguments]		${file_path}	${last_line_number_of_notbuildin}
+	[Arguments]		${file_path}
 	@{buildin}=		Create List	__future__	__main__	_thread	_tkinter	abc	aifc	argparse	array	pkg_resources
 	...    ast	asyncio	atexit	audioop	base64	bdb	binascii	bisect	builtins	bz2	calendar	cgi	cgitb
 	...    chunk	cmath	cmd	code	codecs	codeop	collections	colorsys	compileall	concurrent	configparser

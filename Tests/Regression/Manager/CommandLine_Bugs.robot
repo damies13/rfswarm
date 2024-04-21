@@ -41,7 +41,7 @@ Robbot files with same name but different folders
 Check If The Not Buildin Modules Are Included In The Manager Setup File
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123
 	${imports}	Get Modules From Program .py File That Are Not BuildIn
-	...    ${CURDIR}..${/}..${/}..${/}..${/}rfswarm_manager${/}rfswarm.py	4
+	...    ${CURDIR}..${/}..${/}..${/}..${/}rfswarm_manager${/}rfswarm.py
 
 	Log	${imports}
 

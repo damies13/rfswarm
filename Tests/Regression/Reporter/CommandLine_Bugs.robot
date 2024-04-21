@@ -5,7 +5,7 @@ Resource 	CommandLine_Common.robot
 Check If The Not Buildin Modules Are Included In The Reporter Setup File
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123
 	${imports}	Get Modules From Program .py File That Are Not BuildIn
-	...    ${CURDIR}..${/}..${/}..${/}..${/}rfswarm_reporter${/}rfswarm_reporter.py	4
+	...    ${CURDIR}..${/}..${/}..${/}..${/}rfswarm_reporter${/}rfswarm_reporter.py
 
 	Log	${imports}
 

@@ -58,7 +58,7 @@ Run agent with -x (xml mode)
 Check If The Not Buildin Modules Are Included In The Agent Setup File
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123
 	${imports}	Get Modules From Program .py File That Are Not BuildIn
-	...    ${CURDIR}..${/}..${/}..${/}..${/}rfswarm_agent${/}rfswarm_agent.py	6
+	...    ${CURDIR}..${/}..${/}..${/}..${/}rfswarm_agent${/}rfswarm_agent.py
 
 	Log	${imports}
 
