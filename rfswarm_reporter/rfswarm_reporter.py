@@ -53,6 +53,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 # required for matplot graphs
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure  # required for matplot graphs
+import matplotlib.font_manager as font_manager
 
 # required for company logo's (I beleive this is a depandancy of matplotlib anyway)
 from PIL import Image, ImageTk
@@ -1086,6 +1087,16 @@ class ReporterBase():
 					# -- 		WHERE result_name GLOB 'OC3*'
 					lwhere.append("[" + colname + "] NOT REGEXP '{}'".format(inpFP))
 
+			# Start Time
+			starttime = base.report_starttime()
+			if starttime>0:
+				lwhere.append("end_time >= {}".format( starttime ))
+
+			# End Time
+			endtime = base.report_endtime()
+			if endtime>0:
+				lwhere.append("end_time <= {}".format( endtime ))
+
 			i = 0
 			for iwhere in lwhere:
 				if i == 0:
@@ -1219,6 +1230,16 @@ class ReporterBase():
 						fpwhere += "{} NOT REGEXP '{}'".format(dispcol, inpFP)
 					fpwhere += ")"
 					wherelst.append(fpwhere)
+
+			# Start Time
+			starttime = base.report_starttime()
+			if starttime>0:
+				wherelst.append("MetricTime >= {}".format( starttime ))
+
+			# End Time
+			endtime = base.report_endtime()
+			if endtime>0:
+				wherelst.append("MetricTime <= {}".format( endtime ))
 
 			# if isnum<1:
 			# 	mcolumns.append("MetricValue")
@@ -1399,6 +1420,16 @@ class ReporterBase():
 					# -- 		WHERE result_name GLOB 'OC3*'
 					lwhere.append("[" + colname + "] NOT REGEXP '{}'".format(inpFP))
 
+			# Start Time
+			starttime = base.report_starttime()
+			if starttime>0:
+				lwhere.append("end_time >= {}".format( starttime ))
+
+			# End Time
+			endtime = base.report_endtime()
+			if endtime>0:
+				lwhere.append("end_time <= {}".format( endtime ))
+
 			i = 0
 			for iwhere in lwhere:
 				if i == 0:
@@ -1531,6 +1562,16 @@ class ReporterBase():
 				mcolumns.append("max(CAST(MetricValue AS NUMERIC)) AS 'Maximum'")
 				mcolumns.append("round(stdev(CAST(MetricValue AS NUMERIC)),3) AS 'Std. Dev.'")
 
+			# Start Time
+			starttime = base.report_starttime()
+			if starttime>0:
+				wherelst.append("MetricTime >= {}".format( starttime ))
+
+			# End Time
+			endtime = base.report_endtime()
+			if endtime>0:
+				wherelst.append("MetricTime <= {}".format( endtime ))
+
 			sql = "SELECT "
 
 			i = 0
@@ -1647,6 +1688,16 @@ class ReporterBase():
 				if FNType == "Not Regex":
 					# -- 		WHERE result_name GLOB 'OC3*'
 					lwhere.append("[" + colname + "] NOT REGEXP '{}'".format(inpFP))
+
+			# Start Time
+			starttime = base.report_starttime()
+			if starttime>0:
+				lwhere.append("r.end_time >= {}".format( starttime ))
+
+			# End Time
+			endtime = base.report_endtime()
+			if endtime>0:
+				lwhere.append("r.end_time <= {}".format( endtime ))
 
 			i = 0
 			for iwhere in lwhere:
@@ -2161,6 +2212,16 @@ class ReporterBase():
 		sql += "FROM Results r "
 		sql += "LEFT JOIN MetricData mt on mt.PrimaryMetric = r.script_index AND mt.MetricType = 'Scenario_Test' "
 		sql += "WHERE r.result = 'FAIL' "
+
+		# Start Time
+		starttime = base.report_starttime()
+		if starttime>0:
+			sql += "AND r.end_time >= {} ".format( starttime )
+		# End Time
+		endtime = base.report_endtime()
+		if endtime>0:
+			sql += "AND r.end_time <= {} ".format( endtime )
+
 		# sql += "ORDER BY r.script_index, r.sequence "
 		sql += "ORDER BY [id] ASC "
 
@@ -2579,6 +2640,8 @@ class ReporterCore:
 		base.debugmsg(0, "Robot Framework Swarm: Reporter")
 		base.debugmsg(0, "	Version", base.version)
 		signal.signal(signal.SIGINT, self.on_closing)
+
+		font_manager._get_fontconfig_fonts.cache_clear()
 
 		base.debugmsg(9, "ArgumentParser")
 		# Check for command line args
