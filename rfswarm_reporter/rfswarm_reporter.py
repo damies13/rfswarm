@@ -493,6 +493,12 @@ class ReporterBase():
 	def report_formateddatetimetosec(self, stime):
 		base.debugmsg(5, "stime:", stime)
 		try:
+			if len(stime) == 10 and stime.isdecimal():
+				return int(stime)
+
+			if len(stime) == 13 and stime.isdecimal():
+				return int(stime) / 1000
+				
 			dformat = base.rs_setting_get_dateformat()
 			dformat = dformat.replace("yyyy", "%Y")
 			dformat = dformat.replace("yy", "%y")

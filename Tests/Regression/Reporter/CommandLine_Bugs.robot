@@ -1,0 +1,64 @@
+*** Settings ***
+Resource 	CommandLine_Common.robot
+
+
+*** Test Cases ***
+Command Line Generate HTML
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	HTML
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	${testdata}= 	Set Variable    Issue-#144
+	${resultdata}= 	Set Variable    20230320_185055_demo
+	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
+	Should Exist	${basefolder}
+	Log 	basefolder: ${basefolder} 	console=True
+	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
+	Should Exist	${resultfolder}
+	Log 	resultfolder: ${resultfolder} 	console=True
+	${template}= 	Set Variable    ${basefolder}${/}90%ileTemplate.template
+	Should Exist	${template}
+	Log 	template: ${template} 	console=True
+	# ${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --html
+	${result}= 	Run 	${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --html
+	Log 	result: ${\n}${result} 	console=True
+	Should Not Contain 	${result} 	Traceback
+	Should Exist	${resultfolder}${/}${resultdata}.html
+
+Command Line Generate Docx
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	DOCX
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	${testdata}= 	Set Variable    Issue-#144
+	${resultdata}= 	Set Variable    20230320_185055_demo
+	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
+	Should Exist	${basefolder}
+	Log to console 	basefolder: ${basefolder} 	console=True
+	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
+	Should Exist	${resultfolder}
+	Log 	resultfolder: ${resultfolder} 	console=True
+	${template}= 	Set Variable    ${basefolder}${/}90%ileTemplate.template
+	Should Exist	${template}
+	Log 	template: ${template} 	console=True
+	# ${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --docx
+	${result}= 	Run 	${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --docx
+	Log 	${\n}${result} 	console=True
+	Should Not Contain 	${result} 	Traceback
+	Should Exist	${resultfolder}${/}${resultdata}.docx
+
+Command Line Generate Xlsx
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	XLSX
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	${testdata}= 	Set Variable    Issue-#144
+	${resultdata}= 	Set Variable    20230320_185055_demo
+	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
+	Should Exist	${basefolder}
+	Log 	basefolder: ${basefolder} 	console=True
+	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
+	Should Exist	${resultfolder}
+	Log 	resultfolder: ${resultfolder} 	console=True
+	${template}= 	Set Variable    ${basefolder}${/}90%ileTemplate.template
+	Should Exist	${template}
+	Log 	template: ${template} 	console=True
+	# ${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --xlsx
+	${result}= 	Run 	${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --xlsx
+	Log 	${\n}${result} 	console=True
+	Should Not Contain 	${result} 	Traceback
+	Should Exist	${resultfolder}${/}${resultdata}.xlsx
