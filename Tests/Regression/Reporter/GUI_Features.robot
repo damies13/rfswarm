@@ -19,7 +19,7 @@ Whole report time range
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
-	Click Section			Robot
+	Click Section			Robots
 	Click Tab 	 Preview
 
 	# check the graph as expected
@@ -28,12 +28,15 @@ Whole report time range
 	Click Section			Report
 
 	# Set start time 14:20
-
+	Select Field With Label 	StartTime
 	# Set start time 14:58
+	Select Field With Label 	EndTime
+
+	# Select Field With Label 	Title
 
 	Wait For Status 	PreviewLoaded
 
-	Click Section			Robot
+	Click Section			Robots
 	Wait For Status 	PreviewLoaded
 	Click Tab 	 Preview
 
