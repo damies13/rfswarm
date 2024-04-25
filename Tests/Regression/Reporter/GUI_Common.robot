@@ -1,3 +1,4 @@
+*** Settings ***
 Library 	OperatingSystem
 Library 	Process
 Library 	String
