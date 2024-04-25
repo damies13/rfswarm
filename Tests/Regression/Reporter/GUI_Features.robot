@@ -23,16 +23,24 @@ Whole report time range
 	Click Tab 	 Preview
 
 	# check the graph as expected
+	Locate 	reporter_${platform}_graph_robots1.png
 
 	Click Tab 	 Settings
 	Click Section			Report
 
 	# Set start time 14:20
 	Select Field With Label 	StartTime
+	Press Combination 	KEY.END
+	Press Combination 	KEY.backspace 	KEY.backspace
+	Type 	20
+
 	# Set start time 14:58
 	Select Field With Label 	EndTime
+	Press Combination 	KEY.END
+	Press Combination 	KEY.backspace 	KEY.backspace 	KEY.backspace 	KEY.backspace 	KEY.backspace 	KEY.backspace 	KEY.backspace
+	Type 	14:58
 
-	# Select Field With Label 	Title
+	Select Field With Label 	Title
 
 	Wait For Status 	PreviewLoaded
 
@@ -41,3 +49,4 @@ Whole report time range
 	Click Tab 	 Preview
 
 	# check the graph as expected
+	Locate 	reporter_${platform}_graph_robots2.png
