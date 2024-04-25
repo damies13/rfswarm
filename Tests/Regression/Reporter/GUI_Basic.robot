@@ -1,7 +1,7 @@
 *** Settings ***
+Resource 	GUI_Common.robot
 
 Test Teardown 	Close GUI
-Resource 	GUI_Common.robot
 
 *** Test Cases ***
 GUI Runs and Closes

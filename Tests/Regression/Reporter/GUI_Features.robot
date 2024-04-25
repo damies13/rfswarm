@@ -1,6 +1,7 @@
 *** Settings ***
 Resource 	GUI_Common.robot
-Suite Setup 	Set Platform
+
+Test Teardown 	Close GUI
 
 *** Test Cases ***
 Whole report time range
