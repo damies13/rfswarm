@@ -37,6 +37,7 @@ from io import BytesIO  # used for embedding images  # used for xhtml export
 from typing import Any
 
 import matplotlib  # required for matplot graphs
+import matplotlib.font_manager as font_manager
 import openpyxl  # used for xlsx export
 import tzlocal
 from docx import Document  # used for docx export
@@ -53,7 +54,6 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 # required for matplot graphs
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure  # required for matplot graphs
-import matplotlib.font_manager as font_manager
 
 # required for company logo's (I beleive this is a depandancy of matplotlib anyway)
 from PIL import Image, ImageTk
