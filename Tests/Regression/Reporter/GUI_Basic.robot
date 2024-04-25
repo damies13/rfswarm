@@ -3,13 +3,6 @@
 Test Teardown 	Close GUI
 Resource 	GUI_Common.robot
 
-*** Variables ***
-${cmd_reporter} 		rfswarm-reporter
-${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
-${pyfile}			${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
-${process}		None
-${sssleep}		0.5
-
 *** Test Cases ***
 GUI Runs and Closes
 	[Tags]	macos-latest		windows-latest		ubuntu-latest

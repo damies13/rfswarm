@@ -7,6 +7,13 @@ Library 	ImageHorizonLibrary 	reference_folder=${IMAGE_DIR}
 Library 	OCRLibrary
 
 
+*** Variables ***
+${cmd_reporter} 		rfswarm-reporter
+${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
+${pyfile}			${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
+${process}		None
+${sssleep}		0.5
+
 *** Keywords ***
 Click Tab
 	[Arguments]		${tabname}

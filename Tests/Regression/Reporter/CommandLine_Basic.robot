@@ -3,10 +3,6 @@ Resource 	CommandLine_Common.robot
 
 Suite Setup			Clean Up Old Files
 
-*** Variables ***
-${cmd_reporter} 		rfswarm-reporter
-${pyfile}			${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
-
 *** Test Cases ***
 Robot Version
 	[Documentation] 	Logs the robot framework version used

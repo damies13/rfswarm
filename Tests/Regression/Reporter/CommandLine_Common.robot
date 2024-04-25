@@ -3,6 +3,10 @@ Library 	OperatingSystem
 Library 	Process
 
 
+*** Variables ***
+${cmd_reporter} 		rfswarm-reporter
+${pyfile}			${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
+
 *** Keywords ***
 Clean Up Old Files
 		[Tags]	ubuntu-latest 	macos-latest 	windows-latest

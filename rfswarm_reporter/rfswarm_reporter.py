@@ -498,7 +498,7 @@ class ReporterBase():
 
 			if len(stime) == 13 and stime.isdecimal():
 				return int(stime) / 1000
-				
+
 			dformat = base.rs_setting_get_dateformat()
 			dformat = dformat.replace("yyyy", "%Y")
 			dformat = dformat.replace("yy", "%y")
@@ -1134,13 +1134,13 @@ class ReporterBase():
 
 			# Start Time
 			starttime = base.rs_setting_get_starttime()
-			if starttime>0:
-				lwhere.append("end_time >= {}".format( starttime ))
+			if starttime > 0:
+				lwhere.append("end_time >= {}".format(starttime))
 
 			# End Time
 			endtime = base.rs_setting_get_endtime()
-			if endtime>0:
-				lwhere.append("end_time <= {}".format( endtime ))
+			if endtime > 0:
+				lwhere.append("end_time <= {}".format(endtime))
 
 			i = 0
 			for iwhere in lwhere:
@@ -1278,13 +1278,13 @@ class ReporterBase():
 
 			# Start Time
 			starttime = base.rs_setting_get_starttime()
-			if starttime>0:
-				wherelst.append("MetricTime >= {}".format( starttime ))
+			if starttime > 0:
+				wherelst.append("MetricTime >= {}".format(starttime))
 
 			# End Time
 			endtime = base.rs_setting_get_endtime()
-			if endtime>0:
-				wherelst.append("MetricTime <= {}".format( endtime ))
+			if endtime > 0:
+				wherelst.append("MetricTime <= {}".format(endtime))
 
 			# if isnum<1:
 			# 	mcolumns.append("MetricValue")
@@ -1467,13 +1467,13 @@ class ReporterBase():
 
 			# Start Time
 			starttime = base.rs_setting_get_starttime()
-			if starttime>0:
-				lwhere.append("end_time >= {}".format( starttime ))
+			if starttime > 0:
+				lwhere.append("end_time >= {}".format(starttime))
 
 			# End Time
 			endtime = base.rs_setting_get_endtime()
-			if endtime>0:
-				lwhere.append("end_time <= {}".format( endtime ))
+			if endtime > 0:
+				lwhere.append("end_time <= {}".format(endtime))
 
 			i = 0
 			for iwhere in lwhere:
@@ -1609,13 +1609,13 @@ class ReporterBase():
 
 			# Start Time
 			starttime = base.rs_setting_get_starttime()
-			if starttime>0:
-				wherelst.append("MetricTime >= {}".format( starttime ))
+			if starttime > 0:
+				wherelst.append("MetricTime >= {}".format(starttime))
 
 			# End Time
 			endtime = base.rs_setting_get_endtime()
-			if endtime>0:
-				wherelst.append("MetricTime <= {}".format( endtime ))
+			if endtime > 0:
+				wherelst.append("MetricTime <= {}".format(endtime))
 
 			sql = "SELECT "
 
@@ -1736,13 +1736,13 @@ class ReporterBase():
 
 			# Start Time
 			starttime = base.rs_setting_get_starttime()
-			if starttime>0:
-				lwhere.append("r.end_time >= {}".format( starttime ))
+			if starttime > 0:
+				lwhere.append("r.end_time >= {}".format(starttime))
 
 			# End Time
 			endtime = base.rs_setting_get_endtime()
-			if endtime>0:
-				lwhere.append("r.end_time <= {}".format( endtime ))
+			if endtime > 0:
+				lwhere.append("r.end_time <= {}".format(endtime))
 
 			i = 0
 			for iwhere in lwhere:
@@ -2260,12 +2260,12 @@ class ReporterBase():
 
 		# Start Time
 		starttime = base.rs_setting_get_starttime()
-		if starttime>0:
-			sql += "AND r.end_time >= {} ".format( starttime )
+		if starttime > 0:
+			sql += "AND r.end_time >= {} ".format(starttime)
 		# End Time
 		endtime = base.rs_setting_get_endtime()
-		if endtime>0:
-			sql += "AND r.end_time <= {} ".format( endtime )
+		if endtime > 0:
+			sql += "AND r.end_time <= {} ".format(endtime)
 
 		# sql += "ORDER BY r.script_index, r.sequence "
 		sql += "ORDER BY [id] ASC "
