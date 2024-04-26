@@ -46,6 +46,8 @@ Whole report time range
 	${EndTime}= 	Replace String 	${EndTime} 	15:00 	14:58
 	Set Text Value To Right Of 	EndTime 	${EndTime}
 
+	${bounds}= 	Find Text 	Title:
+
 	Select Field With Label 	Title
 
 	Wait For Status 	PreviewLoaded

@@ -58,7 +58,7 @@ Select Field With Label
 	${img}=	Set Variable		reporter_${platform}_label_${labell}.png
 	${imgsize}= 	Get Image Size 	${IMAGE_DIR}${/}${img}
 	Log		${imgsize}
-	${offsetx}= 	Evaluate 	int(${imgsize}[0]/2)+5
+	${offsetx}= 	Evaluate 	int(${imgsize}[0]/2)+${offsetx}
 	Log		${offsetx}
 	Log		${CURDIR}
  	Log		${IMAGE_DIR}
@@ -100,17 +100,18 @@ Get Text Value To Right Of
 	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
 	${labell}= 	Convert To Lower Case 	${label}
 	${img}= 	Set Variable		reporter_${platform}_label_${labell}.png
-	${value}= 	Copy From The Right Of 	${img}
+	${value}= 	Copy From The Right Of 	${img} 	${offsetx}
 	Take A Screenshot
 	[Return] 	${value}
 
 Set Text Value To Right Of
-	[Arguments]		${label} 	${value} 	${offsetx}=50 	${offsety}=0
+	[Arguments]		${label} 	${value} 	${offsetx}=5 	${offsety}=0
+	Log		${offsetx}
 	${labell}= 	Convert To Lower Case 	${label}
 	${img}= 	Set Variable		reporter_${platform}_label_${labell}.png
 	${imgsize}= 	Get Image Size 	${IMAGE_DIR}${/}${img}
 	Log		${imgsize}
-	${offsetx}= 	Evaluate 	int(${imgsize}[0]/2)+5
+	${offsetx}= 	Evaluate 	int(${imgsize}[0]/2)+${offsetx}
 	Log		${offsetx}
 	Log		${CURDIR}
  	Log		${IMAGE_DIR}
