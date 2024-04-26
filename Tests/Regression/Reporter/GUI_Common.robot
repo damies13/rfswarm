@@ -96,6 +96,36 @@ Click Text
 	Click
 	Take A Screenshot
 
+Get Text Value To Right Of
+	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
+	${labell}= 	Convert To Lower Case 	${label}
+	${img}= 	Set Variable		reporter_${platform}_label_${labell}.png
+	${value}= 	Copy From The Right Of 	${img}
+	Take A Screenshot
+	[Return] 	${value}
+
+Set Text Value To Right Of
+	[Arguments]		${label} 	${value} 	${offsetx}=50 	${offsety}=0
+	${labell}= 	Convert To Lower Case 	${label}
+	${img}= 	Set Variable		reporter_${platform}_label_${labell}.png
+	${imgsize}= 	Get Image Size 	${IMAGE_DIR}${/}${img}
+	Log		${imgsize}
+	${offsetx}= 	Evaluate 	int(${imgsize}[0]/2)+5
+	Log		${offsetx}
+	Log		${CURDIR}
+ 	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+	${x}= 	Evaluate 	${coordinates}[0]+${offsetx}
+	${y}= 	Evaluate 	${coordinates}[1]+${offsety}
+	@{coordinates}= 	Create List 	${x} 	${y}
+	Move To 	${coordinates}
+	Triple Click
+	Type
+	Take A Screenshot
+	${value2}= 	Copy From The Right Of 	${img}
+	Should Be Equal As Strings    ${value}    ${value2}
+
 Get Last Screenshot
 	Log 	${OUTPUT FILE}
 	${path} 	${file}= 	Split Path 	${OUTPUT FILE}

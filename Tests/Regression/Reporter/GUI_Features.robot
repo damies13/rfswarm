@@ -29,16 +29,22 @@ Whole report time range
 	Click Section			Report
 
 	# Set start time 14:20
-	Select Field With Label 	StartTime
-	Press Combination 	KEY.END
-	Press Combination 	KEY.backspace 	KEY.backspace
-	Type 	20
+	# Select Field With Label 	StartTime
+	# Press Combination 	KEY.END
+	# Press Combination 	KEY.backspace 	KEY.backspace
+	# Type 	20
+	${StartTime}= 	Get Text Value To Right Of 	StartTime
+	${StartTime}= 	Replace String 	${StartTime} 	14:11 	14:20
+	Set Text Value To Right Of 	StartTime 	${StartTime}
 
 	# Set start time 14:58
-	Select Field With Label 	EndTime
-	Press Combination 	KEY.END
-	Press Combination 	KEY.backspace 	KEY.backspace 	KEY.backspace 	KEY.backspace 	KEY.backspace 	KEY.backspace 	KEY.backspace
-	Type 	14:58
+	# Select Field With Label 	EndTime
+	# Press Combination 	KEY.END
+	# Press Combination 	KEY.backspace 	KEY.backspace 	KEY.backspace 	KEY.backspace 	KEY.backspace 	KEY.backspace 	KEY.backspace
+	# Type 	14:58
+	${EndTime}= 	Get Text Value To Right Of 	EndTime
+	${EndTime}= 	Replace String 	${EndTime} 	15:00 	14:58
+	Set Text Value To Right Of 	EndTime 	${EndTime}
 
 	Select Field With Label 	Title
 
