@@ -122,7 +122,7 @@ Set Text Value To Right Of
 	@{coordinates}= 	Create List 	${x} 	${y}
 	Move To 	${coordinates}
 	Triple Click
-	Type
+	Type 	${value}
 	Take A Screenshot
 	${value2}= 	Copy From The Right Of 	${img} 	${offsetx}
 	Should Be Equal As Strings    ${value}    ${value2}
