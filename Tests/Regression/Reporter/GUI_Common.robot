@@ -17,8 +17,7 @@ ${sssleep}		0.5
 
 *** Keywords ***
 Make Clipboard Not None
-	Evaluate    tkinter.Tk().clipboard_clear() 	modules=tkinter
-	Evaluate    tkinter.Tk().clipboard_append('You should never see this after copy') 	modules=tkinter
+	Evaluate    clipboard.copy("You should never see this after copy") 	modules=clipboard
 
 Click Tab
 	[Arguments]		${tabname}

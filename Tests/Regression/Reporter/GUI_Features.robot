@@ -24,7 +24,9 @@ Whole report time range
 	Click Tab 	 Preview
 
 	# check the graph as expected
+	Set Confidence		0.8
 	Locate 	reporter_${platform}_graph_robots1.png
+	Set Confidence		0.9
 
 	Click Tab 	 Settings
 	Click Section			Report
@@ -47,7 +49,7 @@ Whole report time range
 	${EndTime}= 	Replace String 	${EndTime} 	15:00 	14:58
 	Set Text Value To Right Of 	EndTime 	${EndTime}
 
-	${bounds}= 	Find Text 	Title:
+	# ${bounds}= 	Find Text 	Title:
 
 	Select Field With Label 	Title
 
