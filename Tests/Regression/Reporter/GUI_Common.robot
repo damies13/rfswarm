@@ -124,7 +124,10 @@ Set Text Value To Right Of
 	${y}= 	Evaluate 	${coordinates}[1]+${offsety}
 	@{coordinates}= 	Create List 	${x} 	${y}
 	Move To 	${coordinates}
-	Triple Click 		button=left 	interval=0.0
+	# Triple Click is broken on MacOS: TypeError: not enough arguments for format string
+	# Triple Click 		button=left 	interval=0.0
+	Click
+	Double Click
 	Type 	${value}
 	Take A Screenshot
 	${value2}= 	Copy From The Right Of 	${img} 	${offsetx}

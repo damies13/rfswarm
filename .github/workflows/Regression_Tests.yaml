@@ -242,6 +242,7 @@ jobs:
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
           sudo apt -y install python3-tk python3-dev python3-xlib scrot fluxbox tesseract-ocr
+          sudo apt -y install xsel xclip
           sudo apt list --installed
       - name: "Ubuntu Xvfb"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
@@ -292,6 +293,9 @@ jobs:
         if: ${{ matrix.platform == 'windows-latest' }}
         run: |
           dir dist
+      - name: "Ubuntu pip installs"
+        if: ${{ matrix.platform == 'ubuntu-latest' }}
+        run: pip install gtk PyQt4
       - name: Install Reporter from dist UM
         if: ${{ matrix.platform != 'windows-latest' }}
         run: pip install rfswarm_reporter-*.whl
