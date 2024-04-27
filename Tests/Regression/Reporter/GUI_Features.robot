@@ -7,6 +7,7 @@ Test Teardown 	Close GUI
 Whole report time range
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #138
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	Make Clipboard Not None
 	${testdata}= 	Set Variable    Issue-#138
 	${resultdata}= 	Set Variable    20230928_141103_OCDemo_Requests
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}

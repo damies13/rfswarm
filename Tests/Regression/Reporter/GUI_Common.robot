@@ -102,7 +102,6 @@ Click Text
 
 Get Text Value To Right Of
 	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
-	Make Clipboard Not None
 	${labell}= 	Convert To Lower Case 	${label}
 	${img}= 	Set Variable		reporter_${platform}_label_${labell}.png
 	${value}= 	Copy From The Right Of 	${img} 	${offsetx}
@@ -126,7 +125,7 @@ Set Text Value To Right Of
 	${y}= 	Evaluate 	${coordinates}[1]+${offsety}
 	@{coordinates}= 	Create List 	${x} 	${y}
 	Move To 	${coordinates}
-	Triple Click
+	Triple Click 		button=left 	interval=0.0
 	Type 	${value}
 	Take A Screenshot
 	${value2}= 	Copy From The Right Of 	${img} 	${offsetx}
