@@ -53,11 +53,14 @@ Whole report time range
 
 	Select Field With Label 	Title
 
+	Click Tab 	 Preview
 	Wait For Status 	PreviewLoaded
 
+	Sleep    10
+
+	Wait For Status 	PreviewLoaded
 	Click Section			Robots
 	Wait For Status 	PreviewLoaded
-	Click Tab 	 Preview
 
 	# check the graph as expected
 	Locate 	reporter_${platform}_graph_robots2.png

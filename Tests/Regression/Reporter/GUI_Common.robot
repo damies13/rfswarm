@@ -103,7 +103,12 @@ Get Text Value To Right Of
 	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
 	${labell}= 	Convert To Lower Case 	${label}
 	${img}= 	Set Variable		reporter_${platform}_label_${labell}.png
+
+	${b4value}= 	Get Clipboard Content
 	${value}= 	Copy From The Right Of 	${img} 	${offsetx}
+	WHILE 	${b4value} == ${value}
+		${value}= 	Copy From The Right Of 	${img} 	${offsetx}
+	END
 	Take A Screenshot
 	[Return] 	${value}
 
