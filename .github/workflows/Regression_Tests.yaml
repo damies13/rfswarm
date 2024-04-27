@@ -293,9 +293,9 @@ jobs:
         if: ${{ matrix.platform == 'windows-latest' }}
         run: |
           dir dist
-      - name: "Ubuntu pip installs"
-        if: ${{ matrix.platform == 'ubuntu-latest' }}
-        run: pip install gtk PyQt4
+      # - name: "Ubuntu pip installs"
+      #   if: ${{ matrix.platform == 'ubuntu-latest' }}
+      #   run: pip install gtk PyQt4
       - name: Install Reporter from dist UM
         if: ${{ matrix.platform != 'windows-latest' }}
         run: pip install rfswarm_reporter-*.whl
