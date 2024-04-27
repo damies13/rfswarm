@@ -16,6 +16,10 @@ ${process}		None
 ${sssleep}		0.5
 
 *** Keywords ***
+Make Clipboard Not None
+	Evaluate    tkinter.Tk().clipboard_clear() 	modules=tkinter
+	Evaluate    tkinter.Tk().clipboard_append('You should never see this after copy') 	modules=tkinter
+
 Click Tab
 	[Arguments]		${tabname}
 	${tabnamel}= 	Convert To Lower Case 	${tabname}
@@ -98,6 +102,7 @@ Click Text
 
 Get Text Value To Right Of
 	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
+	Make Clipboard Not None
 	${labell}= 	Convert To Lower Case 	${label}
 	${img}= 	Set Variable		reporter_${platform}_label_${labell}.png
 	${value}= 	Copy From The Right Of 	${img} 	${offsetx}
