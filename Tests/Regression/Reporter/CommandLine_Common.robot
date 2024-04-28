@@ -5,7 +5,19 @@ Library 	DatabaseLibrary
 Library 	String
 Library 	Collections
 
+*** Variables ***
+${cmd_reporter} 		rfswarm-reporter
+${pyfile}			${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
+
 *** Keywords ***
+Clean Up Old Files
+		[Tags]	ubuntu-latest 	macos-latest 	windows-latest
+		# cleanup previous output
+		Log To Console    ${OUTPUT DIR}
+		Remove File    ${OUTPUT DIR}${/}*.txt
+		Remove File    ${OUTPUT DIR}${/}*.png
+		# Remove File    ${OUTPUT DIR}${/}sikuli_captured${/}*.*
+
 Get Modules From Program .py File That Are Not BuildIn
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123
 	[Arguments]		${file_path}

@@ -37,6 +37,7 @@ from io import BytesIO  # used for embedding images  # used for xhtml export
 from typing import Any
 
 import matplotlib  # required for matplot graphs
+import matplotlib.font_manager as font_manager
 import openpyxl  # used for xlsx export
 import tzlocal
 from docx import Document  # used for docx export
@@ -489,6 +490,37 @@ class ReporterBase():
 		base.debugmsg(9, "ftime:", ftime)
 		return ftime
 
+	def report_formateddatetimetosec(self, stime):
+		base.debugmsg(5, "stime:", stime)
+		try:
+			if len(stime) == 10 and stime.isdecimal():
+				return int(stime)
+
+			if len(stime) == 13 and stime.isdecimal():
+				return int(stime) / 1000
+
+			dformat = base.rs_setting_get_dateformat()
+			dformat = dformat.replace("yyyy", "%Y")
+			dformat = dformat.replace("yy", "%y")
+			dformat = dformat.replace("mm", "%m")
+			dformat = dformat.replace("dd", "%d")
+
+			tformat = base.rs_setting_get_timeformat()
+			tformat = tformat.replace("HH", "%H")
+			tformat = tformat.replace("h", "%I")
+			tformat = tformat.replace("MM", "%M")
+			tformat = tformat.replace("SS", "%S")
+			tformat = tformat.replace("AMPM", "%p")
+
+			tz = zoneinfo.ZoneInfo(base.rs_setting_get_timezone())
+
+			datetime_object = datetime.strptime(stime, "{} {}".format(dformat, tformat)).replace(tzinfo=tz)
+			base.debugmsg(5, "datetime_object:", datetime_object, datetime_object.timestamp())
+			return int(datetime_object.timestamp())
+		except Exception as e:
+			base.debugmsg(8, "e:", e)
+			return -1
+
 	#
 	# Report Settings
 	#
@@ -634,6 +666,20 @@ class ReporterBase():
 	def rs_setting_get_timezone_list(self):
 		# ZI = zoneinfo.ZoneInfo(base.rs_setting_get_timezone())
 		return zoneinfo.available_timezones()
+
+	def rs_setting_get_starttime(self):
+		value = self.rs_setting_get_int('starttime')
+		if value < 1:
+			return self.report_starttime()
+		else:
+			return int(value)
+
+	def rs_setting_get_endtime(self):
+		value = self.rs_setting_get_int('endtime')
+		if value < 1:
+			return self.report_endtime()
+		else:
+			return int(value)
 
 	#
 	# Report Sections
@@ -1086,6 +1132,16 @@ class ReporterBase():
 					# -- 		WHERE result_name GLOB 'OC3*'
 					lwhere.append("[" + colname + "] NOT REGEXP '{}'".format(inpFP))
 
+			# Start Time
+			starttime = base.rs_setting_get_starttime()
+			if starttime > 0:
+				lwhere.append("end_time >= {}".format(starttime))
+
+			# End Time
+			endtime = base.rs_setting_get_endtime()
+			if endtime > 0:
+				lwhere.append("end_time <= {}".format(endtime))
+
 			i = 0
 			for iwhere in lwhere:
 				if i == 0:
@@ -1219,6 +1275,16 @@ class ReporterBase():
 						fpwhere += "{} NOT REGEXP '{}'".format(dispcol, inpFP)
 					fpwhere += ")"
 					wherelst.append(fpwhere)
+
+			# Start Time
+			starttime = base.rs_setting_get_starttime()
+			if starttime > 0:
+				wherelst.append("MetricTime >= {}".format(starttime))
+
+			# End Time
+			endtime = base.rs_setting_get_endtime()
+			if endtime > 0:
+				wherelst.append("MetricTime <= {}".format(endtime))
 
 			# if isnum<1:
 			# 	mcolumns.append("MetricValue")
@@ -1399,6 +1465,16 @@ class ReporterBase():
 					# -- 		WHERE result_name GLOB 'OC3*'
 					lwhere.append("[" + colname + "] NOT REGEXP '{}'".format(inpFP))
 
+			# Start Time
+			starttime = base.rs_setting_get_starttime()
+			if starttime > 0:
+				lwhere.append("end_time >= {}".format(starttime))
+
+			# End Time
+			endtime = base.rs_setting_get_endtime()
+			if endtime > 0:
+				lwhere.append("end_time <= {}".format(endtime))
+
 			i = 0
 			for iwhere in lwhere:
 				if i == 0:
@@ -1531,6 +1607,16 @@ class ReporterBase():
 				mcolumns.append("max(CAST(MetricValue AS NUMERIC)) AS 'Maximum'")
 				mcolumns.append("round(stdev(CAST(MetricValue AS NUMERIC)),3) AS 'Std. Dev.'")
 
+			# Start Time
+			starttime = base.rs_setting_get_starttime()
+			if starttime > 0:
+				wherelst.append("MetricTime >= {}".format(starttime))
+
+			# End Time
+			endtime = base.rs_setting_get_endtime()
+			if endtime > 0:
+				wherelst.append("MetricTime <= {}".format(endtime))
+
 			sql = "SELECT "
 
 			i = 0
@@ -1647,6 +1733,16 @@ class ReporterBase():
 				if FNType == "Not Regex":
 					# -- 		WHERE result_name GLOB 'OC3*'
 					lwhere.append("[" + colname + "] NOT REGEXP '{}'".format(inpFP))
+
+			# Start Time
+			starttime = base.rs_setting_get_starttime()
+			if starttime > 0:
+				lwhere.append("r.end_time >= {}".format(starttime))
+
+			# End Time
+			endtime = base.rs_setting_get_endtime()
+			if endtime > 0:
+				lwhere.append("r.end_time <= {}".format(endtime))
 
 			i = 0
 			for iwhere in lwhere:
@@ -2161,6 +2257,16 @@ class ReporterBase():
 		sql += "FROM Results r "
 		sql += "LEFT JOIN MetricData mt on mt.PrimaryMetric = r.script_index AND mt.MetricType = 'Scenario_Test' "
 		sql += "WHERE r.result = 'FAIL' "
+
+		# Start Time
+		starttime = base.rs_setting_get_starttime()
+		if starttime > 0:
+			sql += "AND r.end_time >= {} ".format(starttime)
+		# End Time
+		endtime = base.rs_setting_get_endtime()
+		if endtime > 0:
+			sql += "AND r.end_time <= {} ".format(endtime)
+
 		# sql += "ORDER BY r.script_index, r.sequence "
 		sql += "ORDER BY [id] ASC "
 
@@ -2579,6 +2685,8 @@ class ReporterCore:
 		base.debugmsg(0, "Robot Framework Swarm: Reporter")
 		base.debugmsg(0, "	Version", base.version)
 		signal.signal(signal.SIGINT, self.on_closing)
+
+		font_manager._get_fontconfig_fonts.cache_clear()
 
 		base.debugmsg(9, "ArgumentParser")
 		# Check for command line args
@@ -3036,14 +3144,14 @@ class ReporterCore:
 			subtitle.set("class", "subtitle center")
 			execdr = ""
 			if base.rs_setting_get_int("showstarttime"):
-				iST = base.report_starttime()
+				iST = base.rs_setting_get_starttime()
 				fSD = "{}".format(base.report_formatdate(iST))
 				fST = "{}".format(base.report_formattime(iST))
 
 				execdr = "{} {}".format(fSD, fST)
 
 			if base.rs_setting_get_int("showendtime"):
-				iET = base.report_endtime()
+				iET = base.rs_setting_get_endtime()
 				fED = "{}".format(base.report_formatdate(iET))
 				fET = "{}".format(base.report_formattime(iET))
 
@@ -3913,14 +4021,14 @@ class ReporterCore:
 			#
 			execdr = ""
 			if base.rs_setting_get_int("showstarttime"):
-				iST = base.report_starttime()
+				iST = base.rs_setting_get_starttime()
 				fSD = "{}".format(base.report_formatdate(iST))
 				fST = "{}".format(base.report_formattime(iST))
 
 				execdr = "{} {}".format(fSD, fST)
 
 			if base.rs_setting_get_int("showendtime"):
-				iET = base.report_endtime()
+				iET = base.rs_setting_get_endtime()
 				fED = "{}".format(base.report_formatdate(iET))
 				fET = "{}".format(base.report_formattime(iET))
 
@@ -4903,14 +5011,14 @@ class ReporterCore:
 
 			execdr = ""
 			if base.rs_setting_get_int("showstarttime"):
-				iST = base.report_starttime()
+				iST = base.rs_setting_get_starttime()
 				fSD = "{}".format(base.report_formatdate(iST))
 				fST = "{}".format(base.report_formattime(iST))
 
 				execdr = "{} {}".format(fSD, fST)
 
 			if base.rs_setting_get_int("showendtime"):
-				iET = base.report_endtime()
+				iET = base.rs_setting_get_endtime()
 				fED = "{}".format(base.report_formatdate(iET))
 				fET = "{}".format(base.report_formattime(iET))
 
@@ -6646,12 +6754,11 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["lblST"].grid(column=0, row=rownum, sticky="nsew")
 
 		self.contentdata[id]["strST"] = tk.StringVar()
-
-		iST = base.report_starttime()
+		iST = base.rs_setting_get_starttime()
 		fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
-
 		self.contentdata[id]["strST"].set(fST)
-		self.contentdata[id]["eST"] = ttk.Label(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strST"])
+
+		self.contentdata[id]["eST"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strST"])
 		self.contentdata[id]["eST"].grid(column=1, row=rownum, sticky="nsew")
 
 		self.contentdata[id]["intST"] = tk.IntVar()
@@ -6665,12 +6772,11 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["lblET"].grid(column=0, row=rownum, sticky="nsew")
 
 		self.contentdata[id]["strET"] = tk.StringVar()
-
-		iET = base.report_endtime()
+		iET = base.rs_setting_get_endtime()
 		fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
-
 		self.contentdata[id]["strET"].set(fET)
-		self.contentdata[id]["eET"] = ttk.Label(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strET"])
+
+		self.contentdata[id]["eET"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strET"])
 		self.contentdata[id]["eET"].grid(column=1, row=rownum, sticky="nsew")
 
 		self.contentdata[id]["intET"] = tk.IntVar()
@@ -6802,8 +6908,26 @@ class ReporterGUI(tk.Frame):
 		if "strTZ" in self.contentdata[id]:
 			base.rs_setting_set("timezone", self.contentdata[id]["strTZ"].get())
 
+		# strST
+		if "strST" in self.contentdata[id]:
+			st = self.contentdata[id]["strST"].get()
+			base.debugmsg(8, "st:", st)
+			ist = base.report_formateddatetimetosec(st)
+			base.debugmsg(8, "ist:", ist)
+			if ist > 0:
+				base.rs_setting_set_int("starttime", ist)
+
 		if "intST" in self.contentdata[id]:
 			base.rs_setting_set_int("showstarttime", self.contentdata[id]["intST"].get())
+
+		# strET
+		if "strET" in self.contentdata[id]:
+			et = self.contentdata[id]["strET"].get()
+			base.debugmsg(8, "et:", et)
+			iet = base.report_formateddatetimetosec(et)
+			base.debugmsg(8, "iet:", iet)
+			if iet > 0:
+				base.rs_setting_set_int("endtime", iet)
 
 		if "intET" in self.contentdata[id]:
 			base.rs_setting_set_int("showendtime", self.contentdata[id]["intET"].get())
@@ -8691,14 +8815,14 @@ class ReporterGUI(tk.Frame):
 		fSD = ""
 
 		if base.rs_setting_get_int("showstarttime"):
-			iST = base.report_starttime()
+			iST = base.rs_setting_get_starttime()
 			fSD = "{}".format(base.report_formatdate(iST))
 			fST = "{}".format(base.report_formattime(iST))
 
 			execdr = "{} {}".format(fSD, fST)
 
 		if base.rs_setting_get_int("showendtime"):
-			iET = base.report_endtime()
+			iET = base.rs_setting_get_endtime()
 			fED = "{}".format(base.report_formatdate(iET))
 			fET = "{}".format(base.report_formattime(iET))
 
