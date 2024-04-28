@@ -130,7 +130,7 @@ Get Text Value To Right Of
 			END
 		END
 	END
-	[Return] 	${value}
+	RETURN 	${value}
 
 Set Text Value To Right Of
 	[Arguments]		${label} 	${value} 	${offsetx}=50 	${offsety}=0
@@ -155,7 +155,7 @@ Set Text Value To Right Of
 	Double Click
 	Type 	${value}
 	Take A Screenshot
-	${value2}= 	Copy From The Right Of 	${img} 	${offsetx}
+	${value2}= 	Get Text Value To Right Of		${label}
 	WHILE 	$value2 != $value 		limit=10
 		${x}= 	Evaluate 	${x}+10
 		${offsetx}= 	Evaluate 	${offsetx}+10
@@ -165,7 +165,7 @@ Set Text Value To Right Of
 		Double Click
 		Type 	${value}
 		Take A Screenshot
-		${value2}= 	Copy From The Right Of 	${img} 	${offsetx}
+		${value2}= 	Get Text Value To Right Of		${label}
 	END
 	Should Be Equal As Strings    ${value}    ${value2}
 
