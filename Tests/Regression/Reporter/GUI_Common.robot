@@ -106,10 +106,12 @@ Get Text Value To Right Of
 
 	${b4value}= 	Get Clipboard Content
 	${value}= 	Copy From The Right Of 	${img} 	${offsetx}
-	WHILE 	$b4value == $value 		limit=100
-		${value}= 	Copy From The Right Of 	${img} 	${offsetx}
-	END
 	Take A Screenshot
+	WHILE 	$b4value == $value 		limit=10
+		Sleep    10 ms
+		${value}= 	Copy From The Right Of 	${img} 	${offsetx}
+		Take A Screenshot
+	END
 	[Return] 	${value}
 
 Set Text Value To Right Of
