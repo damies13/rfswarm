@@ -112,6 +112,10 @@ Get Text Value To Right Of
 		${offsetx}= 	Evaluate 	${offsetx}+10
 		${value}= 	Copy From The Right Of 	${img} 	${offsetx}
 		Take A Screenshot
+		${valuec}= 	Copy
+		IF  $valuec != $value
+			${value}= 	Set Variable 		${valuec}
+		END
 	END
 	[Return] 	${value}
 

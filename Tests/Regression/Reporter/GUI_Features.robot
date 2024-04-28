@@ -63,4 +63,6 @@ Whole report time range
 	Wait For Status 	PreviewLoaded
 
 	# check the graph as expected
+	Set Confidence		0.8
 	Locate 	reporter_${platform}_graph_robots2.png
+	Set Confidence		0.9
