@@ -106,7 +106,7 @@ Get Text Value To Right Of
 
 	${b4value}= 	Get Clipboard Content
 	${value}= 	Copy From The Right Of 	${img} 	${offsetx}
-	WHILE 	${b4value} == ${value}
+	WHILE 	$b4value == $value 		limit=100
 		${value}= 	Copy From The Right Of 	${img} 	${offsetx}
 	END
 	Take A Screenshot
