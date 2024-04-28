@@ -116,6 +116,19 @@ Get Text Value To Right Of
 		IF  $valuec != $value
 			${value}= 	Set Variable 		${valuec}
 		END
+		${valueg}= 	Get Clipboard Content
+		IF  $valueg != $value
+			${value}= 	Set Variable 		${valueg}
+		END
+		IF 	$platform == 'macos'
+			Sleep    10 ms
+			Press Combination 	KEY.command 	c
+			Sleep    10 ms
+			${valueg}= 	Get Clipboard Content
+			IF  $valueg != $value
+				${value}= 	Set Variable 		${valueg}
+			END
+		END
 	END
 	[Return] 	${value}
 
