@@ -139,6 +139,17 @@ Set Text Value To Right Of
 	Type 	${value}
 	Take A Screenshot
 	${value2}= 	Copy From The Right Of 	${img} 	${offsetx}
+	WHILE 	$b4value == $value 		limit=10
+		${x}= 	Evaluate 	${x}+10
+		${offsetx}= 	Evaluate 	${offsetx}+10
+		@{coordinates}= 	Create List 	${x} 	${y}
+		Move To 	${coordinates}
+		Click
+		Double Click
+		Type 	${value}
+		Take A Screenshot
+		${value2}= 	Copy From The Right Of 	${img} 	${offsetx}
+	END
 	Should Be Equal As Strings    ${value}    ${value2}
 
 Get Last Screenshot
