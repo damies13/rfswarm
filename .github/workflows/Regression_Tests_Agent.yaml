@@ -25,6 +25,20 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
 
+      - name: Update Robot Tag
+        # if: ${{ env.isrelease == 1 }}
+        shell: python
+        # https://api.github.com/repos/damies13/rfswarm/milestones
+        run: |
+          import os
+          tag = "${{ matrix.platform }}"
+          tagarr = tag.split("-")
+          tag = "{}-latest".format(tagarr[0])
+
+          env_file = os.getenv('GITHUB_ENV')
+          with open(env_file, "a") as myfile:
+            myfile.write("tag={}\n".format(tag))
+
       - name: Download packages to dist
         uses: actions/download-artifact@v4
         with:
@@ -60,7 +74,7 @@ jobs:
 
       - name: Robot Framework
         run: >
-          robot --include ${{ matrix.platform }}
+          robot --include ${{ env.tag }}
           --outputdir Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
           Tests/Regression/Agent
 
