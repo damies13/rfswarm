@@ -24,3 +24,58 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
+
+      - name: Download packages to dist
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Show Dist UM
+        if: ${{ matrix.platform != 'windows-latest' }}
+        run: |
+          ls -la dist
+      - name: Show Dist W
+        if: ${{ matrix.platform == 'windows-latest' }}
+        run: |
+          dir dist
+      - name: Install Agent from dist UM
+        if: ${{ matrix.platform != 'windows-latest' }}
+        run: pip install rfswarm_agent-*.whl
+        working-directory: ./dist
+      - name: Install Agent from dist W
+        if: ${{ matrix.platform == 'windows-latest' }}
+        shell: cmd
+        run: for %%f in (rfswarm_agent-*.whl) do pip install %%f
+        working-directory: ./dist
+      - name: Install Manager from dist (for testing Issues) UM
+        if: ${{ matrix.platform != 'windows-latest' }}
+        run: pip install rfswarm_manager-*.whl
+        working-directory: ./dist
+      - name: Install Manager from dist (for testing Issues) W
+        if: ${{ matrix.platform == 'windows-latest' }}
+        shell: cmd
+        run: for %%f in (rfswarm_manager-*.whl) do pip install %%f
+        working-directory: ./dist
+      - run: pip install -r Tests/Regression/Agent/pip_requirements.txt
+
+      - name: Robot Framework
+        run: >
+          robot --include ${{ matrix.platform }}
+          --outputdir Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          Tests/Regression/Agent
+
+      - name: Archive Agent Logs
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Agent-${{ matrix.platform }}-${{ matrix.python }}
+          path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          retention-days: 15
+
+      - name: Archive Agent Logs (longer retention if failed)
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Agent-${{ matrix.platform }}-${{ matrix.python }}
+          path: Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          retention-days: 90
