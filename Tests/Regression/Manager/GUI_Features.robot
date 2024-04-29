@@ -46,7 +46,7 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 		Press Key.tab 3 Times
 	END
 	Click Button	runsave
-	Save Scenario File	${scenario_name}
+	Save Scenario File OS DIALOG	${scenario_name}
 
 	${scenario_content}=	Get scenario file content	${global_path}	${scenario_name}
 	@{scenario_content_list}=	Split String	${scenario_content}
@@ -56,9 +56,9 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	Log		${run_robots}
 	Log		${run_times_in_s}
 
-	Verify Scenario File Robots		${scenario_content_list}	${run_robots}
-	Verify Scenario File Times		${scenario_content_list}	${run_times_in_s}
-	Verify Scenario File Robot Data	${scenario_content_list}	${robot_data}
+	Verify Scenario File Robots		${scenario_content_list}	${run_robots}		${1}	${3}
+	Verify Scenario File Times		${scenario_content_list}	${run_times_in_s}	${1}	${3}
+	Verify Scenario File Robot Data	${scenario_content_list}	${robot_data}		${1}	${3}
 
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
@@ -76,7 +76,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 
 	@{settings_locations}	Create List
 	&{row_settings_data}	Create Dictionary
-	...    excludelibraries=builtin,string,operatingsystem,perftest,collections
+	...    exclude_libraries=builtin,string,operatingsystem,perftest,collections
 	...    robot_options=-v var:examplevariable
 	...    test_repeater=True
 	...    inject_sleep=True
@@ -99,10 +99,10 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 	END
 	FOR  ${i}  IN RANGE  0  3
 		Click To The Above Of	${settings_locations}[${i}]	0
-		Change Test Group Settings		&{row_settings_data}
+		Change Test Group Settings	${row_settings_data}
 	END
 	Click Button	runsave
-	Save Scenario File	${scenario_name}
+	Save Scenario File OS DIALOG	${scenario_name}
 
 	${scenario_content}=	Get scenario file content	${global_path}	${scenario_name}
 	@{scenario_content_list}=	Split String	${scenario_content}
@@ -111,8 +111,8 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 	Log		${scenario_content}
 	Log		${row_settings_data}
 
-	Verify Scenario File Robot Data		${scenario_content_list}	${robot_data}
-	Verify Scenario Test Row Settings	${scenario_content_list}	${row_settings_data}
+	Verify Scenario File Robot Data		${scenario_content_list}	${robot_data}			${1}	${3}
+	Verify Scenario Test Row Settings	${scenario_content_list}	${row_settings_data}	${1}	${3}
 
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
@@ -123,14 +123,15 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords
-	...    Set INI Window Size		1200	600										AND
-	...    Open Manager GUI															AND
-	...    Set Global Filename And Default Save Path	${robot_data}[0]			AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Set Test Variable	@{manager_options}	-g	1					AND
+	...    Set INI Window Size		1200	600								AND
+	...    Open Manager GUI		${manager_options}							AND
 	...    Create Robot File
 
 	@{settings_locations}	Create List
 	&{row_settings_data}	Create Dictionary
-	...    excludelibraries=builtin,string,operatingsystem,perftest,collections
+	...    exclude_libraries=builtin,string,operatingsystem,perftest,collections
 	...    robot_options=-v var:examplevariable
 	...    test_repeater=True
 	...    inject_sleep=True
@@ -165,22 +166,222 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	END
 	FOR  ${i}  IN RANGE  0  3
 		Click To The Above Of	${settings_locations}[${i}]	0
-		Change Test Group Settings		&{row_settings_data}
+		Change Test Group Settings	${row_settings_data}
 	END
 	Click Button	runsave
-	Save Scenario File	${scenario_name}
+	Save Scenario File OS DIALOG	${scenario_name}
 
 	${scenario_content}=	Get scenario file content	${global_path}	${scenario_name}
 
 	Run Keyword		Close Manager GUI ${platform}
-	Open Manager GUI
-	Check That The Scenario File Opens Correctly	${robot_data}	${scenario_name}	${scenario_content}
+	Open Manager GUI	${manager_options}
+	Check That The Scenario File Opens Correctly	${scenario_name}	${scenario_content}
 
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Delete Scenario File	test_scenario				AND
 	...    Delete Robot File								AND
 	...    Delete Scenario File	${scenario_name}
+
+Verify If Manager Saves Inject Sleep From Scenario Wide Settings
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600										AND
+	...    Open Manager GUI															AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]			AND
+	...    Create Robot File
+
+	@{inject_sleep_values}	Create List		11	22
+	&{run_settings_data}	Create Dictionary
+	...    inject_sleep=True
+	...    inject_sleep_min=${inject_sleep_values}[0]
+	...    inject_sleep_max=${inject_sleep_values}[1]
+
+	Click Button	runsettings
+	Change Scenario Wide Settings	${run_settings_data}
+	Click Button	runsave
+	Save Scenario File OS DIALOG	${scenario_name}
+
+	${scenario_content}=	Get scenario file content	${global_path}	${scenario_name}
+	@{scenario_content_list}=	Split String	${scenario_content}
+
+	Verify Scenario Wide Settings Data	${scenario_content_list}	${run_settings_data}
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Delete Scenario File	test_scenario				AND
+	...    Delete Robot File								AND
+	...    Delete Scenario File	${scenario_name}
+
+Check If the Manager Reopens Inject Sleep From Scenario Wide Settings Correctly
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600										AND
+	...    Open Manager GUI															AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]			AND
+	...    Create Robot File
+
+	@{inject_sleep_values}	Create List		999	9999
+	&{run_settings_data}	Create Dictionary
+	...    inject_sleep=True
+	...    inject_sleep_min=${inject_sleep_values}[0]
+	...    inject_sleep_max=${inject_sleep_values}[1]
+
+	Click Button	runsettings
+	Change Scenario Wide Settings	${run_settings_data}
+	Click Button	runsave
+	Save Scenario File OS DIALOG	${scenario_name}
+
+	${scenario_content}=	Get scenario file content	${global_path}	${scenario_name}
+	@{scenario_content_list}=	Split String	${scenario_content}
+
+	Verify Scenario Wide Settings Data	${scenario_content_list}	${run_settings_data}
+
+	Click Button	runopen
+	Sleep	2
+	Press key.enter 1 Times
+	Open Scenario File OS DIALOG	${scenario_name}
+	Check That The Scenario File Opens Correctly	${scenario_name}	${scenario_content}
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Delete Scenario File	test_scenario				AND
+	...    Delete Robot File								AND
+	...    Delete Scenario File	${scenario_name}
+
+Check If the Manager (after was closed) Opens Inject Sleep From Scenario Wide Settings Correctly
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
+	[Setup]	Run Keywords
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Set Test Variable	@{manager_options}	-g	1					AND
+	...    Set INI Window Size		1200	600								AND
+	...    Open Manager GUI		${manager_options}							AND
+	...    Create Robot File
+
+	@{inject_sleep_values}	Create List		11	22
+	&{run_settings_data}	Create Dictionary
+	...    inject_sleep=True
+	...    inject_sleep_min=${inject_sleep_values}[0]
+	...    inject_sleep_max=${inject_sleep_values}[1]
+
+	Click Button	runsettings
+	Change Scenario Wide Settings	${run_settings_data}
+	Click Button	runsave
+	Save Scenario File OS DIALOG	${scenario_name}
+
+	${scenario_content}=	Get scenario file content	${global_path}	${scenario_name}
+	@{scenario_content_list}=	Split String	${scenario_content}
+
+	Verify Scenario Wide Settings Data	${scenario_content_list}	${run_settings_data}
+
+	Run Keyword		Close Manager GUI ${platform}
+	Open Manager GUI	${manager_options}
+	Check That The Scenario File Opens Correctly	${scenario_name}	${scenario_content}
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Delete Scenario File	test_scenario				AND
+	...    Delete Robot File								AND
+	...    Delete Scenario File	${scenario_name}
+
+Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Settings
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600										AND
+	...    Open Manager GUI															AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]			AND
+	...    Create Robot File
+
+	@{inject_sleep_values}	Create List		11	22	13	24	15	26
+	&{run_settings_data}	Create Dictionary
+	...    inject_sleep=True
+	...    inject_sleep_min=${inject_sleep_values}[0]
+	...    inject_sleep_max=${inject_sleep_values}[1]
+
+	Click Button	runaddrow
+	Click
+	Click Button	runsettings
+	Change Scenario Wide Settings	${run_settings_data}
+
+	Click Button	runsettingsrow
+	&{first_row_settings_data}	Create Dictionary	inject_sleep=False	inject_sleep_min=${inject_sleep_values}[2]	inject_sleep_max=${inject_sleep_values}[3]
+	Change Test Group Settings	${first_row_settings_data}
+	Click Label With Vertical Offset	button_runsettingsrow	25
+	&{third_row_settings_data}	Create Dictionary	inject_sleep=False	inject_sleep_min=${inject_sleep_values}[4]	inject_sleep_max=${inject_sleep_values}[5]
+	Change Test Group Settings	${third_row_settings_data}
+
+	Click Button	runsave
+	Save Scenario File OS DIALOG	${scenario_name}
+
+	${scenario_content}=	Get scenario file content	${global_path}	${scenario_name}
+	@{scenario_content_list}=	Split String	${scenario_content}
+
+	Verify Scenario Wide Settings Data	${scenario_content_list}	${run_settings_data}
+	Verify Scenario Test Row Settings	${scenario_content_list}	${first_row_settings_data}	${1}	${1}
+	Verify Scenario Test Row Settings	${scenario_content_list}	${third_row_settings_data}	${3}	${3}
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Delete Scenario File	test_scenario				AND
+	...    Delete Robot File								AND
+	...    Delete Scenario File	${scenario_name}
+
+Check If Inject Sleep Option Was Executed in the Test
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
+	[Setup]	Run Keywords
+	...    Remove Directory	${results_dir}	recursive=${True}				AND
+	...    Create Directory	${results_dir}									AND
+	...    Sleep	3														AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Set INI Window Size		1200	600								AND
+	...    Open Agent														AND
+	...    Open Manager GUI													AND
+	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t10s\n\tSleep\t10\n
+
+	@{inject_sleep_values}	Create List		10	15
+	&{run_settings_data}	Create Dictionary
+	...    inject_sleep=True
+	...    inject_sleep_min=${inject_sleep_values}[0]
+	...    inject_sleep_max=${inject_sleep_values}[1]
+
+	Press Key.tab 4 Times
+	Type	15
+	Press Key.tab 1 Times
+	Type	30
+	Click Button	runscriptrow
+	Select Robot File	${robot_data}[0]
+	Select 1 Robot Test Case
+	Click Button	runsettingsrow
+	Change Test Group Settings	${run_settings_data}
+	Check If The Agent Has Connected To The Manager
+	Click Tab	Plan
+	Click Button	runplay
+	
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+
+	@{excluded_files}=	Create List		Example_Test_Case.log	log.html	report.html		Example.log
+	${xml_absolute_paths}	${xml_file_names}
+	...    Find Absolute Paths And Names For Files In Directory	${results_dir}	@{excluded_files}
+
+	Log	${xml_file_names}
+
+	${xml_file_content}	Get File	${xml_absolute_paths}[1]
+	${root}		Parse XML		${xml_file_content}
+	@{rfswarm_sleep_msg}	Get Elements		${root}	suite/test/kw[@name="Sleep"]/msg
+	${rfswarm_sleep_value}	Get Elements			${root}	suite/test/kw[@name="Sleep"]/arg
+
+	${sleep_by_rfswarm}		Set Variable	${rfswarm_sleep_msg}[1]
+	${sleep_value_by_rfswarm}		Set Variable	${rfswarm_sleep_value}[0]
+	Should Be Equal	${sleep_by_rfswarm.text}		Sleep added by RFSwarm	msg=xml data != Expected name
+	Should Be True	${sleep_value_by_rfswarm.text} >= ${inject_sleep_values}[0] and ${sleep_value_by_rfswarm.text} <= ${inject_sleep_values}[1]
+	...    msg=Sleep time is not correct!
+
+	[Teardown]	Run Keywords
+	...    GUI_Common.Stop Agent							AND
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Remove File		${global_path}${/}example.robot
 
 Verify Disable log.html - Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
@@ -443,7 +644,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	Copy Directory	${CURDIR}${/}testdata${/}Issue-52${/}example	${global_path}
 	Copy File	${CURDIR}${/}testdata${/}Issue-52${/}test_scenario.rfs	${global_path}
 	Click Button	runopen
-	Open Scenario File	test_scenario
+	Open Scenario File OS DIALOG	test_scenario
 	Check If The Agent Has Connected To The Manager
 	Sleep	30
 
@@ -488,7 +689,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	Change main1 With main2 In ${scenario_path}
 
 	Click Button	runopen
-	Open Scenario File	test_scenario
+	Open Scenario File OS DIALOG	test_scenario
 	Check If The Agent Has Connected To The Manager
 	Sleep	30
 
@@ -533,7 +734,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	Change main1 With main3 In ${scenario_path}
 
 	Click Button	runopen
-	Open Scenario File	test_scenario
+	Open Scenario File OS DIALOG	test_scenario
 	Check If The Agent Has Connected To The Manager
 	Sleep	30
 
