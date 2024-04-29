@@ -35,6 +35,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
+      - name: Pip Update
+        run: pip install --upgrade pip
       - name: Checkout
         uses: actions/checkout@v4
       - name: "Apt Update"
