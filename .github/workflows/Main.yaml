@@ -14,6 +14,11 @@ jobs:
       - Package_For_PIP
     uses: ./.github/workflows/Regression_Tests.yaml
 
+  Regression_Tests Agent:
+    needs:
+      - Package_For_PIP
+    uses: ./.github/workflows/Regression_Tests_Agent.yaml
+
   Publish_Package:
     needs:
     - Package_For_PIP
