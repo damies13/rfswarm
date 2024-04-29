@@ -26,9 +26,7 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: Update Robot Tag
-        # if: ${{ env.isrelease == 1 }}
         shell: python
-        # https://api.github.com/repos/damies13/rfswarm/milestones
         run: |
           import os
           tag = "${{ matrix.platform }}"

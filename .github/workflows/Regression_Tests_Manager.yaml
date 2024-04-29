@@ -65,6 +65,18 @@ jobs:
           # fluxbox
           fluxbox &
 
+      - name: Update Robot Tag
+        shell: python
+        run: |
+          import os
+          tag = "${{ matrix.platform }}"
+          tagarr = tag.split("-")
+          tag = "{}-latest".format(tagarr[0])
+
+          env_file = os.getenv('GITHUB_ENV')
+          with open(env_file, "a") as myfile:
+            myfile.write("tag={}\n".format(tag))
+
       - name: Download packages to dist
         uses: actions/download-artifact@v4
         with:
@@ -101,7 +113,7 @@ jobs:
       - name: Robot Framework
         id: robottest
         run: >
-          robot --include ${{ matrix.platform }}
+          robot --include ${{ env.tag }}
           --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}
           Tests/Regression/Manager
         env:
