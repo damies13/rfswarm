@@ -65,11 +65,11 @@ Open Manager GUI
 	Take A Screenshot
 
 Close Manager GUI ubuntu
-	Run Keyword And Ignore Error 	Click Dialog Button 	cancel
+	#Run Keyword And Ignore Error 	Click Dialog Button 	cancel
 	Close Manager GUI
 
 Close Manager GUI windows
-	Run Keyword And Ignore Error 	Click Dialog Button 	cancel
+	#Run Keyword And Ignore Error 	Click Dialog Button 	cancel
 	Close Manager GUI
 
 Close Manager GUI

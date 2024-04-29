@@ -367,14 +367,14 @@ Check If Inject Sleep Option Was Executed in the Test
 
 	Log	${xml_file_names}
 
-	${xml_file_content}	Get File	${xml_absolute_paths}[1]
-	${root}		Parse XML		${xml_file_content}
-	@{rfswarm_sleep_msg}	Get Elements		${root}	suite/test/kw[@name="Sleep"]/msg
-	${rfswarm_sleep_value}	Get Elements			${root}	suite/test/kw[@name="Sleep"]/arg
+	${xml_file_content}		Get File	${xml_absolute_paths}[1]
+	${root}		Parse XML	${xml_file_content}
+	@{rfswarm_sleep_value}	Get Elements	${root}	suite/test/kw[@name="Sleep"]/arg
 
-	${sleep_by_rfswarm}		Set Variable	${rfswarm_sleep_msg}[1]
-	${sleep_value_by_rfswarm}		Set Variable	${rfswarm_sleep_value}[0]
-	Should Be Equal	${sleep_by_rfswarm.text}		Sleep added by RFSwarm	msg=xml data != Expected name
+	${sleep_by_rfswarm}			Set Variable	${rfswarm_sleep_value}[1]
+	${sleep_value_by_rfswarm}	Set Variable	${rfswarm_sleep_value}[0]
+	Log To Console	RFSwarm Sleep value: ${sleep_value_by_rfswarm}
+	Should Be Equal	${sleep_by_rfswarm.text}		Sleep added by RFSwarm		msg=xml data != Expected name
 	Should Be True	${sleep_value_by_rfswarm.text} >= ${inject_sleep_values}[0] and ${sleep_value_by_rfswarm.text} <= ${inject_sleep_values}[1]
 	...    msg=Sleep time is not correct!
 
