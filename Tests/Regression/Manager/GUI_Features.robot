@@ -292,6 +292,7 @@ Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Setting
 	...    Set Global Filename And Default Save Path	${robot_data}[0]			AND
 	...    Create Robot File
 
+	@{settings_locations}	Create List
 	@{inject_sleep_values}	Create List		11	22	13	24	15	26
 	&{run_settings_data}	Create Dictionary
 	...    inject_sleep=True
@@ -300,13 +301,21 @@ Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Setting
 
 	Click Button	runaddrow
 	Click
+	Sleep	3
+	FOR  ${i}  IN RANGE  1  4
+		Press Key.tab 8 Times
+		${settings_coordinates}=
+		...    Locate	manager_${platform}_button_selected_runsettingsrow.png
+		Append To List	${settings_locations}	${settings_coordinates}
+		Press Key.tab 1 Times
+	END
 	Click Button	runsettings
 	Change Scenario Wide Settings	${run_settings_data}
 
-	Click Button	runsettingsrow
+	Click To The Above Of	${settings_locations}[0]	0
 	&{first_row_settings_data}	Create Dictionary	inject_sleep=False	inject_sleep_min=${inject_sleep_values}[2]	inject_sleep_max=${inject_sleep_values}[3]
 	Change Test Group Settings	${first_row_settings_data}
-	Click Label With Vertical Offset	button_runsettingsrow	25
+	Click To The Above Of	${settings_locations}[2]	0
 	&{third_row_settings_data}	Create Dictionary	inject_sleep=False	inject_sleep_min=${inject_sleep_values}[4]	inject_sleep_max=${inject_sleep_values}[5]
 	Change Test Group Settings	${third_row_settings_data}
 
@@ -362,6 +371,8 @@ Check If Inject Sleep Option Was Executed in the Test
 	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
 
+	Sleep	10
+
 	@{excluded_files}=	Create List		Example_Test_Case.log	log.html	report.html		Example.log
 	${xml_absolute_paths}	${xml_file_names}
 	...    Find Absolute Paths And Names For Files In Directory	${agent_dir}${/}logs	@{excluded_files}
@@ -390,7 +401,7 @@ Check If Inject Sleep Option Was Executed in the Test
 				${sleep_value_by_rfswarm}	Set Variable	${rfswarm_sleep_value}[0]
 				Log To Console	RFSwarm Sleep value: ${sleep_value_by_rfswarm.text}
 				Should Be True	${sleep_value_by_rfswarm.text} >= ${inject_sleep_values}[0] and ${sleep_value_by_rfswarm.text} <= ${inject_sleep_values}[1]
-				...    msg=Sleep time is not correct!
+				...    msg=Sleep time is not correct! Should be in <${inject_sleep_values}[0]; ${inject_sleep_values}[1]>
 
 				${dont_fail}	Set Variable	${True}
 				BREAK
@@ -781,7 +792,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    CommandLine_Common.Stop Manager
 
 Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the robots)
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
+	[Tags]	windows-latest	ubuntu-latest	Issue #70
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot	AND
 	...    Set INI Window Size		1200	600							AND
@@ -809,7 +820,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	...    Remove File		${global_path}${/}example.robot
 
 Check If Test Scenario Run Will Stop Gradually
-	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
+	[Tags]	windows-latest	ubuntu-latest	Issue #70
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot	AND
 	...    Set INI Window Size		1200	600							AND
