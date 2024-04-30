@@ -329,10 +329,11 @@ Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Setting
 Check If Inject Sleep Option Was Executed in the Test
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
-	...    Remove Directory	${results_dir}	recursive=${True}				AND
-	...    Create Directory	${results_dir}									AND
-	...    Sleep	3														AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Remove Directory	${agent_dir}	recursive=${True}				AND
+	...    Remove File		${global_path}${/}RFSwarmManager.ini			AND
+	...    Create Directory	${agent_dir}									AND
+	...    Sleep	3														AND
 	...    Set INI Window Size		1200	600								AND
 	...    Open Agent														AND
 	...    Open Manager GUI													AND
@@ -345,7 +346,7 @@ Check If Inject Sleep Option Was Executed in the Test
 	...    inject_sleep_max=${inject_sleep_values}[1]
 
 	Press Key.tab 4 Times
-	Type	15
+	Type	20
 	Press Key.tab 1 Times
 	Type	30
 	Click Button	runscriptrow
@@ -363,20 +364,36 @@ Check If Inject Sleep Option Was Executed in the Test
 
 	@{excluded_files}=	Create List		Example_Test_Case.log	log.html	report.html		Example.log
 	${xml_absolute_paths}	${xml_file_names}
-	...    Find Absolute Paths And Names For Files In Directory	${results_dir}	@{excluded_files}
+	...    Find Absolute Paths And Names For Files In Directory	${agent_dir}${/}logs	@{excluded_files}
 
-	Log	${xml_file_names}
-
+	Log		${xml_file_names}
 	${xml_file_content}		Get File	${xml_absolute_paths}[1]
-	${root}		Parse XML	${xml_file_content}
-	@{rfswarm_sleep_value}	Get Elements	${root}	suite/test/kw[@name="Sleep"]/arg
+	Log		${xml_file_content}	
 
-	${sleep_by_rfswarm}			Set Variable	${rfswarm_sleep_value}[1]
-	${sleep_value_by_rfswarm}	Set Variable	${rfswarm_sleep_value}[0]
-	Log To Console	RFSwarm Sleep value: ${sleep_value_by_rfswarm}
-	Should Be Equal	${sleep_by_rfswarm.text}		Sleep added by RFSwarm		msg=xml data != Expected name
-	Should Be True	${sleep_value_by_rfswarm.text} >= ${inject_sleep_values}[0] and ${sleep_value_by_rfswarm.text} <= ${inject_sleep_values}[1]
-	...    msg=Sleep time is not correct!
+	${root}		Parse XML	${xml_file_content}
+	${test_element}	Get Element	${root}	suite/test
+	@{keyword_elements}	Get Elements	${test_element}	kw
+
+	${dont_fail}	Set Variable	${False}
+	FOR  ${keyword}  IN  @{keyword_elements}
+		@{msg_elements}	Get Elements	 ${keyword}	msg
+		FOR  ${msg}  IN  @{msg_elements}
+			IF  '${msg.text}' == 'Sleep added by RFSwarm'
+				Log To Console	${msg.text}
+
+				@{rfswarm_sleep_value}	Get Elements	${keyword}	arg
+				${sleep_value_by_rfswarm}	Set Variable	${rfswarm_sleep_value}[0]
+				Log To Console	RFSwarm Sleep value: ${sleep_value_by_rfswarm.text}
+				Should Be True	${sleep_value_by_rfswarm.text} >= ${inject_sleep_values}[0] and ${sleep_value_by_rfswarm.text} <= ${inject_sleep_values}[1]
+				...    msg=Sleep time is not correct!
+
+				${dont_fail}	Set Variable	${True}
+				BREAK
+			END
+		END
+	END
+
+	Run Keyword If	${dont_fail} == ${False}	Fail	msg="Cant find sleep keyword injected by RFSwarm"
 
 	[Teardown]	Run Keywords
 	...    GUI_Common.Stop Agent							AND
