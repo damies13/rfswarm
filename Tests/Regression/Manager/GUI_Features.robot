@@ -337,7 +337,7 @@ Check If Inject Sleep Option Was Executed in the Test
 	...    Set INI Window Size		1200	600								AND
 	...    Open Agent														AND
 	...    Open Manager GUI													AND
-	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t10s\n\tSleep\t10\n
+	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t9s\n\tSleep\t9\n
 
 	@{inject_sleep_values}	Create List		10	15
 	&{run_settings_data}	Create Dictionary
@@ -373,12 +373,17 @@ Check If Inject Sleep Option Was Executed in the Test
 	${root}		Parse XML	${xml_file_content}
 	${test_element}	Get Element	${root}	suite/test
 	@{keyword_elements}	Get Elements	${test_element}	kw
+	FOR  ${upper_keywords}  IN  @{keyword_elements}
+		@{inside_keyword_elements}	Get Elements	${upper_keywords}	kw
+		Append To List		${keyword_elements}		@{inside_keyword_elements}
+	END
 
 	${dont_fail}	Set Variable	${False}
 	FOR  ${keyword}  IN  @{keyword_elements}
 		@{msg_elements}	Get Elements	 ${keyword}	msg
 		FOR  ${msg}  IN  @{msg_elements}
 			IF  '${msg.text}' == 'Sleep added by RFSwarm'
+				Log To Console	Sleep keyword added by RFSwarm found.
 				Log To Console	${msg.text}
 
 				@{rfswarm_sleep_value}	Get Elements	${keyword}	arg
