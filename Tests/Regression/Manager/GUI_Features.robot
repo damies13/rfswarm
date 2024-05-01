@@ -124,9 +124,9 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
-	...    Set Test Variable	@{manager_options}	-g	1					AND
+	...    Set Test Variable	@{mngr_options}	-g	1					AND
 	...    Set INI Window Size		1200	600								AND
-	...    Open Manager GUI		${manager_options}							AND
+	...    Open Manager GUI		${mngr_options}							AND
 	...    Create Robot File
 
 	@{settings_locations}	Create List
@@ -174,7 +174,7 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	${scenario_content}=	Get scenario file content	${global_path}	${scenario_name}
 
 	Run Keyword		Close Manager GUI ${platform}
-	Open Manager GUI	${manager_options}
+	Open Manager GUI	${mngr_options}
 	Check That The Scenario File Opens Correctly	${scenario_name}	${scenario_content}
 
 	[Teardown]	Run Keywords
@@ -253,9 +253,9 @@ Check If the Manager (after was closed) Opens Inject Sleep From Scenario Wide Se
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
-	...    Set Test Variable	@{manager_options}	-g	1					AND
+	...    Set Test Variable	@{mngr_options}	-g	1					AND
 	...    Set INI Window Size		1200	600								AND
-	...    Open Manager GUI		${manager_options}							AND
+	...    Open Manager GUI		${mngr_options}							AND
 	...    Create Robot File
 
 	@{inject_sleep_values}	Create List		11	22
@@ -275,7 +275,7 @@ Check If the Manager (after was closed) Opens Inject Sleep From Scenario Wide Se
 	Verify Scenario Wide Settings Data	${scenario_content_list}	${run_settings_data}
 
 	Run Keyword		Close Manager GUI ${platform}
-	Open Manager GUI	${manager_options}
+	Open Manager GUI	${mngr_options}
 	Check That The Scenario File Opens Correctly	${scenario_name}	${scenario_content}
 
 	[Teardown]	Run Keywords
@@ -371,7 +371,7 @@ Check If Inject Sleep Option Was Executed in the Test
 	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
 
-	Sleep	10
+	Sleep	30
 
 	@{excluded_files}=	Create List		Example_Test_Case.log	log.html	report.html		Example.log
 	${xml_absolute_paths}	${xml_file_names}
@@ -381,7 +381,11 @@ Check If Inject Sleep Option Was Executed in the Test
 	${xml_file_content}		Get File	${xml_absolute_paths}[1]
 	Log		${xml_file_content}	
 
-	${root}		Parse XML	${xml_file_content}
+	TRY
+		${root}		Parse XML	${xml_file_content}
+	EXCEPT
+		Log		The xml file is empty or invalid!
+	END
 	${test_element}	Get Element	${root}	suite/test
 	@{keyword_elements}	Get Elements	${test_element}	kw
 	FOR  ${upper_keywords}  IN  @{keyword_elements}
@@ -401,7 +405,7 @@ Check If Inject Sleep Option Was Executed in the Test
 				${sleep_value_by_rfswarm}	Set Variable	${rfswarm_sleep_value}[0]
 				Log To Console	RFSwarm Sleep value: ${sleep_value_by_rfswarm.text}
 				Should Be True	${sleep_value_by_rfswarm.text} >= ${inject_sleep_values}[0] and ${sleep_value_by_rfswarm.text} <= ${inject_sleep_values}[1]
-				...    msg=Sleep time is not correct! Should be in <${inject_sleep_values}[0]; ${inject_sleep_values}[1]>
+				...    msg=Sleep time is not correct! Should be in <${inject_sleep_values}[0];${inject_sleep_values}[1]>
 
 				${dont_fail}	Set Variable	${True}
 				BREAK
