@@ -3,7 +3,7 @@
 
 # Time Sponsors
 
-[![Image](Images/Sponsor_NiceProject.jpg)](https://niceproject.eu/)
+[![Image](Images/Sponsor_NiceProject_300.png)](https://niceproject.eu/)
 Thank you [NiceProject Poland](https://niceproject.eu/) for providing the time of Arkadiusz Kuczyński (@ArekKuczynski) to work on RFSwarm
 
 
