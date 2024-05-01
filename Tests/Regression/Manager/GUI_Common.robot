@@ -170,7 +170,7 @@ Utilisation Stats
 	${proc}= 		Evaluate 	list(psutil.process_iter(['pid', 'name', 'exe', 'cmdline', 'username'])) 		modules=psutil
 	Log 	${proc}
 
-Check If The Agent Has Connected To The Manager
+Check If The Agent Is Ready
 	Sleep	1
 	Click Tab	Agents
 	Wait For 	manager_${platform}_agents_ready.png	timeout=300
@@ -467,6 +467,19 @@ Change Scenario Wide Settings
 	Press Key.tab 1 Times
 	IF  'bind_port_number' in ${wide_settings_data}
 		Type	${wide_settings_data['bind_port_number']}
+	END
+	IF  'upload_logs' in ${wide_settings_data}
+		Click Button	on_error_only
+		IF  '${wide_settings_data['upload_logs']}' == 'on_error_only'
+			Press Key.down 2 Times
+			Press Combination	Key.enter
+		ELSE IF  '${wide_settings_data['upload_logs']}' == 'immediately'
+			Press Key.down 1 Times
+			Press Combination	Key.enter
+		ELSE IF  '${wide_settings_data['upload_logs']}' == 'all_deferred'
+			Press Key.down 3 Times
+			Press Combination	Key.enter
+		END
 	END
 	IF  'test_repeater' in ${wide_settings_data}
 		IF  '${wide_settings_data['test_repeater']}' == 'True'

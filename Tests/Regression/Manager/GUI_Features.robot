@@ -339,17 +339,18 @@ Check If Inject Sleep Option Was Executed in the Test
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
-	...    Remove Directory	${agent_dir}	recursive=${True}				AND
+	...    Remove Directory	${results_dir}	recursive=${True}				AND
 	...    Remove File		${global_path}${/}RFSwarmManager.ini			AND
-	...    Create Directory	${agent_dir}									AND
+	...    Create Directory	${results_dir}									AND
 	...    Sleep	3														AND
 	...    Set INI Window Size		1200	600								AND
 	...    Open Agent														AND
 	...    Open Manager GUI													AND
-	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t9s\n\tSleep\t9\n
+	...    Create Robot File	file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t9s\n\tSleep\t9\n
 
 	@{inject_sleep_values}	Create List		10	15
 	&{run_settings_data}	Create Dictionary
+	...    upload_logs=immediately
 	...    inject_sleep=True
 	...    inject_sleep_min=${inject_sleep_values}[0]
 	...    inject_sleep_max=${inject_sleep_values}[1]
@@ -361,9 +362,9 @@ Check If Inject Sleep Option Was Executed in the Test
 	Click Button	runscriptrow
 	Select Robot File	${robot_data}[0]
 	Select 1 Robot Test Case
-	Click Button	runsettingsrow
-	Change Test Group Settings	${run_settings_data}
-	Check If The Agent Has Connected To The Manager
+	Click Button	runsettings
+	Change Scenario Wide Settings	${run_settings_data}
+	Check If The Agent Is Ready
 	Click Tab	Plan
 	Click Button	runplay
 	
@@ -371,21 +372,30 @@ Check If Inject Sleep Option Was Executed in the Test
 	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
 
-	Sleep	30
+	Sleep	10
+	Check If The Agent Is Ready
 
 	@{excluded_files}=	Create List		Example_Test_Case.log	log.html	report.html		Example.log
-	${xml_absolute_paths}	${xml_file_names}
-	...    Find Absolute Paths And Names For Files In Directory	${agent_dir}${/}logs	@{excluded_files}
+	${result_absolute_paths}	${result_file_names}
+	...    Find Absolute Paths And Names For Files In Directory		${results_dir}	@{excluded_files}
 
-	Log		${xml_file_names}
-	${xml_file_content}		Get File	${xml_absolute_paths}[1]
-	Log		${xml_file_content}	
-
+	Log		${result_file_names}
+	FOR  ${result_file}  IN  @{result_absolute_paths}
+		${file_extenstion}	Get Substring	${result_file}	-3
+		IF  '${file_extenstion}' == 'xml'
+			${xml_file_content}		Get File	${result_file}
+			Log		${xml_file_content}	
+			BREAK
+		END
+	END
+	Variable Should Exist	${xml_file_content}		msg="Not xml file found in manager result directory!"
+	Should Not Be Empty		${xml_file_content}		msg=The xml file is empty!
 	TRY
 		${root}		Parse XML	${xml_file_content}
 	EXCEPT
-		Log		The xml file is empty or invalid!
+		Fail	msg=The xml file is invalid!
 	END
+
 	${test_element}	Get Element	${root}	suite/test
 	@{keyword_elements}	Get Elements	${test_element}	kw
 	FOR  ${upper_keywords}  IN  @{keyword_elements}
@@ -682,7 +692,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	Copy File	${CURDIR}${/}testdata${/}Issue-52${/}test_scenario.rfs	${global_path}
 	Click Button	runopen
 	Open Scenario File OS DIALOG	test_scenario
-	Check If The Agent Has Connected To The Manager
+	Check If The Agent Is Ready
 	Sleep	30
 
 	@{excluded_files}=	Create List	RFSListener3.py	RFSListener2.py	RFSTestRepeater.py
@@ -727,7 +737,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 
 	Click Button	runopen
 	Open Scenario File OS DIALOG	test_scenario
-	Check If The Agent Has Connected To The Manager
+	Check If The Agent Is Ready
 	Sleep	30
 
 	@{excluded_files}=	Create List	RFSListener3.py	RFSListener2.py	RFSTestRepeater.py
@@ -772,7 +782,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 
 	Click Button	runopen
 	Open Scenario File OS DIALOG	test_scenario
-	Check If The Agent Has Connected To The Manager
+	Check If The Agent Is Ready
 	Sleep	30
 
 	@{excluded_files}=	Create List	RFSListener3.py	RFSListener2.py	RFSTestRepeater.py
@@ -803,7 +813,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	...    Open Agent													AND
 	...    Open Manager GUI												AND
 	...    Create Robot File
-	...    file_content=***Test Case***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n
+	...    file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n
 
 	Press Key.tab 4 Times
 	Type	15
@@ -812,7 +822,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	Click Button	runscriptrow
 	Select Robot File	${robot_data}[0]
 	Select 1 Robot Test Case
-	Check If The Agent Has Connected To The Manager
+	Check If The Agent Is Ready
 	Click Tab	Plan
 	Click Button	runplay
 	Stop Test Scenario Run Quickly	${15}	${60}
@@ -830,7 +840,7 @@ Check If Test Scenario Run Will Stop Gradually
 	...    Set INI Window Size		1200	600							AND
 	...    Open Agent													AND
 	...    Open Manager GUI												AND
-	...    Create Robot File	file_content=***Test Case***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t60\n
+	...    Create Robot File	file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t60\n
 
 	Utilisation Stats
 	Press Key.tab 4 Times
@@ -840,7 +850,7 @@ Check If Test Scenario Run Will Stop Gradually
 	Click Button	runscriptrow
 	Select Robot File	${robot_data}[0]
 	Select 1 Robot Test Case
-	Check If The Agent Has Connected To The Manager
+	Check If The Agent Is Ready
 	Click Tab	Plan
 	Click Button	runplay
 	Stop Test Scenario Run Gradually	${15}	${60}
