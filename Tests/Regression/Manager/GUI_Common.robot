@@ -454,6 +454,7 @@ Change Scenario Wide Settings
 	END
 	Press Key.tab 3 Times
 	IF  'inject_sleep_min' in ${wide_settings_data}
+		Take A Screenshot	#del later
 		Type	${wide_settings_data['inject_sleep_min']}
 		Take A Screenshot	#del later
 	END
