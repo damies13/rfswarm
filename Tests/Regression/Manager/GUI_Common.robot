@@ -95,8 +95,8 @@ Close Manager GUI macos
 	[Tags]	macos-latest
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
-		Run Keyword And Ignore Error 	Click Dialog Button 	cancel
-		Run Keyword And Ignore Error 	Click Dialog Button 	no
+		#Run Keyword And Ignore Error 	Click Dialog Button 	cancel
+		#Run Keyword And Ignore Error 	Click Dialog Button 	no
 		Click Image		manager_${platform}_titlebar_rfswarm.png
 		Click Button	closewindow
 		# Sleep	5
@@ -455,6 +455,7 @@ Change Scenario Wide Settings
 	Press Key.tab 3 Times
 	IF  'inject_sleep_min' in ${wide_settings_data}
 		Type	${wide_settings_data['inject_sleep_min']}
+		Take A Screenshot	#del later
 	END
 	Press Key.tab 1 Times
 	IF  'inject_sleep_max' in ${wide_settings_data}

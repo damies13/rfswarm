@@ -331,19 +331,17 @@ Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Setting
 
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    Delete Scenario File	test_scenario				AND
 	...    Delete Robot File								AND
 	...    Delete Scenario File	${scenario_name}
 
 Check If Inject Sleep Option Was Executed in the Test
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Remove Directory	${results_dir}	recursive=${True}				AND
-	...    Remove File		${global_path}${/}RFSwarmManager.ini			AND
 	...    Create Directory	${results_dir}									AND
 	...    Sleep	3														AND
-	...    Set INI Window Size		1200	600								AND
 	...    Open Agent														AND
 	...    Open Manager GUI													AND
 	...    Create Robot File	file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t9s\n\tSleep\t9\n
@@ -352,8 +350,8 @@ Check If Inject Sleep Option Was Executed in the Test
 	&{run_settings_data}	Create Dictionary
 	...    upload_logs=immediately
 	...    inject_sleep=True
-	...    inject_sleep_min=${inject_sleep_values}[0]
-	...    inject_sleep_max=${inject_sleep_values}[1]
+	...    inject_sleep_min=10
+	...    inject_sleep_max=15
 
 	Press Key.tab 4 Times
 	Type	20
@@ -367,7 +365,7 @@ Check If Inject Sleep Option Was Executed in the Test
 	Check If The Agent Is Ready
 	Click Tab	Plan
 	Click Button	runplay
-	
+
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
