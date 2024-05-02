@@ -337,33 +337,21 @@ Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Setting
 Check If Inject Sleep Option Was Executed in the Test
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
-	...    Set INI Window Size		1200	600										AND
-	...    Open Manager GUI															AND
-	...    Set Global Filename And Default Save Path	${robot_data}[0]			AND
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Remove Directory	${results_dir}	recursive=${True}				AND
+	...    Create Directory	${results_dir}									AND
+	...    Sleep	3														AND
+	...    Open Agent														AND
+	...    Open Manager GUI													AND
 	...    Create Robot File	file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t9s\n\tSleep\t9\n
 
 	@{inject_sleep_values}	Create List		10	15
-	&{run_settings_data}	Create Dictionary
-	...    upload_logs=immediately
-	...    inject_sleep=True
-	...    inject_sleep_min=${inject_sleep_values}[0]
-	...    inject_sleep_max=${inject_sleep_values}[1]
 
-	Press Key.tab 4 Times
-	Type	20
-	Press Key.tab 1 Times
-	Type	30
-	Click Button	runscriptrow
-	Select Robot File	${robot_data}[0]
-	Select 1 Robot Test Case
-	Click Button	runsettings
-	Change Scenario Wide Settings	${run_settings_data}
-
-	Remove Directory	${results_dir}	recursive=${True}
-	Create Directory	${results_dir}
-	Sleep	3
-	Open Agent
-
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#174${/}test_scenario.rfs
+	Copy File	${scenariofile}	${global_path}
+	Click Button	runopen
+	Open Scenario File OS DIALOG	${scenario_name}
 	Check If The Agent Is Ready
 	Click Tab	Plan
 	Click Button	runplay
@@ -426,6 +414,7 @@ Check If Inject Sleep Option Was Executed in the Test
 	Run Keyword If	${dont_fail} == ${False}	Fail	msg="Cant find sleep keyword injected by RFSwarm"
 
 	[Teardown]	Run Keywords
+	...    Delete Scenario File	test_scenario				AND
 	...    GUI_Common.Stop Agent							AND
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove File		${global_path}${/}example.robot
