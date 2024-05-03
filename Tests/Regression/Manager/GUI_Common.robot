@@ -65,11 +65,13 @@ Open Manager GUI
 	Take A Screenshot
 
 Close Manager GUI ubuntu
-	#Run Keyword And Ignore Error 	Click Dialog Button 	cancel
+	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
+	Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
 	Close Manager GUI
 
 Close Manager GUI windows
-	#Run Keyword And Ignore Error 	Click Dialog Button 	cancel
+	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
+	Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
 	Close Manager GUI
 
 Close Manager GUI
@@ -79,7 +81,8 @@ Close Manager GUI
 	Sleep	5
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
-		Click Dialog Button		no
+		# Click Dialog Button		no
+		Run Keyword And Ignore Error 	Click Dialog Button		no 		10
 	END
 	${result}= 	Wait For Process 	${process_manager} 	timeout=55
 	${running}= 	Is Process Running 	${process_manager}
@@ -95,12 +98,12 @@ Close Manager GUI macos
 	[Tags]	macos-latest
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
-		#Run Keyword And Ignore Error 	Click Dialog Button 	cancel
-		#Run Keyword And Ignore Error 	Click Dialog Button 	no
+		Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
+		Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
 		Click Image		manager_${platform}_titlebar_rfswarm.png
 		Click Button	closewindow
 		# Sleep	5
-		Run Keyword And Ignore Error 	Click Dialog Button		no
+		Run Keyword And Ignore Error 	Click Dialog Button		no 		10
 	END
 	${result}= 	Wait For Process 	${process_manager} 	timeout=55
 	${running}= 	Is Process Running 	${process_manager}
@@ -225,7 +228,7 @@ Click Menu
 	Take A Screenshot
 
 Click Dialog Button
-	[Arguments]		${btnname}
+	[Arguments]		${btnname} 		${timeout}=300
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
 	${img}=	Set Variable		${platform}_dlgbtn_${btnnamel}.png
 	Log		${CURDIR}
