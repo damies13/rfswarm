@@ -7550,6 +7550,10 @@ class RFSwarmGUI(tk.Frame):
 			don_pp = tk.Label(ab, text="PayPal", fg="blue", cursor="hand2")
 			don_pp.grid(column=1, row=aboutrow, sticky="nsew")
 			don_pp.bind("<Button-1>", lambda e: self.openweblink("https://paypal.me/damies13/5"))
+			# sponsors
+			don_sp = tk.Label(ab, text="Sponsors", fg="blue", cursor="hand2")
+			don_sp.grid(column=2, row=aboutrow, sticky="nsew")
+			don_sp.bind("<Button-1>", lambda e: self.openweblink("https://github.com/damies13/rfswarm/blob/master/Doc/Sponsors.md"))
 
 			aboutrow += 1
 			ab.rowconfigure(aboutrow, weight=1)
