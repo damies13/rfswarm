@@ -80,6 +80,11 @@ jobs:
         run: |
           dir dist
 
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
       # Still need to have a check all the milestones are complete
       - name: Do Publish
         if: ${{ env.dopublish == 1 }}
@@ -87,4 +92,6 @@ jobs:
           PYPI_USER: ${{ secrets.PYPI_TOKENU }}
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
+          echo ${#PYPI_USER}
+          echo ${#PYPI_TOKEN}
           echo python3 -m twine upload -u "$PYPI_USER" -p "$PYPI_TOKEN" --verbose dist/rfswarm*
