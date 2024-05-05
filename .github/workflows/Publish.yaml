@@ -87,4 +87,4 @@ jobs:
           PYPI_USER: ${{ secrets.PYPI_TOKENU }}
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
-          echo python3 -m twine upload -u $PYPI_USER -p $PYPI_TOKEN dist/rfswarm*
+          echo python3 -m twine upload -u "$PYPI_USER" -p "$PYPI_TOKEN" --verbose dist/rfswarm*
