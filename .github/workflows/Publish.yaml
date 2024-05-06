@@ -91,14 +91,13 @@ jobs:
       - name: Do Publish
         if: ${{ env.dopublish == 1 }}
         # https://github.com/pypa/gh-action-pypi-publish?tab=readme-ov-file#specifying-a-different-username
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          verbose: true
-          password: ${{ secrets.PYPI_TOKEN }}
-        # env:
-        #   PYPI_USER: ${{ secrets.PYPI_TOKENU }}
-        #   PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
-        # run: |
-        #   echo ${#PYPI_USER}
-        #   echo ${#PYPI_TOKEN}
-        #   echo python3 -m twine upload -u ${{ secrets.PYPI_TOKENU }} -p ${{ secrets.PYPI_TOKEN }} --verbose dist/rfswarm*
+        # uses: pypa/gh-action-pypi-publish@release/v1
+        # with:
+        #   verbose: true
+        #   password: ${{ secrets.PYPI_TOKEN }}
+        env:
+          # PYPI_USER: ${{ secrets.PYPI_TOKENU }}
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          echo ${#PYPI_TOKEN}
+          echo python3 -m twine upload -u __token__ -p ${{ secrets.PYPI_TOKEN }} --verbose dist/rfswarm*
