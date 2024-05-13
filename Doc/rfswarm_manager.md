@@ -108,7 +108,7 @@ By configuring this setting you can adjust which keyword's response times are re
 If you change this setting here from the default, then the agent setting will be overridden with the settings used here for all test groups.
 
 | agent ini setting | scenario setting | test group setting | result |
-|---|---|---|
+|---|---|---|---|
 | default | default | default | default (BuiltIn,String,OperatingSystem,perftest) |
 | configured | default | default | agent ini setting |
 | default | configured | default | scenario setting |
