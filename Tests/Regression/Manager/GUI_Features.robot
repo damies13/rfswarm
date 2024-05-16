@@ -40,7 +40,7 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 		END
 		Press Key.tab 2 Times
 		Click Button	selected_runscriptrow
-		Select Robot File	${robot_data}[0]
+		Select Robot File OS DIALOG		${robot_data}[0]
 		Click Button	selected_select_test_case
 		Click Button	select_example
 		Press Key.tab 3 Times
@@ -88,7 +88,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 		Sleep	2
 		Press Key.tab 6 Times
 		Click Button	selected_runscriptrow
-		Select Robot File	${robot_data}[0]
+		Select Robot File OS DIALOG		${robot_data}[0]
 		Click Button	selected_select_test_case
 		Click Button	select_example
 		Press Key.tab 2 Times
@@ -124,9 +124,9 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
-	...    Set Test Variable	@{mngr_options}	-g	1					AND
+	...    Set Test Variable	@{mngr_options}	-g	1						AND
 	...    Set INI Window Size		1200	600								AND
-	...    Open Manager GUI		${mngr_options}							AND
+	...    Open Manager GUI		${mngr_options}								AND
 	...    Create Robot File
 
 	@{settings_locations}	Create List
@@ -155,7 +155,7 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 		END
 		Press Key.tab 2 Times
 		Click Button	selected_runscriptrow
-		Select Robot File	${robot_data}[0]
+		Select Robot File OS DIALOG		${robot_data}[0]
 		Click Button	selected_select_test_case
 		Click Button	select_example
 		Press Key.tab 2 Times
@@ -182,6 +182,115 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	...    Delete Scenario File	test_scenario				AND
 	...    Delete Robot File								AND
 	...    Delete Scenario File	${scenario_name}
+
+Verify Scenario File Is Updated Correctly When Scripts Are Removed
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #58
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Open Manager GUI													AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Create Robot File	name=example1.robot	file_content=***Test Case***\nExample Test Case1\n	AND
+	...    Create Robot File	name=example2.robot	file_content=***Test Case***\nExample Test Case2\n	AND
+	...    Create Robot File	name=example3.robot	file_content=***Test Case***\nExample Test Case3\n	AND
+	...    Create Robot File	name=example4.robot	file_content=***Test Case***\nExample Test Case4\n	AND
+	...    Create Robot File	name=example5.robot	file_content=***Test Case***\nExample Test Case5\n
+
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#58${/}test_scenario.rfs
+	Copy File	${scenariofile}		${global_path}
+
+	@{expected_robot_data3}	Create List		example3.robot	Example Test Case3
+	@{expected_run_robots3}	Create List		18
+	@{expected_run_times3}	Create List		19	20	21
+	&{expected_row_settings_data3}	Create Dictionary
+	...    exclude_libraries=row3el
+	...    robot_options=row3ro
+	...    test_repeater=True
+	...    inject_sleep=True
+	...    inject_sleep_min=30
+	...    inject_sleep_max=60
+
+	@{expected_robot_data5}	Create List		example5.robot	Example Test Case5
+	@{expected_run_robots5}	Create List		${None}	26
+	@{expected_run_times5}	Create List		${None}	${None}	${None}	27	28	29
+	&{expected_row_settings_data5}	Create Dictionary
+	...    exclude_libraries=row5el
+	...    robot_options=row5ro
+	...    test_repeater=True
+	...    inject_sleep=True
+	...    inject_sleep_min=30
+	...    inject_sleep_max=60
+
+	Click Button	runopen
+	Open Scenario File OS DIALOG	${scenario_name}
+	Click Button	rundelrow
+	Click Button	rundelrow
+	Click Label With Vertical Offset	button_rundelrow	35
+	Click Button	runsave
+
+	${scenario_content}=	Get scenario file content	${global_path}	${scenario_name}
+	@{scenario_content_list}=	Split String	${scenario_content}
+
+	Verify Scenario File Robot Data		${scenario_content_list}	${expected_robot_data3}			${1}	${1}
+	Verify Scenario File Robots			${scenario_content_list}	${expected_run_robots3}			${1}	${1}
+	Verify Scenario File Times			${scenario_content_list}	${expected_run_times3}			${1}	${1}
+	Verify Scenario Test Row Settings	${scenario_content_list}	${expected_row_settings_data3}	${1}	${1}
+
+	Verify Scenario File Robot Data		${scenario_content_list}	${expected_robot_data5}			${2}	${2}
+	Verify Scenario File Robots			${scenario_content_list}	${expected_run_robots5}			${2}	${2}
+	Verify Scenario File Times			${scenario_content_list}	${expected_run_times5}			${2}	${2}
+	Verify Scenario Test Row Settings	${scenario_content_list}	${expected_row_settings_data5}	${2}	${2}
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Delete Robot File	name=example1.robot			AND
+	...    Delete Robot File	name=example2.robot			AND
+	...    Delete Robot File	name=example3.robot			AND
+	...    Delete Robot File	name=example4.robot			AND
+	...    Delete Robot File	name=example5.robot			AND
+	...    Delete Scenario File		${scenario_name}
+
+Verify the Manager Handles Corrupted Scenario Files
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #58
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Open Manager GUI													AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Create Robot File
+
+	${scenario_name}=	Set Variable	test_scenario_corrupted
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#58${/}test_scenario_corrupted.rfs
+	Copy File	${scenariofile}		${global_path}
+
+	@{expected_robot_data}	Create List		example.robot	Example Test Case
+	@{expected_run_robots}	Create List		71
+	@{expected_run_times}	Create List		72	73	74
+	&{expected_row_settings_data}	Create Dictionary
+	...    exclude_libraries=row7el
+	...    robot_options=row7ro
+	...    test_repeater=True
+	...    inject_sleep=True
+	...    inject_sleep_min=70
+	...    inject_sleep_max=75
+
+	Click Button	runopen
+	Open Scenario File OS DIALOG	${scenario_name}
+	Click Button	runsave
+
+	${scenario_content}=	Get scenario file content	${global_path}	${scenario_name}
+	@{scenario_content_list}=	Split String	${scenario_content}
+
+	Verify Scenario File Robot Data		${scenario_content_list}	${expected_robot_data}			${1}	${1}
+	Verify Scenario File Robots			${scenario_content_list}	${expected_run_robots}			${1}	${1}
+	Verify Scenario File Times			${scenario_content_list}	${expected_run_times}			${1}	${1}
+	Verify Scenario Test Row Settings	${scenario_content_list}	${expected_row_settings_data}	${1}	${1}
+
+	# Run Keyword		Close Manager GUI ${platform}
+	# Open Manager GUI	${mngr_options}
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Delete Robot File								AND
+	...    Delete Scenario File		${scenario_name}
 
 Verify If Manager Saves Inject Sleep From Scenario Wide Settings
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
@@ -809,7 +918,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	Press Key.tab 1 Times
 	Type	60
 	Click Button	runscriptrow
-	Select Robot File	${robot_data}[0]
+	Select Robot File OS DIALOG		${robot_data}[0]
 	Select 1 Robot Test Case
 	Check If The Agent Is Ready
 	Click Tab	Plan
@@ -837,7 +946,7 @@ Check If Test Scenario Run Will Stop Gradually
 	Press Key.tab 1 Times
 	Type	60
 	Click Button	runscriptrow
-	Select Robot File	${robot_data}[0]
+	Select Robot File OS DIALOG		${robot_data}[0]
 	Select 1 Robot Test Case
 	Check If The Agent Is Ready
 	Click Tab	Plan

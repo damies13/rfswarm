@@ -440,6 +440,7 @@ Change Test Group Settings
 			Click CheckBox	checked		injectsleep
 		END
 	END
+	# TODO: disableloglog, disablelogreport, disablelogoutput
 
 	Test Group Save Settings
 
@@ -500,6 +501,7 @@ Change Scenario Wide Settings
 			Click CheckBox	checked		injectsleep
 		END
 	END
+	# TODO: disableloglog, disablelogreport, disablelogoutput, bindipaddres, bindport
 
 	Click Button	ok
 
@@ -516,7 +518,12 @@ Change ${str1} With ${str2} In ${file}
 	${file_content}	Replace String	${file_content}	${str1}	${str2}
 	Create File		${file}	${file_content}
 
-Select Robot File
+Select ${n} Robot Test Case
+	Click Button	select_test_case
+	Press Key.down ${n} Times
+	Press Combination	Key.enter
+
+Select Robot File OS DIALOG
 	[Arguments]		${robot_file_name}
 	Sleep	2
 	${robot_file_name}=		Set Variable		${robot_file_name}
@@ -528,11 +535,6 @@ Select Robot File
 	Take A Screenshot
 	Click Dialog Button		open
 	Sleep	1
-
-Select ${n} Robot Test Case
-	Click Button	select_test_case
-	Press Key.down ${n} Times
-	Press Combination	Key.enter
 
 Save Scenario File OS DIALOG
 	[Arguments]		${scenario_name}
@@ -674,6 +676,9 @@ Verify Scenario File Robots
 	FOR  ${rows}  IN RANGE  ${start_group}	${end_group + 1}
 		${row}	Set Variable	[${rows}]	#[1], [2], [3]
 		${i}=	Get Index From List		${scenario_content_list}		${row}
+		IF  '${i}' == '-1'
+			Fail	msg=Cant find index ${row} in scenario file!
+		END
 		Log		${row}
 
 		${robots_offset}	Get Index From List 	${scenario_content_list}	robots	start=${i}
@@ -687,6 +692,9 @@ Verify Scenario File Times
 	FOR  ${rows}  IN RANGE  ${start_group}	${end_group + 1}
 		${row}	Set Variable	[${rows}]
 		${i}=	Get Index From List		${scenario_content_list}		${row}
+		IF  '${i}' == '-1'
+			Fail	msg=Cant find index ${row} in scenario file!
+		END
 		Log		${row}
 		${time_indx}=	Evaluate	${rows - 1}*3
 
@@ -711,14 +719,22 @@ Verify Scenario File Robot Data
 	FOR  ${rows}  IN RANGE  ${start_group}	${end_group + 1}
 		${row}	Set Variable	[${rows}]
 		${i}=	Get Index From List		${scenario_content_list}		${row}
+		IF  '${i}' == '-1'
+			Fail	msg=Cant find index ${row} in scenario file!
+		END
 		Log		${row}
 
 		${test_offset}		Get Index From List 	${scenario_content_list}	test	start=${i}
 		Should Be Equal		test	${scenario_content_list}[${test_offset}]
-		${test_name}=	Catenate
-		...    ${scenario_content_list[${test_offset + 2}]}
-		...    ${scenario_content_list[${test_offset + 3}]}
-		...    ${scenario_content_list[${test_offset + 4}]}
+
+		${next_equal_offset}		Get Index From List		
+		...    ${scenario_content_list}	=	start=${test_offset + 2}
+		@{test_name}	Create List
+		FOR  ${j}  IN RANGE  0  ${next_equal_offset - 1} - ${test_offset} - ${2}
+			Append To List	${test_name}	${scenario_content_list[${test_offset + 2 + ${j}}]}
+		END
+		${test_name}=	Catenate	@{test_name}
+
 		Should Be Equal		${robot_data}[1]	${test_name}
 		...    msg=Robot test file name did not save correctly [settings != scenario]!
 
@@ -733,21 +749,39 @@ Verify Scenario Test Row Settings
 	FOR  ${rows}  IN RANGE  ${start_group}	${end_group + 1}
 		${row}	Set Variable	[${rows}]
 		${i}=	Get Index From List		${scenario_content_list}		${row}
+		IF  '${i}' == '-1'
+			Fail	msg=Cant find index ${row} in scenario file!
+		END
 		Log		${row}
 
 		IF  'exclude_libraries' in ${row_settings_data}
 			${exlibraries_offset}	Get Index From List 	${scenario_content_list}	excludelibraries	start=${i}
 			Should Be Equal		excludelibraries	${scenario_content_list}[${exlibraries_offset}]
-			Should Be Equal		${row_settings_data['exclude_libraries']}	${scenario_content_list}[${exlibraries_offset + 2}]
+
+			${next_equal_offset}		Get Index From List		
+			...    ${scenario_content_list}	=	start=${exlibraries_offset + 2}
+			@{exlibraries}	Create List
+			FOR  ${j}  IN RANGE  0  ${next_equal_offset - 1} - ${exlibraries_offset} - ${2}
+				Append To List	${exlibraries}	${scenario_content_list[${exlibraries_offset + 2 + ${j}}]}
+			END
+			${exlibraries}=	Catenate	@{exlibraries}
+
+			Should Be Equal		${row_settings_data['exclude_libraries']}	${exlibraries}
 			...    msg=Exclude Libraries did not save correctly [settings != scenario]!
 		END
 
 		IF  'robot_options' in ${row_settings_data}
 			${robot_options_offset}		Get Index From List		${scenario_content_list}	robotoptions	start=${i}
 			Should Be Equal		robotoptions	${scenario_content_list}[${robot_options_offset}]
-			${robot_options}=	Catenate
-			...    ${scenario_content_list[${robot_options_offset + 2}]}
-			...    ${scenario_content_list[${robot_options_offset + 3}]}
+
+			${next_equal_offset}		Get Index From List		
+			...    ${scenario_content_list}	=	start=${robot_options_offset + 2}
+			@{robot_options}	Create List
+			FOR  ${j}  IN RANGE  0  ${next_equal_offset - 1} - ${robot_options_offset} - ${2}
+				Append To List	${robot_options}	${scenario_content_list[${robot_options_offset + 2 + ${j}}]}
+			END
+			${robot_options}=	Catenate	@{robot_options}
+
 			Should Be Equal		${row_settings_data['robot_options']}	${robot_options}
 			...    msg=Robot options did not save correctly [settings != scenario]!
 		END
@@ -789,16 +823,31 @@ Verify Scenario Wide Settings Data
 	IF  'exclude_libraries' in ${wide_settings_data}
 		${exlibraries_offset}	Get Index From List 	${scenario_content_list}	excludelibraries	start=${i}	end=${first_group}
 		Should Be Equal		excludelibraries	${scenario_content_list}[${exlibraries_offset}]
-		Should Be Equal		${wide_settings_data['exclude_libraries']}	${scenario_content_list}[${exlibraries_offset + 2}]
+
+		${next_equal_offset}		Get Index From List		
+		...    ${scenario_content_list}	=	start=${exlibraries_offset + 2}
+		@{exlibraries}	Create List
+		FOR  ${j}  IN RANGE  0  ${next_equal_offset - 1} - ${exlibraries_offset} - ${2}
+			Append To List	${exlibraries}	${scenario_content_list[${exlibraries_offset + 2 + ${j}}]}
+		END
+		${exlibraries}=	Catenate	@{exlibraries}
+
+		Should Be Equal		${wide_settings_data['exclude_libraries']}	${exlibraries}
 		...    msg=Exclude Libraries did not save correctly [settings != scenario]!
 	END
 
 	IF  'robot_options' in ${wide_settings_data}
 		${robot_options_offset}		Get Index From List		${scenario_content_list}	robotoptions	start=${i}	end=${first_group}
 		Should Be Equal		robotoptions	${scenario_content_list}[${robot_options_offset}]
-		${robot_options}=	Catenate
-		...    ${scenario_content_list[${robot_options_offset + 2}]}
-		...    ${scenario_content_list[${robot_options_offset + 3}]}
+
+		${next_equal_offset}		Get Index From List		
+		...    ${scenario_content_list}	=	start=${robot_options_offset + 2}
+		@{robot_options}	Create List
+		FOR  ${j}  IN RANGE  0  ${next_equal_offset - 1} - ${robot_options_offset} - ${2}
+			Append To List	${robot_options}	${scenario_content_list[${robot_options_offset + 2 + ${j}}]}
+		END
+		${robot_options}=	Catenate	@{robot_options}
+
 		Should Be Equal		${wide_settings_data['robot_options']}	${robot_options}
 		...    msg=Robot options did not save correctly [settings != scenario]!
 	END
