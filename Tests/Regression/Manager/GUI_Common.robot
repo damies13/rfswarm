@@ -813,7 +813,29 @@ Verify Scenario Test Row Settings
 			Should Be Equal		${row_settings_data['inject_sleep_max']}	${scenario_content_list}[${injectsleep_max_offset + 2}]
 			...    msg=Inject sleep maximum did not save correctly [settings != scenario]!
 		END
+		
+		IF  'disablelog_log' in ${row_settings_data}
+			${disablelog_log_offset}		Get Index From List		${scenario_content_list}	disableloglog	start=${i}
+			Should Be Equal		disableloglog	${scenario_content_list}[${disablelog_log_offset}]
+			Should Be Equal		${row_settings_data['disablelog_log']}		${scenario_content_list}[${disablelog_log_offset + 2}]
+			...    msg=Disablelog Robot Logs: log.html did not save correctly [settings != scenario]!
+		END
+
+		IF  'disablelog_report' in ${row_settings_data}
+			${disablelog_report_offset}		Get Index From List		${scenario_content_list}	disablelogreport	start=${i}
+			Should Be Equal		disablelogreport	${scenario_content_list}[${disablelog_report_offset}]
+			Should Be Equal		${row_settings_data['disablelog_report']}		${scenario_content_list}[${disablelog_report_offset + 2}]
+			...    msg=Disablelog Robot Logs: report.html did not save correctly [settings != scenario]!
+		END
+
+		IF  'disablelog_output' in ${row_settings_data}
+			${disablelog_output_offset}		Get Index From List		${scenario_content_list}	disablelogoutput	start=${i}
+			Should Be Equal		disablelogoutput	${scenario_content_list}[${disablelog_output_offset}]
+			Should Be Equal		${row_settings_data['disablelog_output']}		${scenario_content_list}[${disablelog_output_offset + 2}]
+			...    msg=Disablelog Robot Logs: output.xml did not save correctly [settings != scenario]!
+		END
 	END
+	# TODO: Agent filter
 
 Verify Scenario Wide Settings Data
 	[Arguments]		${scenario_content_list}	${wide_settings_data}
@@ -879,7 +901,28 @@ Verify Scenario Wide Settings Data
 		Should Be Equal		${wide_settings_data['inject_sleep_max']}	${scenario_content_list}[${injectsleep_max_offset + 2}]
 		...    msg=Inject sleep maximum did not save correctly [settings != scenario]!
 	END
-	# TODO: disableloglog, disablelogreport, disablelogoutput, bindipaddres, bindport
+
+	IF  'disablelog_log' in ${wide_settings_data}
+		${disablelog_log_offset}		Get Index From List		${scenario_content_list}	disableloglog	start=${i}	end=${first_group}
+		Should Be Equal		disableloglog	${scenario_content_list}[${disablelog_log_offset}]
+		Should Be Equal		${wide_settings_data['disablelog_log']}		${scenario_content_list}[${disablelog_log_offset + 2}]
+		...    msg=Disablelog Robot Logs: log.html did not save correctly [settings != scenario]!
+	END
+
+	IF  'disablelog_report' in ${wide_settings_data}
+		${disablelog_report_offset}		Get Index From List		${scenario_content_list}	disablelogreport	start=${i}	end=${first_group}
+		Should Be Equal		disablelogreport	${scenario_content_list}[${disablelog_report_offset}]
+		Should Be Equal		${wide_settings_data['disablelog_report']}		${scenario_content_list}[${disablelog_report_offset + 2}]
+		...    msg=Disablelog Robot Logs: report.html did not save correctly [settings != scenario]!
+	END
+
+	IF  'disablelog_output' in ${wide_settings_data}
+		${disablelog_output_offset}		Get Index From List		${scenario_content_list}	disablelogoutput	start=${i}	end=${first_group}
+		Should Be Equal		disablelogoutput	${scenario_content_list}[${disablelog_output_offset}]
+		Should Be Equal		${wide_settings_data['disablelog_output']}		${scenario_content_list}[${disablelog_output_offset + 2}]
+		...    msg=Disablelog Robot Logs: output.xml did not save correctly [settings != scenario]!
+	END
+	# TODO: bindipaddres, bindport
 
 Check That The Scenario File Opens Correctly
 	[Arguments]		${scenario_name}	${scenario_content}

@@ -208,6 +208,9 @@ Verify Scenario File Is Updated Correctly When Scripts Are Removed
 	...    inject_sleep=True
 	...    inject_sleep_min=30
 	...    inject_sleep_max=60
+	...    disablelog_log=True
+	...    disablelog_report=True
+	...    disablelog_output=True
 
 	@{expected_robot_data5}	Create List		example5.robot	Example Test Case5
 	@{expected_run_robots5}	Create List		${None}	26
@@ -219,6 +222,9 @@ Verify Scenario File Is Updated Correctly When Scripts Are Removed
 	...    inject_sleep=True
 	...    inject_sleep_min=30
 	...    inject_sleep_max=60
+	...    disablelog_log=True
+	...    disablelog_report=True
+	...    disablelog_output=True
 
 	Click Button	runopen
 	Open Scenario File OS DIALOG	${scenario_name}
@@ -249,28 +255,46 @@ Verify Scenario File Is Updated Correctly When Scripts Are Removed
 	...    Delete Robot File	name=example5.robot			AND
 	...    Delete Scenario File		${scenario_name}
 
-Verify the Manager Handles Corrupted Scenario Files
+Verify the Manager Handles Corrupted Scenario Files And Repairs It
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #58
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Open Manager GUI													AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
-	...    Create Robot File
+	...    Create Robot File	name=example4.robot	file_content=***Test Case***\nExample Test Case4\n	AND
+	...    Create Robot File	name=example7.robot	file_content=***Test Case***\nExample Test Case7\n
 
 	${scenario_name}=	Set Variable	test_scenario_corrupted
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#58${/}test_scenario_corrupted.rfs
 	Copy File	${scenariofile}		${global_path}
 
-	@{expected_robot_data}	Create List		example.robot	Example Test Case
-	@{expected_run_robots}	Create List		71
-	@{expected_run_times}	Create List		72	73	74
-	&{expected_row_settings_data}	Create Dictionary
-	...    exclude_libraries=row7el
-	...    robot_options=row7ro
+	@{expected_robot_data4}	Create List		example4.robot	Example Test Case4
+	@{expected_run_robots4}	Create List		22
+	@{expected_run_times4}	Create List		23	24	25
+	&{expected_row_settings_data4}	Create Dictionary
+	...    exclude_libraries=row4el
+	...    robot_options=row4ro
 	...    test_repeater=True
 	...    inject_sleep=True
 	...    inject_sleep_min=70
 	...    inject_sleep_max=75
+	...    disablelog_log=True
+	...    disablelog_report=True
+	...    disablelog_output=True
+
+	@{expected_robot_data7}	Create List		example7.robot	Example Test Case7
+	@{expected_run_robots7}	Create List		${None}	71
+	@{expected_run_times7}	Create List		${None}	${None}	${None}	72	73	74
+	&{expected_row_settings_data7}	Create Dictionary
+	...    exclude_libraries=row7el
+	...    robot_options=row7ro
+	...    test_repeater=True
+	...    inject_sleep=True
+	...    inject_sleep_min=30
+	...    inject_sleep_max=60
+	...    disablelog_log=True
+	...    disablelog_report=True
+	...    disablelog_output=True
 
 	Click Button	runopen
 	Open Scenario File OS DIALOG	${scenario_name}
@@ -279,13 +303,15 @@ Verify the Manager Handles Corrupted Scenario Files
 	${scenario_content}=	Get scenario file content	${global_path}	${scenario_name}
 	@{scenario_content_list}=	Split String	${scenario_content}
 
-	Verify Scenario File Robot Data		${scenario_content_list}	${expected_robot_data}			${1}	${1}
-	Verify Scenario File Robots			${scenario_content_list}	${expected_run_robots}			${1}	${1}
-	Verify Scenario File Times			${scenario_content_list}	${expected_run_times}			${1}	${1}
-	Verify Scenario Test Row Settings	${scenario_content_list}	${expected_row_settings_data}	${1}	${1}
+	Verify Scenario File Robot Data		${scenario_content_list}	${expected_robot_data4}			${1}	${1}
+	Verify Scenario File Robots			${scenario_content_list}	${expected_run_robots4}			${1}	${1}
+	Verify Scenario File Times			${scenario_content_list}	${expected_run_times4}			${1}	${1}
+	Verify Scenario Test Row Settings	${scenario_content_list}	${expected_row_settings_data4}	${1}	${1}
 
-	# Run Keyword		Close Manager GUI ${platform}
-	# Open Manager GUI	${mngr_options}
+	Verify Scenario File Robot Data		${scenario_content_list}	${expected_robot_data7}			${2}	${2}
+	Verify Scenario File Robots			${scenario_content_list}	${expected_run_robots7}			${2}	${2}
+	Verify Scenario File Times			${scenario_content_list}	${expected_run_times7}			${2}	${2}
+	Verify Scenario Test Row Settings	${scenario_content_list}	${expected_row_settings_data7}	${2}	${2}
 
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
