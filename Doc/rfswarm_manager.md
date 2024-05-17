@@ -107,15 +107,15 @@ The default value is "BuiltIn,String,OperatingSystem,perftest", this is the same
 By configuring this setting you can adjust which keyword's response times are reported in the test results.
 If you change this setting here from the default, then the agent setting will be overridden with the settings used here for all test groups.
 
-|agent ini setting|scenario setting|test group setting|result|
-|---|---|---|
-|default|default|default|default (BuiltIn,String,OperatingSystem,perftest)|
-|configured|default|default|agent ini setting|
-|default|configured|default|scenario setting|
-|default|default|configured|test group setting|
-|default|configured|configured|test group setting|
-|configured|configured|default|scenario setting|
-|configured|configured|configured|test group setting|
+| agent ini setting | scenario setting | test group setting | result |
+|---|---|---|---|
+| default | default | default | default (BuiltIn,String,OperatingSystem,perftest) |
+| configured | default | default | agent ini setting |
+| default | configured | default | scenario setting |
+| default | default | configured | test group setting |
+| default | configured | configured | test group setting |
+| configured | configured | default | scenario setting |
+| configured | configured | configured | test group setting |
 
 ###### Robot Options
 By default this setting is blank and in most cases wouldn't be used, it allows you to pass additional command-line options to the robot executable, to find out what options can be passed run
