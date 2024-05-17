@@ -26,7 +26,7 @@ if [[ "$version" =~ v[0-9]\. ]]; then
 		sed -i '' -e "s/version *= *\"[^\"]*\",/version=\"${numver}\",/" $(find . -name "*.py")
 		#	Version Test
 		sed -i '' -e "s/#    Version .*/#    Version ${numver}/" $(find . -name "*.py")
-		sed -i '' -e "s/\(.*\)branch=[^&]*/\1branch=${versionurl}/" README.md
+		# sed -i '' -e "s/\(.*\)branch=[^&]*/\1branch=${versionurl}/" README.md
 	else
 		# Missing whitespace around operator (E225)	-	There should be one space before and after all operators.
 		sed -i -e "s/version *= *\"[^\"]*\"[^,]/version = \"${numver}\"/" $(find . -name "*.py")
@@ -34,7 +34,7 @@ if [[ "$version" =~ v[0-9]\. ]]; then
 		# Unexpected spaces around keyword / parameter equals (E251)	-	There should be no spaces before or after the = in a function definition.
 		sed -i -e "s/version *= *\"[^\"]*\",/version=\"${numver}\",/" $(find . -name "*.py")
 		sed -i -e "s/#    Version .*/#    Version ${numver}/" $(find . -name "*.py")
-		sed -i -e "s/\(.*\)branch=[^&]*/\1branch=${versionurl}/" README.md
+		# sed -i -e "s/\(.*\)branch=[^&]*/\1branch=${versionurl}/" README.md
 	fi
 
 
@@ -48,13 +48,13 @@ if [[ "$version" =~ v[0-9]\. ]]; then
 else
 	echo "version ($version) not pattern 'v[0-9]\.'"
 	echo "OS: $OS"
-	if [ "$OS" == 'Darwin' ]; then
-		echo sed -i '' -e '"s/\(.*\)branch=[^&]*/\1branch=${versionurl}/"' README.md
-		sed -i '' -e "s/\(.*\)branch=[^&]*/\1branch=${versionurl}/" README.md
-	else
-		echo sed -i -e '"s/\(.*\)branch=[^&]*/\1branch=${versionurl}/"' README.md
-		sed -i -e "s/\(.*\)branch=[^&]*/\1branch=${versionurl}/" README.md
-	fi
+	# if [ "$OS" == 'Darwin' ]; then
+	# 	echo sed -i '' -e '"s/\(.*\)branch=[^&]*/\1branch=${versionurl}/"' README.md
+	# 	sed -i '' -e "s/\(.*\)branch=[^&]*/\1branch=${versionurl}/" README.md
+	# else
+	# 	echo sed -i -e '"s/\(.*\)branch=[^&]*/\1branch=${versionurl}/"' README.md
+	# 	sed -i -e "s/\(.*\)branch=[^&]*/\1branch=${versionurl}/" README.md
+	# fi
 
 	if ! git diff-index --quiet HEAD --; then
 		# echo "commit: Update version to $version"
