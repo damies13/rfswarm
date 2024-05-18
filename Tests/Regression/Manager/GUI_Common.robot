@@ -682,7 +682,7 @@ Verify Scenario File Robots
 		Log		${row}
 
 		${robots_offset}	Get Index From List 	${scenario_content_list}	robots	start=${i}
-		Should Be Equal		robots	${scenario_content_list}[${robots_offset}]
+		Should Be Equal		robots	${scenario_content_list}[${robots_offset}]	msg=Robots is missing!
 		Should Be Equal		${run_robots}[${rows - 1}]	${scenario_content_list}[${robots_offset + 2}]
 		...    msg=Robots value did not save correctly [settings != scenario]!
 	END
@@ -699,17 +699,17 @@ Verify Scenario File Times
 		${time_indx}=	Evaluate	${rows - 1}*3
 
 		${delay_offset}		Get Index From List 	${scenario_content_list}	delay	start=${i}
-		Should Be Equal		delay	${scenario_content_list}[${delay_offset}]
+		Should Be Equal		delay	${scenario_content_list}[${delay_offset}]	msg=Delay is missing!
 		Should Be Equal		${run_times_in_s}[${time_indx}]		${scenario_content_list}[${delay_offset + 2}]
 		...    msg=Delay time value did not save correctly [settings != scenario]!
 
 		${rampup_offset}	Get Index From List 	${scenario_content_list}	rampup	start=${i}
-		Should Be Equal		rampup	${scenario_content_list}[${rampup_offset}]
+		Should Be Equal		rampup	${scenario_content_list}[${rampup_offset}]	msg=Rampup is missing!
 		Should Be Equal		${run_times_in_s}[${time_indx + 1}]		${scenario_content_list}[${rampup_offset + 2}]
 		...    msg=Rump-up time value did not save correctly [settings != scenario]!
 
 		${run_offset}		Get Index From List 	${scenario_content_list}	run	start=${i}
-		Should Be Equal		run		${scenario_content_list}[${run_offset}]
+		Should Be Equal		run		${scenario_content_list}[${run_offset}]		msg=Run is missing!
 		Should Be Equal		${run_times_in_s}[${time_indx + 2}]		${scenario_content_list}[${run_offset + 2}]
 		...    msg=Run time value did not save correctly [settings != scenario]!
 	END
@@ -725,7 +725,7 @@ Verify Scenario File Robot Data
 		Log		${row}
 
 		${test_offset}		Get Index From List 	${scenario_content_list}	test	start=${i}
-		Should Be Equal		test	${scenario_content_list}[${test_offset}]
+		Should Be Equal		test	${scenario_content_list}[${test_offset}]	msg=Test is missing!
 
 		${next_equal_offset}		Get Index From List		
 		...    ${scenario_content_list}	=	start=${test_offset + 2}
@@ -739,7 +739,7 @@ Verify Scenario File Robot Data
 		...    msg=Robot test file name did not save correctly [settings != scenario]!
 
 		${script_offset}		Get Index From List 	${scenario_content_list}	script	start=${i}
-		Should Be Equal		script	${scenario_content_list}[${script_offset}]
+		Should Be Equal		script	${scenario_content_list}[${script_offset}]	msg=Script is missing!
 		Should Be Equal		${robot_data}[0]	${scenario_content_list}[${script_offset + 2}]
 		...    msg=Robot script name did not save correctly [settings != scenario]!
 	END
@@ -757,6 +757,7 @@ Verify Scenario Test Row Settings
 		IF  'exclude_libraries' in ${row_settings_data}
 			${exlibraries_offset}	Get Index From List 	${scenario_content_list}	excludelibraries	start=${i}
 			Should Be Equal		excludelibraries	${scenario_content_list}[${exlibraries_offset}]
+			...    msg=Exclude Libraries are missing!
 
 			${next_equal_offset}		Get Index From List		
 			...    ${scenario_content_list}	=	start=${exlibraries_offset + 2}
@@ -773,6 +774,7 @@ Verify Scenario Test Row Settings
 		IF  'robot_options' in ${row_settings_data}
 			${robot_options_offset}		Get Index From List		${scenario_content_list}	robotoptions	start=${i}
 			Should Be Equal		robotoptions	${scenario_content_list}[${robot_options_offset}]
+			...    msg=Robot Options are missing!
 
 			${next_equal_offset}		Get Index From List		
 			...    ${scenario_content_list}	=	start=${robot_options_offset + 2}
@@ -789,6 +791,7 @@ Verify Scenario Test Row Settings
 		IF  'test_repeater' in ${row_settings_data}
 			${repeater_offset}		Get Index From List		${scenario_content_list}	testrepeater	start=${i}
 			Should Be Equal		testrepeater	${scenario_content_list}[${repeater_offset}]
+			...    msg=Test Repeater is missing!
 			Should Be Equal		${row_settings_data['test_repeater']}	${scenario_content_list}[${repeater_offset + 2}]
 			...    msg=Test repeater did not save correctly [settings != scenario]!
 		END
@@ -796,6 +799,7 @@ Verify Scenario Test Row Settings
 		IF  'inject_sleep' in ${row_settings_data}
 			${injectsleep_offset}		Get Index From List		${scenario_content_list}	injectsleepenabled	start=${i}
 			Should Be Equal		injectsleepenabled	${scenario_content_list}[${injectsleep_offset}]
+			...    msg=Inject Sleep Enabled is missing!
 			Should Be Equal		${row_settings_data['inject_sleep']}	${scenario_content_list}[${injectsleep_offset + 2}]
 			...    msg=Inject sleep enabled did not save correctly [settings != scenario]!
 		END
@@ -803,6 +807,7 @@ Verify Scenario Test Row Settings
 		IF  'inject_sleep_min' in ${row_settings_data}
 			${injectsleep_min_offset}		Get Index From List		${scenario_content_list}	injectsleepminimum 	start=${i}
 			Should Be Equal		injectsleepminimum 	${scenario_content_list}[${injectsleep_min_offset}]
+			...    msg=Inject Sleep Minimum is missing!
 			Should Be Equal		${row_settings_data['inject_sleep_min']}	${scenario_content_list}[${injectsleep_min_offset + 2}]
 			...    msg=Inject sleep minimum did not save correctly [settings != scenario]!
 		END
@@ -810,6 +815,7 @@ Verify Scenario Test Row Settings
 		IF  'inject_sleep_max' in ${row_settings_data}
 			${injectsleep_max_offset}		Get Index From List		${scenario_content_list}	injectsleepmaximum 	start=${i}
 			Should Be Equal		injectsleepmaximum 	${scenario_content_list}[${injectsleep_max_offset}]
+			...    msg=Inject Sleep Maximum is missing!
 			Should Be Equal		${row_settings_data['inject_sleep_max']}	${scenario_content_list}[${injectsleep_max_offset + 2}]
 			...    msg=Inject sleep maximum did not save correctly [settings != scenario]!
 		END
@@ -817,6 +823,7 @@ Verify Scenario Test Row Settings
 		IF  'disablelog_log' in ${row_settings_data}
 			${disablelog_log_offset}		Get Index From List		${scenario_content_list}	disableloglog	start=${i}
 			Should Be Equal		disableloglog	${scenario_content_list}[${disablelog_log_offset}]
+			...    msg=Disablelog log.html is missing!
 			Should Be Equal		${row_settings_data['disablelog_log']}		${scenario_content_list}[${disablelog_log_offset + 2}]
 			...    msg=Disablelog Robot Logs: log.html did not save correctly [settings != scenario]!
 		END
@@ -824,6 +831,7 @@ Verify Scenario Test Row Settings
 		IF  'disablelog_report' in ${row_settings_data}
 			${disablelog_report_offset}		Get Index From List		${scenario_content_list}	disablelogreport	start=${i}
 			Should Be Equal		disablelogreport	${scenario_content_list}[${disablelog_report_offset}]
+			...    msg=Disablelog report.html is missing!
 			Should Be Equal		${row_settings_data['disablelog_report']}		${scenario_content_list}[${disablelog_report_offset + 2}]
 			...    msg=Disablelog Robot Logs: report.html did not save correctly [settings != scenario]!
 		END
@@ -831,6 +839,7 @@ Verify Scenario Test Row Settings
 		IF  'disablelog_output' in ${row_settings_data}
 			${disablelog_output_offset}		Get Index From List		${scenario_content_list}	disablelogoutput	start=${i}
 			Should Be Equal		disablelogoutput	${scenario_content_list}[${disablelog_output_offset}]
+			...    msg=Disablelog output.xml is missing!
 			Should Be Equal		${row_settings_data['disablelog_output']}		${scenario_content_list}[${disablelog_output_offset + 2}]
 			...    msg=Disablelog Robot Logs: output.xml did not save correctly [settings != scenario]!
 		END
@@ -845,6 +854,7 @@ Verify Scenario Wide Settings Data
 	IF  'exclude_libraries' in ${wide_settings_data}
 		${exlibraries_offset}	Get Index From List 	${scenario_content_list}	excludelibraries	start=${i}	end=${first_group}
 		Should Be Equal		excludelibraries	${scenario_content_list}[${exlibraries_offset}]
+		...    msg=Exclude Libraries are missing!
 
 		${next_equal_offset}		Get Index From List		
 		...    ${scenario_content_list}	=	start=${exlibraries_offset + 2}
@@ -861,6 +871,7 @@ Verify Scenario Wide Settings Data
 	IF  'robot_options' in ${wide_settings_data}
 		${robot_options_offset}		Get Index From List		${scenario_content_list}	robotoptions	start=${i}	end=${first_group}
 		Should Be Equal		robotoptions	${scenario_content_list}[${robot_options_offset}]
+		...    msg=Robot options are missing!
 
 		${next_equal_offset}		Get Index From List		
 		...    ${scenario_content_list}	=	start=${robot_options_offset + 2}
@@ -877,6 +888,7 @@ Verify Scenario Wide Settings Data
 	IF  'test_repeater' in ${wide_settings_data}
 		${repeater_offset}		Get Index From List		${scenario_content_list}	testrepeater	start=${i}	end=${first_group}
 		Should Be Equal		testrepeater	${scenario_content_list}[${repeater_offset}]
+		...    msg=Test repeater is missing!
 		Should Be Equal		${wide_settings_data['test_repeater']}	${scenario_content_list}[${repeater_offset + 2}]
 		...    msg=Test repeater did not save correctly [settings != scenario]!
 	END
@@ -884,6 +896,7 @@ Verify Scenario Wide Settings Data
 	IF  'inject_sleep' in ${wide_settings_data}
 		${injectsleep_offset}		Get Index From List		${scenario_content_list}	injectsleepenabled	start=${i}	end=${first_group}
 		Should Be Equal		injectsleepenabled	${scenario_content_list}[${injectsleep_offset}]
+		...    msg=Inject Sleep Enabled is missing!
 		Should Be Equal		${wide_settings_data['inject_sleep']}	${scenario_content_list}[${injectsleep_offset + 2}]
 		...    msg=Inject sleep enabled did not save correctly [settings != scenario]!
 	END
@@ -891,6 +904,7 @@ Verify Scenario Wide Settings Data
 	IF  'inject_sleep_min' in ${wide_settings_data}
 		${injectsleep_min_offset}		Get Index From List		${scenario_content_list}	injectsleepminimum 	start=${i}	end=${first_group}
 		Should Be Equal		injectsleepminimum 	${scenario_content_list}[${injectsleep_min_offset}]
+		...    msg=Inject Sleep Minimum is missing!
 		Should Be Equal		${wide_settings_data['inject_sleep_min']}	${scenario_content_list}[${injectsleep_min_offset + 2}]
 		...    msg=Inject sleep minimum did not save correctly [settings != scenario]!
 	END
@@ -898,6 +912,7 @@ Verify Scenario Wide Settings Data
 	IF  'inject_sleep_max' in ${wide_settings_data}
 		${injectsleep_max_offset}		Get Index From List		${scenario_content_list}	injectsleepmaximum 	start=${i}	end=${first_group}
 		Should Be Equal		injectsleepmaximum 	${scenario_content_list}[${injectsleep_max_offset}]
+		...    msg=Inject Sleep Maximum is missing!
 		Should Be Equal		${wide_settings_data['inject_sleep_max']}	${scenario_content_list}[${injectsleep_max_offset + 2}]
 		...    msg=Inject sleep maximum did not save correctly [settings != scenario]!
 	END
@@ -905,6 +920,7 @@ Verify Scenario Wide Settings Data
 	IF  'disablelog_log' in ${wide_settings_data}
 		${disablelog_log_offset}		Get Index From List		${scenario_content_list}	disableloglog	start=${i}	end=${first_group}
 		Should Be Equal		disableloglog	${scenario_content_list}[${disablelog_log_offset}]
+		...    msg=Disablelog log.html is missing!
 		Should Be Equal		${wide_settings_data['disablelog_log']}		${scenario_content_list}[${disablelog_log_offset + 2}]
 		...    msg=Disablelog Robot Logs: log.html did not save correctly [settings != scenario]!
 	END
@@ -912,6 +928,7 @@ Verify Scenario Wide Settings Data
 	IF  'disablelog_report' in ${wide_settings_data}
 		${disablelog_report_offset}		Get Index From List		${scenario_content_list}	disablelogreport	start=${i}	end=${first_group}
 		Should Be Equal		disablelogreport	${scenario_content_list}[${disablelog_report_offset}]
+		...    msg=Disablelog report.html is missing!
 		Should Be Equal		${wide_settings_data['disablelog_report']}		${scenario_content_list}[${disablelog_report_offset + 2}]
 		...    msg=Disablelog Robot Logs: report.html did not save correctly [settings != scenario]!
 	END
@@ -919,6 +936,7 @@ Verify Scenario Wide Settings Data
 	IF  'disablelog_output' in ${wide_settings_data}
 		${disablelog_output_offset}		Get Index From List		${scenario_content_list}	disablelogoutput	start=${i}	end=${first_group}
 		Should Be Equal		disablelogoutput	${scenario_content_list}[${disablelog_output_offset}]
+		...    msg=Disablelog output.xml is missing!
 		Should Be Equal		${wide_settings_data['disablelog_output']}		${scenario_content_list}[${disablelog_output_offset + 2}]
 		...    msg=Disablelog Robot Logs: output.xml did not save correctly [settings != scenario]!
 	END
