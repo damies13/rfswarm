@@ -5,7 +5,7 @@ with open("README_PyPi.md", "r") as fh:
 
 setuptools.setup(
 	name="rfswarm-reporter",
-	version="1.4.0",
+	version="1.3.1",
 	author="damies13",
 	author_email="damies13+rfswarm@gmail.com",
 	description="rfswarm reporter",
@@ -21,6 +21,8 @@ setuptools.setup(
 	install_requires=['configparser', 'pillow>=9.1.0', 'pip>=21,>=22', 'matplotlib', 'python-docx', 'openpyxl', 'tzlocal>=4.1', 'lxml'],
 	classifiers=[
 		"Development Status :: 5 - Production/Stable",
+		"Framework :: Robot Framework",
+		"Framework :: Robot Framework :: Tool",
 		"Topic :: Software Development :: Testing",
 		"Programming Language :: Python :: 3.9",
 		"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
