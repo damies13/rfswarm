@@ -19,6 +19,8 @@ setuptools.setup(
 	install_requires=['configparser', 'HTTPServer', 'pillow>=9.1.0', 'psutil', 'pip>=21,>=22', 'matplotlib', 'requests'],
 	classifiers=[
 		"Development Status :: 5 - Production/Stable",
+		"Framework :: Robot Framework",
+		"Framework :: Robot Framework :: Tool",
 		"Topic :: Software Development :: Testing",
 		"Programming Language :: Python :: 3.7",
 		"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",

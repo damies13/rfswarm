@@ -16,6 +16,8 @@ setuptools.setup(
 	install_requires=['configparser', 'requests', 'robotframework', 'psutil'],
 	classifiers=[
 		"Development Status :: 5 - Production/Stable",
+		"Framework :: Robot Framework",
+		"Framework :: Robot Framework :: Tool",
 		"Topic :: Software Development :: Testing",
 		"Programming Language :: Python :: 3.6",
 		"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
