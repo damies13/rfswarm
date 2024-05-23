@@ -318,6 +318,36 @@ Verify the Manager Handles Corrupted Scenario Files And Repairs It
 	...    Delete Robot File								AND
 	...    Delete Scenario File		${scenario_name}
 
+Verify the Manager Handles Scenario Files With Missing Scripts Files
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #241
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Open Manager GUI													AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Create Robot File	name=example.robot	file_content=***Test Case***\nExample Test Case\n
+
+	${scenario_name}=	Set Variable	test_scenario_missing_file
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#241${/}test_scenario_missing_file.rfs
+	Copy File	${scenariofile}		${global_path}
+
+	Click Button	runopen
+	Open Scenario File OS DIALOG	${scenario_name}
+	Sleep	3
+	Take A Screenshot
+	Press key.enter 1 Times
+	${ini_content}=		Get Manager INI Data
+	${ini_content_list}=	Split String	${ini_content}	separator=\n
+	Should Contain	${ini_content_list}		scenariofile =${SPACE}		msg=Scenariofile ini section is not blank!
+	${running}= 	Is Process Running 	${process_manager}
+	IF 	not ${running}
+		Fail	RFSwarm manager crashed!
+	END
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Delete Robot File								AND
+	...    Delete Scenario File		${scenario_name}
+
 Verify If Manager Saves Inject Sleep From Scenario Wide Settings
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
