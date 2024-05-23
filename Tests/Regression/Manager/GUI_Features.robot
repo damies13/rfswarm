@@ -321,9 +321,10 @@ Verify the Manager Handles Corrupted Scenario Files And Repairs It
 Verify the Manager Handles Scenario Files With Missing Scripts Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #241
 	[Setup]	Run Keywords
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Remove File		${global_path}${/}RFSwarmManager.ini			AND
 	...    Set INI Window Size		1200	600								AND
 	...    Open Manager GUI													AND
-	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Create Robot File	name=example.robot	file_content=***Test Case***\nExample Test Case\n
 
 	${scenario_name}=	Set Variable	test_scenario_missing_file

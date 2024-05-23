@@ -1162,6 +1162,8 @@ class RFSwarmBase:
 		return int(st.timestamp())
 
 	def hash_file(self, file, argrelpath=""):
+		if not (os.path.exists(file) and os.path.isfile(file)):
+			raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), file)
 		BLOCKSIZE = 65536
 
 		# if len(argrelpath) > 0:
@@ -3210,20 +3212,20 @@ class RFSwarmCore:
 		else:
 			scriptfile = ""
 
-		if os.path.exists(scriptfile) == False:
+		if not os.path.exists(scriptfile):
 			if base.args.nogui:
-				msg = "File:\n"+scriptfile+"\n\nwhich is saved in the scenaro file as a script cannot be found by RFSwarm Manager."
-				msg += "\n\nScenario dir:\n"+base.config['Plan']['ScenarioDir']
+				msg = "File:\n" + scriptfile + "\n\nwhich is saved in the scenaro file as a script cannot be found by RFSwarm Manager."
+				msg += "\n\nScenario dir:\n" + base.config['Plan']['ScenarioDir']
 				tkm.showwarning("RFSwarm - Warning", msg)
 			else:
-				base.debugmsg(0, "File:", scriptfile, "cannot be found in",base.config['Plan']['ScenarioDir'])
+				base.debugmsg(0, "File:", scriptfile, "cannot be found in", base.config['Plan']['ScenarioDir'])
 			base.config['Plan']['ScenarioFile'] = base.inisafevalue("")
 			base.saveini()
 			return False
-		elif os.path.isfile(scriptfile) == False:
+		elif not os.path.isfile(scriptfile):
 			if base.args.nogui:
-				msg = "Path:\n"+scriptfile+"\n\nwhich is saved in the scenaro file as a script is not a file."
-				msg += "\n\nScenario dir:\n"+base.config['Plan']['ScenarioDir']
+				msg = "Path:\n" + scriptfile + "\n\nwhich is saved in the scenaro file as a script is not a file."
+				msg += "\n\nScenario dir:\n" + base.config['Plan']['ScenarioDir']
 				tkm.showwarning("RFSwarm - Warning", msg)
 			else:
 				base.debugmsg(0, "Path:", scriptfile, "is not a file!")
