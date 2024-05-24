@@ -3213,7 +3213,7 @@ class RFSwarmCore:
 			scriptfile = ""
 
 		if not os.path.exists(scriptfile):
-			if base.args.nogui:
+			if not base.args.nogui:
 				msg = "File:\n" + scriptfile + "\n\nwhich is saved in the scenaro file as a script cannot be found by RFSwarm Manager."
 				msg += "\n\nScenario dir:\n" + base.config['Plan']['ScenarioDir']
 				tkm.showwarning("RFSwarm - Warning", msg)
@@ -3223,7 +3223,7 @@ class RFSwarmCore:
 			base.saveini()
 			return False
 		elif not os.path.isfile(scriptfile):
-			if base.args.nogui:
+			if not base.args.nogui:
 				msg = "Path:\n" + scriptfile + "\n\nwhich is saved in the scenaro file as a script is not a file."
 				msg += "\n\nScenario dir:\n" + base.config['Plan']['ScenarioDir']
 				tkm.showwarning("RFSwarm - Warning", msg)
