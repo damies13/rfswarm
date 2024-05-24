@@ -2704,8 +2704,7 @@ class RFSwarmCore:
 						base.debugmsg(7, "combined:", combined)
 						scriptname = os.path.abspath(combined)
 					base.debugmsg(7, "scriptname:", scriptname)
-					if not self.sr_file_validate(rowcount, scriptname):
-						break
+					self.sr_file_validate(rowcount, scriptname)
 				else:
 					base.debugmsg(3, "script missing [", istr, "]")
 					fileok = False
@@ -3213,24 +3212,18 @@ class RFSwarmCore:
 			scriptfile = ""
 
 		if not os.path.exists(scriptfile):
+			msg = "The referenced file:\n" + scriptfile + "\n\ncannot be found by RFSwarm Manager."
 			if not base.args.nogui:
-				msg = "File:\n" + scriptfile + "\n\nwhich is saved in the scenaro file as a script cannot be found by RFSwarm Manager."
-				msg += "\n\nScenario dir:\n" + base.config['Plan']['ScenarioDir']
 				tkm.showwarning("RFSwarm - Warning", msg)
 			else:
-				base.debugmsg(0, "File:", scriptfile, "cannot be found in", base.config['Plan']['ScenarioDir'])
-			base.config['Plan']['ScenarioFile'] = base.inisafevalue("")
-			base.saveini()
+				base.debugmsg(0, msg)
 			return False
 		elif not os.path.isfile(scriptfile):
+			msg = "The referenced file:\n" + scriptfile + "\n\nis a directory, not a file."
 			if not base.args.nogui:
-				msg = "Path:\n" + scriptfile + "\n\nwhich is saved in the scenaro file as a script is not a file."
-				msg += "\n\nScenario dir:\n" + base.config['Plan']['ScenarioDir']
 				tkm.showwarning("RFSwarm - Warning", msg)
 			else:
-				base.debugmsg(0, "Path:", scriptfile, "is not a file!")
-			base.config['Plan']['ScenarioFile'] = base.inisafevalue("")
-			base.saveini()
+				base.debugmsg(0, msg)
 			return False
 
 		base.debugmsg(7, "scriptfile:", scriptfile)
@@ -5846,6 +5839,7 @@ class RFSwarmGUI(tk.Frame):
 
 			totalcalc = {}
 
+			base.debugmsg(6, "Scriptlist:", base.scriptlist)
 			for grp in base.scriptlist:
 				base.debugmsg(6, "grp:", grp)
 				if 'Index' in grp:
@@ -5967,7 +5961,10 @@ class RFSwarmGUI(tk.Frame):
 				self.axis.xaxis.set_major_formatter(xformatter)
 				self.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
 
-				self.canvas.draw()
+				try:
+					self.canvas.draw()
+				except Exception as e:
+					base.debugmsg(9, "Graphdata:", graphdata, "Exception:", e)
 
 			self.pln_graph_update = False
 
