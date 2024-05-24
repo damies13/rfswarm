@@ -322,9 +322,9 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #241
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
-	...    Remove File		${global_path}${/}RFSwarmManager.ini			AND
+	...    Set Test Variable	@{mngr_options}	-g	1						AND
 	...    Set INI Window Size		1200	600								AND
-	...    Open Manager GUI													AND
+	...    Open Manager GUI		${mngr_options}								AND
 	...    Create Robot File	name=example.robot	file_content=***Test Case***\nExample Test Case\n
 
 	${scenario_name}=	Set Variable	test_scenario_missing_file
@@ -333,15 +333,37 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 
 	Click Button	runopen
 	Open Scenario File OS DIALOG	${scenario_name}
-	Sleep	3
+
+	Wait For	${platform}_warning_label.png	timeout=30
 	Take A Screenshot
 	Press key.enter 1 Times
-	${ini_content}=		Get Manager INI Data
-	${ini_content_list}=	Split String	${ini_content}	separator=\n
-	Should Contain	${ini_content_list}		scenariofile =${SPACE}		msg=Scenariofile ini section is not blank!
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	not ${running}
 		Fail	RFSwarm manager crashed!
+	END
+	TRY
+		Click Tab	Run
+		Wait For	manager_${platform}_button_stoprun.png	timeout=30
+		Click Tab	Plan
+	EXCEPT
+		Fail	msg=RFSwarm Manager is not responding!
+	END
+
+	Run Keyword		Close Manager GUI ${platform}
+	Open Manager GUI		${mngr_options}
+
+	Wait For	${platform}_warning_label.png	timeout=30
+	Press key.enter 1 Times
+	${running}= 	Is Process Running 	${process_manager}
+	IF 	not ${running}
+		Fail	RFSwarm Manager crashed!
+	END
+	TRY
+		Click Tab	Run
+		Wait For	manager_${platform}_button_stoprun.png	timeout=30
+		Click Tab	Plan
+	EXCEPT
+		Fail	msg=RFSwarm Manager is not responding!
 	END
 
 	[Teardown]	Run Keywords
