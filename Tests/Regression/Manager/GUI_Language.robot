@@ -13,8 +13,8 @@ Test Teardown 	Close Manager GUI
 Test Cases For Issue #238
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #238
 	[Template]    Add Test In Language
-	FOR    ${item}    IN    @{ITEMS}
-		${item}    2nd arg
+	FOR    ${lang}    IN    @{languages}
+		${lang}
 	END
 
 
