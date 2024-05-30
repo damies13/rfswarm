@@ -2,7 +2,7 @@
 Resource 	GUI_Common.robot
 
 Suite Setup 	Set Platform
-Test Teardown 	Close Manager GUI
+Test Teardown 	Run Keyword		Close Manager GUI ${platform}
 Test Tags 	windows-latest	ubuntu-latest	macos-latest	Issue #238
 Test Template 	Add Test In Language
 
