@@ -14,3 +14,14 @@ rfswarm aims to solve this problem by allowing you to take an existing functiona
 rfswarm is written completely in python, so if you are already using Robot Framework, then you will already have most of what you need to use rfswarm and will be familiar with pip to get any extra components you need.
 
 [See who has sponsored this project](Sponsors.md)
+
+
+## Star History
+
+<a href="https://star-history.com/#damies13/rfswarm&Date" target="_blank">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=damies13/rfswarm&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=damies13/rfswarm&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=damies13/rfswarm&type=Date" />
+ </picture>
+</a>
