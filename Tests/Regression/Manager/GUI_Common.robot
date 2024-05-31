@@ -845,7 +845,7 @@ Start New Scenario
 	Click Button	runnew
 
 Select ${lang} Language Test Script
-	${filepath}= 		Set Variable    ${CURDIR}/testdata/Issue-#238/language/lang_${lang}.robot
+	${filepath}= 		Set Variable    ${CURDIR}${/}testdata${/}Issue-#238${/}language${/}lang_${lang}.robot
 	Select Test Script 	1 	${filepath}
 
 Click Script Button On Row
@@ -929,3 +929,26 @@ Select Test Script
 	File Open Dialogue Select File		${filepath}
 	Take A Screenshot
 	# Click Dialog Button 	cancel
+
+Wait For File To Exist
+	[Arguments]		${filepath} 	${timeout}=300
+	${start}= 	Get Time 	epoch
+	WHILE    True
+		TRY
+			File Should Exist 		${filepath}
+		EXCEPT
+			${now}= 	Get Time 	epoch
+			IF 	(${now} - ${start}) > ${timeout}
+				Fail 		File '${filepath}' does not exist after ${timeout} seconds
+				BREAK
+			END
+			CONTINUE
+		END
+		BREAK
+	END
+
+Check Agent Downloaded ${lang} Language Test Files
+	${robotfile}= 	Set Variable    ${agent_dir}${/}scripts${/}lang_${lang}.robot
+	Wait For File To Exist 		${robotfile}
+
+#

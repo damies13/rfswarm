@@ -2,7 +2,8 @@
 Resource 	GUI_Common.robot
 
 Suite Setup 	Set Platform
-Test Teardown 	Run Keyword		Close Manager GUI ${platform}
+Test Setup 	Language Test Init
+Test Teardown 	Language Test End
 Test Tags 	windows-latest	ubuntu-latest	macos-latest	Issue #238
 Test Template 	Add Test In Language
 
@@ -40,7 +41,19 @@ Add Test In Language
 	Log 	${langcode} 	console=True
 	Open Manager GUI
 	Start New Scenario
-
+	Check If The Agent Is Ready
+	Click Tab 	Plan
 	Select ${langcode} Language Test Script
+	Select 1 Robot Test Case
+	Check Agent Downloaded ${langcode} Language Test Files
+
+
+Language Test Init
+	# ${options}= 	Create List 	 	-d 	${agent_dir}
+	Open Agent
+
+Language Test End
+	Run Keyword		Close Manager GUI ${platform}
+	Stop Agent
 
 #
