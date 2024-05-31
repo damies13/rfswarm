@@ -941,13 +941,10 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	...    Create Robot File
 	...    file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n
 
-	Press Key.tab 4 Times
-	Type	15
-	Press Key.tab 1 Times
-	Type	60
-	Click Button	runscriptrow
-	Select Robot File OS DIALOG		${robot_data}[0]
-	Select 1 Robot Test Case
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#70${/}test_scenario.rfs
+	Copy File	${scenariofile}		${global_path}
+	Click Button	runopen
+	Open Scenario File OS DIALOG	${scenario_name}
 	Check If The Agent Is Ready
 	Click Tab	Plan
 	Click Button	runplay
@@ -970,13 +967,10 @@ Check If Test Scenario Run Will Stop Gradually
 	...    Create Robot File	file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t60\n
 
 	Utilisation Stats
-	Press Key.tab 4 Times
-	Type	15
-	Press Key.tab 1 Times
-	Type	60
-	Click Button	runscriptrow
-	Select Robot File OS DIALOG		${robot_data}[0]
-	Select 1 Robot Test Case
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#70${/}test_scenario.rfs
+	Copy File	${scenariofile}		${global_path}
+	Click Button	runopen
+	Open Scenario File OS DIALOG	${scenario_name}
 	Check If The Agent Is Ready
 	Click Tab	Plan
 	Click Button	runplay
