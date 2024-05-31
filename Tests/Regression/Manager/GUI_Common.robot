@@ -870,6 +870,7 @@ Click Script Button On Row
 		# manager_macos_button_selected_runscriptrow.png
 		${img}=	Set Variable		manager_${platform}_button_selected_runscriptrow.png
 		Click Image 	${img}
+		Sleep    0.1
 		Take A Screenshot
 
 		# Fail 		Not Implimented
@@ -881,28 +882,38 @@ File Open Dialogue Select File
 
 File Open Dialogue ubuntu Select File
 	[Arguments]		${filepath}
+	Sleep    0.1
 	Take A Screenshot
 	Click Label With Horizontal Offset 	file_name 	50
-	Type 		${filepath} 	Key.ENTER
+	Type 		${filepath}
+	Sleep    0.1
 	Take A Screenshot
 	Click Dialog Button 	open
+	Sleep    0.1
 	Take A Screenshot
 
 File Open Dialogue windows Select File
 	[Arguments]		${filepath}
+	Sleep    0.1
 	Take A Screenshot
 	Click Label With Horizontal Offset 	file_name 	50
-	Type 		${filepath} 	Key.ENTER
+	${filepath}= 	Normalize Path 	${filepath}
+	Type 		${filepath}
+	Sleep    0.1
 	Take A Screenshot
 	Click Dialog Button 	open
+	Sleep    0.1
 	Take A Screenshot
 
 File Open Dialogue macos Select File
 	[Arguments]		${filepath}
+	Sleep    0.1
 	Take A Screenshot
 	Press Combination 	KEY.command 	KEY.shift 	KEY.g
+	Sleep    0.1
 	Take A Screenshot
 	Type 		${filepath} 	Key.ENTER
+	Sleep    0.1
 	Take A Screenshot
 	Click Dialog Button 	open
 
