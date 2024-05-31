@@ -87,6 +87,8 @@ Close Manager GUI
 	${result}= 	Wait For Process 	${process_manager} 	timeout=55
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	not ${running}
+		Log		${result.stdout}
+		Log		${result.stderr}
 		Should Be Equal As Integers 	${result.rc} 	0
 	ELSE
 		Take A Screenshot
@@ -108,8 +110,10 @@ Close Manager GUI macos
 	${result}= 	Wait For Process 	${process_manager} 	timeout=55
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	not ${running}
-		Should Be Equal As Integers 	${result.rc} 	0
 		Take A Screenshot
+		Log		${result.stdout}
+		Log		${result.stderr}
+		Should Be Equal As Integers 	${result.rc} 	0
 	ELSE
 		Take A Screenshot
 		${result} = 	Terminate Process		${process_manager}
@@ -118,6 +122,8 @@ Close Manager GUI macos
 
 Stop Agent
 	${result} = 	Terminate Process		${process_agent}
+	Log		${result.stdout}
+	Log		${result.stderr}
 	# Should Be Equal As Integers 	${result.rc} 	0
 
 Stop Test Scenario Run Gradually
