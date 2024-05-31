@@ -951,6 +951,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	Stop Test Scenario Run Quickly	${15}	${60}
 
 	[Teardown]	Run Keywords
+	...    Delete Scenario File		${scenario_name}		AND
 	...    Set Confidence	0.9								AND
 	...    GUI_Common.Stop Agent							AND
 	...    Run Keyword		Close Manager GUI ${platform}	AND
@@ -977,6 +978,7 @@ Check If Test Scenario Run Will Stop Gradually
 	Stop Test Scenario Run Gradually	${15}	${60}
 
 	[Teardown]	Run Keywords
+	...    Delete Scenario File		${scenario_name}		AND
 	...    Set Confidence	0.9								AND
 	...    GUI_Common.Stop Agent							AND
 	...    Run Keyword		Close Manager GUI ${platform}	AND
