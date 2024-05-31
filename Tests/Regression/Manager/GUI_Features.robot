@@ -477,7 +477,8 @@ Check If Inject Sleep Option Was Executed in the Test
 	...    Remove Directory	${results_dir}	recursive=${True}				AND
 	...    Create Directory	${results_dir}									AND
 	...    Sleep	3														AND
-	...    Open Agent														AND
+	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-1	AND
+	...    Open Agent	${agent_options}														AND
 	...    Open Manager GUI													AND
 	...    Create Robot File	file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t9s\n\tSleep\t9\n
 
@@ -934,7 +935,8 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot	AND
 	...    Set INI Window Size		1200	600							AND
-	...    Open Agent													AND
+	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-2	AND
+	...    Open Agent	${agent_options}														AND
 	...    Open Manager GUI												AND
 	...    Create Robot File
 	...    file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n
@@ -960,10 +962,11 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 Check If Test Scenario Run Will Stop Gradually
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
 	[Setup]	Run Keywords
-	...    Set Global Filename And Default Save Path	example.robot	AND
-	...    Set INI Window Size		1200	600							AND
-	...    Open Agent													AND
-	...    Open Manager GUI												AND
+	...    Set Global Filename And Default Save Path	example.robot							AND
+	...    Set INI Window Size		1200	600													AND
+	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-3	AND
+	...    Open Agent	${agent_options}														AND
+	...    Open Manager GUI																		AND
 	...    Create Robot File	file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t60\n
 
 	Utilisation Stats
