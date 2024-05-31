@@ -41,6 +41,6 @@ Add Test In Language
 	Open Manager GUI
 	Start New Scenario
 
-	Select ${lang} Language Test Script
+	Select ${langcode} Language Test Script
 
 #
