@@ -118,6 +118,8 @@ Close Manager GUI macos
 
 Stop Agent
 	${result} = 	Terminate Process		${process_agent}
+	Log		${result.stdout}
+	Log		${result.stderr}
 	# Should Be Equal As Integers 	${result.rc} 	0
 
 Stop Test Scenario Run Gradually
