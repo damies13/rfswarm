@@ -39,10 +39,8 @@ Add Test In Language
 	[Arguments] 	${langcode}
 	Log 	${langcode} 	console=True
 	Open Manager GUI
-	Click Button	runnew
-	Click Button	runscriptrow
-	Take A Screenshot
-	Press Key.escape 1 Times
-	Take A Screenshot
+	Start New Scenario
+
+	Select ${lang} Language Test Script
 
 #

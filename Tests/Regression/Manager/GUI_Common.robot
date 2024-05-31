@@ -281,7 +281,7 @@ Click Label With Horizontal Offset
 	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right].
 	...	Give the image a full name, for example: button_runopen.
 	${labelname}= 	Convert To Lower Case 	${labelname}
-	${img}=	Set Variable		manager_${platform}_${labelname}.png
+	${img}=	Set Variable		manager_${platform}_label_${labelname}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=300
@@ -839,3 +839,82 @@ Check That The Scenario File Opens Correctly
 	Log		${scenario_content}
 	Log		${scenario_content_reopened}
 	Should Be Equal		${scenario_content}		${scenario_content_reopened}	msg=Scenario files are not equal!
+
+
+Start New Scenario
+	Click Button	runnew
+
+Select ${lang} Language Test Script
+	${filepath}= 		Set Variable    ${CURDIR}/testdata/Issue-#238/language/lang_${lang}.robot
+	Select Test Script 	1 	${filepath}
+
+Click Script Button On Row
+		[Arguments]		${row}
+		${rowheight}= 	Set Variable		30
+		${rowoffset}= 	Evaluate		${rowheight} * ${row}
+
+		${labelname}= 	Set Variable    script
+		${labelname}= 	Convert To Lower Case 	${labelname}
+		${img}=	Set Variable		manager_${platform}_label_${labelname}.png
+
+		# Log		${CURDIR}
+		# Log		${IMAGE_DIR}
+		Wait For 	${img} 	 timeout=300
+		# @{coordinates}= 	Locate		${img}
+		# Log	${coordinates}
+		Click To The Below Of Image 	${img} 	 offset=${rowoffset}
+
+		Take A Screenshot
+		Press Key.tab 1 Times
+		Take A Screenshot
+		# manager_macos_button_selected_runscriptrow.png
+		${img}=	Set Variable		manager_${platform}_button_selected_runscriptrow.png
+		Click Image 	${img}
+		Take A Screenshot
+
+		# Fail 		Not Implimented
+
+File Open Dialogue Select File
+	[Arguments]		${filepath}
+	Run Keyword		File Open Dialogue ${platform} Select File 			${filepath}
+	Take A Screenshot
+
+File Open Dialogue ubuntu Select File
+	[Arguments]		${filepath}
+	Take A Screenshot
+	Click Label With Horizontal Offset 	file_name 	50
+	Type 		${filepath} 	Key.ENTER
+	Take A Screenshot
+	Click Dialog Button 	open
+	Take A Screenshot
+
+File Open Dialogue windows Select File
+	[Arguments]		${filepath}
+	Take A Screenshot
+	Click Label With Horizontal Offset 	file_name 	50
+	Type 		${filepath} 	Key.ENTER
+	Take A Screenshot
+	Click Dialog Button 	open
+	Take A Screenshot
+
+File Open Dialogue macos Select File
+	[Arguments]		${filepath}
+	Take A Screenshot
+	Press Combination 	KEY.command 	KEY.shift 	KEY.g
+	Take A Screenshot
+	Type 		${filepath} 	Key.ENTER
+	Take A Screenshot
+	Click Dialog Button 	open
+
+Select Test Script
+	[Arguments]		${row}	${filepath}
+
+	Click Script Button On Row 	${row}
+
+	# Click Button	runscriptrow
+	# Take A Screenshot
+	# Press Key.escape 1 Times
+
+	File Open Dialogue Select File		${filepath}
+	Take A Screenshot
+	# Click Dialog Button 	cancel
