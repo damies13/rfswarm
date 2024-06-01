@@ -87,10 +87,14 @@ Close Manager GUI
 	${result}= 	Wait For Process 	${process_manager} 	timeout=55
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	not ${running}
+		Log 	${result.stdout}
+		Log 	${result.stderr}
 		Should Be Equal As Integers 	${result.rc} 	0
 	ELSE
 		Take A Screenshot
 		${result} = 	Terminate Process		${process_manager}
+		Log 	${result.stdout}
+		Log 	${result.stderr}
 		Fail
 	END
 
@@ -108,16 +112,22 @@ Close Manager GUI macos
 	${result}= 	Wait For Process 	${process_manager} 	timeout=55
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	not ${running}
+		Log 	${result.stdout}
+		Log 	${result.stderr}
 		Should Be Equal As Integers 	${result.rc} 	0
 		Take A Screenshot
 	ELSE
 		Take A Screenshot
 		${result} = 	Terminate Process		${process_manager}
+		Log 	${result.stdout}
+		Log 	${result.stderr}
 		Fail
 	END
 
 Stop Agent
 	${result} = 	Terminate Process		${process_agent}
+	Log 	${result.stdout}
+	Log 	${result.stderr}
 	# Should Be Equal As Integers 	${result.rc} 	0
 
 Stop Test Scenario Run Gradually
@@ -931,17 +941,18 @@ Select Test Script
 	# Click Dialog Button 	cancel
 
 Wait For File To Exist
-	[Arguments]		${filepath} 	${timeout}=300
-	${start}= 	Get Time 	epoch
-	WHILE    True
+	[Arguments]		${filepath} 	${timeout}=0.3
+	# ${start}= 	Get Time 	epoch
+	WHILE    True 	limit=${timeout} seconds
 		TRY
+			Sleep 	100 ms
 			File Should Exist 		${filepath}
 		EXCEPT
-			${now}= 	Get Time 	epoch
-			IF 	(${now} - ${start}) > ${timeout}
-				Fail 		File '${filepath}' does not exist after ${timeout} seconds
-				BREAK
-			END
+			# ${now}= 	Get Time 	epoch
+			# IF 	(${now} - ${start}) > ${timeout}
+			# 	Fail 		File '${filepath}' does not exist after ${timeout} seconds
+			# 	BREAK
+			# END
 			CONTINUE
 		END
 		BREAK
