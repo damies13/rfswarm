@@ -3,6 +3,9 @@ Language: Hindi
 
 # A blank line
 
+*** स्थापना ***
+संसाधन    resource${/}lang_hi.resource
+
 *** नियत कार्य प्रवेशिका ***
 First Test
     No Operation

@@ -3,6 +3,9 @@ Language: Italian
 
 # A blank line
 
+*** Impostazioni ***
+Risorsa    resource${/}lang_it.resource
+
 *** Casi Di Test ***
 First Test
     No Operation

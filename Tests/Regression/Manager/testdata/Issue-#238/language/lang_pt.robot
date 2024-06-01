@@ -3,12 +3,14 @@ Language: Portuguese
 
 # Mais uma linha em branco
 
+
 *** Comentários ***
 This is a comments block
 Second line of comments
 Maybe this block is still in preamble
 *** Definições ***
 Biblioteca        Process
+Recurso    resource${/}lang_pt.resource
 
 *** Casos de Teste ***
 teste primeiro

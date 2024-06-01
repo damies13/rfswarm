@@ -3,6 +3,9 @@ Language: Vietnamese
 
 # A blank line
 
+*** Cài Đặt ***
+Tài nguyên    resource${/}lang_vi.resource
+
 *** Các kịch bản kiểm thử ***
 First Test
     No Operation

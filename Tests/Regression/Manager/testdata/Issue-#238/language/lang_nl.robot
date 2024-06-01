@@ -3,6 +3,9 @@ Language: Dutch
 
 # A blank line
 
+*** Instellingen ***
+Resource    resource${/}lang_nl.resource
+
 *** Testgevallen ***
 First Test
     No Operation

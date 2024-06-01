@@ -2,6 +2,9 @@ Language: Finnish
 
 # A blank line
 
+*** Asetukset ***
+Resurssi    resource${/}lang_fi.resource
+
 *** Testit ***
 First Test
     No Operation

@@ -3,6 +3,9 @@ Language: Bosnian
 
 # A blank line
 
+*** Postavke ***
+Resursi    resource${/}lang_bs.resource
+
 *** Test Cases ***
 First Test
     No Operation

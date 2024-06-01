@@ -3,6 +3,9 @@ Language: Russian
 
 # A blank line
 
+*** Настройки ***
+Ресурс    resource${/}lang_cs.resource
+
 *** Заголовки тестов ***
 First Test
     No Operation

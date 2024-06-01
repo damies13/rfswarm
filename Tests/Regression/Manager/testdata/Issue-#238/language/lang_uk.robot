@@ -3,6 +3,9 @@ Language: Ukrainian
 
 # A blank line
 
+*** Налаштування ***
+Ресурс    resource${/}lang_uk.resource
+
 *** Тест-кейси ***
 First Test
     No Operation

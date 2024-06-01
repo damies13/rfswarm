@@ -3,6 +3,9 @@ Language: English
 
 # A blank line
 
+*** Settings ***
+Resource    resource${/}lang_en.resource
+
 *** Test Cases ***
 First Test
     No Operation

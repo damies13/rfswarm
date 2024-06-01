@@ -5,6 +5,7 @@ Language: Brazilian Portuguese
 
 *** Configurações ***
 Biblioteca        Process
+Recurso    resource${/}lang_pt_br.resource
 
 *** Casos de Teste ***
 teste primeiro

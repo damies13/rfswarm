@@ -3,6 +3,9 @@ Language: Czech
 
 # A blank line
 
+*** Nastavení ***
+Zdroj    resource${/}lang_cs.resource
+
 *** Testovací případy ***
 First Test
     No Operation

@@ -3,6 +3,9 @@ Language: Romanian
 
 # A blank line
 
+*** Setari ***
+Resursa    resource${/}lang_cs.resource
+
 *** Cazuri De Test ***
 First Test
     No Operation

@@ -3,6 +3,9 @@ Language: Chinese Traditional
 
 # A blank line
 
+*** 設置 ***
+資源文件    resource${/}lang_zh_tw.resource
+
 *** 案例 ***
 First Test
     No Operation

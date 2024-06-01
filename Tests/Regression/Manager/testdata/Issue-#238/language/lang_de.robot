@@ -5,6 +5,7 @@ Language: German
 
 *** Einstellungen ***
 Dokumentation     teste de écrit here at Text EDitor I can't type letter D
+Ressource    resource${/}lang_de.resource
 
 *** Testfälle ***
 First Test

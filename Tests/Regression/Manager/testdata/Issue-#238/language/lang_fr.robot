@@ -1,10 +1,13 @@
 # This is the french example
 Language: French
 
-Vide ligne
+# Vide ligne
+
+*** Paramètres ***
+Ressource    resource${/}lang_fr.resource
 
 *** Unités de Test ***
-Premiére Test
+Premier Test
     No Operation
     First Keyword
     Log To Console    Test execution with success

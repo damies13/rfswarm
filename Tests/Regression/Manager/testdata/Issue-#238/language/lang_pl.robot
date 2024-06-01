@@ -3,6 +3,9 @@ Language: Polish
 
 # A blank line
 
+*** Ustawienia ***
+Zasób    resource${/}lang_pl.resource
+
 *** Przypadki Testowe ***
 First Test
     No Operation

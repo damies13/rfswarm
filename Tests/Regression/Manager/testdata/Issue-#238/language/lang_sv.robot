@@ -3,6 +3,9 @@ Language: Swedish
 
 # A blank line
 
+*** Inställningar ***
+Resurs    resource${/}lang_sv.resource
+
 *** Testfall ***
 First Test
     No Operation
