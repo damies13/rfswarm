@@ -941,25 +941,39 @@ Select Test Script
 	# Click Dialog Button 	cancel
 
 Wait For File To Exist
-	[Arguments]		${filepath} 	${timeout}=0.3
-	# ${start}= 	Get Time 	epoch
-	WHILE    True 	limit=${timeout} seconds
-		TRY
-			Sleep 	100 ms
-			File Should Exist 		${filepath}
-		EXCEPT
-			# ${now}= 	Get Time 	epoch
-			# IF 	(${now} - ${start}) > ${timeout}
-			# 	Fail 		File '${filepath}' does not exist after ${timeout} seconds
-			# 	BREAK
-			# END
-			CONTINUE
+	[Arguments]		${filepath} 	${timeout}=300
+	TRY
+		WHILE    True 	limit=${timeout} seconds
+			TRY
+				Sleep 	100 ms
+				File Should Exist 		${filepath}
+			EXCEPT
+				CONTINUE
+			END
+			BREAK
 		END
-		BREAK
+	EXCEPT
+		Fail 		File '${filepath}' does not exist after ${timeout} seconds
 	END
 
 Check Agent Downloaded ${lang} Language Test Files
 	${robotfile}= 	Set Variable    ${agent_dir}${/}scripts${/}lang_${lang}.robot
 	Wait For File To Exist 		${robotfile}
+
+	# Tests/Regression/Manager/testdata/Issue-#238/language/resource/lang_bg.resource
+	${resourcefile}= 	Set Variable    ${agent_dir}${/}scripts${/}resource${/}lang_${lang}.resource
+	Wait For File To Exist 		${resourcefile}
+	# Tests/Regression/Manager/testdata/Issue-#238/language/resource/lang_bg.json
+	${jsonfile}= 	Set Variable    ${agent_dir}${/}scripts${/}resource${/}lang_${lang}.json
+	Wait For File To Exist 		${jsonfile}
+	# Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_bg.png
+	${imgfile}= 	Set Variable    ${agent_dir}${/}scripts${/}images${/}lang_${lang}.png
+	Wait For File To Exist 		${imgfile}
+	# Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_bg.svg
+	${imgfile}= 	Set Variable    ${agent_dir}${/}scripts${/}images${/}lang_${lang}.svg
+	Wait For File To Exist 		${imgfile}
+
+
+
 
 #
