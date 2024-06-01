@@ -45,12 +45,13 @@ Add Test In Language
 	Click Tab 	Plan
 	Select ${langcode} Language Test Script
 	Select 1 Robot Test Case
+	Take A Screenshot
 	Check Agent Downloaded ${langcode} Language Test Files
 
 
 Language Test Init
 	${mgrini}= 	Get Manager INI Location
-	Set INI Window Size 	800 	390
+	Set INI Window Size 	1200 	600
 	# ${options}= 	Create List 	 	-d 	${agent_dir}
 	Open Agent
 

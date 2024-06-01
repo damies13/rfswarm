@@ -895,12 +895,12 @@ File Open Dialogue ubuntu Select File
 	Sleep    0.1
 	Take A Screenshot
 	Click Label With Horizontal Offset 	file_name 	50
-	Type 		${filepath}
+	Type 		${filepath} 	Key.ENTER
 	Sleep    0.1
 	Take A Screenshot
-	Click Dialog Button 	open
-	Sleep    0.1
-	Take A Screenshot
+	# Click Dialog Button 	open
+	# Sleep    0.1
+	# Take A Screenshot
 
 File Open Dialogue windows Select File
 	[Arguments]		${filepath}
@@ -908,12 +908,12 @@ File Open Dialogue windows Select File
 	Take A Screenshot
 	Click Label With Horizontal Offset 	file_name 	50
 	${filepath}= 	Normalize Path 	${filepath}
-	Type 		${filepath}
+	Type 		${filepath} 	Key.ENTER
 	Sleep    0.1
 	Take A Screenshot
-	Click Dialog Button 	open
-	Sleep    0.1
-	Take A Screenshot
+	# Click Dialog Button 	open
+	# Sleep    0.1
+	# Take A Screenshot
 
 File Open Dialogue macos Select File
 	[Arguments]		${filepath}
@@ -945,7 +945,7 @@ Wait For File To Exist
 	TRY
 		WHILE    True 	limit=${timeout} seconds
 			TRY
-				Sleep 	100 ms
+				Sleep 	500 ms
 				File Should Exist 		${filepath}
 			EXCEPT
 				CONTINUE
