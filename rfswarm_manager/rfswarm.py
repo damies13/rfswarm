@@ -1408,13 +1408,14 @@ class RFSwarmBase:
 
 									base.debugmsg(8, "localrespath", localrespath)
 									localrespath = os.path.abspath(localrespath)
-									base.debugmsg(8, "localrespath", localrespath)
+									base.debugmsg(5, "localrespath", localrespath)
 									if os.path.isfile(localrespath):
 										# relfile = os.path.relpath(localrespath, start=basedir)
 										relfile = base.get_relative_path(base.config['Plan']['ScriptDir'], localrespath)
 										base.debugmsg(8, "relfile", relfile)
 										newhash = self.hash_file(localrespath, relfile)
 										base.debugmsg(8, "newhash", newhash)
+										base.debugmsg(5, "newhash:", newhash, " 	relfile:", relfile)
 										self.scriptfiles[newhash] = {
 											'id': newhash,
 											'basedir': basedir,
@@ -1431,7 +1432,7 @@ class RFSwarmBase:
 										filelst = glob.glob(localrespath)
 										base.debugmsg(6, "filelst", filelst)
 										for file in filelst:
-											base.debugmsg(6, "file", file)
+											base.debugmsg(5, "file", file)
 											# relpath = file.replace(localdir, "")[1:]
 											relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], file)
 											base.debugmsg(6, "relpath", relpath)
