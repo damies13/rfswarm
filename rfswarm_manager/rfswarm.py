@@ -3214,6 +3214,22 @@ class RFSwarmCore:
 			scriptfile = args[0]
 		else:
 			scriptfile = ""
+
+		if not os.path.exists(scriptfile):
+			msg = "The referenced file:\n" + scriptfile + "\n\ncannot be found by RFSwarm Manager."
+			if not base.args.nogui:
+				tkm.showwarning("RFSwarm - Warning", msg)
+			else:
+				base.debugmsg(0, msg)
+			return False
+		elif not os.path.isfile(scriptfile):
+			msg = "The referenced file:\n" + scriptfile + "\n\nis a directory, not a file."
+			if not base.args.nogui:
+				tkm.showwarning("RFSwarm - Warning", msg)
+			else:
+				base.debugmsg(0, msg)
+			return False
+
 		base.debugmsg(7, "scriptfile:", scriptfile)
 		if len(scriptfile) > 0:
 			base.scriptlist[r]["Script"] = scriptfile
@@ -5827,6 +5843,7 @@ class RFSwarmGUI(tk.Frame):
 
 			totalcalc = {}
 
+			base.debugmsg(6, "Scriptlist:", base.scriptlist)
 			for grp in base.scriptlist:
 				base.debugmsg(6, "grp:", grp)
 				if 'Index' in grp:
@@ -5948,7 +5965,10 @@ class RFSwarmGUI(tk.Frame):
 				self.axis.xaxis.set_major_formatter(xformatter)
 				self.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
 
-				self.canvas.draw()
+				try:
+					self.canvas.draw()
+				except Exception as e:
+					base.debugmsg(9, "Graphdata:", graphdata, "Exception:", e)
 
 			self.pln_graph_update = False
 
