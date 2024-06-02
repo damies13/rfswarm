@@ -1318,11 +1318,15 @@ class RFSwarmBase:
 
 		# i guess this could be affected too https://stackoverflow.com/questions/1945920/why-doesnt-os-path-join-work-in-this-case
 		if platform.system() == "Windows":
-			joindpath = os.path.join(*llocaldir, *lresfile)
+			# joindpath = os.path.join(*llocaldir, *lresfile) # this doesn't work on windows, at least not on python 3.6+ (https://docs.python.org/3/library/os.path.html#os.path.join)
+			lrespath = llocaldir + lresfile
+			joindpath = os.path.sep.join(lrespath)
+			base.debugmsg(8, "joindpath:", joindpath)
 		else:
 			joindpath = os.path.join(os.path.sep, *llocaldir, *lresfile)
-		base.debugmsg(5, "joindpath:", joindpath)
+			base.debugmsg(8, "joindpath:", joindpath)
 
+		base.debugmsg(5, "joindpath:", joindpath)
 		pathout = os.path.abspath(joindpath)
 		base.debugmsg(5, "pathout:", pathout)
 
