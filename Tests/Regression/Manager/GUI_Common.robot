@@ -882,6 +882,10 @@ Click Script Button On Row
 		Click Image 	${img}
 		Sleep    0.1
 		Take A Screenshot
+		# 	macos_dlgbtn_open
+		${img}=	Set Variable		${platform}_dlgbtn_open.png
+		Wait For 	${img} 	 timeout=300
+		Take A Screenshot
 
 		# Fail 		Not Implimented
 
