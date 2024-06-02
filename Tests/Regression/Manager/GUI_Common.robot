@@ -883,7 +883,7 @@ Click Script Button On Row
 		Sleep    0.1
 		Take A Screenshot
 		# 	macos_dlgbtn_open
-		${img}=	Set Variable		${platform}_dlgbtn_open.png
+		${img}=	Set Variable		${platform}_dlgbtn_cancel.png
 		Wait For 	${img} 	 timeout=300
 		Take A Screenshot
 
@@ -910,10 +910,14 @@ File Open Dialogue windows Select File
 	[Arguments]		${filepath}
 	Sleep    0.1
 	Take A Screenshot
-	Click Label With Horizontal Offset 	file_name 	50
 	${filepath}= 	Normalize Path 	${filepath}
-	Type 		${filepath} 	Key.ENTER
+	${path} 	${file} = 	Split Path 	${filepath}
+	Click Label With Horizontal Offset 	file_name 	50
+	Type 		${path} 	Key.ENTER
 	Sleep    0.1
+	Take A Screenshot
+	Click Label With Horizontal Offset 	file_name 	50
+	Type 		${file} 	Key.ENTER
 	Take A Screenshot
 	# Click Dialog Button 	open
 	# Sleep    0.1
