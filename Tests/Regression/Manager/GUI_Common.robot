@@ -10,6 +10,9 @@ Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
 Library 	IniFile.py
 
+Resource 	GUI_Video.robot
+
+
 *** Variables ***
 ${cmd_agent} 		rfswarm-agent
 ${cmd_manager} 	rfswarm
@@ -855,8 +858,10 @@ Start New Scenario
 	Click Button	runnew
 
 Select ${lang} Language Test Script
+	Video Start Recording 		${OUTPUT DIR}${/}Select_${lang}_Language_Test_Script.mp4
 	${filepath}= 		Set Variable    ${CURDIR}${/}testdata${/}Issue-#238${/}language${/}lang_${lang}.robot
 	Select Test Script 	1 	${filepath}
+	Video Stop Recording
 
 Click Script Button On Row
 		[Arguments]		${row}
