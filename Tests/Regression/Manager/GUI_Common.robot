@@ -6,11 +6,11 @@ Library		Collections
 Library		DateTime
 Library		XML
 
-Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
+Library		ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
 Library 	IniFile.py
 
-Resource 	GUI_Video.robot
+Library		ScreenRecorderLibrary.py
 
 
 *** Variables ***
