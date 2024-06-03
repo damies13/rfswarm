@@ -935,6 +935,9 @@ File Open Dialogue macos Select File
 	Press Combination 	KEY.command 	KEY.shift 	KEY.g
 	Sleep    0.1
 	Take A Screenshot
+	Type 		Key.BACKSPACE 	Key.DELETE
+	Sleep    0.1
+	Take A Screenshot
 	Type 		${filepath} 	Key.ENTER
 	Sleep    0.1
 	Take A Screenshot
