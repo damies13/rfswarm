@@ -1,5 +1,5 @@
-import pyscreenrec
 import os
+import pyscreenrec
 from robot.api import logger
 
 
@@ -15,7 +15,7 @@ class ScreenRecorderLibrary:
 		try:
 			if os.path.exists(filepath):
 				os.remove(filepath)
-		except Exception as e:
+		except Exception:
 			pass
 		self.recorder = pyscreenrec.ScreenRecorder()
 		self.recorder.start_recording(filepath, fps)
