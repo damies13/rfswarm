@@ -9,7 +9,7 @@ class ScreenRecorderLibrary:
 	filepath = None
 
 	def __init__(self):
-		self.recorder = pyscreenrec.ScreenRecorder()
+		pass
 
 	def video_start_recording(self, filepath, fps=24):
 		try:
@@ -17,6 +17,7 @@ class ScreenRecorderLibrary:
 				os.remove(filepath)
 		except Exception as e:
 			pass
+		self.recorder = pyscreenrec.ScreenRecorder()
 		self.recorder.start_recording(filepath, fps)
 		self.filepath = filepath
 
@@ -25,6 +26,7 @@ class ScreenRecorderLibrary:
 		logger.info(self.filepath)
 		path2file, filename = os.path.split(self.filepath)
 		logger.info('<video width="98%"><source src="./{}" type="video/mp4"></video>'.format(filename))
+		self.recorder = None
 
 	def video_pause_recording(self):
 		self.recorder.pause_recording()
