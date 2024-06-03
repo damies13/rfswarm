@@ -2,6 +2,7 @@ import pyscreenrec
 import os
 from robot.api import logger
 
+
 class ScreenRecorderLibrary:
 
 	recorder = None
@@ -14,7 +15,7 @@ class ScreenRecorderLibrary:
 		try:
 			if os.path.exists(filepath):
 				os.remove(filepath)
-		except:
+		except Exception as e:
 			pass
 		self.recorder.start_recording(filepath, fps)
 		self.filepath = filepath
@@ -24,7 +25,6 @@ class ScreenRecorderLibrary:
 		logger.info(self.filepath)
 		path2file, filename = os.path.split(self.filepath)
 		logger.info('<video width="98%"><source src="./{}" type="video/mp4"></video>'.format(filename))
-
 
 	def video_pause_recording(self):
 		self.recorder.pause_recording()
