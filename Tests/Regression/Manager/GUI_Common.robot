@@ -10,7 +10,8 @@ Library		ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
 Library 	IniFile.py
 
-Library		ScreenRecorderLibrary.py
+# Attempting to record video cause more trouble than help
+# Library		ScreenRecorderLibrary.py
 
 
 *** Variables ***
@@ -858,10 +859,10 @@ Start New Scenario
 	Click Button	runnew
 
 Select ${lang} Language Test Script
-	Video Start Recording 		${OUTPUT DIR}${/}Select_${lang}_Language_Test_Script.mp4
+	# Video Start Recording 		${OUTPUT DIR}${/}Select_${lang}_Language_Test_Script.mp4
 	${filepath}= 		Set Variable    ${CURDIR}${/}testdata${/}Issue-#238${/}language${/}lang_${lang}.robot
 	Select Test Script 	1 	${filepath}
-	Video Stop Recording
+	# Video Stop Recording
 
 Click Script Button On Row
 		[Arguments]		${row}
