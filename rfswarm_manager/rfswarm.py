@@ -2656,7 +2656,7 @@ class RFSwarmCore:
 						base.addScriptRow()
 				else:
 					base.addScriptRow()
-					
+
 				# users = 13
 				if "robots" in filedata[istr] or "users" in filedata[istr]:
 					if "robots" in filedata[istr]:
