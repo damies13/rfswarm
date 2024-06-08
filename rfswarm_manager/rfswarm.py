@@ -2643,8 +2643,7 @@ class RFSwarmCore:
 
 		rowcount = 0
 		for i in range(scriptcount):
-			ii = i + 1
-			istr = str(ii)
+			istr = str(i + 1)
 			if istr in filedata:
 				base.debugmsg(5, "filedata[", istr, "]:", filedata[istr])
 				rowcount += 1
@@ -2653,10 +2652,11 @@ class RFSwarmCore:
 				# 	base.scriptlist.append({})
 				# 	base.scriptlist[ii]["Index"] = ii
 				if not base.args.nogui:
-					if ii + 1 > base.gui.scriptgrid.grid_size()[1]:		# grid_size tupple: (cols, rows)
+					if rowcount + 1 > base.gui.scriptgrid.grid_size()[1]:		# grid_size tupple: (cols, rows)
 						base.addScriptRow()
 				else:
 					base.addScriptRow()
+
 				# users = 13
 				if "robots" in filedata[istr] or "users" in filedata[istr]:
 					if "robots" in filedata[istr]:
@@ -2664,7 +2664,6 @@ class RFSwarmCore:
 						self.sr_users_validate(rowcount, int(filedata[istr]["robots"]))
 					else:
 						base.debugmsg(8, "filedata[", istr, "][users]:", filedata[istr]["users"])
-						# base.scriptlist[ii]["users"] = filedata[istr]["users"]
 						self.sr_users_validate(rowcount, int(filedata[istr]["users"]))
 						# delay = 0
 				else:
@@ -2672,7 +2671,6 @@ class RFSwarmCore:
 					fileok = False
 				if "delay" in filedata[istr]:
 					base.debugmsg(8, "filedata[", istr, "][delay]:", filedata[istr]["delay"])
-					# base.scriptlist[ii]["delay"] = filedata[istr]["delay"]
 					self.sr_delay_validate(rowcount, int(filedata[istr]["delay"]))
 					# rampup = 60
 				else:
@@ -2680,7 +2678,6 @@ class RFSwarmCore:
 					fileok = False
 				if "rampup" in filedata[istr]:
 					base.debugmsg(8, "filedata[", istr, "][rampup]:", filedata[istr]["rampup"])
-					# base.scriptlist[ii]["rampup"] = filedata[istr]["rampup"]
 					self.sr_rampup_validate(rowcount, int(filedata[istr]["rampup"]))
 					# run = 600
 				else:
@@ -2688,7 +2685,6 @@ class RFSwarmCore:
 					fileok = False
 				if "run" in filedata[istr]:
 					base.debugmsg(8, "filedata[", istr, "][run]:", filedata[istr]["run"])
-					# base.scriptlist[ii]["run"] = filedata[istr]["run"]
 					self.sr_run_validate(rowcount, int(filedata[istr]["run"]))
 					# script = /Users/dave/Documents/GitHub/rfswarm/robots/OC_Demo_2.robot
 				else:
@@ -2714,39 +2710,40 @@ class RFSwarmCore:
 					fileok = False
 				if "test" in filedata[istr]:
 					base.debugmsg(8, "filedata[", istr, "][test]:", filedata[istr]["test"])
-					# base.scriptlist[ii]["test"] = filedata[istr]["test"]
 					self.sr_test_validate("row{}".format(rowcount), filedata[istr]["test"])
 				else:
 					base.debugmsg(3, "test missing [", istr, "]")
 					fileok = False
 
 				if "excludelibraries" in filedata[istr]:
-					base.scriptlist[ii]["excludelibraries"] = filedata[istr]["excludelibraries"]
+					base.debugmsg(8, "excludelibraries:", filedata[istr]["excludelibraries"])
+					base.scriptlist[rowcount]["excludelibraries"] = filedata[istr]["excludelibraries"]
 
 				if "robotoptions" in filedata[istr]:
-					base.scriptlist[ii]["robotoptions"] = filedata[istr]["robotoptions"]
+					base.debugmsg(8, "robotoptions:", filedata[istr]["robotoptions"])
+					base.scriptlist[rowcount]["robotoptions"] = filedata[istr]["robotoptions"]
 
 				# testrepeater = True
 				if "testrepeater" in filedata[istr]:
-					base.scriptlist[ii]["testrepeater"] = base.str2bool(filedata[istr]["testrepeater"])
+					base.scriptlist[rowcount]["testrepeater"] = base.str2bool(filedata[istr]["testrepeater"])
 				# injectsleepenabled = True
 				if "injectsleepenabled" in filedata[istr]:
-					base.scriptlist[ii]["injectsleepenabled"] = base.str2bool(filedata[istr]["injectsleepenabled"])
+					base.scriptlist[rowcount]["injectsleepenabled"] = base.str2bool(filedata[istr]["injectsleepenabled"])
 				# injectsleepminimum = 18
 				if "injectsleepminimum" in filedata[istr] and len(filedata[istr]["injectsleepminimum"]) > 0:
-					base.scriptlist[ii]["injectsleepminimum"] = int(filedata[istr]["injectsleepminimum"])
+					base.scriptlist[rowcount]["injectsleepminimum"] = int(filedata[istr]["injectsleepminimum"])
 				# injectsleepmaximum = 33
 				if "injectsleepmaximum" in filedata[istr] and len(filedata[istr]["injectsleepmaximum"]) > 0:
-					base.scriptlist[ii]["injectsleepmaximum"] = int(filedata[istr]["injectsleepmaximum"])
+					base.scriptlist[rowcount]["injectsleepmaximum"] = int(filedata[istr]["injectsleepmaximum"])
 				# disableloglog
 				if "disableloglog" in filedata[istr]:
-					base.scriptlist[ii]["disableloglog"] = base.str2bool(filedata[istr]["disableloglog"])
+					base.scriptlist[rowcount]["disableloglog"] = base.str2bool(filedata[istr]["disableloglog"])
 				# disablelogreport
 				if "disablelogreport" in filedata[istr]:
-					base.scriptlist[ii]["disablelogreport"] = base.str2bool(filedata[istr]["disablelogreport"])
+					base.scriptlist[rowcount]["disablelogreport"] = base.str2bool(filedata[istr]["disablelogreport"])
 				# disablelogoutput
 				if "disablelogoutput" in filedata[istr]:
-					base.scriptlist[ii]["disablelogoutput"] = base.str2bool(filedata[istr]["disablelogoutput"])
+					base.scriptlist[rowcount]["disablelogoutput"] = base.str2bool(filedata[istr]["disablelogoutput"])
 
 				if "filters" in filedata[istr]:
 					base.debugmsg(9, "filedata[istr][filters]:", filedata[istr]["filters"], type(filedata[istr]["filters"]))
@@ -2754,7 +2751,7 @@ class RFSwarmCore:
 					base.debugmsg(9, "filtr:", filtr, type(filtr))
 					filtrs = json.loads(filtr)
 					base.debugmsg(9, "filtrs:", filtrs, type(filtrs))
-					base.scriptlist[ii]["filters"] = filtrs
+					base.scriptlist[rowcount]["filters"] = filtrs
 
 				if not fileok:
 					base.debugmsg(1, "Scenario file is damaged:", ScenarioFile)
