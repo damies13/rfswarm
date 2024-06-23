@@ -74,7 +74,7 @@ Verify if reporter handle missing test result file
 	...    Set Test Variable	${resultdata}	20240622_182505_test_scenario			AND
 	...    Set Test Variable	${basefolder}	${CURDIR}${/}testdata${/}${testdata}	AND
 	...    Set Test Variable	${resultfolder}	${basefolder}${/}${resultdata}			AND
-	...    Copy File	${resultfolder}${/}${resultdata}.db		${basefolder}${/}result_backup
+	...    Copy File	${resultfolder}${/}${resultdata}.db		${basefolder}${/}result_backup${/}
 
 	Log to console 	basefolder: ${basefolder} 	console=True
 	Log 	resultfolder: ${resultfolder} 	console=True
@@ -83,6 +83,7 @@ Verify if reporter handle missing test result file
 	Wait For Status 	PreviewLoaded
 	Close GUI
 
+	Should Exist	${basefolder}${/}result_backup${/}${resultdata}.db
 	Remove File		${resultfolder}${/}${resultdata}.db
 
 	Open GUI	-d 	${resultfolder}
