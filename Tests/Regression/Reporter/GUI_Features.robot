@@ -76,6 +76,7 @@ Verify if reporter handle missing test result file
 	...    Set Test Variable	${resultfolder}	${basefolder}${/}${resultdata}			AND
 	...    Copy File	${resultfolder}${/}${resultdata}.db		${basefolder}${/}result_backup${/}
 
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	Log to console 	basefolder: ${basefolder} 	console=True
 	Log 	resultfolder: ${resultfolder} 	console=True
 
