@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - name: Pip Update
-        run: pip install --upgrade pip
+        run: python -m pip install --upgrade pip
 
       - name: Update Robot Tag
         shell: python
