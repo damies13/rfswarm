@@ -983,7 +983,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    CommandLine_Common.Stop Agent											AND
 	...    CommandLine_Common.Stop Manager
 
-Check If The CSV Report button Works In The Manager
+Check If The CSV Report Button Works In The Manager
 	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #254
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600		AND
@@ -1002,22 +1002,15 @@ Check If The CSV Report button Works In The Manager
 	Press key.enter 1 Times
 	Sleep	5
 
-	@{excluded_files}=	Create List		${None}
-	${absolute_paths}	${file_names}
-	...    Find Absolute Paths And Names For Files In Directory		${test_dir}		@{excluded_files}
-	Log 	${absolute_paths}
-	Log 	${file_names}
+	@{test_results}=	List Directories In Directory	${test_dir}		absolute=${True}	pattern=*Issue-#254
+	@{raw_csv_files}=		List Files In Directory		${test_results}[0]	*.csv
 
-	${csv_file_paths}=		Find csv Files In Given Path List	${absolute_paths}
-	FOR  ${csv_file_path}  IN  @{csv_file_paths}
-		Log To Console	${\n}CSV report file found: ${csv_file_path}
-	END
-	${len}=		Get Length		${csv_file_paths}
-
+	${len}=		Get Length		${raw_csv_files}
 	@{expected_csv_files}	Create List		agent_data.csv  raw_result_data.csv  summary.csv
 	@{csv_files}	Create List
 	FOR  ${i}  IN RANGE  0  ${len}
-		${csv_report_file_type}=	Split String From Right		${csv_file_paths}[${i}]	separator=_Issue-#254_	max_split=1
+		Log To Console	${\n}CSV report file found: ${raw_csv_files}[${i}]
+		${csv_report_file_type}=	Split String From Right		${raw_csv_files}[${i}]	separator=_Issue-#254_	max_split=1
 		${csv_report_file_type}=	Set Variable	${csv_report_file_type}[-1]
 		Append To List	${csv_files}	${csv_report_file_type}
 	END
