@@ -1002,19 +1002,19 @@ Check If The CSV Report Button Works In The Manager
 	Press key.enter 1 Times
 	Sleep	5
 
-	@{test_results}=	List Directories In Directory	${test_dir}		absolute=${True}	pattern=*Issue-#254
-	@{raw_csv_files}=		List Files In Directory		${test_results}[0]	*.csv
+	@{test_results_dir}=	List Directories In Directory	${test_dir}		absolute=${True}	pattern=*Issue-#254
+	@{csv_file_paths}=		List Files In Directory		${test_results_dir}[0]	*.csv
 
-	${len}=		Get Length		${raw_csv_files}
-	@{expected_csv_files}	Create List		agent_data.csv  raw_result_data.csv  summary.csv
-	@{csv_files}	Create List
+	${len}=		Get Length		${csv_file_paths}
+	@{expected_csv_report_files}	Create List		agent_data.csv  raw_result_data.csv  summary.csv
+	@{csv_report_files}	Create List
 	FOR  ${i}  IN RANGE  0  ${len}
-		Log To Console	${\n}CSV report file found: ${raw_csv_files}[${i}]
-		${csv_report_file_type}=	Split String From Right		${raw_csv_files}[${i}]	separator=_Issue-#254_	max_split=1
+		Log To Console	${\n}CSV report file found: ${csv_file_paths}[${i}]
+		${csv_report_file_type}=	Split String From Right		${csv_file_paths}[${i}]	separator=_Issue-#254_	max_split=1
 		${csv_report_file_type}=	Set Variable	${csv_report_file_type}[-1]
-		Append To List	${csv_files}	${csv_report_file_type}
+		Append To List	${csv_report_files}	${csv_report_file_type}
 	END
-	Diff Lists	${csv_files}	${expected_csv_files}
+	Diff Lists	${csv_report_files}	${expected_csv_report_files}
 	...    message=CSV Test Report Files are not generated correctly! List A - Generated CSV Files, List B - Expected CSV Files, Check report for more information.
 
 	[Teardown]	Run Keywords
