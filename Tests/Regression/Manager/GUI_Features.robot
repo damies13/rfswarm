@@ -10,6 +10,51 @@ Suite Setup 	Set Platform
 ${scenario_name}=	test_scenario
 
 *** Test Cases ***
+Check If The CSV Report button Works In The Manager
+	[Tags]	windows-latest	macos	ubuntu-latest	Issue #254
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600		AND
+	...    Open Agent
+
+	${test_dir}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#254
+	@{mngr_options}= 	Create List 	-d	${test_dir}	-s 	${test_dir}${/}Issue-#254.rfs
+	Open Manager GUI 		${mngr_options}
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Click Button	runplay
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Click Button	csv_report
+	Press key.enter 1 Times
+	Sleep	5
+
+	@{excluded_files}=	Create List		${None}
+	${absolute_paths}	${file_names}
+	...    Find Absolute Paths And Names For Files In Directory		${test_dir}		@{excluded_files}
+	Log 	${absolute_paths}
+	Log 	${file_names}
+
+	${csv_file_paths}=		Find csv Files In Given Path List	${absolute_paths}
+	FOR  ${csv_file_path}  IN  @{csv_file_paths}
+		Log To Console	${\n}CSV report file found: ${csv_file_path}
+	END
+	${len}=		Get Length		${csv_file_paths}
+
+	@{expected_csv_files}	Create List		agent_data.csv  raw_result_data.csv  summary.csv
+	@{csv_files}	Create List
+	FOR  ${i}  IN RANGE  0  ${len}
+		${csv_report_file_type}=	Split String From Right		${csv_file_paths}[${i}]	separator=_Issue-#254_	max_split=1
+		${csv_report_file_type}=	Set Variable	${csv_report_file_type}[-1]
+		Append To List	${csv_files}	${csv_report_file_type}
+	END
+	Diff Lists	${csv_files}	${expected_csv_files}
+	...    message=CSV Test Report Files are not generated correctly! List A - Generated CSV Files, List B - Expected CSV Files, Check report for more information.
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    GUI_Common.Stop Agent
+
 Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords
@@ -1036,3 +1081,5 @@ Check If Test Scenario Run Will Stop Gradually
 	...    GUI_Common.Stop Agent							AND
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove File		${global_path}${/}example.robot
+
+#here

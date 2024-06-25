@@ -677,6 +677,19 @@ Diff Lists
 		Lists Should Be Equal 	${list_a} 	${list_b} 		msg=${message}
 	END
 
+Find ${extenstion} Files In Given Path List
+	[Documentation]		For example: Find csv Files In Given Path List
+	[Arguments]		${path_list}
+	${found_files}	Create List
+	FOR  ${path}  IN  @{path_list}
+		${file_extension}=	Split String From Right		${path}		separator=.
+		${file_extension}=	Set Variable	${file_extension}[-1]
+		IF  '${file_extension}' == '${extenstion}'
+			Append To List	${found_files}		${path}
+		END
+	END
+	RETURN	${found_files}
+
 Verify Scenario File Robots
 	[Arguments]		${scenario_content_list}	${run_robots}	${start_group}	${end_group}
 	FOR  ${rows}  IN RANGE  ${start_group}	${end_group + 1}
