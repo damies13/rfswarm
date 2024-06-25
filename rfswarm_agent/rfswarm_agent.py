@@ -1588,7 +1588,6 @@ class RFSwarmAgent():
 		fd.append("		self.debugmsg(3, 'Keyword name: ', data.name)")
 		fd.append("		attrs = result.to_dict()")
 		fd.append("		self.debugmsg(6, 'attrs: ', attrs)")
-		fd.append("		self.debugmsg(5, 'attrs[doc]: ', attrs['doc'])")
 		fd.append("		self.debugmsg(5, 'self.msg: ', self.msg)")
 		fd.append("		")
 		fd.append("		ResultName = ''")
@@ -1602,6 +1601,7 @@ class RFSwarmAgent():
 		fd.append("		if self.msg is not None and not istrace:")
 		fd.append("			ResultName = self.msg.message")
 		fd.append("		elif 'doc' in attrs and len(attrs['doc'])>0:")
+		fd.append("			self.debugmsg(5, 'attrs[doc]: ', attrs['doc'])")
 		fd.append("			ResultName = attrs['doc']")
 		# Quiet Keyword -> https://github.com/damies13/rfswarm/blob/master/Doc/Preparing_for_perf.md#keywords
 		# fd.append("		elif '${' not in name:")
