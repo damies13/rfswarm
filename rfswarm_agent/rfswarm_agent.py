@@ -1952,8 +1952,6 @@ class RFSwarmAgent():
 		fd.append("			test.parent.tests.append(copy)")
 		fd.append("")
 
-
-
 		rfver = self.agentproperties["RobotFramework"]
 		if int(rfver[0]) >= 7:
 			fd.append("	def start_keyword(self, data, result):")
