@@ -640,7 +640,6 @@ Get Relative Paths
 	END
 	RETURN 	${paths_out}
 
-
 Diff Lists
 	[Arguments] 	${list_a} 		${list_b} 	${message}
 
@@ -667,6 +666,96 @@ Diff Lists
 		Log 		\nItems from list B missing from list A: ${Missing_List_From_A} 	console=True
 		Log 		Items from list A missing from list B: ${Missing_List_From_B} 	console=True
 		Lists Should Be Equal 	${list_a} 	${list_b} 		msg=${message}
+	END
+
+Find ${extenstion} Files In Given Path List
+	[Documentation]		For example: Find csv Files In Given Path List
+	[Arguments]		${path_list}
+	${found_files}	Create List
+	FOR  ${path}  IN  @{path_list}
+		${file_extension}=	Split String From Right		${path}		separator=.
+		${file_extension}=	Set Variable	${file_extension}[-1]
+		IF  '${file_extension}' == '${extenstion}'
+			Append To List	${found_files}		${path}
+		END
+	END
+	RETURN	${found_files}
+
+Verify CSV Report Files Content
+	[Arguments]		${csv_file_paths}	${csv_content_list}
+	FOR  ${i}  IN RANGE  0  3
+		@{csv_lines_content}=	Split String	${csv_content_list}[${i}]		separator=\n
+		${csv_report_file_type}=	Split String From Right		${csv_file_paths}[${i}]	separator=_Issue-#17_	max_split=1
+		${csv_report_file_type}=	Set Variable	${csv_report_file_type}[-1]
+		IF  '${csv_report_file_type}' == 'summary.csv'
+			@{header_row_list}=	Split String	${csv_lines_content}[0]		separator=,
+			Log To Console	summary.csv: ${header_row_list}
+			
+			@{correct_header_row_list}	Create List		Result Name  Min  Avg  90%ile  Max  Stdev  Pass  Fail  Other
+			Diff Lists		${header_row_list}	${correct_header_row_list}
+			...    message=Files are not transferred correctly! List A - CSV summary File, List B - Expected Values, Check report for more information.
+			@{second_row}=	Split String	${csv_lines_content}[1]		separator=,
+			Log		${second_row}
+
+			Length Should Be	${csv_lines_content}	3	msg="Some rows in summary.csv are missing!"
+			Should Be Equal		${second_row}[0]	10 seconds		msg=CSV summary File did not save correctly!
+			Length Should Be	${second_row}	9	msg="Some columns in summary.csv are missing!"
+
+		ELSE IF  '${csv_report_file_type}' == 'raw_result_data.csv'
+			@{header_row_list}=	Split String	${csv_lines_content}[0]		separator=,
+			Log To Console	raw_result_data.csv: ${header_row_list}
+			
+			@{correct_header_row_list}	Create List		Script Index  Robot  Iteration  Agent  Sequence  Result Name  Result  Elapsed Time  Start Time  End Time
+			Diff Lists		${header_row_list}	${correct_header_row_list}
+			...    message=Files are not transferred correctly! List A - CSV raw_result_data File, List B - Expected Values, Check report for more information.
+
+			${len}=		Get Length	${csv_lines_content}
+			Should Be True	${len} >= ${3}		msg="Some rows in raw_result_data.csv are missing!"
+
+			@{data_row}=	Split String	${csv_lines_content}[1]		separator=,
+			${Agent_name}=	Set Variable	${data_row}[3]
+			FOR  ${j}  IN RANGE  1  ${len - 1}
+				@{data_row}=	Split String	${csv_lines_content}[${j}]		separator=,
+				Log		${data_row}
+
+				Should Be Equal		${data_row}[0]	1	msg=CSV raw_result_data File did not save correctly!
+				Should Be True		${${data_row}[1]} >= ${1} and ${${data_row}[1]} <= ${10}	msg=CSV raw_result_data File did not save correctly!
+				Should Be Equal		${data_row}[2]	1	msg=CSV raw_result_data File did not save correctly!
+				Should Be Equal		${data_row}[3]	${Agent_name}	msg=CSV raw_result_data File did not save correctly!
+				Should Be Equal		${data_row}[4]	1	msg=CSV raw_result_data File did not save correctly!
+				Should Be Equal		${data_row}[5]	10 seconds	msg=CSV raw_result_data File did not save correctly!
+				Length Should Be	${data_row}	10	msg="Some columns in raw_result_data.csv are missing!"
+			END
+
+		ELSE IF  '${csv_report_file_type}' == 'agent_data.csv'
+			@{header_row_list}=	Split String	${csv_lines_content}[0]		separator=,
+			Log To Console	agent_data.csv: ${header_row_list}
+
+			@{correct_header_row_list}	Create List		Agentname  Agentstatus  Agentlastseen  Agentassigned  Agentrobots  Agentload  Agentcpu  Agentmem  Agentnet
+			Diff Lists		${header_row_list}	${correct_header_row_list}
+			...    message=Files are not transferred correctly! List A - CSV agent_data File, List B - Expected Values, Check report for more information.
+
+			${len}=		Get Length	${csv_lines_content}
+			Should Be True	${len} >= ${3}		msg="Some rows in agent_data.csv are missing!"
+
+			@{expected_status}	Create List  Ready  Running  Critical  Stopping
+			@{data_row}=	Split String	${csv_lines_content}[1]		separator=,
+			${Agent_name}=	Set Variable	${data_row}[0]
+			FOR  ${j}  IN RANGE  1  ${len - 1}
+				@{data_row}=	Split String	${csv_lines_content}[${j}]		separator=,
+				Log		${data_row}
+
+				Should Be Equal		${data_row}[0]	${Agent_name}	msg=CSV agent_data File did not save correctly!
+				IF  '${data_row}[1]' not in @{expected_status}
+					Fail	msg=CSV agent_data File did not save correctly!
+				END
+				Should Be True		${${data_row}[3]} >= ${0} and ${${data_row}[3]} <= ${10}	msg=CSV agent_data File did not save correctly!
+				Should Be True		${${data_row}[4]} >= ${0} and ${${data_row}[4]} <= ${10}	msg=CSV agent_data File did not save correctly!
+				Length Should Be	${data_row}	9	msg="Some columns in agent_data.csv are missing!"
+			END
+		ELSE
+			Fail	msg=Unexpected csv file found.
+		END
 	END
 
 Verify Scenario File Robots

@@ -849,3 +849,46 @@ Check If Test Scenario Run Will Stop Gradually
 	...    GUI_Common.Stop Agent							AND
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove File		${global_path}${/}example.robot
+
+Check If Scenario Csv Report Files Contain Correct Data From The Test
+	[Tags]	windows-latest	macos	ubuntu-latest	Issue #17
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600		AND
+	...    Open Agent
+
+	${test_dir}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#17
+	@{mngr_options}= 	Create List 	-d	${test_dir}	-s 	${test_dir}${/}Issue-#17.rfs
+	Open Manager GUI 		${mngr_options}
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Click Button	runplay
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Click Button	csv_report
+	Press key.enter 1 Times
+	Sleep	5
+	
+	# Get csv files content:
+	@{excluded_files}=	Create List		${None}
+	${absolute_paths}	${file_names}
+	...    Find Absolute Paths And Names For Files In Directory		${test_dir}		@{excluded_files}
+	Log 	${absolute_paths}
+	Log 	${file_names}
+
+	${csv_content_list}=	Create List
+	${csv_file_paths}=		Find csv Files In Given Path List	${absolute_paths}
+	FOR  ${csv_file_path}  IN  @{csv_file_paths}
+		Log To Console	${\n}CSV report file found: ${csv_file_path}
+		${csv_file_content}=	Get File		${csv_file_path}
+		Append To List	${csv_content_list}		${csv_file_content}
+	END
+	Log		${csv_file_paths}
+	Log		${csv_content_list}
+	Length Should Be	${csv_file_paths}	3	msg="Some test report csv files are missing!"
+
+	Verify CSV Report Files Content		${csv_file_paths}	${csv_content_list}
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    GUI_Common.Stop Agent
