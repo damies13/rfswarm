@@ -999,10 +999,15 @@ Check If The CSV Report Button Works In The Manager
 	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
 	Click Button	csv_report
-	Take A Screenshot
-	Click Button	ok
+
+	Wait For	manager_${platform}_reportdatasavesto.png 	timeout=${300}
+
+	# Take A Screenshot
+	Press key.enter 1 Times
+	# Click Button 	ok
+	# Click Dialog Button 	ok
 	Sleep	5
-	Take A Screenshot
+	# Take A Screenshot
 
 	@{test_results_dir}=	List Directories In Directory	${test_dir}		absolute=${True}	pattern=*Issue-#254
 	@{csv_file_paths}=		List Files In Directory		${test_results_dir}[0]	*.csv
