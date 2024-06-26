@@ -1527,15 +1527,15 @@ class RFSwarmBase:
 
 			filedata = self.uploadfiles[hash]['FileData']
 
-			self.debugmsg(6, "filedata:", filedata)
+			self.debugmsg(8, "filedata:", filedata)
 			self.debugmsg(6, "filedata:")
 
 			decoded = base64.b64decode(filedata)
-			self.debugmsg(6, "b64decode: decoded:", decoded)
+			self.debugmsg(8, "b64decode: decoded:", decoded)
 			self.debugmsg(6, "b64decode:")
 
 			uncompressed = lzma.decompress(decoded)
-			self.debugmsg(6, "uncompressed:", uncompressed)
+			self.debugmsg(8, "uncompressed:", uncompressed)
 			self.debugmsg(6, "uncompressed:")
 
 			localfiledir = os.path.dirname(localfile)
@@ -1782,12 +1782,37 @@ class RFSwarmBase:
 
 		sql += " ORDER BY min(r.script_index), min(r.sequence)"
 
-		base.debugmsg(7, "sql:", sql)
+		base.debugmsg(6, "sql:", sql)
 
 		base.dbqueue["Read"].append({"SQL": sql, "KEY": "RunStats"})
 
 		t = threading.Thread(target=self.SaveRunStats_SQL)
 		t.start()
+
+	def UpdateAgents_SQL(self):
+
+		# request agent data for agent report
+		sql = "SELECT * "
+		sql += "FROM AgentHistory as a "
+		sql += "WHERE a.AgentLastSeen>{} ".format(base.robot_schedule["Start"])
+		sql += " ORDER BY a.AgentLastSeen"
+
+		base.debugmsg(6, "sql:", sql)
+
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": "Agents"})
+		# request agent data for agent report
+
+	def UpdateRawResults_SQL(self):
+		# request raw data for agent report
+		sql = "SELECT * "
+		sql += "FROM Results as r "
+		sql += "WHERE r.start_time>{} ".format(base.robot_schedule["Start"])
+		sql += " ORDER BY r.start_time"
+
+		base.debugmsg(6, "sql:", sql)
+
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": "RawResults"})
+		# request raw data for agent report
 
 	def SaveRunStats_SQL(self):
 
@@ -1818,10 +1843,15 @@ class RFSwarmBase:
 		while_cnt = 0
 		while_max = 100
 		filecount = 0
+
 		base.debugmsg(6, "RunStats")
 		base.debugmsg(6, "UpdateRunStats_SQL")
 		base.UpdateRunStats_SQL()
-		if base.args.nogui:
+		base.UpdateAgents_SQL()
+		base.UpdateRawResults_SQL()
+
+		base.debugmsg(6, "RunStats base.args.nogui:", base.args.nogui, "	base.run_starttime:", base.run_starttime, "	base.run_start:", base.run_start, "	base.run_end:", base.run_end)
+		if base.args.nogui or base.run_start > 0:
 			if "RunStats" not in base.dbqueue["ReadResult"]:
 				base.debugmsg(6, "Wait for RunStats")
 				while_cnt = while_max
@@ -1838,22 +1868,6 @@ class RFSwarmBase:
 
 		if "RunStats" in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["RunStats"]) > 0:
 			base.debugmsg(7, "RunStats:", base.dbqueue["ReadResult"]["RunStats"])
-
-			# request agent data for agent report
-			sql = "SELECT * "
-			sql += "FROM AgentHistory as a "
-			sql += "WHERE a.AgentLastSeen>{} ".format(base.robot_schedule["Start"])
-			sql += " ORDER BY a.AgentLastSeen"
-			base.dbqueue["Read"].append({"SQL": sql, "KEY": "Agents"})
-			# request agent data for agent report
-
-			# request raw data for agent report
-			sql = "SELECT * "
-			sql += "FROM Results as r "
-			sql += "WHERE r.start_time>{} ".format(base.robot_schedule["Start"])
-			sql += " ORDER BY r.start_time"
-			base.dbqueue["Read"].append({"SQL": sql, "KEY": "RawResults"})
-			# request raw data for agent report
 
 			fileprefix = base.run_name
 			base.debugmsg(8, "fileprefix:", fileprefix)
@@ -1878,7 +1892,8 @@ class RFSwarmBase:
 
 			filecount += 1
 
-		if base.args.nogui:
+		base.debugmsg(6, "Agents base.args.nogui:", base.args.nogui, "	base.run_starttime:", base.run_starttime, "	base.run_start:", base.run_start, "	base.run_end:", base.run_end)
+		if base.args.nogui or base.run_start > 0:
 			while_cnt = while_max
 			base.debugmsg(6, "Wait for Agents")
 			while "Agents" not in base.dbqueue["ReadResult"] and while_cnt > 0:
@@ -1916,7 +1931,8 @@ class RFSwarmBase:
 
 			filecount += 1
 
-		if base.args.nogui:
+		base.debugmsg(6, "RawResults base.args.nogui:", base.args.nogui, "	base.run_starttime:", base.run_starttime, "	base.run_start:", base.run_start, "	base.run_end:", base.run_end)
+		if base.args.nogui or base.run_start > 0:
 			base.debugmsg(6, "Wait for RawResults")
 			while_cnt = while_max
 			while "RawResults" not in base.dbqueue["ReadResult"] and while_cnt > 0:
@@ -1954,6 +1970,7 @@ class RFSwarmBase:
 
 			filecount += 1
 
+		base.debugmsg(6, "filecount:", filecount)
 		if not base.args.nogui:
 			if filecount > 0:
 				tkm.showinfo("RFSwarm - Info", "Report data saved to: {}".format(base.datapath))
