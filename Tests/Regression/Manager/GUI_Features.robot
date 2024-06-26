@@ -561,7 +561,7 @@ Check If Inject Sleep Option Was Executed in the Test
 		${file_extenstion}	Get Substring	${result_file}	-3
 		IF  '${file_extenstion}' == 'xml'
 			${xml_file_content}		Get File	${result_file}
-			Log		${xml_file_content}	
+			Log		${xml_file_content}
 			BREAK
 		END
 	END
@@ -999,8 +999,10 @@ Check If The CSV Report Button Works In The Manager
 	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
 	Click Button	csv_report
-	Press key.enter 1 Times
+	Take A Screenshot
+	Click Button	ok
 	Sleep	5
+	Take A Screenshot
 
 	@{test_results_dir}=	List Directories In Directory	${test_dir}		absolute=${True}	pattern=*Issue-#254
 	@{csv_file_paths}=		List Files In Directory		${test_results_dir}[0]	*.csv
