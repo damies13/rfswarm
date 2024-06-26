@@ -819,9 +819,9 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 
 	# Verify CSV report files content:
 	FOR  ${i}  IN RANGE  0  3
-		Log To Console	${\n}CSV report file found: ${csv_file_paths}[${i}]
 		${csv_rows_content_list}=	Convert CSV File Cells To a List		${csv_file_paths}[${i}]		csv_separator=,
-		Log		${csv_rows_content_list}
+		Log To Console	${\n}CSV report file found: ${csv_file_paths}[${i}]
+		Log 	${csv_rows_content_list}
 
 		${csv_report_file_type}=	Split String From Right		${csv_file_paths}[${i}]	separator=_Issue-#17_	max_split=1
 		${csv_report_file_type}=	Set Variable	${csv_report_file_type}[-1]
@@ -831,8 +831,8 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 			@{header_row_list}=		Set Variable	${csv_rows_content_list}[0]
 			Log To Console	summary.csv: ${header_row_list}
 			@{expected_header_row_list}	Create List		Result Name  Min  Avg  90%ile  Max  Stdev  Pass  Fail  Other
-			Diff Lists		${header_row_list}	${expected_header_row_list}
-			...    message=CSV Report Files are not generated correctly! List A - CSV summary File, List B - Expected Values, Check report for more information.
+			Diff Lists		${header_row_list}		${expected_header_row_list}
+			...    message=CSV Report Files are not generated correctly! List A - CSV summary file header row, List B - Expected header row values.
 
 			@{second_row}=		Set Variable	${csv_rows_content_list}[1]
 			Log		${second_row}
@@ -846,11 +846,11 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 			@{header_row_list}=		Set Variable	${csv_rows_content_list}[0]
 			Log To Console	raw_result_data.csv: ${header_row_list}
 			@{expected_header_row_list}	Create List		Script Index  Robot  Iteration  Agent  Sequence  Result Name  Result  Elapsed Time  Start Time  End Time
-			Diff Lists		${header_row_list}	${expected_header_row_list}
-			...    message=CSV Report Files are not generated correctly! List A - CSV raw_result_data File, List B - Expected Values, Check report for more information.
+			Diff Lists		${header_row_list}		${expected_header_row_list}
+			...    message=CSV Report Files are not generated correctly! List A - CSV raw_result_data file header row, List B - Expected header row values.
 
-			@{data_row}=	Set Variable	${csv_rows_content_list}[1]
-			${Agent_name}=	Set Variable	${data_row}[3]
+			@{first_data_row}=	Set Variable	${csv_rows_content_list}[1]
+			${Agent_name}=	Set Variable	${first_data_row}[3]
 			FOR  ${j}  IN RANGE  1  ${len}
 				@{data_row}=	Set Variable	${csv_rows_content_list}[${j}]
 				Log		${data_row}
@@ -871,12 +871,12 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 			@{header_row_list}=		Set Variable	${csv_rows_content_list}[0]
 			Log To Console	agent_data.csv: ${header_row_list}
 			@{expected_header_row_list}	Create List		Agentname  Agentstatus  Agentlastseen  Agentassigned  Agentrobots  Agentload  Agentcpu  Agentmem  Agentnet
-			Diff Lists		${header_row_list}	${expected_header_row_list}
-			...    message=CSV Report Files are not generated correctly! List A - CSV agent_data File, List B - Expected Values, Check report for more information.
+			Diff Lists		${header_row_list}		${expected_header_row_list}
+			...    message=CSV Report Files are not generated correctly! List A - CSV agent_data file header row, List B - Expected header row values.
 
 			@{expected_status}	Create List  Ready  Running  Critical  Stopping
-			@{data_row}=	Set Variable	${csv_rows_content_list}[1]
-			${Agent_name}=	Set Variable	${data_row}[0]
+			@{first_data_row}=	Set Variable	${csv_rows_content_list}[1]
+			${Agent_name}=	Set Variable	${first_data_row}[0]
 			FOR  ${j}  IN RANGE  1  ${len}
 				@{data_row}=	Set Variable	${csv_rows_content_list}[${j}]
 				Log		${data_row}
@@ -891,7 +891,7 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 			END
 
 		ELSE
-			Fail	msg=Unexpected csv file found.
+			Fail	msg=Unexpected csv file found: ${csv_file_paths}[${i}].
 		END
 	END
 
