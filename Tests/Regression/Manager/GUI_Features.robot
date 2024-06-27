@@ -10,6 +10,33 @@ Suite Setup 	Set Platform
 ${scenario_name}=	test_scenario
 
 *** Test Cases ***
+Verify That Files Get Saved With Correct Extension And Names
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #39
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Open Manager GUI													AND
+	...    Open Agent
+
+	Log To Console	Files to check: scenario file, csv result files
+	Click Button	runsave
+	Save Scenario File OS DIALOG	Issue-#39
+
+	# !!! csv files are checked in Test Case for Issue #254 !!!
+	@{scenario_file}=		List Files In Directory		${global_path}	Issue-#39*
+	@{all_files}=	List Files In Directory		${global_path}
+	Log To Console	All files: ${all_files}
+	Length Should Be	${scenario_file}	1	msg=Scenario file name didnt saved correctly!
+	@{scenario_file_fragmented}=	Split String	${scenario_file}[0]		separator=.
+	Length Should Be	${scenario_file_fragmented}		2	msg=Scenario file: ${scenario_file}[0] didnt saved correctly! 
+	Should Be Equal		${scenario_file_fragmented}[0]		Issue-#39	msg=File name is not correct!
+	Should Be Equal		${scenario_file_fragmented}[1]		rfs			msg=File extensiton is not correct!
+
+	[Teardown]	Run Keywords
+	...    Delete Scenario File		Issue-#39				AND
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    GUI_Common.Stop Agent
+
 Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords

@@ -9,6 +9,7 @@ Library 	OCRLibrary
 
 
 *** Variables ***
+${platform}		None
 ${cmd_reporter} 		rfswarm-reporter
 ${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
 ${pyfile}			${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
@@ -203,6 +204,18 @@ Click Button
 	Sleep 	${sssleep}
 	Take A Screenshot
 
+Click Dialog Button
+	[Arguments]		${btnname} 		${timeout}=300
+	${btnnamel}= 	Convert To Lower Case 	${btnname}
+	${img}=	Set Variable		${platform}_dlgbtn_${btnnamel}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=${timeout}
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	1
+	Take A Screenshot
+
 Wait For Status
 	[Arguments]		${status}	${timeout}=300
 	${statusl}= 	Convert To Lower Case 	${status}
@@ -335,3 +348,25 @@ Get Image Size
 	${imgsize}= 	Set Variable    ${img.size}
 	# Evaluate    ${img.close()}
 	RETURN 	${imgsize}
+
+Save Template File OS DIALOG
+	[Arguments]		${template_name}
+	Sleep	5
+	Type	${template_name}.template
+	Take A Screenshot
+	Click Dialog Button		save
+	Sleep	1
+
+Get Manager Default Save Path
+	${pip_data}=	Get Manager PIP Data
+	${pip_data_list}=	Split String	${pip_data}
+	${i}=	Get Index From List	${pip_data_list}	Location:
+	${location}=	Set Variable	${pip_data_list}[${i + 1}]
+	RETURN	${location}${/}rfswarm_manager${/}
+
+Get Manager PIP Data
+	Run Process	pip	show	rfswarm-manager		alias=data
+	${pip_data}	Get Process Result	data
+	Should Not Be Empty		${pip_data.stdout}		msg=Manager must be installed with pip
+	Log	${pip_data.stdout}
+	RETURN		${pip_data.stdout}

@@ -4,6 +4,51 @@ Resource 	GUI_Common.robot
 Test Teardown 	Close GUI
 
 *** Test Cases ***
+Verify That Files Get Saved With Correct Extension And Names
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #39
+	${testdata}=		Set Variable	Issue-#39
+	${resultdata}=		Set Variable	20240622_182505_Issue-#39
+	${basefolder}=		Set Variable	${CURDIR}${/}testdata${/}${testdata}
+	${resultfolder}=	Set Variable	${basefolder}${/}${resultdata}
+	${manager_dir}=		Get Manager Default Save Path
+
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	Log to console 	basefolder: ${basefolder} 	console=True
+	Log 	resultfolder: ${resultfolder} 	console=True
+	Log To Console	Files to check: report file, report template, output files from reporter (html docx xlsx)
+
+	Open GUI	-d 	${resultfolder}
+	Click Button	savetemplate
+	Save Template File OS DIALOG	Issue-#39
+	Click Button	generatehtml
+	Click Button	generateword
+	Click Button	generateexcel
+
+	# Verify files:
+	@{template_file}=		List Files In Directory		${manager_dir}	pattern=Issue-#39*
+	Length Should Be	${template_file}	1	msg=Template file name didnt saved correctly!
+	@{template_file_fragmented}=	Split String	${template_file}[0]		separator=.
+	Length Should Be	${template_file_fragmented}		2	msg=template file: ${template_file}[0] didnt saved correctly!
+	Should Be Equal		${template_file_fragmented}[0]		Issue-#39	msg=File name is not correct!
+	Should Be Equal		${template_file_fragmented}[1]		template	msg=File extension is not correct!
+
+	@{result_files}=		List Files In Directory		${resultfolder}
+	Log To Console	All result files: ${result_files}
+	Length Should Be	${result_files}		5	msg=Raport files name didnt saved correctly!
+	
+	@{file_extensions}	Create List		db	docx	html	report	xlsx
+	FOR  ${i}  IN RANGE  0  5
+		${file}		Set Variable	${result_files}[${i}]
+		@{file_fragmented}=		Split String	${file}		separator=.
+		Length Should Be	${file_fragmented}		2	msg=${file_extensions}[${i}] file didnt saved correctly!
+		Should Be Equal		${file_fragmented}[0]		${resultdata}	msg=File name is not correct!
+		Should Be Equal		${file_fragmented}[1]		${file_extensions}[${i}]	msg=File extenstion is not correct!
+	END
+
+	[Teardown]	Run Keywords
+	...    Remove File	${manager_dir}${/}Issue-#39.template	AND
+	...    Close GUI
+
 Whole report time range
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #138
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
@@ -69,12 +114,11 @@ Whole report time range
 
 Verify if reporter handle missing test result file
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #157
-	[Setup]		Run Keywords
-	...    Set Test Variable	${testdata}		Issue-#157								AND
-	...    Set Test Variable	${resultdata}	20240622_182505_test_scenario			AND
-	...    Set Test Variable	${basefolder}	${CURDIR}${/}testdata${/}${testdata}	AND
-	...    Set Test Variable	${resultfolder}	${basefolder}${/}${resultdata}			AND
-	...    Copy File	${resultfolder}${/}${resultdata}.db		${basefolder}${/}result_backup${/}
+	${testdata}		Set Variable	Issue-#157
+	${resultdata}	Set Variable	20240622_182505_test_scenario
+	${basefolder}	Set Variable	${CURDIR}${/}testdata${/}${testdata}
+	${resultfolder}	Set Variable	${basefolder}${/}${resultdata}
+	Copy File	${resultfolder}${/}${resultdata}.db		${basefolder}${/}result_backup${/}
 
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	Log to console 	basefolder: ${basefolder} 	console=True
