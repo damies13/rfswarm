@@ -397,7 +397,8 @@ Change Reporter INI File Settings
 	ELSE
 		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${option_index}] =	${option} = ${new_value}
 	END
-	
+	Log To Console	${ini_content}
+
 	Remove File		${location}
 	Log		${ini_content}
 	Append To File	${location}		${ini_content}
