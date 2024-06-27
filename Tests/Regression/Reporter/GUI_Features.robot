@@ -10,7 +10,7 @@ Verify That Files Get Saved With Correct Extension And Names
 	${resultdata}=		Set Variable	20240622_182505_Issue-#39
 	${basefolder}=		Set Variable	${CURDIR}${/}testdata${/}${testdata}
 	${resultfolder}=	Set Variable	${basefolder}${/}${resultdata}
-	${manager_dir}=		Get Manager Default Save Path
+	#${manager_dir}=		Get Manager Default Save Path
 
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	Log to console 	basefolder: ${basefolder} 	console=True
