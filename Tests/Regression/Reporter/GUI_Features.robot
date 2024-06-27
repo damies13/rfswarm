@@ -10,7 +10,8 @@ Verify That Files Get Saved With Correct Extension And Names
 	${resultdata}=		Set Variable	20240622_182505_Issue-#39
 	${basefolder}=		Set Variable	${CURDIR}${/}testdata${/}${testdata}
 	${resultfolder}=	Set Variable	${basefolder}${/}${resultdata}
-	#${manager_dir}=		Get Manager Default Save Path
+	${templatefolder}=	Set Variable	${resultfolder}${/}template_dir
+	Change Reporter INI File Settings	templatedir		${templatefolder}
 
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	Log to console 	basefolder: ${basefolder} 	console=True
@@ -21,14 +22,16 @@ Verify That Files Get Saved With Correct Extension And Names
 	Click Button	savetemplate
 	Save Template File OS DIALOG	Issue-#39
 	Click Button	generatehtml
+	Sleep	2
 	Click Button	generateword
+	Sleep	2
 	Click Button	generateexcel
-	Sleep	5
+	Sleep	2
 
 	# Verify files:
-	@{manager_files}=		List Files In Directory		${manager_dir}
+	@{manager_files}=		List Files In Directory		${templatefolder}
 	Log To Console	${\n}All manager files: ${manager_files}${\n}
-	@{template_file}=		List Files In Directory		${manager_dir}	pattern=Issue-#39*
+	@{template_file}=		List Files In Directory		${templatefolder}	pattern=Issue-#39*
 	Length Should Be	${template_file}	1	msg=Template file name didnt saved correctly!
 	@{template_file_fragmented}=	Split String	${template_file}[0]		separator=.
 	Length Should Be	${template_file_fragmented}		2	msg=template file: ${template_file}[0] didnt saved correctly!
@@ -49,7 +52,7 @@ Verify That Files Get Saved With Correct Extension And Names
 	END
 
 	[Teardown]	Run Keywords
-	...    Remove File	${manager_dir}${/}Issue-#39*	AND
+	...    Remove File	${templatefolder}${/}Issue-#39*		AND
 	...    Close GUI
 
 Whole report time range
