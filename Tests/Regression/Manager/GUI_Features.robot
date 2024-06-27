@@ -25,7 +25,7 @@ Verify That Files Get Saved With Correct Extension And Names
 	# !!! csv files are checked in Test Case for Issue #254 !!!
 	@{scenario_file}=		List Files In Directory		${global_path}	Issue-#39*
 	@{all_files}=	List Files In Directory		${global_path}
-	Log To Console	All files: ${all_files}
+	Log To Console	${\n}All manager files: ${all_files}${\n}
 	Length Should Be	${scenario_file}	1	msg=Scenario file name didnt saved correctly!
 	@{scenario_file_fragmented}=	Split String	${scenario_file}[0]		separator=.
 	Length Should Be	${scenario_file_fragmented}		2	msg=Scenario file: ${scenario_file}[0] didnt saved correctly! 

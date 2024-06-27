@@ -23,8 +23,11 @@ Verify That Files Get Saved With Correct Extension And Names
 	Click Button	generatehtml
 	Click Button	generateword
 	Click Button	generateexcel
+	Sleep	5
 
 	# Verify files:
+	@{manager_files}=		List Files In Directory		${manager_dir}
+	Log To Console	${\n}All manager files: ${manager_files}${\n}
 	@{template_file}=		List Files In Directory		${manager_dir}	pattern=Issue-#39*
 	Length Should Be	${template_file}	1	msg=Template file name didnt saved correctly!
 	@{template_file_fragmented}=	Split String	${template_file}[0]		separator=.
@@ -33,7 +36,7 @@ Verify That Files Get Saved With Correct Extension And Names
 	Should Be Equal		${template_file_fragmented}[1]		template	msg=File extension is not correct!
 
 	@{result_files}=		List Files In Directory		${resultfolder}
-	Log To Console	All result files: ${result_files}
+	Log To Console	${\n}All result files: ${result_files}${\n}
 	Length Should Be	${result_files}		5	msg=Raport files name didnt saved correctly!
 	
 	@{file_extensions}	Create List		db	docx	html	report	xlsx
@@ -46,7 +49,7 @@ Verify That Files Get Saved With Correct Extension And Names
 	END
 
 	[Teardown]	Run Keywords
-	...    Remove File	${manager_dir}${/}Issue-#39.template	AND
+	...    Remove File	${manager_dir}${/}Issue-#39*	AND
 	...    Close GUI
 
 Whole report time range

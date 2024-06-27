@@ -549,7 +549,7 @@ Save Scenario File OS DIALOG
 Open Scenario File OS DIALOG
 	[Arguments]		${scenario_name}
 	Sleep	5
-	Type	${scenario_name}.rfs
+	Type	${scenario_name}
 	Take A Screenshot
 	Click Dialog Button		open
 	Sleep	1

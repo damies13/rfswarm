@@ -352,7 +352,7 @@ Get Image Size
 Save Template File OS DIALOG
 	[Arguments]		${template_name}
 	Sleep	5
-	Type	${template_name}.template
+	Type	${template_name}
 	Take A Screenshot
 	Click Dialog Button		save
 	Sleep	1
