@@ -9718,7 +9718,7 @@ class ReporterGUI(tk.Frame):
 				initialdir=base.config['Reporter']['TemplateDir'],
 				title="Save RFSwarm Reporter Template",
 				filetypes=(("Template", "*.template"), ("all files", "*.*")),
-				defaultextension="template"
+				defaultextension=".template"
 			)
 		)
 		base.debugmsg(5, "templatefile", templatefile)
