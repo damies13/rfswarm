@@ -11,6 +11,7 @@ Verify That Files Get Saved With Correct Extension And Names
 	${basefolder}=		Set Variable	${CURDIR}${/}testdata${/}${testdata}
 	${resultfolder}=	Set Variable	${basefolder}${/}${resultdata}
 	${templatefolder}=	Set Variable	${resultfolder}${/}template_dir
+	${templatename}=	Set Variable	Issue-#39
 	Change Reporter INI File Settings	templatedir		${templatefolder}
 
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
@@ -20,7 +21,7 @@ Verify That Files Get Saved With Correct Extension And Names
 
 	Open GUI	-d 	${resultfolder}
 	Click Button	savetemplate
-	Save Template File OS DIALOG	Issue-#39
+	Save Template File OS DIALOG	${templatename}
 	Click Button	generatehtml
 	Sleep	2
 	Click Button	generateword
@@ -29,30 +30,28 @@ Verify That Files Get Saved With Correct Extension And Names
 	Sleep	2
 
 	# Verify files:
-	@{manager_files}=		List Files In Directory		${templatefolder}
-	Log To Console	${\n}All manager files: ${manager_files}${\n}
-	@{template_file}=		List Files In Directory		${templatefolder}	pattern=Issue-#39*
-	Length Should Be	${template_file}	1	msg=Template file name didnt saved correctly!
-	@{template_file_fragmented}=	Split String	${template_file}[0]		separator=.
-	Length Should Be	${template_file_fragmented}		2	msg=template file: ${template_file}[0] didnt saved correctly!
-	Should Be Equal		${template_file_fragmented}[0]		Issue-#39	msg=File name is not correct!
-	Should Be Equal		${template_file_fragmented}[1]		template	msg=File extension is not correct!
+	Remove File		${templatefolder}${/}here_will_be_template.txt
+	@{template_files}=		List Files In Directory		${templatefolder}
+	Log To Console	${\n}All Template files: ${template_files}${\n}
+	@{template_file}=		List Files In Directory		${templatefolder}
+	Length Should Be	${template_file}	1	msg=The Template file was not saved at all!
+	Should Be Equal As Strings		${template_file}[0]		${template_name}.template
+	...    msg=Template file name incorrect: expected "${template_name}.template", actual: "${template_file}[0]"
 
 	@{result_files}=		List Files In Directory		${resultfolder}
 	Log To Console	${\n}All result files: ${result_files}${\n}
-	Length Should Be	${result_files}		5	msg=Raport files name didnt saved correctly!
+	Length Should Be	${result_files}		5	msg=Result files didnt saved correctly!
 	
 	@{file_extensions}	Create List		db	docx	html	report	xlsx
 	FOR  ${i}  IN RANGE  0  5
 		${file}		Set Variable	${result_files}[${i}]
-		@{file_fragmented}=		Split String	${file}		separator=.
-		Length Should Be	${file_fragmented}		2	msg=${file_extensions}[${i}] file didnt saved correctly!
-		Should Be Equal		${file_fragmented}[0]		${resultdata}	msg=File name is not correct!
-		Should Be Equal		${file_fragmented}[1]		${file_extensions}[${i}]	msg=File extenstion is not correct!
+		Should Be Equal As Strings		${file}		${resultdata}.${file_extensions}[${i}]
+		...    msg=Result file name incorrect: expected "${resultdata}.${file_extensions}[${i}]", actual: "${file}"
 	END
 
 	[Teardown]	Run Keywords
-	...    Remove File	${templatefolder}${/}Issue-#39*		AND
+	...    Remove File	${templatefolder}${/}Issue-#39*						AND
+	...    Create File		${templatefolder}${/}here_will_be_template.txt	AND
 	...    Close GUI
 
 Whole report time range
