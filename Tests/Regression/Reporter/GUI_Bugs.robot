@@ -155,7 +155,7 @@ Template with Start and End Dates
 	Copy Files 	${resultfolder1}/*.report 	${testresultfolder1}
 	Copy Files 	${resultfolder1}/*.html 	${testresultfolder1}
 
-	${html}= 	Parse XML 		${resultfolder0}${/}${resultdata0}.html
+	${html}= 	Parse XML 		${resultfolder1}${/}${resultdata1}.html
 	${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[text()='2 Test Result Summary']/..
 	${table}= 		Get Element 	${html} 	.//div[@id='${sectionid}']//table
 	FOR 	${index}    ${item}    IN ENUMERATE    @{expected}
