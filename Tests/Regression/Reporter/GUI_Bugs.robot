@@ -68,3 +68,32 @@ New Data Table Section
 	Wait For Status 	SavedXHTMLReport
 
 	# Close GUI
+
+
+Template with Start and End Dates
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #250
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+
+	${testdata}=		Set Variable	Issue-#250
+	${resultdata0}=		Set Variable	20240626_130059_jpetstore-nomon-quick
+	${resultdata1}=		Set Variable	20240626_130756_jpetstore-nomon-quick
+	${basefolder}=		Set Variable	${CURDIR}${/}testdata${/}${testdata}
+	${resultfolder0}=	Set Variable	${basefolder}${/}${resultdata0}
+	${resultfolder1}=	Set Variable	${basefolder}${/}${resultdata1}
+	${templatefolder}=	Set Variable	${resultfolder}${/}template_dir
+	${templatename}=	Set Variable	Issue-#250
+	Change Reporter INI File Settings	templatedir		${templatefolder}
+
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	Log to console 	basefolder: ${basefolder} 	console=True
+	Log 	resultfolder: ${resultfolder} 	console=True
+	Log To Console	Files to check: report file, report template, output files from reporter (html docx xlsx)
+
+	Open GUI	-d 	${resultfolder0}
+
+	# change the start and end times
+
+	# switch to preview tab
+
+	Click Button	savetemplate
+	Save Template File OS DIALOG	${templatename}
