@@ -86,14 +86,33 @@ Template with Start and End Dates
 
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	Log to console 	basefolder: ${basefolder} 	console=True
-	Log 	resultfolder: ${resultfolder} 	console=True
-	Log To Console	Files to check: report file, report template, output files from reporter (html docx xlsx)
+	Log 	resultfolder0: ${resultfolder0} 	console=True
+	Log 	resultfolder1: ${resultfolder1} 	console=True
+	Log To Console	Open Reporter with resultfolder0 and create template
 
 	Open GUI	-d 	${resultfolder0}
 
 	# change the start and end times
+	Click Section			Report
+	Take A Screenshot
+
+	${StartTime}= 	Get Text Value To Right Of 	StartTime
+	# ${StartTime}= 	Replace String 	${StartTime} 	14:11 	14:20
+	# Set Text Value To Right Of 	StartTime 	${StartTime}
+
+	${EndTime}= 	Get Text Value To Right Of 	EndTime
+	# ${EndTime}= 	Replace String 	${EndTime} 	15:00 	14:58
+	# Set Text Value To Right Of 	EndTime 	${EndTime}
+
+	Take A Screenshot
+
 
 	# switch to preview tab
+	Click Tab 	 Preview
+	Take A Screenshot
 
 	Click Button	savetemplate
 	Save Template File OS DIALOG	${templatename}
+
+
+	Log To Console	Open Reporter with resultfolder1 and check template works
