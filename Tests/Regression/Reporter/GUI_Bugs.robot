@@ -75,13 +75,20 @@ Template with Start and End Dates
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 
 	${testdata}=		Set Variable	Issue-#250
-	${resultdata0}=		Set Variable	20240626_130059_jpetstore-nomon-quick
-	${resultdata1}=		Set Variable	20240626_130756_jpetstore-nomon-quick
 	${basefolder}=		Set Variable	${CURDIR}${/}testdata${/}${testdata}
+
+	${resultdata0}=		Set Variable	20240626_130059_jpetstore-nomon-quick
 	${resultfolder0}=	Set Variable	${basefolder}${/}${resultdata0}
+
+	${resultdata1}=		Set Variable	20240626_130756_jpetstore-nomon-quick
 	${resultfolder1}=	Set Variable	${basefolder}${/}${resultdata1}
-	${templatefolder}=	Set Variable	${basefolder}${/}template_dir
+
 	${templatename}=	Set Variable	Issue-#250
+	${templatefolder}=	Set Variable	${OUTPUT DIR}${/}${templatename}-${/}template_dir
+
+	${testresultfolder0}=	Set Variable	${OUTPUT DIR}${/}${templatename}${/}${resultdata0}
+	${testresultfolder1}=	Set Variable	${OUTPUT DIR}${/}${templatename}${/}${resultdata1}
+
 	Change Reporter INI File Settings	templatedir		${templatefolder}
 	Create Directory		${templatefolder}
 
@@ -113,20 +120,35 @@ Template with Start and End Dates
 
 
 	# switch to preview tab
-	Click Section			TestResultSummary
-	# Wait For Status 	PreviewLoaded
 
 	Click Tab 	 Preview
+
+	Click Section			TestResultSummary
+	# Wait For Status 	PreviewLoaded
 	Take A Screenshot
 
 	Click Button	savetemplate
 	Save Template File OS DIALOG	${templatename}
 
+	Click Button 	GenerateHTML
+	Wait For Status 	SavedXHTMLReport
+
 	Close GUI
+
+	Copy Files 	${resultfolder0}/*.report 	${testresultfolder0}
+	Copy Files 	${resultfolder0}/*.html 	${testresultfolder0}
 
 	Log To Console	Open Reporter with resultfolder1 and check template works
 
-	Open GUI	-d 	${resultfolder0}	-t 	${templatefolder}${/}${templatename}.template
+	Open GUI	-d 	${resultfolder1}	-t 	${templatefolder}${/}${templatename}.template
 	Wait For Status 	PreviewLoaded
 	Click Section			TestResultSummary
 	Take A Screenshot
+
+	Click Button 	GenerateHTML
+	Wait For Status 	SavedXHTMLReport
+
+	# Close GUI
+
+	Copy Files 	${resultfolder1}/*.report 	${testresultfolder1}
+	Copy Files 	${resultfolder1}/*.html 	${testresultfolder1}
