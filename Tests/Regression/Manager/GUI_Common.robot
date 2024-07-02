@@ -407,7 +407,7 @@ Create Robot File
 	File Should Exist	${path}${/}${name}
 
 Clear Manager Result Directory
-	[Arguments]		${results_dir}=${resultxs_dir}
+	[Arguments]		${results_dir}=${results_dir}
 	@{run_result_dirs}=		List Directories In Directory	${results_dir}	absolute=${True}
 	FOR  ${dir}  IN  @{run_result_dirs}
 		Remove Directory	${dir}	recursive=${True}
