@@ -364,7 +364,7 @@ class RFSwarmAgent():
 		for nic in nicstats.keys():
 			if nicstats[nic].speed > 0:
 				self.debugmsg(6, "Speed:", nicstats[nic].speed)
-				bytes_speed = nicstats[nic].speed * 1024 * 1024  / 8
+				bytes_speed = nicstats[nic].speed * 1024 * 1024 / 8
 				bytes_sent_sec = niccounters1[nic].bytes_sent - niccounters0[nic].bytes_sent
 				bytes_recv_sec = niccounters1[nic].bytes_recv - niccounters0[nic].bytes_recv
 				self.debugmsg(6, "bytes_speed:	", bytes_speed)
