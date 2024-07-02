@@ -83,6 +83,7 @@ Template with Start and End Dates
 	${templatefolder}=	Set Variable	${basefolder}${/}template_dir
 	${templatename}=	Set Variable	Issue-#250
 	Change Reporter INI File Settings	templatedir		${templatefolder}
+	Create Directory		${templatefolder}
 
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	Log to console 	basefolder: ${basefolder} 	console=True
@@ -91,6 +92,7 @@ Template with Start and End Dates
 	Log To Console	Open Reporter with resultfolder0 and create template
 
 	Open GUI	-d 	${resultfolder0}
+	Wait For Status 	PreviewLoaded
 
 	# change the start and end times
 	Click Section			Report
@@ -105,15 +107,26 @@ Template with Start and End Dates
 	${EndTime}= 	Replace String 	${EndTime} 	03:03 	03:02
 	Set Text Value To Right Of 	EndTime 	${EndTime}
 
+	Select Field With Label 	Title
+	Wait For Status 	PreviewLoaded
 	Take A Screenshot
 
 
 	# switch to preview tab
+	Click Section			TestResultSummary
+	# Wait For Status 	PreviewLoaded
+
 	Click Tab 	 Preview
 	Take A Screenshot
 
 	Click Button	savetemplate
 	Save Template File OS DIALOG	${templatename}
 
+	Close GUI
 
 	Log To Console	Open Reporter with resultfolder1 and check template works
+
+	Open GUI	-d 	${resultfolder0}	-t 	${templatefolder}${/}${templatename}.template
+	Wait For Status 	PreviewLoaded
+	Click Section			TestResultSummary
+	Take A Screenshot
