@@ -96,13 +96,14 @@ Template with Start and End Dates
 	Click Section			Report
 	Take A Screenshot
 
+	Make Clipboard Not None
 	${StartTime}= 	Get Text Value To Right Of 	StartTime
-	# ${StartTime}= 	Replace String 	${StartTime} 	14:11 	14:20
-	# Set Text Value To Right Of 	StartTime 	${StartTime}
+	${StartTime}= 	Replace String 	${StartTime} 	03:00 	03:01
+	Set Text Value To Right Of 	StartTime 	${StartTime}
 
 	${EndTime}= 	Get Text Value To Right Of 	EndTime
-	# ${EndTime}= 	Replace String 	${EndTime} 	15:00 	14:58
-	# Set Text Value To Right Of 	EndTime 	${EndTime}
+	${EndTime}= 	Replace String 	${EndTime} 	03:03 	03:02
+	Set Text Value To Right Of 	EndTime 	${EndTime}
 
 	Take A Screenshot
 
