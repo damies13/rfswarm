@@ -1,5 +1,6 @@
 *** Settings ***
 Resource 	GUI_Common.robot
+Library 	XML 	use_lxml=True
 
 Test Teardown 	Close GUI
 
@@ -84,7 +85,7 @@ Template with Start and End Dates
 	${resultfolder1}=	Set Variable	${basefolder}${/}${resultdata1}
 
 	${templatename}=	Set Variable	Issue-#250
-	${templatefolder}=	Set Variable	${OUTPUT DIR}${/}${templatename}-${/}template_dir
+	${templatefolder}=	Set Variable	${OUTPUT DIR}${/}${templatename}${/}template_dir
 
 	${testresultfolder0}=	Set Variable	${OUTPUT DIR}${/}${templatename}${/}${resultdata0}
 	${testresultfolder1}=	Set Variable	${OUTPUT DIR}${/}${templatename}${/}${resultdata1}
@@ -103,7 +104,7 @@ Template with Start and End Dates
 
 	# change the start and end times
 	Click Section			Report
-	Take A Screenshot
+	# Take A Screenshot
 
 	Make Clipboard Not None
 	${StartTime}= 	Get Text Value To Right Of 	StartTime
@@ -116,7 +117,7 @@ Template with Start and End Dates
 
 	Select Field With Label 	Title
 	Wait For Status 	PreviewLoaded
-	Take A Screenshot
+	# Take A Screenshot
 
 
 	# switch to preview tab
@@ -125,7 +126,7 @@ Template with Start and End Dates
 
 	Click Section			TestResultSummary
 	# Wait For Status 	PreviewLoaded
-	Take A Screenshot
+	# Take A Screenshot
 
 	Click Button	savetemplate
 	Save Template File OS DIALOG	${templatename}
@@ -135,6 +136,11 @@ Template with Start and End Dates
 
 	Close GUI
 
+	${html}= 	Parse XML 		${resultfolder0}${/}${resultdata0}.html
+	${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[text()='2 Test Result Summary']/..
+	${table}= 		Get Element 	${html} 	.//div[@id='${sectionid}']//table
+	${expected}= 	Get Elements Texts 	${table} 	tr/td[1]
+
 	Copy Files 	${resultfolder0}/*.report 	${testresultfolder0}
 	Copy Files 	${resultfolder0}/*.html 	${testresultfolder0}
 
@@ -142,13 +148,24 @@ Template with Start and End Dates
 
 	Open GUI	-d 	${resultfolder1}	-t 	${templatefolder}${/}${templatename}.template
 	Wait For Status 	PreviewLoaded
-	Click Section			TestResultSummary
-	Take A Screenshot
 
 	Click Button 	GenerateHTML
 	Wait For Status 	SavedXHTMLReport
 
-	# Close GUI
-
 	Copy Files 	${resultfolder1}/*.report 	${testresultfolder1}
 	Copy Files 	${resultfolder1}/*.html 	${testresultfolder1}
+
+	${html}= 	Parse XML 		${resultfolder0}${/}${resultdata0}.html
+	${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[text()='2 Test Result Summary']/..
+	${table}= 		Get Element 	${html} 	.//div[@id='${sectionid}']//table
+	FOR 	${index}    ${item}    IN ENUMERATE    @{expected}
+		${row}= 	Evaluate    ${index} + 2
+		${txt}= 	Get Element Text 	${table} 	tr[${row}]/td[1]
+		Should Be Equal As Strings    ${item}    ${txt}
+	END
+
+	Click Tab 	 Preview
+
+	Click Section			TestResultSummary
+	# Take A Screenshot
+	Wait For 	reporter_${platform}_expected_testresultsummary.png 	 timeout=30
