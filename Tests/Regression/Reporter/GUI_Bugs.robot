@@ -80,7 +80,7 @@ Template with Start and End Dates
 	${basefolder}=		Set Variable	${CURDIR}${/}testdata${/}${testdata}
 	${resultfolder0}=	Set Variable	${basefolder}${/}${resultdata0}
 	${resultfolder1}=	Set Variable	${basefolder}${/}${resultdata1}
-	${templatefolder}=	Set Variable	${resultfolder}${/}template_dir
+	${templatefolder}=	Set Variable	${basefolder}${/}template_dir
 	${templatename}=	Set Variable	Issue-#250
 	Change Reporter INI File Settings	templatedir		${templatefolder}
 
