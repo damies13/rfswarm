@@ -6913,7 +6913,7 @@ class ReporterGUI(tk.Frame):
 			ist = base.report_formateddatetimetosec(st)
 			base.debugmsg(8, "ist:", ist)
 			if ist > 0:
-				ios = ist - self.report_starttime()
+				ios = ist - base.report_starttime()
 				base.rs_setting_set_int("startoffset", ios)
 
 		if "intST" in self.contentdata[id]:
@@ -6926,7 +6926,7 @@ class ReporterGUI(tk.Frame):
 			iet = base.report_formateddatetimetosec(et)
 			base.debugmsg(8, "iet:", iet)
 			if iet > 0:
-				ios = self.report_endtime() - iet
+				ios = base.report_endtime() - iet
 				base.rs_setting_set_int("endoffset", ios)
 
 		if "intET" in self.contentdata[id]:
