@@ -325,10 +325,10 @@ class ReporterBase():
 		templatedata = configparser.ConfigParser()
 		templatedata.read_dict(base.report._sections)
 		if "Report" in templatedata:
-			if "starttime" in templatedata["Report"]
+			if "starttime" in templatedata["Report"]:
 				# templatedata["Report"]["starttime"]
 				templatedata.remove_option('Report', 'starttime')
-			if "endtime" in templatedata["Report"]
+			if "endtime" in templatedata["Report"]:
 				# templatedata["Report"]["endtime"]
 				templatedata.remove_option('Report', 'endtime')
 		with open(filename, 'w', encoding="utf8") as templatefile:    # save
