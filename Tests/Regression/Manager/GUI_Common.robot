@@ -852,14 +852,19 @@ Verify Test Result Directory Name
 	@{run_dir_name_fragmented}=	Split String	${result_dir_name}	separator=_		max_split=2
 	Length Should Be	${run_dir_name_fragmented}	3	msg=The test run result dir was not created correctly!
 
-	${expected_time_to_substract}=	Convert Date	${current_date}	date_format=%Y%m%d_%H%M%S
-	${actual_time_to_substract}=	Convert Date	${run_dir_name_fragmented}[0]_${run_dir_name_fragmented}[1]	date_format=%Y%m%d_%H%M%S
-	${time}		Subtract Date From Date	${expected_time_to_substract}	${actual_time_to_substract}
-	Log To Console	Time diff: ${time}
-	Should Be True	${time} >= 0 and ${time} <= 3
+	${current_date}=	Convert Date	${current_date}		result_format=%Y%m%d_%H%M%S
+	${expected_time_to_substract}=	Convert Date	${current_date}		date_format=%Y%m%d_%H%M%S
+	${test_run_time_to_substract}=	Convert Date	${run_dir_name_fragmented}[0]_${run_dir_name_fragmented}[1]		date_format=%Y%m%d_%H%M%S
+	${time_diff}		Subtract Date From Date	${current_date}	${test_run_time_to_substract}
+	Log To Console	Time diff: ${time_diff}
+	Should Be True	${time_diff} >= 0 and ${time_diff} <= 3
 	...    msg=Result directory name has incorrect date: expected "${current_date}_${scenario_name}", actual: "${result_dir_name}". There should be little or no difference.
-	Should Be Equal As Strings		${run_dir_name_fragmented}[2]		${scenario_name}
-	...    msg=Result directory name from scenario is incorrect: expected "${scenario_name}", actual: "${run_dir_name_fragmented}[2]".
+
+	#${current_date}=	Convert Date	${current_date}		date_format=%Y%m%d_%H%M%S
+	${expected_time}=	Subtract Time From Date		${current_date}		${time_diff}	result_format=%Y%m%d_%H%M%S		date_format=%Y%m%d_%H%M%S
+	${expected_name}=	Set Variable	${expected_time}_${run_dir_name_fragmented}[2]
+	Should Be Equal As Strings		${result_dir_name}		${expected_name}
+	...    msg=Result directory name from scenario is incorrect: expected "${expected_name}", actual: "${result_dir_name}".
 
 Verify Generated Run Result Files
 	[Arguments]		${result_dir_name}		${scenario_name}
