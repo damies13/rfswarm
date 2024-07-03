@@ -18,22 +18,21 @@ Verify That Files Get Saved With Correct Extension And Names
 	...    Open Manager GUI													AND
 	...    Open Agent
 
+	${scenario_name}=	Set Variable	Issue-#39
 	Log To Console	Files to check: scenario file, csv result files
 	Click Button	runsave
-	Save Scenario File OS DIALOG	Issue-#39
+	Save Scenario File OS DIALOG	${scenario_name}
 
 	# !!! csv files are checked in Test Case for Issue #254 !!!
-	@{scenario_file}=		List Files In Directory		${global_path}	Issue-#39*
 	@{all_files}=	List Files In Directory		${global_path}
 	Log To Console	${\n}All manager files: ${all_files}${\n}
-	Length Should Be	${scenario_file}	1	msg=Scenario file name didnt saved correctly!
-	@{scenario_file_fragmented}=	Split String	${scenario_file}[0]		separator=.
-	Length Should Be	${scenario_file_fragmented}		2	msg=Scenario file: ${scenario_file}[0] didnt saved correctly! 
-	Should Be Equal		${scenario_file_fragmented}[0]		Issue-#39	msg=File name is not correct!
-	Should Be Equal		${scenario_file_fragmented}[1]		rfs			msg=File extensiton is not correct!
+	@{scenario_file}=		List Files In Directory		${global_path}		${scenario_name}*
+	Length Should Be	${scenario_file}	1	msg=Cant find scenario file. File did not save or saved incorrectly. Check all manager files.
+	Should Be Equal As Strings		${scenario_file}[0]		${scenario_name}.rfs
+	...    msg=Scenario file name is incorrect: expected "${scenario_name}.rfs", actual: "${scenario_file}[0]"
 
 	[Teardown]	Run Keywords
-	...    Delete Scenario File		Issue-#39				AND
+	...    Delete Scenario File		${scenario_name}		AND
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    GUI_Common.Stop Agent
 
