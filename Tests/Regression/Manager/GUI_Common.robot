@@ -406,6 +406,13 @@ Create Robot File
 	Create File		${path}${/}${name}	content=${example_robot_content}
 	File Should Exist	${path}${/}${name}
 
+Clear Manager Result Directory
+	[Arguments]		${results_dir}=${results_dir}
+	@{run_result_dirs}=		List Directories In Directory	${results_dir}	absolute=${True}
+	FOR  ${dir}  IN  @{run_result_dirs}
+		Remove Directory	${dir}	recursive=${True}
+	END
+
 Change Test Group Settings
 	[Arguments]		${row_settings_data}
 	Sleep	2
@@ -839,3 +846,45 @@ Check That The Scenario File Opens Correctly
 	Log		${scenario_content}
 	Log		${scenario_content_reopened}
 	Should Be Equal		${scenario_content}		${scenario_content_reopened}	msg=Scenario files are not equal!
+
+Verify Test Result Directory Name
+	[Arguments]		${result_dir_name}	${scenario_name}	${current_date}
+	@{run_dir_name_fragmented}=	Split String	${result_dir_name}	separator=_		max_split=2
+	Length Should Be	${run_dir_name_fragmented}	3	msg=The test run result dir was not created correctly!
+
+	${current_date}=	Convert Date	${current_date}		result_format=%Y%m%d_%H%M%S
+	${expected_time_to_substract}=	Convert Date	${current_date}		date_format=%Y%m%d_%H%M%S
+	${test_run_time_to_substract}=	Convert Date	${run_dir_name_fragmented}[0]_${run_dir_name_fragmented}[1]		date_format=%Y%m%d_%H%M%S
+	${time_diff}		Subtract Date From Date	${current_date}	${test_run_time_to_substract}
+	Log To Console	Time diff: ${time_diff}
+	Should Be True	${time_diff} >= 0 and ${time_diff} <= 3
+	...    msg=Result directory name has incorrect date: expected "${current_date}_${scenario_name}", actual: "${result_dir_name}". There should be little or no difference.
+
+	#${current_date}=	Convert Date	${current_date}		date_format=%Y%m%d_%H%M%S
+	${expected_time}=	Subtract Time From Date		${current_date}		${time_diff}	result_format=%Y%m%d_%H%M%S		date_format=%Y%m%d_%H%M%S
+	${expected_name}=	Set Variable	${expected_time}_${run_dir_name_fragmented}[2]
+	Should Be Equal As Strings		${result_dir_name}		${expected_name}
+	...    msg=Result directory name from scenario is incorrect: expected "${expected_name}", actual: "${result_dir_name}".
+
+Verify Generated Run Result Files
+	[Arguments]		${result_dir_name}		${scenario_name}
+	@{run_dir_name_fragmented}=	Split String	${result_dir_name}	separator=_		max_split=2
+	${result_dir_time}=	Set Variable	${run_dir_name_fragmented}[0]_${run_dir_name_fragmented}[1]
+
+	${result_files}=		List Files In Directory		${results_dir}${/}${result_dir_name}
+	Log To Console	${\n}All test run result files: ${result_files}{\n}
+	Length Should Be	${result_files}		1	msg=The db file was not created or created unexpected files!
+	${db_file}=		Set Variable	${result_files}[0]
+	Should Be Equal As Strings		${db_file}		${result_dir_time}_${scenario_name}.db
+	...    msg=Result directory name from scenario is incorrect: expected "${scenario_name}", actual: "${run_dir_name_fragmented}[2]".
+
+	${logs}=	List Directories In Directory	${results_dir}${/}${result_dir_name}
+	Log To Console	${\n}All test run result directories: ${logs}{\n}
+	Length Should Be	${logs}		1	msg=The db file was not created or created unexpected files!
+	Should Be Equal As Strings		${logs}[0]		logs
+	...    msg=Logs directory name is incorrect: expected "logs", actual: "${logs}[0]".
+	${logs_absolute_paths}	${logs_file_names}
+	...    Find Absolute Paths And Names For Files In Directory		${results_dir}${/}${result_dir_name}${/}${logs}[0]
+	${len}=		Get Length	${logs_file_names}
+	Log To Console	Number of files in the Logs directory: ${len}
+	Should Be True	${len} >= 20	msg=Number of files in the Logs directory is incorrect: should be at least 20, actual: "${len}".
