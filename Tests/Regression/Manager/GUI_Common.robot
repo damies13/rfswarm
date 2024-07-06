@@ -11,6 +11,11 @@ Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 Library 	IniFile.py
 
 *** Variables ***
+${platform}		None
+${global_path}	None
+${global_name}	None
+@{mngr_options}		None
+@{agent_options}	None
 ${cmd_agent} 		rfswarm-agent
 ${cmd_manager} 	rfswarm
 ${IMAGE_DIR} 	${CURDIR}/Images/file_method
@@ -368,9 +373,8 @@ Get Manager INI Data
 	Should Not Be Empty	${ini_content}
 	RETURN	${ini_content}
 
-Read INI Data
-	[Arguments]		${inifile}
-
+#Read INI Data
+#	[Arguments]		${inifile}
 
 Set INI Window Size
 	[Arguments]		${width}=${None}	${height}=${None}
@@ -552,7 +556,7 @@ Save Scenario File OS DIALOG
 Open Scenario File OS DIALOG
 	[Arguments]		${scenario_name}
 	Sleep	5
-	Type	${scenario_name}.rfs
+	Type	${scenario_name}
 	Take A Screenshot
 	Click Dialog Button		open
 	Sleep	1
