@@ -476,12 +476,10 @@ Verify Disable log.html - Scenario
 	Click Dialog Button 	ok
 	Click Button 	runsave
 
-	Run Keyword		Close Manager GUI ${platform}
-
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
-
+	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify Disable report.html - Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
@@ -514,8 +512,6 @@ Verify Disable report.html - Scenario
 	Click CheckBox 	checked 	reporthtml
 	Click Dialog Button 	ok
 	Click Button 	runsave
-
-	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
@@ -553,8 +549,6 @@ Verify Disable output.xml - Scenario
 	Click CheckBox 	checked 	outputxml
 	Click Dialog Button 	ok
 	Click Button 	runsave
-
-	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
@@ -594,8 +588,6 @@ Verify Disable log.html - Test Row
 	Click CheckBox 	checked 	loghtml
 	Test Group Save Settings
 	Click Button 	runsave
-
-	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True

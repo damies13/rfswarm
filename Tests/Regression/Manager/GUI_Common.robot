@@ -81,9 +81,10 @@ Close Manager GUI windows
 
 Close Manager GUI
 	[Tags]	windows-latest		ubuntu-latest
+	Sleep	5
 	Press Combination 	Key.esc
 	Press Combination 	x 	Key.ctrl
-	Sleep	5
+	Sleep	3
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
 		# Click Dialog Button		no
@@ -877,14 +878,18 @@ Verify Generated Run Result Files
 
 	${result_files}=		List Files In Directory		${results_dir}${/}${result_dir_name}
 	Log To Console	${\n}All test run result files: ${result_files}{\n}
-	Length Should Be	${result_files}		1	msg=The db file was not created or created unexpected files!
+	${len}=		Get Length	${result_files}
+	Should Be True	${len} > 0	msg=The db file was not created.
+	Should Be True	${len} < 2	msg=Unexpected files have been created in the results folder. There should only be ${result_dir_time}_${scenario_name}.db file.
 	${db_file}=		Set Variable	${result_files}[0]
 	Should Be Equal As Strings		${db_file}		${result_dir_time}_${scenario_name}.db
 	...    msg=Result directory name from scenario is incorrect: expected "${scenario_name}", actual: "${run_dir_name_fragmented}[2]".
 
 	${logs}=	List Directories In Directory	${results_dir}${/}${result_dir_name}
 	Log To Console	${\n}All test run result directories: ${logs}{\n}
-	Length Should Be	${logs}		1	msg=The db file was not created or created unexpected files!
+	${len}=		Get Length	${logs}
+	Should Be True	${len} > 0	msg=The logs directory was not created.
+	Should Be True	${len} < 2	msg=Unexpected directories have been created in the results folder. There should only be 'logs' directory.
 	Should Be Equal As Strings		${logs}[0]		logs
 	...    msg=Logs directory name is incorrect: expected "logs", actual: "${logs}[0]".
 	${logs_absolute_paths}	${logs_file_names}
