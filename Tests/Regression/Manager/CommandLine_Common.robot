@@ -29,6 +29,7 @@ Show Log
 	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
 	Log 		${filedata} 		console=True
 	Log 		-----${filename}-----${\n} 		console=True
+	RETURN 		${filedata}
 
 Show Dir Contents
 	[Arguments]		${dir}
@@ -63,7 +64,7 @@ Run Manager CLI
 
 Wait For Manager
 	[Arguments]		${timeout}=10min
-	${result}= 	Wait For Process		${process_manager} 	timeout=${timeout} 	on_timeout=kill
+	${result}= 	Wait For Process		${process_manager} 	timeout=${timeout} 	on_timeout=terminate
 	# Should Be Equal As Integers 	${result.rc} 	0
 	Log to console 	${result.rc}
 

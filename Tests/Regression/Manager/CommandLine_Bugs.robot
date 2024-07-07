@@ -75,24 +75,33 @@ Circular Reference Resource Files
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 	Stop Agent
-	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
 
-	Should Not Contain 	${OUTPUT DIR}${/}stdout_manager.txt 		OSError: [Errno 24] Too many open files
-	Should Not Contain 	${OUTPUT DIR}${/}stderr_manager.txt 		OSError: [Errno 24] Too many open files
+	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
 
-	Should Not Contain 	${OUTPUT DIR}${/}stdout_agent.txt 		Manager Disconnected
+	Should Not Contain 	${stdout_manager} 		OSError: [Errno 24] Too many open files
+	Should Not Contain 	${stderr_manager} 		OSError: [Errno 24] Too many open files
+	Should Not Contain 	${stdout_manager}		OSError
+	Should Not Contain 	${stderr_manager} 		OSError
+	Should Not Contain 	${stdout_manager} 		Errno 24
+	Should Not Contain 	${stderr_manager} 		Errno 24
+	Should Not Contain 	${stdout_manager} 		Too many open files
+	Should Not Contain 	${stderr_manager} 		Too many open files
 
-	@{testdata-dir}= 	List Directory 		${testdata}${/}agent-dir
+	Should Not Contain 	${stdout_agent} 		Manager Disconnected
+
+	@{testdata-dir}= 	List Directory 		${testdata}
 	Log 	testdata-dir: ${testdata-dir} 		console=True
 	@{agent-dir}= 	List Directory 		${testdata}${/}agent-dir
 	Log 	agent-dir: ${agent-dir} 		console=True
 	@{scripts-dir}= 	List Directory 		${testdata}${/}agent-dir${/}scripts
 	Log 	scripts-dir: ${scripts-dir} 		console=True
 
-	@{result_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}agent-dir${/}scripts${/}resources 	*.resource
+	# @{result_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}agent-dir${/}scripts${/}resources 	*.resource
+	@{result_files}= 	List Files In Directory And Sub Directories 	${agent_dir}${/}scripts${/}resources 	*.resource
+
 
 	Diff Lists    ${expected_files}    ${result_files}    Agent didn't get all files from manager
 
@@ -120,17 +129,24 @@ Lots Of Resource Files
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 	Stop Agent
-	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
 
-	Should Not Contain 	${OUTPUT DIR}${/}stdout_manager.txt 		OSError: [Errno 24] Too many open files
-	Should Not Contain 	${OUTPUT DIR}${/}stderr_manager.txt 		OSError: [Errno 24] Too many open files
+	Should Not Contain 	${stdout_manager} 		OSError: [Errno 24] Too many open files
+	Should Not Contain 	${stderr_manager} 		OSError: [Errno 24] Too many open files
+	Should Not Contain 	${stdout_manager}		OSError
+	Should Not Contain 	${stderr_manager} 		OSError
+	Should Not Contain 	${stdout_manager} 		Errno 24
+	Should Not Contain 	${stderr_manager} 		Errno 24
+	Should Not Contain 	${stdout_manager} 		Too many open files
+	Should Not Contain 	${stderr_manager} 		Too many open files
 
-	Should Not Contain 	${OUTPUT DIR}${/}stdout_agent.txt 		Manager Disconnected
+	Should Not Contain 	${stdout_agent} 		Manager Disconnected
 
-	@{result_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}agent-dir${/}scripts${/}resources 	*.resource
+	# @{result_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}agent-dir${/}scripts${/}resources 	*.resource
+	@{result_files}= 	List Files In Directory And Sub Directories 	${agent_dir}${/}scripts${/}resources 	*.resource
 
 	Diff Lists    ${expected_files}    ${result_files}    Agent didn't get all files from manager
 
