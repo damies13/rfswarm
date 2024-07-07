@@ -25,10 +25,10 @@ ${agent_dir} 				${OUTPUT DIR}${/}rfswarm-agent
 
 Show Log
 	[Arguments]		${filename}
-	Log to console 	${\n}-----${filename}-----
-	${filedata}= 	Get File 	${filename}
-	Log to console 	${filedata}
-	Log to console 	-----${filename}-----${\n}
+	Log 		${\n}-----${filename}----- 		console=True
+	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
+	Log 		${filedata} 		console=True
+	Log 		-----${filename}-----${\n} 		console=True
 
 Show Dir Contents
 	[Arguments]		${dir}

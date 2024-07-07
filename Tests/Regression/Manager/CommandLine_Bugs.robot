@@ -85,6 +85,13 @@ Circular Reference Resource Files
 
 	Should Not Contain 	${OUTPUT DIR}${/}stdout_agent.txt 		Manager Disconnected
 
+	@{testdata-dir}= 	List Directory 		${testdata}${/}agent-dir
+	Log 	testdata-dir: ${testdata-dir} 		console=True
+	@{agent-dir}= 	List Directory 		${testdata}${/}agent-dir
+	Log 	agent-dir: ${agent-dir} 		console=True
+	@{scripts-dir}= 	List Directory 		${testdata}${/}agent-dir${/}scripts
+	Log 	scripts-dir: ${scripts-dir} 		console=True
+
 	@{result_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}agent-dir${/}scripts${/}resources 	*.resource
 
 	Diff Lists    ${expected_files}    ${result_files}    Agent didn't get all files from manager
