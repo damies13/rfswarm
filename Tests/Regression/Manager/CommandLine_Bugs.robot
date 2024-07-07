@@ -92,12 +92,12 @@ Circular Reference Resource Files
 
 	Should Not Contain 	${stdout_agent} 		Manager Disconnected
 
-	@{testdata-dir}= 	List Directory 		${testdata}
-	Log 	testdata-dir: ${testdata-dir} 		console=True
-	@{agent-dir}= 	List Directory 		${testdata}${/}agent-dir
-	Log 	agent-dir: ${agent-dir} 		console=True
-	@{scripts-dir}= 	List Directory 		${testdata}${/}agent-dir${/}scripts
-	Log 	scripts-dir: ${scripts-dir} 		console=True
+	# @{testdata-dir}= 	List Directory 		${testdata}
+	# Log 	testdata-dir: ${testdata-dir} 		console=True
+	# @{agent-dir}= 	List Directory 		${testdata}${/}agent-dir
+	# Log 	agent-dir: ${agent-dir} 		console=True
+	# @{scripts-dir}= 	List Directory 		${testdata}${/}agent-dir${/}scripts
+	# Log 	scripts-dir: ${scripts-dir} 		console=True
 
 	# @{result_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}agent-dir${/}scripts${/}resources 	*.resource
 	@{result_files}= 	List Files In Directory And Sub Directories 	${agent_dir}${/}scripts${/}resources 	*.resource
