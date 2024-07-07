@@ -136,7 +136,7 @@ Get Modules From Program .py File That Are Not BuildIn
 	${manager_content}	Get File	${file_path}
 	${all_imports_lines}	Split String	${manager_content}	separator=\n
 	Log	${all_imports_lines}
-	
+
 	${custom_imports}	Create List
 	${length}	Get Length	${all_imports_lines}
 	FOR  ${i}  IN RANGE  0  ${length}
@@ -174,7 +174,7 @@ Get Modules From Program .py File That Are Not BuildIn
 			${custom_imports}[${i}]  Set Variable  ${replace_names}[${custom_imports}[${i}]]
 		END
 	END
-	
+
 	RETURN	${custom_imports}
 
 Get Install Requires From Setup File
@@ -196,7 +196,7 @@ Get Install Requires From Setup File
 					Append To List	${sliced_times}		@{sliced_times1}
 					@{sliced_times2}	Split String	${items}	separator=-
 					Append To List	${sliced_times}		@{sliced_times2}
-					
+
 					FOR  ${i}  IN   @{sliced_times}
 						Append To List	${refactored_requires}	${i}
 
@@ -212,3 +212,83 @@ Get Install Requires From Setup File
 
 	RETURN	${refactored_requires}
 #
+
+Create Testdata Agent INI
+	[Arguments] 	${inifile}
+	Create File 	${inifile} 	[Agent]\n
+	Append To File 	${inifile} 	agentname = E-5CG2026KN2\n
+	Append To File 	${inifile} 	agentdir = ${testdata}${/}agent-dir\n
+	Append To File 	${inifile} 	xmlmode = False\n
+	Append To File 	${inifile} 	excludelibraries = BuiltIn,String,OperatingSystem,perftest\n
+	Append To File 	${inifile} 	properties =\n
+	Append To File 	${inifile} 	swarmmanager = http://localhost:8138/\n
+	Append To File 	${inifile} 	robotcmd = robot\n
+
+Create Testdata Manager INI
+	[Arguments] 	${inifile}
+
+	Create File 	${inifile} 	[GUI]\n
+	Append To File 	${inifile} 	win_width = 1280\n
+	Append To File 	${inifile} 	win_height = 720\n
+	Append To File 	${inifile} 	graph_list = \n
+	Append To File 	${inifile} 	\n
+	Append To File 	${inifile} 	[Plan]\n
+	Append To File 	${inifile} 	scriptdir = ${testdata}\n
+	Append To File 	${inifile} 	scenariodir = ${testdata}\n
+	Append To File 	${inifile} 	scenariofile = ${testdata}${/}scenario.rfs\n
+	Append To File 	${inifile} 	\n
+	Append To File 	${inifile} 	[Run]\n
+	Append To File 	${inifile} 	resultsdir = ${testdata}${/}results\n
+	Append To File 	${inifile} 	display_index = False\n
+	Append To File 	${inifile} 	display_iteration = False\n
+	Append To File 	${inifile} 	display_sequence = False\n
+	Append To File 	${inifile} 	display_percentile = 90\n
+	Append To File 	${inifile} 	\n
+	Append To File 	${inifile} 	[Server]\n
+	Append To File 	${inifile} 	bindip = \n
+	Append To File 	${inifile} 	bindport = 8138\n
+	Append To File 	${inifile} 	\n
+
+List Files In Directory And Sub Directories
+	[Arguments] 	${path} 	${pattern}=None 	${absolute}=False
+	@{files}= 	List Files In Directory 	${path} 	${pattern} 	${absolute}
+	@{dirs}= 	List Directories In Directory 	${path}
+	FOR 	${dir} 	IN 	@{dirs}
+		@{sd_files}= 	List Files In Directory And Sub Directories 	${path}${/}${dir} 	${pattern} 	${absolute}
+		FOR 	${file} 	IN 	@{sd_files}
+			IF 	${absolute}
+				Append To List 	${files} 	${file}
+			ELSE
+				Append To List 	${files} 	${dir}${/}${file}
+			END
+		END
+	END
+	RETURN 	${files}
+
+Diff Lists
+	[Arguments] 	${list_a} 		${list_b} 	${message}
+
+	${status}= 	Run Keyword And Return Status 	Lists Should Be Equal 	${list_a} 	${list_b}
+	IF 	not ${status}
+		Log		${list_a}
+		Log		${list_b}
+		${Missing_List_From_A}= 	Create List
+		${Missing_List_From_B}= 	Create List
+
+		FOR 	${item} 	IN 		@{list_b}
+			${status}= 	Run Keyword And Return Status 	List Should Contain Value 	${list_a} 	${item}
+			IF 	not ${status}
+				Append To List 	${Missing_List_From_A} 	${item}
+			END
+		END
+
+		FOR 	${item} 	IN 		@{list_a}
+			${status}= 	Run Keyword And Return Status 	List Should Contain Value 	${list_b} 	${item}
+			IF 	not ${status}
+				Append To List 	${Missing_List_From_B} 	${item}
+			END
+		END
+		Log 		\nItems from list B missing from list A: ${Missing_List_From_A} 	console=True
+		Log 		Items from list A missing from list B: ${Missing_List_From_B} 	console=True
+		Lists Should Be Equal 	${list_a} 	${list_b} 		msg=${message}
+	END
