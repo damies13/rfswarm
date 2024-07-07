@@ -81,6 +81,12 @@ Circular Reference Resource Files
 	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
 
+
+	Should Not Contain 	${stdout_manager} 		RuntimeError
+	Should Not Contain 	${stderr_manager} 		RuntimeError
+	Should Not Contain 	${stdout_manager} 		Exception
+	Should Not Contain 	${stderr_manager} 		Exception
+
 	Should Not Contain 	${stdout_manager} 		OSError: [Errno 24] Too many open files
 	Should Not Contain 	${stderr_manager} 		OSError: [Errno 24] Too many open files
 	Should Not Contain 	${stdout_manager}		OSError
@@ -101,6 +107,7 @@ Circular Reference Resource Files
 
 	# @{result_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}agent-dir${/}scripts${/}resources 	*.resource
 	@{result_files}= 	List Files In Directory And Sub Directories 	${agent_dir}${/}scripts${/}resources 	*.resource
+	# @{result_files}= 	List Files In Directory And Sub Directories 	${agent_dir}${/}scripts 	*.resource
 
 
 	Diff Lists    ${expected_files}    ${result_files}    Agent didn't get all files from manager
