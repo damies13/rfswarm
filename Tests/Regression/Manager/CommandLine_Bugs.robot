@@ -89,6 +89,11 @@ Circular Reference Resource Files
 
 	Diff Lists    ${expected_files}    ${result_files}    Agent didn't get all files from manager
 
+	[Teardown]	Run Keywords
+	...    Stop Agent	AND
+	...    Stop Manager
+
+
 Lots Of Resource Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #261
 	VAR    ${testdata} 		${CURDIR}${/}testdata${/}Issue-#261${/}lotsa_files_test      scope=TEST
@@ -121,3 +126,7 @@ Lots Of Resource Files
 	@{result_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}agent-dir${/}scripts${/}resources 	*.resource
 
 	Diff Lists    ${expected_files}    ${result_files}    Agent didn't get all files from manager
+
+	[Teardown]	Run Keywords
+	...    Stop Agent	AND
+	...    Stop Manager
