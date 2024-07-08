@@ -81,7 +81,7 @@ Close Manager GUI windows
 
 Close Manager GUI
 	[Tags]	windows-latest		ubuntu-latest
-	Sleep	3
+	Sleep	10
 	Press Combination 	Key.esc
 	Press Combination 	x 	Key.ctrl
 	Sleep	3
@@ -102,7 +102,7 @@ Close Manager GUI
 
 Close Manager GUI macos
 	[Tags]	macos-latest
-	Sleep	3
+	Sleep	10
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
 		Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
