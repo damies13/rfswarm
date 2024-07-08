@@ -102,7 +102,7 @@ Close Manager GUI
 
 Close Manager GUI macos
 	[Tags]	macos-latest
-	Sleep	10
+	Sleep	20
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
 		Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
