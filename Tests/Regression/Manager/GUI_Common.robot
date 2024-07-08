@@ -85,8 +85,9 @@ Close Manager GUI
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
 		Click Image		manager_${platform}_titlebar_rfswarm.png
-		Press Combination 	Key.esc
-		Press Combination 	x 	Key.ctrl
+		Click Button	closewindow
+		# Press Combination 	Key.esc
+		# Press Combination 	x 	Key.ctrl
 		Sleep	3
 		Run Keyword And Ignore Error 	Click Dialog Button		no 		10
 	END
