@@ -4,7 +4,7 @@ Resource          resources/folder-2/b.resource
 
 Metadata	File    resources/config.yaml
 
-Suite Teardown    Close All Browsers
+# Suite Teardown    Close All Browsers
 
 *** Test Cases ***
 Basic test

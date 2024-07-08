@@ -51,6 +51,7 @@ Run Agent
 		${options}= 	Create List
 	END
 	Append To List 	${options} 	-d 	${agent_dir}
+	Empty Directory 	${agent_dir}
 
 	Log to console 	${\n}\${options}: ${options}
 	# ${process}= 	Start Process 	python3 	${pyfile_agent}  @{options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt

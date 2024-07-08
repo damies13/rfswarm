@@ -1406,6 +1406,8 @@ class RFSwarmBase:
 
 								else:
 									base.debugmsg(6, "localrespath", localrespath)
+									if os.path.isdir(localrespath):
+										localrespath = os.path.join(localrespath, "*")
 									filelst = glob.glob(localrespath)
 									base.debugmsg(6, "filelst", filelst)
 									for file in filelst:
@@ -1446,7 +1448,6 @@ class RFSwarmBase:
 					if fileext.lower() in ['.robot', '.resource']:
 						t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
 						t.start()
-
 
 	def check_files_changed(self):
 		# self.scriptfiles[hash]

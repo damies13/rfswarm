@@ -719,7 +719,6 @@ class RFSwarmAgent():
 				del self.download_threads[key]
 		gc.collect()
 
-
 	def getfile(self, hash):
 		self.debugmsg(6, "hash: ", hash)
 		uri = self.swarmmanager + "File"
