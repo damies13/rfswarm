@@ -31,6 +31,12 @@ Show Log
 	Log 		-----${filename}-----${\n} 		console=True
 	RETURN 		${filedata}
 
+Read Log
+	Log 		${filename}
+	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
+	Log 		${filedata}
+	RETURN 		${filedata}
+
 Show Dir Contents
 	[Arguments]		${dir}
 	${filesnfolders}= 	Evaluate    glob.glob("${dir}${/}*", recursive=True) 	modules=glob

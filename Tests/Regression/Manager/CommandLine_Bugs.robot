@@ -16,13 +16,15 @@ Robbot files with same name but different folders
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 	Stop Agent
-	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
 
-	Should Not Contain 	${OUTPUT DIR}${/}stdout_agent.txt 		Robot returned an error
-	Should Not Contain 	${OUTPUT DIR}${/}stdout_agent.txt 		please check the log file
+	Should Not Contain 	${stdout_agent} 		Robot returned an error
+	Should Not Contain 	${stderr_agent} 		Robot returned an error
+	Should Not Contain 	${stdout_agent} 		please check the log file
+	Should Not Contain 	${stderr_agent} 		please check the log file
 
 	${dbfile}= 	Find Result DB
 	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from Summary;
@@ -76,11 +78,10 @@ Circular Reference Resource Files
 	Wait For Manager
 	Stop Agent
 
-	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
-	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
-
+	${stdout_manager}= 		Read Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	${stderr_manager}= 		Read Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	${stdout_agent}= 		Read Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	${stderr_agent}= 		Read Log 	${OUTPUT DIR}${/}stderr_agent.txt
 
 	Should Not Contain 	${stdout_manager} 		RuntimeError
 	Should Not Contain 	${stderr_manager} 		RuntimeError
@@ -136,14 +137,15 @@ Lots Of Resource Files
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 	Stop Agent
-	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
-	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+
+	${stdout_manager}= 		Read Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	${stderr_manager}= 		Read Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	${stdout_agent}= 		Read Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	${stderr_agent}= 		Read Log 	${OUTPUT DIR}${/}stderr_agent.txt
 
 	Should Not Contain 	${stdout_manager} 		OSError: [Errno 24] Too many open files
 	Should Not Contain 	${stderr_manager} 		OSError: [Errno 24] Too many open files
-	Should Not Contain 	${stdout_manager}		OSError
+	Should Not Contain 	${stdout_manager}			OSError
 	Should Not Contain 	${stderr_manager} 		OSError
 	Should Not Contain 	${stdout_manager} 		Errno 24
 	Should Not Contain 	${stderr_manager} 		Errno 24
