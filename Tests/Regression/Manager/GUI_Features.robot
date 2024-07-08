@@ -629,8 +629,6 @@ Verify Disable report.html - Test Row
 	Test Group Save Settings
 	Click Button 	runsave
 
-	Run Keyword		Close Manager GUI ${platform}
-
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
@@ -670,8 +668,6 @@ Verify Disable output.xml - Test Row
 	Click CheckBox 	checked 	outputxml
 	Test Group Save Settings
 	Click Button 	runsave
-
-	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
