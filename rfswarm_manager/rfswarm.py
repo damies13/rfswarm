@@ -1383,7 +1383,7 @@ class RFSwarmBase:
 			filedata = []
 			with open(localpath, 'r', encoding="utf8") as afile:
 				filedata = afile.read().splitlines()
-				# close the file before processing the data
+				# close the file before processing the data - attempt fix for Issue #261
 			for line in filedata:
 				if checking and '*** ' in line:
 					checking = False

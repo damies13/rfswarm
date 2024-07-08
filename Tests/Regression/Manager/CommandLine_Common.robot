@@ -32,6 +32,7 @@ Show Log
 	RETURN 		${filedata}
 
 Read Log
+	[Arguments]		${filename}
 	Log 		${filename}
 	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
 	Log 		${filedata}
