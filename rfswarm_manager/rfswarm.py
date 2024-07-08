@@ -2082,6 +2082,20 @@ class RFSwarmBase:
 					ipaddresslist.append(addr.address)
 		return ipaddresslist
 
+	def agents_ready(self):
+		readycount = 0
+		for agent in base.Agents.keys():
+			if "FileCount" in base.Agents[agent]:
+				localfc = len(self.scriptfiles.keys())
+				if int(base.Agents[agent]["FileCount"]) >= localfc:
+					if "Status" in base.Agents[agent] and base.Agents[agent]["Status"]:
+						readycount += 1
+			else:
+				if "Status" in base.Agents[agent] and base.Agents[agent]["Status"]:
+					readycount += 1
+
+		return readycount
+
 
 class RFSwarmCore:
 
@@ -2353,9 +2367,11 @@ class RFSwarmCore:
 
 			base.debugmsg(5, "len(base.Agents):", len(base.Agents), "	neededagents:", neededagents)
 			# agntlst = list(base.Agents.keys())
-			while len(base.Agents) < neededagents:
+			# while len(base.Agents) < neededagents:
+			while base.agents_ready() < neededagents:
 				base.debugmsg(1, "Waiting for Agents")
-				base.debugmsg(3, "Agents:", len(base.Agents), "	Agents Needed:", neededagents)
+				# base.debugmsg(3, "Agents:", len(base.Agents), "	Agents Needed:", neededagents)
+				base.debugmsg(3, "Agents:", base.agents_ready(), "	Agents Needed:", neededagents)
 				time.sleep(10)
 
 			if base.args.nogui:
@@ -2529,6 +2545,9 @@ class RFSwarmCore:
 		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "CPU", agentdata["CPU%"], agentdata["AgentName"])
 		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "MEM", agentdata["MEM%"], agentdata["AgentName"])
 		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "NET", agentdata["NET%"], agentdata["AgentName"])
+		# FileCount was added in v1.3.2
+		if "FileCount" in agentdata:
+			base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "FileCount", agentdata["FileCount"], agentdata["AgentName"])
 
 		if "AgentIPs" in agentdata:
 			for ip in agentdata["AgentIPs"]:

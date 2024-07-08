@@ -336,6 +336,9 @@ class RFSwarmAgent():
 						self.corethreads["getscripts"] = threading.Thread(target=self.getscripts)
 						self.corethreads["getscripts"].start()
 
+						if len(self.download_queue):
+							self.status = "Downloading ({})".format(len(self.download_queue))
+
 			if (prev_status == "Stopping" or "Uploading" in prev_status) and self.status == "Ready":
 				# neet to reset something
 				# I guess we can just reset the jobs disctionary?
@@ -406,7 +409,8 @@ class RFSwarmAgent():
 			"NET%": self.netpct,
 			"Robots": self.robotcount,
 			"Status": self.status,
-			"Properties": self.agentproperties
+			"Properties": self.agentproperties,
+			"FileCount": len(list(self.scriptlist.keys()))
 		}
 		try:
 			r = requests.post(uri, json=payload, timeout=self.timeout)
@@ -614,6 +618,12 @@ class RFSwarmAgent():
 
 	def getscripts(self):
 		self.debugmsg(6, "getscripts")
+
+		if len(list(self.download_threads.keys())) > 0:
+			# already processing the queue, don't double up
+			self.debugmsg(5, "already processing the queue, don't double up")
+			return None
+
 		uri = self.swarmmanager + "Scripts"
 		payload = {
 			"AgentName": self.agentname
@@ -649,37 +659,41 @@ class RFSwarmAgent():
 			if hash not in self.scriptlist:
 				self.debugmsg(6, "getfile")
 				self.scriptlist[hash] = {'id': hash}
-				# t = threading.Thread(target=self.getfile, args=(hash,))
-				# t.start()
-				self.download_queue.append(hash)
+				if hash not in self.download_queue:
+					self.download_queue.append(hash)
 			else:
-				# self.scriptlist[hash]['localfile']
 				self.debugmsg(6, "Check file")
 				if 'localfile' in self.scriptlist[hash]:
 					if not os.path.isfile(self.scriptlist[hash]['localfile']):
-						# t = threading.Thread(target=self.getfile, args=(hash,))
-						# t.start()
-						self.download_queue.append(hash)
+						if hash not in self.download_queue:
+							self.download_queue.append(hash)
 				else:
 					self.debugmsg(6, "getfile")
 					self.scriptlist[hash] = {'id': hash}
-					# t = threading.Thread(target=self.getfile, args=(hash,))
-					# t.start()
-					self.download_queue.append(hash)
+					if hash not in self.download_queue:
+						self.download_queue.append(hash)
 
-			if len(self.download_queue) > 0:
-				t = threading.Thread(target=self.process_file_download_queue)
-				t.start()
-
+			if len(self.download_queue):
+				self.process_file_download_queue()
 
 	def process_file_download_queue(self):
+
+		if len(list(self.download_threads.keys())) > 0:
+			# already processing the queue, don't double up
+			self.debugmsg(5, "already processing the queue, don't double up")
+			return None
+
 		corecount = psutil.cpu_count()
 		threadcount = corecount * 3
 		self.debugmsg(7, "download_queue", self.download_queue)
 		self.debugmsg(5, "corecount", corecount, "	threadcount:", threadcount)
-		for hash in self.download_queue:
+		# for hash in self.download_queue:
+		while len(self.download_queue) > 0:
 			# limit the number of upload threads so we don't max out the agent and cause it
 			# to go into critical/offline? mode
+
+			hash = self.download_queue.pop(0)
+
 			self.debugmsg(5, "download_threads count:", len(list(self.download_threads.keys())))
 			while len(list(self.download_threads.keys())) > threadcount - 1:
 				self.debugmsg(5, "download_threads count:", len(list(self.download_threads.keys())))
@@ -692,9 +706,11 @@ class RFSwarmAgent():
 					del self.download_threads[key]
 			key = str(uuid.uuid4())
 			self.debugmsg(5, "key:", key)
+			while hash in self.download_queue:
+				self.download_queue.remove(hash)
 			self.download_threads[key] = threading.Thread(target=self.getfile, args=(hash,))
 			self.download_threads[key].start()
-			time.sleep(0.5)
+			time.sleep(0.02)
 		for key in list(self.download_threads.keys()):
 			self.debugmsg(5, "key:", key)
 			if key in self.download_threads and self.download_threads[key].is_alive():
@@ -719,8 +735,7 @@ class RFSwarmAgent():
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
 				self.debugmsg(5, "resp: ", r.status_code, r.text)
 				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
-				# self.isconnected = False
-				return None
+				self.isconnected = False
 
 		except Exception as e:
 			self.debugmsg(5, "Exception:", e)
