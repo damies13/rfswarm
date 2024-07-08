@@ -81,7 +81,7 @@ Close Manager GUI windows
 
 Close Manager GUI
 	[Tags]	windows-latest		ubuntu-latest
-	Sleep	10
+	Sleep	6
 	Press Combination 	Key.esc
 	Press Combination 	x 	Key.ctrl
 	Sleep	3
