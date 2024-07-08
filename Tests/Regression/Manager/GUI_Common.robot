@@ -81,13 +81,12 @@ Close Manager GUI windows
 
 Close Manager GUI
 	[Tags]	windows-latest		ubuntu-latest
-	Sleep	10
+	Sleep	20
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
 		Click Image		manager_${platform}_titlebar_rfswarm.png
-		Click Button	closewindow
-		# Press Combination 	Key.esc
-		# Press Combination 	x 	Key.ctrl
+		Press Combination 	Key.esc
+		Press Combination 	x 	Key.ctrl
 		Sleep	3
 		Run Keyword And Ignore Error 	Click Dialog Button		no 		10
 	END
