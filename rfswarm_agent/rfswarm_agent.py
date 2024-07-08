@@ -672,14 +672,16 @@ class RFSwarmAgent():
 		}
 		try:
 			r = requests.post(uri, json=payload, timeout=self.timeout)
-			self.debugmsg(6, "resp: ", r.status_code, r.text)
+			self.debugmsg(8, "resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
+				self.debugmsg(5, "resp: ", r.status_code, r.text)
 				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
-				self.isconnected = False
+				# self.isconnected = False
+				return None
 
 		except Exception as e:
-			self.debugmsg(8, "Exception:", e)
+			self.debugmsg(5, "Exception:", e)
 			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 			self.isconnected = False
 
