@@ -1346,31 +1346,34 @@ class RFSwarmBase:
 		else:
 			basedir = localdir
 
+		filequeue = []
+
 		# look for __init__. files - Issue #90
 		initfiles = os.path.abspath(os.path.join(localdir, "__init__.*"))
 		base.debugmsg(8, "initfiles", initfiles)
 		filelst = glob.glob(initfiles)
 		for file in filelst:
 			base.debugmsg(7, "file:", file)
-			# relfile = os.path.relpath(file, start=basedir)
-			relfile = base.get_relative_path(base.config['Plan']['ScriptDir'], file)
-			base.debugmsg(7, "relfile:", relfile)
-			newhash = self.hash_file(file, relfile)
-			base.debugmsg(7, "newhash:", newhash)
-			if newhash not in self.scriptfiles:
-				self.scriptfiles[newhash] = {
-					'id': newhash,
-					'basedir': basedir,
-					'localpath': file,
-					'relpath': relfile,
-					'type': "Initialization"
-				}
-				filename, fileext = os.path.splitext(file)
-				# splitext leaves the . on the extention, the list below needs to have the extentions
-				# starting with a . - Issue #94
-				if fileext.lower() in ['.robot', '.resource']:
-					t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
-					t.start()
+			filequeue.append(file)
+			# # relfile = os.path.relpath(file, start=basedir)
+			# relfile = base.get_relative_path(base.config['Plan']['ScriptDir'], file)
+			# base.debugmsg(7, "relfile:", relfile)
+			# newhash = self.hash_file(file, relfile)
+			# base.debugmsg(7, "newhash:", newhash)
+			# if newhash not in self.scriptfiles:
+			# 	self.scriptfiles[newhash] = {
+			# 		'id': newhash,
+			# 		'basedir': basedir,
+			# 		'localpath': file,
+			# 		'relpath': relfile,
+			# 		'type': "Initialization"
+			# 	}
+			# 	filename, fileext = os.path.splitext(file)
+			# 	# splitext leaves the . on the extention, the list below needs to have the extentions
+			# 	# starting with a . - Issue #94
+			# 	if fileext.lower() in ['.robot', '.resource']:
+			# 		t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
+			# 		t.start()
 
 		base.debugmsg(8, "localdir", localdir)
 		filename, fileext = os.path.splitext(localpath)
@@ -1417,22 +1420,25 @@ class RFSwarmBase:
 								localrespath = os.path.abspath(localrespath)
 								base.debugmsg(8, "localrespath", localrespath)
 								if os.path.isfile(localrespath):
-									# relfile = os.path.relpath(localrespath, start=basedir)
 
-									relfile = base.get_relative_path(base.config['Plan']['ScriptDir'], localrespath)
-									base.debugmsg(8, "relfile", relfile)
-									newhash = self.hash_file(localrespath, relfile)
-									base.debugmsg(8, "newhash", newhash)
-									self.scriptfiles[newhash] = {
-										'id': newhash,
-										'basedir': basedir,
-										'localpath': localrespath,
-										'relpath': relfile,
-										'type': linearr[0]
-									}
+									filequeue.append(localrespath)
 
-									t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
-									t.start()
+									# # relfile = os.path.relpath(localrespath, start=basedir)
+									#
+									# relfile = base.get_relative_path(base.config['Plan']['ScriptDir'], localrespath)
+									# base.debugmsg(8, "relfile", relfile)
+									# newhash = self.hash_file(localrespath, relfile)
+									# base.debugmsg(8, "newhash", newhash)
+									# self.scriptfiles[newhash] = {
+									# 	'id': newhash,
+									# 	'basedir': basedir,
+									# 	'localpath': localrespath,
+									# 	'relpath': relfile,
+									# 	'type': linearr[0]
+									# }
+									#
+									# t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
+									# t.start()
 
 								else:
 									base.debugmsg(6, "localrespath", localrespath)
@@ -1440,17 +1446,20 @@ class RFSwarmBase:
 									base.debugmsg(6, "filelst", filelst)
 									for file in filelst:
 										base.debugmsg(6, "file", file)
-										# relpath = file.replace(localdir, "")[1:]
-										relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], file)
-										base.debugmsg(6, "relpath", relpath)
-										newhash = self.hash_file(file, relpath)
-										base.debugmsg(6, "newhash", newhash)
-										self.scriptfiles[newhash] = {
-											'id': newhash,
-											'localpath': file,
-											'relpath': relpath,
-											'type': linearr[0]
-										}
+
+										filequeue.append(file)
+
+										# # relpath = file.replace(localdir, "")[1:]
+										# relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], file)
+										# base.debugmsg(6, "relpath", relpath)
+										# newhash = self.hash_file(file, relpath)
+										# base.debugmsg(6, "newhash", newhash)
+										# self.scriptfiles[newhash] = {
+										# 	'id': newhash,
+										# 	'localpath': file,
+										# 	'relpath': relpath,
+										# 	'type': linearr[0]
+										# }
 
 					except Exception as e:
 						base.debugmsg(6, "line", line)
@@ -1463,6 +1472,29 @@ class RFSwarmBase:
 					base.debugmsg(6, "match.group(0)", match.group(0), "match.group(1)", match.group(1))
 					if match.group(1).strip().upper() in ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD']:
 						checking = True
+
+		if len(filequeue) > 0:
+			for file in filequeue:
+				base.debugmsg(7, "file:", file)
+				relfile = base.get_relative_path(base.config['Plan']['ScriptDir'], file)
+				base.debugmsg(7, "relfile:", relfile)
+				newhash = self.hash_file(file, relfile)
+				base.debugmsg(7, "newhash:", newhash)
+				if newhash not in self.scriptfiles:
+					self.scriptfiles[newhash] = {
+						'id': newhash,
+						'basedir': basedir,
+						'localpath': file,
+						'relpath': relfile,
+						'type': "Initialization"
+					}
+					filename, fileext = os.path.splitext(file)
+					# splitext leaves the . on the extention, the list below needs to have the extentions
+					# starting with a . - Issue #94
+					if fileext.lower() in ['.robot', '.resource']:
+						t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
+						t.start()
+
 
 	def check_files_changed(self):
 		# self.scriptfiles[hash]
