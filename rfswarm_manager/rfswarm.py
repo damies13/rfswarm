@@ -1380,85 +1380,88 @@ class RFSwarmBase:
 		# splitext leaves the . on the extention, the list below needs to have the extentions
 		# starting with a . - Issue #94
 		if (fileext.lower() in ['.robot', '.resource'] and keep_going):
+			filedata = []
 			with open(localpath, 'r', encoding="utf8") as afile:
-				for line in afile:
-					if checking and '*** ' in line:
-						checking = False
+				filedata = afile.read().splitlines()
+				# close the file before processing the data
+			for line in filedata:
+				if checking and '*** ' in line:
+					checking = False
 
-					if checking:
-						base.debugmsg(9, "line", line)
-						try:
-							if line.strip()[:1] != "#":
-								linearr = line.strip().split()
-								base.debugmsg(8, "linearr", linearr)
-								resfile = None
-								if len(linearr) > 1 and linearr[0].upper() in ['RESOURCE', 'VARIABLES', 'LIBRARY']:
-									base.debugmsg(9, "linearr[1]", linearr[1])
-									resfile = linearr[1]
-								if not resfile and len(linearr) > 2 and (linearr[0].upper() == 'METADATA' and linearr[1].upper() == 'FILE'):
-									base.debugmsg(9, "linearr[2]", linearr[2])
-									resfile = linearr[2]
-								if not resfile and len(linearr) > 2 and (linearr[0].upper() == 'IMPORT' and linearr[1].upper() == 'LIBRARY'):
-									base.debugmsg(9, "linearr[2]", linearr[2])
-									resfile = linearr[2]
-								if resfile:
-									base.debugmsg(8, "resfile", resfile)
-									# here we are assuming the resfile is a relative path! should we also consider files with full local paths?
-									# Issue #129 Handle ``${CURDIR}/``
-									if resfile.find("${") > -1:
-										localrespath = base.replace_rf_path_variables(resfile, localdir)
-									else:
-										localrespath = self.localrespath(localdir, resfile)
+				if checking:
+					base.debugmsg(9, "line", line)
+					try:
+						if line.strip()[:1] != "#":
+							linearr = line.strip().split()
+							base.debugmsg(8, "linearr", linearr)
+							resfile = None
+							if len(linearr) > 1 and linearr[0].upper() in ['RESOURCE', 'VARIABLES', 'LIBRARY']:
+								base.debugmsg(9, "linearr[1]", linearr[1])
+								resfile = linearr[1]
+							if not resfile and len(linearr) > 2 and (linearr[0].upper() == 'METADATA' and linearr[1].upper() == 'FILE'):
+								base.debugmsg(9, "linearr[2]", linearr[2])
+								resfile = linearr[2]
+							if not resfile and len(linearr) > 2 and (linearr[0].upper() == 'IMPORT' and linearr[1].upper() == 'LIBRARY'):
+								base.debugmsg(9, "linearr[2]", linearr[2])
+								resfile = linearr[2]
+							if resfile:
+								base.debugmsg(8, "resfile", resfile)
+								# here we are assuming the resfile is a relative path! should we also consider files with full local paths?
+								# Issue #129 Handle ``${CURDIR}/``
+								if resfile.find("${") > -1:
+									localrespath = base.replace_rf_path_variables(resfile, localdir)
+								else:
+									localrespath = self.localrespath(localdir, resfile)
 
-									base.debugmsg(8, "localrespath", localrespath)
-									localrespath = os.path.abspath(localrespath)
-									base.debugmsg(8, "localrespath", localrespath)
-									if os.path.isfile(localrespath):
-										# relfile = os.path.relpath(localrespath, start=basedir)
-										relfile = base.get_relative_path(base.config['Plan']['ScriptDir'], localrespath)
-										base.debugmsg(8, "relfile", relfile)
-										newhash = self.hash_file(localrespath, relfile)
-										base.debugmsg(8, "newhash", newhash)
+								base.debugmsg(8, "localrespath", localrespath)
+								localrespath = os.path.abspath(localrespath)
+								base.debugmsg(8, "localrespath", localrespath)
+								if os.path.isfile(localrespath):
+									# relfile = os.path.relpath(localrespath, start=basedir)
+									relfile = base.get_relative_path(base.config['Plan']['ScriptDir'], localrespath)
+									base.debugmsg(8, "relfile", relfile)
+									newhash = self.hash_file(localrespath, relfile)
+									base.debugmsg(8, "newhash", newhash)
+									self.scriptfiles[newhash] = {
+										'id': newhash,
+										'basedir': basedir,
+										'localpath': localrespath,
+										'relpath': relfile,
+										'type': linearr[0]
+									}
+
+									t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
+									t.start()
+
+								else:
+									base.debugmsg(6, "localrespath", localrespath)
+									filelst = glob.glob(localrespath)
+									base.debugmsg(6, "filelst", filelst)
+									for file in filelst:
+										base.debugmsg(6, "file", file)
+										# relpath = file.replace(localdir, "")[1:]
+										relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], file)
+										base.debugmsg(6, "relpath", relpath)
+										newhash = self.hash_file(file, relpath)
+										base.debugmsg(6, "newhash", newhash)
 										self.scriptfiles[newhash] = {
 											'id': newhash,
-											'basedir': basedir,
-											'localpath': localrespath,
-											'relpath': relfile,
+											'localpath': file,
+											'relpath': relpath,
 											'type': linearr[0]
 										}
 
-										t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
-										t.start()
+					except Exception as e:
+						base.debugmsg(6, "line", line)
+						base.debugmsg(6, "Exception", e)
+						base.debugmsg(6, "linearr", linearr)
 
-									else:
-										base.debugmsg(6, "localrespath", localrespath)
-										filelst = glob.glob(localrespath)
-										base.debugmsg(6, "filelst", filelst)
-										for file in filelst:
-											base.debugmsg(6, "file", file)
-											# relpath = file.replace(localdir, "")[1:]
-											relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], file)
-											base.debugmsg(6, "relpath", relpath)
-											newhash = self.hash_file(file, relpath)
-											base.debugmsg(6, "newhash", newhash)
-											self.scriptfiles[newhash] = {
-												'id': newhash,
-												'localpath': file,
-												'relpath': relpath,
-												'type': linearr[0]
-											}
-
-						except Exception as e:
-							base.debugmsg(6, "line", line)
-							base.debugmsg(6, "Exception", e)
-							base.debugmsg(6, "linearr", linearr)
-
-					# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
-					match = re.search(r'\*+([^*\v]+)', line)
-					if match is not None:
-						base.debugmsg(6, "match.group(0)", match.group(0), "match.group(1)", match.group(1))
-						if match.group(1).strip().upper() in ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD']:
-							checking = True
+				# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
+				match = re.search(r'\*+([^*\v]+)', line)
+				if match is not None:
+					base.debugmsg(6, "match.group(0)", match.group(0), "match.group(1)", match.group(1))
+					if match.group(1).strip().upper() in ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD']:
+						checking = True
 
 	def check_files_changed(self):
 		# self.scriptfiles[hash]
