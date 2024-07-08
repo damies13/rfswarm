@@ -1352,30 +1352,25 @@ class RFSwarmBase:
 		filelst = glob.glob(initfiles)
 		for file in filelst:
 			base.debugmsg(7, "file:", file)
-
-			# get existing hash for file
-			hashes = [k for k, v in d.items() if v['localpath'] == file]
-
-			if len(hashes) < 1:
-				# relfile = os.path.relpath(file, start=basedir)
-				relfile = base.get_relative_path(base.config['Plan']['ScriptDir'], file)
-				base.debugmsg(7, "relfile:", relfile)
-				newhash = self.hash_file(file, relfile)
-				base.debugmsg(7, "newhash:", newhash)
-				if newhash not in self.scriptfiles:
-					self.scriptfiles[newhash] = {
-						'id': newhash,
-						'basedir': basedir,
-						'localpath': file,
-						'relpath': relfile,
-						'type': "Initialization"
-					}
-					filename, fileext = os.path.splitext(file)
-					# splitext leaves the . on the extention, the list below needs to have the extentions
-					# starting with a . - Issue #94
-					if fileext.lower() in ['.robot', '.resource']:
-						t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
-						t.start()
+			# relfile = os.path.relpath(file, start=basedir)
+			relfile = base.get_relative_path(base.config['Plan']['ScriptDir'], file)
+			base.debugmsg(7, "relfile:", relfile)
+			newhash = self.hash_file(file, relfile)
+			base.debugmsg(7, "newhash:", newhash)
+			if newhash not in self.scriptfiles:
+				self.scriptfiles[newhash] = {
+					'id': newhash,
+					'basedir': basedir,
+					'localpath': file,
+					'relpath': relfile,
+					'type': "Initialization"
+				}
+				filename, fileext = os.path.splitext(file)
+				# splitext leaves the . on the extention, the list below needs to have the extentions
+				# starting with a . - Issue #94
+				if fileext.lower() in ['.robot', '.resource']:
+					t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
+					t.start()
 
 		base.debugmsg(8, "localdir", localdir)
 		filename, fileext = os.path.splitext(localpath)
@@ -1423,6 +1418,7 @@ class RFSwarmBase:
 								base.debugmsg(8, "localrespath", localrespath)
 								if os.path.isfile(localrespath):
 									# relfile = os.path.relpath(localrespath, start=basedir)
+
 									relfile = base.get_relative_path(base.config['Plan']['ScriptDir'], localrespath)
 									base.debugmsg(8, "relfile", relfile)
 									newhash = self.hash_file(localrespath, relfile)
