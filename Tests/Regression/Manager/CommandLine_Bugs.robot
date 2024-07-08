@@ -124,7 +124,7 @@ Circular Reference Resource Files 2
 	Create Testdata Agent INI 	${testdata}${/}agent.ini
 	Create Testdata Manager INI 	${testdata}${/}manager.ini
 
-	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources 	*.resource
+	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources
 
 	@{agnt_options}= 	Create List 	-i 	${testdata}${/}agent.ini
 	Run Agent 	${agnt_options}
@@ -167,7 +167,7 @@ Circular Reference Resource Files 2
 	# Log 	scripts-dir: ${scripts-dir} 		console=True
 
 	# @{result_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}agent-dir${/}scripts${/}resources 	*.resource
-	@{result_files}= 	List Files In Directory And Sub Directories 	${agent_dir}${/}scripts${/}resources 	*.resource
+	@{result_files}= 	List Files In Directory And Sub Directories 	${agent_dir}${/}scripts${/}resources
 	# @{result_files}= 	List Files In Directory And Sub Directories 	${agent_dir}${/}scripts 	*.resource
 
 
