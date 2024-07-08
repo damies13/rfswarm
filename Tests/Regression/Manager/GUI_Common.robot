@@ -81,7 +81,7 @@ Close Manager GUI windows
 
 Close Manager GUI
 	[Tags]	windows-latest		ubuntu-latest
-	Sleep	5
+	Sleep	3
 	Press Combination 	Key.esc
 	Press Combination 	x 	Key.ctrl
 	Sleep	3
@@ -102,13 +102,14 @@ Close Manager GUI
 
 Close Manager GUI macos
 	[Tags]	macos-latest
+	Sleep	3
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
 		Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
 		Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
 		Click Image		manager_${platform}_titlebar_rfswarm.png
 		Click Button	closewindow
-		# Sleep	5
+		Sleep	3
 		Run Keyword And Ignore Error 	Click Dialog Button		no 		10
 	END
 	${result}= 	Wait For Process 	${process_manager} 	timeout=55
@@ -549,7 +550,7 @@ Select ${n} Robot Test Case
 Save Scenario File OS DIALOG
 	[Arguments]		${scenario_name}
 	Sleep	5
-	Type	${scenario_name}.rfs
+	Type	${scenario_name}
 	Take A Screenshot
 	Click Dialog Button		save
 	Sleep	1
@@ -557,7 +558,7 @@ Save Scenario File OS DIALOG
 Open Scenario File OS DIALOG
 	[Arguments]		${scenario_name}
 	Sleep	5
-	Type	${scenario_name}
+	Type	${scenario_name}.rfs
 	Take A Screenshot
 	Click Dialog Button		open
 	Sleep	1
