@@ -262,6 +262,12 @@ Create Testdata Manager INI
 List Files In Directory And Sub Directories
 	[Arguments] 	${path} 	${pattern}=None 	${absolute}=False
 	@{files}= 	List Files In Directory 	${path} 	${pattern} 	${absolute}
+	FOR 	${file} 	IN 	@{files}
+		${path} 	${ext} = 	Split Extension 	${file}
+		IF 		'${ext}' == 'pyc'
+			Remove From List 		${files} 	${file}
+		END
+	END
 	@{dirs}= 	List Directories In Directory 	${path}
 	FOR 	${dir} 	IN 	@{dirs}
 		@{sd_files}= 	List Files In Directory And Sub Directories 	${path}${/}${dir} 	${pattern} 	${absolute}
