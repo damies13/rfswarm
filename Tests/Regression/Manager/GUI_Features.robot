@@ -839,6 +839,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
 	Length Should Be	${run_result_dirs}	1	msg=The test run result dir was not created or created unexpected directories!
 
+	Sleep	5
 	Verify Test Result Directory Name	${run_result_dirs}[0]	${scenario_name}	${current_date}
 	Verify Generated Run Result Files	${run_result_dirs}[0]	${scenario_name}
 

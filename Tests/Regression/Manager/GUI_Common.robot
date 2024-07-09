@@ -81,28 +81,27 @@ Close Manager GUI windows
 
 Close Manager GUI
 	[Tags]	windows-latest		ubuntu-latest
-	Sleep	20
+	Sleep	3
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
-		Click Image		manager_${platform}_titlebar_rfswarm.png
 		Press Combination 	Key.esc
 		Press Combination 	x 	Key.ctrl
 		Sleep	3
 		Run Keyword And Ignore Error 	Click Dialog Button		no 		10
 	END
-	${result}= 	Wait For Process 	${process_manager} 	timeout=55
+	${result}= 		Wait For Process 	${process_manager} 	timeout=55
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	not ${running}
 		Should Be Equal As Integers 	${result.rc} 	0
 	ELSE
 		Take A Screenshot
 		${result} = 	Terminate Process		${process_manager}
-		Fail
+		Fail	msg=Had to Terminate Manager result.rc: ${result.rc}
 	END
 
 Close Manager GUI macos
 	[Tags]	macos-latest
-	Sleep	20
+	Sleep	3
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
 		Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
@@ -112,7 +111,7 @@ Close Manager GUI macos
 		Sleep	3
 		Run Keyword And Ignore Error 	Click Dialog Button		no 		10
 	END
-	${result}= 	Wait For Process 	${process_manager} 	timeout=55
+	${result}= 		Wait For Process 	${process_manager} 	timeout=55
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	not ${running}
 		Should Be Equal As Integers 	${result.rc} 	0
@@ -120,7 +119,7 @@ Close Manager GUI macos
 	ELSE
 		Take A Screenshot
 		${result} = 	Terminate Process		${process_manager}
-		Fail
+		Fail	msg=Had to Terminate Manager result.rc: ${result.rc}
 	END
 
 Stop Agent
