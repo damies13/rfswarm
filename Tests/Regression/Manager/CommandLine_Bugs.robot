@@ -195,7 +195,8 @@ Lots Of Resource Files
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n
 	Run Manager CLI 	${mngr_options}
-	Wait For Manager 	15min
+	# It can take a while for the agent to download 3500+ files
+	Wait For Manager 	60min
 	Stop Agent
 
 	${stdout_manager}= 		Read Log 	${OUTPUT DIR}${/}stdout_manager.txt

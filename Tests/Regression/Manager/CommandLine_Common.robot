@@ -265,7 +265,6 @@ List Files In Directory And Sub Directories
 	FOR 	${file} 	IN 	@{files}
 		${fpath} 	${ext} = 	Split Extension 	${file}
 		IF 		'${ext}' == 'pyc'
-			# Remove From List 		${files} 	${file}
 			Remove Values From List 		${files} 	${file}
 		END
 	END
