@@ -5,6 +5,7 @@ Resource 	CommandLine_Common.robot
 Robbot files with same name but different folders
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #184
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	VAR 	${agent_dir} 		${agent_dir}${/}${TEST NAME}      scope=TEST
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	http://localhost:8138
 	Run Agent 	${agnt_options}
 	Sleep    1s
@@ -61,6 +62,7 @@ Check If The Not Buildin Modules Are Included In The Manager Setup File
 Circular Reference Resource Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #261
 	VAR    ${testdata} 		${CURDIR}${/}testdata${/}Issue-#261${/}circular_test      scope=TEST
+	VAR 	${agent_dir} 		${agent_dir}${/}${TEST NAME}      scope=TEST
 	Create Testdata Agent INI 	${testdata}${/}agent.ini
 	Create Testdata Manager INI 	${testdata}${/}manager.ini
 
@@ -121,6 +123,7 @@ Circular Reference Resource Files
 Circular Reference Resource Files 2
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #261
 	VAR    ${testdata} 		${CURDIR}${/}testdata${/}Issue-#261${/}circular_test2      scope=TEST
+	VAR 	${agent_dir} 		${agent_dir}${/}${TEST NAME}      scope=TEST
 	Create Testdata Agent INI 	${testdata}${/}agent.ini
 	Create Testdata Manager INI 	${testdata}${/}manager.ini
 
@@ -180,13 +183,14 @@ Circular Reference Resource Files 2
 
 Lots Of Resource Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #261
-	VAR    ${testdata} 		${CURDIR}${/}testdata${/}Issue-#261${/}lotsa_files_test      scope=TEST
+	VAR 	${testdata} 		${CURDIR}${/}testdata${/}Issue-#261${/}lotsa_files_test      scope=TEST
+	VAR 	${agent_dir} 		${agent_dir}${/}${TEST NAME}      scope=TEST
 	Create Testdata Agent INI 	${testdata}${/}agent.ini
 	Create Testdata Manager INI 	${testdata}${/}manager.ini
 
 	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources 	*.resource
 
-	@{agnt_options}= 	Create List 	-i 	${testdata}${/}agent.ini
+	@{agnt_options}= 	Create List 	-i 	${testdata}${/}agent.ini 	-g 	1
 	Run Agent 	${agnt_options}
 	Sleep    1s
 	Check Agent Is Running
