@@ -51,7 +51,7 @@ Run Agent
 		${options}= 	Create List
 	END
 	Append To List 	${options} 	-d 	${agent_dir}
-	Create Directory 	${results_dir}
+	Create Directory 	${agent_dir}
 	Empty Directory 	${agent_dir}
 
 	Log to console 	${\n}\${options}: ${options}
