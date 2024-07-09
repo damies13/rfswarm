@@ -263,7 +263,7 @@ List Files In Directory And Sub Directories
 	[Arguments] 	${path} 	${pattern}=None 	${absolute}=False
 	@{files}= 	List Files In Directory 	${path} 	${pattern} 	${absolute}
 	FOR 	${file} 	IN 	@{files}
-		${path} 	${ext} = 	Split Extension 	${file}
+		${fpath} 	${ext} = 	Split Extension 	${file}
 		IF 		'${ext}' == 'pyc'
 			Remove From List 		${files} 	${file}
 		END
