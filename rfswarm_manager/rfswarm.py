@@ -1407,13 +1407,13 @@ class RFSwarmBase:
 								else:
 									base.debugmsg(6, "localrespath", localrespath)
 									if os.path.isdir(localrespath):
-										localrespath = os.path.join(localrespath, "*")
-									filelst = glob.glob(localrespath)
+										localrespath = os.path.join(localrespath, "**")
+									filelst = glob.glob(localrespath, recursive=True)
 									base.debugmsg(6, "filelst", filelst)
 									for file in filelst:
 										base.debugmsg(6, "file", file)
-
-										filequeue.append(file)
+										if os.path.isfile(file):
+											filequeue.append(file)
 
 					except Exception as e:
 						base.debugmsg(6, "line", line)

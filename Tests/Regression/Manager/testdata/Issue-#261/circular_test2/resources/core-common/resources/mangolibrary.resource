@@ -3,5 +3,5 @@ Library             Collections
 Library             OperatingSystem
 Library             String
 Library             JSONLibrary
-Library             KubeLibrary
+Library             mangolibrary
 Resource            builtin-ext.resource

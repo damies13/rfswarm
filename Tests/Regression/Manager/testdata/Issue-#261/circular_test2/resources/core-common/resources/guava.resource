@@ -2,4 +2,4 @@
 Library             OperatingSystem
 Library             ../libs/DatabaseLibrary/
 Resource            certificate.resource
-Resource            kubelibrary.resource
+Resource            mangolibrary.resource
