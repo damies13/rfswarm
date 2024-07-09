@@ -19,8 +19,8 @@ Runner CPU Cores
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
 	${CPU Cores} =	Evaluate	psutil.cpu_count() 	modules=psutil
 	Log 	${\n}CPU Cores: ${CPU Cores} 	console=True
-	${CPU Freq} =	Evaluate	psutil.cpu_freq() 	modules=psutil
-	Log 	${\n}CPU Freq: ${CPU Freq} 	console=True
+	# ${CPU Freq} =	Evaluate	psutil.cpu_freq() 	modules=psutil
+	# Log 	${\n}CPU Freq: ${CPU Freq} 	console=True
 
 Runner Memory
 	[Documentation] 	Logs the Runner's Memory
