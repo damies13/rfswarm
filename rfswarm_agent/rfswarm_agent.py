@@ -684,7 +684,7 @@ class RFSwarmAgent():
 			return None
 
 		corecount = psutil.cpu_count()
-		threadcount = corecount * 3
+		threadcount = corecount * 32
 		self.debugmsg(7, "download_queue", self.download_queue)
 		self.debugmsg(5, "corecount", corecount, "	threadcount:", threadcount)
 		# for hash in self.download_queue:
@@ -755,7 +755,7 @@ class RFSwarmAgent():
 		try:
 			self.debugmsg(7, 'scriptdir', self.scriptdir)
 			localfile = os.path.abspath(os.path.join(self.scriptdir, jsonresp['File']))
-			self.debugmsg(1, 'localfile', localfile)
+			self.debugmsg(5, 'localfile', localfile)
 
 		except Exception as e:
 			self.debugmsg(0, "Exception:", e)
@@ -787,6 +787,7 @@ class RFSwarmAgent():
 				self.debugmsg(6, "afile:")
 				afile.write(uncompressed)
 				self.debugmsg(6, "write:")
+			self.debugmsg(1, 'Downloaded:', localfile)
 
 		except Exception as e:
 			self.debugmsg(1, "Exception:", e)
