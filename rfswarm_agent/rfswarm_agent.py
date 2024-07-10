@@ -673,8 +673,8 @@ class RFSwarmAgent():
 					if hash not in self.download_queue:
 						self.download_queue.append(hash)
 
-			if len(self.download_queue):
-				self.process_file_download_queue()
+		if len(self.download_queue):
+			self.process_file_download_queue()
 
 	def process_file_download_queue(self):
 
