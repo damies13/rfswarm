@@ -10,6 +10,34 @@ Suite Setup 	Set Platform
 ${scenario_name}=	test_scenario
 
 *** Test Cases ***
+Verify If the Port Number And Ip Address Get Written To the INI File
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #39
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Open Manager GUI
+
+	${manager_ini_file}		Get Manager INI Location
+	&{run_settings_data}	Create Dictionary
+	...    bind_ip_address=192.168.0.3
+	...    bind_port_number=8148
+
+	Click Button	runsettings
+	Change Scenario Wide Settings	${run_settings_data}
+	Sleep	10
+	Press key.enter 1 Times
+	Run Keyword		Close Manager GUI ${platform}
+	Sleep	2
+	${manager_ini_file_dict}=	Read Ini File	${manager_ini_file}
+	Log		manager ini file dict: ${manager_ini_file_dict}		console=True
+
+	Should Be Equal As Strings 	${manager_ini_file_dict}[Server][bindip] 	${run_settings_data}[bind_ip_address]
+	Should Be Equal As Strings 	${manager_ini_file_dict}[Server][bindport] 	${run_settings_data}[bind_port_number]
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    GUI_Common.Stop Agent
+
 Verify That Files Get Saved With Correct Extension And Names
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #39
 	[Setup]	Run Keywords
@@ -686,6 +714,8 @@ Verify Disable output.xml - Test Row
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
 	Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
+
+# Issue #16 here
 
 Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
