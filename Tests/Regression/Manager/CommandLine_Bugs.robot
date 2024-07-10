@@ -190,7 +190,7 @@ Lots Of Resource Files
 
 	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources 	*.resource
 
-	@{agnt_options}= 	Create List 	-i 	${testdata}${/}agent.ini 	-g 	1
+	@{agnt_options}= 	Create List 	-i 	${testdata}${/}agent.ini
 	Run Agent 	${agnt_options}
 	Sleep    1s
 	Check Agent Is Running
