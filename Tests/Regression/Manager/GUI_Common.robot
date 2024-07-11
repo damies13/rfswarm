@@ -76,6 +76,9 @@ Close Manager GUI windows
 
 Close Manager GUI
 	[Tags]	windows-latest		ubuntu-latest
+	# make sure the window is the active window first, Unlikely the about tab has been selected
+	Run Keyword And Ignore Error 	Click Tab 	 About
+	Click Tab 	 Run
 	Press Combination 	Key.esc
 	Press Combination 	x 	Key.ctrl
 	Sleep	5
