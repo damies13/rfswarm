@@ -100,6 +100,7 @@ Close Manager GUI
 		Take A Screenshot
 		IF 	${running}
 			Fail
+		END
 	END
 
 Close Manager GUI macos
@@ -108,6 +109,9 @@ Close Manager GUI macos
 	IF 	${running}
 		Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
 		Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
+		# make sure the window is the active window first, Unlikely the about tab has been selected
+		Run Keyword And Ignore Error 	Click Tab 	 About
+		Click Tab 	 Run
 		Click Image		manager_${platform}_titlebar_rfswarm.png
 		Click Button	closewindow
 		# Sleep	5
@@ -123,7 +127,11 @@ Close Manager GUI macos
 	ELSE
 		Take A Screenshot
 		${result} = 	Terminate Process		${process_manager}
-		Fail
+		${running}= 	Is Process Running 	${process_manager}
+		Take A Screenshot
+		IF 	${running}
+			Fail
+		END
 	END
 
 Stop Agent
