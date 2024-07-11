@@ -1397,43 +1397,23 @@ class RFSwarmBase:
 								else:
 									localrespath = self.localrespath(localdir, resfile)
 
-									base.debugmsg(8, "localrespath", localrespath)
-									localrespath = os.path.abspath(localrespath)
-									base.debugmsg(5, "localrespath", localrespath)
-									if os.path.isfile(localrespath):
-										# relfile = os.path.relpath(localrespath, start=basedir)
-										relfile = base.get_relative_path(base.config['Plan']['ScriptDir'], localrespath)
-										base.debugmsg(8, "relfile", relfile)
-										newhash = self.hash_file(localrespath, relfile)
-										base.debugmsg(8, "newhash", newhash)
-										base.debugmsg(5, "newhash:", newhash, " 	relfile:", relfile)
-										self.scriptfiles[newhash] = {
-											'id': newhash,
-											'basedir': basedir,
-											'localpath': localrespath,
-											'relpath': relfile,
-											'type': linearr[0]
-										}
+								base.debugmsg(8, "localrespath", localrespath)
+								localrespath = os.path.abspath(localrespath)
+								base.debugmsg(8, "localrespath", localrespath)
+								if os.path.isfile(localrespath):
 
 									filequeue.append(localrespath)
 
-									else:
-										base.debugmsg(6, "localrespath", localrespath)
-										filelst = glob.glob(localrespath)
-										base.debugmsg(6, "filelst", filelst)
-										for file in filelst:
-											base.debugmsg(5, "file", file)
-											# relpath = file.replace(localdir, "")[1:]
-											relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], file)
-											base.debugmsg(6, "relpath", relpath)
-											newhash = self.hash_file(file, relpath)
-											base.debugmsg(6, "newhash", newhash)
-											self.scriptfiles[newhash] = {
-												'id': newhash,
-												'localpath': file,
-												'relpath': relpath,
-												'type': linearr[0]
-											}
+								else:
+									base.debugmsg(6, "localrespath", localrespath)
+									if os.path.isdir(localrespath):
+										localrespath = os.path.join(localrespath, "**")
+									filelst = glob.glob(localrespath, recursive=True)
+									base.debugmsg(6, "filelst", filelst)
+									for file in filelst:
+										base.debugmsg(6, "file", file)
+										if os.path.isfile(file):
+											filequeue.append(file)
 
 					except Exception as e:
 						base.debugmsg(6, "line", line)
