@@ -78,7 +78,7 @@ Close Manager GUI
 	[Tags]	windows-latest		ubuntu-latest
 	# make sure the window is the active window first, Unlikely the about tab has been selected
 	Run Keyword And Ignore Error 	Click Tab 	 About
-	Click Tab 	 Run
+	Run Keyword And Ignore Error 	Click Tab 	 Run
 	Press Combination 	Key.esc
 	Press Combination 	x 	Key.ctrl
 	Sleep	5
@@ -111,7 +111,7 @@ Close Manager GUI macos
 		Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
 		# make sure the window is the active window first, Unlikely the about tab has been selected
 		Run Keyword And Ignore Error 	Click Tab 	 About
-		Click Tab 	 Run
+		Run Keyword And Ignore Error 	Click Tab 	 Run
 		Click Image		manager_${platform}_titlebar_rfswarm.png
 		Click Button	closewindow
 		# Sleep	5
