@@ -1,0 +1,16 @@
+==============================================================================
+Jpetstore                                                                     
+==============================================================================
+Jpetstore 01                                                          [ ERROR ] Calling method 'end_keyword' of listener '/tmp/rfswarmagent/scripts/RFSListener3.py' failed: KeyError: 'doc'
+| FAIL |
+ConnectionError: HTTPConnectionPool(host='192.168.13.82', port=8080): Max retries exceeded with url: /jpetstore/actions/Catalog.action (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fa6df990080>: Failed to establish a new connection: [Errno 113] No route to host'))
+------------------------------------------------------------------------------
+Jpetstore 01 1_1                                                      [ ERROR ] Calling method 'end_keyword' of listener '/tmp/rfswarmagent/scripts/RFSListener3.py' failed: KeyError: 'doc'
+| FAIL |
+ConnectionError: HTTPConnectionPool(host='192.168.13.82', port=8080): Max retries exceeded with url: /jpetstore/actions/Catalog.action (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fa6df992c60>: Failed to establish a new connection: [Errno 113] No route to host'))
+------------------------------------------------------------------------------
+Jpetstore                                                             | FAIL |
+2 tests, 0 passed, 2 failed
+==============================================================================
+Output:  /tmp/rfswarmagent/logs/20240626_130059_jpetstore-nomon-quick/jpetstore_1_14_1719370869_1_1719370881/Jpetstore_01_output.xml
+Log:     /tmp/rfswarmagent/logs/20240626_130059_jpetstore-nomon-quick/jpetstore_1_14_1719370869_1_1719370881/log.html

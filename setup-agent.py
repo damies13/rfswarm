@@ -5,7 +5,7 @@ with open("README_PyPi.md", "r") as fh:
 
 setuptools.setup(
 	name="rfswarm-agent",
-	version="1.4.0",
+	version="1.3.2",
 	author="damies13",
 	author_email="damies13+rfswarm@gmail.com",
 	description="rfswarm Agent",
@@ -16,6 +16,8 @@ setuptools.setup(
 	install_requires=['configparser', 'requests', 'robotframework', 'psutil'],
 	classifiers=[
 		"Development Status :: 5 - Production/Stable",
+		"Framework :: Robot Framework",
+		"Framework :: Robot Framework :: Tool",
 		"Topic :: Software Development :: Testing",
 		"Programming Language :: Python :: 3.6",
 		"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",

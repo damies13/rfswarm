@@ -2,7 +2,7 @@
 #
 # 	Robot Framework Swarm
 #
-#    Version 1.4.0
+#    Version 1.3.2
 #
 
 
@@ -42,7 +42,7 @@ import requests
 
 class RFSwarmAgent():
 
-	version = "1.4.0"
+	version = "1.3.2"
 	config = None
 	isconnected = False
 	isrunning = False
@@ -66,6 +66,8 @@ class RFSwarmAgent():
 	corethreads: Any = {}
 	upload_queue: Any = []
 	upload_threads: Any = {}
+	download_queue: Any = []
+	download_threads: Any = {}
 	robotcount = 0
 	status = "Ready"
 	excludelibraries: Any = []
@@ -334,6 +336,9 @@ class RFSwarmAgent():
 						self.corethreads["getscripts"] = threading.Thread(target=self.getscripts)
 						self.corethreads["getscripts"].start()
 
+						if len(self.download_queue):
+							self.status = "Downloading ({})".format(len(self.download_queue))
+
 			if (prev_status == "Stopping" or "Uploading" in prev_status) and self.status == "Ready":
 				# neet to reset something
 				# I guess we can just reset the jobs disctionary?
@@ -364,7 +369,7 @@ class RFSwarmAgent():
 		for nic in nicstats.keys():
 			if nicstats[nic].speed > 0:
 				self.debugmsg(6, "Speed:", nicstats[nic].speed)
-				bytes_speed = nicstats[nic].speed * 1024 * 1024
+				bytes_speed = nicstats[nic].speed * 1024 * 1024 / 8
 				bytes_sent_sec = niccounters1[nic].bytes_sent - niccounters0[nic].bytes_sent
 				bytes_recv_sec = niccounters1[nic].bytes_recv - niccounters0[nic].bytes_recv
 				self.debugmsg(6, "bytes_speed:	", bytes_speed)
@@ -404,7 +409,8 @@ class RFSwarmAgent():
 			"NET%": self.netpct,
 			"Robots": self.robotcount,
 			"Status": self.status,
-			"Properties": self.agentproperties
+			"Properties": self.agentproperties,
+			"FileCount": len(list(self.scriptlist.keys()))
 		}
 		try:
 			r = requests.post(uri, json=payload, timeout=self.timeout)
@@ -612,6 +618,12 @@ class RFSwarmAgent():
 
 	def getscripts(self):
 		self.debugmsg(6, "getscripts")
+
+		if len(list(self.download_threads.keys())) > 0:
+			# already processing the queue, don't double up
+			self.debugmsg(5, "already processing the queue, don't double up")
+			return None
+
 		uri = self.swarmmanager + "Scripts"
 		payload = {
 			"AgentName": self.agentname
@@ -647,20 +659,65 @@ class RFSwarmAgent():
 			if hash not in self.scriptlist:
 				self.debugmsg(6, "getfile")
 				self.scriptlist[hash] = {'id': hash}
-				t = threading.Thread(target=self.getfile, args=(hash,))
-				t.start()
+				if hash not in self.download_queue:
+					self.download_queue.append(hash)
 			else:
-				# self.scriptlist[hash]['localfile']
 				self.debugmsg(6, "Check file")
 				if 'localfile' in self.scriptlist[hash]:
 					if not os.path.isfile(self.scriptlist[hash]['localfile']):
-						t = threading.Thread(target=self.getfile, args=(hash,))
-						t.start()
+						if hash not in self.download_queue:
+							self.download_queue.append(hash)
 				else:
 					self.debugmsg(6, "getfile")
 					self.scriptlist[hash] = {'id': hash}
-					t = threading.Thread(target=self.getfile, args=(hash,))
-					t.start()
+					if hash not in self.download_queue:
+						self.download_queue.append(hash)
+
+		if len(self.download_queue):
+			self.process_file_download_queue()
+
+	def process_file_download_queue(self):
+
+		if len(list(self.download_threads.keys())) > 0:
+			# already processing the queue, don't double up
+			self.debugmsg(5, "already processing the queue, don't double up")
+			return None
+
+		corecount = psutil.cpu_count()
+		threadcount = corecount * 32
+		self.debugmsg(7, "download_queue", self.download_queue)
+		self.debugmsg(5, "corecount", corecount, "	threadcount:", threadcount)
+		# for hash in self.download_queue:
+		while len(self.download_queue) > 0:
+			# limit the number of upload threads so we don't max out the agent and cause it
+			# to go into critical/offline? mode
+
+			hash = self.download_queue.pop(0)
+
+			self.debugmsg(5, "download_threads count:", len(list(self.download_threads.keys())))
+			while len(list(self.download_threads.keys())) > threadcount - 1:
+				self.debugmsg(5, "download_threads count:", len(list(self.download_threads.keys())))
+				# key = list(self.upload_threads.keys())[0]
+				key = random.choice(list(self.download_threads.keys()))
+				self.debugmsg(5, "key:", key)
+				if key in self.download_threads and self.download_threads[key].is_alive():
+					self.download_threads[key].join()
+				if key in self.download_threads:
+					del self.download_threads[key]
+			key = str(uuid.uuid4())
+			self.debugmsg(5, "key:", key)
+			while hash in self.download_queue:
+				self.download_queue.remove(hash)
+			self.download_threads[key] = threading.Thread(target=self.getfile, args=(hash,))
+			self.download_threads[key].start()
+			time.sleep(0.02)
+		for key in list(self.download_threads.keys()):
+			self.debugmsg(5, "key:", key)
+			if key in self.download_threads and self.download_threads[key].is_alive():
+				self.download_threads[key].join()
+			if key in self.download_threads:
+				del self.download_threads[key]
+		gc.collect()
 
 	def getfile(self, hash):
 		self.debugmsg(6, "hash: ", hash)
@@ -672,14 +729,15 @@ class RFSwarmAgent():
 		}
 		try:
 			r = requests.post(uri, json=payload, timeout=self.timeout)
-			self.debugmsg(6, "resp: ", r.status_code, r.text)
+			self.debugmsg(8, "resp: ", r.status_code, r.text)
 			if (r.status_code != requests.codes.ok):
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
+				self.debugmsg(5, "resp: ", r.status_code, r.text)
 				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 				self.isconnected = False
 
 		except Exception as e:
-			self.debugmsg(8, "Exception:", e)
+			self.debugmsg(5, "Exception:", e)
 			self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 			self.isconnected = False
 
@@ -697,7 +755,7 @@ class RFSwarmAgent():
 		try:
 			self.debugmsg(7, 'scriptdir', self.scriptdir)
 			localfile = os.path.abspath(os.path.join(self.scriptdir, jsonresp['File']))
-			self.debugmsg(1, 'localfile', localfile)
+			self.debugmsg(5, 'localfile', localfile)
 
 		except Exception as e:
 			self.debugmsg(0, "Exception:", e)
@@ -729,6 +787,7 @@ class RFSwarmAgent():
 				self.debugmsg(6, "afile:")
 				afile.write(uncompressed)
 				self.debugmsg(6, "write:")
+			self.debugmsg(1, 'Downloaded:', localfile)
 
 		except Exception as e:
 			self.debugmsg(1, "Exception:", e)
@@ -1588,7 +1647,6 @@ class RFSwarmAgent():
 		fd.append("		self.debugmsg(3, 'Keyword name: ', data.name)")
 		fd.append("		attrs = result.to_dict()")
 		fd.append("		self.debugmsg(6, 'attrs: ', attrs)")
-		fd.append("		self.debugmsg(5, 'attrs[doc]: ', attrs['doc'])")
 		fd.append("		self.debugmsg(5, 'self.msg: ', self.msg)")
 		fd.append("		")
 		fd.append("		ResultName = ''")
@@ -1602,6 +1660,7 @@ class RFSwarmAgent():
 		fd.append("		if self.msg is not None and not istrace:")
 		fd.append("			ResultName = self.msg.message")
 		fd.append("		elif 'doc' in attrs and len(attrs['doc'])>0:")
+		fd.append("			self.debugmsg(5, 'attrs[doc]: ', attrs['doc'])")
 		fd.append("			ResultName = attrs['doc']")
 		# Quiet Keyword -> https://github.com/damies13/rfswarm/blob/master/Doc/Preparing_for_perf.md#keywords
 		# fd.append("		elif '${' not in name:")
@@ -1916,15 +1975,13 @@ class RFSwarmAgent():
 
 		fd = []
 		fd.append("")
-		fd.append("from robot.api import SuiteVisitor")
-		fd.append("")
 		fd.append("from robot.libraries.BuiltIn import BuiltIn")
 		fd.append("")
 		fd.append("import time")
 		fd.append("import os")
 		fd.append("import json")
 		fd.append("")
-		fd.append("class RFSTestRepeater(SuiteVisitor):")
+		fd.append("class RFSTestRepeater:")
 		fd.append("	ROBOT_LISTENER_API_VERSION = 3")
 		fd.append("")
 		fd.append("	testname = None")
@@ -1952,21 +2009,6 @@ class RFSwarmAgent():
 		fd.append("			newname = \"{} {}\".format(self.testname, newiteration)")
 		fd.append("			copy = test.copy(name=newname)")
 		fd.append("			test.parent.tests.append(copy)")
-		fd.append("")
-		fd.append("	def end_suite(self, suite, result):")
-		fd.append("		# This prevents the error:")
-		fd.append("		# [ ERROR ] Calling method 'end_suite' of listener 'TestRepeater.py' failed: TypeError: end_suite() takes 2 positional arguments but 3 were given")
-		fd.append("		pass")
-		fd.append("")
-		fd.append("	def start_suite(self, suite, result):")
-		fd.append("		# This prevents the error:")
-		fd.append("		# [ ERROR ] Calling method 'start_suite' of listener 'TestRepeater.py' failed: TypeError: start_suite() takes 2 positional arguments but 3 were given")
-		fd.append("		pass")
-		fd.append("")
-		fd.append("	def start_test(self, test, result):")
-		fd.append("		# This prevents the error:")
-		fd.append("		# [ ERROR ] Calling method 'start_test' of listener 'TestRepeater.py' failed: TypeError: start_test() takes 2 positional arguments but 3 were given")
-		fd.append("		pass")
 		fd.append("")
 
 		rfver = self.agentproperties["RobotFramework"]
