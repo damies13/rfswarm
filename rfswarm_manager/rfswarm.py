@@ -1346,31 +1346,15 @@ class RFSwarmBase:
 		else:
 			basedir = localdir
 
+		filequeue = []
+
 		# look for __init__. files - Issue #90
 		initfiles = os.path.abspath(os.path.join(localdir, "__init__.*"))
 		base.debugmsg(8, "initfiles", initfiles)
 		filelst = glob.glob(initfiles)
 		for file in filelst:
 			base.debugmsg(7, "file:", file)
-			# relfile = os.path.relpath(file, start=basedir)
-			relfile = base.get_relative_path(base.config['Plan']['ScriptDir'], file)
-			base.debugmsg(7, "relfile:", relfile)
-			newhash = self.hash_file(file, relfile)
-			base.debugmsg(7, "newhash:", newhash)
-			if newhash not in self.scriptfiles:
-				self.scriptfiles[newhash] = {
-					'id': newhash,
-					'basedir': basedir,
-					'localpath': file,
-					'relpath': relfile,
-					'type': "Initialization"
-				}
-				filename, fileext = os.path.splitext(file)
-				# splitext leaves the . on the extention, the list below needs to have the extentions
-				# starting with a . - Issue #94
-				if fileext.lower() in ['.robot', '.resource']:
-					t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
-					t.start()
+			filequeue.append(file)
 
 		base.debugmsg(8, "localdir", localdir)
 		filename, fileext = os.path.splitext(localpath)
@@ -1380,35 +1364,38 @@ class RFSwarmBase:
 		# splitext leaves the . on the extention, the list below needs to have the extentions
 		# starting with a . - Issue #94
 		if (fileext.lower() in ['.robot', '.resource'] and keep_going):
+			filedata = []
 			with open(localpath, 'r', encoding="utf8") as afile:
-				for line in afile:
-					if checking and '*** ' in line:
-						checking = False
+				filedata = afile.read().splitlines()
+				# close the file before processing the data - attempt fix for Issue #261
+			for line in filedata:
+				if checking and '*** ' in line:
+					checking = False
 
-					if checking:
-						base.debugmsg(9, "line", line)
-						try:
-							if line.strip()[:1] != "#":
-								linearr = line.strip().split()
-								base.debugmsg(8, "linearr", linearr)
-								resfile = None
-								if len(linearr) > 1 and linearr[0].upper() in ['RESOURCE', 'VARIABLES', 'LIBRARY']:
-									base.debugmsg(9, "linearr[1]", linearr[1])
-									resfile = linearr[1]
-								if not resfile and len(linearr) > 2 and (linearr[0].upper() == 'METADATA' and linearr[1].upper() == 'FILE'):
-									base.debugmsg(9, "linearr[2]", linearr[2])
-									resfile = linearr[2]
-								if not resfile and len(linearr) > 2 and (linearr[0].upper() == 'IMPORT' and linearr[1].upper() == 'LIBRARY'):
-									base.debugmsg(9, "linearr[2]", linearr[2])
-									resfile = linearr[2]
-								if resfile:
-									base.debugmsg(8, "resfile", resfile)
-									# here we are assuming the resfile is a relative path! should we also consider files with full local paths?
-									# Issue #129 Handle ``${CURDIR}/``
-									if resfile.find("${") > -1:
-										localrespath = base.replace_rf_path_variables(resfile, localdir)
-									else:
-										localrespath = self.localrespath(localdir, resfile)
+				if checking:
+					base.debugmsg(9, "line", line)
+					try:
+						if line.strip()[:1] != "#":
+							linearr = line.strip().split()
+							base.debugmsg(8, "linearr", linearr)
+							resfile = None
+							if len(linearr) > 1 and linearr[0].upper() in ['RESOURCE', 'VARIABLES', 'LIBRARY']:
+								base.debugmsg(9, "linearr[1]", linearr[1])
+								resfile = linearr[1]
+							if not resfile and len(linearr) > 2 and (linearr[0].upper() == 'METADATA' and linearr[1].upper() == 'FILE'):
+								base.debugmsg(9, "linearr[2]", linearr[2])
+								resfile = linearr[2]
+							if not resfile and len(linearr) > 2 and (linearr[0].upper() == 'IMPORT' and linearr[1].upper() == 'LIBRARY'):
+								base.debugmsg(9, "linearr[2]", linearr[2])
+								resfile = linearr[2]
+							if resfile:
+								base.debugmsg(8, "resfile", resfile)
+								# here we are assuming the resfile is a relative path! should we also consider files with full local paths?
+								# Issue #129 Handle ``${CURDIR}/``
+								if resfile.find("${") > -1:
+									localrespath = base.replace_rf_path_variables(resfile, localdir)
+								else:
+									localrespath = self.localrespath(localdir, resfile)
 
 									base.debugmsg(8, "localrespath", localrespath)
 									localrespath = os.path.abspath(localrespath)
@@ -1428,8 +1415,7 @@ class RFSwarmBase:
 											'type': linearr[0]
 										}
 
-										t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
-										t.start()
+									filequeue.append(localrespath)
 
 									else:
 										base.debugmsg(6, "localrespath", localrespath)
@@ -1449,17 +1435,39 @@ class RFSwarmBase:
 												'type': linearr[0]
 											}
 
-						except Exception as e:
-							base.debugmsg(6, "line", line)
-							base.debugmsg(6, "Exception", e)
-							base.debugmsg(6, "linearr", linearr)
+					except Exception as e:
+						base.debugmsg(6, "line", line)
+						base.debugmsg(6, "Exception", e)
+						base.debugmsg(6, "linearr", linearr)
 
-					# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
-					match = re.search(r'\*+([^*\v]+)', line)
-					if match is not None:
-						base.debugmsg(6, "match.group(0)", match.group(0), "match.group(1)", match.group(1))
-						if match.group(1).strip().upper() in ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD']:
-							checking = True
+				# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
+				match = re.search(r'\*+([^*\v]+)', line)
+				if match is not None:
+					base.debugmsg(6, "match.group(0)", match.group(0), "match.group(1)", match.group(1))
+					if match.group(1).strip().upper() in ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD']:
+						checking = True
+
+		if len(filequeue) > 0:
+			for file in filequeue:
+				base.debugmsg(7, "file:", file)
+				relfile = base.get_relative_path(base.config['Plan']['ScriptDir'], file)
+				base.debugmsg(7, "relfile:", relfile)
+				newhash = self.hash_file(file, relfile)
+				base.debugmsg(7, "newhash:", newhash)
+				if newhash not in self.scriptfiles:
+					self.scriptfiles[newhash] = {
+						'id': newhash,
+						'basedir': basedir,
+						'localpath': file,
+						'relpath': relfile,
+						'type': "Initialization"
+					}
+					filename, fileext = os.path.splitext(file)
+					# splitext leaves the . on the extention, the list below needs to have the extentions
+					# starting with a . - Issue #94
+					if fileext.lower() in ['.robot', '.resource']:
+						t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
+						t.start()
 
 	def check_files_changed(self):
 		# self.scriptfiles[hash]
@@ -1528,15 +1536,15 @@ class RFSwarmBase:
 
 			filedata = self.uploadfiles[hash]['FileData']
 
-			self.debugmsg(6, "filedata:", filedata)
+			self.debugmsg(8, "filedata:", filedata)
 			self.debugmsg(6, "filedata:")
 
 			decoded = base64.b64decode(filedata)
-			self.debugmsg(6, "b64decode: decoded:", decoded)
+			self.debugmsg(8, "b64decode: decoded:", decoded)
 			self.debugmsg(6, "b64decode:")
 
 			uncompressed = lzma.decompress(decoded)
-			self.debugmsg(6, "uncompressed:", uncompressed)
+			self.debugmsg(8, "uncompressed:", uncompressed)
 			self.debugmsg(6, "uncompressed:")
 
 			localfiledir = os.path.dirname(localfile)
@@ -1783,12 +1791,37 @@ class RFSwarmBase:
 
 		sql += " ORDER BY min(r.script_index), min(r.sequence)"
 
-		base.debugmsg(7, "sql:", sql)
+		base.debugmsg(6, "sql:", sql)
 
 		base.dbqueue["Read"].append({"SQL": sql, "KEY": "RunStats"})
 
 		t = threading.Thread(target=self.SaveRunStats_SQL)
 		t.start()
+
+	def UpdateAgents_SQL(self):
+
+		# request agent data for agent report
+		sql = "SELECT * "
+		sql += "FROM AgentHistory as a "
+		sql += "WHERE a.AgentLastSeen>{} ".format(base.robot_schedule["Start"])
+		sql += " ORDER BY a.AgentLastSeen"
+
+		base.debugmsg(6, "sql:", sql)
+
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": "Agents"})
+		# request agent data for agent report
+
+	def UpdateRawResults_SQL(self):
+		# request raw data for agent report
+		sql = "SELECT * "
+		sql += "FROM Results as r "
+		sql += "WHERE r.start_time>{} ".format(base.robot_schedule["Start"])
+		sql += " ORDER BY r.start_time"
+
+		base.debugmsg(6, "sql:", sql)
+
+		base.dbqueue["Read"].append({"SQL": sql, "KEY": "RawResults"})
+		# request raw data for agent report
 
 	def SaveRunStats_SQL(self):
 
@@ -1819,10 +1852,15 @@ class RFSwarmBase:
 		while_cnt = 0
 		while_max = 100
 		filecount = 0
+
 		base.debugmsg(6, "RunStats")
 		base.debugmsg(6, "UpdateRunStats_SQL")
 		base.UpdateRunStats_SQL()
-		if base.args.nogui:
+		base.UpdateAgents_SQL()
+		base.UpdateRawResults_SQL()
+
+		base.debugmsg(6, "RunStats base.args.nogui:", base.args.nogui, "	base.run_starttime:", base.run_starttime, "	base.run_start:", base.run_start, "	base.run_end:", base.run_end)
+		if base.args.nogui or base.run_start > 0:
 			if "RunStats" not in base.dbqueue["ReadResult"]:
 				base.debugmsg(6, "Wait for RunStats")
 				while_cnt = while_max
@@ -1839,22 +1877,6 @@ class RFSwarmBase:
 
 		if "RunStats" in base.dbqueue["ReadResult"] and len(base.dbqueue["ReadResult"]["RunStats"]) > 0:
 			base.debugmsg(7, "RunStats:", base.dbqueue["ReadResult"]["RunStats"])
-
-			# request agent data for agent report
-			sql = "SELECT * "
-			sql += "FROM AgentHistory as a "
-			sql += "WHERE a.AgentLastSeen>{} ".format(base.robot_schedule["Start"])
-			sql += " ORDER BY a.AgentLastSeen"
-			base.dbqueue["Read"].append({"SQL": sql, "KEY": "Agents"})
-			# request agent data for agent report
-
-			# request raw data for agent report
-			sql = "SELECT * "
-			sql += "FROM Results as r "
-			sql += "WHERE r.start_time>{} ".format(base.robot_schedule["Start"])
-			sql += " ORDER BY r.start_time"
-			base.dbqueue["Read"].append({"SQL": sql, "KEY": "RawResults"})
-			# request raw data for agent report
 
 			fileprefix = base.run_name
 			base.debugmsg(8, "fileprefix:", fileprefix)
@@ -1879,7 +1901,8 @@ class RFSwarmBase:
 
 			filecount += 1
 
-		if base.args.nogui:
+		base.debugmsg(6, "Agents base.args.nogui:", base.args.nogui, "	base.run_starttime:", base.run_starttime, "	base.run_start:", base.run_start, "	base.run_end:", base.run_end)
+		if base.args.nogui or base.run_start > 0:
 			while_cnt = while_max
 			base.debugmsg(6, "Wait for Agents")
 			while "Agents" not in base.dbqueue["ReadResult"] and while_cnt > 0:
@@ -1917,7 +1940,8 @@ class RFSwarmBase:
 
 			filecount += 1
 
-		if base.args.nogui:
+		base.debugmsg(6, "RawResults base.args.nogui:", base.args.nogui, "	base.run_starttime:", base.run_starttime, "	base.run_start:", base.run_start, "	base.run_end:", base.run_end)
+		if base.args.nogui or base.run_start > 0:
 			base.debugmsg(6, "Wait for RawResults")
 			while_cnt = while_max
 			while "RawResults" not in base.dbqueue["ReadResult"] and while_cnt > 0:
@@ -1955,6 +1979,7 @@ class RFSwarmBase:
 
 			filecount += 1
 
+		base.debugmsg(6, "filecount:", filecount)
 		if not base.args.nogui:
 			if filecount > 0:
 				tkm.showinfo("RFSwarm - Info", "Report data saved to: {}".format(base.datapath))
@@ -2077,6 +2102,20 @@ class RFSwarmBase:
 				if addr.address not in ['127.0.0.1', '::1', 'fe80::1%lo0']:
 					ipaddresslist.append(addr.address)
 		return ipaddresslist
+
+	def agents_ready(self):
+		readycount = 0
+		for agent in base.Agents.keys():
+			if "FileCount" in base.Agents[agent]:
+				localfc = len(self.scriptfiles.keys())
+				if int(base.Agents[agent]["FileCount"]) >= localfc:
+					if "Status" in base.Agents[agent] and base.Agents[agent]["Status"]:
+						readycount += 1
+			else:
+				if "Status" in base.Agents[agent] and base.Agents[agent]["Status"]:
+					readycount += 1
+
+		return readycount
 
 
 class RFSwarmCore:
@@ -2349,9 +2388,11 @@ class RFSwarmCore:
 
 			base.debugmsg(5, "len(base.Agents):", len(base.Agents), "	neededagents:", neededagents)
 			# agntlst = list(base.Agents.keys())
-			while len(base.Agents) < neededagents:
+			# while len(base.Agents) < neededagents:
+			while base.agents_ready() < neededagents:
 				base.debugmsg(1, "Waiting for Agents")
-				base.debugmsg(3, "Agents:", len(base.Agents), "	Agents Needed:", neededagents)
+				# base.debugmsg(3, "Agents:", len(base.Agents), "	Agents Needed:", neededagents)
+				base.debugmsg(3, "Agents:", base.agents_ready(), "	Agents Needed:", neededagents)
 				time.sleep(10)
 
 			if base.args.nogui:
@@ -2525,6 +2566,9 @@ class RFSwarmCore:
 		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "CPU", agentdata["CPU%"], agentdata["AgentName"])
 		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "MEM", agentdata["MEM%"], agentdata["AgentName"])
 		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "NET", agentdata["NET%"], agentdata["AgentName"])
+		# FileCount was added in v1.3.2
+		if "FileCount" in agentdata:
+			base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "FileCount", agentdata["FileCount"], agentdata["AgentName"])
 
 		if "AgentIPs" in agentdata:
 			for ip in agentdata["AgentIPs"]:
@@ -2644,8 +2688,7 @@ class RFSwarmCore:
 
 		rowcount = 0
 		for i in range(scriptcount):
-			ii = i + 1
-			istr = str(ii)
+			istr = str(i + 1)
 			if istr in filedata:
 				base.debugmsg(5, "filedata[", istr, "]:", filedata[istr])
 				rowcount += 1
@@ -2654,10 +2697,11 @@ class RFSwarmCore:
 				# 	base.scriptlist.append({})
 				# 	base.scriptlist[ii]["Index"] = ii
 				if not base.args.nogui:
-					if ii + 1 > base.gui.scriptgrid.grid_size()[1]:		# grid_size tupple: (cols, rows)
+					if rowcount + 1 > base.gui.scriptgrid.grid_size()[1]:		# grid_size tupple: (cols, rows)
 						base.addScriptRow()
 				else:
 					base.addScriptRow()
+
 				# users = 13
 				if "robots" in filedata[istr] or "users" in filedata[istr]:
 					if "robots" in filedata[istr]:
@@ -2665,7 +2709,6 @@ class RFSwarmCore:
 						self.sr_users_validate(rowcount, int(filedata[istr]["robots"]))
 					else:
 						base.debugmsg(8, "filedata[", istr, "][users]:", filedata[istr]["users"])
-						# base.scriptlist[ii]["users"] = filedata[istr]["users"]
 						self.sr_users_validate(rowcount, int(filedata[istr]["users"]))
 						# delay = 0
 				else:
@@ -2673,7 +2716,6 @@ class RFSwarmCore:
 					fileok = False
 				if "delay" in filedata[istr]:
 					base.debugmsg(8, "filedata[", istr, "][delay]:", filedata[istr]["delay"])
-					# base.scriptlist[ii]["delay"] = filedata[istr]["delay"]
 					self.sr_delay_validate(rowcount, int(filedata[istr]["delay"]))
 					# rampup = 60
 				else:
@@ -2681,7 +2723,6 @@ class RFSwarmCore:
 					fileok = False
 				if "rampup" in filedata[istr]:
 					base.debugmsg(8, "filedata[", istr, "][rampup]:", filedata[istr]["rampup"])
-					# base.scriptlist[ii]["rampup"] = filedata[istr]["rampup"]
 					self.sr_rampup_validate(rowcount, int(filedata[istr]["rampup"]))
 					# run = 600
 				else:
@@ -2689,7 +2730,6 @@ class RFSwarmCore:
 					fileok = False
 				if "run" in filedata[istr]:
 					base.debugmsg(8, "filedata[", istr, "][run]:", filedata[istr]["run"])
-					# base.scriptlist[ii]["run"] = filedata[istr]["run"]
 					self.sr_run_validate(rowcount, int(filedata[istr]["run"]))
 					# script = /Users/dave/Documents/GitHub/rfswarm/robots/OC_Demo_2.robot
 				else:
@@ -2715,39 +2755,40 @@ class RFSwarmCore:
 					fileok = False
 				if "test" in filedata[istr]:
 					base.debugmsg(8, "filedata[", istr, "][test]:", filedata[istr]["test"])
-					# base.scriptlist[ii]["test"] = filedata[istr]["test"]
 					self.sr_test_validate("row{}".format(rowcount), filedata[istr]["test"])
 				else:
 					base.debugmsg(3, "test missing [", istr, "]")
 					fileok = False
 
 				if "excludelibraries" in filedata[istr]:
-					base.scriptlist[ii]["excludelibraries"] = filedata[istr]["excludelibraries"]
+					base.debugmsg(8, "excludelibraries:", filedata[istr]["excludelibraries"])
+					base.scriptlist[rowcount]["excludelibraries"] = filedata[istr]["excludelibraries"]
 
 				if "robotoptions" in filedata[istr]:
-					base.scriptlist[ii]["robotoptions"] = filedata[istr]["robotoptions"]
+					base.debugmsg(8, "robotoptions:", filedata[istr]["robotoptions"])
+					base.scriptlist[rowcount]["robotoptions"] = filedata[istr]["robotoptions"]
 
 				# testrepeater = True
 				if "testrepeater" in filedata[istr]:
-					base.scriptlist[ii]["testrepeater"] = base.str2bool(filedata[istr]["testrepeater"])
+					base.scriptlist[rowcount]["testrepeater"] = base.str2bool(filedata[istr]["testrepeater"])
 				# injectsleepenabled = True
 				if "injectsleepenabled" in filedata[istr]:
-					base.scriptlist[ii]["injectsleepenabled"] = base.str2bool(filedata[istr]["injectsleepenabled"])
+					base.scriptlist[rowcount]["injectsleepenabled"] = base.str2bool(filedata[istr]["injectsleepenabled"])
 				# injectsleepminimum = 18
 				if "injectsleepminimum" in filedata[istr] and len(filedata[istr]["injectsleepminimum"]) > 0:
-					base.scriptlist[ii]["injectsleepminimum"] = int(filedata[istr]["injectsleepminimum"])
+					base.scriptlist[rowcount]["injectsleepminimum"] = int(filedata[istr]["injectsleepminimum"])
 				# injectsleepmaximum = 33
 				if "injectsleepmaximum" in filedata[istr] and len(filedata[istr]["injectsleepmaximum"]) > 0:
-					base.scriptlist[ii]["injectsleepmaximum"] = int(filedata[istr]["injectsleepmaximum"])
+					base.scriptlist[rowcount]["injectsleepmaximum"] = int(filedata[istr]["injectsleepmaximum"])
 				# disableloglog
 				if "disableloglog" in filedata[istr]:
-					base.scriptlist[ii]["disableloglog"] = base.str2bool(filedata[istr]["disableloglog"])
+					base.scriptlist[rowcount]["disableloglog"] = base.str2bool(filedata[istr]["disableloglog"])
 				# disablelogreport
 				if "disablelogreport" in filedata[istr]:
-					base.scriptlist[ii]["disablelogreport"] = base.str2bool(filedata[istr]["disablelogreport"])
+					base.scriptlist[rowcount]["disablelogreport"] = base.str2bool(filedata[istr]["disablelogreport"])
 				# disablelogoutput
 				if "disablelogoutput" in filedata[istr]:
-					base.scriptlist[ii]["disablelogoutput"] = base.str2bool(filedata[istr]["disablelogoutput"])
+					base.scriptlist[rowcount]["disablelogoutput"] = base.str2bool(filedata[istr]["disablelogoutput"])
 
 				if "filters" in filedata[istr]:
 					base.debugmsg(9, "filedata[istr][filters]:", filedata[istr]["filters"], type(filedata[istr]["filters"]))
@@ -2755,7 +2796,7 @@ class RFSwarmCore:
 					base.debugmsg(9, "filtr:", filtr, type(filtr))
 					filtrs = json.loads(filtr)
 					base.debugmsg(9, "filtrs:", filtrs, type(filtrs))
-					base.scriptlist[ii]["filters"] = filtrs
+					base.scriptlist[rowcount]["filters"] = filtrs
 
 				if not fileok:
 					base.debugmsg(1, "Scenario file is damaged:", ScenarioFile)
@@ -3215,6 +3256,22 @@ class RFSwarmCore:
 			scriptfile = args[0]
 		else:
 			scriptfile = ""
+
+		if not os.path.exists(scriptfile):
+			msg = "The referenced file:\n" + scriptfile + "\n\ncannot be found by RFSwarm Manager."
+			if not base.args.nogui:
+				tkm.showwarning("RFSwarm - Warning", msg)
+			else:
+				base.debugmsg(0, msg)
+			return False
+		elif not os.path.isfile(scriptfile):
+			msg = "The referenced file:\n" + scriptfile + "\n\nis a directory, not a file."
+			if not base.args.nogui:
+				tkm.showwarning("RFSwarm - Warning", msg)
+			else:
+				base.debugmsg(0, msg)
+			return False
+
 		base.debugmsg(7, "scriptfile:", scriptfile)
 		if len(scriptfile) > 0:
 			base.scriptlist[r]["Script"] = scriptfile
@@ -5828,6 +5885,7 @@ class RFSwarmGUI(tk.Frame):
 
 			totalcalc = {}
 
+			base.debugmsg(6, "Scriptlist:", base.scriptlist)
 			for grp in base.scriptlist:
 				base.debugmsg(6, "grp:", grp)
 				if 'Index' in grp:
@@ -5949,7 +6007,10 @@ class RFSwarmGUI(tk.Frame):
 				self.axis.xaxis.set_major_formatter(xformatter)
 				self.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
 
-				self.canvas.draw()
+				try:
+					self.canvas.draw()
+				except Exception as e:
+					base.debugmsg(9, "Graphdata:", graphdata, "Exception:", e)
 
 			self.pln_graph_update = False
 
