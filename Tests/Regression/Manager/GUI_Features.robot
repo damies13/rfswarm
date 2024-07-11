@@ -10,6 +10,32 @@ Suite Setup 	Set Platform
 ${scenario_name}=	test_scenario
 
 *** Test Cases ***
+Verify That Files Get Saved With Correct Extension And Names
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #39
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Open Manager GUI													AND
+	...    Open Agent
+
+	${scenario_name}=	Set Variable	Issue-#39
+	Log To Console	Files to check: scenario file, csv result files
+	Click Button	runsave
+	Save Scenario File OS DIALOG	${scenario_name}
+
+	# !!! csv files are checked in Test Case for Issue #254 !!!
+	@{all_files}=	List Files In Directory		${global_path}
+	Log To Console	${\n}All manager files: ${all_files}${\n}
+	@{scenario_file}=		List Files In Directory		${global_path}		${scenario_name}*
+	Length Should Be	${scenario_file}	1	msg=Cant find scenario file. File did not save or saved incorrectly. Check all manager files.
+	Should Be Equal As Strings		${scenario_file}[0]		${scenario_name}.rfs
+	...    msg=Scenario file name is incorrect: expected "${scenario_name}.rfs", actual: "${scenario_file}[0]"
+
+	[Teardown]	Run Keywords
+	...    Delete Scenario File		${scenario_name}		AND
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    GUI_Common.Stop Agent
+
 Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords
@@ -62,7 +88,6 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    Delete Scenario File	test_scenario				AND
 	...    Delete Robot File								AND
 	...    Delete Scenario File	${scenario_name}
 
@@ -1027,6 +1052,115 @@ Check If The CSV Report Button Works In The Manager
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    GUI_Common.Stop Agent
+Verify the Results Directory And db File Gets Created Correctly With Scenario Also After a Restart
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
+	[Setup]	Run Keywords
+	...    Clear Manager Result Directory									AND
+	...    Set INI Window Size		1200	600								AND
+	...    Open Manager GUI													AND
+	...    Open Agent														AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Create Robot File
+	...    file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\tFail this\n\tSleep\t10\n\tFail\n
+
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#35_#69${/}Issue-#35_#69.rfs
+	${scenario_name}	Set Variable	Issue-#35_#69
+	Copy File	${scenariofile}		${global_path}
+	Click Button	runopen
+	Open Scenario File OS DIALOG	${scenario_name}
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Click Button	runplay
+
+	Wait For	manager_${platform}_button_stoprun.png 	timeout=${300}
+	${current_date}=	Get Current Date
+	Log To Console	Current time: ${current_date}
+
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+
+	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_*
+	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
+	Length Should Be	${run_result_dirs}	1	msg=The test run result dir was not created or created unexpected directories!
+
+	Verify Test Result Directory Name	${run_result_dirs}[0]	${scenario_name}	${current_date}
+	Verify Generated Run Result Files	${run_result_dirs}[0]	${scenario_name}
+
+	Log To Console	${\n}${\n}All verifications passed. The test run is now being restarted.${\n}${\n}
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Click Button	runplay
+
+	Wait For	manager_${platform}_button_stoprun.png 	timeout=${300}
+	${current_date}=	Get Current Date
+	Log To Console	Current time: ${current_date}
+
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+
+	${previous_result_dir}=		Set Variable	${run_result_dirs}[0]
+	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_*
+	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
+	Length Should Be	${run_result_dirs}	2	msg=The second test run result dir was not created or created unexpected directories!
+	FOR  ${dir}  IN  @{run_result_dirs}
+		IF  '${dir}' != '${previous_result_dir}'
+			${result_dir_name}	Set Variable	${dir}
+		END
+	END
+
+	Verify Test Result Directory Name	${result_dir_name}		${scenario_name}	${current_date}
+	Verify Generated Run Result Files	${result_dir_name}		${scenario_name}
+
+	[Teardown]	Run Keywords
+	...    Delete Robot File						AND
+	...    Delete Scenario File	${scenario_name}	AND
+	...    GUI_Common.Stop Agent					AND
+	...    Run Keyword		Close Manager GUI ${platform}
+
+Verify the Results Directory And db File Gets Created Correctly Without Scenario
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
+	[Setup]	Run Keywords
+	...    Clear Manager Result Directory									AND
+	...    Set INI Window Size		1200	600								AND
+	...    Open Manager GUI													AND
+	...    Open Agent														AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Create Robot File
+	...    file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\tFail this\n\tSleep\t10\n\tFail\n
+
+	${scenario_name}	Set Variable	Scenario
+	Press Key.tab 4 Times
+	Type	15
+	Press Key.tab 1 Times
+	Type	30
+	Click Button	runscriptrow
+	Select Robot File	${robot_data}[0]
+	Select 1 Robot Test Case
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Click Button	runplay
+
+	Wait For	manager_${platform}_button_stoprun.png 	timeout=${300}
+	${current_date}=	Get Current Date
+	Log To Console	Current time: ${current_date}
+
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+
+	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_*
+	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
+	Length Should Be	${run_result_dirs}	1	msg=The test run result dir was not created or created unexpected directories!
+
+	Verify Test Result Directory Name	${run_result_dirs}[0]	${scenario_name}	${current_date}
+	Verify Generated Run Result Files	${run_result_dirs}[0]	${scenario_name}
+
+	[Teardown]	Run Keywords
+	...    Delete Robot File						AND
+	...    GUI_Common.Stop Agent					AND
+	...    Run Keyword		Close Manager GUI ${platform}
 
 Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the robots)
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
