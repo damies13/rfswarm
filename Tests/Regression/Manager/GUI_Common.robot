@@ -93,7 +93,10 @@ Close Manager GUI
 	ELSE
 		Take A Screenshot
 		${result} = 	Terminate Process		${process_manager}
-		Fail
+		${running}= 	Is Process Running 	${process_manager}
+		Take A Screenshot
+		IF 	${running}
+			Fail
 	END
 
 Close Manager GUI macos
@@ -733,7 +736,7 @@ Verify Scenario File Robot Data
 		${test_offset}		Get Index From List 	${scenario_content_list}	test	start=${i}
 		Should Be Equal		test	${scenario_content_list}[${test_offset}]	msg=Test is missing!
 
-		${next_equal_offset}		Get Index From List		
+		${next_equal_offset}		Get Index From List
 		...    ${scenario_content_list}	=	start=${test_offset + 2}
 		@{test_name}	Create List
 		FOR  ${j}  IN RANGE  0  ${next_equal_offset - 1} - ${test_offset} - ${2}
@@ -765,7 +768,7 @@ Verify Scenario Test Row Settings
 			Should Be Equal		excludelibraries	${scenario_content_list}[${exlibraries_offset}]
 			...    msg=Exclude Libraries are missing!
 
-			${next_equal_offset}		Get Index From List		
+			${next_equal_offset}		Get Index From List
 			...    ${scenario_content_list}	=	start=${exlibraries_offset + 2}
 			@{exlibraries}	Create List
 			FOR  ${j}  IN RANGE  0  ${next_equal_offset - 1} - ${exlibraries_offset} - ${2}
@@ -782,7 +785,7 @@ Verify Scenario Test Row Settings
 			Should Be Equal		robotoptions	${scenario_content_list}[${robot_options_offset}]
 			...    msg=Robot Options are missing!
 
-			${next_equal_offset}		Get Index From List		
+			${next_equal_offset}		Get Index From List
 			...    ${scenario_content_list}	=	start=${robot_options_offset + 2}
 			@{robot_options}	Create List
 			FOR  ${j}  IN RANGE  0  ${next_equal_offset - 1} - ${robot_options_offset} - ${2}
@@ -825,7 +828,7 @@ Verify Scenario Test Row Settings
 			Should Be Equal		${row_settings_data['inject_sleep_max']}	${scenario_content_list}[${injectsleep_max_offset + 2}]
 			...    msg=Inject sleep maximum did not save correctly [settings != scenario]!
 		END
-		
+
 		IF  'disablelog_log' in ${row_settings_data}
 			${disablelog_log_offset}		Get Index From List		${scenario_content_list}	disableloglog	start=${i}
 			Should Be Equal		disableloglog	${scenario_content_list}[${disablelog_log_offset}]
@@ -862,7 +865,7 @@ Verify Scenario Wide Settings Data
 		Should Be Equal		excludelibraries	${scenario_content_list}[${exlibraries_offset}]
 		...    msg=Exclude Libraries are missing!
 
-		${next_equal_offset}		Get Index From List		
+		${next_equal_offset}		Get Index From List
 		...    ${scenario_content_list}	=	start=${exlibraries_offset + 2}
 		@{exlibraries}	Create List
 		FOR  ${j}  IN RANGE  0  ${next_equal_offset - 1} - ${exlibraries_offset} - ${2}
@@ -879,7 +882,7 @@ Verify Scenario Wide Settings Data
 		Should Be Equal		robotoptions	${scenario_content_list}[${robot_options_offset}]
 		...    msg=Robot options are missing!
 
-		${next_equal_offset}		Get Index From List		
+		${next_equal_offset}		Get Index From List
 		...    ${scenario_content_list}	=	start=${robot_options_offset + 2}
 		@{robot_options}	Create List
 		FOR  ${j}  IN RANGE  0  ${next_equal_offset - 1} - ${robot_options_offset} - ${2}
