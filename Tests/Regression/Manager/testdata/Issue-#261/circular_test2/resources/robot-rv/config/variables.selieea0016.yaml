@@ -1,0 +1,94 @@
+# Util variables
+LOG_DATE_FORMAT: "[0-9]{2}:[0-9]{2}:[0-9]{2}"
+CERTS: "/opt/robotframework/certs/"
+GENERAL_PASSWORD: "removedpass"
+COMMON_CERT_LOCATION: "certs/"
+KUBECONFIG_LOCATION_EXTERNAL: "robot-dashboard/"
+CLUSTER_NAME: ""
+
+# Browser variables
+BROWSER:
+  type: "chrome"
+  width: "1920"
+  height: "1080"
+  options: ""
+
+# Cluster variables
+CLUSTER:
+  DEFAULT:
+    user: "root"
+    password: "removedpass"
+    namespace: "eric-egg-ns"
+    config: "robot-dashboard/dummy.yaml"
+    nodes: 5
+  NORTH:
+    user: "root"
+    password: "removedpass"
+    namespace: "eric-egg-ns"    # north-eric-egg-ns
+    config: "robot-dashboard/dummy.yaml"
+    nodes: 5
+  SOUTH:
+    user: "root"
+    password: "removedpass"
+    namespace: "eric-egg-ns"    # south-eric-egg-ns
+    config: "egg4-robot/tests/robot-dashboard/dummy.yaml"
+    ip: "10.169.123.129"
+    nodes: 5
+  REGIONAL:
+    - REGIONAL1:
+        user: ""
+        password: "removedpass"
+        namespace: "eric-egg-ns" # regional1-eric-egg-ns
+        config: ""
+        nodes: 5
+
+# Service variables
+SERVICES:
+  GAS:
+    url: "https://gas.egg.company-domain.com/ui/"
+    ip: ""
+  OPENAPI:
+    url: "https://analytics-open-api.egg.company-domain.com"
+    ip: ""
+    mock_token: "removedtoken"
+  VERTICA:
+    namespace: "eric-egg-ns" # ${CLUSTER.SOUTH.namespace}
+    dbname: "vertica"
+    user: "dbadmin"
+    password: "removedpass"
+    host: "10.51.197.102"
+    port: "5433"
+    schema: "data_016"
+    tls_enabled: "False"
+  KEYCLOAK:
+    url: "https://iam.egg.company-domain.com/auth/"
+    ip: ""
+    user: "admin"
+    password: "KeyCl0@kP@ssw0rd"
+  SPOTFIRE:
+    url: "https://seliegg0016.ezhorbe.company-domain.com"
+    user: "autotestuser"
+    password: "removedpass"
+    dashboard_folder: "/fromDevCI/0.4.58-4_06_27_08_56"
+    sso_enabled: "False"
+  SPOTFIRE_SERVER:
+    ip: "10.123.227.19"
+    user: "root"
+    password: "removedpass"
+    version: "12.5.0"
+  ELASTIC:
+    namespace: "eric-egg-ns" # ${CLUSTER.SOUTH.namespace}
+  PROMETHEUS:
+    namespace: "eric-egg-ns" # ${CLUSTER.SOUTH.namespace}
+  REFDATA_PG:
+    namespace: "eric-egg-ns" # ${CLUSTER.SOUTH.namespace}
+  REFDATA_REST:
+    namespace: "eric-egg-ns" # ${CLUSTER.SOUTH.namespace}
+  PRIVACY_SERVICE:
+    namespace: "eric-egg-ns" # ${CLUSTER.SOUTH.namespace}
+  SF_CONFIG_PG:
+    ip: "10.123.227.19"
+    dbname: "postgres"
+    username: "postgres"
+    password: "removedpass"
+    port: "5432"
