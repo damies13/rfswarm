@@ -1136,7 +1136,8 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	Press Key.tab 1 Times
 	Type	30
 	Click Button	runscriptrow
-	Select Robot File	${robot_data}[0]
+	# Select Robot File	${robot_data}[0]
+	Select Robot File OS DIALOG 	${robot_data}[0]
 	Select 1 Robot Test Case
 	Check If The Agent Is Ready
 	Click Tab	Plan
