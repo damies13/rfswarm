@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.0.1 (Python 3.12.4 on linux)" generated="2024-06-26T03:01:23.743719" rpa="false" schemaversion="5">
+<suite id="s1" name="Jpetstore" source="/tmp/rfswarmagent/scripts/jpetstore.robot">
+<test id="s1-t1" name="Jpetstore 01" line="16">
+<kw name="Open Store">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2024-06-26T03:01:24.258013" level="INFO">Creating Session using : alias=jpetstore, url=http://192.168.13.82:8080, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<arg>${SessAlias}</arg>
+<arg>${StorePage}</arg>
+<arg>verify=False</arg>
+<arg>disable_warnings=1</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2024-06-26T03:01:24.257690" elapsed="0.000572"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2024-06-26T03:01:49.695683" level="FAIL">ConnectionError: HTTPConnectionPool(host='192.168.13.82', port=8080): Max retries exceeded with url: /jpetstore/actions/Catalog.action (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x7b65d04702c0&gt;: Failed to establish a new connection: [Errno 113] No route to host'))</msg>
+<var>${resp}</var>
+<arg>${SessAlias}</arg>
+<arg>/jpetstore/actions/Catalog.action</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="FAIL" start="2024-06-26T03:01:24.258550" elapsed="25.441971">ConnectionError: HTTPConnectionPool(host='192.168.13.82', port=8080): Max retries exceeded with url: /jpetstore/actions/Catalog.action (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x7b65d04702c0&gt;: Failed to establish a new connection: [Errno 113] No route to host'))</status>
+</kw>
+<kw name="Get Resources">
+<arg>${resp}</arg>
+<status status="NOT RUN" start="2024-06-26T03:01:49.701278" elapsed="0.000037"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>${resp.cookies}[JSESSIONID]</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2024-06-26T03:01:49.701812" elapsed="0.000027"/>
+</kw>
+<kw name="Set Test Variable" owner="BuiltIn">
+<arg>$JSESSIONID</arg>
+<arg>${resp.cookies}[JSESSIONID]</arg>
+<doc>Makes a variable available everywhere within the scope of the current test.</doc>
+<status status="NOT RUN" start="2024-06-26T03:01:49.702063" elapsed="0.000026"/>
+</kw>
+<doc>Opens jpetstore</doc>
+<status status="FAIL" start="2024-06-26T03:01:24.256945" elapsed="25.445378">ConnectionError: HTTPConnectionPool(host='192.168.13.82', port=8080): Max retries exceeded with url: /jpetstore/actions/Catalog.action (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x7b65d04702c0&gt;: Failed to establish a new connection: [Errno 113] No route to host'))</status>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>37</arg>
+<arg>Sleep added by RFSwarm</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2024-06-26T03:01:49.705395" elapsed="0.000030"/>
+</kw>
+<kw name="Nav Fish" source_name="Nav ${Animal}">
+<var>${products}</var>
+<doc>Navigate to catagory page</doc>
+<status status="NOT RUN" start="2024-06-26T03:01:49.705730" elapsed="0.000030"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>30</arg>
+<arg>Sleep added by RFSwarm</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2024-06-26T03:01:49.706854" elapsed="0.000026"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<var>${product}</var>
+<arg>random.choice(${products})</arg>
+<arg>modules=random</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="NOT RUN" start="2024-06-26T03:01:49.707101" elapsed="0.000025"/>
+</kw>
+<kw name="Nav Product">
+<arg>${product}</arg>
+<doc>Navigate to product page</doc>
+<status status="NOT RUN" start="2024-06-26T03:01:49.707501" elapsed="0.000026"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>15</arg>
+<arg>Sleep added by RFSwarm</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2024-06-26T03:01:49.708594" elapsed="0.000026"/>
+</kw>
+<kw name="Delete All Sessions" owner="RequestsLibrary">
+<doc>Removes all the session objects</doc>
+<status status="NOT RUN" start="2024-06-26T03:01:49.708833" elapsed="0.000024"/>
+</kw>
+<status status="FAIL" start="2024-06-26T03:01:24.256422" elapsed="25.452690">ConnectionError: HTTPConnectionPool(host='192.168.13.82', port=8080): Max retries exceeded with url: /jpetstore/actions/Catalog.action (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x7b65d04702c0&gt;: Failed to establish a new connection: [Errno 113] No route to host'))</status>
+</test>
+<test id="s1-t2" name="Jpetstore 01 1_1" line="16">
+<kw name="Open Store">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2024-06-26T03:01:49.710488" level="INFO">Creating Session using : alias=jpetstore, url=http://192.168.13.82:8080, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<arg>${SessAlias}</arg>
+<arg>${StorePage}</arg>
+<arg>verify=False</arg>
+<arg>disable_warnings=1</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2024-06-26T03:01:49.710211" elapsed="0.000461"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2024-06-26T03:02:14.275158" level="FAIL">ConnectionError: HTTPConnectionPool(host='192.168.13.82', port=8080): Max retries exceeded with url: /jpetstore/actions/Catalog.action (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x7b65d0473740&gt;: Failed to establish a new connection: [Errno 113] No route to host'))</msg>
+<var>${resp}</var>
+<arg>${SessAlias}</arg>
+<arg>/jpetstore/actions/Catalog.action</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="FAIL" start="2024-06-26T03:01:49.710897" elapsed="24.566305">ConnectionError: HTTPConnectionPool(host='192.168.13.82', port=8080): Max retries exceeded with url: /jpetstore/actions/Catalog.action (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x7b65d0473740&gt;: Failed to establish a new connection: [Errno 113] No route to host'))</status>
+</kw>
+<kw name="Get Resources">
+<arg>${resp}</arg>
+<status status="NOT RUN" start="2024-06-26T03:02:14.277869" elapsed="0.000034"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>${resp.cookies}[JSESSIONID]</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:14.278277" elapsed="0.000026"/>
+</kw>
+<kw name="Set Test Variable" owner="BuiltIn">
+<arg>$JSESSIONID</arg>
+<arg>${resp.cookies}[JSESSIONID]</arg>
+<doc>Makes a variable available everywhere within the scope of the current test.</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:14.280430" elapsed="0.000029"/>
+</kw>
+<doc>Opens jpetstore</doc>
+<status status="FAIL" start="2024-06-26T03:01:49.709964" elapsed="24.570726">ConnectionError: HTTPConnectionPool(host='192.168.13.82', port=8080): Max retries exceeded with url: /jpetstore/actions/Catalog.action (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x7b65d0473740&gt;: Failed to establish a new connection: [Errno 113] No route to host'))</status>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>17</arg>
+<arg>Sleep added by RFSwarm</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:14.285500" elapsed="0.000030"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>37</arg>
+<arg>Sleep added by RFSwarm</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:14.285758" elapsed="0.000025"/>
+</kw>
+<kw name="Nav Fish" source_name="Nav ${Animal}">
+<var>${products}</var>
+<doc>Navigate to catagory page</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:14.286072" elapsed="0.000030"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>35</arg>
+<arg>Sleep added by RFSwarm</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:14.291566" elapsed="0.000030"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>30</arg>
+<arg>Sleep added by RFSwarm</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:14.291874" elapsed="0.000026"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<var>${product}</var>
+<arg>random.choice(${products})</arg>
+<arg>modules=random</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:14.292119" elapsed="0.000024"/>
+</kw>
+<kw name="Nav Product">
+<arg>${product}</arg>
+<doc>Navigate to product page</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:14.292407" elapsed="0.000236"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>27</arg>
+<arg>Sleep added by RFSwarm</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:14.294927" elapsed="0.000034"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>15</arg>
+<arg>Sleep added by RFSwarm</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:14.295183" elapsed="0.000025"/>
+</kw>
+<kw name="Delete All Sessions" owner="RequestsLibrary">
+<doc>Removes all the session objects</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:14.295423" elapsed="0.000024"/>
+</kw>
+<status status="FAIL" start="2024-06-26T03:01:49.709643" elapsed="24.586054">ConnectionError: HTTPConnectionPool(host='192.168.13.82', port=8080): Max retries exceeded with url: /jpetstore/actions/Catalog.action (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x7b65d0473740&gt;: Failed to establish a new connection: [Errno 113] No route to host'))</status>
+</test>
+<test id="s1-t3" name="Jpetstore 01 1_2" line="16">
+<kw name="Open Store">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2024-06-26T03:02:14.297031" level="INFO">Creating Session using : alias=jpetstore, url=http://192.168.13.82:8080, headers={},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<arg>${SessAlias}</arg>
+<arg>${StorePage}</arg>
+<arg>verify=False</arg>
+<arg>disable_warnings=1</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2024-06-26T03:02:14.296775" elapsed="0.000441"/>
+</kw>
+<kw name="GET On Session" owner="RequestsLibrary">
+<msg time="2024-06-26T03:02:32.894814" level="FAIL">ConnectionError: HTTPConnectionPool(host='192.168.13.82', port=8080): Max retries exceeded with url: /jpetstore/actions/Catalog.action (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x7b65d0473050&gt;: Failed to establish a new connection: [Errno 113] No route to host'))</msg>
+<var>${resp}</var>
+<arg>${SessAlias}</arg>
+<arg>/jpetstore/actions/Catalog.action</arg>
+<doc>Sends a GET request on a previously created HTTP Session.</doc>
+<status status="FAIL" start="2024-06-26T03:02:14.297469" elapsed="18.599392">ConnectionError: HTTPConnectionPool(host='192.168.13.82', port=8080): Max retries exceeded with url: /jpetstore/actions/Catalog.action (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x7b65d0473050&gt;: Failed to establish a new connection: [Errno 113] No route to host'))</status>
+</kw>
+<kw name="Get Resources">
+<arg>${resp}</arg>
+<status status="NOT RUN" start="2024-06-26T03:02:32.897544" elapsed="0.000034"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>${resp.cookies}[JSESSIONID]</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:32.897946" elapsed="0.000025"/>
+</kw>
+<kw name="Set Test Variable" owner="BuiltIn">
+<arg>$JSESSIONID</arg>
+<arg>${resp.cookies}[JSESSIONID]</arg>
+<doc>Makes a variable available everywhere within the scope of the current test.</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:32.898187" elapsed="0.000024"/>
+</kw>
+<doc>Opens jpetstore</doc>
+<status status="FAIL" start="2024-06-26T03:02:14.296512" elapsed="18.605928">ConnectionError: HTTPConnectionPool(host='192.168.13.82', port=8080): Max retries exceeded with url: /jpetstore/actions/Catalog.action (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x7b65d0473050&gt;: Failed to establish a new connection: [Errno 113] No route to host'))</status>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>39</arg>
+<arg>Sleep added by RFSwarm</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:32.903923" elapsed="0.000029"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>17</arg>
+<arg>Sleep added by RFSwarm</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:32.904171" elapsed="0.000025"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>37</arg>
+<arg>Sleep added by RFSwarm</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:32.904440" elapsed="0.000025"/>
+</kw>
+<kw name="Nav Fish" source_name="Nav ${Animal}">
+<var>${products}</var>
+<doc>Navigate to catagory page</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:32.904768" elapsed="0.000028"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>37</arg>
+<arg>Sleep added by RFSwarm</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:32.906679" elapsed="0.000026"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>35</arg>
+<arg>Sleep added by RFSwarm</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:32.906920" elapsed="0.000024"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>30</arg>
+<arg>Sleep added by RFSwarm</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:32.907169" elapsed="0.000029"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<var>${product}</var>
+<arg>random.choice(${products})</arg>
+<arg>modules=random</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:32.907432" elapsed="0.000024"/>
+</kw>
+<kw name="Nav Product">
+<arg>${product}</arg>
+<doc>Navigate to product page</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:32.907690" elapsed="0.000024"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>33</arg>
+<arg>Sleep added by RFSwarm</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:32.908981" elapsed="0.000026"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>27</arg>
+<arg>Sleep added by RFSwarm</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:32.909217" elapsed="0.000024"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>15</arg>
+<arg>Sleep added by RFSwarm</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:32.909495" elapsed="0.000026"/>
+</kw>
+<kw name="Delete All Sessions" owner="RequestsLibrary">
+<doc>Removes all the session objects</doc>
+<status status="NOT RUN" start="2024-06-26T03:02:32.909723" elapsed="0.000024"/>
+</kw>
+<status status="FAIL" start="2024-06-26T03:02:14.296195" elapsed="18.613780">ConnectionError: HTTPConnectionPool(host='192.168.13.82', port=8080): Max retries exceeded with url: /jpetstore/actions/Catalog.action (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x7b65d0473050&gt;: Failed to establish a new connection: [Errno 113] No route to host'))</status>
+</test>
+<meta name="RFS_AGENTNAME">agent-000</meta>
+<meta name="RFS_AGENTVERSION">1.3.1</meta>
+<meta name="RFS_DEBUGLEVEL">2</meta>
+<meta name="RFS_EXCLUDELIBRARIES">RequestsLibrary,BuiltIn,String,OperatingSystem,perftest</meta>
+<meta name="RFS_INDEX">1</meta>
+<meta name="RFS_INJECTSLEEP">True</meta>
+<meta name="RFS_ITERATION">1</meta>
+<meta name="RFS_ROBOT">23</meta>
+<meta name="RFS_SLEEPMAXIMUM">45</meta>
+<meta name="RFS_SLEEPMINIMUM">15</meta>
+<meta name="RFS_SWARMMANAGER">http://hp-elite-desk-800-g3:8138/</meta>
+<status status="FAIL" start="2024-06-26T03:01:24.132979" elapsed="68.779270"/>
+</suite>
+<statistics>
+<total>
+<stat pass="0" fail="3" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat pass="0" fail="3" skip="0" id="s1" name="Jpetstore">Jpetstore</stat>
+</suite>
+</statistics>
+<errors>
+<msg time="2024-06-26T03:01:49.701598" level="ERROR">Calling method 'end_keyword' of listener '/tmp/rfswarmagent/scripts/RFSListener3.py' failed: KeyError: 'doc'</msg>
+<msg time="2024-06-26T03:02:14.278068" level="ERROR">Calling method 'end_keyword' of listener '/tmp/rfswarmagent/scripts/RFSListener3.py' failed: KeyError: 'doc'</msg>
+<msg time="2024-06-26T03:02:32.897739" level="ERROR">Calling method 'end_keyword' of listener '/tmp/rfswarmagent/scripts/RFSListener3.py' failed: KeyError: 'doc'</msg>
+</errors>
+</robot>

@@ -1,0 +1,15 @@
+[Scenario]
+uploadmode = err
+scriptcount = 1
+graphlist =
+
+[Script Defaults]
+robotoptions = --variablefile resources/config.yaml
+
+[1]
+robots = 2
+delay = 300
+rampup = 10
+run = 60
+test = Basic test
+script = test_id.robot

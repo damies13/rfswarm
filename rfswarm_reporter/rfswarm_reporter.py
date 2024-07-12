@@ -322,8 +322,18 @@ class ReporterBase():
 		saved = False
 		if filename is None or len(filename) < 1:
 			filename = base.config['Reporter']['Template']
+		templatedata = configparser.ConfigParser()
+		templatedata.read_dict(base.report._sections)
+		if "Report" in templatedata:
+			if "starttime" in templatedata["Report"]:
+				# templatedata["Report"]["starttime"]
+				templatedata.remove_option('Report', 'starttime')
+			if "endtime" in templatedata["Report"]:
+				# templatedata["Report"]["endtime"]
+				templatedata.remove_option('Report', 'endtime')
 		with open(filename, 'w', encoding="utf8") as templatefile:    # save
-			base.report.write(templatefile)
+			# base.report.write(templatefile)
+			templatedata.write(templatefile)
 			self.debugmsg(6, "Template Saved:", filename)
 			saved = True
 		if saved:
@@ -394,18 +404,6 @@ class ReporterBase():
 		else:
 			self.reportdata["starttime"] = 0
 			if base.datadb is not None:
-				# SELECT MetricTime
-				# FROM MetricData
-				# WHERE MetricType = 'Scenario'
-				# 	AND PrimaryMetric <> 'PreRun'
-				#
-				# -- Start Time
-				# -- ORDER BY MetricTime ASC
-				# -- End Time
-				# ORDER BY MetricTime DESC
-				#
-				# LIMIT 1
-
 				sql = "SELECT MetricTime "
 				sql += "FROM MetricData "
 				sql += "WHERE MetricType = 'Scenario' "
@@ -668,18 +666,18 @@ class ReporterBase():
 		return zoneinfo.available_timezones()
 
 	def rs_setting_get_starttime(self):
-		value = self.rs_setting_get_int('starttime')
+		value = self.rs_setting_get_int('startoffset')
 		if value < 1:
 			return self.report_starttime()
 		else:
-			return int(value)
+			return self.report_starttime() + int(value)
 
 	def rs_setting_get_endtime(self):
-		value = self.rs_setting_get_int('endtime')
+		value = self.rs_setting_get_int('endoffset')
 		if value < 1:
 			return self.report_endtime()
 		else:
-			return int(value)
+			return self.report_endtime() - int(value)
 
 	#
 	# Report Sections
@@ -6915,7 +6913,8 @@ class ReporterGUI(tk.Frame):
 			ist = base.report_formateddatetimetosec(st)
 			base.debugmsg(8, "ist:", ist)
 			if ist > 0:
-				base.rs_setting_set_int("starttime", ist)
+				ios = ist - base.report_starttime()
+				base.rs_setting_set_int("startoffset", ios)
 
 		if "intST" in self.contentdata[id]:
 			base.rs_setting_set_int("showstarttime", self.contentdata[id]["intST"].get())
@@ -6927,7 +6926,8 @@ class ReporterGUI(tk.Frame):
 			iet = base.report_formateddatetimetosec(et)
 			base.debugmsg(8, "iet:", iet)
 			if iet > 0:
-				base.rs_setting_set_int("endtime", iet)
+				ios = base.report_endtime() - iet
+				base.rs_setting_set_int("endoffset", ios)
 
 		if "intET" in self.contentdata[id]:
 			base.rs_setting_set_int("showendtime", self.contentdata[id]["intET"].get())
@@ -9717,7 +9717,8 @@ class ReporterGUI(tk.Frame):
 			tkf.asksaveasfilename(
 				initialdir=base.config['Reporter']['TemplateDir'],
 				title="Save RFSwarm Reporter Template",
-				filetypes=(("Template", "*.template"), ("all files", "*.*"))
+				filetypes=(("Template", "*.template"), ("all files", "*.*")),
+				defaultextension=".template"
 			)
 		)
 		base.debugmsg(5, "templatefile", templatefile)

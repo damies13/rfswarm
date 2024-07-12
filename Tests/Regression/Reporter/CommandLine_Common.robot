@@ -1,7 +1,7 @@
 *** Settings ***
 Library 	OperatingSystem
 Library 	Process
-Library 	DatabaseLibrary
+# Library 	DatabaseLibrary
 Library 	String
 Library 	Collections
 
@@ -39,11 +39,11 @@ Get Modules From Program .py File That Are Not BuildIn
 	...    turtledemo	types	typing	unicodedata	unittest	urllib	usercustomize	uu	uuid	venv	warnings	wave
 	...    weakref	webbrowser	winreg	winsound	wsgiref	xdrlib	xml	xmlrpc	zipapp	zipfile	zipimport	zlib	zoneinfo
 	&{replace_names}	Create Dictionary	PIL=pillow
-	
+
 	${manager_content}	Get File	${file_path}
 	${all_imports_lines}	Split String	${manager_content}	separator=\n
 	Log	${all_imports_lines}
-	
+
 	${custom_imports}	Create List
 	${length}	Get Length	${all_imports_lines}
 	FOR  ${i}  IN RANGE  0  ${length}
@@ -59,7 +59,7 @@ Get Modules From Program .py File That Are Not BuildIn
 				BREAK
 			END
 		END
-		
+
 		FOR  ${j}  IN RANGE  0  ${length2}
 			Log		${import_line_elements}[${j}]
 			IF  '${import_line_elements}[${j}]' == '#'
@@ -82,7 +82,7 @@ Get Modules From Program .py File That Are Not BuildIn
 			${custom_imports}[${i}]  Set Variable  ${replace_names}[${custom_imports}[${i}]]
 		END
 	END
-	
+
 	RETURN	${custom_imports}
 
 Get Install Requires From Setup File
@@ -104,7 +104,7 @@ Get Install Requires From Setup File
 					Append To List	${sliced_times}		@{sliced_times1}
 					@{sliced_times2}	Split String	${items}	separator=-
 					Append To List	${sliced_times}		@{sliced_times2}
-					
+
 					FOR  ${i}  IN   @{sliced_times}
 						Append To List	${refactored_requires}	${i}
 
