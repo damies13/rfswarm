@@ -665,12 +665,10 @@ Verify Disable log.html - Scenario
 	Click Dialog Button 	ok
 	Click Button 	runsave
 
-	Run Keyword		Close Manager GUI ${platform}
-
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
-
+	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify Disable report.html - Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
@@ -703,8 +701,6 @@ Verify Disable report.html - Scenario
 	Click CheckBox 	checked 	reporthtml
 	Click Dialog Button 	ok
 	Click Button 	runsave
-
-	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
@@ -742,8 +738,6 @@ Verify Disable output.xml - Scenario
 	Click CheckBox 	checked 	outputxml
 	Click Dialog Button 	ok
 	Click Button 	runsave
-
-	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
@@ -783,8 +777,6 @@ Verify Disable log.html - Test Row
 	Click CheckBox 	checked 	loghtml
 	Test Group Save Settings
 	Click Button 	runsave
-
-	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
@@ -826,8 +818,6 @@ Verify Disable report.html - Test Row
 	Test Group Save Settings
 	Click Button 	runsave
 
-	Run Keyword		Close Manager GUI ${platform}
-
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
@@ -867,8 +857,6 @@ Verify Disable output.xml - Test Row
 	Click CheckBox 	checked 	outputxml
 	Test Group Save Settings
 	Click Button 	runsave
-
-	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
@@ -1084,6 +1072,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
 	Length Should Be	${run_result_dirs}	1	msg=The test run result dir was not created or created unexpected directories!
 
+	Sleep	5
 	Verify Test Result Directory Name	${run_result_dirs}[0]	${scenario_name}	${current_date}
 	Verify Generated Run Result Files	${run_result_dirs}[0]	${scenario_name}
 
