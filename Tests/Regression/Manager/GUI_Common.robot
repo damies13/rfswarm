@@ -11,6 +11,11 @@ Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 Library 	IniFile.py
 
 *** Variables ***
+${platform}		None
+${global_path}	None
+${global_name}	None
+@{mngr_options}		None
+@{agent_options}	None
 ${cmd_agent} 		rfswarm-agent
 ${cmd_manager} 	rfswarm
 ${IMAGE_DIR} 	${CURDIR}/Images/file_method
@@ -76,6 +81,9 @@ Close Manager GUI windows
 
 Close Manager GUI
 	[Tags]	windows-latest		ubuntu-latest
+	# make sure the window is the active window first, Unlikely the about tab has been selected
+	Run Keyword And Ignore Error 	Click Tab 	 About
+	Run Keyword And Ignore Error 	Click Tab 	 Run
 	Press Combination 	Key.esc
 	Press Combination 	x 	Key.ctrl
 	Sleep	5
@@ -87,11 +95,17 @@ Close Manager GUI
 	${result}= 	Wait For Process 	${process_manager} 	timeout=55
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	not ${running}
+		Log		${result.stdout}
+		Log		${result.stderr}
 		Should Be Equal As Integers 	${result.rc} 	0
 	ELSE
 		Take A Screenshot
 		${result} = 	Terminate Process		${process_manager}
-		Fail
+		${running}= 	Is Process Running 	${process_manager}
+		Take A Screenshot
+		IF 	${running}
+			Fail
+		END
 	END
 
 Close Manager GUI macos
@@ -100,6 +114,9 @@ Close Manager GUI macos
 	IF 	${running}
 		Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
 		Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
+		# make sure the window is the active window first, Unlikely the about tab has been selected
+		Run Keyword And Ignore Error 	Click Tab 	 About
+		Run Keyword And Ignore Error 	Click Tab 	 Run
 		Click Image		manager_${platform}_titlebar_rfswarm.png
 		Click Button	closewindow
 		# Sleep	5
@@ -108,16 +125,24 @@ Close Manager GUI macos
 	${result}= 	Wait For Process 	${process_manager} 	timeout=55
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	not ${running}
-		Should Be Equal As Integers 	${result.rc} 	0
 		Take A Screenshot
+		Log		${result.stdout}
+		Log		${result.stderr}
+		Should Be Equal As Integers 	${result.rc} 	0
 	ELSE
 		Take A Screenshot
 		${result} = 	Terminate Process		${process_manager}
-		Fail
+		${running}= 	Is Process Running 	${process_manager}
+		Take A Screenshot
+		IF 	${running}
+			Fail
+		END
 	END
 
 Stop Agent
 	${result} = 	Terminate Process		${process_agent}
+	Log		${result.stdout}
+	Log		${result.stderr}
 	# Should Be Equal As Integers 	${result.rc} 	0
 
 Stop Test Scenario Run Gradually
@@ -368,9 +393,8 @@ Get Manager INI Data
 	Should Not Be Empty	${ini_content}
 	RETURN	${ini_content}
 
-Read INI Data
-	[Arguments]		${inifile}
-
+#Read INI Data
+#	[Arguments]		${inifile}
 
 Set INI Window Size
 	[Arguments]		${width}=${None}	${height}=${None}
@@ -406,6 +430,13 @@ Create Robot File
 	Create File		${path}${/}${name}	content=${example_robot_content}
 	File Should Exist	${path}${/}${name}
 
+Clear Manager Result Directory
+	[Arguments]		${results_dir}=${results_dir}
+	@{run_result_dirs}=		List Directories In Directory	${results_dir}	absolute=${True}
+	FOR  ${dir}  IN  @{run_result_dirs}
+		Remove Directory	${dir}	recursive=${True}
+	END
+
 Change Test Group Settings
 	[Arguments]		${row_settings_data}
 	Sleep	2
@@ -440,6 +471,7 @@ Change Test Group Settings
 			Click CheckBox	checked		injectsleep
 		END
 	END
+	# TODO: disableloglog, disablelogreport, disablelogoutput
 
 	Test Group Save Settings
 
@@ -500,6 +532,7 @@ Change Scenario Wide Settings
 			Click CheckBox	checked		injectsleep
 		END
 	END
+	# TODO: disableloglog, disablelogreport, disablelogoutput, bindipaddres, bindport
 
 	Click Button	ok
 
@@ -516,7 +549,12 @@ Change ${str1} With ${str2} In ${file}
 	${file_content}	Replace String	${file_content}	${str1}	${str2}
 	Create File		${file}	${file_content}
 
-Select Robot File
+Select ${n} Robot Test Case
+	Click Button	select_test_case
+	Press Key.down ${n} Times
+	Press Combination	Key.enter
+
+Select Robot File OS DIALOG
 	[Arguments]		${robot_file_name}
 	Sleep	2
 	${robot_file_name}=		Set Variable		${robot_file_name}
@@ -529,11 +567,6 @@ Select Robot File
 	Click Dialog Button		open
 	Sleep	1
 
-Select ${n} Robot Test Case
-	Click Button	select_test_case
-	Press Key.down ${n} Times
-	Press Combination	Key.enter
-
 Save Scenario File OS DIALOG
 	[Arguments]		${scenario_name}
 	Sleep	5
@@ -545,7 +578,7 @@ Save Scenario File OS DIALOG
 Open Scenario File OS DIALOG
 	[Arguments]		${scenario_name}
 	Sleep	5
-	Type	${scenario_name}.rfs
+	Type	${scenario_name}
 	Take A Screenshot
 	Click Dialog Button		open
 	Sleep	1
@@ -691,10 +724,13 @@ Verify Scenario File Robots
 	FOR  ${rows}  IN RANGE  ${start_group}	${end_group + 1}
 		${row}	Set Variable	[${rows}]	#[1], [2], [3]
 		${i}=	Get Index From List		${scenario_content_list}		${row}
+		IF  '${i}' == '-1'
+			Fail	msg=Cant find index ${row} in scenario file!
+		END
 		Log		${row}
 
 		${robots_offset}	Get Index From List 	${scenario_content_list}	robots	start=${i}
-		Should Be Equal		robots	${scenario_content_list}[${robots_offset}]
+		Should Be Equal		robots	${scenario_content_list}[${robots_offset}]	msg=Robots is missing!
 		Should Be Equal		${run_robots}[${rows - 1}]	${scenario_content_list}[${robots_offset + 2}]
 		...    msg=Robots value did not save correctly [settings != scenario]!
 	END
@@ -704,21 +740,24 @@ Verify Scenario File Times
 	FOR  ${rows}  IN RANGE  ${start_group}	${end_group + 1}
 		${row}	Set Variable	[${rows}]
 		${i}=	Get Index From List		${scenario_content_list}		${row}
+		IF  '${i}' == '-1'
+			Fail	msg=Cant find index ${row} in scenario file!
+		END
 		Log		${row}
 		${time_indx}=	Evaluate	${rows - 1}*3
 
 		${delay_offset}		Get Index From List 	${scenario_content_list}	delay	start=${i}
-		Should Be Equal		delay	${scenario_content_list}[${delay_offset}]
+		Should Be Equal		delay	${scenario_content_list}[${delay_offset}]	msg=Delay is missing!
 		Should Be Equal		${run_times_in_s}[${time_indx}]		${scenario_content_list}[${delay_offset + 2}]
 		...    msg=Delay time value did not save correctly [settings != scenario]!
 
 		${rampup_offset}	Get Index From List 	${scenario_content_list}	rampup	start=${i}
-		Should Be Equal		rampup	${scenario_content_list}[${rampup_offset}]
+		Should Be Equal		rampup	${scenario_content_list}[${rampup_offset}]	msg=Rampup is missing!
 		Should Be Equal		${run_times_in_s}[${time_indx + 1}]		${scenario_content_list}[${rampup_offset + 2}]
 		...    msg=Rump-up time value did not save correctly [settings != scenario]!
 
 		${run_offset}		Get Index From List 	${scenario_content_list}	run	start=${i}
-		Should Be Equal		run		${scenario_content_list}[${run_offset}]
+		Should Be Equal		run		${scenario_content_list}[${run_offset}]		msg=Run is missing!
 		Should Be Equal		${run_times_in_s}[${time_indx + 2}]		${scenario_content_list}[${run_offset + 2}]
 		...    msg=Run time value did not save correctly [settings != scenario]!
 	END
@@ -728,19 +767,27 @@ Verify Scenario File Robot Data
 	FOR  ${rows}  IN RANGE  ${start_group}	${end_group + 1}
 		${row}	Set Variable	[${rows}]
 		${i}=	Get Index From List		${scenario_content_list}		${row}
+		IF  '${i}' == '-1'
+			Fail	msg=Cant find index ${row} in scenario file!
+		END
 		Log		${row}
 
 		${test_offset}		Get Index From List 	${scenario_content_list}	test	start=${i}
-		Should Be Equal		test	${scenario_content_list}[${test_offset}]
-		${test_name}=	Catenate
-		...    ${scenario_content_list[${test_offset + 2}]}
-		...    ${scenario_content_list[${test_offset + 3}]}
-		...    ${scenario_content_list[${test_offset + 4}]}
+		Should Be Equal		test	${scenario_content_list}[${test_offset}]	msg=Test is missing!
+
+		${next_equal_offset}		Get Index From List
+		...    ${scenario_content_list}	=	start=${test_offset + 2}
+		@{test_name}	Create List
+		FOR  ${j}  IN RANGE  0  ${next_equal_offset - 1} - ${test_offset} - ${2}
+			Append To List	${test_name}	${scenario_content_list[${test_offset + 2 + ${j}}]}
+		END
+		${test_name}=	Catenate	@{test_name}
+
 		Should Be Equal		${robot_data}[1]	${test_name}
 		...    msg=Robot test file name did not save correctly [settings != scenario]!
 
 		${script_offset}		Get Index From List 	${scenario_content_list}	script	start=${i}
-		Should Be Equal		script	${scenario_content_list}[${script_offset}]
+		Should Be Equal		script	${scenario_content_list}[${script_offset}]	msg=Script is missing!
 		Should Be Equal		${robot_data}[0]	${scenario_content_list}[${script_offset + 2}]
 		...    msg=Robot script name did not save correctly [settings != scenario]!
 	END
@@ -750,21 +797,41 @@ Verify Scenario Test Row Settings
 	FOR  ${rows}  IN RANGE  ${start_group}	${end_group + 1}
 		${row}	Set Variable	[${rows}]
 		${i}=	Get Index From List		${scenario_content_list}		${row}
+		IF  '${i}' == '-1'
+			Fail	msg=Cant find index ${row} in scenario file!
+		END
 		Log		${row}
 
 		IF  'exclude_libraries' in ${row_settings_data}
 			${exlibraries_offset}	Get Index From List 	${scenario_content_list}	excludelibraries	start=${i}
 			Should Be Equal		excludelibraries	${scenario_content_list}[${exlibraries_offset}]
-			Should Be Equal		${row_settings_data['exclude_libraries']}	${scenario_content_list}[${exlibraries_offset + 2}]
+			...    msg=Exclude Libraries are missing!
+
+			${next_equal_offset}		Get Index From List
+			...    ${scenario_content_list}	=	start=${exlibraries_offset + 2}
+			@{exlibraries}	Create List
+			FOR  ${j}  IN RANGE  0  ${next_equal_offset - 1} - ${exlibraries_offset} - ${2}
+				Append To List	${exlibraries}	${scenario_content_list[${exlibraries_offset + 2 + ${j}}]}
+			END
+			${exlibraries}=	Catenate	@{exlibraries}
+
+			Should Be Equal		${row_settings_data['exclude_libraries']}	${exlibraries}
 			...    msg=Exclude Libraries did not save correctly [settings != scenario]!
 		END
 
 		IF  'robot_options' in ${row_settings_data}
 			${robot_options_offset}		Get Index From List		${scenario_content_list}	robotoptions	start=${i}
 			Should Be Equal		robotoptions	${scenario_content_list}[${robot_options_offset}]
-			${robot_options}=	Catenate
-			...    ${scenario_content_list[${robot_options_offset + 2}]}
-			...    ${scenario_content_list[${robot_options_offset + 3}]}
+			...    msg=Robot Options are missing!
+
+			${next_equal_offset}		Get Index From List
+			...    ${scenario_content_list}	=	start=${robot_options_offset + 2}
+			@{robot_options}	Create List
+			FOR  ${j}  IN RANGE  0  ${next_equal_offset - 1} - ${robot_options_offset} - ${2}
+				Append To List	${robot_options}	${scenario_content_list[${robot_options_offset + 2 + ${j}}]}
+			END
+			${robot_options}=	Catenate	@{robot_options}
+
 			Should Be Equal		${row_settings_data['robot_options']}	${robot_options}
 			...    msg=Robot options did not save correctly [settings != scenario]!
 		END
@@ -772,6 +839,7 @@ Verify Scenario Test Row Settings
 		IF  'test_repeater' in ${row_settings_data}
 			${repeater_offset}		Get Index From List		${scenario_content_list}	testrepeater	start=${i}
 			Should Be Equal		testrepeater	${scenario_content_list}[${repeater_offset}]
+			...    msg=Test Repeater is missing!
 			Should Be Equal		${row_settings_data['test_repeater']}	${scenario_content_list}[${repeater_offset + 2}]
 			...    msg=Test repeater did not save correctly [settings != scenario]!
 		END
@@ -779,6 +847,7 @@ Verify Scenario Test Row Settings
 		IF  'inject_sleep' in ${row_settings_data}
 			${injectsleep_offset}		Get Index From List		${scenario_content_list}	injectsleepenabled	start=${i}
 			Should Be Equal		injectsleepenabled	${scenario_content_list}[${injectsleep_offset}]
+			...    msg=Inject Sleep Enabled is missing!
 			Should Be Equal		${row_settings_data['inject_sleep']}	${scenario_content_list}[${injectsleep_offset + 2}]
 			...    msg=Inject sleep enabled did not save correctly [settings != scenario]!
 		END
@@ -786,6 +855,7 @@ Verify Scenario Test Row Settings
 		IF  'inject_sleep_min' in ${row_settings_data}
 			${injectsleep_min_offset}		Get Index From List		${scenario_content_list}	injectsleepminimum 	start=${i}
 			Should Be Equal		injectsleepminimum 	${scenario_content_list}[${injectsleep_min_offset}]
+			...    msg=Inject Sleep Minimum is missing!
 			Should Be Equal		${row_settings_data['inject_sleep_min']}	${scenario_content_list}[${injectsleep_min_offset + 2}]
 			...    msg=Inject sleep minimum did not save correctly [settings != scenario]!
 		END
@@ -793,10 +863,36 @@ Verify Scenario Test Row Settings
 		IF  'inject_sleep_max' in ${row_settings_data}
 			${injectsleep_max_offset}		Get Index From List		${scenario_content_list}	injectsleepmaximum 	start=${i}
 			Should Be Equal		injectsleepmaximum 	${scenario_content_list}[${injectsleep_max_offset}]
+			...    msg=Inject Sleep Maximum is missing!
 			Should Be Equal		${row_settings_data['inject_sleep_max']}	${scenario_content_list}[${injectsleep_max_offset + 2}]
 			...    msg=Inject sleep maximum did not save correctly [settings != scenario]!
 		END
+
+		IF  'disablelog_log' in ${row_settings_data}
+			${disablelog_log_offset}		Get Index From List		${scenario_content_list}	disableloglog	start=${i}
+			Should Be Equal		disableloglog	${scenario_content_list}[${disablelog_log_offset}]
+			...    msg=Disablelog log.html is missing!
+			Should Be Equal		${row_settings_data['disablelog_log']}		${scenario_content_list}[${disablelog_log_offset + 2}]
+			...    msg=Disablelog Robot Logs: log.html did not save correctly [settings != scenario]!
+		END
+
+		IF  'disablelog_report' in ${row_settings_data}
+			${disablelog_report_offset}		Get Index From List		${scenario_content_list}	disablelogreport	start=${i}
+			Should Be Equal		disablelogreport	${scenario_content_list}[${disablelog_report_offset}]
+			...    msg=Disablelog report.html is missing!
+			Should Be Equal		${row_settings_data['disablelog_report']}		${scenario_content_list}[${disablelog_report_offset + 2}]
+			...    msg=Disablelog Robot Logs: report.html did not save correctly [settings != scenario]!
+		END
+
+		IF  'disablelog_output' in ${row_settings_data}
+			${disablelog_output_offset}		Get Index From List		${scenario_content_list}	disablelogoutput	start=${i}
+			Should Be Equal		disablelogoutput	${scenario_content_list}[${disablelog_output_offset}]
+			...    msg=Disablelog output.xml is missing!
+			Should Be Equal		${row_settings_data['disablelog_output']}		${scenario_content_list}[${disablelog_output_offset + 2}]
+			...    msg=Disablelog Robot Logs: output.xml did not save correctly [settings != scenario]!
+		END
 	END
+	# TODO: Agent filter
 
 Verify Scenario Wide Settings Data
 	[Arguments]		${scenario_content_list}	${wide_settings_data}
@@ -806,16 +902,33 @@ Verify Scenario Wide Settings Data
 	IF  'exclude_libraries' in ${wide_settings_data}
 		${exlibraries_offset}	Get Index From List 	${scenario_content_list}	excludelibraries	start=${i}	end=${first_group}
 		Should Be Equal		excludelibraries	${scenario_content_list}[${exlibraries_offset}]
-		Should Be Equal		${wide_settings_data['exclude_libraries']}	${scenario_content_list}[${exlibraries_offset + 2}]
+		...    msg=Exclude Libraries are missing!
+
+		${next_equal_offset}		Get Index From List
+		...    ${scenario_content_list}	=	start=${exlibraries_offset + 2}
+		@{exlibraries}	Create List
+		FOR  ${j}  IN RANGE  0  ${next_equal_offset - 1} - ${exlibraries_offset} - ${2}
+			Append To List	${exlibraries}	${scenario_content_list[${exlibraries_offset + 2 + ${j}}]}
+		END
+		${exlibraries}=	Catenate	@{exlibraries}
+
+		Should Be Equal		${wide_settings_data['exclude_libraries']}	${exlibraries}
 		...    msg=Exclude Libraries did not save correctly [settings != scenario]!
 	END
 
 	IF  'robot_options' in ${wide_settings_data}
 		${robot_options_offset}		Get Index From List		${scenario_content_list}	robotoptions	start=${i}	end=${first_group}
 		Should Be Equal		robotoptions	${scenario_content_list}[${robot_options_offset}]
-		${robot_options}=	Catenate
-		...    ${scenario_content_list[${robot_options_offset + 2}]}
-		...    ${scenario_content_list[${robot_options_offset + 3}]}
+		...    msg=Robot options are missing!
+
+		${next_equal_offset}		Get Index From List
+		...    ${scenario_content_list}	=	start=${robot_options_offset + 2}
+		@{robot_options}	Create List
+		FOR  ${j}  IN RANGE  0  ${next_equal_offset - 1} - ${robot_options_offset} - ${2}
+			Append To List	${robot_options}	${scenario_content_list[${robot_options_offset + 2 + ${j}}]}
+		END
+		${robot_options}=	Catenate	@{robot_options}
+
 		Should Be Equal		${wide_settings_data['robot_options']}	${robot_options}
 		...    msg=Robot options did not save correctly [settings != scenario]!
 	END
@@ -823,6 +936,7 @@ Verify Scenario Wide Settings Data
 	IF  'test_repeater' in ${wide_settings_data}
 		${repeater_offset}		Get Index From List		${scenario_content_list}	testrepeater	start=${i}	end=${first_group}
 		Should Be Equal		testrepeater	${scenario_content_list}[${repeater_offset}]
+		...    msg=Test repeater is missing!
 		Should Be Equal		${wide_settings_data['test_repeater']}	${scenario_content_list}[${repeater_offset + 2}]
 		...    msg=Test repeater did not save correctly [settings != scenario]!
 	END
@@ -830,6 +944,7 @@ Verify Scenario Wide Settings Data
 	IF  'inject_sleep' in ${wide_settings_data}
 		${injectsleep_offset}		Get Index From List		${scenario_content_list}	injectsleepenabled	start=${i}	end=${first_group}
 		Should Be Equal		injectsleepenabled	${scenario_content_list}[${injectsleep_offset}]
+		...    msg=Inject Sleep Enabled is missing!
 		Should Be Equal		${wide_settings_data['inject_sleep']}	${scenario_content_list}[${injectsleep_offset + 2}]
 		...    msg=Inject sleep enabled did not save correctly [settings != scenario]!
 	END
@@ -837,6 +952,7 @@ Verify Scenario Wide Settings Data
 	IF  'inject_sleep_min' in ${wide_settings_data}
 		${injectsleep_min_offset}		Get Index From List		${scenario_content_list}	injectsleepminimum 	start=${i}	end=${first_group}
 		Should Be Equal		injectsleepminimum 	${scenario_content_list}[${injectsleep_min_offset}]
+		...    msg=Inject Sleep Minimum is missing!
 		Should Be Equal		${wide_settings_data['inject_sleep_min']}	${scenario_content_list}[${injectsleep_min_offset + 2}]
 		...    msg=Inject sleep minimum did not save correctly [settings != scenario]!
 	END
@@ -844,10 +960,35 @@ Verify Scenario Wide Settings Data
 	IF  'inject_sleep_max' in ${wide_settings_data}
 		${injectsleep_max_offset}		Get Index From List		${scenario_content_list}	injectsleepmaximum 	start=${i}	end=${first_group}
 		Should Be Equal		injectsleepmaximum 	${scenario_content_list}[${injectsleep_max_offset}]
+		...    msg=Inject Sleep Maximum is missing!
 		Should Be Equal		${wide_settings_data['inject_sleep_max']}	${scenario_content_list}[${injectsleep_max_offset + 2}]
 		...    msg=Inject sleep maximum did not save correctly [settings != scenario]!
 	END
-	# TODO: disableloglog, disablelogreport, disablelogoutput, bindipaddres, bindport
+
+	IF  'disablelog_log' in ${wide_settings_data}
+		${disablelog_log_offset}		Get Index From List		${scenario_content_list}	disableloglog	start=${i}	end=${first_group}
+		Should Be Equal		disableloglog	${scenario_content_list}[${disablelog_log_offset}]
+		...    msg=Disablelog log.html is missing!
+		Should Be Equal		${wide_settings_data['disablelog_log']}		${scenario_content_list}[${disablelog_log_offset + 2}]
+		...    msg=Disablelog Robot Logs: log.html did not save correctly [settings != scenario]!
+	END
+
+	IF  'disablelog_report' in ${wide_settings_data}
+		${disablelog_report_offset}		Get Index From List		${scenario_content_list}	disablelogreport	start=${i}	end=${first_group}
+		Should Be Equal		disablelogreport	${scenario_content_list}[${disablelog_report_offset}]
+		...    msg=Disablelog report.html is missing!
+		Should Be Equal		${wide_settings_data['disablelog_report']}		${scenario_content_list}[${disablelog_report_offset + 2}]
+		...    msg=Disablelog Robot Logs: report.html did not save correctly [settings != scenario]!
+	END
+
+	IF  'disablelog_output' in ${wide_settings_data}
+		${disablelog_output_offset}		Get Index From List		${scenario_content_list}	disablelogoutput	start=${i}	end=${first_group}
+		Should Be Equal		disablelogoutput	${scenario_content_list}[${disablelog_output_offset}]
+		...    msg=Disablelog output.xml is missing!
+		Should Be Equal		${wide_settings_data['disablelog_output']}		${scenario_content_list}[${disablelog_output_offset + 2}]
+		...    msg=Disablelog Robot Logs: output.xml did not save correctly [settings != scenario]!
+	END
+	# TODO: bindipaddres, bindport
 
 Check That The Scenario File Opens Correctly
 	[Arguments]		${scenario_name}	${scenario_content}
@@ -856,3 +997,45 @@ Check That The Scenario File Opens Correctly
 	Log		${scenario_content}
 	Log		${scenario_content_reopened}
 	Should Be Equal		${scenario_content}		${scenario_content_reopened}	msg=Scenario files are not equal!
+
+Verify Test Result Directory Name
+	[Arguments]		${result_dir_name}	${scenario_name}	${current_date}
+	@{run_dir_name_fragmented}=	Split String	${result_dir_name}	separator=_		max_split=2
+	Length Should Be	${run_dir_name_fragmented}	3	msg=The test run result dir was not created correctly!
+
+	${current_date}=	Convert Date	${current_date}		result_format=%Y%m%d_%H%M%S
+	${expected_time_to_substract}=	Convert Date	${current_date}		date_format=%Y%m%d_%H%M%S
+	${test_run_time_to_substract}=	Convert Date	${run_dir_name_fragmented}[0]_${run_dir_name_fragmented}[1]		date_format=%Y%m%d_%H%M%S
+	${time_diff}		Subtract Date From Date	${current_date}	${test_run_time_to_substract}
+	Log To Console	Time diff: ${time_diff}
+	Should Be True	${time_diff} >= 0 and ${time_diff} <= 3
+	...    msg=Result directory name has incorrect date: expected "${current_date}_${scenario_name}", actual: "${result_dir_name}". There should be little or no difference.
+
+	#${current_date}=	Convert Date	${current_date}		date_format=%Y%m%d_%H%M%S
+	${expected_time}=	Subtract Time From Date		${current_date}		${time_diff}	result_format=%Y%m%d_%H%M%S		date_format=%Y%m%d_%H%M%S
+	${expected_name}=	Set Variable	${expected_time}_${run_dir_name_fragmented}[2]
+	Should Be Equal As Strings		${result_dir_name}		${expected_name}
+	...    msg=Result directory name from scenario is incorrect: expected "${expected_name}", actual: "${result_dir_name}".
+
+Verify Generated Run Result Files
+	[Arguments]		${result_dir_name}		${scenario_name}
+	@{run_dir_name_fragmented}=	Split String	${result_dir_name}	separator=_		max_split=2
+	${result_dir_time}=	Set Variable	${run_dir_name_fragmented}[0]_${run_dir_name_fragmented}[1]
+
+	${result_files}=		List Files In Directory		${results_dir}${/}${result_dir_name}
+	Log To Console	${\n}All test run result files: ${result_files}{\n}
+	Length Should Be	${result_files}		1	msg=The db file was not created or created unexpected files!
+	${db_file}=		Set Variable	${result_files}[0]
+	Should Be Equal As Strings		${db_file}		${result_dir_time}_${scenario_name}.db
+	...    msg=Result directory name from scenario is incorrect: expected "${scenario_name}", actual: "${run_dir_name_fragmented}[2]".
+
+	${logs}=	List Directories In Directory	${results_dir}${/}${result_dir_name}
+	Log To Console	${\n}All test run result directories: ${logs}{\n}
+	Length Should Be	${logs}		1	msg=The db file was not created or created unexpected files!
+	Should Be Equal As Strings		${logs}[0]		logs
+	...    msg=Logs directory name is incorrect: expected "logs", actual: "${logs}[0]".
+	${logs_absolute_paths}	${logs_file_names}
+	...    Find Absolute Paths And Names For Files In Directory		${results_dir}${/}${result_dir_name}${/}${logs}[0]
+	${len}=		Get Length	${logs_file_names}
+	Log To Console	Number of files in the Logs directory: ${len}
+	Should Be True	${len} >= 20	msg=Number of files in the Logs directory is incorrect: should be at least 20, actual: "${len}".
