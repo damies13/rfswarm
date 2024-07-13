@@ -1116,11 +1116,11 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 				@{data_row}=	Set Variable	${csv_rows_content_list}[${j}]
 				Log		${data_row}
 
-				Should Be True		${${data_row}[0]} <= ${3}
+				Should Be Equal		${data_row}[0]	1
 				...    msg=CSV raw_result_data File did not save correctly in the Script Index column, ${j+1} row!
 				Should Be True		${${data_row}[1]} >= ${1} and ${${data_row}[1]} <= ${10}
 				...    msg=CSV raw_result_data File did not save correctly in the Robot column, ${j+1} row!
-				Should Be Equal		${data_row}[2]	1
+				Should Be True		${${data_row}[0]} <= ${3}
 				...    msg=CSV raw_result_data File did not save correctly in the Iteration column, ${j+1} row!
 				Should Be Equal		${data_row}[3]	${Agent_name}
 				...    msg=CSV raw_result_data File did not save correctly in the Agent column, ${j+1} row!
