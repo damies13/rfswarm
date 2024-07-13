@@ -1074,7 +1074,7 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 	
 	@{test_results}=	List Directories In Directory	${test_dir}		absolute=${True}	pattern=*Issue-#17
 	@{csv_file_paths}=		List Files In Directory		${test_results}[0]	*.csv	absolute=${True}
-	Length Should Be	${csv_file_paths}	3	msg="Some test report csv files are missing!"
+	Length Should Be	${csv_file_paths}	3	msg=Some test report csv files are missing!
 
 	# Verify CSV report files content:
 	FOR  ${i}  IN RANGE  0  3
@@ -1085,7 +1085,7 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 		${csv_report_file_type}=	Split String From Right		${csv_file_paths}[${i}]	separator=_Issue-#17_	max_split=1
 		${csv_report_file_type}=	Set Variable	${csv_report_file_type}[-1]
 		IF  '${csv_report_file_type}' == 'summary.csv'
-			Length Should Be	${csv_rows_content_list}	2	msg="Some rows in summary.csv are missing!"
+			Length Should Be	${csv_rows_content_list}	2	msg=Some rows in summary.csv are missing, should be 2!
 
 			@{header_row_list}=		Set Variable	${csv_rows_content_list}[0]
 			Log To Console	summary.csv: ${header_row_list}
@@ -1095,12 +1095,14 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 
 			@{second_row}=		Set Variable	${csv_rows_content_list}[1]
 			Log		${second_row}
-			Should Be Equal		${second_row}[0]	10 seconds		msg=CSV summary File did not save correctly!
-			Length Should Be	${second_row}	9	msg="Some columns in summary.csv are missing!"
+			Should Be Equal		${second_row}[0]	10 seconds
+			...    msg=CSV summary File did not save correctly in the Result Name column, second row!
+
+			Length Should Be	${second_row}	9	msg=Some columns in summary.csv are missing in second row, should be 9 of them!
 
 		ELSE IF  '${csv_report_file_type}' == 'raw_result_data.csv'
 			${len}=		Get Length	${csv_rows_content_list}
-			Should Be True	${len} >= ${3}		msg="Some rows in raw_result_data.csv are missing!"
+			Should Be True	${len} >= ${3}		msg=Some rows in raw_result_data.csv are missing, should be at least 3!
 
 			@{header_row_list}=		Set Variable	${csv_rows_content_list}[0]
 			Log To Console	raw_result_data.csv: ${header_row_list}
@@ -1114,18 +1116,25 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 				@{data_row}=	Set Variable	${csv_rows_content_list}[${j}]
 				Log		${data_row}
 
-				Should Be Equal		${data_row}[0]	1	msg=CSV raw_result_data File did not save correctly!
-				Should Be True		${${data_row}[1]} >= ${1} and ${${data_row}[1]} <= ${10}	msg=CSV raw_result_data File did not save correctly!
-				Should Be Equal		${data_row}[2]	1	msg=CSV raw_result_data File did not save correctly!
-				Should Be Equal		${data_row}[3]	${Agent_name}	msg=CSV raw_result_data File did not save correctly!
-				Should Be Equal		${data_row}[4]	1	msg=CSV raw_result_data File did not save correctly!
-				Should Be Equal		${data_row}[5]	10 seconds	msg=CSV raw_result_data File did not save correctly!
-				Length Should Be	${data_row}	10	msg="Some columns in raw_result_data.csv are missing!"
+				Should Be True		${${data_row}[0]} <= ${3}
+				...    msg=CSV raw_result_data File did not save correctly in the Script Index column, ${j+1} row!
+				Should Be True		${${data_row}[1]} >= ${1} and ${${data_row}[1]} <= ${10}
+				...    msg=CSV raw_result_data File did not save correctly in the Robot column, ${j+1} row!
+				Should Be Equal		${data_row}[2]	1
+				...    msg=CSV raw_result_data File did not save correctly in the Iteration column, ${j+1} row!
+				Should Be Equal		${data_row}[3]	${Agent_name}
+				...    msg=CSV raw_result_data File did not save correctly in the Agent column, ${j+1} row!
+				Should Be Equal		${data_row}[4]	1
+				...    msg=CSV raw_result_data File did not save correctly in the Sequence column, ${j+1} row!
+				Should Be Equal		${data_row}[5]	10 seconds
+				...    msg=CSV raw_result_data File did not save correctly in the Result Name column, ${j+1} row!
+
+				Length Should Be	${data_row}	10	msg=Some columns in raw_result_data.csv are missing in ${j+1}nd row, should be 10 of them!
 			END
 
 		ELSE IF  '${csv_report_file_type}' == 'agent_data.csv'
 			${len}=		Get Length	${csv_rows_content_list}
-			Should Be True	${len} >= ${3}		msg="Some rows in agent_data.csv are missing!"
+			Should Be True	${len} >= ${3}		msg=Some rows in agent_data.csv are missing, should be at least 3!
 
 			@{header_row_list}=		Set Variable	${csv_rows_content_list}[0]
 			Log To Console	agent_data.csv: ${header_row_list}
@@ -1140,13 +1149,17 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 				@{data_row}=	Set Variable	${csv_rows_content_list}[${j}]
 				Log		${data_row}
 
-				Should Be Equal		${data_row}[0]	${Agent_name}	msg=CSV agent_data File did not save correctly!
+				Should Be Equal		${data_row}[0]	${Agent_name}
+				...    msg=CSV agent_data File did not save correctly in the Agentname column, ${j+1} row!
 				IF  '${data_row}[1]' not in @{expected_status}
-					Fail	msg=CSV agent_data File did not save correctly!
+					Fail	msg=CSV agent_data File did not save correctly in the Agentstatus column, ${j+1} row! ${data_row}[1] not in ${expected_status}.
 				END
-				Should Be True		${${data_row}[3]} >= ${0} and ${${data_row}[3]} <= ${10}	msg=CSV agent_data File did not save correctly!
-				Should Be True		${${data_row}[4]} >= ${0} and ${${data_row}[4]} <= ${10}	msg=CSV agent_data File did not save correctly!
-				Length Should Be	${data_row}	9	msg="Some columns in agent_data.csv are missing!"
+				Should Be True		${${data_row}[3]} >= ${0} and ${${data_row}[3]} <= ${10}
+				...    msg=CSV agent_data File did not save correctly in the Agentassigned column, ${j+1} row!
+				Should Be True		${${data_row}[4]} >= ${0} and ${${data_row}[4]} <= ${10}
+				...    msg=CSV agent_data File did not save correctly in the Agentrobots column, ${j+1} row!
+
+				Length Should Be	${data_row}		9	msg=Some columns in agent_data.csv are missing in ${j+1}nd row, should be 9 of them!
 			END
 
 		ELSE
