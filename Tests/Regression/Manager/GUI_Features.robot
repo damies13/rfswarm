@@ -1040,6 +1040,112 @@ Check If The CSV Report Button Works In The Manager
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    GUI_Common.Stop Agent
+
+Check If Scenario Csv Report Files Contain Correct Data From The Test
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #17
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600		AND
+	...    Open Agent
+
+	${test_dir}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#17
+	@{mngr_options}= 	Create List 	-d	${test_dir}	-s 	${test_dir}${/}Issue-#17.rfs
+	Open Manager GUI 		${mngr_options}
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Click Button	runplay
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Click Button	csv_report
+	Press key.enter 1 Times
+	Sleep	3
+	
+	@{test_results}=	List Directories In Directory	${test_dir}		absolute=${True}	pattern=*Issue-#17
+	@{csv_file_paths}=		List Files In Directory		${test_results}[0]	*.csv	absolute=${True}
+	Length Should Be	${csv_file_paths}	3	msg="Some test report csv files are missing!"
+
+	# Verify CSV report files content:
+	FOR  ${i}  IN RANGE  0  3
+		${csv_rows_content_list}=	Convert CSV File Cells To a List		${csv_file_paths}[${i}]		csv_separator=,
+		Log To Console	${\n}CSV report file found: ${csv_file_paths}[${i}]
+		Log 	${csv_rows_content_list}
+
+		${csv_report_file_type}=	Split String From Right		${csv_file_paths}[${i}]	separator=_Issue-#17_	max_split=1
+		${csv_report_file_type}=	Set Variable	${csv_report_file_type}[-1]
+		IF  '${csv_report_file_type}' == 'summary.csv'
+			Length Should Be	${csv_rows_content_list}	2	msg="Some rows in summary.csv are missing!"
+
+			@{header_row_list}=		Set Variable	${csv_rows_content_list}[0]
+			Log To Console	summary.csv: ${header_row_list}
+			@{expected_header_row_list}	Create List		Result Name  Min  Avg  90%ile  Max  Stdev  Pass  Fail  Other
+			Diff Lists		${header_row_list}		${expected_header_row_list}
+			...    message=CSV Report Files are not generated correctly! List A - CSV summary file header row, List B - Expected header row values.
+
+			@{second_row}=		Set Variable	${csv_rows_content_list}[1]
+			Log		${second_row}
+			Should Be Equal		${second_row}[0]	10 seconds		msg=CSV summary File did not save correctly!
+			Length Should Be	${second_row}	9	msg="Some columns in summary.csv are missing!"
+
+		ELSE IF  '${csv_report_file_type}' == 'raw_result_data.csv'
+			${len}=		Get Length	${csv_rows_content_list}
+			Should Be True	${len} >= ${3}		msg="Some rows in raw_result_data.csv are missing!"
+
+			@{header_row_list}=		Set Variable	${csv_rows_content_list}[0]
+			Log To Console	raw_result_data.csv: ${header_row_list}
+			@{expected_header_row_list}	Create List		Script Index  Robot  Iteration  Agent  Sequence  Result Name  Result  Elapsed Time  Start Time  End Time
+			Diff Lists		${header_row_list}		${expected_header_row_list}
+			...    message=CSV Report Files are not generated correctly! List A - CSV raw_result_data file header row, List B - Expected header row values.
+
+			@{first_data_row}=	Set Variable	${csv_rows_content_list}[1]
+			${Agent_name}=	Set Variable	${first_data_row}[3]
+			FOR  ${j}  IN RANGE  1  ${len}
+				@{data_row}=	Set Variable	${csv_rows_content_list}[${j}]
+				Log		${data_row}
+
+				Should Be Equal		${data_row}[0]	1	msg=CSV raw_result_data File did not save correctly!
+				Should Be True		${${data_row}[1]} >= ${1} and ${${data_row}[1]} <= ${10}	msg=CSV raw_result_data File did not save correctly!
+				Should Be Equal		${data_row}[2]	1	msg=CSV raw_result_data File did not save correctly!
+				Should Be Equal		${data_row}[3]	${Agent_name}	msg=CSV raw_result_data File did not save correctly!
+				Should Be Equal		${data_row}[4]	1	msg=CSV raw_result_data File did not save correctly!
+				Should Be Equal		${data_row}[5]	10 seconds	msg=CSV raw_result_data File did not save correctly!
+				Length Should Be	${data_row}	10	msg="Some columns in raw_result_data.csv are missing!"
+			END
+
+		ELSE IF  '${csv_report_file_type}' == 'agent_data.csv'
+			${len}=		Get Length	${csv_rows_content_list}
+			Should Be True	${len} >= ${3}		msg="Some rows in agent_data.csv are missing!"
+
+			@{header_row_list}=		Set Variable	${csv_rows_content_list}[0]
+			Log To Console	agent_data.csv: ${header_row_list}
+			@{expected_header_row_list}	Create List		Agentname  Agentstatus  Agentlastseen  Agentassigned  Agentrobots  Agentload  Agentcpu  Agentmem  Agentnet
+			Diff Lists		${header_row_list}		${expected_header_row_list}
+			...    message=CSV Report Files are not generated correctly! List A - CSV agent_data file header row, List B - Expected header row values.
+
+			@{expected_status}	Create List  Ready  Running  Critical  Stopping
+			@{first_data_row}=	Set Variable	${csv_rows_content_list}[1]
+			${Agent_name}=	Set Variable	${first_data_row}[0]
+			FOR  ${j}  IN RANGE  1  ${len}
+				@{data_row}=	Set Variable	${csv_rows_content_list}[${j}]
+				Log		${data_row}
+
+				Should Be Equal		${data_row}[0]	${Agent_name}	msg=CSV agent_data File did not save correctly!
+				IF  '${data_row}[1]' not in @{expected_status}
+					Fail	msg=CSV agent_data File did not save correctly!
+				END
+				Should Be True		${${data_row}[3]} >= ${0} and ${${data_row}[3]} <= ${10}	msg=CSV agent_data File did not save correctly!
+				Should Be True		${${data_row}[4]} >= ${0} and ${${data_row}[4]} <= ${10}	msg=CSV agent_data File did not save correctly!
+				Length Should Be	${data_row}	9	msg="Some columns in agent_data.csv are missing!"
+			END
+
+		ELSE
+			Fail	msg=Unexpected csv file found: ${csv_file_paths}[${i}].
+		END
+	END
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    GUI_Common.Stop Agent
+
 Verify the Results Directory And db File Gets Created Correctly With Scenario Also After a Restart
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
 	[Setup]	Run Keywords

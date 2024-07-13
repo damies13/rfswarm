@@ -676,7 +676,6 @@ Get Relative Paths
 	END
 	RETURN 	${paths_out}
 
-
 Diff Lists
 	[Arguments] 	${list_a} 		${list_b} 	${message}
 
@@ -704,6 +703,24 @@ Diff Lists
 		Log 		Items from list A missing from list B: ${Missing_List_From_B} 	console=True
 		Lists Should Be Equal 	${list_a} 	${list_b} 		msg=${message}
 	END
+
+Convert CSV File Cells To a List
+	[Arguments]		${csv_file_path}	${csv_separator}
+	${csv_file_content}=	Get File		${csv_file_path}
+	@{csv_rows_list}=	Split String	${csv_file_content}		separator=\n
+
+	@{csv_rows_content_list}=	Create List
+	FOR  ${row}  IN  @{csv_rows_list}
+		@{csv_row_cells_list}=		Split String	${row}	separator=${csv_separator}
+		Append To List	${csv_rows_content_list}	${csv_row_cells_list}
+	END
+
+	${status}=	Run Keyword And Return Status	Should Be Empty	@{csv_rows_content_list}[-1]
+	IF  ${status} == ${True}
+		@{csv_rows_content_list}	Set Variable	${csv_rows_content_list}[:-1]
+	END
+
+	RETURN	${csv_rows_content_list}
 
 Verify Scenario File Robots
 	[Arguments]		${scenario_content_list}	${run_robots}	${start_group}	${end_group}
