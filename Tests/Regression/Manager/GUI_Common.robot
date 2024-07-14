@@ -179,9 +179,10 @@ Utilisation Stats
 	Log 	${proc}
 
 Check If The Agent Is Ready
+	[Arguments] 	${timeout}=300
 	Sleep	1
 	Click Tab	Agents
-	Wait For 	manager_${platform}_agents_ready.png	timeout=300
+	Wait For 	manager_${platform}_agents_ready.png	timeout=${timeout}
 
 Check If the Robot Failed
 	[Arguments] 	${expected_time}
@@ -399,6 +400,13 @@ Get Manager PIP Data
 	Should Not Be Empty		${pip_data.stdout}		msg=Manager must be installed with pip
 	Log	${pip_data.stdout}
 	RETURN		${pip_data.stdout}
+
+Get IP addresses
+	${hostname}=	Evaluate	socket.gethostname()	modules=socket
+	${ipv4}=	Evaluate	socket.getaddrinfo("${hostname}", None, socket.AF_INET)[0][4][0]		modules=socket
+	${ipv6}=	Evaluate	socket.getaddrinfo("${hostname}", None, socket.AF_INET6)[0][4][0]		modules=socket
+
+	RETURN	${ipv4}		${ipv6}
 
 Create Robot File
 	[Arguments]		${path}=${global_path}	${name}=${global_name}
