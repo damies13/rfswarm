@@ -10,68 +10,6 @@ Suite Setup 	Set Platform
 ${scenario_name}=	test_scenario
 
 *** Test Cases ***
-Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robots
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #31
-	[Setup]	Run Keywords
-	...    Set INI Window Size		1200	600								AND
-	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
-	...    Open Manager GUI													AND
-	...    Create Robot File
-	...    file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\tFail this\n\tSleep\t10\n\tFail\n
-
-	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#31${/}Issue-#31.rfs
-	${scenario_name}=	Set Variable	Issue-#31
-	Copy File	${scenariofile}		${global_path}
-	Click Button	runopen
-	Open Scenario File OS DIALOG	${scenario_name}
-	Click Button	runplay
-
-	${status}=	Run Keyword And Return Status
-	...    Wait For	${platform}_warning_label_not_enough_agents.png 	timeout=${10}
-	Run Keyword If	not ${status}	Fail	msg=The manager didn't display expected prompt dialogue that says: Not enough Agents available to run Robots!
-	Press key.enter 1 Times
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_abort 	timeout=${10}
-	Run Keyword If	not ${status}	Fail	msg=The manager is not in waiting for agent status.
-
-	Log To Console	${\n}The manager displayed the expected message. It is now waiting for the agent.${\n}
-
-	Open Agent
-	Check If The Agent Is Ready
-	${status}=	Run Keyword And Return Status
-	...    Wait For	${platform}_info_label_enough_agents_available.png 	timeout=${15}
-	Run Keyword If	not ${status}	Fail
-	...    msg=The manager didn't display expected prompt dialogue that says: Enough Agent available to run Robots, test will now resume!
-	Press key.enter 1 Times
-	Click Tab	Run
-
-	Log To Console	${\n}The manager displayed the expected message. Agent is ready. Test will now resume.${\n}
-
-	Sleep	5
-	Click Button	abort
-	Press Key.tab 2 Times
-	Move To	10	10
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
-
-	Click Tab	Plan
-	Click Button	runplay
-	${status}=	Run Keyword And Return Status
-	...    Wait For	${platform}_warning_label_not_enough_agents.png 	timeout=${10}
-	Run Keyword If	${status}	Fail
-	...    msg=The manager have displaed prompt dialogue that says: Not enough Agents available to run Robots! but that was not expected!
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
-
-	[Teardown]	Run Keywords
-	...    Delete Scenario File		${scenario_name}		AND
-	...    Delete Robot File								AND
-	...    GUI_Common.Stop Agent							AND
-	...    Run Keyword		Close Manager GUI ${platform}
-
-
 Verify That Files Get Saved With Correct Extension And Names
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #39
 	[Setup]	Run Keywords
@@ -1114,6 +1052,68 @@ Check If The CSV Report Button Works In The Manager
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    GUI_Common.Stop Agent
+
+Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robots
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #31
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Open Manager GUI													AND
+	...    Create Robot File
+	...    file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\tFail this\n\tSleep\t10\n\tFail\n
+
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#31${/}Issue-#31.rfs
+	${scenario_name}=	Set Variable	Issue-#31
+	Copy File	${scenariofile}		${global_path}
+	Click Button	runopen
+	Open Scenario File OS DIALOG	${scenario_name}
+	Click Button	runplay
+
+	${status}=	Run Keyword And Return Status
+	...    Wait For	${platform}_warning_label_not_enough_agents.png 	timeout=${10}
+	Run Keyword If	not ${status}	Fail	msg=The manager didn't display expected prompt dialogue that says: Not enough Agents available to run Robots!
+	Press key.enter 1 Times
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_abort 	timeout=${10}
+	Run Keyword If	not ${status}	Fail	msg=The manager is not in waiting for agent status.
+
+	Log To Console	${\n}The manager displayed the expected message. It is now waiting for the agent.${\n}
+
+	Open Agent
+	Check If The Agent Is Ready
+	${status}=	Run Keyword And Return Status
+	...    Wait For	${platform}_info_label_enough_agents_available.png 	timeout=${15}
+	Run Keyword If	not ${status}	Fail
+	...    msg=The manager didn't display expected prompt dialogue that says: Enough Agent available to run Robots, test will now resume!
+	Press key.enter 1 Times
+	Click Tab	Run
+
+	Log To Console	${\n}The manager displayed the expected message. Agent is ready. Test will now resume.${\n}
+
+	Sleep	5
+	Click Button	abort
+	Press Key.tab 2 Times
+	Move To	10	10
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+
+	Click Tab	Plan
+	Click Button	runplay
+	${status}=	Run Keyword And Return Status
+	...    Wait For	${platform}_warning_label_not_enough_agents.png 	timeout=${10}
+	Run Keyword If	${status}	Fail
+	...    msg=The manager have displaed prompt dialogue that says: Not enough Agents available to run Robots! but that was not expected!
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+
+	[Teardown]	Run Keywords
+	...    Delete Scenario File		${scenario_name}		AND
+	...    Delete Robot File								AND
+	...    GUI_Common.Stop Agent							AND
+	...    Run Keyword		Close Manager GUI ${platform}
+
 Verify the Results Directory And db File Gets Created Correctly With Scenario Also After a Restart
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
 	[Setup]	Run Keywords
