@@ -1,0 +1,40 @@
+*** Settings ***
+Resource          subfolder-1${/}b_sub.resource
+Resource          subfolder-2${/}b_sub.resource
+Resource          subfolder-3${/}b_sub.resource
+Resource          subfolder-4${/}b_sub.resource
+Resource          subfolder-5${/}b_sub.resource
+Resource          subfolder-6${/}b_sub.resource
+Resource          subfolder-7${/}b_sub.resource
+Resource          subfolder-8${/}b_sub.resource
+Resource          subfolder-9${/}b_sub.resource
+Resource          subfolder-10${/}b_sub.resource
+Resource          subfolder-11${/}b_sub.resource
+Resource          subfolder-12${/}b_sub.resource
+Resource          subfolder-13${/}b_sub.resource
+Resource          subfolder-14${/}b_sub.resource
+Resource          subfolder-15${/}b_sub.resource
+Resource          subfolder-16${/}b_sub.resource
+Resource          subfolder-17${/}b_sub.resource
+Resource          subfolder-18${/}b_sub.resource
+Resource          subfolder-19${/}b_sub.resource
+Resource          subfolder-20${/}b_sub.resource
+Resource          subfolder-21${/}b_sub.resource
+Resource          subfolder-22${/}b_sub.resource
+Resource          subfolder-23${/}b_sub.resource
+Resource          subfolder-24${/}b_sub.resource
+Resource          subfolder-25${/}b_sub.resource
+Resource          subfolder-26${/}b_sub.resource
+Resource          subfolder-27${/}b_sub.resource
+Resource          subfolder-28${/}b_sub.resource
+Resource          subfolder-29${/}b_sub.resource
+Resource          subfolder-30${/}b_sub.resource
+Resource          subfolder-31${/}b_sub.resource
+Resource          subfolder-32${/}b_sub.resource
+Resource          subfolder-33${/}b_sub.resource
+Resource          subfolder-34${/}b_sub.resource
+Resource          subfolder-35${/}b_sub.resource
+
+*** Keywords ***
+Keyword B
+	No Operation

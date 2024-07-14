@@ -14,6 +14,26 @@ Robot Version
 	${Robot_Version} =	Evaluate	robot.__version__ 	modules=robot
 	Log 	${\n}Robot Version: ${Robot_Version} 	console=True
 
+Runner CPU Cores
+	[Documentation] 	Logs the Runner's CPU Cores
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
+	${CPU Cores} =	Evaluate	psutil.cpu_count() 	modules=psutil
+	Log 	${\n}CPU Cores: ${CPU Cores} 	console=True
+	# ${CPU Freq} =	Evaluate	psutil.cpu_freq() 	modules=psutil
+	# Log 	${\n}CPU Freq: ${CPU Freq} 	console=True
+
+Runner Memory
+	[Documentation] 	Logs the Runner's Memory
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
+	${Memory} =	Evaluate	psutil.virtual_memory() 	modules=psutil
+	Log 	${\n}Memory: ${Memory} 	console=True
+
+Runner Disks
+	[Documentation] 	Logs the Runner's Disks
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
+	${Disks} =	Evaluate	psutil.disk_partitions() 	modules=psutil
+	Log 	${\n}Disks: ${Disks} 	console=True
+
 Random Offset
 	[Documentation] 	This just prevents all the test runners doing git push at the same time
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest

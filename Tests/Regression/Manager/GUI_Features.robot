@@ -179,7 +179,7 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 		END
 		Press Key.tab 2 Times
 		Click Button	selected_runscriptrow
-		Select Robot File	${robot_data}[0]
+		Select Robot File OS DIALOG		${robot_data}[0]
 		Click Button	selected_select_test_case
 		Click Button	select_example
 		Press Key.tab 3 Times
@@ -226,7 +226,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 		Sleep	2
 		Press Key.tab 6 Times
 		Click Button	selected_runscriptrow
-		Select Robot File	${robot_data}[0]
+		Select Robot File OS DIALOG		${robot_data}[0]
 		Click Button	selected_select_test_case
 		Click Button	select_example
 		Press Key.tab 2 Times
@@ -262,9 +262,9 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
-	...    Set Test Variable	@{mngr_options}	-g	1					AND
+	...    Set Test Variable	@{mngr_options}	-g	1						AND
 	...    Set INI Window Size		1200	600								AND
-	...    Open Manager GUI		${mngr_options}							AND
+	...    Open Manager GUI		${mngr_options}								AND
 	...    Create Robot File
 
 	@{settings_locations}	Create List
@@ -293,7 +293,7 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 		END
 		Press Key.tab 2 Times
 		Click Button	selected_runscriptrow
-		Select Robot File	${robot_data}[0]
+		Select Robot File OS DIALOG		${robot_data}[0]
 		Click Button	selected_select_test_case
 		Click Button	select_example
 		Press Key.tab 2 Times
@@ -320,6 +320,194 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	...    Delete Scenario File	test_scenario				AND
 	...    Delete Robot File								AND
 	...    Delete Scenario File	${scenario_name}
+
+Verify Scenario File Is Updated Correctly When Scripts Are Removed
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #58
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Open Manager GUI													AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Create Robot File	name=example1.robot	file_content=***Test Case***\nExample Test Case1\n	AND
+	...    Create Robot File	name=example2.robot	file_content=***Test Case***\nExample Test Case2\n	AND
+	...    Create Robot File	name=example3.robot	file_content=***Test Case***\nExample Test Case3\n	AND
+	...    Create Robot File	name=example4.robot	file_content=***Test Case***\nExample Test Case4\n	AND
+	...    Create Robot File	name=example5.robot	file_content=***Test Case***\nExample Test Case5\n
+
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#58${/}test_scenario.rfs
+	Copy File	${scenariofile}		${global_path}
+
+	@{expected_robot_data3}	Create List		example3.robot	Example Test Case3
+	@{expected_run_robots3}	Create List		18
+	@{expected_run_times3}	Create List		19	20	21
+	&{expected_row_settings_data3}	Create Dictionary
+	...    exclude_libraries=row3el
+	...    robot_options=row3ro
+	...    test_repeater=True
+	...    inject_sleep=True
+	...    inject_sleep_min=30
+	...    inject_sleep_max=60
+	...    disablelog_log=True
+	...    disablelog_report=True
+	...    disablelog_output=True
+
+	@{expected_robot_data5}	Create List		example5.robot	Example Test Case5
+	@{expected_run_robots5}	Create List		${None}	26
+	@{expected_run_times5}	Create List		${None}	${None}	${None}	27	28	29
+	&{expected_row_settings_data5}	Create Dictionary
+	...    exclude_libraries=row5el
+	...    robot_options=row5ro
+	...    test_repeater=True
+	...    inject_sleep=True
+	...    inject_sleep_min=30
+	...    inject_sleep_max=60
+	...    disablelog_log=True
+	...    disablelog_report=True
+	...    disablelog_output=True
+
+	Click Button	runopen
+	Open Scenario File OS DIALOG	${scenario_name}
+	Click Button	rundelrow
+	Click Button	rundelrow
+	Click Label With Vertical Offset	button_rundelrow	35
+	Click Button	runsave
+
+	${scenario_content}=	Get scenario file content	${global_path}	${scenario_name}
+	@{scenario_content_list}=	Split String	${scenario_content}
+
+	Verify Scenario File Robot Data		${scenario_content_list}	${expected_robot_data3}			${1}	${1}
+	Verify Scenario File Robots			${scenario_content_list}	${expected_run_robots3}			${1}	${1}
+	Verify Scenario File Times			${scenario_content_list}	${expected_run_times3}			${1}	${1}
+	Verify Scenario Test Row Settings	${scenario_content_list}	${expected_row_settings_data3}	${1}	${1}
+
+	Verify Scenario File Robot Data		${scenario_content_list}	${expected_robot_data5}			${2}	${2}
+	Verify Scenario File Robots			${scenario_content_list}	${expected_run_robots5}			${2}	${2}
+	Verify Scenario File Times			${scenario_content_list}	${expected_run_times5}			${2}	${2}
+	Verify Scenario Test Row Settings	${scenario_content_list}	${expected_row_settings_data5}	${2}	${2}
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Delete Robot File	name=example1.robot			AND
+	...    Delete Robot File	name=example2.robot			AND
+	...    Delete Robot File	name=example3.robot			AND
+	...    Delete Robot File	name=example4.robot			AND
+	...    Delete Robot File	name=example5.robot			AND
+	...    Delete Scenario File		${scenario_name}
+
+Verify the Manager Handles Corrupted Scenario Files And Repairs It
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #58
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Open Manager GUI													AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Create Robot File	name=example4.robot	file_content=***Test Case***\nExample Test Case4\n	AND
+	...    Create Robot File	name=example7.robot	file_content=***Test Case***\nExample Test Case7\n
+
+	${scenario_name}=	Set Variable	test_scenario_corrupted
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#58${/}test_scenario_corrupted.rfs
+	Copy File	${scenariofile}		${global_path}
+
+	@{expected_robot_data4}	Create List		example4.robot	Example Test Case4
+	@{expected_run_robots4}	Create List		22
+	@{expected_run_times4}	Create List		23	24	25
+	&{expected_row_settings_data4}	Create Dictionary
+	...    exclude_libraries=row4el
+	...    robot_options=row4ro
+	...    test_repeater=True
+	...    inject_sleep=True
+	...    inject_sleep_min=70
+	...    inject_sleep_max=75
+	...    disablelog_log=True
+	...    disablelog_report=True
+	...    disablelog_output=True
+
+	@{expected_robot_data7}	Create List		example7.robot	Example Test Case7
+	@{expected_run_robots7}	Create List		${None}	71
+	@{expected_run_times7}	Create List		${None}	${None}	${None}	72	73	74
+	&{expected_row_settings_data7}	Create Dictionary
+	...    exclude_libraries=row7el
+	...    robot_options=row7ro
+	...    test_repeater=True
+	...    inject_sleep=True
+	...    inject_sleep_min=30
+	...    inject_sleep_max=60
+	...    disablelog_log=True
+	...    disablelog_report=True
+	...    disablelog_output=True
+
+	Click Button	runopen
+	Open Scenario File OS DIALOG	${scenario_name}
+	Click Button	runsave
+
+	${scenario_content}=	Get scenario file content	${global_path}	${scenario_name}
+	@{scenario_content_list}=	Split String	${scenario_content}
+
+	Verify Scenario File Robot Data		${scenario_content_list}	${expected_robot_data4}			${1}	${1}
+	Verify Scenario File Robots			${scenario_content_list}	${expected_run_robots4}			${1}	${1}
+	Verify Scenario File Times			${scenario_content_list}	${expected_run_times4}			${1}	${1}
+	Verify Scenario Test Row Settings	${scenario_content_list}	${expected_row_settings_data4}	${1}	${1}
+
+	Verify Scenario File Robot Data		${scenario_content_list}	${expected_robot_data7}			${2}	${2}
+	Verify Scenario File Robots			${scenario_content_list}	${expected_run_robots7}			${2}	${2}
+	Verify Scenario File Times			${scenario_content_list}	${expected_run_times7}			${2}	${2}
+	Verify Scenario Test Row Settings	${scenario_content_list}	${expected_row_settings_data7}	${2}	${2}
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Delete Robot File								AND
+	...    Delete Scenario File		${scenario_name}
+
+Verify the Manager Handles Scenario Files With Missing Scripts Files
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #241
+	[Setup]	Run Keywords
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Set Test Variable	@{mngr_options}	-g	1						AND
+	...    Set INI Window Size		1200	600								AND
+	...    Open Manager GUI		${mngr_options}								AND
+	...    Create Robot File	name=example.robot	file_content=***Test Case***\nExample Test Case\n
+
+	${scenario_name}=	Set Variable	test_scenario_missing_file
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#241${/}test_scenario_missing_file.rfs
+	Copy File	${scenariofile}		${global_path}
+
+	Click Button	runopen
+	Open Scenario File OS DIALOG	${scenario_name}
+
+	Wait For	${platform}_warning_label.png	timeout=30
+	Take A Screenshot
+	Press key.enter 1 Times
+	${running}= 	Is Process Running 	${process_manager}
+	IF 	not ${running}
+		Fail	RFSwarm manager crashed!
+	END
+	TRY
+		Click Tab	Run
+		Wait For	manager_${platform}_button_stoprun.png	timeout=30
+		Click Tab	Plan
+	EXCEPT
+		Fail	msg=RFSwarm Manager is not responding!
+	END
+
+	Run Keyword		Close Manager GUI ${platform}
+	Open Manager GUI		${mngr_options}
+
+	Wait For	${platform}_warning_label.png	timeout=30
+	Press key.enter 1 Times
+	${running}= 	Is Process Running 	${process_manager}
+	IF 	not ${running}
+		Fail	RFSwarm Manager crashed!
+	END
+	TRY
+		Click Tab	Run
+		Wait For	manager_${platform}_button_stoprun.png	timeout=30
+		Click Tab	Plan
+	EXCEPT
+		Fail	msg=RFSwarm Manager is not responding!
+	END
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Delete Robot File								AND
+	...    Delete Scenario File		${scenario_name}
 
 Verify If Manager Saves Inject Sleep From Scenario Wide Settings
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
@@ -480,7 +668,8 @@ Check If Inject Sleep Option Was Executed in the Test
 	...    Remove Directory	${results_dir}	recursive=${True}				AND
 	...    Create Directory	${results_dir}									AND
 	...    Sleep	3														AND
-	...    Open Agent														AND
+	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-1	AND
+	...    Open Agent	${agent_options}														AND
 	...    Open Manager GUI													AND
 	...    Create Robot File	file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t9s\n\tSleep\t9\n
 
@@ -510,7 +699,7 @@ Check If Inject Sleep Option Was Executed in the Test
 		${file_extenstion}	Get Substring	${result_file}	-3
 		IF  '${file_extenstion}' == 'xml'
 			${xml_file_content}		Get File	${result_file}
-			Log		${xml_file_content}	
+			Log		${xml_file_content}
 			BREAK
 		END
 	END
@@ -589,12 +778,10 @@ Verify Disable log.html - Scenario
 	Click Dialog Button 	ok
 	Click Button 	runsave
 
-	Run Keyword		Close Manager GUI ${platform}
-
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
-
+	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify Disable report.html - Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
@@ -627,8 +814,6 @@ Verify Disable report.html - Scenario
 	Click CheckBox 	checked 	reporthtml
 	Click Dialog Button 	ok
 	Click Button 	runsave
-
-	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
@@ -666,8 +851,6 @@ Verify Disable output.xml - Scenario
 	Click CheckBox 	checked 	outputxml
 	Click Dialog Button 	ok
 	Click Button 	runsave
-
-	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
@@ -707,8 +890,6 @@ Verify Disable log.html - Test Row
 	Click CheckBox 	checked 	loghtml
 	Test Group Save Settings
 	Click Button 	runsave
-
-	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
@@ -750,8 +931,6 @@ Verify Disable report.html - Test Row
 	Test Group Save Settings
 	Click Button 	runsave
 
-	Run Keyword		Close Manager GUI ${platform}
-
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
@@ -791,8 +970,6 @@ Verify Disable output.xml - Test Row
 	Click CheckBox 	checked 	outputxml
 	Test Group Save Settings
 	Click Button 	runsave
-
-	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
@@ -934,6 +1111,169 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    CommandLine_Common.Stop Agent											AND
 	...    CommandLine_Common.Stop Manager
 
+Check If The CSV Report Button Works In The Manager
+	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #254
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600		AND
+	...    Open Agent
+
+	${test_dir}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#254
+	@{mngr_options}= 	Create List 	-d	${test_dir}	-s 	${test_dir}${/}Issue-#254.rfs
+	Open Manager GUI 		${mngr_options}
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Click Button	runplay
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Click Button	csv_report
+
+	Wait For	manager_${platform}_reportdatasavesto.png 	timeout=${300}
+
+	# Take A Screenshot
+	Press key.enter 1 Times
+	# Click Button 	ok
+	# Click Dialog Button 	ok
+	Sleep	5
+	# Take A Screenshot
+
+	@{test_results_dir}=	List Directories In Directory	${test_dir}		absolute=${True}	pattern=*Issue-#254
+	@{csv_file_paths}=		List Files In Directory		${test_results_dir}[0]	*.csv
+
+	${len}=		Get Length		${csv_file_paths}
+	@{expected_csv_report_files}	Create List		agent_data.csv  raw_result_data.csv  summary.csv
+	@{csv_report_files}	Create List
+	FOR  ${i}  IN RANGE  0  ${len}
+		Log To Console	${\n}CSV report file found: ${csv_file_paths}[${i}]
+		${csv_report_file_type}=	Split String From Right		${csv_file_paths}[${i}]	separator=_Issue-#254_	max_split=1
+		${csv_report_file_type}=	Set Variable	${csv_report_file_type}[-1]
+		Append To List	${csv_report_files}	${csv_report_file_type}
+	END
+	Diff Lists	${csv_report_files}	${expected_csv_report_files}
+	...    message=CSV Test Report Files are not generated correctly! List A - Generated CSV Files, List B - Expected CSV Files, Check report for more information.
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    GUI_Common.Stop Agent
+
+Check If Scenario Csv Report Files Contain Correct Data From The Test
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #17
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600		AND
+	...    Open Agent
+
+	${test_dir}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#17
+	@{mngr_options}= 	Create List 	-d	${test_dir}	-s 	${test_dir}${/}Issue-#17.rfs
+	Open Manager GUI 		${mngr_options}
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Click Button	runplay
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Click Button	csv_report
+	Press key.enter 1 Times
+	Sleep	3
+	
+	@{test_results}=	List Directories In Directory	${test_dir}		absolute=${True}	pattern=*Issue-#17
+	@{csv_file_paths}=		List Files In Directory		${test_results}[0]	*.csv	absolute=${True}
+	Length Should Be	${csv_file_paths}	3	msg=Some test report csv files are missing!
+
+	# Verify CSV report files content:
+	FOR  ${i}  IN RANGE  0  3
+		${csv_rows_content_list}=	Convert CSV File Cells To a List		${csv_file_paths}[${i}]		csv_separator=,
+		Log To Console	${\n}CSV report file found: ${csv_file_paths}[${i}]
+		Log 	${csv_rows_content_list}
+
+		${csv_report_file_type}=	Split String From Right		${csv_file_paths}[${i}]	separator=_Issue-#17_	max_split=1
+		${csv_report_file_type}=	Set Variable	${csv_report_file_type}[-1]
+		IF  '${csv_report_file_type}' == 'summary.csv'
+			Length Should Be	${csv_rows_content_list}	2	msg=Some rows in summary.csv are missing, should be 2!
+
+			@{header_row_list}=		Set Variable	${csv_rows_content_list}[0]
+			Log To Console	summary.csv: ${header_row_list}
+			@{expected_header_row_list}	Create List		Result Name  Min  Avg  90%ile  Max  Stdev  Pass  Fail  Other
+			Diff Lists		${header_row_list}		${expected_header_row_list}
+			...    message=CSV Report Files are not generated correctly! List A - CSV summary file header row, List B - Expected header row values.
+
+			@{second_row}=		Set Variable	${csv_rows_content_list}[1]
+			Log		${second_row}
+			Should Be Equal		${second_row}[0]	10 seconds
+			...    msg=CSV summary File did not save correctly in the Result Name column, second row!
+
+			Length Should Be	${second_row}	9	msg=Some columns in summary.csv are missing in second row, should be 9 of them!
+
+		ELSE IF  '${csv_report_file_type}' == 'raw_result_data.csv'
+			${len}=		Get Length	${csv_rows_content_list}
+			Should Be True	${len} >= ${3}		msg=Some rows in raw_result_data.csv are missing, should be at least 3!
+
+			@{header_row_list}=		Set Variable	${csv_rows_content_list}[0]
+			Log To Console	raw_result_data.csv: ${header_row_list}
+			@{expected_header_row_list}	Create List		Script Index  Robot  Iteration  Agent  Sequence  Result Name  Result  Elapsed Time  Start Time  End Time
+			Diff Lists		${header_row_list}		${expected_header_row_list}
+			...    message=CSV Report Files are not generated correctly! List A - CSV raw_result_data file header row, List B - Expected header row values.
+
+			@{first_data_row}=	Set Variable	${csv_rows_content_list}[1]
+			${Agent_name}=	Set Variable	${first_data_row}[3]
+			FOR  ${j}  IN RANGE  1  ${len}
+				@{data_row}=	Set Variable	${csv_rows_content_list}[${j}]
+				Log		${data_row}
+
+				Should Be Equal		${data_row}[0]	1
+				...    msg=CSV raw_result_data File did not save correctly in the Script Index column, ${j+1} row!
+				Should Be True		${${data_row}[1]} >= ${1} and ${${data_row}[1]} <= ${10}
+				...    msg=CSV raw_result_data File did not save correctly in the Robot column, ${j+1} row!
+				Should Be True		${${data_row}[0]} <= ${3}
+				...    msg=CSV raw_result_data File did not save correctly in the Iteration column, ${j+1} row!
+				Should Be Equal		${data_row}[3]	${Agent_name}
+				...    msg=CSV raw_result_data File did not save correctly in the Agent column, ${j+1} row!
+				Should Be Equal		${data_row}[4]	1
+				...    msg=CSV raw_result_data File did not save correctly in the Sequence column, ${j+1} row!
+				Should Be Equal		${data_row}[5]	10 seconds
+				...    msg=CSV raw_result_data File did not save correctly in the Result Name column, ${j+1} row!
+
+				Length Should Be	${data_row}	10	msg=Some columns in raw_result_data.csv are missing in ${j+1}nd row, should be 10 of them!
+			END
+
+		ELSE IF  '${csv_report_file_type}' == 'agent_data.csv'
+			${len}=		Get Length	${csv_rows_content_list}
+			Should Be True	${len} >= ${3}		msg=Some rows in agent_data.csv are missing, should be at least 3!
+
+			@{header_row_list}=		Set Variable	${csv_rows_content_list}[0]
+			Log To Console	agent_data.csv: ${header_row_list}
+			@{expected_header_row_list}	Create List		Agentname  Agentstatus  Agentlastseen  Agentassigned  Agentrobots  Agentload  Agentcpu  Agentmem  Agentnet
+			Diff Lists		${header_row_list}		${expected_header_row_list}
+			...    message=CSV Report Files are not generated correctly! List A - CSV agent_data file header row, List B - Expected header row values.
+
+			@{expected_status}	Create List  Ready  Running  Critical  Stopping
+			@{first_data_row}=	Set Variable	${csv_rows_content_list}[1]
+			${Agent_name}=	Set Variable	${first_data_row}[0]
+			FOR  ${j}  IN RANGE  1  ${len}
+				@{data_row}=	Set Variable	${csv_rows_content_list}[${j}]
+				Log		${data_row}
+
+				Should Be Equal		${data_row}[0]	${Agent_name}
+				...    msg=CSV agent_data File did not save correctly in the Agentname column, ${j+1} row!
+				IF  '${data_row}[1]' not in @{expected_status}
+					Fail	msg=CSV agent_data File did not save correctly in the Agentstatus column, ${j+1} row! ${data_row}[1] not in ${expected_status}.
+				END
+				Should Be True		${${data_row}[3]} >= ${0} and ${${data_row}[3]} <= ${10}
+				...    msg=CSV agent_data File did not save correctly in the Agentassigned column, ${j+1} row!
+				Should Be True		${${data_row}[4]} >= ${0} and ${${data_row}[4]} <= ${10}
+				...    msg=CSV agent_data File did not save correctly in the Agentrobots column, ${j+1} row!
+
+				Length Should Be	${data_row}		9	msg=Some columns in agent_data.csv are missing in ${j+1}nd row, should be 9 of them!
+			END
+
+		ELSE
+			Fail	msg=Unexpected csv file found: ${csv_file_paths}[${i}].
+		END
+	END
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    GUI_Common.Stop Agent
+
 Verify the Results Directory And db File Gets Created Correctly With Scenario Also After a Restart
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
 	[Setup]	Run Keywords
@@ -966,6 +1306,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
 	Length Should Be	${run_result_dirs}	1	msg=The test run result dir was not created or created unexpected directories!
 
+	Sleep	5
 	Verify Test Result Directory Name	${run_result_dirs}[0]	${scenario_name}	${current_date}
 	Verify Generated Run Result Files	${run_result_dirs}[0]	${scenario_name}
 
@@ -1018,7 +1359,8 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	Press Key.tab 1 Times
 	Type	30
 	Click Button	runscriptrow
-	Select Robot File	${robot_data}[0]
+	# Select Robot File	${robot_data}[0]
+	Select Robot File OS DIALOG 	${robot_data}[0]
 	Select 1 Robot Test Case
 	Check If The Agent Is Ready
 	Click Tab	Plan
@@ -1045,56 +1387,54 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	...    Run Keyword		Close Manager GUI ${platform}
 
 Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the robots)
-	[Tags]	windows-latest	ubuntu-latest	Issue #70
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot	AND
 	...    Set INI Window Size		1200	600							AND
-	...    Open Agent													AND
+	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-2	AND
+	...    Open Agent	${agent_options}														AND
 	...    Open Manager GUI												AND
 	...    Create Robot File
 	...    file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n
 
-	Press Key.tab 4 Times
-	Type	15
-	Press Key.tab 1 Times
-	Type	60
-	Click Button	runscriptrow
-	Select Robot File	${robot_data}[0]
-	Select 1 Robot Test Case
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#70${/}test_scenario.rfs
+	Copy File	${scenariofile}		${global_path}
+	Click Button	runopen
+	Open Scenario File OS DIALOG	${scenario_name}
 	Check If The Agent Is Ready
 	Click Tab	Plan
 	Click Button	runplay
 	Stop Test Scenario Run Quickly	${15}	${60}
 
 	[Teardown]	Run Keywords
+	...    Delete Scenario File		${scenario_name}		AND
 	...    Set Confidence	0.9								AND
 	...    GUI_Common.Stop Agent							AND
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove File		${global_path}${/}example.robot
 
 Check If Test Scenario Run Will Stop Gradually
-	[Tags]	windows-latest	ubuntu-latest	Issue #70
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
 	[Setup]	Run Keywords
-	...    Set Global Filename And Default Save Path	example.robot	AND
-	...    Set INI Window Size		1200	600							AND
-	...    Open Agent													AND
-	...    Open Manager GUI												AND
+	...    Set Global Filename And Default Save Path	example.robot							AND
+	...    Set INI Window Size		1200	600													AND
+	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-3	AND
+	...    Open Agent	${agent_options}														AND
+	...    Open Manager GUI																		AND
 	...    Create Robot File	file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t60\n
 
 	Utilisation Stats
-	Press Key.tab 4 Times
-	Type	15
-	Press Key.tab 1 Times
-	Type	60
-	Click Button	runscriptrow
-	Select Robot File	${robot_data}[0]
-	Select 1 Robot Test Case
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#70${/}test_scenario.rfs
+	Copy File	${scenariofile}		${global_path}
+	Click Button	runopen
+	Open Scenario File OS DIALOG	${scenario_name}
 	Check If The Agent Is Ready
 	Click Tab	Plan
 	Click Button	runplay
 	Stop Test Scenario Run Gradually	${15}	${60}
 
 	[Teardown]	Run Keywords
+	...    Delete Scenario File		${scenario_name}		AND
 	...    Set Confidence	0.9								AND
 	...    GUI_Common.Stop Agent							AND
 	...    Run Keyword		Close Manager GUI ${platform}	AND

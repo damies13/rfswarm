@@ -5,7 +5,7 @@ Test Teardown 	Close GUI
 
 *** Test Cases ***
 Verify That Files Get Saved With Correct Extension And Names
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #39
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #39 	Issue #257
 	${testdata}=		Set Variable	Issue-#39
 	${resultdata}=		Set Variable	20240622_182505_Issue-#39
 	${basefolder}=		Set Variable	${CURDIR}${/}testdata${/}${testdata}
@@ -41,7 +41,7 @@ Verify That Files Get Saved With Correct Extension And Names
 	@{result_files}=		List Files In Directory		${resultfolder}
 	Log To Console	${\n}All result files: ${result_files}${\n}
 	Length Should Be	${result_files}		5	msg=Result files didnt saved correctly!
-	
+
 	@{file_extensions}	Create List		db	docx	html	report	xlsx
 	FOR  ${i}  IN RANGE  0  5
 		${file}		Set Variable	${result_files}[${i}]
