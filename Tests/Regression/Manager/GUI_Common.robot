@@ -425,12 +425,12 @@ Get Manager PIP Data
 	Log	${pip_data.stdout}
 	RETURN		${pip_data.stdout}
 
-Get IP addresses
-	${hostname}=	Evaluate	socket.gethostname()	modules=socket
-	${ipv4}=	Evaluate	socket.getaddrinfo("${hostname}", None, socket.AF_INET)[0][4][0]		modules=socket
-	${ipv6}=	Evaluate	socket.getaddrinfo("${hostname}", None, socket.AF_INET6)[0][4][0]		modules=socket
+# Get IP addresses
+# 	${hostname}=	Evaluate	socket.gethostname()	modules=socket
+# 	${ipv4}=	Evaluate	socket.getaddrinfo("${hostname}", None, socket.AF_INET)[0][4][0]		modules=socket
+# 	${ipv6}=	Evaluate	socket.getaddrinfo("${hostname}", None, socket.AF_INET6)[0][4][0]		modules=socket
 
-	RETURN	${ipv4}		${ipv6}
+# 	RETURN	${ipv4}		${ipv6}
 
 Create Robot File
 	[Arguments]		${path}=${global_path}	${name}=${global_name}
