@@ -19,8 +19,7 @@ Verify If the Port Number And Ip Address Get Written To the INI File
 	...    Open Manager GUI		${mngr_options}
 
 	${ipv4}		${ipv6}=		Get IP addresses
-	Log		IPV4 address: ${ipv4}
-	Log		IPV6 address: ${ipv6}
+	Log To Console		${\n}IPV4 address: ${ipv4} ${\n}IPV6 address: ${ipv6}${\n}
 	${manager_ini_file}		Get Manager INI Location
 	&{run_settings_data}	Create Dictionary
 	...    bind_ip_address=${ipv4}
@@ -38,7 +37,7 @@ Verify If the Port Number And Ip Address Get Written To the INI File
 	Should Be Equal As Strings 	${manager_ini_file_dict}[Server][bindip] 	${run_settings_data}[bind_ip_address]
 	Should Be Equal As Strings 	${manager_ini_file_dict}[Server][bindport] 	${run_settings_data}[bind_port_number]
 
-	Log To Console	${\n}The bindip and bindport heve been saved to the ini file, now check if the will be applied to the manager after restarting.${\n}
+	Log To Console	${\n}The bindip and bindport heve been saved to the ini file, now check if it will be applied to the manager after restarting.${\n}
 	Open Manager GUI
 	Click Button	runsettings
 	Click Button	ok
@@ -52,7 +51,6 @@ Verify If the Port Number And Ip Address Get Written To the INI File
 	# @{agent_options}	Set Variable	-m	http://${run_settings_data}[bind_ip_address]:${run_settings_data}[bind_port_number]/
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Change = ${ipv4} With = In ${manager_ini_file}	AND
 	...    Change = 8148 With = 8138 In ${manager_ini_file}
 
@@ -106,8 +104,7 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	...    Open Manager GUI		${mngr_options}
 
 	${ipv4}		${ipv6}=		Get IP addresses
-	Log		IPV4 address: ${ipv4}
-	Log		IPV6 address: ${ipv6}
+	Log To Console		${\n}IPV4 address: ${ipv4} ${\n}IPV6 address: ${ipv6}${\n}
 	# ${manager_ini_file}		Get Manager INI Location
 	# &{run_settings_data}	Create Dictionary	bind_ip_address=${ipv4}
 
@@ -1333,6 +1330,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 		END
 	END
 
+	Sleep	5
 	Verify Test Result Directory Name	${result_dir_name}		${scenario_name}	${current_date}
 	Verify Generated Run Result Files	${result_dir_name}		${scenario_name}
 
@@ -1378,6 +1376,7 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
 	Length Should Be	${run_result_dirs}	1	msg=The test run result dir was not created or created unexpected directories!
 
+	Sleep	5
 	Verify Test Result Directory Name	${run_result_dirs}[0]	${scenario_name}	${current_date}
 	Verify Generated Run Result Files	${run_result_dirs}[0]	${scenario_name}
 

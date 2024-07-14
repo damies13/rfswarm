@@ -9,6 +9,7 @@ Library		XML
 Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
 Library 	IniFile.py
+Library 	GetIpAddress.py
 
 *** Variables ***
 ${platform}		None
