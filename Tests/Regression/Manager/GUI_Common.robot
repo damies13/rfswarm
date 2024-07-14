@@ -1002,7 +1002,7 @@ Start New Scenario
 Create ${lang} Language Scenario
 	# [Arguments] 	${langcode}
 	# Log 	${lang} 	console=True
-	${scenariofile}= 		Set Variable    ${CURDIR}${/}testdata${/}Issue-#238${/}language${/}lang_${lang}.robot
+	${scenariofile}= 		Set Variable    ${CURDIR}${/}testdata${/}Issue-#238${/}language${/}lang_${lang}.rfs
 	${robotfile}= 		Set Variable    ${CURDIR}${/}testdata${/}Issue-#238${/}language${/}lang_${lang}.robot
 	${robotfilename}= 		Set Variable    lang_${lang}.robot
 	Create File 	${scenariofile} 	[Scenario]\n
