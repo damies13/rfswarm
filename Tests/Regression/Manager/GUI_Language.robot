@@ -39,7 +39,7 @@ English		en
 Add Test In Language
 	[Arguments] 	${langcode}
 	Log 	${langcode} 	console=True
-	${scenariofile}= 		Create ${lang} Language Scenario
+	${scenariofile}= 		Create ${langcode} Language Scenario
 	@{mngr_options}= 	Create List 	-s 	${scenariofile}
 	Open Manager GUI 		${mngr_options}
 	Check If The Agent Is Ready
