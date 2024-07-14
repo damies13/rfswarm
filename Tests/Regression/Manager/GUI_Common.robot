@@ -89,10 +89,12 @@ Close Manager GUI
 	Sleep	5
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
-		# Click Dialog Button		no
+		Press Combination 	Key.esc
+		Press Combination 	x 	Key.ctrl
+		Sleep	3
 		Run Keyword And Ignore Error 	Click Dialog Button		no 		10
 	END
-	${result}= 	Wait For Process 	${process_manager} 	timeout=55
+	${result}= 		Wait For Process 	${process_manager} 	timeout=55
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	not ${running}
 		Log		${result.stdout}
@@ -110,6 +112,7 @@ Close Manager GUI
 
 Close Manager GUI macos
 	[Tags]	macos-latest
+	Sleep	3
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
 		Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
@@ -119,10 +122,10 @@ Close Manager GUI macos
 		Run Keyword And Ignore Error 	Click Tab 	 Run
 		Click Image		manager_${platform}_titlebar_rfswarm.png
 		Click Button	closewindow
-		# Sleep	5
+		Sleep	3
 		Run Keyword And Ignore Error 	Click Dialog Button		no 		10
 	END
-	${result}= 	Wait For Process 	${process_manager} 	timeout=55
+	${result}= 		Wait For Process 	${process_manager} 	timeout=55
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	not ${running}
 		Take A Screenshot
@@ -570,7 +573,7 @@ Select Robot File OS DIALOG
 Save Scenario File OS DIALOG
 	[Arguments]		${scenario_name}
 	Sleep	5
-	Type	${scenario_name}.rfs
+	Type	${scenario_name}
 	Take A Screenshot
 	Click Dialog Button		save
 	Sleep	1
@@ -578,7 +581,7 @@ Save Scenario File OS DIALOG
 Open Scenario File OS DIALOG
 	[Arguments]		${scenario_name}
 	Sleep	5
-	Type	${scenario_name}
+	Type	${scenario_name}.rfs
 	Take A Screenshot
 	Click Dialog Button		open
 	Sleep	1
@@ -673,7 +676,6 @@ Get Relative Paths
 	END
 	RETURN 	${paths_out}
 
-
 Diff Lists
 	[Arguments] 	${list_a} 		${list_b} 	${message}
 
@@ -701,6 +703,24 @@ Diff Lists
 		Log 		Items from list A missing from list B: ${Missing_List_From_B} 	console=True
 		Lists Should Be Equal 	${list_a} 	${list_b} 		msg=${message}
 	END
+
+Convert CSV File Cells To a List
+	[Arguments]		${csv_file_path}	${csv_separator}
+	${csv_file_content}=	Get File		${csv_file_path}
+	@{csv_rows_list}=	Split String	${csv_file_content}		separator=\n
+
+	@{csv_rows_content_list}=	Create List
+	FOR  ${row}  IN  @{csv_rows_list}
+		@{csv_row_cells_list}=		Split String	${row}	separator=${csv_separator}
+		Append To List	${csv_rows_content_list}	${csv_row_cells_list}
+	END
+
+	${status}=	Run Keyword And Return Status	Should Be Empty	@{csv_rows_content_list}[-1]
+	IF  ${status} == ${True}
+		@{csv_rows_content_list}	Set Variable	${csv_rows_content_list}[:-1]
+	END
+
+	RETURN	${csv_rows_content_list}
 
 Verify Scenario File Robots
 	[Arguments]		${scenario_content_list}	${run_robots}	${start_group}	${end_group}
@@ -1007,14 +1027,18 @@ Verify Generated Run Result Files
 
 	${result_files}=		List Files In Directory		${results_dir}${/}${result_dir_name}
 	Log To Console	${\n}All test run result files: ${result_files}{\n}
-	Length Should Be	${result_files}		1	msg=The db file was not created or created unexpected files!
+	${len}=		Get Length	${result_files}
+	Should Be True	${len} > 0	msg=The db file was not created.
+	Should Be True	${len} < 2	msg=Unexpected files have been created in the results folder. There should only be ${result_dir_time}_${scenario_name}.db file.
 	${db_file}=		Set Variable	${result_files}[0]
 	Should Be Equal As Strings		${db_file}		${result_dir_time}_${scenario_name}.db
 	...    msg=Result directory name from scenario is incorrect: expected "${scenario_name}", actual: "${run_dir_name_fragmented}[2]".
 
 	${logs}=	List Directories In Directory	${results_dir}${/}${result_dir_name}
 	Log To Console	${\n}All test run result directories: ${logs}{\n}
-	Length Should Be	${logs}		1	msg=The db file was not created or created unexpected files!
+	${len}=		Get Length	${logs}
+	Should Be True	${len} > 0	msg=The logs directory was not created.
+	Should Be True	${len} < 2	msg=Unexpected directories have been created in the results folder. There should only be 'logs' directory.
 	Should Be Equal As Strings		${logs}[0]		logs
 	...    msg=Logs directory name is incorrect: expected "logs", actual: "${logs}[0]".
 	${logs_absolute_paths}	${logs_file_names}
