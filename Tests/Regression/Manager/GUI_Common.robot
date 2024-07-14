@@ -166,7 +166,7 @@ Stop Test Scenario Run Gradually
 	Take A Screenshot
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time + 300}
-	Run Keyword If	not ${status}	Fail	msg=Tesxt didn't finish as fast as expected. Check screenshots for more informations.
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
 
 Stop Test Scenario Run Quickly
 	[Arguments]	${rumup_time}	${robot_test_time}
