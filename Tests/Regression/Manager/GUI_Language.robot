@@ -39,12 +39,11 @@ English		en
 Add Test In Language
 	[Arguments] 	${langcode}
 	Log 	${langcode} 	console=True
-	Open Manager GUI
-	Start New Scenario
+	${scenariofile}= 		Create ${lang} Language Scenario
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI 		${mngr_options}
 	Check If The Agent Is Ready
 	Click Tab 	Plan
-	Select ${langcode} Language Test Script
-	Select 1 Robot Test Case
 	Take A Screenshot
 	Check Agent Downloaded ${langcode} Language Test Files
 
@@ -58,5 +57,7 @@ Language Test Init
 Language Test End
 	Run Keyword		Close Manager GUI ${platform}
 	Stop Agent
+
+
 
 #

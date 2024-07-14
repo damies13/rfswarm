@@ -999,11 +999,25 @@ Check That The Scenario File Opens Correctly
 Start New Scenario
 	Click Button	runnew
 
-Select ${lang} Language Test Script
-	# Video Start Recording 		${OUTPUT DIR}${/}Select_${lang}_Language_Test_Script.mp4
-	${filepath}= 		Set Variable    ${CURDIR}${/}testdata${/}Issue-#238${/}language${/}lang_${lang}.robot
-	Select Test Script 	1 	${filepath}
-	# Video Stop Recording
+Create ${lang} Language Scenario
+	# [Arguments] 	${langcode}
+	# Log 	${lang} 	console=True
+	${scenariofile}= 		Set Variable    ${CURDIR}${/}testdata${/}Issue-#238${/}language${/}lang_${lang}.robot
+	${robotfile}= 		Set Variable    ${CURDIR}${/}testdata${/}Issue-#238${/}language${/}lang_${lang}.robot
+	${robotfilename}= 		Set Variable    lang_${lang}.robot
+	Create File 	${scenariofile} 	[Scenario]\n
+	Append To File 	${scenariofile} 	uploadmode = err\n
+	Append To File 	${scenariofile} 	scriptcount = 1\n
+	Append To File 	${scenariofile} 	graphlist =\n
+	Append To File 	${scenariofile} 	\n
+	Append To File 	${scenariofile} 	[1]\n
+	Append To File 	${scenariofile} 	robots = 2\n
+	Append To File 	${scenariofile} 	delay = 300\n
+	Append To File 	${scenariofile} 	rampup = 10\n
+	Append To File 	${scenariofile} 	run = 60\n
+	Append To File 	${scenariofile} 	test = First Test\n
+	Append To File 	${scenariofile} 	script = ${robotfilename}\n
+	RETURN 	${scenariofile}
 
 Click Script Button On Row
 		[Arguments]		${row}
