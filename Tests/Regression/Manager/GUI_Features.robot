@@ -12,8 +12,27 @@ ${scenario_name}=	test_scenario
 *** Test Cases ***
 Test
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
-	@{ip}=	Get IP addresses
-	Log To Console	${\n}${ip}
+	Open Manager GUI
+	@{ip_addresses}=	Get IP addresses
+	Log To Console	${\n}${ip_addresses}
+	FOR  ${ip}  IN  @{ip_addresses}
+		@{splitted_ip}=		Split String To Characters	${ip}
+		IF  ':' in @{splitted_ip}
+			@{agent_options}	Set Variable	-m	http://[${ip}]:8138/
+		ELSE
+			@{agent_options}	Set Variable	-m	http://${ip}:8138/
+		END
+		Open Agent	${agent_options}
+		${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
+		Log To Console	For ${ip}: ${status}
+		GUI_Common.Stop Agent
+		IF  ${status} is ${True}
+			Run Keyword		Close Manager GUI ${platform}
+			Open Manager GUI
+		END
+		Click Tab	Plan
+	END
+	Run Keyword		Close Manager GUI ${platform}
 
 Verify If the Port Number And Ip Address Get Written To the INI File
 	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
