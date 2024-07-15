@@ -1457,20 +1457,53 @@ class RFSwarmBase:
 	def is_resfile_prefix(self, prefixname):
 		prefixs = {
 			"en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# Bulgarian		bg
 			"bg": ['РЕСУРС', 'ПРОМЕНЛИВА', 'БИБЛИОТЕКА', 'МЕТАДАННИ_FILE', 'МЕТАДАННИ_ФАЙЛ', 'ВНОС_БИБЛИОТЕКА'],
+			# Bosnian		bs
 			# "bs": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# Czech		cs
 			# "cs": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# German		de
 			# "de": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
-			# "de": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
-
-			# "de": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
-			# "de": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
-			# "de": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
-			# "de": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
-			# "de": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
-			# "de": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
-			# "de": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
-			# "de": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# Spanish		es
+			# "es": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# Finnish		fi
+			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# French		fr
+			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# Hindi		hi
+			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# Italian		it
+			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# Japanese		ja
+			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# Dutch		nl
+			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# Polish		pl
+			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# Portuguese		pt
+			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# Brazilian Portuguese		pt_br
+			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# Romanian		ro
+			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# Russian		ru
+			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# Swedish		sv
+			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# Thai		th
+			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# Turkish		tr
+			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# Ukrainian		uk
+			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# Vietnamese		vi
+			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# Chinese Simplified		zh_cn
+			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# Chinese Traditional		zh_tw
+			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# For future languages
 			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
 		}
 		for prefix in list(prefixs.keys()):
@@ -1483,15 +1516,53 @@ class RFSwarmBase:
 		# 	checking = True
 		sections = {
 			"en": ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD'],
+			# Bulgarian		bg
 			"bg": ['НАСТРОЙКИ', 'ТЕСТОВИ СЛУЧАИ', 'ЗАДАЧИ', 'КЛЮЧОВИ ДУМИ'],
+			# Bosnian		bs
 			"bs": ['POSTAVKE', 'TEST CASES', 'TASKOVI', 'KEYWORDS'],
+			# Czech		cs
 			"cs": ['NASTAVENÍ', 'TESTOVACÍ PŘÍPADY', 'ÚLOHY', 'KLÍČOVÁ SLOVA'],
+			# German		de
 			"de": ['EINSTELLUNGEN', 'TESTFÄLLE', 'AUFGABEN', 'SCHLÜSSELWÖRTER'],
-			# "en": ['SETTINGS', 'TEST CASES', 'TASKS', 'KEYWORDS'],
-			# "en": ['SETTINGS', 'TEST CASES', 'TASKS', 'KEYWORDS'],
-			# "en": ['SETTINGS', 'TEST CASES', 'TASKS', 'KEYWORDS'],
-			# "en": ['SETTINGS', 'TEST CASES', 'TASKS', 'KEYWORDS'],
-
+			# Spanish		es
+			"es": ['CONFIGURACIONES', 'CASOS DE PRUEBA', 'TAREAS', 'PALABRAS CLAVE'],
+			# Finnish		fi
+			"fi": ['ASETUKSET', 'TESTIT', 'TEHTÄVÄT', 'AVAINSANAT'],
+			# French		fr
+			"fr": ['PARAMÈTRES', 'UNITÉS DE TEST', 'TÂCHES', 'MOTS-CLÉS'],
+			# Hindi		hi
+			"hi": ['स्थापना', 'नियत कार्य प्रवेशिका', 'कार्य प्रवेशिका', 'कुंजीशब्द'],
+			# Italian		it
+			"it": ['IMPOSTAZIONI', 'CASI DI TEST', 'ATTIVITÀ', 'PAROLE CHIAVE'],
+			# Japanese		ja
+			"ja": ['設定', 'テスト ケース', 'タスク', 'キーワード'],
+			# Dutch		nl
+			"nl": ['INSTELLINGEN', 'TESTGEVALLEN', 'TAKEN', 'SLEUTELWOORDEN'],
+			# Polish		pl
+			"pl": ['USTAWIENIA', 'PRZYPADKI TESTOWE', 'ZADANIA', 'SŁOWA KLUCZOWE'],
+			# Portuguese		pt
+			"pt": ['DEFINIÇÕES', 'CASOS DE TESTE', 'TAREFAS', 'PALAVRAS-CHAVE'],
+			# Brazilian Portuguese		pt_br
+			"pt_br": ['CONFIGURAÇÕES', 'CASOS DE TESTE', 'TAREFAS', 'PALAVRAS-CHAVE'],
+			# Romanian		ro
+			"ro": ['SETARI', 'CAZURI DE TEST', 'SARCINI', 'CUVINTE CHEIE'],
+			# Russian		ru
+			"ru": ['НАСТРОЙКИ', 'ЗАГОЛОВКИ ТЕСТОВ', 'ЗАДАЧА', 'КЛЮЧЕВЫЕ СЛОВА'],
+			# Swedish		sv
+			"sv": ['INSTÄLLNINGAR', 'TESTFALL', 'TASKAR', 'NYCKELORD'],
+			# Thai		th
+			"th": ['การตั้งค่า', 'การทดสอบ', 'งาน', 'คำสั่งเพิ่มเติม'],
+			# Turkish		tr
+			"tr": ['AYARLAR', 'TEST DURUMLARI', 'GÖREVLER', 'ANAHTAR KELIMELER'],
+			# Ukrainian		uk
+			"uk": ['НАЛАШТУВАННЯ', 'ТЕСТ-КЕЙСИ', 'ЗАВДАНЬ', 'КЛЮЧОВИХ СЛОВА'],
+			# Vietnamese		vi
+			"vi": ['CÀI ĐẶT', 'CÁC KỊCH BẢN KIỂM THỬ', 'CÁC NGHIỆM VỤ', 'CÁC TỪ KHÓA'],
+			# Chinese Simplified		zh_cn
+			"zh_cn": ['设置', '用例', '任务', '关键字'],
+			# Chinese Traditional		zh_tw
+			"zh_tw": ['設置', '案例', '任務', '關鍵字'],
+			# For future languages
 			# "en": ['SETTINGS', 'TEST CASES', 'TASKS', 'KEYWORDS'],
 		}
 		for section in list(sections.keys()):
