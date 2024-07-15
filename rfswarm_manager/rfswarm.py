@@ -1460,49 +1460,49 @@ class RFSwarmBase:
 			# Bulgarian		bg
 			"bg": ['РЕСУРС', 'ПРОМЕНЛИВА', 'БИБЛИОТЕКА', 'МЕТАДАННИ_FILE', 'МЕТАДАННИ_ФАЙЛ', 'ВНОС_БИБЛИОТЕКА'],
 			# Bosnian		bs
-			# "bs": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"bs": ['RESURSI', 'VARIJABLE', 'BIBLIOTEKA', 'METADATA_FILE', 'METADATA_FILE', 'UVOZ_BIBLIOTEKA'],
 			# Czech		cs
-			# "cs": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"cs": ['ZDROJ', 'PROMĚNNÁ', 'KNIHOVNA', 'METADATA_FILE', 'METADATA_SOUBOR', 'IMPORT_KNIHOVNA'],
 			# German		de
-			# "de": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"de": ['RESSOURCE', 'VARIABLEN', 'BIBLIOTHEK', 'METADATEN_FILE', 'METADATEN_DATEI', 'IMPORTIEREN_BIBLIOTHEK'],
 			# Spanish		es
-			# "es": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"es": ['RECURSOS', 'VARIABLE', 'BIBLIOTECA', 'METADATOS_FILE', 'METADATOS_ARCHIVO', 'IMPORTAR_BIBLIOTECA'],
 			# Finnish		fi
-			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"fi": ['RESURSSI', 'MUUTTUJAT', 'KIRJASTO', 'METATIEDOT_FILE', 'METATIEDOT_TIEDOSTO', 'TUONTI_KIRJASTO'],
 			# French		fr
-			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"fr": ['RESSOURCE', 'VARIABLE', 'BIBLIOTHÈQUE', 'MÉTA-DONNÉE_FILE', 'MÉTA-DONNÉE_DÉPOSER', 'IMPORTER_BIBLIOTHÈQUE'],
 			# Hindi		hi
-			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"hi": ['संसाधन', 'चर', 'कोड़ प्रतिबिंब संग्रह', 'अधि-आंकड़ा_FILE', 'अधि-आंकड़ा_फ़ाइल', 'आयात करें_कोड़ प्रतिबिंब संग्रह'],
 			# Italian		it
-			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"it": ['RISORSA', 'VARIABILE', 'LIBRERIA', 'METADATI_FILE', 'METADATI_FILE', 'IMPORTARE_LIBRERIA'],
 			# Japanese		ja
-			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"ja": ['リソース', '変数', 'ライブラリ', 'メタデータ_FILE', 'メタデータ_ファイル', 'インポート_ライブラリ'],
 			# Dutch		nl
-			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"nl": ['RESOURCE', 'VARIABELE', 'BIBLIOTHEEK', 'METADATA_FILE', 'METADATA_BESTAND', 'IMPORTEREN_BIBLIOTHEEK'],
 			# Polish		pl
-			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"pl": ['ZASÓB', 'ZMIENNE', 'BIBLIOTEKA', 'METADANE_FILE', 'METADANE_PLIK', 'IMPORT_BIBLIOTEKA'],
 			# Portuguese		pt
-			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"pt": ['RECURSO', 'VARIÁVEL', 'BIBLIOTECA', 'METADADOS_FILE', 'METADADOS_FICHEIRO', 'IMPORTAÇÃO_BIBLIOTECA'],
 			# Brazilian Portuguese		pt_br
-			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"pt_br": ['RECURSO', 'VARIÁVEL', 'BIBLIOTECA', 'METADADOS_FILE', 'METADADOS_ARQUIVO', 'IMPORTAR_BIBLIOTECA'],
 			# Romanian		ro
-			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"ro": ['RESURSA', 'VARIABILA', 'LIBRARIE', 'METADATE_FILE', 'METADATE_FIŞIER', 'IMPORT_LIBRARIE'],
 			# Russian		ru
-			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"ru": ['РЕСУРС', 'ПЕРЕМЕННЫЕ', 'БИБЛИОТЕКА', 'МЕТАДАННЫЕ_FILE', 'МЕТАДАННЫЕ_ФАЙЛ', 'ИМПОРТ_БИБЛИОТЕКА'],
 			# Swedish		sv
-			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"sv": ['RESURS', 'VARIABEL', 'BIBLIOTEK', 'METADATA_FILE', 'METADATA_FIL', 'IMPORTERA_BIBLIOTEK'],
 			# Thai		th
-			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"th": ['ไฟล์ที่ใช้', 'ชุดตัวแปร', 'ชุดคำสั่งที่ใช้', 'รายละเอียดเพิ่มเติม_FILE', 'รายละเอียดเพิ่มเติม_ไฟล์', 'นำเข้า_ชุดคำสั่งที่ใช้'],
 			# Turkish		tr
-			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"tr": ['KAYNAK', 'DEĞIŞKENLER', 'KÜTÜPHANE', 'ÜSTVERI_FILE', 'ÜSTVERI_DOSYA', 'İÇE AKTARMAK_KÜTÜPHANE'],
 			# Ukrainian		uk
-			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"uk": ['РЕСУРС', 'ЗМІННА', 'БІБЛІОТЕКА', 'МЕТАДАНІ_FILE', 'МЕТАДАНІ_ФАЙЛ', 'ІМПОРТ_БІБЛІОТЕКА'],
 			# Vietnamese		vi
-			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"vi": ['TÀI NGUYÊN', 'BIẾN SỐ', 'THƯ VIỆN', 'DỮ LIỆU THAM CHIẾU_FILE', 'DỮ LIỆU THAM CHIẾU_TÀI LIỆU', 'NHẬP KHẨU_THƯ VIỆN'],
 			# Chinese Simplified		zh_cn
-			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"zh_cn": ['资源文件', '变量文件', '程序库', '元数据_FILE', '元数据_文件', '导入_程序库'],
 			# Chinese Traditional		zh_tw
-			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"zh_tw": ['資源文件', '變量文件', '函式庫', '元數據_FILE', '元數據_文件', '進口_函式庫'],
 			# For future languages
 			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
 		}
