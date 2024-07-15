@@ -14,24 +14,24 @@ Bosnian		bs
 Czech		cs
 German		de
 English		en
-# Spanish		es
-# Finnish		fi
-# French		fr
-# Hindi		hi
-# Italian		it
-# Dutch		nl
-# Polish		pl
-# Portuguese		pt
-# Brazilian Portuguese		pt_br
-# Romanian		ro
-# Russian		ru
-# Swedish		sv
-# Thai		th
-# Turkish		tr
-# Ukrainian		uk
-# Vietnamese		vi
-# Chinese Simplified		zh_cn
-# Chinese Traditional		zh_tw
+Spanish		es
+Finnish		fi
+French		fr
+Hindi		hi
+Italian		it
+Dutch		nl
+Polish		pl
+Portuguese		pt
+Brazilian Portuguese		pt_br
+Romanian		ro
+Russian		ru
+Swedish		sv
+Thai		th
+Turkish		tr
+Ukrainian		uk
+Vietnamese		vi
+Chinese Simplified		zh_cn
+Chinese Traditional		zh_tw
 
 
 
