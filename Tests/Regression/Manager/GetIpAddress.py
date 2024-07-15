@@ -1,22 +1,12 @@
-import socket
+import psutil
+
 
 def get_ip_addresses():
-    ipv4_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        ipv4_socket.connect(("8.8.8.8", 80))
-        ipv4_address = ipv4_socket.getsockname()[0]
-    except Exception:
-        ipv4_address = None
-    finally:
-        ipv4_socket.close()
+	ipaddresslist = []
+	iflst = psutil.net_if_addrs()
+	for nic in iflst.keys():
+		for addr in iflst[nic]:
+			if addr.address not in ['127.0.0.1', '::1', 'fe80::1%lo0']:
+				ipaddresslist.append(addr.address)
 
-    ipv6_socket = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
-    try:
-        ipv6_socket.connect(("2001:4860:4860::8888", 80))
-        ipv6_address = ipv6_socket.getsockname()[0]
-    except Exception:
-        ipv6_address = None
-    finally:
-        ipv6_socket.close()
-
-    return ipv4_address, ipv6_address
+	return ipaddresslist

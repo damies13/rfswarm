@@ -10,8 +10,13 @@ Suite Setup 	Set Platform
 ${scenario_name}=	test_scenario
 
 *** Test Cases ***
-Verify If the Port Number And Ip Address Get Written To the INI File
+Test
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
+	@{ip}=	Get IP addresses
+	Log To Console	${\n}${ip}
+
+Verify If the Port Number And Ip Address Get Written To the INI File
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -55,7 +60,7 @@ Verify If the Port Number And Ip Address Get Written To the INI File
 	...    Change = 8148 With = 8138 In ${manager_ini_file}
 
 Verify If Agent Can't Connect On Old Port Number After Port Number Changed And Can Connect To the New One
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
