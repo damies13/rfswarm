@@ -1379,15 +1379,20 @@ class RFSwarmBase:
 							linearr = line.strip().split()
 							base.debugmsg(8, "linearr", linearr)
 							resfile = None
-							if len(linearr) > 1 and linearr[0].upper() in ['RESOURCE', 'VARIABLES', 'LIBRARY']:
+							# if len(linearr) > 1 and linearr[0].upper() in ['RESOURCE', 'VARIABLES', 'LIBRARY']:
+							if len(linearr) > 1 and self.is_resfile_prefix(linearr[0]):
 								base.debugmsg(9, "linearr[1]", linearr[1])
 								resfile = linearr[1]
-							if not resfile and len(linearr) > 2 and (linearr[0].upper() == 'METADATA' and linearr[1].upper() == 'FILE'):
+							# if not resfile and len(linearr) > 2 and (linearr[0].upper() == 'METADATA' and linearr[1].upper() == 'FILE'):
+							# 	base.debugmsg(9, "linearr[2]", linearr[2])
+							# 	resfile = linearr[2]
+							# if not resfile and len(linearr) > 2 and (linearr[0].upper() == 'IMPORT' and linearr[1].upper() == 'LIBRARY'):
+							# 	base.debugmsg(9, "linearr[2]", linearr[2])
+							# 	resfile = linearr[2]
+							if not resfile and len(linearr) > 2 and self.is_resfile_prefix(linearr[0] + "_" + linearr[1]):
 								base.debugmsg(9, "linearr[2]", linearr[2])
 								resfile = linearr[2]
-							if not resfile and len(linearr) > 2 and (linearr[0].upper() == 'IMPORT' and linearr[1].upper() == 'LIBRARY'):
-								base.debugmsg(9, "linearr[2]", linearr[2])
-								resfile = linearr[2]
+
 							if resfile:
 								base.debugmsg(8, "resfile", resfile)
 								# here we are assuming the resfile is a relative path! should we also consider files with full local paths?
@@ -1424,7 +1429,7 @@ class RFSwarmBase:
 				match = re.search(r'\*+([^*\v]+)', line)
 				if match is not None:
 					base.debugmsg(6, "match.group(0)", match.group(0), "match.group(1)", match.group(1))
-					if match.group(1).strip().upper() in ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD']:
+					if self.is_section_to_check(match.group(1)):
 						checking = True
 
 		if len(filequeue) > 0:
@@ -1448,6 +1453,38 @@ class RFSwarmBase:
 					if fileext.lower() in ['.robot', '.resource']:
 						t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
 						t.start()
+
+	def is_resfile_prefix(self, prefixname):
+		prefixs = {
+			"en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			"bg": ['РЕСУРС', 'ПРОМЕНЛИВА', 'БИБЛИОТЕКА', 'МЕТАДАННИ_FILE', 'МЕТАДАННИ_ФАЙЛ', 'ВНОС_БИБЛИОТЕКА'],
+			# "bs": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# "cs": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# "de": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+		}
+		for prefix in list(prefixs.keys()):
+			if prefixname.strip().upper() in prefixs[prefix]:
+				return True
+		return False
+
+	def is_section_to_check(self, sectionname):
+		# if match.group(1).strip().upper() in ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD']:
+		# 	checking = True
+		sections = {
+			"en": ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD'],
+			"bg": ['НАСТРОЙКИ', 'ТЕСТОВИ СЛУЧАИ', 'ЗАДАЧИ', 'КЛЮЧОВИ ДУМИ'],
+			"bs": ['POSTAVKE', 'TEST CASES', 'TASKOVI', 'KEYWORDS'],
+			"cs": ['NASTAVENÍ', 'TESTOVACÍ PŘÍPADY', 'ÚLOHY', 'KLÍČOVÁ SLOVA'],
+			"de": ['EINSTELLUNGEN', 'TESTFÄLLE', 'AUFGABEN', 'SCHLÜSSELWÖRTER'],
+			# "en": ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD'],
+			# "en": ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD'],
+			# "en": ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD'],
+			# "en": ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD'],
+		}
+		for section in list(sections.keys()):
+			if sectionname.strip().upper() in sections[section]:
+				return True
+		return False
 
 	def check_files_changed(self):
 		# self.scriptfiles[hash]
