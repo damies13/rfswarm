@@ -4,7 +4,7 @@ Language: Romanian
 # A blank line
 
 *** Setari ***
-Resursa    resource${/}lang_cs.resource
+Resursa    resource${/}lang_ro.resource
 
 *** Cazuri De Test ***
 First Test

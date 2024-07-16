@@ -4,7 +4,7 @@ Language: Russian
 # A blank line
 
 *** Настройки ***
-Ресурс    resource${/}lang_cs.resource
+Ресурс    resource${/}lang_ru.resource
 
 *** Заголовки тестов ***
 First Test
