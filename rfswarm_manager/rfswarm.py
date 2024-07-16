@@ -1383,12 +1383,6 @@ class RFSwarmBase:
 							if len(linearr) > 1 and self.is_resfile_prefix(linearr[0]):
 								base.debugmsg(9, "linearr[1]", linearr[1])
 								resfile = linearr[1]
-							# if not resfile and len(linearr) > 2 and (linearr[0].upper() == 'METADATA' and linearr[1].upper() == 'FILE'):
-							# 	base.debugmsg(9, "linearr[2]", linearr[2])
-							# 	resfile = linearr[2]
-							# if not resfile and len(linearr) > 2 and (linearr[0].upper() == 'IMPORT' and linearr[1].upper() == 'LIBRARY'):
-							# 	base.debugmsg(9, "linearr[2]", linearr[2])
-							# 	resfile = linearr[2]
 							if not resfile and len(linearr) > 2 and self.is_resfile_prefix(linearr[0] + "_" + linearr[1]):
 								base.debugmsg(9, "linearr[2]", linearr[2])
 								resfile = linearr[2]
@@ -1514,63 +1508,6 @@ class RFSwarmBase:
 		return False
 
 	def is_section_to_check(self, sectionname):
-		# if match.group(1).strip().upper() in ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD']:
-		# 	checking = True
-		# sections = {
-		# 	"en": ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD'],
-		# 	# Bulgarian		bg
-		# 	"bg": ['НАСТРОЙКИ', 'ТЕСТОВИ СЛУЧАИ', 'ЗАДАЧИ', 'КЛЮЧОВИ ДУМИ'],
-		# 	# Bosnian		bs
-		# 	"bs": ['POSTAVKE', 'TEST CASES', 'TASKOVI', 'KEYWORDS'],
-		# 	# Czech		cs
-		# 	"cs": ['NASTAVENÍ', 'TESTOVACÍ PŘÍPADY', 'ÚLOHY', 'KLÍČOVÁ SLOVA'],
-		# 	# German		de
-		# 	"de": ['EINSTELLUNGEN', 'TESTFÄLLE', 'AUFGABEN', 'SCHLÜSSELWÖRTER'],
-		# 	# Spanish		es
-		# 	"es": ['CONFIGURACIONES', 'CASOS DE PRUEBA', 'TAREAS', 'PALABRAS CLAVE'],
-		# 	# Finnish		fi
-		# 	"fi": ['ASETUKSET', 'TESTIT', 'TEHTÄVÄT', 'AVAINSANAT'],
-		# 	# French		fr
-		# 	"fr": ['PARAMÈTRES', 'UNITÉS DE TEST', 'TÂCHES', 'MOTS-CLÉS'],
-		# 	# Hindi		hi
-		# 	"hi": ['स्थापना', 'नियत कार्य प्रवेशिका', 'कार्य प्रवेशिका', 'कुंजीशब्द'],
-		# 	# Italian		it
-		# 	"it": ['IMPOSTAZIONI', 'CASI DI TEST', 'ATTIVITÀ', 'PAROLE CHIAVE'],
-		# 	# Japanese		ja
-		# 	"ja": ['設定', 'テスト ケース', 'タスク', 'キーワード'],
-		# 	# Dutch		nl
-		# 	"nl": ['INSTELLINGEN', 'TESTGEVALLEN', 'TAKEN', 'SLEUTELWOORDEN'],
-		# 	# Polish		pl
-		# 	"pl": ['USTAWIENIA', 'PRZYPADKI TESTOWE', 'ZADANIA', 'SŁOWA KLUCZOWE'],
-		# 	# Portuguese		pt
-		# 	"pt": ['DEFINIÇÕES', 'CASOS DE TESTE', 'TAREFAS', 'PALAVRAS-CHAVE'],
-		# 	# Brazilian Portuguese		pt_br
-		# 	"pt_br": ['CONFIGURAÇÕES', 'CASOS DE TESTE', 'TAREFAS', 'PALAVRAS-CHAVE'],
-		# 	# Romanian		ro
-		# 	"ro": ['SETARI', 'CAZURI DE TEST', 'SARCINI', 'CUVINTE CHEIE'],
-		# 	# Russian		ru
-		# 	"ru": ['НАСТРОЙКИ', 'ЗАГОЛОВКИ ТЕСТОВ', 'ЗАДАЧА', 'КЛЮЧЕВЫЕ СЛОВА'],
-		# 	# Swedish		sv
-		# 	"sv": ['INSTÄLLNINGAR', 'TESTFALL', 'TASKAR', 'NYCKELORD'],
-		# 	# Thai		th
-		# 	"th": ['การตั้งค่า', 'การทดสอบ', 'งาน', 'คำสั่งเพิ่มเติม'],
-		# 	# Turkish		tr
-		# 	"tr": ['AYARLAR', 'TEST DURUMLARI', 'GÖREVLER', 'ANAHTAR KELIMELER'],
-		# 	# Ukrainian		uk
-		# 	"uk": ['НАЛАШТУВАННЯ', 'ТЕСТ-КЕЙСИ', 'ЗАВДАНЬ', 'КЛЮЧОВИХ СЛОВА'],
-		# 	# Vietnamese		vi
-		# 	"vi": ['CÀI ĐẶT', 'CÁC KỊCH BẢN KIỂM THỬ', 'CÁC NGHIỆM VỤ', 'CÁC TỪ KHÓA'],
-		# 	# Chinese Simplified		zh_cn
-		# 	"zh_cn": ['设置', '用例', '任务', '关键字'],
-		# 	# Chinese Traditional		zh_tw
-		# 	"zh_tw": ['設置', '案例', '任務', '關鍵字'],
-		# 	# For future languages
-		# 	# "en": ['SETTINGS', 'TEST CASES', 'TASKS', 'KEYWORDS'],
-		# }
-		# for section in list(sections.keys()):
-		# 	if sectionname.strip().upper() in sections[section]:
-		# 		return True
-		# return False
 		if self.is_settings_section(sectionname):
 			return True
 		if self.is_testcases_section(sectionname):
@@ -1998,7 +1935,7 @@ class RFSwarmBase:
 			else:
 				return None
 
-	def addScriptRow(self, *args):
+	def addScriptRow(self):
 		base.scriptcount += 1
 
 		row = int("{}".format(base.scriptcount))
