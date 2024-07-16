@@ -16,6 +16,8 @@ jobs:
       - name: Test IPv6 Connectivity
         run: |
           echo "Test IPv6 connectivity"
+          curl -6 https://ifconfig.co
+          curl -6 https://ipv6.icanhazip.com
           ping6 -c 4 google.com || echo "IPv6 is not working"
 
       - name: Check firewall status
