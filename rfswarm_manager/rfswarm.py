@@ -1376,7 +1376,7 @@ class RFSwarmBase:
 					base.debugmsg(9, "line", line)
 					try:
 						if line.strip()[:1] != "#":
-							linearr = line.strip().split()
+							linearr = re.split(r'\s{2,}', line.strip())
 							base.debugmsg(8, "linearr", linearr)
 							resfile = None
 							# if len(linearr) > 1 and linearr[0].upper() in ['RESOURCE', 'VARIABLES', 'LIBRARY']:
@@ -1455,6 +1455,7 @@ class RFSwarmBase:
 						t.start()
 
 	def is_resfile_prefix(self, prefixname):
+		base.debugmsg(5, "prefixname:", prefixname)
 		prefixs = {
 			"en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'IMPORT_LIBRARY'],
 			# Bulgarian		bg
@@ -1508,65 +1509,247 @@ class RFSwarmBase:
 		}
 		for prefix in list(prefixs.keys()):
 			if prefixname.strip().upper() in prefixs[prefix]:
+				base.debugmsg(5, "is_resfile_prefix:", prefixname, "	Lang:", prefix)
 				return True
 		return False
 
 	def is_section_to_check(self, sectionname):
 		# if match.group(1).strip().upper() in ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD']:
 		# 	checking = True
+		# sections = {
+		# 	"en": ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD'],
+		# 	# Bulgarian		bg
+		# 	"bg": ['НАСТРОЙКИ', 'ТЕСТОВИ СЛУЧАИ', 'ЗАДАЧИ', 'КЛЮЧОВИ ДУМИ'],
+		# 	# Bosnian		bs
+		# 	"bs": ['POSTAVKE', 'TEST CASES', 'TASKOVI', 'KEYWORDS'],
+		# 	# Czech		cs
+		# 	"cs": ['NASTAVENÍ', 'TESTOVACÍ PŘÍPADY', 'ÚLOHY', 'KLÍČOVÁ SLOVA'],
+		# 	# German		de
+		# 	"de": ['EINSTELLUNGEN', 'TESTFÄLLE', 'AUFGABEN', 'SCHLÜSSELWÖRTER'],
+		# 	# Spanish		es
+		# 	"es": ['CONFIGURACIONES', 'CASOS DE PRUEBA', 'TAREAS', 'PALABRAS CLAVE'],
+		# 	# Finnish		fi
+		# 	"fi": ['ASETUKSET', 'TESTIT', 'TEHTÄVÄT', 'AVAINSANAT'],
+		# 	# French		fr
+		# 	"fr": ['PARAMÈTRES', 'UNITÉS DE TEST', 'TÂCHES', 'MOTS-CLÉS'],
+		# 	# Hindi		hi
+		# 	"hi": ['स्थापना', 'नियत कार्य प्रवेशिका', 'कार्य प्रवेशिका', 'कुंजीशब्द'],
+		# 	# Italian		it
+		# 	"it": ['IMPOSTAZIONI', 'CASI DI TEST', 'ATTIVITÀ', 'PAROLE CHIAVE'],
+		# 	# Japanese		ja
+		# 	"ja": ['設定', 'テスト ケース', 'タスク', 'キーワード'],
+		# 	# Dutch		nl
+		# 	"nl": ['INSTELLINGEN', 'TESTGEVALLEN', 'TAKEN', 'SLEUTELWOORDEN'],
+		# 	# Polish		pl
+		# 	"pl": ['USTAWIENIA', 'PRZYPADKI TESTOWE', 'ZADANIA', 'SŁOWA KLUCZOWE'],
+		# 	# Portuguese		pt
+		# 	"pt": ['DEFINIÇÕES', 'CASOS DE TESTE', 'TAREFAS', 'PALAVRAS-CHAVE'],
+		# 	# Brazilian Portuguese		pt_br
+		# 	"pt_br": ['CONFIGURAÇÕES', 'CASOS DE TESTE', 'TAREFAS', 'PALAVRAS-CHAVE'],
+		# 	# Romanian		ro
+		# 	"ro": ['SETARI', 'CAZURI DE TEST', 'SARCINI', 'CUVINTE CHEIE'],
+		# 	# Russian		ru
+		# 	"ru": ['НАСТРОЙКИ', 'ЗАГОЛОВКИ ТЕСТОВ', 'ЗАДАЧА', 'КЛЮЧЕВЫЕ СЛОВА'],
+		# 	# Swedish		sv
+		# 	"sv": ['INSTÄLLNINGAR', 'TESTFALL', 'TASKAR', 'NYCKELORD'],
+		# 	# Thai		th
+		# 	"th": ['การตั้งค่า', 'การทดสอบ', 'งาน', 'คำสั่งเพิ่มเติม'],
+		# 	# Turkish		tr
+		# 	"tr": ['AYARLAR', 'TEST DURUMLARI', 'GÖREVLER', 'ANAHTAR KELIMELER'],
+		# 	# Ukrainian		uk
+		# 	"uk": ['НАЛАШТУВАННЯ', 'ТЕСТ-КЕЙСИ', 'ЗАВДАНЬ', 'КЛЮЧОВИХ СЛОВА'],
+		# 	# Vietnamese		vi
+		# 	"vi": ['CÀI ĐẶT', 'CÁC KỊCH BẢN KIỂM THỬ', 'CÁC NGHIỆM VỤ', 'CÁC TỪ KHÓA'],
+		# 	# Chinese Simplified		zh_cn
+		# 	"zh_cn": ['设置', '用例', '任务', '关键字'],
+		# 	# Chinese Traditional		zh_tw
+		# 	"zh_tw": ['設置', '案例', '任務', '關鍵字'],
+		# 	# For future languages
+		# 	# "en": ['SETTINGS', 'TEST CASES', 'TASKS', 'KEYWORDS'],
+		# }
+		# for section in list(sections.keys()):
+		# 	if sectionname.strip().upper() in sections[section]:
+		# 		return True
+		# return False
+		if self.is_settings_section(sectionname):
+			return True
+		if self.is_testcases_section(sectionname):
+			return True
+		if self.is_keywords_section(sectionname):
+			return True
+		return False
+
+	def is_settings_section(self, sectionname):
 		sections = {
-			"en": ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD'],
+			"en": ['SETTINGS', 'SETTING'],
 			# Bulgarian		bg
-			"bg": ['НАСТРОЙКИ', 'ТЕСТОВИ СЛУЧАИ', 'ЗАДАЧИ', 'КЛЮЧОВИ ДУМИ'],
+			"bg": ['НАСТРОЙКИ'],
 			# Bosnian		bs
-			"bs": ['POSTAVKE', 'TEST CASES', 'TASKOVI', 'KEYWORDS'],
+			"bs": ['POSTAVKE'],
 			# Czech		cs
-			"cs": ['NASTAVENÍ', 'TESTOVACÍ PŘÍPADY', 'ÚLOHY', 'KLÍČOVÁ SLOVA'],
+			"cs": ['NASTAVENÍ'],
 			# German		de
-			"de": ['EINSTELLUNGEN', 'TESTFÄLLE', 'AUFGABEN', 'SCHLÜSSELWÖRTER'],
+			"de": ['EINSTELLUNGEN'],
 			# Spanish		es
-			"es": ['CONFIGURACIONES', 'CASOS DE PRUEBA', 'TAREAS', 'PALABRAS CLAVE'],
+			"es": ['CONFIGURACIONES'],
 			# Finnish		fi
-			"fi": ['ASETUKSET', 'TESTIT', 'TEHTÄVÄT', 'AVAINSANAT'],
+			"fi": ['ASETUKSET'],
 			# French		fr
-			"fr": ['PARAMÈTRES', 'UNITÉS DE TEST', 'TÂCHES', 'MOTS-CLÉS'],
+			"fr": ['PARAMÈTRES'],
 			# Hindi		hi
-			"hi": ['स्थापना', 'नियत कार्य प्रवेशिका', 'कार्य प्रवेशिका', 'कुंजीशब्द'],
+			"hi": ['स्थापना'],
 			# Italian		it
-			"it": ['IMPOSTAZIONI', 'CASI DI TEST', 'ATTIVITÀ', 'PAROLE CHIAVE'],
+			"it": ['IMPOSTAZIONI'],
 			# Japanese		ja
-			"ja": ['設定', 'テスト ケース', 'タスク', 'キーワード'],
+			"ja": ['設定'],
 			# Dutch		nl
-			"nl": ['INSTELLINGEN', 'TESTGEVALLEN', 'TAKEN', 'SLEUTELWOORDEN'],
+			"nl": ['INSTELLINGEN'],
 			# Polish		pl
-			"pl": ['USTAWIENIA', 'PRZYPADKI TESTOWE', 'ZADANIA', 'SŁOWA KLUCZOWE'],
+			"pl": ['USTAWIENIA'],
 			# Portuguese		pt
-			"pt": ['DEFINIÇÕES', 'CASOS DE TESTE', 'TAREFAS', 'PALAVRAS-CHAVE'],
+			"pt": ['DEFINIÇÕES'],
 			# Brazilian Portuguese		pt_br
-			"pt_br": ['CONFIGURAÇÕES', 'CASOS DE TESTE', 'TAREFAS', 'PALAVRAS-CHAVE'],
+			"pt_br": ['CONFIGURAÇÕES'],
 			# Romanian		ro
-			"ro": ['SETARI', 'CAZURI DE TEST', 'SARCINI', 'CUVINTE CHEIE'],
+			"ro": ['SETARI'],
 			# Russian		ru
-			"ru": ['НАСТРОЙКИ', 'ЗАГОЛОВКИ ТЕСТОВ', 'ЗАДАЧА', 'КЛЮЧЕВЫЕ СЛОВА'],
+			"ru": ['НАСТРОЙКИ'],
 			# Swedish		sv
-			"sv": ['INSTÄLLNINGAR', 'TESTFALL', 'TASKAR', 'NYCKELORD'],
+			"sv": ['INSTÄLLNINGAR'],
 			# Thai		th
-			"th": ['การตั้งค่า', 'การทดสอบ', 'งาน', 'คำสั่งเพิ่มเติม'],
+			"th": ['การตั้งค่า'],
 			# Turkish		tr
-			"tr": ['AYARLAR', 'TEST DURUMLARI', 'GÖREVLER', 'ANAHTAR KELIMELER'],
+			"tr": ['AYARLAR'],
 			# Ukrainian		uk
-			"uk": ['НАЛАШТУВАННЯ', 'ТЕСТ-КЕЙСИ', 'ЗАВДАНЬ', 'КЛЮЧОВИХ СЛОВА'],
+			"uk": ['НАЛАШТУВАННЯ'],
 			# Vietnamese		vi
-			"vi": ['CÀI ĐẶT', 'CÁC KỊCH BẢN KIỂM THỬ', 'CÁC NGHIỆM VỤ', 'CÁC TỪ KHÓA'],
+			"vi": ['CÀI ĐẶT'],
 			# Chinese Simplified		zh_cn
-			"zh_cn": ['设置', '用例', '任务', '关键字'],
+			"zh_cn": ['设置'],
 			# Chinese Traditional		zh_tw
-			"zh_tw": ['設置', '案例', '任務', '關鍵字'],
+			"zh_tw": ['設置'],
 			# For future languages
 			# "en": ['SETTINGS', 'TEST CASES', 'TASKS', 'KEYWORDS'],
 		}
 		for section in list(sections.keys()):
 			if sectionname.strip().upper() in sections[section]:
+				base.debugmsg(5, "is_settings:", sectionname, "	Lang:", section)
+				return True
+		return False
+
+	def is_testcases_section(self, sectionname):
+		sections = {
+			"en": ['TEST CASES', 'TEST CASE', 'TASKS', 'TASK'],
+			# Bulgarian		bg
+			"bg": ['ТЕСТОВИ СЛУЧАИ', 'ЗАДАЧИ'],
+			# Bosnian		bs
+			"bs": ['TEST CASES', 'TASKOVI'],
+			# Czech		cs
+			"cs": ['TESTOVACÍ PŘÍPADY', 'ÚLOHY'],
+			# German		de
+			"de": ['TESTFÄLLE', 'AUFGABEN'],
+			# Spanish		es
+			"es": ['CASOS DE PRUEBA', 'TAREAS'],
+			# Finnish		fi
+			"fi": ['TESTIT', 'TEHTÄVÄT'],
+			# French		fr
+			"fr": ['UNITÉS DE TEST', 'TÂCHES'],
+			# Hindi		hi
+			"hi": ['नियत कार्य प्रवेशिका', 'कार्य प्रवेशिका'],
+			# Italian		it
+			"it": ['CASI DI TEST', 'ATTIVITÀ'],
+			# Japanese		ja
+			"ja": ['テスト ケース', 'タスク'],
+			# Dutch		nl
+			"nl": ['TESTGEVALLEN', 'TAKEN'],
+			# Polish		pl
+			"pl": ['PRZYPADKI TESTOWE', 'ZADANIA'],
+			# Portuguese		pt
+			"pt": ['CASOS DE TESTE', 'TAREFAS'],
+			# Brazilian Portuguese		pt_br
+			"pt_br": ['CASOS DE TESTE', 'TAREFAS'],
+			# Romanian		ro
+			"ro": ['CAZURI DE TEST', 'SARCINI'],
+			# Russian		ru
+			"ru": ['ЗАГОЛОВКИ ТЕСТОВ', 'ЗАДАЧА'],
+			# Swedish		sv
+			"sv": ['TESTFALL', 'TASKAR'],
+			# Thai		th
+			"th": ['การทดสอบ', 'งาน'],
+			# Turkish		tr
+			"tr": ['TEST DURUMLARI', 'GÖREVLER'],
+			# Ukrainian		uk
+			"uk": ['ТЕСТ-КЕЙСИ', 'ЗАВДАНЬ'],
+			# Vietnamese		vi
+			"vi": ['CÁC KỊCH BẢN KIỂM THỬ', 'CÁC NGHIỆM VỤ'],
+			# Chinese Simplified		zh_cn
+			"zh_cn": ['用例', '任务'],
+			# Chinese Traditional		zh_tw
+			"zh_tw": ['案例', '任務'],
+			# For future languages
+			# "en": ['SETTINGS', 'TEST CASES', 'TASKS', 'KEYWORDS'],
+		}
+		for section in list(sections.keys()):
+			if sectionname.strip().upper() in sections[section]:
+				base.debugmsg(5, "is_testcases:", sectionname, "	Lang:", section)
+				return True
+		return False
+
+	def is_keywords_section(self, sectionname):
+		sections = {
+			"en": ['KEYWORDS', 'KEYWORD'],
+			# Bulgarian		bg
+			"bg": ['КЛЮЧОВИ ДУМИ'],
+			# Bosnian		bs
+			"bs": ['KEYWORDS'],
+			# Czech		cs
+			"cs": ['KLÍČOVÁ SLOVA'],
+			# German		de
+			"de": ['SCHLÜSSELWÖRTER'],
+			# Spanish		es
+			"es": ['PALABRAS CLAVE'],
+			# Finnish		fi
+			"fi": ['AVAINSANAT'],
+			# French		fr
+			"fr": ['MOTS-CLÉS'],
+			# Hindi		hi
+			"hi": ['कुंजीशब्द'],
+			# Italian		it
+			"it": ['PAROLE CHIAVE'],
+			# Japanese		ja
+			"ja": ['キーワード'],
+			# Dutch		nl
+			"nl": ['SLEUTELWOORDEN'],
+			# Polish		pl
+			"pl": ['SŁOWA KLUCZOWE'],
+			# Portuguese		pt
+			"pt": ['PALAVRAS-CHAVE'],
+			# Brazilian Portuguese		pt_br
+			"pt_br": ['PALAVRAS-CHAVE'],
+			# Romanian		ro
+			"ro": ['CUVINTE CHEIE'],
+			# Russian		ru
+			"ru": ['КЛЮЧЕВЫЕ СЛОВА'],
+			# Swedish		sv
+			"sv": ['NYCKELORD'],
+			# Thai		th
+			"th": ['คำสั่งเพิ่มเติม'],
+			# Turkish		tr
+			"tr": ['ANAHTAR KELIMELER'],
+			# Ukrainian		uk
+			"uk": ['КЛЮЧОВИХ СЛОВА'],
+			# Vietnamese		vi
+			"vi": ['CÁC TỪ KHÓA'],
+			# Chinese Simplified		zh_cn
+			"zh_cn": ['关键字'],
+			# Chinese Traditional		zh_tw
+			"zh_tw": ['關鍵字'],
+			# For future languages
+			# "en": ['SETTINGS', 'TEST CASES', 'TASKS', 'KEYWORDS'],
+		}
+		for section in list(sections.keys()):
+			if sectionname.strip().upper() in sections[section]:
+				base.debugmsg(5, "is_keywords:", sectionname, "	Lang:", section)
 				return True
 		return False
 
@@ -1815,7 +1998,7 @@ class RFSwarmBase:
 			else:
 				return None
 
-	def addScriptRow(self):
+	def addScriptRow(self, *args):
 		base.scriptcount += 1
 
 		row = int("{}".format(base.scriptcount))
@@ -6528,13 +6711,15 @@ class RFSwarmGUI(tk.Frame):
 		tcsection = False
 		tclist = [""]
 		# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
-		regex = r"^\*+[\s]*(Test Case|Task)"
+		# regex = r"^\*+[\s]*(Test Case|Task)"
+		regex = r"^\*{3} ([^\*]*) \*{3}"
 		with open(base.scriptlist[r]["Script"], 'r', encoding="utf8") as f:
 			for line in f:
 				base.debugmsg(9, "sr_test_genlist: tcsection:", tcsection, "	line:", line)
 				if tcsection and line[0:3] == "***":
 					tcsection = False
-				if re.search(regex, line, re.IGNORECASE):
+				m = re.search(regex, line, re.IGNORECASE)
+				if m and base.is_testcases_section(m.group(1)):
 					base.debugmsg(9, "sr_test_genlist: re.search(", regex, ",", line, ")", re.search(regex, line, re.IGNORECASE))
 					tcsection = True
 				if tcsection:
