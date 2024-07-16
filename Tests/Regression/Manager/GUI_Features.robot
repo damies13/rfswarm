@@ -687,6 +687,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 	&{run_settings_data}	Create Dictionary	bind_port_number=8148
 	${manager_ini_file}		Get Manager INI Location
 
+	Log To Console	Writing bindport=${run_settings_data}[bind_port_number] to the manager settings.
 	Click Button	runsettings
 	Change Scenario Wide Settings	${run_settings_data}
 	Sleep	2
@@ -694,21 +695,23 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 	Run Keyword		Close Manager GUI ${platform}
 	Open Manager GUI
 
-	Log To Console	Check if Agent cant connect to the old port number.
+	Log To Console	Check if Agent cant connect to the old port number, Old port number: ${old_port_number}.
 	@{agent_options}	Set Variable	-m	http://localhost:${old_port_number}/
 	Open Agent	${agent_options}
 	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
 	Run Keyword If	${status}	Fail
-	...    msg=The agent has connected to the old port number. Old port number: ${old_port_number}, new: ${run_settings_data}[bind_port_number].
+	...    msg=The agent has connected to the old port number but should not!
+	Log To Console	The Agent did not connect to the Manager with ${old_port_number} port and this was expected.
 	Click Tab	Plan
 	GUI_Common.Stop Agent
 
-	Log To Console	Check if Agent can connect to the new port number.
+	Log To Console	Check if Agent can connect to the new port number. New port number: ${run_settings_data}[bind_port_number].
 	@{agent_options}	Set Variable	-m	http://localhost:${run_settings_data}[bind_port_number]/
 	Open Agent	${agent_options}
 	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
 	Run Keyword If	not ${status}	Fail
-	...    msg=The agent did not connect to the new port number. Old port number: ${old_port_number}, new: ${run_settings_data}[bind_port_number].
+	...    msg=The agent did not connect to the new port number!
+	Log To Console	The Agent has connected to the Manager with ${run_settings_data}[bind_port_number] port and this was expected.
 	Click Tab	Plan
 	
 	[Teardown]	Run Keywords
@@ -729,6 +732,7 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	${manager_ini_file}		Get Manager INI Location
 	&{run_settings_data}	Create Dictionary	bind_ip_address=${ipv4}[0]
 
+	Log To Console	Writing bindip=${ipv4}[0] to the manager settings.
 	Click Button	runsettings
 	Change Scenario Wide Settings	${run_settings_data}
 	Sleep	2
@@ -742,6 +746,7 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
 	Run Keyword If	${status}	Fail
 	...    msg=The agent has connected to the Manager via ${ipv4}[1] but should not!
+	Log To Console	The Agent did not connect to the Manager via ${ipv4}[1] and this was expected.
 	Click Tab	Plan
 	GUI_Common.Stop Agent
 
@@ -751,6 +756,7 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
 	Run Keyword If	not ${status}	Fail
 	...    msg=The agent did not connect to the Manager via ${ipv4}[0]!
+	Log To Console	The Agent has connected to the Manager via ${ipv4}[0] and this was expected.
 	Click Tab	Plan
 
 	[Teardown]	Run Keywords
