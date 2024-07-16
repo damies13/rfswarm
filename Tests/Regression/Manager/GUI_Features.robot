@@ -995,8 +995,6 @@ Verify Disable output.xml - Test Row
 	Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
-# Issue #16 here
-
 Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords
