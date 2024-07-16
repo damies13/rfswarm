@@ -16,7 +16,6 @@ Test
 	@{ip_addresses}=	Get IP addresses
 	Log To Console	${\n}${ip_addresses}
 	FOR  ${ip}  IN  @{ip_addresses}
-		${ip}=	Set Variable	fe80::ce81:b1c:bd2c:69e%utun3
 		@{splitted_ip}=		Split String To Characters	${ip}
 		IF  ':' in @{splitted_ip}
 			IF  '%' in @{splitted_ip}
