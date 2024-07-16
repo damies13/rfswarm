@@ -1,0 +1,25 @@
+name: Check Firewall Status
+
+on: [push]
+
+jobs:
+  check-firewall:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: List Network Interfaces
+        run: |
+          ifconfig -a
+
+      - name: Test IPv6 Connectivity
+        run: |
+          echo "Test IPv6 connectivity"
+          ping6 -c 4 google.com || echo "IPv6 is not working"
+
+      - name: Check firewall status
+        run: |
+          echo "Check firewall status"
+          sudo pfctl -sr
+          sudo pfctl -si
