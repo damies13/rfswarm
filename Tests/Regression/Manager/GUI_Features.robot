@@ -16,9 +16,16 @@ Test
 	@{ip_addresses}=	Get IP addresses
 	Log To Console	${\n}${ip_addresses}
 	FOR  ${ip}  IN  @{ip_addresses}
+		${ip}=	Set Variable	fe80::ce81:b1c:bd2c:69e%utun3
 		@{splitted_ip}=		Split String To Characters	${ip}
 		IF  ':' in @{splitted_ip}
-			@{agent_options}	Set Variable	-m	http://[${ip}]:8138/
+			IF  '%' in @{splitted_ip}
+				@{splitted_ip2}=	Split String	${ip}	separator=%
+				${ip2}=	Set Variable	${splitted_ip2}[0]
+				@{agent_options}	Set Variable	-m	http://[${ip2}]:8138/
+			ELSE
+				@{agent_options}	Set Variable	-m	http://[${ip}]:8138/
+			END
 		ELSE
 			@{agent_options}	Set Variable	-m	http://${ip}:8138/
 		END
