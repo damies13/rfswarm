@@ -645,7 +645,7 @@ Verify If the Port Number And Ip Address Get Written To the INI File
 	Log To Console		${\n}IPV4 address: ${ipv4} ${\n}IPV6 address: ${ipv6}${\n}
 	${manager_ini_file}		Get Manager INI Location
 	&{run_settings_data}	Create Dictionary
-	...    bind_ip_address=${ipv4}
+	...    bind_ip_address=${ipv4}[0]
 	...    bind_port_number=8148
 
 	Click Button	runsettings
@@ -672,7 +672,7 @@ Verify If the Port Number And Ip Address Get Written To the INI File
 	Should Be Equal As Strings 	${manager_ini_file_dict}[Server][bindport] 	${run_settings_data}[bind_port_number]
 
 	[Teardown]	Run Keywords
-	...    Change = ${ipv4} With =${SPACE} In ${manager_ini_file}	AND
+	...    Change = ${ipv4}[0] With =${SPACE} In ${manager_ini_file}	AND
 	...    Change = 8148 With = 8138 In ${manager_ini_file}
 
 Verify If Agent Can't Connect On Old Port Number After Port Number Changed And Can Connect To the New One
