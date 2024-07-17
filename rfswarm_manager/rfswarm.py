@@ -6649,14 +6649,14 @@ class RFSwarmGUI(tk.Frame):
 		tclist = [""]
 		# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
 		# regex = r"^\*+[\s]*(Test Case|Task)"
-		regex = r"^\*{3} ([^\*]*) \*{3}"
+		regex = r"^\*{3}([^\*]*)\*{3}"
 		with open(base.scriptlist[r]["Script"], 'r', encoding="utf8") as f:
 			for line in f:
 				base.debugmsg(9, "sr_test_genlist: tcsection:", tcsection, "	line:", line)
 				if tcsection and line[0:3] == "***":
 					tcsection = False
 				m = re.search(regex, line, re.IGNORECASE)
-				if m and base.is_testcases_section(m.group(1)):
+				if m and base.is_testcases_section(m.group(1).strip()):
 					base.debugmsg(9, "sr_test_genlist: re.search(", regex, ",", line, ")", re.search(regex, line, re.IGNORECASE))
 					tcsection = True
 				if tcsection:
