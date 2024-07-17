@@ -633,6 +633,137 @@ Check If Inject Sleep Option Was Executed in the Test
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove File		${global_path}${/}example.robot
 
+Verify If the Port Number And Ip Address Get Written To the INI File
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Set Test Variable	@{mngr_options}	-g	0						AND
+	...    Open Manager GUI		${mngr_options}
+
+	${ipv4}		${ipv6}		Get IP addresses
+	Log To Console		${\n}IPV4 address: ${ipv4} ${\n}IPV6 address: ${ipv6}${\n}
+	${manager_ini_file}		Get Manager INI Location
+	&{run_settings_data}	Create Dictionary
+	...    bind_ip_address=${ipv4}[0]
+	...    bind_port_number=8148
+
+	Click Button	runsettings
+	Change Scenario Wide Settings	${run_settings_data}
+	Sleep	2
+	Press key.enter 1 Times
+	Run Keyword		Close Manager GUI ${platform}
+	Sleep	2
+	${manager_ini_file_dict}=	Read Ini File	${manager_ini_file}
+	Log		manager ini file dict: ${manager_ini_file_dict}		console=True
+
+	Should Be Equal As Strings 	${manager_ini_file_dict}[Server][bindip] 	${run_settings_data}[bind_ip_address]
+	Should Be Equal As Strings 	${manager_ini_file_dict}[Server][bindport] 	${run_settings_data}[bind_port_number]
+
+	Log To Console	${\n}The bindip and bindport heve been saved to the ini file, now check if it will be applied to the manager after restarting.${\n}
+	Open Manager GUI
+	Click Button	runsettings
+	Click Button	ok
+	Sleep	2
+	Press key.enter 1 Times
+	Run Keyword		Close Manager GUI ${platform}
+
+	Should Be Equal As Strings 	${manager_ini_file_dict}[Server][bindip] 	${run_settings_data}[bind_ip_address]
+	Should Be Equal As Strings 	${manager_ini_file_dict}[Server][bindport] 	${run_settings_data}[bind_port_number]
+
+	[Teardown]	Run Keywords
+	...    Change = ${ipv4}[0] With =${SPACE} In ${manager_ini_file}	AND
+	...    Change = 8148 With = 8138 In ${manager_ini_file}
+
+Verify If Agent Can't Connect On Old Port Number After Port Number Changed And Can Connect To the New One
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Set Test Variable	@{mngr_options}	-g	0						AND
+	...    Open Manager GUI		${mngr_options}
+
+	${old_port_number}=		Set Variable	8138
+	&{run_settings_data}	Create Dictionary	bind_port_number=8148
+	${manager_ini_file}		Get Manager INI Location
+
+	Log To Console	Writing bindport=${run_settings_data}[bind_port_number] to the manager settings.
+	Click Button	runsettings
+	Change Scenario Wide Settings	${run_settings_data}
+	Sleep	2
+	Press key.enter 1 Times
+	Run Keyword		Close Manager GUI ${platform}
+	Open Manager GUI
+
+	Log To Console	Check if Agent cant connect to the old port number, Old port number: ${old_port_number}.
+	@{agent_options}	Set Variable	-m	http://localhost:${old_port_number}/
+	Open Agent	${agent_options}
+	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
+	Run Keyword If	${status}	Fail
+	...    msg=The agent has connected to the old port number but should not!
+	Log To Console	The Agent did not connect to the Manager with ${old_port_number} port and this was expected.
+	Click Tab	Plan
+	GUI_Common.Stop Agent
+
+	Log To Console	Check if Agent can connect to the new port number. New port number: ${run_settings_data}[bind_port_number].
+	@{agent_options}	Set Variable	-m	http://localhost:${run_settings_data}[bind_port_number]/
+	Open Agent	${agent_options}
+	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
+	Run Keyword If	not ${status}	Fail
+	...    msg=The agent did not connect to the new port number!
+	Log To Console	The Agent has connected to the Manager with ${run_settings_data}[bind_port_number] port and this was expected.
+	Click Tab	Plan
+	
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    GUI_Common.Stop Agent							AND
+	...    Change = 8148 With = 8138 In ${manager_ini_file}
+
+Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Address On the Manager's Host
+	[Tags]	windows-latest	ubuntu-latest	Issue #16
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Set Test Variable	@{mngr_options}	-g	0						AND
+	...    Open Manager GUI		${mngr_options}
+
+	${ipv4}		${ipv6}		Get IP addresses
+	Log To Console		${\n}IPV4 address: ${ipv4} ${\n}IPV6 address: ${ipv6}${\n}
+	${manager_ini_file}		Get Manager INI Location
+	&{run_settings_data}	Create Dictionary	bind_ip_address=${ipv4}[0]
+
+	Log To Console	Writing bindip=${ipv4}[0] to the manager settings.
+	Click Button	runsettings
+	Change Scenario Wide Settings	${run_settings_data}
+	Sleep	2
+	Press key.enter 1 Times
+	Run Keyword		Close Manager GUI ${platform}
+	Open Manager GUI
+
+	Log To Console	Check if Agent cant connect to the Manager via ${ipv4}[1] instead of ${ipv4}[0].
+	@{agent_options}	Set Variable	-m	http://${ipv4}[1]:8138/
+	Open Agent	${agent_options}
+	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
+	Run Keyword If	${status}	Fail
+	...    msg=The agent has connected to the Manager via ${ipv4}[1] but should not!
+	Log To Console	The Agent did not connect to the Manager via ${ipv4}[1] and this was expected.
+	Click Tab	Plan
+	GUI_Common.Stop Agent
+
+	Log To Console	Check if Agent can connect to the Manager via ${ipv4}[0].
+	@{agent_options}	Set Variable	-m	http://${ipv4}[0]:8138/
+	Open Agent	${agent_options}
+	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
+	Run Keyword If	not ${status}	Fail
+	...    msg=The agent did not connect to the Manager via ${ipv4}[0]!
+	Log To Console	The Agent has connected to the Manager via ${ipv4}[0] and this was expected.
+	Click Tab	Plan
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    GUI_Common.Stop Agent							AND
+	...    Change = ${ipv4}[0] With =${SPACE} In ${manager_ini_file}
+
 Verify Disable log.html - Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
@@ -1286,6 +1417,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 		END
 	END
 
+	Sleep	5
 	Verify Test Result Directory Name	${result_dir_name}		${scenario_name}	${current_date}
 	Verify Generated Run Result Files	${result_dir_name}		${scenario_name}
 
@@ -1331,6 +1463,7 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
 	Length Should Be	${run_result_dirs}	1	msg=The test run result dir was not created or created unexpected directories!
 
+	Sleep	5
 	Verify Test Result Directory Name	${run_result_dirs}[0]	${scenario_name}	${current_date}
 	Verify Generated Run Result Files	${run_result_dirs}[0]	${scenario_name}
 

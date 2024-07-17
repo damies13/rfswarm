@@ -9,6 +9,7 @@ Library		XML
 Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
 Library 	IniFile.py
+Library 	GetIpAddress.py
 
 *** Variables ***
 ${platform}		None
@@ -202,9 +203,10 @@ Utilisation Stats
 	Log 	${proc}
 
 Check If The Agent Is Ready
+	[Arguments] 	${timeout}=300
 	Sleep	1
 	Click Tab	Agents
-	Wait For 	manager_${platform}_agents_ready.png	timeout=300
+	Wait For 	manager_${platform}_agents_ready.png	timeout=${timeout}
 
 Check If the Robot Failed
 	[Arguments] 	${expected_time}
