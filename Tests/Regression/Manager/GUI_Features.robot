@@ -10,6 +10,36 @@ Suite Setup 	Set Platform
 ${scenario_name}=	test_scenario
 
 *** Test Cases ***
+Verify the Field Validation Is Working In the Manager Plan Screen
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #126
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Open Manager GUI													AND
+	...    Create Robot File	name=example.robot	file_content=***Test Case***\nExample Test Case\n
+
+	@{scenario_names_list}=	Create List		robots  rampup  run  test  script  all
+
+	FOR  ${name}  IN  @{scenario_names_list}
+		${scenarioname}=	Set Variable	Issue-#126_${name}
+		${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#126${/}${scenarioname}.rfs
+
+		Copy File	${scenariofile}		${global_path}
+		Click Button	runopen
+		Open Scenario File OS DIALOG	${scenario_name}
+		Press key.enter 1 Times
+		Click Button	runplay
+		Sleep	2
+		Take A Screenshot	#del later
+		Press key.enter 1 Times
+		Delete Scenario File	${scenario_name}
+
+	END
+
+	[Teardown]	Run Keywords
+	...    Delete Robot File	${robot_data}[0]			AND
+	...    Run Keyword		Close Manager GUI ${platform}
+
 Verify That Files Get Saved With Correct Extension And Names
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #39
 	[Setup]	Run Keywords
