@@ -1376,7 +1376,7 @@ class RFSwarmBase:
 					base.debugmsg(9, "line", line)
 					try:
 						if line.strip()[:1] != "#":
-							linearr = re.split(r'\s{2,}', line.strip())
+							linearr = re.split(r'(\s{2,}|\t+| \| )', line.strip())
 							base.debugmsg(8, "linearr", linearr)
 							resfile = None
 							# if len(linearr) > 1 and linearr[0].upper() in ['RESOURCE', 'VARIABLES', 'LIBRARY']:
