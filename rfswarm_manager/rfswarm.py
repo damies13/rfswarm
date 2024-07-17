@@ -1376,19 +1376,19 @@ class RFSwarmBase:
 					base.debugmsg(9, "line", line)
 					try:
 						if line.strip()[:1] != "#":
-							linearr = re.split(r'(\s{2,}|\t+| \| )', line.strip())
+							linearr = [s for s in re.split(r"( \s+|\t+|\s+\|\s+)", line.strip()) if len(s.strip()) > 0]
 							base.debugmsg(8, "linearr", linearr)
 							resfile = None
 							# if len(linearr) > 1 and linearr[0].upper() in ['RESOURCE', 'VARIABLES', 'LIBRARY']:
 							if len(linearr) > 1 and self.is_resfile_prefix(linearr[0]):
-								base.debugmsg(9, "linearr[1]", linearr[1])
+								base.debugmsg(7, "linearr[1]", linearr[1], "	linearr:", linearr)
 								resfile = linearr[1]
 							if not resfile and len(linearr) > 2 and self.is_resfile_prefix(linearr[0] + "_" + linearr[1]):
-								base.debugmsg(9, "linearr[2]", linearr[2])
+								base.debugmsg(7, "linearr[2]", linearr[2], "	linearr:", linearr)
 								resfile = linearr[2]
 
 							if resfile:
-								base.debugmsg(8, "resfile", resfile)
+								base.debugmsg(7, "resfile", resfile)
 								# here we are assuming the resfile is a relative path! should we also consider files with full local paths?
 								# Issue #129 Handle ``${CURDIR}/``
 								if resfile.find("${") > -1:
