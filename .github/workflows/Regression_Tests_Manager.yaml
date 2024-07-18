@@ -61,6 +61,29 @@ jobs:
           sleep 1
           # fluxbox
           fluxbox &
+      - name: "MacOS Install tesseract"
+        if: ${{ matrix.platform == 'macos-latest' }}
+        run: |
+          brew install tesseract
+      - name: "Windows Download Tesseract"
+        if: ${{ matrix.platform == 'windows-latest' }}
+        shell: pwsh
+        run: >
+          Invoke-WebRequest
+          -Uri "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.3.1.20230401.exe"
+          -OutFile "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe"
+      - name: "Windows Install Tesseract"
+        if: ${{ matrix.platform == 'windows-latest' }}
+        shell: cmd
+        run: |
+          "%Temp%\tesseract-ocr-w64-setup-5.3.1.20230401.exe" /S
+      - name: "Windows Add Tesseract to Path"
+        if: ${{ matrix.platform == 'windows-latest' }}
+        shell: pwsh
+        run: |
+          echo "$($ENV:ProgramFiles)\Tesseract-OCR" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: "Verify tesseract"
+        run: tesseract -v
 
       - name: Update Robot Tag
         shell: python

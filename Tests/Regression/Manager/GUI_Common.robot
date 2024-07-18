@@ -9,6 +9,8 @@ Library		XML
 Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
 Library 	IniFile.py
+Library 	ActiveWindowScreenshot.py
+Library 	FindTargetSentenceProbability.py
 
 *** Variables ***
 ${platform}		None
@@ -1046,3 +1048,32 @@ Verify Generated Run Result Files
 	${len}=		Get Length	${logs_file_names}
 	Log To Console	Number of files in the Logs directory: ${len}
 	Should Be True	${len} >= 20	msg=Number of files in the Logs directory is incorrect: should be at least 20, actual: "${len}".
+
+Find Text
+	[Arguments]		${mytext}	${confidence}
+	${active_window_path}=	Set Variable	${OUTPUT DIR}${/}active_window_screenshot.png
+	Get Screenshot Of The Active Window		${active_window_path}
+	${best_subsequence}  ${best_similarity}		Find Target Sentence Similarity		${active_window_path}  ${mytext}
+	Log To Console	Best found subsequence: "${best_subsequence}""
+	Log To Console	Sentence: "${mytext}" has ${best_similarity} similarity.
+	IF 	${${best_similarity}} >= ${${confidence}}
+		Log To Console	"${mytext}" successfully found with ${confidence} confidence value.
+	ELSE
+		Fail	"${mytext}" Not found on the screen with ${confidence} confidence value.
+	END
+	#${img}=		Screenshot.Take Screenshot		name=current_page	width=2000
+	#Log 	${img}
+	# ${processed_img}= 	Read Image 	${OUTPUT DIR}${/}active_window_screenshot.png
+	# @{splitted_text}=	Split String	${mytext}	separator=${SPACE}
+	# Log		Analysing each word in a sentence "${mytext}":
+	# FOR  ${word}  IN  @{splitted_text}
+	# 	${bounds}= 	Validate Image Content 	${processed_img} 	${word}
+	# 	Log 	${bounds}
+	# 	IF 	${bounds}
+	# 		Log		"${word}" successfully found.
+	# 	ELSE
+	# 		Fail	"${word}" Not found on the screen.
+	# 	END
+
+	# END
+	
