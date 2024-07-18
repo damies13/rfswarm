@@ -15,10 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Run Super-Linter
-        uses: github/super-linter@v4
+        uses: github/super-linter@v6
         env:
           DEFAULT_BRANCH: main
           FILTER_REGEX_EXCLUDE: (.*sh|.git/.*|.Doc/Images/.*|.Tests/.*/Logs/.*|.Tests/.*/testdata/.*)

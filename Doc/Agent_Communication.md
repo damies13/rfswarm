@@ -132,11 +132,11 @@ Response Body:
     "Abort": false,
     "UploadMode": "err",
     "EnvironmentVariables": {
-        "RF_DIRECTORY": {
+        "user_path_var": {
             "vartype": "path",
-            "value": "rf_dir"
+            "value": "user_dir"
         },
-        "RF_MAGICNUM": {
+        "user_var": {
             "vartype": "value",
             "value": "TWELVE"
         }
