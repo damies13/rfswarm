@@ -492,7 +492,7 @@ class RFSwarmBase:
 	run_threads: Any = {}
 	total_robots = 0
 	robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}, "Start": 0}
-	envvars = {}
+	envvars: Any = {}
 	agentserver = None
 	agenthttpserver = None
 	updatethread = None
@@ -1252,7 +1252,7 @@ class RFSwarmBase:
 		if envvar in list(os.environ.keys()):
 			envvalue = os.environ[envvar]
 			base.debugmsg(7, "envvar:", envvar, "	envvalue:", envvalue)
-			if  os.path.exists(envvalue):
+			if os.path.exists(envvalue):
 				vartype = "path"
 				envvalue = base.get_relative_path(base.config['Plan']['ScriptDir'], envvalue)
 			base.debugmsg(5, "envvar:", envvar, "	vartype:", vartype, "	envvalue:", envvalue)
