@@ -822,6 +822,27 @@ class RFSwarmAgent():
 			jsonresp = json.loads(r.text)
 			self.debugmsg(7, "getjobs: jsonresp:", jsonresp)
 
+			# RFSwarmAgent: getjobs(821): [7:7]	 getjobs: r.text: {"AgentName": "hp-elite-desk-800-g3", "StartTime": 0, "EndTime": 0, "RunName": "", "Abort": false, "UploadMode": "err", "EnvironmentVariables": {"RF_DIRECTORY": {"vartype": "path", "value": "rf_dir"}, "RF_MAGICNUM": {"vartype": "value", "value": "TWELVE"}}, "Schedule": {}}
+			# "EnvironmentVariables": {"RF_DIRECTORY": {"vartype": "path", "value": "rf_dir"}, "RF_MAGICNUM": {"vartype": "value", "value": "TWELVE"}},
+			if "EnvironmentVariables" in jsonresp:
+				for envvar in list(jsonresp["EnvironmentVariables"].keys()):
+					self.debugmsg(7, "envvar:", envvar, ":", jsonresp["EnvironmentVariables"][envvar])
+					localval = ""
+					if "vartype" in jsonresp["EnvironmentVariables"][envvar] and jsonresp["EnvironmentVariables"][envvar]["vartype"] == "path":
+						localval = os.path.abspath(os.path.join(self.scriptdir, jsonresp["EnvironmentVariables"][envvar]["value"]))
+						self.debugmsg(5, 'localval:', localval)
+					else:
+						if "value" in jsonresp["EnvironmentVariables"][envvar]:
+							localval = jsonresp["EnvironmentVariables"][envvar]["value"]
+					if envvar in list(os.environ.keys()):
+						# envvalue = os.environ[envvar]
+						if os.environ[envvar] != localval:
+							os.environ[envvar] = localval
+							self.debugmsg(1, "Setting Environment Variable:", envvar, "=", localval)
+					else:
+						os.environ[envvar] = localval
+						self.debugmsg(1, "Setting Environment Variable:", envvar, "=", localval)
+
 			if jsonresp["StartTime"] < int(time.time()) < (jsonresp["EndTime"] + 300):
 				self.isrunning = True
 				self.run_name = jsonresp["RunName"]
