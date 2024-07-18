@@ -1376,20 +1376,19 @@ class RFSwarmBase:
 					base.debugmsg(9, "line", line)
 					try:
 						if line.strip()[:1] != "#":
-							linearr = line.strip().split()
+							linearr = [s for s in re.split(r"( \s+|\t+|\s+\|\s+)", line.strip()) if len(s.strip()) > 0]
 							base.debugmsg(8, "linearr", linearr)
 							resfile = None
-							if len(linearr) > 1 and linearr[0].upper() in ['RESOURCE', 'VARIABLES', 'LIBRARY']:
-								base.debugmsg(9, "linearr[1]", linearr[1])
+							# if len(linearr) > 1 and linearr[0].upper() in ['RESOURCE', 'VARIABLES', 'LIBRARY']:
+							if len(linearr) > 1 and self.is_resfile_prefix(linearr[0]):
+								base.debugmsg(7, "linearr[1]", linearr[1], "	linearr:", linearr)
 								resfile = linearr[1]
-							if not resfile and len(linearr) > 2 and (linearr[0].upper() == 'METADATA' and linearr[1].upper() == 'FILE'):
-								base.debugmsg(9, "linearr[2]", linearr[2])
+							if not resfile and len(linearr) > 2 and self.is_resfile_prefix(linearr[0] + "_" + linearr[1]):
+								base.debugmsg(7, "linearr[2]", linearr[2], "	linearr:", linearr)
 								resfile = linearr[2]
-							if not resfile and len(linearr) > 2 and (linearr[0].upper() == 'IMPORT' and linearr[1].upper() == 'LIBRARY'):
-								base.debugmsg(9, "linearr[2]", linearr[2])
-								resfile = linearr[2]
+
 							if resfile:
-								base.debugmsg(8, "resfile", resfile)
+								base.debugmsg(7, "resfile", resfile)
 								# here we are assuming the resfile is a relative path! should we also consider files with full local paths?
 								# Issue #129 Handle ``${CURDIR}/``
 								if resfile.find("${") > -1:
@@ -1424,7 +1423,7 @@ class RFSwarmBase:
 				match = re.search(r'\*+([^*\v]+)', line)
 				if match is not None:
 					base.debugmsg(6, "match.group(0)", match.group(0), "match.group(1)", match.group(1))
-					if match.group(1).strip().upper() in ['SETTINGS', 'SETTING', 'TEST CASES', 'TEST CASE', 'TASKS', 'TASK', 'KEYWORDS', 'KEYWORD']:
+					if self.is_section_to_check(match.group(1)):
 						checking = True
 
 		if len(filequeue) > 0:
@@ -1448,6 +1447,248 @@ class RFSwarmBase:
 					if fileext.lower() in ['.robot', '.resource']:
 						t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
 						t.start()
+
+	def is_resfile_prefix(self, prefixname):
+		base.debugmsg(5, "prefixname:", prefixname)
+		prefixs = {
+			"en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+			# Bulgarian		bg
+			"bg": ['РЕСУРС', 'ПРОМЕНЛИВА', 'БИБЛИОТЕКА', 'МЕТАДАННИ_FILE', 'МЕТАДАННИ_ФАЙЛ', 'ВНОС_БИБЛИОТЕКА'],
+			# Bosnian		bs
+			"bs": ['RESURSI', 'VARIJABLE', 'BIBLIOTEKA', 'METADATA_FILE', 'METADATA_FILE', 'UVOZ_BIBLIOTEKA'],
+			# Czech		cs
+			"cs": ['ZDROJ', 'PROMĚNNÁ', 'KNIHOVNA', 'METADATA_FILE', 'METADATA_SOUBOR', 'IMPORT_KNIHOVNA'],
+			# German		de
+			"de": ['RESSOURCE', 'VARIABLEN', 'BIBLIOTHEK', 'METADATEN_FILE', 'METADATEN_DATEI', 'IMPORTIEREN_BIBLIOTHEK'],
+			# Spanish		es
+			"es": ['RECURSOS', 'VARIABLE', 'BIBLIOTECA', 'METADATOS_FILE', 'METADATOS_ARCHIVO', 'IMPORTAR_BIBLIOTECA'],
+			# Finnish		fi
+			"fi": ['RESURSSI', 'MUUTTUJAT', 'KIRJASTO', 'METATIEDOT_FILE', 'METATIEDOT_TIEDOSTO', 'TUONTI_KIRJASTO'],
+			# French		fr
+			"fr": ['RESSOURCE', 'VARIABLE', 'BIBLIOTHÈQUE', 'MÉTA-DONNÉE_FILE', 'MÉTA-DONNÉE_DÉPOSER', 'IMPORTER_BIBLIOTHÈQUE'],
+			# Hindi		hi
+			"hi": ['संसाधन', 'चर', 'कोड़ प्रतिबिंब संग्रह', 'अधि-आंकड़ा_FILE', 'अधि-आंकड़ा_फ़ाइल', 'आयात करें_कोड़ प्रतिबिंब संग्रह'],
+			# Italian		it
+			"it": ['RISORSA', 'VARIABILE', 'LIBRERIA', 'METADATI_FILE', 'METADATI_FILE', 'IMPORTARE_LIBRERIA'],
+			# Japanese		ja
+			"ja": ['リソース', '変数', 'ライブラリ', 'メタデータ_FILE', 'メタデータ_ファイル', 'インポート_ライブラリ'],
+			# Dutch		nl
+			"nl": ['RESOURCE', 'VARIABELE', 'BIBLIOTHEEK', 'METADATA_FILE', 'METADATA_BESTAND', 'IMPORTEREN_BIBLIOTHEEK'],
+			# Polish		pl
+			"pl": ['ZASÓB', 'ZMIENNE', 'BIBLIOTEKA', 'METADANE_FILE', 'METADANE_PLIK', 'IMPORT_BIBLIOTEKA'],
+			# Portuguese		pt
+			"pt": ['RECURSO', 'VARIÁVEL', 'BIBLIOTECA', 'METADADOS_FILE', 'METADADOS_FICHEIRO', 'IMPORTAÇÃO_BIBLIOTECA'],
+			# Brazilian Portuguese		pt_br
+			"pt_br": ['RECURSO', 'VARIÁVEL', 'BIBLIOTECA', 'METADADOS_FILE', 'METADADOS_ARQUIVO', 'IMPORTAR_BIBLIOTECA'],
+			# Romanian		ro
+			"ro": ['RESURSA', 'VARIABILA', 'LIBRARIE', 'METADATE_FILE', 'METADATE_FIŞIER', 'IMPORT_LIBRARIE'],
+			# Russian		ru
+			"ru": ['РЕСУРС', 'ПЕРЕМЕННЫЕ', 'БИБЛИОТЕКА', 'МЕТАДАННЫЕ_FILE', 'МЕТАДАННЫЕ_ФАЙЛ', 'ИМПОРТ_БИБЛИОТЕКА'],
+			# Swedish		sv
+			"sv": ['RESURS', 'VARIABEL', 'BIBLIOTEK', 'METADATA_FILE', 'METADATA_FIL', 'IMPORTERA_BIBLIOTEK'],
+			# Thai		th
+			"th": ['ไฟล์ที่ใช้', 'ชุดตัวแปร', 'ชุดคำสั่งที่ใช้', 'รายละเอียดเพิ่มเติม_FILE', 'รายละเอียดเพิ่มเติม_ไฟล์', 'นำเข้า_ชุดคำสั่งที่ใช้'],
+			# Turkish		tr
+			"tr": ['KAYNAK', 'DEĞIŞKENLER', 'KÜTÜPHANE', 'ÜSTVERI_FILE', 'ÜSTVERI_DOSYA', 'İÇE AKTARMAK_KÜTÜPHANE'],
+			# Ukrainian		uk
+			"uk": ['РЕСУРС', 'ЗМІННА', 'БІБЛІОТЕКА', 'МЕТАДАНІ_FILE', 'МЕТАДАНІ_ФАЙЛ', 'ІМПОРТ_БІБЛІОТЕКА'],
+			# Vietnamese		vi
+			"vi": ['TÀI NGUYÊN', 'BIẾN SỐ', 'THƯ VIỆN', 'DỮ LIỆU THAM CHIẾU_FILE', 'DỮ LIỆU THAM CHIẾU_TÀI LIỆU', 'NHẬP KHẨU_THƯ VIỆN'],
+			# Chinese Simplified		zh_cn
+			"zh_cn": ['资源文件', '变量文件', '程序库', '元数据_FILE', '元数据_文件', '导入_程序库'],
+			# Chinese Traditional		zh_tw
+			"zh_tw": ['資源文件', '變量文件', '函式庫', '元數據_FILE', '元數據_文件', '進口_函式庫'],
+			# For future languages
+			# "en": ['RESOURCE', 'VARIABLES', 'LIBRARY', 'METADATA_FILE', 'METADATA_FILE', 'IMPORT_LIBRARY'],
+		}
+		for prefix in list(prefixs.keys()):
+			if prefixname.strip().upper() in prefixs[prefix]:
+				base.debugmsg(5, "is_resfile_prefix:", prefixname, "	Lang:", prefix)
+				return True
+		return False
+
+	def is_section_to_check(self, sectionname):
+		if self.is_settings_section(sectionname):
+			return True
+		if self.is_testcases_section(sectionname):
+			return True
+		if self.is_keywords_section(sectionname):
+			return True
+		return False
+
+	def is_settings_section(self, sectionname):
+		sections = {
+			"en": ['SETTINGS', 'SETTING'],
+			# Bulgarian		bg
+			"bg": ['НАСТРОЙКИ'],
+			# Bosnian		bs
+			"bs": ['POSTAVKE'],
+			# Czech		cs
+			"cs": ['NASTAVENÍ'],
+			# German		de
+			"de": ['EINSTELLUNGEN'],
+			# Spanish		es
+			"es": ['CONFIGURACIONES'],
+			# Finnish		fi
+			"fi": ['ASETUKSET'],
+			# French		fr
+			"fr": ['PARAMÈTRES'],
+			# Hindi		hi
+			"hi": ['स्थापना'],
+			# Italian		it
+			"it": ['IMPOSTAZIONI'],
+			# Japanese		ja
+			"ja": ['設定'],
+			# Dutch		nl
+			"nl": ['INSTELLINGEN'],
+			# Polish		pl
+			"pl": ['USTAWIENIA'],
+			# Portuguese		pt
+			"pt": ['DEFINIÇÕES'],
+			# Brazilian Portuguese		pt_br
+			"pt_br": ['CONFIGURAÇÕES'],
+			# Romanian		ro
+			"ro": ['SETARI'],
+			# Russian		ru
+			"ru": ['НАСТРОЙКИ'],
+			# Swedish		sv
+			"sv": ['INSTÄLLNINGAR'],
+			# Thai		th
+			"th": ['การตั้งค่า'],
+			# Turkish		tr
+			"tr": ['AYARLAR'],
+			# Ukrainian		uk
+			"uk": ['НАЛАШТУВАННЯ'],
+			# Vietnamese		vi
+			"vi": ['CÀI ĐẶT'],
+			# Chinese Simplified		zh_cn
+			"zh_cn": ['设置'],
+			# Chinese Traditional		zh_tw
+			"zh_tw": ['設置'],
+			# For future languages
+			# "en": ['SETTINGS', 'TEST CASES', 'TASKS', 'KEYWORDS'],
+		}
+		for section in list(sections.keys()):
+			if sectionname.strip().upper() in sections[section]:
+				base.debugmsg(5, "is_settings:", sectionname, "	Lang:", section)
+				return True
+		return False
+
+	def is_testcases_section(self, sectionname):
+		sections = {
+			"en": ['TEST CASES', 'TEST CASE', 'TASKS', 'TASK'],
+			# Bulgarian		bg
+			"bg": ['ТЕСТОВИ СЛУЧАИ', 'ЗАДАЧИ'],
+			# Bosnian		bs
+			"bs": ['TEST CASES', 'TASKOVI'],
+			# Czech		cs
+			"cs": ['TESTOVACÍ PŘÍPADY', 'ÚLOHY'],
+			# German		de
+			"de": ['TESTFÄLLE', 'AUFGABEN'],
+			# Spanish		es
+			"es": ['CASOS DE PRUEBA', 'TAREAS'],
+			# Finnish		fi
+			"fi": ['TESTIT', 'TEHTÄVÄT'],
+			# French		fr
+			"fr": ['UNITÉS DE TEST', 'TÂCHES'],
+			# Hindi		hi
+			"hi": ['नियत कार्य प्रवेशिका', 'कार्य प्रवेशिका'],
+			# Italian		it
+			"it": ['CASI DI TEST', 'ATTIVITÀ'],
+			# Japanese		ja
+			"ja": ['テスト ケース', 'タスク'],
+			# Dutch		nl
+			"nl": ['TESTGEVALLEN', 'TAKEN'],
+			# Polish		pl
+			"pl": ['PRZYPADKI TESTOWE', 'ZADANIA'],
+			# Portuguese		pt
+			"pt": ['CASOS DE TESTE', 'TAREFAS'],
+			# Brazilian Portuguese		pt_br
+			"pt_br": ['CASOS DE TESTE', 'TAREFAS'],
+			# Romanian		ro
+			"ro": ['CAZURI DE TEST', 'SARCINI'],
+			# Russian		ru
+			"ru": ['ЗАГОЛОВКИ ТЕСТОВ', 'ЗАДАЧА'],
+			# Swedish		sv
+			"sv": ['TESTFALL', 'TASKAR'],
+			# Thai		th
+			"th": ['การทดสอบ', 'งาน'],
+			# Turkish		tr
+			"tr": ['TEST DURUMLARI', 'GÖREVLER'],
+			# Ukrainian		uk
+			"uk": ['ТЕСТ-КЕЙСИ', 'ЗАВДАНЬ'],
+			# Vietnamese		vi
+			"vi": ['CÁC KỊCH BẢN KIỂM THỬ', 'CÁC NGHIỆM VỤ'],
+			# Chinese Simplified		zh_cn
+			"zh_cn": ['用例', '任务'],
+			# Chinese Traditional		zh_tw
+			"zh_tw": ['案例', '任務'],
+			# For future languages
+			# "en": ['SETTINGS', 'TEST CASES', 'TASKS', 'KEYWORDS'],
+		}
+		for section in list(sections.keys()):
+			if sectionname.strip().upper() in sections[section]:
+				base.debugmsg(5, "is_testcases:", sectionname, "	Lang:", section)
+				return True
+		return False
+
+	def is_keywords_section(self, sectionname):
+		sections = {
+			"en": ['KEYWORDS', 'KEYWORD'],
+			# Bulgarian		bg
+			"bg": ['КЛЮЧОВИ ДУМИ'],
+			# Bosnian		bs
+			"bs": ['KEYWORDS'],
+			# Czech		cs
+			"cs": ['KLÍČOVÁ SLOVA'],
+			# German		de
+			"de": ['SCHLÜSSELWÖRTER'],
+			# Spanish		es
+			"es": ['PALABRAS CLAVE'],
+			# Finnish		fi
+			"fi": ['AVAINSANAT'],
+			# French		fr
+			"fr": ['MOTS-CLÉS'],
+			# Hindi		hi
+			"hi": ['कुंजीशब्द'],
+			# Italian		it
+			"it": ['PAROLE CHIAVE'],
+			# Japanese		ja
+			"ja": ['キーワード'],
+			# Dutch		nl
+			"nl": ['SLEUTELWOORDEN'],
+			# Polish		pl
+			"pl": ['SŁOWA KLUCZOWE'],
+			# Portuguese		pt
+			"pt": ['PALAVRAS-CHAVE'],
+			# Brazilian Portuguese		pt_br
+			"pt_br": ['PALAVRAS-CHAVE'],
+			# Romanian		ro
+			"ro": ['CUVINTE CHEIE'],
+			# Russian		ru
+			"ru": ['КЛЮЧЕВЫЕ СЛОВА'],
+			# Swedish		sv
+			"sv": ['NYCKELORD'],
+			# Thai		th
+			"th": ['คำสั่งเพิ่มเติม'],
+			# Turkish		tr
+			"tr": ['ANAHTAR KELIMELER'],
+			# Ukrainian		uk
+			"uk": ['КЛЮЧОВИХ СЛОВА'],
+			# Vietnamese		vi
+			"vi": ['CÁC TỪ KHÓA'],
+			# Chinese Simplified		zh_cn
+			"zh_cn": ['关键字'],
+			# Chinese Traditional		zh_tw
+			"zh_tw": ['關鍵字'],
+			# For future languages
+			# "en": ['SETTINGS', 'TEST CASES', 'TASKS', 'KEYWORDS'],
+		}
+		for section in list(sections.keys()):
+			if sectionname.strip().upper() in sections[section]:
+				base.debugmsg(5, "is_keywords:", sectionname, "	Lang:", section)
+				return True
+		return False
 
 	def check_files_changed(self):
 		# self.scriptfiles[hash]
@@ -6407,13 +6648,15 @@ class RFSwarmGUI(tk.Frame):
 		tcsection = False
 		tclist = [""]
 		# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
-		regex = r"^\*+[\s]*(Test Case|Task)"
+		# regex = r"^\*+[\s]*(Test Case|Task)"
+		regex = r"^\*{3}([^\*]*)\*{3}"
 		with open(base.scriptlist[r]["Script"], 'r', encoding="utf8") as f:
 			for line in f:
 				base.debugmsg(9, "sr_test_genlist: tcsection:", tcsection, "	line:", line)
 				if tcsection and line[0:3] == "***":
 					tcsection = False
-				if re.search(regex, line, re.IGNORECASE):
+				m = re.search(regex, line, re.IGNORECASE)
+				if m and base.is_testcases_section(m.group(1).strip()):
 					base.debugmsg(9, "sr_test_genlist: re.search(", regex, ",", line, ")", re.search(regex, line, re.IGNORECASE))
 					tcsection = True
 				if tcsection:

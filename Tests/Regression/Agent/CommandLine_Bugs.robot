@@ -23,8 +23,8 @@ Exclude Libraries With Spaces
 	${dbfile}= 	Find Result DB
 	# Query Result DB 	${dbfile} 	Select * from Results
 	# ${result}= 	Query Result DB 	${dbfile} 	Select * from ResultSummary;
-	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
-	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from ResultSummary;
+	${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;
+	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from Summary;
 	Should Be True	${result[0][0]} > 0
 	Should Be Equal As Numbers	${result[0][0]} 	4
 
@@ -50,8 +50,8 @@ Run agent with -x (xml mode)
 	${dbfile}= 	Find Result DB
 	# Query Result DB 	${dbfile} 	Select * from Results
 	# ${result}= 	Query Result DB 	${dbfile} 	Select * from ResultSummary;
-	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
-	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from ResultSummary;
+	${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;
+	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from Summary;
 	Should Be True	${result[0][0]} > 0
 	Should Be Equal As Numbers	${result[0][0]} 	4
 

@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.0 (Python 3.10.12 on linux)" generated="2024-06-01T14:46:40.848350" rpa="false" schemaversion="5">
+<suite id="s1" name="Getimages" source="/home/dave/Documents/Github/rfswarm/Tests/Regression/Manager/testdata/Issue-#238/language/images/getimages.robot">
+<test id="s1-t1" name="Dutch" line="19">
+<kw name="Get Images For Language">
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-06-01T14:46:40.937230" level="INFO">nl</msg>
+<arg>${langcode}</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-06-01T14:46:40.936874" elapsed="0.000474"/>
+</kw>
+<kw name="Get Image URL For Language">
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:40.938362" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/png/yellowish-yellow.png</msg>
+<var>${url}</var>
+<arg>https://dynamic-image.vercel.app/api/generate/${filetype}/yellowish-yellow.${filetype}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:40.938094" elapsed="0.000300"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:40.938822" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/png/yellowish-yellow.png?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%25...</msg>
+<var>${url}</var>
+<arg>${url}?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%255Bblue%255D.svg</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:40.938537" elapsed="0.000317"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:40.939365" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/png/yellowish-yellow.png?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%25...</msg>
+<var>${url}</var>
+<arg>${url}&amp;title=lang_${langcode}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:40.939004" elapsed="0.000397"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:40.939958" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/png/yellowish-yellow.png?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%25...</msg>
+<var>${url}</var>
+<arg>${url}&amp;content=${langcode}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:40.939587" elapsed="0.000417"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:40.940466" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/png/yellowish-yellow.png?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%25...</msg>
+<var>${url}</var>
+<arg>${url}&amp;ref=website</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:40.940180" elapsed="0.000315"/>
+</kw>
+<return>
+<value>${url}</value>
+<status status="PASS" start="2024-06-01T14:46:40.940563" elapsed="0.000067"/>
+</return>
+<msg time="2024-06-01T14:46:40.940792" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/png/yellowish-yellow.png?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%25...</msg>
+<var>${url}</var>
+<arg>${langcode}</arg>
+<arg>png</arg>
+<status status="PASS" start="2024-06-01T14:46:40.937602" elapsed="0.003219"/>
+</kw>
+<kw name="Get Image File Path For Language">
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:40.941738" level="INFO">${fp} = /home/dave/Documents/Github/rfswarm/Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_nl.png</msg>
+<var>${fp}</var>
+<arg>/home/dave/Documents/Github/rfswarm/Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_${langcode}.${filetype}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:40.941505" elapsed="0.000264"/>
+</kw>
+<return>
+<value>${fp}</value>
+<status status="PASS" start="2024-06-01T14:46:40.941829" elapsed="0.000035"/>
+</return>
+<msg time="2024-06-01T14:46:40.942019" level="INFO">${file} = /home/dave/Documents/Github/rfswarm/Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_nl.png</msg>
+<var>${file}</var>
+<arg>${langcode}</arg>
+<arg>png</arg>
+<status status="PASS" start="2024-06-01T14:46:40.941010" elapsed="0.001034"/>
+</kw>
+<kw name="Download Image To File">
+<kw name="GET" owner="RequestsLibrary">
+<msg time="2024-06-01T14:46:41.096666" level="INFO">GET Request : url=https://dynamic-image.vercel.app/api/generate/png/yellowish-yellow.png?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%255Bblue%255D.svg&amp;title=lang_nl&amp;content=nl&amp;ref=website 
+ path_url=/api/generate/png/yellowish-yellow.png?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%255Bblue%255D.svg&amp;title=lang_nl&amp;content=nl&amp;ref=website 
+ headers={'User-Agent': 'python-requests/2.25.1', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg time="2024-06-01T14:46:41.191999" level="INFO">GET Response : url=https://dynamic-image.vercel.app/api/generate/png/yellowish-yellow.png?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%255Bblue%255D.svg&amp;title=lang_nl&amp;content=nl&amp;ref=website 
+ status=200, reason=OK 
+ headers={'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Origin': '*', 'Access-Control-Max-Age': '86400', 'Age': '133', 'Cache-Control': 'public, immutable, no-transform, max-age=2592000', 'Connection': 'keep-alive', 'Content-Length': '20324', 'Content-Type': 'image/png', 'Date': 'Sat, 01 Jun 2024 04:44:27 GMT', 'Server': 'Vercel', 'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload', 'X-Vercel-Cache': 'HIT', 'X-Vercel-Id': 'syd1::iad1::ndjwq-1717217201058-28b2a3612dee'} 
+ body=�PNG
+
+IHDR�8���CsRGB��� IDATx���y�]e�����;�NwB:H�E��,�HT-A IDqa5:��#�°(�8�H	�0� �#�YC�]B(l@d�(!$$������t:��v:��y���{�9�~�U�q�_���OO-o�H��������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������lk���(�������~}� 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 ��[���(y�x޸8��ڲ~��^?������]���a���x�G&gt;:��`�1���Ѧθ�ֶx����b���h0�;n?*�&gt;�:�7ct|��51������H����{ؚ*���tv�_��:~����}��;⚅me�ߖ�ro{4�����U����E�v�ˋѲ����xyUĒ������3�c���'��&amp;�}�|��ֶ�� �T��/��}�X,�����[kc���sck�v�q��j�&lt;�ո�������B\zu[�y�ʸ��u�8��5� �T��yo�2x(����|gmY﹡�wŁ��*~yc�&amp;��
+q�~�����ͻ��ښb�sZ�
+q�4���Z�b���u�=����������w~���x��β~�/�o����t��WVw���W��O��~�:)�ۧ�ųwL�?�99�nl�;~�M7O��M��~8&gt;9����~&lt;�-��AK�ǹ5�d$��5��ź���ד"f�SUrN�������7�Ě��ݦ��3���)���祈Go��~�.vޱ��55c
+���jbѥq��룺�t��9?i�;~S�!u8� #�4.�h��Ϭ�O~����m��=�����z����������|��]��-�]�Qr���G�͗L��'��+�?��~�~����J�9܆s���Ha�K�q�����9���kJV¾��bܵ�c�����Օʟ\�w&gt;8�յ�b1��Qi���������QUU��M��?�������ƭ����ccmse&lt;x�� 3�~ycktw����X��1:&amp;O3Srn�����_7mT��)��-ĉg���uC���?��빿?��q1a�ྺuhMsdm�ϸ����2\s��@
+G�cg�l�&lt;wvM�{W/j�ֶ�G��[�W�����q��Cۦ��[K��v(����qv~�1��	�T��g:�'�J�;�'��9�&amp;�m���k#n�c�[	
+����qQ3�'&amp;_���7��Ӌ�,y}؁c�P����a8� ��-�۶�6Z��ν��-��|�[[�:&amp;~q}O�m���Y�2x0޲[u|���8�����(q�ik���&amp;F͘��ۧ���=�R���8aՀ?#"�Ku�H(�d&amp;Pъ�b\����ر�{�ݹ�kK�Mw��˯t��C��˟W��?��*䦥���j���T��+{[�j1"z���͏oѽ��}?�r�1@f���������{���*�1G��:���������B\ys[�����?��������.i�G��Mq��c����h��KW�z���~rﯹUU����+�7�v(��^����ᮮB����,n���+��x�+�e_�c��`*V{{1~��t�s�~��܍��~���X�\W��s����o����������-�Ǜw-}J˒'7��sWӔ-��|\��v����c�2��X���=^Y��.�C����3:޼k�W���[&lt;f�k��ճ"��Z�?��9�3�.�����p����m�����&gt;����c�2��X�7���斈���U�W������[*7�/�s�_7�m��_?9v����Bښ~Gܣ&gt;X����b̿�}��y���x��U��`ߑ�u�2��H��tǍw&gt;����g��G;�|����c�]z�j/~�+����~]{�~���{�~M��w���5�{�7.l.y=eb�чUv��d&amp;P��Z�m��y�m�W��-��g�����_����6P(⬓�K�=��b�x��W���ָvQi�&gt;�������g�n(s�Y�&gt;���iG�]�b��U����?uG�Ҟ��~��?�&gt;���F�?cL�����+^������3kb�!�1���x{��y�����ŔI[�w�_�.&gt;�͵���س*N&gt;nl�U���1@V0��]q�C�a�&lt;����3����#Ot�;?�z��VF�r_G��1e�w�R7��/,��i/9{|�w�xjYO������g�+q�?����jb������w.��.m�[���grCĕ�oW�Ƚ-�d$0��{qK����͞s�%%�oh�b�'d���������}�::��&gt;�dp��ֲ���Fŏ�9&gt;f��ꀯ�&lt;qT,�鄘y��xr�q�eE1�vnK|�ܖ�eZ!v�V��#V�*Ɠ�:���w��21bѥ����[!]I�2Ǜ2��G�m���z��;��-����o(tGV3���Ν]_�`������k��1���+d�x��8nΘ�l~����eZU�?�!N&lt;cM\�ѳ|#^{6�s���H��ا*�8��eZ�����������-����`��wƒ�J��������Y�%�׵��[��8{h~pڸ�~��m�nT�������;����y�B\tV}�7�!u�}�P� ������7L-��=z���m�xϾ�a�q����I���3�����51_5!N���8�꘶}!jk�QUU��"�۫*&gt;�������L����F�z�o_�1��OO-�� �%U�W��~]MS�z?��x0��'�*�=o�����������Α���I�I�襫i�H�A� 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 ��ŲU�b���Ʋ�;ŲWw���ݶ{1�5mI������:�#���P|zjq���Q�&gt;6'n~F��ԏn��{�#3`U�W��~]MS�z?�������Qg�������Ϋ�yM��9�?��F#K��|��S�o��KV�).|���8"�6�T�۟�?^j�4�랟KV�&gt;#�m�@E���}�7�neL�[����?��p	��#=�%+v���ߺ�u�w̋w��xD��J��G&gt;����3b�a&amp;�+��x�L_�&gt;�FD��C���gz���QghR���c7y|�Ml��ה�����u�&lt;�`�A��-Y��&amp;��k�Ҳ�	�%0�];&gt;���KV�)�x��h��L�s2y�2��@Տn�oX�����yM�Ǽ��7{�������6�
+`*�;�nP��U��c�/,�h`�b0[ݲ��b�3Es�ؘ��=�הg�}�/�mP�9{�{�~t렮�J!�U-[=-μ���Q.�+f�~w|z��[����}(����[�齮��{����`��掱q΃�Z_w���ŲW�ũ3~���m��۟�?,=h@�7�ne�?{�ew]�y�=�2��$C2��䷆M&amp;*��HA�@���(k�Y��Yk�n��vu���x�Z�Y[��0� �	!	I$dI�����$�_��ɐ;3��w�3��_��~�L�p|����^t[��n��fN`���h�j�p���6�%���?�??�;1�z��^۲oj|k�彞�;3���������ٳ��G]�q��u��@QϦ�=Y� }�������*k��-�a�{�S��]���g�p��QL:&gt;][^�B��漞׵�6����8����m��)�FD�vTƲ���[k��֎���G?�k�=��E�~�G@PPk��Ʋ���|�7���Q��#�'V�3M� IDAT�Ϟ���������ٲoj|�ɏ���i5/Fei{���+K����vT��~-�D0��Q������6�p���g-&amp;V���ٟ^|[̮ޞ�����X�pul�?혯��=&gt;]�����]�=�|�?�i5/�t�����'���NH�@�}s���/w��������|sUY{|���esy�s/��t\&gt;wE^�@J`���m�m&gt;��׿p��bRű�|�������{�g���/�+o; E0y�e��X�pu���P���~wﻧ?����5n{|�쯽�a���z6M��z�߮����I�vT���?����Og�r�iQW�Y�eP��o��y]j�z@oJ�����Q_|�^��i5/�9�FD�&gt;y�@����`�dGkm&lt;�����&gt;&gt;�����������P�1_]r8fUo����|V&gt;�u���qbeK\0ceL�l�zC�;���Jv���﮽,~�����==EE���pδU���ڊ�YO!c00\	���w˙񝵗GGwY�&gt;d���73��P����wO*�)dH�+�����,�[����T\�j�MEEo�{����ѱ���(��f��z�Iq�(�g��_���Î�ޣ�w�����O�����Y��&gt;�t��4������O�����/��6wyXÇ��}��}�:����C��u��z�LH��{fĽ���zF2��rv&lt;�gF�3 '0@B:�K��K��?���+��W.����q	�	�}�E��ub�3���ub���e=�KHD���Md=#Y���h�b�3�M	�	��)������).��������xm��Ҭ0pw�x^l�7-��۲oZ���y�&gt;�� 1%��~�7�nL\w�輟���`�anW�����K��1bܺ����6&gt;�pL0�0�����������4�Ұ4�pL0�0v�KK⹖9Y�q�k�?�rF�3�`�a��}\|w�eY������hi��x`�Z��8�U����PWy,[uM�3�u`�ah�ˋbuӼ�g�x����#//�z�Ff��[��2��ڿ&lt;��8p�2�0��s˳UY���vT	��Y w��zk&lt;�ʢ��7i\U�PY%�#��uv�Ğ��h&gt;Ж�3y�&gt;�=�X8iS���������Q�l�5:c��q��Sg���5q҄qyZ6|��kOl������tֲU��W/�RT���:�;`�����c���~][9�,�;{A�&gt;��&lt;���Ns'����}^ܻ���������݇���.�O���&lt;.��9����5ώ��.�׵�F��8K�=�K�����KN�Q%%�&gt;�'/��g�q�0�ut��W����i'���v�9q�x�{��ۦ�q�YQQ��d|�aitt�?"�@�Cܭ�/���	}����8����1aLEV�k����������	�|�{�r'a��N��_8�_�^YrL�����x��q��i����Ώ�{��q��ϸ�������k��Vg��Qqqݜ�9&gt;�����W�����vǫ?�/_�QRԏ�AӲ�;�nꌗ^��{�@kw��EUEQL�Ps����9�1��(��`��c������~]{��3bT����㪢nڤX��~]����s���y�y��d~s����ߍ�������=�����&gt;t$^�y�?�QR��N-��=gT\{yy̛�?��&lt;`�~�6n�xq��_&lt;kJ׌\�g�/�������yZDWWO|�C��=����ז�)��zmQ&lt;��+&gt;���q�������x♎/���������W.�Ξ��a6��:��F���&amp;��ΞҸy��~=Fȟ��wƙ���&gt;s06l��y�?�g]�/&gt;�_ľ?�Ib~��شwf���*/�... (set the log level to DEBUG or TRACE to see the full content) 
+ </msg>
+<msg time="2024-06-01T14:46:41.193108" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>${url}</arg>
+<doc>Sends a GET request.</doc>
+<status status="PASS" start="2024-06-01T14:46:40.942546" elapsed="0.250598"/>
+</kw>
+<kw name="Create Binary File" owner="OperatingSystem">
+<msg time="2024-06-01T14:46:41.194102" level="INFO" html="true">Created binary file '&lt;a href="file:///home/dave/Documents/Github/rfswarm/Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_nl.png"&gt;/home/dave/Documents/Github/rfswarm/Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_nl.png&lt;/a&gt;'.</msg>
+<arg>${filepath}</arg>
+<arg>${response.content}</arg>
+<doc>Creates a binary file with the given content.</doc>
+<status status="PASS" start="2024-06-01T14:46:41.193330" elapsed="0.000853"/>
+</kw>
+<arg>${url}</arg>
+<arg>${file}</arg>
+<status status="PASS" start="2024-06-01T14:46:40.942203" elapsed="0.252072"/>
+</kw>
+<kw name="Get Image URL For Language">
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:41.195244" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/svg/yellowish-yellow.svg</msg>
+<var>${url}</var>
+<arg>https://dynamic-image.vercel.app/api/generate/${filetype}/yellowish-yellow.${filetype}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:41.195011" elapsed="0.000264"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:41.195624" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/svg/yellowish-yellow.svg?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%25...</msg>
+<var>${url}</var>
+<arg>${url}?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%255Bblue%255D.svg</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:41.195396" elapsed="0.000254"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:41.196049" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/svg/yellowish-yellow.svg?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%25...</msg>
+<var>${url}</var>
+<arg>${url}&amp;title=lang_${langcode}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:41.195765" elapsed="0.000310"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:41.196479" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/svg/yellowish-yellow.svg?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%25...</msg>
+<var>${url}</var>
+<arg>${url}&amp;content=${langcode}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:41.196215" elapsed="0.000288"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:41.196807" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/svg/yellowish-yellow.svg?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%25...</msg>
+<var>${url}</var>
+<arg>${url}&amp;ref=website</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:41.196608" elapsed="0.000224"/>
+</kw>
+<return>
+<value>${url}</value>
+<status status="PASS" start="2024-06-01T14:46:41.196882" elapsed="0.000035"/>
+</return>
+<msg time="2024-06-01T14:46:41.197041" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/svg/yellowish-yellow.svg?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%25...</msg>
+<var>${url}</var>
+<arg>${langcode}</arg>
+<arg>svg</arg>
+<status status="PASS" start="2024-06-01T14:46:41.194548" elapsed="0.002515"/>
+</kw>
+<kw name="Get Image File Path For Language">
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:41.197684" level="INFO">${fp} = /home/dave/Documents/Github/rfswarm/Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_nl.svg</msg>
+<var>${fp}</var>
+<arg>/home/dave/Documents/Github/rfswarm/Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_${langcode}.${filetype}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:41.197499" elapsed="0.000210"/>
+</kw>
+<return>
+<value>${fp}</value>
+<status status="PASS" start="2024-06-01T14:46:41.197757" elapsed="0.000028"/>
+</return>
+<msg time="2024-06-01T14:46:41.197900" level="INFO">${file} = /home/dave/Documents/Github/rfswarm/Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_nl.svg</msg>
+<var>${file}</var>
+<arg>${langcode}</arg>
+<arg>svg</arg>
+<status status="PASS" start="2024-06-01T14:46:41.197208" elapsed="0.000716"/>
+</kw>
+<kw name="Download Image To File">
+<kw name="GET" owner="RequestsLibrary">
+<msg time="2024-06-01T14:46:42.515951" level="INFO">GET Request : url=https://dynamic-image.vercel.app/api/generate/svg/yellowish-yellow.svg?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%255Bblue%255D.svg&amp;title=lang_nl&amp;content=nl&amp;ref=website 
+ path_url=/api/generate/svg/yellowish-yellow.svg?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%255Bblue%255D.svg&amp;title=lang_nl&amp;content=nl&amp;ref=website 
+ headers={'User-Agent': 'python-requests/2.25.1', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg time="2024-06-01T14:46:42.516599" level="INFO">GET Response : url=https://dynamic-image.vercel.app/api/generate/svg/yellowish-yellow.svg?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%255Bblue%255D.svg&amp;title=lang_nl&amp;content=nl&amp;ref=website 
+ status=200, reason=OK 
+ headers={'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Origin': '*', 'Access-Control-Max-Age': '86400', 'Age': '0', 'Cache-Control': 'public, immutable, no-transform, max-age=2592000', 'Connection': 'keep-alive', 'Content-Encoding': 'gzip', 'Content-Type': 'image/svg+xml', 'Date': 'Sat, 01 Jun 2024 04:46:42 GMT', 'Server': 'Vercel', 'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload', 'X-Vercel-Cache': 'MISS', 'X-Vercel-Id': 'syd1::iad1::8xlgs-1717217201301-81ed16d1fbb2', 'Transfer-Encoding': 'chunked'} 
+ body=&lt;svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" data-stacking-context="true" aria-owns="html1" width="1920" height="1058.390625" viewBox="0 0 1920 1058.390625"&gt;&lt;!-- Generated by dom-to-svg from about:blank --&gt;&lt;style&gt;@font-face { font-family: Poppins; font-style: normal; font-weight: 500; font-display: swap; src: url("https://fonts.gstatic.com/s/poppins/v21/pxiByp8kv8JHgFVrLGT9Z1JlFc-K.woff2") format("woff2"); unicode-range: U+100-2AF, U+304, U+308, U+329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: Poppins; font-style: normal; font-weight: 500; font-display: swap; src: url("https://fonts.gstatic.com/s/poppins/v21/pxiByp8kv8JHgFVrLGT9Z1xlFQ.woff2") format("woff2"); unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: Poppins; font-style: normal; font-weight: 900; font-display: swap; src: url("https://fonts.gstatic.com/s/poppins/v21/pxiByp8kv8JHgFVrLBT5Z1JlFc-K.woff2") format("woff2"); unicode-range: U+100-2AF, U+304, U+308, U+329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: Poppins; font-style: normal; font-weight: 900; font-display: swap; src: url("https://fonts.gstatic.com/s/poppins/v21/pxiByp8kv8JHgFVrLBT5Z1xlFQ.woff2") format("woff2"); unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+&lt;/style&gt;&lt;g data-stacking-layer="rootBackgroundAndBorders"/&gt;&lt;g data-stacking-layer="childStackingContextsWithNegativeStackLevels"/&gt;&lt;g data-stacking-layer="inFlowNonInlineNonPositionedDescendants"/&gt;&lt;g data-stacking-layer="nonPositionedFloats"/&gt;&lt;g data-stacking-layer="inFlowInlineLevelNonPositionedDescendants"/&gt;&lt;g data-stacking-layer="childStackingContextsWithStackLevelZeroAndPositionedDescendantsWithStackLevelZero"/&gt;&lt;g data-stacking-layer="childStackingContextsWithPositiveStackLevels"/&gt;&lt;g data-tag="html" id="html1" data-z-index="auto" data-stacking-context="true" aria-owns="head1 body1"&gt;&lt;g data-tag="head" id="head1" data-z-index="auto" data-stacking-context="true" aria-owns="meta1 meta2 meta3 link1 link2 link3 link4 title1 style1"&gt;&lt;g data-tag="meta" id="meta1" data-z-index="auto" data-stacking-context="true"/&gt;&lt;g data-tag="meta" id="meta2" data-z-index="auto" data-stacking-context="true"/&gt;&lt;g data-tag="meta" id="meta3" data-z-index="auto" data-stacking-context="true"/&gt;&lt;g data-tag="link" id="link1" data-z-index="auto" data-stacking-context="true" role="link"/&gt;&lt;g data-tag="link" id="link2" data-z-index="auto" data-stacking-context="true" role="link"/&gt;&lt;g data-tag="link" id="link3" data-z-index="auto" data-stacking-context="true" role="link"/&gt;&lt;g data-tag="link" id="link4" data-z-index="auto" data-stacking-context="true" role="link"/&gt;&lt;g data-tag="title" id="title1" data-z-index="auto" data-stacking-context="true"/&gt;&lt;g data-tag="style" id="style1" data-z-index="auto" data-stacking-context="true"/&gt;&lt;/g&gt;&lt;g data-tag="body" id="body1" data-z-index="auto" data-stacking-context="true" role="document" aria-owns="main1 script1"&gt;&lt;g data-stacking-layer="rootBackgroundAndBorders"&gt;&lt;rect width="1920" height="1058.390625" x="0" y="0" fill="rgb(255, 219, 21)"/&gt;&lt;/g&gt;&lt;g data-tag="main" id="main1" data-z-index="auto" data-stacking-context="true" role="main" aria-owns="logoside1 contentside1"&gt;&lt;g data-tag="div" id="logoside1" class="logoside" data-z-index="auto" data-stacking-context="true" aria-owns="icon"&gt;&lt;g data-stacking-layer="rootBackgroundAndBorders"&gt;&lt;line stroke-linecap="square" stroke="rgb(2, 3, 1)" stroke-width="20px" x1="603.75" x2="603.75" y1="178.1875" y2="880.1875"/&gt;&lt;/g&gt;&lt;g data-tag="img" id="icon" data-z-index="auto" data-stacking-context="true" role="img" aria-label="Icon"&gt;&lt;g data-stacking-layer="rootBackgroundAndBorders"/&gt;&lt;g data-stacking-layer="childStackingContextsWithNegativeStackLevels"/&gt;&lt;g data-stacking-layer="inFlowNonInlineNonPositionedDescendants"/&gt;&lt;g data-stacking-layer="nonPositionedFloats"/&gt;&lt;g data-stacking-layer="inFlowInlineLevelNonPositionedDescendants"/&gt;&lt;g data-stacking-layer="childStackingContextsWithStackLevelZeroAndPositionedDescendantsWithStackLevelZero"/&gt;&lt;g data-stacking-layer="childStackingContextsWithPositiveStackLevels"/&gt;&lt;image id="icon-image" xlink:href="https://raw.githubusercontent.com/damies13/rfswarm/master/Doc/Images/Logo/RFSwarm%20svg/icon%20%5Bblue%5D.svg" x="341.875" y="454.1875" width="150" height="150" aria-label="Icon"/&gt;&lt;/g&gt;&lt;/g&gt;&lt;g data-tag="div" id="contentside1" class="contentside" data-z-index="auto" data-stacking-context="true" aria-owns="title2 content1"&gt;&lt;g data-tag="p" id="title2" class="title" data-z-index="auto" data-stacking-context="true"&gt;&lt;text color="rgb(2, 3, 1)" dominant-baseline="text-after-edge" font-family="Poppins, sans-serif" font-size="37.5px" font-stretch="100%" font-style="normal" font-variant="normal" font-weight="500" direction="ltr" letter-spacing="1.5px" text-decoration="none solid rgb(2, 3, 1)" text-anchor="start" text-rendering="auto" unicode-bidi="normal" word-spacing="0px" writing-mode="horizontal-tb" user-select="auto" fill="rgb(2, 3, 1)"&gt;&lt;tspan xml:space="preserve" x="668.75" y="237.59375" textLength="182.5" lengthAdjust="spacingAndGlyphs"&gt;LANG_NL&lt;/tspan&gt;&lt;/text&gt;&lt;/g&gt;&lt;g data-tag="p" id="content1" class="content" data-z-index="auto" data-stacking-context="true"&gt;&lt;text color="rgb(2, 3, 1)" dominant-baseline="text-after-edge" font-family="Poppins, sans-serif" font-size="95px" font-stretch="100%" font-style="normal" font-variant="normal" font-weight="900" direction="ltr" letter-spacing="normal" text-decoration="none solid rgb(2, 3, 1)" text-anchor="start" text-rendering="auto" unicode-bidi="normal" word-spacing="0px" writing-mode="horizontal-tb" user-select="auto" fill="rgb(2, 3, 1)"&gt;&lt;tspan xml:space="preserve" x="668.75" y="599.84375" textLength="98" lengthAdjust="spacingAndGlyphs"&gt;nl&lt;/tspan&gt;&lt;/text&gt;&lt;/g&gt;&lt;/g&gt;&lt;/g&gt;&lt;g data-tag="script" id="script1" data-z-index="auto" data-stacking-context="true"/&gt;&lt;/g&gt;&lt;/g&gt;&lt;/svg&gt; 
+ </msg>
+<msg time="2024-06-01T14:46:42.516971" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>${url}</arg>
+<doc>Sends a GET request.</doc>
+<status status="PASS" start="2024-06-01T14:46:41.198349" elapsed="1.318666"/>
+</kw>
+<kw name="Create Binary File" owner="OperatingSystem">
+<msg time="2024-06-01T14:46:42.519660" level="INFO" html="true">Created binary file '&lt;a href="file:///home/dave/Documents/Github/rfswarm/Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_nl.svg"&gt;/home/dave/Documents/Github/rfswarm/Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_nl.svg&lt;/a&gt;'.</msg>
+<arg>${filepath}</arg>
+<arg>${response.content}</arg>
+<doc>Creates a binary file with the given content.</doc>
+<status status="PASS" start="2024-06-01T14:46:42.517303" elapsed="0.002528"/>
+</kw>
+<arg>${url}</arg>
+<arg>${file}</arg>
+<status status="PASS" start="2024-06-01T14:46:41.198049" elapsed="1.322089"/>
+</kw>
+<arg>nl</arg>
+<status status="PASS" start="2024-06-01T14:46:40.936065" elapsed="1.584168"/>
+</kw>
+<status status="PASS" start="2024-06-01T14:46:40.935413" elapsed="1.585218"/>
+</test>
+<test id="s1-t2" name="Chinese Traditional" line="31">
+<kw name="Get Images For Language">
+<kw name="Log" owner="BuiltIn">
+<msg time="2024-06-01T14:46:42.522578" level="INFO">zh_tw</msg>
+<arg>${langcode}</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2024-06-01T14:46:42.522233" elapsed="0.000489"/>
+</kw>
+<kw name="Get Image URL For Language">
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:42.524247" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/png/yellowish-yellow.png</msg>
+<var>${url}</var>
+<arg>https://dynamic-image.vercel.app/api/generate/${filetype}/yellowish-yellow.${filetype}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:42.523750" elapsed="0.000556"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:42.525025" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/png/yellowish-yellow.png?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%25...</msg>
+<var>${url}</var>
+<arg>${url}?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%255Bblue%255D.svg</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:42.524598" elapsed="0.000481"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:42.525712" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/png/yellowish-yellow.png?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%25...</msg>
+<var>${url}</var>
+<arg>${url}&amp;title=lang_${langcode}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:42.525310" elapsed="0.000446"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:42.526306" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/png/yellowish-yellow.png?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%25...</msg>
+<var>${url}</var>
+<arg>${url}&amp;content=${langcode}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:42.525937" elapsed="0.000405"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:42.526812" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/png/yellowish-yellow.png?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%25...</msg>
+<var>${url}</var>
+<arg>${url}&amp;ref=website</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:42.526507" elapsed="0.000340"/>
+</kw>
+<return>
+<value>${url}</value>
+<status status="PASS" start="2024-06-01T14:46:42.526924" elapsed="0.000067"/>
+</return>
+<msg time="2024-06-01T14:46:42.527205" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/png/yellowish-yellow.png?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%25...</msg>
+<var>${url}</var>
+<arg>${langcode}</arg>
+<arg>png</arg>
+<status status="PASS" start="2024-06-01T14:46:42.523069" elapsed="0.004171"/>
+</kw>
+<kw name="Get Image File Path For Language">
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:42.528537" level="INFO">${fp} = /home/dave/Documents/Github/rfswarm/Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_zh_tw.png</msg>
+<var>${fp}</var>
+<arg>/home/dave/Documents/Github/rfswarm/Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_${langcode}.${filetype}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:42.528141" elapsed="0.000457"/>
+</kw>
+<return>
+<value>${fp}</value>
+<status status="PASS" start="2024-06-01T14:46:42.528702" elapsed="0.000058"/>
+</return>
+<msg time="2024-06-01T14:46:42.528977" level="INFO">${file} = /home/dave/Documents/Github/rfswarm/Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_zh_tw.png</msg>
+<var>${file}</var>
+<arg>${langcode}</arg>
+<arg>png</arg>
+<status status="PASS" start="2024-06-01T14:46:42.527500" elapsed="0.001516"/>
+</kw>
+<kw name="Download Image To File">
+<kw name="GET" owner="RequestsLibrary">
+<msg time="2024-06-01T14:46:42.664838" level="INFO">GET Request : url=https://dynamic-image.vercel.app/api/generate/png/yellowish-yellow.png?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%255Bblue%255D.svg&amp;title=lang_zh_tw&amp;content=zh_tw&amp;ref=website 
+ path_url=/api/generate/png/yellowish-yellow.png?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%255Bblue%255D.svg&amp;title=lang_zh_tw&amp;content=zh_tw&amp;ref=website 
+ headers={'User-Agent': 'python-requests/2.25.1', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg time="2024-06-01T14:46:42.787894" level="INFO">GET Response : url=https://dynamic-image.vercel.app/api/generate/png/yellowish-yellow.png?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%255Bblue%255D.svg&amp;title=lang_zh_tw&amp;content=zh_tw&amp;ref=website 
+ status=200, reason=OK 
+ headers={'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Origin': '*', 'Access-Control-Max-Age': '86400', 'Age': '164', 'Cache-Control': 'public, immutable, no-transform, max-age=2592000', 'Connection': 'keep-alive', 'Content-Length': '24889', 'Content-Type': 'image/png', 'Date': 'Sat, 01 Jun 2024 04:43:58 GMT', 'Server': 'Vercel', 'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload', 'X-Vercel-Cache': 'HIT', 'X-Vercel-Id': 'syd1::iad1::bfjwj-1717217202653-1325857ce2d2'} 
+ body=�PNG
+
+IHDR�8���CsRGB��� IDATx���y�]e���߭5K%�vd�(� !���mP��!LwOCDFmE�Yd騃�4-ؠ##����%�6�"��DքT*���#�[�*U�$%I���&lt;O�8��9�ԭ��S7���o��ܦ�`ЫZ�7�������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������Y�7������^�c���@o�HBHBHBHBHBHBHBHBHBHBHBHBHBHBHBHBHBHBHBH�f]��걯��_��=|Ȁ&gt;Ɨ�5�%W5��OM���Qk|�������q�E��5��{���=n��%�U[��#�\��m5�b�ͪb��5�k�����Q���ݟ�5ѱ`L������5�6ǔ�5���֕�x#����눝'�U��������=�㤷��[Z�.:cx|�ء����rl���die��O��e���c��h����C{{9~z[s�����v��\G[�pGˀ]oU5��V�q��8�e1���xya9������o,��ͳ�qՌ���Kc��߈��/��^��������-�u�=�������r��P�c�y��?�d{!�FD~`]����@*3�o���칿\.�շl���6ƛ�:���-i�c��vL:��x�������R�������7��W/�+�!�I�k۳���_=����s��sۢ��������r��}14�L��{�~ss|��a�X~�_�vc����vͮ^^��M]O=��ȼ���n�ꨮ�x����+��R*��R�/��4�z�=.9�!J��J���Mؿ�oM�5G����¾�Y?��w[_�������nc�b�1��L��u���+�������u�������&lt;/z;������Ԯ��+t��[Æ�Y@_`�h\Z����+DO&gt;�O&gt;���&lt;p�����Zc�;*�ŝ1����o��w��_��a1���xϖ����Z��f�ƥ�,��,ƾˮi�Q#��_&gt;��9Pn����3������s�	����}}�S���:��S�u�hi���f�i��m��:�3��}��{n�3������ۢ������j�� ��l�e͕X4zT�޻#��=�^[�?kI,iة�����G�=xߚ�w��8�s�z�߈���R|bB}��Ѩ��ã��8��������ϵW�W���^Y���أ���q��_��!���G�M�p��@/m*���~̬U�#��m=F�&gt;����`Ҹ��b�������OG8^}KK��]��]f�~ya9N��ҵ��
+7��7�,��OM��_\�Ql�I����_���O�&gt;ڷ_��|�uv�ㄳ�DGG1�_pj�:��Ǥ�����9���^�Ym�u1���Ѷhk����=0�sUl�U�SN0I,|�3�~���5$�nb}a$��\�{��=r�?N?qX!�ǵ�1{A�?��r�}I1�n�M).�6"��Wo���������G����w�qC�q���u�⫖ţOv�]pjC��mͻa�����O?����=��=��a1�K�oZV���z?��n��#�_�����) ����9:;+�t�mJ�߇kc���b��b��&gt;�e�o����[��tK1��%Ѵl��ꃏ��S��~��i��F�ٟ�G�&gt;&gt;{��¿����x�#μ�����j��������;����w����)���o�T������-N#�=򮰴��#[��G ��Qwʑ�0x̑ő���l�斵��)Cbܞ5�l���r�y��M�|�]��c��Kq�����m��]���r\z��uwC�{���?v�s/U&gt;Ȱ�n5��誘�������m��e��MFE|�C5+=(����=��_�x�Q��{�����e��#n����5�J��bZC��Ub�E�Y&lt;��5�bz��Q���E�4�F���~���*&gt;�g~ax츭�`�m����=�-����:�7"����=?�D�J?�1���WUmد�/�`л���߽v����P�Sw�R|��u�W�����w��~M���Pg}ix�v����r)�;mI&lt;~��Q_������x���9'�h�#"��+F��y��K:���l,��u�8韆��u�|�1�|�q�RpȾuQ[S�����}sQļ��Z�|`���n�uu���x��壃[�J��cmq�~�0�}j����/����V.���[����3s�B����x���d㵟����%j�(�/tƿ�{SL���8��Eo�#��Է}��������`�/�]_��-���sFDM�Ѡ���a���ژ�p��n���B��(�=U�V��b�V�&gt;q\]&lt;�b�5{�������xb~{�x�Ԕc��ŵ��ޙ�A����w����r|��!=�;d���|L%�����_��8nMTW���55����M���5�
+��o�����0eh|tw1p]�4��u|���=/�l~`��	�b�=ݦ{�=�-���ku�^�1��[W�/#�Ԧ�(����6����K����T��&gt;�9N��k7��
+����S��i�.�����RwZc̽n�j�V5���Q�~���������'|cIt��楘��a���v[[��T\�zg�[�a�,�����8���w��{�-::�Q]��g5�����������r��-?��ߴ�ۍ��D�Ys�&gt;�����Z���Q�;���
+=��b~艎x����m�^g��N?qX�pgK�~y(����8��8���O���5����u�L�S&lt;w,��k~eZc\|U���z�����.oz�y\�o4Ĉ	z��a+)ޛknm�f�_�SMl�E)^^�|��ۍO�o��v]&gt;������u�8d�b�6��?Rw?��w�����m�#^�ڽ�ۈ�#`X-��`к���xkqe{�����=d���i���ӻ��6��O]UU�
+z���b���_�w�]��ќ�`[tv�{9������}���s/�Ƿ.k*����8���-���@�3g���[�;�'+���SÆ�����qݦ����~�3��m%��}U�����
+��Ak���x��)b�oD���{���K�Q��g�:�+������?T��nm+�q�-�w�=��b�|��r̸����W�������}����;�~���hi�DÑ�;�a��u���2m�]�Egg�g����������}=`�`�	�J��tƭ��&lt;����K��ȼ�U������q�ʟ�s�uąW.�׹�����X�3����������g]���=f�OMX����9f�)����I�c��f�nơ��FMM�C�?�mm帳����&lt;��sMl�Y%�[�o����M�l�_X}0��uw�F����&lt;tH).���@�����~B�R)��Rq�����S���(�~|Cs�8��N=aX�_?�~���8�;�uv��pu�����˻cDCU�G�;�K�"y�����.;U�v[��'�W�e���F�l���ڞ'}���R�h��V��������:c�������=ux��\=`�8�3C�?]~�˚����TG�3�����h�I�/���;2ƌ^��8/�vY|�ƈ�&lt;�w��/;���ֱ�~�1�\Tٮ�)������7t���}�TFk_z����+�)�j��	���ʛ*��ʛ��ŗ+�Oܿ.jk��`u	�://��i��q����o'�oj�'��^�\���koF��@[L�e��5u�ׇǭ����Wo�nD��F��/,�g_���l�ݎz+��?��1G��V��wkk9f�m�~�w=�]��MFE\{�������[��[���2uX|�}޲��&amp;�����o�;��ykKt��;쀾_���E�T�ry�9���6��A��5�SX�λ�)�����cn�bTa{��-�D����#�X�X��kc�{�
+����h�&lt;��*.;gDq�۫}�&amp;W�?�(&amp;�8��r�~��������nU�m���ښ�7��ۣ��g��q����޳���{��Kz���cm1��E+9z�������,_���W����kr�"�ݣ﷛�GU�^���#�:z|�T*���0�	�ujނΘ��&gt;���o.�OM�_�um�9�&gt;�qѲw�o��%���a�����|@]{T]\5�u�w��V���5�b�K�nk�F,_��jﲧ��[u����V�o����Կ+�;�}%G�&gt;�8�.~|c�5�'�����U��&amp;���G�-���k�5�9Гw�*�~�=~�l1sd��~.�sĐ����R�xWϐ5�����l�5;w�Ȫ���6��D�k�#�{�,���\3j���^�z5�*��]a��+?��W�5,'0�t��Ŧ�8h��վ�祈}�(���3���zM�U�9b��q���1�g���6��??4ٯ&amp;�ڬC��Q]]��7���o��s��������'|vhTU��k��������������rL������^��qD?2�S��ܦ=�Z؀U�}}@�ױ`̀^�7�z�|�����W��k��&lt;���Mz�y����&lt;�����I�I��c��u})x�w��I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�IH��/ IDAT�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I�I��_��{��u�?������À��� "��vԭ���ck����Ym��m��s����E�m��m�J~w5-;X�y� '����������0p��u�u�5�����as_��z1�=���&gt;�d� #���0@F(�2B�
+`��Pd� #���0@F(�2�&lt;������o\��������&gt;sǭ�7M~ �+��zOInݨ\�!��[�wV^�n=��c�+���)(�鲲i��׾�6��:c	h����AqÃy����qU�x�k��%��d�.0}�_����{�Ǫ�3b��w00}ʽ[΋�M#�~���cU��$���OY���NU�;FU����{��W�HP4���Z�0����ʛ�C��c���qd��eWsܒ�3"f&lt;&amp;��`������b��	�ǌ��9����2�d��&gt;����_}�e��j�-� �����U����7.&lt;�k���غڍ�f�b��Ϙ;v�q�������K��uP��4&lt;n\�X���0dYy� _����1�bɎ�c[�浱x�kOx��&amp;?P�hP��O���n�WU�WM�y�i���@�۴o\�x��hl��7My �j7�}�#ϟӭk^&gt;偨�8ԭs��PЫ6�7&lt;�hl�����v�����̼��~{��c�Y��d�Swg\&gt;���d��^��Z7&gt;���ߣ~��ش\���ߋ���{�����v�z��vǇf/��ڍ��}��^s�w��#��ت�3⣿�����7Ǥ�m/ylӾq񝕗w:�k&amp;.��\I��xd�I5ۢ�v}��:�����֍ʥ��[��ʸw�y'=���)�3�G��GđY����Ǐ�5|�%��_�hV(�֐�x�kj�3�i ���z^^�oDDckU,Zze|g���Z7&lt;��N��#7(��X��Z�0%-�����h�E����N��U�'&gt;&gt;����L1��ٴo\ܸ�]�&gt;&gt;c䆨*o�����ߪ�����ߍ�����H@A4�VƢ�Wv�|��cVŧ|=&gt;���1�jO���М�1�f[1 S�Ģ�WƦ����Ӈn��� ""&amp;�l�/_���1rC^㾧;fub9 K�$��+�$�Qw�Ǫʛ���t������Ǜ&amp;?p�q/�۸|���f�,Q��{��?޸���?���1���K&gt;_7�θ��������⺙w&amp;��H@b6���^�������{��j����|��m��_ɬa�X%�u�ri���{�yx|����U�}����/�Ҙ��u#7*�Ue��}Mm��t�&lt;��}... (set the log level to DEBUG or TRACE to see the full content) 
+ </msg>
+<msg time="2024-06-01T14:46:42.789144" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>${url}</arg>
+<doc>Sends a GET request.</doc>
+<status status="PASS" start="2024-06-01T14:46:42.529809" elapsed="0.259387"/>
+</kw>
+<kw name="Create Binary File" owner="OperatingSystem">
+<msg time="2024-06-01T14:46:42.790265" level="INFO" html="true">Created binary file '&lt;a href="file:///home/dave/Documents/Github/rfswarm/Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_zh_tw.png"&gt;/home/dave/Documents/Github/rfswarm/Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_zh_tw.png&lt;/a&gt;'.</msg>
+<arg>${filepath}</arg>
+<arg>${response.content}</arg>
+<doc>Creates a binary file with the given content.</doc>
+<status status="PASS" start="2024-06-01T14:46:42.789403" elapsed="0.000974"/>
+</kw>
+<arg>${url}</arg>
+<arg>${file}</arg>
+<status status="PASS" start="2024-06-01T14:46:42.529263" elapsed="0.261231"/>
+</kw>
+<kw name="Get Image URL For Language">
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:42.791999" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/svg/yellowish-yellow.svg</msg>
+<var>${url}</var>
+<arg>https://dynamic-image.vercel.app/api/generate/${filetype}/yellowish-yellow.${filetype}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:42.791377" elapsed="0.000660"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:42.792454" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/svg/yellowish-yellow.svg?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%25...</msg>
+<var>${url}</var>
+<arg>${url}?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%255Bblue%255D.svg</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:42.792203" elapsed="0.000278"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:42.792866" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/svg/yellowish-yellow.svg?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%25...</msg>
+<var>${url}</var>
+<arg>${url}&amp;title=lang_${langcode}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:42.792613" elapsed="0.000280"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:42.793313" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/svg/yellowish-yellow.svg?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%25...</msg>
+<var>${url}</var>
+<arg>${url}&amp;content=${langcode}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:42.793036" elapsed="0.000307"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:42.793710" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/svg/yellowish-yellow.svg?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%25...</msg>
+<var>${url}</var>
+<arg>${url}&amp;ref=website</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:42.793473" elapsed="0.000268"/>
+</kw>
+<return>
+<value>${url}</value>
+<status status="PASS" start="2024-06-01T14:46:42.793798" elapsed="0.000040"/>
+</return>
+<msg time="2024-06-01T14:46:42.793978" level="INFO">${url} = https://dynamic-image.vercel.app/api/generate/svg/yellowish-yellow.svg?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%25...</msg>
+<var>${url}</var>
+<arg>${langcode}</arg>
+<arg>svg</arg>
+<status status="PASS" start="2024-06-01T14:46:42.790819" elapsed="0.003183"/>
+</kw>
+<kw name="Get Image File Path For Language">
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2024-06-01T14:46:42.794689" level="INFO">${fp} = /home/dave/Documents/Github/rfswarm/Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_zh_tw.svg</msg>
+<var>${fp}</var>
+<arg>/home/dave/Documents/Github/rfswarm/Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_${langcode}.${filetype}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2024-06-01T14:46:42.794482" elapsed="0.000233"/>
+</kw>
+<return>
+<value>${fp}</value>
+<status status="PASS" start="2024-06-01T14:46:42.794767" elapsed="0.000029"/>
+</return>
+<msg time="2024-06-01T14:46:42.794919" level="INFO">${file} = /home/dave/Documents/Github/rfswarm/Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_zh_tw.svg</msg>
+<var>${file}</var>
+<arg>${langcode}</arg>
+<arg>svg</arg>
+<status status="PASS" start="2024-06-01T14:46:42.794162" elapsed="0.000780"/>
+</kw>
+<kw name="Download Image To File">
+<kw name="GET" owner="RequestsLibrary">
+<msg time="2024-06-01T14:46:42.921336" level="INFO">GET Request : url=https://dynamic-image.vercel.app/api/generate/svg/yellowish-yellow.svg?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%255Bblue%255D.svg&amp;title=lang_zh_tw&amp;content=zh_tw&amp;ref=website 
+ path_url=/api/generate/svg/yellowish-yellow.svg?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%255Bblue%255D.svg&amp;title=lang_zh_tw&amp;content=zh_tw&amp;ref=website 
+ headers={'User-Agent': 'python-requests/2.25.1', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg time="2024-06-01T14:46:42.922126" level="INFO">GET Response : url=https://dynamic-image.vercel.app/api/generate/svg/yellowish-yellow.svg?icon=https%3A%2F%2Fraw.githubusercontent.com%2Fdamies13%2Frfswarm%2Fmaster%2FDoc%2FImages%2FLogo%2FRFSwarm%2520svg%2Ficon%2520%255Bblue%255D.svg&amp;title=lang_zh_tw&amp;content=zh_tw&amp;ref=website 
+ status=200, reason=OK 
+ headers={'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Access-Control-Allow-Origin': '*', 'Access-Control-Max-Age': '86400', 'Age': '68', 'Cache-Control': 'public, immutable, no-transform, max-age=2592000', 'Connection': 'keep-alive', 'Content-Encoding': 'gzip', 'Content-Type': 'image/svg+xml', 'Date': 'Sat, 01 Jun 2024 04:45:34 GMT', 'Server': 'Vercel', 'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload', 'X-Vercel-Cache': 'HIT', 'X-Vercel-Id': 'syd1::iad1::nhg92-1717217202909-c3d6ba4b5cc1', 'Transfer-Encoding': 'chunked'} 
+ body=&lt;svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" data-stacking-context="true" aria-owns="html1" width="1920" height="1058.390625" viewBox="0 0 1920 1058.390625"&gt;&lt;!-- Generated by dom-to-svg from about:blank --&gt;&lt;style&gt;@font-face { font-family: Poppins; font-style: normal; font-weight: 500; font-display: swap; src: url("https://fonts.gstatic.com/s/poppins/v21/pxiByp8kv8JHgFVrLGT9Z1JlFc-K.woff2") format("woff2"); unicode-range: U+100-2AF, U+304, U+308, U+329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: Poppins; font-style: normal; font-weight: 500; font-display: swap; src: url("https://fonts.gstatic.com/s/poppins/v21/pxiByp8kv8JHgFVrLGT9Z1xlFQ.woff2") format("woff2"); unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: Poppins; font-style: normal; font-weight: 900; font-display: swap; src: url("https://fonts.gstatic.com/s/poppins/v21/pxiByp8kv8JHgFVrLBT5Z1JlFc-K.woff2") format("woff2"); unicode-range: U+100-2AF, U+304, U+308, U+329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: Poppins; font-style: normal; font-weight: 900; font-display: swap; src: url("https://fonts.gstatic.com/s/poppins/v21/pxiByp8kv8JHgFVrLBT5Z1xlFQ.woff2") format("woff2"); unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+&lt;/style&gt;&lt;g data-stacking-layer="rootBackgroundAndBorders"/&gt;&lt;g data-stacking-layer="childStackingContextsWithNegativeStackLevels"/&gt;&lt;g data-stacking-layer="inFlowNonInlineNonPositionedDescendants"/&gt;&lt;g data-stacking-layer="nonPositionedFloats"/&gt;&lt;g data-stacking-layer="inFlowInlineLevelNonPositionedDescendants"/&gt;&lt;g data-stacking-layer="childStackingContextsWithStackLevelZeroAndPositionedDescendantsWithStackLevelZero"/&gt;&lt;g data-stacking-layer="childStackingContextsWithPositiveStackLevels"/&gt;&lt;g data-tag="html" id="html1" data-z-index="auto" data-stacking-context="true" aria-owns="head1 body1"&gt;&lt;g data-tag="head" id="head1" data-z-index="auto" data-stacking-context="true" aria-owns="meta1 meta2 meta3 link1 link2 link3 link4 title1 style1"&gt;&lt;g data-tag="meta" id="meta1" data-z-index="auto" data-stacking-context="true"/&gt;&lt;g data-tag="meta" id="meta2" data-z-index="auto" data-stacking-context="true"/&gt;&lt;g data-tag="meta" id="meta3" data-z-index="auto" data-stacking-context="true"/&gt;&lt;g data-tag="link" id="link1" data-z-index="auto" data-stacking-context="true" role="link"/&gt;&lt;g data-tag="link" id="link2" data-z-index="auto" data-stacking-context="true" role="link"/&gt;&lt;g data-tag="link" id="link3" data-z-index="auto" data-stacking-context="true" role="link"/&gt;&lt;g data-tag="link" id="link4" data-z-index="auto" data-stacking-context="true" role="link"/&gt;&lt;g data-tag="title" id="title1" data-z-index="auto" data-stacking-context="true"/&gt;&lt;g data-tag="style" id="style1" data-z-index="auto" data-stacking-context="true"/&gt;&lt;/g&gt;&lt;g data-tag="body" id="body1" data-z-index="auto" data-stacking-context="true" role="document" aria-owns="main1 script1"&gt;&lt;g data-stacking-layer="rootBackgroundAndBorders"&gt;&lt;rect width="1920" height="1058.390625" x="0" y="0" fill="rgb(255, 219, 21)"/&gt;&lt;/g&gt;&lt;g data-tag="main" id="main1" data-z-index="auto" data-stacking-context="true" role="main" aria-owns="logoside1 contentside1"&gt;&lt;g data-tag="div" id="logoside1" class="logoside" data-z-index="auto" data-stacking-context="true" aria-owns="icon"&gt;&lt;g data-stacking-layer="rootBackgroundAndBorders"&gt;&lt;line stroke-linecap="square" stroke="rgb(2, 3, 1)" stroke-width="20px" x1="603.75" x2="603.75" y1="178.1875" y2="880.1875"/&gt;&lt;/g&gt;&lt;g data-tag="img" id="icon" data-z-index="auto" data-stacking-context="true" role="img" aria-label="Icon"&gt;&lt;g data-stacking-layer="rootBackgroundAndBorders"/&gt;&lt;g data-stacking-layer="childStackingContextsWithNegativeStackLevels"/&gt;&lt;g data-stacking-layer="inFlowNonInlineNonPositionedDescendants"/&gt;&lt;g data-stacking-layer="nonPositionedFloats"/&gt;&lt;g data-stacking-layer="inFlowInlineLevelNonPositionedDescendants"/&gt;&lt;g data-stacking-layer="childStackingContextsWithStackLevelZeroAndPositionedDescendantsWithStackLevelZero"/&gt;&lt;g data-stacking-layer="childStackingContextsWithPositiveStackLevels"/&gt;&lt;image id="icon-image" xlink:href="https://raw.githubusercontent.com/damies13/rfswarm/master/Doc/Images/Logo/RFSwarm%20svg/icon%20%5Bblue%5D.svg" x="341.875" y="454.1875" width="150" height="150" aria-label="Icon"/&gt;&lt;/g&gt;&lt;/g&gt;&lt;g data-tag="div" id="contentside1" class="contentside" data-z-index="auto" data-stacking-context="true" aria-owns="title2 content1"&gt;&lt;g data-tag="p" id="title2" class="title" data-z-index="auto" data-stacking-context="true"&gt;&lt;text color="rgb(2, 3, 1)" dominant-baseline="text-after-edge" font-family="Poppins, sans-serif" font-size="37.5px" font-stretch="100%" font-style="normal" font-variant="normal" font-weight="500" direction="ltr" letter-spacing="1.5px" text-decoration="none solid rgb(2, 3, 1)" text-anchor="start" text-rendering="auto" unicode-bidi="normal" word-spacing="0px" writing-mode="horizontal-tb" user-select="auto" fill="rgb(2, 3, 1)"&gt;&lt;tspan xml:space="preserve" x="668.75" y="237.59375" textLength="279" lengthAdjust="spacingAndGlyphs"&gt;LANG_ZH_TW&lt;/tspan&gt;&lt;/text&gt;&lt;/g&gt;&lt;g data-tag="p" id="content1" class="content" data-z-index="auto" data-stacking-context="true"&gt;&lt;text color="rgb(2, 3, 1)" dominant-baseline="text-after-edge" font-family="Poppins, sans-serif" font-size="95px" font-stretch="100%" font-style="normal" font-variant="normal" font-weight="900" direction="ltr" letter-spacing="normal" text-decoration="none solid rgb(2, 3, 1)" text-anchor="start" text-rendering="auto" unicode-bidi="normal" word-spacing="0px" writing-mode="horizontal-tb" user-select="auto" fill="rgb(2, 3, 1)"&gt;&lt;tspan xml:space="preserve" x="668.75" y="599.84375" textLength="316" lengthAdjust="spacingAndGlyphs"&gt;zh_tw&lt;/tspan&gt;&lt;/text&gt;&lt;/g&gt;&lt;/g&gt;&lt;/g&gt;&lt;g data-tag="script" id="script1" data-z-index="auto" data-stacking-context="true"/&gt;&lt;/g&gt;&lt;/g&gt;&lt;/svg&gt; 
+ </msg>
+<msg time="2024-06-01T14:46:42.922962" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>${url}</arg>
+<doc>Sends a GET request.</doc>
+<status status="PASS" start="2024-06-01T14:46:42.795399" elapsed="0.127637"/>
+</kw>
+<kw name="Create Binary File" owner="OperatingSystem">
+<msg time="2024-06-01T14:46:42.925025" level="INFO" html="true">Created binary file '&lt;a href="file:///home/dave/Documents/Github/rfswarm/Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_zh_tw.svg"&gt;/home/dave/Documents/Github/rfswarm/Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_zh_tw.svg&lt;/a&gt;'.</msg>
+<arg>${filepath}</arg>
+<arg>${response.content}</arg>
+<doc>Creates a binary file with the given content.</doc>
+<status status="PASS" start="2024-06-01T14:46:42.923361" elapsed="0.001884"/>
+</kw>
+<arg>${url}</arg>
+<arg>${file}</arg>
+<status status="PASS" start="2024-06-01T14:46:42.795079" elapsed="0.130635"/>
+</kw>
+<arg>zh_tw</arg>
+<status status="PASS" start="2024-06-01T14:46:42.521660" elapsed="0.404200"/>
+</kw>
+<status status="PASS" start="2024-06-01T14:46:42.520993" elapsed="0.405221"/>
+</test>
+<status status="PASS" start="2024-06-01T14:46:40.849299" elapsed="2.077726"/>
+</suite>
+<statistics>
+<total>
+<stat pass="2" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat pass="2" fail="0" skip="0" id="s1" name="Getimages">Getimages</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>

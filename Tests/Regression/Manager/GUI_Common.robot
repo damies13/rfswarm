@@ -6,9 +6,13 @@ Library		Collections
 Library		DateTime
 Library		XML
 
-Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
+Library		ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
 Library 	IniFile.py
+
+# Attempting to record video cause more trouble than help
+# Library		ScreenRecorderLibrary.py
+
 
 *** Variables ***
 ${platform}		None
@@ -103,6 +107,8 @@ Close Manager GUI
 	ELSE
 		Take A Screenshot
 		${result} = 	Terminate Process		${process_manager}
+		Log 	${result.stdout}
+		Log 	${result.stderr}
 		${running}= 	Is Process Running 	${process_manager}
 		Take A Screenshot
 		IF 	${running}
@@ -128,6 +134,9 @@ Close Manager GUI macos
 	${result}= 		Wait For Process 	${process_manager} 	timeout=55
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	not ${running}
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		Should Be Equal As Integers 	${result.rc} 	0
 		Take A Screenshot
 		Log		${result.stdout}
 		Log		${result.stderr}
@@ -135,6 +144,8 @@ Close Manager GUI macos
 	ELSE
 		Take A Screenshot
 		${result} = 	Terminate Process		${process_manager}
+		Log 	${result.stdout}
+		Log 	${result.stderr}
 		${running}= 	Is Process Running 	${process_manager}
 		Take A Screenshot
 		IF 	${running}
@@ -309,7 +320,7 @@ Click Label With Horizontal Offset
 	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right].
 	...	Give the image a full name, for example: button_runopen.
 	${labelname}= 	Convert To Lower Case 	${labelname}
-	${img}=	Set Variable		manager_${platform}_${labelname}.png
+	${img}=	Set Variable		manager_${platform}_label_${labelname}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=300
@@ -1001,6 +1012,160 @@ Check That The Scenario File Opens Correctly
 	Log		${scenario_content_reopened}
 	Should Be Equal		${scenario_content}		${scenario_content_reopened}	msg=Scenario files are not equal!
 
+
+Start New Scenario
+	Click Button	runnew
+
+Create ${lang} Language Scenario
+	# [Arguments] 	${langcode}
+	# Log 	${lang} 	console=True
+	${scenariofile}= 		Set Variable    ${CURDIR}${/}testdata${/}Issue-#238${/}language${/}lang_${lang}.rfs
+	${robotfile}= 		Set Variable    ${CURDIR}${/}testdata${/}Issue-#238${/}language${/}lang_${lang}.robot
+	${robotfilename}= 		Set Variable    lang_${lang}.robot
+	Create File 	${scenariofile} 	[Scenario]\n
+	Append To File 	${scenariofile} 	uploadmode = err\n
+	Append To File 	${scenariofile} 	scriptcount = 1\n
+	Append To File 	${scenariofile} 	graphlist =\n
+	Append To File 	${scenariofile} 	\n
+	Append To File 	${scenariofile} 	[1]\n
+	Append To File 	${scenariofile} 	robots = 2\n
+	Append To File 	${scenariofile} 	delay = 300\n
+	Append To File 	${scenariofile} 	rampup = 10\n
+	Append To File 	${scenariofile} 	run = 60\n
+	Append To File 	${scenariofile} 	test = First Test\n
+	Append To File 	${scenariofile} 	script = ${robotfilename}\n
+	RETURN 	${scenariofile}
+
+Click Script Button On Row
+		[Arguments]		${row}
+		${rowheight}= 	Set Variable		30
+		${rowoffset}= 	Evaluate		${rowheight} * ${row}
+
+		${labelname}= 	Set Variable    script
+		${labelname}= 	Convert To Lower Case 	${labelname}
+		${img}=	Set Variable		manager_${platform}_label_${labelname}.png
+
+		# Log		${CURDIR}
+		# Log		${IMAGE_DIR}
+		Wait For 	${img} 	 timeout=300
+		# @{coordinates}= 	Locate		${img}
+		# Log	${coordinates}
+		Click To The Below Of Image 	${img} 	 offset=${rowoffset}
+
+		Take A Screenshot
+		Press Key.tab 1 Times
+		Take A Screenshot
+		# manager_macos_button_selected_runscriptrow.png
+		${img}=	Set Variable		manager_${platform}_button_selected_runscriptrow.png
+		Click Image 	${img}
+		Sleep    0.1
+		Take A Screenshot
+		# 	macos_dlgbtn_open
+		${img}=	Set Variable		${platform}_dlgbtn_cancel.png
+		Wait For 	${img} 	 timeout=300
+		Take A Screenshot
+
+		# Fail 		Not Implimented
+
+File Open Dialogue Select File
+	[Arguments]		${filepath}
+	Run Keyword		File Open Dialogue ${platform} Select File 			${filepath}
+	Take A Screenshot
+
+File Open Dialogue ubuntu Select File
+	[Arguments]		${filepath}
+	Sleep    0.1
+	Take A Screenshot
+	Click Label With Horizontal Offset 	file_name 	50
+	Type 		${filepath} 	Key.ENTER
+	Sleep    0.1
+	Take A Screenshot
+	# Click Dialog Button 	open
+	# Sleep    0.1
+	# Take A Screenshot
+
+File Open Dialogue windows Select File
+	[Arguments]		${filepath}
+	Sleep    0.1
+	Take A Screenshot
+	${filepath}= 	Normalize Path 	${filepath}
+	${path} 	${file} = 	Split Path 	${filepath}
+	Click Label With Horizontal Offset 	file_name 	50
+	Type 		${path} 	Key.ENTER
+	Sleep    0.1
+	Take A Screenshot
+	Click Label With Horizontal Offset 	file_name 	50
+	Type 		${file} 	Key.ENTER
+	Take A Screenshot
+	# Click Dialog Button 	open
+	# Sleep    0.1
+	# Take A Screenshot
+
+File Open Dialogue macos Select File
+	[Arguments]		${filepath}
+	Sleep    0.1
+	Take A Screenshot
+	Press Combination 	KEY.command 	KEY.shift 	KEY.g
+	Sleep    0.1
+	Take A Screenshot
+	Type 		Key.BACKSPACE 	Key.DELETE
+	Sleep    0.1
+	Take A Screenshot
+	Type 		${filepath} 	Key.ENTER
+	Sleep    0.1
+	Take A Screenshot
+	Click Dialog Button 	open
+
+Select Test Script
+	[Arguments]		${row}	${filepath}
+
+	Click Script Button On Row 	${row}
+
+	# Click Button	runscriptrow
+	# Take A Screenshot
+	# Press Key.escape 1 Times
+
+	File Open Dialogue Select File		${filepath}
+	Take A Screenshot
+	# Click Dialog Button 	cancel
+
+Wait For File To Exist
+	[Arguments]		${filepath} 	${timeout}=300
+	TRY
+		WHILE    True 	limit=${timeout} seconds
+			TRY
+				Sleep 	500 ms
+				File Should Exist 		${filepath}
+			EXCEPT
+				CONTINUE
+			END
+			BREAK
+		END
+	EXCEPT
+		Fail 		File '${filepath}' does not exist after ${timeout} seconds
+	END
+
+Check Agent Downloaded ${lang} Language Test Files
+	${robotfile}= 	Set Variable    ${agent_dir}${/}scripts${/}lang_${lang}.robot
+	Wait For File To Exist 		${robotfile}
+
+	# Tests/Regression/Manager/testdata/Issue-#238/language/resource/lang_bg.resource
+	${resourcefile}= 	Set Variable    ${agent_dir}${/}scripts${/}resource${/}lang_${lang}.resource
+	Wait For File To Exist 		${resourcefile} 	30
+	# Tests/Regression/Manager/testdata/Issue-#238/language/resource/lang_bg.json
+	${jsonfile}= 	Set Variable    ${agent_dir}${/}scripts${/}resource${/}lang_${lang}.json
+	Wait For File To Exist 		${jsonfile} 	30
+	# Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_bg.png
+	${imgfile}= 	Set Variable    ${agent_dir}${/}scripts${/}images${/}lang_${lang}.png
+	Wait For File To Exist 		${imgfile} 	30
+	# Tests/Regression/Manager/testdata/Issue-#238/language/images/lang_bg.svg
+	${imgfile}= 	Set Variable    ${agent_dir}${/}scripts${/}images${/}lang_${lang}.svg
+	Wait For File To Exist 		${imgfile} 	30
+
+
+
+
+#
 Verify Test Result Directory Name
 	[Arguments]		${result_dir_name}	${scenario_name}	${current_date}
 	@{run_dir_name_fragmented}=	Split String	${result_dir_name}	separator=_		max_split=2
