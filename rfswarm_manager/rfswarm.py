@@ -274,6 +274,7 @@ class AgentServer(BaseHTTPRequestHandler):
 						jsonresp["RunName"] = base.robot_schedule["RunName"]
 						jsonresp["Abort"] = base.run_abort
 						jsonresp["UploadMode"] = base.uploadmode
+						jsonresp["EnvironmentVariables"] = base.envvars
 
 						# base.robot_schedule["Agents"]
 						if jsonresp["AgentName"] in base.robot_schedule["Agents"].keys():
@@ -491,6 +492,7 @@ class RFSwarmBase:
 	run_threads: Any = {}
 	total_robots = 0
 	robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}, "Start": 0}
+	envvars = {}
 	agentserver = None
 	agenthttpserver = None
 	updatethread = None
@@ -1242,11 +1244,46 @@ class RFSwarmBase:
 				pass
 			time.sleep(aday)
 
+	def register_envvar(self, envvar):
+		vartype = "value"
+		base.debugmsg(5, "envvar:", envvar)
+		base.debugmsg(9, "os.environ:", os.environ)
+		base.debugmsg(7, "os.environ.keys():", list(os.environ.keys()))
+		if envvar in list(os.environ.keys()):
+			envvalue = os.environ[envvar]
+			base.debugmsg(7, "envvar:", envvar, "	envvalue:", envvalue)
+			if  os.path.exists(envvalue):
+				vartype = "path"
+				envvalue = base.get_relative_path(base.config['Plan']['ScriptDir'], envvalue)
+			base.debugmsg(5, "envvar:", envvar, "	vartype:", vartype, "	envvalue:", envvalue)
+			base.envvars[envvar] = {}
+			base.envvars[envvar]['vartype'] = vartype
+			base.envvars[envvar]['value'] = envvalue
+			base.debugmsg(9, "base.envvars:", base.envvars)
+		else:
+			envvalue = "<not found>"
+		base.debugmsg(5, "envvar:", envvar, "	vartype:", vartype, "	envvalue:", envvalue)
+
 	def replace_rf_path_variables(self, pathin, localdir):
 		base.debugmsg(6, "pathin:", pathin)
 		base.debugmsg(8, "localdir:", localdir)
 		pathout = pathin
 		base.debugmsg(8, "pathout:", pathout)
+
+		# Issue #165 - Environment Variable Substitution
+		envvars = re.findall("%{([^}]+)}", pathout)
+		for envvar in envvars:
+			base.debugmsg(5, "envvar:", envvar)
+			base.debugmsg(9, "os.environ:", os.environ)
+			base.debugmsg(7, "os.environ.keys():", list(os.environ.keys()))
+			if envvar in list(os.environ.keys()):
+				# Get local value
+				envvalue = os.environ[envvar]
+				base.debugmsg(7, "envvar:", envvar, "	envvalue:", envvalue)
+				searchstr = "%{" + envvar + "}"
+				base.debugmsg(9, "searchstr:", searchstr)
+				pathout = pathout.replace(searchstr, envvalue)
+				base.debugmsg(5, "pathout:", pathout)
 
 		# Issue #129 Handle `${CURDIR}/`
 		if pathout.find("${CURDIR}") > -1:
@@ -1376,6 +1413,11 @@ class RFSwarmBase:
 					base.debugmsg(9, "line", line)
 					try:
 						if line.strip()[:1] != "#":
+							# Identify environment variables the agents need
+							envvars = re.findall("%{([^}]+)}", line.strip())
+							for envvar in envvars:
+								base.register_envvar(envvar)
+
 							linearr = [s for s in re.split(r"( \s+|\t+|\s+\|\s+)", line.strip()) if len(s.strip()) > 0]
 							base.debugmsg(8, "linearr", linearr)
 							resfile = None
@@ -1391,7 +1433,7 @@ class RFSwarmBase:
 								base.debugmsg(7, "resfile", resfile)
 								# here we are assuming the resfile is a relative path! should we also consider files with full local paths?
 								# Issue #129 Handle ``${CURDIR}/``
-								if resfile.find("${") > -1:
+								if resfile.find("${") > -1 or resfile.find("%{") > -1:
 									localrespath = base.replace_rf_path_variables(resfile, localdir)
 								else:
 									localrespath = self.localrespath(localdir, resfile)
