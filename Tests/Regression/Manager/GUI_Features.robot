@@ -633,6 +633,137 @@ Check If Inject Sleep Option Was Executed in the Test
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove File		${global_path}${/}example.robot
 
+Verify If the Port Number And Ip Address Get Written To the INI File
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Set Test Variable	@{mngr_options}	-g	0						AND
+	...    Open Manager GUI		${mngr_options}
+
+	${ipv4}		${ipv6}		Get IP addresses
+	Log To Console		${\n}IPV4 address: ${ipv4} ${\n}IPV6 address: ${ipv6}${\n}
+	${manager_ini_file}		Get Manager INI Location
+	&{run_settings_data}	Create Dictionary
+	...    bind_ip_address=${ipv4}[0]
+	...    bind_port_number=8148
+
+	Click Button	runsettings
+	Change Scenario Wide Settings	${run_settings_data}
+	Sleep	2
+	Press key.enter 1 Times
+	Run Keyword		Close Manager GUI ${platform}
+	Sleep	2
+	${manager_ini_file_dict}=	Read Ini File	${manager_ini_file}
+	Log		manager ini file dict: ${manager_ini_file_dict}		console=True
+
+	Should Be Equal As Strings 	${manager_ini_file_dict}[Server][bindip] 	${run_settings_data}[bind_ip_address]
+	Should Be Equal As Strings 	${manager_ini_file_dict}[Server][bindport] 	${run_settings_data}[bind_port_number]
+
+	Log To Console	${\n}The bindip and bindport heve been saved to the ini file, now check if it will be applied to the manager after restarting.${\n}
+	Open Manager GUI
+	Click Button	runsettings
+	Click Button	ok
+	Sleep	2
+	Press key.enter 1 Times
+	Run Keyword		Close Manager GUI ${platform}
+
+	Should Be Equal As Strings 	${manager_ini_file_dict}[Server][bindip] 	${run_settings_data}[bind_ip_address]
+	Should Be Equal As Strings 	${manager_ini_file_dict}[Server][bindport] 	${run_settings_data}[bind_port_number]
+
+	[Teardown]	Run Keywords
+	...    Change = ${ipv4}[0] With =${SPACE} In ${manager_ini_file}	AND
+	...    Change = 8148 With = 8138 In ${manager_ini_file}
+
+Verify If Agent Can't Connect On Old Port Number After Port Number Changed And Can Connect To the New One
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Set Test Variable	@{mngr_options}	-g	0						AND
+	...    Open Manager GUI		${mngr_options}
+
+	${old_port_number}=		Set Variable	8138
+	&{run_settings_data}	Create Dictionary	bind_port_number=8148
+	${manager_ini_file}		Get Manager INI Location
+
+	Log To Console	Writing bindport=${run_settings_data}[bind_port_number] to the manager settings.
+	Click Button	runsettings
+	Change Scenario Wide Settings	${run_settings_data}
+	Sleep	2
+	Press key.enter 1 Times
+	Run Keyword		Close Manager GUI ${platform}
+	Open Manager GUI
+
+	Log To Console	Check if Agent cant connect to the old port number, Old port number: ${old_port_number}.
+	@{agent_options}	Set Variable	-m	http://localhost:${old_port_number}/
+	Open Agent	${agent_options}
+	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
+	Run Keyword If	${status}	Fail
+	...    msg=The agent has connected to the old port number but should not!
+	Log To Console	The Agent did not connect to the Manager with ${old_port_number} port and this was expected.
+	Click Tab	Plan
+	GUI_Common.Stop Agent
+
+	Log To Console	Check if Agent can connect to the new port number. New port number: ${run_settings_data}[bind_port_number].
+	@{agent_options}	Set Variable	-m	http://localhost:${run_settings_data}[bind_port_number]/
+	Open Agent	${agent_options}
+	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
+	Run Keyword If	not ${status}	Fail
+	...    msg=The agent did not connect to the new port number!
+	Log To Console	The Agent has connected to the Manager with ${run_settings_data}[bind_port_number] port and this was expected.
+	Click Tab	Plan
+	
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    GUI_Common.Stop Agent							AND
+	...    Change = 8148 With = 8138 In ${manager_ini_file}
+
+Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Address On the Manager's Host
+	[Tags]	windows-latest	ubuntu-latest	Issue #16
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Set Test Variable	@{mngr_options}	-g	0						AND
+	...    Open Manager GUI		${mngr_options}
+
+	${ipv4}		${ipv6}		Get IP addresses
+	Log To Console		${\n}IPV4 address: ${ipv4} ${\n}IPV6 address: ${ipv6}${\n}
+	${manager_ini_file}		Get Manager INI Location
+	&{run_settings_data}	Create Dictionary	bind_ip_address=${ipv4}[0]
+
+	Log To Console	Writing bindip=${ipv4}[0] to the manager settings.
+	Click Button	runsettings
+	Change Scenario Wide Settings	${run_settings_data}
+	Sleep	2
+	Press key.enter 1 Times
+	Run Keyword		Close Manager GUI ${platform}
+	Open Manager GUI
+
+	Log To Console	Check if Agent cant connect to the Manager via ${ipv4}[1] instead of ${ipv4}[0].
+	@{agent_options}	Set Variable	-m	http://${ipv4}[1]:8138/
+	Open Agent	${agent_options}
+	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
+	Run Keyword If	${status}	Fail
+	...    msg=The agent has connected to the Manager via ${ipv4}[1] but should not!
+	Log To Console	The Agent did not connect to the Manager via ${ipv4}[1] and this was expected.
+	Click Tab	Plan
+	GUI_Common.Stop Agent
+
+	Log To Console	Check if Agent can connect to the Manager via ${ipv4}[0].
+	@{agent_options}	Set Variable	-m	http://${ipv4}[0]:8138/
+	Open Agent	${agent_options}
+	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
+	Run Keyword If	not ${status}	Fail
+	...    msg=The agent did not connect to the Manager via ${ipv4}[0]!
+	Log To Console	The Agent has connected to the Manager via ${ipv4}[0] and this was expected.
+	Click Tab	Plan
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    GUI_Common.Stop Agent							AND
+	...    Change = ${ipv4}[0] With =${SPACE} In ${manager_ini_file}
+
 Verify Disable log.html - Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
@@ -1041,6 +1172,74 @@ Check If The CSV Report Button Works In The Manager
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    GUI_Common.Stop Agent
 
+Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robots
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #31
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Open Manager GUI													AND
+	...    Create Robot File
+	...    file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\tFail this\n\tSleep\t10\n\tFail\n
+
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#31${/}Issue-#31.rfs
+	${scenario_name}=	Set Variable	Issue-#31
+	Copy File	${scenariofile}		${global_path}
+	Click Button	runopen
+	Open Scenario File OS DIALOG	${scenario_name}
+	Click Button	runplay
+
+	${status}=	Run Keyword And Return Status
+	...    Wait For	${platform}_warning_label_not_enough_agents.png 	timeout=${10}
+	Run Keyword If	not ${status}	Fail	msg=The manager didn't display expected prompt dialogue that says: Not enough Agents available to run Robots!
+	Press key.enter 1 Times
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_abort 	timeout=${10}
+	Run Keyword If	not ${status}	Fail	msg=The manager is not in waiting for agent status.
+
+	Log To Console	${\n}The manager displayed the expected message. It is now waiting for the agent.${\n}
+
+	Open Agent
+	Check If The Agent Is Ready
+	${status}=	Run Keyword And Return Status
+	...    Wait For	${platform}_info_label_enough_agents_available.png 	timeout=${15}
+	Run Keyword If	not ${status}	Fail
+	...    msg=The manager didn't display expected prompt dialogue that says: Enough Agent available to run Robots, test will now resume!
+	Press key.enter 1 Times
+	Click Tab	Run
+
+	Log To Console	${\n}The manager displayed the expected message. Agent is ready. Test will now resume.${\n}
+
+	Sleep	5
+	Click Button	abort
+	Press Key.tab 2 Times
+	Move To	10	10
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+
+	Click Tab	Plan
+	Click Button	runplay
+	${status}=	Run Keyword And Return Status
+	...    Wait For	${platform}_warning_label_not_enough_agents.png 	timeout=${10}
+	Run Keyword If	${status}	Fail
+	...    msg=The manager have displaed prompt dialogue that says: Not enough Agents available to run Robots! but that was not expected!
+	Sleep	5
+	Click Button	stoprun
+	Sleep	2
+	Click
+	Press Key.enter 1 Times
+	Press Key.tab 2 Times
+	Move To		10	10
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+
+	[Teardown]	Run Keywords
+	...    Delete Scenario File		${scenario_name}		AND
+	...    Delete Robot File								AND
+	...    GUI_Common.Stop Agent							AND
+	...    Run Keyword		Close Manager GUI ${platform}
+
 Check If Scenario Csv Report Files Contain Correct Data From The Test
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #17
 	[Setup]	Run Keywords
@@ -1062,7 +1261,7 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 	
 	@{test_results}=	List Directories In Directory	${test_dir}		absolute=${True}	pattern=*Issue-#17
 	@{csv_file_paths}=		List Files In Directory		${test_results}[0]	*.csv	absolute=${True}
-	Length Should Be	${csv_file_paths}	3	msg="Some test report csv files are missing!"
+	Length Should Be	${csv_file_paths}	3	msg=Some test report csv files are missing!
 
 	# Verify CSV report files content:
 	FOR  ${i}  IN RANGE  0  3
@@ -1073,7 +1272,7 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 		${csv_report_file_type}=	Split String From Right		${csv_file_paths}[${i}]	separator=_Issue-#17_	max_split=1
 		${csv_report_file_type}=	Set Variable	${csv_report_file_type}[-1]
 		IF  '${csv_report_file_type}' == 'summary.csv'
-			Length Should Be	${csv_rows_content_list}	2	msg="Some rows in summary.csv are missing!"
+			Length Should Be	${csv_rows_content_list}	2	msg=Some rows in summary.csv are missing, should be 2!
 
 			@{header_row_list}=		Set Variable	${csv_rows_content_list}[0]
 			Log To Console	summary.csv: ${header_row_list}
@@ -1083,12 +1282,14 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 
 			@{second_row}=		Set Variable	${csv_rows_content_list}[1]
 			Log		${second_row}
-			Should Be Equal		${second_row}[0]	10 seconds		msg=CSV summary File did not save correctly!
-			Length Should Be	${second_row}	9	msg="Some columns in summary.csv are missing!"
+			Should Be Equal		${second_row}[0]	10 seconds
+			...    msg=CSV summary File did not save correctly in the Result Name column, second row!
+
+			Length Should Be	${second_row}	9	msg=Some columns in summary.csv are missing in second row, should be 9 of them!
 
 		ELSE IF  '${csv_report_file_type}' == 'raw_result_data.csv'
 			${len}=		Get Length	${csv_rows_content_list}
-			Should Be True	${len} >= ${3}		msg="Some rows in raw_result_data.csv are missing!"
+			Should Be True	${len} >= ${3}		msg=Some rows in raw_result_data.csv are missing, should be at least 3!
 
 			@{header_row_list}=		Set Variable	${csv_rows_content_list}[0]
 			Log To Console	raw_result_data.csv: ${header_row_list}
@@ -1102,18 +1303,25 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 				@{data_row}=	Set Variable	${csv_rows_content_list}[${j}]
 				Log		${data_row}
 
-				Should Be Equal		${data_row}[0]	1	msg=CSV raw_result_data File did not save correctly!
-				Should Be True		${${data_row}[1]} >= ${1} and ${${data_row}[1]} <= ${10}	msg=CSV raw_result_data File did not save correctly!
-				Should Be Equal		${data_row}[2]	1	msg=CSV raw_result_data File did not save correctly!
-				Should Be Equal		${data_row}[3]	${Agent_name}	msg=CSV raw_result_data File did not save correctly!
-				Should Be Equal		${data_row}[4]	1	msg=CSV raw_result_data File did not save correctly!
-				Should Be Equal		${data_row}[5]	10 seconds	msg=CSV raw_result_data File did not save correctly!
-				Length Should Be	${data_row}	10	msg="Some columns in raw_result_data.csv are missing!"
+				Should Be Equal		${data_row}[0]	1
+				...    msg=CSV raw_result_data File did not save correctly in the Script Index column, ${j+1} row!
+				Should Be True		${${data_row}[1]} >= ${1} and ${${data_row}[1]} <= ${10}
+				...    msg=CSV raw_result_data File did not save correctly in the Robot column, ${j+1} row!
+				Should Be True		${${data_row}[0]} <= ${3}
+				...    msg=CSV raw_result_data File did not save correctly in the Iteration column, ${j+1} row!
+				Should Be Equal		${data_row}[3]	${Agent_name}
+				...    msg=CSV raw_result_data File did not save correctly in the Agent column, ${j+1} row!
+				Should Be Equal		${data_row}[4]	1
+				...    msg=CSV raw_result_data File did not save correctly in the Sequence column, ${j+1} row!
+				Should Be Equal		${data_row}[5]	10 seconds
+				...    msg=CSV raw_result_data File did not save correctly in the Result Name column, ${j+1} row!
+
+				Length Should Be	${data_row}	10	msg=Some columns in raw_result_data.csv are missing in ${j+1}nd row, should be 10 of them!
 			END
 
 		ELSE IF  '${csv_report_file_type}' == 'agent_data.csv'
 			${len}=		Get Length	${csv_rows_content_list}
-			Should Be True	${len} >= ${3}		msg="Some rows in agent_data.csv are missing!"
+			Should Be True	${len} >= ${3}		msg=Some rows in agent_data.csv are missing, should be at least 3!
 
 			@{header_row_list}=		Set Variable	${csv_rows_content_list}[0]
 			Log To Console	agent_data.csv: ${header_row_list}
@@ -1128,13 +1336,17 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 				@{data_row}=	Set Variable	${csv_rows_content_list}[${j}]
 				Log		${data_row}
 
-				Should Be Equal		${data_row}[0]	${Agent_name}	msg=CSV agent_data File did not save correctly!
+				Should Be Equal		${data_row}[0]	${Agent_name}
+				...    msg=CSV agent_data File did not save correctly in the Agentname column, ${j+1} row!
 				IF  '${data_row}[1]' not in @{expected_status}
-					Fail	msg=CSV agent_data File did not save correctly!
+					Fail	msg=CSV agent_data File did not save correctly in the Agentstatus column, ${j+1} row! ${data_row}[1] not in ${expected_status}.
 				END
-				Should Be True		${${data_row}[3]} >= ${0} and ${${data_row}[3]} <= ${10}	msg=CSV agent_data File did not save correctly!
-				Should Be True		${${data_row}[4]} >= ${0} and ${${data_row}[4]} <= ${10}	msg=CSV agent_data File did not save correctly!
-				Length Should Be	${data_row}	9	msg="Some columns in agent_data.csv are missing!"
+				Should Be True		${${data_row}[3]} >= ${0} and ${${data_row}[3]} <= ${10}
+				...    msg=CSV agent_data File did not save correctly in the Agentassigned column, ${j+1} row!
+				Should Be True		${${data_row}[4]} >= ${0} and ${${data_row}[4]} <= ${10}
+				...    msg=CSV agent_data File did not save correctly in the Agentrobots column, ${j+1} row!
+
+				Length Should Be	${data_row}		9	msg=Some columns in agent_data.csv are missing in ${j+1}nd row, should be 9 of them!
 			END
 
 		ELSE
@@ -1205,6 +1417,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 		END
 	END
 
+	Sleep	5
 	Verify Test Result Directory Name	${result_dir_name}		${scenario_name}	${current_date}
 	Verify Generated Run Result Files	${result_dir_name}		${scenario_name}
 
@@ -1250,6 +1463,7 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
 	Length Should Be	${run_result_dirs}	1	msg=The test run result dir was not created or created unexpected directories!
 
+	Sleep	5
 	Verify Test Result Directory Name	${run_result_dirs}[0]	${scenario_name}	${current_date}
 	Verify Generated Run Result Files	${run_result_dirs}[0]	${scenario_name}
 

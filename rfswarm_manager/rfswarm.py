@@ -5648,7 +5648,7 @@ class RFSwarmGUI(tk.Frame):
 					return False
 				lclips = base.localipaddresslist()
 				if valid_ipaddr not in lclips:
-					msg = "IP address: {} is not valid for the loacl machine.".format(ipaddr)
+					msg = "IP address: {} is not valid for the local machine.".format(ipaddr)
 					tkm.showwarning("RFSwarm - Warning", msg)
 					return False
 
