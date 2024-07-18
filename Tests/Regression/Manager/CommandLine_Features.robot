@@ -12,6 +12,7 @@ Environment Variable Substitution in Robot/Resource files
 	Log to console 	${CURDIR}
 
 	@{expected_files}= 	List Files In Directory And Sub Directories 	${CURDIR}${/}testdata${/}Issue-#165
+	Remove Values From List 	${expected_files} 	Issue-#165.rfs
 
 	Set Environment Variable 		RF_DIRECTORY 			${CURDIR}${/}testdata${/}Issue-#165${/}rf_dir
 	Set Environment Variable 		RF_MAGICNUM 			Thirteen
@@ -35,6 +36,7 @@ Environment Variable Substitution in Robot/Resource files
 	Should Not Contain 	${stderr_agent} 		please check the log file
 
 	@{result_files}= 	List Files In Directory And Sub Directories 	${agent_dir}${/}scripts
+	Remove Values From List 	${result_files} 	RFSListener2.py 	RFSListener3.py 	RFSTestRepeater.py
 
 	Diff Lists    ${expected_files}    ${result_files}    Agent didn't get all files from manager
 
