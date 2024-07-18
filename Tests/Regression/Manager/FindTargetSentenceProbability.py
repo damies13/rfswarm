@@ -24,6 +24,7 @@ def normalize_spaces(text):
         else:
             normalized_text += char
             in_space = False
+
     return normalized_text.strip()
 
 def find_best_subsequence(recognized_text, target_sentence):
@@ -42,6 +43,9 @@ def find_best_subsequence(recognized_text, target_sentence):
             best_similarity = similarity
             best_subsequence = subsequence
 
+    if len(best_subsequence) == 0:
+        best_similarity = 0
+
     return best_subsequence, best_similarity
 
 def find_target_sentence_similarity(image_path, target_sentence):
@@ -52,9 +56,10 @@ def find_target_sentence_similarity(image_path, target_sentence):
 
     return best_subsequence, best_similarity
 
-# image_path = 'X:/Programy/Robot_framework/rfswarm/rfswarm_fork/Screenshot 2024-07-18 211400.png'
-# target_sentence = "Index 1 has no Robots Index 1 Ramp Up is < 10 sec Index 1 Run is < 10 sec Index 1 has no Script Index 1 has no Test"
-# best_subsequence, best_similarity = find_target_sentence_similarity(image_path, target_sentence)
+# if __name__ == "__main__":
+#     image_path = ''
+#     target_sentence = "Index 1 has no Robots"
+#     best_subsequence, best_similarity = find_target_sentence_similarity(image_path, target_sentence)
 
-# print(f"Best Matching Subsequence: '{best_subsequence}'")
-# print(f"Similarity to Target Sentence: {best_similarity:.2f}")
+#     print(f"Best Matching Subsequence: '{best_subsequence}'")
+#     print(f"Similarity to Target Sentence: {best_similarity:.2f}")

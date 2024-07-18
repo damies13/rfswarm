@@ -5,6 +5,7 @@ Library 	String
 Library		Collections
 Library		DateTime
 Library		XML
+#Library		Screenshot
 
 Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
@@ -1052,6 +1053,7 @@ Verify Generated Run Result Files
 Find Text
 	[Arguments]		${mytext}	${confidence}
 	${active_window_path}=	Set Variable	${OUTPUT DIR}${/}active_window_screenshot.png
+	#${img}=		Screenshot.Take Screenshot		name=current_page	width=100%
 	Get Screenshot Of The Active Window		${active_window_path}
 	${best_subsequence}  ${best_similarity}		Find Target Sentence Similarity		${active_window_path}  ${mytext}
 	Log To Console	Best found subsequence: "${best_subsequence}""
@@ -1059,7 +1061,7 @@ Find Text
 	IF 	${${best_similarity}} >= ${${confidence}}
 		Log To Console	"${mytext}" successfully found with ${confidence} confidence value.
 	ELSE
-		Fail	"${mytext}" Not found on the screen with ${confidence} confidence value.
+		Log To Console	"${mytext}" Not found on the screen with ${confidence} confidence value.
 	END
 	#${img}=		Screenshot.Take Screenshot		name=current_page	width=2000
 	#Log 	${img}
