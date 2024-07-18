@@ -129,8 +129,18 @@ Response Body:
     "StartTime": 1572057404,
     "EndTime": 1572064628,
     "RunName": "Scenario_1572057404",
-	"Abort": false,
-	"UploadMode": "err",
+    "Abort": false,
+    "UploadMode": "err",
+    "EnvironmentVariables": {
+        "RF_DIRECTORY": {
+            "vartype": "path",
+            "value": "rf_dir"
+        },
+        "RF_MAGICNUM": {
+            "vartype": "value",
+            "value": "TWELVE"
+        }
+    },
     "Schedule": {
         "1_1": {
             "ScriptHash": "c4307dee904afe7df89fa33d193a7d30",
