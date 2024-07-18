@@ -75,6 +75,7 @@ class RFSwarmAgent():
 	xmlmode = False
 	timeout = 600
 	uploadmode = "err"
+	managedenvvars = []
 
 	debuglvl = 0
 
@@ -836,10 +837,11 @@ class RFSwarmAgent():
 							localval = jsonresp["EnvironmentVariables"][envvar]["value"]
 					if envvar in list(os.environ.keys()):
 						# envvalue = os.environ[envvar]
-						if os.environ[envvar] != localval:
+						if envvar in self.managedenvvars and os.environ[envvar] != localval:
 							os.environ[envvar] = localval
 							self.debugmsg(1, "Setting Environment Variable:", envvar, "=", localval)
 					else:
+						self.managedenvvars.append(envvar)
 						os.environ[envvar] = localval
 						self.debugmsg(1, "Setting Environment Variable:", envvar, "=", localval)
 
