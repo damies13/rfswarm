@@ -1,7 +1,14 @@
-*** Settings ***
+[Scenario]
+uploadmode = err
+scriptcount = 1
+graphlist =
 
-Resource 	%{RF_DIRECTORY}${/}folder${/}file.resource
+[Script Defaults]
 
-*** Test Cases ***
-Issue #165 Environment Variable Substitution
-	Keyword from RF_DIRECTORY
+[1]
+robots = 2
+delay = 300
+rampup = 10
+run = 60
+test = Issue #165 Environment Variable Substitution
+script = issue165.robot
