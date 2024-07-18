@@ -20,7 +20,7 @@ jobs:
       - name: Run Super-Linter
         uses: github/super-linter@v6
         env:
-          DEFAULT_BRANCH: main
+          DEFAULT_BRANCH: master
           FILTER_REGEX_EXCLUDE: (.*sh|.git/.*|.Doc/Images/.*|.Tests/.*/Logs/.*|.Tests/.*/testdata/.*)
           VALIDATE_PYTHON_BLACK: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
