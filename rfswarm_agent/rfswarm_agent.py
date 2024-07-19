@@ -75,7 +75,7 @@ class RFSwarmAgent():
 	xmlmode = False
 	timeout = 600
 	uploadmode = "err"
-	managedenvvars = []
+	managedenvvars: Any = []
 
 	debuglvl = 0
 
