@@ -21,7 +21,7 @@ jobs:
         run: python -m pip install --upgrade pip
 
       - name: Run Super-Linter
-        uses: github/super-linter@v5
+        uses: super-linter/super-linter@v6
         env:
           DEFAULT_BRANCH: master
           FILTER_REGEX_EXCLUDE: (.*sh|.git/.*|.Doc/Images/.*|.Tests/.*/Logs/.*|.Tests/.*/testdata/.*)
