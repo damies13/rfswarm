@@ -19,6 +19,13 @@ Verify the Field Validation Is Working In the Manager Plan Screen
 	...    Create Robot File	name=example.robot	file_content=***Test Case***\nExample Test Case\n
 
 	@{scenario_names_list}=	Create List		robots  rampup  run  test  script  all
+	&{expected_messages}=	Create Dictionary
+	...    robots=Index 1 has no Robots
+	...    rampup=Index 1 Ramp Up is < 10 sec
+	...    run=Index 1 Run is < 10 sec
+	...    test=Index 1 has no Test
+	...    script=Index 1 has no Script
+	...    all=Index 1 has no Robots Index 1 Ramp Up is < 10 sec Index 1 Run is < 10 sec Index 1 has no Script Index 1 has no Test
 
 	FOR  ${name}  IN  @{scenario_names_list}
 		${scenarioname}=	Set Variable	Issue-#126_${name}
@@ -30,7 +37,9 @@ Verify the Field Validation Is Working In the Manager Plan Screen
 		Press key.enter 1 Times
 		Click Button	runplay
 		Sleep	2
-		Take A Screenshot	#del later
+		${status}=	Run Keyword And Return Status
+		...    Wait For	${platform}_warning_label_no_${name}.png 	timeout=${20}
+		Run Keyword If	not ${status}	Fail	msg=Cant find waring label that says: ${expected_messages}[${name}].
 		Press key.enter 1 Times
 		Delete Scenario File	${scenario_name}
 
