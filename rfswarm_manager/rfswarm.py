@@ -3189,7 +3189,7 @@ class RFSwarmCore:
 			base.debugmsg(5, "grp", grp)
 			if "Index" in grp.keys():
 				if "Robots" not in grp.keys() or grp["Robots"] < 1:
-					warnings.append("Index {} has no Robots".format(grp["Index"]))
+					warnings.append("Index {} has no Robots.".format(grp["Index"]))
 
 				# RampUp	< 10
 				if "RampUp" not in grp.keys() or grp["RampUp"] < 10:
@@ -3199,14 +3199,14 @@ class RFSwarmCore:
 					warnings.append("Index {} Run is < 10 sec.".format(grp["Index"]))
 
 				if "Script" not in grp.keys() or len(grp["Script"]) < 1:
-					warnings.append("Index {} has no Script".format(grp["Index"]))
+					warnings.append("Index {} has no Script.".format(grp["Index"]))
 				else:
 					# ScriptHash
 					if "ScriptHash" not in grp.keys() or len(grp["ScriptHash"]) < 1:
-						warnings.append("Index {} Agents don't have Script yet".format(grp["Index"]))
+						warnings.append("Index {} Agents don't have Script yet.".format(grp["Index"]))
 
 				if "Test" not in grp.keys() or len(grp["Test"]) < 1:
-					warnings.append("Index {} has no Test".format(grp["Index"]))
+					warnings.append("Index {} has no Test.".format(grp["Index"]))
 
 		# warnings.append("Debuging : Don't Run")
 		return warnings
