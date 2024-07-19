@@ -58,7 +58,7 @@ Verify That Files Get Saved With Correct Extension And Names
 	...    Open Agent
 
 	${scenario_name}=	Set Variable	Issue-#39
-	Log To Console	Files to check: scenario file, csv result files
+	Log To Console	Files to check: scenario file, csv result files.
 	Click Button	runsave
 	Save Scenario File OS DIALOG	${scenario_name}
 
