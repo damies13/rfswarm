@@ -17,9 +17,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Pip Update
-        run: python -m pip install --upgrade pip
-
       - name: Run Super-Linter
         uses: super-linter/super-linter@v6
         env:
@@ -30,6 +27,3 @@ jobs:
           VALIDATE_CSS: false
           VALIDATE_HTML: false
           VALIDATE_JSCPD: false
-          VALIDATE_GO: false
-          VALIDATE_GO_MODULES: false
-          VALIDATE_GO_RELEASER: false
