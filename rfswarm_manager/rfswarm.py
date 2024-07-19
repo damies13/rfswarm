@@ -3459,6 +3459,7 @@ class RFSwarmCore:
 
 	def sr_users_validate(self, *args):
 		base.debugmsg(5, "args:", args)
+		usrs = 0
 		if args:
 			r = args[0]
 			if len(args) > 1:
