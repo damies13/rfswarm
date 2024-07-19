@@ -62,7 +62,7 @@ jobs:
           sleep 1
           # fluxbox
           fluxbox &
-      - name: "MacOS Install tesseract"
+      - name: "MacOS Install tesseract and Quartz"
         if: ${{ matrix.platform == 'macos-latest' }}
         run: |
           brew install tesseract
@@ -74,11 +74,12 @@ jobs:
           Invoke-WebRequest
           -Uri "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.3.1.20230401.exe"
           -OutFile "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe"
-      - name: "Windows Install Tesseract"
+      - name: "Windows Install Tesseract and pywin32"
         if: ${{ matrix.platform == 'windows-latest' }}
         shell: cmd
         run: |
           "%Temp%\tesseract-ocr-w64-setup-5.3.1.20230401.exe" /S
+          pip install pywin32
       - name: "Windows Add Tesseract to Path"
         if: ${{ matrix.platform == 'windows-latest' }}
         shell: pwsh
