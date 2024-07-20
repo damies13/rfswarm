@@ -26,13 +26,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Display Branch Name
-        run: echo "Current Branch: ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+      - name: Get Branch Name
+        run: |
+          branchname=$(git rev-parse --abbrev-ref HEAD)
+          echo "branchname=$branchname" >> "$GITHUB_ENV"
 
       - name: Run Super-Linter
         uses: super-linter/super-linter@v6
         env:
-          DEFAULT_BRANCH: : ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          DEFAULT_BRANCH: ${{ env.branchname }}
           FILTER_REGEX_EXCLUDE: (.*sh|.git/.*|.Doc/Images/.*|.Tests/.*/Logs/.*|.Tests/.*/testdata/.*)
           VALIDATE_PYTHON_BLACK: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
