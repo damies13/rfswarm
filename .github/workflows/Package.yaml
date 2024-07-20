@@ -54,7 +54,7 @@ jobs:
           milestonever="NotSet"
           ismilestone=0
           print('branchname	:', branchname)
-          m = re.search("#(\d*)", branchname)
+          m = re.search("#(\\d*)", branchname)
           if m is not None:
             issueno = m[1]
             print('issueno		:', issueno)
