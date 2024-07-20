@@ -14,6 +14,8 @@ permissions: read-all
 jobs:
   super-lint:
     name: Lint code base
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout master
