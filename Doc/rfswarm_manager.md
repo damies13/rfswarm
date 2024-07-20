@@ -243,7 +243,7 @@ Here is an example of configuring the Filter Rules and using the Robot options:
 ### Run
 This is where you monitor your test scenario as it runs, here you will see number of robots running, how long the has been running and live updates of the test results.
 
-Unique by check boxes:
+Unique by checkboxes:
 - Index, use this if multiple test cases have results with the same result name but you want to keep the result timings separated based on the individual test cases.
 - Iteration, use this if you want to keep the result timings separated based on the test iteration.
 - Sequence, use this if multiple test steps in the same test case have the same result name but you want to keep the result timings separated based on the sequence within the test case.

@@ -46,6 +46,7 @@ jobs:
         # if: ${{ env.isrelease == 1 }}
         shell: python
         # https://api.github.com/repos/damies13/rfswarm/milestones
+        # \\d escaped for surper-linter@v6
         run: |
           import os
           import re
@@ -54,7 +55,7 @@ jobs:
           milestonever="NotSet"
           ismilestone=0
           print('branchname	:', branchname)
-          m = re.search("#(\d*)", branchname)
+          m = re.search("#(\\d*)", branchname)
           if m is not None:
             issueno = m[1]
             print('issueno		:', issueno)

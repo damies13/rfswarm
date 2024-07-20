@@ -10,7 +10,7 @@ rfswarm is made up of 3 components, the [Manager](rfswarm_manager.md) where you 
 
 
 <kbd>
-<img align="centre" height="500" src="Images/Manager&Agent_Example.png">
+<img align="centre" height="500" alt="Manager and Agent" src="Images/Manager&Agent_Example.png">
 </kbd><br>
 An example of how your rfswarm setup might look.
 

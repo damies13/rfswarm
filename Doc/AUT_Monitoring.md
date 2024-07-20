@@ -16,7 +16,7 @@ While it may not be obvious at first the process for monitoring and reporting th
 
 1. Create a robot framework test case that connects to your AUT server and gathers the performance data you are interested in collecting, as a minimum you will probably want to collect CPU, Memory and Disk IO Information, you may also want to collect network IO, and then depending on the type of server you are monitoring there may be other details you want to monitor.
 1. report the details back to the manager using the rfswarm API [POST /Metric](Agent_Communication.md#post-metric)
-1. to make this easier the variable `${RFS_SWARMMANAGER}` as documented in the [Swarm Manager](Preparing_for_perf.md#swarm-manager) section of [Useful Variables](Preparing_for_perf.md#useful-variables), can be used to avoid hard coding the manager details.
+1. to make this easier the variable `${RFS_SWARMMANAGER}` as documented in the [Swarm Manager](Preparing_for_perf.md#swarm-manager) section of [Useful Variables](Preparing_for_perf.md#useful-variables), can be used to avoid hardcoding the manager details.
 
 ### Recomendations
 
@@ -25,7 +25,7 @@ Configure the agent with a custom property that identifys the agent e.g. "Monito
 
 ### Unix (Linux) AUT Example
 
-The robot file below is an example of connecting to a unix (linux) AUT server via a SSH session using the robot framework SSH library, collecting a variety of statistics from the AUT server and then posting those details to the Manager API using the robot framework Requests Library.
+The robot file below is an example of connecting to a Unix (Linux) AUT server via a SSH session using the robot framework SSH library, collecting a variety of statistics from the AUT server and then posting those details to the Manager API using the robot framework Requests Library.
 
 This example may work for you, or you may need to modify it to work with the OS that your AUT uses. It is not intended as a ready to use example, but rather a starting point to help you build a monitoring script for your AUT.
 

@@ -24,7 +24,7 @@ To learn more about rfswarm please refer to the [Documentation](https://github.c
 - [Reporting Issues / Known Issues](https://github.com/damies13/rfswarm/issues)
 
 <kbd align="centre">
-<img align="centre" height="350" src="https://github.com/damies13/rfswarm/blob/master/Doc/Images/Manager&Agent_Example.png">
+<img align="centre" height="350" alt="Manager and Agent" src="https://github.com/damies13/rfswarm/blob/master/Doc/Images/Manager&Agent_Example.png">
 </kbd><br>
 An example of how your rfswarm setup might look.
 
