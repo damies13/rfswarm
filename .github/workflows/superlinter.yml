@@ -9,6 +9,8 @@ on:
   pull_request:
     types: [opened, reopened]
 
+permissions: read-all
+
 jobs:
   super-lint:
     name: Lint code base
