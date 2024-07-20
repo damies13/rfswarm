@@ -5,5 +5,5 @@
 
 ## Time Sponsors
 
-|[![Image](Images/Sponsor_NiceProject_300.png)](https://niceproject.eu/)|Thank you [NiceProject Poland](https://niceproject.eu/) for providing the time of [Arkadiusz Kuczyński](https://github.com/ArekKuczynski)
+|[![Image](Images/Sponsor_NiceProject_300.png)](https://niceproject.eu/)|Thank you [NiceProject Poland](https://niceproject.eu/) for providing the time of [Arkadiusz Kuczyński](https://github.com/ArekKuczynski) |
 |----|----|

@@ -9,7 +9,7 @@
 | [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/damies13/rfswarm/superlinter.yml?branch=master&label=Linter)](https://github.com/damies13/rfswarm/actions/workflows/superlinter.yml) |
 | [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/damies13/rfswarm/Main.yaml?branch=master&label=Regression%20Tests)](https://github.com/damies13/rfswarm/actions/workflows/Main.yaml) |
 
-<img align="right" src="Doc/Images/Icon_Information.png">
+<img align="right" alt="Info" src="Doc/Images/Icon_Information.png">
 
 ## About
 rfswarm is a testing tool that allows you to use [Robot Framework](https://robotframework.org/) test cases for performance or load testing.
@@ -28,7 +28,7 @@ To learn more about rfswarm please refer to the [Documentation](Doc/README.md)
 
 ![Image](Doc/Images/MacOS_Run_v0.8.0_2h.png "Run - Showing results being collected live")
 
-<img align="right" src="Doc/Images/Icon_Help.png">
+<img align="right" alt="Help" src="Doc/Images/Icon_Help.png">
 
 ## Getting Help
 
@@ -39,14 +39,14 @@ To learn more about rfswarm please refer to the [Documentation](Doc/README.md)
 - [Reporting Issues / Known Issues](https://github.com/damies13/rfswarm/issues)
 
 <kbd align="centre">
-<img align="centre" height="350" src="Doc/Images/Manager&Agent_Example.png">
+<img align="centre" height="350" alt="Manager and Agent" src="Doc/Images/Manager&Agent_Example.png">
 </kbd><br>
 An example of how your rfswarm setup might look.
 
 ### Commercial Support
 - The easiest way to get commercial support is to sponsor this project on [GitHub](https://github.com/sponsors/damies13?frequency=recurring&sponsor=damies13)
 
-<img align="right" src="Doc/Images/Icon_Contribute.png">
+<img align="right" alt="Contribute" src="Doc/Images/Icon_Contribute.png">
 
 ### Contribute
 If you'd like to help make rfswarm better the are a number of ways you can help (only the last two require programming skills)
@@ -61,7 +61,7 @@ If you'd like to help make rfswarm better the are a number of ways you can help 
 - Fix a bug, please assign the issue to you self or add a comment on the issue first, to prevent duplication of effort.
 - Implement a Feature Request, please assign the issue to you self or add a comment on the issue first, to prevent duplication of effort.
 
-<img align="right" src="Doc/Images/Icon_Donate.png">
+<img align="right" alt="Donate" src="Doc/Images/Icon_Donate.png">
 
 ## Donations
 
