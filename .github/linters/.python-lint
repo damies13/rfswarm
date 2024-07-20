@@ -44,7 +44,7 @@ fail-under = 10
 # format. Because '\\' represents the directory delimiter on Windows systems, it
 # can't be used as an escape character.
 # ignore-paths =
-ignore-paths = Tests/.*
+ignore-paths = ["^Tests/.*$", ]
 
 # Files or directories matching the regular expression patterns are skipped. The
 # regex matches against base names, not paths. The default value ignores Emacs
