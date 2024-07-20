@@ -16,15 +16,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          # super-linter needs the full git history to get the
-          # list of files that changed across commits
-          fetch-depth: 0
+        # with:
+        #   # super-linter needs the full git history to get the
+        #   # list of files that changed across commits
+        #   fetch-depth: 0
           
       - name: Run Super-Linter
         uses: super-linter/super-linter@v6
         env:
-          DEFAULT_BRANCH: master
+          DEFAULT_BRANCH: origin/master
           FILTER_REGEX_EXCLUDE: (.*sh|.git/.*|.Doc/Images/.*|.Tests/.*/Logs/.*|.Tests/.*/testdata/.*)
           VALIDATE_PYTHON_BLACK: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
