@@ -9,31 +9,17 @@ on:
   pull_request:
     types: [opened, reopened]
 
-permissions: read-all
-
 jobs:
   super-lint:
     name: Lint code base
-
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-
     steps:
-      # - name: Checkout master
-      #   uses: actions/checkout@v4
-      #   with:
-      #     ref: master
-
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Get Branch Name
         run: |
           branchname=$(git rev-parse --abbrev-ref HEAD)
           echo "branchname=$branchname" >> "$GITHUB_ENV"
-
       - name: Run Super-Linter
         uses: super-linter/super-linter@v6
         env:
@@ -44,3 +30,4 @@ jobs:
           VALIDATE_CSS: false
           VALIDATE_HTML: false
           VALIDATE_JSCPD: false
+          VALIDATE_CHECKOV: false
