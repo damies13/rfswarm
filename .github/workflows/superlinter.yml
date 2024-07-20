@@ -18,18 +18,21 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout master
-        uses: actions/checkout@v4
-        with:
-          ref: master
+      # - name: Checkout master
+      #   uses: actions/checkout@v4
+      #   with:
+      #     ref: master
 
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Display Branch Name
+        run: echo "Current Branch: ${{ github.ref }}"
+
       - name: Run Super-Linter
         uses: super-linter/super-linter@v6
         env:
-          DEFAULT_BRANCH: master
+          DEFAULT_BRANCH: : ${{ github.ref }}
           FILTER_REGEX_EXCLUDE: (.*sh|.git/.*|.Doc/Images/.*|.Tests/.*/Logs/.*|.Tests/.*/testdata/.*)
           VALIDATE_PYTHON_BLACK: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
