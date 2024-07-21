@@ -2,7 +2,7 @@
 Resource 	CommandLine_Common.robot
 
 *** Test Cases ***
-Robbot files with same name but different folders
+Robot files with same name but different folders
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #184
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	VAR 	${agent_dir} 		${agent_dir}${/}${TEST NAME}      scope=TEST

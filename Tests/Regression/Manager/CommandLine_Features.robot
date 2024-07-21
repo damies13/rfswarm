@@ -54,14 +54,16 @@ Default Result Name Method
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 
+	List Directory 	${results_dir}
+	Copy Directory 	${results_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+
 	${dbfile}= 	Find Result DB
-	# Query Result DB 	${dbfile} 	Select * from Results
-	${result}= 	Query Result DB 	${dbfile} 	Select * from ResultSummary;
-	# ${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;
-	# ${result}= 	Query Result DB 	${dbfile} 	Select count(*) from Summary;
-	# Should Be True	${result[0][0]} > 0
-	# Should Be Equal As Numbers	${result[0][0]} 	4
+	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
 	Log 	${result}
+	Should Be Equal 	${result[0][0]} 	Default Keyword Documentation
+	Should Be Equal 	${result[1][0]} 	Doc Keyword Message
+	Should Be Equal 	${result[2][0]} 	Message for Info Keyword
+	Should Be Equal 	${result[3][0]} 	Doc only keyword From Info Library
 
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
@@ -76,6 +78,16 @@ Documentation Result Name Method
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 
+	List Directory 	${results_dir}
+	Copy Directory 	${results_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+
+	${dbfile}= 	Find Result DB
+	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	Log 	${result}
+	Should Be Equal 	${result[0][0]} 	Default Keyword Documentation
+	Should Be Equal 	${result[1][0]} 	Doc keyword From Info Library
+	Should Be Equal 	${result[3][0]} 	Doc only keyword From Info Library
+
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
 	...    Stop Manager
@@ -88,6 +100,15 @@ Info Result Name Method
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
+
+	List Directory 	${results_dir}
+	Copy Directory 	${results_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+
+	${dbfile}= 	Find Result DB
+	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	Log 	${result}
+	Should Be Equal 	${result[1][0]} 	Doc Keyword Message
+	Should Be Equal 	${result[2][0]} 	Message for Info Keyword
 
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
@@ -102,6 +123,18 @@ Keyword Only Result Name Method
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 
+	List Directory 	${results_dir}
+	Copy Directory 	${results_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+
+	${dbfile}= 	Find Result DB
+	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	Log 	${result}
+	Should Be Equal 	${result[0][0]} 	Default Keyword Name
+	Should Be Equal 	${result[1][0]} 	Quiet Keyword Name
+	Should Be Equal 	${result[2][0]} 	Doc Keyword
+	Should Be Equal 	${result[3][0]} 	Doc Only Keyword
+	Should Be Equal 	${result[4][0]} 	Info Keyword
+
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
 	...    Stop Manager
@@ -114,6 +147,18 @@ Keyword Only Result Name Method
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
+
+	List Directory 	${results_dir}
+	Copy Directory 	${results_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+
+	${dbfile}= 	Find Result DB
+	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	Log 	${result}
+	Should Be Equal 	${result[0][0]} 	Default Keyword Name
+	Should Be Equal 	${result[1][0]} 	Quiet Keyword Name
+	Should Be Equal 	${result[2][0]} 	Doc Keyword Doc Keyword Message
+	Should Be Equal 	${result[3][0]} 	Doc Only Keyword Doc Keyword Message
+	Should Be Equal 	${result[4][0]} 	Info Keyword Message for Info Keyword
 
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
