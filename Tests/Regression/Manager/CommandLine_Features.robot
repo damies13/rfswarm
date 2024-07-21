@@ -44,3 +44,77 @@ Environment Variable Substitution in Robot/Resource files
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
 	...    Stop Manager
+
+Default Result Name Method
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
+	Run Agent
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default.rfs
+	Log to console 	${scenariofile}
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	Run Manager CLI 	${mngr_options}
+	Wait For Manager
+
+	${dbfile}= 	Find Result DB
+	# Query Result DB 	${dbfile} 	Select * from Results
+	${result}= 	Query Result DB 	${dbfile} 	Select * from ResultSummary;
+	# ${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;
+	# ${result}= 	Query Result DB 	${dbfile} 	Select count(*) from Summary;
+	# Should Be True	${result[0][0]} > 0
+	# Should Be Equal As Numbers	${result[0][0]} 	4
+	Log 	${result}
+
+	[Teardown]	Run Keywords
+	...    Stop Agent	AND
+	...    Stop Manager
+
+Documentation Result Name Method
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
+	Run Agent
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}documentation.rfs
+	Log to console 	${scenariofile}
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	Run Manager CLI 	${mngr_options}
+	Wait For Manager
+
+	[Teardown]	Run Keywords
+	...    Stop Agent	AND
+	...    Stop Manager
+
+Info Result Name Method
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
+	Run Agent
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}info.rfs
+	Log to console 	${scenariofile}
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	Run Manager CLI 	${mngr_options}
+	Wait For Manager
+
+	[Teardown]	Run Keywords
+	...    Stop Agent	AND
+	...    Stop Manager
+
+Keyword Only Result Name Method
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
+	Run Agent
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keyword.rfs
+	Log to console 	${scenariofile}
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	Run Manager CLI 	${mngr_options}
+	Wait For Manager
+
+	[Teardown]	Run Keywords
+	...    Stop Agent	AND
+	...    Stop Manager
+
+ Keyword and Args Result Name Method
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
+	Run Agent
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keywordargs.rfs
+	Log to console 	${scenariofile}
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	Run Manager CLI 	${mngr_options}
+	Wait For Manager
+
+	[Teardown]	Run Keywords
+	...    Stop Agent	AND
+	...    Stop Manager
