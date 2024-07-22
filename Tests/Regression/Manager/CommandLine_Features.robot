@@ -55,7 +55,8 @@ Default Result Name Method
 	Wait For Manager
 
 	List Directory 	${results_dir}
-	Copy Directory 	${results_dir}${/}*default 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*default
+	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
 
 	${dbfile}= 	Find Result DB
 	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
@@ -79,7 +80,8 @@ Documentation Result Name Method
 	Wait For Manager
 
 	List Directory 	${results_dir}
-	Copy Directory 	${results_dir}${/}*documentation 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*documentation
+	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
 
 	${dbfile}= 	Find Result DB
 	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
@@ -102,7 +104,8 @@ Info Result Name Method
 	Wait For Manager
 
 	List Directory 	${results_dir}
-	Copy Directory 	${results_dir}${/}*info 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*info
+	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
 
 	${dbfile}= 	Find Result DB
 	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
@@ -124,7 +127,8 @@ Keyword Only Result Name Method
 	Wait For Manager
 
 	List Directory 	${results_dir}
-	Copy Directory 	${results_dir}${/}*keyword 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*keyword
+	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
 
 	${dbfile}= 	Find Result DB
 	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
@@ -149,7 +153,8 @@ Keyword Only Result Name Method
 	Wait For Manager
 
 	List Directory 	${results_dir}
-	Copy Directory 	${results_dir}${/}*keywordargs 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*keywordargs
+	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
 
 	${dbfile}= 	Find Result DB
 	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
