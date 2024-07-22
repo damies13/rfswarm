@@ -591,7 +591,7 @@ Select ${n} Robot Test Case
 Select Robot File OS DIALOG
 	[Arguments]		${robot_file_name}
 	Sleep	5
-	Type	${robot_file_name}.robot
+	Type	${robot_file_name}
 	Take A Screenshot
 	Click Dialog Button		open
 	Sleep	1
