@@ -1088,11 +1088,11 @@ File Open Dialogue Select File
 
 File Open Dialogue ubuntu Select File
 	[Arguments]		${filepath}
-	Sleep    0.1
+	Sleep    2
 	Take A Screenshot
 	Click Label With Horizontal Offset 	file_name 	50
 	Type 		${filepath} 	Key.ENTER
-	Sleep    0.1
+	Sleep    0.5
 	Take A Screenshot
 	# Click Dialog Button 	open
 	# Sleep    0.1
@@ -1100,33 +1100,40 @@ File Open Dialogue ubuntu Select File
 
 File Open Dialogue windows Select File
 	[Arguments]		${filepath}
-	Sleep    0.1
-	Take A Screenshot
-	${filepath}= 	Normalize Path 	${filepath}
-	${path} 	${file} = 	Split Path 	${filepath}
-	Click Label With Horizontal Offset 	file_name 	50
-	Type 		${path} 	Key.ENTER
-	Sleep    0.1
+	Sleep    2
 	Take A Screenshot
 	Click Label With Horizontal Offset 	file_name 	50
-	Type 		${file} 	Key.ENTER
+	Type 		${filepath} 	Key.ENTER
+	Sleep    0.5
 	Take A Screenshot
+	# Sleep    0.1
+	# Take A Screenshot
+	# ${filepath}= 	Normalize Path 	${filepath}
+	# ${path} 	${file} = 	Split Path 	${filepath}
+	# Click Label With Horizontal Offset 	file_name 	50
+	# Type 		${path} 	Key.ENTER
+	# Sleep    0.1
+	# Take A Screenshot
+	# Click Label With Horizontal Offset 	file_name 	50
+	# Type 		${file} 	Key.ENTER
+	# Take A Screenshot
+
 	# Click Dialog Button 	open
 	# Sleep    0.1
 	# Take A Screenshot
 
 File Open Dialogue macos Select File
 	[Arguments]		${filepath}
-	Sleep    0.1
+	Sleep    2
 	Take A Screenshot
 	Press Combination 	KEY.command 	KEY.shift 	KEY.g
-	Sleep    0.1
+	Sleep    0.5
 	Take A Screenshot
 	Type 		Key.BACKSPACE 	Key.DELETE
-	Sleep    0.1
+	Sleep    0.5
 	Take A Screenshot
 	Type 		${filepath} 	Key.ENTER
-	Sleep    0.1
+	Sleep    0.5
 	Take A Screenshot
 	Click Dialog Button 	open
 
