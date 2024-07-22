@@ -429,6 +429,24 @@ Set INI Window Size
 	Log		${ini_content}
 	Append To File	${location}		${ini_content}
 
+Change Manager INI File Settings
+	[Arguments]		${option}	${new_value}
+	${location}=	Get Manager INI Location
+	${ini_content}=		Get Manager INI Data
+	${ini_content_list}=	Split String	${ini_content}
+	${option_index}=	Get Index From List		${ini_content_list}		${option}
+
+	${len}	Get Length	${ini_content_list}
+	IF  ${len} > ${option_index + 2}
+		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${option_index + 2}]	${new_value}
+	ELSE
+		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${option_index}] =	${option} = ${new_value}
+	END
+
+	Remove File		${location}
+	Log		${ini_content}
+	Append To File	${location}		${ini_content}
+
 Get Manager PIP Data
 	Run Process	pip	show	rfswarm-manager		alias=data
 	${pip_data}	Get Process Result	data
@@ -548,7 +566,7 @@ Change Scenario Wide Settings
 			Click CheckBox	checked		injectsleep
 		END
 	END
-	# TODO: disableloglog, disablelogreport, disablelogoutput, bindipaddres, bindport
+	# TODO: disableloglog, disablelogreport, disablelogoutput
 
 	Click Button	ok
 
@@ -572,13 +590,8 @@ Select ${n} Robot Test Case
 
 Select Robot File OS DIALOG
 	[Arguments]		${robot_file_name}
-	Sleep	2
-	${robot_file_name}=		Set Variable		${robot_file_name}
-	${robot_file_name}=		Get Substring	${robot_file_name}	0	-6
-	Log		${robot_file_name}
-	Take A Screenshot
-	Click Dialog Button		${robot_file_name}_robot
-	Sleep	2
+	Sleep	5
+	Type	${robot_file_name}.robot
 	Take A Screenshot
 	Click Dialog Button		open
 	Sleep	1
@@ -1004,7 +1017,6 @@ Verify Scenario Wide Settings Data
 		Should Be Equal		${wide_settings_data['disablelog_output']}		${scenario_content_list}[${disablelog_output_offset + 2}]
 		...    msg=Disablelog Robot Logs: output.xml did not save correctly [settings != scenario]!
 	END
-	# TODO: bindipaddres, bindport
 
 Check That The Scenario File Opens Correctly
 	[Arguments]		${scenario_name}	${scenario_content}

@@ -10,6 +10,53 @@ Suite Setup 	Set Platform
 ${scenario_name}=	test_scenario
 
 *** Test Cases ***
+Verify the Files Referenced In the Scenario Are All Using Relative Paths
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #54
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Open Manager GUI
+
+	${global_path}=		Normalize Path	${global_path}
+	${manager_ini_file}		Get Manager INI Location
+	@{paths}=			Create List		${global_path}  ${global_path}${/}robots  ${EXECDIR}  ${EXECDIR}${/}robots
+	@{robot_names}=		Create List		robot_rel_1  robot_rel_2  robot_rel_3  robot_rel_4
+	@{robot_paths}=		Create List
+	...    ${paths}[0]${/}${robot_names}[0].robot
+	...    ${paths}[1]${/}${robot_names}[1].robot
+	...    ${paths}[2]${/}${robot_names}[2].robot
+	...    ${paths}[3]${/}${robot_names}[3].robot
+	@{rel_robot_paths}=		Get Relative Paths	${global_path}	${robot_paths}
+	Log To Console	Robot relative paths to ${global_path}: ${\n}${rel_robot_paths}
+
+	Create Robot File	path=${global_path}				name=${robot_names}[0].robot
+	Create Robot File	path=${global_path}${/}robots	name=${robot_names}[1].robot
+	Create Robot File	path=${EXECDIR}					name=${robot_names}[2].robot
+	Create Robot File	path=${EXECDIR}${/}robots		name=${robot_names}[3].robot
+
+	FOR  ${i}  IN RANGE  0  4
+		Select Test Script	1		${robot_paths}[${i}]
+		Sleep	1
+		Select 1 Robot Test Case
+		Click Button	runsave
+		IF  ${i} == 0
+			Save Scenario File OS DIALOG	${scenario_name}
+		END
+		Sleep	2
+		${scenario_file_dict}=		Read Ini File 	${global_path}${/}${scenario_name}.rfs
+		Log		Scenario file with relative paths: ${scenario_file_dict}	console=True
+		Should Be Equal As Strings		${scenario_file_dict}[1][script] 	${rel_robot_paths}[${i}]
+
+	END
+	Delete Scenario File		${scenario_name}
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}								AND
+	...    Delete Robot File	path=${global_path}				name=${robot_names}[0]	AND
+	...    Delete Robot File	path=${global_path}${/}robots	name=${robot_names}[1]	AND
+	...    Delete Robot File	path=${EXECDIR}					name=${robot_names}[2]	AND
+	...    Delete Robot File	path=${EXECDIR}${/}robots		name=${robot_names}[3]	AND
+	...    Delete Scenario File		${scenario_name}
+
 Verify the Field Validation Is Working In the Manager Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #126
 	[Setup]	Run Keywords
