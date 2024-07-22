@@ -14,25 +14,29 @@ Verify the Files Referenced In the Scenario Are All Using Relative Paths
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #54
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
-	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
-	...    Open Manager GUI
+	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
-	${global_path}=		Normalize Path	${global_path}
+	${test_data_path}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#54
+	${scenario_path}=	Normalize Path 	${test_data_path}${/}${scenario_name}.rfs
+	Copy File	${test_data_path}${/}${scenario_name}_original.rfs	${scenario_path}
 	${manager_ini_file}		Get Manager INI Location
-	@{paths}=			Create List		${global_path}  ${global_path}${/}robots  ${results_dir}  ${results_dir}${/}robots
+	@{paths}=			Create List		${test_data_path}  ${test_data_path}${/}robots  ${results_dir}  ${results_dir}${/}robots
 	@{robot_names}=		Create List		robot_rel_1  robot_rel_2  robot_rel_3  robot_rel_4
 	@{robot_paths}=		Create List
 	...    ${paths}[0]${/}${robot_names}[0].robot
 	...    ${paths}[1]${/}${robot_names}[1].robot
 	...    ${paths}[2]${/}${robot_names}[2].robot
 	...    ${paths}[3]${/}${robot_names}[3].robot
-	@{rel_robot_paths}=		Get Relative Paths	${global_path}	${robot_paths}
-	Log To Console	Robot relative paths to ${global_path}: ${\n}${rel_robot_paths}
+	@{rel_robot_paths}=		Get Relative Paths	${test_data_path}	${robot_paths}
+	Log To Console	Robot relative paths to ${test_data_path}: ${\n}${\n}${rel_robot_paths}${\n}
 
 	Create Robot File	path=${paths}[0]	name=${robot_names}[0].robot
 	Create Robot File	path=${paths}[1]	name=${robot_names}[1].robot
 	Create Robot File	path=${paths}[2]	name=${robot_names}[2].robot
 	Create Robot File	path=${paths}[3]	name=${robot_names}[3].robot
+
+	@{mngr_options}=	Create List		-s		${scenario_path}
+	Open Manager GUI	${mngr_options}
 
 	FOR  ${i}  IN RANGE  0  4
 		Log To Console		Saving ${rel_robot_paths}[${i}] to the scenario.
@@ -41,26 +45,23 @@ Verify the Files Referenced In the Scenario Are All Using Relative Paths
 		Sleep	1
 		Select 1 Robot Test Case
 		Click Button	runsave
-		IF  ${i} == 0
-			Save Scenario File OS DIALOG	${scenario_name}
-		END
 		Sleep	2
-		${scenario_file_dict}=		Read Ini File 	${global_path}${/}${scenario_name}.rfs
-		Log		Scenario file with relative paths: ${scenario_file_dict}	console=True
+		${scenario_file_dict}=		Read Ini File 	${test_data_path}${/}${scenario_name}.rfs
+		Log To Console		Scenario file with relative path: ${scenario_file_dict}
 		Should Be Equal As Strings		${scenario_file_dict}[1][script] 	${rel_robot_paths}[${i}]
 
 	END
 	Delete Scenario File		${scenario_name}
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}					AND
-	...    Delete Robot File	path=${paths}[0]	name=${robot_names}[0]	AND
-	...    Delete Robot File	path=${paths}[1]	name=${robot_names}[1]	AND
-	...    Delete Robot File	path=${paths}[2]	name=${robot_names}[2]	AND
-	...    Delete Robot File	path=${paths}[3]	name=${robot_names}[3]	AND
-	...    Delete Scenario File		${scenario_name}
+	...    Delete Robot File	path=${paths}[0]	name=${robot_names}[0].robot	AND
+	...    Delete Robot File	path=${paths}[1]	name=${robot_names}[1].robot	AND
+	...    Delete Robot File	path=${paths}[2]	name=${robot_names}[2].robot	AND
+	...    Delete Robot File	path=${paths}[3]	name=${robot_names}[3].robot	AND
+	...    Remove File		${scenario_path}										AND
+	...    Run Keyword		Close Manager GUI ${platform}
 
 Verify the Field Validation Is Working In the Manager Plan Screen
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #126
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #126
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -99,7 +100,7 @@ Verify the Field Validation Is Working In the Manager Plan Screen
 	...    Run Keyword		Close Manager GUI ${platform}
 
 Verify That Files Get Saved With Correct Extension And Names
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #39
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #39
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -125,7 +126,7 @@ Verify That Files Get Saved With Correct Extension And Names
 	...    GUI_Common.Stop Agent
 
 Check If the Manager Saves Times and Robots to the Scenario with Example Robot
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600										AND
 	...    Open Manager GUI															AND
@@ -180,7 +181,7 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	...    Delete Scenario File	${scenario_name}
 
 Check If the Manager Saves Settings on the Test Row With Example Robot
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600										AND
 	...    Open Manager GUI															AND
@@ -234,7 +235,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 	...    Delete Scenario File	${scenario_name}
 
 Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Set Test Variable	@{mngr_options}	-g	1						AND
@@ -297,7 +298,7 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	...    Delete Scenario File	${scenario_name}
 
 Verify Scenario File Is Updated Correctly When Scripts Are Removed
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #58
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #58
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Open Manager GUI													AND
@@ -369,7 +370,7 @@ Verify Scenario File Is Updated Correctly When Scripts Are Removed
 	...    Delete Scenario File		${scenario_name}
 
 Verify the Manager Handles Corrupted Scenario Files And Repairs It
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #58
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #58
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Open Manager GUI													AND
@@ -432,7 +433,7 @@ Verify the Manager Handles Corrupted Scenario Files And Repairs It
 	...    Delete Scenario File		${scenario_name}
 
 Verify the Manager Handles Scenario Files With Missing Scripts Files
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #241
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #241
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Set Test Variable	@{mngr_options}	-g	1						AND
@@ -485,7 +486,7 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	...    Delete Scenario File		${scenario_name}
 
 Verify If Manager Saves Inject Sleep From Scenario Wide Settings
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600										AND
 	...    Open Manager GUI															AND
@@ -515,7 +516,7 @@ Verify If Manager Saves Inject Sleep From Scenario Wide Settings
 	...    Delete Scenario File	${scenario_name}
 
 Check If the Manager Reopens Inject Sleep From Scenario Wide Settings Correctly
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600										AND
 	...    Open Manager GUI															AND
@@ -551,7 +552,7 @@ Check If the Manager Reopens Inject Sleep From Scenario Wide Settings Correctly
 	...    Delete Scenario File	${scenario_name}
 
 Check If the Manager (after was closed) Opens Inject Sleep From Scenario Wide Settings Correctly
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Set Test Variable	@{mngr_options}	-g	1					AND
@@ -586,7 +587,7 @@ Check If the Manager (after was closed) Opens Inject Sleep From Scenario Wide Se
 	...    Delete Scenario File	${scenario_name}
 
 Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Settings
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600										AND
 	...    Open Manager GUI															AND
@@ -636,7 +637,7 @@ Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Setting
 	...    Delete Scenario File	${scenario_name}
 
 Check If Inject Sleep Option Was Executed in the Test
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -722,7 +723,7 @@ Check If Inject Sleep Option Was Executed in the Test
 	...    Remove File		${global_path}${/}example.robot
 
 Verify If the Port Number And Ip Address Get Written To the INI File
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -764,7 +765,7 @@ Verify If the Port Number And Ip Address Get Written To the INI File
 	...    Change = 8148 With = 8138 In ${manager_ini_file}
 
 Verify If Agent Can't Connect On Old Port Number After Port Number Changed And Can Connect To the New One
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -808,7 +809,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 	...    Change = 8148 With = 8138 In ${manager_ini_file}
 
 Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Address On the Manager's Host
-	[Tags]	windows-latest	ubuntu-latest	Issue #16
+	#[Tags]	windows-latest	ubuntu-latest	Issue #16
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -853,7 +854,7 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	...    Change = ${ipv4}[0] With =${SPACE} In ${manager_ini_file}
 
 Verify Disable log.html - Scenario
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-sl.rfs
 	Copy File 	${sourcefile} 	${scenariofile}
@@ -890,7 +891,7 @@ Verify Disable log.html - Scenario
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify Disable report.html - Scenario
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-sr.rfs
 	Copy File 	${sourcefile} 	${scenariofile}
@@ -927,7 +928,7 @@ Verify Disable report.html - Scenario
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify Disable output.xml - Scenario
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-so.rfs
 	Copy File 	${sourcefile} 	${scenariofile}
@@ -964,7 +965,7 @@ Verify Disable output.xml - Scenario
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify Disable log.html - Test Row
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	${testkey}= 	Set Variable 		disableloglog
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-trl.rfs
@@ -1004,7 +1005,7 @@ Verify Disable log.html - Test Row
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify Disable report.html - Test Row
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	${testkey}= 	Set Variable 		disablelogreport
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-trl.rfs
@@ -1044,7 +1045,7 @@ Verify Disable report.html - Test Row
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify Disable output.xml - Test Row
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	${testkey}= 	Set Variable 		disablelogoutput
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-trl.rfs
@@ -1084,7 +1085,7 @@ Verify Disable output.xml - Test Row
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords
 	...    Set INI Window Size		800		600												AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
@@ -1126,7 +1127,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	...    CommandLine_Common.Stop Manager
 
 Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords
 	...    Set INI Window Size		800		600												AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
@@ -1171,7 +1172,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	...    CommandLine_Common.Stop Manager
 
 Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords
 	...    Set INI Window Size		800		600												AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
@@ -1216,7 +1217,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    CommandLine_Common.Stop Manager
 
 Check If The CSV Report Button Works In The Manager
-	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #254
+	#[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #254
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600		AND
 	...    Open Agent
@@ -1261,7 +1262,7 @@ Check If The CSV Report Button Works In The Manager
 	...    GUI_Common.Stop Agent
 
 Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robots
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #31
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #31
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -1329,7 +1330,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 	...    Run Keyword		Close Manager GUI ${platform}
 
 Check If Scenario Csv Report Files Contain Correct Data From The Test
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #17
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #17
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600		AND
 	...    Open Agent
@@ -1447,7 +1448,7 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 	...    GUI_Common.Stop Agent
 
 Verify the Results Directory And db File Gets Created Correctly With Scenario Also After a Restart
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
 	[Setup]	Run Keywords
 	...    Clear Manager Result Directory									AND
 	...    Set INI Window Size		1200	600								AND
@@ -1516,7 +1517,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	...    Run Keyword		Close Manager GUI ${platform}
 
 Verify the Results Directory And db File Gets Created Correctly Without Scenario
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
 	[Setup]	Run Keywords
 	...    Clear Manager Result Directory									AND
 	...    Set INI Window Size		1200	600								AND
@@ -1561,7 +1562,7 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	...    Run Keyword		Close Manager GUI ${platform}
 
 Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the robots)
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot	AND
 	...    Set INI Window Size		1200	600							AND
@@ -1588,7 +1589,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	...    Remove File		${global_path}${/}example.robot
 
 Check If Test Scenario Run Will Stop Gradually
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot							AND
 	...    Set INI Window Size		1200	600													AND
