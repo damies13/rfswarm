@@ -16,27 +16,30 @@ Verify the Files Referenced In the Scenario Are All Using Relative Paths
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
-	${test_data_path}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#54
-	${scenario_path}=	Normalize Path 	${test_data_path}${/}${scenario_name}.rfs
-	Copy File	${test_data_path}${/}${scenario_name}_original.rfs	${scenario_path}
+	${gloabl_path}=		Normalize Path	${global_path}
+	# ${test_data_path}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#54
+	# ${scenario_path}=	Normalize Path 	${test_data_path}${/}${scenario_name}.rfs
+	# Copy File	${test_data_path}${/}${scenario_name}_original.rfs	${scenario_path}
 	${manager_ini_file}		Get Manager INI Location
-	@{paths}=			Create List		${test_data_path}  ${test_data_path}${/}robots  ${results_dir}  ${results_dir}${/}robots
+	@{paths}=			Create List
+	...    ${gloabl_path}  ${gloabl_path}${/}robots
+	...    ${gloabl_path}${/}..${/}..  ${gloabl_path}${/}..${/}..${/}robots
 	@{robot_names}=		Create List		robot_rel_1  robot_rel_2  robot_rel_3  robot_rel_4
 	@{robot_paths}=		Create List
 	...    ${paths}[0]${/}${robot_names}[0].robot
 	...    ${paths}[1]${/}${robot_names}[1].robot
 	...    ${paths}[2]${/}${robot_names}[2].robot
 	...    ${paths}[3]${/}${robot_names}[3].robot
-	@{rel_robot_paths}=		Get Relative Paths	${test_data_path}	${robot_paths}
-	Log To Console	Robot relative paths to ${test_data_path}: ${\n}${\n}${rel_robot_paths}${\n}
+	@{rel_robot_paths}=		Get Relative Paths	${gloabl_path}	${robot_paths}
+	Log To Console	Robot relative paths to ${gloabl_path}: ${\n}${\n}${rel_robot_paths}${\n}
 
 	Create Robot File	path=${paths}[0]	name=${robot_names}[0].robot
 	Create Robot File	path=${paths}[1]	name=${robot_names}[1].robot
 	Create Robot File	path=${paths}[2]	name=${robot_names}[2].robot
 	Create Robot File	path=${paths}[3]	name=${robot_names}[3].robot
 
-	@{mngr_options}=	Create List		-s		${scenario_path}
-	Open Manager GUI	${mngr_options}
+	# @{mngr_options}=	Create List		-s		${scenario_path}
+	Open Manager GUI
 
 	FOR  ${i}  IN RANGE  0  4
 		Log To Console		Saving ${rel_robot_paths}[${i}] to the scenario.
@@ -45,8 +48,12 @@ Verify the Files Referenced In the Scenario Are All Using Relative Paths
 		Sleep	10
 		Select 1 Robot Test Case
 		Click Button	runsave
+		IF  ${i} == 0
+			Save Scenario File OS DIALOG	${scenario_name}
+			Press key.enter 1 Times
+		END
 		Sleep	2
-		${scenario_file_dict}=		Read Ini File 	${test_data_path}${/}${scenario_name}.rfs
+		${scenario_file_dict}=		Read Ini File 	${gloabl_path}${/}${scenario_name}.rfs
 		Log To Console		Scenario file with relative path: ${scenario_file_dict}
 		Should Be Equal As Strings		${scenario_file_dict}[1][script] 	${rel_robot_paths}[${i}]
 
@@ -57,7 +64,7 @@ Verify the Files Referenced In the Scenario Are All Using Relative Paths
 	...    Delete Robot File	path=${paths}[1]	name=${robot_names}[1].robot	AND
 	...    Delete Robot File	path=${paths}[2]	name=${robot_names}[2].robot	AND
 	...    Delete Robot File	path=${paths}[3]	name=${robot_names}[3].robot	AND
-	...    Remove File		${scenario_path}										AND
+	...    Remove File		${gloabl_path}${/}${scenario_name}.rfs					AND
 	...    Run Keyword		Close Manager GUI ${platform}
 
 Verify the Field Validation Is Working In the Manager Plan Screen
