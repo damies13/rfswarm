@@ -1107,6 +1107,7 @@ File Open Dialogue windows Select File
 	${path} 	${file} = 	Split Path 	${filepath}
 	Click Label With Horizontal Offset 	file_name 	50
 	Type 		${filepath}
+	Take A Screenshot
 	Sleep	2
 	Press key.enter 1 Times
 	# Sleep	2

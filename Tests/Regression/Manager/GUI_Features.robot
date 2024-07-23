@@ -39,33 +39,35 @@ Verify the Files Referenced In the Scenario Are All Using Relative Paths
 	Create Robot File	path=${paths}[3]	name=${robot_names}[3].robot
 
 	# @{mngr_options}=	Create List		-s		${scenario_path}
-	Open Manager GUI
+	
 
 	FOR  ${i}  IN RANGE  0  4
+		Open Manager GUI
+
 		Log To Console		Saving ${rel_robot_paths}[${i}] to the scenario.
 		Click Button	runscriptrow
 		File Open Dialogue Select File		${robot_paths}[${i}]
 		Sleep	10
 		Select 1 Robot Test Case
 		Click Button	runsave
-		IF  ${i} == 0
-			Save Scenario File OS DIALOG	${scenario_name}
-			Press key.enter 1 Times
-		END
+		Save Scenario File OS DIALOG	${scenario_name}
+		Press key.enter 1 Times
 		Sleep	2
 		${scenario_file_dict}=		Read Ini File 	${gloabl_path}${/}${scenario_name}.rfs
 		Log To Console		Scenario file with relative path: ${scenario_file_dict}
 		Should Be Equal As Strings		${scenario_file_dict}[1][script] 	${rel_robot_paths}[${i}]
 
+		Run Keyword If  ${i} != 3		Close Manager GUI ${platform}
+		Delete Scenario File		${scenario_name}
 	END
-	Delete Scenario File		${scenario_name}
+	
 	[Teardown]	Run Keywords
 	...    Delete Robot File	path=${paths}[0]	name=${robot_names}[0].robot	AND
 	...    Delete Robot File	path=${paths}[1]	name=${robot_names}[1].robot	AND
 	...    Delete Robot File	path=${paths}[2]	name=${robot_names}[2].robot	AND
 	...    Delete Robot File	path=${paths}[3]	name=${robot_names}[3].robot	AND
 	...    Remove File		${gloabl_path}${/}${scenario_name}.rfs					AND
-	...    Run Keyword		Close Manager GUI ${platform}
+	...    Close Manager GUI ${platform}
 
 Verify the Field Validation Is Working In the Manager Plan Screen
 	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #126
