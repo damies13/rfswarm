@@ -42,7 +42,7 @@ Verify the Files Referenced In the Scenario Are All Using Relative Paths
 		Log To Console		Saving ${rel_robot_paths}[${i}] to the scenario.
 		Click Button	runscriptrow
 		File Open Dialogue Select File		${robot_paths}[${i}]
-		Sleep	1
+		Sleep	10
 		Select 1 Robot Test Case
 		Click Button	runsave
 		Sleep	2

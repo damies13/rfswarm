@@ -1103,32 +1103,19 @@ File Open Dialogue windows Select File
 	[Arguments]		${filepath}
 	Sleep    10
 	Take A Screenshot
+	${filepath}= 	Normalize Path 	${filepath}
+	${path} 	${file} = 	Split Path 	${filepath}
 	Click Label With Horizontal Offset 	file_name 	50
-	Sleep    2
-	@{splitted_path}=	Split String To Characters		${filepath}
-	FOR  ${chr}  IN  @{splitted_path}
-		Sleep	0.5
-		Type	${chr}
-	END
-	Sleep    2
-	Take A Screenshot
+	Type 		${path}
+	Sleep	2
 	Press key.enter 1 Times
-	Sleep    2
+	Sleep	2
 	Take A Screenshot
-	# Sleep    10
-	# Take A Screenshot
-	# ${filepath}= 	Normalize Path 	${filepath}
-	# ${path} 	${file} = 	Split Path 	${filepath}
-	# Click Label With Horizontal Offset 	file_name 	50
-	# Sleep    2
-	# Type 		${path} 	Key.ENTER
-	# Sleep    2
-	# Take A Screenshot
-	# Click Label With Horizontal Offset 	file_name 	50
-	# Sleep    2
-	# Type 		${file} 	Key.ENTER
-	# Take A Screenshot
-
+	Click Label With Horizontal Offset 	file_name 	50
+	Type 		${file}
+	Sleep	2
+	Press key.enter 1 Times
+	Take A Screenshot
 	# Click Dialog Button 	open
 	# Sleep    0.1
 	# Take A Screenshot
@@ -1138,10 +1125,6 @@ File Open Dialogue macos Select File
 	Sleep    10
 	Take A Screenshot
 	Press Combination 	KEY.command 	KEY.shift 	KEY.g
-	Sleep    2
-	Take A Screenshot
-	Type 		Key.BACKSPACE 	Key.DELETE
-	Sleep    2
 	Take A Screenshot
 	@{splitted_path}=	Split String To Characters		${filepath}
 	FOR  ${chr}  IN  @{splitted_path}
@@ -1154,6 +1137,25 @@ File Open Dialogue macos Select File
 	Press key.enter 1 Times
 	Sleep    2
 	Click Dialog Button 	open
+	# Sleep    10
+	# Take A Screenshot
+	# Press Combination 	KEY.command 	KEY.shift 	KEY.g
+	# Sleep    2
+	# Take A Screenshot
+	# Type 		Key.BACKSPACE 	Key.DELETE
+	# Sleep    2
+	# Take A Screenshot
+	# @{splitted_path}=	Split String To Characters		${filepath}
+	# FOR  ${chr}  IN  @{splitted_path}
+	# 	Sleep	0.5
+	# 	Type	${chr}
+	# END
+	# #Type 		${filepath}
+	# Sleep    2
+	# Take A Screenshot
+	# Press key.enter 1 Times
+	# Sleep    2
+	# Click Dialog Button 	open
 
 Select Test Script
 	[Arguments]		${row}	${filepath}
