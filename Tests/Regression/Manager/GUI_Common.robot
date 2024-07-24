@@ -1132,6 +1132,9 @@ File Open Dialogue macos Select File
 	@{splitted_path}=	Split String To Characters		${filepath}
 	FOR  ${chr}  IN  @{splitted_path}
 		Sleep	0.5
+		Run Keyword If	'${chr}' == '/'		Take A Screenshot
+		Run Keyword If	'${chr}' == '_'		Take A Screenshot
+		
 		Type	${chr}
 	END
 	#Type 		${filepath}
