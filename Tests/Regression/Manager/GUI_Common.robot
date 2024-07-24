@@ -1004,7 +1004,6 @@ Verify Scenario Wide Settings Data
 		Should Be Equal		${wide_settings_data['disablelog_output']}		${scenario_content_list}[${disablelog_output_offset + 2}]
 		...    msg=Disablelog Robot Logs: output.xml did not save correctly [settings != scenario]!
 	END
-	# TODO: bindipaddres, bindport
 
 Check That The Scenario File Opens Correctly
 	[Arguments]		${scenario_name}	${scenario_content}
