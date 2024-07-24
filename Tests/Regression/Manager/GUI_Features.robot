@@ -803,260 +803,6 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	...    GUI_Common.Stop Agent							AND
 	...    Change = ${ipv4}[0] With =${SPACE} In ${manager_ini_file}
 
-Verify If Upload logs=Immediately Is Being Saved To The Scenario And Read Back Correctly
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
-	[Setup]	Run Keywords
-	...    Set INI Window Size		1200	600								AND
-	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
-	...    Open Manager GUI
-
-	&{run_settings_data}	Create Dictionary
-	...    upload_logs=immediately
-
-	Click Button	runsettings
-	Change Scenario Wide Settings	${run_settings_data}
-	Click Button	runsave
-	Save Scenario File OS DIALOG	${scenario_name}
-
-	${scenario_path}= 	Normalize Path 	${global_path}${/}${scenario_name}.rfs
-	${scenario_file_content}= 		Read Ini File		${scenario_path}
-	Log To Console	Scenario file content: ${scenario_file_content}
-	Dictionary Should Contain Key	${scenario_file_content}		Scenario
-	Dictionary Should Contain Key	${scenario_file_content}[Scenario]		uploadmode
-	Should Be Equal As Strings 	${scenario_file_content}[Scenario][uploadmode]		imm
-
-	Log To Console	${\n}Manager is now being restarted. Check if Upload logs=Immediately is read back correctly
-	Run Keyword		Close Manager GUI ${platform}
-	@{mngr_options}=	Set Variable	-s	${scenario_path}
-	Open Manager GUI	${mngr_options}
-	Click Button	runsave
-	Log To Console	Scenario file content after Manager restart: ${scenario_file_content}
-	Dictionary Should Contain Key	${scenario_file_content}		Scenario
-	Dictionary Should Contain Key	${scenario_file_content}[Scenario]		uploadmode
-	Should Be Equal As Strings 	${scenario_file_content}[Scenario][uploadmode]		imm
-
-	[Teardown]	Run Keywords
-	...    Delete Scenario File		${scenario_name}	AND
-	...    Run Keyword		Close Manager GUI ${platform}
-
-Verify If Upload logs=Error Only Is Being Saved To The Scenario And Read Back Correctly
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
-	[Setup]	Run Keywords
-	...    Set INI Window Size		1200	600								AND
-	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
-	...    Open Manager GUI
-
-	&{run_settings_data}	Create Dictionary
-	...    upload_logs=on_error_only
-
-	Click Button	runsettings
-	Change Scenario Wide Settings	${run_settings_data}
-	Click Button	runsave
-	Save Scenario File OS DIALOG	${scenario_name}
-
-	${scenario_path}= 	Normalize Path 	${global_path}${/}${scenario_name}.rfs
-	${scenario_file_content}= 		Read Ini File		${scenario_path}
-	Log To Console	Scenario file content: ${scenario_file_content}
-	Dictionary Should Contain Key	${scenario_file_content}		Scenario
-	Dictionary Should Contain Key	${scenario_file_content}[Scenario]		uploadmode
-	Should Be Equal As Strings 	${scenario_file_content}[Scenario][uploadmode]		err
-
-	Log To Console	${\n}Manager is now being restarted. Check if Upload logs=Error Only is read back correctly
-	Run Keyword		Close Manager GUI ${platform}
-	@{mngr_options}=	Set Variable	-s	${scenario_path}
-	Open Manager GUI	${mngr_options}
-	Click Button	runsave
-	Log To Console	Scenario file content after Manager restart: ${scenario_file_content}
-	Dictionary Should Contain Key	${scenario_file_content}		Scenario
-	Dictionary Should Contain Key	${scenario_file_content}[Scenario]		uploadmode
-	Should Be Equal As Strings 	${scenario_file_content}[Scenario][uploadmode]		err
-
-	[Teardown]	Run Keywords
-	...    Delete Scenario File		${scenario_name}	AND
-	...    Run Keyword		Close Manager GUI ${platform}
-
-Verify If Upload logs=All Deferred Is Being Saved To The Scenario And Read Back Correctly
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
-	[Setup]	Run Keywords
-	...    Set INI Window Size		1200	600								AND
-	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
-	...    Open Manager GUI
-
-	&{run_settings_data}	Create Dictionary
-	...    upload_logs=all_deferred
-
-	Click Button	runsettings
-	Change Scenario Wide Settings	${run_settings_data}
-	Click Button	runsave
-	Save Scenario File OS DIALOG	${scenario_name}
-
-	${scenario_path}= 	Normalize Path 	${global_path}${/}${scenario_name}.rfs
-	${scenario_file_content}= 		Read Ini File		${scenario_path}
-	Log To Console	Scenario file content: ${scenario_file_content}
-	Dictionary Should Contain Key	${scenario_file_content}		Scenario
-	Dictionary Should Contain Key	${scenario_file_content}[Scenario]		uploadmode
-	Should Be Equal As Strings 	${scenario_file_content}[Scenario][uploadmode]		def
-
-	Log To Console	${\n}Manager is now being restarted. Check if Upload logs=All Deferred is read back correctly
-	Run Keyword		Close Manager GUI ${platform}
-	@{mngr_options}=	Set Variable	-s	${scenario_path}
-	Open Manager GUI	${mngr_options}
-	Click Button	runsave
-	Log To Console	Scenario file content after Manager restart: ${scenario_file_content}
-	Dictionary Should Contain Key	${scenario_file_content}		Scenario
-	Dictionary Should Contain Key	${scenario_file_content}[Scenario]		uploadmode
-	Should Be Equal As Strings 	${scenario_file_content}[Scenario][uploadmode]		def
-
-	[Teardown]	Run Keywords
-	...    Delete Scenario File		${scenario_name}	AND
-	...    Run Keyword		Close Manager GUI ${platform}
-
-Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardless Of Robot Passes Or Fails
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
-	[Setup]	Run Keywords
-	...    Set INI Window Size		1200	600								AND
-	...    Set Global Filename And Default Save Path	${robot_data}[0]
-
-	${scenarioname}=	Set Variable	immediately.rfs
-	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#91${/}${scenarioname}
-	${robotname}=		Set Variable	immediately.robot
-	${robotfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#91${/}${robotname}
-
-	Copy File	${scenariofile}		${global_path}
-	Copy File	${robotfile}		${global_path}
-	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${results_dir}
-	Open Manager GUI	${mngr_options}
-	Open Agent
-	Check If The Agent Is Ready
-	Click Tab	Plan
-	Click Button	runplay
-
-	Log To Console	Started run, now wait 40s.
-	Sleep	40	#rampup=15 run=50
-	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_immediately*	absolute=${True}
-	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
-	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
-	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
-	${logs_num}=	Get Length	${run_logs}
-	Log To Console	Uploaded logs number after 40s: ${logs_num}
-	Should Be True	${logs_num} >= 1
-	...    msg=Agent is not uploading logs immediately! Should be at least 1 after ~ 40s. Actual number:${logs_num}.
-
-	Check If The Agent Is Ready
-	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
-	${logs_num2}=	Get Length	${run_logs}
-	Log To Console	Number of logs at the end of the test: ${logs_num2}
-	Log To Console	This number should be just bigger than the previos one: ${logs_num}. If not the agent stopped uploading logs after 40s.
-	Should Be True	${logs_num2} > ${logs_num}
-	...    msg=Agent did not continue to uploud logs after test is finished! Should be greater than previous number:${logs_num}. Actual number:${logs_num2}.
-
-	[Teardown]	Run Keywords
-	...    Remove File	${global_path}${/}${robotname}		AND
-	...    Remove File	${global_path}${/}${scenarioname}	AND
-	...    GUI_Common.Stop Agent							AND
-	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
-
-Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only When Robot Fails
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
-	[Setup]	Run Keywords
-	...    Set INI Window Size		1200	600								AND
-	...    Set Global Filename And Default Save Path	${robot_data}[0]
-
-	${scenarioname}=	Set Variable	error_only.rfs
-	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#91${/}${scenarioname}
-	${robotname}=		Set Variable	error_only.robot
-	${robotfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#91${/}${robotname}
-
-	Copy File	${scenariofile}		${global_path}
-	Copy File	${robotfile}		${global_path}
-	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${results_dir}
-	Open Manager GUI	${mngr_options}
-	Open Agent
-	Check If The Agent Is Ready
-	Click Tab	Plan
-	Click Button	runplay
-
-	Log To Console	Started run, now wait 65s.
-	Sleep	65	#rampup=15 run=60
-	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_error_only*	absolute=${True}
-	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
-	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
-	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
-	${logs_num}=	Get Length	${run_logs}
-	Log To Console	Uploaded logs number after 65s: ${logs_num}
-	Should Be True	${logs_num} >= 1
-	...    msg=Agent is not uploading logs on error only! Should be at least 1 after ~ 65s. Actual number:${logs_num}.
-	Should Be True	${logs_num} <= 15
-	...    msg=Agent is uploading every logs but should upload only fail ones! Should be max 15 after ~ 65s. Actual number:${logs_num}.
-
-	Check If The Agent Is Ready
-	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
-	${logs_num2}=	Get Length	${run_logs}
-	Log To Console	Number of logs at the end of the test: ${logs_num2}
-	Log To Console	This number should be at least 40 because those that fail are unlikely to surpass 20 + the second test case that just sleep for 5s.
-	Should Be True	${logs_num2} > 40
-	...    msg=Agent did not continue to uploud logs after test is finished! Should be at least 40. Actual number:${logs_num2}.
-
-	[Teardown]	Run Keywords
-	...    Remove File	${global_path}${/}${robotname}		AND
-	...    Remove File	${global_path}${/}${scenarioname}	AND
-	...    GUI_Common.Stop Agent							AND
-	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
-
-Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
-	[Setup]	Run Keywords
-	...    Set INI Window Size		1200	600								AND
-	...    Set Global Filename And Default Save Path	${robot_data}[0]
-
-	${scenarioname}=	Set Variable	all_deferred.rfs
-	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#91${/}${scenarioname}
-	${robotname}=		Set Variable	all_deferred.robot
-	${robotfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#91${/}${robotname}
-
-	Copy File	${scenariofile}		${global_path}
-	Copy File	${robotfile}		${global_path}
-	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${results_dir}
-	Open Manager GUI	${mngr_options}
-	Open Agent
-	Check If The Agent Is Ready
-	Click Tab	Plan
-	Click Button	runplay
-
-	Log To Console	Started run, now wait 60s.
-	Sleep	60	#rampup=15 run=50
-	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_all_deferred*	absolute=${True}
-	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
-	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
-	${logs_dir_num}=	Get Length	${logs_dir}
-	IF  ${logs_dir_num} == 0
-		Log To Console	Manager did not create Logs directory after 60s and this is expected.
-	ELSE
-		@{run_logs}=	List Directories In Directory	${logs_dir}[0]
-		${logs_num}=	Get Length	${run_logs}
-		Log To Console	Uploaded logs number after 40s: ${logs_num}
-		Length Should Be	${run_logs}		0	msg=Agent uploaded logs but should not. Should be 0 logs. Actual number:${logs_num}.
-	END
-	
-	Check If The Agent Is Ready
-	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_all_deferred*	absolute=${True}
-	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
-	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
-	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
-	${logs_num2}=	Get Length	${run_logs}
-	Log To Console	Number of logs at the end of the test: ${logs_num2}
-	Should Be True	${logs_num2} > 10
-	...    msg=Agent did not continue to uploud logs after test is finished! Should be at least 10. Actual number:${logs_num2}.
-
-	[Teardown]	Run Keywords
-	...    Remove File	${global_path}${/}${robotname}		AND
-	...    Remove File	${global_path}${/}${scenarioname}	AND
-	...    GUI_Common.Stop Agent							AND
-	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
-
 Verify Disable log.html - Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
@@ -1818,3 +1564,260 @@ Check If Test Scenario Run Will Stop Gradually
 	...    GUI_Common.Stop Agent							AND
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove File		${global_path}${/}example.robot
+
+Verify If Upload logs=Immediately Is Being Saved To The Scenario And Read Back Correctly
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Open Manager GUI
+
+	&{run_settings_data}	Create Dictionary
+	...    upload_logs=immediately
+
+	Click Button	runsettings
+	Change Scenario Wide Settings	${run_settings_data}
+	Click Button	runsave
+	Save Scenario File OS DIALOG	${scenario_name}
+
+	${scenario_path}= 	Normalize Path 	${global_path}${/}${scenario_name}.rfs
+	${scenario_file_content}= 		Read Ini File		${scenario_path}
+	Log To Console	Scenario file content: ${scenario_file_content}
+	Dictionary Should Contain Key	${scenario_file_content}		Scenario
+	Dictionary Should Contain Key	${scenario_file_content}[Scenario]		uploadmode
+	Should Be Equal As Strings 	${scenario_file_content}[Scenario][uploadmode]		imm
+
+	Log To Console	${\n}Manager is now being restarted. Check if Upload logs=Immediately is read back correctly
+	Run Keyword		Close Manager GUI ${platform}
+	@{mngr_options}=	Set Variable	-s	${scenario_path}
+	Open Manager GUI	${mngr_options}
+	Click Button	runsave
+	Log To Console	Scenario file content after Manager restart: ${scenario_file_content}
+	Dictionary Should Contain Key	${scenario_file_content}		Scenario
+	Dictionary Should Contain Key	${scenario_file_content}[Scenario]		uploadmode
+	Should Be Equal As Strings 	${scenario_file_content}[Scenario][uploadmode]		imm
+
+	[Teardown]	Run Keywords
+	...    Delete Scenario File		${scenario_name}	AND
+	...    Run Keyword		Close Manager GUI ${platform}
+
+Verify If Upload logs=Error Only Is Being Saved To The Scenario And Read Back Correctly
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Open Manager GUI
+
+	&{run_settings_data}	Create Dictionary
+	...    upload_logs=on_error_only
+
+	Click Button	runsettings
+	Change Scenario Wide Settings	${run_settings_data}
+	Click Button	runsave
+	Save Scenario File OS DIALOG	${scenario_name}
+
+	${scenario_path}= 	Normalize Path 	${global_path}${/}${scenario_name}.rfs
+	${scenario_file_content}= 		Read Ini File		${scenario_path}
+	Log To Console	Scenario file content: ${scenario_file_content}
+	Dictionary Should Contain Key	${scenario_file_content}		Scenario
+	Dictionary Should Contain Key	${scenario_file_content}[Scenario]		uploadmode
+	Should Be Equal As Strings 	${scenario_file_content}[Scenario][uploadmode]		err
+
+	Log To Console	${\n}Manager is now being restarted. Check if Upload logs=Error Only is read back correctly
+	Run Keyword		Close Manager GUI ${platform}
+	@{mngr_options}=	Set Variable	-s	${scenario_path}
+	Open Manager GUI	${mngr_options}
+	Click Button	runsave
+	Log To Console	Scenario file content after Manager restart: ${scenario_file_content}
+	Dictionary Should Contain Key	${scenario_file_content}		Scenario
+	Dictionary Should Contain Key	${scenario_file_content}[Scenario]		uploadmode
+	Should Be Equal As Strings 	${scenario_file_content}[Scenario][uploadmode]		err
+
+	[Teardown]	Run Keywords
+	...    Delete Scenario File		${scenario_name}	AND
+	...    Run Keyword		Close Manager GUI ${platform}
+
+Verify If Upload logs=All Deferred Is Being Saved To The Scenario And Read Back Correctly
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Open Manager GUI
+
+	&{run_settings_data}	Create Dictionary
+	...    upload_logs=all_deferred
+
+	Click Button	runsettings
+	Change Scenario Wide Settings	${run_settings_data}
+	Click Button	runsave
+	Save Scenario File OS DIALOG	${scenario_name}
+
+	${scenario_path}= 	Normalize Path 	${global_path}${/}${scenario_name}.rfs
+	${scenario_file_content}= 		Read Ini File		${scenario_path}
+	Log To Console	Scenario file content: ${scenario_file_content}
+	Dictionary Should Contain Key	${scenario_file_content}		Scenario
+	Dictionary Should Contain Key	${scenario_file_content}[Scenario]		uploadmode
+	Should Be Equal As Strings 	${scenario_file_content}[Scenario][uploadmode]		def
+
+	Log To Console	${\n}Manager is now being restarted. Check if Upload logs=All Deferred is read back correctly
+	Run Keyword		Close Manager GUI ${platform}
+	@{mngr_options}=	Set Variable	-s	${scenario_path}
+	Open Manager GUI	${mngr_options}
+	Click Button	runsave
+	Log To Console	Scenario file content after Manager restart: ${scenario_file_content}
+	Dictionary Should Contain Key	${scenario_file_content}		Scenario
+	Dictionary Should Contain Key	${scenario_file_content}[Scenario]		uploadmode
+	Should Be Equal As Strings 	${scenario_file_content}[Scenario][uploadmode]		def
+
+	[Teardown]	Run Keywords
+	...    Delete Scenario File		${scenario_name}	AND
+	...    Run Keyword		Close Manager GUI ${platform}
+
+Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardless Of Robot Passes Or Fails
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]
+
+	${scenarioname}=	Set Variable	immediately.rfs
+	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#91${/}${scenarioname}
+	${robotname}=		Set Variable	immediately.robot
+	${robotfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#91${/}${robotname}
+
+	Copy File	${scenariofile}		${global_path}
+	Copy File	${robotfile}		${global_path}
+	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${results_dir}
+	Open Manager GUI	${mngr_options}
+	Open Agent
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Click Button	runplay
+
+	Log To Console	Started run, now wait 40s.
+	Sleep	40	#rampup=15 run=50
+	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_immediately*	absolute=${True}
+	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
+	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
+	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
+	${logs_num}=	Get Length	${run_logs}
+	Log To Console	Uploaded logs number after 40s: ${logs_num}
+	Should Be True	${logs_num} >= 1
+	...    msg=Agent is not uploading logs immediately! Should be at least 1 after ~ 40s. Actual number:${logs_num}.
+
+	Press key.enter 1 Times
+	Check If The Agent Is Ready
+	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
+	${logs_num2}=	Get Length	${run_logs}
+	Log To Console	Number of logs at the end of the test: ${logs_num2}
+	Log To Console	This number should be just bigger than the previos one: ${logs_num}. If not the agent stopped uploading logs after 40s.
+	Should Be True	${logs_num2} > ${logs_num}
+	...    msg=Agent did not continue to uploud logs after test is finished! Should be greater than previous number:${logs_num}. Actual number:${logs_num2}.
+
+	[Teardown]	Run Keywords
+	...    Remove File	${global_path}${/}${robotname}		AND
+	...    Remove File	${global_path}${/}${scenarioname}	AND
+	...    GUI_Common.Stop Agent							AND
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
+
+Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only When Robot Fails
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]
+
+	${scenarioname}=	Set Variable	error_only.rfs
+	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#91${/}${scenarioname}
+	${robotname}=		Set Variable	error_only.robot
+	${robotfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#91${/}${robotname}
+
+	Copy File	${scenariofile}		${global_path}
+	Copy File	${robotfile}		${global_path}
+	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${results_dir}
+	Open Manager GUI	${mngr_options}
+	Open Agent
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Click Button	runplay
+
+	Log To Console	Started run, now wait 65s.
+	Sleep	65	#rampup=15 run=60
+	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_error_only*	absolute=${True}
+	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
+	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
+	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
+	${logs_num}=	Get Length	${run_logs}
+	Log To Console	Uploaded logs number after 65s: ${logs_num}
+	Should Be True	${logs_num} >= 1
+	...    msg=Agent is not uploading logs on error only! Should be at least 1 after ~ 65s. Actual number:${logs_num}.
+	Should Be True	${logs_num} <= 15
+	...    msg=Agent is uploading every logs but should upload only fail ones! Should be max 15 after ~ 65s. Actual number:${logs_num}.
+
+	Press key.enter 1 Times
+	Check If The Agent Is Ready
+	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
+	${logs_num2}=	Get Length	${run_logs}
+	Log To Console	Number of logs at the end of the test: ${logs_num2}
+	Log To Console	This number should be at least 30 because those that fail are unlikely to surpass 20 + the second test case that just sleep for 5s.
+	Should Be True	${logs_num2} > 30
+	...    msg=Agent did not continue to uploud logs after test is finished! Should be at least 30. Actual number:${logs_num2}.
+
+	[Teardown]	Run Keywords
+	...    Remove File	${global_path}${/}${robotname}		AND
+	...    Remove File	${global_path}${/}${scenarioname}	AND
+	...    GUI_Common.Stop Agent							AND
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
+
+Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]
+
+	${scenarioname}=	Set Variable	all_deferred.rfs
+	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#91${/}${scenarioname}
+	${robotname}=		Set Variable	all_deferred.robot
+	${robotfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#91${/}${robotname}
+
+	Copy File	${scenariofile}		${global_path}
+	Copy File	${robotfile}		${global_path}
+	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${results_dir}
+	Open Manager GUI	${mngr_options}
+	Open Agent
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Click Button	runplay
+
+	Log To Console	Started run, now wait 60s.
+	Sleep	60	#rampup=15 run=50
+	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_all_deferred*	absolute=${True}
+	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
+	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
+	${logs_dir_num}=	Get Length	${logs_dir}
+	IF  ${logs_dir_num} == 0
+		Log To Console	Manager did not create Logs directory after 60s and this is expected.
+	ELSE
+		@{run_logs}=	List Directories In Directory	${logs_dir}[0]
+		${logs_num}=	Get Length	${run_logs}
+		Log To Console	Uploaded logs number after 40s: ${logs_num}
+		Length Should Be	${run_logs}		0	msg=Agent uploaded logs but should not. Should be 0 logs. Actual number:${logs_num}.
+	END
+
+	Press key.enter 1 Times
+	Check If The Agent Is Ready
+	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_all_deferred*	absolute=${True}
+	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
+	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
+	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
+	${logs_num2}=	Get Length	${run_logs}
+	Log To Console	Number of logs at the end of the test: ${logs_num2}
+	Should Be True	${logs_num2} > 10
+	...    msg=Agent did not continue to uploud logs after test is finished! Should be at least 10. Actual number:${logs_num2}.
+
+	[Teardown]	Run Keywords
+	...    Remove File	${global_path}${/}${robotname}		AND
+	...    Remove File	${global_path}${/}${scenarioname}	AND
+	...    GUI_Common.Stop Agent							AND
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
