@@ -1126,22 +1126,23 @@ File Open Dialogue macos Select File
 	[Arguments]		${filepath}
 	Sleep    10
 	Take A Screenshot
-	Press Combination 	KEY.command 	KEY.shift 	KEY.g
-	Take A Screenshot
 	${filepath}=	Convert To Lower Case	${filepath}
-	@{splitted_path}=	Split String To Characters		${filepath}
-	FOR  ${chr}  IN  @{splitted_path}
+	@{splitted_path}=	Split String	${filepath}		separator=/
+	${len}=		Get Length	${splitted_path}
+	FOR  ${i}  IN RANGE  1  ${len}	#start form 1 because 0 is blank(absolute paths only)
 		Sleep	0.5
-		Run Keyword If	'${chr}' == '/'		Take A Screenshot
-		Run Keyword If	'${chr}' == '_'		Take A Screenshot
-		
-		Type	${chr}
+		Press Combination 	KEY.command 	KEY.shift 	KEY.g
+		Log		Typing: ${splitted_path}[${i}]
+		IF  '${i}' == '1'
+			Type	/
+		END
+		Type	${splitted_path}[${i}]
+		Take A Screenshot	#del later
+		Press key.enter 1 Times
+
 	END
-	#Type 		${filepath}
 	Sleep    2
 	Take A Screenshot
-	Press key.enter 1 Times
-	Sleep    2
 	Click Dialog Button 	open
 	# Sleep    10
 	# Take A Screenshot
