@@ -1127,20 +1127,30 @@ File Open Dialogue macos Select File
 	Sleep    10
 	Take A Screenshot
 	${filepath}=	Convert To Lower Case	${filepath}
-	@{splitted_path}=	Split String	${filepath}		separator=/
-	${len}=		Get Length	${splitted_path}
-	FOR  ${i}  IN RANGE  1  ${len}	#start form 1 because 0 is blank(absolute paths only)
+	@{splitted_path}=	Split String To Characters	${filepath}
+	Press Combination 	KEY.command 	KEY.shift 	KEY.g
+	FOR  ${chr}  IN  @{splitted_path}
 		Sleep	0.5
-		Press Combination 	KEY.command 	KEY.shift 	KEY.g
-		Log		Typing: ${splitted_path}[${i}]
-		IF  '${i}' == '1'
-			Type	/
-		END
-		Type	${splitted_path}[${i}]
+		Log		Typing: ${chr}
+		Press Combination	KEY.${chr}
 		Take A Screenshot	#del later
-		Press key.enter 1 Times
-
 	END
+	
+	# @{splitted_path}=	Split String	${filepath}		separator=/
+	# ${len}=		Get Length	${splitted_path}
+	# FOR  ${i}  IN RANGE  1  ${len}	#start form 1 because 0 is blank(absolute paths only)
+	# 	Sleep	0.5
+	# 	Press Combination 	KEY.command 	KEY.shift 	KEY.g
+	# 	Log		Typing: ${splitted_path}[${i}]
+	# 	IF  '${i}' == '1'
+	# 		Type	/
+	# 	END
+	# 	Type	${splitted_path}[${i}]
+	# 	Take A Screenshot	#del later
+	# 	Press key.enter 1 Times
+
+	# END
+	Press key.enter 1 Times
 	Sleep    2
 	Take A Screenshot
 	Click Dialog Button 	open
