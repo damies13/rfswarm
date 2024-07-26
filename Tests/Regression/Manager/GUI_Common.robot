@@ -1127,9 +1127,19 @@ File Open Dialogue macos Select File
 	Sleep	10
 	Take A Screenshot
 	${filepath}=	Convert To Lower Case	${filepath}
+	Evaluate	clipboard.copy("${filepath}")	modules=clipboard	#copy path to clipboard
 	Press Combination 	KEY.command 	KEY.shift 	KEY.g
-	Evaluate	clipboard.copy("${filepath}")	modules=clipboard
-	Press Combination	KEY.command 	KEY.v
+	Press Combination 	KEY.backspace	#clear text filed
+	Click Label With Horizontal Offset 	file_name 	-10
+	Click	button=right	#show context menu
+	Sleep	2
+	Take A Screenshot
+	Press Combination 	KEY.down	#choose paste option(should be first)
+	Press key.enter 1 Times		#execute paste option 
+	Sleep	2
+	Take A Screenshot
+	#Press Combination	KEY.command 	KEY.v
+	
 
 	# @{splitted_path}=	Split String	${filepath}		separator=/
 	# ${len}=		Get Length	${splitted_path}
