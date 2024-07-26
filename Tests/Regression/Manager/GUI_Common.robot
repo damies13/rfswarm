@@ -1088,43 +1088,32 @@ File Open Dialogue Select File
 
 File Open Dialogue ubuntu Select File
 	[Arguments]		${filepath}
-	Sleep    2
+	Sleep	2
 	Take A Screenshot
 	Click Label With Horizontal Offset 	file_name 	50
-	Sleep    0.5
+	Sleep	0.5
 	Type 		${filepath} 	Key.ENTER
-	Sleep    0.5
+	Sleep	0.5
 	Take A Screenshot
 	# Click Dialog Button 	open
-	# Sleep    0.1
-	# Take A Screenshot
 
 File Open Dialogue windows Select File
 	[Arguments]		${filepath}
-	Sleep    10
+	Sleep	3
 	Take A Screenshot
 	${filepath}= 	Normalize Path 	${filepath}
-	${path} 	${file} = 	Split Path 	${filepath}
+	#${path} 	${file} = 	Split Path 	${filepath}
 	Click Label With Horizontal Offset 	file_name 	50
+	Sleep	0.5
 	Type 		${filepath}
-	Take A Screenshot
-	Sleep	2
+	Sleep	0.5
 	Press key.enter 1 Times
-	# Sleep	2
-	# Take A Screenshot
-	# Click Label With Horizontal Offset 	file_name 	50
-	# Type 		${file}
-	# Sleep	2
-	# Take A Screenshot
-	# Click Dialog Button 	open
 	Take A Screenshot
 	# Click Dialog Button 	open
-	# Sleep    0.1
-	# Take A Screenshot
 
 File Open Dialogue macos Select File
 	[Arguments]		${filepath}
-	Sleep	10
+	Sleep	3
 	Take A Screenshot
 	${filepath}=	Convert To Lower Case	${filepath}
 	Evaluate	clipboard.copy("${filepath}")	modules=clipboard	#copy path to clipboard
@@ -1136,47 +1125,13 @@ File Open Dialogue macos Select File
 	Take A Screenshot
 	Press Combination 	KEY.down	#choose paste option(should be first)
 	Press key.enter 1 Times		#execute paste option 
-	Sleep	2
+	Sleep	0.5
 	Take A Screenshot
-	#Press Combination	KEY.command 	KEY.v
-	
-
-	# @{splitted_path}=	Split String	${filepath}		separator=/
-	# ${len}=		Get Length	${splitted_path}
-	# FOR  ${i}  IN RANGE  1  ${len}	#start form 1 because 0 is blank(absolute paths only)
-	# 	Sleep	0.5
-	# 	Press Combination 	KEY.command 	KEY.shift 	KEY.g
-	# 	Log		Typing: ${splitted_path}[${i}]
-	# 	IF  '${i}' == '1'
-	# 		Type	/
-	# 	END
-	# 	Type	${splitted_path}[${i}]
-	# 	Take A Screenshot	#del later
-	# 	Press key.enter 1 Times
-
-	# END
 	Press key.enter 1 Times
-	Sleep    2
+	Sleep	0.5
 	Take A Screenshot
 	Click Dialog Button 	open
-	# Sleep    10
-	# Take A Screenshot
-	# Press Combination 	KEY.command 	KEY.shift 	KEY.g
-	# Sleep    2
-	# Take A Screenshot
 	# Type 		Key.BACKSPACE 	Key.DELETE
-	# Sleep    2
-	# Take A Screenshot
-	# @{splitted_path}=	Split String To Characters		${filepath}
-	# FOR  ${chr}  IN  @{splitted_path}
-	# 	Sleep	0.5
-	# 	Type	${chr}
-	# END
-	# #Type 		${filepath}
-	# Sleep    2
-	# Take A Screenshot
-	# Press key.enter 1 Times
-	# Sleep    2
 	# Click Dialog Button 	open
 
 Select Test Script
