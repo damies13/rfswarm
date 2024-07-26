@@ -1124,18 +1124,13 @@ File Open Dialogue windows Select File
 
 File Open Dialogue macos Select File
 	[Arguments]		${filepath}
-	Sleep    10
+	Sleep	10
 	Take A Screenshot
 	${filepath}=	Convert To Lower Case	${filepath}
-	@{splitted_path}=	Split String To Characters	${filepath}
 	Press Combination 	KEY.command 	KEY.shift 	KEY.g
-	FOR  ${chr}  IN  @{splitted_path}
-		Sleep	0.5
-		Log		Typing: ${chr}
-		Press Combination	KEY.${chr}
-		Take A Screenshot	#del later
-	END
-	
+	Evaluate	clipboard.copy("${filepath}")	modules=clipboard
+	Press Combination	KEY.command 	KEY.v
+
 	# @{splitted_path}=	Split String	${filepath}		separator=/
 	# ${len}=		Get Length	${splitted_path}
 	# FOR  ${i}  IN RANGE  1  ${len}	#start form 1 because 0 is blank(absolute paths only)
