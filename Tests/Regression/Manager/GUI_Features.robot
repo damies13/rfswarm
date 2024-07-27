@@ -1564,3 +1564,56 @@ Check If Test Scenario Run Will Stop Gradually
 	...    GUI_Common.Stop Agent							AND
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove File		${global_path}${/}example.robot
+
+Verify the Files Referenced In the Scenario Are All Using Relative Paths
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #54
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]
+
+	${test_data_path}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#54
+	${scenario_path}=	Normalize Path 	${test_data_path}${/}${scenario_name}.rfs
+	Copy File	${test_data_path}${/}${scenario_name}_original.rfs	${scenario_path}
+	@{paths}=			Create List
+	...    ${test_data_path}  ${test_data_path}${/}robots  ${results_dir}  ${results_dir}${/}robots
+	@{robot_names}=		Create List		robot_rel_1  robot_rel_2  robot_rel_3  robot_rel_4
+	@{robot_paths}=		Create List
+	...    ${paths}[0]${/}${robot_names}[0].robot
+	...    ${paths}[1]${/}${robot_names}[1].robot
+	...    ${paths}[2]${/}${robot_names}[2].robot
+	...    ${paths}[3]${/}${robot_names}[3].robot
+	@{rel_robot_paths}=		Get Relative Paths	${test_data_path}	${robot_paths}
+	Log To Console	Robot relative paths to ${test_data_path}: ${\n}${\n}${rel_robot_paths}${\n}
+
+	Create Robot File	path=${paths}[0]	name=${robot_names}[0].robot
+	Create Robot File	path=${paths}[1]	name=${robot_names}[1].robot
+	Create Robot File	path=${paths}[2]	name=${robot_names}[2].robot
+	Create Robot File	path=${paths}[3]	name=${robot_names}[3].robot
+
+	@{mngr_options}=	Create List		-s		${scenario_path}
+
+	FOR  ${i}  IN RANGE  1  4	#skip first robot because it is in the same folder as the scenario
+		Open Manager GUI	${mngr_options}
+
+		Log To Console		Saving ${rel_robot_paths}[${i}] to the scenario.
+		Click Button	runscriptrow
+		File Open Dialogue Select File		${robot_paths}[${i}]
+		Sleep	10
+		Select 1 Robot Test Case
+		Click Button	runsave
+		Sleep	2
+		${scenario_file_dict}=		Read Ini File 	${scenario_path}
+		Log To Console		Scenario file with relative path: ${scenario_file_dict}
+		Run Keyword And Warn On Failure		Should Be Equal As Strings		${scenario_file_dict}[1][script] 	${rel_robot_paths}[${i}]
+
+		Run Keyword If  ${i} != 3		Close Manager GUI ${platform}
+		Delete Scenario File		${scenario_name}
+	END
+
+	[Teardown]	Run Keywords
+	...    Delete Robot File	path=${paths}[0]	name=${robot_names}[0].robot	AND
+	...    Delete Robot File	path=${paths}[1]	name=${robot_names}[1].robot	AND
+	...    Delete Robot File	path=${paths}[2]	name=${robot_names}[2].robot	AND
+	...    Delete Robot File	path=${paths}[3]	name=${robot_names}[3].robot	AND
+	...    Remove File			${scenario_path}									AND
+	...    Close Manager GUI ${platform}
