@@ -14,35 +14,17 @@ jobs:
   #     - Package_For_PIP
   #   uses: ./.github/workflows/Regression_Tests.yaml
 
-  Check Changes:
-    uses: dorny/paths-filter@v2
-    id: changes
-    with:
-      filters: |
-        agent:
-          - 'rfswarm_agent/**'
-          - 'Tests/Regression/Agent/**'
-        manager:
-          - 'rfswarm_manager/**'
-          - 'Tests/Regression/Manager/**'
-        reporter:
-          - 'rfswarm_reporter/**'
-          - 'Tests/Regression/Reporter/**'
-
   Regression_Tests_Agent:
-    if: steps.changes.outputs.agent == 'true'
     needs:
       - Package_For_PIP
     uses: ./.github/workflows/Regression_Tests_Agent.yaml
 
   Regression_Tests_Manager:
-    if: steps.changes.outputs.manager == 'true'
     needs:
       - Package_For_PIP
     uses: ./.github/workflows/Regression_Tests_Manager.yaml
 
   Regression_Tests_Reporter:
-    if: steps.changes.outputs.reporter == 'true'
     needs:
       - Package_For_PIP
     uses: ./.github/workflows/Regression_Tests_Reporter.yaml
