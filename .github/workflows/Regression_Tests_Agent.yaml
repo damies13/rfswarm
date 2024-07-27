@@ -1,11 +1,7 @@
 ---
 name: Regression Tests - Agent
 
-on:
-  workflow_call:
-    paths:
-      - 'rfswarm_agent/**'
-      - 'Tests/Regression/Agent/**'
+on: workflow_call
 
 jobs:
   Agent:
