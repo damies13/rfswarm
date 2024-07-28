@@ -8,11 +8,6 @@ Robot Version
 	${Robot_Version} =	Evaluate	robot.__version__ 	modules=robot
 	Log 	${\n}Robot Version: ${Robot_Version} 	console=True
 
-Random Offset
-	[Documentation] 	This just prevents all the test runners doing git push at the same time
-	${random} =	Evaluate	random.randint(0, 60)
-	Sleep    ${random}
-
 Agent Version
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
 	# ${result}= 	Run 	python3 ${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py -v
