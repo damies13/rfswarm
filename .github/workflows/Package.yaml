@@ -66,6 +66,7 @@ jobs:
             ismaster=1
           fi
           echo "ismaster=$ismaster" >> "$GITHUB_ENV"
+          echo "base=" >> "$GITHUB_ENV"
 
       - name: Check Branch for Issue Number with Milestone
         # if: ${{ env.isrelease == 1 }}
@@ -97,6 +98,7 @@ jobs:
           with open(env_file, "a") as myfile:
             myfile.write("milestone={}\n".format(milestonever))
             myfile.write("ismilestone={}\n".format(ismilestone))
+            myfile.write("base={}\n".format(milestonever))
 
       - name: Get Date String
         if: ${{ env.isrelease == 0 && env.ismaster == 0 }}
@@ -207,6 +209,7 @@ jobs:
         id: run_agent
         uses: dorny/paths-filter@v3
         with:
+          base: '${{ env.base }}'
           filters: |
             files:
               - 'rfswarm_agent/**'
@@ -216,6 +219,7 @@ jobs:
         id: run_manager
         uses: dorny/paths-filter@v3
         with:
+          base: '${{ env.base }}'
           filters: |
             files:
               - 'rfswarm_manager/**'
@@ -225,6 +229,7 @@ jobs:
         id: run_reporter
         uses: dorny/paths-filter@v3
         with:
+          base: '${{ env.base }}'
           filters: |
             files:
               - 'rfswarm_reporter/**'
