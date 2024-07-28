@@ -1,7 +1,12 @@
 ---
 name: Package
 
-on: workflow_call
+# on: workflow_call
+on:
+  workflow_call:
+    outputs:
+      isrelease:
+        value: ${{ jobs.Package_For_PIP.outputs.isrelease }}
 
 jobs:
   Package_For_PIP:
