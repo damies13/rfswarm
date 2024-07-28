@@ -7,6 +7,18 @@ on:
     outputs:
       isrelease:
         value: ${{ jobs.Package_For_PIP.outputs.isrelease }}
+      ismilestone:
+        value: ${{ jobs.Package_For_PIP.outputs.ismilestone }}
+      numver:
+        value: ${{ jobs.Package_For_PIP.outputs.numver }}
+      version:
+        value: ${{ jobs.Package_For_PIP.outputs.version }}
+      runagent:
+        value: ${{ steps.run_agent.outputs.files }}
+      runmanager:
+        value: ${{ steps.run_manager.outputs.files }}
+      runreporter:
+        value: ${{ steps.run_reporter.outputs.files }}
 
 jobs:
   Package_For_PIP:
@@ -187,5 +199,32 @@ jobs:
           name: dist
           path: dist
           retention-days: 5
+
+      - name: Check Run Agent Tests
+        id: run_agent
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            files:
+              - 'rfswarm_agent/**'
+              - 'Tests/Regression/Agent/**'
+
+      - name: Check Run Manager Tests
+        id: run_manager
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            files:
+              - 'rfswarm_manager/**'
+              - 'Tests/Regression/Manager/**'
+
+      - name: Check Run Reporter Tests
+        id: run_reporter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            files:
+              - 'rfswarm_reporter/**'
+              - 'Tests/Regression/Reporter/**'
 
 #

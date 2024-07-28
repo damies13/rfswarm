@@ -15,23 +15,25 @@ jobs:
   #   uses: ./.github/workflows/Regression_Tests.yaml
 
   Regression_Tests_Agent:
+    if: needs.Package_For_PIP.outputs.runagent == 'true'
     needs:
       - Package_For_PIP
     uses: ./.github/workflows/Regression_Tests_Agent.yaml
 
   Regression_Tests_Manager:
+    if: needs.Package_For_PIP.outputs.runmanager == 'true'
     needs:
       - Package_For_PIP
     uses: ./.github/workflows/Regression_Tests_Manager.yaml
 
   Regression_Tests_Reporter:
+    if: needs.Package_For_PIP.outputs.runreporter == 'true'
     needs:
       - Package_For_PIP
     uses: ./.github/workflows/Regression_Tests_Reporter.yaml
 
   Publish_Package:
     if: github.repository_owner == 'damies13' && needs.Package_For_PIP.outputs.isrelease == 1
-    # isrelease
     needs:
     - Package_For_PIP
     # - Regression_Tests
