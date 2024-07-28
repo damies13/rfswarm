@@ -6,6 +6,11 @@ on: workflow_call
 jobs:
   Package_For_PIP:
     runs-on: ubuntu-latest
+    outputs:
+      isrelease: ${{ env.isrelease }}
+      ismilestone: ${{ env.ismilestone }}
+      numver: ${{ env.numver }}
+      version: ${{ env.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

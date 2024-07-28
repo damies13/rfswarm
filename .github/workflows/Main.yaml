@@ -30,7 +30,8 @@ jobs:
     uses: ./.github/workflows/Regression_Tests_Reporter.yaml
 
   Publish_Package:
-    if: github.repository_owner == 'damies13'
+    if: github.repository_owner == 'damies13' && needs.Package_For_PIP.outputs.isrelease == 1
+    # isrelease
     needs:
     - Package_For_PIP
     # - Regression_Tests
