@@ -14,11 +14,11 @@ on:
       version:
         value: ${{ jobs.Package_For_PIP.outputs.version }}
       runagent:
-        value: ${{ steps.run_agent.outputs.files }}
+        value: ${{ jobs.Package_For_PIP.steps.run_agent.outputs.files }}
       runmanager:
-        value: ${{ steps.run_manager.outputs.files }}
+        value: ${{ jobs.Package_For_PIP.steps.run_manager.outputs.files }}
       runreporter:
-        value: ${{ steps.run_reporter.outputs.files }}
+        value: ${{ jobs.Package_For_PIP.steps.run_reporter.outputs.files }}
 
 jobs:
   Package_For_PIP:
@@ -217,6 +217,8 @@ jobs:
             files:
               - 'rfswarm_manager/**'
               - 'Tests/Regression/Manager/**'
+
+${{ steps.run_agent.outputs.files }}
 
       - name: Check Run Reporter Tests
         id: run_reporter
