@@ -14,11 +14,11 @@ on:
       version:
         value: ${{ jobs.Package_For_PIP.outputs.version }}
       runagent:
-        value: ${{ jobs.Package_For_PIP.steps.run_agent.outputs.files }}
+        value: ${{ jobs.Package_For_PIP.outputs.runagent }}
       runmanager:
-        value: ${{ jobs.Package_For_PIP.steps.run_manager.outputs.files }}
+        value: ${{ jobs.Package_For_PIP.outputs.runmanager }}
       runreporter:
-        value: ${{ jobs.Package_For_PIP.steps.run_reporter.outputs.files }}
+        value: ${{ jobs.Package_For_PIP.outputs.runreporter }}
 
 jobs:
   Package_For_PIP:
@@ -28,6 +28,9 @@ jobs:
       ismilestone: ${{ env.ismilestone }}
       numver: ${{ env.numver }}
       version: ${{ env.version }}
+      runagent: ${{ steps.run_agent.outputs.files }}
+      runmanager: ${{ steps.run_manager.outputs.files }}
+      runreporter: ${{ steps.run_reporter.outputs.files }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
