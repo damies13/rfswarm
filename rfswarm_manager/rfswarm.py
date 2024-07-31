@@ -477,6 +477,9 @@ class RFSwarmBase:
 	uploadmode = "err" 	# modes are imm, err, def
 	uploadfiles: Any = {}
 
+	resultnamemodes = {'dflt': "Default", 'doco': "Documentation", 'kywrd': "Keyword", "kywrdargs": "Keyword & Arguments"}
+	resultnamemode = "dflt" 	# modes are dflt, doco, kywrd, kywrdargs
+
 	index = ""
 	file = ""
 	sheet = ""
@@ -5515,6 +5518,18 @@ class RFSwarmGUI(tk.Frame):
 		setingsWindow.lblTestDefaults = ttk.Label(setingsWindow.fmeTestDefaults, text="Test Defaults:")
 		setingsWindow.lblTestDefaults.grid(column=0, row=rownum, sticky="nsew")
 
+		# resultnamemode
+		rownum += 1
+		setingsWindow.lblEL = ttk.Label(setingsWindow.fmeTestDefaults, text="Result Name Mode:")
+		setingsWindow.lblEL.grid(column=0, row=rownum, sticky="nsew")
+
+		NameModeOpt = list(base.resultnamemodes.values())
+		setingsWindow.strNameMode = tk.StringVar()
+		setingsWindow.omNameMode = ttk.OptionMenu(setingsWindow.fmeTestDefaults, setingsWindow.strNameMode, None, *NameModeOpt)
+		base.debugmsg(5, "uploadmode:", base.uploadmode)
+		setingsWindow.strNameMode.set(base.resultnamemodes[base.resultnamemode])
+		setingsWindow.omNameMode.grid(column=1, row=rownum, columnspan=10, sticky="nsew")
+
 		rownum += 1
 		setingsWindow.lblEL = ttk.Label(setingsWindow.fmeTestDefaults, text="Exclude libraries:")
 		setingsWindow.lblEL.grid(column=0, row=rownum, sticky="nsew")
@@ -6851,6 +6866,24 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(5, "disablelogoutput:", stgsWindow.disablelogoutput)
 
 		row = 0
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+
+		# resultnamemode
+		row += 1
+		stgsWindow.lblEL = ttk.Label(stgsWindow, text="Result Name Mode:")
+		stgsWindow.lblEL.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		NameModeOpt = list(base.resultnamemodes.values())
+		stgsWindow.strNM = tk.StringVar()
+		stgsWindow.omNM = ttk.OptionMenu(stgsWindow, stgsWindow.strNM, None, *NameModeOpt)
+		base.debugmsg(5, "resultnamemode:", base.resultnamemode)
+		stgsWindow.strNM.set(base.resultnamemodes[base.resultnamemode])
+		stgsWindow.omNM.grid(column=0, row=row, columnspan=10, sticky="nsew")
+
+		row += 1
 		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
 		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
 
