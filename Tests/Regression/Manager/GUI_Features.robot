@@ -294,7 +294,12 @@ Verify Scenario File Is Updated Correctly When Scripts Are Removed
 	Open Scenario File OS DIALOG	${scenario_name}
 	Click Button	rundelrow
 	Click Button	rundelrow
-	Click Label With Vertical Offset	button_rundelrow	35
+	${img}=		Set Variable	manager_${platform}_button_rundelrow.png
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+	Log	${coordinates}
+	Click To The Below Of	${coordinates}	35
+	#Click Label With Vertical Offset	button_rundelrow	35
 	Click Button	runsave
 
 	${scenario_content}=	Get scenario file content	${global_path}	${scenario_name}
@@ -445,9 +450,16 @@ Verify If Manager Saves Inject Sleep From Scenario Wide Settings
 
 	@{inject_sleep_values}	Create List		11	22
 	&{run_settings_data}	Create Dictionary
+	...    exclude_libraries=builtin,string,operatingsystem,perftest,collections
+	...    robot_options=-v var:examplevariable
+	...    test_repeater=True
 	...    inject_sleep=True
-	...    inject_sleep_min=${inject_sleep_values}[0]
-	...    inject_sleep_max=${inject_sleep_values}[1]
+	...    inject_sleep_min=30
+	...    inject_sleep_max=60
+	# ^^^ temp settings. change later because they are not for this issue
+	# ...    inject_sleep=True
+	# ...    inject_sleep_min=${inject_sleep_values}[0]
+	# ...    inject_sleep_max=${inject_sleep_values}[1]
 
 	Click Button	runsettings
 	Change Scenario Wide Settings	${run_settings_data}
