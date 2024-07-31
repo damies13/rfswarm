@@ -477,22 +477,38 @@ Change Test Group Settings
 	#Click Dialog Button		row_settings_frame_name
 	IF  'exclude_libraries' in ${row_settings_data}
 		Click Label With Vertical Offset	exclude_libraries	20
-		Triple Click
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${row_settings_data['exclude_libraries']}
 	END
 	IF  'robot_options' in ${row_settings_data}
 		Click Label With Vertical Offset	robot_options		20
-		Triple Click
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${row_settings_data['robot_options']}
 	END
 	IF  'inject_sleep_min' in ${row_settings_data}
 		Click Label With Vertical Offset	inject_sleep_min	20
-		Triple Click
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${row_settings_data['inject_sleep_min']}
 	END
 	IF  'inject_sleep_max' in ${row_settings_data}
 		Click Label With Vertical Offset	inject_sleep_max	20
-		Triple Click
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${row_settings_data['inject_sleep_max']}
 	END
 	IF  'test_repeater' in ${row_settings_data}
@@ -519,32 +535,56 @@ Change Scenario Wide Settings
 	#Click Label With Vertical Offset	scenario_settings_scenario
 	IF  'exclude_libraries' in ${wide_settings_data}
 		Click Label With Horizontal Offset	exclude_libraries	100
-		Triple Click
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${wide_settings_data['exclude_libraries']}
 	END
 	IF  'robot_options' in ${wide_settings_data}
 		Click Label With Horizontal Offset	robot_options		100
-		Triple Click
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${wide_settings_data['robot_options']}
 	END
 	IF  'inject_sleep_min' in ${wide_settings_data}
 		Click Label With Vertical Offset	inject_sleep_min	20
-		Triple Click
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${wide_settings_data['inject_sleep_min']}
 	END
 	IF  'inject_sleep_max' in ${wide_settings_data}
 		Click Label With Vertical Offset	inject_sleep_max	20
-		Triple Click
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${wide_settings_data['inject_sleep_max']}
 	END
 	IF  'bind_ip_address' in ${wide_settings_data}
 		Click Label With Horizontal Offset	bind_ip_address		100
-		Triple Click
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${wide_settings_data['bind_ip_address']}
 	END
 	IF  'bind_port_number' in ${wide_settings_data}
 		Click Label With Horizontal Offset	bind_port_number	100
-		Triple Click
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${wide_settings_data['bind_port_number']}
 	END
 	IF  'upload_logs' in ${wide_settings_data}
