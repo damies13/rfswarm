@@ -10,54 +10,6 @@ Suite Setup 	Set Platform
 ${scenario_name}=	test_scenario
 
 *** Test Cases ***
-Check If The CSV Report Button Works In the Manager Before There Are Any Results
-	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #128
-	[Setup]	Run Keywords
-	...    Set INI Window Size		1200	600		AND
-	...    Open Agent
-
-	# !!! Checking that the CSV report button works in the manager after results is being checked in Test Case for Issue #254 !!!
-	${test_dir}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#128
-	@{mngr_options}= 	Create List 	-d	${test_dir}	-s 	${test_dir}${/}Issue-#128.rfs
-	Open Manager GUI 		${mngr_options}
-	Check If The Agent Is Ready
-
-	Click Tab	Run
-	Log To Console	Clicking CSV report button before there are any results.
-	Click Button	csv_report
-	${status}=	Run Keyword And Return Status
-	...    Wait For	${platform}_warning_label_no_report_data.png 	timeout=${60}
-	Take A Screenshot
-	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed warning label that says: No report data to save.
-	Press key.enter 1 Times
-	@{test_results_dir}=	List Directories In Directory	${test_dir}		absolute=${True}	pattern=*Issue-#128
-	Length Should Be	${test_results_dir}		0	msg=Manager should not create any result directory.
-
-	Click Tab	Plan
-	Click Button	runplay
-	Sleep	45
-	Log To Console	Clicking CSV report button before end of the test.
-	Click Button	csv_report
-	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${platform}_reportdatasavesto.png 	timeout=${60}
-	Take A Screenshot
-	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed info label that says: Report data saved to:...
-	Press key.enter 1 Times
-
-	@{test_results_dir}=	List Directories In Directory	${test_dir}		absolute=${True}	pattern=*Issue-#128
-	@{csv_files}=		List Files In Directory		${test_results_dir}[0]	*.csv
-	Log To Console	${\n}Generated CSV report files before end of a test run: ${\n}${csv_files}
-	${len}=		Get Length		${csv_files}
-	Should Be True	${len} > 0	msg=Manager didn't generate any CSV report files. Should generate at least 1 most likely agent_data.csv.
-
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected.
-
-	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    GUI_Common.Stop Agent
-
 Verify the Field Validation Is Working In the Manager Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #126
 	[Setup]	Run Keywords
@@ -1213,6 +1165,54 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main3.robot	${CURDIR}${/}testdata${/}Issue-52	AND
 	...    CommandLine_Common.Stop Agent											AND
 	...    CommandLine_Common.Stop Manager
+
+Check If The CSV Report Button Works In the Manager Before There Are Any Results
+	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #128
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600		AND
+	...    Open Agent
+
+	# !!! Checking that the CSV report button works in the manager after results is being checked in Test Case for Issue #254 !!!
+	${test_dir}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#128
+	@{mngr_options}= 	Create List 	-d	${test_dir}	-s 	${test_dir}${/}Issue-#128.rfs
+	Open Manager GUI 		${mngr_options}
+	Check If The Agent Is Ready
+
+	Click Tab	Run
+	Log To Console	Clicking CSV report button before there are any results.
+	Click Button	csv_report
+	${status}=	Run Keyword And Return Status
+	...    Wait For	${platform}_warning_label_no_report_data.png 	timeout=${60}
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed warning label that says: No report data to save.
+	Press key.enter 1 Times
+	@{test_results_dir}=	List Directories In Directory	${test_dir}		absolute=${True}	pattern=*Issue-#128
+	Length Should Be	${test_results_dir}		0	msg=Manager should not create any result directory.
+
+	Click Tab	Plan
+	Click Button	runplay
+	Sleep	45
+	Log To Console	Clicking CSV report button before end of the test.
+	Click Button	csv_report
+	${status}=	Run Keyword And Return Status
+	...    Wait For		manager_${platform}_reportdatasavesto.png 	timeout=${60}
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed info label that says: Report data saved to:...
+	Press key.enter 1 Times
+
+	@{test_results_dir}=	List Directories In Directory	${test_dir}		absolute=${True}	pattern=*Issue-#128
+	@{csv_files}=		List Files In Directory		${test_results_dir}[0]	*.csv
+	Log To Console	${\n}Generated CSV report files before end of a test run: ${\n}${csv_files}
+	${len}=		Get Length		${csv_files}
+	Should Be True	${len} > 0	msg=Manager didn't generate any CSV report files. Should generate at least 1 most likely agent_data.csv.
+
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected.
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    GUI_Common.Stop Agent
 
 Check If The CSV Report Button Works In The Manager After There Are Results
 	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #254
