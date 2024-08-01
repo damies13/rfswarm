@@ -294,7 +294,12 @@ Verify Scenario File Is Updated Correctly When Scripts Are Removed
 	Open Scenario File OS DIALOG	${scenario_name}
 	Click Button	rundelrow
 	Click Button	rundelrow
-	Click Label With Vertical Offset	button_rundelrow	35
+	${img}=		Set Variable	manager_${platform}_button_rundelrow.png
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+	Log	${coordinates}
+	Click To The Below Of	${coordinates}	35
+	#Click Label With Vertical Offset	button_rundelrow	35
 	Click Button	runsave
 
 	${scenario_content}=	Get scenario file content	${global_path}	${scenario_name}

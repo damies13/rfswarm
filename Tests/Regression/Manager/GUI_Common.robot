@@ -306,7 +306,7 @@ Click Label With Vertical Offset
 	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down].
 	...	Give the image a full name, for example: button_runopen.
 	${labelname}= 	Convert To Lower Case 	${labelname}
-	${img}=	Set Variable		manager_${platform}_${labelname}.png
+	${img}=	Set Variable		manager_${platform}_label_${labelname}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=300
@@ -317,7 +317,7 @@ Click Label With Vertical Offset
 	Take A Screenshot
 
 Click Label With Horizontal Offset
-	[Arguments]		${labelname}	${offset}
+	[Arguments]		${labelname}	${offset}=0
 	[Documentation]	Click the image with the offset
 	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right].
 	...	Give the image a full name, for example: button_runopen.
@@ -474,21 +474,41 @@ Clear Manager Result Directory
 Change Test Group Settings
 	[Arguments]		${row_settings_data}
 	Sleep	2
-	Click Dialog Button		row_settings_frame_name
-	Press Key.tab 1 Times
+	#Click Dialog Button		row_settings_frame_name
 	IF  'exclude_libraries' in ${row_settings_data}
+		Click Label With Vertical Offset	exclude_libraries	20
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${row_settings_data['exclude_libraries']}
 	END
-	Press Key.tab 1 Times
 	IF  'robot_options' in ${row_settings_data}
+		Click Label With Vertical Offset	robot_options		20
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${row_settings_data['robot_options']}
 	END
-	Press Key.tab 3 Times
 	IF  'inject_sleep_min' in ${row_settings_data}
+		Click Label With Vertical Offset	inject_sleep_min	20
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${row_settings_data['inject_sleep_min']}
 	END
-	Press Key.tab 1 Times
 	IF  'inject_sleep_max' in ${row_settings_data}
+		Click Label With Vertical Offset	inject_sleep_max	20
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${row_settings_data['inject_sleep_max']}
 	END
 	IF  'test_repeater' in ${row_settings_data}
@@ -512,31 +532,59 @@ Change Test Group Settings
 Change Scenario Wide Settings
 	[Arguments]		${wide_settings_data}
 	Sleep	2
-	Click Label With Vertical Offset	scenario_settings_scenario
-	Press Key.tab 2 Times
+	#Click Label With Vertical Offset	scenario_settings_scenario
 	IF  'exclude_libraries' in ${wide_settings_data}
+		Click Label With Horizontal Offset	exclude_libraries	100
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${wide_settings_data['exclude_libraries']}
 	END
-	Press Key.tab 1 Times
 	IF  'robot_options' in ${wide_settings_data}
+		Click Label With Horizontal Offset	robot_options		100
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${wide_settings_data['robot_options']}
 	END
-	Press Key.tab 3 Times
 	IF  'inject_sleep_min' in ${wide_settings_data}
-		Take A Screenshot	#del later
+		Click Label With Vertical Offset	inject_sleep_min	20
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${wide_settings_data['inject_sleep_min']}
-		Take A Screenshot	#del later
 	END
-	Press Key.tab 1 Times
 	IF  'inject_sleep_max' in ${wide_settings_data}
+		Click Label With Vertical Offset	inject_sleep_max	20
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${wide_settings_data['inject_sleep_max']}
 	END
-	Press Key.tab 4 Times
 	IF  'bind_ip_address' in ${wide_settings_data}
+		Click Label With Horizontal Offset	bind_ip_address		100
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${wide_settings_data['bind_ip_address']}
 	END
-	Press Key.tab 1 Times
 	IF  'bind_port_number' in ${wide_settings_data}
+		Click Label With Horizontal Offset	bind_port_number	100
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${wide_settings_data['bind_port_number']}
 	END
 	IF  'upload_logs' in ${wide_settings_data}
