@@ -450,16 +450,9 @@ Verify If Manager Saves Inject Sleep From Scenario Wide Settings
 
 	@{inject_sleep_values}	Create List		11	22
 	&{run_settings_data}	Create Dictionary
-	...    exclude_libraries=builtin,string,operatingsystem,perftest,collections
-	...    robot_options=-v var:examplevariable
-	...    test_repeater=True
 	...    inject_sleep=True
-	...    inject_sleep_min=30
-	...    inject_sleep_max=60
-	# ^^^ temp settings. change later because they are not for this issue
-	# ...    inject_sleep=True
-	# ...    inject_sleep_min=${inject_sleep_values}[0]
-	# ...    inject_sleep_max=${inject_sleep_values}[1]
+	...    inject_sleep_min=${inject_sleep_values}[0]
+	...    inject_sleep_max=${inject_sleep_values}[1]
 
 	Click Button	runsettings
 	Change Scenario Wide Settings	${run_settings_data}
