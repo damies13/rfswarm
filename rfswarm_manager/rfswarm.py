@@ -3626,6 +3626,7 @@ class RFSwarmCore:
 				# this should prevent issue RuntimeError: dictionary changed size during iteration
 				del base.Agents[agnt]
 
+			# temp. fix for disconnecting agent when inactive:
 			self.updatethread = threading.Thread(target=self.delayed_UpdateAgents)
 			self.updatethread.start()
 
