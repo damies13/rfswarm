@@ -1687,14 +1687,32 @@ class RFSwarmAgent():
 		fd.append("		")
 		fd.append("		iter = BuiltIn().get_variable_value(\"${RFS_ITERATION}\")")
 
-		fd.append("		if self.msg is not None and not istrace:")
-		fd.append("			ResultName = self.msg.message")
-		fd.append("		elif 'doc' in attrs and len(attrs['doc'])>0:")
-		fd.append("			self.debugmsg(5, 'attrs[doc]: ', attrs['doc'])")
-		fd.append("			ResultName = attrs['doc']")
-		# Quiet Keyword -> https://github.com/damies13/rfswarm/blob/master/Doc/Preparing_for_perf.md#keywords
-		# fd.append("		elif '${' not in name:")
-		# fd.append("			ResultName = name")
+		# 'dflt': "Default",
+		fd.append("		if self.resultnamemode == 'dflt':")
+		fd.append("			if self.msg is not None and not istrace:")
+		fd.append("				ResultName = self.msg.message")
+		fd.append("			elif 'doc' in attrs and len(attrs['doc'])>0:")
+		fd.append("				self.debugmsg(5, 'attrs[doc]: ', attrs['doc'])")
+		fd.append("				ResultName = attrs['doc']")
+		# 'doco': "Documentation",
+		fd.append("		if self.resultnamemode == 'doco':")
+		fd.append("			if 'doc' in attrs and len(attrs['doc'])>0:")
+		fd.append("				self.debugmsg(5, 'attrs[doc]: ', attrs['doc'])")
+		fd.append("				ResultName = attrs['doc']")
+		# 'info': "Information",
+		fd.append("		if self.resultnamemode == 'info':")
+		fd.append("			if self.msg is not None:")
+		fd.append("				ResultName = self.msg.message")
+		# 'kywrd': "Keyword",
+		fd.append("		if self.resultnamemode == 'kywrd':")
+		fd.append("			ResultName = data.name")
+		# "kywrdargs": "Keyword & Arguments"
+		fd.append("		if self.resultnamemode == 'kywrdargs':")
+		fd.append("			lResultName = [data.name]")
+		fd.append("			for arg in attrs['args']:")
+		fd.append("				lResultName.append(arg)")
+		fd.append("			ResultName = ' '.join(lResultName)")
+
 		fd.append("		self.debugmsg(3, 'ResultName: ', ResultName, '	:', len(ResultName))")
 		fd.append("		")
 		fd.append("		if 'owner' not in attrs:")
