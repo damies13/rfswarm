@@ -13,6 +13,7 @@ import base64
 import configparser
 import gc
 import hashlib
+import importlib.metadata
 import inspect
 import json
 import lzma
@@ -30,11 +31,6 @@ import uuid
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from typing import Any
-
-if sys.version_info >= (3, 8):
-	import importlib.metadata
-else:
-	import pkg_resources
 
 import psutil
 import requests
@@ -416,7 +412,7 @@ class RFSwarmAgent():
 		try:
 			r = requests.post(uri, json=payload, timeout=self.timeout)
 			self.debugmsg(8, r.status_code, r.text)
-			if (r.status_code != requests.codes.ok):
+			if r.status_code != requests.codes.ok:
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok, r.text)
 				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 				self.isconnected = False
@@ -444,7 +440,7 @@ class RFSwarmAgent():
 			try:
 				r = requests.get(self.swarmmanager, timeout=self.timeout)
 				self.debugmsg(8, r.status_code, r.text)
-				if (r.status_code == requests.codes.ok):
+				if r.status_code == requests.codes.ok:
 					self.debugmsg(7, "r.status_code:", r.status_code, requests.codes.ok, r.text)
 					self.isconnected = True
 					self.debugmsg(0, "Manager Connected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
@@ -477,67 +473,8 @@ class RFSwarmAgent():
 			self.saveini()
 
 	def findlibraries(self):
-		if sys.version_info >= (3, 8):
-			self.findlibraries_new()
-		else:
-			self.findlibraries_old()
-
-	def findlibraries_old(self):
-		# pre python 3.8 method
-		# This method works up to python 3.11 but stops working with python 3.12
-		# it is also known to have perfromance issues, so is not recomended for
-		# python versions over 3.8
-		found = 0
-		liblst = []
-		# import pkg_resources
-		installed_packages = list(pkg_resources.working_set)
-		# self.debugmsg(5, "installed_packages:", installed_packages)
-		for i in installed_packages:
-			# self.debugmsg(5, "i:", i)
-			# self.debugmsg(5, "type(i):", type(i))
-
-			# self.debugmsg(5, "i.key:", i.key)
-			# self.debugmsg(5, "i.value:", installed_packages[i])
-			# self.debugmsg(5, "i value:", str(i).split(" ")[1])
-
-			if i.key.strip() == "robotframework":
-				found = 1
-				thisver = str(i).split(" ")[1]
-				if "RobotFramework" in self.agentproperties:
-					ver = self.higher_version(thisver, self.agentproperties["RobotFramework"])
-					self.agentproperties["RobotFramework"] = ver
-					self.debugmsg(6, i.key.strip(), thisver, "-->", ver)
-				else:
-					self.agentproperties["RobotFramework"] = thisver
-					self.debugmsg(6, i.key.strip(), thisver)
-			if i.key.startswith("robotframework-"):
-				# print(i.key)
-				keyarr = i.key.strip().split("-")
-				thisver = str(i).split(" ")[1]
-				self.debugmsg(7, keyarr, thisver)
-				#  next overwrites previous
-				if "RobotFramework: Library: " + keyarr[1] in self.agentproperties:
-					ver = self.higher_version(thisver, self.agentproperties["RobotFramework: Library: " + keyarr[1]])
-					self.agentproperties["RobotFramework: Library: " + keyarr[1]] = ver
-				else:
-					self.agentproperties["RobotFramework: Library: " + keyarr[1]] = thisver
-				liblst.append(keyarr[1])
-
-		self.debugmsg(8, "liblst:", liblst, len(liblst))
-		if len(liblst) > 0:
-			self.debugmsg(7, "liblst:", ", ".join(liblst))
-			self.agentproperties["RobotFramework: Libraries"] = ", ".join(liblst)
-
-		if not found:
-			self.debugmsg(0, "RobotFramework is not installed!!!")
-			self.debugmsg(0, "RobotFramework is required for the agent to run scripts")
-			self.debugmsg(0, "Perhaps try: 'pip install robotframework'")
-			raise Exception("RobotFramework is not installed")
-
-	def findlibraries_new(self):
 		# post python 3.8 method
 		# This method works for python 3.8 and higher
-		# It is also supposed to perfrom better than the older version
 		found = 0
 		liblst = []
 
@@ -633,7 +570,7 @@ class RFSwarmAgent():
 		try:
 			r = requests.post(uri, json=payload, timeout=self.timeout)
 			self.debugmsg(6, "resp: ", r.status_code, r.text)
-			if (r.status_code != requests.codes.ok):
+			if r.status_code != requests.codes.ok:
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
 				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 				self.isconnected = False
@@ -731,7 +668,7 @@ class RFSwarmAgent():
 		try:
 			r = requests.post(uri, json=payload, timeout=self.timeout)
 			self.debugmsg(8, "resp: ", r.status_code, r.text)
-			if (r.status_code != requests.codes.ok):
+			if r.status_code != requests.codes.ok:
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
 				self.debugmsg(5, "resp: ", r.status_code, r.text)
 				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
@@ -803,7 +740,7 @@ class RFSwarmAgent():
 		try:
 			r = requests.post(uri, json=payload, timeout=self.timeout)
 			self.debugmsg(7, "getjobs: resp: ", r.status_code, r.text)
-			if (r.status_code != requests.codes.ok):
+			if r.status_code != requests.codes.ok:
 				self.debugmsg(7, "r.status_code:", r.status_code, requests.codes.ok)
 				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 				self.isconnected = False
@@ -962,7 +899,7 @@ class RFSwarmAgent():
 		jobdata["jobid"] = jobid
 		jobdata["Test"] = self.jobs[jobid]["Test"]
 
-		with open(jobfile, 'w') as jfile:
+		with open(jobfile, 'w', encoding="utf-8") as jfile:
 			jfile.write(json.dumps(jobdata))
 
 		hash = self.jobs[jobid]['ScriptHash']
@@ -1142,7 +1079,7 @@ class RFSwarmAgent():
 			try:
 				os.chdir(self.scriptdir)
 				# https://stackoverflow.com/questions/4856583/how-do-i-pipe-a-subprocess-call-to-a-text-file
-				with open(logFileName, "w") as f:
+				with open(logFileName, "w", encoding="utf-8") as f:
 					self.debugmsg(3, "Robot run with command: '", " ".join(cmd), "'")
 					# result = subprocess.call(" ".join(cmd), shell=True, stdout=f, stderr=f)
 					try:
@@ -1256,7 +1193,7 @@ class RFSwarmAgent():
 		try:
 			r = requests.post(uri, json=payload, timeout=self.timeout)
 			self.debugmsg(7, "resp: ", r.status_code, r.text)
-			if (r.status_code != requests.codes.ok):
+			if r.status_code != requests.codes.ok:
 				self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
 				self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 				self.isconnected = False
@@ -1306,7 +1243,7 @@ class RFSwarmAgent():
 			try:
 				r = requests.post(uri, json=payload, timeout=self.timeout)
 				self.debugmsg(7, "resp: ", r.status_code, r.text)
-				if (r.status_code != requests.codes.ok):
+				if r.status_code != requests.codes.ok:
 					self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
 					self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 					self.isconnected = False
@@ -1453,7 +1390,7 @@ class RFSwarmAgent():
 				try:
 					r = requests.post(uri, json=payload, timeout=self.timeout)
 					self.debugmsg(6, "run_proces_output: ", r.status_code, r.text)
-					if (r.status_code != requests.codes.ok):
+					if r.status_code != requests.codes.ok:
 						self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
 						self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 						self.isconnected = False
@@ -1519,7 +1456,7 @@ class RFSwarmAgent():
 				try:
 					r = requests.post(uri, json=payload, timeout=self.timeout)
 					self.debugmsg(6, "run_proces_output: ", r.status_code, r.text)
-					if (r.status_code != requests.codes.ok):
+					if r.status_code != requests.codes.ok:
 						self.debugmsg(5, "r.status_code:", r.status_code, requests.codes.ok)
 						self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 						self.isconnected = False
@@ -1537,7 +1474,7 @@ class RFSwarmAgent():
 		return "".join(safe_char(c) for c in s).rstrip("_")
 
 	def saveini(self):
-		with open(self.agentini, 'w') as configfile:    # save
+		with open(self.agentini, 'w', encoding="utf-8") as configfile:    # save
 			self.config.write(configfile)
 
 	def ensuredir(self, dir):
@@ -1791,7 +1728,7 @@ class RFSwarmAgent():
 		fd.append("")
 
 		# print("RFSwarmAgent: create_listner_file: listenerfile: ", self.listenerfile)
-		with open(self.listenerfile, 'w+') as lf:
+		with open(self.listenerfile, 'w+', encoding="utf-8") as lf:
 			# lf.writelines(fd)
 			lf.write('\n'.join(fd))
 
@@ -1989,7 +1926,7 @@ class RFSwarmAgent():
 		fd.append("")
 
 		# print("RFSwarmAgent: create_listner_file: listenerfile: ", self.listenerfile)
-		with open(self.listenerfile, 'w+') as lf:
+		with open(self.listenerfile, 'w+', encoding="utf-8") as lf:
 			# lf.writelines(fd)
 			lf.write('\n'.join(fd))
 
@@ -2048,7 +1985,7 @@ class RFSwarmAgent():
 			fd.append("")
 
 		# print("RFSwarmAgent: create_listner_file: listenerfile: ", self.listenerfile)
-		with open(self.repeaterfile, 'w+') as lf:
+		with open(self.repeaterfile, 'w+', encoding="utf-8") as lf:
 			# lf.writelines(fd)
 			lf.write('\n'.join(fd))
 

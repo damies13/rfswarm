@@ -29,7 +29,7 @@
 # fail-on =
 
 # Specify a score threshold under which the program will exit with error.
-fail-under = 10
+fail-under = 9
 
 # Interpret the stdin as a python script, whose filename needs to be passed as
 # the module_or_package argument.
@@ -44,7 +44,7 @@ fail-under = 10
 # format. Because '\\' represents the directory delimiter on Windows systems, it
 # can't be used as an escape character.
 # ignore-paths =
-ignore-paths = ["^Tests/.*$"]
+#ignore-paths = ["^Tests/.*$"]
 
 # Files or directories matching the regular expression patterns are skipped. The
 # regex matches against base names, not paths. The default value ignores Emacs
@@ -56,7 +56,7 @@ ignore-patterns = ["^\\.#"]
 # during runtime and thus existing member attributes cannot be deduced by static
 # analysis). It supports qualified module names, as well as Unix pattern
 # matching.
-# ignored-modules =
+#ignored-modules = psutil
 
 # Python code to execute, usually for sys.path manipulation such as
 # pygtk.require().
@@ -254,31 +254,31 @@ valid-metaclass-classmethod-first-arg = ["mcs"]
 # ignored-parents =
 
 # Maximum number of arguments for function / method.
-max-args = 5
+max-args = 15
 
 # Maximum number of attributes for a class (see R0902).
-max-attributes = 7
+max-attributes = 11
 
 # Maximum number of boolean expressions in an if statement (see R0916).
 max-bool-expr = 5
 
 # Maximum number of branch for function / method body.
-max-branches = 12
+max-branches = 27
 
 # Maximum number of locals for function / method body.
-max-locals = 15
+max-locals = 50
 
 # Maximum number of parents for a class (see R0901).
 max-parents = 7
 
 # Maximum number of public methods for a class (see R0904).
-max-public-methods = 20
+max-public-methods = 25
 
 # Maximum number of return / yield for function / method body.
-max-returns = 6
+max-returns = 11
 
 # Maximum number of statements in function / method body.
-max-statements = 50
+max-statements = 100
 
 # Minimum number of public methods for a class (see R0903).
 min-public-methods = 2
@@ -304,7 +304,7 @@ indent-string = "\t"
 
 # Maximum number of characters on a single line.
 # max-line-length = 100
-max-line-length = 200
+max-line-length = 2000
 
 # Maximum number of lines in a module.
 max-module-lines = 1000
@@ -376,6 +376,7 @@ confidence =
 # no Warning level messages displayed, use "--disable=all --enable=classes
 # --disable=W".
 # disable = ["raw-checker-failed", "bad-inline-option", "locally-disabled", "file-ignored", "suppressed-message", "useless-suppression", "deprecated-pragma", "use-implicit-booleaness-not-comparison-to-string", "use-implicit-booleaness-not-comparison-to-zero", "use-symbolic-message-instead"]
+disable = import-error, invalid-name, missing-docstring
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

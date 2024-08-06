@@ -2524,7 +2524,7 @@ class ReporterBase():
 
 	def run_db_thread(self):
 		while base.run_dbthread:
-			if (self.datadb is None):
+			if self.datadb is None:
 				base.debugmsg(9, "open results database")
 				if len(base.config['Reporter']['Results']) > 0:
 					self.open_results_db(base.config['Reporter']['Results'])
