@@ -31,11 +31,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 from typing import Any
 
-if sys.version_info >= (3, 8):
-	import importlib.metadata
-else:
-	import pkg_resources
-
+import importlib.metadata
 import psutil
 import requests
 
@@ -477,67 +473,8 @@ class RFSwarmAgent():
 			self.saveini()
 
 	def findlibraries(self):
-		if sys.version_info >= (3, 8):
-			self.findlibraries_new()
-		else:
-			self.findlibraries_old()
-
-	def findlibraries_old(self):
-		# pre python 3.8 method
-		# This method works up to python 3.11 but stops working with python 3.12
-		# it is also known to have perfromance issues, so is not recomended for
-		# python versions over 3.8
-		found = 0
-		liblst = []
-		# import pkg_resources
-		installed_packages = list(pkg_resources.working_set)
-		# self.debugmsg(5, "installed_packages:", installed_packages)
-		for i in installed_packages:
-			# self.debugmsg(5, "i:", i)
-			# self.debugmsg(5, "type(i):", type(i))
-
-			# self.debugmsg(5, "i.key:", i.key)
-			# self.debugmsg(5, "i.value:", installed_packages[i])
-			# self.debugmsg(5, "i value:", str(i).split(" ")[1])
-
-			if i.key.strip() == "robotframework":
-				found = 1
-				thisver = str(i).split(" ")[1]
-				if "RobotFramework" in self.agentproperties:
-					ver = self.higher_version(thisver, self.agentproperties["RobotFramework"])
-					self.agentproperties["RobotFramework"] = ver
-					self.debugmsg(6, i.key.strip(), thisver, "-->", ver)
-				else:
-					self.agentproperties["RobotFramework"] = thisver
-					self.debugmsg(6, i.key.strip(), thisver)
-			if i.key.startswith("robotframework-"):
-				# print(i.key)
-				keyarr = i.key.strip().split("-")
-				thisver = str(i).split(" ")[1]
-				self.debugmsg(7, keyarr, thisver)
-				#  next overwrites previous
-				if "RobotFramework: Library: " + keyarr[1] in self.agentproperties:
-					ver = self.higher_version(thisver, self.agentproperties["RobotFramework: Library: " + keyarr[1]])
-					self.agentproperties["RobotFramework: Library: " + keyarr[1]] = ver
-				else:
-					self.agentproperties["RobotFramework: Library: " + keyarr[1]] = thisver
-				liblst.append(keyarr[1])
-
-		self.debugmsg(8, "liblst:", liblst, len(liblst))
-		if len(liblst) > 0:
-			self.debugmsg(7, "liblst:", ", ".join(liblst))
-			self.agentproperties["RobotFramework: Libraries"] = ", ".join(liblst)
-
-		if not found:
-			self.debugmsg(0, "RobotFramework is not installed!!!")
-			self.debugmsg(0, "RobotFramework is required for the agent to run scripts")
-			self.debugmsg(0, "Perhaps try: 'pip install robotframework'")
-			raise Exception("RobotFramework is not installed")
-
-	def findlibraries_new(self):
 		# post python 3.8 method
 		# This method works for python 3.8 and higher
-		# It is also supposed to perfrom better than the older version
 		found = 0
 		liblst = []
 

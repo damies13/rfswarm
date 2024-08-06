@@ -3464,9 +3464,9 @@ class RFSwarmCore:
 			r = args[0]
 			if len(args) > 1:
 				usrs = args[1]
-		base.debugmsg(6, "Row:", r, "Robots:", usrs)
-		base.debugmsg(8, "base.scriptlist:", base.scriptlist)
-		base.scriptlist[r]["Robots"] = int(usrs)
+			base.debugmsg(6, "Row:", r, "Robots:", usrs)
+			base.debugmsg(8, "base.scriptlist:", base.scriptlist)
+			base.scriptlist[r]["Robots"] = int(usrs)
 
 		if not base.args.nogui:
 			base.gui.sr_users_validate(*args)
@@ -6556,8 +6556,8 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(9, r)
 		if not base.args.nogui:
 			fg = self.scriptgrid.grid_slaves(column=self.plancolscr, row=r)[0].grid_slaves()
-		base.debugmsg(9, fg)
-		base.debugmsg(9, fg[1].get())
+			base.debugmsg(9, fg)
+			base.debugmsg(9, fg[1].get())
 		if args:
 			scriptfile = args[0]
 		else:
