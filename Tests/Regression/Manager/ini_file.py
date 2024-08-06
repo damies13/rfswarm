@@ -5,7 +5,7 @@ import configparser
 
 
 def read_ini_file(filename):
-	"Read ini file and return dictionary."
+	"""Read ini file and return dictionary."""
 	config = configparser.ConfigParser()
 	config.read(filename)
 

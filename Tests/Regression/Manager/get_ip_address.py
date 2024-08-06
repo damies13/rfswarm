@@ -5,7 +5,7 @@ import psutil
 
 
 def get_ip_addresses():
-	"Return lists containing ipv4 and ipv6 addreses."
+	"""Return lists containing ipv4 and ipv6 addreses."""
 	ipv4addresslist = []
 	ipv6addresslist = []
 	iflst = psutil.net_if_addrs()
