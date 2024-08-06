@@ -1077,6 +1077,9 @@ class RFSwarmAgent():
 				if "injectsleepmaximum" in self.jobs[jobid]:
 					metavars.append("RFS_SLEEPMAXIMUM:{}".format(self.jobs[jobid]["injectsleepmaximum"]))
 
+		if "resultnamemode" in self.jobs[jobid]:
+			metavars.append("RFS_RESULTNAMEMODE:{}".format(self.jobs[jobid]["resultnamemode"]))
+
 		for metavar in metavars:
 			cmd.append("-M {}".format(metavar))
 			cmd.append("-v {}".format(metavar))
