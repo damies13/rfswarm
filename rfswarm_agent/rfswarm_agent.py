@@ -1926,7 +1926,7 @@ class RFSwarmAgent():
 		fd.append("")
 
 		# print("RFSwarmAgent: create_listner_file: listenerfile: ", self.listenerfile)
-		with open(self.listenerfile, 'w+') as lf:
+		with open(self.listenerfile, 'w+', encoding="utf-8") as lf:
 			# lf.writelines(fd)
 			lf.write('\n'.join(fd))
 
