@@ -1883,8 +1883,8 @@ class RFSwarmAgent():
 		fd.append("		if 'RFS_SLEEPMAXIMUM' in attrs['metadata']:")
 		fd.append("			self.sleepmaximum = attrs['metadata']['RFS_SLEEPMAXIMUM']")
 		fd.append("			self.debugmsg(6, 'sleepmaximum: ', self.sleepmaximum)")
-		fd.append("		if 'RFS_RESULTNAMEMODE' in result.metadata:")
-		fd.append("			self.resultnamemode = result.metadata['RFS_RESULTNAMEMODE']")
+		fd.append("		if 'RFS_RESULTNAMEMODE' in attrs['metadata']:")
+		fd.append("			self.resultnamemode = attrs['metadata']['RFS_RESULTNAMEMODE']")
 		fd.append("			self.debugmsg(6, 'resultnamemode: ', self.resultnamemode)")
 		fd.append("		self.seedseed()")
 		fd.append("")
@@ -1906,7 +1906,7 @@ class RFSwarmAgent():
 		fd.append("")
 		fd.append("	def end_keyword(self, name, attrs):")
 		fd.append("		self.debugmsg(3, 'Keyword name: ', name)")
-		fd.append("		self.debugmsg(6, 'attrs: ', attrs)")
+		fd.append("		self.debugmsg(8, 'attrs: ', attrs)")
 		fd.append("		self.debugmsg(5, 'attrs[doc]: ', attrs['doc'])")
 		fd.append("		self.debugmsg(5, 'self.msg: ', self.msg)")
 		fd.append("		")
@@ -1918,13 +1918,36 @@ class RFSwarmAgent():
 		fd.append("		")
 		fd.append("		iter = BuiltIn().get_variable_value(\"${RFS_ITERATION}\")")
 
-		fd.append("		if self.msg is not None and 'message' in self.msg and not istrace:")
-		fd.append("			ResultName = self.msg['message']")
-		fd.append("		elif 'doc' in attrs and len(attrs['doc'])>0:")
-		fd.append("			ResultName = attrs['doc']")
-		# Quiet Keyword -> https://github.com/damies13/rfswarm/blob/master/Doc/Preparing_for_perf.md#keywords
-		# fd.append("		elif '${' not in name:")
-		# fd.append("			ResultName = name")
+		# 'dflt': "Default",
+		fd.append("		if self.resultnamemode == 'dflt':")
+		fd.append("			if self.msg is not None and 'message' in self.msg and not istrace:")
+		fd.append("				ResultName = self.msg['message']")
+		fd.append("			elif 'doc' in attrs and len(attrs['doc'])>0:")
+		fd.append("				ResultName = attrs['doc']")
+		# 'doco': "Documentation",
+		fd.append("		if self.resultnamemode == 'doco':")
+		fd.append("			if 'doc' in attrs and len(attrs['doc'])>0:")
+		fd.append("				ResultName = attrs['doc']")
+		# 'info': "Information",
+		fd.append("		if self.resultnamemode == 'info':")
+		fd.append("			if self.msg is not None and 'message' in self.msg:")
+		fd.append("				ResultName = self.msg['message']")
+		# 'kywrd': "Keyword",
+		fd.append("		if self.resultnamemode == 'kywrd':")
+		# fd.append("			ResultName = name")		# returns library.keyword
+		fd.append("			self.debugmsg(8, self.resultnamemode, 'kwname: ', attrs['kwname'])")
+		fd.append("			ResultName = attrs['kwname']")
+		# "kywrdargs": "Keyword & Arguments"
+		fd.append("		if self.resultnamemode == 'kywrdargs':")
+		# fd.append("			lResultName = [name]")		# returns library.keyword
+		fd.append("			self.debugmsg(8, self.resultnamemode, 'kwname: ', attrs['kwname'])")
+		fd.append("			lResultName = [attrs['kwname']]")
+		fd.append("			self.debugmsg(3, 'lResultName: ', lResultName)")
+		fd.append("			for arg in attrs['args']:")
+		fd.append("				lResultName.append(arg)")
+		fd.append("			self.debugmsg(8, 'lResultName: ', lResultName)")
+		fd.append("			ResultName = ' '.join(lResultName)")
+
 		fd.append("		self.debugmsg(3, 'ResultName: ', ResultName, '	:', len(ResultName))")
 		fd.append("		")
 		fd.append("		if len(ResultName)>0:")
