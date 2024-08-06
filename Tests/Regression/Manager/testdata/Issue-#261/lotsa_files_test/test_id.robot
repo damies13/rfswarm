@@ -1,5 +1,5 @@
 *** Settings ***
-Resource          resources/Indonesia/Indonesia.resource
+Resource          resources${/}Indonesia${/}Indonesia.resource
 
 Metadata	File    resources/config.yaml
 
