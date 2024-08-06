@@ -1,7 +1,10 @@
 ---
 name: Package Test Publish
 
-on: push
+on:
+  push:
+  pull_request:
+    types: [opened, reopened]
 
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
 

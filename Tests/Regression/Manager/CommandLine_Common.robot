@@ -78,6 +78,7 @@ Wait For Manager
 	Log to console 	${result.rc}
 
 Check Agent Is Running
+	[Documentation] 	This keyword checks if the agent is running and returns true or false
 	${result}= 	Is Process Running		${process_agent}
 	# Should Be Equal As Integers 	${result.rc} 	0
 	Log 	Is Agent Running: ${result} 	console=True

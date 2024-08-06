@@ -477,8 +477,8 @@ class RFSwarmBase:
 	uploadmode = "err" 	# modes are imm, err, def
 	uploadfiles: Any = {}
 
-	resultnamemodes = {'dflt': "Default", 'doco': "Documentation", 'kywrd': "Keyword", "kywrdargs": "Keyword & Arguments"}
-	resultnamemode = "dflt" 	# modes are dflt, doco, kywrd, kywrdargs
+	resultnamemodes = {'dflt': "Default", 'doco': "Documentation", 'info': "Information", 'kywrd': "Keyword", "kywrdargs": "Keyword & Arguments"}
+	resultnamemodedefault = "dflt" 	# modes are dflt, doco, kywrd, kywrdargs
 
 	index = ""
 	file = ""
@@ -3026,6 +3026,10 @@ class RFSwarmCore:
 					base.debugmsg(3, "test missing [", istr, "]")
 					fileok = False
 
+				if "resultnamemode" in filedata[istr]:
+					base.debugmsg(8, "resultnamemode:", filedata[istr]["resultnamemode"])
+					base.scriptlist[rowcount]["resultnamemode"] = filedata[istr]["resultnamemode"]
+
 				if "excludelibraries" in filedata[istr]:
 					base.debugmsg(8, "excludelibraries:", filedata[istr]["excludelibraries"])
 					base.scriptlist[rowcount]["excludelibraries"] = filedata[istr]["excludelibraries"]
@@ -3373,6 +3377,14 @@ class RFSwarmCore:
 											"EndTime": base.scriptgrpend[gid],
 											"id": grurid
 										}
+
+										if "resultnamemode" in grp:
+											base.robot_schedule["Agents"][nxtagent][grurid]["resultnamemode"] = grp["resultnamemode"]
+										else:
+											if "resultnamemode" in base.scriptdefaults:
+												base.robot_schedule["Agents"][nxtagent][grurid]["resultnamemode"] = base.scriptdefaults["resultnamemode"]
+											else:
+												base.robot_schedule["Agents"][nxtagent][grurid]["resultnamemode"] = base.resultnamemodedefault
 
 										if "excludelibraries" in grp:
 											base.robot_schedule["Agents"][nxtagent][grurid]["excludelibraries"] = grp["excludelibraries"]
@@ -5404,12 +5416,18 @@ class RFSwarmGUI(tk.Frame):
 		# Field Data
 		#
 
+		setingsWindow.resultnamemodedefault = base.resultnamemodedefault
+		setingsWindow.resultnamemodecurrent = setingsWindow.resultnamemodedefault
+		if "resultnamemode" in base.scriptdefaults:
+			setingsWindow.resultnamemodecurrent = base.scriptdefaults["resultnamemode"]
+		base.debugmsg(5, "resultnamemodecurrent:", setingsWindow.resultnamemodecurrent)
+
 		setingsWindow.excludelibrariesdefault = base.excludelibrariesdefault
 
 		base.debugmsg(5, "base.scriptdefaults:", base.scriptdefaults)
 
 		setingsWindow.excludelibrariescurrent = setingsWindow.excludelibrariesdefault
-		base.scriptdefaults
+		# base.scriptdefaults
 		if "excludelibraries" in base.scriptdefaults:
 			setingsWindow.excludelibrariescurrent = base.scriptdefaults["excludelibraries"]
 		base.debugmsg(5, "excludelibrariescurrent:", setingsWindow.excludelibrariescurrent)
@@ -5520,14 +5538,14 @@ class RFSwarmGUI(tk.Frame):
 
 		# resultnamemode
 		rownum += 1
-		setingsWindow.lblEL = ttk.Label(setingsWindow.fmeTestDefaults, text="Result Name Mode:")
-		setingsWindow.lblEL.grid(column=0, row=rownum, sticky="nsew")
+		setingsWindow.lblNameMode = ttk.Label(setingsWindow.fmeTestDefaults, text="Result Name Mode:")
+		setingsWindow.lblNameMode.grid(column=0, row=rownum, sticky="nsew")
 
 		NameModeOpt = list(base.resultnamemodes.values())
 		setingsWindow.strNameMode = tk.StringVar()
 		setingsWindow.omNameMode = ttk.OptionMenu(setingsWindow.fmeTestDefaults, setingsWindow.strNameMode, None, *NameModeOpt)
 		base.debugmsg(5, "uploadmode:", base.uploadmode)
-		setingsWindow.strNameMode.set(base.resultnamemodes[base.resultnamemode])
+		setingsWindow.strNameMode.set(base.resultnamemodes[setingsWindow.resultnamemodecurrent])
 		setingsWindow.omNameMode.grid(column=1, row=rownum, columnspan=10, sticky="nsew")
 
 		rownum += 1
@@ -5744,6 +5762,26 @@ class RFSwarmGUI(tk.Frame):
 			# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 			# Test Defaults
 			#
+
+			# setingsWindow.strNameMode.set(base.resultnamemodes[base.resultnamemode])
+			base.debugmsg(5, "strNameMode:", setingsWindow.strNameMode.get(), "	resultnamemodes:", base.resultnamemodes)
+			nm = base.GetKey(base.resultnamemodes, setingsWindow.strNameMode.get())
+			base.debugmsg(5, "nm:", nm)
+			if len(nm) > 0:
+				if nm != setingsWindow.resultnamemodedefault:
+					base.scriptdefaults["resultnamemode"] = nm
+					self.plan_scnro_chngd = True
+					base.resultnamemode = nm
+					base.debugmsg(5, "resultnamemode:", base.resultnamemode)
+				else:
+					if "resultnamemode" in base.scriptdefaults:
+						del base.scriptdefaults["resultnamemode"]
+						self.plan_scnro_chngd = True
+			else:
+				if "resultnamemode" in base.scriptdefaults:
+					del base.scriptdefaults["resultnamemode"]
+					self.plan_scnro_chngd = True
+
 			el = setingsWindow.inpEL.get()
 			base.debugmsg(7, "el:", el)
 			if len(el) > 0:
@@ -6671,8 +6709,9 @@ class RFSwarmGUI(tk.Frame):
 		if not base.args.nogui:
 			# if 0 in self.scriptgrid.grid_slaves:
 			base.debugmsg(9, "sr_test_validate: grid_slaves:", self.scriptgrid.grid_slaves(column=self.plancoltst, row=r))
-			tol = self.scriptgrid.grid_slaves(column=self.plancoltst, row=r)[0]
-			base.debugmsg(9, "sr_test_validate: tol:", tol)
+			if len(self.scriptgrid.grid_slaves(column=self.plancoltst, row=r))>0:
+				tol = self.scriptgrid.grid_slaves(column=self.plancoltst, row=r)[0]
+				base.debugmsg(9, "sr_test_validate: tol:", tol)
 
 		v = None
 		if len(args) > 1 and len(args[1]) > 1:
@@ -6684,8 +6723,9 @@ class RFSwarmGUI(tk.Frame):
 		else:
 			if not base.args.nogui:
 				base.debugmsg(9, "sr_test_validate: else")
-				base.debugmsg(9, "sr_test_validate: scriptlist[r][TestVar].get():", base.scriptlist[r]["TestVar"].get())
-				base.scriptlist[r]["Test"] = base.scriptlist[r]["TestVar"].get()
+				if "TestVar" in base.scriptlist[r]:
+					base.debugmsg(9, "sr_test_validate: scriptlist[r][TestVar].get():", base.scriptlist[r]["TestVar"].get())
+					base.scriptlist[r]["Test"] = base.scriptlist[r]["TestVar"].get()
 
 		base.debugmsg(9, "scriptlist[r]:", base.scriptlist[r])
 		base.debugmsg(9, "scriptlist[r][TestVar].get():", base.scriptlist[r]["TestVar"].get())
@@ -6785,13 +6825,22 @@ class RFSwarmGUI(tk.Frame):
 		if len(testname) > 0:
 			stgsWindow.title("Settings for {} ({})".format(testname, r))
 
+		base.debugmsg(9, "base.scriptlist[r]:", r, base.scriptlist[r])
+
+		stgsWindow.resultnamemodedefault = base.resultnamemodedefault
+		if "resultnamemode" in base.scriptdefaults:
+			stgsWindow.resultnamemodedefault = base.scriptdefaults["resultnamemode"]
+
+		stgsWindow.resultnamemodecurrent = stgsWindow.resultnamemodedefault
+		if "resultnamemode" in base.scriptlist[r]:
+			stgsWindow.resultnamemodecurrent = base.scriptlist[r]["resultnamemode"]
+		base.debugmsg(5, "resultnamemodecurrent:", stgsWindow.resultnamemodecurrent)
+
 		stgsWindow.excludelibrariesdefault = base.excludelibrariesdefault
 		if "excludelibraries" in base.scriptdefaults:
 			stgsWindow.excludelibrariesdefault = base.scriptdefaults["excludelibraries"]
 
 		stgsWindow.Filters = {}
-
-		base.debugmsg(5, "base.scriptlist[r]:", base.scriptlist[r])
 
 		stgsWindow.excludelibrariescurrent = stgsWindow.excludelibrariesdefault
 		if "excludelibraries" in base.scriptlist[r]:
@@ -6879,8 +6928,8 @@ class RFSwarmGUI(tk.Frame):
 		NameModeOpt = list(base.resultnamemodes.values())
 		stgsWindow.strNM = tk.StringVar()
 		stgsWindow.omNM = ttk.OptionMenu(stgsWindow, stgsWindow.strNM, None, *NameModeOpt)
-		base.debugmsg(5, "resultnamemode:", base.resultnamemode)
-		stgsWindow.strNM.set(base.resultnamemodes[base.resultnamemode])
+		base.debugmsg(5, "resultnamemodecurrent:", stgsWindow.resultnamemodecurrent)
+		stgsWindow.strNM.set(base.resultnamemodes[stgsWindow.resultnamemodecurrent])
 		stgsWindow.omNM.grid(column=0, row=row, columnspan=10, sticky="nsew")
 
 		row += 1
@@ -7025,6 +7074,22 @@ class RFSwarmGUI(tk.Frame):
 	def sr_row_settings_save(self, r, stgsWindow):
 		base.debugmsg(7, "r:", r)
 		base.debugmsg(7, "stgsWindow:", stgsWindow)
+
+		nm = base.GetKey(base.resultnamemodes, stgsWindow.strNM.get())
+		base.debugmsg(7, "nm:", nm)
+		if len(nm) > 0:
+			if nm != stgsWindow.resultnamemodedefault:
+				base.scriptlist[r]["resultnamemode"] = nm
+				self.plan_scnro_chngd = True
+			else:
+				if "resultnamemode" in base.scriptlist[r]:
+					del base.scriptlist[r]["resultnamemode"]
+					self.plan_scnro_chngd = True
+		else:
+			if "resultnamemode" in base.scriptlist[r]:
+				del base.scriptlist[r]["resultnamemode"]
+			self.plan_scnro_chngd = True
+
 		el = stgsWindow.inpEL.get()
 		base.debugmsg(7, "el:", el)
 		if len(el) > 0:
