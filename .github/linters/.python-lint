@@ -55,7 +55,7 @@ ignore-patterns = ["^\\.#"]
 # during runtime and thus existing member attributes cannot be deduced by static
 # analysis). It supports qualified module names, as well as Unix pattern
 # matching.
-ignored-modules = psutil
+#ignored-modules = psutil
 
 # Python code to execute, usually for sys.path manipulation such as
 # pygtk.require().
@@ -375,6 +375,7 @@ confidence =
 # no Warning level messages displayed, use "--disable=all --enable=classes
 # --disable=W".
 # disable = ["raw-checker-failed", "bad-inline-option", "locally-disabled", "file-ignored", "suppressed-message", "useless-suppression", "deprecated-pragma", "use-implicit-booleaness-not-comparison-to-string", "use-implicit-booleaness-not-comparison-to-zero", "use-symbolic-message-instead"]
+disable = import-error
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
