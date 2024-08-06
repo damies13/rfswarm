@@ -6709,7 +6709,7 @@ class RFSwarmGUI(tk.Frame):
 		if not base.args.nogui:
 			# if 0 in self.scriptgrid.grid_slaves:
 			base.debugmsg(9, "sr_test_validate: grid_slaves:", self.scriptgrid.grid_slaves(column=self.plancoltst, row=r))
-			if len(self.scriptgrid.grid_slaves(column=self.plancoltst, row=r))>0:
+			if len(self.scriptgrid.grid_slaves(column=self.plancoltst, row=r)) > 0:
 				tol = self.scriptgrid.grid_slaves(column=self.plancoltst, row=r)[0]
 				base.debugmsg(9, "sr_test_validate: tol:", tol)
 
@@ -6917,7 +6917,6 @@ class RFSwarmGUI(tk.Frame):
 		row = 0
 		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
 		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
-
 
 		# resultnamemode
 		row += 1
