@@ -1709,8 +1709,9 @@ class RFSwarmAgent():
 		# "kywrdargs": "Keyword & Arguments"
 		fd.append("		if self.resultnamemode == 'kywrdargs':")
 		fd.append("			lResultName = [data.name]")
-		fd.append("			for arg in attrs['args']:")
-		fd.append("				lResultName.append(arg)")
+		fd.append("			if 'args' in attrs:")
+		fd.append("				for arg in attrs['args']:")
+		fd.append("					lResultName.append(arg)")
 		fd.append("			ResultName = ' '.join(lResultName)")
 
 		fd.append("		self.debugmsg(3, 'ResultName: ', ResultName, '	:', len(ResultName))")
@@ -1943,8 +1944,9 @@ class RFSwarmAgent():
 		fd.append("			self.debugmsg(8, self.resultnamemode, 'kwname: ', attrs['kwname'])")
 		fd.append("			lResultName = [attrs['kwname']]")
 		fd.append("			self.debugmsg(3, 'lResultName: ', lResultName)")
-		fd.append("			for arg in attrs['args']:")
-		fd.append("				lResultName.append(arg)")
+		fd.append("			if 'args' in attrs:")
+		fd.append("				for arg in attrs['args']:")
+		fd.append("					lResultName.append(arg)")
 		fd.append("			self.debugmsg(8, 'lResultName: ', lResultName)")
 		fd.append("			ResultName = ' '.join(lResultName)")
 
