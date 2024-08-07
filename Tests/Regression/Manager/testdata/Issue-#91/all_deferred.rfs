@@ -1,0 +1,20 @@
+[Scenario]
+uploadmode = def
+scriptcount = 2
+graphlist = 
+
+[1]
+robots = 10
+delay = 0
+rampup = 15
+run = 50
+script = all_deferred.robot
+test = Just Sleep For 20s And Fail
+
+[2]
+robots = 10
+delay = 0
+rampup = 15
+run = 50
+script = all_deferred.robot
+test = Just Sleep For 20s

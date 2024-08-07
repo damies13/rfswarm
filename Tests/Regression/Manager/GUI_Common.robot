@@ -306,7 +306,7 @@ Click Label With Vertical Offset
 	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down].
 	...	Give the image a full name, for example: button_runopen.
 	${labelname}= 	Convert To Lower Case 	${labelname}
-	${img}=	Set Variable		manager_${platform}_${labelname}.png
+	${img}=	Set Variable		manager_${platform}_label_${labelname}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=300
@@ -317,7 +317,7 @@ Click Label With Vertical Offset
 	Take A Screenshot
 
 Click Label With Horizontal Offset
-	[Arguments]		${labelname}	${offset}
+	[Arguments]		${labelname}	${offset}=0
 	[Documentation]	Click the image with the offset
 	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right].
 	...	Give the image a full name, for example: button_runopen.
@@ -429,6 +429,24 @@ Set INI Window Size
 	Log		${ini_content}
 	Append To File	${location}		${ini_content}
 
+Change Manager INI File Settings
+	[Arguments]		${option}	${new_value}
+	${location}=	Get Manager INI Location
+	${ini_content}=		Get Manager INI Data
+	${ini_content_list}=	Split String	${ini_content}
+	${option_index}=	Get Index From List		${ini_content_list}		${option}
+
+	${len}	Get Length	${ini_content_list}
+	IF  ${len} > ${option_index + 2}
+		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${option_index + 2}]	${new_value}
+	ELSE
+		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${option_index}] =	${option} = ${new_value}
+	END
+
+	Remove File		${location}
+	Log		${ini_content}
+	Append To File	${location}		${ini_content}
+
 Get Manager PIP Data
 	Run Process	pip	show	rfswarm-manager		alias=data
 	${pip_data}	Get Process Result	data
@@ -456,21 +474,41 @@ Clear Manager Result Directory
 Change Test Group Settings
 	[Arguments]		${row_settings_data}
 	Sleep	2
-	Click Dialog Button		row_settings_frame_name
-	Press Key.tab 1 Times
+	#Click Dialog Button		row_settings_frame_name
 	IF  'exclude_libraries' in ${row_settings_data}
+		Click Label With Vertical Offset	exclude_libraries	20
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${row_settings_data['exclude_libraries']}
 	END
-	Press Key.tab 1 Times
 	IF  'robot_options' in ${row_settings_data}
+		Click Label With Vertical Offset	robot_options		20
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${row_settings_data['robot_options']}
 	END
-	Press Key.tab 3 Times
 	IF  'inject_sleep_min' in ${row_settings_data}
+		Click Label With Vertical Offset	inject_sleep_min	20
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${row_settings_data['inject_sleep_min']}
 	END
-	Press Key.tab 1 Times
 	IF  'inject_sleep_max' in ${row_settings_data}
+		Click Label With Vertical Offset	inject_sleep_max	20
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${row_settings_data['inject_sleep_max']}
 	END
 	IF  'test_repeater' in ${row_settings_data}
@@ -494,31 +532,59 @@ Change Test Group Settings
 Change Scenario Wide Settings
 	[Arguments]		${wide_settings_data}
 	Sleep	2
-	Click Label With Vertical Offset	scenario_settings_scenario
-	Press Key.tab 2 Times
+	#Click Label With Vertical Offset	scenario_settings_scenario
 	IF  'exclude_libraries' in ${wide_settings_data}
+		Click Label With Horizontal Offset	exclude_libraries	100
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${wide_settings_data['exclude_libraries']}
 	END
-	Press Key.tab 1 Times
 	IF  'robot_options' in ${wide_settings_data}
+		Click Label With Horizontal Offset	robot_options		100
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${wide_settings_data['robot_options']}
 	END
-	Press Key.tab 3 Times
 	IF  'inject_sleep_min' in ${wide_settings_data}
-		Take A Screenshot	#del later
+		Click Label With Vertical Offset	inject_sleep_min	20
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${wide_settings_data['inject_sleep_min']}
-		Take A Screenshot	#del later
 	END
-	Press Key.tab 1 Times
 	IF  'inject_sleep_max' in ${wide_settings_data}
+		Click Label With Vertical Offset	inject_sleep_max	20
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${wide_settings_data['inject_sleep_max']}
 	END
-	Press Key.tab 4 Times
 	IF  'bind_ip_address' in ${wide_settings_data}
+		Click Label With Horizontal Offset	bind_ip_address		100
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${wide_settings_data['bind_ip_address']}
 	END
-	Press Key.tab 1 Times
 	IF  'bind_port_number' in ${wide_settings_data}
+		Click Label With Horizontal Offset	bind_port_number	100
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Type	${wide_settings_data['bind_port_number']}
 	END
 	IF  'upload_logs' in ${wide_settings_data}
@@ -548,7 +614,7 @@ Change Scenario Wide Settings
 			Click CheckBox	checked		injectsleep
 		END
 	END
-	# TODO: disableloglog, disablelogreport, disablelogoutput, bindipaddres, bindport
+	# TODO: disableloglog, disablelogreport, disablelogoutput
 
 	Click Button	ok
 
@@ -572,13 +638,8 @@ Select ${n} Robot Test Case
 
 Select Robot File OS DIALOG
 	[Arguments]		${robot_file_name}
-	Sleep	2
-	${robot_file_name}=		Set Variable		${robot_file_name}
-	${robot_file_name}=		Get Substring	${robot_file_name}	0	-6
-	Log		${robot_file_name}
-	Take A Screenshot
-	Click Dialog Button		${robot_file_name}_robot
-	Sleep	2
+	Sleep	5
+	Type	${robot_file_name}
 	Take A Screenshot
 	Click Dialog Button		open
 	Sleep	1
@@ -1004,7 +1065,6 @@ Verify Scenario Wide Settings Data
 		Should Be Equal		${wide_settings_data['disablelog_output']}		${scenario_content_list}[${disablelog_output_offset + 2}]
 		...    msg=Disablelog Robot Logs: output.xml did not save correctly [settings != scenario]!
 	END
-	# TODO: bindipaddres, bindport
 
 Check That The Scenario File Opens Correctly
 	[Arguments]		${scenario_name}	${scenario_content}
@@ -1076,47 +1136,51 @@ File Open Dialogue Select File
 
 File Open Dialogue ubuntu Select File
 	[Arguments]		${filepath}
-	Sleep    0.1
+	Sleep	2
 	Take A Screenshot
 	Click Label With Horizontal Offset 	file_name 	50
+	Sleep	0.5
 	Type 		${filepath} 	Key.ENTER
-	Sleep    0.1
+	Sleep	0.5
 	Take A Screenshot
 	# Click Dialog Button 	open
-	# Sleep    0.1
-	# Take A Screenshot
 
 File Open Dialogue windows Select File
 	[Arguments]		${filepath}
-	Sleep    0.1
+	Sleep	3
 	Take A Screenshot
 	${filepath}= 	Normalize Path 	${filepath}
-	${path} 	${file} = 	Split Path 	${filepath}
+	#${path} 	${file} = 	Split Path 	${filepath}
 	Click Label With Horizontal Offset 	file_name 	50
-	Type 		${path} 	Key.ENTER
-	Sleep    0.1
-	Take A Screenshot
-	Click Label With Horizontal Offset 	file_name 	50
-	Type 		${file} 	Key.ENTER
+	Sleep	0.5
+	Type 		${filepath}
+	Sleep	0.5
+	Press key.enter 1 Times
 	Take A Screenshot
 	# Click Dialog Button 	open
-	# Sleep    0.1
-	# Take A Screenshot
 
 File Open Dialogue macos Select File
 	[Arguments]		${filepath}
-	Sleep    0.1
+	Sleep	3
 	Take A Screenshot
+	${filepath}=	Convert To Lower Case	${filepath}
+	Evaluate	clipboard.copy("${filepath}")	modules=clipboard	#copy path to clipboard
 	Press Combination 	KEY.command 	KEY.shift 	KEY.g
-	Sleep    0.1
+	Press Combination 	KEY.backspace	#clear text filed
+	Click Label With Horizontal Offset 	file_name 	-10
+	Click	button=right	#show context menu
+	Sleep	2
 	Take A Screenshot
-	Type 		Key.BACKSPACE 	Key.DELETE
-	Sleep    0.1
+	Press Combination 	KEY.down	#choose paste option(should be first)
+	Press key.enter 1 Times		#execute paste option 
+	Sleep	0.5
 	Take A Screenshot
-	Type 		${filepath} 	Key.ENTER
-	Sleep    0.1
+	Press key.enter 1 Times
+	Sleep	0.5
 	Take A Screenshot
 	Click Dialog Button 	open
+	# Type 		Key.BACKSPACE 	Key.DELETE
+	# Click Dialog Button 	open
 
 Select Test Script
 	[Arguments]		${row}	${filepath}

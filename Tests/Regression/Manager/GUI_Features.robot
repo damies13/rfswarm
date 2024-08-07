@@ -39,7 +39,7 @@ Verify the Field Validation Is Working In the Manager Plan Screen
 		Sleep	2
 		${status}=	Run Keyword And Return Status
 		...    Wait For	${platform}_warning_label_no_${name}.png 	timeout=${20}
-		Run Keyword If	not ${status}	Fail	msg=Cant find waring label that says: ${expected_messages}[${name}].
+		Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed warning label that says: ${expected_messages}[${name}].
 		Press key.enter 1 Times
 		Delete Scenario File	${scenario_name}
 
@@ -294,7 +294,12 @@ Verify Scenario File Is Updated Correctly When Scripts Are Removed
 	Open Scenario File OS DIALOG	${scenario_name}
 	Click Button	rundelrow
 	Click Button	rundelrow
-	Click Label With Vertical Offset	button_rundelrow	35
+	${img}=		Set Variable	manager_${platform}_button_rundelrow.png
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+	Log	${coordinates}
+	Click To The Below Of	${coordinates}	35
+	#Click Label With Vertical Offset	button_rundelrow	35
 	Click Button	runsave
 
 	${scenario_content}=	Get scenario file content	${global_path}	${scenario_name}
@@ -1166,7 +1171,55 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    CommandLine_Common.Stop Agent											AND
 	...    CommandLine_Common.Stop Manager
 
-Check If The CSV Report Button Works In The Manager
+Check If The CSV Report Button Works In the Manager Before There Are Any Results
+	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #128
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600		AND
+	...    Open Agent
+
+	# !!! Checking that the CSV report button works in the manager after results is being checked in Test Case for Issue #254 !!!
+	${test_dir}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#128
+	@{mngr_options}= 	Create List 	-d	${test_dir}	-s 	${test_dir}${/}Issue-#128.rfs
+	Open Manager GUI 		${mngr_options}
+	Check If The Agent Is Ready
+
+	Click Tab	Run
+	Log To Console	Clicking CSV report button before there are any results.
+	Click Button	csv_report
+	${status}=	Run Keyword And Return Status
+	...    Wait For	${platform}_warning_label_no_report_data.png 	timeout=${60}
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed warning label that says: No report data to save.
+	Press key.enter 1 Times
+	@{test_results_dir}=	List Directories In Directory	${test_dir}		absolute=${True}	pattern=*Issue-#128
+	Length Should Be	${test_results_dir}		0	msg=Manager should not create any result directory.
+
+	Click Tab	Plan
+	Click Button	runplay
+	Sleep	45
+	Log To Console	Clicking CSV report button before end of the test.
+	Click Button	csv_report
+	${status}=	Run Keyword And Return Status
+	...    Wait For		manager_${platform}_reportdatasavesto.png 	timeout=${60}
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed info label that says: Report data saved to:...
+	Press key.enter 1 Times
+
+	@{test_results_dir}=	List Directories In Directory	${test_dir}		absolute=${True}	pattern=*Issue-#128
+	@{csv_files}=		List Files In Directory		${test_results_dir}[0]	*.csv
+	Log To Console	${\n}Generated CSV report files before end of a test run: ${\n}${csv_files}
+	${len}=		Get Length		${csv_files}
+	Should Be True	${len} > 0	msg=Manager didn't generate any CSV report files. Should generate at least 1 most likely agent_data.csv.
+
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected.
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    GUI_Common.Stop Agent
+
+Check If The CSV Report Button Works In The Manager After There Are Results
 	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #254
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600		AND
@@ -1180,10 +1233,14 @@ Check If The CSV Report Button Works In The Manager
 	Click Button	runplay
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
+	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
 	Click Button	csv_report
 
-	Wait For	manager_${platform}_reportdatasavesto.png 	timeout=${300}
+	${status}=	Run Keyword And Return Status
+	...    Wait For		manager_${platform}_reportdatasavesto.png 	timeout=${60}
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed info label that says: Report data saved to:...
 
 	# Take A Screenshot
 	Press key.enter 1 Times
@@ -1193,14 +1250,14 @@ Check If The CSV Report Button Works In The Manager
 	# Take A Screenshot
 
 	@{test_results_dir}=	List Directories In Directory	${test_dir}		absolute=${True}	pattern=*Issue-#254
-	@{csv_file_paths}=		List Files In Directory		${test_results_dir}[0]	*.csv
+	@{csv_files}=		List Files In Directory		${test_results_dir}[0]	*.csv
 
-	${len}=		Get Length		${csv_file_paths}
+	${len}=		Get Length		${csv_files}
 	@{expected_csv_report_files}	Create List		agent_data.csv  raw_result_data.csv  summary.csv
 	@{csv_report_files}	Create List
 	FOR  ${i}  IN RANGE  0  ${len}
-		Log To Console	${\n}CSV report file found: ${csv_file_paths}[${i}]
-		${csv_report_file_type}=	Split String From Right		${csv_file_paths}[${i}]	separator=_Issue-#254_	max_split=1
+		Log To Console	${\n}CSV report file found: ${csv_files}[${i}]
+		${csv_report_file_type}=	Split String From Right		${csv_files}[${i}]	separator=_Issue-#254_	max_split=1
 		${csv_report_file_type}=	Set Variable	${csv_report_file_type}[-1]
 		Append To List	${csv_report_files}	${csv_report_file_type}
 	END
@@ -1564,3 +1621,313 @@ Check If Test Scenario Run Will Stop Gradually
 	...    GUI_Common.Stop Agent							AND
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove File		${global_path}${/}example.robot
+
+Verify the Files Referenced In the Scenario Are All Using Relative Paths
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #54
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]
+
+	${test_data_path}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#54
+	${scenario_path}=	Normalize Path 	${test_data_path}${/}${scenario_name}.rfs
+	Copy File	${test_data_path}${/}${scenario_name}_original.rfs	${scenario_path}
+	@{paths}=			Create List
+	...    ${test_data_path}  ${test_data_path}${/}robots  ${results_dir}  ${results_dir}${/}robots
+	@{robot_names}=		Create List		robot_rel_1  robot_rel_2  robot_rel_3  robot_rel_4
+	@{robot_paths}=		Create List
+	...    ${paths}[0]${/}${robot_names}[0].robot
+	...    ${paths}[1]${/}${robot_names}[1].robot
+	...    ${paths}[2]${/}${robot_names}[2].robot
+	...    ${paths}[3]${/}${robot_names}[3].robot
+	@{rel_robot_paths}=		Get Relative Paths	${test_data_path}	${robot_paths}
+	Log To Console	Robot relative paths to ${test_data_path}: ${\n}${\n}${rel_robot_paths}${\n}
+
+	Create Robot File	path=${paths}[0]	name=${robot_names}[0].robot
+	Create Robot File	path=${paths}[1]	name=${robot_names}[1].robot
+	Create Robot File	path=${paths}[2]	name=${robot_names}[2].robot
+	Create Robot File	path=${paths}[3]	name=${robot_names}[3].robot
+
+	@{mngr_options}=	Create List		-s		${scenario_path}
+
+	FOR  ${i}  IN RANGE  1  4	#skip first robot because it is in the same folder as the scenario
+		Open Manager GUI	${mngr_options}
+
+		Log To Console		Saving ${rel_robot_paths}[${i}] to the scenario.
+		Click Button	runscriptrow
+		File Open Dialogue Select File		${robot_paths}[${i}]
+		Sleep	10
+		Select 1 Robot Test Case
+		Click Button	runsave
+		Sleep	2
+		${scenario_file_dict}=		Read Ini File 	${scenario_path}
+		Log To Console		Scenario file with relative path: ${scenario_file_dict}
+		Run Keyword And Warn On Failure		Should Be Equal As Strings		${scenario_file_dict}[1][script] 	${rel_robot_paths}[${i}]
+
+		Run Keyword If  ${i} != 3		Close Manager GUI ${platform}
+		Delete Scenario File		${scenario_name}
+	END
+
+	[Teardown]	Run Keywords
+	...    Delete Robot File	path=${paths}[0]	name=${robot_names}[0].robot	AND
+	...    Delete Robot File	path=${paths}[1]	name=${robot_names}[1].robot	AND
+	...    Delete Robot File	path=${paths}[2]	name=${robot_names}[2].robot	AND
+	...    Delete Robot File	path=${paths}[3]	name=${robot_names}[3].robot	AND
+	...    Remove File			${scenario_path}									AND
+	...    Close Manager GUI ${platform}
+
+Verify If Upload logs=Immediately Is Being Saved To The Scenario And Read Back Correctly
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Open Manager GUI
+
+	&{run_settings_data}	Create Dictionary
+	...    upload_logs=immediately
+
+	Click Button	runsettings
+	Change Scenario Wide Settings	${run_settings_data}
+	Click Button	runsave
+	Save Scenario File OS DIALOG	${scenario_name}
+
+	${scenario_path}= 	Normalize Path 	${global_path}${/}${scenario_name}.rfs
+	${scenario_file_content}= 		Read Ini File		${scenario_path}
+	Log To Console	Scenario file content: ${scenario_file_content}
+	Dictionary Should Contain Key	${scenario_file_content}		Scenario
+	Dictionary Should Contain Key	${scenario_file_content}[Scenario]		uploadmode
+	Should Be Equal As Strings 	${scenario_file_content}[Scenario][uploadmode]		imm
+
+	Log To Console	${\n}Manager is now being restarted. Check if Upload logs=Immediately is read back correctly
+	Run Keyword		Close Manager GUI ${platform}
+	@{mngr_options}=	Set Variable	-s	${scenario_path}
+	Open Manager GUI	${mngr_options}
+	Click Button	runsave
+	Log To Console	Scenario file content after Manager restart: ${scenario_file_content}
+	Dictionary Should Contain Key	${scenario_file_content}		Scenario
+	Dictionary Should Contain Key	${scenario_file_content}[Scenario]		uploadmode
+	Should Be Equal As Strings 	${scenario_file_content}[Scenario][uploadmode]		imm
+
+	[Teardown]	Run Keywords
+	...    Delete Scenario File		${scenario_name}	AND
+	...    Run Keyword		Close Manager GUI ${platform}
+
+Verify If Upload logs=Error Only Is Being Saved To The Scenario And Read Back Correctly
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Open Manager GUI
+
+	&{run_settings_data}	Create Dictionary
+	...    upload_logs=on_error_only
+
+	Click Button	runsettings
+	Change Scenario Wide Settings	${run_settings_data}
+	Click Button	runsave
+	Save Scenario File OS DIALOG	${scenario_name}
+
+	${scenario_path}= 	Normalize Path 	${global_path}${/}${scenario_name}.rfs
+	${scenario_file_content}= 		Read Ini File		${scenario_path}
+	Log To Console	Scenario file content: ${scenario_file_content}
+	Dictionary Should Contain Key	${scenario_file_content}		Scenario
+	Dictionary Should Contain Key	${scenario_file_content}[Scenario]		uploadmode
+	Should Be Equal As Strings 	${scenario_file_content}[Scenario][uploadmode]		err
+
+	Log To Console	${\n}Manager is now being restarted. Check if Upload logs=Error Only is read back correctly
+	Run Keyword		Close Manager GUI ${platform}
+	@{mngr_options}=	Set Variable	-s	${scenario_path}
+	Open Manager GUI	${mngr_options}
+	Click Button	runsave
+	Log To Console	Scenario file content after Manager restart: ${scenario_file_content}
+	Dictionary Should Contain Key	${scenario_file_content}		Scenario
+	Dictionary Should Contain Key	${scenario_file_content}[Scenario]		uploadmode
+	Should Be Equal As Strings 	${scenario_file_content}[Scenario][uploadmode]		err
+
+	[Teardown]	Run Keywords
+	...    Delete Scenario File		${scenario_name}	AND
+	...    Run Keyword		Close Manager GUI ${platform}
+
+Verify If Upload logs=All Deferred Is Being Saved To The Scenario And Read Back Correctly
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Open Manager GUI
+
+	&{run_settings_data}	Create Dictionary
+	...    upload_logs=all_deferred
+
+	Click Button	runsettings
+	Change Scenario Wide Settings	${run_settings_data}
+	Click Button	runsave
+	Save Scenario File OS DIALOG	${scenario_name}
+
+	${scenario_path}= 	Normalize Path 	${global_path}${/}${scenario_name}.rfs
+	${scenario_file_content}= 		Read Ini File		${scenario_path}
+	Log To Console	Scenario file content: ${scenario_file_content}
+	Dictionary Should Contain Key	${scenario_file_content}		Scenario
+	Dictionary Should Contain Key	${scenario_file_content}[Scenario]		uploadmode
+	Should Be Equal As Strings 	${scenario_file_content}[Scenario][uploadmode]		def
+
+	Log To Console	${\n}Manager is now being restarted. Check if Upload logs=All Deferred is read back correctly
+	Run Keyword		Close Manager GUI ${platform}
+	@{mngr_options}=	Set Variable	-s	${scenario_path}
+	Open Manager GUI	${mngr_options}
+	Click Button	runsave
+	Log To Console	Scenario file content after Manager restart: ${scenario_file_content}
+	Dictionary Should Contain Key	${scenario_file_content}		Scenario
+	Dictionary Should Contain Key	${scenario_file_content}[Scenario]		uploadmode
+	Should Be Equal As Strings 	${scenario_file_content}[Scenario][uploadmode]		def
+
+	[Teardown]	Run Keywords
+	...    Delete Scenario File		${scenario_name}	AND
+	...    Run Keyword		Close Manager GUI ${platform}
+
+Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardless Of Robot Passes Or Fails
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]
+
+	${scenarioname}=	Set Variable	immediately.rfs
+	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#91${/}${scenarioname}
+	${robotname}=		Set Variable	immediately.robot
+	${robotfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#91${/}${robotname}
+
+	Copy File	${scenariofile}		${global_path}
+	Copy File	${robotfile}		${global_path}
+	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${results_dir}
+	Open Manager GUI	${mngr_options}
+	Open Agent
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Click Button	runplay
+
+	Log To Console	Started run, now wait 40s.
+	Sleep	40	#rampup=15 run=50
+	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_immediately*	absolute=${True}
+	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
+	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
+	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
+	${logs_num}=	Get Length	${run_logs}
+	Log To Console	Uploaded logs number after 40s: ${logs_num}
+	Should Be True	${logs_num} >= 1
+	...    msg=Agent is not uploading logs immediately! Should be at least 1 after ~ 40s. Actual number:${logs_num}.
+
+	Press key.enter 1 Times
+	Check If The Agent Is Ready
+	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
+	${logs_num2}=	Get Length	${run_logs}
+	Log To Console	Number of logs at the end of the test: ${logs_num2}
+	Log To Console	This number should be just bigger than the previos one: ${logs_num}. If not the agent stopped uploading logs after 40s.
+	Should Be True	${logs_num2} > ${logs_num}
+	...    msg=Agent did not continue to uploud logs after test is finished! Should be greater than previous number:${logs_num}. Actual number:${logs_num2}.
+
+	[Teardown]	Run Keywords
+	...    Remove File	${global_path}${/}${robotname}		AND
+	...    Remove File	${global_path}${/}${scenarioname}	AND
+	...    GUI_Common.Stop Agent							AND
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
+
+Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only When Robot Fails
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]
+
+	${scenarioname}=	Set Variable	error_only.rfs
+	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#91${/}${scenarioname}
+	${robotname}=		Set Variable	error_only.robot
+	${robotfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#91${/}${robotname}
+
+	Copy File	${scenariofile}		${global_path}
+	Copy File	${robotfile}		${global_path}
+	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${results_dir}
+	Open Manager GUI	${mngr_options}
+	Open Agent
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Click Button	runplay
+
+	Log To Console	Started run, now wait 65s.
+	Sleep	65	#rampup=15 run=60
+	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_error_only*	absolute=${True}
+	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
+	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
+	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
+	${logs_num}=	Get Length	${run_logs}
+	Log To Console	Uploaded logs number after 65s: ${logs_num}
+	Should Be True	${logs_num} >= 1
+	...    msg=Agent is not uploading logs on error only! Should be at least 1 after ~ 65s. Actual number:${logs_num}.
+	Should Be True	${logs_num} <= 15
+	...    msg=Agent is uploading every logs but should upload only fail ones! Should be max 15 after ~ 65s. Actual number:${logs_num}.
+
+	Press key.enter 1 Times
+	Check If The Agent Is Ready
+	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
+	${logs_num2}=	Get Length	${run_logs}
+	Log To Console	Number of logs at the end of the test: ${logs_num2}
+	Log To Console	This number should be at least 30 because those that fail are unlikely to surpass 20 + the second test case that just sleep for 5s.
+	Should Be True	${logs_num2} > 30
+	...    msg=Agent did not continue to uploud logs after test is finished! Should be at least 30. Actual number:${logs_num2}.
+
+	[Teardown]	Run Keywords
+	...    Remove File	${global_path}${/}${robotname}		AND
+	...    Remove File	${global_path}${/}${scenarioname}	AND
+	...    GUI_Common.Stop Agent							AND
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
+
+Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]
+
+	${scenarioname}=	Set Variable	all_deferred.rfs
+	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#91${/}${scenarioname}
+	${robotname}=		Set Variable	all_deferred.robot
+	${robotfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#91${/}${robotname}
+
+	Copy File	${scenariofile}		${global_path}
+	Copy File	${robotfile}		${global_path}
+	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${results_dir}
+	Open Manager GUI	${mngr_options}
+	Open Agent
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Click Button	runplay
+
+	Log To Console	Started run, now wait 60s.
+	Sleep	60	#rampup=15 run=50
+	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_all_deferred*	absolute=${True}
+	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
+	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
+	${logs_dir_num}=	Get Length	${logs_dir}
+	IF  ${logs_dir_num} == 0
+		Log To Console	Manager did not create Logs directory after 60s and this is expected.
+	ELSE
+		@{run_logs}=	List Directories In Directory	${logs_dir}[0]
+		${logs_num}=	Get Length	${run_logs}
+		Log To Console	Uploaded logs number after 40s: ${logs_num}
+		Length Should Be	${run_logs}		0	msg=Agent uploaded logs but should not. Should be 0 logs. Actual number:${logs_num}.
+	END
+
+	Press key.enter 1 Times
+	Check If The Agent Is Ready
+	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_all_deferred*	absolute=${True}
+	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
+	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
+	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
+	${logs_num2}=	Get Length	${run_logs}
+	Log To Console	Number of logs at the end of the test: ${logs_num2}
+	Should Be True	${logs_num2} > 10
+	...    msg=Agent did not continue to uploud logs after test is finished! Should be at least 10. Actual number:${logs_num2}.
+
+	[Teardown]	Run Keywords
+	...    Remove File	${global_path}${/}${robotname}		AND
+	...    Remove File	${global_path}${/}${scenarioname}	AND
+	...    GUI_Common.Stop Agent							AND
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
