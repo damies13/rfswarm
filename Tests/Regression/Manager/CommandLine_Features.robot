@@ -60,7 +60,7 @@ Default Result Name Method
 
 	${dbfile}= 	Find Result DB
 	# ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
-	${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name;
+	${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
 	Log 	${result}
 	Should Be Equal 	${result[0][0]} 	Default Keyword Documentation
 	Should Be Equal 	${result[1][0]} 	Doc Keyword Message
@@ -86,7 +86,7 @@ Documentation Result Name Method
 
 	${dbfile}= 	Find Result DB
 	# ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
-	${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name;
+	${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
 	Log 	${result}
 	Should Be Equal 	${result[0][0]} 	Default Keyword Documentation
 	Should Be Equal 	${result[1][0]} 	Doc keyword From Info Library
@@ -111,7 +111,7 @@ Info Result Name Method
 
 	${dbfile}= 	Find Result DB
 	# ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
-	${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name;
+	${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
 	Log 	${result}
 	Should Be Equal 	${result[0][0]} 	Doc Keyword Message
 	Should Be Equal 	${result[1][0]} 	Message for Info Keyword
@@ -135,13 +135,13 @@ Keyword Only Result Name Method
 
 	${dbfile}= 	Find Result DB
 	# ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
-	${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name;
+	${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
 	Log 	${result}
 	Should Be Equal 	${result[0][0]} 	Default Keyword Name
-	Should Be Equal 	${result[1][0]} 	Quiet Keyword Name
-	Should Be Equal 	${result[2][0]} 	Doc Keyword
-	Should Be Equal 	${result[3][0]} 	Doc Only Keyword
-	Should Be Equal 	${result[4][0]} 	Info Keyword
+	Should Be Equal 	${result[1][0]} 	Doc Keyword
+	Should Be Equal 	${result[2][0]} 	Doc Only Keyword
+	Should Be Equal 	${result[3][0]} 	Info Keyword
+	Should Be Equal 	${result[4][0]} 	Quiet Keyword Name
 
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
@@ -162,13 +162,13 @@ Keyword and Args Result Name Method
 
 	${dbfile}= 	Find Result DB
 	# ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
-	${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name;
+	${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
 	Log 	${result}
 	Should Be Equal 	${result[0][0]} 	Default Keyword Name
-	Should Be Equal 	${result[1][0]} 	Quiet Keyword Name
-	Should Be Equal 	${result[2][0]} 	Doc Keyword Doc Keyword Message
-	Should Be Equal 	${result[3][0]} 	Doc Only Keyword Doc Keyword Message
-	Should Be Equal 	${result[4][0]} 	Info Keyword Message for Info Keyword
+	Should Be Equal 	${result[1][0]} 	Doc Keyword Doc Keyword Message
+	Should Be Equal 	${result[2][0]} 	Doc Only Keyword Doc Keyword Message
+	Should Be Equal 	${result[3][0]} 	Info Keyword Message for Info Keyword
+	Should Be Equal 	${result[4][0]} 	Quiet Keyword Name
 
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
