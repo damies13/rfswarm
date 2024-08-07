@@ -89,8 +89,8 @@ Documentation Result Name Method
 	${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name;
 	Log 	${result}
 	Should Be Equal 	${result[0][0]} 	Default Keyword Documentation
-	Should Be Equal 	${result[1][0]} 	Doc only keyword From Info Library
-	Should Be Equal 	${result[2][0]} 	Doc keyword From Info Library
+	Should Be Equal 	${result[1][0]} 	Doc keyword From Info Library
+	Should Be Equal 	${result[2][0]} 	Doc only keyword From Info Library
 
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
