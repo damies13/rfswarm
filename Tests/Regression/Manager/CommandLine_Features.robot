@@ -59,7 +59,8 @@ Default Result Name Method
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
 
 	${dbfile}= 	Find Result DB
-	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	# ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name;
 	Log 	${result}
 	Should Be Equal 	${result[0][0]} 	Default Keyword Documentation
 	Should Be Equal 	${result[1][0]} 	Doc Keyword Message
@@ -84,7 +85,8 @@ Documentation Result Name Method
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
 
 	${dbfile}= 	Find Result DB
-	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	# ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name;
 	Log 	${result}
 	Should Be Equal 	${result[0][0]} 	Default Keyword Documentation
 	Should Be Equal 	${result[1][0]} 	Doc only keyword From Info Library
@@ -108,7 +110,8 @@ Info Result Name Method
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
 
 	${dbfile}= 	Find Result DB
-	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	# ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name;
 	Log 	${result}
 	Should Be Equal 	${result[0][0]} 	Doc Keyword Message
 	Should Be Equal 	${result[1][0]} 	Message for Info Keyword
@@ -131,7 +134,8 @@ Keyword Only Result Name Method
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
 
 	${dbfile}= 	Find Result DB
-	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	# ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name;
 	Log 	${result}
 	Should Be Equal 	${result[0][0]} 	Default Keyword Name
 	Should Be Equal 	${result[1][0]} 	Quiet Keyword Name
@@ -143,7 +147,7 @@ Keyword Only Result Name Method
 	...    Stop Agent	AND
 	...    Stop Manager
 
- Keyword and Args Result Name Method
+Keyword and Args Result Name Method
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
 	Run Agent
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keywordargs.rfs
@@ -157,7 +161,8 @@ Keyword Only Result Name Method
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
 
 	${dbfile}= 	Find Result DB
-	${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	# ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name;
 	Log 	${result}
 	Should Be Equal 	${result[0][0]} 	Default Keyword Name
 	Should Be Equal 	${result[1][0]} 	Quiet Keyword Name
