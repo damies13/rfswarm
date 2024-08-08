@@ -81,7 +81,7 @@ Documentation Result Name Method - Tests Defaults
 	Wait For Manager
 
 	List Directory 	${results_dir}
-	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*documentation
+	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*documentation_td
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
 
 	${dbfile}= 	Find Result DB
@@ -106,7 +106,7 @@ Info Result Name Method - Tests Defaults
 	Wait For Manager
 
 	List Directory 	${results_dir}
-	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*info
+	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*info_td
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
 
 	${dbfile}= 	Find Result DB
@@ -130,7 +130,7 @@ Keyword Only Result Name Method - Tests Defaults
 	Wait For Manager
 
 	List Directory 	${results_dir}
-	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*keyword
+	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*keyword_td
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
 
 	${dbfile}= 	Find Result DB
@@ -157,7 +157,7 @@ Keyword and Args Result Name Method - Tests Defaults
 	Wait For Manager
 
 	List Directory 	${results_dir}
-	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*keywordargs
+	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*keywordargs_td
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
 
 	${dbfile}= 	Find Result DB
@@ -184,7 +184,7 @@ Default Result Name Method - Tests Row
 	Wait For Manager
 
 	List Directory 	${results_dir}
-	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*default
+	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*default_tr
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
 
 	${dbfile}= 	Find Result DB
@@ -210,7 +210,7 @@ Documentation Result Name Method - Tests Row
 	Wait For Manager
 
 	List Directory 	${results_dir}
-	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*documentation
+	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*documentation_tr
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
 
 	${dbfile}= 	Find Result DB
@@ -235,7 +235,7 @@ Info Result Name Method - Tests Row
 	Wait For Manager
 
 	List Directory 	${results_dir}
-	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*info
+	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*info_tr
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
 
 	${dbfile}= 	Find Result DB
@@ -259,7 +259,7 @@ Keyword Only Result Name Method - Tests Row
 	Wait For Manager
 
 	List Directory 	${results_dir}
-	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*keyword
+	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*keyword_tr
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
 
 	${dbfile}= 	Find Result DB
@@ -286,7 +286,7 @@ Keyword and Args Result Name Method - Tests Row
 	Wait For Manager
 
 	List Directory 	${results_dir}
-	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*keywordargs
+	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*keywordargs_tr
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
 
 	${dbfile}= 	Find Result DB
