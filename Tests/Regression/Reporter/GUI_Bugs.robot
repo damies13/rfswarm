@@ -127,7 +127,13 @@ First Run
 New Data Table Section
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #149 	Issue #150
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
-	Open GUI
+	${testdata}= 	Set Variable    Issue-#147
+	${resultdata}= 	Set Variable    20230320_185055_demo
+	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
+	Should Exist	${basefolder}
+	Log to console 	basefolder: ${basefolder} 	console=True
+	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
+	Open GUI 	-d 	${resultfolder}
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 	# Click Section			toc
 	# This should click Report
