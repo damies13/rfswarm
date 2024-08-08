@@ -71,10 +71,10 @@ Default Result Name Method
 	...    Stop Agent	AND
 	...    Stop Manager
 
-Documentation Result Name Method
+Documentation Result Name Method - Tests Defaults
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
 	Run Agent
-	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}documentation.rfs
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}documentation_td.rfs
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
 	Run Manager CLI 	${mngr_options}
@@ -96,10 +96,10 @@ Documentation Result Name Method
 	...    Stop Agent	AND
 	...    Stop Manager
 
-Info Result Name Method
+Info Result Name Method - Tests Defaults
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
 	Run Agent
-	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}info.rfs
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}info_td.rfs
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
 	Run Manager CLI 	${mngr_options}
@@ -120,10 +120,10 @@ Info Result Name Method
 	...    Stop Agent	AND
 	...    Stop Manager
 
-Keyword Only Result Name Method
+Keyword Only Result Name Method - Tests Defaults
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
 	Run Agent
-	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keyword.rfs
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keyword_td.rfs
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
 	Run Manager CLI 	${mngr_options}
@@ -147,10 +147,139 @@ Keyword Only Result Name Method
 	...    Stop Agent	AND
 	...    Stop Manager
 
-Keyword and Args Result Name Method
+Keyword and Args Result Name Method - Tests Defaults
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
 	Run Agent
-	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keywordargs.rfs
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keywordargs_td.rfs
+	Log to console 	${scenariofile}
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	Run Manager CLI 	${mngr_options}
+	Wait For Manager
+
+	List Directory 	${results_dir}
+	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*keywordargs
+	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+
+	${dbfile}= 	Find Result DB
+	# ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
+	Log 	${result}
+	Should Be Equal 	${result[0][0]} 	Default Keyword Name
+	Should Be Equal 	${result[1][0]} 	Doc Keyword Doc Keyword Message
+	Should Be Equal 	${result[2][0]} 	Doc Only Keyword Doc Keyword Message
+	Should Be Equal 	${result[3][0]} 	Info Keyword Message for Info Keyword
+	Should Be Equal 	${result[4][0]} 	Quiet Keyword Name
+
+	[Teardown]	Run Keywords
+	...    Stop Agent	AND
+	...    Stop Manager
+
+Default Result Name Method - Tests Row
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
+	Run Agent
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default_tr.rfs
+	Log to console 	${scenariofile}
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	Run Manager CLI 	${mngr_options}
+	Wait For Manager
+
+	List Directory 	${results_dir}
+	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*default
+	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+
+	${dbfile}= 	Find Result DB
+	# ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
+	Log 	${result}
+	Should Be Equal 	${result[0][0]} 	Default Keyword Documentation
+	Should Be Equal 	${result[1][0]} 	Doc Keyword Message
+	Should Be Equal 	${result[2][0]} 	Doc only keyword From Info Library
+	Should Be Equal 	${result[3][0]} 	Message for Info Keyword
+
+	[Teardown]	Run Keywords
+	...    Stop Agent	AND
+	...    Stop Manager
+
+Documentation Result Name Method - Tests Row
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
+	Run Agent
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}documentation_tr.rfs
+	Log to console 	${scenariofile}
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	Run Manager CLI 	${mngr_options}
+	Wait For Manager
+
+	List Directory 	${results_dir}
+	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*documentation
+	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+
+	${dbfile}= 	Find Result DB
+	# ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
+	Log 	${result}
+	Should Be Equal 	${result[0][0]} 	Default Keyword Documentation
+	Should Be Equal 	${result[1][0]} 	Doc keyword From Info Library
+	Should Be Equal 	${result[2][0]} 	Doc only keyword From Info Library
+
+	[Teardown]	Run Keywords
+	...    Stop Agent	AND
+	...    Stop Manager
+
+Info Result Name Method - Tests Row
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
+	Run Agent
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}info_tr.rfs
+	Log to console 	${scenariofile}
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	Run Manager CLI 	${mngr_options}
+	Wait For Manager
+
+	List Directory 	${results_dir}
+	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*info
+	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+
+	${dbfile}= 	Find Result DB
+	# ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
+	Log 	${result}
+	Should Be Equal 	${result[0][0]} 	Doc Keyword Message
+	Should Be Equal 	${result[1][0]} 	Message for Info Keyword
+
+	[Teardown]	Run Keywords
+	...    Stop Agent	AND
+	...    Stop Manager
+
+Keyword Only Result Name Method - Tests Row
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
+	Run Agent
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keyword_tr.rfs
+	Log to console 	${scenariofile}
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	Run Manager CLI 	${mngr_options}
+	Wait For Manager
+
+	List Directory 	${results_dir}
+	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*keyword
+	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+
+	${dbfile}= 	Find Result DB
+	# ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
+	${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
+	Log 	${result}
+	Should Be Equal 	${result[0][0]} 	Default Keyword Name
+	Should Be Equal 	${result[1][0]} 	Doc Keyword
+	Should Be Equal 	${result[2][0]} 	Doc Only Keyword
+	Should Be Equal 	${result[3][0]} 	Info Keyword
+	Should Be Equal 	${result[4][0]} 	Quiet Keyword Name
+
+	[Teardown]	Run Keywords
+	...    Stop Agent	AND
+	...    Stop Manager
+
+Keyword and Args Result Name Method - Tests Row
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
+	Run Agent
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keywordargs_tr.rfs
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
 	Run Manager CLI 	${mngr_options}
