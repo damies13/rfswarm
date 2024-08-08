@@ -128,7 +128,7 @@ New Data Table Section
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #149 	Issue #150
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	Open GUI
-	Wait For Status 	PreviewLoaded
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 	# Click Section			toc
 	# This should click Report
 	Click Section			Report
