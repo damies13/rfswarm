@@ -124,14 +124,17 @@ Find Result DB
 
 Query Result DB
 	[Arguments]		${dbfile} 	${sql}
-	Log to console 	dbfile: ${dbfile}
+	Log 	dbfile: ${dbfile} 	console=true
 	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
 	# Log to console 	\${dbfile}: ${dbfile}
-	Connect To Database Using Custom Params 	sqlite3 	database="${dbfile}", isolation_level=None
-	Log to console 	sql: ${sql}
+	${conn}= 	Connect To Database Using Custom Params 	sqlite3 	database="${dbfile}", isolation_level=None
+	Log 	conn: ${conn} 	console=true
+	Log 	sql: ${sql} 	console=true
+	Check If Exists In Database 	${sql}
 	${result}= 	Query 	${sql}
-	Log to console 	sql result: ${result}
-	Disconnect From Database
+	Log 	sql result: ${result} 	console=true
+	# Disconnect From Database
+	Disconnect From All Databases
 	RETURN 	${result}
 
 Get Modules From Program .py File That Are Not BuildIn
