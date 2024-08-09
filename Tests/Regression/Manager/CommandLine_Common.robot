@@ -124,18 +124,34 @@ Find Result DB
 
 Query Result DB
 	[Arguments]		${dbfile} 	${sql}
+	# Disconnect From All Databases
 	Log 	dbfile: ${dbfile} 	console=true
 	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
 	# Log to console 	\${dbfile}: ${dbfile}
-	${conn}= 	Connect To Database Using Custom Params 	sqlite3 	database="${dbfile}", isolation_level=None
-	Log 	conn: ${conn} 	console=true
+	Connect To Database Using Custom Params 	sqlite3 	database="${dbfile}", isolation_level=None
+	# Log 	conn: ${conn} 	console=true
 	Log 	sql: ${sql} 	console=true
 	Check If Exists In Database 	${sql}
 	${result}= 	Query 	${sql}
 	Log 	sql result: ${result} 	console=true
-	# Disconnect From Database
-	Disconnect From All Databases
+	Disconnect From Database
 	RETURN 	${result}
+
+CSV to List
+	[Arguments] 	${filepath}
+	${f}= 	Evaluate    open("${filepath}")
+	${csvdata}= 	Evaluate    csv.reader($f, delimiter=',') 	modules=csv
+	${data}= 			Evaluate    list($csvdata)
+	Evaluate    str($f.close())
+	RETURN 	${data}
+
+CSV to Dict
+	[Arguments] 	${filepath}
+	${f}= 	Evaluate    open("${filepath}")
+	${csvdata}= 	Evaluate    csv.DictReader($f, delimiter=',') 	modules=csv
+	${data}= 			Evaluate    list($csvdata)
+	Evaluate    str($f.close())
+	RETURN 	${data}
 
 Get Modules From Program .py File That Are Not BuildIn
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123
