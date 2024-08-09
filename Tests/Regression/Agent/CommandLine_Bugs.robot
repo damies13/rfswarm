@@ -102,8 +102,8 @@ Verify If Agent Runs With No Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 
 	${location}=	Get Agent Default Save Path
-	Remove File		${location}${/}RFSwarmReporter.ini
-	File Should Not Exist	${location}${/}RFSwarmReporter.ini
+	Remove File		${location}${/}RFSwarmAgent.ini
+	File Should Not Exist	${location}${/}RFSwarmAgent.ini
 	Log To Console	Running Agent with no existing ini file.
 
 	Run Agent
