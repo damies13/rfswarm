@@ -44,7 +44,7 @@ Verify If Manager Runs With No Existing INI File From Current Version
 	END
 	Run Keyword		Close Manager GUI ${platform}
 
-Verify If Manager Runs With No Existing INI File From Previous Version
+Verify If Manager Runs With Existing INI File From Previous Version
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
 
@@ -116,7 +116,7 @@ Verify If Manager Runs With No Existing INI File From Current Version NO GUI
 		Fail	msg=Manager did not close!
 	END
 
-Verify If Manager Runs With No Existing INI File From Previous Version NO GUI
+Verify If Manager Runs With Existing INI File From Previous Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
 

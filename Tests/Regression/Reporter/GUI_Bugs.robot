@@ -43,7 +43,7 @@ Verify If Reporter Runs With No Existing INI File From Current Version
 		Fail	msg=Reporter is not responding!
 	END
 
-Verify If Reporter Runs With No Existing INI File From Previous Version
+Verify If Reporter Runs With Existing INI File From Previous Version
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 
 	${location}=	Get Reporter Default Save Path
@@ -91,7 +91,7 @@ Verify If Reporter Runs With No Existing INI File From Current Version NO GUI
 	${result}= 	Wait For Process 	${process} 	timeout=60
 	Check Result 	${result}
 
-Verify If Reporter Runs With No Existing INI File From Previous Version NO GUI
+Verify If Reporter Runs With Existing INI File From Previous Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 
 	${location}=	Get Reporter Default Save Path

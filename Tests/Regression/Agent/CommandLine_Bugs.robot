@@ -115,7 +115,7 @@ Verify If Agent Runs With No Existing INI File From Current Version NO GUI
 		Fail	msg=Agest is not running!
 	END
 
-Verify If Agent Runs With No Existing INI File From Previous Version NO GUI
+Verify If Agent Runs With Existing INI File From Previous Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 
 	${location}=	Get Agent Default Save Path
