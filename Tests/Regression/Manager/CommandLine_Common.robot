@@ -139,14 +139,17 @@ Query Result DB
 
 CSV to List
 	[Arguments] 	${filepath}
+	File Should Exist 	${filepath}
 	${f}= 	Evaluate    open("${filepath}")
 	${csvdata}= 	Evaluate    csv.reader($f, delimiter=',') 	modules=csv
 	${data}= 			Evaluate    list($csvdata)
 	Evaluate    str($f.close())
+	${headings}= 			Evaluate    str($data.pop(0))
 	RETURN 	${data}
 
 CSV to Dict
 	[Arguments] 	${filepath}
+	File Should Exist 	${filepath}
 	${f}= 	Evaluate    open("${filepath}")
 	${csvdata}= 	Evaluate    csv.DictReader($f, delimiter=',') 	modules=csv
 	${data}= 			Evaluate    list($csvdata)

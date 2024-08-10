@@ -56,14 +56,19 @@ Default Result Name Method
 
 	List Directory 	${results_dir}
 	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*default
+	Log 	lst_results_dir: ${lst_results_dir} 	console=true
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
 	@{lst_summary}= 	List Files In Directory 	${results_dir}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
+	Log 	lst_summary: ${lst_summary} 	console=true
+	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
 
 	# ${dbfile}= 	Find Result DB
 	# # ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
 	# ${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
+	Sort List 	${result}
 	Log 	${result}
 	Should Be Equal 	${result[0][0]} 	Default Keyword Documentation
 	Should Be Equal 	${result[1][0]} 	Doc Keyword Message
@@ -86,13 +91,17 @@ Documentation Result Name Method - Tests Defaults
 	List Directory 	${results_dir}
 	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*documentation_td
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
 	@{lst_summary}= 	List Files In Directory 	${results_dir}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
+	Log 	lst_summary: ${lst_summary} 	console=true
+	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
 
 	# ${dbfile}= 	Find Result DB
 	# # ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
 	# ${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
+	Sort List 	${result}
 	Log 	${result}
 	Should Be Equal 	${result[0][0]} 	Default Keyword Documentation
 	Should Be Equal 	${result[1][0]} 	Doc keyword From Info Library
@@ -114,13 +123,17 @@ Info Result Name Method - Tests Defaults
 	List Directory 	${results_dir}
 	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*info_td
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
 	@{lst_summary}= 	List Files In Directory 	${results_dir}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
+	Log 	lst_summary: ${lst_summary} 	console=true
+	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
 
 	# ${dbfile}= 	Find Result DB
 	# # ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
 	# ${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
+	Sort List 	${result}
 	Log 	${result}
 	Should Be Equal 	${result[0][0]} 	Doc Keyword Message
 	Should Be Equal 	${result[1][0]} 	Message for Info Keyword
@@ -141,13 +154,17 @@ Keyword Only Result Name Method - Tests Defaults
 	List Directory 	${results_dir}
 	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*keyword_td
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
 	@{lst_summary}= 	List Files In Directory 	${results_dir}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
+	Log 	lst_summary: ${lst_summary} 	console=true
+	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
 
 	# ${dbfile}= 	Find Result DB
 	# # ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
 	# ${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
+	Sort List 	${result}
 	Log 	${result}
 	Should Be Equal 	${result[0][0]} 	Default Keyword Name
 	Should Be Equal 	${result[1][0]} 	Doc Keyword
@@ -171,13 +188,17 @@ Keyword and Args Result Name Method - Tests Defaults
 	List Directory 	${results_dir}
 	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*keywordargs_td
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
 	@{lst_summary}= 	List Files In Directory 	${results_dir}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
+	Log 	lst_summary: ${lst_summary} 	console=true
+	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
 
 	# ${dbfile}= 	Find Result DB
 	# # ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
 	# ${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
+	Sort List 	${result}
 	Log 	${result}
 	Should Be Equal 	${result[0][0]} 	Default Keyword Name
 	Should Be Equal 	${result[1][0]} 	Doc Keyword Doc Keyword Message
@@ -201,13 +222,17 @@ Default Result Name Method - Tests Row
 	List Directory 	${results_dir}
 	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*default_tr
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
 	@{lst_summary}= 	List Files In Directory 	${results_dir}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
+	Log 	lst_summary: ${lst_summary} 	console=true
+	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
 
 	# ${dbfile}= 	Find Result DB
 	# # ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
 	# ${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
+	Sort List 	${result}
 	Log 	${result}
 	Should Be Equal 	${result[0][0]} 	Default Keyword Documentation
 	Should Be Equal 	${result[1][0]} 	Doc Keyword Message
@@ -230,13 +255,17 @@ Documentation Result Name Method - Tests Row
 	List Directory 	${results_dir}
 	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*documentation_tr
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
 	@{lst_summary}= 	List Files In Directory 	${results_dir}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
+	Log 	lst_summary: ${lst_summary} 	console=true
+	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
 
 	# ${dbfile}= 	Find Result DB
 	# # ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
 	# ${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
+	Sort List 	${result}
 	Log 	${result}
 	Should Be Equal 	${result[0][0]} 	Default Keyword Documentation
 	Should Be Equal 	${result[1][0]} 	Doc keyword From Info Library
@@ -258,13 +287,17 @@ Info Result Name Method - Tests Row
 	List Directory 	${results_dir}
 	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*info_tr
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
 	@{lst_summary}= 	List Files In Directory 	${results_dir}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
+	Log 	lst_summary: ${lst_summary} 	console=true
+	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
 
 	# ${dbfile}= 	Find Result DB
 	# # ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
 	# ${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
+	Sort List 	${result}
 	Log 	${result}
 	Should Be Equal 	${result[0][0]} 	Doc Keyword Message
 	Should Be Equal 	${result[1][0]} 	Message for Info Keyword
@@ -285,13 +318,17 @@ Keyword Only Result Name Method - Tests Row
 	List Directory 	${results_dir}
 	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*keyword_tr
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
 	@{lst_summary}= 	List Files In Directory 	${results_dir}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
+	Log 	lst_summary: ${lst_summary} 	console=true
+	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
 
 	# ${dbfile}= 	Find Result DB
 	# # ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
 	# ${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
+	Sort List 	${result}
 	Log 	${result}
 	Should Be Equal 	${result[0][0]} 	Default Keyword Name
 	Should Be Equal 	${result[1][0]} 	Doc Keyword
@@ -315,13 +352,17 @@ Keyword and Args Result Name Method - Tests Row
 	List Directory 	${results_dir}
 	@{lst_results_dir}= 	List Directories In Directory 	${results_dir} 	*keywordargs_tr
 	Copy Directory 	${results_dir}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
+	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
 	@{lst_summary}= 	List Files In Directory 	${results_dir}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
+	Log 	lst_summary: ${lst_summary} 	console=true
+	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
 
 	# ${dbfile}= 	Find Result DB
 	# # ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
 	# ${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
+	Sort List 	${result}
 	Log 	${result}
 	Should Be Equal 	${result[0][0]} 	Default Keyword Name
 	Should Be Equal 	${result[1][0]} 	Doc Keyword Doc Keyword Message
