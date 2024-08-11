@@ -140,7 +140,7 @@ Query Result DB
 CSV to List
 	[Arguments] 	${filepath}
 	File Should Exist 	${filepath}
-	${f}= 	Evaluate    open("${filepath}")
+	${f}= 	Evaluate    open(f"${filepath}")
 	${csvdata}= 	Evaluate    csv.reader($f, delimiter=',') 	modules=csv
 	${data}= 			Evaluate    list($csvdata)
 	Evaluate    str($f.close())
@@ -150,7 +150,7 @@ CSV to List
 CSV to Dict
 	[Arguments] 	${filepath}
 	File Should Exist 	${filepath}
-	${f}= 	Evaluate    open("${filepath}")
+	${f}= 	Evaluate    open(f"${filepath}")
 	${csvdata}= 	Evaluate    csv.DictReader($f, delimiter=',') 	modules=csv
 	${data}= 			Evaluate    list($csvdata)
 	Evaluate    str($f.close())
