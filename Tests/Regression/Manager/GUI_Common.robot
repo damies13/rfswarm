@@ -8,8 +8,8 @@ Library		XML
 
 Library		ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
-Library 	IniFile.py
-Library 	GetIpAddress.py
+Library 	ini_file.py
+Library 	get_ip_address.py
 
 # Attempting to record video cause more trouble than help
 # Library		ScreenRecorderLibrary.py

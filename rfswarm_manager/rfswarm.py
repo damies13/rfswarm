@@ -133,7 +133,7 @@ class AgentServer(BaseHTTPRequestHandler):
 				rawData = (self.rfile.read(int(self.headers['content-length']))).decode('utf-8')
 				base.debugmsg(7, "rawData: ", rawData)
 				base.debugmsg(9, "parsed_path.path", parsed_path.path)
-				if (parsed_path.path == "/AgentStatus"):
+				if parsed_path.path == "/AgentStatus":
 					jsonreq = json.loads(rawData)
 
 					requiredfields = ["AgentName", "Status", "Robots", "CPU%", "MEM%", "NET%"]
@@ -149,7 +149,7 @@ class AgentServer(BaseHTTPRequestHandler):
 						jsonresp["AgentName"] = jsonreq["AgentName"]
 						jsonresp["Status"] = "Updated"
 
-				if (parsed_path.path == "/Scripts"):
+				if parsed_path.path == "/Scripts":
 					jsonreq = json.loads(rawData)
 					requiredfields = ["AgentName"]
 					for field in requiredfields:
@@ -173,7 +173,7 @@ class AgentServer(BaseHTTPRequestHandler):
 						t = threading.Thread(target=base.check_files_changed)
 						t.start()
 
-				if (parsed_path.path == "/File"):
+				if parsed_path.path == "/File":
 					jsonreq = json.loads(rawData)
 
 					requiredfields = ["AgentName", "Hash"]
@@ -256,7 +256,7 @@ class AgentServer(BaseHTTPRequestHandler):
 							httpcode = 404
 							jsonresp["Message"] = "Unknown Action"
 
-				if (parsed_path.path == "/Jobs"):
+				if parsed_path.path == "/Jobs":
 					jsonreq = json.loads(rawData)
 
 					requiredfields = ["AgentName"]
@@ -283,7 +283,7 @@ class AgentServer(BaseHTTPRequestHandler):
 							jsonresp["Schedule"] = {}
 
 				# , "Result"
-				if (parsed_path.path == "/Result"):
+				if parsed_path.path == "/Result":
 					jsonreq = json.loads(rawData)
 					base.debugmsg(6, "Result: jsonreq:", jsonreq)
 					requiredfields = ["AgentName", "ResultName", "Result", "ElapsedTime", "StartTime", "EndTime", "ScriptIndex", "Iteration", "Sequence"]
@@ -313,7 +313,7 @@ class AgentServer(BaseHTTPRequestHandler):
 						jsonresp["Result"] = "Queued"
 						base.debugmsg(7, "Result: jsonresp[\"Result\"]:", jsonresp["Result"])
 
-				if (parsed_path.path == "/Metric"):
+				if parsed_path.path == "/Metric":
 					base.debugmsg(7, "Metric")
 					jsonreq = json.loads(rawData)
 					base.debugmsg(7, "Metric: jsonreq:", jsonreq)
@@ -359,7 +359,7 @@ class AgentServer(BaseHTTPRequestHandler):
 		httpcode = 200
 		try:
 			parsed_path = urllib.parse.urlparse(self.path)
-			if (parsed_path.path == '/'):
+			if parsed_path.path == '/':
 				jsonresp = {}
 
 				jsonresp["POST"] = {}
@@ -2302,7 +2302,7 @@ class RFSwarmBase:
 
 	def sec2hms(self, sec):
 		base.debugmsg(6, "type(sec):", type(sec), sec)
-		if (isinstance(sec, time.struct_time)):
+		if isinstance(sec, time.struct_time):
 			sec = time.mktime(sec)
 			base.debugmsg(6, "type(sec):", type(sec), sec)
 		h = int(sec / 3600)
@@ -3479,9 +3479,9 @@ class RFSwarmCore:
 			r = args[0]
 			if len(args) > 1:
 				usrs = args[1]
-		base.debugmsg(6, "Row:", r, "Robots:", usrs)
-		base.debugmsg(8, "base.scriptlist:", base.scriptlist)
-		base.scriptlist[r]["Robots"] = int(usrs)
+			base.debugmsg(6, "Row:", r, "Robots:", usrs)
+			base.debugmsg(8, "base.scriptlist:", base.scriptlist)
+			base.scriptlist[r]["Robots"] = int(usrs)
 
 		if not base.args.nogui:
 			base.gui.sr_users_validate(*args)
@@ -3608,7 +3608,7 @@ class RFSwarmCore:
 		removeagents = []
 		robot_count = 0
 		time_elapsed = int(time.time()) - base.agenttgridupdate
-		if (time_elapsed >= 5):
+		if time_elapsed >= 5:
 			base.debugmsg(6, "time_elapsed:", time_elapsed)
 
 			base.agenttgridupdate = int(time.time())
@@ -5054,7 +5054,7 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(6, "graphname:", grphWindow.graphname.get())
 		grphWindow.title(grphWindow.graphname.get())
 		base.debugmsg(6, "fmeSettings.show:", grphWindow.fmeSettings.show)
-		if (grphWindow.fmeSettings.show):
+		if grphWindow.fmeSettings.show:
 			grphWindow.fmeSettings.show = False
 			grphWindow.fmeSettings.grid_forget()
 			base.debugmsg(6, "fmeSettings.show:", grphWindow.fmeSettings.show)
@@ -6255,11 +6255,11 @@ class RFSwarmGUI(tk.Frame):
 
 					for i in range(int(1 / chunk) - 1):
 						q += chunk
-						timeruq = grp['Delay'] + (grp['RampUp'] * q)
+						timeruq = grp['Delay'] + grp['RampUp'] * q
 						if timeruq in totalcalc:
-							totalcalc[timeruq] += (grp['Robots'] * chunk)
+							totalcalc[timeruq] += grp['Robots'] * chunk
 						else:
-							totalcalc[timeruq] = (grp['Robots'] * chunk)
+							totalcalc[timeruq] = grp['Robots'] * chunk
 
 					# Run
 					timern = grp['Delay'] + grp['RampUp'] + grp['Run']
@@ -6284,9 +6284,9 @@ class RFSwarmGUI(tk.Frame):
 						q -= chunk
 						timerdq = grp['Delay'] + grp['RampUp'] + grp['Run'] + (grp['RampUp'] * q)
 						if timerdq in totalcalc:
-							totalcalc[timerdq] += (grp['Robots'] * chunk * -1)
+							totalcalc[timerdq] += grp['Robots'] * chunk * -1
 						else:
-							totalcalc[timerdq] = (grp['Robots'] * chunk * -1)
+							totalcalc[timerdq] = grp['Robots'] * chunk * -1
 
 					timerd += 1
 					graphdata[name]["objTime"].append(datetime.fromtimestamp(timerd, timezone.utc))
@@ -6609,8 +6609,8 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(9, r)
 		if not base.args.nogui:
 			fg = self.scriptgrid.grid_slaves(column=self.plancolscr, row=r)[0].grid_slaves()
-		base.debugmsg(9, fg)
-		base.debugmsg(9, fg[1].get())
+			base.debugmsg(9, fg)
+			base.debugmsg(9, fg[1].get())
 		if args:
 			scriptfile = args[0]
 		else:
@@ -7448,13 +7448,13 @@ class RFSwarmGUI(tk.Frame):
 		# base.robot_schedule["Start"]
 		if "Start" in base.robot_schedule:
 			time_elapsed = int(time.time()) - self.rungridupdate
-			if (time_elapsed > 5):
+			if time_elapsed > 5:
 				ut = threading.Thread(target=self.delayed_UpdateRunStats)
 				ut.start()
 
 	def delayed_UpdateRunStats(self):
 		time_elapsed = int(time.time()) - self.rungridupdate
-		if (time_elapsed > 5):
+		if time_elapsed > 5:
 			# queue sqls so UpdateRunStats should have the results
 
 			display_percentile = base.config['Run']['display_percentile']
@@ -7520,7 +7520,7 @@ class RFSwarmGUI(tk.Frame):
 			self.elements["Run"]["btn_stop"]["image"] = self.icoAborted
 
 		time_elapsed = int(time.time()) - self.rungridupdate
-		if (time_elapsed > 5):
+		if time_elapsed > 5:
 			self.rungridupdate = int(time.time())
 
 			if "columns" not in self.display_run:
