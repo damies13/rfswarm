@@ -5,6 +5,108 @@ Library 	XML 	use_lxml=True
 Test Teardown 	Close GUI
 
 *** Test Cases ***
+Verify If Reporter Runs With Existing INI File From Current Version
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
+	[Setup]	Run Keywords
+	...    Open GUI		AND
+	...    Sleep	5	AND
+	...    Close GUI
+
+	${location}=	Get Reporter Default Save Path
+	File Should Exist	${location}${/}RFSwarmReporter.ini
+	File Should Not Be Empty	${location}${/}RFSwarmReporter.ini
+	Log To Console	Running Reporter with existing ini file.
+	Open GUI
+	TRY
+		Sleep	10
+		Click Section	test_result_summary
+		Click	#double click needed. Maybe delete after eel module implemetation
+		Wait For	reporter_${platform}_option_datatable.png 	timeout=${30}
+	EXCEPT
+		Fail	msg=Reporter is not responding!
+	END
+
+Verify If Reporter Runs With No Existing INI File From Current Version
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
+
+	${location}=	Get Reporter Default Save Path
+	Remove File		${location}${/}RFSwarmReporter.ini
+	File Should Not Exist	${location}${/}RFSwarmReporter.ini
+	Log To Console	Running Reporter with no existing ini file.
+	Open GUI
+	TRY
+		Sleep	10
+		Click Section	test_result_summary
+		Click	#double click needed. Maybe delete after eel module implemetation
+		Wait For	reporter_${platform}_option_datatable.png 	timeout=${30}
+	EXCEPT
+		Fail	msg=Reporter is not responding!
+	END
+
+Verify If Reporter Runs With Existing INI File From Previous Version
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
+
+	${location}=	Get Reporter Default Save Path
+	Remove File		${location}${/}RFSwarmReporter.ini
+	File Should Not Exist	${location}${/}RFSwarmReporter.ini
+	${v1_0_0_inifile}=		Normalize Path		${CURDIR}${/}testdata${/}Issue-#49${/}v1_0_0${/}RFSwarmReporter.ini
+	Copy File	${v1_0_0_inifile}		${location}
+	File Should Exist	${location}${/}RFSwarmReporter.ini
+	File Should Not Be Empty	${location}${/}RFSwarmReporter.ini
+	Log To Console	Running Reporter with existing ini file.
+	Open GUI
+	TRY
+		Sleep	10
+		Click Section	test_result_summary
+		Click	#double click needed. Maybe delete after eel module implemetation
+		Wait For	reporter_${platform}_option_datatable.png 	timeout=${30}
+	EXCEPT
+		Fail	msg=Reporter is not responding!
+	END
+
+Verify If Reporter Runs With Existing INI File From Current Version NO GUI
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
+
+	${location}=	Get Reporter Default Save Path
+	Open GUI	-n
+	${result}= 	Wait For Process 	${process} 	timeout=60
+	Check Result 	${result}
+
+	File Should Exist	${location}${/}RFSwarmReporter.ini
+	File Should Not Be Empty	${location}${/}RFSwarmReporter.ini
+	Log To Console	Running Reporter with existing ini file.
+	Open GUI	-n
+	${result}= 	Wait For Process 	${process} 	timeout=60
+	Check Result 	${result}
+
+Verify If Reporter Runs With No Existing INI File From Current Version NO GUI
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
+
+	${location}=	Get Reporter Default Save Path
+	Remove File		${location}${/}RFSwarmReporter.ini
+	File Should Not Exist	${location}${/}RFSwarmReporter.ini
+	Log To Console	Running Reporter with no existing ini file.
+
+	Open GUI	-n
+	${result}= 	Wait For Process 	${process} 	timeout=60
+	Check Result 	${result}
+
+Verify If Reporter Runs With Existing INI File From Previous Version NO GUI
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
+
+	${location}=	Get Reporter Default Save Path
+	Remove File		${location}${/}RFSwarmReporter.ini
+	File Should Not Exist	${location}${/}RFSwarmReporter.ini
+	${v1_0_0_inifile}=		Normalize Path		${CURDIR}${/}testdata${/}Issue-#49${/}v1_0_0${/}RFSwarmReporter.ini
+	Copy File	${v1_0_0_inifile}		${location}
+	File Should Exist	${location}${/}RFSwarmReporter.ini
+	File Should Not Be Empty	${location}${/}RFSwarmReporter.ini
+	Log To Console	Running Reporter with existing ini file.
+
+	Open GUI	-n
+	${result}= 	Wait For Process 	${process} 	timeout=60
+	Check Result 	${result}
+
 First Run
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #147
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
@@ -25,8 +127,14 @@ First Run
 New Data Table Section
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #149 	Issue #150
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
-	Open GUI
-	Wait For Status 	PreviewLoaded
+	${testdata}= 	Set Variable    Issue-#147
+	${resultdata}= 	Set Variable    20230320_185055_demo
+	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
+	Should Exist	${basefolder}
+	Log to console 	basefolder: ${basefolder} 	console=True
+	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
+	Open GUI 	-d 	${resultfolder}
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 	# Click Section			toc
 	# This should click Report
 	Click Section			Report
