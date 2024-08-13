@@ -757,7 +757,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 	...    msg=The agent did not connect to the new port number!
 	Log To Console	The Agent has connected to the Manager with ${run_settings_data}[bind_port_number] port and this was expected.
 	Click Tab	Plan
-	
+
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    GUI_Common.Stop Agent							AND
@@ -1354,7 +1354,7 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 	Click Button	csv_report
 	Press key.enter 1 Times
 	Sleep	3
-	
+
 	@{test_results}=	List Directories In Directory	${test_dir}		absolute=${True}	pattern=*Issue-#17
 	@{csv_file_paths}=		List Files In Directory		${test_results}[0]	*.csv	absolute=${True}
 	Length Should Be	${csv_file_paths}	3	msg=Some test report csv files are missing!
@@ -1931,3 +1931,83 @@ Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 	...    GUI_Common.Stop Agent							AND
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
+
+Verify Result Name - Scenario
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #154  Issue #154-GUI
+	${testkey}= 	Set Variable 		resultnamemode
+	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default.rfs
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}Issue-#154-GUI-TD.rfs
+	Copy File 	${sourcefile} 	${scenariofile}
+	Log 	scenariofile: ${scenariofile} 	console=True
+
+	${scenariofilebefore}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofilebefore: ${scenariofilebefore} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
+
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI 		${mngr_options}
+	Click Button	runsettings
+	# Click CheckBox 	unchecked 	loghtml
+	Take A Screenshot
+	Click Dialog Button 	ok
+	# Click Button 	runsave
+	#
+	# Run Keyword		Close Manager GUI ${platform}
+	#
+	# ${scenariofileafter1}= 		Read Ini File 	${scenariofile}
+	# Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	# Dictionary Should Contain Key 	${scenariofileafter1} 	Script Defaults
+	# Dictionary Should Contain Key 	${scenariofileafter1}[Script Defaults] 	disableloglog
+	# Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][disableloglog] 	True
+	#
+	# Open Manager GUI 		${mngr_options}
+	# Click Button	runsettings
+	# Click CheckBox 	checked 	loghtml
+	# Click Dialog Button 	ok
+	# Click Button 	runsave
+	#
+	# ${scenariofileafter2}= 		Read Ini File 	${scenariofile}
+	# Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
+	# Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
+	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
+
+Verify Disable log.html - Test Row
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #154  Issue #154-GUI
+	${testkey}= 	Set Variable 		resultnamemode
+	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default.rfs
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}Issue-#154-GUI-TR.rfs
+	Copy File 	${sourcefile} 	${scenariofile}
+	Log 	scenariofile: ${scenariofile} 	console=True
+
+	${scenariofilebefore}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofilebefore: ${scenariofilebefore} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
+	Dictionary Should Not Contain Key 	${scenariofilebefore}[1] 	${testkey}
+
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI 		${mngr_options}
+	Click Button	trsettings
+	# Click CheckBox 	unchecked 	loghtml
+	Take A Screenshot
+	Test Group Save Settings
+	# Click Button 	runsave
+	#
+	# Run Keyword		Close Manager GUI ${platform}
+	#
+	# ${scenariofileafter1}= 		Read Ini File 	${scenariofile}
+	# Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	# Dictionary Should Not Contain Key 	${scenariofileafter1} 	Script Defaults
+	# Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
+	# Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	True
+	#
+	# Open Manager GUI 		${mngr_options}
+	# Click Button	trsettings
+	# Click CheckBox 	checked 	loghtml
+	# Test Group Save Settings
+	# Click Button 	runsave
+	#
+	# ${scenariofileafter2}= 		Read Ini File 	${scenariofile}
+	# Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
+	# Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
+	# Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
+	[Teardown] 	Run Keyword		Close Manager GUI ${platform}

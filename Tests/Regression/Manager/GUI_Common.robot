@@ -16,7 +16,9 @@ Library 	get_ip_address.py
 
 
 *** Variables ***
+${default_image_timeout} 	120
 ${platform}		None
+${platform}		ubuntu
 ${global_path}	None
 ${global_name}	None
 @{mngr_options}		None
@@ -33,6 +35,24 @@ ${agent_dir} 				${OUTPUT DIR}${/}rfswarm-agent
 
 *** Keywords ***
 Set Platform
+	Set Platform By Python
+	Set Platform By Tag
+
+Set Platform By Python
+	${system}= 		Evaluate 	platform.system() 	modules=platform
+
+	IF 	"${system}" == "Windows"
+		Set Suite Variable    ${platform}    macos
+	END
+	IF 	"${system}" == "Windows"
+		Set Suite Variable    ${platform}    windows
+	END
+	IF 	"${system}" == "Linux"
+		Set Suite Variable    ${platform}    ubuntu
+	END
+
+
+Set Platform By Tag
 	# [Arguments]		${ostag}
 	Log 	${OPTIONS}
 	Log 	${OPTIONS}[include]
@@ -163,10 +183,10 @@ Stop Agent
 Stop Test Scenario Run Gradually
 	[Arguments]	${rumup_time}	${robot_test_time}
 	Set Confidence	0.95
-	Wait For	manager_${platform}_robots_10.png 	timeout=${rumup_time + 300}
+	Wait For	manager_${platform}_robots_10.png 	timeout=${rumup_time + ${default_image_timeout}}
 	Click Button	stoprun
 	${START_TIME}=	Get Current Date
-	Wait For	manager_${platform}_robots_0.png 	timeout=${robot_test_time + 300}
+	Wait For	manager_${platform}_robots_0.png 	timeout=${robot_test_time + ${default_image_timeout}}
 	Set Confidence	0.9
 	Take A Screenshot
 	${END_TIME}=	Get Current Date
@@ -177,13 +197,13 @@ Stop Test Scenario Run Gradually
 	Move To	10	10
 	Take A Screenshot
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time + 300}
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time + ${default_image_timeout}}
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
 
 Stop Test Scenario Run Quickly
 	[Arguments]	${rumup_time}	${robot_test_time}
 	Set Confidence	0.95
-	Wait For	manager_${platform}_robots_10.png 	timeout=${rumup_time + 300}
+	Wait For	manager_${platform}_robots_10.png 	timeout=${rumup_time + ${default_image_timeout}}
 	Click Button	stoprun
 	Sleep	2
 	Click
@@ -200,7 +220,7 @@ Stop Test Scenario Run Quickly
 	Move To	10	10
 	Take A Screenshot
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time + 300}
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time + ${default_image_timeout}}
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
 
 Utilisation Stats
@@ -214,7 +234,7 @@ Utilisation Stats
 	Log 	${proc}
 
 Check If The Agent Is Ready
-	[Arguments] 	${timeout}=300
+	[Arguments] 	${timeout}=${default_image_timeout}
 	Sleep	1
 	Click Tab	Agents
 	Wait For 	manager_${platform}_agents_ready.png	timeout=${timeout}
@@ -226,7 +246,7 @@ Check If the Robot Failed
 		Click Image 	manager_${platform}_button_abort
 		Press Combination	Key.enter
 	EXCEPT
-		Wait For	manager_${platform}_button_finished_run.png	timeout=300
+		Wait For	manager_${platform}_button_finished_run.png	timeout=${default_image_timeout}
 	END
 	Take A Screenshot
 	${status}=	Run Keyword And Return Status	Locate	manager_${platform}_resource_file_provided.png
@@ -238,7 +258,7 @@ Click Tab
 	${img}=	Set Variable		manager_${platform}_tab_${tabnamel}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=300
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	0.1
@@ -250,7 +270,7 @@ Click Button
 	${img}=	Set Variable		manager_${platform}_button_${btnnamel}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=300
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	0.1
@@ -262,14 +282,14 @@ Click Menu
 	${img}=	Set Variable		manager_${platform}_menu_${menunamel}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=300
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	0.1
 	Take A Screenshot
 
 Click Dialog Button
-	[Arguments]		${btnname} 		${timeout}=300
+	[Arguments]		${btnname} 		${timeout}=${default_image_timeout}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
 	${img}=	Set Variable		${platform}_dlgbtn_${btnnamel}.png
 	Log		${CURDIR}
@@ -287,7 +307,7 @@ Click CheckBox
 	${img}=	Set Variable		${platform}_checkbox_${statusl}_${btnnamel}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=300
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	1
@@ -309,7 +329,7 @@ Click Label With Vertical Offset
 	${img}=	Set Variable		manager_${platform}_label_${labelname}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=300
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Log	${coordinates}
 	Click To The Below Of	${coordinates}	${offset}
@@ -325,7 +345,7 @@ Click Label With Horizontal Offset
 	${img}=	Set Variable		manager_${platform}_label_${labelname}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=300
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Log	${coordinates}
 	Click To The Right Of	${coordinates}	${offset}
@@ -337,7 +357,7 @@ Resize Window
 	[Arguments]		${x}=0		${y}=0
 	# 											manager_macos_corner_resize
 	${img}=	Set Variable		manager_${platform}_corner_resize.png
-	Wait For 	${img} 	 timeout=300
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	@{coordinates2}= 	Create List 	${{${coordinates[0]}+${x}}} 	${{${coordinates[1]}+${y}}}
 	Move To 	@{coordinates}
@@ -349,7 +369,7 @@ Resize Window
 Wait Agent Ready
 	Click Tab 	 Agents
 	${img}=	Set Variable		manager_${platform}_agents_ready.png
-	Wait For 	${img} 	 timeout=300
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 
 Set Global Filename And Default Save Path
 	[Documentation]	Sets global default save path as Test Variable and file name for robot test.
@@ -1109,7 +1129,7 @@ Click Script Button On Row
 
 		# Log		${CURDIR}
 		# Log		${IMAGE_DIR}
-		Wait For 	${img} 	 timeout=300
+		Wait For 	${img} 	 timeout=${default_image_timeout}
 		# @{coordinates}= 	Locate		${img}
 		# Log	${coordinates}
 		Click To The Below Of Image 	${img} 	 offset=${rowoffset}
@@ -1124,7 +1144,7 @@ Click Script Button On Row
 		Take A Screenshot
 		# 	macos_dlgbtn_open
 		${img}=	Set Variable		${platform}_dlgbtn_cancel.png
-		Wait For 	${img} 	 timeout=300
+		Wait For 	${img} 	 timeout=${default_image_timeout}
 		Take A Screenshot
 
 		# Fail 		Not Implimented
@@ -1172,7 +1192,7 @@ File Open Dialogue macos Select File
 	Sleep	2
 	Take A Screenshot
 	Press Combination 	KEY.down	#choose paste option(should be first)
-	Press key.enter 1 Times		#execute paste option 
+	Press key.enter 1 Times		#execute paste option
 	Sleep	0.5
 	Take A Screenshot
 	Press key.enter 1 Times
@@ -1196,7 +1216,7 @@ Select Test Script
 	# Click Dialog Button 	cancel
 
 Wait For File To Exist
-	[Arguments]		${filepath} 	${timeout}=300
+	[Arguments]		${filepath} 	${timeout}=${default_image_timeout}
 	TRY
 		WHILE    True 	limit=${timeout} seconds
 			TRY
