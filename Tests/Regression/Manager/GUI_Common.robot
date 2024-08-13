@@ -264,6 +264,24 @@ Click Tab
 	Sleep 	0.1
 	Take A Screenshot
 
+Select Option
+	[Arguments]		${optname}
+	${optnamel}= 	Convert To Lower Case 	${optname}
+	${img}=	Set Variable		manager_${platform}_option_${optnamel}.png
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	${sssleep}
+	Take A Screenshot
+
+Selected Option Should Be
+	[Arguments]		${optname}
+	${optnamel}= 	Convert To Lower Case 	${optname}
+	${img}=	Set Variable		manager_${platform}_option_${optnamel}.png
+	Wait For 	${img} 	 timeout=300
+	@{coordinates}= 	Locate		${img}
+
+
 Click Button
 	[Arguments]		${btnname}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}

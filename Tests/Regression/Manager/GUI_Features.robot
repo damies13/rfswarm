@@ -1932,7 +1932,7 @@ Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
 
-Verify Result Name - Scenario
+Verify Result Name - Test Defaults
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #154  Issue #154-GUI
 	${testkey}= 	Set Variable 		resultnamemode
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default.rfs
@@ -1947,29 +1947,79 @@ Verify Result Name - Scenario
 	@{mngr_options}= 	Create List 	-s 	${scenariofile}
 	Open Manager GUI 		${mngr_options}
 	Click Button	runsettings
-	# Click CheckBox 	unchecked 	loghtml
+	Selected Option Should Be 	Default
 	Click Label With Horizontal Offset 	result_name 	100
-	Take A Screenshot
+	Select Option 	Documentation
 	Click Dialog Button 	ok
-	# Click Button 	runsave
-	#
-	# Run Keyword		Close Manager GUI ${platform}
-	#
-	# ${scenariofileafter1}= 		Read Ini File 	${scenariofile}
-	# Log 	scenariofileafter: ${scenariofileafter1} 	console=True
-	# Dictionary Should Contain Key 	${scenariofileafter1} 	Script Defaults
-	# Dictionary Should Contain Key 	${scenariofileafter1}[Script Defaults] 	disableloglog
-	# Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][disableloglog] 	True
-	#
-	# Open Manager GUI 		${mngr_options}
-	# Click Button	runsettings
-	# Click CheckBox 	checked 	loghtml
-	# Click Dialog Button 	ok
-	# Click Button 	runsave
-	#
-	# ${scenariofileafter2}= 		Read Ini File 	${scenariofile}
-	# Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
-	# Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Dictionary Should Contain Key 	${scenariofileafter1} 	Script Defaults
+	Dictionary Should Contain Key 	${scenariofileafter1}[Script Defaults] 	${testkey}
+	Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][${testkey}] 	doco
+
+	Open Manager GUI 		${mngr_options}
+	Click Button	runsettings
+	Selected Option Should Be 	Documentation
+	Click Label With Horizontal Offset 	result_name 	100
+	Select Option 	Information
+	Click Dialog Button 	ok
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Dictionary Should Contain Key 	${scenariofileafter1} 	Script Defaults
+	Dictionary Should Contain Key 	${scenariofileafter1}[Script Defaults] 	${testkey}
+	Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][${testkey}] 	info
+
+	Open Manager GUI 		${mngr_options}
+	Click Button	runsettings
+	Selected Option Should Be 	Information
+	Click Label With Horizontal Offset 	result_name 	100
+	Select Option 	Keyword
+	Click Dialog Button 	ok
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Dictionary Should Contain Key 	${scenariofileafter1} 	Script Defaults
+	Dictionary Should Contain Key 	${scenariofileafter1}[Script Defaults] 	${testkey}
+	Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][${testkey}] 	kywrd
+
+	Open Manager GUI 		${mngr_options}
+	Click Button	runsettings
+	Selected Option Should Be 	Keyword
+	Click Label With Horizontal Offset 	result_name 	100
+	Select Option 	KeywordArgs
+	Click Dialog Button 	ok
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Dictionary Should Contain Key 	${scenariofileafter1} 	Script Defaults
+	Dictionary Should Contain Key 	${scenariofileafter1}[Script Defaults] 	${testkey}
+	Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][${testkey}] 	kywrdargs
+
+	Open Manager GUI 		${mngr_options}
+	Click Button	runsettings
+	Selected Option Should Be 	KeywordArgs
+	Click Label With Horizontal Offset 	result_name 	100
+	Select Option 	Default
+	Click Dialog Button 	ok
+	Click Button 	runsave
+
+	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify Result Name - Test Row
@@ -1988,29 +2038,78 @@ Verify Result Name - Test Row
 	@{mngr_options}= 	Create List 	-s 	${scenariofile}
 	Open Manager GUI 		${mngr_options}
 	Click Button	trsettings
-	# Click CheckBox 	unchecked 	loghtml
+	Selected Option Should Be 	Default
 	Click Label With Vertical Offset 	result_name 	20
-
-	Take A Screenshot
+	Select Option 	Documentation
 	Test Group Save Settings
-	# Click Button 	runsave
-	#
-	# Run Keyword		Close Manager GUI ${platform}
-	#
-	# ${scenariofileafter1}= 		Read Ini File 	${scenariofile}
-	# Log 	scenariofileafter: ${scenariofileafter1} 	console=True
-	# Dictionary Should Not Contain Key 	${scenariofileafter1} 	Script Defaults
-	# Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
-	# Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	True
-	#
-	# Open Manager GUI 		${mngr_options}
-	# Click Button	trsettings
-	# Click CheckBox 	checked 	loghtml
-	# Test Group Save Settings
-	# Click Button 	runsave
-	#
-	# ${scenariofileafter2}= 		Read Ini File 	${scenariofile}
-	# Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
-	# Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
-	# Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofileafter1} 	Script Defaults
+	Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
+	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	doco
+
+	Open Manager GUI 		${mngr_options}
+	Click Button	trsettings
+	Selected Option Should Be 	Documentation
+	Click Label With Vertical Offset 	result_name 	20
+	Select Option 	Information
+	Test Group Save Settings
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofileafter1} 	Script Defaults
+	Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
+	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	info
+
+	Open Manager GUI 		${mngr_options}
+	Click Button	trsettings
+	Selected Option Should Be 	Information
+	Click Label With Vertical Offset 	result_name 	20
+	Select Option 	Keyword
+	Test Group Save Settings
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofileafter1} 	Script Defaults
+	Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
+	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	kywrd
+
+	Open Manager GUI 		${mngr_options}
+	Click Button	trsettings
+	Selected Option Should Be 	Keyword
+	Click Label With Vertical Offset 	result_name 	20
+	Select Option 	KeywordArgs
+	Test Group Save Settings
+	Click Button 	runsave
+
+	Run Keyword		Close Manager GUI ${platform}
+
+	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofileafter1} 	Script Defaults
+	Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
+	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	kywrdargs
+
+	Open Manager GUI 		${mngr_options}
+	Click Button	trsettings
+	Selected Option Should Be 	KeywordArgs
+	Click Label With Vertical Offset 	result_name 	20
+	Select Option 	Default
+	Test Group Save Settings
+	Click Button 	runsave
+
+	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
+	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
+	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
+	Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
