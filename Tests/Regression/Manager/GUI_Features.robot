@@ -1948,6 +1948,7 @@ Verify Result Name - Scenario
 	Open Manager GUI 		${mngr_options}
 	Click Button	runsettings
 	# Click CheckBox 	unchecked 	loghtml
+	Click Label With Horizontal Offset 	result_name 	100
 	Take A Screenshot
 	Click Dialog Button 	ok
 	# Click Button 	runsave
@@ -1971,7 +1972,7 @@ Verify Result Name - Scenario
 	# Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
-Verify Disable log.html - Test Row
+Verify Result Name - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #154  Issue #154-GUI
 	${testkey}= 	Set Variable 		resultnamemode
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default.rfs
@@ -1988,6 +1989,8 @@ Verify Disable log.html - Test Row
 	Open Manager GUI 		${mngr_options}
 	Click Button	trsettings
 	# Click CheckBox 	unchecked 	loghtml
+	Click Label With Vertical Offset 	result_name 	20
+
 	Take A Screenshot
 	Test Group Save Settings
 	# Click Button 	runsave

@@ -234,7 +234,7 @@ Utilisation Stats
 	Log 	${proc}
 
 Check If The Agent Is Ready
-	[Arguments] 	${timeout}=${default_image_timeout}
+	[Arguments] 	${timeout}=300
 	Sleep	1
 	Click Tab	Agents
 	Wait For 	manager_${platform}_agents_ready.png	timeout=${timeout}
