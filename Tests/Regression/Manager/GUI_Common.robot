@@ -268,17 +268,16 @@ Select Option
 	[Arguments]		${optname}
 	${optnamel}= 	Convert To Lower Case 	${optname}
 	${img}=	Set Variable		manager_${platform}_option_${optnamel}.png
-	Wait For 	${img} 	 timeout=300
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Sleep 	${sssleep}
 	Take A Screenshot
 
 Selected Option Should Be
 	[Arguments]		${optname}
 	${optnamel}= 	Convert To Lower Case 	${optname}
 	${img}=	Set Variable		manager_${platform}_option_${optnamel}.png
-	Wait For 	${img} 	 timeout=300
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 
 
