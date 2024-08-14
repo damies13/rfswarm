@@ -1938,10 +1938,11 @@ Verify Result Name - Test Defaults
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}Issue-#154-GUI-TD.rfs
 	Copy File 	${sourcefile} 	${scenariofile}
+	Log 	${EMPTY} 	console=True
 	Log 	scenariofile: ${scenariofile} 	console=True
 
 	${scenariofilebefore}= 		Read Ini File 	${scenariofile}
-	Log 	scenariofilebefore: ${scenariofilebefore} 	console=True
+	Log 	scenariofilebefore: ${scenariofilebefore}
 	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
 
 	@{mngr_options}= 	Create List 	-s 	${scenariofile}
@@ -1956,10 +1957,11 @@ Verify Result Name - Test Defaults
 	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
-	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Log 	scenariofileafter: ${scenariofileafter1}
 	Dictionary Should Contain Key 	${scenariofileafter1} 	Script Defaults
 	Dictionary Should Contain Key 	${scenariofileafter1}[Script Defaults] 	${testkey}
 	Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][${testkey}] 	doco
+	Log 	Documentation 	console=True
 
 	Open Manager GUI 		${mngr_options}
 	Click Button	runsettings
@@ -1972,10 +1974,11 @@ Verify Result Name - Test Defaults
 	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
-	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Log 	scenariofileafter: ${scenariofileafter1}
 	Dictionary Should Contain Key 	${scenariofileafter1} 	Script Defaults
 	Dictionary Should Contain Key 	${scenariofileafter1}[Script Defaults] 	${testkey}
 	Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][${testkey}] 	info
+	Log 	Information 	console=True
 
 	Open Manager GUI 		${mngr_options}
 	Click Button	runsettings
@@ -1988,10 +1991,11 @@ Verify Result Name - Test Defaults
 	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
-	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Log 	scenariofileafter: ${scenariofileafter1}
 	Dictionary Should Contain Key 	${scenariofileafter1} 	Script Defaults
 	Dictionary Should Contain Key 	${scenariofileafter1}[Script Defaults] 	${testkey}
 	Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][${testkey}] 	kywrd
+	Log 	Keyword 	console=True
 
 	Open Manager GUI 		${mngr_options}
 	Click Button	runsettings
@@ -2004,10 +2008,11 @@ Verify Result Name - Test Defaults
 	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
-	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Log 	scenariofileafter: ${scenariofileafter1}
 	Dictionary Should Contain Key 	${scenariofileafter1} 	Script Defaults
 	Dictionary Should Contain Key 	${scenariofileafter1}[Script Defaults] 	${testkey}
 	Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][${testkey}] 	kywrdargs
+	Log 	Keyword & Argsuments 	console=True
 
 	Open Manager GUI 		${mngr_options}
 	Click Button	runsettings
@@ -2018,8 +2023,9 @@ Verify Result Name - Test Defaults
 	Click Button 	runsave
 
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
-	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
+	Log 	scenariofileafter2: ${scenariofileafter2}
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
+	Log 	Default 	console=True
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify Result Name - Test Row
@@ -2031,7 +2037,7 @@ Verify Result Name - Test Row
 	Log 	scenariofile: ${scenariofile} 	console=True
 
 	${scenariofilebefore}= 		Read Ini File 	${scenariofile}
-	Log 	scenariofilebefore: ${scenariofilebefore} 	console=True
+	Log 	scenariofilebefore: ${scenariofilebefore}
 	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
 	Dictionary Should Not Contain Key 	${scenariofilebefore}[1] 	${testkey}
 
@@ -2047,10 +2053,11 @@ Verify Result Name - Test Row
 	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
-	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Log 	scenariofileafter: ${scenariofileafter1}
 	Dictionary Should Not Contain Key 	${scenariofileafter1} 	Script Defaults
 	Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
 	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	doco
+	Log 	Documentation 	console=True
 
 	Open Manager GUI 		${mngr_options}
 	Click Button	trsettings
@@ -2063,10 +2070,11 @@ Verify Result Name - Test Row
 	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
-	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Log 	scenariofileafter: ${scenariofileafter1}
 	Dictionary Should Not Contain Key 	${scenariofileafter1} 	Script Defaults
 	Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
 	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	info
+	Log 	Information 	console=True
 
 	Open Manager GUI 		${mngr_options}
 	Click Button	trsettings
@@ -2079,10 +2087,11 @@ Verify Result Name - Test Row
 	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
-	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Log 	scenariofileafter: ${scenariofileafter1}
 	Dictionary Should Not Contain Key 	${scenariofileafter1} 	Script Defaults
 	Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
 	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	kywrd
+	Log 	Keyword 	console=True
 
 	Open Manager GUI 		${mngr_options}
 	Click Button	trsettings
@@ -2095,10 +2104,11 @@ Verify Result Name - Test Row
 	Run Keyword		Close Manager GUI ${platform}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
-	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+	Log 	scenariofileafter: ${scenariofileafter1}
 	Dictionary Should Not Contain Key 	${scenariofileafter1} 	Script Defaults
 	Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
 	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	kywrdargs
+	Log 	Keyword & Argsuments 	console=True
 
 	Open Manager GUI 		${mngr_options}
 	Click Button	trsettings
@@ -2109,7 +2119,8 @@ Verify Result Name - Test Row
 	Click Button 	runsave
 
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
-	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
+	Log 	scenariofileafter2: ${scenariofileafter2}
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
 	Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
+	Log 	Default 	console=True
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
