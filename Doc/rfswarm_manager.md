@@ -150,20 +150,20 @@ Enabling these settings here will enable it for all test groups
 The manager settings allows you to access settings that were previously only accessible from the ini file
 > ![image](Images/Linux_Plan_v1.3.0_Settings.png)
 
-**Bind IP Address**
+###### Bind IP Address
 
 This setting allows you to restrict the web server that the manager uses to communicate with the agents to a specific ip address. By default this setting is blank so the manager will listen on all IP addresses on the machine the manager is running on.
 Generally you should not need to change this setting and it should be left blank unless you know you need to restrict the manager to a specific address.
 
 \* You will need to restart the manager for this setting to take effect.
 
-**Bind Port Number**
+###### Bind Port Number
 
 The default port that the manager web server uses to communicate with the agents is 8138, however in some cases you may need to change the port number.
 
 \* You will need to restart the manager for this setting to take effect.
 
-**Results Location**
+###### Results Location
 
 This setting allows you to configure where the manager will save the test results when you run a performance test.
 
