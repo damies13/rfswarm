@@ -84,10 +84,10 @@ The columns under the graph:
 * For Delay, Ramp Up and Run, you can either type the time in HH:MM:SS or just a number of seconds or MM:SS, the plan screen will auto update it to HH:MM:SS. For example if you typed 300 it will update to 00:05:00, 7200 will update to 02:00:00, also if you type 5:30 it will update to 00:05:30.
 
 #### Settings for the scenario and rfswarm ![image](Images/GUI_btn_cog.gif)
+> ![image](Images/Linux_Plan_v1.4.0_Settings.png)
 
 ##### Scenario settings
 At the moment there is only one scenario setting, the upload logs setting, this allows you to control when the agent will upload the logs for the test cases being run.
-> ![image](Images/Linux_Plan_v1.3.0_Settings.png)
 > ![image](Images/Linux_Plan_v1.3.0_Settings_UploadLogs.png)
 
 The options are:
@@ -100,7 +100,20 @@ The options are:
 \* In earlier releases before v1.0.0 the agent always followed the default case.
 ##### Test Defaults settings
 The test defaults settings allow you to set default default setting values for all test groups. These settings allow you to change and define what the default values are but can still be overridden for an individual test group in the [Additional settings for test group](./rfswarm_manager.md#additional-settings-for-test-group-) screen
-> ![image](Images/Linux_Plan_v1.3.0_Settings.png)
+> ![image](Images/Linux_Plan_v1.4.0_Settings.png)
+
+###### Result Name Mode
+By configuring this setting you can adjust response times named in the test results. The Options are:
+
+| Option | Description |
+| --- | --- |
+| Default | This option is the default behaviour, it also retains the behaviour of RFSwarm versions prior to 1.4.0. This option is a combination if Information and Documentation, first the keyword is checked for an Information message that is not a Trace or return data message if found the Information message is used as the result name, next if no Information message is found the keyword's  Documentation is checked, if found the Documentation is used as the result name, if neither an Information message or Documentation is found no result is returned |
+| Documentation | This option uses only the keyword Documentation, if the keyword does not have any Documentation no result is returned |
+| Information | This option checks for an Information message that is not a Trace or return data message if found the Information message is used as the result name, otherwise no result is returned. User keywords in robot framework cannot return Information messages, only python keywords or Library keyword can be used with this option |
+| Keyword | This option uses the Keyword name for the result name, as such with this option any keyword that's not part of an excluded library will return a result |
+| Keyword & Arguments | This option uses the Keyword combined with any arguments passed to the Keyword as the result name, as such with this option any keyword that's not part of an excluded library will return a result |
+
+> ![image](Images/Linux_Plan_v1.4.0_Settings_ResultNameMode.png)
 
 ###### Exclude libraries
 The default value is "BuiltIn,String,OperatingSystem,perftest", this is the same default value as used in the [agent settings](./rfswarm_agent.md#exclude-libraries) and if you leave this default but change the agent the settings set on the agent will override this setting.
@@ -148,7 +161,7 @@ Enabling these settings here will enable it for all test groups
 
 ##### Manager settings
 The manager settings allows you to access settings that were previously only accessible from the ini file
-> ![image](Images/Linux_Plan_v1.3.0_Settings.png)
+> ![image](Images/Linux_Plan_v1.4.0_Settings.png)
 
 ###### Bind IP Address
 
@@ -184,7 +197,12 @@ e.g. 2 - if the time now is 9:05 PM and you planned to start at 9:00 AM, so ente
 #### Additional settings for test group ![image](Images/GUI_btn_cog.gif)
 
 When clicking on this button a dialogue will be presented that allows you to configure some additional settings for the test group, by default the dialogue will look like this:
-> ![image](Images/Linux_Plan_v1.3.0_Test_Settings.png)
+> ![image](Images/Linux_Plan_v1.4.0_Test_Settings.png)
+
+###### Result Name Mode - Test Group
+This setting allows you to adjust how response times are named in the test results. This has the same default and option values as [Result Name Mode](./rfswarm_manager.md#result-name-mode) in Test Defaults Settings, however here you can override the default settings for this particular test group.
+
+> ![image](Images/Linux_Plan_v1.4.0_Test_Settings_ResultNameMode.png)
 
 ##### Exclude libraries - Test Group
 The default value is "BuiltIn,String,OperatingSystem,perftest", this is the same default value as used in the [agent settings](./rfswarm_agent.md#exclude-libraries) and if you leave this default but change the agent the settings set on the agent will override this setting.
