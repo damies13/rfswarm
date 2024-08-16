@@ -155,7 +155,9 @@ Close Manager GUI macos
 	END
 
 Stop Agent
-	${result} = 	Terminate Process		${process_agent}
+	# ${result} = 	Terminate Process		${process_agent}
+	Send Signal To Process 	SIGINT 	${process_agent}
+	${result}= 	Wait For Process 	${process_agent}
 	Log		${result.stdout}
 	Log		${result.stderr}
 	# Should Be Equal As Integers 	${result.rc} 	0

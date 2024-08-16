@@ -166,9 +166,6 @@ class RFSwarmAgent():
 			self.config['Agent']['properties'] = ""
 			self.saveini()
 
-		t = threading.Thread(target=self.tick_counter)
-		t.start()
-
 		self.findlibraries() 	# Need to wait for findlibraries() to finish before calling ensure_listner_file() for RF version check
 		self.ensure_listner_file()
 		self.ensure_repeater_listner_file()
@@ -525,34 +522,6 @@ class RFSwarmAgent():
 			elif v1 < v2:
 				return versionb
 		return versiona
-
-	def tick_counter(self):
-		#
-		# This function is simply a way to roughly measure the number of agents being used
-		# without collecting any other data from the user or thier machine.
-		#
-		# A simple get request on this file on startup or once a day should make it appear
-		# in the github insights if people are actually using this application.
-		#
-		# t = threading.Thread(target=self.tick_counter)
-		# t.start()
-		# only tick once per day
-		# 1 day, 24 hours  = 60 * 60 * 24
-		aday = 60 * 60 * 24
-		while True:
-
-			ver = self.version
-			if ver[0] != 'v':
-				ver = "v" + ver
-
-			# https://github.com/damies13/rfswarm/blob/v0.6.2/Doc/Images/z_agent.txt
-			url = "https://github.com/damies13/rfswarm/blob/" + ver + "/Doc/Images/z_agent.txt"
-			try:
-				r = requests.get(url, timeout=self.timeout)
-				self.debugmsg(9, "tick_counter:", r.status_code)
-			except Exception:
-				pass
-			time.sleep(aday)
 
 	def getscripts(self):
 		self.debugmsg(6, "getscripts")
@@ -2006,13 +1975,21 @@ class RFSwarmAgent():
 			self.jobs[jobid]["Thread"].join()
 
 		self.debugmsg(3, "Exit")
+		for thread in threading.enumerate():
+			if thread.name != "MainThread":
+				if thread.is_alive():
+					self.debugmsg(9, thread.name, "before")
+					thread.join(timeout=30)
+					self.debugmsg(9, thread.name, "after")
+
 		try:
 			sys.exit(0)
-		except SystemExit:
+		except Exception as e:
 			try:
-				os._exit(0)
+				self.debugmsg(0, "Failed to exit with error:", e)
+				sys.exit(0)
 			except Exception:
-				pass
+				os._exit(0)
 
 
 class RFSwarm():

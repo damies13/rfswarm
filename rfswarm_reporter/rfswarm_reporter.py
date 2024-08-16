@@ -2869,13 +2869,21 @@ class ReporterCore:
 		base.stop_db()
 
 		base.debugmsg(2, "Exit")
+		for thread in threading.enumerate():
+			if thread.name != "MainThread":
+				if thread.is_alive():
+					base.debugmsg(9, thread.name, "before")
+					thread.join(timeout=30)
+					base.debugmsg(9, thread.name, "after")
+
 		try:
 			sys.exit(0)
-		except SystemExit:
+		except Exception as e:
 			try:
-				os._exit(0)
+				self.debugmsg(0, "Failed to exit with error:", e)
+				sys.exit(0)
 			except Exception:
-				pass
+				os._exit(0)
 
 	def selectResults(self, resultsfile):
 		base.debugmsg(5, "resultsfile:", resultsfile)
@@ -6490,6 +6498,7 @@ class ReporterGUI(tk.Frame):
 		# self.sectionstree.see(sectionID)
 
 	def on_closing(self, _event=None, *extras):
+		base.running = False
 		try:
 			base.debugmsg(5, "close window")
 			self.destroy()

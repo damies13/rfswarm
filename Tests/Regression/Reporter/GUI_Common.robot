@@ -298,6 +298,8 @@ Close GUI
 
 Check Result
 	[Arguments]		${result}
+	Log 	${result.stdout}
+	Should Not Contain 	${result.stdout} 	Traceback
 	Log 	${result.stderr}
 	Should Not Contain 	${result.stderr} 	Traceback
 	Should Be Equal As Integers 	${result.rc} 	0
