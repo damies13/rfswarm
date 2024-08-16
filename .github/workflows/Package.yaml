@@ -78,7 +78,7 @@ jobs:
           import re
           import requests
           branchname = os.getenv("branchname")
-          milestonever="NotSet"
+          milestonever="master"
           ismilestone=0
           print('branchname	:', branchname)
           m = re.search("#(\\d*)", branchname)
