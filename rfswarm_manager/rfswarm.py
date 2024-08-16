@@ -2705,7 +2705,7 @@ class RFSwarmCore:
 			if thread.name != "MainThread":
 				if thread.is_alive():
 					base.debugmsg(9, thread.name, "before")
-					thread.join(timeout=30)
+					thread.join(timeout=60)
 					base.debugmsg(9, thread.name, "after")
 
 		try:
