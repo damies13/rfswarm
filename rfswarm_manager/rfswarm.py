@@ -45,7 +45,6 @@ from typing import Any
 
 import matplotlib  # required for matplot graphs
 import psutil
-import requests
 
 # required for matplot graphs
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -5372,7 +5371,7 @@ class RFSwarmGUI(tk.Frame):
 		# self.pln_graph.bind("<Configure>", self.CanvasResize)
 		# May need to bind <Button-4> and <Button-5> to enable mouse scrolling
 		# https://www.python-course.eu/tkinter_events_binds.php
-		
+
 		base.updateplanthread = threading.Thread(target=self.UpdatePlanDisplay)
 		base.updateplanthread.start()
 
