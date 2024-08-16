@@ -2702,7 +2702,7 @@ class RFSwarmCore:
 		time.sleep(1)
 		base.debugmsg(2, "Exit")
 		for thread in threading.enumerate():
-			if thread.name != "MainThread":
+			if thread.name not in ['MainLoop', 'UpdateAgents']:
 				if thread.is_alive():
 					base.debugmsg(9, thread.name, "before")
 					thread.join(timeout=60)
