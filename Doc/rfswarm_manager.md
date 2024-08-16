@@ -199,7 +199,7 @@ e.g. 2 - if the time now is 9:05 PM and you planned to start at 9:00 AM, so ente
 When clicking on this button a dialogue will be presented that allows you to configure some additional settings for the test group, by default the dialogue will look like this:
 > ![image](Images/Linux_Plan_v1.4.0_Test_Settings.png)
 
-###### Result Name Mode - Test Group
+##### Result Name Mode - Test Group
 This setting allows you to adjust how response times are named in the test results. This has the same default and option values as [Result Name Mode](./rfswarm_manager.md#result-name-mode) in Test Defaults Settings, however here you can override the default settings for this particular test group.
 
 > ![image](Images/Linux_Plan_v1.4.0_Test_Settings_ResultNameMode.png)
