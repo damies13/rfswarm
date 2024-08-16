@@ -2676,6 +2676,7 @@ class RFSwarmCore:
 				base.debugmsg(9, "Shutdown Agent Manager after")
 			except Exception:
 				pass
+
 		try:
 			if base.Agentserver.is_alive():
 				base.debugmsg(9, "Join Agent Manager Thread")
@@ -2702,20 +2703,28 @@ class RFSwarmCore:
 		time.sleep(1)
 		base.debugmsg(2, "Exit")
 		for thread in threading.enumerate():
-			if thread.name not in ['MainLoop', 'UpdateAgents']:
-				if thread.is_alive():
+			if thread is not threading.main_thread() and thread.is_alive():
+				if thread.name not in ["UpdateAgents"]:
 					base.debugmsg(9, thread.name, "before")
-					thread.join(timeout=60)
+					thread.join(timeout=30)
 					base.debugmsg(9, thread.name, "after")
 
 		try:
 			sys.exit(0)
-		except Exception as e:
+		except SystemExit as e:
 			try:
-				base.debugmsg(0, "Failed to exit with error:", e)
-				sys.exit(0)
-			except Exception:
-				os._exit(0)
+				remaining_threads = [t for t in threading.enumerate() if t is not threading.main_thread() and t.is_alive()]
+				if remaining_threads:
+					base.debugmsg(3, "Failed to gracefully exit RFSwarm-Manager. Forcing immediate exit.")
+					for thread in remaining_threads:
+						base.debugmsg(9, "Thread name:", thread.name)
+					os._exit(1)
+				else:
+					raise e
+
+			except Exception as e:
+				base.debugmsg(3, "Failed to exit with error:", e)
+				os._exit(2)
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -4675,7 +4684,7 @@ class RFSwarmGUI(tk.Frame):
 
 	def gph_updater(self, grphWindow):
 		try:
-			while True:
+			while True and base.keeprunning:
 				base.debugmsg(6, "graphname:", grphWindow.graphname.get())
 				# self.gph_refresh(grphWindow)
 				tgr = threading.Thread(target=lambda: self.gph_refresh(grphWindow))
