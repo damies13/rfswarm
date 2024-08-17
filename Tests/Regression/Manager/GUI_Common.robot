@@ -175,10 +175,13 @@ Close Manager GUI macos
 	END
 
 Stop Agent
-	${result} = 	Terminate Process		${process_agent}
-	Log		${result.stdout}
-	Log		${result.stderr}
-	# Should Be Equal As Integers 	${result.rc} 	0
+	${running}= 	Is Process Running 	${process_agent}
+	IF 	${running}
+		${result} = 	Terminate Process		${process_agent}
+		Log		${result.stdout}
+		Log		${result.stderr}
+		# Should Be Equal As Integers 	${result.rc} 	0
+	END
 
 Stop Test Scenario Run Gradually
 	[Arguments]	${rumup_time}	${robot_test_time}
