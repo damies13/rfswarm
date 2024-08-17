@@ -3624,6 +3624,7 @@ class RFSwarmCore:
 				agnt_elapsed = int(time.time()) - tm
 				if agnt_elapsed > 30:
 					base.Agents[agnt]["Status"] = "Offline?"
+					includerobots = False
 				if agnt_elapsed > 300:
 					removeagents.append(agnt)
 					includerobots = False
