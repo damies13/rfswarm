@@ -3604,7 +3604,6 @@ class RFSwarmCore:
 	def UpdateAgents(self):
 
 		uploadcount = 0
-		rnum = 0
 		removeagents = []
 		robot_count = 0
 		time_elapsed = int(time.time()) - base.agenttgridupdate
@@ -3642,9 +3641,9 @@ class RFSwarmCore:
 				# this should prevent issue RuntimeError: dictionary changed size during iteration
 				del base.Agents[agnt]
 
-			if rnum > 0:
-				self.updatethread = threading.Thread(target=self.delayed_UpdateAgents)
-				self.updatethread.start()
+			# temp. fix for disconnecting agent when inactive:
+			self.updatethread = threading.Thread(target=self.delayed_UpdateAgents)
+			self.updatethread.start()
 
 			if not base.args.nogui:
 				base.debugmsg(6, "nogui:", base.args.nogui)
@@ -3684,6 +3683,10 @@ class RFSwarmCore:
 				else:
 					time.sleep(1)
 					base.gui.delayed_UpdateRunStats()
+
+	def delayed_UpdateAgents(self):
+		time.sleep(10)
+		self.UpdateAgents()
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
