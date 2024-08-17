@@ -3616,6 +3616,8 @@ class RFSwarmCore:
 			base.debugmsg(6, "agntlst:", agntlst)
 			for agnt in agntlst:
 
+				includerobots = True
+
 				if "Uploading" in base.Agents[agnt]["Status"]:
 					uploadcount += 1
 
@@ -3625,8 +3627,10 @@ class RFSwarmCore:
 					base.Agents[agnt]["Status"] = "Offline?"
 				if agnt_elapsed > 300:
 					removeagents.append(agnt)
+					includerobots = False
 
-				robot_count += base.Agents[agnt]["Robots"]
+				if includerobots:
+					robot_count += base.Agents[agnt]["Robots"]
 
 			if base.total_robots > 0 and robot_count < 1:
 				# run finished so clear run name
