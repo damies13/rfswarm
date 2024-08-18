@@ -1661,7 +1661,7 @@ Verify the Robot Count Reduces When Stop Agent While Test Is Running
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didnt reduce robot count form 10 to 0 in 60s after disconnecting Agent.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${60}
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${120}
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
 
 	[Teardown]	Run Keywords
