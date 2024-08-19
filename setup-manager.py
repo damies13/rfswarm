@@ -21,7 +21,7 @@ class PostInstallCommand(install):
 
 		test_file = os.path.join(user_dir, "rfswarm_test.txt")
 		with open(test_file, "a",) as f:
-			f.writelines("RFSwarm test\n", "install_dir:", install_dir, "\n")
+			f.writelines(["RFSwarm test\n", "install_dir:", install_dir, "\n"])
 
 
 with open("README_PyPi.md", "r", encoding="utf-8") as fh:
