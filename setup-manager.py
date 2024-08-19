@@ -2,7 +2,7 @@
 import os
 import sys
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 from setuptools.command.install import install
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -36,10 +36,10 @@ setup(
 	long_description=long_description,
 	long_description_content_type="text/markdown",
 	url="https://github.com/damies13/rfswarm",
-	# packages=find_packages(exclude=["*fswarm_report*", "*fswarm_agen*", "build/*"]),
-	packages=find_packages(where="rfswarm_manager"),
+	packages=find_packages(exclude=["*fswarm_report*", "*fswarm_agen*", "build/*"]),
+	# packages=find_packages(where="rfswarm_manager"),
 	package_dir={"": "rfswarm_manager"},
-	package_data={"desktop": ["*.png", "*.py"]},
+	package_data={"": ["*.png", "*.py"]},
 	# data_files = [('rfswarm_manager/desktop', ['rfswarm_manager/desktop/rfswarm-manager-128.png'])],
 	include_package_data=True,
 	# I needed a recent version of pip (pip 21.0.1 worked my previous <20 version didn't) for matplotlib
