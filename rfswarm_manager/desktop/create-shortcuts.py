@@ -1,5 +1,6 @@
 #
 
+import importlib
 import os
 import platform
 
@@ -7,6 +8,8 @@ import platform
 def main():
 	print("Create shortcuts for RFSwarm Manager")
 	print("platform:", platform.system())
+	pipdata = importlib.metadata.distribution('rfswarm-manager')
+	print("files:", pipdata.files)
 	if platform.system() == 'Linux':
 		print("Create .desktop file")
 		# /usr/share/applications/
