@@ -40,8 +40,8 @@ setup(
 	packages=find_packages(exclude=["*fswarm_report*", "*fswarm_agen*", "build/*"]),
 	# data_files = [('rfswarm_manager/desktop', ['rfswarm_manager/desktop/*.py']), ('rfswarm_manager/desktop', ['rfswarm_manager/desktop/*.png'])],
 	# data_files = [('rfswarm_manager/desktop/', ['rfswarm_manager/desktop/*.*'])],
-	# package_dir={'': SOURCE_DIR},
-	packages=find_packages(SOURCE_DIR),
+	package_dir={'': SOURCE_DIR},
+	# packages=find_packages(SOURCE_DIR),
 	data_files = [('', ['desktop/*.*'])],
 	# I needed a recent version of pip (pip 21.0.1 worked my previous <20 version didn't) for matplotlib
 	# 	to actually install withput error
