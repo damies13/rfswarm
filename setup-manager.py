@@ -2,8 +2,10 @@
 import os
 import sys
 
-from setuptools import setup
+from setuptools import setup, find_packages
 from setuptools.command.install import install
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class PostInstallCommand(install):
 	"""Post-installation for installation mode."""
@@ -11,7 +13,7 @@ class PostInstallCommand(install):
 		install.run(self)
 		# PUT YOUR POST-INSTALL SCRIPT HERE or CALL A FUNCTION
 		sys.stdout.write("Creating Desktop Shortcut for RFSwarm Manager...\n")
-		install_dir = join(ROOT_DIR, SOURCE_DIR)
+		install_dir = join(ROOT_DIR, "somewhere")
 		sys.stdout.write("install_dir: " + install_dir + "\n")
 
 with open("README_PyPi.md", "r", encoding="utf-8") as fh:
@@ -26,7 +28,7 @@ setup(
 	long_description=long_description,
 	long_description_content_type="text/markdown",
 	url="https://github.com/damies13/rfswarm",
-	packages=setuptools.find_packages(exclude=["*fswarm_report*", "*fswarm_agen*", "build/*"]),
+	packages=find_packages(exclude=["*fswarm_report*", "*fswarm_agen*", "build/*"]),
 	# I needed a recent version of pip (pip 21.0.1 worked my previous <20 version didn't) for matplotlib
 	# 	to actually install withput error
 	# https://matplotlib.org/stable/users/installing.html
