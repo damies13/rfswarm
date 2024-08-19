@@ -1,4 +1,16 @@
+
+import os
 import setuptools
+import sys
+
+class PostInstallCommand(install):
+	"""Post-installation for installation mode."""
+	def run(self):
+		setuptools.command.install.run(self)
+		# PUT YOUR POST-INSTALL SCRIPT HERE or CALL A FUNCTION
+		sys.stdout.write("Creating Desktop Shortcut for RFSwarm Manager...\n")
+		install_dir = join(ROOT_DIR, SOURCE_DIR)
+		sys.stdout.write("install_dir: " + install_dir + "\n")
 
 with open("README_PyPi.md", "r", encoding="utf-8") as fh:
 	long_description = fh.read()
@@ -32,5 +44,12 @@ setuptools.setup(
 		'Say Thanks!': 'https://github.com/damies13/rfswarm#donations',
 		'Source': 'https://github.com/damies13/rfswarm',
 	},
+	cmdclass={
+		'install': PostInstallCommand,
+	},
 	entry_points={'console_scripts': ['rfswarm = rfswarm_manager.rfswarm:RFSwarm', 'rfswarm-manager = rfswarm_manager.rfswarm:RFSwarm']},
 )
+
+
+
+# https://pypi.org/project/pyshortcuts/
