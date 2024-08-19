@@ -3,7 +3,7 @@ import os
 import setuptools
 import sys
 
-class PostInstallCommand(install):
+class PostInstallCommand(setuptools.command.install):
 	"""Post-installation for installation mode."""
 	def run(self):
 		setuptools.command.install.run(self)
