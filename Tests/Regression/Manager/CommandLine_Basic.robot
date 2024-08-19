@@ -55,6 +55,12 @@ Manager Help
 	Log to console 	${\n}${result}
 	Should Contain	${result}	IPADDRESS
 
+Show User Dir
+	${user_dir}= 	Evaluate 	os.path.expanduser("~") 	modules=os
+	Log 	user_dir: ${user_dir} 	console=True
+	@{items}= 	List Directory 	${user_dir}
+	Log 	items: ${items} 	console=True
+
 *** Keywords ***
 Clean Up Old Files
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
