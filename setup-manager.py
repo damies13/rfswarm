@@ -13,7 +13,7 @@ class PostInstallCommand(install):
 		install.run(self)
 		# PUT YOUR POST-INSTALL SCRIPT HERE or CALL A FUNCTION
 		sys.stdout.write("Creating Desktop Shortcut for RFSwarm Manager...\n")
-		install_dir = join(ROOT_DIR, "somewhere")
+		install_dir = os.path.join(ROOT_DIR, "somewhere")
 		sys.stdout.write("install_dir: " + install_dir + "\n")
 
 with open("README_PyPi.md", "r", encoding="utf-8") as fh:
