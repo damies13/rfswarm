@@ -37,7 +37,7 @@ setup(
 	long_description=long_description,
 	long_description_content_type="text/markdown",
 	url="https://github.com/damies13/rfswarm",
-	packages=find_packages(exclude=["*fswarm_report*", "*fswarm_agen*", "build/*"]),
+	# packages=find_packages(exclude=["*fswarm_report*", "*fswarm_agen*", "build/*"]),
 	# data_files = [('rfswarm_manager/desktop', ['rfswarm_manager/desktop/*.py']), ('rfswarm_manager/desktop', ['rfswarm_manager/desktop/*.png'])],
 	# data_files = [('rfswarm_manager/desktop/', ['rfswarm_manager/desktop/*.*'])],
 	package_dir={'': SOURCE_DIR},
