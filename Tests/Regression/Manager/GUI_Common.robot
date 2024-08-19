@@ -155,9 +155,13 @@ Close Manager GUI macos
 	END
 
 Stop Agent
-	# ${result} = 	Terminate Process		${process_agent}
-	Send Signal To Process 	SIGINT 	${process_agent}
-	${result}= 	Wait For Process 	${process_agent}
+	${result} = 	Terminate Process		${process_agent}
+	# IF  '${platform}' == 'windows'
+	# 	Evaluate	os.kill(${process_agent.pid}, signal.SIGINT)	modules=subprocess, os, signal
+	# ELSE
+	# 	Send Signal To Process 	SIGINT 	${process_agent}
+	# END
+	${result}= 	Wait For Process 	${process_agent}	timeout=30	on_timeout=kill
 	Log		${result.stdout}
 	Log		${result.stderr}
 	# Should Be Equal As Integers 	${result.rc} 	0

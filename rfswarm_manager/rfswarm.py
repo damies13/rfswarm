@@ -2627,12 +2627,13 @@ class RFSwarmCore:
 				base.debugmsg(3, "Agents:", base.agents_ready(), "	Agents Needed:", neededagents)
 				time.sleep(10)
 
-			if base.args.nogui and base.keeprunning:
-				base.debugmsg(5, "core.ClickPlay")
-				self.ClickPlay()
-			elif base.keeprunning:
-				base.debugmsg(5, "base.gui.ClickPlay")
-				base.gui.ClickPlay()
+			if base.keeprunning:
+				if base.args.nogui:
+					base.debugmsg(5, "core.ClickPlay")
+					self.ClickPlay()
+				else:
+					base.debugmsg(5, "base.gui.ClickPlay")
+					base.gui.ClickPlay()
 
 	def mainloop(self):
 
@@ -2701,14 +2702,17 @@ class RFSwarmCore:
 			pass
 
 		time.sleep(1)
-		base.debugmsg(2, "Exit")
+		base.debugmsg(3, "Waiting for all threads to be completed")
 		for thread in threading.enumerate():
 			if thread is not threading.main_thread() and thread.is_alive():
 				if thread.name not in ["UpdateAgents"]:
 					base.debugmsg(9, thread.name, "before")
 					thread.join(timeout=30)
 					base.debugmsg(9, thread.name, "after")
+					if thread.is_alive():
+						base.debugmsg(9, thread.name, "did not complete in 30s!")
 
+		base.debugmsg(2, "Exit")
 		try:
 			sys.exit(0)
 		except SystemExit as e:
@@ -2718,13 +2722,13 @@ class RFSwarmCore:
 					base.debugmsg(3, "Failed to gracefully exit RFSwarm-Manager. Forcing immediate exit.")
 					for thread in remaining_threads:
 						base.debugmsg(9, "Thread name:", thread.name)
-					os._exit(1)
+					os._exit(0)
 				else:
 					raise e
 
 			except Exception as e:
 				base.debugmsg(3, "Failed to exit with error:", e)
-				os._exit(2)
+				os._exit(1)
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -2796,8 +2800,7 @@ class RFSwarmCore:
 
 		base.debugmsg(9, "register_agent: agentdata:", agentdata)
 
-		# base.gui.UpdateAgents()
-		t = threading.Thread(target=self.UpdateAgents)
+		t = threading.Thread(target=self.UpdateAgents, name="UpdateAgents")
 		t.start()
 
 		# add filter options to the filter list
@@ -7408,9 +7411,9 @@ class RFSwarmGUI(tk.Frame):
 				base.saveini()
 
 			base.UpdateRunStats_SQL()
-
-			time.sleep(1)
-			self.UpdateRunStats()
+			if base.keeprunning:
+				time.sleep(1)
+				self.UpdateRunStats()
 
 	def UpdateRunStats(self):
 
@@ -7551,8 +7554,9 @@ class RFSwarmGUI(tk.Frame):
 			# May need to bind <Button-4> and <Button-5> to enable mouse scrolling
 			# https://www.python-course.eu/tkinter_events_binds.php
 
-			ut = threading.Thread(target=self.delayed_UpdateRunStats)
-			ut.start()
+			if base.keeprunning:
+				ut = threading.Thread(target=self.delayed_UpdateRunStats)
+				ut.start()
 
 	def ClickStop(self, _event=None):
 		if base.run_end < int(time.time()):
