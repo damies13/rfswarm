@@ -2662,14 +2662,6 @@ class RFSwarmCore:
 		base.keeprunning = False
 		self.neededagents = 0
 
-		try:
-			if base.updateplanthread.is_alive():
-				base.debugmsg(9, "Join Update Plan Display")
-				base.updateplanthread.join(timeout=30)
-				base.debugmsg(9, "Join Update Plan Display after")
-		except Exception:
-			pass
-
 		if base.appstarted:
 			try:
 				base.debugmsg(0, "Shutdown Agent Manager")
@@ -2702,16 +2694,6 @@ class RFSwarmCore:
 			pass
 
 		time.sleep(1)
-		base.debugmsg(3, "Waiting for all threads to be completed")
-		for thread in threading.enumerate():
-			if thread is not threading.main_thread() and thread.is_alive():
-				if thread.name not in ["UpdateAgents"]:
-					base.debugmsg(9, thread.name, "before")
-					thread.join(timeout=30)
-					base.debugmsg(9, thread.name, "after")
-					if thread.is_alive():
-						base.debugmsg(9, thread.name, "did not complete in 30s!")
-
 		base.debugmsg(2, "Exit")
 		try:
 			sys.exit(0)
@@ -2719,7 +2701,7 @@ class RFSwarmCore:
 			try:
 				remaining_threads = [t for t in threading.enumerate() if t is not threading.main_thread() and t.is_alive()]
 				if remaining_threads:
-					base.debugmsg(3, "Failed to gracefully exit RFSwarm-Manager. Forcing immediate exit.")
+					base.debugmsg(5, "Failed to gracefully exit RFSwarm-Manager. Forcing immediate exit.")
 					for thread in remaining_threads:
 						base.debugmsg(9, "Thread name:", thread.name)
 					os._exit(0)

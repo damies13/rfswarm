@@ -2868,22 +2868,24 @@ class ReporterCore:
 		# base.close_results_db()
 		base.stop_db()
 
+		time.sleep(1)
 		base.debugmsg(2, "Exit")
-		for thread in threading.enumerate():
-			if thread.name != "MainThread":
-				if thread.is_alive():
-					base.debugmsg(9, thread.name, "before")
-					thread.join(timeout=30)
-					base.debugmsg(9, thread.name, "after")
-
 		try:
 			sys.exit(0)
-		except Exception as e:
+		except SystemExit as e:
 			try:
-				self.debugmsg(0, "Failed to exit with error:", e)
-				sys.exit(0)
-			except Exception:
-				os._exit(0)
+				remaining_threads = [t for t in threading.enumerate() if t is not threading.main_thread() and t.is_alive()]
+				if remaining_threads:
+					base.debugmsg(5, "Failed to gracefully exit RFSwarm-Reporter. Forcing immediate exit.")
+					for thread in remaining_threads:
+						base.debugmsg(9, "Thread name:", thread.name)
+					os._exit(0)
+				else:
+					raise e
+
+			except Exception as e:
+				base.debugmsg(3, "Failed to exit with error:", e)
+				os._exit(1)
 
 	def selectResults(self, resultsfile):
 		base.debugmsg(5, "resultsfile:", resultsfile)
@@ -2914,7 +2916,7 @@ class ReporterCore:
 			for msg in mesage:
 				msglst.append(msg)
 			msgout = " ".join(msglst)
-			while base.gui is None:
+			while base.gui is None and base.running:
 				time.sleep(0.5)
 			base.gui.updateStatus(msgout)
 		else:

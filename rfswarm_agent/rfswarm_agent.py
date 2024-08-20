@@ -1975,16 +1975,6 @@ class RFSwarmAgent():
 			self.jobs[jobid]["Thread"].join()
 
 		time.sleep(1)
-		self.debugmsg(3, "Waiting for all threads to be completed")
-		for thread in threading.enumerate():
-			if thread is not threading.main_thread() and thread.is_alive():
-				if thread.name not in ["UpdateAgents"]:
-					self.debugmsg(9, thread.name, "before")
-					thread.join(timeout=30)
-					self.debugmsg(9, thread.name, "after")
-					if thread.is_alive():
-						self.debugmsg(9, thread.name, "did not complete in 30s!")
-
 		self.debugmsg(2, "Exit")
 		try:
 			sys.exit(0)
@@ -1992,7 +1982,7 @@ class RFSwarmAgent():
 			try:
 				remaining_threads = [t for t in threading.enumerate() if t is not threading.main_thread() and t.is_alive()]
 				if remaining_threads:
-					self.debugmsg(3, "Failed to gracefully exit RFSwarm-Agent. Forcing immediate exit.")
+					self.debugmsg(5, "Failed to gracefully exit RFSwarm-Agent. Forcing immediate exit.")
 					for thread in remaining_threads:
 						self.debugmsg(9, "Thread name:", thread.name)
 					os._exit(0)
