@@ -166,9 +166,6 @@ class RFSwarmAgent():
 			self.config['Agent']['properties'] = ""
 			self.saveini()
 
-		t = threading.Thread(target=self.tick_counter)
-		t.start()
-
 		self.findlibraries() 	# Need to wait for findlibraries() to finish before calling ensure_listner_file() for RF version check
 		self.ensure_listner_file()
 		self.ensure_repeater_listner_file()
@@ -525,34 +522,6 @@ class RFSwarmAgent():
 			elif v1 < v2:
 				return versionb
 		return versiona
-
-	def tick_counter(self):
-		#
-		# This function is simply a way to roughly measure the number of agents being used
-		# without collecting any other data from the user or thier machine.
-		#
-		# A simple get request on this file on startup or once a day should make it appear
-		# in the github insights if people are actually using this application.
-		#
-		# t = threading.Thread(target=self.tick_counter)
-		# t.start()
-		# only tick once per day
-		# 1 day, 24 hours  = 60 * 60 * 24
-		aday = 60 * 60 * 24
-		while True:
-
-			ver = self.version
-			if ver[0] != 'v':
-				ver = "v" + ver
-
-			# https://github.com/damies13/rfswarm/blob/v0.6.2/Doc/Images/z_agent.txt
-			url = "https://github.com/damies13/rfswarm/blob/" + ver + "/Doc/Images/z_agent.txt"
-			try:
-				r = requests.get(url, timeout=self.timeout)
-				self.debugmsg(9, "tick_counter:", r.status_code)
-			except Exception:
-				pass
-			time.sleep(aday)
 
 	def getscripts(self):
 		self.debugmsg(6, "getscripts")
@@ -2059,14 +2028,24 @@ class RFSwarmAgent():
 			self.debugmsg(3, "Join Agent Thread:", jobid)
 			self.jobs[jobid]["Thread"].join()
 
-		self.debugmsg(3, "Exit")
+		time.sleep(1)
+		self.debugmsg(2, "Exit")
 		try:
 			sys.exit(0)
-		except SystemExit:
+		except SystemExit as e:
 			try:
-				os._exit(0)
-			except Exception:
-				pass
+				remaining_threads = [t for t in threading.enumerate() if t is not threading.main_thread() and t.is_alive()]
+				if remaining_threads:
+					self.debugmsg(5, "Failed to gracefully exit RFSwarm-Agent. Forcing immediate exit.")
+					for thread in remaining_threads:
+						self.debugmsg(9, "Thread name:", thread.name)
+					os._exit(0)
+				else:
+					raise e
+
+			except Exception as e:
+				self.debugmsg(3, "Failed to exit with error:", e)
+				os._exit(1)
 
 
 class RFSwarm():

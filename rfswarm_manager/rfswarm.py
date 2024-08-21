@@ -45,7 +45,6 @@ from typing import Any
 
 import matplotlib  # required for matplot graphs
 import psutil
-import requests
 
 # required for matplot graphs
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -499,6 +498,7 @@ class RFSwarmBase:
 	agentserver = None
 	agenthttpserver = None
 	updatethread = None
+	updateplanthread = None
 
 	Agents: Any = {}
 	agenttgridupdate = 0
@@ -1218,34 +1218,6 @@ class RFSwarmBase:
 
 		if remove:
 			del self.scriptfiles[hash]
-
-	def tick_counter(self):
-		#
-		# This function is simply a way to roughly measure the number of agents being used
-		# without collecting any other data from the user or thier machine.
-		#
-		# A simple get request on this file on startup or once a day should make it appear
-		# in the github insights if people are actually using this application.
-		#
-		# t = threading.Thread(target=self.tick_counter)
-		# t.start()
-		# only tick once per day
-		# 1 day, 24 hours  = 60 * 60 * 24
-		aday = 60 * 60 * 24
-		while True:
-
-			ver = self.version
-			if ver[0] != 'v':
-				ver = "v" + ver
-
-			# https://github.com/damies13/rfswarm/blob/v0.6.2/Doc/Images/z_manager.txt
-			url = "https://github.com/damies13/rfswarm/blob/" + ver + "/Doc/Images/z_manager.txt"
-			try:
-				r = requests.get(url)
-				self.debugmsg(9, "tick_counter:", r.status_code)
-			except Exception:
-				pass
-			time.sleep(aday)
 
 	def register_envvar(self, envvar):
 		vartype = "value"
@@ -2617,9 +2589,6 @@ class RFSwarmCore:
 		base.dbthread = threading.Thread(target=base.run_db_thread)
 		base.dbthread.start()
 
-		t = threading.Thread(target=base.tick_counter)
-		t.start()
-
 	def BuildCore(self):
 		base.debugmsg(5, "BuildCore")
 
@@ -2655,18 +2624,19 @@ class RFSwarmCore:
 			base.debugmsg(5, "len(base.Agents):", len(base.Agents), "	neededagents:", neededagents)
 			# agntlst = list(base.Agents.keys())
 			# while len(base.Agents) < neededagents:
-			while base.agents_ready() < neededagents:
+			while base.agents_ready() < neededagents and base.keeprunning:
 				base.debugmsg(1, "Waiting for Agents")
 				# base.debugmsg(3, "Agents:", len(base.Agents), "	Agents Needed:", neededagents)
 				base.debugmsg(3, "Agents:", base.agents_ready(), "	Agents Needed:", neededagents)
 				time.sleep(10)
 
-			if base.args.nogui:
-				base.debugmsg(5, "core.ClickPlay")
-				self.ClickPlay()
-			else:
-				base.debugmsg(5, "base.gui.ClickPlay")
-				base.gui.ClickPlay()
+			if base.keeprunning:
+				if base.args.nogui:
+					base.debugmsg(5, "core.ClickPlay")
+					self.ClickPlay()
+				else:
+					base.debugmsg(5, "base.gui.ClickPlay")
+					base.gui.ClickPlay()
 
 	def mainloop(self):
 
@@ -2693,23 +2663,30 @@ class RFSwarmCore:
 		# , _event=None is required for any function that has a shortcut key bound to it
 
 		base.keeprunning = False
+		self.neededagents = 0
 
 		if base.appstarted:
 			try:
 				base.debugmsg(0, "Shutdown Agent Manager")
 				base.agenthttpserver.shutdown()
+				base.debugmsg(9, "Shutdown Agent Manager after")
 			except Exception:
 				pass
+
 		try:
-			base.debugmsg(3, "Join Agent Manager Thread")
-			base.Agentserver.join()
+			if base.Agentserver.is_alive():
+				base.debugmsg(9, "Join Agent Manager Thread")
+				base.Agentserver.join(timeout=30)
+				base.debugmsg(9, "Join Agent Manager Thread after")
 		except Exception:
 			pass
 
 		try:
 			base.run_dbthread = False
-			base.debugmsg(3, "Join DB Thread")
-			base.dbthread.join()
+			if base.dbthread.is_alive():
+				base.debugmsg(9, "Join DB Thread")
+				base.dbthread.join(timeout=30)
+				base.debugmsg(9, "Join DB Thread after")
 		except Exception:
 			pass
 
@@ -2723,11 +2700,20 @@ class RFSwarmCore:
 		base.debugmsg(2, "Exit")
 		try:
 			sys.exit(0)
-		except SystemExit:
+		except SystemExit as e:
 			try:
-				os._exit(0)
-			except Exception:
-				pass
+				remaining_threads = [t for t in threading.enumerate() if t is not threading.main_thread() and t.is_alive()]
+				if remaining_threads:
+					base.debugmsg(5, "Failed to gracefully exit RFSwarm-Manager. Forcing immediate exit.")
+					for thread in remaining_threads:
+						base.debugmsg(9, "Thread name:", thread.name)
+					os._exit(0)
+				else:
+					raise e
+
+			except Exception as e:
+				base.debugmsg(3, "Failed to exit with error:", e)
+				os._exit(1)
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -2799,8 +2785,7 @@ class RFSwarmCore:
 
 		base.debugmsg(9, "register_agent: agentdata:", agentdata)
 
-		# base.gui.UpdateAgents()
-		t = threading.Thread(target=self.UpdateAgents)
+		t = threading.Thread(target=self.UpdateAgents, name="UpdateAgents")
 		t.start()
 
 		# add filter options to the filter list
@@ -3810,6 +3795,9 @@ class RFSwarmGUI(tk.Frame):
 
 	def on_closing(self, _event=None):
 
+		base.keeprunning = False
+		self.neededagents = 0
+
 		base.debugmsg(3, "Close Scenario")
 		sf = base.config['Plan']['ScenarioFile']
 		try:
@@ -4696,7 +4684,7 @@ class RFSwarmGUI(tk.Frame):
 
 	def gph_updater(self, grphWindow):
 		try:
-			while True:
+			while True and base.keeprunning:
 				base.debugmsg(6, "graphname:", grphWindow.graphname.get())
 				# self.gph_refresh(grphWindow)
 				tgr = threading.Thread(target=lambda: self.gph_refresh(grphWindow))
@@ -5393,8 +5381,8 @@ class RFSwarmGUI(tk.Frame):
 		# May need to bind <Button-4> and <Button-5> to enable mouse scrolling
 		# https://www.python-course.eu/tkinter_events_binds.php
 
-		ut = threading.Thread(target=self.UpdatePlanDisplay)
-		ut.start()
+		base.updateplanthread = threading.Thread(target=self.UpdatePlanDisplay)
+		base.updateplanthread.start()
 
 	def setings_open(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
@@ -5935,30 +5923,43 @@ class RFSwarmGUI(tk.Frame):
 	def UpdatePlanDisplay(self):
 		while base.keeprunning:
 			if base.run_starttime > 0:
+				base.debugmsg(9, "start_starttime > 0")
+
 				sec2st = base.run_starttime - int(time.time())
 				if sec2st < 0:
 					sec2st = 0
 
+				base.debugmsg(9, "lbl_sched_start_time")
 				self.display_plan['lbl_sched_start_time'].set("  Start Time  ")
 				st = datetime.fromtimestamp(base.run_starttime)
 				if sec2st > 86400:  # 24h * 60m * 60s
+					base.debugmsg(9, "sched_start_time")
 					self.display_plan['sched_start_time'].set("  {}  ".format(st.strftime("%Y-%m-%d %H:%M:%S")))
 				else:
+					base.debugmsg(9, "sched_start_time")
 					self.display_plan['sched_start_time'].set("  {}  ".format(st.strftime("%H:%M:%S")))
 
+				base.debugmsg(9, "lbl_time_remaining")
 				self.display_plan['lbl_time_remaining'].set("  Remaining  ")
+				base.debugmsg(9, "time_remaining")
 				self.display_plan['time_remaining'].set("  {:<10}  ".format(base.format_sec_remain(sec2st)))
 
 			else:
 				try:
-					if 'lbl_sched_start_time' in self.display_plan:
+					base.debugmsg(9, "start")
+					if 'lbl_sched_start_time' in self.display_plan and base.keeprunning:
+						base.debugmsg(9, "lbl_sched_start_time")
 						self.display_plan['lbl_sched_start_time'].set("")
-					if 'sched_start_time' in self.display_plan:
+					if 'sched_start_time' in self.display_plan and base.keeprunning:
+						base.debugmsg(9, "sched_start_time")
 						self.display_plan['sched_start_time'].set("")
-					if 'lbl_time_remaining' in self.display_plan:
+					if 'lbl_time_remaining' in self.display_plan and base.keeprunning:
+						base.debugmsg(9, "lbl_time_remaining")
 						self.display_plan['lbl_time_remaining'].set("")
-					if 'time_remaining' in self.display_plan:
+					if 'time_remaining' in self.display_plan and base.keeprunning:
+						base.debugmsg(9, "time_remaining")
 						self.display_plan['time_remaining'].set("")
+					base.debugmsg(9, "stop")
 				except Exception:
 					pass
 
@@ -6184,9 +6185,8 @@ class RFSwarmGUI(tk.Frame):
 
 	def pln_update_graph(self):
 		base.debugmsg(6, "pln_update_graph", self.pln_graph_update)
-		time.sleep(0.1)
 
-		if not self.pln_graph_update:
+		if not self.pln_graph_update and base.keeprunning:
 			self.pln_graph_update = True
 
 			graphdata = {}
@@ -6205,7 +6205,7 @@ class RFSwarmGUI(tk.Frame):
 			base.debugmsg(6, "Scriptlist:", base.scriptlist)
 			for grp in base.scriptlist:
 				base.debugmsg(6, "grp:", grp)
-				if 'Index' in grp:
+				if 'Index' in grp and base.keeprunning:
 					if 'Test' in grp and len(grp['Test']) > 0:
 						name = "{} - {}".format(grp['Index'], grp['Test'])
 						graphdata[name] = {}
@@ -6307,9 +6307,10 @@ class RFSwarmGUI(tk.Frame):
 				rtotal += totalcalc[k]
 				graphdata["Total"]["Values"].append(rtotal)
 
-			self.axis.plot(graphdata["Total"]["objTime"], graphdata["Total"]["Values"], graphdata["Total"]["Colour"], label="Total")
+			if base.keeprunning:
+				self.axis.plot(graphdata["Total"]["objTime"], graphdata["Total"]["Values"], graphdata["Total"]["Colour"], label="Total")
 
-			if dodraw:
+			if dodraw and base.keeprunning:
 
 				self.axis.grid(True, 'major', 'both')
 
@@ -6330,6 +6331,8 @@ class RFSwarmGUI(tk.Frame):
 					base.debugmsg(9, "Graphdata:", graphdata, "Exception:", e)
 
 			self.pln_graph_update = False
+
+		time.sleep(0.1)
 
 	def addScriptRow(self, *args):
 		base.debugmsg(6, "addScriptRow")
@@ -6706,7 +6709,7 @@ class RFSwarmGUI(tk.Frame):
 		r = int(args[0][3:])
 		base.debugmsg(9, "sr_test_validate: r:", r)
 
-		if not base.args.nogui:
+		if not base.args.nogui and base.keeprunning:
 			# if 0 in self.scriptgrid.grid_slaves:
 			base.debugmsg(9, "sr_test_validate: grid_slaves:", self.scriptgrid.grid_slaves(column=self.plancoltst, row=r))
 			if len(self.scriptgrid.grid_slaves(column=self.plancoltst, row=r)) > 0:
@@ -6732,7 +6735,7 @@ class RFSwarmGUI(tk.Frame):
 
 		self.plan_scnro_chngd = True
 
-		if not base.args.nogui:
+		if not base.args.nogui and base.keeprunning:
 			try:
 				# self.pln_update_graph()
 				t = threading.Thread(target=self.pln_update_graph)
@@ -7487,9 +7490,9 @@ class RFSwarmGUI(tk.Frame):
 				base.saveini()
 
 			base.UpdateRunStats_SQL()
-
-			time.sleep(1)
-			self.UpdateRunStats()
+			if base.keeprunning:
+				time.sleep(1)
+				self.UpdateRunStats()
 
 	def UpdateRunStats(self):
 
@@ -7630,8 +7633,9 @@ class RFSwarmGUI(tk.Frame):
 			# May need to bind <Button-4> and <Button-5> to enable mouse scrolling
 			# https://www.python-course.eu/tkinter_events_binds.php
 
-			ut = threading.Thread(target=self.delayed_UpdateRunStats)
-			ut.start()
+			if base.keeprunning:
+				ut = threading.Thread(target=self.delayed_UpdateRunStats)
+				ut.start()
 
 	def ClickStop(self, _event=None):
 		if base.run_end < int(time.time()):
@@ -8129,7 +8133,8 @@ class RFSwarmGUI(tk.Frame):
 				self.mnu_file_Save()
 
 		base.config['Plan']['ScenarioFile'] = ""
-		self.mnu_file_New()
+		if base.keeprunning:
+			self.mnu_file_New()
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
