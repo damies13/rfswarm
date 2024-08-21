@@ -10,6 +10,173 @@ Suite Setup 	Set Platform
 ${scenario_name}=	test_scenario
 
 *** Test Cases ***
+Manager Command Line PORT -p
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+
+	VAR		&{run_settings_data}	bind_port_number=8148
+	VAR		@{mngr_options}			-p	${run_settings_data}[bind_port_number]
+	VAR		@{agent_options}		-m	http://localhost:${run_settings_data}[bind_port_number]/
+
+	Open Manager GUI	${mngr_options}
+	Log To Console	Check if Agent can connect to the new port number. New port number: ${run_settings_data}[bind_port_number].
+	Open Agent	${agent_options}
+	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
+	Run Keyword If	not ${status}	Fail
+	...    msg=The agent did not connect to the new port number!
+	Log To Console	The Agent has connected to the Manager with ${run_settings_data}[bind_port_number] port and this was expected.
+	Click Tab	Plan
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    GUI_Common.Stop Agent
+
+Manager Command Line IPADDRESS -e
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+
+	${ipv4}		${ipv6}		Get IP addresses
+	Log To Console		${\n}IPV4 address: ${ipv4} ${\n}IPV6 address: ${ipv6}${\n}
+	VAR		@{mngr_options}			-e	${ipv4}[0]
+	VAR		@{agent_options}		-m	http://${ipv4}[0]:8138/
+
+	Open Manager GUI	${mngr_options}
+	Log To Console	Check if Agent can connect to the Manager via ${ipv4}[0].
+	Open Agent	${agent_options}
+	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
+	Run Keyword If	not ${status}	Fail
+	...    msg=The agent did not connect to the Manager via ${ipv4}[0]!
+	Log To Console	The Agent has connected to the Manager via ${ipv4}[0] and this was expected.
+	Click Tab	Plan
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    GUI_Common.Stop Agent
+
+Manager Command Line DIR -d
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+
+	VAR		@{mngr_options}		-n	-d	${global_path}${/}Issue-#14
+
+	Create Directory	${global_path}${/}Issue-#14
+	Open Manager GUI	${mngr_options}
+	@{dir_list}=	List Directories In Directory	${global_path}${/}Issue-#14
+	Should Be Equal As Strings	${dir_list}[0]	PreRun	msg=Manager didn't create PreRun directory in the new Results directory!
+
+	[Teardown]	Run Keywords
+	...    Terminate Process	${process_manager}	AND
+	...    Remove Directory	${global_path}${/}Issue-#14		recursive=${True}
+
+Manager Command Line STARTTIME -t
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+
+	VAR		@{mngr_options}		-t	19:00:00
+
+	${current_date}=	Get Current Date	result_format=%H:%M:%S
+	Log To Console	Current time: ${current_date}
+	${time_diff}=	Subtract Date From Date
+	...    ${current_date}		19:00:00	date1_format=%H:%M:%S	date2_format=%H:%M:%S
+	Log To Console	Time diff: ${time_diff}
+	Run Keyword If	${time_diff} < ${10}	Sleep	11
+	Open Manager GUI	${mngr_options}
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
+	Take A Screenshot
+	# vvv CHANGE LATER vvv
+	# Run Keyword If	not ${status}	Fail	msg=Manager didn't set a scheduled start.
+
+	[Teardown]	Run Keyword		Close Manager GUI ${platform}
+
+Manager Command Line SCENARIO -s
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+
+	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
+	VAR		@{mngr_options}		-s	${scenariofile}
+
+	Open Manager GUI	${mngr_options}
+	Open Agent
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Log To Console	Run the example scenario to check that it has been loaded.
+	
+	TRY
+		Click Button	runplay
+		Wait For	manager_${platform}_button_stoprun.png	timeout=30
+	EXCEPT
+		Press key.enter 1 Times
+		Fail	msg=RFSwarm Manager didn't load and run the the example scenario!
+	END
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    GUI_Common.Stop Agent
+
+Manager Command Line AGENTS -a
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+
+	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
+	VAR		@{mngr_options}		-s	${scenariofile}	-a	2
+
+	Open Manager GUI	${mngr_options}
+	Log To Console	Run Agents only once, but 2 are needed. The Manager should display a special message.
+	Open Agent
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Click Button	runplay
+	${status}=	Run Keyword And Return Status
+	...    Wait For	${platform}_warning_label_not_enough_agents.png 	timeout=${10}
+	Run Keyword If	not ${status}	Fail	msg=The manager didn't display expected prompt dialogue that says: Not enough Agents available to run Robots!
+	Press key.enter 1 Times
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    GUI_Common.Stop Agent
+
+Manager Command Line SCENARIO -r
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+
+	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
+	VAR		@{mngr_options}		-s	${scenariofile}		-r
+
+	Open Manager GUI	${mngr_options}
+	Log To Console	Wait for the Agent to connect, after that the scenario should start automatically.
+	Open Agent
+	Check If The Agent Is Ready
+	TRY
+		Wait For	manager_${platform}_button_stoprun.png	timeout=30
+	EXCEPT
+		Press key.enter 1 Times
+		Fail	msg=RFSwarm Manager didn't run the scenario automatically after connecting to the Agent!
+	END
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    GUI_Common.Stop Agent
+
+Manager Command Line INI -i
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+
+	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmManager.ini
+	VAR		@{mngr_options}		-i	${inifile}
+
+	Open Manager GUI	${mngr_options}
+	Log To Console	Run Manager with alternate ini file with variable: display_index = True.
+	Click Tab	Run
+	Log To Console	Check that Index check box is selected.
+	${status}=	Run Keyword And Return Status
+	...    Wait For	${platform}_checkbox_checked_default.png 	timeout=${10}
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail
+	...    msg=The manager did not load alternate ini file because it cannot find checked check box in the Run tab!
+
+	[Teardown]	Run Keyword		Close Manager GUI ${platform}
+
 Verify the Field Validation Is Working In the Manager Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #126
 	[Setup]	Run Keywords

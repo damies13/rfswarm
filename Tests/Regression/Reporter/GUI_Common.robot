@@ -233,6 +233,7 @@ Open GUI
 	Get Platform
 	${keyword}= 	Set Variable 	Open GUI ${platform}
 	Run Keyword 	${keyword} 	@{appargs}
+	Sleep	3
 
 Get Platform
 	&{platforms}= 	Create Dictionary 	Linux=ubuntu 	Darwin=macos 	Java=notsupported 	Windows=windows
