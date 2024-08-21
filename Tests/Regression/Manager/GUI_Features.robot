@@ -1622,6 +1622,53 @@ Check If Test Scenario Run Will Stop Gradually
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove File		${global_path}${/}example.robot
 
+Verify the Robot Count Reduces When Stop Agent While Test Is Running
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #57	Issue #269
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]
+
+	${scenario_path}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#57${/}Issue-#57.rfs
+	@{mngr_options}=	Create List		-s		${scenario_path}
+
+	Open Manager GUI	${mngr_options}
+	Open Agent
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Click Button	runplay
+	Sleep	60
+	Set Confidence	0.95	#sometimes cant find 10 robots image
+	${status}=	Run Keyword And Return Status
+	...    Wait For		manager_${platform}_robots_10.png 	timeout=${60}
+	Run Keyword If	not ${status}	Fail	msg=Manager could not reach 10 robots after 60s.
+
+	Log To Console	Stopping agent while test is running.
+	GUI_Common.Stop Agent
+	Click Tab	Agents
+	${status}=	Run Keyword And Return Status
+	...    Wait For		manager_${platform}_agents_offline.png 	timeout=${60}
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Agent did not get marked as "offline?".
+	${status}=	Run Keyword And Return Status
+	...    Wait For		manager_${platform}_agents_blank.png 	timeout=${60}
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Agent did not disconnect form Manager completly. It is still connected.
+
+	Log To Console	Checking if robot count will reduce to 0 after shuting down Agent.
+	Click Tab	Run
+	${status}=	Run Keyword And Return Status
+	...    Wait For		manager_${platform}_robots_0.png 	timeout=${60}
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Manager didnt reduce robot count form 10 to 0 in 60s after disconnecting Agent.
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${120}
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    GUI_Common.Stop Agent							AND
+	...    Set Confidence	0.9
+
 Verify the Files Referenced In the Scenario Are All Using Relative Paths
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #54
 	[Setup]	Run Keywords
