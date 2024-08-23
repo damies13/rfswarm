@@ -41,6 +41,7 @@ setup(
 	# package_dir={"": "rfswarm_manager"},
 	# package_data={"desktop": ["*.png"]},
 	data_files = [('rfswarm_manager/desktop', ['rfswarm_manager/desktop/rfswarm-manager-128.png'])],
+	data_files = [('rfswarm_manager/desktop', ['rfswarm_manager/desktop/rfswarm-logo-128.png'])],
 	include_package_data=True,
 	# I needed a recent version of pip (pip 21.0.1 worked my previous <20 version didn't) for matplotlib
 	# 	to actually install withput error

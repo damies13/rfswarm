@@ -53,7 +53,7 @@ def main():
 		directorydata.append('Icon=rfswarm\n')
 
 		try:
-			directoryfilename = os.path.join(os.path.expanduser("~/.local/share/desktop-directories"), "rfswarm.desktop")
+			directoryfilename = os.path.join(os.path.expanduser("~/.local/share/desktop-directories"), "rfswarm.directory")
 			directorydir = os.path.dirname(directoryfilename)
 			if not os.path.exists(directorydir):
 				os.mkdir(directorydir)
@@ -61,6 +61,11 @@ def main():
 			print("directoryfilename:", directoryfilename)
 			with open(directoryfilename, 'w') as df:
 				df.writelines(directorydata)
+			directoryfilename = os.path.join(os.path.expanduser("~/.local/share/applications"), "rfswarm.directory")
+			print("directoryfilename:", directoryfilename)
+			with open(directoryfilename, 'w') as df:
+				df.writelines(directorydata)
+
 		except:
 			pass
 
@@ -73,7 +78,7 @@ def main():
 		desktopdata.append('Type=Application\n')
 		desktopdata.append('Icon=rfswarm-manager\n')
 		desktopdata.append('Categories=RFSwarm\n')
-		desktopdata.append('Keywords=rfswarm;\n')
+		desktopdata.append('Keywords=rfswarm;manager;\n')
 		# desktopdata.append('Icon=rfswarm-manager.png\n')
 		# desktopdata.append('\n')
 
