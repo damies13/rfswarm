@@ -32,7 +32,7 @@ Manager Command Line PORT -p
 	...    GUI_Common.Stop Agent
 
 Manager Command Line IPADDRESS -e
-	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
 
 	${ipv4}		${ipv6}		Get IP addresses
@@ -66,7 +66,7 @@ Manager Command Line DIR -d
 
 	[Teardown]	Run Keywords
 	...    Terminate Process	${process_manager}	AND
-	...    Remove Directory	${global_path}${/}Issue-#14		recursive=${True}
+	...    Remove Directory		${global_path}${/}Issue-#14		recursive=${True}
 
 Manager Command Line STARTTIME -t
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
@@ -119,7 +119,7 @@ Manager Command Line AGENTS -a
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
 
 	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
-	VAR		@{mngr_options}		-s	${scenariofile}	-a	2
+	VAR		@{mngr_options}		-s	${scenariofile} 	-a	2
 
 	Open Manager GUI	${mngr_options}
 	Log To Console	Run Agents only once, but 2 are needed. The Manager should display a special message.

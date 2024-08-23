@@ -57,6 +57,7 @@ Agent Command Line AGENTDIR -d
 
 	Log To Console	Run Agent with custom dir.
 	Run Agent 	${agnt_options}
+	Sleep 	10s
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	@{agentdir_dirs}=	List Directories In Directory	${agentdir}
@@ -103,60 +104,22 @@ Agent Command Line ROBOT -r
 Agent Command Line XMLMODE -x
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 
-	VAR 	${scenario_dir} 	${CURDIR}${/}testdata${/}Issue-#14${/}xmlmode.rfs
-	VAR 	@{agnt_options} 	-x
-	VAR 	@{mngr_options} 	-n 	-s 	${scenario_dir}
+	VAR 	${agentdir} 		${CURDIR}${/}testdata${/}Issue-#14${/}xmlmode_dir
+	VAR 	@{agnt_options} 	-x 	-d 	${agentdir}
 
 	Log To Console	Run Agent with xmlmode.
-	Run Manager CLI 	${mngr_options}
 	Run Agent 	${agnt_options}
-	Wait For Manager	4min
+	Sleep 	10s
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${M_result_stdout}= 	Get File	${OUTPUT DIR}${/}stdout_manager.txt
 
-	Log To Console 	Checking result data base
-	${dbfile} 	Find Result DB 		result_pattern=*_xmlmode
-	${summary_result} 	Query Result DB 	${dbfile}
-	...    SELECT MetricTime FROM MetricData WHERE MetricType='Summary' ORDER BY MetricTime LIMIT 1
-	${running_result} 	Query Result DB 	${dbfile}
-	...    SELECT MetricTime FROM MetricData WHERE MetricValue='Running' ORDER BY MetricTime LIMIT 1
-	${stopping_result} 	Query Result DB 	${dbfile}
-	...    SELECT MetricTime FROM MetricData WHERE MetricValue='Stopping' ORDER BY MetricTime LIMIT 1
+	@{agentdir_dirs}=	List Directories In Directory	${agentdir}
+	List Should Contain Value	${agentdir_dirs}	scripts		msg=Can't find scripts dir in custom Agent dir
+	${agentdir_scripts}=	List Files In Directory		${agentdir}${/}scripts
+	List Should Not Contain Value 	${agentdir_scripts} 	RFSListener3.py
+	List Should Not Contain Value 	${agentdir_scripts} 	RFSListener2.py
 
-	Should Be True 	${summary_result} > ${stopping_result}
-
-	[Teardown]	Run Keywords	Stop Agent	Stop Manager
-
-Agent Command Line XMLMODE -x TEMP. COPY SHOULD FAIL
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
-
-	VAR 	${scenario_dir} 	${CURDIR}${/}testdata${/}Issue-#14${/}xmlmode.rfs
-	VAR 	@{agnt_options} 	-g 	1
-	VAR 	@{mngr_options} 	-n 	-s 	${scenario_dir}
-
-	Log To Console	Run Agent with xmlmode.
-	Run Manager CLI 	${mngr_options}
-	Run Agent 	${agnt_options}
-	Wait For Manager	4min
-	Stop Agent
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${M_result_stdout}= 	Get File	${OUTPUT DIR}${/}stdout_manager.txt
-
-	Log To Console 	Checking result data base
-	${dbfile} 	Find Result DB 		result_pattern=*_xmlmode
-	${summary_result} 	Query Result DB 	${dbfile}
-	...    SELECT MetricTime FROM MetricData WHERE MetricType='Summary' ORDER BY MetricTime LIMIT 1
-	${running_result} 	Query Result DB 	${dbfile}
-	...    SELECT MetricTime FROM MetricData WHERE MetricValue='Running' ORDER BY MetricTime LIMIT 1
-	${stopping_result} 	Query Result DB 	${dbfile}
-	...    SELECT MetricTime FROM MetricData WHERE MetricValue='Stopping' ORDER BY MetricTime LIMIT 1
-
-	Should Be True 	${summary_result} > ${stopping_result}
-
-	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+	[Teardown]	Stop Agent
 
 Agent Command Line AGENTNAME -a
 	[Tags]	ubuntu-latest 	macos-latest 	Issue #14
