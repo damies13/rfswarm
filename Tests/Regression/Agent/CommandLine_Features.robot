@@ -89,6 +89,8 @@ Agent Command Line ROBOT -r
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 
 	@{test_result}=	List Directories In Directory	${results_dir}	absolute=${True}	pattern=*_Issue-#14
 	Log To Console		Result dir: ${test_result}

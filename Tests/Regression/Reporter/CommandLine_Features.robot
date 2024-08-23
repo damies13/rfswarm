@@ -5,7 +5,7 @@ Suite Setup 	Set Platform
 
 *** Test Cases ***
 Reporter Command Line INI -i
-	#[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 
 	VAR 	${testdata}			Issue-#14${/}result_dir
 	VAR 	${resultdata}		ini_testcase
@@ -33,7 +33,7 @@ Reporter Command Line INI -i
 	Should Contain 	${html_content} 	<div class="body"><p>This is a test for Issue-#14</p></div>
 
 Manager Command Line DIR -d
-	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 
 	${testdata}		Set Variable	Issue-#14${/}result_dir
 	${resultdata}	Set Variable	20240622_182505_test_scenario
@@ -56,7 +56,7 @@ Manager Command Line DIR -d
 	...    msg=results path value did not save correctly [settings != scenario]!
 
 Reporter Command Line TEMPLATE -t
-	#[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 
 	${basefolder}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14
 	${templatefile}=	Normalize Path	${basefolder}${/}Issue-#14.template
@@ -79,7 +79,7 @@ Reporter Command Line TEMPLATE -t
 	...    msg=templatedir path value did not save correctly [settings != scenario]!
 
 Manager Command Line HTML report --html
-	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 
 	${testdata}		Set Variable	Issue-#14${/}result_dir
 	${resultdata}	Set Variable	20240622_182505_test_scenario
@@ -92,7 +92,7 @@ Manager Command Line HTML report --html
 	List Should Contain Value	${result_files}		${resultdata}.html
 
 Manager Command Line HTML report --docx
-	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 
 	${testdata}		Set Variable	Issue-#14${/}result_dir
 	${resultdata}	Set Variable	20240622_182505_test_scenario
@@ -105,7 +105,7 @@ Manager Command Line HTML report --docx
 	List Should Contain Value	${result_files}		${resultdata}.docx
 
 Manager Command Line HTML report --xlsx
-	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 
 	${testdata}		Set Variable	Issue-#14${/}result_dir
 	${resultdata}	Set Variable	20240622_182505_test_scenario
