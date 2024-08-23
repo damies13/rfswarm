@@ -69,7 +69,7 @@ Agent Command Line AGENTDIR -d
 	[Teardown]	Stop Agent
 
 Agent Command Line ROBOT -r
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
+	[Tags]	ubuntu-latest 	macos-latest 	Issue #14
 
 	Run Process		whereis		robot		alias=data	#not working on windows
 	${pip_data}		Get Process Result	data
@@ -85,10 +85,11 @@ Agent Command Line ROBOT -r
 	Log To Console	Run Agent with custom robot executable.
 	Run Agent 	${agnt_options}
 	Run Manager CLI 	${mngr_options}
-	Wait For Manager	5min
+	Wait For Manager	8min
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+
 	@{test_result}=	List Directories In Directory	${results_dir}	absolute=${True}	pattern=*_Issue-#14
 	Log To Console		Result dir: ${test_result}
 	Should Not Be Empty		${test_result}

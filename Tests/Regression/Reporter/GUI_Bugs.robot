@@ -2,6 +2,7 @@
 Resource 	GUI_Common.robot
 Library 	XML 	use_lxml=True
 
+Suite Setup 	Set Platform
 Test Teardown 	Close GUI
 
 *** Test Cases ***

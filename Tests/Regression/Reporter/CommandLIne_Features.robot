@@ -2,7 +2,6 @@
 Resource 	GUI_Common.robot
 
 Suite Setup 	Set Platform
-Test Teardown 	Close GUI
 
 *** Test Cases ***
 Reporter Command Line INI -i
@@ -23,7 +22,7 @@ Reporter Command Line INI -i
 
 	Log To Console	Run Reporter with alternate ini file with variable: template = ${test_dir}${/}RFSwarmReporter.ini.
 	Open GUI	-i	${test_dir}${/}RFSwarmReporter.ini 	-d	${resultfolder} 	-n 	--html
-	Log To Console	Check that Robots section exist in html.
+	Log To Console	Check that template elements exist in html.
 	@{html_files}=		List Files In Directory		${resultfolder} 	absolute=True 	pattern=*.html
 	Log To Console	${\n}All result files: ${html_files}${\n}
 	Length Should Be 	${html_files} 	1
