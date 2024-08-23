@@ -79,7 +79,7 @@ Agent Command Line ROBOT -r
 
 	VAR 	${robot_exec} 		${pip_data_list}[1]
 	VAR 	${scenario_dir} 	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
-	VAR 	@{agnt_options} 	-r 	${robot_exec}
+	VAR 	@{agnt_options} 	-g 	1	#-r 	${robot_exec}
 	VAR 	@{mngr_options} 	-n 	-s 	${scenario_dir}
 
 	Log To Console	Run Agent with custom robot executable.
