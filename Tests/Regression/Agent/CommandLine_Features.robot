@@ -16,3 +16,189 @@ Agent Help
 	${result}= 	Run 	rfswarm-agent -h
 	Log to console 	${\n}${result}
 	Should Contain	${result}	AGENTNAME
+
+Agent Command Line INI -i
+	[Tags]	ubuntu-latest 	macos-latest 	Issue #14
+
+	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmAgent.ini
+	VAR		@{agnt_options}		-i	${inifile}
+
+	Run Agent 	${agnt_options}
+	Log To Console	Run Agent with alternate ini file with variable.
+	Stop Agent
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
+	Should Contain	${result_stdout}	${inifile}
+
+	[Teardown]	Stop Agent
+
+Agent Command Line MANAGER -m
+	[Tags]	ubuntu-latest 	macos-latest 	Issue #14
+
+	VAR 	@{agnt_options} 	-m 	http://localhost:8138
+	VAR 	@{mngr_options} 	-n
+
+	Log To Console	Run Agent and Manager and see if they will connect.
+	Run Agent 	${agnt_options}
+	Run Manager CLI 	${mngr_options}
+	Wait For Manager	10s
+	Stop Agent
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
+	Should Contain	${result_stdout}	Manager Connected
+
+	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+
+Agent Command Line AGENTDIR -d
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
+
+	VAR 	${agentdir} 		${CURDIR}${/}testdata${/}Issue-#14${/}agentdir
+	VAR 	@{agnt_options} 	-d 	${agentdir}
+
+	Log To Console	Run Agent with custom dir.
+	Run Agent 	${agnt_options}
+	Stop Agent
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	@{agentdir_dirs}=	List Directories In Directory	${agentdir}
+	List Should Contain Value	${agentdir_dirs}	scripts		msg=Can't find scripts dir in custom Agent dir
+	${agentdir_scripts}=	List Files In Directory		${agentdir}${/}scripts
+	Should Not Be Empty		${agentdir_scripts}
+
+	[Teardown]	Stop Agent
+
+Agent Command Line ROBOT -r
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
+
+	Run Process		whereis		robot		alias=data	#not working on windows
+	${pip_data}		Get Process Result	data
+	Should Not Be Empty		${pip_data.stdout}		msg=Cant find robotframework pip informations
+	${pip_data_list}=	Split String	${pip_data.stdout}
+	Log To Console	robot executable: ${pip_data_list}[1]
+
+	VAR 	${robot_exec} 		${pip_data_list}[1]
+	VAR 	${scenario_dir} 	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
+	VAR 	@{agnt_options} 	-r 	${robot_exec}
+	VAR 	@{mngr_options} 	-n 	-r 	-s 	${scenario_dir}
+
+	Log To Console	Run Agent with custom robot executable.
+	Run Agent 	${agnt_options}
+	Run Manager CLI 	${mngr_options}
+	Wait For Manager	5min
+	Stop Agent
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	${M_result_stdout}= 	Get File	${OUTPUT DIR}${/}stdout_manager.txt
+	Should Contain	${M_result_stdout}	Test Completed
+	@{test_result}=	List Directories In Directory	${results_dir}	absolute=${True}	pattern=*_Issue-#14
+	Log To Console		Result dir: ${test_result}
+	Should Not Be Empty		${test_result}
+	@{result_content}=	List Directories In Directory	${test_result}[0]
+	Log To Console		Result dir content: ${result_content}
+	Should Not Be Empty		${result_content}
+	@{test_logs}=	List Directories In Directory	${test_result}[0]${/}logs
+	Should Not Be Empty		${test_logs}
+
+	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+
+Agent Command Line XMLMODE -x
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
+
+	VAR 	${scenario_dir} 	${CURDIR}${/}testdata${/}Issue-#14${/}xmlmode.rfs
+	VAR 	@{agnt_options} 	-x
+	VAR 	@{mngr_options} 	-n 	-s 	${scenario_dir}
+
+	Log To Console	Run Agent with xmlmode.
+	Run Manager CLI 	${mngr_options}
+	Run Agent 	${agnt_options}
+	Wait For Manager	4min
+	Stop Agent
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	${M_result_stdout}= 	Get File	${OUTPUT DIR}${/}stdout_manager.txt
+
+	Log To Console 	Checking result data base
+	${dbfile} 	Find Result DB 		result_pattern=*_xmlmode
+	${summary_result} 	Query Result DB 	${dbfile}
+	...    SELECT MetricTime FROM MetricData WHERE MetricType='Summary' ORDER BY MetricTime LIMIT 1
+	${running_result} 	Query Result DB 	${dbfile}
+	...    SELECT MetricTime FROM MetricData WHERE MetricValue='Running' ORDER BY MetricTime LIMIT 1
+	${stopping_result} 	Query Result DB 	${dbfile}
+	...    SELECT MetricTime FROM MetricData WHERE MetricValue='Stopping' ORDER BY MetricTime LIMIT 1
+
+	Should Be True 	${summary_result} > ${stopping_result}
+
+	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+
+Agent Command Line XMLMODE -x TEMP. COPY SHOULD FAIL
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
+
+	VAR 	${scenario_dir} 	${CURDIR}${/}testdata${/}Issue-#14${/}xmlmode.rfs
+	VAR 	@{agnt_options} 	-g 	1
+	VAR 	@{mngr_options} 	-n 	-s 	${scenario_dir}
+
+	Log To Console	Run Agent with xmlmode.
+	Run Manager CLI 	${mngr_options}
+	Run Agent 	${agnt_options}
+	Wait For Manager	4min
+	Stop Agent
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	${M_result_stdout}= 	Get File	${OUTPUT DIR}${/}stdout_manager.txt
+
+	Log To Console 	Checking result data base
+	${dbfile} 	Find Result DB 		result_pattern=*_xmlmode
+	${summary_result} 	Query Result DB 	${dbfile}
+	...    SELECT MetricTime FROM MetricData WHERE MetricType='Summary' ORDER BY MetricTime LIMIT 1
+	${running_result} 	Query Result DB 	${dbfile}
+	...    SELECT MetricTime FROM MetricData WHERE MetricValue='Running' ORDER BY MetricTime LIMIT 1
+	${stopping_result} 	Query Result DB 	${dbfile}
+	...    SELECT MetricTime FROM MetricData WHERE MetricValue='Stopping' ORDER BY MetricTime LIMIT 1
+
+	Should Be True 	${summary_result} > ${stopping_result}
+
+	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+
+Agent Command Line AGENTNAME -a
+	[Tags]	ubuntu-latest 	macos-latest 	Issue #14
+
+	VAR 	${agent_name} 		Issue-#14AGENTNAME
+	VAR 	@{agnt_options} 	-a 	${agent_name}
+	VAR 	@{mngr_options} 	-n 	-g 	6
+
+	Log To Console	Run Agent with custom agent name.
+	Run Agent 	${agnt_options}
+	Run Manager CLI 	${mngr_options}
+	Sleep	25s
+	Stop Manager
+	Stop Agent
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	${result_stdout}= 	Get File	${OUTPUT DIR}${/}stdout_manager.txt
+	Log 	${result_stdout}
+	Should Contain	${result_stdout}	${agent_name}
+
+	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+
+Agent Command Line PROPERTY -p
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
+
+	VAR 	@{agnt_options} 	-p 	Issue-#14
+	VAR 	@{mngr_options} 	-n
+
+	Log To Console	Run Agent with custom prop.
+	Run Agent 	${agnt_options}
+	Run Manager CLI 	${mngr_options}
+	Sleep	20s
+	Stop Agent
+	Stop Manager
+
+	Log To Console 	Checking result data base
+	${dbfile} 	Find Result DB 		result_pattern=PreRun
+	${prop_result} 	Query Result DB 	${dbfile}
+	...    SELECT * FROM MetricData WHERE MetricType='Agent' AND SecondaryMetric='Issue-#14'
+
+	${len}= 	Get Length 	${prop_result}
+	Should Be True 	${len} > 0
+	...    msg=Custom propery 'Issue-#14' not found in PreRun db. ${\n}Query Result: ${prop_result}
+
+	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+
