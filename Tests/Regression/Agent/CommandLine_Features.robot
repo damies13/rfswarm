@@ -80,11 +80,11 @@ Agent Command Line ROBOT -r
 	VAR 	${robot_exec} 		${pip_data_list}[1]
 	VAR 	${scenario_dir} 	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
 	VAR 	@{agnt_options} 	-r 	${robot_exec}
-	VAR 	@{mngr_options} 	-n 	-r 	-s 	${scenario_dir}
+	VAR 	@{mngr_options} 	-n 	-s 	${scenario_dir}
 
 	Log To Console	Run Agent with custom robot executable.
-	Run Agent 	${agnt_options}
 	Run Manager CLI 	${mngr_options}
+	Run Agent 	${agnt_options}
 	Wait For Manager	8min
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt

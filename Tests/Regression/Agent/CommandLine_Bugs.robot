@@ -1,5 +1,6 @@
 *** Settings ***
 Resource 	CommandLine_Common.robot
+Suite Setup 	Set Platform
 
 *** Test Cases ***
 Exclude Libraries With Spaces
