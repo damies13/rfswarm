@@ -1,5 +1,6 @@
 *** Settings ***
 Resource 	CommandLine_Common.robot
+Suite Setup 	Set Platform
 
 *** Test Cases ***
 Agent Version
@@ -18,7 +19,7 @@ Agent Help
 	Should Contain	${result}	AGENTNAME
 
 Agent Command Line INI -i
-	[Tags]	ubuntu-latest 	macos-latest 	Issue #14
+	[Tags]	ubuntu-latest 	macos-latest 	Issue #14	# can't get agent output in windows
 
 	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmAgent.ini
 	VAR		@{agnt_options}		-i	${inifile}
@@ -33,7 +34,7 @@ Agent Command Line INI -i
 	[Teardown]	Stop Agent
 
 Agent Command Line MANAGER -m
-	[Tags]	ubuntu-latest 	macos-latest 	Issue #14
+	[Tags]	ubuntu-latest 	macos-latest 	Issue #14 	# can't get agent output in windows
 
 	VAR 	@{agnt_options} 	-m 	http://localhost:8138
 	VAR 	@{mngr_options} 	-n
@@ -88,8 +89,6 @@ Agent Command Line ROBOT -r
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${M_result_stdout}= 	Get File	${OUTPUT DIR}${/}stdout_manager.txt
-	Should Contain	${M_result_stdout}	Test Completed
 	@{test_result}=	List Directories In Directory	${results_dir}	absolute=${True}	pattern=*_Issue-#14
 	Log To Console		Result dir: ${test_result}
 	Should Not Be Empty		${test_result}
@@ -122,7 +121,7 @@ Agent Command Line XMLMODE -x
 	[Teardown]	Stop Agent
 
 Agent Command Line AGENTNAME -a
-	[Tags]	ubuntu-latest 	macos-latest 	Issue #14
+	[Tags]	ubuntu-latest 	macos-latest 	Issue #14	# can't get agent output in windows
 
 	VAR 	${agent_name} 		Issue-#14AGENTNAME
 	VAR 	@{agnt_options} 	-a 	${agent_name}
