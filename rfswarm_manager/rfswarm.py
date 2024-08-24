@@ -2751,8 +2751,6 @@ class RFSwarmCore:
 		base.debugmsg(5, "script_dir:", script_dir)
 
 		if platform.system() == 'Linux':
-			# https://forums.linuxmint.com/viewtopic.php?p=2269391#p2269391
-
 			fileprefix = "~/.local/share"
 			if os.access("/usr/share", os.W_OK):
 				fileprefix = "/usr/share"
@@ -2791,13 +2789,8 @@ class RFSwarmCore:
 			desktopdata.append('Icon=rfswarm-manager\n')
 			desktopdata.append('Categories=RFSwarm;Development;\n')
 			desktopdata.append('Keywords=rfswarm;manager;\n')
-			# desktopdata.append('Icon=rfswarm-manager.png\n')
 			# desktopdata.append('\n')
 
-			# /usr/share/applications/
-			# or
-			# ~/.local/share/applications
-			# dektopfilename = os.path.join(os.path.abspath("~/.local/share/applications"), "rfswarm-manager.desktop")
 			dektopfilename = os.path.join(fileprefix, "applications", "rfswarm-manager.desktop")
 			dektopdir = os.path.dirname(dektopfilename)
 			base.ensuredir(dektopdir)
@@ -2813,22 +2806,17 @@ class RFSwarmCore:
 			#  ~/.local/share/icons/hicolor/256x256/apps/
 			src_iconx128 = os.path.join(script_dir, "rfswarm-manager-128.png")
 			base.debugmsg(5, "src_iconx128:", src_iconx128)
-
-			# dst_iconx128 = os.path.join(os.path.abspath("~/.local/share/icons/hicolor/128x128/apps"), "rfswarm-manager.png")
 			dst_iconx128 = os.path.join(fileprefix, "icons", "hicolor", "128x128", "apps", "rfswarm-manager.png")
 			dst_icondir = os.path.dirname(dst_iconx128)
 			base.ensuredir(dst_icondir)
-
 			base.debugmsg(5, "dst_iconx128:", dst_iconx128)
 			shutil.copy(src_iconx128, dst_iconx128)
 
 			src_iconx128 = os.path.join(script_dir, "rfswarm-logo-128.png")
 			base.debugmsg(5, "src_iconx128:", src_iconx128)
-
 			dst_iconx128 = os.path.join(fileprefix, "icons", "hicolor", "128x128", "apps", "rfswarm-logo.png")
 			base.debugmsg(5, "dst_iconx128:", dst_iconx128)
 			shutil.copy(src_iconx128, dst_iconx128)
-
 
 		if platform.system() == 'Darwin':
 			base.debugmsg(5, "Create folder structure in /Applications")
