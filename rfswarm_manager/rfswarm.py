@@ -2766,19 +2766,20 @@ class RFSwarmCore:
 			directorydata.append('Name=RFSwarm\n')
 			directorydata.append('Icon=rfswarm-logo\n')
 
-			try:
-				directoryfilename = os.path.join(fileprefix, "desktop-directories", "rfswarm.directory")
-				directorydir = os.path.dirname(directoryfilename)
-				if not os.path.exists(directorydir):
-					os.mkdir(directorydir)
+			directoryfilename = os.path.join(fileprefix, "desktop-directories", "rfswarm.directory")
+			directorydir = os.path.dirname(directoryfilename)
+			base.ensuredir(directorydir)
 
-				base.debugmsg(5, "directoryfilename:", directoryfilename)
-				with open(directoryfilename, 'w') as df:
-					df.writelines(directorydata)
-				directoryfilename = os.path.join(fileprefix, "applications", "rfswarm.directory")
-				base.debugmsg(5, "directoryfilename:", directoryfilename)
-				with open(directoryfilename, 'w') as df:
-					df.writelines(directorydata)
+			base.debugmsg(5, "directoryfilename:", directoryfilename)
+			with open(directoryfilename, 'w') as df:
+				df.writelines(directorydata)
+
+			directoryfilename = os.path.join(fileprefix, "applications", "rfswarm.directory")
+			directorydir = os.path.dirname(directoryfilename)
+			base.ensuredir(directorydir)
+			base.debugmsg(5, "directoryfilename:", directoryfilename)
+			with open(directoryfilename, 'w') as df:
+				df.writelines(directorydata)
 
 			except:
 				pass
@@ -2801,6 +2802,8 @@ class RFSwarmCore:
 			# ~/.local/share/applications
 			# dektopfilename = os.path.join(os.path.abspath("~/.local/share/applications"), "rfswarm-manager.desktop")
 			dektopfilename = os.path.join(fileprefix, "applications", "rfswarm-manager.desktop")
+			dektopdir = os.path.dirname(dektopfilename)
+			base.ensuredir(dektopdir)
 
 			base.debugmsg(5, "dektopfilename:", dektopfilename)
 			with open(dektopfilename, 'w') as df:
@@ -2816,6 +2819,9 @@ class RFSwarmCore:
 
 			# dst_iconx128 = os.path.join(os.path.abspath("~/.local/share/icons/hicolor/128x128/apps"), "rfswarm-manager.png")
 			dst_iconx128 = os.path.join(fileprefix, "icons", "hicolor", "128x128", "apps", "rfswarm-manager.png")
+			dst_icondir = os.path.dirname(dst_iconx128)
+			base.ensuredir(dst_icondir)
+
 			base.debugmsg(5, "dst_iconx128:", dst_iconx128)
 			shutil.copy(src_iconx128, dst_iconx128)
 
