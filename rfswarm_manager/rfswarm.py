@@ -2781,9 +2781,6 @@ class RFSwarmCore:
 			with open(directoryfilename, 'w') as df:
 				df.writelines(directorydata)
 
-			except:
-				pass
-
 			base.debugmsg(5, "Create .desktop file")
 			desktopdata = []
 			desktopdata.append('[Desktop Entry]\n')
@@ -2792,7 +2789,7 @@ class RFSwarmCore:
 			desktopdata.append('Terminal=false\n')
 			desktopdata.append('Type=Application\n')
 			desktopdata.append('Icon=rfswarm-manager\n')
-			desktopdata.append('Categories=RFSwarm\n')
+			desktopdata.append('Categories=RFSwarm;Development;\n')
 			desktopdata.append('Keywords=rfswarm;manager;\n')
 			# desktopdata.append('Icon=rfswarm-manager.png\n')
 			# desktopdata.append('\n')
@@ -3861,7 +3858,7 @@ class RFSwarmGUI(tk.Frame):
 
 	def __init__(self, master=None):
 
-		self.root = tk.Tk()
+		self.root = tk.Tk(className="RFSwarm Manager")
 		self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
 		tk.Frame.__init__(self, self.root)
 		# self.grid(sticky="nsew")
@@ -3892,6 +3889,7 @@ class RFSwarmGUI(tk.Frame):
 		# base.debugmsg(5, "bgclr", bgclr)
 		# https://github.com/tcltk/tk/blob/main/macosx/README
 
+		self.set_app_icon()
 		self.load_icons()
 
 		base.debugmsg(6, "BuildUI")
@@ -3919,6 +3917,14 @@ class RFSwarmGUI(tk.Frame):
 		self.icoAbort = self.get_icon("Abort")
 		self.icoAborted = self.get_icon("Aborted")
 		self.icoRefresh = self.get_icon("Refresh")
+
+	def set_app_icon(self):
+		script_dir = os.path.dirname(os.path.abspath(__file__))
+		icon_dir = os.path.join(script_dir, "icons")
+		base.debugmsg(5, "icon_dir:", icon_dir)
+		icon_file = os.path.join(icon_dir, "rfswarm-manager-128.png")
+		icon = tk.PhotoImage(file=icon_file)
+		self.root.wm_iconphoto(False, icon)
 
 	def on_closing(self, _event=None):
 
