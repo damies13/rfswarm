@@ -2425,8 +2425,8 @@ class RFSwarmCore:
 			exit()
 
 		if base.args.create:
-			if base.args.create = "ICONS":
-				pass
+			if base.args.create == "ICONS":
+				self.create_icons()
 			exit()
 
 
@@ -2739,7 +2739,7 @@ class RFSwarmCore:
 				pass
 
 	def create_icons(self):
-		base.debugmsg(5, "Create application icons for RFSwarm Manager")
+		base.debugmsg(0, "Creating application icons for RFSwarm Manager")
 		pipdata = importlib.metadata.distribution('rfswarm-manager')
 		# print("files:", pipdata.files)
 		# print("file0:", pipdata.files[0])
