@@ -2747,8 +2747,9 @@ class RFSwarmCore:
 		base.debugmsg(5, "manager_executable:", manager_executable)
 
 		script_dir = os.path.dirname(os.path.abspath(__file__))
-		script_dir = os.path.join(script_dir, "icons")
 		base.debugmsg(5, "script_dir:", script_dir)
+		icon_dir = os.path.join(pipdata.locate_file('rfswarm_manager'), "icons")
+		base.debugmsg(5, "icon_dir:", icon_dir)
 
 		if platform.system() == 'Linux':
 			fileprefix = "~/.local/share"
@@ -2804,7 +2805,7 @@ class RFSwarmCore:
 			# 	1024x1024  128x128  16x16  192x192  22x22  24x24  256x256  32x32  36x36  42x42  48x48  512x512  64x64  72x72  8x8  96x96
 			# or
 			#  ~/.local/share/icons/hicolor/256x256/apps/
-			src_iconx128 = os.path.join(script_dir, "rfswarm-manager-128.png")
+			src_iconx128 = os.path.join(icon_dir, "rfswarm-manager-128.png")
 			base.debugmsg(5, "src_iconx128:", src_iconx128)
 			dst_iconx128 = os.path.join(fileprefix, "icons", "hicolor", "128x128", "apps", "rfswarm-manager.png")
 			dst_icondir = os.path.dirname(dst_iconx128)
@@ -2812,7 +2813,7 @@ class RFSwarmCore:
 			base.debugmsg(5, "dst_iconx128:", dst_iconx128)
 			shutil.copy(src_iconx128, dst_iconx128)
 
-			src_iconx128 = os.path.join(script_dir, "rfswarm-logo-128.png")
+			src_iconx128 = os.path.join(icon_dir, "rfswarm-logo-128.png")
 			base.debugmsg(5, "src_iconx128:", src_iconx128)
 			dst_iconx128 = os.path.join(fileprefix, "icons", "hicolor", "128x128", "apps", "rfswarm-logo.png")
 			base.debugmsg(5, "dst_iconx128:", dst_iconx128)
@@ -2823,7 +2824,34 @@ class RFSwarmCore:
 
 		if platform.system() == 'Windows':
 			base.debugmsg(5, "Create Startmenu shorcuts")
+			roam_appdata = os.environ["APPDATA"]
+			scutpath = os.path.join(roam_appdata, "Microsoft", "Windows", "Start Menu", "RFSwarm Manager.lnk")
+			# targetpath = "c:\\Users\\Dave\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\rfswarm.exe"
+			# iconpath = "c:\\Users\\Dave\\AppData\\Local\\Programs\\Python\\Python311\\Lib\site-packages\\rfswarm_manager\\icons\\rfswarm-manager-128.ico"
+			src_iconx128 = os.path.join(icon_dir, "rfswarm-manager-128.ico")
 
+			self.create_windows_shortcut(scutpath, manager_executable, src_iconx128, "Performance testing with robot test cases")
+
+
+	def create_windows_shortcut(self, scutpath, targetpath, iconpath, desc, minimised=False):
+	    pslst = []
+
+	    pslst.append("$wshshell = New-Object -COMObject wscript.shell")
+	    pslst.append('$scut = $wshshell.CreateShortcut("""' + scutpath + '""")')
+	    pslst.append('$scut.TargetPath = """' + targetpath + '"""')
+	    pslst.append('$scut.IconLocation = """' + iconpath + '"""')
+	    if minimised:
+	        pslst.append("$scut.WindowStyle = 7")
+	    pslst.append("$scut.Description = '" + desc + "'")
+	    pslst.append("$scut.Save()")
+
+	    # psscript = '\n'.join(pslst)
+	    psscript = '; '.join(pslst)
+	    self.debugmsg(6, "psscript":, psscript)
+
+	    response= os.popen('powershell.exe -command ' + psscript).read()
+
+	    self.debugmsg(6, "response:", response)
 
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

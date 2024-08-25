@@ -203,6 +203,116 @@ class RFSwarmAgent():
 
 		self.debugmsg(9, "self.agentproperties: ", self.agentproperties)
 
+	def create_icons(self):
+		base.debugmsg(0, "Creating application icons for RFSwarm Manager")
+		pipdata = importlib.metadata.distribution('rfswarm-manager')
+		# print("files:", pipdata.files)
+		# print("file0:", pipdata.files[0])
+		manager_executable = os.path.abspath(str(pipdata.locate_file(pipdata.files[0])))
+		base.debugmsg(5, "manager_executable:", manager_executable)
+
+		script_dir = os.path.dirname(os.path.abspath(__file__))
+		script_dir = os.path.join(script_dir, "icons")
+		base.debugmsg(5, "script_dir:", script_dir)
+
+		if platform.system() == 'Linux':
+			fileprefix = "~/.local/share"
+			if os.access("/usr/share", os.W_OK):
+				fileprefix = "/usr/share"
+
+			fileprefix = os.path.expanduser(fileprefix)
+
+			base.debugmsg(5, "Create .directory file")
+			directorydata = []
+			directorydata.append('[Desktop Entry]\n')
+			directorydata.append('Type=Directory\n')
+			directorydata.append('Name=RFSwarm\n')
+			directorydata.append('Icon=rfswarm-logo\n')
+
+			directoryfilename = os.path.join(fileprefix, "desktop-directories", "rfswarm.directory")
+			directorydir = os.path.dirname(directoryfilename)
+			base.ensuredir(directorydir)
+
+			base.debugmsg(5, "directoryfilename:", directoryfilename)
+			with open(directoryfilename, 'w') as df:
+				df.writelines(directorydata)
+
+			directoryfilename = os.path.join(fileprefix, "applications", "rfswarm.directory")
+			directorydir = os.path.dirname(directoryfilename)
+			base.ensuredir(directorydir)
+			base.debugmsg(5, "directoryfilename:", directoryfilename)
+			with open(directoryfilename, 'w') as df:
+				df.writelines(directorydata)
+
+			base.debugmsg(5, "Create .desktop file")
+			desktopdata = []
+			desktopdata.append('[Desktop Entry]\n')
+			desktopdata.append('Name=RFSwarm Manager\n')
+			desktopdata.append('Exec=' + manager_executable + '\n')
+			desktopdata.append('Terminal=false\n')
+			desktopdata.append('Type=Application\n')
+			desktopdata.append('Icon=rfswarm-manager\n')
+			desktopdata.append('Categories=RFSwarm;Development;\n')
+			desktopdata.append('Keywords=rfswarm;manager;\n')
+			# desktopdata.append('\n')
+
+			dektopfilename = os.path.join(fileprefix, "applications", "rfswarm-manager.desktop")
+			dektopdir = os.path.dirname(dektopfilename)
+			base.ensuredir(dektopdir)
+
+			base.debugmsg(5, "dektopfilename:", dektopfilename)
+			with open(dektopfilename, 'w') as df:
+				df.writelines(desktopdata)
+
+			base.debugmsg(5, "Copy icons")
+			# /usr/share/icons/hicolor/128x128/apps/
+			# 	1024x1024  128x128  16x16  192x192  22x22  24x24  256x256  32x32  36x36  42x42  48x48  512x512  64x64  72x72  8x8  96x96
+			# or
+			#  ~/.local/share/icons/hicolor/256x256/apps/
+			src_iconx128 = os.path.join(script_dir, "rfswarm-manager-128.png")
+			base.debugmsg(5, "src_iconx128:", src_iconx128)
+			dst_iconx128 = os.path.join(fileprefix, "icons", "hicolor", "128x128", "apps", "rfswarm-manager.png")
+			dst_icondir = os.path.dirname(dst_iconx128)
+			base.ensuredir(dst_icondir)
+			base.debugmsg(5, "dst_iconx128:", dst_iconx128)
+			shutil.copy(src_iconx128, dst_iconx128)
+
+			src_iconx128 = os.path.join(script_dir, "rfswarm-logo-128.png")
+			base.debugmsg(5, "src_iconx128:", src_iconx128)
+			dst_iconx128 = os.path.join(fileprefix, "icons", "hicolor", "128x128", "apps", "rfswarm-logo.png")
+			base.debugmsg(5, "dst_iconx128:", dst_iconx128)
+			shutil.copy(src_iconx128, dst_iconx128)
+
+		if platform.system() == 'Darwin':
+			base.debugmsg(5, "Create folder structure in /Applications")
+
+		if platform.system() == 'Windows':
+			base.debugmsg(5, "Create Startmenu shorcuts")
+			scutpath = "C:\\Users\\Dave\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\RFSwarm Agent.lnk"
+			targetpath = "c:\\Users\\Dave\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\rfswarm-agent.exe"
+			iconpath = "c:\\Users\\Dave\\AppData\\Local\\Programs\\Python\\Python311\\Lib\site-packages\\rfswarm_agent\\favicon.ico"
+
+			self.create_windows_shortcut(scutpath, targetpath, iconpath, "Connects to Manager and runs robots", True)
+
+	def create_windows_shortcut(self, scutpath, targetpath, iconpath, desc, minimised=False):
+	    pslst = []
+
+	    pslst.append("$wshshell = New-Object -COMObject wscript.shell")
+	    pslst.append('$scut = $wshshell.CreateShortcut("""' + scutpath + '""")')
+	    pslst.append('$scut.TargetPath = """' + targetpath + '"""')
+	    pslst.append('$scut.IconLocation = """' + iconpath + '"""')
+	    if minimised:
+	        pslst.append("$scut.WindowStyle = 7")
+	    pslst.append("$scut.Description = '" + desc + "'")
+	    pslst.append("$scut.Save()")
+
+	    psscript = '; '.join(pslst)
+	    self.debugmsg(6, "psscript":, psscript)
+
+	    response= os.popen('powershell.exe -command ' + psscript).read()
+
+	    self.debugmsg(6, "response:", response)
+
 	def findiniloctaion(self):
 
 		if self.args.ini:
