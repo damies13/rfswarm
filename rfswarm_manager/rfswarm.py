@@ -2847,7 +2847,7 @@ class RFSwarmCore:
 
 	    # psscript = '\n'.join(pslst)
 	    psscript = '; '.join(pslst)
-	    self.debugmsg(6, "psscript":, psscript)
+	    self.debugmsg(6, "psscript:", psscript)
 
 	    response= os.popen('powershell.exe -command ' + psscript).read()
 
@@ -3821,6 +3821,8 @@ class RFSwarmGUI(tk.Frame):
 	# titleprefix = 'Robot Framework Swarm'
 	titleprefix = 'rfswarm'
 
+	icon = None
+
 	# GUI = None
 	tabs = None
 
@@ -3939,8 +3941,8 @@ class RFSwarmGUI(tk.Frame):
 		icon_dir = os.path.join(script_dir, "icons")
 		base.debugmsg(5, "icon_dir:", icon_dir)
 		icon_file = os.path.join(icon_dir, "rfswarm-manager-128.png")
-		icon = tk.PhotoImage(file=icon_file)
-		self.root.wm_iconphoto(False, icon)
+		self.icon = tk.PhotoImage(file=icon_file)
+		self.root.wm_iconphoto(False, self.icon)
 
 	def on_closing(self, _event=None):
 
@@ -4361,6 +4363,8 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(5, "Open Graph Window - settings:", settings)
 
 		grphWindow = tk.Toplevel(self.root)
+		grphWindow.wm_iconphoto(False, self.icon)
+
 		grphWindow.saveready = False
 		# grphWindow.config(bg="pink")
 		grphWindow.columnconfigure(0, weight=1)
@@ -5533,6 +5537,7 @@ class RFSwarmGUI(tk.Frame):
 	def setings_open(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
 		setingsWindow = tk.Toplevel(self.root)
+		setingsWindow.wm_iconphoto(False, self.icon)
 		# setingsWindow.config(bg="pink")
 		setingsWindow.columnconfigure(0, weight=1)
 		setingsWindow.rowconfigure(1, weight=1)
@@ -6925,6 +6930,7 @@ class RFSwarmGUI(tk.Frame):
 	def sr_row_settings(self, r):
 		base.debugmsg(5, "r:", r)
 		stgsWindow = tk.Toplevel(self.root)
+		stgsWindow.wm_iconphoto(False, self.icon)
 		# self.grid(sticky="news", ipadx=0, pady=0)
 		# self.root.resizable(False, False)		# this didn't work as expected, I expected the dialog to not be resizable instaed it stopped the main window from being resizable
 		# self.root.resizable(True, True)
