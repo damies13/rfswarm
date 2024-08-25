@@ -2830,7 +2830,7 @@ class RFSwarmCore:
 			# iconpath = "c:\\Users\\Dave\\AppData\\Local\\Programs\\Python\\Python311\\Lib\site-packages\\rfswarm_manager\\icons\\rfswarm-manager-128.ico"
 			src_iconx128 = os.path.join(icon_dir, "rfswarm-manager-128.ico")
 
-			self.create_windows_shortcut(scutpath, manager_executable, src_iconx128, "Performance testing with robot test cases")
+			self.create_windows_shortcut(scutpath, manager_executable, src_iconx128, "Performance testing with robot test cases", True)
 
 
 	def create_windows_shortcut(self, scutpath, targetpath, iconpath, desc, minimised=False):
@@ -2847,11 +2847,11 @@ class RFSwarmCore:
 
 	    # psscript = '\n'.join(pslst)
 	    psscript = '; '.join(pslst)
-	    self.debugmsg(6, "psscript:", psscript)
+	    base.debugmsg(6, "psscript:", psscript)
 
 	    response= os.popen('powershell.exe -command ' + psscript).read()
 
-	    self.debugmsg(6, "response:", response)
+	    base.debugmsg(6, "response:", response)
 
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -6114,6 +6114,7 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(5, "run_starttime:", base.run_starttime)
 
 		schedWindow = tk.Toplevel(self.root)
+		schedWindow.wm_iconphoto(False, self.icon)
 		# schedWindow.config(bg="pink")
 		schedWindow.columnconfigure(0, weight=1)
 		schedWindow.rowconfigure(1, weight=1)
