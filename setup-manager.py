@@ -7,23 +7,6 @@ from setuptools.command.install import install
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-
-class PostInstallCommand(install):
-	"""Post-installation for installation mode."""
-	def run(self):
-		install.run(self)
-		# PUT YOUR POST-INSTALL SCRIPT HERE or CALL A FUNCTION
-		sys.stdout.write("Creating Desktop Shortcut for RFSwarm Manager...\n")
-		install_dir = os.path.join(ROOT_DIR, "somewhere")
-		sys.stdout.write("install_dir: " + install_dir + "\n")
-
-		user_dir = os.path.expanduser("~")
-
-		test_file = os.path.join(user_dir, "rfswarm_test.txt")
-		with open(test_file, "a",) as f:
-			f.writelines(["RFSwarm test\n", "install_dir:", install_dir, "\n"])
-
-
 with open("README_PyPi.md", "r", encoding="utf-8") as fh:
 	long_description = fh.read()
 
@@ -42,7 +25,9 @@ setup(
 	# package_data={"desktop": ["*.png"]},
 	data_files = [
 		('rfswarm_manager/icons', ['rfswarm_manager/icons/rfswarm-manager-128.png']),
+		('rfswarm_manager/icons', ['rfswarm_manager/icons/rfswarm-manager-128.ico']),
 		('rfswarm_manager/icons', ['rfswarm_manager/icons/rfswarm-logo-128.png']),
+		('rfswarm_manager/icons', ['rfswarm_manager/icons/rfswarm-logo-128.ico']),
 	],
 	include_package_data=True,
 	# I needed a recent version of pip (pip 21.0.1 worked my previous <20 version didn't) for matplotlib
@@ -63,9 +48,6 @@ setup(
 		'Getting Help': 'https://github.com/damies13/rfswarm#getting-help',
 		'Say Thanks!': 'https://github.com/damies13/rfswarm#donations',
 		'Source': 'https://github.com/damies13/rfswarm',
-	},
-	cmdclass={
-		'install': PostInstallCommand,
 	},
 	entry_points={'console_scripts': ['rfswarm = rfswarm_manager.rfswarm:RFSwarm', 'rfswarm-manager = rfswarm_manager.rfswarm:RFSwarm']},
 )
