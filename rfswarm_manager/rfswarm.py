@@ -2413,7 +2413,7 @@ class RFSwarmCore:
 		parser.add_argument('-d', '--dir', help='Results directory')
 		parser.add_argument('-e', '--ipaddress', help='IP Address to bind the server to')
 		parser.add_argument('-p', '--port', help='Port number to bind the server to')
-		parser.add_argument('-c', '--create', help='ICONS : Create application icons')
+		parser.add_argument('-c', '--create', help='ICON : Create application icon / shortcut')
 		base.args = parser.parse_args()
 
 		base.debugmsg(6, "base.args: ", base.args)
@@ -2425,8 +2425,10 @@ class RFSwarmCore:
 			exit()
 
 		if base.args.create:
-			if base.args.create == "ICONS":
+			if base.args.create.upper() == "ICON":
 				self.create_icons()
+			else:
+				base.debugmsg(0, "create with option ", base.args.create.upper(), "not supported.")
 			exit()
 
 
