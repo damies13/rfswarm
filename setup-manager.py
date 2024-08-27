@@ -1,9 +1,7 @@
 
 import os
-import sys
 
 from setuptools import find_packages, setup
-from setuptools.command.install import install
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -23,7 +21,7 @@ setup(
 	# packages=find_packages(where="rfswarm_manager"),
 	# package_dir={"": "rfswarm_manager"},
 	# package_data={"desktop": ["*.png"]},
-	data_files = [
+	data_files=[
 		('rfswarm_manager/icons', ['rfswarm_manager/icons/rfswarm-manager-128.png']),
 		('rfswarm_manager/icons', ['rfswarm_manager/icons/rfswarm-manager-128.ico']),
 		('rfswarm_manager/icons', ['rfswarm_manager/icons/rfswarm-logo-128.png']),

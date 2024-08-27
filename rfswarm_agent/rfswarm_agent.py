@@ -290,28 +290,28 @@ class RFSwarmAgent():
 			base.debugmsg(5, "Create Startmenu shorcuts")
 			scutpath = "C:\\Users\\Dave\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\RFSwarm Agent.lnk"
 			targetpath = "c:\\Users\\Dave\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\rfswarm-agent.exe"
-			iconpath = "c:\\Users\\Dave\\AppData\\Local\\Programs\\Python\\Python311\\Lib\site-packages\\rfswarm_agent\\favicon.ico"
+			iconpath = "c:\\Users\\Dave\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\rfswarm_agent\\favicon.ico"
 
 			self.create_windows_shortcut(scutpath, targetpath, iconpath, "Connects to Manager and runs robots", True)
 
 	def create_windows_shortcut(self, scutpath, targetpath, iconpath, desc, minimised=False):
-	    pslst = []
+		pslst = []
 
-	    pslst.append("$wshshell = New-Object -COMObject wscript.shell")
-	    pslst.append('$scut = $wshshell.CreateShortcut("""' + scutpath + '""")')
-	    pslst.append('$scut.TargetPath = """' + targetpath + '"""')
-	    pslst.append('$scut.IconLocation = """' + iconpath + '"""')
-	    if minimised:
-	        pslst.append("$scut.WindowStyle = 7")
-	    pslst.append("$scut.Description = '" + desc + "'")
-	    pslst.append("$scut.Save()")
+		pslst.append("$wshshell = New-Object -COMObject wscript.shell")
+		pslst.append('$scut = $wshshell.CreateShortcut("""' + scutpath + '""")')
+		pslst.append('$scut.TargetPath = """' + targetpath + '"""')
+		pslst.append('$scut.IconLocation = """' + iconpath + '"""')
+		if minimised:
+			pslst.append("$scut.WindowStyle = 7")
+		pslst.append("$scut.Description = '" + desc + "'")
+		pslst.append("$scut.Save()")
 
-	    psscript = '; '.join(pslst)
-	    self.debugmsg(6, "psscript":, psscript)
+		psscript = '; '.join(pslst)
+		self.debugmsg(6, "psscript:", psscript)
 
-	    response= os.popen('powershell.exe -command ' + psscript).read()
+		response= os.popen('powershell.exe -command ' + psscript).read()
 
-	    self.debugmsg(6, "response:", response)
+		self.debugmsg(6, "response:", response)
 
 	def findiniloctaion(self):
 

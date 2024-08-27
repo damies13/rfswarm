@@ -2431,7 +2431,6 @@ class RFSwarmCore:
 				base.debugmsg(0, "create with option ", base.args.create.upper(), "not supported.")
 			exit()
 
-
 		if base.args.starttime:
 			base.run_starttime = base.parse_time(base.args.starttime)
 			base.debugmsg(5, "run_starttime:", base.run_starttime)
@@ -2840,24 +2839,24 @@ class RFSwarmCore:
 			self.create_windows_shortcut(scutpath, manager_executable, src_iconx128, "Performance testing with robot test cases", True)
 
 	def create_windows_shortcut(self, scutpath, targetpath, iconpath, desc, minimised=False):
-	    pslst = []
+		pslst = []
 
-	    pslst.append("$wshshell = New-Object -COMObject wscript.shell")
-	    pslst.append('$scut = $wshshell.CreateShortcut("""' + scutpath + '""")')
-	    pslst.append('$scut.TargetPath = """' + targetpath + '"""')
-	    pslst.append('$scut.IconLocation = """' + iconpath + '"""')
-	    if minimised:
-	        pslst.append("$scut.WindowStyle = 7")
-	    pslst.append("$scut.Description = '" + desc + "'")
-	    pslst.append("$scut.Save()")
+		pslst.append("$wshshell = New-Object -COMObject wscript.shell")
+		pslst.append('$scut = $wshshell.CreateShortcut("""' + scutpath + '""")')
+		pslst.append('$scut.TargetPath = """' + targetpath + '"""')
+		pslst.append('$scut.IconLocation = """' + iconpath + '"""')
+		if minimised:
+			pslst.append("$scut.WindowStyle = 7")
+		pslst.append("$scut.Description = '" + desc + "'")
+		pslst.append("$scut.Save()")
 
-	    # psscript = '\n'.join(pslst)
-	    psscript = '; '.join(pslst)
-	    base.debugmsg(6, "psscript:", psscript)
+		# psscript = '\n'.join(pslst)
+		psscript = '; '.join(pslst)
+		base.debugmsg(6, "psscript:", psscript)
 
-	    response= os.popen('powershell.exe -command ' + psscript).read()
+		response = os.popen('powershell.exe -command ' + psscript).read()
 
-	    base.debugmsg(6, "response:", response)
+		base.debugmsg(6, "response:", response)
 
 	def create_macos_app_bundle(self, name, version, exesrc, icosrc):
 
@@ -2929,7 +2928,6 @@ class RFSwarmCore:
 		# apppath + "/Contents/MacOS/main.py"
 		execbundle = os.path.join(apppath, "Contents", "MacOS", "refswarm-manager")
 		os.symlink(exesrc, execbundle)
-
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
