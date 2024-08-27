@@ -2907,7 +2907,6 @@ class RFSwarmCore:
 		response = os.popen(cmd).read()
 		base.debugmsg(6, "response:", response)
 
-
 		#  create apppath + "/Contents/Info.plist"
 		bundleName = name
 		bundleIdentifier = "org.rfswarm." + projname
@@ -2959,10 +2958,9 @@ class RFSwarmCore:
 
 		# apppath + "/Contents/MacOS/main.py"
 		execbundle = os.path.join(apppath, "Contents", "MacOS", projname)
-		try:
-			os.symlink(exesrc, execbundle)
-		except:
-			pass
+		if os.path.exists(execbundle):
+			os.remove(execbundle)
+		os.symlink(exesrc, execbundle)
 
 		# touch '/Applications/RFSwarm Manager.app' to update .aa icon
 		cmd = "touch '{0}'".format(apppath)
