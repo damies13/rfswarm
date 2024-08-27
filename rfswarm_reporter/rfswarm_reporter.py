@@ -10,12 +10,14 @@ import base64  # used for embedding images  # used for xhtml export
 import configparser
 import difflib
 import glob
+import importlib.metadata
 import inspect
 import math
 import os
 import platform
 import random
 import re
+import shutil
 import signal
 import sqlite3
 import sys
@@ -2888,7 +2890,7 @@ class ReporterCore:
 	def create_icons(self):
 		base.debugmsg(0, "Creating application icons for RFSwarm Reporter")
 		appname = "RFSwarm Reporter"
-		namelst = name.split()
+		namelst = appname.split()
 		self.debugmsg(6, "namelst:", namelst)
 		projname = "-".join(namelst).lower()
 		self.debugmsg(6, "projname:", projname)

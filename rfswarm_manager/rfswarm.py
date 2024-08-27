@@ -2742,7 +2742,7 @@ class RFSwarmCore:
 	def create_icons(self):
 		base.debugmsg(0, "Creating application icons for RFSwarm Manager")
 		appname = "RFSwarm Manager"
-		namelst = name.split()
+		namelst = appname.split()
 		self.debugmsg(6, "namelst:", namelst)
 		projname = "-".join(namelst).lower()
 		self.debugmsg(6, "projname:", projname)
