@@ -2824,6 +2824,11 @@ class RFSwarmCore:
 		if platform.system() == 'Darwin':
 			base.debugmsg(5, "Create folder structure in /Applications")
 
+			appname = "RFSwarm Manager"
+			src_iconx128 = os.path.join(icon_dir, "rfswarm-manager-128.ico")
+
+			self.create_macos_app_bundle(appname, pipdata.version, manager_executable, src_iconx128)
+
 		if platform.system() == 'Windows':
 			base.debugmsg(5, "Create Startmenu shorcuts")
 			roam_appdata = os.environ["APPDATA"]
@@ -2833,7 +2838,6 @@ class RFSwarmCore:
 			src_iconx128 = os.path.join(icon_dir, "rfswarm-manager-128.ico")
 
 			self.create_windows_shortcut(scutpath, manager_executable, src_iconx128, "Performance testing with robot test cases", True)
-
 
 	def create_windows_shortcut(self, scutpath, targetpath, iconpath, desc, minimised=False):
 	    pslst = []
@@ -2854,6 +2858,77 @@ class RFSwarmCore:
 	    response= os.popen('powershell.exe -command ' + psscript).read()
 
 	    base.debugmsg(6, "response:", response)
+
+	def create_macos_app_bundle(self, name, version, exesrc, icosrc):
+
+		appspath = "~/Applications"
+		if os.access("/Applications", os.W_OK):
+			appspath = "/Applications"
+
+		appspath = os.path.expanduser(appspath)
+
+		# https://stackoverflow.com/questions/7404792/how-to-create-mac-application-bundle-for-python-script-via-python
+
+		apppath = os.path.join(appspath, name + ".app")
+		MacOSFolder = os.path.join(apppath, "Contents", "MacOS")
+		base.ensuredir(MacOSFolder)
+
+		# need to create the icon file:
+		# https://stackoverflow.com/questions/646671/how-do-i-set-the-icon-for-my-applications-mac-os-x-app-bundle
+
+		#  create apppath + "/Contents/Info.plist"
+		bundleName = name
+		namelst = name.split()
+		bundleIdentifier = "org.rfswarm." + "-".join(namelst).lower()
+
+		Infoplist = os.path.join(apppath, "Contents", "Info.plist")
+		with open(Infoplist, "w") as f:
+			f.write("""<?xml version="1.0" encoding="UTF-8"?>
+			<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+			<plist version="1.0">
+			<dict>
+				<key>CFBundleDevelopmentRegion</key>
+				<string>English</string>
+				<key>CFBundleExecutable</key>
+				<string>main.py</string>
+				<key>CFBundleGetInfoString</key>
+				<string>%s</string>
+				<key>CFBundleIconFile</key>
+				<string>app.icns</string>
+				<key>CFBundleIdentifier</key>
+				<string>%s</string>
+				<key>CFBundleInfoDictionaryVersion</key>
+				<string>6.0</string>
+				<key>CFBundleName</key>
+				<string>%s</string>
+				<key>CFBundlePackageType</key>
+				<string>APPL</string>
+				<key>CFBundleShortVersionString</key>
+				<string>%s</string>
+				<key>CFBundleSignature</key>
+				<string>????</string>
+				<key>CFBundleVersion</key>
+				<string>%s</string>
+				<key>NSAppleScriptEnabled</key>
+				<string>YES</string>
+				<key>NSMainNibFile</key>
+				<string>MainMenu</string>
+				<key>NSPrincipalClass</key>
+				<string>NSApplication</string>
+			</dict>
+			</plist>
+			""" % (bundleName + " " + version, bundleIdentifier, bundleName, bundleName + " " + version, version))
+			f.close()
+
+		# create apppath + "/Contents/PkgInfo"
+		PkgInfo = os.path.join(apppath, "Contents", "PkgInfo")
+		with open(PkgInfo, "w") as f:
+			f.write("APPL????")
+			f.close()
+
+		# apppath + "/Contents/MacOS/main.py"
+		execbundle = os.path.join(apppath, "Contents", "MacOS", "refswarm-manager")
+		os.symlink(exesrc, execbundle)
 
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
