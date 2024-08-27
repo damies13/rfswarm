@@ -2875,7 +2875,9 @@ class RFSwarmCore:
 		# need to create the icon file:
 		# https://stackoverflow.com/questions/646671/how-do-i-set-the-icon-for-my-applications-mac-os-x-app-bundle
 		namelst = name.split()
+		base.debugmsg(6, "namelst:", namelst)
 		projname = "-".join(namelst).lower()
+		base.debugmsg(6, "projname:", projname)
 
 		ResourcesFolder = os.path.join(apppath, "Contents", "Resources")
 		iconset = os.path.join(ResourcesFolder, projname + ".iconset")
