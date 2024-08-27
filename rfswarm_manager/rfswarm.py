@@ -2741,7 +2741,12 @@ class RFSwarmCore:
 
 	def create_icons(self):
 		base.debugmsg(0, "Creating application icons for RFSwarm Manager")
-		pipdata = importlib.metadata.distribution('rfswarm-manager')
+		appname = "RFSwarm Manager"
+		namelst = name.split()
+		self.debugmsg(6, "namelst:", namelst)
+		projname = "-".join(namelst).lower()
+		self.debugmsg(6, "projname:", projname)
+		pipdata = importlib.metadata.distribution(projname)
 		# print("files:", pipdata.files)
 		# print("file0:", pipdata.files[0])
 		manager_executable = os.path.abspath(str(pipdata.locate_file(pipdata.files[0])))
@@ -2784,16 +2789,16 @@ class RFSwarmCore:
 			base.debugmsg(5, "Create .desktop file")
 			desktopdata = []
 			desktopdata.append('[Desktop Entry]\n')
-			desktopdata.append('Name=RFSwarm Manager\n')
+			desktopdata.append('Name=' + appname + '\n')
 			desktopdata.append('Exec=' + manager_executable + '\n')
 			desktopdata.append('Terminal=false\n')
 			desktopdata.append('Type=Application\n')
-			desktopdata.append('Icon=rfswarm-manager\n')
+			desktopdata.append('Icon=' + projname + '\n')
 			desktopdata.append('Categories=RFSwarm;Development;\n')
 			desktopdata.append('Keywords=rfswarm;manager;\n')
 			# desktopdata.append('\n')
 
-			dektopfilename = os.path.join(fileprefix, "applications", "rfswarm-manager.desktop")
+			dektopfilename = os.path.join(fileprefix, "applications", projname + ".desktop")
 			dektopdir = os.path.dirname(dektopfilename)
 			base.ensuredir(dektopdir)
 
@@ -2806,9 +2811,9 @@ class RFSwarmCore:
 			# 	1024x1024  128x128  16x16  192x192  22x22  24x24  256x256  32x32  36x36  42x42  48x48  512x512  64x64  72x72  8x8  96x96
 			# or
 			#  ~/.local/share/icons/hicolor/256x256/apps/
-			src_iconx128 = os.path.join(icon_dir, "rfswarm-manager-128.png")
+			src_iconx128 = os.path.join(script_dir, projname + "-128.png")
 			base.debugmsg(5, "src_iconx128:", src_iconx128)
-			dst_iconx128 = os.path.join(fileprefix, "icons", "hicolor", "128x128", "apps", "rfswarm-manager.png")
+			dst_iconx128 = os.path.join(fileprefix, "icons", "hicolor", "128x128", "apps", projname + ".png")
 			dst_icondir = os.path.dirname(dst_iconx128)
 			base.ensuredir(dst_icondir)
 			base.debugmsg(5, "dst_iconx128:", dst_iconx128)
@@ -2823,18 +2828,17 @@ class RFSwarmCore:
 		if platform.system() == 'Darwin':
 			base.debugmsg(5, "Create folder structure in /Applications")
 
-			appname = "RFSwarm Manager"
-			src_iconx1024 = os.path.join(icon_dir, "rfswarm-manager-1024.png")
+			src_iconx1024 = os.path.join(icon_dir, projname + "-1024.png")
 
 			self.create_macos_app_bundle(appname, pipdata.version, manager_executable, src_iconx1024)
 
 		if platform.system() == 'Windows':
 			base.debugmsg(5, "Create Startmenu shorcuts")
 			roam_appdata = os.environ["APPDATA"]
-			scutpath = os.path.join(roam_appdata, "Microsoft", "Windows", "Start Menu", "RFSwarm Manager.lnk")
+			scutpath = os.path.join(roam_appdata, "Microsoft", "Windows", "Start Menu", appname + ".lnk")
 			# targetpath = "c:\\Users\\Dave\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\rfswarm.exe"
 			# iconpath = "c:\\Users\\Dave\\AppData\\Local\\Programs\\Python\\Python311\\Lib\site-packages\\rfswarm_manager\\icons\\rfswarm-manager-128.ico"
-			src_iconx128 = os.path.join(icon_dir, "rfswarm-manager-128.ico")
+			src_iconx128 = os.path.join(icon_dir, projname + "-128.ico")
 
 			self.create_windows_shortcut(scutpath, manager_executable, src_iconx128, "Performance testing with robot test cases", True)
 
