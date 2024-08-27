@@ -24,6 +24,7 @@ setup(
 	data_files=[
 		('rfswarm_manager/icons', ['rfswarm_manager/icons/rfswarm-manager-128.png']),
 		('rfswarm_manager/icons', ['rfswarm_manager/icons/rfswarm-manager-128.ico']),
+		('rfswarm_manager/icons', ['rfswarm_manager/icons/rfswarm-manager-1024.png']),
 		('rfswarm_manager/icons', ['rfswarm_manager/icons/rfswarm-logo-128.png']),
 		('rfswarm_manager/icons', ['rfswarm_manager/icons/rfswarm-logo-128.ico']),
 	],

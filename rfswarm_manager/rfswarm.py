@@ -2824,9 +2824,9 @@ class RFSwarmCore:
 			base.debugmsg(5, "Create folder structure in /Applications")
 
 			appname = "RFSwarm Manager"
-			src_iconx128 = os.path.join(icon_dir, "rfswarm-manager-128.ico")
+			src_iconx1024 = os.path.join(icon_dir, "rfswarm-manager-1024.png")
 
-			self.create_macos_app_bundle(appname, pipdata.version, manager_executable, src_iconx128)
+			self.create_macos_app_bundle(appname, pipdata.version, manager_executable, src_iconx1024)
 
 		if platform.system() == 'Windows':
 			base.debugmsg(5, "Create Startmenu shorcuts")
@@ -2874,11 +2874,41 @@ class RFSwarmCore:
 
 		# need to create the icon file:
 		# https://stackoverflow.com/questions/646671/how-do-i-set-the-icon-for-my-applications-mac-os-x-app-bundle
+		namelst = name.split()
+		projname = "-".join(namelst).lower()
+
+		ResourcesFolder = os.path.join(apppath, "Contents", "Resources")
+		iconset = os.path.join(ResourcesFolder, projname + ".iconset")
+		icnsfile = os.path.join(ResourcesFolder, projname + ".icns")
+		base.ensuredir(iconset)
+
+		# Normal screen icons
+		base.debugmsg(6, "Normal screen icons")
+		for size in [16, 32, 64, 128, 256, 512]:
+			cmd = "sips -z {0} {0} {1} --out '{2}/icon_{0}x{0}.png'".format(size, icosrc, iconset)
+			base.debugmsg(6, "cmd:", cmd)
+			response = os.popen(cmd).read()
+			base.debugmsg(6, "response:", response)
+
+		# Retina display icons
+		base.debugmsg(6, "Retina display icons")
+		for size in [32, 64, 128, 256, 512, 1024]:
+			cmd = "sips -z {0} {0} {1} --out '{2}/icon_{3}x{3}x2.png'".format(size, icosrc, iconset, int(size / 2))
+			base.debugmsg(6, "cmd:", cmd)
+			response = os.popen(cmd).read()
+			base.debugmsg(6, "response:", response)
+
+		# Make a multi-resolution Icon
+		base.debugmsg(6, "Make a multi-resolution Icon")
+		cmd = "iconutil -c icns -o '{0}' '{1}'".format(icnsfile, iconset)
+		base.debugmsg(6, "cmd:", cmd)
+		response = os.popen(cmd).read()
+		base.debugmsg(6, "response:", response)
+
 
 		#  create apppath + "/Contents/Info.plist"
 		bundleName = name
-		namelst = name.split()
-		bundleIdentifier = "org.rfswarm." + "-".join(namelst).lower()
+		bundleIdentifier = "org.rfswarm." + projname
 
 		Infoplist = os.path.join(apppath, "Contents", "Info.plist")
 		with open(Infoplist, "w") as f:
@@ -2889,11 +2919,11 @@ class RFSwarmCore:
 				<key>CFBundleDevelopmentRegion</key>
 				<string>English</string>
 				<key>CFBundleExecutable</key>
-				<string>main.py</string>
+				<string>%s</string>
 				<key>CFBundleGetInfoString</key>
 				<string>%s</string>
 				<key>CFBundleIconFile</key>
-				<string>app.icns</string>
+				<string>%s.icns</string>
 				<key>CFBundleIdentifier</key>
 				<string>%s</string>
 				<key>CFBundleInfoDictionaryVersion</key>
@@ -2916,7 +2946,7 @@ class RFSwarmCore:
 				<string>NSApplication</string>
 			</dict>
 			</plist>
-			""" % (bundleName + " " + version, bundleIdentifier, bundleName, bundleName + " " + version, version))
+			""" % (projname, bundleName + " " + version, projname, bundleIdentifier, bundleName, bundleName + " " + version, version))
 			f.close()
 
 		# create apppath + "/Contents/PkgInfo"
@@ -2926,8 +2956,17 @@ class RFSwarmCore:
 			f.close()
 
 		# apppath + "/Contents/MacOS/main.py"
-		execbundle = os.path.join(apppath, "Contents", "MacOS", "refswarm-manager")
-		os.symlink(exesrc, execbundle)
+		execbundle = os.path.join(apppath, "Contents", "MacOS", projname)
+		try:
+			os.symlink(exesrc, execbundle)
+		except:
+			pass
+
+		# touch '/Applications/RFSwarm Manager.app' to update .aa icon
+		cmd = "touch '{0}'".format(apppath)
+		base.debugmsg(6, "cmd:", cmd)
+		response = os.popen(cmd).read()
+		base.debugmsg(6, "response:", response)
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
