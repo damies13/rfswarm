@@ -505,8 +505,17 @@ Once you have the prerequisites sorted, the installation is simply
 ```console
 pip* install rfswarm-manager
 ```
-
 \*some systems might need you to use pip3 and or sudo
+
+Next, desktop users, can optionally install the desktop icon
+- In the start menu for Windows
+- In the Applications folder for Mac
+- As a .desktop file for Linux (known to work for Gnome, KDE, Cinamon, XFCE, LXQt, should also work for other desktop environments that support standard .desktop files)
+
+Using the command
+```console
+rfswarm-manager -c icon
+```
 
 ### 2. Adjust the Firewall
 
