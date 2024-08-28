@@ -3937,7 +3937,7 @@ class RFSwarmCore:
 
 class RFSwarmGUI(tk.Frame):
 	# titleprefix = 'Robot Framework Swarm'
-	titleprefix = 'rfswarm'
+	titleprefix = 'RFSwarm'
 
 	icon = None
 
