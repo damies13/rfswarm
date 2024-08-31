@@ -37,6 +37,10 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Pip Update
         run: python -m pip install --upgrade pip
+
+      - name: Robot Framework RC
+        run: pip install --upgrade --pre robotframework
+
       - name: Checkout
         uses: actions/checkout@v4
       - name: "Apt Update"
