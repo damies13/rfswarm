@@ -79,7 +79,7 @@ Agent Command Line ROBOT -r
 
 	${scenario_dir}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
 	VAR 	${robot_exec} 		${pip_data_list}[1]
-	#VAR 	${scenario_dir} 	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
+	# VAR 	${scenario_dir} 	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
 	VAR 	@{agnt_options} 	-g 	1 	-r 	${robot_exec}
 	VAR 	@{mngr_options} 	-g 	1 	-n 	-s 	${scenario_dir}
 
@@ -101,7 +101,7 @@ Agent Command Line ROBOT -r
 	Log To Console		Result dir content: ${result_content}
 	Should Not Be Empty 	${result_content}
 	@{test_logs}=	List Directories In Directory	${test_result}[0]${/}logs
-	Log To Console		Logs files: ${result_content}
+	Log To Console		Logs dirs: ${test_logs}
 	Should Not Be Empty 	${test_logs}
 
 	[Teardown]	Run Keywords	Stop Agent	Stop Manager
