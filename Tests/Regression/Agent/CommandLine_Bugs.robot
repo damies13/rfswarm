@@ -74,7 +74,7 @@ Check If The Not Buildin Modules Are Included In The Agent Setup File
 	END
 
 Verify If Agent Runs With Existing INI File From Current Version
-	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 
 	${location}=	Get Agent Default Save Path
 	Run Agent
@@ -100,7 +100,7 @@ Verify If Agent Runs With Existing INI File From Current Version
 	END
 
 Verify If Agent Runs With No Existing INI File From Current Version NO GUI
-	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 
 	${location}=	Get Agent Default Save Path
 	Remove File		${location}${/}RFSwarmAgent.ini
@@ -117,7 +117,7 @@ Verify If Agent Runs With No Existing INI File From Current Version NO GUI
 	END
 
 Verify If Agent Runs With Existing INI File From Previous Version NO GUI
-	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 
 	${location}=	Get Agent Default Save Path
 	Remove File		${location}${/}RFSwarmAgent.ini
@@ -136,3 +136,9 @@ Verify If Agent Runs With Existing INI File From Previous Version NO GUI
 	ELSE
 		Fail	msg=Agest is not running!
 	END
+
+	[Teardown] 	Run Keywords
+	...    Remove File 	${location}${/}RFSwarmAgent.ini 	AND
+	...    Run Agent 	AND
+	...    Sleep 	3 	AND
+	...    Stop Agent

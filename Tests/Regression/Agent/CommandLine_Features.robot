@@ -18,42 +18,6 @@ Agent Help
 	Log to console 	${\n}${result}
 	Should Contain	${result}	AGENTNAME
 
-Agent Command Line ROBOT -r
-	[Tags]	ubuntu-latest 	macos-latest 	Issue #14
-
-	Run Process 	whereis 	robot		alias=data	#not working on windows
-	${pip_data} 	Get Process Result	data
-	Should Not Be Empty 	${pip_data.stdout}		msg=Cant find robotframework pip informations
-	${pip_data_list}=	Split String	${pip_data.stdout}
-	Log To Console	robot executable: ${pip_data_list}[1]
-
-	VAR 	${robot_exec} 		${pip_data_list}[1]
-	VAR 	${scenario_dir} 	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
-	VAR 	@{agnt_options} 	-g 	1 	-r 	${robot_exec} 	-m 	http://localhost:8138
-	VAR 	@{mngr_options} 	-g 	1 	-n 	-s 	${scenario_dir}
-
-	Log To Console	Run Agent with custom robot executable.
-	Run Agent 	${agnt_options}
-	Sleep 	5s
-	Run Manager CLI 	${mngr_options}
-	Wait For Manager	8min
-	Stop Agent
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
-
-	@{test_result}= 	List Directories In Directory	${results_dir}	absolute=${True}	pattern=*_Issue-#14
-	Log To Console		Result dir: ${test_result}
-	Should Not Be Empty 	${test_result}
-	@{result_content}=	List Directories In Directory	${test_result}[0]
-	Log To Console		Result dir content: ${result_content}
-	Should Not Be Empty 	${result_content}
-	@{test_logs}=	List Directories In Directory	${test_result}[0]${/}logs
-	Should Not Be Empty 	${test_logs}
-
-	[Teardown]	Run Keywords	Stop Agent	Stop Manager
-
 Agent Command Line INI -i
 	[Tags]	ubuntu-latest 	macos-latest 	Issue #14	# can't get agent output in windows
 
@@ -104,7 +68,43 @@ Agent Command Line AGENTDIR -d
 
 	[Teardown]	Stop Agent
 
-# -r mode here
+Agent Command Line ROBOT -r
+	[Tags]	ubuntu-latest 	macos-latest 	Issue #14
+
+	Run Process 	whereis 	robot		alias=data	#not working on windows
+	${pip_data} 	Get Process Result	data
+	Should Not Be Empty 	${pip_data.stdout}		msg=Cant find robotframework pip informations
+	${pip_data_list}=	Split String	${pip_data.stdout}
+	Log To Console	robot executable: ${pip_data_list}[1]
+
+	${scenario_dir}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
+	VAR 	${robot_exec} 		${pip_data_list}[1]
+	#VAR 	${scenario_dir} 	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
+	VAR 	@{agnt_options} 	-g 	1 	-r 	${robot_exec}
+	VAR 	@{mngr_options} 	-g 	1 	-n 	-s 	${scenario_dir}
+
+	Log To Console	Run Agent with custom robot executable.
+	Run Agent 	${agnt_options}
+	Sleep 	5s
+	Run Manager CLI 	${mngr_options}
+	Wait For Manager	8min
+	Stop Agent
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+
+	@{test_result}= 	List Directories In Directory	${results_dir}	absolute=${True}	pattern=*_Issue-#14
+	Log To Console		Result dir: ${test_result}
+	Should Not Be Empty 	${test_result}
+	@{result_content}=	List Directories In Directory	${test_result}[0]
+	Log To Console		Result dir content: ${result_content}
+	Should Not Be Empty 	${result_content}
+	@{test_logs}=	List Directories In Directory	${test_result}[0]${/}logs
+	Log To Console		Logs files: ${result_content}
+	Should Not Be Empty 	${test_logs}
+
+	[Teardown]	Run Keywords	Stop Agent	Stop Manager
 
 Agent Command Line XMLMODE -x
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
