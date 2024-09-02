@@ -116,7 +116,7 @@ Verify If Reporter Runs With Existing INI File From Previous Version NO GUI
 
 	[Teardown] 	Run Keywords
 	...    Remove File 	${location}${/}RFSwarmReporter.ini 	AND
-	...    Open GUI 	-n 		AND
+	...    Open GUI 	-n
 
 First Run
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #147

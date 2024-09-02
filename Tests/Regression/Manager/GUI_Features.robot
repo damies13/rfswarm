@@ -2,7 +2,6 @@
 Library 	Collections
 Library 	String
 Resource 	GUI_Common.robot
-Resource 	${CURDIR}${/}..${/}Agent${/}CommandLine_Common.robot
 Suite Setup 	Set Platform
 
 *** Variables ***
@@ -1211,7 +1210,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	[Setup]	Run Keywords
 	...    Set INI Window Size		800		600												AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
-	...    CommandLine_Common.Run Agent	${agent_options}									AND
+	...    Open Agent	${agent_options}													AND
 	...    Open Manager GUI																	AND
 	...    Set Global Filename And Default Save Path	main								AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main1.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
@@ -1245,15 +1244,15 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	...    Remove Directory	${global_path}${/}example	recursive=${True}			AND
 	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main1.robot	${CURDIR}${/}testdata${/}Issue-52	AND
-	...    CommandLine_Common.Stop Agent											AND
-	...    CommandLine_Common.Stop Manager
+	...    Stop Agent																AND
+	...    Close Manager GUI ${platform}
 
 Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords
 	...    Set INI Window Size		800		600												AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
-	...    CommandLine_Common.Run Agent	${agent_options}									AND
+	...    Open Agent	${agent_options}													AND
 	...    Open Manager GUI																	AND
 	...    Set Global Filename And Default Save Path	main								AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main2.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
@@ -1290,15 +1289,15 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	...    Remove Directory	${global_path}${/}example	recursive=${True}			AND
 	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main2.robot	${CURDIR}${/}testdata${/}Issue-52	AND
-	...    CommandLine_Common.Stop Agent											AND
-	...    CommandLine_Common.Stop Manager
+	...    Stop Agent																AND
+	...    Close Manager GUI ${platform}
 
 Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords
 	...    Set INI Window Size		800		600												AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
-	...    CommandLine_Common.Run Agent	${agent_options}									AND
+	...    Open Agent	${agent_options}													AND
 	...    Open Manager GUI																	AND
 	...    Set Global Filename And Default Save Path	main								AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main3.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
@@ -1335,8 +1334,8 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    Remove Directory	${global_path}${/}example	recursive=${True}			AND
 	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main3.robot	${CURDIR}${/}testdata${/}Issue-52	AND
-	...    CommandLine_Common.Stop Agent											AND
-	...    CommandLine_Common.Stop Manager
+	...    Stop Agent																AND
+	...    Close Manager GUI ${platform}
 
 Check If The CSV Report Button Works In the Manager Before There Are Any Results
 	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #128

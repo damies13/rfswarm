@@ -175,15 +175,19 @@ Close Manager GUI macos
 	END
 
 Stop Agent
-	IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
-		${result} = 	Terminate Process		${process_agent}
-	ELSE
-		Send Signal To Process 	SIGINT 	${process_agent}
-		${result}= 	Wait For Process 	${process_agent}	timeout=30	on_timeout=kill
+	${running}= 	Is Process Running 	${process_agent}
+	IF 	${running}
+		Sleep	3s
+		IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
+			${result} = 	Terminate Process		${process_agent}
+		ELSE
+			Send Signal To Process 	SIGINT 	${process_agent}
+			${result}= 	Wait For Process 	${process_agent}	timeout=30	on_timeout=kill
+		END
+		Log		${result.stdout}
+		Log		${result.stderr}
+		# Should Be Equal As Integers 	${result.rc} 	0
 	END
-	Log		${result.stdout}
-	Log		${result.stderr}
-	# Should Be Equal As Integers 	${result.rc} 	0
 
 Stop Test Scenario Run Gradually
 	[Arguments]	${rumup_time}	${robot_test_time}
