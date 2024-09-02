@@ -296,14 +296,14 @@ Open GUI windows
 Open GUI ubuntu
 	[Arguments]		@{appargs}
 	Set Suite Variable    ${platform}    ubuntu
-	#Set Confidence		0.9
+	Set Confidence		0.9
 	# ${process}= 	Start Process 	python3 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	${process}= 	Start Process 	${cmd_reporter} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Set Suite Variable 	$process 	${process}
 	# Sleep 	60
 	# Capture Screen
-	#Set Screenshot Folder 	${OUTPUT DIR}
-	#Take A Screenshot
+	Set Screenshot Folder 	${OUTPUT DIR}
+	Take A Screenshot
 
 Open GUI macos
 	[Arguments]		@{appargs}
