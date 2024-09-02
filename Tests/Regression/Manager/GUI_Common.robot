@@ -147,7 +147,7 @@ Close Manager GUI macos
 		# make sure the window is the active window first, Unlikely the about tab has been selected
 		Run Keyword And Ignore Error 	Click Tab 	 About
 		Run Keyword And Ignore Error 	Click Tab 	 Run
-		Click Image		manager_${platform}_titlebar_rfswarm.png
+		# Click Image		manager_${platform}_titlebar_rfswarm.png
 		Click Button	closewindow
 		Sleep	3
 		Run Keyword And Ignore Error 	Click Dialog Button		no 		10

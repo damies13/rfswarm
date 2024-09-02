@@ -64,6 +64,7 @@ Verify If Reporter Runs With Existing INI File From Previous Version
 	EXCEPT
 		Fail	msg=Reporter is not responding!
 	END
+	Close GUI
 
 	[Teardown] 	Run Keywords
 	...    Remove File 	${location}${/}RFSwarmReporter.ini 	AND
