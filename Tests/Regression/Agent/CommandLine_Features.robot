@@ -33,10 +33,42 @@ Agent Command Line INI -i
 
 	[Teardown]	Stop Agent
 
+Agent Command Line INI --ini
+	[Tags]	ubuntu-latest 	macos-latest 	Issue #14	# can't get agent output in windows
+
+	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmAgent.ini
+	VAR		@{agnt_options}		--ini	${inifile}
+
+	Run Agent 	${agnt_options}
+	Log To Console	Run Agent with alternate ini file with variable.
+	Stop Agent
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
+	Should Contain	${result_stdout}	${inifile}
+
+	[Teardown]	Stop Agent
+
 Agent Command Line MANAGER -m
 	[Tags]	ubuntu-latest 	macos-latest 	Issue #14 	# can't get agent output in windows
 
 	VAR 	@{agnt_options} 	-m 	http://localhost:8138
+	VAR 	@{mngr_options} 	-n
+
+	Log To Console	Run Agent and Manager and see if they will connect.
+	Run Agent 	${agnt_options}
+	Run Manager CLI 	${mngr_options}
+	Wait For Manager	10s
+	Stop Agent
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
+	Should Contain	${result_stdout}	Manager Connected
+
+	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+
+Agent Command Line MANAGER --manager
+	[Tags]	ubuntu-latest 	macos-latest 	Issue #14 	# can't get agent output in windows
+
+	VAR 	@{agnt_options} 	--manager 	http://localhost:8138
 	VAR 	@{mngr_options} 	-n
 
 	Log To Console	Run Agent and Manager and see if they will connect.
@@ -55,6 +87,24 @@ Agent Command Line AGENTDIR -d
 
 	VAR 	${agentdir} 		${CURDIR}${/}testdata${/}Issue-#14${/}agentdir
 	VAR 	@{agnt_options} 	-d 	${agentdir}
+
+	Log To Console	Run Agent with custom dir.
+	Run Agent 	${agnt_options}
+	Sleep 	10s
+	Stop Agent
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	@{agentdir_dirs}=	List Directories In Directory	${agentdir}
+	List Should Contain Value	${agentdir_dirs}	scripts		msg=Can't find scripts dir in custom Agent dir
+	${agentdir_scripts}=	List Files In Directory		${agentdir}${/}scripts
+	Should Not Be Empty		${agentdir_scripts}
+
+	[Teardown]	Stop Agent
+
+Agent Command Line AGENTDIR --agentdir
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
+
+	VAR 	${agentdir} 		${CURDIR}${/}testdata${/}Issue-#14${/}agentdir
+	VAR 	@{agnt_options} 	--agentdir 	${agentdir}
 
 	Log To Console	Run Agent with custom dir.
 	Run Agent 	${agnt_options}
@@ -111,6 +161,26 @@ Agent Command Line XMLMODE -x
 
 	VAR 	${agentdir} 		${CURDIR}${/}testdata${/}Issue-#14${/}xmlmode_dir
 	VAR 	@{agnt_options} 	-x 	-d 	${agentdir}
+
+	Log To Console	Run Agent with xmlmode.
+	Run Agent 	${agnt_options}
+	Sleep 	10s
+	Stop Agent
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+
+	@{agentdir_dirs}=	List Directories In Directory	${agentdir}
+	List Should Contain Value	${agentdir_dirs}	scripts		msg=Can't find scripts dir in custom Agent dir
+	${agentdir_scripts}=	List Files In Directory		${agentdir}${/}scripts
+	List Should Not Contain Value 	${agentdir_scripts} 	RFSListener3.py
+	List Should Not Contain Value 	${agentdir_scripts} 	RFSListener2.py
+
+	[Teardown]	Stop Agent
+
+Agent Command Line XMLMODE --xmlmode
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
+
+	VAR 	${agentdir} 		${CURDIR}${/}testdata${/}Issue-#14${/}xmlmode_dir
+	VAR 	@{agnt_options} 	--xmlmode 	-d 	${agentdir}
 
 	Log To Console	Run Agent with xmlmode.
 	Run Agent 	${agnt_options}

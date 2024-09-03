@@ -13,9 +13,9 @@ Manager Command Line PORT -p
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
 
-	VAR		&{run_settings_data}	bind_port_number=8148
-	VAR		@{mngr_options}			-p	${run_settings_data}[bind_port_number]
-	VAR		@{agent_options}		-m	http://localhost:${run_settings_data}[bind_port_number]/
+	VAR 	&{run_settings_data} 	bind_port_number=8148
+	VAR 	@{mngr_options} 		-p 	${run_settings_data}[bind_port_number]
+	VAR 	@{agent_options} 		-m 	http://localhost:${run_settings_data}[bind_port_number]/
 
 	Open Manager GUI	${mngr_options}
 	Log To Console	Check if Agent can connect to the new port number. New port number: ${run_settings_data}[bind_port_number].
@@ -28,15 +28,15 @@ Manager Command Line PORT -p
 
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    GUI_Common.Stop Agent
+	...    Stop Agent
 
 Manager Command Line IPADDRESS -e
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
 
-	${ipv4}		${ipv6}		Get IP addresses
+	${ipv4} 	${ipv6} 	Get IP addresses
 	Log To Console		${\n}IPV4 address: ${ipv4} ${\n}IPV6 address: ${ipv6}${\n}
-	VAR		@{mngr_options}			-e	${ipv4}[0]
+	VAR		@{mngr_options} 		-e	${ipv4}[0]
 	VAR		@{agent_options}		-m	http://${ipv4}[0]:8138/
 
 	Open Manager GUI	${mngr_options}
@@ -50,7 +50,7 @@ Manager Command Line IPADDRESS -e
 
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    GUI_Common.Stop Agent
+	...    Stop Agent
 
 Manager Command Line DIR -d
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
@@ -67,24 +67,52 @@ Manager Command Line DIR -d
 	...    Terminate Process	${process_manager}	AND
 	...    Remove Directory		${global_path}${/}Issue-#14		recursive=${True}
 
+Manager Command Line DIR --dir
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+
+	VAR		@{mngr_options}		-n	--dir	${global_path}${/}Issue-#14
+
+	Create Directory	${global_path}${/}Issue-#14
+	Open Manager GUI	${mngr_options}
+	@{dir_list}=	List Directories In Directory	${global_path}${/}Issue-#14
+	Should Be Equal As Strings	${dir_list}[0]	PreRun	msg=Manager didn't create PreRun directory in the new Results directory!
+
+	[Teardown]	Run Keywords
+	...    Terminate Process	${process_manager}	AND
+	...    Remove Directory		${global_path}${/}Issue-#14		recursive=${True}
+
 Manager Command Line STARTTIME -t
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
 
-	VAR		@{mngr_options}		-t	19:00:00
-
 	${current_date}=	Get Current Date	result_format=%H:%M:%S
 	Log To Console	Current time: ${current_date}
-	${time_diff}=	Subtract Date From Date
-	...    ${current_date}		19:00:00	date1_format=%H:%M:%S	date2_format=%H:%M:%S
-	Log To Console	Time diff: ${time_diff}
-	Run Keyword If	${time_diff} < ${10}	Sleep	11
+	${new_date}=	Subtract Time From Date 	${current_date} 	30 		date_format=%H:%M:%S 	result_format=%H:%M:%S
+	VAR		@{mngr_options}		-t 	${new_date}
+	
 	Open Manager GUI	${mngr_options}
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
 	Take A Screenshot
-	# vvv CHANGE LATER vvv
-	# Run Keyword If	not ${status}	Fail	msg=Manager didn't set a scheduled start.
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a scheduled start.
+
+	[Teardown]	Run Keyword		Close Manager GUI ${platform}
+
+Manager Command Line STARTTIME --starttime
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14	hi
+	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+
+	${current_date}=	Get Current Date	result_format=%H:%M:%S
+	Log To Console	Current time: ${current_date}
+	${new_date}=	Subtract Time From Date 	${current_date} 	30 		date_format=%H:%M:%S 	result_format=%H:%M:%S
+	VAR		@{mngr_options}		--starttime 	${new_date}
+	
+	Open Manager GUI	${mngr_options}
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a scheduled start.
 
 	[Teardown]	Run Keyword		Close Manager GUI ${platform}
 
@@ -105,13 +133,13 @@ Manager Command Line SCENARIO -s
 		Click Button	runplay
 		Wait For	manager_${platform}_button_stoprun.png	timeout=30
 	EXCEPT
-		Press key.enter 1 Times
+		Press key.enter 1 Times 	# warning message
 		Fail	msg=RFSwarm Manager didn't load and run the the example scenario!
 	END
 
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    GUI_Common.Stop Agent
+	...    Stop Agent
 
 Manager Command Line AGENTS -a
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
@@ -133,14 +161,14 @@ Manager Command Line AGENTS -a
 
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    GUI_Common.Stop Agent
+	...    Stop Agent
 
-Manager Command Line SCENARIO -r
+Manager Command Line RUN -r
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
 
 	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
-	VAR		@{mngr_options}		-s	${scenariofile}		-r
+	VAR 	@{mngr_options} 	-s	${scenariofile} 	-r
 
 	Open Manager GUI	${mngr_options}
 	Log To Console	Wait for the Agent to connect, after that the scenario should start automatically.
@@ -155,7 +183,7 @@ Manager Command Line SCENARIO -r
 
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    GUI_Common.Stop Agent
+	...    Stop Agent
 
 Manager Command Line INI -i
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
@@ -163,6 +191,25 @@ Manager Command Line INI -i
 
 	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmManager.ini
 	VAR		@{mngr_options}		-i	${inifile}
+
+	Open Manager GUI	${mngr_options}
+	Log To Console	Run Manager with alternate ini file with variable: display_index = True.
+	Click Tab	Run
+	Log To Console	Check that Index check box is selected.
+	${status}=	Run Keyword And Return Status
+	...    Wait For	${platform}_checkbox_checked_default.png 	timeout=${10}
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail
+	...    msg=The manager did not load alternate ini file because it cannot find checked check box in the Run tab!
+
+	[Teardown]	Run Keyword		Close Manager GUI ${platform}
+
+Manager Command Line INI --ini
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+
+	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmManager.ini
+	VAR		@{mngr_options}		--ini	${inifile}
 
 	Open Manager GUI	${mngr_options}
 	Log To Console	Run Manager with alternate ini file with variable: display_index = True.
@@ -239,7 +286,7 @@ Verify That Files Get Saved With Correct Extension And Names
 	[Teardown]	Run Keywords
 	...    Delete Scenario File		${scenario_name}		AND
 	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    GUI_Common.Stop Agent
+	...    Stop Agent
 
 Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
@@ -839,7 +886,7 @@ Check If Inject Sleep Option Was Executed in the Test
 
 	[Teardown]	Run Keywords
 	...    Delete Scenario File	test_scenario				AND
-	...    GUI_Common.Stop Agent							AND
+	...    Stop Agent							AND
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove File		${global_path}${/}example.robot
 
@@ -913,7 +960,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 	...    msg=The agent has connected to the old port number but should not!
 	Log To Console	The Agent did not connect to the Manager with ${old_port_number} port and this was expected.
 	Click Tab	Plan
-	GUI_Common.Stop Agent
+	Stop Agent
 
 	Log To Console	Check if Agent can connect to the new port number. New port number: ${run_settings_data}[bind_port_number].
 	@{agent_options}	Set Variable	-m	http://localhost:${run_settings_data}[bind_port_number]/
@@ -926,7 +973,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    GUI_Common.Stop Agent							AND
+	...    Stop Agent							AND
 	...    Change = 8148 With = 8138 In ${manager_ini_file}
 
 Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Address On the Manager's Host
@@ -958,7 +1005,7 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	...    msg=The agent has connected to the Manager via ${ipv4}[1] but should not!
 	Log To Console	The Agent did not connect to the Manager via ${ipv4}[1] and this was expected.
 	Click Tab	Plan
-	GUI_Common.Stop Agent
+	Stop Agent
 
 	Log To Console	Check if Agent can connect to the Manager via ${ipv4}[0].
 	@{agent_options}	Set Variable	-m	http://${ipv4}[0]:8138/
@@ -971,7 +1018,7 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    GUI_Common.Stop Agent							AND
+	...    Stop Agent							AND
 	...    Change = ${ipv4}[0] With =${SPACE} In ${manager_ini_file}
 
 Verify Disable log.html - Scenario
@@ -1383,7 +1430,7 @@ Check If The CSV Report Button Works In the Manager Before There Are Any Results
 
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    GUI_Common.Stop Agent
+	...    Stop Agent
 
 Check If The CSV Report Button Works In The Manager After There Are Results
 	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #254
@@ -1432,7 +1479,7 @@ Check If The CSV Report Button Works In The Manager After There Are Results
 
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    GUI_Common.Stop Agent
+	...    Stop Agent
 
 Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robots
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #31
@@ -1499,7 +1546,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 	[Teardown]	Run Keywords
 	...    Delete Scenario File		${scenario_name}		AND
 	...    Delete Robot File								AND
-	...    GUI_Common.Stop Agent							AND
+	...    Stop Agent							AND
 	...    Run Keyword		Close Manager GUI ${platform}
 
 Check If Scenario Csv Report Files Contain Correct Data From The Test
@@ -1618,7 +1665,7 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    GUI_Common.Stop Agent
+	...    Stop Agent
 
 Verify the Results Directory And db File Gets Created Correctly With Scenario Also After a Restart
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
@@ -1686,7 +1733,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	[Teardown]	Run Keywords
 	...    Delete Robot File						AND
 	...    Delete Scenario File	${scenario_name}	AND
-	...    GUI_Common.Stop Agent					AND
+	...    Stop Agent					AND
 	...    Run Keyword		Close Manager GUI ${platform}
 
 Verify the Results Directory And db File Gets Created Correctly Without Scenario
@@ -1731,7 +1778,7 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 
 	[Teardown]	Run Keywords
 	...    Delete Robot File						AND
-	...    GUI_Common.Stop Agent					AND
+	...    Stop Agent					AND
 	...    Run Keyword		Close Manager GUI ${platform}
 
 Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the robots)
@@ -1757,7 +1804,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	[Teardown]	Run Keywords
 	...    Delete Scenario File		${scenario_name}		AND
 	...    Set Confidence	0.9								AND
-	...    GUI_Common.Stop Agent							AND
+	...    Stop Agent							AND
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove File		${global_path}${/}example.robot
 
@@ -1784,7 +1831,7 @@ Check If Test Scenario Run Will Stop Gradually
 	[Teardown]	Run Keywords
 	...    Delete Scenario File		${scenario_name}		AND
 	...    Set Confidence	0.9								AND
-	...    GUI_Common.Stop Agent							AND
+	...    Stop Agent							AND
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove File		${global_path}${/}example.robot
 
@@ -1809,7 +1856,7 @@ Verify the Robot Count Reduces When Stop Agent While Test Is Running
 	Run Keyword If	not ${status}	Fail	msg=Manager could not reach 10 robots after 60s.
 
 	Log To Console	Stopping agent while test is running.
-	GUI_Common.Stop Agent
+	Stop Agent
 	Click Tab	Agents
 	${status}=	Run Keyword And Return Status
 	...    Wait For		manager_${platform}_agents_offline.png 	timeout=${60}
@@ -1832,7 +1879,7 @@ Verify the Robot Count Reduces When Stop Agent While Test Is Running
 
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    GUI_Common.Stop Agent							AND
+	...    Stop Agent							AND
 	...    Set Confidence	0.9
 
 Verify the Files Referenced In the Scenario Are All Using Relative Paths
@@ -2039,7 +2086,7 @@ Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardl
 	[Teardown]	Run Keywords
 	...    Remove File	${global_path}${/}${robotname}		AND
 	...    Remove File	${global_path}${/}${scenarioname}	AND
-	...    GUI_Common.Stop Agent							AND
+	...    Stop Agent							AND
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
 
@@ -2088,7 +2135,7 @@ Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only Whe
 	[Teardown]	Run Keywords
 	...    Remove File	${global_path}${/}${robotname}		AND
 	...    Remove File	${global_path}${/}${scenarioname}	AND
-	...    GUI_Common.Stop Agent							AND
+	...    Stop Agent							AND
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
 
@@ -2141,7 +2188,7 @@ Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 	[Teardown]	Run Keywords
 	...    Remove File	${global_path}${/}${robotname}		AND
 	...    Remove File	${global_path}${/}${scenarioname}	AND
-	...    GUI_Common.Stop Agent							AND
+	...    Stop Agent							AND
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
 
