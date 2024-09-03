@@ -170,12 +170,32 @@ Manager Command Line RUN -r
 	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
 	VAR 	@{mngr_options} 	-s	${scenariofile} 	-r
 
+	Open Agent
 	Open Manager GUI	${mngr_options}
 	Log To Console	Wait for the Agent to connect, after that the scenario should start automatically.
-	Open Agent
-	Check If The Agent Is Ready
 	TRY
-		Wait For	manager_${platform}_button_stoprun.png	timeout=30
+		Wait For	manager_${platform}_button_stoprun.png	timeout=60
+	EXCEPT
+		Press key.enter 1 Times
+		Fail	msg=RFSwarm Manager didn't run the scenario automatically after connecting to the Agent!
+	END
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Stop Agent
+
+Manager Command Line RUN --run
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+
+	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
+	VAR 	@{mngr_options} 	-s	${scenariofile} 	--run
+
+	Open Agent
+	Open Manager GUI	${mngr_options}
+	Log To Console	Wait for the Agent to connect, after that the scenario should start automatically.
+	TRY
+		Wait For	manager_${platform}_button_stoprun.png	timeout=60
 	EXCEPT
 		Press key.enter 1 Times
 		Fail	msg=RFSwarm Manager didn't run the scenario automatically after connecting to the Agent!
