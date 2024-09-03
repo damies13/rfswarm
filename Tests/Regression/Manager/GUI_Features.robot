@@ -100,7 +100,7 @@ Manager Command Line STARTTIME -t
 	[Teardown]	Run Keyword		Close Manager GUI ${platform}
 
 Manager Command Line STARTTIME --starttime
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14	hi
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
 
 	${current_date}=	Get Current Date	result_format=%H:%M:%S
