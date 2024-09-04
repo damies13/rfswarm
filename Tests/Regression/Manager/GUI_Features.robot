@@ -1658,7 +1658,7 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 			Diff Lists		${header_row_list}		${expected_header_row_list}
 			...    message=CSV Report Files are not generated correctly! List A - CSV agent_data file header row, List B - Expected header row values.
 
-			@{expected_status}	Create List  Ready  Running  Critical  Stopping
+			@{expected_status}	Create List  Ready  Running  Critical  Stopping  Warning  Offline?
 			@{first_data_row}=	Set Variable	${csv_rows_content_list}[1]
 			${Agent_name}=	Set Variable	${first_data_row}[0]
 			FOR  ${j}  IN RANGE  1  ${len}
