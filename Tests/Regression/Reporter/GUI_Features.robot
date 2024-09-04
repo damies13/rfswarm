@@ -66,7 +66,8 @@ Whole report time range
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
-	Open GUI	-d 	${resultfolder}
+	# pass a non-existant ini file to ensure that default values are used
+	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}${testdata}.ini
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
