@@ -197,7 +197,7 @@ Agent Command Line XMLMODE --xmlmode
 	[Teardown]	Stop Agent
 
 Agent Command Line AGENTNAME -a
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14	hi
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 	[Setup] 	Start Server	127.0.0.1	8138
 
 	VAR 	${agent_name} 		Issue-#14AGENTNAME
@@ -214,7 +214,7 @@ Agent Command Line AGENTNAME -a
 	[Teardown]	Run Keywords	Stop Server 	Stop Agent
 
 Agent Command Line AGENTNAME --agentname
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14	hi
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 	[Setup] 	Start Server	127.0.0.1	8138
 
 	VAR 	${agent_name} 		Issue-#14AGENTNAME
