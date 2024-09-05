@@ -39,6 +39,7 @@ Verify the Field Validation Is Working In the Manager Plan Screen
 		Sleep	2
 		${status}=	Run Keyword And Return Status
 		...    Wait For	${platform}_warning_label_no_${name}.png 	timeout=${20}
+		Take A Screenshot
 		Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed warning label that says: ${expected_messages}[${name}].
 		Press key.enter 1 Times
 		Delete Scenario File	${scenario_name}
