@@ -1,5 +1,6 @@
 *** Settings ***
 Resource 	CommandLine_Common.robot
+Suite Setup 	Set Platform
 
 *** Test Cases ***
 Exclude Libraries With Spaces
@@ -135,3 +136,9 @@ Verify If Agent Runs With Existing INI File From Previous Version NO GUI
 	ELSE
 		Fail	msg=Agest is not running!
 	END
+
+	[Teardown] 	Run Keywords
+	...    Remove File 	${location}${/}RFSwarmAgent.ini 	AND
+	...    Run Agent 	AND
+	...    Sleep 	3 	AND
+	...    Stop Agent

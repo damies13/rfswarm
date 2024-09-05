@@ -2,6 +2,7 @@
 Resource 	GUI_Common.robot
 Library 	XML 	use_lxml=True
 
+Suite Setup 	Set Platform
 Test Teardown 	Close GUI
 
 *** Test Cases ***
@@ -63,6 +64,13 @@ Verify If Reporter Runs With Existing INI File From Previous Version
 	EXCEPT
 		Fail	msg=Reporter is not responding!
 	END
+	Close GUI
+
+	[Teardown] 	Run Keywords
+	...    Remove File 	${location}${/}RFSwarmReporter.ini 	AND
+	...    Open GUI 	AND
+	...    Sleep 	5 	AND
+	...    Close GUI
 
 Verify If Reporter Runs With Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
@@ -106,6 +114,10 @@ Verify If Reporter Runs With Existing INI File From Previous Version NO GUI
 	Open GUI	-n
 	${result}= 	Wait For Process 	${process} 	timeout=60
 	Check Result 	${result}
+
+	[Teardown] 	Run Keywords
+	...    Remove File 	${location}${/}RFSwarmReporter.ini 	AND
+	...    Open GUI 	-n
 
 First Run
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #147

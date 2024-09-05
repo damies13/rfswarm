@@ -147,7 +147,7 @@ Close Manager GUI macos
 		# make sure the window is the active window first, Unlikely the about tab has been selected
 		Run Keyword And Ignore Error 	Click Tab 	 About
 		Run Keyword And Ignore Error 	Click Tab 	 Run
-		Click Image		manager_${platform}_titlebar_rfswarm.png
+		# Click Image		manager_${platform}_titlebar_rfswarm.png
 		Click Button	closewindow
 		Sleep	3
 		Run Keyword And Ignore Error 	Click Dialog Button		no 		10
@@ -175,15 +175,19 @@ Close Manager GUI macos
 	END
 
 Stop Agent
-	IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
-		${result} = 	Terminate Process		${process_agent}
-	ELSE
-		Send Signal To Process 	SIGINT 	${process_agent}
-		${result}= 	Wait For Process 	${process_agent}	timeout=30	on_timeout=kill
+	${running}= 	Is Process Running 	${process_agent}
+	IF 	${running}
+		Sleep	3s
+		IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
+			${result} = 	Terminate Process		${process_agent}
+		ELSE
+			Send Signal To Process 	SIGINT 	${process_agent}
+			${result}= 	Wait For Process 	${process_agent}	timeout=30	on_timeout=kill
+		END
+		Log		${result.stdout}
+		Log		${result.stderr}
+		# Should Be Equal As Integers 	${result.rc} 	0
 	END
-	Log		${result.stdout}
-	Log		${result.stderr}
-	# Should Be Equal As Integers 	${result.rc} 	0
 
 Stop Test Scenario Run Gradually
 	[Arguments]	${rumup_time}	${robot_test_time}

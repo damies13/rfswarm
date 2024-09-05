@@ -12,6 +12,7 @@ ${pyfile_agent} 		${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py
 ${pyfile_manager} 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
 ${process_agent} 		None
 ${process_manager} 	None
+${platform}		None
 
 # datapath: /home/runner/work/rfswarm/rfswarm/rfswarm_manager/results/PreRun
 # datapath: /opt/hostedtoolcache/Python/3.9.18/x64/lib/python3.9/site-packages/rfswarm_manager/results/PreRun -- let's control the output path rather than leaving it to chance
@@ -20,6 +21,40 @@ ${process_manager} 	None
 # ${results_dir} 			${TEMPDIR}${/}rfswarm_manager${/}results
 ${results_dir} 			${OUTPUT DIR}${/}results
 *** Keywords ***
+Set Platform
+	Set Platform By Python
+	Set Platform By Tag
+
+Set Platform By Python
+	${system}= 		Evaluate 	platform.system() 	modules=platform
+
+	IF 	"${system}" == "Windows"
+		Set Suite Variable    ${platform}    macos
+	END
+	IF 	"${system}" == "Windows"
+		Set Suite Variable    ${platform}    windows
+	END
+	IF 	"${system}" == "Linux"
+		Set Suite Variable    ${platform}    ubuntu
+	END
+
+
+Set Platform By Tag
+	# [Arguments]		${ostag}
+	Log 	${OPTIONS}
+	Log 	${OPTIONS}[include]
+	Log 	${OPTIONS}[include][0]
+	${ostag}= 	Set Variable 	${OPTIONS}[include][0]
+
+	IF 	"${ostag}" == "macos-latest"
+		Set Suite Variable    ${platform}    macos
+	END
+	IF 	"${ostag}" == "windows-latest"
+		Set Suite Variable    ${platform}    windows
+	END
+	IF 	"${ostag}" == "ubuntu-latest"
+		Set Suite Variable    ${platform}    ubuntu
+	END
 
 Show Log
 	[Arguments]		${filename}
@@ -58,19 +93,42 @@ Wait For Manager
 	Log to console 	${result.rc}
 
 Stop Manager
-	${result}= 	Terminate Process		${process_manager}
-	# Should Be Equal As Integers 	${result.rc} 	0
-	Log to console 	Terminate Process returned: ${result.rc}
+	${running}= 	Is Process Running 	${process_manager}
+	IF 	${running}
+		Sleep	3s
+		IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
+			${result}= 	Terminate Process		${process_manager}
+		ELSE
+			Send Signal To Process 	SIGINT 	${process_manager}
+			${result}= 	Wait For Process 	${process_manager}	timeout=30	on_timeout=kill
+		END
+		Log		${result.stdout}
+		Log		${result.stderr}
+		
+		# Should Be Equal As Integers 	${result.rc} 	0
+		Log to console 	Process returned: ${result.rc}
+	END
 
 Stop Agent
-	${result}= 	Terminate Process		${process_agent}
-	# Should Be Equal As Integers 	${result.rc} 	0
-	Log to console 	Terminate Process returned: ${result.rc}
+	${running}= 	Is Process Running 	${process_agent}
+	IF 	${running}
+		Sleep	3s
+		IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
+			${result} = 	Terminate Process		${process_agent}
+		ELSE
+			Send Signal To Process 	SIGINT 	${process_agent}
+			${result}= 	Wait For Process 	${process_agent}	timeout=30	on_timeout=kill
+		END
+		Log		${result.stdout}
+		Log		${result.stderr}
+		# Should Be Equal As Integers 	${result.rc} 	0
+	END
 
 Find Result DB
+	[Arguments] 	${result_pattern}=*_*
 	# ${fols}= 	List Directory 	${results_dir}
 	# Log to console 	${fols}
-	${fols}= 	List Directory 	${results_dir} 	*_* 	absolute=True
+	${fols}= 	List Directory 	${results_dir} 	${result_pattern} 	absolute=True
 	Log to console 	${fols}
 	# ${files}= 	List Directory 	${fols[0]}
 	# Log to console 	${files}
