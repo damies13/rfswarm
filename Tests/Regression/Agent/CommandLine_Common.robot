@@ -141,7 +141,6 @@ Test Agent Connectivity
 	Reply By	200
 	${method}=	Get Request Method
 	${url}= 	Get Request Url
-	${body}=	Get Request Body
 	Should Be Equal 	${method}	POST
 	#Should Be Equal 	${url}		/Jobs
 

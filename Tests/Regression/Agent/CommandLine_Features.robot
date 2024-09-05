@@ -205,10 +205,16 @@ Agent Command Line AGENTNAME -a
 
 	Log To Console	Run Agent with custom agent name.
 	Run Agent 	${agnt_options}
-
 	Test Agent Connectivity
 	Wait For Request 		20
-	Set Stub Reply	POST	/Jobs 	200 	${agent_name}
+	Reply By	200
+	${method}=	Get Request Method
+	${body}=	Get Request Body
+	${body}=	Decode Bytes To String	${body} 	UTF-8
+
+	Should Be Equal 	${method}	POST
+	Log 	${body}
+	Should Contain	${body} 	Issue-#14AGENTNAME
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 
 	[Teardown]	Run Keywords	Stop Server 	Stop Agent
@@ -224,7 +230,14 @@ Agent Command Line AGENTNAME --agentname
 	Run Agent 	${agnt_options}
 	Test Agent Connectivity
 	Wait For Request 		20
-	Set Stub Reply	POST	/Jobs 	200 	${agent_name}
+	Reply By	200
+	${method}=	Get Request Method
+	${body}=	Get Request Body
+	${body}=	Decode Bytes To String	${body} 	UTF-8
+
+	Should Be Equal 	${method}	POST
+	Log 	${body}
+	Should Contain	${body} 	Issue-#14AGENTNAME
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 
 	[Teardown]	Run Keywords	Stop Server 	Stop Agent
