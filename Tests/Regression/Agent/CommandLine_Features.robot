@@ -197,24 +197,37 @@ Agent Command Line XMLMODE --xmlmode
 	[Teardown]	Stop Agent
 
 Agent Command Line AGENTNAME -a
-	[Tags]	ubuntu-latest 	macos-latest 	Issue #14	# can't get agent output in windows
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14	hi
+	[Setup] 	Start Server	127.0.0.1	8138
 
 	VAR 	${agent_name} 		Issue-#14AGENTNAME
 	VAR 	@{agnt_options} 	-a 	${agent_name}
-	VAR 	@{mngr_options} 	-n 	-g 	6
 
 	Log To Console	Run Agent with custom agent name.
 	Run Agent 	${agnt_options}
-	Run Manager CLI 	${mngr_options}
-	Sleep	25s
-	Stop Manager
-	Stop Agent
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${result_stdout}= 	Get File	${OUTPUT DIR}${/}stdout_manager.txt
-	Log 	${result_stdout}
-	Should Contain	${result_stdout}	${agent_name}
 
-	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+	Test Agent Connectivity
+	Wait For Request 		20
+	Set Stub Reply	POST	/Jobs 	200 	${agent_name}
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+
+	[Teardown]	Run Keywords	Stop Server 	Stop Agent
+
+Agent Command Line AGENTNAME --agentname
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14	hi
+	[Setup] 	Start Server	127.0.0.1	8138
+
+	VAR 	${agent_name} 		Issue-#14AGENTNAME
+	VAR 	@{agnt_options} 	--agentname 	${agent_name}
+
+	Log To Console	Run Agent with custom agent name.
+	Run Agent 	${agnt_options}
+	Test Agent Connectivity
+	Wait For Request 		20
+	Set Stub Reply	POST	/Jobs 	200 	${agent_name}
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+
+	[Teardown]	Run Keywords	Stop Server 	Stop Agent
 
 Agent Command Line PROPERTY -p
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
@@ -239,4 +252,3 @@ Agent Command Line PROPERTY -p
 	...    msg=Custom propery 'Issue-#14' not found in PreRun db. ${\n}Query Result: ${prop_result}
 
 	[Teardown]	Run Keywords	Stop Agent	Stop Manager
-

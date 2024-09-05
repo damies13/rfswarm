@@ -24,7 +24,7 @@ Set Platform
 Set Platform By Python
 	${system}= 		Evaluate 	platform.system() 	modules=platform
 
-	IF 	"${system}" == "Windows"
+	IF 	"${system}" == "Darwin"
 		Set Suite Variable    ${platform}    macos
 	END
 	IF 	"${system}" == "Windows"
