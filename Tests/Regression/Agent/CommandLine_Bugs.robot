@@ -142,3 +142,53 @@ Verify If Agent Runs With Existing INI File From Previous Version NO GUI
 	...    Run Agent 	AND
 	...    Sleep 	3 	AND
 	...    Stop Agent
+
+Verify If Agent Name Has Been Transferred To the Manager (-a command line switch)
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #100
+
+	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#100${/}command_line
+	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
+	VAR 	@{agnt_options} 	-a 	Issue-#100AGENTNAME
+	VAR 	@{mngr_options} 	-n 	-d 	${test_dir}
+
+	Create Directory 	${test_dir}
+	Log To Console	Run Agent with custom agent name.
+	Run Agent 	${agnt_options}
+	Run Manager CLI 	${mngr_options}
+	Sleep	20s
+	Stop Agent
+	Stop Manager
+
+	Log To Console 	Checking PreRun data base.
+	${query_result} 	Query Result DB 	${dbfile}
+	...    SELECT * FROM AgentList WHERE AgentName='Issue-#100AGENTNAME'
+	${len}= 	Get Length 	${query_result}
+	Should Be True 	${len} > 0
+	...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}
+
+	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+
+Verify If Agent Name Has Been Transferred To the Manager (ini file)
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #100
+
+	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#100${/}ini_file
+	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
+	VAR 	@{agnt_options} 	-i 	${CURDIR}${/}testdata${/}Issue-#100${/}RFSwarmAgent.ini
+	VAR 	@{mngr_options} 	-n 	-d 	${test_dir}
+
+	Create Directory 	${test_dir}
+	Log To Console	Run Agent with custom agent name.
+	Run Agent 	${agnt_options}
+	Run Manager CLI 	${mngr_options}
+	Sleep	20s
+	Stop Agent
+	Stop Manager
+
+	Log To Console 	Checking PreRun data base.
+	${query_result} 	Query Result DB 	${dbfile}
+	...    SELECT * FROM AgentList WHERE AgentName='Issue-#100AGENTNAME'
+	${len}= 	Get Length 	${query_result}
+	Should Be True 	${len} > 0
+	...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}
+
+	[Teardown]	Run Keywords	Stop Agent	Stop Manager

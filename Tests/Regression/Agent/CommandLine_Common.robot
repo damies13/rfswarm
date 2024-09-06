@@ -78,9 +78,9 @@ Run Manager CLI
 	[Arguments]		${options}=None
 	IF  ${options} == None
 		${options}= 	Create List
+		Create Directory 	${results_dir}
+		Append To List 	${options} 	-d 	${results_dir}
 	END
-	Create Directory 	${results_dir}
-	Append To List 	${options} 	-d 	${results_dir}
 	Log to console 	${\n}\${options}: ${options}
 	# ${process}= 	Start Process 	python3 	${pyfile_manager}  @{options}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
 	${process}= 	Start Process 	${cmd_manager}  @{options}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
