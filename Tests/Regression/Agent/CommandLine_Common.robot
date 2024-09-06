@@ -78,6 +78,8 @@ Run Manager CLI
 	[Arguments]		${options}=None
 	IF  ${options} == None
 		${options}= 	Create List
+	END
+	IF  '-d' not in ${options}
 		Create Directory 	${results_dir}
 		Append To List 	${options} 	-d 	${results_dir}
 	END

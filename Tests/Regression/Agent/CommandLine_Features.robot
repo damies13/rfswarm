@@ -131,7 +131,7 @@ Agent Command Line ROBOT -r
 	VAR 	${robot_exec} 		${pip_data_list}[1]
 	# VAR 	${scenario_dir} 	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
 	VAR 	@{agnt_options} 	-g 	1 	-r 	${robot_exec}
-	VAR 	@{mngr_options} 	-g 	1 	-n 	-d 	${results_dir} 	-s 	${scenario_dir}
+	VAR 	@{mngr_options} 	-g 	1 	-n 	-s 	${scenario_dir}
 
 	Log To Console	Run Agent with custom robot executable.
 	Run Agent 	${agnt_options}
@@ -246,7 +246,7 @@ Agent Command Line PROPERTY -p
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 
 	VAR 	@{agnt_options} 	-p 	Issue-#14
-	VAR 	@{mngr_options} 	-n 	-d 	${results_dir}
+	VAR 	@{mngr_options} 	-n
 
 	Log To Console	Run Agent with custom prop.
 	Run Agent 	${agnt_options}
