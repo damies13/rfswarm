@@ -4,6 +4,7 @@ Library 	Process
 Library 	DatabaseLibrary
 Library 	String
 Library 	Collections
+Library 	HttpCtrl.Server
 
 *** Variables ***
 ${cmd_agent} 		rfswarm-agent
@@ -28,7 +29,7 @@ Set Platform
 Set Platform By Python
 	${system}= 		Evaluate 	platform.system() 	modules=platform
 
-	IF 	"${system}" == "Windows"
+	IF 	"${system}" == "Darwin"
 		Set Suite Variable    ${platform}    macos
 	END
 	IF 	"${system}" == "Windows"
@@ -123,6 +124,27 @@ Stop Agent
 		Log		${result.stderr}
 		# Should Be Equal As Integers 	${result.rc} 	0
 	END
+
+Test Agent Connectivity
+	#[Setup] 	Start Server	127.0.0.1	8138
+
+	# wait for GET poll to /
+	Wait For Request 		20
+	Reply By	200
+	${method}=	Get Request Method
+	${url}= 	Get Request Url
+	Should Be Equal 	${method} 	GET
+	Should Be Equal 	${url}		/
+
+	# wait for POST to /Jobs
+	Wait For Request 		20
+	Reply By	200
+	${method}=	Get Request Method
+	${url}= 	Get Request Url
+	Should Be Equal 	${method}	POST
+	#Should Be Equal 	${url}		/Jobs
+
+	#[Teardown]	Stop Server
 
 Find Result DB
 	[Arguments] 	${result_pattern}=*_*
