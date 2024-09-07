@@ -314,6 +314,9 @@ class RFSwarmAgent():
 	def create_windows_shortcut(self, scutpath, targetpath, iconpath, desc, minimised=False):
 		pslst = []
 
+		directorydir = os.path.dirname(scutpath)
+		self.ensuredir(directorydir)
+
 		pslst.append("$wshshell = New-Object -COMObject wscript.shell")
 		pslst.append('$scut = $wshshell.CreateShortcut("""' + scutpath + '""")')
 		pslst.append('$scut.TargetPath = """' + targetpath + '"""')

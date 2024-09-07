@@ -408,12 +408,13 @@ Check Icon Install For Macos
 	File Should Exist 	${appfolder}${/}Contents${/}MacOS${/}${projname} 		Executable Symbolic Link File not found
 
 Check Icon Install For Windows
-	# Log 	%{HOME}
 	Log 	%{USERPROFILE}
-
-	# roam_appdata = os.environ["APPDATA"]
 	Log 	%{APPDATA}
-	# scutpath = os.path.join(roam_appdata, "Microsoft", "Windows", "Start Menu", appname + ".lnk")
+
+	Directory Should Exist 	%{APPDATA} 		APPDATA Directory not found
+	Directory Should Exist 	%{APPDATA}${/}Microsoft 		Microsoft Directory not found
+	Directory Should Exist 	%{APPDATA}${/}Microsoft${/}Windows 		Windows Directory not found
+	Directory Should Exist 	%{APPDATA}${/}Microsoft${/}Windows${/}Start Menu 		Start Menu Directory not found
 	File Should Exist 	%{APPDATA}${/}Microsoft${/}Windows${/}Start Menu${/}${projname}.lnk 		Shortcut File not found
 
 
