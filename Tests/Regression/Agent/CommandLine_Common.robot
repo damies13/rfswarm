@@ -59,7 +59,7 @@ Show Log
 	[Arguments]		${filename}
 	Log to console 	${\n}-----${filename}-----
 	${filedata}= 	Get File 	${filename}
-	Log to console 	${filedata}
+	Log 	${filedata} 	console=True
 	Log to console 	-----${filename}-----${\n}
 
 Run Agent
@@ -242,14 +242,15 @@ Get Agent Default Save Path
 
 Check Icon Install
 	VAR 	${projname}= 		rfswarm-agent 		scope=TEST
+	VAR 	${dispname}= 		RFSwarm Agent 		scope=TEST
 	Run Keyword 	Check Icon Install For ${platform}
 
 Check Icon Install For Macos
 	${Status}= 	Run Keyword And Return Status 	Directory Should Exist 	%{HOME}${/}Applications${/}${projname}.app
 	IF 	${Status}
-		${appfolder}= 		Set Variable    %{HOME}${/}Applications${/}${projname}.app
+		${appfolder}= 		Set Variable    %{HOME}${/}Applications${/}${dispname}.app
 	ELSE
-		${appfolder}= 		Set Variable    ${/}Applications${/}${projname}.app
+		${appfolder}= 		Set Variable    ${/}Applications${/}${dispname}.app
 	END
 	Directory Should Exist 	${appfolder} 		.app Folder not found
 
@@ -277,22 +278,20 @@ Check Icon Install For Windows
 	Directory Should Exist 	%{APPDATA}${/}Microsoft 		Microsoft Directory not found
 	Directory Should Exist 	%{APPDATA}${/}Microsoft${/}Windows 		Windows Directory not found
 	Directory Should Exist 	%{APPDATA}${/}Microsoft${/}Windows${/}Start Menu 		Start Menu Directory not found
-	File Should Exist 	%{APPDATA}${/}Microsoft${/}Windows${/}Start Menu${/}${projname}.lnk 		Shortcut File not found
+	File Should Exist 	%{APPDATA}${/}Microsoft${/}Windows${/}Start Menu${/}${dispname}.lnk 		Shortcut File not found
 
 
 Check Icon Install For Ubuntu
 	Log 	%{HOME}
 	# /home/dave/.local/share/applications/rfswarm-manager.desktop
-	${Status}= 	Run Keyword And Return Status 	File Should Exist 	%{HOME}${/}.local${/}share${/}applications${/}rfswarm-manager.desktop
+	${Status}= 	Run Keyword And Return Status 	File Should Exist 	%{HOME}${/}.local${/}share${/}applications${/}${projname}.desktop
 	IF 	${Status}
 		${pathprefix}= 		Set Variable    %{HOME}${/}.local${/}share
 	ELSE
 		${pathprefix}= 		Set Variable    ${/}usr${/}share
 	END
-	File Should Exist 	${pathprefix}${/}applications${/}rfswarm-manager.desktop 		Desktop File not found
-
-	File Should Exist 	${pathprefix}${/}applications${/}rfswarm-manager.desktop 		Desktop File not found
-	File Should Exist 	${pathprefix}${/}icons${/}hicolor${/}128x128${/}apps${/}rfswarm-manager.png 		Icon File not found
+	File Should Exist 	${pathprefix}${/}applications${/}${projname}.desktop 		Desktop File not found
+	File Should Exist 	${pathprefix}${/}icons${/}hicolor${/}128x128${/}apps${/}${projname}.png 		Icon File not found
 
 
 
