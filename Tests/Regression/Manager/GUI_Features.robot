@@ -1287,6 +1287,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 
 	${status}=	Run Keyword And Return Status
 	...    Wait For	${platform}_warning_label_not_enough_agents.png 	timeout=${10}
+	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=The manager didn't display expected prompt dialogue that says: Not enough Agents available to run Robots!
 	Press key.enter 1 Times
 	${status}=	Run Keyword And Return Status

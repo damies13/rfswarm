@@ -22,6 +22,39 @@ ${results_dir} 			${OUTPUT DIR}${/}results
 ${agent_dir} 				${OUTPUT DIR}${/}rfswarm-agent
 
 *** Keywords ***
+Set Platform
+	Set Platform By Python
+	Set Platform By Tag
+
+Set Platform By Python
+	${system}= 		Evaluate 	platform.system() 	modules=platform
+
+	IF 	"${system}" == "Darwin"
+		Set Suite Variable    ${platform}    macos
+	END
+	IF 	"${system}" == "Windows"
+		Set Suite Variable    ${platform}    windows
+	END
+	IF 	"${system}" == "Linux"
+		Set Suite Variable    ${platform}    ubuntu
+	END
+
+Set Platform By Tag
+	# [Arguments]		${ostag}
+	Log 	${OPTIONS}
+	Log 	${OPTIONS}[include]
+	Log 	${OPTIONS}[include][0]
+	${ostag}= 	Set Variable 	${OPTIONS}[include][0]
+
+	IF 	"${ostag}" == "macos-latest"
+		Set Suite Variable    ${platform}    macos
+	END
+	IF 	"${ostag}" == "windows-latest"
+		Set Suite Variable    ${platform}    windows
+	END
+	IF 	"${ostag}" == "ubuntu-latest"
+		Set Suite Variable    ${platform}    ubuntu
+	END
 
 Show Log
 	[Arguments]		${filename}
@@ -343,3 +376,57 @@ Diff Lists
 		Log 		Items from list A missing from list B: ${Missing_List_From_B} 	console=True
 		Lists Should Be Equal 	${list_a} 	${list_b} 		msg=${message}
 	END
+
+Check Icon Install
+	VAR 	${projname}= 		rfswarm-manager 		scope=TEST
+	Check Icon Install For ${platform}
+
+Check Icon Install For Macos
+	${Status}= 	Run Keyword And Return Status 	Directory Should Exist 	%{HOME}${/}Applications${/}${projname}.app
+	IF 	${Status}
+		${appfolder}= 		Set Variable    %{HOME}${/}Applications${/}${projname}.app
+	ELSE
+		${appfolder}= 		Set Variable    ${/}Applications${/}${projname}.app
+	END
+	Directory Should Exist 	${appfolder} 		.app Folder not found
+
+	Directory Should Exist 	${appfolder}${/}Contents 		Contents Folder not found
+	Directory Should Exist 	${appfolder}${/}Contents${/}MacOS 		MacOS Folder not found
+
+	Directory Should Exist 	${appfolder}${/}Contents${/}Resources 		Resources Folder not found
+
+	Directory Should Exist 	${appfolder}${/}Contents${/}Resources${/}${projname}.iconset 		iconset Folder not found
+
+	File Should Exist 	${appfolder}${/}Contents${/}Resources${/}${projname}.iconset${/}icon_*.png 		Icons Images not found
+
+	File Should Exist 	${appfolder}${/}Contents${/}Resources${/}${projname}.icns 		icns File not found
+
+	File Should Exist 	${appfolder}${/}Contents${/}Info.plist 		plist File not found
+
+	File Should Exist 	${appfolder}${/}Contents${/}PkgInfo 		PkgInfo File not found
+
+	File Should Exist 	${appfolder}${/}Contents${/}MacOS${/}${projname} 		Executable Symbolic Link File not found
+
+Check Icon Install For Windows
+	# Log 	%{HOME}
+	Log 	%{USERPROFILE}
+
+	# roam_appdata = os.environ["APPDATA"]
+	Log 	%{APPDATA}
+	# scutpath = os.path.join(roam_appdata, "Microsoft", "Windows", "Start Menu", appname + ".lnk")
+	File Should Exist 	%{APPDATA}${/}Microsoft${/}Windows${/}Start Menu${/}${projname}.lnk 		Shortcut File not found
+
+
+Check Icon Install For Ubuntu
+	Log 	%{HOME}
+	# /home/dave/.local/share/applications/rfswarm-manager.desktop
+	${Status}= 	Run Keyword And Return Status 	File Should Exist 	%{HOME}${/}.local${/}share${/}applications${/}rfswarm-manager.desktop
+	IF 	${Status}
+		${pathprefix}= 		Set Variable    %{HOME}${/}.local${/}share
+	ELSE
+		${pathprefix}= 		Set Variable    ${/}usr${/}share
+	END
+	File Should Exist 	${pathprefix}${/}applications${/}rfswarm-manager.desktop 		Desktop File not found
+
+	File Should Exist 	${pathprefix}${/}applications${/}rfswarm-manager.desktop 		Desktop File not found
+	File Should Exist 	${pathprefix}${/}icons${/}hicolor${/}128x128${/}apps${/}rfswarm-manager.png 		Icon File not found

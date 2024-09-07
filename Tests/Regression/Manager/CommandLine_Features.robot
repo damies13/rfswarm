@@ -1,6 +1,8 @@
 *** Settings ***
 Resource 	CommandLine_Common.robot
 
+Suite Setup 	Set Platform
+
 *** Test Cases ***
 Environment Variable Substitution in Robot/Resource files
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #165
@@ -373,3 +375,11 @@ Keyword and Args Result Name Method - Tests Row
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
 	...    Stop Manager
+
+Install Application Icon or Desktop Shortcut
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
+
+	@{mngr_options}= 	Create List 	-c 	ICON
+	Run Manager CLI 	${mngr_options}
+
+	Check Icon Install

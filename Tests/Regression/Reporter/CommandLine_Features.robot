@@ -7,7 +7,6 @@ Suite Setup 	Set Platform
 Install Application Icon or Desktop Shortcut
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
 
-	@{agent_options}= 	Create List 	-c 	ICON
-	Run Agent 	${agent_options}
-
+	${result}= 	Run 	${cmd_reporter} -c ICON
+	Log 		${result}
 	Check Icon Install
