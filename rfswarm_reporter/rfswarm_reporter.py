@@ -2891,9 +2891,9 @@ class ReporterCore:
 		base.debugmsg(0, "Creating application icons for RFSwarm Reporter")
 		appname = "RFSwarm Reporter"
 		namelst = appname.split()
-		self.debugmsg(6, "namelst:", namelst)
+		base.debugmsg(6, "namelst:", namelst)
 		projname = "-".join(namelst).lower()
-		self.debugmsg(6, "projname:", projname)
+		base.debugmsg(6, "projname:", projname)
 		pipdata = importlib.metadata.distribution(projname)
 		# print("files:", pipdata.files)
 		# print("file0:", pipdata.files[0])
