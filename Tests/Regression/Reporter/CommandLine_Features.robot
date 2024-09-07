@@ -7,6 +7,6 @@ Suite Setup 	Set Platform
 Install Application Icon or Desktop Shortcut
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
 
-	${result}= 	Run 	${cmd_reporter} -c ICON
+	${result}= 	Run 	${cmd_reporter} -g 6 -c ICON
 	Log 		${result}
 	Check Icon Install

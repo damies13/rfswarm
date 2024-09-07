@@ -379,7 +379,7 @@ Keyword and Args Result Name Method - Tests Row
 Install Application Icon or Desktop Shortcut
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
 
-	@{mngr_options}= 	Create List 	-c 	ICON
+	@{mngr_options}= 	Create List 	-g 	6 	-c 	ICON
 	Run Manager CLI 	${mngr_options}
 
 	Check Icon Install
