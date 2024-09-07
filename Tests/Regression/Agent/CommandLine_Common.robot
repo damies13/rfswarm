@@ -241,7 +241,7 @@ Get Agent Default Save Path
 	RETURN	${location}${/}rfswarm_agent${/}
 
 Check Icon Install
-	VAR 	${projname}= 		rfswarm-manager 		scope=TEST
+	VAR 	${projname}= 		rfswarm-agent 		scope=TEST
 	Run Keyword 	Check Icon Install For ${platform}
 
 Check Icon Install For Macos

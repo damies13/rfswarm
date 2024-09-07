@@ -155,7 +155,7 @@ Get Install Requires From Setup File
 	RETURN	${refactored_requires}
 
 Check Icon Install
-	VAR 	${projname}= 		rfswarm-manager 		scope=TEST
+	VAR 	${projname}= 		rfswarm-reporter 		scope=TEST
 	Run Keyword 	Check Icon Install For ${platform}
 
 Check Icon Install For Macos
