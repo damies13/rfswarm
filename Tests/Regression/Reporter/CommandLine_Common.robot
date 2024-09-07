@@ -156,7 +156,7 @@ Get Install Requires From Setup File
 
 Check Icon Install
 	VAR 	${projname}= 		rfswarm-manager 		scope=TEST
-	Check Icon Install For ${platform}
+	Run Keyword 	Check Icon Install For ${platform}
 
 Check Icon Install For Macos
 	${Status}= 	Run Keyword And Return Status 	Directory Should Exist 	%{HOME}${/}Applications${/}${projname}.app
