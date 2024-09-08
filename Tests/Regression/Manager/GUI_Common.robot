@@ -1386,7 +1386,11 @@ Navigate to and check Desktop Icon For Ubuntu
 	Take A Screenshot
 
 	# Check for Icon
-	Fail 	Not Implimented
+	# ubuntu_lxqt_rfswarm_manager_menu.png
+	${img}=	Set Variable		${platform}lxqt_rfswarm_manager_menu.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+
+	Press Combination 	KEY.ESC
 
 
 

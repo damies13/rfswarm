@@ -502,7 +502,11 @@ Navigate to and check Desktop Icon For Ubuntu
 	Take A Screenshot
 
 	# Check for Icon
-	Fail 	Not Implimented
+	# ubuntu_lxqt_rfswarm_reporter_menu.png
+	${img}=	Set Variable		${platform}_lxqt_rfswarm_reporter_menu.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+
+	Press Combination 	KEY.ESC
 
 
 
