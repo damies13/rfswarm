@@ -494,6 +494,12 @@ Navigate to and check Desktop Icon For Ubuntu
 	Take A Screenshot
 
 	# Navigate Menu
+	# lxqt_programming_menu.png
+	${img}=	Set Variable		${platform}_lxqt_programming_menu.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Click Image		${img}
+	Sleep 	0.5
+	Take A Screenshot
 
 	# Check for Icon
 	Fail 	Not Implimented
