@@ -435,6 +435,7 @@ Navigate to and check Desktop Icon For MacOS
 
 	Take A Screenshot
 	# Open Launchpad (F4?)
+	# Press Combination   key.f4
 	${img}=	Set Variable		${platform}_launchpad.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
@@ -448,9 +449,11 @@ Navigate to and check Desktop Icon For MacOS
 	Take A Screenshot
 
 	# Check for Icon
+	# macos_launchpad_rfswarm_reporter.png
+	${img}=	Set Variable		${platform}_launchpad_rfswarm_reporter.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 
 	Press Combination 	KEY.ESC
-	Fail 	Not Implimented
 
 Navigate to and check Desktop Icon For Windows
 
@@ -484,9 +487,9 @@ Navigate to and check Desktop Icon For Ubuntu
 	${img}=	Set Variable		${platform}_lxqt_menu.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
-	# Click Image		${img}
-	Move To 	${coordinates}
-	Click 	button=right
+	Click Image		${img}
+	# Move To 	${coordinates}
+	# Click 	button=right
 	Sleep 	0.5
 	Take A Screenshot
 

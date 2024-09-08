@@ -1321,32 +1321,51 @@ Navigate to and check Desktop Icon
 	Run Keyword 	Navigate to and check Desktop Icon For ${platform}
 
 Navigate to and check Desktop Icon For MacOS
+	Take A Screenshot
 	# Open Launchpad (F4?)
-	Press Combination 	key.f4
-	Sleep 	0.1
+	# Press Combination   key.f4
+	${img}=	Set Variable		${platform}_launchpad.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	1
 	Take A Screenshot
 
 	# Search Launchpad
 	Type 	RFSwarm
-	Sleep 	0.1
+	Sleep 	0.5
 	Take A Screenshot
 
 	# Check for Icon
-	Fail 	Not Implimented
+	# macos_launchpad_rfswarm_reporter.png
+	${img}=	Set Variable		${platform}_launchpad_rfswarm_manager.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+
+	Press Combination 	KEY.ESC
 
 Navigate to and check Desktop Icon For Windows
+	Take A Screenshot
 	# Open Start Menu
 	${img}=	Set Variable		${platform}_start_menu.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Sleep 	0.1
+	Sleep 	1
 	Take A Screenshot
 
+	${img}=	Set Variable		${platform}_start_menu_rfswarm_manager.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+
 	# Navigate Start Menu
+	Type 	RFSwarm
+	Sleep 	0.5
+	Take A Screenshot
 
 	# Check for Icon
-	Fail 	Not Implimented
+	${img}=	Set Variable		${platform}_search_rfswarm_manager.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+
+	Press Combination 	KEY.ESC
 
 Navigate to and check Desktop Icon For Ubuntu
 
@@ -1354,9 +1373,7 @@ Navigate to and check Desktop Icon For Ubuntu
 	${img}=	Set Variable		${platform}_lxqt_menu.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
-	# Click Image		${img}
-	Move To 	${coordinates}
-	Click 	button=right
+	Click Image		${img}
 	Sleep 	0.5
 	Take A Screenshot
 
@@ -1364,6 +1381,9 @@ Navigate to and check Desktop Icon For Ubuntu
 
 	# Check for Icon
 	Fail 	Not Implimented
+
+
+
 
 
 
