@@ -2794,7 +2794,7 @@ class RFSwarmCore:
 			# base.debugmsg(5, "directoryfilename:", directoryfilename)
 			# with open(directoryfilename, 'w') as df:
 			# 	df.writelines(directorydata)
-			
+
 			base.debugmsg(5, "Create .desktop file")
 			desktopdata = []
 			desktopdata.append('[Desktop Entry]\n')
@@ -2820,7 +2820,7 @@ class RFSwarmCore:
 			# 	1024x1024  128x128  16x16  192x192  22x22  24x24  256x256  32x32  36x36  42x42  48x48  512x512  64x64  72x72  8x8  96x96
 			# or
 			#  ~/.local/share/icons/hicolor/256x256/apps/
-			src_iconx128 = os.path.join(script_dir, projname + "-128.png")
+			src_iconx128 = os.path.join(icon_dir, projname + "-128.png")
 			base.debugmsg(5, "src_iconx128:", src_iconx128)
 			dst_iconx128 = os.path.join(fileprefix, "icons", "hicolor", "128x128", "apps", projname + ".png")
 			dst_icondir = os.path.dirname(dst_iconx128)
