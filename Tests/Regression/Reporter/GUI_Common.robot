@@ -9,6 +9,7 @@ Library 	OCRLibrary
 
 
 *** Variables ***
+${default_image_timeout} 	120
 ${platform}		None
 ${cmd_reporter} 		rfswarm-reporter
 ${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
@@ -431,6 +432,8 @@ Navigate to and check Desktop Icon
 	Run Keyword 	Navigate to and check Desktop Icon For ${platform}
 
 Navigate to and check Desktop Icon For MacOS
+
+	Take A Screenshot
 	# Open Launchpad (F4?)
 	Press Combination 	key.f4
 	Sleep 	0.1
@@ -445,6 +448,8 @@ Navigate to and check Desktop Icon For MacOS
 	Fail 	Not Implimented
 
 Navigate to and check Desktop Icon For Windows
+
+	Take A Screenshot
 	# Open Start Menu
 	${img}=	Set Variable		${platform}_start_menu.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
@@ -460,6 +465,7 @@ Navigate to and check Desktop Icon For Windows
 
 Navigate to and check Desktop Icon For Ubuntu
 
+	Take A Screenshot
 	# Open Menu
 	${img}=	Set Variable		${platform}_fluxbox_menu.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
