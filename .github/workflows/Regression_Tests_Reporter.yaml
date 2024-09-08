@@ -65,7 +65,9 @@ jobs:
           xauth list
           sleep 1
           # fluxbox
-          fluxbox &
+          # fluxbox &
+          # lxqt
+          lxqt & 
       - name: "MacOS Install tesseract"
         if: ${{ matrix.platform == 'macos-latest' }}
         run: |

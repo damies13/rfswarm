@@ -435,16 +435,21 @@ Navigate to and check Desktop Icon For MacOS
 
 	Take A Screenshot
 	# Open Launchpad (F4?)
-	Press Combination 	key.f4
-	Sleep 	0.1
+	${img}=	Set Variable		${platform}_launchpad.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	1
 	Take A Screenshot
 
 	# Search Launchpad
 	Type 	RFSwarm
-	Sleep 	0.1
+	Sleep 	0.5
 	Take A Screenshot
 
 	# Check for Icon
+
+	Press Combination 	KEY.ESC
 	Fail 	Not Implimented
 
 Navigate to and check Desktop Icon For Windows
@@ -459,8 +464,15 @@ Navigate to and check Desktop Icon For Windows
 	Take A Screenshot
 
 	# Navigate Start Menu
+	Type 	RFSwarm
+	Sleep 	0.5
+	Take A Screenshot
 
 	# Check for Icon
+	${img}=	Set Variable		${platform}_start_menu_rfswarm_reporter.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+
+	Press Combination 	KEY.ESC
 	Fail 	Not Implimented
 
 Navigate to and check Desktop Icon For Ubuntu
