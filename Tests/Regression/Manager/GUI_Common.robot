@@ -1351,13 +1351,13 @@ Navigate to and check Desktop Icon For Windows
 Navigate to and check Desktop Icon For Ubuntu
 
 	# Open Menu
-	${img}=	Set Variable		${platform}_fluxbox_menu.png
+	${img}=	Set Variable		${platform}_lxqt_menu.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	# Click Image		${img}
 	Move To 	${coordinates}
 	Click 	button=right
-	Sleep 	0.1
+	Sleep 	0.5
 	Take A Screenshot
 
 	# Navigate Menu
