@@ -455,7 +455,7 @@ Navigate to and check Desktop Icon For Windows
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Sleep 	0.1
+	Sleep 	1
 	Take A Screenshot
 
 	# Navigate Start Menu
