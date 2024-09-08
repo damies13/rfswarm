@@ -284,6 +284,26 @@ class ReporterBase():
 			base.debugmsg(9, "valout:", valout)
 		return valout
 
+	def ensuredir(self, dir):
+		if len(dir) < 1:
+			return True
+		if os.path.exists(dir):
+			return True
+		try:
+			patharr = os.path.split(dir)
+			self.debugmsg(6, "patharr: ", patharr)
+			self.ensuredir(patharr[0])
+			os.mkdir(dir, mode=0o777)
+			self.debugmsg(5, "Directory Created: ", dir)
+			return True
+		except FileExistsError:
+			self.debugmsg(5, "Directory Exists: ", dir)
+			return False
+		except Exception as e:
+			self.debugmsg(1, "Directory Create failed: ", dir)
+			self.debugmsg(1, "with error: ", e)
+			return False
+
 	#
 	# Template Functions
 	#
