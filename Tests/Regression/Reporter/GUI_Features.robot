@@ -150,3 +150,12 @@ Verify if reporter handle missing test result file
 	...    Copy File	${basefolder}${/}result_backup${/}${resultdata}.db	${resultfolder}		AND
 	...    Remove File	${basefolder}${/}result_backup${/}${resultdata}.db						AND
 	...    Close GUI
+
+Check Application Icon or Desktop Shortcut in GUI
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
+
+	Navigate to and check Desktop Icon
+
+
+
+#

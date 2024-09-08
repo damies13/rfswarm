@@ -2126,3 +2126,12 @@ Verify Result Name - Test Row
 	Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
 	Log 	Default 	console=True
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
+
+Check Application Icon or Desktop Shortcut in GUI
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
+
+	Navigate to and check Desktop Icon
+
+
+
+#

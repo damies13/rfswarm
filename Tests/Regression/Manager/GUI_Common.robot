@@ -1314,3 +1314,57 @@ Verify Generated Run Result Files
 	${len}=		Get Length	${logs_file_names}
 	Log To Console	Number of files in the Logs directory: ${len}
 	Should Be True	${len} >= 20	msg=Number of files in the Logs directory is incorrect: should be at least 20, actual: "${len}".
+
+Navigate to and check Desktop Icon
+	VAR 	${projname}= 		rfswarm-manager 		scope=TEST
+	VAR 	${dispname}= 		RFSwarm Manager 		scope=TEST
+	Run Keyword 	Navigate to and check Desktop Icon For ${platform}
+
+Navigate to and check Desktop Icon For MacOS
+	# Open Launchpad (F4?)
+	Press Combination 	key.f4
+	Sleep 	0.1
+	Take A Screenshot
+
+	# Search Launchpad
+	Type 	RFSwarm
+	Sleep 	0.1
+	Take A Screenshot
+
+	# Check for Icon
+	Fail 	Not Implimented
+
+Navigate to and check Desktop Icon For Windows
+	# Open Start Menu
+	${img}=	Set Variable		${platform}_start_menu.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	0.1
+	Take A Screenshot
+
+	# Navigate Start Menu
+
+	# Check for Icon
+	Fail 	Not Implimented
+
+Navigate to and check Desktop Icon For Ubuntu
+
+	# Open Menu
+	${img}=	Set Variable		${platform}_fluxbox_menu.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	# Click Image		${img}
+	Move To 	${coordinates}
+	Click 	button=right
+	Sleep 	0.1
+	Take A Screenshot
+
+	# Navigate Menu
+
+	# Check for Icon
+	Fail 	Not Implimented
+
+
+
+#
