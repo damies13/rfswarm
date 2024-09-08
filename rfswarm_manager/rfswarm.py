@@ -2768,7 +2768,7 @@ class RFSwarmCore:
 						df.writelines(directorydata)
 					os.remove(directoryfilename)
 					fileprefix = "/usr/share"
-				except:
+				except Exception:
 					pass
 
 			fileprefix = os.path.expanduser(fileprefix)
