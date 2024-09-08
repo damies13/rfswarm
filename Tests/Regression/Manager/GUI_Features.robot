@@ -3,7 +3,7 @@ Library 	Collections
 Library 	String
 Resource 	GUI_Common.robot
 Resource 	${CURDIR}${/}..${/}Agent${/}CommandLine_Common.robot
-Suite Setup 	Set Platform
+Suite Setup 	GUI_Common.Set Platform
 
 *** Variables ***
 @{robot_data}=	example.robot	Example Test Case
