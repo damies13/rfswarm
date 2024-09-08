@@ -2928,31 +2928,40 @@ class ReporterCore:
 		if platform.system() == 'Linux':
 			fileprefix = "~/.local/share"
 			if os.access("/usr/share", os.W_OK):
-				fileprefix = "/usr/share"
+				try:
+					base.ensuredir("/usr/share/applications")
+					directoryfilename = os.path.join("/usr/share/applications", "rfswarm.directory")
+					directorydata = ["test"]
+					with open(directoryfilename, 'w') as df:
+						df.writelines(directorydata)
+					os.remove(directoryfilename)
+					fileprefix = "/usr/share"
+				except:
+					pass
 
 			fileprefix = os.path.expanduser(fileprefix)
 
-			base.debugmsg(5, "Create .directory file")
-			directorydata = []
-			directorydata.append('[Desktop Entry]\n')
-			directorydata.append('Type=Directory\n')
-			directorydata.append('Name=RFSwarm\n')
-			directorydata.append('Icon=rfswarm-logo\n')
-
-			directoryfilename = os.path.join(fileprefix, "desktop-directories", "rfswarm.directory")
-			directorydir = os.path.dirname(directoryfilename)
-			base.ensuredir(directorydir)
-
-			base.debugmsg(5, "directoryfilename:", directoryfilename)
-			with open(directoryfilename, 'w') as df:
-				df.writelines(directorydata)
-
-			directoryfilename = os.path.join(fileprefix, "applications", "rfswarm.directory")
-			directorydir = os.path.dirname(directoryfilename)
-			base.ensuredir(directorydir)
-			base.debugmsg(5, "directoryfilename:", directoryfilename)
-			with open(directoryfilename, 'w') as df:
-				df.writelines(directorydata)
+			# base.debugmsg(5, "Create .directory file")
+			# directorydata = []
+			# directorydata.append('[Desktop Entry]\n')
+			# directorydata.append('Type=Directory\n')
+			# directorydata.append('Name=RFSwarm\n')
+			# directorydata.append('Icon=rfswarm-logo\n')
+			#
+			# directoryfilename = os.path.join(fileprefix, "desktop-directories", "rfswarm.directory")
+			# directorydir = os.path.dirname(directoryfilename)
+			# base.ensuredir(directorydir)
+			#
+			# base.debugmsg(5, "directoryfilename:", directoryfilename)
+			# with open(directoryfilename, 'w') as df:
+			# 	df.writelines(directorydata)
+			#
+			# directoryfilename = os.path.join(fileprefix, "applications", "rfswarm.directory")
+			# directorydir = os.path.dirname(directoryfilename)
+			# base.ensuredir(directorydir)
+			# base.debugmsg(5, "directoryfilename:", directoryfilename)
+			# with open(directoryfilename, 'w') as df:
+			# 	df.writelines(directorydata)
 
 			base.debugmsg(5, "Create .desktop file")
 			desktopdata = []
