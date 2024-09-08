@@ -92,7 +92,7 @@ Open Manager GUI
 	Set Test Variable 	$process_manager 	${process}
 	Sleep 	10
 	Set Screenshot Folder 	${OUTPUT DIR}
-	Take A Screenshot
+	# Take A Screenshot
 
 Close Manager GUI ubuntu
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
@@ -188,14 +188,14 @@ Stop Test Scenario Run Gradually
 	${START_TIME}=	Get Current Date
 	Wait For	manager_${platform}_robots_0.png 	timeout=${robot_test_time + ${default_image_timeout}}
 	Set Confidence	0.9
-	Take A Screenshot
+	# Take A Screenshot
 	${END_TIME}=	Get Current Date
 	${ELAPSED_TIME}=	Subtract Date From Date	${END_TIME}	${START_TIME}
 	Should Be True	${ELAPSED_TIME} >= ${robot_test_time / 2} and ${ELAPSED_TIME} <= ${robot_test_time + 90}
 
 	Press Key.tab 2 Times
 	Move To	10	10
-	Take A Screenshot
+	# Take A Screenshot
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time + ${default_image_timeout}}
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
@@ -211,14 +211,14 @@ Stop Test Scenario Run Quickly
 	${START_TIME}=	Get Current Date
 	Wait For	manager_${platform}_robots_0.png 	timeout=${robot_test_time + 60}
 	Set Confidence	0.9
-	Take A Screenshot
+	# Take A Screenshot
 	${END_TIME}=	Get Current Date
 	${ELAPSED_TIME}=	Subtract Date From Date	${END_TIME}	${START_TIME}
 	Should Be True	${ELAPSED_TIME} <= ${robot_test_time / 2}
 
 	Press Key.tab 2 Times
 	Move To	10	10
-	Take A Screenshot
+	# Take A Screenshot
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time + ${default_image_timeout}}
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
@@ -248,7 +248,7 @@ Check If the Robot Failed
 	EXCEPT
 		Wait For	manager_${platform}_button_finished_run.png	timeout=${default_image_timeout}
 	END
-	Take A Screenshot
+	# Take A Screenshot
 	${status}=	Run Keyword And Return Status	Locate	manager_${platform}_resource_file_provided.png
 	Run Keyword If	not ${status}	Fail	msg=Test failed. Check screenshots for more informations.
 
@@ -262,7 +262,7 @@ Click Tab
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	0.1
-	Take A Screenshot
+	# Take A Screenshot
 
 Select Option
 	[Arguments]		${optname}
@@ -271,7 +271,7 @@ Select Option
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Take A Screenshot
+	# Take A Screenshot
 
 Selected Option Should Be
 	[Arguments]		${optname}
@@ -291,7 +291,7 @@ Click Button
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	0.1
-	Take A Screenshot
+	# Take A Screenshot
 
 Click Menu
 	[Arguments]		${menuname}
@@ -303,7 +303,7 @@ Click Menu
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	0.1
-	Take A Screenshot
+	# Take A Screenshot
 
 Click Dialog Button
 	[Arguments]		${btnname} 		${timeout}=${default_image_timeout}
@@ -315,7 +315,7 @@ Click Dialog Button
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	1
-	Take A Screenshot
+	# Take A Screenshot
 
 Click CheckBox
 	[Arguments]		${status} 		${btnname}
@@ -328,7 +328,7 @@ Click CheckBox
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	1
-	Take A Screenshot
+	# Take A Screenshot
 
 Press ${key} ${n} Times
 	[Documentation]	Provide full name. For example: Key.tab
@@ -351,7 +351,7 @@ Click Label With Vertical Offset
 	Log	${coordinates}
 	Click To The Below Of	${coordinates}	${offset}
 	Sleep 	0.1
-	Take A Screenshot
+	# Take A Screenshot
 
 Click Label With Horizontal Offset
 	[Arguments]		${labelname}	${offset}=0
@@ -367,7 +367,7 @@ Click Label With Horizontal Offset
 	Log	${coordinates}
 	Click To The Right Of	${coordinates}	${offset}
 	Sleep 	0.1
-	Take A Screenshot
+	# Take A Screenshot
 
 #TODO: Chceck if it works
 Resize Window
@@ -380,7 +380,7 @@ Resize Window
 	Move To 	@{coordinates}
 	Mouse Down
 	Move To 	@{coordinates2}
-	Take A Screenshot
+	# Take A Screenshot
 	Mouse Up
 
 Wait Agent Ready
@@ -677,7 +677,7 @@ Select Robot File OS DIALOG
 	[Arguments]		${robot_file_name}
 	Sleep	5
 	Type	${robot_file_name}
-	Take A Screenshot
+	# Take A Screenshot
 	Click Dialog Button		open
 	Sleep	1
 
@@ -685,7 +685,7 @@ Save Scenario File OS DIALOG
 	[Arguments]		${scenario_name}
 	Sleep	5
 	Type	${scenario_name}
-	Take A Screenshot
+	# Take A Screenshot
 	Click Dialog Button		save
 	Sleep	1
 
@@ -693,7 +693,7 @@ Open Scenario File OS DIALOG
 	[Arguments]		${scenario_name}
 	Sleep	5
 	Type	${scenario_name}.rfs
-	Take A Screenshot
+	# Take A Screenshot
 	Click Dialog Button		open
 	Sleep	1
 
@@ -1151,41 +1151,41 @@ Click Script Button On Row
 		# Log	${coordinates}
 		Click To The Below Of Image 	${img} 	 offset=${rowoffset}
 
-		Take A Screenshot
+		# Take A Screenshot
 		Press Key.tab 1 Times
-		Take A Screenshot
+		# Take A Screenshot
 		# manager_macos_button_selected_runscriptrow.png
 		${img}=	Set Variable		manager_${platform}_button_selected_runscriptrow.png
 		Click Image 	${img}
 		Sleep    0.1
-		Take A Screenshot
+		# Take A Screenshot
 		# 	macos_dlgbtn_open
 		${img}=	Set Variable		${platform}_dlgbtn_cancel.png
 		Wait For 	${img} 	 timeout=${default_image_timeout}
-		Take A Screenshot
+		# Take A Screenshot
 
 		# Fail 		Not Implimented
 
 File Open Dialogue Select File
 	[Arguments]		${filepath}
 	Run Keyword		File Open Dialogue ${platform} Select File 			${filepath}
-	Take A Screenshot
+	# Take A Screenshot
 
 File Open Dialogue ubuntu Select File
 	[Arguments]		${filepath}
 	Sleep	2
-	Take A Screenshot
+	# Take A Screenshot
 	Click Label With Horizontal Offset 	file_name 	50
 	Sleep	0.5
 	Type 		${filepath} 	Key.ENTER
 	Sleep	0.5
-	Take A Screenshot
+	# Take A Screenshot
 	# Click Dialog Button 	open
 
 File Open Dialogue windows Select File
 	[Arguments]		${filepath}
 	Sleep	3
-	Take A Screenshot
+	# Take A Screenshot
 	${filepath}= 	Normalize Path 	${filepath}
 	#${path} 	${file} = 	Split Path 	${filepath}
 	Click Label With Horizontal Offset 	file_name 	50
@@ -1193,13 +1193,13 @@ File Open Dialogue windows Select File
 	Type 		${filepath}
 	Sleep	0.5
 	Press key.enter 1 Times
-	Take A Screenshot
+	# Take A Screenshot
 	# Click Dialog Button 	open
 
 File Open Dialogue macos Select File
 	[Arguments]		${filepath}
 	Sleep	3
-	Take A Screenshot
+	# Take A Screenshot
 	${filepath}=	Convert To Lower Case	${filepath}
 	Evaluate	clipboard.copy("${filepath}")	modules=clipboard	#copy path to clipboard
 	Press Combination 	KEY.command 	KEY.shift 	KEY.g
@@ -1207,14 +1207,14 @@ File Open Dialogue macos Select File
 	Click Label With Horizontal Offset 	file_name 	-10
 	Click	button=right	#show context menu
 	Sleep	2
-	Take A Screenshot
+	# Take A Screenshot
 	Press Combination 	KEY.down	#choose paste option(should be first)
 	Press key.enter 1 Times		#execute paste option
 	Sleep	0.5
-	Take A Screenshot
+	# Take A Screenshot
 	Press key.enter 1 Times
 	Sleep	0.5
-	Take A Screenshot
+	# Take A Screenshot
 	Click Dialog Button 	open
 	# Type 		Key.BACKSPACE 	Key.DELETE
 	# Click Dialog Button 	open
@@ -1229,7 +1229,7 @@ Select Test Script
 	# Press Key.escape 1 Times
 
 	File Open Dialogue Select File		${filepath}
-	Take A Screenshot
+	# Take A Screenshot
 	# Click Dialog Button 	cancel
 
 Wait For File To Exist

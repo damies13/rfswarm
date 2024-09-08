@@ -31,7 +31,7 @@ Click Tab
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	${sssleep}
-	Take A Screenshot
+	# Take A Screenshot
 
 Click Section
 	[Arguments]		${sectname}
@@ -43,7 +43,7 @@ Click Section
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	${sssleep}
-	Take A Screenshot
+	# Take A Screenshot
 
 Select Option
 	[Arguments]		${optname}
@@ -55,7 +55,7 @@ Select Option
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	${sssleep}
-	Take A Screenshot
+	# Take A Screenshot
 
 Select Field With Label
 	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
@@ -75,7 +75,7 @@ Select Field With Label
 	Move To 	${coordinates}
 	Click
 	Sleep 	${sssleep}
-	Take A Screenshot
+	# Take A Screenshot
 
 Find Text
 	[Arguments]		${mytext}
@@ -99,7 +99,7 @@ Click Text
 	@{coordinates}= 	Create List 	${x} 	${y}
 	Move To 	${coordinates}
 	Click
-	Take A Screenshot
+	# Take A Screenshot
 
 Get Text Value To Right Of
 	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
@@ -108,12 +108,12 @@ Get Text Value To Right Of
 
 	${b4value}= 	Get Clipboard Content
 	${value}= 	Copy From The Right Of 	${img} 	${offsetx}
-	Take A Screenshot
+	# Take A Screenshot
 	WHILE 	$b4value == $value 		limit=10
 		Sleep    10 ms
 		${offsetx}= 	Evaluate 	${offsetx}+10
 		${value}= 	Copy From The Right Of 	${img} 	${offsetx}
-		Take A Screenshot
+		# Take A Screenshot
 		${valuec}= 	Copy
 		IF  $valuec != $value
 			${value}= 	Set Variable 		${valuec}
@@ -156,7 +156,7 @@ Set Text Value To Right Of
 	Click
 	Double Click
 	Type 	${value}
-	Take A Screenshot
+	# Take A Screenshot
 	${value2}= 	Get Text Value To Right Of		${label}
 	WHILE 	$value2 != $value 		limit=10
 		${x}= 	Evaluate 	${x}+10
@@ -166,7 +166,7 @@ Set Text Value To Right Of
 		Click
 		Double Click
 		Type 	${value}
-		Take A Screenshot
+		# Take A Screenshot
 		${value2}= 	Get Text Value To Right Of		${label}
 	END
 	Should Be Equal As Strings    ${value}    ${value2}
@@ -203,7 +203,7 @@ Click Button
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	${sssleep}
-	Take A Screenshot
+	# Take A Screenshot
 
 Click Dialog Button
 	[Arguments]		${btnname} 		${timeout}=300
@@ -215,7 +215,7 @@ Click Dialog Button
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	1
-	Take A Screenshot
+	# Take A Screenshot
 
 Wait For Status
 	[Arguments]		${status}	${timeout}=300
@@ -225,7 +225,7 @@ Wait For Status
 	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=${timeout}
 	Sleep 	${sssleep}
-	Take A Screenshot
+	# Take A Screenshot
 
 Open GUI
 	[Arguments]		@{appargs}
@@ -256,7 +256,7 @@ Open GUI windows
 	# Sleep 	60
 	# Capture Screen
 	Set Screenshot Folder 	${OUTPUT DIR}
-	Take A Screenshot
+	# Take A Screenshot
 
 Open GUI ubuntu
 	[Arguments]		@{appargs}
@@ -268,7 +268,7 @@ Open GUI ubuntu
 	# Sleep 	60
 	# Capture Screen
 	Set Screenshot Folder 	${OUTPUT DIR}
-	Take A Screenshot
+	# Take A Screenshot
 
 Open GUI macos
 	[Arguments]		@{appargs}
@@ -279,7 +279,7 @@ Open GUI macos
 	Set Suite Variable 	$process 	${process}
 	# Sleep 	60
 	Set Screenshot Folder 	${OUTPUT DIR}
-	Take A Screenshot
+	# Take A Screenshot
 
 
 Close GUI
@@ -408,7 +408,7 @@ Save Template File OS DIALOG
 	[Arguments]		${template_name}
 	Sleep	5
 	Type	${template_name}
-	Take A Screenshot
+	# Take A Screenshot
 	Click Dialog Button		save
 	Sleep	1
 
