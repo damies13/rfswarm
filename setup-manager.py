@@ -49,9 +49,10 @@ setup(
 		'Source': 'https://github.com/damies13/rfswarm',
 	},
 	# https://stackoverflow.com/questions/68747660/is-there-any-way-to-have-icon-for-exe-file-that-created-as-an-entry-point-using
-	# entry_points={'console_scripts': ['rfswarm = rfswarm_manager.rfswarm:RFSwarm', 'rfswarm-manager = rfswarm_manager.rfswarm:RFSwarm']},
+	entry_points={'console_scripts': ['rfswarm = rfswarm_manager.rfswarm:RFSwarm', 'rfswarm-manager = rfswarm_manager.rfswarm:RFSwarm']},
 	# entry_points={'console_scripts': ['rfswarm = rfswarm_manager.rfswarm:RFSwarm', 'rfswarm-manager = rfswarm_manager.rfswarm:RFSwarm'], 'gui_scripts': ['rfswarm-manager-gui = rfswarm_manager.rfswarm:RFSwarm']},
-	entry_points={'gui_scripts': ['rfswarm = rfswarm_manager.rfswarm:RFSwarm', 'rfswarm-manager = rfswarm_manager.rfswarm:RFSwarm']},
+	# this breaks console logs
+	# entry_points={'gui_scripts': ['rfswarm = rfswarm_manager.rfswarm:RFSwarm', 'rfswarm-manager = rfswarm_manager.rfswarm:RFSwarm']},
 )
 
 # https://pypi.org/project/pyshortcuts/
