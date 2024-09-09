@@ -2132,6 +2132,7 @@ Check Application Icon or Desktop Shortcut in GUI
 
 	Navigate to and check Desktop Icon
 
+	[Teardown]	Press Combination 	KEY.ESC
 
 
 #
