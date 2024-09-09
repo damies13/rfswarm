@@ -333,9 +333,13 @@ Verify the Time Fields In the Plan Screen For Delay
 		Press Key.tab 2 Times
 		Take A Screenshot
 		Sleep	2
-		Copy
-		${copied_updated_delay_value}=		Get Clipboard Content
-		Should Be Equal 	${updated_delay_times}[${i}]	${copied_updated_delay_value}
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.c
+		ELSE
+			Press Combination	KEY.ctrl		KEY.c
+		END
+		${copied_converted_delay_value}=		Evaluate	clipboard.paste()	modules=clipboard
+		Should Be Equal 	${updated_delay_times}[${i}]	${copied_converted_delay_value}
 		...    msg=The updated delay time did not convert seconds to the time as expected [ Expected != Converted ]
 		Press Key.tab 7 Times
 	END
@@ -348,15 +352,15 @@ Verify the Time Fields In the Plan Screen For Ramp Up
 	...    Set INI Window Size		1200	600		AND
 	...    Open Manager GUI
 
-	@{delay_times_in_s} 	Create List		158			1592		5025
-	@{updated_delay_times}	Create List		00:02:38	00:26:32	01:23:45
+	@{ramp_up_times_in_s} 	Create List		158			1592		5025
+	@{updated_ramp_up_times}	Create List		00:02:38	00:26:32	01:23:45
 	Click Button	runaddrow
 	Click
 	FOR  ${i}  IN RANGE  0  3
 		Sleep	2
 		Press Key.tab 3 Times
 		Take A Screenshot
-		Type	${delay_times_in_s}[${i}]
+		Type	${ramp_up_times_in_s}[${i}]
 		Press Key.tab 6 Times
 	END
 
@@ -367,9 +371,13 @@ Verify the Time Fields In the Plan Screen For Ramp Up
 		Press Key.tab 3 Times
 		Take A Screenshot
 		Sleep	2
-		Copy
-		${copied_updated_delay_value}=		Get Clipboard Content
-		Should Be Equal 	${updated_delay_times}[${i}]	${copied_updated_delay_value}
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.c
+		ELSE
+			Press Combination	KEY.ctrl		KEY.c
+		END
+		${copied_converted_ramp_up_value}=		Evaluate	clipboard.paste()	modules=clipboard
+		Should Be Equal 	${updated_ramp_up_times}[${i}]	${copied_converted_ramp_up_value}
 		...    msg=The updated delay time did not convert seconds to the time as expected [ Expected != Converted ]
 		Press Key.tab 6 Times
 	END
@@ -382,15 +390,15 @@ Verify the Time Fields In the Plan Screen For Run
 	...    Set INI Window Size		1200	600		AND
 	...    Open Manager GUI
 
-	@{delay_times_in_s} 	Create List		158			1592		5025
-	@{updated_delay_times}	Create List		00:02:38	00:26:32	01:23:45
+	@{run_times_in_s} 	Create List		158			1592		5025
+	@{updated_run_times}	Create List		00:02:38	00:26:32	01:23:45
 	Click Button	runaddrow
 	Click
 	FOR  ${i}  IN RANGE  0  3
 		Sleep	2
 		Press Key.tab 4 Times
 		Take A Screenshot
-		Type	${delay_times_in_s}[${i}]
+		Type	${run_times_in_s}[${i}]
 		Press Key.tab 5 Times
 	END
 
@@ -401,9 +409,13 @@ Verify the Time Fields In the Plan Screen For Run
 		Press Key.tab 4 Times
 		Take A Screenshot
 		Sleep	2
-		Copy
-		${copied_updated_delay_value}=		Get Clipboard Content
-		Should Be Equal 	${updated_delay_times}[${i}]	${copied_updated_delay_value}
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.c
+		ELSE
+			Press Combination	KEY.ctrl		KEY.c
+		END
+		${copied_converted_run_value}=		Evaluate	clipboard.paste()	modules=clipboard
+		Should Be Equal 	${updated_run_times}[${i}]	${copied_converted_run_value}
 		...    msg=The updated delay time did not convert seconds to the time as expected [ Expected != Converted ]
 		Press Key.tab 5 Times
 	END
