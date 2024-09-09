@@ -308,6 +308,108 @@ Verify That Files Get Saved With Correct Extension And Names
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Stop Agent
 
+Verify the Time Fields In the Plan Screen For Delay
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600		AND
+	...    Open Manager GUI
+
+	@{delay_times_in_s} 	Create List		158			1592		5025
+	@{updated_delay_times}	Create List		00:02:38	00:26:32	01:23:45
+	Click Button	runaddrow
+	Click
+	FOR  ${i}  IN RANGE  0  3
+		Sleep	2
+		Press Key.tab 2 Times
+		Take A Screenshot
+		Type	${delay_times_in_s}[${i}]
+		Press Key.tab 7 Times
+	END
+
+	Click Button	runaddrow
+
+	FOR  ${i}  IN RANGE  0  3
+		Sleep	2
+		Press Key.tab 2 Times
+		Take A Screenshot
+		Sleep	2
+		Copy
+		${copied_updated_delay_value}=		Get Clipboard Content
+		Should Be Equal 	${updated_delay_times}[${i}]	${copied_updated_delay_value}
+		...    msg=The updated delay time did not convert seconds to the time as expected [ Expected != Converted ]
+		Press Key.tab 7 Times
+	END
+
+	[Teardown]	Run Keyword		Close Manager GUI ${platform}
+
+Verify the Time Fields In the Plan Screen For Ramp Up
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600		AND
+	...    Open Manager GUI
+
+	@{delay_times_in_s} 	Create List		158			1592		5025
+	@{updated_delay_times}	Create List		00:02:38	00:26:32	01:23:45
+	Click Button	runaddrow
+	Click
+	FOR  ${i}  IN RANGE  0  3
+		Sleep	2
+		Press Key.tab 3 Times
+		Take A Screenshot
+		Type	${delay_times_in_s}[${i}]
+		Press Key.tab 6 Times
+	END
+
+	Click Button	runaddrow
+
+	FOR  ${i}  IN RANGE  0  3
+		Sleep	2
+		Press Key.tab 3 Times
+		Take A Screenshot
+		Sleep	2
+		Copy
+		${copied_updated_delay_value}=		Get Clipboard Content
+		Should Be Equal 	${updated_delay_times}[${i}]	${copied_updated_delay_value}
+		...    msg=The updated delay time did not convert seconds to the time as expected [ Expected != Converted ]
+		Press Key.tab 6 Times
+	END
+
+	[Teardown]	Run Keyword		Close Manager GUI ${platform}
+
+Verify the Time Fields In the Plan Screen For Run
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600		AND
+	...    Open Manager GUI
+
+	@{delay_times_in_s} 	Create List		158			1592		5025
+	@{updated_delay_times}	Create List		00:02:38	00:26:32	01:23:45
+	Click Button	runaddrow
+	Click
+	FOR  ${i}  IN RANGE  0  3
+		Sleep	2
+		Press Key.tab 4 Times
+		Take A Screenshot
+		Type	${delay_times_in_s}[${i}]
+		Press Key.tab 5 Times
+	END
+
+	Click Button	runaddrow
+
+	FOR  ${i}  IN RANGE  0  3
+		Sleep	2
+		Press Key.tab 4 Times
+		Take A Screenshot
+		Sleep	2
+		Copy
+		${copied_updated_delay_value}=		Get Clipboard Content
+		Should Be Equal 	${updated_delay_times}[${i}]	${copied_updated_delay_value}
+		...    msg=The updated delay time did not convert seconds to the time as expected [ Expected != Converted ]
+		Press Key.tab 5 Times
+	END
+
+	[Teardown]	Run Keyword		Close Manager GUI ${platform}
+
 Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords
