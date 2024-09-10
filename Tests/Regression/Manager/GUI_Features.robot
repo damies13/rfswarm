@@ -378,7 +378,7 @@ Verify the Time Fields In the Plan Screen For Ramp Up
 		END
 		${copied_converted_ramp_up_value}=		Evaluate	clipboard.paste()	modules=clipboard
 		Should Be Equal 	${updated_ramp_up_times}[${i}]	${copied_converted_ramp_up_value}
-		...    msg=The updated delay time did not convert seconds to the time as expected [ Expected != Converted ]
+		...    msg=The updated ramp up time did not convert seconds to the time as expected [ Expected != Converted ]
 		Press Key.tab 6 Times
 	END
 
@@ -416,7 +416,7 @@ Verify the Time Fields In the Plan Screen For Run
 		END
 		${copied_converted_run_value}=		Evaluate	clipboard.paste()	modules=clipboard
 		Should Be Equal 	${updated_run_times}[${i}]	${copied_converted_run_value}
-		...    msg=The updated delay time did not convert seconds to the time as expected [ Expected != Converted ]
+		...    msg=The updated run time did not convert seconds to the time as expected [ Expected != Converted ]
 		Press Key.tab 5 Times
 	END
 
