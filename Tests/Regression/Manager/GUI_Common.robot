@@ -81,6 +81,10 @@ Open Agent
 
 Open Manager GUI
 	[Arguments]		${options}=None
+	# Press Escape and move mouse because on linux the screen save had kicked in
+	Press Combination 	Key.esc
+	Move To 	10 	10
+	Move To 	20 	20
 	IF  ${options} == None
 		${options}= 	Create List
 		Create Directory 	${results_dir}
@@ -93,6 +97,8 @@ Open Manager GUI
 	Sleep 	10
 	Set Screenshot Folder 	${OUTPUT DIR}
 	# Take A Screenshot
+	${img}=	Set Variable		manager_${platform}_tab_agents.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 
 Close Manager GUI ubuntu
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
