@@ -6,6 +6,7 @@ Library 	String
 Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 
 *** Variables ***
+${default_image_timeout} 	120
 ${cmd_agent} 		rfswarm-agent
 ${cmd_manager} 	rfswarm
 ${IMAGE_DIR} 	${CURDIR}/Images/file_method
