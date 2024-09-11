@@ -25,7 +25,7 @@ Open GUI
 	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	${process}= 	Start Process 	${cmd_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}Open_GUI_stdout.txt 	stderr=${OUTPUT DIR}${/}Open_GUI_stderr.txt
 	Set Test Variable 	$process 	${process}
-	Sleep 	10
+	# Sleep 	10 			# not needed now we wait for the agents tab to be visible
 	Set Screenshot Folder 	${OUTPUT DIR}
 	${img}=	Set Variable		manager_${platform}_tab_agents.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
@@ -42,7 +42,7 @@ Open GUI
 	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	${process}= 	Start Process 	${cmd_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}Open_GUI_stdout.txt 	stderr=${OUTPUT DIR}${/}Open_GUI_stderr.txt
 	Set Test Variable 	$process 	${process}
-	Sleep 	10
+	# Sleep 	10 			# not needed now we wait for the agents tab to be visible
 	Set Screenshot Folder 	${OUTPUT DIR}
 	${img}=	Set Variable		manager_${platform}_tab_agents.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
@@ -59,7 +59,7 @@ Open GUI
 	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	${process}= 	Start Process 	${cmd_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}Open_GUI_stdout.txt 	stderr=${OUTPUT DIR}${/}Open_GUI_stderr.txt
 	Set Test Variable 	$process 	${process}
-	Sleep 	10
+	# Sleep 	10 			# not needed now we wait for the agents tab to be visible
 	Set Screenshot Folder 	${OUTPUT DIR}
 	${img}=	Set Variable		manager_${platform}_tab_agents.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
