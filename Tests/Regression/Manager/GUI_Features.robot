@@ -316,10 +316,14 @@ Verify the Time Fields In the Plan Screen For Delay
 
 	@{delay_times_in_s} 	Create List		158			1592		5025
 	@{updated_delay_times}	Create List		00:02:38	00:26:32	01:23:45
+	${len}		Get Length	${delay_times_in_s}
+
 	Click Button	runaddrow
-	Click
-	FOR  ${i}  IN RANGE  0  3
-		Sleep	2
+	FOR  ${i}  IN RANGE  0  ${len - 2}
+		Click
+	END
+
+	FOR  ${i}  IN RANGE  0  ${len}
 		Press Key.tab 2 Times
 		Take A Screenshot
 		Type	${delay_times_in_s}[${i}]
@@ -329,10 +333,50 @@ Verify the Time Fields In the Plan Screen For Delay
 	Click Button	runaddrow
 
 	FOR  ${i}  IN RANGE  0  3
-		Sleep	2
 		Press Key.tab 2 Times
 		Take A Screenshot
-		Sleep	2
+		Sleep	1
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.c
+		ELSE
+			Press Combination	KEY.ctrl		KEY.c
+		END
+		${copied_converted_delay_value}=		Evaluate	clipboard.paste()	modules=clipboard
+		Should Be Equal 	${updated_delay_times}[${i}]	${copied_converted_delay_value}
+		...    msg=The updated delay time did not convert seconds to the time as expected [ Expected != Converted ]
+		Press Key.tab 7 Times
+	END
+
+	[Teardown]	Run Keyword		Close Manager GUI ${platform}
+
+Verify the Time Fields In the Plan Screen For Delay: Complex Variations
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600		AND
+	...    Open Manager GUI
+
+	@{delay_times} 			Create List 	2:56:30   36:91     25:73:81  3:14      1:5:7     8::12     7:43:     :53:9     12::      :38:      ::42
+	@{updated_delay_times}	Create List 	02:56:30  00:37:31  26:14:21  00:03:14  01:05:07  08:00:12  07:43:00  00:53:09  12:00:00  00:38:00  00:00:42
+	${len}		Get Length	${delay_times}
+
+	Click Button	runaddrow
+	FOR  ${i}  IN RANGE  0  ${len - 2}
+		Click
+	END
+
+	FOR  ${i}  IN RANGE  0  ${len}
+		Press Key.tab 2 Times
+		Take A Screenshot
+		Type	${delay_times}[${i}]
+		Press Key.tab 7 Times
+	END
+
+	Click Button	runaddrow
+
+	FOR  ${i}  IN RANGE  0  ${len}
+		Press Key.tab 2 Times
+		Take A Screenshot
+		Sleep	1
 		IF  "${platform}" == "macos"
 			Press Combination	KEY.command		KEY.c
 		ELSE
@@ -354,10 +398,14 @@ Verify the Time Fields In the Plan Screen For Ramp Up
 
 	@{ramp_up_times_in_s} 	Create List		158			1592		5025
 	@{updated_ramp_up_times}	Create List		00:02:38	00:26:32	01:23:45
+	${len}		Get Length	${ramp_up_times_in_s}
+
 	Click Button	runaddrow
-	Click
-	FOR  ${i}  IN RANGE  0  3
-		Sleep	2
+	FOR  ${i}  IN RANGE  0  ${len - 2}
+		Click
+	END
+
+	FOR  ${i}  IN RANGE  0  ${len}
 		Press Key.tab 3 Times
 		Take A Screenshot
 		Type	${ramp_up_times_in_s}[${i}]
@@ -367,10 +415,50 @@ Verify the Time Fields In the Plan Screen For Ramp Up
 	Click Button	runaddrow
 
 	FOR  ${i}  IN RANGE  0  3
-		Sleep	2
 		Press Key.tab 3 Times
 		Take A Screenshot
-		Sleep	2
+		Sleep	1
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.c
+		ELSE
+			Press Combination	KEY.ctrl		KEY.c
+		END
+		${copied_converted_ramp_up_value}=		Evaluate	clipboard.paste()	modules=clipboard
+		Should Be Equal 	${updated_ramp_up_times}[${i}]	${copied_converted_ramp_up_value}
+		...    msg=The updated ramp up time did not convert seconds to the time as expected [ Expected != Converted ]
+		Press Key.tab 6 Times
+	END
+
+	[Teardown]	Run Keyword		Close Manager GUI ${platform}
+
+Verify the Time Fields In the Plan Screen For Ramp Up: Complex Variations
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600		AND
+	...    Open Manager GUI
+
+	@{ramp_up_times} 			Create List 	2:56:30   36:91     25:73:81  3:14      1:5:7     8::12     7:43:     :53:9     12::      :38:      ::42
+	@{updated_ramp_up_times}	Create List 	02:56:30  00:37:31  26:14:21  00:03:14  01:05:07  08:00:12  07:43:00  00:53:09  12:00:00  00:38:00  00:00:42
+	${len}		Get Length	${ramp_up_times}
+
+	Click Button	runaddrow
+	FOR  ${i}  IN RANGE  0  ${len - 2}
+		Click
+	END
+
+	FOR  ${i}  IN RANGE  0  ${len}
+		Press Key.tab 3 Times
+		Take A Screenshot
+		Type	${ramp_up_times}[${i}]
+		Press Key.tab 6 Times
+	END
+
+	Click Button	runaddrow
+
+	FOR  ${i}  IN RANGE  0  ${len}
+		Press Key.tab 3 Times
+		Take A Screenshot
+		Sleep	1
 		IF  "${platform}" == "macos"
 			Press Combination	KEY.command		KEY.c
 		ELSE
@@ -392,10 +480,14 @@ Verify the Time Fields In the Plan Screen For Run
 
 	@{run_times_in_s} 	Create List		158			1592		5025
 	@{updated_run_times}	Create List		00:02:38	00:26:32	01:23:45
+	${len}		Get Length	${run_times_in_s}
+
 	Click Button	runaddrow
-	Click
-	FOR  ${i}  IN RANGE  0  3
-		Sleep	2
+	FOR  ${i}  IN RANGE  0  ${len - 2}
+		Click
+	END
+
+	FOR  ${i}  IN RANGE  0  ${len}
 		Press Key.tab 4 Times
 		Take A Screenshot
 		Type	${run_times_in_s}[${i}]
@@ -405,10 +497,50 @@ Verify the Time Fields In the Plan Screen For Run
 	Click Button	runaddrow
 
 	FOR  ${i}  IN RANGE  0  3
-		Sleep	2
 		Press Key.tab 4 Times
 		Take A Screenshot
-		Sleep	2
+		Sleep	1
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.c
+		ELSE
+			Press Combination	KEY.ctrl		KEY.c
+		END
+		${copied_converted_run_value}=		Evaluate	clipboard.paste()	modules=clipboard
+		Should Be Equal 	${updated_run_times}[${i}]	${copied_converted_run_value}
+		...    msg=The updated run time did not convert seconds to the time as expected [ Expected != Converted ]
+		Press Key.tab 5 Times
+	END
+
+	[Teardown]	Run Keyword		Close Manager GUI ${platform}
+
+Verify the Time Fields In the Plan Screen For Run: Complex Variations
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600		AND
+	...    Open Manager GUI
+
+	@{run_times} 			Create List 	2:56:30   36:91     25:73:81  3:14      1:5:7     8::12     7:43:     :53:9     12::      :38:      ::42
+	@{updated_run_times}	Create List 	02:56:30  00:37:31  26:14:21  00:03:14  01:05:07  08:00:12  07:43:00  00:53:09  12:00:00  00:38:00  00:00:42
+	${len}		Get Length	${run_times}
+
+	Click Button	runaddrow
+	FOR  ${i}  IN RANGE  0  ${len - 2}
+		Click
+	END
+
+	FOR  ${i}  IN RANGE  0  ${len}
+		Press Key.tab 4 Times
+		Take A Screenshot
+		Type	${run_times}[${i}]
+		Press Key.tab 5 Times
+	END
+
+	Click Button	runaddrow
+
+	FOR  ${i}  IN RANGE  0  ${len}
+		Press Key.tab 4 Times
+		Take A Screenshot
+		Sleep	1
 		IF  "${platform}" == "macos"
 			Press Combination	KEY.command		KEY.c
 		ELSE
