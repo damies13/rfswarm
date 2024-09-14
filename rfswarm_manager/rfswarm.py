@@ -496,7 +496,8 @@ class RFSwarmBase:
 	run_paused = False
 	run_threads: Any = {}
 	total_robots = 0
-	robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}, "Start": 0}
+	robot_schedule_template = {"RunName": "", "Agents": {}, "Scripts": {}, "Start": 0}
+	robot_schedule = self.robot_schedule_template
 	envvars: Any = {}
 	agentserver = None
 	agenthttpserver = None
@@ -3366,7 +3367,7 @@ class RFSwarmCore:
 		base.run_paused = False
 		base.MetricIDs = {}
 
-		base.robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}}
+		base.robot_schedule = base.robot_schedule_template
 
 		warnings = self.Pre_Run_Checks()
 		if len(warnings) > 0:
@@ -3571,7 +3572,7 @@ class RFSwarmCore:
 
 							if base.run_start < 1:
 								base.run_start = int(time.time())  # time now
-								base.robot_schedule = {}
+								base.robot_schedule = base.robot_schedule_template
 								base.robot_schedule["RunName"] = base.run_name
 								base.robot_schedule["Agents"] = {}
 								base.robot_schedule["Scripts"] = {}
