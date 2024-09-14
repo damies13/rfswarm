@@ -94,11 +94,11 @@ Open Manager GUI
 	Set Confidence		0.9
 	${process}= 	Start Process 	${cmd_manager}  @{options}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
 	Set Test Variable 	$process_manager 	${process}
-	Sleep 	10
+	# Sleep 	10
 	Set Screenshot Folder 	${OUTPUT DIR}
 	# Take A Screenshot
 	${img}=	Set Variable		manager_${platform}_tab_agents.png
-	${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=30
+	${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=${default_image_timeout / 2}
 	IF 	not ${passed}
 		${running}= 	Is Process Running 	${process_manager}
 		IF 	not ${running}
@@ -118,7 +118,7 @@ Open Manager GUI
 
 			Fail 		Manager not running
 		ELSE
-			Wait For 	${img} 	 timeout=30
+			Wait For 	${img} 	 timeout=${default_image_timeout / 2}
 		END
 	END
 

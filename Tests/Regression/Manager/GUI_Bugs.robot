@@ -2,6 +2,8 @@
 Resource 	GUI_Common.robot
 Suite Setup 	Set Platform
 
+Test Teardown 	Run Keyword		Close Manager GUI ${platform}
+
 *** Variables ***
 @{robot_data}=	example.robot	Example Test Case
 ${scenario_name}=	test_scenario
@@ -25,7 +27,9 @@ Verify If Manager Runs With Existing INI File From Current Version
 	EXCEPT
 		Fail	msg=RFSwarm Manager is not responding!
 	END
-	Run Keyword		Close Manager GUI ${platform}
+
+	# [Teardown]	Run Keywords
+	# ...    Run Keyword		Close Manager GUI ${platform}
 
 Verify If Manager Runs With No Existing INI File From Current Version
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
@@ -42,7 +46,9 @@ Verify If Manager Runs With No Existing INI File From Current Version
 	EXCEPT
 		Fail	msg=RFSwarm Manager is not responding!
 	END
-	Run Keyword		Close Manager GUI ${platform}
+
+	# [Teardown]	Run Keywords
+	# ...    Run Keyword		Close Manager GUI ${platform}
 
 Verify If Manager Runs With Existing INI File From Previous Version
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
@@ -63,7 +69,9 @@ Verify If Manager Runs With Existing INI File From Previous Version
 	EXCEPT
 		Fail	msg=RFSwarm Manager is not responding!
 	END
-	Run Keyword		Close Manager GUI ${platform}
+
+	# [Teardown]	Run Keywords
+	# ...    Run Keyword		Close Manager GUI ${platform}
 
 Verify If Manager Runs With Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
@@ -96,6 +104,9 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 		Fail	msg=Manager did not close!
 	END
 
+	# [Teardown]	Run Keywords
+	# ...    Run Keyword		Close Manager GUI ${platform}
+
 Verify If Manager Runs With No Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
@@ -115,6 +126,9 @@ Verify If Manager Runs With No Existing INI File From Current Version NO GUI
 	IF 	${running}
 		Fail	msg=Manager did not close!
 	END
+
+	# [Teardown]	Run Keywords
+	# ...    Run Keyword		Close Manager GUI ${platform}
 
 Verify If Manager Runs With Existing INI File From Previous Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
@@ -139,6 +153,9 @@ Verify If Manager Runs With Existing INI File From Previous Version NO GUI
 	IF 	${running}
 		Fail	msg=Manager did not close!
 	END
+
+	# [Teardown]	Run Keywords
+	# ...    Run Keyword		Close Manager GUI ${platform}
 
 # # Test for Issue #171	moved to agent test suite, can easily be tested for via the command line
 # Issue #171
