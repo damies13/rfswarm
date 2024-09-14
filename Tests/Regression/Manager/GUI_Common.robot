@@ -98,12 +98,14 @@ Open Manager GUI
 	Set Screenshot Folder 	${OUTPUT DIR}
 	# Take A Screenshot
 	${img}=	Set Variable		manager_${platform}_tab_agents.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Wait For 	${img} 	 timeout=30
 
 Close Manager GUI ubuntu
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
 	Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
 	Close Manager GUI
+
+
 
 Close Manager GUI windows
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
@@ -142,6 +144,9 @@ Close Manager GUI
 			Fail
 		END
 	END
+	# stdout=${OUTPUT DIR}${/}stdout_manager.txt    stderr=${OUTPUT DIR}${/}stderr_manager.txt
+	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 
 Close Manager GUI macos
 	[Tags]	macos-latest
@@ -179,12 +184,28 @@ Close Manager GUI macos
 			Fail
 		END
 	END
+	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 
 Stop Agent
 	${result} = 	Terminate Process		${process_agent}
 	Log		${result.stdout}
 	Log		${result.stderr}
 	# Should Be Equal As Integers 	${result.rc} 	0
+
+	#	 stdout=${OUTPUT DIR}${/}stdout_agent.txt    stderr=${OUTPUT DIR}${/}stderr_agent.txt
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+
+
+Show Log
+	[Arguments]		${filename}
+	Log 		${\n}-----${filename}----- 		console=True
+	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
+	Log 		${filedata} 		console=True
+	Log 		-----${filename}-----${\n} 		console=True
+	RETURN 		${filedata}
+
 
 Stop Test Scenario Run Gradually
 	[Arguments]	${rumup_time}	${robot_test_time}
