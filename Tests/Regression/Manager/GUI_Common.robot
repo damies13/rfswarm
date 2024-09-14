@@ -16,7 +16,7 @@ Library 	get_ip_address.py
 
 
 *** Variables ***
-${default_image_timeout} 	120
+${default_image_timeout} 	${120}
 ${platform}		None
 ${platform}		ubuntu
 ${global_path}	None

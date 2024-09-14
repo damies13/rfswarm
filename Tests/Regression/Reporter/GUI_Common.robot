@@ -9,7 +9,7 @@ Library 	OCRLibrary
 
 
 *** Variables ***
-${default_image_timeout} 	120
+${default_image_timeout} 	${120}
 ${platform}		None
 ${cmd_reporter} 		rfswarm-reporter
 ${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
