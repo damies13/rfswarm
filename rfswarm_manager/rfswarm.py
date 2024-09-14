@@ -497,7 +497,7 @@ class RFSwarmBase:
 	run_threads: Any = {}
 	total_robots = 0
 	robot_schedule_template = {"RunName": "", "Agents": {}, "Scripts": {}, "Start": 0}
-	robot_schedule = self.robot_schedule_template
+	robot_schedule = robot_schedule_template
 	envvars: Any = {}
 	agentserver = None
 	agenthttpserver = None
