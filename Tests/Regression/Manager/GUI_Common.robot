@@ -98,7 +98,29 @@ Open Manager GUI
 	Set Screenshot Folder 	${OUTPUT DIR}
 	# Take A Screenshot
 	${img}=	Set Variable		manager_${platform}_tab_agents.png
-	Wait For 	${img} 	 timeout=30
+	${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=30
+	IF 	not ${passed}
+		${running}= 	Is Process Running 	${process_manager}
+		IF 	not ${running}
+			${result} = 	Get Process Result
+
+			Log		rc: ${result.rc} 		console=True
+			Log		stdout: ${result.stdout} 		console=True
+			Log		stderr: ${result.stderr} 		console=True
+			Log		stdout_path: ${result.stdout_path} 		console=True
+			Log		stderr_path: ${result.stderr_path} 		console=True
+
+			Show Log 	${result.stdout_path}
+			Show Log 	${result.stderr_path}
+
+			Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+			Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+
+			Fail 		Manager not running
+		ELSE
+			Wait For 	${img} 	 timeout=30
+		END
+	END
 
 Close Manager GUI ubuntu
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
