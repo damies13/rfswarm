@@ -100,7 +100,7 @@ Open Manager GUI
 	${result}= 	Wait Until Keyword Succeeds 	${default_image_timeout} sec 	500ms 	Process Should Be Running 	${process_manager}
 	Log		Process Is Running: ${result} 		console=True
 
-	${img}=	Set Variable		manager_${platform}_tab_agents.png
+	${img}=	Set Variable		manager_${platform}_button_runschedule.png
 	${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=${default_image_timeout / 2}
 	IF 	not ${passed}
 		${running}= 	Is Process Running 	${process_manager}
