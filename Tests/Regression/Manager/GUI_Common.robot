@@ -287,7 +287,7 @@ Utilisation Stats
 
 Check If The Agent Is Ready
 	[Arguments] 	${timeout}=300
-	Sleep	1
+	# Sleep	1
 	Click Tab	Agents
 	Wait For 	manager_${platform}_agents_ready.png	timeout=${timeout}
 
@@ -366,7 +366,7 @@ Click Dialog Button
 	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Sleep 	1
+	Sleep 	0.1
 	# Take A Screenshot
 
 Click CheckBox
@@ -379,7 +379,7 @@ Click CheckBox
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Sleep 	1
+	Sleep 	0.1
 	# Take A Screenshot
 
 Press ${key} ${n} Times
