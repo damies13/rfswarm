@@ -236,3 +236,87 @@ Lots Of Resource Files
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
 	...    Stop Manager
+
+Verify If Manager Runs With Existing INI File From Current Version NO GUI
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
+	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+
+	@{mngr_options}		Create List		-n
+
+	Run Manager CLI	${mngr_options}
+	${running}= 	Is Process Running		${process_manager}
+	IF 	not ${running}
+		Fail	msg=Manager is not running!
+	END
+	${result} = 	Terminate Process		${process_manager}
+	${running}= 	Is Process Running		${process_manager}
+	IF 	${running}
+		Fail	msg=Manager did not close!
+	END
+
+	File Should Exist	${global_path}${/}RFSwarmManager.ini
+	File Should Not Be Empty	${global_path}${/}RFSwarmManager.ini
+	Log To Console	Running Manager with existing ini file.
+	Run Manager CLI	${mngr_options}
+	${running}= 	Is Process Running		${process_manager}
+	IF 	not ${running}
+		Fail	msg=Manager is not running!
+	END
+	${result} = 	Terminate Process		${process_manager}
+	${running}= 	Is Process Running		${process_manager}
+	IF 	${running}
+		Fail	msg=Manager did not close!
+	END
+
+	# [Teardown]	Run Keywords
+	# ...    Run Keyword		Close Manager GUI ${platform}
+
+Verify If Manager Runs With No Existing INI File From Current Version NO GUI
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
+	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+
+	@{mngr_options}		Create List		-n
+	Remove File		${global_path}${/}RFSwarmManager.ini
+	File Should Not Exist	${global_path}${/}RFSwarmManager.ini
+	Log To Console	Running Manager with no existing ini file.
+
+	Run Manager CLI	${mngr_options}
+	${running}= 	Is Process Running		${process_manager}
+	IF 	not ${running}
+		Fail	msg=Manager is not running!
+	END
+	${result} = 	Terminate Process		${process_manager}
+	${running}= 	Is Process Running		${process_manager}
+	IF 	${running}
+		Fail	msg=Manager did not close!
+	END
+
+	# [Teardown]	Run Keywords
+	# ...    Run Keyword		Close Manager GUI ${platform}
+
+Verify If Manager Runs With Existing INI File From Previous Version NO GUI
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
+	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+
+	@{mngr_options}		Create List		-n
+	Remove File		${global_path}${/}RFSwarmManager.ini
+	File Should Not Exist	${global_path}${/}RFSwarmManager.ini
+	${v1_0_0_inifile}=		Normalize Path		${CURDIR}${/}testdata${/}Issue-#49${/}v1_0_0${/}RFSwarmManager.ini
+	Copy File	${v1_0_0_inifile}		${global_path}
+	File Should Exist	${global_path}${/}RFSwarmManager.ini
+	File Should Not Be Empty	${global_path}${/}RFSwarmManager.ini
+	Log To Console	Running Manager with existing ini file.
+
+	Run Manager CLI	${mngr_options}
+	${running}= 	Is Process Running		${process_manager}
+	IF 	not ${running}
+		Fail	msg=Manager is not running!
+	END
+	${result} = 	Terminate Process		${process_manager}
+	${running}= 	Is Process Running		${process_manager}
+	IF 	${running}
+		Fail	msg=Manager did not close!
+	END
+
+	# [Teardown]	Run Keywords
+	# ...    Run Keyword		Close Manager GUI ${platform}
