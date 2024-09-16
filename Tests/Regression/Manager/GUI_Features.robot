@@ -9,8 +9,216 @@ Suite Setup 	Set Platform
 ${scenario_name}=	test_scenario
 
 *** Test Cases ***
+Verify That Time Gets Correctly Validated For Schelduled Start
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600 	AND
+	...    Open Manager GUI
+
+	VAR 	@{start_times} 			2:56:30   1:50:2   8:3:12     7:43      53:9      12::      :38:      ::42
+	VAR 	@{updated_start_times}	02:56:30  01:50:02  08:03:12  07:43:00  53:09:00  12:00:00  00:38:00  00:00:42
+	${len}		Get Length	${start_times}
+
+	Click Button	runschedule
+	Sleep	2 	#del later
+	Take A Screenshot	#del later
+	Click RadioBtn	default
+	Press key.tab 1 Times
+	FOR  ${i}  IN RANGE  0  ${len}
+		Evaluate	clipboard.copy("${start_times}[${i}]")	modules=clipboard
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.v
+		ELSE
+			Press Combination	KEY.ctrl		KEY.v
+		END
+		Press key.tab 1 Times
+		Sleep	1
+		Press key.tab 5 Times
+		Sleep	1
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.c
+		ELSE
+			Press Combination	KEY.ctrl		KEY.c
+		END
+		${copied_converted_start_time_value}=		Evaluate	clipboard.paste()	modules=clipboard
+		Should Be Equal 	${updated_start_times}[${i}]	${copied_converted_start_time_value}
+		...    msg=The "Schedule Time" did not convert to the time as expected [ Expected != Converted ]
+	
+	END
+
+	[Teardown]	Run Keywords	Close Manager GUI ${platform}
+
+Verify Schedule Date And Time Is Always In the Future
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600 	AND
+	...    Open Manager GUI
+
+	Click Button	runschedule
+	Click RadioBtn	default
+	Press key.tab 1 Times
+	${current_time}=	Get Current Date	result_format=%H:%M:%S
+	#${new_time}=	Add Time To Date 	${current_time} 	1200 		date_format=%H:%M: 	result_format=%H:%M:
+
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.c
+	ELSE
+		Press Combination	KEY.ctrl		KEY.c
+	END
+	${copied_start_time_value}= 	Evaluate	clipboard.paste()	modules=clipboard
+	${time_diff}=	Subtract Date From Date 	${copied_start_time_value} 	${current_time} 	date1_format=%H:%M:%S 	date2_format=%H:%M:%S
+	Log To Console	Time diff: ${time_diff} between current time and copied default time from "Schedule Time" filed.
+	Should Be True	${time_diff} >= 300 	msg=The Time diff should be at least grater than 5 minutes. Should be in the future.
+
+	Log To Console	Default time: ${copied_start_time_value} this should be always in the future.
+	Log To Console	Current time: ${current_time}
+	${copied_start_time_value}= 	Get Substring	${copied_start_time_value} 	0	5
+	Log To Console	Applied time: ${copied_start_time_value}
+	Type	${copied_start_time_value}
+	Sleep	2
+
+	Press key.tab 1 Times
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command 	KEY.c
+	ELSE
+		Press Combination	KEY.ctrl		KEY.c
+	END
+	${current_date}=	Get Current Date	result_format=%Y-%m-%d
+	${copied_converted_start_date_value}=		Evaluate	clipboard.paste()	modules=clipboard
+	Log To Console	Converted date: ${copied_converted_start_date_value} should be the same as today's date.
+	Should Be Equal 	${current_date} 	${copied_converted_start_date_value}
+	...    msg=The "Schedule Date" did not convert to the current date [ Current Date != Converted ]
+
+	Click Dialog Button 	ok
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
+
+	[Teardown]	Run Keywords	Close Manager GUI ${platform}
+
+Verify That When Time Is Entered In tge Past It Becomes the Next Day
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600 	AND
+	...    Open Manager GUI
+
+	Click Button	runschedule
+	Click RadioBtn	default
+	Press key.tab 1 Times
+	${current_time}=	Get Current Date	result_format=%H:%M:
+	${new_time}=	Subtract Time From Date 	${current_time} 	120 		date_format=%H:%M: 	result_format=%H:%M:
+	Log To Console	Current time: ${current_time}
+	Log To Console	Applied time that is in the past: ${new_time}
+	Type	${new_time}
+	Sleep	2
+
+	Press key.tab 1 Times
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.c
+	ELSE
+		Press Combination	KEY.ctrl		KEY.c
+	END
+	${current_date}=	Get Current Date	result_format=%Y-%m-%d
+	${next_date}=		Add Time To Date 	${current_date} 	1 day 		date_format=%Y-%m-%d 	result_format=%Y-%m-%d
+	${copied_converted_start_date_value}=		Evaluate	clipboard.paste()	modules=clipboard
+	Log To Console	Converted time: ${copied_converted_start_date_value}
+	Should Be Equal 	${next_date} 	${copied_converted_start_date_value}
+	...    msg=The "Schedule Date" did not convert to the next date [ Next Date != Converted ]
+
+	Click Dialog Button 	ok
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
+
+	[Teardown]	Run Keywords	Close Manager GUI ${platform}
+
+Verify the Start Time And Time Remaining Are Displayed Plan Screen
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
+	No Operation	#need to implement
+
+Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time Has Elapsed
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600 	AND
+	...    Open Agent
+
+	${current_time}=	Get Current Date	result_format=%H:%M:%S
+	${new_time}=	Add Time To Date 	${current_time} 	45 		date_format=%H:%M:%S 	result_format=%H:%M:%S
+	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#89${/}Issue-#89.rfs
+	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-t 	${new_time}
+
+	Open Manager GUI	${mngr_options}
+	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_button_stoprun.png	timeout=30
+	Run Keyword If	${status}	Fail
+	...    msg=The Manager started script before the scheduled start-up!
+	Log To Console	Scenario should start soon.
+	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_button_stoprun.png	timeout=60
+	Run Keyword If	not ${status}	Fail
+	...    msg=The Manager did not started script after the scheduled time has elapsed!
+
+	[Teardown]	Run Keywords	Close Manager GUI ${platform}
+
+Verify That the Start Time And Time Remaining Are Removed From Plan Screen When Scheduled Start Is Disabled
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600 	AND
+	...    Open Manager GUI
+
+	Click Button	runschedule
+	Click RadioBtn	default
+	Press key.tab 1 Times
+	${current_time}=	Get Current Date	result_format=%H:%M:%S
+
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.c
+	ELSE
+		Press Combination	KEY.ctrl		KEY.c
+	END
+	${copied_start_time_value}= 	Evaluate	clipboard.paste()	modules=clipboard
+	${copied_start_time_value}= 	Get Substring	${copied_start_time_value} 	0	5
+	Log To Console	Applied time: ${copied_start_time_value}
+	Type	${copied_start_time_value}
+	Sleep	2
+	Press key.tab 1 Times
+
+	Click Dialog Button 	ok
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
+
+	Log To Console	Disabling Scheduled Start
+	Press key.tab 1 Times	#unselect runschedule button to make it possible to click
+	Click Button	runschedule
+	Click RadioBtn	default
+	Click Dialog Button 	ok
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${10}
+	Take A Screenshot
+	Run Keyword If	${status}	Fail	msg=Manager didn't unset a "Start Time" for scheduled start after disabling it.
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${10}
+	Take A Screenshot
+	Run Keyword If	${status}	Fail	msg=Manager didn't unset a "Remaining" for scheduled start after disabling it.
+
+	[Teardown]	Run Keywords	Close Manager GUI ${platform}
+
 Manager Command Line PORT -p
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
 
 	VAR 	&{run_settings_data} 	bind_port_number=8148
@@ -31,7 +239,7 @@ Manager Command Line PORT -p
 	...    Stop Agent
 
 Manager Command Line IPADDRESS -e
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
 
 	${ipv4} 	${ipv6} 	Get IP addresses
@@ -53,7 +261,7 @@ Manager Command Line IPADDRESS -e
 	...    Stop Agent
 
 Manager Command Line DIR -d
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
 
 	VAR		@{mngr_options}		-n	-d	${global_path}${/}Issue-#14
@@ -68,7 +276,7 @@ Manager Command Line DIR -d
 	...    Remove Directory		${global_path}${/}Issue-#14		recursive=${True}
 
 Manager Command Line DIR --dir
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
 
 	VAR		@{mngr_options}		-n	--dir	${global_path}${/}Issue-#14
@@ -83,7 +291,7 @@ Manager Command Line DIR --dir
 	...    Remove Directory		${global_path}${/}Issue-#14		recursive=${True}
 
 Manager Command Line STARTTIME -t
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
 
 	${current_date}=	Get Current Date	result_format=%H:%M:%S
@@ -95,12 +303,16 @@ Manager Command Line STARTTIME -t
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
 	Take A Screenshot
-	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a scheduled start.
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
 
 	[Teardown]	Run Keyword		Close Manager GUI ${platform}
 
 Manager Command Line STARTTIME --starttime
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
 
 	${current_date}=	Get Current Date	result_format=%H:%M:%S
@@ -112,12 +324,16 @@ Manager Command Line STARTTIME --starttime
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
 	Take A Screenshot
-	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a scheduled start.
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
 
 	[Teardown]	Run Keyword		Close Manager GUI ${platform}
 
 Manager Command Line SCENARIO -s
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
 
 	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
@@ -142,7 +358,7 @@ Manager Command Line SCENARIO -s
 	...    Stop Agent
 
 Manager Command Line AGENTS -a
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
 
 	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
@@ -164,7 +380,7 @@ Manager Command Line AGENTS -a
 	...    Stop Agent
 
 Manager Command Line RUN -r
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
 
 	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
@@ -185,7 +401,7 @@ Manager Command Line RUN -r
 	...    Stop Agent
 
 Manager Command Line RUN --run
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
 
 	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
@@ -206,7 +422,7 @@ Manager Command Line RUN --run
 	...    Stop Agent
 
 Manager Command Line INI -i
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
 
 	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmManager.ini
@@ -225,7 +441,7 @@ Manager Command Line INI -i
 	[Teardown]	Run Keyword		Close Manager GUI ${platform}
 
 Manager Command Line INI --ini
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
 
 	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmManager.ini
@@ -244,7 +460,7 @@ Manager Command Line INI --ini
 	[Teardown]	Run Keyword		Close Manager GUI ${platform}
 
 Verify the Field Validation Is Working In the Manager Plan Screen
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #126
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #126
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -283,7 +499,7 @@ Verify the Field Validation Is Working In the Manager Plan Screen
 	...    Run Keyword		Close Manager GUI ${platform}
 
 Verify That Files Get Saved With Correct Extension And Names
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #39
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #39
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -309,7 +525,7 @@ Verify That Files Get Saved With Correct Extension And Names
 	...    Stop Agent
 
 Verify the Time Fields In the Plan Screen For Delay
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600		AND
 	...    Open Manager GUI
@@ -332,7 +548,7 @@ Verify the Time Fields In the Plan Screen For Delay
 
 	Click Button	runaddrow
 
-	FOR  ${i}  IN RANGE  0  3
+	FOR  ${i}  IN RANGE  0  ${len}
 		Press Key.tab 2 Times
 		Take A Screenshot
 		Sleep	1
@@ -343,14 +559,14 @@ Verify the Time Fields In the Plan Screen For Delay
 		END
 		${copied_converted_delay_value}=		Evaluate	clipboard.paste()	modules=clipboard
 		Should Be Equal 	${updated_delay_times}[${i}]	${copied_converted_delay_value}
-		...    msg=The updated delay time did not convert seconds to the time as expected [ Expected != Converted ]
+		...    msg=The updated delay time did not convert to the time as expected [ Expected != Converted ]
 		Press Key.tab 7 Times
 	END
 
 	[Teardown]	Run Keyword		Close Manager GUI ${platform}
 
 Verify the Time Fields In the Plan Screen For Delay: Complex Variations
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600		AND
 	...    Open Manager GUI
@@ -384,14 +600,14 @@ Verify the Time Fields In the Plan Screen For Delay: Complex Variations
 		END
 		${copied_converted_delay_value}=		Evaluate	clipboard.paste()	modules=clipboard
 		Should Be Equal 	${updated_delay_times}[${i}]	${copied_converted_delay_value}
-		...    msg=The updated delay time did not convert seconds to the time as expected [ Expected != Converted ]
+		...    msg=The updated delay time did not convert to the time as expected [ Expected != Converted ]
 		Press Key.tab 7 Times
 	END
 
 	[Teardown]	Run Keyword		Close Manager GUI ${platform}
 
 Verify the Time Fields In the Plan Screen For Ramp Up
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600		AND
 	...    Open Manager GUI
@@ -425,14 +641,14 @@ Verify the Time Fields In the Plan Screen For Ramp Up
 		END
 		${copied_converted_ramp_up_value}=		Evaluate	clipboard.paste()	modules=clipboard
 		Should Be Equal 	${updated_ramp_up_times}[${i}]	${copied_converted_ramp_up_value}
-		...    msg=The updated ramp up time did not convert seconds to the time as expected [ Expected != Converted ]
+		...    msg=The updated ramp up time did not convert to the time as expected [ Expected != Converted ]
 		Press Key.tab 6 Times
 	END
 
 	[Teardown]	Run Keyword		Close Manager GUI ${platform}
 
 Verify the Time Fields In the Plan Screen For Ramp Up: Complex Variations
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600		AND
 	...    Open Manager GUI
@@ -466,14 +682,14 @@ Verify the Time Fields In the Plan Screen For Ramp Up: Complex Variations
 		END
 		${copied_converted_ramp_up_value}=		Evaluate	clipboard.paste()	modules=clipboard
 		Should Be Equal 	${updated_ramp_up_times}[${i}]	${copied_converted_ramp_up_value}
-		...    msg=The updated ramp up time did not convert seconds to the time as expected [ Expected != Converted ]
+		...    msg=The updated ramp up time did not convert to the time as expected [ Expected != Converted ]
 		Press Key.tab 6 Times
 	END
 
 	[Teardown]	Run Keyword		Close Manager GUI ${platform}
 
 Verify the Time Fields In the Plan Screen For Run
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600		AND
 	...    Open Manager GUI
@@ -507,14 +723,14 @@ Verify the Time Fields In the Plan Screen For Run
 		END
 		${copied_converted_run_value}=		Evaluate	clipboard.paste()	modules=clipboard
 		Should Be Equal 	${updated_run_times}[${i}]	${copied_converted_run_value}
-		...    msg=The updated run time did not convert seconds to the time as expected [ Expected != Converted ]
+		...    msg=The updated run time did not convert to the time as expected [ Expected != Converted ]
 		Press Key.tab 5 Times
 	END
 
 	[Teardown]	Run Keyword		Close Manager GUI ${platform}
 
 Verify the Time Fields In the Plan Screen For Run: Complex Variations
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600		AND
 	...    Open Manager GUI
@@ -548,14 +764,14 @@ Verify the Time Fields In the Plan Screen For Run: Complex Variations
 		END
 		${copied_converted_run_value}=		Evaluate	clipboard.paste()	modules=clipboard
 		Should Be Equal 	${updated_run_times}[${i}]	${copied_converted_run_value}
-		...    msg=The updated run time did not convert seconds to the time as expected [ Expected != Converted ]
+		...    msg=The updated run time did not convert to the time as expected [ Expected != Converted ]
 		Press Key.tab 5 Times
 	END
 
 	[Teardown]	Run Keyword		Close Manager GUI ${platform}
 
 Check If the Manager Saves Times and Robots to the Scenario with Example Robot
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600										AND
 	...    Open Manager GUI															AND
@@ -610,7 +826,7 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	...    Delete Scenario File	${scenario_name}
 
 Check If the Manager Saves Settings on the Test Row With Example Robot
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600										AND
 	...    Open Manager GUI															AND
@@ -664,7 +880,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 	...    Delete Scenario File	${scenario_name}
 
 Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Set Test Variable	@{mngr_options}	-g	1						AND
@@ -727,7 +943,7 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	...    Delete Scenario File	${scenario_name}
 
 Verify Scenario File Is Updated Correctly When Scripts Are Removed
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #58
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #58
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Open Manager GUI													AND
@@ -804,7 +1020,7 @@ Verify Scenario File Is Updated Correctly When Scripts Are Removed
 	...    Delete Scenario File		${scenario_name}
 
 Verify the Manager Handles Corrupted Scenario Files And Repairs It
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #58
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #58
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Open Manager GUI													AND
@@ -867,7 +1083,7 @@ Verify the Manager Handles Corrupted Scenario Files And Repairs It
 	...    Delete Scenario File		${scenario_name}
 
 Verify the Manager Handles Scenario Files With Missing Scripts Files
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #241
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #241
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Set Test Variable	@{mngr_options}	-g	1						AND
@@ -920,7 +1136,7 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	...    Delete Scenario File		${scenario_name}
 
 Verify If Manager Saves Inject Sleep From Scenario Wide Settings
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600										AND
 	...    Open Manager GUI															AND
@@ -950,7 +1166,7 @@ Verify If Manager Saves Inject Sleep From Scenario Wide Settings
 	...    Delete Scenario File	${scenario_name}
 
 Check If the Manager Reopens Inject Sleep From Scenario Wide Settings Correctly
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600										AND
 	...    Open Manager GUI															AND
@@ -986,7 +1202,7 @@ Check If the Manager Reopens Inject Sleep From Scenario Wide Settings Correctly
 	...    Delete Scenario File	${scenario_name}
 
 Check If the Manager (after was closed) Opens Inject Sleep From Scenario Wide Settings Correctly
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Set Test Variable	@{mngr_options}	-g	1					AND
@@ -1021,7 +1237,7 @@ Check If the Manager (after was closed) Opens Inject Sleep From Scenario Wide Se
 	...    Delete Scenario File	${scenario_name}
 
 Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Settings
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600										AND
 	...    Open Manager GUI															AND
@@ -1071,7 +1287,7 @@ Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Setting
 	...    Delete Scenario File	${scenario_name}
 
 Check If Inject Sleep Option Was Executed in the Test
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -1157,7 +1373,7 @@ Check If Inject Sleep Option Was Executed in the Test
 	...    Remove File		${global_path}${/}example.robot
 
 Verify If the Port Number And Ip Address Get Written To the INI File
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -1199,7 +1415,7 @@ Verify If the Port Number And Ip Address Get Written To the INI File
 	...    Change = 8148 With = 8138 In ${manager_ini_file}
 
 Verify If Agent Can't Connect On Old Port Number After Port Number Changed And Can Connect To the New One
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -1243,7 +1459,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 	...    Change = 8148 With = 8138 In ${manager_ini_file}
 
 Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Address On the Manager's Host
-	[Tags]	windows-latest	ubuntu-latest	Issue #16
+	#[Tags]	windows-latest	ubuntu-latest	Issue #16
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -1288,7 +1504,7 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	...    Change = ${ipv4}[0] With =${SPACE} In ${manager_ini_file}
 
 Verify Disable log.html - Scenario
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-sl.rfs
 	Copy File 	${sourcefile} 	${scenariofile}
@@ -1325,7 +1541,7 @@ Verify Disable log.html - Scenario
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify Disable report.html - Scenario
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-sr.rfs
 	Copy File 	${sourcefile} 	${scenariofile}
@@ -1362,7 +1578,7 @@ Verify Disable report.html - Scenario
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify Disable output.xml - Scenario
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-so.rfs
 	Copy File 	${sourcefile} 	${scenariofile}
@@ -1399,7 +1615,7 @@ Verify Disable output.xml - Scenario
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify Disable log.html - Test Row
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	${testkey}= 	Set Variable 		disableloglog
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-trl.rfs
@@ -1439,7 +1655,7 @@ Verify Disable log.html - Test Row
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify Disable report.html - Test Row
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	${testkey}= 	Set Variable 		disablelogreport
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-trl.rfs
@@ -1479,7 +1695,7 @@ Verify Disable report.html - Test Row
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify Disable output.xml - Test Row
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
 	${testkey}= 	Set Variable 		disablelogoutput
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-trl.rfs
@@ -1519,7 +1735,7 @@ Verify Disable output.xml - Test Row
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords
 	...    Set INI Window Size		800		600												AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
@@ -1561,7 +1777,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	...    Close Manager GUI ${platform}
 
 Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords
 	...    Set INI Window Size		800		600												AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
@@ -1606,7 +1822,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	...    Close Manager GUI ${platform}
 
 Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords
 	...    Set INI Window Size		800		600												AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
@@ -1651,7 +1867,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    Close Manager GUI ${platform}
 
 Check If The CSV Report Button Works In the Manager Before There Are Any Results
-	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #128
+	#[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #128
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600		AND
 	...    Open Agent
@@ -1699,7 +1915,7 @@ Check If The CSV Report Button Works In the Manager Before There Are Any Results
 	...    Stop Agent
 
 Check If The CSV Report Button Works In The Manager After There Are Results
-	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #254
+	#[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #254
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600		AND
 	...    Open Agent
@@ -1748,7 +1964,7 @@ Check If The CSV Report Button Works In The Manager After There Are Results
 	...    Stop Agent
 
 Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robots
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #31
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #31
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -1816,7 +2032,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 	...    Run Keyword		Close Manager GUI ${platform}
 
 Check If Scenario Csv Report Files Contain Correct Data From The Test
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #17
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #17
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600		AND
 	...    Open Agent
@@ -1934,7 +2150,7 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 	...    Stop Agent
 
 Verify the Results Directory And db File Gets Created Correctly With Scenario Also After a Restart
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
 	[Setup]	Run Keywords
 	...    Clear Manager Result Directory									AND
 	...    Set INI Window Size		1200	600								AND
@@ -2003,7 +2219,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	...    Run Keyword		Close Manager GUI ${platform}
 
 Verify the Results Directory And db File Gets Created Correctly Without Scenario
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
 	[Setup]	Run Keywords
 	...    Clear Manager Result Directory									AND
 	...    Set INI Window Size		1200	600								AND
@@ -2048,7 +2264,7 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	...    Run Keyword		Close Manager GUI ${platform}
 
 Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the robots)
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot	AND
 	...    Set INI Window Size		1200	600							AND
@@ -2075,7 +2291,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	...    Remove File		${global_path}${/}example.robot
 
 Check If Test Scenario Run Will Stop Gradually
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot							AND
 	...    Set INI Window Size		1200	600													AND
@@ -2102,7 +2318,7 @@ Check If Test Scenario Run Will Stop Gradually
 	...    Remove File		${global_path}${/}example.robot
 
 Verify the Robot Count Reduces When Stop Agent While Test Is Running
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #57	Issue #269
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #57	Issue #269
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
@@ -2149,7 +2365,7 @@ Verify the Robot Count Reduces When Stop Agent While Test Is Running
 	...    Set Confidence	0.9
 
 Verify the Files Referenced In the Scenario Are All Using Relative Paths
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #54
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #54
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
@@ -2202,7 +2418,7 @@ Verify the Files Referenced In the Scenario Are All Using Relative Paths
 	...    Close Manager GUI ${platform}
 
 Verify If Upload logs=Immediately Is Being Saved To The Scenario And Read Back Correctly
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -2238,7 +2454,7 @@ Verify If Upload logs=Immediately Is Being Saved To The Scenario And Read Back C
 	...    Run Keyword		Close Manager GUI ${platform}
 
 Verify If Upload logs=Error Only Is Being Saved To The Scenario And Read Back Correctly
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -2274,7 +2490,7 @@ Verify If Upload logs=Error Only Is Being Saved To The Scenario And Read Back Co
 	...    Run Keyword		Close Manager GUI ${platform}
 
 Verify If Upload logs=All Deferred Is Being Saved To The Scenario And Read Back Correctly
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -2310,7 +2526,7 @@ Verify If Upload logs=All Deferred Is Being Saved To The Scenario And Read Back 
 	...    Run Keyword		Close Manager GUI ${platform}
 
 Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardless Of Robot Passes Or Fails
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
@@ -2357,7 +2573,7 @@ Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardl
 	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
 
 Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only When Robot Fails
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
@@ -2406,7 +2622,7 @@ Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only Whe
 	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
 
 Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
@@ -2459,7 +2675,7 @@ Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
 
 Verify Result Name - Test Defaults
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #154  Issue #154-GUI
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #154  Issue #154-GUI
 	${testkey}= 	Set Variable 		resultnamemode
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}Issue-#154-GUI-TD.rfs
@@ -2555,7 +2771,7 @@ Verify Result Name - Test Defaults
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
 
 Verify Result Name - Test Row
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #154  Issue #154-GUI
+	#[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #154  Issue #154-GUI
 	${testkey}= 	Set Variable 		resultnamemode
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}Issue-#154-GUI-TR.rfs
