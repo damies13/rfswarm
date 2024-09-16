@@ -1,6 +1,10 @@
 *** Settings ***
 Resource 	CommandLine_Common.robot
 
+*** Variables ***
+@{robot_data}=	example.robot	Example Test Case
+${scenario_name}=	test_scenario
+
 *** Test Cases ***
 Robot files with same name but different folders
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #184
