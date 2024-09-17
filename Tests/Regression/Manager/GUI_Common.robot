@@ -500,6 +500,20 @@ Get Manager PIP Data
 	Log	${pip_data.stdout}
 	RETURN		${pip_data.stdout}
 
+Get Agent PIP Data
+	Run Process		pip		show	rfswarm-agent		alias=data
+	${pip_data}	Get Process Result	data
+	Should Not Be Empty		${pip_data.stdout}		msg=Agent must be installed with pip
+	Log		${pip_data.stdout}
+	RETURN		${pip_data.stdout}
+
+Get Agent Default Save Path
+	${pip_data}=	Get Agent PIP Data
+	${pip_data_list}=	Split String	${pip_data}
+	${i}=	Get Index From List	${pip_data_list}	Location:
+	${location}=	Set Variable	${pip_data_list}[${i + 1}]
+	RETURN	${location}${/}rfswarm_agent${/}
+
 Create Robot File
 	[Arguments]		${path}=${global_path}	${name}=${global_name}
 	...    ${file_content}=***Test Case***\nExample Test Case\n

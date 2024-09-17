@@ -1156,6 +1156,88 @@ Check If Inject Sleep Option Was Executed in the Test
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove File		${global_path}${/}example.robot
 
+Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has Trailing
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #98
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Open Agent
+
+	${agent_def_path}=	Get Agent Default Save Path
+	${agent_ini_file_content}=	Get File	${agent_def_path}${/}RFSwarmAgent.ini
+	Should Contain	${agent_ini_file_content}	swarmmanager = http://localhost:8138/
+
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#98${/}Issue-#98.rfs
+	VAR 	${agent_script_dir} 	${agent_dir}${/}scripts
+	VAR 	@{mngr_options} 		-d 	${results_dir} 	-s 	${scenariofile}
+
+	Open Manager GUI		${mngr_options}
+	Wait Agent Ready
+	Sleep	10s
+	Should Exist	${agent_script_dir}${/}Issue-#98.robot
+	Should Not Be Empty 	${agent_script_dir}${/}Issue-#98.robot
+	Click Tab	Plan
+	Click Button	runplay
+
+	Log To Console	Started run, now wait 40s. Check if Agent will send results to the Manager.
+	Sleep	40	#rampup=10
+	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_Issue-#98*	absolute=${True}
+	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
+	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
+	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
+	${logs_num}=	Get Length	${run_logs}
+	Log To Console	Uploaded logs number after 40s: ${logs_num}
+	Should Be True	${logs_num} >= 1
+	...    msg=Agent is not uploading logs immediately! Should be at least 1 after ~ 40s. Actual number:${logs_num}.
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}		AND
+	...    Stop Agent											AND
+	...    Remove File 	${agent_script_dir}${/}Issue-#98.robot	AND
+	...    Remove Directory 	${run_result_dirs}[0]	resursive=${True}
+
+Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has No Trailing
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #98
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Open Agent
+
+	${agent_def_path}=	Get Agent Default Save Path
+	Change http://localhost:8138/ With http://localhost:8138 In ${agent_def_path}${/}RFSwarmAgent.ini
+	${agent_ini_file_content}=	Get File	${agent_def_path}${/}RFSwarmAgent.ini
+	Should Contain	${agent_ini_file_content}	swarmmanager = http://localhost:8138
+
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#98${/}Issue-#98.rfs
+	VAR 	${agent_script_dir} 	${agent_dir}${/}scripts
+	VAR 	@{mngr_options} 		-d 	${results_dir} 	-s 	${scenariofile}
+
+	Open Manager GUI		${mngr_options}
+	Wait Agent Ready
+	Sleep	10s
+	Should Exist	${agent_script_dir}${/}Issue-#98.robot
+	Should Not Be Empty 	${agent_script_dir}${/}Issue-#98.robot
+	Click Tab	Plan
+	Click Button	runplay
+
+	Log To Console	Started run, now wait 40s. Check if Agent will send results to the Manager.
+	Sleep	40	#rampup=10
+	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_Issue-#98*	absolute=${True}
+	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
+	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
+	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
+	${logs_num}=	Get Length	${run_logs}
+	Log To Console	Uploaded logs number after 40s: ${logs_num}
+	Should Be True	${logs_num} >= 1
+	...    msg=Agent is not uploading logs immediately! Should be at least 1 after ~ 40s. Actual number:${logs_num}.
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}		AND
+	...    Stop Agent											AND
+	...    Change http://localhost:8138 With http://localhost:8138/ In ${agent_def_path}${/}RFSwarmAgent.ini	AND
+	...    Remove File 	${agent_script_dir}${/}Issue-#98.robot	AND
+	...    Remove Directory 	${run_result_dirs}[0]	resursive=${True}
+
 Verify If the Port Number And Ip Address Get Written To the INI File
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
 	[Setup]	Run Keywords
