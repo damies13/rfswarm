@@ -6047,7 +6047,7 @@ class RFSwarmGUI(tk.Frame):
 		schedWindow.lblSD = ttk.Label(schedWindow.fmeTime, text="Schedule Date")
 		schedWindow.lblSD.grid(column=0, row=1, sticky="nsew")
 
-		schedWindow.txtSD = ttk.Label(schedWindow.fmeTime, textvariable=schedWindow.date)
+		schedWindow.txtSD = ttk.Entry(schedWindow.fmeTime, state="readonly", textvariable=schedWindow.date)
 		schedWindow.txtSD.grid(column=1, row=1, sticky="nsew")
 
 		schedWindow.lblBLNK = ttk.Label(schedWindow.fmeBBar, text=" ")	 # just a spacer before the buttons
