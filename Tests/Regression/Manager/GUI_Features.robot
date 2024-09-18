@@ -164,7 +164,9 @@ Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time
 	Run Keyword If	not ${status}	Fail
 	...    msg=The Manager did not started script after the scheduled time has elapsed!
 
-	[Teardown]	Run Keywords	Close Manager GUI ${platform}
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Stop Agent
 
 Verify That the Start Time And Time Remaining Are Removed From Plan Screen When Scheduled Start Is Disabled
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
