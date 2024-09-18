@@ -48,8 +48,7 @@ jobs:
         if: ${{ matrix.platform == 'ubuntu-latest' }}
           # sudo apt install -y python3-tk python3-dev python3-xlib scrot fluxbox # tesseract-ocr
         run: |
-          sudo apt -y install python3-tk python3-dev python3-xlib scrot lxqt tesseract-ocr
-          sudo apt install -y python3-tk python3-dev python3-xlib scrot fluxbox xclip # tesseract-ocr
+          sudo apt -y install python3-tk python3-dev python3-xlib scrot lxqt xclip # tesseract-ocr
           sudo apt list --installed
       - name: "Ubuntu Xvfb"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
