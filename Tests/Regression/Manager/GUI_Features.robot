@@ -2,7 +2,6 @@
 Library 	Collections
 Library 	String
 Resource 	GUI_Common.robot
-Resource 	${CURDIR}${/}..${/}Agent${/}CommandLine_Common.robot
 Suite Setup 	GUI_Common.Set Platform
 
 *** Variables ***
@@ -91,7 +90,7 @@ Manager Command Line STARTTIME -t
 	Log To Console	Current time: ${current_date}
 	${new_date}=	Subtract Time From Date 	${current_date} 	30 		date_format=%H:%M:%S 	result_format=%H:%M:%S
 	VAR		@{mngr_options}		-t 	${new_date}
-	
+
 	Open Manager GUI	${mngr_options}
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
@@ -108,7 +107,7 @@ Manager Command Line STARTTIME --starttime
 	Log To Console	Current time: ${current_date}
 	${new_date}=	Subtract Time From Date 	${current_date} 	30 		date_format=%H:%M:%S 	result_format=%H:%M:%S
 	VAR		@{mngr_options}		--starttime 	${new_date}
-	
+
 	Open Manager GUI	${mngr_options}
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
@@ -129,7 +128,7 @@ Manager Command Line SCENARIO -s
 	Check If The Agent Is Ready
 	Click Tab	Plan
 	Log To Console	Run the example scenario to check that it has been loaded.
-	
+
 	TRY
 		Click Button	runplay
 		Wait For	manager_${platform}_button_stoprun.png	timeout=30
