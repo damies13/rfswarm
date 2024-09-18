@@ -123,7 +123,6 @@ Circular Reference Resource Files
 	...    Stop Agent	AND
 	...    Stop Manager
 
-
 Circular Reference Resource Files 2
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #261
 	VAR    ${testdata} 		${CURDIR}${/}testdata${/}Issue-#261${/}circular_test2      scope=TEST
@@ -183,7 +182,6 @@ Circular Reference Resource Files 2
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
 	...    Stop Manager
-
 
 Lots Of Resource Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #261
@@ -259,6 +257,10 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 	IF 	${running}
 		Fail	msg=Manager did not close!
 	END
+	Log 	${result.stdout}
+	Log 	${result.stderr}
+	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 
 	File Should Exist	${global_path}${/}RFSwarmManager.ini
 	File Should Not Be Empty	${global_path}${/}RFSwarmManager.ini
@@ -296,6 +298,10 @@ Verify If Manager Runs With No Existing INI File From Current Version NO GUI
 	IF 	${running}
 		Fail	msg=Manager did not close!
 	END
+	Log 	${result.stdout}
+	Log 	${result.stderr}
+	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 
 	# [Teardown]	Run Keywords
 	# ...    Run Keyword		Close Manager GUI ${platform}
@@ -323,6 +329,10 @@ Verify If Manager Runs With Existing INI File From Previous Version NO GUI
 	IF 	${running}
 		Fail	msg=Manager did not close!
 	END
+	Log 	${result.stdout}
+	Log 	${result.stderr}
+	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 
 	# [Teardown]	Run Keywords
 	# ...    Run Keyword		Close Manager GUI ${platform}
