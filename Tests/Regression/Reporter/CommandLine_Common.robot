@@ -194,7 +194,6 @@ Check Icon Install For Windows
 	Directory Should Exist 	%{APPDATA}${/}Microsoft${/}Windows${/}Start Menu 		Start Menu Directory not found
 	File Should Exist 	%{APPDATA}${/}Microsoft${/}Windows${/}Start Menu${/}${dispname}.lnk 		Shortcut File not found
 
-
 Check Icon Install For Ubuntu
 	Log 	%{HOME}
 	# /home/dave/.local/share/applications/rfswarm-manager.desktop
@@ -207,3 +206,17 @@ Check Icon Install For Ubuntu
 	File Should Exist 	${pathprefix}${/}applications${/}${projname}.desktop 		Desktop File not found
 
 	File Should Exist 	${pathprefix}${/}icons${/}hicolor${/}128x128${/}apps${/}${projname}.png 		Icon File not found
+
+Open Reporter
+	[Arguments]		@{appargs}
+	${var}= 	Get Variables
+	Log 	${var}
+	Get Platform
+	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	Set Suite Variable 	$process 	${process}
+	Sleep	3
+
+Get Platform
+	&{platforms}= 	Create Dictionary 	Linux=ubuntu 	Darwin=macos 	Java=notsupported 	Windows=windows
+	${os}= 	Evaluate 	platform.system() 	platform
+	Set Suite Variable    ${platform}    ${platforms}[${os}]

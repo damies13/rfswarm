@@ -31,7 +31,7 @@ Reporter Command Line INI -i
 	Append To File	${test_dir}${/}RFSwarmReporter.ini	${ini_content}
 
 	Log To Console	Run Reporter with alternate ini file with variable: template = ${test_dir}${/}RFSwarmReporter.ini.
-	Open GUI	-n 	-i	${test_dir}${/}RFSwarmReporter.ini 	-d	${resultfolder} 	--html
+	Open Reporter	-n 	-i	${test_dir}${/}RFSwarmReporter.ini 	-d	${resultfolder} 	--html
 	Log To Console	Check that template elements exist in html.
 	@{html_files}=		List Files In Directory		${resultfolder} 	absolute=True 	pattern=*.html
 	Log To Console	${\n}All result files: ${html_files}${\n}
@@ -59,7 +59,7 @@ Reporter Command Line INI --ini
 	Append To File	${test_dir}${/}RFSwarmReporter.ini	${ini_content}
 
 	Log To Console	Run Reporter with alternate ini file with variable: template = ${test_dir}${/}RFSwarmReporter.ini.
-	Open GUI	-n	--ini	${test_dir}${/}RFSwarmReporter.ini 	-d	${resultfolder} 	--html
+	Open Reporter	-n	--ini	${test_dir}${/}RFSwarmReporter.ini 	-d	${resultfolder} 	--html
 	Log To Console	Check that template elements exist in html.
 	@{html_files}=		List Files In Directory		${resultfolder} 	absolute=True 	pattern=*.html
 	Log To Console	${\n}All result files: ${html_files}${\n}
@@ -78,7 +78,7 @@ Manager Command Line DIR -d
 	${basefolder}	Set Variable	${CURDIR}${/}testdata${/}${testdata}
 	${resultfolder}	Set Variable	${basefolder}${/}${resultdata}
 
-	Open GUI	-n	-d 	${resultfolder}
+	Open Reporter	-n	-d 	${resultfolder}
 	${inifile}=		Get Reporter INI Location
 	${inifile_content}=		Get File		${inifile}
 	${inifile_content}=		Split String	${inifile_content}
@@ -101,7 +101,7 @@ Manager Command Line DIR --dir
 	${basefolder}	Set Variable	${CURDIR}${/}testdata${/}${testdata}
 	${resultfolder}	Set Variable	${basefolder}${/}${resultdata}
 
-	Open GUI	-n	--dir	${resultfolder}
+	Open Reporter	-n	--dir	${resultfolder}
 	${inifile}=		Get Reporter INI Location
 	${inifile_content}=		Get File		${inifile}
 	${inifile_content}=		Split String	${inifile_content}
@@ -122,7 +122,7 @@ Reporter Command Line TEMPLATE -t
 	${basefolder}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14
 	${templatefile}=	Normalize Path	${basefolder}${/}Issue-#14.template
 
-	Open GUI	-n	-t	${templatefile}
+	Open Reporter	-n	-t	${templatefile}
 	${inifile}=		Get Reporter INI Location
 	${inifile_content}=		Get File		${inifile}
 	${inifile_content}=		Split String	${inifile_content}
@@ -145,7 +145,7 @@ Reporter Command Line TEMPLATE --template
 	${basefolder}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14
 	${templatefile}=	Normalize Path	${basefolder}${/}Issue-#14.template
 
-	Open GUI	-n	--template	${templatefile}
+	Open Reporter	-n	--template	${templatefile}
 	${inifile}=		Get Reporter INI Location
 	${inifile_content}=		Get File		${inifile}
 	${inifile_content}=		Split String	${inifile_content}
@@ -170,7 +170,7 @@ Manager Command Line HTML report --html
 	${basefolder}	Set Variable	${CURDIR}${/}testdata${/}${testdata}
 	${resultfolder}	Set Variable	${basefolder}${/}${resultdata}
 
-	Open GUI	-n	-d	${resultfolder}		--html
+	Open Reporter	-n	-d	${resultfolder}		--html
 	@{result_files}=		List Files In Directory		${resultfolder}
 	Log To Console	${\n}All result files: ${result_files}${\n}
 	List Should Contain Value	${result_files}		${resultdata}.html
@@ -183,7 +183,7 @@ Manager Command Line HTML report --docx
 	${basefolder}	Set Variable	${CURDIR}${/}testdata${/}${testdata}
 	${resultfolder}	Set Variable	${basefolder}${/}${resultdata}
 
-	Open GUI	-n	-d	${resultfolder}		--docx
+	Open Reporter	-n	-d	${resultfolder}		--docx
 	@{result_files}=		List Files In Directory		${resultfolder}
 	Log To Console	${\n}All result files: ${result_files}${\n}
 	List Should Contain Value	${result_files}		${resultdata}.docx
@@ -196,7 +196,7 @@ Manager Command Line HTML report --xlsx
 	${basefolder}	Set Variable	${CURDIR}${/}testdata${/}${testdata}
 	${resultfolder}	Set Variable	${basefolder}${/}${resultdata}
 
-	Open GUI	-n	-d	${resultfolder}		--xlsx
+	Open Reporter	-n	-d	${resultfolder}		--xlsx
 	@{result_files}=		List Files In Directory		${resultfolder}
 	Log To Console	${\n}All result files: ${result_files}${\n}
 	List Should Contain Value	${result_files}		${resultdata}.xlsx
