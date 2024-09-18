@@ -36,6 +36,7 @@ To learn more about rfswarm please refer to the [Documentation](Doc/README.md)
 
 - [rfswarm Documentation](Doc/README.md)
 - [Discord](https://discord.gg/jJfCMrqCsT)
+- [Slack](https://robotframework.slack.com/archives/C06J2Q0LGEM)
 - [Reporting Issues / Known Issues](https://github.com/damies13/rfswarm/issues)
 
 <kbd align="centre">

@@ -41,7 +41,7 @@ Set Platform
 Set Platform By Python
 	${system}= 		Evaluate 	platform.system() 	modules=platform
 
-	IF 	"${system}" == "Windows"
+	IF 	"${system}" == "Darwin"
 		Set Suite Variable    ${platform}    macos
 	END
 	IF 	"${system}" == "Windows"
@@ -187,7 +187,7 @@ Close Manager GUI macos
 		# make sure the window is the active window first, Unlikely the about tab has been selected
 		Run Keyword And Ignore Error 	Click Tab 	 About
 		Run Keyword And Ignore Error 	Click Tab 	 Run
-		Click Image		manager_${platform}_titlebar_rfswarm.png
+		# Click Image		manager_${platform}_titlebar_rfswarm.png
 		Click Button	closewindow
 		Sleep	3
 		Run Keyword And Ignore Error 	Click Dialog Button		no 		10
@@ -217,10 +217,19 @@ Close Manager GUI macos
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 
 Stop Agent
-	${result} = 	Terminate Process		${process_agent}
-	Log		${result.stdout}
-	Log		${result.stderr}
-	# Should Be Equal As Integers 	${result.rc} 	0
+	${running}= 	Is Process Running 	${process_agent}
+	IF 	${running}
+		Sleep	3s
+		IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
+			${result} = 	Terminate Process		${process_agent}
+		ELSE
+			Send Signal To Process 	SIGINT 	${process_agent}
+			${result}= 	Wait For Process 	${process_agent}	timeout=30	on_timeout=kill
+		END
+		Log		${result.stdout}
+		Log		${result.stderr}
+		# Should Be Equal As Integers 	${result.rc} 	0
+	END
 
 	#	 stdout=${OUTPUT DIR}${/}stdout_agent.txt    stderr=${OUTPUT DIR}${/}stderr_agent.txt
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -546,6 +555,20 @@ Get Manager PIP Data
 	Should Not Be Empty		${pip_data.stdout}		msg=Manager must be installed with pip
 	Log	${pip_data.stdout}
 	RETURN		${pip_data.stdout}
+
+Get Agent PIP Data
+	Run Process		pip		show	rfswarm-agent		alias=data
+	${pip_data}	Get Process Result	data
+	Should Not Be Empty		${pip_data.stdout}		msg=Agent must be installed with pip
+	Log		${pip_data.stdout}
+	RETURN		${pip_data.stdout}
+
+Get Agent Default Save Path
+	${pip_data}=	Get Agent PIP Data
+	${pip_data_list}=	Split String	${pip_data}
+	${i}=	Get Index From List	${pip_data_list}	Location:
+	${location}=	Set Variable	${pip_data_list}[${i + 1}]
+	RETURN	${location}${/}rfswarm_agent${/}
 
 Create Robot File
 	[Arguments]		${path}=${global_path}	${name}=${global_name}

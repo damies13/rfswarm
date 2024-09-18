@@ -2898,14 +2898,24 @@ class ReporterCore:
 		# base.close_results_db()
 		base.stop_db()
 
+		time.sleep(1)
 		base.debugmsg(2, "Exit")
 		try:
 			sys.exit(0)
-		except SystemExit:
+		except SystemExit as e:
 			try:
-				os._exit(0)
-			except Exception:
-				pass
+				remaining_threads = [t for t in threading.enumerate() if t is not threading.main_thread() and t.is_alive()]
+				if remaining_threads:
+					base.debugmsg(5, "Failed to gracefully exit RFSwarm-Reporter. Forcing immediate exit.")
+					for thread in remaining_threads:
+						base.debugmsg(9, "Thread name:", thread.name)
+					os._exit(0)
+				else:
+					raise e
+
+			except Exception as e:
+				base.debugmsg(3, "Failed to exit with error:", e)
+				os._exit(1)
 
 	def create_icons(self):
 		base.debugmsg(0, "Creating application icons for RFSwarm Reporter")
@@ -3179,7 +3189,7 @@ class ReporterCore:
 			for msg in mesage:
 				msglst.append(msg)
 			msgout = " ".join(msglst)
-			while base.gui is None:
+			while base.gui is None and base.running:
 				time.sleep(0.5)
 			base.gui.updateStatus(msgout)
 		else:
@@ -6774,6 +6784,7 @@ class ReporterGUI(tk.Frame):
 		# self.sectionstree.see(sectionID)
 
 	def on_closing(self, _event=None, *extras):
+		base.running = False
 		try:
 			base.debugmsg(5, "close window")
 			self.destroy()

@@ -18,6 +18,41 @@ ${process}		None
 ${sssleep}		0.5
 
 *** Keywords ***
+Set Platform
+	Set Platform By Python
+	Set Platform By Tag
+
+Set Platform By Python
+	${system}= 		Evaluate 	platform.system() 	modules=platform
+
+	IF 	"${system}" == "Darwin"
+		Set Suite Variable    ${platform}    macos
+	END
+	IF 	"${system}" == "Windows"
+		Set Suite Variable    ${platform}    windows
+	END
+	IF 	"${system}" == "Linux"
+		Set Suite Variable    ${platform}    ubuntu
+	END
+
+
+Set Platform By Tag
+	# [Arguments]		${ostag}
+	Log 	${OPTIONS}
+	Log 	${OPTIONS}[include]
+	Log 	${OPTIONS}[include][0]
+	${ostag}= 	Set Variable 	${OPTIONS}[include][0]
+
+	IF 	"${ostag}" == "macos-latest"
+		Set Suite Variable    ${platform}    macos
+	END
+	IF 	"${ostag}" == "windows-latest"
+		Set Suite Variable    ${platform}    windows
+	END
+	IF 	"${ostag}" == "ubuntu-latest"
+		Set Suite Variable    ${platform}    ubuntu
+	END
+
 Make Clipboard Not None
 	Evaluate    clipboard.copy("You should never see this after copy") 	modules=clipboard
 
@@ -234,6 +269,7 @@ Open GUI
 	Get Platform
 	${keyword}= 	Set Variable 	Open GUI ${platform}
 	Run Keyword 	${keyword} 	@{appargs}
+	Sleep	3
 
 Get Platform
 	&{platforms}= 	Create Dictionary 	Linux=ubuntu 	Darwin=macos 	Java=notsupported 	Windows=windows
@@ -299,6 +335,8 @@ Close GUI
 
 Check Result
 	[Arguments]		${result}
+	Log 	${result.stdout}
+	Should Not Contain 	${result.stdout} 	Traceback
 	Log 	${result.stderr}
 	Should Not Contain 	${result.stderr} 	Traceback
 	Should Be Equal As Integers 	${result.rc} 	0
