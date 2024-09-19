@@ -1346,13 +1346,15 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	Run Keyword		Close Manager GUI ${platform}
 	Open Manager GUI
 
-	Log To Console	Check if Agent cant connect to the Manager via ${ipv4}[1] instead of ${ipv4}[0].
-	@{agent_options}	Set Variable	-m	http://${ipv4}[1]:8138/
+	# ${altip}= 	Set Variable    ${ipv4} [1]
+	${altip}= 	Set Variable    127.0.0.1
+	Log To Console	Check if Agent cant connect to the Manager via ${altip} instead of ${ipv4}[0].
+	@{agent_options}	Set Variable	-m	http://${altip}:8138/
 	Open Agent	${agent_options}
 	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
 	Run Keyword If	${status}	Fail
-	...    msg=The agent has connected to the Manager via ${ipv4}[1] but should not!
-	Log To Console	The Agent did not connect to the Manager via ${ipv4}[1] and this was expected.
+	...    msg=The agent has connected to the Manager via ${altip} but should not!
+	Log To Console	The Agent did not connect to the Manager via ${altip} and this was expected.
 	Click Tab	Plan
 	Stop Agent
 
