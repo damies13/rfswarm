@@ -245,8 +245,11 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 
 	@{mngr_options}		Create List		-n
 
-	File Should Exist	${global_path}${/}RFSwarmManager.ini
-	Show Log 	${global_path}${/}RFSwarmManager.ini
+	${passed} = 	Run Keyword And Return Status 	File Should Exist 	${global_path}${/}RFSwarmManager.ini
+	IF 	${passed}
+		Show Log 	${global_path}${/}RFSwarmManager.ini
+		Remove File 	${global_path}${/}RFSwarmManager.ini
+	END
 
 	Run Manager CLI	${mngr_options}
 	${running}= 	Is Process Running		${process_manager}
