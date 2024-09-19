@@ -1,6 +1,8 @@
 *** Settings ***
 Resource 	CommandLine_Common.robot
 
+Suite Setup 		Create Directory 	${results_dir}
+
 *** Variables ***
 @{robot_data}=	example.robot	Example Test Case
 ${scenario_name}=	test_scenario
@@ -17,7 +19,7 @@ Robot files with same name but different folders
 	Log to console 	${CURDIR}
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#184${/}Issue-#184.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 	Stop Agent
@@ -79,7 +81,7 @@ Circular Reference Resource Files
 	Log to console 	${CURDIR}
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#184${/}Issue-#184.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n
+	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 	Stop Agent
@@ -139,7 +141,7 @@ Circular Reference Resource Files 2
 	Log to console 	${CURDIR}
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#184${/}Issue-#184.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n
+	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 	Stop Agent
@@ -199,7 +201,7 @@ Lots Of Resource Files
 	Log to console 	${CURDIR}
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#184${/}Issue-#184.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n
+	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
 	# It can take a while for the agent to download 3500+ files
 	Wait For Manager 	60min
@@ -258,7 +260,7 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 		Fail	msg=Manager is not running!
 	END
 	# Hopefully this resolves the blank ini file issue
-	Sleep    10
+	Sleep    1
 	${result} = 	Terminate Process		${process_manager}
 	${running}= 	Is Process Running		${process_manager}
 	IF 	${running}
