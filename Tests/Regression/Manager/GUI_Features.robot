@@ -15,8 +15,8 @@ Verify That Time Gets Correctly Validated For Schelduled Start
 	...    Set INI Window Size		1200	600 	AND
 	...    Open Manager GUI
 
-	VAR 	@{start_times} 			2:56:30   1:50:2   8:3:12     7:43      53:9      12::      :38:      ::42
-	VAR 	@{updated_start_times}	02:56:30  01:50:02  08:03:12  07:43:00  53:09:00  12:00:00  00:38:00  00:00:42
+	VAR 	@{start_times} 			2:56:30   1:50:2    17:5:1  8:3:12     7:43      53:9      12::      :38:      ::42
+	VAR 	@{updated_start_times}	02:56:30  01:50:02  17:05:01  08:03:12  07:43:00  53:09:00  12:00:00  00:38:00  00:00:42
 	${len}		Get Length	${start_times}
 
 	Click Button	runschedule
@@ -46,7 +46,7 @@ Verify That Time Gets Correctly Validated For Schelduled Start
 
 	[Teardown]	Run Keywords	Close Manager GUI ${platform}
 
-Verify Schedule Date And Time Is Always In the Future
+Verify Schedule Date And Time Are Always In the Future
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600 	AND
@@ -99,7 +99,7 @@ Verify Schedule Date And Time Is Always In the Future
 
 	[Teardown]	Run Keywords	Close Manager GUI ${platform}
 
-Verify That When Time Is Entered In tge Past It Becomes the Next Day
+Verify That When Time Is Entered In the Past It Becomes the Next Day
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600 	AND
@@ -139,10 +139,6 @@ Verify That When Time Is Entered In tge Past It Becomes the Next Day
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
 
 	[Teardown]	Run Keywords	Close Manager GUI ${platform}
-
-Verify the Start Time And Time Remaining Are Displayed Plan Screen
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
-	No Operation	#need to implement
 
 Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time Has Elapsed
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
