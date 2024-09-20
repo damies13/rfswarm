@@ -56,7 +56,6 @@ Verify Schedule Date And Time Are Always In the Future
 	Click RadioBtn	default
 	Press key.tab 1 Times
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
-	#${new_time}=	Add Time To Date 	${current_time} 	1200 		date_format=%H:%M: 	result_format=%H:%M:
 
 	IF  "${platform}" == "macos"
 		Press Combination	KEY.command		KEY.c
@@ -90,11 +89,9 @@ Verify Schedule Date And Time Are Always In the Future
 	Click Dialog Button 	ok
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
-	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
-	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
 
 	[Teardown]	Run Keywords	Close Manager GUI ${platform}
@@ -131,11 +128,9 @@ Verify That When Time Is Entered In the Past It Becomes the Next Day
 	Click Dialog Button 	ok
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
-	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
-	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
 
 	[Teardown]	Run Keywords	Close Manager GUI ${platform}
@@ -168,16 +163,24 @@ Verify the Start Time Is Displayed On the Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
 	[Setup]	Set INI Window Size		1200	600
 
-	VAR		@{mngr_options}		-t 	3:00:00
+	${current_time}=	Get Current Date	result_format=%H
+	IF  '${current_time}' == '${3}'
+		VAR 	${scheduled_time}	15:00:00
+		VAR 	${expected_time_image}	15_00_00
+	ELSE
+		VAR 	${scheduled_time}	3:00:00
+		VAR 	${expected_time_image}	3_00_00
+	END
+	VAR		@{mngr_options}		-t 	${scheduled_time}
 	
 	Open Manager GUI	${mngr_options}
 	Take A Screenshot
-	Run Keyword 	Close Manager GUI ${platform}
-
-	VAR		@{mngr_options}		-t 	15:00:00
-	
-	Open Manager GUI	${mngr_options}
-	Take A Screenshot
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "Start Time" for scheduled start.
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_${expected_time_image}.png 	timeout=${20}
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "${scheduled_time}" for scheduled start.
 
 	[Teardown]	Run Keyword 	Close Manager GUI ${platform}
 
@@ -191,56 +194,52 @@ Verify the Remaining Time Is Displayed On the Plan Screen
 	VAR		@{mngr_options}		-t 	${new_time}
 
 	Open Manager GUI	${mngr_options}
-	Sleep	11
 	Take A Screenshot
+	Sleep	8
+	Take A Screenshot
+	Sleep	1
+	Take A Screenshot
+	Sleep	1
+	Take A Screenshot
+	Sleep	1
+	Take A Screenshot
+	Sleep	1
+	Take A Screenshot
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "Remaining" for scheduled start.
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_10_00.png 	timeout=${20}
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "10:00" for scheduled start.
 
 	[Teardown]	Run Keyword 	Close Manager GUI ${platform}
 
 Verify That the Start Time And Time Remaining Are Removed From Plan Screen When Scheduled Start Is Disabled
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
-	[Setup]	Run Keywords
-	...    Set INI Window Size		1200	600 	AND
-	...    Open Manager GUI
+	[Setup]	Set INI Window Size		1200	600
 
-	Click Button	runschedule
-	Click RadioBtn	default
-	Press key.tab 1 Times
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
+	#adding 10m:20s
+	${new_time}=	Add Time To Date 	${current_time} 	620 		date_format=%H:%M:%S 	result_format=%H:%M:%S
+	VAR		@{mngr_options}		-t 	${new_time}
 
-	IF  "${platform}" == "macos"
-		Press Combination	KEY.command		KEY.c
-	ELSE
-		Press Combination	KEY.ctrl		KEY.c
-	END
-	${copied_start_time_value}= 	Evaluate	clipboard.paste()	modules=clipboard
-	${copied_start_time_value}= 	Get Substring	${copied_start_time_value} 	0	5
-	Log To Console	Applied time: ${copied_start_time_value}
-	Type	${copied_start_time_value}
-	Sleep	2
-	Press key.tab 1 Times
-
-	Click Dialog Button 	ok
+	Open Manager GUI	${mngr_options}
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
-	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
-	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
 
 	Log To Console	Disabling Scheduled Start
-	Press key.tab 1 Times	#unselect runschedule button to make it possible to click
 	Click Button	runschedule
 	Click RadioBtn	default
 	Click Dialog Button 	ok
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${10}
-	Take A Screenshot
 	Run Keyword If	${status}	Fail	msg=Manager didn't unset a "Start Time" for scheduled start after disabling it.
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${10}
-	Take A Screenshot
 	Run Keyword If	${status}	Fail	msg=Manager didn't unset a "Remaining" for scheduled start after disabling it.
 
 	[Teardown]	Run Keywords	Close Manager GUI ${platform}
