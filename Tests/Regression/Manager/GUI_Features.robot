@@ -164,6 +164,38 @@ Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Stop Agent
 
+Verify the Start Time Is Displayed On the Plan Screen
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
+	[Setup]	Set INI Window Size		1200	600
+
+	VAR		@{mngr_options}		-t 	3:00:00
+	
+	Open Manager GUI	${mngr_options}
+	Take A Screenshot
+	Run Keyword 	Close Manager GUI ${platform}
+
+	VAR		@{mngr_options}		-t 	15:00:00
+	
+	Open Manager GUI	${mngr_options}
+	Take A Screenshot
+
+	[Teardown]	Run Keyword 	Close Manager GUI ${platform}
+
+Verify the Remaining Time Is Displayed On the Plan Screen
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
+	[Setup]	Set INI Window Size		1200	600
+
+	${current_time}=	Get Current Date	result_format=%H:%M:%S
+	#adding 10m:20s
+	${new_time}=	Add Time To Date 	${current_time} 	620 		date_format=%H:%M:%S 	result_format=%H:%M:%S
+	VAR		@{mngr_options}		-t 	${new_time}
+
+	Open Manager GUI	${mngr_options}
+	Sleep	11
+	Take A Screenshot
+
+	[Teardown]	Run Keyword 	Close Manager GUI ${platform}
+
 Verify That the Start Time And Time Remaining Are Removed From Plan Screen When Scheduled Start Is Disabled
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
 	[Setup]	Run Keywords
