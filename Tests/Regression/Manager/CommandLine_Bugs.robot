@@ -260,6 +260,7 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 		Fail	msg=Manager is not running!
 	END
 	# Hopefully this resolves the blank ini file issue
+	Sleep    0.5
 	${result} = 	Terminate Process		${process_manager}
 	${running}= 	Is Process Running		${process_manager}
 	IF 	${running}
@@ -279,6 +280,7 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 	IF 	not ${running}
 		Fail	msg=Manager is not running!
 	END
+	Sleep    0.5
 	${result} = 	Terminate Process		${process_manager}
 	${running}= 	Is Process Running		${process_manager}
 	IF 	${running}
