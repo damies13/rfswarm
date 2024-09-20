@@ -195,16 +195,6 @@ Verify the Remaining Time Is Displayed On the Plan Screen
 
 	Open Manager GUI	${mngr_options}
 	Take A Screenshot
-	Sleep	8
-	Take A Screenshot
-	Sleep	1
-	Take A Screenshot
-	Sleep	1
-	Take A Screenshot
-	Sleep	1
-	Take A Screenshot
-	Sleep	1
-	Take A Screenshot
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "Remaining" for scheduled start.
