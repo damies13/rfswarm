@@ -69,7 +69,7 @@ Verify Schedule Date And Time Are Always In the Future
 
 	Log To Console	Default time: ${copied_start_time_value} this should be always in the future.
 	Log To Console	Current time: ${current_time}
-	${copied_start_time_value}= 	Get Substring	${copied_start_time_value} 	0	5
+	${copied_start_time_value}= 	Get Substring	${copied_start_time_value} 	0	6
 	Log To Console	Applied time: ${copied_start_time_value}
 	Type	${copied_start_time_value}
 	Sleep	2
