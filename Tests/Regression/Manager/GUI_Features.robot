@@ -2736,8 +2736,14 @@ Verify Schedule Date And Time Are Always In the Future
 	Log To Console	Current time: ${current_time}
 	${copied_start_time_value}= 	Get Substring	${copied_start_time_value} 	0	6
 	Log To Console	Applied time: ${copied_start_time_value}
-	Type	${copied_start_time_value}
+	Evaluate	clipboard.copy("${copied_start_time_value}")	modules=clipboard
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.v
+	ELSE
+		Press Combination	KEY.ctrl		KEY.v
+	END
 	Sleep	2
+	Press key.tab 2 Times
 
 	Click Label With Horizontal Offset	schedule_date	100
 	IF  "${platform}" == "macos"
@@ -2784,8 +2790,14 @@ Verify That When Time Is Entered In the Past It Becomes the Next Day
 	${new_time}=	Subtract Time From Date 	${current_time} 	120 		date_format=%H:%M: 	result_format=%H:%M:
 	Log To Console	Current time: ${current_time}
 	Log To Console	Applied time that is in the past: ${new_time}
-	Type	${new_time}
+	Evaluate	clipboard.copy("${copied_start_time_value}")	modules=clipboard
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.v
+	ELSE
+		Press Combination	KEY.ctrl		KEY.v
+	END
 	Sleep	2
+	Press key.tab 2 Times
 
 	Click Label With Horizontal Offset	schedule_date	100
 	IF  "${platform}" == "macos"
