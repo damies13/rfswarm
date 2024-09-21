@@ -1528,8 +1528,8 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	...    Set Global Filename And Default Save Path	main								AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main1.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
 
-	${M_absolute_paths}	${M_file_names}
-	...    Find Absolute Paths And Names For Files In Directory	${CURDIR}${/}testdata${/}Issue-52${/}example
+	${M_absolute_paths} 	${M_file_names} 	Find Absolute Paths And Names For Files In Directory
+	...    ${CURDIR}${/}testdata${/}Issue-52${/}example
 	Log 	${M_absolute_paths}
 	Log 	${M_file_names}
 
@@ -1540,9 +1540,9 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	Check If The Agent Is Ready
 	Sleep	30
 
-	@{excluded_files}=	Create List	RFSListener3.py	RFSListener2.py	RFSTestRepeater.py
-	${A_absolute_paths}	${A_file_names}
-	...    Find Absolute Paths And Names For Files In Directory	${TEMPDIR}${/}agent_temp_issue52	@{excluded_files}
+	@{excluded_files}=	Create List  RFSListener3.py  RFSListener2.py  RFSTestRepeater.py
+	${A_absolute_paths}	${A_file_names} 	Find Absolute Paths And Names For Files In Directory
+	...    ${TEMPDIR}${/}agent_temp_issue52	@{excluded_files}
 	Log 	${A_absolute_paths}
 	Log 	${A_file_names}
 
@@ -1570,8 +1570,8 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	...    Set Global Filename And Default Save Path	main								AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main2.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
 
-	${M_absolute_paths}	${M_file_names}
-	...    Find Absolute Paths And Names For Files In Directory	${CURDIR}${/}testdata${/}Issue-52${/}example
+	${M_absolute_paths}	${M_file_names} 	Find Absolute Paths And Names For Files In Directory
+	...    ${CURDIR}${/}testdata${/}Issue-52${/}example
 	Log 	${M_absolute_paths}
 	Log 	${M_file_names}
 
@@ -1585,9 +1585,9 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	Check If The Agent Is Ready
 	Sleep	30
 
-	@{excluded_files}=	Create List	RFSListener3.py	RFSListener2.py	RFSTestRepeater.py
-	${A_absolute_paths}	${A_file_names}
-	...    Find Absolute Paths And Names For Files In Directory	${TEMPDIR}${/}agent_temp_issue52	@{excluded_files}
+	@{excluded_files}=	Create List  RFSListener3.py  RFSListener2.py  RFSTestRepeater.py
+	${A_absolute_paths} 	${A_file_names} 	Find Absolute Paths And Names For Files In Directory
+	...    ${TEMPDIR}${/}agent_temp_issue52	@{excluded_files}
 	Log 	${A_absolute_paths}
 	Log 	${A_file_names}
 
@@ -1615,8 +1615,8 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    Set Global Filename And Default Save Path	main								AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main3.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
 
-	${M_absolute_paths}	${M_file_names}
-	...    Find Absolute Paths And Names For Files In Directory	${CURDIR}${/}testdata${/}Issue-52${/}example
+	${M_absolute_paths} 	${M_file_names} 	Find Absolute Paths And Names For Files In Directory
+	...    ${CURDIR}${/}testdata${/}Issue-52${/}example
 	Log 	${M_absolute_paths}
 	Log 	${M_file_names}
 
@@ -1630,9 +1630,9 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	Check If The Agent Is Ready
 	Sleep	30
 
-	@{excluded_files}=	Create List	RFSListener3.py	RFSListener2.py	RFSTestRepeater.py
-	${A_absolute_paths}	${A_file_names}
-	...    Find Absolute Paths And Names For Files In Directory	${TEMPDIR}${/}agent_temp_issue52	@{excluded_files}
+	@{excluded_files}=	Create List  RFSListener3.py  RFSListener2.py  RFSTestRepeater.py
+	${A_absolute_paths}	${A_file_names} 	Find Absolute Paths And Names For Files In Directory
+	...    ${TEMPDIR}${/}agent_temp_issue52	@{excluded_files}
 	Log 	${A_absolute_paths}
 	Log 	${A_file_names}
 
@@ -1648,6 +1648,57 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main3.robot	${CURDIR}${/}testdata${/}Issue-52	AND
 	...    Stop Agent																AND
+	...    Close Manager GUI ${platform}
+
+Verify If __init__.robot Files Get Transfered To the Agent Along With Robot/Resuorce File
+	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #90	hi
+	[Setup]	Run Keywords
+	...    Set INI Window Size		800		600		AND
+	...    Set Global Filename And Default Save Path	main
+
+	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#90${/}test_scenario.rfs
+	VAR 	@{mngr_options} 	-s 	${scenariofile}
+	VAR 	@{agent_options} 	-d 	${TEMPDIR}${/}agent_temp_issue90
+
+	Open Agent	${agent_options}
+	Open Manager GUI	${mngr_options}
+
+	${example_dir}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#90${/}example
+	${M_absolute_paths} 	${M_file_names} 	Find Absolute Paths And Names For Files In Directory	${example_dir}
+	Log 	${M_absolute_paths}
+	Log 	${M_file_names}
+
+	Check If The Agent Is Ready
+	Sleep	30
+
+	Log To Console	Verify if all __init__.robot files get transfered to the Agent script folder
+	@{excluded_files}=	Create List  RFSListener3.py  RFSListener2.py  RFSTestRepeater.py
+	${A_absolute_paths} 	${A_file_names} 	Find Absolute Paths And Names For Files In Directory
+	...    ${TEMPDIR}${/}agent_temp_issue90 	@{excluded_files}
+	Log 	${A_absolute_paths}
+	Log 	${A_file_names}
+
+	${M_rel_paths}= 		Get Relative Paths 		${CURDIR}${/}testdata${/}Issue-#90${/}example${/}main 		${M_absolute_paths}
+	${A_rel_paths}= 		Get Relative Paths 		${TEMPDIR}${/}agent_temp_issue90${/}scripts 	${A_absolute_paths}
+	Diff Lists 		${M_rel_paths} 		${A_rel_paths} 	Files are not transferred correctly! List A - Manager, List B - Agent, Check report for more information.
+
+	Log To Console	Verify content of the __init__.robot files
+	${init_file}=	Get File	${TEMPDIR}${/}agent_temp_issue90${/}__init__.robot
+	Should Contain	${init_file}	example
+	${init_file}=	Get File	${TEMPDIR}${/}agent_temp_issue90${/}dir4${/}__init__.robot
+	Should Contain	${init_file}	dir4
+	${init_file}=	Get File	${TEMPDIR}${/}agent_temp_issue90${/}scripts${/}__init__.robot
+	Should Contain	${init_file}	main
+	${init_file}=	Get File	${TEMPDIR}${/}agent_temp_issue90${/}scripts${/}dir1${/}__init__.robot
+	Should Contain	${init_file}	dir1
+	${init_file}=	Get File	${TEMPDIR}${/}agent_temp_issue90${/}scripts${/}dir1${/}dir2${/}__init__.robot
+	Should Contain	${init_file}	dir2
+	${init_file}=	Get File	${TEMPDIR}${/}agent_temp_issue90${/}scripts${/}dir1${/}dir2${/}dir3${/}__init__.robot
+	Should Contain	${init_file}	dir3
+
+	[Teardown]	Run Keywords
+	...    Remove Directory 	${TEMPDIR}${/}agent_temp_issue90	recursive=${True}	AND
+	...    Stop Agent																	AND
 	...    Close Manager GUI ${platform}
 
 Check If The CSV Report Button Works In the Manager Before There Are Any Results
