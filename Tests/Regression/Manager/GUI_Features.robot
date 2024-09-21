@@ -2671,7 +2671,12 @@ Verify That Time Gets Correctly Validated For Schelduled Start
 
 	Click Button	runschedule
 	Click RadioBtn	default
-	Press key.tab 1 Times
+	Click Label With Horizontal Offset	schedule_time	100
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.a
+	ELSE
+		Double Click
+	END
 	FOR  ${i}  IN RANGE  0  ${len}
 		Evaluate	clipboard.copy("${start_times}[${i}]")	modules=clipboard
 		IF  "${platform}" == "macos"
@@ -2681,7 +2686,12 @@ Verify That Time Gets Correctly Validated For Schelduled Start
 		END
 		Press key.tab 1 Times
 		Sleep	1
-		Press key.tab 5 Times
+		Click Label With Horizontal Offset	schedule_time	100
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.a
+		ELSE
+			Double Click
+		END
 		Sleep	1
 		IF  "${platform}" == "macos"
 			Press Combination	KEY.command		KEY.c
@@ -2704,9 +2714,14 @@ Verify Schedule Date And Time Are Always In the Future
 
 	Click Button	runschedule
 	Click RadioBtn	default
-	Press key.tab 1 Times
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
 
+	Click Label With Horizontal Offset	schedule_time	100
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.a
+	ELSE
+		Double Click
+	END
 	IF  "${platform}" == "macos"
 		Press Combination	KEY.command		KEY.c
 	ELSE
@@ -2724,7 +2739,12 @@ Verify Schedule Date And Time Are Always In the Future
 	Type	${copied_start_time_value}
 	Sleep	2
 
-	Press key.tab 1 Times
+	Click Label With Horizontal Offset	schedule_date	100
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.a
+	ELSE
+		Double Click
+	END
 	IF  "${platform}" == "macos"
 		Press Combination	KEY.command 	KEY.c
 	ELSE
@@ -2754,7 +2774,12 @@ Verify That When Time Is Entered In the Past It Becomes the Next Day
 
 	Click Button	runschedule
 	Click RadioBtn	default
-	Press key.tab 1 Times
+	Click Label With Horizontal Offset	schedule_time	100
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.a
+	ELSE
+		Double Click
+	END
 	${current_time}=	Get Current Date	result_format=%H:%M:
 	${new_time}=	Subtract Time From Date 	${current_time} 	120 		date_format=%H:%M: 	result_format=%H:%M:
 	Log To Console	Current time: ${current_time}
@@ -2762,7 +2787,12 @@ Verify That When Time Is Entered In the Past It Becomes the Next Day
 	Type	${new_time}
 	Sleep	2
 
-	Press key.tab 1 Times
+	Click Label With Horizontal Offset	schedule_date	100
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.a
+	ELSE
+		Double Click
+	END
 	IF  "${platform}" == "macos"
 		Press Combination	KEY.command		KEY.c
 	ELSE
