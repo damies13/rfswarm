@@ -1651,7 +1651,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    Close Manager GUI ${platform}
 
 Verify If __init__.robot Files Get Transfered To the Agent Along With Robot/Resuorce File
-	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #90	hi
+	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #90
 	[Setup]	Run Keywords
 	...    Set INI Window Size		800		600		AND
 	...    Set Global Filename And Default Save Path	main
