@@ -2790,7 +2790,7 @@ Verify That When Time Is Entered In the Past It Becomes the Next Day
 	${new_time}=	Subtract Time From Date 	${current_time} 	120 		date_format=%H:%M: 	result_format=%H:%M:
 	Log To Console	Current time: ${current_time}
 	Log To Console	Applied time that is in the past: ${new_time}
-	Evaluate	clipboard.copy("${copied_start_time_value}")	modules=clipboard
+	Evaluate	clipboard.copy("${new_time}")	modules=clipboard
 	IF  "${platform}" == "macos"
 		Press Combination	KEY.command		KEY.v
 	ELSE
