@@ -9,231 +9,6 @@ Suite Setup 	Set Platform
 ${scenario_name}=	test_scenario
 
 *** Test Cases ***
-Verify That Time Gets Correctly Validated For Schelduled Start
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
-	[Setup]	Run Keywords
-	...    Set INI Window Size		1200	600 	AND
-	...    Open Manager GUI
-
-	VAR 	@{start_times} 			2:56:30   1:50:2    17:5:1  8:3:12     7:43      53:9      12::      :38:      ::42
-	VAR 	@{updated_start_times}	02:56:30  01:50:02  17:05:01  08:03:12  07:43:00  53:09:00  12:00:00  00:38:00  00:00:42
-	${len}		Get Length	${start_times}
-
-	Click Button	runschedule
-	Click RadioBtn	default
-	Press key.tab 1 Times
-	FOR  ${i}  IN RANGE  0  ${len}
-		Evaluate	clipboard.copy("${start_times}[${i}]")	modules=clipboard
-		IF  "${platform}" == "macos"
-			Press Combination	KEY.command		KEY.v
-		ELSE
-			Press Combination	KEY.ctrl		KEY.v
-		END
-		Press key.tab 1 Times
-		Sleep	1
-		Press key.tab 5 Times
-		Sleep	1
-		IF  "${platform}" == "macos"
-			Press Combination	KEY.command		KEY.c
-		ELSE
-			Press Combination	KEY.ctrl		KEY.c
-		END
-		${copied_converted_start_time_value}=		Evaluate	clipboard.paste()	modules=clipboard
-		Should Be Equal 	${updated_start_times}[${i}]	${copied_converted_start_time_value}
-		...    msg=The "Schedule Time" did not convert to the time as expected [ Expected != Converted ]
-	
-	END
-
-	[Teardown]	Run Keywords	Close Manager GUI ${platform}
-
-Verify Schedule Date And Time Are Always In the Future
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
-	[Setup]	Run Keywords
-	...    Set INI Window Size		1200	600 	AND
-	...    Open Manager GUI
-
-	Click Button	runschedule
-	Click RadioBtn	default
-	Press key.tab 1 Times
-	${current_time}=	Get Current Date	result_format=%H:%M:%S
-
-	IF  "${platform}" == "macos"
-		Press Combination	KEY.command		KEY.c
-	ELSE
-		Press Combination	KEY.ctrl		KEY.c
-	END
-	${copied_start_time_value}= 	Evaluate	clipboard.paste()	modules=clipboard
-	${time_diff}=	Subtract Date From Date 	${copied_start_time_value} 	${current_time} 	date1_format=%H:%M:%S 	date2_format=%H:%M:%S
-	Log To Console	Time diff: ${time_diff} between current time and copied default time from "Schedule Time" filed.
-	Should Be True	${time_diff} >= 300 	msg=The Time diff should be at least grater than 5 minutes. Should be in the future.
-
-	Log To Console	Default time: ${copied_start_time_value} this should be always in the future.
-	Log To Console	Current time: ${current_time}
-	${copied_start_time_value}= 	Get Substring	${copied_start_time_value} 	0	6
-	Log To Console	Applied time: ${copied_start_time_value}
-	Type	${copied_start_time_value}
-	Sleep	2
-
-	Press key.tab 1 Times
-	IF  "${platform}" == "macos"
-		Press Combination	KEY.command 	KEY.c
-	ELSE
-		Press Combination	KEY.ctrl		KEY.c
-	END
-	${current_date}=	Get Current Date	result_format=%Y-%m-%d
-	${copied_converted_start_date_value}=		Evaluate	clipboard.paste()	modules=clipboard
-	Log To Console	Converted date: ${copied_converted_start_date_value} should be the same as today's date.
-	Should Be Equal 	${current_date} 	${copied_converted_start_date_value}
-	...    msg=The "Schedule Date" did not convert to the current date [ Current Date != Converted ]
-
-	Click Dialog Button 	ok
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
-	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
-	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
-
-	[Teardown]	Run Keywords	Close Manager GUI ${platform}
-
-Verify That When Time Is Entered In the Past It Becomes the Next Day
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
-	[Setup]	Run Keywords
-	...    Set INI Window Size		1200	600 	AND
-	...    Open Manager GUI
-
-	Click Button	runschedule
-	Click RadioBtn	default
-	Press key.tab 1 Times
-	${current_time}=	Get Current Date	result_format=%H:%M:
-	${new_time}=	Subtract Time From Date 	${current_time} 	120 		date_format=%H:%M: 	result_format=%H:%M:
-	Log To Console	Current time: ${current_time}
-	Log To Console	Applied time that is in the past: ${new_time}
-	Type	${new_time}
-	Sleep	2
-
-	Press key.tab 1 Times
-	IF  "${platform}" == "macos"
-		Press Combination	KEY.command		KEY.c
-	ELSE
-		Press Combination	KEY.ctrl		KEY.c
-	END
-	${current_date}=	Get Current Date	result_format=%Y-%m-%d
-	${next_date}=		Add Time To Date 	${current_date} 	1 day 		date_format=%Y-%m-%d 	result_format=%Y-%m-%d
-	${copied_converted_start_date_value}=		Evaluate	clipboard.paste()	modules=clipboard
-	Log To Console	Converted time: ${copied_converted_start_date_value}
-	Should Be Equal 	${next_date} 	${copied_converted_start_date_value}
-	...    msg=The "Schedule Date" did not convert to the next date [ Next Date != Converted ]
-
-	Click Dialog Button 	ok
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
-	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
-	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
-
-	[Teardown]	Run Keywords	Close Manager GUI ${platform}
-
-Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time Has Elapsed
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
-	[Setup]	Run Keywords
-	...    Set INI Window Size		1200	600 	AND
-	...    Open Agent
-
-	${current_time}=	Get Current Date	result_format=%H:%M:%S
-	${new_time}=	Add Time To Date 	${current_time} 	45 		date_format=%H:%M:%S 	result_format=%H:%M:%S
-	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#89${/}Issue-#89.rfs
-	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-t 	${new_time}
-
-	Open Manager GUI	${mngr_options}
-	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_button_stoprun.png	timeout=30
-	Run Keyword If	${status}	Fail
-	...    msg=The Manager started script before the scheduled start-up!
-	Log To Console	Scenario should start soon.
-	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_button_stoprun.png	timeout=60
-	Run Keyword If	not ${status}	Fail
-	...    msg=The Manager did not started script after the scheduled time has elapsed!
-
-	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
-	...    Stop Agent
-
-Verify the Start Time Is Displayed On the Plan Screen
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
-	[Setup]	Set INI Window Size		1200	600
-
-	${current_time}=	Get Current Date	result_format=%H
-	IF  '${current_time}' == '${3}'
-		VAR 	${scheduled_time}	15:00:00
-		VAR 	${expected_time_image}	15_00_00
-	ELSE
-		VAR 	${scheduled_time}	3:00:00
-		VAR 	${expected_time_image}	3_00_00
-	END
-	VAR		@{mngr_options}		-t 	${scheduled_time}
-	
-	Open Manager GUI	${mngr_options}
-	Take A Screenshot
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
-	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "Start Time" for scheduled start.
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_${expected_time_image}.png 	timeout=${20}
-	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "${scheduled_time}" for scheduled start.
-
-	[Teardown]	Run Keyword 	Close Manager GUI ${platform}
-
-Verify the Remaining Time Is Displayed On the Plan Screen
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
-	[Setup]	Set INI Window Size		1200	600
-
-	${current_time}=	Get Current Date	result_format=%H:%M:%S
-	#adding 10m:20s
-	${new_time}=	Add Time To Date 	${current_time} 	620 		date_format=%H:%M:%S 	result_format=%H:%M:%S
-	VAR		@{mngr_options}		-t 	${new_time}
-
-	Open Manager GUI	${mngr_options}
-	Take A Screenshot
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
-	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "Remaining" for scheduled start.
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_10_00.png 	timeout=${20}
-	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "10:00" for scheduled start.
-
-	[Teardown]	Run Keyword 	Close Manager GUI ${platform}
-
-Verify That the Start Time And Time Remaining Are Removed From Plan Screen When Scheduled Start Is Disabled
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
-	[Setup]	Set INI Window Size		1200	600
-
-	${current_time}=	Get Current Date	result_format=%H:%M:%S
-	#adding 10m:20s
-	${new_time}=	Add Time To Date 	${current_time} 	620 		date_format=%H:%M:%S 	result_format=%H:%M:%S
-	VAR		@{mngr_options}		-t 	${new_time}
-
-	Open Manager GUI	${mngr_options}
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
-	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
-	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
-
-	Log To Console	Disabling Scheduled Start
-	Click Button	runschedule
-	Click RadioBtn	default
-	Click Dialog Button 	ok
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${10}
-	Run Keyword If	${status}	Fail	msg=Manager didn't unset a "Start Time" for scheduled start after disabling it.
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${10}
-	Run Keyword If	${status}	Fail	msg=Manager didn't unset a "Remaining" for scheduled start after disabling it.
-
-	[Teardown]	Run Keywords	Close Manager GUI ${platform}
-
 Manager Command Line PORT -p
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
@@ -2883,3 +2658,229 @@ Verify Result Name - Test Row
 	Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
 	Log 	Default 	console=True
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
+
+Verify That Time Gets Correctly Validated For Schelduled Start
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600 	AND
+	...    Open Manager GUI
+
+	VAR 	@{start_times} 			2:56:30   1:50:2    17:5:1  8:3:12     7:43      53:9      12::      :38:      ::42
+	VAR 	@{updated_start_times}	02:56:30  01:50:02  17:05:01  08:03:12  07:43:00  53:09:00  12:00:00  00:38:00  00:00:42
+	${len}		Get Length	${start_times}
+
+	Click Button	runschedule
+	Click RadioBtn	default
+	Press key.tab 1 Times
+	FOR  ${i}  IN RANGE  0  ${len}
+		Evaluate	clipboard.copy("${start_times}[${i}]")	modules=clipboard
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.v
+		ELSE
+			Press Combination	KEY.ctrl		KEY.v
+		END
+		Press key.tab 1 Times
+		Sleep	1
+		Press key.tab 5 Times
+		Sleep	1
+		IF  "${platform}" == "macos"
+			Press Combination	KEY.command		KEY.c
+		ELSE
+			Press Combination	KEY.ctrl		KEY.c
+		END
+		${copied_converted_start_time_value}=		Evaluate	clipboard.paste()	modules=clipboard
+		Should Be Equal 	${updated_start_times}[${i}]	${copied_converted_start_time_value}
+		...    msg=The "Schedule Time" did not convert to the time as expected [ Expected != Converted ]
+	
+	END
+
+	[Teardown]	Run Keywords	Close Manager GUI ${platform}
+
+Verify Schedule Date And Time Are Always In the Future
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600 	AND
+	...    Open Manager GUI
+
+	Click Button	runschedule
+	Click RadioBtn	default
+	Press key.tab 1 Times
+	${current_time}=	Get Current Date	result_format=%H:%M:%S
+
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.c
+	ELSE
+		Press Combination	KEY.ctrl		KEY.c
+	END
+	${copied_start_time_value}= 	Evaluate	clipboard.paste()	modules=clipboard
+	${time_diff}=	Subtract Date From Date 	${copied_start_time_value} 	${current_time} 	date1_format=%H:%M:%S 	date2_format=%H:%M:%S
+	Log To Console	Time diff: ${time_diff} between current time and copied default time from "Schedule Time" filed.
+	Should Be True	${time_diff} >= 300 	msg=The Time diff should be at least grater than 5 minutes. Should be in the future.
+
+	Log To Console	Default time: ${copied_start_time_value} this should be always in the future.
+	Log To Console	Current time: ${current_time}
+	${copied_start_time_value}= 	Get Substring	${copied_start_time_value} 	0	6
+	Log To Console	Applied time: ${copied_start_time_value}
+	Type	${copied_start_time_value}
+	Sleep	2
+
+	Press key.tab 1 Times
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command 	KEY.c
+	ELSE
+		Press Combination	KEY.ctrl		KEY.c
+	END
+	${current_date}=	Get Current Date	result_format=%Y-%m-%d
+	${copied_converted_start_date_value}=		Evaluate	clipboard.paste()	modules=clipboard
+	Log To Console	Converted date: ${copied_converted_start_date_value} should be the same as today's date.
+	Should Be Equal 	${current_date} 	${copied_converted_start_date_value}
+	...    msg=The "Schedule Date" did not convert to the current date [ Current Date != Converted ]
+
+	Click Dialog Button 	ok
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
+
+	[Teardown]	Run Keywords	Close Manager GUI ${platform}
+
+Verify That When Time Is Entered In the Past It Becomes the Next Day
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600 	AND
+	...    Open Manager GUI
+
+	Click Button	runschedule
+	Click RadioBtn	default
+	Press key.tab 1 Times
+	${current_time}=	Get Current Date	result_format=%H:%M:
+	${new_time}=	Subtract Time From Date 	${current_time} 	120 		date_format=%H:%M: 	result_format=%H:%M:
+	Log To Console	Current time: ${current_time}
+	Log To Console	Applied time that is in the past: ${new_time}
+	Type	${new_time}
+	Sleep	2
+
+	Press key.tab 1 Times
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.c
+	ELSE
+		Press Combination	KEY.ctrl		KEY.c
+	END
+	${current_date}=	Get Current Date	result_format=%Y-%m-%d
+	${next_date}=		Add Time To Date 	${current_date} 	1 day 		date_format=%Y-%m-%d 	result_format=%Y-%m-%d
+	${copied_converted_start_date_value}=		Evaluate	clipboard.paste()	modules=clipboard
+	Log To Console	Converted time: ${copied_converted_start_date_value}
+	Should Be Equal 	${next_date} 	${copied_converted_start_date_value}
+	...    msg=The "Schedule Date" did not convert to the next date [ Next Date != Converted ]
+
+	Click Dialog Button 	ok
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
+
+	[Teardown]	Run Keywords	Close Manager GUI ${platform}
+
+Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time Has Elapsed
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600 	AND
+	...    Open Agent
+
+	${current_time}=	Get Current Date	result_format=%H:%M:%S
+	${new_time}=	Add Time To Date 	${current_time} 	45 		date_format=%H:%M:%S 	result_format=%H:%M:%S
+	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#89${/}Issue-#89.rfs
+	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-t 	${new_time}
+
+	Open Manager GUI	${mngr_options}
+	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_button_stoprun.png	timeout=30
+	Run Keyword If	${status}	Fail
+	...    msg=The Manager started script before the scheduled start-up!
+	Log To Console	Scenario should start soon.
+	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_button_stoprun.png	timeout=60
+	Run Keyword If	not ${status}	Fail
+	...    msg=The Manager did not started script after the scheduled time has elapsed!
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Stop Agent
+
+Verify the Start Time Is Displayed On the Plan Screen
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
+	[Setup]	Set INI Window Size		1200	600
+
+	${current_time}=	Get Current Date	result_format=%H
+	IF  '${current_time}' == '${3}'
+		VAR 	${scheduled_time}	15:00:00
+		VAR 	${expected_time_image}	15_00_00
+	ELSE
+		VAR 	${scheduled_time}	3:00:00
+		VAR 	${expected_time_image}	3_00_00
+	END
+	VAR		@{mngr_options}		-t 	${scheduled_time}
+	
+	Open Manager GUI	${mngr_options}
+	Take A Screenshot
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "Start Time" for scheduled start.
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_${expected_time_image}.png 	timeout=${20}
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "${scheduled_time}" for scheduled start.
+
+	[Teardown]	Run Keyword 	Close Manager GUI ${platform}
+
+Verify the Remaining Time Is Displayed On the Plan Screen
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
+	[Setup]	Set INI Window Size		1200	600
+
+	${current_time}=	Get Current Date	result_format=%H:%M:%S
+	#adding 10m:20s
+	${new_time}=	Add Time To Date 	${current_time} 	620 		date_format=%H:%M:%S 	result_format=%H:%M:%S
+	VAR		@{mngr_options}		-t 	${new_time}
+
+	Open Manager GUI	${mngr_options}
+	Take A Screenshot
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "Remaining" for scheduled start.
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_10_00.png 	timeout=${20}
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "10:00" for scheduled start.
+
+	[Teardown]	Run Keyword 	Close Manager GUI ${platform}
+
+Verify That the Start Time And Time Remaining Are Removed From Plan Screen When Scheduled Start Is Disabled
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
+	[Setup]	Set INI Window Size		1200	600
+
+	${current_time}=	Get Current Date	result_format=%H:%M:%S
+	#adding 10m:20s
+	${new_time}=	Add Time To Date 	${current_time} 	620 		date_format=%H:%M:%S 	result_format=%H:%M:%S
+	VAR		@{mngr_options}		-t 	${new_time}
+
+	Open Manager GUI	${mngr_options}
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
+	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
+
+	Log To Console	Disabling Scheduled Start
+	Click Button	runschedule
+	Click RadioBtn	default
+	Click Dialog Button 	ok
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${10}
+	Run Keyword If	${status}	Fail	msg=Manager didn't unset a "Start Time" for scheduled start after disabling it.
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${10}
+	Run Keyword If	${status}	Fail	msg=Manager didn't unset a "Remaining" for scheduled start after disabling it.
+
+	[Teardown]	Run Keywords	Close Manager GUI ${platform}
+
