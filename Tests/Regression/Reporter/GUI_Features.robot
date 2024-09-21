@@ -155,6 +155,10 @@ Verify if reporter handle missing test result file
 Check Application Icon or Desktop Shortcut in GUI
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
 
+	${result}= 	Run 	${cmd_reporter} -c ICON
+	Log 		${result}
+	Sleep    1
+
 	Navigate to and check Desktop Icon
 
 	[Teardown]	Type 	KEY.ESC 	KEY.ESC 	KEY.ESC

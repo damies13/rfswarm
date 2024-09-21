@@ -9,11 +9,9 @@ Install Application Icon or Desktop Shortcut
 
 	${result}= 	Run 	${cmd_reporter} -g 6 -c ICON
 	Log 		${result}
+	Sleep    1
 	Check Icon Install
-Resource 	GUI_Common.robot
-Suite Setup 	Set Platform
 
-*** Test Cases ***
 Reporter Command Line INI -i
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 
