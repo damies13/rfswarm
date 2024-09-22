@@ -2743,7 +2743,7 @@ Check Application Icon or Desktop Shortcut in GUI
 		# ${result}= 	Run 	${cmd_agent} -c ICON
 		# Log 		${result}
 
-	${result}= 	Run 	${cmd_manager} -c ICON
+	${result}= 	Run 	${cmd_manager} -g 6 -c ICON
 	Log 		${result}
 	Sleep    1
 
