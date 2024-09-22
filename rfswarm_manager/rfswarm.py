@@ -2965,8 +2965,16 @@ class RFSwarmCore:
 			os.remove(execbundle)
 		os.symlink(exesrc, execbundle)
 
-		# touch '/Applications/RFSwarm Manager.app' to update .aa icon
+		# touch '/Applications/RFSwarm Manager.app' to update .app icon
 		cmd = "touch '{0}'".format(apppath)
+		base.debugmsg(6, "cmd:", cmd)
+		response = os.popen(cmd).read()
+		base.debugmsg(6, "response:", response)
+
+		# Try re-registering your application with Launch Services:
+		# /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f /Applications/MyTool.app
+		lsregister = "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+		cmd = "{0} -f '{1}'".format(lsregister, apppath)
 		base.debugmsg(6, "cmd:", cmd)
 		response = os.popen(cmd).read()
 		base.debugmsg(6, "response:", response)
