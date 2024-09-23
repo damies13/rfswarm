@@ -44,6 +44,21 @@ Set Platform By Tag
 		Set Suite Variable    ${platform}    ubuntu
 	END
 
+Show Log
+	[Arguments]		${filename}
+	Log 		${\n}-----${filename}----- 		console=True
+	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
+	Log 		${filedata} 		console=True
+	Log 		-----${filename}-----${\n} 		console=True
+	RETURN 		${filedata}
+
+Read Log
+	[Arguments]		${filename}
+	Log 		${filename}
+	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
+	Log 		${filedata}
+	RETURN 		${filedata}
+
 Clean Up Old Files
 		[Tags]	ubuntu-latest 	macos-latest 	windows-latest
 		# cleanup previous output
@@ -180,8 +195,10 @@ Check Icon Install For Macos
 	File Should Exist 	${appfolder}${/}Contents${/}Resources${/}${projname}.icns 		icns File not found
 
 	File Should Exist 	${appfolder}${/}Contents${/}Info.plist 		plist File not found
+	Show Log 	 					${appfolder}${/}Contents${/}Info.plist
 
 	File Should Exist 	${appfolder}${/}Contents${/}PkgInfo 		PkgInfo File not found
+	Show Log 	 					${appfolder}${/}Contents${/}PkgInfo
 
 	File Should Exist 	${appfolder}${/}Contents${/}MacOS${/}${projname} 		Executable Symbolic Link File not found
 

@@ -506,8 +506,10 @@ Check Icon Install For Macos
 	File Should Exist 	${appfolder}${/}Contents${/}Resources${/}${projname}.icns 		icns File not found
 
 	File Should Exist 	${appfolder}${/}Contents${/}Info.plist 		plist File not found
+	Show Log 	 					${appfolder}${/}Contents${/}Info.plist
 
 	File Should Exist 	${appfolder}${/}Contents${/}PkgInfo 		PkgInfo File not found
+	Show Log 	 					${appfolder}${/}Contents${/}PkgInfo
 
 	File Should Exist 	${appfolder}${/}Contents${/}MacOS${/}${projname} 		Executable Symbolic Link File not found
 
