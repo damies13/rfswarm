@@ -496,6 +496,9 @@ Navigate to and check Desktop Icon For MacOS
 	Take A Screenshot
 
 	# Filter/Search /Applications?
+	Type 	RFSwarm
+	Sleep 	0.3
+	Take A Screenshot
 
 
 	# Open Launchpad (F4?)
@@ -504,12 +507,12 @@ Navigate to and check Desktop Icon For MacOS
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Sleep 	0.3
+	Sleep 	1
 	Take A Screenshot
 
 	# Search Launchpad
 	Type 	RFSwarm
-	Sleep 	0.5
+	Sleep 	0.3
 	Take A Screenshot
 
 	# Check for Icon
