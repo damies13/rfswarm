@@ -328,6 +328,8 @@ Auto Generate DOCX Report With GUI Using Template
 	Log To Console	Run Reporter with cutom template and generate docx report.
 	${template_dir}=		Normalize Path	${basefolder}${/}Issue-#132.template
 	Open GUI	-d 	${resultfolder} 	-t 	${template_dir} 	--docx
+	Sleep	1s
+	Take A Screenshot
 	Sleep	5s
 	Close GUI
 	@{docx_files}=		List Files In Directory		${resultfolder} 	absolute=True 	pattern=*.docx
@@ -349,6 +351,8 @@ Auto Generate XLSX Report With GUI Using Template
 	Log To Console	Run Reporter with cutom template and generate xlsx report.
 	${template_dir}=		Normalize Path	${basefolder}${/}Issue-#132.template
 	Open GUI	-d 	${resultfolder} 	-t 	${template_dir} 	--xlsx
+	Sleep	1s
+	Take A Screenshot
 	Sleep	5s
 	Close GUI
 	@{xlsx_files}=		List Files In Directory		${resultfolder} 	absolute=True 	pattern=*.xlsx
