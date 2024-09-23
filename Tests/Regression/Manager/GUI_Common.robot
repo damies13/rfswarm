@@ -1408,13 +1408,14 @@ Navigate to and check Desktop Icon For MacOS
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	# Sleep 	0.3
-	${img}=	Set Variable		${platform}_finder_toolbar.png
+	${img}=	Set Variable		${platform}_finder_recents.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Click Image		${img}
 	# Take A Screenshot
 
 	# un-maximise finder if maximised
 	${img}=	Set Variable		${platform}_finder.png
-	${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=1
+	${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=0.5
 	IF 	not ${passed}
 		Take A Screenshot
 		Press Combination 	KEY.fn 	KEY.f
