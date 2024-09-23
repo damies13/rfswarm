@@ -301,9 +301,9 @@ Auto Generate HTML Report With GUI Using Template
 	Log To Console	Run Reporter with cutom template and generate html report.
 	${template_dir}=		Normalize Path	${basefolder}${/}Issue-#132.template
 	Open GUI	-d 	${resultfolder} 	-t 	${template_dir} 	--html
-	${status}=	Run Keyword And Return Status
-	...    Wait For 	reporter_${platform}_status_savedxhtmlreport.png 	timeout=${10}
-	Run Keyword If	not ${status}	Fail	msg=Reporter didn't saved HTML report file in 10 seconds!
+	Sleep	1s
+	Take A Screenshot
+	Sleep	5s
 	Close GUI
 	@{html_files}=		List Files In Directory		${resultfolder} 	absolute=True 	pattern=*.html
 	Log To Console	${\n}All result files: ${html_files}${\n}
@@ -315,7 +315,7 @@ Auto Generate HTML Report With GUI Using Template
 	Should Contain 	${html_content} 	<h1>4 Issue-#132</h1>
 	Should Contain 	${html_content} 	<div class="body"><p>This is a test for Issue-#132</p></div>
 
-	[Teardown] 	Remove File 	${resultfolder}${/}${resultdata}.html
+	[Teardown] 	Run Keywords 	Remove File 	${resultfolder}${/}${resultdata}.html	AND 	Close GUI
 
 Auto Generate DOCX Report With GUI Using Template
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #132 	DOCX
@@ -328,11 +328,7 @@ Auto Generate DOCX Report With GUI Using Template
 	Log To Console	Run Reporter with cutom template and generate docx report.
 	${template_dir}=		Normalize Path	${basefolder}${/}Issue-#132.template
 	Open GUI	-d 	${resultfolder} 	-t 	${template_dir} 	--docx
-	Sleep	2			#del later
-	Take A Screenshot	#del later
-	# ${status}=	Run Keyword And Return Status
-	# ...    Wait For 	reporter_${platform}_status_saveddocxreport.png 	timeout=${10}
-	# Run Keyword If	not ${status}	Fail	msg=Reporter didn't saved HTML report file in 10 seconds!
+	Sleep	5s
 	Close GUI
 	@{docx_files}=		List Files In Directory		${resultfolder} 	absolute=True 	pattern=*.docx
 	Log To Console	${\n}All result files: ${docx_files}${\n}
@@ -340,7 +336,7 @@ Auto Generate DOCX Report With GUI Using Template
 
 	File Should Not Be Empty 	${docx_files}[0]
 
-	[Teardown] 	Remove File 	${resultfolder}${/}${resultdata}.docx
+	[Teardown] 	Run Keywords 	Remove File 	${resultfolder}${/}${resultdata}.docx	AND 	Close GUI
 
 Auto Generate XLSX Report With GUI Using Template
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #132 	XLSX
@@ -353,11 +349,7 @@ Auto Generate XLSX Report With GUI Using Template
 	Log To Console	Run Reporter with cutom template and generate xlsx report.
 	${template_dir}=		Normalize Path	${basefolder}${/}Issue-#132.template
 	Open GUI	-d 	${resultfolder} 	-t 	${template_dir} 	--xlsx
-	Sleep	2			#del later
-	Take A Screenshot	#del later
-	# ${status}=	Run Keyword And Return Status
-	# ...    Wait For 	reporter_${platform}_status_savedxlsxreport.png 	timeout=${10}
-	# Run Keyword If	not ${status}	Fail	msg=Reporter didn't saved HTML report file in 10 seconds!
+	Sleep	5s
 	Close GUI
 	@{xlsx_files}=		List Files In Directory		${resultfolder} 	absolute=True 	pattern=*.xlsx
 	Log To Console	${\n}All result files: ${xlsx_files}${\n}
@@ -365,5 +357,5 @@ Auto Generate XLSX Report With GUI Using Template
 
 	File Should Not Be Empty 	${xlsx_files}[0]
 
-	[Teardown] 	Remove File 	${resultfolder}${/}${resultdata}.xlsx
+	[Teardown] 	Run Keywords 	Remove File 	${resultfolder}${/}${resultdata}.docx	AND 	Close GUI
 

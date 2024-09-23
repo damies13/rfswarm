@@ -35,6 +35,7 @@ Auto Generate HTML Report Without GUI Using Template
 	${template}= 	Set Variable    ${basefolder}${/}90%ileTemplate.template
 	Should Exist	${template}
 	Log 	template: ${template} 	console=True
+	Log To Console	Run Reporter with cutom template and generate html report.
 	# ${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --html
 	${result}= 	Run 	${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --html
 	Log 	result: ${\n}${result} 	console=True
@@ -63,6 +64,7 @@ Auto Generate DOCX Report Without GUI Using Template
 	${template}= 	Set Variable    ${basefolder}${/}90%ileTemplate.template
 	Should Exist	${template}
 	Log 	template: ${template} 	console=True
+	Log To Console	Run Reporter with cutom template and generate docx report.
 	# ${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --docx
 	${result}= 	Run 	${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --docx
 	Log 	result: ${\n}${result} 	console=True
