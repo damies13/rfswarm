@@ -483,6 +483,16 @@ Navigate to and check Desktop Icon For MacOS
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	# Take A Screenshot
 
+	# un-maximise finder if maximised
+	${img}=	Set Variable		${platform}_finder.png
+	${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=1
+	IF 	not ${passed}
+		Take A Screenshot
+		Press Combination 	KEY.fn 	KEY.f
+		Sleep 	0.3
+		Take A Screenshot
+	END
+
 	# nav to /Applications
 	Press Combination 	KEY.command 	KEY.shift 	KEY.g
 	${img}=	Set Variable		${platform}_finder_gotofolder.png
