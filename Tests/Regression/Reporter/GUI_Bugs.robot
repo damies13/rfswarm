@@ -301,9 +301,7 @@ Auto Generate HTML Report With GUI Using Template
 	Log To Console	Run Reporter with cutom template and generate html report.
 	${template_dir}=		Normalize Path	${basefolder}${/}Issue-#132.template
 	Open GUI	-d 	${resultfolder} 	-t 	${template_dir} 	--html
-	Sleep	1s
-	Take A Screenshot
-	Sleep	5s
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
 	Close GUI
 	@{html_files}=		List Files In Directory		${resultfolder} 	absolute=True 	pattern=*.html
 	Log To Console	${\n}All result files: ${html_files}${\n}
@@ -328,9 +326,7 @@ Auto Generate DOCX Report With GUI Using Template
 	Log To Console	Run Reporter with cutom template and generate docx report.
 	${template_dir}=		Normalize Path	${basefolder}${/}Issue-#132.template
 	Open GUI	-d 	${resultfolder} 	-t 	${template_dir} 	--docx
-	Sleep	1s
-	Take A Screenshot
-	Sleep	5s
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
 	Close GUI
 	@{docx_files}=		List Files In Directory		${resultfolder} 	absolute=True 	pattern=*.docx
 	Log To Console	${\n}All result files: ${docx_files}${\n}
@@ -351,9 +347,7 @@ Auto Generate XLSX Report With GUI Using Template
 	Log To Console	Run Reporter with cutom template and generate xlsx report.
 	${template_dir}=		Normalize Path	${basefolder}${/}Issue-#132.template
 	Open GUI	-d 	${resultfolder} 	-t 	${template_dir} 	--xlsx
-	Sleep	1s
-	Take A Screenshot
-	Sleep	5s
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
 	Close GUI
 	@{xlsx_files}=		List Files In Directory		${resultfolder} 	absolute=True 	pattern=*.xlsx
 	Log To Console	${\n}All result files: ${xlsx_files}${\n}
