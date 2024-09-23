@@ -1401,19 +1401,53 @@ Navigate to and check Desktop Icon
 
 Navigate to and check Desktop Icon For MacOS
 	Take A Screenshot
+
+	# open finder
+	${img}=	Set Variable		${platform}_finder.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	# Sleep 	0.3
+	${img}=	Set Variable		${platform}_finder_toolbar.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	# Take A Screenshot
+
+	# nav to /Applications
+	Press Combination 	KEY.command 	KEY.shift 	KEY.g
+	Press Combination 	KEY.backspace		#clear text filed
+	# Sleep 	0.3
+	# Take A Screenshot
+
+	Type 		/Applications
+	# Sleep 	0.3
+	# Take A Screenshot
+
+	Press Combination 	KEY.enter
+	# Sleep	0.5
+	# Take A Screenshot
+
+	# Filter/Search /Applications?
+	Type 	RFSwarm
+	Sleep 	0.3
+	# ${img}=	Set Variable		${platform}_finder_rfswarm_reporter.png
+	# Wait For 	${img} 	 timeout=${default_image_timeout}
+	Take A Screenshot
+
 	# Open Launchpad (F4?)
 	# Press Combination   key.f4
 	${img}=	Set Variable		${platform}_launchpad.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Sleep 	1
-	Take A Screenshot
+	# Sleep 	1
+	${img}=	Set Variable		${platform}_launchpad_search.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	# Take A Screenshot
 
 	# Search Launchpad
 	Type 	RFSwarm
-	Sleep 	0.5
-	Take A Screenshot
+	# Sleep 	0.5
+	# Take A Screenshot
 
 	# Check for Icon
 	# macos_launchpad_rfswarm_reporter.png
