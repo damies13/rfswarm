@@ -472,13 +472,39 @@ Navigate to and check Desktop Icon
 Navigate to and check Desktop Icon For MacOS
 
 	Take A Screenshot
+
+	# open finder
+	${img}=	Set Variable		${platform}_finder.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	0.3
+	Take A Screenshot
+
+	# nav to /Applications
+	Press Combination 	KEY.command 	KEY.shift 	KEY.g
+	Press Combination 	KEY.backspace		#clear text filed
+	Sleep 	0.3
+	Take A Screenshot
+
+	Type 		/Applications
+	Sleep 	0.3
+	Take A Screenshot
+
+	Press Combination 	KEY.enter
+	Sleep	0.5
+	Take A Screenshot
+
+	# Filter/Search /Applications?
+
+
 	# Open Launchpad (F4?)
 	# Press Combination   key.f4
 	${img}=	Set Variable		${platform}_launchpad.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Sleep 	1
+	Sleep 	0.3
 	Take A Screenshot
 
 	# Search Launchpad

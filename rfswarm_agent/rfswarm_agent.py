@@ -105,7 +105,7 @@ class RFSwarmAgent():
 			exit()
 
 		if self.args.create:
-			if self.args.create.upper() == "ICON":
+			if self.args.create.upper() in ["ICON", "ICONS"]:
 				self.create_icons()
 			else:
 				self.debugmsg(0, "create with option ", self.args.create.upper(), "not supported.")
@@ -350,6 +350,8 @@ class RFSwarmAgent():
 		self.debugmsg(6, "namelst:", namelst)
 		projname = "-".join(namelst).lower()
 		self.debugmsg(6, "projname:", projname)
+		signature = "RFS{0}".format(namelst[1].upper())
+		self.debugmsg(6, "signature:", signature)
 
 		ResourcesFolder = os.path.join(apppath, "Contents", "Resources")
 		iconset = os.path.join(ResourcesFolder, projname + ".iconset")
@@ -383,11 +385,16 @@ class RFSwarmAgent():
 		bundleName = name
 		bundleIdentifier = "org.rfswarm." + projname
 
+		# https://stackoverflow.com/questions/1596945/building-osx-app-bundle
+		# Found 2 issues:
+		# 	- <xml and <plist wasn't closed with > and xml was missing encoding
+		# 	- APPL???? --> RFS<SIGNATURE_NAME>
+
 		Infoplist = os.path.join(apppath, "Contents", "Info.plist")
 		with open(Infoplist, "w") as f:
-			f.write("""<?xml version = "1.4.0"
+			f.write("""<?xml version="1.0" encoding="UTF-8"?>
 			<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-			<plist version = "1.4.0"
+			<plist version = "1.0">
 			<dict>
 				<key>CFBundleDevelopmentRegion</key>
 				<string>English</string>
@@ -408,7 +415,7 @@ class RFSwarmAgent():
 				<key>CFBundleShortVersionString</key>
 				<string>%s</string>
 				<key>CFBundleSignature</key>
-				<string>????</string>
+				<string>%s</string>
 				<key>CFBundleVersion</key>
 				<string>%s</string>
 				<key>NSAppleScriptEnabled</key>
@@ -419,13 +426,13 @@ class RFSwarmAgent():
 				<string>NSApplication</string>
 			</dict>
 			</plist>
-			""" % (projname, bundleName + " " + version, projname, bundleIdentifier, bundleName, bundleName + " " + version, version))
+			""" % (projname, bundleName + " " + version, projname, bundleIdentifier, bundleName, version, signature, version))
 			f.close()
 
 		# create apppath + "/Contents/PkgInfo"
 		PkgInfo = os.path.join(apppath, "Contents", "PkgInfo")
 		with open(PkgInfo, "w") as f:
-			f.write("APPL????")
+			f.write("APPL%s" % signature)
 			f.close()
 
 		# apppath + "/Contents/MacOS/main.py"
@@ -440,13 +447,13 @@ class RFSwarmAgent():
 		response = os.popen(cmd).read()
 		self.debugmsg(6, "response:", response)
 
-		# Try re-registering your application with Launch Services:
-		# /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f /Applications/MyTool.app
-		lsregister = "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
-		cmd = "{0} -f '{1}'".format(lsregister, apppath)
-		base.debugmsg(6, "cmd:", cmd)
-		response = os.popen(cmd).read()
-		base.debugmsg(6, "response:", response)
+		# # Try re-registering your application with Launch Services:
+		# # /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f /Applications/MyTool.app
+		# lsregister = "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+		# cmd = "{0} -f '{1}'".format(lsregister, apppath)
+		# self.debugmsg(6, "cmd:", cmd)
+		# response = os.popen(cmd).read()
+		# self.debugmsg(6, "response:", response)
 
 	def findiniloctaion(self):
 
