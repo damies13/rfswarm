@@ -152,7 +152,7 @@ Reporter Command Line TEMPLATE --template
 	...    msg=templatedir path value did not save correctly [settings != scenario]!
 
 Manager Command Line HTML report --html
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14 	HTML
 
 	${testdata}		Set Variable	Issue-#14${/}result_dir
 	${resultdata}	Set Variable	20240622_182505_test_scenario
@@ -165,7 +165,7 @@ Manager Command Line HTML report --html
 	List Should Contain Value	${result_files}		${resultdata}.html
 
 Manager Command Line HTML report --docx
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14 	DOCX
 
 	${testdata}		Set Variable	Issue-#14${/}result_dir
 	${resultdata}	Set Variable	20240622_182505_test_scenario
@@ -178,7 +178,7 @@ Manager Command Line HTML report --docx
 	List Should Contain Value	${result_files}		${resultdata}.docx
 
 Manager Command Line HTML report --xlsx
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14 	XLSX
 
 	${testdata}		Set Variable	Issue-#14${/}result_dir
 	${resultdata}	Set Variable	20240622_182505_test_scenario
