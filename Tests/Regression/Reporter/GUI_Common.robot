@@ -495,12 +495,11 @@ Navigate to and check Desktop Icon For MacOS
 
 	# nav to /Applications
 	Press Combination 	KEY.command 	KEY.shift 	KEY.g
-	${img}=	Set Variable		${platform}_finder_gotofolder.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-
 	Press Combination 	KEY.backspace		#clear text filed
 	# Sleep 	0.3
 	# Take A Screenshot
+	${img}=	Set Variable		${platform}_finder_gotofolder.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 
 	Type 		/Applications
 	# Sleep 	0.3

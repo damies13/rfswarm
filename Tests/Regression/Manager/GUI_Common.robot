@@ -1415,7 +1415,7 @@ Navigate to and check Desktop Icon For MacOS
 
 	# un-maximise finder if maximised
 	${img}=	Set Variable		${platform}_launchpad.png
-	${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=0.5
+	${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=3
 	IF 	not ${passed}
 		Take A Screenshot
 		Press Combination 	KEY.fn 	KEY.f
@@ -1446,9 +1446,18 @@ Navigate to and check Desktop Icon For MacOS
 	# Filter/Search /Applications?
 	Type 	RFSwarm
 	Sleep 	3
-	# ${img}=	Set Variable		${platform}_finder_rfswarm_manager.png
-	# Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${platform}_finder_rfswarm_manager.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 	Take A Screenshot
+
+	${img}=	Set Variable		${platform}_launchpad.png
+	${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=3
+	IF 	not ${passed}
+		Take A Screenshot
+		Press Combination 	KEY.fn 	KEY.f
+		Sleep 	0.3
+		Take A Screenshot
+	END
 
 	# Open Launchpad (F4?)
 	# Press Combination   key.f4
