@@ -1423,6 +1423,11 @@ Navigate to and check Desktop Icon For MacOS
 		Take A Screenshot
 	END
 
+	${img}=	Set Variable		${platform}_finder_recents.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Click Image		${img}
+	Sleep 	0.1
+
 	# nav to /Applications
 	Press Combination 	KEY.command 	KEY.shift 	KEY.g
 	Press Combination 	KEY.backspace		#clear text filed
