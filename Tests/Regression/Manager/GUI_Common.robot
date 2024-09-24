@@ -179,7 +179,7 @@ Close Manager GUI
 
 Close Manager GUI macos
 	[Tags]	macos-latest
-	Sleep	3
+	# Sleep	3
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
 		Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
@@ -189,8 +189,8 @@ Close Manager GUI macos
 		Run Keyword And Ignore Error 	Click Tab 	 Run
 		# Click Image		manager_${platform}_titlebar_rfswarm.png
 		Click Button	closewindow
-		Sleep	3
-		Run Keyword And Ignore Error 	Click Dialog Button		no 		10
+		# Sleep	3
+		Run Keyword And Ignore Error 	Click Dialog Button		no 		1
 	END
 	${result}= 		Wait For Process 	${process_manager} 	timeout=55
 	${running}= 	Is Process Running 	${process_manager}
@@ -1414,7 +1414,7 @@ Navigate to and check Desktop Icon For MacOS
 	# Take A Screenshot
 
 	# un-maximise finder if maximised
-	${img}=	Set Variable		${platform}_finder.png
+	${img}=	Set Variable		${platform}_launchpad.png
 	${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=0.5
 	IF 	not ${passed}
 		Take A Screenshot
