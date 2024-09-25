@@ -1431,14 +1431,19 @@ Navigate to and check Desktop Icon For MacOS
 	# macos_finder_menu_go.png
 	${img}=	Set Variable		${platform}_finder_menu_go.png
 	Click Image		${img}
-	Sleep 	0.3
-	Take A Screenshot
+	# Sleep 	0.3
+	# Take A Screenshot
+
+	# _finder_menu_gotofolder.png
+	${img}=	Set Variable		${platform}_finder_menu_gotofolder.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Click Image		${img}
 
 	# nav to /Applications
-	Press Combination 	KEY.command 	KEY.shift 	KEY.g
+	# Press Combination 	KEY.command 	KEY.shift 	KEY.g
 	${img}=	Set Variable		${platform}_finder_gotoprompt.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
-	Sleep 	0.3
+	# Sleep 	0.3
 
 	Press Combination 	KEY.backspace		#clear text filed
 	# Sleep 	0.3
