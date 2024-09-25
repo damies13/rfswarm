@@ -2119,6 +2119,7 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
 
+	Check If The Agent Is Ready
 	Log To Console 	Running scenario one more time to test if iteration counter get reset.
 	Click Tab	Plan
 	Click Button	runplay
