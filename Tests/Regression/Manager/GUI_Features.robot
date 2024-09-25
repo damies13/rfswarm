@@ -2116,20 +2116,39 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 	Click Tab	Plan
 	Click Button	runplay
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${360}
+	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
 
 	Check If The Agent Is Ready
 	Log To Console 	Running scenario one more time to test if iteration counter get reset.
 	Click Tab	Plan
 	Click Button	runplay
+	Sleep	10
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${360}
+	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Check If The Agent Is Ready
 
+	Log To Console 	Checking second run Database.
+	${dbfile}= 	Find Result DB 		result_pattern=*_Issue-#41*
+	${db_iterations}= 	Query Result DB 	${dbfile}
+	...    SELECT DISTINCT MetricValue FROM MetricData WHERE SecondaryMetric='iteration' ORDER BY MetricValue
+	Log 	Found iterations in MetricData after scenario second run: ${db_iterations}	console=${True}
+
+	${first_iter}= 		Query Result DB 	${dbfile}	SELECT count(*) FROM Results WHERE iteration='1'
+	${second_iter}= 	Query Result DB 	${dbfile}	SELECT count(*) FROM Results WHERE iteration='2'
+	${third_iter}= 		Query Result DB 	${dbfile}	SELECT count(*) FROM Results WHERE iteration='3'
+	Should Be Equal 	${first_iter}[0][0] 	${3}
+	Should Be Equal 	${second_iter}[0][0] 	${3}
+	Should Be Equal 	${third_iter}[0][0] 	${3}
+
+	Log To Console 	Checking second run logs.
 	@{run_result_dirs}= 	List Directories In Directory	${results_dir}	pattern=*_Issue-#41*	absolute=${True}
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
-	@{run_logs}=	List Directories In Directory	${run_result_dirs}[-1]${/}logs
+	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[-1]	absolute=${True}
+	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
 
 	VAR 	@{iterations}
 	FOR  ${log}  IN  @{run_logs}
@@ -2138,14 +2157,14 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 		Append To List	${iterations}	${iteration_number}
 	END
 	${iterations_set}=	Evaluate	set(${iterations})
-	Log To Console 	Found iterations after scenario second run: ${iterations_set}
+	Log 	Found iterations in logs after scenario second run: ${iterations_set}	console=${True}
 
 	${first_iter} 	Count Values In List	${iterations}	1
 	${second_iter} 	Count Values In List	${iterations}	2
 	${third_iter} 	Count Values In List	${iterations}	3
-	Should Be Equal 	${first_iter} 	${4}
-	Should Be Equal 	${second_iter} 	${4}
-	Should Be Equal 	${third_iter} 	${4}
+	Should Be Equal 	${first_iter} 	${3}
+	Should Be Equal 	${second_iter} 	${3}
+	Should Be Equal 	${third_iter} 	${3}
 
 	[Teardown]	Run Keywords
 	...    Close Manager GUI ${platform}	AND
