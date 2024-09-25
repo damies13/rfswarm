@@ -1426,10 +1426,14 @@ Navigate to and check Desktop Icon For MacOS
 	${img}=	Set Variable		${platform}_finder_recents.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	Click Image		${img}
-	Sleep 	0.1
+	Sleep 	0.3
 
 	# nav to /Applications
 	Press Combination 	KEY.command 	KEY.shift 	KEY.g
+	${img}=	Set Variable		${platform}_finder_gotoprompt.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Sleep 	0.3
+
 	Press Combination 	KEY.backspace		#clear text filed
 	# Sleep 	0.3
 	# Take A Screenshot
