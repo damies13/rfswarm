@@ -1481,7 +1481,7 @@ Navigate to and check Desktop Icon For MacOS
 
 	# Open Launchpad (F4?)
 	# Press Combination   key.f4
-	${img}=	Set Variable		${platform}_launchpad.png
+	${img}=	Set Variable		${platform}_dock_launchpad.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
