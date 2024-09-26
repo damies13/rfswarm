@@ -1414,7 +1414,7 @@ Navigate to and check Desktop Icon For MacOS
 	# Take A Screenshot
 
 	# un-maximise finder if maximised
-	${img}=	Set Variable		${platform}_launchpad.png
+	${img}=	Set Variable		${platform}_dock_trash.png
 	${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=3
 	IF 	not ${passed}
 		Take A Screenshot
@@ -1470,7 +1470,7 @@ Navigate to and check Desktop Icon For MacOS
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	Take A Screenshot
 
-	${img}=	Set Variable		${platform}_launchpad.png
+	${img}=	Set Variable		${platform}_dock_trash.png
 	${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=3
 	IF 	not ${passed}
 		Take A Screenshot
