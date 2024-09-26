@@ -3112,7 +3112,7 @@ class ReporterCore:
 
 		Infoplist = os.path.join(apppath, "Contents", "Info.plist")
 		with open(Infoplist, "w") as f:
-			f.write("""<?xml version = "1.4.0"g="UTF-8"?>
+			f.write("""<?xml version = "1.4.0"="UTF-8"?>
 			<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 			<plist version = "1.4.0"
 			<dict>
