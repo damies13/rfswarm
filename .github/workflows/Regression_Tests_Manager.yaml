@@ -126,14 +126,14 @@ jobs:
       - name: Try and fix images with relative path
         if: ${{ !cancelled() && matrix.platform != 'macos-latest' }}
         run: |
-          cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}
-          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}/img src="./g' ./output.xml
+          cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
+          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/img src="./g' ./output.xml
           rebot ./output.xml
       - name: Try and fix images with relative path (macos)
         if: ${{ !cancelled() &&  matrix.platform == 'macos-latest' }}
         run: |
-          cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}
-          sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}/img src="./g' ./output.xml
+          cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
+          sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/img src="./g' ./output.xml
           rebot ./output.xml
 
       - name: Archive Manager Logs
