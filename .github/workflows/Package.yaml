@@ -152,8 +152,8 @@ jobs:
           for file in $files
           do
             # echo "version variable : $file"
-            sed -i -e "s/version = \"[^\"]*\"/version = \"${numver}\"/" "$file"
-            sed -i -e "s/version=\"[^\"]*\"/version = \"${numver}\"/" "$file"
+            sed -i -e "s/version = \"[^\"]*\"^/version = \"${numver}\"/" "$file"
+            sed -i -e "s/version=\"[^\"]*\"^/version = \"${numver}\"/" "$file"
             # echo "version comment : $file"
             sed -i -e "s/#    Version .*/#    Version ${numver}/" "$file"
           done
