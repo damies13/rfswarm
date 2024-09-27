@@ -4,6 +4,6 @@ Example Test Case
 
 *** Keywords ***
 Sleep Keyword
-    [Documentation]  Sleep for 8s
-    Sleep   8
+    [Documentation]  Sleep for 5s
+    Sleep   5
 

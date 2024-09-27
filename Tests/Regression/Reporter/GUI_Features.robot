@@ -67,7 +67,8 @@ Whole report time range
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
-	Open GUI	-d 	${resultfolder}
+	# pass a non-existant ini file to ensure that default values are used
+	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}${testdata}.ini
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
@@ -150,3 +151,17 @@ Verify if reporter handle missing test result file
 	...    Copy File	${basefolder}${/}result_backup${/}${resultdata}.db	${resultfolder}		AND
 	...    Remove File	${basefolder}${/}result_backup${/}${resultdata}.db						AND
 	...    Close GUI
+
+Check Application Icon or Desktop Shortcut in GUI
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
+
+	${result}= 	Run 	${cmd_reporter} -g 6 -c ICON
+	Log 		${result}
+	Sleep    1
+
+	Navigate to and check Desktop Icon
+
+	[Teardown]	Type 	KEY.ESC 	KEY.ESC 	KEY.ESC
+
+
+#
