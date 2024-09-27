@@ -1,4 +1,6 @@
 *** Settings ***
+Test Tags       Features 	GUI
+
 Library 	Collections
 Library 	String
 Resource 	GUI_Common.robot

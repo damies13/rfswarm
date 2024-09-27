@@ -1,4 +1,6 @@
 *** Settings ***
+Test Tags       Basic 	CommandLine
+
 Library 	OperatingSystem
 
 Suite Setup			Clean Up Old Files

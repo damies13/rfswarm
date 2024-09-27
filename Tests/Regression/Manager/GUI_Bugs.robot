@@ -1,4 +1,6 @@
 *** Settings ***
+Test Tags       Bugs 	GUI
+
 Resource 	GUI_Common.robot
 Suite Setup 	Set Platform
 
