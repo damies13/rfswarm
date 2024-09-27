@@ -12,6 +12,6 @@ First Test
     Erste Keyword
     Log To Console    Test execution with success
 
-*** Sleutelwoorden ***
+*** Actiewoorden ***
 Erste Keyword
     Log To Console    This is First Keyword

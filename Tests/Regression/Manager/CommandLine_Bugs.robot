@@ -1,6 +1,12 @@
 *** Settings ***
 Resource 	CommandLine_Common.robot
 
+Suite Setup 		Create Directory 	${results_dir}
+
+*** Variables ***
+@{robot_data}=	example.robot	Example Test Case
+${scenario_name}=	test_scenario
+
 *** Test Cases ***
 Robot files with same name but different folders
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #184
@@ -13,7 +19,7 @@ Robot files with same name but different folders
 	Log to console 	${CURDIR}
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#184${/}Issue-#184.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 	Stop Agent
@@ -75,7 +81,7 @@ Circular Reference Resource Files
 	Log to console 	${CURDIR}
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#184${/}Issue-#184.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n
+	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 	Stop Agent
@@ -119,7 +125,6 @@ Circular Reference Resource Files
 	...    Stop Agent	AND
 	...    Stop Manager
 
-
 Circular Reference Resource Files 2
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #261
 	VAR    ${testdata} 		${CURDIR}${/}testdata${/}Issue-#261${/}circular_test2      scope=TEST
@@ -136,7 +141,7 @@ Circular Reference Resource Files 2
 	Log to console 	${CURDIR}
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#184${/}Issue-#184.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n
+	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 	Stop Agent
@@ -180,7 +185,6 @@ Circular Reference Resource Files 2
 	...    Stop Agent	AND
 	...    Stop Manager
 
-
 Lots Of Resource Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #261
 	VAR 	${testdata} 		${CURDIR}${/}testdata${/}Issue-#261${/}lotsa_files_test      scope=TEST
@@ -197,7 +201,7 @@ Lots Of Resource Files
 	Log to console 	${CURDIR}
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#184${/}Issue-#184.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n
+	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
 	# It can take a while for the agent to download 3500+ files
 	Wait For Manager 	60min
@@ -236,3 +240,110 @@ Lots Of Resource Files
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
 	...    Stop Manager
+
+Verify If Manager Runs With Existing INI File From Current Version NO GUI
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
+	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+
+	@{mngr_options}		Create List		-n
+
+	${passed} = 	Run Keyword And Return Status 	File Should Exist 	${global_path}${/}RFSwarmManager.ini
+	IF 	${passed}
+		Show Log 	${global_path}${/}RFSwarmManager.ini
+		Remove File 	${global_path}${/}RFSwarmManager.ini
+		File Should Not Exist 	${global_path}${/}RFSwarmManager.ini
+	END
+
+	Run Manager CLI	${mngr_options}
+	${running}= 	Is Process Running		${process_manager}
+	IF 	not ${running}
+		Fail	msg=Manager is not running!
+	END
+	Wait Until Created  	${global_path}${/}RFSwarmManager.ini
+	Sleep    0.5
+	${result} = 	Terminate Process		${process_manager}
+	${running}= 	Is Process Running		${process_manager}
+	IF 	${running}
+		Fail	msg=Manager did not close!
+	END
+	Log 	${result.stdout}
+	Log 	${result.stderr}
+	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+
+ 	File Should Exist	${global_path}${/}RFSwarmManager.ini
+	Show Log 	${global_path}${/}RFSwarmManager.ini
+	File Should Not Be Empty	${global_path}${/}RFSwarmManager.ini
+	Log To Console	Running Manager with existing ini file.
+	Run Manager CLI	${mngr_options}
+	${running}= 	Is Process Running		${process_manager}
+	IF 	not ${running}
+		Fail	msg=Manager is not running!
+	END
+	Sleep    0.5
+	${result} = 	Terminate Process		${process_manager}
+	${running}= 	Is Process Running		${process_manager}
+	IF 	${running}
+		Fail	msg=Manager did not close!
+	END
+
+	# [Teardown]	Run Keywords
+	# ...    Run Keyword		Close Manager GUI ${platform}
+
+Verify If Manager Runs With No Existing INI File From Current Version NO GUI
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
+	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+
+	@{mngr_options}		Create List		-n
+	Remove File		${global_path}${/}RFSwarmManager.ini
+	File Should Not Exist	${global_path}${/}RFSwarmManager.ini
+	Log To Console	Running Manager with no existing ini file.
+
+	Run Manager CLI	${mngr_options}
+	${running}= 	Is Process Running		${process_manager}
+	IF 	not ${running}
+		Fail	msg=Manager is not running!
+	END
+	${result} = 	Terminate Process		${process_manager}
+	${running}= 	Is Process Running		${process_manager}
+	IF 	${running}
+		Fail	msg=Manager did not close!
+	END
+	Log 	${result.stdout}
+	Log 	${result.stderr}
+	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+
+	# [Teardown]	Run Keywords
+	# ...    Run Keyword		Close Manager GUI ${platform}
+
+Verify If Manager Runs With Existing INI File From Previous Version NO GUI
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
+	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+
+	@{mngr_options}		Create List		-n
+	Remove File		${global_path}${/}RFSwarmManager.ini
+	File Should Not Exist	${global_path}${/}RFSwarmManager.ini
+	${v1_0_0_inifile}=		Normalize Path		${CURDIR}${/}testdata${/}Issue-#49${/}v1_0_0${/}RFSwarmManager.ini
+	Copy File	${v1_0_0_inifile}		${global_path}
+	File Should Exist	${global_path}${/}RFSwarmManager.ini
+	File Should Not Be Empty	${global_path}${/}RFSwarmManager.ini
+	Log To Console	Running Manager with existing ini file.
+
+	Run Manager CLI	${mngr_options}
+	${running}= 	Is Process Running		${process_manager}
+	IF 	not ${running}
+		Fail	msg=Manager is not running!
+	END
+	${result} = 	Terminate Process		${process_manager}
+	${running}= 	Is Process Running		${process_manager}
+	IF 	${running}
+		Fail	msg=Manager did not close!
+	END
+	Log 	${result.stdout}
+	Log 	${result.stderr}
+	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+
+	# [Teardown]	Run Keywords
+	# ...    Run Keyword		Close Manager GUI ${platform}

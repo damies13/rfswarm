@@ -39,7 +39,6 @@ Set Platform By Python
 		Set Suite Variable    ${platform}    ubuntu
 	END
 
-
 Set Platform By Tag
 	# [Arguments]		${ostag}
 	Log 	${OPTIONS}
@@ -61,7 +60,7 @@ Show Log
 	[Arguments]		${filename}
 	Log to console 	${\n}-----${filename}-----
 	${filedata}= 	Get File 	${filename}
-	Log to console 	${filedata}
+	Log 	${filedata} 	console=True
 	Log to console 	-----${filename}-----${\n}
 
 Run Agent
@@ -107,7 +106,7 @@ Stop Manager
 		END
 		Log		${result.stdout}
 		Log		${result.stderr}
-		
+
 		# Should Be Equal As Integers 	${result.rc} 	0
 		Log to console 	Process returned: ${result.rc}
 	END
@@ -193,11 +192,11 @@ Get Modules From Program .py File That Are Not BuildIn
 	...    turtledemo	types	typing	unicodedata	unittest	urllib	usercustomize	uu	uuid	venv	warnings	wave
 	...    weakref	webbrowser	winreg	winsound	wsgiref	xdrlib	xml	xmlrpc	zipapp	zipfile	zipimport	zlib	zoneinfo
 	&{replace_names}	Create Dictionary	PIL=pillow
-	
+
 	${manager_content}	Get File	${file_path}
 	${all_imports_lines}	Split String	${manager_content}	separator=\n
 	Log	${all_imports_lines}
-	
+
 	${custom_imports}	Create List
 	${length}	Get Length	${all_imports_lines}
 	FOR  ${i}  IN RANGE  0  ${length}
@@ -213,7 +212,7 @@ Get Modules From Program .py File That Are Not BuildIn
 				BREAK
 			END
 		END
-		
+
 		FOR  ${j}  IN RANGE  0  ${length2}
 			Log		${import_line_elements}[${j}]
 			IF  '${import_line_elements}[${j}]' == '#'
@@ -236,7 +235,7 @@ Get Modules From Program .py File That Are Not BuildIn
 			${custom_imports}[${i}]  Set Variable  ${replace_names}[${custom_imports}[${i}]]
 		END
 	END
-	
+
 	RETURN	${custom_imports}
 
 Get Install Requires From Setup File
@@ -258,7 +257,7 @@ Get Install Requires From Setup File
 					Append To List	${sliced_times}		@{sliced_times1}
 					@{sliced_times2}	Split String	${items}	separator=-
 					Append To List	${sliced_times}		@{sliced_times2}
-					
+
 					FOR  ${i}  IN   @{sliced_times}
 						Append To List	${refactored_requires}	${i}
 
@@ -287,4 +286,63 @@ Get Agent Default Save Path
 	${i}=	Get Index From List	${pip_data_list}	Location:
 	${location}=	Set Variable	${pip_data_list}[${i + 1}]
 	RETURN	${location}${/}rfswarm_agent${/}
+
+Check Icon Install
+	VAR 	${projname}= 		rfswarm-agent 		scope=TEST
+	VAR 	${dispname}= 		RFSwarm Agent 		scope=TEST
+	Run Keyword 	Check Icon Install For ${platform}
+
+Check Icon Install For Macos
+	${Status}= 	Run Keyword And Return Status 	Directory Should Exist 	%{HOME}${/}Applications${/}${projname}.app
+	IF 	${Status}
+		${appfolder}= 		Set Variable    %{HOME}${/}Applications${/}${dispname}.app
+	ELSE
+		${appfolder}= 		Set Variable    ${/}Applications${/}${dispname}.app
+	END
+	Directory Should Exist 	${appfolder} 		.app Folder not found
+
+	Directory Should Exist 	${appfolder}${/}Contents 		Contents Folder not found
+	Directory Should Exist 	${appfolder}${/}Contents${/}MacOS 		MacOS Folder not found
+
+	Directory Should Exist 	${appfolder}${/}Contents${/}Resources 		Resources Folder not found
+
+	Directory Should Exist 	${appfolder}${/}Contents${/}Resources${/}${projname}.iconset 		iconset Folder not found
+
+	File Should Exist 	${appfolder}${/}Contents${/}Resources${/}${projname}.iconset${/}icon_*.png 		Icons Images not found
+
+	File Should Exist 	${appfolder}${/}Contents${/}Resources${/}${projname}.icns 		icns File not found
+
+	File Should Exist 	${appfolder}${/}Contents${/}Info.plist 		plist File not found
+	Show Log 	 					${appfolder}${/}Contents${/}Info.plist
+
+	File Should Exist 	${appfolder}${/}Contents${/}PkgInfo 		PkgInfo File not found
+	Show Log 	 					${appfolder}${/}Contents${/}PkgInfo
+
+	File Should Exist 	${appfolder}${/}Contents${/}MacOS${/}${projname} 		Executable Symbolic Link File not found
+
+Check Icon Install For Windows
+	Log 	%{USERPROFILE}
+	Log 	%{APPDATA}
+	Directory Should Exist 	%{APPDATA} 		APPDATA Directory not found
+	Directory Should Exist 	%{APPDATA}${/}Microsoft 		Microsoft Directory not found
+	Directory Should Exist 	%{APPDATA}${/}Microsoft${/}Windows 		Windows Directory not found
+	Directory Should Exist 	%{APPDATA}${/}Microsoft${/}Windows${/}Start Menu 		Start Menu Directory not found
+	File Should Exist 	%{APPDATA}${/}Microsoft${/}Windows${/}Start Menu${/}${dispname}.lnk 		Shortcut File not found
+
+
+Check Icon Install For Ubuntu
+	Log 	%{HOME}
+	# /home/dave/.local/share/applications/rfswarm-manager.desktop
+	${Status}= 	Run Keyword And Return Status 	File Should Exist 	%{HOME}${/}.local${/}share${/}applications${/}${projname}.desktop
+	IF 	${Status}
+		${pathprefix}= 		Set Variable    %{HOME}${/}.local${/}share
+	ELSE
+		${pathprefix}= 		Set Variable    ${/}usr${/}share
+	END
+	File Should Exist 	${pathprefix}${/}applications${/}${projname}.desktop 		Desktop File not found
+	File Should Exist 	${pathprefix}${/}icons${/}hicolor${/}128x128${/}apps${/}${projname}.png 		Icon File not found
+
+
+
+	#
 #

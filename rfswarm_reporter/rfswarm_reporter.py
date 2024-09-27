@@ -10,12 +10,14 @@ import base64  # used for embedding images  # used for xhtml export
 import configparser
 import difflib
 import glob
+import importlib.metadata
 import inspect
 import math
 import os
 import platform
 import random
 import re
+import shutil
 import signal
 import sqlite3
 import sys
@@ -281,6 +283,26 @@ class ReporterBase():
 			valout = valout.replace('x35', '#')
 			base.debugmsg(9, "valout:", valout)
 		return valout
+
+	def ensuredir(self, dir):
+		if len(dir) < 1:
+			return True
+		if os.path.exists(dir):
+			return True
+		try:
+			patharr = os.path.split(dir)
+			self.debugmsg(6, "patharr: ", patharr)
+			self.ensuredir(patharr[0])
+			os.mkdir(dir, mode=0o777)
+			self.debugmsg(5, "Directory Created: ", dir)
+			return True
+		except FileExistsError:
+			self.debugmsg(5, "Directory Exists: ", dir)
+			return False
+		except Exception as e:
+			self.debugmsg(1, "Directory Create failed: ", dir)
+			self.debugmsg(1, "with error: ", e)
+			return False
 
 	#
 	# Template Functions
@@ -2701,6 +2723,7 @@ class ReporterCore:
 		parser.add_argument('--xlsx', help='Generate a MS Excel report', action='store_true')
 		# parser.add_argument('--odt', help='Generate an OpenOffice/LibreOffice Writer report', action='store_true')
 		# parser.add_argument('--ods', help='Generate an OpenOffice/LibreOffice Calc report', action='store_true')
+		parser.add_argument('-c', '--create', help='ICON : Create application icon / shortcut')
 		base.args = parser.parse_args()
 
 		base.debugmsg(6, "base.args: ", base.args)
@@ -2709,6 +2732,13 @@ class ReporterCore:
 			base.debuglvl = int(base.args.debug)
 
 		if base.args.version:
+			exit()
+
+		if base.args.create:
+			if base.args.create.upper() in ["ICON", "ICONS"]:
+				self.create_icons()
+			else:
+				base.debugmsg(0, "create with option ", base.args.create.upper(), "not supported.")
 			exit()
 
 		if base.args.nogui:
@@ -2886,6 +2916,264 @@ class ReporterCore:
 			except Exception as e:
 				base.debugmsg(3, "Failed to exit with error:", e)
 				os._exit(1)
+
+	def create_icons(self):
+		base.debugmsg(0, "Creating application icons for RFSwarm Reporter")
+		appname = "RFSwarm Reporter"
+		namelst = appname.split()
+		base.debugmsg(6, "namelst:", namelst)
+		projname = "-".join(namelst).lower()
+		base.debugmsg(6, "projname:", projname)
+		pipdata = importlib.metadata.distribution(projname)
+		# print("files:", pipdata.files)
+		# print("file0:", pipdata.files[0])
+		reporter_executable = os.path.abspath(str(pipdata.locate_file(pipdata.files[0])))
+		base.debugmsg(5, "reporter_executable:", reporter_executable)
+
+		script_dir = os.path.dirname(os.path.abspath(__file__))
+		base.debugmsg(5, "script_dir:", script_dir)
+		icon_dir = os.path.join(pipdata.locate_file('rfswarm_reporter'), "icons")
+		base.debugmsg(5, "icon_dir:", icon_dir)
+
+		if platform.system() == 'Linux':
+			fileprefix = "~/.local/share"
+			if os.access("/usr/share", os.W_OK):
+				try:
+					base.ensuredir("/usr/share/applications")
+					directoryfilename = os.path.join("/usr/share/applications", "rfswarm.directory")
+					directorydata = ["test"]
+					with open(directoryfilename, 'w') as df:
+						df.writelines(directorydata)
+					os.remove(directoryfilename)
+					fileprefix = "/usr/share"
+				except Exception:
+					pass
+
+			fileprefix = os.path.expanduser(fileprefix)
+
+			# base.debugmsg(5, "Create .directory file")
+			# directorydata = []
+			# directorydata.append('[Desktop Entry]\n')
+			# directorydata.append('Type=Directory\n')
+			# directorydata.append('Name=RFSwarm\n')
+			# directorydata.append('Icon=rfswarm-logo\n')
+			#
+			# directoryfilename = os.path.join(fileprefix, "desktop-directories", "rfswarm.directory")
+			# directorydir = os.path.dirname(directoryfilename)
+			# base.ensuredir(directorydir)
+			#
+			# base.debugmsg(5, "directoryfilename:", directoryfilename)
+			# with open(directoryfilename, 'w') as df:
+			# 	df.writelines(directorydata)
+			#
+			# directoryfilename = os.path.join(fileprefix, "applications", "rfswarm.directory")
+			# directorydir = os.path.dirname(directoryfilename)
+			# base.ensuredir(directorydir)
+			# base.debugmsg(5, "directoryfilename:", directoryfilename)
+			# with open(directoryfilename, 'w') as df:
+			# 	df.writelines(directorydata)
+
+			base.debugmsg(5, "Create .desktop file")
+			desktopdata = []
+			desktopdata.append('[Desktop Entry]\n')
+			desktopdata.append('Name=' + appname + '\n')
+			desktopdata.append('Exec=' + reporter_executable + '\n')
+			desktopdata.append('Terminal=false\n')
+			desktopdata.append('Type=Application\n')
+			desktopdata.append('Icon=' + projname + '\n')
+			desktopdata.append('Categories=RFSwarm;Development;\n')
+			desktopdata.append('Keywords=rfswarm;reporter;\n')
+			# desktopdata.append('\n')
+
+			dektopfilename = os.path.join(fileprefix, "applications", projname + ".desktop")
+			dektopdir = os.path.dirname(dektopfilename)
+			base.ensuredir(dektopdir)
+
+			base.debugmsg(5, "dektopfilename:", dektopfilename)
+			with open(dektopfilename, 'w') as df:
+				df.writelines(desktopdata)
+
+			base.debugmsg(5, "Copy icons")
+			# /usr/share/icons/hicolor/128x128/apps/
+			# 	1024x1024  128x128  16x16  192x192  22x22  24x24  256x256  32x32  36x36  42x42  48x48  512x512  64x64  72x72  8x8  96x96
+			# or
+			#  ~/.local/share/icons/hicolor/256x256/apps/
+			src_iconx128 = os.path.join(icon_dir, projname + "-128.png")
+			base.debugmsg(5, "src_iconx128:", src_iconx128)
+			dst_iconx128 = os.path.join(fileprefix, "icons", "hicolor", "128x128", "apps", projname + ".png")
+			dst_icondir = os.path.dirname(dst_iconx128)
+			base.ensuredir(dst_icondir)
+			base.debugmsg(5, "dst_iconx128:", dst_iconx128)
+			shutil.copy(src_iconx128, dst_iconx128)
+
+			src_iconx128 = os.path.join(icon_dir, "rfswarm-logo-128.png")
+			base.debugmsg(5, "src_iconx128:", src_iconx128)
+			dst_iconx128 = os.path.join(fileprefix, "icons", "hicolor", "128x128", "apps", "rfswarm-logo.png")
+			base.debugmsg(5, "dst_iconx128:", dst_iconx128)
+			shutil.copy(src_iconx128, dst_iconx128)
+
+		if platform.system() == 'Darwin':
+			base.debugmsg(5, "Create folder structure in /Applications")
+
+			src_iconx1024 = os.path.join(icon_dir, projname + "-1024.png")
+
+			self.create_macos_app_bundle(appname, pipdata.version, reporter_executable, src_iconx1024)
+
+		if platform.system() == 'Windows':
+			base.debugmsg(5, "Create Startmenu shorcuts")
+			roam_appdata = os.environ["APPDATA"]
+			scutpath = os.path.join(roam_appdata, "Microsoft", "Windows", "Start Menu", appname + ".lnk")
+			src_iconx128 = os.path.join(icon_dir, projname + "-128.ico")
+
+			self.create_windows_shortcut(scutpath, reporter_executable, src_iconx128, "Performance testing with robot test cases", True)
+
+	def create_windows_shortcut(self, scutpath, targetpath, iconpath, desc, minimised=False):
+		pslst = []
+
+		directorydir = os.path.dirname(scutpath)
+		base.ensuredir(directorydir)
+
+		pslst.append("$wshshell = New-Object -COMObject wscript.shell")
+		pslst.append('$scut = $wshshell.CreateShortcut("""' + scutpath + '""")')
+		pslst.append('$scut.TargetPath = """' + targetpath + '"""')
+		pslst.append('$scut.IconLocation = """' + iconpath + '"""')
+		if minimised:
+			pslst.append("$scut.WindowStyle = 7")
+		pslst.append("$scut.Description = '" + desc + "'")
+		pslst.append("$scut.Save()")
+
+		# psscript = '\n'.join(pslst)
+		psscript = '; '.join(pslst)
+		base.debugmsg(6, "psscript:", psscript)
+
+		response = os.popen('powershell.exe -command ' + psscript).read()
+
+		base.debugmsg(6, "response:", response)
+
+	def create_macos_app_bundle(self, name, version, exesrc, icosrc):
+
+		appspath = "~/Applications"
+		if os.access("/Applications", os.W_OK):
+			appspath = "/Applications"
+
+		appspath = os.path.expanduser(appspath)
+
+		# https://stackoverflow.com/questions/7404792/how-to-create-mac-application-bundle-for-python-script-via-python
+
+		apppath = os.path.join(appspath, name + ".app")
+		MacOSFolder = os.path.join(apppath, "Contents", "MacOS")
+		base.ensuredir(MacOSFolder)
+
+		# need to create the icon file:
+		# https://stackoverflow.com/questions/646671/how-do-i-set-the-icon-for-my-applications-mac-os-x-app-bundle
+		namelst = name.split()
+		base.debugmsg(6, "namelst:", namelst)
+		projname = "-".join(namelst).lower()
+		base.debugmsg(6, "projname:", projname)
+		signature = "RFS{0}".format(namelst[1].upper())
+		base.debugmsg(6, "signature:", signature)
+
+		ResourcesFolder = os.path.join(apppath, "Contents", "Resources")
+		iconset = os.path.join(ResourcesFolder, projname + ".iconset")
+		icnsfile = os.path.join(ResourcesFolder, projname + ".icns")
+		base.ensuredir(iconset)
+
+		# Normal screen icons
+		base.debugmsg(6, "Normal screen icons")
+		for size in [16, 32, 64, 128, 256, 512]:
+			cmd = "sips -z {0} {0} {1} --out '{2}/icon_{0}x{0}.png'".format(size, icosrc, iconset)
+			base.debugmsg(6, "cmd:", cmd)
+			response = os.popen(cmd).read()
+			base.debugmsg(6, "response:", response)
+
+		# Retina display icons
+		base.debugmsg(6, "Retina display icons")
+		for size in [32, 64, 128, 256, 512, 1024]:
+			cmd = "sips -z {0} {0} {1} --out '{2}/icon_{3}x{3}x2.png'".format(size, icosrc, iconset, int(size / 2))
+			base.debugmsg(6, "cmd:", cmd)
+			response = os.popen(cmd).read()
+			base.debugmsg(6, "response:", response)
+
+		# Make a multi-resolution Icon
+		base.debugmsg(6, "Make a multi-resolution Icon")
+		cmd = "iconutil -c icns -o '{0}' '{1}'".format(icnsfile, iconset)
+		base.debugmsg(6, "cmd:", cmd)
+		response = os.popen(cmd).read()
+		base.debugmsg(6, "response:", response)
+
+		#  create apppath + "/Contents/Info.plist"
+		bundleName = name
+		bundleIdentifier = "org.rfswarm." + projname
+
+		# https://stackoverflow.com/questions/1596945/building-osx-app-bundle
+		# Found 2 issues:
+		# 	- <xml and <plist wasn't closed with > and xml was missing encoding
+		# 	- APPL???? --> RFS<SIGNATURE_NAME>
+
+		Infoplist = os.path.join(apppath, "Contents", "Info.plist")
+		with open(Infoplist, "w") as f:
+			f.write("""<?xml version="1.0" encoding="UTF-8"?>
+			<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+			<plist version="1.0">
+			<dict>
+				<key>CFBundleDevelopmentRegion</key>
+				<string>English</string>
+				<key>CFBundleExecutable</key>
+				<string>%s</string>
+				<key>CFBundleGetInfoString</key>
+				<string>%s</string>
+				<key>CFBundleIconFile</key>
+				<string>%s.icns</string>
+				<key>CFBundleIdentifier</key>
+				<string>%s</string>
+				<key>CFBundleInfoDictionaryVersion</key>
+				<string>6.0</string>
+				<key>CFBundleName</key>
+				<string>%s</string>
+				<key>CFBundlePackageType</key>
+				<string>APPL</string>
+				<key>CFBundleShortVersionString</key>
+				<string>%s</string>
+				<key>CFBundleSignature</key>
+				<string>%s</string>
+				<key>CFBundleVersion</key>
+				<string>%s</string>
+				<key>NSAppleScriptEnabled</key>
+				<string>YES</string>
+				<key>NSMainNibFile</key>
+				<string>MainMenu</string>
+				<key>NSPrincipalClass</key>
+				<string>NSApplication</string>
+			</dict>
+			</plist>
+			""" % (projname, bundleName + " " + version, projname, bundleIdentifier, bundleName, version, signature, version))
+			f.close()
+
+		# create apppath + "/Contents/PkgInfo"
+		PkgInfo = os.path.join(apppath, "Contents", "PkgInfo")
+		with open(PkgInfo, "w") as f:
+			f.write("APPL%s" % signature)
+			f.close()
+
+		# apppath + "/Contents/MacOS/main.py"
+		execbundle = os.path.join(apppath, "Contents", "MacOS", projname)
+		if os.path.exists(execbundle):
+			os.remove(execbundle)
+		os.symlink(exesrc, execbundle)
+
+		# touch '/Applications/RFSwarm Reporter.app' to update .app icon
+		cmd = "touch '{0}'".format(apppath)
+		base.debugmsg(6, "cmd:", cmd)
+		response = os.popen(cmd).read()
+		base.debugmsg(6, "response:", response)
+
+		# # Try re-registering your application with Launch Services:
+		# # /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f /Applications/MyTool.app
+		# lsregister = "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+		# cmd = "{0} -f '{1}'".format(lsregister, apppath)
+		# base.debugmsg(6, "cmd:", cmd)
+		# response = os.popen(cmd).read()
+		# base.debugmsg(6, "response:", response)
 
 	def selectResults(self, resultsfile):
 		base.debugmsg(5, "resultsfile:", resultsfile)
@@ -5917,13 +6205,15 @@ class ReporterGUI(tk.Frame):
 	contentdata: Any = {}
 	t_preview: Any = {}
 
-	titleprefix = "rfswarm Reporter"
+	titleprefix = "RFSwarm Reporter"
+
+	icon = None
 
 	c_preview = False
 
 	def __init__(self, master=None):
 
-		self.root = tk.Tk()
+		self.root = tk.Tk(className="RFSwarm Reporter")
 		self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
 		tk.Frame.__init__(self, self.root)
 		self.grid(sticky="news", ipadx=0, pady=0)
@@ -5941,6 +6231,7 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "self.root[background]", self.root["background"])
 		self.rootBackground = self.root["background"]
 
+		self.set_app_icon()
 		self.load_icons()
 
 		base.debugmsg(5, "BuildUI")
@@ -6064,6 +6355,14 @@ class ReporterGUI(tk.Frame):
 		self.b64["picture.gif"] = b"GIF87a\x10\x00\x10\x00\xe6\x00\x00\x00\x00\x00\x9b{1v\x82]\x80\x83T\xb0\x86<\x87\x8b>\x86\x8eA^\x91\x8bc\x93\x91b\x978i\x97\xa4e\x9a<i\x9a\xa6s\x9e\xc4w\x9e\xd7h\x9f\x9b\xd3\xa0R|\xa2\xd9}\xa3\xc6\x81\xa5\xdbt\xa7H\x82\xa7\xc8\x8e\xa7\xce\x84\xa8\xdd\x8e\xa8\xcew\xa9Jx\xab\xa0z\xabL\x94\xab\xcf{\xacj\x8a\xac\xdf\x94\xac\xd0\x9a\xae\xce\x8e\xaf\xe1\x9b\xaf\xd0\xd2\xb0m|\xb1x\x9b\xb1\xce\x87\xb3o\xa0\xb3\xd0\x7f\xb4\xa2\x87\xb4\xb7\x8d\xb5\xd1\x96\xb5\xe4\xa3\xb5\xce\x80\xb6\xaa\x93\xb6\xd2\x98\xb6\xe4\x80\xb7\xa4\x87\xb8\xb9\x9c\xb9\xe5z\xbbM\x87\xbc`\x8b\xbc\x83\xa0\xbc\xe7\x7f\xbeS\x87\xbek\x8a\xbed\xa2\xbe\xe8\x81\xbfQ\x87\xc2U\x8b\xc3W\x8e\xc3q\x94\xc3\x8a\x8f\xc6b\x91\xc7]\xca\xc9\x9d\x99\xcai\x9a\xcad\xa2\xcd\x93\xa1\xce}\xa7\xd1\x82\xaa\xd2\x83\xa9\xd3t\xc6\xd4\xb0\xc4\xda\xbb\xc3\xdd\xc0\xeb\xec\xec\xe6\xee\xf6\xeb\xef\xf2\xed\xf2\xf7\xef\xf3\xf8\xf1\xf4\xf8\xf3\xf5\xf7\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00U\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xb5\x80U\x82\x83\x84\x85\x82,'\x1c\x18\x8b\x8b\x16\x8e\x16\x1c%\x82'MS\x96\x97\x97PO \x82\x1cS+*-EHG?\x0f\r\x0eP\x1f\x82\x18S/1EIDDC5\x0c\x11\xaa\xacS20HDA=<>\x07\xb8\x1c\xba2(FA<;78\x07\x13N\xc6U\x18P2)?@;37$\n\x17\xd2\xacP6.\x1a&94\x1d\x08\x12\x1e\xe1\xd4P:\xe4\x02\x06\x05\x03\x15!\xed\xd3\xd5\x1b\x19\x14\x01\x10\x10\x08,X\x90\xc0\x9d\x05(L\x12*\x112bIB&\x06\x11>\x9c\x98\xd0\x1d\x87'S\xa4H\xb1\x04\xa5#\x94(OD\x08*!\x82\x83\xc9\x93(Ap2\xc4rP \x00;"
 
 		self.b64["color_swatch.gif"] = b'GIF87a\x10\x00\x10\x00\xb3\x00\x00\x00\x00\x00\xfeoj\xffw\xb2Vz\xb1\xda\x9c\xde\xff\xabs_\xb1\xebN\xcdl\xf0\xd6f\xd1\xeb\xb3\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00\x0b\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x04@p\xc9I\xab\xbd6\xe8U\xfaB`\xa5\x05\x9c\x07"\xe2\xd6\x15_\x88\xbdS"/G\xbd\x18x%\'\xb4\x8d\x1b\xbaY\xedp\xcb\xc1`\x83\xe4\x82\xc0\\\x08\x9e\x95\xe4`\xd9|\n\xa2J&\xc1\t=z\xbf\xe0\x08\x00;'
+
+	def set_app_icon(self):
+		script_dir = os.path.dirname(os.path.abspath(__file__))
+		icon_dir = os.path.join(script_dir, "icons")
+		base.debugmsg(5, "icon_dir:", icon_dir)
+		icon_file = os.path.join(icon_dir, "rfswarm-reporter-128.png")
+		self.icon = tk.PhotoImage(file=icon_file)
+		self.root.wm_iconphoto(False, self.icon)
 
 	def updateTitle(self):
 		titletext = "{} v{} - {}".format(self.titleprefix, base.version, "Please Select")

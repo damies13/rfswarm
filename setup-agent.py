@@ -13,6 +13,14 @@ setuptools.setup(
 	long_description_content_type="text/markdown",
 	url="https://github.com/damies13/rfswarm",
 	packages=setuptools.find_packages(exclude=["*fswarm_report*", "*rfswarm_manager*", "build/*"]),
+	data_files=[
+		('rfswarm_agent/icons', ['rfswarm_agent/icons/rfswarm-agent-128.png']),
+		('rfswarm_agent/icons', ['rfswarm_agent/icons/rfswarm-agent-128.ico']),
+		('rfswarm_agent/icons', ['rfswarm_agent/icons/rfswarm-agent-1024.png']),
+		('rfswarm_agent/icons', ['rfswarm_agent/icons/rfswarm-logo-128.png']),
+		('rfswarm_agent/icons', ['rfswarm_agent/icons/rfswarm-logo-128.ico']),
+	],
+	include_package_data=True,
 	install_requires=['configparser', 'requests', 'robotframework', 'psutil'],
 	classifiers=[
 		"Development Status :: 5 - Production/Stable",

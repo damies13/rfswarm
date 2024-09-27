@@ -20,7 +20,6 @@ Check If The Not Buildin Modules Are Included In The Reporter Setup File
 		...    msg="Some modules are not in Reporter setup file"
 	END
 
-*** Test Cases ***
 Command Line Generate HTML
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	HTML
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
