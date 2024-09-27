@@ -18,6 +18,14 @@ setuptools.setup(
 	# https://matplotlib.org/stable/users/installing.html
 	# zoneinfo requires python 3.9
 	# tzlocal is needed to get the local timezone in a format that zoneinfo likes
+	data_files=[
+		('rfswarm_reporter/icons', ['rfswarm_reporter/icons/rfswarm-reporter-128.png']),
+		('rfswarm_reporter/icons', ['rfswarm_reporter/icons/rfswarm-reporter-128.ico']),
+		('rfswarm_reporter/icons', ['rfswarm_reporter/icons/rfswarm-reporter-1024.png']),
+		('rfswarm_reporter/icons', ['rfswarm_reporter/icons/rfswarm-logo-128.png']),
+		('rfswarm_reporter/icons', ['rfswarm_reporter/icons/rfswarm-logo-128.ico']),
+	],
+	include_package_data=True,
 	install_requires=['configparser', 'pillow>=9.1.0', 'pip>=21,>=22', 'matplotlib', 'python-docx', 'openpyxl', 'tzlocal>=4.1', 'lxml'],
 	classifiers=[
 		"Development Status :: 5 - Production/Stable",
@@ -35,4 +43,6 @@ setuptools.setup(
 		'Source': 'https://github.com/damies13/rfswarm',
 	},
 	entry_points={'console_scripts': ['rfswarm-reporter = rfswarm_reporter.rfswarm_reporter:RFSwarm']},
+	# this breaks console logs
+	# entry_points={'gui_scripts': ['rfswarm-reporter = rfswarm_reporter.rfswarm_reporter:RFSwarm']},
 )

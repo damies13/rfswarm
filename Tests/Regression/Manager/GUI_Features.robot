@@ -2,7 +2,7 @@
 Library 	Collections
 Library 	String
 Resource 	GUI_Common.robot
-Suite Setup 	Set Platform
+Suite Setup 	GUI_Common.Set Platform
 
 *** Variables ***
 @{robot_data}=	example.robot	Example Test Case
@@ -90,7 +90,7 @@ Manager Command Line STARTTIME -t
 	Log To Console	Current time: ${current_date}
 	${new_date}=	Subtract Time From Date 	${current_date} 	30 		date_format=%H:%M:%S 	result_format=%H:%M:%S
 	VAR		@{mngr_options}		-t 	${new_date}
-	
+
 	Open Manager GUI	${mngr_options}
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
@@ -107,7 +107,7 @@ Manager Command Line STARTTIME --starttime
 	Log To Console	Current time: ${current_date}
 	${new_date}=	Subtract Time From Date 	${current_date} 	30 		date_format=%H:%M:%S 	result_format=%H:%M:%S
 	VAR		@{mngr_options}		--starttime 	${new_date}
-	
+
 	Open Manager GUI	${mngr_options}
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
@@ -128,7 +128,7 @@ Manager Command Line SCENARIO -s
 	Check If The Agent Is Ready
 	Click Tab	Plan
 	Log To Console	Run the example scenario to check that it has been loaded.
-	
+
 	TRY
 		Click Button	runplay
 		Wait For	manager_${platform}_button_stoprun.png	timeout=30
@@ -272,6 +272,7 @@ Verify the Field Validation Is Working In the Manager Plan Screen
 		Sleep	2
 		${status}=	Run Keyword And Return Status
 		...    Wait For	${platform}_warning_label_no_${name}.png 	timeout=${20}
+		Take A Screenshot
 		Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed warning label that says: ${expected_messages}[${name}].
 		Press key.enter 1 Times
 		Delete Scenario File	${scenario_name}
@@ -1156,6 +1157,88 @@ Check If Inject Sleep Option Was Executed in the Test
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove File		${global_path}${/}example.robot
 
+Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has Trailing
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #98
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Open Agent
+
+	${agent_def_path}=	Get Agent Default Save Path
+	${agent_ini_file_content}=	Get File	${agent_def_path}${/}RFSwarmAgent.ini
+	Should Contain	${agent_ini_file_content}	swarmmanager = http://localhost:8138/
+
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#98${/}Issue-#98.rfs
+	VAR 	${agent_script_dir} 	${agent_dir}${/}scripts
+	VAR 	@{mngr_options} 		-d 	${results_dir} 	-s 	${scenariofile}
+
+	Open Manager GUI		${mngr_options}
+	Wait Agent Ready
+	Sleep	10s
+	Should Exist	${agent_script_dir}${/}Issue-#98.robot
+	Should Not Be Empty 	${agent_script_dir}${/}Issue-#98.robot
+	Click Tab	Plan
+	Click Button	runplay
+
+	Log To Console	Started run, now wait 40s. Check if Agent will send results to the Manager.
+	Sleep	40	#rampup=10
+	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_Issue-#98*	absolute=${True}
+	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
+	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
+	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
+	${logs_num}=	Get Length	${run_logs}
+	Log To Console	Uploaded logs number after 40s: ${logs_num}
+	Should Be True	${logs_num} >= 1
+	...    msg=Agent is not uploading logs immediately! Should be at least 1 after ~ 40s. Actual number:${logs_num}.
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}		AND
+	...    Stop Agent											AND
+	...    Remove File 	${agent_script_dir}${/}Issue-#98.robot	AND
+	...    Remove Directory 	${run_result_dirs}[0]	resursive=${True}
+
+Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has No Trailing
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #98
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Open Agent
+
+	${agent_def_path}=	Get Agent Default Save Path
+	Change http://localhost:8138/ With http://localhost:8138 In ${agent_def_path}${/}RFSwarmAgent.ini
+	${agent_ini_file_content}=	Get File	${agent_def_path}${/}RFSwarmAgent.ini
+	Should Contain	${agent_ini_file_content}	swarmmanager = http://localhost:8138
+
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#98${/}Issue-#98.rfs
+	VAR 	${agent_script_dir} 	${agent_dir}${/}scripts
+	VAR 	@{mngr_options} 		-d 	${results_dir} 	-s 	${scenariofile}
+
+	Open Manager GUI		${mngr_options}
+	Wait Agent Ready
+	Sleep	10s
+	Should Exist	${agent_script_dir}${/}Issue-#98.robot
+	Should Not Be Empty 	${agent_script_dir}${/}Issue-#98.robot
+	Click Tab	Plan
+	Click Button	runplay
+
+	Log To Console	Started run, now wait 40s. Check if Agent will send results to the Manager.
+	Sleep	40	#rampup=10
+	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_Issue-#98*	absolute=${True}
+	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
+	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
+	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
+	${logs_num}=	Get Length	${run_logs}
+	Log To Console	Uploaded logs number after 40s: ${logs_num}
+	Should Be True	${logs_num} >= 1
+	...    msg=Agent is not uploading logs immediately! Should be at least 1 after ~ 40s. Actual number:${logs_num}.
+
+	[Teardown]	Run Keywords
+	...    Run Keyword		Close Manager GUI ${platform}		AND
+	...    Stop Agent											AND
+	...    Change http://localhost:8138 With http://localhost:8138/ In ${agent_def_path}${/}RFSwarmAgent.ini	AND
+	...    Remove File 	${agent_script_dir}${/}Issue-#98.robot	AND
+	...    Remove Directory 	${run_result_dirs}[0]	resursive=${True}
+
 Verify If the Port Number And Ip Address Get Written To the INI File
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
 	[Setup]	Run Keywords
@@ -1243,7 +1326,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 	...    Change = 8148 With = 8138 In ${manager_ini_file}
 
 Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Address On the Manager's Host
-	[Tags]	windows-latest	ubuntu-latest	Issue #16
+	[Tags]	windows-latest 	ubuntu-latest 	macos-latest 	Issue #16
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -1263,13 +1346,15 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	Run Keyword		Close Manager GUI ${platform}
 	Open Manager GUI
 
-	Log To Console	Check if Agent cant connect to the Manager via ${ipv4}[1] instead of ${ipv4}[0].
-	@{agent_options}	Set Variable	-m	http://${ipv4}[1]:8138/
+	# ${altip}= 	Set Variable    ${ipv4} [1]
+	${altip}= 	Set Variable    127.0.0.1
+	Log To Console	Check if Agent cant connect to the Manager via ${altip} instead of ${ipv4}[0].
+	@{agent_options}	Set Variable	-m	http://${altip}:8138/
 	Open Agent	${agent_options}
 	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
 	Run Keyword If	${status}	Fail
-	...    msg=The agent has connected to the Manager via ${ipv4}[1] but should not!
-	Log To Console	The Agent did not connect to the Manager via ${ipv4}[1] and this was expected.
+	...    msg=The agent has connected to the Manager via ${altip} but should not!
+	Log To Console	The Agent did not connect to the Manager via ${altip} and this was expected.
 	Click Tab	Plan
 	Stop Agent
 
@@ -1765,6 +1850,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 
 	${status}=	Run Keyword And Return Status
 	...    Wait For	${platform}_warning_label_not_enough_agents.png 	timeout=${10}
+	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=The manager didn't display expected prompt dialogue that says: Not enough Agents available to run Robots!
 	Press key.enter 1 Times
 	${status}=	Run Keyword And Return Status
@@ -2650,3 +2736,20 @@ Verify Result Name - Test Row
 	Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
 	Log 	Default 	console=True
 	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
+
+Check Application Icon or Desktop Shortcut in GUI
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
+
+		# ${result}= 	Run 	${cmd_agent} -c ICON
+		# Log 		${result}
+
+	${result}= 	Run 	${cmd_manager} -g 6 -c ICON
+	Log 		${result}
+	Sleep    1
+
+	Navigate to and check Desktop Icon
+
+	[Teardown]	Type 	KEY.ESC 	KEY.ESC 	KEY.ESC
+
+
+#
