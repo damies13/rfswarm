@@ -9,6 +9,7 @@ Library 	OCRLibrary
 
 
 *** Variables ***
+${default_image_timeout} 	${120}
 ${platform}		None
 ${cmd_reporter} 		rfswarm-reporter
 ${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
@@ -65,7 +66,7 @@ Click Tab
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	${sssleep}
-	Take A Screenshot
+	# Take A Screenshot
 
 Click Section
 	[Arguments]		${sectname}
@@ -77,7 +78,7 @@ Click Section
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	${sssleep}
-	Take A Screenshot
+	# Take A Screenshot
 
 Select Option
 	[Arguments]		${optname}
@@ -89,7 +90,7 @@ Select Option
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	${sssleep}
-	Take A Screenshot
+	# Take A Screenshot
 
 Select Field With Label
 	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
@@ -109,7 +110,7 @@ Select Field With Label
 	Move To 	${coordinates}
 	Click
 	Sleep 	${sssleep}
-	Take A Screenshot
+	# Take A Screenshot
 
 Find Text
 	[Arguments]		${mytext}
@@ -133,7 +134,7 @@ Click Text
 	@{coordinates}= 	Create List 	${x} 	${y}
 	Move To 	${coordinates}
 	Click
-	Take A Screenshot
+	# Take A Screenshot
 
 Get Text Value To Right Of
 	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
@@ -142,12 +143,12 @@ Get Text Value To Right Of
 
 	${b4value}= 	Get Clipboard Content
 	${value}= 	Copy From The Right Of 	${img} 	${offsetx}
-	Take A Screenshot
+	# Take A Screenshot
 	WHILE 	$b4value == $value 		limit=10
 		Sleep    10 ms
 		${offsetx}= 	Evaluate 	${offsetx}+10
 		${value}= 	Copy From The Right Of 	${img} 	${offsetx}
-		Take A Screenshot
+		# Take A Screenshot
 		${valuec}= 	Copy
 		IF  $valuec != $value
 			${value}= 	Set Variable 		${valuec}
@@ -190,7 +191,7 @@ Set Text Value To Right Of
 	Click
 	Double Click
 	Type 	${value}
-	Take A Screenshot
+	# Take A Screenshot
 	${value2}= 	Get Text Value To Right Of		${label}
 	WHILE 	$value2 != $value 		limit=10
 		${x}= 	Evaluate 	${x}+10
@@ -200,7 +201,7 @@ Set Text Value To Right Of
 		Click
 		Double Click
 		Type 	${value}
-		Take A Screenshot
+		# Take A Screenshot
 		${value2}= 	Get Text Value To Right Of		${label}
 	END
 	Should Be Equal As Strings    ${value}    ${value2}
@@ -237,7 +238,7 @@ Click Button
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	${sssleep}
-	Take A Screenshot
+	# Take A Screenshot
 
 Click Dialog Button
 	[Arguments]		${btnname} 		${timeout}=300
@@ -249,7 +250,7 @@ Click Dialog Button
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	1
-	Take A Screenshot
+	# Take A Screenshot
 
 Wait For Status
 	[Arguments]		${status}	${timeout}=300
@@ -259,7 +260,7 @@ Wait For Status
 	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=${timeout}
 	Sleep 	${sssleep}
-	Take A Screenshot
+	# Take A Screenshot
 
 Open GUI
 	[Arguments]		@{appargs}
@@ -291,7 +292,7 @@ Open GUI windows
 	# Sleep 	60
 	# Capture Screen
 	Set Screenshot Folder 	${OUTPUT DIR}
-	Take A Screenshot
+	# Take A Screenshot
 
 Open GUI ubuntu
 	[Arguments]		@{appargs}
@@ -303,7 +304,7 @@ Open GUI ubuntu
 	# Sleep 	60
 	# Capture Screen
 	Set Screenshot Folder 	${OUTPUT DIR}
-	Take A Screenshot
+	# Take A Screenshot
 
 Open GUI macos
 	[Arguments]		@{appargs}
@@ -314,7 +315,7 @@ Open GUI macos
 	Set Suite Variable 	$process 	${process}
 	# Sleep 	60
 	Set Screenshot Folder 	${OUTPUT DIR}
-	Take A Screenshot
+	# Take A Screenshot
 
 
 Close GUI
@@ -445,7 +446,7 @@ Save Template File OS DIALOG
 	[Arguments]		${template_name}
 	Sleep	5
 	Type	${template_name}
-	Take A Screenshot
+	# Take A Screenshot
 	Click Dialog Button		save
 	Sleep	1
 
@@ -462,3 +463,139 @@ Get Manager PIP Data
 	Should Not Be Empty		${pip_data.stdout}		msg=Manager must be installed with pip
 	Log	${pip_data.stdout}
 	RETURN		${pip_data.stdout}
+
+Navigate to and check Desktop Icon
+	VAR 	${projname}= 		rfswarm-manager 		scope=TEST
+	VAR 	${dispname}= 		RFSwarm Manager 		scope=TEST
+	Run Keyword 	Navigate to and check Desktop Icon For ${platform}
+
+Navigate to and check Desktop Icon For MacOS
+
+	Take A Screenshot
+
+	# open finder
+	${img}=	Set Variable		${platform}_finder.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	# Sleep 	0.3
+	${img}=	Set Variable		${platform}_finder_toolbar.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	# Take A Screenshot
+
+	# un-maximise finder if maximised
+	${img}=	Set Variable		${platform}_finder.png
+	${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=1
+	IF 	not ${passed}
+		Take A Screenshot
+		Press Combination 	KEY.fn 	KEY.f
+		Sleep 	0.3
+		Take A Screenshot
+	END
+
+	# nav to /Applications
+	Press Combination 	KEY.command 	KEY.shift 	KEY.g
+	Press Combination 	KEY.backspace		#clear text filed
+	# Sleep 	0.3
+	# Take A Screenshot
+	${img}=	Set Variable		${platform}_finder_gotofolder.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+
+	Type 		/Applications
+	# Sleep 	0.3
+	# Take A Screenshot
+	${img}=	Set Variable		${platform}_finder_gotoapplications.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+
+	Press Combination 	KEY.enter
+	# Sleep	0.5
+	# Take A Screenshot
+	${img}=	Set Variable		${platform}_finder_facetime.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+
+	# Filter/Search /Applications?
+	Type 	RFSwarm
+	# Sleep 	0.3
+	${img}=	Set Variable		${platform}_finder_rfswarm_reporter.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	# Take A Screenshot
+
+	# Open Launchpad (F4?)
+	# Press Combination   key.f4
+	${img}=	Set Variable		${platform}_launchpad.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	# Sleep 	1
+	${img}=	Set Variable		${platform}_launchpad_search.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	# Take A Screenshot
+
+	# Search Launchpad
+	Type 	RFSwarm
+	# Sleep 	0.3
+	# Take A Screenshot
+
+	# Check for Icon
+	# macos_launchpad_rfswarm_reporter.png
+	${img}=	Set Variable		${platform}_launchpad_rfswarm_reporter.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+
+	Press Combination 	KEY.ESC
+
+Navigate to and check Desktop Icon For Windows
+
+	Take A Screenshot
+	# Open Start Menu
+	${img}=	Set Variable		${platform}_start_menu.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	1
+	Take A Screenshot
+
+	${img}=	Set Variable		${platform}_start_menu_rfswarm_reporter.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+
+	# Navigate Start Menu
+	Type 	RFSwarm
+	Sleep 	0.5
+	Take A Screenshot
+
+	# Check for Icon
+	${img}=	Set Variable		${platform}_search_rfswarm_reporter.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+
+	Press Combination 	KEY.ESC
+
+Navigate to and check Desktop Icon For Ubuntu
+
+	Take A Screenshot
+	# Open Menu
+	${img}=	Set Variable		${platform}_lxqt_menu.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	# Move To 	${coordinates}
+	# Click 	button=right
+	Sleep 	0.5
+	Take A Screenshot
+
+	# Navigate Menu
+	# lxqt_programming_menu.png
+	${img}=	Set Variable		${platform}_lxqt_programming_menu.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Click Image		${img}
+	Sleep 	0.5
+	Take A Screenshot
+
+	# Check for Icon
+	# ubuntu_lxqt_rfswarm_reporter_menu.png
+	${img}=	Set Variable		${platform}_lxqt_rfswarm_reporter_menu.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+
+	Press Combination 	KEY.ESC
+
+
+
+#

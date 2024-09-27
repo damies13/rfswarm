@@ -16,7 +16,7 @@ Library 	get_ip_address.py
 
 
 *** Variables ***
-${default_image_timeout} 	120
+${default_image_timeout} 	${120}
 ${platform}		None
 ${platform}		ubuntu
 ${global_path}	None
@@ -81,6 +81,10 @@ Open Agent
 
 Open Manager GUI
 	[Arguments]		${options}=None
+	# Press Escape and move mouse because on linux the screen save had kicked in
+	Press Combination 	Key.esc
+	Move To 	10 	10
+	Move To 	20 	20
 	IF  ${options} == None
 		${options}= 	Create List
 		Create Directory 	${results_dir}
@@ -90,14 +94,47 @@ Open Manager GUI
 	Set Confidence		0.9
 	${process}= 	Start Process 	${cmd_manager}  @{options}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
 	Set Test Variable 	$process_manager 	${process}
-	Sleep 	10
+	# Sleep 	10
 	Set Screenshot Folder 	${OUTPUT DIR}
-	Take A Screenshot
+	# Take A Screenshot
+	${result}= 	Wait Until Keyword Succeeds 	${default_image_timeout} sec 	500ms 	Process Should Be Running 	${process_manager}
+	Log		Process Is Running: ${result} 		console=True
+
+	IF 	'-n' in ${options}
+		Sleep 	10
+	ELSE
+		${img}=	Set Variable		manager_${platform}_button_runschedule.png
+		${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=${default_image_timeout / 2}
+		IF 	not ${passed}
+			${running}= 	Is Process Running 	${process_manager}
+			IF 	not ${running}
+				${result} = 	Get Process Result
+
+				Log		rc: ${result.rc} 		console=True
+				Log		stdout: ${result.stdout} 		console=True
+				Log		stderr: ${result.stderr} 		console=True
+				Log		stdout_path: ${result.stdout_path} 		console=True
+				Log		stderr_path: ${result.stderr_path} 		console=True
+
+				Show Log 	${result.stdout_path}
+				Show Log 	${result.stderr_path}
+
+				Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+				Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+
+				Fail 		Manager not running
+			ELSE
+				Wait For 	${img} 	 timeout=${default_image_timeout / 2}
+			END
+		END
+	END
 
 Close Manager GUI ubuntu
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
 	Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
 	Close Manager GUI
+
+
 
 Close Manager GUI windows
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
@@ -136,10 +173,13 @@ Close Manager GUI
 			Fail
 		END
 	END
+	# stdout=${OUTPUT DIR}${/}stdout_manager.txt    stderr=${OUTPUT DIR}${/}stderr_manager.txt
+	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 
 Close Manager GUI macos
 	[Tags]	macos-latest
-	Sleep	3
+	# Sleep	3
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
 		Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
@@ -149,8 +189,8 @@ Close Manager GUI macos
 		Run Keyword And Ignore Error 	Click Tab 	 Run
 		# Click Image		manager_${platform}_titlebar_rfswarm.png
 		Click Button	closewindow
-		Sleep	3
-		Run Keyword And Ignore Error 	Click Dialog Button		no 		10
+		# Sleep	3
+		Run Keyword And Ignore Error 	Click Dialog Button		no 		1
 	END
 	${result}= 		Wait For Process 	${process_manager} 	timeout=55
 	${running}= 	Is Process Running 	${process_manager}
@@ -173,6 +213,8 @@ Close Manager GUI macos
 			Fail
 		END
 	END
+	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 
 Stop Agent
 	${running}= 	Is Process Running 	${process_agent}
@@ -189,6 +231,20 @@ Stop Agent
 		# Should Be Equal As Integers 	${result.rc} 	0
 	END
 
+	#	 stdout=${OUTPUT DIR}${/}stdout_agent.txt    stderr=${OUTPUT DIR}${/}stderr_agent.txt
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+
+
+Show Log
+	[Arguments]		${filename}
+	Log 		${\n}-----${filename}----- 		console=True
+	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
+	Log 		${filedata} 		console=True
+	Log 		-----${filename}-----${\n} 		console=True
+	RETURN 		${filedata}
+
+
 Stop Test Scenario Run Gradually
 	[Arguments]	${rumup_time}	${robot_test_time}
 	Set Confidence	0.95
@@ -197,14 +253,14 @@ Stop Test Scenario Run Gradually
 	${START_TIME}=	Get Current Date
 	Wait For	manager_${platform}_robots_0.png 	timeout=${robot_test_time + ${default_image_timeout}}
 	Set Confidence	0.9
-	Take A Screenshot
+	# Take A Screenshot
 	${END_TIME}=	Get Current Date
 	${ELAPSED_TIME}=	Subtract Date From Date	${END_TIME}	${START_TIME}
 	Should Be True	${ELAPSED_TIME} >= ${robot_test_time / 2} and ${ELAPSED_TIME} <= ${robot_test_time + 90}
 
 	Press Key.tab 2 Times
 	Move To	10	10
-	Take A Screenshot
+	# Take A Screenshot
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time + ${default_image_timeout}}
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
@@ -220,14 +276,14 @@ Stop Test Scenario Run Quickly
 	${START_TIME}=	Get Current Date
 	Wait For	manager_${platform}_robots_0.png 	timeout=${robot_test_time + 60}
 	Set Confidence	0.9
-	Take A Screenshot
+	# Take A Screenshot
 	${END_TIME}=	Get Current Date
 	${ELAPSED_TIME}=	Subtract Date From Date	${END_TIME}	${START_TIME}
 	Should Be True	${ELAPSED_TIME} <= ${robot_test_time / 2}
 
 	Press Key.tab 2 Times
 	Move To	10	10
-	Take A Screenshot
+	# Take A Screenshot
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time + ${default_image_timeout}}
 	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
@@ -244,7 +300,7 @@ Utilisation Stats
 
 Check If The Agent Is Ready
 	[Arguments] 	${timeout}=300
-	Sleep	1
+	# Sleep	1
 	Click Tab	Agents
 	Wait For 	manager_${platform}_agents_ready.png	timeout=${timeout}
 
@@ -257,7 +313,7 @@ Check If the Robot Failed
 	EXCEPT
 		Wait For	manager_${platform}_button_finished_run.png	timeout=${default_image_timeout}
 	END
-	Take A Screenshot
+	# Take A Screenshot
 	${status}=	Run Keyword And Return Status	Locate	manager_${platform}_resource_file_provided.png
 	Run Keyword If	not ${status}	Fail	msg=Test failed. Check screenshots for more informations.
 
@@ -271,7 +327,7 @@ Click Tab
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	0.1
-	Take A Screenshot
+	# Take A Screenshot
 
 Select Option
 	[Arguments]		${optname}
@@ -280,7 +336,7 @@ Select Option
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Take A Screenshot
+	# Take A Screenshot
 
 Selected Option Should Be
 	[Arguments]		${optname}
@@ -300,7 +356,7 @@ Click Button
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	0.1
-	Take A Screenshot
+	# Take A Screenshot
 
 Click Menu
 	[Arguments]		${menuname}
@@ -312,7 +368,7 @@ Click Menu
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	0.1
-	Take A Screenshot
+	# Take A Screenshot
 
 Click Dialog Button
 	[Arguments]		${btnname} 		${timeout}=${default_image_timeout}
@@ -323,8 +379,8 @@ Click Dialog Button
 	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Sleep 	1
-	Take A Screenshot
+	Sleep 	0.1
+	# Take A Screenshot
 
 Click CheckBox
 	[Arguments]		${status} 		${btnname}
@@ -336,8 +392,8 @@ Click CheckBox
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Sleep 	1
-	Take A Screenshot
+	Sleep 	0.1
+	# Take A Screenshot
 
 Click RadioBtn
 	[Arguments]		${btnname}
@@ -372,7 +428,7 @@ Click Label With Vertical Offset
 	Log	${coordinates}
 	Click To The Below Of	${coordinates}	${offset}
 	Sleep 	0.1
-	Take A Screenshot
+	# Take A Screenshot
 
 Click Label With Horizontal Offset
 	[Arguments]		${labelname}	${offset}=0
@@ -388,7 +444,7 @@ Click Label With Horizontal Offset
 	Log	${coordinates}
 	Click To The Right Of	${coordinates}	${offset}
 	Sleep 	0.1
-	Take A Screenshot
+	# Take A Screenshot
 
 #TODO: Chceck if it works
 Resize Window
@@ -401,7 +457,7 @@ Resize Window
 	Move To 	@{coordinates}
 	Mouse Down
 	Move To 	@{coordinates2}
-	Take A Screenshot
+	# Take A Screenshot
 	Mouse Up
 
 Wait Agent Ready
@@ -511,6 +567,20 @@ Get Manager PIP Data
 	Should Not Be Empty		${pip_data.stdout}		msg=Manager must be installed with pip
 	Log	${pip_data.stdout}
 	RETURN		${pip_data.stdout}
+
+Get Agent PIP Data
+	Run Process		pip		show	rfswarm-agent		alias=data
+	${pip_data}	Get Process Result	data
+	Should Not Be Empty		${pip_data.stdout}		msg=Agent must be installed with pip
+	Log		${pip_data.stdout}
+	RETURN		${pip_data.stdout}
+
+Get Agent Default Save Path
+	${pip_data}=	Get Agent PIP Data
+	${pip_data_list}=	Split String	${pip_data}
+	${i}=	Get Index From List	${pip_data_list}	Location:
+	${location}=	Set Variable	${pip_data_list}[${i + 1}]
+	RETURN	${location}${/}rfswarm_agent${/}
 
 Create Robot File
 	[Arguments]		${path}=${global_path}	${name}=${global_name}
@@ -698,7 +768,7 @@ Select Robot File OS DIALOG
 	[Arguments]		${robot_file_name}
 	Sleep	5
 	Type	${robot_file_name}
-	Take A Screenshot
+	# Take A Screenshot
 	Click Dialog Button		open
 	Sleep	1
 
@@ -706,7 +776,7 @@ Save Scenario File OS DIALOG
 	[Arguments]		${scenario_name}
 	Sleep	5
 	Type	${scenario_name}
-	Take A Screenshot
+	# Take A Screenshot
 	Click Dialog Button		save
 	Sleep	1
 
@@ -714,7 +784,7 @@ Open Scenario File OS DIALOG
 	[Arguments]		${scenario_name}
 	Sleep	5
 	Type	${scenario_name}.rfs
-	Take A Screenshot
+	# Take A Screenshot
 	Click Dialog Button		open
 	Sleep	1
 
@@ -1172,41 +1242,41 @@ Click Script Button On Row
 		# Log	${coordinates}
 		Click To The Below Of Image 	${img} 	 offset=${rowoffset}
 
-		Take A Screenshot
+		# Take A Screenshot
 		Press Key.tab 1 Times
-		Take A Screenshot
+		# Take A Screenshot
 		# manager_macos_button_selected_runscriptrow.png
 		${img}=	Set Variable		manager_${platform}_button_selected_runscriptrow.png
 		Click Image 	${img}
 		Sleep    0.1
-		Take A Screenshot
+		# Take A Screenshot
 		# 	macos_dlgbtn_open
 		${img}=	Set Variable		${platform}_dlgbtn_cancel.png
 		Wait For 	${img} 	 timeout=${default_image_timeout}
-		Take A Screenshot
+		# Take A Screenshot
 
 		# Fail 		Not Implimented
 
 File Open Dialogue Select File
 	[Arguments]		${filepath}
 	Run Keyword		File Open Dialogue ${platform} Select File 			${filepath}
-	Take A Screenshot
+	# Take A Screenshot
 
 File Open Dialogue ubuntu Select File
 	[Arguments]		${filepath}
 	Sleep	2
-	Take A Screenshot
+	# Take A Screenshot
 	Click Label With Horizontal Offset 	file_name 	50
 	Sleep	0.5
 	Type 		${filepath} 	Key.ENTER
 	Sleep	0.5
-	Take A Screenshot
+	# Take A Screenshot
 	# Click Dialog Button 	open
 
 File Open Dialogue windows Select File
 	[Arguments]		${filepath}
 	Sleep	3
-	Take A Screenshot
+	# Take A Screenshot
 	${filepath}= 	Normalize Path 	${filepath}
 	#${path} 	${file} = 	Split Path 	${filepath}
 	Click Label With Horizontal Offset 	file_name 	50
@@ -1214,28 +1284,28 @@ File Open Dialogue windows Select File
 	Type 		${filepath}
 	Sleep	0.5
 	Press key.enter 1 Times
-	Take A Screenshot
+	# Take A Screenshot
 	# Click Dialog Button 	open
 
 File Open Dialogue macos Select File
 	[Arguments]		${filepath}
 	Sleep	3
-	Take A Screenshot
+	# Take A Screenshot
 	${filepath}=	Convert To Lower Case	${filepath}
-	Evaluate	clipboard.copy("${filepath}")	modules=clipboard	#copy path to clipboard
+	Evaluate	clipboard.copy("${filepath}")	modules=clipboard		#copy path to clipboard
 	Press Combination 	KEY.command 	KEY.shift 	KEY.g
-	Press Combination 	KEY.backspace	#clear text filed
+	Press Combination 	KEY.backspace		#clear text filed
 	Click Label With Horizontal Offset 	file_name 	-10
 	Click	button=right	#show context menu
 	Sleep	2
-	Take A Screenshot
+	# Take A Screenshot
 	Press Combination 	KEY.down	#choose paste option(should be first)
 	Press key.enter 1 Times		#execute paste option
 	Sleep	0.5
-	Take A Screenshot
+	# Take A Screenshot
 	Press key.enter 1 Times
 	Sleep	0.5
-	Take A Screenshot
+	# Take A Screenshot
 	Click Dialog Button 	open
 	# Type 		Key.BACKSPACE 	Key.DELETE
 	# Click Dialog Button 	open
@@ -1250,7 +1320,7 @@ Select Test Script
 	# Press Key.escape 1 Times
 
 	File Open Dialogue Select File		${filepath}
-	Take A Screenshot
+	# Take A Screenshot
 	# Click Dialog Button 	cancel
 
 Wait For File To Exist
@@ -1335,3 +1405,173 @@ Verify Generated Run Result Files
 	${len}=		Get Length	${logs_file_names}
 	Log To Console	Number of files in the Logs directory: ${len}
 	Should Be True	${len} >= 20	msg=Number of files in the Logs directory is incorrect: should be at least 20, actual: "${len}".
+
+Navigate to and check Desktop Icon
+	VAR 	${projname}= 		rfswarm-manager 		scope=TEST
+	VAR 	${dispname}= 		RFSwarm Manager 		scope=TEST
+	Run Keyword 	Navigate to and check Desktop Icon For ${platform}
+
+Navigate to and check Desktop Icon For MacOS
+	Take A Screenshot
+
+	# open finder
+	${img}=	Set Variable		${platform}_finder.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	# Sleep 	0.3
+	${img}=	Set Variable		${platform}_finder_recents.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Click Image		${img}
+	# Take A Screenshot
+
+	# un-maximise finder if maximised
+	${img}=	Set Variable		${platform}_dock_trash.png
+	${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=3
+	IF 	not ${passed}
+		Take A Screenshot
+		Press Combination 	KEY.fn 	KEY.f
+		Sleep 	0.3
+		Take A Screenshot
+	END
+
+	${img}=	Set Variable		${platform}_finder_recents.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Click Image		${img}
+	Sleep 	0.3
+
+	# macos_finder_menu_go.png
+	${img}=	Set Variable		${platform}_finder_menu_go.png
+	Click Image		${img}
+	# Sleep 	0.3
+	# Take A Screenshot
+
+	# _finder_menu_gotofolder.png
+	${img}=	Set Variable		${platform}_finder_menu_gotofolder.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Click Image		${img}
+
+	# nav to /Applications
+	# Press Combination 	KEY.command 	KEY.shift 	KEY.g
+	${img}=	Set Variable		${platform}_finder_gotoprompt.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	# Sleep 	0.3
+
+	Press Combination 	KEY.backspace		#clear text filed
+	# Sleep 	0.3
+	# Take A Screenshot
+	${img}=	Set Variable		${platform}_finder_gotofolder.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+
+	Type 		/Applications
+	# Sleep 	0.3
+	# Take A Screenshot
+	${img}=	Set Variable		${platform}_finder_gotoapplications.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+
+	Press Combination 	KEY.enter
+	# Sleep	0.5
+	# Take A Screenshot
+	${img}=	Set Variable		${platform}_finder_facetime.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+
+	# Filter/Search /Applications?
+	Type 	RFSwarm
+	Sleep 	3
+	${img}=	Set Variable		${platform}_finder_rfswarm_manager.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Take A Screenshot
+
+	${img}=	Set Variable		${platform}_dock_trash.png
+	${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=3
+	IF 	not ${passed}
+		Take A Screenshot
+		Press Combination 	KEY.fn 	KEY.f
+		Sleep 	0.3
+		Take A Screenshot
+	END
+
+	# Close finder window
+	Press Combination 	KEY.command 	KEY.w
+	Sleep 	0.3
+
+
+	# Open Launchpad (F4?)
+	# Press Combination   key.f4
+	# ${img}=	Set Variable		${platform}_dock_launchpad.png
+	${img}=	Set Variable		${platform}_launchpad.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	# Sleep 	1
+	${img}=	Set Variable		${platform}_launchpad_search.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	# Take A Screenshot
+
+	# Search Launchpad
+	Type 	RFSwarm
+	# Sleep 	0.5
+	# Take A Screenshot
+
+	# Check for Icon
+	# macos_launchpad_rfswarm_reporter.png
+	${img}=	Set Variable		${platform}_launchpad_rfswarm_manager.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+
+	Press Combination 	KEY.ESC
+
+Navigate to and check Desktop Icon For Windows
+	Take A Screenshot
+	# Open Start Menu
+	${img}=	Set Variable		${platform}_start_menu.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	1
+	Take A Screenshot
+
+	${img}=	Set Variable		${platform}_start_menu_rfswarm_manager.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+
+	# Navigate Start Menu
+	Type 	RFSwarm
+	Sleep 	0.5
+	Take A Screenshot
+
+	# Check for Icon
+	${img}=	Set Variable		${platform}_search_rfswarm_manager.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+
+	Press Combination 	KEY.ESC
+
+Navigate to and check Desktop Icon For Ubuntu
+
+	# Open Menu
+	${img}=	Set Variable		${platform}_lxqt_menu.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	0.5
+	Take A Screenshot
+
+	# Navigate Menu
+	# lxqt_programming_menu.png
+	${img}=	Set Variable		${platform}_lxqt_programming_menu.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Click Image		${img}
+	Sleep 	0.5
+	Take A Screenshot
+
+	# Check for Icon
+	# ubuntu_lxqt_rfswarm_manager_menu.png
+	${img}=	Set Variable		${platform}_lxqt_rfswarm_manager_menu.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+
+	Press Combination 	KEY.ESC
+
+
+
+
+
+
+#

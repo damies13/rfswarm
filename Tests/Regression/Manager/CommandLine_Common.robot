@@ -22,6 +22,39 @@ ${results_dir} 			${OUTPUT DIR}${/}results
 ${agent_dir} 				${OUTPUT DIR}${/}rfswarm-agent
 
 *** Keywords ***
+Set Platform
+	Set Platform By Python
+	Set Platform By Tag
+
+Set Platform By Python
+	${system}= 		Evaluate 	platform.system() 	modules=platform
+
+	IF 	"${system}" == "Darwin"
+		Set Suite Variable    ${platform}    macos
+	END
+	IF 	"${system}" == "Windows"
+		Set Suite Variable    ${platform}    windows
+	END
+	IF 	"${system}" == "Linux"
+		Set Suite Variable    ${platform}    ubuntu
+	END
+
+Set Platform By Tag
+	# [Arguments]		${ostag}
+	Log 	${OPTIONS}
+	Log 	${OPTIONS}[include]
+	Log 	${OPTIONS}[include][0]
+	${ostag}= 	Set Variable 	${OPTIONS}[include][0]
+
+	IF 	"${ostag}" == "macos-latest"
+		Set Suite Variable    ${platform}    macos
+	END
+	IF 	"${ostag}" == "windows-latest"
+		Set Suite Variable    ${platform}    windows
+	END
+	IF 	"${ostag}" == "ubuntu-latest"
+		Set Suite Variable    ${platform}    ubuntu
+	END
 
 Show Log
 	[Arguments]		${filename}
@@ -63,9 +96,9 @@ Run Manager CLI
 	[Arguments]		${options}=None
 	IF  ${options} == None
 		${options}= 	Create List
+		Create Directory 	${results_dir}
+		Append To List 	${options} 	-d 	${results_dir}
 	END
-	Create Directory 	${results_dir}
-	Append To List 	${options} 	-d 	${results_dir}
 	Log to console 	${\n}\${options}: ${options}
 	# ${process}= 	Start Process 	python3 	${pyfile_manager}  @{options}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
 	${process}= 	Start Process 	${cmd_manager}  @{options}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
@@ -110,6 +143,109 @@ Stop Agent
 	Log 	stderr_path: ${result.stderr_path} 	console=True
 	Log 	stderr: ${result.stderr} 	console=True
 	Show Dir Contents 	${agent_dir}
+
+Set Global Filename And Default Save Path
+	[Documentation]	Sets global default save path as Test Variable and file name for robot test.
+	...    You can also provide optional save path.
+	[Arguments]		${input_name}	${optional_path}=${None}
+
+	Set Test Variable	${global_name}	${input_name}
+	${location}=	Get Manager Default Save Path
+	Set Test Variable	${global_path}	${location}
+
+	Set Test Variable 	$file_name 	${global_name}
+	IF  '${optional_path}' != '${None}'
+		Set Test Variable	${global_path}	${optional_path}
+		${location}=	Get Manager INI Location
+		${ini_content}=		Get Manager INI Data
+		${ini_content_list}=	Split String	${ini_content}
+		${scriptdir}=	Get Index From List		${ini_content_list}		scriptdir
+
+		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${scriptdir + 2}]	${optional_path}
+		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${scriptdir + 5}]	${optional_path}
+
+		Remove File		${location}
+		Log		${ini_content}
+		Append To File	${location}		${ini_content}
+	END
+
+	Log		${global_name}
+	Log		${global_path}
+
+Get Manager Default Save Path
+	${pip_data}=	Get Manager PIP Data
+	${pip_data_list}=	Split String	${pip_data}
+	${i}=	Get Index From List	${pip_data_list}	Location:
+	${location}=	Set Variable	${pip_data_list}[${i + 1}]
+	RETURN	${location}${/}rfswarm_manager${/}
+
+Get Manager INI Location
+	${location}=	Get Manager Default Save Path
+	RETURN	${location}${/}RFSwarmManager.ini
+
+Get Manager INI Data
+	${location}=	Get Manager INI Location
+	TRY
+		File Should Exist	${location}
+		File Should Not Be Empty	${location}
+	EXCEPT
+		# --- temp fix:
+		@{mngr_options}= 	Create List 	-g 	1
+		Open Manager GUI 		${mngr_options}
+		# ---
+		Run Keyword		Close Manager GUI ${platform}
+		File Should Exist	${location}
+		File Should Not Be Empty	${location}
+	END
+	${ini_content}=	Get File	${location}
+	Log	${ini_content}
+	Should Not Be Empty	${ini_content}
+	RETURN	${ini_content}
+
+#Read INI Data
+#	[Arguments]		${inifile}
+
+Set INI Window Size
+	[Arguments]		${width}=${None}	${height}=${None}
+	${location}=	Get Manager INI Location
+	${ini_content}=		Get Manager INI Data
+	${ini_content_list}=	Split String	${ini_content}
+	${i}=	Get Index From List		${ini_content_list}		win_width
+	${j}=	Get Index From List		${ini_content_list}		win_height
+	IF	"${width}" != "${None}"
+		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${i + 2}]	${width}
+	END
+	IF	"${height}" != "${None}"
+		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${j + 2}]	${height}
+	END
+	Remove File		${location}
+	Log		${ini_content}
+	Append To File	${location}		${ini_content}
+
+Change Manager INI File Settings
+	[Arguments]		${option}	${new_value}
+	${location}=	Get Manager INI Location
+	${ini_content}=		Get Manager INI Data
+	${ini_content_list}=	Split String	${ini_content}
+	${option_index}=	Get Index From List		${ini_content_list}		${option}
+
+	${len}	Get Length	${ini_content_list}
+	IF  ${len} > ${option_index + 2}
+		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${option_index + 2}]	${new_value}
+	ELSE
+		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${option_index}] =	${option} = ${new_value}
+	END
+
+	Remove File		${location}
+	Log		${ini_content}
+	Append To File	${location}		${ini_content}
+
+Get Manager PIP Data
+	Run Process	pip	show	rfswarm-manager		alias=data
+	${pip_data}	Get Process Result	data
+	Should Not Be Empty		${pip_data.stdout}		msg=Manager must be installed with pip
+	Log	${pip_data.stdout}
+	RETURN		${pip_data.stdout}
 
 Find Result DB
 	# ${fols}= 	List Directory 	${results_dir}
@@ -343,3 +479,60 @@ Diff Lists
 		Log 		Items from list A missing from list B: ${Missing_List_From_B} 	console=True
 		Lists Should Be Equal 	${list_a} 	${list_b} 		msg=${message}
 	END
+
+Check Icon Install
+	VAR 	${projname}= 		rfswarm-manager 		scope=TEST
+	VAR 	${dispname}= 		RFSwarm Manager 		scope=TEST
+	Run Keyword 	Check Icon Install For ${platform}
+
+Check Icon Install For Macos
+	${Status}= 	Run Keyword And Return Status 	Directory Should Exist 	%{HOME}${/}Applications${/}${projname}.app
+	IF 	${Status}
+		${appfolder}= 		Set Variable    %{HOME}${/}Applications${/}${dispname}.app
+	ELSE
+		${appfolder}= 		Set Variable    ${/}Applications${/}${dispname}.app
+	END
+	Directory Should Exist 	${appfolder} 		.app Folder not found
+
+	Directory Should Exist 	${appfolder}${/}Contents 		Contents Folder not found
+	Directory Should Exist 	${appfolder}${/}Contents${/}MacOS 		MacOS Folder not found
+
+	Directory Should Exist 	${appfolder}${/}Contents${/}Resources 		Resources Folder not found
+
+	Directory Should Exist 	${appfolder}${/}Contents${/}Resources${/}${projname}.iconset 		iconset Folder not found
+
+	File Should Exist 	${appfolder}${/}Contents${/}Resources${/}${projname}.iconset${/}icon_*.png 		Icons Images not found
+
+	File Should Exist 	${appfolder}${/}Contents${/}Resources${/}${projname}.icns 		icns File not found
+
+	File Should Exist 	${appfolder}${/}Contents${/}Info.plist 		plist File not found
+	Show Log 	 					${appfolder}${/}Contents${/}Info.plist
+
+	File Should Exist 	${appfolder}${/}Contents${/}PkgInfo 		PkgInfo File not found
+	Show Log 	 					${appfolder}${/}Contents${/}PkgInfo
+
+	File Should Exist 	${appfolder}${/}Contents${/}MacOS${/}${projname} 		Executable Symbolic Link File not found
+
+Check Icon Install For Windows
+	Log 	%{USERPROFILE}
+	Log 	%{APPDATA}
+
+	Directory Should Exist 	%{APPDATA} 		APPDATA Directory not found
+	Directory Should Exist 	%{APPDATA}${/}Microsoft 		Microsoft Directory not found
+	Directory Should Exist 	%{APPDATA}${/}Microsoft${/}Windows 		Windows Directory not found
+	Directory Should Exist 	%{APPDATA}${/}Microsoft${/}Windows${/}Start Menu 		Start Menu Directory not found
+	File Should Exist 	%{APPDATA}${/}Microsoft${/}Windows${/}Start Menu${/}${dispname}.lnk 		Shortcut File not found
+
+
+Check Icon Install For Ubuntu
+	Log 	%{HOME}
+	# /home/dave/.local/share/applications/rfswarm-manager.desktop
+	${Status}= 	Run Keyword And Return Status 	File Should Exist 	%{HOME}${/}.local${/}share${/}applications${/}${projname}.desktop
+	IF 	${Status}
+		${pathprefix}= 		Set Variable    %{HOME}${/}.local${/}share
+	ELSE
+		${pathprefix}= 		Set Variable    ${/}usr${/}share
+	END
+	File Should Exist 	${pathprefix}${/}applications${/}${projname}.desktop 		Desktop File not found
+
+	File Should Exist 	${pathprefix}${/}icons${/}hicolor${/}128x128${/}apps${/}${projname}.png 		Icon File not found

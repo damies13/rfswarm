@@ -16,6 +16,7 @@ import csv
 import errno
 import glob
 import hashlib
+import importlib.metadata
 import inspect
 import ipaddress
 import json
@@ -25,6 +26,7 @@ import os
 import platform
 import random
 import re
+import shutil
 import signal
 import socket
 import sqlite3
@@ -493,7 +495,8 @@ class RFSwarmBase:
 	run_paused = False
 	run_threads: Any = {}
 	total_robots = 0
-	robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}, "Start": 0}
+	robot_schedule_template = {"RunName": "", "Agents": {}, "Scripts": {}, "Start": 0}
+	robot_schedule = robot_schedule_template
 	envvars: Any = {}
 	agentserver = None
 	agenthttpserver = None
@@ -2383,6 +2386,7 @@ class RFSwarmCore:
 		parser.add_argument('-d', '--dir', help='Results directory')
 		parser.add_argument('-e', '--ipaddress', help='IP Address to bind the server to')
 		parser.add_argument('-p', '--port', help='Port number to bind the server to')
+		parser.add_argument('-c', '--create', help='ICON : Create application icon / shortcut')
 		base.args = parser.parse_args()
 
 		base.debugmsg(6, "base.args: ", base.args)
@@ -2391,6 +2395,13 @@ class RFSwarmCore:
 			base.debuglvl = int(base.args.debug)
 
 		if base.args.version:
+			exit()
+
+		if base.args.create:
+			if base.args.create.upper() in ["ICON", "ICONS"]:
+				self.create_icons()
+			else:
+				base.debugmsg(0, "create with option ", base.args.create.upper(), "not supported.")
 			exit()
 
 		if base.args.starttime:
@@ -2714,6 +2725,266 @@ class RFSwarmCore:
 			except Exception as e:
 				base.debugmsg(3, "Failed to exit with error:", e)
 				os._exit(1)
+
+	def create_icons(self):
+		base.debugmsg(0, "Creating application icons for RFSwarm Manager")
+		appname = "RFSwarm Manager"
+		namelst = appname.split()
+		base.debugmsg(6, "namelst:", namelst)
+		projname = "-".join(namelst).lower()
+		base.debugmsg(6, "projname:", projname)
+		pipdata = importlib.metadata.distribution(projname)
+		# print("files:", pipdata.files)
+		# print("file0:", pipdata.files[0])
+		manager_executable = os.path.abspath(str(pipdata.locate_file(pipdata.files[0])))
+		base.debugmsg(5, "manager_executable:", manager_executable)
+
+		script_dir = os.path.dirname(os.path.abspath(__file__))
+		base.debugmsg(5, "script_dir:", script_dir)
+		icon_dir = os.path.join(pipdata.locate_file('rfswarm_manager'), "icons")
+		base.debugmsg(5, "icon_dir:", icon_dir)
+
+		if platform.system() == 'Linux':
+			fileprefix = "~/.local/share"
+			if os.access("/usr/share", os.W_OK):
+				try:
+					base.ensuredir("/usr/share/applications")
+					directoryfilename = os.path.join("/usr/share/applications", "rfswarm.directory")
+					directorydata = ["test"]
+					with open(directoryfilename, 'w') as df:
+						df.writelines(directorydata)
+					os.remove(directoryfilename)
+					fileprefix = "/usr/share"
+				except Exception:
+					pass
+
+			fileprefix = os.path.expanduser(fileprefix)
+
+			# base.debugmsg(5, "Create .directory file")
+			# directorydata = []
+			# directorydata.append('[Desktop Entry]\n')
+			# directorydata.append('Type=Directory\n')
+			# directorydata.append('Name=RFSwarm\n')
+			# directorydata.append('Icon=rfswarm-logo\n')
+			#
+			# directoryfilename = os.path.join(fileprefix, "desktop-directories", "rfswarm.directory")
+			# directorydir = os.path.dirname(directoryfilename)
+			# base.ensuredir(directorydir)
+			#
+			# base.debugmsg(5, "directoryfilename:", directoryfilename)
+			# with open(directoryfilename, 'w') as df:
+			# 	df.writelines(directorydata)
+			#
+			# directoryfilename = os.path.join(fileprefix, "applications", "rfswarm.directory")
+			# directorydir = os.path.dirname(directoryfilename)
+			# base.ensuredir(directorydir)
+			# base.debugmsg(5, "directoryfilename:", directoryfilename)
+			# with open(directoryfilename, 'w') as df:
+			# 	df.writelines(directorydata)
+
+			base.debugmsg(5, "Create .desktop file")
+			desktopdata = []
+			desktopdata.append('[Desktop Entry]\n')
+			desktopdata.append('Name=' + appname + '\n')
+			desktopdata.append('Exec=' + manager_executable + '\n')
+			desktopdata.append('Terminal=false\n')
+			desktopdata.append('Type=Application\n')
+			desktopdata.append('Icon=' + projname + '\n')
+			desktopdata.append('Categories=RFSwarm;Development;\n')
+			desktopdata.append('Keywords=rfswarm;manager;\n')
+			# desktopdata.append('\n')
+
+			dektopfilename = os.path.join(fileprefix, "applications", projname + ".desktop")
+			dektopdir = os.path.dirname(dektopfilename)
+			base.ensuredir(dektopdir)
+
+			base.debugmsg(5, "dektopfilename:", dektopfilename)
+			with open(dektopfilename, 'w') as df:
+				df.writelines(desktopdata)
+
+			base.debugmsg(5, "Copy icons")
+			# /usr/share/icons/hicolor/128x128/apps/
+			# 	1024x1024  128x128  16x16  192x192  22x22  24x24  256x256  32x32  36x36  42x42  48x48  512x512  64x64  72x72  8x8  96x96
+			# or
+			#  ~/.local/share/icons/hicolor/256x256/apps/
+			src_iconx128 = os.path.join(icon_dir, projname + "-128.png")
+			base.debugmsg(5, "src_iconx128:", src_iconx128)
+			dst_iconx128 = os.path.join(fileprefix, "icons", "hicolor", "128x128", "apps", projname + ".png")
+			dst_icondir = os.path.dirname(dst_iconx128)
+			base.ensuredir(dst_icondir)
+			base.debugmsg(5, "dst_iconx128:", dst_iconx128)
+			shutil.copy(src_iconx128, dst_iconx128)
+
+			src_iconx128 = os.path.join(icon_dir, "rfswarm-logo-128.png")
+			base.debugmsg(5, "src_iconx128:", src_iconx128)
+			dst_iconx128 = os.path.join(fileprefix, "icons", "hicolor", "128x128", "apps", "rfswarm-logo.png")
+			base.debugmsg(5, "dst_iconx128:", dst_iconx128)
+			shutil.copy(src_iconx128, dst_iconx128)
+
+		if platform.system() == 'Darwin':
+			base.debugmsg(5, "Create folder structure in /Applications")
+
+			src_iconx1024 = os.path.join(icon_dir, projname + "-1024.png")
+
+			self.create_macos_app_bundle(appname, pipdata.version, manager_executable, src_iconx1024)
+
+		if platform.system() == 'Windows':
+			base.debugmsg(5, "Create Startmenu shorcuts")
+			roam_appdata = os.environ["APPDATA"]
+			scutpath = os.path.join(roam_appdata, "Microsoft", "Windows", "Start Menu", appname + ".lnk")
+			# targetpath = "c:\\Users\\Dave\\AppData\\Local\\Programs\\Python\\Python311\\Scripts\\rfswarm.exe"
+			# iconpath = "c:\\Users\\Dave\\AppData\\Local\\Programs\\Python\\Python311\\Lib\site-packages\\rfswarm_manager\\icons\\rfswarm-manager-128.ico"
+			src_iconx128 = os.path.join(icon_dir, projname + "-128.ico")
+
+			self.create_windows_shortcut(scutpath, manager_executable, src_iconx128, "Performance testing with robot test cases", True)
+
+	def create_windows_shortcut(self, scutpath, targetpath, iconpath, desc, minimised=False):
+		pslst = []
+
+		directorydir = os.path.dirname(scutpath)
+		base.ensuredir(directorydir)
+
+		pslst.append("$wshshell = New-Object -COMObject wscript.shell")
+		pslst.append('$scut = $wshshell.CreateShortcut("""' + scutpath + '""")')
+		pslst.append('$scut.TargetPath = """' + targetpath + '"""')
+		pslst.append('$scut.IconLocation = """' + iconpath + '"""')
+		if minimised:
+			pslst.append("$scut.WindowStyle = 7")
+		pslst.append("$scut.Description = '" + desc + "'")
+		pslst.append("$scut.Save()")
+
+		# psscript = '\n'.join(pslst)
+		psscript = '; '.join(pslst)
+		base.debugmsg(6, "psscript:", psscript)
+
+		response = os.popen('powershell.exe -command ' + psscript).read()
+
+		base.debugmsg(6, "response:", response)
+
+	def create_macos_app_bundle(self, name, version, exesrc, icosrc):
+
+		appspath = "~/Applications"
+		if os.access("/Applications", os.W_OK):
+			appspath = "/Applications"
+
+		appspath = os.path.expanduser(appspath)
+
+		# https://stackoverflow.com/questions/7404792/how-to-create-mac-application-bundle-for-python-script-via-python
+
+		apppath = os.path.join(appspath, name + ".app")
+		MacOSFolder = os.path.join(apppath, "Contents", "MacOS")
+		base.ensuredir(MacOSFolder)
+
+		# need to create the icon file:
+		# https://stackoverflow.com/questions/646671/how-do-i-set-the-icon-for-my-applications-mac-os-x-app-bundle
+		namelst = name.split()
+		base.debugmsg(6, "namelst:", namelst)
+		projname = "-".join(namelst).lower()
+		base.debugmsg(6, "projname:", projname)
+		signature = "RFS{0}".format(namelst[1].upper())
+		base.debugmsg(6, "signature:", signature)
+
+		ResourcesFolder = os.path.join(apppath, "Contents", "Resources")
+		iconset = os.path.join(ResourcesFolder, projname + ".iconset")
+		icnsfile = os.path.join(ResourcesFolder, projname + ".icns")
+		base.ensuredir(iconset)
+
+		# Normal screen icons
+		base.debugmsg(6, "Normal screen icons")
+		for size in [16, 32, 64, 128, 256, 512]:
+			cmd = "sips -z {0} {0} {1} --out '{2}/icon_{0}x{0}.png'".format(size, icosrc, iconset)
+			base.debugmsg(6, "cmd:", cmd)
+			response = os.popen(cmd).read()
+			base.debugmsg(6, "response:", response)
+
+		# Retina display icons
+		base.debugmsg(6, "Retina display icons")
+		for size in [32, 64, 128, 256, 512, 1024]:
+			cmd = "sips -z {0} {0} {1} --out '{2}/icon_{3}x{3}x2.png'".format(size, icosrc, iconset, int(size / 2))
+			base.debugmsg(6, "cmd:", cmd)
+			response = os.popen(cmd).read()
+			base.debugmsg(6, "response:", response)
+
+		# Make a multi-resolution Icon
+		base.debugmsg(6, "Make a multi-resolution Icon")
+		cmd = "iconutil -c icns -o '{0}' '{1}'".format(icnsfile, iconset)
+		base.debugmsg(6, "cmd:", cmd)
+		response = os.popen(cmd).read()
+		base.debugmsg(6, "response:", response)
+
+		#  create apppath + "/Contents/Info.plist"
+		bundleName = name
+		bundleIdentifier = "org.rfswarm." + projname
+
+		# https://stackoverflow.com/questions/1596945/building-osx-app-bundle
+		# Found 2 issues:
+		# 	- <xml and <plist wasn't closed with > and xml was missing encoding
+		# 	- APPL???? --> RFS<SIGNATURE_NAME>
+
+		Infoplist = os.path.join(apppath, "Contents", "Info.plist")
+		with open(Infoplist, "w") as f:
+			f.write("""<?xml version="1.0" encoding="UTF-8"?>
+			<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+			<plist version="1.0">
+			<dict>
+				<key>CFBundleDevelopmentRegion</key>
+				<string>English</string>
+				<key>CFBundleExecutable</key>
+				<string>%s</string>
+				<key>CFBundleGetInfoString</key>
+				<string>%s</string>
+				<key>CFBundleIconFile</key>
+				<string>%s.icns</string>
+				<key>CFBundleIdentifier</key>
+				<string>%s</string>
+				<key>CFBundleInfoDictionaryVersion</key>
+				<string>6.0</string>
+				<key>CFBundleName</key>
+				<string>%s</string>
+				<key>CFBundlePackageType</key>
+				<string>APPL</string>
+				<key>CFBundleShortVersionString</key>
+				<string>%s</string>
+				<key>CFBundleSignature</key>
+				<string>%s</string>
+				<key>CFBundleVersion</key>
+				<string>%s</string>
+				<key>NSAppleScriptEnabled</key>
+				<string>YES</string>
+				<key>NSMainNibFile</key>
+				<string>MainMenu</string>
+				<key>NSPrincipalClass</key>
+				<string>NSApplication</string>
+			</dict>
+			</plist>
+			""" % (projname, bundleName + " " + version, projname, bundleIdentifier, bundleName, version, signature, version))
+			f.close()
+
+		# create apppath + "/Contents/PkgInfo"
+		PkgInfo = os.path.join(apppath, "Contents", "PkgInfo")
+		with open(PkgInfo, "w") as f:
+			f.write("APPL%s" % signature)
+			f.close()
+
+		# apppath + "/Contents/MacOS/main.py"
+		execbundle = os.path.join(apppath, "Contents", "MacOS", projname)
+		if os.path.exists(execbundle):
+			os.remove(execbundle)
+		os.symlink(exesrc, execbundle)
+
+		# touch '/Applications/RFSwarm Manager.app' to update .app icon
+		cmd = "touch '{0}'".format(apppath)
+		base.debugmsg(6, "cmd:", cmd)
+		response = os.popen(cmd).read()
+		base.debugmsg(6, "response:", response)
+
+		# # Try re-registering your application with Launch Services:
+		# # /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f /Applications/MyTool.app
+		# lsregister = "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+		# cmd = "{0} -f '{1}'".format(lsregister, apppath)
+		# base.debugmsg(6, "cmd:", cmd)
+		# response = os.popen(cmd).read()
+		# base.debugmsg(6, "response:", response)
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -3096,7 +3367,7 @@ class RFSwarmCore:
 		base.run_paused = False
 		base.MetricIDs = {}
 
-		base.robot_schedule = {"RunName": "", "Agents": {}, "Scripts": {}}
+		base.robot_schedule = base.robot_schedule_template
 
 		warnings = self.Pre_Run_Checks()
 		if len(warnings) > 0:
@@ -3301,7 +3572,7 @@ class RFSwarmCore:
 
 							if base.run_start < 1:
 								base.run_start = int(time.time())  # time now
-								base.robot_schedule = {}
+								base.robot_schedule = base.robot_schedule_template
 								base.robot_schedule["RunName"] = base.run_name
 								base.robot_schedule["Agents"] = {}
 								base.robot_schedule["Scripts"] = {}
@@ -3687,7 +3958,9 @@ class RFSwarmCore:
 
 class RFSwarmGUI(tk.Frame):
 	# titleprefix = 'Robot Framework Swarm'
-	titleprefix = 'rfswarm'
+	titleprefix = 'RFSwarm'
+
+	icon = None
 
 	# GUI = None
 	tabs = None
@@ -3742,7 +4015,7 @@ class RFSwarmGUI(tk.Frame):
 
 	def __init__(self, master=None):
 
-		self.root = tk.Tk()
+		self.root = tk.Tk(className="RFSwarm Manager")
 		self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
 		tk.Frame.__init__(self, self.root)
 		# self.grid(sticky="nsew")
@@ -3773,6 +4046,7 @@ class RFSwarmGUI(tk.Frame):
 		# base.debugmsg(5, "bgclr", bgclr)
 		# https://github.com/tcltk/tk/blob/main/macosx/README
 
+		self.set_app_icon()
 		self.load_icons()
 
 		base.debugmsg(6, "BuildUI")
@@ -3800,6 +4074,14 @@ class RFSwarmGUI(tk.Frame):
 		self.icoAbort = self.get_icon("Abort")
 		self.icoAborted = self.get_icon("Aborted")
 		self.icoRefresh = self.get_icon("Refresh")
+
+	def set_app_icon(self):
+		script_dir = os.path.dirname(os.path.abspath(__file__))
+		icon_dir = os.path.join(script_dir, "icons")
+		base.debugmsg(5, "icon_dir:", icon_dir)
+		icon_file = os.path.join(icon_dir, "rfswarm-manager-128.png")
+		self.icon = tk.PhotoImage(file=icon_file)
+		self.root.wm_iconphoto(False, self.icon)
 
 	def on_closing(self, _event=None):
 
@@ -4223,6 +4505,8 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(5, "Open Graph Window - settings:", settings)
 
 		grphWindow = tk.Toplevel(self.root)
+		grphWindow.wm_iconphoto(False, self.icon)
+
 		grphWindow.saveready = False
 		# grphWindow.config(bg="pink")
 		grphWindow.columnconfigure(0, weight=1)
@@ -5395,6 +5679,7 @@ class RFSwarmGUI(tk.Frame):
 	def setings_open(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
 		setingsWindow = tk.Toplevel(self.root)
+		setingsWindow.wm_iconphoto(False, self.icon)
 		# setingsWindow.config(bg="pink")
 		setingsWindow.columnconfigure(0, weight=1)
 		setingsWindow.rowconfigure(1, weight=1)
@@ -5984,6 +6269,7 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(5, "run_starttime:", base.run_starttime)
 
 		schedWindow = tk.Toplevel(self.root)
+		schedWindow.wm_iconphoto(False, self.icon)
 		# schedWindow.config(bg="pink")
 		schedWindow.columnconfigure(0, weight=1)
 		schedWindow.rowconfigure(1, weight=1)
@@ -6802,6 +7088,7 @@ class RFSwarmGUI(tk.Frame):
 	def sr_row_settings(self, r):
 		base.debugmsg(5, "r:", r)
 		stgsWindow = tk.Toplevel(self.root)
+		stgsWindow.wm_iconphoto(False, self.icon)
 		# self.grid(sticky="news", ipadx=0, pady=0)
 		# self.root.resizable(False, False)		# this didn't work as expected, I expected the dialog to not be resizable instaed it stopped the main window from being resizable
 		# self.root.resizable(True, True)

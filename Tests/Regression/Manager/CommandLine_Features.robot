@@ -1,6 +1,8 @@
 *** Settings ***
 Resource 	CommandLine_Common.robot
 
+Suite Setup 	Set Platform
+
 *** Test Cases ***
 Environment Variable Substitution in Robot/Resource files
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #165
@@ -19,7 +21,7 @@ Environment Variable Substitution in Robot/Resource files
 
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#165${/}Issue-#165.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 	Stop Agent
@@ -50,7 +52,7 @@ Default Result Name Method
 	Run Agent
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 
@@ -84,7 +86,7 @@ Documentation Result Name Method - Tests Defaults
 	Run Agent
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}documentation_td.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 
@@ -116,7 +118,7 @@ Info Result Name Method - Tests Defaults
 	Run Agent
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}info_td.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 
@@ -147,7 +149,7 @@ Keyword Only Result Name Method - Tests Defaults
 	Run Agent
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keyword_td.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 
@@ -181,7 +183,7 @@ Keyword and Args Result Name Method - Tests Defaults
 	Run Agent
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keywordargs_td.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 
@@ -215,7 +217,7 @@ Default Result Name Method - Tests Row
 	Run Agent
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default_tr.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 
@@ -248,7 +250,7 @@ Documentation Result Name Method - Tests Row
 	Run Agent
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}documentation_tr.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 
@@ -280,7 +282,7 @@ Info Result Name Method - Tests Row
 	Run Agent
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}info_tr.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 
@@ -311,7 +313,7 @@ Keyword Only Result Name Method - Tests Row
 	Run Agent
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keyword_tr.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 
@@ -345,7 +347,7 @@ Keyword and Args Result Name Method - Tests Row
 	Run Agent
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keywordargs_tr.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 
@@ -373,3 +375,13 @@ Keyword and Args Result Name Method - Tests Row
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
 	...    Stop Manager
+
+Install Application Icon or Desktop Shortcut
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
+
+	@{mngr_options}= 	Create List 	-g 	6 	-c 	ICON
+	Run Manager CLI 	${mngr_options}
+	Sleep    2
+	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	Check Icon Install
