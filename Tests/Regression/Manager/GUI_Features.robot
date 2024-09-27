@@ -3003,6 +3003,7 @@ Verify That the Start Time And Time Remaining Are Removed From Plan Screen When 
 	Click Button	runschedule
 	Click RadioBtn	default
 	Click Dialog Button 	ok
+	Sleep 	1
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${10}
 	Run Keyword If	${status}	Fail	msg=Manager didn't unset a "Start Time" for scheduled start after disabling it.
