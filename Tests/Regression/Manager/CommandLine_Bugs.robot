@@ -259,7 +259,8 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 	IF 	not ${running}
 		Fail	msg=Manager is not running!
 	END
-	Sleep    1
+	Wait Until Created  	${global_path}${/}RFSwarmManager.ini
+	Sleep    0.5
 	${result} = 	Terminate Process		${process_manager}
 	${running}= 	Is Process Running		${process_manager}
 	IF 	${running}
