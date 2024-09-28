@@ -2793,8 +2793,12 @@ Verify Result Name - Test Row
 Check Application Icon or Desktop Shortcut in GUI
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
 
-		# ${result}= 	Run 	${cmd_agent} -c ICON
-		# Log 		${result}
+	# ${result}= 	Run 	${cmd_agent} -c ICON
+	# Log 		${result}
+
+	${result}= 	Run 	${cmd_manager} -c ICON
+	Log 		${result}
+	Sleep    1
 
 	${result}= 	Run 	${cmd_manager} -g 6 -c ICON
 	Log 		${result}
