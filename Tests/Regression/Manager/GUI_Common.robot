@@ -1539,21 +1539,21 @@ Navigate to and check Desktop Icon For Ubuntu
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Move To 		${coordinates}
-	Sleep 	0.5
-	Take A Screenshot
 	Click Image		${img}
-	Sleep 	0.5
-	Take A Screenshot
+	# Sleep 	0.5
+	# Take A Screenshot
 
 	# Navigate Menu
 	# lxqt_programming_menu.png
 	${img}=	Set Variable		${platform}_lxqt_programming_menu.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
+	Move To 		${coordinates}
+	Sleep 	0.5
 	Take A Screenshot
 	Click Image		${img}
-	# Sleep 	1
-	# Take A Screenshot
+	Sleep 	1
+	Take A Screenshot
 
 	# Check for Icon
 	# ubuntu_lxqt_rfswarm_manager_menu.png
