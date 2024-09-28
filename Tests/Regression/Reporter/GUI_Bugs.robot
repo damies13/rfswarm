@@ -313,7 +313,9 @@ Auto Generate HTML Report With GUI Using Template
 	Should Contain 	${html_content} 	<h1>4 Issue-#132</h1>
 	Should Contain 	${html_content} 	<div class="body"><p>This is a test for Issue-#132</p></div>
 
-	[Teardown] 	Run Keywords 	Remove File 	${resultfolder}${/}${resultdata}.html	AND 	Close GUI
+	[Teardown] 	Run Keywords
+	...    Close GUI	AND
+	...    Move File 	${resultfolder}${/}${resultdata}.html 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.html
 
 Auto Generate DOCX Report With GUI Using Template
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #132 	DOCX
@@ -334,7 +336,9 @@ Auto Generate DOCX Report With GUI Using Template
 
 	File Should Not Be Empty 	${docx_files}[0]
 
-	[Teardown] 	Run Keywords 	Remove File 	${resultfolder}${/}${resultdata}.docx	AND 	Close GUI
+	[Teardown] 	Run Keywords
+	...    Close GUI	AND
+	...    Move File 	${resultfolder}${/}${resultdata}.docx 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.docx
 
 Auto Generate XLSX Report With GUI Using Template
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #132 	XLSX
@@ -355,5 +359,7 @@ Auto Generate XLSX Report With GUI Using Template
 
 	File Should Not Be Empty 	${xlsx_files}[0]
 
-	[Teardown] 	Run Keywords 	Remove File 	${resultfolder}${/}${resultdata}.docx	AND 	Close GUI
+	[Teardown] 	Run Keywords
+	...    Close GUI	AND
+	...    Move File 	${resultfolder}${/}${resultdata}.xlsx 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.xlsx
 

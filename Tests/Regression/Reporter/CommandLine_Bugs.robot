@@ -48,7 +48,7 @@ Auto Generate HTML Report Without GUI Using Template
 	Should Contain 	${html_content} 	<h1>8 Issue-#132</h1>
 	Should Contain 	${html_content} 	<div class="body"><p>This is a test for Issue-#132</p></div>
 
-	[Teardown] 	Remove File 	${resultfolder}${/}${resultdata}.html
+	[Teardown] 	Move File 	${resultfolder}${/}${resultdata}.html 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.html
 
 Auto Generate DOCX Report Without GUI Using Template
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	Issue #132 	DOCX
@@ -73,7 +73,7 @@ Auto Generate DOCX Report Without GUI Using Template
 	Should Exist	${resultfolder}${/}${resultdata}.docx
 	File Should Not Be Empty 	${resultfolder}${/}${resultdata}.docx
 
-	[Teardown] 	Remove File 	${resultfolder}${/}${resultdata}.docx
+	[Teardown] 	Move File 	${resultfolder}${/}${resultdata}.docx 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.docx
 
 Auto Generate XLSX Report Without GUI Using Template
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	Issue #132 	XLSX
@@ -98,4 +98,5 @@ Auto Generate XLSX Report Without GUI Using Template
 	Should Exist	${resultfolder}${/}${resultdata}.xlsx
 	File Should Not Be Empty 	${resultfolder}${/}${resultdata}.xlsx
 
-	[Teardown] 	Remove File 	${resultfolder}${/}${resultdata}.xlsx
+	[Teardown] 	Move File 	${resultfolder}${/}${resultdata}.xlsx 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.xlsx
+
