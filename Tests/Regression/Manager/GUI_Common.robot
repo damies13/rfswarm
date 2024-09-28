@@ -395,6 +395,18 @@ Click CheckBox
 	Sleep 	0.1
 	# Take A Screenshot
 
+Click RadioBtn
+	[Arguments]		${btnname}
+	${btnnamel}= 	Convert To Lower Case 	${btnname}
+	${img}=	Set Variable		${platform}_radiobtn_${btnnamel}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	1
+	Take A Screenshot
+
 Press ${key} ${n} Times
 	[Documentation]	Provide full name. For example: Key.tab
 	Sleep	1
@@ -1356,7 +1368,7 @@ Verify Test Result Directory Name
 	${current_date}=	Convert Date	${current_date}		result_format=%Y%m%d_%H%M%S
 	${expected_time_to_substract}=	Convert Date	${current_date}		date_format=%Y%m%d_%H%M%S
 	${test_run_time_to_substract}=	Convert Date	${run_dir_name_fragmented}[0]_${run_dir_name_fragmented}[1]		date_format=%Y%m%d_%H%M%S
-	${time_diff}		Subtract Date From Date	${current_date}	${test_run_time_to_substract}
+	${time_diff}		Subtract Date From Date	${current_date} 	${test_run_time_to_substract}
 	Log To Console	Time diff: ${time_diff}
 	Should Be True	${time_diff} >= 0 and ${time_diff} <= 3
 	...    msg=Result directory name has incorrect date: expected "${current_date}_${scenario_name}", actual: "${result_dir_name}". There should be little or no difference.
