@@ -2796,13 +2796,9 @@ Check Application Icon or Desktop Shortcut in GUI
 	# ${result}= 	Run 	${cmd_agent} -c ICON
 	# Log 		${result}
 
-	${result}= 	Run 	${cmd_manager} -c ICON
-	Log 		${result}
-	Sleep    1
-
 	${result}= 	Run 	${cmd_manager} -g 6 -c ICON
 	Log 		${result}
-	Sleep    1
+	Sleep    5
 
 	Navigate to and check Desktop Icon
 

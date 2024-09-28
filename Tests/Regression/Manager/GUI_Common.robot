@@ -1537,16 +1537,19 @@ Navigate to and check Desktop Icon For Ubuntu
 	# Open Menu
 	${img}=	Set Variable		${platform}_lxqt_menu.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
-	Take A Screenshot
 	@{coordinates}= 	Locate		${img}
+	Move To 		${coordinates}
+	Sleep 	0.5
+	Take A Screenshot
 	Click Image		${img}
-	# Sleep 	0.5
-	# Take A Screenshot
+	Sleep 	0.5
+	Take A Screenshot
 
 	# Navigate Menu
 	# lxqt_programming_menu.png
 	${img}=	Set Variable		${platform}_lxqt_programming_menu.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
 	Take A Screenshot
 	Click Image		${img}
 	# Sleep 	1
