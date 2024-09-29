@@ -2248,6 +2248,75 @@ Check If Test Scenario Run Will Stop Gradually
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove File		${global_path}${/}example.robot
 
+Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #41
+	[Setup]	Run Keywords
+	...    Set INI Window Size		1200	600								AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]
+
+	${scenario_path}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#41${/}Issue-#41.rfs
+	VAR 	@{mngr_options} 	-s 	${scenario_path}	-d 	${results_dir}
+
+	Open Manager GUI	${mngr_options}
+	Open Agent
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Click Button	runplay
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${360}
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+
+	Check If The Agent Is Ready
+	Log To Console 	Running scenario one more time to test if iteration counter get reset.
+	Click Tab	Plan
+	Click Button	runplay
+	Sleep	10
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${360}
+	Take A Screenshot
+	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Check If The Agent Is Ready
+
+	Log To Console 	Checking second run Database.
+	${dbfile}= 	Find Result DB 		result_pattern=*_Issue-#41*
+	${db_iterations}= 	Query Result DB 	${dbfile}
+	...    SELECT DISTINCT MetricValue FROM MetricData WHERE SecondaryMetric='iteration' ORDER BY MetricValue
+	Log 	Found iterations in MetricData after scenario second run: ${db_iterations}	console=${True}
+
+	${first_iter}= 		Query Result DB 	${dbfile}	SELECT count(*) FROM Results WHERE iteration='1'
+	${second_iter}= 	Query Result DB 	${dbfile}	SELECT count(*) FROM Results WHERE iteration='2'
+	${third_iter}= 		Query Result DB 	${dbfile}	SELECT count(*) FROM Results WHERE iteration='3'
+	Should Be Equal 	${first_iter}[0][0] 	${3}
+	Should Be Equal 	${second_iter}[0][0] 	${3}
+	Should Be Equal 	${third_iter}[0][0] 	${3}
+
+	Log To Console 	Checking second run logs.
+	@{run_result_dirs}= 	List Directories In Directory	${results_dir}	pattern=*_Issue-#41*	absolute=${True}
+	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
+	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[-1]	absolute=${True}
+	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
+
+	VAR 	@{iterations}
+	FOR  ${log}  IN  @{run_logs}
+		@{splitted_log}= 	Split String	${log}	separator=_
+		VAR 	${iteration_number} 	${splitted_log}[-2]
+		Append To List	${iterations}	${iteration_number}
+	END
+	${iterations_set}=	Evaluate	set(${iterations})
+	Log 	Found iterations in logs after scenario second run: ${iterations_set}	console=${True}
+
+	${first_iter} 	Count Values In List	${iterations}	1
+	${second_iter} 	Count Values In List	${iterations}	2
+	${third_iter} 	Count Values In List	${iterations}	3
+	Should Be Equal 	${first_iter} 	${3}
+	Should Be Equal 	${second_iter} 	${3}
+	Should Be Equal 	${third_iter} 	${3}
+
+	[Teardown]	Run Keywords
+	...    Close Manager GUI ${platform}	AND
+	...    Stop Agent
+
 Verify the Robot Count Reduces When Stop Agent While Test Is Running
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #57	Issue #269
 	[Setup]	Run Keywords
