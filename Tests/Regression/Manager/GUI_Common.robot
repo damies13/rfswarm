@@ -1,6 +1,7 @@
 *** Settings ***
 Library 	OperatingSystem
 Library 	Process
+Library 	DatabaseLibrary
 Library 	String
 Library		Collections
 Library		DateTime
@@ -1405,6 +1406,30 @@ Verify Generated Run Result Files
 	${len}=		Get Length	${logs_file_names}
 	Log To Console	Number of files in the Logs directory: ${len}
 	Should Be True	${len} >= 20	msg=Number of files in the Logs directory is incorrect: should be at least 20, actual: "${len}".
+
+Find Result DB
+	[Arguments] 	${result_pattern}=*_*
+	# ${fols}= 	List Directory 	${results_dir}
+	# Log to console 	${fols}
+	${fols}= 	List Directory 	${results_dir} 	${result_pattern} 	absolute=True
+	Log to console 	${fols}
+	# ${files}= 	List Directory 	${fols[0]}
+	# Log to console 	${files}
+	${file}= 	List Directory 	${fols[-1]} 	*.db 	absolute=True
+	Log to console 	Result DB: ${file[-1]}
+	RETURN 	${file[-1]}
+
+Query Result DB
+	[Arguments]		${dbfile} 	${sql}
+	Log to console 	dbfile: ${dbfile}
+	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
+	# Log to console 	\${dbfile}: ${dbfile}
+	Connect To Database Using Custom Params 	sqlite3 	database="${dbfile}", isolation_level=None
+	Log to console 	sql: ${sql}
+	${result}= 	Query 	${sql}
+	Log to console 	sql result: ${result}
+	Disconnect From Database
+	RETURN 	${result}
 
 Navigate to and check Desktop Icon
 	VAR 	${projname}= 		rfswarm-manager 		scope=TEST
