@@ -1514,6 +1514,7 @@ Navigate to and check Desktop Icon For Windows
 	${img}=	Set Variable		${platform}_start_menu.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
+	Move To 		${coordinates}
 	Click Image		${img}
 	# Sleep 	1
 	# Take A Screenshot
