@@ -8798,6 +8798,12 @@ class ReporterGUI(tk.Frame):
 
 	def cs_errors(self, id):
 		base.debugmsg(9, "id:", id)
+
+		iST = base.rt_setting_get_starttime(id)
+		base.debugmsg(5, "iST:", iST)
+		iET = base.rt_setting_get_endtime(id)
+		base.debugmsg(5, "iET:", iET)
+
 		images = base.rt_errors_get_images(id)
 		base.debugmsg(5, "images:", images)
 		grouprn = base.rt_errors_get_group_rn(id)
@@ -8816,6 +8822,31 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["LFrame"].columnconfigure(99, weight=1)
 		rownum = 0
 
+		# 		start time
+		rownum += 1
+		self.contentdata[id]["lblST"] = ttk.Label(self.contentdata[id]["LFrame"], text="Start Time:")
+		self.contentdata[id]["lblST"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["strST"] = tk.StringVar()
+		fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
+		self.contentdata[id]["strST"].set(fST)
+
+		self.contentdata[id]["eST"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["strST"])
+		self.contentdata[id]["eST"].grid(column=1, row=rownum, sticky="nsew")
+
+		# 		end time
+		rownum += 1
+		self.contentdata[id]["lblET"] = ttk.Label(self.contentdata[id]["LFrame"], text="End Time:")
+		self.contentdata[id]["lblET"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["strET"] = tk.StringVar()
+		fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
+		self.contentdata[id]["strET"].set(fET)
+
+		self.contentdata[id]["eET"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["strET"])
+		self.contentdata[id]["eET"].grid(column=1, row=rownum, sticky="nsew")
+
+		# 		Show Screenshots
 		rownum += 1
 		self.contentdata[id]["lblImages"] = ttk.Label(self.contentdata[id]["LFrame"], text="Show screenshots:")
 		self.contentdata[id]["lblImages"].grid(column=0, row=rownum, sticky="nsew")
@@ -8825,6 +8856,7 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["intImages"].set(images)
 		self.contentdata[id]["chkImages"].grid(column=1, row=rownum, sticky="nsew")
 
+		# 		Group by result name
 		rownum += 1
 		self.contentdata[id]["lblGroupRN"] = ttk.Label(self.contentdata[id]["LFrame"], text="Group by result name:")
 		self.contentdata[id]["lblGroupRN"].grid(column=0, row=rownum, sticky="nsew")
@@ -8834,6 +8866,7 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["intGroupRN"].set(grouprn)
 		self.contentdata[id]["chkGroupRN"].grid(column=1, row=rownum, sticky="nsew")
 
+		# 		Group by error text
 		rownum += 1
 		self.contentdata[id]["lblGroupET"] = ttk.Label(self.contentdata[id]["LFrame"], text="Group by error text:")
 		self.contentdata[id]["lblGroupET"].grid(column=0, row=rownum, sticky="nsew")
