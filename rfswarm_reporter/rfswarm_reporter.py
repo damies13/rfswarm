@@ -902,6 +902,35 @@ class ReporterBase():
 		base.report_item_set_changed(id)
 		base.report_save()
 
+
+	#
+	# Report Sections values
+	#
+	def report_item_get_value(self, id, name):
+		base.debugmsg(9, "id:", id, "name:", name)
+		if id in base.report and name in base.report[id]:
+			return base.whitespace_get_ini_value(base.report[id][name])
+		else:
+			return None
+
+	def report_item_set_value(self, id, name, value):
+		base.debugmsg(9, "id:", id, "name:", name, "	value:", value)
+		base.report[id][name] = base.whitespace_set_ini_value(value)
+		# base.report_item_set_changed("Report")
+		base.report_save()
+		return 1
+
+	def report_item__get_int(self, id, name):
+		value = base.report_item_get_value(id, name)
+		if value is None:
+			return -1
+		else:
+			return int(value)
+
+	def report_item__set_int(self, id, name, value):
+		base.report_item_set_value(id, name, str(value))
+		return 1
+
 	#
 	# Report Item Type: contents
 	#
@@ -1805,6 +1834,24 @@ class ReporterBase():
 				base.report_save()
 				return 1
 		return 0
+
+	# 	rt_setting_get_starttime
+	def rt_setting_get_starttime(self, id):
+		# value = self.rs_setting_get_int('startoffset')
+		value = base.report_item__get_int(id, 'startoffset')
+		if value < 1:
+			return self.report_starttime()
+		else:
+			return self.report_starttime() + int(value)
+
+	def rt_setting_get_endtime(self, id):
+		# value = self.rs_setting_get_int('endoffset')
+		value = base.report_item__get_int(id, 'endoffset')
+		if value < -1:
+			return self.report_endtime()
+		else:
+			return self.report_endtime() - int(value)
+
 
 	def rt_table_get_dt(self, id):
 		base.debugmsg(9, "id:", id)
@@ -7458,6 +7505,32 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["intColours"].set(colours)
 		self.contentdata[id]["chkColours"].grid(column=1, row=rownum, sticky="nsew")
 
+		# 		start time
+		rownum += 1
+		self.contentdata[id]["lblST"] = ttk.Label(self.contentdata[id]["LFrame"], text="Start Time:")
+		self.contentdata[id]["lblST"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["strST"] = tk.StringVar()
+		iST = base.rt_setting_get_starttime(id)
+		fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
+		self.contentdata[id]["strST"].set(fST)
+
+		self.contentdata[id]["eST"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["strST"])
+		self.contentdata[id]["eST"].grid(column=1, row=rownum, sticky="nsew")
+
+		# 		end time
+		rownum += 1
+		self.contentdata[id]["lblET"] = ttk.Label(self.contentdata[id]["LFrame"], text="End Time:")
+		self.contentdata[id]["lblET"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["strET"] = tk.StringVar()
+		iET = base.rt_setting_get_endtime(id)
+		fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
+		self.contentdata[id]["strET"].set(fET)
+
+		self.contentdata[id]["eET"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["strET"])
+		self.contentdata[id]["eET"].grid(column=1, row=rownum, sticky="nsew")
+
 		rownum += 1
 		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["LFrame"], text="Data Type:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
@@ -8099,6 +8172,32 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[idr]["chkAxsEn"] = ttk.Checkbutton(self.contentdata[pid]["RFrame"], variable=self.contentdata[idr]["intAxsEn"], command=self.cs_graph_update)
 		self.contentdata[idr]["intAxsEn"].set(axisenr)
 		self.contentdata[idr]["chkAxsEn"].grid(column=1, row=rownum, sticky="nsew")
+
+		# # 		start time
+		# rownum += 1
+		# self.contentdata[id]["lblST"] = ttk.Label(self.contentdata[id]["LFrame"], text="Start Time:")
+		# self.contentdata[id]["lblST"].grid(column=0, row=rownum, sticky="nsew")
+		#
+		# self.contentdata[id]["strST"] = tk.StringVar()
+		# iST = base.rt_setting_get_starttime(id)
+		# fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
+		# self.contentdata[id]["strST"].set(fST)
+		#
+		# self.contentdata[id]["eST"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["strST"])
+		# self.contentdata[id]["eST"].grid(column=1, row=rownum, sticky="nsew")
+		#
+		# # 		end time
+		# rownum += 1
+		# self.contentdata[id]["lblET"] = ttk.Label(self.contentdata[id]["LFrame"], text="End Time:")
+		# self.contentdata[id]["lblET"].grid(column=0, row=rownum, sticky="nsew")
+		#
+		# self.contentdata[id]["strET"] = tk.StringVar()
+		# iET = base.rt_setting_get_endtime(id)
+		# fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
+		# self.contentdata[id]["strET"].set(fET)
+		#
+		# self.contentdata[id]["eET"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["strET"])
+		# self.contentdata[id]["eET"].grid(column=1, row=rownum, sticky="nsew")
 
 		rownum += 1
 		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[pid]["LFrame"], text="Data Type:")
