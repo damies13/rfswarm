@@ -8139,6 +8139,10 @@ class ReporterGUI(tk.Frame):
 	def cs_graph(self, id):
 		base.debugmsg(9, "id:", id)
 		pid, idl, idr = base.rt_graph_LR_Ids(id)
+
+		iST = base.rt_setting_get_starttime(pid)
+		iET = base.rt_setting_get_endtime(pid)
+
 		axisenl = base.rt_graph_get_axisen(idl)
 		axisenr = base.rt_graph_get_axisen(idr)
 		datatypel = base.rt_graph_get_dt(idl)
@@ -8146,6 +8150,50 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[pid]["LFrame"].columnconfigure(99, weight=1)
 		rownum = 0
 
+		# 		start time
+		rownum += 1
+		self.contentdata[pid]["lblST"] = ttk.Label(self.contentdata[pid]["LFrame"], text="Start Time:")
+		self.contentdata[pid]["lblST"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[pid]["strST"] = tk.StringVar()
+		fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
+		self.contentdata[pid]["strST"].set(fST)
+
+		self.contentdata[pid]["eST"] = ttk.Entry(self.contentdata[pid]["LFrame"], textvariable=self.contentdata[pid]["strST"])
+		self.contentdata[pid]["eST"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[pid]["eST"].bind('<Leave>', self.cs_graph_update)
+		self.contentdata[pid]["eST"].bind('<FocusOut>', self.cs_graph_update)
+
+
+		self.contentdata[pid]["lblBlank"] = ttk.Label(self.contentdata[pid]["RFrame"], text=" ")
+		self.contentdata[pid]["lblBlank"].grid(column=0, row=rownum, sticky="nsew")
+
+		# 		end time
+		rownum += 1
+		self.contentdata[pid]["lblET"] = ttk.Label(self.contentdata[pid]["LFrame"], text="End Time:")
+		self.contentdata[pid]["lblET"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[pid]["strET"] = tk.StringVar()
+		fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
+		self.contentdata[pid]["strET"].set(fET)
+
+		self.contentdata[pid]["eET"] = ttk.Entry(self.contentdata[pid]["LFrame"], textvariable=self.contentdata[pid]["strET"])
+		self.contentdata[pid]["eET"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[pid]["eET"].bind('<Leave>', self.cs_graph_update)
+		self.contentdata[pid]["eET"].bind('<FocusOut>', self.cs_graph_update)
+
+		self.contentdata[pid]["lblBlank"] = ttk.Label(self.contentdata[pid]["RFrame"], text=" ")
+		self.contentdata[pid]["lblBlank"].grid(column=0, row=rownum, sticky="nsew")
+
+		# 		blank row
+		rownum += 1
+		self.contentdata[pid]["lblBlank"] = ttk.Label(self.contentdata[pid]["LFrame"], text=" ")
+		self.contentdata[pid]["lblBlank"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[pid]["lblBlank"] = ttk.Label(self.contentdata[pid]["RFrame"], text=" ")
+		self.contentdata[pid]["lblBlank"].grid(column=0, row=rownum, sticky="nsew")
+
+		# 		Y-Axis
 		rownum += 1
 		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[pid]["LFrame"], text="Y-Axis:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
@@ -8172,32 +8220,6 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[idr]["chkAxsEn"] = ttk.Checkbutton(self.contentdata[pid]["RFrame"], variable=self.contentdata[idr]["intAxsEn"], command=self.cs_graph_update)
 		self.contentdata[idr]["intAxsEn"].set(axisenr)
 		self.contentdata[idr]["chkAxsEn"].grid(column=1, row=rownum, sticky="nsew")
-
-		# # 		start time
-		# rownum += 1
-		# self.contentdata[id]["lblST"] = ttk.Label(self.contentdata[id]["LFrame"], text="Start Time:")
-		# self.contentdata[id]["lblST"].grid(column=0, row=rownum, sticky="nsew")
-		#
-		# self.contentdata[id]["strST"] = tk.StringVar()
-		# iST = base.rt_setting_get_starttime(id)
-		# fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
-		# self.contentdata[id]["strST"].set(fST)
-		#
-		# self.contentdata[id]["eST"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["strST"])
-		# self.contentdata[id]["eST"].grid(column=1, row=rownum, sticky="nsew")
-		#
-		# # 		end time
-		# rownum += 1
-		# self.contentdata[id]["lblET"] = ttk.Label(self.contentdata[id]["LFrame"], text="End Time:")
-		# self.contentdata[id]["lblET"].grid(column=0, row=rownum, sticky="nsew")
-		#
-		# self.contentdata[id]["strET"] = tk.StringVar()
-		# iET = base.rt_setting_get_endtime(id)
-		# fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
-		# self.contentdata[id]["strET"].set(fET)
-		#
-		# self.contentdata[id]["eET"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["strET"])
-		# self.contentdata[id]["eET"].grid(column=1, row=rownum, sticky="nsew")
 
 		rownum += 1
 		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[pid]["LFrame"], text="Data Type:")
