@@ -10,7 +10,7 @@ def read_docx_file(docx_path: str) -> dict:
     """Read docx file and return dictionary."""
     doc = Document(docx_path)
 
-    doc_sections: dict[str, str] = {}
+    doc_sections: dict = {}
     current_heading = None
 
     for paragraph in doc.paragraphs:
