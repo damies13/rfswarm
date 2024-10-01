@@ -217,18 +217,6 @@ parent = TOP
 type = graph
 changed = 1727714826.2641904
 
-[FB6A07238B2L]
-datatype = Result
-changed = 1727705359.431957
-sql = SELECT floor(end_time) as 'Time' , count(result) as 'Value' , result_name as x91Namex93 FROM Results WHERE x91Namex93 NOT LIKE 'Exception in threadx37' AND end_time >= 1690522973 AND end_time <= 1690523400 GROUP by floor(end_time) , result_name , result ORDER by floor(end_time), result DESC, count(result) DESC
-metrictype = 
-filteragent = None
-filtertype = None
-primarymetric = 
-secondarymetric = 
-resulttype = TPS
-filterresult = None
-
 [FB6A07238B2R]
 datatype = None
 changed = 1727705045.599285
