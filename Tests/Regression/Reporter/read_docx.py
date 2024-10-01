@@ -1,15 +1,16 @@
-from docx import Document
-import docx.oxml.ns as ns
-from docx.oxml.shared import OxmlElement, qn
-import subprocess
 import os
 import re
+import subprocess
+
+from docx import Document
+from docx.oxml.shared import OxmlElement, qn
+
 
 def read_docx_file(docx_path: str) -> dict:
     """Read docx file and return dictionary."""
     doc = Document(docx_path)
 
-    doc_sections = {}
+    doc_sections: dict[str, str] = {}
     current_heading = None
 
     for paragraph in doc.paragraphs:
@@ -25,6 +26,7 @@ def read_docx_file(docx_path: str) -> dict:
 
     return doc_sections
 
+
 def update_docx_with_libreoffice(docx_path: str):
     """Not working currently."""
     command = [
@@ -37,10 +39,11 @@ def update_docx_with_libreoffice(docx_path: str):
     else:
         print(f"Document fields updated successfully: {docx_path}")
 
+
 def update_table_of_contents(docx_path: str):
     """Set updateFields in DOCX file to true."""
     doc = Document(docx_path)
-    
+
     settings_element = doc.settings.element
     update_fields_element = OxmlElement('w:updateFields')
     update_fields_element.set(qn('w:val'), 'true')
@@ -48,6 +51,7 @@ def update_table_of_contents(docx_path: str):
     settings_element.append(update_fields_element)
 
     doc.save(docx_path)
+
 
 def extract_images_from_docx(docx_path: str, output_folder: str) -> list:
     """
@@ -72,6 +76,7 @@ def extract_images_from_docx(docx_path: str, output_folder: str) -> list:
 
     return saved_images
 
+
 def extract_tables_from_docx(docx_path: str) -> list:
     """
     Extract all tables from DOCX one by one.
@@ -92,10 +97,10 @@ def extract_tables_from_docx(docx_path: str) -> list:
 
     return tables
 
+
 def sort_docx_images(docx_images: list) -> list:
     """Sort given list using natural sorting"""
     def natural_sort_key(filename):
         return [int(text) if text.isdigit() else text for text in re.split(r'(\d+)', filename)]
 
     return sorted(docx_images, key=natural_sort_key)
-
