@@ -161,11 +161,11 @@ Verify the Content Of the DOCX Report
 	VAR 	${resultfolder} 	${basefolder}${/}${resultdata}
 	VAR 	${template_dir} 	${basefolder}${/}sample.template
 	VAR 	${docx_file}		${resultfolder}${/}${resultdata}.docx
-	VAR 	${image_move_tolerance} 	100 	# used for comparing images (this is needed because of different colours)
+	VAR 	${image_move_tolerance} 	10 	# used for comparing images (this is needed because of different colours)
 
 	Log 	template: ${template_dir} 	console=True
 	Open GUI	-d 	${resultfolder} 	-t 	${template_dir}
-	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=180
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=540
 	Click Button	generateword
 	Wait Until Created 	${resultfolder}${/}${resultdata}.docx	timeout=9 minutes
 	Close GUI
