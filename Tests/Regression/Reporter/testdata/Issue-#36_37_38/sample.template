@@ -219,7 +219,7 @@ changed = 1727776406.4581892
 
 [FB6A07238B2L]
 datatype = Result
-changed = 1727776333.4604933
+changed = 1727785420.214303
 sql = SELECT floor(end_time) as 'Time' , count(result) as 'Value' , result_name as x91Namex93 FROM Results WHERE x91Namex93 NOT LIKE 'Exception in threadx37' AND end_time >= 1690522973 AND end_time <= 1690523400 GROUP by floor(end_time) , result_name , result ORDER by floor(end_time), result DESC, count(result) DESC
 metrictype = 
 filteragent = None
@@ -228,7 +228,7 @@ primarymetric =
 secondarymetric = 
 resulttype = TPS
 filterresult = None
-axisen = 0
+axisen = 1
 
 [FB6A07238B2R]
 datatype = None
