@@ -1840,17 +1840,17 @@ class ReporterBase():
 		# value = self.rs_setting_get_int('startoffset')
 		value = base.report_item__get_int(id, 'startoffset')
 		if value < 1:
-			return self.report_starttime()
+			return self.rs_setting_get_starttime()
 		else:
-			return self.report_starttime() + int(value)
+			return self.rs_setting_get_starttime() + int(value)
 
 	def rt_setting_get_endtime(self, id):
 		# value = self.rs_setting_get_int('endoffset')
 		value = base.report_item__get_int(id, 'endoffset')
 		if value < -1:
-			return self.report_endtime()
+			return self.rs_setting_get_endtime()
 		else:
-			return self.report_endtime() - int(value)
+			return self.rs_setting_get_endtime() - int(value)
 
 
 	def rt_table_get_dt(self, id):
@@ -6975,7 +6975,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["eHeading"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["Heading"])
 				self.contentdata[id]["eHeading"].grid(column=1, row=rownum, sticky="nsew")
 				# https://pysimplegui.readthedocs.io/en/latest/
-				self.contentdata[id]["eHeading"].bind('<Leave>', self.cs_rename_heading)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[id]["eHeading"].bind('<Leave>', self.cs_rename_heading)
 				self.contentdata[id]["eHeading"].bind('<FocusOut>', self.cs_rename_heading)
 
 				rownum += 1
@@ -7059,7 +7060,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["strTitle"].set(base.rs_setting_get_title())
 		self.contentdata[id]["eTitle"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strTitle"])
 		self.contentdata[id]["eTitle"].grid(column=1, columnspan=9, row=rownum, sticky="nsew")
-		self.contentdata[id]["eTitle"].bind('<Leave>', self.cs_report_settings_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["eTitle"].bind('<Leave>', self.cs_report_settings_update)
 		self.contentdata[id]["eTitle"].bind('<FocusOut>', self.cs_report_settings_update)
 
 		# chkbox display start and end time of test
@@ -7115,6 +7117,9 @@ class ReporterGUI(tk.Frame):
 
 		self.contentdata[id]["eST"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strST"])
 		self.contentdata[id]["eST"].grid(column=1, row=rownum, sticky="nsew")
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["eST"].bind('<Leave>', self.cs_report_settings_update)
+		self.contentdata[id]["eST"].bind('<FocusOut>', self.cs_report_settings_update)
 
 		self.contentdata[id]["intST"] = tk.IntVar()
 		self.contentdata[id]["intST"].set(base.rs_setting_get_int("showstarttime"))
@@ -7133,6 +7138,9 @@ class ReporterGUI(tk.Frame):
 
 		self.contentdata[id]["eET"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strET"])
 		self.contentdata[id]["eET"].grid(column=1, row=rownum, sticky="nsew")
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["eET"].bind('<Leave>', self.cs_report_settings_update)
+		self.contentdata[id]["eET"].bind('<FocusOut>', self.cs_report_settings_update)
 
 		self.contentdata[id]["intET"] = tk.IntVar()
 		self.contentdata[id]["intET"].set(base.rs_setting_get_int("showendtime"))
@@ -7231,7 +7239,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["intPctile"].set(base.rs_setting_get_pctile())
 		self.contentdata[id]["ePctile"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["intPctile"])
 		self.contentdata[id]["ePctile"].grid(column=1, row=rownum, sticky="nsew")
-		self.contentdata[id]["ePctile"].bind('<Leave>', self.cs_report_settings_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["ePctile"].bind('<Leave>', self.cs_report_settings_update)
 		self.contentdata[id]["ePctile"].bind('<FocusOut>', self.cs_report_settings_update)
 
 		self.contentdata[id]["lblPctile"] = ttk.Label(self.contentdata[id]["Settings"], text="%")
@@ -7470,7 +7479,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["tNote"].grid(column=0, row=0, sticky="nsew")
 		self.contentdata[id]["LFrame"].rowconfigure(0, weight=1)
 		self.contentdata[id]["LFrame"].columnconfigure(0, weight=1)
-		self.contentdata[id]["tNote"].bind('<Leave>', self.cs_note_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["tNote"].bind('<Leave>', self.cs_note_update)
 		self.contentdata[id]["tNote"].bind('<FocusOut>', self.cs_note_update)
 
 	def cs_note_update(self, _event=None):
@@ -7514,9 +7524,13 @@ class ReporterGUI(tk.Frame):
 		iST = base.rt_setting_get_starttime(id)
 		fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
 		self.contentdata[id]["strST"].set(fST)
+		self.contentdata[id]["fST"] = fST
 
 		self.contentdata[id]["eST"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["strST"])
 		self.contentdata[id]["eST"].grid(column=1, row=rownum, sticky="nsew")
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["eST"].bind('<Leave>', self.cs_datatable_update)
+		self.contentdata[id]["eST"].bind('<FocusOut>', self.cs_datatable_update)
 
 		# 		end time
 		rownum += 1
@@ -7527,9 +7541,13 @@ class ReporterGUI(tk.Frame):
 		iET = base.rt_setting_get_endtime(id)
 		fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
 		self.contentdata[id]["strET"].set(fET)
+		self.contentdata[id]["fET"] = fET
 
 		self.contentdata[id]["eET"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["strET"])
 		self.contentdata[id]["eET"].grid(column=1, row=rownum, sticky="nsew")
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["eET"].bind('<Leave>', self.cs_datatable_update)
+		self.contentdata[id]["eET"].bind('<FocusOut>', self.cs_datatable_update)
 
 		rownum += 1
 		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["LFrame"], text="Data Type:")
@@ -7560,6 +7578,42 @@ class ReporterGUI(tk.Frame):
 		if "intColours" in self.contentdata[id]:
 			colours = self.contentdata[id]["intColours"].get()
 			changes += base.rt_table_set_colours(id, colours)
+
+		# 		start time
+		if "strST" in self.contentdata[id]:
+			pass
+			st = self.contentdata[id]["strST"].get()
+			base.debugmsg(5, "st:", st)
+			if st != self.contentdata[id]["fST"]:
+				ist = base.report_formateddatetimetosec(st)
+				base.debugmsg(5, "ist:", ist)
+				if ist > 0:
+					ios = ist - base.rs_setting_get_starttime()
+					base.debugmsg(5, "ios:", ios)
+					base.report_item__set_int(id, "startoffset", ios)
+
+			iST = base.rt_setting_get_starttime(id)
+			fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
+			self.contentdata[id]["strST"].set(fST)
+			self.contentdata[id]["fST"] = fST
+
+		# 		end time
+		if "strET" in self.contentdata[id]:
+			pass
+			et = self.contentdata[id]["strET"].get()
+			base.debugmsg(5, "et:", et)
+			if et != self.contentdata[id]["fET"]:
+				iet = base.report_formateddatetimetosec(et)
+				base.debugmsg(5, "iet:", iet)
+				if iet > 0:
+					ios = base.rs_setting_get_endtime() - iet
+					base.debugmsg(5, "ios:", ios)
+					base.report_item__set_int(id, "endoffset", ios)
+
+			iET = base.rt_setting_get_endtime(id)
+			fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
+			self.contentdata[id]["strET"].set(fET)
+			self.contentdata[id]["fET"] = fET
 
 		base.debugmsg(5, "changes:", changes)
 		if "intIsNum" in self.contentdata[id]:
@@ -7849,7 +7903,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["FPattern"] = tk.StringVar()
 				self.contentdata[id]["inpFP"] = ttk.Entry(self.contentdata[id]["Frames"][datatype], textvariable=self.contentdata[id]["FPattern"])
 				self.contentdata[id]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
-				self.contentdata[id]["inpFP"].bind('<Leave>', self.cs_datatable_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[id]["inpFP"].bind('<Leave>', self.cs_datatable_update)
 				self.contentdata[id]["inpFP"].bind('<FocusOut>', self.cs_datatable_update)
 
 			if datatype == "Result":
@@ -7909,7 +7964,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["FPattern"] = tk.StringVar()
 				self.contentdata[id]["inpFP"] = ttk.Entry(self.contentdata[id]["Frames"][datatype], textvariable=self.contentdata[id]["FPattern"])
 				self.contentdata[id]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
-				self.contentdata[id]["inpFP"].bind('<Leave>', self.cs_datatable_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[id]["inpFP"].bind('<Leave>', self.cs_datatable_update)
 				self.contentdata[id]["inpFP"].bind('<FocusOut>', self.cs_datatable_update)
 
 			if datatype == "ResultSummary":
@@ -7946,7 +8002,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["FPattern"] = tk.StringVar()
 				self.contentdata[id]["inpFP"] = ttk.Entry(self.contentdata[id]["Frames"][datatype], textvariable=self.contentdata[id]["FPattern"])
 				self.contentdata[id]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
-				self.contentdata[id]["inpFP"].bind('<Leave>', self.cs_datatable_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[id]["inpFP"].bind('<Leave>', self.cs_datatable_update)
 				self.contentdata[id]["inpFP"].bind('<FocusOut>', self.cs_datatable_update)
 
 			if datatype == "SQL":
@@ -7959,7 +8016,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["tSQL"] = tk.Text(self.contentdata[id]["Frames"][datatype])
 				self.contentdata[id]["tSQL"].grid(column=0, row=rownum, columnspan=100, sticky="nsew")
 				# data = self.contentdata[id]["tSQL"].insert('0.0', sql)
-				self.contentdata[id]["tSQL"].bind('<Leave>', self.cs_datatable_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[id]["tSQL"].bind('<Leave>', self.cs_datatable_update)
 				self.contentdata[id]["tSQL"].bind('<FocusOut>', self.cs_datatable_update)
 
 		base.debugmsg(8, "id:", id, "renamecols 1")
@@ -8127,7 +8185,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["renamecolumns"][colname] = tk.StringVar()
 				self.contentdata[id]["renamecolumns"][colinput] = ttk.Entry(self.contentdata[id]["Frames"]["renamecols"], textvariable=self.contentdata[id]["renamecolumns"][colname])
 				self.contentdata[id]["renamecolumns"][colinput].grid(column=colnum, row=rownum, sticky="nsew")
-				self.contentdata[id]["renamecolumns"][colinput].bind('<Leave>', self.cs_datatable_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[id]["renamecolumns"][colinput].bind('<Leave>', self.cs_datatable_update)
 				self.contentdata[id]["renamecolumns"][colinput].bind('<FocusOut>', self.cs_datatable_update)
 
 				self.contentdata[id]["renamecolumns"][colname].set(base.rt_table_get_colname(id, colname))
@@ -8161,7 +8220,8 @@ class ReporterGUI(tk.Frame):
 
 		self.contentdata[pid]["eST"] = ttk.Entry(self.contentdata[pid]["LFrame"], textvariable=self.contentdata[pid]["strST"])
 		self.contentdata[pid]["eST"].grid(column=1, row=rownum, sticky="nsew")
-		self.contentdata[pid]["eST"].bind('<Leave>', self.cs_graph_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[pid]["eST"].bind('<Leave>', self.cs_graph_update)
 		self.contentdata[pid]["eST"].bind('<FocusOut>', self.cs_graph_update)
 
 
@@ -8179,7 +8239,8 @@ class ReporterGUI(tk.Frame):
 
 		self.contentdata[pid]["eET"] = ttk.Entry(self.contentdata[pid]["LFrame"], textvariable=self.contentdata[pid]["strET"])
 		self.contentdata[pid]["eET"].grid(column=1, row=rownum, sticky="nsew")
-		self.contentdata[pid]["eET"].bind('<Leave>', self.cs_graph_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[pid]["eET"].bind('<Leave>', self.cs_graph_update)
 		self.contentdata[pid]["eET"].bind('<FocusOut>', self.cs_graph_update)
 
 		self.contentdata[pid]["lblBlank"] = ttk.Label(self.contentdata[pid]["RFrame"], text=" ")
@@ -8498,7 +8559,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idl]["FPattern"] = tk.StringVar()
 				self.contentdata[idl]["inpFP"] = ttk.Entry(self.contentdata[idl]["Frames"][datatypel], textvariable=self.contentdata[idl]["FPattern"])
 				self.contentdata[idl]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
-				self.contentdata[idl]["inpFP"].bind('<Leave>', self.cs_graph_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[idl]["inpFP"].bind('<Leave>', self.cs_graph_update)
 				self.contentdata[idl]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
 			if datatypel == "Result":
@@ -8554,7 +8616,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idl]["FPattern"] = tk.StringVar()
 				self.contentdata[idl]["inpFP"] = ttk.Entry(self.contentdata[idl]["Frames"][datatypel], textvariable=self.contentdata[idl]["FPattern"])
 				self.contentdata[idl]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
-				self.contentdata[idl]["inpFP"].bind('<Leave>', self.cs_graph_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[idl]["inpFP"].bind('<Leave>', self.cs_graph_update)
 				self.contentdata[idl]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
 			if datatypel == "SQL":
@@ -8567,7 +8630,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idl]["tSQL"] = tk.Text(self.contentdata[idl]["Frames"][datatypel])
 				self.contentdata[idl]["tSQL"].grid(column=0, row=rownum, columnspan=100, sticky="nsew")
 				# data = self.contentdata[id]["tSQL"].insert('0.0', sql)
-				self.contentdata[idl]["tSQL"].bind('<Leave>', self.cs_graph_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[idl]["tSQL"].bind('<Leave>', self.cs_graph_update)
 				self.contentdata[idl]["tSQL"].bind('<FocusOut>', self.cs_graph_update)
 
 		if datatyper not in self.contentdata[id]["Frames"]:
@@ -8655,7 +8719,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idr]["FPattern"] = tk.StringVar()
 				self.contentdata[idr]["inpFP"] = ttk.Entry(self.contentdata[idr]["Frames"][datatyper], textvariable=self.contentdata[idr]["FPattern"])
 				self.contentdata[idr]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
-				self.contentdata[idr]["inpFP"].bind('<Leave>', self.cs_graph_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[idr]["inpFP"].bind('<Leave>', self.cs_graph_update)
 				self.contentdata[idr]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
 			if datatyper == "Result":
@@ -8711,7 +8776,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idr]["FPattern"] = tk.StringVar()
 				self.contentdata[idr]["inpFP"] = ttk.Entry(self.contentdata[idr]["Frames"][datatyper], textvariable=self.contentdata[idr]["FPattern"])
 				self.contentdata[idr]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
-				self.contentdata[idr]["inpFP"].bind('<Leave>', self.cs_graph_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[idr]["inpFP"].bind('<Leave>', self.cs_graph_update)
 				self.contentdata[idr]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
 			if datatyper == "SQL":
@@ -8724,7 +8790,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idr]["tSQL"] = tk.Text(self.contentdata[idr]["Frames"][datatyper])
 				self.contentdata[idr]["tSQL"].grid(column=0, row=rownum, columnspan=100, sticky="nsew")
 				# data = self.contentdata[idr]["tSQL"].insert('0.0', sql)
-				self.contentdata[idr]["tSQL"].bind('<Leave>', self.cs_graph_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[idr]["tSQL"].bind('<Leave>', self.cs_graph_update)
 				self.contentdata[idr]["tSQL"].bind('<FocusOut>', self.cs_graph_update)
 
 		# Update
@@ -8899,7 +8966,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["varResult"].set(lbl_Result)
 		self.contentdata[id]["inpResult"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["varResult"])
 		self.contentdata[id]["inpResult"].grid(column=1, row=rownum, sticky="nsew")
-		self.contentdata[id]["inpResult"].bind('<Leave>', self.cs_errors_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["inpResult"].bind('<Leave>', self.cs_errors_update)
 		self.contentdata[id]["inpResult"].bind('<FocusOut>', self.cs_errors_update)
 
 		rownum += 1
@@ -8910,7 +8978,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["varTest"].set(lbl_Test)
 		self.contentdata[id]["inpTest"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["varTest"])
 		self.contentdata[id]["inpTest"].grid(column=1, row=rownum, sticky="nsew")
-		self.contentdata[id]["inpTest"].bind('<Leave>', self.cs_errors_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["inpTest"].bind('<Leave>', self.cs_errors_update)
 		self.contentdata[id]["inpTest"].bind('<FocusOut>', self.cs_errors_update)
 
 		rownum += 1
@@ -8921,7 +8990,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["varScript"].set(lbl_Script)
 		self.contentdata[id]["inpScript"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["varScript"])
 		self.contentdata[id]["inpScript"].grid(column=1, row=rownum, sticky="nsew")
-		self.contentdata[id]["inpScript"].bind('<Leave>', self.cs_errors_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["inpScript"].bind('<Leave>', self.cs_errors_update)
 		self.contentdata[id]["inpScript"].bind('<FocusOut>', self.cs_errors_update)
 
 		rownum += 1
@@ -8932,7 +9002,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["varError"].set(lbl_Error)
 		self.contentdata[id]["inpError"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["varError"])
 		self.contentdata[id]["inpError"].grid(column=1, row=rownum, sticky="nsew")
-		self.contentdata[id]["inpError"].bind('<Leave>', self.cs_errors_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["inpError"].bind('<Leave>', self.cs_errors_update)
 		self.contentdata[id]["inpError"].bind('<FocusOut>', self.cs_errors_update)
 
 		rownum += 1
@@ -8943,7 +9014,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["varCount"].set(lbl_Count)
 		self.contentdata[id]["inpCount"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["varCount"])
 		self.contentdata[id]["inpCount"].grid(column=1, row=rownum, sticky="nsew")
-		self.contentdata[id]["inpCount"].bind('<Leave>', self.cs_errors_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["inpCount"].bind('<Leave>', self.cs_errors_update)
 		self.contentdata[id]["inpCount"].bind('<FocusOut>', self.cs_errors_update)
 
 		rownum += 1
@@ -8954,7 +9026,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["varScreenshot"].set(lbl_Screenshot)
 		self.contentdata[id]["inpScreenshot"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["varScreenshot"])
 		self.contentdata[id]["inpScreenshot"].grid(column=1, row=rownum, sticky="nsew")
-		self.contentdata[id]["inpScreenshot"].bind('<Leave>', self.cs_errors_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["inpScreenshot"].bind('<Leave>', self.cs_errors_update)
 		self.contentdata[id]["inpScreenshot"].bind('<FocusOut>', self.cs_errors_update)
 
 		rownum += 1
@@ -8965,7 +9038,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["varNoScreenshot"].set(lbl_NoScreenshot)
 		self.contentdata[id]["inpNoScreenshot"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["varNoScreenshot"])
 		self.contentdata[id]["inpNoScreenshot"].grid(column=1, row=rownum, sticky="nsew")
-		self.contentdata[id]["inpNoScreenshot"].bind('<Leave>', self.cs_errors_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["inpNoScreenshot"].bind('<Leave>', self.cs_errors_update)
 		self.contentdata[id]["inpNoScreenshot"].bind('<FocusOut>', self.cs_errors_update)
 
 	def cs_errors_update(self, _event=None, *args):
