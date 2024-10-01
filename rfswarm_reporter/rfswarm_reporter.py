@@ -2415,14 +2415,14 @@ class ReporterBase():
 			base.debugmsg(8, "ldir:", ldir)
 
 			# 		opencart_1_1_1690876686_1_1690876693
-			gpatt = os.path.join(ldir, "{}_{}_{}_*_{}*".format(rdata['script'].split('.')[0], rdata['script_index'], rdata['robot'], rdata['iteration']))
+			gpatt = os.path.join(ldir, "{}_{}_{}_*_{}_*".format(rdata['script'].split('.')[0], rdata['script_index'], rdata['robot'], rdata['iteration']))
 			base.debugmsg(9, "gpatt:", gpatt)
 
 			lfol = glob.glob(gpatt, recursive=True)[0]
 			base.debugmsg(9, "lfol:", lfol)
 
 			# 		opencart_1_1_1690876686_1_1690876693/Opencart_Sales_output.xml
-			gxpatt = os.path.join(ldir, "{}_{}_{}_*_{}*".format(rdata['script'].split('.')[0], rdata['script_index'], rdata['robot'], rdata['iteration']), "*_output.xml")
+			gxpatt = os.path.join(ldir, "{}_{}_{}_*_{}_*".format(rdata['script'].split('.')[0], rdata['script_index'], rdata['robot'], rdata['iteration']), "*_output.xml")
 			base.debugmsg(9, "gxpatt:", gxpatt)
 
 			xmlf = glob.glob(gxpatt, recursive=True)[0]
