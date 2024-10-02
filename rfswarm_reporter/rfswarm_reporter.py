@@ -8936,9 +8936,11 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["strST"] = tk.StringVar()
 		fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
 		self.contentdata[id]["strST"].set(fST)
+		self.contentdata[id]["fST"] = fST
 
 		self.contentdata[id]["eST"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["strST"])
 		self.contentdata[id]["eST"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[id]["eST"].bind('<FocusOut>', self.cs_errors_update)
 
 		# 		end time
 		rownum += 1
@@ -8948,9 +8950,11 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["strET"] = tk.StringVar()
 		fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
 		self.contentdata[id]["strET"].set(fET)
+		self.contentdata[id]["fET"] = fET
 
 		self.contentdata[id]["eET"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["strET"])
 		self.contentdata[id]["eET"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[id]["eET"].bind('<FocusOut>', self.cs_errors_update)
 
 		# 		Show Screenshots
 		rownum += 1
@@ -9093,6 +9097,44 @@ class ReporterGUI(tk.Frame):
 			if name is not None:
 				id = _event
 		base.debugmsg(9, "id:", id)
+
+		# 		start time
+		if "strST" in self.contentdata[id]:
+			pass
+			st = self.contentdata[id]["strST"].get()
+			base.debugmsg(5, "st:", st)
+			if st != self.contentdata[id]["fST"]:
+				ist = base.report_formateddatetimetosec(st)
+				base.debugmsg(5, "ist:", ist)
+				if ist > 0:
+					ios = ist - base.rs_setting_get_starttime()
+					base.debugmsg(5, "ios:", ios)
+					base.report_item__set_int(id, "startoffset", ios)
+
+			iST = base.rt_setting_get_starttime(id)
+			fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
+			self.contentdata[id]["strST"].set(fST)
+			self.contentdata[id]["fST"] = fST
+
+		# 		end time
+		if "strET" in self.contentdata[id]:
+			pass
+			et = self.contentdata[id]["strET"].get()
+			base.debugmsg(5, "et:", et)
+			if et != self.contentdata[id]["fET"]:
+				iet = base.report_formateddatetimetosec(et)
+				base.debugmsg(5, "iet:", iet)
+				if iet > 0:
+					ios = base.rs_setting_get_endtime() - iet
+					base.debugmsg(5, "ios:", ios)
+					base.report_item__set_int(id, "endoffset", ios)
+
+			iET = base.rt_setting_get_endtime(id)
+			fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
+			self.contentdata[id]["strET"].set(fET)
+			self.contentdata[id]["fET"] = fET
+
+
 		if "intImages" in self.contentdata[id]:
 			images = self.contentdata[id]["intImages"].get()
 			changes += base.rt_errors_set_images(id, images)
