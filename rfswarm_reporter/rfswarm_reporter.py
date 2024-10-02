@@ -7590,7 +7590,7 @@ class ReporterGUI(tk.Frame):
 				if ist > 0:
 					ios = ist - base.rs_setting_get_starttime()
 					base.debugmsg(5, "ios:", ios)
-					base.report_item__set_int(id, "startoffset", ios)
+					changes += base.report_item__set_int(id, "startoffset", ios)
 
 			iST = base.rt_setting_get_starttime(id)
 			fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
@@ -7608,7 +7608,7 @@ class ReporterGUI(tk.Frame):
 				if iet > 0:
 					ios = base.rs_setting_get_endtime() - iet
 					base.debugmsg(5, "ios:", ios)
-					base.report_item__set_int(id, "endoffset", ios)
+					changes += base.report_item__set_int(id, "endoffset", ios)
 
 			iET = base.rt_setting_get_endtime(id)
 			fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
@@ -8306,6 +8306,43 @@ class ReporterGUI(tk.Frame):
 		id = self.sectionstree.focus()
 		base.debugmsg(9, "id:", id)
 		pid, idl, idr = base.rt_graph_LR_Ids(id)
+
+
+		# 		start time
+		if "strST" in self.contentdata[pid]:
+			pass
+			st = self.contentdata[pid]["strST"].get()
+			base.debugmsg(5, "st:", st)
+			if st != self.contentdata[pid]["fST"]:
+				ist = base.report_formateddatetimetosec(st)
+				base.debugmsg(5, "ist:", ist)
+				if ist > 0:
+					ios = ist - base.rs_setting_get_starttime()
+					base.debugmsg(5, "ios:", ios)
+					base.report_item__set_int(pid, "startoffset", ios)
+
+			iST = base.rt_setting_get_starttime(pid)
+			fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
+			self.contentdata[id]["strST"].set(fST)
+			self.contentdata[id]["fST"] = fST
+
+		# 		end time
+		if "strET" in self.contentdata[pid]:
+			pass
+			et = self.contentdata[pid]["strET"].get()
+			base.debugmsg(5, "et:", et)
+			if et != self.contentdata[pid]["fET"]:
+				iet = base.report_formateddatetimetosec(et)
+				base.debugmsg(5, "iet:", iet)
+				if iet > 0:
+					ios = base.rs_setting_get_endtime() - iet
+					base.debugmsg(5, "ios:", ios)
+					base.report_item__set_int(pid, "endoffset", ios)
+
+			iET = base.rt_setting_get_endtime(pid)
+			fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
+			self.contentdata[id]["strET"].set(fET)
+			self.contentdata[id]["fET"] = fET
 
 		# intIsNum
 		if "intIsNum" in self.contentdata[idl]:
