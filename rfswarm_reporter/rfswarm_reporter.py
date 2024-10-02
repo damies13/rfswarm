@@ -422,6 +422,7 @@ class ReporterBase():
 
 	def report_starttime(self):
 		if "starttime" in self.reportdata and self.reportdata["starttime"] > 0:
+			base.debugmsg(5, "starttime:", self.reportdata["starttime"])
 			return self.reportdata["starttime"]
 		else:
 			self.reportdata["starttime"] = 0
@@ -444,14 +445,16 @@ class ReporterBase():
 
 				self.reportdata["starttime"] = int(gdata[0]["MetricTime"])
 
-				base.debugmsg(8, "starttime:", self.reportdata["starttime"])
+				base.debugmsg(5, "starttime:", self.reportdata["starttime"])
 
 				return self.reportdata["starttime"]
 			else:
+				base.debugmsg(5, "starttime:", int(time.time()) - 1)
 				return int(time.time()) - 1
 
 	def report_endtime(self):
 		if "endtime" in self.reportdata and self.reportdata["endtime"] > 0:
+			base.debugmsg(5, "endtime:", self.reportdata["endtime"])
 			return self.reportdata["endtime"]
 		else:
 			self.reportdata["endtime"] = 0
@@ -475,10 +478,11 @@ class ReporterBase():
 
 				self.reportdata["endtime"] = int(gdata[0]["MetricTime"])
 
-				base.debugmsg(8, "endtime:", self.reportdata["endtime"])
+				base.debugmsg(5, "endtime:", self.reportdata["endtime"])
 
 				return self.reportdata["endtime"]
 			else:
+				base.debugmsg(5, "starttime:", int(time.time()))
 				return int(time.time())
 
 	def report_formatdate(self, itime):
@@ -689,6 +693,7 @@ class ReporterBase():
 
 	def rs_setting_get_starttime(self):
 		value = self.rs_setting_get_int('startoffset')
+		base.debugmsg(5, "value:", value)
 		if value < 1:
 			return self.report_starttime()
 		else:
@@ -696,6 +701,7 @@ class ReporterBase():
 
 	def rs_setting_get_endtime(self):
 		value = self.rs_setting_get_int('endoffset')
+		base.debugmsg(5, "value:", value)
 		if value < 1:
 			return self.report_endtime()
 		else:
@@ -1063,6 +1069,13 @@ class ReporterBase():
 		base.debugmsg(8, "id:", id)
 		sql = ""
 		DataType = self.rt_table_get_dt(id)
+
+		pid = base.report_subsection_parent(id)
+		starttime = base.rt_setting_get_starttime(pid)
+		base.debugmsg(5, "starttime:", starttime)
+		endtime = base.rt_setting_get_endtime(pid)
+		base.debugmsg(5, "endtime:", endtime)
+
 		if DataType == "Result":
 			RType = self.rt_table_get_rt(id)
 			EnFR = self.rt_table_get_enfr(id)
@@ -1182,12 +1195,10 @@ class ReporterBase():
 					lwhere.append("[" + colname + "] NOT REGEXP '{}'".format(inpFP))
 
 			# Start Time
-			starttime = base.rs_setting_get_starttime()
 			if starttime > 0:
 				lwhere.append("end_time >= {}".format(starttime))
 
 			# End Time
-			endtime = base.rs_setting_get_endtime()
 			if endtime > 0:
 				lwhere.append("end_time <= {}".format(endtime))
 
@@ -1326,12 +1337,10 @@ class ReporterBase():
 					wherelst.append(fpwhere)
 
 			# Start Time
-			starttime = base.rs_setting_get_starttime()
 			if starttime > 0:
 				wherelst.append("MetricTime >= {}".format(starttime))
 
 			# End Time
-			endtime = base.rs_setting_get_endtime()
 			if endtime > 0:
 				wherelst.append("MetricTime <= {}".format(endtime))
 
@@ -1416,6 +1425,10 @@ class ReporterBase():
 		display_percentile = base.rs_setting_get_pctile()
 		sql = ""
 		DataType = self.rt_table_get_dt(id)
+
+		starttime = base.rt_setting_get_starttime(id)
+		endtime = base.rt_setting_get_endtime(id)
+
 		if DataType == "Result":
 			RType = self.rt_table_get_rt(id)
 			EnFR = self.rt_table_get_enfr(id)
@@ -1515,12 +1528,10 @@ class ReporterBase():
 					lwhere.append("[" + colname + "] NOT REGEXP '{}'".format(inpFP))
 
 			# Start Time
-			starttime = base.rs_setting_get_starttime()
 			if starttime > 0:
 				lwhere.append("end_time >= {}".format(starttime))
 
 			# End Time
-			endtime = base.rs_setting_get_endtime()
 			if endtime > 0:
 				lwhere.append("end_time <= {}".format(endtime))
 
@@ -1657,12 +1668,10 @@ class ReporterBase():
 				mcolumns.append("round(stdev(CAST(MetricValue AS NUMERIC)),3) AS 'Std. Dev.'")
 
 			# Start Time
-			starttime = base.rs_setting_get_starttime()
 			if starttime > 0:
 				wherelst.append("MetricTime >= {}".format(starttime))
 
 			# End Time
-			endtime = base.rs_setting_get_endtime()
 			if endtime > 0:
 				wherelst.append("MetricTime <= {}".format(endtime))
 
@@ -1784,12 +1793,10 @@ class ReporterBase():
 					lwhere.append("[" + colname + "] NOT REGEXP '{}'".format(inpFP))
 
 			# Start Time
-			starttime = base.rs_setting_get_starttime()
 			if starttime > 0:
 				lwhere.append("r.end_time >= {}".format(starttime))
 
 			# End Time
-			endtime = base.rs_setting_get_endtime()
 			if endtime > 0:
 				lwhere.append("r.end_time <= {}".format(endtime))
 
@@ -1839,6 +1846,7 @@ class ReporterBase():
 	def rt_setting_get_starttime(self, id):
 		# value = self.rs_setting_get_int('startoffset')
 		value = base.report_item__get_int(id, 'startoffset')
+		base.debugmsg(5, "value:", value)
 		if value < 1:
 			return self.rs_setting_get_starttime()
 		else:
@@ -1847,11 +1855,11 @@ class ReporterBase():
 	def rt_setting_get_endtime(self, id):
 		# value = self.rs_setting_get_int('endoffset')
 		value = base.report_item__get_int(id, 'endoffset')
-		if value < -1:
+		base.debugmsg(5, "value:", value)
+		if value < 1:
 			return self.rs_setting_get_endtime()
 		else:
 			return self.rs_setting_get_endtime() - int(value)
-
 
 	def rt_table_get_dt(self, id):
 		base.debugmsg(9, "id:", id)
@@ -2308,6 +2316,10 @@ class ReporterBase():
 
 	def rt_errors_generate_sql(self, id):
 		base.debugmsg(8, "id:", id)
+
+		starttime = base.rt_setting_get_starttime(id)
+		endtime = base.rt_setting_get_endtime(id)
+
 		sql = ""
 
 		sql += "SELECT "
@@ -2326,11 +2338,9 @@ class ReporterBase():
 		sql += "WHERE r.result = 'FAIL' "
 
 		# Start Time
-		starttime = base.rs_setting_get_starttime()
 		if starttime > 0:
 			sql += "AND r.end_time >= {} ".format(starttime)
 		# End Time
-		endtime = base.rs_setting_get_endtime()
 		if endtime > 0:
 			sql += "AND r.end_time <= {} ".format(endtime)
 
@@ -2415,8 +2425,12 @@ class ReporterBase():
 
 	def rt_errors_get_data(self, id):
 		base.debugmsg(5, "id:", id)
+		key = "{}_{}".format(id, base.report_item_get_changed(id))
 
 		if id not in base.reportdata:
+			base.reportdata[id] = {}
+
+		if "key" in base.reportdata[id]	and base.reportdata[id]["key"] != key:
 			base.reportdata[id] = {}
 
 		sql = base.rt_errors_generate_sql(id)
@@ -2424,8 +2438,8 @@ class ReporterBase():
 		# colours = base.rt_table_get_colours(id)
 		if sql is not None and len(sql.strip()) > 0:
 			base.debugmsg(5, "sql:", sql)
-			key = "{}_{}".format(id, base.report_item_get_changed(id))
 			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+			base.reportdata[id]["key"] = key
 			while key not in base.dbqueue["ReadResult"]:
 				time.sleep(0.1)
 
@@ -7621,7 +7635,7 @@ class ReporterGUI(tk.Frame):
 			changes += base.rt_table_set_isnumeric(id, value)
 		if "intShCnt" in self.contentdata[id]:
 			value = self.contentdata[id]["intShCnt"].get()
-			base.rt_table_set_showcount(id, value)
+			changes += base.rt_table_set_showcount(id, value)
 		# self.contentdata[id]["MType"].set(base.rt_table_get_mt(id))
 		if "MType" in self.contentdata[id]:
 			value = self.contentdata[id]["MType"].get()
@@ -9873,58 +9887,61 @@ class ReporterGUI(tk.Frame):
 			keys = list(base.reportdata[id].keys())
 			for key in keys:
 				base.debugmsg(5, "key:", key)
-				rdata = base.reportdata[id][key]
+				if key != "key":
+					rdata = base.reportdata[id][key]
 
-				if grouprn:
-					result_name = rdata['result_name']
-					matches = difflib.get_close_matches(result_name, list(self.contentdata[id]["grpdata"]["resultnames"].keys()), cutoff=pctalike)
-					base.debugmsg(5, "matches:", matches)
-					if len(matches) > 0:
-						result_name = matches[0]
-						basekey = self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"][0]
-						base.debugmsg(5, "basekey:", basekey)
-						self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"].append(key)
-					else:
-						self.contentdata[id]["grpdata"]["resultnames"][result_name] = {}
-						self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"] = []
-						self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"].append(key)
-						self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"] = {}
+					if grouprn:
+						result_name = rdata['result_name']
+						matches = difflib.get_close_matches(result_name, list(self.contentdata[id]["grpdata"]["resultnames"].keys()), cutoff=pctalike)
+						base.debugmsg(5, "matches:", matches)
+						if len(matches) > 0:
+							result_name = matches[0]
+							basekey = self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"][0]
+							base.debugmsg(5, "basekey:", basekey)
+							self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"].append(key)
+						else:
+							self.contentdata[id]["grpdata"]["resultnames"][result_name] = {}
+							self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"] = []
+							self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"].append(key)
+							self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"] = {}
+
+						if groupet:
+							errortext = rdata['error']
+							# errortext_sub = errortext.split(r'\n')[0]
+							errortext_sub = errortext.splitlines()[0]
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							matcheset = difflib.get_close_matches(errortext_sub, list(self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"].keys()), cutoff=pctalike)
+							base.debugmsg(5, "matcheset:", matcheset)
+							if len(matcheset) > 0:
+								errortext = matcheset[0]
+								errortext_sub = errortext.splitlines()[0]
+								base.debugmsg(5, "errortext:", errortext)
+								baseid = self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"][0]
+								base.debugmsg(5, "baseid:", baseid)
+								self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+							else:
+								self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub] = {}
+								self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
+								self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
 
 					if groupet:
 						errortext = rdata['error']
-						# errortext_sub = errortext.split(r'\n')[0]
 						errortext_sub = errortext.splitlines()[0]
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						matcheset = difflib.get_close_matches(errortext_sub, list(self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"].keys()), cutoff=pctalike)
-						base.debugmsg(5, "matcheset:", matcheset)
-						if len(matcheset) > 0:
-							errortext = matcheset[0]
-							baseid = self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"][0]
+						matches = difflib.get_close_matches(errortext_sub, list(self.contentdata[id]["grpdata"]["errortexts"].keys()), cutoff=pctalike)
+						base.debugmsg(5, "matches:", matches)
+						if len(matches) > 0:
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							errortext = matches[0]
+							base.debugmsg(5, "errortext:", errortext)
+							baseid = self.contentdata[id]["grpdata"]["errortexts"][errortext]["keys"][0]
 							base.debugmsg(5, "baseid:", baseid)
-							self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+							self.contentdata[id]["grpdata"]["errortexts"][errortext]["keys"].append(key)
 						else:
-							self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub] = {}
-							self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
-							self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
-
-				if groupet:
-					errortext = rdata['error']
-					errortext_sub = errortext.splitlines()[0]
-					base.debugmsg(5, "errortext_sub:", errortext_sub)
-					matches = difflib.get_close_matches(errortext_sub, list(self.contentdata[id]["grpdata"]["errortexts"].keys()), cutoff=pctalike)
-					base.debugmsg(5, "matches:", matches)
-					if len(matches) > 0:
-						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						errortext = matches[0]
-						base.debugmsg(5, "errortext:", errortext)
-						baseid = self.contentdata[id]["grpdata"]["errortexts"][errortext]["keys"][0]
-						base.debugmsg(5, "baseid:", baseid)
-						self.contentdata[id]["grpdata"]["errortexts"][errortext]["keys"].append(key)
-					else:
-						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						self.contentdata[id]["grpdata"]["errortexts"][errortext_sub] = {}
-						self.contentdata[id]["grpdata"]["errortexts"][errortext_sub]["keys"] = []
-						self.contentdata[id]["grpdata"]["errortexts"][errortext_sub]["keys"].append(key)
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							self.contentdata[id]["grpdata"]["errortexts"][errortext_sub] = {}
+							self.contentdata[id]["grpdata"]["errortexts"][errortext_sub]["keys"] = []
+							self.contentdata[id]["grpdata"]["errortexts"][errortext_sub]["keys"].append(key)
 
 			resultnames = self.contentdata[id]["grpdata"]["resultnames"]
 			base.debugmsg(5, "resultnames:", resultnames)
