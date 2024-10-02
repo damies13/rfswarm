@@ -8217,6 +8217,7 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[pid]["strST"] = tk.StringVar()
 		fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
 		self.contentdata[pid]["strST"].set(fST)
+		self.contentdata[pid]["fST"] = fST
 
 		self.contentdata[pid]["eST"] = ttk.Entry(self.contentdata[pid]["LFrame"], textvariable=self.contentdata[pid]["strST"])
 		self.contentdata[pid]["eST"].grid(column=1, row=rownum, sticky="nsew")
@@ -8236,6 +8237,7 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[pid]["strET"] = tk.StringVar()
 		fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
 		self.contentdata[pid]["strET"].set(fET)
+		self.contentdata[pid]["fET"] = fET
 
 		self.contentdata[pid]["eET"] = ttk.Entry(self.contentdata[pid]["LFrame"], textvariable=self.contentdata[pid]["strET"])
 		self.contentdata[pid]["eET"].grid(column=1, row=rownum, sticky="nsew")
