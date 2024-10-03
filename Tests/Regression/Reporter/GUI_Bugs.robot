@@ -232,11 +232,14 @@ Template with Start and End Dates
 	${StartTime}= 	Replace String 	${StartTime} 	03:00 	03:01
 	Set Text Value To Right Of 	StartTime 	${StartTime}
 
+	Select Field With Label 	Title
+
 	Take A Screenshot
 	${EndTime}= 	Get Text Value To Right Of 	EndTime
 	${EndTime}= 	Replace String 	${EndTime} 	03:03 	03:02
 	Set Text Value To Right Of 	EndTime 	${EndTime}
 	Take A Screenshot
+
 
 	Select Field With Label 	Title
 	Wait For Status 	PreviewLoaded

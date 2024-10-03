@@ -93,6 +93,7 @@ Whole report time range
 	${StartTime}= 	Replace String 	${StartTime} 	14:11 	14:20
 	Set Text Value To Right Of 	StartTime 	${StartTime}
 
+	Select Field With Label 	Title
 	Take A Screenshot
 	# Set start time 14:58
 	# Select Field With Label 	EndTime
