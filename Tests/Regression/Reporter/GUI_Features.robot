@@ -93,7 +93,9 @@ Whole report time range
 	${StartTime}= 	Replace String 	${StartTime} 	14:11 	14:20
 	Set Text Value To Right Of 	StartTime 	${StartTime}
 
-	Select Field With Label 	Title
+	Take A Screenshot
+	Select Field With Label 	Title 		150
+	Wait For Status 	PreviewLoaded
 	Take A Screenshot
 	# Set start time 14:58
 	# Select Field With Label 	EndTime
@@ -107,7 +109,7 @@ Whole report time range
 	Take A Screenshot
 	# ${bounds}= 	Find Text 	Title:
 
-	Select Field With Label 	Title
+	Select Field With Label 	Title 		150
 
 	Click Tab 	 Preview
 	Wait For Status 	PreviewLoaded
