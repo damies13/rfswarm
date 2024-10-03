@@ -85,6 +85,7 @@ def extract_tables_from_docx(docx_path: str) -> list:
     """
     doc = Document(docx_path)
     tables = []
+
     def iter_unique_row_cells(row):
         """Generate cells in given row skipping empty grid cells."""
         last_cell_tc = None
