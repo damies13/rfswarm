@@ -3314,6 +3314,9 @@ class ReporterCore:
 		styledata += "table, th, td { border: 1px solid #ccc; border-collapse: collapse; }"
 		styledata += "th { color: " + highlightcolour + "; }"
 
+		# pre	{white-space: pre-wrap;}
+		styledata += "pre	{white-space: pre-wrap;}"
+
 		for i in range(6):
 			styledata += "h" + str(i + 1) + "	{ color: " + highlightcolour + "; margin-left: " + str(i * 5) + "px; }"
 
@@ -3421,6 +3424,7 @@ class ReporterCore:
 	#
 	# 	XHTML
 	#
+
 
 	def xhtml_save(self, filename, html):
 		result = etree.tostring(
@@ -3964,58 +3968,60 @@ class ReporterCore:
 			keys = list(base.reportdata[id].keys())
 			for key in keys:
 				base.debugmsg(5, "key:", key)
-				rdata = base.reportdata[id][key]
+				if key != "key":
+					rdata = base.reportdata[id][key]
 
-				if grouprn:
-					result_name = rdata['result_name']
-					matches = difflib.get_close_matches(result_name, list(grpdata["resultnames"].keys()), cutoff=pctalike)
-					base.debugmsg(5, "matches:", matches)
-					if len(matches) > 0:
-						result_name = matches[0]
-						basekey = grpdata["resultnames"][result_name]["keys"][0]
-						base.debugmsg(5, "basekey:", basekey)
-						grpdata["resultnames"][result_name]["keys"].append(key)
-					else:
-						grpdata["resultnames"][result_name] = {}
-						grpdata["resultnames"][result_name]["keys"] = []
-						grpdata["resultnames"][result_name]["keys"].append(key)
-						grpdata["resultnames"][result_name]["errortexts"] = {}
+					if grouprn:
+						result_name = rdata['result_name']
+						matches = difflib.get_close_matches(result_name, list(grpdata["resultnames"].keys()), cutoff=pctalike)
+						base.debugmsg(5, "matches:", matches)
+						if len(matches) > 0:
+							result_name = matches[0]
+							basekey = grpdata["resultnames"][result_name]["keys"][0]
+							base.debugmsg(5, "basekey:", basekey)
+							grpdata["resultnames"][result_name]["keys"].append(key)
+						else:
+							grpdata["resultnames"][result_name] = {}
+							grpdata["resultnames"][result_name]["keys"] = []
+							grpdata["resultnames"][result_name]["keys"].append(key)
+							grpdata["resultnames"][result_name]["errortexts"] = {}
+
+						if groupet:
+							errortext = rdata['error']
+							# errortext_sub = errortext.split(r'\n')[0]
+							errortext_sub = errortext.splitlines()[0]
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							matcheset = difflib.get_close_matches(errortext_sub, list(grpdata["resultnames"][result_name]["errortexts"].keys()), cutoff=pctalike)
+							base.debugmsg(5, "matcheset:", matcheset)
+							if len(matcheset) > 0:
+								errortext = matcheset[0]
+								errortext_sub = errortext.splitlines()[0]
+								baseid = grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"][0]
+								base.debugmsg(5, "baseid:", baseid)
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+							else:
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub] = {}
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
 
 					if groupet:
 						errortext = rdata['error']
-						# errortext_sub = errortext.split(r'\n')[0]
 						errortext_sub = errortext.splitlines()[0]
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						matcheset = difflib.get_close_matches(errortext_sub, list(grpdata["resultnames"][result_name]["errortexts"].keys()), cutoff=pctalike)
-						base.debugmsg(5, "matcheset:", matcheset)
-						if len(matcheset) > 0:
-							errortext = matcheset[0]
-							baseid = grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"][0]
+						matches = difflib.get_close_matches(errortext_sub, list(grpdata["errortexts"].keys()), cutoff=pctalike)
+						base.debugmsg(5, "matches:", matches)
+						if len(matches) > 0:
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							errortext = matches[0]
+							base.debugmsg(5, "errortext:", errortext)
+							baseid = grpdata["errortexts"][errortext]["keys"][0]
 							base.debugmsg(5, "baseid:", baseid)
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+							grpdata["errortexts"][errortext]["keys"].append(key)
 						else:
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub] = {}
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
-
-				if groupet:
-					errortext = rdata['error']
-					errortext_sub = errortext.splitlines()[0]
-					base.debugmsg(5, "errortext_sub:", errortext_sub)
-					matches = difflib.get_close_matches(errortext_sub, list(grpdata["errortexts"].keys()), cutoff=pctalike)
-					base.debugmsg(5, "matches:", matches)
-					if len(matches) > 0:
-						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						errortext = matches[0]
-						base.debugmsg(5, "errortext:", errortext)
-						baseid = grpdata["errortexts"][errortext]["keys"][0]
-						base.debugmsg(5, "baseid:", baseid)
-						grpdata["errortexts"][errortext]["keys"].append(key)
-					else:
-						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						grpdata["errortexts"][errortext_sub] = {}
-						grpdata["errortexts"][errortext_sub]["keys"] = []
-						grpdata["errortexts"][errortext_sub]["keys"].append(key)
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							grpdata["errortexts"][errortext_sub] = {}
+							grpdata["errortexts"][errortext_sub]["keys"] = []
+							grpdata["errortexts"][errortext_sub]["keys"].append(key)
 
 			resultnames = grpdata["resultnames"]
 			base.debugmsg(5, "resultnames:", resultnames)
@@ -4159,48 +4165,49 @@ class ReporterCore:
 			keys = list(base.reportdata[id].keys())
 			for key in keys:
 				base.debugmsg(5, "key:", key)
-				rdata = base.reportdata[id][key]
+				if key != "key":
+					rdata = base.reportdata[id][key]
 
-				tr = etree.SubElement(tbl, 'tr')
-
-				th = etree.SubElement(tr, 'th')
-				th.text = "{}:".format(lbl_Result)
-				td = etree.SubElement(tr, 'td')
-				td.text = rdata['result_name']
-
-				th = etree.SubElement(tr, 'th')
-				th.text = "{}:".format(lbl_Test)
-				td = etree.SubElement(tr, 'td')
-				td.text = rdata['test_name']
-
-				th = etree.SubElement(tr, 'th')
-				th.text = "{}:".format(lbl_Script)
-				td = etree.SubElement(tr, 'td')
-				td.text = rdata['script']
-
-				tr = etree.SubElement(tbl, 'tr')
-
-				th = etree.SubElement(tr, 'th')
-				th.text = "{}:".format(lbl_Error)
-				td = etree.SubElement(tr, 'td')
-				pre = etree.SubElement(td, 'pre')
-				pre.text = rdata['error']
-				td.set('colspan', '5')
-
-				if showimages:
 					tr = etree.SubElement(tbl, 'tr')
 
 					th = etree.SubElement(tr, 'th')
-					th.text = "{}:".format(lbl_Screenshot)
-
+					th.text = "{}:".format(lbl_Result)
 					td = etree.SubElement(tr, 'td')
+					td.text = rdata['result_name']
+
+					th = etree.SubElement(tr, 'th')
+					th.text = "{}:".format(lbl_Test)
+					td = etree.SubElement(tr, 'td')
+					td.text = rdata['test_name']
+
+					th = etree.SubElement(tr, 'th')
+					th.text = "{}:".format(lbl_Script)
+					td = etree.SubElement(tr, 'td')
+					td.text = rdata['script']
+
+					tr = etree.SubElement(tbl, 'tr')
+
+					th = etree.SubElement(tr, 'th')
+					th.text = "{}:".format(lbl_Error)
+					td = etree.SubElement(tr, 'td')
+					pre = etree.SubElement(td, 'pre')
+					pre.text = rdata['error']
 					td.set('colspan', '5')
-					if 'image_file' in rdata:
-						# td.text = rdata['image_file']
-						oimg = Image.open(rdata['image_file'])
-						self.xhtml_sections_embedimg(td, key, oimg)
-					else:
-						td.text = lbl_NoScreenshot
+
+					if showimages:
+						tr = etree.SubElement(tbl, 'tr')
+
+						th = etree.SubElement(tr, 'th')
+						th.text = "{}:".format(lbl_Screenshot)
+
+						td = etree.SubElement(tr, 'td')
+						td.set('colspan', '5')
+						if 'image_file' in rdata:
+							# td.text = rdata['image_file']
+							oimg = Image.open(rdata['image_file'])
+							self.xhtml_sections_embedimg(td, key, oimg)
+						else:
+							td.text = lbl_NoScreenshot
 
 	#
 	# 	MS Word
@@ -4864,58 +4871,60 @@ class ReporterCore:
 			keys = list(base.reportdata[id].keys())
 			for key in keys:
 				base.debugmsg(5, "key:", key)
-				rdata = base.reportdata[id][key]
+				if key != "key":
+					rdata = base.reportdata[id][key]
 
-				if grouprn:
-					result_name = rdata['result_name']
-					matches = difflib.get_close_matches(result_name, list(grpdata["resultnames"].keys()), cutoff=pctalike)
-					base.debugmsg(5, "matches:", matches)
-					if len(matches) > 0:
-						result_name = matches[0]
-						basekey = grpdata["resultnames"][result_name]["keys"][0]
-						base.debugmsg(5, "basekey:", basekey)
-						grpdata["resultnames"][result_name]["keys"].append(key)
-					else:
-						grpdata["resultnames"][result_name] = {}
-						grpdata["resultnames"][result_name]["keys"] = []
-						grpdata["resultnames"][result_name]["keys"].append(key)
-						grpdata["resultnames"][result_name]["errortexts"] = {}
+					if grouprn:
+						result_name = rdata['result_name']
+						matches = difflib.get_close_matches(result_name, list(grpdata["resultnames"].keys()), cutoff=pctalike)
+						base.debugmsg(5, "matches:", matches)
+						if len(matches) > 0:
+							result_name = matches[0]
+							basekey = grpdata["resultnames"][result_name]["keys"][0]
+							base.debugmsg(5, "basekey:", basekey)
+							grpdata["resultnames"][result_name]["keys"].append(key)
+						else:
+							grpdata["resultnames"][result_name] = {}
+							grpdata["resultnames"][result_name]["keys"] = []
+							grpdata["resultnames"][result_name]["keys"].append(key)
+							grpdata["resultnames"][result_name]["errortexts"] = {}
+
+						if groupet:
+							errortext = rdata['error']
+							# errortext_sub = errortext.split(r'\n')[0]
+							errortext_sub = errortext.splitlines()[0]
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							matcheset = difflib.get_close_matches(errortext_sub, list(grpdata["resultnames"][result_name]["errortexts"].keys()), cutoff=pctalike)
+							base.debugmsg(5, "matcheset:", matcheset)
+							if len(matcheset) > 0:
+								errortext = matcheset[0]
+								errortext_sub = errortext.splitlines()[0]
+								baseid = grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"][0]
+								base.debugmsg(5, "baseid:", baseid)
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+							else:
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub] = {}
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
 
 					if groupet:
 						errortext = rdata['error']
-						# errortext_sub = errortext.split(r'\n')[0]
 						errortext_sub = errortext.splitlines()[0]
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						matcheset = difflib.get_close_matches(errortext_sub, list(grpdata["resultnames"][result_name]["errortexts"].keys()), cutoff=pctalike)
-						base.debugmsg(5, "matcheset:", matcheset)
-						if len(matcheset) > 0:
-							errortext = matcheset[0]
-							baseid = grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"][0]
+						matches = difflib.get_close_matches(errortext_sub, list(grpdata["errortexts"].keys()), cutoff=pctalike)
+						base.debugmsg(5, "matches:", matches)
+						if len(matches) > 0:
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							errortext = matches[0]
+							base.debugmsg(5, "errortext:", errortext)
+							baseid = grpdata["errortexts"][errortext]["keys"][0]
 							base.debugmsg(5, "baseid:", baseid)
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+							grpdata["errortexts"][errortext]["keys"].append(key)
 						else:
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub] = {}
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
-
-				if groupet:
-					errortext = rdata['error']
-					errortext_sub = errortext.splitlines()[0]
-					base.debugmsg(5, "errortext_sub:", errortext_sub)
-					matches = difflib.get_close_matches(errortext_sub, list(grpdata["errortexts"].keys()), cutoff=pctalike)
-					base.debugmsg(5, "matches:", matches)
-					if len(matches) > 0:
-						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						errortext = matches[0]
-						base.debugmsg(5, "errortext:", errortext)
-						baseid = grpdata["errortexts"][errortext]["keys"][0]
-						base.debugmsg(5, "baseid:", baseid)
-						grpdata["errortexts"][errortext]["keys"].append(key)
-					else:
-						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						grpdata["errortexts"][errortext_sub] = {}
-						grpdata["errortexts"][errortext_sub]["keys"] = []
-						grpdata["errortexts"][errortext_sub]["keys"].append(key)
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							grpdata["errortexts"][errortext_sub] = {}
+							grpdata["errortexts"][errortext_sub]["keys"] = []
+							grpdata["errortexts"][errortext_sub]["keys"].append(key)
 
 			resultnames = grpdata["resultnames"]
 			base.debugmsg(5, "resultnames:", resultnames)
@@ -5150,87 +5159,88 @@ class ReporterCore:
 			keys = list(base.reportdata[id].keys())
 			for key in keys:
 				base.debugmsg(5, "key:", key)
-				rdata = base.reportdata[id][key]
+				if key != "key":
+					rdata = base.reportdata[id][key]
 
-				cellcol = 0
-				cellrow += 1
+					cellcol = 0
+					cellrow += 1
 
-				if cellrow > 0:
-					table.add_row()
+					if cellrow > 0:
+						table.add_row()
 
-				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
-				table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Result)
-				table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
-				# table.columns[cellcol].width = Cm(1.8)
+					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+					table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Result)
+					table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+					# table.columns[cellcol].width = Cm(1.8)
 
-				cellcol += 1
-				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-				a = table.cell(cellrow, cellcol)
-				b = table.cell(cellrow, cellcol + 1)
-				a.merge(b)
-				table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['result_name']
-				table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
-				table.rows[cellrow].cells[cellcol].paragraphs[0].FitText = True
+					cellcol += 1
+					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+					a = table.cell(cellrow, cellcol)
+					b = table.cell(cellrow, cellcol + 1)
+					a.merge(b)
+					table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['result_name']
+					table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+					table.rows[cellrow].cells[cellcol].paragraphs[0].FitText = True
 
-				cellcol += 2
-				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
-				table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Test)
-				table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
-				# table.columns[cellcol].width = Cm(1.8)
+					cellcol += 2
+					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+					table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Test)
+					table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+					# table.columns[cellcol].width = Cm(1.8)
 
-				cellcol += 1
-				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-				table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['test_name']
-				table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+					cellcol += 1
+					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+					table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['test_name']
+					table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 
-				cellcol += 1
-				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
-				table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Script)
-				table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
-				# table.columns[cellcol].width = Cm(1.8)
+					cellcol += 1
+					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+					table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Script)
+					table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+					# table.columns[cellcol].width = Cm(1.8)
 
-				cellcol += 1
-				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-				table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['script']
-				table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+					cellcol += 1
+					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+					table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['script']
+					table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 
-				cellcol = 0
-				cellrow += 1
-				table.add_row()
-
-				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
-				table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Error)
-				table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
-
-				cellcol += 1
-				a = table.cell(cellrow, cellcol)
-				b = table.cell(cellrow, cellcol + 5)
-				a.merge(b)
-
-				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-				table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
-				table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
-
-				if showimages:
 					cellcol = 0
 					cellrow += 1
 					table.add_row()
 
 					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
-					table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Screenshot)
+					table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Error)
 					table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 
 					cellcol += 1
 					a = table.cell(cellrow, cellcol)
 					b = table.cell(cellrow, cellcol + 5)
 					a.merge(b)
+
 					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-					if 'image_file' in rdata:
-						run = table.rows[cellrow].cells[cellcol].paragraphs[0].add_run()
-						run.add_picture(rdata['image_file'], width=imgsizew)
-					else:
-						table.rows[cellrow].cells[cellcol].paragraphs[0].text = lbl_NoScreenshot
+					table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
+					table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+
+					if showimages:
+						cellcol = 0
+						cellrow += 1
+						table.add_row()
+
+						table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+						table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Screenshot)
 						table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+
+						cellcol += 1
+						a = table.cell(cellrow, cellcol)
+						b = table.cell(cellrow, cellcol + 5)
+						a.merge(b)
+						table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+						if 'image_file' in rdata:
+							run = table.rows[cellrow].cells[cellcol].paragraphs[0].add_run()
+							run.add_picture(rdata['image_file'], width=imgsizew)
+						else:
+							table.rows[cellrow].cells[cellcol].paragraphs[0].text = lbl_NoScreenshot
+							table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 
 	#
 	# 	MS Excel
@@ -5927,58 +5937,60 @@ class ReporterCore:
 			keys = list(base.reportdata[id].keys())
 			for key in keys:
 				base.debugmsg(5, "key:", key)
-				rdata = base.reportdata[id][key]
+				if key != "key":
+					rdata = base.reportdata[id][key]
 
-				if grouprn:
-					result_name = rdata['result_name']
-					matches = difflib.get_close_matches(result_name, list(grpdata["resultnames"].keys()), cutoff=pctalike)
-					base.debugmsg(5, "matches:", matches)
-					if len(matches) > 0:
-						result_name = matches[0]
-						basekey = grpdata["resultnames"][result_name]["keys"][0]
-						base.debugmsg(5, "basekey:", basekey)
-						grpdata["resultnames"][result_name]["keys"].append(key)
-					else:
-						grpdata["resultnames"][result_name] = {}
-						grpdata["resultnames"][result_name]["keys"] = []
-						grpdata["resultnames"][result_name]["keys"].append(key)
-						grpdata["resultnames"][result_name]["errortexts"] = {}
+					if grouprn:
+						result_name = rdata['result_name']
+						matches = difflib.get_close_matches(result_name, list(grpdata["resultnames"].keys()), cutoff=pctalike)
+						base.debugmsg(5, "matches:", matches)
+						if len(matches) > 0:
+							result_name = matches[0]
+							basekey = grpdata["resultnames"][result_name]["keys"][0]
+							base.debugmsg(5, "basekey:", basekey)
+							grpdata["resultnames"][result_name]["keys"].append(key)
+						else:
+							grpdata["resultnames"][result_name] = {}
+							grpdata["resultnames"][result_name]["keys"] = []
+							grpdata["resultnames"][result_name]["keys"].append(key)
+							grpdata["resultnames"][result_name]["errortexts"] = {}
+
+						if groupet:
+							errortext = rdata['error']
+							# errortext_sub = errortext.split(r'\n')[0]
+							errortext_sub = errortext.splitlines()[0]
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							matcheset = difflib.get_close_matches(errortext_sub, list(grpdata["resultnames"][result_name]["errortexts"].keys()), cutoff=pctalike)
+							base.debugmsg(5, "matcheset:", matcheset)
+							if len(matcheset) > 0:
+								errortext = matcheset[0]
+								errortext_sub = errortext.splitlines()[0]
+								baseid = grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"][0]
+								base.debugmsg(5, "baseid:", baseid)
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+							else:
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub] = {}
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
 
 					if groupet:
 						errortext = rdata['error']
-						# errortext_sub = errortext.split(r'\n')[0]
 						errortext_sub = errortext.splitlines()[0]
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						matcheset = difflib.get_close_matches(errortext_sub, list(grpdata["resultnames"][result_name]["errortexts"].keys()), cutoff=pctalike)
-						base.debugmsg(5, "matcheset:", matcheset)
-						if len(matcheset) > 0:
-							errortext = matcheset[0]
-							baseid = grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"][0]
+						matches = difflib.get_close_matches(errortext_sub, list(grpdata["errortexts"].keys()), cutoff=pctalike)
+						base.debugmsg(5, "matches:", matches)
+						if len(matches) > 0:
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							errortext = matches[0]
+							base.debugmsg(5, "errortext:", errortext)
+							baseid = grpdata["errortexts"][errortext]["keys"][0]
 							base.debugmsg(5, "baseid:", baseid)
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+							grpdata["errortexts"][errortext]["keys"].append(key)
 						else:
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub] = {}
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
-
-				if groupet:
-					errortext = rdata['error']
-					errortext_sub = errortext.splitlines()[0]
-					base.debugmsg(5, "errortext_sub:", errortext_sub)
-					matches = difflib.get_close_matches(errortext_sub, list(grpdata["errortexts"].keys()), cutoff=pctalike)
-					base.debugmsg(5, "matches:", matches)
-					if len(matches) > 0:
-						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						errortext = matches[0]
-						base.debugmsg(5, "errortext:", errortext)
-						baseid = grpdata["errortexts"][errortext]["keys"][0]
-						base.debugmsg(5, "baseid:", baseid)
-						grpdata["errortexts"][errortext]["keys"].append(key)
-					else:
-						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						grpdata["errortexts"][errortext_sub] = {}
-						grpdata["errortexts"][errortext_sub]["keys"] = []
-						grpdata["errortexts"][errortext_sub]["keys"].append(key)
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							grpdata["errortexts"][errortext_sub] = {}
+							grpdata["errortexts"][errortext_sub]["keys"] = []
+							grpdata["errortexts"][errortext_sub]["keys"].append(key)
 
 			resultnames = grpdata["resultnames"]
 			base.debugmsg(5, "resultnames:", resultnames)
@@ -6165,62 +6177,63 @@ class ReporterCore:
 			keys = list(base.reportdata[id].keys())
 			for key in keys:
 				base.debugmsg(5, "key:", key)
-				rdata = base.reportdata[id][key]
+				if key != "key":
+					rdata = base.reportdata[id][key]
 
-				cellcol = 1
-				rownum += 1
-
-				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Result), "Table Heading", 0)
-				cellcol += 1
-				self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['result_name'], "Table Data", 0)
-
-				cellcol += 1
-				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Test), "Table Heading", 0)
-				cellcol += 1
-				self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['test_name'], "Table Data", 0)
-
-				cellcol += 1
-				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Script), "Table Heading", 0)
-				cellcol += 1
-				self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['script'], "Table Data", 0)
-
-				cellcol = 1
-				rownum += 1
-				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Error), "Table Heading", 0)
-				cellcol += 1
-				self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['error'], "Table Data", 4)
-
-				if showimages:
 					cellcol = 1
 					rownum += 1
-					self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Screenshot), "Table Heading", 0)
+
+					self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Result), "Table Heading", 0)
+					cellcol += 1
+					self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['result_name'], "Table Data", 0)
 
 					cellcol += 1
+					self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Test), "Table Heading", 0)
+					cellcol += 1
+					self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['test_name'], "Table Data", 0)
 
-					if 'image_file' in rdata:
-						self.xlsx_sections_errors_fill_cell(cellcol, rownum, " ", "Table Data", 4)
-						img = openpyxl.drawing.image.Image(rdata['image_file'])
-						cellname = ws.cell(row=rownum, column=cellcol).coordinate
+					cellcol += 1
+					self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Script), "Table Heading", 0)
+					cellcol += 1
+					self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['script'], "Table Data", 0)
 
-						base.debugmsg(5, "img.width:", img.width, "	img.height:", img.height)
-						# 								31.75					32.60
-						# 								22.23					22.82	==> 70%
-						newiw = 850
-						ratio = newiw / img.width
-						base.debugmsg(5, "ratio:", ratio)
-						newih = img.height * ratio
-						base.debugmsg(5, "newih:", newih)
-						img.width = newiw
-						img.height = newih
+					cellcol = 1
+					rownum += 1
+					self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Error), "Table Heading", 0)
+					cellcol += 1
+					self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['error'], "Table Data", 4)
 
-						newh = newih * 0.76
-						# 43.44 cm ==> 32.95 cm	==>	76%
-						base.debugmsg(5, "newh:", newh)
-						ws.row_dimensions[rownum].height = newh
+					if showimages:
+						cellcol = 1
+						rownum += 1
+						self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Screenshot), "Table Heading", 0)
 
-						ws.add_image(img, cellname)
-					else:
-						self.xlsx_sections_errors_fill_cell(cellcol, rownum, lbl_NoScreenshot, "Table Data", 4)
+						cellcol += 1
+
+						if 'image_file' in rdata:
+							self.xlsx_sections_errors_fill_cell(cellcol, rownum, " ", "Table Data", 4)
+							img = openpyxl.drawing.image.Image(rdata['image_file'])
+							cellname = ws.cell(row=rownum, column=cellcol).coordinate
+
+							base.debugmsg(5, "img.width:", img.width, "	img.height:", img.height)
+							# 								31.75					32.60
+							# 								22.23					22.82	==> 70%
+							newiw = 850
+							ratio = newiw / img.width
+							base.debugmsg(5, "ratio:", ratio)
+							newih = img.height * ratio
+							base.debugmsg(5, "newih:", newih)
+							img.width = newiw
+							img.height = newih
+
+							newh = newih * 0.76
+							# 43.44 cm ==> 32.95 cm	==>	76%
+							base.debugmsg(5, "newh:", newh)
+							ws.row_dimensions[rownum].height = newh
+
+							ws.add_image(img, cellname)
+						else:
+							self.xlsx_sections_errors_fill_cell(cellcol, rownum, lbl_NoScreenshot, "Table Data", 4)
 
 	def xlsx_sections_errors_fill_cell(self, cellcol, rownum, val, style, span):
 		base.debugmsg(7, "cellcol:", cellcol, "	rownum:", rownum, "	val:", val, "	style:", style)
@@ -10155,78 +10168,79 @@ class ReporterGUI(tk.Frame):
 			keys = list(base.reportdata[id].keys())
 			for key in keys:
 				base.debugmsg(5, "key:", key)
-				i += 1
-				rownum += 1
-				rdata = base.reportdata[id][key]
-
-				colnum = 0
-				cellname = "{}_{}".format("lbl_result_name", key)
-				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Result), style='Report.TBody.TLabel')
-				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-
-				colnum += 1
-				cellname = "{}_{}".format("result_name", key)
-				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['result_name']), style='Report.TBody.TLabel')
-				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-
-				colnum += 1
-				cellname = "{}_{}".format("lbl_test_name", key)
-				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Test), style='Report.TBody.TLabel')
-				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-
-				colnum += 1
-				cellname = "{}_{}".format("test_name", key)
-				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['test_name']), style='Report.TBody.TLabel')
-				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-
-				colnum += 1
-				cellname = "{}_{}".format("lbl_script", key)
-				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Script), style='Report.TBody.TLabel')
-				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-
-				colnum += 1
-				cellname = "{}_{}".format("script", key)
-				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['script']), style='Report.TBody.TLabel')
-				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-
-				rownum += 1
-				colnum = 0
-				cellname = "{}_{}".format("lbl_error", key)
-				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Error), style='Report.TBody.TLabel')
-				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-
-				colnum += 1
-				cellname = "{}_{}".format("error", key)
-				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
-				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
-
-				if showimages:
+				if key != "key":
+					i += 1
 					rownum += 1
+					rdata = base.reportdata[id][key]
+
 					colnum = 0
-					cellname = "{}_{}".format("lbl_image", key)
+					cellname = "{}_{}".format("lbl_result_name", key)
 					base.debugmsg(5, "cellname:", cellname)
-					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Screenshot), style='Report.TBody.TLabel')
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Result), style='Report.TBody.TLabel')
 					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 					colnum += 1
-					cellname = "{}_{}".format("image_file", key)
-					cellimg = "{}_{}".format("image", key)
+					cellname = "{}_{}".format("result_name", key)
 					base.debugmsg(5, "cellname:", cellname)
-					if 'image_file' in rdata:
-						self.contentdata[id][cellimg] = tk.PhotoImage(file=rdata['image_file'])
-						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id][cellimg], style='Report.TBody.TLabel')
-						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
-					else:
-						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}".format(lbl_NoScreenshot), style='Report.TBody.TLabel')
-						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['result_name']), style='Report.TBody.TLabel')
+					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+					colnum += 1
+					cellname = "{}_{}".format("lbl_test_name", key)
+					base.debugmsg(5, "cellname:", cellname)
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Test), style='Report.TBody.TLabel')
+					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+					colnum += 1
+					cellname = "{}_{}".format("test_name", key)
+					base.debugmsg(5, "cellname:", cellname)
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['test_name']), style='Report.TBody.TLabel')
+					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+					colnum += 1
+					cellname = "{}_{}".format("lbl_script", key)
+					base.debugmsg(5, "cellname:", cellname)
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Script), style='Report.TBody.TLabel')
+					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+					colnum += 1
+					cellname = "{}_{}".format("script", key)
+					base.debugmsg(5, "cellname:", cellname)
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['script']), style='Report.TBody.TLabel')
+					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+					rownum += 1
+					colnum = 0
+					cellname = "{}_{}".format("lbl_error", key)
+					base.debugmsg(5, "cellname:", cellname)
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Error), style='Report.TBody.TLabel')
+					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+					colnum += 1
+					cellname = "{}_{}".format("error", key)
+					base.debugmsg(5, "cellname:", cellname)
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
+					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
+
+					if showimages:
+						rownum += 1
+						colnum = 0
+						cellname = "{}_{}".format("lbl_image", key)
+						base.debugmsg(5, "cellname:", cellname)
+						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Screenshot), style='Report.TBody.TLabel')
+						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+						colnum += 1
+						cellname = "{}_{}".format("image_file", key)
+						cellimg = "{}_{}".format("image", key)
+						base.debugmsg(5, "cellname:", cellname)
+						if 'image_file' in rdata:
+							self.contentdata[id][cellimg] = tk.PhotoImage(file=rdata['image_file'])
+							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id][cellimg], style='Report.TBody.TLabel')
+							self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
+						else:
+							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}".format(lbl_NoScreenshot), style='Report.TBody.TLabel')
+							self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
 
 	#
 	# Export content generation functions
