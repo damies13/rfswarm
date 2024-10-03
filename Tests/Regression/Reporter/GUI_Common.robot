@@ -147,12 +147,12 @@ Get Text Value To Right Of
 
 	${b4value}= 	Get Clipboard Content
 	${value}= 	Copy From The Right Of 	${img} 	${offsetx}
-	# Take A Screenshot
+	Take A Screenshot
 	WHILE 	$b4value == $value 		limit=10
 		Sleep    10 ms
 		${offsetx}= 	Evaluate 	${offsetx}+10
 		${value}= 	Copy From The Right Of 	${img} 	${offsetx}
-		# Take A Screenshot
+		Take A Screenshot
 		${valuec}= 	Copy
 		IF  $valuec != $value
 			${value}= 	Set Variable 		${valuec}
