@@ -226,14 +226,17 @@ Template with Start and End Dates
 	Click Section			Report
 	# Take A Screenshot
 
+	Take A Screenshot
 	Make Clipboard Not None
 	${StartTime}= 	Get Text Value To Right Of 	StartTime
 	${StartTime}= 	Replace String 	${StartTime} 	03:00 	03:01
 	Set Text Value To Right Of 	StartTime 	${StartTime}
 
+	Take A Screenshot
 	${EndTime}= 	Get Text Value To Right Of 	EndTime
 	${EndTime}= 	Replace String 	${EndTime} 	03:03 	03:02
 	Set Text Value To Right Of 	EndTime 	${EndTime}
+	Take A Screenshot
 
 	Select Field With Label 	Title
 	Wait For Status 	PreviewLoaded
@@ -362,4 +365,3 @@ Auto Generate XLSX Report With GUI Using Template
 	[Teardown] 	Run Keywords
 	...    Close GUI	AND
 	...    Move File 	${resultfolder}${/}${resultdata}.xlsx 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.xlsx
-
