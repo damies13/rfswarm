@@ -2541,8 +2541,10 @@ class ReporterBase():
 	def rt_errors_get_label(self, id, lblname):
 		base.debugmsg(5, "id:", id, "	lblname:", lblname)
 		if lblname in base.report[id]:
+			base.debugmsg(5, "id:", id, "	lblname:", lblname, "	retvalue:", base.whitespace_get_ini_value(base.report[id][lblname]))
 			return base.whitespace_get_ini_value(base.report[id][lblname])
 		else:
+			base.debugmsg(5, "id:", id, "	lblname:", lblname, "	retvalue:", base.defaultlabels[lblname])
 			return base.defaultlabels[lblname]
 
 	def rt_errors_set_label(self, id, lblname, lblvalue):
@@ -5898,15 +5900,19 @@ class ReporterCore:
 		self.xlsx_select_cell(1, rownum)
 
 	def xlsx_sections_errors(self, id):
-		base.debugmsg(8, "id:", id)
+		base.debugmsg(5, "id:", id)
 
 		wb = self.cg_data["xlsx"]["Workbook"]
 		ws = wb.active
 		rownum = ws[ws.active_cell].row
+		base.debugmsg(5, "rownum:", rownum)
 
 		cellcol = 1
+		base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum)
 		ws.column_dimensions["A"].width = 3
+
 		cellcol += 1
+		base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum)
 
 		showimages = base.rt_errors_get_images(id)
 		base.debugmsg(5, "showimages:", showimages)
@@ -6004,27 +6010,36 @@ class ReporterCore:
 				base.debugmsg(5, "basekey:", basekey)
 				rdata = base.reportdata[id][basekey]
 
-				cellcol = 1
 				rownum += 1
+				cellcol = 0
 
+				cellcol += 1
+				base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum)
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Result), "Table Heading", 0)
 				cellcol += 1
+				base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum)
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['result_name'], "Table Data", 0)
 
 				cellcol += 1
+				base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum)
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Test), "Table Heading", 0)
 				cellcol += 1
+				base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum)
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['test_name'], "Table Data", 0)
 
 				cellcol += 1
+				base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum)
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Script), "Table Heading", 0)
 				cellcol += 1
+				base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum)
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['script'], "Table Data", 0)
 
 				cellcol += 1
+				base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum)
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Count), "Table Heading", 0)
 				count = len(grpdata["resultnames"][result_name]["keys"])
 				cellcol += 1
+				base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum)
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, str(count), "Table Data", 0)
 
 				if groupet:
@@ -6235,36 +6250,49 @@ class ReporterCore:
 						else:
 							self.xlsx_sections_errors_fill_cell(cellcol, rownum, lbl_NoScreenshot, "Table Data", 4)
 
+		rownum += 1
+		rownum += 1
+		self.xlsx_select_cell(1, rownum)
+
 	def xlsx_sections_errors_fill_cell(self, cellcol, rownum, val, style, span):
-		base.debugmsg(7, "cellcol:", cellcol, "	rownum:", rownum, "	val:", val, "	style:", style)
+		base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum, "	val:", val, "	style:", style, "	span:", span)
 		wb = self.cg_data["xlsx"]["Workbook"]
 		ws = wb.active
 
+		self.xlsx_select_cell(cellcol, rownum)
+
+		base.debugmsg(5, "setting Cell value")
 		cell = ws.cell(column=cellcol, row=rownum, value=val)
+		base.debugmsg(5, "splitting val to lines")
 		lines = str(val).splitlines()
 
+		base.debugmsg(5, "lines:", lines)
+
 		if span > 0:
+			base.debugmsg(5, "span:", span)
 			ws.merge_cells(start_row=rownum, start_column=cellcol, end_row=rownum, end_column=cellcol + span)
 		else:
+			base.debugmsg(5, "span:", span)
 			currw = ws.column_dimensions[cell.column_letter].width
 			valw = 0
 			for line in lines:
 				valw = max(valw, len(line))
-			base.debugmsg(9, "currw:", currw, "	valw:", valw)
+			base.debugmsg(5, "currw:", currw, "	valw:", valw)
 			neww = max(currw, valw)
-			base.debugmsg(8, "neww:", neww)
+			base.debugmsg(5, "neww:", neww)
 			ws.column_dimensions[cell.column_letter].width = neww
 
 		if len(lines) > 1:
-			base.debugmsg(8, "len(lines):", len(lines))
+			base.debugmsg(5, "len(lines):", len(lines))
 			# currh = ws.row_dimensions[rownum].height
 			# https://stackoverflow.com/questions/32855656/column-and-row-dimensions-in-openpyxl-are-always-none
 			currh = 13
-			base.debugmsg(8, "currh:", currh)
+			base.debugmsg(5, "currh:", currh)
 			newh = currh * len(lines)
-			base.debugmsg(8, "newh:", newh)
+			base.debugmsg(5, "newh:", newh)
 			ws.row_dimensions[rownum].height = newh
 
+		base.debugmsg(5, "style:", style)
 		cell.style = style
 
 
