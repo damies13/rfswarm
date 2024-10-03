@@ -6,8 +6,8 @@ from docx import Document
 from docx.oxml.shared import OxmlElement, qn
 
 
-def read_docx_file(docx_path: str) -> dict:
-    """Read docx file and return dictionary."""
+def read_paragraphs_docx_file(docx_path: str) -> dict:
+    """Read paragraphs docx file and return dictionary."""
     doc = Document(docx_path)
 
     doc_sections: dict = {}
@@ -56,7 +56,7 @@ def update_table_of_contents(docx_path: str):
 def extract_images_from_docx(docx_path: str, output_folder: str) -> list:
     """
     Extract all images from DOCX one by one.
-    Returns list of saved images.
+    Returns list of the saved images.
     """
     doc = Document(docx_path)
     saved_images = []
@@ -85,12 +85,21 @@ def extract_tables_from_docx(docx_path: str) -> list:
     """
     doc = Document(docx_path)
     tables = []
+    def iter_unique_row_cells(row):
+        """Generate cells in given row skipping empty grid cells."""
+        last_cell_tc = None
+        for cell in row.cells:
+            this_cell_tc = cell._tc
+            if this_cell_tc is last_cell_tc:
+                continue
+            last_cell_tc = this_cell_tc
+            yield cell
 
     for table in doc.tables:
         table_data = []
         for row in table.rows:
             row_data = []
-            for i, cell in enumerate(row.cells):
+            for cell in iter_unique_row_cells(row):
                 row_data.append(cell.text)
             table_data.append(row_data)
         tables.append(table_data)
