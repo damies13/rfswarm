@@ -908,10 +908,10 @@ class ReporterBase():
 		base.report_item_set_changed(id)
 		base.report_save()
 
-
 	#
 	# Report Sections values
 	#
+
 	def report_item_get_value(self, id, name):
 		base.debugmsg(9, "id:", id, "name:", name)
 		if id in base.report and name in base.report[id]:
@@ -2430,7 +2430,7 @@ class ReporterBase():
 		if id not in base.reportdata:
 			base.reportdata[id] = {}
 
-		if "key" in base.reportdata[id]	and base.reportdata[id]["key"] != key:
+		if "key" in base.reportdata[id] and base.reportdata[id]["key"] != key:
 			base.reportdata[id] = {}
 
 		sql = base.rt_errors_generate_sql(id)
@@ -3426,7 +3426,6 @@ class ReporterCore:
 	#
 	# 	XHTML
 	#
-
 
 	def xhtml_save(self, filename, html):
 		result = etree.tostring(
@@ -8280,7 +8279,6 @@ class ReporterGUI(tk.Frame):
 		# self.contentdata[pid]["eST"].bind('<Leave>', self.cs_graph_update)
 		self.contentdata[pid]["eST"].bind('<FocusOut>', self.cs_graph_update)
 
-
 		self.contentdata[pid]["lblBlank"] = ttk.Label(self.contentdata[pid]["RFrame"], text=" ")
 		self.contentdata[pid]["lblBlank"].grid(column=0, row=rownum, sticky="nsew")
 
@@ -8363,7 +8361,6 @@ class ReporterGUI(tk.Frame):
 		id = self.sectionstree.focus()
 		base.debugmsg(9, "id:", id)
 		pid, idl, idr = base.rt_graph_LR_Ids(id)
-
 
 		# 		start time
 		if "strST" in self.contentdata[pid]:
@@ -9188,7 +9185,6 @@ class ReporterGUI(tk.Frame):
 			fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
 			self.contentdata[id]["strET"].set(fET)
 			self.contentdata[id]["fET"] = fET
-
 
 		if "intImages" in self.contentdata[id]:
 			images = self.contentdata[id]["intImages"].get()
