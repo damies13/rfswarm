@@ -9242,7 +9242,6 @@ class ReporterGUI(tk.Frame):
 			lbl_NoScreenshot = self.contentdata[id]["varNoScreenshot"].get()
 			changes += base.rt_errors_set_label(id, "lbl_NoScreenshot", lbl_NoScreenshot)
 
-
 		if changes > 0:
 			base.debugmsg(5, "content_preview id:", id)
 			# self.content_preview(id)
