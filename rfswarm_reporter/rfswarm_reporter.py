@@ -557,10 +557,17 @@ class ReporterBase():
 
 	def rs_setting_set(self, name, value):
 		base.debugmsg(9, "name:", name, "	value:", value)
-		base.report["Report"][name] = base.whitespace_set_ini_value(value)
-		# base.report_item_set_changed("Report")
-		base.report_save()
-		return 1
+		currvalue = ""
+		if name in base.report["Report"]:
+			currvalue = base.report["Report"][name]
+
+		if currvalue != value:
+			base.report["Report"][name] = base.whitespace_set_ini_value(value)
+			# base.report_item_set_changed("Report")
+			base.report_save()
+			return 1
+		else:
+			return 0
 
 	def rs_setting_get_int(self, name):
 		value = base.rs_setting_get(name)
@@ -570,8 +577,8 @@ class ReporterBase():
 			return int(value)
 
 	def rs_setting_set_int(self, name, value):
-		base.rs_setting_set(name, str(value))
-		return 1
+		changes = base.rs_setting_set(name, str(value))
+		return changes
 
 	def rs_setting_get_file(self, name):
 		value = base.rs_setting_get(name)
@@ -585,8 +592,8 @@ class ReporterBase():
 		# base.config['Reporter']['Report']	base.config['Reporter']['ResultDir']
 		if os.path.exists(value):
 			relpath = os.path.relpath(value, start=base.config['Reporter']['ResultDir'])
-			base.rs_setting_set(name, relpath)
-			return 1
+			changes = base.rs_setting_set(name, relpath)
+			return changes
 		return 0
 
 	def rs_setting_get_title(self):
@@ -921,10 +928,17 @@ class ReporterBase():
 
 	def report_item_set_value(self, id, name, value):
 		base.debugmsg(9, "id:", id, "name:", name, "	value:", value)
-		base.report[id][name] = base.whitespace_set_ini_value(value)
-		# base.report_item_set_changed("Report")
-		base.report_save()
-		return 1
+		currvalue = ""
+		if name in base.report[id]:
+			currvalue = base.report[id][name]
+		if currvalue != value:
+			base.report[id][name] = base.whitespace_set_ini_value(value)
+			# base.report_item_set_changed("Report")
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		else:
+			return 0
 
 	def report_item__get_int(self, id, name):
 		value = base.report_item_get_value(id, name)
@@ -934,8 +948,8 @@ class ReporterBase():
 			return int(value)
 
 	def report_item__set_int(self, id, name, value):
-		base.report_item_set_value(id, name, str(value))
-		return 1
+		changes = base.report_item_set_value(id, name, str(value))
+		return changes
 
 	#
 	# Report Item Type: contents
@@ -950,10 +964,8 @@ class ReporterBase():
 
 	def rt_contents_set_mode(self, id, mode):
 		base.debugmsg(5, "id:", id, "	mode:", mode)
-		base.report[id]['mode'] = base.whitespace_set_ini_value(mode)
-		base.report_item_set_changed(id)
-		base.report_save()
-		return 1
+		changes = base.report_item_set_value(id, 'mode', mode)
+		return changes
 
 	def rt_contents_get_level(self, id):
 		base.debugmsg(8, "id:", id)
@@ -966,10 +978,8 @@ class ReporterBase():
 
 	def rt_contents_set_level(self, id, level):
 		base.debugmsg(5, "id:", id, "	level:", level)
-		base.report[id]['level'] = base.whitespace_set_ini_value(str(level))
-		base.report_item_set_changed(id)
-		base.report_save()
-		return 1
+		changes = base.report_item_set_value(id, 'level', str(level))
+		return changes
 
 	#
 	# Report Item Type: note
@@ -991,6 +1001,8 @@ class ReporterBase():
 			base.report_save()
 			return 1
 		return 0
+		# changes = base.report_item_set_value(id, 'note', noteText)
+		# return changes
 	#
 	# Report Item Type: graph
 	#
@@ -7304,27 +7316,28 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "_event:", _event)
 		# id = self.sectionstree.focus()
 		# base.debugmsg(9, "id:", id)
+		changes = 0
 		id = "TOP"
 
 		if "strTitle" in self.contentdata[id]:
-			base.rs_setting_set("title", self.contentdata[id]["strTitle"].get())
+			changes += base.rs_setting_set("title", self.contentdata[id]["strTitle"].get())
 
 		# base.rs_setting_set_file("tlogo", fpath)
 		if "strLIPath" in self.contentdata[id]:
-			base.rs_setting_set_file("tlogo", self.contentdata[id]["strLIPath"])
+			changes += base.rs_setting_set_file("tlogo", self.contentdata[id]["strLIPath"])
 
 		# showlogo
 		if "intLI" in self.contentdata[id]:
-			base.rs_setting_set_int("showtlogo", self.contentdata[id]["intLI"].get())
+			changes += base.rs_setting_set_int("showtlogo", self.contentdata[id]["intLI"].get())
 
 		if "strDF" in self.contentdata[id]:
-			base.rs_setting_set("dateformat", self.contentdata[id]["strDF"].get())
+			changes += base.rs_setting_set("dateformat", self.contentdata[id]["strDF"].get())
 
 		if "strTF" in self.contentdata[id]:
-			base.rs_setting_set("timeformat", self.contentdata[id]["strTF"].get())
+			changes += base.rs_setting_set("timeformat", self.contentdata[id]["strTF"].get())
 
 		if "strTZ" in self.contentdata[id]:
-			base.rs_setting_set("timezone", self.contentdata[id]["strTZ"].get())
+			changes += base.rs_setting_set("timezone", self.contentdata[id]["strTZ"].get())
 
 		# strST
 		if "strST" in self.contentdata[id]:
@@ -7334,10 +7347,10 @@ class ReporterGUI(tk.Frame):
 			base.debugmsg(8, "ist:", ist)
 			if ist > 0:
 				ios = ist - base.report_starttime()
-				base.rs_setting_set_int("startoffset", ios)
+				changes += base.rs_setting_set_int("startoffset", ios)
 
 		if "intST" in self.contentdata[id]:
-			base.rs_setting_set_int("showstarttime", self.contentdata[id]["intST"].get())
+			changes += base.rs_setting_set_int("showstarttime", self.contentdata[id]["intST"].get())
 
 		# strET
 		if "strET" in self.contentdata[id]:
@@ -7347,30 +7360,31 @@ class ReporterGUI(tk.Frame):
 			base.debugmsg(8, "iet:", iet)
 			if iet > 0:
 				ios = base.report_endtime() - iet
-				base.rs_setting_set_int("endoffset", ios)
+				changes += base.rs_setting_set_int("endoffset", ios)
 
 		if "intET" in self.contentdata[id]:
-			base.rs_setting_set_int("showendtime", self.contentdata[id]["intET"].get())
+			changes += base.rs_setting_set_int("showendtime", self.contentdata[id]["intET"].get())
 
 		if "strFont" in self.contentdata[id]:
-			base.rs_setting_set("font", self.contentdata[id]["strFont"].get())
+			changes += base.rs_setting_set("font", self.contentdata[id]["strFont"].get())
 
 		if "intFontSz" in self.contentdata[id]:
 			fsz = self.contentdata[id]["intFontSz"].get()
 			base.debugmsg(5, "fsz:", fsz, "	", type(fsz))
-			base.rs_setting_set_int("fontsize", fsz)
+			changes += base.rs_setting_set_int("fontsize", fsz)
 
 		if "intPctile" in self.contentdata[id]:
 			pct = int(self.contentdata[id]["intPctile"].get())
 			if pct > 0:
 				base.debugmsg(5, "pct:", pct, "	", type(pct))
-				base.rs_setting_set_int("percentile", pct)
+				changes += base.rs_setting_set_int("percentile", pct)
 
-		self.cs_reportsettings()
+		if changes > 0:
+			self.cs_reportsettings()
 
-		self.ConfigureStyle()
-		regen = threading.Thread(target=self.cp_regenerate_preview)
-		regen.start()
+			self.ConfigureStyle()
+			regen = threading.Thread(target=self.cp_regenerate_preview)
+			regen.start()
 
 	def cs_select_logoimage(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
@@ -7505,17 +7519,19 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "_event:", _event)
 		id = self.sectionstree.focus()
 		base.debugmsg(9, "id:", id)
+		changes = 0
 
 		if "strCM" in self.contentdata[id]:
 			value = self.contentdata[id]["strCM"].get()
-			base.rt_contents_set_mode(id, value)
+			changes += base.rt_contents_set_mode(id, value)
 
 		if "intCL" in self.contentdata[id]:
 			value = self.contentdata[id]["intCL"].get()
-			base.rt_contents_set_level(id, value)
+			changes += base.rt_contents_set_level(id, value)
 
-		cp = threading.Thread(target=lambda: self.content_preview(id))
-		cp.start()
+		if changes > 0:
+			cp = threading.Thread(target=lambda: self.content_preview(id))
+			cp.start()
 
 	#
 	# Settings	-	Note
@@ -8361,6 +8377,7 @@ class ReporterGUI(tk.Frame):
 		id = self.sectionstree.focus()
 		base.debugmsg(9, "id:", id)
 		pid, idl, idr = base.rt_graph_LR_Ids(id)
+		changes = 0
 
 		# 		start time
 		if "strST" in self.contentdata[pid]:
@@ -8373,7 +8390,7 @@ class ReporterGUI(tk.Frame):
 				if ist > 0:
 					ios = ist - base.rs_setting_get_starttime()
 					base.debugmsg(5, "ios:", ios)
-					base.report_item__set_int(pid, "startoffset", ios)
+					changes += base.report_item__set_int(pid, "startoffset", ios)
 
 			iST = base.rt_setting_get_starttime(pid)
 			fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
@@ -8391,7 +8408,7 @@ class ReporterGUI(tk.Frame):
 				if iet > 0:
 					ios = base.rs_setting_get_endtime() - iet
 					base.debugmsg(5, "ios:", ios)
-					base.report_item__set_int(pid, "endoffset", ios)
+					changes += base.report_item__set_int(pid, "endoffset", ios)
 
 			iET = base.rt_setting_get_endtime(pid)
 			fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
@@ -8401,92 +8418,92 @@ class ReporterGUI(tk.Frame):
 		# intIsNum
 		if "intIsNum" in self.contentdata[idl]:
 			value = self.contentdata[idl]["intIsNum"].get()
-			base.rt_table_set_isnumeric(idl, value)
+			changes += base.rt_table_set_isnumeric(idl, value)
 		if "intIsNum" in self.contentdata[idr]:
 			value = self.contentdata[idr]["intIsNum"].get()
-			base.rt_table_set_isnumeric(idr, value)
+			changes += base.rt_table_set_isnumeric(idr, value)
 
 		# intShCnt
 		if "intShCnt" in self.contentdata[idl]:
 			value = self.contentdata[idl]["intShCnt"].get()
-			base.rt_table_set_showcount(idl, value)
+			changes += base.rt_table_set_showcount(idl, value)
 		if "intShCnt" in self.contentdata[idr]:
 			value = self.contentdata[idr]["intShCnt"].get()
-			base.rt_table_set_showcount(idr, value)
+			changes += base.rt_table_set_showcount(idr, value)
 
 		if "MType" in self.contentdata[idl]:
 			value = self.contentdata[idl]["MType"].get()
-			base.rt_table_set_mt(idl, value)
+			changes += base.rt_table_set_mt(idl, value)
 		if "MType" in self.contentdata[idr]:
 			value = self.contentdata[idr]["MType"].get()
-			base.rt_table_set_mt(idr, value)
+			changes += base.rt_table_set_mt(idr, value)
 
 		if "PMetric" in self.contentdata[idl]:
 			value = self.contentdata[idl]["PMetric"].get()
-			base.rt_table_set_pm(idl, value)
+			changes += base.rt_table_set_pm(idl, value)
 		if "PMetric" in self.contentdata[idr]:
 			value = self.contentdata[idr]["PMetric"].get()
-			base.rt_table_set_pm(idr, value)
+			changes += base.rt_table_set_pm(idr, value)
 
 		if "SMetric" in self.contentdata[idl]:
 			value = self.contentdata[idl]["SMetric"].get()
-			base.rt_table_set_sm(idl, value)
+			changes += base.rt_table_set_sm(idl, value)
 		if "SMetric" in self.contentdata[idr]:
 			value = self.contentdata[idr]["SMetric"].get()
-			base.rt_table_set_sm(idr, value)
+			changes += base.rt_table_set_sm(idr, value)
 
 		if "RType" in self.contentdata[idl]:
 			value = self.contentdata[idl]["RType"].get()
-			base.rt_table_set_rt(idl, value)
+			changes += base.rt_table_set_rt(idl, value)
 		if "RType" in self.contentdata[idr]:
 			value = self.contentdata[idr]["RType"].get()
-			base.rt_table_set_rt(idr, value)
+			changes += base.rt_table_set_rt(idr, value)
 
 		if "FRType" in self.contentdata[idl]:
 			value = self.contentdata[idl]["FRType"].get()
-			base.rt_table_set_fr(idl, value)
+			changes += base.rt_table_set_fr(idl, value)
 		if "FRType" in self.contentdata[idr]:
 			value = self.contentdata[idr]["FRType"].get()
-			base.rt_table_set_fr(idr, value)
+			changes += base.rt_table_set_fr(idr, value)
 
 		if "intFR" in self.contentdata[idl]:
 			value = self.contentdata[idl]["intFR"].get()
-			base.rt_table_set_enfr(idl, value)
+			changes += base.rt_table_set_enfr(idl, value)
 		if "intFR" in self.contentdata[idr]:
 			value = self.contentdata[idr]["intFR"].get()
-			base.rt_table_set_enfr(idr, value)
+			changes += base.rt_table_set_enfr(idr, value)
 
 		if "intFA" in self.contentdata[idl]:
 			value = self.contentdata[idl]["intFA"].get()
-			base.rt_table_set_enfa(idl, value)
+			changes += base.rt_table_set_enfa(idl, value)
 		if "intFA" in self.contentdata[idr]:
 			value = self.contentdata[idr]["intFA"].get()
-			base.rt_table_set_enfa(idr, value)
+			changes += base.rt_table_set_enfa(idr, value)
 
 		if "FAType" in self.contentdata[idl]:
 			value = self.contentdata[idl]["FAType"].get()
-			base.rt_table_set_fa(idl, value)
+			changes += base.rt_table_set_fa(idl, value)
 		if "FAType" in self.contentdata[idr]:
 			value = self.contentdata[idr]["FAType"].get()
-			base.rt_table_set_fa(idr, value)
+			changes += base.rt_table_set_fa(idr, value)
 
 		if "FNType" in self.contentdata[idl]:
 			value = self.contentdata[idl]["FNType"].get()
-			base.rt_table_set_fn(idl, value)
+			changes += base.rt_table_set_fn(idl, value)
 		if "FNType" in self.contentdata[idr]:
 			value = self.contentdata[idr]["FNType"].get()
-			base.rt_table_set_fn(idr, value)
+			changes += base.rt_table_set_fn(idr, value)
 
 		if "FPattern" in self.contentdata[idl]:
 			value = self.contentdata[idl]["FPattern"].get()
-			base.rt_table_set_fp(idl, value)
+			changes += base.rt_table_set_fp(idl, value)
 		if "FPattern" in self.contentdata[idr]:
 			value = self.contentdata[idr]["FPattern"].get()
-			base.rt_table_set_fp(idr, value)
+			changes += base.rt_table_set_fp(idr, value)
 
 		if "strDT" in self.contentdata[idl]:
 			datatype = self.contentdata[idl]["strDT"].get()
-			base.rt_table_set_dt(idl, datatype)
+			changes += base.rt_table_set_dt(idl, datatype)
 			if datatype == "Metric":
 				self.cs_datatable_update_metrics(idl)
 			if datatype != "SQL":
@@ -8494,7 +8511,7 @@ class ReporterGUI(tk.Frame):
 				base.rt_graph_generate_sql(idl)
 		if "strDT" in self.contentdata[idr]:
 			datatype = self.contentdata[idr]["strDT"].get()
-			base.rt_table_set_dt(idr, datatype)
+			changes += base.rt_table_set_dt(idr, datatype)
 			if datatype == "Metric":
 				self.cs_datatable_update_metrics(idr)
 			if datatype != "SQL":
@@ -8504,30 +8521,31 @@ class ReporterGUI(tk.Frame):
 		# self.contentdata[idl]["intAxsEn"] = tk.IntVar()
 		if "intAxsEn" in self.contentdata[idl]:
 			value = self.contentdata[idl]["intAxsEn"].get()
-			base.rt_graph_set_axisen(idl, value)
+			changes += base.rt_graph_set_axisen(idl, value)
 		if "intAxsEn" in self.contentdata[idr]:
 			value = self.contentdata[idr]["intAxsEn"].get()
-			base.rt_graph_set_axisen(idr, value)
+			changes += base.rt_graph_set_axisen(idr, value)
 
 		if "tSQL" in self.contentdata[idl]:
 			data = self.contentdata[idl]["tSQL"].get('0.0', tk.END).strip()
 			base.debugmsg(5, "data:", data)
-			base.rt_graph_set_sql(idl, data)
+			changes += base.rt_graph_set_sql(idl, data)
 		else:
 			time.sleep(0.1)
-			base.rt_graph_generate_sql(idl)
+			changes += base.rt_graph_generate_sql(idl)
 		if "tSQL" in self.contentdata[idr]:
 			data = self.contentdata[idr]["tSQL"].get('0.0', tk.END).strip()
 			base.debugmsg(5, "data:", data)
-			base.rt_graph_set_sql(idr, data)
+			changes += base.rt_graph_set_sql(idr, data)
 		else:
 			time.sleep(0.1)
 			base.rt_graph_generate_sql(idr)
 
-		base.debugmsg(5, "content_preview id:", id)
-		# self.content_preview(id)
-		cp = threading.Thread(target=lambda: self.content_preview(id))
-		cp.start()
+		if changes > 0:
+			base.debugmsg(5, "content_preview id:", id)
+			# self.content_preview(id)
+			cp = threading.Thread(target=lambda: self.content_preview(id))
+			cp.start()
 
 	def cs_graph_switchdt(self, _event=None):
 		base.debugmsg(5, "self:", self, "	_event:", _event)
@@ -9152,7 +9170,6 @@ class ReporterGUI(tk.Frame):
 
 		# 		start time
 		if "strST" in self.contentdata[id]:
-			pass
 			st = self.contentdata[id]["strST"].get()
 			base.debugmsg(5, "st:", st)
 			if st != self.contentdata[id]["fST"]:
@@ -9161,7 +9178,7 @@ class ReporterGUI(tk.Frame):
 				if ist > 0:
 					ios = ist - base.rs_setting_get_starttime()
 					base.debugmsg(5, "ios:", ios)
-					base.report_item__set_int(id, "startoffset", ios)
+					changes += base.report_item__set_int(id, "startoffset", ios)
 
 			iST = base.rt_setting_get_starttime(id)
 			fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
@@ -9170,7 +9187,6 @@ class ReporterGUI(tk.Frame):
 
 		# 		end time
 		if "strET" in self.contentdata[id]:
-			pass
 			et = self.contentdata[id]["strET"].get()
 			base.debugmsg(5, "et:", et)
 			if et != self.contentdata[id]["fET"]:
@@ -9179,7 +9195,7 @@ class ReporterGUI(tk.Frame):
 				if iet > 0:
 					ios = base.rs_setting_get_endtime() - iet
 					base.debugmsg(5, "ios:", ios)
-					base.report_item__set_int(id, "endoffset", ios)
+					changes += base.report_item__set_int(id, "endoffset", ios)
 
 			iET = base.rt_setting_get_endtime(id)
 			fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
@@ -9226,10 +9242,12 @@ class ReporterGUI(tk.Frame):
 			lbl_NoScreenshot = self.contentdata[id]["varNoScreenshot"].get()
 			changes += base.rt_errors_set_label(id, "lbl_NoScreenshot", lbl_NoScreenshot)
 
-		base.debugmsg(5, "content_preview id:", id)
-		# self.content_preview(id)
-		cp = threading.Thread(target=lambda: self.content_preview(id))
-		cp.start()
+
+		if changes > 0:
+			base.debugmsg(5, "content_preview id:", id)
+			# self.content_preview(id)
+			cp = threading.Thread(target=lambda: self.content_preview(id))
+			cp.start()
 
 	#
 	# Preview
