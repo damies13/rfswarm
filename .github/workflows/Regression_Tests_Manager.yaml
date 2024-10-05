@@ -10,6 +10,7 @@ jobs:
         platform: [ubuntu-latest, macos-latest, windows-latest]
         # robot: ['6.1.1', '7.0']
         python: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        tag: ['GUI', 'CommandLine']
       fail-fast: false
     runs-on: ${{ matrix.platform }}
     steps:
@@ -114,7 +115,8 @@ jobs:
         id: robottest
         run: >
           robot --include ${{ env.tag }}
-          --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          --exclude NOT${{ matrix.tag }}
+          --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
           Tests/Regression/Manager
         env:
           DISPLAY: :13.0
@@ -124,28 +126,28 @@ jobs:
       - name: Try and fix images with relative path
         if: ${{ !cancelled() && matrix.platform != 'macos-latest' }}
         run: |
-          cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}
-          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}/img src="./g' ./output.xml
+          cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
+          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/img src="./g' ./output.xml
           rebot ./output.xml
       - name: Try and fix images with relative path (macos)
         if: ${{ !cancelled() &&  matrix.platform == 'macos-latest' }}
         run: |
-          cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}
-          sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}/img src="./g' ./output.xml
+          cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
+          sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/img src="./g' ./output.xml
           rebot ./output.xml
 
       - name: Archive Manager Logs
         if: ${{ success() }}
         uses: actions/upload-artifact@v4
         with:
-          name: Manager-${{ matrix.platform }}-${{ matrix.python }}
-          path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}
+          path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
           retention-days: 15
 
       - name: Archive Manager Logs (longer retention if failed)
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: Manager-${{ matrix.platform }}-${{ matrix.python }}
-          path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}
+          path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
           retention-days: 90

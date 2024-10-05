@@ -1,4 +1,6 @@
 *** Settings ***
+Test Tags       Basic 	GUI
+
 Library 	OperatingSystem
 Library 	Process
 Library 	String

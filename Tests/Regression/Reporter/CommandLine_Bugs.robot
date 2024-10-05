@@ -1,6 +1,7 @@
 *** Settings ***
 Resource 	CommandLine_Common.robot
 
+
 *** Test Cases ***
 Check If The Not Buildin Modules Are Included In The Reporter Setup File
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123
@@ -20,8 +21,8 @@ Check If The Not Buildin Modules Are Included In The Reporter Setup File
 		...    msg="Some modules are not in Reporter setup file"
 	END
 
-Command Line Generate HTML
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	HTML
+Auto Generate HTML Report Without GUI Using Template
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	Issue #132 	HTML
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	${testdata}= 	Set Variable    Issue-#144
 	${resultdata}= 	Set Variable    20230320_185055_demo
@@ -34,14 +35,23 @@ Command Line Generate HTML
 	${template}= 	Set Variable    ${basefolder}${/}90%ileTemplate.template
 	Should Exist	${template}
 	Log 	template: ${template} 	console=True
+	Log To Console	Run Reporter with cutom template and generate html report.
 	# ${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --html
 	${result}= 	Run 	${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --html
 	Log 	result: ${\n}${result} 	console=True
+
 	Should Not Contain 	${result} 	Traceback
 	Should Exist	${resultfolder}${/}${resultdata}.html
+	File Should Not Be Empty 	${resultfolder}${/}${resultdata}.html
+	${html_content}= 	Get File 	${resultfolder}${/}${resultdata}.html
+	Should Contain 	${html_content} 	<title>quickdemo</title>
+	Should Contain 	${html_content} 	<h1>8 Issue-#132</h1>
+	Should Contain 	${html_content} 	<div class="body"><p>This is a test for Issue-#132</p></div>
 
-Command Line Generate Docx
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	DOCX
+	[Teardown] 	Move File 	${resultfolder}${/}${resultdata}.html 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.html
+
+Auto Generate DOCX Report Without GUI Using Template
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	Issue #132 	DOCX
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	${testdata}= 	Set Variable    Issue-#144
 	${resultdata}= 	Set Variable    20230320_185055_demo
@@ -54,14 +64,19 @@ Command Line Generate Docx
 	${template}= 	Set Variable    ${basefolder}${/}90%ileTemplate.template
 	Should Exist	${template}
 	Log 	template: ${template} 	console=True
+	Log To Console	Run Reporter with cutom template and generate docx report.
 	# ${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --docx
 	${result}= 	Run 	${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --docx
-	Log 	${\n}${result} 	console=True
+	Log 	result: ${\n}${result} 	console=True
+
 	Should Not Contain 	${result} 	Traceback
 	Should Exist	${resultfolder}${/}${resultdata}.docx
+	File Should Not Be Empty 	${resultfolder}${/}${resultdata}.docx
 
-Command Line Generate Xlsx
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	XLSX
+	[Teardown] 	Move File 	${resultfolder}${/}${resultdata}.docx 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.docx
+
+Auto Generate XLSX Report Without GUI Using Template
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #144 	Issue #132 	XLSX
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	${testdata}= 	Set Variable    Issue-#144
 	${resultdata}= 	Set Variable    20230320_185055_demo
@@ -74,8 +89,14 @@ Command Line Generate Xlsx
 	${template}= 	Set Variable    ${basefolder}${/}90%ileTemplate.template
 	Should Exist	${template}
 	Log 	template: ${template} 	console=True
+	Log To Console	Run Reporter with cutom template and generate xlsx report.
 	# ${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --xlsx
 	${result}= 	Run 	${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --xlsx
-	Log 	${\n}${result} 	console=True
+	Log 	result: ${\n}${result} 	console=True
+
 	Should Not Contain 	${result} 	Traceback
 	Should Exist	${resultfolder}${/}${resultdata}.xlsx
+	File Should Not Be Empty 	${resultfolder}${/}${resultdata}.xlsx
+
+	[Teardown] 	Move File 	${resultfolder}${/}${resultdata}.xlsx 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.xlsx
+

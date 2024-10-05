@@ -98,6 +98,7 @@ Select Field With Label
 	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
 	${labell}= 	Convert To Lower Case 	${label}
 	${img}=	Set Variable		reporter_${platform}_label_${labell}.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 	${imgsize}= 	Get Image Size 	${IMAGE_DIR}${/}${img}
 	Log		${imgsize}
 	${offsetx}= 	Evaluate 	int(${imgsize}[0]/2)+${offsetx}
@@ -112,6 +113,7 @@ Select Field With Label
 	Move To 	${coordinates}
 	Click
 	Sleep 	${sssleep}
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 	# Take A Screenshot
 
 Find Text
@@ -142,6 +144,8 @@ Get Text Value To Right Of
 	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
 	${labell}= 	Convert To Lower Case 	${label}
 	${img}= 	Set Variable		reporter_${platform}_label_${labell}.png
+
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 
 	${b4value}= 	Get Clipboard Content
 	${value}= 	Copy From The Right Of 	${img} 	${offsetx}

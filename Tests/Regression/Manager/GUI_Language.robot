@@ -1,10 +1,11 @@
 *** Settings ***
+Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #238 	Languages 	GUI
+
 Resource 	GUI_Common.robot
 
 Suite Setup 	Set Platform
 Test Setup 	Language Test Init
 Test Teardown 	Language Test End
-Test Tags 	windows-latest	ubuntu-latest	macos-latest	Issue #238
 Test Template 	Add Test In Language
 
 *** Test Cases ***
@@ -24,7 +25,7 @@ Polish		pl
 Portuguese		pt
 Brazilian Portuguese		pt_br
 Romanian		ro
-Russian		ru
+# Russian		ru		# Sorry no tests of Russian Language while Russian Troops remain in Ukraine
 Swedish		sv
 Thai		th
 Turkish		tr

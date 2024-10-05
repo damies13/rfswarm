@@ -1,6 +1,7 @@
 *** Settings ***
 Library 	OperatingSystem
 Library 	Process
+Library 	DatabaseLibrary
 Library 	String
 Library		Collections
 Library		DateTime
@@ -394,6 +395,18 @@ Click CheckBox
 	Click Image		${img}
 	Sleep 	0.1
 	# Take A Screenshot
+
+Click RadioBtn
+	[Arguments]		${btnname}
+	${btnnamel}= 	Convert To Lower Case 	${btnname}
+	${img}=	Set Variable		${platform}_radiobtn_${btnnamel}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+	Sleep 	1
+	Take A Screenshot
 
 Press ${key} ${n} Times
 	[Documentation]	Provide full name. For example: Key.tab
@@ -1356,7 +1369,7 @@ Verify Test Result Directory Name
 	${current_date}=	Convert Date	${current_date}		result_format=%Y%m%d_%H%M%S
 	${expected_time_to_substract}=	Convert Date	${current_date}		date_format=%Y%m%d_%H%M%S
 	${test_run_time_to_substract}=	Convert Date	${run_dir_name_fragmented}[0]_${run_dir_name_fragmented}[1]		date_format=%Y%m%d_%H%M%S
-	${time_diff}		Subtract Date From Date	${current_date}	${test_run_time_to_substract}
+	${time_diff}		Subtract Date From Date	${current_date} 	${test_run_time_to_substract}
 	Log To Console	Time diff: ${time_diff}
 	Should Be True	${time_diff} >= 0 and ${time_diff} <= 3
 	...    msg=Result directory name has incorrect date: expected "${current_date}_${scenario_name}", actual: "${result_dir_name}". There should be little or no difference.
@@ -1393,6 +1406,30 @@ Verify Generated Run Result Files
 	${len}=		Get Length	${logs_file_names}
 	Log To Console	Number of files in the Logs directory: ${len}
 	Should Be True	${len} >= 20	msg=Number of files in the Logs directory is incorrect: should be at least 20, actual: "${len}".
+
+Find Result DB
+	[Arguments] 	${result_pattern}=*_*
+	# ${fols}= 	List Directory 	${results_dir}
+	# Log to console 	${fols}
+	${fols}= 	List Directory 	${results_dir} 	${result_pattern} 	absolute=True
+	Log to console 	${fols}
+	# ${files}= 	List Directory 	${fols[0]}
+	# Log to console 	${files}
+	${file}= 	List Directory 	${fols[-1]} 	*.db 	absolute=True
+	Log to console 	Result DB: ${file[-1]}
+	RETURN 	${file[-1]}
+
+Query Result DB
+	[Arguments]		${dbfile} 	${sql}
+	Log to console 	dbfile: ${dbfile}
+	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
+	# Log to console 	\${dbfile}: ${dbfile}
+	Connect To Database Using Custom Params 	sqlite3 	database="${dbfile}", isolation_level=None
+	Log to console 	sql: ${sql}
+	${result}= 	Query 	${sql}
+	Log to console 	sql result: ${result}
+	Disconnect From Database
+	RETURN 	${result}
 
 Navigate to and check Desktop Icon
 	VAR 	${projname}= 		rfswarm-manager 		scope=TEST
@@ -1514,17 +1551,18 @@ Navigate to and check Desktop Icon For Windows
 	${img}=	Set Variable		${platform}_start_menu.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
+	Move To 		${coordinates}
 	Click Image		${img}
-	Sleep 	1
-	Take A Screenshot
+	# Sleep 	1
+	# Take A Screenshot
 
 	${img}=	Set Variable		${platform}_start_menu_rfswarm_manager.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 
 	# Navigate Start Menu
 	Type 	RFSwarm
-	Sleep 	0.5
-	Take A Screenshot
+	# Sleep 	0.5
+	# Take A Screenshot
 
 	# Check for Icon
 	${img}=	Set Variable		${platform}_search_rfswarm_manager.png
@@ -1538,22 +1576,28 @@ Navigate to and check Desktop Icon For Ubuntu
 	${img}=	Set Variable		${platform}_lxqt_menu.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
+	Move To 		${coordinates}
 	Click Image		${img}
-	Sleep 	0.5
-	Take A Screenshot
+	# Sleep 	0.5
+	# Take A Screenshot
 
 	# Navigate Menu
 	# lxqt_programming_menu.png
 	${img}=	Set Variable		${platform}_lxqt_programming_menu.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
-	Click Image		${img}
+	@{coordinates}= 	Locate		${img}
+	Move To 		${coordinates}
 	Sleep 	0.5
+	Take A Screenshot
+	Click Image		${img}
+	Sleep 	1
 	Take A Screenshot
 
 	# Check for Icon
 	# ubuntu_lxqt_rfswarm_manager_menu.png
 	${img}=	Set Variable		${platform}_lxqt_rfswarm_manager_menu.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Take A Screenshot
 
 	Press Combination 	KEY.ESC
 

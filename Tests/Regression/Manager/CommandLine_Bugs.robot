@@ -1,4 +1,6 @@
 *** Settings ***
+Test Tags       Bugs 	CommandLine
+
 Resource 	CommandLine_Common.robot
 
 Suite Setup 		Create Directory 	${results_dir}

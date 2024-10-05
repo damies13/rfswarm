@@ -83,6 +83,7 @@ Whole report time range
 	Click Tab 	 Settings
 	Click Section			Report
 
+	# Take A Screenshot
 	# Set start time 14:20
 	# Select Field With Label 	StartTime
 	# Press Combination 	KEY.END
@@ -92,6 +93,10 @@ Whole report time range
 	${StartTime}= 	Replace String 	${StartTime} 	14:11 	14:20
 	Set Text Value To Right Of 	StartTime 	${StartTime}
 
+	# Take A Screenshot
+	Select Field With Label 	Title 		150
+	Wait For Status 	PreviewLoaded
+	# Take A Screenshot
 	# Set start time 14:58
 	# Select Field With Label 	EndTime
 	# Press Combination 	KEY.END
@@ -101,9 +106,10 @@ Whole report time range
 	${EndTime}= 	Replace String 	${EndTime} 	15:00 	14:58
 	Set Text Value To Right Of 	EndTime 	${EndTime}
 
+	# Take A Screenshot
 	# ${bounds}= 	Find Text 	Title:
 
-	Select Field With Label 	Title
+	Select Field With Label 	Title 		150
 
 	Click Tab 	 Preview
 	Wait For Status 	PreviewLoaded

@@ -422,6 +422,7 @@ class ReporterBase():
 
 	def report_starttime(self):
 		if "starttime" in self.reportdata and self.reportdata["starttime"] > 0:
+			base.debugmsg(5, "starttime:", self.reportdata["starttime"])
 			return self.reportdata["starttime"]
 		else:
 			self.reportdata["starttime"] = 0
@@ -444,14 +445,16 @@ class ReporterBase():
 
 				self.reportdata["starttime"] = int(gdata[0]["MetricTime"])
 
-				base.debugmsg(8, "starttime:", self.reportdata["starttime"])
+				base.debugmsg(5, "starttime:", self.reportdata["starttime"])
 
 				return self.reportdata["starttime"]
 			else:
+				base.debugmsg(5, "starttime:", int(time.time()) - 1)
 				return int(time.time()) - 1
 
 	def report_endtime(self):
 		if "endtime" in self.reportdata and self.reportdata["endtime"] > 0:
+			base.debugmsg(5, "endtime:", self.reportdata["endtime"])
 			return self.reportdata["endtime"]
 		else:
 			self.reportdata["endtime"] = 0
@@ -475,10 +478,11 @@ class ReporterBase():
 
 				self.reportdata["endtime"] = int(gdata[0]["MetricTime"])
 
-				base.debugmsg(8, "endtime:", self.reportdata["endtime"])
+				base.debugmsg(5, "endtime:", self.reportdata["endtime"])
 
 				return self.reportdata["endtime"]
 			else:
+				base.debugmsg(5, "starttime:", int(time.time()))
 				return int(time.time())
 
 	def report_formatdate(self, itime):
@@ -553,10 +557,17 @@ class ReporterBase():
 
 	def rs_setting_set(self, name, value):
 		base.debugmsg(9, "name:", name, "	value:", value)
-		base.report["Report"][name] = base.whitespace_set_ini_value(value)
-		# base.report_item_set_changed("Report")
-		base.report_save()
-		return 1
+		currvalue = ""
+		if name in base.report["Report"]:
+			currvalue = base.report["Report"][name]
+
+		if currvalue != value:
+			base.report["Report"][name] = base.whitespace_set_ini_value(value)
+			# base.report_item_set_changed("Report")
+			base.report_save()
+			return 1
+		else:
+			return 0
 
 	def rs_setting_get_int(self, name):
 		value = base.rs_setting_get(name)
@@ -566,8 +577,8 @@ class ReporterBase():
 			return int(value)
 
 	def rs_setting_set_int(self, name, value):
-		base.rs_setting_set(name, str(value))
-		return 1
+		changes = base.rs_setting_set(name, str(value))
+		return changes
 
 	def rs_setting_get_file(self, name):
 		value = base.rs_setting_get(name)
@@ -581,8 +592,8 @@ class ReporterBase():
 		# base.config['Reporter']['Report']	base.config['Reporter']['ResultDir']
 		if os.path.exists(value):
 			relpath = os.path.relpath(value, start=base.config['Reporter']['ResultDir'])
-			base.rs_setting_set(name, relpath)
-			return 1
+			changes = base.rs_setting_set(name, relpath)
+			return changes
 		return 0
 
 	def rs_setting_get_title(self):
@@ -689,6 +700,7 @@ class ReporterBase():
 
 	def rs_setting_get_starttime(self):
 		value = self.rs_setting_get_int('startoffset')
+		base.debugmsg(5, "value:", value)
 		if value < 1:
 			return self.report_starttime()
 		else:
@@ -696,6 +708,7 @@ class ReporterBase():
 
 	def rs_setting_get_endtime(self):
 		value = self.rs_setting_get_int('endoffset')
+		base.debugmsg(5, "value:", value)
 		if value < 1:
 			return self.report_endtime()
 		else:
@@ -903,6 +916,42 @@ class ReporterBase():
 		base.report_save()
 
 	#
+	# Report Sections values
+	#
+
+	def report_item_get_value(self, id, name):
+		base.debugmsg(9, "id:", id, "name:", name)
+		if id in base.report and name in base.report[id]:
+			return base.whitespace_get_ini_value(base.report[id][name])
+		else:
+			return None
+
+	def report_item_set_value(self, id, name, value):
+		base.debugmsg(9, "id:", id, "name:", name, "	value:", value)
+		currvalue = ""
+		if name in base.report[id]:
+			currvalue = base.report[id][name]
+		if currvalue != value:
+			base.report[id][name] = base.whitespace_set_ini_value(value)
+			# base.report_item_set_changed("Report")
+			base.report_item_set_changed(id)
+			base.report_save()
+			return 1
+		else:
+			return 0
+
+	def report_item__get_int(self, id, name):
+		value = base.report_item_get_value(id, name)
+		if value is None:
+			return -1
+		else:
+			return int(value)
+
+	def report_item__set_int(self, id, name, value):
+		changes = base.report_item_set_value(id, name, str(value))
+		return changes
+
+	#
 	# Report Item Type: contents
 	#
 
@@ -915,10 +964,8 @@ class ReporterBase():
 
 	def rt_contents_set_mode(self, id, mode):
 		base.debugmsg(5, "id:", id, "	mode:", mode)
-		base.report[id]['mode'] = base.whitespace_set_ini_value(mode)
-		base.report_item_set_changed(id)
-		base.report_save()
-		return 1
+		changes = base.report_item_set_value(id, 'mode', mode)
+		return changes
 
 	def rt_contents_get_level(self, id):
 		base.debugmsg(8, "id:", id)
@@ -931,10 +978,8 @@ class ReporterBase():
 
 	def rt_contents_set_level(self, id, level):
 		base.debugmsg(5, "id:", id, "	level:", level)
-		base.report[id]['level'] = base.whitespace_set_ini_value(str(level))
-		base.report_item_set_changed(id)
-		base.report_save()
-		return 1
+		changes = base.report_item_set_value(id, 'level', str(level))
+		return changes
 
 	#
 	# Report Item Type: note
@@ -956,6 +1001,8 @@ class ReporterBase():
 			base.report_save()
 			return 1
 		return 0
+		# changes = base.report_item_set_value(id, 'note', noteText)
+		# return changes
 	#
 	# Report Item Type: graph
 	#
@@ -1034,6 +1081,13 @@ class ReporterBase():
 		base.debugmsg(8, "id:", id)
 		sql = ""
 		DataType = self.rt_table_get_dt(id)
+
+		pid = base.report_subsection_parent(id)
+		starttime = base.rt_setting_get_starttime(pid)
+		base.debugmsg(5, "starttime:", starttime)
+		endtime = base.rt_setting_get_endtime(pid)
+		base.debugmsg(5, "endtime:", endtime)
+
 		if DataType == "Result":
 			RType = self.rt_table_get_rt(id)
 			EnFR = self.rt_table_get_enfr(id)
@@ -1153,12 +1207,10 @@ class ReporterBase():
 					lwhere.append("[" + colname + "] NOT REGEXP '{}'".format(inpFP))
 
 			# Start Time
-			starttime = base.rs_setting_get_starttime()
 			if starttime > 0:
 				lwhere.append("end_time >= {}".format(starttime))
 
 			# End Time
-			endtime = base.rs_setting_get_endtime()
 			if endtime > 0:
 				lwhere.append("end_time <= {}".format(endtime))
 
@@ -1297,12 +1349,10 @@ class ReporterBase():
 					wherelst.append(fpwhere)
 
 			# Start Time
-			starttime = base.rs_setting_get_starttime()
 			if starttime > 0:
 				wherelst.append("MetricTime >= {}".format(starttime))
 
 			# End Time
-			endtime = base.rs_setting_get_endtime()
 			if endtime > 0:
 				wherelst.append("MetricTime <= {}".format(endtime))
 
@@ -1387,6 +1437,10 @@ class ReporterBase():
 		display_percentile = base.rs_setting_get_pctile()
 		sql = ""
 		DataType = self.rt_table_get_dt(id)
+
+		starttime = base.rt_setting_get_starttime(id)
+		endtime = base.rt_setting_get_endtime(id)
+
 		if DataType == "Result":
 			RType = self.rt_table_get_rt(id)
 			EnFR = self.rt_table_get_enfr(id)
@@ -1486,12 +1540,10 @@ class ReporterBase():
 					lwhere.append("[" + colname + "] NOT REGEXP '{}'".format(inpFP))
 
 			# Start Time
-			starttime = base.rs_setting_get_starttime()
 			if starttime > 0:
 				lwhere.append("end_time >= {}".format(starttime))
 
 			# End Time
-			endtime = base.rs_setting_get_endtime()
 			if endtime > 0:
 				lwhere.append("end_time <= {}".format(endtime))
 
@@ -1628,12 +1680,10 @@ class ReporterBase():
 				mcolumns.append("round(stdev(CAST(MetricValue AS NUMERIC)),3) AS 'Std. Dev.'")
 
 			# Start Time
-			starttime = base.rs_setting_get_starttime()
 			if starttime > 0:
 				wherelst.append("MetricTime >= {}".format(starttime))
 
 			# End Time
-			endtime = base.rs_setting_get_endtime()
 			if endtime > 0:
 				wherelst.append("MetricTime <= {}".format(endtime))
 
@@ -1755,12 +1805,10 @@ class ReporterBase():
 					lwhere.append("[" + colname + "] NOT REGEXP '{}'".format(inpFP))
 
 			# Start Time
-			starttime = base.rs_setting_get_starttime()
 			if starttime > 0:
 				lwhere.append("r.end_time >= {}".format(starttime))
 
 			# End Time
-			endtime = base.rs_setting_get_endtime()
 			if endtime > 0:
 				lwhere.append("r.end_time <= {}".format(endtime))
 
@@ -1805,6 +1853,25 @@ class ReporterBase():
 				base.report_save()
 				return 1
 		return 0
+
+	# 	rt_setting_get_starttime
+	def rt_setting_get_starttime(self, id):
+		# value = self.rs_setting_get_int('startoffset')
+		value = base.report_item__get_int(id, 'startoffset')
+		base.debugmsg(5, "value:", value)
+		if value < 1:
+			return self.rs_setting_get_starttime()
+		else:
+			return self.rs_setting_get_starttime() + int(value)
+
+	def rt_setting_get_endtime(self, id):
+		# value = self.rs_setting_get_int('endoffset')
+		value = base.report_item__get_int(id, 'endoffset')
+		base.debugmsg(5, "value:", value)
+		if value < 1:
+			return self.rs_setting_get_endtime()
+		else:
+			return self.rs_setting_get_endtime() - int(value)
 
 	def rt_table_get_dt(self, id):
 		base.debugmsg(9, "id:", id)
@@ -2261,6 +2328,10 @@ class ReporterBase():
 
 	def rt_errors_generate_sql(self, id):
 		base.debugmsg(8, "id:", id)
+
+		starttime = base.rt_setting_get_starttime(id)
+		endtime = base.rt_setting_get_endtime(id)
+
 		sql = ""
 
 		sql += "SELECT "
@@ -2279,11 +2350,9 @@ class ReporterBase():
 		sql += "WHERE r.result = 'FAIL' "
 
 		# Start Time
-		starttime = base.rs_setting_get_starttime()
 		if starttime > 0:
 			sql += "AND r.end_time >= {} ".format(starttime)
 		# End Time
-		endtime = base.rs_setting_get_endtime()
 		if endtime > 0:
 			sql += "AND r.end_time <= {} ".format(endtime)
 
@@ -2368,8 +2437,12 @@ class ReporterBase():
 
 	def rt_errors_get_data(self, id):
 		base.debugmsg(5, "id:", id)
+		key = "{}_{}".format(id, base.report_item_get_changed(id))
 
 		if id not in base.reportdata:
+			base.reportdata[id] = {}
+
+		if "key" in base.reportdata[id] and base.reportdata[id]["key"] != key:
 			base.reportdata[id] = {}
 
 		sql = base.rt_errors_generate_sql(id)
@@ -2377,8 +2450,8 @@ class ReporterBase():
 		# colours = base.rt_table_get_colours(id)
 		if sql is not None and len(sql.strip()) > 0:
 			base.debugmsg(5, "sql:", sql)
-			key = "{}_{}".format(id, base.report_item_get_changed(id))
 			base.dbqueue["Read"].append({"SQL": sql, "KEY": key})
+			base.reportdata[id]["key"] = key
 			while key not in base.dbqueue["ReadResult"]:
 				time.sleep(0.1)
 
@@ -2448,40 +2521,43 @@ class ReporterBase():
 				failkws = root.findall(".//kw/status[@status='FAIL']/..")
 				base.debugmsg(9, "failkws:", failkws)
 
-				failkw = failkws[-1]
-				failmsg = failkw.find("msg[@level='FAIL']")
-				base.debugmsg(5, "failmsg:", failmsg, failmsg.text)
+				if len(failkws) > 0:
+					failkw = failkws[-1]
+					failmsg = failkw.find("msg[@level='FAIL']")
+					base.debugmsg(5, "failmsg:", failmsg, failmsg.text)
 
-				base.reportdata[id][rid]['error'] = failmsg.text
+					base.reportdata[id][rid]['error'] = failmsg.text
 
-				# //kw/status[@status='FAIL']/../msg[@level='INFO'] --> html decode for img tag
-				# //kw/status[@status='FAIL']/../msg[@level='INFO' and @html='true']
-				# </td></tr><tr><td colspan="3"><a href="selenium-screenshot-1.png"><img src="selenium-screenshot-1.png" width="800px"></a>
-				# infomsg = failkw.find("msg[@level='INFO' and @html='true']")
+					# //kw/status[@status='FAIL']/../msg[@level='INFO'] --> html decode for img tag
+					# //kw/status[@status='FAIL']/../msg[@level='INFO' and @html='true']
+					# </td></tr><tr><td colspan="3"><a href="selenium-screenshot-1.png"><img src="selenium-screenshot-1.png" width="800px"></a>
+					# infomsg = failkw.find("msg[@level='INFO' and @html='true']")
 
-				infomsg = failkw.find("msg[@html='true']")
-				if infomsg is not None:
-					base.debugmsg(5, "infomsg:", infomsg, infomsg.text)
+					infomsg = failkw.find("msg[@html='true']")
+					if infomsg is not None:
+						base.debugmsg(5, "infomsg:", infomsg, infomsg.text)
 
-					# <a[^>]*href="([^"]*)
-					# m = re.search(r'<a[^>]*href="([^"]*)', infomsg.text)
-					m = re.search(r'<img[^>]*src="([^"]*)', infomsg.text)
-					image = m.group(1)
-					base.debugmsg(5, "image:", image)
-					if image is not None:
-						imgdir = os.path.dirname(xmlf)
-						imagef = os.path.join(imgdir, image)
+						# <a[^>]*href="([^"]*)
+						# m = re.search(r'<a[^>]*href="([^"]*)', infomsg.text)
+						m = re.search(r'<img[^>]*src="([^"]*)', infomsg.text)
+						image = m.group(1)
+						base.debugmsg(5, "image:", image)
+						if image is not None:
+							imgdir = os.path.dirname(xmlf)
+							imagef = os.path.join(imgdir, image)
 
-						if os.path.isfile(imagef):
-							base.debugmsg(5, "imagef:", imagef)
-							base.reportdata[id][rid]['image'] = image
-							base.reportdata[id][rid]['image_file'] = imagef
+							if os.path.isfile(imagef):
+								base.debugmsg(5, "imagef:", imagef)
+								base.reportdata[id][rid]['image'] = image
+								base.reportdata[id][rid]['image_file'] = imagef
 
 	def rt_errors_get_label(self, id, lblname):
 		base.debugmsg(5, "id:", id, "	lblname:", lblname)
 		if lblname in base.report[id]:
+			base.debugmsg(5, "id:", id, "	lblname:", lblname, "	retvalue:", base.whitespace_get_ini_value(base.report[id][lblname]))
 			return base.whitespace_get_ini_value(base.report[id][lblname])
 		else:
+			base.debugmsg(5, "id:", id, "	lblname:", lblname, "	retvalue:", base.defaultlabels[lblname])
 			return base.defaultlabels[lblname]
 
 	def rt_errors_set_label(self, id, lblname, lblvalue):
@@ -3253,6 +3329,9 @@ class ReporterCore:
 		styledata += "table, th, td { border: 1px solid #ccc; border-collapse: collapse; }"
 		styledata += "th { color: " + highlightcolour + "; }"
 
+		# pre	{white-space: pre-wrap;}
+		styledata += "pre	{white-space: pre-wrap;}"
+
 		for i in range(6):
 			styledata += "h" + str(i + 1) + "	{ color: " + highlightcolour + "; margin-left: " + str(i * 5) + "px; }"
 
@@ -3903,58 +3982,60 @@ class ReporterCore:
 			keys = list(base.reportdata[id].keys())
 			for key in keys:
 				base.debugmsg(5, "key:", key)
-				rdata = base.reportdata[id][key]
+				if key != "key":
+					rdata = base.reportdata[id][key]
 
-				if grouprn:
-					result_name = rdata['result_name']
-					matches = difflib.get_close_matches(result_name, list(grpdata["resultnames"].keys()), cutoff=pctalike)
-					base.debugmsg(5, "matches:", matches)
-					if len(matches) > 0:
-						result_name = matches[0]
-						basekey = grpdata["resultnames"][result_name]["keys"][0]
-						base.debugmsg(5, "basekey:", basekey)
-						grpdata["resultnames"][result_name]["keys"].append(key)
-					else:
-						grpdata["resultnames"][result_name] = {}
-						grpdata["resultnames"][result_name]["keys"] = []
-						grpdata["resultnames"][result_name]["keys"].append(key)
-						grpdata["resultnames"][result_name]["errortexts"] = {}
+					if grouprn:
+						result_name = rdata['result_name']
+						matches = difflib.get_close_matches(result_name, list(grpdata["resultnames"].keys()), cutoff=pctalike)
+						base.debugmsg(5, "matches:", matches)
+						if len(matches) > 0:
+							result_name = matches[0]
+							basekey = grpdata["resultnames"][result_name]["keys"][0]
+							base.debugmsg(5, "basekey:", basekey)
+							grpdata["resultnames"][result_name]["keys"].append(key)
+						else:
+							grpdata["resultnames"][result_name] = {}
+							grpdata["resultnames"][result_name]["keys"] = []
+							grpdata["resultnames"][result_name]["keys"].append(key)
+							grpdata["resultnames"][result_name]["errortexts"] = {}
 
-					if groupet:
+						if groupet and 'error' in rdata:
+							errortext = rdata['error']
+							# errortext_sub = errortext.split(r'\n')[0]
+							errortext_sub = errortext.splitlines()[0]
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							matcheset = difflib.get_close_matches(errortext_sub, list(grpdata["resultnames"][result_name]["errortexts"].keys()), cutoff=pctalike)
+							base.debugmsg(5, "matcheset:", matcheset)
+							if len(matcheset) > 0:
+								errortext = matcheset[0]
+								errortext_sub = errortext.splitlines()[0]
+								baseid = grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"][0]
+								base.debugmsg(5, "baseid:", baseid)
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+							else:
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub] = {}
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+
+					if groupet and 'error' in rdata:
 						errortext = rdata['error']
-						# errortext_sub = errortext.split(r'\n')[0]
 						errortext_sub = errortext.splitlines()[0]
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						matcheset = difflib.get_close_matches(errortext_sub, list(grpdata["resultnames"][result_name]["errortexts"].keys()), cutoff=pctalike)
-						base.debugmsg(5, "matcheset:", matcheset)
-						if len(matcheset) > 0:
-							errortext = matcheset[0]
-							baseid = grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"][0]
+						matches = difflib.get_close_matches(errortext_sub, list(grpdata["errortexts"].keys()), cutoff=pctalike)
+						base.debugmsg(5, "matches:", matches)
+						if len(matches) > 0:
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							errortext = matches[0]
+							base.debugmsg(5, "errortext:", errortext)
+							baseid = grpdata["errortexts"][errortext]["keys"][0]
 							base.debugmsg(5, "baseid:", baseid)
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+							grpdata["errortexts"][errortext]["keys"].append(key)
 						else:
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub] = {}
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
-
-				if groupet:
-					errortext = rdata['error']
-					errortext_sub = errortext.splitlines()[0]
-					base.debugmsg(5, "errortext_sub:", errortext_sub)
-					matches = difflib.get_close_matches(errortext_sub, list(grpdata["errortexts"].keys()), cutoff=pctalike)
-					base.debugmsg(5, "matches:", matches)
-					if len(matches) > 0:
-						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						errortext = matches[0]
-						base.debugmsg(5, "errortext:", errortext)
-						baseid = grpdata["errortexts"][errortext]["keys"][0]
-						base.debugmsg(5, "baseid:", baseid)
-						grpdata["errortexts"][errortext]["keys"].append(key)
-					else:
-						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						grpdata["errortexts"][errortext_sub] = {}
-						grpdata["errortexts"][errortext_sub]["keys"] = []
-						grpdata["errortexts"][errortext_sub]["keys"].append(key)
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							grpdata["errortexts"][errortext_sub] = {}
+							grpdata["errortexts"][errortext_sub]["keys"] = []
+							grpdata["errortexts"][errortext_sub]["keys"].append(key)
 
 			resultnames = grpdata["resultnames"]
 			base.debugmsg(5, "resultnames:", resultnames)
@@ -4002,30 +4083,31 @@ class ReporterCore:
 						th.text = "{}:".format(lbl_Error)
 						td = etree.SubElement(tr, 'td')
 						pre = etree.SubElement(td, 'pre')
-						pre.text = rdata['error']
-						td.set('colspan', '5')
-
-						th = etree.SubElement(tr, 'th')
-						th.text = "{}:".format(lbl_Count)
-						td = etree.SubElement(tr, 'td')
-						count = len(grpdata["resultnames"][result_name]["errortexts"][errortext]["keys"])
-						base.debugmsg(5, "count:", count)
-						td.text = str(count)
-
-						if showimages:
-							tr = etree.SubElement(tbl, 'tr')
+						if 'error' in rdata:
+							pre.text = rdata['error']
+							td.set('colspan', '5')
 
 							th = etree.SubElement(tr, 'th')
-							th.text = "{}:".format(lbl_Screenshot)
-
+							th.text = "{}:".format(lbl_Count)
 							td = etree.SubElement(tr, 'td')
-							td.set('colspan', '7')
-							if 'image_file' in rdata:
-								# td.text = rdata['image_file']
-								oimg = Image.open(rdata['image_file'])
-								self.xhtml_sections_embedimg(td, basekey, oimg)
-							else:
-								td.text = lbl_NoScreenshot
+							count = len(grpdata["resultnames"][result_name]["errortexts"][errortext]["keys"])
+							base.debugmsg(5, "count:", count)
+							td.text = str(count)
+
+							if showimages:
+								tr = etree.SubElement(tbl, 'tr')
+
+								th = etree.SubElement(tr, 'th')
+								th.text = "{}:".format(lbl_Screenshot)
+
+								td = etree.SubElement(tr, 'td')
+								td.set('colspan', '7')
+								if 'image_file' in rdata:
+									# td.text = rdata['image_file']
+									oimg = Image.open(rdata['image_file'])
+									self.xhtml_sections_embedimg(td, basekey, oimg)
+								else:
+									td.text = lbl_NoScreenshot
 
 				else:
 					for keyi in grpdata["resultnames"][result_name]["keys"]:
@@ -4038,23 +4120,24 @@ class ReporterCore:
 
 						td = etree.SubElement(tr, 'td')
 						pre = etree.SubElement(td, 'pre')
-						pre.text = rdata['error']
-						td.set('colspan', '7')
-
-						if showimages:
-							tr = etree.SubElement(tbl, 'tr')
-
-							th = etree.SubElement(tr, 'th')
-							th.text = "{}:".format(lbl_Screenshot)
-
-							td = etree.SubElement(tr, 'td')
+						if 'error' in rdata:
+							pre.text = rdata['error']
 							td.set('colspan', '7')
-							if 'image_file' in rdata:
-								# td.text = rdata['image_file']
-								oimg = Image.open(rdata['image_file'])
-								self.xhtml_sections_embedimg(td, keyi, oimg)
-							else:
-								td.text = lbl_NoScreenshot
+
+							if showimages:
+								tr = etree.SubElement(tbl, 'tr')
+
+								th = etree.SubElement(tr, 'th')
+								th.text = "{}:".format(lbl_Screenshot)
+
+								td = etree.SubElement(tr, 'td')
+								td.set('colspan', '7')
+								if 'image_file' in rdata:
+									# td.text = rdata['image_file']
+									oimg = Image.open(rdata['image_file'])
+									self.xhtml_sections_embedimg(td, keyi, oimg)
+								else:
+									td.text = lbl_NoScreenshot
 
 		if groupet and not grouprn:
 			for errortext in list(grpdata["errortexts"].keys()):
@@ -4069,77 +4152,80 @@ class ReporterCore:
 
 				td = etree.SubElement(tr, 'td')
 				pre = etree.SubElement(td, 'pre')
-				pre.text = rdata['error']
-				td.set('colspan', '5')
-
-				th = etree.SubElement(tr, 'th')
-				th.text = "{}:".format(lbl_Count)
-				count = len(grpdata["errortexts"][errortext]["keys"])
-				base.debugmsg(5, "count:", count)
-				td = etree.SubElement(tr, 'td')
-				td.text = str(count)
-
-				if showimages:
-					tr = etree.SubElement(tbl, 'tr')
+				if 'error' in rdata:
+					pre.text = rdata['error']
+					td.set('colspan', '5')
 
 					th = etree.SubElement(tr, 'th')
-					th.text = "{}:".format(lbl_Screenshot)
-
+					th.text = "{}:".format(lbl_Count)
+					count = len(grpdata["errortexts"][errortext]["keys"])
+					base.debugmsg(5, "count:", count)
 					td = etree.SubElement(tr, 'td')
-					td.set('colspan', '7')
-					if 'image_file' in rdata:
-						# td.text = rdata['image_file']
-						oimg = Image.open(rdata['image_file'])
-						self.xhtml_sections_embedimg(td, basekey, oimg)
-					else:
-						td.text = lbl_NoScreenshot
+					td.text = str(count)
+
+					if showimages:
+						tr = etree.SubElement(tbl, 'tr')
+
+						th = etree.SubElement(tr, 'th')
+						th.text = "{}:".format(lbl_Screenshot)
+
+						td = etree.SubElement(tr, 'td')
+						td.set('colspan', '7')
+						if 'image_file' in rdata:
+							# td.text = rdata['image_file']
+							oimg = Image.open(rdata['image_file'])
+							self.xhtml_sections_embedimg(td, basekey, oimg)
+						else:
+							td.text = lbl_NoScreenshot
 
 		if not grouprn and not groupet:
 			keys = list(base.reportdata[id].keys())
 			for key in keys:
 				base.debugmsg(5, "key:", key)
-				rdata = base.reportdata[id][key]
+				if key != "key":
+					rdata = base.reportdata[id][key]
 
-				tr = etree.SubElement(tbl, 'tr')
-
-				th = etree.SubElement(tr, 'th')
-				th.text = "{}:".format(lbl_Result)
-				td = etree.SubElement(tr, 'td')
-				td.text = rdata['result_name']
-
-				th = etree.SubElement(tr, 'th')
-				th.text = "{}:".format(lbl_Test)
-				td = etree.SubElement(tr, 'td')
-				td.text = rdata['test_name']
-
-				th = etree.SubElement(tr, 'th')
-				th.text = "{}:".format(lbl_Script)
-				td = etree.SubElement(tr, 'td')
-				td.text = rdata['script']
-
-				tr = etree.SubElement(tbl, 'tr')
-
-				th = etree.SubElement(tr, 'th')
-				th.text = "{}:".format(lbl_Error)
-				td = etree.SubElement(tr, 'td')
-				pre = etree.SubElement(td, 'pre')
-				pre.text = rdata['error']
-				td.set('colspan', '5')
-
-				if showimages:
 					tr = etree.SubElement(tbl, 'tr')
 
 					th = etree.SubElement(tr, 'th')
-					th.text = "{}:".format(lbl_Screenshot)
-
+					th.text = "{}:".format(lbl_Result)
 					td = etree.SubElement(tr, 'td')
-					td.set('colspan', '5')
-					if 'image_file' in rdata:
-						# td.text = rdata['image_file']
-						oimg = Image.open(rdata['image_file'])
-						self.xhtml_sections_embedimg(td, key, oimg)
-					else:
-						td.text = lbl_NoScreenshot
+					td.text = rdata['result_name']
+
+					th = etree.SubElement(tr, 'th')
+					th.text = "{}:".format(lbl_Test)
+					td = etree.SubElement(tr, 'td')
+					td.text = rdata['test_name']
+
+					th = etree.SubElement(tr, 'th')
+					th.text = "{}:".format(lbl_Script)
+					td = etree.SubElement(tr, 'td')
+					td.text = rdata['script']
+
+					tr = etree.SubElement(tbl, 'tr')
+
+					th = etree.SubElement(tr, 'th')
+					th.text = "{}:".format(lbl_Error)
+					td = etree.SubElement(tr, 'td')
+					pre = etree.SubElement(td, 'pre')
+					if 'error' in rdata:
+						pre.text = rdata['error']
+						td.set('colspan', '5')
+
+						if showimages:
+							tr = etree.SubElement(tbl, 'tr')
+
+							th = etree.SubElement(tr, 'th')
+							th.text = "{}:".format(lbl_Screenshot)
+
+							td = etree.SubElement(tr, 'td')
+							td.set('colspan', '5')
+							if 'image_file' in rdata:
+								# td.text = rdata['image_file']
+								oimg = Image.open(rdata['image_file'])
+								self.xhtml_sections_embedimg(td, key, oimg)
+							else:
+								td.text = lbl_NoScreenshot
 
 	#
 	# 	MS Word
@@ -4803,58 +4889,60 @@ class ReporterCore:
 			keys = list(base.reportdata[id].keys())
 			for key in keys:
 				base.debugmsg(5, "key:", key)
-				rdata = base.reportdata[id][key]
+				if key != "key":
+					rdata = base.reportdata[id][key]
 
-				if grouprn:
-					result_name = rdata['result_name']
-					matches = difflib.get_close_matches(result_name, list(grpdata["resultnames"].keys()), cutoff=pctalike)
-					base.debugmsg(5, "matches:", matches)
-					if len(matches) > 0:
-						result_name = matches[0]
-						basekey = grpdata["resultnames"][result_name]["keys"][0]
-						base.debugmsg(5, "basekey:", basekey)
-						grpdata["resultnames"][result_name]["keys"].append(key)
-					else:
-						grpdata["resultnames"][result_name] = {}
-						grpdata["resultnames"][result_name]["keys"] = []
-						grpdata["resultnames"][result_name]["keys"].append(key)
-						grpdata["resultnames"][result_name]["errortexts"] = {}
+					if grouprn:
+						result_name = rdata['result_name']
+						matches = difflib.get_close_matches(result_name, list(grpdata["resultnames"].keys()), cutoff=pctalike)
+						base.debugmsg(5, "matches:", matches)
+						if len(matches) > 0:
+							result_name = matches[0]
+							basekey = grpdata["resultnames"][result_name]["keys"][0]
+							base.debugmsg(5, "basekey:", basekey)
+							grpdata["resultnames"][result_name]["keys"].append(key)
+						else:
+							grpdata["resultnames"][result_name] = {}
+							grpdata["resultnames"][result_name]["keys"] = []
+							grpdata["resultnames"][result_name]["keys"].append(key)
+							grpdata["resultnames"][result_name]["errortexts"] = {}
 
-					if groupet:
+						if groupet and 'error' in rdata:
+							errortext = rdata['error']
+							# errortext_sub = errortext.split(r'\n')[0]
+							errortext_sub = errortext.splitlines()[0]
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							matcheset = difflib.get_close_matches(errortext_sub, list(grpdata["resultnames"][result_name]["errortexts"].keys()), cutoff=pctalike)
+							base.debugmsg(5, "matcheset:", matcheset)
+							if len(matcheset) > 0:
+								errortext = matcheset[0]
+								errortext_sub = errortext.splitlines()[0]
+								baseid = grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"][0]
+								base.debugmsg(5, "baseid:", baseid)
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+							else:
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub] = {}
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+
+					if groupet and 'error' in rdata:
 						errortext = rdata['error']
-						# errortext_sub = errortext.split(r'\n')[0]
 						errortext_sub = errortext.splitlines()[0]
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						matcheset = difflib.get_close_matches(errortext_sub, list(grpdata["resultnames"][result_name]["errortexts"].keys()), cutoff=pctalike)
-						base.debugmsg(5, "matcheset:", matcheset)
-						if len(matcheset) > 0:
-							errortext = matcheset[0]
-							baseid = grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"][0]
+						matches = difflib.get_close_matches(errortext_sub, list(grpdata["errortexts"].keys()), cutoff=pctalike)
+						base.debugmsg(5, "matches:", matches)
+						if len(matches) > 0:
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							errortext = matches[0]
+							base.debugmsg(5, "errortext:", errortext)
+							baseid = grpdata["errortexts"][errortext]["keys"][0]
 							base.debugmsg(5, "baseid:", baseid)
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+							grpdata["errortexts"][errortext]["keys"].append(key)
 						else:
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub] = {}
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
-
-				if groupet:
-					errortext = rdata['error']
-					errortext_sub = errortext.splitlines()[0]
-					base.debugmsg(5, "errortext_sub:", errortext_sub)
-					matches = difflib.get_close_matches(errortext_sub, list(grpdata["errortexts"].keys()), cutoff=pctalike)
-					base.debugmsg(5, "matches:", matches)
-					if len(matches) > 0:
-						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						errortext = matches[0]
-						base.debugmsg(5, "errortext:", errortext)
-						baseid = grpdata["errortexts"][errortext]["keys"][0]
-						base.debugmsg(5, "baseid:", baseid)
-						grpdata["errortexts"][errortext]["keys"].append(key)
-					else:
-						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						grpdata["errortexts"][errortext_sub] = {}
-						grpdata["errortexts"][errortext_sub]["keys"] = []
-						grpdata["errortexts"][errortext_sub]["keys"].append(key)
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							grpdata["errortexts"][errortext_sub] = {}
+							grpdata["errortexts"][errortext_sub]["keys"] = []
+							grpdata["errortexts"][errortext_sub]["keys"].append(key)
 
 			resultnames = grpdata["resultnames"]
 			base.debugmsg(5, "resultnames:", resultnames)
@@ -4944,7 +5032,8 @@ class ReporterCore:
 						a.merge(b)
 
 						table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-						table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
+						if 'error' in rdata:
+							table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
 						table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 
 						cellcol += 6
@@ -4999,7 +5088,8 @@ class ReporterCore:
 						a.merge(b)
 
 						table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-						table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
+						if 'error' in rdata:
+							table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
 						table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 
 						if showimages:
@@ -5049,7 +5139,8 @@ class ReporterCore:
 				a.merge(b)
 
 				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-				table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
+				if 'error' in rdata:
+					table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
 				table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 
 				cellcol += 6
@@ -5089,87 +5180,89 @@ class ReporterCore:
 			keys = list(base.reportdata[id].keys())
 			for key in keys:
 				base.debugmsg(5, "key:", key)
-				rdata = base.reportdata[id][key]
+				if key != "key":
+					rdata = base.reportdata[id][key]
 
-				cellcol = 0
-				cellrow += 1
+					cellcol = 0
+					cellrow += 1
 
-				if cellrow > 0:
-					table.add_row()
+					if cellrow > 0:
+						table.add_row()
 
-				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
-				table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Result)
-				table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
-				# table.columns[cellcol].width = Cm(1.8)
+					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+					table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Result)
+					table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+					# table.columns[cellcol].width = Cm(1.8)
 
-				cellcol += 1
-				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-				a = table.cell(cellrow, cellcol)
-				b = table.cell(cellrow, cellcol + 1)
-				a.merge(b)
-				table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['result_name']
-				table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
-				table.rows[cellrow].cells[cellcol].paragraphs[0].FitText = True
+					cellcol += 1
+					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+					a = table.cell(cellrow, cellcol)
+					b = table.cell(cellrow, cellcol + 1)
+					a.merge(b)
+					table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['result_name']
+					table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+					table.rows[cellrow].cells[cellcol].paragraphs[0].FitText = True
 
-				cellcol += 2
-				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
-				table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Test)
-				table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
-				# table.columns[cellcol].width = Cm(1.8)
+					cellcol += 2
+					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+					table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Test)
+					table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+					# table.columns[cellcol].width = Cm(1.8)
 
-				cellcol += 1
-				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-				table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['test_name']
-				table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+					cellcol += 1
+					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+					table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['test_name']
+					table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 
-				cellcol += 1
-				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
-				table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Script)
-				table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
-				# table.columns[cellcol].width = Cm(1.8)
+					cellcol += 1
+					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+					table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Script)
+					table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+					# table.columns[cellcol].width = Cm(1.8)
 
-				cellcol += 1
-				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-				table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['script']
-				table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+					cellcol += 1
+					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+					table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['script']
+					table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 
-				cellcol = 0
-				cellrow += 1
-				table.add_row()
-
-				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
-				table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Error)
-				table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
-
-				cellcol += 1
-				a = table.cell(cellrow, cellcol)
-				b = table.cell(cellrow, cellcol + 5)
-				a.merge(b)
-
-				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-				table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
-				table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
-
-				if showimages:
 					cellcol = 0
 					cellrow += 1
 					table.add_row()
 
 					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
-					table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Screenshot)
+					table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Error)
 					table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 
 					cellcol += 1
 					a = table.cell(cellrow, cellcol)
 					b = table.cell(cellrow, cellcol + 5)
 					a.merge(b)
+
 					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-					if 'image_file' in rdata:
-						run = table.rows[cellrow].cells[cellcol].paragraphs[0].add_run()
-						run.add_picture(rdata['image_file'], width=imgsizew)
-					else:
-						table.rows[cellrow].cells[cellcol].paragraphs[0].text = lbl_NoScreenshot
+					if 'error' in rdata:
+						table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
+					table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+
+					if showimages:
+						cellcol = 0
+						cellrow += 1
+						table.add_row()
+
+						table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+						table.rows[cellrow].cells[cellcol].paragraphs[0].text = "{}:".format(lbl_Screenshot)
 						table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+
+						cellcol += 1
+						a = table.cell(cellrow, cellcol)
+						b = table.cell(cellrow, cellcol + 5)
+						a.merge(b)
+						table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+						if 'image_file' in rdata:
+							run = table.rows[cellrow].cells[cellcol].paragraphs[0].add_run()
+							run.add_picture(rdata['image_file'], width=imgsizew)
+						else:
+							table.rows[cellrow].cells[cellcol].paragraphs[0].text = lbl_NoScreenshot
+							table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 
 	#
 	# 	MS Excel
@@ -5827,15 +5920,19 @@ class ReporterCore:
 		self.xlsx_select_cell(1, rownum)
 
 	def xlsx_sections_errors(self, id):
-		base.debugmsg(8, "id:", id)
+		base.debugmsg(5, "id:", id)
 
 		wb = self.cg_data["xlsx"]["Workbook"]
 		ws = wb.active
 		rownum = ws[ws.active_cell].row
+		base.debugmsg(5, "rownum:", rownum)
 
 		cellcol = 1
+		base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum)
 		ws.column_dimensions["A"].width = 3
+
 		cellcol += 1
+		base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum)
 
 		showimages = base.rt_errors_get_images(id)
 		base.debugmsg(5, "showimages:", showimages)
@@ -5866,58 +5963,60 @@ class ReporterCore:
 			keys = list(base.reportdata[id].keys())
 			for key in keys:
 				base.debugmsg(5, "key:", key)
-				rdata = base.reportdata[id][key]
+				if key != "key":
+					rdata = base.reportdata[id][key]
 
-				if grouprn:
-					result_name = rdata['result_name']
-					matches = difflib.get_close_matches(result_name, list(grpdata["resultnames"].keys()), cutoff=pctalike)
-					base.debugmsg(5, "matches:", matches)
-					if len(matches) > 0:
-						result_name = matches[0]
-						basekey = grpdata["resultnames"][result_name]["keys"][0]
-						base.debugmsg(5, "basekey:", basekey)
-						grpdata["resultnames"][result_name]["keys"].append(key)
-					else:
-						grpdata["resultnames"][result_name] = {}
-						grpdata["resultnames"][result_name]["keys"] = []
-						grpdata["resultnames"][result_name]["keys"].append(key)
-						grpdata["resultnames"][result_name]["errortexts"] = {}
+					if grouprn:
+						result_name = rdata['result_name']
+						matches = difflib.get_close_matches(result_name, list(grpdata["resultnames"].keys()), cutoff=pctalike)
+						base.debugmsg(5, "matches:", matches)
+						if len(matches) > 0:
+							result_name = matches[0]
+							basekey = grpdata["resultnames"][result_name]["keys"][0]
+							base.debugmsg(5, "basekey:", basekey)
+							grpdata["resultnames"][result_name]["keys"].append(key)
+						else:
+							grpdata["resultnames"][result_name] = {}
+							grpdata["resultnames"][result_name]["keys"] = []
+							grpdata["resultnames"][result_name]["keys"].append(key)
+							grpdata["resultnames"][result_name]["errortexts"] = {}
 
-					if groupet:
+						if groupet and 'error' in rdata:
+							errortext = rdata['error']
+							# errortext_sub = errortext.split(r'\n')[0]
+							errortext_sub = errortext.splitlines()[0]
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							matcheset = difflib.get_close_matches(errortext_sub, list(grpdata["resultnames"][result_name]["errortexts"].keys()), cutoff=pctalike)
+							base.debugmsg(5, "matcheset:", matcheset)
+							if len(matcheset) > 0:
+								errortext = matcheset[0]
+								errortext_sub = errortext.splitlines()[0]
+								baseid = grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"][0]
+								base.debugmsg(5, "baseid:", baseid)
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+							else:
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub] = {}
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
+								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+
+					if groupet and 'error' in rdata:
 						errortext = rdata['error']
-						# errortext_sub = errortext.split(r'\n')[0]
 						errortext_sub = errortext.splitlines()[0]
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						matcheset = difflib.get_close_matches(errortext_sub, list(grpdata["resultnames"][result_name]["errortexts"].keys()), cutoff=pctalike)
-						base.debugmsg(5, "matcheset:", matcheset)
-						if len(matcheset) > 0:
-							errortext = matcheset[0]
-							baseid = grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"][0]
+						matches = difflib.get_close_matches(errortext_sub, list(grpdata["errortexts"].keys()), cutoff=pctalike)
+						base.debugmsg(5, "matches:", matches)
+						if len(matches) > 0:
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							errortext = matches[0]
+							base.debugmsg(5, "errortext:", errortext)
+							baseid = grpdata["errortexts"][errortext]["keys"][0]
 							base.debugmsg(5, "baseid:", baseid)
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+							grpdata["errortexts"][errortext]["keys"].append(key)
 						else:
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub] = {}
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
-							grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
-
-				if groupet:
-					errortext = rdata['error']
-					errortext_sub = errortext.splitlines()[0]
-					base.debugmsg(5, "errortext_sub:", errortext_sub)
-					matches = difflib.get_close_matches(errortext_sub, list(grpdata["errortexts"].keys()), cutoff=pctalike)
-					base.debugmsg(5, "matches:", matches)
-					if len(matches) > 0:
-						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						errortext = matches[0]
-						base.debugmsg(5, "errortext:", errortext)
-						baseid = grpdata["errortexts"][errortext]["keys"][0]
-						base.debugmsg(5, "baseid:", baseid)
-						grpdata["errortexts"][errortext]["keys"].append(key)
-					else:
-						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						grpdata["errortexts"][errortext_sub] = {}
-						grpdata["errortexts"][errortext_sub]["keys"] = []
-						grpdata["errortexts"][errortext_sub]["keys"].append(key)
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							grpdata["errortexts"][errortext_sub] = {}
+							grpdata["errortexts"][errortext_sub]["keys"] = []
+							grpdata["errortexts"][errortext_sub]["keys"].append(key)
 
 			resultnames = grpdata["resultnames"]
 			base.debugmsg(5, "resultnames:", resultnames)
@@ -5931,27 +6030,36 @@ class ReporterCore:
 				base.debugmsg(5, "basekey:", basekey)
 				rdata = base.reportdata[id][basekey]
 
-				cellcol = 1
 				rownum += 1
+				cellcol = 0
 
+				cellcol += 1
+				base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum)
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Result), "Table Heading", 0)
 				cellcol += 1
+				base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum)
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['result_name'], "Table Data", 0)
 
 				cellcol += 1
+				base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum)
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Test), "Table Heading", 0)
 				cellcol += 1
+				base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum)
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['test_name'], "Table Data", 0)
 
 				cellcol += 1
+				base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum)
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Script), "Table Heading", 0)
 				cellcol += 1
+				base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum)
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['script'], "Table Data", 0)
 
 				cellcol += 1
+				base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum)
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Count), "Table Heading", 0)
 				count = len(grpdata["resultnames"][result_name]["keys"])
 				cellcol += 1
+				base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum)
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, str(count), "Table Data", 0)
 
 				if groupet:
@@ -5964,7 +6072,8 @@ class ReporterCore:
 						rownum += 1
 						self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Error), "Table Heading", 0)
 						cellcol += 1
-						self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['error'], "Table Data", 4)
+						if 'error' in rdata:
+							self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['error'], "Table Data", 4)
 
 						cellcol += 5
 						self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Count), "Table Heading", 0)
@@ -6013,7 +6122,8 @@ class ReporterCore:
 
 						self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Error), "Table Heading", 0)
 						cellcol += 1
-						self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['error'], "Table Data", 4)
+						if 'error' in rdata:
+							self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['error'], "Table Data", 4)
 
 						if showimages:
 							cellcol = 1
@@ -6060,7 +6170,8 @@ class ReporterCore:
 
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Error), "Table Heading", 0)
 				cellcol += 1
-				self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['error'], "Table Data", colspan)
+				if 'error' in rdata:
+					self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['error'], "Table Data", colspan)
 
 				cellcol += colspan + 1
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Count), "Table Heading", 0)
@@ -6104,93 +6215,108 @@ class ReporterCore:
 			keys = list(base.reportdata[id].keys())
 			for key in keys:
 				base.debugmsg(5, "key:", key)
-				rdata = base.reportdata[id][key]
+				if key != "key":
+					rdata = base.reportdata[id][key]
 
-				cellcol = 1
-				rownum += 1
-
-				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Result), "Table Heading", 0)
-				cellcol += 1
-				self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['result_name'], "Table Data", 0)
-
-				cellcol += 1
-				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Test), "Table Heading", 0)
-				cellcol += 1
-				self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['test_name'], "Table Data", 0)
-
-				cellcol += 1
-				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Script), "Table Heading", 0)
-				cellcol += 1
-				self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['script'], "Table Data", 0)
-
-				cellcol = 1
-				rownum += 1
-				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Error), "Table Heading", 0)
-				cellcol += 1
-				self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['error'], "Table Data", 4)
-
-				if showimages:
 					cellcol = 1
 					rownum += 1
-					self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Screenshot), "Table Heading", 0)
+
+					self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Result), "Table Heading", 0)
+					cellcol += 1
+					self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['result_name'], "Table Data", 0)
 
 					cellcol += 1
+					self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Test), "Table Heading", 0)
+					cellcol += 1
+					self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['test_name'], "Table Data", 0)
 
-					if 'image_file' in rdata:
-						self.xlsx_sections_errors_fill_cell(cellcol, rownum, " ", "Table Data", 4)
-						img = openpyxl.drawing.image.Image(rdata['image_file'])
-						cellname = ws.cell(row=rownum, column=cellcol).coordinate
+					cellcol += 1
+					self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Script), "Table Heading", 0)
+					cellcol += 1
+					self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['script'], "Table Data", 0)
 
-						base.debugmsg(5, "img.width:", img.width, "	img.height:", img.height)
-						# 								31.75					32.60
-						# 								22.23					22.82	==> 70%
-						newiw = 850
-						ratio = newiw / img.width
-						base.debugmsg(5, "ratio:", ratio)
-						newih = img.height * ratio
-						base.debugmsg(5, "newih:", newih)
-						img.width = newiw
-						img.height = newih
+					cellcol = 1
+					rownum += 1
+					self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Error), "Table Heading", 0)
+					cellcol += 1
+					if 'error' in rdata:
+						self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['error'], "Table Data", 4)
 
-						newh = newih * 0.76
-						# 43.44 cm ==> 32.95 cm	==>	76%
-						base.debugmsg(5, "newh:", newh)
-						ws.row_dimensions[rownum].height = newh
+					if showimages:
+						cellcol = 1
+						rownum += 1
+						self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Screenshot), "Table Heading", 0)
 
-						ws.add_image(img, cellname)
-					else:
-						self.xlsx_sections_errors_fill_cell(cellcol, rownum, lbl_NoScreenshot, "Table Data", 4)
+						cellcol += 1
+
+						if 'image_file' in rdata:
+							self.xlsx_sections_errors_fill_cell(cellcol, rownum, " ", "Table Data", 4)
+							img = openpyxl.drawing.image.Image(rdata['image_file'])
+							cellname = ws.cell(row=rownum, column=cellcol).coordinate
+
+							base.debugmsg(5, "img.width:", img.width, "	img.height:", img.height)
+							# 								31.75					32.60
+							# 								22.23					22.82	==> 70%
+							newiw = 850
+							ratio = newiw / img.width
+							base.debugmsg(5, "ratio:", ratio)
+							newih = img.height * ratio
+							base.debugmsg(5, "newih:", newih)
+							img.width = newiw
+							img.height = newih
+
+							newh = newih * 0.76
+							# 43.44 cm ==> 32.95 cm	==>	76%
+							base.debugmsg(5, "newh:", newh)
+							ws.row_dimensions[rownum].height = newh
+
+							ws.add_image(img, cellname)
+						else:
+							self.xlsx_sections_errors_fill_cell(cellcol, rownum, lbl_NoScreenshot, "Table Data", 4)
+
+		rownum += 1
+		rownum += 1
+		self.xlsx_select_cell(1, rownum)
 
 	def xlsx_sections_errors_fill_cell(self, cellcol, rownum, val, style, span):
-		base.debugmsg(7, "cellcol:", cellcol, "	rownum:", rownum, "	val:", val, "	style:", style)
+		base.debugmsg(5, "cellcol:", cellcol, "	rownum:", rownum, "	val:", val, "	style:", style, "	span:", span)
 		wb = self.cg_data["xlsx"]["Workbook"]
 		ws = wb.active
 
+		self.xlsx_select_cell(cellcol, rownum)
+
+		base.debugmsg(5, "setting Cell value")
 		cell = ws.cell(column=cellcol, row=rownum, value=val)
+		base.debugmsg(5, "splitting val to lines")
 		lines = str(val).splitlines()
 
+		base.debugmsg(5, "lines:", lines)
+
 		if span > 0:
+			base.debugmsg(5, "span:", span)
 			ws.merge_cells(start_row=rownum, start_column=cellcol, end_row=rownum, end_column=cellcol + span)
 		else:
+			base.debugmsg(5, "span:", span)
 			currw = ws.column_dimensions[cell.column_letter].width
 			valw = 0
 			for line in lines:
 				valw = max(valw, len(line))
-			base.debugmsg(9, "currw:", currw, "	valw:", valw)
+			base.debugmsg(5, "currw:", currw, "	valw:", valw)
 			neww = max(currw, valw)
-			base.debugmsg(8, "neww:", neww)
+			base.debugmsg(5, "neww:", neww)
 			ws.column_dimensions[cell.column_letter].width = neww
 
 		if len(lines) > 1:
-			base.debugmsg(8, "len(lines):", len(lines))
+			base.debugmsg(5, "len(lines):", len(lines))
 			# currh = ws.row_dimensions[rownum].height
 			# https://stackoverflow.com/questions/32855656/column-and-row-dimensions-in-openpyxl-are-always-none
 			currh = 13
-			base.debugmsg(8, "currh:", currh)
+			base.debugmsg(5, "currh:", currh)
 			newh = currh * len(lines)
-			base.debugmsg(8, "newh:", newh)
+			base.debugmsg(5, "newh:", newh)
 			ws.row_dimensions[rownum].height = newh
 
+		base.debugmsg(5, "style:", style)
 		cell.style = style
 
 
@@ -6928,7 +7054,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["eHeading"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["Heading"])
 				self.contentdata[id]["eHeading"].grid(column=1, row=rownum, sticky="nsew")
 				# https://pysimplegui.readthedocs.io/en/latest/
-				self.contentdata[id]["eHeading"].bind('<Leave>', self.cs_rename_heading)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[id]["eHeading"].bind('<Leave>', self.cs_rename_heading)
 				self.contentdata[id]["eHeading"].bind('<FocusOut>', self.cs_rename_heading)
 
 				rownum += 1
@@ -7012,7 +7139,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["strTitle"].set(base.rs_setting_get_title())
 		self.contentdata[id]["eTitle"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strTitle"])
 		self.contentdata[id]["eTitle"].grid(column=1, columnspan=9, row=rownum, sticky="nsew")
-		self.contentdata[id]["eTitle"].bind('<Leave>', self.cs_report_settings_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["eTitle"].bind('<Leave>', self.cs_report_settings_update)
 		self.contentdata[id]["eTitle"].bind('<FocusOut>', self.cs_report_settings_update)
 
 		# chkbox display start and end time of test
@@ -7068,6 +7196,9 @@ class ReporterGUI(tk.Frame):
 
 		self.contentdata[id]["eST"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strST"])
 		self.contentdata[id]["eST"].grid(column=1, row=rownum, sticky="nsew")
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["eST"].bind('<Leave>', self.cs_report_settings_update)
+		self.contentdata[id]["eST"].bind('<FocusOut>', self.cs_report_settings_update)
 
 		self.contentdata[id]["intST"] = tk.IntVar()
 		self.contentdata[id]["intST"].set(base.rs_setting_get_int("showstarttime"))
@@ -7086,6 +7217,9 @@ class ReporterGUI(tk.Frame):
 
 		self.contentdata[id]["eET"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strET"])
 		self.contentdata[id]["eET"].grid(column=1, row=rownum, sticky="nsew")
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["eET"].bind('<Leave>', self.cs_report_settings_update)
+		self.contentdata[id]["eET"].bind('<FocusOut>', self.cs_report_settings_update)
 
 		self.contentdata[id]["intET"] = tk.IntVar()
 		self.contentdata[id]["intET"].set(base.rs_setting_get_int("showendtime"))
@@ -7184,7 +7318,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["intPctile"].set(base.rs_setting_get_pctile())
 		self.contentdata[id]["ePctile"] = ttk.Entry(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["intPctile"])
 		self.contentdata[id]["ePctile"].grid(column=1, row=rownum, sticky="nsew")
-		self.contentdata[id]["ePctile"].bind('<Leave>', self.cs_report_settings_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["ePctile"].bind('<Leave>', self.cs_report_settings_update)
 		self.contentdata[id]["ePctile"].bind('<FocusOut>', self.cs_report_settings_update)
 
 		self.contentdata[id]["lblPctile"] = ttk.Label(self.contentdata[id]["Settings"], text="%")
@@ -7194,27 +7329,28 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "_event:", _event)
 		# id = self.sectionstree.focus()
 		# base.debugmsg(9, "id:", id)
+		changes = 0
 		id = "TOP"
 
 		if "strTitle" in self.contentdata[id]:
-			base.rs_setting_set("title", self.contentdata[id]["strTitle"].get())
+			changes += base.rs_setting_set("title", self.contentdata[id]["strTitle"].get())
 
 		# base.rs_setting_set_file("tlogo", fpath)
 		if "strLIPath" in self.contentdata[id]:
-			base.rs_setting_set_file("tlogo", self.contentdata[id]["strLIPath"])
+			changes += base.rs_setting_set_file("tlogo", self.contentdata[id]["strLIPath"])
 
 		# showlogo
 		if "intLI" in self.contentdata[id]:
-			base.rs_setting_set_int("showtlogo", self.contentdata[id]["intLI"].get())
+			changes += base.rs_setting_set_int("showtlogo", self.contentdata[id]["intLI"].get())
 
 		if "strDF" in self.contentdata[id]:
-			base.rs_setting_set("dateformat", self.contentdata[id]["strDF"].get())
+			changes += base.rs_setting_set("dateformat", self.contentdata[id]["strDF"].get())
 
 		if "strTF" in self.contentdata[id]:
-			base.rs_setting_set("timeformat", self.contentdata[id]["strTF"].get())
+			changes += base.rs_setting_set("timeformat", self.contentdata[id]["strTF"].get())
 
 		if "strTZ" in self.contentdata[id]:
-			base.rs_setting_set("timezone", self.contentdata[id]["strTZ"].get())
+			changes += base.rs_setting_set("timezone", self.contentdata[id]["strTZ"].get())
 
 		# strST
 		if "strST" in self.contentdata[id]:
@@ -7224,10 +7360,10 @@ class ReporterGUI(tk.Frame):
 			base.debugmsg(8, "ist:", ist)
 			if ist > 0:
 				ios = ist - base.report_starttime()
-				base.rs_setting_set_int("startoffset", ios)
+				changes += base.rs_setting_set_int("startoffset", ios)
 
 		if "intST" in self.contentdata[id]:
-			base.rs_setting_set_int("showstarttime", self.contentdata[id]["intST"].get())
+			changes += base.rs_setting_set_int("showstarttime", self.contentdata[id]["intST"].get())
 
 		# strET
 		if "strET" in self.contentdata[id]:
@@ -7237,30 +7373,31 @@ class ReporterGUI(tk.Frame):
 			base.debugmsg(8, "iet:", iet)
 			if iet > 0:
 				ios = base.report_endtime() - iet
-				base.rs_setting_set_int("endoffset", ios)
+				changes += base.rs_setting_set_int("endoffset", ios)
 
 		if "intET" in self.contentdata[id]:
-			base.rs_setting_set_int("showendtime", self.contentdata[id]["intET"].get())
+			changes += base.rs_setting_set_int("showendtime", self.contentdata[id]["intET"].get())
 
 		if "strFont" in self.contentdata[id]:
-			base.rs_setting_set("font", self.contentdata[id]["strFont"].get())
+			changes += base.rs_setting_set("font", self.contentdata[id]["strFont"].get())
 
 		if "intFontSz" in self.contentdata[id]:
 			fsz = self.contentdata[id]["intFontSz"].get()
 			base.debugmsg(5, "fsz:", fsz, "	", type(fsz))
-			base.rs_setting_set_int("fontsize", fsz)
+			changes += base.rs_setting_set_int("fontsize", fsz)
 
 		if "intPctile" in self.contentdata[id]:
 			pct = int(self.contentdata[id]["intPctile"].get())
 			if pct > 0:
 				base.debugmsg(5, "pct:", pct, "	", type(pct))
-				base.rs_setting_set_int("percentile", pct)
+				changes += base.rs_setting_set_int("percentile", pct)
 
-		self.cs_reportsettings()
+		if changes > 0:
+			self.cs_reportsettings()
 
-		self.ConfigureStyle()
-		regen = threading.Thread(target=self.cp_regenerate_preview)
-		regen.start()
+			self.ConfigureStyle()
+			regen = threading.Thread(target=self.cp_regenerate_preview)
+			regen.start()
 
 	def cs_select_logoimage(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
@@ -7395,17 +7532,19 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "_event:", _event)
 		id = self.sectionstree.focus()
 		base.debugmsg(9, "id:", id)
+		changes = 0
 
 		if "strCM" in self.contentdata[id]:
 			value = self.contentdata[id]["strCM"].get()
-			base.rt_contents_set_mode(id, value)
+			changes += base.rt_contents_set_mode(id, value)
 
 		if "intCL" in self.contentdata[id]:
 			value = self.contentdata[id]["intCL"].get()
-			base.rt_contents_set_level(id, value)
+			changes += base.rt_contents_set_level(id, value)
 
-		cp = threading.Thread(target=lambda: self.content_preview(id))
-		cp.start()
+		if changes > 0:
+			cp = threading.Thread(target=lambda: self.content_preview(id))
+			cp.start()
 
 	#
 	# Settings	-	Note
@@ -7423,7 +7562,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["tNote"].grid(column=0, row=0, sticky="nsew")
 		self.contentdata[id]["LFrame"].rowconfigure(0, weight=1)
 		self.contentdata[id]["LFrame"].columnconfigure(0, weight=1)
-		self.contentdata[id]["tNote"].bind('<Leave>', self.cs_note_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["tNote"].bind('<Leave>', self.cs_note_update)
 		self.contentdata[id]["tNote"].bind('<FocusOut>', self.cs_note_update)
 
 	def cs_note_update(self, _event=None):
@@ -7458,6 +7598,40 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["intColours"].set(colours)
 		self.contentdata[id]["chkColours"].grid(column=1, row=rownum, sticky="nsew")
 
+		# 		start time
+		rownum += 1
+		self.contentdata[id]["lblST"] = ttk.Label(self.contentdata[id]["LFrame"], text="Start Time:")
+		self.contentdata[id]["lblST"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["strST"] = tk.StringVar()
+		iST = base.rt_setting_get_starttime(id)
+		fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
+		self.contentdata[id]["strST"].set(fST)
+		self.contentdata[id]["fST"] = fST
+
+		self.contentdata[id]["eST"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["strST"])
+		self.contentdata[id]["eST"].grid(column=1, row=rownum, sticky="nsew")
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["eST"].bind('<Leave>', self.cs_datatable_update)
+		self.contentdata[id]["eST"].bind('<FocusOut>', self.cs_datatable_update)
+
+		# 		end time
+		rownum += 1
+		self.contentdata[id]["lblET"] = ttk.Label(self.contentdata[id]["LFrame"], text="End Time:")
+		self.contentdata[id]["lblET"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["strET"] = tk.StringVar()
+		iET = base.rt_setting_get_endtime(id)
+		fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
+		self.contentdata[id]["strET"].set(fET)
+		self.contentdata[id]["fET"] = fET
+
+		self.contentdata[id]["eET"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["strET"])
+		self.contentdata[id]["eET"].grid(column=1, row=rownum, sticky="nsew")
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["eET"].bind('<Leave>', self.cs_datatable_update)
+		self.contentdata[id]["eET"].bind('<FocusOut>', self.cs_datatable_update)
+
 		rownum += 1
 		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["LFrame"], text="Data Type:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
@@ -7488,13 +7662,49 @@ class ReporterGUI(tk.Frame):
 			colours = self.contentdata[id]["intColours"].get()
 			changes += base.rt_table_set_colours(id, colours)
 
+		# 		start time
+		if "strST" in self.contentdata[id]:
+			pass
+			st = self.contentdata[id]["strST"].get()
+			base.debugmsg(5, "st:", st)
+			if st != self.contentdata[id]["fST"]:
+				ist = base.report_formateddatetimetosec(st)
+				base.debugmsg(5, "ist:", ist)
+				if ist > 0:
+					ios = ist - base.rs_setting_get_starttime()
+					base.debugmsg(5, "ios:", ios)
+					changes += base.report_item__set_int(id, "startoffset", ios)
+
+			iST = base.rt_setting_get_starttime(id)
+			fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
+			self.contentdata[id]["strST"].set(fST)
+			self.contentdata[id]["fST"] = fST
+
+		# 		end time
+		if "strET" in self.contentdata[id]:
+			pass
+			et = self.contentdata[id]["strET"].get()
+			base.debugmsg(5, "et:", et)
+			if et != self.contentdata[id]["fET"]:
+				iet = base.report_formateddatetimetosec(et)
+				base.debugmsg(5, "iet:", iet)
+				if iet > 0:
+					ios = base.rs_setting_get_endtime() - iet
+					base.debugmsg(5, "ios:", ios)
+					changes += base.report_item__set_int(id, "endoffset", ios)
+
+			iET = base.rt_setting_get_endtime(id)
+			fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
+			self.contentdata[id]["strET"].set(fET)
+			self.contentdata[id]["fET"] = fET
+
 		base.debugmsg(5, "changes:", changes)
 		if "intIsNum" in self.contentdata[id]:
 			value = self.contentdata[id]["intIsNum"].get()
 			changes += base.rt_table_set_isnumeric(id, value)
 		if "intShCnt" in self.contentdata[id]:
 			value = self.contentdata[id]["intShCnt"].get()
-			base.rt_table_set_showcount(id, value)
+			changes += base.rt_table_set_showcount(id, value)
 		# self.contentdata[id]["MType"].set(base.rt_table_get_mt(id))
 		if "MType" in self.contentdata[id]:
 			value = self.contentdata[id]["MType"].get()
@@ -7776,7 +7986,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["FPattern"] = tk.StringVar()
 				self.contentdata[id]["inpFP"] = ttk.Entry(self.contentdata[id]["Frames"][datatype], textvariable=self.contentdata[id]["FPattern"])
 				self.contentdata[id]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
-				self.contentdata[id]["inpFP"].bind('<Leave>', self.cs_datatable_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[id]["inpFP"].bind('<Leave>', self.cs_datatable_update)
 				self.contentdata[id]["inpFP"].bind('<FocusOut>', self.cs_datatable_update)
 
 			if datatype == "Result":
@@ -7836,7 +8047,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["FPattern"] = tk.StringVar()
 				self.contentdata[id]["inpFP"] = ttk.Entry(self.contentdata[id]["Frames"][datatype], textvariable=self.contentdata[id]["FPattern"])
 				self.contentdata[id]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
-				self.contentdata[id]["inpFP"].bind('<Leave>', self.cs_datatable_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[id]["inpFP"].bind('<Leave>', self.cs_datatable_update)
 				self.contentdata[id]["inpFP"].bind('<FocusOut>', self.cs_datatable_update)
 
 			if datatype == "ResultSummary":
@@ -7873,7 +8085,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["FPattern"] = tk.StringVar()
 				self.contentdata[id]["inpFP"] = ttk.Entry(self.contentdata[id]["Frames"][datatype], textvariable=self.contentdata[id]["FPattern"])
 				self.contentdata[id]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
-				self.contentdata[id]["inpFP"].bind('<Leave>', self.cs_datatable_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[id]["inpFP"].bind('<Leave>', self.cs_datatable_update)
 				self.contentdata[id]["inpFP"].bind('<FocusOut>', self.cs_datatable_update)
 
 			if datatype == "SQL":
@@ -7886,7 +8099,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["tSQL"] = tk.Text(self.contentdata[id]["Frames"][datatype])
 				self.contentdata[id]["tSQL"].grid(column=0, row=rownum, columnspan=100, sticky="nsew")
 				# data = self.contentdata[id]["tSQL"].insert('0.0', sql)
-				self.contentdata[id]["tSQL"].bind('<Leave>', self.cs_datatable_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[id]["tSQL"].bind('<Leave>', self.cs_datatable_update)
 				self.contentdata[id]["tSQL"].bind('<FocusOut>', self.cs_datatable_update)
 
 		base.debugmsg(8, "id:", id, "renamecols 1")
@@ -8054,7 +8268,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["renamecolumns"][colname] = tk.StringVar()
 				self.contentdata[id]["renamecolumns"][colinput] = ttk.Entry(self.contentdata[id]["Frames"]["renamecols"], textvariable=self.contentdata[id]["renamecolumns"][colname])
 				self.contentdata[id]["renamecolumns"][colinput].grid(column=colnum, row=rownum, sticky="nsew")
-				self.contentdata[id]["renamecolumns"][colinput].bind('<Leave>', self.cs_datatable_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[id]["renamecolumns"][colinput].bind('<Leave>', self.cs_datatable_update)
 				self.contentdata[id]["renamecolumns"][colinput].bind('<FocusOut>', self.cs_datatable_update)
 
 				self.contentdata[id]["renamecolumns"][colname].set(base.rt_table_get_colname(id, colname))
@@ -8066,6 +8281,10 @@ class ReporterGUI(tk.Frame):
 	def cs_graph(self, id):
 		base.debugmsg(9, "id:", id)
 		pid, idl, idr = base.rt_graph_LR_Ids(id)
+
+		iST = base.rt_setting_get_starttime(pid)
+		iET = base.rt_setting_get_endtime(pid)
+
 		axisenl = base.rt_graph_get_axisen(idl)
 		axisenr = base.rt_graph_get_axisen(idr)
 		datatypel = base.rt_graph_get_dt(idl)
@@ -8073,6 +8292,53 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[pid]["LFrame"].columnconfigure(99, weight=1)
 		rownum = 0
 
+		# 		start time
+		rownum += 1
+		self.contentdata[pid]["lblST"] = ttk.Label(self.contentdata[pid]["LFrame"], text="Start Time:")
+		self.contentdata[pid]["lblST"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[pid]["strST"] = tk.StringVar()
+		fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
+		self.contentdata[pid]["strST"].set(fST)
+		self.contentdata[pid]["fST"] = fST
+
+		self.contentdata[pid]["eST"] = ttk.Entry(self.contentdata[pid]["LFrame"], textvariable=self.contentdata[pid]["strST"])
+		self.contentdata[pid]["eST"].grid(column=1, row=rownum, sticky="nsew")
+		# <Leave> makes UI to jumpy
+		# self.contentdata[pid]["eST"].bind('<Leave>', self.cs_graph_update)
+		self.contentdata[pid]["eST"].bind('<FocusOut>', self.cs_graph_update)
+
+		self.contentdata[pid]["lblBlank"] = ttk.Label(self.contentdata[pid]["RFrame"], text=" ")
+		self.contentdata[pid]["lblBlank"].grid(column=0, row=rownum, sticky="nsew")
+
+		# 		end time
+		rownum += 1
+		self.contentdata[pid]["lblET"] = ttk.Label(self.contentdata[pid]["LFrame"], text="End Time:")
+		self.contentdata[pid]["lblET"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[pid]["strET"] = tk.StringVar()
+		fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
+		self.contentdata[pid]["strET"].set(fET)
+		self.contentdata[pid]["fET"] = fET
+
+		self.contentdata[pid]["eET"] = ttk.Entry(self.contentdata[pid]["LFrame"], textvariable=self.contentdata[pid]["strET"])
+		self.contentdata[pid]["eET"].grid(column=1, row=rownum, sticky="nsew")
+		# <Leave> makes UI to jumpy
+		# self.contentdata[pid]["eET"].bind('<Leave>', self.cs_graph_update)
+		self.contentdata[pid]["eET"].bind('<FocusOut>', self.cs_graph_update)
+
+		self.contentdata[pid]["lblBlank"] = ttk.Label(self.contentdata[pid]["RFrame"], text=" ")
+		self.contentdata[pid]["lblBlank"].grid(column=0, row=rownum, sticky="nsew")
+
+		# 		blank row
+		rownum += 1
+		self.contentdata[pid]["lblBlank"] = ttk.Label(self.contentdata[pid]["LFrame"], text=" ")
+		self.contentdata[pid]["lblBlank"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[pid]["lblBlank"] = ttk.Label(self.contentdata[pid]["RFrame"], text=" ")
+		self.contentdata[pid]["lblBlank"].grid(column=0, row=rownum, sticky="nsew")
+
+		# 		Y-Axis
 		rownum += 1
 		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[pid]["LFrame"], text="Y-Axis:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
@@ -8124,96 +8390,133 @@ class ReporterGUI(tk.Frame):
 		id = self.sectionstree.focus()
 		base.debugmsg(9, "id:", id)
 		pid, idl, idr = base.rt_graph_LR_Ids(id)
+		changes = 0
+
+		# 		start time
+		if "strST" in self.contentdata[pid]:
+			pass
+			st = self.contentdata[pid]["strST"].get()
+			base.debugmsg(5, "st:", st)
+			if st != self.contentdata[pid]["fST"]:
+				ist = base.report_formateddatetimetosec(st)
+				base.debugmsg(5, "ist:", ist)
+				if ist > 0:
+					ios = ist - base.rs_setting_get_starttime()
+					base.debugmsg(5, "ios:", ios)
+					changes += base.report_item__set_int(pid, "startoffset", ios)
+
+			iST = base.rt_setting_get_starttime(pid)
+			fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
+			self.contentdata[id]["strST"].set(fST)
+			self.contentdata[id]["fST"] = fST
+
+		# 		end time
+		if "strET" in self.contentdata[pid]:
+			pass
+			et = self.contentdata[pid]["strET"].get()
+			base.debugmsg(5, "et:", et)
+			if et != self.contentdata[pid]["fET"]:
+				iet = base.report_formateddatetimetosec(et)
+				base.debugmsg(5, "iet:", iet)
+				if iet > 0:
+					ios = base.rs_setting_get_endtime() - iet
+					base.debugmsg(5, "ios:", ios)
+					changes += base.report_item__set_int(pid, "endoffset", ios)
+
+			iET = base.rt_setting_get_endtime(pid)
+			fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
+			self.contentdata[id]["strET"].set(fET)
+			self.contentdata[id]["fET"] = fET
 
 		# intIsNum
 		if "intIsNum" in self.contentdata[idl]:
 			value = self.contentdata[idl]["intIsNum"].get()
-			base.rt_table_set_isnumeric(idl, value)
+			changes += base.rt_table_set_isnumeric(idl, value)
 		if "intIsNum" in self.contentdata[idr]:
 			value = self.contentdata[idr]["intIsNum"].get()
-			base.rt_table_set_isnumeric(idr, value)
+			changes += base.rt_table_set_isnumeric(idr, value)
 
 		# intShCnt
 		if "intShCnt" in self.contentdata[idl]:
 			value = self.contentdata[idl]["intShCnt"].get()
-			base.rt_table_set_showcount(idl, value)
+			changes += base.rt_table_set_showcount(idl, value)
 		if "intShCnt" in self.contentdata[idr]:
 			value = self.contentdata[idr]["intShCnt"].get()
-			base.rt_table_set_showcount(idr, value)
+			changes += base.rt_table_set_showcount(idr, value)
 
 		if "MType" in self.contentdata[idl]:
 			value = self.contentdata[idl]["MType"].get()
-			base.rt_table_set_mt(idl, value)
+			changes += base.rt_table_set_mt(idl, value)
 		if "MType" in self.contentdata[idr]:
 			value = self.contentdata[idr]["MType"].get()
-			base.rt_table_set_mt(idr, value)
+			changes += base.rt_table_set_mt(idr, value)
 
 		if "PMetric" in self.contentdata[idl]:
 			value = self.contentdata[idl]["PMetric"].get()
-			base.rt_table_set_pm(idl, value)
+			changes += base.rt_table_set_pm(idl, value)
 		if "PMetric" in self.contentdata[idr]:
 			value = self.contentdata[idr]["PMetric"].get()
-			base.rt_table_set_pm(idr, value)
+			changes += base.rt_table_set_pm(idr, value)
 
 		if "SMetric" in self.contentdata[idl]:
 			value = self.contentdata[idl]["SMetric"].get()
-			base.rt_table_set_sm(idl, value)
+			changes += base.rt_table_set_sm(idl, value)
 		if "SMetric" in self.contentdata[idr]:
 			value = self.contentdata[idr]["SMetric"].get()
-			base.rt_table_set_sm(idr, value)
+			changes += base.rt_table_set_sm(idr, value)
 
 		if "RType" in self.contentdata[idl]:
 			value = self.contentdata[idl]["RType"].get()
-			base.rt_table_set_rt(idl, value)
+			changes += base.rt_table_set_rt(idl, value)
 		if "RType" in self.contentdata[idr]:
 			value = self.contentdata[idr]["RType"].get()
-			base.rt_table_set_rt(idr, value)
+			changes += base.rt_table_set_rt(idr, value)
 
 		if "FRType" in self.contentdata[idl]:
 			value = self.contentdata[idl]["FRType"].get()
-			base.rt_table_set_fr(idl, value)
+			changes += base.rt_table_set_fr(idl, value)
 		if "FRType" in self.contentdata[idr]:
 			value = self.contentdata[idr]["FRType"].get()
-			base.rt_table_set_fr(idr, value)
+			changes += base.rt_table_set_fr(idr, value)
 
 		if "intFR" in self.contentdata[idl]:
 			value = self.contentdata[idl]["intFR"].get()
-			base.rt_table_set_enfr(idl, value)
+			changes += base.rt_table_set_enfr(idl, value)
 		if "intFR" in self.contentdata[idr]:
 			value = self.contentdata[idr]["intFR"].get()
-			base.rt_table_set_enfr(idr, value)
+			changes += base.rt_table_set_enfr(idr, value)
 
 		if "intFA" in self.contentdata[idl]:
 			value = self.contentdata[idl]["intFA"].get()
-			base.rt_table_set_enfa(idl, value)
+			changes += base.rt_table_set_enfa(idl, value)
 		if "intFA" in self.contentdata[idr]:
 			value = self.contentdata[idr]["intFA"].get()
-			base.rt_table_set_enfa(idr, value)
+			changes += base.rt_table_set_enfa(idr, value)
 
 		if "FAType" in self.contentdata[idl]:
 			value = self.contentdata[idl]["FAType"].get()
-			base.rt_table_set_fa(idl, value)
+			changes += base.rt_table_set_fa(idl, value)
 		if "FAType" in self.contentdata[idr]:
 			value = self.contentdata[idr]["FAType"].get()
-			base.rt_table_set_fa(idr, value)
+			changes += base.rt_table_set_fa(idr, value)
 
 		if "FNType" in self.contentdata[idl]:
 			value = self.contentdata[idl]["FNType"].get()
-			base.rt_table_set_fn(idl, value)
+			changes += base.rt_table_set_fn(idl, value)
 		if "FNType" in self.contentdata[idr]:
 			value = self.contentdata[idr]["FNType"].get()
-			base.rt_table_set_fn(idr, value)
+			changes += base.rt_table_set_fn(idr, value)
 
 		if "FPattern" in self.contentdata[idl]:
 			value = self.contentdata[idl]["FPattern"].get()
-			base.rt_table_set_fp(idl, value)
+			changes += base.rt_table_set_fp(idl, value)
 		if "FPattern" in self.contentdata[idr]:
 			value = self.contentdata[idr]["FPattern"].get()
-			base.rt_table_set_fp(idr, value)
+			changes += base.rt_table_set_fp(idr, value)
 
 		if "strDT" in self.contentdata[idl]:
 			datatype = self.contentdata[idl]["strDT"].get()
-			base.rt_table_set_dt(idl, datatype)
+			changes += base.rt_table_set_dt(idl, datatype)
 			if datatype == "Metric":
 				self.cs_datatable_update_metrics(idl)
 			if datatype != "SQL":
@@ -8221,7 +8524,7 @@ class ReporterGUI(tk.Frame):
 				base.rt_graph_generate_sql(idl)
 		if "strDT" in self.contentdata[idr]:
 			datatype = self.contentdata[idr]["strDT"].get()
-			base.rt_table_set_dt(idr, datatype)
+			changes += base.rt_table_set_dt(idr, datatype)
 			if datatype == "Metric":
 				self.cs_datatable_update_metrics(idr)
 			if datatype != "SQL":
@@ -8231,30 +8534,31 @@ class ReporterGUI(tk.Frame):
 		# self.contentdata[idl]["intAxsEn"] = tk.IntVar()
 		if "intAxsEn" in self.contentdata[idl]:
 			value = self.contentdata[idl]["intAxsEn"].get()
-			base.rt_graph_set_axisen(idl, value)
+			changes += base.rt_graph_set_axisen(idl, value)
 		if "intAxsEn" in self.contentdata[idr]:
 			value = self.contentdata[idr]["intAxsEn"].get()
-			base.rt_graph_set_axisen(idr, value)
+			changes += base.rt_graph_set_axisen(idr, value)
 
 		if "tSQL" in self.contentdata[idl]:
 			data = self.contentdata[idl]["tSQL"].get('0.0', tk.END).strip()
 			base.debugmsg(5, "data:", data)
-			base.rt_graph_set_sql(idl, data)
+			changes += base.rt_graph_set_sql(idl, data)
 		else:
 			time.sleep(0.1)
-			base.rt_graph_generate_sql(idl)
+			changes += base.rt_graph_generate_sql(idl)
 		if "tSQL" in self.contentdata[idr]:
 			data = self.contentdata[idr]["tSQL"].get('0.0', tk.END).strip()
 			base.debugmsg(5, "data:", data)
-			base.rt_graph_set_sql(idr, data)
+			changes += base.rt_graph_set_sql(idr, data)
 		else:
 			time.sleep(0.1)
 			base.rt_graph_generate_sql(idr)
 
-		base.debugmsg(5, "content_preview id:", id)
-		# self.content_preview(id)
-		cp = threading.Thread(target=lambda: self.content_preview(id))
-		cp.start()
+		if changes > 0:
+			base.debugmsg(5, "content_preview id:", id)
+			# self.content_preview(id)
+			cp = threading.Thread(target=lambda: self.content_preview(id))
+			cp.start()
 
 	def cs_graph_switchdt(self, _event=None):
 		base.debugmsg(5, "self:", self, "	_event:", _event)
@@ -8377,7 +8681,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idl]["FPattern"] = tk.StringVar()
 				self.contentdata[idl]["inpFP"] = ttk.Entry(self.contentdata[idl]["Frames"][datatypel], textvariable=self.contentdata[idl]["FPattern"])
 				self.contentdata[idl]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
-				self.contentdata[idl]["inpFP"].bind('<Leave>', self.cs_graph_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[idl]["inpFP"].bind('<Leave>', self.cs_graph_update)
 				self.contentdata[idl]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
 			if datatypel == "Result":
@@ -8433,7 +8738,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idl]["FPattern"] = tk.StringVar()
 				self.contentdata[idl]["inpFP"] = ttk.Entry(self.contentdata[idl]["Frames"][datatypel], textvariable=self.contentdata[idl]["FPattern"])
 				self.contentdata[idl]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
-				self.contentdata[idl]["inpFP"].bind('<Leave>', self.cs_graph_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[idl]["inpFP"].bind('<Leave>', self.cs_graph_update)
 				self.contentdata[idl]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
 			if datatypel == "SQL":
@@ -8446,7 +8752,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idl]["tSQL"] = tk.Text(self.contentdata[idl]["Frames"][datatypel])
 				self.contentdata[idl]["tSQL"].grid(column=0, row=rownum, columnspan=100, sticky="nsew")
 				# data = self.contentdata[id]["tSQL"].insert('0.0', sql)
-				self.contentdata[idl]["tSQL"].bind('<Leave>', self.cs_graph_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[idl]["tSQL"].bind('<Leave>', self.cs_graph_update)
 				self.contentdata[idl]["tSQL"].bind('<FocusOut>', self.cs_graph_update)
 
 		if datatyper not in self.contentdata[id]["Frames"]:
@@ -8534,7 +8841,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idr]["FPattern"] = tk.StringVar()
 				self.contentdata[idr]["inpFP"] = ttk.Entry(self.contentdata[idr]["Frames"][datatyper], textvariable=self.contentdata[idr]["FPattern"])
 				self.contentdata[idr]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
-				self.contentdata[idr]["inpFP"].bind('<Leave>', self.cs_graph_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[idr]["inpFP"].bind('<Leave>', self.cs_graph_update)
 				self.contentdata[idr]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
 			if datatyper == "Result":
@@ -8590,7 +8898,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idr]["FPattern"] = tk.StringVar()
 				self.contentdata[idr]["inpFP"] = ttk.Entry(self.contentdata[idr]["Frames"][datatyper], textvariable=self.contentdata[idr]["FPattern"])
 				self.contentdata[idr]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
-				self.contentdata[idr]["inpFP"].bind('<Leave>', self.cs_graph_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[idr]["inpFP"].bind('<Leave>', self.cs_graph_update)
 				self.contentdata[idr]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
 			if datatyper == "SQL":
@@ -8603,7 +8912,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idr]["tSQL"] = tk.Text(self.contentdata[idr]["Frames"][datatyper])
 				self.contentdata[idr]["tSQL"].grid(column=0, row=rownum, columnspan=100, sticky="nsew")
 				# data = self.contentdata[idr]["tSQL"].insert('0.0', sql)
-				self.contentdata[idr]["tSQL"].bind('<Leave>', self.cs_graph_update)
+				# <Leave> makes UI to jumpy
+				# self.contentdata[idr]["tSQL"].bind('<Leave>', self.cs_graph_update)
 				self.contentdata[idr]["tSQL"].bind('<FocusOut>', self.cs_graph_update)
 
 		# Update
@@ -8677,6 +8987,12 @@ class ReporterGUI(tk.Frame):
 
 	def cs_errors(self, id):
 		base.debugmsg(9, "id:", id)
+
+		iST = base.rt_setting_get_starttime(id)
+		base.debugmsg(5, "iST:", iST)
+		iET = base.rt_setting_get_endtime(id)
+		base.debugmsg(5, "iET:", iET)
+
 		images = base.rt_errors_get_images(id)
 		base.debugmsg(5, "images:", images)
 		grouprn = base.rt_errors_get_group_rn(id)
@@ -8695,6 +9011,35 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["LFrame"].columnconfigure(99, weight=1)
 		rownum = 0
 
+		# 		start time
+		rownum += 1
+		self.contentdata[id]["lblST"] = ttk.Label(self.contentdata[id]["LFrame"], text="Start Time:")
+		self.contentdata[id]["lblST"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["strST"] = tk.StringVar()
+		fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
+		self.contentdata[id]["strST"].set(fST)
+		self.contentdata[id]["fST"] = fST
+
+		self.contentdata[id]["eST"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["strST"])
+		self.contentdata[id]["eST"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[id]["eST"].bind('<FocusOut>', self.cs_errors_update)
+
+		# 		end time
+		rownum += 1
+		self.contentdata[id]["lblET"] = ttk.Label(self.contentdata[id]["LFrame"], text="End Time:")
+		self.contentdata[id]["lblET"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[id]["strET"] = tk.StringVar()
+		fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
+		self.contentdata[id]["strET"].set(fET)
+		self.contentdata[id]["fET"] = fET
+
+		self.contentdata[id]["eET"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["strET"])
+		self.contentdata[id]["eET"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[id]["eET"].bind('<FocusOut>', self.cs_errors_update)
+
+		# 		Show Screenshots
 		rownum += 1
 		self.contentdata[id]["lblImages"] = ttk.Label(self.contentdata[id]["LFrame"], text="Show screenshots:")
 		self.contentdata[id]["lblImages"].grid(column=0, row=rownum, sticky="nsew")
@@ -8704,6 +9049,7 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["intImages"].set(images)
 		self.contentdata[id]["chkImages"].grid(column=1, row=rownum, sticky="nsew")
 
+		# 		Group by result name
 		rownum += 1
 		self.contentdata[id]["lblGroupRN"] = ttk.Label(self.contentdata[id]["LFrame"], text="Group by result name:")
 		self.contentdata[id]["lblGroupRN"].grid(column=0, row=rownum, sticky="nsew")
@@ -8713,6 +9059,7 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["intGroupRN"].set(grouprn)
 		self.contentdata[id]["chkGroupRN"].grid(column=1, row=rownum, sticky="nsew")
 
+		# 		Group by error text
 		rownum += 1
 		self.contentdata[id]["lblGroupET"] = ttk.Label(self.contentdata[id]["LFrame"], text="Group by error text:")
 		self.contentdata[id]["lblGroupET"].grid(column=0, row=rownum, sticky="nsew")
@@ -8745,7 +9092,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["varResult"].set(lbl_Result)
 		self.contentdata[id]["inpResult"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["varResult"])
 		self.contentdata[id]["inpResult"].grid(column=1, row=rownum, sticky="nsew")
-		self.contentdata[id]["inpResult"].bind('<Leave>', self.cs_errors_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["inpResult"].bind('<Leave>', self.cs_errors_update)
 		self.contentdata[id]["inpResult"].bind('<FocusOut>', self.cs_errors_update)
 
 		rownum += 1
@@ -8756,7 +9104,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["varTest"].set(lbl_Test)
 		self.contentdata[id]["inpTest"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["varTest"])
 		self.contentdata[id]["inpTest"].grid(column=1, row=rownum, sticky="nsew")
-		self.contentdata[id]["inpTest"].bind('<Leave>', self.cs_errors_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["inpTest"].bind('<Leave>', self.cs_errors_update)
 		self.contentdata[id]["inpTest"].bind('<FocusOut>', self.cs_errors_update)
 
 		rownum += 1
@@ -8767,7 +9116,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["varScript"].set(lbl_Script)
 		self.contentdata[id]["inpScript"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["varScript"])
 		self.contentdata[id]["inpScript"].grid(column=1, row=rownum, sticky="nsew")
-		self.contentdata[id]["inpScript"].bind('<Leave>', self.cs_errors_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["inpScript"].bind('<Leave>', self.cs_errors_update)
 		self.contentdata[id]["inpScript"].bind('<FocusOut>', self.cs_errors_update)
 
 		rownum += 1
@@ -8778,7 +9128,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["varError"].set(lbl_Error)
 		self.contentdata[id]["inpError"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["varError"])
 		self.contentdata[id]["inpError"].grid(column=1, row=rownum, sticky="nsew")
-		self.contentdata[id]["inpError"].bind('<Leave>', self.cs_errors_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["inpError"].bind('<Leave>', self.cs_errors_update)
 		self.contentdata[id]["inpError"].bind('<FocusOut>', self.cs_errors_update)
 
 		rownum += 1
@@ -8789,7 +9140,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["varCount"].set(lbl_Count)
 		self.contentdata[id]["inpCount"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["varCount"])
 		self.contentdata[id]["inpCount"].grid(column=1, row=rownum, sticky="nsew")
-		self.contentdata[id]["inpCount"].bind('<Leave>', self.cs_errors_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["inpCount"].bind('<Leave>', self.cs_errors_update)
 		self.contentdata[id]["inpCount"].bind('<FocusOut>', self.cs_errors_update)
 
 		rownum += 1
@@ -8800,7 +9152,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["varScreenshot"].set(lbl_Screenshot)
 		self.contentdata[id]["inpScreenshot"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["varScreenshot"])
 		self.contentdata[id]["inpScreenshot"].grid(column=1, row=rownum, sticky="nsew")
-		self.contentdata[id]["inpScreenshot"].bind('<Leave>', self.cs_errors_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["inpScreenshot"].bind('<Leave>', self.cs_errors_update)
 		self.contentdata[id]["inpScreenshot"].bind('<FocusOut>', self.cs_errors_update)
 
 		rownum += 1
@@ -8811,7 +9164,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["varNoScreenshot"].set(lbl_NoScreenshot)
 		self.contentdata[id]["inpNoScreenshot"] = ttk.Entry(self.contentdata[id]["LFrame"], textvariable=self.contentdata[id]["varNoScreenshot"])
 		self.contentdata[id]["inpNoScreenshot"].grid(column=1, row=rownum, sticky="nsew")
-		self.contentdata[id]["inpNoScreenshot"].bind('<Leave>', self.cs_errors_update)
+		# <Leave> makes UI to jumpy
+		# self.contentdata[id]["inpNoScreenshot"].bind('<Leave>', self.cs_errors_update)
 		self.contentdata[id]["inpNoScreenshot"].bind('<FocusOut>', self.cs_errors_update)
 
 	def cs_errors_update(self, _event=None, *args):
@@ -8826,6 +9180,41 @@ class ReporterGUI(tk.Frame):
 			if name is not None:
 				id = _event
 		base.debugmsg(9, "id:", id)
+
+		# 		start time
+		if "strST" in self.contentdata[id]:
+			st = self.contentdata[id]["strST"].get()
+			base.debugmsg(5, "st:", st)
+			if st != self.contentdata[id]["fST"]:
+				ist = base.report_formateddatetimetosec(st)
+				base.debugmsg(5, "ist:", ist)
+				if ist > 0:
+					ios = ist - base.rs_setting_get_starttime()
+					base.debugmsg(5, "ios:", ios)
+					changes += base.report_item__set_int(id, "startoffset", ios)
+
+			iST = base.rt_setting_get_starttime(id)
+			fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
+			self.contentdata[id]["strST"].set(fST)
+			self.contentdata[id]["fST"] = fST
+
+		# 		end time
+		if "strET" in self.contentdata[id]:
+			et = self.contentdata[id]["strET"].get()
+			base.debugmsg(5, "et:", et)
+			if et != self.contentdata[id]["fET"]:
+				iet = base.report_formateddatetimetosec(et)
+				base.debugmsg(5, "iet:", iet)
+				if iet > 0:
+					ios = base.rs_setting_get_endtime() - iet
+					base.debugmsg(5, "ios:", ios)
+					changes += base.report_item__set_int(id, "endoffset", ios)
+
+			iET = base.rt_setting_get_endtime(id)
+			fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
+			self.contentdata[id]["strET"].set(fET)
+			self.contentdata[id]["fET"] = fET
+
 		if "intImages" in self.contentdata[id]:
 			images = self.contentdata[id]["intImages"].get()
 			changes += base.rt_errors_set_images(id, images)
@@ -8866,10 +9255,11 @@ class ReporterGUI(tk.Frame):
 			lbl_NoScreenshot = self.contentdata[id]["varNoScreenshot"].get()
 			changes += base.rt_errors_set_label(id, "lbl_NoScreenshot", lbl_NoScreenshot)
 
-		base.debugmsg(5, "content_preview id:", id)
-		# self.content_preview(id)
-		cp = threading.Thread(target=lambda: self.content_preview(id))
-		cp.start()
+		if changes > 0:
+			base.debugmsg(5, "content_preview id:", id)
+			# self.content_preview(id)
+			cp = threading.Thread(target=lambda: self.content_preview(id))
+			cp.start()
 
 	#
 	# Preview
@@ -9564,58 +9954,61 @@ class ReporterGUI(tk.Frame):
 			keys = list(base.reportdata[id].keys())
 			for key in keys:
 				base.debugmsg(5, "key:", key)
-				rdata = base.reportdata[id][key]
+				if key != "key":
+					rdata = base.reportdata[id][key]
 
-				if grouprn:
-					result_name = rdata['result_name']
-					matches = difflib.get_close_matches(result_name, list(self.contentdata[id]["grpdata"]["resultnames"].keys()), cutoff=pctalike)
-					base.debugmsg(5, "matches:", matches)
-					if len(matches) > 0:
-						result_name = matches[0]
-						basekey = self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"][0]
-						base.debugmsg(5, "basekey:", basekey)
-						self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"].append(key)
-					else:
-						self.contentdata[id]["grpdata"]["resultnames"][result_name] = {}
-						self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"] = []
-						self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"].append(key)
-						self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"] = {}
+					if grouprn:
+						result_name = rdata['result_name']
+						matches = difflib.get_close_matches(result_name, list(self.contentdata[id]["grpdata"]["resultnames"].keys()), cutoff=pctalike)
+						base.debugmsg(5, "matches:", matches)
+						if len(matches) > 0:
+							result_name = matches[0]
+							basekey = self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"][0]
+							base.debugmsg(5, "basekey:", basekey)
+							self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"].append(key)
+						else:
+							self.contentdata[id]["grpdata"]["resultnames"][result_name] = {}
+							self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"] = []
+							self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"].append(key)
+							self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"] = {}
 
-					if groupet:
+						if groupet and 'error' in rdata:
+							errortext = rdata['error']
+							# errortext_sub = errortext.split(r'\n')[0]
+							errortext_sub = errortext.splitlines()[0]
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							matcheset = difflib.get_close_matches(errortext_sub, list(self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"].keys()), cutoff=pctalike)
+							base.debugmsg(5, "matcheset:", matcheset)
+							if len(matcheset) > 0:
+								errortext = matcheset[0]
+								errortext_sub = errortext.splitlines()[0]
+								base.debugmsg(5, "errortext:", errortext)
+								baseid = self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"][0]
+								base.debugmsg(5, "baseid:", baseid)
+								self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+							else:
+								self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub] = {}
+								self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
+								self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+
+					if groupet and 'error' in rdata:
 						errortext = rdata['error']
-						# errortext_sub = errortext.split(r'\n')[0]
 						errortext_sub = errortext.splitlines()[0]
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						matcheset = difflib.get_close_matches(errortext_sub, list(self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"].keys()), cutoff=pctalike)
-						base.debugmsg(5, "matcheset:", matcheset)
-						if len(matcheset) > 0:
-							errortext = matcheset[0]
-							baseid = self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"][0]
+						matches = difflib.get_close_matches(errortext_sub, list(self.contentdata[id]["grpdata"]["errortexts"].keys()), cutoff=pctalike)
+						base.debugmsg(5, "matches:", matches)
+						if len(matches) > 0:
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							errortext = matches[0]
+							base.debugmsg(5, "errortext:", errortext)
+							baseid = self.contentdata[id]["grpdata"]["errortexts"][errortext]["keys"][0]
 							base.debugmsg(5, "baseid:", baseid)
-							self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
+							self.contentdata[id]["grpdata"]["errortexts"][errortext]["keys"].append(key)
 						else:
-							self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub] = {}
-							self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
-							self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
-
-				if groupet:
-					errortext = rdata['error']
-					errortext_sub = errortext.splitlines()[0]
-					base.debugmsg(5, "errortext_sub:", errortext_sub)
-					matches = difflib.get_close_matches(errortext_sub, list(self.contentdata[id]["grpdata"]["errortexts"].keys()), cutoff=pctalike)
-					base.debugmsg(5, "matches:", matches)
-					if len(matches) > 0:
-						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						errortext = matches[0]
-						base.debugmsg(5, "errortext:", errortext)
-						baseid = self.contentdata[id]["grpdata"]["errortexts"][errortext]["keys"][0]
-						base.debugmsg(5, "baseid:", baseid)
-						self.contentdata[id]["grpdata"]["errortexts"][errortext]["keys"].append(key)
-					else:
-						base.debugmsg(5, "errortext_sub:", errortext_sub)
-						self.contentdata[id]["grpdata"]["errortexts"][errortext_sub] = {}
-						self.contentdata[id]["grpdata"]["errortexts"][errortext_sub]["keys"] = []
-						self.contentdata[id]["grpdata"]["errortexts"][errortext_sub]["keys"].append(key)
+							base.debugmsg(5, "errortext_sub:", errortext_sub)
+							self.contentdata[id]["grpdata"]["errortexts"][errortext_sub] = {}
+							self.contentdata[id]["grpdata"]["errortexts"][errortext_sub]["keys"] = []
+							self.contentdata[id]["grpdata"]["errortexts"][errortext_sub]["keys"].append(key)
 
 			resultnames = self.contentdata[id]["grpdata"]["resultnames"]
 			base.debugmsg(5, "resultnames:", resultnames)
@@ -9696,7 +10089,8 @@ class ReporterGUI(tk.Frame):
 						colnum += 1
 						cellname = "{}_{}".format("error", basekey)
 						base.debugmsg(5, "cellname:", cellname)
-						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
+						if 'error' in rdata:
+							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
 
 						colnum += 5
@@ -9747,7 +10141,8 @@ class ReporterGUI(tk.Frame):
 						colnum += 1
 						cellname = "{}_{}".format("error", keyi)
 						base.debugmsg(5, "cellname:", cellname)
-						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
+						if 'error' in rdata:
+							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=7)
 
 						if showimages:
@@ -9787,7 +10182,8 @@ class ReporterGUI(tk.Frame):
 				colnum += 1
 				cellname = "{}_{}".format("error", basekey)
 				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
+				if 'error' in rdata:
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
 				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
 
 				colnum += 5
@@ -9829,78 +10225,80 @@ class ReporterGUI(tk.Frame):
 			keys = list(base.reportdata[id].keys())
 			for key in keys:
 				base.debugmsg(5, "key:", key)
-				i += 1
-				rownum += 1
-				rdata = base.reportdata[id][key]
-
-				colnum = 0
-				cellname = "{}_{}".format("lbl_result_name", key)
-				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Result), style='Report.TBody.TLabel')
-				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-
-				colnum += 1
-				cellname = "{}_{}".format("result_name", key)
-				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['result_name']), style='Report.TBody.TLabel')
-				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-
-				colnum += 1
-				cellname = "{}_{}".format("lbl_test_name", key)
-				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Test), style='Report.TBody.TLabel')
-				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-
-				colnum += 1
-				cellname = "{}_{}".format("test_name", key)
-				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['test_name']), style='Report.TBody.TLabel')
-				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-
-				colnum += 1
-				cellname = "{}_{}".format("lbl_script", key)
-				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Script), style='Report.TBody.TLabel')
-				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-
-				colnum += 1
-				cellname = "{}_{}".format("script", key)
-				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['script']), style='Report.TBody.TLabel')
-				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-
-				rownum += 1
-				colnum = 0
-				cellname = "{}_{}".format("lbl_error", key)
-				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Error), style='Report.TBody.TLabel')
-				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-
-				colnum += 1
-				cellname = "{}_{}".format("error", key)
-				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
-				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
-
-				if showimages:
+				if key != "key":
+					i += 1
 					rownum += 1
+					rdata = base.reportdata[id][key]
+
 					colnum = 0
-					cellname = "{}_{}".format("lbl_image", key)
+					cellname = "{}_{}".format("lbl_result_name", key)
 					base.debugmsg(5, "cellname:", cellname)
-					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Screenshot), style='Report.TBody.TLabel')
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Result), style='Report.TBody.TLabel')
 					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 					colnum += 1
-					cellname = "{}_{}".format("image_file", key)
-					cellimg = "{}_{}".format("image", key)
+					cellname = "{}_{}".format("result_name", key)
 					base.debugmsg(5, "cellname:", cellname)
-					if 'image_file' in rdata:
-						self.contentdata[id][cellimg] = tk.PhotoImage(file=rdata['image_file'])
-						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id][cellimg], style='Report.TBody.TLabel')
-						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
-					else:
-						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}".format(lbl_NoScreenshot), style='Report.TBody.TLabel')
-						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['result_name']), style='Report.TBody.TLabel')
+					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+					colnum += 1
+					cellname = "{}_{}".format("lbl_test_name", key)
+					base.debugmsg(5, "cellname:", cellname)
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Test), style='Report.TBody.TLabel')
+					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+					colnum += 1
+					cellname = "{}_{}".format("test_name", key)
+					base.debugmsg(5, "cellname:", cellname)
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['test_name']), style='Report.TBody.TLabel')
+					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+					colnum += 1
+					cellname = "{}_{}".format("lbl_script", key)
+					base.debugmsg(5, "cellname:", cellname)
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Script), style='Report.TBody.TLabel')
+					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+					colnum += 1
+					cellname = "{}_{}".format("script", key)
+					base.debugmsg(5, "cellname:", cellname)
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['script']), style='Report.TBody.TLabel')
+					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+					rownum += 1
+					colnum = 0
+					cellname = "{}_{}".format("lbl_error", key)
+					base.debugmsg(5, "cellname:", cellname)
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Error), style='Report.TBody.TLabel')
+					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+					colnum += 1
+					cellname = "{}_{}".format("error", key)
+					base.debugmsg(5, "cellname:", cellname)
+					if 'error' in rdata:
+						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
+					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
+
+					if showimages:
+						rownum += 1
+						colnum = 0
+						cellname = "{}_{}".format("lbl_image", key)
+						base.debugmsg(5, "cellname:", cellname)
+						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}:".format(lbl_Screenshot), style='Report.TBody.TLabel')
+						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+						colnum += 1
+						cellname = "{}_{}".format("image_file", key)
+						cellimg = "{}_{}".format("image", key)
+						base.debugmsg(5, "cellname:", cellname)
+						if 'image_file' in rdata:
+							self.contentdata[id][cellimg] = tk.PhotoImage(file=rdata['image_file'])
+							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], image=self.contentdata[id][cellimg], style='Report.TBody.TLabel')
+							self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
+						else:
+							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{}".format(lbl_NoScreenshot), style='Report.TBody.TLabel')
+							self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
 
 	#
 	# Export content generation functions
