@@ -162,7 +162,7 @@ Verify the Content Of the DOCX Report
 	VAR 	${template_dir} 	${basefolder}${/}sample.template
 	VAR 	${docx_file}		${resultfolder}${/}${resultdata}.docx
 	# VAR 	${image_move_tolerance} 	0	# used for comparing images (this is needed because of different colours)
-	VAR 	${image_treshold} 	0.5 	# from 0 to 1
+	VAR 	${image_treshold} 	0.3 	# from 0 to 1
 
 	Log 	template: ${template_dir} 	console=True
 	Open GUI	-d 	${resultfolder} 	-t 	${template_dir}
