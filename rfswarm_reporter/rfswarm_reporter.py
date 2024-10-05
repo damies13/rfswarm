@@ -2521,7 +2521,7 @@ class ReporterBase():
 				failkws = root.findall(".//kw/status[@status='FAIL']/..")
 				base.debugmsg(9, "failkws:", failkws)
 
-				if len(failkws)>0:
+				if len(failkws) > 0:
 					failkw = failkws[-1]
 					failmsg = failkw.find("msg[@level='FAIL']")
 					base.debugmsg(5, "failmsg:", failmsg, failmsg.text)
