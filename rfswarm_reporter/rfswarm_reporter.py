@@ -2521,34 +2521,35 @@ class ReporterBase():
 				failkws = root.findall(".//kw/status[@status='FAIL']/..")
 				base.debugmsg(9, "failkws:", failkws)
 
-				failkw = failkws[-1]
-				failmsg = failkw.find("msg[@level='FAIL']")
-				base.debugmsg(5, "failmsg:", failmsg, failmsg.text)
+				if len(failkws)>0:
+					failkw = failkws[-1]
+					failmsg = failkw.find("msg[@level='FAIL']")
+					base.debugmsg(5, "failmsg:", failmsg, failmsg.text)
 
-				base.reportdata[id][rid]['error'] = failmsg.text
+					base.reportdata[id][rid]['error'] = failmsg.text
 
-				# //kw/status[@status='FAIL']/../msg[@level='INFO'] --> html decode for img tag
-				# //kw/status[@status='FAIL']/../msg[@level='INFO' and @html='true']
-				# </td></tr><tr><td colspan="3"><a href="selenium-screenshot-1.png"><img src="selenium-screenshot-1.png" width="800px"></a>
-				# infomsg = failkw.find("msg[@level='INFO' and @html='true']")
+					# //kw/status[@status='FAIL']/../msg[@level='INFO'] --> html decode for img tag
+					# //kw/status[@status='FAIL']/../msg[@level='INFO' and @html='true']
+					# </td></tr><tr><td colspan="3"><a href="selenium-screenshot-1.png"><img src="selenium-screenshot-1.png" width="800px"></a>
+					# infomsg = failkw.find("msg[@level='INFO' and @html='true']")
 
-				infomsg = failkw.find("msg[@html='true']")
-				if infomsg is not None:
-					base.debugmsg(5, "infomsg:", infomsg, infomsg.text)
+					infomsg = failkw.find("msg[@html='true']")
+					if infomsg is not None:
+						base.debugmsg(5, "infomsg:", infomsg, infomsg.text)
 
-					# <a[^>]*href="([^"]*)
-					# m = re.search(r'<a[^>]*href="([^"]*)', infomsg.text)
-					m = re.search(r'<img[^>]*src="([^"]*)', infomsg.text)
-					image = m.group(1)
-					base.debugmsg(5, "image:", image)
-					if image is not None:
-						imgdir = os.path.dirname(xmlf)
-						imagef = os.path.join(imgdir, image)
+						# <a[^>]*href="([^"]*)
+						# m = re.search(r'<a[^>]*href="([^"]*)', infomsg.text)
+						m = re.search(r'<img[^>]*src="([^"]*)', infomsg.text)
+						image = m.group(1)
+						base.debugmsg(5, "image:", image)
+						if image is not None:
+							imgdir = os.path.dirname(xmlf)
+							imagef = os.path.join(imgdir, image)
 
-						if os.path.isfile(imagef):
-							base.debugmsg(5, "imagef:", imagef)
-							base.reportdata[id][rid]['image'] = image
-							base.reportdata[id][rid]['image_file'] = imagef
+							if os.path.isfile(imagef):
+								base.debugmsg(5, "imagef:", imagef)
+								base.reportdata[id][rid]['image'] = image
+								base.reportdata[id][rid]['image_file'] = imagef
 
 	def rt_errors_get_label(self, id, lblname):
 		base.debugmsg(5, "id:", id, "	lblname:", lblname)
@@ -3999,7 +4000,7 @@ class ReporterCore:
 							grpdata["resultnames"][result_name]["keys"].append(key)
 							grpdata["resultnames"][result_name]["errortexts"] = {}
 
-						if groupet:
+						if groupet and 'error' in rdata:
 							errortext = rdata['error']
 							# errortext_sub = errortext.split(r'\n')[0]
 							errortext_sub = errortext.splitlines()[0]
@@ -4017,7 +4018,7 @@ class ReporterCore:
 								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
 								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
 
-					if groupet:
+					if groupet and 'error' in rdata:
 						errortext = rdata['error']
 						errortext_sub = errortext.splitlines()[0]
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
@@ -4082,30 +4083,31 @@ class ReporterCore:
 						th.text = "{}:".format(lbl_Error)
 						td = etree.SubElement(tr, 'td')
 						pre = etree.SubElement(td, 'pre')
-						pre.text = rdata['error']
-						td.set('colspan', '5')
-
-						th = etree.SubElement(tr, 'th')
-						th.text = "{}:".format(lbl_Count)
-						td = etree.SubElement(tr, 'td')
-						count = len(grpdata["resultnames"][result_name]["errortexts"][errortext]["keys"])
-						base.debugmsg(5, "count:", count)
-						td.text = str(count)
-
-						if showimages:
-							tr = etree.SubElement(tbl, 'tr')
+						if 'error' in rdata:
+							pre.text = rdata['error']
+							td.set('colspan', '5')
 
 							th = etree.SubElement(tr, 'th')
-							th.text = "{}:".format(lbl_Screenshot)
-
+							th.text = "{}:".format(lbl_Count)
 							td = etree.SubElement(tr, 'td')
-							td.set('colspan', '7')
-							if 'image_file' in rdata:
-								# td.text = rdata['image_file']
-								oimg = Image.open(rdata['image_file'])
-								self.xhtml_sections_embedimg(td, basekey, oimg)
-							else:
-								td.text = lbl_NoScreenshot
+							count = len(grpdata["resultnames"][result_name]["errortexts"][errortext]["keys"])
+							base.debugmsg(5, "count:", count)
+							td.text = str(count)
+
+							if showimages:
+								tr = etree.SubElement(tbl, 'tr')
+
+								th = etree.SubElement(tr, 'th')
+								th.text = "{}:".format(lbl_Screenshot)
+
+								td = etree.SubElement(tr, 'td')
+								td.set('colspan', '7')
+								if 'image_file' in rdata:
+									# td.text = rdata['image_file']
+									oimg = Image.open(rdata['image_file'])
+									self.xhtml_sections_embedimg(td, basekey, oimg)
+								else:
+									td.text = lbl_NoScreenshot
 
 				else:
 					for keyi in grpdata["resultnames"][result_name]["keys"]:
@@ -4118,23 +4120,24 @@ class ReporterCore:
 
 						td = etree.SubElement(tr, 'td')
 						pre = etree.SubElement(td, 'pre')
-						pre.text = rdata['error']
-						td.set('colspan', '7')
-
-						if showimages:
-							tr = etree.SubElement(tbl, 'tr')
-
-							th = etree.SubElement(tr, 'th')
-							th.text = "{}:".format(lbl_Screenshot)
-
-							td = etree.SubElement(tr, 'td')
+						if 'error' in rdata:
+							pre.text = rdata['error']
 							td.set('colspan', '7')
-							if 'image_file' in rdata:
-								# td.text = rdata['image_file']
-								oimg = Image.open(rdata['image_file'])
-								self.xhtml_sections_embedimg(td, keyi, oimg)
-							else:
-								td.text = lbl_NoScreenshot
+
+							if showimages:
+								tr = etree.SubElement(tbl, 'tr')
+
+								th = etree.SubElement(tr, 'th')
+								th.text = "{}:".format(lbl_Screenshot)
+
+								td = etree.SubElement(tr, 'td')
+								td.set('colspan', '7')
+								if 'image_file' in rdata:
+									# td.text = rdata['image_file']
+									oimg = Image.open(rdata['image_file'])
+									self.xhtml_sections_embedimg(td, keyi, oimg)
+								else:
+									td.text = lbl_NoScreenshot
 
 		if groupet and not grouprn:
 			for errortext in list(grpdata["errortexts"].keys()):
@@ -4149,30 +4152,31 @@ class ReporterCore:
 
 				td = etree.SubElement(tr, 'td')
 				pre = etree.SubElement(td, 'pre')
-				pre.text = rdata['error']
-				td.set('colspan', '5')
-
-				th = etree.SubElement(tr, 'th')
-				th.text = "{}:".format(lbl_Count)
-				count = len(grpdata["errortexts"][errortext]["keys"])
-				base.debugmsg(5, "count:", count)
-				td = etree.SubElement(tr, 'td')
-				td.text = str(count)
-
-				if showimages:
-					tr = etree.SubElement(tbl, 'tr')
+				if 'error' in rdata:
+					pre.text = rdata['error']
+					td.set('colspan', '5')
 
 					th = etree.SubElement(tr, 'th')
-					th.text = "{}:".format(lbl_Screenshot)
-
+					th.text = "{}:".format(lbl_Count)
+					count = len(grpdata["errortexts"][errortext]["keys"])
+					base.debugmsg(5, "count:", count)
 					td = etree.SubElement(tr, 'td')
-					td.set('colspan', '7')
-					if 'image_file' in rdata:
-						# td.text = rdata['image_file']
-						oimg = Image.open(rdata['image_file'])
-						self.xhtml_sections_embedimg(td, basekey, oimg)
-					else:
-						td.text = lbl_NoScreenshot
+					td.text = str(count)
+
+					if showimages:
+						tr = etree.SubElement(tbl, 'tr')
+
+						th = etree.SubElement(tr, 'th')
+						th.text = "{}:".format(lbl_Screenshot)
+
+						td = etree.SubElement(tr, 'td')
+						td.set('colspan', '7')
+						if 'image_file' in rdata:
+							# td.text = rdata['image_file']
+							oimg = Image.open(rdata['image_file'])
+							self.xhtml_sections_embedimg(td, basekey, oimg)
+						else:
+							td.text = lbl_NoScreenshot
 
 		if not grouprn and not groupet:
 			keys = list(base.reportdata[id].keys())
@@ -4204,23 +4208,24 @@ class ReporterCore:
 					th.text = "{}:".format(lbl_Error)
 					td = etree.SubElement(tr, 'td')
 					pre = etree.SubElement(td, 'pre')
-					pre.text = rdata['error']
-					td.set('colspan', '5')
-
-					if showimages:
-						tr = etree.SubElement(tbl, 'tr')
-
-						th = etree.SubElement(tr, 'th')
-						th.text = "{}:".format(lbl_Screenshot)
-
-						td = etree.SubElement(tr, 'td')
+					if 'error' in rdata:
+						pre.text = rdata['error']
 						td.set('colspan', '5')
-						if 'image_file' in rdata:
-							# td.text = rdata['image_file']
-							oimg = Image.open(rdata['image_file'])
-							self.xhtml_sections_embedimg(td, key, oimg)
-						else:
-							td.text = lbl_NoScreenshot
+
+						if showimages:
+							tr = etree.SubElement(tbl, 'tr')
+
+							th = etree.SubElement(tr, 'th')
+							th.text = "{}:".format(lbl_Screenshot)
+
+							td = etree.SubElement(tr, 'td')
+							td.set('colspan', '5')
+							if 'image_file' in rdata:
+								# td.text = rdata['image_file']
+								oimg = Image.open(rdata['image_file'])
+								self.xhtml_sections_embedimg(td, key, oimg)
+							else:
+								td.text = lbl_NoScreenshot
 
 	#
 	# 	MS Word
@@ -4902,7 +4907,7 @@ class ReporterCore:
 							grpdata["resultnames"][result_name]["keys"].append(key)
 							grpdata["resultnames"][result_name]["errortexts"] = {}
 
-						if groupet:
+						if groupet and 'error' in rdata:
 							errortext = rdata['error']
 							# errortext_sub = errortext.split(r'\n')[0]
 							errortext_sub = errortext.splitlines()[0]
@@ -4920,7 +4925,7 @@ class ReporterCore:
 								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
 								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
 
-					if groupet:
+					if groupet and 'error' in rdata:
 						errortext = rdata['error']
 						errortext_sub = errortext.splitlines()[0]
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
@@ -5027,7 +5032,8 @@ class ReporterCore:
 						a.merge(b)
 
 						table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-						table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
+						if 'error' in rdata:
+							table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
 						table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 
 						cellcol += 6
@@ -5082,7 +5088,8 @@ class ReporterCore:
 						a.merge(b)
 
 						table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-						table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
+						if 'error' in rdata:
+							table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
 						table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 
 						if showimages:
@@ -5132,7 +5139,8 @@ class ReporterCore:
 				a.merge(b)
 
 				table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-				table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
+				if 'error' in rdata:
+					table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
 				table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 
 				cellcol += 6
@@ -5231,7 +5239,8 @@ class ReporterCore:
 					a.merge(b)
 
 					table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-					table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
+					if 'error' in rdata:
+						table.rows[cellrow].cells[cellcol].paragraphs[0].text = rdata['error']
 					table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 
 					if showimages:
@@ -5972,7 +5981,7 @@ class ReporterCore:
 							grpdata["resultnames"][result_name]["keys"].append(key)
 							grpdata["resultnames"][result_name]["errortexts"] = {}
 
-						if groupet:
+						if groupet and 'error' in rdata:
 							errortext = rdata['error']
 							# errortext_sub = errortext.split(r'\n')[0]
 							errortext_sub = errortext.splitlines()[0]
@@ -5990,7 +5999,7 @@ class ReporterCore:
 								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
 								grpdata["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
 
-					if groupet:
+					if groupet and 'error' in rdata:
 						errortext = rdata['error']
 						errortext_sub = errortext.splitlines()[0]
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
@@ -6063,7 +6072,8 @@ class ReporterCore:
 						rownum += 1
 						self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Error), "Table Heading", 0)
 						cellcol += 1
-						self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['error'], "Table Data", 4)
+						if 'error' in rdata:
+							self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['error'], "Table Data", 4)
 
 						cellcol += 5
 						self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Count), "Table Heading", 0)
@@ -6112,7 +6122,8 @@ class ReporterCore:
 
 						self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Error), "Table Heading", 0)
 						cellcol += 1
-						self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['error'], "Table Data", 4)
+						if 'error' in rdata:
+							self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['error'], "Table Data", 4)
 
 						if showimages:
 							cellcol = 1
@@ -6159,7 +6170,8 @@ class ReporterCore:
 
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Error), "Table Heading", 0)
 				cellcol += 1
-				self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['error'], "Table Data", colspan)
+				if 'error' in rdata:
+					self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['error'], "Table Data", colspan)
 
 				cellcol += colspan + 1
 				self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Count), "Table Heading", 0)
@@ -6227,7 +6239,8 @@ class ReporterCore:
 					rownum += 1
 					self.xlsx_sections_errors_fill_cell(cellcol, rownum, "{}:".format(lbl_Error), "Table Heading", 0)
 					cellcol += 1
-					self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['error'], "Table Data", 4)
+					if 'error' in rdata:
+						self.xlsx_sections_errors_fill_cell(cellcol, rownum, rdata['error'], "Table Data", 4)
 
 					if showimages:
 						cellcol = 1
@@ -9959,7 +9972,7 @@ class ReporterGUI(tk.Frame):
 							self.contentdata[id]["grpdata"]["resultnames"][result_name]["keys"].append(key)
 							self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"] = {}
 
-						if groupet:
+						if groupet and 'error' in rdata:
 							errortext = rdata['error']
 							# errortext_sub = errortext.split(r'\n')[0]
 							errortext_sub = errortext.splitlines()[0]
@@ -9978,7 +9991,7 @@ class ReporterGUI(tk.Frame):
 								self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"] = []
 								self.contentdata[id]["grpdata"]["resultnames"][result_name]["errortexts"][errortext_sub]["keys"].append(key)
 
-					if groupet:
+					if groupet and 'error' in rdata:
 						errortext = rdata['error']
 						errortext_sub = errortext.splitlines()[0]
 						base.debugmsg(5, "errortext_sub:", errortext_sub)
@@ -10076,7 +10089,8 @@ class ReporterGUI(tk.Frame):
 						colnum += 1
 						cellname = "{}_{}".format("error", basekey)
 						base.debugmsg(5, "cellname:", cellname)
-						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
+						if 'error' in rdata:
+							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
 
 						colnum += 5
@@ -10127,7 +10141,8 @@ class ReporterGUI(tk.Frame):
 						colnum += 1
 						cellname = "{}_{}".format("error", keyi)
 						base.debugmsg(5, "cellname:", cellname)
-						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
+						if 'error' in rdata:
+							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=7)
 
 						if showimages:
@@ -10167,7 +10182,8 @@ class ReporterGUI(tk.Frame):
 				colnum += 1
 				cellname = "{}_{}".format("error", basekey)
 				base.debugmsg(5, "cellname:", cellname)
-				self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
+				if 'error' in rdata:
+					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
 				self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
 
 				colnum += 5
@@ -10260,7 +10276,8 @@ class ReporterGUI(tk.Frame):
 					colnum += 1
 					cellname = "{}_{}".format("error", key)
 					base.debugmsg(5, "cellname:", cellname)
-					self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
+					if 'error' in rdata:
+						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(rdata['error']), style='Report.TBody.TLabel')
 					self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew", columnspan=5)
 
 					if showimages:
