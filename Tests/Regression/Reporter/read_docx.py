@@ -82,7 +82,7 @@ def extract_images_from_docx(docx_path: str, output_folder: str, black_and_wite=
             with open(os.path.join(output_folder, img_name), "wb") as img_file:
                 img_file.write(img_data)
                 if black_and_wite:
-                    convert_image_to_black_and_white(os.path.join(output_folder, img_name), os.path.join(output_folder, img_name))
+                    convert_image_to_black_and_white(os.path.join(output_folder, img_name))
                 print(f"DOCX RFSwarm raport image saved as: {img_name}")
                 saved_images.append(img_name)
 

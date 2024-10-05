@@ -171,6 +171,7 @@ Verify the Content Of the DOCX Report
 	Log 	template: ${template_dir} 	console=True
 	Open GUI	-d 	${resultfolder} 	-t 	${template_dir}
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=300
+	Take A Screenshot
 	Click Button	generateword
 	Wait Until Created 	${resultfolder}${/}${resultdata}.docx	timeout=9 minutes
 	Close GUI
