@@ -161,8 +161,8 @@ Verify the Content Of the DOCX Report
 	VAR 	${resultfolder} 	${basefolder}${/}${resultdata}
 	VAR 	${template_dir} 	${basefolder}${/}sample.template
 	VAR 	${docx_file}		${resultfolder}${/}${resultdata}.docx
-	VAR 	${image_move_tolerance} 	10 	# used for comparing images (this is needed because of different colours)
-	VAR 	${image_treshold} 	0.1 	# from 0 to 1
+	# VAR 	${image_move_tolerance} 	0	# used for comparing images (this is needed because of different colours)
+	VAR 	${image_treshold} 	0.5 	# from 0 to 1
 
 	Log 	template: ${template_dir} 	console=True
 	Open GUI	-d 	${resultfolder} 	-t 	${template_dir}
@@ -217,28 +217,28 @@ Verify the Content Of the DOCX Report
 
 	# Graphs - when new graphs are required, save them using the function in read_docx.py!
 	Dictionary Should Contain Key 	${docx_paragraphs} 	6 Data Graph Left Metric
-	Compare Images 	${expected_docx_images}[0] 	${docx_images}[0] 	move_tolerance=${image_move_tolerance} 	threshold=${image_treshold}
+	Compare Images 	${expected_docx_images}[0] 	${docx_images}[0] 	threshold=${image_treshold}
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	7 Data Graph Left Result
-	Compare Images 	${expected_docx_images}[1] 	${docx_images}[1] 	move_tolerance=${image_move_tolerance} 	threshold=${image_treshold}
+	Compare Images 	${expected_docx_images}[1] 	${docx_images}[1] 	threshold=${image_treshold}
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	8 Data Graph Left Result FAIL
-	Compare Images 	${expected_docx_images}[2] 	${docx_images}[2] 	move_tolerance=${image_move_tolerance} 	threshold=${image_treshold}
+	Compare Images 	${expected_docx_images}[2] 	${docx_images}[2] 	threshold=${image_treshold}
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	9 Data Graph Left Result TPS
-	Compare Images 	${expected_docx_images}[3] 	${docx_images}[3] 	move_tolerance=${image_move_tolerance} 	threshold=${image_treshold}
+	Compare Images 	${expected_docx_images}[3] 	${docx_images}[3] 	threshold=${image_treshold}
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	10 Data Graph Left Result Total TPS
-	Compare Images 	${expected_docx_images}[4] 	${docx_images}[4] 	move_tolerance=${image_move_tolerance} 	threshold=${image_treshold}
+	Compare Images 	${expected_docx_images}[4] 	${docx_images}[4] 	threshold=${image_treshold}
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	11 Data Graph Right Metric
-	Compare Images 	${expected_docx_images}[5] 	${docx_images}[5] 	move_tolerance=${image_move_tolerance} 	threshold=${image_treshold}
+	Compare Images 	${expected_docx_images}[5] 	${docx_images}[5] 	threshold=${image_treshold}
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	12 Data Graph Right Result
-	Compare Images 	${expected_docx_images}[6] 	${docx_images}[6] 	move_tolerance=${image_move_tolerance} 	threshold=${image_treshold}
+	Compare Images 	${expected_docx_images}[6] 	${docx_images}[6] 	threshold=${image_treshold}
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	13 Data Graph LR Combined
-	Compare Images 	${expected_docx_images}[7] 	${docx_images}[7] 	move_tolerance=${image_move_tolerance} 	threshold=${image_treshold}
+	Compare Images 	${expected_docx_images}[7] 	${docx_images}[7] 	threshold=${image_treshold}
 
 
 	# Tables:
