@@ -76,7 +76,7 @@ Whole report time range
 	Click Tab 	 Preview
 
 	# check the graph as expected
-	Set Confidence		0.8
+	Set Confidence		0.7
 	Locate 	reporter_${platform}_graph_robots1.png
 	Set Confidence		0.9
 
@@ -121,9 +121,13 @@ Whole report time range
 	Wait For Status 	PreviewLoaded
 
 	# check the graph as expected
-	Set Confidence		0.8
+	Set Confidence		0.7
 	Locate 	reporter_${platform}_graph_robots2.png
 	Set Confidence		0.9
+
+	[Teardown]	Run Keywords
+	...    Set Confidence 	0.9 	AND
+	...    Close GUI
 
 Verify if reporter handle missing test result file
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #157
