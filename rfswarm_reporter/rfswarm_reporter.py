@@ -158,6 +158,8 @@ class ReporterBase():
 	defcolours = ['#000000', '#008450', '#B81D13', '#EFB700', '#888888']
 	namecolours = ['total', 'pass', 'fail', 'warning', 'not run']
 
+	illegal_xml_chars_re = re.compile(u'[\x00-\x08\x0b\x0c\x0e-\x1F\uD800-\uDFFF\uFFFE\uFFFF]', re.UNICODE)
+
 	def debugmsg(self, lvl, *msg):
 		msglst = []
 		prefix = ""
@@ -3945,9 +3947,7 @@ class ReporterCore:
 						if col not in ["Colour"]:
 							td = etree.SubElement(tr, 'td')
 							val = str(row[col]).strip()
-							# Exclude illegal characters out of xml
-							illegal_xml_chars_re = re.compile(u'[\x00-\x08\x0b\x0c\x0e-\x1F\uD800-\uDFFF\uFFFE\uFFFF]', re.UNICODE)
-							val = illegal_xml_chars_re.sub('', val)
+							val = base.illegal_xml_chars_re.sub('', val)
 							base.debugmsg(8, "val:", val)
 							td.text = val
 
@@ -4834,9 +4834,7 @@ class ReporterCore:
 					for col in cols:
 						if col not in ["Colour"]:
 							val = str(row[col]).strip()
-							# Exclude illegal characters out of xml
-							illegal_xml_chars_re = re.compile(u'[\x00-\x08\x0b\x0c\x0e-\x1F\uD800-\uDFFF\uFFFE\uFFFF]', re.UNICODE)
-							val = illegal_xml_chars_re.sub('', val)
+							val = base.illegal_xml_chars_re.sub('', val)
 							base.debugmsg(8, "val:", val)
 
 							# table.rows[cellrow].cells[cellcol].text = str(val)
@@ -5913,9 +5911,7 @@ class ReporterCore:
 					for col in cols:
 						if col not in ["Colour"]:
 							val = str(row[col]).strip()
-							# Exclude illegal characters out of xml
-							illegal_xml_chars_re = re.compile(u'[\x00-\x08\x0b\x0c\x0e-\x1F\uD800-\uDFFF\uFFFE\uFFFF]', re.UNICODE)
-							val = illegal_xml_chars_re.sub('', val)
+							val = base.illegal_xml_chars_re.sub('', val)
 							base.debugmsg(8, "val:", val)
 
 							dcell = ws.cell(column=cellcol, row=rownum, value=val)
@@ -6299,9 +6295,7 @@ class ReporterCore:
 		self.xlsx_select_cell(cellcol, rownum)
 
 		base.debugmsg(5, "setting Cell value")
-		# Exclude illegal characters out of xml
-		illegal_xml_chars_re = re.compile(u'[\x00-\x08\x0b\x0c\x0e-\x1F\uD800-\uDFFF\uFFFE\uFFFF]', re.UNICODE)
-		val = illegal_xml_chars_re.sub('', val)
+		val = base.illegal_xml_chars_re.sub('', val)
 		base.debugmsg(8, "val:", val)
 		cell = ws.cell(column=cellcol, row=rownum, value=val)
 		base.debugmsg(5, "splitting val to lines")
