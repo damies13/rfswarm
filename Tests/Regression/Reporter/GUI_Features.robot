@@ -58,6 +58,7 @@ Verify That Files Get Saved With Correct Extension And Names
 Whole report time range
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #138
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	Change Reporter INI File Settings 	win_height 	750
 	Make Clipboard Not None
 	${testdata}= 	Set Variable    Issue-#138
 	${resultdata}= 	Set Variable    20230928_141103_OCDemo_Requests
@@ -68,7 +69,7 @@ Whole report time range
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
 	# pass a non-existant ini file to ensure that default values are used
-	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}${testdata}.ini
+	Open GUI 	-d 	${resultfolder}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
