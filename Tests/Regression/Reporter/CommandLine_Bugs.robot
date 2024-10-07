@@ -100,3 +100,35 @@ Auto Generate XLSX Report Without GUI Using Template
 
 	[Teardown] 	Move File 	${resultfolder}${/}${resultdata}.xlsx 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.xlsx
 
+Generate Reports With Unsupported Characters
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #305 	HTML 	DOCX 	XLSX
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	VAR 	${testdata}= 		Issue-#305
+	VAR 	${resultdata}= 		20241006_111707_AUT_Linux_ssh_scenario
+	VAR 	${basefolder}= 		${CURDIR}${/}testdata${/}${testdata}
+	VAR 	${resultfolder}= 	${basefolder}${/}${resultdata}
+	VAR 	${template}= 	${basefolder}${/}sample.template
+
+	Should Exist	${basefolder}
+	Log 	basefolder: ${basefolder} 	console=True
+	Should Exist	${resultfolder}
+	Log 	resultfolder: ${resultfolder} 	console=True
+	Should Exist	${template}
+	Log 	template: ${template} 	console=True
+
+	Log To Console	Run Reporter with cutom template and generate html, docx, xlsx reports.
+	${result}= 	Run 	${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --html --docx --xlsx
+	Log 	result: ${\n}${result} 	console=True
+
+	Should Not Contain 	${result} 	Traceback
+	Should Exist	${resultfolder}${/}${resultdata}.html
+	File Should Not Be Empty 	${resultfolder}${/}${resultdata}.html
+	Should Exist	${resultfolder}${/}${resultdata}.docx
+	File Should Not Be Empty 	${resultfolder}${/}${resultdata}.docx
+	Should Exist	${resultfolder}${/}${resultdata}.xlsx
+	File Should Not Be Empty 	${resultfolder}${/}${resultdata}.xlsx
+
+	[Teardown] 	Run Keywords
+	...    Move File 	${resultfolder}${/}${resultdata}.html 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.html	AND
+	...    Move File 	${resultfolder}${/}${resultdata}.docx 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.docx	AND
+	...    Move File 	${resultfolder}${/}${resultdata}.xlsx 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.xlsx

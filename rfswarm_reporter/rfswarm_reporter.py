@@ -158,6 +158,8 @@ class ReporterBase():
 	defcolours = ['#000000', '#008450', '#B81D13', '#EFB700', '#888888']
 	namecolours = ['total', 'pass', 'fail', 'warning', 'not run']
 
+	illegal_xml_chars_re = re.compile(u'[\x00-\x08\x0b\x0c\x0e-\x1F\uD800-\uDFFF\uFFFE\uFFFF]', re.UNICODE)
+
 	def debugmsg(self, lvl, *msg):
 		msglst = []
 		prefix = ""
@@ -3943,9 +3945,11 @@ class ReporterCore:
 					# for val in vals:
 					for col in cols:
 						if col not in ["Colour"]:
-							val = str(row[col]).strip()
 							td = etree.SubElement(tr, 'td')
-							td.text = str(val)
+							val = str(row[col]).strip()
+							val = base.illegal_xml_chars_re.sub('', val)
+							base.debugmsg(8, "val:", val)
+							td.text = val
 
 	def xhtml_sections_errors(self, elmt, id):
 		base.debugmsg(8, "id:", id)
@@ -4830,10 +4834,13 @@ class ReporterCore:
 					for col in cols:
 						if col not in ["Colour"]:
 							val = str(row[col]).strip()
+							val = base.illegal_xml_chars_re.sub('', val)
+							base.debugmsg(8, "val:", val)
+
 							# table.rows[cellrow].cells[cellcol].text = str(val)
 							# table.rows[cellrow].cells[cellcol].add_paragraph(text=str(val), style="Table Cell")
 							table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-							table.rows[cellrow].cells[cellcol].paragraphs[0].text = str(val)
+							table.rows[cellrow].cells[cellcol].paragraphs[0].text = val
 
 							tcw = int(table.columns[cellcol].width.cm) + 1
 							# base.debugmsg(5, "tcw:", tcw)
@@ -5904,7 +5911,9 @@ class ReporterCore:
 					for col in cols:
 						if col not in ["Colour"]:
 							val = str(row[col]).strip()
+							val = base.illegal_xml_chars_re.sub('', val)
 							base.debugmsg(8, "val:", val)
+
 							dcell = ws.cell(column=cellcol, row=rownum, value=val)
 							dcell.style = "Table Data"
 
@@ -6286,6 +6295,8 @@ class ReporterCore:
 		self.xlsx_select_cell(cellcol, rownum)
 
 		base.debugmsg(5, "setting Cell value")
+		val = base.illegal_xml_chars_re.sub('', val)
+		base.debugmsg(8, "val:", val)
 		cell = ws.cell(column=cellcol, row=rownum, value=val)
 		base.debugmsg(5, "splitting val to lines")
 		lines = str(val).splitlines()
@@ -8394,7 +8405,6 @@ class ReporterGUI(tk.Frame):
 
 		# 		start time
 		if "strST" in self.contentdata[pid]:
-			pass
 			st = self.contentdata[pid]["strST"].get()
 			base.debugmsg(5, "st:", st)
 			if st != self.contentdata[pid]["fST"]:
@@ -8412,7 +8422,6 @@ class ReporterGUI(tk.Frame):
 
 		# 		end time
 		if "strET" in self.contentdata[pid]:
-			pass
 			et = self.contentdata[pid]["strET"].get()
 			base.debugmsg(5, "et:", et)
 			if et != self.contentdata[pid]["fET"]:
