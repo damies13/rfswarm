@@ -3714,6 +3714,8 @@ class ReporterCore:
 		datatypel = base.rt_graph_get_dt(idl)
 		datatyper = base.rt_graph_get_dt(idr)
 
+		tz = zoneinfo.ZoneInfo(base.rs_setting_get_timezone())
+
 		if datatypel == "SQL":
 			sqll = base.rt_graph_get_sql(idl)
 		else:
@@ -3776,7 +3778,7 @@ class ReporterCore:
 							graphdata[name]["objTime"] = []
 							graphdata[name]["Values"] = []
 
-						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"], tz))
 						graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
 					else:
 						break
@@ -3807,7 +3809,7 @@ class ReporterCore:
 							graphdata[name]["objTime"] = []
 							graphdata[name]["Values"] = []
 
-						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"], tz))
 						graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
 					else:
 						break
@@ -4552,6 +4554,8 @@ class ReporterCore:
 		datatypel = base.rt_graph_get_dt(idl)
 		datatyper = base.rt_graph_get_dt(idr)
 
+		tz = zoneinfo.ZoneInfo(base.rs_setting_get_timezone())
+
 		if datatypel == "SQL":
 			sqll = base.rt_graph_get_sql(idl)
 		else:
@@ -4613,7 +4617,7 @@ class ReporterCore:
 							graphdata[name]["objTime"] = []
 							graphdata[name]["Values"] = []
 
-						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"], tz))
 						graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
 					else:
 						break
@@ -4644,7 +4648,7 @@ class ReporterCore:
 							graphdata[name]["objTime"] = []
 							graphdata[name]["Values"] = []
 
-						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"], tz))
 						graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
 					else:
 						break
@@ -5645,6 +5649,8 @@ class ReporterCore:
 		datatypel = base.rt_graph_get_dt(idl)
 		datatyper = base.rt_graph_get_dt(idr)
 
+		tz = zoneinfo.ZoneInfo(base.rs_setting_get_timezone())
+
 		if datatypel == "SQL":
 			sqll = base.rt_graph_get_sql(idl)
 		else:
@@ -5706,7 +5712,7 @@ class ReporterCore:
 							graphdata[name]["objTime"] = []
 							graphdata[name]["Values"] = []
 
-						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"], tz))
 						graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
 					else:
 						break
@@ -5737,7 +5743,7 @@ class ReporterCore:
 							graphdata[name]["objTime"] = []
 							graphdata[name]["Values"] = []
 
-						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"], tz))
 						graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
 					else:
 						break
@@ -7282,11 +7288,14 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(9, "tkFont.families()", tkFont.families())
 		fontlst = list(tkFont.families())
 
-		Fonts = [None] + fontlst
+		Fonts = [""] + fontlst
+		Fonts.sort()
 		self.contentdata[id]["strFont"] = tk.StringVar()
-		self.contentdata[id]["omFont"] = ttk.OptionMenu(self.contentdata[id]["Settings"], self.contentdata[id]["strFont"], command=self.cs_report_settings_update, *Fonts)
+		self.contentdata[id]["omFont"] = ttk.Combobox(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strFont"])
 		self.contentdata[id]["strFont"].set(base.rs_setting_get_font())
 		self.contentdata[id]["omFont"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[id]["omFont"]['values'] = Fonts
+		self.contentdata[id]["omFont"].bind('<<ComboboxSelected>>', self.cs_report_settings_update)
 
 		Fontsize = [None]
 		fs = 6
@@ -7361,7 +7370,19 @@ class ReporterGUI(tk.Frame):
 			changes += base.rs_setting_set("timeformat", self.contentdata[id]["strTF"].get())
 
 		if "strTZ" in self.contentdata[id]:
-			changes += base.rs_setting_set("timezone", self.contentdata[id]["strTZ"].get())
+			changed = base.rs_setting_set("timezone", self.contentdata[id]["strTZ"].get())
+			changes += changed
+			if changed:
+				# update the start and end time fields for new timezone
+				iST = base.rs_setting_get_starttime()
+				fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
+				self.contentdata[id]["strST"].set(fST)
+				iET = base.rs_setting_get_endtime()
+				fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
+				self.contentdata[id]["strET"].set(fET)
+
+				update_section_times = threading.Thread(target=self.cs_update_start_and_end_times(id, fST, fET))
+				update_section_times.start()
 
 		# strST
 		if "strST" in self.contentdata[id]:
@@ -8554,7 +8575,7 @@ class ReporterGUI(tk.Frame):
 			changes += base.rt_graph_set_sql(idl, data)
 		else:
 			time.sleep(0.1)
-			changes += base.rt_graph_generate_sql(idl)
+			base.rt_graph_generate_sql(idl)
 		if "tSQL" in self.contentdata[idr]:
 			data = self.contentdata[idr]["tSQL"].get('0.0', tk.END).strip()
 			base.debugmsg(5, "data:", data)
@@ -9270,6 +9291,18 @@ class ReporterGUI(tk.Frame):
 			cp = threading.Thread(target=lambda: self.content_preview(id))
 			cp.start()
 
+	def cs_update_start_and_end_times(self, id, fST, fET):
+		children = base.report_get_order(id)
+
+		for child in children:
+			if child not in self.contentdata:
+				break
+			if "strST" in self.contentdata[child] and "strET" in self.contentdata[child]:
+				base.debugmsg(5, "section id with strST and strET to update:", id)
+				self.contentdata[child]["strST"].set(fST)
+				self.contentdata[child]["strET"].set(fET)
+			self.cs_update_start_and_end_times(child, fST, fET)
+
 	#
 	# Preview
 	#
@@ -9652,6 +9685,8 @@ class ReporterGUI(tk.Frame):
 		datatypel = base.rt_graph_get_dt(idl)
 		datatyper = base.rt_graph_get_dt(idr)
 
+		tz = zoneinfo.ZoneInfo(base.rs_setting_get_timezone())
+
 		if datatypel == "SQL":
 			sqll = base.rt_graph_get_sql(idl)
 		else:
@@ -9748,7 +9783,7 @@ class ReporterGUI(tk.Frame):
 							self.contentdata[id]["graphdata"][name]["objTime"] = []
 							self.contentdata[id]["graphdata"][name]["Values"] = []
 
-						self.contentdata[id]["graphdata"][name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						self.contentdata[id]["graphdata"][name]["objTime"].append(datetime.fromtimestamp(row["Time"], tz))
 						self.contentdata[id]["graphdata"][name]["Values"].append(base.rt_graph_floatval(row["Value"]))
 					else:
 						break
@@ -9782,7 +9817,7 @@ class ReporterGUI(tk.Frame):
 							self.contentdata[id]["graphdata"][name]["objTime"] = []
 							self.contentdata[id]["graphdata"][name]["Values"] = []
 
-						self.contentdata[id]["graphdata"][name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						self.contentdata[id]["graphdata"][name]["objTime"].append(datetime.fromtimestamp(row["Time"], tz))
 						self.contentdata[id]["graphdata"][name]["Values"].append(base.rt_graph_floatval(row["Value"]))
 					else:
 						break
