@@ -2793,6 +2793,122 @@ class ReporterBase():
 
 		return score
 
+	#
+	# Data Post Processing Functions
+	#
+
+	def graph_postprocess_data_plan(self, datain):
+		base.debugmsg(5, "datain:", datain)
+		# [
+		# 	{'PrimaryMetric': 'Delay_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '0', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Ramp_Up_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '20', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Robots_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '30', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Run_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '60', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'}
+		# ]
+		# 	 'Time' 	 'Value' 	 [Name]
+		dataout = []
+		data = {}
+		totaldata = {}
+		for rowin in datain:
+			base.debugmsg(5, "rowin:", rowin)
+			if 'PrimaryMetric' in rowin and "_" in rowin['PrimaryMetric']:
+				key, index = rowin['PrimaryMetric'].rsplit("_", 1)
+				base.debugmsg(5, "key:", key, "	index:", index)
+				if index not in data:
+					data[index] = {}
+				if key == "Delay":
+					data[index]["start"] = rowin['MetricTime']
+					data[index]["delay"] = rowin['MetricValue']
+					data[index]["colourkey"] = rowin['SecondaryMetric'] + " " + rowin['FilePath']
+
+				if key == "Ramp_Up":
+					data[index]["rampup"] = rowin['MetricValue']
+				if key == "Robots":
+					data[index]["robots"] = rowin['MetricValue']
+				if key == "Run":
+					data[index]["run"] = rowin['MetricValue']
+
+			else:
+				base.debugmsg(5, "Unexpected data in rowin:", rowin)
+
+		for index in data.keys():
+			base.debugmsg(5, "index:", index, data[index])
+
+			eventtime = data[index]["start"]
+			rowout = {}
+			rowout["Time"] = eventtime
+			rowout["Value"] = 0
+			rowout["Name"] = data[index]["colourkey"]
+			dataout.append(rowout)
+
+			if eventtime in totaldata:
+				totaldata[eventtime] += 0
+			else:
+				totaldata[eventtime] = 0
+
+			eventtime += int(data[index]["delay"])
+			rowout = {}
+			rowout["Time"] = eventtime
+			rowout["Value"] = 0
+			rowout["Name"] = data[index]["colourkey"]
+			dataout.append(rowout)
+
+			if eventtime in totaldata:
+				totaldata[eventtime] += 0
+			else:
+				totaldata[eventtime] = 0
+
+			eventtime += int(data[index]["rampup"])
+			rowout = {}
+			rowout["Time"] = eventtime
+			rowout["Value"] = int(data[index]["robots"])
+			rowout["Name"] = data[index]["colourkey"]
+			dataout.append(rowout)
+
+			if eventtime in totaldata:
+				totaldata[eventtime] += int(data[index]["robots"])
+			else:
+				totaldata[eventtime] = int(data[index]["robots"])
+
+			eventtime += int(data[index]["run"])
+			rowout = {}
+			rowout["Time"] = eventtime
+			rowout["Value"] = int(data[index]["robots"])
+			rowout["Name"] = data[index]["colourkey"]
+			dataout.append(rowout)
+
+			if eventtime in totaldata:
+				totaldata[eventtime] += 0
+			else:
+				totaldata[eventtime] = 0
+
+			# estimated rampdown
+			eventtime += int(data[index]["rampup"])
+			rowout = {}
+			rowout["Time"] = eventtime
+			rowout["Value"] = 0
+			rowout["Name"] = data[index]["colourkey"]
+			dataout.append(rowout)
+
+			if eventtime in totaldata:
+				totaldata[eventtime] += int(data[index]["robots"]) * -1
+			else:
+				totaldata[eventtime] = int(data[index]["robots"]) * -1
+
+		robots = 0
+		for key in totaldata.keys():
+			base.debugmsg(5, "key:", key, totaldata[key])
+			robots += totaldata[key]
+			rowout = {}
+			rowout["Time"] = key
+			rowout["Value"] = robots
+			rowout["Name"] = "Total"
+			dataout.append(rowout)
+
+		base.debugmsg(5, "dataout:", dataout)
+		return dataout
+
+
 
 class ReporterCore:
 
@@ -3778,6 +3894,11 @@ class ReporterCore:
 					time.sleep(0.1)
 
 				gdata = base.dbqueue["ReadResult"][key]
+
+				if datatypel == "Plan":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_plan(gdata)
+
 				base.debugmsg(9, "gdata:", gdata)
 
 				for row in gdata:
@@ -3809,6 +3930,11 @@ class ReporterCore:
 					time.sleep(0.1)
 
 				gdata = base.dbqueue["ReadResult"][key]
+
+				if datatyper == "Plan":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_plan(gdata)
+
 				base.debugmsg(9, "gdata:", gdata)
 
 				for row in gdata:
@@ -4615,6 +4741,11 @@ class ReporterCore:
 					time.sleep(0.1)
 
 				gdata = base.dbqueue["ReadResult"][key]
+
+				if datatypel == "Plan":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_plan(gdata)
+
 				base.debugmsg(9, "gdata:", gdata)
 
 				for row in gdata:
@@ -4646,6 +4777,11 @@ class ReporterCore:
 					time.sleep(0.1)
 
 				gdata = base.dbqueue["ReadResult"][key]
+
+				if datatyper == "Plan":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_plan(gdata)
+
 				base.debugmsg(9, "gdata:", gdata)
 
 				for row in gdata:
@@ -5708,6 +5844,11 @@ class ReporterCore:
 					time.sleep(0.1)
 
 				gdata = base.dbqueue["ReadResult"][key]
+
+				if datatypel == "Plan":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_plan(gdata)
+
 				base.debugmsg(9, "gdata:", gdata)
 
 				for row in gdata:
@@ -5739,6 +5880,11 @@ class ReporterCore:
 					time.sleep(0.1)
 
 				gdata = base.dbqueue["ReadResult"][key]
+
+				if datatyper == "Plan":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_plan(gdata)
+
 				base.debugmsg(9, "gdata:", gdata)
 
 				for row in gdata:
@@ -9768,7 +9914,7 @@ class ReporterGUI(tk.Frame):
 
 				if datatypel == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
-					gdata = self.cp_graph_postprocess_data_plan(gdata)
+					gdata = base.graph_postprocess_data_plan(gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -9804,6 +9950,11 @@ class ReporterGUI(tk.Frame):
 					# base.debugmsg(9, "Waiting for gdata for:", key)
 
 				gdata = base.dbqueue["ReadResult"][key]
+
+				if datatyper == "Plan":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_plan(gdata)
+
 				base.debugmsg(9, "gdata:", gdata)
 
 				for row in gdata:
@@ -9887,117 +10038,6 @@ class ReporterGUI(tk.Frame):
 					self.contentdata[id]["canvas"].draw()
 				except Exception as e:
 					base.debugmsg(5, "canvas.draw() Exception:", e)
-
-	def cp_graph_postprocess_data_plan(self, datain):
-		base.debugmsg(5, "datain:", datain)
-		# [
-		# 	{'PrimaryMetric': 'Delay_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '0', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
-		# 	{'PrimaryMetric': 'Ramp_Up_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '20', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
-		# 	{'PrimaryMetric': 'Robots_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '30', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
-		# 	{'PrimaryMetric': 'Run_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '60', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'}
-		# ]
-		# 	 'Time' 	 'Value' 	 [Name]
-		dataout = []
-		data = {}
-		totaldata = {}
-		for rowin in datain:
-			base.debugmsg(5, "rowin:", rowin)
-			if 'PrimaryMetric' in rowin and "_" in rowin['PrimaryMetric']:
-				key, index = rowin['PrimaryMetric'].rsplit("_", 1)
-				base.debugmsg(5, "key:", key, "	index:", index)
-				if index not in data:
-					data[index] = {}
-				if key == "Delay":
-					data[index]["start"] = rowin['MetricTime']
-					data[index]["delay"] = rowin['MetricValue']
-					data[index]["colourkey"] = rowin['SecondaryMetric'] + " " + rowin['FilePath']
-
-				if key == "Ramp_Up":
-					data[index]["rampup"] = rowin['MetricValue']
-				if key == "Robots":
-					data[index]["robots"] = rowin['MetricValue']
-				if key == "Run":
-					data[index]["run"] = rowin['MetricValue']
-
-			else:
-				base.debugmsg(5, "Unexpected data in rowin:", rowin)
-
-		for index in data.keys():
-			base.debugmsg(5, "index:", index, data[index])
-
-			eventtime = data[index]["start"]
-			rowout = {}
-			rowout["Time"] = eventtime
-			rowout["Value"] = 0
-			rowout["Name"] = data[index]["colourkey"]
-			dataout.append(rowout)
-
-			if eventtime in totaldata:
-				totaldata[eventtime] += 0
-			else:
-				totaldata[eventtime] = 0
-
-			eventtime += int(data[index]["delay"])
-			rowout = {}
-			rowout["Time"] = eventtime
-			rowout["Value"] = 0
-			rowout["Name"] = data[index]["colourkey"]
-			dataout.append(rowout)
-
-			if eventtime in totaldata:
-				totaldata[eventtime] += 0
-			else:
-				totaldata[eventtime] = 0
-
-			eventtime += int(data[index]["rampup"])
-			rowout = {}
-			rowout["Time"] = eventtime
-			rowout["Value"] = int(data[index]["robots"])
-			rowout["Name"] = data[index]["colourkey"]
-			dataout.append(rowout)
-
-			if eventtime in totaldata:
-				totaldata[eventtime] += int(data[index]["robots"])
-			else:
-				totaldata[eventtime] = int(data[index]["robots"])
-
-			eventtime += int(data[index]["run"])
-			rowout = {}
-			rowout["Time"] = eventtime
-			rowout["Value"] = int(data[index]["robots"])
-			rowout["Name"] = data[index]["colourkey"]
-			dataout.append(rowout)
-
-			if eventtime in totaldata:
-				totaldata[eventtime] += 0
-			else:
-				totaldata[eventtime] = 0
-
-			# estimated rampdown
-			eventtime += int(data[index]["rampup"])
-			rowout = {}
-			rowout["Time"] = eventtime
-			rowout["Value"] = 0
-			rowout["Name"] = data[index]["colourkey"]
-			dataout.append(rowout)
-
-			if eventtime in totaldata:
-				totaldata[eventtime] += int(data[index]["robots"]) * -1
-			else:
-				totaldata[eventtime] = int(data[index]["robots"]) * -1
-
-		robots = 0
-		for key in totaldata.keys():
-			base.debugmsg(5, "key:", key, totaldata[key])
-			robots += totaldata[key]
-			rowout = {}
-			rowout["Time"] = key
-			rowout["Value"] = robots
-			rowout["Name"] = "Total"
-			dataout.append(rowout)
-
-		base.debugmsg(5, "dataout:", dataout)
-		return dataout
 
 	def cp_table(self, id):
 		base.debugmsg(9, "id:", id)
