@@ -1422,7 +1422,6 @@ class ReporterBase():
 			sql += "AND md1.MetricType = 'Scenario' "
 			sql += "WHERE md0.MetricType = 'Scenario' AND md0.PrimaryMetric like 'Test_%' "
 
-
 		base.debugmsg(5, "sql:", sql)
 		self.rt_graph_set_sql(id, sql)
 		return sql
@@ -9897,8 +9896,7 @@ class ReporterGUI(tk.Frame):
 		# 	{'PrimaryMetric': 'Robots_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '30', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
 		# 	{'PrimaryMetric': 'Run_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '60', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'}
 		# ]
-
-		#	 'Time' 	 'Value' 	 [Name]
+		# 	 'Time' 	 'Value' 	 [Name]
 		dataout = []
 		data = {}
 		totaldata = {}
@@ -9920,7 +9918,6 @@ class ReporterGUI(tk.Frame):
 					data[index]["robots"] = rowin['MetricValue']
 				if key == "Run":
 					data[index]["run"] = rowin['MetricValue']
-
 
 			else:
 				base.debugmsg(5, "Unexpected data in rowin:", rowin)
@@ -9998,8 +9995,6 @@ class ReporterGUI(tk.Frame):
 			rowout["Value"] = robots
 			rowout["Name"] = "Total"
 			dataout.append(rowout)
-
-
 
 		base.debugmsg(5, "dataout:", dataout)
 		return dataout
