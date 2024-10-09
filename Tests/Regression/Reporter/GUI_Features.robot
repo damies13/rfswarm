@@ -183,8 +183,17 @@ Verify Plan Graph - No Total
 	Should Exist	${basefolder}
 	Log to console 	basefolder: ${basefolder} 	console=True
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
+	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
+	Should Not Exist	${resultfile}
+
+
+	${inifile}= 	Get Reporter INI Location
+	Log    ini: ${inifile} 		console=True
+	Change Reporter INI File Settings		win_width 		1000
+	Change Reporter INI File Settings		win_height 		600
+
 	# pass a default ini file with extended height to ensure that default values are used
 	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
@@ -214,6 +223,7 @@ Verify Plan Graph - No Total
 	Take A Screenshot
 	Select Option 	Plan
 
+	Sleep    1
 	Take A Screenshot
 	Wait For Status 	PreviewLoaded
 
@@ -229,6 +239,7 @@ Verify Plan Graph - No Total
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
 	...    Close GUI
+	...    Remove File 		${resultfile}
 
 
 Verify Plan Graph - With Total
@@ -241,8 +252,14 @@ Verify Plan Graph - With Total
 	Should Exist	${basefolder}
 	Log to console 	basefolder: ${basefolder} 	console=True
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
+	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
+	Should Not Exist	${resultfile}
+
+	Change Reporter INI File Settings		win_width 		1000
+	Change Reporter INI File Settings		win_height 		600
+	
 	# pass a default ini file with extended height to ensure that default values are used
 	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
@@ -272,6 +289,7 @@ Verify Plan Graph - With Total
 	Take A Screenshot
 	Select Option 	Plan
 
+	Sleep    1
 	Take A Screenshot
 	Select Field With Label 	ShowTotal
 
@@ -290,6 +308,7 @@ Verify Plan Graph - With Total
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
 	...    Close GUI
+	...    Remove File 		${resultfile}
 
 
 #
