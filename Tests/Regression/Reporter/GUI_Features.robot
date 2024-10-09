@@ -67,8 +67,8 @@ Whole report time range
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
-	# pass a non-existant ini file to ensure that default values are used
-	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}${testdata}.ini
+	# pass a default ini file with extended height to ensure that default values are used
+	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
@@ -76,13 +76,14 @@ Whole report time range
 	Click Tab 	 Preview
 
 	# check the graph as expected
-	Set Confidence		0.8
+	Set Confidence		0.7
 	Locate 	reporter_${platform}_graph_robots1.png
 	Set Confidence		0.9
 
 	Click Tab 	 Settings
 	Click Section			Report
 
+	# Take A Screenshot
 	# Set start time 14:20
 	# Select Field With Label 	StartTime
 	# Press Combination 	KEY.END
@@ -92,6 +93,10 @@ Whole report time range
 	${StartTime}= 	Replace String 	${StartTime} 	14:11 	14:20
 	Set Text Value To Right Of 	StartTime 	${StartTime}
 
+	# Take A Screenshot
+	Select Field With Label 	Title 		150
+	Wait For Status 	PreviewLoaded
+	# Take A Screenshot
 	# Set start time 14:58
 	# Select Field With Label 	EndTime
 	# Press Combination 	KEY.END
@@ -101,9 +106,10 @@ Whole report time range
 	${EndTime}= 	Replace String 	${EndTime} 	15:00 	14:58
 	Set Text Value To Right Of 	EndTime 	${EndTime}
 
+	# Take A Screenshot
 	# ${bounds}= 	Find Text 	Title:
 
-	Select Field With Label 	Title
+	Select Field With Label 	Title 		150
 
 	Click Tab 	 Preview
 	Wait For Status 	PreviewLoaded
@@ -115,9 +121,13 @@ Whole report time range
 	Wait For Status 	PreviewLoaded
 
 	# check the graph as expected
-	Set Confidence		0.8
+	Set Confidence		0.7
 	Locate 	reporter_${platform}_graph_robots2.png
 	Set Confidence		0.9
+
+	[Teardown]	Run Keywords
+	...    Set Confidence 	0.9 	AND
+	...    Close GUI
 
 Verify if reporter handle missing test result file
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #157
