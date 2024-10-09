@@ -2911,6 +2911,7 @@ class ReporterBase():
 		base.debugmsg(5, "dataout:", dataout)
 		return dataout
 
+
 class ReporterCore:
 
 	cg_data: Any = {}
