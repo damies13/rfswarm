@@ -942,14 +942,14 @@ class ReporterBase():
 		else:
 			return 0
 
-	def report_item__get_int(self, id, name):
+	def report_item_get_int(self, id, name):
 		value = base.report_item_get_value(id, name)
 		if value is None:
 			return -1
 		else:
 			return int(value)
 
-	def report_item__set_int(self, id, name, value):
+	def report_item_set_int(self, id, name, value):
 		changes = base.report_item_set_value(id, name, str(value))
 		return changes
 
@@ -1878,7 +1878,7 @@ class ReporterBase():
 	# 	rt_setting_get_starttime
 	def rt_setting_get_starttime(self, id):
 		# value = self.rs_setting_get_int('startoffset')
-		value = base.report_item__get_int(id, 'startoffset')
+		value = base.report_item_get_int(id, 'startoffset')
 		base.debugmsg(5, "value:", value)
 		if value < 1:
 			return self.rs_setting_get_starttime()
@@ -1887,7 +1887,7 @@ class ReporterBase():
 
 	def rt_setting_get_endtime(self, id):
 		# value = self.rs_setting_get_int('endoffset')
-		value = base.report_item__get_int(id, 'endoffset')
+		value = base.report_item_get_int(id, 'endoffset')
 		base.debugmsg(5, "value:", value)
 		if value < 1:
 			return self.rs_setting_get_endtime()
@@ -2797,7 +2797,7 @@ class ReporterBase():
 	# Data Post Processing Functions
 	#
 
-	def graph_postprocess_data_plan(self, datain):
+	def graph_postprocess_data_plan(self, id, datain):
 		base.debugmsg(5, "datain:", datain)
 		# [
 		# 	{'PrimaryMetric': 'Delay_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '0', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
@@ -2895,15 +2895,18 @@ class ReporterBase():
 			else:
 				totaldata[eventtime] = int(data[index]["robots"]) * -1
 
-		robots = 0
-		for key in totaldata.keys():
-			base.debugmsg(5, "key:", key, totaldata[key])
-			robots += totaldata[key]
-			rowout = {}
-			rowout["Time"] = key
-			rowout["Value"] = robots
-			rowout["Name"] = "Total"
-			dataout.append(rowout)
+		stot = base.report_item_get_int(id, "ShowTotal")
+
+		if stot > 0:
+			robots = 0
+			for key in totaldata.keys():
+				base.debugmsg(5, "key:", key, totaldata[key])
+				robots += totaldata[key]
+				rowout = {}
+				rowout["Time"] = key
+				rowout["Value"] = robots
+				rowout["Name"] = "Total"
+				dataout.append(rowout)
 
 		base.debugmsg(5, "dataout:", dataout)
 		return dataout
@@ -3897,7 +3900,7 @@ class ReporterCore:
 
 				if datatypel == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
-					gdata = base.graph_postprocess_data_plan(gdata)
+					gdata = base.graph_postprocess_data_plan(idl, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -3933,7 +3936,7 @@ class ReporterCore:
 
 				if datatyper == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
-					gdata = base.graph_postprocess_data_plan(gdata)
+					gdata = base.graph_postprocess_data_plan(idr, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -4744,7 +4747,7 @@ class ReporterCore:
 
 				if datatypel == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
-					gdata = base.graph_postprocess_data_plan(gdata)
+					gdata = base.graph_postprocess_data_plan(idl, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -4780,7 +4783,7 @@ class ReporterCore:
 
 				if datatyper == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
-					gdata = base.graph_postprocess_data_plan(gdata)
+					gdata = base.graph_postprocess_data_plan(idr, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -5847,7 +5850,7 @@ class ReporterCore:
 
 				if datatypel == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
-					gdata = base.graph_postprocess_data_plan(gdata)
+					gdata = base.graph_postprocess_data_plan(idl, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -5883,7 +5886,7 @@ class ReporterCore:
 
 				if datatyper == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
-					gdata = base.graph_postprocess_data_plan(gdata)
+					gdata = base.graph_postprocess_data_plan(idr, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -7850,7 +7853,7 @@ class ReporterGUI(tk.Frame):
 				if ist > 0:
 					ios = ist - base.rs_setting_get_starttime()
 					base.debugmsg(5, "ios:", ios)
-					changes += base.report_item__set_int(id, "startoffset", ios)
+					changes += base.report_item_set_int(id, "startoffset", ios)
 
 			iST = base.rt_setting_get_starttime(id)
 			fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
@@ -7868,7 +7871,7 @@ class ReporterGUI(tk.Frame):
 				if iet > 0:
 					ios = base.rs_setting_get_endtime() - iet
 					base.debugmsg(5, "ios:", ios)
-					changes += base.report_item__set_int(id, "endoffset", ios)
+					changes += base.report_item_set_int(id, "endoffset", ios)
 
 			iET = base.rt_setting_get_endtime(id)
 			fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
@@ -8579,7 +8582,7 @@ class ReporterGUI(tk.Frame):
 				if ist > 0:
 					ios = ist - base.rs_setting_get_starttime()
 					base.debugmsg(5, "ios:", ios)
-					changes += base.report_item__set_int(pid, "startoffset", ios)
+					changes += base.report_item_set_int(pid, "startoffset", ios)
 
 			iST = base.rt_setting_get_starttime(pid)
 			fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
@@ -8596,7 +8599,7 @@ class ReporterGUI(tk.Frame):
 				if iet > 0:
 					ios = base.rs_setting_get_endtime() - iet
 					base.debugmsg(5, "ios:", ios)
-					changes += base.report_item__set_int(pid, "endoffset", ios)
+					changes += base.report_item_set_int(pid, "endoffset", ios)
 
 			iET = base.rt_setting_get_endtime(pid)
 			fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
@@ -8714,6 +8717,13 @@ class ReporterGUI(tk.Frame):
 			value = self.contentdata[idr]["intAxsEn"].get()
 			changes += base.rt_graph_set_axisen(idr, value)
 
+		if "intSTot" in self.contentdata[idl]:
+			value = self.contentdata[idl]["intSTot"].get()
+			changes += base.report_item_set_int(idl, "ShowTotal", value)
+		if "intSTot" in self.contentdata[idr]:
+			value = self.contentdata[idr]["intSTot"].get()
+			changes += base.report_item_set_int(idr, "ShowTotal", value)
+
 		if "tSQL" in self.contentdata[idl]:
 			data = self.contentdata[idl]["tSQL"].get('0.0', tk.END).strip()
 			base.debugmsg(5, "data:", data)
@@ -8785,6 +8795,15 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[idl]["Frames"][datatypel].columnconfigure(99, weight=1)
 
 			# "Metric", "Result", "SQL"
+
+			if datatypel == "Plan":
+				rownum += 1
+				self.contentdata[idl]["lblSTot"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Show Total:")
+				self.contentdata[idl]["lblSTot"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idl]["intSTot"] = tk.IntVar()
+				self.contentdata[idl]["chkSTot"] = ttk.Checkbutton(self.contentdata[idl]["Frames"][datatypel], variable=self.contentdata[idl]["intSTot"], command=self.cs_graph_update)
+				self.contentdata[idl]["chkSTot"].grid(column=2, row=rownum, sticky="nsew")
 
 			if datatypel == "Metric":
 				showmetricagents = 0
@@ -8945,6 +8964,15 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[idr]["Frames"][datatyper].columnconfigure(99, weight=1)
 
 			# "Metric", "Result", "SQL"
+
+			if datatyper == "Plan":
+				rownum += 1
+				self.contentdata[idr]["lblSTot"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Show Total:")
+				self.contentdata[idr]["lblSTot"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idr]["intSTot"] = tk.IntVar()
+				self.contentdata[idr]["chkSTot"] = ttk.Checkbutton(self.contentdata[idr]["Frames"][datatyper], variable=self.contentdata[idr]["intSTot"], command=self.cs_graph_update)
+				self.contentdata[idr]["chkSTot"].grid(column=2, row=rownum, sticky="nsew")
 
 			if datatyper == "Metric":
 				showmetricagents = 0
@@ -9159,9 +9187,11 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[idr]["FPattern"].set(base.rt_table_get_fp(idr))
 
 		if datatypel == "Plan":
+			self.contentdata[idl]["intSTot"].set(base.report_item_get_int(idl, "ShowTotal"))
 			changes += 1
 
 		if datatyper == "Plan":
+			self.contentdata[idr]["intSTot"].set(base.report_item_get_int(idr, "ShowTotal"))
 			changes += 1
 
 		# Show
@@ -9381,7 +9411,7 @@ class ReporterGUI(tk.Frame):
 				if ist > 0:
 					ios = ist - base.rs_setting_get_starttime()
 					base.debugmsg(5, "ios:", ios)
-					changes += base.report_item__set_int(id, "startoffset", ios)
+					changes += base.report_item_set_int(id, "startoffset", ios)
 
 			iST = base.rt_setting_get_starttime(id)
 			fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
@@ -9398,7 +9428,7 @@ class ReporterGUI(tk.Frame):
 				if iet > 0:
 					ios = base.rs_setting_get_endtime() - iet
 					base.debugmsg(5, "ios:", ios)
-					changes += base.report_item__set_int(id, "endoffset", ios)
+					changes += base.report_item_set_int(id, "endoffset", ios)
 
 			iET = base.rt_setting_get_endtime(id)
 			fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
@@ -9914,7 +9944,7 @@ class ReporterGUI(tk.Frame):
 
 				if datatypel == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
-					gdata = base.graph_postprocess_data_plan(gdata)
+					gdata = base.graph_postprocess_data_plan(idl, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -9953,7 +9983,7 @@ class ReporterGUI(tk.Frame):
 
 				if datatyper == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
-					gdata = base.graph_postprocess_data_plan(gdata)
+					gdata = base.graph_postprocess_data_plan(idr, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
