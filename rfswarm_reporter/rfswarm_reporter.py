@@ -7185,16 +7185,19 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["lblTZ"] = ttk.Label(self.contentdata[id]["Settings"], text="Time Zone")
 		self.contentdata[id]["lblTZ"].grid(column=0, row=rownum, sticky="nsew")
 
-		TZones = [None]
+		TZones = [""]
 		ZL = list(base.rs_setting_get_timezone_list())
 		LTZ = base.rs_setting_get_timezone()
 		if LTZ not in ZL:
 			TZones.append(LTZ)
 		TZones = TZones + ZL
+		TZones.sort()
 		self.contentdata[id]["strTZ"] = tk.StringVar()
 		self.contentdata[id]["strTZ"].set(LTZ)
-		self.contentdata[id]["omTZ"] = ttk.OptionMenu(self.contentdata[id]["Settings"], self.contentdata[id]["strTZ"], command=self.cs_report_settings_update, *TZones)
+		self.contentdata[id]["omTZ"] = ttk.Combobox(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strTZ"])
 		self.contentdata[id]["omTZ"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[id]["omTZ"]['values'] = TZones
+		self.contentdata[id]["omTZ"].bind('<<ComboboxSelected>>', self.cs_report_settings_update)
 
 		rownum += 1
 		col_disp = 3
