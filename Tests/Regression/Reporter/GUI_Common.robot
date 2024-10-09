@@ -349,6 +349,8 @@ Close GUI windows
 	# Press Combination 	Key.esc
 	# Press Combination 	x 	Key.ctrl
 	# Press Combination 	Key.f4 	Key.alt
+	Wait For Status 	PreviewLoaded
+	Click Image		reporter_${platform}_status_previewloaded.png
 	Click Image		reporter_${platform}_button_closewindow.png
 	Take A Screenshot
 	Sleep 	0.5
@@ -357,6 +359,8 @@ Close GUI windows
 Close GUI ubuntu
 	# Press Combination 	Key.esc
 	# Press Combination 	x 	Key.ctrl
+	Wait For Status 	PreviewLoaded
+	Click Image		reporter_${platform}_status_previewloaded.png
 	Click Image		reporter_${platform}_button_closewindow.png
 	Take A Screenshot
 	Sleep 	0.5
@@ -366,6 +370,8 @@ Close GUI macos
 	# Press Combination 	Key.esc
 	# Press Combination 	q 	Key.command
 	# Click Image		reporter_${platform}_menu_python3.png
+	Wait For Status 	PreviewLoaded
+	Click Image		reporter_${platform}_status_previewloaded.png
 	Click Image		reporter_${platform}_button_closewindow.png
 	Take A Screenshot
 	Sleep 	0.5
