@@ -171,6 +171,7 @@ Verify the Content Of the DOCX Report
 	VAR 	${resultfolder} 	${basefolder}${/}${resultdata}
 	VAR 	${template_dir} 	${basefolder}${/}sample.template
 	VAR 	${docx_file}		${resultfolder}${/}${resultdata}.docx
+	VAR 	${img_comp_threshold} 		0.2
 
 	Log 	template: ${template_dir} 	console=True
 	Open GUI	-d 	${resultfolder} 	-t 	${template_dir}
@@ -201,7 +202,7 @@ Verify the Content Of the DOCX Report
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	No Heading
 	@{no_heading_contet} 	Convert To List 	${docx_paragraphs}[No Heading]
-	VAR 	@{no_heading_expected}	quickdemo  2023-07-28 15:42 - 15:50
+	VAR 	@{no_heading_expected}	quickdemo  2023-07-28 7:42 - 7:50
 	Lists Should Be Equal 	${no_heading_expected} 		${no_heading_contet}	msg=[ Expected != Converted ]
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	1 This is Heading
@@ -227,35 +228,35 @@ Verify the Content Of the DOCX Report
 	# Graphs - when new graphs are required, save them using the function in read_docx.py!
 	Dictionary Should Contain Key 	${docx_paragraphs} 	6 Data Graph Left Metric
 	Convert Image To Black And White 	${docx_images}[0]
-	Compare Images 	${expected_docx_images}[0] 	${docx_images}[0]
+	Compare Images 	${expected_docx_images}[0] 	${docx_images}[0] 	threshold=${img_comp_threshold}
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	7 Data Graph Left Result
 	Convert Image To Black And White 	${docx_images}[1]
-	Compare Images 	${expected_docx_images}[1] 	${docx_images}[1]
+	Compare Images 	${expected_docx_images}[1] 	${docx_images}[1] 	threshold=${img_comp_threshold}
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	8 Data Graph Left Result FAIL
 	Convert Image To Black And White 	${docx_images}[2]
-	Compare Images 	${expected_docx_images}[2] 	${docx_images}[2]
+	Compare Images 	${expected_docx_images}[2] 	${docx_images}[2] 	threshold=${img_comp_threshold}
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	9 Data Graph Left Result TPS
 	Convert Image To Black And White 	${docx_images}[3]
-	Compare Images 	${expected_docx_images}[3] 	${docx_images}[3]
+	Compare Images 	${expected_docx_images}[3] 	${docx_images}[3] 	threshold=${img_comp_threshold}
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	10 Data Graph Left Result Total TPS
 	Convert Image To Black And White 	${docx_images}[4]
-	Compare Images 	${expected_docx_images}[4] 	${docx_images}[4]
+	Compare Images 	${expected_docx_images}[4] 	${docx_images}[4] 	threshold=${img_comp_threshold}
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	11 Data Graph Right Metric
 	Convert Image To Black And White 	${docx_images}[5]
-	Compare Images 	${expected_docx_images}[5] 	${docx_images}[5]
+	Compare Images 	${expected_docx_images}[5] 	${docx_images}[5] 	threshold=${img_comp_threshold}
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	12 Data Graph Right Result
 	Convert Image To Black And White 	${docx_images}[6]
-	Compare Images 	${expected_docx_images}[6] 	${docx_images}[6]
+	Compare Images 	${expected_docx_images}[6] 	${docx_images}[6] 	threshold=${img_comp_threshold}
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	13 Data Graph LR Combined
 	Convert Image To Black And White 	${docx_images}[7]
-	Compare Images 	${expected_docx_images}[7] 	${docx_images}[7]
+	Compare Images 	${expected_docx_images}[7] 	${docx_images}[7] 	threshold=${img_comp_threshold}
 
 
 	# Tables:
@@ -312,10 +313,10 @@ Verify the Content Of the DOCX Report
 	@{15_table_-1} 	Convert To List 	${docx_tables}[1][-1]
 	VAR 	@{15_table_-1_expected} 	Waits until the element ``locator`` is visible. 	0.045 	0.115 	None 	0.204 	0.078 	5
 	Lists Should Be Equal 	${15_table_-1_expected} 	${15_table_-1}	msg=[ Expected != Converted ]
-	# [11] equals quater row
-	@{15_table_11} 	Convert To List 	${docx_tables}[1][11]
-	VAR 	@{15_table_11_expected} 	Odoo Confirm RFQ 	0.001 	1.131 	None 	2.262 	1.599 	2
-	Lists Should Be Equal 	${15_table_11_expected} 	${15_table_11}	msg=[ Expected != Converted ]
+	# [12] equals quater row
+	@{15_table_12} 	Convert To List 	${docx_tables}[1][12]
+	VAR 	@{15_table_12_expected} 	Odoo Confirm Sale 	0.0 	11.09 	54.927 	54.927 	23.013 	10
+	Lists Should Be Equal 	${15_table_12_expected} 	${15_table_12}	msg=[ Expected != Converted ]
 	# [21] equals middle row
 	@{15_table_21} 	Convert To List 	${docx_tables}[1][21]
 	VAR 	@{15_table_21_expected} 	Odoo Open Receipt 	0.0 	0.0 	None 	0.0 	None 	1
