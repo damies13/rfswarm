@@ -8800,9 +8800,11 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idl]["lblSTot"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Show Total:")
 				self.contentdata[idl]["lblSTot"].grid(column=0, row=rownum, sticky="nsew")
 
+				# self.contentdata[idl]["Frames"][datatypel].columnconfigure(1, weight=1)
+				self.contentdata[idl]["Frames"][datatypel].columnconfigure(1, minsize=150)
 				self.contentdata[idl]["intSTot"] = tk.IntVar()
 				self.contentdata[idl]["chkSTot"] = ttk.Checkbutton(self.contentdata[idl]["Frames"][datatypel], variable=self.contentdata[idl]["intSTot"], command=self.cs_graph_update)
-				self.contentdata[idl]["chkSTot"].grid(column=2, row=rownum, sticky="nsew")
+				self.contentdata[idl]["chkSTot"].grid(column=1, row=rownum, sticky="nsew")
 
 			if datatypel == "Metric":
 				showmetricagents = 0
@@ -8969,9 +8971,11 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idr]["lblSTot"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Show Total:")
 				self.contentdata[idr]["lblSTot"].grid(column=0, row=rownum, sticky="nsew")
 
+				# self.contentdata[idr]["Frames"][datatyper].columnconfigure(1, weight=1)
+				self.contentdata[idr]["Frames"][datatyper].columnconfigure(1, minsize=150)
 				self.contentdata[idr]["intSTot"] = tk.IntVar()
 				self.contentdata[idr]["chkSTot"] = ttk.Checkbutton(self.contentdata[idr]["Frames"][datatyper], variable=self.contentdata[idr]["intSTot"], command=self.cs_graph_update)
-				self.contentdata[idr]["chkSTot"].grid(column=2, row=rownum, sticky="nsew")
+				self.contentdata[idr]["chkSTot"].grid(column=1, row=rownum, sticky="nsew")
 
 			if datatyper == "Metric":
 				showmetricagents = 0
