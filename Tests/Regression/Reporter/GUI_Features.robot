@@ -220,10 +220,10 @@ Verify Plan Graph - No Total
 	# Take A Screenshot
 	Wait For Status 	PreviewLoaded
 
-	Take A Screenshot
+	# Take A Screenshot
 	Click Tab 	 Preview
 
-	Take A Screenshot
+	# Take A Screenshot
 
 	Set Confidence		0.7
 	Locate 	reporter_${platform}_graph_plannototal.png
@@ -288,10 +288,10 @@ Verify Plan Graph - With Total
 	# Take A Screenshot
 	Wait For Status 	PreviewLoaded
 
-	Take A Screenshot
+	# Take A Screenshot
 	Click Tab 	 Preview
 
-	Take A Screenshot
+	# Take A Screenshot
 
 	Set Confidence		0.7
 	Locate 	reporter_${platform}_graph_plantotal.png
