@@ -205,16 +205,16 @@ Verify Plan Graph - No Total
 
 	Select Field With Label 	Type
 
-	Take A Screenshot
+	# Take A Screenshot
 	Select Option 	DataGraph
-	Take A Screenshot
+	# Take A Screenshot
 
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 
-	Take A Screenshot
+	# Take A Screenshot
 	Select Field With Label 	DataType
 
-	Take A Screenshot
+	# Take A Screenshot
 	Select Option 	Plan
 
 	# Take A Screenshot
@@ -224,11 +224,11 @@ Verify Plan Graph - No Total
 	Click Tab 	 Preview
 
 	Take A Screenshot
-	# Click Button 	GenerateHTML
-	#
-	# Take A Screenshot
-	# Wait For Status 	SavedXHTMLReport
-	# Take A Screenshot
+
+	Set Confidence		0.7
+	Locate 	reporter_${platform}_graph_plannototal.png
+	Set Confidence		0.9
+
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
@@ -263,40 +263,39 @@ Verify Plan Graph - With Total
 	Click To The Below Of Image 	reporter_${platform}_label_sectionname.png 	20
 	Type 	Issue #140
 	Click Button 			OK
-	Take A Screenshot
+	# Take A Screenshot
 	Click Section			Issue#140
 
 	Select Field With Label 	Type
 
-	Take A Screenshot
+	# Take A Screenshot
 	Select Option 	DataGraph
-	Take A Screenshot
+	# Take A Screenshot
 
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 
-	Take A Screenshot
+	# Take A Screenshot
 	Select Field With Label 	DataType
 
-	Take A Screenshot
+	# Take A Screenshot
 	Select Option 	Plan
 
 	Wait For Status 	PreviewLoaded
 
-	Take A Screenshot
+	# Take A Screenshot
 	Select Field With Label 	ShowTotal
 
-	Take A Screenshot
+	# Take A Screenshot
 	Wait For Status 	PreviewLoaded
 
 	Take A Screenshot
 	Click Tab 	 Preview
 
 	Take A Screenshot
-	# Click Button 	GenerateHTML
-	#
-	# Take A Screenshot
-	# Wait For Status 	SavedXHTMLReport
-	# Take A Screenshot
+
+	Set Confidence		0.7
+	Locate 	reporter_${platform}_graph_plantotal.png
+	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
