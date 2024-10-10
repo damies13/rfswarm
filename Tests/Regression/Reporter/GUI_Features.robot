@@ -188,12 +188,6 @@ Verify Plan Graph - No Total
 	Log 	resultfolder: ${resultfolder} 	console=True
 	Should Not Exist	${resultfile}
 
-
-	${inifile}= 	Get Reporter INI Location
-	Log    ini: ${inifile} 		console=True
-	Change Reporter INI File Settings		win_width 		1000
-	Change Reporter INI File Settings		win_height 		600
-
 	# pass a default ini file with extended height to ensure that default values are used
 	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
@@ -256,9 +250,6 @@ Verify Plan Graph - With Total
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
 	Should Not Exist	${resultfile}
-
-	Change Reporter INI File Settings		win_width 		1000
-	Change Reporter INI File Settings		win_height 		600
 
 	# pass a default ini file with extended height to ensure that default values are used
 	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini
