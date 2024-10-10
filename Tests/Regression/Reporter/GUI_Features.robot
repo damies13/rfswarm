@@ -223,10 +223,10 @@ Verify Plan Graph - No Total
 	Take A Screenshot
 	Select Option 	Plan
 
-	Sleep    1
-	Take A Screenshot
+	# Take A Screenshot
 	Wait For Status 	PreviewLoaded
 
+	Take A Screenshot
 	Click Tab 	 Preview
 
 	Take A Screenshot
@@ -238,7 +238,7 @@ Verify Plan Graph - No Total
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI
+	...    Close GUI 		AND
 	...    Remove File 		${resultfile}
 
 
@@ -259,7 +259,7 @@ Verify Plan Graph - With Total
 
 	Change Reporter INI File Settings		win_width 		1000
 	Change Reporter INI File Settings		win_height 		600
-	
+
 	# pass a default ini file with extended height to ensure that default values are used
 	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
@@ -289,13 +289,15 @@ Verify Plan Graph - With Total
 	Take A Screenshot
 	Select Option 	Plan
 
-	Sleep    1
+	Wait For Status 	PreviewLoaded
+
 	Take A Screenshot
 	Select Field With Label 	ShowTotal
 
 	Take A Screenshot
 	Wait For Status 	PreviewLoaded
 
+	Take A Screenshot
 	Click Tab 	 Preview
 
 	Take A Screenshot
@@ -307,7 +309,7 @@ Verify Plan Graph - With Total
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI
+	...    Close GUI 		AND
 	...    Remove File 		${resultfile}
 
 

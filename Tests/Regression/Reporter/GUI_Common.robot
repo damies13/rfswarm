@@ -417,7 +417,7 @@ Get Reporter Default Save Path
 
 Get Reporter INI Location
 	${location}=	Get Reporter Default Save Path
-	RETURN	${location}${/}RFSwarmReporter.ini
+	RETURN	${location}RFSwarmReporter.ini
 
 Get Reporter INI Data
 	${location}=	Get Reporter INI Location
