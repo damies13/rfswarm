@@ -158,6 +158,8 @@ class ReporterBase():
 	defcolours = ['#000000', '#008450', '#B81D13', '#EFB700', '#888888']
 	namecolours = ['total', 'pass', 'fail', 'warning', 'not run']
 
+	illegal_xml_chars_re = re.compile(u'[\x00-\x08\x0b\x0c\x0e-\x1F\uD800-\uDFFF\uFFFE\uFFFF]', re.UNICODE)
+
 	def debugmsg(self, lvl, *msg):
 		msglst = []
 		prefix = ""
@@ -940,14 +942,14 @@ class ReporterBase():
 		else:
 			return 0
 
-	def report_item__get_int(self, id, name):
+	def report_item_get_int(self, id, name):
 		value = base.report_item_get_value(id, name)
 		if value is None:
 			return -1
 		else:
 			return int(value)
 
-	def report_item__set_int(self, id, name, value):
+	def report_item_set_int(self, id, name, value):
 		changes = base.report_item_set_value(id, name, str(value))
 		return changes
 
@@ -1400,6 +1402,25 @@ class ReporterBase():
 					i += 1
 
 			sql += "ORDER BY MetricTime "
+
+		if DataType == "Plan":
+			# MType = self.rt_table_get_mt(id)
+			# PM = self.rt_table_get_pm(id)
+
+			sql = "SELECT "
+			sql += "md1.* "
+			sql += ", md0.SecondaryMetric as [File] "
+			sql += ", fp0.SecondaryMetric as [FilePath] "
+			# sql += ", concat(fp0.SecondaryMetric, " ", md0.MetricValue ) as [ColourKey] "
+			sql += "FROM MetricData as md0 "
+			sql += "LEFT JOIN MetricData as fp0 "
+			sql += "ON fp0.MetricValue = md0.MetricValue "
+			sql += "AND fp0.MetricType = 'Scenario' "
+			sql += "AND fp0.PrimaryMetric like 'Local_Path_%' "
+			sql += "LEFT JOIN MetricData as md1 "
+			sql += "ON md1.SecondaryMetric = md0.MetricValue "
+			sql += "AND md1.MetricType = 'Scenario' "
+			sql += "WHERE md0.MetricType = 'Scenario' AND md0.PrimaryMetric like 'Test_%' "
 
 		base.debugmsg(5, "sql:", sql)
 		self.rt_graph_set_sql(id, sql)
@@ -1857,7 +1878,7 @@ class ReporterBase():
 	# 	rt_setting_get_starttime
 	def rt_setting_get_starttime(self, id):
 		# value = self.rs_setting_get_int('startoffset')
-		value = base.report_item__get_int(id, 'startoffset')
+		value = base.report_item_get_int(id, 'startoffset')
 		base.debugmsg(5, "value:", value)
 		if value < 1:
 			return self.rs_setting_get_starttime()
@@ -1866,7 +1887,7 @@ class ReporterBase():
 
 	def rt_setting_get_endtime(self, id):
 		# value = self.rs_setting_get_int('endoffset')
-		value = base.report_item__get_int(id, 'endoffset')
+		value = base.report_item_get_int(id, 'endoffset')
 		base.debugmsg(5, "value:", value)
 		if value < 1:
 			return self.rs_setting_get_endtime()
@@ -1883,6 +1904,7 @@ class ReporterBase():
 	def rt_table_set_dt(self, id, datatype):
 		base.debugmsg(9, "id:", id, "	datatype:", datatype)
 		prev = self.rt_table_get_dt(id)
+		base.debugmsg(8, "prev:", prev)
 		if datatype != prev and datatype is not None:
 			base.report[id]['DataType'] = base.whitespace_set_ini_value(datatype)
 			base.report_item_set_changed(id)
@@ -2770,6 +2792,124 @@ class ReporterBase():
 		self.debugmsg(8, "score:", score)
 
 		return score
+
+	#
+	# Data Post Processing Functions
+	#
+
+	def graph_postprocess_data_plan(self, id, datain):
+		base.debugmsg(5, "datain:", datain)
+		# [
+		# 	{'PrimaryMetric': 'Delay_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '0', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Ramp_Up_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '20', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Robots_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '30', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Run_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '60', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'}
+		# ]
+		# 	 'Time' 	 'Value' 	 [Name]
+		dataout = []
+		data = {}
+		totaldata = {}
+		for rowin in datain:
+			base.debugmsg(5, "rowin:", rowin)
+			if 'PrimaryMetric' in rowin and "_" in rowin['PrimaryMetric']:
+				key, index = rowin['PrimaryMetric'].rsplit("_", 1)
+				base.debugmsg(5, "key:", key, "	index:", index)
+				if index not in data:
+					data[index] = {}
+				if key == "Delay":
+					data[index]["start"] = rowin['MetricTime']
+					data[index]["delay"] = rowin['MetricValue']
+					data[index]["colourkey"] = rowin['SecondaryMetric'] + " " + rowin['FilePath']
+
+				if key == "Ramp_Up":
+					data[index]["rampup"] = rowin['MetricValue']
+				if key == "Robots":
+					data[index]["robots"] = rowin['MetricValue']
+				if key == "Run":
+					data[index]["run"] = rowin['MetricValue']
+
+			else:
+				base.debugmsg(5, "Unexpected data in rowin:", rowin)
+
+		for index in data.keys():
+			base.debugmsg(5, "index:", index, data[index])
+
+			eventtime = data[index]["start"]
+			rowout = {}
+			rowout["Time"] = eventtime
+			rowout["Value"] = 0
+			rowout["Name"] = data[index]["colourkey"]
+			dataout.append(rowout)
+
+			if eventtime in totaldata:
+				totaldata[eventtime] += 0
+			else:
+				totaldata[eventtime] = 0
+
+			eventtime += int(data[index]["delay"])
+			rowout = {}
+			rowout["Time"] = eventtime
+			rowout["Value"] = 0
+			rowout["Name"] = data[index]["colourkey"]
+			dataout.append(rowout)
+
+			if eventtime in totaldata:
+				totaldata[eventtime] += 0
+			else:
+				totaldata[eventtime] = 0
+
+			eventtime += int(data[index]["rampup"])
+			rowout = {}
+			rowout["Time"] = eventtime
+			rowout["Value"] = int(data[index]["robots"])
+			rowout["Name"] = data[index]["colourkey"]
+			dataout.append(rowout)
+
+			if eventtime in totaldata:
+				totaldata[eventtime] += int(data[index]["robots"])
+			else:
+				totaldata[eventtime] = int(data[index]["robots"])
+
+			eventtime += int(data[index]["run"])
+			rowout = {}
+			rowout["Time"] = eventtime
+			rowout["Value"] = int(data[index]["robots"])
+			rowout["Name"] = data[index]["colourkey"]
+			dataout.append(rowout)
+
+			if eventtime in totaldata:
+				totaldata[eventtime] += 0
+			else:
+				totaldata[eventtime] = 0
+
+			# estimated rampdown
+			eventtime += int(data[index]["rampup"])
+			rowout = {}
+			rowout["Time"] = eventtime
+			rowout["Value"] = 0
+			rowout["Name"] = data[index]["colourkey"]
+			dataout.append(rowout)
+
+			if eventtime in totaldata:
+				totaldata[eventtime] += int(data[index]["robots"]) * -1
+			else:
+				totaldata[eventtime] = int(data[index]["robots"]) * -1
+
+		stot = base.report_item_get_int(id, "ShowTotal")
+
+		if stot > 0:
+			robots = 0
+			for key in totaldata.keys():
+				base.debugmsg(5, "key:", key, totaldata[key])
+				robots += totaldata[key]
+				rowout = {}
+				rowout["Time"] = key
+				rowout["Value"] = robots
+				rowout["Name"] = "Total"
+				dataout.append(rowout)
+
+		base.debugmsg(5, "dataout:", dataout)
+		return dataout
 
 
 class ReporterCore:
@@ -3712,6 +3852,8 @@ class ReporterCore:
 		datatypel = base.rt_graph_get_dt(idl)
 		datatyper = base.rt_graph_get_dt(idr)
 
+		tz = zoneinfo.ZoneInfo(base.rs_setting_get_timezone())
+
 		if datatypel == "SQL":
 			sqll = base.rt_graph_get_sql(idl)
 		else:
@@ -3756,6 +3898,11 @@ class ReporterCore:
 					time.sleep(0.1)
 
 				gdata = base.dbqueue["ReadResult"][key]
+
+				if datatypel == "Plan":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_plan(idl, gdata)
+
 				base.debugmsg(9, "gdata:", gdata)
 
 				for row in gdata:
@@ -3774,7 +3921,7 @@ class ReporterCore:
 							graphdata[name]["objTime"] = []
 							graphdata[name]["Values"] = []
 
-						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"], tz))
 						graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
 					else:
 						break
@@ -3787,6 +3934,11 @@ class ReporterCore:
 					time.sleep(0.1)
 
 				gdata = base.dbqueue["ReadResult"][key]
+
+				if datatyper == "Plan":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_plan(idr, gdata)
+
 				base.debugmsg(9, "gdata:", gdata)
 
 				for row in gdata:
@@ -3805,7 +3957,7 @@ class ReporterCore:
 							graphdata[name]["objTime"] = []
 							graphdata[name]["Values"] = []
 
-						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"], tz))
 						graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
 					else:
 						break
@@ -3943,9 +4095,11 @@ class ReporterCore:
 					# for val in vals:
 					for col in cols:
 						if col not in ["Colour"]:
-							val = str(row[col]).strip()
 							td = etree.SubElement(tr, 'td')
-							td.text = str(val)
+							val = str(row[col]).strip()
+							val = base.illegal_xml_chars_re.sub('', val)
+							base.debugmsg(8, "val:", val)
+							td.text = val
 
 	def xhtml_sections_errors(self, elmt, id):
 		base.debugmsg(8, "id:", id)
@@ -4548,6 +4702,8 @@ class ReporterCore:
 		datatypel = base.rt_graph_get_dt(idl)
 		datatyper = base.rt_graph_get_dt(idr)
 
+		tz = zoneinfo.ZoneInfo(base.rs_setting_get_timezone())
+
 		if datatypel == "SQL":
 			sqll = base.rt_graph_get_sql(idl)
 		else:
@@ -4591,6 +4747,11 @@ class ReporterCore:
 					time.sleep(0.1)
 
 				gdata = base.dbqueue["ReadResult"][key]
+
+				if datatypel == "Plan":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_plan(idl, gdata)
+
 				base.debugmsg(9, "gdata:", gdata)
 
 				for row in gdata:
@@ -4609,7 +4770,7 @@ class ReporterCore:
 							graphdata[name]["objTime"] = []
 							graphdata[name]["Values"] = []
 
-						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"], tz))
 						graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
 					else:
 						break
@@ -4622,6 +4783,11 @@ class ReporterCore:
 					time.sleep(0.1)
 
 				gdata = base.dbqueue["ReadResult"][key]
+
+				if datatyper == "Plan":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_plan(idr, gdata)
+
 				base.debugmsg(9, "gdata:", gdata)
 
 				for row in gdata:
@@ -4640,7 +4806,7 @@ class ReporterCore:
 							graphdata[name]["objTime"] = []
 							graphdata[name]["Values"] = []
 
-						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"], tz))
 						graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
 					else:
 						break
@@ -4830,10 +4996,13 @@ class ReporterCore:
 					for col in cols:
 						if col not in ["Colour"]:
 							val = str(row[col]).strip()
+							val = base.illegal_xml_chars_re.sub('', val)
+							base.debugmsg(8, "val:", val)
+
 							# table.rows[cellrow].cells[cellcol].text = str(val)
 							# table.rows[cellrow].cells[cellcol].add_paragraph(text=str(val), style="Table Cell")
 							table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-							table.rows[cellrow].cells[cellcol].paragraphs[0].text = str(val)
+							table.rows[cellrow].cells[cellcol].paragraphs[0].text = val
 
 							tcw = int(table.columns[cellcol].width.cm) + 1
 							# base.debugmsg(5, "tcw:", tcw)
@@ -5638,6 +5807,8 @@ class ReporterCore:
 		datatypel = base.rt_graph_get_dt(idl)
 		datatyper = base.rt_graph_get_dt(idr)
 
+		tz = zoneinfo.ZoneInfo(base.rs_setting_get_timezone())
+
 		if datatypel == "SQL":
 			sqll = base.rt_graph_get_sql(idl)
 		else:
@@ -5681,6 +5852,11 @@ class ReporterCore:
 					time.sleep(0.1)
 
 				gdata = base.dbqueue["ReadResult"][key]
+
+				if datatypel == "Plan":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_plan(idl, gdata)
+
 				base.debugmsg(9, "gdata:", gdata)
 
 				for row in gdata:
@@ -5699,7 +5875,7 @@ class ReporterCore:
 							graphdata[name]["objTime"] = []
 							graphdata[name]["Values"] = []
 
-						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"], tz))
 						graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
 					else:
 						break
@@ -5712,6 +5888,11 @@ class ReporterCore:
 					time.sleep(0.1)
 
 				gdata = base.dbqueue["ReadResult"][key]
+
+				if datatyper == "Plan":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_plan(idr, gdata)
+
 				base.debugmsg(9, "gdata:", gdata)
 
 				for row in gdata:
@@ -5730,7 +5911,7 @@ class ReporterCore:
 							graphdata[name]["objTime"] = []
 							graphdata[name]["Values"] = []
 
-						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						graphdata[name]["objTime"].append(datetime.fromtimestamp(row["Time"], tz))
 						graphdata[name]["Values"].append(base.rt_graph_floatval(row["Value"]))
 					else:
 						break
@@ -5904,7 +6085,9 @@ class ReporterCore:
 					for col in cols:
 						if col not in ["Colour"]:
 							val = str(row[col]).strip()
+							val = base.illegal_xml_chars_re.sub('', val)
 							base.debugmsg(8, "val:", val)
+
 							dcell = ws.cell(column=cellcol, row=rownum, value=val)
 							dcell.style = "Table Data"
 
@@ -6286,6 +6469,8 @@ class ReporterCore:
 		self.xlsx_select_cell(cellcol, rownum)
 
 		base.debugmsg(5, "setting Cell value")
+		val = base.illegal_xml_chars_re.sub('', val)
+		base.debugmsg(8, "val:", val)
 		cell = ws.cell(column=cellcol, row=rownum, value=val)
 		base.debugmsg(5, "splitting val to lines")
 		lines = str(val).splitlines()
@@ -7168,16 +7353,19 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["lblTZ"] = ttk.Label(self.contentdata[id]["Settings"], text="Time Zone")
 		self.contentdata[id]["lblTZ"].grid(column=0, row=rownum, sticky="nsew")
 
-		TZones = [None]
+		TZones = [""]
 		ZL = list(base.rs_setting_get_timezone_list())
 		LTZ = base.rs_setting_get_timezone()
 		if LTZ not in ZL:
 			TZones.append(LTZ)
 		TZones = TZones + ZL
+		TZones.sort()
 		self.contentdata[id]["strTZ"] = tk.StringVar()
 		self.contentdata[id]["strTZ"].set(LTZ)
-		self.contentdata[id]["omTZ"] = ttk.OptionMenu(self.contentdata[id]["Settings"], self.contentdata[id]["strTZ"], command=self.cs_report_settings_update, *TZones)
+		self.contentdata[id]["omTZ"] = ttk.Combobox(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strTZ"])
 		self.contentdata[id]["omTZ"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[id]["omTZ"]['values'] = TZones
+		self.contentdata[id]["omTZ"].bind('<<ComboboxSelected>>', self.cs_report_settings_update)
 
 		rownum += 1
 		col_disp = 3
@@ -7271,11 +7459,14 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(9, "tkFont.families()", tkFont.families())
 		fontlst = list(tkFont.families())
 
-		Fonts = [None] + fontlst
+		Fonts = [""] + fontlst
+		Fonts.sort()
 		self.contentdata[id]["strFont"] = tk.StringVar()
-		self.contentdata[id]["omFont"] = ttk.OptionMenu(self.contentdata[id]["Settings"], self.contentdata[id]["strFont"], command=self.cs_report_settings_update, *Fonts)
+		self.contentdata[id]["omFont"] = ttk.Combobox(self.contentdata[id]["Settings"], textvariable=self.contentdata[id]["strFont"])
 		self.contentdata[id]["strFont"].set(base.rs_setting_get_font())
 		self.contentdata[id]["omFont"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[id]["omFont"]['values'] = Fonts
+		self.contentdata[id]["omFont"].bind('<<ComboboxSelected>>', self.cs_report_settings_update)
 
 		Fontsize = [None]
 		fs = 6
@@ -7350,7 +7541,19 @@ class ReporterGUI(tk.Frame):
 			changes += base.rs_setting_set("timeformat", self.contentdata[id]["strTF"].get())
 
 		if "strTZ" in self.contentdata[id]:
-			changes += base.rs_setting_set("timezone", self.contentdata[id]["strTZ"].get())
+			changed = base.rs_setting_set("timezone", self.contentdata[id]["strTZ"].get())
+			changes += changed
+			if changed:
+				# update the start and end time fields for new timezone
+				iST = base.rs_setting_get_starttime()
+				fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
+				self.contentdata[id]["strST"].set(fST)
+				iET = base.rs_setting_get_endtime()
+				fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
+				self.contentdata[id]["strET"].set(fET)
+
+				update_section_times = threading.Thread(target=self.cs_update_start_and_end_times(id, fST, fET))
+				update_section_times.start()
 
 		# strST
 		if "strST" in self.contentdata[id]:
@@ -7673,7 +7876,7 @@ class ReporterGUI(tk.Frame):
 				if ist > 0:
 					ios = ist - base.rs_setting_get_starttime()
 					base.debugmsg(5, "ios:", ios)
-					changes += base.report_item__set_int(id, "startoffset", ios)
+					changes += base.report_item_set_int(id, "startoffset", ios)
 
 			iST = base.rt_setting_get_starttime(id)
 			fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
@@ -7691,7 +7894,7 @@ class ReporterGUI(tk.Frame):
 				if iet > 0:
 					ios = base.rs_setting_get_endtime() - iet
 					base.debugmsg(5, "ios:", ios)
-					changes += base.report_item__set_int(id, "endoffset", ios)
+					changes += base.report_item_set_int(id, "endoffset", ios)
 
 			iET = base.rt_setting_get_endtime(id)
 			fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
@@ -8370,7 +8573,7 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[pid]["LFrame"], text="Data Type:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
 
-		DataTypes = [None, "Metric", "Result", "SQL"]
+		DataTypes = [None, "Metric", "Result", "Plan", "SQL"]
 		self.contentdata[idl]["strDT"] = tk.StringVar()
 		self.contentdata[idl]["omDT"] = ttk.OptionMenu(self.contentdata[pid]["LFrame"], self.contentdata[idl]["strDT"], command=self.cs_graph_switchdt, *DataTypes)
 		self.contentdata[idl]["strDT"].set(datatypel)
@@ -8394,7 +8597,6 @@ class ReporterGUI(tk.Frame):
 
 		# 		start time
 		if "strST" in self.contentdata[pid]:
-			pass
 			st = self.contentdata[pid]["strST"].get()
 			base.debugmsg(5, "st:", st)
 			if st != self.contentdata[pid]["fST"]:
@@ -8403,7 +8605,7 @@ class ReporterGUI(tk.Frame):
 				if ist > 0:
 					ios = ist - base.rs_setting_get_starttime()
 					base.debugmsg(5, "ios:", ios)
-					changes += base.report_item__set_int(pid, "startoffset", ios)
+					changes += base.report_item_set_int(pid, "startoffset", ios)
 
 			iST = base.rt_setting_get_starttime(pid)
 			fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
@@ -8412,7 +8614,6 @@ class ReporterGUI(tk.Frame):
 
 		# 		end time
 		if "strET" in self.contentdata[pid]:
-			pass
 			et = self.contentdata[pid]["strET"].get()
 			base.debugmsg(5, "et:", et)
 			if et != self.contentdata[pid]["fET"]:
@@ -8421,7 +8622,7 @@ class ReporterGUI(tk.Frame):
 				if iet > 0:
 					ios = base.rs_setting_get_endtime() - iet
 					base.debugmsg(5, "ios:", ios)
-					changes += base.report_item__set_int(pid, "endoffset", ios)
+					changes += base.report_item_set_int(pid, "endoffset", ios)
 
 			iET = base.rt_setting_get_endtime(pid)
 			fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
@@ -8539,13 +8740,22 @@ class ReporterGUI(tk.Frame):
 			value = self.contentdata[idr]["intAxsEn"].get()
 			changes += base.rt_graph_set_axisen(idr, value)
 
+		if "intSTot" in self.contentdata[idl]:
+			value = self.contentdata[idl]["intSTot"].get()
+			changes += base.report_item_set_int(idl, "ShowTotal", value)
+		if "intSTot" in self.contentdata[idr]:
+			value = self.contentdata[idr]["intSTot"].get()
+			changes += base.report_item_set_int(idr, "ShowTotal", value)
+
 		if "tSQL" in self.contentdata[idl]:
 			data = self.contentdata[idl]["tSQL"].get('0.0', tk.END).strip()
 			base.debugmsg(5, "data:", data)
 			changes += base.rt_graph_set_sql(idl, data)
 		else:
 			time.sleep(0.1)
-			changes += base.rt_graph_generate_sql(idl)
+			base.rt_graph_generate_sql(idl)
+			changes += 1
+
 		if "tSQL" in self.contentdata[idr]:
 			data = self.contentdata[idr]["tSQL"].get('0.0', tk.END).strip()
 			base.debugmsg(5, "data:", data)
@@ -8553,6 +8763,7 @@ class ReporterGUI(tk.Frame):
 		else:
 			time.sleep(0.1)
 			base.rt_graph_generate_sql(idr)
+			changes += 1
 
 		if changes > 0:
 			base.debugmsg(5, "content_preview id:", id)
@@ -8565,6 +8776,9 @@ class ReporterGUI(tk.Frame):
 		rownum = 0
 		id = self.sectionstree.focus()
 		base.debugmsg(5, "id:", id)
+
+		changes = 0
+
 		if _event is not None:
 			name = base.report_item_get_name(_event)
 			if name is not None:
@@ -8604,6 +8818,17 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[idl]["Frames"][datatypel].columnconfigure(99, weight=1)
 
 			# "Metric", "Result", "SQL"
+
+			if datatypel == "Plan":
+				rownum += 1
+				self.contentdata[idl]["lblSTot"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Show Total:")
+				self.contentdata[idl]["lblSTot"].grid(column=0, row=rownum, sticky="nsew")
+
+				# self.contentdata[idl]["Frames"][datatypel].columnconfigure(1, weight=1)
+				self.contentdata[idl]["Frames"][datatypel].columnconfigure(1, minsize=150)
+				self.contentdata[idl]["intSTot"] = tk.IntVar()
+				self.contentdata[idl]["chkSTot"] = ttk.Checkbutton(self.contentdata[idl]["Frames"][datatypel], variable=self.contentdata[idl]["intSTot"], command=self.cs_graph_update)
+				self.contentdata[idl]["chkSTot"].grid(column=1, row=rownum, sticky="nsew")
 
 			if datatypel == "Metric":
 				showmetricagents = 0
@@ -8743,8 +8968,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idl]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
 			if datatypel == "SQL":
-				# sql = base.rt_table_get_sql(id)
 				rownum += 1
+				# sql = base.rt_table_get_sql(id)
 				self.contentdata[idl]["lblSQL"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="SQL:")
 				self.contentdata[idl]["lblSQL"].grid(column=0, row=rownum, sticky="nsew")
 
@@ -8764,6 +8989,17 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[idr]["Frames"][datatyper].columnconfigure(99, weight=1)
 
 			# "Metric", "Result", "SQL"
+
+			if datatyper == "Plan":
+				rownum += 1
+				self.contentdata[idr]["lblSTot"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Show Total:")
+				self.contentdata[idr]["lblSTot"].grid(column=0, row=rownum, sticky="nsew")
+
+				# self.contentdata[idr]["Frames"][datatyper].columnconfigure(1, weight=1)
+				self.contentdata[idr]["Frames"][datatyper].columnconfigure(1, minsize=150)
+				self.contentdata[idr]["intSTot"] = tk.IntVar()
+				self.contentdata[idr]["chkSTot"] = ttk.Checkbutton(self.contentdata[idr]["Frames"][datatyper], variable=self.contentdata[idr]["intSTot"], command=self.cs_graph_update)
+				self.contentdata[idr]["chkSTot"].grid(column=1, row=rownum, sticky="nsew")
 
 			if datatyper == "Metric":
 				showmetricagents = 0
@@ -8903,8 +9139,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idr]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
 			if datatyper == "SQL":
-				# sql = base.rt_table_get_sql(id)
 				rownum += 1
+				# sql = base.rt_table_get_sql(id)
 				self.contentdata[idr]["lblSQL"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="SQL:")
 				self.contentdata[idr]["lblSQL"].grid(column=0, row=rownum, sticky="nsew")
 
@@ -8977,9 +9213,20 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[idr]["FNType"].set(base.rt_table_get_fn(idr))
 			self.contentdata[idr]["FPattern"].set(base.rt_table_get_fp(idr))
 
+		if datatypel == "Plan":
+			self.contentdata[idl]["intSTot"].set(base.report_item_get_int(idl, "ShowTotal"))
+			changes += 1
+
+		if datatyper == "Plan":
+			self.contentdata[idr]["intSTot"].set(base.report_item_get_int(idr, "ShowTotal"))
+			changes += 1
+
 		# Show
 		self.contentdata[idl]["Frames"][datatypel].grid(column=0, row=self.contentdata[id]["DTFrame"], columnspan=100, sticky="nsew")
 		self.contentdata[idr]["Frames"][datatyper].grid(column=0, row=self.contentdata[id]["DTFrame"], columnspan=100, sticky="nsew")
+
+		if changes > 0:
+			self.cs_graph_update(_event)
 
 	#
 	# Settings	-	Error Details
@@ -9191,7 +9438,7 @@ class ReporterGUI(tk.Frame):
 				if ist > 0:
 					ios = ist - base.rs_setting_get_starttime()
 					base.debugmsg(5, "ios:", ios)
-					changes += base.report_item__set_int(id, "startoffset", ios)
+					changes += base.report_item_set_int(id, "startoffset", ios)
 
 			iST = base.rt_setting_get_starttime(id)
 			fST = "{} {}".format(base.report_formatdate(iST), base.report_formattime(iST))
@@ -9208,7 +9455,7 @@ class ReporterGUI(tk.Frame):
 				if iet > 0:
 					ios = base.rs_setting_get_endtime() - iet
 					base.debugmsg(5, "ios:", ios)
-					changes += base.report_item__set_int(id, "endoffset", ios)
+					changes += base.report_item_set_int(id, "endoffset", ios)
 
 			iET = base.rt_setting_get_endtime(id)
 			fET = "{} {}".format(base.report_formatdate(iET), base.report_formattime(iET))
@@ -9260,6 +9507,18 @@ class ReporterGUI(tk.Frame):
 			# self.content_preview(id)
 			cp = threading.Thread(target=lambda: self.content_preview(id))
 			cp.start()
+
+	def cs_update_start_and_end_times(self, id, fST, fET):
+		children = base.report_get_order(id)
+
+		for child in children:
+			if child not in self.contentdata:
+				break
+			if "strST" in self.contentdata[child] and "strET" in self.contentdata[child]:
+				base.debugmsg(5, "section id with strST and strET to update:", id)
+				self.contentdata[child]["strST"].set(fST)
+				self.contentdata[child]["strET"].set(fET)
+			self.cs_update_start_and_end_times(child, fST, fET)
 
 	#
 	# Preview
@@ -9643,6 +9902,8 @@ class ReporterGUI(tk.Frame):
 		datatypel = base.rt_graph_get_dt(idl)
 		datatyper = base.rt_graph_get_dt(idr)
 
+		tz = zoneinfo.ZoneInfo(base.rs_setting_get_timezone())
+
 		if datatypel == "SQL":
 			sqll = base.rt_graph_get_sql(idl)
 		else:
@@ -9721,6 +9982,11 @@ class ReporterGUI(tk.Frame):
 					# base.debugmsg(9, "Waiting for gdata for:", key)
 
 				gdata = base.dbqueue["ReadResult"][key]
+
+				if datatypel == "Plan":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_plan(idl, gdata)
+
 				base.debugmsg(9, "gdata:", gdata)
 
 				for row in gdata:
@@ -9739,7 +10005,7 @@ class ReporterGUI(tk.Frame):
 							self.contentdata[id]["graphdata"][name]["objTime"] = []
 							self.contentdata[id]["graphdata"][name]["Values"] = []
 
-						self.contentdata[id]["graphdata"][name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						self.contentdata[id]["graphdata"][name]["objTime"].append(datetime.fromtimestamp(row["Time"], tz))
 						self.contentdata[id]["graphdata"][name]["Values"].append(base.rt_graph_floatval(row["Value"]))
 					else:
 						break
@@ -9755,6 +10021,11 @@ class ReporterGUI(tk.Frame):
 					# base.debugmsg(9, "Waiting for gdata for:", key)
 
 				gdata = base.dbqueue["ReadResult"][key]
+
+				if datatyper == "Plan":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_plan(idr, gdata)
+
 				base.debugmsg(9, "gdata:", gdata)
 
 				for row in gdata:
@@ -9773,7 +10044,7 @@ class ReporterGUI(tk.Frame):
 							self.contentdata[id]["graphdata"][name]["objTime"] = []
 							self.contentdata[id]["graphdata"][name]["Values"] = []
 
-						self.contentdata[id]["graphdata"][name]["objTime"].append(datetime.fromtimestamp(row["Time"]))
+						self.contentdata[id]["graphdata"][name]["objTime"].append(datetime.fromtimestamp(row["Time"], tz))
 						self.contentdata[id]["graphdata"][name]["Values"].append(base.rt_graph_floatval(row["Value"]))
 					else:
 						break

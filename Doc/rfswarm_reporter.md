@@ -154,9 +154,17 @@ The data graph section is used for displaying graphs of test results and other m
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Settings_Type.png)
 
 The data sources for the graphs can be:
+- [Plan](#data-graph-plan)
 - [Metric](#data-graph-metric)
 - [Result](#data-graph-result)
 - [Custom SQL](#data-graph-sql)
+
+##### Data Graph Plan
+The Plan Data Graph allows you to include the graph from the plan tab of the RFSwarm Manager in your test report.
+> ![Image](Images/MacOS_Reporter_v1.4.0_DataTable_Plan.png)
+
+**Show Total** - If enabled, shows a line for the total number of planned robots. The image below shows an example with Show Total enabled.
+> ![Image](Images/MacOS_Reporter_v1.4.0_DataTable_PlanPreview.png)
 
 ##### Data Graph Metric
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric.png)
