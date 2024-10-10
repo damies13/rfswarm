@@ -173,5 +173,134 @@ Check Application Icon or Desktop Shortcut in GUI
 
 	[Teardown]	Type 	KEY.ESC 	KEY.ESC 	KEY.ESC
 
+Verify Plan Graph - No Total
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #140
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	Make Clipboard Not None
+	${testdata}= 	Set Variable    Issue-#140
+	${resultdata}= 	Set Variable    20230728_130340_Odoo-demo
+	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
+	Should Exist	${basefolder}
+	Log to console 	basefolder: ${basefolder} 	console=True
+	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
+	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
+	Should Exist	${resultfolder}
+	Log 	resultfolder: ${resultfolder} 	console=True
+	Should Not Exist	${resultfile}
+
+	# pass a default ini file with extended height to ensure that default values are used
+	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini
+	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
+	Wait For Status 	PreviewLoaded
+
+	Click Section			Report
+
+	Click Button 			AddSection
+
+	Click To The Below Of Image 	reporter_${platform}_label_sectionname.png 	20
+	Type 	Issue #140
+	Click Button 			OK
+	Take A Screenshot
+	Click Section			Issue#140
+
+	Select Field With Label 	Type
+
+	# Take A Screenshot
+	Select Option 	DataGraph
+	# Take A Screenshot
+
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
+
+	# Take A Screenshot
+	Select Field With Label 	DataType
+
+	# Take A Screenshot
+	Select Option 	Plan
+
+	# Take A Screenshot
+	Wait For Status 	PreviewLoaded
+
+	# Take A Screenshot
+	Click Tab 	 Preview
+
+	# Take A Screenshot
+
+	Set Confidence		0.7
+	Locate 	reporter_${platform}_graph_plannototal.png
+	Set Confidence		0.9
+
+
+	[Teardown]	Run Keywords
+	...    Set Confidence 	0.9 	AND
+	...    Close GUI 		AND
+	...    Remove File 		${resultfile}
+
+
+Verify Plan Graph - With Total
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #140
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	Make Clipboard Not None
+	${testdata}= 	Set Variable    Issue-#140
+	${resultdata}= 	Set Variable    20230728_130340_Odoo-demo
+	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
+	Should Exist	${basefolder}
+	Log to console 	basefolder: ${basefolder} 	console=True
+	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
+	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
+	Should Exist	${resultfolder}
+	Log 	resultfolder: ${resultfolder} 	console=True
+	Should Not Exist	${resultfile}
+
+	# pass a default ini file with extended height to ensure that default values are used
+	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini
+	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
+	Wait For Status 	PreviewLoaded
+
+	Click Section			Report
+
+	Click Button 			AddSection
+
+	Click To The Below Of Image 	reporter_${platform}_label_sectionname.png 	20
+	Type 	Issue #140
+	Click Button 			OK
+	# Take A Screenshot
+	Click Section			Issue#140
+
+	Select Field With Label 	Type
+
+	# Take A Screenshot
+	Select Option 	DataGraph
+	# Take A Screenshot
+
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
+
+	# Take A Screenshot
+	Select Field With Label 	DataType
+
+	# Take A Screenshot
+	Select Option 	Plan
+
+	Wait For Status 	PreviewLoaded
+
+	# Take A Screenshot
+	Select Field With Label 	ShowTotal
+
+	# Take A Screenshot
+	Wait For Status 	PreviewLoaded
+
+	# Take A Screenshot
+	Click Tab 	 Preview
+
+	# Take A Screenshot
+
+	Set Confidence		0.7
+	Locate 	reporter_${platform}_graph_plantotal.png
+	Set Confidence		0.9
+
+	[Teardown]	Run Keywords
+	...    Set Confidence 	0.9 	AND
+	...    Close GUI 		AND
+	...    Remove File 		${resultfile}
+
 
 #

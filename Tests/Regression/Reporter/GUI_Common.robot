@@ -349,7 +349,10 @@ Close GUI windows
 	# Press Combination 	Key.esc
 	# Press Combination 	x 	Key.ctrl
 	# Press Combination 	Key.f4 	Key.alt
+	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
+	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
 	Click Image		reporter_${platform}_button_closewindow.png
+	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
 	Take A Screenshot
 	Sleep 	0.5
 	End Process If Still Running
@@ -357,7 +360,10 @@ Close GUI windows
 Close GUI ubuntu
 	# Press Combination 	Key.esc
 	# Press Combination 	x 	Key.ctrl
+	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
+	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
 	Click Image		reporter_${platform}_button_closewindow.png
+	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
 	Take A Screenshot
 	Sleep 	0.5
 	End Process If Still Running
@@ -366,7 +372,10 @@ Close GUI macos
 	# Press Combination 	Key.esc
 	# Press Combination 	q 	Key.command
 	# Click Image		reporter_${platform}_menu_python3.png
+	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
+	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
 	Click Image		reporter_${platform}_button_closewindow.png
+	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
 	Take A Screenshot
 	Sleep 	0.5
 	End Process If Still Running
@@ -408,7 +417,7 @@ Get Reporter Default Save Path
 
 Get Reporter INI Location
 	${location}=	Get Reporter Default Save Path
-	RETURN	${location}${/}RFSwarmReporter.ini
+	RETURN	${location}RFSwarmReporter.ini
 
 Get Reporter INI Data
 	${location}=	Get Reporter INI Location

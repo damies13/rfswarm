@@ -171,7 +171,7 @@ New Data Table Section
 
 	Select Field With Label 	ShowGraphColours
 
-	Select Field With Label 	DataType
+	Select Field With Label 	DataTypeWide
 
 	Select Option 	Result
 

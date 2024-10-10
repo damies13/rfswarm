@@ -92,6 +92,13 @@ jobs:
       - name: "Verify tesseract"
         run: tesseract -v
 
+        # https://github.com/actions/runner-images/issues/2935
+      - name: "Windows Set Display Resolution"
+        if: ${{ matrix.platform == 'windows-latest' }}
+        shell: pwsh
+        run: |
+          Set-DisplayResolution -Width 1920 -Height 1080 -Force
+
       - name: Update Robot Tag
         shell: python
         run: |
