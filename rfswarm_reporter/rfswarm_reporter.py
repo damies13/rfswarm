@@ -997,6 +997,24 @@ class ReporterBase():
 		changes = base.report_item_set_value(id, name, str(value))
 		return changes
 
+	def report_item_get_bool_def0(self, id, name):
+		value = base.report_item_get_int(id, name)
+		if value < 0:
+			return 0
+		else:
+			return int(value)
+
+	def report_item_get_bool_def1(self, id, name):
+		value = base.report_item_get_int(id, name)
+		if value < 0:
+			return 1
+		else:
+			return int(value)
+
+	def report_item_set_bool(self, id, name, value):
+		changes = base.report_item_set_int(id, name, value)
+		return changes
+
 	#
 	# Report Item Type: contents
 	#
@@ -4169,9 +4187,11 @@ class ReporterCore:
 					th = etree.SubElement(tr, 'th')
 				for col in cols:
 					if col not in ["Colour"]:
-						dispname = base.rt_table_get_colname(id, col)
-						th = etree.SubElement(tr, 'th')
-						th.text = dispname.strip()
+						show = base.report_item_get_bool_def1(id, base.rt_table_ini_colname(f"{col} Show"))
+						if show:
+							dispname = base.rt_table_get_colname(id, col)
+							th = etree.SubElement(tr, 'th')
+							th.text = dispname.strip()
 
 				# table rows
 				for row in tdata:
@@ -4198,11 +4218,13 @@ class ReporterCore:
 					# for val in vals:
 					for col in cols:
 						if col not in ["Colour"]:
-							td = etree.SubElement(tr, 'td')
-							val = str(row[col]).strip()
-							val = base.illegal_xml_chars_re.sub('', val)
-							base.debugmsg(8, "val:", val)
-							td.text = val
+							show = base.report_item_get_bool_def1(id, base.rt_table_ini_colname(f"{col} Show"))
+							if show:
+								td = etree.SubElement(tr, 'td')
+								val = str(row[col]).strip()
+								val = base.illegal_xml_chars_re.sub('', val)
+								base.debugmsg(8, "val:", val)
+								td.text = val
 
 	def xhtml_sections_errors(self, elmt, id):
 		base.debugmsg(8, "id:", id)
@@ -5024,7 +5046,8 @@ class ReporterCore:
 				cols = list(tdata[0].keys())
 				base.debugmsg(7, "cols:", cols)
 
-				numcols = len(cols)
+				# numcols = len(cols)
+				numcols = 1
 				cellcol = 0
 				cellrow = 0
 				if colours:
@@ -5046,15 +5069,19 @@ class ReporterCore:
 				cw = 5
 				for col in cols:
 					if col not in ["Colour"]:
-						dispname = base.rt_table_get_colname(id, col)
-						table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
-						table.rows[cellrow].cells[cellcol].paragraphs[0].text = dispname.strip()
-						table.columns[cellcol].width = Cm(cw)
-						if cw > 2:
-							cw = 1.7
-						if cellcol > 5:
-							cw = 1.1
-						cellcol += 1
+						show = base.report_item_get_bool_def1(id, base.rt_table_ini_colname(f"{col} Show"))
+						if show:
+							if cellcol > 0:
+								table.add_column(width=1)
+							dispname = base.rt_table_get_colname(id, col)
+							table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+							table.rows[cellrow].cells[cellcol].paragraphs[0].text = dispname.strip()
+							table.columns[cellcol].width = Cm(cw)
+							if cw > 2:
+								cw = 1.7
+							if cellcol > 5:
+								cw = 1.1
+							cellcol += 1
 
 				# table rows
 				for row in tdata:
@@ -5101,21 +5128,23 @@ class ReporterCore:
 					# for val in vals:
 					for col in cols:
 						if col not in ["Colour"]:
-							val = str(row[col]).strip()
-							val = base.illegal_xml_chars_re.sub('', val)
-							base.debugmsg(8, "val:", val)
+							show = base.report_item_get_bool_def1(id, base.rt_table_ini_colname(f"{col} Show"))
+							if show:
+								val = str(row[col]).strip()
+								val = base.illegal_xml_chars_re.sub('', val)
+								base.debugmsg(8, "val:", val)
 
-							# table.rows[cellrow].cells[cellcol].text = str(val)
-							# table.rows[cellrow].cells[cellcol].add_paragraph(text=str(val), style="Table Cell")
-							table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-							table.rows[cellrow].cells[cellcol].paragraphs[0].text = val
+								# table.rows[cellrow].cells[cellcol].text = str(val)
+								# table.rows[cellrow].cells[cellcol].add_paragraph(text=str(val), style="Table Cell")
+								table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+								table.rows[cellrow].cells[cellcol].paragraphs[0].text = val
 
-							tcw = int(table.columns[cellcol].width.cm) + 1
-							# base.debugmsg(5, "tcw:", tcw)
-							if tcw > 5:
-								table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+								tcw = int(table.columns[cellcol].width.cm) + 1
+								# base.debugmsg(5, "tcw:", tcw)
+								if tcw > 5:
+									table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 
-							cellcol += 1
+								cellcol += 1
 
 				table.autofit = True
 				# table.style.paragraph_format.left_indent = Cm(-0.50)
@@ -6150,18 +6179,19 @@ class ReporterCore:
 
 				for col in cols:
 					if col not in ["Colour"]:
+						show = base.report_item_get_bool_def1(id, base.rt_table_ini_colname(f"{col} Show"))
+						if show:
+							dispname = base.rt_table_get_colname(id, col)
 
-						dispname = base.rt_table_get_colname(id, col)
+							base.debugmsg(8, "col:", col, "	cellcol:", cellcol, "	rownum:", rownum)
+							hcell = ws.cell(column=cellcol, row=rownum, value=dispname.strip())
+							hcell.style = "Table Heading"
 
-						base.debugmsg(8, "col:", col, "	cellcol:", cellcol, "	rownum:", rownum)
-						hcell = ws.cell(column=cellcol, row=rownum, value=dispname.strip())
-						hcell.style = "Table Heading"
+							neww = len(str(col.strip())) * 1.3
+							base.debugmsg(9, "neww:", neww)
+							ws.column_dimensions[hcell.column_letter].width = neww
 
-						neww = len(str(col.strip())) * 1.3
-						base.debugmsg(9, "neww:", neww)
-						ws.column_dimensions[hcell.column_letter].width = neww
-
-						cellcol += 1
+							cellcol += 1
 
 				# table rows
 				for row in tdata:
@@ -6193,20 +6223,22 @@ class ReporterCore:
 					# for val in vals:
 					for col in cols:
 						if col not in ["Colour"]:
-							val = str(row[col]).strip()
-							val = base.illegal_xml_chars_re.sub('', val)
-							base.debugmsg(8, "val:", val)
+							show = base.report_item_get_bool_def1(id, base.rt_table_ini_colname(f"{col} Show"))
+							if show:
+								val = str(row[col]).strip()
+								val = base.illegal_xml_chars_re.sub('', val)
+								base.debugmsg(8, "val:", val)
 
-							dcell = ws.cell(column=cellcol, row=rownum, value=val)
-							dcell.style = "Table Data"
+								dcell = ws.cell(column=cellcol, row=rownum, value=val)
+								dcell.style = "Table Data"
 
-							currw = ws.column_dimensions[dcell.column_letter].width
-							base.debugmsg(9, "currw:", currw, "	len(val):", len(str(val)))
-							neww = max(currw, len(str(val)))
-							base.debugmsg(8, "neww:", neww)
-							ws.column_dimensions[dcell.column_letter].width = neww
+								currw = ws.column_dimensions[dcell.column_letter].width
+								base.debugmsg(9, "currw:", currw, "	len(val):", len(str(val)))
+								neww = max(currw, len(str(val)))
+								base.debugmsg(8, "neww:", neww)
+								ws.column_dimensions[dcell.column_letter].width = neww
 
-							cellcol += 1
+								cellcol += 1
 
 		rownum += 2
 		self.xlsx_select_cell(1, rownum)
@@ -8099,6 +8131,12 @@ class ReporterGUI(tk.Frame):
 				value = self.contentdata[id]["renamecolumns"][colname].get()
 				changes += base.rt_table_set_colname(id, colname, value)
 
+				value = self.contentdata[id]["renamecolumns"][f"{colname} Show"].get()
+				changes += base.report_item_set_bool(id, base.rt_table_ini_colname(f"{colname} Show"), value)
+
+				if datatype == "Plan":
+					pass
+
 		base.debugmsg(5, "content_preview id:", id)
 		# self.content_preview(id)
 		base.debugmsg(5, "changes:", changes)
@@ -8438,6 +8476,13 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[id]["lbldispnme"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Display Name")
 			self.contentdata[id]["lbldispnme"].grid(column=1, row=rownum, sticky="nsew")
 
+			self.contentdata[id]["lblshowcol"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Show Column")
+			self.contentdata[id]["lblshowcol"].grid(column=2, row=rownum, sticky="nsew")
+
+			if datatype == "Plan":
+				self.contentdata[id]["lblcolopt"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Options")
+				self.contentdata[id]["lblcolopt"].grid(column=3, row=rownum, sticky="nsew")
+
 			self.contentdata[id]["renamecolumns"] = {}
 			self.contentdata[id]["renamecolumns"]["startrow"] = rownum + 1
 			self.contentdata[id]["renamecolumns"]["rownum"] = rownum + 1
@@ -8570,10 +8615,13 @@ class ReporterGUI(tk.Frame):
 
 	def cs_datatable_add_renamecol(self, id, colname):
 		base.debugmsg(5, "id:", id, "	colname:", colname)
+		datatype = base.rt_table_get_dt(id)
 
 		if "renamecolumns" in self.contentdata[id] and "renamecols" in self.contentdata[id]["Frames"]:
 			collabel = "lbl_{}".format(colname)
 			colinput = "inp_{}".format(colname)
+			colshow = "show_{}".format(colname)
+			colopt = "opt_{}".format(colname)
 			rownum = self.contentdata[id]["renamecolumns"]["rownum"]
 			if colname not in self.contentdata[id]["renamecolumns"]["colnames"]:
 				self.contentdata[id]["renamecolumns"]["rownum"] += 1
@@ -8591,6 +8639,16 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["renamecolumns"][colinput].bind('<FocusOut>', self.cs_datatable_update)
 
 				self.contentdata[id]["renamecolumns"][colname].set(base.rt_table_get_colname(id, colname))
+
+				self.contentdata[id]["renamecolumns"][f"{colname} Show"] = tk.IntVar()
+				self.contentdata[id]["renamecolumns"][colshow] = ttk.Checkbutton(self.contentdata[id]["Frames"]["renamecols"], variable=self.contentdata[id]["renamecolumns"][f"{colname} Show"], command=self.cs_datatable_update)
+				self.contentdata[id]["renamecolumns"][colshow].grid(column=2, row=rownum, sticky="nsew")
+				self.contentdata[id]["renamecolumns"][f"{colname} Show"].set(base.report_item_get_bool_def1(id, base.rt_table_ini_colname(f"{colname} Show")))
+
+				if datatype == "Plan":
+					if colname == "Script":
+						pass
+						# add option ["File", "Path"]
 
 	#
 	# Settings	-	Graph
@@ -10269,12 +10327,14 @@ class ReporterGUI(tk.Frame):
 				colnum = 1 + colours
 				for col in cols:
 					if col not in ["Colour"]:
-						cellname = "h_{}".format(col)
-						base.debugmsg(9, "cellname:", cellname)
-						dispname = base.rt_table_get_colname(id, col)
-						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{} ".format(dispname.strip()), style='Report.THead.TLabel')
-						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-						colnum += 1
+						show = base.report_item_get_bool_def1(id, base.rt_table_ini_colname(f"{col} Show"))
+						if show:
+							cellname = "h_{}".format(col)
+							base.debugmsg(9, "cellname:", cellname)
+							dispname = base.rt_table_get_colname(id, col)
+							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{} ".format(dispname.strip()), style='Report.THead.TLabel')
+							self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+							colnum += 1
 				i = 0
 				for row in tdata:
 					i += 1
@@ -10300,11 +10360,13 @@ class ReporterGUI(tk.Frame):
 
 					for col in cols:
 						if col not in ["Colour"]:
-							colnum += 1
-							cellname = "{}_{}".format(i, col)
-							base.debugmsg(9, "cellname:", cellname)
-							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(row[col]), style='Report.TBody.TLabel')
-							self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+							show = base.report_item_get_bool_def1(id, base.rt_table_ini_colname(f"{col} Show"))
+							if show:
+								colnum += 1
+								cellname = "{}_{}".format(i, col)
+								base.debugmsg(9, "cellname:", cellname)
+								self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(row[col]), style='Report.TBody.TLabel')
+								self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 	def cp_errors(self, id):
 		base.debugmsg(5, "id:", id)
