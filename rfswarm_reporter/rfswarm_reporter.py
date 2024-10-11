@@ -306,6 +306,50 @@ class ReporterBase():
 			self.debugmsg(1, "with error: ", e)
 			return False
 
+	def sec2hms(self, sec):
+		base.debugmsg(6, "type(sec):", type(sec), sec)
+		if isinstance(sec, time.struct_time):
+			sec = time.mktime(sec)
+			base.debugmsg(6, "type(sec):", type(sec), sec)
+		h = int(sec / 3600)
+		m = int((sec - h * 3600) / 60)
+		s = int((sec - h * 3600) - m * 60)
+		hms = "{:02}:{:02}:{:02}".format(h, m, s)
+		return hms
+
+	def hms2sec(self, hms):
+		sec = 0
+		arrhms = str(hms).split(":")
+		base.debugmsg(6, "arrhms:", arrhms)
+		if len(arrhms) == 3:
+			if len(arrhms[0]) > 0:
+				h = int(arrhms[0])
+			else:
+				h = 0
+			if len(arrhms[1]) > 0:
+				m = int(arrhms[1])
+			else:
+				m = 0
+			if len(arrhms[2]) > 0:
+				s = int(arrhms[2])
+			else:
+				s = 0
+			sec = (h * 3600) + (m * 60) + s
+		if len(arrhms) == 2:
+			h = 0
+			if len(arrhms[0]) > 0:
+				m = int(arrhms[0])
+			else:
+				m = 0
+			if len(arrhms[1]) > 0:
+				s = int(arrhms[1])
+			else:
+				s = 0
+			sec = (h * 3600) + (m * 60) + s
+		if len(arrhms) == 1:
+			sec = int(arrhms[0])
+		return sec
+
 	#
 	# Template Functions
 	#
@@ -1404,9 +1448,6 @@ class ReporterBase():
 			sql += "ORDER BY MetricTime "
 
 		if DataType == "Plan":
-			# MType = self.rt_table_get_mt(id)
-			# PM = self.rt_table_get_pm(id)
-
 			sql = "SELECT "
 			sql += "md1.* "
 			sql += ", md0.SecondaryMetric as [File] "
@@ -1461,6 +1502,22 @@ class ReporterBase():
 
 		starttime = base.rt_setting_get_starttime(id)
 		endtime = base.rt_setting_get_endtime(id)
+
+		if DataType == "Plan":
+			sql = "SELECT "
+			sql += "md1.* "
+			sql += ", md0.SecondaryMetric as [File] "
+			sql += ", fp0.SecondaryMetric as [FilePath] "
+			# sql += ", concat(fp0.SecondaryMetric, " ", md0.MetricValue ) as [ColourKey] "
+			sql += "FROM MetricData as md0 "
+			sql += "LEFT JOIN MetricData as fp0 "
+			sql += "ON fp0.MetricValue = md0.MetricValue "
+			sql += "AND fp0.MetricType = 'Scenario' "
+			sql += "AND fp0.PrimaryMetric like 'Local_Path_%' "
+			sql += "LEFT JOIN MetricData as md1 "
+			sql += "ON md1.SecondaryMetric = md0.MetricValue "
+			sql += "AND md1.MetricType = 'Scenario' "
+			sql += "WHERE md0.MetricType = 'Scenario' AND md0.PrimaryMetric like 'Test_%' "
 
 		if DataType == "Result":
 			RType = self.rt_table_get_rt(id)
@@ -1739,19 +1796,6 @@ class ReporterBase():
 					i += 1
 
 		if DataType == "ResultSummary":
-			# SELECT
-			# 	rs.Name
-			# 	, rs.Min
-			# 	, rs.Average
-			# 	, rs.StDev
-			# 	, rs.[%ile_Value] '90 %ile'
-			# 	, rs.Max
-			# 	, rs.Pass
-			# 	, rs.Fail
-			# 	, rs.Other
-			# FROM ResultSummary rs
-			# WHERE rs.Name not like '%<%'
-
 			EnFA = self.rt_table_get_enfa(id)
 			FAType = self.rt_table_get_fa(id)
 			FNType = self.rt_table_get_fn(id)
@@ -2907,6 +2951,62 @@ class ReporterBase():
 				rowout["Value"] = robots
 				rowout["Name"] = "Total"
 				dataout.append(rowout)
+
+		base.debugmsg(5, "dataout:", dataout)
+		return dataout
+
+	def table_postprocess_data_plan(self, id, datain):
+		base.debugmsg(5, "datain:", datain)
+		# [
+		# 	{'PrimaryMetric': 'Delay_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '0', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Ramp_Up_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '20', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Robots_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '30', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Run_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '60', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'}
+		# ]
+		# 	 Index		Robots		Delay  		RampUp 		Run		Script		Test	Settings
+		dataout = []
+		data = {}
+		totaldata = {}
+		for rowin in datain:
+			base.debugmsg(5, "rowin:", rowin)
+			if 'PrimaryMetric' in rowin and "_" in rowin['PrimaryMetric']:
+				key, index = rowin['PrimaryMetric'].rsplit("_", 1)
+				base.debugmsg(5, "key:", key, "	index:", index)
+				if index not in data:
+					data[index] = {}
+				if key == "Delay":
+					data[index]["Index"] = index
+					data[index]["Delay"] = int(rowin['MetricValue'])
+					data[index]["Colour"] = rowin['SecondaryMetric'] + " " + rowin['FilePath']
+					data[index]["Script"] = rowin['File']
+					data[index]["ScriptPath"] = rowin['FilePath']
+					data[index]["Test"] = rowin['SecondaryMetric']
+
+				if key == "Ramp_Up":
+					data[index]["Ramp Up"] = int(rowin['MetricValue'])
+				if key == "Robots":
+					data[index]["Robots"] = int(rowin['MetricValue'])
+				if key == "Run":
+					data[index]["Run"] = int(rowin['MetricValue'])
+
+			else:
+				base.debugmsg(5, "Unexpected data in rowin:", rowin)
+
+		for index in data.keys():
+			base.debugmsg(5, "index:", index, data[index])
+
+			datarow = {}
+			# 	 Index		Robots		Delay  		RampUp 		Run		Script		Test	Settings
+			datarow["Colour"] = data[index]["Colour"]
+			datarow["Index"] = data[index]["Index"]
+			datarow["Robots"] = data[index]["Robots"]
+			datarow["Delay"] = base.sec2hms(data[index]["Delay"])
+			datarow["Ramp Up"] = base.sec2hms(data[index]["Ramp Up"])
+			datarow["Run"] = base.sec2hms(data[index]["Run"])
+			datarow["Script"] = data[index]["Script"]
+			datarow["Test"] = data[index]["Test"]
+
+			dataout.append(datarow)
 
 		base.debugmsg(5, "dataout:", dataout)
 		return dataout
@@ -7962,6 +8062,9 @@ class ReporterGUI(tk.Frame):
 
 			base.debugmsg(8, "datatype:", datatype)
 
+			if datatype == "Plan":
+				self.cs_datatable_update_plan(id)
+
 			if datatype == "Metric":
 				self.cs_datatable_update_metrics(id)
 
@@ -8019,6 +8122,9 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["omFA"].set_menu(*self.contentdata[id]["FATypes"])
 			except Exception as e:
 				base.debugmsg(5, "e:", e)
+
+	def cs_datatable_update_plan(self, id):
+		pass
 
 	def cs_datatable_update_metrics(self, id):
 		base.debugmsg(5, "id:", id)
@@ -8290,7 +8396,6 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["inpFP"].bind('<FocusOut>', self.cs_datatable_update)
 
 			if datatype == "SQL":
-				# sql = base.rt_table_get_sql(id)
 				rownum += 1
 				self.contentdata[id]["lblSQL"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="SQL:")
 				self.contentdata[id]["lblSQL"].grid(column=0, row=rownum, sticky="nsew")
@@ -8392,7 +8497,8 @@ class ReporterGUI(tk.Frame):
 				sql = base.rt_table_generate_sql(id)
 				if len(sql.strip()) < 1:
 					return None
-				sql += " LIMIT 1 "
+				if datatype not in ["Plan"]:
+					sql += " LIMIT 1 "
 
 			base.debugmsg(5, "sql:", sql)
 			key = "{}_{}_{}".format(id, base.report_item_get_changed(id), datetime.now().timestamp())
@@ -8409,6 +8515,9 @@ class ReporterGUI(tk.Frame):
 				time.sleep(0.1)
 
 			tdata = base.dbqueue["ReadResult"][key]
+			if datatype == "Plan":
+				base.debugmsg(9, "tdata before:", tdata)
+				tdata = base.table_postprocess_data_plan(id, tdata)
 			base.debugmsg(8, "tdata:", tdata)
 
 			if len(tdata) > 0:
@@ -8797,13 +8906,16 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[idr]["Frames"] = {}
 		# Forget
 		for frame in self.contentdata[id]["Frames"].keys():
-			self.contentdata[id]["Frames"][frame].grid_forget()
+			if frame in self.contentdata[id]["Frames"]:
+				self.contentdata[id]["Frames"][frame].grid_forget()
 			self.contentdata[id]["Frames"] = {}
 		for frame in self.contentdata[idl]["Frames"].keys():
-			self.contentdata[idl]["Frames"][frame].grid_forget()
+			if frame in self.contentdata[id]["Frames"]:
+				self.contentdata[idl]["Frames"][frame].grid_forget()
 			self.contentdata[idl]["Frames"] = {}
 		for frame in self.contentdata[idr]["Frames"].keys():
-			self.contentdata[idr]["Frames"][frame].grid_forget()
+			if frame in self.contentdata[id]["Frames"]:
+				self.contentdata[idr]["Frames"][frame].grid_forget()
 			self.contentdata[idr]["Frames"] = {}
 
 		# Construct
@@ -10127,6 +10239,10 @@ class ReporterGUI(tk.Frame):
 				time.sleep(0.1)
 
 			tdata = base.dbqueue["ReadResult"][key]
+			# table_postprocess_data_plan
+			if datatype == "Plan":
+				base.debugmsg(9, "tdata before:", tdata)
+				tdata = base.table_postprocess_data_plan(id, tdata)
 			base.debugmsg(8, "tdata:", tdata)
 
 			# self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text=notetxt)
