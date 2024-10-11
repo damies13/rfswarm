@@ -58,10 +58,10 @@ Set Platform By Tag
 
 Show Log
 	[Arguments]		${filename}
-	Log 		${\n}-----${filename}----- 		console=True
+	Log 		${\n}--VVV--${filename}--VVV-- 		console=True
 	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
 	Log 		${filedata} 		console=True
-	Log 		-----${filename}-----${\n} 		console=True
+	Log 		--ɅɅɅ--${filename}--ɅɅɅ--${\n} 		console=True
 	RETURN 		${filedata}
 
 Read Log
