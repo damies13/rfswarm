@@ -58,10 +58,10 @@ Set Platform By Tag
 
 Show Log
 	[Arguments]		${filename}
-	Log to console 	${\n}-----${filename}-----
+	Log to console 	${\n}--VVV--${filename}--VVV--
 	${filedata}= 	Get File 	${filename}
 	Log 	${filedata} 	console=True
-	Log to console 	-----${filename}-----${\n}
+	Log to console 	--ɅɅɅ--${filename}--ɅɅɅ--${\n}
 
 Run Agent
 	[Arguments]		${options}=None
