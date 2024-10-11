@@ -4155,6 +4155,9 @@ class ReporterCore:
 				time.sleep(0.1)
 
 			tdata = base.dbqueue["ReadResult"][key]
+			if datatype == "Plan":
+				base.debugmsg(9, "tdata before:", tdata)
+				tdata = base.table_postprocess_data_plan(id, tdata)
 			base.debugmsg(9, "tdata:", tdata)
 
 			if len(tdata) > 0:
@@ -5011,6 +5014,9 @@ class ReporterCore:
 				time.sleep(0.1)
 
 			tdata = base.dbqueue["ReadResult"][key]
+			if datatype == "Plan":
+				base.debugmsg(9, "tdata before:", tdata)
+				tdata = base.table_postprocess_data_plan(id, tdata)
 			base.debugmsg(8, "tdata:", tdata)
 
 			if len(tdata) > 0:
@@ -6116,6 +6122,9 @@ class ReporterCore:
 				time.sleep(0.1)
 
 			tdata = base.dbqueue["ReadResult"][key]
+			if datatype == "Plan":
+				base.debugmsg(9, "tdata before:", tdata)
+				tdata = base.table_postprocess_data_plan(id, tdata)
 			base.debugmsg(8, "tdata:", tdata)
 
 			if len(tdata) > 0:
