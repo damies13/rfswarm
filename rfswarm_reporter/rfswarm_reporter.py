@@ -7839,7 +7839,7 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["LFrame"], text="Data Type:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
 
-		DataTypes = [None, "Metric", "Result", "ResultSummary", "SQL"]
+		DataTypes = [None, "Metric", "Result", "ResultSummary", "Plan", "SQL"]
 		self.contentdata[id]["strDT"] = tk.StringVar()
 		self.contentdata[id]["omDT"] = ttk.OptionMenu(self.contentdata[id]["LFrame"], self.contentdata[id]["strDT"], command=self.cs_datatable_switchdt, *DataTypes)
 		self.contentdata[id]["strDT"].set(datatype)
@@ -7991,12 +7991,9 @@ class ReporterGUI(tk.Frame):
 		# self.content_preview(id)
 		base.debugmsg(5, "changes:", changes)
 		if changes > 0:
-			# this should make the UI a bit less jumpy
 			cp = threading.Thread(target=lambda: self.content_preview(id))
 			cp.start()
 			self.cs_datatable_add_renamecols(id)
-			# cp = threading.Thread(target=lambda: self.cs_datatable_add_renamecols(id))
-			# cp.start()
 
 		# rt_table_get_alst
 
