@@ -2986,7 +2986,7 @@ class ReporterBase():
 		data = {}
 
 		scriptopt = base.report_item_get_value(id, base.rt_table_ini_colname("Script Opt"))
-		if scriptopt == None:
+		if scriptopt is None:
 			scriptopt = "File"
 
 		for rowin in datain:
@@ -3013,7 +3013,6 @@ class ReporterBase():
 
 			else:
 				base.debugmsg(5, "Unexpected data in rowin:", rowin)
-
 
 		for index in data.keys():
 			base.debugmsg(5, "index:", index, data[index])
@@ -8659,7 +8658,7 @@ class ReporterGUI(tk.Frame):
 					if colname == "Script":
 						colnum += 1
 						optval = base.report_item_get_value(id, base.rt_table_ini_colname(f"{colname} Opt"))
-						if optval == None:
+						if optval is None:
 							optval = "File"
 
 						base.debugmsg(5, "colnum:", colnum, "	rownum:", rownum, "	optval:", optval)
