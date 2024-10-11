@@ -2984,7 +2984,11 @@ class ReporterBase():
 		# 	 Index		Robots		Delay  		RampUp 		Run		Script		Test	Settings
 		dataout = []
 		data = {}
-		totaldata = {}
+
+		scriptopt = base.report_item_get_value(id, base.rt_table_ini_colname("Script Opt"))
+		if scriptopt == None:
+			scriptopt = "File"
+
 		for rowin in datain:
 			base.debugmsg(5, "rowin:", rowin)
 			if 'PrimaryMetric' in rowin and "_" in rowin['PrimaryMetric']:
@@ -3010,6 +3014,7 @@ class ReporterBase():
 			else:
 				base.debugmsg(5, "Unexpected data in rowin:", rowin)
 
+
 		for index in data.keys():
 			base.debugmsg(5, "index:", index, data[index])
 
@@ -3021,7 +3026,10 @@ class ReporterBase():
 			datarow["Delay"] = base.sec2hms(data[index]["Delay"])
 			datarow["Ramp Up"] = base.sec2hms(data[index]["Ramp Up"])
 			datarow["Run"] = base.sec2hms(data[index]["Run"])
-			datarow["Script"] = data[index]["Script"]
+			if scriptopt == "File":
+				datarow["Script"] = data[index]["Script"]
+			else:
+				datarow["Script"] = data[index]["ScriptPath"]
 			datarow["Test"] = data[index]["Test"]
 
 			dataout.append(datarow)
@@ -8134,8 +8142,9 @@ class ReporterGUI(tk.Frame):
 				value = self.contentdata[id]["renamecolumns"][f"{colname} Show"].get()
 				changes += base.report_item_set_bool(id, base.rt_table_ini_colname(f"{colname} Show"), value)
 
-				if datatype == "Plan":
-					pass
+				if f"{colname} Opt" in self.contentdata[id]["renamecolumns"]:
+					value = self.contentdata[id]["renamecolumns"][f"{colname} Opt"].get()
+					changes += base.report_item_set_value(id, base.rt_table_ini_colname(f"{colname} Opt"), value)
 
 		base.debugmsg(5, "content_preview id:", id)
 		# self.content_preview(id)
@@ -8630,25 +8639,36 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["renamecolumns"][collabel] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text=" {} ".format(colname))
 				self.contentdata[id]["renamecolumns"][collabel].grid(column=colnum, row=rownum, sticky="nsew")
 
-				colnum = 1
+				colnum += 1
 				self.contentdata[id]["renamecolumns"][colname] = tk.StringVar()
 				self.contentdata[id]["renamecolumns"][colinput] = ttk.Entry(self.contentdata[id]["Frames"]["renamecols"], textvariable=self.contentdata[id]["renamecolumns"][colname])
 				self.contentdata[id]["renamecolumns"][colinput].grid(column=colnum, row=rownum, sticky="nsew")
 				# <Leave> makes UI to jumpy
 				# self.contentdata[id]["renamecolumns"][colinput].bind('<Leave>', self.cs_datatable_update)
 				self.contentdata[id]["renamecolumns"][colinput].bind('<FocusOut>', self.cs_datatable_update)
-
 				self.contentdata[id]["renamecolumns"][colname].set(base.rt_table_get_colname(id, colname))
 
+				colnum += 1
 				self.contentdata[id]["renamecolumns"][f"{colname} Show"] = tk.IntVar()
 				self.contentdata[id]["renamecolumns"][colshow] = ttk.Checkbutton(self.contentdata[id]["Frames"]["renamecols"], variable=self.contentdata[id]["renamecolumns"][f"{colname} Show"], command=self.cs_datatable_update)
-				self.contentdata[id]["renamecolumns"][colshow].grid(column=2, row=rownum, sticky="nsew")
+				self.contentdata[id]["renamecolumns"][colshow].grid(column=colnum, row=rownum, sticky="nsew")
 				self.contentdata[id]["renamecolumns"][f"{colname} Show"].set(base.report_item_get_bool_def1(id, base.rt_table_ini_colname(f"{colname} Show")))
+				base.debugmsg(5, "colnum:", colnum, "	rownum:", rownum)
 
 				if datatype == "Plan":
 					if colname == "Script":
-						pass
-						# add option ["File", "Path"]
+						colnum += 1
+						optval = base.report_item_get_value(id, base.rt_table_ini_colname(f"{colname} Opt"))
+						if optval == None:
+							optval = "File"
+
+						base.debugmsg(5, "colnum:", colnum, "	rownum:", rownum, "	optval:", optval)
+
+						DataTypes = [None, "File", "Path"]
+						self.contentdata[id]["renamecolumns"][f"{colname} Opt"] = tk.StringVar()
+						self.contentdata[id]["renamecolumns"][colopt] = ttk.OptionMenu(self.contentdata[id]["Frames"]["renamecols"], self.contentdata[id]["renamecolumns"][f"{colname} Opt"], command=self.cs_datatable_update, *DataTypes)
+						self.contentdata[id]["renamecolumns"][colopt].grid(column=colnum, row=rownum, sticky="nsew")
+						self.contentdata[id]["renamecolumns"][f"{colname} Opt"].set(optval)
 
 	#
 	# Settings	-	Graph
