@@ -341,7 +341,7 @@ Verify Plan Table
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 
 	# Take A Screenshot
-	Select Field With Label 	DataType
+	Select Field With Label 	DataTypeWide
 
 	# Take A Screenshot
 	Select Option 	Plan
