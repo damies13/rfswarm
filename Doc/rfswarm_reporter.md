@@ -254,7 +254,7 @@ The Plan Data Table allows you to include the test row data from the plan tab of
 
 **Show Column** - If disabled, hides the column from the report
 
-**Options** - Allows you to choose what is shown in the column, currently only the script column has an option that allows you to choose between the file name of the robot file or the full path of the robot file
+**Options** - Allows you to choose what is shown in the column, currently only the script column has an option that allows you to choose between the filename of the robot file or the full path of the robot file
 
 The image below shows an example with Show graph colours and all columns enabled.
 > ![Image](Images/MacOS_Reporter_v1.4.0_DataTable_PlanPreview.png)
