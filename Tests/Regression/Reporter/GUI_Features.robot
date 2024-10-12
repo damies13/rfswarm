@@ -228,35 +228,35 @@ Verify the Content Of the DOCX Report
 
 	# Graphs - when new graphs are required, save them using the function in read_docx.py!
 	Dictionary Should Contain Key 	${docx_paragraphs} 	6 Data Graph Left Metric
-	Convert Image To Black And White 	${docx_images}[0]
+	# Convert Image To Black And White 	${docx_images}[0]
 	Compare Images 	${expected_docx_images}[0] 	${docx_images}[0] 	threshold=${img_comp_threshold} 	move_tolerance=${move_tolerance}
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	7 Data Graph Left Result
-	Convert Image To Black And White 	${docx_images}[1]
+	# Convert Image To Black And White 	${docx_images}[1]
 	Compare Images 	${expected_docx_images}[1] 	${docx_images}[1] 	threshold=${img_comp_threshold} 	move_tolerance=${move_tolerance}
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	8 Data Graph Left Result FAIL
-	Convert Image To Black And White 	${docx_images}[2]
+	# Convert Image To Black And White 	${docx_images}[2]
 	Compare Images 	${expected_docx_images}[2] 	${docx_images}[2] 	threshold=${img_comp_threshold} 	move_tolerance=${move_tolerance}
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	9 Data Graph Left Result TPS
-	Convert Image To Black And White 	${docx_images}[3]
+	# Convert Image To Black And White 	${docx_images}[3]
 	Compare Images 	${expected_docx_images}[3] 	${docx_images}[3] 	threshold=${img_comp_threshold} 	move_tolerance=${move_tolerance}
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	10 Data Graph Left Result Total TPS
-	Convert Image To Black And White 	${docx_images}[4]
+	# Convert Image To Black And White 	${docx_images}[4]
 	Compare Images 	${expected_docx_images}[4] 	${docx_images}[4] 	threshold=${img_comp_threshold} 	move_tolerance=${move_tolerance}
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	11 Data Graph Right Metric
-	Convert Image To Black And White 	${docx_images}[5]
+	# Convert Image To Black And White 	${docx_images}[5]
 	Compare Images 	${expected_docx_images}[5] 	${docx_images}[5] 	threshold=${img_comp_threshold} 	move_tolerance=${move_tolerance}
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	12 Data Graph Right Result
-	Convert Image To Black And White 	${docx_images}[6]
+	# Convert Image To Black And White 	${docx_images}[6]
 	Compare Images 	${expected_docx_images}[6] 	${docx_images}[6] 	threshold=${img_comp_threshold} 	move_tolerance=${move_tolerance}
 
 	Dictionary Should Contain Key 	${docx_paragraphs} 	13 Data Graph LR Combined
-	Convert Image To Black And White 	${docx_images}[7]
+	# Convert Image To Black And White 	${docx_images}[7]
 	Compare Images 	${expected_docx_images}[7] 	${docx_images}[7] 	threshold=${img_comp_threshold} 	move_tolerance=${move_tolerance}
 
 
