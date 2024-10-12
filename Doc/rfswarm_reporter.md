@@ -150,12 +150,13 @@ The note section is used for adding free text sections to your report, some exam
 
 #### Data Graph Section
 The data graph section is used for displaying graphs of test results and other metrics collected during the test.
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Settings.png)
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Settings_Type.png)
 
 **Start Time** - Allows you to constrain this graph's data to a specific time range.
 
 **End Time** - Allows you to constrain this graph's data to a specific time range.
+
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Settings.png)
+> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Settings_Type.png)
 
 The data sources for the graphs can be:
 - [Plan](#data-graph-plan)
