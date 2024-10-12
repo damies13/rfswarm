@@ -62,8 +62,8 @@ When Report is selected, the settings pane will display settings the global repo
 | Date Format | Here you can select the date format you wish to use in the report (defaults to yyyy-mm-dd) |
 | Time Format | Here you can select the time format you wish to use in the report (defaults to HH:MM) |
 | Time Zone | Times in rfswarm are stored using epoch time also known as Unix timestamp, as such all times are UTC with no timezone offset. To display the expected times rfswram Reporter needs to know the timeszone to apply to the timestamp. This should default to the timezone of your local machine, however you may want to display times in your report for another timezone. |
-| Start Time | This value is extracted from the results database, to display it on the title page, enable the checkbox in the display column |
-| End Time | This value is extracted from the results database, to display it on the title page, enable the checkbox in the display column |
+| Start Time | The default value is extracted from the results database, You can adjust the time to constrain this report's data to a specific time range. To display it on the title page, enable the checkbox in the display column |
+| End Time | The default value is extracted from the results database, You can adjust the time to constrain this report's data to a specific time range. To display it on the title page, enable the checkbox in the display column |
 | Logo Image | This setting lets you add a picture to the title page of your report, typically this would be your organisation's logo, but it can be anything you want. the field is read only but will show the filename of the file you selected. Click the ![image](Images/REP_picture.gif)Select Picture button and browse to the image you want to use. Then enable the checkbox in the display column |
 | Font | This setting allows you to choose the font and font size to be used throughout the report. Headings and titles use the same font however the font size will be scaled proportionally to the base font size. |
 | Highlight Colour | This setting allows you to choose a colour for headings and column headings, Click the ![image](Images/REP_color_swatch.gif)Colour Swatch button next to the colour preview to bring up the system colour picker and choose a colour. For best results choose the colour that matches your organisation's branding. |
@@ -153,6 +153,10 @@ The data graph section is used for displaying graphs of test results and other m
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Settings.png)
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Settings_Type.png)
 
+**Start Time** - Allows you to constrain this graph's data to a specific time range.
+
+**End Time** - Allows you to constrain this graph's data to a specific time range.
+
 The data sources for the graphs can be:
 - [Plan](#data-graph-plan)
 - [Metric](#data-graph-metric)
@@ -161,10 +165,10 @@ The data sources for the graphs can be:
 
 ##### Data Graph Plan
 The Plan Data Graph allows you to include the graph from the plan tab of the RFSwarm Manager in your test report.
-> ![Image](Images/MacOS_Reporter_v1.4.0_DataTable_Plan.png)
+> ![Image](Images/MacOS_Reporter_v1.4.0_DataGraph_Plan.png)
 
 **Show Total** - If enabled, shows a line for the total number of planned robots. The image below shows an example with Show Total enabled.
-> ![Image](Images/MacOS_Reporter_v1.4.0_DataTable_PlanPreview.png)
+> ![Image](Images/MacOS_Reporter_v1.4.0_DataGraph_PlanPreview.png)
 
 ##### Data Graph Metric
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric.png)
@@ -228,15 +232,31 @@ The data table section is used for displaying tables of test results and other m
 
 **Show graph colours** - When enabled will display a colour swatch in the first column of the table that matches the first data column to the matching data value on a related graph, this is useful for creating legend tables.
 
+**Start Time** - Allows you to constrain this table's data to a specific time range.
+
+**End Time** - Allows you to constrain this table's data to a specific time range.
+
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Settings_Type.png)
 
 **Rename Columns** - This section allows you to change the default English column names, to another name you prefer or the equivalent in your preferred language
 
 The data sources for the graphs can be:
+- [Plan](#data-table-plan)
 - [Metric](#data-table-metric)
 - [Result](#data-table-result)
 - [ResultSummary](#data-table-resultsummary)
 - [Custom SQL](#data-table-sql)
+
+##### Data Table Plan
+The Plan Data Table allows you to include the test row data from the plan tab of the RFSwarm Manager in your test report.
+> ![Image](Images/MacOS_Reporter_v1.4.0_DataTable_Plan.png)
+
+**Show Column** - If disabled, hides the column from the report
+
+**Options** - Allows you to choose what is shown in the column, currently only the script column has an option that allows you to choose between the file name of the robot file or the full path of the robot file
+
+The image below shows an example with Show graph colours and all columns enabled.
+> ![Image](Images/MacOS_Reporter_v1.4.0_DataTable_PlanPreview.png)
 
 ##### Data Table Metric
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric.png)
@@ -310,6 +330,10 @@ Also note that **Show graph colours** will use values of the first data column t
 #### Error Details Section
 The data table section is used for displaying error details for any failed keywords during the test. This report section queries the results database for FAIL results, then uses the test group number, the robot number and the iteration to identify the correct output.xml file, it then reads the error detail and also finds any related screenshots included in the failed keyword.
 > ![Image](Images/Linux_Reporter_v1.2.0_ErrorDetails_Settings.png)
+
+**Start Time** - Allows you to constrain this error details section's data to a specific time range.
+
+**End Time** - Allows you to constrain this error details section's data to a specific time range.
 
 **Show screenshots** - If the test library takes screenshots of the AUT when a keyword fails, this setting will include any screenshot found in the report.
 
