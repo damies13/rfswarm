@@ -329,7 +329,7 @@ Verify Plan Table
 	Click To The Below Of Image 	reporter_${platform}_label_sectionname.png 	20
 	Type 	Issue #141
 	Click Button 			OK
-	Take A Screenshot
+	# Take A Screenshot
 	Click Section			Issue#141
 
 	Select Field With Label 	Type
@@ -354,7 +354,7 @@ Verify Plan Table
 	# Take A Screenshot
 	Wait For Status 	PreviewLoaded
 
-	Take A Screenshot
+	# Take A Screenshot
 	Click Tab 	 Preview
 
 	Take A Screenshot
