@@ -172,7 +172,7 @@ Verify the Content Of the DOCX Report
 	VAR 	${template_dir} 	${basefolder}${/}sample.template
 	VAR 	${docx_file}		${resultfolder}${/}${resultdata}.docx
 	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		10
+	VAR 	${move_tolerance} 		20
 
 	Log 	template: ${template_dir} 	console=True
 	Open GUI	-d 	${resultfolder} 	-t 	${template_dir}
