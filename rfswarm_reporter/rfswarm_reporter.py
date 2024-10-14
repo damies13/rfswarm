@@ -365,7 +365,10 @@ class ReporterBase():
 
 		base.debugmsg(5, "base.report: ", base.report._sections)
 
-		es = self.report_new_section("TOP", "Template")
+		#
+		# 	Information
+		#
+		es = self.report_new_section("TOP", "Information")
 		self.report_item_set_type(es, 'note')
 		notetxt = "Define your template by adding sections and configuring the section settings\n"
 		notetxt += "Each section can be:\n"
@@ -373,18 +376,411 @@ class ReporterBase():
 		notetxt += " -  Heading, usefull for grouping sections\n"
 		notetxt += " -  Contents like a table of contents or figures\n"
 		notetxt += " -  Data Table, with data from test results\n"
-		notetxt += " -  Data Graph, for graphical representation of test results\n\n"
-		notetxt += "Each section can also have sub sections\n\n"
-		notetxt += "The cover page and overall report settings can be found on the settings pane of the Report item above\n"
+		notetxt += " -  Data Graph, for graphical representation of test results\n"
+		notetxt += " - Errors, gather error details and screenshots (if applicable) from robot logs\n\n"
+		notetxt += "Each section can also have sub sections.\n\n"
+		notetxt += "Use the arrows buttons to move sections up and down within the report.\n\n"
+		notetxt += "The cover page and overall report settings can be found on the settings pane of the Report item above.\n\n"
+		notetxt += "When you have your report how you like it, save it as a report template, so your future test results can use the same report format.\n\n"
 		self.rt_note_set(es, notetxt)
 
+		#
+		# 	Table of Contents
+		#
+		# name = Contents
+		# parent = TOP
+		toc = self.report_new_section("TOP", "Table of Contents")
+		# type = contents
+		self.report_item_set_type(toc, 'contents')
+		# mode = Table Of Contents
+		self.rt_contents_set_mode(toc, 'Table Of Contents')
+		# level = 2
+		self.rt_contents_set_level(toc, '2')
+
+		#
+		# 	Scenario Plan
+		#
+		plng = self.report_new_section("TOP", "Scenario Plan")
+		self.report_item_set_type(plng, 'graph')
+
+		# [FB9082D01BCL]
+		plngl = plng + "L"
+		# datatype = Plan
+		self.rt_table_set_dt(plngl, 'Plan')
+		# changed = 1728738092.5689259
+		# sql = SELECT md1.* , md0.SecondaryMetric as x91Filex93 , fp0.SecondaryMetric as x91FilePathx93 FROM MetricData as md0 LEFT JOIN MetricData as fp0 ON fp0.MetricValue = md0.MetricValue AND fp0.MetricType = 'Scenario' AND fp0.PrimaryMetric like 'Local_Path_x37' LEFT JOIN MetricData as md1 ON md1.SecondaryMetric = md0.MetricValue AND md1.MetricType = 'Scenario' WHERE md0.MetricType = 'Scenario' AND md0.PrimaryMetric like 'Test_x37'
+		# showtotal = 1
+		base.report_item_set_int(plngl, "ShowTotal", 1)
+
+		# [FB9082D01BCR]
+		plngr = plng + "R"
+		# datatype = None
+		self.rt_table_set_dt(plngr, 'None')
+
+		#
+		# 	-	Scenario Detail
+		#
+		# name = Scenario Detail
+		# parent = FB9082D01BC
+		plnt = self.report_new_section(plng, "Scenario Detail")
+		# type = table
+		self.report_item_set_type(plnt, 'table')
+		# colours = 1
+		self.rt_table_set_colours(plnt, 1)
+		# datatype = Plan
+		self.rt_table_set_dt(plnt, "Plan")
+		# col_index_show = 1
+		base.report_item_set_bool(plnt, base.rt_table_ini_colname("index Show"), 1)
+		# col_robots_show = 1
+		base.report_item_set_bool(plnt, base.rt_table_ini_colname("robots Show"), 1)
+		# col_delay_show = 1
+		base.report_item_set_bool(plnt, base.rt_table_ini_colname("delay Show"), 1)
+		# col_ramp_up_show = 1
+		base.report_item_set_bool(plnt, base.rt_table_ini_colname("ramp up Show"), 1)
+		# col_run_show = 1
+		base.report_item_set_bool(plnt, base.rt_table_ini_colname("run Show"), 1)
+		# col_script_show = 1
+		base.report_item_set_bool(plnt, base.rt_table_ini_colname("script Show"), 1)
+		# col_script_opt = File
+		base.report_item_set_value(plnt, base.rt_table_ini_colname("script Opt"), "File")
+		# col_test_show = 1
+		base.report_item_set_bool(plnt, base.rt_table_ini_colname("test Show"), 1)
+
+		#
+		# 	Test Result Summary
+		#
+		# name = Test Result Summary
+		# parent = TOP
 		trs = self.report_new_section("TOP", "Test Result Summary")
+		# type = table
 		self.report_item_set_type(trs, 'table')
 
 		# colours = 0
 		self.rt_table_set_colours(trs, 0)
 		# datatype = ResultSummary
 		self.rt_table_set_dt(trs, "ResultSummary")
+		# filteragent =
+		# filtertype = None
+		# col_result_name_show = 1
+		base.report_item_set_bool(trs, base.rt_table_ini_colname("Result Name Show"), 1)
+		# col_minimum_show = 0
+		base.report_item_set_bool(trs, base.rt_table_ini_colname("minimum Show"), 0)
+		# col_average_show = 1
+		base.report_item_set_bool(trs, base.rt_table_ini_colname("average Show"), 1)
+		# col_90x37ile_show = 1
+		base.report_item_set_bool(trs, base.rt_table_ini_colname("90%ile Show"), 1)
+		# col_maximum_show = 1
+		base.report_item_set_bool(trs, base.rt_table_ini_colname("maximum Show"), 1)
+		# col_std_dev_show = 1
+		base.report_item_set_bool(trs, base.rt_table_ini_colname("Std Dev Show"), 1)
+		# col_pass_show = 1
+		base.report_item_set_bool(trs, base.rt_table_ini_colname("pass Show"), 1)
+		# col_fail_show = 1
+		base.report_item_set_bool(trs, base.rt_table_ini_colname("fail Show"), 1)
+		# col_other_show = 0
+		base.report_item_set_bool(trs, base.rt_table_ini_colname("other Show"), 0)
+
+		#
+		# 	Robots vs Response Time
+		#
+		rrt = self.report_new_section("TOP", "Robots vs Response Time")
+		self.report_item_set_type(rrt, 'graph')
+
+		# [FA37C950802L]
+		idl = rrt + "L"
+		# resulttype = Response Time
+		base.report_item_set_value(idl, "resulttype", "Response Time")
+		# changed = 1728738059.779502
+		# filterresult = None
+		# filteragent = None
+		# datatype = Result
+		self.rt_table_set_dt(idl, 'Result')
+
+		# [FA37C950802R]
+		idr = rrt + "R"
+		# datatype = Metric
+		self.rt_table_set_dt(idr, 'Metric')
+		# changed = 1728738059.7891614
+		# axisen = 1
+		base.report_item_set_bool(idr, "axisen", 1)
+		# metrictype = Scenario
+		base.report_item_set_value(idr, "metrictype", "Scenario")
+		# filteragent = None
+		# filtertype = None
+
+		#
+		# 	-	Response Times
+		#
+		# name = Response Times
+		rt = self.report_new_section(rrt, "Response Times")
+		# parent = FA37C950802
+		self.report_item_set_type(rt, 'table')
+		# type = table
+		base.report_item_set_value(rt, "type", "table")
+		# changed = 1728738060.9264157
+		# colours = 1
+		base.report_item_set_bool(rt, "colours", 1)
+		# datatype = Result
+		base.report_item_set_value(rt, "datatype", "Result")
+		# resulttype = Response Time
+		base.report_item_set_value(rt, "resulttype", "Response Time")
+		# filterresult = None
+		# filteragent = None
+
+		#
+		# 	-	Robots
+		#
+		# name = Robots
+		rb = self.report_new_section(rrt, "Robots")
+		# type = table
+		self.report_item_set_type(rb, 'table')
+		# parent = FA37C950802
+		# changed = 1728744845.4971852
+		# colours = 1
+		base.report_item_set_bool(rb, "colours", 1)
+		# datatype = Metric
+		base.report_item_set_value(rb, "datatype", "Metric")
+		# metrictype = Scenario
+		base.report_item_set_value(rb, "metrictype", "Scenario")
+		# filteragent = None
+		# filtertype = None
+		# secondarymetric = total_robots
+		base.report_item_set_value(rb, "secondarymetric", "total_robots")
+		# isnumeric = 1
+		base.report_item_set_bool(rb, "isnumeric", 1)
+		# showcount = 0
+		base.report_item_set_bool(rb, "showcount", 1)
+		# col_primarymetric_show = 1
+		base.report_item_set_bool(rb, "col_primarymetric_show", 1)
+		# col_minimum_show = 0
+		base.report_item_set_bool(rb, "col_minimum_show", 0)
+		# col_average_show = 0
+		base.report_item_set_bool(rb, "col_average_show", 0)
+		# col_90x37ile_show = 0
+		base.report_item_set_bool(rb, "col_90x37ile_show", 0)
+		# col_maximum_show = 1
+		base.report_item_set_bool(rb, "col_maximum_show", 1)
+		# col_std_dev_show = 0
+		base.report_item_set_bool(rb, "col_std_dev_show", 0)
+		# col_maximum = Robots
+		base.report_item_set_value(rb, "col_maximum", "Robots")
+
+		#
+		# 	Agents
+		#
+		# name = Agents
+		agnt = self.report_new_section("TOP", "Agents")
+		# type = head
+		self.report_item_set_type(agnt, 'head')
+		# parent = TOP
+
+		#
+		# 	-	CPU
+		#
+		cpu = self.report_new_section(agnt, "Agent CPU Usage")
+		self.report_item_set_type(cpu, 'graph')
+		# name = CPU
+		# parent = FB90C705569
+		# type = graph
+
+		# [FB90C728C87L]
+		idl = cpu + "L"
+		# metrictype = Agent
+		base.report_item_set_value(idl, "metrictype", "Agent")
+		# changed = 1728745351.1353724
+		base.report_item_set_bool(idl, "axisen", 1)
+		# filteragent = None
+		# filtertype = None
+		# datatype = Metric
+		base.report_item_set_value(idl, "datatype", "Metric")
+		# secondarymetric = CPU
+		base.report_item_set_value(idl, "secondarymetric", "CPU")
+		# enablefilteragent = 1
+		base.report_item_set_bool(rt, "enablefilteragent", 1)
+		#
+		# [FB90C728C87R]
+		idr = cpu + "R"
+		# datatype = Metric
+		base.report_item_set_value(idr, "datatype", "Metric")
+		# changed = 1728745351.027923
+		# axisen = 1
+		base.report_item_set_bool(idr, "axisen", 1)
+		# metrictype = Scenario
+		base.report_item_set_value(idr, "metrictype", "Scenario")
+		# filteragent = None
+		# filtertype = None
+		# secondarymetric = total_robots
+		base.report_item_set_value(idr, "secondarymetric", "total_robots")
+
+		#
+		# 	-	Memory
+		#
+		# name = Memory
+		mem = self.report_new_section(agnt, "Agent Memory (RAM) Usage")
+		# type = graph
+		self.report_item_set_type(mem, 'graph')
+
+		# [FB90C73DBB6L]
+		idl = cpu + "L"
+		# metrictype = Agent
+		base.report_item_set_value(idl, "metrictype", "Agent")
+		# changed = 1728745342.77505
+		base.report_item_set_bool(idl, "axisen", 1)
+		# filteragent = None
+		# filtertype = None
+		# datatype = Metric
+		base.report_item_set_value(idl, "datatype", "Metric")
+		# secondarymetric = MEM
+		base.report_item_set_value(idl, "secondarymetric", "MEM")
+		# enablefilteragent = 1
+		base.report_item_set_bool(rt, "enablefilteragent", 1)
+		#
+		# [FB90C73DBB6R]
+		idr = cpu + "R"
+		# datatype = Metric
+		base.report_item_set_value(idr, "datatype", "Metric")
+		# changed = 1728745342.6672406
+		# axisen = 1
+		base.report_item_set_bool(idr, "axisen", 1)
+		# filteragent = None
+		# filtertype = None
+		# metrictype = Scenario
+		base.report_item_set_value(idr, "metrictype", "Scenario")
+		# secondarymetric = total_robots
+		base.report_item_set_value(idr, "secondarymetric", "total_robots")
+
+		#
+		# 	-	Agent Names
+		#
+		# name = Agent Names
+		an = self.report_new_section(agnt, "Agent Names")
+		# type = table
+		self.report_item_set_type(an, 'table')
+		# colours = 1
+		base.report_item_set_bool(an, "colours", 1)
+		# datatype = Metric
+		base.report_item_set_value(an, "datatype", "Metric")
+		# metrictype = Agent
+		base.report_item_set_value(an, "metrictype", "Agent")
+		# filteragent = None
+		# filtertype = None
+		# col_primarymetric_show = 0
+		base.report_item_set_bool(an, "col_primarymetric_show", 0)
+		# col_metrictype_show = 1
+		base.report_item_set_bool(an, "col_metrictype_show", 1)
+		# col_secondarymetric_show = 1
+		base.report_item_set_bool(an, "col_secondarymetric_show", 1)
+		# col_metricvalue_show = 0
+		base.report_item_set_bool(an, "col_metricvalue_show", 0)
+		# enablefilteragent = 1
+		base.report_item_set_bool(an, "enablefilteragent", 1)
+		# secondarymetric = CPU
+		base.report_item_set_value(an, "secondarymetric", "CPU")
+		# col_agent_show = 1
+		base.report_item_set_bool(an, "col_agent_show", 1)
+
+		#
+		# 	-	Agent Details
+		#
+		# name = Agent Details
+		ad = self.report_new_section(agnt, "Agent Details")
+		# type = table
+		self.report_item_set_type(ad, 'table')
+		# parent = FB90C705569
+		# changed = 1728745707.049637
+		# colours = 0
+		base.report_item_set_bool(ad, "colours", 0)
+		# datatype = Metric
+		base.report_item_set_value(ad, "datatype", "Metric")
+		# metrictype = Agent
+		base.report_item_set_value(ad, "datatype", "Metric")
+		# filteragent = None
+		# filtertype = None
+		# col_primarymetric_show = 1
+		base.report_item_set_bool(ad, "col_primarymetric_show", 1)
+		# col_metrictype_show = 1
+		base.report_item_set_bool(ad, "col_metrictype_show", 1)
+		# col_secondarymetric_show = 1
+		base.report_item_set_bool(ad, "col_secondarymetric_show", 1)
+		# col_metricvalue_show = 1
+		base.report_item_set_bool(ad, "col_metricvalue_show", 1)
+		# enablefilteragent = 1
+		base.report_item_set_bool(ad, "enablefilteragent", 1)
+		# col_agent_show = 0
+		base.report_item_set_bool(ad, "col_agent_show", 0)
+		# col_primarymetric = Agent Name
+		base.report_item_set_value(ad, "col_primarymetric", "Agent Name")
+		# col_secondarymetric = Metric Name
+		base.report_item_set_value(ad, "col_secondarymetric", "Metric Name")
+		# col_metricvalue = Metric Value
+		base.report_item_set_value(ad, "col_metricvalue", "Metric Value")
+
+		#
+		# 	Errors
+		#
+		# name = Errors
+		# parent = TOP
+		err = self.report_new_section("TOP", "Errors")
+		# type = head
+		self.report_item_set_type(err, 'head')
+
+		#
+		# 	-	Failed Keywords Graph
+		#
+		# name = Failed Keywords Graph
+		fkg = self.report_new_section(err, "Failed Keywords Graph")
+		# type = graph
+		self.report_item_set_type(fkg, 'graph')
+
+		# [FB90CDCCFC9L]
+		# resulttype = TPS
+		# changed = 1728746053.26743
+		# filterresult = Fail
+		# filteragent = None
+		# datatype = Result
+		# enablefilterresult = 1
+		#
+		# [FB90CDCCFC9R]
+		# datatype = Metric
+		# changed = 1728746053.2828546
+		# axisen = 1
+		# metrictype = Scenario
+		# filteragent = None
+		# filtertype = None
+		# secondarymetric = total_robots
+
+		#
+		# 	-	Failed Keywords Names
+		#
+		fkn = self.report_new_section(err, "Failed Keywords Names")
+		self.report_item_set_type(fkn, 'table')
+		# name = Failed Keywords Names
+		# parent = FB90CD6ECAE
+		# type = table
+		# changed = 1728746043.623058
+		# colours = 1
+		# datatype = Result
+		# resulttype = TPS
+		# filterresult = Fail
+		# filteragent = None
+		# enablefilterresult = 1
+		# col_result_name_show = 1
+		# col_result_show = 1
+		# col_count_show = 1
+
+		#
+		# 	-	Error Details
+		#
+		ed = self.report_new_section(err, "Error Details")
+		self.report_item_set_type(ed, 'Err')
+		# name = Error Details
+		# parent = FB90CD6ECAE
+		# type = errors
+		# changed = 1728746092.6821463
+		# images = 1
+		# grouprn = 1
+		# groupet = 1
+
 
 	def template_save(self, filename):
 		saved = False
