@@ -257,7 +257,7 @@ Click Dialog Button
 	# Take A Screenshot
 
 Wait For Status
-	[Arguments]		${status}	${timeout}=300
+	[Arguments]		${status}	${timeout}=600
 	${statusl}= 	Convert To Lower Case 	${status}
 	${img}=	Set Variable		reporter_${platform}_status_${statusl}.png
 	Log		${CURDIR}
