@@ -9212,7 +9212,7 @@ class ReporterGUI(tk.Frame):
 		changes = 0
 
 		# 		start time
-		if "strST" in self.contentdata[pid]:
+		if "strST" in self.contentdata[pid] and "fST" in self.contentdata[pid]:
 			st = self.contentdata[pid]["strST"].get()
 			base.debugmsg(5, "st:", st)
 			if st != self.contentdata[pid]["fST"]:
@@ -9229,7 +9229,7 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[id]["fST"] = fST
 
 		# 		end time
-		if "strET" in self.contentdata[pid]:
+		if "strET" in self.contentdata[pid] and "fET" in self.contentdata[pid]:
 			et = self.contentdata[pid]["strET"].get()
 			base.debugmsg(5, "et:", et)
 			if et != self.contentdata[pid]["fET"]:
