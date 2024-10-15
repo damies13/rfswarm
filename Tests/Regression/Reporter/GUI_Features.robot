@@ -23,12 +23,14 @@ Verify That Files Get Saved With Correct Extension And Names
 	Open GUI	-d 	${resultfolder}
 	Click Button	savetemplate
 	Save Template File OS DIALOG	${templatename}
-	Click Button	generatehtml
-	Sleep	2
 	Click Button	generateword
 	Sleep	2
 	Click Button	generateexcel
 	Sleep	2
+	Click Button	generatehtml
+	Sleep	2
+
+	Wait For Status 	SavedXHTMLReport
 
 	# Verify files:
 	Remove File		${templatefolder}${/}here_will_be_template.txt
