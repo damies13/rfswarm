@@ -3005,7 +3005,7 @@ class ReporterBase():
 
 			xmlf = "not_found"
 			xmll = glob.glob(gxpatt, recursive=True)
-			if len(xmll)>0:
+			if len(xmll) > 0:
 				xmlf = glob.glob(gxpatt, recursive=True)[0]
 			base.debugmsg(5, "xmlf:", xmlf)
 
