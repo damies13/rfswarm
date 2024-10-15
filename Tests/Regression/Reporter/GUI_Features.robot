@@ -442,23 +442,23 @@ Verify the Content Of the DOCX Report
 	END
 	# [1] equals first data row
 	@{21_table_1} 	Convert To List 	${docx_tables}[6][1]
-	VAR 	@{21_table_1_expected} 		${EMPTY} 	:example: 'John Doe' 	0.001 	0.001 	None 	0.001 	None 	1 	0 	0
+	VAR 	@{21_table_1_expected} 		:example: 'John Doe' 	0.001 	0.001 	None 	0.001 	None 	1 	0 	0
 	Lists Should Be Equal 	${21_table_1_expected} 	${21_table_1}	msg=[ Expected != Converted ]
 	# [-1] equals last row
 	@{21_table_-1} 	Convert To List 	${docx_tables}[6][-1]
-	VAR 	@{21_table_-1_expected} 	${EMPTY} 	Open Odoo Login Screen 	1.712 	1.834 	None 	1.956 	0.173 	2 	0
+	VAR 	@{21_table_-1_expected} 	Open Odoo Login Screen 	1.712 	1.834 	None 	1.956 	0.173 	2 	0
 	Lists Should Be Equal 	${21_table_-1_expected} 	${21_table_-1}	msg=[ Expected != Converted ]
 	# [4] equals quater row
 	@{21_table_4} 	Convert To List 	${docx_tables}[6][4]
-	VAR 	@{21_table_4_expected} 	${EMPTY} 	Odoo Fill Sale Data	0.713 	0.713 	None 	0.713 	None 	1 	0 	1
+	VAR 	@{21_table_4_expected} 		Odoo Fill Sale Data	0.713 	0.713 	None 	0.713 	None 	1 	0 	1
 	Lists Should Be Equal 	${21_table_4_expected} 	${21_table_4}	msg=[ Expected != Converted ]
 	# [7] equals middle row
 	@{21_table_7} 	Convert To List 	${docx_tables}[6][7]
-	VAR 	@{21_table_7_expected} 	${EMPTY} 	Odoo Open Delivery Orders 	0.433 	0.433 	None 	0.433 	None 	1 	0 	1
+	VAR 	@{21_table_7_expected} 		Odoo Open Delivery Orders 	0.433 	0.433 	None 	0.433 	None 	1 	0 	1
 	Lists Should Be Equal 	${21_table_7_expected} 	${21_table_7}	msg=[ Expected != Converted ]
 	# [10] equals upper middle row
 	@{21_table_10} 	Convert To List 	${docx_tables}[6][10]
-	VAR 	@{21_table_10_expected} 	${EMPTY} 	Odoo Return to Inventory Overview 	None 	None 	None 	None 	None 	0 	0 	1
+	VAR 	@{21_table_10_expected} 	Odoo Return to Inventory Overview 	None 	None 	None 	None 	None 	0 	0 	1
 	Lists Should Be Equal 	${21_table_10_expected} 	${21_table_10}	msg=[ Expected != Converted ]
 
 
