@@ -4286,6 +4286,10 @@ class ReporterCore:
 
 		img = etree.SubElement(elmt, 'img')
 
+		img.set("id", id + "_img")
+		img.set("imgid", id)
+		img.text = ""
+
 		# <img src="data:image/png;base64,
 		base.debugmsg(9, "oimg format:", oimg.format)
 		# base.debugmsg(5, "oimg info:", oimg.info)
