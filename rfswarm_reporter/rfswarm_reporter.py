@@ -702,7 +702,7 @@ class ReporterBase():
 		# datatype = Metric
 		base.report_item_set_value(ad, "datatype", "Metric")
 		# metrictype = Agent
-		base.report_item_set_value(ad, "datatype", "Metric")
+		base.report_item_set_value(ad, "metrictype", "Metric")
 		# filteragent = None
 		# filtertype = None
 		# col_primarymetric_show = 1
@@ -723,7 +723,6 @@ class ReporterBase():
 		base.report_item_set_value(ad, "col_secondarymetric", "Metric Name")
 		# col_metricvalue = Metric Value
 		base.report_item_set_value(ad, "col_metricvalue", "Metric Value")
-
 
 		# 	Errors
 		#
@@ -755,7 +754,6 @@ class ReporterBase():
 		base.report_item_set_value(fkgl, "datatype", "Result")
 		# enablefilterresult = 1
 		base.report_item_set_bool(fkgl, "enablefilterresult", 1)
-
 
 		#
 		# [FB90CDCCFC9R]
@@ -815,7 +813,6 @@ class ReporterBase():
 		base.report_item_set_bool(ed, "grouprn", 1)
 		# groupet = 1
 		base.report_item_set_bool(ed, "groupet", 1)
-
 
 	def template_save(self, filename):
 		saved = False
