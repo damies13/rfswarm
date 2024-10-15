@@ -446,11 +446,11 @@ Verify the Content Of the DOCX Report
 	Lists Should Be Equal 	${21_table_1_expected} 	${21_table_1}	msg=[ Expected != Converted ]
 	# [-1] equals last row
 	@{21_table_-1} 	Convert To List 	${docx_tables}[6][-1]
-	VAR 	@{21_table_-1_expected} 	Open Odoo Login Screen 	1.712 	1.834 	None 	1.956 	0.173 	2 	0
+	VAR 	@{21_table_-1_expected} 	Open Odoo Login Screen 	1.712 	1.834 	None 	1.956 	0.173 	2 	0 	0
 	Lists Should Be Equal 	${21_table_-1_expected} 	${21_table_-1}	msg=[ Expected != Converted ]
 	# [4] equals quater row
 	@{21_table_4} 	Convert To List 	${docx_tables}[6][4]
-	VAR 	@{21_table_4_expected} 		Odoo Fill Sale Data	0.713 	0.713 	None 	0.713 	None 	1 	0 	1
+	VAR 	@{21_table_4_expected} 		Odoo Fill Sale Data 	0.713 	0.713 	None 	0.713 	None 	1 	0 	1
 	Lists Should Be Equal 	${21_table_4_expected} 	${21_table_4}	msg=[ Expected != Converted ]
 	# [7] equals middle row
 	@{21_table_7} 	Convert To List 	${docx_tables}[6][7]
@@ -464,7 +464,7 @@ Verify the Content Of the DOCX Report
 
 	# Error Details:
 	# Error Details Screenshots:
-	VAR 	${first_error_image} 	49
+	VAR 	${first_error_image} 	50
 	${len}= 	Get Length 	${expected_docx_images}
 	FOR  ${image_num}  IN RANGE  ${first_error_image}  ${len}
 		Compare Images 	${expected_docx_images}[${image_num}] 	${docx_images}[${image_num}]	# images should be the same tolerance is not needed
