@@ -377,7 +377,7 @@ class ReporterBase():
 		notetxt += " -  Contents like a table of contents or figures\n"
 		notetxt += " -  Data Table, with data from test results\n"
 		notetxt += " -  Data Graph, for graphical representation of test results\n"
-		notetxt += " - Errors, gather error details and screenshots (if applicable) from robot logs\n\n"
+		notetxt += " -  Errors, gather error details and screenshots (if applicable) from robot logs\n\n"
 		notetxt += "Each section can also have sub sections.\n\n"
 		notetxt += "Use the arrows buttons to move sections up and down within the report.\n\n"
 		notetxt += "The cover page and overall report settings can be found on the settings pane of the Report item above.\n\n"
@@ -405,6 +405,7 @@ class ReporterBase():
 
 		# [FB9082D01BCL]
 		plngl = plng + "L"
+		base.report_add_subsection(plngl)
 		# datatype = Plan
 		self.rt_table_set_dt(plngl, 'Plan')
 		# changed = 1728738092.5689259
@@ -414,6 +415,7 @@ class ReporterBase():
 
 		# [FB9082D01BCR]
 		plngr = plng + "R"
+		base.report_add_subsection(plngr)
 		# datatype = None
 		self.rt_table_set_dt(plngr, 'None')
 
@@ -486,27 +488,30 @@ class ReporterBase():
 		rrt = self.report_new_section("TOP", "Robots vs Response Time")
 		self.report_item_set_type(rrt, 'graph')
 
-		# [FA37C950802L]
-		idl = rrt + "L"
+		# [FA37C950802L]idl
+		rttl = rrt + "L"
+		base.report_add_subsection(rttl)
 		# resulttype = Response Time
-		base.report_item_set_value(idl, "resulttype", "Response Time")
+		base.report_item_set_value(rttl, "resulttype", "Response Time")
 		# changed = 1728738059.779502
 		# filterresult = None
 		# filteragent = None
 		# datatype = Result
-		self.rt_table_set_dt(idl, 'Result')
+		self.rt_table_set_dt(rttl, 'Result')
 
 		# [FA37C950802R]
-		idr = rrt + "R"
+		rttr = rrt + "R"
+		base.report_add_subsection(rttr)
 		# datatype = Metric
-		self.rt_table_set_dt(idr, 'Metric')
+		self.rt_table_set_dt(rttr, 'Metric')
 		# changed = 1728738059.7891614
 		# axisen = 1
-		base.report_item_set_bool(idr, "axisen", 1)
+		base.report_item_set_bool(rttr, "axisen", 1)
 		# metrictype = Scenario
-		base.report_item_set_value(idr, "metrictype", "Scenario")
+		base.report_item_set_value(rttr, "metrictype", "Scenario")
 		# filteragent = None
 		# filtertype = None
+		base.report_item_set_value(rttr, "secondarymetric", "total_robots")
 
 		#
 		# 	-	Response Times
@@ -584,33 +589,35 @@ class ReporterBase():
 		# type = graph
 
 		# [FB90C728C87L]
-		idl = cpu + "L"
+		cpul = cpu + "L"
+		base.report_add_subsection(cpul)
 		# metrictype = Agent
-		base.report_item_set_value(idl, "metrictype", "Agent")
+		base.report_item_set_value(cpul, "metrictype", "Agent")
 		# changed = 1728745351.1353724
-		base.report_item_set_bool(idl, "axisen", 1)
+		base.report_item_set_bool(cpul, "axisen", 1)
 		# filteragent = None
 		# filtertype = None
 		# datatype = Metric
-		base.report_item_set_value(idl, "datatype", "Metric")
+		base.report_item_set_value(cpul, "datatype", "Metric")
 		# secondarymetric = CPU
-		base.report_item_set_value(idl, "secondarymetric", "CPU")
+		base.report_item_set_value(cpul, "secondarymetric", "CPU")
 		# enablefilteragent = 1
-		base.report_item_set_bool(rt, "enablefilteragent", 1)
+		base.report_item_set_bool(cpul, "enablefilteragent", 1)
 		#
 		# [FB90C728C87R]
-		idr = cpu + "R"
+		cpur = cpu + "R"
+		base.report_add_subsection(cpur)
 		# datatype = Metric
-		base.report_item_set_value(idr, "datatype", "Metric")
+		base.report_item_set_value(cpur, "datatype", "Metric")
 		# changed = 1728745351.027923
 		# axisen = 1
-		base.report_item_set_bool(idr, "axisen", 1)
+		base.report_item_set_bool(cpur, "axisen", 1)
 		# metrictype = Scenario
-		base.report_item_set_value(idr, "metrictype", "Scenario")
+		base.report_item_set_value(cpur, "metrictype", "Scenario")
 		# filteragent = None
 		# filtertype = None
 		# secondarymetric = total_robots
-		base.report_item_set_value(idr, "secondarymetric", "total_robots")
+		base.report_item_set_value(cpur, "secondarymetric", "total_robots")
 
 		#
 		# 	-	Memory
@@ -621,33 +628,35 @@ class ReporterBase():
 		self.report_item_set_type(mem, 'graph')
 
 		# [FB90C73DBB6L]
-		idl = cpu + "L"
+		meml = mem + "L"
+		base.report_add_subsection(meml)
 		# metrictype = Agent
-		base.report_item_set_value(idl, "metrictype", "Agent")
+		base.report_item_set_value(meml, "metrictype", "Agent")
 		# changed = 1728745342.77505
-		base.report_item_set_bool(idl, "axisen", 1)
+		base.report_item_set_bool(meml, "axisen", 1)
 		# filteragent = None
 		# filtertype = None
 		# datatype = Metric
-		base.report_item_set_value(idl, "datatype", "Metric")
+		base.report_item_set_value(meml, "datatype", "Metric")
 		# secondarymetric = MEM
-		base.report_item_set_value(idl, "secondarymetric", "MEM")
+		base.report_item_set_value(meml, "secondarymetric", "MEM")
 		# enablefilteragent = 1
-		base.report_item_set_bool(rt, "enablefilteragent", 1)
+		base.report_item_set_bool(meml, "enablefilteragent", 1)
 		#
 		# [FB90C73DBB6R]
-		idr = cpu + "R"
+		memr = mem + "R"
+		base.report_add_subsection(memr)
 		# datatype = Metric
-		base.report_item_set_value(idr, "datatype", "Metric")
+		base.report_item_set_value(memr, "datatype", "Metric")
 		# changed = 1728745342.6672406
 		# axisen = 1
-		base.report_item_set_bool(idr, "axisen", 1)
+		base.report_item_set_bool(memr, "axisen", 1)
 		# filteragent = None
 		# filtertype = None
 		# metrictype = Scenario
-		base.report_item_set_value(idr, "metrictype", "Scenario")
+		base.report_item_set_value(memr, "metrictype", "Scenario")
 		# secondarymetric = total_robots
-		base.report_item_set_value(idr, "secondarymetric", "total_robots")
+		base.report_item_set_value(memr, "secondarymetric", "total_robots")
 
 		#
 		# 	-	Agent Names
@@ -715,7 +724,7 @@ class ReporterBase():
 		# col_metricvalue = Metric Value
 		base.report_item_set_value(ad, "col_metricvalue", "Metric Value")
 
-		#
+
 		# 	Errors
 		#
 		# name = Errors
@@ -733,53 +742,79 @@ class ReporterBase():
 		self.report_item_set_type(fkg, 'graph')
 
 		# [FB90CDCCFC9L]
+		fkgl = fkg + "L"
+		base.report_add_subsection(fkgl)
+		base.report_item_set_bool(fkgl, "axisen", 1)
 		# resulttype = TPS
+		base.report_item_set_value(fkgl, "resulttype", "TPS")
 		# changed = 1728746053.26743
 		# filterresult = Fail
+		base.report_item_set_value(fkgl, "filterresult", "Fail")
 		# filteragent = None
 		# datatype = Result
+		base.report_item_set_value(fkgl, "datatype", "Result")
 		# enablefilterresult = 1
+		base.report_item_set_bool(fkgl, "enablefilterresult", 1)
+
+
 		#
 		# [FB90CDCCFC9R]
+		fkgr = fkg + "R"
+		base.report_add_subsection(fkgr)
 		# datatype = Metric
+		base.report_item_set_value(fkgr, "datatype", "Metric")
 		# changed = 1728746053.2828546
 		# axisen = 1
+		base.report_item_set_bool(fkgr, "axisen", 1)
 		# metrictype = Scenario
+		base.report_item_set_value(fkgr, "metrictype", "Scenario")
 		# filteragent = None
 		# filtertype = None
 		# secondarymetric = total_robots
+		base.report_item_set_value(fkgr, "secondarymetric", "total_robots")
 
 		#
 		# 	-	Failed Keywords Names
 		#
-		fkn = self.report_new_section(err, "Failed Keywords Names")
-		self.report_item_set_type(fkn, 'table')
 		# name = Failed Keywords Names
-		# parent = FB90CD6ECAE
+		fkn = self.report_new_section(err, "Failed Keywords Names")
 		# type = table
+		self.report_item_set_type(fkn, 'table')
+		# parent = FB90CD6ECAE
 		# changed = 1728746043.623058
 		# colours = 1
+		base.report_item_set_bool(fkn, "colours", 1)
 		# datatype = Result
+		base.report_item_set_value(fkn, "datatype", "Result")
 		# resulttype = TPS
+		base.report_item_set_value(fkn, "resulttype", "TPS")
 		# filterresult = Fail
+		base.report_item_set_value(fkn, "filterresult", "Fail")
 		# filteragent = None
 		# enablefilterresult = 1
+		base.report_item_set_bool(fkn, "enablefilterresult", 1)
 		# col_result_name_show = 1
+		base.report_item_set_bool(fkn, "col_result_name_show", 1)
 		# col_result_show = 1
+		base.report_item_set_bool(fkn, "col_result_show", 1)
 		# col_count_show = 1
+		base.report_item_set_bool(fkn, "col_count_show", 1)
 
 		#
 		# 	-	Error Details
 		#
-		ed = self.report_new_section(err, "Error Details")
-		self.report_item_set_type(ed, 'Err')
 		# name = Error Details
-		# parent = FB90CD6ECAE
+		ed = self.report_new_section(err, "Error Details")
 		# type = errors
+		self.report_item_set_type(ed, 'errors')
+		# parent = FB90CD6ECAE
 		# changed = 1728746092.6821463
 		# images = 1
+		base.report_item_set_bool(ed, "images", 1)
 		# grouprn = 1
+		base.report_item_set_bool(ed, "grouprn", 1)
 		# groupet = 1
+		base.report_item_set_bool(ed, "groupet", 1)
 
 
 	def template_save(self, filename):
@@ -9780,14 +9815,22 @@ class ReporterGUI(tk.Frame):
 			base.debugmsg(5, "Set Options")
 			while "SMetric" not in self.contentdata[idl]:
 				time.sleep(0.1)
-			self.contentdata[idl]["intIsNum"].set(base.rt_table_get_isnumeric(idl))
-			self.contentdata[idl]["MType"].set(base.rt_table_get_mt(idl))
-			self.contentdata[idl]["PMetric"].set(base.rt_table_get_pm(idl))
-			self.contentdata[idl]["SMetric"].set(base.rt_table_get_sm(idl))
-			self.contentdata[idl]["intFA"].set(base.rt_table_get_enfa(idl))
-			self.contentdata[idl]["FAType"].set(base.rt_table_get_fa(idl))
-			self.contentdata[idl]["FNType"].set(base.rt_table_get_fn(idl))
-			self.contentdata[idl]["FPattern"].set(base.rt_table_get_fp(idl))
+			if "intIsNum" in self.contentdata[idl]:
+				self.contentdata[idl]["intIsNum"].set(base.rt_table_get_isnumeric(idl))
+			if "MType" in self.contentdata[idl]:
+				self.contentdata[idl]["MType"].set(base.rt_table_get_mt(idl))
+			if "PMetric" in self.contentdata[idl]:
+				self.contentdata[idl]["PMetric"].set(base.rt_table_get_pm(idl))
+			if "SMetric" in self.contentdata[idl]:
+				self.contentdata[idl]["SMetric"].set(base.rt_table_get_sm(idl))
+			if "intFA" in self.contentdata[idl]:
+				self.contentdata[idl]["intFA"].set(base.rt_table_get_enfa(idl))
+			if "FAType" in self.contentdata[idl]:
+				self.contentdata[idl]["FAType"].set(base.rt_table_get_fa(idl))
+			if "FNType" in self.contentdata[idl]:
+				self.contentdata[idl]["FNType"].set(base.rt_table_get_fn(idl))
+			if "FPattern" in self.contentdata[idl]:
+				self.contentdata[idl]["FPattern"].set(base.rt_table_get_fp(idl))
 
 		if datatyper == "Metric":
 			base.debugmsg(5, "Update Options")
@@ -9795,14 +9838,22 @@ class ReporterGUI(tk.Frame):
 			base.debugmsg(5, "Set Options")
 			while "SMetric" not in self.contentdata[idr]:
 				time.sleep(0.1)
-			self.contentdata[idr]["intIsNum"].set(base.rt_table_get_isnumeric(idr))
-			self.contentdata[idr]["MType"].set(base.rt_table_get_mt(idr))
-			self.contentdata[idr]["PMetric"].set(base.rt_table_get_pm(idr))
-			self.contentdata[idr]["SMetric"].set(base.rt_table_get_sm(idr))
-			self.contentdata[idr]["intFA"].set(base.rt_table_get_enfa(idr))
-			self.contentdata[idr]["FAType"].set(base.rt_table_get_fa(idr))
-			self.contentdata[idr]["FNType"].set(base.rt_table_get_fn(idr))
-			self.contentdata[idr]["FPattern"].set(base.rt_table_get_fp(idr))
+			if "intIsNum" in self.contentdata[idr]:
+				self.contentdata[idr]["intIsNum"].set(base.rt_table_get_isnumeric(idr))
+			if "MType" in self.contentdata[idr]:
+				self.contentdata[idr]["MType"].set(base.rt_table_get_mt(idr))
+			if "PMetric" in self.contentdata[idr]:
+				self.contentdata[idr]["PMetric"].set(base.rt_table_get_pm(idr))
+			if "SMetric" in self.contentdata[idr]:
+				self.contentdata[idr]["SMetric"].set(base.rt_table_get_sm(idr))
+			if "intFA" in self.contentdata[idr]:
+				self.contentdata[idr]["intFA"].set(base.rt_table_get_enfa(idr))
+			if "FAType" in self.contentdata[idr]:
+				self.contentdata[idr]["FAType"].set(base.rt_table_get_fa(idr))
+			if "FNType" in self.contentdata[idr]:
+				self.contentdata[idr]["FNType"].set(base.rt_table_get_fn(idr))
+			if "FPattern" in self.contentdata[idr]:
+				self.contentdata[idr]["FPattern"].set(base.rt_table_get_fp(idr))
 
 		if datatypel == "Plan":
 			self.contentdata[idl]["intSTot"].set(base.report_item_get_int(idl, "ShowTotal"))
