@@ -265,13 +265,13 @@ Template with Start and End Dates
 	Sleep    1
 	Close GUI
 
+	Copy Files 	${resultfolder0}/*.report 	${testresultfolder0}
+	Copy Files 	${resultfolder0}/*.html 	${testresultfolder0}
+
 	${html}= 	Parse XML 		${resultfolder0}${/}${resultdata0}.html
 	${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[text()='2 Test Result Summary']/..
 	${table}= 		Get Element 	${html} 	.//div[@id='${sectionid}']//table
 	${expected}= 	Get Elements Texts 	${table} 	tr/td[1]
-
-	Copy Files 	${resultfolder0}/*.report 	${testresultfolder0}
-	Copy Files 	${resultfolder0}/*.html 	${testresultfolder0}
 
 	Log To Console	Open Reporter with resultfolder1 and check template works
 
