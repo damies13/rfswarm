@@ -273,7 +273,7 @@ Template with Start and End Dates
 	# tree = lxml.etree.parse("/home/dave/Downloads/Reporter-windows-latest-3.11/Issue-#250/20240626_130059_jpetstore-nomon-quick/20240626_130059_jpetstore-nomon-quick.html", lxml.etree.HTMLParser())
 	# ${html}= 	Evaluate 			lxml.etree.parse("${resultfolder0}${/}${resultdata0}.html", lxml.etree.HTMLParser()) 	modules=lxml.etree
 	${rawhtml}= 	Get File 	${resultfolder0}${/}${resultdata0}.html
-	${html}= 	Evaluate 			lxml.etree.fromstring(${rawhtml}, lxml.etree.HTMLParser()) 	modules=lxml.etree
+	${html}= 	Evaluate 			lxml.etree.fromstring('${rawhtml}', lxml.etree.HTMLParser()) 	modules=lxml.etree
 	${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[text()='2 Test Result Summary']/..
 	${table}= 		Get Element 	${html} 	.//div[@id='${sectionid}']//table
 	${expected}= 	Get Elements Texts 	${table} 	tr/td[1]
@@ -292,7 +292,7 @@ Template with Start and End Dates
 	# ${html}= 	Parse XML 		${resultfolder1}${/}${resultdata1}.html
 	# ${html}= 	Evaluate 			lxml.etree.parse("${resultfolder1}${/}${resultdata1}.html", lxml.etree.HTMLParser()) 	modules=lxml.etree
 	${rawhtml}= 	Get File 	${resultfolder1}${/}${resultdata1}.html
-	${html}= 	Evaluate 			lxml.etree.fromstring(${rawhtml}, lxml.etree.HTMLParser()) 	modules=lxml.etree
+	${html}= 	Evaluate 			lxml.etree.fromstring('${rawhtml}', lxml.etree.HTMLParser()) 	modules=lxml.etree
 	${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[text()='2 Test Result Summary']/..
 	${table}= 		Get Element 	${html} 	.//div[@id='${sectionid}']//table
 	FOR 	${index}    ${item}    IN ENUMERATE    @{expected}
