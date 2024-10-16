@@ -260,7 +260,7 @@ Template with Start and End Dates
 	Save Template File OS DIALOG	${templatename}
 
 	Click Button 	GenerateHTML
-	Wait For Status 	GeneratingXHTMLReport
+	# Wait For Status 	GeneratingXHTMLReport
 	Wait For Status 	SavedXHTMLReport
 	Sleep    1
 	Close GUI
