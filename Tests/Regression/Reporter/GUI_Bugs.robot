@@ -271,7 +271,7 @@ Template with Start and End Dates
 	# ${html}= 	Parse XML 		${resultfolder0}${/}${resultdata0}.html
 	# import lxml.etree
 	# tree = lxml.etree.parse("/home/dave/Downloads/Reporter-windows-latest-3.11/Issue-#250/20240626_130059_jpetstore-nomon-quick/20240626_130059_jpetstore-nomon-quick.html", lxml.etree.HTMLParser())
-	${html}= 	Evaluate 			lxml.etree.parse("${resultfolder0}${/}${resultdata0}.html", lxml.etree.HTMLParser()) 	modules=lxml.etree
+	${html}= 	Evaluate 			lxml.etree.parse(r'${resultfolder0}${/}${resultdata0}.html', lxml.etree.HTMLParser()) 	modules=lxml.etree
 	# ${rawhtml}= 	Get File 	${resultfolder0}${/}${resultdata0}.html
 	# ${html}= 	Evaluate 			lxml.etree.fromstring('${rawhtml}', lxml.etree.HTMLParser()) 	modules=lxml.etree
 	${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[text()='2 Test Result Summary']/..
