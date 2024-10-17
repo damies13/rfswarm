@@ -1,0 +1,462 @@
+[Report]
+order = FB633D007AE,FB633DDEB43,FB634BA09A3,FB634BC6F62,FB633E47CD4,FB63521E022,FB633EB6327,FB6A0B4C09D,FB6A07238B2,FB6A0ABC435,FB6352D21FA,FB634E5493F,FB7350079CD,FB967177C83,FB63406A7EF,FB63574547B,FB6A11F3115,FB6A1256B53,FB63584F263,FB7350A2468,FB9675E1328,FB63411065A,FB7355B8E87,FB735654ABA,FB735667ABF,FB7356761CB,FB967C81D32
+title = quickdemo
+showtlogo = -1
+dateformat = yyyy-mm-dd
+timeformat = HH:MM
+timezone = Europe/Warsaw
+startoffset = -53
+showstarttime = 1
+endoffset = 58
+showendtime = 1
+font = Verdana
+fontsize = 12
+percentile = 90
+
+[FB633D007AE]
+name = This is Heading
+parent = TOP
+type = head
+changed = 1728896976.3225422
+note = Define your template by adding sections and configuring the section settingsx12Each section can be:x12 -  Note (like this) section, free textx12 -  Heading, usefull for grouping sectionsx12 -  Contents like a table of contents or figuresx12 -  Data Table, with data from test resultsx12 -  Data Graph, for graphical representation of test resultsx12x12Each section can also have sub sectionsx12x12The cover page and overall report settings can be found on the settings pane of the Report item abovex12x12
+order = 
+
+[FB633DDEB43]
+name = Contents contents
+parent = TOP
+type = contents
+changed = 1728896976.3239317
+mode = Table Of Contents
+level = 3
+order = 
+
+[FB633E47CD4]
+name = Note
+parent = TOP
+type = note
+changed = 1728896976.3279803
+note = Hello i am a simple and obvious note :-)x12This is just second line.x12 - first linex12 - second linex12 - third linex12
+order = FB635F8AEAF
+
+[FB633EB6327]
+name = Data Graph Left Result
+parent = TOP
+type = graph
+changed = 1728896976.333076
+
+[FB633EB6327L]
+resulttype = Response Time
+changed = 1728153977.623978
+filterresult = None
+filteragent = 
+datatype = Result
+sql = SELECT end_time as 'Time' , elapsed_time as 'Value' , result_name as x91Namex93 FROM Results WHERE x91Namex93 NOT LIKE 'Exception in threadx37' AND end_time >= 1690522973 AND end_time <= 1690523400
+isnumeric = 1
+axisen = 1
+enablefilterresult = 0
+enablefilteragent = 0
+filtertype = Not Wildcard (Unix Glob)
+
+[FB633EB6327R]
+datatype = Result
+changed = 1728153977.6249843
+axisen = 0
+filteragent = None
+filtertype = None
+sql = SELECT end_time as 'Time' , elapsed_time as 'Value' , result_name as x91Namex93 FROM Results WHERE x91Namex93 NOT LIKE 'Exception in threadx37' AND end_time >= 1690522973 AND end_time <= 1690523400
+resulttype = Response Time
+filterresult = None
+
+[FB63406A7EF]
+name = Data Table Metric
+parent = TOP
+type = table
+changed = 1728896976.3409705
+colours = 0
+datatype = Metric
+resulttype = Response Time
+filterresult = None
+filteragent = None
+sql = SELECT PrimaryMetric , MetricType , SecondaryMetric , min(CAST(MetricValue AS NUMERIC)) AS 'Minimum' , round(avg(CAST(MetricValue AS NUMERIC)),3) AS 'Average' , round(percentile(CAST(MetricValue AS NUMERIC), 90),3) AS '90x37ile' , max(CAST(MetricValue AS NUMERIC)) AS 'Maximum' , round(stdev(CAST(MetricValue AS NUMERIC)),3) AS 'Std. Dev.' FROM MetricData WHERE MetricTime >= 1690522973 AND MetricTime <= 1690523400 GROUP by PrimaryMetric , MetricType , SecondaryMetric
+primarymetric = 
+isnumeric = 1
+showcount = 1
+
+[FB63411065A]
+name = Error Details
+parent = TOP
+type = errors
+changed = 1728896976.347805
+images = 1
+grouprn = 1
+groupet = 1
+sql = SELECT r.script_index || '_' || r.robot || '_' || r.iteration || '_' || r.sequence 'id' , r.result_name , r.script_index , r.robot , r.iteration , r.sequence , mt.SecondaryMetric 'script' , mt.MetricValue 'test_name' FROM Results r LEFT JOIN MetricData mt on mt.PrimaryMetric = r.script_index AND mt.MetricType = 'Scenario_Test' WHERE r.result = 'FAIL' AND r.end_time >= 1690522973 AND r.end_time <= 1690523400 ORDER BY x91idx93 ASC
+
+[FB634BA09A3]
+name = Contents graphs
+parent = TOP
+type = contents
+changed = 1728896976.3251538
+mode = Table of Graphs
+level = 1
+
+[FB634BC6F62]
+name = Contents tables
+parent = TOP
+type = contents
+changed = 1728896976.3266122
+mode = Table Of Tables
+level = 1
+
+[FB634E5493F]
+name = Data Graph Right Result
+parent = TOP
+type = graph
+changed = 1728896976.3389778
+
+[FB634E5493FL]
+datatype = None
+changed = 1727524603.2300546
+axisen = 0
+
+[FB634E5493FR]
+datatype = Result
+changed = 1728153981.1474557
+axisen = 1
+isnumeric = 0
+filteragent = None
+filtertype = None
+sql = SELECT end_time as 'Time' , elapsed_time as 'Value' , result_name as x91Namex93 FROM Results WHERE x91Namex93 NOT LIKE 'Exception in threadx37' AND end_time >= 1690522973 AND end_time <= 1690523400
+resulttype = Response Time
+filterresult = None
+
+[FB63521E022]
+name = Data Graph Left Metric
+parent = TOP
+type = graph
+changed = 1728896976.3319454
+
+[FB63521E022L]
+metrictype = Summary
+changed = 1728153976.634895
+filteragent = None
+filtertype = None
+datatype = Metric
+sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric || ' - ' || SecondaryMetric as x91Namex93  FROM MetricData WHERE MetricType == 'Summary' AND MetricTime >= 1690522973 AND MetricTime <= 1690523400 ORDER BY MetricTime
+primarymetric = 
+axisen = 1
+enablefilteragent = 0
+secondarymetric = 
+
+[FB63521E022R]
+datatype = None
+changed = 1727525021.8122218
+
+[FB6352D21FA]
+name = Data Graph Right Metric
+parent = TOP
+type = graph
+changed = 1728896976.3379183
+
+[FB6352D21FAL]
+datatype = None
+changed = 1727525071.454143
+axisen = 0
+
+[FB6352D21FAR]
+datatype = Metric
+changed = 1728153980.205394
+axisen = 1
+metrictype = Summary
+filteragent = None
+filtertype = None
+sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric || ' - ' || SecondaryMetric as x91Namex93  FROM MetricData WHERE MetricType == 'Summary' AND MetricTime >= 1690522973 AND MetricTime <= 1690523400 ORDER BY MetricTime
+
+[FB63574547B]
+name = Data Table Result
+parent = TOP
+type = table
+changed = 1728896976.3420203
+colours = 0
+datatype = Result
+resulttype = Response Time
+filterresult = None
+enablefilterresult = 0
+filteragent = 
+sql = SELECT result_name as x91Result Namex93 , round(min(elapsed_time),3) 'Minimum' , round(avg(elapsed_time),3) 'Average' , round(percentile(elapsed_time, 90),3) '90x37ile' , round(max(elapsed_time),3) 'Maximum' , round(stdev(elapsed_time),3) 'Std. Dev.' , count(result) as 'Count' FROM Results WHERE x91Result Namex93 NOT LIKE 'Exception in threadx37' AND end_time >= 1690522973 AND end_time <= 1690523400 GROUP by x91Result Namex93
+
+[FB63584F263]
+name = Data Table ResultSummary
+parent = TOP
+type = table
+changed = 1728896976.3457146
+colours = 1
+datatype = ResultSummary
+sql = SELECT r.result_name as x91Result Namex93 , round(min(rp.elapsed_time),3) 'Minimum', round(avg(rp.elapsed_time),3) 'Average', round(percentile(rp.elapsed_time, 90),3) '90x37ile', round(max(rp.elapsed_time),3) 'Maximum', round(stdev(rp.elapsed_time),3) 'Std. Dev.', count(rp.result) as 'Pass', count(rf.result) as 'Fail', count(ro.result) as 'Other' FROM Results as r LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == 'PASS' LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == 'FAIL' LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' WHERE r.end_time >= 1690522973 AND r.end_time <= 1690523400 GROUP BY  r.result_name ORDER BY x91Result Namex93
+filteragent = 
+filtertype = None
+
+[FB635F8AEAF]
+name = Second Note
+parent = FB633E47CD4
+type = note
+changed = 1728896976.3280838
+note = This is my second note.x12
+order = FB636059500
+
+[FB636059500]
+name = Third Note
+parent = FB635F8AEAF
+type = note
+changed = 1728896976.328136
+note = This is my third note.x12
+
+[FB6A07238B2]
+name = Data Graph Left Result TPS
+parent = TOP
+type = graph
+changed = 1728896976.3356938
+
+[FB6A07238B2L]
+datatype = Result
+changed = 1728153978.9268098
+sql = SELECT floor(end_time) as 'Time' , count(result) as 'Value' , result_name as x91Namex93 FROM Results WHERE x91Namex93 NOT LIKE 'Exception in threadx37' AND end_time >= 1690522973 AND end_time <= 1690523400 GROUP by floor(end_time) , result_name , result ORDER by floor(end_time), result DESC, count(result) DESC
+metrictype = 
+filteragent = None
+filtertype = None
+primarymetric = 
+secondarymetric = 
+resulttype = TPS
+filterresult = None
+axisen = 1
+
+[FB6A07238B2R]
+datatype = None
+changed = 1727705045.599285
+
+[FB6A0ABC435]
+name = Data Graph Left Result Total TPS
+parent = TOP
+type = graph
+changed = 1728896976.3368347
+
+[FB6A0ABC435L]
+resulttype = Total TPS
+changed = 1728153979.5795178
+filterresult = None
+filteragent = None
+datatype = Result
+sql = SELECT floor(end_time) as 'Time', count(result) as 'Value' , result as x91Namex93 FROM Results WHERE end_time >= 1690522973 AND end_time <= 1690523400 GROUP by floor(end_time) , result ORDER by floor(end_time), count(result) DESC
+
+[FB6A0ABC435R]
+datatype = None
+changed = 1727705416.418125
+
+[FB6A0B4C09D]
+name = Data Graph Left Result FAIL
+parent = TOP
+type = graph
+changed = 1728896976.3345714
+
+[FB6A0B4C09DL]
+resulttype = Response Time
+changed = 1728153978.2833788
+filterresult = Fail
+filteragent = None
+datatype = Result
+sql = SELECT end_time as 'Time' , elapsed_time as 'Value' , result_name as x91Namex93 FROM Results WHERE result == 'FAIL' AND x91Namex93 NOT LIKE 'Exception in threadx37' AND end_time >= 1690522973 AND end_time <= 1690523400
+enablefilterresult = 0
+
+[FB6A0B4C09DR]
+datatype = None
+changed = 1727705478.0610175
+
+[FB6A11F3115]
+name = Data Table Result TPS
+parent = TOP
+type = table
+changed = 1728896976.3432028
+colours = 0
+datatype = Result
+resulttype = TPS
+filterresult = None
+filteragent = None
+sql = SELECT result_name as x91Result Namex93 , result 'Result' , count(result)  as 'Count' FROM Results WHERE x91Result Namex93 NOT LIKE 'Exception in threadx37' AND end_time >= 1690522973 AND end_time <= 1690523400 GROUP by x91Result Namex93 , result ORDER BY result DESC, count(result) DESC
+
+[FB6A1256B53]
+name = Data Table Result TotalTPS
+parent = TOP
+type = table
+changed = 1728896976.3444252
+colours = 0
+datatype = Result
+resulttype = Total TPS
+filterresult = None
+filteragent = None
+sql = SELECT result  as x91Result x93 , count(result)  as 'Count' FROM Results WHERE end_time >= 1690522973 AND end_time <= 1690523400 GROUP by  x91Result x93 ORDER BY count(x91Result x93) DESC
+
+[FB7350079CD]
+name = Data Graph LR Combined
+parent = TOP
+type = graph
+changed = 1728896976.340008
+
+[FB7350079CDL]
+isnumeric = 1
+changed = 1728153981.792224
+filteragent = None
+filtertype = None
+datatype = Metric
+sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric as x91Namex93  FROM MetricData WHERE MetricType == 'Scenario' AND SecondaryMetric == 'total_robots' AND MetricTime >= 1690522973 AND MetricTime <= 1690523400 ORDER BY MetricTime
+metrictype = Scenario
+secondarymetric = total_robots
+
+[FB7350079CDR]
+datatype = Result
+changed = 1728153981.7932255
+axisen = 1
+resulttype = Total TPS
+filterresult = None
+filteragent = None
+sql = SELECT floor(end_time) as 'Time', count(result) as 'Value' , result as x91Namex93 FROM Results WHERE end_time >= 1690522973 AND end_time <= 1690523400 GROUP by floor(end_time) , result ORDER by floor(end_time), count(result) DESC
+
+[FB7350A2468]
+name = Data Table Polish Lang
+parent = TOP
+type = table
+changed = 1728896976.3468468
+colours = 0
+datatype = ResultSummary
+sql = SELECT r.result_name as x91Result Namex93 , round(min(rp.elapsed_time),3) 'Minimum', round(avg(rp.elapsed_time),3) 'Average', round(percentile(rp.elapsed_time, 90),3) '90x37ile', round(max(rp.elapsed_time),3) 'Maximum', round(stdev(rp.elapsed_time),3) 'Std. Dev.', count(rp.result) as 'Pass', count(rf.result) as 'Fail', count(ro.result) as 'Other' FROM Results as r LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == 'PASS' LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == 'FAIL' LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' WHERE r.end_time >= 1690522973 AND r.end_time <= 1690523400 GROUP BY  r.result_name ORDER BY x91Result Namex93
+filteragent = 
+filtertype = None
+resulttype = None
+filterresult = None
+col_result_name = Nazwa Wyniku
+col_average = Średnia
+col_90x37ile = 90x37yl
+col_maximum = Maksimum
+col_std_dev = Odchylenie Standardowe
+col_pass = Pomyślnie
+col_fail = Niepowodzenie
+col_other = Inne
+
+[FB7355B8E87]
+name = Error Details No Screenshots
+parent = TOP
+type = errors
+changed = 1728896976.3487208
+images = 0
+grouprn = 1
+groupet = 1
+sql = SELECT r.script_index || '_' || r.robot || '_' || r.iteration || '_' || r.sequence 'id' , r.result_name , r.script_index , r.robot , r.iteration , r.sequence , mt.SecondaryMetric 'script' , mt.MetricValue 'test_name' FROM Results r LEFT JOIN MetricData mt on mt.PrimaryMetric = r.script_index AND mt.MetricType = 'Scenario_Test' WHERE r.result = 'FAIL' AND r.end_time >= 1690522973 AND r.end_time <= 1690523400 ORDER BY x91idx93 ASC
+lbl_result = Result
+lbl_test = Test
+lbl_script = Script
+lbl_error = Error
+lbl_count = Count
+lbl_screenshot = Screenshot
+lbl_noscreenshot = No Screenshot
+
+[FB735654ABA]
+name = Error Details No GBRN
+parent = TOP
+type = errors
+changed = 1728896976.34963
+images = 1
+grouprn = 0
+groupet = 1
+sql = SELECT r.script_index || '_' || r.robot || '_' || r.iteration || '_' || r.sequence 'id' , r.result_name , r.script_index , r.robot , r.iteration , r.sequence , mt.SecondaryMetric 'script' , mt.MetricValue 'test_name' FROM Results r LEFT JOIN MetricData mt on mt.PrimaryMetric = r.script_index AND mt.MetricType = 'Scenario_Test' WHERE r.result = 'FAIL' AND r.end_time >= 1690522973 AND r.end_time <= 1690523400 ORDER BY x91idx93 ASC
+lbl_result = Result
+lbl_test = Test
+lbl_script = Script
+lbl_error = Error
+lbl_count = Count
+lbl_screenshot = Screenshot
+lbl_noscreenshot = No Screenshot
+
+[FB735667ABF]
+name = Error Details No GBET
+parent = TOP
+type = errors
+changed = 1728896976.350854
+images = 1
+grouprn = 1
+groupet = 0
+sql = SELECT r.script_index || '_' || r.robot || '_' || r.iteration || '_' || r.sequence 'id' , r.result_name , r.script_index , r.robot , r.iteration , r.sequence , mt.SecondaryMetric 'script' , mt.MetricValue 'test_name' FROM Results r LEFT JOIN MetricData mt on mt.PrimaryMetric = r.script_index AND mt.MetricType = 'Scenario_Test' WHERE r.result = 'FAIL' AND r.end_time >= 1690522973 AND r.end_time <= 1690523400 ORDER BY x91idx93 ASC
+lbl_result = Result
+lbl_test = Test
+lbl_script = Script
+lbl_error = Error
+lbl_count = Count
+lbl_screenshot = Screenshot
+lbl_noscreenshot = No Screenshot
+
+[FB7356761CB]
+name = Error Details Polish Lang
+parent = TOP
+type = errors
+changed = 1728896976.3518205
+images = 0
+grouprn = 0
+groupet = 0
+sql = SELECT r.script_index || '_' || r.robot || '_' || r.iteration || '_' || r.sequence 'id' , r.result_name , r.script_index , r.robot , r.iteration , r.sequence , mt.SecondaryMetric 'script' , mt.MetricValue 'test_name' FROM Results r LEFT JOIN MetricData mt on mt.PrimaryMetric = r.script_index AND mt.MetricType = 'Scenario_Test' WHERE r.result = 'FAIL' AND r.end_time >= 1690522973 AND r.end_time <= 1690523400 ORDER BY x91idx93 ASC
+lbl_result = Nazwa Wyniku
+lbl_test = Test
+lbl_script = Skrypt
+lbl_error = Błąd
+lbl_count = Liczba
+lbl_screenshot = Zrzut Ekranu
+lbl_noscreenshot = Brak Zrzutu Ekranu
+
+[FB967177C83]
+name = Data Graph ST ET
+parent = TOP
+type = graph
+changed = 1728897643.6657975
+startoffset = 307
+
+[FB967177C83L]
+resulttype = Response Time
+changed = 1728897643.7702172
+filterresult = None
+filteragent = None
+datatype = Result
+sql = SELECT end_time as 'Time' , elapsed_time as 'Value' , result_name as x91Namex93 FROM Results WHERE x91Namex93 NOT LIKE 'Exception in threadx37' AND end_time >= 1690523280 AND end_time <= 1690523400
+
+[FB967177C83R]
+datatype = None
+changed = 1728897434.4794645
+
+[FB9675E1328]
+name = Data Table ST ET
+parent = TOP
+type = table
+changed = 1728898375.506334
+colours = 0
+datatype = ResultSummary
+sql = SELECT r.result_name as x91Result Namex93 , round(min(rp.elapsed_time),3) 'Minimum', round(avg(rp.elapsed_time),3) 'Average', round(percentile(rp.elapsed_time, 90),3) '90x37ile', round(max(rp.elapsed_time),3) 'Maximum', round(stdev(rp.elapsed_time),3) 'Std. Dev.', count(rp.result) as 'Pass', count(rf.result) as 'Fail', count(ro.result) as 'Other' FROM Results as r LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == 'PASS' LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == 'FAIL' LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' WHERE r.end_time >= 1690523340 AND r.end_time <= 1690523400 GROUP BY  r.result_name ORDER BY x91Result Namex93
+startoffset = 367
+filteragent = 
+filtertype = None
+endoffset = -60
+
+[FB967C81D32]
+name = Error Details ST ET
+parent = TOP
+type = errors
+changed = 1728898545.4942107
+images = 1
+grouprn = 1
+groupet = 1
+sql = SELECT r.script_index || '_' || r.robot || '_' || r.iteration || '_' || r.sequence 'id' , r.result_name , r.script_index , r.robot , r.iteration , r.sequence , mt.SecondaryMetric 'script' , mt.MetricValue 'test_name' FROM Results r LEFT JOIN MetricData mt on mt.PrimaryMetric = r.script_index AND mt.MetricType = 'Scenario_Test' WHERE r.result = 'FAIL' AND r.end_time >= 1690523280 AND r.end_time <= 1690523340 ORDER BY x91idx93 ASC
+startoffset = 307
+lbl_result = Result
+lbl_test = Test
+lbl_script = Script
+lbl_error = Error
+lbl_count = Count
+lbl_screenshot = Screenshot
+lbl_noscreenshot = No Screenshot
+endoffset = 60
+
