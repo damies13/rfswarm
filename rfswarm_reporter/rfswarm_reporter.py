@@ -306,6 +306,50 @@ class ReporterBase():
 			self.debugmsg(1, "with error: ", e)
 			return False
 
+	def sec2hms(self, sec):
+		base.debugmsg(6, "type(sec):", type(sec), sec)
+		if isinstance(sec, time.struct_time):
+			sec = time.mktime(sec)
+			base.debugmsg(6, "type(sec):", type(sec), sec)
+		h = int(sec / 3600)
+		m = int((sec - h * 3600) / 60)
+		s = int((sec - h * 3600) - m * 60)
+		hms = "{:02}:{:02}:{:02}".format(h, m, s)
+		return hms
+
+	def hms2sec(self, hms):
+		sec = 0
+		arrhms = str(hms).split(":")
+		base.debugmsg(6, "arrhms:", arrhms)
+		if len(arrhms) == 3:
+			if len(arrhms[0]) > 0:
+				h = int(arrhms[0])
+			else:
+				h = 0
+			if len(arrhms[1]) > 0:
+				m = int(arrhms[1])
+			else:
+				m = 0
+			if len(arrhms[2]) > 0:
+				s = int(arrhms[2])
+			else:
+				s = 0
+			sec = (h * 3600) + (m * 60) + s
+		if len(arrhms) == 2:
+			h = 0
+			if len(arrhms[0]) > 0:
+				m = int(arrhms[0])
+			else:
+				m = 0
+			if len(arrhms[1]) > 0:
+				s = int(arrhms[1])
+			else:
+				s = 0
+			sec = (h * 3600) + (m * 60) + s
+		if len(arrhms) == 1:
+			sec = int(arrhms[0])
+		return sec
+
 	#
 	# Template Functions
 	#
@@ -953,6 +997,24 @@ class ReporterBase():
 		changes = base.report_item_set_value(id, name, str(value))
 		return changes
 
+	def report_item_get_bool_def0(self, id, name):
+		value = base.report_item_get_int(id, name)
+		if value < 0:
+			return 0
+		else:
+			return int(value)
+
+	def report_item_get_bool_def1(self, id, name):
+		value = base.report_item_get_int(id, name)
+		if value < 0:
+			return 1
+		else:
+			return int(value)
+
+	def report_item_set_bool(self, id, name, value):
+		changes = base.report_item_set_int(id, name, value)
+		return changes
+
 	#
 	# Report Item Type: contents
 	#
@@ -1404,9 +1466,6 @@ class ReporterBase():
 			sql += "ORDER BY MetricTime "
 
 		if DataType == "Plan":
-			# MType = self.rt_table_get_mt(id)
-			# PM = self.rt_table_get_pm(id)
-
 			sql = "SELECT "
 			sql += "md1.* "
 			sql += ", md0.SecondaryMetric as [File] "
@@ -1461,6 +1520,22 @@ class ReporterBase():
 
 		starttime = base.rt_setting_get_starttime(id)
 		endtime = base.rt_setting_get_endtime(id)
+
+		if DataType == "Plan":
+			sql = "SELECT "
+			sql += "md1.* "
+			sql += ", md0.SecondaryMetric as [File] "
+			sql += ", fp0.SecondaryMetric as [FilePath] "
+			# sql += ", concat(fp0.SecondaryMetric, " ", md0.MetricValue ) as [ColourKey] "
+			sql += "FROM MetricData as md0 "
+			sql += "LEFT JOIN MetricData as fp0 "
+			sql += "ON fp0.MetricValue = md0.MetricValue "
+			sql += "AND fp0.MetricType = 'Scenario' "
+			sql += "AND fp0.PrimaryMetric like 'Local_Path_%' "
+			sql += "LEFT JOIN MetricData as md1 "
+			sql += "ON md1.SecondaryMetric = md0.MetricValue "
+			sql += "AND md1.MetricType = 'Scenario' "
+			sql += "WHERE md0.MetricType = 'Scenario' AND md0.PrimaryMetric like 'Test_%' "
 
 		if DataType == "Result":
 			RType = self.rt_table_get_rt(id)
@@ -1739,19 +1814,6 @@ class ReporterBase():
 					i += 1
 
 		if DataType == "ResultSummary":
-			# SELECT
-			# 	rs.Name
-			# 	, rs.Min
-			# 	, rs.Average
-			# 	, rs.StDev
-			# 	, rs.[%ile_Value] '90 %ile'
-			# 	, rs.Max
-			# 	, rs.Pass
-			# 	, rs.Fail
-			# 	, rs.Other
-			# FROM ResultSummary rs
-			# WHERE rs.Name not like '%<%'
-
 			EnFA = self.rt_table_get_enfa(id)
 			FAType = self.rt_table_get_fa(id)
 			FNType = self.rt_table_get_fn(id)
@@ -2911,6 +2973,69 @@ class ReporterBase():
 		base.debugmsg(5, "dataout:", dataout)
 		return dataout
 
+	def table_postprocess_data_plan(self, id, datain):
+		base.debugmsg(5, "datain:", datain)
+		# [
+		# 	{'PrimaryMetric': 'Delay_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '0', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Ramp_Up_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '20', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Robots_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '30', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Run_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '60', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'}
+		# ]
+		# 	 Index		Robots		Delay  		RampUp 		Run		Script		Test	Settings
+		dataout = []
+		data = {}
+
+		scriptopt = base.report_item_get_value(id, base.rt_table_ini_colname("Script Opt"))
+		if scriptopt is None:
+			scriptopt = "File"
+
+		for rowin in datain:
+			base.debugmsg(5, "rowin:", rowin)
+			if 'PrimaryMetric' in rowin and "_" in rowin['PrimaryMetric']:
+				key, index = rowin['PrimaryMetric'].rsplit("_", 1)
+				base.debugmsg(5, "key:", key, "	index:", index)
+				if index not in data:
+					data[index] = {}
+				if key == "Delay":
+					data[index]["Index"] = index
+					data[index]["Delay"] = int(rowin['MetricValue'])
+					data[index]["Colour"] = rowin['SecondaryMetric'] + " " + rowin['FilePath']
+					data[index]["Script"] = rowin['File']
+					data[index]["ScriptPath"] = rowin['FilePath']
+					data[index]["Test"] = rowin['SecondaryMetric']
+
+				if key == "Ramp_Up":
+					data[index]["Ramp Up"] = int(rowin['MetricValue'])
+				if key == "Robots":
+					data[index]["Robots"] = int(rowin['MetricValue'])
+				if key == "Run":
+					data[index]["Run"] = int(rowin['MetricValue'])
+
+			else:
+				base.debugmsg(5, "Unexpected data in rowin:", rowin)
+
+		for index in data.keys():
+			base.debugmsg(5, "index:", index, data[index])
+
+			datarow = {}
+			# 	 Index		Robots		Delay  		RampUp 		Run		Script		Test	Settings
+			datarow["Colour"] = data[index]["Colour"]
+			datarow["Index"] = data[index]["Index"]
+			datarow["Robots"] = data[index]["Robots"]
+			datarow["Delay"] = base.sec2hms(data[index]["Delay"])
+			datarow["Ramp Up"] = base.sec2hms(data[index]["Ramp Up"])
+			datarow["Run"] = base.sec2hms(data[index]["Run"])
+			if scriptopt == "File":
+				datarow["Script"] = data[index]["Script"]
+			else:
+				datarow["Script"] = data[index]["ScriptPath"]
+			datarow["Test"] = data[index]["Test"]
+
+			dataout.append(datarow)
+
+		base.debugmsg(5, "dataout:", dataout)
+		return dataout
+
 
 class ReporterCore:
 
@@ -4055,6 +4180,9 @@ class ReporterCore:
 				time.sleep(0.1)
 
 			tdata = base.dbqueue["ReadResult"][key]
+			if datatype == "Plan":
+				base.debugmsg(9, "tdata before:", tdata)
+				tdata = base.table_postprocess_data_plan(id, tdata)
 			base.debugmsg(9, "tdata:", tdata)
 
 			if len(tdata) > 0:
@@ -4066,9 +4194,11 @@ class ReporterCore:
 					th = etree.SubElement(tr, 'th')
 				for col in cols:
 					if col not in ["Colour"]:
-						dispname = base.rt_table_get_colname(id, col)
-						th = etree.SubElement(tr, 'th')
-						th.text = dispname.strip()
+						show = base.report_item_get_bool_def1(id, base.rt_table_ini_colname(f"{col} Show"))
+						if show:
+							dispname = base.rt_table_get_colname(id, col)
+							th = etree.SubElement(tr, 'th')
+							th.text = dispname.strip()
 
 				# table rows
 				for row in tdata:
@@ -4095,11 +4225,13 @@ class ReporterCore:
 					# for val in vals:
 					for col in cols:
 						if col not in ["Colour"]:
-							td = etree.SubElement(tr, 'td')
-							val = str(row[col]).strip()
-							val = base.illegal_xml_chars_re.sub('', val)
-							base.debugmsg(8, "val:", val)
-							td.text = val
+							show = base.report_item_get_bool_def1(id, base.rt_table_ini_colname(f"{col} Show"))
+							if show:
+								td = etree.SubElement(tr, 'td')
+								val = str(row[col]).strip()
+								val = base.illegal_xml_chars_re.sub('', val)
+								base.debugmsg(8, "val:", val)
+								td.text = val
 
 	def xhtml_sections_errors(self, elmt, id):
 		base.debugmsg(8, "id:", id)
@@ -4911,6 +5043,9 @@ class ReporterCore:
 				time.sleep(0.1)
 
 			tdata = base.dbqueue["ReadResult"][key]
+			if datatype == "Plan":
+				base.debugmsg(9, "tdata before:", tdata)
+				tdata = base.table_postprocess_data_plan(id, tdata)
 			base.debugmsg(8, "tdata:", tdata)
 
 			if len(tdata) > 0:
@@ -4918,7 +5053,8 @@ class ReporterCore:
 				cols = list(tdata[0].keys())
 				base.debugmsg(7, "cols:", cols)
 
-				numcols = len(cols)
+				# numcols = len(cols)
+				numcols = 1
 				cellcol = 0
 				cellrow = 0
 				if colours:
@@ -4940,15 +5076,19 @@ class ReporterCore:
 				cw = 5
 				for col in cols:
 					if col not in ["Colour"]:
-						dispname = base.rt_table_get_colname(id, col)
-						table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
-						table.rows[cellrow].cells[cellcol].paragraphs[0].text = dispname.strip()
-						table.columns[cellcol].width = Cm(cw)
-						if cw > 2:
-							cw = 1.7
-						if cellcol > 5:
-							cw = 1.1
-						cellcol += 1
+						show = base.report_item_get_bool_def1(id, base.rt_table_ini_colname(f"{col} Show"))
+						if show:
+							if cellcol > 0:
+								table.add_column(width=1)
+							dispname = base.rt_table_get_colname(id, col)
+							table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Header"
+							table.rows[cellrow].cells[cellcol].paragraphs[0].text = dispname.strip()
+							table.columns[cellcol].width = Cm(cw)
+							if cw > 2:
+								cw = 1.7
+							if cellcol > 5:
+								cw = 1.1
+							cellcol += 1
 
 				# table rows
 				for row in tdata:
@@ -4995,21 +5135,23 @@ class ReporterCore:
 					# for val in vals:
 					for col in cols:
 						if col not in ["Colour"]:
-							val = str(row[col]).strip()
-							val = base.illegal_xml_chars_re.sub('', val)
-							base.debugmsg(8, "val:", val)
+							show = base.report_item_get_bool_def1(id, base.rt_table_ini_colname(f"{col} Show"))
+							if show:
+								val = str(row[col]).strip()
+								val = base.illegal_xml_chars_re.sub('', val)
+								base.debugmsg(8, "val:", val)
 
-							# table.rows[cellrow].cells[cellcol].text = str(val)
-							# table.rows[cellrow].cells[cellcol].add_paragraph(text=str(val), style="Table Cell")
-							table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
-							table.rows[cellrow].cells[cellcol].paragraphs[0].text = val
+								# table.rows[cellrow].cells[cellcol].text = str(val)
+								# table.rows[cellrow].cells[cellcol].add_paragraph(text=str(val), style="Table Cell")
+								table.rows[cellrow].cells[cellcol].paragraphs[0].style = "Table Cell"
+								table.rows[cellrow].cells[cellcol].paragraphs[0].text = val
 
-							tcw = int(table.columns[cellcol].width.cm) + 1
-							# base.debugmsg(5, "tcw:", tcw)
-							if tcw > 5:
-								table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
+								tcw = int(table.columns[cellcol].width.cm) + 1
+								# base.debugmsg(5, "tcw:", tcw)
+								if tcw > 5:
+									table.rows[cellrow].cells[cellcol].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.LEFT
 
-							cellcol += 1
+								cellcol += 1
 
 				table.autofit = True
 				# table.style.paragraph_format.left_indent = Cm(-0.50)
@@ -6016,6 +6158,9 @@ class ReporterCore:
 				time.sleep(0.1)
 
 			tdata = base.dbqueue["ReadResult"][key]
+			if datatype == "Plan":
+				base.debugmsg(9, "tdata before:", tdata)
+				tdata = base.table_postprocess_data_plan(id, tdata)
 			base.debugmsg(8, "tdata:", tdata)
 
 			if len(tdata) > 0:
@@ -6041,18 +6186,19 @@ class ReporterCore:
 
 				for col in cols:
 					if col not in ["Colour"]:
+						show = base.report_item_get_bool_def1(id, base.rt_table_ini_colname(f"{col} Show"))
+						if show:
+							dispname = base.rt_table_get_colname(id, col)
 
-						dispname = base.rt_table_get_colname(id, col)
+							base.debugmsg(8, "col:", col, "	cellcol:", cellcol, "	rownum:", rownum)
+							hcell = ws.cell(column=cellcol, row=rownum, value=dispname.strip())
+							hcell.style = "Table Heading"
 
-						base.debugmsg(8, "col:", col, "	cellcol:", cellcol, "	rownum:", rownum)
-						hcell = ws.cell(column=cellcol, row=rownum, value=dispname.strip())
-						hcell.style = "Table Heading"
+							neww = len(str(col.strip())) * 1.3
+							base.debugmsg(9, "neww:", neww)
+							ws.column_dimensions[hcell.column_letter].width = neww
 
-						neww = len(str(col.strip())) * 1.3
-						base.debugmsg(9, "neww:", neww)
-						ws.column_dimensions[hcell.column_letter].width = neww
-
-						cellcol += 1
+							cellcol += 1
 
 				# table rows
 				for row in tdata:
@@ -6084,20 +6230,22 @@ class ReporterCore:
 					# for val in vals:
 					for col in cols:
 						if col not in ["Colour"]:
-							val = str(row[col]).strip()
-							val = base.illegal_xml_chars_re.sub('', val)
-							base.debugmsg(8, "val:", val)
+							show = base.report_item_get_bool_def1(id, base.rt_table_ini_colname(f"{col} Show"))
+							if show:
+								val = str(row[col]).strip()
+								val = base.illegal_xml_chars_re.sub('', val)
+								base.debugmsg(8, "val:", val)
 
-							dcell = ws.cell(column=cellcol, row=rownum, value=val)
-							dcell.style = "Table Data"
+								dcell = ws.cell(column=cellcol, row=rownum, value=val)
+								dcell.style = "Table Data"
 
-							currw = ws.column_dimensions[dcell.column_letter].width
-							base.debugmsg(9, "currw:", currw, "	len(val):", len(str(val)))
-							neww = max(currw, len(str(val)))
-							base.debugmsg(8, "neww:", neww)
-							ws.column_dimensions[dcell.column_letter].width = neww
+								currw = ws.column_dimensions[dcell.column_letter].width
+								base.debugmsg(9, "currw:", currw, "	len(val):", len(str(val)))
+								neww = max(currw, len(str(val)))
+								base.debugmsg(8, "neww:", neww)
+								ws.column_dimensions[dcell.column_letter].width = neww
 
-							cellcol += 1
+								cellcol += 1
 
 		rownum += 2
 		self.xlsx_select_cell(1, rownum)
@@ -7839,7 +7987,7 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["LFrame"], text="Data Type:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
 
-		DataTypes = [None, "Metric", "Result", "ResultSummary", "SQL"]
+		DataTypes = [None, "Metric", "Result", "ResultSummary", "Plan", "SQL"]
 		self.contentdata[id]["strDT"] = tk.StringVar()
 		self.contentdata[id]["omDT"] = ttk.OptionMenu(self.contentdata[id]["LFrame"], self.contentdata[id]["strDT"], command=self.cs_datatable_switchdt, *DataTypes)
 		self.contentdata[id]["strDT"].set(datatype)
@@ -7962,6 +8110,9 @@ class ReporterGUI(tk.Frame):
 
 			base.debugmsg(8, "datatype:", datatype)
 
+			if datatype == "Plan":
+				self.cs_datatable_update_plan(id)
+
 			if datatype == "Metric":
 				self.cs_datatable_update_metrics(id)
 
@@ -7987,16 +8138,20 @@ class ReporterGUI(tk.Frame):
 				value = self.contentdata[id]["renamecolumns"][colname].get()
 				changes += base.rt_table_set_colname(id, colname, value)
 
+				value = self.contentdata[id]["renamecolumns"][f"{colname} Show"].get()
+				changes += base.report_item_set_bool(id, base.rt_table_ini_colname(f"{colname} Show"), value)
+
+				if f"{colname} Opt" in self.contentdata[id]["renamecolumns"]:
+					value = self.contentdata[id]["renamecolumns"][f"{colname} Opt"].get()
+					changes += base.report_item_set_value(id, base.rt_table_ini_colname(f"{colname} Opt"), value)
+
 		base.debugmsg(5, "content_preview id:", id)
 		# self.content_preview(id)
 		base.debugmsg(5, "changes:", changes)
 		if changes > 0:
-			# this should make the UI a bit less jumpy
 			cp = threading.Thread(target=lambda: self.content_preview(id))
 			cp.start()
 			self.cs_datatable_add_renamecols(id)
-			# cp = threading.Thread(target=lambda: self.cs_datatable_add_renamecols(id))
-			# cp.start()
 
 		# rt_table_get_alst
 
@@ -8022,6 +8177,9 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["omFA"].set_menu(*self.contentdata[id]["FATypes"])
 			except Exception as e:
 				base.debugmsg(5, "e:", e)
+
+	def cs_datatable_update_plan(self, id):
+		pass
 
 	def cs_datatable_update_metrics(self, id):
 		base.debugmsg(5, "id:", id)
@@ -8293,7 +8451,6 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["inpFP"].bind('<FocusOut>', self.cs_datatable_update)
 
 			if datatype == "SQL":
-				# sql = base.rt_table_get_sql(id)
 				rownum += 1
 				self.contentdata[id]["lblSQL"] = ttk.Label(self.contentdata[id]["Frames"][datatype], text="SQL:")
 				self.contentdata[id]["lblSQL"].grid(column=0, row=rownum, sticky="nsew")
@@ -8326,6 +8483,13 @@ class ReporterGUI(tk.Frame):
 
 			self.contentdata[id]["lbldispnme"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Display Name")
 			self.contentdata[id]["lbldispnme"].grid(column=1, row=rownum, sticky="nsew")
+
+			self.contentdata[id]["lblshowcol"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Show Column")
+			self.contentdata[id]["lblshowcol"].grid(column=2, row=rownum, sticky="nsew")
+
+			if datatype == "Plan":
+				self.contentdata[id]["lblcolopt"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Options")
+				self.contentdata[id]["lblcolopt"].grid(column=3, row=rownum, sticky="nsew")
 
 			self.contentdata[id]["renamecolumns"] = {}
 			self.contentdata[id]["renamecolumns"]["startrow"] = rownum + 1
@@ -8395,7 +8559,8 @@ class ReporterGUI(tk.Frame):
 				sql = base.rt_table_generate_sql(id)
 				if len(sql.strip()) < 1:
 					return None
-				sql += " LIMIT 1 "
+				if datatype not in ["Plan"]:
+					sql += " LIMIT 1 "
 
 			base.debugmsg(5, "sql:", sql)
 			key = "{}_{}_{}".format(id, base.report_item_get_changed(id), datetime.now().timestamp())
@@ -8412,6 +8577,9 @@ class ReporterGUI(tk.Frame):
 				time.sleep(0.1)
 
 			tdata = base.dbqueue["ReadResult"][key]
+			if datatype == "Plan":
+				base.debugmsg(9, "tdata before:", tdata)
+				tdata = base.table_postprocess_data_plan(id, tdata)
 			base.debugmsg(8, "tdata:", tdata)
 
 			if len(tdata) > 0:
@@ -8455,10 +8623,13 @@ class ReporterGUI(tk.Frame):
 
 	def cs_datatable_add_renamecol(self, id, colname):
 		base.debugmsg(5, "id:", id, "	colname:", colname)
+		datatype = base.rt_table_get_dt(id)
 
 		if "renamecolumns" in self.contentdata[id] and "renamecols" in self.contentdata[id]["Frames"]:
 			collabel = "lbl_{}".format(colname)
 			colinput = "inp_{}".format(colname)
+			colshow = "show_{}".format(colname)
+			colopt = "opt_{}".format(colname)
 			rownum = self.contentdata[id]["renamecolumns"]["rownum"]
 			if colname not in self.contentdata[id]["renamecolumns"]["colnames"]:
 				self.contentdata[id]["renamecolumns"]["rownum"] += 1
@@ -8467,15 +8638,36 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["renamecolumns"][collabel] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text=" {} ".format(colname))
 				self.contentdata[id]["renamecolumns"][collabel].grid(column=colnum, row=rownum, sticky="nsew")
 
-				colnum = 1
+				colnum += 1
 				self.contentdata[id]["renamecolumns"][colname] = tk.StringVar()
 				self.contentdata[id]["renamecolumns"][colinput] = ttk.Entry(self.contentdata[id]["Frames"]["renamecols"], textvariable=self.contentdata[id]["renamecolumns"][colname])
 				self.contentdata[id]["renamecolumns"][colinput].grid(column=colnum, row=rownum, sticky="nsew")
 				# <Leave> makes UI to jumpy
 				# self.contentdata[id]["renamecolumns"][colinput].bind('<Leave>', self.cs_datatable_update)
 				self.contentdata[id]["renamecolumns"][colinput].bind('<FocusOut>', self.cs_datatable_update)
-
 				self.contentdata[id]["renamecolumns"][colname].set(base.rt_table_get_colname(id, colname))
+
+				colnum += 1
+				self.contentdata[id]["renamecolumns"][f"{colname} Show"] = tk.IntVar()
+				self.contentdata[id]["renamecolumns"][colshow] = ttk.Checkbutton(self.contentdata[id]["Frames"]["renamecols"], variable=self.contentdata[id]["renamecolumns"][f"{colname} Show"], command=self.cs_datatable_update)
+				self.contentdata[id]["renamecolumns"][colshow].grid(column=colnum, row=rownum, sticky="nsew")
+				self.contentdata[id]["renamecolumns"][f"{colname} Show"].set(base.report_item_get_bool_def1(id, base.rt_table_ini_colname(f"{colname} Show")))
+				base.debugmsg(5, "colnum:", colnum, "	rownum:", rownum)
+
+				if datatype == "Plan":
+					if colname == "Script":
+						colnum += 1
+						optval = base.report_item_get_value(id, base.rt_table_ini_colname(f"{colname} Opt"))
+						if optval is None:
+							optval = "File"
+
+						base.debugmsg(5, "colnum:", colnum, "	rownum:", rownum, "	optval:", optval)
+
+						DataTypes = [None, "File", "Path"]
+						self.contentdata[id]["renamecolumns"][f"{colname} Opt"] = tk.StringVar()
+						self.contentdata[id]["renamecolumns"][colopt] = ttk.OptionMenu(self.contentdata[id]["Frames"]["renamecols"], self.contentdata[id]["renamecolumns"][f"{colname} Opt"], command=self.cs_datatable_update, *DataTypes)
+						self.contentdata[id]["renamecolumns"][colopt].grid(column=colnum, row=rownum, sticky="nsew")
+						self.contentdata[id]["renamecolumns"][f"{colname} Opt"].set(optval)
 
 	#
 	# Settings	-	Graph
@@ -8800,13 +8992,16 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[idr]["Frames"] = {}
 		# Forget
 		for frame in self.contentdata[id]["Frames"].keys():
-			self.contentdata[id]["Frames"][frame].grid_forget()
+			if frame in self.contentdata[id]["Frames"]:
+				self.contentdata[id]["Frames"][frame].grid_forget()
 			self.contentdata[id]["Frames"] = {}
 		for frame in self.contentdata[idl]["Frames"].keys():
-			self.contentdata[idl]["Frames"][frame].grid_forget()
+			if frame in self.contentdata[id]["Frames"]:
+				self.contentdata[idl]["Frames"][frame].grid_forget()
 			self.contentdata[idl]["Frames"] = {}
 		for frame in self.contentdata[idr]["Frames"].keys():
-			self.contentdata[idr]["Frames"][frame].grid_forget()
+			if frame in self.contentdata[id]["Frames"]:
+				self.contentdata[idr]["Frames"][frame].grid_forget()
 			self.contentdata[idr]["Frames"] = {}
 
 		# Construct
@@ -10130,6 +10325,10 @@ class ReporterGUI(tk.Frame):
 				time.sleep(0.1)
 
 			tdata = base.dbqueue["ReadResult"][key]
+			# table_postprocess_data_plan
+			if datatype == "Plan":
+				base.debugmsg(9, "tdata before:", tdata)
+				tdata = base.table_postprocess_data_plan(id, tdata)
 			base.debugmsg(8, "tdata:", tdata)
 
 			# self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text=notetxt)
@@ -10147,12 +10346,14 @@ class ReporterGUI(tk.Frame):
 				colnum = 1 + colours
 				for col in cols:
 					if col not in ["Colour"]:
-						cellname = "h_{}".format(col)
-						base.debugmsg(9, "cellname:", cellname)
-						dispname = base.rt_table_get_colname(id, col)
-						self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{} ".format(dispname.strip()), style='Report.THead.TLabel')
-						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
-						colnum += 1
+						show = base.report_item_get_bool_def1(id, base.rt_table_ini_colname(f"{col} Show"))
+						if show:
+							cellname = "h_{}".format(col)
+							base.debugmsg(9, "cellname:", cellname)
+							dispname = base.rt_table_get_colname(id, col)
+							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{} ".format(dispname.strip()), style='Report.THead.TLabel')
+							self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+							colnum += 1
 				i = 0
 				for row in tdata:
 					i += 1
@@ -10178,11 +10379,13 @@ class ReporterGUI(tk.Frame):
 
 					for col in cols:
 						if col not in ["Colour"]:
-							colnum += 1
-							cellname = "{}_{}".format(i, col)
-							base.debugmsg(9, "cellname:", cellname)
-							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(row[col]), style='Report.TBody.TLabel')
-							self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+							show = base.report_item_get_bool_def1(id, base.rt_table_ini_colname(f"{col} Show"))
+							if show:
+								colnum += 1
+								cellname = "{}_{}".format(i, col)
+								base.debugmsg(9, "cellname:", cellname)
+								self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(row[col]), style='Report.TBody.TLabel')
+								self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 	def cp_errors(self, id):
 		base.debugmsg(5, "id:", id)
