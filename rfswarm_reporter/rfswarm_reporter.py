@@ -4161,7 +4161,7 @@ class ReporterCore:
 
 		M = ElementMaker(namespace=None, nsmap={None: "http://www.w3.org/1999/xhtml"})
 		# html = M.html(E.head(E.title("Test page")), E.body(E.p("Hello world")))
-		html = M.html(E.head(E.title("Test page")), E.body())
+		html = M.html(E.head(E.title("Test page"), E.meta(charset="utf-8")), E.body())
 
 		return html
 
