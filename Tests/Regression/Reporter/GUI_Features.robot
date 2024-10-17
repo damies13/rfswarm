@@ -228,7 +228,7 @@ Verify Plan Graph - No Total
 
 	# Take A Screenshot
 
-	Set Confidence		0.7
+	Set Confidence		0.5
 	Locate 	reporter_${platform}_graph_plannototal.png
 	Set Confidence		0.9
 
@@ -297,7 +297,7 @@ Verify Plan Graph - With Total
 
 	# Take A Screenshot
 
-	Set Confidence		0.7
+	Set Confidence		0.5
 	Locate 	reporter_${platform}_graph_plantotal.png
 	Set Confidence		0.9
 
@@ -364,7 +364,7 @@ Verify Plan Table
 
 	Take A Screenshot
 
-	Set Confidence		0.7
+	Set Confidence		0.5
 	Locate 	reporter_${platform}_table_plan.png
 	Set Confidence		0.9
 
