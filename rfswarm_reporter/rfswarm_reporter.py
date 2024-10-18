@@ -2694,7 +2694,7 @@ class ReporterBase():
 			self.datadb.create_aggregate("percentile", 2, percentile)
 			self.datadb.create_aggregate("stdev", 1, stdevclass)
 
-			compopt = db.execute("PRAGMA compile_options;")
+			compopt = self.datadb.execute("PRAGMA compile_options;")
 			self.db_compile_options = [x[0] for x in compopt.fetchall()]
 
 			if "ENABLE_MATH_FUNCTIONS" not in self.db_compile_options:
