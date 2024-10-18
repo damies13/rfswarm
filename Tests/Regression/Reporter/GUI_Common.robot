@@ -3,10 +3,12 @@ Library 	OperatingSystem
 Library 	Process
 Library 	String
 Library 	Collections
+Library 	DocTest.VisualTest
 
 Library 	ImageHorizonLibrary 	reference_folder=${IMAGE_DIR}
 Library 	OCRLibrary
 
+Library 	read_docx.py
 
 *** Variables ***
 ${default_image_timeout} 	${120}
