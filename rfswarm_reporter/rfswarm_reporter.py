@@ -5486,10 +5486,10 @@ class ReporterCore:
 				cellcol = 0
 				cellrow = 0
 				if colours:
-					numcols += 1
+					# numcols += 1
 					cellcol += 1
-				if "Colour" in cols:
-					numcols -= 1
+				# if "Colour" in cols:
+				# 	numcols -= 1
 
 				table = document.add_table(rows=1, cols=numcols)
 				# Table Grid Light
