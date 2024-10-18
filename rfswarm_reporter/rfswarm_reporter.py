@@ -143,6 +143,7 @@ class ReporterBase():
 	# dbfile = ""
 	datadb = None
 	dbqueue: Any = {"Write": [], "Read": [], "ReadResult": {}, "Results": [], "Metric": [], "Metrics": []}
+	db_compile_options = []
 
 	defaultlabels = {"lbl_Result": "Result", "lbl_Test": "Test", "lbl_Script": "Script", "lbl_Error": "Error", "lbl_Count": "Count", "lbl_Screenshot": "Screenshot", "lbl_NoScreenshot": "No Screenshot"}
 
@@ -2692,6 +2693,15 @@ class ReporterBase():
 			self.datadb = sqlite3.connect(dbpath)
 			self.datadb.create_aggregate("percentile", 2, percentile)
 			self.datadb.create_aggregate("stdev", 1, stdevclass)
+
+			compopt = db.execute("PRAGMA compile_options;")
+			self.db_compile_options = [x[0] for x in compopt.fetchall()]
+
+			if "ENABLE_MATH_FUNCTIONS" not in self.db_compile_options:
+				self.datadb.create_function('floor', 1, math.floor)
+				# https://www.sqlite.org/lang_mathfunc.html
+				# https://stackoverflow.com/questions/70451170/sqlite3-math-functions-python
+
 			mds = threading.Thread(target=lambda: self.column_in_table("Metrics", "DataSource"))
 			mds.start()
 
