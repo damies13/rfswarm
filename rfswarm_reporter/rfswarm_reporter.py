@@ -143,7 +143,7 @@ class ReporterBase():
 	# dbfile = ""
 	datadb = None
 	dbqueue: Any = {"Write": [], "Read": [], "ReadResult": {}, "Results": [], "Metric": [], "Metrics": []}
-	db_compile_options = []
+	db_compile_options: Any = []
 
 	defaultlabels = {"lbl_Result": "Result", "lbl_Test": "Test", "lbl_Script": "Script", "lbl_Error": "Error", "lbl_Count": "Count", "lbl_Screenshot": "Screenshot", "lbl_NoScreenshot": "No Screenshot"}
 
