@@ -10,7 +10,7 @@
 - [Do we have any sample test cases?](#do-we-have-any-sample-test-cases)
 - [Is there a tutorial on how to use rfswarm?](#is-there-a-tutorial-on-how-to-use-rfswarm)
 - [does rfswarm support IPv6?](#does-rfswarm-support-ipv6)
-- [Errors mentioning Matplotlib, Numpy or Kiwisolver](#errors-mentioning-matplotlib,-numpy-or-kiwisolver)
+- [Errors mentioning Matplotlib, Numpy or Kiwisolver](#errors-mentioning-matplotlib-numpy-or-kiwisolver)
 - [Windows Defender Prompt](#windows-defender-prompt)
 
 ## How are issues prioritised?
