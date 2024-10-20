@@ -115,7 +115,7 @@ rfswarm works in IPv4 only networks as well.
 ## Errors mentioning Matplotlib, Numpy or Kiwisolver
 
 If you are using Windows OS and getting these types of errors try installing `msvc-runtime` as this is a common issue on Windows
-```
+```console
 pip install msvc-runtime
 ```
 If this doesn't solve the problem or you are not using Windows (i.e. Mac / Linux) then please create a bug report
@@ -126,4 +126,4 @@ On Windows computers you may receive the following dialogue the first time you r
 
 ![Image](Images/WindowsDefenderFirewall.png "Windows Defender Prompt")
 
-For best results it's suggested you make sure both check boxes are checked and then click allow, so that your agent machines can connect to your manager
+For best results it's suggested you make sure both checkboxes are checked and then click allow, so that your agent machines can connect to your manager
