@@ -26,6 +26,7 @@ import threading
 import time
 import tkinter as tk  # python3
 import tkinter.colorchooser as tkac
+import tkinter.messagebox as tkm  # python3
 import tkinter.filedialog as tkf  # python3
 import tkinter.font as tkFont
 
@@ -3555,6 +3556,10 @@ class ReporterCore:
 
 		if 'win_height' not in base.config['GUI']:
 			base.config['GUI']['win_height'] = "390"
+			base.saveini()
+
+		if 'donation_reminder' not in base.config['GUI']:
+			base.config['GUI']['donation_reminder'] = "0"
 			base.saveini()
 
 		#
@@ -7134,6 +7139,7 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "BuildUI")
 		self.BuildUI()
 		self.BuildMenu()
+		self.dispaly_donation_reminder()
 
 	def load_icons(self):
 		# 	"New Report Template"	page_add.png
@@ -7795,6 +7801,23 @@ class ReporterGUI(tk.Frame):
 		# self.content_preview(id)
 		cp = threading.Thread(target=lambda: self.content_preview(id))
 		cp.start()
+
+	def dispaly_donation_reminder(self):
+		if 'donation_reminder' not in base.config['GUI']:
+			base.config['GUI']['donation_reminder'] = "0"
+			base.saveini()
+
+		reminder = int(base.config['GUI']['donation_reminder'])
+
+		donatemsg = "RFSwarm's mission is to give you a an industry leading performance test tool, that is easy to use, quick to develop test scripts and free from limitations so that you can just get on with testing."
+		donatemsg += "\n\n"
+		donatemsg += "Accomplishing this mission costs us resources, and requires the time of many talented people to fix bugs and develop new features and generally improve RFSwarm."
+		donatemsg += "\n\n"
+		donatemsg += "RFSwarm is proud to be a completely open source application that is 100% community funded and does not harvest and sell your data in any way."
+		donatemsg += "\n\n"
+		donatemsg += "So today we're asking for you help to make RFSwarm better, please consider giving a donation to support RFSwarm."
+
+		tkm.showinfo("RFSwarm Reporter - Donation Reminder", donatemsg)
 
 	#
 	# Settings
