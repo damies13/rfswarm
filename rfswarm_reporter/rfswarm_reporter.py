@@ -7139,7 +7139,9 @@ class ReporterGUI(tk.Frame):
 		base.debugmsg(5, "BuildUI")
 		self.BuildUI()
 		self.BuildMenu()
-		self.dispaly_donation_reminder()
+		# self.dispaly_donation_reminder()
+		dr = threading.Thread(target=self.dispaly_donation_reminder)
+		dr.start()
 
 	def load_icons(self):
 		# 	"New Report Template"	page_add.png
@@ -7809,15 +7811,83 @@ class ReporterGUI(tk.Frame):
 
 		reminder = int(base.config['GUI']['donation_reminder'])
 
-		donatemsg = "RFSwarm's mission is to give you a an industry leading performance test tool, that is easy to use, quick to develop test scripts and free from limitations so that you can just get on with testing."
-		donatemsg += "\n\n"
-		donatemsg += "Accomplishing this mission costs us resources, and requires the time of many talented people to fix bugs and develop new features and generally improve RFSwarm."
-		donatemsg += "\n\n"
-		donatemsg += "RFSwarm is proud to be a completely open source application that is 100% community funded and does not harvest and sell your data in any way."
-		donatemsg += "\n\n"
-		donatemsg += "So today we're asking for you help to make RFSwarm better, please consider giving a donation to support RFSwarm."
+		if reminder < 1:
 
-		tkm.showinfo("RFSwarm Reporter - Donation Reminder", donatemsg)
+			titlemsg = "RFSwarm Reporter - Donation Reminder"
+
+			donatemsg = "RFSwarm's mission is to give you a an industry leading performance test tool, that is easy to use, "
+			# donatemsg += "\n"
+			donatemsg += "quick to develop test scripts and free from limitations so that you can just get on with testing."
+			donatemsg += "\n\n"
+			donatemsg += "Accomplishing this mission costs us resources, and requires the time of many talented people to fix "
+			# donatemsg += "\n"
+			donatemsg += "bugs and develop new features and generally improve RFSwarm."
+			donatemsg += "\n\n"
+			donatemsg += "RFSwarm is proud to be a completely open source application that is 100% community funded and "
+			# donatemsg += "\n"
+			donatemsg += "does not harvest and sell your data in any way."
+			donatemsg += "\n\n"
+			donatemsg += "So today we're asking for you help to make RFSwarm better, please consider giving a donation "
+			# donatemsg += "\n"
+			donatemsg += "to support RFSwarm."
+
+			# tkm.showinfo(titlemsg, donatemsg)
+
+
+			# self.drWindow = tk.Toplevel(self.root, height=200, width=600)
+			self.drWindow = tk.Toplevel(self.root)
+			self.drWindow.wm_iconphoto(False, self.icon)
+			self.drWindow.columnconfigure(0, weight=1)
+			self.drWindow.columnconfigure(2, weight=1)
+			self.drWindow.title(titlemsg)
+			self.drWindow.attributes('-topmost', 'true')
+
+			row = 0
+			self.drWindow.rowconfigure(row, weight=1)
+
+			self.drWindow.lblDR00 = ttk.Label(self.drWindow, text=" ")
+			self.drWindow.lblDR00.grid(column=0, row=row, sticky="nsew")
+
+			self.drWindow.lblDR01 = ttk.Label(self.drWindow, text=" ")
+			self.drWindow.lblDR01.grid(column=1, row=row, sticky="nsew")
+
+			self.drWindow.lblDR02 = ttk.Label(self.drWindow, text=" ")
+			self.drWindow.lblDR02.grid(column=2, row=row, sticky="nsew")
+
+			row += 1
+			self.drWindow.lblDR11 = ttk.Label(self.drWindow, text=donatemsg, wraplength=600)
+			# self.drWindow.lblDR11 = ttk.Label(self.drWindow, text=donatemsg)
+			self.drWindow.lblDR11.grid(column=1, row=row, sticky="nsew")
+			# self.drWindow.lblDR11.bind('<Configure>', lambda e: self.drWindow.lblDR11.config(wraplength=self.drWindow.lblDR11.winfo_width()))
+
+			row += 1
+			self.drWindow.rowconfigure(row, weight=1)
+			self.drWindow.lblDR21 = ttk.Label(self.drWindow, text=" ")
+			self.drWindow.lblDR21.grid(column=1, row=row, sticky="nsew")
+
+			row += 1
+
+			self.drWindow.fmeBBar = tk.Frame(self.drWindow)
+			self.drWindow.fmeBBar.grid(column=0, row=row, columnspan=5, sticky="nsew")
+
+			self.drWindow.fmeBBar.columnconfigure(0, weight=1)
+
+
+			self.drWindow.bind('<Return>', self.close_donation_reminder)
+			self.drWindow.bind('<Key-Escape>', self.drWindow.destroy)
+
+			bdonate = ttk.Button(self.drWindow.fmeBBar, text="Donate", padding='1 1 1 1', command=self.close_donation_reminder)
+			bdonate.grid(column=9, row=0, sticky="nsew")
+
+			blater = ttk.Button(self.drWindow.fmeBBar, text="Maybe Later", padding='1 1 1 1', command=self.drWindow.destroy)
+			blater.grid(column=8, row=0, sticky="nsew")
+
+			# base.config['GUI']['donation_reminder'] = str(int(datetime.now().timestamp()))
+			# base.saveini()
+
+	def close_donation_reminder(self, *args):
+		base.debugmsg(5, "args:", args)
+		self.drWindow.destroy()
 
 	#
 	# Settings
