@@ -236,12 +236,12 @@ Get Last Screenshot
 
 
 Click Button
-	[Arguments]		${bttnname}
+	[Arguments]		${bttnname} 		${timeout}=300
 	${bttnnamel}= 	Convert To Lower Case 	${bttnname}
 	${img}=	Set Variable		reporter_${platform}_button_${bttnnamel}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=300
+	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	${sssleep}
@@ -331,7 +331,7 @@ Open GUI macos
 
 Handle Donation Reminder
 	VAR 	${DonationReminter} 	${False} 		scope=TEST
-	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater
+	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		60
 	IF 	${found}
 		VAR 	${DonationReminter} 	${True} 		scope=TEST
 	END
