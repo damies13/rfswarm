@@ -274,6 +274,12 @@ Open GUI
 	${var}= 	Get Variables
 	Log 	${var}
 	Get Platform
+
+	# Press Escape and move mouse because on linux the screen save had kicked in
+	Press Combination 	Key.esc
+	Move To 	10 	10
+	Move To 	20 	20
+
 	${keyword}= 	Set Variable 	Open GUI ${platform}
 	Run Keyword 	${keyword} 	@{appargs}
 	Handle Donation Reminder
