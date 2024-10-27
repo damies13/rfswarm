@@ -1,7 +1,8 @@
+import os
+
 from openpyxl import load_workbook
 from openpyxl_image_loader import SheetImageLoader
 from pandas import read_excel
-import os
 
 
 def read_all_xlsx_sheets(xlsx_path: str) -> list:
@@ -30,8 +31,8 @@ def read_xlsx_text_data_from_sheet(xlsx_path: str, sheet_name: str) -> list:
     all_excel_data_frame = read_excel(xlsx_path, sheet_name, keep_default_na=False, na_values=['NaN'])
     excel_data_list = all_excel_data_frame.values.tolist()
 
-    for row_n in range(len(excel_data_list) -1, -1, -1):
-        for cell_n in range(len(excel_data_list[row_n]) -1, -1, -1):
+    for row_n in range(len(excel_data_list) - 1, -1, -1):
+        for cell_n in range(len(excel_data_list[row_n]) - 1, -1, -1):
             if excel_data_list[row_n][cell_n] == "":
                 excel_data_list[row_n].pop(cell_n)
 
@@ -41,7 +42,7 @@ def read_xlsx_text_data_from_sheet(xlsx_path: str, sheet_name: str) -> list:
     return excel_data_list
 
 
-def extract_image_from_xlsx_sheet(xlsx_path: str, xlsx_sheet: str, cell_id: str, output_folder: str, show_image: bool = False) -> str:
+def extract_image_from_xlsx_sheet(xlsx_path: str, xlsx_sheet: str, cell_id: str, output_folder: str, show_image: bool = False):
     """
     Extract an image from XLSX file from a given cell in specified sheet.
     Returns name of the saved image.
