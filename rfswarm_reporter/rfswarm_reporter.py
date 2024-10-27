@@ -7810,9 +7810,13 @@ class ReporterGUI(tk.Frame):
 			base.config['GUI']['donation_reminder'] = "0"
 			base.saveini()
 
-		reminder = int(base.config['GUI']['donation_reminder'])
+		lastreminder = int(base.config['GUI']['donation_reminder'])
+		timenow = int(datetime.now().timestamp())
+		timesincereminder = timenow - lastreminder
+		yearseconds = 60 * 60 * 24 * 365
 
-		if reminder < 1:
+		# display donation reminder on first launch and then once per year
+		if timesincereminder > yearseconds:
 
 			titlemsg = "RFSwarm Reporter - Donation Reminder"
 
@@ -7877,14 +7881,14 @@ class ReporterGUI(tk.Frame):
 			self.drWindow.bind('<Return>', self.close_donation_reminder)
 			self.drWindow.bind('<Key-Escape>', self.drWindow.destroy)
 
-			bdonate = ttk.Button(self.drWindow.fmeBBar, text="Donate", padding='1 1 1 1', command=self.close_donation_reminder)
+			bdonate = ttk.Button(self.drWindow.fmeBBar, text="Donate", padding='3 3 3 3', command=self.close_donation_reminder)
 			bdonate.grid(column=9, row=0, sticky="nsew")
 
-			blater = ttk.Button(self.drWindow.fmeBBar, text="Maybe Later", padding='1 1 1 1', command=self.drWindow.destroy)
+			blater = ttk.Button(self.drWindow.fmeBBar, text="Maybe Later", padding='3 3 3 3', command=self.drWindow.destroy)
 			blater.grid(column=8, row=0, sticky="nsew")
 
-			# base.config['GUI']['donation_reminder'] = str(int(datetime.now().timestamp()))
-			# base.saveini()
+			base.config['GUI']['donation_reminder'] = str(int(datetime.now().timestamp()))
+			base.saveini()
 
 	def close_donation_reminder(self, *args):
 		base.debugmsg(5, "args:", args)
