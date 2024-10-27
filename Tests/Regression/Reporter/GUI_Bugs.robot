@@ -239,6 +239,7 @@ Template with Start and End Dates
 
 	${EndTime}= 	Get Text Value To Right Of 	EndTime
 	${EndTime}= 	Replace String 	${EndTime} 	03:03 	03:02
+	Wait For Status 	PreviewLoaded
 	Set Text Value To Right Of 	EndTime 	${EndTime}
 	# Take A Screenshot
 

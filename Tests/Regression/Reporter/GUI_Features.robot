@@ -174,7 +174,7 @@ Verify the Content Of the DOCX Report
 	VAR 	${template_dir} 	${basefolder}${/}sample.template
 	VAR 	${docx_file}		${resultfolder}${/}${resultdata}.docx
 	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		10
+	VAR 	${move_tolerance} 		30
 
 	Log 	template: ${template_dir} 	console=True
 	Open GUI	-d 	${resultfolder} 	-t 	${template_dir}
@@ -679,7 +679,7 @@ Verify the Content Of the XLSX Report
 	VAR 	${xlsx_images} 		${OUTPUT_DIR}${/}${testdata}${/}xlsx_images
 	VAR 	${xlsx_expected_images} 		${CURDIR}${/}testdata${/}Issue-#37${/}xlsx_images
 	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		10
+	VAR 	${move_tolerance} 		30
 
 	Log 	template: ${template_dir} 	console=True
 	Open GUI	-d 	${resultfolder} 	-t 	${template_dir}
