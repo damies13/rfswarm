@@ -265,6 +265,8 @@ Wait For Status
 	${img}=	Set Variable		reporter_${platform}_status_${statusl}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
+	Wiggle Mouse
+	Take A Screenshot
 	Wait For 	${img} 	 timeout=${timeout}
 	Sleep 	${sssleep}
 	# Take A Screenshot
@@ -277,12 +279,15 @@ Open GUI
 
 	# Press Escape and move mouse because on linux the screen save had kicked in
 	Press Combination 	Key.esc
-	Move To 	10 	10
-	Move To 	20 	20
+	Wiggle Mouse
 
 	${keyword}= 	Set Variable 	Open GUI ${platform}
 	Run Keyword 	${keyword} 	@{appargs}
 	Handle Donation Reminder
+
+Wiggle Mouse
+	Move To 	10 	10
+	Move To 	20 	20
 
 Get Platform
 	&{platforms}= 	Create Dictionary 	Linux=ubuntu 	Darwin=macos 	Java=notsupported 	Windows=windows
