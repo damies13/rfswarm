@@ -18,6 +18,7 @@ ${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
 ${pyfile}			${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
 ${process}		None
 ${sssleep}		0.5
+${DonationReminter} 	${False}
 
 *** Keywords ***
 Set Platform
@@ -275,13 +276,12 @@ Open GUI
 	Get Platform
 	${keyword}= 	Set Variable 	Open GUI ${platform}
 	Run Keyword 	${keyword} 	@{appargs}
-	Sleep	3
+	Handle Donation Reminder
 
 Get Platform
 	&{platforms}= 	Create Dictionary 	Linux=ubuntu 	Darwin=macos 	Java=notsupported 	Windows=windows
 	${os}= 	Evaluate 	platform.system() 	platform
 	Set Suite Variable    ${platform}    ${platforms}[${os}]
-
 
 Open GUI windows
 	[Arguments]		@{appargs}
@@ -323,6 +323,12 @@ Open GUI macos
 	Set Screenshot Folder 	${OUTPUT DIR}
 	# Take A Screenshot
 
+Handle Donation Reminder
+	VAR 	${DonationReminter} 	${False} 		scope=TEST
+	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater
+	IF 	${found}
+		VAR 	${DonationReminter} 	${True} 		scope=TEST
+	END
 
 Close GUI
 	${keyword}= 	Set Variable 	Close GUI ${platform}
