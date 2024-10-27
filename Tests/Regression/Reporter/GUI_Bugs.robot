@@ -18,11 +18,11 @@ Verify If Reporter Runs With Existing INI File From Current Version
 	File Should Not Be Empty	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with existing ini file.
 	Open GUI
+	Wait For Status 	PreviewLoaded
 	TRY
-		Sleep	10
 		Click Section	test_result_summary
 		Click	#double click needed. Maybe delete after eel module implemetation
-		Wait For	reporter_${platform}_option_datatable.png 	timeout=${30}
+		Wait For	reporter_${platform}_option_datatable.png 	timeout=${60}
 	EXCEPT
 		Fail	msg=Reporter is not responding!
 	END
@@ -35,8 +35,8 @@ Verify If Reporter Runs With No Existing INI File From Current Version
 	File Should Not Exist	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with no existing ini file.
 	Open GUI
+	Wait For Status 	PreviewLoaded
 	TRY
-		Sleep	10
 		Click Section	test_result_summary
 		Click	#double click needed. Maybe delete after eel module implemetation
 		Wait For	reporter_${platform}_option_datatable.png 	timeout=${30}
@@ -56,8 +56,8 @@ Verify If Reporter Runs With Existing INI File From Previous Version
 	File Should Not Be Empty	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with existing ini file.
 	Open GUI
+	Wait For Status 	PreviewLoaded
 	TRY
-		Sleep	10
 		Click Section	test_result_summary
 		Click	#double click needed. Maybe delete after eel module implemetation
 		Wait For	reporter_${platform}_option_datatable.png 	timeout=${30}

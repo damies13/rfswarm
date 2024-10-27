@@ -150,8 +150,8 @@ Get Text Value To Right Of
 
 	${b4value}= 	Get Clipboard Content
 	${value}= 	Copy From The Right Of 	${img} 	${offsetx}
-	# Take A Screenshot
-	WHILE 	$b4value == $value 		limit=10
+	Take A Screenshot
+	WHILE 	$b4value == $value 		limit=15
 		Wait For 	${img} 	 timeout=${default_image_timeout}
 		${offsetx}= 	Evaluate 	${offsetx}+10
 		${value}= 	Copy From The Right Of 	${img} 	${offsetx}
