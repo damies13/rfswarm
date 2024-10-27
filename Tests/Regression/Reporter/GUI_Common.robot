@@ -152,7 +152,7 @@ Get Text Value To Right Of
 	${value}= 	Copy From The Right Of 	${img} 	${offsetx}
 	# Take A Screenshot
 	WHILE 	$b4value == $value 		limit=10
-		Sleep    10 ms
+		Wait For 	${img} 	 timeout=${default_image_timeout}
 		${offsetx}= 	Evaluate 	${offsetx}+10
 		${value}= 	Copy From The Right Of 	${img} 	${offsetx}
 		# Take A Screenshot
@@ -260,7 +260,7 @@ Click Dialog Button
 	# Take A Screenshot
 
 Wait For Status
-	[Arguments]		${status}	${timeout}=300
+	[Arguments]		${status}	${timeout}=1800
 	${statusl}= 	Convert To Lower Case 	${status}
 	${img}=	Set Variable		reporter_${platform}_status_${statusl}.png
 	Log		${CURDIR}
@@ -291,7 +291,7 @@ Open GUI windows
 	Set Confidence		0.9
 	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	# ${process}= 	Start Process 	python 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	${cmd_reporter} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 
 	Set Suite Variable 	$process 	${process}
 	# reporter_windows_status_previewloaded
@@ -306,7 +306,7 @@ Open GUI ubuntu
 	Set Suite Variable    ${platform}    ubuntu
 	Set Confidence		0.9
 	# ${process}= 	Start Process 	python3 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	${cmd_reporter} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Set Suite Variable 	$process 	${process}
 	# Sleep 	60
 	# Capture Screen
@@ -318,7 +318,7 @@ Open GUI macos
 	Set Suite Variable    ${platform}    macos
 	Set Confidence		0.9
 	# ${process}= 	Start Process 	python3 	${pyfile} 	-g 	5 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	${cmd_reporter} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	Set Suite Variable 	$process 	${process}
 	# Sleep 	60
 	Set Screenshot Folder 	${OUTPUT DIR}

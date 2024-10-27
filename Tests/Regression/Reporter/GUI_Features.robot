@@ -23,12 +23,14 @@ Verify That Files Get Saved With Correct Extension And Names
 	Open GUI	-d 	${resultfolder}
 	Click Button	savetemplate
 	Save Template File OS DIALOG	${templatename}
-	Click Button	generatehtml
-	Sleep	2
 	Click Button	generateword
 	Sleep	2
 	Click Button	generateexcel
 	Sleep	2
+	Click Button	generatehtml
+	Sleep	2
+
+	Wait For Status 	SavedXHTMLReport
 
 	# Verify files:
 	Remove File		${templatefolder}${/}here_will_be_template.txt
@@ -1232,12 +1234,13 @@ Verify Plan Graph - No Total
 	Log to console 	basefolder: ${basefolder} 	console=True
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
+	${templatefile}= 	Set Variable    ${basefolder}${/}original_base.template
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini
+	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
@@ -1295,12 +1298,13 @@ Verify Plan Graph - With Total
 	Log to console 	basefolder: ${basefolder} 	console=True
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
+	${templatefile}= 	Set Variable    ${basefolder}${/}original_base.template
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini
+	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
@@ -1361,12 +1365,13 @@ Verify Plan Table
 	Log to console 	basefolder: ${basefolder} 	console=True
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
+	${templatefile}= 	Set Variable    ${basefolder}${/}original_base.template
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini
+	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 

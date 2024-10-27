@@ -260,17 +260,26 @@ Template with Start and End Dates
 	Save Template File OS DIALOG	${templatename}
 
 	Click Button 	GenerateHTML
+	# Wait For Status 	GeneratingXHTMLReport
 	Wait For Status 	SavedXHTMLReport
-
+	Sleep    1
 	Close GUI
-
-	${html}= 	Parse XML 		${resultfolder0}${/}${resultdata0}.html
-	${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[text()='2 Test Result Summary']/..
-	${table}= 		Get Element 	${html} 	.//div[@id='${sectionid}']//table
-	${expected}= 	Get Elements Texts 	${table} 	tr/td[1]
 
 	Copy Files 	${resultfolder0}/*.report 	${testresultfolder0}
 	Copy Files 	${resultfolder0}/*.html 	${testresultfolder0}
+
+	# ${html}= 	Parse XML 		${resultfolder0}${/}${resultdata0}.html
+	# import lxml.etree
+	# tree = lxml.etree.parse("/home/dave/Downloads/Reporter-windows-latest-3.11/Issue-#250/20240626_130059_jpetstore-nomon-quick/20240626_130059_jpetstore-nomon-quick.html", lxml.etree.HTMLParser())
+	${html}= 	Evaluate 			lxml.etree.parse(r'${resultfolder0}${/}${resultdata0}.html', lxml.etree.HTMLParser()) 	modules=lxml.etree
+	# ${rawhtml}= 	Get File 	${resultfolder0}${/}${resultdata0}.html
+	# ${html}= 	Evaluate 			lxml.etree.fromstring('${rawhtml}', lxml.etree.HTMLParser()) 	modules=lxml.etree
+	# ${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[text()='2 Test Result Summary']/..
+	# ${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[text()='4 Test Result Summary']/..
+	${sectionid}= 		Get Element Attribute 	${html} 	id 	//h1[contains(text(), 'Test Result Summary')]/..
+	# FB9D1A0486F		//div[@id='FB9D1A0486F']//table
+	${table}= 		Get Element 	${html} 	//div[@id='${sectionid}']//table
+	${expected}= 	Get Elements Texts 	${table} 	tr/td[1]
 
 	Log To Console	Open Reporter with resultfolder1 and check template works
 
@@ -283,8 +292,13 @@ Template with Start and End Dates
 	Copy Files 	${resultfolder1}/*.report 	${testresultfolder1}
 	Copy Files 	${resultfolder1}/*.html 	${testresultfolder1}
 
-	${html}= 	Parse XML 		${resultfolder1}${/}${resultdata1}.html
-	${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[text()='2 Test Result Summary']/..
+	# ${html}= 	Parse XML 		${resultfolder1}${/}${resultdata1}.html
+	# ${html}= 	Evaluate 			lxml.etree.parse("${resultfolder1}${/}${resultdata1}.html", lxml.etree.HTMLParser()) 	modules=lxml.etree
+	${html}= 	Evaluate 			lxml.etree.parse(r'${resultfolder1}${/}${resultdata1}.html', lxml.etree.HTMLParser()) 	modules=lxml.etree
+	# ${rawhtml}= 	Get File 	${resultfolder1}${/}${resultdata1}.html
+	# ${html}= 	Evaluate 			lxml.etree.fromstring('${rawhtml}', lxml.etree.HTMLParser()) 	modules=lxml.etree
+	# ${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[text()='2 Test Result Summary']/..
+	${sectionid}= 		Get Element Attribute 	${html} 	id 	//h1[contains(text(), 'Test Result Summary')]/..
 	${table}= 		Get Element 	${html} 	.//div[@id='${sectionid}']//table
 	FOR 	${index}    ${item}    IN ENUMERATE    @{expected}
 		${row}= 	Evaluate    ${index} + 2

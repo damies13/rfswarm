@@ -366,7 +366,10 @@ class ReporterBase():
 
 		base.debugmsg(5, "base.report: ", base.report._sections)
 
-		es = self.report_new_section("TOP", "Template")
+		#
+		# 	Information
+		#
+		es = self.report_new_section("TOP", "Information")
 		self.report_item_set_type(es, 'note')
 		notetxt = "Define your template by adding sections and configuring the section settings\n"
 		notetxt += "Each section can be:\n"
@@ -374,18 +377,443 @@ class ReporterBase():
 		notetxt += " -  Heading, usefull for grouping sections\n"
 		notetxt += " -  Contents like a table of contents or figures\n"
 		notetxt += " -  Data Table, with data from test results\n"
-		notetxt += " -  Data Graph, for graphical representation of test results\n\n"
-		notetxt += "Each section can also have sub sections\n\n"
-		notetxt += "The cover page and overall report settings can be found on the settings pane of the Report item above\n"
+		notetxt += " -  Data Graph, for graphical representation of test results\n"
+		notetxt += " -  Errors, gather error details and screenshots (if applicable) from robot logs\n\n"
+		notetxt += "Each section can also have sub sections.\n\n"
+		notetxt += "Use the arrows buttons to move sections up and down within the report.\n\n"
+		notetxt += "The cover page and overall report settings can be found on the settings pane of the Report item above.\n\n"
+		notetxt += "When you have your report how you like it, save it as a report template, so your future test results can use the same report format.\n\n"
 		self.rt_note_set(es, notetxt)
 
+		#
+		# 	Table of Contents
+		#
+		# name = Contents
+		# parent = TOP
+		toc = self.report_new_section("TOP", "Table of Contents")
+		# type = contents
+		self.report_item_set_type(toc, 'contents')
+		# mode = Table Of Contents
+		self.rt_contents_set_mode(toc, 'Table Of Contents')
+		# level = 2
+		self.rt_contents_set_level(toc, '2')
+
+		#
+		# 	Scenario Plan
+		#
+		plng = self.report_new_section("TOP", "Scenario Plan")
+		self.report_item_set_type(plng, 'graph')
+
+		# [FB9082D01BCL]
+		plngl = plng + "L"
+		base.report_add_subsection(plngl)
+		# datatype = Plan
+		self.rt_table_set_dt(plngl, 'Plan')
+		# changed = 1728738092.5689259
+		# sql = SELECT md1.* , md0.SecondaryMetric as x91Filex93 , fp0.SecondaryMetric as x91FilePathx93 FROM MetricData as md0 LEFT JOIN MetricData as fp0 ON fp0.MetricValue = md0.MetricValue AND fp0.MetricType = 'Scenario' AND fp0.PrimaryMetric like 'Local_Path_x37' LEFT JOIN MetricData as md1 ON md1.SecondaryMetric = md0.MetricValue AND md1.MetricType = 'Scenario' WHERE md0.MetricType = 'Scenario' AND md0.PrimaryMetric like 'Test_x37'
+		# showtotal = 1
+		base.report_item_set_int(plngl, "ShowTotal", 1)
+
+		# [FB9082D01BCR]
+		plngr = plng + "R"
+		base.report_add_subsection(plngr)
+		# datatype = None
+		self.rt_table_set_dt(plngr, 'None')
+
+		#
+		# 	-	Scenario Detail
+		#
+		# name = Scenario Detail
+		# parent = FB9082D01BC
+		plnt = self.report_new_section(plng, "Scenario Detail")
+		# type = table
+		self.report_item_set_type(plnt, 'table')
+		# colours = 1
+		self.rt_table_set_colours(plnt, 1)
+		# datatype = Plan
+		self.rt_table_set_dt(plnt, "Plan")
+		# col_index_show = 1
+		base.report_item_set_bool(plnt, base.rt_table_ini_colname("index Show"), 1)
+		# col_robots_show = 1
+		base.report_item_set_bool(plnt, base.rt_table_ini_colname("robots Show"), 1)
+		# col_delay_show = 1
+		base.report_item_set_bool(plnt, base.rt_table_ini_colname("delay Show"), 1)
+		# col_ramp_up_show = 1
+		base.report_item_set_bool(plnt, base.rt_table_ini_colname("ramp up Show"), 1)
+		# col_run_show = 1
+		base.report_item_set_bool(plnt, base.rt_table_ini_colname("run Show"), 1)
+		# col_script_show = 1
+		base.report_item_set_bool(plnt, base.rt_table_ini_colname("script Show"), 1)
+		# col_script_opt = File
+		base.report_item_set_value(plnt, base.rt_table_ini_colname("script Opt"), "File")
+		# col_test_show = 1
+		base.report_item_set_bool(plnt, base.rt_table_ini_colname("test Show"), 1)
+
+		#
+		# 	Test Result Summary
+		#
+		# name = Test Result Summary
+		# parent = TOP
 		trs = self.report_new_section("TOP", "Test Result Summary")
+		# type = table
 		self.report_item_set_type(trs, 'table')
 
 		# colours = 0
 		self.rt_table_set_colours(trs, 0)
 		# datatype = ResultSummary
 		self.rt_table_set_dt(trs, "ResultSummary")
+		# filteragent =
+		# filtertype = None
+		# col_result_name_show = 1
+		base.report_item_set_bool(trs, base.rt_table_ini_colname("Result Name Show"), 1)
+		# col_minimum_show = 0
+		base.report_item_set_bool(trs, base.rt_table_ini_colname("minimum Show"), 0)
+		# col_average_show = 1
+		base.report_item_set_bool(trs, base.rt_table_ini_colname("average Show"), 1)
+		# col_90x37ile_show = 1
+		base.report_item_set_bool(trs, base.rt_table_ini_colname("90%ile Show"), 1)
+		# col_maximum_show = 1
+		base.report_item_set_bool(trs, base.rt_table_ini_colname("maximum Show"), 1)
+		# col_std_dev_show = 1
+		base.report_item_set_bool(trs, base.rt_table_ini_colname("Std Dev Show"), 1)
+		# col_pass_show = 1
+		base.report_item_set_bool(trs, base.rt_table_ini_colname("pass Show"), 1)
+		# col_fail_show = 1
+		base.report_item_set_bool(trs, base.rt_table_ini_colname("fail Show"), 1)
+		# col_other_show = 0
+		base.report_item_set_bool(trs, base.rt_table_ini_colname("other Show"), 0)
+
+		#
+		# 	Robots vs Response Time
+		#
+		rrt = self.report_new_section("TOP", "Robots vs Response Time")
+		self.report_item_set_type(rrt, 'graph')
+
+		# [FA37C950802L]idl
+		rttl = rrt + "L"
+		base.report_add_subsection(rttl)
+		# resulttype = Response Time
+		base.report_item_set_value(rttl, "resulttype", "Response Time")
+		# changed = 1728738059.779502
+		# filterresult = None
+		# filteragent = None
+		# datatype = Result
+		self.rt_table_set_dt(rttl, 'Result')
+
+		# [FA37C950802R]
+		rttr = rrt + "R"
+		base.report_add_subsection(rttr)
+		# datatype = Metric
+		self.rt_table_set_dt(rttr, 'Metric')
+		# changed = 1728738059.7891614
+		# axisen = 1
+		base.report_item_set_bool(rttr, "axisen", 1)
+		# metrictype = Scenario
+		base.report_item_set_value(rttr, "metrictype", "Scenario")
+		# filteragent = None
+		# filtertype = None
+		base.report_item_set_value(rttr, "secondarymetric", "total_robots")
+
+		#
+		# 	-	Response Times
+		#
+		# name = Response Times
+		rt = self.report_new_section(rrt, "Response Times")
+		# parent = FA37C950802
+		self.report_item_set_type(rt, 'table')
+		# type = table
+		base.report_item_set_value(rt, "type", "table")
+		# changed = 1728738060.9264157
+		# colours = 1
+		base.report_item_set_bool(rt, "colours", 1)
+		# datatype = Result
+		base.report_item_set_value(rt, "datatype", "Result")
+		# resulttype = Response Time
+		base.report_item_set_value(rt, "resulttype", "Response Time")
+		# filterresult = None
+		# filteragent = None
+
+		#
+		# 	-	Robots
+		#
+		# name = Robots
+		rb = self.report_new_section(rrt, "Robots")
+		# type = table
+		self.report_item_set_type(rb, 'table')
+		# parent = FA37C950802
+		# changed = 1728744845.4971852
+		# colours = 1
+		base.report_item_set_bool(rb, "colours", 1)
+		# datatype = Metric
+		base.report_item_set_value(rb, "datatype", "Metric")
+		# metrictype = Scenario
+		base.report_item_set_value(rb, "metrictype", "Scenario")
+		# filteragent = None
+		# filtertype = None
+		# secondarymetric = total_robots
+		base.report_item_set_value(rb, "secondarymetric", "total_robots")
+		# isnumeric = 1
+		base.report_item_set_bool(rb, "isnumeric", 1)
+		# showcount = 0
+		base.report_item_set_bool(rb, "showcount", 1)
+		# col_primarymetric_show = 1
+		base.report_item_set_bool(rb, "col_primarymetric_show", 1)
+		# col_minimum_show = 0
+		base.report_item_set_bool(rb, "col_minimum_show", 0)
+		# col_average_show = 0
+		base.report_item_set_bool(rb, "col_average_show", 0)
+		# col_90x37ile_show = 0
+		base.report_item_set_bool(rb, "col_90x37ile_show", 0)
+		# col_maximum_show = 1
+		base.report_item_set_bool(rb, "col_maximum_show", 1)
+		# col_std_dev_show = 0
+		base.report_item_set_bool(rb, "col_std_dev_show", 0)
+		# col_maximum = Robots
+		base.report_item_set_value(rb, "col_maximum", "Robots")
+
+		#
+		# 	Agents
+		#
+		# name = Agents
+		agnt = self.report_new_section("TOP", "Agents")
+		# type = head
+		self.report_item_set_type(agnt, 'head')
+		# parent = TOP
+
+		#
+		# 	-	CPU
+		#
+		cpu = self.report_new_section(agnt, "Agent CPU Usage")
+		self.report_item_set_type(cpu, 'graph')
+		# name = CPU
+		# parent = FB90C705569
+		# type = graph
+
+		# [FB90C728C87L]
+		cpul = cpu + "L"
+		base.report_add_subsection(cpul)
+		# metrictype = Agent
+		base.report_item_set_value(cpul, "metrictype", "Agent")
+		# changed = 1728745351.1353724
+		base.report_item_set_bool(cpul, "axisen", 1)
+		# filteragent = None
+		# filtertype = None
+		# datatype = Metric
+		base.report_item_set_value(cpul, "datatype", "Metric")
+		# secondarymetric = CPU
+		base.report_item_set_value(cpul, "secondarymetric", "CPU")
+		# enablefilteragent = 1
+		base.report_item_set_bool(cpul, "enablefilteragent", 1)
+		#
+		# [FB90C728C87R]
+		cpur = cpu + "R"
+		base.report_add_subsection(cpur)
+		# datatype = Metric
+		base.report_item_set_value(cpur, "datatype", "Metric")
+		# changed = 1728745351.027923
+		# axisen = 1
+		base.report_item_set_bool(cpur, "axisen", 1)
+		# metrictype = Scenario
+		base.report_item_set_value(cpur, "metrictype", "Scenario")
+		# filteragent = None
+		# filtertype = None
+		# secondarymetric = total_robots
+		base.report_item_set_value(cpur, "secondarymetric", "total_robots")
+
+		#
+		# 	-	Memory
+		#
+		# name = Memory
+		mem = self.report_new_section(agnt, "Agent Memory (RAM) Usage")
+		# type = graph
+		self.report_item_set_type(mem, 'graph')
+
+		# [FB90C73DBB6L]
+		meml = mem + "L"
+		base.report_add_subsection(meml)
+		# metrictype = Agent
+		base.report_item_set_value(meml, "metrictype", "Agent")
+		# changed = 1728745342.77505
+		base.report_item_set_bool(meml, "axisen", 1)
+		# filteragent = None
+		# filtertype = None
+		# datatype = Metric
+		base.report_item_set_value(meml, "datatype", "Metric")
+		# secondarymetric = MEM
+		base.report_item_set_value(meml, "secondarymetric", "MEM")
+		# enablefilteragent = 1
+		base.report_item_set_bool(meml, "enablefilteragent", 1)
+		#
+		# [FB90C73DBB6R]
+		memr = mem + "R"
+		base.report_add_subsection(memr)
+		# datatype = Metric
+		base.report_item_set_value(memr, "datatype", "Metric")
+		# changed = 1728745342.6672406
+		# axisen = 1
+		base.report_item_set_bool(memr, "axisen", 1)
+		# filteragent = None
+		# filtertype = None
+		# metrictype = Scenario
+		base.report_item_set_value(memr, "metrictype", "Scenario")
+		# secondarymetric = total_robots
+		base.report_item_set_value(memr, "secondarymetric", "total_robots")
+
+		#
+		# 	-	Agent Names
+		#
+		# name = Agent Names
+		an = self.report_new_section(agnt, "Agent Names")
+		# type = table
+		self.report_item_set_type(an, 'table')
+		# colours = 1
+		base.report_item_set_bool(an, "colours", 1)
+		# datatype = Metric
+		base.report_item_set_value(an, "datatype", "Metric")
+		# metrictype = Agent
+		base.report_item_set_value(an, "metrictype", "Agent")
+		# filteragent = None
+		# filtertype = None
+		# col_primarymetric_show = 0
+		base.report_item_set_bool(an, "col_primarymetric_show", 0)
+		# col_metrictype_show = 1
+		base.report_item_set_bool(an, "col_metrictype_show", 1)
+		# col_secondarymetric_show = 1
+		base.report_item_set_bool(an, "col_secondarymetric_show", 1)
+		# col_metricvalue_show = 0
+		base.report_item_set_bool(an, "col_metricvalue_show", 0)
+		# enablefilteragent = 1
+		base.report_item_set_bool(an, "enablefilteragent", 1)
+		# secondarymetric = CPU
+		base.report_item_set_value(an, "secondarymetric", "CPU")
+		# col_agent_show = 1
+		base.report_item_set_bool(an, "col_agent_show", 1)
+
+		#
+		# 	-	Agent Details
+		#
+		# name = Agent Details
+		ad = self.report_new_section(agnt, "Agent Details")
+		# type = table
+		self.report_item_set_type(ad, 'table')
+		# parent = FB90C705569
+		# changed = 1728745707.049637
+		# colours = 0
+		base.report_item_set_bool(ad, "colours", 0)
+		# datatype = Metric
+		base.report_item_set_value(ad, "datatype", "Metric")
+		# metrictype = Agent
+		base.report_item_set_value(ad, "metrictype", "Metric")
+		# filteragent = None
+		# filtertype = None
+		# col_primarymetric_show = 1
+		base.report_item_set_bool(ad, "col_primarymetric_show", 1)
+		# col_metrictype_show = 1
+		base.report_item_set_bool(ad, "col_metrictype_show", 1)
+		# col_secondarymetric_show = 1
+		base.report_item_set_bool(ad, "col_secondarymetric_show", 1)
+		# col_metricvalue_show = 1
+		base.report_item_set_bool(ad, "col_metricvalue_show", 1)
+		# enablefilteragent = 1
+		base.report_item_set_bool(ad, "enablefilteragent", 1)
+		# col_agent_show = 0
+		base.report_item_set_bool(ad, "col_agent_show", 0)
+		# col_primarymetric = Agent Name
+		base.report_item_set_value(ad, "col_primarymetric", "Agent Name")
+		# col_secondarymetric = Metric Name
+		base.report_item_set_value(ad, "col_secondarymetric", "Metric Name")
+		# col_metricvalue = Metric Value
+		base.report_item_set_value(ad, "col_metricvalue", "Metric Value")
+
+		# 	Errors
+		#
+		# name = Errors
+		# parent = TOP
+		err = self.report_new_section("TOP", "Errors")
+		# type = head
+		self.report_item_set_type(err, 'head')
+
+		#
+		# 	-	Failed Keywords Graph
+		#
+		# name = Failed Keywords Graph
+		fkg = self.report_new_section(err, "Failed Keywords Graph")
+		# type = graph
+		self.report_item_set_type(fkg, 'graph')
+
+		# [FB90CDCCFC9L]
+		fkgl = fkg + "L"
+		base.report_add_subsection(fkgl)
+		base.report_item_set_bool(fkgl, "axisen", 1)
+		# resulttype = TPS
+		base.report_item_set_value(fkgl, "resulttype", "TPS")
+		# changed = 1728746053.26743
+		# filterresult = Fail
+		base.report_item_set_value(fkgl, "filterresult", "Fail")
+		# filteragent = None
+		# datatype = Result
+		base.report_item_set_value(fkgl, "datatype", "Result")
+		# enablefilterresult = 1
+		base.report_item_set_bool(fkgl, "enablefilterresult", 1)
+
+		#
+		# [FB90CDCCFC9R]
+		fkgr = fkg + "R"
+		base.report_add_subsection(fkgr)
+		# datatype = Metric
+		base.report_item_set_value(fkgr, "datatype", "Metric")
+		# changed = 1728746053.2828546
+		# axisen = 1
+		base.report_item_set_bool(fkgr, "axisen", 1)
+		# metrictype = Scenario
+		base.report_item_set_value(fkgr, "metrictype", "Scenario")
+		# filteragent = None
+		# filtertype = None
+		# secondarymetric = total_robots
+		base.report_item_set_value(fkgr, "secondarymetric", "total_robots")
+
+		#
+		# 	-	Failed Keywords Names
+		#
+		# name = Failed Keywords Names
+		fkn = self.report_new_section(err, "Failed Keywords Names")
+		# type = table
+		self.report_item_set_type(fkn, 'table')
+		# parent = FB90CD6ECAE
+		# changed = 1728746043.623058
+		# colours = 1
+		base.report_item_set_bool(fkn, "colours", 1)
+		# datatype = Result
+		base.report_item_set_value(fkn, "datatype", "Result")
+		# resulttype = TPS
+		base.report_item_set_value(fkn, "resulttype", "TPS")
+		# filterresult = Fail
+		base.report_item_set_value(fkn, "filterresult", "Fail")
+		# filteragent = None
+		# enablefilterresult = 1
+		base.report_item_set_bool(fkn, "enablefilterresult", 1)
+		# col_result_name_show = 1
+		base.report_item_set_bool(fkn, "col_result_name_show", 1)
+		# col_result_show = 1
+		base.report_item_set_bool(fkn, "col_result_show", 1)
+		# col_count_show = 1
+		base.report_item_set_bool(fkn, "col_count_show", 1)
+
+		#
+		# 	-	Error Details
+		#
+		# name = Error Details
+		ed = self.report_new_section(err, "Error Details")
+		# type = errors
+		self.report_item_set_type(ed, 'errors')
+		# parent = FB90CD6ECAE
+		# changed = 1728746092.6821463
+		# images = 1
+		base.report_item_set_bool(ed, "images", 1)
+		# grouprn = 1
+		base.report_item_set_bool(ed, "grouprn", 1)
+		# groupet = 1
+		base.report_item_set_bool(ed, "groupet", 1)
 
 	def template_save(self, filename):
 		saved = False
@@ -2572,18 +3000,14 @@ class ReporterBase():
 			ldir = os.path.join(os.path.dirname(dbfile), "logs")
 			base.debugmsg(8, "ldir:", ldir)
 
-			# 		opencart_1_1_1690876686_1_1690876693
-			gpatt = os.path.join(ldir, "{}_{}_{}_*_{}_*".format(rdata['script'].split('.')[0], rdata['script_index'], rdata['robot'], rdata['iteration']))
-			base.debugmsg(9, "gpatt:", gpatt)
-
-			lfol = glob.glob(gpatt, recursive=True)[0]
-			base.debugmsg(9, "lfol:", lfol)
-
 			# 		opencart_1_1_1690876686_1_1690876693/Opencart_Sales_output.xml
 			gxpatt = os.path.join(ldir, "{}_{}_{}_*_{}_*".format(rdata['script'].split('.')[0], rdata['script_index'], rdata['robot'], rdata['iteration']), "*_output.xml")
 			base.debugmsg(9, "gxpatt:", gxpatt)
 
-			xmlf = glob.glob(gxpatt, recursive=True)[0]
+			xmlf = "not_found"
+			xmll = glob.glob(gxpatt, recursive=True)
+			if len(xmll) > 0:
+				xmlf = glob.glob(gxpatt, recursive=True)[0]
 			base.debugmsg(5, "xmlf:", xmlf)
 
 			if os.path.isfile(xmlf):
@@ -3747,7 +4171,7 @@ class ReporterCore:
 
 		M = ElementMaker(namespace=None, nsmap={None: "http://www.w3.org/1999/xhtml"})
 		# html = M.html(E.head(E.title("Test page")), E.body(E.p("Hello world")))
-		html = M.html(E.head(E.title("Test page")), E.body())
+		html = M.html(E.head(E.title("Test page"), E.meta(charset="utf-8")), E.body())
 
 		return html
 
@@ -3871,6 +4295,10 @@ class ReporterCore:
 		base.debugmsg(8, "id:", id, "	oimg:", oimg)
 
 		img = etree.SubElement(elmt, 'img')
+
+		img.set("id", id + "_img")
+		img.set("imgid", id)
+		img.text = ""
 
 		# <img src="data:image/png;base64,
 		base.debugmsg(9, "oimg format:", oimg.format)
@@ -8798,7 +9226,7 @@ class ReporterGUI(tk.Frame):
 		changes = 0
 
 		# 		start time
-		if "strST" in self.contentdata[pid]:
+		if "strST" in self.contentdata[pid] and "fST" in self.contentdata[pid]:
 			st = self.contentdata[pid]["strST"].get()
 			base.debugmsg(5, "st:", st)
 			if st != self.contentdata[pid]["fST"]:
@@ -8815,7 +9243,7 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[id]["fST"] = fST
 
 		# 		end time
-		if "strET" in self.contentdata[pid]:
+		if "strET" in self.contentdata[pid] and "fET" in self.contentdata[pid]:
 			et = self.contentdata[pid]["strET"].get()
 			base.debugmsg(5, "et:", et)
 			if et != self.contentdata[pid]["fET"]:
@@ -9394,14 +9822,22 @@ class ReporterGUI(tk.Frame):
 			base.debugmsg(5, "Set Options")
 			while "SMetric" not in self.contentdata[idl]:
 				time.sleep(0.1)
-			self.contentdata[idl]["intIsNum"].set(base.rt_table_get_isnumeric(idl))
-			self.contentdata[idl]["MType"].set(base.rt_table_get_mt(idl))
-			self.contentdata[idl]["PMetric"].set(base.rt_table_get_pm(idl))
-			self.contentdata[idl]["SMetric"].set(base.rt_table_get_sm(idl))
-			self.contentdata[idl]["intFA"].set(base.rt_table_get_enfa(idl))
-			self.contentdata[idl]["FAType"].set(base.rt_table_get_fa(idl))
-			self.contentdata[idl]["FNType"].set(base.rt_table_get_fn(idl))
-			self.contentdata[idl]["FPattern"].set(base.rt_table_get_fp(idl))
+			if "intIsNum" in self.contentdata[idl]:
+				self.contentdata[idl]["intIsNum"].set(base.rt_table_get_isnumeric(idl))
+			if "MType" in self.contentdata[idl]:
+				self.contentdata[idl]["MType"].set(base.rt_table_get_mt(idl))
+			if "PMetric" in self.contentdata[idl]:
+				self.contentdata[idl]["PMetric"].set(base.rt_table_get_pm(idl))
+			if "SMetric" in self.contentdata[idl]:
+				self.contentdata[idl]["SMetric"].set(base.rt_table_get_sm(idl))
+			if "intFA" in self.contentdata[idl]:
+				self.contentdata[idl]["intFA"].set(base.rt_table_get_enfa(idl))
+			if "FAType" in self.contentdata[idl]:
+				self.contentdata[idl]["FAType"].set(base.rt_table_get_fa(idl))
+			if "FNType" in self.contentdata[idl]:
+				self.contentdata[idl]["FNType"].set(base.rt_table_get_fn(idl))
+			if "FPattern" in self.contentdata[idl]:
+				self.contentdata[idl]["FPattern"].set(base.rt_table_get_fp(idl))
 
 		if datatyper == "Metric":
 			base.debugmsg(5, "Update Options")
@@ -9409,14 +9845,22 @@ class ReporterGUI(tk.Frame):
 			base.debugmsg(5, "Set Options")
 			while "SMetric" not in self.contentdata[idr]:
 				time.sleep(0.1)
-			self.contentdata[idr]["intIsNum"].set(base.rt_table_get_isnumeric(idr))
-			self.contentdata[idr]["MType"].set(base.rt_table_get_mt(idr))
-			self.contentdata[idr]["PMetric"].set(base.rt_table_get_pm(idr))
-			self.contentdata[idr]["SMetric"].set(base.rt_table_get_sm(idr))
-			self.contentdata[idr]["intFA"].set(base.rt_table_get_enfa(idr))
-			self.contentdata[idr]["FAType"].set(base.rt_table_get_fa(idr))
-			self.contentdata[idr]["FNType"].set(base.rt_table_get_fn(idr))
-			self.contentdata[idr]["FPattern"].set(base.rt_table_get_fp(idr))
+			if "intIsNum" in self.contentdata[idr]:
+				self.contentdata[idr]["intIsNum"].set(base.rt_table_get_isnumeric(idr))
+			if "MType" in self.contentdata[idr]:
+				self.contentdata[idr]["MType"].set(base.rt_table_get_mt(idr))
+			if "PMetric" in self.contentdata[idr]:
+				self.contentdata[idr]["PMetric"].set(base.rt_table_get_pm(idr))
+			if "SMetric" in self.contentdata[idr]:
+				self.contentdata[idr]["SMetric"].set(base.rt_table_get_sm(idr))
+			if "intFA" in self.contentdata[idr]:
+				self.contentdata[idr]["intFA"].set(base.rt_table_get_enfa(idr))
+			if "FAType" in self.contentdata[idr]:
+				self.contentdata[idr]["FAType"].set(base.rt_table_get_fa(idr))
+			if "FNType" in self.contentdata[idr]:
+				self.contentdata[idr]["FNType"].set(base.rt_table_get_fn(idr))
+			if "FPattern" in self.contentdata[idr]:
+				self.contentdata[idr]["FPattern"].set(base.rt_table_get_fp(idr))
 
 		if datatypel == "Plan":
 			self.contentdata[idl]["intSTot"].set(base.report_item_get_int(idl, "ShowTotal"))
