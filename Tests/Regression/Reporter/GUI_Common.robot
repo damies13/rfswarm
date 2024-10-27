@@ -9,6 +9,7 @@ Library 	ImageHorizonLibrary 	reference_folder=${IMAGE_DIR}
 Library 	OCRLibrary
 
 Library 	read_docx.py
+Library 	read_xlsx.py
 
 *** Variables ***
 ${default_image_timeout} 	${120}
