@@ -150,6 +150,7 @@ Get Text Value To Right Of
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 
 	${b4value}= 	Get Clipboard Content
+	Click To The Right Of Image 	${img} 	${offsetx}
 	${value}= 	Copy From The Right Of 	${img} 	${offsetx}
 	Take A Screenshot
 	WHILE 	$b4value == $value 		limit=15
