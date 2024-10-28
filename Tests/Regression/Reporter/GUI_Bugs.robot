@@ -35,7 +35,7 @@ Verify If Reporter Runs With No Existing INI File From Current Version
 	File Should Not Exist	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with no existing ini file.
 	Open GUI
-	Wait For Status 	PreviewLoaded
+	Wait For Status 	SelectResulFfile
 	TRY
 		Click Section	test_result_summary
 		Click	#double click needed. Maybe delete after eel module implemetation
@@ -56,7 +56,7 @@ Verify If Reporter Runs With Existing INI File From Previous Version
 	File Should Not Be Empty	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with existing ini file.
 	Open GUI
-	Wait For Status 	PreviewLoaded
+	Wait For Status 	SelectResulFfile
 	TRY
 		Click Section	test_result_summary
 		Click	#double click needed. Maybe delete after eel module implemetation
