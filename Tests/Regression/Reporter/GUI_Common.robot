@@ -156,6 +156,7 @@ Get Text Value To Right Of
 	WHILE 	$b4value == $value 		limit=15
 		Wait For 	${img} 	 timeout=${default_image_timeout}
 		${offsetx}= 	Evaluate 	${offsetx}+10
+		Click To The Right Of Image 	${img} 	${offsetx}
 		${value}= 	Copy From The Right Of 	${img} 	${offsetx}
 		# Take A Screenshot
 		${valuec}= 	Copy
