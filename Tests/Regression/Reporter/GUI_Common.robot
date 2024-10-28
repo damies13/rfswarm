@@ -266,7 +266,7 @@ Wait For Status
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
 	Wiggle Mouse
-	Take A Screenshot
+	# Take A Screenshot
 	Wait For 	${img} 	 timeout=${timeout}
 	Sleep 	${sssleep}
 	# Take A Screenshot
