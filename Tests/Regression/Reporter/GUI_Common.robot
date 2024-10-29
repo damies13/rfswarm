@@ -169,6 +169,8 @@ Get Text Value To Right Of
 		END
 		IF 	$platform == 'macos'
 			Sleep    10 ms
+			Click To The Right Of Image 	${img} 	${offsetx} 	clicks=3
+			Take A Screenshot
 			Press Combination 	KEY.command 	c
 			Sleep    10 ms
 			${valueg}= 	Get Clipboard Content
