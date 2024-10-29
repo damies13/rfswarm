@@ -178,7 +178,7 @@ Get Text Value To Right Of
 			Take A Screenshot
 			Click To The Right Of Image 	${img} 	${offsetx} 	clicks=3
 			Take A Screenshot
-			Press Combination 	KEY.command 	c
+			Press Combination 	KEY.command 	KEY.c
 			Sleep    10 ms
 			${valueg}= 	Get Clipboard Content
 			IF  $valueg != $value
