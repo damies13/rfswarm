@@ -184,6 +184,12 @@ Get Text Value To Right Of
 			IF  $valueg != $value
 				${value}= 	Set Variable 		${valueg}
 			END
+
+			${valueclp}= 	Evaluate 		pyperclip.paste() 		modules=pyperclip
+			IF  $valueclp != $value
+				${value}= 	Set Variable 		${valueclp}
+			END
+
 		END
 	END
 	RETURN 	${value}
