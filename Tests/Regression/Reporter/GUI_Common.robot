@@ -151,6 +151,9 @@ Get Text Value To Right Of
 
 	${b4value}= 	Get Clipboard Content
 	Click To The Right Of Image 	${img} 	${offsetx}
+	Sleep    10 ms
+	Click To The Right Of Image 	${img} 	${offsetx}
+	Sleep    10 ms
 	${value}= 	Copy From The Right Of 	${img} 	${offsetx}
 	Take A Screenshot
 	WHILE 	$b4value == $value 		limit=15
@@ -168,8 +171,10 @@ Get Text Value To Right Of
 			${value}= 	Set Variable 		${valueg}
 		END
 		IF 	$platform == 'macos'
+			Click To The Right Of Image 	${img} 	${offsetx}
 			Sleep    10 ms
-			Click To The Right Of Image 	${img} 	${offsetx} 	clicks=1
+			Click To The Right Of Image 	${img} 	${offsetx}
+			Sleep    10 ms
 			Take A Screenshot
 			Click To The Right Of Image 	${img} 	${offsetx} 	clicks=3
 			Take A Screenshot
