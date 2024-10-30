@@ -17,6 +17,22 @@ Select Preview Tab
 	Click Tab 	 Preview
 	# Close GUI
 
+MacOS Accessability Settings
+	[Tags]	macos-latest
+
+	# setting -> security & privacy -> Accessibility -> Terminal 'check'
+
+	# Open Settings
+	${img}=	Set Variable		${platform}_finder.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Click Image		${img}
+
+	# Open security & privacy
+	# Open Accessibility
+	# Open Check Terminal
+
+	Take A Screenshot
 
 
 # Intentional Fail
