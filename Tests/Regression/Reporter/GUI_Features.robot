@@ -75,33 +75,35 @@ Whole report time range
 	Wait For Status 	PreviewLoaded
 
 	Click Section			Robots
-	Take A Screenshot
+	# Take A Screenshot
 	Click Tab 	 Preview
-	Take A Screenshot
+	# Take A Screenshot
 
 	# check the graph as expected
-	Take A Screenshot
+	# Take A Screenshot
 	Set Confidence		0.7
 	Locate 	reporter_${platform}_graph_robots1.png
 	Set Confidence		0.9
 
 	Click Tab 	 Settings
-	Take A Screenshot
+	# Take A Screenshot
 	Click Section			Report
 
-	Take A Screenshot
+	# Take A Screenshot
 
-	${title}= 	Get Text Value To Right Of 	Title
+	# ${title}= 	Get Text Value To Right Of 	Title
 
-	Take A Screenshot
+	# Take A Screenshot
 	# Set start time 14:20
 	# Select Field With Label 	StartTime
 	# Press Combination 	KEY.END
 	# Press Combination 	KEY.backspace 	KEY.backspace
 	# Type 	20
-	${StartTime}= 	Get Text Value To Right Of 	StartTime
-	${StartTime}= 	Replace String 	${StartTime} 	14:11 	14:20
+	${StartTime}= 	Set Variable    2023-09-28 14:20
+	# ${StartTime}= 	Get Text Value To Right Of 	StartTime
+	# ${StartTime}= 	Replace String 	${StartTime} 	14:11 	14:20
 	Set Text Value To Right Of 	StartTime 	${StartTime}
+	Take A Screenshot
 
 	# Take A Screenshot
 	Select Field With Label 	Title 		150
@@ -112,9 +114,11 @@ Whole report time range
 	# Press Combination 	KEY.END
 	# Press Combination 	KEY.backspace 	KEY.backspace 	KEY.backspace 	KEY.backspace 	KEY.backspace 	KEY.backspace 	KEY.backspace
 	# Type 	14:58
-	${EndTime}= 	Get Text Value To Right Of 	EndTime
-	${EndTime}= 	Replace String 	${EndTime} 	15:00 	14:58
+	${EndTime}= 	Set Variable    2023-09-28 14:58
+	# ${EndTime}= 	Get Text Value To Right Of 	EndTime
+	# ${EndTime}= 	Replace String 	${EndTime} 	15:00 	14:58
 	Set Text Value To Right Of 	EndTime 	${EndTime}
+	Take A Screenshot
 
 	# Take A Screenshot
 	# ${bounds}= 	Find Text 	Title:
@@ -124,9 +128,9 @@ Whole report time range
 	Click Tab 	 Preview
 	Wait For Status 	PreviewLoaded
 
-	Sleep    10
-
-	Wait For Status 	PreviewLoaded
+	# Sleep    10
+	#
+	# Wait For Status 	PreviewLoaded
 	Click Section			Robots
 	Wait For Status 	PreviewLoaded
 

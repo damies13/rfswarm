@@ -171,17 +171,17 @@ Get Text Value To Right Of
 			${value}= 	Set Variable 		${valueg}
 		END
 		IF 	$platform == 'macos' and $b4value == $value
-			Click To The Right Of Image 	${img} 	${offsetx}
-			Sleep    10 ms
-			Click To The Right Of Image 	${img} 	${offsetx}
-			Sleep    10 ms
-			Take A Screenshot
+			# Click To The Right Of Image 	${img} 	${offsetx}
+			# Sleep    10 ms
+			# Click To The Right Of Image 	${img} 	${offsetx}
+			# Sleep    10 ms
+			# Take A Screenshot
 			Click To The Right Of Image 	${img} 	${offsetx} 	clicks=3
-			Take A Screenshot
+			# Take A Screenshot
 			Press Combination 	KEY.command 	KEY.c
 			# Press Combination 	KEY.command 	KEY.v
 			Sleep    10 ms
-			Take A Screenshot
+			# Take A Screenshot
 			# Press Combination 	KEY.command 	KEY.v
 			# Sleep    10 ms
 			# Take A Screenshot
