@@ -178,17 +178,21 @@ Get Text Value To Right Of
 			Take A Screenshot
 			Click To The Right Of Image 	${img} 	${offsetx} 	clicks=3
 			Take A Screenshot
-			Press Combination 	KEY.command 	KEY.c
+			Press Combination 	KEY.command 	KEY.x
 			Sleep    10 ms
+			Take A Screenshot
+			Press Combination 	KEY.command 	KEY.v
+			Sleep    10 ms
+			Take A Screenshot
 			${valueg}= 	Get Clipboard Content
 			IF  $valueg != $value
 				${value}= 	Set Variable 		${valueg}
 			END
 
-			${valueclp}= 	Evaluate 		pyperclip.paste() 		modules=pyperclip
-			IF  $valueclp != $value
-				${value}= 	Set Variable 		${valueclp}
-			END
+			# ${valueclp}= 	Evaluate 		pyperclip.paste() 		modules=pyperclip
+			# IF  $valueclp != $value
+			# 	${value}= 	Set Variable 		${valueclp}
+			# END
 
 		END
 	END
