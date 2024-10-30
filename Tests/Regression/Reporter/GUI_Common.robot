@@ -170,7 +170,7 @@ Get Text Value To Right Of
 		IF  $valueg != $value
 			${value}= 	Set Variable 		${valueg}
 		END
-		IF 	$platform == 'macos'
+		IF 	$platform == 'macos' and $b4value == $value
 			Click To The Right Of Image 	${img} 	${offsetx}
 			Sleep    10 ms
 			Click To The Right Of Image 	${img} 	${offsetx}
@@ -178,12 +178,13 @@ Get Text Value To Right Of
 			Take A Screenshot
 			Click To The Right Of Image 	${img} 	${offsetx} 	clicks=3
 			Take A Screenshot
-			Press Combination 	KEY.command 	KEY.x
+			Press Combination 	KEY.command 	KEY.c
+			# Press Combination 	KEY.command 	KEY.v
 			Sleep    10 ms
 			Take A Screenshot
-			Press Combination 	KEY.command 	KEY.v
-			Sleep    10 ms
-			Take A Screenshot
+			# Press Combination 	KEY.command 	KEY.v
+			# Sleep    10 ms
+			# Take A Screenshot
 			${valueg}= 	Get Clipboard Content
 			IF  $valueg != $value
 				${value}= 	Set Variable 		${valueg}

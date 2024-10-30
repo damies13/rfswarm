@@ -75,17 +75,25 @@ Whole report time range
 	Wait For Status 	PreviewLoaded
 
 	Click Section			Robots
+	Take A Screenshot
 	Click Tab 	 Preview
+	Take A Screenshot
 
 	# check the graph as expected
+	Take A Screenshot
 	Set Confidence		0.7
 	Locate 	reporter_${platform}_graph_robots1.png
 	Set Confidence		0.9
 
 	Click Tab 	 Settings
+	Take A Screenshot
 	Click Section			Report
 
-	# Take A Screenshot
+	Take A Screenshot
+
+	${title}= 	Get Text Value To Right Of 	Title
+
+	Take A Screenshot
 	# Set start time 14:20
 	# Select Field With Label 	StartTime
 	# Press Combination 	KEY.END
@@ -498,7 +506,7 @@ Verify the Content Of the DOCX Report
 	Lists Should Be Equal 	${22_sect_10_expected} 	${22_sect_10}	msg=[ Expected != Converted ]
 	# [15] equals middle row
 	@{22_sect_15} 	Convert To List 	${docx_tables}[7][15]
-	VAR 	@{22_sect_15_expected} 		
+	VAR 	@{22_sect_15_expected}
 	...    Result: 	Text 'Requests for Quotation' did not appear in 2 minutes. 	Test: 	Odoo Process RFQs 	Script: 	Odoo.robot 	Count: 	1
 	Lists Should Be Equal 	${22_sect_15_expected} 	${22_sect_15}	msg=[ Expected != Converted ]
 	# [20] equals upper middle row
@@ -1013,7 +1021,7 @@ Verify the Content Of the XLSX Report
 	Lists Should Be Equal 	${22_sect_10_expected} 	${22_sect_10}	msg=[ Expected != Converted ]
 	# [15] equals middle row
 	@{22_sect_15} 	Convert To List 	${22_sect_content}[15]
-	VAR 	@{22_sect_15_expected} 		
+	VAR 	@{22_sect_15_expected}
 	...    Result: 	Text 'Requests for Quotation' did not appear in 2 minutes. 	Test: 	Odoo Process RFQs 	Script: 	Odoo.robot 	Count: 	1
 	Lists Should Be Equal 	${22_sect_15_expected} 	${22_sect_15}	msg=[ Expected != Converted ]
 	# [20] equals upper middle row
