@@ -221,20 +221,23 @@ Set Text Value To Right Of
 	Click
 	Double Click
 	Type 	${value}
-	# Take A Screenshot
-	${value2}= 	Get Text Value To Right Of		${label}
-	WHILE 	$value2 != $value 		limit=10
-		${x}= 	Evaluate 	${x}+10
-		${offsetx}= 	Evaluate 	${offsetx}+10
-		@{coordinates}= 	Create List 	${x} 	${y}
-		Move To 	${coordinates}
-		Click
-		Double Click
-		Type 	${value}
-		# Take A Screenshot
+	IF 	$platform == 'macos'
+		Take A Screenshot
+	ELSE
 		${value2}= 	Get Text Value To Right Of		${label}
+		WHILE 	$value2 != $value 		limit=10
+			${x}= 	Evaluate 	${x}+10
+			${offsetx}= 	Evaluate 	${offsetx}+10
+			@{coordinates}= 	Create List 	${x} 	${y}
+			Move To 	${coordinates}
+			Click
+			Double Click
+			Type 	${value}
+			# Take A Screenshot
+			${value2}= 	Get Text Value To Right Of		${label}
+		END
+		Should Be Equal As Strings    ${value}    ${value2}
 	END
-	Should Be Equal As Strings    ${value}    ${value2}
 
 Get Last Screenshot
 	Log 	${OUTPUT FILE}
