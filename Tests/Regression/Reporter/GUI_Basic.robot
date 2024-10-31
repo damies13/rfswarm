@@ -42,6 +42,7 @@ MacOS Accessability Settings
 		Take A Screenshot
 		Click Image		${imgsd}
 		${found}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=10
+	END
 	Take A Screenshot
 	Click Image		${img}
 
