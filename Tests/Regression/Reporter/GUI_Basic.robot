@@ -35,15 +35,14 @@ MacOS Accessability Settings
 	Click Image		${img}
 
 	# Open Accessibility
-	${img}=	Set Variable		${platform}_settings_scrolldown.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-	Click Image		${img}
-
-	Sleep 	10.5
+	${img}=	Set Variable		${platform}_settings_accessibility.png
+	${imgsd}=	Set Variable		${platform}_settings_scrolldown.png
+	${found}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=10
+	WHILE 	not ${found}
+		Take A Screenshot
+		Click Image		${imgsd}
+		${found}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=10
 	Take A Screenshot
-
-	${img}=	Set Variable		${platform}_settings_scrolldown.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
 	Click Image		${img}
 
 	# Open Check Terminal
