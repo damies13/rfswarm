@@ -35,6 +35,17 @@ MacOS Accessability Settings
 	Click Image		${img}
 
 	# Open Accessibility
+	${img}=	Set Variable		${platform}_settings_scrolldown.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Click Image		${img}
+
+	Sleep 	10.5
+	Take A Screenshot
+
+	${img}=	Set Variable		${platform}_settings_scrolldown.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Click Image		${img}
+
 	# Open Check Terminal
 
 	Sleep 	10.5
