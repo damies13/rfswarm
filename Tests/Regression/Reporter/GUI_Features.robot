@@ -102,11 +102,11 @@ Whole report time range
 	# Press Combination 	KEY.END
 	# Press Combination 	KEY.backspace 	KEY.backspace
 	# Type 	20
-	${StartTime}= 	Set Variable    2023-09-28 14:20
-	# ${StartTime}= 	Get Text Value To Right Of 	StartTime
-	# ${StartTime}= 	Replace String 	${StartTime} 	14:11 	14:20
+	# ${StartTime}= 	Set Variable    2023-09-28 14:20
+	${StartTime}= 	Get Text Value To Right Of 	StartTime
+	${StartTime}= 	Replace String 	${StartTime} 	14:11 	14:20
 	Set Text Value To Right Of 	StartTime 	${StartTime}
-	Take A Screenshot
+	# Take A Screenshot
 
 	# Take A Screenshot
 	Select Field With Label 	Title 		150
@@ -117,9 +117,9 @@ Whole report time range
 	# Press Combination 	KEY.END
 	# Press Combination 	KEY.backspace 	KEY.backspace 	KEY.backspace 	KEY.backspace 	KEY.backspace 	KEY.backspace 	KEY.backspace
 	# Type 	14:58
-	${EndTime}= 	Set Variable    2023-09-28 14:58
-	# ${EndTime}= 	Get Text Value To Right Of 	EndTime
-	# ${EndTime}= 	Replace String 	${EndTime} 	15:00 	14:58
+	# ${EndTime}= 	Set Variable    2023-09-28 14:58
+	${EndTime}= 	Get Text Value To Right Of 	EndTime
+	${EndTime}= 	Replace String 	${EndTime} 	15:00 	14:58
 	Set Text Value To Right Of 	EndTime 	${EndTime}
 	Take A Screenshot
 
