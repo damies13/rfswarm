@@ -23,7 +23,7 @@ MacOS Accessability Settings
 	# setting -> security & privacy -> Accessibility -> Terminal 'check'
 
 	# Open Settings
-	${img}=	Set Variable		${platform}_finder.png
+	${img}=	Set Variable		${platform}_settings.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
@@ -34,6 +34,13 @@ MacOS Accessability Settings
 
 	Take A Screenshot
 
+	Click Image		reporter_${platform}_button_closewindow.png
+	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
+	Take A Screenshot
+	Sleep 	0.5
+
+
+	Fatal Error 	Intentional Fail
 
 # Intentional Fail
 # 	[Tags]	ubuntu-latest		windows-latest		macos-latest
