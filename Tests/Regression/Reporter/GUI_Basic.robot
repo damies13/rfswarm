@@ -28,7 +28,12 @@ MacOS Accessability Settings
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 
+
 	# Open security & privacy
+	${img}=	Set Variable		${platform}_settings_privsec.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Click Image		${img}
+
 	# Open Accessibility
 	# Open Check Terminal
 
