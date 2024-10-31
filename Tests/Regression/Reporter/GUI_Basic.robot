@@ -32,7 +32,9 @@ MacOS Accessability Settings
 	# Open Accessibility
 	# Open Check Terminal
 
+	Sleep 	10.5
 	Take A Screenshot
+	Fatal Error 	Intentional Fail
 
 	Click Image		reporter_${platform}_button_closewindow.png
 	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
@@ -41,6 +43,8 @@ MacOS Accessability Settings
 
 
 	Fatal Error 	Intentional Fail
+
+	[Teardown] 		Fatal Error 	Intentional Fail
 
 # Intentional Fail
 # 	[Tags]	ubuntu-latest		windows-latest		macos-latest
