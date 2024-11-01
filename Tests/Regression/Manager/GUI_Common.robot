@@ -84,8 +84,8 @@ Open Manager GUI
 	[Arguments]		${options}=None
 	# Press Escape and move mouse because on linux the screen save had kicked in
 	Press Combination 	Key.esc
-	Move To 	10 	10
-	Move To 	20 	20
+	Wiggle Mouse
+
 	IF  ${options} == None
 		${options}= 	Create List
 		Create Directory 	${results_dir}
@@ -104,6 +104,8 @@ Open Manager GUI
 	IF 	'-n' in ${options}
 		Sleep 	10
 	ELSE
+		Handle Donation Reminder
+
 		${img}=	Set Variable		manager_${platform}_button_runschedule.png
 		${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=${default_image_timeout / 2}
 		IF 	not ${passed}
@@ -130,12 +132,18 @@ Open Manager GUI
 		END
 	END
 
+Wiggle Mouse
+	Move To 	10 	10
+	Move To 	20 	20
+
+Handle Donation Reminder
+	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		${default_image_timeout / 2}
+	VAR 	${DonationReminder} 	${found} 		scope=TEST
+
 Close Manager GUI ubuntu
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
 	Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
 	Close Manager GUI
-
-
 
 Close Manager GUI windows
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01

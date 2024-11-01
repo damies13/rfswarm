@@ -361,11 +361,8 @@ Open GUI macos
 	# Take A Screenshot
 
 Handle Donation Reminder
-	VAR 	${DonationReminter} 	${False} 		scope=TEST
-	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		60
-	IF 	${found}
-		VAR 	${DonationReminter} 	${True} 		scope=TEST
-	END
+	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		${default_image_timeout / 2}
+	VAR 	${DonationReminder} 	${found} 		scope=TEST
 
 Close GUI
 	${keyword}= 	Set Variable 	Close GUI ${platform}
