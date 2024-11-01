@@ -1,6 +1,8 @@
 *** Settings ***
 Test Tags       Basic 	GUI
 
+Resource 	GUI_Common.robot
+
 Library 	OperatingSystem
 Library 	Process
 Library 	String
@@ -20,8 +22,8 @@ Open GUI
 	[Tags]	macos-latest
 	# Press Escape and move mouse because on linux the screen save had kicked in
 	Press Combination 	Key.esc
-	Move To 	10 	10
-	Move To 	20 	20
+	Wiggle Mouse
+
 	Set Suite Variable    ${platform}    macos
 	Set Confidence		0.9
 	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
@@ -29,6 +31,9 @@ Open GUI
 	Set Test Variable 	$process 	${process}
 	# Sleep 	10 			# not needed now we wait for the agents tab to be visible
 	Set Screenshot Folder 	${OUTPUT DIR}
+
+	Handle Donation Reminder
+
 	${img}=	Set Variable		manager_${platform}_tab_agents.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	Take A Screenshot
@@ -37,8 +42,8 @@ Open GUI
 	[Tags]	windows-latest
 	# Press Escape and move mouse because on linux the screen save had kicked in
 	Press Combination 	Key.esc
-	Move To 	10 	10
-	Move To 	20 	20
+	Wiggle Mouse
+
 	Set Suite Variable    ${platform}    windows
 	Set Confidence		0.9
 	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
@@ -46,6 +51,9 @@ Open GUI
 	Set Test Variable 	$process 	${process}
 	# Sleep 	10 			# not needed now we wait for the agents tab to be visible
 	Set Screenshot Folder 	${OUTPUT DIR}
+
+	Handle Donation Reminder
+
 	${img}=	Set Variable		manager_${platform}_tab_agents.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	Take A Screenshot
@@ -54,8 +62,8 @@ Open GUI
 	[Tags]	ubuntu-latest
 	# Press Escape and move mouse because on linux the screen save had kicked in
 	Press Combination 	Key.esc
-	Move To 	10 	10
-	Move To 	20 	20
+	Wiggle Mouse
+
 	Set Suite Variable    ${platform}    ubuntu
 	Set Confidence		0.9
 	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
@@ -63,6 +71,9 @@ Open GUI
 	Set Test Variable 	$process 	${process}
 	# Sleep 	10 			# not needed now we wait for the agents tab to be visible
 	Set Screenshot Folder 	${OUTPUT DIR}
+	
+	Handle Donation Reminder
+
 	${img}=	Set Variable		manager_${platform}_tab_agents.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	Take A Screenshot

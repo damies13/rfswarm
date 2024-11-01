@@ -356,12 +356,12 @@ Selected Option Should Be
 
 
 Click Button
-	[Arguments]		${btnname}
+	[Arguments]		${btnname} 		${timeout}=${default_image_timeout}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
 	${img}=	Set Variable		manager_${platform}_button_${btnnamel}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	0.1
