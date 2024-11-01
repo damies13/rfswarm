@@ -7817,7 +7817,7 @@ class ReporterGUI(tk.Frame):
 		# display donation reminder on first launch and then once per year
 		if timesincereminder > yearseconds:
 
-			titlemsg = "RFSwarm Reporter - Donation Reminder"
+			titlemsg = self.titleprefix + " - Donation Reminder"
 
 			donatemsg = "RFSwarm's mission is to give you a an industry leading performance test tool, that is easy to use, "
 			donatemsg += "quick to develop test scripts and free from limitations so that you can just get on with testing."
