@@ -4554,7 +4554,6 @@ class RFSwarmGUI(tk.Frame):
 		url = "https://github.com/sponsors/damies13"
 		webbrowser.open(url, new=0, autoraise=True)
 
-
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
 	# Graphs
