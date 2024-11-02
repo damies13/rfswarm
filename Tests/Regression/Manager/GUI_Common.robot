@@ -259,7 +259,7 @@ Kill If Still Running
 	# Log		${processes}
 	FOR 	${p} 	IN 	@{processes}
 		# Log		${p}
-		IF 	"${cmdname}" in $p.name()
+		IF 	$cmdname in $p.name()
 			Evaluate    $p.kill()
 		END
 	END
