@@ -255,9 +255,11 @@ Kill Agent If Still Running
 
 Kill If Still Running
 	[Arguments]		${cmdname}
-	${processes}= 	Evaluate    psutil.process_iter() 	modules=psutil
-	FOR 	${p} 	IN 	${processes}
-		IF 	$cmdname in $p.name()
+	${processes}= 	Evaluate    list(psutil.process_iter()) 	modules=psutil
+	# Log		${processes}
+	FOR 	${p} 	IN 	@{processes}
+		# Log		${p}
+		IF 	"${cmdname}" in $p.name()
 			Evaluate    $p.kill()
 		END
 	END
