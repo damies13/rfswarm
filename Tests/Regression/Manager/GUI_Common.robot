@@ -257,8 +257,8 @@ Kill If Still Running
 	[Arguments]		${cmdname}
 	${processes}= 	Evaluate    psutil.process_iter() 	modules=psutil
 	FOR 	${p} 	IN 	${processes}
-		IF 	"${cmdname}" in ${p.name()}
-			Evaluate    ${p.kill()}
+		IF 	"${cmdname}" in ${p}.name()
+			Evaluate    ${p}.kill()
 		END
 	END
 
