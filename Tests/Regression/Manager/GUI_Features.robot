@@ -2909,7 +2909,7 @@ Verify That Time Gets Correctly Validated For Schelduled Start
 		${copied_converted_start_time_value}=		Evaluate	clipboard.paste()	modules=clipboard
 		Should Be Equal 	${updated_start_times}[${i}]	${copied_converted_start_time_value}
 		...    msg=The "Schedule Time" did not convert to the time as expected [ Expected != Converted ]
-	
+
 	END
 
 	[Teardown]	Run Keywords	Close Manager GUI ${platform}
@@ -3042,7 +3042,7 @@ Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time
 	...    Open Agent
 
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
-	${new_time}=	Add Time To Date 	${current_time} 	45 		date_format=%H:%M:%S 	result_format=%H:%M:%S
+	${new_time}=	Add Time To Date 	${current_time} 	105 		date_format=%H:%M:%S 	result_format=%H:%M:%S
 	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#89${/}Issue-#89.rfs
 	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-t 	${new_time}
 
@@ -3072,7 +3072,7 @@ Verify the Start Time Is Displayed On the Plan Screen
 		VAR 	${expected_time_image}	3_00_00
 	END
 	VAR		@{mngr_options}		-t 	${scheduled_time}
-	
+
 	Open Manager GUI	${mngr_options}
 	Take A Screenshot
 	${status}=	Run Keyword And Return Status
@@ -3090,7 +3090,7 @@ Verify the Remaining Time Is Displayed On the Plan Screen
 
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
 	#adding 10m:20s
-	${new_time}=	Add Time To Date 	${current_time} 	620 		date_format=%H:%M:%S 	result_format=%H:%M:%S
+	${new_time}=	Add Time To Date 	${current_time} 	680 		date_format=%H:%M:%S 	result_format=%H:%M:%S
 	VAR		@{mngr_options}		-t 	${new_time}
 
 	Open Manager GUI	${mngr_options}

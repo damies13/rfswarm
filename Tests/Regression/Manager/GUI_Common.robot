@@ -103,6 +103,8 @@ Open Manager GUI
 
 	IF 	'-n' in ${options}
 		Sleep 	10
+	ELSE IF 	'-r' in ${options} or '--run' in ${options}
+		Handle Donation Reminder
 	ELSE
 		Handle Donation Reminder
 
