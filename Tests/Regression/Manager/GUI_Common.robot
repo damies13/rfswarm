@@ -25,7 +25,7 @@ ${global_name}	None
 @{mngr_options}		None
 @{agent_options}	None
 ${cmd_agent} 		rfswarm-agent
-${cmd_manager} 	rfswarm
+${cmd_manager} 	rfswarm-manager
 ${IMAGE_DIR} 	${CURDIR}/Images/file_method
 ${pyfile_manager}			${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
 ${pyfile_agent}			${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py
@@ -182,6 +182,7 @@ Close Manager GUI
 			Fail
 		END
 	END
+	Kill Manager If Still Running
 	# stdout=${OUTPUT DIR}${/}stdout_manager.txt    stderr=${OUTPUT DIR}${/}stderr_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
@@ -222,8 +223,12 @@ Close Manager GUI macos
 			Fail
 		END
 	END
+	Kill Manager If Still Running
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+
+Kill Manager If Still Running
+	Kill If Still Running 	${cmd_manager}
 
 Stop Agent
 	${running}= 	Is Process Running 	${process_agent}
@@ -240,10 +245,22 @@ Stop Agent
 		# Should Be Equal As Integers 	${result.rc} 	0
 	END
 
+	Kill Agent If Still Running
 	#	 stdout=${OUTPUT DIR}${/}stdout_agent.txt    stderr=${OUTPUT DIR}${/}stderr_agent.txt
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
 
+Kill Agent If Still Running
+	Kill If Still Running 	${cmd_agent}
+
+Kill If Still Running
+	[Arguments]		${cmdname}
+	${processes}= 	Evaluate    psutil.process_iter() 	modules=psutil
+	FOR 	${p} 	IN 	${processes}
+		IF 	"${cmdname}" in ${p.name()}
+			Evaluate    ${p.kill()}
+		END
+	END
 
 Show Log
 	[Arguments]		${filename}

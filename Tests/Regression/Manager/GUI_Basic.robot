@@ -12,7 +12,7 @@ Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
 *** Variables ***
 ${default_image_timeout} 	${120}
 ${cmd_agent} 		rfswarm-agent
-${cmd_manager} 	rfswarm
+${cmd_manager} 	rfswarm-manager
 ${IMAGE_DIR} 	${CURDIR}/Images/file_method
 ${pyfile}			${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
 ${process}		None
@@ -71,7 +71,7 @@ Open GUI
 	Set Test Variable 	$process 	${process}
 	# Sleep 	10 			# not needed now we wait for the agents tab to be visible
 	Set Screenshot Folder 	${OUTPUT DIR}
-	
+
 	Handle Donation Reminder
 
 	${img}=	Set Variable		manager_${platform}_tab_agents.png
@@ -111,6 +111,7 @@ Close GUI
 		${result} = 	Terminate Process		${process}
 		Fail
 	END
+	Kill Manager If Still Running
 
 Close GUI
 	[Tags]	macos-latest
@@ -128,6 +129,7 @@ Close GUI
 		${result} = 	Terminate Process		${process}
 		Fail
 	END
+	Kill Manager If Still Running
 
 # Intentional Fail
 # 	[Tags]	ubuntu-latest		windows-latest		macos-latest
