@@ -266,7 +266,7 @@ Kill If Still Running
 				Evaluate    $p.kill()
 			END
 		EXCEPT               # Match any error.
-			Pass
+			No Operation
     END
 	END
 
