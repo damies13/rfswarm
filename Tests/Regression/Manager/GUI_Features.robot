@@ -166,7 +166,16 @@ Manager Command Line AGENTS -a
 	Click Button	runplay
 	${status}=	Run Keyword And Return Status
 	...    Wait For	${platform}_warning_label_not_enough_agents.png 	timeout=${10}
-	Run Keyword If	not ${status}	Fail	msg=The manager didn't display expected prompt dialogue that says: Not enough Agents available to run Robots!
+	IF	not ${status}
+		# Try again with alt screenshot
+		${status}=	Run Keyword And Return Status
+		...    Wait For	${platform}_warning_label_not_enough_agents2.png 	timeout=${10}
+	END
+
+	IF	not ${status}
+		Take A Screenshot
+		Fail	msg=The manager didn't display expected prompt dialogue that says: Not enough Agents available to run Robots!
+	END
 	Press key.enter 1 Times
 
 	[Teardown]	Run Keywords
@@ -1911,8 +1920,17 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 
 	${status}=	Run Keyword And Return Status
 	...    Wait For	${platform}_warning_label_not_enough_agents.png 	timeout=${10}
-	Take A Screenshot
-	Run Keyword If	not ${status}	Fail	msg=The manager didn't display expected prompt dialogue that says: Not enough Agents available to run Robots!
+	IF	not ${status}
+		# Try again with alt screenshot
+		${status}=	Run Keyword And Return Status
+		...    Wait For	${platform}_warning_label_not_enough_agents2.png 	timeout=${10}
+	END
+
+	IF	not ${status}
+		Take A Screenshot
+		Fail	msg=The manager didn't display expected prompt dialogue that says: Not enough Agents available to run Robots!
+	END
+
 	Press key.enter 1 Times
 	${status}=	Run Keyword And Return Status
 	...    Wait For	manager_${platform}_button_abort 	timeout=${10}
@@ -1943,8 +1961,18 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 	Click Button	runplay
 	${status}=	Run Keyword And Return Status
 	...    Wait For	${platform}_warning_label_not_enough_agents.png 	timeout=${10}
-	Run Keyword If	${status}	Fail
-	...    msg=The manager have displaed prompt dialogue that says: Not enough Agents available to run Robots! but that was not expected!
+
+	IF	not ${status}
+		# Try again with alt screenshot
+		${status}=	Run Keyword And Return Status
+		...    Wait For	${platform}_warning_label_not_enough_agents2.png 	timeout=${10}
+	END
+
+	IF	not ${status}
+		Take A Screenshot
+		Fail	msg=The manager have displaed prompt dialogue that says: Not enough Agents available to run Robots! but that was not expected!
+	END
+
 	Sleep	5
 	Click Button	stoprun
 	Sleep	2
