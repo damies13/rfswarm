@@ -1968,7 +1968,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 		...    Wait For	${platform}_warning_label_not_enough_agents2.png 	timeout=${10}
 	END
 
-	IF	not ${status}
+	IF	${status}
 		Take A Screenshot
 		Fail	msg=The manager have displaed prompt dialogue that says: Not enough Agents available to run Robots! but that was not expected!
 	END
