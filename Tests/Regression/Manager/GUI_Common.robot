@@ -25,7 +25,7 @@ ${global_name}	None
 @{mngr_options}		None
 @{agent_options}	None
 ${cmd_agent} 		rfswarm-agent
-${cmd_manager} 	rfswarm
+${cmd_manager} 	rfswarm-manager
 ${IMAGE_DIR} 	${CURDIR}/Images/file_method
 ${pyfile_manager}			${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
 ${pyfile_agent}			${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py
@@ -84,8 +84,8 @@ Open Manager GUI
 	[Arguments]		${options}=None
 	# Press Escape and move mouse because on linux the screen save had kicked in
 	Press Combination 	Key.esc
-	Move To 	10 	10
-	Move To 	20 	20
+	Wiggle Mouse
+
 	IF  ${options} == None
 		${options}= 	Create List
 		Create Directory 	${results_dir}
@@ -103,7 +103,11 @@ Open Manager GUI
 
 	IF 	'-n' in ${options}
 		Sleep 	10
+	ELSE IF 	'-r' in ${options} or '--run' in ${options}
+		Handle Donation Reminder
 	ELSE
+		Handle Donation Reminder
+
 		${img}=	Set Variable		manager_${platform}_button_runschedule.png
 		${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=${default_image_timeout / 2}
 		IF 	not ${passed}
@@ -130,12 +134,18 @@ Open Manager GUI
 		END
 	END
 
+Wiggle Mouse
+	Move To 	10 	10
+	Move To 	20 	20
+
+Handle Donation Reminder
+	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		${default_image_timeout / 2}
+	VAR 	${DonationReminder} 	${found} 		scope=TEST
+
 Close Manager GUI ubuntu
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
 	Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
 	Close Manager GUI
-
-
 
 Close Manager GUI windows
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
@@ -174,6 +184,7 @@ Close Manager GUI
 			Fail
 		END
 	END
+	Kill Manager If Still Running
 	# stdout=${OUTPUT DIR}${/}stdout_manager.txt    stderr=${OUTPUT DIR}${/}stderr_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
@@ -214,8 +225,12 @@ Close Manager GUI macos
 			Fail
 		END
 	END
+	Kill Manager If Still Running
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+
+Kill Manager If Still Running
+	Kill If Still Running 	${cmd_manager}
 
 Stop Agent
 	${running}= 	Is Process Running 	${process_agent}
@@ -232,10 +247,28 @@ Stop Agent
 		# Should Be Equal As Integers 	${result.rc} 	0
 	END
 
+	Kill Agent If Still Running
 	#	 stdout=${OUTPUT DIR}${/}stdout_agent.txt    stderr=${OUTPUT DIR}${/}stderr_agent.txt
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
 
+Kill Agent If Still Running
+	Kill If Still Running 	${cmd_agent}
+
+Kill If Still Running
+	[Arguments]		${cmdname}
+	${processes}= 	Evaluate    list(psutil.process_iter()) 	modules=psutil
+	# Log		${processes}
+	FOR 	${p} 	IN 	@{processes}
+		# Log		${p}
+		TRY
+			IF 	$cmdname in $p.name()
+				Evaluate    $p.kill()
+			END
+		EXCEPT               # Match any error.
+			No Operation
+    END
+	END
 
 Show Log
 	[Arguments]		${filename}
@@ -348,12 +381,12 @@ Selected Option Should Be
 
 
 Click Button
-	[Arguments]		${btnname}
+	[Arguments]		${btnname} 		${timeout}=${default_image_timeout}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
 	${img}=	Set Variable		manager_${platform}_button_${btnnamel}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	0.1

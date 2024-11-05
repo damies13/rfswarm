@@ -19,6 +19,7 @@ ${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
 ${pyfile}			${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
 ${process}		None
 ${sssleep}		0.5
+${DonationReminter} 	${False}
 
 *** Keywords ***
 Set Platform
@@ -149,11 +150,16 @@ Get Text Value To Right Of
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 
 	${b4value}= 	Get Clipboard Content
+	Click To The Right Of Image 	${img} 	${offsetx}
+	Sleep    10 ms
+	Click To The Right Of Image 	${img} 	${offsetx}
+	Sleep    10 ms
 	${value}= 	Copy From The Right Of 	${img} 	${offsetx}
-	# Take A Screenshot
-	WHILE 	$b4value == $value 		limit=10
+	Take A Screenshot
+	WHILE 	$b4value == $value 		limit=15
 		Wait For 	${img} 	 timeout=${default_image_timeout}
 		${offsetx}= 	Evaluate 	${offsetx}+10
+		Click To The Right Of Image 	${img} 	${offsetx}
 		${value}= 	Copy From The Right Of 	${img} 	${offsetx}
 		# Take A Screenshot
 		${valuec}= 	Copy
@@ -164,14 +170,31 @@ Get Text Value To Right Of
 		IF  $valueg != $value
 			${value}= 	Set Variable 		${valueg}
 		END
-		IF 	$platform == 'macos'
+		IF 	$platform == 'macos' and $b4value == $value
+			# Click To The Right Of Image 	${img} 	${offsetx}
+			# Sleep    10 ms
+			# Click To The Right Of Image 	${img} 	${offsetx}
+			# Sleep    10 ms
+			# Take A Screenshot
+			Click To The Right Of Image 	${img} 	${offsetx} 	clicks=3
+			# Take A Screenshot
+			Press Combination 	KEY.command 	KEY.c
+			# Press Combination 	KEY.command 	KEY.v
 			Sleep    10 ms
-			Press Combination 	KEY.command 	c
-			Sleep    10 ms
+			# Take A Screenshot
+			# Press Combination 	KEY.command 	KEY.v
+			# Sleep    10 ms
+			# Take A Screenshot
 			${valueg}= 	Get Clipboard Content
 			IF  $valueg != $value
 				${value}= 	Set Variable 		${valueg}
 			END
+
+			# ${valueclp}= 	Evaluate 		pyperclip.paste() 		modules=pyperclip
+			# IF  $valueclp != $value
+			# 	${value}= 	Set Variable 		${valueclp}
+			# END
+
 		END
 	END
 	RETURN 	${value}
@@ -198,20 +221,23 @@ Set Text Value To Right Of
 	Click
 	Double Click
 	Type 	${value}
-	# Take A Screenshot
-	${value2}= 	Get Text Value To Right Of		${label}
-	WHILE 	$value2 != $value 		limit=10
-		${x}= 	Evaluate 	${x}+10
-		${offsetx}= 	Evaluate 	${offsetx}+10
-		@{coordinates}= 	Create List 	${x} 	${y}
-		Move To 	${coordinates}
-		Click
-		Double Click
-		Type 	${value}
-		# Take A Screenshot
+	IF 	$platform == 'macos'
+		Take A Screenshot
+	ELSE
 		${value2}= 	Get Text Value To Right Of		${label}
+		WHILE 	$value2 != $value 		limit=10
+			${x}= 	Evaluate 	${x}+10
+			${offsetx}= 	Evaluate 	${offsetx}+10
+			@{coordinates}= 	Create List 	${x} 	${y}
+			Move To 	${coordinates}
+			Click
+			Double Click
+			Type 	${value}
+			# Take A Screenshot
+			${value2}= 	Get Text Value To Right Of		${label}
+		END
+		Should Be Equal As Strings    ${value}    ${value2}
 	END
-	Should Be Equal As Strings    ${value}    ${value2}
 
 Get Last Screenshot
 	Log 	${OUTPUT FILE}
@@ -236,12 +262,12 @@ Get Last Screenshot
 
 
 Click Button
-	[Arguments]		${bttnname}
+	[Arguments]		${bttnname} 		${timeout}=300
 	${bttnnamel}= 	Convert To Lower Case 	${bttnname}
 	${img}=	Set Variable		reporter_${platform}_button_${bttnnamel}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=300
+	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	${sssleep}
@@ -265,6 +291,8 @@ Wait For Status
 	${img}=	Set Variable		reporter_${platform}_status_${statusl}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
+	Wiggle Mouse
+	# Take A Screenshot
 	Wait For 	${img} 	 timeout=${timeout}
 	Sleep 	${sssleep}
 	# Take A Screenshot
@@ -274,15 +302,23 @@ Open GUI
 	${var}= 	Get Variables
 	Log 	${var}
 	Get Platform
+
+	# Press Escape and move mouse because on linux the screen save had kicked in
+	Press Combination 	Key.esc
+	Wiggle Mouse
+
 	${keyword}= 	Set Variable 	Open GUI ${platform}
 	Run Keyword 	${keyword} 	@{appargs}
-	Sleep	3
+	Handle Donation Reminder
+
+Wiggle Mouse
+	Move To 	10 	10
+	Move To 	20 	20
 
 Get Platform
 	&{platforms}= 	Create Dictionary 	Linux=ubuntu 	Darwin=macos 	Java=notsupported 	Windows=windows
 	${os}= 	Evaluate 	platform.system() 	platform
 	Set Suite Variable    ${platform}    ${platforms}[${os}]
-
 
 Open GUI windows
 	[Arguments]		@{appargs}
@@ -324,6 +360,9 @@ Open GUI macos
 	Set Screenshot Folder 	${OUTPUT DIR}
 	# Take A Screenshot
 
+Handle Donation Reminder
+	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		${default_image_timeout / 2}
+	VAR 	${DonationReminder} 	${found} 		scope=TEST
 
 Close GUI
 	${keyword}= 	Set Variable 	Close GUI ${platform}

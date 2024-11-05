@@ -4052,6 +4052,9 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(6, "BuildUI")
 		self.BuildUI()
 
+		dr = threading.Thread(target=self.dispaly_donation_reminder)
+		dr.start()
+
 		try:
 			base.debugmsg(6, "pln_update_graph")
 			ug = threading.Thread(target=self.pln_update_graph)
@@ -4469,6 +4472,87 @@ class RFSwarmGUI(tk.Frame):
 				style.configure("TSpinbox", foreground=self.style_text_colour)
 
 				style.configure("TRadiobutton", foreground=self.style_text_colour)
+
+	def dispaly_donation_reminder(self):
+		if 'donation_reminder' not in base.config['GUI']:
+			base.config['GUI']['donation_reminder'] = "0"
+			base.saveini()
+
+		lastreminder = int(base.config['GUI']['donation_reminder'])
+		timenow = int(datetime.now().timestamp())
+		timesincereminder = timenow - lastreminder
+		yearseconds = 60 * 60 * 24 * 365
+
+		# display donation reminder on first launch and then once per year
+		if timesincereminder > yearseconds:
+
+			titlemsg = self.titleprefix + " - Donation Reminder"
+
+			donatemsg = "RFSwarm's mission is to give you a an industry leading performance test tool, that is easy to use, "
+			donatemsg += "quick to develop test scripts and free from limitations so that you can just get on with testing."
+			donatemsg += "\n\n"
+			donatemsg += "Accomplishing this mission costs us resources, and requires the time of many talented people to fix "
+			donatemsg += "bugs and develop new features and generally improve RFSwarm."
+			donatemsg += "\n\n"
+			donatemsg += "RFSwarm is proud to be a completely open source application that is 100% community funded and "
+			donatemsg += "does not harvest and sell your data in any way."
+			donatemsg += "\n\n"
+			donatemsg += "So today we're asking for you help to make RFSwarm better, please consider giving a donation "
+			donatemsg += "to support RFSwarm."
+
+			self.drWindow = tk.Toplevel(self.root)
+			self.drWindow.wm_iconphoto(False, self.icon)
+			self.drWindow.columnconfigure(0, weight=1)
+			self.drWindow.columnconfigure(2, weight=1)
+			self.drWindow.title(titlemsg)
+			self.drWindow.attributes('-topmost', 'true')
+
+			row = 0
+			self.drWindow.rowconfigure(row, weight=1)
+
+			self.drWindow.lblDR00 = ttk.Label(self.drWindow, text=" ")
+			self.drWindow.lblDR00.grid(column=0, row=row, sticky="nsew")
+
+			self.drWindow.lblDR01 = ttk.Label(self.drWindow, text=" ")
+			self.drWindow.lblDR01.grid(column=1, row=row, sticky="nsew")
+
+			self.drWindow.lblDR02 = ttk.Label(self.drWindow, text=" ")
+			self.drWindow.lblDR02.grid(column=2, row=row, sticky="nsew")
+
+			row += 1
+			self.drWindow.lblDR11 = ttk.Label(self.drWindow, text=donatemsg, wraplength=600)
+			self.drWindow.lblDR11.grid(column=1, row=row, sticky="nsew")
+
+			row += 1
+			self.drWindow.rowconfigure(row, weight=1)
+			self.drWindow.lblDR21 = ttk.Label(self.drWindow, text=" ")
+			self.drWindow.lblDR21.grid(column=1, row=row, sticky="nsew")
+
+			row += 1
+
+			self.drWindow.fmeBBar = tk.Frame(self.drWindow)
+			self.drWindow.fmeBBar.grid(column=0, row=row, columnspan=5, sticky="nsew")
+
+			self.drWindow.fmeBBar.columnconfigure(0, weight=1)
+
+			self.drWindow.bind('<Return>', self.close_donation_reminder)
+			self.drWindow.bind('<Key-Escape>', self.drWindow.destroy)
+
+			bdonate = ttk.Button(self.drWindow.fmeBBar, text="Donate", padding='3 3 3 3', command=self.close_donation_reminder)
+			bdonate.grid(column=9, row=0, sticky="nsew")
+
+			blater = ttk.Button(self.drWindow.fmeBBar, text="Maybe Later", padding='3 3 3 3', command=self.drWindow.destroy)
+			blater.grid(column=8, row=0, sticky="nsew")
+
+			base.config['GUI']['donation_reminder'] = str(int(datetime.now().timestamp()))
+			base.saveini()
+
+	def close_donation_reminder(self, *args):
+		base.debugmsg(5, "args:", args)
+		self.drWindow.destroy()
+
+		url = "https://github.com/sponsors/damies13"
+		webbrowser.open(url, new=0, autoraise=True)
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
