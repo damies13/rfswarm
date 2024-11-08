@@ -2,7 +2,7 @@
 #
 # 	Robot Framework Swarm
 # 		Manager
-#    Version 1.4.0
+#    Version 2.0.0
 #
 
 # 	Helpful links
@@ -449,7 +449,7 @@ class AgentServer(BaseHTTPRequestHandler):
 
 
 class RFSwarmBase:
-	version = "1.4.0"
+	version = "2.0.0"
 	debuglvl = 0
 
 	config = None
