@@ -2387,6 +2387,10 @@ class RFSwarmCore:
 		parser.add_argument('-e', '--ipaddress', help='IP Address to bind the server to')
 		parser.add_argument('-p', '--port', help='Port number to bind the server to')
 		parser.add_argument('-c', '--create', help='ICON : Create application icon / shortcut')
+		# to be deprecated by version 2.1
+		parser.add_argument('--tkinter', help='Run v1.x tkinter GUI')
+		parser.add_argument('--html', help='Run v2.x html GUI')
+
 		base.args = parser.parse_args()
 
 		base.debugmsg(6, "base.args: ", base.args)
@@ -2588,7 +2592,16 @@ class RFSwarmCore:
 			if not base.args.run:
 				base.args.run = True
 		else:
-			base.gui = RFSwarmGUI()
+			if base.args.tkinter:
+				base.gui = RFSwarmGUItk()
+
+			if base.args.html:
+				base.gui = RFSwarmGUIhtml()
+
+			if not base.args.tkinter and not base.args.html:
+				# run default
+				base.gui = RFSwarmGUItk()
+				# base.gui = RFSwarmGUIhtml()
 
 		self.BuildCore()
 
@@ -3956,7 +3969,7 @@ class RFSwarmCore:
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-class RFSwarmGUI(tk.Frame):
+class RFSwarmGUItk(tk.Frame):
 	# titleprefix = 'Robot Framework Swarm'
 	titleprefix = 'RFSwarm'
 
@@ -6832,9 +6845,9 @@ class RFSwarmGUI(tk.Frame):
 				except Exception:
 					pass
 			return True
-		base.debugmsg(9, "RFSwarmGUI: grid_size:", self.scriptgrid.grid_size())
+		base.debugmsg(9, "grid_size:", self.scriptgrid.grid_size())
 		for r in range(self.scriptgrid.grid_size()[1]):
-			base.debugmsg(9, "RFSwarmGUI: r:", r)
+			base.debugmsg(9, "r:", r)
 			if r > 0:
 				usrs = self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].get()
 				base.debugmsg(9, "Row:", r, "Robots:", usrs)

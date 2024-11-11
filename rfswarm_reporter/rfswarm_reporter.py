@@ -3500,6 +3500,10 @@ class ReporterCore:
 		# parser.add_argument('--odt', help='Generate an OpenOffice/LibreOffice Writer report', action='store_true')
 		# parser.add_argument('--ods', help='Generate an OpenOffice/LibreOffice Calc report', action='store_true')
 		parser.add_argument('-c', '--create', help='ICON : Create application icon / shortcut')
+		# to be deprecated by version 2.1
+		parser.add_argument('--tkinter', help='Run v1.x tkinter GUI')
+		parser.add_argument('--html', help='Run v2.x html GUI')
+
 		base.args = parser.parse_args()
 
 		base.debugmsg(6, "base.args: ", base.args)
@@ -3656,7 +3660,16 @@ class ReporterCore:
 			self.t_export["xlsx"].start()
 
 		if base.displaygui:
-			base.gui = ReporterGUI()
+			if base.args.tkinter:
+				base.gui = ReporterGUItk()
+
+			if base.args.html:
+				base.gui = ReporterGUIhtml()
+
+			if not base.args.tkinter and not base.args.html:
+				# run default
+				base.gui = ReporterGUItk()
+				# base.gui = ReporterGUIhtml()
 		else:
 			# t_export
 			for thd in self.t_export.keys():
@@ -7096,7 +7109,7 @@ class ReporterCore:
 		cell.style = style
 
 
-class ReporterGUI(tk.Frame):
+class ReporterGUItk(tk.Frame):
 
 	style_reportbg_colour = "white"
 	style_feild_colour = "white"
