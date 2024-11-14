@@ -214,7 +214,7 @@ Verify the Content Of the HTML Report
 
 
 	# Contents:
-	Log 	Verifying Contents: 	console=${True}
+	Log 	\nVerifying Contents: 	console=${True}
 	VAR 	${section} 	Contents contents
 	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
 	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
@@ -232,7 +232,7 @@ Verify the Content Of the HTML Report
 
 
 	# Notes:
-	Log 	Verifying Notes: 	console=${True}
+	Log 	\nVerifying Notes: 	console=${True}
 	VAR 	${section} 		Note
 	VAR 	${break_at} 	h2
 	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
@@ -252,7 +252,7 @@ Verify the Content Of the HTML Report
 
 
 	# Graphs - when new graphs are required, save them using the function in save_html_image.py!
-	Log 	Verifying Graphs: 	console=${True}
+	Log 	\nVerifying Graphs: 	console=${True}
 	VAR 	${section} 	Data Graph Left Metric
 	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
 	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
@@ -300,7 +300,7 @@ Verify the Content Of the HTML Report
 
 
 	# Tables:
-	Log 	Verifying Tables: 	console=${True}
+	Log 	\nVerifying Tables: 	console=${True}
 	VAR 	${section} 	Data Table Metric
 	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
 	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
@@ -338,7 +338,7 @@ Verify the Content Of the HTML Report
 
 
 	# Error Details:
-	Log 	Verifying Error Details: 	console=${True}
+	Log 	\nVerifying Error Details: 	console=${True}
 	VAR 	${section} 	Error Details
 	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
 	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
