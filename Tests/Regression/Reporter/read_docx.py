@@ -54,15 +54,6 @@ def update_table_of_contents(docx_path: str):
     doc.save(docx_path)
 
 
-def convert_image_to_black_and_white(image_path: str):
-    """Convert given image to black and white.
-    All colours except white will be converted to black."""
-    image = Image.open(image_path)
-    gray_image = image.convert("L")
-    bw_image = gray_image.point(lambda x: 0 if x < 255 else 255, '1')
-    bw_image.save(image_path)
-
-
 def extract_images_from_docx(docx_path: str, output_folder: str, black_and_wite=False) -> list:
     """
     Extract all images from DOCX one by one.

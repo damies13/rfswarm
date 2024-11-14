@@ -179,6 +179,200 @@ Verify if reporter handle missing test result file
 	...    Remove File	${basefolder}${/}result_backup${/}${resultdata}.db						AND
 	...    Close GUI
 
+Verify the Content Of the HTML Report
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #36 	HTML 	robot:continue-on-failure
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	VAR 	${testdata} 		Issue-#36_37_38
+	VAR 	${resultdata}		20230728_154253_Odoo-demo
+	VAR 	${basefolder}		${CURDIR}${/}testdata${/}${testdata}
+	VAR 	${resultfolder} 	${basefolder}${/}${resultdata}
+	VAR 	${template_dir} 	${basefolder}${/}sample.template
+	VAR 	${html_file}		${resultfolder}${/}${resultdata}.html
+	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${testdata}${/}html_images
+	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}Issue-#36${/}html_images
+	VAR 	${img_comp_threshold} 	0.7
+	VAR 	${move_tolerance} 		30
+
+	Log 	template: ${template_dir} 	console=True
+	Open GUI	-d 	${resultfolder} 	-t 	${template_dir}
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=300
+	Take A Screenshot
+	Click Button	generatehtml
+	Wait Until Created 	${html_file}	timeout=9 minutes
+	Close GUI
+
+	Log To Console	Verification of saved data in the RFSwarm HTML raport started.
+	${html} 	Parse HTML File 	${html_file}
+	@{headings}= 	Extract All HTML Report Headings 	${html}
+	Log		${headings}
+
+	Verify HTML Cover Page 	${html}
+
+	VAR 	${section} 	This is Heading
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+
+
+	# Contents:
+	Log 	Verifying Contents: 	console=${True}
+	VAR 	${section} 	Contents contents
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Contents 	${section} 	${section_obj}
+
+	VAR 	${section} 	Contents graphs
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Contents 	${section} 	${section_obj}
+
+	VAR 	${section} 	Contents tables
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Contents 	${section} 	${section_obj}
+
+
+	# Notes:
+	Log 	Verifying Notes: 	console=${True}
+	VAR 	${section} 		Note
+	VAR 	${break_at} 	h2
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Notes 	${section} 	${section_obj} 	${break_at}
+
+	VAR 	${section} 	Second Note
+	VAR 	${break_at} 	h3
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section} 	heading=h2
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Notes 	${section} 	${section_obj} 	${break_at}
+
+	VAR 	${section} 	Third Note
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section} 	heading=h3
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Notes 	${section} 	${section_obj}
+
+
+	# Graphs - when new graphs are required, save them using the function in save_html_image.py!
+	Log 	Verifying Graphs: 	console=${True}
+	VAR 	${section} 	Data Graph Left Metric
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
+
+	VAR 	${section} 	Data Graph Left Result
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
+
+	VAR 	${section} 	Data Graph Left Result FAIL
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
+
+	VAR 	${section} 	Data Graph Left Result TPS
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
+
+	VAR 	${section} 	Data Graph Left Result Total TPS
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
+
+	VAR 	${section} 	Data Graph Right Metric
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
+
+	VAR 	${section} 	Data Graph Right Result
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
+
+	VAR 	${section} 	Data Graph LR Combined
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
+
+	VAR 	${section} 	Data Graph ST ET
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
+
+
+	# Tables:
+	Log 	Verifying Tables: 	console=${True}
+	VAR 	${section} 	Data Table Metric
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Table Content 	${section} 	${section_obj}
+
+	VAR 	${section} 	Data Table Result
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Table Content 	${section} 	${section_obj}
+
+	VAR 	${section} 	Data Table Result TPS
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Table Content 	${section} 	${section_obj}
+
+	VAR 	${section} 	Data Table Result TotalTPS
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Table Content 	${section} 	${section_obj}
+
+	VAR 	${section} 	Data Table ResultSummary
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Table Content 	${section} 	${section_obj}
+
+	VAR 	${section} 	Data Table Polish Lang
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Table Content 	${section} 	${section_obj}
+
+	VAR 	${section} 	Data Table ST ET
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Table Content 	${section} 	${section_obj}
+
+
+	# Error Details:
+	Log 	Verifying Error Details: 	console=${True}
+	VAR 	${section} 	Error Details
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Error Details Content 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path}
+	
+	VAR 	${section} 	Error Details No Screenshots
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Error Details Content 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path}
+
+	VAR 	${section} 	Error Details No GBRN
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Error Details Content 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path}
+
+	VAR 	${section} 	Error Details No GBET
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Error Details Content 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path}
+
+	VAR 	${section} 	Error Details Polish Lang
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Error Details Content 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path}
+
+	VAR 	${section} 	Error Details ST ET
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Error Details Content 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path}
+
+	[Teardown] 	Run Keywords
+	...    Close GUI	AND
+	...    Move File 	${html_file} 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.html
+
 Verify the Content Of the DOCX Report
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #38 	DOCX	robot:continue-on-failure
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
@@ -1435,9 +1629,6 @@ Verify Plan Table
 	...    Set Confidence 	0.9 	AND
 	...    Close GUI 		AND
 	...    Remove File 		${resultfile}
-
-
-#
 
 
 #
