@@ -2388,7 +2388,7 @@ class RFSwarmCore:
 		parser.add_argument('-p', '--port', help='Port number to bind the server to')
 		parser.add_argument('-c', '--create', help='ICON : Create application icon / shortcut')
 		# to be deprecated by version 2.1
-		parser.add_argument('-u', '--ui',, help='[ V1 | V2 ] Specify which version of the GUI you want to use (default: V1)')
+		parser.add_argument('-u', '--ui', help='[ V1 | V2 ] Specify which version of the GUI you want to use (default: V1)')
 
 		base.args = parser.parse_args()
 
