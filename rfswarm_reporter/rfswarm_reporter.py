@@ -3501,8 +3501,7 @@ class ReporterCore:
 		# parser.add_argument('--ods', help='Generate an OpenOffice/LibreOffice Calc report', action='store_true')
 		parser.add_argument('-c', '--create', help='ICON : Create application icon / shortcut')
 		# to be deprecated by version 2.1
-		parser.add_argument('--tkinter', help='Run v1.x tkinter GUI')
-		parser.add_argument('--html', help='Run v2.x html GUI')
+		parser.add_argument('-u', '--ui',, help='[ V1 | V2 ] Specify which version of the GUI you want to use (default: V1)')
 
 		base.args = parser.parse_args()
 
@@ -3660,13 +3659,14 @@ class ReporterCore:
 			self.t_export["xlsx"].start()
 
 		if base.displaygui:
-			if base.args.tkinter:
-				base.gui = ReporterGUItk()
+			if base.args.ui:
+				if base.args.ui.upper() in ["V1"]:
+					base.gui = ReporterGUItk()
 
-			if base.args.html:
-				base.gui = ReporterGUIhtml()
+				if base.args.ui.upper() in ["V2"]:
+					base.gui = ReporterGUIhtml()
 
-			if not base.args.tkinter and not base.args.html:
+			else:
 				# run default
 				base.gui = ReporterGUItk()
 				# base.gui = ReporterGUIhtml()

@@ -2388,8 +2388,7 @@ class RFSwarmCore:
 		parser.add_argument('-p', '--port', help='Port number to bind the server to')
 		parser.add_argument('-c', '--create', help='ICON : Create application icon / shortcut')
 		# to be deprecated by version 2.1
-		parser.add_argument('--tkinter', help='Run v1.x tkinter GUI')
-		parser.add_argument('--html', help='Run v2.x html GUI')
+		parser.add_argument('-u', '--ui',, help='[ V1 | V2 ] Specify which version of the GUI you want to use (default: V1)')
 
 		base.args = parser.parse_args()
 
@@ -2592,13 +2591,14 @@ class RFSwarmCore:
 			if not base.args.run:
 				base.args.run = True
 		else:
-			if base.args.tkinter:
-				base.gui = RFSwarmGUItk()
+			if base.args.ui:
+				if base.args.ui.upper() in ["V1"]:
+					base.gui = RFSwarmGUItk()
 
-			if base.args.html:
-				base.gui = RFSwarmGUIhtml()
+				if base.args.ui.upper() in ["V2"]:
+					base.gui = RFSwarmGUIhtml()
 
-			if not base.args.tkinter and not base.args.html:
+			else:
 				# run default
 				base.gui = RFSwarmGUItk()
 				# base.gui = RFSwarmGUIhtml()
@@ -8530,7 +8530,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
-	# End class RFSwarmGUI
+	# End class RFSwarmGUItk
 	#
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
