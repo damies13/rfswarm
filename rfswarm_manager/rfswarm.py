@@ -48,6 +48,8 @@ from typing import Any
 import matplotlib  # required for matplot graphs
 import psutil
 
+from RFSwarmGUIhtml import RFSwarmGUIhtml
+
 # required for matplot graphs
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure  # required for matplot graphs
