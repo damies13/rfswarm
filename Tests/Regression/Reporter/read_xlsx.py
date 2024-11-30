@@ -24,11 +24,28 @@ def read_all_xlsx_text_data(xlsx_path: str) -> list:
     return xlsx_tables
 
 
-def read_xlsx_text_data_from_sheet(xlsx_path: str, sheet_name: str) -> list:
+def get_xlsx_sheet_by_name(xlsx_path: str, sheet_name: str) -> list:
     """
-    Read xlsx text data from given xlsx sheet.
+    Find the full name of the xlsx sheet by its name.
+    For example: given: "Contents tables" output: "4 Contents tables".
     """
-    all_excel_data_frame = read_excel(xlsx_path, sheet_name, keep_default_na=False, na_values=['NaN'])
+    xlsx_sheets = load_workbook(xlsx_path, keep_links=False).sheetnames
+    for sheet in xlsx_sheets:
+        if " " in list(sheet):
+            sheet_fragmented = sheet.split(" ", maxsplit=1)
+            if sheet_fragmented[1] == sheet_name:
+                return sheet
+    
+    return 0
+
+
+def read_xlsx_text_data_from_sheet(xlsx_path: str, sheet: str, start_at=None, stop_at=None) -> list:
+    """
+    Read xlsx text data from the given xlsx sheet.
+    start_at - start from the specified string, but do not include it.
+    stop_at - end at specified string, and don't include it.
+    """
+    all_excel_data_frame = read_excel(xlsx_path, sheet, keep_default_na=False, na_values=['NaN'])
     excel_data_list = all_excel_data_frame.values.tolist()
 
     for row_n in range(len(excel_data_list) - 1, -1, -1):
@@ -39,18 +56,29 @@ def read_xlsx_text_data_from_sheet(xlsx_path: str, sheet_name: str) -> list:
         if len(excel_data_list[row_n]) == 0:
             excel_data_list.pop(row_n)
 
-    return excel_data_list
+    start_index = 0
+    end_index = len(excel_data_list)
+    if start_at is not None:
+        for row_n in range(0, len(excel_data_list)):
+            if start_at in excel_data_list[row_n]:
+                start_index = row_n + 1
+    if stop_at is not None:
+        for row_n in range(0, len(excel_data_list)):
+            if stop_at in excel_data_list[row_n]:
+                end_index = row_n
+
+    return excel_data_list[start_index : end_index]
 
 
-def extract_image_from_xlsx_sheet(xlsx_path: str, xlsx_sheet: str, cell_id: str, output_folder: str, show_image: bool = False):
+def extract_image_from_xlsx_sheet(xlsx_path: str, sheet: str, cell_id: str, output_folder: str, show_image: bool = False):
     """
     Extract an image from XLSX file from a given cell in specified sheet.
     Returns name of the saved image.
     """
     wb = load_workbook(xlsx_path, keep_links=False)
-    sheet = wb[xlsx_sheet]
+    sheet_obj = wb[sheet]
     try:
-        image_loader = SheetImageLoader(sheet)
+        image_loader = SheetImageLoader(sheet_obj)
     except Exception as e:
         raise AssertionError("Error in SheetImageLoader:", e)
     try:
@@ -60,7 +88,7 @@ def extract_image_from_xlsx_sheet(xlsx_path: str, xlsx_sheet: str, cell_id: str,
         return 0
     if show_image:
         image.show()
-    img_name = (xlsx_sheet + "_" + cell_id + "_image.png").replace(" ", "_")
+    img_name = (sheet + "_" + cell_id + "_image.png").replace(" ", "_")
 
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)

@@ -1,3 +1,6 @@
+Cover:
+  text: ['quickdemo', '2023-07-28 07:42 - 07:50']
+
 Contents contents:
   text: ['This is Heading', 'Contents contents', 'Contents graphs', 'Contents tables', 'Note', 'Second Note', 'Third Note',
   'Data Graph Left Metric', 'Data Graph Left Result', 'Data Graph Left Result FAIL', 'Data Graph Left Result TPS',
@@ -16,6 +19,9 @@ Contents tables:
 
 Note:
   text: ['Hello i am a simple and obvious note :-)', 'This is just second line.', ' - first line', ' - second line', ' - third line', ""]
+
+Note DOCX:
+  text: ['Hello i am a simple and obvious note :-)', 'This is just second line.', '- first line', '- second line', '- third line']
 
 Second Note:
   text: ['This is my second note.']
@@ -72,6 +78,26 @@ Data Table ResultSummary:
   quater_row: ['_', 'Odoo Confirm RFQ', 'None', 'None', 'None', 'None', 'None', '0', '1', '1']
   mid_row: ['_', 'Odoo Open Receipt', 'None', 'None', 'None', 'None', 'None', '0', '0', '1']
   upper_mid_row: ['_', 'Returns the number of elements matching ``locator``.', '0.012', '0.012', 'None', '0.012', 'None', '1', '0', '2']
+
+Data Table ResultSummary XLSX: # special version for XLSX
+  length: 42
+  header: ['Result Name', 'Minimum', 'Average', '90%ile', 'Maximum', 'Std. Dev.', 'Pass', 'Fail', 'Other']
+  rows_numbers: [1, -1, 11, 21, 31]
+  first_row: [':example: ''John Doe''', '0.001', '0.001', 'None', '0.001', '0.0', '4', '0', '0']
+  last_row: ['Waits until the element ``locator`` is visible.', '0.045', '0.115', 'None', '0.204', '0.078', '5', '0', '0']
+  quater_row: ['Odoo Confirm RFQ', 'None', 'None', 'None', 'None', 'None', '0', '1', '1']
+  mid_row: ['Odoo Open Receipt', 'None', 'None', 'None', 'None', 'None', '0', '0', '1']
+  upper_mid_row: ['Returns the number of elements matching ``locator``.', '0.012', '0.012', 'None', '0.012', 'None', '1', '0', '2']
+
+Data Table ResultSummary DOCX: # special version for DOCX
+  length: 42
+  header: ["", 'Result Name', 'Minimum', 'Average', '90%ile', 'Maximum', 'Std. Dev.', 'Pass', 'Fail', 'Other']
+  rows_numbers: [1, -1, 11, 21, 31]
+  first_row: ["", ':example: ''John Doe''', '0.001', '0.001', 'None', '0.001', '0.0', '4', '0', '0']
+  last_row: ["", 'Waits until the element ``locator`` is visible.', '0.045', '0.115', 'None', '0.204', '0.078', '5', '0', '0']
+  quater_row: ["", 'Odoo Confirm RFQ', 'None', 'None', 'None', 'None', 'None', '0', '1', '1']
+  mid_row: ["", 'Odoo Open Receipt', 'None', 'None', 'None', 'None', 'None', '0', '0', '1']
+  upper_mid_row: ["", 'Returns the number of elements matching ``locator``.', '0.012', '0.012', 'None', '0.012', 'None', '1', '0', '2']
 
 Data Table Polish Lang:
   length: 42
