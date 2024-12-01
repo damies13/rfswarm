@@ -24,7 +24,7 @@ def read_all_xlsx_text_data(xlsx_path: str) -> list:
     return xlsx_tables
 
 
-def get_xlsx_sheet_by_name(xlsx_path: str, sheet_name: str) -> str | int:
+def get_xlsx_sheet_by_name(xlsx_path: str, sheet_name: str):
     """
     Find the full name of the xlsx sheet by its name.
     For example: given: "Contents tables" output: "4 Contents tables".
