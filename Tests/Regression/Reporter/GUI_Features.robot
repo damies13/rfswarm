@@ -437,6 +437,7 @@ Verify the Content Of the DOCX Report
 
 
 	# Graphs - when new graphs are required, save them using the function in read_docx.py!
+	Log 	\nVerifying Graphs: 	console=${True}
 	VAR 	${section} 		Data Graph Left Metric
 	Dictionary Should Contain Key 	${docx_data} 	${section} 	msg=Didn't find "${section}" section.
 	Verify DOCX Report Graph 	${section} 	${docx_file} 	${docx_expected_img_path} 	${docx_img_path} 	${img_comp_threshold} 	${move_tolerance}
@@ -596,7 +597,7 @@ Verify the Content Of the XLSX Report
 	${sheet_number} 	Get Substring 	${xlsx_sheet} 	0 	1
 
 	Should Not Be Equal 	${xlsx_sheet} 	${0} 	msg=Didn't find "${section1}" section.
-	Verify XLSX Report Notes 	${xlsx_file} 	${section1} 	${xlsx_sheet} 	stop_at=${sheet_number}.1 ${section2}
+	Verify XLSX Report Notes 	${xlsx_file} 	${section1} 	${xlsx_sheet} 	stop_at=${sheet_number}.1 ${section2} 	custom=${True}
 
 	Verify XLSX Report Notes 	${xlsx_file} 	${section2} 	${xlsx_sheet} 	start_at=${sheet_number}.1 ${section2} 	stop_at=${sheet_number}.1.1 ${section3}
 

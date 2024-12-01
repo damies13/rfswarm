@@ -2,8 +2,8 @@ import os
 import re
 import subprocess
 
-from docx import Document
 import docx
+from docx import Document
 from docx.oxml.shared import OxmlElement, qn
 
 
@@ -54,7 +54,7 @@ def update_table_of_contents(docx_path: str):
     doc.save(docx_path)
 
 
-def extract_docx_images_under_heading(heading:str, docx_path:str, output_folder:str, debug=False) -> list:
+def extract_docx_images_under_heading(heading: str, docx_path: str, output_folder: str, debug=False) -> list:
     """
     Extract images from a DOCX file, including images inside tables,
     and associate them to the provided heading.
@@ -102,6 +102,7 @@ def extract_docx_images_under_heading(heading:str, docx_path:str, output_folder:
         elif isinstance(inner_obj, docx.table.Table):
             if current_heading_name == heading:
                 table = inner_obj
+
                 def iter_unique_row_cells(row):
                     """Generate cells in given row skipping empty grid cells."""
                     last_cell_tc = None
@@ -185,7 +186,7 @@ def read_docx_file(docx_path: str, debug=False) -> dict:
     dict = {"Heading 1" = {"text" = ["line 1", "line 2", ...], "table" = [[row 1], [row 2], ...] }, ...}
     """
     doc = Document(docx_path)
-    doc_data = dict()
+    doc_data: dict[str, dict] = dict()
 
     current_heading_name = None
 
@@ -196,7 +197,7 @@ def read_docx_file(docx_path: str, debug=False) -> dict:
                 heading_name = paragraph.text.strip()
                 heading_name_splitted = heading_name.split(" ", maxsplit=1)
                 current_heading_name = heading_name_splitted[1]
-                doc_data.setdefault(current_heading_name, {"text":[], "table":[]})
+                doc_data.setdefault(current_heading_name, {"text": [], "table": []})
 
             elif paragraph.text.strip():
                 if current_heading_name:
@@ -204,7 +205,7 @@ def read_docx_file(docx_path: str, debug=False) -> dict:
                     doc_data[current_heading_name]["text"].append(paragraph.text.strip())
                 else:
                     print(paragraph.text.strip())
-                    doc_data.setdefault("Cover", {"text":[]})
+                    doc_data.setdefault("Cover", {"text": []})
                     doc_data["Cover"]["text"].append(paragraph.text.strip())
 
         elif isinstance(inner_obj, docx.table.Table):
@@ -214,7 +215,7 @@ def read_docx_file(docx_path: str, debug=False) -> dict:
 
     if debug:
         for k in doc_data:
-            print(" -",k,":")
+            print(" -", k, ":")
             print(doc_data[k], end="\n\n\n")
 
     return doc_data

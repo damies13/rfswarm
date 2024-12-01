@@ -961,7 +961,11 @@ Verify XLSX Cover Page
 	List Should Contain Value 	${xlsx_sheets} 	Cover
 	@{cover_txtdata}= 	Read Xlsx Text Data From Sheet 	${xlsx_file} 	Cover
 	@{cover_expected} 	Convert To List 	${Cover.text}
-	Lists Should Be Equal 	${cover_expected} 		${cover_txtdata}	msg=[ Expected != Converted ]
+
+	${len} 	Get Length 	${cover_expected}
+	FOR  ${i}  IN RANGE  0  ${len}
+		Should Be Equal 	${cover_expected}[${i}] 	${cover_txtdata}[${i}][0] 	msg=[ Expected != Converted ]
+	END
 
 Verify XLSX Report Contents
 	[Documentation]
@@ -994,7 +998,7 @@ Verify XLSX Report Notes
 	Log 	${section_txtdata}
 	@{notes_expected} 	Convert To List 	${${section}.text}
 
-	${len} 	Get Length 	${section_txtdata}
+	${len} 	Get Length 	${notes_expected}
 	FOR  ${i}  IN RANGE  0  ${len}
 		Should Be Equal 	${notes_expected}[${i}] 	${section_txtdata}[${i}][0] 	msg=[ Expected != Converted ]
 	END
@@ -1179,7 +1183,7 @@ Verify DOCX Report Notes
 
 	@{notes_expected} 	Convert To List 	${${section}.text}
 
-	${len} 	Get Length 	${section_txtdata}
+	${len} 	Get Length 	${notes_expected}
 	FOR  ${i}  IN RANGE  0  ${len}
 		Should Be Equal 	${notes_expected}[${i}] 	${section_txtdata}[${i}] 	msg=[ Expected != Converted ]
 	END

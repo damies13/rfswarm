@@ -24,7 +24,7 @@ def read_all_xlsx_text_data(xlsx_path: str) -> list:
     return xlsx_tables
 
 
-def get_xlsx_sheet_by_name(xlsx_path: str, sheet_name: str) -> list:
+def get_xlsx_sheet_by_name(xlsx_path: str, sheet_name: str) -> str | int:
     """
     Find the full name of the xlsx sheet by its name.
     For example: given: "Contents tables" output: "4 Contents tables".
@@ -35,7 +35,7 @@ def get_xlsx_sheet_by_name(xlsx_path: str, sheet_name: str) -> list:
             sheet_fragmented = sheet.split(" ", maxsplit=1)
             if sheet_fragmented[1] == sheet_name:
                 return sheet
-    
+
     return 0
 
 
@@ -67,7 +67,7 @@ def read_xlsx_text_data_from_sheet(xlsx_path: str, sheet: str, start_at=None, st
             if stop_at in excel_data_list[row_n]:
                 end_index = row_n
 
-    return excel_data_list[start_index : end_index]
+    return excel_data_list[start_index: end_index]
 
 
 def extract_image_from_xlsx_sheet(xlsx_path: str, sheet: str, cell_id: str, output_folder: str, show_image: bool = False):
