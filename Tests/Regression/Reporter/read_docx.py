@@ -186,7 +186,7 @@ def read_docx_file(docx_path: str, debug=False) -> dict:
     dict = {"Heading 1" = {"text" = ["line 1", "line 2", ...], "table" = [[row 1], [row 2], ...] }, ...}
     """
     doc = Document(docx_path)
-    doc_data: dict[str, dict[str, list[str | list[str]]]] = dict()
+    doc_data: dict = {}
 
     current_heading_name = None
 
