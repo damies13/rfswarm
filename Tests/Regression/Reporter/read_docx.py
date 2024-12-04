@@ -75,7 +75,7 @@ def extract_docx_images_under_heading(heading: str, docx_path: str, output_folde
             for rel in run.element.xpath('.//a:blip/@r:embed'):
                 part = doc.part.related_parts[rel]
 
-                image_name = f"{heading.replace(" ", "_")}_{image_counter}_image.png"
+                image_name = f"{heading.replace(' ', '_')}_{image_counter}_image.png"
                 image_path = os.path.join(output_folder, image_name)
 
                 with open(image_path, 'wb') as img_file:
@@ -201,10 +201,8 @@ def read_docx_file(docx_path: str, debug=False) -> dict:
 
             elif paragraph.text.strip():
                 if current_heading_name:
-                    print(paragraph.text.strip())
                     doc_data[current_heading_name]["text"].append(paragraph.text.strip())
                 else:
-                    print(paragraph.text.strip())
                     doc_data.setdefault("Cover", {"text": []})
                     doc_data["Cover"]["text"].append(paragraph.text.strip())
 
