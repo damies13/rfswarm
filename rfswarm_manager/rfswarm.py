@@ -13,6 +13,7 @@ import argparse
 import base64
 import configparser
 import csv
+import eel
 import errno
 import glob
 import hashlib
@@ -49,6 +50,7 @@ import matplotlib  # required for matplot graphs
 import psutil
 
 from RFSwarmGUIhtml import RFSwarmGUIhtml
+from RFSwarmV2API import RFSwarmV2API
 
 # required for matplot graphs
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -534,6 +536,14 @@ class RFSwarmBase:
 	args = None
 
 	gui = None
+
+	# V2 GUI options
+	v2path = "V2UI"
+	v2starturl = "index.html"
+	v2startmode = None 				# `None` or `False` to not open a window. *Default:* :code:`'chrome'`.
+	v2starthost = 'localhost'
+	v2startport = 8139
+	v2startapp = None
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -2598,7 +2608,7 @@ class RFSwarmCore:
 					base.gui = RFSwarmGUItk()
 
 				if base.args.ui.upper() in ["V2"]:
-					base.gui = RFSwarmGUIhtml()
+					base.gui = RFSwarmGUIhtml(base, self)
 
 			else:
 				# run default
@@ -2610,6 +2620,11 @@ class RFSwarmCore:
 		base.debugmsg(5, "run_agent_server")
 		base.Agentserver = threading.Thread(target=self.run_agent_server)
 		base.Agentserver.start()
+
+		base.debugmsg(5, "run_v2_server")
+		base.v2server = threading.Thread(target=self.run_v2_server)
+		base.v2server.start()
+
 		base.debugmsg(5, "run_db_thread")
 		base.run_dbthread = True
 		base.dbthread = threading.Thread(target=base.run_db_thread)
@@ -3006,6 +3021,30 @@ class RFSwarmCore:
 	# Server
 	#
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+	def run_v2_server(self):
+
+		# base.v2startmode = 'chrome'
+		# base.v2path = "V2UI"
+		# base.v2starturl = "index.html"
+		if len(base.config['Server']['BindIP'])>0:
+			base.v2starthost = base.config['Server']['BindIP']
+		base.v2startport = int(base.config['Server']['BindPort']) + 1
+		base.v2startapp = RFSwarmV2API().api_object()
+
+		v2width = int(base.config['GUI']['win_width'])
+		v2height = int(base.config['GUI']['win_height'])
+
+		eel.init(base.v2path)
+		try:
+			base.debugmsg(1, "Starting V2 Manager", "http://{}:{}/".format(base.v2starthost, base.v2startport))
+			eel.start(base.v2starturl, mode=base.v2startmode, host=base.v2starthost, port=base.v2startport, app=base.v2startapp, size=(v2width,v2height))
+			base.appstarted = True
+			base.debugmsg(5, "appstarted:", base.appstarted)
+		except Exception as e:
+			base.debugmsg(5, "e:", e)
+			self.on_closing()
+			return False
 
 	def run_agent_server(self):
 

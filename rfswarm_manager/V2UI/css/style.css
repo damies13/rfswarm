@@ -1,0 +1,76 @@
+.theme-a {
+  background: #dca;
+  color: #731;
+}
+@media (prefers-color-scheme: dark) {
+  .theme-a.adaptive {
+    background: #753;
+    color: #dcb;
+    outline: 5px dashed #000;
+  }
+}
+
+.theme-b {
+  background: #447;
+  color: #bbd;
+}
+@media (prefers-color-scheme: light) {
+  .theme-b.adaptive {
+    background: #bcd;
+    color: #334;
+    outline: 5px dotted #000;
+  }
+}
+
+
+body {
+ padding: 25px;
+ background-color: white;
+ color: black;
+ font-size: 25px;
+}
+
+/* @media (prefers-color-scheme: dark) {
+	body {
+	 background-color: black;
+	 color: white;
+	}
+} */
+.toolbar {
+	font-size: medium;
+}
+.toolbar .ui-selectmenu-button.ui-button {
+	width: auto;
+}
+
+#tabs {
+	font-size: medium;
+}
+
+
+#tab-about h1 {
+	text-align: center;
+}
+#tab-about h2 {
+	text-align: center;
+}
+#tab-about h4 {
+	text-align: center;
+}
+#tab-about small {
+	text-align: center;
+	width: 80%;
+}
+#tab-about table {
+	text-align: center;
+	width: 100%;
+}
+
+
+#tab-about .quote {
+	font-size: medium;
+	text-align: center;
+	display: flex;
+	width: 40%;
+	margin: auto;
+}
