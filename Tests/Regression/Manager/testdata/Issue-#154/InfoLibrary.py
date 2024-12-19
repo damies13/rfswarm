@@ -12,3 +12,6 @@ class InfoLibrary:
 	def doc_only_keyword(self, message):
 		"""Doc only keyword From Info Library"""
 		return message
+
+	def return_only_keyword(self, message):
+		return message
