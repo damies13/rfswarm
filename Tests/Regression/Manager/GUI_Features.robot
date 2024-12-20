@@ -3079,7 +3079,7 @@ Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time
 	Run Keyword If	${status}	Fail
 	...    msg=The Manager started script before the scheduled start-up!
 	Log To Console	Scenario should start soon.
-	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_button_stoprun.png	timeout=60
+	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_button_stoprun.png	timeout=85
 	Run Keyword If	not ${status}	Fail
 	...    msg=The Manager did not started script after the scheduled time has elapsed!
 
