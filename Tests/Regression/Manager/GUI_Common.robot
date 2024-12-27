@@ -92,7 +92,7 @@ Open Manager GUI
 		Append To List 	${options} 	-d 	${results_dir}
 	END
 	Log to console 	${\n}\${options}: ${options}
-	Set Confidence		0.85
+	Set Confidence		0.9
 	${process}= 	Start Process 	${cmd_manager}  @{options}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
 	Set Test Variable 	$process_manager 	${process}
 	# Sleep 	10
