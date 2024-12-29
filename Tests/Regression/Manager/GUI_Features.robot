@@ -605,7 +605,8 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 		Press Key.tab 2 Times
 		Click Button	selected_runscriptrow
 		Select Robot File OS DIALOG		${robot_data}[0]
-		Click Button	selected_select_test_case
+		# Click Button	selected_select_test_case # replaced with horizontal offset because of the image difference in python versions
+		Click Button With Horizontal Offset 	selected_runscriptrow 	30
 		Click Button	select_example
 		Press Key.tab 3 Times
 	END
@@ -652,7 +653,8 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 		Press Key.tab 6 Times
 		Click Button	selected_runscriptrow
 		Select Robot File OS DIALOG		${robot_data}[0]
-		Click Button	selected_select_test_case
+		# Click Button	selected_select_test_case # replaced with horizontal offset because of the image difference in python versions
+		Click Button With Horizontal Offset 	selected_runscriptrow 	30
 		Click Button	select_example
 		Press Key.tab 2 Times
 		${settings_coordinates}=
@@ -719,7 +721,8 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 		Press Key.tab 2 Times
 		Click Button	selected_runscriptrow
 		Select Robot File OS DIALOG		${robot_data}[0]
-		Click Button	selected_select_test_case
+		# Click Button	selected_select_test_case # replaced with horizontal offset because of the image difference in python versions
+		Click Button With Horizontal Offset 	selected_runscriptrow 	30
 		Click Button	select_example
 		Press Key.tab 2 Times
 		${settings_coordinates}=

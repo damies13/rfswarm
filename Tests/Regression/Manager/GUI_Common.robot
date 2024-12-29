@@ -452,7 +452,6 @@ Click Label With Vertical Offset
 	[Arguments]		${labelname}	${offset}=0
 	[Documentation]	Click the image with the offset
 	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down].
-	...	Give the image a full name, for example: button_runopen.
 	${labelname}= 	Convert To Lower Case 	${labelname}
 	${img}=	Set Variable		manager_${platform}_label_${labelname}.png
 	Log		${CURDIR}
@@ -468,9 +467,38 @@ Click Label With Horizontal Offset
 	[Arguments]		${labelname}	${offset}=0
 	[Documentation]	Click the image with the offset
 	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right].
-	...	Give the image a full name, for example: button_runopen.
 	${labelname}= 	Convert To Lower Case 	${labelname}
 	${img}=	Set Variable		manager_${platform}_label_${labelname}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Log	${coordinates}
+	Click To The Right Of	${coordinates}	${offset}
+	Sleep 	0.1
+	# Take A Screenshot
+
+Click Button With Vertical Offset
+	[Arguments]		${btnname}	${offset}=0
+	[Documentation]	Click the image with the offset
+	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down].
+	${btnname}= 	Convert To Lower Case 	${btnname}
+	${img}=	Set Variable		manager_${platform}_button_${btnname}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Log	${coordinates}
+	Click To The Below Of	${coordinates}	${offset}
+	Sleep 	0.1
+	# Take A Screenshot
+
+Click Button With Horizontal Offset
+	[Arguments]		${btnname}	${offset}=0
+	[Documentation]	Click the image with the offset
+	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right].
+	${btnname}= 	Convert To Lower Case 	${btnname}
+	${img}=	Set Variable		manager_${platform}_button_${btnname}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=${default_image_timeout}
