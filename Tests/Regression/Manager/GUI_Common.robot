@@ -113,7 +113,7 @@ Open Manager GUI
 		IF 	not ${passed}
 			${running}= 	Is Process Running 	${process_manager}
 			IF 	not ${running}
-				${result} = 	Get Process Result
+				${result}= 		Get Process Result 	${process_manager}
 
 				Log		rc: ${result.rc} 		console=True
 				Log		stdout: ${result.stdout} 		console=True
