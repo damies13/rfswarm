@@ -50,7 +50,7 @@ Environment Variable Substitution in Robot/Resource files
 	...    Stop Manager
 
 Default Result Name Method
-	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
 	Run Agent
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default.rfs
 	Log to console 	${scenariofile}
@@ -69,11 +69,9 @@ Default Result Name Method
 	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
 
-	# ${dbfile}= 	Find Result DB
-	# # ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
-	# ${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
 	Sort List 	${result}
-	Log 	${result}
+	Log 	Found result names from keywords in CSV summary file after scenario run: ${\n}${result} 	console=${True}
+	Length Should Be 	${result} 	4 	msg=Unique Result Names number from keywords is incorrect. Check the Logs.
 	Should Be Equal 	${result[0][0]} 	Default Keyword Documentation
 	Should Be Equal 	${result[1][0]} 	Doc Keyword Message
 	Should Be Equal 	${result[2][0]} 	Doc only keyword From Info Library
@@ -84,7 +82,7 @@ Default Result Name Method
 	...    Stop Manager
 
 Documentation Result Name Method - Tests Defaults
-	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
 	Run Agent
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}documentation_td.rfs
 	Log to console 	${scenariofile}
@@ -102,11 +100,9 @@ Documentation Result Name Method - Tests Defaults
 	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
 
-	# ${dbfile}= 	Find Result DB
-	# # ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
-	# ${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
 	Sort List 	${result}
-	Log 	${result}
+	Log 	Found result names from keywords in CSV summary file after scenario run: ${\n}${result} 	console=${True}
+	Length Should Be 	${result} 	3 	msg=Unique Result Names number from keywords is incorrect. Check the Logs.
 	Should Be Equal 	${result[0][0]} 	Default Keyword Documentation
 	Should Be Equal 	${result[1][0]} 	Doc keyword From Info Library
 	Should Be Equal 	${result[2][0]} 	Doc only keyword From Info Library
@@ -116,7 +112,7 @@ Documentation Result Name Method - Tests Defaults
 	...    Stop Manager
 
 Info Result Name Method - Tests Defaults
-	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
 	Run Agent
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}info_td.rfs
 	Log to console 	${scenariofile}
@@ -134,11 +130,9 @@ Info Result Name Method - Tests Defaults
 	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
 
-	# ${dbfile}= 	Find Result DB
-	# # ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
-	# ${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
 	Sort List 	${result}
-	Log 	${result}
+	Log 	Found result names from keywords in CSV summary file after scenario run: ${\n}${result} 	console=${True}
+	Length Should Be 	${result} 	2 	msg=Unique Result Names number from keywords is incorrect. Check the Logs.
 	Should Be Equal 	${result[0][0]} 	Doc Keyword Message
 	Should Be Equal 	${result[1][0]} 	Message for Info Keyword
 
@@ -147,7 +141,7 @@ Info Result Name Method - Tests Defaults
 	...    Stop Manager
 
 Keyword Only Result Name Method - Tests Defaults
-	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
 	Run Agent
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keyword_td.rfs
 	Log to console 	${scenariofile}
@@ -165,23 +159,23 @@ Keyword Only Result Name Method - Tests Defaults
 	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
 
-	# ${dbfile}= 	Find Result DB
-	# # ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
-	# ${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
 	Sort List 	${result}
-	Log 	${result}
-	Should Be Equal 	${result[0][0]} 	Default Keyword Name
-	Should Be Equal 	${result[1][0]} 	Doc Keyword
-	Should Be Equal 	${result[2][0]} 	Doc Only Keyword
-	Should Be Equal 	${result[3][0]} 	Info Keyword
-	Should Be Equal 	${result[4][0]} 	Quiet Keyword Name
+	Log 	Found result names from keywords in CSV summary file after scenario run: ${\n}${result} 	console=${True}
+	Length Should Be 	${result} 	7 	msg=Unique Result Names number from keywords is incorrect. Check the Logs.
+	Should Be Equal 	${result[0][0]} 	Argument Keyword
+	Should Be Equal 	${result[1][0]} 	Default Keyword Name
+	Should Be Equal 	${result[2][0]} 	Doc Keyword
+	Should Be Equal 	${result[3][0]} 	Doc Only Keyword
+	Should Be Equal 	${result[4][0]} 	Info Keyword
+	Should Be Equal 	${result[5][0]} 	Quiet Keyword Name
+	Should Be Equal 	${result[6][0]} 	Return Only Keyword
 
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
 	...    Stop Manager
 
 Keyword and Args Result Name Method - Tests Defaults
-	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
 	Run Agent
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keywordargs_td.rfs
 	Log to console 	${scenariofile}
@@ -199,23 +193,23 @@ Keyword and Args Result Name Method - Tests Defaults
 	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
 
-	# ${dbfile}= 	Find Result DB
-	# # ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
-	# ${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
 	Sort List 	${result}
-	Log 	${result}
-	Should Be Equal 	${result[0][0]} 	Default Keyword Name
-	Should Be Equal 	${result[1][0]} 	Doc Keyword Doc Keyword Message
-	Should Be Equal 	${result[2][0]} 	Doc Only Keyword Doc Keyword Message
-	Should Be Equal 	${result[3][0]} 	Info Keyword Message for Info Keyword
-	Should Be Equal 	${result[4][0]} 	Quiet Keyword Name
+	Log 	Found result names from keywords in CSV summary file after scenario run: ${\n}${result} 	console=${True}
+	Length Should Be 	${result} 	7 	msg=Unique Result Names number from keywords is incorrect. Check the Logs.
+	Should Be Equal 	${result[0][0]} 	Argument Keyword Arg1
+	Should Be Equal 	${result[1][0]} 	Default Keyword Name
+	Should Be Equal 	${result[2][0]} 	Doc Keyword Doc Keyword Message
+	Should Be Equal 	${result[3][0]} 	Doc Only Keyword Doc Keyword Message
+	Should Be Equal 	${result[4][0]} 	Info Keyword Message for Info Keyword
+	Should Be Equal 	${result[5][0]} 	Quiet Keyword Name
+	Should Be Equal 	${result[6][0]} 	Return Only Keyword Hello
 
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
 	...    Stop Manager
 
 Default Result Name Method - Tests Row
-	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
 	Run Agent
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default_tr.rfs
 	Log to console 	${scenariofile}
@@ -233,11 +227,9 @@ Default Result Name Method - Tests Row
 	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
 
-	# ${dbfile}= 	Find Result DB
-	# # ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
-	# ${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
 	Sort List 	${result}
-	Log 	${result}
+	Log 	Found result names from keywords in CSV summary file after scenario run: ${\n}${result} 	console=${True}
+	Length Should Be 	${result} 	4 	msg=Unique Result Names number from keywords is incorrect. Check the Logs.
 	Should Be Equal 	${result[0][0]} 	Default Keyword Documentation
 	Should Be Equal 	${result[1][0]} 	Doc Keyword Message
 	Should Be Equal 	${result[2][0]} 	Doc only keyword From Info Library
@@ -248,7 +240,7 @@ Default Result Name Method - Tests Row
 	...    Stop Manager
 
 Documentation Result Name Method - Tests Row
-	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
 	Run Agent
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}documentation_tr.rfs
 	Log to console 	${scenariofile}
@@ -266,11 +258,9 @@ Documentation Result Name Method - Tests Row
 	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
 
-	# ${dbfile}= 	Find Result DB
-	# # ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
-	# ${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
 	Sort List 	${result}
-	Log 	${result}
+	Log 	Found result names from keywords in CSV summary file after scenario run: ${\n}${result} 	console=${True}
+	Length Should Be 	${result} 	3 	msg=Unique Result Names number from keywords is incorrect. Check the Logs.
 	Should Be Equal 	${result[0][0]} 	Default Keyword Documentation
 	Should Be Equal 	${result[1][0]} 	Doc keyword From Info Library
 	Should Be Equal 	${result[2][0]} 	Doc only keyword From Info Library
@@ -280,7 +270,7 @@ Documentation Result Name Method - Tests Row
 	...    Stop Manager
 
 Info Result Name Method - Tests Row
-	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
 	Run Agent
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}info_tr.rfs
 	Log to console 	${scenariofile}
@@ -298,11 +288,9 @@ Info Result Name Method - Tests Row
 	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
 
-	# ${dbfile}= 	Find Result DB
-	# # ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
-	# ${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
 	Sort List 	${result}
-	Log 	${result}
+	Log 	Found result names from keywords in CSV summary file after scenario run: ${\n}${result} 	console=${True}
+	Length Should Be 	${result} 	2 	msg=Unique Result Names number from keywords is incorrect. Check the Logs.
 	Should Be Equal 	${result[0][0]} 	Doc Keyword Message
 	Should Be Equal 	${result[1][0]} 	Message for Info Keyword
 
@@ -311,7 +299,7 @@ Info Result Name Method - Tests Row
 	...    Stop Manager
 
 Keyword Only Result Name Method - Tests Row
-	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
 	Run Agent
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keyword_tr.rfs
 	Log to console 	${scenariofile}
@@ -329,23 +317,23 @@ Keyword Only Result Name Method - Tests Row
 	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
 
-	# ${dbfile}= 	Find Result DB
-	# # ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
-	# ${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
 	Sort List 	${result}
-	Log 	${result}
-	Should Be Equal 	${result[0][0]} 	Default Keyword Name
-	Should Be Equal 	${result[1][0]} 	Doc Keyword
-	Should Be Equal 	${result[2][0]} 	Doc Only Keyword
-	Should Be Equal 	${result[3][0]} 	Info Keyword
-	Should Be Equal 	${result[4][0]} 	Quiet Keyword Name
+	Log 	Found result names from keywords in CSV summary file after scenario run: ${\n}${result} 	console=${True}
+	Length Should Be 	${result} 	7 	msg=Unique Result Names number from keywords is incorrect. Check the Logs.
+	Should Be Equal 	${result[0][0]} 	Argument Keyword
+	Should Be Equal 	${result[1][0]} 	Default Keyword Name
+	Should Be Equal 	${result[2][0]} 	Doc Keyword
+	Should Be Equal 	${result[3][0]} 	Doc Only Keyword
+	Should Be Equal 	${result[4][0]} 	Info Keyword
+	Should Be Equal 	${result[5][0]} 	Quiet Keyword Name
+	Should Be Equal 	${result[6][0]} 	Return Only Keyword
 
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
 	...    Stop Manager
 
 Keyword and Args Result Name Method - Tests Row
-	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
 	Run Agent
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keywordargs_tr.rfs
 	Log to console 	${scenariofile}
@@ -363,16 +351,16 @@ Keyword and Args Result Name Method - Tests Row
 	Length Should Be 	${lst_summary} 	1
 	${result}= 	CSV to List 	${lst_summary}[0]
 
-	# ${dbfile}= 	Find Result DB
-	# # ${result}= 	Query Result DB 	${dbfile} 	Select Name from ResultSummary;
-	# ${result}= 	Query Result DB 	${dbfile} 	SELECT result_name FROM Results GROUP BY result_name ORDER BY result_name;
 	Sort List 	${result}
-	Log 	${result}
-	Should Be Equal 	${result[0][0]} 	Default Keyword Name
-	Should Be Equal 	${result[1][0]} 	Doc Keyword Doc Keyword Message
-	Should Be Equal 	${result[2][0]} 	Doc Only Keyword Doc Keyword Message
-	Should Be Equal 	${result[3][0]} 	Info Keyword Message for Info Keyword
-	Should Be Equal 	${result[4][0]} 	Quiet Keyword Name
+	Log 	Found result names from keywords in CSV summary file after scenario run: ${\n}${result} 	console=${True}
+	Length Should Be 	${result} 	7 	msg=Unique Result Names number from keywords is incorrect. Check the Logs.
+	Should Be Equal 	${result[0][0]} 	Argument Keyword Arg1
+	Should Be Equal 	${result[1][0]} 	Default Keyword Name
+	Should Be Equal 	${result[2][0]} 	Doc Keyword Doc Keyword Message
+	Should Be Equal 	${result[3][0]} 	Doc Only Keyword Doc Keyword Message
+	Should Be Equal 	${result[4][0]} 	Info Keyword Message for Info Keyword
+	Should Be Equal 	${result[5][0]} 	Quiet Keyword Name
+	Should Be Equal 	${result[6][0]} 	Return Only Keyword Hello
 
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
