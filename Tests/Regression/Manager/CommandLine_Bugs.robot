@@ -19,13 +19,19 @@ Next Day For Scheduled Start Is In the Next Month
 		Log 	${result.stdout}
 		Log 	${result.stderr}
 		${result}= 	Run Process 	date
-		Log 	New date: ${result} 	console=${True}
+		Log 	New date: ${result.stdout} 	console=${True}
 		Log 	${result.stderr}
 		# date  MMDDHHMMYYYY
 		#date
 	END
 	IF 	"${platform}" == "windows"
-		${result}= 	Run Process 	powershell.exe  Set-Date  -Date  '31/12/2024' 	shell=${True}
+		${result}= 	Run Process 	powershell.exe  Set-Date  -Date  (Get-Date "31/12/2024") 	shell=${True}
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	powershell.exe  Set-Date  -Date  (Get-Date "2024-12-31") 	shell=${True}
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	powershell.exe  Set-Date  -Date  (Get-Date "12/31/2024") 	shell=${True}
 		Log 	${result.stdout}
 		Log 	${result.stderr}
 		${result}= 	Run Process 	powershell.exe  Get-Date  -Format  'dd/MM/yyyy' 	shell=${True}
@@ -56,17 +62,17 @@ Next Day For Scheduled Start Is In the Next Month
 
 	IF 	"${platform}" == "macos"
 		${result}= 	Run Process 	sudo  sntp  -sS  time.apple.com
-		Log 	${result.stdout}
+		Log 	Back to original date: ${result.stdout} 	console=${True}
 		Log 	${result.stderr} 
 	END
 	IF 	"${platform}" == "windows"
 		${result}= 	Run Process 	powershell.exe  w32tm  /resync 	shell=${True}
-		Log 	${result.stdout}
+		Log 	Back to original date: ${result.stdout} 	console=${True}
 		Log 	${result.stderr} 
 	END
 	IF 	"${platform}" == "ubuntu"
 		${result}= 	Run Process 	sudo  timedatectl  set-ntp  true
-		Log 	${result.stdout}
+		Log 	Back to original date: ${result.stdout} 	console=${True}
 		Log 	${result.stderr} 
 	END
 
@@ -74,7 +80,6 @@ Next Day For Scheduled Start Is In the Next Month
 	...    Run Keyword If 	"${platform}" == "macos" 	Run Process 	sudo  sntp  -sS  time.apple.com 				AND
 	...    Run Keyword If 	"${platform}" == "windows" 	Run Process 	powershell.exe  w32tm  /resync 	shell=${True} 	AND
 	...    Run Keyword If 	"${platform}" == "ubuntu" 	Run Process 	sudo  timedatectl  set-ntp  true				AND
-	...    Log 	Back to original date: ${result.stdout} 	console=${True} 	AND
 	...    Stop Manager
 
 Robot files with same name but different folders
