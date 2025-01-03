@@ -11,6 +11,32 @@ ${scenario_name}=	test_scenario
 
 *** Test Cases ***
 Robot files with same name but different folders
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #328
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+
+	IF 	"${platform}" == "macos"
+		Set Suite Variable 	${platform} 	macos
+	END
+	IF 	"${platform}" == "windows"
+		Set Suite Variable 	${platform} 	windows
+		#Set-Date -Date "31/12/2024"
+		#Get-Date -Format "MM/dd/yyyy"
+	END
+	IF 	"${platform}" == "ubuntu"
+		Set Suite Variable 	${platform} 	ubuntu
+	END
+	
+
+	@{mngr_options}= 	Create List 	-g 	3 	-n 	-d 	${results_dir} 	-t 	
+	Run Manager CLI 	${mngr_options}
+
+	[Teardown] 	Run Keywords
+	...    Run Keyword If 	"${platform}" == "macos" 	Start Process 	sntp  -sS  time.apple.com 	AND
+	...    Run Keyword If 	"${platform}" == "windows" 	Start Process 	w32tm  /resync 				AND
+	...    Run Keyword If 	"${platform}" == "ubuntu" 	Start Process 	hwclock  --hctosys 			AND
+	...    Stop Manager
+
+Robot files with same name but different folders
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #184
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	VAR 	${agent_dir} 		${agent_dir}${/}${TEST NAME}      scope=TEST
@@ -289,9 +315,6 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 		Fail	msg=Manager did not close!
 	END
 
-	# [Teardown]	Run Keywords
-	# ...    Run Keyword		Close Manager GUI ${platform}
-
 Verify If Manager Runs With No Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
@@ -315,9 +338,6 @@ Verify If Manager Runs With No Existing INI File From Current Version NO GUI
 	Log 	${result.stderr}
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
-
-	# [Teardown]	Run Keywords
-	# ...    Run Keyword		Close Manager GUI ${platform}
 
 Verify If Manager Runs With Existing INI File From Previous Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
@@ -346,6 +366,3 @@ Verify If Manager Runs With Existing INI File From Previous Version NO GUI
 	Log 	${result.stderr}
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
-
-	# [Teardown]	Run Keywords
-	# ...    Run Keyword		Close Manager GUI ${platform}
