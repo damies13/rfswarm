@@ -23,13 +23,7 @@ Next Day For Scheduled Start Is In the Next Month
 		Log 	${result.stderr}
 	END
 	IF 	"${platform}" == "windows"
-		${result}= 	Run Process 	powershell.exe  Set-Date  -Date  (Get-Date '31/12/2024' -Format dd/MM/yyyy) 	shell=${True}
-		Log 	${result.stdout}
-		Log 	${result.stderr}
 		${result}= 	Run Process 	powershell.exe  Set-Date  -Date  (Get-Date '2024-12-31') 	shell=${True}
-		Log 	${result.stdout}
-		Log 	${result.stderr}
-		${result}= 	Run Process 	powershell.exe  Set-Date  -Date  (Get-Date '12/31/2024') 	shell=${True}
 		Log 	${result.stdout}
 		Log 	${result.stderr}
 		${result}= 	Run Process 	powershell.exe  Get-Date  -Format  'dd/MM/yyyy' 	shell=${True}
@@ -46,7 +40,10 @@ Next Day For Scheduled Start Is In the Next Month
 		${result}= 	Run Process 	sudo  timedatectl  set-time  '12/31/2024'
 		Log 	${result.stdout}
 		Log 	${result.stderr}
-		${result}= 	Run Process 	sudo  timedatectl  set-time  "2024-12-31 00:00:00"
+		${result}= 	Run Process 	sudo  timedatectl  set-time  '2024-12-31 00:00:00'
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	sudo  date  -s  '2024-12-31 00:00:00'
 		Log 	${result.stdout}
 		Log 	${result.stderr}
 		${result}= 	Run Process 	date
@@ -63,6 +60,12 @@ Next Day For Scheduled Start Is In the Next Month
 
 	IF 	"${platform}" == "macos"
 		${result}= 	Run Process 	sudo  sntp  -sS  time.apple.com
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	sudo  systemsetup  -setusingnetworktime  on
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	sudo  systemsetup  -setnetworktimeserver  time.apple.com
 		Log 	${result.stdout}
 		Log 	${result.stderr}
 		${result}= 	Run Process 	date
