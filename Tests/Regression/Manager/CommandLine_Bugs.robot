@@ -81,7 +81,7 @@ Circular Reference Resource Files
 	Sleep    1s
 	Check Agent Is Running
 	Log to console 	${CURDIR}
-	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#184${/}Issue-#184.rfs
+	${scenariofile}= 	Normalize Path 	${testdata}${/}scenario.rfs
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
@@ -141,7 +141,7 @@ Circular Reference Resource Files 2
 	Sleep    1s
 	Check Agent Is Running
 	Log to console 	${CURDIR}
-	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#184${/}Issue-#184.rfs
+	${scenariofile}= 	Normalize Path 	${testdata}${/}scenario.rfs
 	Log to console 	${scenariofile}
 	@{time}= 	Get Time 	hour min sec 	NOW + 2min
 	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${results_dir} 	-t 	${time[0]}:${time[1]}:${time[2]}
@@ -202,7 +202,7 @@ Lots Of Resource Files
 	Sleep    1s
 	Check Agent Is Running
 	Log to console 	${CURDIR}
-	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#184${/}Issue-#184.rfs
+	${scenariofile}= 	Normalize Path 	${testdata}${/}scenario.rfs
 	Log to console 	${scenariofile}
 	@{time}= 	Get Time 	hour min sec 	NOW + 300s
 	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${results_dir} 	-t 	${time[0]}:${time[1]}:${time[2]}
