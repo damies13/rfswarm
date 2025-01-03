@@ -3,37 +3,78 @@ Test Tags       Bugs 	CommandLine
 
 Resource 	CommandLine_Common.robot
 
-Suite Setup 		Create Directory 	${results_dir}
+Suite Setup 	Run Keywords 	Create Directory 	${results_dir} 	AND 	Set Platform
 
 *** Variables ***
 @{robot_data}=	example.robot	Example Test Case
 ${scenario_name}=	test_scenario
 
 *** Test Cases ***
-Robot files with same name but different folders
+Next Day For Scheduled Start Is In the Next Month
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #328
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 
 	IF 	"${platform}" == "macos"
-		Set Suite Variable 	${platform} 	macos
+		${result}= 	Run Process 	sudo  date  123100002024
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	date
+		Log 	New date: ${result} 	console=${True}
+		Log 	${result.stderr}
+		# date  MMDDHHMMYYYY
+		#date
 	END
 	IF 	"${platform}" == "windows"
-		Set Suite Variable 	${platform} 	windows
-		#Set-Date -Date "31/12/2024"
-		#Get-Date -Format "MM/dd/yyyy"
+		${result}= 	Run Process 	powershell.exe  Set-Date  -Date  '31/12/2024' 	shell=${True}
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	powershell.exe  Get-Date  -Format  'dd/MM/yyyy' 	shell=${True}
+		Log 	New date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+		# Set-Date -Date "31/12/2024"
+		# Get-Date -Format "dd/MM/yyyy"
+		# w32tm /resync
 	END
 	IF 	"${platform}" == "ubuntu"
-		Set Suite Variable 	${platform} 	ubuntu
+		${result}= 	Run Process 	sudo  timedatectl  set-ntp  false
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	sudo  timedatectl  set-time  '2024-12-31'
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	date
+		Log 	New date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+		# timedatectl set-time "YYYY-MM-DD"
+		# hwclock --set --date="YYYY-MM-DD"
+		#date -s "YYYY-MM-DD HH:MM:SS"
+		#hwclock  --hctosys
 	END
-	
 
-	@{mngr_options}= 	Create List 	-g 	3 	-n 	-d 	${results_dir} 	-t 	
+	@{mngr_options}= 	Create List 	-g 	3 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
 
+	IF 	"${platform}" == "macos"
+		${result}= 	Run Process 	sudo  sntp  -sS  time.apple.com
+		Log 	${result.stdout}
+		Log 	${result.stderr} 
+	END
+	IF 	"${platform}" == "windows"
+		${result}= 	Run Process 	powershell.exe  w32tm  /resync 	shell=${True}
+		Log 	${result.stdout}
+		Log 	${result.stderr} 
+	END
+	IF 	"${platform}" == "ubuntu"
+		${result}= 	Run Process 	sudo  timedatectl  set-ntp  true
+		Log 	${result.stdout}
+		Log 	${result.stderr} 
+	END
+
 	[Teardown] 	Run Keywords
-	...    Run Keyword If 	"${platform}" == "macos" 	Start Process 	sntp  -sS  time.apple.com 	AND
-	...    Run Keyword If 	"${platform}" == "windows" 	Start Process 	w32tm  /resync 				AND
-	...    Run Keyword If 	"${platform}" == "ubuntu" 	Start Process 	hwclock  --hctosys 			AND
+	...    Run Keyword If 	"${platform}" == "macos" 	Run Process 	sudo  sntp  -sS  time.apple.com 				AND
+	...    Run Keyword If 	"${platform}" == "windows" 	Run Process 	powershell.exe  w32tm  /resync 	shell=${True} 	AND
+	...    Run Keyword If 	"${platform}" == "ubuntu" 	Run Process 	sudo  timedatectl  set-ntp  true				AND
+	...    Log 	Back to original date: ${result.stdout} 	console=${True} 	AND
 	...    Stop Manager
 
 Robot files with same name but different folders
