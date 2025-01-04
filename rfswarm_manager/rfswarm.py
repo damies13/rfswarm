@@ -520,7 +520,7 @@ class RFSwarmBase:
 	scriptfilters = [""]
 
 	corecount = psutil.cpu_count()
-	threadcount = corecount * 32
+	threadcount = corecount * 16
 
 	# #000000 = Black
 	# https://www.schemecolor.com/traffic-red-yellow-green.php
