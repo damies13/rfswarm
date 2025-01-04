@@ -1471,9 +1471,9 @@ class RFSwarmBase:
 						t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
 						t.start()
 
-						base.debugmsg(0, "threading active count:", threading.active_count())
+						base.debugmsg(9, "threading active count:", threading.active_count())
 						while threading.active_count() > self.threadcount:
-							base.debugmsg(0, "threading active count:", threading.active_count())
+							base.debugmsg(9, "threading active count:", threading.active_count())
 							time.sleep(0.1)
 
 	def is_resfile_prefix(self, prefixname):
