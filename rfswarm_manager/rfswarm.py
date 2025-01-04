@@ -519,6 +519,9 @@ class RFSwarmBase:
 	MetricIDs: Any = {}
 	scriptfilters = [""]
 
+	corecount = psutil.cpu_count()
+	threadcount = corecount * 32
+
 	# #000000 = Black
 	# https://www.schemecolor.com/traffic-red-yellow-green.php
 	defcolours = ['#000000', '#008450', '#B81D13', '#EFB700', '#888888']
@@ -1469,7 +1472,7 @@ class RFSwarmBase:
 						t.start()
 
 						base.debugmsg(0, "threading active count:", threading.active_count())
-						while threading.active_count() > 50:
+						while threading.active_count() > self.threadcount:
 							base.debugmsg(0, "threading active count:", threading.active_count())
 							time.sleep(0.1)
 
