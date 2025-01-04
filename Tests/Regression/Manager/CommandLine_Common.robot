@@ -108,7 +108,7 @@ Wait For Manager
 	[Arguments]		${timeout}=30min
 	${result}= 	Wait For Process		${process_manager} 	timeout=${timeout} 	on_timeout=terminate
 	# Should Be Equal As Integers 	${result.rc} 	0
-	Log to console 	${result.rc}
+	Log to console 	Manager exited with: ${result.rc}
 
 Check Agent Is Running
 	[Documentation] 	This keyword checks if the agent is running and returns true or false
