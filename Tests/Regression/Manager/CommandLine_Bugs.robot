@@ -43,7 +43,12 @@ Next Day For Scheduled Start Is In the Next Month
 		Log 	${result.stdout}
 		Log 	${result.stderr}
 
-		${result}= 	Run Process 	sudo  hwclock  --set  --date="2024-12-31 00:00:00"
+		${result}= 	Run Process 	sudo  date  +%s  -s  @1735603200
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		VAR    ${t}    =
+		${result}= 	Run Process 	sudo  hwclock  --set  --date${t}"2024-12-31 00:00:00"
 		Log 	${result.stdout}
 		Log 	${result.stderr}
 		${result}= 	Run Process 	sudo  hwclock  --hctosys
