@@ -29,23 +29,31 @@ Next Day For Scheduled Start Is In the Next Month
 		${result}= 	Run Process 	powershell.exe  Get-Date  -Format  'dd/MM/yyyy' 	shell=${True}
 		Log 	New date: ${result.stdout} 	console=${True}
 		Log 	${result.stderr}
-		# Set-Date -Date "31/12/2024"
-		# Get-Date -Format "dd/MM/yyyy"
-		# w32tm /resync
 	END
 	IF 	"${platform}" == "ubuntu"
 		${result}= 	Run Process 	sudo  timedatectl  set-ntp  false
 		Log 	${result.stdout}
 		Log 	${result.stderr}
-		${result}= 	Run Process 	sudo  timedatectl  set-time  '12/31/2024'
+
+		${result}= 	Run Process 	sudo  timedatectl  set-time  "12/31/2024"
 		Log 	${result.stdout}
 		Log 	${result.stderr}
-		${result}= 	Run Process 	sudo  timedatectl  set-time  '2024-12-31 00:00:00'
+
+		${result}= 	Run Process 	sudo  timedatectl  set-time  "2024-12-31 00:00:00"
 		Log 	${result.stdout}
 		Log 	${result.stderr}
-		${result}= 	Run Process 	sudo  date  -s  '2024-12-31 00:00:00'
+
+		${result}= 	Run Process 	sudo  hwclock  --set  --date="2024-12-31 00:00:00"
 		Log 	${result.stdout}
 		Log 	${result.stderr}
+		${result}= 	Run Process 	sudo  hwclock  --hctosys
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	sudo  date  -s  "2024-12-31 00:00:00"
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
 		${result}= 	Run Process 	date
 		Log 	New date: ${result.stdout} 	console=${True}
 		Log 	${result.stderr}
