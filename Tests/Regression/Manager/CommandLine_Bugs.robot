@@ -204,7 +204,7 @@ Lots Of Resource Files
 	Log to console 	${CURDIR}
 	${scenariofile}= 	Normalize Path 	${testdata}${/}scenario.rfs
 	Log to console 	${scenariofile}
-	@{time}= 	Get Time 	hour min sec 	NOW + 7 min
+	@{time}= 	Get Time 	hour min sec 	NOW + 10 min
 	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${results_dir} 	-t 	${time[0]}:${time[1]}:${time[2]}
 	Run Manager CLI 	${mngr_options}
 	# It can take a while for the agent to download 3500+ files
