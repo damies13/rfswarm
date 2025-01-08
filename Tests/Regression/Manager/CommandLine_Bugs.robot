@@ -97,6 +97,12 @@ Next Day For Scheduled Start Is In the Next Month
 		${result}= 	Run Process 	sudo  timedatectl  set-ntp  true
 		Log 	${result.stdout}
 		Log 	${result.stderr}
+		${result}= 	Run Process 	sudo  sntp  -s  time.google.com
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	sudo  ntpdate  -u  time.google.com
+		Log 	${result.stdout}
+		Log 	${result.stderr}
 		${result}= 	Run Process 	date
 		Log 	Back to original date: ${result.stdout} 	console=${True}
 		Log 	${result.stderr}
