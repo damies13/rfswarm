@@ -2,6 +2,7 @@
 Library 	OperatingSystem
 Library 	Process
 Library 	DatabaseLibrary
+Library		DateTime
 Library 	String
 Library 	Collections
 
@@ -576,21 +577,15 @@ Set Date Manually
 		# Log 	${result.stdout}
 		# Log 	${result.stderr}
 
-		# ${result}= 	Run Process 	sudo  date  +%s  -s  @1735603200
-		# Log 	${result.stdout}
-		# Log 	${result.stderr}
-
-		# VAR    ${t}    =
-		# ${result}= 	Run Process 	sudo  hwclock  --set  --date${t}"2024-12-31 00:00:00"
-		# Log 	${result.stdout}
-		# Log 	${result.stderr}
-		# ${result}= 	Run Process 	sudo  hwclock  --hctosys
-		# Log 	${result.stdout}
-		# Log 	${result.stderr}
-
-		${result}= 	Run Process 	sudo  date  -s  '${input_date}'  +%Y-%m-%d
+		${input_date_epoch}= 	Convert Date 	${input_date} 	date_format=%Y-%m-%d 	result_format=epoch
+		${input_date_epoch}= 	Convert To Integer 	${input_date_epoch}
+		${result}= 	Run Process 	sudo  date  +%s  -s  @${input_date_epoch}
 		Log 	${result.stdout}
 		Log 	${result.stderr}
+
+		# ${result}= 	Run Process 	sudo  date  -s  ${input_date}  +%Y-%m-%d
+		# Log 	${result.stdout}
+		# Log 	${result.stderr}
 
 		${result}= 	Run Process 	date  +%Y-%m-%d
 		Should Be Equal As Strings 	${result.stdout} 	${input_date}
@@ -625,6 +620,9 @@ Resync Date With Time Server
 	END
 	IF 	"${platform}" == "ubuntu"
 		${result}= 	Run Process 	sudo  timedatectl  set-ntp  true
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	sudo  date  -s  '$(wget -qSO- --max-redirect=0 google.com 2>&1 | grep Date: | cut -d' ' -f5-8)Z'
 		Log 	${result.stdout}
 		Log 	${result.stderr}
 
