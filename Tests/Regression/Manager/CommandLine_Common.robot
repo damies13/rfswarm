@@ -537,3 +537,99 @@ Check Icon Install For Ubuntu
 	File Should Exist 	${pathprefix}${/}applications${/}${projname}.desktop 		Desktop File not found
 
 	File Should Exist 	${pathprefix}${/}icons${/}hicolor${/}128x128${/}apps${/}${projname}.png 		Icon File not found
+
+Set Date Manually
+	[Arguments] 	${input_date}
+	IF 	"${platform}" == "macos"
+		# ${result}= 	Run Process 	sudo  date  123100002024
+		# Log 	${result.stdout}
+		# Log 	${result.stderr}
+		${result}= 	Run Process 	sudo  date  -f  '%Y-%m-%d'  '${input_date}'
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	date  +%Y-%m-%d
+		Should Be Equal As Strings 	${result.stdout} 	${input_date}
+		Log 	New date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
+	IF 	"${platform}" == "windows"
+		${result}= 	Run Process 	powershell.exe  Set-Date  -Date  (Get-Date '${input_date}' -Format 'yyyy-MM-dd') 	shell=${True}
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	powershell.exe  Get-Date  -Format  'yyyy-MM-dd' 	shell=${True}
+		Should Be Equal As Strings 	${result.stdout} 	${input_date}
+		Log 	New date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
+	IF 	"${platform}" == "ubuntu"
+		${result}= 	Run Process 	sudo  timedatectl  set-ntp  false
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		# ${result}= 	Run Process 	sudo  timedatectl  set-time  "12/31/2024"
+		# Log 	${result.stdout}
+		# Log 	${result.stderr}
+
+		# ${result}= 	Run Process 	sudo  timedatectl  set-time  "2024-12-31 00:00:00"
+		# Log 	${result.stdout}
+		# Log 	${result.stderr}
+
+		# ${result}= 	Run Process 	sudo  date  +%s  -s  @1735603200
+		# Log 	${result.stdout}
+		# Log 	${result.stderr}
+
+		# VAR    ${t}    =
+		# ${result}= 	Run Process 	sudo  hwclock  --set  --date${t}"2024-12-31 00:00:00"
+		# Log 	${result.stdout}
+		# Log 	${result.stderr}
+		# ${result}= 	Run Process 	sudo  hwclock  --hctosys
+		# Log 	${result.stdout}
+		# Log 	${result.stderr}
+
+		${result}= 	Run Process 	sudo  date  -s  '${input_date}'  +%Y-%m-%d
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	date  +%Y-%m-%d
+		Should Be Equal As Strings 	${result.stdout} 	${input_date}
+		Log 	New date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
+
+Resync Date With Time Server
+	[Arguments] 	${old_date}
+	IF 	"${platform}" == "macos"
+		${result}= 	Run Process 	sudo  systemsetup  -setusingnetworktime  on
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	sudo  systemsetup  -setnetworktimeserver  time.apple.com
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	date  +%Y-%m-%d
+		Should Not Be Equal As Strings 	${result.stdout} 	${old_date}
+		Log 	Back to original date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
+	IF 	"${platform}" == "windows"
+		${result}= 	Run Process 	powershell.exe  w32tm  /resync 	shell=${True}
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	powershell.exe  Get-Date  -Format  'yyyy-MM-dd' 	shell=${True}
+		Should Not Be Equal As Strings 	${result.stdout} 	${old_date}
+		Log 	Back to original date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
+	IF 	"${platform}" == "ubuntu"
+		${result}= 	Run Process 	sudo  timedatectl  set-ntp  true
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	date  +%Y-%m-%d
+		Should Not Be Equal As Strings 	${result.stdout} 	${old_date}
+		Log 	Back to original date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
