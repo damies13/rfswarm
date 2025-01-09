@@ -622,7 +622,10 @@ Resync Date With Time Server
 		${result}= 	Run Process 	sudo  timedatectl  set-ntp  true
 		Log 	${result.stdout}
 		Log 	${result.stderr}
-		${result}= 	Run Process 	sudo  date  -s  '$(wget -qSO- google.com 2>&1 | grep Date: | cut -d' ' -f5-8)Z'
+		${result}= 	Run Process 	sudo  systemctl  restart  systemd-timesyncd
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	sudo  sntp  -s  time.google.com
 		Log 	${result.stdout}
 		Log 	${result.stderr}
 
