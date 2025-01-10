@@ -866,6 +866,11 @@ class ReporterBase():
 	def report_save(self):
 		saved = False
 		if 'Reporter' in base.config:
+			if "Colours" not in base.report:
+				base.report["Colours"] = {}
+			base.report["Colours"]["defcolours"] = ",".join(base.defcolours)
+			base.report["Colours"]["namecolours"] = ",".join(base.namecolours)
+
 			if 'Report' in base.config['Reporter'] and len(base.config['Reporter']['Report']) > 0:
 				filename = base.config['Reporter']['Report']
 				filedir = os.path.dirname(filename)
@@ -895,6 +900,9 @@ class ReporterBase():
 				base.template_create()
 			base.debugmsg(7, "report_save")
 			base.report_save()
+
+		base.defcolours = base.report["Colours"]["defcolours"].split(",")
+		base.namecolours = base.report["Colours"]["namecolours"].split(",")
 
 	def report_starttime(self):
 		if "starttime" in self.reportdata and self.reportdata["starttime"] > 0:
@@ -3234,9 +3242,10 @@ class ReporterBase():
 	#
 
 	def named_colour(self, name):
-		if name.lower() not in base.namecolours:
-			base.namecolours.append(name.lower())
-		return self.line_colour(base.namecolours.index(name.lower()))
+		safename = name.lower().replace(",", ";")
+		if safename not in base.namecolours:
+			base.namecolours.append(safename)
+		return self.line_colour(base.namecolours.index(safename))
 
 	def line_colour(self, grp):
 		if grp < len(base.defcolours):
@@ -3249,6 +3258,7 @@ class ReporterBase():
 				newcolour = self.get_colour()
 				base.debugmsg(9, "newcolour:", newcolour)
 			base.defcolours.append(newcolour)
+			base.report_save()
 			return newcolour
 
 	def get_colour(self):
