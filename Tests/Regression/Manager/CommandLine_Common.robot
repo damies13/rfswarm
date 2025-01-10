@@ -619,13 +619,13 @@ Resync Date With Time Server
 		Log 	${result.stderr}
 	END
 	IF 	"${platform}" == "ubuntu"
+		${result}= 	Run Process 	sudo  hwclock  --systohc
+		Log 	${result.stdout}
+		Log 	${result.stderr}
 		${result}= 	Run Process 	sudo  timedatectl  set-ntp  true
 		Log 	${result.stdout}
 		Log 	${result.stderr}
-		${result}= 	Run Process 	sudo  systemctl  restart  systemd-timesyncd
-		Log 	${result.stdout}
-		Log 	${result.stderr}
-		${result}= 	Run Process 	sudo  sntp  -s  time.google.com
+		${result}= 	Run Process 	sudo  ntpdate  -u  time.google.com
 		Log 	${result.stdout}
 		Log 	${result.stderr}
 
