@@ -868,8 +868,8 @@ class ReporterBase():
 		if 'Reporter' in base.config:
 			if "Colours" not in base.report:
 				base.report["Colours"] = {}
-			base.report["Colours"]["defcolours"] = ",".join(base.defcolours)
-			base.report["Colours"]["namecolours"] = ",".join(base.namecolours)
+			base.report["Colours"]["defcolours"] = base.whitespace_set_ini_value(",".join(base.defcolours))
+			base.report["Colours"]["namecolours"] = base.whitespace_set_ini_value(",".join(base.namecolours))
 
 			if 'Report' in base.config['Reporter'] and len(base.config['Reporter']['Report']) > 0:
 				filename = base.config['Reporter']['Report']
@@ -903,9 +903,9 @@ class ReporterBase():
 
 		if "Colours" in base.report:
 			if "defcolours" in base.report["Colours"]:
-				base.defcolours = base.report["Colours"]["defcolours"].split(",")
+				base.defcolours = base.whitespace_get_ini_value(base.report["Colours"]["defcolours"]).split(",")
 			if "namecolours" in base.report["Colours"]:
-				base.namecolours = base.report["Colours"]["namecolours"].split(",")
+				base.namecolours = base.whitespace_get_ini_value(base.report["Colours"]["namecolours"]).split(",")
 
 	def report_starttime(self):
 		if "starttime" in self.reportdata and self.reportdata["starttime"] > 0:
