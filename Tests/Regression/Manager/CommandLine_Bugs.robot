@@ -24,6 +24,9 @@ Next Day For Scheduled Start Is In the Next Month
 
 	Stop Manager
 
+	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+
 	Should Not Contain 	${stdout_manager} 	RuntimeError
 	Should Not Contain 	${stderr_manager} 	RuntimeError
 	Should Not Contain 	${stdout_manager} 	ValueError
