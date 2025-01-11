@@ -20,13 +20,13 @@ Next Day For Scheduled Start Is In the Next Month
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
 	Log To Console	Current time: ${current_time}
 	${future_time}=	Subtract Time From Date 	${current_time} 	120 	date_format=%H:%M:%S 	result_format=%H:%M:%S
-	VAR 	@{mngr_options} 	-g 	3 	-n 	-d 	${results_dir} 	-t 	${future_time}
+	VAR 	@{mngr_options} 	-g 	3 	-n 	-d 	${results_dir} 	-t 	${future_time}  -a  0
 	Run Manager CLI 	${mngr_options}
 	Sleep 	10s
 
-	Wait Until Keyword Succeeds 	5x 	1s 	Resync Date With Time Server 	${test_date}
-
 	Stop Manager
+
+	Wait Until Keyword Succeeds 	5x 	1s 	Resync Date With Time Server 	${test_date}
 
 	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
