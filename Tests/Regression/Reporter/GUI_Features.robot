@@ -87,7 +87,7 @@ Whole report time range
 	# check the graph as expected
 	# Take A Screenshot
 	Set Confidence		0.7
-	IF ${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
+	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
 		Locate 	reporter_${platform}_graph_robots1_py3.9.png
 	ELSE
 		Locate 	reporter_${platform}_graph_robots1.png
@@ -808,7 +808,7 @@ Verify Plan Graph - No Total
 	${pvinfo}= 	Get Python Version Info
 
 	Set Confidence		0.7
-	IF ${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
+	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
 		Locate 	reporter_${platform}_graph_plannototal_py3.9.png
 	ELSE
 		Locate 	reporter_${platform}_graph_plannototal.png
@@ -883,7 +883,7 @@ Verify Plan Graph - With Total
 	${pvinfo}= 	Get Python Version Info
 
 	Set Confidence		0.7
-	IF ${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
+	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
 		Locate 	reporter_${platform}_graph_plantotal_py3.9.png
 	ELSE
 		Locate 	reporter_${platform}_graph_plantotal.png
