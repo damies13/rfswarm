@@ -17,7 +17,10 @@ Next Day For Scheduled Start Is In the Next Month
 	VAR 	${test_date} 	2024-12-31
 	Wait Until Keyword Succeeds 	5x 	100ms 	Set Date Manually 	${test_date}
 
-	@{mngr_options}= 	Create List 	-g 	3 	-n 	-d 	${results_dir}
+	${current_time}=	Get Current Date	result_format=%H:%M:%S
+	Log To Console	Current time: ${current_time}
+	${future_time}=	Subtract Time From Date 	${current_time} 	120 	date_format=%H:%M:%S 	result_format=%H:%M:%S
+	VAR 	@{mngr_options} 	-g 	3 	-n 	-d 	${results_dir} 	-t 	${future_time}
 	Run Manager CLI 	${mngr_options}
 
 	Wait Until Keyword Succeeds 	5x 	1s 	Resync Date With Time Server 	${test_date}
