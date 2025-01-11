@@ -439,6 +439,10 @@ End Process If Still Running
 		Fail 	Had to Terminate Process
 	END
 
+Get Python Version Info
+	${vinfo}= 	Evaluate    sys.version_info 	modules=sys
+	return ${vinfo}
+
 Get Image Size
 	[Arguments] 	${imgfile}
 	# ahrrrg windows paths, PIL.Image.open doesn't like them, need to escape / replace \\
@@ -1028,7 +1032,7 @@ Verify XLSX Report Table Content
 	IF  ${custom} == ${True}
 		VAR 	${section} 	${section} XLSX
 	END
-	
+
 	@{section_table}= 	Read Xlsx Text Data From Sheet 	${xlsx_file} 	${xlsx_sheet} 	${start_at} 	${stop_at}
 	Log 	${section} table content: ${section_table}
 	VAR 	${st_length_expected} 	${${section}.length}
@@ -1077,7 +1081,7 @@ Verify XLSX Report Error Details Content
 	IF  ${custom} == ${True}
 		VAR 	${section} 	${section} XLSX
 	END
-	
+
 	@{section_table}= 	Read Xlsx Text Data From Sheet 	${xlsx_file} 	${xlsx_sheet} 	${start_at} 	${stop_at}
 	Log 	${section} table content: ${section_table}
 	VAR 	${st_length_expected} 	${${section}.length}
@@ -1214,7 +1218,7 @@ Verify DOCX Report Table Content
 	IF  ${custom} == ${True}
 		VAR 	${section} 	${section} DOCX
 	END
-	
+
 	Log 	${section} table content: ${section_table}
 	VAR 	${st_length_expected} 	${${section}.length}
 	@{st_header_expected} 	Convert To List 	${${section}.header}
@@ -1260,7 +1264,7 @@ Verify DOCX Report Error Details Content
 	IF  ${custom} == ${True}
 		VAR 	${section} 	${section} DOCX
 	END
-	
+
 	@{section_table}= 	Convert To List 	${docx_data}[${section}][table]
 	Log 	${section} table content: ${section_table}
 	VAR 	${st_length_expected} 	${${section}.length}

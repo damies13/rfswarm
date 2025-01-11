@@ -82,10 +82,16 @@ Whole report time range
 	Click Tab 	 Preview
 	# Take A Screenshot
 
+	${pvinfo}= 	Get Python Version Info
+
 	# check the graph as expected
 	# Take A Screenshot
 	Set Confidence		0.7
-	Locate 	reporter_${platform}_graph_robots1.png
+	IF ${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
+		Locate 	reporter_${platform}_graph_robots1_py3.9.png
+	ELSE
+		Locate 	reporter_${platform}_graph_robots1.png
+	END
 	Set Confidence		0.9
 
 	Click Tab 	 Settings
@@ -343,7 +349,7 @@ Verify the Content Of the HTML Report
 	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
 	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
 	Verify HTML Report Error Details Content 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path}
-	
+
 	VAR 	${section} 	Error Details No Screenshots
 	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
 	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
@@ -609,55 +615,55 @@ Verify the Content Of the XLSX Report
 	VAR 	${section} 	Data Graph Left Metric
 	${xlsx_sheet} 	Get Xlsx Sheet By Name 	${xlsx_file} 	${section}
 	Should Not Be Equal 	${xlsx_sheet} 	${0} 	msg=Didn't find "${section}" section.
-	Verify XLSX Report Graph 	${xlsx_file} 	${section} 	B3 	${xlsx_sheet} 	
+	Verify XLSX Report Graph 	${xlsx_file} 	${section} 	B3 	${xlsx_sheet}
 	...    ${xlsx_expected_img_path} 	${xlsx_img_path} 	${img_comp_threshold} 	${move_tolerance}
 
 	VAR 	${section} 	Data Graph Left Result
 	${xlsx_sheet} 	Get Xlsx Sheet By Name 	${xlsx_file} 	${section}
 	Should Not Be Equal 	${xlsx_sheet} 	${0} 	msg=Didn't find "${section}" section.
-	Verify XLSX Report Graph 	${xlsx_file} 	${section} 	B3 	${xlsx_sheet} 	
+	Verify XLSX Report Graph 	${xlsx_file} 	${section} 	B3 	${xlsx_sheet}
 	...    ${xlsx_expected_img_path} 	${xlsx_img_path} 	${img_comp_threshold} 	${move_tolerance}
 
 	VAR 	${section} 	Data Graph Left Result FAIL
 	${xlsx_sheet} 	Get Xlsx Sheet By Name 	${xlsx_file} 	${section}
 	Should Not Be Equal 	${xlsx_sheet} 	${0} 	msg=Didn't find "${section}" section.
-	Verify XLSX Report Graph 	${xlsx_file} 	${section} 	B3 	${xlsx_sheet} 	
+	Verify XLSX Report Graph 	${xlsx_file} 	${section} 	B3 	${xlsx_sheet}
 	...    ${xlsx_expected_img_path} 	${xlsx_img_path} 	${img_comp_threshold} 	${move_tolerance}
 
 	VAR 	${section} 	Data Graph Left Result TPS
 	${xlsx_sheet} 	Get Xlsx Sheet By Name 	${xlsx_file} 	${section}
 	Should Not Be Equal 	${xlsx_sheet} 	${0} 	msg=Didn't find "${section}" section.
-	Verify XLSX Report Graph 	${xlsx_file} 	${section} 	B3 	${xlsx_sheet} 	
+	Verify XLSX Report Graph 	${xlsx_file} 	${section} 	B3 	${xlsx_sheet}
 	...    ${xlsx_expected_img_path} 	${xlsx_img_path} 	${img_comp_threshold} 	${move_tolerance}
 
 	VAR 	${section} 	Data Graph Left Result Total TPS
 	${xlsx_sheet} 	Get Xlsx Sheet By Name 	${xlsx_file} 	${section}
 	Should Not Be Equal 	${xlsx_sheet} 	${0} 	msg=Didn't find "${section}" section.
-	Verify XLSX Report Graph 	${xlsx_file} 	${section} 	B3 	${xlsx_sheet} 	
+	Verify XLSX Report Graph 	${xlsx_file} 	${section} 	B3 	${xlsx_sheet}
 	...    ${xlsx_expected_img_path} 	${xlsx_img_path} 	${img_comp_threshold} 	${move_tolerance}
 
 	VAR 	${section} 	Data Graph Right Metric
 	${xlsx_sheet} 	Get Xlsx Sheet By Name 	${xlsx_file} 	${section}
 	Should Not Be Equal 	${xlsx_sheet} 	${0} 	msg=Didn't find "${section}" section.
-	Verify XLSX Report Graph 	${xlsx_file} 	${section} 	B3 	${xlsx_sheet} 	
+	Verify XLSX Report Graph 	${xlsx_file} 	${section} 	B3 	${xlsx_sheet}
 	...    ${xlsx_expected_img_path} 	${xlsx_img_path} 	${img_comp_threshold} 	${move_tolerance}
 
 	VAR 	${section} 	Data Graph Right Result
 	${xlsx_sheet} 	Get Xlsx Sheet By Name 	${xlsx_file} 	${section}
 	Should Not Be Equal 	${xlsx_sheet} 	${0} 	msg=Didn't find "${section}" section.
-	Verify XLSX Report Graph 	${xlsx_file} 	${section} 	B3 	${xlsx_sheet} 	
+	Verify XLSX Report Graph 	${xlsx_file} 	${section} 	B3 	${xlsx_sheet}
 	...    ${xlsx_expected_img_path} 	${xlsx_img_path} 	${img_comp_threshold} 	${move_tolerance}
 
 	VAR 	${section} 	Data Graph LR Combined
 	${xlsx_sheet} 	Get Xlsx Sheet By Name 	${xlsx_file} 	${section}
 	Should Not Be Equal 	${xlsx_sheet} 	${0} 	msg=Didn't find "${section}" section.
-	Verify XLSX Report Graph 	${xlsx_file} 	${section} 	B3 	${xlsx_sheet} 	
+	Verify XLSX Report Graph 	${xlsx_file} 	${section} 	B3 	${xlsx_sheet}
 	...    ${xlsx_expected_img_path} 	${xlsx_img_path} 	${img_comp_threshold} 	${move_tolerance}
 
 	VAR 	${section} 	Data Graph ST ET
 	${xlsx_sheet} 	Get Xlsx Sheet By Name 	${xlsx_file} 	${section}
 	Should Not Be Equal 	${xlsx_sheet} 	${0} 	msg=Didn't find "${section}" section.
-	Verify XLSX Report Graph 	${xlsx_file} 	${section} 	B3 	${xlsx_sheet} 	
+	Verify XLSX Report Graph 	${xlsx_file} 	${section} 	B3 	${xlsx_sheet}
 	...    ${xlsx_expected_img_path} 	${xlsx_img_path} 	${img_comp_threshold} 	${move_tolerance}
 
 
@@ -799,8 +805,14 @@ Verify Plan Graph - No Total
 
 	# Take A Screenshot
 
+	${pvinfo}= 	Get Python Version Info
+
 	Set Confidence		0.7
-	Locate 	reporter_${platform}_graph_plannototal.png
+	IF ${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
+		Locate 	reporter_${platform}_graph_plannototal_py3.9.png
+	ELSE
+		Locate 	reporter_${platform}_graph_plannototal.png
+	END
 	Set Confidence		0.9
 
 
@@ -868,8 +880,14 @@ Verify Plan Graph - With Total
 
 	# Take A Screenshot
 
+	${pvinfo}= 	Get Python Version Info
+
 	Set Confidence		0.7
-	Locate 	reporter_${platform}_graph_plantotal.png
+	IF ${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
+		Locate 	reporter_${platform}_graph_plantotal_py3.9.png
+	ELSE
+		Locate 	reporter_${platform}_graph_plantotal.png
+	END
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
