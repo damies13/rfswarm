@@ -145,7 +145,11 @@ Whole report time range
 
 	# check the graph as expected
 	Set Confidence		0.7
-	Locate 	reporter_${platform}_graph_robots2.png
+	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
+		Locate 	reporter_${platform}_graph_robots2_py3.9.png
+	ELSE
+		Locate 	reporter_${platform}_graph_robots2.png
+	END
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
