@@ -22,6 +22,17 @@ Next Day For Scheduled Start Is In the Next Month
 
 	Wait Until Keyword Succeeds 	5x 	1s 	Resync Date With Time Server 	${test_date}
 
+	Stop Manager
+
+	Should Not Contain 	${stdout_manager} 	RuntimeError
+	Should Not Contain 	${stderr_manager} 	RuntimeError
+	Should Not Contain 	${stdout_manager} 	ValueError
+	Should Not Contain 	${stderr_manager} 	ValueError
+	Should Not Contain 	${stdout_manager} 	Traceback
+	Should Not Contain 	${stderr_manager} 	Traceback
+	Should Not Contain 	${stdout_manager} 	Exception
+	Should Not Contain 	${stderr_manager} 	Exception
+
 	[Teardown] 	Stop Manager
 
 Robot files with same name but different folders
