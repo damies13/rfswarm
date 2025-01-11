@@ -901,8 +901,11 @@ class ReporterBase():
 			base.debugmsg(7, "report_save")
 			base.report_save()
 
-		base.defcolours = base.report["Colours"]["defcolours"].split(",")
-		base.namecolours = base.report["Colours"]["namecolours"].split(",")
+		if "Colours" in base.report:
+			if "defcolours" in base.report["Colours"]:
+				base.defcolours = base.report["Colours"]["defcolours"].split(",")
+			if "namecolours" in base.report["Colours"]:
+				base.namecolours = base.report["Colours"]["namecolours"].split(",")
 
 	def report_starttime(self):
 		if "starttime" in self.reportdata and self.reportdata["starttime"] > 0:
