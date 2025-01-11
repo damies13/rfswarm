@@ -3244,11 +3244,29 @@ class ReporterBase():
 	# Colour Functions
 	#
 
+	def set_named_colour(self, name, incolour):
+		safename = name.lower().replace(",", ";")
+		if safename not in base.namecolours:
+			base.namecolours.append(safename)
+		self.set_line_colour(base.namecolours.index(safename), incolour)
+
 	def named_colour(self, name):
 		safename = name.lower().replace(",", ";")
 		if safename not in base.namecolours:
 			base.namecolours.append(safename)
 		return self.line_colour(base.namecolours.index(safename))
+
+	def set_line_colour(self, grp, incolour):
+		if grp < len(base.defcolours):
+			base.defcolours[grp] = incolour
+		else:
+			while grp < len(base.defcolours):
+				base.debugmsg(9, base.defcolours)
+				newcolour = self.get_colour()
+				base.debugmsg(9, "newcolour:", newcolour)
+				base.defcolours.append(newcolour)
+			base.defcolours[grp] = incolour
+			base.report_save()
 
 	def line_colour(self, grp):
 		if grp < len(base.defcolours):
