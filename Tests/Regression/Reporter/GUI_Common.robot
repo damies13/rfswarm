@@ -441,7 +441,7 @@ End Process If Still Running
 
 Get Python Version Info
 	${vinfo}= 	Evaluate    sys.version_info 	modules=sys
-	return ${vinfo}
+	RETURN		${vinfo}
 
 Get Image Size
 	[Arguments] 	${imgfile}
