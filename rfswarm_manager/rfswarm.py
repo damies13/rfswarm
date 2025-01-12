@@ -40,7 +40,7 @@ import tkinter.messagebox as tkm  # python3
 import tkinter.ttk as ttk  # python3
 import urllib.parse
 import webbrowser
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from operator import itemgetter
 from typing import Any
