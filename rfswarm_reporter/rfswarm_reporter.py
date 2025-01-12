@@ -10952,7 +10952,8 @@ class ReporterGUI(tk.Frame):
 					if colours:
 						colnum += 1
 						cellname = "{}_{}".format(i, "colour")
-						self.contentdata[id][cellname] = tk.Button(self.contentdata[id]["Preview"], text="  ")
+						self.contentdata[id][cellname] = tk.Label(self.contentdata[id]["Preview"], text="  ")
+						# self.contentdata[id][cellname] = tk.Button(self.contentdata[id]["Preview"], text=" ")
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 						base.debugmsg(9, "row:", row)
@@ -10963,9 +10964,11 @@ class ReporterGUI(tk.Frame):
 						base.debugmsg(9, "label:", label)
 						colour = base.named_colour(label)
 						base.debugmsg(9, "colour:", colour)
-						self.contentdata[id][cellname].config(background=colour, activebackground=colour)
+						self.contentdata[id][cellname].config(bg=colour)
+						# self.contentdata[id][cellname].config(background=colour, activebackground=colour)
 
-						self.contentdata[id][cellname].config(command= lambda a=id, b=cellname, c=label: self.cp_select_hcolour(a, b, c))
+						# self.contentdata[id][cellname].config(command= lambda a=id, b=cellname, c=label: self.cp_select_hcolour(a, b, c))
+						self.contentdata[id][cellname].bind("<Button-1>", lambda a=id, b=cellname, c=label: self.cp_select_hcolour(a, b, c))
 
 					for col in cols:
 						if col not in ["Colour"]:
