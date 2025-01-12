@@ -120,17 +120,25 @@ Check Agent Is Running
 	Should Be True 	${result}
 
 Stop Manager
-	${result}= 	Terminate Process		${process_manager}
-	# Should Be Equal As Integers 	${result.rc} 	0
+	${running}= 	Is Process Running 	${process_manager}
+	IF 	${running}
+		Sleep	3s
+		IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
+			${result} = 	Terminate Process		${process_manager}
+		ELSE
+			Send Signal To Process 	SIGINT 	${process_manager}
+			${result}= 	Wait For Process 	${process_manager}	timeout=30	on_timeout=kill
+		END
 
-	Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_manager.txt
-	Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_manager.txt
+		Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_manager.txt
+		Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_manager.txt
 
-	Log to console 	Terminate Manager Process returned: ${result.rc} 	console=True
-	Log 	stdout_path: ${result.stdout_path} 	console=True
-	Log 	stdout: ${result.stdout} 	console=True
-	Log 	stderr_path: ${result.stderr_path} 	console=True
-	Log 	stderr: ${result.stderr} 	console=True
+		Log to console 	Terminate Manager Process returned: ${result.rc} 	console=True
+		Log 	stdout_path: ${result.stdout_path} 	console=True
+		Log 	stdout: ${result.stdout} 	console=True
+		Log 	stderr_path: ${result.stderr_path} 	console=True
+		Log 	stderr: ${result.stderr} 	console=True
+	END
 
 Stop Agent
 	${result}= 	Terminate Process		${process_agent}

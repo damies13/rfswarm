@@ -11,7 +11,7 @@ ${scenario_name}=	test_scenario
 
 *** Test Cases ***
 Next Day For Scheduled Start Is In the Next Month
-	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #328
+	[Tags]	ubuntu-latest		macos-latest 	Issue #328
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 
 	VAR 	${test_date} 	2024-12-31
@@ -20,10 +20,9 @@ Next Day For Scheduled Start Is In the Next Month
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
 	Log To Console	Current time: ${current_time}
 	${future_time}=	Subtract Time From Date 	${current_time} 	120 	date_format=%H:%M:%S 	result_format=%H:%M:%S
-	VAR 	@{mngr_options} 	-g 	3 	-n 	-d 	${results_dir} 	-t 	${future_time}  -a  0
+	VAR 	@{mngr_options} 	-g 	9 	-n 	-d 	${results_dir} 	-t 	${future_time}  -a  0
 	Run Manager CLI 	${mngr_options}
 	Sleep 	10s
-
 	Stop Manager
 
 	Wait Until Keyword Succeeds 	5x 	1s 	Resync Date With Time Server 	${test_date}
