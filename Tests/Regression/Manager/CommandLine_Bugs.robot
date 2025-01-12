@@ -19,8 +19,10 @@ Next Day For Scheduled Start Is In the Next Month
 
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
 	Log To Console	Current time: ${current_time}
-	${future_time}=	Subtract Time From Date 	${current_time} 	120 	date_format=%H:%M:%S 	result_format=%H:%M:%S
-	VAR 	@{mngr_options} 	-g 	9 	-n 	-d 	${results_dir} 	-t 	${future_time}  -a  0
+	Sleep 	10
+	# ${future_time}=	Subtract Time From Date 	${current_time} 	120 	date_format=%H:%M:%S 	result_format=%H:%M:%S
+	VAR 	${future_time} 		00:00:00
+	VAR 	@{mngr_options} 	-g 	6 	-n 	-d 	${results_dir} 	-t 	${future_time}  -a  0
 	Run Manager CLI 	${mngr_options}
 	Sleep 	10s
 	Stop Manager
