@@ -7698,7 +7698,12 @@ class ReporterGUI(tk.Frame):
 
 		self.sectionstree.bind("<Button-1>", self.sect_click_sect)
 
-		self.LoadSections("TOP")
+		selected = self.sectionstree.focus()
+		base.debugmsg(5, "selected:", selected)
+		if len(selected) > 0:
+			self.LoadSections(selected)
+		else:
+			self.LoadSections("TOP")
 
 	def LoadSections(self, ParentID):
 		if ParentID == "TOP":
@@ -7823,7 +7828,12 @@ class ReporterGUI(tk.Frame):
 		self.tabs.grid(column=0, row=0, sticky="nsew")
 		self.tabs.select(1)
 		# self.c_preview
-		self.content_load("TOP")
+		selected = self.sectionstree.focus()
+		base.debugmsg(5, "selected:", selected)
+		if len(selected) > 0:
+			self.content_load(selected)
+		else:
+			self.content_load("TOP")
 
 	def content_load(self, id):
 		base.debugmsg(8, "id:", id)
@@ -8352,7 +8362,7 @@ class ReporterGUI(tk.Frame):
 	def cs_select_hcolour(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
 		# https://www.pythontutorial.net/tkinter/tkinter-color-chooser/
-		newcolour = tkac.askcolor(self.style_head_colour, title="Tkinter Color Chooser")
+		newcolour = tkac.askcolor(self.style_head_colour, title="Choose Heading Colour")
 		base.debugmsg(5, "newcolour:", newcolour)
 		newcolourhx = newcolour[-1]
 		base.debugmsg(5, "newcolourhx:", newcolourhx)
@@ -10331,7 +10341,13 @@ class ReporterGUI(tk.Frame):
 			# if "Preview" in self.contentdata[itm]:
 			# 	del self.contentdata[itm]["Preview"]
 			self.contentdata[itm]["Changed"] = 0
-		self.content_preview("TOP")
+
+		selected = self.sectionstree.focus()
+		base.debugmsg(5, "selected:", selected)
+		if len(selected) > 0:
+			self.content_preview(selected)
+		else:
+			self.content_preview("TOP")
 
 	def cp_generate_preview(self, id):
 		base.debugmsg(8, "id:", id)
@@ -10936,8 +10952,7 @@ class ReporterGUI(tk.Frame):
 					if colours:
 						colnum += 1
 						cellname = "{}_{}".format(i, "colour")
-						# self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="  ")
-						self.contentdata[id][cellname] = tk.Label(self.contentdata[id]["Preview"], text="  ")
+						self.contentdata[id][cellname] = tk.Button(self.contentdata[id]["Preview"], text="  ")
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 						base.debugmsg(9, "row:", row)
@@ -10948,8 +10963,9 @@ class ReporterGUI(tk.Frame):
 						base.debugmsg(9, "label:", label)
 						colour = base.named_colour(label)
 						base.debugmsg(9, "colour:", colour)
-						# self.contentdata[id][cellname].config(background=colour)
-						self.contentdata[id][cellname].config(bg=colour)
+						self.contentdata[id][cellname].config(background=colour, activebackground=colour)
+
+						self.contentdata[id][cellname].config(command= lambda a=id, b=cellname, c=label: self.cp_select_hcolour(a, b, c))
 
 					for col in cols:
 						if col not in ["Colour"]:
@@ -10960,6 +10976,21 @@ class ReporterGUI(tk.Frame):
 								base.debugmsg(9, "cellname:", cellname)
 								self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(row[col]), style='Report.TBody.TLabel')
 								self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+	def cp_select_hcolour(self, id, cellname, label, *args):
+		base.debugmsg(5, "args:", args)
+		base.debugmsg(5, "id:", id, " cellname:", cellname, " label:", label)
+		colour = base.named_colour(label)
+		base.debugmsg(5, "colour:", colour)
+
+		newcolour = tkac.askcolor(colour, title=f"Choose Colour for {label}")
+		base.debugmsg(5, "newcolour:", newcolour)
+		newcolourhx = newcolour[-1]
+		base.debugmsg(5, "newcolourhx:", newcolourhx)
+		if newcolourhx is not None:
+			base.set_named_colour(label, newcolourhx)
+			regen = threading.Thread(target=self.cp_regenerate_preview)
+			regen.start()
 
 	def cp_errors(self, id):
 		base.debugmsg(5, "id:", id)
@@ -11414,9 +11445,15 @@ class ReporterGUI(tk.Frame):
 			self.updateTitle()
 			self.updateResults()
 			base.debugmsg(5, "LoadSections")
-			self.LoadSections("TOP")
+			if len(selected) > 0:
+				self.LoadSections(selected)
+			else:
+				self.LoadSections("TOP")
 			base.debugmsg(5, "content_load")
-			self.content_load("TOP")
+			if len(selected) > 0:
+				self.content_load(selected)
+			else:
+				self.content_load("TOP")
 
 	def mnu_template_New(self, _event=None):
 		base.debugmsg(5, "New Report Template")
@@ -11448,9 +11485,18 @@ class ReporterGUI(tk.Frame):
 			base.debugmsg(5, "ConfigureStyle")
 			self.ConfigureStyle()
 			base.debugmsg(5, "LoadSections")
-			self.LoadSections("TOP")
+			selected = self.sectionstree.focus()
+			base.debugmsg(5, "selected:", selected)
+			if len(selected) > 0:
+				self.LoadSections(selected)
+			else:
+				self.LoadSections("TOP")
 			base.debugmsg(5, "content_load")
-			self.content_load("TOP")
+			base.debugmsg(5, "selected:", selected)
+			if len(selected) > 0:
+				self.content_load(selected)
+			else:
+				self.content_load("TOP")
 			base.debugmsg(5, "updateTemplate")
 			self.updateTemplate()
 			# base.debugmsg(5, "cp_regenerate_preview")
