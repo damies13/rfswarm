@@ -550,9 +550,6 @@ Check Icon Install For Ubuntu
 Set Date Manually
 	[Arguments] 	${input_date}
 	IF 	"${platform}" == "macos"
-		# ${result}= 	Run Process 	sudo  date  123100002024
-		# Log 	${result.stdout}
-		# Log 	${result.stderr}
 		${result}= 	Run Process 	sudo  date  -f  '%Y-%m-%d'  '${input_date}'
 		Log 	${result.stdout}
 		Log 	${result.stderr}
@@ -576,21 +573,11 @@ Set Date Manually
 		${result}= 	Run Process 	sudo  timedatectl  set-ntp  false
 		Log 	${result.stdout}
 		Log 	${result.stderr}
-
-		# ${result}= 	Run Process 	sudo  timedatectl  set-time  "12/31/2024"
-		# Log 	${result.stdout}
-		# Log 	${result.stderr}
-
-		# ${result}= 	Run Process 	sudo  timedatectl  set-time  "2024-12-31 00:00:00"
-		# Log 	${result.stdout}
-		# Log 	${result.stderr}
-
 		${input_date_epoch}= 	Convert Date 	${input_date} 	date_format=%Y-%m-%d 	result_format=epoch
 		${input_date_epoch}= 	Convert To Integer 	${input_date_epoch}
 		${result}= 	Run Process 	sudo  date  +%s  -s  @${input_date_epoch}
 		Log 	${result.stdout}
 		Log 	${result.stderr}
-
 		# ${result}= 	Run Process 	sudo  date  -s  ${input_date}  +%Y-%m-%d
 		# Log 	${result.stdout}
 		# Log 	${result.stderr}
