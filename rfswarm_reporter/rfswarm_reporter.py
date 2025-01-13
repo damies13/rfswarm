@@ -7828,12 +7828,12 @@ class ReporterGUI(tk.Frame):
 		self.tabs.grid(column=0, row=0, sticky="nsew")
 		self.tabs.select(1)
 		# self.c_preview
-		selected = self.sectionstree.focus()
-		base.debugmsg(5, "selected:", selected)
-		if len(selected) > 0:
-			self.content_load(selected)
-		else:
-			self.content_load("TOP")
+		# selected = self.sectionstree.focus()
+		# base.debugmsg(5, "selected:", selected)
+		# if len(selected) > 0:
+		# 	self.content_load(selected)
+		# else:
+		self.content_load("TOP")
 
 	def content_load(self, id):
 		base.debugmsg(8, "id:", id)
