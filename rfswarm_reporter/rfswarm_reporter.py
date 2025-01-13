@@ -11448,11 +11448,15 @@ class ReporterGUI(tk.Frame):
 			self.updateTitle()
 			self.updateResults()
 			base.debugmsg(5, "LoadSections")
+			selected = self.sectionstree.focus()
+			base.debugmsg(5, "selected:", selected)
 			if len(selected) > 0:
 				self.LoadSections(selected)
 			else:
 				self.LoadSections("TOP")
 			base.debugmsg(5, "content_load")
+			selected = self.sectionstree.focus()
+			base.debugmsg(5, "selected:", selected)
 			if len(selected) > 0:
 				self.content_load(selected)
 			else:
