@@ -40,7 +40,7 @@ import tkinter.messagebox as tkm  # python3
 import tkinter.ttk as ttk  # python3
 import urllib.parse
 import webbrowser
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from operator import itemgetter
 from typing import Any
@@ -1163,11 +1163,11 @@ class RFSwarmBase:
 			st = datetime(n.year, n.month, n.day, int(tarr[0]), int(tarr[1]), int(tarr[2]))
 
 		if int(st.timestamp()) < int(n.timestamp()):
-			st = datetime(n.year, n.month, n.day + 1, int(tarr[0]))
+			st = datetime(n.year, n.month, n.day, int(tarr[0])) + timedelta(days=1)
 			if len(tarr) == 2:
-				st = datetime(n.year, n.month, n.day + 1, int(tarr[0]), int(tarr[1]))
+				st = datetime(n.year, n.month, n.day, int(tarr[0]), int(tarr[1])) + timedelta(days=1)
 			if len(tarr) == 3:
-				st = datetime(n.year, n.month, n.day + 1, int(tarr[0]), int(tarr[1]), int(tarr[2]))
+				st = datetime(n.year, n.month, n.day, int(tarr[0]), int(tarr[1]), int(tarr[2])) + timedelta(days=1)
 
 		base.debugmsg(8, "st:", st, "	", int(st.timestamp()))
 		return int(st.timestamp())

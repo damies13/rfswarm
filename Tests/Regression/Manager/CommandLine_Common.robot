@@ -2,6 +2,7 @@
 Library 	OperatingSystem
 Library 	Process
 Library 	DatabaseLibrary
+Library		DateTime
 Library 	String
 Library 	Collections
 
@@ -10,8 +11,9 @@ ${cmd_agent} 		rfswarm-agent
 ${cmd_manager} 	rfswarm
 ${pyfile_agent} 		${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py
 ${pyfile_manager} 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
-${process_agent} 		None
-${process_manager} 	None
+${process_agent} 		${None}
+${process_manager} 	${None}
+${platform} 	${None}
 
 # datapath: /home/runner/work/rfswarm/rfswarm/rfswarm_manager/results/PreRun
 # datapath: /opt/hostedtoolcache/Python/3.9.18/x64/lib/python3.9/site-packages/rfswarm_manager/results/PreRun -- let's control the output path rather than leaving it to chance
@@ -118,17 +120,25 @@ Check Agent Is Running
 	Should Be True 	${result}
 
 Stop Manager
-	${result}= 	Terminate Process		${process_manager}
-	# Should Be Equal As Integers 	${result.rc} 	0
+	${running}= 	Is Process Running 	${process_manager}
+	IF 	${running}
+		Sleep	3s
+		IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
+			${result} = 	Terminate Process		${process_manager}
+		ELSE
+			Send Signal To Process 	SIGINT 	${process_manager}
+			${result}= 	Wait For Process 	${process_manager}	timeout=30	on_timeout=kill
+		END
 
-	Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_manager.txt
-	Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_manager.txt
+		Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_manager.txt
+		Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_manager.txt
 
-	Log to console 	Terminate Manager Process returned: ${result.rc} 	console=True
-	Log 	stdout_path: ${result.stdout_path} 	console=True
-	Log 	stdout: ${result.stdout} 	console=True
-	Log 	stderr_path: ${result.stderr_path} 	console=True
-	Log 	stderr: ${result.stderr} 	console=True
+		Log to console 	Terminate Manager Process returned: ${result.rc} 	console=True
+		Log 	stdout_path: ${result.stdout_path} 	console=True
+		Log 	stdout: ${result.stdout} 	console=True
+		Log 	stderr_path: ${result.stderr_path} 	console=True
+		Log 	stderr: ${result.stderr} 	console=True
+	END
 
 Stop Agent
 	${result}= 	Terminate Process		${process_agent}
@@ -536,3 +546,86 @@ Check Icon Install For Ubuntu
 	File Should Exist 	${pathprefix}${/}applications${/}${projname}.desktop 		Desktop File not found
 
 	File Should Exist 	${pathprefix}${/}icons${/}hicolor${/}128x128${/}apps${/}${projname}.png 		Icon File not found
+
+Set Date Manually
+	[Arguments] 	${input_date}
+	IF 	"${platform}" == "macos"
+		${result}= 	Run Process 	sudo  date  -f  '%Y-%m-%d'  '${input_date}'
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	date  +%Y-%m-%d
+		Should Be Equal As Strings 	${result.stdout} 	${input_date}
+		Log 	New date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
+	IF 	"${platform}" == "windows"
+		${result}= 	Run Process 	powershell.exe  Set-Date  -Date  (Get-Date '${input_date}' -Format 'yyyy-MM-dd') 	shell=${True}
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	powershell.exe  Get-Date  -Format  'yyyy-MM-dd' 	shell=${True}
+		Should Be Equal As Strings 	${result.stdout} 	${input_date}
+		Log 	New date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
+	IF 	"${platform}" == "ubuntu"
+		${result}= 	Run Process 	sudo  timedatectl  set-ntp  false
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${input_date_epoch}= 	Convert Date 	${input_date} 	date_format=%Y-%m-%d 	result_format=epoch
+		${input_date_epoch}= 	Convert To Integer 	${input_date_epoch}
+		${result}= 	Run Process 	sudo  date  +%s  -s  @${input_date_epoch}
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		# ${result}= 	Run Process 	sudo  date  -s  ${input_date}  +%Y-%m-%d
+		# Log 	${result.stdout}
+		# Log 	${result.stderr}
+
+		${result}= 	Run Process 	date  +%Y-%m-%d
+		Should Be Equal As Strings 	${result.stdout} 	${input_date}
+		Log 	New date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
+
+Resync Date With Time Server
+	[Arguments] 	${old_date}
+	IF 	"${platform}" == "macos"
+		${result}= 	Run Process 	sudo  systemsetup  -setusingnetworktime  on
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	sudo  systemsetup  -setnetworktimeserver  time.apple.com
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	date  +%Y-%m-%d
+		Should Not Be Equal As Strings 	${result.stdout} 	${old_date}
+		Log 	Back to original date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
+	IF 	"${platform}" == "windows"
+		${result}= 	Run Process 	powershell.exe  w32tm  /resync 	shell=${True}
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	powershell.exe  Get-Date  -Format  'yyyy-MM-dd' 	shell=${True}
+		Should Not Be Equal As Strings 	${result.stdout} 	${old_date}
+		Log 	Back to original date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
+	IF 	"${platform}" == "ubuntu"
+		${result}= 	Run Process 	sudo  hwclock  --systohc
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	sudo  timedatectl  set-ntp  true
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	sudo  ntpdate  -u  time.google.com
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	date  +%Y-%m-%d
+		Should Not Be Equal As Strings 	${result.stdout} 	${old_date}
+		Log 	Back to original date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
