@@ -1000,6 +1000,7 @@ Change Line Colour
 
 	Click Tab 	 Preview
 
+	Sleep 	1
 	Take A Screenshot
 
 	[Teardown]	Run Keywords

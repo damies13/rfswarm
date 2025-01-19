@@ -854,6 +854,16 @@ class ReporterBase():
 			base.report = configparser.ConfigParser()
 			base.report.read(filename, encoding="utf8")
 
+			base.debugmsg(7, "base.report: ", base.report)
+			if "Colours" in base.report:
+				base.debugmsg(7, "base.report[Colours]: ", base.report["Colours"])
+				if "defcolours" in base.report["Colours"]:
+					base.defcolours = base.whitespace_get_ini_value(base.report["Colours"]["defcolours"]).split(",")
+					base.debugmsg(7, "base.defcolours: ", base.defcolours)
+				if "namecolours" in base.report["Colours"]:
+					base.namecolours = base.whitespace_get_ini_value(base.report["Colours"]["namecolours"]).split(",")
+					base.debugmsg(7, "base.namecolours: ", base.namecolours)
+
 			base.report_item_set_changed_all("TOP")
 
 		else:
@@ -901,11 +911,15 @@ class ReporterBase():
 			base.debugmsg(7, "report_save")
 			base.report_save()
 
+		base.debugmsg(7, "base.report: ", base.report)
 		if "Colours" in base.report:
+			base.debugmsg(7, "base.report[Colours]: ", base.report["Colours"])
 			if "defcolours" in base.report["Colours"]:
 				base.defcolours = base.whitespace_get_ini_value(base.report["Colours"]["defcolours"]).split(",")
+				base.debugmsg(7, "base.defcolours: ", base.defcolours)
 			if "namecolours" in base.report["Colours"]:
 				base.namecolours = base.whitespace_get_ini_value(base.report["Colours"]["namecolours"]).split(",")
+				base.debugmsg(7, "base.namecolours: ", base.namecolours)
 
 	def report_starttime(self):
 		if "starttime" in self.reportdata and self.reportdata["starttime"] > 0:
