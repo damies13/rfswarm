@@ -989,13 +989,18 @@ Verify Plan Graph - No Total
 
 	Click Section			Report
 
-	Take A Screenshot
+	Wait For Status 	PreviewLoaded
+
+	# Take A Screenshot
 
 	# Scenario Plan
 	Click Section			ScenarioPlan
 
+	Wait For Status 	PreviewLoaded
+
 	Click Tab 	 Preview
 
+	Take A Screenshot
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
