@@ -966,5 +966,42 @@ Verify Plan Table
 	...    Close GUI 		AND
 	...    Remove File 		${resultfile}
 
+Verify Plan Graph - No Total
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #307
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	Make Clipboard Not None
+	${testdata}= 	Set Variable    Issue-#307
+	${resultdata}= 	Set Variable    20230728_130340_Odoo-demo
+	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
+	Should Exist	${basefolder}
+	Log to console 	basefolder: ${basefolder} 	console=True
+	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
+	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
+	${templatefile}= 	Set Variable    ${basefolder}${/}Issue-#307.template
+	Should Exist	${resultfolder}
+	Log 	resultfolder: ${resultfolder} 	console=True
+	Should Not Exist	${resultfile}
+
+	# pass a default ini file with extended height to ensure that default values are used
+	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
+	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
+	Wait For Status 	PreviewLoaded
+
+	Click Section			Report
+
+	Take A Screenshot
+
+	# Scenario Plan
+	Click Section			ScenarioPlan
+
+	Click Tab 	 Preview
+
+
+	[Teardown]	Run Keywords
+	...    Set Confidence 	0.9 	AND
+	...    Close GUI 		AND
+	...    Remove File 		${resultfile}
+
+
 
 #
