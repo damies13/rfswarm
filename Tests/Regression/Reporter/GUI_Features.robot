@@ -966,7 +966,7 @@ Verify Plan Table
 	...    Close GUI 		AND
 	...    Remove File 		${resultfile}
 
-Verify Plan Graph - No Total
+Change Line Colour
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #307
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	Make Clipboard Not None
