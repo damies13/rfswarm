@@ -264,8 +264,6 @@ Get Last Screenshot
 		RETURN 	${files}[-1]
 	END
 
-
-
 Click Button
 	[Arguments]		${bttnname} 		${timeout}=300
 	${bttnnamel}= 	Convert To Lower Case 	${bttnname}
@@ -1305,5 +1303,22 @@ Verify DOCX Report Error Details Content
 	@{upper_mid_row} 			Convert To List 	${section_table}[${rows_numbers}[4]]
 	@{upper_mid_row_expected} 	Convert To List 	${${section}.upper_mid_row}
 	Lists Should Be Equal 	${upper_mid_row_expected} 	${upper_mid_row}	msg=[ Expected != Converted ]
+
+Choose Colour With OS Colour Picker
+	[Documentation]
+	...    Select a colour using the OS's colour picker.
+	...    Colour should be in rrbbgg hex values
+	[Arguments] 	${hex_colour}
+
+Choose Colour With macos Colour Picker
+	Locate 	reporter_${platform}_dlg_aaa.png
+
+Choose Colour With windows Colour Picker
+	Locate 	reporter_${platform}_dlg_aaa.png
+
+Choose Colour With ubuntu Colour Picker
+	Locate 	reporter_${platform}_dlg_aaa.png
+
+
 
 #

@@ -1000,8 +1000,19 @@ Change Line Colour
 
 	Click Tab 	 Preview
 
+	Locate 	reporter_${platform}_graph_plancolourb4.png
+
+	Click Button 		ColourSales
+
 	Sleep 	1
 	Take A Screenshot
+
+	Choose Colour With OS Colour Picker 		aabbcc
+
+
+	Wait For Status 	PreviewLoaded
+
+	Locate 	reporter_${platform}_graph_plancolourafter.png
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
