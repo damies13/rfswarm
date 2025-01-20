@@ -230,7 +230,7 @@ Set Text Value To Right Of
 	IF 	$platform == 'macos'
 		Take A Screenshot
 	ELSE
-		${value2}= 	Get Text Value To Right Of		${label}
+		${value2}= 	Get Text Value To Right Of		${label} 		${offsetx}
 		WHILE 	$value2 != $value 		limit=10
 			${x}= 	Evaluate 	${x}+10
 			${offsetx}= 	Evaluate 	${offsetx}+10
@@ -240,7 +240,7 @@ Set Text Value To Right Of
 			Double Click
 			Type 	${value}
 			# Take A Screenshot
-			${value2}= 	Get Text Value To Right Of		${label}
+			${value2}= 	Get Text Value To Right Of		${label} 		${offsetx}
 		END
 		Should Be Equal As Strings    ${value}    ${value2}
 	END
@@ -1331,10 +1331,10 @@ Choose Colour With macos Colour Picker
 	[Arguments] 	${hex_colour}
 	# @{RGB}= 	Hex to DEC RGB 	${hex_colour}
 
+	Click Button 	Sliders
+
 	# Click Grayscale Slider option menu, then select RGB Slider
 	Select Option 	GrayscaleSlider
-
-	Click Button 	Sliders
 
 
 
@@ -1352,7 +1352,27 @@ Choose Colour With ubuntu Colour Picker
 	[Arguments] 	${hex_colour}
 	@{RGB}= 	Hex to DEC RGB 	${hex_colour}
 
-	Locate 	reporter_${platform}_dlg_aaa.png
+	# Click To The Below Of Image
+
+	# Press Alt+s
+	Press Combination 	Key.Alt 	Key.s
+
+	# Press Home, then press Shift + End
+	Press Combination 	Key.Home
+	Press Combination 	Key.Shift 	Key.End
+
+	# Type #value
+	Type 		#${hex_colour} 		Key.ENTER
+
+	Sleep 	1
+	Take A Screenshot
+	# Press Alt+O
+	Press Combination 	Key.Alt 	Key.o
+
+	Sleep 	1
+	Take A Screenshot
+
+	# Locate 	reporter_${platform}_dlg_aaa.png
 
 
 

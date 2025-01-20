@@ -1,0 +1,317 @@
+[Report]
+order = FA37C90FE25,FB90C2384CE,FB9082D01BC,FA37C90FE2B,FA37C950802,FB90C705569,FB90CD6ECAE
+title = Example RFSwarm Report
+showtlogo = 1
+dateformat = yyyy-mm-dd
+timeformat = HH:MM:SS
+timezone = Australia/Brisbane
+showstarttime = 1
+showendtime = 1
+font = Verdana
+fontsize = 12
+percentile = 90
+startoffset = 0
+endoffset = 0
+tlogo = ../../../../../rfswarm_manager/icons/rfswarm-logo-128.png
+
+[FA37C90FE25]
+name = Information
+parent = TOP
+type = note
+changed = 1737368362.212418
+note = Define your template by adding sections and configuring the section settingsx12Each section can be:x12 -  Note (like this) section, free textx12 -  Heading, usefull for grouping sectionsx12 -  Contents like a table of contents or figuresx12 -  Data Table, with data from test resultsx12 -  Data Graph, for graphical representation of test resultsx12 -  Errors, gather error details and screenshots (if applicable) from robot logsx12x12Each section can also have sub sections as required.x12x12Use the arrows buttons to move sections up and down within the report.x12x12The cover page and overall report settings can be found on the settings pane of the Report item above.x12x12When you have your report how you like it, save it as a report template, so your future test results can use the same report format.x12
+
+[FA37C90FE2B]
+name = Test Result Summary
+parent = TOP
+type = table
+changed = 1737368362.2160408
+colours = 0
+datatype = ResultSummary
+sql = SELECT r.result_name as x91Result Namex93 , round(min(rp.elapsed_time),3) 'Minimum', round(avg(rp.elapsed_time),3) 'Average', round(percentile(rp.elapsed_time, 90),3) '90x37ile', round(max(rp.elapsed_time),3) 'Maximum', round(stdev(rp.elapsed_time),3) 'Std. Dev.', count(rp.result) as 'Pass', count(rf.result) as 'Fail', count(ro.result) as 'Other' FROM Results as r LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == 'PASS' LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == 'FAIL' LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' WHERE r.end_time >= 1690513420 AND r.end_time <= 1690513632 GROUP BY  r.result_name ORDER BY x91Result Namex93
+filteragent = 
+filtertype = None
+col_result_name_show = 1
+col_minimum_show = 0
+col_average_show = 1
+col_90x37ile_show = 1
+col_maximum_show = 1
+col_std_dev_show = 1
+col_pass_show = 1
+col_fail_show = 1
+col_other_show = 0
+
+[FA37C950802]
+name = Robots vs Response Time
+parent = TOP
+type = graph
+changed = 1737368362.2165186
+order = FA37C9CED76,FA37C9DCB93
+
+[FA37C950802L]
+resulttype = Response Time
+changed = 1728738059.779502
+filterresult = None
+filteragent = None
+datatype = Result
+sql = SELECT end_time as 'Time' , elapsed_time as 'Value' , result_name as x91Namex93 FROM Results WHERE x91Namex93 NOT LIKE 'Exception in threadx37' AND end_time >= 1690513420 AND end_time <= 1690513632
+
+[FA37C950802R]
+datatype = Metric
+changed = 1728738059.7891614
+axisen = 1
+metrictype = Scenario
+filteragent = None
+filtertype = None
+sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric as x91Namex93  FROM MetricData WHERE MetricType == 'Scenario' AND SecondaryMetric == 'total_robots' AND MetricTime >= 1690513420 AND MetricTime <= 1690513632 ORDER BY MetricTime
+secondarymetric = total_robots
+
+[FA37C9CED76]
+name = Response Times
+parent = FA37C950802
+type = table
+changed = 1737368362.216575
+colours = 1
+datatype = Result
+resulttype = Response Time
+filterresult = None
+filteragent = None
+sql = SELECT result_name as x91Result Namex93 , round(min(elapsed_time),3) 'Minimum' , round(avg(elapsed_time),3) 'Average' , round(percentile(elapsed_time, 90),3) '90x37ile' , round(max(elapsed_time),3) 'Maximum' , round(stdev(elapsed_time),3) 'Std. Dev.' , count(result) as 'Count' FROM Results WHERE x91Result Namex93 NOT LIKE 'Exception in threadx37' AND end_time >= 1690513420 AND end_time <= 1690513632 GROUP by x91Result Namex93
+
+[FA37C9DCB93]
+name = Robots
+parent = FA37C950802
+type = table
+changed = 1737368362.217059
+colours = 1
+datatype = Metric
+sql = SELECT PrimaryMetric , PrimaryMetric as x91Colourx93  , min(CAST(MetricValue AS NUMERIC)) AS 'Minimum' , round(avg(CAST(MetricValue AS NUMERIC)),3) AS 'Average' , round(percentile(CAST(MetricValue AS NUMERIC), 90),3) AS '90x37ile' , max(CAST(MetricValue AS NUMERIC)) AS 'Maximum' , round(stdev(CAST(MetricValue AS NUMERIC)),3) AS 'Std. Dev.' FROM MetricData WHERE MetricType == 'Scenario' AND SecondaryMetric == 'total_robots' AND MetricTime >= 1690513420 AND MetricTime <= 1690513632 GROUP by PrimaryMetric
+metrictype = Scenario
+filteragent = None
+filtertype = None
+secondarymetric = total_robots
+isnumeric = 1
+showcount = 0
+col_primarymetric_show = 1
+col_minimum_show = 0
+col_average_show = 0
+col_90x37ile_show = 0
+col_maximum_show = 1
+col_std_dev_show = 0
+col_maximum = Robots
+
+[FB9082D01BC]
+name = Scenario Plan
+parent = TOP
+type = graph
+changed = 1737368362.214831
+order = FB9083069E0
+
+[FB9083069E0]
+name = Scenario Detail
+parent = FB9082D01BC
+type = table
+changed = 1737368362.2149243
+colours = 1
+datatype = Plan
+sql = SELECT md1.* , md0.SecondaryMetric as x91Filex93 , fp0.SecondaryMetric as x91FilePathx93 FROM MetricData as md0 LEFT JOIN MetricData as fp0 ON fp0.MetricValue = md0.MetricValue AND fp0.MetricType = 'Scenario' AND fp0.PrimaryMetric like 'Local_Path_x37' LEFT JOIN MetricData as md1 ON md1.SecondaryMetric = md0.MetricValue AND md1.MetricType = 'Scenario' WHERE md0.MetricType = 'Scenario' AND md0.PrimaryMetric like 'Test_x37'
+col_index_show = 1
+col_robots_show = 1
+col_delay_show = 1
+col_ramp_up_show = 1
+col_run_show = 1
+col_script_show = 1
+col_script_opt = File
+col_test_show = 1
+
+[FB9082D01BCL]
+datatype = Plan
+changed = 1728738092.5689259
+sql = SELECT md1.* , md0.SecondaryMetric as x91Filex93 , fp0.SecondaryMetric as x91FilePathx93 FROM MetricData as md0 LEFT JOIN MetricData as fp0 ON fp0.MetricValue = md0.MetricValue AND fp0.MetricType = 'Scenario' AND fp0.PrimaryMetric like 'Local_Path_x37' LEFT JOIN MetricData as md1 ON md1.SecondaryMetric = md0.MetricValue AND md1.MetricType = 'Scenario' WHERE md0.MetricType = 'Scenario' AND md0.PrimaryMetric like 'Test_x37'
+showtotal = 1
+
+[FB9082D01BCR]
+datatype = None
+changed = 1728738088.3645983
+
+[FB90C2384CE]
+name = Contents
+parent = TOP
+type = contents
+changed = 1737368362.2135985
+mode = Table Of Contents
+level = 2
+
+[FB90C705569]
+name = Agents
+parent = TOP
+type = head
+changed = 1737368362.2181463
+order = FB90C728C87,FB90C73DBB6,FB90C8D12E4,FB90C98D7D9
+
+[FB90C728C87]
+name = CPU
+parent = FB90C705569
+type = graph
+changed = 1737368362.2182167
+
+[FB90C73DBB6]
+name = Memory
+parent = FB90C705569
+type = graph
+changed = 1737368362.2188137
+
+[FB90C728C87L]
+metrictype = Agent
+changed = 1728745351.1353724
+filteragent = None
+filtertype = None
+datatype = Metric
+sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric || ' - ' || DataSource as x91Namex93  FROM MetricData WHERE MetricType == 'Agent' AND SecondaryMetric == 'CPU' AND MetricTime >= 1690513420 AND MetricTime <= 1690513632 ORDER BY MetricTime
+secondarymetric = CPU
+enablefilteragent = 1
+
+[FB90C728C87R]
+datatype = Metric
+changed = 1728745351.027923
+axisen = 1
+metrictype = Scenario
+filteragent = None
+filtertype = None
+sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric as x91Namex93  FROM MetricData WHERE MetricType == 'Scenario' AND SecondaryMetric == 'total_robots' AND MetricTime >= 1690513420 AND MetricTime <= 1690513632 ORDER BY MetricTime
+secondarymetric = total_robots
+
+[FB90C73DBB6L]
+metrictype = Agent
+changed = 1728745342.77505
+filteragent = None
+filtertype = None
+datatype = Metric
+sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric || ' - ' || DataSource as x91Namex93  FROM MetricData WHERE MetricType == 'Agent' AND SecondaryMetric == 'MEM' AND MetricTime >= 1690513420 AND MetricTime <= 1690513632 ORDER BY MetricTime
+secondarymetric = MEM
+enablefilteragent = 1
+
+[FB90C73DBB6R]
+datatype = Metric
+changed = 1728745342.6672406
+axisen = 1
+filteragent = None
+filtertype = None
+sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric as x91Namex93  FROM MetricData WHERE MetricType == 'Scenario' AND SecondaryMetric == 'total_robots' AND MetricTime >= 1690513420 AND MetricTime <= 1690513632 ORDER BY MetricTime
+metrictype = Scenario
+secondarymetric = total_robots
+
+[FB90C8D12E4]
+name = Agent Names
+parent = FB90C705569
+type = table
+changed = 1737368362.2194037
+colours = 1
+datatype = Metric
+sql = SELECT PrimaryMetric , DataSource 'Agent' , PrimaryMetric || ' - ' || DataSource as x91Colourx93  , MetricValue FROM MetricData WHERE MetricType == 'Agent' AND SecondaryMetric == 'CPU' AND MetricTime >= 1690513420 AND MetricTime <= 1690513632 GROUP by PrimaryMetric , DataSource
+metrictype = Agent
+filteragent = None
+filtertype = None
+col_primarymetric_show = 0
+col_metrictype_show = 1
+col_secondarymetric_show = 1
+col_metricvalue_show = 0
+enablefilteragent = 1
+secondarymetric = CPU
+col_agent_show = 1
+
+[FB90C98D7D9]
+name = Agent Details
+parent = FB90C705569
+type = table
+changed = 1737368362.2201698
+colours = 0
+datatype = Metric
+sql = SELECT PrimaryMetric , SecondaryMetric , DataSource 'Agent' , MetricValue FROM MetricData WHERE MetricType == 'Agent' AND MetricTime >= 1690513420 AND MetricTime <= 1690513632 GROUP by PrimaryMetric , SecondaryMetric , DataSource
+metrictype = Agent
+filteragent = None
+filtertype = None
+col_primarymetric_show = 1
+col_metrictype_show = 1
+col_secondarymetric_show = 1
+col_metricvalue_show = 1
+enablefilteragent = 1
+col_agent_show = 0
+col_primarymetric = Agent Name
+col_secondarymetric = Metric Name
+col_metricvalue = Metric Value
+
+[FB90C98D7D9L]
+metrictype = Agent
+changed = 1728745484.330808
+filteragent = None
+filtertype = None
+datatype = Metric
+sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric || ' - ' || SecondaryMetric as x91Namex93  FROM MetricData WHERE MetricType == 'Agent' AND MetricTime >= 1690513420 AND MetricTime <= 1690513632 ORDER BY MetricTime
+
+[FB90C98D7D9R]
+datatype = None
+changed = 1728745484.3325863
+
+[FB90CD6ECAE]
+name = Errors
+parent = TOP
+type = head
+changed = 1737368362.2213008
+order = FB90CDCCFC9,FB90CE7DEFC,FB90CF6D82F
+
+[FB90CDCCFC9]
+name = Failed Keywords Graph
+parent = FB90CD6ECAE
+type = graph
+changed = 1737368362.2213411
+
+[FB90CDCCFC9L]
+resulttype = TPS
+changed = 1728746053.26743
+filterresult = Fail
+filteragent = None
+datatype = Result
+sql = SELECT floor(end_time) as 'Time' , count(result) as 'Value' , result_name as x91Namex93 FROM Results WHERE result == 'FAIL' AND x91Namex93 NOT LIKE 'Exception in threadx37' AND end_time >= 1690513420 AND end_time <= 1690513632 GROUP by floor(end_time) , result_name , result ORDER by floor(end_time), result DESC, count(result) DESC
+enablefilterresult = 1
+
+[FB90CDCCFC9R]
+datatype = Metric
+changed = 1728746053.2828546
+axisen = 1
+metrictype = Scenario
+filteragent = None
+filtertype = None
+sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric as x91Namex93  FROM MetricData WHERE MetricType == 'Scenario' AND SecondaryMetric == 'total_robots' AND MetricTime >= 1690513420 AND MetricTime <= 1690513632 ORDER BY MetricTime
+secondarymetric = total_robots
+
+[FB90CE7DEFC]
+name = Failed Keywords Names
+parent = FB90CD6ECAE
+type = table
+changed = 1737368362.2218297
+colours = 1
+datatype = Result
+resulttype = TPS
+filterresult = Fail
+filteragent = None
+sql = SELECT result_name as x91Result Namex93 , result 'Result' , count(result)  as 'Count' FROM Results WHERE result == 'FAIL' AND x91Result Namex93 NOT LIKE 'Exception in threadx37' AND end_time >= 1690513420 AND end_time <= 1690513632 GROUP by x91Result Namex93 , result ORDER BY result DESC, count(result) DESC
+enablefilterresult = 1
+col_result_name_show = 1
+col_result_show = 1
+col_count_show = 1
+
+[FB90CF6D82F]
+name = Error Details
+parent = FB90CD6ECAE
+type = errors
+changed = 1737368362.2224178
+images = 1
+grouprn = 1
+groupet = 1
+sql = SELECT r.script_index || '_' || r.robot || '_' || r.iteration || '_' || r.sequence 'id' , r.result_name , r.script_index , r.robot , r.iteration , r.sequence , mt.SecondaryMetric 'script' , mt.MetricValue 'test_name' FROM Results r LEFT JOIN MetricData mt on mt.PrimaryMetric = r.script_index AND mt.MetricType = 'Scenario_Test' WHERE r.result = 'FAIL' AND r.end_time >= 1690513420 AND r.end_time <= 1690513632 ORDER BY x91idx93 ASC
+
+[Colours]
+defcolours = x35000000,x35008450,x35B81D13,x35EFB700,x35888888,x35aa4c4f,x3552e77c,x359038cc,x35dd1162,x35b7a7c1,x35f55050,x35429b0f,x35234cff,x357e5949,x35e8722f,x355bd6a5,x3561445d,x35f4b1b3,x357bd51d,x358a8993,x3587c863,x35a0ee96,x358c8273,x3526f0f6,x354526ab,x35e1c25a,x3514c788,x35d3ed41,x35f5bd4a,x35410f3d,x351d00b6,x35ef2bd4,x35ec6e7c,x35f588bb,x35dd86db,x35a7ed66,x3552f96c,x3590a95a,x3543d7b7,x350f3e84
+namecolours = total,pass,fail,warning,not run,odoo sales /home/dave/documents/tmp/odoo_demo/odoo.robot,odoo deliveries /home/dave/documents/tmp/odoo_demo/odoo.robot,open odoo login screen,odoo login,odoo open module,odoo create sale,:example: 'john doe',odoo sale add product,odoo confirm sale,sets the implicit wait value used by selenium.,opening browser 'chrome' to base url 'https://192.168.13.58'.,waits until the element ``locator`` is visible.,typing text 'wh001@example.com' into text field '//inputx91@name="login"x93'.,typing text 'user123' into text field '//inputx91@name="password"x93'.,clicking element '//buttonx91@class="btn btn-primary btn-block"x93'.,waits until ``text`` appears on the current page.,clicking element 'css:li.dropdown'.,clicking link 'inventory'.,returns the text value of the element identified by ``locator``.,clicking button '//divx91@name="stock_picking" and div//spanx91text()='delivery orders'x93x93//button'.,returns the number of elements matching ``locator``.,odoo open delivery orders,clicking element '(//tr/td/spanx91text()='ready'x93)x911x93'.,odoo open delivery order,clicking button 'validate'.,clicking button 'apply'.,odoo validate delivery order,</td></tr><tr><td colspan="3"><a href="selenium-screenshot-1.png"><img src="selenium-screenshot-1.png" width="800px"></a>,clicking link 'inventory overview'.,odoo return to inventory,</td></tr><tr><td colspan="3"><a href="selenium-screenshot-2.png"><img src="selenium-screenshot-2.png" width="800px"></a>,closes all open browsers and resets the browser cache.,20230728_130340_odoo-demo,prerun,rfaselenium0 - rfaselenium0
+

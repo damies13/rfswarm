@@ -1007,10 +1007,14 @@ Change Line Colour
 	Sleep 	1
 	Take A Screenshot
 
-	Choose Colour With OS Colour Picker 		0088ff
+	# Original colour : aa4c4f
+	Choose Colour With OS Colour Picker 		0088ff		# Mid blue
+	# Choose Colour With OS Colour Picker 		DA8801 	# Mid orange
 
 
 	Wait For Status 	PreviewLoaded
+
+	Take A Screenshot
 
 	Locate 	reporter_${platform}_graph_plancolourafter.png
 
