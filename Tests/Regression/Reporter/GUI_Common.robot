@@ -1304,18 +1304,35 @@ Verify DOCX Report Error Details Content
 	@{upper_mid_row_expected} 	Convert To List 	${${section}.upper_mid_row}
 	Lists Should Be Equal 	${upper_mid_row_expected} 	${upper_mid_row}	msg=[ Expected != Converted ]
 
+Hex to DEC RGB
+	[Arguments] 	${hex_colour}
+	${HexR} = 	Get Substring 	${hex_colour} 	0 	1
+	${HexG} = 	Get Substring 	${hex_colour} 	1 	3
+	${HexB} = 	Get Substring 	${hex_colour} 	-2
+
+	${DecR}= 	Convert To Integer 	${HexR} 	16
+	${DecB}= 	Convert To Integer 	${HexB} 	16
+	${DecG}= 	Convert To Integer 	${HexG} 	16
+
+	${dec_rgb}= 	Create List 	${DecR} 	${DecG} 	${DecB}
+
+	RETURN 		${dec_rgb}
+
 Choose Colour With OS Colour Picker
 	[Documentation]
 	...    Select a colour using the OS's colour picker.
 	...    Colour should be in rrbbgg hex values
 	[Arguments] 	${hex_colour}
-
+	Log    Hex Colour: ${hex_colour}
 	Run Keyword 	Choose Colour With ${platform} Colour Picker 		${hex_colour}
-
 
 Choose Colour With macos Colour Picker
 	[Arguments] 	${hex_colour}
-	Locate 	reporter_${platform}_dlg_aaa.png
+	@{RGB}= 	Hex to DEC RGB 	${hex_colour}
+
+	Click Button 	Sliders
+
+
 
 Choose Colour With windows Colour Picker
 	[Arguments] 	${hex_colour}
@@ -1329,20 +1346,10 @@ Choose Colour With windows Colour Picker
 
 Choose Colour With ubuntu Colour Picker
 	[Arguments] 	${hex_colour}
+	@{RGB}= 	Hex to DEC RGB 	${hex_colour}
+
 	Locate 	reporter_${platform}_dlg_aaa.png
 
-Hex to DEC RGB
-	[Arguments] 	${hex_colour}
-	${HexR} = 	Get Substring 	${string} 	0 	1
-	${HexG} = 	Get Substring 	${string} 	1 	3
-	${HexB} = 	Get Substring 	${string} 	-2
 
-	${DecR}= 	Convert To Integer 	${HexR} 	16
-	${DecB}= 	Convert To Integer 	${HexB} 	16
-	${DecG}= 	Convert To Integer 	${HexG} 	16
-
-	${dec_rgb}= 	Create List 	${DecR} 	${DecG} 	${DecB}
-
-	RETURN 		${dec_rgb}
 
 #
