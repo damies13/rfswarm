@@ -1310,15 +1310,39 @@ Choose Colour With OS Colour Picker
 	...    Colour should be in rrbbgg hex values
 	[Arguments] 	${hex_colour}
 
+	Run Keyword 	Choose Colour With ${platform} Colour Picker 		${hex_colour}
+
+
 Choose Colour With macos Colour Picker
+	[Arguments] 	${hex_colour}
 	Locate 	reporter_${platform}_dlg_aaa.png
 
 Choose Colour With windows Colour Picker
-	Locate 	reporter_${platform}_dlg_aaa.png
+	[Arguments] 	${hex_colour}
+	@{RGB}= 	Hex to DEC RGB 	${hex_colour}
+
+	Set Text Value To Right Of 		Red 		${RGB[0]}
+	Set Text Value To Right Of 		Green 	${RGB[2]}
+	Set Text Value To Right Of 		Blue 		${RGB[1]}
+
+	Click Button 	OK
 
 Choose Colour With ubuntu Colour Picker
+	[Arguments] 	${hex_colour}
 	Locate 	reporter_${platform}_dlg_aaa.png
 
+Hex to DEC RGB
+	[Arguments] 	${hex_colour}
+	${HexR} = 	Get Substring 	${string} 	0 	1
+	${HexG} = 	Get Substring 	${string} 	1 	3
+	${HexB} = 	Get Substring 	${string} 	-2
 
+	${DecR}= 	Convert To Integer 	${HexR} 	16
+	${DecB}= 	Convert To Integer 	${HexB} 	16
+	${DecG}= 	Convert To Integer 	${HexG} 	16
+
+	${dec_rgb}= 	Create List 	${DecR} 	${DecG} 	${DecB}
+
+	RETURN 		${dec_rgb}
 
 #
