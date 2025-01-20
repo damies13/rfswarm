@@ -1007,7 +1007,7 @@ Change Line Colour
 	Sleep 	1
 	Take A Screenshot
 
-	Choose Colour With OS Colour Picker 		aabbcc
+	Choose Colour With OS Colour Picker 		0088ff
 
 
 	Wait For Status 	PreviewLoaded

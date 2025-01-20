@@ -207,6 +207,7 @@ Get Text Value To Right Of
 Set Text Value To Right Of
 	[Arguments]		${label} 	${value} 	${offsetx}=50 	${offsety}=0
 	Log		${offsetx}
+	${value}= 	Convert To String 	${value}
 	${labell}= 	Convert To Lower Case 	${label}
 	${img}= 	Set Variable		reporter_${platform}_label_${labell}.png
 	${imgsize}= 	Get Image Size 	${IMAGE_DIR}${/}${img}
@@ -1306,8 +1307,8 @@ Verify DOCX Report Error Details Content
 
 Hex to DEC RGB
 	[Arguments] 	${hex_colour}
-	${HexR} = 	Get Substring 	${hex_colour} 	0 	1
-	${HexG} = 	Get Substring 	${hex_colour} 	1 	3
+	${HexR} = 	Get Substring 	${hex_colour} 	0 	2
+	${HexG} = 	Get Substring 	${hex_colour} 	2 	4
 	${HexB} = 	Get Substring 	${hex_colour} 	-2
 
 	${DecR}= 	Convert To Integer 	${HexR} 	16
@@ -1328,7 +1329,10 @@ Choose Colour With OS Colour Picker
 
 Choose Colour With macos Colour Picker
 	[Arguments] 	${hex_colour}
-	@{RGB}= 	Hex to DEC RGB 	${hex_colour}
+	# @{RGB}= 	Hex to DEC RGB 	${hex_colour}
+
+	# Click Grayscale Slider option menu, then select RGB Slider
+	Select Option 	GrayscaleSlider
 
 	Click Button 	Sliders
 
@@ -1338,9 +1342,9 @@ Choose Colour With windows Colour Picker
 	[Arguments] 	${hex_colour}
 	@{RGB}= 	Hex to DEC RGB 	${hex_colour}
 
-	Set Text Value To Right Of 		Red 		${RGB[0]}
-	Set Text Value To Right Of 		Green 	${RGB[2]}
-	Set Text Value To Right Of 		Blue 		${RGB[1]}
+	Set Text Value To Right Of 		Red 		${RGB[0]} 	10
+	Set Text Value To Right Of 		Green 	${RGB[2]} 	10
+	Set Text Value To Right Of 		Blue 		${RGB[1]} 	10
 
 	Click Button 	OK
 
