@@ -225,21 +225,27 @@ Set Text Value To Right Of
 	# Triple Click is broken on MacOS: TypeError: not enough arguments for format string
 	# Triple Click 		button=left 	interval=0.0
 	Click
+	Take A Screenshot
 	Double Click
+	Take A Screenshot
 	Type 	${value}
+	Take A Screenshot
 	IF 	$platform == 'macos'
 		Take A Screenshot
 	ELSE
 		${value2}= 	Get Text Value To Right Of		${label} 		${offsetx}
 		WHILE 	$value2 != $value 		limit=10
+			Log 	${value2} != ${value}
 			${x}= 	Evaluate 	${x}+10
 			${offsetx}= 	Evaluate 	${offsetx}+10
 			@{coordinates}= 	Create List 	${x} 	${y}
 			Move To 	${coordinates}
 			Click
+			Take A Screenshot
 			Double Click
+			Take A Screenshot
 			Type 	${value}
-			# Take A Screenshot
+			Take A Screenshot
 			${value2}= 	Get Text Value To Right Of		${label} 		${offsetx}
 		END
 		Should Be Equal As Strings    ${value}    ${value2}
@@ -1312,8 +1318,8 @@ Hex to DEC RGB
 	${HexB} = 	Get Substring 	${hex_colour} 	-2
 
 	${DecR}= 	Convert To Integer 	${HexR} 	16
-	${DecB}= 	Convert To Integer 	${HexB} 	16
 	${DecG}= 	Convert To Integer 	${HexG} 	16
+	${DecB}= 	Convert To Integer 	${HexB} 	16
 
 	${dec_rgb}= 	Create List 	${DecR} 	${DecG} 	${DecB}
 
@@ -1335,7 +1341,7 @@ Choose Colour With macos Colour Picker
 
 	# Click Grayscale Slider option menu, then select RGB Slider
 	Select Option 	GrayscaleSlider
-
+	Select Option 	RGBSlider
 
 
 Choose Colour With windows Colour Picker
@@ -1350,7 +1356,7 @@ Choose Colour With windows Colour Picker
 
 Choose Colour With ubuntu Colour Picker
 	[Arguments] 	${hex_colour}
-	@{RGB}= 	Hex to DEC RGB 	${hex_colour}
+	# @{RGB}= 	Hex to DEC RGB 	${hex_colour}
 
 	# Click To The Below Of Image
 
@@ -1361,8 +1367,21 @@ Choose Colour With ubuntu Colour Picker
 	Press Combination 	Key.Home
 	Press Combination 	Key.Shift 	Key.End
 
+	Sleep 	1
+	Take A Screenshot
+
+	Press Combination 	Key.Delete
+
+	Sleep 	1
+	Take A Screenshot
 	# Type #value
-	Type 		#${hex_colour} 		Key.ENTER
+	Log 		#${hex_colour}
+	Type 		#${hex_colour}
+
+	Sleep 	1
+	Take A Screenshot
+
+	Press Combination 	Key.ENTER
 
 	Sleep 	1
 	Take A Screenshot
