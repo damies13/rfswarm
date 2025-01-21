@@ -1343,10 +1343,20 @@ Choose Colour With macos Colour Picker
 	Select Option 	GrayscaleSlider
 	Select Option 	RGBSlider
 
+	Set Text Value To Right Of 		HexColor 		${hex_colour} 	10
+
 
 Choose Colour With windows Colour Picker
 	[Arguments] 	${hex_colour}
 	@{RGB}= 	Hex to DEC RGB 	${hex_colour}
+
+	Press Combination 	Key.Alt 	Key.r
+	Sleep 	1
+	Take A Screenshot
+
+	Type 		${RGB[0]}
+	Sleep 	1
+	Take A Screenshot
 
 	Set Text Value To Right Of 		Red 		${RGB[0]} 	10
 	Set Text Value To Right Of 		Green 	${RGB[2]} 	10
@@ -1375,8 +1385,8 @@ Choose Colour With ubuntu Colour Picker
 	Sleep 	1
 	Take A Screenshot
 	# Type #value
-	Log 		#${hex_colour}
-	Type 		#${hex_colour}
+	Log 		\#${hex_colour}
+	Type 		\#${hex_colour}
 
 	Sleep 	1
 	Take A Screenshot
