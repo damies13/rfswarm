@@ -1358,12 +1358,13 @@ Choose Colour With macos Colour Picker
 	Take A Screenshot
 
 	# Press Combination 	Key.ENTER
-	Press Combination 	Key.TAB
+	# Press Combination 	Key.TAB
+	Press Combination 	Key.Shift 	Key.TAB
 
 	# Sleep 	1
 	Take A Screenshot
 
-	Click Button 	OK
+	Click Button 	OK2
 	#
 	# Sleep 	1
 	Take A Screenshot
