@@ -232,6 +232,14 @@ Set Text Value To Right Of
 	Take A Screenshot
 	IF 	$platform == 'macos'
 		Take A Screenshot
+
+		Press Combination 	Key.Home
+		Press Combination 	Key.Shift 	Key.End
+
+		Take A Screenshot
+		Type 	${value}
+		Take A Screenshot
+
 	ELSE
 		${value2}= 	Get Text Value To Right Of		${label} 		${offsetx}
 		WHILE 	$value2 != $value 		limit=10
@@ -1353,26 +1361,30 @@ Choose Colour With macos Colour Picker
 	Sleep 	1
 	Take A Screenshot
 
-	Click Button 	OK
-
-	Sleep 	1
-	Take A Screenshot
+	# Click Button 	OK
+	#
+	# Sleep 	1
+	# Take A Screenshot
 
 Choose Colour With windows Colour Picker
 	[Arguments] 	${hex_colour}
 	@{RGB}= 	Hex to DEC RGB 	${hex_colour}
 
+	${CRed}= 	Convert To String 	${RGB[0]}
+	${CGreen}= 	Convert To String 	${RGB[1]}
+	${CBlue}= 	Convert To String 	${RGB[2]}
+
 	# Red
 	Press Combination 	Key.Alt 	Key.r
-	Type 		${RGB[0]}
+	Type 		${CRed}
 
 	# Green
 	Press Combination 	Key.Alt 	Key.g
-	Type 		${RGB[1]}
+	Type 		${CGreen}
 
 	# Blue
 	Press Combination 	Key.Alt 	Key.u
-	Type 		${RGB[2]}
+	Type 		${CBlue}
 
 	# Set Text Value To Right Of 		Red 		${RGB[0]} 	10
 	# Set Text Value To Right Of 		Green 	${RGB[2]} 	10
@@ -1399,29 +1411,29 @@ Choose Colour With ubuntu Colour Picker
 	Press Combination 	Key.Home
 	Press Combination 	Key.Shift 	Key.End
 
-	Sleep 	1
-	Take A Screenshot
+	# Sleep 	1
+	# Take A Screenshot
 
 	Press Combination 	Key.Delete
 
-	Sleep 	1
-	Take A Screenshot
+	# Sleep 	1
+	# Take A Screenshot
 	# Type #value
 	Log 		\#${hex_colour}
 	Type 		\#${hex_colour}
 
-	Sleep 	1
-	Take A Screenshot
+	# Sleep 	1
+	# Take A Screenshot
 
 	Press Combination 	Key.ENTER
 
-	Sleep 	1
-	Take A Screenshot
+	# Sleep 	1
+	# Take A Screenshot
 	# Press Alt+O
 	Press Combination 	Key.Alt 	Key.o
 
-	Sleep 	1
-	Take A Screenshot
+	# Sleep 	1
+	# Take A Screenshot
 
 	# Locate 	reporter_${platform}_dlg_aaa.png
 
