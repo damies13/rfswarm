@@ -233,11 +233,12 @@ Set Text Value To Right Of
 	IF 	$platform == 'macos'
 		Take A Screenshot
 
-		Press Combination 	Key.Home
+		# Press Combination 	Key.Home
 		Press Combination 	Key.Shift 	Key.End
 
 		Take A Screenshot
-		Type 	${value}
+		# Type 	${value}
+		Press Combination 	Key.Delete
 		Take A Screenshot
 
 	ELSE
@@ -1390,12 +1391,13 @@ Choose Colour With windows Colour Picker
 	# Set Text Value To Right Of 		Green 	${RGB[2]} 	10
 	# Set Text Value To Right Of 		Blue 		${RGB[1]} 	10
 
-	Sleep 	1
+	# Sleep 	1
 	Take A Screenshot
 
-	Click Button 	OK
+	Press Combination 	Key.ENTER
+	# Click Button 	OK
 
-	Sleep 	1
+	# Sleep 	1
 	Take A Screenshot
 
 Choose Colour With ubuntu Colour Picker
