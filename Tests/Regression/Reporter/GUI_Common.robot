@@ -1345,24 +1345,46 @@ Choose Colour With macos Colour Picker
 
 	Set Text Value To Right Of 		HexColor 		${hex_colour} 	10
 
+	Sleep 	1
+	Take A Screenshot
+
+	Press Combination 	Key.ENTER
+
+	Sleep 	1
+	Take A Screenshot
+
+	Click Button 	OK
+
+	Sleep 	1
+	Take A Screenshot
 
 Choose Colour With windows Colour Picker
 	[Arguments] 	${hex_colour}
 	@{RGB}= 	Hex to DEC RGB 	${hex_colour}
 
+	# Red
 	Press Combination 	Key.Alt 	Key.r
-	Sleep 	1
-	Take A Screenshot
-
 	Type 		${RGB[0]}
+
+	# Green
+	Press Combination 	Key.Alt 	Key.g
+	Type 		${RGB[1]}
+
+	# Blue
+	Press Combination 	Key.Alt 	Key.u
+	Type 		${RGB[2]}
+
+	# Set Text Value To Right Of 		Red 		${RGB[0]} 	10
+	# Set Text Value To Right Of 		Green 	${RGB[2]} 	10
+	# Set Text Value To Right Of 		Blue 		${RGB[1]} 	10
+
 	Sleep 	1
 	Take A Screenshot
-
-	Set Text Value To Right Of 		Red 		${RGB[0]} 	10
-	Set Text Value To Right Of 		Green 	${RGB[2]} 	10
-	Set Text Value To Right Of 		Blue 		${RGB[1]} 	10
 
 	Click Button 	OK
+
+	Sleep 	1
+	Take A Screenshot
 
 Choose Colour With ubuntu Colour Picker
 	[Arguments] 	${hex_colour}
