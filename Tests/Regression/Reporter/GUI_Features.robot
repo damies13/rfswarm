@@ -1004,7 +1004,7 @@ Change Line Colour
 
 	Click Button 		ColourSales
 
-	Sleep 	1
+	# Sleep 	1
 	Take A Screenshot
 
 	# Original colour : aa4c4f

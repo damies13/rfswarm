@@ -231,15 +231,15 @@ Set Text Value To Right Of
 	Type 	${value}
 	Take A Screenshot
 	IF 	$platform == 'macos'
-		Take A Screenshot
+		# Take A Screenshot
 
 		# Press Combination 	Key.Home
 		Press Combination 	Key.Shift 	Key.End
 
-		Take A Screenshot
+		# Take A Screenshot
 		# Type 	${value}
 		Press Combination 	Key.Delete
-		Take A Screenshot
+		# Take A Screenshot
 
 	ELSE
 		${value2}= 	Get Text Value To Right Of		${label} 		${offsetx}
@@ -1355,19 +1355,19 @@ Choose Colour With macos Colour Picker
 	Set Text Value To Right Of 		HexColor 		${hex_colour} 	10
 
 	# Sleep 	1
-	Take A Screenshot
+	# Take A Screenshot
 
 	# Press Combination 	Key.ENTER
 	# Press Combination 	Key.TAB
 	Press Combination 	Key.Shift 	Key.TAB
 
 	# Sleep 	1
-	Take A Screenshot
+	# Take A Screenshot
 
 	Click Button 	OK2
 	#
 	# Sleep 	1
-	Take A Screenshot
+	# Take A Screenshot
 
 Choose Colour With windows Colour Picker
 	[Arguments] 	${hex_colour}
@@ -1394,13 +1394,13 @@ Choose Colour With windows Colour Picker
 	# Set Text Value To Right Of 		Blue 		${RGB[1]} 	10
 
 	# Sleep 	1
-	Take A Screenshot
+	# Take A Screenshot
 
 	Press Combination 	Key.ENTER
 	# Click Button 	OK
 
 	# Sleep 	1
-	Take A Screenshot
+	# Take A Screenshot
 
 Choose Colour With ubuntu Colour Picker
 	[Arguments] 	${hex_colour}
