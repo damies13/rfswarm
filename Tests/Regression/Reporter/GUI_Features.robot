@@ -783,6 +783,7 @@ Verify Plan Graph - No Total
 
 	Click To The Below Of Image 	reporter_${platform}_label_sectionname.png 	20
 	Type 	Issue #140
+	Take A Screenshot
 	Click Button 			OK
 	Take A Screenshot
 	Click Section			Issue#140
@@ -853,8 +854,9 @@ Verify Plan Graph - With Total
 
 	Click To The Below Of Image 	reporter_${platform}_label_sectionname.png 	20
 	Type 	Issue #140
+	Take A Screenshot
 	Click Button 			OK
-	# Take A Screenshot
+	Take A Screenshot
 	Click Section			Issue#140
 
 	Select Field With Label 	Type
@@ -926,8 +928,9 @@ Verify Plan Table
 
 	Click To The Below Of Image 	reporter_${platform}_label_sectionname.png 	20
 	Type 	Issue #141
+	Take A Screenshot
 	Click Button 			OK
-	# Take A Screenshot
+	Take A Screenshot
 	Click Section			Issue#141
 
 	Select Field With Label 	Type
@@ -1017,6 +1020,8 @@ Change Line Colour
 	Take A Screenshot
 
 	Locate 	reporter_${platform}_graph_plancolourafter.png
+	# bring window to foreground so teardown works
+	Click Image 	reporter_${platform}_graph_plancolourafter.png
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
