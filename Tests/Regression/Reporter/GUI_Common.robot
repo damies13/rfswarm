@@ -549,6 +549,8 @@ Navigate to and check Desktop Icon
 
 Navigate to and check Desktop Icon For MacOS
 
+	Release Fn Key
+
 	Take A Screenshot
 
 	# open finder
@@ -1440,6 +1442,17 @@ Choose Colour With ubuntu Colour Picker
 	# Take A Screenshot
 
 	# Locate 	reporter_${platform}_dlg_aaa.png
+
+Release Fn Key
+
+	IF 	$platform == 'macos'
+		# https://github.com/asweigart/pyautogui/issues/796
+		${result}= 		Evaluate 	pyautogui.keyUp('fn') 	modules=pyautogui
+		Log    ${result}
+
+
+
+
 
 
 
