@@ -136,7 +136,7 @@ jobs:
         shell: cmd
         run: for %%f in (rfswarm_reporter-*.whl) do pip install %%f
         working-directory: ./dist
-      - run: pip install -r Tests/Regression/Reporter/pip_requirements.txt
+      - run: pip install -r Tests/Regression/Reporter/pip_requirements_${{ matrix.platform }}.txt
 
       - name: Robot Framework
         id: robottest
