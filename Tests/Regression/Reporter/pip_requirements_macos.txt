@@ -3,6 +3,16 @@ numpy>2; python_version > '3.12' and platform_system == 'Windows'
 PyMuPDF>=1.23.1; python_version > '3.12' and platform_system == 'Windows' # require numpy > 2
 robotframework
 robotframework-doctestlibrary
+
+# 2025-01-29 pyautogui 0.9.53 started failing to send keyboard input on macos around 2025-01-27
+# comparing the pip packages that are different:
+# - imageio-2.36.1 				-> imageio-2.37.0
+imageio==2.36.1
+# - scikit-image-0.25.0		-> scikit-image-0.25.1
+# scikit-image==0.25.0
+# - tzdata-2024.2					-> tzdata-2025.1
+# tzdata==2024.2
+
 # pyscreeze 0.1.29 doesn't seem to work with pyautogui 0.9.53
 # pyscreeze!=0.1.29
 pyscreeze==0.1.28
