@@ -782,6 +782,7 @@ Verify Plan Graph - No Total
 	Click Button 			AddSection
 
 	Click To The Below Of Image 	reporter_${platform}_label_sectionname.png 	20
+	Press Combination 	Key.End
 	Type 	Issue #140
 	Take A Screenshot
 	Click Button 			OK
@@ -853,6 +854,7 @@ Verify Plan Graph - With Total
 	Click Button 			AddSection
 
 	Click To The Below Of Image 	reporter_${platform}_label_sectionname.png 	20
+	Press Combination 	Key.End
 	Type 	Issue #140
 	Take A Screenshot
 	Click Button 			OK
@@ -927,6 +929,7 @@ Verify Plan Table
 	Click Button 			AddSection
 
 	Click To The Below Of Image 	reporter_${platform}_label_sectionname.png 	20
+	Press Combination 	Key.End
 	Type 	Issue #141
 	Take A Screenshot
 	Click Button 			OK
