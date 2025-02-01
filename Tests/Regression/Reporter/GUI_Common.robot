@@ -77,6 +77,18 @@ Click Tab
 	Sleep 	${sssleep}
 	# Take A Screenshot
 
+Create New Section
+	[Arguments]		${sectname}
+	Click To The Below Of Image 	reporter_${platform}_label_sectionname.png 	20
+	Sleep    10
+	Press Combination 	Key.End
+	Sleep    10
+	Type 		${sectname}
+	Take A Screenshot
+	Sleep    10
+	Click Button 			OK
+	Take A Screenshot
+
 Click Section
 	[Arguments]		${sectname}
 	${sectnamel}= 	Convert To Lower Case 	${sectname}

@@ -781,15 +781,8 @@ Verify Plan Graph - No Total
 
 	Click Button 			AddSection
 
-	Click To The Below Of Image 	reporter_${platform}_label_sectionname.png 	20
-	Sleep    10 ms
-	Press Combination 	Key.End
-	Sleep    10 ms
-	Type 	Issue #140
-	Take A Screenshot
-	Sleep    10 ms
-	Click Button 			OK
-	Take A Screenshot
+	Create New Section 		Issue #140
+
 	Click Section			Issue#140
 
 	Select Field With Label 	Type
@@ -856,15 +849,8 @@ Verify Plan Graph - With Total
 
 	Click Button 			AddSection
 
-	Click To The Below Of Image 	reporter_${platform}_label_sectionname.png 	20
-	Sleep    10 ms
-	Press Combination 	Key.End
-	Sleep    10 ms
-	Type 	Issue #140
-	Take A Screenshot
-	Sleep    10 ms
-	Click Button 			OK
-	Take A Screenshot
+	Create New Section 		Issue #140
+
 	Click Section			Issue#140
 
 	Select Field With Label 	Type
@@ -934,15 +920,8 @@ Verify Plan Table
 
 	Click Button 			AddSection
 
-	Click To The Below Of Image 	reporter_${platform}_label_sectionname.png 	20
-	Sleep    10 ms
-	Press Combination 	Key.End
-	Sleep    10 ms
-	Type 	Issue #141
-	Take A Screenshot
-	Sleep    10 ms
-	Click Button 			OK
-	Take A Screenshot
+	Create New Section 		Issue #141
+
 	Click Section			Issue#141
 
 	Select Field With Label 	Type
