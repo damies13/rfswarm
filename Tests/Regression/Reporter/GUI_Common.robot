@@ -86,7 +86,7 @@ Create New Section
 	Click Image		${img}
 	Sleep    2
 	Take A Screenshot
-	Click To The Below Of Image 	${img} 	50
+	Click To The Below Of Image 	${img} 	30
 	Sleep    2
 	Take A Screenshot
 	Press Combination 	Key.End
