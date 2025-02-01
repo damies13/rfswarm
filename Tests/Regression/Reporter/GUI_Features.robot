@@ -779,8 +779,6 @@ Verify Plan Graph - No Total
 
 	Click Section			Report
 
-	Click Button 			AddSection
-
 	Create New Section 		Issue #140
 
 	Click Section			Issue#140
@@ -846,8 +844,6 @@ Verify Plan Graph - With Total
 	Wait For Status 	PreviewLoaded
 
 	Click Section			Report
-
-	Click Button 			AddSection
 
 	Create New Section 		Issue #140
 
@@ -917,8 +913,6 @@ Verify Plan Table
 	Wait For Status 	PreviewLoaded
 
 	Click Section			Report
-
-	Click Button 			AddSection
 
 	Create New Section 		Issue #141
 

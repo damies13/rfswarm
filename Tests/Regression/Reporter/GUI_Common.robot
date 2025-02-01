@@ -80,11 +80,13 @@ Click Tab
 Create New Section
 	[Arguments]		${sectname}
 
+	Click Button 			AddSection
+	Take A Screenshot
 	${img}=	Set Variable		reporter_${platform}_label_sectionname.png
 	Click Image		${img}
 	Sleep    2
 	Take A Screenshot
-	Click To The Below Of Image 	${img} 	20
+	Click To The Below Of Image 	${img} 	50
 	Sleep    2
 	Take A Screenshot
 	Press Combination 	Key.End
