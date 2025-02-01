@@ -3,13 +3,46 @@ Test Tags       Bugs 	CommandLine
 
 Resource 	CommandLine_Common.robot
 
-Suite Setup 		Create Directory 	${results_dir}
+Suite Setup 	Run Keywords 	Create Directory 	${results_dir} 	AND 	Set Platform
 
 *** Variables ***
 @{robot_data}=	example.robot	Example Test Case
 ${scenario_name}=	test_scenario
 
 *** Test Cases ***
+Next Day For Scheduled Start Is In the Next Month
+	[Tags]	ubuntu-latest		macos-latest 	Issue #328
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+
+	VAR 	${test_date} 	2024-12-31
+	Wait Until Keyword Succeeds 	5x 	100ms 	Set Date Manually 	${test_date}
+
+	${current_time}=	Get Current Date	result_format=%H:%M:%S
+	Log To Console	Current time: ${current_time}
+	Sleep 	10
+	# ${future_time}=	Subtract Time From Date 	${current_time} 	120 	date_format=%H:%M:%S 	result_format=%H:%M:%S
+	VAR 	${future_time} 		00:00:00
+	VAR 	@{mngr_options} 	-g 	6 	-n 	-d 	${results_dir} 	-t 	${future_time}  -a  0
+	Run Manager CLI 	${mngr_options}
+	Sleep 	10s
+	Stop Manager
+
+	Wait Until Keyword Succeeds 	5x 	1s 	Resync Date With Time Server 	${test_date}
+
+	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+
+	Should Not Contain 	${stdout_manager} 	RuntimeError
+	Should Not Contain 	${stderr_manager} 	RuntimeError
+	Should Not Contain 	${stdout_manager} 	ValueError
+	Should Not Contain 	${stderr_manager} 	ValueError
+	Should Not Contain 	${stdout_manager} 	Traceback
+	Should Not Contain 	${stderr_manager} 	Traceback
+	Should Not Contain 	${stdout_manager} 	Exception
+	Should Not Contain 	${stderr_manager} 	Exception
+
+	[Teardown] 	Stop Manager
+
 Robot files with same name but different folders
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #184
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
@@ -291,9 +324,6 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 		Fail	msg=Manager did not close!
 	END
 
-	# [Teardown]	Run Keywords
-	# ...    Run Keyword		Close Manager GUI ${platform}
-
 Verify If Manager Runs With No Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
@@ -317,9 +347,6 @@ Verify If Manager Runs With No Existing INI File From Current Version NO GUI
 	Log 	${result.stderr}
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
-
-	# [Teardown]	Run Keywords
-	# ...    Run Keyword		Close Manager GUI ${platform}
 
 Verify If Manager Runs With Existing INI File From Previous Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
@@ -348,6 +375,3 @@ Verify If Manager Runs With Existing INI File From Previous Version NO GUI
 	Log 	${result.stderr}
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
-
-	# [Teardown]	Run Keywords
-	# ...    Run Keyword		Close Manager GUI ${platform}
