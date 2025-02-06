@@ -103,7 +103,10 @@ Create New Section
 		# Type 		${sectname}
 		# Evaluate 		pyautogui.write('${sectname}', interval=0.10)		modules=pyautogui
 		# try keyboard.write('The quick brown fox jumps over the lazy dog.')
-		Evaluate 		keyboard.write('${sectname}') 		modules=keyboard
+		# Evaluate 		keyboard.write('${sectname}') 		modules=keyboard
+		# try pynput.keyboard.Controller
+		Evaluate 		pynput.keyboard.Controller().type('${sectname}') 		modules=pynput.keyboard
+		Sleep    2
 		Take A Screenshot
 		Sleep    2
 		Click Button 			OK
