@@ -83,24 +83,24 @@ Create New Section
 	Click Button 			AddSection
 	Take A Screenshot
 	${img}=	Set Variable		reporter_${platform}_label_sectionname.png
-	Wait For		${img}
+	Wait For		${img} 	 timeout=300
 	Take A Screenshot
-	Type 		${sectname}
-	Sleep    2
-	Take A Screenshot
+	# Type 		${sectname}
+	# Sleep    2
+	# Take A Screenshot
 	Press Combination 	Key.Tab
 	# Click Image		${img}
 	Sleep    2
 	Take A Screenshot
-	# Click To The Below Of Image 	${img} 	20
-	# Sleep    2
-	# Take A Screenshot
-	# Press Combination 	Key.End
-	# Sleep    2
-	# Take A Screenshot
-	# Type 		${sectname}
-	# Take A Screenshot
-	# Sleep    2
+	Click To The Below Of Image 	${img} 	20
+	Sleep    2
+	Take A Screenshot
+	Press Combination 	Key.End
+	Sleep    2
+	Take A Screenshot
+	Type 		${sectname}
+	Take A Screenshot
+	Sleep    2
 	Click Button 			OK
 	Take A Screenshot
 
