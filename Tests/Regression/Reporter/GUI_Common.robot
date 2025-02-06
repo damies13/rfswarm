@@ -98,7 +98,8 @@ Create New Section
 	Press Combination 	Key.End
 	Sleep    2
 	Take A Screenshot
-	Type 		${sectname}
+	# Type 		${sectname}
+	Evaluate 		pyautogui.write('${sectname}', interval=0.10)		modules=pyautogui
 	Take A Screenshot
 	Sleep    2
 	Click Button 			OK
