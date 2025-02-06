@@ -85,25 +85,39 @@ Create New Section
 	${img}=	Set Variable		reporter_${platform}_label_sectionname.png
 	Wait For		${img} 	 timeout=300
 	Take A Screenshot
-	# Type 		${sectname}
-	# Sleep    2
-	# Take A Screenshot
-	Press Combination 	Key.Tab
-	# Click Image		${img}
-	Sleep    2
-	Take A Screenshot
-	Click To The Below Of Image 	${img} 	20
-	Sleep    2
-	Take A Screenshot
-	Press Combination 	Key.End
-	Sleep    2
-	Take A Screenshot
-	# Type 		${sectname}
-	Evaluate 		pyautogui.write('${sectname}', interval=0.10)		modules=pyautogui
-	Take A Screenshot
-	Sleep    2
-	Click Button 			OK
-	Take A Screenshot
+
+	IF 	$platform == 'macos'
+		# Type 		${sectname}
+		# Sleep    2
+		# Take A Screenshot
+		Press Combination 	Key.Tab
+		# Click Image		${img}
+		Sleep    2
+		Take A Screenshot
+		Click To The Below Of Image 	${img} 	20
+		Sleep    2
+		Take A Screenshot
+		Press Combination 	Key.End
+		Sleep    2
+		Take A Screenshot
+		# Type 		${sectname}
+		# Evaluate 		pyautogui.write('${sectname}', interval=0.10)		modules=pyautogui
+		# try keyboard.write('The quick brown fox jumps over the lazy dog.')
+		Evaluate 		keyboard.write('${sectname}') 		modules=keyboard
+		Take A Screenshot
+		Sleep    2
+		Click Button 			OK
+		Take A Screenshot
+	ELSE
+		Click To The Below Of Image 	${img} 	20
+		# Sleep    2
+		# Take A Screenshot
+		Type 		${sectname}
+		Take A Screenshot
+		# Sleep    2
+		Click Button 			OK
+		# Take A Screenshot
+	END
 
 Click Section
 	[Arguments]		${sectname}
