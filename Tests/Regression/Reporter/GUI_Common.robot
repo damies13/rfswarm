@@ -594,7 +594,7 @@ Navigate to and check Desktop Icon
 
 Navigate to and check Desktop Icon For MacOS
 
-	Release Fn Key
+	# Release Fn Key
 
 	Take A Screenshot
 
@@ -620,30 +620,35 @@ Navigate to and check Desktop Icon For MacOS
 
 	# nav to /Applications
 	Press Combination 	KEY.command 	KEY.shift 	KEY.g
+	Take A Screenshot
 	Press Combination 	KEY.backspace		#clear text filed
+	Take A Screenshot
 	# Sleep 	0.3
 	# Take A Screenshot
 	${img}=	Set Variable		${platform}_finder_gotofolder.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Take A Screenshot
 
 	Type 		/Applications
 	# Sleep 	0.3
 	# Take A Screenshot
 	${img}=	Set Variable		${platform}_finder_gotoapplications.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Take A Screenshot
 
 	Press Combination 	KEY.enter
 	# Sleep	0.5
 	# Take A Screenshot
 	${img}=	Set Variable		${platform}_finder_facetime.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Take A Screenshot
 
 	# Filter/Search /Applications?
 	Type 	RFSwarm
 	# Sleep 	0.3
 	${img}=	Set Variable		${platform}_finder_rfswarm_reporter.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
-	# Take A Screenshot
+	Take A Screenshot
 
 	# Open Launchpad (F4?)
 	# Press Combination   key.f4
@@ -654,19 +659,21 @@ Navigate to and check Desktop Icon For MacOS
 	# Sleep 	1
 	${img}=	Set Variable		${platform}_launchpad_search.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
-	# Take A Screenshot
+	Take A Screenshot
 
 	# Search Launchpad
 	Type 	RFSwarm
 	# Sleep 	0.3
-	# Take A Screenshot
+	Take A Screenshot
 
 	# Check for Icon
 	# macos_launchpad_rfswarm_reporter.png
 	${img}=	Set Variable		${platform}_launchpad_rfswarm_reporter.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Take A Screenshot
 
 	Press Combination 	KEY.ESC
+	Take A Screenshot
 
 Navigate to and check Desktop Icon For Windows
 
