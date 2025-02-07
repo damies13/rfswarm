@@ -92,25 +92,23 @@ Create New Section
 		# Take A Screenshot
 		Press Combination 	Key.Tab
 		# Click Image		${img}
-		Sleep    2
-		Take A Screenshot
+		# Sleep    2
+		# Take A Screenshot
 		Click To The Below Of Image 	${img} 	20
-		Sleep    2
-		Take A Screenshot
+		# Sleep    2
+		# Take A Screenshot
 		Press Combination 	Key.End
 		Sleep    2
-		Take A Screenshot
+		# Take A Screenshot
 		# Type 		${sectname}
 		# Evaluate 		pyautogui.write('${sectname}', interval=0.10)		modules=pyautogui
-		# try keyboard.write('The quick brown fox jumps over the lazy dog.')
-		# Evaluate 		keyboard.write('${sectname}') 		modules=keyboard
 		# try pynput.keyboard.Controller
 		Evaluate 		pynput.keyboard.Controller().type('${sectname}') 		modules=pynput.keyboard
-		Sleep    2
-		Take A Screenshot
-		Sleep    2
+		# Sleep    2
+		# Take A Screenshot
+		# Sleep    2
 		Click Button 			OK
-		Take A Screenshot
+		# Take A Screenshot
 	ELSE
 		Click To The Below Of Image 	${img} 	20
 		# Sleep    2
@@ -607,6 +605,8 @@ Navigate to and check Desktop Icon For MacOS
 	${img}=	Set Variable		${platform}_finder_toolbar.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	# Take A Screenshot
+	Sleep 	0.3
+	Take A Screenshot
 
 	# un-maximise finder if maximised
 	${img}=	Set Variable		${platform}_finder.png
@@ -614,14 +614,16 @@ Navigate to and check Desktop Icon For MacOS
 	IF 	not ${passed}
 		Take A Screenshot
 		Press Combination 	KEY.fn 	KEY.f
-		Sleep 	0.3
-		Take A Screenshot
 	END
+	Sleep 	0.3
+	Take A Screenshot
 
 	# nav to /Applications
 	Press Combination 	KEY.command 	KEY.shift 	KEY.g
+	Sleep 	0.3
 	Take A Screenshot
 	Press Combination 	KEY.backspace		#clear text filed
+	Sleep 	0.3
 	Take A Screenshot
 	# Sleep 	0.3
 	# Take A Screenshot
@@ -1502,6 +1504,7 @@ Release Fn Key
 		${result}= 		Evaluate 	pyautogui.keyUp('fn') 	modules=pyautogui
 		Log    ${result}
 
+	END
 
 
 
