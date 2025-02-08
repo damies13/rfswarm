@@ -599,6 +599,8 @@ Navigate to and check Desktop Icon For MacOS
 	# open go menu
 	${img}=	Set Variable		${platform}_finder_menu_go.png
 	Click Image		${img}
+	Sleep 	0.3
+	Take A Screenshot
 
 
 	# # open finder
