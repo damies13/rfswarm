@@ -637,9 +637,9 @@ Navigate to and check Desktop Icon For MacOS
 	# Press Combination 	KEY.command 	KEY.shift 	KEY.g
 	# Sleep 	0.3
 	# Take A Screenshot
-	Press Combination 	KEY.backspace		#clear text filed
-	Sleep 	0.3
-	Take A Screenshot
+	# Press Combination 	KEY.backspace		#clear text filed
+	# Sleep 	0.3
+	# Take A Screenshot
 	# Sleep 	0.3
 	# Take A Screenshot
 	${img}=	Set Variable		${platform}_finder_gotofolder.png
