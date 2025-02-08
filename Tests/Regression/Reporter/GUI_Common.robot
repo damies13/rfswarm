@@ -602,6 +602,12 @@ Navigate to and check Desktop Icon For MacOS
 	Sleep 	0.3
 	Take A Screenshot
 
+	# select Go to Folder from Go menu
+	${img}=	Set Variable		${platform}_finder_menu_gotofolder.png
+	Click Image		${img}
+	Sleep 	0.3
+	Take A Screenshot
+
 
 	# # open finder
 	# ${img}=	Set Variable		${platform}_finder.png
