@@ -647,7 +647,9 @@ Navigate to and check Desktop Icon For MacOS
 	Click Image		${img}
 	Take A Screenshot
 
-	Type 		/Applications
+	# Type 		/Applications
+	Evaluate 		pynput.keyboard.Controller().type('/Applications') 		modules=pynput.keyboard
+
 	# Sleep 	0.3
 	# Take A Screenshot
 	${img}=	Set Variable		${platform}_finder_gotoapplications.png
