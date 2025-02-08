@@ -151,7 +151,7 @@ The note section is used for adding free text sections to your report, some exam
 #### Data Graph Section
 The data graph section is used for displaying graphs of test results and other metrics collected during the test.
 
-**Start Time** - Allows you to constrain this graph's data to a specific time range.
+**Start Time** - Allows you to constrain this graph's data to a Show graph coloursspecific time range.
 
 **End Time** - Allows you to constrain this graph's data to a specific time range.
 
@@ -163,6 +163,8 @@ The data sources for the graphs can be:
 - [Metric](#data-graph-metric)
 - [Result](#data-graph-result)
 - [Custom SQL](#data-graph-sql)
+
+To change the line colour on the graphs refer to the Show graph colours section of [Data Table](#data-table-section)
 
 ##### Data Graph Plan
 The Plan Data Graph allows you to include the graph from the plan tab of the RFSwarm Manager in your test report.
@@ -232,6 +234,8 @@ The data table section is used for displaying tables of test results and other m
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Settings.png)
 
 **Show graph colours** - When enabled will display a colour swatch in the first column of the table that matches the first data column to the matching data value on a related graph, this is useful for creating legend tables.
+
+To control the colours on the table and graphs, click the colour swatch in the data table preview, and use the colour picker to choose your desired colour.
 
 **Start Time** - Allows you to constrain this table's data to a specific time range.
 
