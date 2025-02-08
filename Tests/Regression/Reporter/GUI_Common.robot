@@ -601,11 +601,8 @@ Navigate to and check Desktop Icon For MacOS
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	# Sleep 	0.3
 	${img}=	Set Variable		${platform}_finder_toolbar.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
-	# Take A Screenshot
-	Sleep 	0.3
 	Take A Screenshot
 
 	# un-maximise finder if maximised
@@ -615,6 +612,11 @@ Navigate to and check Desktop Icon For MacOS
 		Take A Screenshot
 		Press Combination 	KEY.fn 	KEY.f
 	END
+	Sleep 	0.3
+	Take A Screenshot
+
+	${img}=	Set Variable		${platform}_finder_toolbar.png
+	Click Image 	${img}
 	Sleep 	0.3
 	Take A Screenshot
 
