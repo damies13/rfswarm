@@ -604,6 +604,7 @@ Navigate to and check Desktop Icon For MacOS
 
 	# select Go to Folder from Go menu
 	${img}=	Set Variable		${platform}_finder_menu_gotofolder.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 	Click Image		${img}
 	# Sleep 	0.3
 	# Take A Screenshot
