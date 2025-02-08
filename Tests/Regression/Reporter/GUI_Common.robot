@@ -644,6 +644,7 @@ Navigate to and check Desktop Icon For MacOS
 	# Take A Screenshot
 	${img}=	Set Variable		${platform}_finder_gotofolder.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Click Image		${img}
 	Take A Screenshot
 
 	Type 		/Applications
