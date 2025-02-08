@@ -599,14 +599,14 @@ Navigate to and check Desktop Icon For MacOS
 	# open go menu
 	${img}=	Set Variable		${platform}_finder_menu_go.png
 	Click Image		${img}
-	Sleep 	0.3
-	Take A Screenshot
+	# Sleep 	0.3
+	# Take A Screenshot
 
 	# select Go to Folder from Go menu
 	${img}=	Set Variable		${platform}_finder_menu_gotofolder.png
 	Click Image		${img}
-	Sleep 	0.3
-	Take A Screenshot
+	# Sleep 	0.3
+	# Take A Screenshot
 
 
 	# # open finder
@@ -645,7 +645,7 @@ Navigate to and check Desktop Icon For MacOS
 	${img}=	Set Variable		${platform}_finder_gotofolder.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	Click Image		${img}
-	Take A Screenshot
+	# Take A Screenshot
 
 	# Type 		/Applications
 	Evaluate 		pynput.keyboard.Controller().type('/Applications') 		modules=pynput.keyboard
@@ -654,14 +654,14 @@ Navigate to and check Desktop Icon For MacOS
 	# Take A Screenshot
 	${img}=	Set Variable		${platform}_finder_gotoapplications.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
-	Take A Screenshot
+	# Take A Screenshot
 
 	Press Combination 	KEY.enter
 	# Sleep	0.5
 	# Take A Screenshot
 	${img}=	Set Variable		${platform}_finder_facetime.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
-	Take A Screenshot
+	# Take A Screenshot
 
 	# Filter/Search /Applications?
 	Type 	RFSwarm
@@ -679,7 +679,7 @@ Navigate to and check Desktop Icon For MacOS
 	# Sleep 	1
 	${img}=	Set Variable		${platform}_launchpad_search.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
-	Take A Screenshot
+	# Take A Screenshot
 
 	# Search Launchpad
 	Type 	RFSwarm
@@ -690,10 +690,10 @@ Navigate to and check Desktop Icon For MacOS
 	# macos_launchpad_rfswarm_reporter.png
 	${img}=	Set Variable		${platform}_launchpad_rfswarm_reporter.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
-	Take A Screenshot
+	# Take A Screenshot
 
 	Press Combination 	KEY.ESC
-	Take A Screenshot
+	# Take A Screenshot
 
 Navigate to and check Desktop Icon For Windows
 
