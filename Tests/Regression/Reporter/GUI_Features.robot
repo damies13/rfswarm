@@ -988,7 +988,12 @@ Change Line Colour
 
 	Click Tab 	 Preview
 
-	Locate 	reporter_${platform}_graph_plancolourb4.png
+	# Locate 	reporter_${platform}_graph_plancolourb4.png
+	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
+		Locate 	reporter_${platform}_graph_plancolourb4_py3.9.png
+	ELSE
+		Locate 	reporter_${platform}_graph_plancolourb4.png
+	END
 
 	Click Button 		ColourSales
 
