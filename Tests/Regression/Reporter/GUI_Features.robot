@@ -1010,9 +1010,14 @@ Change Line Colour
 
 	Take A Screenshot
 
-	Locate 	reporter_${platform}_graph_plancolourafter.png
-	# bring window to foreground so teardown works
-	Click Image 	reporter_${platform}_graph_plancolourafter.png
+	# Locate 	reporter_${platform}_graph_plancolourafter.png
+	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
+		Locate 	reporter_${platform}_graph_plancolourafter_py3.9.png
+	ELSE
+		Locate 	reporter_${platform}_graph_plancolourafter.png
+	END
+	# bring window to foreground so teardown works	reporter_ubuntu_status_previewloaded
+	Click Image 	reporter_${platform}_status_previewloaded.png
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
