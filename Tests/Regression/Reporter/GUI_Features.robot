@@ -988,6 +988,7 @@ Change Line Colour
 
 	Click Tab 	 Preview
 
+	${pvinfo}= 	Get Python Version Info
 	# Locate 	reporter_${platform}_graph_plancolourb4.png
 	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
 		Locate 	reporter_${platform}_graph_plancolourb4_py3.9.png
