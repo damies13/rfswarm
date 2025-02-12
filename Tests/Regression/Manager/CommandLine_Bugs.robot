@@ -3,7 +3,9 @@ Test Tags       Bugs 	CommandLine
 
 Resource 	CommandLine_Common.robot
 
-Suite Setup 		Create Directory 	${results_dir}
+Suite Setup 		Run Keywords
+...    Create Directory 	${results_dir} 	AND
+...    Set Platform
 
 *** Variables ***
 @{robot_data}=	example.robot	Example Test Case
@@ -242,6 +244,41 @@ Lots Of Resource Files
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
 	...    Stop Manager
+
+Check For Possible Collision Between Scenario File In -s And -i
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #340
+
+	${scenatio_file}= 	Normalize Path 		${CURDIR}${/}testdata${/}Issue-#340${/}Issue-#340.rfs
+	${inifile}= 		Normalize Path 		${CURDIR}${/}testdata${/}Issue-#340${/}RFSwarmManager.ini
+	VAR 	@{mngr_options} 	-n 	-s 	${CURDIR}${/}/path/to/file/that/doesnt/exist.rfs 	-i 	${inifile}
+
+	File Should Not Exist	${CURDIR}${/}/path/to/file/that/doesnt/exist.rfs
+	File Should Exist 	${inifile}
+	File Should Exist 	${scenatio_file}
+	File Should Not Be Empty 	${inifile}
+	File Should Not Be Empty 	${scenatio_file}
+	Change = new_dir With = ${scenatio_file} In ${inifile}
+	Change Manager INI File Settings 	scenariofile 	${inifile}
+
+	Run Manager CLI 	${mngr_options}
+	${running}= 	Is Process Running		${process_manager}
+	IF 	not ${running}
+		Fail	msg=Manager is not running!
+	END
+	${result}= 		Terminate Process 		${process_manager}
+	${running}= 	Is Process Running 		${process_manager}
+	IF 	${running}
+		Fail 	msg=Manager did not close!
+	END
+	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+
+	Should Not Contain 	${stdout_manager} 		RuntimeError
+	Should Not Contain 	${stderr_manager} 		RuntimeError
+	Should Not Contain 	${stdout_manager} 		Exception
+	Should Not Contain 	${stderr_manager} 		Exception
+
+	Should Contain 	${stdout_manager} 	*SPECIAL MESSAGE*  # this will fail
 
 Verify If Manager Runs With Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49

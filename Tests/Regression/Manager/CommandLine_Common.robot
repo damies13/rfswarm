@@ -6,12 +6,16 @@ Library 	String
 Library 	Collections
 
 *** Variables ***
+${platform}		${None}
+${global_name} 	${None}
+${global_path} 	${None}
+
 ${cmd_agent} 		rfswarm-agent
 ${cmd_manager} 	rfswarm
 ${pyfile_agent} 		${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py
 ${pyfile_manager} 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
-${process_agent} 		None
-${process_manager} 	None
+${process_agent} 	${None}
+${process_manager} 	${None}
 
 # datapath: /home/runner/work/rfswarm/rfswarm/rfswarm_manager/results/PreRun
 # datapath: /opt/hostedtoolcache/Python/3.9.18/x64/lib/python3.9/site-packages/rfswarm_manager/results/PreRun -- let's control the output path rather than leaving it to chance
@@ -239,6 +243,12 @@ Change Manager INI File Settings
 	Remove File		${location}
 	Log		${ini_content}
 	Append To File	${location}		${ini_content}
+
+Change ${str1} With ${str2} In ${file}
+	${file_content}	Get File	${file}
+	Remove File		${file}
+	${file_content}	Replace String	${file_content}	${str1}	${str2}
+	Create File		${file}	${file_content}
 
 Get Manager PIP Data
 	Run Process	pip	show	rfswarm-manager		alias=data
