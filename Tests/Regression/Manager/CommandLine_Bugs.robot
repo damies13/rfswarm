@@ -245,7 +245,7 @@ Lots Of Resource Files
 	...    Stop Agent	AND
 	...    Stop Manager
 
-Check That the Manager Supports the Missing Scenario File Proviced By the -s Argument
+Check That the Manager Supports the Missing Scenario File Provided By the -s Argument
 	[Tags]	ubuntu-latest	macos-latest	Issue #340
 
 	${scenatio_file}= 	Normalize Path 		${CURDIR}${/}testdata${/}Issue-#340${/}Issue-#340.rfs
