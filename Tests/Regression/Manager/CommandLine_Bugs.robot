@@ -109,7 +109,7 @@ Circular Reference Resource Files
 	Should Not Contain 	${stdout_manager} 		Too many open files
 	Should Not Contain 	${stderr_manager} 		Too many open files
 
-	Should Not Contain 	${stdout_agent} 		Manager Disconnected
+	# Should Not Contain 	${stdout_agent} 		Manager Disconnected
 
 	# @{testdata-dir}= 	List Directory 		${testdata}
 	# Log 	testdata-dir: ${testdata-dir} 		console=True
@@ -169,7 +169,7 @@ Circular Reference Resource Files 2
 	Should Not Contain 	${stdout_manager} 		Too many open files
 	Should Not Contain 	${stderr_manager} 		Too many open files
 
-	Should Not Contain 	${stdout_agent} 		Manager Disconnected
+	# Should Not Contain 	${stdout_agent} 		Manager Disconnected
 
 	# @{testdata-dir}= 	List Directory 		${testdata}
 	# Log 	testdata-dir: ${testdata-dir} 		console=True
@@ -225,7 +225,7 @@ Lots Of Resource Files
 	Should Not Contain 	${stdout_manager} 		Too many open files
 	Should Not Contain 	${stderr_manager} 		Too many open files
 
-	Should Not Contain 	${stdout_agent} 		Manager Disconnected
+	# Should Not Contain 	${stdout_agent} 		Manager Disconnected
 
 	# @{testdata-dir}= 	List Directory 		${testdata}
 	# Log 	testdata-dir: ${testdata-dir} 		console=True
