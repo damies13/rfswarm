@@ -245,8 +245,8 @@ Lots Of Resource Files
 	...    Stop Agent	AND
 	...    Stop Manager
 
-Check For Possible Collision Between Scenario File In -s And -i
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #340
+Check That the Manager Supports the Missing Scenario File Proviced By the -s Argument
+	[Tags]	ubuntu-latest	macos-latest	Issue #340
 
 	${scenatio_file}= 	Normalize Path 		${CURDIR}${/}testdata${/}Issue-#340${/}Issue-#340.rfs
 	${inifile}= 		Normalize Path 		${CURDIR}${/}testdata${/}Issue-#340${/}RFSwarmManager.ini
@@ -261,13 +261,16 @@ Check For Possible Collision Between Scenario File In -s And -i
 	Change Manager INI File Settings 	scenariofile 	${inifile}
 
 	Run Manager CLI 	${mngr_options}
+	Sleep 	3
 	${running}= 	Is Process Running		${process_manager}
 	IF 	not ${running}
 		Fail	msg=Manager is not running!
 	END
-	${result}= 		Terminate Process 		${process_manager}
+	Sleep 	6
+	Stop Manager
 	${running}= 	Is Process Running 		${process_manager}
 	IF 	${running}
+		${result}= 		Terminate Process 		${process_manager}
 		Fail 	msg=Manager did not close!
 	END
 	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
@@ -278,6 +281,7 @@ Check For Possible Collision Between Scenario File In -s And -i
 	Should Not Contain 	${stdout_manager} 		Exception
 	Should Not Contain 	${stderr_manager} 		Exception
 
+	# windows does not work with reading logs.
 	Should Contain 	${stdout_manager} 	*SPECIAL MESSAGE*  # this will fail
 
 Verify If Manager Runs With Existing INI File From Current Version NO GUI
