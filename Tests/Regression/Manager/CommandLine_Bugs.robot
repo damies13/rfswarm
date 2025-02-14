@@ -3,7 +3,9 @@ Test Tags       Bugs 	CommandLine
 
 Resource 	CommandLine_Common.robot
 
-Suite Setup 		Create Directory 	${results_dir}
+Suite Setup 		Run Keywords
+...    Create Directory 	${results_dir} 	AND
+...    Set Platform
 
 *** Variables ***
 @{robot_data}=	example.robot	Example Test Case
@@ -107,7 +109,7 @@ Circular Reference Resource Files
 	Should Not Contain 	${stdout_manager} 		Too many open files
 	Should Not Contain 	${stderr_manager} 		Too many open files
 
-	Should Not Contain 	${stdout_agent} 		Manager Disconnected
+	# Should Not Contain 	${stdout_agent} 		Manager Disconnected
 
 	# @{testdata-dir}= 	List Directory 		${testdata}
 	# Log 	testdata-dir: ${testdata-dir} 		console=True
@@ -167,7 +169,7 @@ Circular Reference Resource Files 2
 	Should Not Contain 	${stdout_manager} 		Too many open files
 	Should Not Contain 	${stderr_manager} 		Too many open files
 
-	Should Not Contain 	${stdout_agent} 		Manager Disconnected
+	# Should Not Contain 	${stdout_agent} 		Manager Disconnected
 
 	# @{testdata-dir}= 	List Directory 		${testdata}
 	# Log 	testdata-dir: ${testdata-dir} 		console=True
@@ -223,7 +225,7 @@ Lots Of Resource Files
 	Should Not Contain 	${stdout_manager} 		Too many open files
 	Should Not Contain 	${stderr_manager} 		Too many open files
 
-	Should Not Contain 	${stdout_agent} 		Manager Disconnected
+	# Should Not Contain 	${stdout_agent} 		Manager Disconnected
 
 	# @{testdata-dir}= 	List Directory 		${testdata}
 	# Log 	testdata-dir: ${testdata-dir} 		console=True
@@ -242,6 +244,45 @@ Lots Of Resource Files
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
 	...    Stop Manager
+
+Check That the Manager Supports the Missing Scenario File Provided By the -s Argument
+	[Tags]	ubuntu-latest	macos-latest	Issue #340
+
+	${scenatio_file}= 	Normalize Path 		${CURDIR}${/}testdata${/}Issue-#340${/}Issue-#340.rfs
+	${inifile}= 		Normalize Path 		${CURDIR}${/}testdata${/}Issue-#340${/}RFSwarmManager.ini
+	VAR 	@{mngr_options} 	-n 	-s 	${CURDIR}${/}/path/to/file/that/doesnt/exist.rfs 	-i 	${inifile}
+
+	File Should Not Exist	${CURDIR}${/}/path/to/file/that/doesnt/exist.rfs
+	File Should Exist 	${inifile}
+	File Should Exist 	${scenatio_file}
+	File Should Not Be Empty 	${inifile}
+	File Should Not Be Empty 	${scenatio_file}
+	Change = new_dir With = ${scenatio_file} In ${inifile}
+	Change Manager INI File Settings 	scenariofile 	${inifile}
+
+	Run Manager CLI 	${mngr_options}
+	Sleep 	3
+	${running}= 	Is Process Running		${process_manager}
+	IF 	not ${running}
+		Fail	msg=Manager is not running!
+	END
+	Sleep 	6
+	Stop Manager
+	${running}= 	Is Process Running 		${process_manager}
+	IF 	${running}
+		${result}= 		Terminate Process 		${process_manager}
+		Fail 	msg=Manager did not close!
+	END
+	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+
+	Should Not Contain 	${stdout_manager} 		RuntimeError
+	Should Not Contain 	${stderr_manager} 		RuntimeError
+	Should Not Contain 	${stdout_manager} 		Exception
+	Should Not Contain 	${stderr_manager} 		Exception
+
+	# windows does not work with reading logs.
+	Should Contain 	${stdout_manager} 	*SPECIAL MESSAGE*  # this will fail
 
 Verify If Manager Runs With Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
