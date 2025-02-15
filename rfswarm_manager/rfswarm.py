@@ -2449,6 +2449,7 @@ class RFSwarmCore:
 			base.debugmsg(5, "scenariofile: ", scenariofile)
 			if 'Plan' not in base.config:
 				base.config['Plan'] = {}
+				base.config['Plan']['ScenarioFile'] = ""
 			base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
 			base.config['Plan']['ScenarioFile'] = base.inisafevalue(scenariofile)
 			base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
