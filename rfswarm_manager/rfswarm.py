@@ -2529,7 +2529,7 @@ class RFSwarmCore:
 			# check file exists - it may have been deleted since rfswarm last ran with this ini file
 			base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
 			if not os.path.exists(base.config['Plan']['ScenarioFile']):
-				if len(base.config['Plan']['ScenarioFile'])>1:
+				if len(base.config['Plan']['ScenarioFile']) > 1:
 					msg = "Scenario file Not found:\n" + base.config['Plan']['ScenarioFile']
 					if not base.args.nogui:
 						tkm.showwarning("RFSwarm - Warning", msg)
@@ -3169,10 +3169,10 @@ class RFSwarmCore:
 					base.debugmsg(6, "ScenarioFile:", ScenarioFile)
 					base.config['Plan']['ScenarioFile'] = base.inisafevalue(ScenarioFile)
 					base.saveini()
-			except:
+			except Exception as e:
 				base.config['Plan']['ScenarioFile'] = ""
 		else:
-			if len(ScenarioFile)>1:
+			if len(ScenarioFile) > 1:
 				# error file not exist
 				msg = "Scenario file Not found:\n" + ScenarioFile
 				if not base.args.nogui:
