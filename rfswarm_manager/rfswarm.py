@@ -3169,7 +3169,7 @@ class RFSwarmCore:
 					base.debugmsg(6, "ScenarioFile:", ScenarioFile)
 					base.config['Plan']['ScenarioFile'] = base.inisafevalue(ScenarioFile)
 					base.saveini()
-			except Exception as e:
+			except Exception:
 				base.config['Plan']['ScenarioFile'] = ""
 		else:
 			if len(ScenarioFile) > 1:
