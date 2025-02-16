@@ -263,16 +263,10 @@ Check That the Manager Supports the Missing Scenario File Provided By the -s Arg
 	Run Manager CLI 	${mngr_options}
 	Sleep 	3
 	${running}= 	Is Process Running		${process_manager}
-	IF 	not ${running}
-		Fail	msg=Manager is not running!
-	END
-	Sleep 	6
-	Stop Manager
-	${running}= 	Is Process Running 		${process_manager}
 	IF 	${running}
-		${result}= 		Terminate Process 		${process_manager}
-		Fail 	msg=Manager did not close!
+		Fail	msg=Manager is still running!
 	END
+
 	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 
@@ -282,7 +276,10 @@ Check That the Manager Supports the Missing Scenario File Provided By the -s Arg
 	Should Not Contain 	${stderr_manager} 		Exception
 
 	# windows does not work with reading logs.
-	Should Contain 	${stdout_manager} 	*SPECIAL MESSAGE*  # this will fail
+	Should Contain 	${stdout_manager} 	Scenario file Not found:
+
+	[Teardown]	Stop Manager
+
 
 Verify If Manager Runs With Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
