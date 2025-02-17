@@ -70,6 +70,21 @@ Set Platform By Tag
 		Set Suite Variable    ${platform}    ubuntu
 	END
 
+Show Log
+	[Arguments]		${filename}
+	Log 		${\n}--VVV--${filename}--VVV-- 		console=True
+	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
+	Log 		${filedata} 		console=True
+	Log 		--ɅɅɅ--${filename}--ɅɅɅ--${\n} 		console=True
+	RETURN 		${filedata}
+
+Read Log
+	[Arguments]		${filename}
+	Log 		${filename}
+	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
+	Log 		${filedata}
+	RETURN 		${filedata}
+
 Open Agent
 	[Arguments]		${options}=None
 	IF  ${options} == None
@@ -270,15 +285,6 @@ Kill If Still Running
     END
 	END
 
-Show Log
-	[Arguments]		${filename}
-	Log 		${\n}--VVV--${filename}--VVV-- 		console=True
-	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
-	Log 		${filedata} 		console=True
-	Log 		--ɅɅɅ--${filename}--ɅɅɅ--${\n} 		console=True
-	RETURN 		${filedata}
-
-
 Stop Test Scenario Run Gradually
 	[Arguments]	${rumup_time}	${robot_test_time}
 	Set Confidence	0.95
@@ -294,10 +300,7 @@ Stop Test Scenario Run Gradually
 
 	Press Key.tab 2 Times
 	Move To	10	10
-	# Take A Screenshot
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time + ${default_image_timeout}}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish 	time=${robot_test_time + ${default_image_timeout}}
 
 Stop Test Scenario Run Quickly
 	[Arguments]	${rumup_time}	${robot_test_time}
@@ -317,10 +320,7 @@ Stop Test Scenario Run Quickly
 
 	Press Key.tab 2 Times
 	Move To	10	10
-	# Take A Screenshot
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${robot_test_time + ${default_image_timeout}}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish 	time=${robot_test_time + ${default_image_timeout}}
 
 Utilisation Stats
 	${cpupct}= 	Evaluate 	psutil.cpu_percent(interval=1, percpu=True) 				modules=psutil
@@ -337,6 +337,15 @@ Check If The Agent Is Ready
 	# Sleep	1
 	Click Tab	Agents
 	Wait For 	manager_${platform}_agents_ready.png	timeout=${timeout}
+
+Wait For the Scenario Run To Finish
+	[Arguments] 	${time}=${300}
+	${status}=	Run Keyword And Return Status
+	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${time}
+	IF  not ${status}
+		Take A Screenshot
+		Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	END
 
 Check If the Robot Failed
 	[Arguments] 	${expected_time}
@@ -1469,10 +1478,10 @@ Verify Generated Run Result Files
 	Should Be True	${len} >= 20	msg=Number of files in the Logs directory is incorrect: should be at least 20, actual: "${len}".
 
 Find Result DB
-	[Arguments] 	${result_pattern}=*_*
+	[Arguments] 	${directory}=${results_dir} 	${result_pattern}=*_*
 	# ${fols}= 	List Directory 	${results_dir}
 	# Log to console 	${fols}
-	${fols}= 	List Directory 	${results_dir} 	${result_pattern} 	absolute=True
+	${fols}= 	List Directory 	${directory} 	${result_pattern} 	absolute=True
 	Log to console 	${fols}
 	# ${files}= 	List Directory 	${fols[0]}
 	# Log to console 	${files}

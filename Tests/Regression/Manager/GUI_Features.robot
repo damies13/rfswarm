@@ -1115,10 +1115,7 @@ Check If Inject Sleep Option Was Executed in the Test
 	Check If The Agent Is Ready
 	Click Tab	Plan
 	Click Button	runplay
-
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish
 
 	Sleep	10
 	Check If The Agent Is Ready
@@ -1848,9 +1845,7 @@ Check If The CSV Report Button Works In the Manager Before There Are Any Results
 	${len}=		Get Length		${csv_files}
 	Should Be True	${len} > 0	msg=Manager didn't generate any CSV report files. Should generate at least 1 most likely agent_data.csv.
 
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected.
+	Wait For the Scenario Run To Finish
 
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
@@ -1868,10 +1863,7 @@ Check If The CSV Report Button Works In The Manager After There Are Results
 	Check If The Agent Is Ready
 	Click Tab	Plan
 	Click Button	runplay
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
-	Take A Screenshot
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish
 	Click Button	csv_report
 
 	${status}=	Run Keyword And Return Status
@@ -1956,9 +1948,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 	Click Button	abort
 	Press Key.tab 2 Times
 	Move To	10	10
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish
 
 	Click Tab	Plan
 	Click Button	runplay
@@ -1983,9 +1973,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 	Press Key.enter 1 Times
 	Press Key.tab 2 Times
 	Move To		10	10
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish
 
 	[Teardown]	Run Keywords
 	...    Delete Scenario File		${scenario_name}		AND
@@ -2005,9 +1993,7 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 	Check If The Agent Is Ready
 	Click Tab	Plan
 	Click Button	runplay
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish
 	Click Button	csv_report
 	Press key.enter 1 Times
 	Sleep	3
@@ -2135,9 +2121,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	${current_date}=	Get Current Date
 	Log To Console	Current time: ${current_date}
 
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish
 
 	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_*
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
@@ -2156,9 +2140,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	${current_date}=	Get Current Date
 	Log To Console	Current time: ${current_date}
 
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish
 
 	${previous_result_dir}=		Set Variable	${run_result_dirs}[0]
 	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_*
@@ -2208,9 +2190,7 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	${current_date}=	Get Current Date
 	Log To Console	Current time: ${current_date}
 
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish
 
 	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_*
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
@@ -2293,20 +2273,14 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 	Check If The Agent Is Ready
 	Click Tab	Plan
 	Click Button	runplay
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${360}
-	Take A Screenshot
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish 	time=${360}
 
 	Check If The Agent Is Ready
 	Log To Console 	Running scenario one more time to test if iteration counter get reset.
 	Click Tab	Plan
 	Click Button	runplay
 	Sleep	10
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${360}
-	Take A Screenshot
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish 	time={360}
 	Check If The Agent Is Ready
 
 	Log To Console 	Checking second run Database.
@@ -2386,9 +2360,7 @@ Verify the Robot Count Reduces When Stop Agent While Test Is Running
 	...    Wait For		manager_${platform}_robots_0.png 	timeout=${60}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didnt reduce robot count form 10 to 0 in 60s after disconnecting Agent.
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${120}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish 	time=${120}
 
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
