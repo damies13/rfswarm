@@ -2280,7 +2280,7 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 	Click Tab	Plan
 	Click Button	runplay
 	Sleep	10
-	Wait For the Scenario Run To Finish 	time={360}
+	Wait For the Scenario Run To Finish 	time=${360}
 	Check If The Agent Is Ready
 
 	Log To Console 	Checking second run Database.
