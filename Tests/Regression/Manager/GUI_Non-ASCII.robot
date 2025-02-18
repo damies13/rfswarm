@@ -12,9 +12,9 @@ Suite Teardown 	Copy Directory 	${test_data} 	${OUTPUT DIR}${/}results
 
 
 *** Variables ***
-${test_data} 	${CURDIR}${/}testdata${/}Issue-#97
+${test_data} 		${CURDIR}${/}testdata${/}Issue-#97
 ${scenario_name} 	${None}
-${results_dir} 	${None}
+${results_dir} 		${None}
 
 
 *** Test Cases ***
@@ -37,10 +37,10 @@ Test Non-ASCII Characters
 	Log 	\n\n\n> Testing: ${langcode} 	console=True
 
 	VAR 	${sample} 	${Samples.${langcode}}
+	Set Test Variable 	${scenario_name} 	${langcode}_scenario
 	Set Test Variable 	${results_dir} 		${test_data}${/}results
 	Create Directory 	${results_dir}
-	Set Test Variable 	${scenario_name} 	${langcode}_scenario
-	${robot_file} 	${scenario_file}= 	Create Language Files 	${test_data} 	${langcode} 	${sample}
+	${robot_file} 	${scenario_file}= 	Create Language Files 	${langcode} 	${sample}
 	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${results_dir}
 
 	Open Manager GUI 		${mngr_options}
@@ -69,7 +69,7 @@ Non-ASCII Test Teardown
 	Run Keyword		Close Manager GUI ${platform}
 
 Create Language Files
-	[Arguments] 	${test_data} 	${langcode} 	${sample}
+	[Arguments] 	${langcode} 	${sample}
 	Create Directory 	${test_data}${/}files
 	VAR 	${robot_file} 		${test_data}${/}files${/}${sample}_sample_test.robot
 	VAR 	${scenario_file} 	${test_data}${/}files${/}${scenario_name}.rfs
@@ -122,8 +122,6 @@ Check CSV Files
 			${len}=		Get Length	${csv_rows_content_list}
 			Should Be True	${len} >= ${3}		msg=Some rows in raw_result_data.csv are missing, should be at least 3!
 
-			@{first_data_row}=	Set Variable	${csv_rows_content_list}[1]
-			${Agent_name}=	Set Variable	${first_data_row}[3]
 			FOR  ${j}  IN RANGE  1  ${len}
 				@{data_row}=	Set Variable	${csv_rows_content_list}[${j}]
 				Log		${data_row}

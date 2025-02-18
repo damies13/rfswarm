@@ -62,6 +62,21 @@ Set Platform By Tag
 		Set Suite Variable    ${platform}    ubuntu
 	END
 
+Show Log
+	[Arguments]		${filename}
+	Log 		${\n}-----${filename}----- 		console=True
+	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
+	Log 		${filedata} 		console=True
+	Log 		-----${filename}-----${\n} 		console=True
+	RETURN 		${filedata}
+
+Read Log
+	[Arguments]		${filename}
+	Log 		${filename}
+	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
+	Log 		${filedata}
+	RETURN 		${filedata}
+
 Make Clipboard Not None
 	Evaluate    clipboard.copy("You should never see this after copy") 	modules=clipboard
 
@@ -119,6 +134,36 @@ Create New Section
 		Click Button 			OK
 		# Take A Screenshot
 	END
+
+Click ${item} With Vertical Offset
+	[Arguments]		${image_name}	${offset}=0
+	[Documentation]	Click the item with the offset. An item can be: Label, Button, ...
+	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down].
+	${image_name}= 	Convert To Lower Case 	${image_name}
+	${item}= 	Convert To Lower Case 	${item}
+	${img}=	Set Variable		reporter_${platform}_${item}_${image_name}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Log	${coordinates}
+	Click To The Below Of	${coordinates}	${offset}
+	Sleep 	0.1
+
+Click ${item} With Horizontal Offset
+	[Arguments]		${image_name}	${offset}=0
+	[Documentation]	Click the item with the offset. An item can be: Label, Button, ...
+	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right].
+	${image_name}= 	Convert To Lower Case 	${image_name}
+	${item}= 	Convert To Lower Case 	${item}
+	${img}=	Set Variable		reporter_${platform}_${item}_${image_name}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Log	${coordinates}
+	Click To The Right Of	${coordinates}	${offset}
+	Sleep 	0.1
 
 Click Section
 	[Arguments]		${sectname}

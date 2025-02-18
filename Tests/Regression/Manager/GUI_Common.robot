@@ -457,12 +457,13 @@ Press ${key} ${n} Times
 		Press Combination 	${key}
 	END
 
-Click Label With Vertical Offset
-	[Arguments]		${labelname}	${offset}=0
-	[Documentation]	Click the image with the offset
+Click ${item} With Vertical Offset
+	[Arguments]		${image_name}	${offset}=0
+	[Documentation]	Click the item with the offset. An item can be: Label, Button, ...
 	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down].
-	${labelname}= 	Convert To Lower Case 	${labelname}
-	${img}=	Set Variable		manager_${platform}_label_${labelname}.png
+	${image_name}= 	Convert To Lower Case 	${image_name}
+	${item}= 	Convert To Lower Case 	${item}
+	${img}=	Set Variable		manager_${platform}_${item}_${image_name}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=${default_image_timeout}
@@ -470,14 +471,14 @@ Click Label With Vertical Offset
 	Log	${coordinates}
 	Click To The Below Of	${coordinates}	${offset}
 	Sleep 	0.1
-	# Take A Screenshot
 
-Click Label With Horizontal Offset
-	[Arguments]		${labelname}	${offset}=0
-	[Documentation]	Click the image with the offset
+Click ${item} With Horizontal Offset
+	[Arguments]		${image_name}	${offset}=0
+	[Documentation]	Click the item with the offset. An item can be: Label, Button, ...
 	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right].
-	${labelname}= 	Convert To Lower Case 	${labelname}
-	${img}=	Set Variable		manager_${platform}_label_${labelname}.png
+	${image_name}= 	Convert To Lower Case 	${image_name}
+	${item}= 	Convert To Lower Case 	${item}
+	${img}=	Set Variable		manager_${platform}_${item}_${image_name}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=${default_image_timeout}
@@ -485,37 +486,6 @@ Click Label With Horizontal Offset
 	Log	${coordinates}
 	Click To The Right Of	${coordinates}	${offset}
 	Sleep 	0.1
-	# Take A Screenshot
-
-Click Button With Vertical Offset
-	[Arguments]		${btnname}	${offset}=0
-	[Documentation]	Click the image with the offset
-	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down].
-	${btnname}= 	Convert To Lower Case 	${btnname}
-	${img}=	Set Variable		manager_${platform}_button_${btnname}.png
-	Log		${CURDIR}
-	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-	@{coordinates}= 	Locate		${img}
-	Log	${coordinates}
-	Click To The Below Of	${coordinates}	${offset}
-	Sleep 	0.1
-	# Take A Screenshot
-
-Click Button With Horizontal Offset
-	[Arguments]		${btnname}	${offset}=0
-	[Documentation]	Click the image with the offset
-	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right].
-	${btnname}= 	Convert To Lower Case 	${btnname}
-	${img}=	Set Variable		manager_${platform}_button_${btnname}.png
-	Log		${CURDIR}
-	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-	@{coordinates}= 	Locate		${img}
-	Log	${coordinates}
-	Click To The Right Of	${coordinates}	${offset}
-	Sleep 	0.1
-	# Take A Screenshot
 
 #TODO: Chceck if it works
 Resize Window
