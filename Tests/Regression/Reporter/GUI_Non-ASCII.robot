@@ -40,9 +40,9 @@ Test Non-ASCII Characters
 	#Set Test Variable 	${scenario_name} 	${langcode}_scenario
 	Set Test Variable 	${results_dir} 		${test_data}${/}results
 	Create Directory 	${results_dir}
-	#${robot_file} 	${scenario_file}= 	Create Language Files 	${langcode} 	${sample}
+	${template_file}= 	Create Language Files 	${langcode} 	${sample}
 
-	Open GUI 	-g 	1 	-d 	${results_dir}
+	Open GUI 	-g 	1 	-d 	${results_dir} 	-t 	${template_file}
 	Wait For Status 	PreviewLoaded
 
 	Log 	Test fields: 	console=${True}
@@ -78,18 +78,16 @@ Non-ASCII Test Teardown
 Create Language Files
 	[Arguments] 	${langcode} 	${sample}
 	Create Directory 	${test_data}${/}files
-	VAR 	${robot_file} 		${test_data}${/}files${/}${sample}_sample_test.robot
-	VAR 	${scenario_file} 	${test_data}${/}files${/}${scenario_name}.rfs
+	VAR 	${template_file} 	${test_data}${/}files${/}${sample}.template
 
-	Copy File 	${test_data}${/}LANG_sample_test.robot 	${robot_file}
-	Copy File 	${test_data}${/}LANG_scenario.rfs 	${scenario_file}
+	Copy File 	${test_data}${/}LANG_template.template 	${template_file}
 
 	# Change __Lang__ With ${langcode} In ${robot_file}
 	# Change __Lang_Sample__ With ${sample} In ${robot_file}
 	# Change __LangRobot__ With ${robot_file} In ${scenario_file}
 	# Change __LangTest__ With ${sample} Test Case In ${scenario_file}
 
-	RETURN 	${robot_file} 	${scenario_file}
+	RETURN 	${template_file}
 
 Check Logs
 	${stdout_manager}= 		Read Log 	${OUTPUT DIR}${/}stdout_manager.txt

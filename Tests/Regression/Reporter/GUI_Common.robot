@@ -242,6 +242,7 @@ Get Text Value To Right Of
 
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 
+	Make Clipboard Not None 	# reset clipboard
 	${b4value}= 	Get Clipboard Content
 	Click To The Right Of Image 	${img} 	${offsetx}
 	Sleep    10 ms
