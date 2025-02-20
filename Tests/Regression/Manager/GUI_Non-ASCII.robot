@@ -1,5 +1,5 @@
 *** Settings ***
-Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #97 	Languages 	GUI
+Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #97 	Languages
 
 Resource 	GUI_Common.robot
 Variables 	${CURDIR}${/}testdata${/}Issue-#97${/}lang_samples.yaml
@@ -19,6 +19,7 @@ ${results_dir} 		${None}
 
 *** Test Cases ***
 Latin 		pl
+Icelandic 	is
 Greek 		gr
 Cyrillic 	cy
 Armenian 	am
@@ -42,8 +43,10 @@ Test Non-ASCII Characters
 	Create Directory 	${results_dir}
 	${robot_file} 	${scenario_file}= 	Create Language Files 	${langcode} 	${sample}
 	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${results_dir}
+	VAR 	@{agnt_options} 	-a 	${sample}
 
-	Open Manager GUI 		${mngr_options}
+	Open Agent 			${agnt_options}
+	Open Manager GUI 	${mngr_options}
 	Take A Screenshot
 	Check If The Agent Is Ready
 	Click Tab 	Plan
@@ -62,7 +65,6 @@ Test Non-ASCII Characters
 Non-ASCII Test Setup
 	${mgrini}= 	Get Manager INI Location
 	Set INI Window Size 	1200 	600
-	Open Agent
 
 Non-ASCII Test Teardown
 	Stop Agent
@@ -89,7 +91,7 @@ Check DB For Metrics
 	Log 	\tChecking run Database 	console=${True}
 	${dbfile}= 	Find Result DB 	directory=${results_dir}	result_pattern=*_${scenario_name}*
 	${db_query_result}= 	Query Result DB 	${dbfile}
-	...    SELECT count(*) FROM MetricData WHERE PrimaryMetric='${sample}'
+	...    SELECT count(*) FROM MetricData WHERE PrimaryMetric='${sample} Keyword'
 
 	Log 	${db_query_result}[0][0]
 	Should Not Be Equal 	${db_query_result}[0][0] 	${0} 	msg=Can't find Language sample string in Metrics DB Table for "${langcode}"!
@@ -133,7 +135,17 @@ Check CSV Files
 			END
 
 		ELSE IF  '${csv_report_file_type}' == 'agent_data.csv'
-			No Operation
+			${len}=		Get Length	${csv_rows_content_list}
+			@{expected_status}	Create List  Ready  Running  Critical  Stopping  Warning  Offline?
+
+			FOR  ${j}  IN RANGE  1  ${len}
+				@{data_row}=	Set Variable	${csv_rows_content_list}[${j}]
+				Log		${data_row}
+
+				Should Be Equal		${data_row}[0]	${sample}
+				...    msg=CSV agent_data File did not save correctly in the Agentname column, ${j+1} row!
+				Length Should Be	${data_row}		9	msg=Some columns in agent_data.csv are missing in ${j+1}nd row, should be 9 of them!
+			END
 		END
 	END
 

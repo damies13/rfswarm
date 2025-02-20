@@ -1,5 +1,5 @@
 *** Settings ***
-Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #97 	Languages 	GUI
+Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #97 	Languages
 
 Resource 	GUI_Common.robot
 Variables 	${CURDIR}${/}testdata${/}Issue-#97${/}lang_samples.yaml
@@ -19,15 +19,16 @@ ${results_dir} 		${None}
 
 *** Test Cases ***
 Latin 		pl
-# Greek 		gr
-# Cyrillic 	cy
-# Armenian 	am
-# Thai 		th
-# Chinese (Simplified) 	zh
-# Japanese 	ja
-# Korean 		ko
-# Arabic 		ar
-# Tibetan  	ti
+Icelandic 	is
+Greek 		gr
+Cyrillic 	cy
+Armenian 	am
+Thai 		th
+Chinese (Simplified) 	zh
+Japanese 	ja
+Korean 		ko
+Arabic 		ar
+Tibetan  	ti
 
 
 *** Keywords ***
@@ -37,7 +38,6 @@ Test Non-ASCII Characters
 	Log 	\n\n\n> Testing: ${langcode} 	console=True
 
 	VAR 	${sample} 	${Samples.${langcode}}
-	#Set Test Variable 	${scenario_name} 	${langcode}_scenario
 	Set Test Variable 	${results_dir} 		${test_data}${/}results
 	Create Directory 	${results_dir}
 	${template_file}= 	Create Language Files 	${langcode} 	${sample}
@@ -45,26 +45,45 @@ Test Non-ASCII Characters
 	Open GUI 	-g 	1 	-d 	${results_dir} 	-t 	${template_file}
 	Wait For Status 	PreviewLoaded
 
+
 	Log 	Test fields: 	console=${True}
-	Take A Screenshot
+
 	Set Text Value To Right Of 	Title 	${sample}
 	Take A Screenshot
+
 	Click Section 	Note
-	Set Text Value To Right Of 	Heading 	${sample}
+	VAR 	${note_sample_heading} 	${sample} Note
+	Set Text Value To Right Of 	Heading 	${note_sample_heading}
 	Click Label With Vertical Offset 	Heading 	90
 	Type 	${sample}
 	Take A Screenshot
+
 	Click Section	TestResultSummary
+	VAR 	${data_table_sample_heading} 	${sample} TestResultSummary
+	Set Text Value To Right Of 	Heading 	${data_table_sample_heading}
 	Take A Screenshot  # get image*** vvv
-	Set Text Value To Right Of 	ResultName 	${sample}
-	#Click Section 	ScenarioPlan
+	Set Text Value To Right Of 	ResultName 	${sample} 	offsetx=100
 	Take A Screenshot
+
+	Click Section 	DataGraph
+	VAR 	${graph_sample_heading} 	${sample} DataGraph
+	Set Text Value To Right Of 	Heading 	${graph_sample_heading}
+	Take A Screenshot
+
+	Click Section 	Errors
+	VAR 	${errors_sample_heading} 	${sample} Errors
+	Set Text Value To Right Of 	Heading 	${errors_sample_heading}
+	Take A Screenshot
+	# K all section headings
+	# K preview Table of Contents for section headings (html)
+	# filter for graphs and data table (Metric and Agent name)
+	# Error details
 
 	Log 	Test Template: 	console=${True}
 
 
-	Log 	Test HTML DOCX XLSX Reports: 	console=${True}
-
+	Log 	Test HTML DOCX? XLSX? Reports: 	console=${True}
+	# preview Table of Contents
 
 	Check Logs
 
@@ -82,10 +101,8 @@ Create Language Files
 
 	Copy File 	${test_data}${/}LANG_template.template 	${template_file}
 
-	# Change __Lang__ With ${langcode} In ${robot_file}
-	# Change __Lang_Sample__ With ${sample} In ${robot_file}
-	# Change __LangRobot__ With ${robot_file} In ${scenario_file}
-	# Change __LangTest__ With ${sample} Test Case In ${scenario_file}
+	Change __Lang__ With ${langcode} In ${template_file}
+	Change __Lang_Sample__ With ${sample} In ${template_file}
 
 	RETURN 	${template_file}
 
