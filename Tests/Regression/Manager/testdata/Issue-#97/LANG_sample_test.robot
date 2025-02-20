@@ -5,7 +5,7 @@ __Lang_Sample__ Test Case
 
 *** Keywords ***
 __Lang__ Keyword
-    [Documentation]  __Lang_Sample__
+    [Documentation]  __Lang_Sample__ Keyword
     Sleep   10
 
 __Lang__ Fail Keyword

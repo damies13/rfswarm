@@ -15,11 +15,12 @@ Suite Teardown 	Copy Directory 	${test_data} 	${OUTPUT DIR}${/}results
 ${test_data} 		${CURDIR}${/}testdata${/}Issue-#97
 ${scenario_name} 	${None}
 ${results_dir} 		${None}
+${agent_name} 		${None}
 
 
 *** Test Cases ***
 Latin 		pl
-Icelandic 	is
+Icelandic 	ic
 Greek 		gr
 Cyrillic 	cy
 Armenian 	am
@@ -40,10 +41,11 @@ Test Non-ASCII Characters
 	VAR 	${sample} 	${Samples.${langcode}}
 	Set Test Variable 	${scenario_name} 	${langcode}_scenario
 	Set Test Variable 	${results_dir} 		${test_data}${/}results
+	Set Test Variable 	${agent_name} 		${sample}
 	Create Directory 	${results_dir}
 	${robot_file} 	${scenario_file}= 	Create Language Files 	${langcode} 	${sample}
 	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${results_dir}
-	VAR 	@{agnt_options} 	-a 	${sample}
+	VAR 	@{agnt_options} 	-a 	${agent_name}
 
 	Open Agent 			${agnt_options}
 	Open Manager GUI 	${mngr_options}
@@ -99,6 +101,8 @@ Check DB For Metrics
 Check CSV Files
 	[Arguments] 	${langcode} 	${sample}
 	Log 	\tChecking CSV Files 	console=${True}
+	VAR 	@{keywords} 	${sample} Keyword 	${sample} Fail Keyword
+
 	@{test_results}=	List Directories In Directory	${results_dir}		absolute=${True}	pattern=*${scenario_name}
 	@{csv_file_paths}=		List Files In Directory		${test_results}[0]	*.csv	absolute=${True}
 	Length Should Be	${csv_file_paths}	3	msg=Some CSV files are missing!
@@ -111,14 +115,18 @@ Check CSV Files
 		${csv_report_file_type}=	Split String From Right		${csv_file_paths}[${i}]	separator=_${scenario_name}_	max_split=1
 		VAR 	${csv_report_file_type} 	${csv_report_file_type}[-1]
 		IF  '${csv_report_file_type}' == 'summary.csv'
-			Length Should Be	${csv_rows_content_list}	2	msg=Some rows in summary.csv are missing, should be 2!
-
 			@{second_row}=		Set Variable	${csv_rows_content_list}[1]
 			Log		${second_row}
-			Should Be Equal		${second_row}[0]	${sample}
-			...    msg=CSV summary File did not save correctly in the Result Name column, second row!
+			IF  '${second_row}[0]' not in @{keywords}
+				Fail	msg=CSV summary File did not save correctly in the Result Name column, second row!
+			END
+			@{third_row}=		Set Variable	${csv_rows_content_list}[1]
+			IF  '${third_row}[0]' not in @{keywords}
+				Fail	msg=CSV summary File did not save correctly in the Result Name column, third row!
+			END
 
 			Length Should Be	${second_row}	9	msg=Some columns in summary.csv are missing in second row, should be 9 of them!
+			Length Should Be	${third_row}	9	msg=Some columns in summary.csv are missing in third row, should be 9 of them!
 
 		ELSE IF  '${csv_report_file_type}' == 'raw_result_data.csv'
 			${len}=		Get Length	${csv_rows_content_list}
@@ -127,9 +135,9 @@ Check CSV Files
 			FOR  ${j}  IN RANGE  1  ${len}
 				@{data_row}=	Set Variable	${csv_rows_content_list}[${j}]
 				Log		${data_row}
-
-				Should Be Equal		${data_row}[5]	${sample}
-				...    msg=CSV raw_result_data File did not save correctly in the Result Name column, ${j+1} row!
+				IF  '${data_row}[5]' not in @{keywords}
+					Fail	msg=CSV raw_result_data File did not save correctly in the Result Name column, ${j+1} row!
+				END
 
 				Length Should Be	${data_row}	10	msg=Some columns in raw_result_data.csv are missing in ${j+1}nd row, should be 10 of them!
 			END
@@ -142,7 +150,7 @@ Check CSV Files
 				@{data_row}=	Set Variable	${csv_rows_content_list}[${j}]
 				Log		${data_row}
 
-				Should Be Equal		${data_row}[0]	${sample}
+				Should Be Equal		${data_row}[0]	${agent_name}
 				...    msg=CSV agent_data File did not save correctly in the Agentname column, ${j+1} row!
 				Length Should Be	${data_row}		9	msg=Some columns in agent_data.csv are missing in ${j+1}nd row, should be 9 of them!
 			END

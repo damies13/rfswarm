@@ -19,7 +19,7 @@ ${results_dir} 		${None}
 
 *** Test Cases ***
 Latin 		pl
-Icelandic 	is
+Icelandic 	ic
 Greek 		gr
 Cyrillic 	cy
 Armenian 	am
