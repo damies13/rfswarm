@@ -749,7 +749,7 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 Verify Scenario File Is Updated Correctly When Scripts Are Removed
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #58
 	[Setup]	Run Keywords
-	...    Change Manager INI File Settings 	scenariofile 	${EMPTY}				AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Open Manager GUI													AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -827,7 +827,7 @@ Verify Scenario File Is Updated Correctly When Scripts Are Removed
 Verify the Manager Handles Corrupted Scenario Files And Repairs It
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #58
 	[Setup]	Run Keywords
-	# ...    Change Manager INI File Settings 	scenariofile 	${EMPTY}				AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Open Manager GUI													AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -895,7 +895,7 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	# ...			Remove File		${location}												AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Set Test Variable	@{mngr_options}	-g	1						AND
-	# ...    Change Manager INI File Settings 	scenariofile 	${EMPTY}				AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Open Manager GUI		${mngr_options}								AND
 	...    Create Robot File	name=example.robot	file_content=***Test Case***\nExample Test Case\n
@@ -948,7 +948,7 @@ Verify If Manager Saves Inject Sleep From Scenario Wide Settings
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600																	AND
-	...    Change Manager INI File Settings 	scenariofile 	${EMPTY}				AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Open Manager GUI																									AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]			AND
 	...    Create Robot File
@@ -979,7 +979,7 @@ Check If the Manager Reopens Inject Sleep From Scenario Wide Settings Correctly
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
 	...    Set INI Window Size		1200	600																	AND
-	...    Change Manager INI File Settings 	scenariofile 	${EMPTY}				AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Open Manager GUI																									AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]			AND
 	...    Create Robot File
@@ -1017,7 +1017,7 @@ Check If the Manager (after was closed) Opens Inject Sleep From Scenario Wide Se
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]			AND
 	...    Set Test Variable	@{mngr_options}	-g	1													AND
-	...    Change Manager INI File Settings 	scenariofile 	${EMPTY}				AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600																	AND
 	...    Open Manager GUI		${mngr_options}																AND
 	...    Create Robot File
@@ -1051,7 +1051,7 @@ Check If the Manager (after was closed) Opens Inject Sleep From Scenario Wide Se
 Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Settings
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
-	...    Change Manager INI File Settings 	scenariofile 	${EMPTY}				AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600										AND
 	...    Open Manager GUI															AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]			AND
@@ -1102,7 +1102,7 @@ Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Setting
 Check If Inject Sleep Option Was Executed in the Test
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
-	...    Change Manager INI File Settings 	scenariofile 	${EMPTY}				AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Remove Directory	${results_dir}	recursive=${True}				AND
@@ -1271,7 +1271,7 @@ Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has
 Verify If the Port Number And Ip Address Get Written To the INI File
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
 	[Setup]	Run Keywords
-	...    Change Manager INI File Settings 	scenariofile 	${EMPTY}				AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Set Test Variable	@{mngr_options}	-g	0						AND

@@ -511,17 +511,18 @@ Set Global Filename And Default Save Path
 	Set Test Variable 	$file_name 	${global_name}
 	IF  '${optional_path}' != '${None}'
 		Set Test Variable	${global_path}	${optional_path}
-		${location}=	Get Manager INI Location
-		${ini_content}=		Get Manager INI Data
-		${ini_content_list}=	Split String	${ini_content}
-		${scriptdir}=	Get Index From List		${ini_content_list}		scriptdir
-
-		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${scriptdir + 2}]	${optional_path}
-		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${scriptdir + 5}]	${optional_path}
-
-		Remove File		${location}
-		Log		${ini_content}
-		Append To File	${location}		${ini_content}
+		# ${location}=	Get Manager INI Location
+		# ${ini_content}=		Get Manager INI Data
+		# ${ini_content_list}=	Split String	${ini_content}
+		# ${scriptdir}=	Get Index From List		${ini_content_list}		scriptdir
+		#
+		# ${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${scriptdir + 2}]	${optional_path}
+		# ${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${scriptdir + 5}]	${optional_path}
+		#
+		# Remove File		${location}
+		# Log		${ini_content}
+		# Append To File	${location}		${ini_content}
+		Change Manager INI Option 	Plan 		scriptdir 	${optional_path}
 	END
 
 	Log		${global_name}
@@ -540,60 +541,79 @@ Get Manager INI Location
 
 Get Manager INI Data
 	${location}=	Get Manager INI Location
-	TRY
-		File Should Exist	${location}
-		File Should Not Be Empty	${location}
-	EXCEPT
-		# --- temp fix:
-		@{mngr_options}= 	Create List 	-g 	1
-		Open Manager GUI 		${mngr_options}
-		# ---
-		Run Keyword		Close Manager GUI ${platform}
-		File Should Exist	${location}
-		File Should Not Be Empty	${location}
-	END
-	${ini_content}=	Get File	${location}
-	Log	${ini_content}
-	Should Not Be Empty	${ini_content}
-	RETURN	${ini_content}
+	# TRY
+	# 	File Should Exist	${location}
+	# 	File Should Not Be Empty	${location}
+	# EXCEPT
+	# 	# --- temp fix:
+	# 	@{mngr_options}= 	Create List 	-g 	1
+	# 	Open Manager GUI 		${mngr_options}
+	# 	# ---
+	# 	Run Keyword		Close Manager GUI ${platform}
+	# 	File Should Exist	${location}
+	# 	File Should Not Be Empty	${location}
+	# END
+	# ${ini_content}=	Get File	${location}
+	# Log	${ini_content}
+	# Should Not Be Empty	${ini_content}
+	# RETURN	${ini_content}
+	${cfg}= 	Evaluate 		configparser.ConfigParser()		modules=configparser
+	Evaluate 		$cfg.read('${location}')
+	${ini_content}= 	Convert To Dictionary 		${cfg}
+	Log				${ini_content}
+	RETURN		${ini_content}
 
 #Read INI Data
 #	[Arguments]		${inifile}
 
 Set INI Window Size
 	[Arguments]		${width}=${None}	${height}=${None}
-	${location}=	Get Manager INI Location
-	${ini_content}=		Get Manager INI Data
-	${ini_content_list}=	Split String	${ini_content}
-	${i}=	Get Index From List		${ini_content_list}		win_width
-	${j}=	Get Index From List		${ini_content_list}		win_height
+	# ${location}=	Get Manager INI Location
+	# ${ini_content}=		Get Manager INI Data
+	# ${ini_content_list}=	Split String	${ini_content}
+	# ${i}=	Get Index From List		${ini_content_list}		win_width
+	# ${j}=	Get Index From List		${ini_content_list}		win_height
 	IF	"${width}" != "${None}"
-		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${i + 2}]	${width}
+		# ${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${i + 2}]	${width}
+		Change Manager INI Option 	GUI 		win_width 	${width}
 	END
 	IF	"${height}" != "${None}"
-		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${j + 2}]	${height}
+		# ${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${j + 2}]	${height}
+		Change Manager INI Option 	GUI 		win_height 	${height}
 	END
-	Remove File		${location}
-	Log		${ini_content}
-	Append To File	${location}		${ini_content}
+	# Remove File		${location}
+	# Log		${ini_content}
+	# Append To File	${location}		${ini_content}
+
+Change Manager INI Option
+	[Arguments]		${section} 		${option}		${new_value}
+	${location}=	Get Manager INI Location
+	${cfg}= 	Evaluate 		configparser.ConfigParser()		modules=configparser
+	Evaluate 		$cfg.read('${location}')
+	Evaluate 		$cfg[${section}][${option}]=${new_value}
+	Evaluate 		with open('${location}', 'w') as configfile:
+	... 		config.write(configfile)
+	${ini_content}= 	Convert To Dictionary 		${cfg}
+	Log				${ini_content}
 
 Change Manager INI File Settings
 	[Arguments]		${option}	${new_value}
-	${location}=	Get Manager INI Location
-	${ini_content}=		Get Manager INI Data
-	${ini_content_list}=	Split String	${ini_content}
-	${option_index}=	Get Index From List		${ini_content_list}		${option}
-
-	${len}	Get Length	${ini_content_list}
-	IF  ${len} > ${option_index + 2}
-		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${option_index + 2}]	${new_value}
-	ELSE
-		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${option_index}] =	${option} = ${new_value}
-	END
-
-	Remove File		${location}
-	Log		${ini_content}
-	Append To File	${location}		${ini_content}
+	Fail 		Deprecated keyword, use: Change Manager INI Option
+	# ${location}=	Get Manager INI Location
+	# ${ini_content}=		Get Manager INI Data
+	# ${ini_content_list}=	Split String	${ini_content}
+	# ${option_index}=	Get Index From List		${ini_content_list}		${option}
+	#
+	# ${len}	Get Length	${ini_content_list}
+	# IF  ${len} > ${option_index + 2}
+	# 	${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${option_index + 2}]	${new_value}
+	# ELSE
+	# 	${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${option_index}] =	${option} = ${new_value}
+	# END
+	#
+	# Remove File		${location}
+	# Log		${ini_content}
+	# Append To File	${location}		${ini_content}
 
 Get Manager PIP Data
 	Run Process	pip	show	rfswarm-manager		alias=data
