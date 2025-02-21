@@ -4,11 +4,11 @@ Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #97 	Languages
 Resource 	GUI_Common.robot
 Variables 	${CURDIR}${/}testdata${/}Issue-#97${/}lang_samples.yaml
 
-Suite Setup 	Set Platform
+Suite Setup 	Non-ASCII Suite Setup
 Test Setup 		Non-ASCII Test Setup
 Test Template 	Test Non-ASCII Characters
 Test Teardown 	Non-ASCII Test Teardown
-Suite Teardown 	Copy Directory 	${test_data} 	${OUTPUT DIR}${/}results
+Suite Teardown 	Non-ASCII Suite Teardown
 
 
 *** Variables ***
@@ -63,6 +63,15 @@ Test Non-ASCII Characters
 	Check DB For Metrics 	${langcode} 	${sample}
 	Check CSV Files 	${langcode} 	${sample}
 	Check Logs
+
+Non-ASCII Suite Setup
+	Remove Directory 	${OUTPUT DIR}${/}results${/}Issue-#97 	recursive=${True}
+	Set Platform
+
+Non-ASCII Suite Teardown
+	Copy Directory 		${test_data} 	${OUTPUT DIR}${/}results${/}Issue-#97
+	Remove Directory 	${test_data}${/}files 	recursive=${True}
+	Remove Directory 	${test_data}${/}results 	recursive=${True}
 
 Non-ASCII Test Setup
 	${mgrini}= 	Get Manager INI Location

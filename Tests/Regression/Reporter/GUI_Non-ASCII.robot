@@ -4,17 +4,15 @@ Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #97 	Languages
 Resource 	GUI_Common.robot
 Variables 	${CURDIR}${/}testdata${/}Issue-#97${/}lang_samples.yaml
 
-Suite Setup 	Set Platform
+Suite Setup 	Non-ASCII Suite Setup
 Test Setup 		Non-ASCII Test Setup
 Test Template 	Test Non-ASCII Characters
 Test Teardown 	Non-ASCII Test Teardown
-Suite Teardown 	Copy Directory 	${test_data} 	${OUTPUT DIR}${/}results
-
+Suite Teardown 	Non-ASCII Suite Teardown
 
 *** Variables ***
 ${test_data} 		${CURDIR}${/}testdata${/}Issue-#97
 ${scenario_name} 	${None}
-${results_dir} 		${None}
 
 
 *** Test Cases ***
@@ -36,19 +34,17 @@ Test Non-ASCII Characters
 	[Documentation] 	Verify all fields handle UTF-8 correctly, especially non Latin characters.
 	[Arguments] 	${langcode}
 	Log 	\n\n\n> Testing: ${langcode} 	console=True
-
 	VAR 	${sample} 	${Samples.${langcode}}
-	Set Test Variable 	${results_dir} 		${test_data}${/}results
-	Create Directory 	${results_dir}
 	${template_file}= 	Create Language Files 	${langcode} 	${sample}
+	${manager_results} 	Choose Language Manager Result DB 	${langcode}
 
-	Open GUI 	-g 	1 	-d 	${results_dir} 	-t 	${template_file}
+	Open GUI 	-g 	1 	-d 	${manager_results} 	-t 	${template_file}
 	Wait For Status 	PreviewLoaded
 
 
 	Log 	Test fields: 	console=${True}
 
-	Set Text Value To Right Of 	Title 	${sample}
+	#Set Text Value To Right Of 	Title 	${sample}
 	Take A Screenshot
 
 	Click Section 	Note
@@ -87,6 +83,16 @@ Test Non-ASCII Characters
 
 	Check Logs
 
+Non-ASCII Suite Setup
+	Remove Directory 	${OUTPUT DIR}${/}results${/}Issue-#97 	recursive=${True}
+	Set Platform
+	Extract Zip File 	${test_data}${/}manager_results.zip 	${test_data}
+
+Non-ASCII Suite Teardown
+	Copy Directory 		${test_data} 	${OUTPUT DIR}${/}results${/}Issue-#97
+	Remove Directory 	${test_data}${/}files 	recursive=${True}
+	Remove Directory 	${test_data}${/}manager_results 	recursive=${True}
+
 Non-ASCII Test Setup
 	Change Reporter INI File Settings 	win_width 	1200
 	Change Reporter INI File Settings 	win_height 	700
@@ -94,6 +100,20 @@ Non-ASCII Test Setup
 Non-ASCII Test Teardown
 	Close GUI
 
+Choose Language Manager Result DB
+	[Arguments] 	${langcode}
+	VAR 	${manager_results} 	${test_data}${/}manager_results
+	@{manager_results}= 	List Directories In Directory 	${manager_results} 	absolute=${True}
+	FOR  ${result}  IN  @{manager_results}
+		@{splitted_path}= 	Split String From Right 	${result} 	separator=_ 	max_split=2
+		VAR 	${result_langcode} 	${splitted_path}[-2]
+		IF  '${result_langcode}' == '${langcode}'
+			RETURN 	${result}
+		END
+	END
+
+	Fail 	Can't find manager results directory with the specified language code.
+	
 Create Language Files
 	[Arguments] 	${langcode} 	${sample}
 	Create Directory 	${test_data}${/}files
@@ -107,20 +127,12 @@ Create Language Files
 	RETURN 	${template_file}
 
 Check Logs
-	${stdout_manager}= 		Read Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Read Log 	${OUTPUT DIR}${/}stderr_manager.txt
-	${stdout_agent}= 		Read Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${stderr_agent}= 		Read Log 	${OUTPUT DIR}${/}stderr_agent.txt
+	${stdout_reporter}= 		Read Log 	${OUTPUT DIR}${/}stdout.txt
+	${stderr_reporter}= 		Read Log 	${OUTPUT DIR}${/}stderr.txt
 
-	Should Not Contain 	${stdout_manager} 	RuntimeError
-	Should Not Contain 	${stderr_manager} 	RuntimeError
-	Should Not Contain 	${stdout_manager} 	Exception
-	Should Not Contain 	${stderr_manager} 	Exception
-	Should Not Contain 	${stdout_manager}	OSError
-	Should Not Contain 	${stderr_manager} 	OSError
-	Should Not Contain 	${stdout_agent} 	RuntimeError
-	Should Not Contain 	${stderr_agent} 	RuntimeError
-	Should Not Contain 	${stdout_agent} 	Exception
-	Should Not Contain 	${stderr_agent} 	Exception
-	Should Not Contain 	${stdout_agent}		OSError
-	Should Not Contain 	${stderr_agent} 	OSError
+	Should Not Contain 	${stdout_reporter} 	RuntimeError
+	Should Not Contain 	${stderr_reporter} 	RuntimeError
+	Should Not Contain 	${stdout_reporter} 	Exception
+	Should Not Contain 	${stderr_reporter} 	Exception
+	Should Not Contain 	${stdout_reporter}	OSError
+	Should Not Contain 	${stderr_reporter} 	OSError

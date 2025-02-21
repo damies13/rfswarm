@@ -3,6 +3,7 @@ Library 	OperatingSystem
 Library 	Process
 Library 	String
 Library 	Collections
+Library 	ArchiveLibrary
 Library 	DocTest.VisualTest
 Library 	XML 	use_lxml=True
 
@@ -323,7 +324,25 @@ Set Text Value To Right Of
 	Take A Screenshot
 	Double Click
 	Take A Screenshot
-	Type 	${value}
+	
+	# @{characters}= 	Split String 	${value} 	separator=${SPACE}
+	# ${len} 	Get Length 	${characters}
+	# FOR  ${i}  IN RANGE  0  ${len}
+	# 	Type 	${characters}[${i}]
+	# 	Sleep 	0.1s
+	# 	IF  not ${i+1} == ${len}
+	# 		Type 	${SPACE}
+	# 	END
+	# 	Sleep 	0.1s
+	# END
+	
+	Evaluate 	clipboard.copy("${value}") 	modules=clipboard
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.v
+	ELSE
+		Press Combination	KEY.ctrl		KEY.v
+	END
+	# Type 	${value}
 	Take A Screenshot
 	IF 	$platform == 'macos'
 		# Take A Screenshot
