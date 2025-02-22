@@ -57,17 +57,20 @@ Set Platform By Tag
 	# [Arguments]		${ostag}
 	Log 	${OPTIONS}
 	Log 	${OPTIONS}[include]
-	Log 	${OPTIONS}[include][0]
-	${ostag}= 	Set Variable 	${OPTIONS}[include][0]
+	${inclen}= 	Get Length 	${OPTIONS}[include]
+x	IF 	${inclen} > 0
+		Log 	${OPTIONS}[include][0]
+		${ostag}= 	Set Variable 	${OPTIONS}[include][0]
 
-	IF 	"${ostag}" == "macos-latest"
-		Set Suite Variable    ${platform}    macos
-	END
-	IF 	"${ostag}" == "windows-latest"
-		Set Suite Variable    ${platform}    windows
-	END
-	IF 	"${ostag}" == "ubuntu-latest"
-		Set Suite Variable    ${platform}    ubuntu
+		IF 	"${ostag}" == "macos-latest"
+			Set Suite Variable    ${platform}    macos
+		END
+		IF 	"${ostag}" == "windows-latest"
+			Set Suite Variable    ${platform}    windows
+		END
+		IF 	"${ostag}" == "ubuntu-latest"
+			Set Suite Variable    ${platform}    ubuntu
+		END
 	END
 
 Open Agent
@@ -541,22 +544,6 @@ Get Manager INI Location
 
 Get Manager INI Data
 	${location}=	Get Manager INI Location
-	# TRY
-	# 	File Should Exist	${location}
-	# 	File Should Not Be Empty	${location}
-	# EXCEPT
-	# 	# --- temp fix:
-	# 	@{mngr_options}= 	Create List 	-g 	1
-	# 	Open Manager GUI 		${mngr_options}
-	# 	# ---
-	# 	Run Keyword		Close Manager GUI ${platform}
-	# 	File Should Exist	${location}
-	# 	File Should Not Be Empty	${location}
-	# END
-	# ${ini_content}=	Get File	${location}
-	# Log	${ini_content}
-	# Should Not Be Empty	${ini_content}
-	# RETURN	${ini_content}
 	${cfg}= 	Evaluate 		configparser.ConfigParser()		modules=configparser
 	Evaluate 		$cfg.read('${location}')
 	${ini_content}= 	Convert To Dictionary 		${cfg}
@@ -568,52 +555,22 @@ Get Manager INI Data
 
 Set INI Window Size
 	[Arguments]		${width}=${None}	${height}=${None}
-	# ${location}=	Get Manager INI Location
-	# ${ini_content}=		Get Manager INI Data
-	# ${ini_content_list}=	Split String	${ini_content}
-	# ${i}=	Get Index From List		${ini_content_list}		win_width
-	# ${j}=	Get Index From List		${ini_content_list}		win_height
 	IF	"${width}" != "${None}"
-		# ${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${i + 2}]	${width}
 		Change Manager INI Option 	GUI 		win_width 	${width}
 	END
 	IF	"${height}" != "${None}"
-		# ${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${j + 2}]	${height}
 		Change Manager INI Option 	GUI 		win_height 	${height}
 	END
-	# Remove File		${location}
-	# Log		${ini_content}
-	# Append To File	${location}		${ini_content}
 
 Change Manager INI Option
 	[Arguments]		${section} 		${option}		${new_value}
 	${location}=	Get Manager INI Location
-	${cfg}= 	Evaluate 		configparser.ConfigParser()		modules=configparser
-	Evaluate 		$cfg.read('${location}')
-	Evaluate 		$cfg[${section}][${option}]=${new_value}
-	Evaluate 		with open('${location}', 'w') as configfile:
-	... 		config.write(configfile)
-	${ini_content}= 	Convert To Dictionary 		${cfg}
-	Log				${ini_content}
+	Change INI Option 	${location} 	${section} 		${option}		${new_value}
+
 
 Change Manager INI File Settings
 	[Arguments]		${option}	${new_value}
 	Fail 		Deprecated keyword, use: Change Manager INI Option
-	# ${location}=	Get Manager INI Location
-	# ${ini_content}=		Get Manager INI Data
-	# ${ini_content_list}=	Split String	${ini_content}
-	# ${option_index}=	Get Index From List		${ini_content_list}		${option}
-	#
-	# ${len}	Get Length	${ini_content_list}
-	# IF  ${len} > ${option_index + 2}
-	# 	${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${option_index + 2}]	${new_value}
-	# ELSE
-	# 	${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${option_index}] =	${option} = ${new_value}
-	# END
-	#
-	# Remove File		${location}
-	# Log		${ini_content}
-	# Append To File	${location}		${ini_content}
 
 Get Manager PIP Data
 	Run Process	pip	show	rfswarm-manager		alias=data
