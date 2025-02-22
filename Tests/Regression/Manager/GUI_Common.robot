@@ -407,6 +407,16 @@ Click Menu
 	Sleep 	0.1
 	# Take A Screenshot
 
+Wait For Dialog Button
+	[Arguments]		${btnname} 		${timeout}=${default_image_timeout}
+	${btnnamel}= 	Convert To Lower Case 	${btnname}
+	${img}=	Set Variable		${platform}_dlgbtn_${btnnamel}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=${timeout}
+	@{coordinates}= 	Locate		${img}
+	# Take A Screenshot
+
 Click Dialog Button
 	[Arguments]		${btnname} 		${timeout}=${default_image_timeout}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
@@ -777,7 +787,8 @@ Select ${n} Robot Test Case
 
 Select Robot File OS DIALOG
 	[Arguments]		${robot_file_name}
-	Sleep	5
+	# Sleep	5
+	Wait For Dialog Button		open
 	Type	${robot_file_name}
 	# Take A Screenshot
 	Click Dialog Button		open
@@ -785,15 +796,18 @@ Select Robot File OS DIALOG
 
 Save Scenario File OS DIALOG
 	[Arguments]		${scenario_name}
-	Sleep	5
+	# Sleep	5
+	Wait For Dialog Button		save
+	Take A Screenshot
 	Type	${scenario_name}
-	# Take A Screenshot
+	Take A Screenshot
 	Click Dialog Button		save
 	Sleep	1
 
 Open Scenario File OS DIALOG
 	[Arguments]		${scenario_name}
-	Sleep	5
+	# Sleep	5
+	Wait For Dialog Button		open
 	Type	${scenario_name}.rfs
 	# Take A Screenshot
 	Click Dialog Button		open

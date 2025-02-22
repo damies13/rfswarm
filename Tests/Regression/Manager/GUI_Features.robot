@@ -305,6 +305,7 @@ Verify the Field Validation Is Working In the Manager Plan Screen
 Verify That Files Get Saved With Correct Extension And Names
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #39
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Manager GUI													AND
@@ -577,6 +578,7 @@ Verify the Time Fields In the Plan Screen For Run: Complex Variations
 Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600										AND
 	...    Open Manager GUI															AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]			AND
@@ -632,6 +634,7 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 Check If the Manager Saves Settings on the Test Row With Example Robot
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600										AND
 	...    Open Manager GUI															AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]			AND
@@ -1189,6 +1192,7 @@ Check If Inject Sleep Option Was Executed in the Test
 Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has Trailing
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #98
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Agent
@@ -1229,6 +1233,7 @@ Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has
 Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has No Trailing
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #98
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Agent
@@ -1314,6 +1319,7 @@ Verify If the Port Number And Ip Address Get Written To the INI File
 Verify If Agent Can't Connect On Old Port Number After Port Number Changed And Can Connect To the New One
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Set Test Variable	@{mngr_options}	-g	0						AND
@@ -1358,6 +1364,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Address On the Manager's Host
 	[Tags]	windows-latest 	ubuntu-latest 	macos-latest 	Issue #16
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Set Test Variable	@{mngr_options}	-g	0						AND
@@ -1636,6 +1643,7 @@ Verify Disable output.xml - Test Row
 Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		800		600												AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
 	...    Open Agent	${agent_options}													AND
@@ -1678,6 +1686,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		800		600												AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
 	...    Open Agent	${agent_options}													AND
@@ -1723,6 +1732,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		800		600												AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
 	...    Open Agent	${agent_options}													AND
@@ -1768,6 +1778,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 Verify If __init__.robot Files Get Transfered To the Agent Along With Robot/Resuorce File
 	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #90
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		800		600		AND
 	...    Set Global Filename And Default Save Path	main
 
@@ -1819,6 +1830,7 @@ Verify If __init__.robot Files Get Transfered To the Agent Along With Robot/Resu
 Check If The CSV Report Button Works In the Manager Before There Are Any Results
 	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #128
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600		AND
 	...    Open Agent
 
@@ -1867,6 +1879,7 @@ Check If The CSV Report Button Works In the Manager Before There Are Any Results
 Check If The CSV Report Button Works In The Manager After There Are Results
 	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #254
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600		AND
 	...    Open Agent
 
@@ -1916,6 +1929,7 @@ Check If The CSV Report Button Works In The Manager After There Are Results
 Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robots
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #31
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Manager GUI													AND
@@ -2004,6 +2018,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 Check If Scenario Csv Report Files Contain Correct Data From The Test
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #17
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600		AND
 	...    Open Agent
 
@@ -2123,6 +2138,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
 	[Setup]	Run Keywords
 	...    Clear Manager Result Directory									AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Open Manager GUI													AND
 	...    Open Agent														AND
@@ -2192,6 +2208,7 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
 	[Setup]	Run Keywords
 	...    Clear Manager Result Directory									AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Open Manager GUI													AND
 	...    Open Agent														AND
@@ -2237,6 +2254,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot	AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600							AND
 	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-2	AND
 	...    Open Agent	${agent_options}														AND
@@ -2264,6 +2282,7 @@ Check If Test Scenario Run Will Stop Gradually
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot							AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600													AND
 	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-3	AND
 	...    Open Agent	${agent_options}														AND
@@ -2290,6 +2309,7 @@ Check If Test Scenario Run Will Stop Gradually
 Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #41
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
@@ -2359,6 +2379,7 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 Verify the Robot Count Reduces When Stop Agent While Test Is Running
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #57	Issue #269
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
@@ -2406,6 +2427,7 @@ Verify the Robot Count Reduces When Stop Agent While Test Is Running
 Verify the Files Referenced In the Scenario Are All Using Relative Paths
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #54
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
@@ -2459,6 +2481,7 @@ Verify the Files Referenced In the Scenario Are All Using Relative Paths
 Verify If Upload logs=Immediately Is Being Saved To The Scenario And Read Back Correctly
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Manager GUI
@@ -2495,6 +2518,7 @@ Verify If Upload logs=Immediately Is Being Saved To The Scenario And Read Back C
 Verify If Upload logs=Error Only Is Being Saved To The Scenario And Read Back Correctly
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Manager GUI
@@ -2531,6 +2555,7 @@ Verify If Upload logs=Error Only Is Being Saved To The Scenario And Read Back Co
 Verify If Upload logs=All Deferred Is Being Saved To The Scenario And Read Back Correctly
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Manager GUI
@@ -2567,6 +2592,7 @@ Verify If Upload logs=All Deferred Is Being Saved To The Scenario And Read Back 
 Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardless Of Robot Passes Or Fails
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
@@ -2614,6 +2640,7 @@ Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardl
 Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only When Robot Fails
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
@@ -2663,6 +2690,7 @@ Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only Whe
 Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
@@ -2909,6 +2937,7 @@ Verify Result Name - Test Row
 Verify That Time Gets Correctly Validated For Schelduled Start
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600 	AND
 	...    Open Manager GUI
 
@@ -2956,6 +2985,7 @@ Verify That Time Gets Correctly Validated For Schelduled Start
 Verify Schedule Date And Time Are Always In the Future
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600 	AND
 	...    Open Manager GUI
 
@@ -3022,6 +3052,7 @@ Verify Schedule Date And Time Are Always In the Future
 Verify That When Time Is Entered In the Past It Becomes the Next Day
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600 	AND
 	...    Open Manager GUI
 
@@ -3077,6 +3108,7 @@ Verify That When Time Is Entered In the Past It Becomes the Next Day
 Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time Has Elapsed
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600 	AND
 	...    Open Agent
 
@@ -3100,7 +3132,9 @@ Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time
 
 Verify the Start Time Is Displayed On the Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
-	[Setup]	Set INI Window Size		1200	600
+	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
+	...    Set INI Window Size		1200	600 	AND
 
 	${current_time}=	Get Current Date	result_format=%H
 	IF  '${current_time}' == '${3}'
@@ -3125,7 +3159,9 @@ Verify the Start Time Is Displayed On the Plan Screen
 
 Verify the Remaining Time Is Displayed On the Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
-	[Setup]	Set INI Window Size		1200	600
+	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
+	...    Set INI Window Size		1200	600 	AND
 
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
 	#adding 10m:20s
@@ -3145,7 +3181,9 @@ Verify the Remaining Time Is Displayed On the Plan Screen
 
 Verify That the Start Time And Time Remaining Are Removed From Plan Screen When Scheduled Start Is Disabled
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
-	[Setup]	Set INI Window Size		1200	600
+	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
+	...    Set INI Window Size		1200	600 	AND
 
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
 	#adding 10m:20s
