@@ -553,7 +553,7 @@ Get Manager INI Location
 	RETURN	${location}RFSwarmManager.ini
 
 Show Manager INI Data
-	${location}=	Get Manager Default Save Path
+	${location}=	Get Manager INI Location
 	Show Log 	${location}
 
 Get Manager INI Data
