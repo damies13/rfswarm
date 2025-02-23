@@ -550,7 +550,11 @@ Get Manager Default Save Path
 
 Get Manager INI Location
 	${location}=	Get Manager Default Save Path
-	RETURN	${location}${/}RFSwarmManager.ini
+	RETURN	${location}RFSwarmManager.ini
+
+Show Manager INI Data
+	${location}=	Get Manager Default Save Path
+	Show Log 	${location}
 
 Get Manager INI Data
 	${location}=	Get Manager INI Location
@@ -788,7 +792,7 @@ Select ${n} Robot Test Case
 Select Robot File OS DIALOG
 	[Arguments]		${robot_file_name}
 	# Sleep	5
-	Wait For Dialog Button		open
+	Wait For Dialog Button		cancel
 	Type	${robot_file_name}
 	# Take A Screenshot
 	Click Dialog Button		open
@@ -797,7 +801,7 @@ Select Robot File OS DIALOG
 Save Scenario File OS DIALOG
 	[Arguments]		${scenario_name}
 	# Sleep	5
-	Wait For Dialog Button		save
+	Wait For Dialog Button		cancel
 	Take A Screenshot
 	Type	${scenario_name}
 	Take A Screenshot
@@ -807,7 +811,7 @@ Save Scenario File OS DIALOG
 Open Scenario File OS DIALOG
 	[Arguments]		${scenario_name}
 	# Sleep	5
-	Wait For Dialog Button		open
+	Wait For Dialog Button		cancel
 	Type	${scenario_name}.rfs
 	# Take A Screenshot
 	Click Dialog Button		open

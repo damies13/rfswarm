@@ -265,8 +265,11 @@ Manager Command Line INI --ini
 Verify the Field Validation Is Working In the Manager Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #126
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
+	...    Show Manager INI Data																AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Show Manager INI Data																AND
 	...    Open Manager GUI													AND
 	...    Create Robot File	name=example.robot	file_content=***Test Case***\nExample Test Case\n
 
@@ -307,6 +310,7 @@ Verify That Files Get Saved With Correct Extension And Names
 	[Setup]	Run Keywords
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
+	...    Show Manager INI Data																AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Manager GUI													AND
 	...    Open Agent
@@ -1689,8 +1693,9 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		800		600												AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
+	...    Show Manager INI Data																AND
 	...    Open Agent	${agent_options}													AND
-	...    Open Manager GUI																	AND
+	...    Open Manager GUI																			AND
 	...    Set Global Filename And Default Save Path	main								AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main2.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
 
@@ -3134,7 +3139,7 @@ Verify the Start Time Is Displayed On the Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
 	[Setup]	Run Keywords
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
-	...    Set INI Window Size		1200	600 	AND
+	...    Set INI Window Size		1200	600
 
 	${current_time}=	Get Current Date	result_format=%H
 	IF  '${current_time}' == '${3}'
@@ -3161,7 +3166,7 @@ Verify the Remaining Time Is Displayed On the Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
 	[Setup]	Run Keywords
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
-	...    Set INI Window Size		1200	600 	AND
+	...    Set INI Window Size		1200	600
 
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
 	#adding 10m:20s
@@ -3183,7 +3188,7 @@ Verify That the Start Time And Time Remaining Are Removed From Plan Screen When 
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
 	[Setup]	Run Keywords
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
-	...    Set INI Window Size		1200	600 	AND
+	...    Set INI Window Size		1200	600
 
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
 	#adding 10m:20s
