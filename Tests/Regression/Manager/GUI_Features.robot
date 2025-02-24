@@ -301,9 +301,9 @@ Verify the Field Validation Is Working In the Manager Plan Screen
 
 	END
 
-	# [Teardown]	Run Keywords
+	[Teardown]	Run Keywords
 	# ...    Delete Robot File	${robot_data}[0]			AND
-	# ...    Run Keyword		Close Manager GUI ${platform}
+	...    Run Keyword		Close Manager GUI ${platform}
 
 Verify That Files Get Saved With Correct Extension And Names
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #39
