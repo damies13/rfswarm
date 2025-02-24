@@ -16,6 +16,7 @@ def read_ini_file(filename):
 			variables[section][key] = value
 	return variables
 
+
 def change_ini_option(filename, section, optionname, new_value):
 	"""Open ini change setting and close"""
 	print("filename:", filename)
@@ -30,8 +31,7 @@ def change_ini_option(filename, section, optionname, new_value):
 		config[section] = {}
 	print("section:", config, dict(config))
 
-	config[section][optionname]=new_value
-
+	config[section][optionname] = new_value
 
 	with open(filename, 'w') as configfile:
 		config.write(configfile)
