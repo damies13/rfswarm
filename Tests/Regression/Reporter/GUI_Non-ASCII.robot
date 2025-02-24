@@ -104,7 +104,7 @@ Test Non-ASCII Characters
 	Wait Until Created 	${html_file}	timeout=9 minutes
 
 	VAR 	@{data} 	${sample}  2025-02-21 01:47 - 01:49
-	VAR 	&{Cover_ASCII} 	text=${data}
+	VAR 	&{Cover_ASCII} 	text=${${langcode} Cover}
 	VAR 	${Cover} 	&{Cover_ASCII} 	scope=TEST
 	${html} 	Parse HTML File 	${html_file}
 	@{headings}= 	Extract All HTML Report Headings 	${html}
@@ -152,8 +152,6 @@ Test Non-ASCII Characters
 	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
 	Verify HTML Report Error Details Content 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path}
 
-	Check Logs
-
 Non-ASCII Suite Setup
 	Remove Directory 	${OUTPUT DIR}${/}results${/}Issue-#97 	recursive=${True}
 	Set Platform
@@ -170,6 +168,7 @@ Non-ASCII Test Setup
 
 Non-ASCII Test Teardown
 	Close GUI
+	Check Logs
 
 Choose Language Manager Result DB
 	[Arguments] 	${langcode}

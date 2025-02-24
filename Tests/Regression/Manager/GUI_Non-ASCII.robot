@@ -62,7 +62,6 @@ Test Non-ASCII Characters
 
 	Check DB For Metrics 	${langcode} 	${sample}
 	Check CSV Files 	${langcode} 	${sample}
-	Check Logs
 
 Non-ASCII Suite Setup
 	Remove Directory 	${OUTPUT DIR}${/}results${/}Issue-#97 	recursive=${True}
@@ -80,6 +79,7 @@ Non-ASCII Test Setup
 Non-ASCII Test Teardown
 	Stop Agent
 	Run Keyword		Close Manager GUI ${platform}
+	Check Logs
 
 Create Language Files
 	[Arguments] 	${langcode} 	${sample}
