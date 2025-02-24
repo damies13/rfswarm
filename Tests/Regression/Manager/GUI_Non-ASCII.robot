@@ -39,9 +39,9 @@ Test Non-ASCII Characters
 	Log 	\n\n\n> Testing: ${langcode} 	console=True
 
 	VAR 	${sample} 	${Samples.${langcode}}
-	Set Test Variable 	${scenario_name} 	${langcode}_scenario
-	Set Test Variable 	${results_dir} 		${test_data}${/}results
-	Set Test Variable 	${agent_name} 		${sample}
+	VAR 	${scenario_name} 	${langcode}_scenario 		scope=TEST
+	VAR 	${results_dir} 		${test_data}${/}results 	scope=TEST
+	VAR 	${agent_name} 		${sample} 					scope=TEST
 	Create Directory 	${results_dir}
 	${robot_file} 	${scenario_file}= 	Create Language Files 	${langcode} 	${sample}
 	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${results_dir}

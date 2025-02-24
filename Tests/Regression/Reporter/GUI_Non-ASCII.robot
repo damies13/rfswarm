@@ -44,42 +44,113 @@ Test Non-ASCII Characters
 
 	Log 	Test fields: 	console=${True}
 
-	#Set Text Value To Right Of 	Title 	${sample}
+	Set Text Value To Right Of 	Title 	${sample}
 	Take A Screenshot
 
 	Click Section 	Note
 	VAR 	${note_sample_heading} 	${sample} Note
 	Set Text Value To Right Of 	Heading 	${note_sample_heading}
 	Click Label With Vertical Offset 	Heading 	90
-	Type 	${sample}
+	Evaluate 	clipboard.copy("${sample}") 	modules=clipboard
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.v
+	ELSE
+		Press Combination	KEY.ctrl		KEY.v
+	END
 	Take A Screenshot
+	Click Tab 	Preview
+	Click Tab 	Settings
 
 	Click Section	TestResultSummary
 	VAR 	${data_table_sample_heading} 	${sample} TestResultSummary
 	Set Text Value To Right Of 	Heading 	${data_table_sample_heading}
-	Take A Screenshot  # get image*** vvv
 	Set Text Value To Right Of 	ResultName 	${sample} 	offsetx=100
 	Take A Screenshot
+	Click Tab 	Preview
+	Click Tab 	Settings
 
 	Click Section 	DataGraph
 	VAR 	${graph_sample_heading} 	${sample} DataGraph
 	Set Text Value To Right Of 	Heading 	${graph_sample_heading}
 	Take A Screenshot
+	Click Tab 	Preview
+	Click Tab 	Settings
 
 	Click Section 	Errors
 	VAR 	${errors_sample_heading} 	${sample} Errors
 	Set Text Value To Right Of 	Heading 	${errors_sample_heading}
 	Take A Screenshot
-	# K all section headings
-	# K preview Table of Contents for section headings (html)
-	# filter for graphs and data table (Metric and Agent name)
-	# Error details
+	Click Tab 	Preview
+	Click Tab 	Settings
+
+	Click Button 	SaveTemplate
+	Sleep 	10
 
 	Log 	Test Template: 	console=${True}
-
+	${template_content} 	Get File 	${template_file}
+	Should Contain 	${template_content} 	title = ${sample}
+	Should Contain 	${template_content} 	name = ${note_sample_heading}
+	Should Contain 	${template_content} 	name = ${data_table_sample_heading}
+	Should Contain 	${template_content} 	col_result_name = ${sample}
+	Should Contain 	${template_content} 	filterpattern = ${sample} Keyword
+	Should Contain 	${template_content} 	name = ${graph_sample_heading}
+	Should Contain 	${template_content} 	name = ${errors_sample_heading}
 
 	Log 	Test HTML DOCX? XLSX? Reports: 	console=${True}
-	# preview Table of Contents
+	Click Button	generatehtml
+	Sleep 	1
+	@{files} 	List Files In Directory 	${manager_results} 	pattern=*.html 	absolute=${True}
+	VAR 	${html_file} 	${files}[0]
+	Wait Until Created 	${html_file}	timeout=9 minutes
+
+	VAR 	@{data} 	${sample}  2025-02-21 01:47 - 01:49
+	VAR 	&{Cover_ASCII} 	text=${data}
+	VAR 	${Cover} 	&{Cover_ASCII} 	scope=TEST
+	${html} 	Parse HTML File 	${html_file}
+	@{headings}= 	Extract All HTML Report Headings 	${html}
+	Log		${headings}
+
+	Verify HTML Cover Page 	${html}
+
+	VAR 	${section} 	${note_sample_heading}
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	VAR 	${section} 	${langcode} Note
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Notes 	${section} 	${section_obj}
+
+	VAR 	${section} 	Table of Contents
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	VAR 	${section} 	${langcode} Contents
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Contents 	${section} 	${section_obj}
+
+	VAR 	${section} 	${data_table_sample_heading}
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	VAR 	${section} 	${langcode} Table
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Table Content 	${section} 	${section_obj}
+
+	VAR 	${section} 	Filter TestResultSummary
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	VAR 	${section} 	${langcode} Filter Table
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Table Content 	${section} 	${section_obj}
+
+	VAR 	${html_img_path} 	${manager_results}${/}html_images
+	VAR 	${html_expected_img_path} 	${test_data}${/}html_images
+	VAR 	${img_comp_threshold} 	0.7
+	VAR 	${move_tolerance} 	30
+	VAR 	${section} 	${graph_sample_heading}
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	VAR 	${section} 	${langcode} graph
+	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
+
+	VAR 	${section} 	${errors_sample_heading}
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	VAR 	${section} 	${langcode} Errors
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Error Details Content 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path}
 
 	Check Logs
 

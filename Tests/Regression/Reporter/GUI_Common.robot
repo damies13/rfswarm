@@ -1047,25 +1047,35 @@ Verify HTML Report Table Content
 
 	@{rows_numbers} 	Convert To List 	${${section}.rows_numbers}
 
-	@{first_data_row} 		Convert To List 	${section_table}[${rows_numbers}[0]]
-	@{first_row_expected} 	Convert To List 	${${section}.first_row}
-	Lists Should Be Equal 	${first_row_expected} 	${first_data_row}	msg=[ Expected != Converted ]
+	IF  '${rows_numbers}[0]' != '_'
+		@{first_data_row} 		Convert To List 	${section_table}[${rows_numbers}[0]]
+		@{first_row_expected} 	Convert To List 	${${section}.first_row}
+		Lists Should Be Equal 	${first_row_expected} 	${first_data_row}	msg=[ Expected != Converted ]
+	END
 
-	@{last_row} 			Convert To List 	${section_table}[${rows_numbers}[1]]
-	@{last_row_expected} 	Convert To List 	${${section}.last_row}
-	Lists Should Be Equal 	${last_row_expected} 	${last_row}	msg=[ Expected != Converted ]
+	IF  '${rows_numbers}[1]' != '_'
+		@{last_row} 			Convert To List 	${section_table}[${rows_numbers}[1]]
+		@{last_row_expected} 	Convert To List 	${${section}.last_row}
+		Lists Should Be Equal 	${last_row_expected} 	${last_row}	msg=[ Expected != Converted ]
+	END
 
-	@{quater_row} 			Convert To List 	${section_table}[${rows_numbers}[2]]
-	@{quater_row_expected} 	Convert To List 	${${section}.quater_row}
-	Lists Should Be Equal 	${quater_row_expected} 	${quater_row}	msg=[ Expected != Converted ]
+	IF  '${rows_numbers}[2]' != '_'
+		@{quater_row} 			Convert To List 	${section_table}[${rows_numbers}[2]]
+		@{quater_row_expected} 	Convert To List 	${${section}.quater_row}
+		Lists Should Be Equal 	${quater_row_expected} 	${quater_row}	msg=[ Expected != Converted ]
+	END
 
-	@{mid_row} 				Convert To List 	${section_table}[${rows_numbers}[3]]
-	@{mid_row_expected} 	Convert To List 	${${section}.mid_row}
-	Lists Should Be Equal 	${mid_row_expected} 	${mid_row}	msg=[ Expected != Converted ]
+	IF  '${rows_numbers}[3]' != '_'
+		@{mid_row} 				Convert To List 	${section_table}[${rows_numbers}[3]]
+		@{mid_row_expected} 	Convert To List 	${${section}.mid_row}
+		Lists Should Be Equal 	${mid_row_expected} 	${mid_row}	msg=[ Expected != Converted ]
+	END
 
-	@{upper_mid_row} 			Convert To List 	${section_table}[${rows_numbers}[4]]
-	@{upper_mid_row_expected} 	Convert To List 	${${section}.upper_mid_row}
-	Lists Should Be Equal 	${upper_mid_row_expected} 	${upper_mid_row}	msg=[ Expected != Converted ]
+	IF  '${rows_numbers}[4]' != '_'
+		@{upper_mid_row} 			Convert To List 	${section_table}[${rows_numbers}[4]]
+		@{upper_mid_row_expected} 	Convert To List 	${${section}.upper_mid_row}
+		Lists Should Be Equal 	${upper_mid_row_expected} 	${upper_mid_row}	msg=[ Expected != Converted ]
+	END
 
 Verify HTML Report Error Details Content
 	[Documentation]
@@ -1099,25 +1109,35 @@ Verify HTML Report Error Details Content
 
 	@{rows_numbers} 	Convert To List 	${${section}.rows_numbers}
 
-	@{first_data_row} 		Convert To List 	${section_table}[${rows_numbers}[0]]
-	@{first_row_expected} 	Convert To List 	${${section}.first_row}
-	Lists Should Be Equal 	${first_row_expected} 	${first_data_row}	msg=[ Expected != Converted ]
+	IF  '${rows_numbers}[0]' != '_'
+		@{first_data_row} 		Convert To List 	${section_table}[${rows_numbers}[0]]
+		@{first_row_expected} 	Convert To List 	${${section}.first_row}
+		Lists Should Be Equal 	${first_row_expected} 	${first_data_row}	msg=[ Expected != Converted ]
+	END
 
-	@{last_row} 			Convert To List 	${section_table}[${rows_numbers}[1]]
-	@{last_row_expected} 	Convert To List 	${${section}.last_row}
-	Lists Should Be Equal 	${last_row_expected} 	${last_row}	msg=[ Expected != Converted ]
+	IF  '${rows_numbers}[1]' != '_'
+		@{last_row} 			Convert To List 	${section_table}[${rows_numbers}[1]]
+		@{last_row_expected} 	Convert To List 	${${section}.last_row}
+		Lists Should Be Equal 	${last_row_expected} 	${last_row}	msg=[ Expected != Converted ]
+	END
 
-	@{quater_row} 			Convert To List 	${section_table}[${rows_numbers}[2]]
-	@{quater_row_expected} 	Convert To List 	${${section}.quater_row}
-	Lists Should Be Equal 	${quater_row_expected} 	${quater_row}	msg=[ Expected != Converted ]
+	IF  '${rows_numbers}[2]' != '_'
+		@{quater_row} 			Convert To List 	${section_table}[${rows_numbers}[2]]
+		@{quater_row_expected} 	Convert To List 	${${section}.quater_row}
+		Lists Should Be Equal 	${quater_row_expected} 	${quater_row}	msg=[ Expected != Converted ]
+	END
 
-	@{mid_row} 				Convert To List 	${section_table}[${rows_numbers}[3]]
-	@{mid_row_expected} 	Convert To List 	${${section}.mid_row}
-	Lists Should Be Equal 	${mid_row_expected} 	${mid_row}	msg=[ Expected != Converted ]
+	IF  '${rows_numbers}[3]' != '_'
+		@{mid_row} 				Convert To List 	${section_table}[${rows_numbers}[3]]
+		@{mid_row_expected} 	Convert To List 	${${section}.mid_row}
+		Lists Should Be Equal 	${mid_row_expected} 	${mid_row}	msg=[ Expected != Converted ]
+	END
 
-	@{upper_mid_row} 			Convert To List 	${section_table}[${rows_numbers}[4]]
-	@{upper_mid_row_expected} 	Convert To List 	${${section}.upper_mid_row}
-	Lists Should Be Equal 	${upper_mid_row_expected} 	${upper_mid_row}	msg=[ Expected != Converted ]
+	IF  '${rows_numbers}[4]' != '_'
+		@{upper_mid_row} 			Convert To List 	${section_table}[${rows_numbers}[4]]
+		@{upper_mid_row_expected} 	Convert To List 	${${section}.upper_mid_row}
+		Lists Should Be Equal 	${upper_mid_row_expected} 	${upper_mid_row}	msg=[ Expected != Converted ]
+	END
 
 Verify XLSX Cover Page
 	[Arguments] 	${xlsx_file}
