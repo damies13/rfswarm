@@ -321,9 +321,14 @@ Set Text Value To Right Of
 	# Triple Click is broken on MacOS: TypeError: not enough arguments for format string
 	# Triple Click 		button=left 	interval=0.0
 	Click
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.a
+	ELSE
+		Press Combination	KEY.ctrl		KEY.a
+	END
 	Take A Screenshot
-	Double Click
-	Take A Screenshot
+	# Double Click
+	# Take A Screenshot
 	
 	# @{characters}= 	Split String 	${value} 	separator=${SPACE}
 	# ${len} 	Get Length 	${characters}
