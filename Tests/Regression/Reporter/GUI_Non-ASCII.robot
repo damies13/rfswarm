@@ -158,6 +158,7 @@ Non-ASCII Suite Setup
 
 Non-ASCII Suite Teardown
 	Copy Directory 		${test_data} 	${OUTPUT DIR}${/}results${/}Issue-#97
+	Remove File 	${OUTPUT DIR}${/}results${/}Issue-#97${/}manager_results.zip
 	Remove Directory 	${test_data}${/}files 	recursive=${True}
 	Remove Directory 	${test_data}${/}manager_results 	recursive=${True}
 
