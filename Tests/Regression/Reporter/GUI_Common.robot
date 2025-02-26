@@ -836,7 +836,7 @@ Parse HTML File
 	[Documentation] 	Parse HTML file to the etree object using lxml module.
 	[Arguments] 	${html_file}
 	File Should Exist 	${html_file}
-	${html}= 	Evaluate 	lxml.etree.parse(r'${html_file}', lxml.etree.HTMLParser()) 	modules=lxml.etree
+	${html}= 	Evaluate 	lxml.etree.parse(r'${html_file}', lxml.etree.HTMLParser(encoding="utf-8")) 	modules=lxml.etree
 
 	RETURN 	${html}
 
