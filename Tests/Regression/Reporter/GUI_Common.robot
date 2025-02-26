@@ -321,12 +321,14 @@ Set Text Value To Right Of
 	# Triple Click is broken on MacOS: TypeError: not enough arguments for format string
 	# Triple Click 		button=left 	interval=0.0
 	Click
+	Sleep 	0.3
 	IF  "${platform}" == "macos"
 		Press Combination	KEY.command		KEY.a
 	ELSE
 		Press Combination	KEY.ctrl		KEY.a
 	END
 	Take A Screenshot
+	Sleep 	0.3
 	# Double Click
 	# Take A Screenshot
 	
@@ -372,7 +374,12 @@ Set Text Value To Right Of
 			Take A Screenshot
 			Double Click
 			Take A Screenshot
-			Type 	${value}
+			Evaluate 	clipboard.copy("${value}") 	modules=clipboard
+			IF  "${platform}" == "macos"
+				Press Combination	KEY.command		KEY.v
+			ELSE
+				Press Combination	KEY.ctrl		KEY.v
+			END
 			Take A Screenshot
 			${value2}= 	Get Text Value To Right Of		${label} 		${offsetx}
 		END

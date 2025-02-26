@@ -44,7 +44,7 @@ Test Non-ASCII Characters
 
 	Log 	Test fields: 	console=${True}
 
-	Set Text Value To Right Of 	Title 	${sample}
+	Set Text Value To Right Of 	Title 	${sample} 	offsetx=100
 	Take A Screenshot
 
 	Click Section 	Note
@@ -104,9 +104,7 @@ Test Non-ASCII Characters
 	VAR 	${html_file} 	${files}[0]
 	Wait Until Created 	${html_file}	timeout=9 minutes
 
-	VAR 	@{data} 	${sample}  2025-02-21 01:47 - 01:49
-	VAR 	&{Cover_ASCII} 	text=${${langcode} Cover}
-	VAR 	${Cover} 	&{Cover_ASCII} 	scope=TEST
+	VAR 	${Cover} 	${${langcode} Cover} 	scope=TEST
 	${html} 	Parse HTML File 	${html_file}
 	@{headings}= 	Extract All HTML Report Headings 	${html}
 	Log		${headings}
