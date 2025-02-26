@@ -389,11 +389,17 @@ Click Button
 	${img}=	Set Variable		manager_${platform}_button_${btnnamel}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
+	IF  "${platform}" == "windows"
+		Set Confidence	0.8
+	END
 	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Sleep 	0.1
 	# Take A Screenshot
+	IF  "${platform}" == "windows"
+		Set Confidence	0.9
+	END
 
 Click Menu
 	[Arguments]		${menuname}
