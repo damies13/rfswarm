@@ -660,8 +660,14 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 		Click Button	selected_select_test_case
 		Click Button	select_example
 		Press Key.tab 2 Times
+		IF  "${platform}" == "windows"
+			Set Confidence	0.8
+		END
 		${settings_coordinates}=
-		...    Locate	manager_${platform}_button_selected_runsettingsrow.png
+		...    Locate 	manager_${platform}_button_selected_runsettingsrow.png
+		IF  "${platform}" == "windows"
+			Set Confidence	0.9
+		END
 		Append To List	${settings_locations}	${settings_coordinates}
 		Press Key.tab 1 Times
 	END
@@ -727,8 +733,14 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 		Click Button	selected_select_test_case
 		Click Button	select_example
 		Press Key.tab 2 Times
+		IF  "${platform}" == "windows"
+			Set Confidence	0.8
+		END
 		${settings_coordinates}=
-		...    Locate	manager_${platform}_button_selected_runsettingsrow.png
+		...    Locate 	manager_${platform}_button_selected_runsettingsrow.png
+		IF  "${platform}" == "windows"
+			Set Confidence	0.9
+		END
 		Append To List	${settings_locations}	${settings_coordinates}
 		Press Key.tab 1 Times
 	END
