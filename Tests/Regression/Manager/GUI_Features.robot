@@ -602,9 +602,8 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 				${time_in_s}=	Evaluate	str(${i}${j} * 60 + ${i}${j})
 				Type	${time_in_s}
 				Append To List	${run_times_in_s}	${time_in_s}
-
 			END
-
+			Take A Screenshot
 		END
 		Press Key.tab 2 Times
 		Click Button	selected_runscriptrow
@@ -613,6 +612,7 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 		Click Button	select_example
 		Press Key.tab 3 Times
 	END
+	Take A Screenshot
 	Click Button	runsave
 	Save Scenario File OS DIALOG	${scenario_name}
 
