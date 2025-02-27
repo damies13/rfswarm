@@ -662,11 +662,13 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 		Press Key.tab 2 Times
 		IF  "${platform}" == "windows"
 			Set Confidence	0.85
+			Take A Screenshot
 		END
 		${settings_coordinates}=
 		...    Locate 	manager_${platform}_button_selected_runsettingsrow.png
 		IF  "${platform}" == "windows"
 			Set Confidence	0.9
+			Take A Screenshot
 		END
 		Append To List	${settings_locations}	${settings_coordinates}
 		Press Key.tab 1 Times
@@ -675,6 +677,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 		Click To The Above Of	${settings_locations}[${i}]	0
 		Change Test Group Settings	${row_settings_data}
 	END
+	Take A Screenshot
 	Click Button	runsave
 	Save Scenario File OS DIALOG	${scenario_name}
 
@@ -735,11 +738,13 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 		Press Key.tab 2 Times
 		IF  "${platform}" == "windows"
 			Set Confidence	0.85
+			Take A Screenshot
 		END
 		${settings_coordinates}=
 		...    Locate 	manager_${platform}_button_selected_runsettingsrow.png
 		IF  "${platform}" == "windows"
 			Set Confidence	0.9
+			Take A Screenshot
 		END
 		Append To List	${settings_locations}	${settings_coordinates}
 		Press Key.tab 1 Times
@@ -748,6 +753,7 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 		Click To The Above Of	${settings_locations}[${i}]	0
 		Change Test Group Settings	${row_settings_data}
 	END
+	Take A Screenshot
 	Click Button	runsave
 	Save Scenario File OS DIALOG	${scenario_name}
 
