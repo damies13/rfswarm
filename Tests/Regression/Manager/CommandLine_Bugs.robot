@@ -202,10 +202,14 @@ Lots Of Resource Files
 	Run Agent 	${agnt_options}
 	Sleep    1s
 	Check Agent Is Running
-	Log to console 	${CURDIR}
+	Log 	${CURDIR} 	console=true
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#184${/}Issue-#184.rfs
-	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${results_dir}
+	Log 	${scenariofile} 	console=true
+
+	${time}= 	Get Time 	hour min 		NOW + 15 min
+	Log 	${time} 	console=true
+
+	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${results_dir} 	-t 	${time}
 	Run Manager CLI 	${mngr_options}
 	# It can take a while for the agent to download 3500+ files
 	Wait For Manager 	60min
