@@ -206,8 +206,13 @@ Lots Of Resource Files
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#184${/}Issue-#184.rfs
 	Log 	${scenariofile} 	console=true
 
-	${time}= 	Get Time 	hour min sec 		NOW + 15 min
-	Log 	${time} 	console=true
+	${time}= 	Get Time 	hour min sec 		NOW
+	Log 	Now ${time} 		console=true
+
+	# VAR 	${offset} 		+ 15 min
+	VAR 	${offset} 		+ 10 min
+	${time}= 	Get Time 	hour min sec 		NOW ${offset}
+	Log 	Now ${offset} ${time} 		console=true
 
 	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${results_dir} 	-t 	${time}[0]:${time}[1]
 	Run Manager CLI 	${mngr_options}
