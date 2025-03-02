@@ -617,7 +617,7 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 			Press Combination 	key.down
 			Sleep	0.5
 			Take A Screenshot
-			Press Combination 	key.space
+			Press Combination 	key.enter
 		ELSE
 			Click Button	select_example
 		END
@@ -677,7 +677,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 			Press Combination 	key.down
 			Sleep	0.5
 			Take A Screenshot
-			Press Combination 	key.space
+			Press Combination 	key.enter
 		ELSE
 			Click Button	select_example
 		END
@@ -763,7 +763,7 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 			Press Combination 	key.down
 			Sleep	0.5
 			Take A Screenshot
-			Press Combination 	key.space
+			Press Combination 	key.enter
 		ELSE
 			Click Button	select_example
 		END
