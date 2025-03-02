@@ -610,14 +610,15 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 		# Take A Screenshot
 		Click Button	selected_runscriptrow
 		Select Robot File OS DIALOG		${robot_data}[0]
-		# Take A Screenshot
+		Take A Screenshot
 		Click Button	selected_select_test_case
 		# Take A Screenshot
 		IF  "${platform}" == "windows"
 			Press Combination 	key.down
 			Sleep	0.5
-			# Take A Screenshot
+			Take A Screenshot
 			Press Combination 	key.enter
+			Take A Screenshot
 		ELSE
 			Click Button	select_example
 		END
@@ -670,14 +671,15 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 		Press Key.tab 6 Times
 		Click Button	selected_runscriptrow
 		Select Robot File OS DIALOG		${robot_data}[0]
-		# Take A Screenshot
+		Take A Screenshot
 		Click Button	selected_select_test_case
 		# Take A Screenshot
 		IF  "${platform}" == "windows"
 			Press Combination 	key.down
 			Sleep	0.5
-			# Take A Screenshot
+			Take A Screenshot
 			Press Combination 	key.enter
+			Take A Screenshot
 		ELSE
 			Click Button	select_example
 		END
@@ -756,14 +758,15 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 		Press Key.tab 2 Times
 		Click Button	selected_runscriptrow
 		Select Robot File OS DIALOG		${robot_data}[0]
-		# Take A Screenshot
+		Take A Screenshot
 		Click Button	selected_select_test_case
 		# Take A Screenshot
 		IF  "${platform}" == "windows"
 			Press Combination 	key.down
 			Sleep	0.5
-			# Take A Screenshot
+			Take A Screenshot
 			Press Combination 	key.enter
+			Take A Screenshot
 		ELSE
 			Click Button	select_example
 		END
