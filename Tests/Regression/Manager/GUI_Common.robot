@@ -390,7 +390,7 @@ Click Button
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
 	IF  "${platform}" == "windows"
-		Set Confidence	0.8
+		Set Confidence	0.85
 	END
 	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate		${img}
