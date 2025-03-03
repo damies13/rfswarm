@@ -759,15 +759,20 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 		Click Button	selected_runscriptrow
 		Select Robot File OS DIALOG		${robot_data}[0]
 		Take A Screenshot
-		Click Button	selected_select_test_case
-		# Take A Screenshot
 		IF  "${platform}" == "windows"
+			Press Key.tab 1 Times
+			Take A Screenshot
+			Press Combination 	key.space
+
+			Take A Screenshot
 			Press Combination 	key.down
 			Sleep	0.5
 			Take A Screenshot
 			Press Combination 	key.enter
 			Take A Screenshot
 		ELSE
+			Click Button	selected_select_test_case
+			# Take A Screenshot
 			Click Button	select_example
 		END
 		# Take A Screenshot
