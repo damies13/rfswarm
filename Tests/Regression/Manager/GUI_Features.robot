@@ -611,19 +611,26 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 		Click Button	selected_runscriptrow
 		Select Robot File OS DIALOG		${robot_data}[0]
 		Take A Screenshot
-		Click Button	selected_select_test_case
-		# Take A Screenshot
 		IF  "${platform}" == "windows"
+			Press Key.tab 1 Times
+			Take A Screenshot
+			Press Combination 	key.space
+
+			Take A Screenshot
 			Press Combination 	key.down
 			Sleep	0.5
 			Take A Screenshot
 			Press Combination 	key.enter
 			Take A Screenshot
+			Press Key.tab 2 Times
+			Take A Screenshot
 		ELSE
+			Click Button	selected_select_test_case
+			# Take A Screenshot
 			Click Button	select_example
+			# Take A Screenshot
+			Press Key.tab 3 Times
 		END
-		# Take A Screenshot
-		Press Key.tab 3 Times
 		# Take A Screenshot
 	END
 	# Take A Screenshot
@@ -672,16 +679,25 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 		Click Button	selected_runscriptrow
 		Select Robot File OS DIALOG		${robot_data}[0]
 		Take A Screenshot
-		Click Button	selected_select_test_case
-		# Take A Screenshot
 		IF  "${platform}" == "windows"
+			Press Key.tab 1 Times
+			Take A Screenshot
+			Press Combination 	key.space
+
+			Take A Screenshot
 			Press Combination 	key.down
 			Sleep	0.5
 			Take A Screenshot
 			Press Combination 	key.enter
 			Take A Screenshot
+			Press Key.tab 1 Times
+			Take A Screenshot
 		ELSE
+			Click Button	selected_select_test_case
+			# Take A Screenshot
 			Click Button	select_example
+			# Take A Screenshot
+			Press Key.tab 2 Times
 		END
 		# Take A Screenshot
 		Press Key.tab 2 Times
@@ -770,13 +786,15 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 			Take A Screenshot
 			Press Combination 	key.enter
 			Take A Screenshot
+			Press Key.tab 1 Times
+			Take A Screenshot
 		ELSE
 			Click Button	selected_select_test_case
 			# Take A Screenshot
 			Click Button	select_example
+			# Take A Screenshot
+			Press Key.tab 2 Times
 		END
-		# Take A Screenshot
-		Press Key.tab 2 Times
 		IF  "${platform}" == "windows"
 			Set Confidence	0.85
 			# Take A Screenshot
