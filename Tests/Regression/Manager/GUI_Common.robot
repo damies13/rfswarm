@@ -1586,23 +1586,26 @@ Navigate to and check Desktop Icon For Windows
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Move To 		${coordinates}
+	Sleep    0.5
 	Click Image		${img}
-	# Sleep 	1
-	# Take A Screenshot
+	Sleep 	0.5
+	Take A Screenshot
 
 	${img}=	Set Variable		${platform}_start_menu_rfswarm_manager.png
 	Take A Screenshot
 	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Take A Screenshot
 
 	# Navigate Start Menu
 	Type 	RFSwarm
-	# Sleep 	0.5
-	# Take A Screenshot
+	Sleep 	0.5
+	Take A Screenshot
 
 	# Check for Icon
 	${img}=	Set Variable		${platform}_search_rfswarm_manager.png
-	Take A Screenshot
+	# Take A Screenshot
 	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Take A Screenshot
 
 	Press Combination 	KEY.ESC
 
