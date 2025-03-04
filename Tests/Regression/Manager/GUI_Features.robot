@@ -699,8 +699,6 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 			# Take A Screenshot
 			Press Key.tab 2 Times
 		END
-		# Take A Screenshot
-		Press Key.tab 2 Times
 		IF  "${platform}" == "windows"
 			Set Confidence	0.85
 			# Take A Screenshot
