@@ -1591,6 +1591,9 @@ Navigate to and check Desktop Icon For Windows
 	Sleep 	0.5
 	Take A Screenshot
 
+	${img}=	Set Variable		${platform}_start_menu_powersettings.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+
 	${img}=	Set Variable		${platform}_start_menu_rfswarm_manager.png
 	Take A Screenshot
 	Wait For 	${img} 	 timeout=${default_image_timeout}
@@ -1600,6 +1603,12 @@ Navigate to and check Desktop Icon For Windows
 	Type 	RFSwarm
 	Sleep 	0.5
 	Take A Screenshot
+
+	# Press Combination 	KEY.ENTER
+	# Take A Screenshot
+
+	${img}=	Set Variable		${platform}_search_bestmatch.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 
 	# Check for Icon
 	${img}=	Set Variable		${platform}_search_rfswarm_manager.png
