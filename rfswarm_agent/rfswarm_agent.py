@@ -20,6 +20,7 @@ import lzma
 import os
 import platform
 import random
+import re
 import shutil
 import socket
 import subprocess
@@ -1694,10 +1695,7 @@ class RFSwarmAgent():
 
 	def make_safe_filename(self, s):
 		def safe_char(c):
-			if c.isalnum():
-				return c
-			else:
-				return "_"
+			return re.sub(r'[<>:"/\\|?*\n\t]', "_", c)
 		return "".join(safe_char(c) for c in s).rstrip("_")
 
 	def saveini(self):
