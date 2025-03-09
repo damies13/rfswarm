@@ -85,7 +85,10 @@ Whole report time range
 	# check the graph as expected
 	# Take A Screenshot
 	Set Confidence		0.7
-	Locate 	reporter_${platform}_graph_robots1.png
+	TRY
+		Locate 	reporter_${platform}_graph_robots1.png
+	EXCEPT
+		Locate 	reporter_${platform}_graph_robots1a.png
 	Set Confidence		0.9
 
 	Click Tab 	 Settings
@@ -139,7 +142,10 @@ Whole report time range
 
 	# check the graph as expected
 	Set Confidence		0.7
-	Locate 	reporter_${platform}_graph_robots2.png
+	TRY
+		Locate 	reporter_${platform}_graph_robots2.png
+	EXCEPT
+		Locate 	reporter_${platform}_graph_robots2a.png
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
@@ -513,7 +519,7 @@ Verify the Content Of the DOCX Report
 	Lists Should Be Equal 	${22_sect_10_expected} 	${22_sect_10}	msg=[ Expected != Converted ]
 	# [15] equals middle row
 	@{22_sect_15} 	Convert To List 	${docx_tables}[7][15]
-	VAR 	@{22_sect_15_expected} 		
+	VAR 	@{22_sect_15_expected}
 	...    Result: 	Text 'Requests for Quotation' did not appear in 2 minutes. 	Test: 	Odoo Process RFQs 	Script: 	Odoo.robot 	Count: 	1
 	Lists Should Be Equal 	${22_sect_15_expected} 	${22_sect_15}	msg=[ Expected != Converted ]
 	# [20] equals upper middle row
@@ -1028,7 +1034,7 @@ Verify the Content Of the XLSX Report
 	Lists Should Be Equal 	${22_sect_10_expected} 	${22_sect_10}	msg=[ Expected != Converted ]
 	# [15] equals middle row
 	@{22_sect_15} 	Convert To List 	${22_sect_content}[15]
-	VAR 	@{22_sect_15_expected} 		
+	VAR 	@{22_sect_15_expected}
 	...    Result: 	Text 'Requests for Quotation' did not appear in 2 minutes. 	Test: 	Odoo Process RFQs 	Script: 	Odoo.robot 	Count: 	1
 	Lists Should Be Equal 	${22_sect_15_expected} 	${22_sect_15}	msg=[ Expected != Converted ]
 	# [20] equals upper middle row
@@ -1292,7 +1298,10 @@ Verify Plan Graph - No Total
 	# Take A Screenshot
 
 	Set Confidence		0.7
-	Locate 	reporter_${platform}_graph_plannototal.png
+	TRY
+		Locate 	reporter_${platform}_graph_plannototal.png
+	EXCEPT
+		Locate 	reporter_${platform}_graph_plannototala.png
 	Set Confidence		0.9
 
 
@@ -1361,7 +1370,10 @@ Verify Plan Graph - With Total
 	# Take A Screenshot
 
 	Set Confidence		0.7
-	Locate 	reporter_${platform}_graph_plantotal.png
+	TRY
+		Locate 	reporter_${platform}_graph_plantotal.png
+	EXCEPT
+		Locate 	reporter_${platform}_graph_plantotala.png
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
