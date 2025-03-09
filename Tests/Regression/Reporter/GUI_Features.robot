@@ -89,6 +89,7 @@ Whole report time range
 		Locate 	reporter_${platform}_graph_robots1.png
 	EXCEPT
 		Locate 	reporter_${platform}_graph_robots1a.png
+	END
 	Set Confidence		0.9
 
 	Click Tab 	 Settings
@@ -146,6 +147,7 @@ Whole report time range
 		Locate 	reporter_${platform}_graph_robots2.png
 	EXCEPT
 		Locate 	reporter_${platform}_graph_robots2a.png
+	END
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
@@ -1302,6 +1304,7 @@ Verify Plan Graph - No Total
 		Locate 	reporter_${platform}_graph_plannototal.png
 	EXCEPT
 		Locate 	reporter_${platform}_graph_plannototala.png
+	END
 	Set Confidence		0.9
 
 
@@ -1374,6 +1377,7 @@ Verify Plan Graph - With Total
 		Locate 	reporter_${platform}_graph_plantotal.png
 	EXCEPT
 		Locate 	reporter_${platform}_graph_plantotala.png
+	END
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
