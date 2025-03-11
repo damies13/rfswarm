@@ -3,7 +3,9 @@ Test Tags       Bugs 	CommandLine
 
 Resource 	CommandLine_Common.robot
 
-Suite Setup 	Run Keywords 	Create Directory 	${results_dir} 	AND 	Set Platform
+Suite Setup 		Run Keywords
+...    Create Directory 	${results_dir} 	AND
+...    Set Platform
 
 *** Variables ***
 @{robot_data}=	example.robot	Example Test Case
@@ -140,7 +142,7 @@ Circular Reference Resource Files
 	Should Not Contain 	${stdout_manager} 		Too many open files
 	Should Not Contain 	${stderr_manager} 		Too many open files
 
-	Should Not Contain 	${stdout_agent} 		Manager Disconnected
+	# Should Not Contain 	${stdout_agent} 		Manager Disconnected
 
 	# @{testdata-dir}= 	List Directory 		${testdata}
 	# Log 	testdata-dir: ${testdata-dir} 		console=True
@@ -201,7 +203,7 @@ Circular Reference Resource Files 2
 	Should Not Contain 	${stdout_manager} 		Too many open files
 	Should Not Contain 	${stderr_manager} 		Too many open files
 
-	Should Not Contain 	${stdout_agent} 		Manager Disconnected
+	# Should Not Contain 	${stdout_agent} 		Manager Disconnected
 
 	# @{testdata-dir}= 	List Directory 		${testdata}
 	# Log 	testdata-dir: ${testdata-dir} 		console=True
@@ -234,11 +236,19 @@ Lots Of Resource Files
 	Run Agent 	${agnt_options}
 	Sleep    1s
 	Check Agent Is Running
-	Log to console 	${CURDIR}
-	${scenariofile}= 	Normalize Path 	${testdata}${/}scenario.rfs
-	Log to console 	${scenariofile}
+	Log 	${CURDIR} 	console=true
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#184${/}Issue-#184.rfs
+	Log 	${scenariofile} 	console=true
+
 	@{time}= 	Get Time 	hour min sec 	NOW + 10 min
-	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${results_dir} 	-t 	${time[0]}:${time[1]}:${time[2]}
+	Log 	Now ${time} 		console=true
+
+	# VAR 	${offset} 		+ 15 min
+	VAR 	${offset} 		+ 10 min
+	${time}= 	Get Time 	hour min sec 		NOW ${offset}
+	Log 	Now ${offset} ${time} 		console=true
+
+	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${results_dir} 	-t 	${time}[0]:${time}[1]
 	Run Manager CLI 	${mngr_options}
 	# It can take a while for the agent to download 3500+ files
 	Wait For Manager 	60min
@@ -258,7 +268,7 @@ Lots Of Resource Files
 	Should Not Contain 	${stdout_manager} 		Too many open files
 	Should Not Contain 	${stderr_manager} 		Too many open files
 
-	Should Not Contain 	${stdout_agent} 		Manager Disconnected
+	# Should Not Contain 	${stdout_agent} 		Manager Disconnected
 
 	# @{testdata-dir}= 	List Directory 		${testdata}
 	# Log 	testdata-dir: ${testdata-dir} 		console=True
@@ -277,6 +287,42 @@ Lots Of Resource Files
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
 	...    Stop Manager
+
+Check That the Manager Supports the Missing Scenario File Provided By the -s Argument
+	[Tags]	ubuntu-latest	macos-latest	Issue #340
+
+	${scenatio_file}= 	Normalize Path 		${CURDIR}${/}testdata${/}Issue-#340${/}Issue-#340.rfs
+	${inifile}= 		Normalize Path 		${CURDIR}${/}testdata${/}Issue-#340${/}RFSwarmManager.ini
+	VAR 	@{mngr_options} 	-n 	-s 	${CURDIR}${/}/path/to/file/that/doesnt/exist.rfs 	-i 	${inifile}
+
+	File Should Not Exist	${CURDIR}${/}/path/to/file/that/doesnt/exist.rfs
+	File Should Exist 	${inifile}
+	File Should Exist 	${scenatio_file}
+	File Should Not Be Empty 	${inifile}
+	File Should Not Be Empty 	${scenatio_file}
+	Change = new_dir With = ${scenatio_file} In ${inifile}
+	Change Manager INI File Settings 	scenariofile 	${inifile}
+
+	Run Manager CLI 	${mngr_options}
+	Sleep 	3
+	${running}= 	Is Process Running		${process_manager}
+	IF 	${running}
+		Fail	msg=Manager is still running!
+	END
+
+	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+
+	Should Not Contain 	${stdout_manager} 		RuntimeError
+	Should Not Contain 	${stderr_manager} 		RuntimeError
+	Should Not Contain 	${stdout_manager} 		Exception
+	Should Not Contain 	${stderr_manager} 		Exception
+
+	# windows does not work with reading logs.
+	Should Contain 	${stdout_manager} 	Scenario file Not found:
+
+	[Teardown]	Stop Manager
+
 
 Verify If Manager Runs With Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49

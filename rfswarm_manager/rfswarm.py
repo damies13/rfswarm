@@ -2457,7 +2457,10 @@ class RFSwarmCore:
 			base.debugmsg(5, "scenariofile: ", scenariofile)
 			if 'Plan' not in base.config:
 				base.config['Plan'] = {}
+				base.config['Plan']['ScenarioFile'] = ""
+			base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
 			base.config['Plan']['ScenarioFile'] = base.inisafevalue(scenariofile)
+			base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
 
 		if base.args.dir:
 			base.save_ini = False
@@ -2529,11 +2532,22 @@ class RFSwarmCore:
 
 		if 'ScenarioFile' not in base.config['Plan']:
 			base.config['Plan']['ScenarioFile'] = ""
+			base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
 			base.saveini()
 		else:
 			# check file exists - it may have been deleted since rfswarm last ran with this ini file
+			base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
 			if not os.path.exists(base.config['Plan']['ScenarioFile']):
+				if len(base.config['Plan']['ScenarioFile']) > 1:
+					msg = "Scenario file Not found:\n" + base.config['Plan']['ScenarioFile']
+					if not base.args.nogui:
+						tkm.showwarning("RFSwarm - Warning", msg)
+						base.debugmsg(0, msg)
+					else:
+						base.debugmsg(0, msg)
+						self.on_closing(msg)
 				base.config['Plan']['ScenarioFile'] = ""
+				base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
 				base.config['Plan']['ScriptDir'] = base.inisafevalue(base.dir_path)
 				base.debugmsg(5, "ScriptDir: ", base.config['Plan']['ScriptDir'])
 				base.config['Plan']['ScenarioDir'] = base.inisafevalue(base.dir_path)
@@ -2611,6 +2625,7 @@ class RFSwarmCore:
 	def BuildCore(self):
 		base.debugmsg(5, "BuildCore")
 
+		base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
 		base.debugmsg(5, "BuildCorePlan")
 		self.BuildCorePlan()
 		base.debugmsg(5, "BuildCoreRun")
@@ -3137,6 +3152,8 @@ class RFSwarmCore:
 	def BuildCorePlan(self):
 		base.debugmsg(5, "BuildCorePlan")
 
+		base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
+		base.debugmsg(6, "ScenarioFile: ", len(base.config['Plan']['ScenarioFile']), base.config['Plan']['ScenarioFile'])
 		if len(base.config['Plan']['ScenarioFile']) > 0:
 			self.OpenFile(base.config['Plan']['ScenarioFile'])
 		else:
@@ -3149,17 +3166,31 @@ class RFSwarmCore:
 		base.debugmsg(6, "base.config['Plan']['ScenarioFile']: ", base.config['Plan']['ScenarioFile'])
 		base.config['Plan']['ScenarioDir'] = base.inisafevalue(os.path.dirname(ScenarioFile))
 		base.debugmsg(6, "base.config['Plan']['ScenarioDir']: ", base.config['Plan']['ScenarioDir'])
-		if base.config['Plan']['ScenarioFile'] != ScenarioFile:
-			base.debugmsg(6, "ScenarioFile:", ScenarioFile)
-			base.config['Plan']['ScenarioFile'] = base.inisafevalue(ScenarioFile)
-			base.saveini()
 
 		filedata = configparser.ConfigParser()
 		base.debugmsg(6, "filedata: ", filedata._sections)
 
 		if os.path.isfile(ScenarioFile):
 			base.debugmsg(9, "ScenarioFile: ", ScenarioFile)
-			filedata.read(ScenarioFile, encoding="utf8")
+			try:
+				filedata.read(ScenarioFile, encoding="utf8")
+				if base.config['Plan']['ScenarioFile'] != ScenarioFile:
+					base.debugmsg(6, "ScenarioFile:", ScenarioFile)
+					base.config['Plan']['ScenarioFile'] = base.inisafevalue(ScenarioFile)
+					base.saveini()
+			except Exception:
+				base.config['Plan']['ScenarioFile'] = ""
+		else:
+			if len(ScenarioFile) > 1:
+				# error file not exist
+				msg = "Scenario file Not found:\n" + ScenarioFile
+				if not base.args.nogui:
+					tkm.showwarning("RFSwarm - Warning", msg)
+					base.debugmsg(0, msg)
+				else:
+					base.debugmsg(0, msg)
+					self.on_closing(msg)
+			return 1
 
 		base.debugmsg(6, "filedata: ", filedata)
 
@@ -3179,6 +3210,7 @@ class RFSwarmCore:
 
 		else:
 			base.debugmsg(1, "File contains no scenario:", ScenarioFile)
+			base.config['Plan']['ScenarioFile'] = ""
 			return 1
 
 		if "Script Defaults" in filedata:
@@ -7107,7 +7139,8 @@ class RFSwarmGUI(tk.Frame):
 			v = args[1]
 			base.debugmsg(9, "sr_test_validate: v:", v)
 			if not base.args.nogui:
-				base.scriptlist[r]["TestVar"].set(v)
+				if "TestVar" in base.scriptlist[r]:
+					base.scriptlist[r]["TestVar"].set(v)
 			base.scriptlist[r]["Test"] = v
 		else:
 			if not base.args.nogui:
@@ -7117,7 +7150,6 @@ class RFSwarmGUI(tk.Frame):
 					base.scriptlist[r]["Test"] = base.scriptlist[r]["TestVar"].get()
 
 		base.debugmsg(9, "scriptlist[r]:", base.scriptlist[r])
-		base.debugmsg(9, "scriptlist[r][TestVar].get():", base.scriptlist[r]["TestVar"].get())
 
 		self.plan_scnro_chngd = True
 
