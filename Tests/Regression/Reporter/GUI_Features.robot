@@ -525,39 +525,6 @@ Verify the Content Of the DOCX Report
 	VAR 	${section} 	Error Details No Screenshots
 	Dictionary Should Contain Key 	${docx_data} 	${section} 	msg=Didn't find "${section}" section.
 	Verify DOCX Report Error Details Content 	${docx_data} 	${section} 	${docx_file} 	${docx_expected_img_path} 	${docx_img_path}
-	Dictionary Should Contain Key 	${docx_paragraphs} 	22 Error Details
-	Log 	Error Details Table content: ${docx_tables}[7]
-	VAR 	${table_error_expected_length} 	33
-	VAR 	@{expected_header_col} 		Result: 	Error: 	Screenshot:
-	Length Should Be 	${docx_tables}[7] 	${table_error_expected_length}
-	FOR  ${i}  IN RANGE  0  ${table_error_expected_length}
-		VAR 	${row} 		${docx_tables}[7][${i}]
-		Should Not Be Empty 	${row} 		msg=Row ${i} is empty in the Error Details Table!
-		IF  '${row}[0]' not in @{expected_header_col}
-			Fail	msg=First column in the ${i} row does not save correctly because "${row}[0]" is not in expected values: ${expected_header_col}.
-		END
-	END
-	# [0] equals first data row
-	@{22_sect_0} 	Convert To List 	${docx_tables}[7][0]
-	VAR 	@{22_sect_0_expected} 		Result: 	Odoo Create Sale 	Test: 	Odoo Sales 	Script: 	Odoo.robot 	Count: 	4
-	Lists Should Be Equal 	${22_sect_0_expected} 	${22_sect_0}	msg=[ Expected != Converted ]
-	# [-1] equals last row
-	@{22_sect_-1} 	Convert To List 	${docx_tables}[7][-1]
-	VAR 	@{22_sect_-1_expected} 		Screenshot: 	${EMPTY}
-	Lists Should Be Equal 	${22_sect_-1_expected} 	${22_sect_-1}	msg=[ Expected != Converted ]
-	# [10] equals quater row
-	@{22_sect_10} 	Convert To List 	${docx_tables}[7][10]
-	VAR 	@{22_sect_10_expected} 		Error: 	Text 'Scheduled Date' did not appear in 2 minutes. 	Count: 	2
-	Lists Should Be Equal 	${22_sect_10_expected} 	${22_sect_10}	msg=[ Expected != Converted ]
-	# [15] equals middle row
-	@{22_sect_15} 	Convert To List 	${docx_tables}[7][15]
-	VAR 	@{22_sect_15_expected}
-	...    Result: 	Text 'Requests for Quotation' did not appear in 2 minutes. 	Test: 	Odoo Process RFQs 	Script: 	Odoo.robot 	Count: 	1
-	Lists Should Be Equal 	${22_sect_15_expected} 	${22_sect_15}	msg=[ Expected != Converted ]
-	# [20] equals upper middle row
-	@{22_sect_20} 	Convert To List 	${docx_tables}[7][20]
-	VAR 	@{22_sect_20_expected} 		Screenshot: 	${EMPTY}
-	Lists Should Be Equal 	${22_sect_20_expected} 	${22_sect_20}	msg=[ Expected != Converted ]
 
 	VAR 	${section} 	Error Details No GBRN
 	Dictionary Should Contain Key 	${docx_data} 	${section} 	msg=Didn't find "${section}" section.
@@ -748,45 +715,6 @@ Verify the Content Of the XLSX Report
 	${xlsx_sheet} 	Get Xlsx Sheet By Name 	${xlsx_file} 	${section}
 	Should Not Be Equal 	${xlsx_sheet} 	${0} 	msg=Didn't find "${section}" section.
 	Verify XLSX Report Error Details Content 	${xlsx_file} 	${section} 	${xlsx_sheet} 	${xlsx_expected_img_path} 	${xlsx_img_path}
-	List Should Contain Value 	${xlsx_sheets} 	22 Error Details
-	@{22_sect_content}= 	Read Xlsx Text Data From Sheet 	${xlsx_file} 	22 Error Details
-	Log 	Error Details: ${22_sect_content}
-	VAR 	${table_error_length_expected} 	33
-	VAR 	@{expected_header_col} 		Result: 	Error: 	Screenshot:
-	Length Should Be 	${22_sect_content} 	${table_error_length_expected}
-	FOR  ${i}  IN RANGE  0  ${table_error_length_expected}
-		VAR 	${row} 		${22_sect_content}[${i}]
-		Should Not Be Empty 	${row} 		msg=Row ${i} is empty in the Error Details Table!
-		IF  '${row}[0]' not in @{expected_header_col}
-			Fail	msg=First column in the ${i} row does not save correctly because "${row}[0]" is not in expected values: ${expected_header_col}.
-		END
-		${img}= 	Extract Image From Xlsx Sheet 	${xlsx_file} 	22 Error Details 	B${i + 3} 	${xlsx_images}
-		IF  '${img}' != '${0}'
-			Log 	Image was found in B${i} cell.
-			Compare Images 	${xlsx_expected_images}${/}${img} 	${xlsx_images}${/}${img}
-		END
-	END
-	# [0] equals first data row
-	@{22_sect_0} 	Convert To List 	${22_sect_content}[0]
-	VAR 	@{22_sect_0_expected} 		Result: 	Odoo Create Sale 	Test: 	Odoo Sales 	Script: 	Odoo.robot 	Count: 	4
-	Lists Should Be Equal 	${22_sect_0_expected} 	${22_sect_0}	msg=[ Expected != Converted ]
-	# [-1] equals last row
-	@{22_sect_-1} 	Convert To List 	${22_sect_content}[-1]
-	VAR 	@{22_sect_-1_expected} 		Screenshot: 	${SPACE}
-	Lists Should Be Equal 	${22_sect_-1_expected} 	${22_sect_-1}	msg=[ Expected != Converted ]
-	# [10] equals quater row
-	@{22_sect_10} 	Convert To List 	${22_sect_content}[10]
-	VAR 	@{22_sect_10_expected} 		Error: 	Text 'Scheduled Date' did not appear in 2 minutes. 	Count: 	2
-	Lists Should Be Equal 	${22_sect_10_expected} 	${22_sect_10}	msg=[ Expected != Converted ]
-	# [15] equals middle row
-	@{22_sect_15} 	Convert To List 	${22_sect_content}[15]
-	VAR 	@{22_sect_15_expected}
-	...    Result: 	Text 'Requests for Quotation' did not appear in 2 minutes. 	Test: 	Odoo Process RFQs 	Script: 	Odoo.robot 	Count: 	1
-	Lists Should Be Equal 	${22_sect_15_expected} 	${22_sect_15}	msg=[ Expected != Converted ]
-	# [20] equals upper middle row
-	@{22_sect_20} 	Convert To List 	${22_sect_content}[20]
-	VAR 	@{22_sect_20_expected} 		Screenshot: 	${SPACE}
-	Lists Should Be Equal 	${22_sect_20_expected} 	${22_sect_20}	msg=[ Expected != Converted ]
 
 	VAR 	${section} 	Error Details No Screenshots
 	${xlsx_sheet} 	Get Xlsx Sheet By Name 	${xlsx_file} 	${section}
