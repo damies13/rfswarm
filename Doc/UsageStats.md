@@ -1,16 +1,16 @@
-# PyPi Usage Stats
+# Usage Stats
 [Return to Index](README.md)
 
-## Manager (was previously called Server/GUI)
-[Manager](https://pypistats.org/packages/rfswarm-manager)
+# PyPi
 
-[Server/GUI](https://pypistats.org/packages/rfswarm-gui)
+## Manager (was previously called Server/GUI)
+[Manager](https://pypistats.org/packages/rfswarm-manager) | 	[Server/GUI](https://pypistats.org/packages/rfswarm-gui)
 
 ## Agent
 [Agent](https://pypistats.org/packages/rfswarm-agent)
 
 ## Reporter
-[Agent](https://pypistats.org/packages/rfswarm-reporter)
+[Reporter](https://pypistats.org/packages/rfswarm-reporter)
 
 ## TestDataTable
 [TestDataTable](https://pypistats.org/packages/testdatatable)
@@ -18,3 +18,33 @@
 
 ## Stargazers over time
 [![Stargazers over time](https://starchart.cc/damies13/rfswarm.svg?variant=adaptive)](https://starchart.cc/damies13/rfswarm)
+
+# ClickPy
+
+## Manager (was previously called Server/GUI)
+[Manager](https://clickpy.clickhouse.com/dashboard/rfswarm-manager) | 	[Server/GUI](https://clickpy.clickhouse.com/dashboard/rfswarm-gui)
+
+## Agent
+[Agent](https://clickpy.clickhouse.com/dashboard/rfswarm-agent)
+
+## Reporter
+[Reporter](https://clickpy.clickhouse.com/dashboard/rfswarm-reporter)
+
+## TestDataTable
+[TestDataTable](https://clickpy.clickhouse.com/dashboard/testdatatable)
+
+## robotframework-perfmon
+[robotframework-perfmon](https://clickpy.clickhouse.com/dashboard/robotframework-perfmon) | [pyperfmon](https://clickpy.clickhouse.com/dashboard/pyperfmon)
+
+
+# Open Source Insights
+
+- [Git Project](https://deps.dev/project/github/damies13%2Frfswarm)
+- [Manager](https://deps.dev/pypi/rfswarm-manager)
+- [Agent](https://deps.dev/pypi/rfswarm-agent)
+- [Reporter](https://deps.dev/pypi/rfswarm-reporter)
+- [TestDataTable](https://deps.dev/pypi/testdatatable)
+- [robotframework-perfmon](https://deps.dev/pypi/robotframework-perfmon)
+- [pyperfmon](https://deps.dev/pypi/pyperfmon)
+
+<!--  -->
