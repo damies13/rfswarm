@@ -1,43 +1,28 @@
 # Usage Stats
 [Return to Index](README.md)
 
-# PyPi
+## PyPi
 
-## Manager (was previously called Server/GUI)
-[Manager](https://pypistats.org/packages/rfswarm-manager) | 	[Server/GUI](https://pypistats.org/packages/rfswarm-gui)
+- [Manager](https://pypistats.org/packages/rfswarm-manager) | [Server/GUI](https://pypistats.org/packages/rfswarm-gui)
+- [Agent](https://pypistats.org/packages/rfswarm-agent)
+- [Reporter](https://pypistats.org/packages/rfswarm-reporter)
 
-## Agent
-[Agent](https://pypistats.org/packages/rfswarm-agent)
-
-## Reporter
-[Reporter](https://pypistats.org/packages/rfswarm-reporter)
-
-## TestDataTable
-[TestDataTable](https://pypistats.org/packages/testdatatable)
+- [TestDataTable](https://pypistats.org/packages/testdatatable)
 
 
 ## Stargazers over time
 [![Stargazers over time](https://starchart.cc/damies13/rfswarm.svg?variant=adaptive)](https://starchart.cc/damies13/rfswarm)
 
-# ClickPy
+## ClickPy
 
-## Manager (was previously called Server/GUI)
-[Manager](https://clickpy.clickhouse.com/dashboard/rfswarm-manager) | 	[Server/GUI](https://clickpy.clickhouse.com/dashboard/rfswarm-gui)
-
-## Agent
-[Agent](https://clickpy.clickhouse.com/dashboard/rfswarm-agent)
-
-## Reporter
-[Reporter](https://clickpy.clickhouse.com/dashboard/rfswarm-reporter)
-
-## TestDataTable
-[TestDataTable](https://clickpy.clickhouse.com/dashboard/testdatatable)
-
-## robotframework-perfmon
-[robotframework-perfmon](https://clickpy.clickhouse.com/dashboard/robotframework-perfmon) | [pyperfmon](https://clickpy.clickhouse.com/dashboard/pyperfmon)
+- [Manager](https://clickpy.clickhouse.com/dashboard/rfswarm-manager) | [Server/GUI](https://clickpy.clickhouse.com/dashboard/rfswarm-gui)
+- [Agent](https://clickpy.clickhouse.com/dashboard/rfswarm-agent)
+- [Reporter](https://clickpy.clickhouse.com/dashboard/rfswarm-reporter)
+- [TestDataTable](https://clickpy.clickhouse.com/dashboard/testdatatable)
+- [robotframework-perfmon](https://clickpy.clickhouse.com/dashboard/robotframework-perfmon) | [pyperfmon](https://clickpy.clickhouse.com/dashboard/pyperfmon)
 
 
-# Open Source Insights
+## Open Source Insights
 
 - [Git Project](https://deps.dev/project/github/damies13%2Frfswarm)
 - [Manager](https://deps.dev/pypi/rfswarm-manager)
