@@ -1452,6 +1452,17 @@ class ReporterBase():
 		changes = base.report_item_set_value(id, name, str(value))
 		return changes
 
+	def report_item_get_float(self, id, name):
+		value = base.report_item_get_value(id, name)
+		if value is None:
+			return -1.0
+		else:
+			return float(value)
+
+	def report_item_set_float(self, id, name, value):
+		changes = base.report_item_set_value(id, name, str(value))
+		return changes
+
 	def report_item_get_bool_def0(self, id, name):
 		value = base.report_item_get_int(id, name)
 		if value < 0:
@@ -2843,6 +2854,30 @@ class ReporterBase():
 			base.report_save()
 			return 1
 		return 0
+
+	# GSeconds Granularity Seconds
+	def rt_table_get_gseconds(self, id):
+		value = base.report_item_get_float(id, "GSeconds")
+		if value < 0:
+			return 0
+		else:
+			return value
+
+	def rt_table_set_gseconds(self, id, value):
+		changes = base.report_item_set_float(id, "GSeconds", float(value))
+		return changes
+
+	# GW Granularity shoW mode
+	def rt_table_get_gw(self, id):
+		value = base.report_item_get_value(id, "GWType")
+		if value is None:
+			return "Average"
+		else:
+			return value
+
+	def rt_table_set_gw(self, id, value):
+		changes = base.report_item_set_float(id, "GWType", value)
+		return changes
 
 	#
 	# Report Item Type: errors
@@ -9489,6 +9524,20 @@ class ReporterGUI(tk.Frame):
 			value = self.contentdata[idr]["FPattern"].get()
 			changes += base.rt_table_set_fp(idr, value)
 
+		if "GSeconds" in self.contentdata[idl]:
+			value = float(self.contentdata[idl]["GSeconds"].get())
+			changes += base.rt_table_set_gseconds(idl, value)
+		if "GSeconds" in self.contentdata[idr]:
+			value = float(self.contentdata[idr]["GSeconds"].get())
+			changes += base.rt_table_set_gseconds(idr, value)
+
+		if "GWType" in self.contentdata[idl]:
+			value = self.contentdata[idl]["GWType"].get()
+			changes += base.rt_table_set_gw(idl, value)
+		if "GWType" in self.contentdata[idr]:
+			value = self.contentdata[idr]["GWType"].get()
+			changes += base.rt_table_set_gw(idr, value)
+
 		if "strDT" in self.contentdata[idl]:
 			datatype = self.contentdata[idl]["strDT"].get()
 			changes += base.rt_table_set_dt(idl, datatype)
@@ -9687,6 +9736,26 @@ class ReporterGUI(tk.Frame):
 				# self.contentdata[idl]["inpFP"].bind('<Leave>', self.cs_graph_update)
 				self.contentdata[idl]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
+				rownum += 1
+				self.contentdata[idl]["lblGG"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Apply Granuality:")
+				self.contentdata[idl]["lblGG"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idl]["lblGS"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Seconds")
+				self.contentdata[idl]["lblGS"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[idl]["lblGW"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Show")
+				self.contentdata[idl]["lblGW"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idl]["GSeconds"] = tk.StringVar()
+				self.contentdata[idl]["inpGS"] = ttk.Entry(self.contentdata[idl]["Frames"][datatypel], textvariable=self.contentdata[idl]["GSeconds"])
+				self.contentdata[idl]["inpGS"].grid(column=1, row=rownum, sticky="nsew")
+
+				GWTypes = ["Average", "Average", "Maximum", "Minimum"]
+				self.contentdata[idl]["GWType"] = tk.StringVar()
+				self.contentdata[idl]["omGW"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["GWType"], command=self.cs_graph_update, *GWTypes)
+				self.contentdata[idl]["omGW"].grid(column=2, row=rownum, sticky="nsew")
+
 			if datatypel == "Result":
 				rownum += 1
 				self.contentdata[idl]["lblRT"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Result Type:")
@@ -9743,6 +9812,26 @@ class ReporterGUI(tk.Frame):
 				# <Leave> makes UI to jumpy
 				# self.contentdata[idl]["inpFP"].bind('<Leave>', self.cs_graph_update)
 				self.contentdata[idl]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
+
+				rownum += 1
+				self.contentdata[idl]["lblGG"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Apply Granuality:")
+				self.contentdata[idl]["lblGG"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idl]["lblGS"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Seconds")
+				self.contentdata[idl]["lblGS"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[idl]["lblGW"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Show")
+				self.contentdata[idl]["lblGW"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idl]["GSeconds"] = tk.StringVar()
+				self.contentdata[idl]["inpGS"] = ttk.Entry(self.contentdata[idl]["Frames"][datatypel], textvariable=self.contentdata[idl]["GSeconds"])
+				self.contentdata[idl]["inpGS"].grid(column=1, row=rownum, sticky="nsew")
+
+				GWTypes = ["Average", "Average", "Maximum", "Minimum"]
+				self.contentdata[idl]["GWType"] = tk.StringVar()
+				self.contentdata[idl]["omGW"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["GWType"], command=self.cs_graph_update, *GWTypes)
+				self.contentdata[idl]["omGW"].grid(column=2, row=rownum, sticky="nsew")
 
 			if datatypel == "SQL":
 				rownum += 1
@@ -9858,6 +9947,26 @@ class ReporterGUI(tk.Frame):
 				# self.contentdata[idr]["inpFP"].bind('<Leave>', self.cs_graph_update)
 				self.contentdata[idr]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
+				rownum += 1
+				self.contentdata[idr]["lblGG"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Apply Granuality:")
+				self.contentdata[idr]["lblGG"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idr]["lblGS"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Seconds")
+				self.contentdata[idr]["lblGS"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[idr]["lblGW"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Show")
+				self.contentdata[idr]["lblGW"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idr]["GSeconds"] = tk.StringVar()
+				self.contentdata[idr]["inpFP"] = ttk.Entry(self.contentdata[idr]["Frames"][datatyper], textvariable=self.contentdata[idr]["GSeconds"])
+				self.contentdata[idr]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
+
+				GWTypes = ["Average", "Average", "Maximum", "Minimum"]
+				self.contentdata[idr]["GWType"] = tk.StringVar()
+				self.contentdata[idr]["omGW"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["GWType"], command=self.cs_graph_update, *GWTypes)
+				self.contentdata[idr]["omGW"].grid(column=2, row=rownum, sticky="nsew")
+
 			if datatyper == "Result":
 				rownum += 1
 				self.contentdata[idr]["lblRT"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Result Type:")
@@ -9915,6 +10024,26 @@ class ReporterGUI(tk.Frame):
 				# self.contentdata[idr]["inpFP"].bind('<Leave>', self.cs_graph_update)
 				self.contentdata[idr]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
+				rownum += 1
+				self.contentdata[idr]["lblGG"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Apply Granuality:")
+				self.contentdata[idr]["lblGG"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idr]["lblGS"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Seconds")
+				self.contentdata[idr]["lblGS"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[idr]["lblGW"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Show")
+				self.contentdata[idr]["lblGW"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idr]["GSeconds"] = tk.StringVar()
+				self.contentdata[idr]["inpGS"] = ttk.Entry(self.contentdata[idr]["Frames"][datatyper], textvariable=self.contentdata[idr]["GSeconds"])
+				self.contentdata[idr]["inpGS"].grid(column=1, row=rownum, sticky="nsew")
+
+				GWTypes = ["Average", "Average", "Maximum", "Minimum"]
+				self.contentdata[idr]["GWType"] = tk.StringVar()
+				self.contentdata[idr]["omGW"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["GWType"], command=self.cs_graph_update, *GWTypes)
+				self.contentdata[idr]["omGW"].grid(column=2, row=rownum, sticky="nsew")
+
 			if datatyper == "SQL":
 				rownum += 1
 				# sql = base.rt_table_get_sql(id)
@@ -9949,6 +10078,8 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[idl]["FAType"].set(base.rt_table_get_fa(idl))
 			self.contentdata[idl]["FNType"].set(base.rt_table_get_fn(idl))
 			self.contentdata[idl]["FPattern"].set(base.rt_table_get_fp(idl))
+			self.contentdata[idl]["GSeconds"].set(base.rt_table_get_gseconds(idl))
+			self.contentdata[idl]["GWType"].set(base.rt_table_get_gw(idl))
 
 		if datatyper == "Result":
 			self.cs_datatable_update_result(idr)
@@ -9959,6 +10090,9 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[idr]["FAType"].set(base.rt_table_get_fa(idr))
 			self.contentdata[idr]["FNType"].set(base.rt_table_get_fn(idr))
 			self.contentdata[idr]["FPattern"].set(base.rt_table_get_fp(idr))
+
+			self.contentdata[idr]["GSeconds"].set(base.rt_table_get_gseconds(idr))
+			self.contentdata[idr]["GWType"].set(base.rt_table_get_gw(idr))
 
 		if datatypel == "Metric":
 			base.debugmsg(5, "Update Options")
@@ -9982,6 +10116,10 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idl]["FNType"].set(base.rt_table_get_fn(idl))
 			if "FPattern" in self.contentdata[idl]:
 				self.contentdata[idl]["FPattern"].set(base.rt_table_get_fp(idl))
+			if "GSeconds" in self.contentdata[idl]:
+				self.contentdata[idl]["GSeconds"].set(base.rt_table_get_gseconds(idl))
+			if "GWType" in self.contentdata[idl]:
+				self.contentdata[idl]["GWType"].set(base.rt_table_get_gw(idl))
 
 		if datatyper == "Metric":
 			base.debugmsg(5, "Update Options")
@@ -10005,6 +10143,10 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idr]["FNType"].set(base.rt_table_get_fn(idr))
 			if "FPattern" in self.contentdata[idr]:
 				self.contentdata[idr]["FPattern"].set(base.rt_table_get_fp(idr))
+			if "GSeconds" in self.contentdata[idr]:
+				self.contentdata[idr]["GSeconds"].set(base.rt_table_get_gseconds(idr))
+			if "GWType" in self.contentdata[idr]:
+				self.contentdata[idr]["GWType"].set(base.rt_table_get_gw(idr))
 
 		if datatypel == "Plan":
 			self.contentdata[idl]["intSTot"].set(base.report_item_get_int(idl, "ShowTotal"))
