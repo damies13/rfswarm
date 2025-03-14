@@ -1626,6 +1626,9 @@ class ReporterBase():
 			FAType = self.rt_table_get_fa(id)
 			FNType = self.rt_table_get_fn(id)
 			inpFP = self.rt_table_get_fp(id)
+			GSeconds = self.rt_graph_get_gseconds(id)
+			fltGW = self.rt_graph_get_gw(id)
+
 			colname = "Name"
 
 			sql = "SELECT "
@@ -1633,8 +1636,19 @@ class ReporterBase():
 			base.debugmsg(8, "RType:", RType, "sql:", sql)
 
 			if RType == "Response Time":
-				sql += "end_time as 'Time' "
-				sql += ", elapsed_time as 'Value' "
+				if GSeconds > 0:
+					sql += "max(end_time) as 'Time' "
+					if fltGW.lower() == "maximum":
+						sql += ", max(elapsed_time) as 'Value' "
+					elif fltGW.lower() == "minimum":
+						sql += ", min(elapsed_time) as 'Value' "
+					elif fltGW.lower() == "average":
+						sql += ", avg(elapsed_time) as 'Value' "
+					else:
+						sql += ", avg(elapsed_time) as 'Value' "
+				else:
+					sql += "end_time as 'Time' "
+					sql += ", elapsed_time as 'Value' "
 				# sql += ", result_name as 'Name' "
 				sql += ", result_name"
 				if EnFR and FRType in [None, "", "None"]:
@@ -1663,7 +1677,7 @@ class ReporterBase():
 				# sql += 		"LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' "
 
 			if RType == "TPS":
-				sql += "floor(end_time) as 'Time' "
+				sql += "floor(max(end_time)) as 'Time' "
 				sql += ", count(result) as 'Value' "
 				# sql += ", result_name as 'Name' "
 				sql += ", result_name"
@@ -1673,7 +1687,7 @@ class ReporterBase():
 					sql += " || ' - ' || agent"
 				sql += " as [" + colname + "] "
 			if RType == "Total TPS":
-				sql += "floor(end_time) as 'Time'"
+				sql += "floor(max(end_time)) as 'Time'"
 				sql += ", count(result) as 'Value' "
 				# sql += ", result as 'Name' "
 				sql += ", result"
@@ -1758,11 +1772,16 @@ class ReporterBase():
 				pass
 			if RType == "Response Time":
 				# sql += 		"result_name "
-				pass
+				if GSeconds > 0:
+					sql += f"GROUP BY [Name], floor(end_time/{GSeconds})"
+				sql += "ORDER BY end_time"
 
 			if RType == "TPS":
 				sql += "GROUP by "
-				sql += "floor(end_time) "
+				if GSeconds > 0:
+					sql += f"floor(end_time/{GSeconds}) "
+				else:
+					sql += "floor(end_time) "
 				sql += ", result_name "
 				sql += ", result "
 				sql += "ORDER by "
@@ -1771,7 +1790,10 @@ class ReporterBase():
 				sql += ", count(result) DESC "
 			if RType == "Total TPS":
 				sql += "GROUP by "
-				sql += "floor(end_time) "
+				if GSeconds > 0:
+					sql += f"floor(end_time/{GSeconds}) "
+				else:
+					sql += "floor(end_time) "
 				sql += ", result "
 				sql += "ORDER by "
 				sql += "floor(end_time)"
@@ -1787,16 +1809,37 @@ class ReporterBase():
 			FAType = self.rt_table_get_fa(id)
 			FNType = self.rt_table_get_fn(id)
 			inpFP = self.rt_table_get_fp(id)
+			GSeconds = self.rt_graph_get_gseconds(id)
+			fltGW = self.rt_graph_get_gw(id)
+
 			colname = "Name"
 
 			base.debugmsg(6, "MType:", MType, "	PM:", PM, "	SM:", SM)
 
 			mnamecolumns = []
 			# mcolumns = ["MetricTime as 'Time'", "MetricValue as 'Value'", "PrimaryMetric as 'Name'", "MetricType as 'Name'", "SecondaryMetric as 'Name'"]
-			mcolumns = ["MetricTime as 'Time'", "MetricValue as 'Value'"]
+			if GSeconds > 0:
+				mcolumns = ["max(MetricTime) as 'Time'"]
+				if fltGW.lower() == "maximum":
+					mcolumns.append("max(MetricValue) as 'Value'")
+				elif fltGW.lower() == "minimum":
+					mcolumns.append("min(MetricValue) as 'Value'")
+				elif fltGW.lower() == "average":
+					mcolumns.append("avg(MetricValue) as 'Value'")
+				else:
+					mcolumns.append("avg(MetricValue) as 'Value'")
+
+			else:
+				mcolumns = ["MetricTime as 'Time'", "MetricValue as 'Value'"]
 			wherelst = []
 			# grouplst = ["PrimaryMetric", "MetricType", "SecondaryMetric"]
 			grouplst = []
+
+			if GSeconds > 0:
+				# [Name], floor(end_time/{GSeconds})
+				grouplst.append(f"[{colname}]")
+				grouplst.append(f"floor(MetricTime/{GSeconds})")
+
 
 			if MType not in [None, "", "None"] and len(MType) > 0:
 				# if "MetricType as 'Name'" in mcolumns:
@@ -1956,6 +1999,30 @@ class ReporterBase():
 			return float(value)
 		except Exception:
 			return value
+
+	# GSeconds Granularity Seconds
+	def rt_graph_get_gseconds(self, id):
+		value = base.report_item_get_float(id, "GSeconds")
+		if value < 0:
+			return 0
+		else:
+			return value
+
+	def rt_graph_set_gseconds(self, id, value):
+		changes = base.report_item_set_float(id, "GSeconds", float(value))
+		return changes
+
+	# GW Granularity shoW mode
+	def rt_graph_get_gw(self, id):
+		value = base.report_item_get_value(id, "GWType")
+		if value is None:
+			return "Average"
+		else:
+			return value
+
+	def rt_graph_set_gw(self, id, value):
+		changes = base.report_item_set_float(id, "GWType", value)
+		return changes
 
 	#
 	# Report Item Type: table
@@ -2854,30 +2921,6 @@ class ReporterBase():
 			base.report_save()
 			return 1
 		return 0
-
-	# GSeconds Granularity Seconds
-	def rt_table_get_gseconds(self, id):
-		value = base.report_item_get_float(id, "GSeconds")
-		if value < 0:
-			return 0
-		else:
-			return value
-
-	def rt_table_set_gseconds(self, id, value):
-		changes = base.report_item_set_float(id, "GSeconds", float(value))
-		return changes
-
-	# GW Granularity shoW mode
-	def rt_table_get_gw(self, id):
-		value = base.report_item_get_value(id, "GWType")
-		if value is None:
-			return "Average"
-		else:
-			return value
-
-	def rt_table_set_gw(self, id, value):
-		changes = base.report_item_set_float(id, "GWType", value)
-		return changes
 
 	#
 	# Report Item Type: errors
@@ -9526,17 +9569,17 @@ class ReporterGUI(tk.Frame):
 
 		if "GSeconds" in self.contentdata[idl]:
 			value = float(self.contentdata[idl]["GSeconds"].get())
-			changes += base.rt_table_set_gseconds(idl, value)
+			changes += base.rt_graph_set_gseconds(idl, value)
 		if "GSeconds" in self.contentdata[idr]:
 			value = float(self.contentdata[idr]["GSeconds"].get())
-			changes += base.rt_table_set_gseconds(idr, value)
+			changes += base.rt_graph_set_gseconds(idr, value)
 
 		if "GWType" in self.contentdata[idl]:
 			value = self.contentdata[idl]["GWType"].get()
-			changes += base.rt_table_set_gw(idl, value)
+			changes += base.rt_graph_set_gw(idl, value)
 		if "GWType" in self.contentdata[idr]:
 			value = self.contentdata[idr]["GWType"].get()
-			changes += base.rt_table_set_gw(idr, value)
+			changes += base.rt_graph_set_gw(idr, value)
 
 		if "strDT" in self.contentdata[idl]:
 			datatype = self.contentdata[idl]["strDT"].get()
@@ -10078,8 +10121,8 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[idl]["FAType"].set(base.rt_table_get_fa(idl))
 			self.contentdata[idl]["FNType"].set(base.rt_table_get_fn(idl))
 			self.contentdata[idl]["FPattern"].set(base.rt_table_get_fp(idl))
-			self.contentdata[idl]["GSeconds"].set(base.rt_table_get_gseconds(idl))
-			self.contentdata[idl]["GWType"].set(base.rt_table_get_gw(idl))
+			self.contentdata[idl]["GSeconds"].set(base.rt_graph_get_gseconds(idl))
+			self.contentdata[idl]["GWType"].set(base.rt_graph_get_gw(idl))
 
 		if datatyper == "Result":
 			self.cs_datatable_update_result(idr)
@@ -10091,8 +10134,8 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[idr]["FNType"].set(base.rt_table_get_fn(idr))
 			self.contentdata[idr]["FPattern"].set(base.rt_table_get_fp(idr))
 
-			self.contentdata[idr]["GSeconds"].set(base.rt_table_get_gseconds(idr))
-			self.contentdata[idr]["GWType"].set(base.rt_table_get_gw(idr))
+			self.contentdata[idr]["GSeconds"].set(base.rt_graph_get_gseconds(idr))
+			self.contentdata[idr]["GWType"].set(base.rt_graph_get_gw(idr))
 
 		if datatypel == "Metric":
 			base.debugmsg(5, "Update Options")
@@ -10117,9 +10160,9 @@ class ReporterGUI(tk.Frame):
 			if "FPattern" in self.contentdata[idl]:
 				self.contentdata[idl]["FPattern"].set(base.rt_table_get_fp(idl))
 			if "GSeconds" in self.contentdata[idl]:
-				self.contentdata[idl]["GSeconds"].set(base.rt_table_get_gseconds(idl))
+				self.contentdata[idl]["GSeconds"].set(base.rt_graph_get_gseconds(idl))
 			if "GWType" in self.contentdata[idl]:
-				self.contentdata[idl]["GWType"].set(base.rt_table_get_gw(idl))
+				self.contentdata[idl]["GWType"].set(base.rt_graph_get_gw(idl))
 
 		if datatyper == "Metric":
 			base.debugmsg(5, "Update Options")
@@ -10144,9 +10187,9 @@ class ReporterGUI(tk.Frame):
 			if "FPattern" in self.contentdata[idr]:
 				self.contentdata[idr]["FPattern"].set(base.rt_table_get_fp(idr))
 			if "GSeconds" in self.contentdata[idr]:
-				self.contentdata[idr]["GSeconds"].set(base.rt_table_get_gseconds(idr))
+				self.contentdata[idr]["GSeconds"].set(base.rt_graph_get_gseconds(idr))
 			if "GWType" in self.contentdata[idr]:
-				self.contentdata[idr]["GWType"].set(base.rt_table_get_gw(idr))
+				self.contentdata[idr]["GWType"].set(base.rt_graph_get_gw(idr))
 
 		if datatypel == "Plan":
 			self.contentdata[idl]["intSTot"].set(base.report_item_get_int(idl, "ShowTotal"))
