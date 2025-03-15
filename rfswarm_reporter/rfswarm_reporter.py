@@ -704,7 +704,7 @@ class ReporterBase():
 		# datatype = Metric
 		base.report_item_set_value(ad, "datatype", "Metric")
 		# metrictype = Agent
-		base.report_item_set_value(ad, "metrictype", "Metric")
+		base.report_item_set_value(ad, "metrictype", "Agent")
 		# filteragent = None
 		# filtertype = None
 		# col_primarymetric_show = 1
@@ -1839,7 +1839,6 @@ class ReporterBase():
 				# [Name], floor(end_time/{GSeconds})
 				grouplst.append(f"[{colname}]")
 				grouplst.append(f"floor(MetricTime/{GSeconds})")
-
 
 			if MType not in [None, "", "None"] and len(MType) > 0:
 				# if "MetricType as 'Name'" in mcolumns:
@@ -9518,12 +9517,15 @@ class ReporterGUI(tk.Frame):
 			value = self.contentdata[idr]["SMetric"].get()
 			changes += base.rt_table_set_sm(idr, value)
 
+		RTypeChanges = 0
 		if "RType" in self.contentdata[idl]:
 			value = self.contentdata[idl]["RType"].get()
 			changes += base.rt_table_set_rt(idl, value)
+			RTypeChanges = changes
 		if "RType" in self.contentdata[idr]:
 			value = self.contentdata[idr]["RType"].get()
 			changes += base.rt_table_set_rt(idr, value)
+			RTypeChanges = changes
 
 		if "FRType" in self.contentdata[idl]:
 			value = self.contentdata[idl]["FRType"].get()
@@ -9636,6 +9638,9 @@ class ReporterGUI(tk.Frame):
 			# self.content_preview(id)
 			cp = threading.Thread(target=lambda: self.content_preview(id))
 			cp.start()
+
+		if RTypeChanges > 0:
+			self.cs_graph_switchdt(id)
 
 	def cs_graph_switchdt(self, _event=None):
 		base.debugmsg(5, "self:", self, "	_event:", _event)
@@ -9804,7 +9809,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idl]["lblRT"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Result Type:")
 				self.contentdata[idl]["lblRT"].grid(column=0, row=rownum, sticky="nsew")
 
-				RTypes = [None, "Response Time", "TPS", "Total TPS"]
+				RType = base.rt_table_get_rt(idl)
+				RTypes = [RType, "Response Time", "TPS", "Total TPS"]
 				self.contentdata[idl]["RType"] = tk.StringVar()
 				self.contentdata[idl]["omRT"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["RType"], command=self.cs_graph_update, *RTypes)
 				self.contentdata[idl]["omRT"].grid(column=1, row=rownum, sticky="nsew")
@@ -9863,8 +9869,9 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idl]["lblGS"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Seconds")
 				self.contentdata[idl]["lblGS"].grid(column=1, row=rownum, sticky="nsew")
 
-				self.contentdata[idl]["lblGW"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Show")
-				self.contentdata[idl]["lblGW"].grid(column=2, row=rownum, sticky="nsew")
+				if RType is not None and "TPS" not in RType:
+					self.contentdata[idl]["lblGW"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Show")
+					self.contentdata[idl]["lblGW"].grid(column=2, row=rownum, sticky="nsew")
 
 				rownum += 1
 				self.contentdata[idl]["GSeconds"] = tk.StringVar()
@@ -9873,8 +9880,9 @@ class ReporterGUI(tk.Frame):
 
 				GWTypes = ["Average", "Average", "Maximum", "Minimum"]
 				self.contentdata[idl]["GWType"] = tk.StringVar()
-				self.contentdata[idl]["omGW"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["GWType"], command=self.cs_graph_update, *GWTypes)
-				self.contentdata[idl]["omGW"].grid(column=2, row=rownum, sticky="nsew")
+				if RType is not None and "TPS" not in RType:
+					self.contentdata[idl]["omGW"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["GWType"], command=self.cs_graph_update, *GWTypes)
+					self.contentdata[idl]["omGW"].grid(column=2, row=rownum, sticky="nsew")
 
 			if datatypel == "SQL":
 				rownum += 1
@@ -10015,7 +10023,8 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idr]["lblRT"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Result Type:")
 				self.contentdata[idr]["lblRT"].grid(column=0, row=rownum, sticky="nsew")
 
-				RTypes = [None, "Response Time", "TPS", "Total TPS"]
+				RType = base.rt_table_get_rt(idr)
+				RTypes = [RType, "Response Time", "TPS", "Total TPS"]
 				self.contentdata[idr]["RType"] = tk.StringVar()
 				self.contentdata[idr]["omRT"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["RType"], command=self.cs_graph_update, *RTypes)
 				self.contentdata[idr]["omRT"].grid(column=1, row=rownum, sticky="nsew")
@@ -10074,8 +10083,9 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idr]["lblGS"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Seconds")
 				self.contentdata[idr]["lblGS"].grid(column=1, row=rownum, sticky="nsew")
 
-				self.contentdata[idr]["lblGW"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Show")
-				self.contentdata[idr]["lblGW"].grid(column=2, row=rownum, sticky="nsew")
+				if RType is not None and "TPS" not in RType:
+					self.contentdata[idr]["lblGW"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Show")
+					self.contentdata[idr]["lblGW"].grid(column=2, row=rownum, sticky="nsew")
 
 				rownum += 1
 				self.contentdata[idr]["GSeconds"] = tk.StringVar()
@@ -10084,8 +10094,9 @@ class ReporterGUI(tk.Frame):
 
 				GWTypes = ["Average", "Average", "Maximum", "Minimum"]
 				self.contentdata[idr]["GWType"] = tk.StringVar()
-				self.contentdata[idr]["omGW"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["GWType"], command=self.cs_graph_update, *GWTypes)
-				self.contentdata[idr]["omGW"].grid(column=2, row=rownum, sticky="nsew")
+				if RType is not None and "TPS" not in RType:
+					self.contentdata[idr]["omGW"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["GWType"], command=self.cs_graph_update, *GWTypes)
+					self.contentdata[idr]["omGW"].grid(column=2, row=rownum, sticky="nsew")
 
 			if datatyper == "SQL":
 				rownum += 1
