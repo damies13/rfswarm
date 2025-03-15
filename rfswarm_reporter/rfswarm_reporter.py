@@ -63,6 +63,7 @@ from PIL import Image, ImageTk
 
 matplotlib.use("TkAgg") 	# required for matplot graphs
 
+__name__ = "rfswarm-manager"
 
 class percentile:
 	def __init__(self):
@@ -123,7 +124,7 @@ class stdevclass:
 			base.debugmsg(5, "Exception:", e)
 
 
-class ReporterBase():
+class ReporterBase:
 	version = "1.5.0"
 	debuglvl = 0
 
@@ -9798,6 +9799,7 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idl]["GSeconds"] = tk.StringVar()
 				self.contentdata[idl]["inpGS"] = ttk.Entry(self.contentdata[idl]["Frames"][datatypel], textvariable=self.contentdata[idl]["GSeconds"])
 				self.contentdata[idl]["inpGS"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[idl]["inpGS"].bind('<FocusOut>', self.cs_graph_update)
 
 				GWTypes = ["Average", "Average", "Maximum", "Minimum"]
 				self.contentdata[idl]["GWType"] = tk.StringVar()
@@ -9805,6 +9807,11 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idl]["omGW"].grid(column=2, row=rownum, sticky="nsew")
 
 			if datatypel == "Result":
+
+				rownum += 1
+				self.contentdata[idl]["lblEnabled"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Enabled")
+				self.contentdata[idl]["lblEnabled"].grid(column=2, row=rownum, sticky="nsew")
+
 				rownum += 1
 				self.contentdata[idl]["lblRT"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Result Type:")
 				self.contentdata[idl]["lblRT"].grid(column=0, row=rownum, sticky="nsew")
@@ -9877,6 +9884,7 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idl]["GSeconds"] = tk.StringVar()
 				self.contentdata[idl]["inpGS"] = ttk.Entry(self.contentdata[idl]["Frames"][datatypel], textvariable=self.contentdata[idl]["GSeconds"])
 				self.contentdata[idl]["inpGS"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[idl]["inpGS"].bind('<FocusOut>', self.cs_graph_update)
 
 				GWTypes = ["Average", "Average", "Maximum", "Minimum"]
 				self.contentdata[idl]["GWType"] = tk.StringVar()
@@ -10010,8 +10018,9 @@ class ReporterGUI(tk.Frame):
 
 				rownum += 1
 				self.contentdata[idr]["GSeconds"] = tk.StringVar()
-				self.contentdata[idr]["inpFP"] = ttk.Entry(self.contentdata[idr]["Frames"][datatyper], textvariable=self.contentdata[idr]["GSeconds"])
-				self.contentdata[idr]["inpFP"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[idr]["inpGS"] = ttk.Entry(self.contentdata[idr]["Frames"][datatyper], textvariable=self.contentdata[idr]["GSeconds"])
+				self.contentdata[idr]["inpGS"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[idr]["inpGS"].bind('<FocusOut>', self.cs_graph_update)
 
 				GWTypes = ["Average", "Average", "Maximum", "Minimum"]
 				self.contentdata[idr]["GWType"] = tk.StringVar()
@@ -10019,6 +10028,11 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idr]["omGW"].grid(column=2, row=rownum, sticky="nsew")
 
 			if datatyper == "Result":
+
+				rownum += 1
+				self.contentdata[idr]["lblEnabled"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Enabled")
+				self.contentdata[idr]["lblEnabled"].grid(column=2, row=rownum, sticky="nsew")
+
 				rownum += 1
 				self.contentdata[idr]["lblRT"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Result Type:")
 				self.contentdata[idr]["lblRT"].grid(column=0, row=rownum, sticky="nsew")
@@ -10091,6 +10105,7 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idr]["GSeconds"] = tk.StringVar()
 				self.contentdata[idr]["inpGS"] = ttk.Entry(self.contentdata[idr]["Frames"][datatyper], textvariable=self.contentdata[idr]["GSeconds"])
 				self.contentdata[idr]["inpGS"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[idr]["inpGS"].bind('<FocusOut>', self.cs_graph_update)
 
 				GWTypes = ["Average", "Average", "Maximum", "Minimum"]
 				self.contentdata[idr]["GWType"] = tk.StringVar()
@@ -11847,6 +11862,13 @@ base = ReporterBase()
 
 core = ReporterCore()
 
-core.mainloop()
+try:
+	core.mainloop()
+except KeyboardInterrupt:
+	core.on_closing()
+except Exception as e:
+	base.debugmsg(1, "core.Exception:", e)
+	core.on_closing()
+
 
 # r = RFSwarm_Reporter()
