@@ -1694,9 +1694,9 @@ class RFSwarmAgent():
 					self.isconnected = False
 
 	def make_safe_filename(self, s):
-		def safe_char(c):
-			return re.sub(r'[<>:"/\\|?*\n\t]', "_", c)
-		return "".join(safe_char(c) for c in s).rstrip("_")
+		def safe_string(s):
+			return re.sub(r'[<>:"/\\|?*\n\t]', "_", s)
+		return "".join(safe_string(s)).rstrip("_")
 
 	def saveini(self):
 		with open(self.agentini, 'w', encoding="utf-8") as configfile:    # save
