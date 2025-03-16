@@ -3,6 +3,7 @@ Library 	OperatingSystem
 Library 	Process
 Library 	String
 Library 	Collections
+Library 	ArchiveLibrary
 Library 	DocTest.VisualTest
 Library 	XML 	use_lxml=True
 
@@ -62,8 +63,29 @@ Set Platform By Tag
 		Set Suite Variable    ${platform}    ubuntu
 	END
 
+Show Log
+	[Arguments]		${filename}
+	Log 		${\n}-----${filename}----- 		console=True
+	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
+	Log 		${filedata} 		console=True
+	Log 		-----${filename}-----${\n} 		console=True
+	RETURN 		${filedata}
+
+Read Log
+	[Arguments]		${filename}
+	Log 		${filename}
+	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
+	Log 		${filedata}
+	RETURN 		${filedata}
+
 Make Clipboard Not None
 	Evaluate    clipboard.copy("You should never see this after copy") 	modules=clipboard
+
+Change ${str1} With ${str2} In ${file}
+	${file_content}	Get File	${file}
+	Remove File		${file}
+	${file_content}	Replace String	${file_content}	${str1}	${str2}
+	Create File		${file}	${file_content}
 
 Click Tab
 	[Arguments]		${tabname}
@@ -119,6 +141,36 @@ Create New Section
 		Click Button 			OK
 		# Take A Screenshot
 	END
+
+Click ${item} With Vertical Offset
+	[Arguments]		${image_name}	${offset}=0
+	[Documentation]	Click the item with the offset. An item can be: Label, Button, ...
+	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down].
+	${image_name}= 	Convert To Lower Case 	${image_name}
+	${item}= 	Convert To Lower Case 	${item}
+	${img}=	Set Variable		reporter_${platform}_${item}_${image_name}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Log	${coordinates}
+	Click To The Below Of	${coordinates}	${offset}
+	Sleep 	0.1
+
+Click ${item} With Horizontal Offset
+	[Arguments]		${image_name}	${offset}=0
+	[Documentation]	Click the item with the offset. An item can be: Label, Button, ...
+	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right].
+	${image_name}= 	Convert To Lower Case 	${image_name}
+	${item}= 	Convert To Lower Case 	${item}
+	${img}=	Set Variable		reporter_${platform}_${item}_${image_name}.png
+	Log		${CURDIR}
+	Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Log	${coordinates}
+	Click To The Right Of	${coordinates}	${offset}
+	Sleep 	0.1
 
 Click Section
 	[Arguments]		${sectname}
@@ -197,6 +249,7 @@ Get Text Value To Right Of
 
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 
+	Make Clipboard Not None 	# reset clipboard
 	${b4value}= 	Get Clipboard Content
 	Click To The Right Of Image 	${img} 	${offsetx}
 	Sleep    10 ms
@@ -268,10 +321,35 @@ Set Text Value To Right Of
 	# Triple Click is broken on MacOS: TypeError: not enough arguments for format string
 	# Triple Click 		button=left 	interval=0.0
 	Click
+	Sleep 	0.3
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.a
+	ELSE
+		Press Combination	KEY.ctrl		KEY.a
+	END
 	Take A Screenshot
-	Double Click
-	Take A Screenshot
-	Type 	${value}
+	Sleep 	0.3
+	# Double Click
+	# Take A Screenshot
+	
+	# @{characters}= 	Split String 	${value} 	separator=${SPACE}
+	# ${len} 	Get Length 	${characters}
+	# FOR  ${i}  IN RANGE  0  ${len}
+	# 	Type 	${characters}[${i}]
+	# 	Sleep 	0.1s
+	# 	IF  not ${i+1} == ${len}
+	# 		Type 	${SPACE}
+	# 	END
+	# 	Sleep 	0.1s
+	# END
+	
+	Evaluate 	clipboard.copy("${value}") 	modules=clipboard
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.v
+	ELSE
+		Press Combination	KEY.ctrl		KEY.v
+	END
+	# Type 	${value}
 	Take A Screenshot
 	IF 	$platform == 'macos'
 		# Take A Screenshot
@@ -296,7 +374,12 @@ Set Text Value To Right Of
 			Take A Screenshot
 			Double Click
 			Take A Screenshot
-			Type 	${value}
+			Evaluate 	clipboard.copy("${value}") 	modules=clipboard
+			IF  "${platform}" == "macos"
+				Press Combination	KEY.command		KEY.v
+			ELSE
+				Press Combination	KEY.ctrl		KEY.v
+			END
 			Take A Screenshot
 			${value2}= 	Get Text Value To Right Of		${label} 		${offsetx}
 		END
@@ -753,7 +836,7 @@ Parse HTML File
 	[Documentation] 	Parse HTML file to the etree object using lxml module.
 	[Arguments] 	${html_file}
 	File Should Exist 	${html_file}
-	${html}= 	Evaluate 	lxml.etree.parse(r'${html_file}', lxml.etree.HTMLParser()) 	modules=lxml.etree
+	${html}= 	Evaluate 	lxml.etree.parse(r'${html_file}', lxml.etree.HTMLParser(encoding="utf-8")) 	modules=lxml.etree
 
 	RETURN 	${html}
 
@@ -976,25 +1059,35 @@ Verify HTML Report Table Content
 
 	@{rows_numbers} 	Convert To List 	${${section}.rows_numbers}
 
-	@{first_data_row} 		Convert To List 	${section_table}[${rows_numbers}[0]]
-	@{first_row_expected} 	Convert To List 	${${section}.first_row}
-	Lists Should Be Equal 	${first_row_expected} 	${first_data_row}	msg=[ Expected != Converted ]
+	IF  '${rows_numbers}[0]' != '_'
+		@{first_data_row} 		Convert To List 	${section_table}[${rows_numbers}[0]]
+		@{first_row_expected} 	Convert To List 	${${section}.first_row}
+		Lists Should Be Equal 	${first_row_expected} 	${first_data_row}	msg=[ Expected != Converted ]
+	END
 
-	@{last_row} 			Convert To List 	${section_table}[${rows_numbers}[1]]
-	@{last_row_expected} 	Convert To List 	${${section}.last_row}
-	Lists Should Be Equal 	${last_row_expected} 	${last_row}	msg=[ Expected != Converted ]
+	IF  '${rows_numbers}[1]' != '_'
+		@{last_row} 			Convert To List 	${section_table}[${rows_numbers}[1]]
+		@{last_row_expected} 	Convert To List 	${${section}.last_row}
+		Lists Should Be Equal 	${last_row_expected} 	${last_row}	msg=[ Expected != Converted ]
+	END
 
-	@{quater_row} 			Convert To List 	${section_table}[${rows_numbers}[2]]
-	@{quater_row_expected} 	Convert To List 	${${section}.quater_row}
-	Lists Should Be Equal 	${quater_row_expected} 	${quater_row}	msg=[ Expected != Converted ]
+	IF  '${rows_numbers}[2]' != '_'
+		@{quater_row} 			Convert To List 	${section_table}[${rows_numbers}[2]]
+		@{quater_row_expected} 	Convert To List 	${${section}.quater_row}
+		Lists Should Be Equal 	${quater_row_expected} 	${quater_row}	msg=[ Expected != Converted ]
+	END
 
-	@{mid_row} 				Convert To List 	${section_table}[${rows_numbers}[3]]
-	@{mid_row_expected} 	Convert To List 	${${section}.mid_row}
-	Lists Should Be Equal 	${mid_row_expected} 	${mid_row}	msg=[ Expected != Converted ]
+	IF  '${rows_numbers}[3]' != '_'
+		@{mid_row} 				Convert To List 	${section_table}[${rows_numbers}[3]]
+		@{mid_row_expected} 	Convert To List 	${${section}.mid_row}
+		Lists Should Be Equal 	${mid_row_expected} 	${mid_row}	msg=[ Expected != Converted ]
+	END
 
-	@{upper_mid_row} 			Convert To List 	${section_table}[${rows_numbers}[4]]
-	@{upper_mid_row_expected} 	Convert To List 	${${section}.upper_mid_row}
-	Lists Should Be Equal 	${upper_mid_row_expected} 	${upper_mid_row}	msg=[ Expected != Converted ]
+	IF  '${rows_numbers}[4]' != '_'
+		@{upper_mid_row} 			Convert To List 	${section_table}[${rows_numbers}[4]]
+		@{upper_mid_row_expected} 	Convert To List 	${${section}.upper_mid_row}
+		Lists Should Be Equal 	${upper_mid_row_expected} 	${upper_mid_row}	msg=[ Expected != Converted ]
+	END
 
 Verify HTML Report Error Details Content
 	[Documentation]
@@ -1028,25 +1121,35 @@ Verify HTML Report Error Details Content
 
 	@{rows_numbers} 	Convert To List 	${${section}.rows_numbers}
 
-	@{first_data_row} 		Convert To List 	${section_table}[${rows_numbers}[0]]
-	@{first_row_expected} 	Convert To List 	${${section}.first_row}
-	Lists Should Be Equal 	${first_row_expected} 	${first_data_row}	msg=[ Expected != Converted ]
+	IF  '${rows_numbers}[0]' != '_'
+		@{first_data_row} 		Convert To List 	${section_table}[${rows_numbers}[0]]
+		@{first_row_expected} 	Convert To List 	${${section}.first_row}
+		Lists Should Be Equal 	${first_row_expected} 	${first_data_row}	msg=[ Expected != Converted ]
+	END
 
-	@{last_row} 			Convert To List 	${section_table}[${rows_numbers}[1]]
-	@{last_row_expected} 	Convert To List 	${${section}.last_row}
-	Lists Should Be Equal 	${last_row_expected} 	${last_row}	msg=[ Expected != Converted ]
+	IF  '${rows_numbers}[1]' != '_'
+		@{last_row} 			Convert To List 	${section_table}[${rows_numbers}[1]]
+		@{last_row_expected} 	Convert To List 	${${section}.last_row}
+		Lists Should Be Equal 	${last_row_expected} 	${last_row}	msg=[ Expected != Converted ]
+	END
 
-	@{quater_row} 			Convert To List 	${section_table}[${rows_numbers}[2]]
-	@{quater_row_expected} 	Convert To List 	${${section}.quater_row}
-	Lists Should Be Equal 	${quater_row_expected} 	${quater_row}	msg=[ Expected != Converted ]
+	IF  '${rows_numbers}[2]' != '_'
+		@{quater_row} 			Convert To List 	${section_table}[${rows_numbers}[2]]
+		@{quater_row_expected} 	Convert To List 	${${section}.quater_row}
+		Lists Should Be Equal 	${quater_row_expected} 	${quater_row}	msg=[ Expected != Converted ]
+	END
 
-	@{mid_row} 				Convert To List 	${section_table}[${rows_numbers}[3]]
-	@{mid_row_expected} 	Convert To List 	${${section}.mid_row}
-	Lists Should Be Equal 	${mid_row_expected} 	${mid_row}	msg=[ Expected != Converted ]
+	IF  '${rows_numbers}[3]' != '_'
+		@{mid_row} 				Convert To List 	${section_table}[${rows_numbers}[3]]
+		@{mid_row_expected} 	Convert To List 	${${section}.mid_row}
+		Lists Should Be Equal 	${mid_row_expected} 	${mid_row}	msg=[ Expected != Converted ]
+	END
 
-	@{upper_mid_row} 			Convert To List 	${section_table}[${rows_numbers}[4]]
-	@{upper_mid_row_expected} 	Convert To List 	${${section}.upper_mid_row}
-	Lists Should Be Equal 	${upper_mid_row_expected} 	${upper_mid_row}	msg=[ Expected != Converted ]
+	IF  '${rows_numbers}[4]' != '_'
+		@{upper_mid_row} 			Convert To List 	${section_table}[${rows_numbers}[4]]
+		@{upper_mid_row_expected} 	Convert To List 	${${section}.upper_mid_row}
+		Lists Should Be Equal 	${upper_mid_row_expected} 	${upper_mid_row}	msg=[ Expected != Converted ]
+	END
 
 Verify XLSX Cover Page
 	[Arguments] 	${xlsx_file}
