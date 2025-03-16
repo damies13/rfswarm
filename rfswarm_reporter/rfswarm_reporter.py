@@ -3014,6 +3014,7 @@ class ReporterBase():
 
 	def rt_errors_parse_xml(self, id, rid):
 		base.debugmsg(5, "id:", id, "	rid:", rid)
+
 		def safe_string(s):
 			return re.sub(r'[<>:"/\\|?*\n\t]', "_", s)
 		if id in base.reportdata and rid in base.reportdata[id]:
@@ -3033,7 +3034,7 @@ class ReporterBase():
 				rdata['script_index'],
 				rdata['robot'],
 				rdata['iteration']
-				), "*_output.xml")
+			), "*_output.xml")
 			base.debugmsg(9, "gxpatt:", gxpatt)
 
 			xmlf = "not_found"
