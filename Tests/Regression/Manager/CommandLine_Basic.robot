@@ -46,7 +46,7 @@ Manager Version
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
 	# ${result}= 	Run 	python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -v
 	${result}= 	Run 	${cmd_manager} -v
-	Log to console 	${\n}${result}
+	Log 	${\n}${result} 		console=true
 	Should Contain	${result}	Version
 	Should Contain	${result}	Manager
 
@@ -54,7 +54,7 @@ Manager Help
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
 	# ${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_manager${/}rfswarm.py -h
 	${result}=	Run 	${cmd_manager} -h
-	Log to console 	${\n}${result}
+	Log 	${\n}${result} 		console=true
 	Should Contain	${result}	IPADDRESS
 
 Show User Dir

@@ -13,3 +13,15 @@ robotframework-databaselibrary
 pyscreenrec
 clipboard
 pyyaml
+#	numpy-2.2.3 crashes on windows with python 3.13 with error below, but works on other python versions
+# potentially this issue https://github.com/numpy/numpy/issues/26038
+#  	<frozen importlib._bootstrap>:488: Warning: Numpy built with MINGW-W64 on Windows 64 bits is experimental, and only available for testing. You are advised not to use it for production.
+#
+# CRASHES ARE TO BE EXPECTED - PLEASE REPORT THEM TO NUMPY DEVELOPERS
+# C:\hostedtoolcache\windows\Python\3.13.2\x64\Lib\site-packages\numpy\core\getlimits.py:225: RuntimeWarning: invalid value encountered in exp2  epsneg_f128 = exp2(ld(-113))
+# C:\hostedtoolcache\windows\Python\3.13.2\x64\Lib\site-packages\numpy\core\getlimits.py:226: RuntimeWarning: invalid value encountered in exp2  tiny_f128 = exp2(ld(-16382))
+# C:\hostedtoolcache\windows\Python\3.13.2\x64\Lib\site-packages\numpy\core\getlimits.py:240: RuntimeWarning: invalid value encountered in exp2  eps=exp2(ld(-112)),
+# C:\hostedtoolcache\windows\Python\3.13.2\x64\Lib\site-packages\numpy\core\getlimits.py:41: RuntimeWarning: invalid value encountered in nextafter  self._smallest_subnormal = nextafter(
+# C:\hostedtoolcache\windows\Python\3.13.2\x64\Lib\site-packages\numpy\core\getlimits.py:52: RuntimeWarning: invalid value encountered in log10  self.precision = int(-log10(self.eps))
+# numpy!=2.2.3 # installed numpy-1.26.4
+numpy==2.2.2; python_version == '3.13'
