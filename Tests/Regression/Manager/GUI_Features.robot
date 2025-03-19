@@ -3262,6 +3262,26 @@ Verify That the Start Time And Time Remaining Are Removed From Plan Screen When 
 
 	[Teardown]	Run Keywords	Close Manager GUI ${platform}
 
+Verify That TPS Is TP And Not TPmS
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #155
+	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY} 	AND
+	...    Set INI Window Size 	1200 	600 	AND
+	...    Open Agent
+
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#155${/}tps.rfs
+	VAR 	@{mngr_options} 	-s 	${scenariofile}
+	Open Manager GUI 	${mngr_options}
+	Check If The Agent Is Ready
+	Click Tab 	Plan
+	Click Button 	runplay
+	Wait For the Scenario Run To Finish
+	Click Menu 	graphs
+
+	[Teardown]	Run Keywords
+	...    Run Keyword 	Close Manager GUI ${platform} 	AND
+	...    Stop Agent
+
 Check Application Icon or Desktop Shortcut in GUI
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
 

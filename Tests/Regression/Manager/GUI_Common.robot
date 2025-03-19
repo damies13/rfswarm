@@ -58,7 +58,7 @@ Set Platform By Tag
 	Log 	${OPTIONS}
 	Log 	${OPTIONS}[include]
 	${inclen}= 	Get Length 	${OPTIONS}[include]
-x	IF 	${inclen} > 0
+	IF 	${inclen} > 0
 		Log 	${OPTIONS}[include][0]
 		${ostag}= 	Set Variable 	${OPTIONS}[include][0]
 
