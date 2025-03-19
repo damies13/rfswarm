@@ -3277,6 +3277,9 @@ Verify That TPS Is TP And Not TPmS
 	Click Button 	runplay
 	Wait For the Scenario Run To Finish
 	Click Menu 	graphs
+	Take A Screenshot
+	# Click Menu 	NewGraphWindow
+	Take A Screenshot
 
 	[Teardown]	Run Keywords
 	...    Run Keyword 	Close Manager GUI ${platform} 	AND
