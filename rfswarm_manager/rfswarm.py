@@ -4819,13 +4819,21 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeRSettings.lblFA.grid(column=0, row=rowR, sticky="nsew")
 
 		grphWindow.fmeRSettings.FATypes = [None, "", "Loading..."]
-		grphWindow.settings["FAType"] = tk.StringVar()
-		grphWindow.fmeRSettings.omFA = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["FAType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.FATypes)
+		grphWindow.settings["RFAType"] = tk.StringVar()
+		grphWindow.fmeRSettings.omFA = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["RFAType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.FATypes)
 		grphWindow.fmeRSettings.omFA.grid(column=1, row=rowR, sticky="nsew")
+		if 'filter_agent' in settings and len(settings['filter_agent']) > 1:
+			if settings['filter_agent'] not in grphWindow.fmeRSettings.FATypes:
+				grphWindow.fmeRSettings.FATypes.append(settings['filter_agent'])
+			grphWindow.settings["RFAType"].set(settings['filter_agent'])
 
-		grphWindow.settings["intFA"] = tk.IntVar()
-		grphWindow.fmeRSettings.chkFA = ttk.Checkbutton(grphWindow.fmeRSettings, variable=grphWindow.settings["intFA"], command=lambda *args: self.gs_refresh(grphWindow))
+		grphWindow.settings["RintFA"] = tk.IntVar()
+		grphWindow.fmeRSettings.chkFA = ttk.Checkbutton(grphWindow.fmeRSettings, variable=grphWindow.settings["RintFA"], command=lambda *args: self.gs_refresh(grphWindow))
 		grphWindow.fmeRSettings.chkFA.grid(column=2, row=rowR, sticky="nsew")
+		if 'en_filter_agent' in settings and int(settings['en_filter_agent']) > -1:
+			grphWindow.settings["RintFA"].set(int(settings['en_filter_agent']))
+		else:
+			grphWindow.settings["RintFA"].set(0)
 
 		rowR += 1
 		# result_name filtered by GLOB (Unix file globbing syntax for its wildcards)
@@ -4844,22 +4852,22 @@ class RFSwarmGUI(tk.Frame):
 		#
 		# grphWindow.fmeRSettings.FNTypes = [None, "None", "Wildcard (Unix Glob)", "Regex", "Not Wildcard (Unix Glob)", "Not Regex"]
 		grphWindow.fmeRSettings.FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
-		grphWindow.settings["FNType"] = tk.StringVar()
-		grphWindow.fmeRSettings.omFR = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["FNType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.FNTypes)
+		grphWindow.settings["RFNType"] = tk.StringVar()
+		grphWindow.fmeRSettings.omFR = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["RFNType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.FNTypes)
 		if 'filter_name' in settings and len(settings['filter_name']) > 1:
-			grphWindow.settings["FNType"].set(settings['filter_name'])
+			grphWindow.settings["RFNType"].set(settings['filter_name'])
 		else:
-			grphWindow.settings["FNType"].set(grphWindow.fmeRSettings.FNTypes[1])
+			grphWindow.settings["RFNType"].set(grphWindow.fmeRSettings.FNTypes[1])
 		grphWindow.fmeRSettings.omFR.grid(column=1, row=rowR, sticky="nsew")
 
 		rowR += 1
 		grphWindow.fmeRSettings.lblFP = ttk.Label(grphWindow.fmeRSettings, text="Filter Pattern:")
 		grphWindow.fmeRSettings.lblFP.grid(column=0, row=rowR, sticky="nsew")
 
-		grphWindow.settings["FPattern"] = tk.StringVar()
-		grphWindow.fmeRSettings.inpFP = ttk.Entry(grphWindow.fmeRSettings, textvariable=grphWindow.settings["FPattern"])
+		grphWindow.settings["RFPattern"] = tk.StringVar()
+		grphWindow.fmeRSettings.inpFP = ttk.Entry(grphWindow.fmeRSettings, textvariable=grphWindow.settings["RFPattern"])
 		if 'filter_pattern' in settings and len(settings['filter_pattern']) > 1:
-			grphWindow.settings["FPattern"].set(settings['filter_pattern'])
+			grphWindow.settings["RFPattern"].set(settings['filter_pattern'])
 		grphWindow.fmeRSettings.inpFP.grid(column=1, row=rowR, sticky="nsew")
 
 		rowR += 1
@@ -4874,16 +4882,24 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeRSettings.lblGW.grid(column=2, row=rowR, sticky="nsew")
 
 		rowR += 1
-		grphWindow.settings["GSeconds"] = tk.StringVar()
-		grphWindow.fmeRSettings.inpGS = ttk.Entry(grphWindow.fmeRSettings, textvariable=grphWindow.settings["GSeconds"])
+		grphWindow.settings["RGSeconds"] = tk.StringVar()
+		grphWindow.fmeRSettings.inpGS = ttk.Entry(grphWindow.fmeRSettings, textvariable=grphWindow.settings["RGSeconds"])
 		grphWindow.fmeRSettings.inpGS.grid(column=1, row=rowR, sticky="nsew")
 		grphWindow.fmeRSettings.inpGS.bind('<FocusOut>', lambda *args: self.gs_refresh(grphWindow))
+		if 'granuality_seconds' in settings and len(settings['granuality_seconds']) > 1:
+			grphWindow.settings["RGSeconds"].set(settings['granuality_seconds'])
+		else:
+			grphWindow.settings["RGSeconds"].set(0)
 
 		grphWindow.fmeRSettings.GWTypes = ["Average", "Average", "Maximum", "Minimum"]
-		grphWindow.settings["GWType"] = tk.StringVar()
+		grphWindow.settings["RGWType"] = tk.StringVar()
 		# if grphWindow.fmeRSettings.RType is not None and "TPS" not in grphWindow.fmeRSettings.RType:
-		grphWindow.fmeRSettings.omGW = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["GWType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.GWTypes)
+		grphWindow.fmeRSettings.omGW = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["RGWType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.GWTypes)
 		grphWindow.fmeRSettings.omGW.grid(column=2, row=rowR, sticky="nsew")
+		if 'granuality_type' in settings and len(settings['granuality_type']) > 1:
+			grphWindow.settings["RGWType"].set(settings['granuality_type'])
+		else:
+			grphWindow.settings["RGWType"].set(grphWindow.fmeRSettings.GWTypes[1])
 
 		#
 		# 	DT Metric Settings
@@ -4939,32 +4955,46 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeMSettings.lblFA.grid(column=0, row=rowM, sticky="nsew")
 
 		grphWindow.fmeMSettings.FATypes = [None, "", "Loading..."]
-		grphWindow.settings["FAType"] = tk.StringVar()
-		grphWindow.fmeMSettings.omFA = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["FAType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.FATypes)
+		grphWindow.settings["MFAType"] = tk.StringVar()
+		grphWindow.fmeMSettings.omFA = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MFAType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.FATypes)
 		grphWindow.fmeMSettings.omFA.grid(column=1, row=rowM, sticky="nsew")
+		if 'filter_agent' in settings and len(settings['filter_agent']) > 1:
+			if settings['filter_agent'] not in grphWindow.fmeMSettings.FATypes:
+				grphWindow.fmeMSettings.FATypes.append(settings['filter_agent'])
+			grphWindow.settings["MFAType"].set(settings['filter_agent'])
 
-		grphWindow.settings["intFA"] = tk.IntVar()
-		grphWindow.fmeMSettings.chkFA = ttk.Checkbutton(grphWindow.fmeMSettings, variable=grphWindow.settings["intFA"], command=lambda *args: self.gs_refresh(grphWindow))
+		grphWindow.settings["MintFA"] = tk.IntVar()
+		grphWindow.fmeMSettings.chkFA = ttk.Checkbutton(grphWindow.fmeMSettings, variable=grphWindow.settings["MintFA"], command=lambda *args: self.gs_refresh(grphWindow))
 		grphWindow.fmeMSettings.chkFA.grid(column=2, row=rowM, sticky="nsew")
+		if 'en_filter_agent' in settings and int(settings['en_filter_agent']) > -1:
+			grphWindow.settings["MintFA"].set(int(settings['en_filter_agent']))
+		else:
+			grphWindow.settings["MintFA"].set(0)
 
 		rowM += 1
 		grphWindow.fmeMSettings.lblFN = ttk.Label(grphWindow.fmeMSettings, text="Filter Type:")
 		grphWindow.fmeMSettings.lblFN.grid(column=0, row=rowM, sticky="nsew")
 
 		grphWindow.fmeMSettings.FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
-		grphWindow.settings["FNType"] = tk.StringVar()
-		grphWindow.fmeMSettings.omFR = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["FNType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.FNTypes)
+		grphWindow.settings["MFNType"] = tk.StringVar()
+		grphWindow.fmeMSettings.omFR = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MFNType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.FNTypes)
 		grphWindow.fmeMSettings.omFR.grid(column=1, row=rowM, sticky="nsew")
+		if 'filter_name' in settings and len(settings['filter_name']) > 1:
+			grphWindow.settings["MFNType"].set(settings['filter_name'])
+		else:
+			grphWindow.settings["MFNType"].set(grphWindow.fmeMSettings.FNTypes[1])
 
 		rowM += 1
 		grphWindow.fmeMSettings.lblFP = ttk.Label(grphWindow.fmeMSettings, text="Filter Pattern:")
 		grphWindow.fmeMSettings.lblFP.grid(column=0, row=rowM, sticky="nsew")
 
-		grphWindow.settings["FPattern"] = tk.StringVar()
-		grphWindow.fmeMSettings.inpFP = ttk.Entry(grphWindow.fmeMSettings, textvariable=grphWindow.settings["FPattern"])
+		grphWindow.settings["MFPattern"] = tk.StringVar()
+		grphWindow.fmeMSettings.inpFP = ttk.Entry(grphWindow.fmeMSettings, textvariable=grphWindow.settings["MFPattern"])
 		grphWindow.fmeMSettings.inpFP.grid(column=1, row=rowM, sticky="nsew")
 		# <Leave> makes UI to jumpy
 		grphWindow.fmeMSettings.inpFP.bind('<FocusOut>', lambda *args: self.gs_refresh(grphWindow))
+		if 'filter_pattern' in settings and len(settings['filter_pattern']) > 1:
+			grphWindow.settings["MFPattern"].set(settings['filter_pattern'])
 
 		rowM += 1
 		grphWindow.fmeMSettings.lblGG = ttk.Label(grphWindow.fmeMSettings, text="Apply Granuality:")
@@ -4977,15 +5007,23 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeMSettings.lblGW.grid(column=2, row=rowM, sticky="nsew")
 
 		rowM += 1
-		grphWindow.settings["GSeconds"] = tk.StringVar()
-		grphWindow.fmeMSettings.inpGS = ttk.Entry(grphWindow.fmeMSettings, textvariable=grphWindow.settings["GSeconds"])
+		grphWindow.settings["MGSeconds"] = tk.StringVar()
+		grphWindow.fmeMSettings.inpGS = ttk.Entry(grphWindow.fmeMSettings, textvariable=grphWindow.settings["MGSeconds"])
 		grphWindow.fmeMSettings.inpGS.grid(column=1, row=rowM, sticky="nsew")
 		grphWindow.fmeMSettings.inpGS.bind('<FocusOut>', lambda *args: self.gs_refresh(grphWindow))
+		if 'granuality_seconds' in settings and len(settings['granuality_seconds']) > 1:
+			grphWindow.settings["MGSeconds"].set(settings['granuality_seconds'])
+		else:
+			grphWindow.settings["MGSeconds"].set(0)
 
 		grphWindow.fmeMSettings.GWTypes = ["Average", "Average", "Maximum", "Minimum"]
-		grphWindow.settings["GWType"] = tk.StringVar()
-		grphWindow.fmeMSettings.omGW = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["GWType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.GWTypes)
+		grphWindow.settings["MGWType"] = tk.StringVar()
+		grphWindow.fmeMSettings.omGW = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MGWType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.GWTypes)
 		grphWindow.fmeMSettings.omGW.grid(column=2, row=rowM, sticky="nsew")
+		if 'granuality_type' in settings and len(settings['granuality_type']) > 1:
+			grphWindow.settings["MGWType"].set(settings['granuality_type'])
+		else:
+			grphWindow.settings["MGWType"].set(grphWindow.fmeMSettings.GWTypes[1])
 
 		# set default size to 600 x 450
 		ww = grphWindow.winfo_width()
@@ -5214,6 +5252,7 @@ class RFSwarmGUI(tk.Frame):
 			return value
 
 	def gph_settings(self, grphWindow):
+		base.debugmsg(8, "grphWindow:", grphWindow)
 		settings = {}
 		settings["id"] = grphWindow.graphid
 		settings["open"] = True
@@ -5236,7 +5275,18 @@ class RFSwarmGUI(tk.Frame):
 			settings["metric_type"] = grphWindow.settings["MType"].get()
 			settings["primary_metric"] = grphWindow.settings["PMetric"].get()
 			settings["secondary_metric"] = grphWindow.settings["SMetric"].get()
+
+			settings["filter_agent"] = grphWindow.settings["MFAType"].get()
+			settings["en_filter_agent"] = grphWindow.settings["MintFA"].get()
+
+			settings["filter_name"] = grphWindow.settings["MFNType"].get()
+			settings["filter_pattern"] = grphWindow.settings["MFPattern"].get()
+
+			settings["granuality_seconds"] = grphWindow.settings["MGSeconds"].get()
+			settings["granuality_type"] = grphWindow.settings["MGWType"].get()
+
 		if settings["data_type"] == "Result":
+			base.debugmsg(9, "settings[data_type]:", settings["data_type"])
 			settings["result_type"] = grphWindow.settings["RType"].get()
 			# There's no sane way to reload/refresh the graph settings pane for now
 			# leave this commented out and leave the show option always visible
@@ -5244,8 +5294,19 @@ class RFSwarmGUI(tk.Frame):
 			# if settings["result_type"] != grphWindow.fmeRSettings.RType:
 			# 	pass
 			settings["flter_result"] = grphWindow.settings["FRType"].get()
-			settings["filter_name"] = grphWindow.settings["FNType"].get()
-			settings["filter_pattern"] = grphWindow.settings["FPattern"].get()
+
+			settings["filter_agent"] = grphWindow.settings["RFAType"].get()
+			settings["en_filter_agent"] = grphWindow.settings["RintFA"].get()
+
+			settings["filter_name"] = grphWindow.settings["RFNType"].get()
+			settings["filter_pattern"] = grphWindow.settings["RFPattern"].get()
+			base.debugmsg(9, "FPattern:", grphWindow.settings["RFPattern"].get())
+
+			settings["granuality_seconds"] = grphWindow.settings["RGSeconds"].get()
+			base.debugmsg(9, "GSeconds:", grphWindow.settings["RGSeconds"].get())
+			settings["granuality_type"] = grphWindow.settings["RGWType"].get()
+			base.debugmsg(9, "GWType:", grphWindow.settings["RGWType"].get())
+
 		return settings
 
 	def gph_refresh(self, grphWindow):
@@ -5260,6 +5321,12 @@ class RFSwarmGUI(tk.Frame):
 				base.debugmsg(7, "PMetric:", PMetric)
 				SMetric = grphWindow.settings["SMetric"].get()
 				base.debugmsg(7, "SMetric:", SMetric)
+
+				FNType = grphWindow.settings["MFNType"].get()
+				base.debugmsg(7, "FNType:", FNType)
+
+				inpFP = grphWindow.settings["MFPattern"].get()
+				base.debugmsg(7, "inpFP:", inpFP)
 
 				hasfilter = False
 				if MType is not None and len(MType) > 0:
@@ -5381,10 +5448,10 @@ class RFSwarmGUI(tk.Frame):
 				FRType = grphWindow.settings["FRType"].get()
 				base.debugmsg(7, "FRType:", FRType)
 
-				FNType = grphWindow.settings["FNType"].get()
+				FNType = grphWindow.settings["RFNType"].get()
 				base.debugmsg(7, "FNType:", FNType)
 
-				inpFP = grphWindow.settings["FPattern"].get()
+				inpFP = grphWindow.settings["RFPattern"].get()
 				base.debugmsg(7, "inpFP:", inpFP)
 
 				sql = "SELECT "
@@ -5524,6 +5591,10 @@ class RFSwarmGUI(tk.Frame):
 			self.RefreshRecentGraphs()
 
 	def gs_refresh(self, grphWindow):
+
+		base.debugmsg(6, "save")
+		tgr = threading.Thread(target=lambda: self.gph_refresh(grphWindow))
+		tgr.start()
 		base.debugmsg(6, "start")
 		tgn = threading.Thread(target=lambda: self.gs_updatename(grphWindow))
 		tgn.start()
@@ -5537,8 +5608,8 @@ class RFSwarmGUI(tk.Frame):
 		tsm = threading.Thread(target=lambda: self.gs_updatesecmetrics(grphWindow))
 		tsm.start()
 		base.debugmsg(6, "tsm")
-		tgr = threading.Thread(target=lambda: self.gph_refresh(grphWindow))
-		tgr.start()
+		tal = threading.Thread(target=lambda: self.gs_updateagents(grphWindow))
+		tal.start()
 
 	def gs_dbolnames(self):
 
@@ -5666,6 +5737,31 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeMSettings.SMetrics = newSMetrics
 		grphWindow.fmeMSettings.omSM.set_menu(*grphWindow.fmeMSettings.SMetrics)
 		base.debugmsg(6, "grphWindow.fmeMSettings.omSM.set_menu():", grphWindow.fmeMSettings.SMetrics)
+
+	def gs_updateagents(self, grphWindow):
+
+		agntlst = list(base.Agents.keys())
+
+		base.debugmsg(7, "agntlst:", agntlst)
+		base.debugmsg(9, "Results FATypes:", grphWindow.fmeRSettings.FATypes)
+		base.debugmsg(9, "Metrics FATypes:", grphWindow.fmeMSettings.FATypes)
+		if len(agntlst) > 0:
+			if "Loading..." in grphWindow.fmeRSettings.FATypes:
+				grphWindow.fmeRSettings.FATypes.remove("Loading...")
+				base.debugmsg(9, "Results FATypes:", grphWindow.fmeRSettings.FATypes)
+			if "Loading..." in grphWindow.fmeMSettings.FATypes:
+				grphWindow.fmeMSettings.FATypes.remove("Loading...")
+				base.debugmsg(9, "Metrics FATypes:", grphWindow.fmeMSettings.FATypes)
+
+			for agentname in agntlst:
+				if agentname not in grphWindow.fmeRSettings.FATypes:
+					grphWindow.fmeRSettings.FATypes.append(agentname)
+				if agentname not in grphWindow.fmeMSettings.FATypes:
+					grphWindow.fmeMSettings.FATypes.append(agentname)
+			base.debugmsg(8, "Results FATypes:", grphWindow.fmeRSettings.FATypes)
+			base.debugmsg(8, "Metrics FATypes:", grphWindow.fmeMSettings.FATypes)
+			grphWindow.fmeRSettings.omFA.set_menu(*grphWindow.fmeRSettings.FATypes)
+			grphWindow.fmeMSettings.omFA.set_menu(*grphWindow.fmeMSettings.FATypes)
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
