@@ -3263,7 +3263,7 @@ Verify That the Start Time And Time Remaining Are Removed From Plan Screen When 
 	[Teardown]	Run Keywords	Close Manager GUI ${platform}
 
 Verify That TPS Is TP And Not TPmS
-	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #155
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #155 	robot:continue-on-failure
 	[Setup]	Run Keywords
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY} 	AND
 	...    Set INI Window Size 	1200 	600 	AND
@@ -3278,7 +3278,15 @@ Verify That TPS Is TP And Not TPmS
 	Wait For the Scenario Run To Finish
 	Click Menu 	graphs
 	Take A Screenshot
-	# Click Menu 	NewGraphWindow
+	Click Menu 	NewGraphWindow
+	Take A Screenshot
+	Click Label With Horizontal Offset 	DataType 	90
+	Take A Screenshot
+	Select Option 	Result
+	Take A Screenshot
+	Click Label With Horizontal Offset 	ResultType 	90
+	Take A Screenshot
+	Select Option 	TPS
 	Take A Screenshot
 
 	[Teardown]	Run Keywords
