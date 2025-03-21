@@ -3287,6 +3287,7 @@ Verify That TPS Is TP And Not TPmS
 	Click Label With Horizontal Offset 	ResultType 	90
 	Take A Screenshot
 	Select Option 	TPS
+	Sleep 	10
 	Take A Screenshot
 
 	[Teardown]	Run Keywords
