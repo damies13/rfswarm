@@ -1,8 +1,10 @@
 *** Test Cases ***
-TPS Test 0.5
-    Sleep Keyword 0.5
+TPS Test
+    Sleep Keyword
 
 *** Keywords ***
-Sleep Keyword 0.5
-    [Documentation]  Measuring TPS with this keyword [0.5s]
-    Sleep   0.5
+Sleep Keyword
+    [Documentation]  Measuring TPS with this keyword [Variable sleep]
+    ${value}=   Evaluate    ((${RFS_ITERATION} % 5) + 5.1) / 10
+    # ${value}=   Evaluate    ${RFS_ITERATION} / 2
+    Sleep   ${value}
