@@ -3277,20 +3277,17 @@ Verify That TPS Is TP And Not TPmS
 	Click Button 	runplay
 	Wait For the Scenario Run To Finish
 	Click Menu 	graphs
-	Take A Screenshot
 	Click Menu 	NewGraphWindow
-	Take A Screenshot
 	Click Label With Horizontal Offset 	DataType 	90
-	Take A Screenshot
 	Select Option 	Result
-	Take A Screenshot
 	Click Label With Horizontal Offset 	ResultType 	90
-	Take A Screenshot
 	Select Option 	TPS
-	Take A Screenshot
 	Click Label With Horizontal Offset 	ShowLegend 	60
 	Sleep 	10
+
 	Take A Screenshot
+	VAR 	${tpslegend} 	manager_${platform}_label_tpslegend.png
+	Wait For 	${tpslegend} 	 timeout=300
 
 	[Teardown]	Run Keywords
 	...    Run Keyword 	Close Manager GUI ${platform} 	AND
