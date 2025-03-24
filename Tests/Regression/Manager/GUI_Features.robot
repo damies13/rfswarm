@@ -3287,6 +3287,8 @@ Verify That TPS Is TP And Not TPmS
 	Click Label With Horizontal Offset 	ResultType 	90
 	Take A Screenshot
 	Select Option 	TPS
+	Take A Screenshot
+	Click Label With Horizontal Offset 	ShowLegend 	60
 	Sleep 	10
 	Take A Screenshot
 
