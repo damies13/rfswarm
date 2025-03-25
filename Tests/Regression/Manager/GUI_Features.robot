@@ -3276,6 +3276,8 @@ Verify That TPS Is TP And Not TPmS
 	Click Tab 	Plan
 	Click Button 	runplay
 	Wait For the Scenario Run To Finish
+	Sleep 	5
+	Take A Screenshot
 	Click Menu 	graphs
 	Click Menu 	NewGraphWindow
 	Click Label With Horizontal Offset 	DataType 	90
@@ -3287,7 +3289,11 @@ Verify That TPS Is TP And Not TPmS
 
 	Take A Screenshot
 	VAR 	${tpslegend} 	manager_${platform}_label_tpslegend.png
-	Wait For 	${tpslegend} 	 timeout=300
+	Wait For 	${tpslegend} 	 timeout=30
+
+	Take A Screenshot
+	VAR 	${tpslegend} 	manager_${platform}_label_tpsvalueaxis.png
+	Wait For 	${tpslegend} 	 timeout=30
 
 	[Teardown]	Run Keywords
 	...    Run Keyword 	Close Manager GUI ${platform} 	AND
