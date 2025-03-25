@@ -3288,12 +3288,17 @@ Verify That TPS Is TP And Not TPmS
 	Sleep 	10
 
 	Take A Screenshot
-	VAR 	${tpslegend} 	manager_${platform}_label_tpslegend.png
+	${pvinfo}= 	Get Python Version Info
+	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
+		VAR 	${tpslegend} 	manager_${platform}_label_tpslegend_py3.9.png
+	ELSE
+		VAR 	${tpslegend} 	manager_${platform}_label_tpslegend.png
+	END
 	Wait For 	${tpslegend} 	 timeout=30
 
 	Take A Screenshot
-	VAR 	${tpslegend} 	manager_${platform}_label_tpsvalueaxis.png
-	Wait For 	${tpslegend} 	 timeout=30
+	VAR 	${tpsvalue} 	manager_${platform}_label_tpsvalueaxis.png
+	Wait For 	${tpsvalue} 	 timeout=30
 
 	[Teardown]	Run Keywords
 	...    Run Keyword 	Close Manager GUI ${platform} 	AND
