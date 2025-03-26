@@ -554,6 +554,10 @@ Set Global Filename And Default Save Path
 	Log		${global_name}
 	Log		${global_path}
 
+Get Python Version Info
+	${vinfo}= 	Evaluate    sys.version_info 	modules=sys
+	RETURN		${vinfo}
+
 Get Manager Default Save Path
 	${pip_data}=	Get Manager PIP Data
 	${pip_data_list}=	Split String	${pip_data}
