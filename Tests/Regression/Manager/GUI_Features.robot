@@ -3297,7 +3297,7 @@ Verify That TPS Is TP And Not TPmS
 	Wait For 	${tpslegend} 	 timeout=30
 
 	Take A Screenshot
-	VAR 	${tpsvalue} 	manager_${platform}_label_tpsvalueaxis.png
+	VAR 	${tpsvalue} 	manager_${platform}_label_tpsvaluesaxis.png
 	Wait For 	${tpsvalue} 	 timeout=30
 
 	[Teardown]	Run Keywords
