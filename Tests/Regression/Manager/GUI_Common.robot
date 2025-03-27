@@ -635,6 +635,7 @@ Create Robot File
 	File Should Exist	${path}${/}${name}
 
 Clear Manager Result Directory
+	[Documentation] 	Clears all files and directories in ${results_dir} directory. Use with caution.
 	[Arguments]		${results_dir}=${results_dir}
 	@{run_result_dirs}=		List Directories In Directory	${results_dir}	absolute=${True}
 	FOR  ${dir}  IN  @{run_result_dirs}

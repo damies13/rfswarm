@@ -502,6 +502,7 @@ class RFSwarmBase:
 	agenthttpserver = None
 	updatethread = None
 	updateplanthread = None
+	graph_updater = None
 
 	Agents: Any = {}
 	agenttgridupdate = 0
@@ -4141,6 +4142,14 @@ class RFSwarmGUI(tk.Frame):
 		# 		in the ini file so the next app open loads the file
 		base.config['Plan']['ScenarioFile'] = base.inisafevalue(sf)
 
+		try:
+			if base.graph_updater.is_alive():
+				base.debugmsg(9, "Join Update Graph Thread")
+				base.graph_updater.join(timeout=30)
+				base.debugmsg(9, "Join Update Graph Thread after")
+		except Exception:
+			pass
+
 		base.debugmsg(3, "Close GUI")
 		try:
 			self.destroy()
@@ -4933,10 +4942,10 @@ class RFSwarmGUI(tk.Frame):
 
 		#
 		# # start thread to update the graph (gph_updater)
-		t1 = threading.Thread(target=lambda: self.gph_updater(grphWindow))
-		t1.start()
+		base.graph_updater = threading.Thread(target=lambda: self.gph_updater(grphWindow), name='graph_updater')
+		base.graph_updater.start()
 
-		base.debugmsg(5, "t1:", t1)
+		base.debugmsg(5, "t1:", base.graph_updater)
 
 		# start threads to update option lists
 		t2 = threading.Thread(target=lambda: self.gs_refresh(grphWindow))
@@ -5146,7 +5155,7 @@ class RFSwarmGUI(tk.Frame):
 		return settings
 
 	def gph_refresh(self, grphWindow):
-		if grphWindow.saveready:
+		if grphWindow.saveready and base.keeprunning:
 			base.debugmsg(6, "graphname:", grphWindow.graphname.get())
 			DataType = grphWindow.settings["DataType"].get()
 			base.debugmsg(7, "DataType:", DataType)

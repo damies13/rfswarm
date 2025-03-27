@@ -2201,17 +2201,21 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 Verify the Results Directory And db File Gets Created Correctly With Scenario Also After a Restart
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
 	[Setup]	Run Keywords
-	...    Clear Manager Result Directory									AND
-	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set INI Window Size		1200	600								AND
-	...    Open Manager GUI													AND
 	...    Open Agent														AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Create Robot File
 	...    file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\tFail this\n\tSleep\t10\n\tFail\n
 
+	VAR 	${scenario_name}	Issue-#35_#69
+	VAR 	${results_dir} 		${results_dir}${/}Issue-#69_1 	scope=TEST
+	VAR 	@{mngr_options} 	-d 		${results_dir}
+	Create Directory 	${results_dir}
+	Clear Manager Result Directory
+	Open Manager GUI 	${mngr_options}
+
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#35_#69${/}Issue-#35_#69.rfs
-	${scenario_name}	Set Variable	Issue-#35_#69
 	Copy File	${scenariofile}		${global_path}
 	Click Button	runopen
 	Open Scenario File OS DIALOG	${scenario_name}
@@ -2261,20 +2265,24 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	[Teardown]	Run Keywords
 	...    Delete Robot File						AND
 	...    Delete Scenario File	${scenario_name}	AND
-	...    Stop Agent					AND
+	...    Stop Agent								AND
 	...    Run Keyword		Close Manager GUI ${platform}
 
 Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
 	[Setup]	Run Keywords
-	...    Clear Manager Result Directory									AND
-	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set INI Window Size		1200	600								AND
-	...    Open Manager GUI													AND
 	...    Open Agent														AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Create Robot File
 	...    file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\tFail this\n\tSleep\t10\n\tFail\n
+
+	VAR 	${results_dir} 		${results_dir}${/}Issue-#69_2 	scope=TEST
+	VAR 	@{mngr_options} 	-d 		${results_dir}
+	Create Directory 	${results_dir}
+	Clear Manager Result Directory
+	Open Manager GUI 	${mngr_options}
 
 	${scenario_name}	Set Variable	Scenario
 	Press Key.tab 4 Times
@@ -2304,8 +2312,8 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	Verify Generated Run Result Files	${run_result_dirs}[0]	${scenario_name}
 
 	[Teardown]	Run Keywords
-	...    Delete Robot File						AND
-	...    Stop Agent					AND
+	...    Delete Robot File	AND
+	...    Stop Agent			AND
 	...    Run Keyword		Close Manager GUI ${platform}
 
 Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the robots)
@@ -3270,7 +3278,7 @@ Verify That TPS Is TP And Not TPmS
 	...    Open Agent
 
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#155${/}tps.rfs
-	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-d 	${results_dir}
+	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-d 	${results_dir} 	-g 	6
 	Open Manager GUI 	${mngr_options}
 	Check If The Agent Is Ready
 	Click Tab 	Plan
@@ -3303,6 +3311,12 @@ Verify That TPS Is TP And Not TPmS
 		VAR 	${tpsvalue} 	manager_${platform}_label_tpsvaluesaxis.png
 	END
 	Wait For 	${tpsvalue} 	 timeout=30
+
+	IF 	"${platform}" == "macos"
+		Click Button 	CloseWindow
+	ELSE
+		Click Button With Vertical Offset 	GraphSettings 	offset=-15
+	END
 
 	[Teardown]	Run Keywords
 	...    Run Keyword 	Close Manager GUI ${platform} 	AND
