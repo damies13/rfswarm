@@ -3270,7 +3270,7 @@ Verify That TPS Is TP And Not TPmS
 	...    Open Agent
 
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#155${/}tps.rfs
-	VAR 	@{mngr_options} 	-s 	${scenariofile}
+	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-d 	${results_dir}
 	Open Manager GUI 	${mngr_options}
 	Check If The Agent Is Ready
 	Click Tab 	Plan
@@ -3297,7 +3297,11 @@ Verify That TPS Is TP And Not TPmS
 	Wait For 	${tpslegend} 	 timeout=30
 
 	Take A Screenshot
-	VAR 	${tpsvalue} 	manager_${platform}_label_tpsvaluesaxis.png
+	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
+		VAR 	${tpsvalue} 	manager_${platform}_label_tpsvaluesaxis_py3.9.png
+	ELSE
+		VAR 	${tpsvalue} 	manager_${platform}_label_tpsvaluesaxis.png
+	END
 	Wait For 	${tpsvalue} 	 timeout=30
 
 	[Teardown]	Run Keywords
