@@ -817,6 +817,14 @@ class RFSwarmBase:
 				self.datadb.create_aggregate("stdev", 1, stdevclass)
 				self.MetricIDs = {}
 
+				compopt = self.datadb.execute("PRAGMA compile_options;")
+				self.db_compile_options = [x[0] for x in compopt.fetchall()]
+
+				if "ENABLE_MATH_FUNCTIONS" not in self.db_compile_options:
+					self.datadb.create_function('floor', 1, math.floor)
+					# https://www.sqlite.org/lang_mathfunc.html
+					# https://stackoverflow.com/questions/70451170/sqlite3-math-functions-python
+
 			if createschema:
 				base.debugmsg(5, "Create Schema")
 				c = self.datadb.cursor()
