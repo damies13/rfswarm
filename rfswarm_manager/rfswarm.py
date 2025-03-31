@@ -502,7 +502,7 @@ class RFSwarmBase:
 	agenthttpserver = None
 	updatethread = None
 	updateplanthread = None
-	graph_updater = None
+	graph_refresher = {}
 
 	Agents: Any = {}
 	agenttgridupdate = 0
@@ -4150,13 +4150,14 @@ class RFSwarmGUI(tk.Frame):
 		# 		in the ini file so the next app open loads the file
 		base.config['Plan']['ScenarioFile'] = base.inisafevalue(sf)
 
-		try:
-			if base.graph_updater.is_alive():
-				base.debugmsg(9, "Join Update Graph Thread")
-				base.graph_updater.join(timeout=30)
-				base.debugmsg(9, "Join Update Graph Thread after")
-		except Exception:
-			pass
+		for id in base.graph_refresher.keys():
+			try:
+				if base.graph_refresher[id].is_alive():
+					base.debugmsg(9, "Join Update Graph Thread")
+					base.graph_refresher[id].join(timeout=30)
+					base.debugmsg(9, "Join Update Graph Thread after")
+			except Exception:
+				pass
 
 		base.debugmsg(3, "Close GUI")
 		try:
@@ -4950,10 +4951,10 @@ class RFSwarmGUI(tk.Frame):
 
 		#
 		# # start thread to update the graph (gph_updater)
-		base.graph_updater = threading.Thread(target=lambda: self.gph_updater(grphWindow), name='graph_updater')
-		base.graph_updater.start()
+		t1 = threading.Thread(target=lambda: self.gph_updater(grphWindow), name='graph_updater')
+		t1.start()
 
-		base.debugmsg(5, "t1:", base.graph_updater)
+		base.debugmsg(5, "t1:", t1)
 
 		# start threads to update option lists
 		t2 = threading.Thread(target=lambda: self.gs_refresh(grphWindow))
@@ -5117,12 +5118,13 @@ class RFSwarmGUI(tk.Frame):
 
 	def gph_updater(self, grphWindow):
 		try:
-			while True and base.keeprunning:
+			while base.keeprunning:
 				base.debugmsg(6, "graphname:", grphWindow.graphname.get())
 				# self.gph_refresh(grphWindow)
-				tgr = threading.Thread(target=lambda: self.gph_refresh(grphWindow))
-				tgr.start()
-				time.sleep(5)
+				base.graph_refresher[grphWindow.graphid] = threading.Thread(target=lambda: self.gph_refresh(grphWindow))
+				base.graph_refresher[grphWindow.graphid].start()
+				if base.keeprunning:
+					time.sleep(5)
 		except Exception:
 			pass
 
