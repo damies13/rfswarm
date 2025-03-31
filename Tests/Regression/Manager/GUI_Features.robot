@@ -3278,7 +3278,7 @@ Verify That TPS Is TP And Not TPmS
 	...    Open Agent
 
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#155${/}tps.rfs
-	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-d 	${results_dir} 	-g 	6
+	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-d 	${results_dir} 	-g 	3
 	Open Manager GUI 	${mngr_options}
 	Check If The Agent Is Ready
 	Click Tab 	Plan

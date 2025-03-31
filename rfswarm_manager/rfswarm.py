@@ -502,7 +502,7 @@ class RFSwarmBase:
 	agenthttpserver = None
 	updatethread = None
 	updateplanthread = None
-	graph_refresher = {}
+	graph_refresher: dict[str, threading.Thread] = {}
 
 	Agents: Any = {}
 	agenttgridupdate = 0
