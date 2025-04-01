@@ -502,6 +502,7 @@ class RFSwarmBase:
 	agenthttpserver = None
 	updatethread = None
 	updateplanthread = None
+	graph_refresher: dict[str, threading.Thread] = {}
 
 	Agents: Any = {}
 	agenttgridupdate = 0
@@ -815,6 +816,14 @@ class RFSwarmBase:
 				self.datadb.create_aggregate("percentile", 2, percentile)
 				self.datadb.create_aggregate("stdev", 1, stdevclass)
 				self.MetricIDs = {}
+
+				compopt = self.datadb.execute("PRAGMA compile_options;")
+				self.db_compile_options = [x[0] for x in compopt.fetchall()]
+
+				if "ENABLE_MATH_FUNCTIONS" not in self.db_compile_options:
+					self.datadb.create_function('floor', 1, math.floor)
+					# https://www.sqlite.org/lang_mathfunc.html
+					# https://stackoverflow.com/questions/70451170/sqlite3-math-functions-python
 
 			if createschema:
 				base.debugmsg(5, "Create Schema")
@@ -4141,6 +4150,15 @@ class RFSwarmGUI(tk.Frame):
 		# 		in the ini file so the next app open loads the file
 		base.config['Plan']['ScenarioFile'] = base.inisafevalue(sf)
 
+		for id in base.graph_refresher.keys():
+			try:
+				if base.graph_refresher[id].is_alive():
+					base.debugmsg(9, "Join Update Graph Thread")
+					base.graph_refresher[id].join(timeout=30)
+					base.debugmsg(9, "Join Update Graph Thread after")
+			except Exception:
+				pass
+
 		base.debugmsg(3, "Close GUI")
 		try:
 			self.destroy()
@@ -4933,7 +4951,7 @@ class RFSwarmGUI(tk.Frame):
 
 		#
 		# # start thread to update the graph (gph_updater)
-		t1 = threading.Thread(target=lambda: self.gph_updater(grphWindow))
+		t1 = threading.Thread(target=lambda: self.gph_updater(grphWindow), name='graph_updater')
 		t1.start()
 
 		base.debugmsg(5, "t1:", t1)
@@ -5100,12 +5118,13 @@ class RFSwarmGUI(tk.Frame):
 
 	def gph_updater(self, grphWindow):
 		try:
-			while True and base.keeprunning:
+			while base.keeprunning:
 				base.debugmsg(6, "graphname:", grphWindow.graphname.get())
 				# self.gph_refresh(grphWindow)
-				tgr = threading.Thread(target=lambda: self.gph_refresh(grphWindow))
-				tgr.start()
-				time.sleep(5)
+				base.graph_refresher[grphWindow.graphid] = threading.Thread(target=lambda: self.gph_refresh(grphWindow))
+				base.graph_refresher[grphWindow.graphid].start()
+				if base.keeprunning:
+					time.sleep(5)
 		except Exception:
 			pass
 
@@ -5146,7 +5165,7 @@ class RFSwarmGUI(tk.Frame):
 		return settings
 
 	def gph_refresh(self, grphWindow):
-		if grphWindow.saveready:
+		if grphWindow.saveready and base.keeprunning:
 			base.debugmsg(6, "graphname:", grphWindow.graphname.get())
 			DataType = grphWindow.settings["DataType"].get()
 			base.debugmsg(7, "DataType:", DataType)

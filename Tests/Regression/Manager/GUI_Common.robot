@@ -58,7 +58,7 @@ Set Platform By Tag
 	Log 	${OPTIONS}
 	Log 	${OPTIONS}[include]
 	${inclen}= 	Get Length 	${OPTIONS}[include]
-x	IF 	${inclen} > 0
+	IF 	${inclen} > 0
 		Log 	${OPTIONS}[include][0]
 		${ostag}= 	Set Variable 	${OPTIONS}[include][0]
 
@@ -554,6 +554,10 @@ Set Global Filename And Default Save Path
 	Log		${global_name}
 	Log		${global_path}
 
+Get Python Version Info
+	${vinfo}= 	Evaluate    sys.version_info 	modules=sys
+	RETURN		${vinfo}
+
 Get Manager Default Save Path
 	${pip_data}=	Get Manager PIP Data
 	${pip_data_list}=	Split String	${pip_data}
@@ -631,6 +635,7 @@ Create Robot File
 	File Should Exist	${path}${/}${name}
 
 Clear Manager Result Directory
+	[Documentation] 	Clears all files and directories in ${results_dir} directory. Use with caution.
 	[Arguments]		${results_dir}=${results_dir}
 	@{run_result_dirs}=		List Directories In Directory	${results_dir}	absolute=${True}
 	FOR  ${dir}  IN  @{run_result_dirs}
