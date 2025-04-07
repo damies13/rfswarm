@@ -295,7 +295,7 @@ Query Result DB
 	Log 	dbfile: ${dbfile} 	console=true
 	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
 	# Log to console 	\${dbfile}: ${dbfile}
-	Connect To Database Using Custom Params 	sqlite3 	database="${dbfile}", isolation_level=None
+	Connect To Database 	sqlite3 	database=${dbfile} 	isolation_level=${None}
 	# Log 	conn: ${conn} 	console=true
 	Log 	sql: ${sql} 	console=true
 	Check If Exists In Database 	${sql}
