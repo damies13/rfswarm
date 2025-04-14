@@ -1500,6 +1500,10 @@ Navigate to and check Desktop Icon For MacOS
 	${img}=	Set Variable		${platform}_dock_trash.png
 	${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=3
 	IF 	not ${passed}
+		${img}=	Set Variable		${platform}_dock_trash2.png
+		${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=3
+	END
+	IF 	not ${passed}
 		Take A Screenshot
 		Press Combination 	KEY.fn 	KEY.f
 		Sleep 	0.3
@@ -1513,6 +1517,7 @@ Navigate to and check Desktop Icon For MacOS
 
 	# macos_finder_menu_go.png
 	${img}=	Set Variable		${platform}_finder_menu_go.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 	Click Image		${img}
 	# Sleep 	0.3
 	# Take A Screenshot
