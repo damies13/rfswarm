@@ -510,6 +510,7 @@ class RFSwarmBase:
 	dir_path = os.path.dirname(os.path.realpath(__file__))
 	resultsdir = ""
 	run_dbthread = True
+	dbconnecttime = 0
 	dbthread = None
 	datapath = ""
 	dbfile = ""
@@ -812,6 +813,7 @@ class RFSwarmBase:
 			if self.datadb is None:
 				base.debugmsg(5, "Connect to DB")
 				self.datadb = sqlite3.connect(self.dbfile)
+				base.dbconnecttime = int(time.time())
 				self.datadb.create_aggregate("percentile", 2, percentile)
 				self.datadb.create_aggregate("stdev", 1, stdevclass)
 				self.MetricIDs = {}
@@ -5446,9 +5448,9 @@ class RFSwarmGUI(tk.Frame):
 						fpwhere += ")"
 						wherelst.append(fpwhere)
 
-				# # Start Time
-				# if starttime > 0:
-				# 	wherelst.append("MetricTime >= {}".format(starttime))
+				# Start Time
+				if base.dbconnecttime > 0:
+					wherelst.append("MetricTime >= {}".format(base.dbconnecttime))
 				#
 				# # End Time
 				# if endtime > 0:
@@ -5502,7 +5504,8 @@ class RFSwarmGUI(tk.Frame):
 
 				base.debugmsg(5, "sql:", sql)
 
-				name = "|".join(mnamecolumns)
+				# name = "|".join(mnamecolumns)
+				name = grphWindow.graphname.get()
 				base.dbqueue["Read"].append({"SQL": sql, "KEY": "GraphData_{}".format(name)})
 
 				dodraw = False
