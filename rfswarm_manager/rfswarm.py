@@ -5317,10 +5317,10 @@ class RFSwarmGUI(tk.Frame):
 			if DataType == "Metric":
 				MType = grphWindow.settings["MType"].get()
 				base.debugmsg(7, "MType:", MType)
-				PMetric = grphWindow.settings["PMetric"].get()
-				base.debugmsg(7, "PMetric:", PMetric)
-				SMetric = grphWindow.settings["SMetric"].get()
-				base.debugmsg(7, "SMetric:", SMetric)
+				PM = grphWindow.settings["PMetric"].get()
+				base.debugmsg(7, "PMetric:", PM)
+				SM = grphWindow.settings["SMetric"].get()
+				base.debugmsg(7, "SMetric:", SM)
 
 				EnFA = grphWindow.settings["MintFA"].get()
 				base.debugmsg(7, "EnFA:", EnFA)
@@ -5338,238 +5338,237 @@ class RFSwarmGUI(tk.Frame):
 				fltGW = grphWindow.settings["MGWType"].get()
 				base.debugmsg(7, "inpFP:", inpFP)
 
+				colname = "Name"
 
-				hasfilter = False
-				if MType is not None and len(MType) > 0:
-					MTLst = [MType]
-					hasfilter = True
+				base.debugmsg(6, "MType:", MType, "	PM:", PM, "	SM:", SM)
+
+				mnamecolumns = []
+				# mcolumns = ["MetricTime as 'Time'", "MetricValue as 'Value'", "PrimaryMetric as 'Name'", "MetricType as 'Name'", "SecondaryMetric as 'Name'"]
+				if GSeconds > 0:
+					mcolumns = ["max(MetricTime) as 'Time'"]
+					if fltGW.lower() == "maximum":
+						mcolumns.append("max(MetricValue) as 'Value'")
+					elif fltGW.lower() == "minimum":
+						mcolumns.append("min(MetricValue) as 'Value'")
+					elif fltGW.lower() == "average":
+						mcolumns.append("avg(MetricValue) as 'Value'")
+					else:
+						mcolumns.append("avg(MetricValue) as 'Value'")
+
 				else:
-					MTLst = list(base.MetricIDs.keys())
-					if "MetricCount" in MTLst:
-						MTLst.remove("MetricCount")
-				base.debugmsg(6, "MTLst:", MTLst)
+					mcolumns = ["MetricTime as 'Time'", "MetricValue as 'Value'"]
+				wherelst = []
+				# grouplst = ["PrimaryMetric", "MetricType", "SecondaryMetric"]
+				grouplst = []
 
-				if PMetric is not None and len(PMetric) > 0:
-					PMLst = [PMetric]
-					hasfilter = True
+				if GSeconds > 0:
+					# [Name], floor(end_time/{GSeconds})
+					grouplst.append(f"[{colname}]")
+					grouplst.append(f"floor(MetricTime/{GSeconds})")
+
+				if PM not in [None, "", "None"] and len(PM) > 0:
+					# if "PrimaryMetric as 'Name'" in mcolumns:
+					# 	mcolumns.remove("PrimaryMetric as 'Name'")
+					wherelst.append("PrimaryMetric == '{}'".format(PM.replace("'", "''")))
+					if "PrimaryMetric" in grouplst:
+						grouplst.remove("PrimaryMetric")
 				else:
-					PMLst = []
-					for mt in MTLst:
-						if mt in base.MetricIDs:
-							for pm in base.MetricIDs[mt].keys():
-								PMLst.append(pm)
-				base.debugmsg(6, "PMLst:", PMLst)
-
-				if SMetric is not None and len(SMetric) > 0:
-					SMLst = [SMetric]
-					hasfilter = True
+					mnamecolumns.append("PrimaryMetric")
+				if MType not in [None, "", "None"] and len(MType) > 0:
+					# if "MetricType as 'Name'" in mcolumns:
+					# 	mcolumns.remove("MetricType as 'Name'")
+					wherelst.append("MetricType == '{}'".format(MType.replace("'", "''")))
+					if "MetricType" in grouplst:
+						grouplst.remove("MetricType")
 				else:
-					SMLst = []
-					for mt in MTLst:
-						if mt in base.MetricIDs:
-							for pm in PMLst:
-								if pm in base.MetricIDs[mt]:
-									for sm in base.MetricIDs[mt][pm].keys():
-										if sm != "ID":
-											SMLst.append(sm)
-				base.debugmsg(6, "SMLst:", SMLst)
+					mnamecolumns.append("MetricType")
+				if SM not in [None, "", "None"] and len(SM) > 0:
+					# if "SecondaryMetric as 'Name'" in mcolumns:
+					# 	mcolumns.remove("SecondaryMetric as 'Name'")
+					wherelst.append("SecondaryMetric == '{}'".format(SM.replace("'", "''")))
+					if "SecondaryMetric" in grouplst:
+						grouplst.remove("SecondaryMetric")
+				else:
+					mnamecolumns.append("SecondaryMetric")
 
-				GDNames = []
-				if hasfilter:
+				if EnFA:
+					if FAType in [None, "", "None"]:
+						mnamecolumns.append("DataSource")
+					else:
+						wherelst.append("DataSource == '{}'".format(FAType))
+
+				if len(mnamecolumns) < 1:
+					mnamecolumns.append("'" + SM + "'")
+
+				# Construct Name Column
+				mnamecolumn = " || ' - ' || ".join(mnamecolumns)
+				mnamecolumn += " as [" + colname + "] "
+				mcolumns.append(mnamecolumn)
+
+				if FNType not in [None, "", "None"] and len(inpFP) > 0:
+					# construct pattern
+					# "Wildcard (Unix Glob)",
+					if FNType == "Wildcard (Unix Glob)":
+						# AND PrimaryMetric GLOB '*_1*' OR SecondaryMetric GLOB '*_1*' OR DataSource GLOB '*_1*' OR MetricValue GLOB '*_1*'
+						base.debugmsg(5, "mnamecolumns:", mnamecolumns)
+						fpwhere = "("
+						for dispcol in mnamecolumns:
+							if len(fpwhere) > 1:
+								fpwhere += "OR "
+							fpwhere += "{} GLOB '{}'".format(dispcol, inpFP)
+						fpwhere += ")"
+						wherelst.append(fpwhere)
+					# "Regex",
+					if FNType == "Regex":
+						fpwhere = "("
+						for dispcol in mnamecolumns:
+							if len(fpwhere) > 1:
+								fpwhere += "OR "
+							fpwhere += "{} REGEXP '{}'".format(dispcol, inpFP)
+						fpwhere += ")"
+						wherelst.append(fpwhere)
+					# "Not Wildcard (Unix Glob)",
+					if FNType == "Not Wildcard (Unix Glob)":
+						fpwhere = "("
+						for dispcol in mnamecolumns:
+							if len(fpwhere) > 1:
+								fpwhere += "AND "
+							fpwhere += "{} NOT GLOB '{}'".format(dispcol, inpFP)
+						fpwhere += ")"
+						wherelst.append(fpwhere)
+					# "Not Regex"
+					if FNType == "Not Regex":
+						fpwhere = "("
+						for dispcol in mnamecolumns:
+							if len(fpwhere) > 1:
+								fpwhere += "AND "
+							fpwhere += "{} NOT REGEXP '{}'".format(dispcol, inpFP)
+						fpwhere += ")"
+						wherelst.append(fpwhere)
+
+				# # Start Time
+				# if starttime > 0:
+				# 	wherelst.append("MetricTime >= {}".format(starttime))
+				#
+				# # End Time
+				# if endtime > 0:
+				# 	wherelst.append("MetricTime <= {}".format(endtime))
+
+				# if isnum<1:
+				# 	mcolumns.append("MetricValue")
+				# 	if sc>0:
+				# 		mcolumns.append("count(MetricTime) as 'Count'")
+				# 		if "MetricValue" in grouplst:
+				# 			grouplst.remove("MetricValue")
+				# else:
+				# 	mcolumns.append("min(CAST(MetricValue AS NUMERIC)) AS 'Minimum'")
+				# 	mcolumns.append("round(avg(CAST(MetricValue AS NUMERIC)),3) AS 'Average'")
+				# 	mcolumns.append("round(percentile(CAST(MetricValue AS NUMERIC), {}),3) AS '{}%ile'".format(display_percentile, display_percentile))
+				# 	mcolumns.append("max(CAST(MetricValue AS NUMERIC)) AS 'Maximum'")
+				# 	mcolumns.append("round(stdev(CAST(MetricValue AS NUMERIC)),3) AS 'StdDev'")
+
+				sql = "SELECT "
+
+				i = 0
+				for col in mcolumns:
+					if i < 1:
+						sql += "{} ".format(col)
+					else:
+						sql += ", {} ".format(col)
+					i += 1
+
+				sql += "FROM MetricData "
+
+				i = 0
+				for iwhere in wherelst:
+					if i == 0:
+						sql += "WHERE {} ".format(iwhere)
+					else:
+						sql += "AND {} ".format(iwhere)
+					i += 1
+
+				if len(grouplst) > 0:
+					sql += "GROUP by "
+					i = 0
+					for col in grouplst:
+						if i < 1:
+							sql += "{} ".format(col)
+						else:
+							sql += ", {} ".format(col)
+						i += 1
+
+				sql += "ORDER BY MetricTime "
+
+
+				base.debugmsg(5, "sql:", sql)
+
+				name = "|".join(mnamecolumns)
+				base.dbqueue["Read"].append({"SQL": sql, "KEY": "GraphData_{}".format(name)})
+
+				dodraw = False
+
+				gdname = "GraphData_{}".format(name)
+				if gdname in base.dbqueue["ReadResult"]:
+					base.debugmsg(6, gdname, ":", base.dbqueue["ReadResult"][gdname])
+					grphWindow.graphdata = {}
 					try:
 						grphWindow.axis.cla()
 					except Exception:
 						pass
-					for mt in MTLst:
-						for pm in PMLst:
-							if pm in base.MetricIDs[mt]:
-								for sm in SMLst:
-									if sm in base.MetricIDs[mt][pm]:
-										name = "{}|{}|{}".format(mt, pm, sm)
 
-										base.debugmsg(5, "name:", name)
-										GDNames.append(name)
+					for r in base.dbqueue["ReadResult"][gdname]:
 
-										colname = "Name"
+						base.debugmsg(6, "r:", r)
+						linename = r['Name']
 
-										mnamecolumns = []
-										# mcolumns = ["MetricTime as 'Time'", "MetricValue as 'Value'", "PrimaryMetric as 'Name'", "MetricType as 'Name'", "SecondaryMetric as 'Name'"]
-										if GSeconds > 0:
-											mcolumns = ["max(MetricTime) as 'Time'"]
-											if fltGW.lower() == "maximum":
-												mcolumns.append("max(MetricValue) as 'Value'")
-											elif fltGW.lower() == "minimum":
-												mcolumns.append("min(MetricValue) as 'Value'")
-											elif fltGW.lower() == "average":
-												mcolumns.append("avg(MetricValue) as 'Value'")
-											else:
-												mcolumns.append("avg(MetricValue) as 'Value'")
+						if linename not in grphWindow.graphdata:
+							dname = " ".join(list(set(linename.split("|")).symmetric_difference(set([MType, PM, SM])))).strip()
+							base.debugmsg(6, "dname:", dname)
+							colour = base.named_colour(dname)
+							base.debugmsg(6, "name:", linename, "	colour:", colour)
 
-										else:
-											mcolumns = ["MetricTime as 'Time'", "MetricValue as 'Value'"]
+							grphWindow.graphdata[linename] = {}
+							grphWindow.graphdata[linename]["Label"] = dname
+							grphWindow.graphdata[linename]["Colour"] = colour
+							grphWindow.graphdata[linename]["objTime"] = []
+							grphWindow.graphdata[linename]["Values"] = []
 
-										wherelst = []
-										# grouplst = ["PrimaryMetric", "MetricType", "SecondaryMetric"]
-										grouplst = []
+						# grphWindow.graphdata[name]["objTime"] = [datetime.fromtimestamp(r['Time']) for r in base.dbqueue["ReadResult"][gdname]]
+						grphWindow.graphdata[linename]["objTime"].append(datetime.fromtimestamp(r['Time']))
+						# grphWindow.graphdata[name]["Values"] = [self.gph_floatval(r['Value']) for r in base.dbqueue["ReadResult"][gdname]]
+						grphWindow.graphdata[linename]["Values"].append(self.gph_floatval(r['Value']))
+						base.debugmsg(9, gdname, "Values:", grphWindow.graphdata[linename]["Values"])
+						#
+					for linename in grphWindow.graphdata.keys():
+						base.debugmsg(6, gdname, ":", grphWindow.graphdata[linename])
+						if len(grphWindow.graphdata[linename]["Values"]) > 1 and len(grphWindow.graphdata[linename]["Values"]) == len(grphWindow.graphdata[linename]["objTime"]):
+							grphWindow.axis.plot(grphWindow.graphdata[linename]["objTime"], grphWindow.graphdata[linename]["Values"], grphWindow.graphdata[linename]["Colour"], label=grphWindow.graphdata[linename]["Label"])
+							dodraw = True
+						if len(grphWindow.graphdata[linename]["Values"]) == 1 and len(grphWindow.graphdata[linename]["Values"]) == len(grphWindow.graphdata[linename]["objTime"]):
+							grphWindow.axis.plot(grphWindow.graphdata[linename]["objTime"], grphWindow.graphdata[linename]["Values"], grphWindow.graphdata[linename]["Colour"], label=grphWindow.graphdata[linename]["Label"], marker='o')
+							dodraw = True
 
-										if GSeconds > 0:
-											# [Name], floor(end_time/{GSeconds})
-											grouplst.append(f"[{colname}]")
-											grouplst.append(f"floor(MetricTime/{GSeconds})")
+				if dodraw:
 
-										# sql = "SELECT "
-										# sql += "  MetricTime "
-										# sql += ", MetricValue "
-										# sql += "FROM MetricData "
+					grphWindow.axis.grid(True, 'major', 'both')
+					base.debugmsg(6, "SMetric:", SM)
+					if SM in ["Load", "CPU", "MEM", "NET"]:
+						grphWindow.axis.set_ylim(0, 100)
+					else:
+						grphWindow.axis.set_ylim(0)
 
-										# sql += "WHERE MetricType = '{}' ".format(mt.replace("'", "''"))
-										# wherelst.append("MetricType = '{}' ".format(mt.replace("'", "''")))
-										# sql += "	AND PrimaryMetric = '{}' ".format(pm.replace("'", "''"))
-										# wherelst.append("PrimaryMetric = '{}' ".format(pm.replace("'", "''")))
-										# sql += "	AND SecondaryMetric = '{}' ".format(sm.replace("'", "''"))
-										# wherelst.append("SecondaryMetric = '{}' ".format(sm.replace("'", "''")))
+					base.debugmsg(9, "showlegend:", grphWindow.showlegend.get())
+					if grphWindow.showlegend.get():
+						# grphWindow.axis.legend()
+						# grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),&nbsp; shadow=True, ncol=2)
+						grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
 
-										base.debugmsg(5, "mt:", mt)
-										if mt not in [None, "", "None"] and len(mt) > 0:
-											wherelst.append("MetricType == '{}'".format(mt.replace("'", "''")))
-											if "MetricType" in grouplst:
-												grouplst.remove("MetricType")
-										else:
-											mnamecolumns.append("MetricType")
-
-										base.debugmsg(5, "pm:", pm)
-										if pm not in [None, "", "None"] and len(pm) > 0:
-											wherelst.append("PrimaryMetric == '{}'".format(pm.replace("'", "''")))
-											if "PrimaryMetric" in grouplst:
-												grouplst.remove("PrimaryMetric")
-										else:
-											mnamecolumns.append("PrimaryMetric")
-
-										base.debugmsg(5, "sm:", sm)
-										if sm not in [None, "", "None"] and len(sm) > 0:
-											wherelst.append("SecondaryMetric == '{}'".format(sm.replace("'", "''")))
-											if "SecondaryMetric" in grouplst:
-												grouplst.remove("SecondaryMetric")
-										else:
-											mnamecolumns.append("SecondaryMetric")
-
-										if EnFA:
-											if FAType in [None, "", "None"]:
-												mnamecolumns.append("DataSource")
-											else:
-												wherelst.append("DataSource == '{}'".format(FAType))
-
-										base.debugmsg(5, "mnamecolumns:", mnamecolumns)
-										if len(mnamecolumns) < 1:
-											mnamecolumns.append("'" + sm + "'")
-
-										base.debugmsg(5, "mnamecolumns:", mnamecolumns)
-										# Construct Name Column
-										mnamecolumn = " || ' - ' || ".join(mnamecolumns)
-										mnamecolumn += " as [" + colname + "] "
-										mcolumns.append(mnamecolumn)
-										base.debugmsg(5, "mnamecolumn:", mnamecolumn)
-
-										if FNType != "None" and len(inpFP) > 0:
-											# construct pattern
-											# "Wildcard (Unix Glob)",
-											if FNType == "Wildcard (Unix Glob)":
-												wherelst.append("result_name GLOB '{}'".format(inpFP))
-											# "Regex",
-											if FNType == "Regex":
-												wherelst.append("result_name REGEXP '{}'".format(inpFP))
-											# "Not Wildcard (Unix Glob)",
-											if FNType == "Not Wildcard (Unix Glob)":
-												wherelst.append("result_name NOT GLOB '{}'".format(inpFP))
-											# "Not Regex"
-											if FNType == "Not Regex":
-												wherelst.append("result_name NOT REGEXP '{}'".format(inpFP))
-
-										sql = "SELECT "
-
-										i = 0
-										for col in mcolumns:
-											if i < 1:
-												sql += "{} ".format(col)
-											else:
-												sql += ", {} ".format(col)
-											i += 1
-
-										sql += "FROM MetricData "
-
-										i = 0
-										for iwhere in wherelst:
-											if i == 0:
-												sql += "WHERE {} ".format(iwhere)
-											else:
-												sql += "AND {} ".format(iwhere)
-											i += 1
-
-										if len(grouplst) > 0:
-											sql += "GROUP by "
-											i = 0
-											for col in grouplst:
-												if i < 1:
-													sql += "{} ".format(col)
-												else:
-													sql += ", {} ".format(col)
-												i += 1
-
-										sql += "ORDER BY MetricTime "
-
-										base.debugmsg(5, "sql:", sql)
-
-										base.dbqueue["Read"].append({"SQL": sql, "KEY": "GraphData_{}".format(name)})
-
-					dodraw = False
-					for name in GDNames:
-
-						dname = " ".join(list(set(name.split("|")).symmetric_difference(set([MType, PMetric, SMetric])))).strip()
-						base.debugmsg(6, "dname:", dname)
-						if name not in grphWindow.graphdata:
-							grphWindow.graphdata[name] = {}
-						colour = base.named_colour(dname)
-						base.debugmsg(6, "name:", name, "	colour:", colour)
-						grphWindow.graphdata[name]["Colour"] = colour
-						grphWindow.graphdata[name]["objTime"] = []
-						grphWindow.graphdata[name]["Values"] = []
-						gdname = "GraphData_{}".format(name)
-						if gdname in base.dbqueue["ReadResult"]:
-							base.debugmsg(6, gdname, ":", base.dbqueue["ReadResult"][gdname])
-
-							grphWindow.graphdata[name]["objTime"] = [datetime.fromtimestamp(r['Time']) for r in base.dbqueue["ReadResult"][gdname]]
-							grphWindow.graphdata[name]["Values"] = [self.gph_floatval(r['Value']) for r in base.dbqueue["ReadResult"][gdname]]
-							base.debugmsg(9, gdname, "Values:", grphWindow.graphdata[name]["Values"])
-
-							base.debugmsg(6, gdname, ":", grphWindow.graphdata[name])
-							if len(grphWindow.graphdata[name]["Values"]) > 1 and len(grphWindow.graphdata[name]["Values"]) == len(grphWindow.graphdata[name]["objTime"]):
-								grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], colour, label=dname)
-								dodraw = True
-							if len(grphWindow.graphdata[name]["Values"]) == 1 and len(grphWindow.graphdata[name]["Values"]) == len(grphWindow.graphdata[name]["objTime"]):
-								grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], colour, label=dname, marker='o')
-								dodraw = True
-
-					if dodraw:
-
-						grphWindow.axis.grid(True, 'major', 'both')
-						base.debugmsg(6, "SMetric:", SMetric)
-						if SMetric in ["Load", "CPU", "MEM", "NET"]:
-							grphWindow.axis.set_ylim(0, 100)
-						else:
-							grphWindow.axis.set_ylim(0)
-
-						base.debugmsg(9, "showlegend:", grphWindow.showlegend.get())
-						if grphWindow.showlegend.get():
-							# grphWindow.axis.legend()
-							# grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),&nbsp; shadow=True, ncol=2)
-							grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
-
-						grphWindow.fig.set_tight_layout(True)
-						grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
-						try:
-							grphWindow.canvas.draw()
-						except Exception as e:
-							base.debugmsg(5, "canvas.draw() Exception:", e)
+					grphWindow.fig.set_tight_layout(True)
+					grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+					try:
+						grphWindow.canvas.draw()
+					except Exception as e:
+						base.debugmsg(5, "canvas.draw() Exception:", e)
 
 			if DataType == "Result":
 				RType = grphWindow.settings["RType"].get()
