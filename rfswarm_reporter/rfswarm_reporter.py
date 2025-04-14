@@ -65,6 +65,7 @@ matplotlib.use("TkAgg") 	# required for matplot graphs
 
 __name__ = "rfswarm-manager"
 
+
 class percentile:
 	def __init__(self):
 		self.count = 0

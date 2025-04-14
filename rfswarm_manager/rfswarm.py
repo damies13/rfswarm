@@ -5501,7 +5501,6 @@ class RFSwarmGUI(tk.Frame):
 
 				sql += "ORDER BY MetricTime "
 
-
 				base.debugmsg(5, "sql:", sql)
 
 				# name = "|".join(mnamecolumns)
