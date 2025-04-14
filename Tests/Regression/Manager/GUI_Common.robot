@@ -1500,6 +1500,7 @@ Navigate to and check Desktop Icon For MacOS
 	${img}=	Set Variable		${platform}_dock_trash.png
 	${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=3
 	IF 	not ${passed}
+		Take A Screenshot
 		${img}=	Set Variable		${platform}_dock_trash2.png
 		${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=3
 	END
