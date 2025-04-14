@@ -1841,14 +1841,6 @@ class ReporterBase:
 				grouplst.append(f"[{colname}]")
 				grouplst.append(f"floor(MetricTime/{GSeconds})")
 
-			if MType not in [None, "", "None"] and len(MType) > 0:
-				# if "MetricType as 'Name'" in mcolumns:
-				# 	mcolumns.remove("MetricType as 'Name'")
-				wherelst.append("MetricType == '{}'".format(MType.replace("'", "''")))
-				if "MetricType" in grouplst:
-					grouplst.remove("MetricType")
-			else:
-				mnamecolumns.append("MetricType")
 			if PM not in [None, "", "None"] and len(PM) > 0:
 				# if "PrimaryMetric as 'Name'" in mcolumns:
 				# 	mcolumns.remove("PrimaryMetric as 'Name'")
@@ -1857,6 +1849,14 @@ class ReporterBase:
 					grouplst.remove("PrimaryMetric")
 			else:
 				mnamecolumns.append("PrimaryMetric")
+			if MType not in [None, "", "None"] and len(MType) > 0:
+				# if "MetricType as 'Name'" in mcolumns:
+				# 	mcolumns.remove("MetricType as 'Name'")
+				wherelst.append("MetricType == '{}'".format(MType.replace("'", "''")))
+				if "MetricType" in grouplst:
+					grouplst.remove("MetricType")
+			else:
+				mnamecolumns.append("MetricType")
 			if SM not in [None, "", "None"] and len(SM) > 0:
 				# if "SecondaryMetric as 'Name'" in mcolumns:
 				# 	mcolumns.remove("SecondaryMetric as 'Name'")
