@@ -1470,7 +1470,7 @@ Query Result DB
 	Log to console 	dbfile: ${dbfile}
 	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
 	# Log to console 	\${dbfile}: ${dbfile}
-	Connect To Database Using Custom Params 	sqlite3 	database="${dbfile}", isolation_level=None
+	Connect To Database 	sqlite3 	database=${dbfile} 	isolation_level=${None}
 	Log to console 	sql: ${sql}
 	${result}= 	Query 	${sql}
 	Log to console 	sql result: ${result}
@@ -1501,6 +1501,11 @@ Navigate to and check Desktop Icon For MacOS
 	${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=3
 	IF 	not ${passed}
 		Take A Screenshot
+		${img}=	Set Variable		${platform}_dock_trash2.png
+		${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=3
+	END
+	IF 	not ${passed}
+		Take A Screenshot
 		Press Combination 	KEY.fn 	KEY.f
 		Sleep 	0.3
 		Take A Screenshot
@@ -1513,6 +1518,7 @@ Navigate to and check Desktop Icon For MacOS
 
 	# macos_finder_menu_go.png
 	${img}=	Set Variable		${platform}_finder_menu_go.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 	Click Image		${img}
 	# Sleep 	0.3
 	# Take A Screenshot

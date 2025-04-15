@@ -164,7 +164,7 @@ Query Result DB
 	Log to console 	dbfile: ${dbfile}
 	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
 	# Log to console 	\${dbfile}: ${dbfile}
-	Connect To Database Using Custom Params 	sqlite3 	database="${dbfile}", isolation_level=None
+	Connect To Database 	sqlite3 	database=${dbfile} 	isolation_level=${None}
 	Log to console 	sql: ${sql}
 	${result}= 	Query 	${sql}
 	Log to console 	sql result: ${result}
