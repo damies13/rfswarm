@@ -3093,6 +3093,9 @@ class ReporterBase:
 
 	def rt_errors_parse_xml(self, id, rid):
 		base.debugmsg(5, "id:", id, "	rid:", rid)
+
+		def safe_string(s):
+			return re.sub(r'[<>:"/\\|?*\n\t]', "_", s)
 		if id in base.reportdata and rid in base.reportdata[id]:
 			rdata = base.reportdata[id][rid]
 			base.debugmsg(8, "rdata:", rdata)
@@ -3104,9 +3107,13 @@ class ReporterBase:
 
 			ldir = os.path.join(os.path.dirname(dbfile), "logs")
 			base.debugmsg(8, "ldir:", ldir)
-
 			# 		opencart_1_1_1690876686_1_1690876693/Opencart_Sales_output.xml
-			gxpatt = os.path.join(ldir, "{}_{}_{}_*_{}_*".format(rdata['script'].split('.')[0], rdata['script_index'], rdata['robot'], rdata['iteration']), "*_output.xml")
+			gxpatt = os.path.join(ldir, "{}_{}_{}_*_{}_*".format(
+				safe_string(rdata['script'].split('.')[0]).rstrip("_"),
+				rdata['script_index'],
+				rdata['robot'],
+				rdata['iteration']
+			), "*_output.xml")
 			base.debugmsg(9, "gxpatt:", gxpatt)
 
 			xmlf = "not_found"
