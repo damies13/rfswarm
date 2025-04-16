@@ -5563,10 +5563,10 @@ class RFSwarmGUI(tk.Frame):
 					for linename in grphWindow.graphdata.keys():
 						base.debugmsg(6, gdname, ":", grphWindow.graphdata[linename])
 						if len(grphWindow.graphdata[linename]["Values"]) > 1 and len(grphWindow.graphdata[linename]["Values"]) == len(grphWindow.graphdata[linename]["objTime"]):
-							grphWindow.axis.plot(grphWindow.graphdata[linename]["objTime"], grphWindow.graphdata[linename]["Values"], grphWindow.graphdata[linename]["Colour"], label=grphWindow.graphdata[linename]["Label"])
+							grphWindow.axis.plot(grphWindow.graphdata[linename]["objTime"], grphWindow.graphdata[linename]["Values"], color=grphWindow.graphdata[linename]["Colour"], label=grphWindow.graphdata[linename]["Label"])
 							dodraw = True
 						if len(grphWindow.graphdata[linename]["Values"]) == 1 and len(grphWindow.graphdata[linename]["Values"]) == len(grphWindow.graphdata[linename]["objTime"]):
-							grphWindow.axis.plot(grphWindow.graphdata[linename]["objTime"], grphWindow.graphdata[linename]["Values"], grphWindow.graphdata[linename]["Colour"], label=grphWindow.graphdata[linename]["Label"], marker='o')
+							grphWindow.axis.plot(grphWindow.graphdata[linename]["objTime"], grphWindow.graphdata[linename]["Values"], color=grphWindow.graphdata[linename]["Colour"], label=grphWindow.graphdata[linename]["Label"], marker='o')
 							dodraw = True
 
 				if dodraw:
@@ -5710,11 +5710,11 @@ class RFSwarmGUI(tk.Frame):
 
 					for name in grphWindow.graphdata:
 						if len(grphWindow.graphdata[name]["Values"]) > 1 and len(grphWindow.graphdata[name]["Values"]) == len(grphWindow.graphdata[name]["objTime"]):
-							grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], grphWindow.graphdata[name]["Colour"], label=name)
+							grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], color=grphWindow.graphdata[name]["Colour"], label=name)
 							dodraw = True
 
 						if len(grphWindow.graphdata[name]["Values"]) == 1 and len(grphWindow.graphdata[name]["Values"]) == len(grphWindow.graphdata[name]["objTime"]):
-							grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], grphWindow.graphdata[name]["Colour"], label=name, marker='o')
+							grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], color=grphWindow.graphdata[name]["Colour"], label=name, marker='o')
 							dodraw = True
 
 				if dodraw:
