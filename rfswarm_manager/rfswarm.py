@@ -5267,6 +5267,8 @@ class RFSwarmGUI(tk.Frame):
 			pass
 
 	def gph_floatval(self, value):
+		if value == None:
+			return 0
 		try:
 			return float(value)
 		except Exception:
