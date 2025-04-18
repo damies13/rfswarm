@@ -4560,7 +4560,7 @@ class RFSwarmGUI(tk.Frame):
 			donatemsg += "So today we're asking for you help to make RFSwarm better, please consider giving a donation "
 			donatemsg += "to support RFSwarm."
 
-			self.drWindow = tk.Toplevel(self.root)
+			self.drWindow = tk.Toplevel()
 			self.drWindow.wm_iconphoto(False, self.icon)
 			self.drWindow.columnconfigure(0, weight=1)
 			self.drWindow.columnconfigure(2, weight=1)
