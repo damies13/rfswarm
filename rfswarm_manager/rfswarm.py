@@ -4103,8 +4103,10 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(6, "BuildUI")
 		self.BuildUI()
 
-		dr = threading.Thread(target=self.dispaly_donation_reminder)
-		dr.start()
+		# dr = threading.Thread(target=self.dispaly_donation_reminder)
+		# dr.start()
+		# fix for: RuntimeError: main thread is not in main loop
+		self.dispaly_donation_reminder()
 
 		try:
 			base.debugmsg(6, "pln_update_graph")
@@ -4560,7 +4562,7 @@ class RFSwarmGUI(tk.Frame):
 			donatemsg += "So today we're asking for you help to make RFSwarm better, please consider giving a donation "
 			donatemsg += "to support RFSwarm."
 
-			self.drWindow = tk.Toplevel()
+			self.drWindow = tk.Toplevel(self.root)
 			self.drWindow.wm_iconphoto(False, self.icon)
 			self.drWindow.columnconfigure(0, weight=1)
 			self.drWindow.columnconfigure(2, weight=1)
