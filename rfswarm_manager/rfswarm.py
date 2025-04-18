@@ -1974,7 +1974,7 @@ class RFSwarmBase:
 			else:
 				return None
 
-	def addScriptRow(self):
+	def addScriptRow(self, *args):
 		base.scriptcount += 1
 
 		row = int("{}".format(base.scriptcount))
