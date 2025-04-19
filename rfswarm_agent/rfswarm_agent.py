@@ -2279,7 +2279,8 @@ class RFSwarmAgent():
 			# self.Agentserver.join()
 
 			self.debugmsg(3, "Join Agent Thread:", jobid)
-			self.jobs[jobid]["Thread"].join()
+			if "Thread" in self.jobs[jobid]:
+				self.jobs[jobid]["Thread"].join()
 
 		time.sleep(1)
 		self.debugmsg(2, "Exit")
