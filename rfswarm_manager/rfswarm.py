@@ -5019,7 +5019,7 @@ class RFSwarmGUI(tk.Frame):
 			grphWindow.settings["MFPattern"].set(settings['filter_pattern'])
 
 		rowM += 1
-		grphWindow.fmeMSettings.lblGG = ttk.Label(grphWindow.fmeMSettings, text="Apply Granuality:")
+		grphWindow.fmeMSettings.lblGG = ttk.Label(grphWindow.fmeMSettings, text="Apply Granularity:")
 		grphWindow.fmeMSettings.lblGG.grid(column=0, row=rowM, sticky="nsew")
 
 		grphWindow.fmeMSettings.lblGS = ttk.Label(grphWindow.fmeMSettings, text="Seconds")
