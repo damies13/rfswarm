@@ -196,8 +196,8 @@ The Plan Data Graph allows you to include the graph from the plan tab of the RFS
 **Apply Granularity** - This option lets you apply smoothing to the graph by grouping values to a single point on the graph, you can control the number of seconds to group the values for, and which grouped value to show.
 | Apply Granularity | Values | Notes |
 |---|---|---|
-| Seconds | 0 - n | Default value (0) applies no granularity, all values are shown, values can be any positive value including decimal values, a value of 60 will group values to the same minute and a value of 0.001 will group values to 1 millisecond |
-| Show | Default value (Average). Maximum, Minimum | Determines which value to show on the graph when grouping values by the granularity seconds, Average shows the average of all values in that time group, Maximum shows the highest value in that time group, and Minimum shows the lowest value. |
+| Seconds | 0 - n Default: 0 (applies no granularity) | Values can be any positive value including decimal values, a value of 60 will group values to the same minute and a value of 0.001 will group values to 1 millisecond |
+| Show | Average, Maximum, Minimum Default: Average | Determines which value to show on the graph when grouping values by the granularity seconds, Average shows the average of all values in that time group, Maximum shows the highest value in that time group, and Minimum shows the lowest value. |
 
 ##### Data Graph Result
 > ![Image](Images/Linux_Reporter_v1.5.0_DataGraph_Result.png)
@@ -228,8 +228,8 @@ The Plan Data Graph allows you to include the graph from the plan tab of the RFS
 **Apply Granularity** - This option lets you apply smoothing to the graph by grouping values to a single point on the graph, you can control the number of seconds to group the values for, and which grouped value to show.
 | Apply Granularity | Values | Notes |
 |---|---|---|
-| Seconds | 0 - n | Default value (0) applies no granularity, all values are shown, values can be any positive value including decimal values, a value of 60 will group values to the same minute and a value of 0.001 will group values to 1 millisecond |
-| Show | Default value (Average). Maximum, Minimum | Determines which value to show on the graph when grouping values by the granularity seconds, Average shows the average of all values in that time group, Maximum shows the highest value in that time group, and Minimum shows the lowest value. |
+| Seconds | 0 - n Default: 0 (applies no granularity) | Values can be any positive value including decimal values, a value of 60 will group values to the same minute and a value of 0.001 will group values to 1 millisecond |
+| Show | Average, Maximum, Minimum Default: Average | Determines which value to show on the graph when grouping values by the granularity seconds, Average shows the average of all values in that time group, Maximum shows the highest value in that time group, and Minimum shows the lowest value. |
 
 ##### Data Graph SQL
 The SQL option allows you to write your own SQL statement to produce graphs that couldn't be produced with the other options.
