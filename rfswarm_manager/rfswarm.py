@@ -1,4 +1,4 @@
-Granularity#!/usr/bin/python
+#!/usr/bin/python
 #
 # 	Robot Framework Swarm
 # 		Manager
