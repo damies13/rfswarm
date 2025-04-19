@@ -424,7 +424,7 @@ Metric Settings:
 |Filter Agent | Allows restricting results to only results from a specific agent machine, or use the 'Enabled' checkbox to group results by agents |
 |Filter Type | Determine if the filter pattern will limit results shown or restrict results from being shown |
 |Filter Pattern | The pattern, using [glob patterns](https://www.sqlitetutorial.net/sqlite-glob/) |
-|Apply Granularity | Allows smoothing of graphs by grouping values to a single point on the graph, you can control the number of seconds to groups the values for and which grouped value to show. Defaults are 0 seconds (no grouping) and average of values |
+|Apply Granularity | Allows smoothing of graphs by grouping values to a single point on the graph, you can control the number of seconds to group the values for and which grouped value to show. Defaults are 0 seconds (no grouping) and average of values |
 
 Results Settings:
 
@@ -435,7 +435,7 @@ Results Settings:
 |Filter Agent | Allows restricting results to only results from a specific agent machine, or use the 'Enabled' checkbox to group results by agents |
 |Filter Type | Determine if the filter pattern will limit results shown or restrict results from being shown |
 |Filter Pattern | The pattern, using [glob patterns](https://www.sqlitetutorial.net/sqlite-glob/) |
-|Apply Granularity | Allows smoothing of graphs by grouping values to a single point on the graph, you can control the number of seconds to groups the values for and which grouped value to show. Defaults are 0 seconds (no grouping) and average of values |
+|Apply Granularity | Allows smoothing of graphs by grouping values to a single point on the graph, you can control the number of seconds to group the values for and which grouped value to show. Defaults are 0 seconds (no grouping) and average of values |
 
 
 Some of the examples of pre-configured graphs:

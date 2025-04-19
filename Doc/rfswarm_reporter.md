@@ -174,21 +174,33 @@ The Plan Data Graph allows you to include the graph from the plan tab of the RFS
 > ![Image](Images/MacOS_Reporter_v1.4.0_DataGraph_PlanPreview.png)
 
 ##### Data Graph Metric
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric.png)
+> ![Image](Images/Linux_Reporter_v1.5.0_DataGraph_Metric.png)
 
 **Number value** - All metrics are stored in the results database as strings, if you want rfswarm Reporter to treat the metric value as a numeric check this checkbox
 
 **Metric Type** - This option list is auto generated based on the metric types in the results, the types, Agent, Scenario and Summary will always be in the list as these are created by rfswarm Manager, Other custom types you add will also show here.
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Type.png)
 
 **Primary Metric** - This option list is auto generated based on the primary metrics in the results, it will be updated with a filtered set based on the metric types selection
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Primary.png)
 
 **Secondary Metric** - This option list is auto generated based on the secondary metrics in the results, it will be updated with a filtered set based on the metric types or primary metrics selections.
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Secondary.png)
+
+**Filter Agent** - This option lets you limit values to those from a specific agent machine or group by the agent machines with the Enabled checkbox.
+
+**Filter Type** - This option is used in with **Filter Pattern**, if the Filter Type is None, then Filter Pattern is ignored, otherwise Filter Pattern is used to filter the metrics shown.
+| Filter Type | Filter Pattern | Result |
+|---|---|---|
+| None |  | Filter Pattern is ignored |
+| Wildcard (Unix Glob) | \*abc\* | Only metrics that contain 'abc' will be shown |
+| Not Wildcard (Unix Glob) | \*abc\* | Metrics that contain 'abc' will not be shown, all other metrics will be shown |
+
+**Apply Granularity** - This option lets you apply smoothing to the graph by grouping values to a single point on the graph, you can control the number of seconds to group the values for, and which grouped value to show.
+| Apply Granularity | Values | Default | Notes |
+|---|---|---|---|
+| Seconds | 0 - n | Default value (0) applies no granularity, all values are shown, values can be any positive value including decimal values, a value of 60 will group values to the same minute and a value of 0.001 will group values to 1 millisecond |
+| Show | Average, Maximum, Minimum | Average | Determines which value to show on the graph when grouping values by the granularity seconds, Average shows the average of all values in that time group, Maximum shows the highest value in that time group, and Minimum shows the lowest value. |
 
 ##### Data Graph Result
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result.png)
+> ![Image](Images/Linux_Reporter_v1.5.0_DataGraph_Result.png)
 
 **Result Type** - This option lets you choose between the Response Time, TPS or Total TPS.
 |   |   |
@@ -196,7 +208,6 @@ The Plan Data Graph allows you to include the graph from the plan tab of the RFS
 | Response Time | The time the keyword took, as measured by robot framework and then reported back to the Manager by the Agent |
 | TPS (Transactions per Second) | Simply a count of the number of times each keyword recorded a result in any given second. |
 | Total TPS | Simply a count of the number of times all keywords recorded a result in any given second. |
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_Type.png)
 
 **Filter Result** - This option lets you choose between the None, Pass or Fail.
 |   |   |
@@ -204,7 +215,8 @@ The Plan Data Graph allows you to include the graph from the plan tab of the RFS
 | None | Does not filter results (shows all) |
 | Pass | Filters the results to only show when a keyword returned a pass state |
 | Fail | Filters the results to only show when a keyword returned a fail state |
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_FilterResult.png)
+
+**Filter Agent** - This option lets you limit values to those from a specific agent machine or group by the agent machines with the Enabled checkbox.
 
 **Filter Type** - This option is used in with **Filter Pattern**, if the Filter Type is None, then Filter Pattern is ignored, otherwise Filter Pattern is used to filter the results shown.
 | Filter Type | Filter Pattern | Result |
@@ -212,7 +224,12 @@ The Plan Data Graph allows you to include the graph from the plan tab of the RFS
 | None |  | Filter Pattern is ignored |
 | Wildcard (Unix Glob) | \*abc\* | Only results that contain 'abc' will be shown |
 | Not Wildcard (Unix Glob) | \*abc\* | Results that contain 'abc' will not be shown, all other results will be shown |
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_FilterType.png)
+
+**Apply Granularity** - This option lets you apply smoothing to the graph by grouping values to a single point on the graph, you can control the number of seconds to group the values for, and which grouped value to show.
+| Apply Granularity | Values | Default | Notes |
+|---|---|---|---|
+| Seconds | 0 - n | Default value (0) applies no granularity, all values are shown, values can be any positive value including decimal values, a value of 60 will group values to the same minute and a value of 0.001 will group values to 1 millisecond |
+| Show | Average, Maximum, Minimum | Average | Determines which value to show on the graph when grouping values by the granularity seconds, Average shows the average of all values in that time group, Maximum shows the highest value in that time group, and Minimum shows the lowest value. |
 
 ##### Data Graph SQL
 The SQL option allows you to write your own SQL statement to produce graphs that couldn't be produced with the other options.
