@@ -1,4 +1,4 @@
-#!/usr/bin/python
+Granularity#!/usr/bin/python
 #
 # 	Robot Framework Swarm
 # 		Manager
@@ -4893,7 +4893,7 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeRSettings.inpFP.grid(column=1, row=rowR, sticky="nsew")
 
 		rowR += 1
-		grphWindow.fmeRSettings.lblGG = ttk.Label(grphWindow.fmeRSettings, text="Apply Granuality:")
+		grphWindow.fmeRSettings.lblGG = ttk.Label(grphWindow.fmeRSettings, text="Apply Granularity:")
 		grphWindow.fmeRSettings.lblGG.grid(column=0, row=rowR, sticky="nsew")
 
 		grphWindow.fmeRSettings.lblGS = ttk.Label(grphWindow.fmeRSettings, text="Seconds")
@@ -4908,8 +4908,8 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeRSettings.inpGS = ttk.Entry(grphWindow.fmeRSettings, textvariable=grphWindow.settings["RGSeconds"])
 		grphWindow.fmeRSettings.inpGS.grid(column=1, row=rowR, sticky="nsew")
 		grphWindow.fmeRSettings.inpGS.bind('<FocusOut>', lambda *args: self.gs_refresh(grphWindow))
-		if 'granuality_seconds' in settings and len(settings['granuality_seconds']) > 1:
-			grphWindow.settings["RGSeconds"].set(settings['granuality_seconds'])
+		if 'granularity_seconds' in settings and len(settings['granularity_seconds']) > 1:
+			grphWindow.settings["RGSeconds"].set(settings['granularity_seconds'])
 		else:
 			grphWindow.settings["RGSeconds"].set(0)
 
@@ -4918,8 +4918,8 @@ class RFSwarmGUI(tk.Frame):
 		# if grphWindow.fmeRSettings.RType is not None and "TPS" not in grphWindow.fmeRSettings.RType:
 		grphWindow.fmeRSettings.omGW = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["RGWType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.GWTypes)
 		grphWindow.fmeRSettings.omGW.grid(column=2, row=rowR, sticky="nsew")
-		if 'granuality_type' in settings and len(settings['granuality_type']) > 1:
-			grphWindow.settings["RGWType"].set(settings['granuality_type'])
+		if 'granularity_type' in settings and len(settings['granularity_type']) > 1:
+			grphWindow.settings["RGWType"].set(settings['granularity_type'])
 		else:
 			grphWindow.settings["RGWType"].set(grphWindow.fmeRSettings.GWTypes[1])
 
@@ -5033,8 +5033,8 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeMSettings.inpGS = ttk.Entry(grphWindow.fmeMSettings, textvariable=grphWindow.settings["MGSeconds"])
 		grphWindow.fmeMSettings.inpGS.grid(column=1, row=rowM, sticky="nsew")
 		grphWindow.fmeMSettings.inpGS.bind('<FocusOut>', lambda *args: self.gs_refresh(grphWindow))
-		if 'granuality_seconds' in settings and len(settings['granuality_seconds']) > 1:
-			grphWindow.settings["MGSeconds"].set(settings['granuality_seconds'])
+		if 'granularity_seconds' in settings and len(settings['granularity_seconds']) > 1:
+			grphWindow.settings["MGSeconds"].set(settings['granularity_seconds'])
 		else:
 			grphWindow.settings["MGSeconds"].set(0)
 
@@ -5042,8 +5042,8 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.settings["MGWType"] = tk.StringVar()
 		grphWindow.fmeMSettings.omGW = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MGWType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.GWTypes)
 		grphWindow.fmeMSettings.omGW.grid(column=2, row=rowM, sticky="nsew")
-		if 'granuality_type' in settings and len(settings['granuality_type']) > 1:
-			grphWindow.settings["MGWType"].set(settings['granuality_type'])
+		if 'granularity_type' in settings and len(settings['granularity_type']) > 1:
+			grphWindow.settings["MGWType"].set(settings['granularity_type'])
 		else:
 			grphWindow.settings["MGWType"].set(grphWindow.fmeMSettings.GWTypes[1])
 
@@ -5307,8 +5307,8 @@ class RFSwarmGUI(tk.Frame):
 			settings["filter_name"] = grphWindow.settings["MFNType"].get()
 			settings["filter_pattern"] = grphWindow.settings["MFPattern"].get()
 
-			settings["granuality_seconds"] = grphWindow.settings["MGSeconds"].get()
-			settings["granuality_type"] = grphWindow.settings["MGWType"].get()
+			settings["granularity_seconds"] = grphWindow.settings["MGSeconds"].get()
+			settings["granularity_type"] = grphWindow.settings["MGWType"].get()
 
 		if settings["data_type"] == "Result":
 			base.debugmsg(9, "settings[data_type]:", settings["data_type"])
@@ -5327,9 +5327,9 @@ class RFSwarmGUI(tk.Frame):
 			settings["filter_pattern"] = grphWindow.settings["RFPattern"].get()
 			base.debugmsg(9, "FPattern:", grphWindow.settings["RFPattern"].get())
 
-			settings["granuality_seconds"] = grphWindow.settings["RGSeconds"].get()
+			settings["granularity_seconds"] = grphWindow.settings["RGSeconds"].get()
 			base.debugmsg(9, "GSeconds:", grphWindow.settings["RGSeconds"].get())
-			settings["granuality_type"] = grphWindow.settings["RGWType"].get()
+			settings["granularity_type"] = grphWindow.settings["RGWType"].get()
 			base.debugmsg(9, "GWType:", grphWindow.settings["RGWType"].get())
 
 		return settings

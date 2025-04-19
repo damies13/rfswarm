@@ -9794,7 +9794,7 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idl]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
 				rownum += 1
-				self.contentdata[idl]["lblGG"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Apply Granuality:")
+				self.contentdata[idl]["lblGG"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Apply Granularity:")
 				self.contentdata[idl]["lblGG"].grid(column=0, row=rownum, sticky="nsew")
 
 				self.contentdata[idl]["lblGS"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Seconds")
@@ -9878,7 +9878,7 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idl]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
 				rownum += 1
-				self.contentdata[idl]["lblGG"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Apply Granuality:")
+				self.contentdata[idl]["lblGG"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Apply Granularity:")
 				self.contentdata[idl]["lblGG"].grid(column=0, row=rownum, sticky="nsew")
 
 				self.contentdata[idl]["lblGS"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Seconds")
@@ -10015,7 +10015,7 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idr]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
 				rownum += 1
-				self.contentdata[idr]["lblGG"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Apply Granuality:")
+				self.contentdata[idr]["lblGG"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Apply Granularity:")
 				self.contentdata[idr]["lblGG"].grid(column=0, row=rownum, sticky="nsew")
 
 				self.contentdata[idr]["lblGS"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Seconds")
@@ -10099,7 +10099,7 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[idr]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
 				rownum += 1
-				self.contentdata[idr]["lblGG"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Apply Granuality:")
+				self.contentdata[idr]["lblGG"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Apply Granularity:")
 				self.contentdata[idr]["lblGG"].grid(column=0, row=rownum, sticky="nsew")
 
 				self.contentdata[idr]["lblGS"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Seconds")
