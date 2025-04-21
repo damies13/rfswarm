@@ -474,6 +474,12 @@ class RFSwarmBase:
 	scriptgrpend: Any = {}
 	scriptdefaults: Any = {}
 
+	mscriptcount = 0
+	mscriptlist: Any = [{}]
+	mscriptfiles: Any = {}
+	mscriptgrpend: Any = {}
+	mscriptdefaults: Any = {}
+
 	uploadmodes = {'imm': "Immediately", 'err': "On Error Only", 'def': "All Deferred"}
 	uploadmode = "err" 	# modes are imm, err, def
 	uploadfiles: Any = {}
@@ -1999,6 +2005,36 @@ class RFSwarmBase:
 
 		if not base.args.nogui and base.gui:
 			base.gui.addScriptRow()
+
+	def addMScriptRow(self, *args):
+		base.mscriptcount += 1
+
+		row = int("{}".format(base.mscriptcount))
+		base.debugmsg(5, "row:", row)
+
+		base.mscriptlist.append({})
+
+		base.mscriptlist[row]["Index"] = base.scriptcount
+
+		num = "1"
+		base.mscriptlist[row]["Robots"] = int(num)
+
+		num = "0"
+		base.mscriptlist[row]["Delay"] = int(num)
+
+		num = "0"	 # 30 minutes
+		base.mscriptlist[row]["RampUp"] = int(num)
+
+		# num = "18000"  # 18000 sec = 5 hours
+		num = "0"  # 3600 sec = 1hr, 7200 sec = 2 hours
+		base.mscriptlist[row]["Run"] = int(num)
+
+		base.mscriptlist[row]["Test"] = ""
+
+		base.debugmsg(5, "base.mscriptlist[", row, "]:", base.mscriptlist[row])
+
+		if not base.args.nogui and base.gui:
+			base.gui.addMScriptRow()
 
 	def UpdateRunStats_SQL(self):
 
@@ -4043,6 +4079,17 @@ class RFSwarmGUI(tk.Frame):
 	plancolset = 8
 	plancoladd = 99
 
+	mtrngcolidx = 0
+	mtrngcolusr = 1
+	mtrngcoldly = 2
+	mtrngcolrmp = 3
+	mtrngcolrun = 4
+	mtrngcolnme = 5
+	mtrngcolscr = 6
+	mtrngcoltst = 7
+	mtrngcolset = 8
+	mtrngcoladd = 99
+
 	display_agents: Any = {}
 	display_run: Any = {}
 	display_plan: Any = {}
@@ -4310,6 +4357,12 @@ class RFSwarmGUI(tk.Frame):
 		# p.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
 		self.tabs.add(p, text='Plan')
 
+		base.debugmsg(6, "m")
+		m = ttk.Frame(self.tabs)   # first page, which would get widgets gridded into it
+		m.grid(row=0, column=0, sticky="nsew")
+		# p.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
+		self.tabs.add(m, text='Monitoring')
+
 		base.debugmsg(6, "r")
 		r = ttk.Frame(self.tabs)   # second page
 		r.grid(row=0, column=0, sticky="nsew")
@@ -4335,6 +4388,8 @@ class RFSwarmGUI(tk.Frame):
 
 		base.debugmsg(6, "BuildPlan")
 		self.BuildPlan(p)
+		base.debugmsg(6, "BuildMonitoring")
+		self.BuildMonitoring(m)
 		base.debugmsg(6, "BuildRun")
 		self.BuildRun(r)
 		base.debugmsg(6, "BuildAgent")
@@ -5941,110 +5996,7 @@ class RFSwarmGUI(tk.Frame):
 		# bbar.config(bg="red")
 		bbar.columnconfigure(0, weight=1)
 
-		bbargrid = tk.Frame(bbar)
-		bbargrid.grid(row=0, column=0, sticky="nsew")
-		# bbargrid.config(bg="blue")
-		# bbargrid.columnconfigure(0, weight=1)
-
-		# new
-		base.debugmsg(7, "Button New")
-		btnno = 0
-		icontext = "New"
-		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		base.debugmsg(9, "self.imgdata:[", icontext, "]", self.imgdata[icontext])
-		bnew = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_New)
-		bnew.grid(column=btnno, row=0, sticky="nsew")
-
-		# open
-		base.debugmsg(7, "Button Open")
-		btnno += 1
-
-		icontext = "Open"
-		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		base.debugmsg(9, "self.imgdata:[", icontext, "]", self.imgdata[icontext])
-		bopen = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_Open)
-		bopen.grid(column=btnno, row=0, sticky="nsew")
-
-		# save
-		base.debugmsg(7, "Button Save")
-		btnno += 1
-		icontext = "Save"
-		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		base.debugmsg(9, "self.imgdata:[", icontext, "]", self.imgdata[icontext])
-		bSave = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_Save)
-		bSave.grid(column=btnno, row=0, sticky="nsew")
-
-		# settings
-		base.debugmsg(7, "Button Settings")
-		btnno += 1
-		icontext = "Advanced"
-		bSST = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', text="Settings", command=self.setings_open)
-		bSST.grid(column=btnno, row=0, sticky="nsew")
-
-		# StartTime
-		base.debugmsg(7, "Button Scheduled Start")
-		btnno += 1
-		icontext = "StartTime"
-		# base.debugmsg(9, "self.imgdata:[",icontext,"]", self.imgdata[icontext])
-		bSST = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', text="StartTime", command=self.ScheduledStart)
-		bSST.grid(column=btnno, row=0, sticky="nsew")
-
-		# play
-		base.debugmsg(7, "Button Play")
-		btnno += 1
-		icontext = "Play"
-		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		base.debugmsg(9, "self.imgdata:[", icontext, "]", self.imgdata[icontext])
-		bPlay = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', text="Play", command=self.ClickPlay)
-		# bPlay = ttk.Button(bbargrid, image=self.icoPlay, padding='3 3 3 3', command=self.ClickPlay)
-		# bPlay = ttk.Button(bbargrid, text="Play", command=self.ClickPlay)
-		bPlay.grid(column=btnno, row=0, sticky="nsew")
-
-		# spacer
-		btnno += 1
-		spcr = ttk.Label(bbargrid, text=" ")	 # # just a blank column as a spacer
-		spcr.grid(column=btnno, row=0, sticky="nsew")
-		bbargrid.columnconfigure(btnno, weight=10)
-
-		# display_plan
-		if "lbl_sched_start_time" not in self.display_plan:
-			self.display_plan['lbl_sched_start_time'] = tk.StringVar()
-		if "sched_start_time" not in self.display_plan:
-			self.display_plan['sched_start_time'] = tk.StringVar()
-		if "lbl_time_remaining" not in self.display_plan:
-			self.display_plan['lbl_time_remaining'] = tk.StringVar()
-		if "time_remaining" not in self.display_plan:
-			self.display_plan['time_remaining'] = tk.StringVar()
-
-		base.debugmsg(7, "Scheduled Start Time")
-		btnno += 1
-		lblSST = ttk.Label(bbargrid, textvariable=self.display_plan['lbl_sched_start_time'])
-		lblSST.grid(column=btnno, row=0, sticky="nsew")
-		bbargrid.columnconfigure(btnno, weight=1)
-		btnno += 1
-		dspSST = ttk.Label(bbargrid, textvariable=self.display_plan['sched_start_time'])
-		dspSST.grid(column=btnno, row=0, sticky="nsew")
-		bbargrid.columnconfigure(btnno, weight=1)
-
-		base.debugmsg(7, "Time Remaining")
-		btnno += 1
-		lblSST = ttk.Label(bbargrid, textvariable=self.display_plan['lbl_time_remaining'])
-		lblSST.grid(column=btnno, row=0, sticky="nsew")
-		bbargrid.columnconfigure(btnno, weight=1)
-		btnno += 1
-		dspSST = ttk.Label(bbargrid, textvariable=self.display_plan['time_remaining'])
-		dspSST.grid(column=btnno, row=0, sticky="nsew")
-		bbargrid.columnconfigure(btnno, weight=1)
-
-		# # spacer
-		# btnno += 1
-		# spcr = ttk.Label(bbargrid, text = " ")	# just a blank column as a spacer
-		# spcr.grid(column=btnno, row=0, sticky="nsew")
-		# bbargrid.columnconfigure(btnno, weight=1)
+		self.BuildPlanButtonBar(bbar)
 
 		planrow += 1
 		# p.columnconfigure(0, weight=1)
@@ -6152,6 +6104,113 @@ class RFSwarmGUI(tk.Frame):
 
 		base.updateplanthread = threading.Thread(target=self.UpdatePlanDisplay)
 		base.updateplanthread.start()
+
+	def BuildPlanButtonBar(self, bbar):
+
+		bbargrid = tk.Frame(bbar)
+		bbargrid.grid(row=0, column=0, sticky="nsew")
+		# bbargrid.config(bg="blue")
+		# bbargrid.columnconfigure(0, weight=1)
+
+		# new
+		base.debugmsg(7, "Button New")
+		btnno = 0
+		icontext = "New"
+		base.debugmsg(9, "self.imgdata:", self.imgdata)
+		base.debugmsg(9, "self.imgdata:", self.imgdata)
+		base.debugmsg(9, "self.imgdata:[", icontext, "]", self.imgdata[icontext])
+		bnew = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_New)
+		bnew.grid(column=btnno, row=0, sticky="nsew")
+
+		# open
+		base.debugmsg(7, "Button Open")
+		btnno += 1
+
+		icontext = "Open"
+		base.debugmsg(9, "self.imgdata:", self.imgdata)
+		base.debugmsg(9, "self.imgdata:", self.imgdata)
+		base.debugmsg(9, "self.imgdata:[", icontext, "]", self.imgdata[icontext])
+		bopen = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_Open)
+		bopen.grid(column=btnno, row=0, sticky="nsew")
+
+		# save
+		base.debugmsg(7, "Button Save")
+		btnno += 1
+		icontext = "Save"
+		base.debugmsg(9, "self.imgdata:", self.imgdata)
+		base.debugmsg(9, "self.imgdata:", self.imgdata)
+		base.debugmsg(9, "self.imgdata:[", icontext, "]", self.imgdata[icontext])
+		bSave = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_Save)
+		bSave.grid(column=btnno, row=0, sticky="nsew")
+
+		# settings
+		base.debugmsg(7, "Button Settings")
+		btnno += 1
+		icontext = "Advanced"
+		bSST = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', text="Settings", command=self.setings_open)
+		bSST.grid(column=btnno, row=0, sticky="nsew")
+
+		# StartTime
+		base.debugmsg(7, "Button Scheduled Start")
+		btnno += 1
+		icontext = "StartTime"
+		# base.debugmsg(9, "self.imgdata:[",icontext,"]", self.imgdata[icontext])
+		bSST = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', text="StartTime", command=self.ScheduledStart)
+		bSST.grid(column=btnno, row=0, sticky="nsew")
+
+		# play
+		base.debugmsg(7, "Button Play")
+		btnno += 1
+		icontext = "Play"
+		base.debugmsg(9, "self.imgdata:", self.imgdata)
+		base.debugmsg(9, "self.imgdata:", self.imgdata)
+		base.debugmsg(9, "self.imgdata:[", icontext, "]", self.imgdata[icontext])
+		bPlay = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', text="Play", command=self.ClickPlay)
+		# bPlay = ttk.Button(bbargrid, image=self.icoPlay, padding='3 3 3 3', command=self.ClickPlay)
+		# bPlay = ttk.Button(bbargrid, text="Play", command=self.ClickPlay)
+		bPlay.grid(column=btnno, row=0, sticky="nsew")
+
+		# spacer
+		btnno += 1
+		spcr = ttk.Label(bbargrid, text=" ")	 # # just a blank column as a spacer
+		spcr.grid(column=btnno, row=0, sticky="nsew")
+		bbargrid.columnconfigure(btnno, weight=10)
+
+		# display_plan
+		if "lbl_sched_start_time" not in self.display_plan:
+			self.display_plan['lbl_sched_start_time'] = tk.StringVar()
+		if "sched_start_time" not in self.display_plan:
+			self.display_plan['sched_start_time'] = tk.StringVar()
+		if "lbl_time_remaining" not in self.display_plan:
+			self.display_plan['lbl_time_remaining'] = tk.StringVar()
+		if "time_remaining" not in self.display_plan:
+			self.display_plan['time_remaining'] = tk.StringVar()
+
+		base.debugmsg(7, "Scheduled Start Time")
+		btnno += 1
+		lblSST = ttk.Label(bbargrid, textvariable=self.display_plan['lbl_sched_start_time'])
+		lblSST.grid(column=btnno, row=0, sticky="nsew")
+		bbargrid.columnconfigure(btnno, weight=1)
+		btnno += 1
+		dspSST = ttk.Label(bbargrid, textvariable=self.display_plan['sched_start_time'])
+		dspSST.grid(column=btnno, row=0, sticky="nsew")
+		bbargrid.columnconfigure(btnno, weight=1)
+
+		base.debugmsg(7, "Time Remaining")
+		btnno += 1
+		lblSST = ttk.Label(bbargrid, textvariable=self.display_plan['lbl_time_remaining'])
+		lblSST.grid(column=btnno, row=0, sticky="nsew")
+		bbargrid.columnconfigure(btnno, weight=1)
+		btnno += 1
+		dspSST = ttk.Label(bbargrid, textvariable=self.display_plan['time_remaining'])
+		dspSST.grid(column=btnno, row=0, sticky="nsew")
+		bbargrid.columnconfigure(btnno, weight=1)
+
+		# # spacer
+		# btnno += 1
+		# spcr = ttk.Label(bbargrid, text = " ")	# just a blank column as a spacer
+		# spcr.grid(column=btnno, row=0, sticky="nsew")
+		# bbargrid.columnconfigure(btnno, weight=1)
 
 	def setings_open(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
@@ -7106,8 +7165,8 @@ class RFSwarmGUI(tk.Frame):
 		time.sleep(0.1)
 
 	def addScriptRow(self, *args):
-		base.debugmsg(6, "addScriptRow")
 		row = base.scriptcount
+		base.debugmsg(6, "addScriptRow:", row)
 
 		colour = base.line_colour(base.scriptcount)
 		base.debugmsg(5, "colour:", colour)
@@ -8032,6 +8091,809 @@ class RFSwarmGUI(tk.Frame):
 		del stgsWindow.Filters[r]
 
 		stgsWindow.update_idletasks()
+
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+	#
+	# Monitoring
+	#
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+	def BuildMonitoring(self, m):
+
+		base.debugmsg(6, "config")
+
+		base.debugmsg(6, "updateTitle")
+		self.updateTitle()
+
+		mtrngrow = 0
+		m.columnconfigure(mtrngrow, weight=1)
+		m.rowconfigure(mtrngrow, weight=0)  # weight=0 means don't resize with other grid rows / keep a fixed size
+		# Button Bar
+		base.debugmsg(6, "Button Bar")
+
+		bbar = tk.Frame(m)
+		bbar.grid(column=0, row=mtrngrow, sticky="nsew")
+		# bbar.config(bg="red")
+		bbar.columnconfigure(0, weight=1)
+
+		self.BuildPlanButtonBar(bbar)
+
+		mtrngrow += 1
+		# p.columnconfigure(0, weight=1)
+		m.rowconfigure(mtrngrow, weight=1)
+		# Plan scripts
+		base.debugmsg(6, "Monitoring scripts")
+
+		# # 2020-12-27 try again
+		sm = tk.Frame(m)
+		sm.grid(row=mtrngrow, column=0, pady=(0, 0), sticky='news')
+		sm.grid_rowconfigure(0, weight=1)
+		sm.grid_columnconfigure(0, weight=1)
+
+		self.sm_canvas = tk.Canvas(sm)
+		self.sm_canvas.grid(row=0, column=0, sticky="news")
+
+		# Link a scrollbar to the canvas
+		sm_vsb = tk.Scrollbar(sm, orient="vertical", command=self.sm_canvas.yview)
+		sm_vsb.grid(row=0, column=1, sticky='ns')
+		self.sm_canvas.configure(yscrollcommand=sm_vsb.set)
+
+		# Link another scrollbar to the canvas
+		sm_hsb = tk.Scrollbar(sm, orient="horizontal", command=self.sm_canvas.xview)
+		sm_hsb.grid(row=1, column=0, sticky='ew')
+		self.sm_canvas.configure(xscrollcommand=sm_hsb.set)
+
+		self.mscriptgrid = tk.Frame(self.sm_canvas)
+		self.sm_canvas.create_window((0, 0), window=self.mscriptgrid, anchor='nw')
+
+		# label row 0 of sg
+		self.mscriptgrid.columnconfigure(self.mtrngcolidx, weight=0)
+		idx = ttk.Label(self.mscriptgrid, text="Index")
+		idx.grid(column=self.mtrngcolidx, row=0, sticky="nsew")
+
+		# self.mscriptgrid.columnconfigure(self.mtrngcolusr, weight=0)
+		# usr = ttk.Label(self.mscriptgrid, text="Robots")
+		# usr.grid(column=self.mtrngcolusr, row=0, sticky="nsew")
+
+		# self.mscriptgrid.columnconfigure(self.mtrngcoldly, weight=0)
+		# usr = ttk.Label(self.mscriptgrid, text="Delay")
+		# usr.grid(column=self.mtrngcoldly, row=0, sticky="nsew")
+		#
+		# self.mscriptgrid.columnconfigure(self.mtrngcolrmp, weight=0)
+		# usr = ttk.Label(self.mscriptgrid, text="Ramp Up")
+		# usr.grid(column=self.mtrngcolrmp, row=0, sticky="nsew")
+		#
+		# self.mscriptgrid.columnconfigure(self.mtrngcolrun, weight=0)
+		# usr = ttk.Label(self.mscriptgrid, text="Run")
+		# usr.grid(column=self.mtrngcolrun, row=0, sticky="nsew")
+
+		self.mscriptgrid.columnconfigure(self.mtrngcolscr, weight=5)
+		scr = ttk.Label(self.mscriptgrid, text="Script")
+		scr.grid(column=self.mtrngcolscr, row=0, sticky="nsew")
+
+		self.mscriptgrid.columnconfigure(self.mtrngcoltst, weight=5)
+		tst = ttk.Label(self.mscriptgrid, text="Test")
+		tst.grid(column=self.mtrngcoltst, row=0, sticky="nsew")
+
+		self.mscriptgrid.columnconfigure(self.mtrngcoltst, weight=5)
+		tst = ttk.Label(self.mscriptgrid, text="Settings")
+		tst.grid(column=self.mtrngcolset, row=0, sticky="nsew")
+
+		icontext = "AddRow"
+		self.mscriptgrid.columnconfigure(self.mtrngcoladd, weight=0)
+		new = ttk.Button(self.mscriptgrid, image=self.imgdata[icontext], padding='3 3 3 3', text="+", command=base.addMScriptRow, width=1)
+		new.grid(column=self.mtrngcoladd, row=0, sticky="nsew")
+
+		# self.scrollable_sg.update()
+		# update scrollbars
+		self.mscriptgrid.update_idletasks()
+		self.sm_canvas.config(scrollregion=self.sm_canvas.bbox("all"))
+
+		# self.pln_graph.bind("<Configure>", self.CanvasResize)
+		# May need to bind <Button-4> and <Button-5> to enable mouse scrolling
+		# https://www.python-course.eu/tkinter_events_binds.php
+
+		# base.updateplanthread = threading.Thread(target=self.UpdatePlanDisplay)
+		# base.updateplanthread.start()
+
+	def addMScriptRow(self, *args):
+		row = base.mscriptcount
+		base.debugmsg(5, "addMScriptRow:",row)
+
+		# colour = base.line_colour(base.scriptcount)
+		# base.debugmsg(5, "colour:", colour)
+
+		idx = tk.Label(self.mscriptgrid, text=str(base.mscriptcount))
+		# idx['bg'] = colour
+		idx.grid(column=self.mtrngcolidx, row=base.mscriptcount, sticky="nsew")
+
+		# num = base.mscriptlist[base.mscriptcount]["Robots"]
+		# usr = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout")
+		# usr.config(validatecommand=lambda: self.sr_users_validate(row))
+		# usr.grid(column=self.plancolusr, row=base.scriptcount, sticky="nsew")
+		# usr.insert(0, num)
+		# base.mscriptlist[base.scriptcount]["Robots"] = int(num)
+
+		# num = base.mscriptlist[base.scriptcount]["Delay"]
+		# dly = ttk.Entry(self.scriptgrid, width=8, justify="right", validate="focusout")
+		# dly.config(validatecommand=lambda: self.sr_delay_validate(row))
+		# dly.grid(column=self.plancoldly, row=base.scriptcount, sticky="nsew")
+		# dly.insert(0, base.sec2hms(num))
+		# base.mscriptlist[base.scriptcount]["Delay"] = base.hms2sec(num)
+
+		# num = base.mscriptlist[base.scriptcount]["RampUp"]
+		# rmp = ttk.Entry(self.scriptgrid, width=8, justify="right", validate="focusout")
+		# rmp.config(validatecommand=lambda: self.sr_rampup_validate(row))
+		# rmp.grid(column=self.plancolrmp, row=base.scriptcount, sticky="nsew")
+		# # rmp.insert(0, num)
+		# rmp.insert(0, base.sec2hms(num))
+		# base.mscriptlist[base.scriptcount]["RampUp"] = base.hms2sec(num)
+
+		# num = base.mscriptlist[base.scriptcount]["Run"]
+		# run = ttk.Entry(self.scriptgrid, width=8, justify="right", validate="focusout")
+		# run.config(validatecommand=lambda: self.sr_run_validate(row))
+		# run.grid(column=self.plancolrun, row=base.scriptcount, sticky="nsew")
+		# # run.insert(0, num)
+		# run.insert(0, base.sec2hms(num))
+		# base.mscriptlist[base.scriptcount]["Run"] = base.hms2sec(num)
+
+		fgf = ttk.Frame(self.mscriptgrid)
+		fgf.grid(column=self.mtrngcolscr, row=base.mscriptcount, sticky="nsew")
+		scr = ttk.Entry(fgf, state="readonly", justify="right")
+		scr.grid(column=0, row=0, sticky="nsew")
+		fgf.columnconfigure(scr, weight=1)
+
+		icontext = "Script"
+		scrf = ttk.Button(fgf, image=self.imgdata[icontext], text="...", width=1)
+		scrf.config(command=lambda: self.msr_file_validate(row))
+		scrf.grid(column=1, row=0, sticky="nsew")
+		fgf.columnconfigure(scrf, weight=0)
+
+		base.mscriptlist[row]["TestVar"] = tk.StringVar(value=base.mscriptlist[row]["Test"], name="row{}".format(row))
+		base.mscriptlist[row]["TestVar"].trace("w", self.msr_test_validate)
+		tst = ttk.OptionMenu(self.mscriptgrid, base.mscriptlist[row]["TestVar"], None, "test", command=lambda: self.msr_test_validate(row))
+		tst.config(width=20)
+		tst.grid(column=self.mtrngcoltst, row=base.mscriptcount, sticky="nsew")
+
+		icontext = "Advanced"
+		self.mscriptgrid.columnconfigure(self.plancoladd, weight=0)
+		new = ttk.Button(self.mscriptgrid, image=self.imgdata[icontext], text="Settings", command=lambda: self.msr_row_settings(row), width=1)
+		new.grid(column=self.mtrngcolset, row=base.mscriptcount, sticky="nsew")
+
+		icontext = "Delete"
+		self.scriptgrid.columnconfigure(self.plancoladd, weight=0)
+		new = ttk.Button(self.mscriptgrid, image=self.imgdata[icontext], text="X", command=lambda: self.msr_remove_row(row), width=1)
+		new.grid(column=self.mtrngcoladd, row=base.mscriptcount, sticky="nsew")
+
+		# # self.scrollable_sg.update()
+		# base.debugmsg(6, "base.args.nogui", base.args.nogui)
+		# if not base.args.nogui:
+		# 	try:
+		# 		base.debugmsg(6, "call pln_update_graph")
+		# 		# self.pln_update_graph()
+		# 		t = threading.Thread(target=self.pln_update_graph)
+		# 		t.start()
+		# 		base.debugmsg(6, "call fill_canvas")
+		# 		# self.scrollable_sg.fill_canvas()
+		# 		fc = threading.Thread(target=self.scrollable_sg.fill_canvas)
+		# 		fc.start()
+		#
+		# 	except Exception:
+		# 		pass
+		#
+		# base.debugmsg(6, "addScriptRow done")
+		#
+		# # update scrollbars
+		# self.scriptgrid.update_idletasks()
+		# self.sg_canvas.config(scrollregion=self.sg_canvas.bbox("all"))
+
+	def msr_file_validate(self, r, *args):
+		base.debugmsg(5, r)
+		# if not base.args.nogui:
+		# 	fg = self.scriptgrid.grid_slaves(column=self.plancolscr, row=r)[0].grid_slaves()
+		# 	base.debugmsg(9, fg)
+		# 	base.debugmsg(9, fg[1].get())
+		# if args:
+		# 	scriptfile = args[0]
+		# else:
+		# 	if not base.args.nogui:
+		# 		scriptfile = str(
+		# 			tkf.askopenfilename(
+		# 				initialdir=base.config['Plan']['ScriptDir'],
+		# 				title="Select Robot Framework File",
+		# 				filetypes=(("Robot Framework", "*.robot"), ("all files", "*.*"))
+		# 			)
+		# 		)
+		# 	else:
+		# 		scriptfile = ""
+		# base.debugmsg(5, "scriptfile:", scriptfile)
+		# if len(scriptfile) > 0:
+		# 	relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], scriptfile)
+		# 	base.debugmsg(5, "relpath:", relpath)
+		#
+		# 	if ".." in relpath:
+		# 		base.debugmsg(5, "do update relpath:", relpath)
+		# 		base.debugmsg(5, "ScriptDir:", base.config['Plan']['ScriptDir'])
+		# 		if base.config['Plan']['ScriptDir'] == base.dir_path:
+		# 			base.config['Plan']['ScriptDir'] = os.path.basename(scriptfile)
+		# 			base.debugmsg(5, "ScriptDir:", base.config['Plan']['ScriptDir'])
+		# 			relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], scriptfile)
+		# 			base.debugmsg(5, "relpath:", relpath)
+		# 		if len(base.mscriptlist) > 1:
+		# 			base.debugmsg(5, "base.mscriptlist:", base.mscriptlist)
+		# 			filelst = [scriptfile]
+		# 			for i in range(len(base.mscriptlist)):
+		# 				if "Script" in base.mscriptlist[i]:
+		# 					filelst.append(base.mscriptlist[i]["Script"])
+		# 			commonpath = os.path.commonpath(filelst)
+		# 			base.debugmsg(5, "commonpath: ", commonpath)
+		# 			base.config['Plan']['ScriptDir'] = base.inisafevalue(commonpath)
+		# 			relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], scriptfile)
+		# 			# base.saveini()
+		# 			for i in range(len(base.mscriptlist)):
+		# 				if "Script" in base.mscriptlist[i]:
+		# 					self.sr_file_validate(i, base.mscriptlist[i]["Script"])
+		#
+		# 	fg[1].configure(state='normal')
+		# 	fg[1].select_clear()
+		# 	fg[1].delete(0, 'end')
+		# 	fg[1].insert(0, relpath)
+		# 	fg[1].configure(state='readonly')
+		#
+		# 	base.mscriptlist[r]["Script"] = scriptfile
+		# 	base.debugmsg(8, "test: ", fg[1].get())
+		# 	script_hash = base.hash_file(scriptfile, relpath)
+		# 	base.mscriptlist[r]["ScriptHash"] = script_hash
+		#
+		# 	base.debugmsg(5, "script_hash:", script_hash, " in scriptfiles?:", script_hash in base.scriptfiles)
+		# 	if script_hash not in base.scriptfiles:
+		# 		base.scriptfiles[script_hash] = {
+		# 			"id": script_hash,
+		# 			"localpath": scriptfile,
+		# 			"relpath": relpath,
+		# 			"type": "script"
+		# 		}
+		#
+		# 		t = threading.Thread(target=base.find_dependancies, args=(script_hash, ))
+		# 		t.start()
+		#
+		# 	self.sr_test_genlist(r)
+		# else:
+		# 	fg[1].configure(state='normal')
+		# 	fg[1].delete(0, 'end')
+		# 	# fg[1].select_clear()
+		# 	fg[1].configure(state='readonly')
+		# 	if "ScriptHash" in base.mscriptlist[r]:
+		# 		oldhash = base.mscriptlist[r]["ScriptHash"]
+		# 		t = threading.Thread(target=base.remove_hash, args=(oldhash, ))
+		# 		t.start()
+		#
+		# 	base.mscriptlist[r]["Script"] = ''
+		# 	base.mscriptlist[r]["ScriptHash"] = ''
+		#
+		# self.plan_scnro_chngd = True
+		#
+		# if not base.args.nogui:
+		# 	try:
+		# 		# self.pln_update_graph()
+		# 		t = threading.Thread(target=self.pln_update_graph)
+		# 		t.start()
+		# 	except Exception:
+		# 		pass
+		return True
+
+	def msr_test_validate(self, *args):
+		base.debugmsg(5, "args:", args)
+		# r = int(args[0][-1:])+1
+		r = int(args[0][3:])
+		base.debugmsg(5, "msr_test_validate: r:", r)
+
+		# if not base.args.nogui and base.keeprunning:
+		# 	# if 0 in self.scriptgrid.grid_slaves:
+		# 	base.debugmsg(9, "sr_test_validate: grid_slaves:", self.scriptgrid.grid_slaves(column=self.plancoltst, row=r))
+		# 	if len(self.scriptgrid.grid_slaves(column=self.plancoltst, row=r)) > 0:
+		# 		tol = self.scriptgrid.grid_slaves(column=self.plancoltst, row=r)[0]
+		# 		base.debugmsg(9, "sr_test_validate: tol:", tol)
+		#
+		# v = None
+		# if len(args) > 1 and len(args[1]) > 1:
+		# 	v = args[1]
+		# 	base.debugmsg(9, "sr_test_validate: v:", v)
+		# 	if not base.args.nogui:
+		# 		if "TestVar" in base.mscriptlist[r]:
+		# 			base.mscriptlist[r]["TestVar"].set(v)
+		# 	base.mscriptlist[r]["Test"] = v
+		# else:
+		# 	if not base.args.nogui:
+		# 		base.debugmsg(9, "sr_test_validate: else")
+		# 		if "TestVar" in base.mscriptlist[r]:
+		# 			base.debugmsg(9, "sr_test_validate: scriptlist[r][TestVar].get():", base.mscriptlist[r]["TestVar"].get())
+		# 			base.mscriptlist[r]["Test"] = base.mscriptlist[r]["TestVar"].get()
+		#
+		# base.debugmsg(9, "scriptlist[r]:", base.mscriptlist[r])
+		#
+		# self.plan_scnro_chngd = True
+		#
+		# if not base.args.nogui and base.keeprunning:
+		# 	try:
+		# 		# self.pln_update_graph()
+		# 		t = threading.Thread(target=self.pln_update_graph)
+		# 		t.start()
+		# 	except Exception:
+		# 		pass
+		return True
+
+	def msr_row_settings(self, r):
+		base.debugmsg(5, "r:", r)
+		stgsWindow = tk.Toplevel(self.root)
+		stgsWindow.wm_iconphoto(False, self.icon)
+		# self.grid(sticky="news", ipadx=0, pady=0)
+		# self.root.resizable(False, False)		# this didn't work as expected, I expected the dialog to not be resizable instaed it stopped the main window from being resizable
+		# self.root.resizable(True, True)
+
+		# https://tkdocs.com/shipman/toplevel.html
+		# I believe this should keep the settings window infront of the menager window
+		# well it didn't work on macosx but it may help, i'll leave it for now
+		# stgsWindow.transient()
+		# stgsWindow.transient(parent=self.root)
+		# Now it works :)
+		stgsWindow.transient(self.root)
+
+		stgsWindow.columnconfigure(0, weight=1)
+		stgsWindow.columnconfigure(1, weight=1)
+		stgsWindow.columnconfigure(2, weight=1)
+		stgsWindow.columnconfigure(3, weight=1)
+		stgsWindow.columnconfigure(4, weight=1)
+		stgsWindow.columnconfigure(5, weight=1)
+		stgsWindow.columnconfigure(6, weight=1)
+		stgsWindow.columnconfigure(7, weight=1)
+		stgsWindow.columnconfigure(8, weight=1)
+		stgsWindow.columnconfigure(9, weight=1)
+		# stgsWindow.rowconfigure(1, weight=1)
+
+		stgsWindow.title("Settings for row {}".format(r))
+		testname = ""
+		try:
+			testname = base.mscriptlist[r]["TestVar"].get()
+		except Exception:
+			pass
+		base.debugmsg(5, "testname:", testname)
+		if len(testname) > 0:
+			stgsWindow.title("Settings for {} ({})".format(testname, r))
+
+		base.debugmsg(9, "base.mscriptlist[r]:", r, base.mscriptlist[r])
+
+		stgsWindow.resultnamemodedefault = base.resultnamemodedefault
+		if "resultnamemode" in base.scriptdefaults:
+			stgsWindow.resultnamemodedefault = base.scriptdefaults["resultnamemode"]
+
+		stgsWindow.resultnamemodecurrent = stgsWindow.resultnamemodedefault
+		if "resultnamemode" in base.mscriptlist[r]:
+			stgsWindow.resultnamemodecurrent = base.mscriptlist[r]["resultnamemode"]
+		base.debugmsg(5, "resultnamemodecurrent:", stgsWindow.resultnamemodecurrent)
+
+		stgsWindow.excludelibrariesdefault = base.excludelibrariesdefault
+		if "excludelibraries" in base.scriptdefaults:
+			stgsWindow.excludelibrariesdefault = base.scriptdefaults["excludelibraries"]
+
+		stgsWindow.Filters = {}
+
+		stgsWindow.excludelibrariescurrent = stgsWindow.excludelibrariesdefault
+		if "excludelibraries" in base.mscriptlist[r]:
+			stgsWindow.excludelibrariescurrent = base.mscriptlist[r]["excludelibraries"]
+		base.debugmsg(5, "excludelibrariescurrent:", stgsWindow.excludelibrariescurrent)
+
+		stgsWindow.robotoptionscurrent = ""
+		if "robotoptions" in base.scriptdefaults:
+			stgsWindow.robotoptionscurrent = base.scriptdefaults["robotoptions"]
+		if "robotoptions" in base.mscriptlist[r]:
+			stgsWindow.robotoptionscurrent = base.mscriptlist[r]["robotoptions"]
+		base.debugmsg(5, "robotoptionscurrent:", stgsWindow.robotoptionscurrent)
+
+		stgsWindow.testrepeaterdefault = base.testrepeaterdefault
+		if "testrepeater" in base.scriptdefaults:
+			stgsWindow.testrepeaterdefault = base.str2bool(base.scriptdefaults["testrepeater"])
+
+		stgsWindow.testrepeatercurrent = stgsWindow.testrepeaterdefault
+		if "testrepeater" in base.mscriptlist[r]:
+			stgsWindow.testrepeatercurrent = base.str2bool(base.mscriptlist[r]["testrepeater"])
+		base.debugmsg(5, "testrepeatercurrent:", stgsWindow.testrepeatercurrent)
+
+		stgsWindow.injectsleepenableddefault = base.injectsleepenableddefault
+		if "injectsleepenabled" in base.scriptdefaults:
+			stgsWindow.injectsleepenableddefault = base.str2bool(base.scriptdefaults["injectsleepenabled"])
+		stgsWindow.injectsleepenabled = stgsWindow.injectsleepenableddefault
+		if "injectsleepenabled" in base.mscriptlist[r]:
+			stgsWindow.injectsleepenabled = base.str2bool(base.mscriptlist[r]["injectsleepenabled"])
+		base.debugmsg(5, "injectsleepenabled:", stgsWindow.injectsleepenabled)
+
+		stgsWindow.injectsleepminimumdefault = base.injectsleepminimumdefault
+		if "injectsleepminimum" in base.scriptdefaults:
+			stgsWindow.injectsleepminimumdefault = int(base.scriptdefaults["injectsleepminimum"])
+		stgsWindow.injectsleepminimum = stgsWindow.injectsleepminimumdefault
+		if "injectsleepminimum" in base.mscriptlist[r]:
+			stgsWindow.injectsleepminimum = int(base.mscriptlist[r]["injectsleepminimum"])
+		base.debugmsg(5, "injectsleepminimum:", stgsWindow.injectsleepminimum)
+
+		stgsWindow.injectsleepmaximumdefault = base.injectsleepmaximumdefault
+		if "injectsleepmaximum" in base.scriptdefaults:
+			stgsWindow.injectsleepmaximumdefault = int(base.scriptdefaults["injectsleepmaximum"])
+		stgsWindow.injectsleepmaximum = stgsWindow.injectsleepmaximumdefault
+		if "injectsleepmaximum" in base.mscriptlist[r]:
+			stgsWindow.injectsleepmaximum = int(base.mscriptlist[r]["injectsleepmaximum"])
+		base.debugmsg(5, "injectsleepmaximum:", stgsWindow.injectsleepmaximum)
+
+		# disableloglogdefault = False
+		stgsWindow.disableloglogdefault = base.disableloglogdefault
+		if "disableloglog" in base.scriptdefaults:
+			stgsWindow.disableloglogdefault = base.str2bool(base.scriptdefaults["disableloglog"])
+		stgsWindow.disableloglog = stgsWindow.disableloglogdefault
+		if "disableloglog" in base.mscriptlist[r]:
+			stgsWindow.disableloglog = base.str2bool(base.mscriptlist[r]["disableloglog"])
+		base.debugmsg(5, "disableloglog:", stgsWindow.disableloglog)
+
+		# disablelogreportdefault = False
+		stgsWindow.disablelogreportdefault = base.disablelogreportdefault
+		if "disablelogreport" in base.scriptdefaults:
+			stgsWindow.disablelogreportdefault = base.str2bool(base.scriptdefaults["disablelogreport"])
+		stgsWindow.disablelogreport = stgsWindow.disablelogreportdefault
+		if "disablelogreport" in base.mscriptlist[r]:
+			stgsWindow.disablelogreport = base.str2bool(base.mscriptlist[r]["disablelogreport"])
+		base.debugmsg(5, "disablelogreport:", stgsWindow.disablelogreport)
+
+		# disablelogoutputdefault = False
+		stgsWindow.disablelogoutputdefault = base.disablelogoutputdefault
+		if "disablelogoutput" in base.scriptdefaults:
+			stgsWindow.disablelogoutputdefault = base.str2bool(base.scriptdefaults["disablelogoutput"])
+		stgsWindow.disablelogoutput = stgsWindow.disablelogoutputdefault
+		if "disablelogoutput" in base.mscriptlist[r]:
+			stgsWindow.disablelogoutput = base.str2bool(base.mscriptlist[r]["disablelogoutput"])
+		base.debugmsg(5, "disablelogoutput:", stgsWindow.disablelogoutput)
+
+		row = 0
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		# resultnamemode
+		row += 1
+		stgsWindow.lblEL = ttk.Label(stgsWindow, text="Result Name Mode:")
+		stgsWindow.lblEL.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		NameModeOpt = list(base.resultnamemodes.values())
+		stgsWindow.strNM = tk.StringVar()
+		stgsWindow.omNM = ttk.OptionMenu(stgsWindow, stgsWindow.strNM, None, *NameModeOpt)
+		base.debugmsg(5, "resultnamemodecurrent:", stgsWindow.resultnamemodecurrent)
+		stgsWindow.strNM.set(base.resultnamemodes[stgsWindow.resultnamemodecurrent])
+		stgsWindow.omNM.grid(column=0, row=row, columnspan=10, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblEL = ttk.Label(stgsWindow, text="Exclude libraries:")
+		stgsWindow.lblEL.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.inpEL = ttk.Entry(stgsWindow)
+		stgsWindow.inpEL.delete(0, 'end')
+		stgsWindow.inpEL.insert(0, stgsWindow.excludelibrariescurrent)
+		stgsWindow.inpEL.grid(column=0, row=row, columnspan=10, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblRO = ttk.Label(stgsWindow, text="Robot Options:")
+		stgsWindow.lblRO.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.inpRO = ttk.Entry(stgsWindow)
+		stgsWindow.inpRO.delete(0, 'end')
+		stgsWindow.inpRO.insert(0, stgsWindow.robotoptionscurrent)
+		stgsWindow.inpRO.grid(column=0, row=row, columnspan=10, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblTR = ttk.Label(stgsWindow, text="Test Repeater:")
+		stgsWindow.lblTR.grid(column=0, row=row, sticky="nsew")
+
+		stgsWindow.boolTR = tk.BooleanVar()
+		stgsWindow.boolTR.set(stgsWindow.testrepeatercurrent)
+		stgsWindow.inpTR = tk.Checkbutton(stgsWindow, variable=stgsWindow.boolTR, onvalue=True, offvalue=False)
+		stgsWindow.inpTR.grid(column=1, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblIS = ttk.Label(stgsWindow, text="Inject Sleep:")
+		stgsWindow.lblIS.grid(column=0, row=row, sticky="nsew")
+
+		stgsWindow.lblISE = ttk.Label(stgsWindow, text="Enabled")
+		stgsWindow.lblISE.grid(column=1, row=row, sticky="nsew")
+		stgsWindow.lblISMN = ttk.Label(stgsWindow, text="Minimum")
+		stgsWindow.lblISMN.grid(column=2, row=row, sticky="nsew")
+		stgsWindow.lblISMX = ttk.Label(stgsWindow, text="Maximum")
+		stgsWindow.lblISMX.grid(column=3, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.boolISE = tk.BooleanVar()
+		stgsWindow.boolISE.set(stgsWindow.injectsleepenabled)
+		stgsWindow.inpISE = tk.Checkbutton(stgsWindow, variable=stgsWindow.boolISE, onvalue=True, offvalue=False)
+		stgsWindow.inpISE.grid(column=1, row=row, sticky="nsew")
+
+		stgsWindow.inpISMN = ttk.Entry(stgsWindow, width=5, justify=tk.RIGHT)
+		stgsWindow.inpISMN.delete(0, 'end')
+		stgsWindow.inpISMN.insert(0, stgsWindow.injectsleepminimum)
+		stgsWindow.inpISMN.grid(column=2, row=row, sticky="nsew")
+
+		stgsWindow.inpISMX = ttk.Entry(stgsWindow, width=5, justify=tk.RIGHT)
+		stgsWindow.inpISMX.delete(0, 'end')
+		stgsWindow.inpISMX.insert(0, stgsWindow.injectsleepmaximum)
+		stgsWindow.inpISMX.grid(column=3, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblDL = ttk.Label(stgsWindow, text="Disable Robot Log:")
+		stgsWindow.lblDL.grid(column=0, row=row, sticky="nsew")
+
+		stgsWindow.lblDLL = ttk.Label(stgsWindow, text="log.html")
+		stgsWindow.lblDLL.grid(column=1, row=row, sticky="nsew")
+		stgsWindow.lblDLR = ttk.Label(stgsWindow, text="report.html")
+		stgsWindow.lblDLR.grid(column=2, row=row, sticky="nsew")
+		stgsWindow.lblDLO = ttk.Label(stgsWindow, text="output.xml")
+		stgsWindow.lblDLO.grid(column=3, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.boolDLL = tk.BooleanVar()
+		stgsWindow.boolDLL.set(stgsWindow.disableloglog)
+		stgsWindow.inpDLL = tk.Checkbutton(stgsWindow, variable=stgsWindow.boolDLL, onvalue=True, offvalue=False)
+		stgsWindow.inpDLL.grid(column=1, row=row, sticky="nsew")
+
+		stgsWindow.boolDLR = tk.BooleanVar()
+		stgsWindow.boolDLR.set(stgsWindow.disablelogreport)
+		stgsWindow.inpDLR = tk.Checkbutton(stgsWindow, variable=stgsWindow.boolDLR, onvalue=True, offvalue=False)
+		stgsWindow.inpDLR.grid(column=2, row=row, sticky="nsew")
+
+		stgsWindow.boolDLO = tk.BooleanVar()
+		stgsWindow.boolDLO.set(stgsWindow.disablelogoutput)
+		stgsWindow.inpDLO = tk.Checkbutton(stgsWindow, variable=stgsWindow.boolDLO, onvalue=True, offvalue=False)
+		stgsWindow.inpDLO.grid(column=3, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer before the filters
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblAF = ttk.Label(stgsWindow, text="Agent Filter:")
+		stgsWindow.lblAF.grid(column=0, row=row, sticky="nsew")
+
+		icontext = "AddRow"
+		stgsWindow.btnAddFil = ttk.Button(stgsWindow, image=self.imgdata[icontext], text="+", command=lambda: self.sr_row_settings_addf(r, stgsWindow), width=1)
+		stgsWindow.btnAddFil.grid(column=9, row=row, sticky="news")
+
+		row += 1
+		stgsWindow.fmeFilters = tk.Frame(stgsWindow)
+		stgsWindow.fmeFilters.grid(column=0, row=row, columnspan=10, sticky="nsew")
+
+		if "filters" in base.mscriptlist[r]:
+			for f in base.mscriptlist[r]["filters"]:
+				base.debugmsg(5, "f:", f)
+				base.add_scriptfilter(f['optn'])
+				self.sr_row_settings_addf(r, stgsWindow, f['rule'], f['optn'])
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer before the buttons
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.rowconfigure(row, weight=1)
+
+		row += 1
+		btnSave = ttk.Button(stgsWindow, text="Save", command=lambda: self.sr_row_settings_save(r, stgsWindow))
+		btnSave.grid(column=6, row=row, sticky="nsew")
+
+		btnCancel = ttk.Button(stgsWindow, text="Cancel", command=stgsWindow.destroy)
+		btnCancel.grid(column=7, row=row, columnspan=3, sticky="nsew")  # cols 7, 8, 9
+
+	def msr_row_settings_save(self, r, stgsWindow):
+		base.debugmsg(7, "r:", r)
+		base.debugmsg(7, "stgsWindow:", stgsWindow)
+
+		nm = base.GetKey(base.resultnamemodes, stgsWindow.strNM.get())
+		base.debugmsg(7, "nm:", nm)
+		if len(nm) > 0:
+			if nm != stgsWindow.resultnamemodedefault:
+				base.mscriptlist[r]["resultnamemode"] = nm
+				self.plan_scnro_chngd = True
+			else:
+				if "resultnamemode" in base.mscriptlist[r]:
+					del base.mscriptlist[r]["resultnamemode"]
+					self.plan_scnro_chngd = True
+		else:
+			if "resultnamemode" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["resultnamemode"]
+			self.plan_scnro_chngd = True
+
+		el = stgsWindow.inpEL.get()
+		base.debugmsg(7, "el:", el)
+		if len(el) > 0:
+			if el != stgsWindow.excludelibrariesdefault:
+				base.mscriptlist[r]["excludelibraries"] = el
+				self.plan_scnro_chngd = True
+			else:
+				if "excludelibraries" in base.mscriptlist[r]:
+					del base.mscriptlist[r]["excludelibraries"]
+		else:
+			if "excludelibraries" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["excludelibraries"]
+			self.plan_scnro_chngd = True
+
+		ro = stgsWindow.inpRO.get()
+		base.debugmsg(7, "el:", el)
+		if len(ro) > 0:
+			if ro != stgsWindow.robotoptionscurrent:
+				base.mscriptlist[r]["robotoptions"] = ro
+				self.plan_scnro_chngd = True
+		else:
+			if "robotoptions" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["robotoptions"]
+			self.plan_scnro_chngd = True
+
+		tr = stgsWindow.boolTR.get()
+		base.debugmsg(7, "tr:", tr)
+		if tr != stgsWindow.testrepeaterdefault:
+			base.mscriptlist[r]["testrepeater"] = str(tr)
+			self.plan_scnro_chngd = True
+		else:
+			if "testrepeater" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["testrepeater"]
+				self.plan_scnro_chngd = True
+
+		# Inject Sleep
+		ise = stgsWindow.boolISE.get()
+		base.debugmsg(7, "ise:", ise)
+		if ise != stgsWindow.injectsleepenableddefault:
+			base.mscriptlist[r]["injectsleepenabled"] = str(ise)
+			self.plan_scnro_chngd = True
+		else:
+			if "injectsleepenabled" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["injectsleepenabled"]
+				self.plan_scnro_chngd = True
+
+		ismn = stgsWindow.inpISMN.get()
+		if len(ismn) > 0:
+			ismn = int(ismn)
+		else:
+			ismn = stgsWindow.injectsleepminimumdefault
+		base.debugmsg(7, "ismn:", ismn)
+		if ismn != stgsWindow.injectsleepminimumdefault:
+			base.mscriptlist[r]["injectsleepminimum"] = str(ismn)
+			self.plan_scnro_chngd = True
+		else:
+			if "injectsleepminimum" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["injectsleepminimum"]
+				self.plan_scnro_chngd = True
+
+		ismx = stgsWindow.inpISMX.get()
+		if len(ismx) > 0:
+			ismx = int(ismx)
+		else:
+			ismx = stgsWindow.injectsleepmaximumdefault
+		base.debugmsg(7, "ismx:", ismx)
+		if ismx != stgsWindow.injectsleepmaximumdefault:
+			base.mscriptlist[r]["injectsleepmaximum"] = str(ismx)
+			self.plan_scnro_chngd = True
+		else:
+			if "injectsleepmaximum" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["injectsleepmaximum"]
+				self.plan_scnro_chngd = True
+
+		# disableloglogdefault = False
+		dll = stgsWindow.boolDLL.get()
+		base.debugmsg(7, "ise:", ise)
+		if dll != stgsWindow.disableloglogdefault:
+			base.mscriptlist[r]["disableloglog"] = str(dll)
+			self.plan_scnro_chngd = True
+		else:
+			if "disableloglog" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["disableloglog"]
+				self.plan_scnro_chngd = True
+
+		# disablelogreportdefault = False
+		dlr = stgsWindow.boolDLR.get()
+		base.debugmsg(7, "ise:", ise)
+		if dlr != stgsWindow.disablelogreportdefault:
+			base.mscriptlist[r]["disablelogreport"] = str(dlr)
+			self.plan_scnro_chngd = True
+		else:
+			if "disablelogreport" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["disablelogreport"]
+				self.plan_scnro_chngd = True
+
+		# disablelogoutputdefault = False
+		dlo = stgsWindow.boolDLO.get()
+		base.debugmsg(7, "ise:", ise)
+		if dlo != stgsWindow.disablelogoutputdefault:
+			base.mscriptlist[r]["disablelogoutput"] = str(dlo)
+			self.plan_scnro_chngd = True
+		else:
+			if "disablelogoutput" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["disablelogoutput"]
+				self.plan_scnro_chngd = True
+
+		base.debugmsg(7, "stgsWindow.Filters:", stgsWindow.Filters)
+		if len(stgsWindow.Filters.keys()) > 0:
+			base.mscriptlist[r]["filters"] = []
+			for fil in stgsWindow.Filters.keys():
+				filtr = {}
+				filtr["rule"] = stgsWindow.Filters[fil]["FilRule"].get()
+				filtr["optn"] = stgsWindow.Filters[fil]["FilOpt"].get()
+
+				if "filters" not in base.mscriptlist[r]:
+					base.mscriptlist[r]["filters"] = []
+				base.mscriptlist[r]["filters"].append(filtr)
+			self.plan_scnro_chngd = True
+		else:
+			if "filters" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["filters"]
+			self.plan_scnro_chngd = True
+
+		base.debugmsg(7, "base.mscriptlist[r]:", base.mscriptlist[r])
+
+		stgsWindow.destroy()
+
+	def msr_row_settings_addf(self, r, stgsWindow, *args):
+
+		FilRule = [None, "Require", "Exclude"]
+
+		base.debugmsg(5, "r:", r)
+		xy = stgsWindow.fmeFilters.grid_size()
+		base.debugmsg(5, "xy:", xy)
+		fid = xy[1]
+
+		stgsWindow.Filters[fid] = {}
+		stgsWindow.Filters[fid]["FilRule"] = tk.StringVar()
+		omfr = ttk.OptionMenu(stgsWindow.fmeFilters, stgsWindow.Filters[fid]["FilRule"], *FilRule)
+		stgsWindow.Filters[fid]["FilRule"].set(FilRule[1])
+		omfr.grid(column=0, row=fid, sticky="nsew")
+
+		stgsWindow.Filters[fid]["FilOpt"] = tk.StringVar()
+		omfo = ttk.OptionMenu(stgsWindow.fmeFilters, stgsWindow.Filters[fid]["FilOpt"], *base.scriptfilters)
+		omfo.grid(column=1, row=fid, sticky="nsew")
+
+		icontext = "Delete"
+		stgsWindow.btnRemFil = ttk.Button(stgsWindow.fmeFilters, image=self.imgdata[icontext], text="X", command=lambda: self.sr_row_settings_remf(fid, stgsWindow), width=1)
+		stgsWindow.btnRemFil.grid(column=9, row=fid, sticky="nsew")
+
+		if len(args) > 0:
+			base.debugmsg(5, "args[0]:", args[0])
+			stgsWindow.Filters[fid]["FilRule"].set(args[0])
+		if len(args) > 1:
+			base.debugmsg(5, "args[1]:", args[1])
+			stgsWindow.Filters[fid]["FilOpt"].set(args[1])
+
+	def msr_row_settings_remf(self, r, stgsWindow):
+		relmts = stgsWindow.fmeFilters.grid_slaves(row=r, column=None)
+		base.debugmsg(5, relmts)
+
+		for elmt in relmts:
+			elmt.destroy()
+
+		del stgsWindow.Filters[r]
+
+		stgsWindow.update_idletasks()
+
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
