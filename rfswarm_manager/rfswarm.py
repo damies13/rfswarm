@@ -2014,7 +2014,7 @@ class RFSwarmBase:
 
 		base.mscriptlist.append({})
 
-		base.mscriptlist[row]["Index"] = base.scriptcount
+		base.mscriptlist[row]["Index"] = base.mscriptcount
 
 		num = "1"
 		base.mscriptlist[row]["Robots"] = int(num)
@@ -2034,7 +2034,7 @@ class RFSwarmBase:
 		base.debugmsg(5, "base.mscriptlist[", row, "]:", base.mscriptlist[row])
 
 		if not base.args.nogui and base.gui:
-			base.gui.addMScriptRow()
+			base.gui.addMScriptRow(row)
 
 	def UpdateRunStats_SQL(self):
 
@@ -2599,6 +2599,17 @@ class RFSwarmCore:
 				base.debugmsg(5, "ScriptDir: ", base.config['Plan']['ScriptDir'])
 				base.config['Plan']['ScenarioDir'] = base.inisafevalue(base.dir_path)
 				base.saveini()
+
+		#
+		# Monitoring
+		#
+
+		if 'Monitoring' not in base.config:
+			base.config['Monitoring'] = {}
+			base.saveini()
+
+		if 'ScriptDir' not in base.config['Monitoring']:
+			base.config['Monitoring']['ScriptDir'] = base.config['Plan']['ScriptDir']
 
 		#
 		# Run
@@ -7219,7 +7230,8 @@ class RFSwarmGUI(tk.Frame):
 
 		base.scriptlist[row]["TestVar"] = tk.StringVar(value=base.scriptlist[row]["Test"], name="row{}".format(row))
 		base.scriptlist[row]["TestVar"].trace("w", self.sr_test_validate)
-		tst = ttk.OptionMenu(self.scriptgrid, base.scriptlist[row]["TestVar"], None, "test", command=lambda: self.sr_test_validate(row))
+		# tst = ttk.OptionMenu(self.scriptgrid, base.scriptlist[row]["TestVar"], None, "test", command=lambda: self.sr_test_validate(row))
+		tst = ttk.OptionMenu(self.scriptgrid, base.scriptlist[row]["TestVar"], None, "test")
 		tst.config(width=20)
 		tst.grid(column=self.plancoltst, row=base.scriptcount, sticky="nsew")
 
@@ -7575,7 +7587,7 @@ class RFSwarmGUI(tk.Frame):
 		return True
 
 	def sr_test_genlist(self, r):
-		base.debugmsg(8, "Script File:", base.scriptlist[r]["Script"])
+		base.debugmsg(5, "Script File:", base.scriptlist[r]["Script"])
 		tcsection = False
 		tclist = [""]
 		# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
@@ -8198,7 +8210,7 @@ class RFSwarmGUI(tk.Frame):
 
 	def addMScriptRow(self, *args):
 		row = base.mscriptcount
-		base.debugmsg(5, "addMScriptRow:",row)
+		base.debugmsg(5, "addMScriptRow:", row)
 
 		# colour = base.line_colour(base.scriptcount)
 		# base.debugmsg(5, "colour:", colour)
@@ -8210,21 +8222,21 @@ class RFSwarmGUI(tk.Frame):
 		# num = base.mscriptlist[base.mscriptcount]["Robots"]
 		# usr = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout")
 		# usr.config(validatecommand=lambda: self.sr_users_validate(row))
-		# usr.grid(column=self.plancolusr, row=base.scriptcount, sticky="nsew")
+		# usr.grid(column=self.mtrngcolusr, row=base.scriptcount, sticky="nsew")
 		# usr.insert(0, num)
 		# base.mscriptlist[base.scriptcount]["Robots"] = int(num)
 
 		# num = base.mscriptlist[base.scriptcount]["Delay"]
 		# dly = ttk.Entry(self.scriptgrid, width=8, justify="right", validate="focusout")
 		# dly.config(validatecommand=lambda: self.sr_delay_validate(row))
-		# dly.grid(column=self.plancoldly, row=base.scriptcount, sticky="nsew")
+		# dly.grid(column=self.mtrngcoldly, row=base.scriptcount, sticky="nsew")
 		# dly.insert(0, base.sec2hms(num))
 		# base.mscriptlist[base.scriptcount]["Delay"] = base.hms2sec(num)
 
 		# num = base.mscriptlist[base.scriptcount]["RampUp"]
 		# rmp = ttk.Entry(self.scriptgrid, width=8, justify="right", validate="focusout")
 		# rmp.config(validatecommand=lambda: self.sr_rampup_validate(row))
-		# rmp.grid(column=self.plancolrmp, row=base.scriptcount, sticky="nsew")
+		# rmp.grid(column=self.mtrngcolrmp, row=base.scriptcount, sticky="nsew")
 		# # rmp.insert(0, num)
 		# rmp.insert(0, base.sec2hms(num))
 		# base.mscriptlist[base.scriptcount]["RampUp"] = base.hms2sec(num)
@@ -8232,195 +8244,215 @@ class RFSwarmGUI(tk.Frame):
 		# num = base.mscriptlist[base.scriptcount]["Run"]
 		# run = ttk.Entry(self.scriptgrid, width=8, justify="right", validate="focusout")
 		# run.config(validatecommand=lambda: self.sr_run_validate(row))
-		# run.grid(column=self.plancolrun, row=base.scriptcount, sticky="nsew")
+		# run.grid(column=self.mtrngcolrun, row=base.scriptcount, sticky="nsew")
 		# # run.insert(0, num)
 		# run.insert(0, base.sec2hms(num))
 		# base.mscriptlist[base.scriptcount]["Run"] = base.hms2sec(num)
 
-		fgf = ttk.Frame(self.mscriptgrid)
-		fgf.grid(column=self.mtrngcolscr, row=base.mscriptcount, sticky="nsew")
-		scr = ttk.Entry(fgf, state="readonly", justify="right")
-		scr.grid(column=0, row=0, sticky="nsew")
-		fgf.columnconfigure(scr, weight=1)
+		mfgf = ttk.Frame(self.mscriptgrid)
+		mfgf.grid(column=self.mtrngcolscr, row=base.mscriptcount, sticky="nsew")
+		mscr = ttk.Entry(mfgf, state="readonly", justify="right")
+		mscr.grid(column=0, row=0, sticky="nsew")
+		mfgf.columnconfigure(mscr, weight=1)
 
 		icontext = "Script"
-		scrf = ttk.Button(fgf, image=self.imgdata[icontext], text="...", width=1)
-		scrf.config(command=lambda: self.msr_file_validate(row))
-		scrf.grid(column=1, row=0, sticky="nsew")
-		fgf.columnconfigure(scrf, weight=0)
+		mscrf = ttk.Button(mfgf, image=self.imgdata[icontext], text="...", width=1)
+		mscrf.config(command=lambda: self.msr_file_validate(row))
+		mscrf.grid(column=1, row=0, sticky="nsew")
+		mfgf.columnconfigure(mscrf, weight=0)
 
-		base.mscriptlist[row]["TestVar"] = tk.StringVar(value=base.mscriptlist[row]["Test"], name="row{}".format(row))
+		srow = "row{}".format(row)
+
+		base.mscriptlist[row]["TestVar"] = tk.StringVar(value=base.mscriptlist[row]["Test"], name="mrow{}".format(row))
 		base.mscriptlist[row]["TestVar"].trace("w", self.msr_test_validate)
-		tst = ttk.OptionMenu(self.mscriptgrid, base.mscriptlist[row]["TestVar"], None, "test", command=lambda: self.msr_test_validate(row))
-		tst.config(width=20)
-		tst.grid(column=self.mtrngcoltst, row=base.mscriptcount, sticky="nsew")
+		# mtst = ttk.OptionMenu(self.mscriptgrid, base.mscriptlist[row]["TestVar"], None, "test", command=lambda srow=srow: self.msr_test_validate(srow))
+		mtst = ttk.OptionMenu(self.mscriptgrid, base.mscriptlist[row]["TestVar"], None, "test")
+		mtst.config(width=20)
+		mtst.grid(column=self.mtrngcoltst, row=base.mscriptcount, sticky="nsew")
 
 		icontext = "Advanced"
-		self.mscriptgrid.columnconfigure(self.plancoladd, weight=0)
-		new = ttk.Button(self.mscriptgrid, image=self.imgdata[icontext], text="Settings", command=lambda: self.msr_row_settings(row), width=1)
-		new.grid(column=self.mtrngcolset, row=base.mscriptcount, sticky="nsew")
+		self.mscriptgrid.columnconfigure(self.mtrngcoladd, weight=0)
+		mnew = ttk.Button(self.mscriptgrid, image=self.imgdata[icontext], text="Settings", command=lambda: self.msr_row_settings(row), width=1)
+		mnew.grid(column=self.mtrngcolset, row=base.mscriptcount, sticky="nsew")
 
 		icontext = "Delete"
-		self.scriptgrid.columnconfigure(self.plancoladd, weight=0)
-		new = ttk.Button(self.mscriptgrid, image=self.imgdata[icontext], text="X", command=lambda: self.msr_remove_row(row), width=1)
-		new.grid(column=self.mtrngcoladd, row=base.mscriptcount, sticky="nsew")
+		self.scriptgrid.columnconfigure(self.mtrngcoladd, weight=0)
+		mdel = ttk.Button(self.mscriptgrid, image=self.imgdata[icontext], text="X", command=lambda: self.msr_remove_row(row), width=1)
+		mdel.grid(column=self.mtrngcoladd, row=base.mscriptcount, sticky="nsew")
 
-		# # self.scrollable_sg.update()
-		# base.debugmsg(6, "base.args.nogui", base.args.nogui)
-		# if not base.args.nogui:
-		# 	try:
-		# 		base.debugmsg(6, "call pln_update_graph")
-		# 		# self.pln_update_graph()
-		# 		t = threading.Thread(target=self.pln_update_graph)
-		# 		t.start()
-		# 		base.debugmsg(6, "call fill_canvas")
-		# 		# self.scrollable_sg.fill_canvas()
-		# 		fc = threading.Thread(target=self.scrollable_sg.fill_canvas)
-		# 		fc.start()
-		#
-		# 	except Exception:
-		# 		pass
-		#
-		# base.debugmsg(6, "addScriptRow done")
-		#
-		# # update scrollbars
-		# self.scriptgrid.update_idletasks()
-		# self.sg_canvas.config(scrollregion=self.sg_canvas.bbox("all"))
+		base.debugmsg(5, "addMScriptRow done")
+
+		# update scrollbars
+		self.mscriptgrid.update_idletasks()
+		self.sm_canvas.config(scrollregion=self.sm_canvas.bbox("all"))
 
 	def msr_file_validate(self, r, *args):
 		base.debugmsg(5, r)
-		# if not base.args.nogui:
-		# 	fg = self.scriptgrid.grid_slaves(column=self.plancolscr, row=r)[0].grid_slaves()
-		# 	base.debugmsg(9, fg)
-		# 	base.debugmsg(9, fg[1].get())
-		# if args:
-		# 	scriptfile = args[0]
-		# else:
-		# 	if not base.args.nogui:
-		# 		scriptfile = str(
-		# 			tkf.askopenfilename(
-		# 				initialdir=base.config['Plan']['ScriptDir'],
-		# 				title="Select Robot Framework File",
-		# 				filetypes=(("Robot Framework", "*.robot"), ("all files", "*.*"))
-		# 			)
-		# 		)
-		# 	else:
-		# 		scriptfile = ""
-		# base.debugmsg(5, "scriptfile:", scriptfile)
-		# if len(scriptfile) > 0:
-		# 	relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], scriptfile)
-		# 	base.debugmsg(5, "relpath:", relpath)
-		#
-		# 	if ".." in relpath:
-		# 		base.debugmsg(5, "do update relpath:", relpath)
-		# 		base.debugmsg(5, "ScriptDir:", base.config['Plan']['ScriptDir'])
-		# 		if base.config['Plan']['ScriptDir'] == base.dir_path:
-		# 			base.config['Plan']['ScriptDir'] = os.path.basename(scriptfile)
-		# 			base.debugmsg(5, "ScriptDir:", base.config['Plan']['ScriptDir'])
-		# 			relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], scriptfile)
-		# 			base.debugmsg(5, "relpath:", relpath)
-		# 		if len(base.mscriptlist) > 1:
-		# 			base.debugmsg(5, "base.mscriptlist:", base.mscriptlist)
-		# 			filelst = [scriptfile]
-		# 			for i in range(len(base.mscriptlist)):
-		# 				if "Script" in base.mscriptlist[i]:
-		# 					filelst.append(base.mscriptlist[i]["Script"])
-		# 			commonpath = os.path.commonpath(filelst)
-		# 			base.debugmsg(5, "commonpath: ", commonpath)
-		# 			base.config['Plan']['ScriptDir'] = base.inisafevalue(commonpath)
-		# 			relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], scriptfile)
-		# 			# base.saveini()
-		# 			for i in range(len(base.mscriptlist)):
-		# 				if "Script" in base.mscriptlist[i]:
-		# 					self.sr_file_validate(i, base.mscriptlist[i]["Script"])
-		#
-		# 	fg[1].configure(state='normal')
-		# 	fg[1].select_clear()
-		# 	fg[1].delete(0, 'end')
-		# 	fg[1].insert(0, relpath)
-		# 	fg[1].configure(state='readonly')
-		#
-		# 	base.mscriptlist[r]["Script"] = scriptfile
-		# 	base.debugmsg(8, "test: ", fg[1].get())
-		# 	script_hash = base.hash_file(scriptfile, relpath)
-		# 	base.mscriptlist[r]["ScriptHash"] = script_hash
-		#
-		# 	base.debugmsg(5, "script_hash:", script_hash, " in scriptfiles?:", script_hash in base.scriptfiles)
-		# 	if script_hash not in base.scriptfiles:
-		# 		base.scriptfiles[script_hash] = {
-		# 			"id": script_hash,
-		# 			"localpath": scriptfile,
-		# 			"relpath": relpath,
-		# 			"type": "script"
-		# 		}
-		#
-		# 		t = threading.Thread(target=base.find_dependancies, args=(script_hash, ))
-		# 		t.start()
-		#
-		# 	self.sr_test_genlist(r)
-		# else:
-		# 	fg[1].configure(state='normal')
-		# 	fg[1].delete(0, 'end')
-		# 	# fg[1].select_clear()
-		# 	fg[1].configure(state='readonly')
-		# 	if "ScriptHash" in base.mscriptlist[r]:
-		# 		oldhash = base.mscriptlist[r]["ScriptHash"]
-		# 		t = threading.Thread(target=base.remove_hash, args=(oldhash, ))
-		# 		t.start()
-		#
-		# 	base.mscriptlist[r]["Script"] = ''
-		# 	base.mscriptlist[r]["ScriptHash"] = ''
-		#
-		# self.plan_scnro_chngd = True
-		#
-		# if not base.args.nogui:
-		# 	try:
-		# 		# self.pln_update_graph()
-		# 		t = threading.Thread(target=self.pln_update_graph)
-		# 		t.start()
-		# 	except Exception:
-		# 		pass
+		if not base.args.nogui:
+			fg = self.mscriptgrid.grid_slaves(column=self.mtrngcolscr, row=r)[0].grid_slaves()
+			base.debugmsg(9, fg)
+			base.debugmsg(9, fg[1].get())
+		if args:
+			scriptfile = args[0]
+		else:
+			if not base.args.nogui:
+				scriptfile = str(
+					tkf.askopenfilename(
+						initialdir=base.config['Monitoring']['ScriptDir'],
+						title="Select Robot Framework File",
+						filetypes=(("Robot Framework", "*.robot"), ("all files", "*.*"))
+					)
+				)
+			else:
+				scriptfile = ""
+		base.debugmsg(5, "scriptfile:", scriptfile)
+		if len(scriptfile) > 0:
+			relpath = base.get_relative_path(base.config['Monitoring']['ScriptDir'], scriptfile)
+			base.debugmsg(5, "relpath:", relpath)
+
+			if ".." in relpath:
+				base.debugmsg(5, "do update relpath:", relpath)
+				base.debugmsg(5, "ScriptDir:", base.config['Monitoring']['ScriptDir'])
+				if base.config['Monitoring']['ScriptDir'] == base.dir_path:
+					base.config['Monitoring']['ScriptDir'] = os.path.basename(scriptfile)
+					base.debugmsg(5, "ScriptDir:", base.config['Monitoring']['ScriptDir'])
+					relpath = base.get_relative_path(base.config['Monitoring']['ScriptDir'], scriptfile)
+					base.debugmsg(5, "relpath:", relpath)
+				if len(base.mscriptlist) > 1:
+					base.debugmsg(5, "base.mscriptlist:", base.mscriptlist)
+					filelst = [scriptfile]
+					for i in range(len(base.mscriptlist)):
+						if "Script" in base.mscriptlist[i]:
+							filelst.append(base.mscriptlist[i]["Script"])
+					base.debugmsg(5, "filelst:", filelst)
+					commonpath = os.path.commonpath(filelst)
+					base.debugmsg(5, "commonpath: ", commonpath)
+					base.config['Monitoring']['ScriptDir'] = base.inisafevalue(commonpath)
+					relpath = base.get_relative_path(base.config['Monitoring']['ScriptDir'], scriptfile)
+					# base.saveini()
+					for i in range(len(base.mscriptlist)):
+						if "Script" in base.mscriptlist[i]:
+							self.msr_file_validate(i, base.mscriptlist[i]["Script"])
+
+			fg[1].configure(state='normal')
+			fg[1].select_clear()
+			fg[1].delete(0, 'end')
+			fg[1].insert(0, relpath)
+			fg[1].configure(state='readonly')
+
+			base.mscriptlist[r]["Script"] = scriptfile
+			base.debugmsg(5, "test: ", fg[1].get())
+			script_hash = base.hash_file(scriptfile, relpath)
+			base.mscriptlist[r]["ScriptHash"] = script_hash
+
+			base.debugmsg(5, "script_hash:", script_hash, " in scriptfiles?:", script_hash in base.mscriptfiles)
+			if script_hash not in base.scriptfiles:
+				base.scriptfiles[script_hash] = {
+					"id": script_hash,
+					"localpath": scriptfile,
+					"relpath": relpath,
+					"type": "script"
+				}
+
+				base.debugmsg(5, "base.find_dependancies(", script_hash, ")")
+				t = threading.Thread(target=base.find_dependancies, args=(script_hash, ))
+				t.start()
+
+			base.debugmsg(5, "msr_test_genlist(", r, ")")
+			self.msr_test_genlist(r)
+		else:
+			fg[1].configure(state='normal')
+			fg[1].delete(0, 'end')
+			# fg[1].select_clear()
+			fg[1].configure(state='readonly')
+			if "ScriptHash" in base.mscriptlist[r]:
+				oldhash = base.mscriptlist[r]["ScriptHash"]
+				t = threading.Thread(target=base.remove_hash, args=(oldhash, ))
+				t.start()
+
+			base.mscriptlist[r]["Script"] = ''
+			base.mscriptlist[r]["ScriptHash"] = ''
+
+		self.plan_scnro_chngd = True
+
 		return True
 
 	def msr_test_validate(self, *args):
 		base.debugmsg(5, "args:", args)
 		# r = int(args[0][-1:])+1
-		r = int(args[0][3:])
-		base.debugmsg(5, "msr_test_validate: r:", r)
+		if len(args) < 3:
+			return True
+		r = int(args[0][4:])
+		base.debugmsg(5, "r:", r)
 
-		# if not base.args.nogui and base.keeprunning:
-		# 	# if 0 in self.scriptgrid.grid_slaves:
-		# 	base.debugmsg(9, "sr_test_validate: grid_slaves:", self.scriptgrid.grid_slaves(column=self.plancoltst, row=r))
-		# 	if len(self.scriptgrid.grid_slaves(column=self.plancoltst, row=r)) > 0:
-		# 		tol = self.scriptgrid.grid_slaves(column=self.plancoltst, row=r)[0]
-		# 		base.debugmsg(9, "sr_test_validate: tol:", tol)
-		#
-		# v = None
-		# if len(args) > 1 and len(args[1]) > 1:
-		# 	v = args[1]
-		# 	base.debugmsg(9, "sr_test_validate: v:", v)
-		# 	if not base.args.nogui:
-		# 		if "TestVar" in base.mscriptlist[r]:
-		# 			base.mscriptlist[r]["TestVar"].set(v)
-		# 	base.mscriptlist[r]["Test"] = v
-		# else:
-		# 	if not base.args.nogui:
-		# 		base.debugmsg(9, "sr_test_validate: else")
-		# 		if "TestVar" in base.mscriptlist[r]:
-		# 			base.debugmsg(9, "sr_test_validate: scriptlist[r][TestVar].get():", base.mscriptlist[r]["TestVar"].get())
-		# 			base.mscriptlist[r]["Test"] = base.mscriptlist[r]["TestVar"].get()
-		#
-		# base.debugmsg(9, "scriptlist[r]:", base.mscriptlist[r])
-		#
-		# self.plan_scnro_chngd = True
-		#
-		# if not base.args.nogui and base.keeprunning:
-		# 	try:
-		# 		# self.pln_update_graph()
-		# 		t = threading.Thread(target=self.pln_update_graph)
-		# 		t.start()
-		# 	except Exception:
-		# 		pass
+		if not base.args.nogui and base.keeprunning:
+			# if 0 in self.scriptgrid.grid_slaves:
+			base.debugmsg(9, "grid_slaves:", self.mscriptgrid.grid_slaves(column=self.mtrngcoltst, row=r))
+			if len(self.scriptgrid.grid_slaves(column=self.mtrngcoltst, row=r)) > 0:
+				tol = self.scriptgrid.grid_slaves(column=self.mtrngcoltst, row=r)[0]
+				base.debugmsg(9, "sr_test_validate: tol:", tol)
+
+		v = None
+		if len(args) > 1 and len(args[1]) > 1:
+			v = args[1]
+			base.debugmsg(5, "v:", v)
+			if not base.args.nogui:
+				if "TestVar" in base.mscriptlist[r]:
+					base.mscriptlist[r]["TestVar"].set(v)
+			base.mscriptlist[r]["Test"] = v
+		else:
+			if not base.args.nogui:
+				base.debugmsg(5, "else")
+				if "TestVar" in base.mscriptlist[r]:
+					base.debugmsg(5, "mscriptlist[r][TestVar].get():", base.mscriptlist[r]["TestVar"].get())
+					base.mscriptlist[r]["Test"] = base.mscriptlist[r]["TestVar"].get()
+
+		base.debugmsg(5, "mscriptlist[r]:", base.mscriptlist[r])
+
+		self.plan_scnro_chngd = True
+
+		return True
+
+	def msr_test_genlist(self, r):
+		base.debugmsg(5, "Script File:", base.mscriptlist[r]["Script"])
+		tcsection = False
+		tclist = [""]
+		# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
+		# regex = r"^\*+[\s]*(Test Case|Task)"
+		regex = r"^\*{3}([^\*]*)\*{3}"
+		with open(base.mscriptlist[r]["Script"], 'r', encoding="utf8") as f:
+			for line in f:
+				base.debugmsg(5, "tcsection:", tcsection, "	line:", line)
+				if tcsection and line[0:3] == "***":
+					tcsection = False
+				m = re.search(regex, line, re.IGNORECASE)
+				if m and base.is_testcases_section(m.group(1).strip()):
+					base.debugmsg(5, "re.search(", regex, ",", line, ")", re.search(regex, line, re.IGNORECASE))
+					tcsection = True
+				if tcsection:
+					if line[0:1] not in ('\t', ' ', '*', '#', '\n', '\r'):
+						base.debugmsg(9, "", line[0:1], "")
+						tclist.append(line[0:-1])
+		base.debugmsg(8, tclist)
+		if not base.args.nogui:
+			tol = self.mscriptgrid.grid_slaves(column=self.mtrngcoltst, row=r)[0]
+			base.debugmsg(5, "tol: ", tol)
+			tol.set_menu(*tclist)
+
+	def msr_remove_row(self, r):
+		base.debugmsg(5, "msr_remove_row:", r)
+		base.debugmsg(5, self.mscriptgrid)
+		relmts = self.mscriptgrid.grid_slaves(row=r, column=None)
+		base.debugmsg(5, "relmts:", relmts)
+		for elmt in relmts:
+			elmt.destroy()
+		base.mscriptlist[r] = {}
+		base.debugmsg(5, "base.mscriptlist:", base.mscriptlist)
+
+		# update scrollbars
+		self.mscriptgrid.update_idletasks()
+		self.sm_canvas.config(scrollregion=self.sm_canvas.bbox("all"))
+
 		return True
 
 	def msr_row_settings(self, r):
@@ -8679,7 +8711,7 @@ class RFSwarmGUI(tk.Frame):
 		stgsWindow.lblAF.grid(column=0, row=row, sticky="nsew")
 
 		icontext = "AddRow"
-		stgsWindow.btnAddFil = ttk.Button(stgsWindow, image=self.imgdata[icontext], text="+", command=lambda: self.sr_row_settings_addf(r, stgsWindow), width=1)
+		stgsWindow.btnAddFil = ttk.Button(stgsWindow, image=self.imgdata[icontext], text="+", command=lambda: self.msr_row_settings_addf(r, stgsWindow), width=1)
 		stgsWindow.btnAddFil.grid(column=9, row=row, sticky="news")
 
 		row += 1
@@ -8700,7 +8732,7 @@ class RFSwarmGUI(tk.Frame):
 		stgsWindow.rowconfigure(row, weight=1)
 
 		row += 1
-		btnSave = ttk.Button(stgsWindow, text="Save", command=lambda: self.sr_row_settings_save(r, stgsWindow))
+		btnSave = ttk.Button(stgsWindow, text="Save", command=lambda: self.msr_row_settings_save(r, stgsWindow))
 		btnSave.grid(column=6, row=row, sticky="nsew")
 
 		btnCancel = ttk.Button(stgsWindow, text="Cancel", command=stgsWindow.destroy)
@@ -8849,7 +8881,7 @@ class RFSwarmGUI(tk.Frame):
 				del base.mscriptlist[r]["filters"]
 			self.plan_scnro_chngd = True
 
-		base.debugmsg(7, "base.mscriptlist[r]:", base.mscriptlist[r])
+		base.debugmsg(5, "base.mscriptlist[r]:", base.mscriptlist[r])
 
 		stgsWindow.destroy()
 
@@ -8873,7 +8905,7 @@ class RFSwarmGUI(tk.Frame):
 		omfo.grid(column=1, row=fid, sticky="nsew")
 
 		icontext = "Delete"
-		stgsWindow.btnRemFil = ttk.Button(stgsWindow.fmeFilters, image=self.imgdata[icontext], text="X", command=lambda: self.sr_row_settings_remf(fid, stgsWindow), width=1)
+		stgsWindow.btnRemFil = ttk.Button(stgsWindow.fmeFilters, image=self.imgdata[icontext], text="X", command=lambda: self.msr_row_settings_remf(fid, stgsWindow), width=1)
 		stgsWindow.btnRemFil.grid(column=9, row=fid, sticky="nsew")
 
 		if len(args) > 0:
@@ -8893,7 +8925,6 @@ class RFSwarmGUI(tk.Frame):
 		del stgsWindow.Filters[r]
 
 		stgsWindow.update_idletasks()
-
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
