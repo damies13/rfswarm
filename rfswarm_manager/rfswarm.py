@@ -3499,7 +3499,12 @@ class RFSwarmCore:
 				base.debugmsg(5, "base.gui.delayed_UpdateRunStats")
 				ut = threading.Thread(target=base.gui.delayed_UpdateRunStats)
 				ut.start()
-				base.gui.tabs.select(1)
+				base.debugmsg(9, "base.gui.tabs.tabs()", base.gui.tabs.tabs())
+				base.debugmsg(8, "base.gui.tabids", base.gui.tabids)
+				base.debugmsg(7, "base.gui.tabids['Run']", base.gui.tabids['Run'])
+				# self.tabids['Run']
+				# base.gui.tabs.select(2)
+				base.gui.tabs.select(base.gui.tabids['Run'])
 
 			# wait till db has been opened
 			while base.run_name != base.run_name_current:
@@ -4062,6 +4067,7 @@ class RFSwarmGUI(tk.Frame):
 
 	# GUI = None
 	tabs = None
+	tabids = {}
 
 	pln_graph_update = False
 	pln_graph = None
@@ -4345,8 +4351,10 @@ class RFSwarmGUI(tk.Frame):
 
 	def BuildUI(self):
 		p = None
+		m = None
 		r = None
 		a = None
+		tabcount = 0
 
 		self.columnconfigure(0, weight=1)
 		self.rowconfigure(0, weight=1)
@@ -4367,30 +4375,41 @@ class RFSwarmGUI(tk.Frame):
 		p.grid(row=0, column=0, sticky="nsew")
 		# p.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
 		self.tabs.add(p, text='Plan')
+		self.tabids['Plan'] = tabcount
+		tabcount += 1
 
 		base.debugmsg(6, "m")
 		m = ttk.Frame(self.tabs)   # first page, which would get widgets gridded into it
 		m.grid(row=0, column=0, sticky="nsew")
 		# p.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
 		self.tabs.add(m, text='Monitoring')
+		self.tabids['Monitoring'] = tabcount
+		tabcount += 1
 
 		base.debugmsg(6, "r")
 		r = ttk.Frame(self.tabs)   # second page
 		r.grid(row=0, column=0, sticky="nsew")
 		self.tabs.add(r, text='Run')
+		self.tabids['Run'] = tabcount
+		tabcount += 1
 
 		base.debugmsg(6, "a")
 		a = ttk.Frame(self.tabs)   # 3rd page
 		a.grid(row=0, column=0, sticky="nsew")
 		self.tabs.add(a, text='Agents')
+		self.tabids['Agents'] = tabcount
+		tabcount += 1
 
 		base.debugmsg(6, "ab")
 		ab = ttk.Frame(self.tabs)   # About page
 		ab.grid(row=0, column=0, sticky="nsew")
 		self.tabs.add(ab, text='About')
+		self.tabids['About'] = tabcount
+		tabcount += 1
 
 		self.tabs.grid(column=0, row=0, sticky="nsew")
 		# self.tabs.grid(column=0, row=0, padx=0, pady=0, sticky="nsew")
+		base.debugmsg(6, "self.tabids", self.tabids)
 
 		self.ConfigureStyle()
 
@@ -8131,6 +8150,56 @@ class RFSwarmGUI(tk.Frame):
 		self.BuildPlanButtonBar(bbar)
 
 		mtrngrow += 1
+
+		ctlbar = tk.Frame(m)
+		ctlbar.grid(column=0, row=mtrngrow, sticky="nsew")
+
+		ctlrow = 0
+		ctlcol = 0
+
+		# spacelbl = ttk.Label(ctlbar, text="")
+		# spacelbl.grid(column=ctlcol, row=ctlrow, sticky="nsew")
+		# ctlbar.columnconfigure(ctlcol, weight=1)
+		#
+		# ctlcol += 1
+
+		beforetxt = "Start monitoring before test by: "
+		b4lbl = ttk.Label(ctlbar, text=beforetxt)
+		b4lbl.grid(column=ctlcol, row=ctlrow, sticky="nsew")
+		# ctlbar.columnconfigure(ctlcol, weight=0)
+
+		ctlcol += 1
+
+		b4inp = ttk.Entry(ctlbar, justify="right")
+		b4inp.grid(column=ctlcol, row=ctlrow, sticky="nsew")
+		# ctlbar.columnconfigure(ctlcol, weight=0)
+
+		ctlcol += 1
+
+		spacelbl = ttk.Label(ctlbar, text=" ")
+		spacelbl.grid(column=ctlcol, row=ctlrow, sticky="nsew")
+		# ctlbar.columnconfigure(ctlcol, weight=1)
+
+		ctlcol += 1
+
+		aftertxt = "Continue monitoring after test for: "
+		aftlbl = ttk.Label(ctlbar, text=aftertxt)
+		aftlbl.grid(column=ctlcol, row=ctlrow, sticky="nsew")
+		# ctlbar.columnconfigure(ctlcol, weight=0)
+
+		ctlcol += 1
+
+		aftinp = ttk.Entry(ctlbar, justify="right")
+		aftinp.grid(column=ctlcol, row=ctlrow, sticky="nsew")
+		# ctlbar.columnconfigure(ctlcol, weight=0)
+
+		ctlcol += 1
+
+		spacelbl = ttk.Label(ctlbar, text="")
+		spacelbl.grid(column=ctlcol, row=ctlrow, sticky="nsew")
+		ctlbar.columnconfigure(ctlcol, weight=1)
+
+		mtrngrow += 1
 		# p.columnconfigure(0, weight=1)
 		m.rowconfigure(mtrngrow, weight=1)
 		# Plan scripts
@@ -8260,8 +8329,6 @@ class RFSwarmGUI(tk.Frame):
 		mscrf.config(command=lambda: self.msr_file_validate(row))
 		mscrf.grid(column=1, row=0, sticky="nsew")
 		mfgf.columnconfigure(mscrf, weight=0)
-
-		srow = "row{}".format(row)
 
 		base.mscriptlist[row]["TestVar"] = tk.StringVar(value=base.mscriptlist[row]["Test"], name="mrow{}".format(row))
 		base.mscriptlist[row]["TestVar"].trace("w", self.msr_test_validate)
