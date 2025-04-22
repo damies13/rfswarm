@@ -474,6 +474,8 @@ class RFSwarmBase:
 	scriptgrpend: Any = {}
 	scriptdefaults: Any = {}
 
+	mtimebefore = 0
+	mtimeafter = 0
 	mscriptcount = 0
 	mscriptlist: Any = [{}]
 	mscriptfiles: Any = {}
@@ -1861,7 +1863,7 @@ class RFSwarmBase:
 		elif isinstance(value, str):
 			return value.replace('%', '%%')
 		else:
-			return value
+			return str(value)
 
 	def saveini(self):
 		self.debugmsg(6, "save_ini:", self.save_ini)
@@ -2686,6 +2688,8 @@ class RFSwarmCore:
 		base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
 		base.debugmsg(5, "BuildCorePlan")
 		self.BuildCorePlan()
+		base.debugmsg(5, "BuildCoreMonitoring")
+		self.BuildCoreMonitoring()
 		base.debugmsg(5, "BuildCoreRun")
 		self.BuildCoreRun()
 
@@ -3266,6 +3270,16 @@ class RFSwarmCore:
 			if "uploadmode" in filedata["Scenario"]:
 				base.uploadmode = filedata['Scenario']['uploadmode']
 
+			if "monitortimebefore" in filedata["Scenario"]:
+				base.mtimebefore = int(filedata['Scenario']['monitortimebefore'])
+				base.debugmsg(5, "base.mtimebefore:", base.mtimebefore)
+				self.msr_delayb4_validate("OpenFile", base.mtimebefore)
+
+			if "monitortimeafter" in filedata["Scenario"]:
+				base.mtimeafter = int(filedata['Scenario']['monitortimeafter'])
+				base.debugmsg(5, "base.mtimeafter:", base.mtimeafter)
+				self.msr_delayaft_validate("OpenFile", base.mtimeafter)
+
 		else:
 			base.debugmsg(1, "File contains no scenario:", ScenarioFile)
 			base.config['Plan']['ScenarioFile'] = ""
@@ -3576,6 +3590,27 @@ class RFSwarmCore:
 
 		# warnings.append("Debuging : Don't Run")
 		return warnings
+
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+	#
+	# Monitoring
+	#
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+	def BuildCoreMonitoring(self):
+		base.debugmsg(5, "RFSwarmCore: BuildCoreMonitoring")
+
+	def msr_delayb4_validate(self, *args):
+		base.debugmsg(5, "args", args)
+		if not base.args.nogui:
+			base.gui.msr_delayb4_validate(*args)
+		return True
+
+	def msr_delayaft_validate(self, *args):
+		base.debugmsg(5, "args", args)
+		if not base.args.nogui:
+			base.gui.msr_delayaft_validate(*args)
+		return True
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -4067,7 +4102,8 @@ class RFSwarmGUI(tk.Frame):
 
 	# GUI = None
 	tabs = None
-	tabids = {}
+	# tabids: Any = {}
+	tabids: dict[str, int] = {}
 
 	pln_graph_update = False
 	pln_graph = None
@@ -8131,16 +8167,13 @@ class RFSwarmGUI(tk.Frame):
 
 	def BuildMonitoring(self, m):
 
-		base.debugmsg(6, "config")
-
-		base.debugmsg(6, "updateTitle")
-		self.updateTitle()
+		base.debugmsg(5, "BuildMonitoring Start")
 
 		mtrngrow = 0
 		m.columnconfigure(mtrngrow, weight=1)
 		m.rowconfigure(mtrngrow, weight=0)  # weight=0 means don't resize with other grid rows / keep a fixed size
 		# Button Bar
-		base.debugmsg(6, "Button Bar")
+		base.debugmsg(5, "Button Bar")
 
 		bbar = tk.Frame(m)
 		bbar.grid(column=0, row=mtrngrow, sticky="nsew")
@@ -8163,16 +8196,21 @@ class RFSwarmGUI(tk.Frame):
 		#
 		# ctlcol += 1
 
-		beforetxt = "Start monitoring before test by: "
+		beforetxt = "Monitoring time before test: "
 		b4lbl = ttk.Label(ctlbar, text=beforetxt)
 		b4lbl.grid(column=ctlcol, row=ctlrow, sticky="nsew")
 		# ctlbar.columnconfigure(ctlcol, weight=0)
 
 		ctlcol += 1
 
-		b4inp = ttk.Entry(ctlbar, justify="right")
-		b4inp.grid(column=ctlcol, row=ctlrow, sticky="nsew")
+		num = 0
+		num = base.mtimebefore
+		self.b4dly = ttk.Entry(ctlbar, width=8, justify="right", validate="focusout")
+		self.b4dly.config(validatecommand=self.msr_delayb4_validate)
+		self.b4dly.grid(column=ctlcol, row=ctlrow, sticky="nsew")
 		# ctlbar.columnconfigure(ctlcol, weight=0)
+		self.b4dly.insert(0, base.sec2hms(num))
+		base.debugmsg(9, "b4dly:", self.b4dly)
 
 		ctlcol += 1
 
@@ -8182,16 +8220,21 @@ class RFSwarmGUI(tk.Frame):
 
 		ctlcol += 1
 
-		aftertxt = "Continue monitoring after test for: "
+		aftertxt = "Monitoring time after test: "
 		aftlbl = ttk.Label(ctlbar, text=aftertxt)
 		aftlbl.grid(column=ctlcol, row=ctlrow, sticky="nsew")
 		# ctlbar.columnconfigure(ctlcol, weight=0)
 
 		ctlcol += 1
 
-		aftinp = ttk.Entry(ctlbar, justify="right")
-		aftinp.grid(column=ctlcol, row=ctlrow, sticky="nsew")
+		num = 0
+		num = base.mtimeafter
+		self.aftdly = ttk.Entry(ctlbar, width=8, justify="right", validate="focusout")
+		self.aftdly.config(validatecommand=self.msr_delayaft_validate)
+		self.aftdly.grid(column=ctlcol, row=ctlrow, sticky="nsew")
 		# ctlbar.columnconfigure(ctlcol, weight=0)
+		self.aftdly.insert(0, base.sec2hms(num))
+		base.debugmsg(9, "aftdly:", self.aftdly)
 
 		ctlcol += 1
 
@@ -8276,6 +8319,45 @@ class RFSwarmGUI(tk.Frame):
 
 		# base.updateplanthread = threading.Thread(target=self.UpdatePlanDisplay)
 		# base.updateplanthread.start()
+		base.debugmsg(5, "BuildMonitoring End")
+
+	def msr_delayb4_validate(self, *args):
+		base.debugmsg(5, "args:", args)
+		if len(args)>1:
+			dly = args[1]
+		else:
+			dly = self.b4dly.get()
+		idly = base.hms2sec(dly)
+		self.b4dly.delete(0, 'end')
+		self.b4dly.insert(0, base.sec2hms(idly))
+		base.debugmsg(5, "idly:", idly, "Delay:", dly)
+		if idly > 0:
+			base.mtimebefore = idly
+			self.plan_scnro_chngd = True
+		else:
+			base.mtimebefore = 0
+			self.plan_scnro_chngd = True
+
+		return True
+
+	def msr_delayaft_validate(self, *args):
+		base.debugmsg(5, "args:", args)
+		if len(args)>1:
+			dly = args[1]
+		else:
+			dly = self.aftdly.get()
+		idly = base.hms2sec(dly)
+		self.aftdly.delete(0, 'end')
+		self.aftdly.insert(0, base.sec2hms(idly))
+		base.debugmsg(5, "idly:", idly, "Delay:", dly)
+		if idly > 0:
+			base.mtimeafter = idly
+			self.plan_scnro_chngd = True
+		else:
+			base.mtimeafter = 0
+			self.plan_scnro_chngd = True
+
+		return True
 
 	def addMScriptRow(self, *args):
 		row = base.mscriptcount
@@ -9817,6 +9899,11 @@ class RFSwarmGUI(tk.Frame):
 							base.debugmsg(8, "filedata[", scriptidx, "][", key, "]:", filedata[scriptidx][key])
 
 			filedata['Scenario']['ScriptCount'] = base.inisafevalue(scriptidx)
+
+			# Save Monitoring
+
+			filedata['Scenario']['MonitorTimeBefore'] = base.inisafevalue(base.mtimebefore)
+			filedata['Scenario']['MonitorTimeAfter'] = base.inisafevalue(base.mtimeafter)
 
 			# Save graphs
 
