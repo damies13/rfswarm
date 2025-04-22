@@ -8323,7 +8323,7 @@ class RFSwarmGUI(tk.Frame):
 
 	def msr_delayb4_validate(self, *args):
 		base.debugmsg(5, "args:", args)
-		if len(args)>1:
+		if len(args) > 1:
 			dly = args[1]
 		else:
 			dly = self.b4dly.get()
@@ -8342,7 +8342,7 @@ class RFSwarmGUI(tk.Frame):
 
 	def msr_delayaft_validate(self, *args):
 		base.debugmsg(5, "args:", args)
-		if len(args)>1:
+		if len(args) > 1:
 			dly = args[1]
 		else:
 			dly = self.aftdly.get()
