@@ -1,0 +1,27 @@
+[Scenario]
+uploadmode = err
+scriptcount = 2
+graphlist = 
+
+[Script Defaults]
+resultnamemode = kywrd
+testrepeater = True
+disablelogreport = True
+excludelibraries = BuiltIn,String,OperatingSystem,perftest,requests
+
+[1]
+robots = 20
+delay = 0
+rampup = 1800
+run = 7200
+test = Test Scenario 1
+script = AppTests.robot
+
+[2]
+robots = 10
+delay = 0
+rampup = 1800
+run = 7200
+test = Test Scenario 2
+script = AppTests.robot
+
