@@ -1024,6 +1024,38 @@ Change Line Colour
 	...    Close GUI 		AND
 	...    Remove File 		${resultfile}
 
+Change Font
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #148
+	VAR 	${test_data} 	${CURDIR}${/}testdata${/}Issue-#148
+	VAR 	${result_dir} 	${test_data}${/}20240823_134721_example
+	VAR 	${result_db} 	${result_dir}${/}20240823_134721_example.db
+	VAR 	${template_dir} 	${test_data}${/}font_test.template
 
+	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
+	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
+	Wait For Status 	PreviewLoaded
+	Sleep 	3
+	Click Tab 	Preview
+
+	Take A Screenshot
+
+	Click Section 	Note
+	Sleep 	5
+	Take A Screenshot
+
+	Click Section	TestResultSummary
+	Sleep 	5
+	Take A Screenshot
+
+	Click Section 	DataGraph
+	Sleep 	5
+	Take A Screenshot
+
+	Click Section 	Errors
+	Sleep 	5
+	Take A Screenshot
+
+	[Teardown] 	Run Keywords
+	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
 #
