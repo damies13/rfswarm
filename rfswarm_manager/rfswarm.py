@@ -4329,7 +4329,6 @@ class RFSwarmCore:
 			base.gui.msr_test_validate(*args)
 		return True
 
-
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
 	# End class RFSwarmCore
@@ -7762,10 +7761,9 @@ class RFSwarmGUI(tk.Frame):
 				base.debugmsg(5, "base.config[Plan][ScriptDir]:", base.config['Plan']['ScriptDir'])
 
 				retfile = tkf.askopenfilename(
-						initialdir=base.config['Plan']['ScriptDir'],
-						title="Select Robot Framework File",
-						filetypes=(("Robot Framework", "*.robot"), ("all files", "*.*"))
-					)
+					initialdir=base.config['Plan']['ScriptDir'],
+					title="Select Robot Framework File",
+					filetypes=(("Robot Framework", "*.robot"), ("all files", "*.*")) )
 				base.debugmsg(5, "retfile:", retfile)
 				if len(retfile) > 0:
 					scriptfile = str(retfile)
@@ -8698,10 +8696,9 @@ class RFSwarmGUI(tk.Frame):
 				base.debugmsg(5, "base.config[Plan][ScriptDir]:", base.config['Plan']['ScriptDir'])
 
 				retfile = tkf.askopenfilename(
-						initialdir=base.config['Plan']['ScriptDir'],
-						title="Select Robot Framework File",
-						filetypes=(("Robot Framework", "*.robot"), ("all files", "*.*"))
-					)
+					initialdir=base.config['Plan']['ScriptDir'],
+					title="Select Robot Framework File",
+					filetypes=(("Robot Framework", "*.robot"), ("all files", "*.*")) )
 				base.debugmsg(5, "retfile:", retfile)
 				if len(retfile) > 0:
 					scriptfile = str(retfile)
