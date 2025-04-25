@@ -8701,7 +8701,7 @@ class RFSwarmGUI(tk.Frame):
 					initialdir=base.config['Plan']['ScriptDir'],
 					title="Select Robot Framework File",
 					filetypes=(("Robot Framework", "*.robot"), ("all files", "*.*"))
-					)
+				)
 				base.debugmsg(5, "retfile:", retfile)
 				if len(retfile) > 0:
 					scriptfile = str(retfile)
