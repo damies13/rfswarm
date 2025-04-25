@@ -3272,6 +3272,7 @@ class RFSwarmCore:
 		base.debugmsg(6, "filedata: ", filedata)
 
 		scriptcount = 0
+		monitorcount = 0
 		graphlist = []
 		if "Scenario" in filedata:
 			base.debugmsg(6, "Scenario:", filedata["Scenario"])
