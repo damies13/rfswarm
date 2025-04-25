@@ -3635,6 +3635,7 @@ class RFSwarmCore:
 		# before we start any robots we need to make sure the assigned robot counts are zero
 		for nxtagent in base.Agents.keys():
 			base.Agents[nxtagent]["AssignedRobots"] = 0
+			base.Agents[nxtagent]["AssignedMRobots"] = 0
 
 		base.run_abort = False
 		base.run_start = 0
@@ -3651,6 +3652,7 @@ class RFSwarmCore:
 			# report warnings and stop test from running
 			base.run_abort = False
 			base.run_end = int(time.time()) - 1
+			base.plan_end = int(time.time()) - 1
 			base.run_finish = int(time.time()) - 1
 
 			for warning in warnings:
@@ -3734,24 +3736,47 @@ class RFSwarmCore:
 			base.debugmsg(5, "grp", grp)
 			if "Index" in grp.keys():
 				if "Robots" not in grp.keys() or grp["Robots"] < 1:
-					warnings.append("Index {} has no Robots.".format(grp["Index"]))
+					warnings.append("Plan Index {} has no Robots.".format(grp["Index"]))
 
 				# RampUp	< 10
 				if "RampUp" not in grp.keys() or grp["RampUp"] < 10:
-					warnings.append("Index {} Ramp Up is < 10 sec.".format(grp["Index"]))
+					warnings.append("Plan Index {} Ramp Up is < 10 sec.".format(grp["Index"]))
 
 				if "Run" not in grp.keys() or grp["Run"] < 10:
-					warnings.append("Index {} Run is < 10 sec.".format(grp["Index"]))
+					warnings.append("Plan Index {} Run is < 10 sec.".format(grp["Index"]))
 
 				if "Script" not in grp.keys() or len(grp["Script"]) < 1:
-					warnings.append("Index {} has no Script.".format(grp["Index"]))
+					warnings.append("Plan Index {} has no Script.".format(grp["Index"]))
 				else:
 					# ScriptHash
 					if "ScriptHash" not in grp.keys() or len(grp["ScriptHash"]) < 1:
-						warnings.append("Index {} Agents don't have Script yet.".format(grp["Index"]))
+						warnings.append("Plan Index {} Agents don't have Script yet.".format(grp["Index"]))
 
 				if "Test" not in grp.keys() or len(grp["Test"]) < 1:
-					warnings.append("Index {} has no Test.".format(grp["Index"]))
+					warnings.append("Plan Index {} has no Test.".format(grp["Index"]))
+
+				grp_plan_end = int(time.time()) + base.mtimebefore + grp['Delay'] + grp["RampUp"] + grp['Run'] + grp["RampUp"]
+				# mtimebefore = 0
+				# mtimeafter = 0
+				if grp_plan_end > base.plan_end:
+					base.plan_end = grp_plan_end
+
+		base.debugmsg(5, "mscriptlist:", base.mscriptlist)
+		for grp in base.mscriptlist:
+			base.debugmsg(5, "grp", grp)
+			if "Index" in grp.keys():
+				if "Robots" not in grp.keys() or grp["Robots"] < 1:
+					warnings.append("Monitoring Index {} has no Robots.".format(grp["Index"]))
+
+				if "Script" not in grp.keys() or len(grp["Script"]) < 1:
+					warnings.append("Monitoring Index {} has no Script.".format(grp["Index"]))
+				else:
+					# ScriptHash
+					if "ScriptHash" not in grp.keys() or len(grp["ScriptHash"]) < 1:
+						warnings.append("Monitoring Index {} Agents don't have Script yet.".format(grp["Index"]))
+
+				if "Test" not in grp.keys() or len(grp["Test"]) < 1:
+					warnings.append("Monitoring Index {} has no Test.".format(grp["Index"]))
 
 		# warnings.append("Debuging : Don't Run")
 		return warnings
