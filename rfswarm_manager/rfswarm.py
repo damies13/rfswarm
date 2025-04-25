@@ -7763,7 +7763,8 @@ class RFSwarmGUI(tk.Frame):
 				retfile = tkf.askopenfilename(
 					initialdir=base.config['Plan']['ScriptDir'],
 					title="Select Robot Framework File",
-					filetypes=(("Robot Framework", "*.robot"), ("all files", "*.*")) )
+					filetypes=(("Robot Framework", "*.robot"), ("all files", "*.*"))
+				)
 				base.debugmsg(5, "retfile:", retfile)
 				if len(retfile) > 0:
 					scriptfile = str(retfile)
@@ -8698,7 +8699,8 @@ class RFSwarmGUI(tk.Frame):
 				retfile = tkf.askopenfilename(
 					initialdir=base.config['Plan']['ScriptDir'],
 					title="Select Robot Framework File",
-					filetypes=(("Robot Framework", "*.robot"), ("all files", "*.*")) )
+					filetypes=(("Robot Framework", "*.robot"), ("all files", "*.*"))
+					)
 				base.debugmsg(5, "retfile:", retfile)
 				if len(retfile) > 0:
 					scriptfile = str(retfile)
