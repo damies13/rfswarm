@@ -3,13 +3,14 @@ uploadmode = err
 scriptcount = 2
 monitortimebefore = 30
 monitortimeafter = 90
+monitorcount = 5
 graphlist = 
 
 [Script Defaults]
 resultnamemode = kywrd
 testrepeater = True
 disablelogreport = True
-excludelibraries = BuiltIn,String,OperatingSystem,perftest,requests
+excludelibraries = BuiltIn,String,OperatingSystem,perftest,requestslibrary,fakerlibrary
 
 [1]
 robots = 20
@@ -26,4 +27,50 @@ rampup = 1800
 run = 7200
 test = Test Scenario 2
 script = AppTests.robot
+
+[m1]
+robots = 1
+delay = 0
+rampup = 0
+run = 0
+test = Simulated Web Server 1
+script = monitoring.robot
+filters = [{'rule': 'Require', 'optn': 'RobotFramework: Library: requests'}]
+
+[m2]
+robots = 1
+delay = 0
+rampup = 0
+run = 0
+test = Simulated Web Server 2
+script = monitoring.robot
+disablelogreport = False
+
+[m3]
+robots = 1
+delay = 0
+rampup = 0
+run = 0
+test = Simulated Web Server 3
+script = monitoring.robot
+resultnamemode = dflt
+filters = [{'rule': 'Exclude', 'optn': 'OS: System: Linux'}]
+
+[m4]
+robots = 1
+delay = 0
+rampup = 0
+run = 0
+test = Simulated DB Server 1
+script = monitoring.robot
+testrepeater = False
+
+[m5]
+robots = 1
+delay = 0
+rampup = 0
+run = 0
+test = Simulated DB Server 2
+script = monitoring.robot
+testrepeater = False
 
