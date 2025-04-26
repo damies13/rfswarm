@@ -3147,7 +3147,6 @@ class RFSwarmCore:
 		if "Monitor" not in agentdata.keys():
 			agentdata["Monitor"] = 0
 
-
 		agentdata["LastSeen"] = int(time.time())
 		if "Status" not in agentdata.keys():
 			agentdata["Status"] = "Unknown"
