@@ -499,6 +499,8 @@ class RFSwarmBase:
 	run_starttime = 0
 	run_start = 0
 	run_end = 0
+	plan_end = 0
+	mon_end = 0
 	run_finish = 0
 	run_paused = False
 	run_threads: Any = {}
@@ -2031,7 +2033,7 @@ class RFSwarmBase:
 
 		base.mscriptlist.append({})
 
-		base.mscriptlist[row]["Index"] = base.mscriptcount
+		base.mscriptlist[row]["Index"] = f"m{base.mscriptcount}"
 
 		num = "1"
 		base.mscriptlist[row]["Robots"] = int(num)
@@ -3128,13 +3130,23 @@ class RFSwarmCore:
 
 	def register_agent(self, agentdata):
 		base.debugmsg(7, "agentdata:", agentdata)
+		agentname = agentdata["AgentName"]
 
-		base.add_scriptfilter("Agent: {}".format(agentdata["AgentName"]))
+		base.add_scriptfilter("Agent: {}".format(agentname))
 
 		AssignedRobots = 0
-		if agentdata["AgentName"] in base.Agents and "AssignedRobots" in base.Agents[agentdata["AgentName"]]:
-			AssignedRobots = base.Agents[agentdata["AgentName"]]["AssignedRobots"]
+		if agentname in base.Agents and "AssignedRobots" in base.Agents[agentname]:
+			AssignedRobots = base.Agents[agentname]["AssignedRobots"]
 		agentdata["AssignedRobots"] = AssignedRobots
+
+		AssignedMRobots = 0
+		if agentname in base.Agents and "AssignedMRobots" in base.Agents[agentname]:
+			AssignedMRobots = base.Agents[agentname]["AssignedMRobots"]
+		agentdata["AssignedMRobots"] = AssignedMRobots
+
+		if "Monitor" not in agentdata.keys():
+			agentdata["Monitor"] = 0
+
 
 		agentdata["LastSeen"] = int(time.time())
 		if "Status" not in agentdata.keys():
@@ -3640,6 +3652,8 @@ class RFSwarmCore:
 		base.run_abort = False
 		base.run_start = 0
 		base.run_end = 0
+		base.plan_end = 0
+		base.mon_end = 0
 		base.run_finish = 0
 		base.posttest = False
 		base.run_paused = False
@@ -3653,6 +3667,7 @@ class RFSwarmCore:
 			base.run_abort = False
 			base.run_end = int(time.time()) - 1
 			base.plan_end = int(time.time()) - 1
+			base.mon_end = int(time.time()) - 1
 			base.run_finish = int(time.time()) - 1
 
 			for warning in warnings:
@@ -3662,7 +3677,9 @@ class RFSwarmCore:
 
 		sec2st = base.run_starttime - int(time.time())
 		if sec2st < 1:
-			starttime = int(time.time())
+			mstarttime = int(time.time())
+			mendtime = base.mon_end - mstarttime
+			starttime = mstarttime + base.mtimebefore
 			datafiletime = datetime.now().strftime("%Y%m%d_%H%M%S")
 			if len(base.config['Plan']['ScenarioFile']) > 0:
 				filename = os.path.basename(base.config['Plan']['ScenarioFile'])
@@ -3672,11 +3689,13 @@ class RFSwarmCore:
 				base.run_name = "{}_{}".format(datafiletime, "Scenario")
 			base.debugmsg(5, "base.run_name:", base.run_name)
 
+			# give some time (10ms) to create the db before starting monitoring
+			time.sleep(1)
 			base.debugmsg(5, "core.run_start_threads")
 			t = threading.Thread(target=core.run_start_threads)
 			t.start()
 			if not base.args.nogui:
-				time.sleep(1)
+				time.sleep(0.1)
 				base.debugmsg(5, "base.gui.delayed_UpdateRunStats")
 				ut = threading.Thread(target=base.gui.delayed_UpdateRunStats)
 				ut.start()
@@ -3723,6 +3742,28 @@ class RFSwarmCore:
 					base.save_metrics("Run_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['Run'], base.srvdisphost)
 					base.save_metrics(grp['Index'], "Scenario_Run", starttime, grp['Test'], grp['Run'], base.srvdisphost)
 
+			for grp in base.mscriptlist:
+				base.debugmsg(5, "grp", grp)
+				if "Test" in grp.keys() and len(grp["Test"]) > 0:
+					base.debugmsg(5, "grp[Index]", grp['Index'])
+					base.save_metrics("Local_Path_{}".format(grp['Index']), "Scenario", mstarttime, grp['Script'], grp['Test'], base.srvdisphost)
+
+					relpath = base.get_relative_path(base.config['Plan']['ScenarioFile'], grp['Script'])
+					base.save_metrics("Test_{}".format(grp['Index']), "Scenario", mstarttime, relpath, grp['Test'], base.srvdisphost)
+					base.save_metrics(grp['Index'], "Scenario_Test", mstarttime, relpath, grp['Test'], base.srvdisphost)
+
+					base.save_metrics("Robots_{}".format(grp['Index']), "Scenario", mstarttime, grp['Test'], grp['Robots'], base.srvdisphost)
+					base.save_metrics(grp['Index'], "Scenario_Robots", mstarttime, grp['Test'], grp['Robots'], base.srvdisphost)
+
+					base.save_metrics("Delay_{}".format(grp['Index']), "Scenario", mstarttime, grp['Test'], grp['Delay'], base.srvdisphost)
+					base.save_metrics(grp['Index'], "Scenario_Delay", mstarttime, grp['Test'], grp['Delay'], base.srvdisphost)
+
+					base.save_metrics("Ramp_Up_{}".format(grp['Index']), "Scenario", mstarttime, grp['Test'], grp['RampUp'], base.srvdisphost)
+					base.save_metrics(grp['Index'], "Scenario_Ramp_Up", mstarttime, grp['Test'], grp['RampUp'], base.srvdisphost)
+
+					base.save_metrics("Run_{}".format(grp['Index']), "Scenario", mstarttime, grp['Test'], mendtime, base.srvdisphost)
+					base.save_metrics(grp['Index'], "Scenario_Run", mstarttime, grp['Test'], mendtime, base.srvdisphost)
+
 	def Pre_Run_Checks(self, _event=None):
 		warnings = []
 
@@ -3760,6 +3801,8 @@ class RFSwarmCore:
 				# mtimeafter = 0
 				if grp_plan_end > base.plan_end:
 					base.plan_end = grp_plan_end
+					base.debugmsg(5, "base.plan_end:", base.plan_end)
+					base.mon_end = base.plan_end + base.mtimeafter
 
 		base.debugmsg(5, "mscriptlist:", base.mscriptlist)
 		for grp in base.mscriptlist:
@@ -3834,6 +3877,159 @@ class RFSwarmCore:
 		totrbts = 0
 		currbts = 0
 
+		# Start Monitoring robots
+		base.debugmsg(5, "base.mscriptlist:", base.mscriptlist)
+		for grp in base.mscriptlist:
+			if "Test" in grp.keys() and len(grp["Test"]) > 0:
+				base.debugmsg(5, "grp:", grp)
+				nxtagent = None
+				agentwarn = False
+				while nxtagent is None:
+					if 'filters' in grp:
+						nxtagent = base.get_next_agent(grp['filters'])
+						base.debugmsg(7, '(filters) next_agent:', nxtagent)
+					else:
+						nxtagent = base.get_next_agent([])
+						base.debugmsg(9, '(filters else) next_agent:', nxtagent)
+					base.debugmsg(5, '(Monitoring) next_agent:', nxtagent)
+					if nxtagent is None:
+						base.debugmsg(7, 'next_agent is None !!!')
+						agentwarn = True
+						# MsgBox = tkm.askyesno('Save Scenario','Do you want to save the current scenario?')
+						if not base.args.nogui and not base.run_paused:
+							base.debugmsg(7, 'base.args.nogui:', base.args.nogui, "base.run_paused:", base.run_paused)
+							tkm.showwarning("RFSwarm - Warning", "Not enough Agents available to run Monitoring Robots!\n\nTest run is paused, please add agents to continue or click stop to abort.")
+							# tkm.showinfo("RFSwarm - Warning", "Not enough Agents available to run Robots! Test run is paused, please add agents to continue or click stop to abort.")
+							base.debugmsg(7, 'base.args.nogui:', base.args.nogui, "base.run_paused:", base.run_paused)
+
+						base.debugmsg(5, 'Not enough Agents available to run Robots! (Monitoring)')
+						base.debugmsg(0, 'Not enough Agents available to run Monitoring Robots!')
+						time.sleep(10)
+					elif agentwarn:
+						agentwarn = False
+						if not base.args.nogui:
+							tkm.showinfo("RFSwarm - Info", "Enough Agents available to run Monitoring Robots, test will now resume.")
+						base.debugmsg(0, 'Enough Agents available to run Monitoring Robots, resuming.')
+				# now we have agent for monitoring rorbot assign robobt
+
+				if base.run_start < 1:
+					base.run_start = int(time.time())  # time now
+					base.robot_schedule = base.robot_schedule_template
+					base.robot_schedule["RunName"] = base.run_name
+					base.robot_schedule["Agents"] = {}
+					base.robot_schedule["Scripts"] = {}
+					base.robot_schedule["Start"] = base.run_start
+
+					if not base.args.nogui:
+						stm = time.localtime(base.robot_schedule["Start"])
+						base.gui.display_run['start_time'].set("  {}  ".format(time.strftime("%H:%M:%S", stm)))
+
+				gid = grp["Index"]
+				base.debugmsg(5, "gid", gid, " 	robot_schedule[Scripts].keys()", base.robot_schedule["Scripts"].keys())
+				if gid not in base.robot_schedule["Scripts"].keys():
+					base.robot_schedule["Scripts"][gid] = {}
+
+				nxtuid = 1
+				uid = nxtuid
+				grurid = "{}_{}_{}".format(gid, uid, int(time.time()))
+				base.debugmsg(9, 'uid', uid)
+				base.robot_schedule["Scripts"][gid][uid] = grurid
+
+				if nxtagent not in base.robot_schedule["Agents"].keys():
+					base.robot_schedule["Agents"][nxtagent] = {}
+
+				base.robot_schedule["Agents"][nxtagent][grurid] = {
+					"ScriptHash": grp["ScriptHash"],
+					"Test": grp["Test"],
+					"StartTime": int(time.time()),
+					"EndTime": base.mon_end,
+					"id": grurid
+				}
+
+				if "resultnamemode" in grp:
+					base.robot_schedule["Agents"][nxtagent][grurid]["resultnamemode"] = grp["resultnamemode"]
+				else:
+					if "resultnamemode" in base.scriptdefaults:
+						base.robot_schedule["Agents"][nxtagent][grurid]["resultnamemode"] = base.scriptdefaults["resultnamemode"]
+					else:
+						base.robot_schedule["Agents"][nxtagent][grurid]["resultnamemode"] = base.resultnamemodedefault
+
+				if "excludelibraries" in grp:
+					base.robot_schedule["Agents"][nxtagent][grurid]["excludelibraries"] = grp["excludelibraries"]
+				else:
+					if "excludelibraries" in base.scriptdefaults:
+						base.robot_schedule["Agents"][nxtagent][grurid]["excludelibraries"] = base.scriptdefaults["excludelibraries"]
+					else:
+						base.robot_schedule["Agents"][nxtagent][grurid]["excludelibraries"] = base.excludelibrariesdefault
+
+				if "robotoptions" in grp:
+					base.robot_schedule["Agents"][nxtagent][grurid]["robotoptions"] = grp["robotoptions"]
+				else:
+					if "robotoptions" in base.scriptdefaults:
+						base.robot_schedule["Agents"][nxtagent][grurid]["robotoptions"] = base.scriptdefaults["robotoptions"]
+
+				tr = base.testrepeaterdefault
+				if "testrepeater" in base.scriptdefaults:
+					tr = base.scriptdefaults["testrepeater"]
+				if "testrepeater" in grp:
+					tr = grp["testrepeater"]
+				base.robot_schedule["Agents"][nxtagent][grurid]["testrepeater"] = str(tr)
+
+				# injectsleepenableddefault = False
+				ise = base.injectsleepenableddefault
+				if "injectsleepenabled" in base.scriptdefaults:
+					ise = base.scriptdefaults["injectsleepenabled"]
+				if "injectsleepenabled" in grp:
+					ise = grp["injectsleepenabled"]
+				base.robot_schedule["Agents"][nxtagent][grurid]["injectsleepenabled"] = str(ise)
+				if base.str2bool(ise):
+					# injectsleepminimumdefault = 15
+					ismn = base.injectsleepminimumdefault
+					if "injectsleepminimum" in base.scriptdefaults:
+						ismn = base.scriptdefaults["injectsleepminimum"]
+					if "injectsleepminimum" in grp:
+						ismn = grp["injectsleepminimum"]
+					base.robot_schedule["Agents"][nxtagent][grurid]["injectsleepminimum"] = str(ismn)
+					# injectsleepmaximumdefault = 45
+					ismx = base.injectsleepmaximumdefault
+					if "injectsleepmaximum" in base.scriptdefaults:
+						ismx = base.scriptdefaults["injectsleepmaximum"]
+					if "injectsleepmaximum" in grp:
+						ismx = grp["injectsleepmaximum"]
+					base.robot_schedule["Agents"][nxtagent][grurid]["injectsleepmaximum"] = str(ismx)
+
+				# disableloglogdefault = False
+				dll = base.disableloglogdefault
+				if "disableloglog" in base.scriptdefaults:
+					dll = base.scriptdefaults["disableloglog"]
+				if "disableloglog" in grp:
+					dll = grp["disableloglog"]
+				base.robot_schedule["Agents"][nxtagent][grurid]["disableloglog"] = str(dll)
+				# disablelogreportdefault = False
+				dlr = base.disablelogreportdefault
+				if "disablelogreport" in base.scriptdefaults:
+					dlr = base.scriptdefaults["disablelogreport"]
+				if "disablelogreport" in grp:
+					dlr = grp["disablelogreport"]
+				base.robot_schedule["Agents"][nxtagent][grurid]["disablelogreport"] = str(dlr)
+				# disablelogoutputdefault = False
+				dlo = base.disablelogoutputdefault
+				if "disablelogoutput" in base.scriptdefaults:
+					dlo = base.scriptdefaults["disablelogoutput"]
+				if "disablelogoutput" in grp:
+					dlo = grp["disablelogoutput"]
+				base.robot_schedule["Agents"][nxtagent][grurid]["disablelogoutput"] = str(dlo)
+
+				base.Agents[nxtagent]["AssignedMRobots"] += 1
+				base.debugmsg(5, "base.Agents[", nxtagent, "][AssignedMRobots]:", base.Agents[nxtagent]["AssignedMRobots"])
+
+				# currbts += 1
+				# base.debugmsg(2, "Robot:", currbts, "	Test:", grp["Test"], "	Assigned to:", nxtagent)
+				base.debugmsg(2, "Monitoring Robot:", " Test:", grp["Test"], "	Assigned to:", nxtagent)
+
+				# base.debugmsg(9, "robot_schedule", base.robot_schedule)
+
+		# Start Plan robots
 		base.debugmsg(8, "base.scriptlist:", base.scriptlist)
 		for grp in base.scriptlist:
 			if "Robots" in grp:
@@ -3910,7 +4106,7 @@ class RFSwarmCore:
 									stm = time.localtime(base.robot_schedule["Start"])
 									base.gui.display_run['start_time'].set("  {}  ".format(time.strftime("%H:%M:%S", stm)))
 
-								base.run_end = base.run_start + grp["Delay"] + grp["RampUp"] + grp["Run"]
+								base.run_end = base.run_start + base.mtimebefore + grp["Delay"] + grp["RampUp"] + grp["Run"]
 								base.debugmsg(9, grp['Index'], " 	run_start:", base.run_start, " 	Delay:", grp["Delay"], " 	RampUp:", grp["RampUp"], " 	Run:", grp["Run"], " 	run_end:", base.run_end)
 								base.robot_schedule["End"] = base.run_end
 
@@ -3925,25 +4121,28 @@ class RFSwarmCore:
 								base.debugmsg(9, "totrbts", totrbts)
 
 							if gid not in base.scriptgrpend.keys() or base.scriptgrpend[gid] < base.run_start:
-								base.scriptgrpend[gid] = base.run_start + grp["Delay"] + grp["RampUp"] + grp["Run"]
-								base.debugmsg(9, "gid:", gid, " 	run_start:", base.run_start, " 	Delay:", grp["Delay"], " 	RampUp:", grp["RampUp"], " 	Run:", grp["Run"], " 	run_end:", base.run_end)
+								base.scriptgrpend[gid] = base.run_start + base.mtimebefore + grp["Delay"] + grp["RampUp"] + grp["Run"]
+								base.debugmsg(9, "gid:", gid, " 	run_start:", base.run_start, "	base.mtimebefore:", base.mtimebefore, " 	Delay:", grp["Delay"], " 	RampUp:", grp["RampUp"], " 	Run:", grp["Run"], " 	run_end:", base.run_end)
 								if base.scriptgrpend[gid] > base.run_end:
 									base.run_end = base.scriptgrpend[gid]
 
 							time_elapsed = int(time.time()) - base.run_start
-							base.debugmsg(9, 'time_elapsed', time_elapsed, "Delay", grp["Delay"])
-							if time_elapsed > grp["Delay"] - 1:
+							base.debugmsg(9, 'time_elapsed', time_elapsed, " Monitoring Delay", base.mtimebefore, " Delay", grp["Delay"])
+							if time_elapsed > (base.mtimebefore + grp["Delay"]) - 1:
 								uid = 0
 								nxtuid = len(base.robot_schedule["Scripts"][gid]) + 1
 								base.debugmsg(9, 'nxtuid', nxtuid)
 								# Determine if we should start another user?
 								if nxtuid < grp["Robots"] + 1:
 									if grp["RampUp"] > 0:
-										rupct = (time_elapsed - grp["Delay"]) / grp["RampUp"]
+										rupct = (time_elapsed - (base.mtimebefore + grp["Delay"])) / grp["RampUp"]
+										# base.mtimebefore
+										# rupct - Ramp-up percent
 									else:
 										rupct = 1
 									base.debugmsg(9, 'rupct', rupct)
-									ruusr = int(grp["Robots"] * rupct)
+									# ruusr - Ramp-up user
+									ruusr = int(grp["Robots"] * rupct) + 1
 									base.debugmsg(9, 'nxtuid', nxtuid, 'ruusr', ruusr)
 									if nxtuid < ruusr + 1:
 										uid = nxtuid
@@ -9793,38 +9992,58 @@ class RFSwarmGUI(tk.Frame):
 
 			base.debugmsg(6, "Column Headings")
 
+			hcol = 0
 			usr = ttk.Label(self.agenttgrid, text="  Status  ", borderwidth=2, relief="raised")
-			usr.grid(column=0, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			usr = ttk.Label(self.agenttgrid, text="  Agent  ", borderwidth=2, relief="raised")
-			usr.grid(column=2, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			usr = ttk.Label(self.agenttgrid, text="  Last Seen  ", borderwidth=2, relief="raised")
-			usr.grid(column=4, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			usr = ttk.Label(self.agenttgrid, text="  Assigned  ", borderwidth=2, relief="raised")
-			usr.grid(column=5, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			usr = ttk.Label(self.agenttgrid, text="  Robots  ", borderwidth=2, relief="raised")
-			usr.grid(column=6, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
+
+			usr = ttk.Label(self.agenttgrid, text="  Monitor Assigned  ", borderwidth=2, relief="raised")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
+
+			usr = ttk.Label(self.agenttgrid, text="  Monitor  ", borderwidth=2, relief="raised")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			usr = ttk.Label(self.agenttgrid, text="  Load  ", borderwidth=2, relief="raised")
-			usr.grid(column=7, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			usr = ttk.Label(self.agenttgrid, text="  CPU %  ", borderwidth=2, relief="raised")
-			usr.grid(column=8, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			usr = ttk.Label(self.agenttgrid, text="  MEM %  ", borderwidth=2, relief="raised")
-			usr.grid(column=10, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			usr = ttk.Label(self.agenttgrid, text="  NET %  ", borderwidth=2, relief="raised")
-			usr.grid(column=12, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			usr = ttk.Label(self.agenttgrid, text="  Version  ", borderwidth=2, relief="raised")
-			usr.grid(column=13, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			usr = ttk.Label(self.agenttgrid, text="  Libraries  ", borderwidth=2, relief="raised")
-			usr.grid(column=15, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			# update scrollbars
 			self.agenttgrid.update_idletasks()
@@ -9838,6 +10057,7 @@ class RFSwarmGUI(tk.Frame):
 		rnum = 0
 		removeagents = []
 		robot_count = 0
+		minitor_count = 0
 		displayagent = True
 		base.debugmsg(6, "")
 
@@ -9878,6 +10098,11 @@ class RFSwarmGUI(tk.Frame):
 				if "AssignedRobots" not in self.display_agents[rnum]:
 					self.display_agents[rnum]["AssignedRobots"] = tk.StringVar()
 
+				if "AssignedMRobots" not in self.display_agents[rnum]:
+					self.display_agents[rnum]["AssignedMRobots"] = tk.StringVar()
+				if "Monitor" not in self.display_agents[rnum]:
+					self.display_agents[rnum]["Monitor"] = tk.StringVar()
+
 				if "Version" not in self.display_agents[rnum]:
 					self.display_agents[rnum]["Version"] = tk.StringVar()
 
@@ -9891,6 +10116,8 @@ class RFSwarmGUI(tk.Frame):
 				self.display_agents[rnum]["LastSeen"].set("  {}  ".format(dt.isoformat(sep=' ', timespec='seconds')))
 				self.display_agents[rnum]["AssignedRobots"].set("  {}  ".format(base.Agents[agnt]["AssignedRobots"]))
 				self.display_agents[rnum]["Robots"].set("  {}  ".format(base.Agents[agnt]["Robots"]))
+				self.display_agents[rnum]["AssignedMRobots"].set("  {}  ".format(base.Agents[agnt]["AssignedMRobots"]))
+				self.display_agents[rnum]["Monitor"].set("  {}  ".format(base.Agents[agnt]["Monitor"]))
 				self.display_agents[rnum]["LOAD%"].set("  {}  ".format(base.Agents[agnt]["LOAD%"]))
 				self.display_agents[rnum]["CPU%"].set("  {}  ".format(base.Agents[agnt]["CPU%"]))
 				self.display_agents[rnum]["MEM%"].set("  {}  ".format(base.Agents[agnt]["MEM%"]))
@@ -9903,9 +10130,10 @@ class RFSwarmGUI(tk.Frame):
 				if "Properties" in base.Agents[agnt] and "RobotFramework: Libraries" in base.Agents[agnt]["Properties"]:
 					self.display_agents[rnum]["Libraries"].set("  {}  ".format(base.Agents[agnt]["Properties"]["RobotFramework: Libraries"]))
 
-				base.debugmsg(9, "UpdateAgents: display_agents:", self.display_agents)
+				base.debugmsg(5, "UpdateAgents: display_agents:", self.display_agents)
 
 			robot_count += base.Agents[agnt]["Robots"]
+			minitor_count += base.Agents[agnt]["Monitor"]
 
 			grdrows = self.agenttgrid.grid_size()[1]
 			if grdrows > 0:
@@ -9941,38 +10169,61 @@ class RFSwarmGUI(tk.Frame):
 		# https://www.python-course.eu/tkinter_events_binds.php
 
 	def add_agent_row(self, rnum):
-		base.debugmsg(9, "add_row: rnum:", rnum)
-		base.debugmsg(9, "add_row: Status:", self.display_agents[rnum]["Status"])
+		base.debugmsg(5, "rnum:", rnum)
+		base.debugmsg(5, "Status:", self.display_agents[rnum]["Status"])
+
+		dcol = 0
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["Status"], borderwidth=2, relief="groove")
-		usr.grid(column=0, row=rnum, sticky="nsew")
-		base.debugmsg(9, "add_row: Agent:", self.display_agents[rnum]["Agent"])
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
+		base.debugmsg(5, "Agent:", self.display_agents[rnum]["Agent"])
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["Agent"], borderwidth=2, relief="groove")
-		usr.grid(column=2, row=rnum, sticky="nsew")
-		base.debugmsg(9, "add_row: LastSeen:", self.display_agents[rnum]["LastSeen"])
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
+		base.debugmsg(5, "LastSeen:", self.display_agents[rnum]["LastSeen"])
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["LastSeen"], borderwidth=2, relief="groove")
-		usr.grid(column=4, row=rnum, sticky="nsew")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["AssignedRobots"], borderwidth=2, relief="groove")
-		usr.grid(column=5, row=rnum, sticky="nsew")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
+		base.debugmsg(5, "Robots:", self.display_agents[rnum]["Robots"])
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["Robots"], borderwidth=2, relief="groove")
-		usr.grid(column=6, row=rnum, sticky="nsew")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
+		base.debugmsg(5, "AssignedMRobots:", self.display_agents[rnum]["AssignedMRobots"])
+		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["AssignedMRobots"], borderwidth=2, relief="groove")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
+		base.debugmsg(5, "Monitor:", self.display_agents[rnum]["Monitor"])
+		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["Monitor"], borderwidth=2, relief="groove")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["LOAD%"], borderwidth=2, relief="groove")
-		usr.grid(column=7, row=rnum, sticky="nsew")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["CPU%"], borderwidth=2, relief="groove")
-		usr.grid(column=8, row=rnum, sticky="nsew")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["MEM%"], borderwidth=2, relief="groove")
-		usr.grid(column=10, row=rnum, sticky="nsew")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["NET%"], borderwidth=2, relief="groove")
-		usr.grid(column=12, row=rnum, sticky="nsew")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
 
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["Version"], borderwidth=2, relief="groove")
-		usr.grid(column=13, row=rnum, sticky="nsew")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
 
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["Libraries"], borderwidth=2, relief="groove")
-		usr.grid(column=15, row=rnum, sticky="nsew")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
 
 		# update scrollbars
 		self.agenttgrid.update_idletasks()
 		self.ag_canvas.config(scrollregion=self.ag_canvas.bbox("all"))
+		base.debugmsg(5, "done: rnum:", rnum)
 
 	def UA_removerow(self, r):
 		relmts = self.agenttgrid.grid_slaves(row=r, column=None)
