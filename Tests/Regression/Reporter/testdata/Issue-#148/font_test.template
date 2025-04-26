@@ -1,5 +1,5 @@
 [Report]
-order = FD4775FA70C,FD47763734B,FD477088D4F,FD477690865,FD3729CF59E,FD4776B42A1
+order = FE084ACBCC8,FD47763734B,FD477088D4F,FD477690865,FD3729CF59E,FD4776B42A1
 title = #_TEST_TITLE_123
 timezone = Europe/Warsaw
 dateformat = yyyy-mm-dd
@@ -17,11 +17,11 @@ percentile = 90
 name = Test Result Summary
 parent = TOP
 type = table
-changed = 1744822167.7918737
+changed = 1745697418.3192227
 colours = 0
 datatype = ResultSummary
 col_result_name_show = 1
-col_minimum_show = 0
+col_minimum_show = 1
 col_average_show = 1
 col_90x37ile_show = 1
 col_maximum_show = 1
@@ -29,31 +29,27 @@ col_std_dev_show = 1
 col_pass_show = 1
 col_fail_show = 1
 col_other_show = 0
-sql = SELECT r.result_name as x91Result Namex93 , round(min(rp.elapsed_time),3) 'Minimum', round(avg(rp.elapsed_time),3) 'Average', round(percentile(rp.elapsed_time, 90),3) '90x37ile', round(max(rp.elapsed_time),3) 'Maximum', round(stdev(rp.elapsed_time),3) 'Std. Dev.', count(rp.result) as 'Pass', count(rf.result) as 'Fail', count(ro.result) as 'Other' FROM Results as r LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == 'PASS' LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == 'FAIL' LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' WHERE r.end_time >= 1724413641 AND r.end_time <= 1724413740 GROUP BY  r.result_name ORDER BY x91Result Namex93
-
-[FD4775FA70C]
-name = Note
-parent = TOP
-type = note
-changed = 1744822129.7691767
+sql = SELECT r.result_name as x91Result Namex93 , round(min(rp.elapsed_time),3) 'Minimum', round(avg(rp.elapsed_time),3) 'Average', round(percentile(rp.elapsed_time, 90),3) '90x37ile', round(max(rp.elapsed_time),3) 'Maximum', round(stdev(rp.elapsed_time),3) 'Std. Dev.', count(rp.result) as 'Pass', count(rf.result) as 'Fail', count(ro.result) as 'Other' FROM Results as r LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == 'PASS' LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == 'FAIL' LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' WHERE r.end_time >= 1743110280 AND r.end_time <= 1743110327 GROUP BY  r.result_name ORDER BY x91Result Namex93
+filteragent = 
+filtertype = None
 
 [FD47763734B]
 name = Table of Contents
 parent = TOP
 type = contents
-changed = 1744822129.769643
+changed = 1745697418.3182209
 
 [FD477690865]
 name = Filter TestResultSummary
 parent = TOP
 type = table
-changed = 1744822168.3143644
+changed = 1745697418.3202205
 colours = 0
 datatype = ResultSummary
-sql = SELECT r.result_name as x91Result Namex93 , round(min(rp.elapsed_time),3) 'Minimum', round(avg(rp.elapsed_time),3) 'Average', round(percentile(rp.elapsed_time, 90),3) '90x37ile', round(max(rp.elapsed_time),3) 'Maximum', round(stdev(rp.elapsed_time),3) 'Std. Dev.', count(rp.result) as 'Pass', count(rf.result) as 'Fail', count(ro.result) as 'Other' FROM Results as r LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == 'PASS' LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == 'FAIL' LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' WHERE x91Result Namex93 GLOB '__Lang_Sample__ Keyword' AND r.end_time >= 1724413641 AND r.end_time <= 1724413740 GROUP BY  r.result_name ORDER BY x91Result Namex93
+sql = SELECT r.result_name as x91Result Namex93 , round(min(rp.elapsed_time),3) 'Minimum', round(avg(rp.elapsed_time),3) 'Average', round(percentile(rp.elapsed_time, 90),3) '90x37ile', round(max(rp.elapsed_time),3) 'Maximum', round(stdev(rp.elapsed_time),3) 'Std. Dev.', count(rp.result) as 'Pass', count(rf.result) as 'Fail', count(ro.result) as 'Other' FROM Results as r LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == 'PASS' LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == 'FAIL' LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' WHERE r.end_time >= 1743110280 AND r.end_time <= 1743110327 GROUP BY  r.result_name ORDER BY x91Result Namex93
 filteragent = 
-filtertype = Wildcard (Unix Glob)
-filterpattern = __Lang_Sample__ Keyword
+filtertype = None
+filterpattern = 
 col_result_name_show = 1
 col_minimum_show = 1
 col_average_show = 1
@@ -69,40 +65,53 @@ enablefilteragent = 0
 name = Errors
 parent = TOP
 type = errors
-changed = 1744822169.0018883
+changed = 1745697418.3222203
 images = 1
 grouprn = 1
 groupet = 1
-sql = SELECT r.script_index || '_' || r.robot || '_' || r.iteration || '_' || r.sequence 'id' , r.result_name , r.script_index , r.robot , r.iteration , r.sequence , mt.SecondaryMetric 'script' , mt.MetricValue 'test_name' FROM Results r LEFT JOIN MetricData mt on mt.PrimaryMetric = r.script_index AND mt.MetricType = 'Scenario_Test' WHERE r.result = 'FAIL' AND r.end_time >= 1724413641 AND r.end_time <= 1724413740 ORDER BY x91idx93 ASC
+sql = SELECT r.script_index || '_' || r.robot || '_' || r.iteration || '_' || r.sequence 'id' , r.result_name , r.script_index , r.robot , r.iteration , r.sequence , mt.SecondaryMetric 'script' , mt.MetricValue 'test_name' FROM Results r LEFT JOIN MetricData mt on mt.PrimaryMetric = r.script_index AND mt.MetricType = 'Scenario_Test' WHERE r.result = 'FAIL' AND r.end_time >= 1743110280 AND r.end_time <= 1743110327 ORDER BY x91idx93 ASC
 
 [FD3729CF59E]
 name = Data Graph
 parent = TOP
 type = graph
-changed = 1744822129.7711437
+changed = 1745697418.3212197
 
 [FD3729CF59EL]
-changed = 1744822168.5227847
+changed = 1745696467.250385
 resulttype = Response Time
 filterresult = None
 filteragent = None
-datatype = Metric
-sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric || ' - ' || SecondaryMetric as x91Namex93  FROM MetricData WHERE MetricType == 'Summary' AND (PrimaryMetric GLOB '__Lang_Sample__ Keyword'OR SecondaryMetric GLOB '__Lang_Sample__ Keyword') AND MetricTime >= 1724413641 AND MetricTime <= 1724413740 ORDER BY MetricTime
+datatype = Plan
+sql = SELECT md1.* , md0.SecondaryMetric as x91Filex93 , fp0.SecondaryMetric as x91FilePathx93 FROM MetricData as md0 LEFT JOIN MetricData as fp0 ON fp0.MetricValue = md0.MetricValue AND fp0.MetricType = 'Scenario' AND fp0.PrimaryMetric like 'Local_Path_x37' LEFT JOIN MetricData as md1 ON md1.SecondaryMetric = md0.MetricValue AND md1.MetricType = 'Scenario' WHERE md0.MetricType = 'Scenario' AND md0.PrimaryMetric like 'Test_x37'
 filtertype = Wildcard (Unix Glob)
-filterpattern = __Lang_Sample__ Keyword
+filterpattern = 
 axisen = 1
 isnumeric = 0
-metrictype = Summary
+metrictype = rfswarm
+primarymetric = Manager
+showtotal = -1
 
 [FD3729CF59ER]
-changed = 1744822168.524361
+changed = 1745697433.7027535
 datatype = Metric
 axisen = 0
 isnumeric = 0
 filteragent = None
 filtertype = None
-sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric as x91Namex93  FROM MetricData WHERE MetricType == 'Scenario' AND SecondaryMetric == 'total_robots' AND MetricTime >= 1724413641 AND MetricTime <= 1724413740 ORDER BY MetricTime
+sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric as x91Namex93  FROM MetricData WHERE MetricType == 'Scenario' AND SecondaryMetric == 'total_robots' AND MetricTime >= 1743110280 AND MetricTime <= 1743110327 ORDER BY MetricTime
 metrictype = Scenario
 secondarymetric = total_robots
 filterpattern = 
+
+[FE084ACBCC8]
+name = Note
+parent = TOP
+type = note
+changed = 1745697418.3162193
+note = Test_Note 123 x35$x37x12
+
+[Colours]
+defcolours = x35000000,x35008450,x35B81D13,x35EFB700,x35888888,x358c60d4
+namecolours = total,pass,fail,warning,not run,example test case x:\programy\robot_framework\rfswarm\rfswarm_fork\venv\lib\site-packages\rfswarm_manager\example.robot
 

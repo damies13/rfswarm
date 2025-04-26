@@ -1028,8 +1028,8 @@ Change Font
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #148
 	[Setup] 	Change Reporter INI File Settings 	win_height 	600
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}Issue-#148
-	VAR 	${result_dir} 	${test_data}${/}20240823_134721_example
-	VAR 	${result_db} 	${result_dir}${/}20240823_134721_example.db
+	VAR 	${result_dir} 	${test_data}${/}20250327_221800_example
+	VAR 	${result_db} 	${result_dir}${/}20250327_221800_example.db
 	VAR 	${template_dir} 	${test_data}${/}font_test.template
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
