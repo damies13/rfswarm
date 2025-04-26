@@ -1026,6 +1026,7 @@ Change Line Colour
 
 Change Font
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #148
+	[Setup] 	Change Reporter INI File Settings 	win_height 	600
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}Issue-#148
 	VAR 	${result_dir} 	${test_data}${/}20240823_134721_example
 	VAR 	${result_db} 	${result_dir}${/}20240823_134721_example.db
@@ -1036,6 +1037,7 @@ Change Font
 	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
 	Wait For Status 	PreviewLoaded
 	Sleep 	3
+	Take A Screenshot
 	Click Tab 	Preview
 
 	Take A Screenshot
