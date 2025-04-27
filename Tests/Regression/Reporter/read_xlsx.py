@@ -101,13 +101,14 @@ def extract_image_from_xlsx_sheet(xlsx_path: str, sheet: str, cell_id: str, outp
 
 
 def get_font_name_from_xlsx_sheet(xlsx_path: str, sheet: str) -> str:
+    """"""
     wb = load_workbook(xlsx_path, keep_links=False)
-    sheet = wb.active
+    sheet_obj = wb[sheet]
 
     font_name = ''
-    for row in sheet.iter_rows():
+    for row in sheet_obj.iter_rows():
         for cell in row:
-            if cell.font and cell.value != None:
+            if cell.font and cell.value is not None:
                 if cell.font.name != font_name and font_name != '':
                     LOGGER.warn(f'Different fonts found in the sheet! font:{font_name}')
                 font_name = cell.font.name

@@ -1034,13 +1034,19 @@ Change Font
 	VAR 	${template_dir} 	${test_data}${/}font_test.template
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
+	IF 	"${platform}" == "ubuntu" # impact font is not available in ubuntu
+		VAR 	${font_name} 	msam10
+		Change Impact With ${font_name} In ${template_dir}
+	ELSE
+		VAR 	${font_name} 	Impact
+	END
 
-	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
+	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1 	--html 	--docx 	--xlsx
 	Wait For Status 	PreviewLoaded
 	Sleep 	3
 	Take A Screenshot
 	Click Tab 	Preview
-
+	Sleep 	5
 	Take A Screenshot
 
 	Click Section 	Note
@@ -1060,21 +1066,14 @@ Change Font
 	Take A Screenshot
 
 
-	Click Button	generateword
-	Sleep	2
-	Click Button	generateexcel
-	Sleep	2
-	Click Button	generatehtml
-	Sleep	2
-
-	Wait For Status 	SavedXHTMLReport
-
 	${docx_font} 	Get Default Font Name From Document 	${result_dir}${/}${result_name}.docx
+	Should Be Equal 	${docx_font} 	${font_name}
 
 	${xlsx_font} 	Get Font Name From Xlsx Sheet 	${result_dir}${/}${result_name}.xlsx 	Cover
+	Should Be Equal 	${xlsx_font} 	${font_name}
 
 	${html_content} 	Get File 	${result_dir}${/}${result_name}.html
-	Should Contain 	${html_content} 	font-family: "Impact"
+	Should Contain 	${html_content} 	font-family: "${font_name}"
 
 	[Teardown] 	Run Keywords
 	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}

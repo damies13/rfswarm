@@ -65,7 +65,7 @@ def get_default_font_name_from_document(docx_path: str) -> str:
         return default_style.font.name
     else:
         LOGGER.warn("Default font is not set.")
-        return None
+        return 'None'
 
 
 def extract_docx_images_under_heading(heading: str, docx_path: str, output_folder: str, debug=False) -> list:
@@ -231,6 +231,3 @@ def read_docx_file(docx_path: str, debug=False) -> dict:
             print(doc_data[k], end="\n\n\n")
 
     return doc_data
-
-t = get_default_font_name_from_document(r'X:\Programy\Robot_framework\rfswarm\rfswarm_fork\rfswarm\Tests\Regression\Reporter\testdata\Issue-#36_37_38\20230728_154253_Odoo-demo\20230728_154253_Odoo-demo.docx')
-print(t)
