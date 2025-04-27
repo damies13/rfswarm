@@ -505,6 +505,7 @@ class RFSwarmBase:
 	run_paused = False
 	run_threads: Any = {}
 	total_robots = 0
+	total_monitor = 0
 	robot_schedule_template = {"RunName": "", "Agents": {}, "Scripts": {}, "Start": 0}
 	robot_schedule = robot_schedule_template
 	envvars: Any = {}
@@ -3195,6 +3196,7 @@ class RFSwarmCore:
 		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "LastSeen", agentdata["LastSeen"], agentdata["AgentName"])
 		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "AssignedRobots", agentdata["AssignedRobots"], agentdata["AgentName"])
 		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "Robots", agentdata["Robots"], agentdata["AgentName"])
+		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "Monitor", agentdata["Monitor"], agentdata["AgentName"])
 		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "Load", agentdata["LOAD%"], agentdata["AgentName"])
 		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "CPU", agentdata["CPU%"], agentdata["AgentName"])
 		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "MEM", agentdata["MEM%"], agentdata["AgentName"])
@@ -3867,6 +3869,7 @@ class RFSwarmCore:
 			for agnt in base.robot_schedule["Agents"].keys():
 				for grurid in base.robot_schedule["Agents"][agnt].keys():
 					base.robot_schedule["Agents"][agnt][grurid]["EndTime"] = base.run_end
+			base.mon_end = base.run_end
 
 	def run_start_threads(self):
 
@@ -4388,6 +4391,7 @@ class RFSwarmCore:
 		uploadcount = 0
 		removeagents = []
 		robot_count = 0
+		monitor_count = 0
 		time_elapsed = int(time.time()) - base.agenttgridupdate
 		if time_elapsed >= 5:
 			base.debugmsg(6, "time_elapsed:", time_elapsed)
@@ -4413,16 +4417,36 @@ class RFSwarmCore:
 
 				if includerobots:
 					robot_count += base.Agents[agnt]["Robots"]
+					monitor_count += base.Agents[agnt]["Monitor"]
 
-			if base.total_robots > 0 and robot_count < 1:
+			if base.total_robots > 0 and robot_count < 1 and base.total_monitor > 0 and monitor_count < 1:
 				# run finished so clear run name
 				base.save_metrics(base.run_name, "Scenario", int(time.time()), "total_robots", robot_count, base.srvdisphost)
+				base.save_metrics(base.run_name, "Scenario", int(time.time()), "monitor_robots", monitor_count, base.srvdisphost)
 				base.save_metrics(base.run_name, "Scenario", int(time.time()), "End_Time", int(time.time()), base.srvdisphost)
 				base.save_metrics("Time", "Scenario", int(time.time()), "End", int(time.time()), base.srvdisphost)
 				base.run_name = ""
 				base.robot_schedule["RunName"] = base.run_name
 
+			# Update base.mon_end time on monitoring robot's jobs in the situations where:
+			# base.total_robots > 0 and time now + base.mtimeafter is greater than base.mon_end
+			# (Ensure we monitor long enough)
+			if base.total_robots > 0:
+				new_mon_end = int(time.time()) + base.mtimeafter
+				if new_mon_end > base.mon_end:
+					base.mon_end = new_mon_end
+					self.update_monitoring_jobs_mon_end()
+
+			# base.total_robots > 0 and robot_count < 1 and time now + base.mtimeafter is less than base.mon_end
+			# (Ensure we don't monitor too long)
+			if base.total_robots > 0 and robot_count < 1:
+				new_mon_end = int(time.time()) + base.mtimeafter
+				if new_mon_end < base.mon_end:
+					base.mon_end = new_mon_end
+					self.update_monitoring_jobs_mon_end()
+
 			base.total_robots = robot_count
+			base.total_monitor = monitor_count
 
 			for agnt in removeagents:
 				# this should prevent issue RuntimeError: dictionary changed size during iteration
@@ -4442,16 +4466,25 @@ class RFSwarmCore:
 			# Save Total Robots Metric
 			if len(base.run_name) > 0:
 				base.save_metrics(base.run_name, "Scenario", int(time.time()), "total_robots", base.total_robots, base.srvdisphost)
+				base.save_metrics(base.run_name, "Scenario", int(time.time()), "monitor_robots", base.total_monitor, base.srvdisphost)
 			else:
 				base.save_metrics("PreRun", "Scenario", int(time.time()), "total_robots", base.total_robots, base.srvdisphost)
+				base.save_metrics("PreRun", "Scenario", int(time.time()), "monitor_robots", base.total_monitor, base.srvdisphost)
 
 			# if base.args.run:
 			base.debugmsg(5, "base.args.run:", base.args.run, "	base.args.nogui:", base.args.nogui, "	run_end:", base.run_end, "	time:", int(time.time()))
 			base.debugmsg(5, "base.posttest:", base.posttest, "	total_robots:", base.total_robots)
+			base.debugmsg(5, "base.posttest:", base.posttest, "	total_monitor:", base.total_monitor)
 			base.debugmsg(5, "run_finish:", base.run_finish, "	time:", int(time.time()), "uploadcount:", uploadcount)
-			if base.run_end > 0 and base.run_end < int(time.time()) and base.total_robots < 1 and not base.posttest and base.run_finish < 1 and uploadcount < 1:
+			if base.run_end > 0\
+					and base.run_end < int(time.time())\
+					and base.total_robots < 1\
+					and base.total_monitor < 1\
+					and not base.posttest\
+					and base.run_finish < 1\
+					and uploadcount < 1:
 				base.run_finish = int(time.time())
-				base.debugmsg(5, "run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots)
+				base.debugmsg(5, "run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots, "	total_monitor", base.total_monitor)
 				# base.save_metrics(base.run_name, "Scenario", base.run_finish, "End_Time", base.run_finish, base.srvdisphost)
 				base.save_metrics("Time", "Scenario", base.run_finish, "Upload_Finished", base.run_finish, base.srvdisphost)
 
@@ -4552,6 +4585,15 @@ class RFSwarmCore:
 		if not base.args.nogui:
 			base.gui.msr_test_validate(*args)
 		return True
+
+	def update_monitoring_jobs_mon_end(self, *args):
+		base.debugmsg(5, "args:", args)
+		for agnt in base.robot_schedule["Agents"].keys():
+			for grurid in base.robot_schedule["Agents"][agnt].keys():
+				base.debugmsg(5, "grurid:", grurid)
+				if grurid[0] is "m":
+					base.debugmsg(5, "grurid:", grurid, "New EndTime", base.mon_end)
+					base.robot_schedule["Agents"][agnt][grurid]["EndTime"] = base.mon_end
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -9638,6 +9680,14 @@ class RFSwarmGUI(tk.Frame):
 		usr = ttk.Label(rgbar, textvariable=self.display_run['total_robots'])
 		usr.grid(column=26, row=2, sticky="nsew")
 
+		if "total_monitor" not in self.display_run:
+			self.display_run['total_monitor'] = tk.StringVar()
+			self.display_run['total_monitor'].set("  {}  ".format(base.total_monitor))
+		usr = ttk.Label(rgbar, text="  Monitor  ")
+		usr.grid(column=27, row=1, sticky="nsew")
+		usr = ttk.Label(rgbar, textvariable=self.display_run['total_monitor'])
+		usr.grid(column=27, row=2, sticky="nsew")
+
 		if "finish_time" not in self.display_run:
 			self.display_run['finish_time'] = tk.StringVar()
 			self.display_run['finish_time'].set("  --:--:--  ")
@@ -10144,6 +10194,14 @@ class RFSwarmGUI(tk.Frame):
 		self.display_run['total_robots'].set("  {}  ".format(base.total_robots))
 		base.debugmsg(9, "total_robots:", base.total_robots)
 		if base.total_robots > 0:
+			# etm = time.gmtime(int(time.time()) - base.robot_schedule["Start"])
+			etm = int(time.time()) - base.robot_schedule["Start"]
+			# self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
+			self.display_run['elapsed_time'].set("  {}  ".format(base.sec2hms(etm)))
+
+		self.display_run['total_monitor'].set("  {}  ".format(base.total_monitor))
+		base.debugmsg(9, "total_monitor:", base.total_monitor)
+		if base.total_monitor > 0:
 			# etm = time.gmtime(int(time.time()) - base.robot_schedule["Start"])
 			etm = int(time.time()) - base.robot_schedule["Start"]
 			# self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))

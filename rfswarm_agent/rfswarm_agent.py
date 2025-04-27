@@ -66,6 +66,7 @@ class RFSwarmAgent():
 	download_queue: Any = []
 	download_threads: Any = {}
 	robotcount = 0
+	monitorcount = 0
 	status = "Ready"
 	excludelibraries: Any = []
 	args = None
@@ -546,6 +547,7 @@ class RFSwarmAgent():
 				"isrunning:", self.isrunning,
 				"isstopping:", self.isstopping,
 				"robotcount:", self.robotcount,
+				"monitorcount:", self.monitorcount,
 				"\n"
 			)
 
@@ -658,6 +660,7 @@ class RFSwarmAgent():
 			"MEM%": dict(psutil.virtual_memory()._asdict())["percent"],
 			"NET%": self.netpct,
 			"Robots": self.robotcount,
+			"Monitor": self.monitorcount,
 			"Status": self.status,
 			"Properties": self.agentproperties,
 			"FileCount": len(list(self.scriptlist.keys()))
@@ -868,18 +871,19 @@ class RFSwarmAgent():
 				if key in self.download_threads:
 					del self.download_threads[key]
 			key = str(uuid.uuid4())
-			self.debugmsg(5, "key:", key)
+			self.debugmsg(6, "New download thread key:", key)
 			while hash in self.download_queue:
 				self.download_queue.remove(hash)
 			self.download_threads[key] = threading.Thread(target=self.getfile, args=(hash,))
 			self.download_threads[key].start()
 			time.sleep(0.02)
 		for key in list(self.download_threads.keys()):
-			self.debugmsg(5, "key:", key)
+			self.debugmsg(6, "download thread key:", key)
 			if key in self.download_threads and self.download_threads[key].is_alive():
 				self.download_threads[key].join()
 			if key in self.download_threads:
 				del self.download_threads[key]
+			self.debugmsg(6, "Finished download thread key:", key)
 		gc.collect()
 
 	def getfile(self, hash):
@@ -1022,7 +1026,7 @@ class RFSwarmAgent():
 
 				if int(time.time()) > jsonresp["EndTime"]:
 					self.isstopping = True
-				if self.isstopping and self.robotcount < 1:
+				if self.isstopping and self.robotcount < 1 and self.monitorcount < 1 :
 					self.jobs = {}
 					self.isrunning = False
 					self.isstopping = False
@@ -1100,13 +1104,16 @@ class RFSwarmAgent():
 		self.ensure_repeater_listner_file()
 
 		if "ScriptIndex" not in self.jobs[jobid]:
-			self.debugmsg(6, "runthread: jobid:", jobid)
-			self.debugmsg(6, "runthread: job data:", self.jobs[jobid])
+			self.debugmsg(5, "runthread: jobid:", jobid)
+			self.debugmsg(5, "runthread: job data:", self.jobs[jobid])
 			jobarr = jobid.split("_")
 			self.jobs[jobid]["ScriptIndex"] = jobarr[0]
 			self.jobs[jobid]["Robot"] = jobarr[1]
 			self.jobs[jobid]["Iteration"] = 0
-			self.debugmsg(6, "runthread: job data:", self.jobs[jobid])
+			self.jobs[jobid]["RobotType"] = "Plan"
+			if jobarr[0].lower()[0] is "m":
+				self.jobs[jobid]["RobotType"] = "Monitor"
+			self.debugmsg(5, "runthread: job data:", self.jobs[jobid])
 
 		self.jobs[jobid]["Iteration"] += 1
 
@@ -1228,6 +1235,7 @@ class RFSwarmAgent():
 		metavars.append("RFS_ITERATION:{}".format(self.jobs[jobid]["Iteration"]))
 		metavars.append("RFS_SWARMMANAGER:{}".format(self.swarmmanager))
 		metavars.append("RFS_EXCLUDELIBRARIES:{}".format(excludelibraries))
+		metavars.append("RFS_ROBOTTYPE:{}".format(self.jobs[jobid]["RobotType"]))
 
 		if "injectsleepenabled" in self.jobs[jobid]:
 			metavars.append("RFS_INJECTSLEEP:{}".format(self.jobs[jobid]["injectsleepenabled"]))
@@ -1301,7 +1309,11 @@ class RFSwarmAgent():
 		robotexe = shutil.which(robotcmd)
 		self.debugmsg(6, "runthread: robotexe:", robotexe)
 		if robotexe is not None:
-			self.robotcount += 1
+
+			if self.jobs[jobid]["RobotType"] in ["Monitor"]:
+				self.monitorcount += 1
+			else:
+				self.robotcount += 1
 
 			result = 0
 			try:
@@ -1350,7 +1362,11 @@ class RFSwarmAgent():
 			# Uplad any files found
 			self.queue_file_upload(uploadmode, result, odir)
 
-			self.robotcount += -1
+			if self.jobs[jobid]["RobotType"] in ["Monitor"]:
+				self.monitorcount += -1
+			else:
+				self.robotcount += -1
+
 		else:
 			self.debugmsg(1, "Could not find robot executeable:", robotexe)
 
