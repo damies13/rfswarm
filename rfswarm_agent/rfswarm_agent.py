@@ -1026,7 +1026,7 @@ class RFSwarmAgent():
 
 				if int(time.time()) > jsonresp["EndTime"]:
 					self.isstopping = True
-				if self.isstopping and self.robotcount < 1 and self.monitorcount < 1 :
+				if self.isstopping and self.robotcount < 1 and self.monitorcount < 1:
 					self.jobs = {}
 					self.isrunning = False
 					self.isstopping = False
@@ -1111,7 +1111,7 @@ class RFSwarmAgent():
 			self.jobs[jobid]["Robot"] = jobarr[1]
 			self.jobs[jobid]["Iteration"] = 0
 			self.jobs[jobid]["RobotType"] = "Plan"
-			if jobarr[0].lower()[0] is "m":
+			if jobarr[0].lower()[0] == "m":
 				self.jobs[jobid]["RobotType"] = "Monitor"
 			self.debugmsg(5, "runthread: job data:", self.jobs[jobid])
 

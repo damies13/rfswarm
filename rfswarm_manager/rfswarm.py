@@ -4477,12 +4477,13 @@ class RFSwarmCore:
 			base.debugmsg(5, "base.posttest:", base.posttest, "	total_monitor:", base.total_monitor)
 			base.debugmsg(5, "run_finish:", base.run_finish, "	time:", int(time.time()), "uploadcount:", uploadcount)
 			if base.run_end > 0\
-					and base.run_end < int(time.time())\
-					and base.total_robots < 1\
-					and base.total_monitor < 1\
-					and not base.posttest\
-					and base.run_finish < 1\
-					and uploadcount < 1:
+				and base.run_end < int(time.time())\
+				and base.total_robots < 1\
+				and base.total_monitor < 1\
+				and not base.posttest\
+				and base.run_finish < 1\
+				and uploadcount < 1:
+
 				base.run_finish = int(time.time())
 				base.debugmsg(5, "run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots, "	total_monitor", base.total_monitor)
 				# base.save_metrics(base.run_name, "Scenario", base.run_finish, "End_Time", base.run_finish, base.srvdisphost)
@@ -4591,7 +4592,7 @@ class RFSwarmCore:
 		for agnt in base.robot_schedule["Agents"].keys():
 			for grurid in base.robot_schedule["Agents"][agnt].keys():
 				base.debugmsg(5, "grurid:", grurid)
-				if grurid[0] is "m":
+				if grurid[0] == "m":
 					base.debugmsg(5, "grurid:", grurid, "New EndTime", base.mon_end)
 					base.robot_schedule["Agents"][agnt][grurid]["EndTime"] = base.mon_end
 
