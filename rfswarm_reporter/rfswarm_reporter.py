@@ -428,13 +428,13 @@ class ReporterBase:
 		#
 		# name = Scenario Detail
 		# parent = FB9082D01BC
-		plnt = self.report_new_section(plng, "Scenario Detail")
+		plnt = base.report_new_section(plng, "Scenario Detail")
 		# type = table
-		self.report_item_set_type(plnt, 'table')
+		base.report_item_set_type(plnt, 'table')
 		# colours = 1
-		self.rt_table_set_colours(plnt, 1)
+		base.rt_table_set_colours(plnt, 1)
 		# datatype = Plan
-		self.rt_table_set_dt(plnt, "Plan")
+		base.rt_table_set_dt(plnt, "Plan")
 		# col_index_show = 1
 		base.report_item_set_bool(plnt, base.rt_table_ini_colname("index Show"), 1)
 		# col_robots_show = 1
@@ -451,6 +451,29 @@ class ReporterBase:
 		base.report_item_set_value(plnt, base.rt_table_ini_colname("script Opt"), "File")
 		# col_test_show = 1
 		base.report_item_set_bool(plnt, base.rt_table_ini_colname("test Show"), 1)
+		#
+		# 	-	Monitoring Detail
+		#
+		# name = Monitoring Detail
+		mtrt = base.report_new_section(plng, "Monitoring Detail")
+		# type = table
+		base.report_item_set_type(mtrt, 'table')
+		# colours = 1
+		base.rt_table_set_colours(mtrt, 0)
+		# datatype = Monitoring
+		base.rt_table_set_dt(mtrt, "Monitoring")
+		# col_index_show = 1
+		base.report_item_set_bool(mtrt, base.rt_table_ini_colname("index Show"), 1)
+		# col_robots_show = 1
+		base.report_item_set_bool(mtrt, base.rt_table_ini_colname("robots Show"), 1)
+		# col_delay_show = 1
+		base.report_item_set_bool(mtrt, base.rt_table_ini_colname("run Show"), 1)
+		# col_script_show = 1
+		base.report_item_set_bool(mtrt, base.rt_table_ini_colname("script Show"), 1)
+		# col_script_opt = File
+		base.report_item_set_value(mtrt, base.rt_table_ini_colname("script Opt"), "File")
+		# col_test_show = 1
+		base.report_item_set_bool(mtrt, base.rt_table_ini_colname("test Show"), 1)
 
 		#
 		# 	Test Result Summary
@@ -1989,7 +2012,26 @@ class ReporterBase:
 			sql += "LEFT JOIN MetricData as md1 "
 			sql += "ON md1.SecondaryMetric = md0.MetricValue "
 			sql += "AND md1.MetricType = 'Scenario' "
-			sql += "WHERE md0.MetricType = 'Scenario' AND md0.PrimaryMetric like 'Test_%' "
+			sql += "WHERE md0.MetricType = 'Scenario' "
+			sql += "AND md0.PrimaryMetric like 'Test_%' "
+			sql += "AND md0.PrimaryMetric not like 'Test_m%' "
+
+		if DataType == "Monitoring":
+			sql = "SELECT "
+			sql += "md1.* "
+			sql += ", md0.SecondaryMetric as [File] "
+			sql += ", fp0.SecondaryMetric as [FilePath] "
+			# sql += ", concat(fp0.SecondaryMetric, " ", md0.MetricValue ) as [ColourKey] "
+			sql += "FROM MetricData as md0 "
+			sql += "LEFT JOIN MetricData as fp0 "
+			sql += "ON fp0.MetricValue = md0.MetricValue "
+			sql += "AND fp0.MetricType = 'Scenario' "
+			sql += "AND fp0.PrimaryMetric like 'Local_Path_%' "
+			sql += "LEFT JOIN MetricData as md1 "
+			sql += "ON md1.SecondaryMetric = md0.MetricValue "
+			sql += "AND md1.MetricType = 'Scenario' "
+			sql += "WHERE md0.MetricType = 'Scenario' "
+			sql += "AND md0.PrimaryMetric like 'Test_m%' "
 
 		base.debugmsg(5, "sql:", sql)
 		self.rt_graph_set_sql(id, sql)
@@ -2055,6 +2097,23 @@ class ReporterBase:
 		starttime = base.rt_setting_get_starttime(id)
 		endtime = base.rt_setting_get_endtime(id)
 
+		if DataType == "Monitoring":
+			sql = "SELECT "
+			sql += "md1.* "
+			sql += ", md0.SecondaryMetric as [File] "
+			sql += ", fp0.SecondaryMetric as [FilePath] "
+			# sql += ", concat(fp0.SecondaryMetric, " ", md0.MetricValue ) as [ColourKey] "
+			sql += "FROM MetricData as md0 "
+			sql += "LEFT JOIN MetricData as fp0 "
+			sql += "ON fp0.MetricValue = md0.MetricValue "
+			sql += "AND fp0.MetricType = 'Scenario' "
+			sql += "AND fp0.PrimaryMetric like 'Local_Path_%' "
+			sql += "LEFT JOIN MetricData as md1 "
+			sql += "ON md1.SecondaryMetric = md0.MetricValue "
+			sql += "AND md1.MetricType = 'Scenario' "
+			sql += "WHERE md0.MetricType = 'Scenario' "
+			sql += "AND md0.PrimaryMetric like 'Test_m%' "
+
 		if DataType == "Plan":
 			sql = "SELECT "
 			sql += "md1.* "
@@ -2069,7 +2128,9 @@ class ReporterBase:
 			sql += "LEFT JOIN MetricData as md1 "
 			sql += "ON md1.SecondaryMetric = md0.MetricValue "
 			sql += "AND md1.MetricType = 'Scenario' "
-			sql += "WHERE md0.MetricType = 'Scenario' AND md0.PrimaryMetric like 'Test_%' "
+			sql += "WHERE md0.MetricType = 'Scenario' "
+			sql += "AND md0.PrimaryMetric like 'Test_%' "
+			sql += "AND md0.PrimaryMetric not like 'Test_m%' "
 
 		if DataType == "Result":
 			RType = self.rt_table_get_rt(id)
@@ -2492,7 +2553,8 @@ class ReporterBase:
 
 	def rt_table_get_dt(self, id):
 		base.debugmsg(9, "id:", id)
-		if 'DataType' in base.report[id]:
+		# report_subsection_parent
+		if id in base.report and 'DataType' in base.report[id]:
 			return base.whitespace_get_ini_value(base.report[id]['DataType'])
 		else:
 			return None
@@ -3462,7 +3524,7 @@ class ReporterBase:
 		for index in data.keys():
 			base.debugmsg(5, "index:", index, data[index])
 
-			eventtime = data[index]["start"]
+			eventtime = int(data[index]["start"])
 			rowout = {}
 			rowout["Time"] = eventtime
 			rowout["Value"] = 0
@@ -3474,7 +3536,7 @@ class ReporterBase:
 			else:
 				totaldata[eventtime] = 0
 
-			eventtime += int(data[index]["delay"])
+			eventtime += int(data[index]["delay"]) + 0.001
 			rowout = {}
 			rowout["Time"] = eventtime
 			rowout["Value"] = 0
@@ -3511,7 +3573,121 @@ class ReporterBase:
 				totaldata[eventtime] = 0
 
 			# estimated rampdown
+			eventtime += int(data[index]["rampup"]) + 0.001
+			rowout = {}
+			rowout["Time"] = eventtime
+			rowout["Value"] = 0
+			rowout["Name"] = data[index]["colourkey"]
+			dataout.append(rowout)
+
+			if eventtime in totaldata:
+				totaldata[eventtime] += int(data[index]["robots"]) * -1
+			else:
+				totaldata[eventtime] = int(data[index]["robots"]) * -1
+
+		stot = base.report_item_get_int(id, "ShowTotal")
+
+		if stot > 0:
+			robots = 0
+			for key in totaldata.keys():
+				base.debugmsg(5, "key:", key, totaldata[key])
+				robots += totaldata[key]
+				rowout = {}
+				rowout["Time"] = key
+				rowout["Value"] = robots
+				rowout["Name"] = "Total"
+				dataout.append(rowout)
+
+		base.debugmsg(5, "dataout:", dataout)
+		return dataout
+
+	def graph_postprocess_data_monitoring(self, id, datain):
+		base.debugmsg(5, "datain:", datain)
+		# [
+		# 	{'PrimaryMetric': 'Delay_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '0', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Ramp_Up_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '20', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Robots_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '30', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Run_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '60', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'}
+		# ]
+		# 	 'Time' 	 'Value' 	 [Name]
+		dataout = []
+		data = {}
+		totaldata = {}
+		for rowin in datain:
+			base.debugmsg(5, "rowin:", rowin)
+			if 'PrimaryMetric' in rowin and "_" in rowin['PrimaryMetric']:
+				key, index = rowin['PrimaryMetric'].rsplit("_", 1)
+				base.debugmsg(5, "key:", key, "	index:", index)
+				if index not in data:
+					data[index] = {}
+				if key == "Delay":
+					data[index]["start"] = rowin['MetricTime']
+					data[index]["delay"] = rowin['MetricValue']
+					data[index]["colourkey"] = rowin['SecondaryMetric'] + " " + rowin['FilePath']
+
+				if key == "Ramp_Up":
+					data[index]["rampup"] = rowin['MetricValue']
+				if key == "Robots":
+					data[index]["robots"] = rowin['MetricValue']
+				if key == "Run":
+					data[index]["run"] = rowin['MetricValue']
+
+			else:
+				base.debugmsg(5, "Unexpected data in rowin:", rowin)
+
+		for index in data.keys():
+			base.debugmsg(5, "index:", index, data[index])
+
+			eventtime = int(data[index]["start"])
+			rowout = {}
+			rowout["Time"] = eventtime
+			rowout["Value"] = 0
+			rowout["Name"] = data[index]["colourkey"]
+			dataout.append(rowout)
+
+			if eventtime in totaldata:
+				totaldata[eventtime] += 0
+			else:
+				totaldata[eventtime] = 0
+
+			eventtime += int(data[index]["delay"]) + 0.001
+			rowout = {}
+			rowout["Time"] = eventtime
+			rowout["Value"] = 0
+			rowout["Name"] = data[index]["colourkey"]
+			dataout.append(rowout)
+
+			if eventtime in totaldata:
+				totaldata[eventtime] += 0
+			else:
+				totaldata[eventtime] = 0
+
 			eventtime += int(data[index]["rampup"])
+			rowout = {}
+			rowout["Time"] = eventtime
+			rowout["Value"] = int(data[index]["robots"])
+			rowout["Name"] = data[index]["colourkey"]
+			dataout.append(rowout)
+
+			if eventtime in totaldata:
+				totaldata[eventtime] += int(data[index]["robots"])
+			else:
+				totaldata[eventtime] = int(data[index]["robots"])
+
+			eventtime += int(data[index]["run"])
+			rowout = {}
+			rowout["Time"] = eventtime
+			rowout["Value"] = int(data[index]["robots"])
+			rowout["Name"] = data[index]["colourkey"]
+			dataout.append(rowout)
+
+			if eventtime in totaldata:
+				totaldata[eventtime] += 0
+			else:
+				totaldata[eventtime] = 0
+
+			# estimated rampdown
+			eventtime += int(data[index]["rampup"]) + 0.001
 			rowout = {}
 			rowout["Time"] = eventtime
 			rowout["Value"] = 0
@@ -3602,6 +3778,68 @@ class ReporterBase:
 		base.debugmsg(5, "dataout:", dataout)
 		return dataout
 
+	def table_postprocess_data_monitoring(self, id, datain):
+		base.debugmsg(5, "datain:", datain)
+		# [
+		# 	{'PrimaryMetric': 'Delay_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '0', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Ramp_Up_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '20', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Robots_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '30', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Run_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '60', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'}
+		# ]
+		# 	 Index		Robots		Delay  		RampUp 		Run		Script		Test	Settings
+		dataout = []
+		data = {}
+
+		scriptopt = base.report_item_get_value(id, base.rt_table_ini_colname("Script Opt"))
+		if scriptopt is None:
+			scriptopt = "File"
+
+		for rowin in datain:
+			base.debugmsg(5, "rowin:", rowin)
+			if 'PrimaryMetric' in rowin and "_" in rowin['PrimaryMetric']:
+				key, index = rowin['PrimaryMetric'].rsplit("_", 1)
+				base.debugmsg(5, "key:", key, "	index:", index)
+				if index not in data:
+					data[index] = {}
+				if key == "Delay":
+					data[index]["Index"] = index
+					data[index]["Delay"] = int(rowin['MetricValue'])
+					data[index]["Colour"] = rowin['SecondaryMetric'] + " " + rowin['FilePath']
+					data[index]["Script"] = rowin['File']
+					data[index]["ScriptPath"] = rowin['FilePath']
+					data[index]["Test"] = rowin['SecondaryMetric']
+
+				if key == "Ramp_Up":
+					data[index]["Ramp Up"] = int(rowin['MetricValue'])
+				if key == "Robots":
+					data[index]["Robots"] = int(rowin['MetricValue'])
+				if key == "Run":
+					data[index]["Run"] = int(rowin['MetricValue'])
+
+			else:
+				base.debugmsg(5, "Unexpected data in rowin:", rowin)
+
+		for index in data.keys():
+			base.debugmsg(5, "index:", index, data[index])
+
+			datarow = {}
+			# 	 Index		Robots		Delay  		RampUp 		Run		Script		Test	Settings
+			datarow["Colour"] = data[index]["Colour"]
+			datarow["Index"] = data[index]["Index"]
+			datarow["Robots"] = data[index]["Robots"]
+			# datarow["Delay"] = base.sec2hms(data[index]["Delay"])
+			# datarow["Ramp Up"] = base.sec2hms(data[index]["Ramp Up"])
+			datarow["Run"] = base.sec2hms(data[index]["Run"])
+			if scriptopt == "File":
+				datarow["Script"] = data[index]["Script"]
+			else:
+				datarow["Script"] = data[index]["ScriptPath"]
+			datarow["Test"] = data[index]["Test"]
+
+			dataout.append(datarow)
+
+		base.debugmsg(5, "dataout:", dataout)
+		return dataout
 
 class ReporterCore:
 
@@ -4601,6 +4839,9 @@ class ReporterCore:
 				if datatypel == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
 					gdata = base.graph_postprocess_data_plan(idl, gdata)
+				if datatypel == "Monitoring":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_monitoring(idl, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -4637,6 +4878,9 @@ class ReporterCore:
 				if datatyper == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
 					gdata = base.graph_postprocess_data_plan(idr, gdata)
+				if datatyper == "Monitoring":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_monitoring(idr, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -4757,6 +5001,9 @@ class ReporterCore:
 			if datatype == "Plan":
 				base.debugmsg(9, "tdata before:", tdata)
 				tdata = base.table_postprocess_data_plan(id, tdata)
+			if datatype == "Monitoring":
+				base.debugmsg(9, "tdata before:", tdata)
+				tdata = base.table_postprocess_data_monitoring(id, tdata)
 			base.debugmsg(9, "tdata:", tdata)
 
 			if len(tdata) > 0:
@@ -5457,6 +5704,9 @@ class ReporterCore:
 				if datatypel == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
 					gdata = base.graph_postprocess_data_plan(idl, gdata)
+				if datatypel == "Monitoring":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_monitoring(idl, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -5493,6 +5743,9 @@ class ReporterCore:
 				if datatyper == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
 					gdata = base.graph_postprocess_data_plan(idr, gdata)
+				if datatyper == "Monitoring":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_monitoring(idr, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -5620,6 +5873,9 @@ class ReporterCore:
 			if datatype == "Plan":
 				base.debugmsg(9, "tdata before:", tdata)
 				tdata = base.table_postprocess_data_plan(id, tdata)
+			if datatype == "Monitoring":
+				base.debugmsg(9, "tdata before:", tdata)
+				tdata = base.table_postprocess_data_monitoring(id, tdata)
 			base.debugmsg(8, "tdata:", tdata)
 
 			if len(tdata) > 0:
@@ -6572,6 +6828,9 @@ class ReporterCore:
 				if datatypel == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
 					gdata = base.graph_postprocess_data_plan(idl, gdata)
+				if datatypel == "Monitoring":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_monitoring(idl, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -6608,6 +6867,9 @@ class ReporterCore:
 				if datatyper == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
 					gdata = base.graph_postprocess_data_plan(idr, gdata)
+				if datatyper == "Monitoring":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_monitoring(idr, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -6735,6 +6997,9 @@ class ReporterCore:
 			if datatype == "Plan":
 				base.debugmsg(9, "tdata before:", tdata)
 				tdata = base.table_postprocess_data_plan(id, tdata)
+			if datatype == "Monitoring":
+				base.debugmsg(9, "tdata before:", tdata)
+				tdata = base.table_postprocess_data_monitoring(id, tdata)
 			base.debugmsg(8, "tdata:", tdata)
 
 			if len(tdata) > 0:
@@ -7237,6 +7502,8 @@ class ReporterGUI(tk.Frame):
 	b64: Any = {}
 	contentdata: Any = {}
 	t_preview: Any = {}
+
+	DataTypes = [None, "Metric", "Result", "ResultSummary", "Plan", "Monitoring", "SQL"]
 
 	titleprefix = "RFSwarm Reporter"
 
@@ -8655,9 +8922,8 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["LFrame"], text="Data Type:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
 
-		DataTypes = [None, "Metric", "Result", "ResultSummary", "Plan", "SQL"]
 		self.contentdata[id]["strDT"] = tk.StringVar()
-		self.contentdata[id]["omDT"] = ttk.OptionMenu(self.contentdata[id]["LFrame"], self.contentdata[id]["strDT"], command=self.cs_datatable_switchdt, *DataTypes)
+		self.contentdata[id]["omDT"] = ttk.OptionMenu(self.contentdata[id]["LFrame"], self.contentdata[id]["strDT"], command=self.cs_datatable_switchdt, *self.DataTypes)
 		self.contentdata[id]["strDT"].set(datatype)
 		self.contentdata[id]["omDT"].grid(column=1, row=rownum, sticky="nsew")
 
@@ -9227,7 +9493,7 @@ class ReporterGUI(tk.Frame):
 				sql = base.rt_table_generate_sql(id)
 				if len(sql.strip()) < 1:
 					return None
-				if datatype not in ["Plan"]:
+				if datatype not in ["Plan", "Monitoring"]:
 					sql += " LIMIT 1 "
 
 			base.debugmsg(5, "sql:", sql)
@@ -9248,6 +9514,9 @@ class ReporterGUI(tk.Frame):
 			if datatype == "Plan":
 				base.debugmsg(9, "tdata before:", tdata)
 				tdata = base.table_postprocess_data_plan(id, tdata)
+			if datatype == "Monitoring":
+				base.debugmsg(9, "tdata before:", tdata)
+				tdata = base.table_postprocess_data_monitoring(id, tdata)
 			base.debugmsg(8, "tdata:", tdata)
 
 			if len(tdata) > 0:
@@ -9322,7 +9591,7 @@ class ReporterGUI(tk.Frame):
 				self.contentdata[id]["renamecolumns"][f"{colname} Show"].set(base.report_item_get_bool_def1(id, base.rt_table_ini_colname(f"{colname} Show")))
 				base.debugmsg(5, "colnum:", colnum, "	rownum:", rownum)
 
-				if datatype == "Plan":
+				if datatype in ["Plan", "Monitoring"]:
 					if colname == "Script":
 						colnum += 1
 						optval = base.report_item_get_value(id, base.rt_table_ini_colname(f"{colname} Opt"))
@@ -9331,9 +9600,9 @@ class ReporterGUI(tk.Frame):
 
 						base.debugmsg(5, "colnum:", colnum, "	rownum:", rownum, "	optval:", optval)
 
-						DataTypes = [None, "File", "Path"]
+						ScriptTypes = [None, "File", "Path"]
 						self.contentdata[id]["renamecolumns"][f"{colname} Opt"] = tk.StringVar()
-						self.contentdata[id]["renamecolumns"][colopt] = ttk.OptionMenu(self.contentdata[id]["Frames"]["renamecols"], self.contentdata[id]["renamecolumns"][f"{colname} Opt"], command=self.cs_datatable_update, *DataTypes)
+						self.contentdata[id]["renamecolumns"][colopt] = ttk.OptionMenu(self.contentdata[id]["Frames"]["renamecols"], self.contentdata[id]["renamecolumns"][f"{colname} Opt"], command=self.cs_datatable_update, *ScriptTypes)
 						self.contentdata[id]["renamecolumns"][colopt].grid(column=colnum, row=rownum, sticky="nsew")
 						self.contentdata[id]["renamecolumns"][f"{colname} Opt"].set(optval)
 
@@ -9433,14 +9702,13 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[pid]["LFrame"], text="Data Type:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
 
-		DataTypes = [None, "Metric", "Result", "Plan", "SQL"]
 		self.contentdata[idl]["strDT"] = tk.StringVar()
-		self.contentdata[idl]["omDT"] = ttk.OptionMenu(self.contentdata[pid]["LFrame"], self.contentdata[idl]["strDT"], command=self.cs_graph_switchdt, *DataTypes)
+		self.contentdata[idl]["omDT"] = ttk.OptionMenu(self.contentdata[pid]["LFrame"], self.contentdata[idl]["strDT"], command=self.cs_graph_switchdt, *self.DataTypes)
 		self.contentdata[idl]["strDT"].set(datatypel)
 		self.contentdata[idl]["omDT"].grid(column=1, row=rownum, sticky="nsew")
 
 		self.contentdata[idr]["strDT"] = tk.StringVar()
-		self.contentdata[idr]["omDT"] = ttk.OptionMenu(self.contentdata[pid]["RFrame"], self.contentdata[idr]["strDT"], command=self.cs_graph_switchdt, *DataTypes)
+		self.contentdata[idr]["omDT"] = ttk.OptionMenu(self.contentdata[pid]["RFrame"], self.contentdata[idr]["strDT"], command=self.cs_graph_switchdt, *self.DataTypes)
 		self.contentdata[idr]["strDT"].set(datatyper)
 		self.contentdata[idr]["omDT"].grid(column=1, row=rownum, sticky="nsew")
 
@@ -9702,6 +9970,17 @@ class ReporterGUI(tk.Frame):
 
 			# "Metric", "Result", "SQL"
 
+			if datatypel == "Monitoring":
+				rownum += 1
+				self.contentdata[idl]["lblSTot"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Show Total:")
+				self.contentdata[idl]["lblSTot"].grid(column=0, row=rownum, sticky="nsew")
+
+				# self.contentdata[idl]["Frames"][datatypel].columnconfigure(1, weight=1)
+				self.contentdata[idl]["Frames"][datatypel].columnconfigure(1, minsize=150)
+				self.contentdata[idl]["intSTot"] = tk.IntVar()
+				self.contentdata[idl]["chkSTot"] = ttk.Checkbutton(self.contentdata[idl]["Frames"][datatypel], variable=self.contentdata[idl]["intSTot"], command=self.cs_graph_update)
+				self.contentdata[idl]["chkSTot"].grid(column=1, row=rownum, sticky="nsew")
+
 			if datatypel == "Plan":
 				rownum += 1
 				self.contentdata[idl]["lblSTot"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Show Total:")
@@ -9922,6 +10201,17 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[idr]["Frames"][datatyper].columnconfigure(99, weight=1)
 
 			# "Metric", "Result", "SQL"
+
+			if datatyper == "Monitoring":
+				rownum += 1
+				self.contentdata[idr]["lblSTot"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Show Total:")
+				self.contentdata[idr]["lblSTot"].grid(column=0, row=rownum, sticky="nsew")
+
+				# self.contentdata[idr]["Frames"][datatyper].columnconfigure(1, weight=1)
+				self.contentdata[idr]["Frames"][datatyper].columnconfigure(1, minsize=150)
+				self.contentdata[idr]["intSTot"] = tk.IntVar()
+				self.contentdata[idr]["chkSTot"] = ttk.Checkbutton(self.contentdata[idr]["Frames"][datatyper], variable=self.contentdata[idr]["intSTot"], command=self.cs_graph_update)
+				self.contentdata[idr]["chkSTot"].grid(column=1, row=rownum, sticky="nsew")
 
 			if datatyper == "Plan":
 				rownum += 1
@@ -10230,6 +10520,14 @@ class ReporterGUI(tk.Frame):
 			changes += 1
 
 		if datatyper == "Plan":
+			self.contentdata[idr]["intSTot"].set(base.report_item_get_int(idr, "ShowTotal"))
+			changes += 1
+
+		if datatypel == "Monitoring":
+			self.contentdata[idl]["intSTot"].set(base.report_item_get_int(idl, "ShowTotal"))
+			changes += 1
+
+		if datatyper == "Monitoring":
 			self.contentdata[idr]["intSTot"].set(base.report_item_get_int(idr, "ShowTotal"))
 			changes += 1
 
@@ -11004,6 +11302,9 @@ class ReporterGUI(tk.Frame):
 				if datatypel == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
 					gdata = base.graph_postprocess_data_plan(idl, gdata)
+				if datatypel == "Monitoring":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_monitoring(idl, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -11043,6 +11344,9 @@ class ReporterGUI(tk.Frame):
 				if datatyper == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
 					gdata = base.graph_postprocess_data_plan(idr, gdata)
+				if datatyper == "Monitoring":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_monitoring(idr, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -11152,6 +11456,9 @@ class ReporterGUI(tk.Frame):
 			if datatype == "Plan":
 				base.debugmsg(9, "tdata before:", tdata)
 				tdata = base.table_postprocess_data_plan(id, tdata)
+			if datatype == "Monitoring":
+				base.debugmsg(9, "tdata before:", tdata)
+				tdata = base.table_postprocess_data_monitoring(id, tdata)
 			base.debugmsg(8, "tdata:", tdata)
 
 			# self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text=notetxt)
@@ -11174,7 +11481,7 @@ class ReporterGUI(tk.Frame):
 							cellname = "h_{}".format(col)
 							base.debugmsg(9, "cellname:", cellname)
 							dispname = base.rt_table_get_colname(id, col)
-							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{} ".format(dispname.strip()), style='Report.THead.TLabel')
+							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=f" {dispname.strip()} ", style='Report.THead.TLabel')
 							self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 							colnum += 1
 				i = 0
@@ -11210,7 +11517,7 @@ class ReporterGUI(tk.Frame):
 								colnum += 1
 								cellname = "{}_{}".format(i, col)
 								base.debugmsg(9, "cellname:", cellname)
-								self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(row[col]), style='Report.TBody.TLabel')
+								self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=f" {str(row[col])} ", style='Report.TBody.TLabel')
 								self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 	def cp_select_hcolour(self, id, cellname, label, *args):
