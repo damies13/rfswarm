@@ -1028,8 +1028,9 @@ Change Font
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #148
 	[Setup] 	Change Reporter INI File Settings 	win_height 	600
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}Issue-#148
-	VAR 	${result_dir} 	${test_data}${/}20250327_221800_example
-	VAR 	${result_db} 	${result_dir}${/}20250327_221800_example.db
+	VAR 	${result_name} 	20250327_221800_example
+	VAR 	${result_dir} 	${test_data}${/}${result_name}
+	VAR 	${result_db} 	${result_dir}${/}${result_name}.db
 	VAR 	${template_dir} 	${test_data}${/}font_test.template
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
@@ -1057,6 +1058,23 @@ Change Font
 	Click Section 	Errors
 	Sleep 	5
 	Take A Screenshot
+
+
+	Click Button	generateword
+	Sleep	2
+	Click Button	generateexcel
+	Sleep	2
+	Click Button	generatehtml
+	Sleep	2
+
+	Wait For Status 	SavedXHTMLReport
+
+	${docx_font} 	Get Default Font Name From Document 	${result_dir}${/}${result_name}.docx
+
+	${xlsx_font} 	Get Font Name From Xlsx Sheet 	${result_dir}${/}${result_name}.xlsx 	Cover
+
+	${html_content} 	Get File 	${result_dir}${/}${result_name}.html
+	Should Contain 	${html_content} 	font-family: "Impact"
 
 	[Teardown] 	Run Keywords
 	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
