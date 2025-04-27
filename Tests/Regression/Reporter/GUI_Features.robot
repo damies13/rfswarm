@@ -1035,7 +1035,7 @@ Change Font
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 	IF 	"${platform}" == "ubuntu" # impact font is not available in ubuntu
-		VAR 	${font_name} 	msam10
+		VAR 	${font_name} 	Standard Symbols L
 		Change Impact With ${font_name} In ${template_dir}
 	ELSE
 		VAR 	${font_name} 	Impact
