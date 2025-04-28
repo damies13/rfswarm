@@ -101,7 +101,7 @@ def extract_image_from_xlsx_sheet(xlsx_path: str, sheet: str, cell_id: str, outp
 
 
 def get_font_name_from_xlsx_sheet(xlsx_path: str, sheet: str) -> str:
-    """"""
+    """Returns the name of the font that is used by default in given sheet."""
     wb = load_workbook(xlsx_path, keep_links=False)
     sheet_obj = wb[sheet]
 

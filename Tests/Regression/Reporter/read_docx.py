@@ -56,7 +56,7 @@ def update_table_of_contents(docx_path: str):
 
 
 def get_default_font_name_from_document(docx_path: str) -> str:
-    """"""
+    """Returns the name of the font that is used by default in the document."""
     doc = Document(docx_path)
 
     default_style = doc.styles['Normal']
