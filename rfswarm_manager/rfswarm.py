@@ -511,6 +511,7 @@ class RFSwarmBase:
 	dir_path = os.path.dirname(os.path.realpath(__file__))
 	resultsdir = ""
 	run_dbthread = True
+	dbconnecttime = 0
 	dbthread = None
 	datapath = ""
 	dbfile = ""
@@ -813,6 +814,7 @@ class RFSwarmBase:
 			if self.datadb is None:
 				base.debugmsg(5, "Connect to DB")
 				self.datadb = sqlite3.connect(self.dbfile)
+				base.dbconnecttime = int(time.time())
 				self.datadb.create_aggregate("percentile", 2, percentile)
 				self.datadb.create_aggregate("stdev", 1, stdevclass)
 				self.MetricIDs = {}
@@ -1972,7 +1974,7 @@ class RFSwarmBase:
 			else:
 				return None
 
-	def addScriptRow(self):
+	def addScriptRow(self, *args):
 		base.scriptcount += 1
 
 		row = int("{}".format(base.scriptcount))
@@ -4101,8 +4103,10 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(6, "BuildUI")
 		self.BuildUI()
 
-		dr = threading.Thread(target=self.dispaly_donation_reminder)
-		dr.start()
+		# dr = threading.Thread(target=self.dispaly_donation_reminder)
+		# dr.start()
+		# fix for: RuntimeError: main thread is not in main loop
+		self.dispaly_donation_reminder()
 
 		try:
 			base.debugmsg(6, "pln_update_graph")
@@ -4801,16 +4805,21 @@ class RFSwarmGUI(tk.Frame):
 		#
 		rowR = 0
 		# grphWindow.fmeRSettings
+
+		grphWindow.fmeRSettings.lblEnabled = ttk.Label(grphWindow.fmeRSettings, text="Enabled")
+		grphWindow.fmeRSettings.lblEnabled.grid(column=2, row=rowR, sticky="nsew")
+
+		rowR += 1
 		grphWindow.fmeRSettings.lblRT = ttk.Label(grphWindow.fmeRSettings, text="Result Type:")
 		grphWindow.fmeRSettings.lblRT.grid(column=0, row=rowR, sticky="nsew")
 
-		grphWindow.fmeRSettings.RTypes = [None, "Response Time", "TPS", "Total TPS"]
+		grphWindow.fmeRSettings.RType = "Response Time"
+		if 'result_type' in settings and len(settings['result_type']) > 1:
+			grphWindow.fmeRSettings.RType = settings['result_type']
+		grphWindow.fmeRSettings.RTypes = [grphWindow.fmeRSettings.RType, "Response Time", "TPS", "Total TPS"]
 		grphWindow.settings["RType"] = tk.StringVar()
 		grphWindow.fmeRSettings.omRT = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["RType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.RTypes)
-		if 'result_type' in settings and len(settings['result_type']) > 1:
-			grphWindow.settings["RType"].set(settings['result_type'])
-		else:
-			grphWindow.settings["RType"].set(grphWindow.fmeRSettings.RTypes[1])
+		grphWindow.settings["RType"].set(grphWindow.fmeRSettings.RType)
 		grphWindow.fmeRSettings.omRT.grid(column=1, row=rowR, sticky="nsew")
 
 		rowR += 1
@@ -4826,6 +4835,27 @@ class RFSwarmGUI(tk.Frame):
 		else:
 			grphWindow.settings["FRType"].set(grphWindow.fmeRSettings.FRTypes[2])
 		grphWindow.fmeRSettings.omFR.grid(column=1, row=rowR, sticky="nsew")
+
+		rowR += 1
+		grphWindow.fmeRSettings.lblFA = ttk.Label(grphWindow.fmeRSettings, text="Filter Agent:")
+		grphWindow.fmeRSettings.lblFA.grid(column=0, row=rowR, sticky="nsew")
+
+		grphWindow.fmeRSettings.FATypes = [None, "", "Loading..."]
+		grphWindow.settings["RFAType"] = tk.StringVar()
+		grphWindow.fmeRSettings.omFA = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["RFAType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.FATypes)
+		grphWindow.fmeRSettings.omFA.grid(column=1, row=rowR, sticky="nsew")
+		if 'filter_agent' in settings and len(settings['filter_agent']) > 1:
+			if settings['filter_agent'] not in grphWindow.fmeRSettings.FATypes:
+				grphWindow.fmeRSettings.FATypes.append(settings['filter_agent'])
+			grphWindow.settings["RFAType"].set(settings['filter_agent'])
+
+		grphWindow.settings["RintFA"] = tk.IntVar()
+		grphWindow.fmeRSettings.chkFA = ttk.Checkbutton(grphWindow.fmeRSettings, variable=grphWindow.settings["RintFA"], command=lambda *args: self.gs_refresh(grphWindow))
+		grphWindow.fmeRSettings.chkFA.grid(column=2, row=rowR, sticky="nsew")
+		if 'en_filter_agent' in settings and int(settings['en_filter_agent']) > -1:
+			grphWindow.settings["RintFA"].set(int(settings['en_filter_agent']))
+		else:
+			grphWindow.settings["RintFA"].set(0)
 
 		rowR += 1
 		# result_name filtered by GLOB (Unix file globbing syntax for its wildcards)
@@ -4844,28 +4874,63 @@ class RFSwarmGUI(tk.Frame):
 		#
 		# grphWindow.fmeRSettings.FNTypes = [None, "None", "Wildcard (Unix Glob)", "Regex", "Not Wildcard (Unix Glob)", "Not Regex"]
 		grphWindow.fmeRSettings.FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
-		grphWindow.settings["FNType"] = tk.StringVar()
-		grphWindow.fmeRSettings.omFR = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["FNType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.FNTypes)
+		grphWindow.settings["RFNType"] = tk.StringVar()
+		grphWindow.fmeRSettings.omFR = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["RFNType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.FNTypes)
 		if 'filter_name' in settings and len(settings['filter_name']) > 1:
-			grphWindow.settings["FNType"].set(settings['filter_name'])
+			grphWindow.settings["RFNType"].set(settings['filter_name'])
 		else:
-			grphWindow.settings["FNType"].set(grphWindow.fmeRSettings.FNTypes[1])
+			grphWindow.settings["RFNType"].set(grphWindow.fmeRSettings.FNTypes[1])
 		grphWindow.fmeRSettings.omFR.grid(column=1, row=rowR, sticky="nsew")
 
 		rowR += 1
 		grphWindow.fmeRSettings.lblFP = ttk.Label(grphWindow.fmeRSettings, text="Filter Pattern:")
 		grphWindow.fmeRSettings.lblFP.grid(column=0, row=rowR, sticky="nsew")
 
-		grphWindow.settings["FPattern"] = tk.StringVar()
-		grphWindow.fmeRSettings.inpFP = ttk.Entry(grphWindow.fmeRSettings, textvariable=grphWindow.settings["FPattern"])
+		grphWindow.settings["RFPattern"] = tk.StringVar()
+		grphWindow.fmeRSettings.inpFP = ttk.Entry(grphWindow.fmeRSettings, textvariable=grphWindow.settings["RFPattern"])
 		if 'filter_pattern' in settings and len(settings['filter_pattern']) > 1:
-			grphWindow.settings["FPattern"].set(settings['filter_pattern'])
+			grphWindow.settings["RFPattern"].set(settings['filter_pattern'])
 		grphWindow.fmeRSettings.inpFP.grid(column=1, row=rowR, sticky="nsew")
+
+		rowR += 1
+		grphWindow.fmeRSettings.lblGG = ttk.Label(grphWindow.fmeRSettings, text="Apply Granularity:")
+		grphWindow.fmeRSettings.lblGG.grid(column=0, row=rowR, sticky="nsew")
+
+		grphWindow.fmeRSettings.lblGS = ttk.Label(grphWindow.fmeRSettings, text="Seconds")
+		grphWindow.fmeRSettings.lblGS.grid(column=1, row=rowR, sticky="nsew")
+
+		# if grphWindow.fmeRSettings.RType is not None and "TPS" not in grphWindow.fmeRSettings.RType:
+		grphWindow.fmeRSettings.lblGW = ttk.Label(grphWindow.fmeRSettings, text="Show")
+		grphWindow.fmeRSettings.lblGW.grid(column=2, row=rowR, sticky="nsew")
+
+		rowR += 1
+		grphWindow.settings["RGSeconds"] = tk.StringVar()
+		grphWindow.fmeRSettings.inpGS = ttk.Entry(grphWindow.fmeRSettings, textvariable=grphWindow.settings["RGSeconds"])
+		grphWindow.fmeRSettings.inpGS.grid(column=1, row=rowR, sticky="nsew")
+		grphWindow.fmeRSettings.inpGS.bind('<FocusOut>', lambda *args: self.gs_refresh(grphWindow))
+		if 'granularity_seconds' in settings and len(settings['granularity_seconds']) > 1:
+			grphWindow.settings["RGSeconds"].set(settings['granularity_seconds'])
+		else:
+			grphWindow.settings["RGSeconds"].set(0)
+
+		grphWindow.fmeRSettings.GWTypes = ["Average", "Average", "Maximum", "Minimum"]
+		grphWindow.settings["RGWType"] = tk.StringVar()
+		# if grphWindow.fmeRSettings.RType is not None and "TPS" not in grphWindow.fmeRSettings.RType:
+		grphWindow.fmeRSettings.omGW = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["RGWType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.GWTypes)
+		grphWindow.fmeRSettings.omGW.grid(column=2, row=rowR, sticky="nsew")
+		if 'granularity_type' in settings and len(settings['granularity_type']) > 1:
+			grphWindow.settings["RGWType"].set(settings['granularity_type'])
+		else:
+			grphWindow.settings["RGWType"].set(grphWindow.fmeRSettings.GWTypes[1])
 
 		#
 		# 	DT Metric Settings
 		#
 		rowM = 0
+		grphWindow.fmeMSettings.lblEnabled = ttk.Label(grphWindow.fmeMSettings, text="Enabled")
+		grphWindow.fmeMSettings.lblEnabled.grid(column=2, row=rowM, sticky="nsew")
+
+		rowM += 1
 		grphWindow.fmeMSettings.lblMT = ttk.Label(grphWindow.fmeMSettings, text="Metric Type:")
 		grphWindow.fmeMSettings.lblMT.grid(column=0, row=rowM, sticky="nsew")
 
@@ -4906,6 +4971,81 @@ class RFSwarmGUI(tk.Frame):
 				grphWindow.fmeMSettings.SMetrics.append(settings['secondary_metric'])
 			grphWindow.settings["SMetric"].set(settings['secondary_metric'])
 		grphWindow.fmeMSettings.omSM.grid(column=1, row=rowM, sticky="nsew")
+
+		rowM += 1
+		grphWindow.fmeMSettings.lblFA = ttk.Label(grphWindow.fmeMSettings, text="Filter Agent:")
+		grphWindow.fmeMSettings.lblFA.grid(column=0, row=rowM, sticky="nsew")
+
+		grphWindow.fmeMSettings.FATypes = [None, "", "Loading..."]
+		grphWindow.settings["MFAType"] = tk.StringVar()
+		grphWindow.fmeMSettings.omFA = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MFAType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.FATypes)
+		grphWindow.fmeMSettings.omFA.grid(column=1, row=rowM, sticky="nsew")
+		if 'filter_agent' in settings and len(settings['filter_agent']) > 1:
+			if settings['filter_agent'] not in grphWindow.fmeMSettings.FATypes:
+				grphWindow.fmeMSettings.FATypes.append(settings['filter_agent'])
+			grphWindow.settings["MFAType"].set(settings['filter_agent'])
+
+		grphWindow.settings["MintFA"] = tk.IntVar()
+		grphWindow.fmeMSettings.chkFA = ttk.Checkbutton(grphWindow.fmeMSettings, variable=grphWindow.settings["MintFA"], command=lambda *args: self.gs_refresh(grphWindow))
+		grphWindow.fmeMSettings.chkFA.grid(column=2, row=rowM, sticky="nsew")
+		if 'en_filter_agent' in settings and int(settings['en_filter_agent']) > -1:
+			grphWindow.settings["MintFA"].set(int(settings['en_filter_agent']))
+		else:
+			grphWindow.settings["MintFA"].set(0)
+
+		rowM += 1
+		grphWindow.fmeMSettings.lblFN = ttk.Label(grphWindow.fmeMSettings, text="Filter Type:")
+		grphWindow.fmeMSettings.lblFN.grid(column=0, row=rowM, sticky="nsew")
+
+		grphWindow.fmeMSettings.FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
+		grphWindow.settings["MFNType"] = tk.StringVar()
+		grphWindow.fmeMSettings.omFR = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MFNType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.FNTypes)
+		grphWindow.fmeMSettings.omFR.grid(column=1, row=rowM, sticky="nsew")
+		if 'filter_name' in settings and len(settings['filter_name']) > 1:
+			grphWindow.settings["MFNType"].set(settings['filter_name'])
+		else:
+			grphWindow.settings["MFNType"].set(grphWindow.fmeMSettings.FNTypes[1])
+
+		rowM += 1
+		grphWindow.fmeMSettings.lblFP = ttk.Label(grphWindow.fmeMSettings, text="Filter Pattern:")
+		grphWindow.fmeMSettings.lblFP.grid(column=0, row=rowM, sticky="nsew")
+
+		grphWindow.settings["MFPattern"] = tk.StringVar()
+		grphWindow.fmeMSettings.inpFP = ttk.Entry(grphWindow.fmeMSettings, textvariable=grphWindow.settings["MFPattern"])
+		grphWindow.fmeMSettings.inpFP.grid(column=1, row=rowM, sticky="nsew")
+		# <Leave> makes UI to jumpy
+		grphWindow.fmeMSettings.inpFP.bind('<FocusOut>', lambda *args: self.gs_refresh(grphWindow))
+		if 'filter_pattern' in settings and len(settings['filter_pattern']) > 1:
+			grphWindow.settings["MFPattern"].set(settings['filter_pattern'])
+
+		rowM += 1
+		grphWindow.fmeMSettings.lblGG = ttk.Label(grphWindow.fmeMSettings, text="Apply Granularity:")
+		grphWindow.fmeMSettings.lblGG.grid(column=0, row=rowM, sticky="nsew")
+
+		grphWindow.fmeMSettings.lblGS = ttk.Label(grphWindow.fmeMSettings, text="Seconds")
+		grphWindow.fmeMSettings.lblGS.grid(column=1, row=rowM, sticky="nsew")
+
+		grphWindow.fmeMSettings.lblGW = ttk.Label(grphWindow.fmeMSettings, text="Show")
+		grphWindow.fmeMSettings.lblGW.grid(column=2, row=rowM, sticky="nsew")
+
+		rowM += 1
+		grphWindow.settings["MGSeconds"] = tk.StringVar()
+		grphWindow.fmeMSettings.inpGS = ttk.Entry(grphWindow.fmeMSettings, textvariable=grphWindow.settings["MGSeconds"])
+		grphWindow.fmeMSettings.inpGS.grid(column=1, row=rowM, sticky="nsew")
+		grphWindow.fmeMSettings.inpGS.bind('<FocusOut>', lambda *args: self.gs_refresh(grphWindow))
+		if 'granularity_seconds' in settings and len(settings['granularity_seconds']) > 1:
+			grphWindow.settings["MGSeconds"].set(settings['granularity_seconds'])
+		else:
+			grphWindow.settings["MGSeconds"].set(0)
+
+		grphWindow.fmeMSettings.GWTypes = ["Average", "Average", "Maximum", "Minimum"]
+		grphWindow.settings["MGWType"] = tk.StringVar()
+		grphWindow.fmeMSettings.omGW = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MGWType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.GWTypes)
+		grphWindow.fmeMSettings.omGW.grid(column=2, row=rowM, sticky="nsew")
+		if 'granularity_type' in settings and len(settings['granularity_type']) > 1:
+			grphWindow.settings["MGWType"].set(settings['granularity_type'])
+		else:
+			grphWindow.settings["MGWType"].set(grphWindow.fmeMSettings.GWTypes[1])
 
 		# set default size to 600 x 450
 		ww = grphWindow.winfo_width()
@@ -5129,12 +5269,15 @@ class RFSwarmGUI(tk.Frame):
 			pass
 
 	def gph_floatval(self, value):
+		if value is None:
+			return 0
 		try:
 			return float(value)
 		except Exception:
 			return value
 
 	def gph_settings(self, grphWindow):
+		base.debugmsg(8, "grphWindow:", grphWindow)
 		settings = {}
 		settings["id"] = grphWindow.graphid
 		settings["open"] = True
@@ -5157,11 +5300,38 @@ class RFSwarmGUI(tk.Frame):
 			settings["metric_type"] = grphWindow.settings["MType"].get()
 			settings["primary_metric"] = grphWindow.settings["PMetric"].get()
 			settings["secondary_metric"] = grphWindow.settings["SMetric"].get()
+
+			settings["filter_agent"] = grphWindow.settings["MFAType"].get()
+			settings["en_filter_agent"] = grphWindow.settings["MintFA"].get()
+
+			settings["filter_name"] = grphWindow.settings["MFNType"].get()
+			settings["filter_pattern"] = grphWindow.settings["MFPattern"].get()
+
+			settings["granularity_seconds"] = grphWindow.settings["MGSeconds"].get()
+			settings["granularity_type"] = grphWindow.settings["MGWType"].get()
+
 		if settings["data_type"] == "Result":
+			base.debugmsg(9, "settings[data_type]:", settings["data_type"])
 			settings["result_type"] = grphWindow.settings["RType"].get()
+			# There's no sane way to reload/refresh the graph settings pane for now
+			# leave this commented out and leave the show option always visible
+			# and we can fix this with the UI re-write in version 2.0.0
+			# if settings["result_type"] != grphWindow.fmeRSettings.RType:
+			# 	pass
 			settings["flter_result"] = grphWindow.settings["FRType"].get()
-			settings["filter_name"] = grphWindow.settings["FNType"].get()
-			settings["filter_pattern"] = grphWindow.settings["FPattern"].get()
+
+			settings["filter_agent"] = grphWindow.settings["RFAType"].get()
+			settings["en_filter_agent"] = grphWindow.settings["RintFA"].get()
+
+			settings["filter_name"] = grphWindow.settings["RFNType"].get()
+			settings["filter_pattern"] = grphWindow.settings["RFPattern"].get()
+			base.debugmsg(9, "FPattern:", grphWindow.settings["RFPattern"].get())
+
+			settings["granularity_seconds"] = grphWindow.settings["RGSeconds"].get()
+			base.debugmsg(9, "GSeconds:", grphWindow.settings["RGSeconds"].get())
+			settings["granularity_type"] = grphWindow.settings["RGWType"].get()
+			base.debugmsg(9, "GWType:", grphWindow.settings["RGWType"].get())
+
 		return settings
 
 	def gph_refresh(self, grphWindow):
@@ -5172,123 +5342,258 @@ class RFSwarmGUI(tk.Frame):
 			if DataType == "Metric":
 				MType = grphWindow.settings["MType"].get()
 				base.debugmsg(7, "MType:", MType)
-				PMetric = grphWindow.settings["PMetric"].get()
-				base.debugmsg(7, "PMetric:", PMetric)
-				SMetric = grphWindow.settings["SMetric"].get()
-				base.debugmsg(7, "SMetric:", SMetric)
+				PM = grphWindow.settings["PMetric"].get()
+				base.debugmsg(7, "PMetric:", PM)
+				SM = grphWindow.settings["SMetric"].get()
+				base.debugmsg(7, "SMetric:", SM)
 
-				hasfilter = False
-				if MType is not None and len(MType) > 0:
-					MTLst = [MType]
-					hasfilter = True
+				EnFA = grphWindow.settings["MintFA"].get()
+				base.debugmsg(7, "EnFA:", EnFA)
+				FAType = grphWindow.settings["MFAType"].get()
+				base.debugmsg(7, "FAType:", FAType)
+
+				FNType = grphWindow.settings["MFNType"].get()
+				base.debugmsg(7, "FNType:", FNType)
+
+				inpFP = grphWindow.settings["MFPattern"].get()
+				base.debugmsg(7, "inpFP:", inpFP)
+
+				GSeconds = int(grphWindow.settings["MGSeconds"].get())
+				base.debugmsg(7, "inpFP:", inpFP)
+				fltGW = grphWindow.settings["MGWType"].get()
+				base.debugmsg(7, "inpFP:", inpFP)
+
+				colname = "Name"
+
+				base.debugmsg(6, "MType:", MType, "	PM:", PM, "	SM:", SM)
+
+				mnamecolumns = []
+				# mcolumns = ["MetricTime as 'Time'", "MetricValue as 'Value'", "PrimaryMetric as 'Name'", "MetricType as 'Name'", "SecondaryMetric as 'Name'"]
+				if GSeconds > 0:
+					mcolumns = ["max(MetricTime) as 'Time'"]
+					if fltGW.lower() == "maximum":
+						mcolumns.append("max(MetricValue) as 'Value'")
+					elif fltGW.lower() == "minimum":
+						mcolumns.append("min(MetricValue) as 'Value'")
+					elif fltGW.lower() == "average":
+						mcolumns.append("avg(MetricValue) as 'Value'")
+					else:
+						mcolumns.append("avg(MetricValue) as 'Value'")
+
 				else:
-					MTLst = list(base.MetricIDs.keys())
-					if "MetricCount" in MTLst:
-						MTLst.remove("MetricCount")
-				base.debugmsg(6, "MTLst:", MTLst)
+					mcolumns = ["MetricTime as 'Time'", "MetricValue as 'Value'"]
+				wherelst = []
+				# grouplst = ["PrimaryMetric", "MetricType", "SecondaryMetric"]
+				grouplst = []
 
-				if PMetric is not None and len(PMetric) > 0:
-					PMLst = [PMetric]
-					hasfilter = True
+				if GSeconds > 0:
+					# [Name], floor(end_time/{GSeconds})
+					grouplst.append(f"[{colname}]")
+					grouplst.append(f"floor(MetricTime/{GSeconds})")
+
+				if PM not in [None, "", "None"] and len(PM) > 0:
+					# if "PrimaryMetric as 'Name'" in mcolumns:
+					# 	mcolumns.remove("PrimaryMetric as 'Name'")
+					wherelst.append("PrimaryMetric == '{}'".format(PM.replace("'", "''")))
+					if "PrimaryMetric" in grouplst:
+						grouplst.remove("PrimaryMetric")
 				else:
-					PMLst = []
-					for mt in MTLst:
-						if mt in base.MetricIDs:
-							for pm in base.MetricIDs[mt].keys():
-								PMLst.append(pm)
-				base.debugmsg(6, "PMLst:", PMLst)
-
-				if SMetric is not None and len(SMetric) > 0:
-					SMLst = [SMetric]
-					hasfilter = True
+					mnamecolumns.append("PrimaryMetric")
+				if MType not in [None, "", "None"] and len(MType) > 0:
+					# if "MetricType as 'Name'" in mcolumns:
+					# 	mcolumns.remove("MetricType as 'Name'")
+					wherelst.append("MetricType == '{}'".format(MType.replace("'", "''")))
+					if "MetricType" in grouplst:
+						grouplst.remove("MetricType")
 				else:
-					SMLst = []
-					for mt in MTLst:
-						if mt in base.MetricIDs:
-							for pm in PMLst:
-								if pm in base.MetricIDs[mt]:
-									for sm in base.MetricIDs[mt][pm].keys():
-										if sm != "ID":
-											SMLst.append(sm)
-				base.debugmsg(6, "SMLst:", SMLst)
+					mnamecolumns.append("MetricType")
+				if SM not in [None, "", "None"] and len(SM) > 0:
+					# if "SecondaryMetric as 'Name'" in mcolumns:
+					# 	mcolumns.remove("SecondaryMetric as 'Name'")
+					wherelst.append("SecondaryMetric == '{}'".format(SM.replace("'", "''")))
+					if "SecondaryMetric" in grouplst:
+						grouplst.remove("SecondaryMetric")
+				else:
+					mnamecolumns.append("SecondaryMetric")
 
-				GDNames = []
-				if hasfilter:
+				if EnFA:
+					if FAType in [None, "", "None"]:
+						mnamecolumns.append("DataSource")
+					else:
+						wherelst.append("DataSource == '{}'".format(FAType))
+
+				if len(mnamecolumns) < 1:
+					mnamecolumns.append("'" + SM + "'")
+
+				# Construct Name Column
+				mnamecolumn = " || ' - ' || ".join(mnamecolumns)
+				mnamecolumn += " as [" + colname + "] "
+				mcolumns.append(mnamecolumn)
+
+				if FNType not in [None, "", "None"] and len(inpFP) > 0:
+					# construct pattern
+					# "Wildcard (Unix Glob)",
+					if FNType == "Wildcard (Unix Glob)":
+						# AND PrimaryMetric GLOB '*_1*' OR SecondaryMetric GLOB '*_1*' OR DataSource GLOB '*_1*' OR MetricValue GLOB '*_1*'
+						base.debugmsg(5, "mnamecolumns:", mnamecolumns)
+						fpwhere = "("
+						for dispcol in mnamecolumns:
+							if len(fpwhere) > 1:
+								fpwhere += "OR "
+							fpwhere += "{} GLOB '{}'".format(dispcol, inpFP)
+						fpwhere += ")"
+						wherelst.append(fpwhere)
+					# "Regex",
+					if FNType == "Regex":
+						fpwhere = "("
+						for dispcol in mnamecolumns:
+							if len(fpwhere) > 1:
+								fpwhere += "OR "
+							fpwhere += "{} REGEXP '{}'".format(dispcol, inpFP)
+						fpwhere += ")"
+						wherelst.append(fpwhere)
+					# "Not Wildcard (Unix Glob)",
+					if FNType == "Not Wildcard (Unix Glob)":
+						fpwhere = "("
+						for dispcol in mnamecolumns:
+							if len(fpwhere) > 1:
+								fpwhere += "AND "
+							fpwhere += "{} NOT GLOB '{}'".format(dispcol, inpFP)
+						fpwhere += ")"
+						wherelst.append(fpwhere)
+					# "Not Regex"
+					if FNType == "Not Regex":
+						fpwhere = "("
+						for dispcol in mnamecolumns:
+							if len(fpwhere) > 1:
+								fpwhere += "AND "
+							fpwhere += "{} NOT REGEXP '{}'".format(dispcol, inpFP)
+						fpwhere += ")"
+						wherelst.append(fpwhere)
+
+				# Start Time
+				if base.dbconnecttime > 0:
+					wherelst.append("MetricTime >= {}".format(base.dbconnecttime))
+				#
+				# # End Time
+				# if endtime > 0:
+				# 	wherelst.append("MetricTime <= {}".format(endtime))
+
+				# if isnum<1:
+				# 	mcolumns.append("MetricValue")
+				# 	if sc>0:
+				# 		mcolumns.append("count(MetricTime) as 'Count'")
+				# 		if "MetricValue" in grouplst:
+				# 			grouplst.remove("MetricValue")
+				# else:
+				# 	mcolumns.append("min(CAST(MetricValue AS NUMERIC)) AS 'Minimum'")
+				# 	mcolumns.append("round(avg(CAST(MetricValue AS NUMERIC)),3) AS 'Average'")
+				# 	mcolumns.append("round(percentile(CAST(MetricValue AS NUMERIC), {}),3) AS '{}%ile'".format(display_percentile, display_percentile))
+				# 	mcolumns.append("max(CAST(MetricValue AS NUMERIC)) AS 'Maximum'")
+				# 	mcolumns.append("round(stdev(CAST(MetricValue AS NUMERIC)),3) AS 'StdDev'")
+
+				sql = "SELECT "
+
+				i = 0
+				for col in mcolumns:
+					if i < 1:
+						sql += "{} ".format(col)
+					else:
+						sql += ", {} ".format(col)
+					i += 1
+
+				sql += "FROM MetricData "
+
+				i = 0
+				for iwhere in wherelst:
+					if i == 0:
+						sql += "WHERE {} ".format(iwhere)
+					else:
+						sql += "AND {} ".format(iwhere)
+					i += 1
+
+				if len(grouplst) > 0:
+					sql += "GROUP by "
+					i = 0
+					for col in grouplst:
+						if i < 1:
+							sql += "{} ".format(col)
+						else:
+							sql += ", {} ".format(col)
+						i += 1
+
+				sql += "ORDER BY MetricTime "
+
+				base.debugmsg(5, "sql:", sql)
+
+				# name = "|".join(mnamecolumns)
+				name = grphWindow.graphname.get()
+				base.dbqueue["Read"].append({"SQL": sql, "KEY": "GraphData_{}".format(name)})
+
+				dodraw = False
+
+				gdname = "GraphData_{}".format(name)
+				if gdname in base.dbqueue["ReadResult"]:
+					base.debugmsg(6, gdname, ":", base.dbqueue["ReadResult"][gdname])
+					grphWindow.graphdata = {}
 					try:
 						grphWindow.axis.cla()
 					except Exception:
 						pass
-					for mt in MTLst:
-						for pm in PMLst:
-							if pm in base.MetricIDs[mt]:
-								for sm in SMLst:
-									if sm in base.MetricIDs[mt][pm]:
-										name = "{}|{}|{}".format(mt, pm, sm)
 
-										base.debugmsg(6, "name:", name)
-										GDNames.append(name)
+					for r in base.dbqueue["ReadResult"][gdname]:
 
-										sql = "SELECT "
-										sql += "  MetricTime "
-										sql += ", MetricValue "
-										sql += "FROM MetricData "
-										sql += "WHERE MetricType = '{}' ".format(mt.replace("'", "''"))
-										sql += "	AND PrimaryMetric = '{}' ".format(pm.replace("'", "''"))
-										sql += "	AND SecondaryMetric = '{}' ".format(sm.replace("'", "''"))
+						base.debugmsg(6, "r:", r)
+						linename = r['Name']
 
-										base.debugmsg(7, "sql:", sql)
+						if linename not in grphWindow.graphdata:
+							dname = " ".join(list(set(linename.split("|")).symmetric_difference(set([MType, PM, SM])))).strip()
+							base.debugmsg(6, "dname:", dname)
+							colour = base.named_colour(dname)
+							base.debugmsg(6, "name:", linename, "	colour:", colour)
 
-										base.dbqueue["Read"].append({"SQL": sql, "KEY": "GraphData_{}".format(name)})
+							grphWindow.graphdata[linename] = {}
+							grphWindow.graphdata[linename]["Label"] = dname
+							grphWindow.graphdata[linename]["Colour"] = colour
+							grphWindow.graphdata[linename]["objTime"] = []
+							grphWindow.graphdata[linename]["Values"] = []
 
-					dodraw = False
-					for name in GDNames:
+						# grphWindow.graphdata[name]["objTime"] = [datetime.fromtimestamp(r['Time']) for r in base.dbqueue["ReadResult"][gdname]]
+						grphWindow.graphdata[linename]["objTime"].append(datetime.fromtimestamp(r['Time']))
+						# grphWindow.graphdata[name]["Values"] = [self.gph_floatval(r['Value']) for r in base.dbqueue["ReadResult"][gdname]]
+						grphWindow.graphdata[linename]["Values"].append(self.gph_floatval(r['Value']))
+						base.debugmsg(9, gdname, "Values:", grphWindow.graphdata[linename]["Values"])
+						#
+					for linename in grphWindow.graphdata.keys():
+						base.debugmsg(6, gdname, ":", grphWindow.graphdata[linename])
+						if len(grphWindow.graphdata[linename]["Values"]) > 1 and len(grphWindow.graphdata[linename]["Values"]) == len(grphWindow.graphdata[linename]["objTime"]):
+							grphWindow.axis.plot(grphWindow.graphdata[linename]["objTime"], grphWindow.graphdata[linename]["Values"], color=grphWindow.graphdata[linename]["Colour"], label=grphWindow.graphdata[linename]["Label"])
+							dodraw = True
+						if len(grphWindow.graphdata[linename]["Values"]) == 1 and len(grphWindow.graphdata[linename]["Values"]) == len(grphWindow.graphdata[linename]["objTime"]):
+							grphWindow.axis.plot(grphWindow.graphdata[linename]["objTime"], grphWindow.graphdata[linename]["Values"], color=grphWindow.graphdata[linename]["Colour"], label=grphWindow.graphdata[linename]["Label"], marker='o')
+							dodraw = True
 
-						dname = " ".join(list(set(name.split("|")).symmetric_difference(set([MType, PMetric, SMetric])))).strip()
-						base.debugmsg(6, "dname:", dname)
-						if name not in grphWindow.graphdata:
-							grphWindow.graphdata[name] = {}
-						colour = base.named_colour(dname)
-						base.debugmsg(6, "name:", name, "	colour:", colour)
-						grphWindow.graphdata[name]["Colour"] = colour
-						grphWindow.graphdata[name]["objTime"] = []
-						grphWindow.graphdata[name]["Values"] = []
-						gdname = "GraphData_{}".format(name)
-						if gdname in base.dbqueue["ReadResult"]:
-							base.debugmsg(6, gdname, ":", base.dbqueue["ReadResult"][gdname])
+				if dodraw:
 
-							grphWindow.graphdata[name]["objTime"] = [datetime.fromtimestamp(r['MetricTime']) for r in base.dbqueue["ReadResult"][gdname]]
-							grphWindow.graphdata[name]["Values"] = [self.gph_floatval(r['MetricValue']) for r in base.dbqueue["ReadResult"][gdname]]
-							base.debugmsg(9, gdname, "Values:", grphWindow.graphdata[name]["Values"])
+					grphWindow.axis.grid(True, 'major', 'both')
+					base.debugmsg(6, "SMetric:", SM)
+					if SM in ["Load", "CPU", "MEM", "NET"]:
+						grphWindow.axis.set_ylim(0, 100)
+					else:
+						grphWindow.axis.set_ylim(0)
 
-							base.debugmsg(6, gdname, ":", grphWindow.graphdata[name])
-							if len(grphWindow.graphdata[name]["Values"]) > 1 and len(grphWindow.graphdata[name]["Values"]) == len(grphWindow.graphdata[name]["objTime"]):
-								grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], colour, label=dname)
-								dodraw = True
-							if len(grphWindow.graphdata[name]["Values"]) == 1 and len(grphWindow.graphdata[name]["Values"]) == len(grphWindow.graphdata[name]["objTime"]):
-								grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], colour, label=dname, marker='o')
-								dodraw = True
+					base.debugmsg(9, "showlegend:", grphWindow.showlegend.get())
+					if grphWindow.showlegend.get():
+						# grphWindow.axis.legend()
+						# grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),&nbsp; shadow=True, ncol=2)
+						grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
 
-					if dodraw:
-
-						grphWindow.axis.grid(True, 'major', 'both')
-						base.debugmsg(6, "SMetric:", SMetric)
-						if SMetric in ["Load", "CPU", "MEM", "NET"]:
-							grphWindow.axis.set_ylim(0, 100)
-						else:
-							grphWindow.axis.set_ylim(0)
-
-						base.debugmsg(9, "showlegend:", grphWindow.showlegend.get())
-						if grphWindow.showlegend.get():
-							# grphWindow.axis.legend()
-							# grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),&nbsp; shadow=True, ncol=2)
-							grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
-
-						grphWindow.fig.set_tight_layout(True)
-						grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
-						try:
-							grphWindow.canvas.draw()
-						except Exception as e:
-							base.debugmsg(5, "canvas.draw() Exception:", e)
+					grphWindow.fig.set_tight_layout(True)
+					grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+					try:
+						grphWindow.canvas.draw()
+					except Exception as e:
+						base.debugmsg(5, "canvas.draw() Exception:", e)
 
 			if DataType == "Result":
 				RType = grphWindow.settings["RType"].get()
@@ -5297,10 +5602,10 @@ class RFSwarmGUI(tk.Frame):
 				FRType = grphWindow.settings["FRType"].get()
 				base.debugmsg(7, "FRType:", FRType)
 
-				FNType = grphWindow.settings["FNType"].get()
+				FNType = grphWindow.settings["RFNType"].get()
 				base.debugmsg(7, "FNType:", FNType)
 
-				inpFP = grphWindow.settings["FPattern"].get()
+				inpFP = grphWindow.settings["RFPattern"].get()
 				base.debugmsg(7, "inpFP:", inpFP)
 
 				sql = "SELECT "
@@ -5409,11 +5714,11 @@ class RFSwarmGUI(tk.Frame):
 
 					for name in grphWindow.graphdata:
 						if len(grphWindow.graphdata[name]["Values"]) > 1 and len(grphWindow.graphdata[name]["Values"]) == len(grphWindow.graphdata[name]["objTime"]):
-							grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], grphWindow.graphdata[name]["Colour"], label=name)
+							grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], color=grphWindow.graphdata[name]["Colour"], label=name)
 							dodraw = True
 
 						if len(grphWindow.graphdata[name]["Values"]) == 1 and len(grphWindow.graphdata[name]["Values"]) == len(grphWindow.graphdata[name]["objTime"]):
-							grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], grphWindow.graphdata[name]["Colour"], label=name, marker='o')
+							grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], color=grphWindow.graphdata[name]["Colour"], label=name, marker='o')
 							dodraw = True
 
 				if dodraw:
@@ -5440,6 +5745,10 @@ class RFSwarmGUI(tk.Frame):
 			self.RefreshRecentGraphs()
 
 	def gs_refresh(self, grphWindow):
+
+		base.debugmsg(6, "save")
+		tgr = threading.Thread(target=lambda: self.gph_refresh(grphWindow))
+		tgr.start()
 		base.debugmsg(6, "start")
 		tgn = threading.Thread(target=lambda: self.gs_updatename(grphWindow))
 		tgn.start()
@@ -5453,8 +5762,8 @@ class RFSwarmGUI(tk.Frame):
 		tsm = threading.Thread(target=lambda: self.gs_updatesecmetrics(grphWindow))
 		tsm.start()
 		base.debugmsg(6, "tsm")
-		tgr = threading.Thread(target=lambda: self.gph_refresh(grphWindow))
-		tgr.start()
+		tal = threading.Thread(target=lambda: self.gs_updateagents(grphWindow))
+		tal.start()
 
 	def gs_dbolnames(self):
 
@@ -5473,7 +5782,7 @@ class RFSwarmGUI(tk.Frame):
 		while "MetricNames" not in base.dbqueue["ReadResult"]:
 			time.sleep(1)
 
-	def gs_showhide(self, grphWindow):
+	def gs_showhide(self, grphWindow, *args):
 		base.debugmsg(6, "graphname:", grphWindow.graphname.get())
 		grphWindow.title(grphWindow.graphname.get())
 		base.debugmsg(6, "fmeSettings.show:", grphWindow.fmeSettings.show)
@@ -5486,7 +5795,7 @@ class RFSwarmGUI(tk.Frame):
 			grphWindow.fmeSettings.grid(column=90, row=0, columnspan=10, sticky="nsew")
 			base.debugmsg(6, "fmeSettings.show:", grphWindow.fmeSettings.show)
 
-	def gs_updatename(self, grphWindow):
+	def gs_updatename(self, grphWindow, *args):
 		base.debugmsg(6, "graphname:", grphWindow.graphname.get())
 		grphWindow.title(grphWindow.graphname.get())
 
@@ -5505,7 +5814,7 @@ class RFSwarmGUI(tk.Frame):
 		if datatype == "Result":
 			grphWindow.fmeRSettings.grid(column=0, row=grphWindow.fmeDTRow, columnspan=2, sticky="nsew")
 
-	def gs_updatemetrictypes(self, grphWindow):
+	def gs_updatemetrictypes(self, grphWindow, *args):
 		base.debugmsg(9, "start")
 		try:
 			base.debugmsg(9, "MetricType:", base.MetricIDs.keys())
@@ -5524,7 +5833,7 @@ class RFSwarmGUI(tk.Frame):
 		except Exception as e:
 			base.debugmsg(6, "e:", e)
 
-	def gs_updateprimetrics(self, grphWindow):
+	def gs_updateprimetrics(self, grphWindow, *args):
 		MType = grphWindow.settings["MType"].get()
 		base.debugmsg(9, "MType:", MType)
 
@@ -5543,7 +5852,7 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeMSettings.omPM.set_menu(*grphWindow.fmeMSettings.PMetrics)
 		base.debugmsg(6, "grphWindow.fmeMSettings.omPM.set_menu():", grphWindow.fmeMSettings.PMetrics)
 
-	def gs_updatesecmetrics(self, grphWindow):
+	def gs_updatesecmetrics(self, grphWindow, *args):
 		MType = grphWindow.settings["MType"].get()
 		base.debugmsg(6, "MType:", MType)
 		PMetric = grphWindow.settings["PMetric"].get()
@@ -5582,6 +5891,31 @@ class RFSwarmGUI(tk.Frame):
 		grphWindow.fmeMSettings.SMetrics = newSMetrics
 		grphWindow.fmeMSettings.omSM.set_menu(*grphWindow.fmeMSettings.SMetrics)
 		base.debugmsg(6, "grphWindow.fmeMSettings.omSM.set_menu():", grphWindow.fmeMSettings.SMetrics)
+
+	def gs_updateagents(self, grphWindow, *args):
+
+		agntlst = list(base.Agents.keys())
+
+		base.debugmsg(7, "agntlst:", agntlst)
+		base.debugmsg(9, "Results FATypes:", grphWindow.fmeRSettings.FATypes)
+		base.debugmsg(9, "Metrics FATypes:", grphWindow.fmeMSettings.FATypes)
+		if len(agntlst) > 0:
+			if "Loading..." in grphWindow.fmeRSettings.FATypes:
+				grphWindow.fmeRSettings.FATypes.remove("Loading...")
+				base.debugmsg(9, "Results FATypes:", grphWindow.fmeRSettings.FATypes)
+			if "Loading..." in grphWindow.fmeMSettings.FATypes:
+				grphWindow.fmeMSettings.FATypes.remove("Loading...")
+				base.debugmsg(9, "Metrics FATypes:", grphWindow.fmeMSettings.FATypes)
+
+			for agentname in agntlst:
+				if agentname not in grphWindow.fmeRSettings.FATypes:
+					grphWindow.fmeRSettings.FATypes.append(agentname)
+				if agentname not in grphWindow.fmeMSettings.FATypes:
+					grphWindow.fmeMSettings.FATypes.append(agentname)
+			base.debugmsg(8, "Results FATypes:", grphWindow.fmeRSettings.FATypes)
+			base.debugmsg(8, "Metrics FATypes:", grphWindow.fmeMSettings.FATypes)
+			grphWindow.fmeRSettings.omFA.set_menu(*grphWindow.fmeRSettings.FATypes)
+			grphWindow.fmeMSettings.omFA.set_menu(*grphWindow.fmeMSettings.FATypes)
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#

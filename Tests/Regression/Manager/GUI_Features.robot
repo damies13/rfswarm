@@ -3288,11 +3288,11 @@ Verify That TPS Is TP And Not TPmS
 	Take A Screenshot
 	Click Menu 	graphs
 	Click Menu 	NewGraphWindow
-	Click Label With Horizontal Offset 	DataType 	90
+	Click Label With Horizontal Offset 	DataType 	250
 	Select Option 	Result
-	Click Label With Horizontal Offset 	ResultType 	90
+	Click Label With Horizontal Offset 	ResultType 	150
 	Select Option 	TPS
-	Click Label With Horizontal Offset 	ShowLegend 	60
+	Click Label With Horizontal Offset 	ShowLegend 	250
 	Sleep 	10
 
 	Take A Screenshot

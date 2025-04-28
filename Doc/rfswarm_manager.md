@@ -395,10 +395,10 @@ The Graphs menu has the following options:
 | Scenario | This menu is dynamically generated, it contains all the graphs that were opened when the scenario was saved, if you select a graph from this menu that is already open then it will be brought to the front and gain focus, otherwise it will open the graph as it was when it was closed. If you save preconfigured graphs on one machine and then open the scenario on another machine these graphs will automatically open when you open the scenario and attempt to retain their position. |
 
 > _Graphs - New Graph - Metric_ <br>
-> ![Image](Images/MacOS_Graphs_v0.8.0_New_Graph_Metric.png "New Graph - Metric")
+> ![Image](Images/Linux_Graphs_v1.5.0_New_Graph_Metric.png "New Graph - Metric")
 >
 > _Graphs - New Graph - Result_ <br>
-> ![Image](Images/MacOS_Graphs_v0.8.0_New_Graph_Result.png "New Graph - Result")
+> ![Image](Images/Linux_Graphs_v1.5.0_New_Graph_Result.png "New Graph - Result")
 
 
 |   |   |   |
@@ -421,6 +421,10 @@ Metric Settings:
 |Metric Type | Allows restricting results to specific types of metrics |
 |Primary Metric | Allows restricting results by primary metric |
 |Secondary Metric | Allows restricting results by secondary metric |
+|Filter Agent | Allows restricting results to only results from a specific agent machine, or use the 'Enabled' checkbox to group results by agents |
+|Filter Type | Determine if the filter pattern will limit results shown or restrict results from being shown |
+|Filter Pattern | The pattern, using [glob patterns](https://www.sqlitetutorial.net/sqlite-glob/) |
+|Apply Granularity | Allows smoothing of graphs by grouping values to a single point on the graph, you can control the number of seconds to group the values for and which grouped value to show. Defaults are 0 seconds (no grouping) and average of values |
 
 Results Settings:
 
@@ -428,11 +432,13 @@ Results Settings:
 |---|---|
 |Result Type | Results, TPS (transactions per second) or a Total TPS|
 |Filter Result | Optionally restrict results to Pass or Fail |
+|Filter Agent | Allows restricting results to only results from a specific agent machine, or use the 'Enabled' checkbox to group results by agents |
 |Filter Type | Determine if the filter pattern will limit results shown or restrict results from being shown |
 |Filter Pattern | The pattern, using [glob patterns](https://www.sqlitetutorial.net/sqlite-glob/) |
+|Apply Granularity | Allows smoothing of graphs by grouping values to a single point on the graph, you can control the number of seconds to group the values for and which grouped value to show. Defaults are 0 seconds (no grouping) and average of values |
 
 
-Some of the example preconfigured graphs:
+Some of the examples of pre-configured graphs:
 
 > _Graphs - Running Robots_ <br>
 > ![Image](Images/MacOS_Graphs_v0.8.0_Running_Robots.png "Graphs - Running Robots")
