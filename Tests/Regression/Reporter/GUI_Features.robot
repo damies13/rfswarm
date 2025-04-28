@@ -1071,7 +1071,12 @@ Change Font
 	Click Section 	DataGraph
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${platform}_customfont_graph.png
+	${pvinfo}= 	Get Python Version Info
+	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
+		VAR 	${img} 	reporter_${platform}_customfont_graph_py3.9.png
+	ELSE
+		VAR 	${img} 	reporter_${platform}_customfont_graph.png
+	END
 	Wait For 	${img} 	 timeout=30
 
 	Click Section 	Errors
