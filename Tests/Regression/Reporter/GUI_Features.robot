@@ -1065,8 +1065,8 @@ Change Font
 	Click Section 	Table_of_Contents
 	Sleep 	1
 	Take A Screenshot
-	# VAR 	${img} 	reporter_${platform}_customfont_heading.png
-	# Wait For 	${img} 	 timeout=30
+	VAR 	${img} 	reporter_${platform}_customfont_contents.png
+	Wait For 	${img} 	 timeout=30
 
 	Click Section	TestResultSummary
 	Sleep 	1
