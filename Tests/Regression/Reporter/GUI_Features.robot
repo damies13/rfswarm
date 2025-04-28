@@ -1045,27 +1045,40 @@ Change Font
 
 	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1 	--html 	--docx 	--xlsx
 	Wait For Status 	PreviewLoaded
-	Sleep 	3
+	Sleep 	1
 	Take A Screenshot
 	Click Tab 	Preview
-	Sleep 	5
+	Sleep 	1
+	Take A Screenshot
+	VAR 	${img} 	reporter_${platform}_customfont_title.png
+	Wait For 	${img} 	 timeout=30
 	Take A Screenshot
 
 	Click Section 	Note
-	Sleep 	5
+	Sleep 	1
 	Take A Screenshot
+	VAR 	${img} 	reporter_${platform}_customfont_heading.png
+	Wait For 	${img} 	 timeout=30
+	VAR 	${img} 	reporter_${platform}_customfont_note.png
+	Wait For 	${img} 	 timeout=30
 
 	Click Section	TestResultSummary
-	Sleep 	5
+	Sleep 	1
 	Take A Screenshot
+	VAR 	${img} 	reporter_${platform}_customfont_datatable.png
+	Wait For 	${img} 	 timeout=30
 
 	Click Section 	DataGraph
-	Sleep 	5
+	Sleep 	1
 	Take A Screenshot
+	VAR 	${img} 	reporter_${platform}_customfont_graph.png
+	Wait For 	${img} 	 timeout=30
 
 	Click Section 	Errors
-	Sleep 	5
+	Sleep 	1
 	Take A Screenshot
+	VAR 	${img} 	reporter_${platform}_customfont_errors.png
+	Wait For 	${img} 	 timeout=30
 
 
 	${docx_font} 	Get Default Font Name From Document 	${result_dir}${/}${result_name}.docx
