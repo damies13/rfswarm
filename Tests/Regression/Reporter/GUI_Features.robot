@@ -1065,7 +1065,7 @@ Change Font
 	Click Section	TestResultSummary
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${platform}_customfont_datatable.png
+	VAR 	${img} 	reporter_${platform}_customfont_tabledata.png
 	Wait For 	${img} 	 timeout=30
 
 	Click Section 	DataGraph
