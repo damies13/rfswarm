@@ -5,6 +5,7 @@ import subprocess
 import docx
 from docx import Document
 from docx.oxml.shared import OxmlElement, qn
+from robot.api import logger as LOGGER
 
 
 def read_paragraphs_docx_file(docx_path: str) -> dict:
@@ -52,6 +53,19 @@ def update_table_of_contents(docx_path: str):
     settings_element.append(update_fields_element)
 
     doc.save(docx_path)
+
+
+def get_default_font_name_from_document(docx_path: str) -> str:
+    """Returns the name of the font that is used by default in the document."""
+    doc = Document(docx_path)
+
+    default_style = doc.styles['Normal']
+
+    if default_style.font.name:
+        return default_style.font.name
+    else:
+        LOGGER.warn("Default font is not set.")
+        return 'None'
 
 
 def extract_docx_images_under_heading(heading: str, docx_path: str, output_folder: str, debug=False) -> list:

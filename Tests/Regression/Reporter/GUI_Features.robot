@@ -1024,6 +1024,83 @@ Change Line Colour
 	...    Close GUI 		AND
 	...    Remove File 		${resultfile}
 
+Change Font
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #148
+	[Setup] 	Change Reporter INI File Settings 	win_height 	600
+	VAR 	${test_data} 	${CURDIR}${/}testdata${/}Issue-#148
+	VAR 	${result_name} 	20250327_221800_example
+	VAR 	${result_dir} 	${test_data}${/}${result_name}
+	VAR 	${result_db} 	${result_dir}${/}${result_name}.db
+	VAR 	${template_dir} 	${test_data}${/}font_test.template
+
+	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
+	IF 	"${platform}" == "ubuntu" # impact font is not available in ubuntu
+		VAR 	${font_name} 	Standard Symbols PS
+		Change Impact With ${font_name} In ${template_dir}
+		${test} 	Get File 	${template_dir}
+		Log 	${test}
+	ELSE
+		VAR 	${font_name} 	Impact
+	END
+
+	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1 	--html 	--docx 	--xlsx
+	Wait For Status 	PreviewLoaded
+	Sleep 	1
+	Take A Screenshot
+	Click Tab 	Preview
+	Sleep 	1
+	Take A Screenshot
+	VAR 	${img} 	reporter_${platform}_customfont_title.png
+	Wait For 	${img} 	 timeout=30
+	Take A Screenshot
+
+	Click Section 	Note
+	Sleep 	1
+	Take A Screenshot
+	VAR 	${img} 	reporter_${platform}_customfont_heading.png
+	Wait For 	${img} 	 timeout=30
+	VAR 	${img} 	reporter_${platform}_customfont_note.png
+	Wait For 	${img} 	 timeout=30
+
+	Click Section 	Table_of_Contents
+	Sleep 	1
+	Take A Screenshot
+	VAR 	${img} 	reporter_${platform}_customfont_contents.png
+	Wait For 	${img} 	 timeout=30
+
+	Click Section	TestResultSummary
+	Sleep 	1
+	Take A Screenshot
+	VAR 	${img} 	reporter_${platform}_customfont_tabledata.png
+	Wait For 	${img} 	 timeout=30
+
+	Click Section 	DataGraph
+	Sleep 	1
+	Take A Screenshot
+	${pvinfo}= 	Get Python Version Info
+	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
+		VAR 	${img} 	reporter_${platform}_customfont_graph_py3.9.png
+	ELSE
+		VAR 	${img} 	reporter_${platform}_customfont_graph.png
+	END
+	Wait For 	${img} 	 timeout=30
+
+	Click Section 	Errors
+	Sleep 	1
+	Take A Screenshot
+	VAR 	${img} 	reporter_${platform}_customfont_errors.png
+	Wait For 	${img} 	 timeout=30
 
 
+	${docx_font} 	Get Default Font Name From Document 	${result_dir}${/}${result_name}.docx
+	Should Be Equal 	${docx_font} 	${font_name}
+
+	${xlsx_font} 	Get Font Name From Xlsx Sheet 	${result_dir}${/}${result_name}.xlsx 	Cover
+	Should Be Equal 	${xlsx_font} 	${font_name}
+
+	${html_content} 	Get File 	${result_dir}${/}${result_name}.html
+	Should Contain 	${html_content} 	font-family: "${font_name}"
+
+	[Teardown] 	Run Keywords
+	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
 #
