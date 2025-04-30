@@ -3342,14 +3342,12 @@ Filter Agent Graphs
 	Click Button 	Refresh
 	Click Label With Horizontal Offset 	FilterAgent 	140
 	Take A Screenshot
-	Select Option 	TEST_2
-	Sleep 	1
-	Press Key.down 2 Times
-	Press Combination	Key.enter
-	Sleep 	5
+	Select Option 	TEST_1
+	Sleep 	3
 	Take A Screenshot
-	VAR 	${tpsvalue} 	manager_${platform}_label_4.0.png
-	Wait For 	${tpsvalue} 	 timeout=30
+	VAR 	${robots_value} 	manager_${platform}_label_4.0.png
+	${status}=	Run Keyword And Return Status	Wait For 	${robots_value} 	 timeout=6
+	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph!
 
 	[Teardown]	Run Keywords
 	...    Set Test Variable 	${process_agent} 	${process_agent_1} 	AND
@@ -3381,33 +3379,49 @@ Filter Metric Graphs
 	Press Key.down 2 Times
 	Press Combination	Key.enter
 	Click Label With Horizontal Offset 	FilterPattern 	140
-	VAR 	${value} 	*22*
+	VAR 	${value} 	*21*
 	Evaluate 	clipboard.copy("${value}") 	modules=clipboard
 	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.a
+		Press Combination 	KEY.backspace
 		Press Combination	KEY.command		KEY.v
 	ELSE
+		Press Combination	KEY.command		KEY.a
+		Press Combination 	KEY.backspace
 		Press Combination	KEY.ctrl		KEY.v
 	END
+	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
-	# VAR 	${tpsvalue} 	manager_${platform}_label_4.0.png
-	# Wait For 	${tpsvalue} 	 timeout=30
+	VAR 	${y_value} 	manager_${platform}_label_8.png
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=6
+	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph!
+	VAR 	${y_value} 	manager_${platform}_label_4.png
+	Wait For 	${y_value} 	 timeout=30
 
 	Click Label With Horizontal Offset 	FilterType 	140
 	Press Key.down 3 Times
 	Press Combination	Key.enter
 	Click Label With Horizontal Offset 	FilterPattern 	140
-	VAR 	${value} 	*2*
+	VAR 	${value} 	*Keyword 1*
 	Evaluate 	clipboard.copy("${value}") 	modules=clipboard
 	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.a
+		Press Combination 	KEY.backspace
 		Press Combination	KEY.command		KEY.v
 	ELSE
+		Press Combination	KEY.command		KEY.a
+		Press Combination 	KEY.backspace
 		Press Combination	KEY.ctrl		KEY.v
 	END
+	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
-	# VAR 	${tpsvalue} 	manager_${platform}_label_4.0.png
-	# Wait For 	${tpsvalue} 	 timeout=30
+	VAR 	${y_value} 	manager_${platform}_label_8.png
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=6
+	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph!
+	VAR 	${y_value} 	manager_${platform}_label_4.png
+	Wait For 	${y_value} 	 timeout=30
 
 	[Teardown]	Run Keywords
 	...    Set Test Variable 	${process_agent} 	${process_agent_1} 	AND
@@ -3439,33 +3453,49 @@ Filter Result Graphs
 	Press Key.down 2 Times
 	Press Combination	Key.enter
 	Click Label With Horizontal Offset 	FilterPattern 	140
-	VAR 	${value} 	*22*
+	VAR 	${value} 	*21*
 	Evaluate 	clipboard.copy("${value}") 	modules=clipboard
 	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.a
+		Press Combination 	KEY.backspace
 		Press Combination	KEY.command		KEY.v
 	ELSE
+		Press Combination	KEY.command		KEY.a
+		Press Combination 	KEY.backspace
 		Press Combination	KEY.ctrl		KEY.v
 	END
+	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
-	# VAR 	${tpsvalue} 	manager_${platform}_label_4.0.png
-	# Wait For 	${tpsvalue} 	 timeout=30
+	VAR 	${y_value} 	manager_${platform}_label_8.png
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=6
+	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph!
+	VAR 	${y_value} 	manager_${platform}_label_4.png
+	Wait For 	${y_value} 	 timeout=30
 
 	Click Label With Horizontal Offset 	FilterType 	140
 	Press Key.down 3 Times
 	Press Combination	Key.enter
 	Click Label With Horizontal Offset 	FilterPattern 	140
-	VAR 	${value} 	*2*
+	VAR 	${value} 	*Keyword 1*
 	Evaluate 	clipboard.copy("${value}") 	modules=clipboard
 	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.a
+		Press Combination 	KEY.backspace
 		Press Combination	KEY.command		KEY.v
 	ELSE
+		Press Combination	KEY.command		KEY.a
+		Press Combination 	KEY.backspace
 		Press Combination	KEY.ctrl		KEY.v
 	END
+	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
-	# VAR 	${tpsvalue} 	manager_${platform}_label_4.0.png
-	# Wait For 	${tpsvalue} 	 timeout=30
+	VAR 	${y_value} 	manager_${platform}_label_8.png
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=6
+	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph!
+	VAR 	${y_value} 	manager_${platform}_label_4.png
+	Wait For 	${y_value} 	 timeout=30
 
 	[Teardown]	Run Keywords
 	...    Set Test Variable 	${process_agent} 	${process_agent_1} 	AND
