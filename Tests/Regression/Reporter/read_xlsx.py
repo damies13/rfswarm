@@ -3,6 +3,7 @@ import os
 from openpyxl import load_workbook
 from openpyxl_image_loader import SheetImageLoader
 from pandas import read_excel
+from robot.api import logger as LOGGER
 
 
 def read_all_xlsx_sheets(xlsx_path: str) -> list:
@@ -97,3 +98,19 @@ def extract_image_from_xlsx_sheet(xlsx_path: str, sheet: str, cell_id: str, outp
     print(f"XLSX RFSwarm raport image saved as: {img_name}")
 
     return img_name
+
+
+def get_font_name_from_xlsx_sheet(xlsx_path: str, sheet: str) -> str:
+    """Returns the name of the font that is used by default in given sheet."""
+    wb = load_workbook(xlsx_path, keep_links=False)
+    sheet_obj = wb[sheet]
+
+    font_name = ''
+    for row in sheet_obj.iter_rows():
+        for cell in row:
+            if cell.font and cell.value is not None:
+                if cell.font.name != font_name and font_name != '':
+                    LOGGER.warn(f'Different fonts found in the sheet! font:{font_name}')
+                font_name = cell.font.name
+
+    return font_name
