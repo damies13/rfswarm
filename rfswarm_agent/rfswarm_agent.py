@@ -1220,6 +1220,8 @@ class RFSwarmAgent():
 			self.debugmsg(1, "runthread: self.args.robot: ", self.args.robot)
 			robotcmd = self.args.robot
 
+		self.debugmsg(6, "runthread: robotcmd:", robotcmd)
+
 		cmd = [robotcmd]
 		cmd.append("-t")
 		cmd.append('"' + test + '"')
