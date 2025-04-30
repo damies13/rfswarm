@@ -1,0 +1,44 @@
+[Scenario]
+uploadmode = def
+scriptcount = 2
+graphlist = 681145d8-1
+
+[1]
+robots = 2
+delay = 0
+rampup = 15
+run = 45
+test = Filter Test Case 1
+script = filter.robot
+filters = [{'rule': 'Require', 'optn': 'Agent: TEST_1'}]
+
+[2]
+robots = 2
+delay = 0
+rampup = 15
+run = 45
+test = Filter Test Case 2
+script = filter.robot
+filters = [{'rule': 'Require', 'optn': 'Agent: TEST_2'}]
+
+[681145d8-1]
+id = 681145d8-1
+open = True
+win_width = 771
+win_height = 371
+win_location_x = 196
+win_location_y = 506
+win_screen = :0.0
+name = Filter Result
+show_settings = True
+show_legend = 1
+data_type = Result
+result_type = Response Time
+flter_result = Pass
+filter_agent = 
+en_filter_agent = 0
+filter_name = None
+filter_pattern = 
+granularity_seconds = 0
+granularity_type = Average
+

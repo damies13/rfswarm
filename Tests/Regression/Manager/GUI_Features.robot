@@ -3322,6 +3322,158 @@ Verify That TPS Is TP And Not TPmS
 	...    Run Keyword 	Close Manager GUI ${platform} 	AND
 	...    Stop Agent
 
+Filter Agent Graphs
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure
+	VAR 	${scenario_name} 	filter_agent
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
+	VAR 	${agent_name_1} 	TEST_1
+	VAR 	${agent_name_2} 	TEST_2
+	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${results_dir} 	-r 	-a 	2
+	VAR 	@{agnt_options_1} 	-a 	${agent_name_1}
+	VAR 	@{agnt_options_2} 	-a 	${agent_name_2}
+
+	Open Agent 			${agnt_options_1}
+	VAR 	${process_agent_1} 	${process_agent}
+	Open Agent 			${agnt_options_2}
+	VAR 	${process_agent_2} 	${process_agent}
+	Open Manager GUI 	${mngr_options}
+
+	Wait For the Scenario Run To Finish
+	Click Button 	Refresh
+	Click Label With Horizontal Offset 	FilterAgent 	140
+	Take A Screenshot
+	Select Option 	TEST_2
+	Sleep 	1
+	Press Key.down 2 Times
+	Press Combination	Key.enter
+	Sleep 	5
+	Take A Screenshot
+	VAR 	${tpsvalue} 	manager_${platform}_label_4.0.png
+	Wait For 	${tpsvalue} 	 timeout=30
+
+	[Teardown]	Run Keywords
+	...    Set Test Variable 	${process_agent} 	${process_agent_1} 	AND
+	...    Stop Agent 	AND
+	...    Set Test Variable 	${process_agent} 	${process_agent_2} 	AND
+	...    Stop Agent 	AND
+	...    Run Keyword 	Close Manager GUI ${platform}
+
+Filter Metric Graphs
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure
+	VAR 	${scenario_name} 	filter_metric
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
+	VAR 	${agent_name_1} 	TEST_1
+	VAR 	${agent_name_2} 	TEST_2
+	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${results_dir} 	-r 	-a 	2
+	VAR 	@{agnt_options_1} 	-a 	${agent_name_1}
+	VAR 	@{agnt_options_2} 	-a 	${agent_name_2}
+
+	Open Agent 			${agnt_options_1}
+	VAR 	${process_agent_1} 	${process_agent}
+	Open Agent 			${agnt_options_2}
+	VAR 	${process_agent_2} 	${process_agent}
+	Open Manager GUI 	${mngr_options}
+
+	Wait For the Scenario Run To Finish
+	Click Button 	Refresh
+
+	Click Label With Horizontal Offset 	FilterType 	140
+	Press Key.down 2 Times
+	Press Combination	Key.enter
+	Click Label With Horizontal Offset 	FilterPattern 	140
+	VAR 	${value} 	*22*
+	Evaluate 	clipboard.copy("${value}") 	modules=clipboard
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.v
+	ELSE
+		Press Combination	KEY.ctrl		KEY.v
+	END
+	Sleep 	5
+	Take A Screenshot
+	# VAR 	${tpsvalue} 	manager_${platform}_label_4.0.png
+	# Wait For 	${tpsvalue} 	 timeout=30
+
+	Click Label With Horizontal Offset 	FilterType 	140
+	Press Key.down 3 Times
+	Press Combination	Key.enter
+	Click Label With Horizontal Offset 	FilterPattern 	140
+	VAR 	${value} 	*2*
+	Evaluate 	clipboard.copy("${value}") 	modules=clipboard
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.v
+	ELSE
+		Press Combination	KEY.ctrl		KEY.v
+	END
+	Sleep 	5
+	Take A Screenshot
+	# VAR 	${tpsvalue} 	manager_${platform}_label_4.0.png
+	# Wait For 	${tpsvalue} 	 timeout=30
+
+	[Teardown]	Run Keywords
+	...    Set Test Variable 	${process_agent} 	${process_agent_1} 	AND
+	...    Stop Agent 	AND
+	...    Set Test Variable 	${process_agent} 	${process_agent_2} 	AND
+	...    Stop Agent 	AND
+	...    Run Keyword 	Close Manager GUI ${platform}
+
+Filter Result Graphs
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure
+	VAR 	${scenario_name} 	filter_result
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
+	VAR 	${agent_name_1} 	TEST_1
+	VAR 	${agent_name_2} 	TEST_2
+	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${results_dir} 	-r 	-a 	2
+	VAR 	@{agnt_options_1} 	-a 	${agent_name_1}
+	VAR 	@{agnt_options_2} 	-a 	${agent_name_2}
+
+	Open Agent 			${agnt_options_1}
+	VAR 	${process_agent_1} 	${process_agent}
+	Open Agent 			${agnt_options_2}
+	VAR 	${process_agent_2} 	${process_agent}
+	Open Manager GUI 	${mngr_options}
+
+	Wait For the Scenario Run To Finish
+	Click Button 	Refresh
+
+	Click Label With Horizontal Offset 	FilterType 	140
+	Press Key.down 2 Times
+	Press Combination	Key.enter
+	Click Label With Horizontal Offset 	FilterPattern 	140
+	VAR 	${value} 	*22*
+	Evaluate 	clipboard.copy("${value}") 	modules=clipboard
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.v
+	ELSE
+		Press Combination	KEY.ctrl		KEY.v
+	END
+	Sleep 	5
+	Take A Screenshot
+	# VAR 	${tpsvalue} 	manager_${platform}_label_4.0.png
+	# Wait For 	${tpsvalue} 	 timeout=30
+
+	Click Label With Horizontal Offset 	FilterType 	140
+	Press Key.down 3 Times
+	Press Combination	Key.enter
+	Click Label With Horizontal Offset 	FilterPattern 	140
+	VAR 	${value} 	*2*
+	Evaluate 	clipboard.copy("${value}") 	modules=clipboard
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.v
+	ELSE
+		Press Combination	KEY.ctrl		KEY.v
+	END
+	Sleep 	5
+	Take A Screenshot
+	# VAR 	${tpsvalue} 	manager_${platform}_label_4.0.png
+	# Wait For 	${tpsvalue} 	 timeout=30
+
+	[Teardown]	Run Keywords
+	...    Set Test Variable 	${process_agent} 	${process_agent_1} 	AND
+	...    Stop Agent 	AND
+	...    Set Test Variable 	${process_agent} 	${process_agent_2} 	AND
+	...    Stop Agent 	AND
+	...    Run Keyword 	Close Manager GUI ${platform}
+
 Check Application Icon or Desktop Shortcut in GUI
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
 
