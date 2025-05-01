@@ -3343,6 +3343,7 @@ Filter Agent Graphs
 	Click Label With Horizontal Offset 	FilterAgent 	140
 	Take A Screenshot
 	Select Option 	TEST_1
+	Click Button 	Refresh
 	Sleep 	3
 	Take A Screenshot
 	VAR 	${robots_value} 	manager_${platform}_label_4.0.png
@@ -3379,17 +3380,14 @@ Filter Metric Graphs
 	Press Key.down 2 Times
 	Press Combination	Key.enter
 	Click Label With Horizontal Offset 	FilterPattern 	140
-	VAR 	${value} 	*21*
-	Evaluate 	clipboard.copy("${value}") 	modules=clipboard
+	VAR 	${filter} 	*21*
+	# Evaluate 	clipboard.copy("${value}") 	modules=clipboard
 	IF  "${platform}" == "macos"
-		Press Combination	KEY.command		KEY.a
-		Press Combination 	KEY.backspace
-		Press Combination	KEY.command		KEY.v
+		Press Combination 	KEY.command 	KEY.a
 	ELSE
-		Press Combination	KEY.command		KEY.a
-		Press Combination 	KEY.backspace
-		Press Combination	KEY.ctrl		KEY.v
+		Double Click
 	END
+	Type 	${filter}
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
@@ -3403,17 +3401,14 @@ Filter Metric Graphs
 	Press Key.down 3 Times
 	Press Combination	Key.enter
 	Click Label With Horizontal Offset 	FilterPattern 	140
-	VAR 	${value} 	*Keyword 1*
-	Evaluate 	clipboard.copy("${value}") 	modules=clipboard
+	VAR 	${filter} 	*Keyword 1*
+	# Evaluate 	clipboard.copy("${value}") 	modules=clipboard
 	IF  "${platform}" == "macos"
-		Press Combination	KEY.command		KEY.a
-		Press Combination 	KEY.backspace
-		Press Combination	KEY.command		KEY.v
+		Press Combination 	KEY.command 	KEY.a
 	ELSE
-		Press Combination	KEY.command		KEY.a
-		Press Combination 	KEY.backspace
-		Press Combination	KEY.ctrl		KEY.v
+		Double Click
 	END
+	Type 	${filter}
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
@@ -3453,17 +3448,14 @@ Filter Result Graphs
 	Press Key.down 2 Times
 	Press Combination	Key.enter
 	Click Label With Horizontal Offset 	FilterPattern 	140
-	VAR 	${value} 	*21*
-	Evaluate 	clipboard.copy("${value}") 	modules=clipboard
+	VAR 	${filter} 	*21*
+	# Evaluate 	clipboard.copy("${value}") 	modules=clipboard
 	IF  "${platform}" == "macos"
-		Press Combination	KEY.command		KEY.a
-		Press Combination 	KEY.backspace
-		Press Combination	KEY.command		KEY.v
+		Press Combination 	KEY.command 	KEY.a
 	ELSE
-		Press Combination	KEY.command		KEY.a
-		Press Combination 	KEY.backspace
-		Press Combination	KEY.ctrl		KEY.v
+		Double Click
 	END
+	Type 	${filter}
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
@@ -3477,17 +3469,14 @@ Filter Result Graphs
 	Press Key.down 3 Times
 	Press Combination	Key.enter
 	Click Label With Horizontal Offset 	FilterPattern 	140
-	VAR 	${value} 	*Keyword 1*
-	Evaluate 	clipboard.copy("${value}") 	modules=clipboard
+	VAR 	${filter} 	*Keyword 1*
+	# Evaluate 	clipboard.copy("${value}") 	modules=clipboard
 	IF  "${platform}" == "macos"
-		Press Combination	KEY.command		KEY.a
-		Press Combination 	KEY.backspace
-		Press Combination	KEY.command		KEY.v
+		Press Combination 	KEY.command 	KEY.a
 	ELSE
-		Press Combination	KEY.command		KEY.a
-		Press Combination 	KEY.backspace
-		Press Combination	KEY.ctrl		KEY.v
+		Double Click
 	END
+	Type 	${filter}
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
