@@ -1223,6 +1223,12 @@ class RFSwarmAgent():
 		self.debugmsg(6, "runthread: robotcmd:", robotcmd)
 
 		cmd = [robotcmd]
+
+		if "robotoptions" in self.jobs[jobid]:
+			cmd.append("{}".format(self.jobs[jobid]['robotoptions']))
+
+		self.debugmsg(9, "runthread: cmd:", cmd)
+		
 		cmd.append("-t")
 		cmd.append('"' + test + '"')
 		cmd.append("-d")
@@ -1278,11 +1284,6 @@ class RFSwarmAgent():
 			self.debugmsg(9, "runthread: self.jobs[jobid][testrepeater]:", self.str2bool(self.jobs[jobid]["testrepeater"]), type(self.str2bool(self.jobs[jobid]["testrepeater"])))
 			if self.str2bool(self.jobs[jobid]["testrepeater"]):
 				cmd.append("--listener {}".format('"' + self.repeaterfile + '"'))
-
-		self.debugmsg(9, "runthread: cmd:", cmd)
-
-		if "robotoptions" in self.jobs[jobid]:
-			cmd.append("{}".format(self.jobs[jobid]['robotoptions']))
 
 		self.debugmsg(9, "runthread: cmd:", cmd)
 
