@@ -1223,7 +1223,7 @@ Verify Filter Metric For Data Table and Graph
 	VAR 	${section} 	Filter Data Graph METRIC 1
 	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
 
-	Copy File 	${result_dir}${/}${result_name}.html 	${test_data}${/}${result_name}_METRIC_1.html
+	Copy File 	${result_dir}${/}${result_name}.html 	${OUTPUT_DIR}${/}${issue}${/}${result_name}_METRIC_1.html
 	Remove File 	${result_dir}${/}${result_name}.html
 
 
@@ -1275,7 +1275,7 @@ Verify Filter Metric For Data Table and Graph
 	VAR 	${section} 	Filter Data Graph METRIC 2
 	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
 
-	Copy File 	${result_dir}${/}${result_name}.html 	${test_data}${/}${result_name}_METRIC_2.html
+	Copy File 	${result_dir}${/}${result_name}.html 	${OUTPUT_DIR}${/}${issue}${/}${result_name}_METRIC_2.html
 	Remove File 	${result_dir}${/}${result_name}.html
 
 	[Teardown] 	Run Keywords
