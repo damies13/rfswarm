@@ -1228,7 +1228,7 @@ class RFSwarmAgent():
 			cmd.append("{}".format(self.jobs[jobid]['robotoptions']))
 
 		self.debugmsg(9, "runthread: cmd:", cmd)
-		
+
 		cmd.append("-t")
 		cmd.append('"' + test + '"')
 		cmd.append("-d")
