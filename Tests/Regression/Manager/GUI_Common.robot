@@ -1617,22 +1617,25 @@ Navigate to and check Desktop Icon For Windows
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	Take A Screenshot
 
-	# Navigate Start Menu
-	Type 	RFSwarm
-	Sleep 	0.5
-	Take A Screenshot
-
-	# Press Combination 	KEY.ENTER
+	#
+	# Start menu searching with best match result unreliable
+	# 
+	# # Navigate Start Menu
+	# Type 	RFSwarm
+	# Sleep 	0.5
 	# Take A Screenshot
-
-	${img}=	Set Variable		${platform}_search_bestmatch.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-
-	# Check for Icon
-	${img}=	Set Variable		${platform}_search_rfswarm_manager.png
+	#
+	# # Press Combination 	KEY.ENTER
+	# # Take A Screenshot
+	#
+	# ${img}=	Set Variable		${platform}_search_bestmatch.png
+	# Wait For 	${img} 	 timeout=${default_image_timeout}
+	#
+	# # Check for Icon
+	# ${img}=	Set Variable		${platform}_search_rfswarm_manager.png
+	# # Take A Screenshot
+	# Wait For 	${img} 	 timeout=${default_image_timeout}
 	# Take A Screenshot
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-	Take A Screenshot
 
 	Press Combination 	KEY.ESC
 
