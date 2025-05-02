@@ -4,9 +4,9 @@ title = #_TEST_TITLE_123
 timezone = Europe/Warsaw
 dateformat = yyyy-mm-dd
 timeformat = HH:MM
-startoffset = -54
+startoffset = -43
 showstarttime = -1
-endoffset = 42
+endoffset = 47
 showtlogo = -1
 showendtime = -1
 font = Verdana
@@ -17,7 +17,7 @@ percentile = 90
 name = Test Result Summary
 parent = TOP
 type = table
-changed = 1746138050.433258
+changed = 1746195188.2354584
 colours = 0
 datatype = Metric
 col_result_name_show = 1
@@ -29,7 +29,7 @@ col_std_dev_show = 1
 col_pass_show = 1
 col_fail_show = 1
 col_other_show = 0
-sql = SELECT PrimaryMetric , SecondaryMetric , MetricValue FROM MetricData WHERE MetricType == 'Summary' AND MetricTime >= 1746088783 AND MetricTime <= 1746088865 GROUP by PrimaryMetric , SecondaryMetric
+sql = SELECT PrimaryMetric , SecondaryMetric , MetricValue FROM MetricData WHERE MetricType == 'Summary' AND MetricTime >= 1746088783 AND MetricTime <= 1746088860 GROUP by PrimaryMetric , SecondaryMetric
 filteragent = 
 filtertype = None
 col_primarymetric_show = 1
@@ -38,18 +38,19 @@ col_secondarymetric_show = 1
 col_metricvalue_show = 1
 filterpattern = 
 metrictype = Summary
+secondarymetric = 
 
 [FD47763734B]
 name = Table of Contents
 parent = TOP
 type = contents
-changed = 1746138046.6618762
+changed = 1746137928.990252
 
 [FD4776B42A1]
 name = Errors
 parent = TOP
 type = errors
-changed = 1746138046.6639907
+changed = 1746137928.9917583
 images = 1
 grouprn = 1
 groupet = 1
@@ -59,16 +60,16 @@ sql = SELECT r.script_index || '_' || r.robot || '_' || r.iteration || '_' || r.
 name = Data Graph
 parent = TOP
 type = graph
-changed = 1746138046.6639907
+changed = 1746137928.9917583
 
 [FD3729CF59EL]
-changed = 1746137624.2308934
+changed = 1746195142.2580066
 resulttype = Response Time
 filterresult = None
 filteragent = 
 datatype = Metric
-sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric as x91Namex93  FROM MetricData WHERE MetricType == 'Summary' AND SecondaryMetric == 'avg' AND MetricTime >= 1746088783 AND MetricTime <= 1746088865 ORDER BY MetricTime
-filtertype = None
+sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric as x91Namex93  FROM MetricData WHERE MetricType == 'Summary' AND SecondaryMetric == 'min' AND MetricTime >= 1746088783 AND MetricTime <= 1746088860 ORDER BY MetricTime
+filtertype = Not Wildcard (Unix Glob)
 filterpattern = 
 axisen = 1
 isnumeric = 0
@@ -98,7 +99,7 @@ showtotal = -1
 name = Note
 parent = TOP
 type = note
-changed = 1746138046.6618762
+changed = 1746137928.989253
 note = Test_Note 123 x35$x37x12
 
 [Colours]
@@ -109,7 +110,7 @@ namecolours = total,pass,fail,warning,not run,example test case x:\programy\robo
 name = Robots
 parent = TOP
 type = graph
-changed = 1746138046.6629996
+changed = 1746137928.990252
 
 [FE16DE59841L]
 metrictype = Agent

@@ -1619,7 +1619,7 @@ Navigate to and check Desktop Icon For Windows
 
 	# Navigate Start Menu
 	Type 	RFSwarm
-	Sleep 	0.5
+	Sleep 	2
 	Take A Screenshot
 
 	# Press Combination 	KEY.ENTER
