@@ -10414,6 +10414,10 @@ class RFSwarmGUI(tk.Frame):
 			base.scriptcount += -1
 		base.scriptlist = [{}]
 		base.addScriptRow()
+		while base.mscriptcount > 0:
+			self.msr_remove_row(base.mscriptcount)
+			base.mscriptcount += -1
+		base.mscriptlist = [{}]
 
 	def mnu_file_Open(self, _event=None):
 		base.debugmsg(9, "mnu_file_Open")
