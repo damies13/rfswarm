@@ -160,6 +160,7 @@ The data graph section is used for displaying graphs of test results and other m
 
 The data sources for the graphs can be:
 - [Plan](#data-graph-plan)
+- [Monitoring](#data-graph-monitoring)
 - [Metric](#data-graph-metric)
 - [Result](#data-graph-result)
 - [Custom SQL](#data-graph-sql)
@@ -172,6 +173,13 @@ The Plan Data Graph allows you to include the graph from the plan tab of the RFS
 
 **Show Total** - If enabled, shows a line for the total number of planned robots. The image below shows an example with Show Total enabled.
 > ![Image](Images/MacOS_Reporter_v1.4.0_DataGraph_PlanPreview.png)
+
+##### Data Graph Monitoring
+The Monitoring Data Graph allows you to include a graph of the monitoring tab of the RFSwarm Manager in your test report. As all monitor groups have a robot count of 1, this graph may not be very useful, though it will show the planned run time for the monitoring groups.
+> ![Image](Images/Ubuntu_Reporter_v1.5.0_DataGraph_Monitoring.png)
+
+**Show Total** - If enabled, shows a line for the total number of planned monitoring robots, this will be equal to the number of monitoring groups in your scenario. The image below shows an example with Show Total enabled.
+> ![Image](Images/Ubuntu_Reporter_v1.5.0_DataGraph_MonitoringPreview.png)
 
 ##### Data Graph Metric
 > ![Image](Images/Linux_Reporter_v1.5.0_DataGraph_Metric.png)
@@ -264,6 +272,7 @@ To control the colours on the table and graphs, click the colour swatch in the d
 
 The data sources for the graphs can be:
 - [Plan](#data-table-plan)
+- [Monitoring](#data-table-monitoring)
 - [Metric](#data-table-metric)
 - [Result](#data-table-result)
 - [ResultSummary](#data-table-resultsummary)
@@ -279,6 +288,17 @@ The Plan Data Table allows you to include the test row data from the plan tab of
 
 The image below shows an example with Show graph colours and all columns enabled.
 > ![Image](Images/MacOS_Reporter_v1.4.0_DataTable_PlanPreview.png)
+
+##### Data Table Monitoring
+The Monitoring Data Table allows you to include the test row data from the monitoring tab of the RFSwarm Manager in your test report.
+> ![Image](Images/Ubuntu_Reporter_v1.5.0_DataTable_Monitoring.png)
+
+**Show Column** - If disabled, hides the column from the report
+
+**Options** - Allows you to choose what is shown in the column, currently only the script column has an option that allows you to choose between the filename of the robot file or the full path of the robot file
+
+The image below shows an example without Show graph colours and all columns enabled.
+> ![Image](Images/Ubuntu_Reporter_v1.5.0_DataTable_MonitoringPreview.png)
 
 ##### Data Table Metric
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric.png)
