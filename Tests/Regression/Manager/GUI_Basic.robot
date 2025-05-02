@@ -78,7 +78,7 @@ Open GUI
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	Take A Screenshot
 
-Select Agents Monitoring
+Select Monitoring Tab
 	[Tags]	ubuntu-latest		windows-latest		macos-latest	Issue #173
 	Click Tab 	 Monitoring
 	Sleep 	5

@@ -38,17 +38,15 @@ You will probably want to refer to the [Hardware Requirements](HardwareRequireme
 
 There may be a firewall blocking the communication, Windows 10, Recent Mac OSX and some linux desktop distributions come with a firewall enabled by default. Consult your operating system documentation for both the Agent and Manager machines to confirm if this is the case, if so you may need to [add a firewall rule](./rfswarm_py.md#2-adjust-the-firewall).
 
-## I have some experience in performance testing, can you translate the terminology between rfswarm and tool xzy?
+## I have some experience in performance testing, can you translate the terminology between RFSwarm and tool xzy?
 
-This should cover off the main components with the most common tools:
-
-|rfswarm|Loadrunner|JMeter|
-|-------|----------|------|
-|Manager|Controller|JMeter client (JMeter GUI)|
-|Agents|Agent process (sometimes called Load Generators or Injectors)|JMeter servers (JMeterEngine)|
-|Reporter|Analysis||
-|Scenario|Scenario|Test Plan|
-|Test Case|Script|Thread Group|
+|rfswarm|JMeter|Loadrunner|NeoLoad|
+|-------|------|----------|-------|
+|Manager|JMeter client (JMeter GUI)|Controller|Runtime Tab|
+|Agents|JMeter servers (JMeterEngine)|Agent process (sometimes called Load Generators or Injectors)|Load Generators|
+|Reporter||Analysis|Results Tab|
+|Scenario|Test Plan|Scenario|Runtime Tab > Scenarios Tab|
+|Test Case|Thread Group|Script|Design Tab > User Paths|
 
 ## Can you help me get started? Which test cases should I choose?
 

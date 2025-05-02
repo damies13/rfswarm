@@ -3386,16 +3386,20 @@ Check If Monitoring settings are loaded and used
 	Click Button	runopen
 	Open Scenario File OS DIALOG	${scenario_name}
 
+	Take A Screenshot
 	Click Tab	Monitoring
+	Take A Screenshot
 
 	Log 	Verify Monitoring screen loaded as expected
 	Wait For 	manager_${platform}_issue_173_monitoring_settings.png 	 timeout=${default_image_timeout}
 
 	Click Tab	Plan
+	Take A Screenshot
 
 	Log 	Verify Plan screen loaded as expected
 	Wait For 	manager_${platform}_issue_173_plan_settings.png 	 timeout=${default_image_timeout}
 
+	Take A Screenshot
 	Check If The Agent Is Ready
 	Click Tab	Plan
 	Click Button	runplay
