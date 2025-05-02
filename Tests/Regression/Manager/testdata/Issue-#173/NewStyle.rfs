@@ -4,7 +4,7 @@ scriptcount = 2
 monitortimebefore = 30
 monitortimeafter = 90
 monitorcount = 5
-graphlist = 
+graphlist =
 
 [Script Defaults]
 resultnamemode = kywrd
@@ -13,18 +13,18 @@ disablelogreport = True
 excludelibraries = BuiltIn,String,OperatingSystem,perftest,requestslibrary,fakerlibrary
 
 [1]
-robots = 20
+robots = 6
 delay = 0
-rampup = 1800
-run = 7200
+rampup = 30
+run = 60
 test = Test Scenario 1
 script = AppTests.robot
 
 [2]
-robots = 10
+robots = 4
 delay = 0
-rampup = 1800
-run = 7200
+rampup = 30
+run = 60
 test = Test Scenario 2
 script = AppTests.robot
 
@@ -68,4 +68,3 @@ rampup = 0
 run = 0
 test = Simulated DB Server 2
 script = monitoring.robot
-

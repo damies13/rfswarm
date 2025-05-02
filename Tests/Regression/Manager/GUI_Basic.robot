@@ -78,6 +78,11 @@ Open GUI
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	Take A Screenshot
 
+Select Agents Monitoring
+	[Tags]	ubuntu-latest		windows-latest		macos-latest	Issue #173
+	Click Tab 	 Monitoring
+	Sleep 	5
+
 Select Run Tab
 	[Tags]	ubuntu-latest		windows-latest		macos-latest
 	Click Tab 	 Run
