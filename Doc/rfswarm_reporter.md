@@ -175,7 +175,7 @@ The Plan Data Graph allows you to include the graph from the plan tab of the RFS
 > ![Image](Images/MacOS_Reporter_v1.4.0_DataGraph_PlanPreview.png)
 
 ##### Data Graph Monitoring
-The Monitoring Data Graph allows you to include a graph of the monitoring tab of the RFSwarm Manager in your test report. As all monitor groups have a robot count of 1, this graph may not be very useful, though it will show the planned run time for the monitoring groups.
+The Monitoring Data Graph allows you to include a graph of the monitoring tab of the RFSwarm Manager in your test report. As all monitor groups have a robot count of 1, this graph may not be very useful, though it will show the planned time for running the  monitoring groups.
 > ![Image](Images/Ubuntu_Reporter_v1.5.0_DataGraph_Monitoring.png)
 
 **Show Total** - If enabled, shows a line for the total number of planned monitoring robots, this will be equal to the number of monitoring groups in your scenario. The image below shows an example with Show Total enabled.
