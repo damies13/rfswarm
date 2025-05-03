@@ -17,7 +17,7 @@ percentile = 90
 name = Test Result Summary
 parent = TOP
 type = table
-changed = 1746260370.6317573
+changed = 1746305977.992098
 colours = 0
 datatype = Result
 col_result_name_show = 1
@@ -29,7 +29,7 @@ col_std_dev_show = 1
 col_pass_show = 1
 col_fail_show = 1
 col_other_show = 0
-sql = SELECT result_name as x91Result Namex93 , round(min(elapsed_time),3) 'Minimum' , round(avg(elapsed_time),3) 'Average' , round(percentile(elapsed_time, 90),3) '90x37ile' , round(max(elapsed_time),3) 'Maximum' , round(stdev(elapsed_time),3) 'Std. Dev.' , count(result) as 'Count' FROM Results WHERE x91Result Namex93 NOT LIKE 'Exception in threadx37' AND end_time >= 1746088783 AND end_time <= 1746088860 GROUP by x91Result Namex93
+sql = SELECT result_name || ' - ' || result as x91Result Namex93 , round(min(elapsed_time),3) 'Minimum' , round(avg(elapsed_time),3) 'Average' , round(percentile(elapsed_time, 90),3) '90x37ile' , round(max(elapsed_time),3) 'Maximum' , round(stdev(elapsed_time),3) 'Std. Dev.' , count(result) as 'Count' FROM Results WHERE x91Result Namex93 NOT LIKE 'Exception in threadx37' AND end_time >= 1746088783 AND end_time <= 1746088860 GROUP by x91Result Namex93
 filteragent = 
 filtertype = None
 col_primarymetric_show = 1
@@ -43,18 +43,19 @@ resulttype = Response Time
 filterresult = None
 col_count_show = 1
 col_result__show = 1
+enablefilterresult = 1
 
 [FD47763734B]
 name = Table of Contents
 parent = TOP
 type = contents
-changed = 1746260348.4670987
+changed = 1746305952.8972926
 
 [FD4776B42A1]
 name = Errors
 parent = TOP
 type = errors
-changed = 1746260352.1332328
+changed = 1746305952.9002922
 images = 1
 grouprn = 1
 groupet = 1
@@ -64,7 +65,7 @@ sql = SELECT r.script_index || '_' || r.robot || '_' || r.iteration || '_' || r.
 name = Data Graph
 parent = TOP
 type = graph
-changed = 1746260348.468099
+changed = 1746305952.8992906
 
 [FD3729CF59EL]
 changed = 1746260390.3435724
@@ -103,7 +104,7 @@ showtotal = -1
 name = Note
 parent = TOP
 type = note
-changed = 1746260348.4651003
+changed = 1746305952.8972926
 note = Test_Note 123 x35$x37x12
 
 [Colours]
@@ -114,7 +115,7 @@ namecolours = total,pass,fail,warning,not run,example test case x:\programy\robo
 name = Robots
 parent = TOP
 type = graph
-changed = 1746260348.4670987
+changed = 1746305952.8982909
 
 [FE16DE59841L]
 metrictype = Agent
