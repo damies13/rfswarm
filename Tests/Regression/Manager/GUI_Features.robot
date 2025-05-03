@@ -3383,8 +3383,9 @@ Check If Monitoring settings are loaded and used
 
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#173${/}NewStyle.rfs
 	Copy File	${scenariofile}		${global_path}
-	Click Button	runopen
-	Select Robot File OS DIALOG 	${scenariofile}
+	Click Button						runopen
+	Wait For Dialog Button				cancel
+	File Open Dialogue Select File 		${scenariofile}
 
 	Take A Screenshot
 	Click Tab	Monitoring
