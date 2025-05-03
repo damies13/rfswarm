@@ -1179,10 +1179,10 @@ Verify Filter Metric For Data Table and Graph - Wildcard
 	Sleep 	1
 	Click Label With Horizontal Offset 	FilterType 	140
 	Take A Screenshot
-	Press Key.down 2 Times
-	Press Combination	Key.enter
+	Select Option 	Wildcard
 	VAR 	${filter} 	*21*
 	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=140
+	Sleep 	2
 	Take A Screenshot
 	Click Tab 	Preview
 	Sleep 	2
@@ -1192,10 +1192,10 @@ Verify Filter Metric For Data Table and Graph - Wildcard
 	Sleep 	1
 	Click Label With Horizontal Offset 	FilterType 	140
 	Take A Screenshot
-	Press Key.down 2 Times
-	Press Combination	Key.enter
+	Select Option 	Wildcard
 	VAR 	${filter} 	*21*
 	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=140
+	Sleep 	2
 	Take A Screenshot
 	Click Tab 	Preview
 	Sleep 	2
@@ -1260,10 +1260,10 @@ Verify Filter Metric For Data Table and Graph - Not Wildcard
 	Sleep 	1
 	Click Label With Horizontal Offset 	FilterType 	140
 	Take A Screenshot
-	Press Key.down 3 Times
-	Press Combination	Key.enter
+	Select Option 	NotWildcard
 	VAR 	${filter} 	*Keyword *2
 	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=140
+	Sleep 	2
 	Take A Screenshot
 	Click Tab 	Preview
 	Sleep 	2
@@ -1273,10 +1273,10 @@ Verify Filter Metric For Data Table and Graph - Not Wildcard
 	Sleep 	1
 	Click Label With Horizontal Offset 	FilterType 	140
 	Take A Screenshot
-	Press Key.down 3 Times
-	Press Combination	Key.enter
+	Select Option 	NotWildcard
 	VAR 	${filter} 	*Keyword *2
 	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=140
+	Sleep 	2
 	Take A Screenshot
 	Click Tab 	Preview
 	Sleep 	2
@@ -1339,10 +1339,10 @@ Verify Filter Result For Data Table and Graph - Wildcard
 	Sleep 	1
 	Click Label With Horizontal Offset 	FilterType 	140
 	Take A Screenshot
-	Press Key.down 2 Times
-	Press Combination	Key.enter
+	Select Option 	Wildcard
 	VAR 	${filter} 	*21*
 	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=140
+	Sleep 	2
 	Take A Screenshot
 	Click Tab 	Preview
 	Sleep 	2
@@ -1352,10 +1352,10 @@ Verify Filter Result For Data Table and Graph - Wildcard
 	Sleep 	1
 	Click Label With Horizontal Offset 	FilterType 	140
 	Take A Screenshot
-	Press Key.down 2 Times
-	Press Combination	Key.enter
+	Select Option 	Wildcard
 	VAR 	${filter} 	*21*
 	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=140
+	Sleep 	2
 	Take A Screenshot
 	Click Tab 	Preview
 	Sleep 	2
@@ -1420,10 +1420,10 @@ Verify Filter Result For Data Table and Graph - Not Wildcard
 	Sleep 	1
 	Click Label With Horizontal Offset 	FilterType 	140
 	Take A Screenshot
-	Press Key.down 3 Times
-	Press Combination	Key.enter
+	Select Option 	NotWildcard
 	VAR 	${filter} 	*Keyword *2
 	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=140
+	Sleep 	2
 	Take A Screenshot
 	Click Tab 	Preview
 	Sleep 	2
@@ -1433,10 +1433,10 @@ Verify Filter Result For Data Table and Graph - Not Wildcard
 	Sleep 	1
 	Click Label With Horizontal Offset 	FilterType 	140
 	Take A Screenshot
-	Press Key.down 3 Times
-	Press Combination	Key.enter
+	Select Option 	NotWildcard
 	VAR 	${filter} 	*Keyword *2
 	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=140
+	Sleep 	2
 	Take A Screenshot
 	Click Tab 	Preview
 	Sleep 	2
@@ -1501,8 +1501,9 @@ Verify Filter Result For Data Table and Graph - Filter Result
 	Take A Screenshot
 	Click Label With Horizontal Offset 	FilterResult 	140
 	Sleep 	1
-	Press Key.down 3 Times 	# FAIL
-	Press Combination	Key.enter
+	Take A Screenshot
+	Select Option 	Fail
+	Sleep 	2
 	Take A Screenshot
 	Click Tab 	Preview
 	Sleep 	2
@@ -1514,8 +1515,8 @@ Verify Filter Result For Data Table and Graph - Filter Result
 	Click Label With Horizontal Offset 	FilterResult 	140
 	Sleep 	1
 	Take A Screenshot
-	Press Key.down 3 Times 	# FAIL
-	Press Combination	Key.enter
+	Select Option 	Fail
+	Sleep 	2
 	Take A Screenshot
 	Click Tab 	Preview
 	Sleep 	2
