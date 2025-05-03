@@ -3357,7 +3357,7 @@ Verify That TPS Is TP And Not TPmS
 # 	...    Stop Agent 	AND
 # 	...    Run Keyword 	Close Manager GUI ${platform}
 
-Verify Filter Metric Graphs
+Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure
 	VAR 	${scenario_name} 	filter_metric
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
@@ -3374,7 +3374,7 @@ Verify Filter Metric Graphs
 	Open Manager GUI 	${mngr_options}
 
 	Wait For the Scenario Run To Finish
-	Click Button 	Refresh
+	Click Button 	Refresh 	# re-load settings
 
 	Click Label With Horizontal Offset 	FilterType 	140
 	Press Key.down 2 Times
@@ -3391,14 +3391,16 @@ Verify Filter Metric Graphs
 		Sleep 	1
 		Press Combination	KEY.ctrl		KEY.v
 	END
+
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
 	VAR 	${y_value} 	manager_${platform}_label_8.png
-	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=6
-	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph!
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should not be visible on the graph.
 	VAR 	${y_value} 	manager_${platform}_label_4.png
-	Wait For 	${y_value} 	 timeout=30
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
 
 	Click Label With Horizontal Offset 	FilterType 	140
 	Press Key.down 3 Times
@@ -3415,14 +3417,16 @@ Verify Filter Metric Graphs
 		Sleep 	1
 		Press Combination	KEY.ctrl		KEY.v
 	END
+
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
 	VAR 	${y_value} 	manager_${platform}_label_8.png
-	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=6
-	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph!
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should not be visible on the graph.
 	VAR 	${y_value} 	manager_${platform}_label_4.png
-	Wait For 	${y_value} 	 timeout=30
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
 
 	[Teardown]	Run Keywords
 	...    Set Test Variable 	${process_agent} 	${process_agent_1} 	AND
@@ -3431,7 +3435,7 @@ Verify Filter Metric Graphs
 	...    Stop Agent 	AND
 	...    Run Keyword 	Close Manager GUI ${platform}
 
-Verify Filter Result Graphs
+Verify Filter Result Graphs - Wildcard & Not Wildcard
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure
 	VAR 	${scenario_name} 	filter_result
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
@@ -3448,7 +3452,7 @@ Verify Filter Result Graphs
 	Open Manager GUI 	${mngr_options}
 
 	Wait For the Scenario Run To Finish
-	Click Button 	Refresh
+	Click Button 	Refresh 	# re-load settings
 
 	Click Label With Horizontal Offset 	FilterType 	140
 	Press Key.down 2 Times
@@ -3465,14 +3469,16 @@ Verify Filter Result Graphs
 		Sleep 	1
 		Press Combination	KEY.ctrl		KEY.v
 	END
+
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
 	VAR 	${y_value} 	manager_${platform}_label_8.png
-	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=6
-	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph!
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}" should not be visible on the graph.
 	VAR 	${y_value} 	manager_${platform}_label_4.png
-	Wait For 	${y_value} 	 timeout=30
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
 
 	Click Label With Horizontal Offset 	FilterType 	140
 	Press Key.down 3 Times
@@ -3489,14 +3495,16 @@ Verify Filter Result Graphs
 		Sleep 	1
 		Press Combination	KEY.ctrl		KEY.v
 	END
+
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
 	VAR 	${y_value} 	manager_${platform}_label_8.png
-	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=6
-	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph!
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}" should not be visible on the graph.
 	VAR 	${y_value} 	manager_${platform}_label_4.png
-	Wait For 	${y_value} 	 timeout=30
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
 
 	[Teardown]	Run Keywords
 	...    Set Test Variable 	${process_agent} 	${process_agent_1} 	AND
