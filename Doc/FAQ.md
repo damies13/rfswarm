@@ -43,7 +43,7 @@ There may be a firewall blocking the communication, Windows 10, Recent Mac OSX a
 |rfswarm|JMeter|Loadrunner|NeoLoad|
 |-------|------|----------|-------|
 |Manager|JMeter client (JMeter GUI)|Controller|Runtime Tab|
-|Agents|JMeter servers (JMeterEngine)|Agent process (sometimes called Load Generators or Injectors)|Load Generators|
+|Agents|JMeter servers (JMeterEngine)|Agent process <br>(sometimes called Load Generators or Injectors)|Load Generators|
 |Reporter||Analysis|Results Tab|
 |Scenario|Test Plan|Scenario|Runtime Tab > Scenarios Tab|
 |Test Case|Thread Group|Script|Design Tab > User Paths|

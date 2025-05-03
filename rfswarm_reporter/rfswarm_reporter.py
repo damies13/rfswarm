@@ -9422,7 +9422,7 @@ class ReporterGUI(tk.Frame):
 			self.contentdata[id]["lblshowcol"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Show Column")
 			self.contentdata[id]["lblshowcol"].grid(column=2, row=rownum, sticky="nsew")
 
-			if datatype == "Plan":
+			if datatype in ["Plan", "Monitoring"]:
 				self.contentdata[id]["lblcolopt"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Options")
 				self.contentdata[id]["lblcolopt"].grid(column=3, row=rownum, sticky="nsew")
 

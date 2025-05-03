@@ -261,7 +261,10 @@ Here is an example of configuring the Filter Rules and using the Robot options:
 ### Monitoring
 This section allows you to add monitoring tests/tasks separately from the tests used for the Application Under Test (AUT), to make a clear distinction between tests that are for validating the performance of the AUT and tests/tasks used for monitoring
 
-- All monitoring groups will have 1 robot each, a delay and ramp-up of 0, and run's time is calculated based on `Monitoring time before test + total plan execution time + Monitoring time after test`
+- All monitoring groups will have:
+  - 1 robot each
+  - a delay and ramp-up of 0 seconds
+  - and for run, the time is calculated based on `Monitoring time before test + total plan execution time + Monitoring time after test`
 - All monitoring groups will start immediately and run until the scenario end
 
 #### Monitoring time before test
