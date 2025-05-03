@@ -3379,12 +3379,12 @@ Check If Monitoring settings are loaded and used
 	VAR 	${monitortimebefore}= 		30
 	VAR 	${monitortimeafter}= 		90
 	VAR 	${robot_test_time}= 		60
-	VAR 	${scenario_name}= 			NewStyle
+	# VAR 	${scenario_name}= 			NewStyle
 
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#173${/}NewStyle.rfs
 	Copy File	${scenariofile}		${global_path}
 	Click Button	runopen
-	Open Scenario File OS DIALOG	${scenario_name}
+	Open Scenario File OS DIALOG	${scenariofile}
 
 	Take A Screenshot
 	Click Tab	Monitoring
