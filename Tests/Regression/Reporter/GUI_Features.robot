@@ -1177,11 +1177,11 @@ Verify Filter Metric For Data Table and Graph - Wildcard
  	# Enable filters:
 	Click Section	TestResultSummary
 	Sleep 	1
-	Click Label With Horizontal Offset 	FilterType 	140
+	Click Label With Horizontal Offset 	FilterType 	120
 	Take A Screenshot
 	Select Option 	Wildcard
 	VAR 	${filter} 	*21*
-	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=140
+	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=120
 	Sleep 	2
 	Take A Screenshot
 	Click Tab 	Preview
@@ -1190,11 +1190,11 @@ Verify Filter Metric For Data Table and Graph - Wildcard
 	Click Tab 	Settings
 	Click Section 	DataGraph
 	Sleep 	1
-	Click Label With Horizontal Offset 	FilterType 	140
+	Click Label With Horizontal Offset 	FilterType 	120
 	Take A Screenshot
 	Select Option 	Wildcard
 	VAR 	${filter} 	*21*
-	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=140
+	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=120
 	Sleep 	2
 	Take A Screenshot
 	Click Tab 	Preview
@@ -1258,11 +1258,11 @@ Verify Filter Metric For Data Table and Graph - Not Wildcard
 	# Enable filters:
 	Click Section	TestResultSummary
 	Sleep 	1
-	Click Label With Horizontal Offset 	FilterType 	140
+	Click Label With Horizontal Offset 	FilterType 	120
 	Take A Screenshot
 	Select Option 	NotWildcard
 	VAR 	${filter} 	*Keyword *2
-	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=140
+	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=120
 	Sleep 	2
 	Take A Screenshot
 	Click Tab 	Preview
@@ -1271,11 +1271,11 @@ Verify Filter Metric For Data Table and Graph - Not Wildcard
 	Click Tab 	Settings
 	Click Section 	DataGraph
 	Sleep 	1
-	Click Label With Horizontal Offset 	FilterType 	140
+	Click Label With Horizontal Offset 	FilterType 	120
 	Take A Screenshot
 	Select Option 	NotWildcard
 	VAR 	${filter} 	*Keyword *2
-	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=140
+	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=120
 	Sleep 	2
 	Take A Screenshot
 	Click Tab 	Preview
@@ -1337,11 +1337,11 @@ Verify Filter Result For Data Table and Graph - Wildcard
  	# Enable filters:
 	Click Section	TestResultSummary
 	Sleep 	1
-	Click Label With Horizontal Offset 	FilterType 	140
+	Click Label With Horizontal Offset 	FilterType 	120
 	Take A Screenshot
 	Select Option 	Wildcard
 	VAR 	${filter} 	*21*
-	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=140
+	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=120
 	Sleep 	2
 	Take A Screenshot
 	Click Tab 	Preview
@@ -1350,11 +1350,11 @@ Verify Filter Result For Data Table and Graph - Wildcard
 	Click Tab 	Settings
 	Click Section 	DataGraph
 	Sleep 	1
-	Click Label With Horizontal Offset 	FilterType 	140
+	Click Label With Horizontal Offset 	FilterType 	120
 	Take A Screenshot
 	Select Option 	Wildcard
 	VAR 	${filter} 	*21*
-	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=140
+	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=120
 	Sleep 	2
 	Take A Screenshot
 	Click Tab 	Preview
@@ -1418,11 +1418,11 @@ Verify Filter Result For Data Table and Graph - Not Wildcard
 	# Enable filters:
 	Click Section	TestResultSummary
 	Sleep 	1
-	Click Label With Horizontal Offset 	FilterType 	140
+	Click Label With Horizontal Offset 	FilterType 	120
 	Take A Screenshot
 	Select Option 	NotWildcard
 	VAR 	${filter} 	*Keyword *2
-	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=140
+	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=120
 	Sleep 	2
 	Take A Screenshot
 	Click Tab 	Preview
@@ -1431,11 +1431,11 @@ Verify Filter Result For Data Table and Graph - Not Wildcard
 	Click Tab 	Settings
 	Click Section 	DataGraph
 	Sleep 	1
-	Click Label With Horizontal Offset 	FilterType 	140
+	Click Label With Horizontal Offset 	FilterType 	120
 	Take A Screenshot
 	Select Option 	NotWildcard
 	VAR 	${filter} 	*Keyword *2
-	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=140
+	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=120
 	Sleep 	2
 	Take A Screenshot
 	Click Tab 	Preview
@@ -1499,10 +1499,12 @@ Verify Filter Result For Data Table and Graph - Filter Result
 	Click Section	TestResultSummary
 	Sleep 	1
 	Take A Screenshot
-	Click Label With Horizontal Offset 	FilterResult 	140
+	Click Label With Horizontal Offset 	FilterResult 	120
 	Sleep 	1
 	Take A Screenshot
 	Select Option 	Fail
+	Sleep 	1
+	Click Label With Vertical Offset 	Enabled 	42 	# enable filter
 	Sleep 	2
 	Take A Screenshot
 	Click Tab 	Preview
@@ -1512,10 +1514,12 @@ Verify Filter Result For Data Table and Graph - Filter Result
 	Click Section 	DataGraph
 	Sleep 	1
 	Take A Screenshot
-	Click Label With Horizontal Offset 	FilterResult 	140
+	Click Label With Horizontal Offset 	FilterResult 	120
 	Sleep 	1
 	Take A Screenshot
 	Select Option 	Fail
+	Sleep 	1
+	Click Label With Vertical Offset 	Enabled 	42 	# enable filter
 	Sleep 	2
 	Take A Screenshot
 	Click Tab 	Preview
