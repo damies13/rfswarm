@@ -3403,9 +3403,11 @@ Check If Monitoring settings are loaded and used
 	Take A Screenshot
 	Check If The Agent Is Ready
 	Click Tab	Plan
+	sleep 	1
 	Click Button	runplay
 	# Stop Test Scenario Run Gradually	${15}	${60}
 	${START_TIME}= 	Get Current Date
+	sleep 	10
 	Take A Screenshot
 
 	Log 	Wait for monitoring robots to start

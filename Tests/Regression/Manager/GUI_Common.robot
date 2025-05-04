@@ -1325,15 +1325,19 @@ File Open Dialogue windows Select File
 	Sleep	3
 	# Take A Screenshot
 	${filepath}= 	Normalize Path 	${filepath}
-	#${path} 	${file} = 	Split Path 	${filepath}
+	${path} 	${file} = 	Split Path 	${filepath}
 	Click Label With Horizontal Offset 	file_name 	50
 	Sleep	0.5
-	Type 		${filepath}
+	Type 		${path} 	Key.ENTER
+	Sleep	0.5
+	Take A Screenshot
+	Type 		${file}
 	Sleep	0.5
 	Take A Screenshot
 	Press key.enter 1 Times
 	# Take A Screenshot
 	# Click Dialog Button 	open
+	Sleep	0.5
 
 File Open Dialogue macos Select File
 	[Arguments]		${filepath}
