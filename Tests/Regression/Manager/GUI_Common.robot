@@ -1330,6 +1330,7 @@ File Open Dialogue windows Select File
 	Sleep	0.5
 	Type 		${filepath}
 	Sleep	0.5
+	Take A Screenshot
 	Press key.enter 1 Times
 	# Take A Screenshot
 	# Click Dialog Button 	open
@@ -1619,7 +1620,7 @@ Navigate to and check Desktop Icon For Windows
 
 	#
 	# Start menu searching with best match result unreliable
-	# 
+	#
 	# # Navigate Start Menu
 	# Type 	RFSwarm
 	# Sleep 	0.5
