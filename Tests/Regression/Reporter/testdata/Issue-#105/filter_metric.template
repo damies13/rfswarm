@@ -69,7 +69,7 @@ filterresult = None
 filteragent = 
 datatype = Metric
 sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric as x91Namex93  FROM MetricData WHERE MetricType == 'Summary' AND SecondaryMetric == 'min' AND MetricTime >= 1746088783 AND MetricTime <= 1746088860 ORDER BY MetricTime
-filtertype = Not Wildcard (Unix Glob)
+filtertype = None
 filterpattern = 
 axisen = 1
 isnumeric = 0
