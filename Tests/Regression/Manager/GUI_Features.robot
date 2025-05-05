@@ -3387,55 +3387,56 @@ Check If Monitoring settings are loaded and used
 	Wait For Dialog Button				cancel
 	File Open Dialogue Select File 		${scenariofile}
 
-	Sleep 	10
-	Take A Screenshot
+	# Sleep 	10
+	# Take A Screenshot
 	Click Tab	Monitoring
-	Take A Screenshot
+	# Take A Screenshot
 
-	Log 	Verify Monitoring screen loaded as expected
+	Log 	Verify Monitoring screen loaded as expected		console=True
 	Wait For 	manager_${platform}_issue_173_monitoring_settings.png 	 timeout=${default_image_timeout}
 
 	Click Tab	Plan
-	Take A Screenshot
+	# Take A Screenshot
 
-	Log 	Verify Plan screen loaded as expected
+	Log 	Verify Plan screen loaded as expected		console=True
 	Wait For 	manager_${platform}_issue_173_plan_settings.png 	 timeout=${default_image_timeout}
 
-	Take A Screenshot
+	# Take A Screenshot
 	Check If The Agent Is Ready
 	Click Tab	Plan
-	Sleep 	1
+	Sleep 	0.5
 	Click Button	runplay
 	# Stop Test Scenario Run Gradually	${15}	${60}
 	${START_TIME}= 	Get Current Date
-	Sleep 	26
-	Take A Screenshot
+	# Sleep 	26		# this was needed to get the _monitor_5 screenshot
+	# Take A Screenshot
 
-	Log 	Wait for monitoring robots to start
+	Log 	Wait for monitoring robots to start		console=True
 	Wait For   manager_${platform}_monitor_5.png    timeout=${monitortimebefore}
 	${MON_START_TIME}= 	Get Current Date
-	Take A Screenshot
+	# Take A Screenshot
 
 	${ELAPSED_TIME}= 	Subtract Date From Date 	${MON_START_TIME} 	${START_TIME}
 	${sleeptime}= 		Evaluate    ${monitortimebefore} - ${ELAPSED_TIME} - 2
 	Sleep    ${sleeptime}
 
-	Log 	Verify robots don't start in pre-run monitoring time
+	Log 	Verify robots don't start in pre-run monitoring time		console=True
 	Wait For   manager_${platform}_robots_0.png    timeout=1
-	Take A Screenshot
+	# Take A Screenshot
 
 	Wait For   manager_${platform}_robots_10.png    timeout=${default_image_timeout}
-	Take A Screenshot
+	# Take A Screenshot
 
 	Wait For   manager_${platform}_robots_0.png    timeout=${robot_test_time + ${default_image_timeout}}
 	${END_TIME}= 	Get Current Date
 
-	Take A Screenshot
-	Log 	Wait for monitoring robots to end
+	# Take A Screenshot
+	Log 	Wait for monitoring robots to end		console=True
 	Wait For   manager_${platform}_monitor_0.png    timeout=${monitortimeafter + ${default_image_timeout}}
 	${MON_END_TIME}= 	Get Current Date
-	Take A Screenshot
+	# Take A Screenshot
 
+	Log 	Verify Post run time		console=True
 	${ELAPSED_TIME}= 	Subtract Date From Date 	${MON_END_TIME} 	${END_TIME}
 	Should Be True   ${ELAPSED_TIME} >= ${monitortimeafter}
 
