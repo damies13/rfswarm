@@ -1103,4 +1103,456 @@ Change Font
 
 	[Teardown] 	Run Keywords
 	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
+
+# Verify Agent Filter Metric For Data Table and Graph
+# 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #217 	robot:continue-on-failure
+# 	[Setup] 	Change Reporter INI File Settings 	win_height 	600
+# 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}Issue-#105
+# 	VAR 	${result_name} 	20250501_103943_example
+# 	VAR 	${result_dir} 	${test_data}${/}${result_name}
+# 	VAR 	${result_db} 	${result_dir}${/}${result_name}.db
+# 	VAR 	${template_name} 	filter_metric
+# 	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
+
+# 	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${testdata}${/}html_images
+# 	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}Issue-#105${/}html_images
+# 	VAR 	${img_comp_threshold} 	0.7
+# 	VAR 	${move_tolerance} 		30
+
+# 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
+
+# 	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
+# 	Wait For Status 	PreviewLoaded
+# 	Sleep 	1
+# 	Take A Screenshot
+
+# 	# Enable filters:
+# 	Click Section 	Robots
+# 	Sleep 	1
+# 	Take A Screenshot
+# 	Click Label With Horizontal Offset 	FilterAgent 	140
+# 	Take A Screenshot
+# 	Select Option 	TEST_1
+# 	Sleep 	3
+# 	Click Tab 	Preview
+# 	Take A Screenshot
+# 	Click Tab 	Settings
+
+
+# 	# HTML:
+# 	VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+# 	Click Button 	generatehtml
+# 	Wait Until Created 	${html_file} 	timeout=9 minutes
+
+# 	Log 	\nVerifying Graphs: 	console=${True}
+# 	VAR 	${section} 	Robots
+# 	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+# 	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+# 	VAR 	${section} 	Filter Robots METRIC 1
+# 	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
+
+Verify Filter Metric For Data Table and Graph - Wildcard
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Setup] 	Change Reporter INI File Settings 	win_height 	600
+	VAR 	${issue} 	Issue-#105
+	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
+	VAR 	${result_name} 	20250501_103943_example
+	VAR 	${result_dir} 	${test_data}${/}${result_name}
+	VAR 	${result_db} 	${result_dir}${/}${result_name}.db
+	VAR 	${template_name} 	filter_metric
+	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
+
+	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${issue}${/}html_images
+	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}${issue}${/}html_images
+	VAR 	${img_comp_threshold} 	0.7
+	VAR 	${move_tolerance} 		30
+
+	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
+
+	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
+	Wait For Status 	PreviewLoaded
+	Sleep 	1
+	Take A Screenshot
+
+ 	# Enable filters:
+	Click Section	TestResultSummary
+	Sleep 	1
+	Click Label With Horizontal Offset 	FilterType 	120
+	Take A Screenshot
+	Select Option 	Wildcard
+	VAR 	${filter} 	*21*
+	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=120
+	Sleep 	2
+	Take A Screenshot
+	Click Tab 	Preview
+	Sleep 	2
+	Take A Screenshot
+	Click Tab 	Settings
+	Click Section 	DataGraph
+	Sleep 	1
+	Click Label With Horizontal Offset 	FilterType 	120
+	Take A Screenshot
+	Select Option 	Wildcard
+	VAR 	${filter} 	*21*
+	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=120
+	Sleep 	2
+	Take A Screenshot
+	Click Tab 	Preview
+	Sleep 	2
+	Take A Screenshot
+	Click Tab 	Settings
+
+
+	# HTML:
+	VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+	Click Button 	generatehtml
+	Wait Until Created 	${html_file} 	timeout=9 minutes
+
+	Log To Console	Verification of saved data in the RFSwarm HTML report started [ METRIC 1. ].
+	${html} 	Parse HTML File 	${html_file}
+	@{headings}= 	Extract All HTML Report Headings 	${html}
+	Log		${headings}
+	Log 	\nVerifying Tables: 	console=${True}
+	VAR 	${section} 	Test Result Summary
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	VAR 	${section} 	Filter Test Result Summary METRIC 1
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Table Content 	${section} 	${section_obj}
+	Log 	\nVerifying Graphs: 	console=${True}
+	VAR 	${section} 	Data Graph
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	VAR 	${section} 	Filter Data Graph METRIC 1
+	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
+
+	Copy File 	${result_dir}${/}${result_name}.html 	${OUTPUT_DIR}${/}${issue}${/}${result_name}_METRIC_1.html
+	Remove File 	${result_dir}${/}${result_name}.html
+
+	[Teardown] 	Run Keywords
+	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
+
+Verify Filter Metric For Data Table and Graph - Not Wildcard
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Setup] 	Change Reporter INI File Settings 	win_height 	600
+	VAR 	${issue} 	Issue-#105
+	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
+	VAR 	${result_name} 	20250501_103943_example
+	VAR 	${result_dir} 	${test_data}${/}${result_name}
+	VAR 	${result_db} 	${result_dir}${/}${result_name}.db
+	VAR 	${template_name} 	filter_metric
+	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
+
+	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${issue}${/}html_images
+	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}${issue}${/}html_images
+	VAR 	${img_comp_threshold} 	0.7
+	VAR 	${move_tolerance} 		30
+
+	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
+
+	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
+	Wait For Status 	PreviewLoaded
+	Sleep 	1
+	Take A Screenshot
+
+
+	# Enable filters:
+	Click Section	TestResultSummary
+	Sleep 	1
+	Click Label With Horizontal Offset 	FilterType 	120
+	Take A Screenshot
+	Select Option 	NotWildcard
+	VAR 	${filter} 	*Keyword *2
+	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=120
+	Sleep 	2
+	Take A Screenshot
+	Click Tab 	Preview
+	Sleep 	2
+	Take A Screenshot
+	Click Tab 	Settings
+	Click Section 	DataGraph
+	Sleep 	1
+	Click Label With Horizontal Offset 	FilterType 	120
+	Take A Screenshot
+	Select Option 	NotWildcard
+	VAR 	${filter} 	*Keyword *2
+	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=120
+	Sleep 	2
+	Take A Screenshot
+	Click Tab 	Preview
+	Sleep 	2
+	Take A Screenshot
+	Click Tab 	Settings
+
+	VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+	Click Button 	generatehtml
+	Wait Until Created 	${html_file} 	timeout=9 minutes
+
+	# HTML:
+	Log To Console	Verification of saved data in the RFSwarm HTML report started [ METRIC 2. ].
+	${html} 	Parse HTML File 	${html_file}
+	@{headings}= 	Extract All HTML Report Headings 	${html}
+	Log		${headings}
+	Log 	\nVerifying Tables: 	console=${True}
+	VAR 	${section} 	Test Result Summary
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	VAR 	${section} 	Filter Test Result Summary METRIC 2
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Table Content 	${section} 	${section_obj}
+	Log 	\nVerifying Graphs: 	console=${True}
+	VAR 	${section} 	Data Graph
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	VAR 	${section} 	Filter Data Graph METRIC 2
+	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
+
+	Copy File 	${result_dir}${/}${result_name}.html 	${OUTPUT_DIR}${/}${issue}${/}${result_name}_METRIC_2.html
+	Remove File 	${result_dir}${/}${result_name}.html
+
+	[Teardown] 	Run Keywords
+	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
+
+Verify Filter Result For Data Table and Graph - Wildcard
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Setup] 	Change Reporter INI File Settings 	win_height 	600
+	VAR 	${issue} 	Issue-#105
+	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
+	VAR 	${result_name} 	20250501_103943_example
+	VAR 	${result_dir} 	${test_data}${/}${result_name}
+	VAR 	${result_db} 	${result_dir}${/}${result_name}.db
+	VAR 	${template_name} 	filter_result
+	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
+
+	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${issue}${/}html_images
+	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}${issue}${/}html_images
+	VAR 	${img_comp_threshold} 	0.7
+	VAR 	${move_tolerance} 		30
+
+	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
+
+	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
+	Wait For Status 	PreviewLoaded
+	Sleep 	1
+	Take A Screenshot
+
+ 	# Enable filters:
+	Click Section	TestResultSummary
+	Sleep 	1
+	Click Label With Horizontal Offset 	FilterType 	120
+	Take A Screenshot
+	Select Option 	Wildcard
+	VAR 	${filter} 	*21*
+	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=120
+	Sleep 	2
+	Take A Screenshot
+	Click Tab 	Preview
+	Sleep 	2
+	Take A Screenshot
+	Click Tab 	Settings
+	Click Section 	DataGraph
+	Sleep 	1
+	Click Label With Horizontal Offset 	FilterType 	120
+	Take A Screenshot
+	Select Option 	Wildcard
+	VAR 	${filter} 	*21*
+	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=120
+	Sleep 	2
+	Take A Screenshot
+	Click Tab 	Preview
+	Sleep 	2
+	Take A Screenshot
+	Click Tab 	Settings
+
+
+	# HTML:
+	VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+	Click Button 	generatehtml
+	Wait Until Created 	${html_file} 	timeout=9 minutes
+
+	Log To Console	Verification of saved data in the RFSwarm HTML report started [ RESULT 1. ].
+	${html} 	Parse HTML File 	${html_file}
+	@{headings}= 	Extract All HTML Report Headings 	${html}
+	Log		${headings}
+	Log 	\nVerifying Tables: 	console=${True}
+	VAR 	${section} 	Test Result Summary
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	VAR 	${section} 	Filter Test Result Summary RESULT 1
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Table Content 	${section} 	${section_obj}
+	Log 	\nVerifying Graphs: 	console=${True}
+	VAR 	${section} 	Data Graph
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	VAR 	${section} 	Filter Data Graph RESULT 1
+	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
+
+	Copy File 	${result_dir}${/}${result_name}.html 	${OUTPUT_DIR}${/}${issue}${/}${result_name}_RESULT_1.html
+	Remove File 	${result_dir}${/}${result_name}.html
+
+	[Teardown] 	Run Keywords
+	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
+
+Verify Filter Result For Data Table and Graph - Not Wildcard
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Setup] 	Change Reporter INI File Settings 	win_height 	600
+	VAR 	${issue} 	Issue-#105
+	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
+	VAR 	${result_name} 	20250501_103943_example
+	VAR 	${result_dir} 	${test_data}${/}${result_name}
+	VAR 	${result_db} 	${result_dir}${/}${result_name}.db
+	VAR 	${template_name} 	filter_result
+	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
+
+	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${issue}${/}html_images
+	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}${issue}${/}html_images
+	VAR 	${img_comp_threshold} 	0.7
+	VAR 	${move_tolerance} 		30
+
+	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
+
+	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
+	Wait For Status 	PreviewLoaded
+	Sleep 	1
+	Take A Screenshot
+
+
+	# Enable filters:
+	Click Section	TestResultSummary
+	Sleep 	1
+	Click Label With Horizontal Offset 	FilterType 	120
+	Take A Screenshot
+	Select Option 	NotWildcard
+	VAR 	${filter} 	*Keyword *2
+	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=120
+	Sleep 	2
+	Take A Screenshot
+	Click Tab 	Preview
+	Sleep 	2
+	Take A Screenshot
+	Click Tab 	Settings
+	Click Section 	DataGraph
+	Sleep 	1
+	Click Label With Horizontal Offset 	FilterType 	120
+	Take A Screenshot
+	Select Option 	NotWildcard
+	VAR 	${filter} 	*Keyword *2
+	Set Text Value To Right Of 	FilterPattern 	${filter} 	offsetx=120
+	Sleep 	2
+	Take A Screenshot
+	Click Tab 	Preview
+	Sleep 	2
+	Take A Screenshot
+	Click Tab 	Settings
+
+	VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+	Click Button 	generatehtml
+	Wait Until Created 	${html_file} 	timeout=9 minutes
+
+	# HTML:
+	Log To Console	Verification of saved data in the RFSwarm HTML report started [ RESULT 2. ].
+	${html} 	Parse HTML File 	${html_file}
+	@{headings}= 	Extract All HTML Report Headings 	${html}
+	Log		${headings}
+	Log 	\nVerifying Tables: 	console=${True}
+	VAR 	${section} 	Test Result Summary
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	VAR 	${section} 	Filter Test Result Summary RESULT 2
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Table Content 	${section} 	${section_obj}
+	Log 	\nVerifying Graphs: 	console=${True}
+	VAR 	${section} 	Data Graph
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	VAR 	${section} 	Filter Data Graph RESULT 2
+	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
+
+	Copy File 	${result_dir}${/}${result_name}.html 	${OUTPUT_DIR}${/}${issue}${/}${result_name}_RESULT_2.html
+	Remove File 	${result_dir}${/}${result_name}.html
+
+	[Teardown] 	Run Keywords
+	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
+
+Verify Filter Result For Data Table and Graph - Filter Result
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Setup] 	Change Reporter INI File Settings 	win_height 	600
+	VAR 	${issue} 	Issue-#105
+	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
+	VAR 	${result_name} 	20250501_103943_example
+	VAR 	${result_dir} 	${test_data}${/}${result_name}
+	VAR 	${result_db} 	${result_dir}${/}${result_name}.db
+	VAR 	${template_name} 	filter_result
+	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
+
+	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${issue}${/}html_images
+	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}${issue}${/}html_images
+	VAR 	${img_comp_threshold} 	0.7
+	VAR 	${move_tolerance} 		30
+
+	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
+
+	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
+	Wait For Status 	PreviewLoaded
+	Sleep 	1
+	Take A Screenshot
+
+
+	# Enable filters:
+	Click Section	TestResultSummary
+	Sleep 	1
+	Take A Screenshot
+	Click Label With Horizontal Offset 	FilterResult 	120
+	Sleep 	1
+	Take A Screenshot
+	Select Option 	Fail
+	Sleep 	1
+	Click Label With Vertical Offset 	Enabled 	42 	# enable filter
+	Sleep 	2
+	Take A Screenshot
+	Click Tab 	Preview
+	Sleep 	2
+	Take A Screenshot
+	Click Tab 	Settings
+	Click Section 	DataGraph
+	Sleep 	1
+	Take A Screenshot
+	Click Label With Horizontal Offset 	FilterResult 	120
+	Sleep 	1
+	Take A Screenshot
+	Select Option 	Fail
+	Sleep 	1
+	Click Label With Vertical Offset 	Enabled 	42 	# enable filter
+	Sleep 	2
+	Take A Screenshot
+	Click Tab 	Preview
+	Sleep 	2
+	Take A Screenshot
+	Click Tab 	Settings
+
+	VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+	Click Button 	generatehtml
+	Wait Until Created 	${html_file} 	timeout=9 minutes
+
+	# HTML:
+	Log To Console	Verification of saved data in the RFSwarm HTML report started [ RESULT 3. ].
+	${html} 	Parse HTML File 	${html_file}
+	@{headings}= 	Extract All HTML Report Headings 	${html}
+	Log		${headings}
+	Log 	\nVerifying Tables: 	console=${True}
+	VAR 	${section} 	Test Result Summary
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	VAR 	${section} 	Filter Test Result Summary RESULT 3
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	Verify HTML Report Table Content 	${section} 	${section_obj}
+	Log 	\nVerifying Graphs: 	console=${True}
+	VAR 	${section} 	Data Graph
+	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+	VAR 	${section} 	Filter Data Graph RESULT 3
+	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
+
+	Copy File 	${result_dir}${/}${result_name}.html 	${OUTPUT_DIR}${/}${issue}${/}${result_name}_RESULT_3.html
+	Remove File 	${result_dir}${/}${result_name}.html
+
+	[Teardown] 	Run Keywords
+	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
+
 #
