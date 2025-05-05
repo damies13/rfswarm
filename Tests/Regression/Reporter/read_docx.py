@@ -93,7 +93,7 @@ def extract_docx_images_under_heading(heading: str, docx_path: str, output_folde
 				with open(image_path, 'wb') as img_file:
 					img_file.write(part.blob)
 
-				print(f"DOCX RFSwarm report image saved as: {image_name}") # if debug else 0
+				print(f"DOCX RFSwarm report image saved as: {image_name}")  # if debug else 0
 				image_list.append(image_name)
 				image_counter += 1
 

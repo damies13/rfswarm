@@ -1780,9 +1780,9 @@ class RFSwarmBase:
 			path1 = os.path.dirname(path1)
 			base.debugmsg(7, "path1:", path1)
 
-		if os.path.splitroot(path1)[0] != os.path.splitroot(path2)[0]
+		if os.path.splitroot(path1)[0] != os.path.splitroot(path2)[0]:
 			path1 = os.path.dirname(path2)
-			
+
 		relpath = os.path.relpath(path2, start=path1)
 		# https://www.geeksforgeeks.org/python-os-path-relpath-method/
 		base.debugmsg(5, "relpath:", relpath)
