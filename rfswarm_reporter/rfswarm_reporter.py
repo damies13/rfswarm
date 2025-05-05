@@ -67,6 +67,10 @@ __name__ = "rfswarm-manager"
 
 
 class percentile:
+	count = 0
+	percent = 90
+	values = []
+
 	def __init__(self):
 		self.count = 0
 		self.percent = 90
@@ -100,6 +104,10 @@ class percentile:
 
 
 class stdevclass:
+	M = 0.0
+	S = 0.0
+	k = 1
+
 	def __init__(self):
 		self.M = 0.0
 		self.S = 0.0
@@ -861,7 +869,7 @@ class ReporterBase:
 			saved = True
 		if saved:
 			base.config['Reporter']['Template'] = base.whitespace_set_ini_value(filename)
-			path, file = os.path.split(base.config['Reporter']['Template'])
+			path = os.path.split(base.config['Reporter']['Template'])[0]
 			base.config['Reporter']['TemplateDir'] = base.whitespace_set_ini_value(path)
 			base.saveini()
 
@@ -870,7 +878,7 @@ class ReporterBase:
 			base.debugmsg(7, "filename: ", filename)
 
 			base.config['Reporter']['Template'] = base.whitespace_set_ini_value(filename)
-			path, file = os.path.split(base.config['Reporter']['Template'])
+			path = os.path.split(base.config['Reporter']['Template'])[0]
 			base.config['Reporter']['TemplateDir'] = base.whitespace_set_ini_value(path)
 			base.saveini()
 
@@ -1133,7 +1141,7 @@ class ReporterBase:
 				if len(results) > 0:
 					filename = os.path.basename(results)
 					base.debugmsg(9, "filename: ", filename)
-					basename, ext = os.path.splitext(filename)
+					basename = os.path.splitext(filename)[0]
 					base.debugmsg(9, "basename: ", basename)
 					basearr = basename.split('_')
 					base.debugmsg(9, "basearr: ", basearr)
