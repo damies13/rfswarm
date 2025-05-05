@@ -3376,9 +3376,9 @@ Check If Monitoring settings are loaded and used
 
 	Utilisation Stats
 
-	VAR 	${monitortimebefore}= 		30
-	VAR 	${monitortimeafter}= 		90
-	VAR 	${robot_test_time}= 		60
+	VAR 	${monitortimebefore}= 		${30}
+	VAR 	${monitortimeafter}= 		${90}
+	VAR 	${robot_test_time}= 		${60}
 	# VAR 	${scenario_name}= 			NewStyle
 
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#173${/}NewStyle.rfs
@@ -3408,7 +3408,7 @@ Check If Monitoring settings are loaded and used
 	Click Button	runplay
 	# Stop Test Scenario Run Gradually	${15}	${60}
 	${START_TIME}= 	Get Current Date
-	Sleep 	28
+	Sleep 	26
 	Take A Screenshot
 
 	Log 	Wait for monitoring robots to start
