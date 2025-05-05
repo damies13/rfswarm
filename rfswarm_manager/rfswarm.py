@@ -1780,8 +1780,13 @@ class RFSwarmBase:
 			path1 = os.path.dirname(path1)
 			base.debugmsg(7, "path1:", path1)
 
-		if os.path.splitroot(path1)[0] != os.path.splitroot(path2)[0]:
-			path1 = os.path.dirname(path2)
+		if platform.system() == "Windows":
+			# os.path.splitroot is only available from python 3.12+ maybe we can use this
+			# 	in the future when python 3.11 os EOL
+			# if os.path.splitroot(path1)[0] != os.path.splitroot(path2)[0]:
+			# os.path.splitdrive only works on windows, but supports Python 3.6+
+			if os.path.splitdrive(path1)[0] != os.path.splitdrive(path2)[0]:
+				path1 = os.path.dirname(path2)
 
 		relpath = os.path.relpath(path2, start=path1)
 		# https://www.geeksforgeeks.org/python-os-path-relpath-method/
