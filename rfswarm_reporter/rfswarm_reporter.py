@@ -69,7 +69,7 @@ __name__ = "rfswarm-manager"
 class percentile:
 	count = 0
 	percent = 90
-	values = []
+	values: Any = []
 
 	def __init__(self):
 		self.count = 0
