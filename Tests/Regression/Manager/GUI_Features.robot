@@ -3438,7 +3438,7 @@ Check If Monitoring settings are loaded and used
 
 	Log 	Verify Post run time		console=True
 	${ELAPSED_TIME}= 	Subtract Date From Date 	${MON_END_TIME} 	${END_TIME}
-	Should Be True   ${ELAPSED_TIME} >= ${monitortimeafter}
+	Should Be True   ${ELAPSED_TIME} >= ${monitortimeafter} 		Monitoring time after test should be ~${monitortimeafter} seconds, actual was ${ELAPSED_TIME} seconds.
 
 	[Teardown]	Run Keywords
 	...    Delete Scenario File		${scenario_name}		AND
