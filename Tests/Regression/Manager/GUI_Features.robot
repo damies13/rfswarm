@@ -3350,6 +3350,197 @@ Verify That TPS Is TP And Not TPmS
 	...    Run Keyword 	Close Manager GUI ${platform} 	AND
 	...    Stop Agent
 
+# Verify Agent Filter Graphs
+# 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #217 	robot:continue-on-failure
+# 	VAR 	${scenario_name} 	filter_agent
+# 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
+# 	VAR 	${agent_name_1} 	TEST_1
+# 	VAR 	${agent_name_2} 	TEST_2
+# 	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${results_dir} 	-r 	-a 	2
+# 	VAR 	@{agnt_options_1} 	-a 	${agent_name_1}
+# 	VAR 	@{agnt_options_2} 	-a 	${agent_name_2}
+
+# 	Open Agent 			${agnt_options_1}
+# 	VAR 	${process_agent_1} 	${process_agent}
+# 	Open Agent 			${agnt_options_2}
+# 	VAR 	${process_agent_2} 	${process_agent}
+# 	Open Manager GUI 	${mngr_options}
+
+# 	Wait For the Scenario Run To Finish
+# 	Click Button 	Refresh
+# 	Click Label With Horizontal Offset 	FilterAgent 	140
+# 	Take A Screenshot
+# 	Select Option 	TEST_1
+# 	Click Button 	Refresh
+# 	Sleep 	3
+# 	Take A Screenshot
+# 	VAR 	${robots_value} 	manager_${platform}_label_4.0.png
+# 	${status}=	Run Keyword And Return Status	Wait For 	${robots_value} 	 timeout=6
+# 	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph!
+
+# 	[Teardown]	Run Keywords
+# 	...    Set Test Variable 	${process_agent} 	${process_agent_1} 	AND
+# 	...    Stop Agent 	AND
+# 	...    Set Test Variable 	${process_agent} 	${process_agent_2} 	AND
+# 	...    Stop Agent 	AND
+# 	...    Run Keyword 	Close Manager GUI ${platform}
+
+Verify Filter Metric Graphs - Wildcard & Not Wildcard
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure
+	VAR 	${scenario_name} 	filter_metric
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
+	VAR 	${agent_name_1} 	TEST_1
+	VAR 	${agent_name_2} 	TEST_2
+	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${results_dir} 	-r 	-a 	2
+	VAR 	@{agnt_options_1} 	-a 	${agent_name_1}
+	VAR 	@{agnt_options_2} 	-a 	${agent_name_2}
+
+	Open Agent 			${agnt_options_1}
+	VAR 	${process_agent_1} 	${process_agent}
+	Open Agent 			${agnt_options_2}
+	VAR 	${process_agent_2} 	${process_agent}
+	Open Manager GUI 	${mngr_options}
+
+	Wait For the Scenario Run To Finish
+	Click Button 	Refresh 	# re-load settings
+
+	Click Label With Horizontal Offset 	FilterType 	140
+	Press Key.down 2 Times
+	Press Combination	Key.enter
+	Click Label With Horizontal Offset 	FilterPattern 	140
+	VAR 	${filter} 	*21*
+	Evaluate 	clipboard.copy("${filter}") 	modules=clipboard
+	IF  "${platform}" == "macos"
+		Press Combination 	KEY.command 	KEY.a
+		Sleep 	1
+		Press Combination	KEY.command		KEY.v
+	ELSE
+		Double Click
+		Sleep 	1
+		Press Combination	KEY.ctrl		KEY.v
+	END
+
+	Click Button 	Refresh
+	Sleep 	5
+	Take A Screenshot
+	VAR 	${y_value} 	manager_${platform}_label_8.png
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should not be visible on the graph.
+	VAR 	${y_value} 	manager_${platform}_label_4.png
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
+
+	Click Label With Horizontal Offset 	FilterType 	140
+	Press Key.down 3 Times
+	Press Combination	Key.enter
+	Click Label With Horizontal Offset 	FilterPattern 	140
+	VAR 	${filter} 	*Keyword *2
+	Evaluate 	clipboard.copy("${filter}") 	modules=clipboard
+	IF  "${platform}" == "macos"
+		Press Combination 	KEY.command 	KEY.a
+		Sleep 	1
+		Press Combination	KEY.command		KEY.v
+	ELSE
+		Double Click
+		Sleep 	1
+		Press Combination	KEY.ctrl		KEY.v
+	END
+
+	Click Button 	Refresh
+	Sleep 	5
+	Take A Screenshot
+	VAR 	${y_value} 	manager_${platform}_label_8.png
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should not be visible on the graph.
+	VAR 	${y_value} 	manager_${platform}_label_4.png
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
+
+	[Teardown]	Run Keywords
+	...    Set Test Variable 	${process_agent} 	${process_agent_1} 	AND
+	...    Stop Agent 	AND
+	...    Set Test Variable 	${process_agent} 	${process_agent_2} 	AND
+	...    Stop Agent 	AND
+	...    Run Keyword 	Close Manager GUI ${platform}
+
+Verify Filter Result Graphs - Wildcard & Not Wildcard
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure
+	VAR 	${scenario_name} 	filter_result
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
+	VAR 	${agent_name_1} 	TEST_1
+	VAR 	${agent_name_2} 	TEST_2
+	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${results_dir} 	-r 	-a 	2
+	VAR 	@{agnt_options_1} 	-a 	${agent_name_1}
+	VAR 	@{agnt_options_2} 	-a 	${agent_name_2}
+
+	Open Agent 			${agnt_options_1}
+	VAR 	${process_agent_1} 	${process_agent}
+	Open Agent 			${agnt_options_2}
+	VAR 	${process_agent_2} 	${process_agent}
+	Open Manager GUI 	${mngr_options}
+
+	Wait For the Scenario Run To Finish
+	Click Button 	Refresh 	# re-load settings
+
+	Click Label With Horizontal Offset 	FilterType 	140
+	Press Key.down 2 Times
+	Press Combination	Key.enter
+	Click Label With Horizontal Offset 	FilterPattern 	140
+	VAR 	${filter} 	*21*
+	Evaluate 	clipboard.copy("${filter}") 	modules=clipboard
+	IF  "${platform}" == "macos"
+		Press Combination 	KEY.command 	KEY.a
+		Sleep 	1
+		Press Combination	KEY.command		KEY.v
+	ELSE
+		Double Click
+		Sleep 	1
+		Press Combination	KEY.ctrl		KEY.v
+	END
+
+	Click Button 	Refresh
+	Sleep 	5
+	Take A Screenshot
+	VAR 	${y_value} 	manager_${platform}_label_8.png
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}" should not be visible on the graph.
+	VAR 	${y_value} 	manager_${platform}_label_4.png
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
+
+	Click Label With Horizontal Offset 	FilterType 	140
+	Press Key.down 3 Times
+	Press Combination	Key.enter
+	Click Label With Horizontal Offset 	FilterPattern 	140
+	VAR 	${filter} 	*Keyword *2
+	Evaluate 	clipboard.copy("${filter}") 	modules=clipboard
+	IF  "${platform}" == "macos"
+		Press Combination 	KEY.command 	KEY.a
+		Sleep 	1
+		Press Combination	KEY.command		KEY.v
+	ELSE
+		Double Click
+		Sleep 	1
+		Press Combination	KEY.ctrl		KEY.v
+	END
+
+	Click Button 	Refresh
+	Sleep 	5
+	Take A Screenshot
+	VAR 	${y_value} 	manager_${platform}_label_8.png
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}" should not be visible on the graph.
+	VAR 	${y_value} 	manager_${platform}_label_4.png
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
+
+	[Teardown]	Run Keywords
+	...    Set Test Variable 	${process_agent} 	${process_agent_1} 	AND
+	...    Stop Agent 	AND
+	...    Set Test Variable 	${process_agent} 	${process_agent_2} 	AND
+	...    Stop Agent 	AND
+	...    Run Keyword 	Close Manager GUI ${platform}
+
 Check Application Icon or Desktop Shortcut in GUI
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
 

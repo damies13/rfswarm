@@ -142,6 +142,13 @@ Create New Section
 		# Take A Screenshot
 	END
 
+Press ${key} ${n} Times
+	[Documentation]	Provide full name. For example: Key.tab
+	Sleep	1
+	FOR  ${i}  IN RANGE  0  ${n}
+		Press Combination 	${key}
+	END
+
 Click ${item} With Vertical Offset
 	[Arguments]		${image_name}	${offset}=0
 	[Documentation]	Click the item with the offset. An item can be: Label, Button, ...

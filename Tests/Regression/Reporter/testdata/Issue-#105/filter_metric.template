@@ -1,0 +1,129 @@
+[Report]
+order = FE084ACBCC8,FD47763734B,FE16DE59841,FD477088D4F,FD3729CF59E,FD4776B42A1
+title = #_TEST_TITLE_123
+timezone = Europe/Warsaw
+dateformat = yyyy-mm-dd
+timeformat = HH:MM
+startoffset = -43
+showstarttime = -1
+endoffset = 47
+showtlogo = -1
+showendtime = -1
+font = Verdana
+fontsize = 12
+percentile = 90
+
+[FD477088D4F]
+name = Test Result Summary
+parent = TOP
+type = table
+changed = 1746195188.2354584
+colours = 0
+datatype = Metric
+col_result_name_show = 1
+col_minimum_show = 1
+col_average_show = 1
+col_90x37ile_show = 1
+col_maximum_show = 1
+col_std_dev_show = 1
+col_pass_show = 1
+col_fail_show = 1
+col_other_show = 0
+sql = SELECT PrimaryMetric , SecondaryMetric , MetricValue FROM MetricData WHERE MetricType == 'Summary' AND MetricTime >= 1746088783 AND MetricTime <= 1746088860 GROUP by PrimaryMetric , SecondaryMetric
+filteragent = 
+filtertype = None
+col_primarymetric_show = 1
+col_metrictype_show = 1
+col_secondarymetric_show = 1
+col_metricvalue_show = 1
+filterpattern = 
+metrictype = Summary
+secondarymetric = 
+
+[FD47763734B]
+name = Table of Contents
+parent = TOP
+type = contents
+changed = 1746137928.990252
+
+[FD4776B42A1]
+name = Errors
+parent = TOP
+type = errors
+changed = 1746137928.9917583
+images = 1
+grouprn = 1
+groupet = 1
+sql = SELECT r.script_index || '_' || r.robot || '_' || r.iteration || '_' || r.sequence 'id' , r.result_name , r.script_index , r.robot , r.iteration , r.sequence , mt.SecondaryMetric 'script' , mt.MetricValue 'test_name' FROM Results r LEFT JOIN MetricData mt on mt.PrimaryMetric = r.script_index AND mt.MetricType = 'Scenario_Test' WHERE r.result = 'FAIL' AND r.end_time >= 1746088783 AND r.end_time <= 1746088865 ORDER BY x91idx93 ASC
+
+[FD3729CF59E]
+name = Data Graph
+parent = TOP
+type = graph
+changed = 1746137928.9917583
+
+[FD3729CF59EL]
+changed = 1746195142.2580066
+resulttype = Response Time
+filterresult = None
+filteragent = 
+datatype = Metric
+sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric as x91Namex93  FROM MetricData WHERE MetricType == 'Summary' AND SecondaryMetric == 'min' AND MetricTime >= 1746088783 AND MetricTime <= 1746088860 ORDER BY MetricTime
+filtertype = None
+filterpattern = 
+axisen = 1
+isnumeric = 0
+metrictype = Summary
+primarymetric = 
+showtotal = -1
+gseconds = 0.0
+gwtype = Average
+secondarymetric = avg
+
+[FD3729CF59ER]
+changed = 1746124686.8210566
+datatype = Plan
+axisen = 0
+isnumeric = 0
+filteragent = None
+filtertype = None
+sql = SELECT md1.* , md0.SecondaryMetric as x91Filex93 , fp0.SecondaryMetric as x91FilePathx93 FROM MetricData as md0 LEFT JOIN MetricData as fp0 ON fp0.MetricValue = md0.MetricValue AND fp0.MetricType = 'Scenario' AND fp0.PrimaryMetric like 'Local_Path_x37' LEFT JOIN MetricData as md1 ON md1.SecondaryMetric = md0.MetricValue AND md1.MetricType = 'Scenario' WHERE md0.MetricType = 'Scenario' AND md0.PrimaryMetric like 'Test_x37'
+metrictype = Scenario
+secondarymetric = total_robots
+filterpattern = 
+gseconds = 0.0
+gwtype = Average
+showtotal = -1
+
+[FE084ACBCC8]
+name = Note
+parent = TOP
+type = note
+changed = 1746137928.989253
+note = Test_Note 123 x35$x37x12
+
+[Colours]
+defcolours = x35000000,x35008450,x35B81D13,x35EFB700,x35888888,x358c60d4,x353721d0,x35caf27b,x35956e11,x35f27c06,x3506a177,x35c27a2d,x3555c3e0,x356bd5da,x35c07457,x3534f2be,x35d01246,x35cd6a16,x35736aab,x35ed06c4,x35a0745a,x356a1a88,x352cd03d,x35fcc6c0,x35784569,x359b4f17,x35006b73,x3572ad8b,x35ba0f77,x35e74ab8,x35b2a358,x35628aba,x35a281eb,x357a3b2f,x35851344,x3586cb74,x357d8b1e,x35bdc44d,x35c1ed53,x359f7510,x350a68ce,x35aa3387,x35cfbf87,x35591d27,x35ec7158,x3598e1e5,x351b5ae4,x35d854ce,x35fdeb39,x354e8bbc,x35084e91,x35929ee4,x3530fa58,x35229f75,x355bbce6,x354557b9,x35035dd1,x351b5c92,x35a54e0b,x359e50c8,x356bd215,x35474ac4,x3564c46e,x350f26f2,x35ca01dd,x35b9cdac,x3526e56b,x35553e23,x350aaeb5,x35bba8ee,x35d7eb62,x35a81e26,x35ac10c4,x35c7db47,x35568910,x35ad6801,x355ee08f,x3526fba9,x3528398c,x35f63545,x356c3d03,x35fb78e6,x35945f93,x358f890e,x3539e2d7,x35711fa9,x35078163,x357384da,x3511036c,x3555c5f0,x35531489,x35ff5faa,x35b0438d,x357cb5ef,x35f122e4,x351dc5c6,x3591bf96,x359c16f1,x35b3496b,x358002e6,x359e541d,x359bc25c
+namecolours = total,pass,fail,warning,not run,example test case x:\programy\robot_framework\rfswarm\rfswarm_fork\venv\lib\site-packages\rfswarm_manager\example.robot,filter test case 1 x:\programy\robot_framework\rfswarm\rfswarm_fork\rfswarm\tests\regression\manager\testdata\issue-x35105\filter.robot,filter test case 2 x:\programy\robot_framework\rfswarm\rfswarm_fork\rfswarm\tests\regression\manager\testdata\issue-x35105\filter.robot,test_2 - assignedrobots,test_2 - cpu,test_2 - filecount,test_2 - ipaddress,test_2 - lastseen,test_2 - load,test_2 - mem,test_2 - net,test_2 - os: platform,test_2 - os: release,test_2 - os: system,test_2 - os: version,test_2 - os: version: major,test_2 - os: version: minor,test_2 - rfswarmagent: version,test_2 - robotframework,test_2 - robotframework: libraries,test_2 - robotframework: library: archivelibrary,test_2 - robotframework: library: dashboard,test_2 - robotframework: library: databaselibrary,test_2 - robotframework: library: doctestlibrary,test_2 - robotframework: library: excellib,test_2 - robotframework: library: httpctrl,test_2 - robotframework: library: imagehorizonlibrary,test_2 - robotframework: library: ocrlibrary,test_2 - robotframework: library: requests,test_2 - robotframework: library: sshlibrary,test_2 - robots,test_2 - status,test_1 - assignedrobots,test_1 - cpu,test_1 - filecount,test_1 - ipaddress,test_1 - lastseen,test_1 - load,test_1 - mem,test_1 - net,test_1 - os: platform,test_1 - os: release,test_1 - os: system,test_1 - os: version,test_1 - os: version: major,test_1 - os: version: minor,test_1 - rfswarmagent: version,test_1 - robotframework,test_1 - robotframework: libraries,test_1 - robotframework: library: archivelibrary,test_1 - robotframework: library: dashboard,test_1 - robotframework: library: databaselibrary,test_1 - robotframework: library: doctestlibrary,test_1 - robotframework: library: excellib,test_1 - robotframework: library: httpctrl,test_1 - robotframework: library: imagehorizonlibrary,test_1 - robotframework: library: ocrlibrary,test_1 - robotframework: library: requests,test_1 - robotframework: library: sshlibrary,test_1 - robots,test_1 - status,test_2,test_1,version,filter keyword 11 - 90x37ile,filter keyword 11 - entrytime,filter keyword 11 - _fail,filter keyword 11 - _other,filter keyword 11 - _pass,filter keyword 11 - avg,filter keyword 11 - max,filter keyword 11 - min,filter keyword 11 - stdev,filter keyword 21 - 90x37ile,filter keyword 21 - entrytime,filter keyword 21 - _fail,filter keyword 21 - _other,filter keyword 21 - _pass,filter keyword 21 - avg,filter keyword 21 - max,filter keyword 21 - min,filter keyword 21 - stdev,filter fail keyword 1 - 90x37ile,filter fail keyword 1 - entrytime,filter fail keyword 1 - _fail,filter fail keyword 1 - _other,filter fail keyword 1 - _pass,filter fail keyword 1 - avg,filter fail keyword 1 - max,filter fail keyword 1 - min,filter fail keyword 1 - stdev,filter keyword 11,filter keyword 21,filter fail keyword 1,filter keyword 12,filter keyword 22,filter fail keyword 2
+
+[FE16DE59841]
+name = Robots
+parent = TOP
+type = graph
+changed = 1746137928.990252
+
+[FE16DE59841L]
+metrictype = Agent
+changed = 1746088978.891793
+filteragent = None
+filtertype = None
+gseconds = 0.0
+gwtype = Average
+datatype = Metric
+sql = SELECT MetricTime as 'Time' , MetricValue as 'Value' , PrimaryMetric as x91Namex93  FROM MetricData WHERE MetricType == 'Agent' AND SecondaryMetric == 'Robots' AND MetricTime >= 1746088783 AND MetricTime <= 1746088865 ORDER BY MetricTime
+secondarymetric = Robots
+
+[FE16DE59841R]
+datatype = None
+changed = 1746088591.444866
+

@@ -1622,12 +1622,12 @@ Navigate to and check Desktop Icon For Windows
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	Take A Screenshot
 
-	#
-	# Start menu searching with best match result unreliable
-	#
-	# # Navigate Start Menu
-	# Type 	RFSwarm
-	# Sleep 	0.5
+	# Navigate Start Menu
+	Type 	RFSwarm
+	Sleep 	2
+	Take A Screenshot
+
+	# Press Combination 	KEY.ENTER
 	# Take A Screenshot
 	#
 	# # Press Combination 	KEY.ENTER
