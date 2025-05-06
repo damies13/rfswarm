@@ -3431,10 +3431,11 @@ Check If Monitoring settings are loaded and used
 	${END_TIME}= 	Get Current Date
 
 	# Take A Screenshot
+	Set Confidence 		0.95
 	Log 	Wait for monitoring robots to end		console=True
 	Wait For   manager_${platform}_monitor_0.png    timeout=${monitortimeafter + ${default_image_timeout}}
 	${MON_END_TIME}= 	Get Current Date
-	# Take A Screenshot
+	Take A Screenshot
 
 	Log 	Verify Post run time		console=True
 	${ELAPSED_TIME}= 	Subtract Date From Date 	${MON_END_TIME} 	${END_TIME}
