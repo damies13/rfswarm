@@ -363,6 +363,18 @@ class ReporterBase:
 			sec = int(arrhms[0])
 		return sec
 
+	def configparser_safe_dict(self, dictin):
+		self.debugmsg(7, "dictin: ", dictin)
+		dictout = dictin
+		for k in dictout.keys():
+			self.debugmsg(7, "value type: ", type(dictout[k]))
+			if isinstance(dictout[k], dict):
+				dictout[k] = self.configparser_safe_dict(dictout[k])
+			if dictout[k] is None:
+				dictout[k] = ""
+		self.debugmsg(7, "dictout: ", dictout)
+		return dictout
+
 	#
 	# Template Functions
 	#
@@ -3914,7 +3926,34 @@ class ReporterCore:
 
 		if os.path.isfile(base.reporter_ini):
 			base.debugmsg(7, "reporter_ini: ", base.reporter_ini)
-			base.config.read(base.reporter_ini, encoding="utf8")
+			arrconfigfile = os.path.splitext(base.reporter_ini)
+			self.debugmsg(5, "arrconfigfile: ", arrconfigfile)
+			if len(arrconfigfile) < 2:
+				self.debugmsg(0, "Configuration file ", base.reporter_ini, " missing extention, unable to determine supported format. Plesae use extentions .ini, .yaml or .json")
+				exit()
+			if arrconfigfile[1].lower() not in [".ini", ".yaml", ".json"]:
+				self.debugmsg(0, "Configuration file ", base.reporter_ini, " has an invalid extention, unable to determine supported format. Plesae use extentions .ini, .yaml or .json")
+				exit()
+			if arrconfigfile[1].lower() == ".ini":
+				base.config.read(base.reporter_ini, encoding="utf8")
+			else:
+				configdict = {}
+				if arrconfigfile[1].lower() == ".yaml":
+					# read yaml file
+					self.debugmsg(5, "read yaml file")
+					with open(base.reporter_ini, 'r', encoding="utf-8") as f:
+						configdict = yaml.safe_load(f)
+						configdict = base.configparser_safe_dict(configdict)
+						self.debugmsg(5, "configdict: ", configdict)
+				if arrconfigfile[1].lower() == ".json":
+					# read json file
+					self.debugmsg(5, "read json file")
+					with open(base.reporter_ini, 'r', encoding="utf-8") as f:
+						configdict = json.load(f)
+						configdict = base.configparser_safe_dict(configdict)
+						self.debugmsg(5, "configdict: ", configdict)
+				self.debugmsg(5, "configdict: ", configdict)
+				self.config.read_dict(configdict)
 		else:
 			base.saveini()
 
