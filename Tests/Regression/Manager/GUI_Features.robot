@@ -2372,6 +2372,34 @@ Check If Test Scenario Run Will Stop Gradually
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove File		${global_path}${/}example.robot
 
+Check If Test Scenario Run Will Stop Gradually - TestRepeater
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #133
+	[Setup]	Run Keywords
+	...    Set Global Filename And Default Save Path	example.robot							AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
+	...    Set INI Window Size		1200	600													AND
+	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-3	AND
+	...    Open Agent	${agent_options}														AND
+	...    Open Manager GUI																		AND
+	...    Create Robot File	file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t60\n
+
+	Utilisation Stats
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#133${/}test_scenario.rfs
+	Copy File	${scenariofile}		${global_path}
+	Click Button	runopen
+	Open Scenario File OS DIALOG	${scenario_name}
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Click Button	runplay
+	Stop Test Scenario Run Gradually	${15}	${60}
+
+	[Teardown]	Run Keywords
+	...    Delete Scenario File		${scenario_name}		AND
+	...    Set Confidence	0.9								AND
+	...    Stop Agent							AND
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Remove File		${global_path}${/}example.robot
+
 Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #41
 	[Setup]	Run Keywords
@@ -3526,6 +3554,91 @@ Check Application Icon or Desktop Shortcut in GUI
 	Navigate to and check Desktop Icon
 
 	[Teardown]	Type 	KEY.ESC 	KEY.ESC 	KEY.ESC
+
+Check If Monitoring settings are loaded and used
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #173
+	[Setup]	Run Keywords
+	...    Set Global Filename And Default Save Path	example.robot							AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
+	...    Set INI Window Size		1200	600													AND
+	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-3	AND
+	...    Open Agent	${agent_options}														AND
+	...    Open Manager GUI
+
+	Utilisation Stats
+
+	VAR 	${monitortimebefore}= 		${30}
+	VAR 	${monitortimeafter}= 		${90}
+	VAR 	${robot_test_time}= 		${60}
+	# VAR 	${scenario_name}= 			NewStyle
+
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#173${/}NewStyle.rfs
+	Copy File	${scenariofile}		${global_path}
+	Click Button						runopen
+	Wait For Dialog Button				cancel
+	File Open Dialogue Select File 		${scenariofile}
+
+	# Sleep 	10
+	# Take A Screenshot
+	Click Tab	Monitoring
+	# Take A Screenshot
+
+	Log 	Verify Monitoring screen loaded as expected		console=True
+	Wait For 	manager_${platform}_issue_173_monitoring_settings.png 	 timeout=${default_image_timeout}
+
+	Click Tab	Plan
+	# Take A Screenshot
+
+	Log 	Verify Plan screen loaded as expected		console=True
+	Wait For 	manager_${platform}_issue_173_plan_settings.png 	 timeout=${default_image_timeout}
+
+	# Take A Screenshot
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Sleep 	0.5
+	Click Button	runplay
+	# Stop Test Scenario Run Gradually	${15}	${60}
+	${START_TIME}= 	Get Current Date
+	# Sleep 	26		# this was needed to get the _monitor_5 screenshot
+	# Take A Screenshot
+
+	Log 	Wait for monitoring robots to start		console=True
+	Wait For   manager_${platform}_monitor_5.png    timeout=${monitortimebefore}
+	${MON_START_TIME}= 	Get Current Date
+	# Take A Screenshot
+
+	${ELAPSED_TIME}= 	Subtract Date From Date 	${MON_START_TIME} 	${START_TIME}
+	${sleeptime}= 		Evaluate    ${monitortimebefore} - ${ELAPSED_TIME} - 2
+	Sleep    ${sleeptime}
+
+	Log 	Verify robots don't start in pre-run monitoring time		console=True
+	Wait For   manager_${platform}_robots_0.png    timeout=1
+	# Take A Screenshot
+
+	Wait For   manager_${platform}_robots_10.png    timeout=${default_image_timeout}
+	# Take A Screenshot
+
+	Wait For   manager_${platform}_robots_0.png    timeout=${robot_test_time + ${default_image_timeout}}
+	${END_TIME}= 	Get Current Date
+
+	# Take A Screenshot
+	Set Confidence 		0.95
+	Log 	Wait for monitoring robots to end		console=True
+	Wait For   manager_${platform}_monitor_0.png    timeout=${monitortimeafter + ${default_image_timeout}}
+	${MON_END_TIME}= 	Get Current Date
+	Take A Screenshot
+
+	Log 	Verify Post run time		console=True
+	${ELAPSED_TIME}= 	Subtract Date From Date 	${MON_END_TIME} 	${END_TIME}
+	Should Be True   ${ELAPSED_TIME} >= ${monitortimeafter} 		Monitoring time after test should be ~${monitortimeafter} seconds, actual was ${ELAPSED_TIME} seconds.
+
+	[Teardown]	Run Keywords
+	...    Delete Scenario File		${scenario_name}		AND
+	...    Set Confidence	0.9								AND
+	...    Stop Agent							AND
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Remove File		${global_path}${/}example.robot
+
 
 
 #

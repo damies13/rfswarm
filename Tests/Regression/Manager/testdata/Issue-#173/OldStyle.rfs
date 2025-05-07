@@ -1,0 +1,88 @@
+[Scenario]
+uploadmode = err
+scriptcount = 7
+graphlist = 68075be2-2
+
+[Script Defaults]
+resultnamemode = kywrd
+testrepeater = True
+excludelibraries = BuiltIn,String,OperatingSystem,perftest,requests
+
+[1]
+robots = 20
+delay = 900
+rampup = 1800
+run = 7200
+test = Test Scenario 1
+script = AppTests.robot
+
+[2]
+robots = 10
+delay = 900
+rampup = 1800
+run = 7200
+test = Test Scenario 2
+script = AppTests.robot
+
+[3]
+robots = 1
+delay = 0
+rampup = 10
+run = 12600
+test = Simulated Web Server 1
+script = monitoring.robot
+
+[4]
+robots = 1
+delay = 0
+rampup = 10
+run = 12600
+test = Simulated Web Server 2
+script = monitoring.robot
+
+[5]
+robots = 1
+delay = 0
+rampup = 10
+run = 12600
+test = Simulated Web Server 3
+script = monitoring.robot
+
+[6]
+robots = 1
+delay = 0
+rampup = 10
+run = 12600
+test = Simulated DB Server 1
+script = monitoring.robot
+
+[7]
+robots = 1
+delay = 0
+rampup = 10
+run = 12600
+test = Simulated DB Server 2
+script = monitoring.robot
+
+[68075be2-2]
+id = 68075be2-2
+open = True
+win_width = 840
+win_height = 372
+win_location_x = 4127
+win_location_y = 228
+win_screen = :0.0
+name = New Graph 2
+show_settings = True
+show_legend = 0
+data_type = Metric
+metric_type = AUT Web
+primary_metric = 
+secondary_metric = 
+filter_agent = 
+en_filter_agent = 0
+filter_name = None
+filter_pattern = 
+granularity_seconds = 0
+granularity_type = Average
+

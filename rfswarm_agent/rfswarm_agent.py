@@ -66,6 +66,7 @@ class RFSwarmAgent():
 	download_queue: Any = []
 	download_threads: Any = {}
 	robotcount = 0
+	monitorcount = 0
 	status = "Ready"
 	excludelibraries: Any = []
 	args = None
@@ -546,6 +547,7 @@ class RFSwarmAgent():
 				"isrunning:", self.isrunning,
 				"isstopping:", self.isstopping,
 				"robotcount:", self.robotcount,
+				"monitorcount:", self.monitorcount,
 				"\n"
 			)
 
@@ -658,6 +660,7 @@ class RFSwarmAgent():
 			"MEM%": dict(psutil.virtual_memory()._asdict())["percent"],
 			"NET%": self.netpct,
 			"Robots": self.robotcount,
+			"Monitor": self.monitorcount,
 			"Status": self.status,
 			"Properties": self.agentproperties,
 			"FileCount": len(list(self.scriptlist.keys()))
@@ -868,18 +871,19 @@ class RFSwarmAgent():
 				if key in self.download_threads:
 					del self.download_threads[key]
 			key = str(uuid.uuid4())
-			self.debugmsg(5, "key:", key)
+			self.debugmsg(6, "New download thread key:", key)
 			while hash in self.download_queue:
 				self.download_queue.remove(hash)
 			self.download_threads[key] = threading.Thread(target=self.getfile, args=(hash,))
 			self.download_threads[key].start()
 			time.sleep(0.02)
 		for key in list(self.download_threads.keys()):
-			self.debugmsg(5, "key:", key)
+			self.debugmsg(6, "download thread key:", key)
 			if key in self.download_threads and self.download_threads[key].is_alive():
 				self.download_threads[key].join()
 			if key in self.download_threads:
 				del self.download_threads[key]
+			self.debugmsg(6, "Finished download thread key:", key)
 		gc.collect()
 
 	def getfile(self, hash):
@@ -1022,7 +1026,7 @@ class RFSwarmAgent():
 
 				if int(time.time()) > jsonresp["EndTime"]:
 					self.isstopping = True
-				if self.isstopping and self.robotcount < 1:
+				if self.isstopping and self.robotcount < 1 and self.monitorcount < 1:
 					self.jobs = {}
 					self.isrunning = False
 					self.isstopping = False
@@ -1100,13 +1104,16 @@ class RFSwarmAgent():
 		self.ensure_repeater_listner_file()
 
 		if "ScriptIndex" not in self.jobs[jobid]:
-			self.debugmsg(6, "runthread: jobid:", jobid)
-			self.debugmsg(6, "runthread: job data:", self.jobs[jobid])
+			self.debugmsg(5, "runthread: jobid:", jobid)
+			self.debugmsg(5, "runthread: job data:", self.jobs[jobid])
 			jobarr = jobid.split("_")
 			self.jobs[jobid]["ScriptIndex"] = jobarr[0]
 			self.jobs[jobid]["Robot"] = jobarr[1]
 			self.jobs[jobid]["Iteration"] = 0
-			self.debugmsg(6, "runthread: job data:", self.jobs[jobid])
+			self.jobs[jobid]["RobotType"] = "Plan"
+			if jobarr[0].lower()[0] == "m":
+				self.jobs[jobid]["RobotType"] = "Monitor"
+			self.debugmsg(5, "runthread: job data:", self.jobs[jobid])
 
 		self.jobs[jobid]["Iteration"] += 1
 
@@ -1213,7 +1220,15 @@ class RFSwarmAgent():
 			self.debugmsg(1, "runthread: self.args.robot: ", self.args.robot)
 			robotcmd = self.args.robot
 
+		self.debugmsg(6, "runthread: robotcmd:", robotcmd)
+
 		cmd = [robotcmd]
+
+		if "robotoptions" in self.jobs[jobid]:
+			cmd.append("{}".format(self.jobs[jobid]['robotoptions']))
+
+		self.debugmsg(9, "runthread: cmd:", cmd)
+
 		cmd.append("-t")
 		cmd.append('"' + test + '"')
 		cmd.append("-d")
@@ -1228,6 +1243,7 @@ class RFSwarmAgent():
 		metavars.append("RFS_ITERATION:{}".format(self.jobs[jobid]["Iteration"]))
 		metavars.append("RFS_SWARMMANAGER:{}".format(self.swarmmanager))
 		metavars.append("RFS_EXCLUDELIBRARIES:{}".format(excludelibraries))
+		metavars.append("RFS_ROBOTTYPE:{}".format(self.jobs[jobid]["RobotType"]))
 
 		if "injectsleepenabled" in self.jobs[jobid]:
 			metavars.append("RFS_INJECTSLEEP:{}".format(self.jobs[jobid]["injectsleepenabled"]))
@@ -1271,11 +1287,6 @@ class RFSwarmAgent():
 
 		self.debugmsg(9, "runthread: cmd:", cmd)
 
-		if "robotoptions" in self.jobs[jobid]:
-			cmd.append("{}".format(self.jobs[jobid]['robotoptions']))
-
-		self.debugmsg(9, "runthread: cmd:", cmd)
-
 		# disableloglog': 'True',
 		if "disableloglog" in self.jobs[jobid]:
 			if self.str2bool(self.jobs[jobid]["disableloglog"]):
@@ -1301,7 +1312,11 @@ class RFSwarmAgent():
 		robotexe = shutil.which(robotcmd)
 		self.debugmsg(6, "runthread: robotexe:", robotexe)
 		if robotexe is not None:
-			self.robotcount += 1
+
+			if self.jobs[jobid]["RobotType"] in ["Monitor"]:
+				self.monitorcount += 1
+			else:
+				self.robotcount += 1
 
 			result = 0
 			try:
@@ -1350,7 +1365,11 @@ class RFSwarmAgent():
 			# Uplad any files found
 			self.queue_file_upload(uploadmode, result, odir)
 
-			self.robotcount += -1
+			if self.jobs[jobid]["RobotType"] in ["Monitor"]:
+				self.monitorcount += -1
+			else:
+				self.robotcount += -1
+
 		else:
 			self.debugmsg(1, "Could not find robot executeable:", robotexe)
 
@@ -2216,6 +2235,7 @@ class RFSwarmAgent():
 		fd.append("import time")
 		fd.append("import os")
 		fd.append("import json")
+		fd.append("import requests")
 		fd.append("")
 		fd.append("class RFSTestRepeater:")
 		fd.append("	ROBOT_LISTENER_API_VERSION = 3")
@@ -2226,20 +2246,37 @@ class RFSwarmAgent():
 		fd.append("	def end_test(self, test, result):")
 		fd.append("")
 		fd.append("		jobdata = {}")
+		fd.append("		timeout = 600")
+		fd.append("		agent = test.parent.metadata['RFS_AGENTNAME']")
+		fd.append("		manager = test.parent.metadata['RFS_SWARMMANAGER']")
 		fd.append("		index = test.parent.metadata['RFS_INDEX']")
 		fd.append("		robot = test.parent.metadata['RFS_ROBOT']")
 		fd.append("		scriptdir = os.path.dirname(__file__)")
 		fd.append("		jobfile = os.path.join(scriptdir, \"RFS_Job_{}_{}.json\".format(index, robot))")
+		fd.append("		jobid = \"{}_{}\".format(index, robot)")
+		fd.append("		endtime = 0")
 		fd.append("")
 		fd.append("		if os.path.exists(jobfile):")
 		fd.append("			with open(jobfile, 'r') as f:")
 		fd.append("				jobdata = json.load(f)")
+		fd.append("				endtime = jobdata['EndTime']")
+		fd.append("				jobid = jobdata['jobid']")
+		fd.append("")
+		fd.append("		try:")
+		fd.append("			uri = manager + 'Jobs'")
+		fd.append("			payload = {'AgentName': agent}")
+		fd.append("			r = requests.post(uri, json=payload, timeout=timeout)")
+		fd.append("			if r.status_code == requests.codes.ok:")
+		fd.append("				jsonresp = json.loads(r.text)")
+		fd.append("				endtime = jsonresp['Schedule'][jobid]['EndTime']")
+		fd.append("		except:")
+		fd.append("			pass")
 		fd.append("")
 		fd.append("		self.count += 1")
 		fd.append("		newiteration = \"{}_{}\".format(test.parent.metadata['RFS_ITERATION'], self.count)")
 		fd.append("		BuiltIn().set_suite_variable(\"${RFS_ITERATION}\", newiteration)")
 		fd.append("")
-		fd.append("		if int(time.time()) < jobdata[\"EndTime\"]:")
+		fd.append("		if int(time.time()) < endtime:")
 		fd.append("			if self.testname is None:")
 		fd.append("				self.testname = test.name")
 		fd.append("			newname = \"{} {}\".format(self.testname, newiteration)")
