@@ -2532,12 +2532,12 @@ class RFSwarmCore:
 		if os.path.isfile(base.manager_ini):
 			base.debugmsg(7, "agentini: ", base.manager_ini)
 			arrconfigfile = os.path.splitext(base.manager_ini)
-			self.debugmsg(5, "arrconfigfile: ", arrconfigfile)
+			base.debugmsg(5, "arrconfigfile: ", arrconfigfile)
 			if len(arrconfigfile) < 2:
-				self.debugmsg(0, "Configuration file ", base.manager_ini, " missing extention, unable to determine supported format. Plesae use extentions .ini, .yaml or .json")
+				base.debugmsg(0, "Configuration file ", base.manager_ini, " missing extention, unable to determine supported format. Plesae use extentions .ini, .yaml or .json")
 				exit()
 			if arrconfigfile[1].lower() not in [".ini", ".yml", ".yaml", ".json"]:
-				self.debugmsg(0, "Configuration file ", base.manager_ini, " has an invalid extention, unable to determine supported format. Plesae use extentions .ini, .yaml or .json")
+				base.debugmsg(0, "Configuration file ", base.manager_ini, " has an invalid extention, unable to determine supported format. Plesae use extentions .ini, .yaml or .json")
 				exit()
 			if arrconfigfile[1].lower() == ".ini":
 				base.config.read(base.manager_ini, encoding="utf8")
@@ -2545,19 +2545,19 @@ class RFSwarmCore:
 				configdict = {}
 				if arrconfigfile[1].lower() in [".yml", ".yaml"]:
 					# read yaml file
-					self.debugmsg(5, "read yaml file")
+					base.debugmsg(5, "read yaml file")
 					with open(base.manager_ini, 'r', encoding="utf-8") as f:
 						configdict = yaml.safe_load(f)
 						configdict = base.configparser_safe_dict(configdict)
-						self.debugmsg(5, "configdict: ", configdict)
+						base.debugmsg(5, "configdict: ", configdict)
 				if arrconfigfile[1].lower() == ".json":
 					# read json file
-					self.debugmsg(5, "read json file")
+					base.debugmsg(5, "read json file")
 					with open(base.manager_ini, 'r', encoding="utf-8") as f:
 						configdict = json.load(f)
 						configdict = base.configparser_safe_dict(configdict)
-						self.debugmsg(5, "configdict: ", configdict)
-				self.debugmsg(5, "configdict: ", configdict)
+						base.debugmsg(5, "configdict: ", configdict)
+				base.debugmsg(5, "configdict: ", configdict)
 				self.config.read_dict(configdict)
 		else:
 			base.saveini()
