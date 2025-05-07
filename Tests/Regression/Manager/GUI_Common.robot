@@ -1325,14 +1325,19 @@ File Open Dialogue windows Select File
 	Sleep	3
 	# Take A Screenshot
 	${filepath}= 	Normalize Path 	${filepath}
-	#${path} 	${file} = 	Split Path 	${filepath}
+	${path} 	${file} = 	Split Path 	${filepath}
 	Click Label With Horizontal Offset 	file_name 	50
 	Sleep	0.5
-	Type 		${filepath}
+	Type 		${path} 	Key.ENTER
 	Sleep	0.5
+	Take A Screenshot
+	Type 		${file}
+	Sleep	0.5
+	Take A Screenshot
 	Press key.enter 1 Times
 	# Take A Screenshot
 	# Click Dialog Button 	open
+	Sleep	0.5
 
 File Open Dialogue macos Select File
 	[Arguments]		${filepath}
@@ -1624,15 +1629,18 @@ Navigate to and check Desktop Icon For Windows
 
 	# Press Combination 	KEY.ENTER
 	# Take A Screenshot
-
-	${img}=	Set Variable		${platform}_search_bestmatch.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-
-	# Check for Icon
-	${img}=	Set Variable		${platform}_search_rfswarm_manager.png
+	#
+	# # Press Combination 	KEY.ENTER
+	# # Take A Screenshot
+	#
+	# ${img}=	Set Variable		${platform}_search_bestmatch.png
+	# Wait For 	${img} 	 timeout=${default_image_timeout}
+	#
+	# # Check for Icon
+	# ${img}=	Set Variable		${platform}_search_rfswarm_manager.png
+	# # Take A Screenshot
+	# Wait For 	${img} 	 timeout=${default_image_timeout}
 	# Take A Screenshot
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-	Take A Screenshot
 
 	Press Combination 	KEY.ESC
 

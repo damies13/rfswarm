@@ -5,6 +5,7 @@ rfswarm Manager is the central server component of rfswarm, this is where you pl
 
 - [User Interface](#user-interface)
   - [Plan](#plan)
+  - [Monitoring](#monitoring)
   - [Run](#run)
   - [Agents](#agents)
   - [About](#about)
@@ -257,6 +258,53 @@ The combination of multiple require and exclude rules, the default and custom ag
 Here is an example of configuring the Filter Rules and using the Robot options:
 > ![image](Images/Linux_Plan_v1.3.0_Test_Settings_Filter_Rules.png)
 
+### Monitoring
+This section allows you to add monitoring tests/tasks separately from the tests used for the Application Under Test (AUT), to make a clear distinction between tests that are for validating the performance of the AUT and tests/tasks used for monitoring
+
+- All monitoring groups will have:
+  - 1 robot each
+  - a delay and ramp-up of 0 seconds
+  - and for run, the time is calculated based on `Monitoring time before test + total plan execution time + Monitoring time after test`
+- All monitoring groups will start immediately and run until the scenario end
+
+#### Monitoring time before test
+when this field is set to a value greater than 0, it will delay all test groups on the plan tab by this amount of time, this delay is in addition to any delay set on a test group. During this time only the monitoring groups will run.
+
+#### Monitoring time after test
+when this field is set to a value greater than 0, it will keep the monitoring groups will running for this amount of time after the test finishes and the number of running robots has reached 0 robots. During this time only the monitoring groups will continue running.
+
+> _Monitoring - Example_ <br>
+> ![Image](Images/Ubuntu_Monitoring_v1.5.0_Example.png "Monitoring - Example")
+>
+
+While hopefully this is intuitive, the tool bar buttons are:
+
+|   |   |   |
+|---|---|---|
+| New | ![image](Images/GUI_btn_page_white.edt.gif) | Create a new scenario |
+| Open | ![image](Images/GUI_btn_folder_explore.gif) | Open an existing scenario |
+| Save | ![image](Images/GUI_btn_disk.gif) | Save the current scenario |
+| Settings | ![image](Images/GUI_btn_cog.gif) | Configure additional settings for the current scenario or rfswarm |
+| Schedule | ![image](Images/GUI_btn_time.gif) | Schedule the test start time |
+| Play | ![image](Images/GUI_btn_resultset_next.gif) | Play the current scenario |
+
+The monitoring group buttons are:
+
+|   |   |   |
+|---|---|---|
+| Add | ![image](Images/GUI_btn_add.gif) | Add another monitoring group |
+| Select | ![image](Images/GUI_btn_script.gif) | Select a robot file |
+| Settings | ![image](Images/GUI_btn_cog.gif) | Configure additional settings for a monitoring group |
+| Remove | ![image](Images/GUI_btn_cross.gif) | Remove this monitoring group |
+
+The columns in the monitoring group are:
+
+| Column Name | Detail |
+|---|---|
+| Index | The test group's line number in the scenario |
+| Script | This is where you select the robot file that contains the test you want to assign to this monitoring group |
+| Test | This is where you select the test/task you want to run for this monitoring group, this option list is auto populated when you select a robot file in the Script column |
+| Settings | This is where you can select additional settings for the monitoring group |
 
 ### Run
 This is where you monitor your test scenario as it runs, here you will see number of robots running, how long the has been running and live updates of the test results.

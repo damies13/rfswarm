@@ -33,7 +33,7 @@ def change_ini_option(filename, section, optionname, new_value):
 
 	config[section][optionname] = new_value
 
-	with open(filename, 'w') as configfile:
+	with open(filename, 'w', encoding="utf8") as configfile:
 		config.write(configfile)
 
 	print("After:", config, dict(config))
