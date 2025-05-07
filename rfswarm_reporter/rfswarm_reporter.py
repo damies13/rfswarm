@@ -3931,14 +3931,14 @@ class ReporterCore:
 			if len(arrconfigfile) < 2:
 				self.debugmsg(0, "Configuration file ", base.reporter_ini, " missing extention, unable to determine supported format. Plesae use extentions .ini, .yaml or .json")
 				exit()
-			if arrconfigfile[1].lower() not in [".ini", ".yaml", ".json"]:
+			if arrconfigfile[1].lower() not in [".ini", ".yml", ".yaml", ".json"]:
 				self.debugmsg(0, "Configuration file ", base.reporter_ini, " has an invalid extention, unable to determine supported format. Plesae use extentions .ini, .yaml or .json")
 				exit()
 			if arrconfigfile[1].lower() == ".ini":
 				base.config.read(base.reporter_ini, encoding="utf8")
 			else:
 				configdict = {}
-				if arrconfigfile[1].lower() == ".yaml":
+				if arrconfigfile[1].lower() in [".yml", ".yaml"]:
 					# read yaml file
 					self.debugmsg(5, "read yaml file")
 					with open(base.reporter_ini, 'r', encoding="utf-8") as f:

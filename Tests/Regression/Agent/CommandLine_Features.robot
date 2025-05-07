@@ -293,6 +293,23 @@ Agent Yaml Configuration File
 
 	[Teardown]	Stop Agent
 
+Agent Yml Configuration File
+	[Tags]	ubuntu-latest 	macos-latest 	Issue #172	# can't get agent output in windows
+
+	VAR 	${yamlurl}= 	http://ymlmanager:8003/
+	${yamlfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#172${/}agent-config.yml
+	VAR		@{agnt_options}		--ini	${yamlfile} 	-g 	2
+
+	Run Agent 	${agnt_options}
+	Log To Console	Run Agent with Yaml Configuration File.
+	Sleep    20
+	Stop Agent
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
+	Should Contain	${result_stdout}	${yamlurl}
+
+	[Teardown]	Stop Agent
+
 Agent JSON Configuration File
 	[Tags]	ubuntu-latest 	macos-latest 	Issue #172	# can't get agent output in windows
 

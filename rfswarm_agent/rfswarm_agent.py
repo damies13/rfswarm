@@ -125,14 +125,14 @@ class RFSwarmAgent():
 			if len(arrconfigfile) < 2:
 				self.debugmsg(0, "Configuration file ", self.agentini, " missing extention, unable to determine supported format. Plesae use extentions .ini, .yaml or .json")
 				exit()
-			if arrconfigfile[1].lower() not in [".ini", ".yaml", ".json"]:
+			if arrconfigfile[1].lower() not in [".ini", ".yml", ".yaml", ".json"]:
 				self.debugmsg(0, "Configuration file ", self.agentini, " has an invalid extention, unable to determine supported format. Plesae use extentions .ini, .yaml or .json")
 				exit()
 			if arrconfigfile[1].lower() == ".ini":
 				self.config.read(self.agentini)
 			else:
 				configdict = {}
-				if arrconfigfile[1].lower() == ".yaml":
+				if arrconfigfile[1].lower() in [".yml", ".yaml"]:
 					# read yaml file
 					self.debugmsg(5, "read yaml file")
 					with open(self.agentini, 'r', encoding="utf-8") as f:
