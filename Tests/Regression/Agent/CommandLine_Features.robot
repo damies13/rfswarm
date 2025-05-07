@@ -275,3 +275,37 @@ Agent Command Line PROPERTY -p
 	...    msg=Custom propery 'Issue-#14' not found in PreRun db. ${\n}Query Result: ${prop_result}
 
 	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+
+Agent Yaml Configuration File
+	[Tags]	ubuntu-latest 	macos-latest 	Issue #172	# can't get agent output in windows
+
+	VAR 	${yamlurl}= 	http://yamlmanager:8001/
+	${yamlfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#172${/}agent-config.yaml
+	VAR		@{agnt_options}		--ini	${yamlfile} 	-g 	2
+
+	Run Agent 	${agnt_options}
+	Log To Console	Run Agent with Yaml Configuration File.
+	Sleep    20
+	Stop Agent
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
+	Should Contain	${result_stdout}	${yamlurl}
+
+	[Teardown]	Stop Agent
+
+Agent JSON Configuration File
+	[Tags]	ubuntu-latest 	macos-latest 	Issue #172	# can't get agent output in windows
+
+	VAR 	${jsonurl}= 	http://jsonmanager:8002/
+	${jsonfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#172${/}agent-config.json
+	VAR		@{agnt_options}		--ini	${jsonfile} 	-g 	2
+
+	Run Agent 	${agnt_options}
+	Log To Console	Run Agent with JSON Configuration File.
+	Sleep    20
+	Stop Agent
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
+	Should Contain	${result_stdout}	${jsonurl}
+
+	[Teardown]	Stop Agent

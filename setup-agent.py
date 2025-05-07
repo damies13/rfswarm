@@ -21,7 +21,7 @@ setuptools.setup(
 		('rfswarm_agent/icons', ['rfswarm_agent/icons/rfswarm-logo-128.ico']),
 	],
 	include_package_data=True,
-	install_requires=['configparser', 'requests', 'robotframework', 'psutil'],
+	install_requires=['configparser', 'requests', 'robotframework', 'psutil', 'pyyaml'],
 	classifiers=[
 		"Development Status :: 5 - Production/Stable",
 		"Framework :: Robot Framework",

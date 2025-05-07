@@ -30,6 +30,7 @@ import threading
 import time
 import uuid
 import xml.etree.ElementTree as ET
+import yaml
 from datetime import datetime
 from typing import Any
 
@@ -117,12 +118,35 @@ class RFSwarmAgent():
 		self.agentini = self.findiniloctaion()
 
 		if os.path.isfile(self.agentini):
-			self.debugmsg(6, "agentini: ", self.agentini)
-			self.config.read(self.agentini)
+			self.debugmsg(5, "agentini: ", self.agentini)
+			arrconfigfile = os.path.splitext(self.agentini)
+			self.debugmsg(5, "arrconfigfile: ", arrconfigfile)
+			if len(arrconfigfile) < 2:
+				self.debugmsg(0, "Configuration file ", self.agentini, " missing extention, unable to determine supported format. Plesae use extentions .ini, .yaml or .json")
+				exit()
+			if arrconfigfile[1].lower() == ".ini":
+				self.config.read(self.agentini)
+			else:
+				configdict = {}
+				if arrconfigfile[1].lower() == ".yaml":
+					# read yaml file
+					self.debugmsg(5, "read yaml file")
+					with open(self.agentini, 'r', encoding="utf-8") as f:
+						configdict = yaml.safe_load(f)
+						self.debugmsg(5, "configdict: ", configdict)
+				if arrconfigfile[1].lower() == ".json":
+					# read json file
+					self.debugmsg(5, "read json file")
+					with open(self.agentini, 'r', encoding="utf-8") as f:
+						configdict = json.load(f)
+						self.debugmsg(5, "configdict: ", configdict)
+				self.debugmsg(5, "configdict: ", configdict)
+				self.config.read_dict(configdict)
 		else:
 			self.saveini()
 
 		self.debugmsg(0, "	Configuration File: ", self.agentini)
+		self.debugmsg(5, "self.config: ", self.config)
 
 		if self.args.agentname:
 			self.agentname = self.args.agentname
@@ -459,7 +483,7 @@ class RFSwarmAgent():
 	def findiniloctaion(self):
 
 		if self.args.ini:
-			self.debugmsg(1, "self.args.ini: ", self.args.ini)
+			self.debugmsg(5, "self.args.ini: ", self.args.ini)
 			return self.args.ini
 
 		inilocations = []
