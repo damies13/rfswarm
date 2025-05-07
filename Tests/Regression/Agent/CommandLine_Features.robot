@@ -294,7 +294,7 @@ Agent Yaml Configuration File
 	[Teardown]	Stop Agent
 
 Agent Yml Configuration File
-	[Tags]	ubuntu-latest 	macos-latest 	Issue #172	# can't get agent output in windows
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172	# can't get agent output in windows
 
 	VAR 	${yamlurl}= 	http://ymlmanager:8003/
 	${yamlfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#172${/}agent-config.yml
