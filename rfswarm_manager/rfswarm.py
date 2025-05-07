@@ -47,6 +47,7 @@ from typing import Any
 
 import matplotlib  # required for matplot graphs
 import psutil
+import yaml
 
 # required for matplot graphs
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg

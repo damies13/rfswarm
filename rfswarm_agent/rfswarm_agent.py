@@ -134,12 +134,14 @@ class RFSwarmAgent():
 					self.debugmsg(5, "read yaml file")
 					with open(self.agentini, 'r', encoding="utf-8") as f:
 						configdict = yaml.safe_load(f)
+						configdict = self.configparser_safe_dict(configdict)
 						self.debugmsg(5, "configdict: ", configdict)
 				if arrconfigfile[1].lower() == ".json":
 					# read json file
 					self.debugmsg(5, "read json file")
 					with open(self.agentini, 'r', encoding="utf-8") as f:
 						configdict = json.load(f)
+						configdict = self.configparser_safe_dict(configdict)
 						self.debugmsg(5, "configdict: ", configdict)
 				self.debugmsg(5, "configdict: ", configdict)
 				self.config.read_dict(configdict)
@@ -1735,6 +1737,18 @@ class RFSwarmAgent():
 					self.debugmsg(8, "Exception:", e)
 					self.debugmsg(0, "Manager Disconnected", self.swarmmanager, datetime.now().isoformat(sep=' ', timespec='seconds'), "(", int(time.time()), ")")
 					self.isconnected = False
+
+	def configparser_safe_dict(self, dictin):
+		self.debugmsg(7, "dictin: ", dictin)
+		dictout = dictin
+		for k in dictout.keys():
+			self.debugmsg(7, "value type: ", type(dictout[k]))
+			if isinstance(dictout[k], dict):
+				dictout[k] = self.configparser_safe_dict(dictout[k])
+			if dictout[k] is None:
+				dictout[k] = ""
+		self.debugmsg(7, "dictout: ", dictout)
+		return dictout
 
 	def make_safe_filename(self, s):
 		def safe_string(s):

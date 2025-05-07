@@ -43,6 +43,7 @@ import matplotlib  # required for matplot graphs
 import matplotlib.font_manager as font_manager
 import openpyxl  # used for xlsx export
 import tzlocal
+import yaml
 from docx import Document  # used for docx export
 from docx.enum.style import WD_STYLE_TYPE  # used for docx export
 from docx.enum.text import WD_ALIGN_PARAGRAPH  # used for docx export
