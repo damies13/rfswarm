@@ -30,12 +30,12 @@ import threading
 import time
 import uuid
 import xml.etree.ElementTree as ET
-import yaml
 from datetime import datetime
 from typing import Any
 
 import psutil
 import requests
+import yaml
 
 
 class RFSwarmAgent():
