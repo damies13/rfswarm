@@ -104,12 +104,15 @@ Stop Manager
 			Send Signal To Process 	SIGINT 	${process_manager}
 			${result}= 	Wait For Process 	${process_manager}	timeout=30	on_timeout=kill
 		END
-		Log		${result.stdout}
-		Log		${result.stderr}
-
-		# Should Be Equal As Integers 	${result.rc} 	0
-		Log to console 	Process returned: ${result.rc}
+	ELSE
+		# get result var for process even if not running any more
+		${result}= 	Get Process Result		${process_manager}
 	END
+	Log		${result.stdout}
+	Log		${result.stderr}
+
+	# Should Be Equal As Integers 	${result.rc} 	0
+	Log to console 	Process returned: ${result.rc}
 
 Stop Agent
 	${running}= 	Is Process Running 	${process_agent}
@@ -121,10 +124,13 @@ Stop Agent
 			Send Signal To Process 	SIGINT 	${process_agent}
 			${result}= 	Wait For Process 	${process_agent}	timeout=30	on_timeout=kill
 		END
-		Log		${result.stdout}
-		Log		${result.stderr}
-		# Should Be Equal As Integers 	${result.rc} 	0
+	ELSE
+		# get result var for process even if not running any more
+		${result}= 	Get Process Result		${process_agent}
 	END
+	Log		${result.stdout}
+	Log		${result.stderr}
+	# Should Be Equal As Integers 	${result.rc} 	0
 
 Test Agent Connectivity
 	#[Setup] 	Start Server	127.0.0.1	8138

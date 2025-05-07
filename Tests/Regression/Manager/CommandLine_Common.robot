@@ -133,17 +133,20 @@ Stop Manager
 			Send Signal To Process 	SIGINT 	${process_manager}
 			${result}= 	Wait For Process 	${process_manager}	timeout=30	on_timeout=kill
 		END
-
-		Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_manager.txt
-		Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_manager.txt
-
-		Log to console 	Terminate Manager Process returned: ${result.rc} 	console=True
-		Log 	stdout_path: ${result.stdout_path} 	console=True
-		Log 	stdout: ${result.stdout} 	console=True
-		Log 	stderr_path: ${result.stderr_path} 	console=True
-		Log 	stderr: ${result.stderr} 	console=True
-
+	ELSE
+		# get result var for process even if not running any more
+		${result}= 	Get Process Result		${process_manager}
 	END
+
+	Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_manager.txt
+	Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_manager.txt
+
+	Log to console 	Terminate Manager Process returned: ${result.rc} 	console=True
+	Log 	stdout_path: ${result.stdout_path} 	console=True
+	Log 	stdout: ${result.stdout} 	console=True
+	Log 	stderr_path: ${result.stderr_path} 	console=True
+	Log 	stderr: ${result.stderr} 	console=True
+
 
 Stop Agent
 	${running}= 	Is Process Running 	${process_agent}
@@ -155,18 +158,20 @@ Stop Agent
 			Send Signal To Process 	SIGINT 	${process_agent}
 			${result}= 	Wait For Process 	${process_agent}	timeout=30	on_timeout=kill
 		END
-
-		Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_agent.txt
-		Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_agent.txt
-
-		Log to console 	Agent returned: ${result.rc}
-		Log 	stdout_path: ${result.stdout_path} 	console=True
-		Log 	stdout: ${result.stdout} 	console=True
-		Log 	stderr_path: ${result.stderr_path} 	console=True
-		Log 	stderr: ${result.stderr} 	console=True
-		Show Dir Contents 	${agent_dir}
-
+	ELSE
+		# get result var for process even if not running any more
+		${result}= 	Get Process Result		${process_agent}
 	END
+
+	Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_agent.txt
+	Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_agent.txt
+
+	Log to console 	Agent returned: ${result.rc}
+	Log 	stdout_path: ${result.stdout_path} 	console=True
+	Log 	stdout: ${result.stdout} 	console=True
+	Log 	stderr_path: ${result.stderr_path} 	console=True
+	Log 	stderr: ${result.stderr} 	console=True
+	Show Dir Contents 	${agent_dir}
 
 Set Global Filename And Default Save Path
 	[Documentation]	Sets global default save path as Test Variable and file name for robot test.
