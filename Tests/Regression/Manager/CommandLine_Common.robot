@@ -134,18 +134,24 @@ Stop Manager
 			${result}= 	Wait For Process 	${process_manager}	timeout=30	on_timeout=kill
 		END
 	ELSE
-		# get result var for process even if not running any more
-		${result}= 	Get Process Result		${process_manager}
+		TRY
+			# get result var for process even if not running any more
+			${result}= 	Get Process Result		${process_manager}
+		EXCEPT
+			Pass
+		END
 	END
 
-	Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_manager.txt
-	Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_manager.txt
+	IF 		${result} is not None
+		Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_manager.txt
+		Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_manager.txt
 
-	Log to console 	Terminate Manager Process returned: ${result.rc} 	console=True
-	Log 	stdout_path: ${result.stdout_path} 	console=True
-	Log 	stdout: ${result.stdout} 	console=True
-	Log 	stderr_path: ${result.stderr_path} 	console=True
-	Log 	stderr: ${result.stderr} 	console=True
+		Log to console 	Terminate Manager Process returned: ${result.rc} 	console=True
+		Log 	stdout_path: ${result.stdout_path} 	console=True
+		Log 	stdout: ${result.stdout} 	console=True
+		Log 	stderr_path: ${result.stderr_path} 	console=True
+		Log 	stderr: ${result.stderr} 	console=True
+	END
 
 
 Stop Agent
