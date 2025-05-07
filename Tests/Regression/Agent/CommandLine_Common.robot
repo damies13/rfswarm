@@ -191,7 +191,8 @@ Get Modules From Program .py File That Are Not BuildIn
 	...    textwrap	threading	time	timeit	tkinter	token	tokenize	tomllib	trace	traceback	tracemalloc	tty	turtle
 	...    turtledemo	types	typing	unicodedata	unittest	urllib	usercustomize	uu	uuid	venv	warnings	wave
 	...    weakref	webbrowser	winreg	winsound	wsgiref	xdrlib	xml	xmlrpc	zipapp	zipfile	zipimport	zlib	zoneinfo
-	&{replace_names}	Create Dictionary	PIL=pillow
+
+	&{replace_names}	Create Dictionary	PIL=pillow 		yaml=pyyaml
 
 	${manager_content}	Get File	${file_path}
 	${all_imports_lines}	Split String	${manager_content}	separator=\n
