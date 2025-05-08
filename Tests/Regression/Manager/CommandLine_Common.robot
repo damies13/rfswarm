@@ -114,7 +114,21 @@ Wait For Manager
 	[Arguments]		${timeout}=30min
 	${result}= 	Wait For Process		${process_manager} 	timeout=${timeout} 	on_timeout=terminate
 	# Should Be Equal As Integers 	${result.rc} 	0
-	Log to console 	Manager exited with: ${result.rc}
+	# Log to console 	Manager exited with: ${result.rc}
+
+	TRY
+		Log 	Manager exited with: ${result.rc} 		console=true
+
+		Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_manager.txt
+		Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_manager.txt
+
+		Log 	stdout_path: ${result.stdout_path} 	console=True
+		Log 	stdout: ${result.stdout} 	console=True
+		Log 	stderr_path: ${result.stderr_path} 	console=True
+		Log 	stderr: ${result.stderr} 	console=True
+	EXCEPT 		${message}
+		Log 	${message} 		console=true
+	END
 
 Check Agent Is Running
 	[Documentation] 	This keyword checks if the agent is running and returns true or false
@@ -137,12 +151,12 @@ Stop Manager
 		TRY
 			# get result var for process even if not running any more
 			${result}= 	Get Process Result		${process_manager}
-		EXCEPT
-			Pass
+		EXCEPT 		${message}
+			Log 	${message} 		console=true
 		END
 	END
 
-	IF 		$result is not None
+	TRY
 		Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_manager.txt
 		Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_manager.txt
 
@@ -151,6 +165,8 @@ Stop Manager
 		Log 	stdout: ${result.stdout} 	console=True
 		Log 	stderr_path: ${result.stderr_path} 	console=True
 		Log 	stderr: ${result.stderr} 	console=True
+	EXCEPT 		${message}
+		Log 	${message} 		console=true
 	END
 
 
@@ -165,19 +181,27 @@ Stop Agent
 			${result}= 	Wait For Process 	${process_agent}	timeout=30	on_timeout=kill
 		END
 	ELSE
-		# get result var for process even if not running any more
-		${result}= 	Get Process Result		${process_agent}
+		TRY
+			# get result var for process even if not running any more
+			${result}= 	Get Process Result		${process_agent}
+		EXCEPT 		${message}
+			Log 	${message} 		console=true
+		END
 	END
 
-	Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_agent.txt
-	Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_agent.txt
+	TRY
+		Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_agent.txt
+		Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_agent.txt
 
-	Log to console 	Agent returned: ${result.rc}
-	Log 	stdout_path: ${result.stdout_path} 	console=True
-	Log 	stdout: ${result.stdout} 	console=True
-	Log 	stderr_path: ${result.stderr_path} 	console=True
-	Log 	stderr: ${result.stderr} 	console=True
-	Show Dir Contents 	${agent_dir}
+		Log to console 	Agent returned: ${result.rc}
+		Log 	stdout_path: ${result.stdout_path} 	console=True
+		Log 	stdout: ${result.stdout} 	console=True
+		Log 	stderr_path: ${result.stderr_path} 	console=True
+		Log 	stderr: ${result.stderr} 	console=True
+		Show Dir Contents 	${agent_dir}
+	EXCEPT 		${message}
+		Log 	${message} 		console=true
+	END
 
 Set Global Filename And Default Save Path
 	[Documentation]	Sets global default save path as Test Variable and file name for robot test.
