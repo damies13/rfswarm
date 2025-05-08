@@ -176,37 +176,6 @@ apt install python3-dev
 You may need to do something similar.
 
 
-## INI File Settings
-
-### [Agent]
-All of the agent settings are under the Agent section
-
-### Swarm Manager
-The swarm manager setting defines the Manager that controls the test and that this agent receives instructions from. The default value is localhost on port 8138. As you will normally run the agent on a different machine to the Manager, this is the first ini file setting you will probably change.
-```ini
-swarmmanager = http://localhost:8138/
-```
-
-### Agent Directory
-The agent directory is the file system location where the agent will download robot files and their dependancies, this also the location the robot files are executed from.
-By default a directory called rfswarmagent is created in the logged in users temp directory.
-```ini
-agentdir = <TEMP>/rfswarmagent
-```
-
-### Robot Command
-The robot command is the robot framework executable, this should normally be in your path so this setting should not require changing. However if this is not the case you may need to identify the full path to your robot executable and enter it here.
-```ini
-robotcmd = robot
-```
-
-### Exclude Libraries
-In order to keep the test results focused on the application under test and avoid reporting response times for steps from support libraries, certain libraries are excluded when the agent is processing results to return to the Manager. The default setting is:
-```ini
-excludelibraries = BuiltIn,String,OperatingSystem,perftest
-```
-You can add and remove libraries from this list to meet the requirements of your tests.
-
 ## Agent polling of the Manager
 
 ### Disconnected State
