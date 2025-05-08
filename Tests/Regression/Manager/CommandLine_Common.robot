@@ -142,7 +142,7 @@ Stop Manager
 		END
 	END
 
-	IF 		${result} is not None
+	IF 		$result is not None
 		Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_manager.txt
 		Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_manager.txt
 

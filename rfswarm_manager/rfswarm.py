@@ -3735,7 +3735,6 @@ class RFSwarmCore:
 			t = threading.Thread(target=base.gui.pln_update_graph)
 			t.start()
 
-
 	def ClickPlay(self, _event=None):
 
 		base.debugmsg(0, "Test Started:	", int(time.time()), "[", datetime.now().isoformat(sep=' ', timespec='seconds'), "]")
