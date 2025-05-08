@@ -126,8 +126,8 @@ Wait For Manager
 		Log 	stdout: ${result.stdout} 	console=True
 		Log 	stderr_path: ${result.stderr_path} 	console=True
 		Log 	stderr: ${result.stderr} 	console=True
-	EXCEPT 		${message}
-		Log 	${message} 		console=true
+	EXCEPT 	AS 	${error}
+		Log 	error: ${error} 		console=true
 	END
 
 Check Agent Is Running
@@ -151,8 +151,8 @@ Stop Manager
 		TRY
 			# get result var for process even if not running any more
 			${result}= 	Get Process Result		${process_manager}
-		EXCEPT 		${message}
-			Log 	${message} 		console=true
+		EXCEPT 	AS 	${error}
+			Log 	error: ${error} 		console=true
 		END
 	END
 
@@ -165,8 +165,8 @@ Stop Manager
 		Log 	stdout: ${result.stdout} 	console=True
 		Log 	stderr_path: ${result.stderr_path} 	console=True
 		Log 	stderr: ${result.stderr} 	console=True
-	EXCEPT 		${message}
-		Log 	${message} 		console=true
+	EXCEPT 	AS 	${error}
+		Log 	error: ${error} 		console=true
 	END
 
 
@@ -184,8 +184,8 @@ Stop Agent
 		TRY
 			# get result var for process even if not running any more
 			${result}= 	Get Process Result		${process_agent}
-		EXCEPT 		${message}
-			Log 	${message} 		console=true
+		EXCEPT 	AS 	${error}
+			Log 	error: ${error} 		console=true
 		END
 	END
 
@@ -199,8 +199,8 @@ Stop Agent
 		Log 	stderr_path: ${result.stderr_path} 	console=True
 		Log 	stderr: ${result.stderr} 	console=True
 		Show Dir Contents 	${agent_dir}
-	EXCEPT 		${message}
-		Log 	${message} 		console=true
+	EXCEPT 	AS 	${error}
+		Log 	error: ${error} 		console=true
 	END
 
 Set Global Filename And Default Save Path
