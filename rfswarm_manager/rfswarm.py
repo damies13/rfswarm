@@ -559,7 +559,7 @@ class RFSwarmBase:
 	def findiniloctaion(self):
 
 		if self.args.ini:
-			self.debugmsg(1, "self.args.ini: ", self.args.ini)
+			self.debugmsg(5, "self.args.ini: ", self.args.ini)
 			return self.args.ini
 
 		inilocations = []
@@ -2443,12 +2443,12 @@ class RFSwarmBase:
 		return readycount
 
 	def configparser_safe_dict(self, dictin):
-		self.debugmsg(7, "dictin: ", dictin)
+		self.debugmsg(8, "dictin: ", dictin)
 		dictout = dictin
 		for k in dictout.keys():
-			self.debugmsg(7, "value type: ", type(dictout[k]))
+			self.debugmsg(8, "value type: ", type(dictout[k]))
 			if isinstance(dictout[k], dict):
-				dictout[k] = self.configparser_safe_dict(dictout[k])
+				dictout[k] = base.configparser_safe_dict(dictout[k])
 			if dictout[k] is None:
 				dictout[k] = ""
 		self.debugmsg(7, "dictout: ", dictout)
@@ -3139,6 +3139,20 @@ class RFSwarmCore:
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
+	# Messages
+	#
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+	def display_warning(self, message):
+		if not base.args.nogui:
+			tkm.showwarning("RFSwarm - Warning", message)
+			base.debugmsg(0, message)
+		else:
+			base.debugmsg(0, message)
+			self.on_closing(message)
+
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+	#
 	# Server
 	#
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -3311,7 +3325,38 @@ class RFSwarmCore:
 		if os.path.isfile(ScenarioFile):
 			base.debugmsg(9, "ScenarioFile: ", ScenarioFile)
 			try:
-				filedata.read(ScenarioFile, encoding="utf8")
+				arrfile = os.path.splitext(ScenarioFile)
+				base.debugmsg(5, "arrfile: ", arrfile)
+				if len(arrfile) < 2:
+					msg = "Scenario file ", ScenarioFile, " missing extention, unable to determine supported format. Plesae use extentions .rfs, .yaml or .json"
+					self.display_warning(msg)
+					return 1
+				if arrfile[1].lower() not in [".rfs", ".yml", ".yaml", ".json"]:
+					msg = "Configuration file ", ScenarioFile, " has an invalid extention, unable to determine supported format. Plesae use extentions .rfs, .yaml or .json"
+					self.display_warning(msg)
+					return 1
+				if arrfile[1].lower() == ".rfs":
+					filedata.read(ScenarioFile, encoding="utf8")
+				else:
+					filedict = {}
+					if arrfile[1].lower() in [".yml", ".yaml"]:
+						# read yaml file
+						base.debugmsg(5, "read yaml file")
+						with open(ScenarioFile, 'r', encoding="utf-8") as f:
+							filedict = yaml.safe_load(f)
+						base.debugmsg(5, "filedict: ", filedict)
+						filedict = base.configparser_safe_dict(filedict)
+						base.debugmsg(5, "filedict: ", filedict)
+					if arrfile[1].lower() == ".json":
+						# read json file
+						base.debugmsg(5, "read json file")
+						with open(ScenarioFile, 'r', encoding="utf-8") as f:
+							filedict = json.load(f)
+						base.debugmsg(5, "filedict: ", filedict)
+						filedict = base.configparser_safe_dict(filedict)
+						base.debugmsg(5, "filedict: ", filedict)
+					base.debugmsg(5, "filedict: ", filedict)
+					filedata.read_dict(filedict)
 				if base.config['Plan']['ScenarioFile'] != ScenarioFile:
 					base.debugmsg(6, "ScenarioFile:", ScenarioFile)
 					base.config['Plan']['ScenarioFile'] = base.inisafevalue(ScenarioFile)
@@ -3322,12 +3367,7 @@ class RFSwarmCore:
 			if len(ScenarioFile) > 1:
 				# error file not exist
 				msg = "Scenario file Not found:\n" + ScenarioFile
-				if not base.args.nogui:
-					tkm.showwarning("RFSwarm - Warning", msg)
-					base.debugmsg(0, msg)
-				else:
-					base.debugmsg(0, msg)
-					self.on_closing(msg)
+				self.display_warning(msg)
 			return 1
 
 		base.debugmsg(6, "filedata: ", filedata)
@@ -3688,6 +3728,13 @@ class RFSwarmCore:
 
 		if not base.args.nogui:
 			base.gui.OpenINIGraphs()
+			time.sleep(0.250)
+
+			base.debugmsg(5, "Call base.gui.pln_update_graph")
+			base.gui.pln_graph_update = False
+			t = threading.Thread(target=base.gui.pln_update_graph)
+			t.start()
+
 
 	def ClickPlay(self, _event=None):
 
@@ -7637,7 +7684,7 @@ class RFSwarmGUI(tk.Frame):
 		core.ClickPlay()
 
 	def pln_update_graph(self):
-		base.debugmsg(6, "pln_update_graph", self.pln_graph_update)
+		base.debugmsg(5, "pln_update_graph:", self.pln_graph_update, " base.keeprunning:", base.keeprunning)
 
 		if not self.pln_graph_update and base.keeprunning:
 			self.pln_graph_update = True
@@ -9141,7 +9188,7 @@ class RFSwarmGUI(tk.Frame):
 		regex = r"^\*{3}([^\*]*)\*{3}"
 		with open(base.mscriptlist[r]["Script"], 'r', encoding="utf8") as f:
 			for line in f:
-				base.debugmsg(5, "tcsection:", tcsection, "	line:", line)
+				base.debugmsg(9, "tcsection:", tcsection, "	line:", line)
 				if tcsection and line[0:3] == "***":
 					tcsection = False
 				m = re.search(regex, line, re.IGNORECASE)
@@ -9155,7 +9202,7 @@ class RFSwarmGUI(tk.Frame):
 		base.debugmsg(8, tclist)
 		if not base.args.nogui:
 			tol = self.mscriptgrid.grid_slaves(column=self.mtrngcoltst, row=r)[0]
-			base.debugmsg(5, "tol: ", tol)
+			base.debugmsg(8, "tol: ", tol)
 			tol.set_menu(*tclist)
 
 	def msr_remove_row(self, r):
@@ -10585,8 +10632,20 @@ class RFSwarmGUI(tk.Frame):
 
 			filedata['Scenario']['GraphList'] = base.inisafevalue(",".join(sgraphs))
 
+			arrfile = os.path.splitext(base.config['Plan']['ScenarioFile'])
+			base.debugmsg(5, "arrfile: ", arrfile)
+
+			if arrfile[1].lower() not in [".rfs", ".yml", ".yaml", ".json"]:
+				msg = "Unsupported file type: " + arrfile[1].lower()
+				core.display_warning(msg)
+				return 1
 			with open(base.config['Plan']['ScenarioFile'], 'w', encoding="utf8") as sf:    # save
-				filedata.write(sf)
+				if arrfile[1].lower() == ".rfs":
+					filedata.write(sf)
+				if arrfile[1].lower() in [".yml", ".yaml"]:
+					yaml.dump(filedata._sections, sf, default_flow_style=False, sort_keys=False, allow_unicode=True, encoding='utf-8')
+				if arrfile[1].lower() == ".json":
+					json.dump(filedata._sections, sf, indent="\t")
 
 			self.updateTitle()
 
@@ -10597,16 +10656,16 @@ class RFSwarmGUI(tk.Frame):
 			tkf.asksaveasfilename(
 				initialdir=base.config['Plan']['ScenarioDir'],
 				title="Save RFSwarm Scenario File",
-				filetypes=(("RFSwarm", "*.rfs"), ("all files", "*.*"))
-				# filetypes=(("RFSwarm", "*.rfs"), ("Yaml", "*.yml"), ("Yaml", "*.yaml"), ("JSON", "*.json"), ("all files", "*.*"))
+				# filetypes=(("RFSwarm", "*.rfs"), ("all files", "*.*"))
+				filetypes=(("RFSwarm", "*.rfs"), ("Yaml", "*.yml"), ("Yaml", "*.yaml"), ("JSON", "*.json"), ("all files", "*.*"))
 			)
 		)
-		base.debugmsg(9, "mnu_file_SaveAs: ScenarioFile:", ScenarioFile)
+		base.debugmsg(5, "ScenarioFile:", ScenarioFile)
 		if ScenarioFile is not None and len(ScenarioFile) > 0:
 			# ScenarioFile
 			filetupl = os.path.splitext(ScenarioFile)
 			base.debugmsg(9, "mnu_file_SaveAs: filetupl:", filetupl)
-			if filetupl[1] != ".rfs":
+			if filetupl[1].lower() not in [".rfs", ".yml", ".yaml", ".json"]:
 				ScenarioFile += ".rfs"
 				base.debugmsg(9, "mnu_file_SaveAs: ScenarioFile:", ScenarioFile)
 			base.config['Plan']['ScenarioFile'] = base.inisafevalue(ScenarioFile)
