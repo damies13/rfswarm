@@ -19,7 +19,7 @@ swarmmanager = http://localhost:8138/
 All of the agent settings are under the Agent section heading
 
 #### Swarm Manager
-The swarm manager setting defines the Manager that controls the test and that this agent receives instructions from. The default value is localhost on port 8138. As you will normally run the agent on a different machine to the Manager, this is the first ini file setting you will probably change. For example, you can specify the url of a manager that is on a different network on a different port.
+The swarm manager setting defines the Manager that controls the test and that this agent receives instructions from. The default value is localhost on port 8138. As you will normally run the agent on a different machine to the Manager, this is the first ini file setting you will probably change. For example, you can specify the URL of a manager that is on a different network on a different port.
 ```ini
 swarmmanager = http://localhost:8138/
 ```

@@ -2,7 +2,7 @@
 [Return to Index](README.md)
 
 ## Configuration File
-The INI file is the default configuration file format for the Manager and is created when the Manager is launched for the first time or when the Manager cannot find it in the default directory.
+The configuration File is the default configuration file format for the Manager and is created when the Manager is launched for the first time or when the Manager cannot find it in the default directory.
 
 **Example default RFSwarmManager.ini file:**
 ```ini
@@ -44,9 +44,9 @@ The window height setting defines the height of the main Manager window. This se
 win_height = 350
 ```
 
-#### Graph List
+#### Configuration File Graph List
 The graph list setting is used to save graph IDs that have been created by the user in the Manager via: "Graph" > "New Graph Window". These graphs are saved in the configuration file when a new graph is created, and their order is reproduced here.
-This setting is used by the Manager to give the user the ability to reopen these graphs via "Graph" > "Recent" without having to save them in the script file.
+This setting is used by the Manager to give the user the ability to reopen these graphs via: "Graph" > "Recent" without having to save them in the scenario file.
 ```ini
 graph_list = 681933ac-1,68193880-2
 ```
@@ -72,8 +72,8 @@ This setting defines the default path for scenario files which will be shown whe
 scenariodir = C:\rfswarm\venv\Lib\site-packages\rfswarm_manager
 ```
 
-#### Scenario File
-This scenario file setting specifies the path to the scenario file which will be opened in the Manager at the opening.
+#### Manager Scenario File
+The scenario file setting specifies the path to the scenario file which will be opened in the Manager at the opening of the application.
 ```ini
 scenariofile = C:\rfswarm\venv\Lib\site-packages\rfswarm_manager\this-is-my-scenario.rfs
 ```
@@ -108,7 +108,7 @@ display_sequence = False
 #### Display Percentile
 The display percentile sets which percentile will be included in the run. Specifies the percentage of requests which were completed in a time equal to or less than the achieved value.
 ```ini
-display_percentile = 50
+display_percentile = 95
 ```
 
 ### [Server]
@@ -116,21 +116,21 @@ All of the settings that are related to the network connectivity of the Manager 
 
 #### Bind IP Address
 The bind ip address specify the IP address that Manager will listen and send requests. This setting is really useful if the machine has multiple network interfaces.
-For more information follow: [rfswarm Manager](rfswarm_manager.md#bind-ip-address)
+For more information follow: [rfswarm Manager: bind ip address](rfswarm_manager.md#bind-ip-address)
 ```ini
 bindip = 192.168.0.99
 ```
 
 #### Bind Port
 The bind port setting is used for changing Manger port.
-For more information follow: [rfswarm Manager](rfswarm_manager.md#bind-port-number)
+For more information follow: [rfswarm Manager: bind port number](rfswarm_manager.md#bind-port-number)
 ```ini
 bindport = 8138
 ```
 
 ### [Monitoring]
 
-#### Script Directory
+#### Monitoring Script Directory
 This setting defines the default path that the created tests/tasks groups in Manager "Monitoring" menu will refer to and create relative paths to them. This setting is necessary so that the Manager can find these files and be consistent in determining them.
 ```ini
 scriptdir = C:\rfswarm\venv\Lib\site-packages\rfswarm_manager
@@ -152,7 +152,7 @@ graphlist =
 
 [Script Defaults]
 resultnamemode = doco
-excludelibraries = BuiltI,String,OperatingSystem,perftest
+excludelibraries = BuiltIn,String,OperatingSystem,perftest
 testrepeater = True
 injectsleepenabled = True
 disableloglog = True
@@ -188,42 +188,42 @@ script = ..\..\..\..\rfswarm\Tests\Monitor_Basic.robot
 In this section heading you will find the settings for the general structure and flow of the test that you want to perform.
 
 #### Upload Mode
-This setting determines the way in which files will be transferred to the manager. The options are: def (All Deferred), err (On Error Only), imm (Immediately).
-For more information follow: [rfswarm Manager](rfswarm_manager.md#settings-for-the-scenario-and-rfswarm-image)
+This setting determines the way in which files will be transferred from the Agent to the Manager. The options are: def (All Deferred), err (On Error Only), imm (Immediately).
+For more information follow: [rfswarm Manager: settings for the scenario](rfswarm_manager.md#settings-for-the-scenario-and-rfswarm-image)
 ```ini
 uploadmode = err
 ```
 
 #### Script Count
-This setting describes the number of created script indexes in the Manager "Plan" screen. This number must match the actual number of tests/tasks groups that were configured and should be edited with care.
+This setting describes the number of created script indices in the Manager "Plan" screen. This number must match the actual number of tests/tasks groups that were configured and should be edited with care.
 ```ini
 scriptcount = 2
 ```
 
 #### Monitor Time Before
 This setting is not visible by default in the Manager's configuration file and must be configured via the Manager's "Monitor" menu screen once configured, this option will appear.
-Here, the monitoring time before the test is set in seconds. For more information follow: [rfswarm Manager](rfswarm_manager.md)
+This setting determines the monitoring time before the tests start and is given in seconds. For more information follow: [rfswarm Manager: monitoring](rfswarm_manager.md#monitoring)
 ```ini
 monitortimebefore = 60
 ```
 
 #### Monitor Time After
-This setting is not visible by default in the Manager's configuration file and must be configured via the Manager's "Monitor" menu screen once configured, this option will appear.
-Here, the monitoring time after the test is set in seconds. For more information follow: [rfswarm Manager](rfswarm_manager.md)
+This setting is not visible by default in the Manager's configuration file and must be configured via the Manager's "Monitor" menu screen. Once configured, this option will appear.
+This setting determines the post-test monitoring time and is given in seconds. For more information follow: [rfswarm Manager: monitoring](rfswarm_manager.md#monitoring)
 ```ini
 monitortimeafter = 120
 ```
 
 #### Monitor Count
-This setting is not visible by default in the Manager's configuration file and must be configured via the Manager's "Monitor" menu screen once configured, this option will appear.
-This setting describes the number of created monitoring script indexes in the Manager "Monitor" screen. This number must match the actual number of monitoring tests/tasks groups that were configured and should be edited with care.
+This setting is not visible by default in the Manager's configuration file and must be configured via the Manager's "Monitor" menu screen. Once configured, this option will appear.
+This setting describes the number of created monitoring script indices in the Manager "Monitor" screen. This number must match the actual number of monitoring tests/tasks groups that were configured and should be edited with care.
 ```ini
 monitorcount = 3
 ```
 
-#### Graph List
-This setting is not visible by default in the Manager's scenario file and will appear after saving the scenario file when at least one graph was open before the Manager was closed. 
-These graphs settings are saved in the scenario file, and their order is reproduced here. This setting is used by the Manager to give the user the ability to reopen these graphs via "Graph" > "Scenario"
+#### Scenario Graph List
+This setting is not visible by default in the Manager's scenario file and will appear after saving the scenario file when at least one graph was open before the Manager was closed.
+These graphs settings are saved in the scenario file, and their order is reproduced here. This setting is used by the Manager to give the user the ability to reopen these graphs via: "Graph" > "Scenario".
 ```ini
 graphlist = 68193c4e-1
 ```
@@ -231,7 +231,7 @@ graphlist = 68193c4e-1
 ### [Script Defaults]
 In this section heading you will find the global scenario settings that are applied to all settings.
 This section header is **not visible in the scenario file by default**, as it contains the global settings for the Manager and will appear if the default global settings are changed in any way.
-For more information about settings under this section heading follow: [rfswarm Manager](rfswarm_manager.md#scenario-settings)
+For more information about settings under this section heading follow: [rfswarm Manager: scenario settings](rfswarm_manager.md#scenario-settings)
 
 #### Result Name Mode
 This setting defines response times named in the test results.
@@ -244,7 +244,7 @@ resultnamemode = doco
 #### Exclude Libraries
 This setting determines which libraries are excludes from reporting in the test results.
 ```ini
-excludelibraries = BuiltI,String,OperatingSystem,perftest
+excludelibraries = BuiltIn,String,OperatingSystem,perftest,DateTime
 ```
 
 #### Test Repeater
@@ -276,9 +276,9 @@ robotoptions = -v "var1:123"
 ```
 
 ### [plan_index]
-The header of the plan index section represents the created test group in the "Plan" menu of the Manager and has its index value, for example: [1] or [2] and so on. 
-There can theoretically be an unlimited number of these sections. They should be numbered from 1 to the number of indexes defined in the [Scenario] section. This heading contains settings about the test group in question.
-For more information follow: [rfswarm Manager](rfswarm_manager.md#plan)
+The header of the plan index section represents the created test group in the "Plan" menu of the Manager and has its index value, for example: [1] or [2] and so on.
+There can theoretically be an unlimited number of these sections. They should be numbered from 1 to the number of indices defined in the [Scenario] section. This heading contains settings about the test group in question.
+For more information follow: [rfswarm Manager: plan](rfswarm_manager.md#plan)
 
 #### Robots
 The robots setting is the number of robots (virtual users) you are planning to run in the scenario for this ([plan_index]) test group that this setting is under.
@@ -320,17 +320,17 @@ script = ..\..\..\..\performance_tests.robot
 The header of the monitoring index section represents the created test group in the "Monitoring" menu of the Manager and has its index value, for example: [m1] or [m2] and so on.
 There can theoretically be an unlimited number of these sections.
 This section has the same settings as [plan_index] section, but the difference is it that it has the different purpose.
-For more information follow: [rfswarm Manager](rfswarm_manager.md#monitoring)
+For more information follow: [rfswarm Manager: monitoring](rfswarm_manager.md#monitoring)
 
 ## Common Sections
 These sections are used in all the previously mentioned configuration files.
 
 ### [graph_id]
-The header of the graph id contains settings that are related to the graph window and it's configuration. The name of the section is actually the ID of the graph, for example: [68193c4e-1] or [68193c4e-2] and so on.
+The header of the graph ID contains settings that are related to the graph window and it's configuration. The name of the section is actually the ID of the graph, for example: [68193c4e-1] or [68193c4e-2] and so on.
 There can theoretically be an unlimited number of these sections.
-For more information follow: [rfswarm Manager](rfswarm_manager.md#graphs)
+For more information follow: [rfswarm Manager: monitoring](rfswarm_manager.md#graphs)
 
-#### Id
+#### ID
 The graph ID is made from the epoch time converted to hexadecimal notation and an additional appended number indicating the graph number symbolising the order.
 ```ini
 id = 6819dcc8-1
@@ -342,7 +342,7 @@ The open setting determines whether the graph should be opened on the start of t
 open = True
 ```
 
-#### Id
+#### Window Width & Height
 These settings have the same purpose as in the GUI section of the configuration file.
 ```ini
 win_width = 761
