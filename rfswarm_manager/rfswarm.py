@@ -805,7 +805,7 @@ class RFSwarmBase:
 						core.on_closing()
 
 			base.datapath = os.path.join(self.resultsdir, base.run_name)
-			base.debugmsg(1, "datapath:", base.datapath)
+			base.debugmsg(3, "datapath:", base.datapath)
 			if not os.path.exists(base.datapath):
 				try:
 					os.mkdir(base.datapath)
@@ -2558,7 +2558,7 @@ class RFSwarmCore:
 						configdict = base.configparser_safe_dict(configdict)
 						base.debugmsg(5, "configdict: ", configdict)
 				base.debugmsg(5, "configdict: ", configdict)
-				self.config.read_dict(configdict)
+				base.config.read_dict(configdict)
 		else:
 			base.saveini()
 
@@ -9079,7 +9079,7 @@ class RFSwarmGUI(tk.Frame):
 				base.debugmsg(5, "do update relpath:", relpath)
 				base.debugmsg(5, "ScriptDir:", base.config['Monitoring']['ScriptDir'])
 				if base.config['Monitoring']['ScriptDir'] == base.dir_path:
-					base.config['Monitoring']['ScriptDir'] = os.path.basename(scriptfile)
+					base.config['Monitoring']['ScriptDir'] = os.path.dirname(scriptfile)
 					base.debugmsg(5, "ScriptDir:", base.config['Monitoring']['ScriptDir'])
 					relpath = base.get_relative_path(base.config['Monitoring']['ScriptDir'], scriptfile)
 					base.debugmsg(5, "relpath:", relpath)

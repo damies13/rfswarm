@@ -375,3 +375,121 @@ Install Application Icon or Desktop Shortcut
 	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 	Check Icon Install
+
+Run Mnager with JSON Configuration and JSON Scenario
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #172
+
+	# By telling the agent to connect on the port we specified in the JSON configuration file (RFSwarmManager.json)
+	# we can infer that the manager read the configuration correctly if the agent connects sucessfully
+	VAR 	${managerurl} 		http://localhost:8152
+	@{agnt_options}= 	Create List 	-g 	1 	-m 	${managerurl}
+	Run Agent 	${agnt_options}
+
+	${configfile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}RFSwarmManager.json
+	Log 	configfile: ${configfile} 		console=true
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}NewStyle_small_long.json
+	Log 	scenariofile: ${scenariofile} 		console=true
+	@{mngr_options}= 	Create List 	-g 	1 	-i 	${configfile} 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
+	Run Manager CLI 	${mngr_options}
+	Wait For Manager
+
+	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+
+	Stop Agent
+
+	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+
+	# Check the manager thinks it's listening on the port from the configuration file
+	Should Contain 		${stdout_manager} 		Starting Agent Manager ${managerurl}
+
+	# Check the agent connected to the manager on the port from the configuration file
+	Should Contain 		${stdout_agent} 		Manager Connected ${managerurl}
+	# Check the agent got the script files specifed in the scenaio, infers the manager read the scenario file
+	Should Contain 		${stdout_agent} 		AppTests-json.robot
+	Should Contain 		${stdout_agent} 		monitoring-json.robot
+	Should Contain 		${stdout_agent} 		Manager Disconnected ${managerurl}
+
+	[Teardown]	Run Keywords
+	...    Stop Agent	AND
+	...    Stop Manager
+
+
+Run Mnager with Yaml Configuration and Yaml Scenario
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #172
+
+	# By telling the agent to connect on the port we specified in the Yaml configuration file (RFSwarmManager.yaml)
+	# we can infer that the manager read the configuration correctly if the agent connects sucessfully
+	VAR 	${managerurl} 		http://localhost:8141
+	@{agnt_options}= 	Create List 	-g 	1 	-m 	${managerurl}
+	Run Agent 	${agnt_options}
+
+	${configfile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}RFSwarmManager.yaml
+	Log 	configfile: ${configfile} 		console=true
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}NewStyle_small_long.yaml
+	Log 	scenariofile: ${scenariofile} 		console=true
+	@{mngr_options}= 	Create List 	-g 	1 	-i 	${configfile} 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
+	Run Manager CLI 	${mngr_options}
+	Wait For Manager
+
+	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+
+	Stop Agent
+
+	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+
+	# Check the manager thinks it's listening on the port from the configuration file
+	Should Contain 		${stdout_manager} 		Starting Agent Manager ${managerurl}
+
+	# Check the agent connected to the manager on the port from the configuration file
+	Should Contain 		${stdout_agent} 		Manager Connected ${managerurl}
+	# Check the agent got the script files specifed in the scenaio, infers the manager read the scenario file
+	Should Contain 		${stdout_agent} 		AppTests-yaml.robot
+	Should Contain 		${stdout_agent} 		monitoring-yaml.robot
+	Should Contain 		${stdout_agent} 		Manager Disconnected ${managerurl}
+
+	[Teardown]	Run Keywords
+	...    Stop Agent	AND
+	...    Stop Manager
+
+Run Mnager with yml Configuration and yml Scenario
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #172
+
+	# By telling the agent to connect on the port we specified in the yml configuration file (RFSwarmManager.yml)
+	# we can infer that the manager read the configuration correctly if the agent connects sucessfully
+	VAR 	${managerurl} 		http://localhost:8171
+	@{agnt_options}= 	Create List 	-g 	1 	-m 	${managerurl}
+	Run Agent 	${agnt_options}
+
+	${configfile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}RFSwarmManager.yml
+	Log 	configfile: ${configfile} 		console=true
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}NewStyle_small_long.yml
+	Log 	scenariofile: ${scenariofile} 		console=true
+	@{mngr_options}= 	Create List 	-g 	1 	-i 	${configfile} 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
+	Run Manager CLI 	${mngr_options}
+	Wait For Manager
+
+	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+
+	Stop Agent
+
+	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+
+	# Check the manager thinks it's listening on the port from the configuration file
+	Should Contain 		${stdout_manager} 		Starting Agent Manager ${managerurl}
+
+	# Check the agent connected to the manager on the port from the configuration file
+	Should Contain 		${stdout_agent} 		Manager Connected ${managerurl}
+	# Check the agent got the script files specifed in the scenaio, infers the manager read the scenario file
+	Should Contain 		${stdout_agent} 		AppTests-yml.robot
+	Should Contain 		${stdout_agent} 		monitoring-yml.robot
+	Should Contain 		${stdout_agent} 		Manager Disconnected ${managerurl}
+
+	[Teardown]	Run Keywords
+	...    Stop Agent	AND
+	...    Stop Manager
