@@ -371,6 +371,8 @@ class ReporterBase:
 			self.debugmsg(7, "value type: ", type(dictout[k]))
 			if isinstance(dictout[k], dict):
 				dictout[k] = self.configparser_safe_dict(dictout[k])
+			if isinstance(dictout[k], str):
+				dictout[k] = base.whitespace_set_ini_value(dictout[k])
 			if dictout[k] is None:
 				dictout[k] = ""
 		self.debugmsg(7, "dictout: ", dictout)
@@ -867,6 +869,15 @@ class ReporterBase:
 		saved = False
 		if filename is None or len(filename) < 1:
 			filename = base.config['Reporter']['Template']
+
+		arrfile = os.path.splitext(filename)
+		base.debugmsg(5, "arrfile: ", arrfile)
+
+		if arrfile[1].lower() not in [".template", ".yml", ".yaml", ".json"]:
+			msg = "Unsupported file type: " + arrfile[1].lower()
+			core.display_message(msg)
+			return 1
+
 		templatedata = configparser.ConfigParser()
 		templatedata.read_dict(base.report._sections)
 		if "Report" in templatedata:
@@ -876,12 +887,22 @@ class ReporterBase:
 			if "endtime" in templatedata["Report"]:
 				# templatedata["Report"]["endtime"]
 				templatedata.remove_option('Report', 'endtime')
+
 		with open(filename, 'w', encoding="utf8") as templatefile:    # save
-			# base.report.write(templatefile)
-			templatedata.write(templatefile)
-			self.debugmsg(6, "Template Saved:", filename)
-			saved = True
+			if arrfile[1].lower() == ".template":
+				templatedata.write(templatefile)
+				saved = True
+			if arrfile[1].lower() in [".yml", ".yaml"]:
+				yaml.dump(templatedata._sections, templatefile, default_flow_style=False, sort_keys=False, allow_unicode=True, encoding='utf-8')
+				saved = True
+			if arrfile[1].lower() == ".json":
+				json.dump(templatedata._sections, templatefile, indent="\t")
+				saved = True
+
 		if saved:
+			self.debugmsg(6, "Template Saved:", filename)
+			core.display_message("Template Saved:", filename)
+
 			base.config['Reporter']['Template'] = base.whitespace_set_ini_value(filename)
 			path = os.path.split(base.config['Reporter']['Template'])[0]
 			base.config['Reporter']['TemplateDir'] = base.whitespace_set_ini_value(path)
@@ -890,6 +911,19 @@ class ReporterBase:
 	def template_open(self, filename):
 		if len(filename) > 0 and os.path.isfile(filename):
 			base.debugmsg(7, "filename: ", filename)
+			arrfile = os.path.splitext(filename)
+			base.debugmsg(5, "arrfile: ", arrfile)
+
+			if len(arrfile) < 2:
+				msg = "Template file ", filename, " missing extention, unable to determine supported format. Plesae use extentions .template, .yaml or .json"
+				core.display_message(msg)
+				base.template_create()
+				return 1
+			if arrfile[1].lower() not in [".template", ".yml", ".yaml", ".json"]:
+				msg = "Template file ", filename, " has an invalid extention, unable to determine supported format. Plesae use extentions .template, .yaml or .json"
+				core.display_message(msg)
+				base.template_create()
+				return 1
 
 			base.config['Reporter']['Template'] = base.whitespace_set_ini_value(filename)
 			path = os.path.split(base.config['Reporter']['Template'])[0]
@@ -899,7 +933,29 @@ class ReporterBase:
 			base.report = None
 			self.reportdata = {}
 			base.report = configparser.ConfigParser()
-			base.report.read(filename, encoding="utf8")
+
+			if arrfile[1].lower() == ".rfs":
+				base.report.read(filename, encoding="utf8")
+			else:
+				filedict = {}
+				if arrfile[1].lower() in [".yml", ".yaml"]:
+					# read yaml file
+					base.debugmsg(5, "read yaml file")
+					with open(filename, 'r', encoding="utf-8") as f:
+						filedict = yaml.safe_load(f)
+					base.debugmsg(5, "filedict: ", filedict)
+					filedict = base.configparser_safe_dict(filedict)
+					base.debugmsg(5, "filedict: ", filedict)
+				if arrfile[1].lower() == ".json":
+					# read json file
+					base.debugmsg(5, "read json file")
+					with open(filename, 'r', encoding="utf-8") as f:
+						filedict = json.load(f)
+					base.debugmsg(5, "filedict: ", filedict)
+					filedict = base.configparser_safe_dict(filedict)
+					base.debugmsg(5, "filedict: ", filedict)
+				base.debugmsg(5, "filedict: ", filedict)
+				base.report.read_dict(filedict)
 
 			base.debugmsg(7, "base.report: ", base.report)
 			if "Colours" in base.report:
@@ -4406,6 +4462,7 @@ class ReporterCore:
 			while base.gui is None and base.running:
 				time.sleep(0.5)
 			base.gui.updateStatus(msgout)
+			base.debugmsg(1, msgout)
 		else:
 			msglst = []
 			for msg in mesage:
@@ -12066,7 +12123,7 @@ class ReporterGUI(tk.Frame):
 			tkf.askopenfilename(
 				initialdir=base.config['Reporter']['TemplateDir'],
 				title="Select RFSwarm Reporter Template",
-				filetypes=(("RFSwarm Reporter Template", "*.template"), ("all files", "*.*"))
+				filetypes=(("RFSwarm Reporter Template", "*.template"), ("Yaml", "*.yml"), ("Yaml", "*.yaml"), ("JSON", "*.json"), ("all files", "*.*"))
 			)
 		)
 		base.debugmsg(5, "TemplateFile:", TemplateFile)
@@ -12116,7 +12173,7 @@ class ReporterGUI(tk.Frame):
 			tkf.asksaveasfilename(
 				initialdir=base.config['Reporter']['TemplateDir'],
 				title="Save RFSwarm Reporter Template",
-				filetypes=(("Template", "*.template"), ("all files", "*.*")),
+				filetypes=(("RFSwarm Reporter Template", "*.template"), ("Yaml", "*.yml"), ("Yaml", "*.yaml"), ("JSON", "*.json"), ("all files", "*.*")),
 				defaultextension=".template"
 			)
 		)

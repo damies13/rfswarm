@@ -2449,6 +2449,8 @@ class RFSwarmBase:
 			self.debugmsg(8, "value type: ", type(dictout[k]))
 			if isinstance(dictout[k], dict):
 				dictout[k] = base.configparser_safe_dict(dictout[k])
+			if isinstance(dictout[k], str):
+				dictout[k] = base.inisafevalue(dictout[k])
 			if dictout[k] is None:
 				dictout[k] = ""
 		self.debugmsg(7, "dictout: ", dictout)
@@ -3332,7 +3334,7 @@ class RFSwarmCore:
 					self.display_warning(msg)
 					return 1
 				if arrfile[1].lower() not in [".rfs", ".yml", ".yaml", ".json"]:
-					msg = "Configuration file ", ScenarioFile, " has an invalid extention, unable to determine supported format. Plesae use extentions .rfs, .yaml or .json"
+					msg = "Scenario file ", ScenarioFile, " has an invalid extention, unable to determine supported format. Plesae use extentions .rfs, .yaml or .json"
 					self.display_warning(msg)
 					return 1
 				if arrfile[1].lower() == ".rfs":
@@ -3939,6 +3941,87 @@ class RFSwarmCore:
 		if not base.args.nogui:
 			base.gui.msr_delayaft_validate(*args)
 		return True
+
+	def msr_file_validate(self, r, *args):
+		base.debugmsg(5, "r:", r, "	args:", args)
+		if args:
+			scriptfile = args[0]
+		else:
+			scriptfile = ""
+
+		if not os.path.exists(scriptfile):
+			msg = "The referenced file:\n" + scriptfile + "\n\ncannot be found by RFSwarm Manager."
+			if not base.args.nogui:
+				tkm.showwarning("RFSwarm - Warning", msg)
+			else:
+				base.debugmsg(0, msg)
+			return False
+		elif not os.path.isfile(scriptfile):
+			msg = "The referenced file:\n" + scriptfile + "\n\nis a directory, not a file."
+			if not base.args.nogui:
+				tkm.showwarning("RFSwarm - Warning", msg)
+			else:
+				base.debugmsg(0, msg)
+			return False
+
+		base.debugmsg(5, "scriptfile:", scriptfile)
+		if len(scriptfile) > 0:
+			base.mscriptlist[r]["Script"] = scriptfile
+			relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], scriptfile)
+			script_hash = base.hash_file(scriptfile, relpath)
+			base.mscriptlist[r]["ScriptHash"] = script_hash
+
+			if script_hash not in base.scriptfiles:
+				base.scriptfiles[script_hash] = {
+					"id": script_hash,
+					"localpath": scriptfile,
+					"relpath": relpath,
+					"type": "script"
+				}
+
+				t = threading.Thread(target=base.find_dependancies, args=(script_hash, ))
+				t.start()
+
+		else:
+			if "ScriptHash" in base.mscriptlist[r]:
+				oldhash = base.mscriptlist[r]["ScriptHash"]
+				t = threading.Thread(target=base.remove_hash, args=(oldhash, ))
+				t.start()
+
+			base.mscriptlist[r]["Script"] = ''
+			base.mscriptlist[r]["ScriptHash"] = ''
+
+		self.plan_scnro_chngd = True
+		if not base.args.nogui:
+			base.gui.msr_file_validate(r, *args)
+		return True
+
+	def msr_test_validate(self, *args):
+		base.debugmsg(5, "args:", args)
+		# r = int(args[0][-1:])+1
+		r = int(args[0][4:])
+		base.debugmsg(5, "r:", r)
+
+		v = None
+		if len(args) > 1 and len(args[1]) > 1:
+			v = args[1]
+			base.debugmsg(5, "v:", v)
+			base.mscriptlist[r]["Test"] = v
+
+		base.debugmsg(5, "mscriptlist[r]:", base.mscriptlist[r])
+
+		if not base.args.nogui:
+			base.gui.msr_test_validate(*args)
+		return True
+
+	def update_monitoring_jobs_mon_end(self, *args):
+		base.debugmsg(5, "args:", args)
+		for agnt in base.robot_schedule["Agents"].keys():
+			for grurid in base.robot_schedule["Agents"][agnt].keys():
+				base.debugmsg(5, "grurid:", grurid)
+				if grurid[0] == "m":
+					base.debugmsg(5, "grurid:", grurid, "New EndTime", base.mon_end)
+					base.robot_schedule["Agents"][agnt][grurid]["EndTime"] = base.mon_end
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -4602,93 +4685,6 @@ class RFSwarmCore:
 	def delayed_UpdateAgents(self):
 		time.sleep(10)
 		self.UpdateAgents()
-
-	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-	#
-	# Monitoring
-	#
-	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-	def msr_file_validate(self, r, *args):
-		base.debugmsg(5, "r:", r, "	args:", args)
-		if args:
-			scriptfile = args[0]
-		else:
-			scriptfile = ""
-
-		if not os.path.exists(scriptfile):
-			msg = "The referenced file:\n" + scriptfile + "\n\ncannot be found by RFSwarm Manager."
-			if not base.args.nogui:
-				tkm.showwarning("RFSwarm - Warning", msg)
-			else:
-				base.debugmsg(0, msg)
-			return False
-		elif not os.path.isfile(scriptfile):
-			msg = "The referenced file:\n" + scriptfile + "\n\nis a directory, not a file."
-			if not base.args.nogui:
-				tkm.showwarning("RFSwarm - Warning", msg)
-			else:
-				base.debugmsg(0, msg)
-			return False
-
-		base.debugmsg(5, "scriptfile:", scriptfile)
-		if len(scriptfile) > 0:
-			base.mscriptlist[r]["Script"] = scriptfile
-			relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], scriptfile)
-			script_hash = base.hash_file(scriptfile, relpath)
-			base.mscriptlist[r]["ScriptHash"] = script_hash
-
-			if script_hash not in base.scriptfiles:
-				base.scriptfiles[script_hash] = {
-					"id": script_hash,
-					"localpath": scriptfile,
-					"relpath": relpath,
-					"type": "script"
-				}
-
-				t = threading.Thread(target=base.find_dependancies, args=(script_hash, ))
-				t.start()
-
-		else:
-			if "ScriptHash" in base.mscriptlist[r]:
-				oldhash = base.mscriptlist[r]["ScriptHash"]
-				t = threading.Thread(target=base.remove_hash, args=(oldhash, ))
-				t.start()
-
-			base.mscriptlist[r]["Script"] = ''
-			base.mscriptlist[r]["ScriptHash"] = ''
-
-		self.plan_scnro_chngd = True
-		if not base.args.nogui:
-			base.gui.msr_file_validate(r, *args)
-		return True
-
-	def msr_test_validate(self, *args):
-		base.debugmsg(5, "args:", args)
-		# r = int(args[0][-1:])+1
-		r = int(args[0][4:])
-		base.debugmsg(5, "r:", r)
-
-		v = None
-		if len(args) > 1 and len(args[1]) > 1:
-			v = args[1]
-			base.debugmsg(5, "v:", v)
-			base.mscriptlist[r]["Test"] = v
-
-		base.debugmsg(5, "mscriptlist[r]:", base.mscriptlist[r])
-
-		if not base.args.nogui:
-			base.gui.msr_test_validate(*args)
-		return True
-
-	def update_monitoring_jobs_mon_end(self, *args):
-		base.debugmsg(5, "args:", args)
-		for agnt in base.robot_schedule["Agents"].keys():
-			for grurid in base.robot_schedule["Agents"][agnt].keys():
-				base.debugmsg(5, "grurid:", grurid)
-				if grurid[0] == "m":
-					base.debugmsg(5, "grurid:", grurid, "New EndTime", base.mon_end)
-					base.robot_schedule["Agents"][agnt][grurid]["EndTime"] = base.mon_end
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
