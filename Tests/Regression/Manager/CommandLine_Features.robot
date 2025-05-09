@@ -387,7 +387,7 @@ Run Mnager with JSON Configuration and JSON Scenario
 
 	${configfile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}RFSwarmManager.json
 	Log 	configfile: ${configfile} 		console=true
-	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}NewStyle_small_long.json
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}NewStyle_small_json.json
 	Log 	scenariofile: ${scenariofile} 		console=true
 	@{mngr_options}= 	Create List 	-g 	1 	-i 	${configfile} 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
@@ -401,17 +401,20 @@ Run Mnager with JSON Configuration and JSON Scenario
 	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
 
-	# Check the manager thinks it's listening on the port from the configuration file
-	# for some reason the manager stdout is blank, but we can confirm what we need from the agent
-	# Should Contain 		${stdout_manager} 		Starting Agent Manager ${managerurl}
+	# can't get stdout in windows
+	IF 	"${platform}" != "windows"
+		# Check the manager thinks it's listening on the port from the configuration file
+		# for some reason the manager stdout is blank, but we can confirm what we need from the agent
+		# Should Contain 		${stdout_manager} 		Starting Agent Manager ${managerurl}
 
-	# Check the agent connected to the manager on the port from the configuration file
-	Should Contain 		${stdout_agent} 		Manager Connected ${managerurl}
-	# Check the agent got the script files specifed in the scenaio, infers the manager read the scenario file
-	Should Contain 		${stdout_agent} 		AppTests-json.robot
-	Should Contain 		${stdout_agent} 		monitoring-json.robot
-	# sometimes the agent doesn't get to disconnected state, could make this pass by making test slower but not needed
-	# Should Contain 		${stdout_agent} 		Manager Disconnected ${managerurl}
+		# Check the agent connected to the manager on the port from the configuration file
+		Should Contain 		${stdout_agent} 		Manager Connected ${managerurl}
+		# Check the agent got the script files specifed in the scenaio, infers the manager read the scenario file
+		Should Contain 		${stdout_agent} 		AppTests-json.robot
+		Should Contain 		${stdout_agent} 		monitoring-json.robot
+		# sometimes the agent doesn't get to disconnected state, could make this pass by making test slower but not needed
+		# Should Contain 		${stdout_agent} 		Manager Disconnected ${managerurl}
+	END
 
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
@@ -429,7 +432,7 @@ Run Mnager with Yaml Configuration and Yaml Scenario
 
 	${configfile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}RFSwarmManager.yaml
 	Log 	configfile: ${configfile} 		console=true
-	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}NewStyle_small_long.yaml
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}NewStyle_small_yaml.yaml
 	Log 	scenariofile: ${scenariofile} 		console=true
 	@{mngr_options}= 	Create List 	-g 	1 	-i 	${configfile} 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
@@ -443,17 +446,20 @@ Run Mnager with Yaml Configuration and Yaml Scenario
 	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
 
-	# Check the manager thinks it's listening on the port from the configuration file
-	# for some reason the manager stdout is blank, but we can confirm what we need from the agent
-	# Should Contain 		${stdout_manager} 		Starting Agent Manager ${managerurl}
+	# can't get stdout in windows
+	IF 	"${platform}" != "windows"
+		# Check the manager thinks it's listening on the port from the configuration file
+		# for some reason the manager stdout is blank, but we can confirm what we need from the agent
+		# Should Contain 		${stdout_manager} 		Starting Agent Manager ${managerurl}
 
-	# Check the agent connected to the manager on the port from the configuration file
-	Should Contain 		${stdout_agent} 		Manager Connected ${managerurl}
-	# Check the agent got the script files specifed in the scenaio, infers the manager read the scenario file
-	Should Contain 		${stdout_agent} 		AppTests-yaml.robot
-	Should Contain 		${stdout_agent} 		monitoring-yaml.robot
-	# sometimes the agent doesn't get to disconnected state, could make this pass by making test slower but not needed
-	# Should Contain 		${stdout_agent} 		Manager Disconnected ${managerurl}
+		# Check the agent connected to the manager on the port from the configuration file
+		Should Contain 		${stdout_agent} 		Manager Connected ${managerurl}
+		# Check the agent got the script files specifed in the scenaio, infers the manager read the scenario file
+		Should Contain 		${stdout_agent} 		AppTests-yaml.robot
+		Should Contain 		${stdout_agent} 		monitoring-yaml.robot
+		# sometimes the agent doesn't get to disconnected state, could make this pass by making test slower but not needed
+		# Should Contain 		${stdout_agent} 		Manager Disconnected ${managerurl}
+	END
 
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
@@ -470,7 +476,7 @@ Run Mnager with yml Configuration and yml Scenario
 
 	${configfile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}RFSwarmManager.yml
 	Log 	configfile: ${configfile} 		console=true
-	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}NewStyle_small_long.yml
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}NewStyle_small_yml.yml
 	Log 	scenariofile: ${scenariofile} 		console=true
 	@{mngr_options}= 	Create List 	-g 	1 	-i 	${configfile} 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
 	Run Manager CLI 	${mngr_options}
@@ -484,17 +490,20 @@ Run Mnager with yml Configuration and yml Scenario
 	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
 
-	# Check the manager thinks it's listening on the port from the configuration file
-	# for some reason the manager stdout is blank, but we can confirm what we need from the agent
-	# Should Contain 		${stdout_manager} 		Starting Agent Manager ${managerurl}
+	# can't get stdout in windows
+	IF 	"${platform}" != "windows"
+		# Check the manager thinks it's listening on the port from the configuration file
+		# for some reason the manager stdout is blank, but we can confirm what we need from the agent
+		# Should Contain 		${stdout_manager} 		Starting Agent Manager ${managerurl}
 
-	# Check the agent connected to the manager on the port from the configuration file
-	Should Contain 		${stdout_agent} 		Manager Connected ${managerurl}
-	# Check the agent got the script files specifed in the scenaio, infers the manager read the scenario file
-	Should Contain 		${stdout_agent} 		AppTests-yml.robot
-	Should Contain 		${stdout_agent} 		monitoring-yml.robot
-	# sometimes the agent doesn't get to disconnected state, could make this pass by making test slower but not needed
-	# Should Contain 		${stdout_agent} 		Manager Disconnected ${managerurl}
+		# Check the agent connected to the manager on the port from the configuration file
+		Should Contain 		${stdout_agent} 		Manager Connected ${managerurl}
+		# Check the agent got the script files specifed in the scenaio, infers the manager read the scenario file
+		Should Contain 		${stdout_agent} 		AppTests-yml.robot
+		Should Contain 		${stdout_agent} 		monitoring-yml.robot
+		# sometimes the agent doesn't get to disconnected state, could make this pass by making test slower but not needed
+		# Should Contain 		${stdout_agent} 		Manager Disconnected ${managerurl}
+	END
 
 	[Teardown]	Run Keywords
 	...    Stop Agent	AND
