@@ -934,7 +934,7 @@ class ReporterBase:
 			self.reportdata = {}
 			base.report = configparser.ConfigParser()
 
-			if arrfile[1].lower() == ".rfs":
+			if arrfile[1].lower() == ".template":
 				base.report.read(filename, encoding="utf8")
 			else:
 				filedict = {}
