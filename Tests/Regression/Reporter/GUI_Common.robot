@@ -445,10 +445,7 @@ Wait For Status
 	Log		${IMAGE_DIR}
 	Wiggle Mouse
 	# Take A Screenshot
-	# Wait For 	${img} 	 timeout=${timeout}
-	# Screen saver triggered during the 1800 default timeout causing a screenshot of the Screen saver
-	# 	which was fairly useless, hopefully this will work better
-	Wait Until Keyword Succeeds 	10x 	200ms 	Run Keywords 	Wiggle Mouse 	AND 	Wait For 	${img} 	 timeout=${timeout / 10}
+	Wait For 	${img} 	 timeout=${timeout}
 	Sleep 	${sssleep}
 	# Take A Screenshot
 
