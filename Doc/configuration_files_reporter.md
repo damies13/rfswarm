@@ -146,7 +146,7 @@ defcolours = x35000000,x35008450,x35B81D13,x35EFB700, ...
 namecolours = ...
 
 [FE35765B841]
-name = Errord
+name = Error
 parent = TOP
 type = errors
 changed = 1746909832.5245595
@@ -274,7 +274,7 @@ The settings in this section define how it behaves in relation to the data colle
 The settings are selected according to the type of section selected.
 More information on these sections and the settings for them can be found here: [rfswarm Reporter: section types](rfswarm_reporter.md#section-types)
 
-**General settings for all section types. Further on, there are defined settings for individual section types.**
+>_**General settings for all section types. Further on, there are defined settings for individual section types:**_
 
 #### Name
 The name setting defines the name of the setting that will be displayed in the report file and in the Reporter application.
@@ -302,7 +302,7 @@ The changed setting specifies the time at which any changes were made to this se
 changed = 1746899573.085544
 ```
 
-**Type: Note**
+>_**Type: Note**_
 
 #### Note
 The note setting defines the content of this note, which will be shown in the preview and report.
@@ -310,7 +310,7 @@ The note setting defines the content of this note, which will be shown in the pr
 note = Hello, this is my note.
 ```
 
-**Type: Contents**
+>_**Type: Contents**_
 
 #### Mode
 The mode setting determines which sections will be included in the table of contents.
@@ -325,7 +325,7 @@ The level determines the level of subsections to be displayed in the table of co
 level = 2
 ```
 
-**Type: Data Table**
+>_**Type: Data Table**_
 
 #### Colours
 The colours setting specifies whether to display the assigned colours to the data in the table or not.
@@ -352,7 +352,7 @@ This setting determines which column name has been changed and to what new name.
 col_*column_name* = *new_column_name*
 ```
 
-**Type: Error Details**
+>_**Type: Error Details**_
 
 #### Show Screenshots
 The images setting determines whether the Reporter should include a screenshot in the report (if found by the Reporter) or not.
@@ -378,7 +378,7 @@ This setting determines which label of the error section name has been changed a
 lbl_*column_name* = *new_column_name*
 ```
 
-**Type: Data Table & Data Graph & Error Details**
+>_**Type: Data Table & Data Graph & Error Details**_
 
 #### End Offset (internal)
 The end offset setting is responsible for setting the end offset for this section. This is used to control the time interval over which data from the database will be taken for analysis in this section.
@@ -392,7 +392,7 @@ The start offset setting is responsible for setting the start offset for this se
 startoffset = 17
 ```
 
-**Type: Data Table & Graph Sections & Error Details**
+>_**Type: Data Table & Graph Sections & Error Details**_
 
 #### SQL
 This setting contains the entire query which is sent to the Manager's database in order to get the necessary data to create the content of the section.
@@ -400,7 +400,7 @@ This setting contains the entire query which is sent to the Manager's database i
 sql = *sql query*
 ```
 
-**Type: Data Table & Graph Sections**
+>_**Type: Data Table & Graph Sections**_
 
 #### Data Type
 The data type setting determines which data from the Manager's database is displayed on the section graph or table and the rest of the data types are later selected based on this setting.
@@ -471,7 +471,7 @@ This setting determines whether data is to be filtered by result type or not.
 enablefilterresult = 1
 ```
 
-**Type: Data Table & Error Details**
+>_**Type: Data Table & Error Details**_
 
 #### Column Show
 This setting specifies whether to show the specified column in the table or not.
