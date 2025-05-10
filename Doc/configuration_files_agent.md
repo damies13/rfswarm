@@ -1,8 +1,10 @@
 # Configuration files for Agent
 [Return to Index](README.md)
 
-## INI File
-The INI file is the default configuration file format for the Agent and is created when the Agent is launched for the first time or when the Agent cannot find it in the default directory.
+1. [Configuration File](#configuration-file)
+
+## Configuration File
+The Configuration INI file is the default configuration file format for the Agent and is created when the Agent is launched for the first time or when the Agent cannot find it in the default directory.
 
 **Default RFSwarmAgent.ini file:**
 ```ini
@@ -11,7 +13,7 @@ agentname = <HOSTNAME>
 agentdir = <TEMP>/rfswarmagent
 xmlmode = False
 excludelibraries = BuiltIn,String,OperatingSystem,perftest
-properties = 
+properties =
 swarmmanager = http://localhost:8138/
 ```
 

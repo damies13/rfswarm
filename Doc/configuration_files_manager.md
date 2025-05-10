@@ -1,6 +1,9 @@
 # Configuration files for Manager
 [Return to Index](README.md)
 
+1. [Configuration File](#configuration-file)
+1. [Scenario File](#scenario-file)
+
 ## Configuration File
 The configuration File is the default configuration file format for the Manager and is created when the Manager is launched for the first time or when the Manager cannot find it in the default directory.
 
@@ -9,13 +12,13 @@ The configuration File is the default configuration file format for the Manager 
 [GUI]
 win_width = 800
 win_height = 350
-graph_list = 
+graph_list =
 donation_reminder = 1746482031
 
 [Plan]
 scriptdir = C:\rfswarm\venv\Lib\site-packages\rfswarm_manager
 scenariodir = C:\rfswarm\venv\Lib\site-packages\rfswarm_manager
-scenariofile = 
+scenariofile =
 
 [Run]
 resultsdir = C:\rfswarm\venv\Lib\site-packages\rfswarm_manager\results
@@ -25,7 +28,7 @@ display_sequence = False
 display_percentile = 90
 
 [Server]
-bindip = 
+bindip =
 bindport = 8138
 ```
 
@@ -148,7 +151,7 @@ scriptcount = 2
 monitortimebefore = 60
 monitortimeafter = 120
 monitorcount = 1
-graphlist = 
+graphlist =
 
 [Script Defaults]
 resultnamemode = doco

@@ -6,7 +6,7 @@
 1. [rfswarm Manager](rfswarm_manager.md)
 1. [rfswarm Agent](rfswarm_agent.md)
 1. [rfswarm Reporter](rfswarm_reporter.md)
-1. rfswarm configuration:
+1. [rfswarm configuration files](configuration_files_overview.md)
     1. [Agent configuration](configuration_files_agent.md)
     1. [Manager configuration](configuration_files_manager.md)
     1. [Reporter configuration](configuration_files_reporter.md)
