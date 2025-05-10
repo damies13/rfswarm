@@ -237,8 +237,8 @@ This section header is **not visible in the scenario file by default**, as it co
 For more information about settings under this section heading follow: [rfswarm Manager: scenario settings](rfswarm_manager.md#scenario-settings)
 
 #### Result Name Mode
-This setting defines response times named in the test results.
-The possible values are: doco (Documentation), info (Information), kywrd (Keyword), kywrdargs (Keyword & Arguments)
+This setting defines response times names in the test results.
+The possible values are: doco (Documentation), info (Information), kywrd (Keyword), kywrdargs (Keyword & Arguments).
 If "Default" option is set up, this setting is deleted from configuration file.
 ```ini
 resultnamemode = doco
@@ -280,7 +280,7 @@ robotoptions = -v "var1:123"
 
 ### [plan_index]
 The header of the plan index section represents the created test group in the "Plan" menu of the Manager and has its index value, for example: [1] or [2] and so on.
-There can theoretically be an unlimited number of these sections. They should be numbered from 1 to the number of indices defined in the [Scenario] section. This heading contains settings about the test group in question.
+There can theoretically be an unlimited number of these sections. They should be numbered from 1 to the number of indices defined in the [Scenario] section. This header contains the settings for a specific test group.
 For more information follow: [rfswarm Manager: plan](rfswarm_manager.md#plan)
 
 #### Robots
@@ -359,8 +359,8 @@ win_location_x = 494
 win_location_y = 295
 ```
 
-#### Window screen
-The windows screen setting is used for placing graph on the screen. It's used for specify at which screen the graph will appear. This setting will ensure that the graph opens on a good screen.
+#### Window Screen
+The window screen setting is used for placing graph on the screen. It's used for specify at which screen the graph will appear. This setting will ensure that the graph opens on a correct screen.
 ```ini
 win_screen = :0.0
 ```

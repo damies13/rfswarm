@@ -60,7 +60,7 @@ results = C:\rfswarm\venv\Lib\site-packages\rfswarm_manager\results\20250501_103
 ```
 
 #### Report
-The report setting indicates the path to the report template file, which is the basis for all possible reports the user may create, for example: html report.
+The report setting indicates the path to the report template file, which is the basis for all possible reports the user may create, for example: HTML report.
 This file is just used by Reporter to generate reports and should not be edited. This file is generated based on the provided template file.
 ```ini
 report = C:\rfswarm\venv\Lib\site-packages\rfswarm_manager\results\20250501_103943_browser\20250501_103943_browser.report
@@ -203,14 +203,14 @@ endoffset = 47
 ```
 
 #### Show Start Time
-The show start time setting determines whether the start time is to be displayed in the report file in the Cover section. 
+The show start time setting determines whether the start time is to be displayed in the report file in the Cover section.
 (-1 = Not configured yet, 0 = No, 1 = Yes)
 ```ini
 showstarttime = -1
 ```
 
 #### Show End Time
-The show end time setting determines whether the end time is to be displayed in the report file in the Cover section. 
+The show end time setting determines whether the end time is to be displayed in the report file in the Cover section.
 (-1 = Not configured yet, 0 = No, 1 = Yes)
 ```ini
 showendtime = 0
@@ -223,7 +223,7 @@ tlogo = ..\my_page.jpg
 ```
 
 #### Show Logo
-The show logo setting determines whether to show logo in the Reporter Cover section. 
+The show logo setting determines whether to show logo in the Reporter Cover section.
 ```ini
 showtlogo = 0
 ```
@@ -284,7 +284,7 @@ name = Table of Contents
 
 #### Parent
 The parent setting defines the upper section for this section. The default value is TOP, i.e. the section is displayed as part of the report as the main section.
-If the section is a subsection of another section, the id of that section will appear here. In this way, this section will be displayed in the report as a subsection of another section.
+If the section is a subsection of another section, the ID of that section will appear here. In this way, this section will be displayed in the report as a subsection of another section.
 ```ini
 parent = TOP
 ```
@@ -372,7 +372,7 @@ The images setting determines whether the Reporter should group all errors based
 groupet = 1
 ```
 
-#### Rename Column Name Data Table
+#### Rename Column Name Error Details
 This setting determines which label of the error section name has been changed and to what new name.
 ```ini
 lbl_*column_name* = *new_column_name*
@@ -426,7 +426,7 @@ This setting determines the specific type of secondary metric.
 secondarymetric = min
 ```
 
-#### Secondary Metric
+#### Result Type
 Response Time, TPS. Total TPS.
 ```ini
 resulttype = Response Time
@@ -481,7 +481,7 @@ col_*column_name*_show = 0
 
 ### [section_id(L or R)] - Graph Sections
 This section(s) is created when the graph section is defined. This section(s) is/are similar to the Data Table section, and contains most of the settings of that section. It is used to define what data is displayed on the graph and what is not.
-The section id with "L" indicates the left side of the graph in which data will be assigned to the left y-axis. The same with the twin section with "R".
+The section ID with "L" indicates the left side of the graph in which data will be assigned to the left y-axis. The same with the twin section with "R".
 
 #### Show Total
 The show total setting determines whether to shows (if the Data Type is set to the Plan) a line for the total number of planned robots or not.
