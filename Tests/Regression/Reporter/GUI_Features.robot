@@ -1567,6 +1567,9 @@ Check Reporter with JSON Configuration File
 
 	# pass a default ini file with extended height to ensure that default values are used
 	Open GUI 	-i 	${configfile}
+
+	Sleep    10s
+	Take A Screenshot
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	SelectResultFile
 
