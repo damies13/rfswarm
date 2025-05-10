@@ -15,11 +15,11 @@ win_height = 370
 donation_reminder = 1746894451
 
 [Reporter]
-resultdir = C:\rfswarm\venv\Lib\site-packages\rfswarm_reporter
-results = 
-report = 
-template = 
-templatedir = 
+resultdir = C:\rfswarm\venv\Lib\site-packages\rfswarm_manager\results
+results = C:\rfswarm\venv\Lib\site-packages\rfswarm_manager\results\20250501_103943_browser\20250501_103943_browser.db
+report = C:\rfswarm\venv\Lib\site-packages\rfswarm_manager\results\20250501_103943_browser\20250501_103943_browser.report
+template = C:\rfswarm\templates\browser_template_1.template
+templatedir = C:\rfswarm\templates
 ```
 
 ### [GUI]
