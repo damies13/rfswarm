@@ -32,7 +32,7 @@ The documentation links above detail the the ini file format, what the section n
 <td>
 
 
-```
+```ini
 [Section]
 option = value
 ```
@@ -43,7 +43,7 @@ option = value
 ```json
 {
   "Section": {
-    "option" = "value"
+    "option": "value"
   }
 }
 ```
