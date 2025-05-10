@@ -2,13 +2,13 @@
 [Return to Index](README.md)
 1. [Overview](#overview)
 1. [Agent configuration](configuration_files_agent.md)
-	1. [Agent Configuration File](configuration_files_agent.md#configuration-file)
+    1. [Agent Configuration File](configuration_files_agent.md#configuration-file)
 1. [Manager configuration](configuration_files_manager.md)
-	1. [Manager Configuration File](configuration_files_manager.md#configuration-file)
-	1. [Scenario File](configuration_files_manager.md#scenario-file)
+    1. [Manager Configuration File](configuration_files_manager.md#configuration-file)
+    1. [Scenario File](configuration_files_manager.md#scenario-file)
 1. [Reporter configuration](configuration_files_reporter.md)
-	1. [Reporter Configuration File](configuration_files_reporter.md#configuration-file)
-	1. [Template File](configuration_files_reporter.md#template-file)
+    1. [Reporter Configuration File](configuration_files_reporter.md#configuration-file)
+    1. [Template File](configuration_files_reporter.md#template-file)
 
 ## Overview
 
@@ -20,13 +20,13 @@ An unexpected benefit of this design is that some RFSwarm users dynamically gene
 
 Prior to RFSawrm version 1.5.0 only this ini file format is supported.
 
-With RFSawrm version 1.5.0 in addition to the ini file format, Yaml and JSON file formats are now also supported. The ini file format will remain the default, however it's now possible to save your scenario and report template files in these new formats and use them with RFSwarm.
+With RFSawrm version 1.5.0 in addition to the ini file format, YAML and JSON file formats are now also supported. The ini file format will remain the default, however it's now possible to save your scenario and report template files in these new formats and use them with RFSwarm.
 
-The documentation links above detail the the ini file format, what the section names are and the possible option and values within each section. If you wish to construct a JSON or Yaml file, when referring to the documentation use the table below to translate the ini file format setting to the JSON or Yaml file format
+The documentation links above detail the the ini file format, what the section names are and the possible option and values within each section. If you wish to construct a JSON or YAML file, when referring to the documentation use the table below to translate the ini file format setting to the JSON or YAML file format
 
 <table>
 <tr>
-<td> ini file </td><td> JSON File </td><td> Yaml File </td>
+<td> ini file </td><td> JSON File </td><td> YAML File </td>
 </tr>
 <tr>
 <td>
