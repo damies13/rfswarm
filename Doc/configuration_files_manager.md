@@ -55,7 +55,7 @@ graph_list = 681933ac-1,68193880-2
 ```
 
 #### Donation Reminder
-This setting is only used by the Manager to control donation reminders .
+This setting is only used by the Manager to control donation reminders.
 ```ini
 donation_reminder = 1746482031
 ```
@@ -331,7 +331,7 @@ These sections are used in all the previously mentioned configuration files.
 ### [graph_id]
 The header of the graph ID contains settings that are related to the graph window and it's configuration. The name of the section is actually the ID of the graph, for example: [68193c4e-1] or [68193c4e-2] and so on.
 There can theoretically be an unlimited number of these sections.
-For more information follow: [rfswarm Manager: monitoring](rfswarm_manager.md#graphs)
+For more information follow: [rfswarm Manager: graphs](rfswarm_manager.md#graphs)
 
 #### ID
 The graph ID is made from the epoch time converted to hexadecimal notation and an additional appended number indicating the graph number symbolising the order.
@@ -384,7 +384,7 @@ show_legend = 1
 ```
 
 #### Data Type
-The data type setting determines which data from the Manager's database is displayed on the graph and the primary metric and secondary metric settings are later selected based on this setting.
+The data type setting determines which data from the Manager's database is displayed on the graph and the rest of the data types are later selected based on this setting.
 ```ini
 data_type = Metric
 ```
@@ -431,6 +431,13 @@ filter_name = Wildcard (Unix Glob)
 This setting is closely linked to the filter_name setting. This setting is used to store the pattern used in the graph, so that the data can be filtered according to the filter_name type used.
 ```ini
 filter_pattern = Click Button *
+```
+
+#### Filter Result
+This setting determines how the data is filtered based on the result returned by the test.
+The possible types are: Pass, Fail, None.
+```ini
+filter_result = Pass
 ```
 
 #### Granularity Seconds
