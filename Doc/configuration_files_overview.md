@@ -24,26 +24,37 @@ With RFSawrm version 1.5.0 in addition to the ini file format, Yaml and JSON fil
 
 The documentation links above detail the the ini file format, what the section names are and the possible option and values within each section. If you wish to construct a JSON or Yaml file, when referring to the documentation use the table below to translate the ini file format setting to the JSON or Yaml file format
 
-| ini file | JSON File | Yaml File |
-| ---- | ---- | ---- |
+<table>
+<tr>
+<td> ini file </td><td> JSON File </td><td> Yaml File </td>
+</tr>
+<tr>
 <td>
-	```
-	[Section]
-	option = value
-	```
+
+ 
+```
+[Section]
+option = value
+```
 </td>
 <td>
-	```json
-	{
-		"Section": {
-			"option" = "value"
-		}
+
+
+```json
+{
+	"Section": {
+		"option" = "value"
 	}
-	```
+}
+```
 </td>
 <td>
-	```yaml
-	Section:
-		option: value
-	```
+
+
+```yaml
+Section:
+	option: value
+```
 </td>
+</tr>
+</table>
