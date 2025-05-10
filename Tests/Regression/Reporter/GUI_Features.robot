@@ -1555,4 +1555,198 @@ Verify Filter Result For Data Table and Graph - Filter Result
 	[Teardown] 	Run Keywords
 	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
 
+Check Reporter with JSON Configuration File
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	Make Clipboard Not None
+	${testdata}= 	Set Variable    Issue-#172
+	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
+	Should Exist	${basefolder}
+	Log to console 	basefolder: ${basefolder} 	console=True
+	${configfile}= 	Set Variable    ${basefolder}${/}RFSwarmReporter-JSON.json
+
+	# pass a default ini file with extended height to ensure that default values are used
+	Open GUI 	-i 	${configfile}
+	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
+	Wait For Status 	SelectResultFile
+
+	Take A Screenshot
+
+	# Set Confidence		0.7
+	Locate 	reporter_${platform}_windowsize_json.png
+	# Set Confidence		0.9
+
+	[Teardown]	Run Keywords
+	...    Set Confidence 	0.9 	AND
+	...    Close GUI
+
+Check Reporter with Yaml Configuration File
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	Make Clipboard Not None
+	${testdata}= 	Set Variable    Issue-#172
+	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
+	Should Exist	${basefolder}
+	Log to console 	basefolder: ${basefolder} 	console=True
+	${configfile}= 	Set Variable    ${basefolder}${/}RFSwarmReporter-Yaml.yaml
+
+	# pass a default ini file with extended height to ensure that default values are used
+	Open GUI 	-i 	${configfile}
+	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
+	Wait For Status 	SelectResultFile
+
+	Take A Screenshot
+
+	# Set Confidence		0.7
+	Locate 	reporter_${platform}_windowsize_yaml.png
+	# Set Confidence		0.9
+
+	[Teardown]	Run Keywords
+	...    Set Confidence 	0.9 	AND
+	...    Close GUI
+
+Check Reporter with yml Configuration File
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	Make Clipboard Not None
+	${testdata}= 	Set Variable    Issue-#172
+	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
+	Should Exist	${basefolder}
+	Log to console 	basefolder: ${basefolder} 	console=True
+	${configfile}= 	Set Variable    ${basefolder}${/}RFSwarmReporter-yml.yml
+
+	# pass a default ini file with extended height to ensure that default values are used
+	Open GUI 	-i 	${configfile}
+	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
+	Wait For Status 	SelectResultFile
+
+	Take A Screenshot
+
+	# Set Confidence		0.7
+	Locate 	reporter_${platform}_windowsize_yml.png
+	# Set Confidence		0.9
+
+	[Teardown]	Run Keywords
+	...    Set Confidence 	0.9 	AND
+	...    Close GUI
+
+Check Reporter with JSON Template File
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	Make Clipboard Not None
+
+	${testdata}= 	Set Variable    Issue-#172
+	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
+	Should Exist	${basefolder}
+	Log to console 	basefolder: ${basefolder} 	console=True
+	${templatefile}= 	Set Variable    ${basefolder}${/}template-JSON.json
+
+
+	${testdata2}= 	Set Variable    Issue-#140
+	${resultdata}= 	Set Variable    20230728_130340_Odoo-demo
+	${basefolder2}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata2}
+	Should Exist	${basefolder2}
+	Log to console 	basefolder2: ${basefolder2} 	console=True
+	${resultfolder}= 	Set Variable    ${basefolder2}${/}${resultdata}
+	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
+	Should Exist	${resultfolder}
+	Log 	resultfolder: ${resultfolder} 	console=True
+	Should Not Exist	${resultfile}
+
+	# pass a default ini file with extended height to ensure that default values are used
+	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
+	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
+	Wait For Status 	PreviewLoaded
+
+	Click Section			Report
+
+	Take A Screenshot
+
+	Click Section			Issue#172-json
+
+	[Teardown]	Run Keywords
+	...    Set Confidence 	0.9 	AND
+	...    Close GUI 		AND
+	...    Remove File 		${resultfile}
+
+Check Reporter with Yaml Template File
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	Make Clipboard Not None
+
+	${testdata}= 	Set Variable    Issue-#172
+	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
+	Should Exist	${basefolder}
+	Log to console 	basefolder: ${basefolder} 	console=True
+	${templatefile}= 	Set Variable    ${basefolder}${/}template-Yaml.yaml
+
+
+	${testdata2}= 	Set Variable    Issue-#140
+	${resultdata}= 	Set Variable    20230728_130340_Odoo-demo
+	${basefolder2}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata2}
+	Should Exist	${basefolder2}
+	Log to console 	basefolder2: ${basefolder2} 	console=True
+	${resultfolder}= 	Set Variable    ${basefolder2}${/}${resultdata}
+	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
+	Should Exist	${resultfolder}
+	Log 	resultfolder: ${resultfolder} 	console=True
+	Should Not Exist	${resultfile}
+
+	# pass a default ini file with extended height to ensure that default values are used
+	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
+	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
+	Wait For Status 	PreviewLoaded
+
+	Click Section			Report
+
+	Take A Screenshot
+
+	Click Section			Issue#172-Yaml
+
+	[Teardown]	Run Keywords
+	...    Set Confidence 	0.9 	AND
+	...    Close GUI 		AND
+	...    Remove File 		${resultfile}
+
+Check Reporter with yml Template File
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	Make Clipboard Not None
+
+	${testdata}= 	Set Variable    Issue-#172
+	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
+	Should Exist	${basefolder}
+	Log to console 	basefolder: ${basefolder} 	console=True
+	${templatefile}= 	Set Variable    ${basefolder}${/}template-yml.yml
+
+
+	${testdata2}= 	Set Variable    Issue-#140
+	${resultdata}= 	Set Variable    20230728_130340_Odoo-demo
+	${basefolder2}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata2}
+	Should Exist	${basefolder2}
+	Log to console 	basefolder2: ${basefolder2} 	console=True
+	${resultfolder}= 	Set Variable    ${basefolder2}${/}${resultdata}
+	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
+	Should Exist	${resultfolder}
+	Log 	resultfolder: ${resultfolder} 	console=True
+	Should Not Exist	${resultfile}
+
+	# pass a default ini file with extended height to ensure that default values are used
+	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
+	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
+	Wait For Status 	PreviewLoaded
+
+	Click Section			Report
+
+	Take A Screenshot
+
+	Click Section			Issue#172-yml
+
+	[Teardown]	Run Keywords
+	...    Set Confidence 	0.9 	AND
+	...    Close GUI 		AND
+	...    Remove File 		${resultfile}
+
+
+
 #

@@ -4010,7 +4010,7 @@ class ReporterCore:
 						configdict = base.configparser_safe_dict(configdict)
 						base.debugmsg(5, "configdict: ", configdict)
 				base.debugmsg(5, "configdict: ", configdict)
-				self.config.read_dict(configdict)
+				base.config.read_dict(configdict)
 		else:
 			base.saveini()
 
