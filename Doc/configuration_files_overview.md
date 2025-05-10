@@ -31,7 +31,7 @@ The documentation links above detail the the ini file format, what the section n
 <tr>
 <td>
 
- 
+
 ```
 [Section]
 option = value
@@ -42,9 +42,9 @@ option = value
 
 ```json
 {
-	"Section": {
-		"option" = "value"
-	}
+  "Section": {
+    "option" = "value"
+  }
 }
 ```
 </td>
@@ -53,7 +53,7 @@ option = value
 
 ```yaml
 Section:
-	option: value
+    option: value
 ```
 </td>
 </tr>
