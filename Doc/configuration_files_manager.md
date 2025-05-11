@@ -55,7 +55,7 @@ graph_list = 681933ac-1,68193880-2
 ```
 
 #### Donation Reminder
-This setting is only used by the Manager to control donation reminders .
+This setting is only used by the Manager to control donation reminders.
 ```ini
 donation_reminder = 1746482031
 ```
@@ -237,8 +237,8 @@ This section header is **not visible in the scenario file by default**, as it co
 For more information about settings under this section heading follow: [rfswarm Manager: scenario settings](rfswarm_manager.md#scenario-settings)
 
 #### Result Name Mode
-This setting defines response times named in the test results.
-The possible values are: doco (Documentation), info (Information), kywrd (Keyword), kywrdargs (Keyword & Arguments)
+This setting defines response times names in the test results.
+The possible values are: doco (Documentation), info (Information), kywrd (Keyword), kywrdargs (Keyword & Arguments).
 If "Default" option is set up, this setting is deleted from configuration file.
 ```ini
 resultnamemode = doco
@@ -280,7 +280,7 @@ robotoptions = -v "var1:123"
 
 ### [plan_index]
 The header of the plan index section represents the created test group in the "Plan" menu of the Manager and has its index value, for example: [1] or [2] and so on.
-There can theoretically be an unlimited number of these sections. They should be numbered from 1 to the number of indices defined in the [Scenario] section. This heading contains settings about the test group in question.
+There can theoretically be an unlimited number of these sections. They should be numbered from 1 to the number of indices defined in the [Scenario] section. This header contains the settings for a specific test group.
 For more information follow: [rfswarm Manager: plan](rfswarm_manager.md#plan)
 
 #### Robots
@@ -331,7 +331,7 @@ These sections are used in all the previously mentioned configuration files.
 ### [graph_id]
 The header of the graph ID contains settings that are related to the graph window and it's configuration. The name of the section is actually the ID of the graph, for example: [68193c4e-1] or [68193c4e-2] and so on.
 There can theoretically be an unlimited number of these sections.
-For more information follow: [rfswarm Manager: monitoring](rfswarm_manager.md#graphs)
+For more information follow: [rfswarm Manager: graphs](rfswarm_manager.md#graphs)
 
 #### ID
 The graph ID is made from the epoch time converted to hexadecimal notation and an additional appended number indicating the graph number symbolising the order.
@@ -359,8 +359,8 @@ win_location_x = 494
 win_location_y = 295
 ```
 
-#### Window screen
-The windows screen setting is used for placing graph on the screen. It's used for specify at which screen the graph will appear. This setting will ensure that the graph opens on a good screen.
+#### Window Screen
+The window screen setting is used for placing graph on the screen. It's used for specify at which screen the graph will appear. This setting will ensure that the graph opens on a correct screen.
 ```ini
 win_screen = :0.0
 ```
@@ -384,7 +384,7 @@ show_legend = 1
 ```
 
 #### Data Type
-The data type setting determines which data from the Manager's database is displayed on the graph and the primary metric and secondary metric settings are later selected based on this setting.
+The data type setting determines which data from the Manager's database is displayed on the graph and the rest of the data types are later selected based on this setting.
 ```ini
 data_type = Metric
 ```
@@ -431,6 +431,13 @@ filter_name = Wildcard (Unix Glob)
 This setting is closely linked to the filter_name setting. This setting is used to store the pattern used in the graph, so that the data can be filtered according to the filter_name type used.
 ```ini
 filter_pattern = Click Button *
+```
+
+#### Filter Result
+This setting determines how the data is filtered based on the result returned by the test.
+The possible types are: Pass, Fail, None.
+```ini
+filter_result = Pass
 ```
 
 #### Granularity Seconds
