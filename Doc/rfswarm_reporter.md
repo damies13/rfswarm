@@ -151,7 +151,7 @@ The note section is used for adding free text sections to your report, some exam
 #### Data Graph Section
 The data graph section is used for displaying graphs of test results and other metrics collected during the test.
 
-**Start Time** - Allows you to constrain this graph's data to a specific time range.
+**Start Time** - Allows you to constrain this graph's data to a Show graph coloursspecific time range.
 
 **End Time** - Allows you to constrain this graph's data to a specific time range.
 
@@ -160,9 +160,12 @@ The data graph section is used for displaying graphs of test results and other m
 
 The data sources for the graphs can be:
 - [Plan](#data-graph-plan)
+- [Monitoring](#data-graph-monitoring)
 - [Metric](#data-graph-metric)
 - [Result](#data-graph-result)
 - [Custom SQL](#data-graph-sql)
+
+To change the line colour on the graphs refer to the Show graph colours section of [Data Table](#data-table-section)
 
 ##### Data Graph Plan
 The Plan Data Graph allows you to include the graph from the plan tab of the RFSwarm Manager in your test report.
@@ -171,22 +174,41 @@ The Plan Data Graph allows you to include the graph from the plan tab of the RFS
 **Show Total** - If enabled, shows a line for the total number of planned robots. The image below shows an example with Show Total enabled.
 > ![Image](Images/MacOS_Reporter_v1.4.0_DataGraph_PlanPreview.png)
 
+##### Data Graph Monitoring
+The Monitoring Data Graph allows you to include a graph of the monitoring tab of the RFSwarm Manager in your test report. As all monitor groups have a robot count of 1, this graph may not be very useful, though it will show the planned time for running the  monitoring groups.
+> ![Image](Images/Ubuntu_Reporter_v1.5.0_DataGraph_Monitoring.png)
+
+**Show Total** - If enabled, shows a line for the total number of planned monitoring robots, this will be equal to the number of monitoring groups in your scenario. The image below shows an example with Show Total enabled.
+> ![Image](Images/Ubuntu_Reporter_v1.5.0_DataGraph_MonitoringPreview.png)
+
 ##### Data Graph Metric
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric.png)
+> ![Image](Images/Linux_Reporter_v1.5.0_DataGraph_Metric.png)
 
 **Number value** - All metrics are stored in the results database as strings, if you want rfswarm Reporter to treat the metric value as a numeric check this checkbox
 
 **Metric Type** - This option list is auto generated based on the metric types in the results, the types, Agent, Scenario and Summary will always be in the list as these are created by rfswarm Manager, Other custom types you add will also show here.
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Type.png)
 
 **Primary Metric** - This option list is auto generated based on the primary metrics in the results, it will be updated with a filtered set based on the metric types selection
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Primary.png)
 
 **Secondary Metric** - This option list is auto generated based on the secondary metrics in the results, it will be updated with a filtered set based on the metric types or primary metrics selections.
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Metric_Secondary.png)
+
+**Filter Agent** - This option lets you limit values to those from a specific agent machine or group by the agent machines with the Enabled checkbox.
+
+**Filter Type** - This option is used in with **Filter Pattern**, if the Filter Type is None, then Filter Pattern is ignored, otherwise Filter Pattern is used to filter the metrics shown.
+| Filter Type | Filter Pattern | Result |
+|---|---|---|
+| None |  | Filter Pattern is ignored |
+| Wildcard (Unix Glob) | \*abc\* | Only metrics that contain 'abc' will be shown |
+| Not Wildcard (Unix Glob) | \*abc\* | Metrics that contain 'abc' will not be shown, all other metrics will be shown |
+
+**Apply Granularity** - This option lets you apply smoothing to the graph by grouping values to a single point on the graph, you can control the number of seconds to group the values for, and which grouped value to show.
+| Apply Granularity | Values | Notes |
+|---|---|---|
+| Seconds | 0 - n Default: 0 (applies no granularity) | Values can be any positive value including decimal values, a value of 60 will group values to the same minute and a value of 0.001 will group values to 1 millisecond |
+| Show | Average, Maximum, Minimum Default: Average | Determines which value to show on the graph when grouping values by the granularity seconds, Average shows the average of all values in that time group, Maximum shows the highest value in that time group, and Minimum shows the lowest value. |
 
 ##### Data Graph Result
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result.png)
+> ![Image](Images/Linux_Reporter_v1.5.0_DataGraph_Result.png)
 
 **Result Type** - This option lets you choose between the Response Time, TPS or Total TPS.
 |   |   |
@@ -194,7 +216,6 @@ The Plan Data Graph allows you to include the graph from the plan tab of the RFS
 | Response Time | The time the keyword took, as measured by robot framework and then reported back to the Manager by the Agent |
 | TPS (Transactions per Second) | Simply a count of the number of times each keyword recorded a result in any given second. |
 | Total TPS | Simply a count of the number of times all keywords recorded a result in any given second. |
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_Type.png)
 
 **Filter Result** - This option lets you choose between the None, Pass or Fail.
 |   |   |
@@ -202,7 +223,8 @@ The Plan Data Graph allows you to include the graph from the plan tab of the RFS
 | None | Does not filter results (shows all) |
 | Pass | Filters the results to only show when a keyword returned a pass state |
 | Fail | Filters the results to only show when a keyword returned a fail state |
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_FilterResult.png)
+
+**Filter Agent** - This option lets you limit values to those from a specific agent machine or group by the agent machines with the Enabled checkbox.
 
 **Filter Type** - This option is used in with **Filter Pattern**, if the Filter Type is None, then Filter Pattern is ignored, otherwise Filter Pattern is used to filter the results shown.
 | Filter Type | Filter Pattern | Result |
@@ -210,7 +232,12 @@ The Plan Data Graph allows you to include the graph from the plan tab of the RFS
 | None |  | Filter Pattern is ignored |
 | Wildcard (Unix Glob) | \*abc\* | Only results that contain 'abc' will be shown |
 | Not Wildcard (Unix Glob) | \*abc\* | Results that contain 'abc' will not be shown, all other results will be shown |
-> ![Image](Images/MacOS_Reporter_v1.0.0_DataGraph_Result_FilterType.png)
+
+**Apply Granularity** - This option lets you apply smoothing to the graph by grouping values to a single point on the graph, you can control the number of seconds to group the values for, and which grouped value to show.
+| Apply Granularity | Values | Notes |
+|---|---|---|
+| Seconds | 0 - n Default: 0 (applies no granularity) | Values can be any positive value including decimal values, a value of 60 will group values to the same minute and a value of 0.001 will group values to 1 millisecond |
+| Show | Average, Maximum, Minimum Default: Average | Determines which value to show on the graph when grouping values by the granularity seconds, Average shows the average of all values in that time group, Maximum shows the highest value in that time group, and Minimum shows the lowest value. |
 
 ##### Data Graph SQL
 The SQL option allows you to write your own SQL statement to produce graphs that couldn't be produced with the other options.
@@ -233,6 +260,8 @@ The data table section is used for displaying tables of test results and other m
 
 **Show graph colours** - When enabled will display a colour swatch in the first column of the table that matches the first data column to the matching data value on a related graph, this is useful for creating legend tables.
 
+To control the colours on the table and graphs, click the colour swatch in the data table preview, and use the colour picker to choose your desired colour.
+
 **Start Time** - Allows you to constrain this table's data to a specific time range.
 
 **End Time** - Allows you to constrain this table's data to a specific time range.
@@ -243,6 +272,7 @@ The data table section is used for displaying tables of test results and other m
 
 The data sources for the graphs can be:
 - [Plan](#data-table-plan)
+- [Monitoring](#data-table-monitoring)
 - [Metric](#data-table-metric)
 - [Result](#data-table-result)
 - [ResultSummary](#data-table-resultsummary)
@@ -258,6 +288,17 @@ The Plan Data Table allows you to include the test row data from the plan tab of
 
 The image below shows an example with Show graph colours and all columns enabled.
 > ![Image](Images/MacOS_Reporter_v1.4.0_DataTable_PlanPreview.png)
+
+##### Data Table Monitoring
+The Monitoring Data Table allows you to include the test row data from the monitoring tab of the RFSwarm Manager in your test report.
+> ![Image](Images/Ubuntu_Reporter_v1.5.0_DataTable_Monitoring.png)
+
+**Show Column** - If disabled, hides the column from the report
+
+**Options** - Allows you to choose what is shown in the column, currently only the script column has an option that allows you to choose between the filename of the robot file or the full path of the robot file
+
+The image below shows an example without Show graph colours and all columns enabled.
+> ![Image](Images/Ubuntu_Reporter_v1.5.0_DataTable_MonitoringPreview.png)
 
 ##### Data Table Metric
 > ![Image](Images/MacOS_Reporter_v1.0.0_DataTable_Metric.png)

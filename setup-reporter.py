@@ -26,7 +26,7 @@ setuptools.setup(
 		('rfswarm_reporter/icons', ['rfswarm_reporter/icons/rfswarm-logo-128.ico']),
 	],
 	include_package_data=True,
-	install_requires=['configparser', 'pillow>=9.1.0', 'pip>=21,>=22', 'matplotlib', 'python-docx', 'openpyxl', 'tzlocal>=4.1', 'lxml'],
+	install_requires=['configparser', 'pillow>=9.1.0', 'pip>=21,>=22', 'matplotlib', 'python-docx', 'openpyxl', 'tzlocal>=4.1', 'lxml', 'pyyaml'],
 	classifiers=[
 		"Development Status :: 5 - Production/Stable",
 		"Framework :: Robot Framework",

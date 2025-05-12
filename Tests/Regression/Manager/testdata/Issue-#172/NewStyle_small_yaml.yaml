@@ -1,0 +1,40 @@
+Scenario:
+  uploadmode: err
+  scriptcount: 2
+  monitortimebefore: 0
+  monitortimeafter: 0
+  monitorcount: 2
+  graphlist: ~
+Script Defaults:
+  resultnamemode: kywrd
+  testrepeater: True
+  disablelogreport: True
+  excludelibraries: BuiltIn,String,OperatingSystem,perftest,requestslibrary,fakerlibrary
+'1':
+  robots: 3
+  delay: 0
+  rampup: 30
+  run: 60
+  test: Test Scenario 1
+  script: AppTests-yaml.robot
+'2':
+  robots: 2
+  delay: 0
+  rampup: 30
+  run: 60
+  test: Test Scenario 2
+  script: AppTests-yaml.robot
+m1:
+  robots: 1
+  delay: 0
+  rampup: 0
+  run: 0
+  test: Simulated Web Server 1
+  script: monitoring-yaml.robot
+m2:
+  robots: 1
+  delay: 0
+  rampup: 0
+  run: 0
+  test: Simulated DB Server 1
+  script: monitoring-yaml.robot

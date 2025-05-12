@@ -41,13 +41,14 @@ import tkinter.messagebox as tkm  # python3
 import tkinter.ttk as ttk  # python3
 import urllib.parse
 import webbrowser
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from operator import itemgetter
 from typing import Any
 
 import matplotlib  # required for matplot graphs
 import psutil
+import yaml
 
 from RFSwarmGUIhtml import RFSwarmGUIhtml
 from RFSwarmV2API import RFSwarmV2API
@@ -478,6 +479,14 @@ class RFSwarmBase:
 	scriptgrpend: Any = {}
 	scriptdefaults: Any = {}
 
+	mtimebefore = 0
+	mtimeafter = 0
+	mscriptcount = 0
+	mscriptlist: Any = [{}]
+	mscriptfiles: Any = {}
+	mscriptgrpend: Any = {}
+	mscriptdefaults: Any = {}
+
 	uploadmodes = {'imm': "Immediately", 'err': "On Error Only", 'def': "All Deferred"}
 	uploadmode = "err" 	# modes are imm, err, def
 	uploadfiles: Any = {}
@@ -495,10 +504,13 @@ class RFSwarmBase:
 	run_starttime = 0
 	run_start = 0
 	run_end = 0
+	plan_end = 0
+	mon_end = 0
 	run_finish = 0
 	run_paused = False
 	run_threads: Any = {}
 	total_robots = 0
+	total_monitor = 0
 	robot_schedule_template = {"RunName": "", "Agents": {}, "Scripts": {}, "Start": 0}
 	robot_schedule = robot_schedule_template
 	envvars: Any = {}
@@ -506,6 +518,7 @@ class RFSwarmBase:
 	agenthttpserver = None
 	updatethread = None
 	updateplanthread = None
+	graph_refresher: dict[str, threading.Thread] = {}
 
 	Agents: Any = {}
 	agenttgridupdate = 0
@@ -514,6 +527,7 @@ class RFSwarmBase:
 	dir_path = os.path.dirname(os.path.realpath(__file__))
 	resultsdir = ""
 	run_dbthread = True
+	dbconnecttime = 0
 	dbthread = None
 	datapath = ""
 	dbfile = ""
@@ -522,6 +536,9 @@ class RFSwarmBase:
 	dbqueue: Any = {"Write": [], "Read": [], "ReadResult": {}, "Results": [], "Metric": [], "Metrics": []}
 	MetricIDs: Any = {}
 	scriptfilters = [""]
+
+	corecount = psutil.cpu_count()
+	threadcount = corecount * 16
 
 	# #000000 = Black
 	# https://www.schemecolor.com/traffic-red-yellow-green.php
@@ -554,7 +571,7 @@ class RFSwarmBase:
 	def findiniloctaion(self):
 
 		if self.args.ini:
-			self.debugmsg(1, "self.args.ini: ", self.args.ini)
+			self.debugmsg(5, "self.args.ini: ", self.args.ini)
 			return self.args.ini
 
 		inilocations = []
@@ -800,7 +817,7 @@ class RFSwarmBase:
 						core.on_closing()
 
 			base.datapath = os.path.join(self.resultsdir, base.run_name)
-			base.debugmsg(1, "datapath:", base.datapath)
+			base.debugmsg(3, "datapath:", base.datapath)
 			if not os.path.exists(base.datapath):
 				try:
 					os.mkdir(base.datapath)
@@ -821,9 +838,18 @@ class RFSwarmBase:
 			if self.datadb is None:
 				base.debugmsg(5, "Connect to DB")
 				self.datadb = sqlite3.connect(self.dbfile)
+				base.dbconnecttime = int(time.time())
 				self.datadb.create_aggregate("percentile", 2, percentile)
 				self.datadb.create_aggregate("stdev", 1, stdevclass)
 				self.MetricIDs = {}
+
+				compopt = self.datadb.execute("PRAGMA compile_options;")
+				self.db_compile_options = [x[0] for x in compopt.fetchall()]
+
+				if "ENABLE_MATH_FUNCTIONS" not in self.db_compile_options:
+					self.datadb.create_function('floor', 1, math.floor)
+					# https://www.sqlite.org/lang_mathfunc.html
+					# https://stackoverflow.com/questions/70451170/sqlite3-math-functions-python
 
 			if createschema:
 				base.debugmsg(5, "Create Schema")
@@ -1172,11 +1198,11 @@ class RFSwarmBase:
 			st = datetime(n.year, n.month, n.day, int(tarr[0]), int(tarr[1]), int(tarr[2]))
 
 		if int(st.timestamp()) < int(n.timestamp()):
-			st = datetime(n.year, n.month, n.day + 1, int(tarr[0]))
+			st = datetime(n.year, n.month, n.day, int(tarr[0])) + timedelta(days=1)
 			if len(tarr) == 2:
-				st = datetime(n.year, n.month, n.day + 1, int(tarr[0]), int(tarr[1]))
+				st = datetime(n.year, n.month, n.day, int(tarr[0]), int(tarr[1])) + timedelta(days=1)
 			if len(tarr) == 3:
-				st = datetime(n.year, n.month, n.day + 1, int(tarr[0]), int(tarr[1]), int(tarr[2]))
+				st = datetime(n.year, n.month, n.day, int(tarr[0]), int(tarr[1]), int(tarr[2])) + timedelta(days=1)
 
 		base.debugmsg(8, "st:", st, "	", int(st.timestamp()))
 		return int(st.timestamp())
@@ -1480,6 +1506,11 @@ class RFSwarmBase:
 						t = threading.Thread(target=base.find_dependancies, args=(newhash, ))
 						t.start()
 
+						base.debugmsg(9, "threading active count:", threading.active_count())
+						while threading.active_count() > self.threadcount:
+							base.debugmsg(9, "threading active count:", threading.active_count())
+							time.sleep(0.1)
+
 	def is_resfile_prefix(self, prefixname):
 		base.debugmsg(5, "prefixname:", prefixname)
 		prefixs = {
@@ -1762,6 +1793,14 @@ class RFSwarmBase:
 			path1 = os.path.dirname(path1)
 			base.debugmsg(7, "path1:", path1)
 
+		if platform.system() == "Windows":
+			# os.path.splitroot is only available from python 3.12+ maybe we can use this
+			# 	in the future when python 3.11 os EOL
+			# if os.path.splitroot(path1)[0] != os.path.splitroot(path2)[0]:
+			# os.path.splitdrive only works on windows, but supports Python 3.6+
+			if os.path.splitdrive(path1)[0] != os.path.splitdrive(path2)[0]:
+				path1 = os.path.dirname(path2)
+
 		relpath = os.path.relpath(path2, start=path1)
 		# https://www.geeksforgeeks.org/python-os-path-relpath-method/
 		base.debugmsg(5, "relpath:", relpath)
@@ -1848,7 +1887,20 @@ class RFSwarmBase:
 		elif isinstance(value, str):
 			return value.replace('%', '%%')
 		else:
-			return value
+			return str(value)
+
+	def inisafedir(self, path):
+		# Ensured the path returned is a directory not a file
+		self.debugmsg(5, "path in:", path)
+		if os.path.isdir(path):
+			return base.inisafevalue(path)
+		if os.path.isfile(path):
+			filedir = os.path.dirname(path)
+			self.debugmsg(5, "path out:", filedir)
+			return base.inisafevalue(filedir)
+		# if path provided is not a file or directory return the default value
+		self.debugmsg(5, "path out:", base.dir_path)
+		return base.inisafevalue(base.dir_path)
 
 	def saveini(self):
 		self.debugmsg(6, "save_ini:", self.save_ini)
@@ -1967,7 +2019,7 @@ class RFSwarmBase:
 			else:
 				return None
 
-	def addScriptRow(self):
+	def addScriptRow(self, *args):
 		base.scriptcount += 1
 
 		row = int("{}".format(base.scriptcount))
@@ -1990,8 +2042,40 @@ class RFSwarmBase:
 
 		base.scriptlist[row]["Test"] = ""
 
+		base.debugmsg(5, "base.scriptlist[", row, "]:", base.scriptlist[row])
+
 		if not base.args.nogui and base.gui:
 			base.gui.addScriptRow()
+
+	def addMScriptRow(self, *args):
+		base.mscriptcount += 1
+
+		row = int("{}".format(base.mscriptcount))
+		base.debugmsg(5, "row:", row)
+
+		base.mscriptlist.append({})
+
+		base.mscriptlist[row]["Index"] = f"m{base.mscriptcount}"
+
+		num = "1"
+		base.mscriptlist[row]["Robots"] = int(num)
+
+		num = "0"
+		base.mscriptlist[row]["Delay"] = int(num)
+
+		num = "0"	 # 30 minutes
+		base.mscriptlist[row]["RampUp"] = int(num)
+
+		# num = "18000"  # 18000 sec = 5 hours
+		num = "0"  # 3600 sec = 1hr, 7200 sec = 2 hours
+		base.mscriptlist[row]["Run"] = int(num)
+
+		base.mscriptlist[row]["Test"] = ""
+
+		base.debugmsg(5, "base.mscriptlist[", row, "]:", base.mscriptlist[row])
+
+		if not base.args.nogui and base.gui:
+			base.gui.addMScriptRow(row)
 
 	def UpdateRunStats_SQL(self):
 
@@ -2370,6 +2454,20 @@ class RFSwarmBase:
 
 		return readycount
 
+	def configparser_safe_dict(self, dictin):
+		self.debugmsg(8, "dictin: ", dictin)
+		dictout = dictin
+		for k in dictout.keys():
+			self.debugmsg(8, "value type: ", type(dictout[k]))
+			if isinstance(dictout[k], dict):
+				dictout[k] = base.configparser_safe_dict(dictout[k])
+			if isinstance(dictout[k], str):
+				dictout[k] = base.inisafevalue(dictout[k])
+			if dictout[k] is None:
+				dictout[k] = ""
+		self.debugmsg(7, "dictout: ", dictout)
+		return dictout
+
 
 class RFSwarmCore:
 
@@ -2450,7 +2548,34 @@ class RFSwarmCore:
 
 		if os.path.isfile(base.manager_ini):
 			base.debugmsg(7, "agentini: ", base.manager_ini)
-			base.config.read(base.manager_ini, encoding="utf8")
+			arrconfigfile = os.path.splitext(base.manager_ini)
+			base.debugmsg(5, "arrconfigfile: ", arrconfigfile)
+			if len(arrconfigfile) < 2:
+				base.debugmsg(0, "Configuration file ", base.manager_ini, " missing extention, unable to determine supported format. Plesae use extentions .ini, .yaml or .json")
+				exit()
+			if arrconfigfile[1].lower() not in [".ini", ".yml", ".yaml", ".json"]:
+				base.debugmsg(0, "Configuration file ", base.manager_ini, " has an invalid extention, unable to determine supported format. Plesae use extentions .ini, .yaml or .json")
+				exit()
+			if arrconfigfile[1].lower() == ".ini":
+				base.config.read(base.manager_ini, encoding="utf8")
+			else:
+				configdict = {}
+				if arrconfigfile[1].lower() in [".yml", ".yaml"]:
+					# read yaml file
+					base.debugmsg(5, "read yaml file")
+					with open(base.manager_ini, 'r', encoding="utf-8") as f:
+						configdict = yaml.safe_load(f)
+						configdict = base.configparser_safe_dict(configdict)
+						base.debugmsg(5, "configdict: ", configdict)
+				if arrconfigfile[1].lower() == ".json":
+					# read json file
+					base.debugmsg(5, "read json file")
+					with open(base.manager_ini, 'r', encoding="utf-8") as f:
+						configdict = json.load(f)
+						configdict = base.configparser_safe_dict(configdict)
+						base.debugmsg(5, "configdict: ", configdict)
+				base.debugmsg(5, "configdict: ", configdict)
+				base.config.read_dict(configdict)
 		else:
 			base.saveini()
 
@@ -2464,7 +2589,10 @@ class RFSwarmCore:
 			base.debugmsg(5, "scenariofile: ", scenariofile)
 			if 'Plan' not in base.config:
 				base.config['Plan'] = {}
+				base.config['Plan']['ScenarioFile'] = ""
+			base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
 			base.config['Plan']['ScenarioFile'] = base.inisafevalue(scenariofile)
+			base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
 
 		if base.args.dir:
 			base.save_ini = False
@@ -2517,34 +2645,56 @@ class RFSwarmCore:
 			base.saveini()
 
 		if 'ScriptDir' not in base.config['Plan']:
-			base.config['Plan']['ScriptDir'] = base.inisafevalue(base.dir_path)
+			base.config['Plan']['ScriptDir'] = base.inisafedir(base.dir_path)
 			base.debugmsg(5, "ScriptDir: ", base.config['Plan']['ScriptDir'])
 			base.saveini()
 		else:
 			if not os.path.isdir(base.config['Plan']['ScriptDir']):
-				base.config['Plan']['ScriptDir'] = base.inisafevalue(base.dir_path)
+				base.config['Plan']['ScriptDir'] = base.inisafedir(base.dir_path)
 				base.debugmsg(5, "ScriptDir: ", base.config['Plan']['ScriptDir'])
 				base.saveini()
 
 		if 'ScenarioDir' not in base.config['Plan']:
-			base.config['Plan']['ScenarioDir'] = base.inisafevalue(base.dir_path)
+			base.config['Plan']['ScenarioDir'] = base.inisafedir(base.dir_path)
 			base.saveini()
 		else:
 			if not os.path.isdir(base.config['Plan']['ScenarioDir']):
-				base.config['Plan']['ScenarioDir'] = base.inisafevalue(base.dir_path)
+				base.config['Plan']['ScenarioDir'] = base.inisafedir(base.dir_path)
 				base.saveini()
 
 		if 'ScenarioFile' not in base.config['Plan']:
 			base.config['Plan']['ScenarioFile'] = ""
+			base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
 			base.saveini()
 		else:
 			# check file exists - it may have been deleted since rfswarm last ran with this ini file
+			base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
 			if not os.path.exists(base.config['Plan']['ScenarioFile']):
+				if len(base.config['Plan']['ScenarioFile']) > 1:
+					msg = "Scenario file Not found:\n" + base.config['Plan']['ScenarioFile']
+					if not base.args.nogui:
+						tkm.showwarning("RFSwarm - Warning", msg)
+						base.debugmsg(0, msg)
+					else:
+						base.debugmsg(0, msg)
+						self.on_closing(msg)
 				base.config['Plan']['ScenarioFile'] = ""
-				base.config['Plan']['ScriptDir'] = base.inisafevalue(base.dir_path)
+				base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
+				base.config['Plan']['ScriptDir'] = base.inisafedir(base.dir_path)
 				base.debugmsg(5, "ScriptDir: ", base.config['Plan']['ScriptDir'])
-				base.config['Plan']['ScenarioDir'] = base.inisafevalue(base.dir_path)
+				base.config['Plan']['ScenarioDir'] = base.inisafedir(base.dir_path)
 				base.saveini()
+
+		#
+		# Monitoring
+		#
+
+		if 'Monitoring' not in base.config:
+			base.config['Monitoring'] = {}
+			base.saveini()
+
+		if 'ScriptDir' not in base.config['Monitoring']:
+			base.config['Monitoring']['ScriptDir'] = base.config['Plan']['ScriptDir']
 
 		#
 		# Run
@@ -2633,8 +2783,11 @@ class RFSwarmCore:
 	def BuildCore(self):
 		base.debugmsg(5, "BuildCore")
 
+		base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
 		base.debugmsg(5, "BuildCorePlan")
 		self.BuildCorePlan()
+		base.debugmsg(5, "BuildCoreMonitoring")
+		self.BuildCoreMonitoring()
 		base.debugmsg(5, "BuildCoreRun")
 		self.BuildCoreRun()
 
@@ -3018,6 +3171,20 @@ class RFSwarmCore:
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
+	# Messages
+	#
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+	def display_warning(self, message):
+		if not base.args.nogui:
+			tkm.showwarning("RFSwarm - Warning", message)
+			base.debugmsg(0, message)
+		else:
+			base.debugmsg(0, message)
+			self.on_closing(message)
+
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+	#
 	# Server
 	#
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -3082,13 +3249,22 @@ class RFSwarmCore:
 
 	def register_agent(self, agentdata):
 		base.debugmsg(7, "agentdata:", agentdata)
+		agentname = agentdata["AgentName"]
 
-		base.add_scriptfilter("Agent: {}".format(agentdata["AgentName"]))
+		base.add_scriptfilter("Agent: {}".format(agentname))
 
 		AssignedRobots = 0
-		if agentdata["AgentName"] in base.Agents and "AssignedRobots" in base.Agents[agentdata["AgentName"]]:
-			AssignedRobots = base.Agents[agentdata["AgentName"]]["AssignedRobots"]
+		if agentname in base.Agents and "AssignedRobots" in base.Agents[agentname]:
+			AssignedRobots = base.Agents[agentname]["AssignedRobots"]
 		agentdata["AssignedRobots"] = AssignedRobots
+
+		AssignedMRobots = 0
+		if agentname in base.Agents and "AssignedMRobots" in base.Agents[agentname]:
+			AssignedMRobots = base.Agents[agentname]["AssignedMRobots"]
+		agentdata["AssignedMRobots"] = AssignedMRobots
+
+		if "Monitor" not in agentdata.keys():
+			agentdata["Monitor"] = 0
 
 		agentdata["LastSeen"] = int(time.time())
 		if "Status" not in agentdata.keys():
@@ -3138,6 +3314,7 @@ class RFSwarmCore:
 		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "LastSeen", agentdata["LastSeen"], agentdata["AgentName"])
 		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "AssignedRobots", agentdata["AssignedRobots"], agentdata["AgentName"])
 		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "Robots", agentdata["Robots"], agentdata["AgentName"])
+		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "Monitor", agentdata["Monitor"], agentdata["AgentName"])
 		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "Load", agentdata["LOAD%"], agentdata["AgentName"])
 		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "CPU", agentdata["CPU%"], agentdata["AgentName"])
 		base.save_metrics(agentdata["AgentName"], "Agent", agentdata["LastSeen"], "MEM", agentdata["MEM%"], agentdata["AgentName"])
@@ -3183,6 +3360,8 @@ class RFSwarmCore:
 	def BuildCorePlan(self):
 		base.debugmsg(5, "BuildCorePlan")
 
+		base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
+		base.debugmsg(6, "ScenarioFile: ", len(base.config['Plan']['ScenarioFile']), base.config['Plan']['ScenarioFile'])
 		if len(base.config['Plan']['ScenarioFile']) > 0:
 			self.OpenFile(base.config['Plan']['ScenarioFile'])
 		else:
@@ -3193,23 +3372,64 @@ class RFSwarmCore:
 
 		base.debugmsg(6, "ScenarioFile: ", ScenarioFile)
 		base.debugmsg(6, "base.config['Plan']['ScenarioFile']: ", base.config['Plan']['ScenarioFile'])
-		base.config['Plan']['ScenarioDir'] = base.inisafevalue(os.path.dirname(ScenarioFile))
+		base.config['Plan']['ScenarioDir'] = base.inisafedir(os.path.dirname(ScenarioFile))
 		base.debugmsg(6, "base.config['Plan']['ScenarioDir']: ", base.config['Plan']['ScenarioDir'])
-		if base.config['Plan']['ScenarioFile'] != ScenarioFile:
-			base.debugmsg(6, "ScenarioFile:", ScenarioFile)
-			base.config['Plan']['ScenarioFile'] = base.inisafevalue(ScenarioFile)
-			base.saveini()
 
 		filedata = configparser.ConfigParser()
 		base.debugmsg(6, "filedata: ", filedata._sections)
 
 		if os.path.isfile(ScenarioFile):
 			base.debugmsg(9, "ScenarioFile: ", ScenarioFile)
-			filedata.read(ScenarioFile, encoding="utf8")
+			try:
+				arrfile = os.path.splitext(ScenarioFile)
+				base.debugmsg(5, "arrfile: ", arrfile)
+				if len(arrfile) < 2:
+					msg = "Scenario file ", ScenarioFile, " missing extention, unable to determine supported format. Plesae use extentions .rfs, .yaml or .json"
+					self.display_warning(msg)
+					return 1
+				if arrfile[1].lower() not in [".rfs", ".yml", ".yaml", ".json"]:
+					msg = "Scenario file ", ScenarioFile, " has an invalid extention, unable to determine supported format. Plesae use extentions .rfs, .yaml or .json"
+					self.display_warning(msg)
+					return 1
+				if arrfile[1].lower() == ".rfs":
+					filedata.read(ScenarioFile, encoding="utf8")
+				else:
+					filedict = {}
+					if arrfile[1].lower() in [".yml", ".yaml"]:
+						# read yaml file
+						base.debugmsg(5, "read yaml file")
+						with open(ScenarioFile, 'r', encoding="utf-8") as f:
+							filedict = yaml.safe_load(f)
+						base.debugmsg(5, "filedict: ", filedict)
+						filedict = base.configparser_safe_dict(filedict)
+						base.debugmsg(5, "filedict: ", filedict)
+					if arrfile[1].lower() == ".json":
+						# read json file
+						base.debugmsg(5, "read json file")
+						with open(ScenarioFile, 'r', encoding="utf-8") as f:
+							filedict = json.load(f)
+						base.debugmsg(5, "filedict: ", filedict)
+						filedict = base.configparser_safe_dict(filedict)
+						base.debugmsg(5, "filedict: ", filedict)
+					base.debugmsg(5, "filedict: ", filedict)
+					filedata.read_dict(filedict)
+				if base.config['Plan']['ScenarioFile'] != ScenarioFile:
+					base.debugmsg(6, "ScenarioFile:", ScenarioFile)
+					base.config['Plan']['ScenarioFile'] = base.inisafevalue(ScenarioFile)
+					base.saveini()
+			except Exception:
+				base.config['Plan']['ScenarioFile'] = ""
+		else:
+			if len(ScenarioFile) > 1:
+				# error file not exist
+				msg = "Scenario file Not found:\n" + ScenarioFile
+				self.display_warning(msg)
+			return 1
 
 		base.debugmsg(6, "filedata: ", filedata)
 
 		scriptcount = 0
+		monitorcount = 0
 		graphlist = []
 		if "Scenario" in filedata:
 			base.debugmsg(6, "Scenario:", filedata["Scenario"])
@@ -3223,8 +3443,23 @@ class RFSwarmCore:
 			if "uploadmode" in filedata["Scenario"]:
 				base.uploadmode = filedata['Scenario']['uploadmode']
 
+			if "monitortimebefore" in filedata["Scenario"]:
+				base.mtimebefore = int(filedata['Scenario']['monitortimebefore'])
+				base.debugmsg(5, "base.mtimebefore:", base.mtimebefore)
+				self.msr_delayb4_validate("OpenFile", base.mtimebefore)
+
+			if "monitortimeafter" in filedata["Scenario"]:
+				base.mtimeafter = int(filedata['Scenario']['monitortimeafter'])
+				base.debugmsg(5, "base.mtimeafter:", base.mtimeafter)
+				self.msr_delayaft_validate("OpenFile", base.mtimeafter)
+
+			if "monitorcount" in filedata["Scenario"]:
+				monitorcount = int(filedata["Scenario"]["monitorcount"])
+				base.debugmsg(5, "monitorcount:", monitorcount)
+
 		else:
 			base.debugmsg(1, "File contains no scenario:", ScenarioFile)
+			base.config['Plan']['ScenarioFile'] = ""
 			return 1
 
 		if "Script Defaults" in filedata:
@@ -3233,6 +3468,7 @@ class RFSwarmCore:
 		# Set base.config['Plan']['ScriptDir']
 		base.debugmsg(5, "scriptcount:", scriptcount)
 		filelst = []
+
 		for i in range(scriptcount):
 			istr = str(i + 1)
 			base.debugmsg(5, "istr:", istr)
@@ -3251,14 +3487,37 @@ class RFSwarmCore:
 						scriptname = os.path.abspath(combined)
 					base.debugmsg(5, "scriptname:", scriptname)
 
-					filelst.append(scriptname)
+					if scriptname not in filelst:
+						filelst.append(scriptname)
+
+		for i in range(monitorcount):
+			istr = "m{}".format(i + 1)
+			base.debugmsg(5, "istr:", istr)
+			if istr in filedata:
+				base.debugmsg(5, "filedata[", istr, "]:", filedata[istr])
+				if "script" in filedata[istr]:
+					base.debugmsg(5, "filedata[", istr, "][script]:", filedata[istr]["script"])
+					scriptname = filedata[istr]["script"]
+					if '\\' in scriptname:
+						scriptnamearr = scriptname.split('\\')
+						scriptname = "/".join(scriptnamearr)
+					if not os.path.isabs(scriptname):
+						# relative path, need to find absolute path
+						combined = os.path.join(base.config['Plan']['ScenarioDir'], scriptname)
+						base.debugmsg(5, "combined:", combined)
+						scriptname = os.path.abspath(combined)
+					base.debugmsg(5, "scriptname:", scriptname)
+
+					if scriptname not in filelst:
+						filelst.append(scriptname)
+
 		if len(filelst) > 0:
 			commonpath = os.path.commonpath(filelst)
 			base.debugmsg(5, "commonpath: ", commonpath)
-			base.config['Plan']['ScriptDir'] = base.inisafevalue(commonpath)
+			base.config['Plan']['ScriptDir'] = base.inisafedir(commonpath)
 			base.saveini()
 		else:
-			base.config['Plan']['ScriptDir'] = base.inisafevalue(base.dir_path)
+			base.config['Plan']['ScriptDir'] = base.inisafedir(base.dir_path)
 			base.debugmsg(5, "ScriptDir: ", base.config['Plan']['ScriptDir'])
 			base.saveini()
 
@@ -3382,6 +3641,127 @@ class RFSwarmCore:
 					base.debugmsg(1, "Scenario file is damaged:", ScenarioFile)
 					return 1
 
+		rowcount = 0
+		for i in range(monitorcount):
+			istr = "m{}".format(i + 1)
+			if istr in filedata:
+				base.debugmsg(5, "filedata[", istr, "]:", filedata[istr])
+				rowcount += 1
+
+				# if i not in base.scriptlist:
+				# 	base.scriptlist.append({})
+				# 	base.scriptlist[ii]["Index"] = ii
+				# if not base.args.nogui:
+				# 	if rowcount + 1 > base.gui.scriptgrid.grid_size()[1]:		# grid_size tupple: (cols, rows)
+				# 		base.addMScriptRow()
+				# else:
+				base.addMScriptRow()
+
+				# users = 13
+				# if "robots" in filedata[istr] or "users" in filedata[istr]:
+				# 	if "robots" in filedata[istr]:
+				# 		base.debugmsg(8, "filedata[", istr, "][robots]:", filedata[istr]["robots"])
+				# 		self.msr_users_validate(rowcount, int(filedata[istr]["robots"]))
+				# 	else:
+				# 		base.debugmsg(8, "filedata[", istr, "][users]:", filedata[istr]["users"])
+				# 		self.msr_users_validate(rowcount, int(filedata[istr]["users"]))
+				# 		# delay = 0
+				# else:
+				# 	base.debugmsg(3, "robots missing [", istr, "]")
+				# 	fileok = False
+				# if "delay" in filedata[istr]:
+				# 	base.debugmsg(8, "filedata[", istr, "][delay]:", filedata[istr]["delay"])
+				# 	self.msr_delay_validate(rowcount, int(filedata[istr]["delay"]))
+				# 	# rampup = 60
+				# else:
+				# 	base.debugmsg(3, "delay missing [", istr, "]")
+				# 	fileok = False
+				# if "rampup" in filedata[istr]:
+				# 	base.debugmsg(8, "filedata[", istr, "][rampup]:", filedata[istr]["rampup"])
+				# 	self.msr_rampup_validate(rowcount, int(filedata[istr]["rampup"]))
+				# 	# run = 600
+				# else:
+				# 	base.debugmsg(3, "rampup missing [", istr, "]")
+				# 	fileok = False
+				# if "run" in filedata[istr]:
+				# 	base.debugmsg(8, "filedata[", istr, "][run]:", filedata[istr]["run"])
+				# 	self.msr_run_validate(rowcount, int(filedata[istr]["run"]))
+				# 	# script = /Users/dave/Documents/GitHub/rfswarm/robots/OC_Demo_2.robot
+				# else:
+				# 	base.debugmsg(3, "run missing [", istr, "]")
+				# 	fileok = False
+
+				if "script" in filedata[istr]:
+					base.debugmsg(5, "filedata[", istr, "][script]:", filedata[istr]["script"])
+					scriptname = filedata[istr]["script"]
+					if '\\' in scriptname:
+						scriptnamearr = scriptname.split('\\')
+						scriptname = "/".join(scriptnamearr)
+
+					base.debugmsg(5, "scriptname:", scriptname)
+					if not os.path.isabs(scriptname):
+						# relative path, need to find absolute path
+						combined = os.path.join(base.config['Plan']['ScenarioDir'], scriptname)
+						base.debugmsg(7, "combined:", combined)
+						scriptname = os.path.abspath(combined)
+					base.debugmsg(7, "scriptname:", scriptname)
+					self.msr_file_validate(rowcount, scriptname)
+				else:
+					base.debugmsg(3, "script missing [", istr, "]")
+					fileok = False
+				if "test" in filedata[istr]:
+					base.debugmsg(8, "filedata[", istr, "][test]:", filedata[istr]["test"])
+					self.msr_test_validate("mrow{}".format(rowcount), filedata[istr]["test"])
+				else:
+					base.debugmsg(3, "test missing [", istr, "]")
+					fileok = False
+
+				if "resultnamemode" in filedata[istr]:
+					base.debugmsg(8, "resultnamemode:", filedata[istr]["resultnamemode"])
+					base.mscriptlist[rowcount]["resultnamemode"] = filedata[istr]["resultnamemode"]
+
+				if "excludelibraries" in filedata[istr]:
+					base.debugmsg(8, "excludelibraries:", filedata[istr]["excludelibraries"])
+					base.mscriptlist[rowcount]["excludelibraries"] = filedata[istr]["excludelibraries"]
+
+				if "robotoptions" in filedata[istr]:
+					base.debugmsg(8, "robotoptions:", filedata[istr]["robotoptions"])
+					base.mscriptlist[rowcount]["robotoptions"] = filedata[istr]["robotoptions"]
+
+				# testrepeater = True
+				if "testrepeater" in filedata[istr]:
+					base.mscriptlist[rowcount]["testrepeater"] = base.str2bool(filedata[istr]["testrepeater"])
+				# injectsleepenabled = True
+				if "injectsleepenabled" in filedata[istr]:
+					base.mscriptlist[rowcount]["injectsleepenabled"] = base.str2bool(filedata[istr]["injectsleepenabled"])
+				# injectsleepminimum = 18
+				if "injectsleepminimum" in filedata[istr] and len(filedata[istr]["injectsleepminimum"]) > 0:
+					base.mscriptlist[rowcount]["injectsleepminimum"] = int(filedata[istr]["injectsleepminimum"])
+				# injectsleepmaximum = 33
+				if "injectsleepmaximum" in filedata[istr] and len(filedata[istr]["injectsleepmaximum"]) > 0:
+					base.mscriptlist[rowcount]["injectsleepmaximum"] = int(filedata[istr]["injectsleepmaximum"])
+				# disableloglog
+				if "disableloglog" in filedata[istr]:
+					base.mscriptlist[rowcount]["disableloglog"] = base.str2bool(filedata[istr]["disableloglog"])
+				# disablelogreport
+				if "disablelogreport" in filedata[istr]:
+					base.mscriptlist[rowcount]["disablelogreport"] = base.str2bool(filedata[istr]["disablelogreport"])
+				# disablelogoutput
+				if "disablelogoutput" in filedata[istr]:
+					base.mscriptlist[rowcount]["disablelogoutput"] = base.str2bool(filedata[istr]["disablelogoutput"])
+
+				if "filters" in filedata[istr]:
+					base.debugmsg(9, "filedata[istr][filters]:", filedata[istr]["filters"], type(filedata[istr]["filters"]))
+					filtr = filedata[istr]["filters"].replace("'", '"')
+					base.debugmsg(9, "filtr:", filtr, type(filtr))
+					filtrs = json.loads(filtr)
+					base.debugmsg(9, "filtrs:", filtrs, type(filtrs))
+					base.mscriptlist[rowcount]["filters"] = filtrs
+
+				if not fileok:
+					base.debugmsg(1, "Scenario file is damaged:", ScenarioFile)
+					return 1
+
 		base.debugmsg(9, "config graph_list: ", base.config['GUI']['graph_list'])
 
 		base.debugmsg(9, "graphlist: ", graphlist)
@@ -3404,6 +3784,12 @@ class RFSwarmCore:
 
 		if not base.args.nogui:
 			base.gui.OpenINIGraphs()
+			time.sleep(0.250)
+
+			base.debugmsg(5, "Call base.gui.pln_update_graph")
+			base.gui.pln_graph_update = False
+			t = threading.Thread(target=base.gui.pln_update_graph)
+			t.start()
 
 	def ClickPlay(self, _event=None):
 
@@ -3412,10 +3798,13 @@ class RFSwarmCore:
 		# before we start any robots we need to make sure the assigned robot counts are zero
 		for nxtagent in base.Agents.keys():
 			base.Agents[nxtagent]["AssignedRobots"] = 0
+			base.Agents[nxtagent]["AssignedMRobots"] = 0
 
 		base.run_abort = False
 		base.run_start = 0
 		base.run_end = 0
+		base.plan_end = 0
+		base.mon_end = 0
 		base.run_finish = 0
 		base.posttest = False
 		base.run_paused = False
@@ -3428,6 +3817,8 @@ class RFSwarmCore:
 			# report warnings and stop test from running
 			base.run_abort = False
 			base.run_end = int(time.time()) - 1
+			base.plan_end = int(time.time()) - 1
+			base.mon_end = int(time.time()) - 1
 			base.run_finish = int(time.time()) - 1
 
 			for warning in warnings:
@@ -3437,7 +3828,9 @@ class RFSwarmCore:
 
 		sec2st = base.run_starttime - int(time.time())
 		if sec2st < 1:
-			starttime = int(time.time())
+			mstarttime = int(time.time())
+			mendtime = base.mon_end - mstarttime
+			starttime = mstarttime + base.mtimebefore
 			datafiletime = datetime.now().strftime("%Y%m%d_%H%M%S")
 			if len(base.config['Plan']['ScenarioFile']) > 0:
 				filename = os.path.basename(base.config['Plan']['ScenarioFile'])
@@ -3447,15 +3840,22 @@ class RFSwarmCore:
 				base.run_name = "{}_{}".format(datafiletime, "Scenario")
 			base.debugmsg(5, "base.run_name:", base.run_name)
 
+			# give some time (10ms) to create the db before starting monitoring
+			time.sleep(1)
 			base.debugmsg(5, "core.run_start_threads")
 			t = threading.Thread(target=core.run_start_threads)
 			t.start()
 			if not base.args.nogui:
-				time.sleep(1)
+				time.sleep(0.1)
 				base.debugmsg(5, "base.gui.delayed_UpdateRunStats")
 				ut = threading.Thread(target=base.gui.delayed_UpdateRunStats)
 				ut.start()
-				base.gui.tabs.select(1)
+				base.debugmsg(9, "base.gui.tabs.tabs()", base.gui.tabs.tabs())
+				base.debugmsg(8, "base.gui.tabids", base.gui.tabids)
+				base.debugmsg(7, "base.gui.tabids['Run']", base.gui.tabids['Run'])
+				# self.tabids['Run']
+				# base.gui.tabs.select(2)
+				base.gui.tabs.select(base.gui.tabids['Run'])
 
 			# wait till db has been opened
 			while base.run_name != base.run_name_current:
@@ -3493,6 +3893,28 @@ class RFSwarmCore:
 					base.save_metrics("Run_{}".format(grp['Index']), "Scenario", starttime, grp['Test'], grp['Run'], base.srvdisphost)
 					base.save_metrics(grp['Index'], "Scenario_Run", starttime, grp['Test'], grp['Run'], base.srvdisphost)
 
+			for grp in base.mscriptlist:
+				base.debugmsg(5, "grp", grp)
+				if "Test" in grp.keys() and len(grp["Test"]) > 0:
+					base.debugmsg(5, "grp[Index]", grp['Index'])
+					base.save_metrics("Local_Path_{}".format(grp['Index']), "Scenario", mstarttime, grp['Script'], grp['Test'], base.srvdisphost)
+
+					relpath = base.get_relative_path(base.config['Plan']['ScenarioFile'], grp['Script'])
+					base.save_metrics("Test_{}".format(grp['Index']), "Scenario", mstarttime, relpath, grp['Test'], base.srvdisphost)
+					base.save_metrics(grp['Index'], "Scenario_Test", mstarttime, relpath, grp['Test'], base.srvdisphost)
+
+					base.save_metrics("Robots_{}".format(grp['Index']), "Scenario", mstarttime, grp['Test'], grp['Robots'], base.srvdisphost)
+					base.save_metrics(grp['Index'], "Scenario_Robots", mstarttime, grp['Test'], grp['Robots'], base.srvdisphost)
+
+					base.save_metrics("Delay_{}".format(grp['Index']), "Scenario", mstarttime, grp['Test'], grp['Delay'], base.srvdisphost)
+					base.save_metrics(grp['Index'], "Scenario_Delay", mstarttime, grp['Test'], grp['Delay'], base.srvdisphost)
+
+					base.save_metrics("Ramp_Up_{}".format(grp['Index']), "Scenario", mstarttime, grp['Test'], grp['RampUp'], base.srvdisphost)
+					base.save_metrics(grp['Index'], "Scenario_Ramp_Up", mstarttime, grp['Test'], grp['RampUp'], base.srvdisphost)
+
+					base.save_metrics("Run_{}".format(grp['Index']), "Scenario", mstarttime, grp['Test'], mendtime, base.srvdisphost)
+					base.save_metrics(grp['Index'], "Scenario_Run", mstarttime, grp['Test'], mendtime, base.srvdisphost)
+
 	def Pre_Run_Checks(self, _event=None):
 		warnings = []
 
@@ -3506,27 +3928,154 @@ class RFSwarmCore:
 			base.debugmsg(5, "grp", grp)
 			if "Index" in grp.keys():
 				if "Robots" not in grp.keys() or grp["Robots"] < 1:
-					warnings.append("Index {} has no Robots.".format(grp["Index"]))
+					warnings.append("Plan Index {} has no Robots.".format(grp["Index"]))
 
 				# RampUp	< 10
 				if "RampUp" not in grp.keys() or grp["RampUp"] < 10:
-					warnings.append("Index {} Ramp Up is < 10 sec.".format(grp["Index"]))
+					warnings.append("Plan Index {} Ramp Up is < 10 sec.".format(grp["Index"]))
 
 				if "Run" not in grp.keys() or grp["Run"] < 10:
-					warnings.append("Index {} Run is < 10 sec.".format(grp["Index"]))
+					warnings.append("Plan Index {} Run is < 10 sec.".format(grp["Index"]))
 
 				if "Script" not in grp.keys() or len(grp["Script"]) < 1:
-					warnings.append("Index {} has no Script.".format(grp["Index"]))
+					warnings.append("Plan Index {} has no Script.".format(grp["Index"]))
 				else:
 					# ScriptHash
 					if "ScriptHash" not in grp.keys() or len(grp["ScriptHash"]) < 1:
-						warnings.append("Index {} Agents don't have Script yet.".format(grp["Index"]))
+						warnings.append("Plan Index {} Agents don't have Script yet.".format(grp["Index"]))
 
 				if "Test" not in grp.keys() or len(grp["Test"]) < 1:
-					warnings.append("Index {} has no Test.".format(grp["Index"]))
+					warnings.append("Plan Index {} has no Test.".format(grp["Index"]))
+
+				grp_plan_end = int(time.time()) + base.mtimebefore + grp['Delay'] + grp["RampUp"] + grp['Run'] + grp["RampUp"]
+				# mtimebefore = 0
+				# mtimeafter = 0
+				if grp_plan_end > base.plan_end:
+					base.plan_end = grp_plan_end
+					base.debugmsg(5, "base.plan_end:", base.plan_end)
+					base.mon_end = base.plan_end + base.mtimeafter
+
+		base.debugmsg(5, "mscriptlist:", base.mscriptlist)
+		for grp in base.mscriptlist:
+			base.debugmsg(5, "grp", grp)
+			if "Index" in grp.keys():
+				if "Robots" not in grp.keys() or grp["Robots"] < 1:
+					warnings.append("Monitoring Index {} has no Robots.".format(grp["Index"]))
+
+				if "Script" not in grp.keys() or len(grp["Script"]) < 1:
+					warnings.append("Monitoring Index {} has no Script.".format(grp["Index"]))
+				else:
+					# ScriptHash
+					if "ScriptHash" not in grp.keys() or len(grp["ScriptHash"]) < 1:
+						warnings.append("Monitoring Index {} Agents don't have Script yet.".format(grp["Index"]))
+
+				if "Test" not in grp.keys() or len(grp["Test"]) < 1:
+					warnings.append("Monitoring Index {} has no Test.".format(grp["Index"]))
 
 		# warnings.append("Debuging : Don't Run")
 		return warnings
+
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+	#
+	# Monitoring
+	#
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+	def BuildCoreMonitoring(self):
+		base.debugmsg(5, "RFSwarmCore: BuildCoreMonitoring")
+
+	def msr_delayb4_validate(self, *args):
+		base.debugmsg(5, "args", args)
+		if not base.args.nogui:
+			base.gui.msr_delayb4_validate(*args)
+		return True
+
+	def msr_delayaft_validate(self, *args):
+		base.debugmsg(5, "args", args)
+		if not base.args.nogui:
+			base.gui.msr_delayaft_validate(*args)
+		return True
+
+	def msr_file_validate(self, r, *args):
+		base.debugmsg(5, "r:", r, "	args:", args)
+		if args:
+			scriptfile = args[0]
+		else:
+			scriptfile = ""
+
+		if not os.path.exists(scriptfile):
+			msg = "The referenced file:\n" + scriptfile + "\n\ncannot be found by RFSwarm Manager."
+			if not base.args.nogui:
+				tkm.showwarning("RFSwarm - Warning", msg)
+			else:
+				base.debugmsg(0, msg)
+			return False
+		elif not os.path.isfile(scriptfile):
+			msg = "The referenced file:\n" + scriptfile + "\n\nis a directory, not a file."
+			if not base.args.nogui:
+				tkm.showwarning("RFSwarm - Warning", msg)
+			else:
+				base.debugmsg(0, msg)
+			return False
+
+		base.debugmsg(5, "scriptfile:", scriptfile)
+		if len(scriptfile) > 0:
+			base.mscriptlist[r]["Script"] = scriptfile
+			relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], scriptfile)
+			script_hash = base.hash_file(scriptfile, relpath)
+			base.mscriptlist[r]["ScriptHash"] = script_hash
+
+			if script_hash not in base.scriptfiles:
+				base.scriptfiles[script_hash] = {
+					"id": script_hash,
+					"localpath": scriptfile,
+					"relpath": relpath,
+					"type": "script"
+				}
+
+				t = threading.Thread(target=base.find_dependancies, args=(script_hash, ))
+				t.start()
+
+		else:
+			if "ScriptHash" in base.mscriptlist[r]:
+				oldhash = base.mscriptlist[r]["ScriptHash"]
+				t = threading.Thread(target=base.remove_hash, args=(oldhash, ))
+				t.start()
+
+			base.mscriptlist[r]["Script"] = ''
+			base.mscriptlist[r]["ScriptHash"] = ''
+
+		self.plan_scnro_chngd = True
+		if not base.args.nogui:
+			base.gui.msr_file_validate(r, *args)
+		return True
+
+	def msr_test_validate(self, *args):
+		base.debugmsg(5, "args:", args)
+		# r = int(args[0][-1:])+1
+		r = int(args[0][4:])
+		base.debugmsg(5, "r:", r)
+
+		v = None
+		if len(args) > 1 and len(args[1]) > 1:
+			v = args[1]
+			base.debugmsg(5, "v:", v)
+			base.mscriptlist[r]["Test"] = v
+
+		base.debugmsg(5, "mscriptlist[r]:", base.mscriptlist[r])
+
+		if not base.args.nogui:
+			base.gui.msr_test_validate(*args)
+		return True
+
+	def update_monitoring_jobs_mon_end(self, *args):
+		base.debugmsg(5, "args:", args)
+		for agnt in base.robot_schedule["Agents"].keys():
+			for grurid in base.robot_schedule["Agents"][agnt].keys():
+				base.debugmsg(5, "grurid:", grurid)
+				if grurid[0] == "m":
+					base.debugmsg(5, "grurid:", grurid, "New EndTime", base.mon_end)
+					base.robot_schedule["Agents"][agnt][grurid]["EndTime"] = base.mon_end
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -3551,6 +4100,7 @@ class RFSwarmCore:
 			for agnt in base.robot_schedule["Agents"].keys():
 				for grurid in base.robot_schedule["Agents"][agnt].keys():
 					base.robot_schedule["Agents"][agnt][grurid]["EndTime"] = base.run_end
+			base.mon_end = base.run_end
 
 	def run_start_threads(self):
 
@@ -3560,6 +4110,159 @@ class RFSwarmCore:
 		totrbts = 0
 		currbts = 0
 
+		# Start Monitoring robots
+		base.debugmsg(5, "base.mscriptlist:", base.mscriptlist)
+		for grp in base.mscriptlist:
+			if "Test" in grp.keys() and len(grp["Test"]) > 0:
+				base.debugmsg(5, "grp:", grp)
+				nxtagent = None
+				agentwarn = False
+				while nxtagent is None:
+					if 'filters' in grp:
+						nxtagent = base.get_next_agent(grp['filters'])
+						base.debugmsg(7, '(filters) next_agent:', nxtagent)
+					else:
+						nxtagent = base.get_next_agent([])
+						base.debugmsg(9, '(filters else) next_agent:', nxtagent)
+					base.debugmsg(5, '(Monitoring) next_agent:', nxtagent)
+					if nxtagent is None:
+						base.debugmsg(7, 'next_agent is None !!!')
+						agentwarn = True
+						# MsgBox = tkm.askyesno('Save Scenario','Do you want to save the current scenario?')
+						if not base.args.nogui and not base.run_paused:
+							base.debugmsg(7, 'base.args.nogui:', base.args.nogui, "base.run_paused:", base.run_paused)
+							tkm.showwarning("RFSwarm - Warning", "Not enough Agents available to run Monitoring Robots!\n\nTest run is paused, please add agents to continue or click stop to abort.")
+							# tkm.showinfo("RFSwarm - Warning", "Not enough Agents available to run Robots! Test run is paused, please add agents to continue or click stop to abort.")
+							base.debugmsg(7, 'base.args.nogui:', base.args.nogui, "base.run_paused:", base.run_paused)
+
+						base.debugmsg(5, 'Not enough Agents available to run Robots! (Monitoring)')
+						base.debugmsg(0, 'Not enough Agents available to run Monitoring Robots!')
+						time.sleep(10)
+					elif agentwarn:
+						agentwarn = False
+						if not base.args.nogui:
+							tkm.showinfo("RFSwarm - Info", "Enough Agents available to run Monitoring Robots, test will now resume.")
+						base.debugmsg(0, 'Enough Agents available to run Monitoring Robots, resuming.')
+				# now we have agent for monitoring rorbot assign robobt
+
+				if base.run_start < 1:
+					base.run_start = int(time.time())  # time now
+					base.robot_schedule = base.robot_schedule_template
+					base.robot_schedule["RunName"] = base.run_name
+					base.robot_schedule["Agents"] = {}
+					base.robot_schedule["Scripts"] = {}
+					base.robot_schedule["Start"] = base.run_start
+
+					if not base.args.nogui:
+						stm = time.localtime(base.robot_schedule["Start"])
+						base.gui.display_run['start_time'].set("  {}  ".format(time.strftime("%H:%M:%S", stm)))
+
+				gid = grp["Index"]
+				base.debugmsg(5, "gid", gid, " 	robot_schedule[Scripts].keys()", base.robot_schedule["Scripts"].keys())
+				if gid not in base.robot_schedule["Scripts"].keys():
+					base.robot_schedule["Scripts"][gid] = {}
+
+				nxtuid = 1
+				uid = nxtuid
+				grurid = "{}_{}_{}".format(gid, uid, int(time.time()))
+				base.debugmsg(9, 'uid', uid)
+				base.robot_schedule["Scripts"][gid][uid] = grurid
+
+				if nxtagent not in base.robot_schedule["Agents"].keys():
+					base.robot_schedule["Agents"][nxtagent] = {}
+
+				base.robot_schedule["Agents"][nxtagent][grurid] = {
+					"ScriptHash": grp["ScriptHash"],
+					"Test": grp["Test"],
+					"StartTime": int(time.time()),
+					"EndTime": base.mon_end,
+					"id": grurid
+				}
+
+				if "resultnamemode" in grp:
+					base.robot_schedule["Agents"][nxtagent][grurid]["resultnamemode"] = grp["resultnamemode"]
+				else:
+					if "resultnamemode" in base.scriptdefaults:
+						base.robot_schedule["Agents"][nxtagent][grurid]["resultnamemode"] = base.scriptdefaults["resultnamemode"]
+					else:
+						base.robot_schedule["Agents"][nxtagent][grurid]["resultnamemode"] = base.resultnamemodedefault
+
+				if "excludelibraries" in grp:
+					base.robot_schedule["Agents"][nxtagent][grurid]["excludelibraries"] = grp["excludelibraries"]
+				else:
+					if "excludelibraries" in base.scriptdefaults:
+						base.robot_schedule["Agents"][nxtagent][grurid]["excludelibraries"] = base.scriptdefaults["excludelibraries"]
+					else:
+						base.robot_schedule["Agents"][nxtagent][grurid]["excludelibraries"] = base.excludelibrariesdefault
+
+				if "robotoptions" in grp:
+					base.robot_schedule["Agents"][nxtagent][grurid]["robotoptions"] = grp["robotoptions"]
+				else:
+					if "robotoptions" in base.scriptdefaults:
+						base.robot_schedule["Agents"][nxtagent][grurid]["robotoptions"] = base.scriptdefaults["robotoptions"]
+
+				tr = base.testrepeaterdefault
+				if "testrepeater" in base.scriptdefaults:
+					tr = base.scriptdefaults["testrepeater"]
+				if "testrepeater" in grp:
+					tr = grp["testrepeater"]
+				base.robot_schedule["Agents"][nxtagent][grurid]["testrepeater"] = str(tr)
+
+				# injectsleepenableddefault = False
+				ise = base.injectsleepenableddefault
+				if "injectsleepenabled" in base.scriptdefaults:
+					ise = base.scriptdefaults["injectsleepenabled"]
+				if "injectsleepenabled" in grp:
+					ise = grp["injectsleepenabled"]
+				base.robot_schedule["Agents"][nxtagent][grurid]["injectsleepenabled"] = str(ise)
+				if base.str2bool(ise):
+					# injectsleepminimumdefault = 15
+					ismn = base.injectsleepminimumdefault
+					if "injectsleepminimum" in base.scriptdefaults:
+						ismn = base.scriptdefaults["injectsleepminimum"]
+					if "injectsleepminimum" in grp:
+						ismn = grp["injectsleepminimum"]
+					base.robot_schedule["Agents"][nxtagent][grurid]["injectsleepminimum"] = str(ismn)
+					# injectsleepmaximumdefault = 45
+					ismx = base.injectsleepmaximumdefault
+					if "injectsleepmaximum" in base.scriptdefaults:
+						ismx = base.scriptdefaults["injectsleepmaximum"]
+					if "injectsleepmaximum" in grp:
+						ismx = grp["injectsleepmaximum"]
+					base.robot_schedule["Agents"][nxtagent][grurid]["injectsleepmaximum"] = str(ismx)
+
+				# disableloglogdefault = False
+				dll = base.disableloglogdefault
+				if "disableloglog" in base.scriptdefaults:
+					dll = base.scriptdefaults["disableloglog"]
+				if "disableloglog" in grp:
+					dll = grp["disableloglog"]
+				base.robot_schedule["Agents"][nxtagent][grurid]["disableloglog"] = str(dll)
+				# disablelogreportdefault = False
+				dlr = base.disablelogreportdefault
+				if "disablelogreport" in base.scriptdefaults:
+					dlr = base.scriptdefaults["disablelogreport"]
+				if "disablelogreport" in grp:
+					dlr = grp["disablelogreport"]
+				base.robot_schedule["Agents"][nxtagent][grurid]["disablelogreport"] = str(dlr)
+				# disablelogoutputdefault = False
+				dlo = base.disablelogoutputdefault
+				if "disablelogoutput" in base.scriptdefaults:
+					dlo = base.scriptdefaults["disablelogoutput"]
+				if "disablelogoutput" in grp:
+					dlo = grp["disablelogoutput"]
+				base.robot_schedule["Agents"][nxtagent][grurid]["disablelogoutput"] = str(dlo)
+
+				base.Agents[nxtagent]["AssignedMRobots"] += 1
+				base.debugmsg(5, "base.Agents[", nxtagent, "][AssignedMRobots]:", base.Agents[nxtagent]["AssignedMRobots"])
+
+				# currbts += 1
+				# base.debugmsg(2, "Robot:", currbts, "	Test:", grp["Test"], "	Assigned to:", nxtagent)
+				base.debugmsg(2, "Monitoring Robot:", " Test:", grp["Test"], "	Assigned to:", nxtagent)
+
+				# base.debugmsg(9, "robot_schedule", base.robot_schedule)
+
+		# Start Plan robots
 		base.debugmsg(8, "base.scriptlist:", base.scriptlist)
 		for grp in base.scriptlist:
 			if "Robots" in grp:
@@ -3636,7 +4339,7 @@ class RFSwarmCore:
 									stm = time.localtime(base.robot_schedule["Start"])
 									base.gui.display_run['start_time'].set("  {}  ".format(time.strftime("%H:%M:%S", stm)))
 
-								base.run_end = base.run_start + grp["Delay"] + grp["RampUp"] + grp["Run"]
+								base.run_end = base.run_start + base.mtimebefore + grp["Delay"] + grp["RampUp"] + grp["Run"]
 								base.debugmsg(9, grp['Index'], " 	run_start:", base.run_start, " 	Delay:", grp["Delay"], " 	RampUp:", grp["RampUp"], " 	Run:", grp["Run"], " 	run_end:", base.run_end)
 								base.robot_schedule["End"] = base.run_end
 
@@ -3651,25 +4354,28 @@ class RFSwarmCore:
 								base.debugmsg(9, "totrbts", totrbts)
 
 							if gid not in base.scriptgrpend.keys() or base.scriptgrpend[gid] < base.run_start:
-								base.scriptgrpend[gid] = base.run_start + grp["Delay"] + grp["RampUp"] + grp["Run"]
-								base.debugmsg(9, "gid:", gid, " 	run_start:", base.run_start, " 	Delay:", grp["Delay"], " 	RampUp:", grp["RampUp"], " 	Run:", grp["Run"], " 	run_end:", base.run_end)
+								base.scriptgrpend[gid] = base.run_start + base.mtimebefore + grp["Delay"] + grp["RampUp"] + grp["Run"]
+								base.debugmsg(9, "gid:", gid, " 	run_start:", base.run_start, "	base.mtimebefore:", base.mtimebefore, " 	Delay:", grp["Delay"], " 	RampUp:", grp["RampUp"], " 	Run:", grp["Run"], " 	run_end:", base.run_end)
 								if base.scriptgrpend[gid] > base.run_end:
 									base.run_end = base.scriptgrpend[gid]
 
 							time_elapsed = int(time.time()) - base.run_start
-							base.debugmsg(9, 'time_elapsed', time_elapsed, "Delay", grp["Delay"])
-							if time_elapsed > grp["Delay"] - 1:
+							base.debugmsg(9, 'time_elapsed', time_elapsed, " Monitoring Delay", base.mtimebefore, " Delay", grp["Delay"])
+							if time_elapsed > (base.mtimebefore + grp["Delay"]) - 1:
 								uid = 0
 								nxtuid = len(base.robot_schedule["Scripts"][gid]) + 1
 								base.debugmsg(9, 'nxtuid', nxtuid)
 								# Determine if we should start another user?
 								if nxtuid < grp["Robots"] + 1:
 									if grp["RampUp"] > 0:
-										rupct = (time_elapsed - grp["Delay"]) / grp["RampUp"]
+										rupct = (time_elapsed - (base.mtimebefore + grp["Delay"])) / grp["RampUp"]
+										# base.mtimebefore
+										# rupct - Ramp-up percent
 									else:
 										rupct = 1
 									base.debugmsg(9, 'rupct', rupct)
-									ruusr = int(grp["Robots"] * rupct)
+									# ruusr - Ramp-up user
+									ruusr = int(grp["Robots"] * rupct) + 1
 									base.debugmsg(9, 'nxtuid', nxtuid, 'ruusr', ruusr)
 									if nxtuid < ruusr + 1:
 										uid = nxtuid
@@ -3916,6 +4622,7 @@ class RFSwarmCore:
 		uploadcount = 0
 		removeagents = []
 		robot_count = 0
+		monitor_count = 0
 		time_elapsed = int(time.time()) - base.agenttgridupdate
 		if time_elapsed >= 5:
 			base.debugmsg(6, "time_elapsed:", time_elapsed)
@@ -3941,16 +4648,36 @@ class RFSwarmCore:
 
 				if includerobots:
 					robot_count += base.Agents[agnt]["Robots"]
+					monitor_count += base.Agents[agnt]["Monitor"]
 
-			if base.total_robots > 0 and robot_count < 1:
+			if base.total_robots > 0 and robot_count < 1 and base.total_monitor > 0 and monitor_count < 1:
 				# run finished so clear run name
 				base.save_metrics(base.run_name, "Scenario", int(time.time()), "total_robots", robot_count, base.srvdisphost)
+				base.save_metrics(base.run_name, "Scenario", int(time.time()), "monitor_robots", monitor_count, base.srvdisphost)
 				base.save_metrics(base.run_name, "Scenario", int(time.time()), "End_Time", int(time.time()), base.srvdisphost)
 				base.save_metrics("Time", "Scenario", int(time.time()), "End", int(time.time()), base.srvdisphost)
 				base.run_name = ""
 				base.robot_schedule["RunName"] = base.run_name
 
+			# Update base.mon_end time on monitoring robot's jobs in the situations where:
+			# base.total_robots > 0 and time now + base.mtimeafter is greater than base.mon_end
+			# (Ensure we monitor long enough)
+			if base.total_robots > 0:
+				new_mon_end = int(time.time()) + base.mtimeafter
+				if new_mon_end > base.mon_end:
+					base.mon_end = new_mon_end
+					self.update_monitoring_jobs_mon_end()
+
+			# base.total_robots > 0 and robot_count < 1 and time now + base.mtimeafter is less than base.mon_end
+			# (Ensure we don't monitor too long)
+			if base.total_robots > 0 and robot_count < 1:
+				new_mon_end = int(time.time()) + base.mtimeafter
+				if new_mon_end < base.mon_end:
+					base.mon_end = new_mon_end
+					self.update_monitoring_jobs_mon_end()
+
 			base.total_robots = robot_count
+			base.total_monitor = monitor_count
 
 			for agnt in removeagents:
 				# this should prevent issue RuntimeError: dictionary changed size during iteration
@@ -3970,16 +4697,26 @@ class RFSwarmCore:
 			# Save Total Robots Metric
 			if len(base.run_name) > 0:
 				base.save_metrics(base.run_name, "Scenario", int(time.time()), "total_robots", base.total_robots, base.srvdisphost)
+				base.save_metrics(base.run_name, "Scenario", int(time.time()), "monitor_robots", base.total_monitor, base.srvdisphost)
 			else:
 				base.save_metrics("PreRun", "Scenario", int(time.time()), "total_robots", base.total_robots, base.srvdisphost)
+				base.save_metrics("PreRun", "Scenario", int(time.time()), "monitor_robots", base.total_monitor, base.srvdisphost)
 
 			# if base.args.run:
 			base.debugmsg(5, "base.args.run:", base.args.run, "	base.args.nogui:", base.args.nogui, "	run_end:", base.run_end, "	time:", int(time.time()))
 			base.debugmsg(5, "base.posttest:", base.posttest, "	total_robots:", base.total_robots)
+			base.debugmsg(5, "base.posttest:", base.posttest, "	total_monitor:", base.total_monitor)
 			base.debugmsg(5, "run_finish:", base.run_finish, "	time:", int(time.time()), "uploadcount:", uploadcount)
-			if base.run_end > 0 and base.run_end < int(time.time()) and base.total_robots < 1 and not base.posttest and base.run_finish < 1 and uploadcount < 1:
+			if base.run_end > 0\
+				and base.run_end < int(time.time())\
+				and base.total_robots < 1\
+				and base.total_monitor < 1\
+				and not base.posttest\
+				and base.run_finish < 1\
+				and uploadcount < 1:
+
 				base.run_finish = int(time.time())
-				base.debugmsg(5, "run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots)
+				base.debugmsg(5, "run_end:", base.run_end, "	time:", int(time.time()), "	total_robots:", base.total_robots, "	total_monitor", base.total_monitor)
 				# base.save_metrics(base.run_name, "Scenario", base.run_finish, "End_Time", base.run_finish, base.srvdisphost)
 				base.save_metrics("Time", "Scenario", base.run_finish, "Upload_Finished", base.run_finish, base.srvdisphost)
 
@@ -4018,6 +4755,8 @@ class RFSwarmGUItk(tk.Frame):
 
 	# GUI = None
 	tabs = None
+	# tabids: Any = {}
+	tabids: dict[str, int] = {}
 
 	pln_graph_update = False
 	pln_graph = None
@@ -4045,6 +4784,17 @@ class RFSwarmGUItk(tk.Frame):
 	plancoltst = 7
 	plancolset = 8
 	plancoladd = 99
+
+	mtrngcolidx = 0
+	mtrngcolusr = 1
+	mtrngcoldly = 2
+	mtrngcolrmp = 3
+	mtrngcolrun = 4
+	mtrngcolnme = 5
+	mtrngcolscr = 6
+	mtrngcoltst = 7
+	mtrngcolset = 8
+	mtrngcoladd = 99
 
 	display_agents: Any = {}
 	display_run: Any = {}
@@ -4106,8 +4856,10 @@ class RFSwarmGUItk(tk.Frame):
 		base.debugmsg(6, "BuildUI")
 		self.BuildUI()
 
-		dr = threading.Thread(target=self.dispaly_donation_reminder)
-		dr.start()
+		# dr = threading.Thread(target=self.dispaly_donation_reminder)
+		# dr.start()
+		# fix for: RuntimeError: main thread is not in main loop
+		self.dispaly_donation_reminder()
 
 		try:
 			base.debugmsg(6, "pln_update_graph")
@@ -4154,6 +4906,15 @@ class RFSwarmGUItk(tk.Frame):
 		# mnu_file_Close clears this value, need to set it back so that it is saved
 		# 		in the ini file so the next app open loads the file
 		base.config['Plan']['ScenarioFile'] = base.inisafevalue(sf)
+
+		for id in base.graph_refresher.keys():
+			try:
+				if base.graph_refresher[id].is_alive():
+					base.debugmsg(9, "Join Update Graph Thread")
+					base.graph_refresher[id].join(timeout=30)
+					base.debugmsg(9, "Join Update Graph Thread after")
+			except Exception:
+				pass
 
 		base.debugmsg(3, "Close GUI")
 		try:
@@ -4279,8 +5040,10 @@ class RFSwarmGUItk(tk.Frame):
 
 	def BuildUI(self):
 		p = None
+		m = None
 		r = None
 		a = None
+		tabcount = 0
 
 		self.columnconfigure(0, weight=1)
 		self.rowconfigure(0, weight=1)
@@ -4301,24 +5064,41 @@ class RFSwarmGUItk(tk.Frame):
 		p.grid(row=0, column=0, sticky="nsew")
 		# p.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
 		self.tabs.add(p, text='Plan')
+		self.tabids['Plan'] = tabcount
+		tabcount += 1
+
+		base.debugmsg(6, "m")
+		m = ttk.Frame(self.tabs)   # first page, which would get widgets gridded into it
+		m.grid(row=0, column=0, sticky="nsew")
+		# p.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
+		self.tabs.add(m, text='Monitoring')
+		self.tabids['Monitoring'] = tabcount
+		tabcount += 1
 
 		base.debugmsg(6, "r")
 		r = ttk.Frame(self.tabs)   # second page
 		r.grid(row=0, column=0, sticky="nsew")
 		self.tabs.add(r, text='Run')
+		self.tabids['Run'] = tabcount
+		tabcount += 1
 
 		base.debugmsg(6, "a")
 		a = ttk.Frame(self.tabs)   # 3rd page
 		a.grid(row=0, column=0, sticky="nsew")
 		self.tabs.add(a, text='Agents')
+		self.tabids['Agents'] = tabcount
+		tabcount += 1
 
 		base.debugmsg(6, "ab")
 		ab = ttk.Frame(self.tabs)   # About page
 		ab.grid(row=0, column=0, sticky="nsew")
 		self.tabs.add(ab, text='About')
+		self.tabids['About'] = tabcount
+		tabcount += 1
 
 		self.tabs.grid(column=0, row=0, sticky="nsew")
 		# self.tabs.grid(column=0, row=0, padx=0, pady=0, sticky="nsew")
+		base.debugmsg(6, "self.tabids", self.tabids)
 
 		self.ConfigureStyle()
 
@@ -4327,6 +5107,8 @@ class RFSwarmGUItk(tk.Frame):
 
 		base.debugmsg(6, "BuildPlan")
 		self.BuildPlan(p)
+		base.debugmsg(6, "BuildMonitoring")
+		self.BuildMonitoring(m)
 		base.debugmsg(6, "BuildRun")
 		self.BuildRun(r)
 		base.debugmsg(6, "BuildAgent")
@@ -4797,16 +5579,21 @@ class RFSwarmGUItk(tk.Frame):
 		#
 		rowR = 0
 		# grphWindow.fmeRSettings
+
+		grphWindow.fmeRSettings.lblEnabled = ttk.Label(grphWindow.fmeRSettings, text="Enabled")
+		grphWindow.fmeRSettings.lblEnabled.grid(column=2, row=rowR, sticky="nsew")
+
+		rowR += 1
 		grphWindow.fmeRSettings.lblRT = ttk.Label(grphWindow.fmeRSettings, text="Result Type:")
 		grphWindow.fmeRSettings.lblRT.grid(column=0, row=rowR, sticky="nsew")
 
-		grphWindow.fmeRSettings.RTypes = [None, "Response Time", "TPS", "Total TPS"]
+		grphWindow.fmeRSettings.RType = "Response Time"
+		if 'result_type' in settings and len(settings['result_type']) > 1:
+			grphWindow.fmeRSettings.RType = settings['result_type']
+		grphWindow.fmeRSettings.RTypes = [grphWindow.fmeRSettings.RType, "Response Time", "TPS", "Total TPS"]
 		grphWindow.settings["RType"] = tk.StringVar()
 		grphWindow.fmeRSettings.omRT = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["RType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.RTypes)
-		if 'result_type' in settings and len(settings['result_type']) > 1:
-			grphWindow.settings["RType"].set(settings['result_type'])
-		else:
-			grphWindow.settings["RType"].set(grphWindow.fmeRSettings.RTypes[1])
+		grphWindow.settings["RType"].set(grphWindow.fmeRSettings.RType)
 		grphWindow.fmeRSettings.omRT.grid(column=1, row=rowR, sticky="nsew")
 
 		rowR += 1
@@ -4822,6 +5609,27 @@ class RFSwarmGUItk(tk.Frame):
 		else:
 			grphWindow.settings["FRType"].set(grphWindow.fmeRSettings.FRTypes[2])
 		grphWindow.fmeRSettings.omFR.grid(column=1, row=rowR, sticky="nsew")
+
+		rowR += 1
+		grphWindow.fmeRSettings.lblFA = ttk.Label(grphWindow.fmeRSettings, text="Filter Agent:")
+		grphWindow.fmeRSettings.lblFA.grid(column=0, row=rowR, sticky="nsew")
+
+		grphWindow.fmeRSettings.FATypes = [None, "", "Loading..."]
+		grphWindow.settings["RFAType"] = tk.StringVar()
+		grphWindow.fmeRSettings.omFA = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["RFAType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.FATypes)
+		grphWindow.fmeRSettings.omFA.grid(column=1, row=rowR, sticky="nsew")
+		if 'filter_agent' in settings and len(settings['filter_agent']) > 1:
+			if settings['filter_agent'] not in grphWindow.fmeRSettings.FATypes:
+				grphWindow.fmeRSettings.FATypes.append(settings['filter_agent'])
+			grphWindow.settings["RFAType"].set(settings['filter_agent'])
+
+		grphWindow.settings["RintFA"] = tk.IntVar()
+		grphWindow.fmeRSettings.chkFA = ttk.Checkbutton(grphWindow.fmeRSettings, variable=grphWindow.settings["RintFA"], command=lambda *args: self.gs_refresh(grphWindow))
+		grphWindow.fmeRSettings.chkFA.grid(column=2, row=rowR, sticky="nsew")
+		if 'en_filter_agent' in settings and int(settings['en_filter_agent']) > -1:
+			grphWindow.settings["RintFA"].set(int(settings['en_filter_agent']))
+		else:
+			grphWindow.settings["RintFA"].set(0)
 
 		rowR += 1
 		# result_name filtered by GLOB (Unix file globbing syntax for its wildcards)
@@ -4840,28 +5648,63 @@ class RFSwarmGUItk(tk.Frame):
 		#
 		# grphWindow.fmeRSettings.FNTypes = [None, "None", "Wildcard (Unix Glob)", "Regex", "Not Wildcard (Unix Glob)", "Not Regex"]
 		grphWindow.fmeRSettings.FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
-		grphWindow.settings["FNType"] = tk.StringVar()
-		grphWindow.fmeRSettings.omFR = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["FNType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.FNTypes)
+		grphWindow.settings["RFNType"] = tk.StringVar()
+		grphWindow.fmeRSettings.omFR = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["RFNType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.FNTypes)
 		if 'filter_name' in settings and len(settings['filter_name']) > 1:
-			grphWindow.settings["FNType"].set(settings['filter_name'])
+			grphWindow.settings["RFNType"].set(settings['filter_name'])
 		else:
-			grphWindow.settings["FNType"].set(grphWindow.fmeRSettings.FNTypes[1])
+			grphWindow.settings["RFNType"].set(grphWindow.fmeRSettings.FNTypes[1])
 		grphWindow.fmeRSettings.omFR.grid(column=1, row=rowR, sticky="nsew")
 
 		rowR += 1
 		grphWindow.fmeRSettings.lblFP = ttk.Label(grphWindow.fmeRSettings, text="Filter Pattern:")
 		grphWindow.fmeRSettings.lblFP.grid(column=0, row=rowR, sticky="nsew")
 
-		grphWindow.settings["FPattern"] = tk.StringVar()
-		grphWindow.fmeRSettings.inpFP = ttk.Entry(grphWindow.fmeRSettings, textvariable=grphWindow.settings["FPattern"])
+		grphWindow.settings["RFPattern"] = tk.StringVar()
+		grphWindow.fmeRSettings.inpFP = ttk.Entry(grphWindow.fmeRSettings, textvariable=grphWindow.settings["RFPattern"])
 		if 'filter_pattern' in settings and len(settings['filter_pattern']) > 1:
-			grphWindow.settings["FPattern"].set(settings['filter_pattern'])
+			grphWindow.settings["RFPattern"].set(settings['filter_pattern'])
 		grphWindow.fmeRSettings.inpFP.grid(column=1, row=rowR, sticky="nsew")
+
+		rowR += 1
+		grphWindow.fmeRSettings.lblGG = ttk.Label(grphWindow.fmeRSettings, text="Apply Granularity:")
+		grphWindow.fmeRSettings.lblGG.grid(column=0, row=rowR, sticky="nsew")
+
+		grphWindow.fmeRSettings.lblGS = ttk.Label(grphWindow.fmeRSettings, text="Seconds")
+		grphWindow.fmeRSettings.lblGS.grid(column=1, row=rowR, sticky="nsew")
+
+		# if grphWindow.fmeRSettings.RType is not None and "TPS" not in grphWindow.fmeRSettings.RType:
+		grphWindow.fmeRSettings.lblGW = ttk.Label(grphWindow.fmeRSettings, text="Show")
+		grphWindow.fmeRSettings.lblGW.grid(column=2, row=rowR, sticky="nsew")
+
+		rowR += 1
+		grphWindow.settings["RGSeconds"] = tk.StringVar()
+		grphWindow.fmeRSettings.inpGS = ttk.Entry(grphWindow.fmeRSettings, textvariable=grphWindow.settings["RGSeconds"])
+		grphWindow.fmeRSettings.inpGS.grid(column=1, row=rowR, sticky="nsew")
+		grphWindow.fmeRSettings.inpGS.bind('<FocusOut>', lambda *args: self.gs_refresh(grphWindow))
+		if 'granularity_seconds' in settings and len(settings['granularity_seconds']) > 1:
+			grphWindow.settings["RGSeconds"].set(settings['granularity_seconds'])
+		else:
+			grphWindow.settings["RGSeconds"].set(0)
+
+		grphWindow.fmeRSettings.GWTypes = ["Average", "Average", "Maximum", "Minimum"]
+		grphWindow.settings["RGWType"] = tk.StringVar()
+		# if grphWindow.fmeRSettings.RType is not None and "TPS" not in grphWindow.fmeRSettings.RType:
+		grphWindow.fmeRSettings.omGW = ttk.OptionMenu(grphWindow.fmeRSettings, grphWindow.settings["RGWType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeRSettings.GWTypes)
+		grphWindow.fmeRSettings.omGW.grid(column=2, row=rowR, sticky="nsew")
+		if 'granularity_type' in settings and len(settings['granularity_type']) > 1:
+			grphWindow.settings["RGWType"].set(settings['granularity_type'])
+		else:
+			grphWindow.settings["RGWType"].set(grphWindow.fmeRSettings.GWTypes[1])
 
 		#
 		# 	DT Metric Settings
 		#
 		rowM = 0
+		grphWindow.fmeMSettings.lblEnabled = ttk.Label(grphWindow.fmeMSettings, text="Enabled")
+		grphWindow.fmeMSettings.lblEnabled.grid(column=2, row=rowM, sticky="nsew")
+
+		rowM += 1
 		grphWindow.fmeMSettings.lblMT = ttk.Label(grphWindow.fmeMSettings, text="Metric Type:")
 		grphWindow.fmeMSettings.lblMT.grid(column=0, row=rowM, sticky="nsew")
 
@@ -4902,6 +5745,81 @@ class RFSwarmGUItk(tk.Frame):
 				grphWindow.fmeMSettings.SMetrics.append(settings['secondary_metric'])
 			grphWindow.settings["SMetric"].set(settings['secondary_metric'])
 		grphWindow.fmeMSettings.omSM.grid(column=1, row=rowM, sticky="nsew")
+
+		rowM += 1
+		grphWindow.fmeMSettings.lblFA = ttk.Label(grphWindow.fmeMSettings, text="Filter Agent:")
+		grphWindow.fmeMSettings.lblFA.grid(column=0, row=rowM, sticky="nsew")
+
+		grphWindow.fmeMSettings.FATypes = [None, "", "Loading..."]
+		grphWindow.settings["MFAType"] = tk.StringVar()
+		grphWindow.fmeMSettings.omFA = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MFAType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.FATypes)
+		grphWindow.fmeMSettings.omFA.grid(column=1, row=rowM, sticky="nsew")
+		if 'filter_agent' in settings and len(settings['filter_agent']) > 1:
+			if settings['filter_agent'] not in grphWindow.fmeMSettings.FATypes:
+				grphWindow.fmeMSettings.FATypes.append(settings['filter_agent'])
+			grphWindow.settings["MFAType"].set(settings['filter_agent'])
+
+		grphWindow.settings["MintFA"] = tk.IntVar()
+		grphWindow.fmeMSettings.chkFA = ttk.Checkbutton(grphWindow.fmeMSettings, variable=grphWindow.settings["MintFA"], command=lambda *args: self.gs_refresh(grphWindow))
+		grphWindow.fmeMSettings.chkFA.grid(column=2, row=rowM, sticky="nsew")
+		if 'en_filter_agent' in settings and int(settings['en_filter_agent']) > -1:
+			grphWindow.settings["MintFA"].set(int(settings['en_filter_agent']))
+		else:
+			grphWindow.settings["MintFA"].set(0)
+
+		rowM += 1
+		grphWindow.fmeMSettings.lblFN = ttk.Label(grphWindow.fmeMSettings, text="Filter Type:")
+		grphWindow.fmeMSettings.lblFN.grid(column=0, row=rowM, sticky="nsew")
+
+		grphWindow.fmeMSettings.FNTypes = [None, "None", "Wildcard (Unix Glob)", "Not Wildcard (Unix Glob)"]
+		grphWindow.settings["MFNType"] = tk.StringVar()
+		grphWindow.fmeMSettings.omFR = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MFNType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.FNTypes)
+		grphWindow.fmeMSettings.omFR.grid(column=1, row=rowM, sticky="nsew")
+		if 'filter_name' in settings and len(settings['filter_name']) > 1:
+			grphWindow.settings["MFNType"].set(settings['filter_name'])
+		else:
+			grphWindow.settings["MFNType"].set(grphWindow.fmeMSettings.FNTypes[1])
+
+		rowM += 1
+		grphWindow.fmeMSettings.lblFP = ttk.Label(grphWindow.fmeMSettings, text="Filter Pattern:")
+		grphWindow.fmeMSettings.lblFP.grid(column=0, row=rowM, sticky="nsew")
+
+		grphWindow.settings["MFPattern"] = tk.StringVar()
+		grphWindow.fmeMSettings.inpFP = ttk.Entry(grphWindow.fmeMSettings, textvariable=grphWindow.settings["MFPattern"])
+		grphWindow.fmeMSettings.inpFP.grid(column=1, row=rowM, sticky="nsew")
+		# <Leave> makes UI to jumpy
+		grphWindow.fmeMSettings.inpFP.bind('<FocusOut>', lambda *args: self.gs_refresh(grphWindow))
+		if 'filter_pattern' in settings and len(settings['filter_pattern']) > 1:
+			grphWindow.settings["MFPattern"].set(settings['filter_pattern'])
+
+		rowM += 1
+		grphWindow.fmeMSettings.lblGG = ttk.Label(grphWindow.fmeMSettings, text="Apply Granularity:")
+		grphWindow.fmeMSettings.lblGG.grid(column=0, row=rowM, sticky="nsew")
+
+		grphWindow.fmeMSettings.lblGS = ttk.Label(grphWindow.fmeMSettings, text="Seconds")
+		grphWindow.fmeMSettings.lblGS.grid(column=1, row=rowM, sticky="nsew")
+
+		grphWindow.fmeMSettings.lblGW = ttk.Label(grphWindow.fmeMSettings, text="Show")
+		grphWindow.fmeMSettings.lblGW.grid(column=2, row=rowM, sticky="nsew")
+
+		rowM += 1
+		grphWindow.settings["MGSeconds"] = tk.StringVar()
+		grphWindow.fmeMSettings.inpGS = ttk.Entry(grphWindow.fmeMSettings, textvariable=grphWindow.settings["MGSeconds"])
+		grphWindow.fmeMSettings.inpGS.grid(column=1, row=rowM, sticky="nsew")
+		grphWindow.fmeMSettings.inpGS.bind('<FocusOut>', lambda *args: self.gs_refresh(grphWindow))
+		if 'granularity_seconds' in settings and len(settings['granularity_seconds']) > 1:
+			grphWindow.settings["MGSeconds"].set(settings['granularity_seconds'])
+		else:
+			grphWindow.settings["MGSeconds"].set(0)
+
+		grphWindow.fmeMSettings.GWTypes = ["Average", "Average", "Maximum", "Minimum"]
+		grphWindow.settings["MGWType"] = tk.StringVar()
+		grphWindow.fmeMSettings.omGW = ttk.OptionMenu(grphWindow.fmeMSettings, grphWindow.settings["MGWType"], command=lambda *args: self.gs_refresh(grphWindow), *grphWindow.fmeMSettings.GWTypes)
+		grphWindow.fmeMSettings.omGW.grid(column=2, row=rowM, sticky="nsew")
+		if 'granularity_type' in settings and len(settings['granularity_type']) > 1:
+			grphWindow.settings["MGWType"].set(settings['granularity_type'])
+		else:
+			grphWindow.settings["MGWType"].set(grphWindow.fmeMSettings.GWTypes[1])
 
 		# set default size to 600 x 450
 		ww = grphWindow.winfo_width()
@@ -4947,7 +5865,7 @@ class RFSwarmGUItk(tk.Frame):
 
 		#
 		# # start thread to update the graph (gph_updater)
-		t1 = threading.Thread(target=lambda: self.gph_updater(grphWindow))
+		t1 = threading.Thread(target=lambda: self.gph_updater(grphWindow), name='graph_updater')
 		t1.start()
 
 		base.debugmsg(5, "t1:", t1)
@@ -5114,22 +6032,26 @@ class RFSwarmGUItk(tk.Frame):
 
 	def gph_updater(self, grphWindow):
 		try:
-			while True and base.keeprunning:
+			while base.keeprunning:
 				base.debugmsg(6, "graphname:", grphWindow.graphname.get())
 				# self.gph_refresh(grphWindow)
-				tgr = threading.Thread(target=lambda: self.gph_refresh(grphWindow))
-				tgr.start()
-				time.sleep(5)
+				base.graph_refresher[grphWindow.graphid] = threading.Thread(target=lambda: self.gph_refresh(grphWindow))
+				base.graph_refresher[grphWindow.graphid].start()
+				if base.keeprunning:
+					time.sleep(5)
 		except Exception:
 			pass
 
 	def gph_floatval(self, value):
+		if value is None:
+			return 0
 		try:
 			return float(value)
 		except Exception:
 			return value
 
 	def gph_settings(self, grphWindow):
+		base.debugmsg(8, "grphWindow:", grphWindow)
 		settings = {}
 		settings["id"] = grphWindow.graphid
 		settings["open"] = True
@@ -5152,138 +6074,300 @@ class RFSwarmGUItk(tk.Frame):
 			settings["metric_type"] = grphWindow.settings["MType"].get()
 			settings["primary_metric"] = grphWindow.settings["PMetric"].get()
 			settings["secondary_metric"] = grphWindow.settings["SMetric"].get()
+
+			settings["filter_agent"] = grphWindow.settings["MFAType"].get()
+			settings["en_filter_agent"] = grphWindow.settings["MintFA"].get()
+
+			settings["filter_name"] = grphWindow.settings["MFNType"].get()
+			settings["filter_pattern"] = grphWindow.settings["MFPattern"].get()
+
+			settings["granularity_seconds"] = grphWindow.settings["MGSeconds"].get()
+			settings["granularity_type"] = grphWindow.settings["MGWType"].get()
+
 		if settings["data_type"] == "Result":
+			base.debugmsg(9, "settings[data_type]:", settings["data_type"])
 			settings["result_type"] = grphWindow.settings["RType"].get()
+			# There's no sane way to reload/refresh the graph settings pane for now
+			# leave this commented out and leave the show option always visible
+			# and we can fix this with the UI re-write in version 2.0.0
+			# if settings["result_type"] != grphWindow.fmeRSettings.RType:
+			# 	pass
 			settings["flter_result"] = grphWindow.settings["FRType"].get()
-			settings["filter_name"] = grphWindow.settings["FNType"].get()
-			settings["filter_pattern"] = grphWindow.settings["FPattern"].get()
+
+			settings["filter_agent"] = grphWindow.settings["RFAType"].get()
+			settings["en_filter_agent"] = grphWindow.settings["RintFA"].get()
+
+			settings["filter_name"] = grphWindow.settings["RFNType"].get()
+			settings["filter_pattern"] = grphWindow.settings["RFPattern"].get()
+			base.debugmsg(9, "FPattern:", grphWindow.settings["RFPattern"].get())
+
+			settings["granularity_seconds"] = grphWindow.settings["RGSeconds"].get()
+			base.debugmsg(9, "GSeconds:", grphWindow.settings["RGSeconds"].get())
+			settings["granularity_type"] = grphWindow.settings["RGWType"].get()
+			base.debugmsg(9, "GWType:", grphWindow.settings["RGWType"].get())
+
 		return settings
 
 	def gph_refresh(self, grphWindow):
-		if grphWindow.saveready:
+		if grphWindow.saveready and base.keeprunning:
 			base.debugmsg(6, "graphname:", grphWindow.graphname.get())
 			DataType = grphWindow.settings["DataType"].get()
 			base.debugmsg(7, "DataType:", DataType)
 			if DataType == "Metric":
 				MType = grphWindow.settings["MType"].get()
 				base.debugmsg(7, "MType:", MType)
-				PMetric = grphWindow.settings["PMetric"].get()
-				base.debugmsg(7, "PMetric:", PMetric)
-				SMetric = grphWindow.settings["SMetric"].get()
-				base.debugmsg(7, "SMetric:", SMetric)
+				PM = grphWindow.settings["PMetric"].get()
+				base.debugmsg(7, "PMetric:", PM)
+				SM = grphWindow.settings["SMetric"].get()
+				base.debugmsg(7, "SMetric:", SM)
 
-				hasfilter = False
-				if MType is not None and len(MType) > 0:
-					MTLst = [MType]
-					hasfilter = True
+				EnFA = grphWindow.settings["MintFA"].get()
+				base.debugmsg(7, "EnFA:", EnFA)
+				FAType = grphWindow.settings["MFAType"].get()
+				base.debugmsg(7, "FAType:", FAType)
+
+				FNType = grphWindow.settings["MFNType"].get()
+				base.debugmsg(7, "FNType:", FNType)
+
+				inpFP = grphWindow.settings["MFPattern"].get()
+				base.debugmsg(7, "inpFP:", inpFP)
+
+				GSeconds = int(grphWindow.settings["MGSeconds"].get())
+				base.debugmsg(7, "inpFP:", inpFP)
+				fltGW = grphWindow.settings["MGWType"].get()
+				base.debugmsg(7, "inpFP:", inpFP)
+
+				colname = "Name"
+
+				base.debugmsg(6, "MType:", MType, "	PM:", PM, "	SM:", SM)
+
+				mnamecolumns = []
+				# mcolumns = ["MetricTime as 'Time'", "MetricValue as 'Value'", "PrimaryMetric as 'Name'", "MetricType as 'Name'", "SecondaryMetric as 'Name'"]
+				if GSeconds > 0:
+					mcolumns = ["max(MetricTime) as 'Time'"]
+					if fltGW.lower() == "maximum":
+						mcolumns.append("max(MetricValue) as 'Value'")
+					elif fltGW.lower() == "minimum":
+						mcolumns.append("min(MetricValue) as 'Value'")
+					elif fltGW.lower() == "average":
+						mcolumns.append("avg(MetricValue) as 'Value'")
+					else:
+						mcolumns.append("avg(MetricValue) as 'Value'")
+
 				else:
-					MTLst = list(base.MetricIDs.keys())
-					if "MetricCount" in MTLst:
-						MTLst.remove("MetricCount")
-				base.debugmsg(6, "MTLst:", MTLst)
+					mcolumns = ["MetricTime as 'Time'", "MetricValue as 'Value'"]
+				wherelst = []
+				# grouplst = ["PrimaryMetric", "MetricType", "SecondaryMetric"]
+				grouplst = []
 
-				if PMetric is not None and len(PMetric) > 0:
-					PMLst = [PMetric]
-					hasfilter = True
+				if GSeconds > 0:
+					# [Name], floor(end_time/{GSeconds})
+					grouplst.append(f"[{colname}]")
+					grouplst.append(f"floor(MetricTime/{GSeconds})")
+
+				if PM not in [None, "", "None"] and len(PM) > 0:
+					# if "PrimaryMetric as 'Name'" in mcolumns:
+					# 	mcolumns.remove("PrimaryMetric as 'Name'")
+					wherelst.append("PrimaryMetric == '{}'".format(PM.replace("'", "''")))
+					if "PrimaryMetric" in grouplst:
+						grouplst.remove("PrimaryMetric")
 				else:
-					PMLst = []
-					for mt in MTLst:
-						if mt in base.MetricIDs:
-							for pm in base.MetricIDs[mt].keys():
-								PMLst.append(pm)
-				base.debugmsg(6, "PMLst:", PMLst)
-
-				if SMetric is not None and len(SMetric) > 0:
-					SMLst = [SMetric]
-					hasfilter = True
+					mnamecolumns.append("PrimaryMetric")
+				if MType not in [None, "", "None"] and len(MType) > 0:
+					# if "MetricType as 'Name'" in mcolumns:
+					# 	mcolumns.remove("MetricType as 'Name'")
+					wherelst.append("MetricType == '{}'".format(MType.replace("'", "''")))
+					if "MetricType" in grouplst:
+						grouplst.remove("MetricType")
 				else:
-					SMLst = []
-					for mt in MTLst:
-						if mt in base.MetricIDs:
-							for pm in PMLst:
-								if pm in base.MetricIDs[mt]:
-									for sm in base.MetricIDs[mt][pm].keys():
-										if sm != "ID":
-											SMLst.append(sm)
-				base.debugmsg(6, "SMLst:", SMLst)
+					mnamecolumns.append("MetricType")
+				if SM not in [None, "", "None"] and len(SM) > 0:
+					# if "SecondaryMetric as 'Name'" in mcolumns:
+					# 	mcolumns.remove("SecondaryMetric as 'Name'")
+					wherelst.append("SecondaryMetric == '{}'".format(SM.replace("'", "''")))
+					if "SecondaryMetric" in grouplst:
+						grouplst.remove("SecondaryMetric")
+				else:
+					mnamecolumns.append("SecondaryMetric")
 
-				GDNames = []
-				if hasfilter:
+				if EnFA:
+					if FAType in [None, "", "None"]:
+						mnamecolumns.append("DataSource")
+					else:
+						wherelst.append("DataSource == '{}'".format(FAType))
+
+				if len(mnamecolumns) < 1:
+					mnamecolumns.append("'" + SM + "'")
+
+				# Construct Name Column
+				mnamecolumn = " || ' - ' || ".join(mnamecolumns)
+				mnamecolumn += " as [" + colname + "] "
+				mcolumns.append(mnamecolumn)
+
+				if FNType not in [None, "", "None"] and len(inpFP) > 0:
+					# construct pattern
+					# "Wildcard (Unix Glob)",
+					if FNType == "Wildcard (Unix Glob)":
+						# AND PrimaryMetric GLOB '*_1*' OR SecondaryMetric GLOB '*_1*' OR DataSource GLOB '*_1*' OR MetricValue GLOB '*_1*'
+						base.debugmsg(5, "mnamecolumns:", mnamecolumns)
+						fpwhere = "("
+						for dispcol in mnamecolumns:
+							if len(fpwhere) > 1:
+								fpwhere += "OR "
+							fpwhere += "{} GLOB '{}'".format(dispcol, inpFP)
+						fpwhere += ")"
+						wherelst.append(fpwhere)
+					# "Regex",
+					if FNType == "Regex":
+						fpwhere = "("
+						for dispcol in mnamecolumns:
+							if len(fpwhere) > 1:
+								fpwhere += "OR "
+							fpwhere += "{} REGEXP '{}'".format(dispcol, inpFP)
+						fpwhere += ")"
+						wherelst.append(fpwhere)
+					# "Not Wildcard (Unix Glob)",
+					if FNType == "Not Wildcard (Unix Glob)":
+						fpwhere = "("
+						for dispcol in mnamecolumns:
+							if len(fpwhere) > 1:
+								fpwhere += "AND "
+							fpwhere += "{} NOT GLOB '{}'".format(dispcol, inpFP)
+						fpwhere += ")"
+						wherelst.append(fpwhere)
+					# "Not Regex"
+					if FNType == "Not Regex":
+						fpwhere = "("
+						for dispcol in mnamecolumns:
+							if len(fpwhere) > 1:
+								fpwhere += "AND "
+							fpwhere += "{} NOT REGEXP '{}'".format(dispcol, inpFP)
+						fpwhere += ")"
+						wherelst.append(fpwhere)
+
+				# Start Time
+				if base.dbconnecttime > 0:
+					wherelst.append("MetricTime >= {}".format(base.dbconnecttime))
+				#
+				# # End Time
+				# if endtime > 0:
+				# 	wherelst.append("MetricTime <= {}".format(endtime))
+
+				# if isnum<1:
+				# 	mcolumns.append("MetricValue")
+				# 	if sc>0:
+				# 		mcolumns.append("count(MetricTime) as 'Count'")
+				# 		if "MetricValue" in grouplst:
+				# 			grouplst.remove("MetricValue")
+				# else:
+				# 	mcolumns.append("min(CAST(MetricValue AS NUMERIC)) AS 'Minimum'")
+				# 	mcolumns.append("round(avg(CAST(MetricValue AS NUMERIC)),3) AS 'Average'")
+				# 	mcolumns.append("round(percentile(CAST(MetricValue AS NUMERIC), {}),3) AS '{}%ile'".format(display_percentile, display_percentile))
+				# 	mcolumns.append("max(CAST(MetricValue AS NUMERIC)) AS 'Maximum'")
+				# 	mcolumns.append("round(stdev(CAST(MetricValue AS NUMERIC)),3) AS 'StdDev'")
+
+				sql = "SELECT "
+
+				i = 0
+				for col in mcolumns:
+					if i < 1:
+						sql += "{} ".format(col)
+					else:
+						sql += ", {} ".format(col)
+					i += 1
+
+				sql += "FROM MetricData "
+
+				i = 0
+				for iwhere in wherelst:
+					if i == 0:
+						sql += "WHERE {} ".format(iwhere)
+					else:
+						sql += "AND {} ".format(iwhere)
+					i += 1
+
+				if len(grouplst) > 0:
+					sql += "GROUP by "
+					i = 0
+					for col in grouplst:
+						if i < 1:
+							sql += "{} ".format(col)
+						else:
+							sql += ", {} ".format(col)
+						i += 1
+
+				sql += "ORDER BY MetricTime "
+
+				base.debugmsg(5, "sql:", sql)
+
+				# name = "|".join(mnamecolumns)
+				name = grphWindow.graphname.get()
+				base.dbqueue["Read"].append({"SQL": sql, "KEY": "GraphData_{}".format(name)})
+
+				dodraw = False
+
+				gdname = "GraphData_{}".format(name)
+				if gdname in base.dbqueue["ReadResult"]:
+					base.debugmsg(6, gdname, ":", base.dbqueue["ReadResult"][gdname])
+					grphWindow.graphdata = {}
 					try:
 						grphWindow.axis.cla()
 					except Exception:
 						pass
-					for mt in MTLst:
-						for pm in PMLst:
-							if pm in base.MetricIDs[mt]:
-								for sm in SMLst:
-									if sm in base.MetricIDs[mt][pm]:
-										name = "{}|{}|{}".format(mt, pm, sm)
 
-										base.debugmsg(6, "name:", name)
-										GDNames.append(name)
+					for r in base.dbqueue["ReadResult"][gdname]:
 
-										sql = "SELECT "
-										sql += "  MetricTime "
-										sql += ", MetricValue "
-										sql += "FROM MetricData "
-										sql += "WHERE MetricType = '{}' ".format(mt.replace("'", "''"))
-										sql += "	AND PrimaryMetric = '{}' ".format(pm.replace("'", "''"))
-										sql += "	AND SecondaryMetric = '{}' ".format(sm.replace("'", "''"))
+						base.debugmsg(6, "r:", r)
+						linename = r['Name']
 
-										base.debugmsg(7, "sql:", sql)
+						if linename not in grphWindow.graphdata:
+							dname = " ".join(list(set(linename.split("|")).symmetric_difference(set([MType, PM, SM])))).strip()
+							base.debugmsg(6, "dname:", dname)
+							colour = base.named_colour(dname)
+							base.debugmsg(6, "name:", linename, "	colour:", colour)
 
-										base.dbqueue["Read"].append({"SQL": sql, "KEY": "GraphData_{}".format(name)})
+							grphWindow.graphdata[linename] = {}
+							grphWindow.graphdata[linename]["Label"] = dname
+							grphWindow.graphdata[linename]["Colour"] = colour
+							grphWindow.graphdata[linename]["objTime"] = []
+							grphWindow.graphdata[linename]["Values"] = []
 
-					dodraw = False
-					for name in GDNames:
+						# grphWindow.graphdata[name]["objTime"] = [datetime.fromtimestamp(r['Time']) for r in base.dbqueue["ReadResult"][gdname]]
+						grphWindow.graphdata[linename]["objTime"].append(datetime.fromtimestamp(r['Time']))
+						# grphWindow.graphdata[name]["Values"] = [self.gph_floatval(r['Value']) for r in base.dbqueue["ReadResult"][gdname]]
+						grphWindow.graphdata[linename]["Values"].append(self.gph_floatval(r['Value']))
+						base.debugmsg(9, gdname, "Values:", grphWindow.graphdata[linename]["Values"])
+						#
+					for linename in grphWindow.graphdata.keys():
+						base.debugmsg(6, gdname, ":", grphWindow.graphdata[linename])
+						if len(grphWindow.graphdata[linename]["Values"]) > 1 and len(grphWindow.graphdata[linename]["Values"]) == len(grphWindow.graphdata[linename]["objTime"]):
+							grphWindow.axis.plot(grphWindow.graphdata[linename]["objTime"], grphWindow.graphdata[linename]["Values"], color=grphWindow.graphdata[linename]["Colour"], label=grphWindow.graphdata[linename]["Label"])
+							dodraw = True
+						if len(grphWindow.graphdata[linename]["Values"]) == 1 and len(grphWindow.graphdata[linename]["Values"]) == len(grphWindow.graphdata[linename]["objTime"]):
+							grphWindow.axis.plot(grphWindow.graphdata[linename]["objTime"], grphWindow.graphdata[linename]["Values"], color=grphWindow.graphdata[linename]["Colour"], label=grphWindow.graphdata[linename]["Label"], marker='o')
+							dodraw = True
 
-						dname = " ".join(list(set(name.split("|")).symmetric_difference(set([MType, PMetric, SMetric])))).strip()
-						base.debugmsg(6, "dname:", dname)
-						if name not in grphWindow.graphdata:
-							grphWindow.graphdata[name] = {}
-						colour = base.named_colour(dname)
-						base.debugmsg(6, "name:", name, "	colour:", colour)
-						grphWindow.graphdata[name]["Colour"] = colour
-						grphWindow.graphdata[name]["objTime"] = []
-						grphWindow.graphdata[name]["Values"] = []
-						gdname = "GraphData_{}".format(name)
-						if gdname in base.dbqueue["ReadResult"]:
-							base.debugmsg(6, gdname, ":", base.dbqueue["ReadResult"][gdname])
+				if dodraw:
 
-							grphWindow.graphdata[name]["objTime"] = [datetime.fromtimestamp(r['MetricTime']) for r in base.dbqueue["ReadResult"][gdname]]
-							grphWindow.graphdata[name]["Values"] = [self.gph_floatval(r['MetricValue']) for r in base.dbqueue["ReadResult"][gdname]]
-							base.debugmsg(9, gdname, "Values:", grphWindow.graphdata[name]["Values"])
+					grphWindow.axis.grid(True, 'major', 'both')
+					base.debugmsg(6, "SMetric:", SM)
+					if SM in ["Load", "CPU", "MEM", "NET"]:
+						grphWindow.axis.set_ylim(0, 100)
+					else:
+						grphWindow.axis.set_ylim(0)
 
-							base.debugmsg(6, gdname, ":", grphWindow.graphdata[name])
-							if len(grphWindow.graphdata[name]["Values"]) > 1 and len(grphWindow.graphdata[name]["Values"]) == len(grphWindow.graphdata[name]["objTime"]):
-								grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], colour, label=dname)
-								dodraw = True
-							if len(grphWindow.graphdata[name]["Values"]) == 1 and len(grphWindow.graphdata[name]["Values"]) == len(grphWindow.graphdata[name]["objTime"]):
-								grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], colour, label=dname, marker='o')
-								dodraw = True
+					base.debugmsg(9, "showlegend:", grphWindow.showlegend.get())
+					if grphWindow.showlegend.get():
+						# grphWindow.axis.legend()
+						# grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),&nbsp; shadow=True, ncol=2)
+						grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
 
-					if dodraw:
-
-						grphWindow.axis.grid(True, 'major', 'both')
-						base.debugmsg(6, "SMetric:", SMetric)
-						if SMetric in ["Load", "CPU", "MEM", "NET"]:
-							grphWindow.axis.set_ylim(0, 100)
-						else:
-							grphWindow.axis.set_ylim(0)
-
-						base.debugmsg(9, "showlegend:", grphWindow.showlegend.get())
-						if grphWindow.showlegend.get():
-							# grphWindow.axis.legend()
-							# grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),&nbsp; shadow=True, ncol=2)
-							grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
-
-						grphWindow.fig.set_tight_layout(True)
-						grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
-						try:
-							grphWindow.canvas.draw()
-						except Exception as e:
-							base.debugmsg(5, "canvas.draw() Exception:", e)
+					grphWindow.fig.set_tight_layout(True)
+					grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
+					try:
+						grphWindow.canvas.draw()
+					except Exception as e:
+						base.debugmsg(5, "canvas.draw() Exception:", e)
 
 			if DataType == "Result":
 				RType = grphWindow.settings["RType"].get()
@@ -5292,10 +6376,10 @@ class RFSwarmGUItk(tk.Frame):
 				FRType = grphWindow.settings["FRType"].get()
 				base.debugmsg(7, "FRType:", FRType)
 
-				FNType = grphWindow.settings["FNType"].get()
+				FNType = grphWindow.settings["RFNType"].get()
 				base.debugmsg(7, "FNType:", FNType)
 
-				inpFP = grphWindow.settings["FPattern"].get()
+				inpFP = grphWindow.settings["RFPattern"].get()
 				base.debugmsg(7, "inpFP:", inpFP)
 
 				sql = "SELECT "
@@ -5404,11 +6488,11 @@ class RFSwarmGUItk(tk.Frame):
 
 					for name in grphWindow.graphdata:
 						if len(grphWindow.graphdata[name]["Values"]) > 1 and len(grphWindow.graphdata[name]["Values"]) == len(grphWindow.graphdata[name]["objTime"]):
-							grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], grphWindow.graphdata[name]["Colour"], label=name)
+							grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], color=grphWindow.graphdata[name]["Colour"], label=name)
 							dodraw = True
 
 						if len(grphWindow.graphdata[name]["Values"]) == 1 and len(grphWindow.graphdata[name]["Values"]) == len(grphWindow.graphdata[name]["objTime"]):
-							grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], grphWindow.graphdata[name]["Colour"], label=name, marker='o')
+							grphWindow.axis.plot(grphWindow.graphdata[name]["objTime"], grphWindow.graphdata[name]["Values"], color=grphWindow.graphdata[name]["Colour"], label=name, marker='o')
 							dodraw = True
 
 				if dodraw:
@@ -5435,6 +6519,10 @@ class RFSwarmGUItk(tk.Frame):
 			self.RefreshRecentGraphs()
 
 	def gs_refresh(self, grphWindow):
+
+		base.debugmsg(6, "save")
+		tgr = threading.Thread(target=lambda: self.gph_refresh(grphWindow))
+		tgr.start()
 		base.debugmsg(6, "start")
 		tgn = threading.Thread(target=lambda: self.gs_updatename(grphWindow))
 		tgn.start()
@@ -5448,8 +6536,8 @@ class RFSwarmGUItk(tk.Frame):
 		tsm = threading.Thread(target=lambda: self.gs_updatesecmetrics(grphWindow))
 		tsm.start()
 		base.debugmsg(6, "tsm")
-		tgr = threading.Thread(target=lambda: self.gph_refresh(grphWindow))
-		tgr.start()
+		tal = threading.Thread(target=lambda: self.gs_updateagents(grphWindow))
+		tal.start()
 
 	def gs_dbolnames(self):
 
@@ -5468,7 +6556,7 @@ class RFSwarmGUItk(tk.Frame):
 		while "MetricNames" not in base.dbqueue["ReadResult"]:
 			time.sleep(1)
 
-	def gs_showhide(self, grphWindow):
+	def gs_showhide(self, grphWindow, *args):
 		base.debugmsg(6, "graphname:", grphWindow.graphname.get())
 		grphWindow.title(grphWindow.graphname.get())
 		base.debugmsg(6, "fmeSettings.show:", grphWindow.fmeSettings.show)
@@ -5481,7 +6569,7 @@ class RFSwarmGUItk(tk.Frame):
 			grphWindow.fmeSettings.grid(column=90, row=0, columnspan=10, sticky="nsew")
 			base.debugmsg(6, "fmeSettings.show:", grphWindow.fmeSettings.show)
 
-	def gs_updatename(self, grphWindow):
+	def gs_updatename(self, grphWindow, *args):
 		base.debugmsg(6, "graphname:", grphWindow.graphname.get())
 		grphWindow.title(grphWindow.graphname.get())
 
@@ -5500,7 +6588,7 @@ class RFSwarmGUItk(tk.Frame):
 		if datatype == "Result":
 			grphWindow.fmeRSettings.grid(column=0, row=grphWindow.fmeDTRow, columnspan=2, sticky="nsew")
 
-	def gs_updatemetrictypes(self, grphWindow):
+	def gs_updatemetrictypes(self, grphWindow, *args):
 		base.debugmsg(9, "start")
 		try:
 			base.debugmsg(9, "MetricType:", base.MetricIDs.keys())
@@ -5519,7 +6607,7 @@ class RFSwarmGUItk(tk.Frame):
 		except Exception as e:
 			base.debugmsg(6, "e:", e)
 
-	def gs_updateprimetrics(self, grphWindow):
+	def gs_updateprimetrics(self, grphWindow, *args):
 		MType = grphWindow.settings["MType"].get()
 		base.debugmsg(9, "MType:", MType)
 
@@ -5538,7 +6626,7 @@ class RFSwarmGUItk(tk.Frame):
 		grphWindow.fmeMSettings.omPM.set_menu(*grphWindow.fmeMSettings.PMetrics)
 		base.debugmsg(6, "grphWindow.fmeMSettings.omPM.set_menu():", grphWindow.fmeMSettings.PMetrics)
 
-	def gs_updatesecmetrics(self, grphWindow):
+	def gs_updatesecmetrics(self, grphWindow, *args):
 		MType = grphWindow.settings["MType"].get()
 		base.debugmsg(6, "MType:", MType)
 		PMetric = grphWindow.settings["PMetric"].get()
@@ -5578,6 +6666,31 @@ class RFSwarmGUItk(tk.Frame):
 		grphWindow.fmeMSettings.omSM.set_menu(*grphWindow.fmeMSettings.SMetrics)
 		base.debugmsg(6, "grphWindow.fmeMSettings.omSM.set_menu():", grphWindow.fmeMSettings.SMetrics)
 
+	def gs_updateagents(self, grphWindow, *args):
+
+		agntlst = list(base.Agents.keys())
+
+		base.debugmsg(7, "agntlst:", agntlst)
+		base.debugmsg(9, "Results FATypes:", grphWindow.fmeRSettings.FATypes)
+		base.debugmsg(9, "Metrics FATypes:", grphWindow.fmeMSettings.FATypes)
+		if len(agntlst) > 0:
+			if "Loading..." in grphWindow.fmeRSettings.FATypes:
+				grphWindow.fmeRSettings.FATypes.remove("Loading...")
+				base.debugmsg(9, "Results FATypes:", grphWindow.fmeRSettings.FATypes)
+			if "Loading..." in grphWindow.fmeMSettings.FATypes:
+				grphWindow.fmeMSettings.FATypes.remove("Loading...")
+				base.debugmsg(9, "Metrics FATypes:", grphWindow.fmeMSettings.FATypes)
+
+			for agentname in agntlst:
+				if agentname not in grphWindow.fmeRSettings.FATypes:
+					grphWindow.fmeRSettings.FATypes.append(agentname)
+				if agentname not in grphWindow.fmeMSettings.FATypes:
+					grphWindow.fmeMSettings.FATypes.append(agentname)
+			base.debugmsg(8, "Results FATypes:", grphWindow.fmeRSettings.FATypes)
+			base.debugmsg(8, "Metrics FATypes:", grphWindow.fmeMSettings.FATypes)
+			grphWindow.fmeRSettings.omFA.set_menu(*grphWindow.fmeRSettings.FATypes)
+			grphWindow.fmeMSettings.omFA.set_menu(*grphWindow.fmeMSettings.FATypes)
+
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
 	# Plan
@@ -5602,110 +6715,7 @@ class RFSwarmGUItk(tk.Frame):
 		# bbar.config(bg="red")
 		bbar.columnconfigure(0, weight=1)
 
-		bbargrid = tk.Frame(bbar)
-		bbargrid.grid(row=0, column=0, sticky="nsew")
-		# bbargrid.config(bg="blue")
-		# bbargrid.columnconfigure(0, weight=1)
-
-		# new
-		base.debugmsg(7, "Button New")
-		btnno = 0
-		icontext = "New"
-		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		base.debugmsg(9, "self.imgdata:[", icontext, "]", self.imgdata[icontext])
-		bnew = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_New)
-		bnew.grid(column=btnno, row=0, sticky="nsew")
-
-		# open
-		base.debugmsg(7, "Button Open")
-		btnno += 1
-
-		icontext = "Open"
-		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		base.debugmsg(9, "self.imgdata:[", icontext, "]", self.imgdata[icontext])
-		bopen = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_Open)
-		bopen.grid(column=btnno, row=0, sticky="nsew")
-
-		# save
-		base.debugmsg(7, "Button Save")
-		btnno += 1
-		icontext = "Save"
-		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		base.debugmsg(9, "self.imgdata:[", icontext, "]", self.imgdata[icontext])
-		bSave = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_Save)
-		bSave.grid(column=btnno, row=0, sticky="nsew")
-
-		# settings
-		base.debugmsg(7, "Button Settings")
-		btnno += 1
-		icontext = "Advanced"
-		bSST = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', text="Settings", command=self.setings_open)
-		bSST.grid(column=btnno, row=0, sticky="nsew")
-
-		# StartTime
-		base.debugmsg(7, "Button Scheduled Start")
-		btnno += 1
-		icontext = "StartTime"
-		# base.debugmsg(9, "self.imgdata:[",icontext,"]", self.imgdata[icontext])
-		bSST = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', text="StartTime", command=self.ScheduledStart)
-		bSST.grid(column=btnno, row=0, sticky="nsew")
-
-		# play
-		base.debugmsg(7, "Button Play")
-		btnno += 1
-		icontext = "Play"
-		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		base.debugmsg(9, "self.imgdata:", self.imgdata)
-		base.debugmsg(9, "self.imgdata:[", icontext, "]", self.imgdata[icontext])
-		bPlay = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', text="Play", command=self.ClickPlay)
-		# bPlay = ttk.Button(bbargrid, image=self.icoPlay, padding='3 3 3 3', command=self.ClickPlay)
-		# bPlay = ttk.Button(bbargrid, text="Play", command=self.ClickPlay)
-		bPlay.grid(column=btnno, row=0, sticky="nsew")
-
-		# spacer
-		btnno += 1
-		spcr = ttk.Label(bbargrid, text=" ")	 # # just a blank column as a spacer
-		spcr.grid(column=btnno, row=0, sticky="nsew")
-		bbargrid.columnconfigure(btnno, weight=10)
-
-		# display_plan
-		if "lbl_sched_start_time" not in self.display_plan:
-			self.display_plan['lbl_sched_start_time'] = tk.StringVar()
-		if "sched_start_time" not in self.display_plan:
-			self.display_plan['sched_start_time'] = tk.StringVar()
-		if "lbl_time_remaining" not in self.display_plan:
-			self.display_plan['lbl_time_remaining'] = tk.StringVar()
-		if "time_remaining" not in self.display_plan:
-			self.display_plan['time_remaining'] = tk.StringVar()
-
-		base.debugmsg(7, "Scheduled Start Time")
-		btnno += 1
-		lblSST = ttk.Label(bbargrid, textvariable=self.display_plan['lbl_sched_start_time'])
-		lblSST.grid(column=btnno, row=0, sticky="nsew")
-		bbargrid.columnconfigure(btnno, weight=1)
-		btnno += 1
-		dspSST = ttk.Label(bbargrid, textvariable=self.display_plan['sched_start_time'])
-		dspSST.grid(column=btnno, row=0, sticky="nsew")
-		bbargrid.columnconfigure(btnno, weight=1)
-
-		base.debugmsg(7, "Time Remaining")
-		btnno += 1
-		lblSST = ttk.Label(bbargrid, textvariable=self.display_plan['lbl_time_remaining'])
-		lblSST.grid(column=btnno, row=0, sticky="nsew")
-		bbargrid.columnconfigure(btnno, weight=1)
-		btnno += 1
-		dspSST = ttk.Label(bbargrid, textvariable=self.display_plan['time_remaining'])
-		dspSST.grid(column=btnno, row=0, sticky="nsew")
-		bbargrid.columnconfigure(btnno, weight=1)
-
-		# # spacer
-		# btnno += 1
-		# spcr = ttk.Label(bbargrid, text = " ")	# just a blank column as a spacer
-		# spcr.grid(column=btnno, row=0, sticky="nsew")
-		# bbargrid.columnconfigure(btnno, weight=1)
+		self.BuildPlanButtonBar(bbar)
 
 		planrow += 1
 		# p.columnconfigure(0, weight=1)
@@ -5813,6 +6823,113 @@ class RFSwarmGUItk(tk.Frame):
 
 		base.updateplanthread = threading.Thread(target=self.UpdatePlanDisplay)
 		base.updateplanthread.start()
+
+	def BuildPlanButtonBar(self, bbar):
+
+		bbargrid = tk.Frame(bbar)
+		bbargrid.grid(row=0, column=0, sticky="nsew")
+		# bbargrid.config(bg="blue")
+		# bbargrid.columnconfigure(0, weight=1)
+
+		# new
+		base.debugmsg(7, "Button New")
+		btnno = 0
+		icontext = "New"
+		base.debugmsg(9, "self.imgdata:", self.imgdata)
+		base.debugmsg(9, "self.imgdata:", self.imgdata)
+		base.debugmsg(9, "self.imgdata:[", icontext, "]", self.imgdata[icontext])
+		bnew = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_New)
+		bnew.grid(column=btnno, row=0, sticky="nsew")
+
+		# open
+		base.debugmsg(7, "Button Open")
+		btnno += 1
+
+		icontext = "Open"
+		base.debugmsg(9, "self.imgdata:", self.imgdata)
+		base.debugmsg(9, "self.imgdata:", self.imgdata)
+		base.debugmsg(9, "self.imgdata:[", icontext, "]", self.imgdata[icontext])
+		bopen = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_Open)
+		bopen.grid(column=btnno, row=0, sticky="nsew")
+
+		# save
+		base.debugmsg(7, "Button Save")
+		btnno += 1
+		icontext = "Save"
+		base.debugmsg(9, "self.imgdata:", self.imgdata)
+		base.debugmsg(9, "self.imgdata:", self.imgdata)
+		base.debugmsg(9, "self.imgdata:[", icontext, "]", self.imgdata[icontext])
+		bSave = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', command=self.mnu_file_Save)
+		bSave.grid(column=btnno, row=0, sticky="nsew")
+
+		# settings
+		base.debugmsg(7, "Button Settings")
+		btnno += 1
+		icontext = "Advanced"
+		bSST = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', text="Settings", command=self.setings_open)
+		bSST.grid(column=btnno, row=0, sticky="nsew")
+
+		# StartTime
+		base.debugmsg(7, "Button Scheduled Start")
+		btnno += 1
+		icontext = "StartTime"
+		# base.debugmsg(9, "self.imgdata:[",icontext,"]", self.imgdata[icontext])
+		bSST = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', text="StartTime", command=self.ScheduledStart)
+		bSST.grid(column=btnno, row=0, sticky="nsew")
+
+		# play
+		base.debugmsg(7, "Button Play")
+		btnno += 1
+		icontext = "Play"
+		base.debugmsg(9, "self.imgdata:", self.imgdata)
+		base.debugmsg(9, "self.imgdata:", self.imgdata)
+		base.debugmsg(9, "self.imgdata:[", icontext, "]", self.imgdata[icontext])
+		bPlay = ttk.Button(bbargrid, image=self.imgdata[icontext], padding='3 3 3 3', text="Play", command=self.ClickPlay)
+		# bPlay = ttk.Button(bbargrid, image=self.icoPlay, padding='3 3 3 3', command=self.ClickPlay)
+		# bPlay = ttk.Button(bbargrid, text="Play", command=self.ClickPlay)
+		bPlay.grid(column=btnno, row=0, sticky="nsew")
+
+		# spacer
+		btnno += 1
+		spcr = ttk.Label(bbargrid, text=" ")	 # # just a blank column as a spacer
+		spcr.grid(column=btnno, row=0, sticky="nsew")
+		bbargrid.columnconfigure(btnno, weight=10)
+
+		# display_plan
+		if "lbl_sched_start_time" not in self.display_plan:
+			self.display_plan['lbl_sched_start_time'] = tk.StringVar()
+		if "sched_start_time" not in self.display_plan:
+			self.display_plan['sched_start_time'] = tk.StringVar()
+		if "lbl_time_remaining" not in self.display_plan:
+			self.display_plan['lbl_time_remaining'] = tk.StringVar()
+		if "time_remaining" not in self.display_plan:
+			self.display_plan['time_remaining'] = tk.StringVar()
+
+		base.debugmsg(7, "Scheduled Start Time")
+		btnno += 1
+		lblSST = ttk.Label(bbargrid, textvariable=self.display_plan['lbl_sched_start_time'])
+		lblSST.grid(column=btnno, row=0, sticky="nsew")
+		bbargrid.columnconfigure(btnno, weight=1)
+		btnno += 1
+		dspSST = ttk.Label(bbargrid, textvariable=self.display_plan['sched_start_time'])
+		dspSST.grid(column=btnno, row=0, sticky="nsew")
+		bbargrid.columnconfigure(btnno, weight=1)
+
+		base.debugmsg(7, "Time Remaining")
+		btnno += 1
+		lblSST = ttk.Label(bbargrid, textvariable=self.display_plan['lbl_time_remaining'])
+		lblSST.grid(column=btnno, row=0, sticky="nsew")
+		bbargrid.columnconfigure(btnno, weight=1)
+		btnno += 1
+		dspSST = ttk.Label(bbargrid, textvariable=self.display_plan['time_remaining'])
+		dspSST.grid(column=btnno, row=0, sticky="nsew")
+		bbargrid.columnconfigure(btnno, weight=1)
+
+		# # spacer
+		# btnno += 1
+		# spcr = ttk.Label(bbargrid, text = " ")	# just a blank column as a spacer
+		# spcr.grid(column=btnno, row=0, sticky="nsew")
+		# bbargrid.columnconfigure(btnno, weight=1)
 
 	def setings_open(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
@@ -6616,7 +7733,7 @@ class RFSwarmGUItk(tk.Frame):
 		core.ClickPlay()
 
 	def pln_update_graph(self):
-		base.debugmsg(6, "pln_update_graph", self.pln_graph_update)
+		base.debugmsg(5, "pln_update_graph:", self.pln_graph_update, " base.keeprunning:", base.keeprunning)
 
 		if not self.pln_graph_update and base.keeprunning:
 			self.pln_graph_update = True
@@ -6767,8 +7884,8 @@ class RFSwarmGUItk(tk.Frame):
 		time.sleep(0.1)
 
 	def addScriptRow(self, *args):
-		base.debugmsg(6, "addScriptRow")
 		row = base.scriptcount
+		base.debugmsg(6, "addScriptRow:", row)
 
 		colour = base.line_colour(base.scriptcount)
 		base.debugmsg(5, "colour:", colour)
@@ -6821,7 +7938,8 @@ class RFSwarmGUItk(tk.Frame):
 
 		base.scriptlist[row]["TestVar"] = tk.StringVar(value=base.scriptlist[row]["Test"], name="row{}".format(row))
 		base.scriptlist[row]["TestVar"].trace("w", self.sr_test_validate)
-		tst = ttk.OptionMenu(self.scriptgrid, base.scriptlist[row]["TestVar"], None, "test", command=lambda: self.sr_test_validate(row))
+		# tst = ttk.OptionMenu(self.scriptgrid, base.scriptlist[row]["TestVar"], None, "test", command=lambda: self.sr_test_validate(row))
+		tst = ttk.OptionMenu(self.scriptgrid, base.scriptlist[row]["TestVar"], None, "test")
 		tst.config(width=20)
 		tst.grid(column=self.plancoltst, row=base.scriptcount, sticky="nsew")
 
@@ -7050,13 +8168,19 @@ class RFSwarmGUItk(tk.Frame):
 			scriptfile = args[0]
 		else:
 			if not base.args.nogui:
-				scriptfile = str(
-					tkf.askopenfilename(
-						initialdir=base.config['Plan']['ScriptDir'],
-						title="Select Robot Framework File",
-						filetypes=(("Robot Framework", "*.robot"), ("all files", "*.*"))
-					)
+
+				base.debugmsg(5, "base.config[Plan][ScriptDir]:", base.config['Plan']['ScriptDir'])
+
+				retfile = tkf.askopenfilename(
+					initialdir=base.config['Plan']['ScriptDir'],
+					title="Select Robot Framework File",
+					filetypes=(("Robot Framework", "*.robot"), ("all files", "*.*"))
 				)
+				base.debugmsg(5, "retfile:", retfile)
+				if len(retfile) > 0:
+					scriptfile = str(retfile)
+				else:
+					scriptfile = ""
 			else:
 				scriptfile = ""
 		base.debugmsg(5, "scriptfile:", scriptfile)
@@ -7068,7 +8192,7 @@ class RFSwarmGUItk(tk.Frame):
 				base.debugmsg(5, "do update relpath:", relpath)
 				base.debugmsg(5, "ScriptDir:", base.config['Plan']['ScriptDir'])
 				if base.config['Plan']['ScriptDir'] == base.dir_path:
-					base.config['Plan']['ScriptDir'] = os.path.basename(scriptfile)
+					base.config['Plan']['ScriptDir'] = base.inisafedir(scriptfile)
 					base.debugmsg(5, "ScriptDir:", base.config['Plan']['ScriptDir'])
 					relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], scriptfile)
 					base.debugmsg(5, "relpath:", relpath)
@@ -7080,7 +8204,7 @@ class RFSwarmGUItk(tk.Frame):
 							filelst.append(base.scriptlist[i]["Script"])
 					commonpath = os.path.commonpath(filelst)
 					base.debugmsg(5, "commonpath: ", commonpath)
-					base.config['Plan']['ScriptDir'] = base.inisafevalue(commonpath)
+					base.config['Plan']['ScriptDir'] = base.inisafedir(commonpath)
 					relpath = base.get_relative_path(base.config['Plan']['ScriptDir'], scriptfile)
 					# base.saveini()
 					for i in range(len(base.scriptlist)):
@@ -7153,7 +8277,8 @@ class RFSwarmGUItk(tk.Frame):
 			v = args[1]
 			base.debugmsg(9, "sr_test_validate: v:", v)
 			if not base.args.nogui:
-				base.scriptlist[r]["TestVar"].set(v)
+				if "TestVar" in base.scriptlist[r]:
+					base.scriptlist[r]["TestVar"].set(v)
 			base.scriptlist[r]["Test"] = v
 		else:
 			if not base.args.nogui:
@@ -7163,7 +8288,6 @@ class RFSwarmGUItk(tk.Frame):
 					base.scriptlist[r]["Test"] = base.scriptlist[r]["TestVar"].get()
 
 		base.debugmsg(9, "scriptlist[r]:", base.scriptlist[r])
-		base.debugmsg(9, "scriptlist[r][TestVar].get():", base.scriptlist[r]["TestVar"].get())
 
 		self.plan_scnro_chngd = True
 
@@ -7177,7 +8301,7 @@ class RFSwarmGUItk(tk.Frame):
 		return True
 
 	def sr_test_genlist(self, r):
-		base.debugmsg(8, "Script File:", base.scriptlist[r]["Script"])
+		base.debugmsg(5, "Script File:", base.scriptlist[r]["Script"])
 		tcsection = False
 		tclist = [""]
 		# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
@@ -7696,6 +8820,929 @@ class RFSwarmGUItk(tk.Frame):
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
+	# Monitoring
+	#
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+	def BuildMonitoring(self, m):
+
+		base.debugmsg(5, "BuildMonitoring Start")
+
+		mtrngrow = 0
+		m.columnconfigure(mtrngrow, weight=1)
+		m.rowconfigure(mtrngrow, weight=0)  # weight=0 means don't resize with other grid rows / keep a fixed size
+		# Button Bar
+		base.debugmsg(5, "Button Bar")
+
+		bbar = tk.Frame(m)
+		bbar.grid(column=0, row=mtrngrow, sticky="nsew")
+		# bbar.config(bg="red")
+		bbar.columnconfigure(0, weight=1)
+
+		self.BuildPlanButtonBar(bbar)
+
+		mtrngrow += 1
+
+		ctlbar = tk.Frame(m)
+		ctlbar.grid(column=0, row=mtrngrow, sticky="nsew")
+
+		ctlrow = 0
+		ctlcol = 0
+
+		# spacelbl = ttk.Label(ctlbar, text="")
+		# spacelbl.grid(column=ctlcol, row=ctlrow, sticky="nsew")
+		# ctlbar.columnconfigure(ctlcol, weight=1)
+		#
+		# ctlcol += 1
+
+		beforetxt = "Monitoring time before test: "
+		b4lbl = ttk.Label(ctlbar, text=beforetxt)
+		b4lbl.grid(column=ctlcol, row=ctlrow, sticky="nsew")
+		# ctlbar.columnconfigure(ctlcol, weight=0)
+
+		ctlcol += 1
+
+		num = 0
+		num = base.mtimebefore
+		self.b4dly = ttk.Entry(ctlbar, width=8, justify="right", validate="focusout")
+		self.b4dly.config(validatecommand=self.msr_delayb4_validate)
+		self.b4dly.grid(column=ctlcol, row=ctlrow, sticky="nsew")
+		# ctlbar.columnconfigure(ctlcol, weight=0)
+		self.b4dly.insert(0, base.sec2hms(num))
+		base.debugmsg(9, "b4dly:", self.b4dly)
+
+		ctlcol += 1
+
+		spacelbl = ttk.Label(ctlbar, text=" ")
+		spacelbl.grid(column=ctlcol, row=ctlrow, sticky="nsew")
+		# ctlbar.columnconfigure(ctlcol, weight=1)
+
+		ctlcol += 1
+
+		aftertxt = "Monitoring time after test: "
+		aftlbl = ttk.Label(ctlbar, text=aftertxt)
+		aftlbl.grid(column=ctlcol, row=ctlrow, sticky="nsew")
+		# ctlbar.columnconfigure(ctlcol, weight=0)
+
+		ctlcol += 1
+
+		num = 0
+		num = base.mtimeafter
+		self.aftdly = ttk.Entry(ctlbar, width=8, justify="right", validate="focusout")
+		self.aftdly.config(validatecommand=self.msr_delayaft_validate)
+		self.aftdly.grid(column=ctlcol, row=ctlrow, sticky="nsew")
+		# ctlbar.columnconfigure(ctlcol, weight=0)
+		self.aftdly.insert(0, base.sec2hms(num))
+		base.debugmsg(9, "aftdly:", self.aftdly)
+
+		ctlcol += 1
+
+		spacelbl = ttk.Label(ctlbar, text="")
+		spacelbl.grid(column=ctlcol, row=ctlrow, sticky="nsew")
+		ctlbar.columnconfigure(ctlcol, weight=1)
+
+		mtrngrow += 1
+		# p.columnconfigure(0, weight=1)
+		m.rowconfigure(mtrngrow, weight=1)
+		# Plan scripts
+		base.debugmsg(6, "Monitoring scripts")
+
+		# # 2020-12-27 try again
+		sm = tk.Frame(m)
+		sm.grid(row=mtrngrow, column=0, pady=(0, 0), sticky='news')
+		sm.grid_rowconfigure(0, weight=1)
+		sm.grid_columnconfigure(0, weight=1)
+
+		self.sm_canvas = tk.Canvas(sm)
+		self.sm_canvas.grid(row=0, column=0, sticky="news")
+
+		# Link a scrollbar to the canvas
+		sm_vsb = tk.Scrollbar(sm, orient="vertical", command=self.sm_canvas.yview)
+		sm_vsb.grid(row=0, column=1, sticky='ns')
+		self.sm_canvas.configure(yscrollcommand=sm_vsb.set)
+
+		# Link another scrollbar to the canvas
+		sm_hsb = tk.Scrollbar(sm, orient="horizontal", command=self.sm_canvas.xview)
+		sm_hsb.grid(row=1, column=0, sticky='ew')
+		self.sm_canvas.configure(xscrollcommand=sm_hsb.set)
+
+		self.mscriptgrid = tk.Frame(self.sm_canvas)
+		self.sm_canvas.create_window((0, 0), window=self.mscriptgrid, anchor='nw')
+
+		# label row 0 of sg
+		self.mscriptgrid.columnconfigure(self.mtrngcolidx, weight=0)
+		idx = ttk.Label(self.mscriptgrid, text="Index")
+		idx.grid(column=self.mtrngcolidx, row=0, sticky="nsew")
+
+		# self.mscriptgrid.columnconfigure(self.mtrngcolusr, weight=0)
+		# usr = ttk.Label(self.mscriptgrid, text="Robots")
+		# usr.grid(column=self.mtrngcolusr, row=0, sticky="nsew")
+
+		# self.mscriptgrid.columnconfigure(self.mtrngcoldly, weight=0)
+		# usr = ttk.Label(self.mscriptgrid, text="Delay")
+		# usr.grid(column=self.mtrngcoldly, row=0, sticky="nsew")
+		#
+		# self.mscriptgrid.columnconfigure(self.mtrngcolrmp, weight=0)
+		# usr = ttk.Label(self.mscriptgrid, text="Ramp Up")
+		# usr.grid(column=self.mtrngcolrmp, row=0, sticky="nsew")
+		#
+		# self.mscriptgrid.columnconfigure(self.mtrngcolrun, weight=0)
+		# usr = ttk.Label(self.mscriptgrid, text="Run")
+		# usr.grid(column=self.mtrngcolrun, row=0, sticky="nsew")
+
+		self.mscriptgrid.columnconfigure(self.mtrngcolscr, weight=5)
+		scr = ttk.Label(self.mscriptgrid, text="Script")
+		scr.grid(column=self.mtrngcolscr, row=0, sticky="nsew")
+
+		self.mscriptgrid.columnconfigure(self.mtrngcoltst, weight=5)
+		tst = ttk.Label(self.mscriptgrid, text="Test")
+		tst.grid(column=self.mtrngcoltst, row=0, sticky="nsew")
+
+		self.mscriptgrid.columnconfigure(self.mtrngcoltst, weight=5)
+		tst = ttk.Label(self.mscriptgrid, text="Settings")
+		tst.grid(column=self.mtrngcolset, row=0, sticky="nsew")
+
+		icontext = "AddRow"
+		self.mscriptgrid.columnconfigure(self.mtrngcoladd, weight=0)
+		new = ttk.Button(self.mscriptgrid, image=self.imgdata[icontext], padding='3 3 3 3', text="+", command=base.addMScriptRow, width=1)
+		new.grid(column=self.mtrngcoladd, row=0, sticky="nsew")
+
+		# self.scrollable_sg.update()
+		# update scrollbars
+		self.mscriptgrid.update_idletasks()
+		self.sm_canvas.config(scrollregion=self.sm_canvas.bbox("all"))
+
+		# self.pln_graph.bind("<Configure>", self.CanvasResize)
+		# May need to bind <Button-4> and <Button-5> to enable mouse scrolling
+		# https://www.python-course.eu/tkinter_events_binds.php
+
+		# base.updateplanthread = threading.Thread(target=self.UpdatePlanDisplay)
+		# base.updateplanthread.start()
+		base.debugmsg(5, "BuildMonitoring End")
+
+	def msr_delayb4_validate(self, *args):
+		base.debugmsg(5, "args:", args)
+		if len(args) > 1:
+			dly = args[1]
+		else:
+			dly = self.b4dly.get()
+		idly = base.hms2sec(dly)
+		self.b4dly.delete(0, 'end')
+		self.b4dly.insert(0, base.sec2hms(idly))
+		base.debugmsg(5, "idly:", idly, "Delay:", dly)
+		if idly > 0:
+			base.mtimebefore = idly
+			self.plan_scnro_chngd = True
+		else:
+			base.mtimebefore = 0
+			self.plan_scnro_chngd = True
+
+		return True
+
+	def msr_delayaft_validate(self, *args):
+		base.debugmsg(5, "args:", args)
+		if len(args) > 1:
+			dly = args[1]
+		else:
+			dly = self.aftdly.get()
+		idly = base.hms2sec(dly)
+		self.aftdly.delete(0, 'end')
+		self.aftdly.insert(0, base.sec2hms(idly))
+		base.debugmsg(5, "idly:", idly, "Delay:", dly)
+		if idly > 0:
+			base.mtimeafter = idly
+			self.plan_scnro_chngd = True
+		else:
+			base.mtimeafter = 0
+			self.plan_scnro_chngd = True
+
+		return True
+
+	def addMScriptRow(self, *args):
+		row = base.mscriptcount
+		base.debugmsg(5, "addMScriptRow:", row)
+
+		# colour = base.line_colour(base.scriptcount)
+		# base.debugmsg(5, "colour:", colour)
+
+		idx = tk.Label(self.mscriptgrid, text=str(base.mscriptcount))
+		# idx['bg'] = colour
+		idx.grid(column=self.mtrngcolidx, row=base.mscriptcount, sticky="nsew")
+
+		# num = base.mscriptlist[base.mscriptcount]["Robots"]
+		# usr = ttk.Entry(self.scriptgrid, width=5, justify="right", validate="focusout")
+		# usr.config(validatecommand=lambda: self.sr_users_validate(row))
+		# usr.grid(column=self.mtrngcolusr, row=base.scriptcount, sticky="nsew")
+		# usr.insert(0, num)
+		# base.mscriptlist[base.scriptcount]["Robots"] = int(num)
+
+		# num = base.mscriptlist[base.scriptcount]["Delay"]
+		# dly = ttk.Entry(self.scriptgrid, width=8, justify="right", validate="focusout")
+		# dly.config(validatecommand=lambda: self.sr_delay_validate(row))
+		# dly.grid(column=self.mtrngcoldly, row=base.scriptcount, sticky="nsew")
+		# dly.insert(0, base.sec2hms(num))
+		# base.mscriptlist[base.scriptcount]["Delay"] = base.hms2sec(num)
+
+		# num = base.mscriptlist[base.scriptcount]["RampUp"]
+		# rmp = ttk.Entry(self.scriptgrid, width=8, justify="right", validate="focusout")
+		# rmp.config(validatecommand=lambda: self.sr_rampup_validate(row))
+		# rmp.grid(column=self.mtrngcolrmp, row=base.scriptcount, sticky="nsew")
+		# # rmp.insert(0, num)
+		# rmp.insert(0, base.sec2hms(num))
+		# base.mscriptlist[base.scriptcount]["RampUp"] = base.hms2sec(num)
+
+		# num = base.mscriptlist[base.scriptcount]["Run"]
+		# run = ttk.Entry(self.scriptgrid, width=8, justify="right", validate="focusout")
+		# run.config(validatecommand=lambda: self.sr_run_validate(row))
+		# run.grid(column=self.mtrngcolrun, row=base.scriptcount, sticky="nsew")
+		# # run.insert(0, num)
+		# run.insert(0, base.sec2hms(num))
+		# base.mscriptlist[base.scriptcount]["Run"] = base.hms2sec(num)
+
+		mfgf = ttk.Frame(self.mscriptgrid)
+		mfgf.grid(column=self.mtrngcolscr, row=base.mscriptcount, sticky="nsew")
+		mscr = ttk.Entry(mfgf, state="readonly", justify="right")
+		mscr.grid(column=0, row=0, sticky="nsew")
+		mfgf.columnconfigure(mscr, weight=1)
+
+		icontext = "Script"
+		mscrf = ttk.Button(mfgf, image=self.imgdata[icontext], text="...", width=1)
+		mscrf.config(command=lambda: self.msr_file_validate(row))
+		mscrf.grid(column=1, row=0, sticky="nsew")
+		mfgf.columnconfigure(mscrf, weight=0)
+
+		base.mscriptlist[row]["TestVar"] = tk.StringVar(value=base.mscriptlist[row]["Test"], name="mrow{}".format(row))
+		base.mscriptlist[row]["TestVar"].trace("w", self.msr_test_validate)
+		# mtst = ttk.OptionMenu(self.mscriptgrid, base.mscriptlist[row]["TestVar"], None, "test", command=lambda srow=srow: self.msr_test_validate(srow))
+		mtst = ttk.OptionMenu(self.mscriptgrid, base.mscriptlist[row]["TestVar"], None, "test")
+		mtst.config(width=20)
+		mtst.grid(column=self.mtrngcoltst, row=base.mscriptcount, sticky="nsew")
+
+		icontext = "Advanced"
+		self.mscriptgrid.columnconfigure(self.mtrngcoladd, weight=0)
+		mnew = ttk.Button(self.mscriptgrid, image=self.imgdata[icontext], text="Settings", command=lambda: self.msr_row_settings(row), width=1)
+		mnew.grid(column=self.mtrngcolset, row=base.mscriptcount, sticky="nsew")
+
+		icontext = "Delete"
+		self.scriptgrid.columnconfigure(self.mtrngcoladd, weight=0)
+		mdel = ttk.Button(self.mscriptgrid, image=self.imgdata[icontext], text="X", command=lambda: self.msr_remove_row(row), width=1)
+		mdel.grid(column=self.mtrngcoladd, row=base.mscriptcount, sticky="nsew")
+
+		base.debugmsg(5, "addMScriptRow done")
+
+		# update scrollbars
+		self.mscriptgrid.update_idletasks()
+		self.sm_canvas.config(scrollregion=self.sm_canvas.bbox("all"))
+
+	def msr_file_validate(self, r, *args):
+		base.debugmsg(5, r)
+		if not base.args.nogui:
+			fg = self.mscriptgrid.grid_slaves(column=self.mtrngcolscr, row=r)[0].grid_slaves()
+			base.debugmsg(9, fg)
+			base.debugmsg(9, fg[1].get())
+		if args:
+			scriptfile = args[0]
+		else:
+			if not base.args.nogui:
+
+				base.debugmsg(5, "base.config[Plan][ScriptDir]:", base.config['Plan']['ScriptDir'])
+
+				retfile = tkf.askopenfilename(
+					initialdir=base.config['Plan']['ScriptDir'],
+					title="Select Robot Framework File",
+					filetypes=(("Robot Framework", "*.robot"), ("all files", "*.*"))
+				)
+				base.debugmsg(5, "retfile:", retfile)
+				if len(retfile) > 0:
+					scriptfile = str(retfile)
+				else:
+					scriptfile = ""
+			else:
+				scriptfile = ""
+		base.debugmsg(5, "scriptfile:", scriptfile)
+		if len(scriptfile) > 0:
+			relpath = base.get_relative_path(base.config['Monitoring']['ScriptDir'], scriptfile)
+			base.debugmsg(5, "relpath:", relpath)
+
+			if ".." in relpath:
+				base.debugmsg(5, "do update relpath:", relpath)
+				base.debugmsg(5, "ScriptDir:", base.config['Monitoring']['ScriptDir'])
+				if base.config['Monitoring']['ScriptDir'] == base.dir_path:
+					base.config['Monitoring']['ScriptDir'] = os.path.dirname(scriptfile)
+					base.debugmsg(5, "ScriptDir:", base.config['Monitoring']['ScriptDir'])
+					relpath = base.get_relative_path(base.config['Monitoring']['ScriptDir'], scriptfile)
+					base.debugmsg(5, "relpath:", relpath)
+				if len(base.mscriptlist) > 1:
+					base.debugmsg(5, "base.mscriptlist:", base.mscriptlist)
+					filelst = [scriptfile]
+					for i in range(len(base.mscriptlist)):
+						if "Script" in base.mscriptlist[i]:
+							filelst.append(base.mscriptlist[i]["Script"])
+					base.debugmsg(5, "filelst:", filelst)
+					commonpath = os.path.commonpath(filelst)
+					base.debugmsg(5, "commonpath: ", commonpath)
+					base.config['Monitoring']['ScriptDir'] = base.inisafevalue(commonpath)
+					relpath = base.get_relative_path(base.config['Monitoring']['ScriptDir'], scriptfile)
+					# base.saveini()
+					for i in range(len(base.mscriptlist)):
+						if "Script" in base.mscriptlist[i]:
+							self.msr_file_validate(i, base.mscriptlist[i]["Script"])
+
+			fg[1].configure(state='normal')
+			fg[1].select_clear()
+			fg[1].delete(0, 'end')
+			fg[1].insert(0, relpath)
+			fg[1].configure(state='readonly')
+
+			base.mscriptlist[r]["Script"] = scriptfile
+			base.debugmsg(5, "test: ", fg[1].get())
+			script_hash = base.hash_file(scriptfile, relpath)
+			base.mscriptlist[r]["ScriptHash"] = script_hash
+
+			base.debugmsg(5, "script_hash:", script_hash, " in scriptfiles?:", script_hash in base.scriptfiles)
+			if script_hash not in base.scriptfiles:
+				base.scriptfiles[script_hash] = {
+					"id": script_hash,
+					"localpath": scriptfile,
+					"relpath": relpath,
+					"type": "script"
+				}
+
+				base.debugmsg(5, "base.find_dependancies(", script_hash, ")")
+				t = threading.Thread(target=base.find_dependancies, args=(script_hash, ))
+				t.start()
+
+			base.debugmsg(5, "msr_test_genlist(", r, ")")
+			self.msr_test_genlist(r)
+		else:
+			fg[1].configure(state='normal')
+			fg[1].delete(0, 'end')
+			# fg[1].select_clear()
+			fg[1].configure(state='readonly')
+			if "ScriptHash" in base.mscriptlist[r]:
+				oldhash = base.mscriptlist[r]["ScriptHash"]
+				t = threading.Thread(target=base.remove_hash, args=(oldhash, ))
+				t.start()
+
+			base.mscriptlist[r]["Script"] = ''
+			base.mscriptlist[r]["ScriptHash"] = ''
+
+		self.plan_scnro_chngd = True
+
+		return True
+
+	def msr_test_validate(self, *args):
+		base.debugmsg(5, "args:", args)
+		# r = int(args[0][-1:])+1
+		if len(args) < 2:
+			base.debugmsg(5, "Insufficent args:", args)
+			return True
+		r = int(args[0][4:])
+		base.debugmsg(5, "r:", r)
+
+		if not base.args.nogui and base.keeprunning:
+			# if 0 in self.scriptgrid.grid_slaves:
+			base.debugmsg(9, "grid_slaves:", self.mscriptgrid.grid_slaves(column=self.mtrngcoltst, row=r))
+			if len(self.scriptgrid.grid_slaves(column=self.mtrngcoltst, row=r)) > 0:
+				tol = self.scriptgrid.grid_slaves(column=self.mtrngcoltst, row=r)[0]
+				base.debugmsg(9, "sr_test_validate: tol:", tol)
+
+		v = None
+		if len(args) > 1 and len(args[1]) > 1:
+			v = args[1]
+			base.debugmsg(5, "v:", v)
+			if not base.args.nogui:
+				if "TestVar" in base.mscriptlist[r]:
+					base.mscriptlist[r]["TestVar"].set(v)
+			base.mscriptlist[r]["Test"] = v
+		else:
+			if not base.args.nogui:
+				base.debugmsg(5, "else")
+				if "TestVar" in base.mscriptlist[r]:
+					base.debugmsg(5, "mscriptlist[r][TestVar].get():", base.mscriptlist[r]["TestVar"].get())
+					base.mscriptlist[r]["Test"] = base.mscriptlist[r]["TestVar"].get()
+
+		base.debugmsg(5, "mscriptlist[r]:", base.mscriptlist[r])
+
+		self.plan_scnro_chngd = True
+
+		return True
+
+	def msr_test_genlist(self, r):
+		base.debugmsg(5, "Script File:", base.mscriptlist[r]["Script"])
+		tcsection = False
+		tclist = [""]
+		# http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-data-sections
+		# regex = r"^\*+[\s]*(Test Case|Task)"
+		regex = r"^\*{3}([^\*]*)\*{3}"
+		with open(base.mscriptlist[r]["Script"], 'r', encoding="utf8") as f:
+			for line in f:
+				base.debugmsg(9, "tcsection:", tcsection, "	line:", line)
+				if tcsection and line[0:3] == "***":
+					tcsection = False
+				m = re.search(regex, line, re.IGNORECASE)
+				if m and base.is_testcases_section(m.group(1).strip()):
+					base.debugmsg(5, "re.search(", regex, ",", line, ")", re.search(regex, line, re.IGNORECASE))
+					tcsection = True
+				if tcsection:
+					if line[0:1] not in ('\t', ' ', '*', '#', '\n', '\r'):
+						base.debugmsg(9, "", line[0:1], "")
+						tclist.append(line[0:-1])
+		base.debugmsg(8, tclist)
+		if not base.args.nogui:
+			tol = self.mscriptgrid.grid_slaves(column=self.mtrngcoltst, row=r)[0]
+			base.debugmsg(8, "tol: ", tol)
+			tol.set_menu(*tclist)
+
+	def msr_remove_row(self, r):
+		base.debugmsg(5, "msr_remove_row:", r)
+		base.debugmsg(5, self.mscriptgrid)
+		relmts = self.mscriptgrid.grid_slaves(row=r, column=None)
+		base.debugmsg(5, "relmts:", relmts)
+		for elmt in relmts:
+			elmt.destroy()
+		base.mscriptlist[r] = {}
+		base.debugmsg(5, "base.mscriptlist:", base.mscriptlist)
+
+		# update scrollbars
+		self.mscriptgrid.update_idletasks()
+		self.sm_canvas.config(scrollregion=self.sm_canvas.bbox("all"))
+
+		return True
+
+	def msr_row_settings(self, r):
+		base.debugmsg(5, "r:", r)
+		stgsWindow = tk.Toplevel(self.root)
+		stgsWindow.wm_iconphoto(False, self.icon)
+		# self.grid(sticky="news", ipadx=0, pady=0)
+		# self.root.resizable(False, False)		# this didn't work as expected, I expected the dialog to not be resizable instaed it stopped the main window from being resizable
+		# self.root.resizable(True, True)
+
+		# https://tkdocs.com/shipman/toplevel.html
+		# I believe this should keep the settings window infront of the menager window
+		# well it didn't work on macosx but it may help, i'll leave it for now
+		# stgsWindow.transient()
+		# stgsWindow.transient(parent=self.root)
+		# Now it works :)
+		stgsWindow.transient(self.root)
+
+		stgsWindow.columnconfigure(0, weight=1)
+		stgsWindow.columnconfigure(1, weight=1)
+		stgsWindow.columnconfigure(2, weight=1)
+		stgsWindow.columnconfigure(3, weight=1)
+		stgsWindow.columnconfigure(4, weight=1)
+		stgsWindow.columnconfigure(5, weight=1)
+		stgsWindow.columnconfigure(6, weight=1)
+		stgsWindow.columnconfigure(7, weight=1)
+		stgsWindow.columnconfigure(8, weight=1)
+		stgsWindow.columnconfigure(9, weight=1)
+		# stgsWindow.rowconfigure(1, weight=1)
+
+		stgsWindow.title("Settings for row {}".format(r))
+		testname = ""
+		try:
+			testname = base.mscriptlist[r]["TestVar"].get()
+		except Exception:
+			pass
+		base.debugmsg(5, "testname:", testname)
+		if len(testname) > 0:
+			stgsWindow.title("Settings for {} ({})".format(testname, r))
+
+		base.debugmsg(9, "base.mscriptlist[r]:", r, base.mscriptlist[r])
+
+		stgsWindow.resultnamemodedefault = base.resultnamemodedefault
+		if "resultnamemode" in base.scriptdefaults:
+			stgsWindow.resultnamemodedefault = base.scriptdefaults["resultnamemode"]
+
+		stgsWindow.resultnamemodecurrent = stgsWindow.resultnamemodedefault
+		if "resultnamemode" in base.mscriptlist[r]:
+			stgsWindow.resultnamemodecurrent = base.mscriptlist[r]["resultnamemode"]
+		base.debugmsg(5, "resultnamemodecurrent:", stgsWindow.resultnamemodecurrent)
+
+		stgsWindow.excludelibrariesdefault = base.excludelibrariesdefault
+		if "excludelibraries" in base.scriptdefaults:
+			stgsWindow.excludelibrariesdefault = base.scriptdefaults["excludelibraries"]
+
+		stgsWindow.Filters = {}
+
+		stgsWindow.excludelibrariescurrent = stgsWindow.excludelibrariesdefault
+		if "excludelibraries" in base.mscriptlist[r]:
+			stgsWindow.excludelibrariescurrent = base.mscriptlist[r]["excludelibraries"]
+		base.debugmsg(5, "excludelibrariescurrent:", stgsWindow.excludelibrariescurrent)
+
+		stgsWindow.robotoptionscurrent = ""
+		if "robotoptions" in base.scriptdefaults:
+			stgsWindow.robotoptionscurrent = base.scriptdefaults["robotoptions"]
+		if "robotoptions" in base.mscriptlist[r]:
+			stgsWindow.robotoptionscurrent = base.mscriptlist[r]["robotoptions"]
+		base.debugmsg(5, "robotoptionscurrent:", stgsWindow.robotoptionscurrent)
+
+		stgsWindow.testrepeaterdefault = base.testrepeaterdefault
+		if "testrepeater" in base.scriptdefaults:
+			stgsWindow.testrepeaterdefault = base.str2bool(base.scriptdefaults["testrepeater"])
+
+		stgsWindow.testrepeatercurrent = stgsWindow.testrepeaterdefault
+		if "testrepeater" in base.mscriptlist[r]:
+			stgsWindow.testrepeatercurrent = base.str2bool(base.mscriptlist[r]["testrepeater"])
+		base.debugmsg(5, "testrepeatercurrent:", stgsWindow.testrepeatercurrent)
+
+		stgsWindow.injectsleepenableddefault = base.injectsleepenableddefault
+		if "injectsleepenabled" in base.scriptdefaults:
+			stgsWindow.injectsleepenableddefault = base.str2bool(base.scriptdefaults["injectsleepenabled"])
+		stgsWindow.injectsleepenabled = stgsWindow.injectsleepenableddefault
+		if "injectsleepenabled" in base.mscriptlist[r]:
+			stgsWindow.injectsleepenabled = base.str2bool(base.mscriptlist[r]["injectsleepenabled"])
+		base.debugmsg(5, "injectsleepenabled:", stgsWindow.injectsleepenabled)
+
+		stgsWindow.injectsleepminimumdefault = base.injectsleepminimumdefault
+		if "injectsleepminimum" in base.scriptdefaults:
+			stgsWindow.injectsleepminimumdefault = int(base.scriptdefaults["injectsleepminimum"])
+		stgsWindow.injectsleepminimum = stgsWindow.injectsleepminimumdefault
+		if "injectsleepminimum" in base.mscriptlist[r]:
+			stgsWindow.injectsleepminimum = int(base.mscriptlist[r]["injectsleepminimum"])
+		base.debugmsg(5, "injectsleepminimum:", stgsWindow.injectsleepminimum)
+
+		stgsWindow.injectsleepmaximumdefault = base.injectsleepmaximumdefault
+		if "injectsleepmaximum" in base.scriptdefaults:
+			stgsWindow.injectsleepmaximumdefault = int(base.scriptdefaults["injectsleepmaximum"])
+		stgsWindow.injectsleepmaximum = stgsWindow.injectsleepmaximumdefault
+		if "injectsleepmaximum" in base.mscriptlist[r]:
+			stgsWindow.injectsleepmaximum = int(base.mscriptlist[r]["injectsleepmaximum"])
+		base.debugmsg(5, "injectsleepmaximum:", stgsWindow.injectsleepmaximum)
+
+		# disableloglogdefault = False
+		stgsWindow.disableloglogdefault = base.disableloglogdefault
+		if "disableloglog" in base.scriptdefaults:
+			stgsWindow.disableloglogdefault = base.str2bool(base.scriptdefaults["disableloglog"])
+		stgsWindow.disableloglog = stgsWindow.disableloglogdefault
+		if "disableloglog" in base.mscriptlist[r]:
+			stgsWindow.disableloglog = base.str2bool(base.mscriptlist[r]["disableloglog"])
+		base.debugmsg(5, "disableloglog:", stgsWindow.disableloglog)
+
+		# disablelogreportdefault = False
+		stgsWindow.disablelogreportdefault = base.disablelogreportdefault
+		if "disablelogreport" in base.scriptdefaults:
+			stgsWindow.disablelogreportdefault = base.str2bool(base.scriptdefaults["disablelogreport"])
+		stgsWindow.disablelogreport = stgsWindow.disablelogreportdefault
+		if "disablelogreport" in base.mscriptlist[r]:
+			stgsWindow.disablelogreport = base.str2bool(base.mscriptlist[r]["disablelogreport"])
+		base.debugmsg(5, "disablelogreport:", stgsWindow.disablelogreport)
+
+		# disablelogoutputdefault = False
+		stgsWindow.disablelogoutputdefault = base.disablelogoutputdefault
+		if "disablelogoutput" in base.scriptdefaults:
+			stgsWindow.disablelogoutputdefault = base.str2bool(base.scriptdefaults["disablelogoutput"])
+		stgsWindow.disablelogoutput = stgsWindow.disablelogoutputdefault
+		if "disablelogoutput" in base.mscriptlist[r]:
+			stgsWindow.disablelogoutput = base.str2bool(base.mscriptlist[r]["disablelogoutput"])
+		base.debugmsg(5, "disablelogoutput:", stgsWindow.disablelogoutput)
+
+		row = 0
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		# resultnamemode
+		row += 1
+		stgsWindow.lblEL = ttk.Label(stgsWindow, text="Result Name Mode:")
+		stgsWindow.lblEL.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		NameModeOpt = list(base.resultnamemodes.values())
+		stgsWindow.strNM = tk.StringVar()
+		stgsWindow.omNM = ttk.OptionMenu(stgsWindow, stgsWindow.strNM, None, *NameModeOpt)
+		base.debugmsg(5, "resultnamemodecurrent:", stgsWindow.resultnamemodecurrent)
+		stgsWindow.strNM.set(base.resultnamemodes[stgsWindow.resultnamemodecurrent])
+		stgsWindow.omNM.grid(column=0, row=row, columnspan=10, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblEL = ttk.Label(stgsWindow, text="Exclude libraries:")
+		stgsWindow.lblEL.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.inpEL = ttk.Entry(stgsWindow)
+		stgsWindow.inpEL.delete(0, 'end')
+		stgsWindow.inpEL.insert(0, stgsWindow.excludelibrariescurrent)
+		stgsWindow.inpEL.grid(column=0, row=row, columnspan=10, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblRO = ttk.Label(stgsWindow, text="Robot Options:")
+		stgsWindow.lblRO.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.inpRO = ttk.Entry(stgsWindow)
+		stgsWindow.inpRO.delete(0, 'end')
+		stgsWindow.inpRO.insert(0, stgsWindow.robotoptionscurrent)
+		stgsWindow.inpRO.grid(column=0, row=row, columnspan=10, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblTR = ttk.Label(stgsWindow, text="Test Repeater:")
+		stgsWindow.lblTR.grid(column=0, row=row, sticky="nsew")
+
+		stgsWindow.boolTR = tk.BooleanVar()
+		stgsWindow.boolTR.set(stgsWindow.testrepeatercurrent)
+		stgsWindow.inpTR = tk.Checkbutton(stgsWindow, variable=stgsWindow.boolTR, onvalue=True, offvalue=False)
+		stgsWindow.inpTR.grid(column=1, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblIS = ttk.Label(stgsWindow, text="Inject Sleep:")
+		stgsWindow.lblIS.grid(column=0, row=row, sticky="nsew")
+
+		stgsWindow.lblISE = ttk.Label(stgsWindow, text="Enabled")
+		stgsWindow.lblISE.grid(column=1, row=row, sticky="nsew")
+		stgsWindow.lblISMN = ttk.Label(stgsWindow, text="Minimum")
+		stgsWindow.lblISMN.grid(column=2, row=row, sticky="nsew")
+		stgsWindow.lblISMX = ttk.Label(stgsWindow, text="Maximum")
+		stgsWindow.lblISMX.grid(column=3, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.boolISE = tk.BooleanVar()
+		stgsWindow.boolISE.set(stgsWindow.injectsleepenabled)
+		stgsWindow.inpISE = tk.Checkbutton(stgsWindow, variable=stgsWindow.boolISE, onvalue=True, offvalue=False)
+		stgsWindow.inpISE.grid(column=1, row=row, sticky="nsew")
+
+		stgsWindow.inpISMN = ttk.Entry(stgsWindow, width=5, justify=tk.RIGHT)
+		stgsWindow.inpISMN.delete(0, 'end')
+		stgsWindow.inpISMN.insert(0, stgsWindow.injectsleepminimum)
+		stgsWindow.inpISMN.grid(column=2, row=row, sticky="nsew")
+
+		stgsWindow.inpISMX = ttk.Entry(stgsWindow, width=5, justify=tk.RIGHT)
+		stgsWindow.inpISMX.delete(0, 'end')
+		stgsWindow.inpISMX.insert(0, stgsWindow.injectsleepmaximum)
+		stgsWindow.inpISMX.grid(column=3, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblDL = ttk.Label(stgsWindow, text="Disable Robot Log:")
+		stgsWindow.lblDL.grid(column=0, row=row, sticky="nsew")
+
+		stgsWindow.lblDLL = ttk.Label(stgsWindow, text="log.html")
+		stgsWindow.lblDLL.grid(column=1, row=row, sticky="nsew")
+		stgsWindow.lblDLR = ttk.Label(stgsWindow, text="report.html")
+		stgsWindow.lblDLR.grid(column=2, row=row, sticky="nsew")
+		stgsWindow.lblDLO = ttk.Label(stgsWindow, text="output.xml")
+		stgsWindow.lblDLO.grid(column=3, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.boolDLL = tk.BooleanVar()
+		stgsWindow.boolDLL.set(stgsWindow.disableloglog)
+		stgsWindow.inpDLL = tk.Checkbutton(stgsWindow, variable=stgsWindow.boolDLL, onvalue=True, offvalue=False)
+		stgsWindow.inpDLL.grid(column=1, row=row, sticky="nsew")
+
+		stgsWindow.boolDLR = tk.BooleanVar()
+		stgsWindow.boolDLR.set(stgsWindow.disablelogreport)
+		stgsWindow.inpDLR = tk.Checkbutton(stgsWindow, variable=stgsWindow.boolDLR, onvalue=True, offvalue=False)
+		stgsWindow.inpDLR.grid(column=2, row=row, sticky="nsew")
+
+		stgsWindow.boolDLO = tk.BooleanVar()
+		stgsWindow.boolDLO.set(stgsWindow.disablelogoutput)
+		stgsWindow.inpDLO = tk.Checkbutton(stgsWindow, variable=stgsWindow.boolDLO, onvalue=True, offvalue=False)
+		stgsWindow.inpDLO.grid(column=3, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer before the filters
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblAF = ttk.Label(stgsWindow, text="Agent Filter:")
+		stgsWindow.lblAF.grid(column=0, row=row, sticky="nsew")
+
+		icontext = "AddRow"
+		stgsWindow.btnAddFil = ttk.Button(stgsWindow, image=self.imgdata[icontext], text="+", command=lambda: self.msr_row_settings_addf(r, stgsWindow), width=1)
+		stgsWindow.btnAddFil.grid(column=9, row=row, sticky="news")
+
+		row += 1
+		stgsWindow.fmeFilters = tk.Frame(stgsWindow)
+		stgsWindow.fmeFilters.grid(column=0, row=row, columnspan=10, sticky="nsew")
+
+		if "filters" in base.mscriptlist[r]:
+			for f in base.mscriptlist[r]["filters"]:
+				base.debugmsg(5, "f:", f)
+				base.add_scriptfilter(f['optn'])
+				self.sr_row_settings_addf(r, stgsWindow, f['rule'], f['optn'])
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer before the buttons
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.rowconfigure(row, weight=1)
+
+		row += 1
+		btnSave = ttk.Button(stgsWindow, text="Save", command=lambda: self.msr_row_settings_save(r, stgsWindow))
+		btnSave.grid(column=6, row=row, sticky="nsew")
+
+		btnCancel = ttk.Button(stgsWindow, text="Cancel", command=stgsWindow.destroy)
+		btnCancel.grid(column=7, row=row, columnspan=3, sticky="nsew")  # cols 7, 8, 9
+
+	def msr_row_settings_save(self, r, stgsWindow):
+		base.debugmsg(7, "r:", r)
+		base.debugmsg(7, "stgsWindow:", stgsWindow)
+
+		nm = base.GetKey(base.resultnamemodes, stgsWindow.strNM.get())
+		base.debugmsg(7, "nm:", nm)
+		if len(nm) > 0:
+			if nm != stgsWindow.resultnamemodedefault:
+				base.mscriptlist[r]["resultnamemode"] = nm
+				self.plan_scnro_chngd = True
+			else:
+				if "resultnamemode" in base.mscriptlist[r]:
+					del base.mscriptlist[r]["resultnamemode"]
+					self.plan_scnro_chngd = True
+		else:
+			if "resultnamemode" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["resultnamemode"]
+			self.plan_scnro_chngd = True
+
+		el = stgsWindow.inpEL.get()
+		base.debugmsg(7, "el:", el)
+		if len(el) > 0:
+			if el != stgsWindow.excludelibrariesdefault:
+				base.mscriptlist[r]["excludelibraries"] = el
+				self.plan_scnro_chngd = True
+			else:
+				if "excludelibraries" in base.mscriptlist[r]:
+					del base.mscriptlist[r]["excludelibraries"]
+		else:
+			if "excludelibraries" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["excludelibraries"]
+			self.plan_scnro_chngd = True
+
+		ro = stgsWindow.inpRO.get()
+		base.debugmsg(7, "el:", el)
+		if len(ro) > 0:
+			if ro != stgsWindow.robotoptionscurrent:
+				base.mscriptlist[r]["robotoptions"] = ro
+				self.plan_scnro_chngd = True
+		else:
+			if "robotoptions" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["robotoptions"]
+			self.plan_scnro_chngd = True
+
+		tr = stgsWindow.boolTR.get()
+		base.debugmsg(7, "tr:", tr)
+		if tr != stgsWindow.testrepeaterdefault:
+			base.mscriptlist[r]["testrepeater"] = str(tr)
+			self.plan_scnro_chngd = True
+		else:
+			if "testrepeater" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["testrepeater"]
+				self.plan_scnro_chngd = True
+
+		# Inject Sleep
+		ise = stgsWindow.boolISE.get()
+		base.debugmsg(7, "ise:", ise)
+		if ise != stgsWindow.injectsleepenableddefault:
+			base.mscriptlist[r]["injectsleepenabled"] = str(ise)
+			self.plan_scnro_chngd = True
+		else:
+			if "injectsleepenabled" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["injectsleepenabled"]
+				self.plan_scnro_chngd = True
+
+		ismn = stgsWindow.inpISMN.get()
+		if len(ismn) > 0:
+			ismn = int(ismn)
+		else:
+			ismn = stgsWindow.injectsleepminimumdefault
+		base.debugmsg(7, "ismn:", ismn)
+		if ismn != stgsWindow.injectsleepminimumdefault:
+			base.mscriptlist[r]["injectsleepminimum"] = str(ismn)
+			self.plan_scnro_chngd = True
+		else:
+			if "injectsleepminimum" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["injectsleepminimum"]
+				self.plan_scnro_chngd = True
+
+		ismx = stgsWindow.inpISMX.get()
+		if len(ismx) > 0:
+			ismx = int(ismx)
+		else:
+			ismx = stgsWindow.injectsleepmaximumdefault
+		base.debugmsg(7, "ismx:", ismx)
+		if ismx != stgsWindow.injectsleepmaximumdefault:
+			base.mscriptlist[r]["injectsleepmaximum"] = str(ismx)
+			self.plan_scnro_chngd = True
+		else:
+			if "injectsleepmaximum" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["injectsleepmaximum"]
+				self.plan_scnro_chngd = True
+
+		# disableloglogdefault = False
+		dll = stgsWindow.boolDLL.get()
+		base.debugmsg(7, "ise:", ise)
+		if dll != stgsWindow.disableloglogdefault:
+			base.mscriptlist[r]["disableloglog"] = str(dll)
+			self.plan_scnro_chngd = True
+		else:
+			if "disableloglog" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["disableloglog"]
+				self.plan_scnro_chngd = True
+
+		# disablelogreportdefault = False
+		dlr = stgsWindow.boolDLR.get()
+		base.debugmsg(7, "ise:", ise)
+		if dlr != stgsWindow.disablelogreportdefault:
+			base.mscriptlist[r]["disablelogreport"] = str(dlr)
+			self.plan_scnro_chngd = True
+		else:
+			if "disablelogreport" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["disablelogreport"]
+				self.plan_scnro_chngd = True
+
+		# disablelogoutputdefault = False
+		dlo = stgsWindow.boolDLO.get()
+		base.debugmsg(7, "ise:", ise)
+		if dlo != stgsWindow.disablelogoutputdefault:
+			base.mscriptlist[r]["disablelogoutput"] = str(dlo)
+			self.plan_scnro_chngd = True
+		else:
+			if "disablelogoutput" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["disablelogoutput"]
+				self.plan_scnro_chngd = True
+
+		base.debugmsg(7, "stgsWindow.Filters:", stgsWindow.Filters)
+		if len(stgsWindow.Filters.keys()) > 0:
+			base.mscriptlist[r]["filters"] = []
+			for fil in stgsWindow.Filters.keys():
+				filtr = {}
+				filtr["rule"] = stgsWindow.Filters[fil]["FilRule"].get()
+				filtr["optn"] = stgsWindow.Filters[fil]["FilOpt"].get()
+
+				if "filters" not in base.mscriptlist[r]:
+					base.mscriptlist[r]["filters"] = []
+				base.mscriptlist[r]["filters"].append(filtr)
+			self.plan_scnro_chngd = True
+		else:
+			if "filters" in base.mscriptlist[r]:
+				del base.mscriptlist[r]["filters"]
+			self.plan_scnro_chngd = True
+
+		base.debugmsg(5, "base.mscriptlist[r]:", base.mscriptlist[r])
+
+		stgsWindow.destroy()
+
+	def msr_row_settings_addf(self, r, stgsWindow, *args):
+
+		FilRule = [None, "Require", "Exclude"]
+
+		base.debugmsg(5, "r:", r)
+		xy = stgsWindow.fmeFilters.grid_size()
+		base.debugmsg(5, "xy:", xy)
+		fid = xy[1]
+
+		stgsWindow.Filters[fid] = {}
+		stgsWindow.Filters[fid]["FilRule"] = tk.StringVar()
+		omfr = ttk.OptionMenu(stgsWindow.fmeFilters, stgsWindow.Filters[fid]["FilRule"], *FilRule)
+		stgsWindow.Filters[fid]["FilRule"].set(FilRule[1])
+		omfr.grid(column=0, row=fid, sticky="nsew")
+
+		stgsWindow.Filters[fid]["FilOpt"] = tk.StringVar()
+		omfo = ttk.OptionMenu(stgsWindow.fmeFilters, stgsWindow.Filters[fid]["FilOpt"], *base.scriptfilters)
+		omfo.grid(column=1, row=fid, sticky="nsew")
+
+		icontext = "Delete"
+		stgsWindow.btnRemFil = ttk.Button(stgsWindow.fmeFilters, image=self.imgdata[icontext], text="X", command=lambda: self.msr_row_settings_remf(fid, stgsWindow), width=1)
+		stgsWindow.btnRemFil.grid(column=9, row=fid, sticky="nsew")
+
+		if len(args) > 0:
+			base.debugmsg(5, "args[0]:", args[0])
+			stgsWindow.Filters[fid]["FilRule"].set(args[0])
+		if len(args) > 1:
+			base.debugmsg(5, "args[1]:", args[1])
+			stgsWindow.Filters[fid]["FilOpt"].set(args[1])
+
+	def msr_row_settings_remf(self, r, stgsWindow):
+		relmts = stgsWindow.fmeFilters.grid_slaves(row=r, column=None)
+		base.debugmsg(5, relmts)
+
+		for elmt in relmts:
+			elmt.destroy()
+
+		del stgsWindow.Filters[r]
+
+		stgsWindow.update_idletasks()
+
+	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+	#
 	# Run
 	#
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -7777,6 +9824,14 @@ class RFSwarmGUItk(tk.Frame):
 		usr.grid(column=26, row=1, sticky="nsew")
 		usr = ttk.Label(rgbar, textvariable=self.display_run['total_robots'])
 		usr.grid(column=26, row=2, sticky="nsew")
+
+		if "total_monitor" not in self.display_run:
+			self.display_run['total_monitor'] = tk.StringVar()
+			self.display_run['total_monitor'].set("  {}  ".format(base.total_monitor))
+		usr = ttk.Label(rgbar, text="  Monitor  ")
+		usr.grid(column=27, row=1, sticky="nsew")
+		usr = ttk.Label(rgbar, textvariable=self.display_run['total_monitor'])
+		usr.grid(column=27, row=2, sticky="nsew")
 
 		if "finish_time" not in self.display_run:
 			self.display_run['finish_time'] = tk.StringVar()
@@ -8131,38 +10186,58 @@ class RFSwarmGUItk(tk.Frame):
 
 			base.debugmsg(6, "Column Headings")
 
+			hcol = 0
 			usr = ttk.Label(self.agenttgrid, text="  Status  ", borderwidth=2, relief="raised")
-			usr.grid(column=0, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			usr = ttk.Label(self.agenttgrid, text="  Agent  ", borderwidth=2, relief="raised")
-			usr.grid(column=2, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			usr = ttk.Label(self.agenttgrid, text="  Last Seen  ", borderwidth=2, relief="raised")
-			usr.grid(column=4, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			usr = ttk.Label(self.agenttgrid, text="  Assigned  ", borderwidth=2, relief="raised")
-			usr.grid(column=5, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			usr = ttk.Label(self.agenttgrid, text="  Robots  ", borderwidth=2, relief="raised")
-			usr.grid(column=6, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
+
+			usr = ttk.Label(self.agenttgrid, text="  Monitor Assigned  ", borderwidth=2, relief="raised")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
+
+			usr = ttk.Label(self.agenttgrid, text="  Monitor  ", borderwidth=2, relief="raised")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			usr = ttk.Label(self.agenttgrid, text="  Load  ", borderwidth=2, relief="raised")
-			usr.grid(column=7, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			usr = ttk.Label(self.agenttgrid, text="  CPU %  ", borderwidth=2, relief="raised")
-			usr.grid(column=8, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			usr = ttk.Label(self.agenttgrid, text="  MEM %  ", borderwidth=2, relief="raised")
-			usr.grid(column=10, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			usr = ttk.Label(self.agenttgrid, text="  NET %  ", borderwidth=2, relief="raised")
-			usr.grid(column=12, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			usr = ttk.Label(self.agenttgrid, text="  Version  ", borderwidth=2, relief="raised")
-			usr.grid(column=13, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			usr = ttk.Label(self.agenttgrid, text="  Libraries  ", borderwidth=2, relief="raised")
-			usr.grid(column=15, row=0, sticky="nsew")
+			usr.grid(column=hcol, row=0, sticky="nsew")
+			hcol += 1
 
 			# update scrollbars
 			self.agenttgrid.update_idletasks()
@@ -8176,6 +10251,7 @@ class RFSwarmGUItk(tk.Frame):
 		rnum = 0
 		removeagents = []
 		robot_count = 0
+		minitor_count = 0
 		displayagent = True
 		base.debugmsg(6, "")
 
@@ -8216,6 +10292,11 @@ class RFSwarmGUItk(tk.Frame):
 				if "AssignedRobots" not in self.display_agents[rnum]:
 					self.display_agents[rnum]["AssignedRobots"] = tk.StringVar()
 
+				if "AssignedMRobots" not in self.display_agents[rnum]:
+					self.display_agents[rnum]["AssignedMRobots"] = tk.StringVar()
+				if "Monitor" not in self.display_agents[rnum]:
+					self.display_agents[rnum]["Monitor"] = tk.StringVar()
+
 				if "Version" not in self.display_agents[rnum]:
 					self.display_agents[rnum]["Version"] = tk.StringVar()
 
@@ -8229,6 +10310,8 @@ class RFSwarmGUItk(tk.Frame):
 				self.display_agents[rnum]["LastSeen"].set("  {}  ".format(dt.isoformat(sep=' ', timespec='seconds')))
 				self.display_agents[rnum]["AssignedRobots"].set("  {}  ".format(base.Agents[agnt]["AssignedRobots"]))
 				self.display_agents[rnum]["Robots"].set("  {}  ".format(base.Agents[agnt]["Robots"]))
+				self.display_agents[rnum]["AssignedMRobots"].set("  {}  ".format(base.Agents[agnt]["AssignedMRobots"]))
+				self.display_agents[rnum]["Monitor"].set("  {}  ".format(base.Agents[agnt]["Monitor"]))
 				self.display_agents[rnum]["LOAD%"].set("  {}  ".format(base.Agents[agnt]["LOAD%"]))
 				self.display_agents[rnum]["CPU%"].set("  {}  ".format(base.Agents[agnt]["CPU%"]))
 				self.display_agents[rnum]["MEM%"].set("  {}  ".format(base.Agents[agnt]["MEM%"]))
@@ -8241,9 +10324,10 @@ class RFSwarmGUItk(tk.Frame):
 				if "Properties" in base.Agents[agnt] and "RobotFramework: Libraries" in base.Agents[agnt]["Properties"]:
 					self.display_agents[rnum]["Libraries"].set("  {}  ".format(base.Agents[agnt]["Properties"]["RobotFramework: Libraries"]))
 
-				base.debugmsg(9, "UpdateAgents: display_agents:", self.display_agents)
+				base.debugmsg(5, "UpdateAgents: display_agents:", self.display_agents)
 
 			robot_count += base.Agents[agnt]["Robots"]
+			minitor_count += base.Agents[agnt]["Monitor"]
 
 			grdrows = self.agenttgrid.grid_size()[1]
 			if grdrows > 0:
@@ -8255,6 +10339,14 @@ class RFSwarmGUItk(tk.Frame):
 		self.display_run['total_robots'].set("  {}  ".format(base.total_robots))
 		base.debugmsg(9, "total_robots:", base.total_robots)
 		if base.total_robots > 0:
+			# etm = time.gmtime(int(time.time()) - base.robot_schedule["Start"])
+			etm = int(time.time()) - base.robot_schedule["Start"]
+			# self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
+			self.display_run['elapsed_time'].set("  {}  ".format(base.sec2hms(etm)))
+
+		self.display_run['total_monitor'].set("  {}  ".format(base.total_monitor))
+		base.debugmsg(9, "total_monitor:", base.total_monitor)
+		if base.total_monitor > 0:
 			# etm = time.gmtime(int(time.time()) - base.robot_schedule["Start"])
 			etm = int(time.time()) - base.robot_schedule["Start"]
 			# self.display_run['elapsed_time'].set("  {}  ".format(time.strftime("%H:%M:%S", etm)))
@@ -8279,38 +10371,61 @@ class RFSwarmGUItk(tk.Frame):
 		# https://www.python-course.eu/tkinter_events_binds.php
 
 	def add_agent_row(self, rnum):
-		base.debugmsg(9, "add_row: rnum:", rnum)
-		base.debugmsg(9, "add_row: Status:", self.display_agents[rnum]["Status"])
+		base.debugmsg(5, "rnum:", rnum)
+		base.debugmsg(5, "Status:", self.display_agents[rnum]["Status"])
+
+		dcol = 0
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["Status"], borderwidth=2, relief="groove")
-		usr.grid(column=0, row=rnum, sticky="nsew")
-		base.debugmsg(9, "add_row: Agent:", self.display_agents[rnum]["Agent"])
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
+		base.debugmsg(5, "Agent:", self.display_agents[rnum]["Agent"])
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["Agent"], borderwidth=2, relief="groove")
-		usr.grid(column=2, row=rnum, sticky="nsew")
-		base.debugmsg(9, "add_row: LastSeen:", self.display_agents[rnum]["LastSeen"])
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
+		base.debugmsg(5, "LastSeen:", self.display_agents[rnum]["LastSeen"])
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["LastSeen"], borderwidth=2, relief="groove")
-		usr.grid(column=4, row=rnum, sticky="nsew")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["AssignedRobots"], borderwidth=2, relief="groove")
-		usr.grid(column=5, row=rnum, sticky="nsew")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
+		base.debugmsg(5, "Robots:", self.display_agents[rnum]["Robots"])
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["Robots"], borderwidth=2, relief="groove")
-		usr.grid(column=6, row=rnum, sticky="nsew")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
+		base.debugmsg(5, "AssignedMRobots:", self.display_agents[rnum]["AssignedMRobots"])
+		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["AssignedMRobots"], borderwidth=2, relief="groove")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
+		base.debugmsg(5, "Monitor:", self.display_agents[rnum]["Monitor"])
+		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["Monitor"], borderwidth=2, relief="groove")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["LOAD%"], borderwidth=2, relief="groove")
-		usr.grid(column=7, row=rnum, sticky="nsew")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["CPU%"], borderwidth=2, relief="groove")
-		usr.grid(column=8, row=rnum, sticky="nsew")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["MEM%"], borderwidth=2, relief="groove")
-		usr.grid(column=10, row=rnum, sticky="nsew")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["NET%"], borderwidth=2, relief="groove")
-		usr.grid(column=12, row=rnum, sticky="nsew")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
 
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["Version"], borderwidth=2, relief="groove")
-		usr.grid(column=13, row=rnum, sticky="nsew")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
 
 		usr = ttk.Label(self.agenttgrid, textvariable=self.display_agents[rnum]["Libraries"], borderwidth=2, relief="groove")
-		usr.grid(column=15, row=rnum, sticky="nsew")
+		usr.grid(column=dcol, row=rnum, sticky="nsew")
+		dcol += 1
 
 		# update scrollbars
 		self.agenttgrid.update_idletasks()
 		self.ag_canvas.config(scrollregion=self.ag_canvas.bbox("all"))
+		base.debugmsg(5, "done: rnum:", rnum)
 
 	def UA_removerow(self, r):
 		relmts = self.agenttgrid.grid_slaves(row=r, column=None)
@@ -8443,6 +10558,10 @@ class RFSwarmGUItk(tk.Frame):
 			base.scriptcount += -1
 		base.scriptlist = [{}]
 		base.addScriptRow()
+		while base.mscriptcount > 0:
+			self.msr_remove_row(base.mscriptcount)
+			base.mscriptcount += -1
+		base.mscriptlist = [{}]
 
 	def mnu_file_Open(self, _event=None):
 		base.debugmsg(9, "mnu_file_Open")
@@ -8456,7 +10575,7 @@ class RFSwarmGUItk(tk.Frame):
 				tkf.askopenfilename(
 					initialdir=base.config['Plan']['ScenarioDir'],
 					title="Select RFSwarm Scenario File",
-					filetypes=(("RFSwarm", "*.rfs"), ("all files", "*.*"))
+					filetypes=(("RFSwarm", "*.rfs"), ("Yaml", "*.yml"), ("Yaml", "*.yaml"), ("JSON", "*.json"), ("all files", "*.*"))
 				)
 			)
 		else:
@@ -8519,6 +10638,37 @@ class RFSwarmGUItk(tk.Frame):
 
 			filedata['Scenario']['ScriptCount'] = base.inisafevalue(scriptidx)
 
+			# Save Monitoring
+
+			filedata['Scenario']['MonitorTimeBefore'] = base.inisafevalue(base.mtimebefore)
+			filedata['Scenario']['MonitorTimeAfter'] = base.inisafevalue(base.mtimeafter)
+
+			scriptcount = 0
+			if 'MonitorCount' not in filedata['Scenario']:
+				# filedata['Scenario']['ScriptCount'] = str(len(base.scriptlist)-1)
+				filedata['Scenario']['MonitorCount'] = base.inisafevalue(scriptcount)
+
+			for scrp in base.mscriptlist:
+				base.debugmsg(8, "scrp:", scrp)
+				if 'Index' in scrp:
+					scrpcopy = scrp.copy()
+					scriptcount += 1
+					scriptidx = f"m{scriptcount}"
+					if 'Script' in scrpcopy:
+						relpath = base.get_relative_path(base.config['Plan']['ScenarioFile'], scrp['Script'])
+						base.debugmsg(8, "relpath:", relpath)
+						scrpcopy['Script'] = relpath
+
+					if scriptidx not in filedata:
+						filedata[scriptidx] = {}
+					for key in scrpcopy.keys():
+						base.debugmsg(8, "key:", key)
+						if key not in ['Index', 'TestVar', 'ScriptHash']:
+							filedata[scriptidx][key] = base.inisafevalue(str(scrpcopy[key]))
+							base.debugmsg(8, "filedata[", scriptidx, "][", key, "]:", filedata[scriptidx][key])
+
+			filedata['Scenario']['MonitorCount'] = base.inisafevalue(scriptcount)
+
 			# Save graphs
 
 			sgraphs = []
@@ -8531,8 +10681,20 @@ class RFSwarmGUItk(tk.Frame):
 
 			filedata['Scenario']['GraphList'] = base.inisafevalue(",".join(sgraphs))
 
+			arrfile = os.path.splitext(base.config['Plan']['ScenarioFile'])
+			base.debugmsg(5, "arrfile: ", arrfile)
+
+			if arrfile[1].lower() not in [".rfs", ".yml", ".yaml", ".json"]:
+				msg = "Unsupported file type: " + arrfile[1].lower()
+				core.display_warning(msg)
+				return 1
 			with open(base.config['Plan']['ScenarioFile'], 'w', encoding="utf8") as sf:    # save
-				filedata.write(sf)
+				if arrfile[1].lower() == ".rfs":
+					filedata.write(sf)
+				if arrfile[1].lower() in [".yml", ".yaml"]:
+					yaml.dump(filedata._sections, sf, default_flow_style=False, sort_keys=False, allow_unicode=True, encoding='utf-8')
+				if arrfile[1].lower() == ".json":
+					json.dump(filedata._sections, sf, indent="\t")
 
 			self.updateTitle()
 
@@ -8543,15 +10705,16 @@ class RFSwarmGUItk(tk.Frame):
 			tkf.asksaveasfilename(
 				initialdir=base.config['Plan']['ScenarioDir'],
 				title="Save RFSwarm Scenario File",
-				filetypes=(("RFSwarm", "*.rfs"), ("all files", "*.*"))
+				# filetypes=(("RFSwarm", "*.rfs"), ("all files", "*.*"))
+				filetypes=(("RFSwarm", "*.rfs"), ("Yaml", "*.yml"), ("Yaml", "*.yaml"), ("JSON", "*.json"), ("all files", "*.*"))
 			)
 		)
-		base.debugmsg(9, "mnu_file_SaveAs: ScenarioFile:", ScenarioFile)
+		base.debugmsg(5, "ScenarioFile:", ScenarioFile)
 		if ScenarioFile is not None and len(ScenarioFile) > 0:
 			# ScenarioFile
 			filetupl = os.path.splitext(ScenarioFile)
 			base.debugmsg(9, "mnu_file_SaveAs: filetupl:", filetupl)
-			if filetupl[1] != ".rfs":
+			if filetupl[1].lower() not in [".rfs", ".yml", ".yaml", ".json"]:
 				ScenarioFile += ".rfs"
 				base.debugmsg(9, "mnu_file_SaveAs: ScenarioFile:", ScenarioFile)
 			base.config['Plan']['ScenarioFile'] = base.inisafevalue(ScenarioFile)

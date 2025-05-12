@@ -15,3 +15,25 @@ def read_ini_file(filename):
 		for key, value in config.items(section):
 			variables[section][key] = value
 	return variables
+
+
+def change_ini_option(filename, section, optionname, new_value):
+	"""Open ini change setting and close"""
+	print("filename:", filename)
+	print("section:", section, " optionname:", optionname, " new_value:", new_value)
+
+	config = configparser.ConfigParser()
+	print("Before:", config, dict(config))
+	config.read(filename)
+	print("Read:", config, dict(config))
+
+	if section not in config:
+		config[section] = {}
+	print("section:", config, dict(config))
+
+	config[section][optionname] = new_value
+
+	with open(filename, 'w', encoding="utf8") as configfile:
+		config.write(configfile)
+
+	print("After:", config, dict(config))

@@ -12,6 +12,7 @@ import difflib
 import glob
 import importlib.metadata
 import inspect
+import json
 import math
 import os
 import platform
@@ -43,6 +44,7 @@ import matplotlib  # required for matplot graphs
 import matplotlib.font_manager as font_manager
 import openpyxl  # used for xlsx export
 import tzlocal
+import yaml
 from docx import Document  # used for docx export
 from docx.enum.style import WD_STYLE_TYPE  # used for docx export
 from docx.enum.text import WD_ALIGN_PARAGRAPH  # used for docx export
@@ -65,8 +67,14 @@ from PIL import Image, ImageTk
 
 matplotlib.use("TkAgg") 	# required for matplot graphs
 
+__name__ = "rfswarm-manager"
+
 
 class percentile:
+	count = 0
+	percent = 90
+	values: Any = []
+
 	def __init__(self):
 		self.count = 0
 		self.percent = 90
@@ -100,6 +108,10 @@ class percentile:
 
 
 class stdevclass:
+	M = 0.0
+	S = 0.0
+	k = 1
+
 	def __init__(self):
 		self.M = 0.0
 		self.S = 0.0
@@ -354,6 +366,20 @@ class ReporterBase():
 			sec = int(arrhms[0])
 		return sec
 
+	def configparser_safe_dict(self, dictin):
+		self.debugmsg(7, "dictin: ", dictin)
+		dictout = dictin
+		for k in dictout.keys():
+			self.debugmsg(7, "value type: ", type(dictout[k]))
+			if isinstance(dictout[k], dict):
+				dictout[k] = self.configparser_safe_dict(dictout[k])
+			if isinstance(dictout[k], str):
+				dictout[k] = base.whitespace_set_ini_value(dictout[k])
+			if dictout[k] is None:
+				dictout[k] = ""
+		self.debugmsg(7, "dictout: ", dictout)
+		return dictout
+
 	#
 	# Template Functions
 	#
@@ -428,13 +454,13 @@ class ReporterBase():
 		#
 		# name = Scenario Detail
 		# parent = FB9082D01BC
-		plnt = self.report_new_section(plng, "Scenario Detail")
+		plnt = base.report_new_section(plng, "Scenario Detail")
 		# type = table
-		self.report_item_set_type(plnt, 'table')
+		base.report_item_set_type(plnt, 'table')
 		# colours = 1
-		self.rt_table_set_colours(plnt, 1)
+		base.rt_table_set_colours(plnt, 1)
 		# datatype = Plan
-		self.rt_table_set_dt(plnt, "Plan")
+		base.rt_table_set_dt(plnt, "Plan")
 		# col_index_show = 1
 		base.report_item_set_bool(plnt, base.rt_table_ini_colname("index Show"), 1)
 		# col_robots_show = 1
@@ -451,6 +477,29 @@ class ReporterBase():
 		base.report_item_set_value(plnt, base.rt_table_ini_colname("script Opt"), "File")
 		# col_test_show = 1
 		base.report_item_set_bool(plnt, base.rt_table_ini_colname("test Show"), 1)
+		#
+		# 	-	Monitoring Detail
+		#
+		# name = Monitoring Detail
+		mtrt = base.report_new_section(plng, "Monitoring Detail")
+		# type = table
+		base.report_item_set_type(mtrt, 'table')
+		# colours = 1
+		base.rt_table_set_colours(mtrt, 0)
+		# datatype = Monitoring
+		base.rt_table_set_dt(mtrt, "Monitoring")
+		# col_index_show = 1
+		base.report_item_set_bool(mtrt, base.rt_table_ini_colname("index Show"), 1)
+		# col_robots_show = 1
+		base.report_item_set_bool(mtrt, base.rt_table_ini_colname("robots Show"), 1)
+		# col_delay_show = 1
+		base.report_item_set_bool(mtrt, base.rt_table_ini_colname("run Show"), 1)
+		# col_script_show = 1
+		base.report_item_set_bool(mtrt, base.rt_table_ini_colname("script Show"), 1)
+		# col_script_opt = File
+		base.report_item_set_value(mtrt, base.rt_table_ini_colname("script Opt"), "File")
+		# col_test_show = 1
+		base.report_item_set_bool(mtrt, base.rt_table_ini_colname("test Show"), 1)
 
 		#
 		# 	Test Result Summary
@@ -706,7 +755,7 @@ class ReporterBase():
 		# datatype = Metric
 		base.report_item_set_value(ad, "datatype", "Metric")
 		# metrictype = Agent
-		base.report_item_set_value(ad, "metrictype", "Metric")
+		base.report_item_set_value(ad, "metrictype", "Agent")
 		# filteragent = None
 		# filtertype = None
 		# col_primarymetric_show = 1
@@ -822,6 +871,15 @@ class ReporterBase():
 		saved = False
 		if filename is None or len(filename) < 1:
 			filename = base.config['Reporter']['Template']
+
+		arrfile = os.path.splitext(filename)
+		base.debugmsg(5, "arrfile: ", arrfile)
+
+		if arrfile[1].lower() not in [".template", ".yml", ".yaml", ".json"]:
+			msg = "Unsupported file type: " + arrfile[1].lower()
+			core.display_message(msg)
+			return 1
+
 		templatedata = configparser.ConfigParser()
 		templatedata.read_dict(base.report._sections)
 		if "Report" in templatedata:
@@ -831,30 +889,85 @@ class ReporterBase():
 			if "endtime" in templatedata["Report"]:
 				# templatedata["Report"]["endtime"]
 				templatedata.remove_option('Report', 'endtime')
+
 		with open(filename, 'w', encoding="utf8") as templatefile:    # save
-			# base.report.write(templatefile)
-			templatedata.write(templatefile)
-			self.debugmsg(6, "Template Saved:", filename)
-			saved = True
+			if arrfile[1].lower() == ".template":
+				templatedata.write(templatefile)
+				saved = True
+			if arrfile[1].lower() in [".yml", ".yaml"]:
+				yaml.dump(templatedata._sections, templatefile, default_flow_style=False, sort_keys=False, allow_unicode=True, encoding='utf-8')
+				saved = True
+			if arrfile[1].lower() == ".json":
+				json.dump(templatedata._sections, templatefile, indent="\t")
+				saved = True
+
 		if saved:
+			self.debugmsg(6, "Template Saved:", filename)
+			core.display_message("Template Saved:", filename)
+
 			base.config['Reporter']['Template'] = base.whitespace_set_ini_value(filename)
-			path, file = os.path.split(base.config['Reporter']['Template'])
+			path = os.path.split(base.config['Reporter']['Template'])[0]
 			base.config['Reporter']['TemplateDir'] = base.whitespace_set_ini_value(path)
 			base.saveini()
 
 	def template_open(self, filename):
 		if len(filename) > 0 and os.path.isfile(filename):
 			base.debugmsg(7, "filename: ", filename)
+			arrfile = os.path.splitext(filename)
+			base.debugmsg(5, "arrfile: ", arrfile)
+
+			if len(arrfile) < 2:
+				msg = "Template file ", filename, " missing extention, unable to determine supported format. Plesae use extentions .template, .yaml or .json"
+				core.display_message(msg)
+				base.template_create()
+				return 1
+			if arrfile[1].lower() not in [".template", ".yml", ".yaml", ".json"]:
+				msg = "Template file ", filename, " has an invalid extention, unable to determine supported format. Plesae use extentions .template, .yaml or .json"
+				core.display_message(msg)
+				base.template_create()
+				return 1
 
 			base.config['Reporter']['Template'] = base.whitespace_set_ini_value(filename)
-			path, file = os.path.split(base.config['Reporter']['Template'])
+			path = os.path.split(base.config['Reporter']['Template'])[0]
 			base.config['Reporter']['TemplateDir'] = base.whitespace_set_ini_value(path)
 			base.saveini()
 
 			base.report = None
 			self.reportdata = {}
 			base.report = configparser.ConfigParser()
-			base.report.read(filename, encoding="utf8")
+
+			if arrfile[1].lower() == ".template":
+				base.report.read(filename, encoding="utf8")
+			else:
+				filedict = {}
+				if arrfile[1].lower() in [".yml", ".yaml"]:
+					# read yaml file
+					base.debugmsg(5, "read yaml file")
+					with open(filename, 'r', encoding="utf-8") as f:
+						filedict = yaml.safe_load(f)
+					base.debugmsg(5, "filedict: ", filedict)
+					filedict = base.configparser_safe_dict(filedict)
+					base.debugmsg(5, "filedict: ", filedict)
+				if arrfile[1].lower() == ".json":
+					# read json file
+					base.debugmsg(5, "read json file")
+					with open(filename, 'r', encoding="utf-8") as f:
+						filedict = json.load(f)
+					base.debugmsg(5, "filedict: ", filedict)
+					filedict = base.configparser_safe_dict(filedict)
+					base.debugmsg(5, "filedict: ", filedict)
+				base.debugmsg(5, "filedict: ", filedict)
+				base.report.read_dict(filedict)
+
+			base.debugmsg(7, "base.report: ", base.report)
+			if "Colours" in base.report:
+				base.debugmsg(7, "base.report[Colours]: ", base.report["Colours"])
+				if "defcolours" in base.report["Colours"]:
+					base.defcolours = base.whitespace_get_ini_value(base.report["Colours"]["defcolours"]).split(",")
+					base.debugmsg(7, "base.defcolours: ", base.defcolours)
+				if "namecolours" in base.report["Colours"]:
+					base.namecolours = base.whitespace_get_ini_value(base.report["Colours"]["namecolours"]).split(",")
+					base.debugmsg(7, "base.namecolours: ", base.namecolours)
 
 			base.report_item_set_changed_all("TOP")
 
@@ -868,6 +981,11 @@ class ReporterBase():
 	def report_save(self):
 		saved = False
 		if 'Reporter' in base.config:
+			if "Colours" not in base.report:
+				base.report["Colours"] = {}
+			base.report["Colours"]["defcolours"] = base.whitespace_set_ini_value(",".join(base.defcolours))
+			base.report["Colours"]["namecolours"] = base.whitespace_set_ini_value(",".join(base.namecolours))
+
 			if 'Report' in base.config['Reporter'] and len(base.config['Reporter']['Report']) > 0:
 				filename = base.config['Reporter']['Report']
 				filedir = os.path.dirname(filename)
@@ -897,6 +1015,16 @@ class ReporterBase():
 				base.template_create()
 			base.debugmsg(7, "report_save")
 			base.report_save()
+
+		base.debugmsg(7, "base.report: ", base.report)
+		if "Colours" in base.report:
+			base.debugmsg(7, "base.report[Colours]: ", base.report["Colours"])
+			if "defcolours" in base.report["Colours"]:
+				base.defcolours = base.whitespace_get_ini_value(base.report["Colours"]["defcolours"]).split(",")
+				base.debugmsg(7, "base.defcolours: ", base.defcolours)
+			if "namecolours" in base.report["Colours"]:
+				base.namecolours = base.whitespace_get_ini_value(base.report["Colours"]["namecolours"]).split(",")
+				base.debugmsg(7, "base.namecolours: ", base.namecolours)
 
 	def report_starttime(self):
 		if "starttime" in self.reportdata and self.reportdata["starttime"] > 0:
@@ -1085,7 +1213,7 @@ class ReporterBase():
 				if len(results) > 0:
 					filename = os.path.basename(results)
 					base.debugmsg(9, "filename: ", filename)
-					basename, ext = os.path.splitext(filename)
+					basename = os.path.splitext(filename)[0]
 					base.debugmsg(9, "basename: ", basename)
 					basearr = basename.split('_')
 					base.debugmsg(9, "basearr: ", basearr)
@@ -1429,6 +1557,17 @@ class ReporterBase():
 		changes = base.report_item_set_value(id, name, str(value))
 		return changes
 
+	def report_item_get_float(self, id, name):
+		value = base.report_item_get_value(id, name)
+		if value is None:
+			return -1.0
+		else:
+			return float(value)
+
+	def report_item_set_float(self, id, name, value):
+		changes = base.report_item_set_value(id, name, str(value))
+		return changes
+
 	def report_item_get_bool_def0(self, id, name):
 		value = base.report_item_get_int(id, name)
 		if value < 0:
@@ -1592,6 +1731,9 @@ class ReporterBase():
 			FAType = self.rt_table_get_fa(id)
 			FNType = self.rt_table_get_fn(id)
 			inpFP = self.rt_table_get_fp(id)
+			GSeconds = self.rt_graph_get_gseconds(id)
+			fltGW = self.rt_graph_get_gw(id)
+
 			colname = "Name"
 
 			sql = "SELECT "
@@ -1599,8 +1741,19 @@ class ReporterBase():
 			base.debugmsg(8, "RType:", RType, "sql:", sql)
 
 			if RType == "Response Time":
-				sql += "end_time as 'Time' "
-				sql += ", elapsed_time as 'Value' "
+				if GSeconds > 0:
+					sql += "max(end_time) as 'Time' "
+					if fltGW.lower() == "maximum":
+						sql += ", max(elapsed_time) as 'Value' "
+					elif fltGW.lower() == "minimum":
+						sql += ", min(elapsed_time) as 'Value' "
+					elif fltGW.lower() == "average":
+						sql += ", avg(elapsed_time) as 'Value' "
+					else:
+						sql += ", avg(elapsed_time) as 'Value' "
+				else:
+					sql += "end_time as 'Time' "
+					sql += ", elapsed_time as 'Value' "
 				# sql += ", result_name as 'Name' "
 				sql += ", result_name"
 				if EnFR and FRType in [None, "", "None"]:
@@ -1629,7 +1782,7 @@ class ReporterBase():
 				# sql += 		"LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' "
 
 			if RType == "TPS":
-				sql += "floor(end_time) as 'Time' "
+				sql += "floor(max(end_time)) as 'Time' "
 				sql += ", count(result) as 'Value' "
 				# sql += ", result_name as 'Name' "
 				sql += ", result_name"
@@ -1639,7 +1792,7 @@ class ReporterBase():
 					sql += " || ' - ' || agent"
 				sql += " as [" + colname + "] "
 			if RType == "Total TPS":
-				sql += "floor(end_time) as 'Time'"
+				sql += "floor(max(end_time)) as 'Time'"
 				sql += ", count(result) as 'Value' "
 				# sql += ", result as 'Name' "
 				sql += ", result"
@@ -1724,11 +1877,16 @@ class ReporterBase():
 				pass
 			if RType == "Response Time":
 				# sql += 		"result_name "
-				pass
+				if GSeconds > 0:
+					sql += f"GROUP BY [Name], floor(end_time/{GSeconds})"
+				sql += "ORDER BY end_time"
 
 			if RType == "TPS":
 				sql += "GROUP by "
-				sql += "floor(end_time) "
+				if GSeconds > 0:
+					sql += f"floor(end_time/{GSeconds}) "
+				else:
+					sql += "floor(end_time) "
 				sql += ", result_name "
 				sql += ", result "
 				sql += "ORDER by "
@@ -1737,7 +1895,10 @@ class ReporterBase():
 				sql += ", count(result) DESC "
 			if RType == "Total TPS":
 				sql += "GROUP by "
-				sql += "floor(end_time) "
+				if GSeconds > 0:
+					sql += f"floor(end_time/{GSeconds}) "
+				else:
+					sql += "floor(end_time) "
 				sql += ", result "
 				sql += "ORDER by "
 				sql += "floor(end_time)"
@@ -1753,25 +1914,37 @@ class ReporterBase():
 			FAType = self.rt_table_get_fa(id)
 			FNType = self.rt_table_get_fn(id)
 			inpFP = self.rt_table_get_fp(id)
+			GSeconds = self.rt_graph_get_gseconds(id)
+			fltGW = self.rt_graph_get_gw(id)
+
 			colname = "Name"
 
 			base.debugmsg(6, "MType:", MType, "	PM:", PM, "	SM:", SM)
 
 			mnamecolumns = []
 			# mcolumns = ["MetricTime as 'Time'", "MetricValue as 'Value'", "PrimaryMetric as 'Name'", "MetricType as 'Name'", "SecondaryMetric as 'Name'"]
-			mcolumns = ["MetricTime as 'Time'", "MetricValue as 'Value'"]
+			if GSeconds > 0:
+				mcolumns = ["max(MetricTime) as 'Time'"]
+				if fltGW.lower() == "maximum":
+					mcolumns.append("max(MetricValue) as 'Value'")
+				elif fltGW.lower() == "minimum":
+					mcolumns.append("min(MetricValue) as 'Value'")
+				elif fltGW.lower() == "average":
+					mcolumns.append("avg(MetricValue) as 'Value'")
+				else:
+					mcolumns.append("avg(MetricValue) as 'Value'")
+
+			else:
+				mcolumns = ["MetricTime as 'Time'", "MetricValue as 'Value'"]
 			wherelst = []
 			# grouplst = ["PrimaryMetric", "MetricType", "SecondaryMetric"]
 			grouplst = []
 
-			if MType not in [None, "", "None"] and len(MType) > 0:
-				# if "MetricType as 'Name'" in mcolumns:
-				# 	mcolumns.remove("MetricType as 'Name'")
-				wherelst.append("MetricType == '{}'".format(MType.replace("'", "''")))
-				if "MetricType" in grouplst:
-					grouplst.remove("MetricType")
-			else:
-				mnamecolumns.append("MetricType")
+			if GSeconds > 0:
+				# [Name], floor(end_time/{GSeconds})
+				grouplst.append(f"[{colname}]")
+				grouplst.append(f"floor(MetricTime/{GSeconds})")
+
 			if PM not in [None, "", "None"] and len(PM) > 0:
 				# if "PrimaryMetric as 'Name'" in mcolumns:
 				# 	mcolumns.remove("PrimaryMetric as 'Name'")
@@ -1780,6 +1953,14 @@ class ReporterBase():
 					grouplst.remove("PrimaryMetric")
 			else:
 				mnamecolumns.append("PrimaryMetric")
+			if MType not in [None, "", "None"] and len(MType) > 0:
+				# if "MetricType as 'Name'" in mcolumns:
+				# 	mcolumns.remove("MetricType as 'Name'")
+				wherelst.append("MetricType == '{}'".format(MType.replace("'", "''")))
+				if "MetricType" in grouplst:
+					grouplst.remove("MetricType")
+			else:
+				mnamecolumns.append("MetricType")
 			if SM not in [None, "", "None"] and len(SM) > 0:
 				# if "SecondaryMetric as 'Name'" in mcolumns:
 				# 	mcolumns.remove("SecondaryMetric as 'Name'")
@@ -1911,7 +2092,26 @@ class ReporterBase():
 			sql += "LEFT JOIN MetricData as md1 "
 			sql += "ON md1.SecondaryMetric = md0.MetricValue "
 			sql += "AND md1.MetricType = 'Scenario' "
-			sql += "WHERE md0.MetricType = 'Scenario' AND md0.PrimaryMetric like 'Test_%' "
+			sql += "WHERE md0.MetricType = 'Scenario' "
+			sql += "AND md0.PrimaryMetric like 'Test_%' "
+			sql += "AND md0.PrimaryMetric not like 'Test_m%' "
+
+		if DataType == "Monitoring":
+			sql = "SELECT "
+			sql += "md1.* "
+			sql += ", md0.SecondaryMetric as [File] "
+			sql += ", fp0.SecondaryMetric as [FilePath] "
+			# sql += ", concat(fp0.SecondaryMetric, " ", md0.MetricValue ) as [ColourKey] "
+			sql += "FROM MetricData as md0 "
+			sql += "LEFT JOIN MetricData as fp0 "
+			sql += "ON fp0.MetricValue = md0.MetricValue "
+			sql += "AND fp0.MetricType = 'Scenario' "
+			sql += "AND fp0.PrimaryMetric like 'Local_Path_%' "
+			sql += "LEFT JOIN MetricData as md1 "
+			sql += "ON md1.SecondaryMetric = md0.MetricValue "
+			sql += "AND md1.MetricType = 'Scenario' "
+			sql += "WHERE md0.MetricType = 'Scenario' "
+			sql += "AND md0.PrimaryMetric like 'Test_m%' "
 
 		base.debugmsg(5, "sql:", sql)
 		self.rt_graph_set_sql(id, sql)
@@ -1922,6 +2122,30 @@ class ReporterBase():
 			return float(value)
 		except Exception:
 			return value
+
+	# GSeconds Granularity Seconds
+	def rt_graph_get_gseconds(self, id):
+		value = base.report_item_get_float(id, "GSeconds")
+		if value < 0:
+			return 0
+		else:
+			return value
+
+	def rt_graph_set_gseconds(self, id, value):
+		changes = base.report_item_set_float(id, "GSeconds", float(value))
+		return changes
+
+	# GW Granularity shoW mode
+	def rt_graph_get_gw(self, id):
+		value = base.report_item_get_value(id, "GWType")
+		if value is None:
+			return "Average"
+		else:
+			return value
+
+	def rt_graph_set_gw(self, id, value):
+		changes = base.report_item_set_float(id, "GWType", value)
+		return changes
 
 	#
 	# Report Item Type: table
@@ -1953,6 +2177,23 @@ class ReporterBase():
 		starttime = base.rt_setting_get_starttime(id)
 		endtime = base.rt_setting_get_endtime(id)
 
+		if DataType == "Monitoring":
+			sql = "SELECT "
+			sql += "md1.* "
+			sql += ", md0.SecondaryMetric as [File] "
+			sql += ", fp0.SecondaryMetric as [FilePath] "
+			# sql += ", concat(fp0.SecondaryMetric, " ", md0.MetricValue ) as [ColourKey] "
+			sql += "FROM MetricData as md0 "
+			sql += "LEFT JOIN MetricData as fp0 "
+			sql += "ON fp0.MetricValue = md0.MetricValue "
+			sql += "AND fp0.MetricType = 'Scenario' "
+			sql += "AND fp0.PrimaryMetric like 'Local_Path_%' "
+			sql += "LEFT JOIN MetricData as md1 "
+			sql += "ON md1.SecondaryMetric = md0.MetricValue "
+			sql += "AND md1.MetricType = 'Scenario' "
+			sql += "WHERE md0.MetricType = 'Scenario' "
+			sql += "AND md0.PrimaryMetric like 'Test_m%' "
+
 		if DataType == "Plan":
 			sql = "SELECT "
 			sql += "md1.* "
@@ -1967,7 +2208,9 @@ class ReporterBase():
 			sql += "LEFT JOIN MetricData as md1 "
 			sql += "ON md1.SecondaryMetric = md0.MetricValue "
 			sql += "AND md1.MetricType = 'Scenario' "
-			sql += "WHERE md0.MetricType = 'Scenario' AND md0.PrimaryMetric like 'Test_%' "
+			sql += "WHERE md0.MetricType = 'Scenario' "
+			sql += "AND md0.PrimaryMetric like 'Test_%' "
+			sql += "AND md0.PrimaryMetric not like 'Test_m%' "
 
 		if DataType == "Result":
 			RType = self.rt_table_get_rt(id)
@@ -2390,7 +2633,8 @@ class ReporterBase():
 
 	def rt_table_get_dt(self, id):
 		base.debugmsg(9, "id:", id)
-		if 'DataType' in base.report[id]:
+		# report_subsection_parent
+		if id in base.report and 'DataType' in base.report[id]:
 			return base.whitespace_get_ini_value(base.report[id]['DataType'])
 		else:
 			return None
@@ -2991,6 +3235,9 @@ class ReporterBase():
 
 	def rt_errors_parse_xml(self, id, rid):
 		base.debugmsg(5, "id:", id, "	rid:", rid)
+
+		def safe_string(s):
+			return re.sub(r'[<>:"/\\|?*\n\t]', "_", s)
 		if id in base.reportdata and rid in base.reportdata[id]:
 			rdata = base.reportdata[id][rid]
 			base.debugmsg(8, "rdata:", rdata)
@@ -3002,9 +3249,13 @@ class ReporterBase():
 
 			ldir = os.path.join(os.path.dirname(dbfile), "logs")
 			base.debugmsg(8, "ldir:", ldir)
-
 			# 		opencart_1_1_1690876686_1_1690876693/Opencart_Sales_output.xml
-			gxpatt = os.path.join(ldir, "{}_{}_{}_*_{}_*".format(rdata['script'].split('.')[0], rdata['script_index'], rdata['robot'], rdata['iteration']), "*_output.xml")
+			gxpatt = os.path.join(ldir, "{}_{}_{}_*_{}_*".format(
+				safe_string(rdata['script'].split('.')[0]).rstrip("_"),
+				rdata['script_index'],
+				rdata['robot'],
+				rdata['iteration']
+			), "*_output.xml")
 			base.debugmsg(9, "gxpatt:", gxpatt)
 
 			xmlf = "not_found"
@@ -3235,10 +3486,29 @@ class ReporterBase():
 	# Colour Functions
 	#
 
+	def set_named_colour(self, name, incolour):
+		safename = name.lower().replace(",", ";")
+		if safename not in base.namecolours:
+			base.namecolours.append(safename)
+		self.set_line_colour(base.namecolours.index(safename), incolour)
+
 	def named_colour(self, name):
-		if name.lower() not in base.namecolours:
-			base.namecolours.append(name.lower())
-		return self.line_colour(base.namecolours.index(name.lower()))
+		safename = name.lower().replace(",", ";")
+		if safename not in base.namecolours:
+			base.namecolours.append(safename)
+		return self.line_colour(base.namecolours.index(safename))
+
+	def set_line_colour(self, grp, incolour):
+		if grp < len(base.defcolours):
+			base.defcolours[grp] = incolour
+		else:
+			while grp < len(base.defcolours):
+				base.debugmsg(9, base.defcolours)
+				newcolour = self.get_colour()
+				base.debugmsg(9, "newcolour:", newcolour)
+				base.defcolours.append(newcolour)
+			base.defcolours[grp] = incolour
+			base.report_save()
 
 	def line_colour(self, grp):
 		if grp < len(base.defcolours):
@@ -3251,6 +3521,7 @@ class ReporterBase():
 				newcolour = self.get_colour()
 				base.debugmsg(9, "newcolour:", newcolour)
 			base.defcolours.append(newcolour)
+			base.report_save()
 			return newcolour
 
 	def get_colour(self):
@@ -3333,7 +3604,7 @@ class ReporterBase():
 		for index in data.keys():
 			base.debugmsg(5, "index:", index, data[index])
 
-			eventtime = data[index]["start"]
+			eventtime = int(data[index]["start"])
 			rowout = {}
 			rowout["Time"] = eventtime
 			rowout["Value"] = 0
@@ -3345,7 +3616,7 @@ class ReporterBase():
 			else:
 				totaldata[eventtime] = 0
 
-			eventtime += int(data[index]["delay"])
+			eventtime += int(data[index]["delay"]) + 0.001
 			rowout = {}
 			rowout["Time"] = eventtime
 			rowout["Value"] = 0
@@ -3382,7 +3653,121 @@ class ReporterBase():
 				totaldata[eventtime] = 0
 
 			# estimated rampdown
+			eventtime += int(data[index]["rampup"]) + 0.001
+			rowout = {}
+			rowout["Time"] = eventtime
+			rowout["Value"] = 0
+			rowout["Name"] = data[index]["colourkey"]
+			dataout.append(rowout)
+
+			if eventtime in totaldata:
+				totaldata[eventtime] += int(data[index]["robots"]) * -1
+			else:
+				totaldata[eventtime] = int(data[index]["robots"]) * -1
+
+		stot = base.report_item_get_int(id, "ShowTotal")
+
+		if stot > 0:
+			robots = 0
+			for key in totaldata.keys():
+				base.debugmsg(5, "key:", key, totaldata[key])
+				robots += totaldata[key]
+				rowout = {}
+				rowout["Time"] = key
+				rowout["Value"] = robots
+				rowout["Name"] = "Total"
+				dataout.append(rowout)
+
+		base.debugmsg(5, "dataout:", dataout)
+		return dataout
+
+	def graph_postprocess_data_monitoring(self, id, datain):
+		base.debugmsg(5, "datain:", datain)
+		# [
+		# 	{'PrimaryMetric': 'Delay_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '0', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Ramp_Up_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '20', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Robots_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '30', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Run_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '60', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'}
+		# ]
+		# 	 'Time' 	 'Value' 	 [Name]
+		dataout = []
+		data = {}
+		totaldata = {}
+		for rowin in datain:
+			base.debugmsg(5, "rowin:", rowin)
+			if 'PrimaryMetric' in rowin and "_" in rowin['PrimaryMetric']:
+				key, index = rowin['PrimaryMetric'].rsplit("_", 1)
+				base.debugmsg(5, "key:", key, "	index:", index)
+				if index not in data:
+					data[index] = {}
+				if key == "Delay":
+					data[index]["start"] = rowin['MetricTime']
+					data[index]["delay"] = rowin['MetricValue']
+					data[index]["colourkey"] = rowin['SecondaryMetric'] + " " + rowin['FilePath']
+
+				if key == "Ramp_Up":
+					data[index]["rampup"] = rowin['MetricValue']
+				if key == "Robots":
+					data[index]["robots"] = rowin['MetricValue']
+				if key == "Run":
+					data[index]["run"] = rowin['MetricValue']
+
+			else:
+				base.debugmsg(5, "Unexpected data in rowin:", rowin)
+
+		for index in data.keys():
+			base.debugmsg(5, "index:", index, data[index])
+
+			eventtime = int(data[index]["start"])
+			rowout = {}
+			rowout["Time"] = eventtime
+			rowout["Value"] = 0
+			rowout["Name"] = data[index]["colourkey"]
+			dataout.append(rowout)
+
+			if eventtime in totaldata:
+				totaldata[eventtime] += 0
+			else:
+				totaldata[eventtime] = 0
+
+			eventtime += int(data[index]["delay"]) + 0.001
+			rowout = {}
+			rowout["Time"] = eventtime
+			rowout["Value"] = 0
+			rowout["Name"] = data[index]["colourkey"]
+			dataout.append(rowout)
+
+			if eventtime in totaldata:
+				totaldata[eventtime] += 0
+			else:
+				totaldata[eventtime] = 0
+
 			eventtime += int(data[index]["rampup"])
+			rowout = {}
+			rowout["Time"] = eventtime
+			rowout["Value"] = int(data[index]["robots"])
+			rowout["Name"] = data[index]["colourkey"]
+			dataout.append(rowout)
+
+			if eventtime in totaldata:
+				totaldata[eventtime] += int(data[index]["robots"])
+			else:
+				totaldata[eventtime] = int(data[index]["robots"])
+
+			eventtime += int(data[index]["run"])
+			rowout = {}
+			rowout["Time"] = eventtime
+			rowout["Value"] = int(data[index]["robots"])
+			rowout["Name"] = data[index]["colourkey"]
+			dataout.append(rowout)
+
+			if eventtime in totaldata:
+				totaldata[eventtime] += 0
+			else:
+				totaldata[eventtime] = 0
+
+			# estimated rampdown
+			eventtime += int(data[index]["rampup"]) + 0.001
 			rowout = {}
 			rowout["Time"] = eventtime
 			rowout["Value"] = 0
@@ -3473,6 +3858,69 @@ class ReporterBase():
 		base.debugmsg(5, "dataout:", dataout)
 		return dataout
 
+	def table_postprocess_data_monitoring(self, id, datain):
+		base.debugmsg(5, "datain:", datain)
+		# [
+		# 	{'PrimaryMetric': 'Delay_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '0', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Ramp_Up_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '20', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Robots_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '30', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'},
+		# 	{'PrimaryMetric': 'Run_1', 'MetricType': 'Scenario', 'MetricTime': 1719370859, 'SecondaryMetric': 'Jpetstore 01', 'MetricValue': '60', 'DataSource': 'hp-elite-desk-800-g3', 'File': 'jpetstore.robot', 'FilePath': '/home/dave/Documents/tmp/jpetstore/jpetstore.robot'}
+		# ]
+		# 	 Index		Robots		Delay  		RampUp 		Run		Script		Test	Settings
+		dataout = []
+		data = {}
+
+		scriptopt = base.report_item_get_value(id, base.rt_table_ini_colname("Script Opt"))
+		if scriptopt is None:
+			scriptopt = "File"
+
+		for rowin in datain:
+			base.debugmsg(5, "rowin:", rowin)
+			if 'PrimaryMetric' in rowin and "_" in rowin['PrimaryMetric']:
+				key, index = rowin['PrimaryMetric'].rsplit("_", 1)
+				base.debugmsg(5, "key:", key, "	index:", index)
+				if index not in data:
+					data[index] = {}
+				if key == "Delay":
+					data[index]["Index"] = index
+					data[index]["Delay"] = int(rowin['MetricValue'])
+					data[index]["Colour"] = rowin['SecondaryMetric'] + " " + rowin['FilePath']
+					data[index]["Script"] = rowin['File']
+					data[index]["ScriptPath"] = rowin['FilePath']
+					data[index]["Test"] = rowin['SecondaryMetric']
+
+				if key == "Ramp_Up":
+					data[index]["Ramp Up"] = int(rowin['MetricValue'])
+				if key == "Robots":
+					data[index]["Robots"] = int(rowin['MetricValue'])
+				if key == "Run":
+					data[index]["Run"] = int(rowin['MetricValue'])
+
+			else:
+				base.debugmsg(5, "Unexpected data in rowin:", rowin)
+
+		for index in data.keys():
+			base.debugmsg(5, "index:", index, data[index])
+
+			datarow = {}
+			# 	 Index		Robots		Delay  		RampUp 		Run		Script		Test	Settings
+			datarow["Colour"] = data[index]["Colour"]
+			datarow["Index"] = data[index]["Index"]
+			datarow["Robots"] = data[index]["Robots"]
+			# datarow["Delay"] = base.sec2hms(data[index]["Delay"])
+			# datarow["Ramp Up"] = base.sec2hms(data[index]["Ramp Up"])
+			datarow["Run"] = base.sec2hms(data[index]["Run"])
+			if scriptopt == "File":
+				datarow["Script"] = data[index]["Script"]
+			else:
+				datarow["Script"] = data[index]["ScriptPath"]
+			datarow["Test"] = data[index]["Test"]
+
+			dataout.append(datarow)
+
+		base.debugmsg(5, "dataout:", dataout)
+		return dataout
+
 
 class ReporterCore:
 
@@ -3540,7 +3988,34 @@ class ReporterCore:
 
 		if os.path.isfile(base.reporter_ini):
 			base.debugmsg(7, "reporter_ini: ", base.reporter_ini)
-			base.config.read(base.reporter_ini, encoding="utf8")
+			arrconfigfile = os.path.splitext(base.reporter_ini)
+			base.debugmsg(5, "arrconfigfile: ", arrconfigfile)
+			if len(arrconfigfile) < 2:
+				base.debugmsg(0, "Configuration file ", base.reporter_ini, " missing extention, unable to determine supported format. Plesae use extentions .ini, .yaml or .json")
+				exit()
+			if arrconfigfile[1].lower() not in [".ini", ".yml", ".yaml", ".json"]:
+				base.debugmsg(0, "Configuration file ", base.reporter_ini, " has an invalid extention, unable to determine supported format. Plesae use extentions .ini, .yaml or .json")
+				exit()
+			if arrconfigfile[1].lower() == ".ini":
+				base.config.read(base.reporter_ini, encoding="utf8")
+			else:
+				configdict = {}
+				if arrconfigfile[1].lower() in [".yml", ".yaml"]:
+					# read yaml file
+					base.debugmsg(5, "read yaml file")
+					with open(base.reporter_ini, 'r', encoding="utf-8") as f:
+						configdict = yaml.safe_load(f)
+						configdict = base.configparser_safe_dict(configdict)
+						base.debugmsg(5, "configdict: ", configdict)
+				if arrconfigfile[1].lower() == ".json":
+					# read json file
+					base.debugmsg(5, "read json file")
+					with open(base.reporter_ini, 'r', encoding="utf-8") as f:
+						configdict = json.load(f)
+						configdict = base.configparser_safe_dict(configdict)
+						base.debugmsg(5, "configdict: ", configdict)
+				base.debugmsg(5, "configdict: ", configdict)
+				base.config.read_dict(configdict)
 		else:
 			base.saveini()
 
@@ -4002,6 +4477,7 @@ class ReporterCore:
 			while base.gui is None and base.running:
 				time.sleep(0.5)
 			base.gui.updateStatus(msgout)
+			base.debugmsg(1, msgout)
 		else:
 			msglst = []
 			for msg in mesage:
@@ -4485,6 +4961,9 @@ class ReporterCore:
 				if datatypel == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
 					gdata = base.graph_postprocess_data_plan(idl, gdata)
+				if datatypel == "Monitoring":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_monitoring(idl, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -4521,6 +5000,9 @@ class ReporterCore:
 				if datatyper == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
 					gdata = base.graph_postprocess_data_plan(idr, gdata)
+				if datatyper == "Monitoring":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_monitoring(idr, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -4641,6 +5123,9 @@ class ReporterCore:
 			if datatype == "Plan":
 				base.debugmsg(9, "tdata before:", tdata)
 				tdata = base.table_postprocess_data_plan(id, tdata)
+			if datatype == "Monitoring":
+				base.debugmsg(9, "tdata before:", tdata)
+				tdata = base.table_postprocess_data_monitoring(id, tdata)
 			base.debugmsg(9, "tdata:", tdata)
 
 			if len(tdata) > 0:
@@ -5341,6 +5826,9 @@ class ReporterCore:
 				if datatypel == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
 					gdata = base.graph_postprocess_data_plan(idl, gdata)
+				if datatypel == "Monitoring":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_monitoring(idl, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -5377,6 +5865,9 @@ class ReporterCore:
 				if datatyper == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
 					gdata = base.graph_postprocess_data_plan(idr, gdata)
+				if datatyper == "Monitoring":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_monitoring(idr, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -5504,6 +5995,9 @@ class ReporterCore:
 			if datatype == "Plan":
 				base.debugmsg(9, "tdata before:", tdata)
 				tdata = base.table_postprocess_data_plan(id, tdata)
+			if datatype == "Monitoring":
+				base.debugmsg(9, "tdata before:", tdata)
+				tdata = base.table_postprocess_data_monitoring(id, tdata)
 			base.debugmsg(8, "tdata:", tdata)
 
 			if len(tdata) > 0:
@@ -6456,6 +6950,9 @@ class ReporterCore:
 				if datatypel == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
 					gdata = base.graph_postprocess_data_plan(idl, gdata)
+				if datatypel == "Monitoring":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_monitoring(idl, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -6492,6 +6989,9 @@ class ReporterCore:
 				if datatyper == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
 					gdata = base.graph_postprocess_data_plan(idr, gdata)
+				if datatyper == "Monitoring":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_monitoring(idr, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -6619,6 +7119,9 @@ class ReporterCore:
 			if datatype == "Plan":
 				base.debugmsg(9, "tdata before:", tdata)
 				tdata = base.table_postprocess_data_plan(id, tdata)
+			if datatype == "Monitoring":
+				base.debugmsg(9, "tdata before:", tdata)
+				tdata = base.table_postprocess_data_monitoring(id, tdata)
 			base.debugmsg(8, "tdata:", tdata)
 
 			if len(tdata) > 0:
@@ -7121,6 +7624,8 @@ class ReporterGUItk(tk.Frame):
 	b64: Any = {}
 	contentdata: Any = {}
 	t_preview: Any = {}
+
+	DataTypes = [None, "Metric", "Result", "ResultSummary", "Plan", "Monitoring", "SQL"]
 
 	titleprefix = "RFSwarm Reporter"
 
@@ -7682,7 +8187,12 @@ class ReporterGUItk(tk.Frame):
 
 		self.sectionstree.bind("<Button-1>", self.sect_click_sect)
 
-		self.LoadSections("TOP")
+		selected = self.sectionstree.focus()
+		base.debugmsg(5, "selected:", selected)
+		if len(selected) > 0:
+			self.LoadSections(selected)
+		else:
+			self.LoadSections("TOP")
 
 	def LoadSections(self, ParentID):
 		if ParentID == "TOP":
@@ -7807,6 +8317,11 @@ class ReporterGUItk(tk.Frame):
 		self.tabs.grid(column=0, row=0, sticky="nsew")
 		self.tabs.select(1)
 		# self.c_preview
+		# selected = self.sectionstree.focus()
+		# base.debugmsg(5, "selected:", selected)
+		# if len(selected) > 0:
+		# 	self.content_load(selected)
+		# else:
 		self.content_load("TOP")
 
 	def content_load(self, id):
@@ -8336,7 +8851,7 @@ class ReporterGUItk(tk.Frame):
 	def cs_select_hcolour(self, _event=None):
 		base.debugmsg(5, "_event:", _event)
 		# https://www.pythontutorial.net/tkinter/tkinter-color-chooser/
-		newcolour = tkac.askcolor(self.style_head_colour, title="Tkinter Color Chooser")
+		newcolour = tkac.askcolor(self.style_head_colour, title="Choose Heading Colour")
 		base.debugmsg(5, "newcolour:", newcolour)
 		newcolourhx = newcolour[-1]
 		base.debugmsg(5, "newcolourhx:", newcolourhx)
@@ -8529,9 +9044,8 @@ class ReporterGUItk(tk.Frame):
 		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[id]["LFrame"], text="Data Type:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
 
-		DataTypes = [None, "Metric", "Result", "ResultSummary", "Plan", "SQL"]
 		self.contentdata[id]["strDT"] = tk.StringVar()
-		self.contentdata[id]["omDT"] = ttk.OptionMenu(self.contentdata[id]["LFrame"], self.contentdata[id]["strDT"], command=self.cs_datatable_switchdt, *DataTypes)
+		self.contentdata[id]["omDT"] = ttk.OptionMenu(self.contentdata[id]["LFrame"], self.contentdata[id]["strDT"], command=self.cs_datatable_switchdt, *self.DataTypes)
 		self.contentdata[id]["strDT"].set(datatype)
 		self.contentdata[id]["omDT"].grid(column=1, row=rownum, sticky="nsew")
 
@@ -9029,7 +9543,7 @@ class ReporterGUItk(tk.Frame):
 			self.contentdata[id]["lblshowcol"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Show Column")
 			self.contentdata[id]["lblshowcol"].grid(column=2, row=rownum, sticky="nsew")
 
-			if datatype == "Plan":
+			if datatype in ["Plan", "Monitoring"]:
 				self.contentdata[id]["lblcolopt"] = ttk.Label(self.contentdata[id]["Frames"]["renamecols"], text="Options")
 				self.contentdata[id]["lblcolopt"].grid(column=3, row=rownum, sticky="nsew")
 
@@ -9101,7 +9615,7 @@ class ReporterGUItk(tk.Frame):
 				sql = base.rt_table_generate_sql(id)
 				if len(sql.strip()) < 1:
 					return None
-				if datatype not in ["Plan"]:
+				if datatype not in ["Plan", "Monitoring"]:
 					sql += " LIMIT 1 "
 
 			base.debugmsg(5, "sql:", sql)
@@ -9122,6 +9636,9 @@ class ReporterGUItk(tk.Frame):
 			if datatype == "Plan":
 				base.debugmsg(9, "tdata before:", tdata)
 				tdata = base.table_postprocess_data_plan(id, tdata)
+			if datatype == "Monitoring":
+				base.debugmsg(9, "tdata before:", tdata)
+				tdata = base.table_postprocess_data_monitoring(id, tdata)
 			base.debugmsg(8, "tdata:", tdata)
 
 			if len(tdata) > 0:
@@ -9196,7 +9713,7 @@ class ReporterGUItk(tk.Frame):
 				self.contentdata[id]["renamecolumns"][f"{colname} Show"].set(base.report_item_get_bool_def1(id, base.rt_table_ini_colname(f"{colname} Show")))
 				base.debugmsg(5, "colnum:", colnum, "	rownum:", rownum)
 
-				if datatype == "Plan":
+				if datatype in ["Plan", "Monitoring"]:
 					if colname == "Script":
 						colnum += 1
 						optval = base.report_item_get_value(id, base.rt_table_ini_colname(f"{colname} Opt"))
@@ -9205,9 +9722,9 @@ class ReporterGUItk(tk.Frame):
 
 						base.debugmsg(5, "colnum:", colnum, "	rownum:", rownum, "	optval:", optval)
 
-						DataTypes = [None, "File", "Path"]
+						ScriptTypes = [None, "File", "Path"]
 						self.contentdata[id]["renamecolumns"][f"{colname} Opt"] = tk.StringVar()
-						self.contentdata[id]["renamecolumns"][colopt] = ttk.OptionMenu(self.contentdata[id]["Frames"]["renamecols"], self.contentdata[id]["renamecolumns"][f"{colname} Opt"], command=self.cs_datatable_update, *DataTypes)
+						self.contentdata[id]["renamecolumns"][colopt] = ttk.OptionMenu(self.contentdata[id]["Frames"]["renamecols"], self.contentdata[id]["renamecolumns"][f"{colname} Opt"], command=self.cs_datatable_update, *ScriptTypes)
 						self.contentdata[id]["renamecolumns"][colopt].grid(column=colnum, row=rownum, sticky="nsew")
 						self.contentdata[id]["renamecolumns"][f"{colname} Opt"].set(optval)
 
@@ -9307,14 +9824,13 @@ class ReporterGUItk(tk.Frame):
 		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[pid]["LFrame"], text="Data Type:")
 		self.contentdata[id]["lblDT"].grid(column=0, row=rownum, sticky="nsew")
 
-		DataTypes = [None, "Metric", "Result", "Plan", "SQL"]
 		self.contentdata[idl]["strDT"] = tk.StringVar()
-		self.contentdata[idl]["omDT"] = ttk.OptionMenu(self.contentdata[pid]["LFrame"], self.contentdata[idl]["strDT"], command=self.cs_graph_switchdt, *DataTypes)
+		self.contentdata[idl]["omDT"] = ttk.OptionMenu(self.contentdata[pid]["LFrame"], self.contentdata[idl]["strDT"], command=self.cs_graph_switchdt, *self.DataTypes)
 		self.contentdata[idl]["strDT"].set(datatypel)
 		self.contentdata[idl]["omDT"].grid(column=1, row=rownum, sticky="nsew")
 
 		self.contentdata[idr]["strDT"] = tk.StringVar()
-		self.contentdata[idr]["omDT"] = ttk.OptionMenu(self.contentdata[pid]["RFrame"], self.contentdata[idr]["strDT"], command=self.cs_graph_switchdt, *DataTypes)
+		self.contentdata[idr]["omDT"] = ttk.OptionMenu(self.contentdata[pid]["RFrame"], self.contentdata[idr]["strDT"], command=self.cs_graph_switchdt, *self.DataTypes)
 		self.contentdata[idr]["strDT"].set(datatyper)
 		self.contentdata[idr]["omDT"].grid(column=1, row=rownum, sticky="nsew")
 
@@ -9400,12 +9916,15 @@ class ReporterGUItk(tk.Frame):
 			value = self.contentdata[idr]["SMetric"].get()
 			changes += base.rt_table_set_sm(idr, value)
 
+		RTypeChanges = 0
 		if "RType" in self.contentdata[idl]:
 			value = self.contentdata[idl]["RType"].get()
 			changes += base.rt_table_set_rt(idl, value)
+			RTypeChanges = changes
 		if "RType" in self.contentdata[idr]:
 			value = self.contentdata[idr]["RType"].get()
 			changes += base.rt_table_set_rt(idr, value)
+			RTypeChanges = changes
 
 		if "FRType" in self.contentdata[idl]:
 			value = self.contentdata[idl]["FRType"].get()
@@ -9448,6 +9967,20 @@ class ReporterGUItk(tk.Frame):
 		if "FPattern" in self.contentdata[idr]:
 			value = self.contentdata[idr]["FPattern"].get()
 			changes += base.rt_table_set_fp(idr, value)
+
+		if "GSeconds" in self.contentdata[idl]:
+			value = float(self.contentdata[idl]["GSeconds"].get())
+			changes += base.rt_graph_set_gseconds(idl, value)
+		if "GSeconds" in self.contentdata[idr]:
+			value = float(self.contentdata[idr]["GSeconds"].get())
+			changes += base.rt_graph_set_gseconds(idr, value)
+
+		if "GWType" in self.contentdata[idl]:
+			value = self.contentdata[idl]["GWType"].get()
+			changes += base.rt_graph_set_gw(idl, value)
+		if "GWType" in self.contentdata[idr]:
+			value = self.contentdata[idr]["GWType"].get()
+			changes += base.rt_graph_set_gw(idr, value)
 
 		if "strDT" in self.contentdata[idl]:
 			datatype = self.contentdata[idl]["strDT"].get()
@@ -9505,6 +10038,9 @@ class ReporterGUItk(tk.Frame):
 			cp = threading.Thread(target=lambda: self.content_preview(id))
 			cp.start()
 
+		if RTypeChanges > 0:
+			self.cs_graph_switchdt(id)
+
 	def cs_graph_switchdt(self, _event=None):
 		base.debugmsg(5, "self:", self, "	_event:", _event)
 		rownum = 0
@@ -9555,6 +10091,17 @@ class ReporterGUItk(tk.Frame):
 			self.contentdata[idl]["Frames"][datatypel].columnconfigure(99, weight=1)
 
 			# "Metric", "Result", "SQL"
+
+			if datatypel == "Monitoring":
+				rownum += 1
+				self.contentdata[idl]["lblSTot"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Show Total:")
+				self.contentdata[idl]["lblSTot"].grid(column=0, row=rownum, sticky="nsew")
+
+				# self.contentdata[idl]["Frames"][datatypel].columnconfigure(1, weight=1)
+				self.contentdata[idl]["Frames"][datatypel].columnconfigure(1, minsize=150)
+				self.contentdata[idl]["intSTot"] = tk.IntVar()
+				self.contentdata[idl]["chkSTot"] = ttk.Checkbutton(self.contentdata[idl]["Frames"][datatypel], variable=self.contentdata[idl]["intSTot"], command=self.cs_graph_update)
+				self.contentdata[idl]["chkSTot"].grid(column=1, row=rownum, sticky="nsew")
 
 			if datatypel == "Plan":
 				rownum += 1
@@ -9647,12 +10194,39 @@ class ReporterGUItk(tk.Frame):
 				# self.contentdata[idl]["inpFP"].bind('<Leave>', self.cs_graph_update)
 				self.contentdata[idl]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
+				rownum += 1
+				self.contentdata[idl]["lblGG"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Apply Granularity:")
+				self.contentdata[idl]["lblGG"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idl]["lblGS"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Seconds")
+				self.contentdata[idl]["lblGS"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[idl]["lblGW"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Show")
+				self.contentdata[idl]["lblGW"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idl]["GSeconds"] = tk.StringVar()
+				self.contentdata[idl]["inpGS"] = ttk.Entry(self.contentdata[idl]["Frames"][datatypel], textvariable=self.contentdata[idl]["GSeconds"])
+				self.contentdata[idl]["inpGS"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[idl]["inpGS"].bind('<FocusOut>', self.cs_graph_update)
+
+				GWTypes = ["Average", "Average", "Maximum", "Minimum"]
+				self.contentdata[idl]["GWType"] = tk.StringVar()
+				self.contentdata[idl]["omGW"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["GWType"], command=self.cs_graph_update, *GWTypes)
+				self.contentdata[idl]["omGW"].grid(column=2, row=rownum, sticky="nsew")
+
 			if datatypel == "Result":
+
+				rownum += 1
+				self.contentdata[idl]["lblEnabled"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Enabled")
+				self.contentdata[idl]["lblEnabled"].grid(column=2, row=rownum, sticky="nsew")
+
 				rownum += 1
 				self.contentdata[idl]["lblRT"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Result Type:")
 				self.contentdata[idl]["lblRT"].grid(column=0, row=rownum, sticky="nsew")
 
-				RTypes = [None, "Response Time", "TPS", "Total TPS"]
+				RType = base.rt_table_get_rt(idl)
+				RTypes = [RType, "Response Time", "TPS", "Total TPS"]
 				self.contentdata[idl]["RType"] = tk.StringVar()
 				self.contentdata[idl]["omRT"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["RType"], command=self.cs_graph_update, *RTypes)
 				self.contentdata[idl]["omRT"].grid(column=1, row=rownum, sticky="nsew")
@@ -9704,6 +10278,29 @@ class ReporterGUItk(tk.Frame):
 				# self.contentdata[idl]["inpFP"].bind('<Leave>', self.cs_graph_update)
 				self.contentdata[idl]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
+				rownum += 1
+				self.contentdata[idl]["lblGG"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Apply Granularity:")
+				self.contentdata[idl]["lblGG"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idl]["lblGS"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Seconds")
+				self.contentdata[idl]["lblGS"].grid(column=1, row=rownum, sticky="nsew")
+
+				if RType is not None and "TPS" not in RType:
+					self.contentdata[idl]["lblGW"] = ttk.Label(self.contentdata[idl]["Frames"][datatypel], text="Show")
+					self.contentdata[idl]["lblGW"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idl]["GSeconds"] = tk.StringVar()
+				self.contentdata[idl]["inpGS"] = ttk.Entry(self.contentdata[idl]["Frames"][datatypel], textvariable=self.contentdata[idl]["GSeconds"])
+				self.contentdata[idl]["inpGS"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[idl]["inpGS"].bind('<FocusOut>', self.cs_graph_update)
+
+				GWTypes = ["Average", "Average", "Maximum", "Minimum"]
+				self.contentdata[idl]["GWType"] = tk.StringVar()
+				if RType is not None and "TPS" not in RType:
+					self.contentdata[idl]["omGW"] = ttk.OptionMenu(self.contentdata[idl]["Frames"][datatypel], self.contentdata[idl]["GWType"], command=self.cs_graph_update, *GWTypes)
+					self.contentdata[idl]["omGW"].grid(column=2, row=rownum, sticky="nsew")
+
 			if datatypel == "SQL":
 				rownum += 1
 				# sql = base.rt_table_get_sql(id)
@@ -9726,6 +10323,17 @@ class ReporterGUItk(tk.Frame):
 			self.contentdata[idr]["Frames"][datatyper].columnconfigure(99, weight=1)
 
 			# "Metric", "Result", "SQL"
+
+			if datatyper == "Monitoring":
+				rownum += 1
+				self.contentdata[idr]["lblSTot"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Show Total:")
+				self.contentdata[idr]["lblSTot"].grid(column=0, row=rownum, sticky="nsew")
+
+				# self.contentdata[idr]["Frames"][datatyper].columnconfigure(1, weight=1)
+				self.contentdata[idr]["Frames"][datatyper].columnconfigure(1, minsize=150)
+				self.contentdata[idr]["intSTot"] = tk.IntVar()
+				self.contentdata[idr]["chkSTot"] = ttk.Checkbutton(self.contentdata[idr]["Frames"][datatyper], variable=self.contentdata[idr]["intSTot"], command=self.cs_graph_update)
+				self.contentdata[idr]["chkSTot"].grid(column=1, row=rownum, sticky="nsew")
 
 			if datatyper == "Plan":
 				rownum += 1
@@ -9818,12 +10426,39 @@ class ReporterGUItk(tk.Frame):
 				# self.contentdata[idr]["inpFP"].bind('<Leave>', self.cs_graph_update)
 				self.contentdata[idr]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
+				rownum += 1
+				self.contentdata[idr]["lblGG"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Apply Granularity:")
+				self.contentdata[idr]["lblGG"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idr]["lblGS"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Seconds")
+				self.contentdata[idr]["lblGS"].grid(column=1, row=rownum, sticky="nsew")
+
+				self.contentdata[idr]["lblGW"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Show")
+				self.contentdata[idr]["lblGW"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idr]["GSeconds"] = tk.StringVar()
+				self.contentdata[idr]["inpGS"] = ttk.Entry(self.contentdata[idr]["Frames"][datatyper], textvariable=self.contentdata[idr]["GSeconds"])
+				self.contentdata[idr]["inpGS"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[idr]["inpGS"].bind('<FocusOut>', self.cs_graph_update)
+
+				GWTypes = ["Average", "Average", "Maximum", "Minimum"]
+				self.contentdata[idr]["GWType"] = tk.StringVar()
+				self.contentdata[idr]["omGW"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["GWType"], command=self.cs_graph_update, *GWTypes)
+				self.contentdata[idr]["omGW"].grid(column=2, row=rownum, sticky="nsew")
+
 			if datatyper == "Result":
+
+				rownum += 1
+				self.contentdata[idr]["lblEnabled"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Enabled")
+				self.contentdata[idr]["lblEnabled"].grid(column=2, row=rownum, sticky="nsew")
+
 				rownum += 1
 				self.contentdata[idr]["lblRT"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Result Type:")
 				self.contentdata[idr]["lblRT"].grid(column=0, row=rownum, sticky="nsew")
 
-				RTypes = [None, "Response Time", "TPS", "Total TPS"]
+				RType = base.rt_table_get_rt(idr)
+				RTypes = [RType, "Response Time", "TPS", "Total TPS"]
 				self.contentdata[idr]["RType"] = tk.StringVar()
 				self.contentdata[idr]["omRT"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["RType"], command=self.cs_graph_update, *RTypes)
 				self.contentdata[idr]["omRT"].grid(column=1, row=rownum, sticky="nsew")
@@ -9875,6 +10510,29 @@ class ReporterGUItk(tk.Frame):
 				# self.contentdata[idr]["inpFP"].bind('<Leave>', self.cs_graph_update)
 				self.contentdata[idr]["inpFP"].bind('<FocusOut>', self.cs_graph_update)
 
+				rownum += 1
+				self.contentdata[idr]["lblGG"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Apply Granularity:")
+				self.contentdata[idr]["lblGG"].grid(column=0, row=rownum, sticky="nsew")
+
+				self.contentdata[idr]["lblGS"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Seconds")
+				self.contentdata[idr]["lblGS"].grid(column=1, row=rownum, sticky="nsew")
+
+				if RType is not None and "TPS" not in RType:
+					self.contentdata[idr]["lblGW"] = ttk.Label(self.contentdata[idr]["Frames"][datatyper], text="Show")
+					self.contentdata[idr]["lblGW"].grid(column=2, row=rownum, sticky="nsew")
+
+				rownum += 1
+				self.contentdata[idr]["GSeconds"] = tk.StringVar()
+				self.contentdata[idr]["inpGS"] = ttk.Entry(self.contentdata[idr]["Frames"][datatyper], textvariable=self.contentdata[idr]["GSeconds"])
+				self.contentdata[idr]["inpGS"].grid(column=1, row=rownum, sticky="nsew")
+				self.contentdata[idr]["inpGS"].bind('<FocusOut>', self.cs_graph_update)
+
+				GWTypes = ["Average", "Average", "Maximum", "Minimum"]
+				self.contentdata[idr]["GWType"] = tk.StringVar()
+				if RType is not None and "TPS" not in RType:
+					self.contentdata[idr]["omGW"] = ttk.OptionMenu(self.contentdata[idr]["Frames"][datatyper], self.contentdata[idr]["GWType"], command=self.cs_graph_update, *GWTypes)
+					self.contentdata[idr]["omGW"].grid(column=2, row=rownum, sticky="nsew")
+
 			if datatyper == "SQL":
 				rownum += 1
 				# sql = base.rt_table_get_sql(id)
@@ -9909,6 +10567,8 @@ class ReporterGUItk(tk.Frame):
 			self.contentdata[idl]["FAType"].set(base.rt_table_get_fa(idl))
 			self.contentdata[idl]["FNType"].set(base.rt_table_get_fn(idl))
 			self.contentdata[idl]["FPattern"].set(base.rt_table_get_fp(idl))
+			self.contentdata[idl]["GSeconds"].set(base.rt_graph_get_gseconds(idl))
+			self.contentdata[idl]["GWType"].set(base.rt_graph_get_gw(idl))
 
 		if datatyper == "Result":
 			self.cs_datatable_update_result(idr)
@@ -9919,6 +10579,9 @@ class ReporterGUItk(tk.Frame):
 			self.contentdata[idr]["FAType"].set(base.rt_table_get_fa(idr))
 			self.contentdata[idr]["FNType"].set(base.rt_table_get_fn(idr))
 			self.contentdata[idr]["FPattern"].set(base.rt_table_get_fp(idr))
+
+			self.contentdata[idr]["GSeconds"].set(base.rt_graph_get_gseconds(idr))
+			self.contentdata[idr]["GWType"].set(base.rt_graph_get_gw(idr))
 
 		if datatypel == "Metric":
 			base.debugmsg(5, "Update Options")
@@ -9942,6 +10605,10 @@ class ReporterGUItk(tk.Frame):
 				self.contentdata[idl]["FNType"].set(base.rt_table_get_fn(idl))
 			if "FPattern" in self.contentdata[idl]:
 				self.contentdata[idl]["FPattern"].set(base.rt_table_get_fp(idl))
+			if "GSeconds" in self.contentdata[idl]:
+				self.contentdata[idl]["GSeconds"].set(base.rt_graph_get_gseconds(idl))
+			if "GWType" in self.contentdata[idl]:
+				self.contentdata[idl]["GWType"].set(base.rt_graph_get_gw(idl))
 
 		if datatyper == "Metric":
 			base.debugmsg(5, "Update Options")
@@ -9965,12 +10632,24 @@ class ReporterGUItk(tk.Frame):
 				self.contentdata[idr]["FNType"].set(base.rt_table_get_fn(idr))
 			if "FPattern" in self.contentdata[idr]:
 				self.contentdata[idr]["FPattern"].set(base.rt_table_get_fp(idr))
+			if "GSeconds" in self.contentdata[idr]:
+				self.contentdata[idr]["GSeconds"].set(base.rt_graph_get_gseconds(idr))
+			if "GWType" in self.contentdata[idr]:
+				self.contentdata[idr]["GWType"].set(base.rt_graph_get_gw(idr))
 
 		if datatypel == "Plan":
 			self.contentdata[idl]["intSTot"].set(base.report_item_get_int(idl, "ShowTotal"))
 			changes += 1
 
 		if datatyper == "Plan":
+			self.contentdata[idr]["intSTot"].set(base.report_item_get_int(idr, "ShowTotal"))
+			changes += 1
+
+		if datatypel == "Monitoring":
+			self.contentdata[idl]["intSTot"].set(base.report_item_get_int(idl, "ShowTotal"))
+			changes += 1
+
+		if datatyper == "Monitoring":
 			self.contentdata[idr]["intSTot"].set(base.report_item_get_int(idr, "ShowTotal"))
 			changes += 1
 
@@ -10315,7 +10994,13 @@ class ReporterGUItk(tk.Frame):
 			# if "Preview" in self.contentdata[itm]:
 			# 	del self.contentdata[itm]["Preview"]
 			self.contentdata[itm]["Changed"] = 0
-		self.content_preview("TOP")
+
+		selected = self.sectionstree.focus()
+		base.debugmsg(5, "selected:", selected)
+		if len(selected) > 0:
+			self.content_preview(selected)
+		else:
+			self.content_preview("TOP")
 
 	def cp_generate_preview(self, id):
 		base.debugmsg(8, "id:", id)
@@ -10739,6 +11424,9 @@ class ReporterGUItk(tk.Frame):
 				if datatypel == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
 					gdata = base.graph_postprocess_data_plan(idl, gdata)
+				if datatypel == "Monitoring":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_monitoring(idl, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -10778,6 +11466,9 @@ class ReporterGUItk(tk.Frame):
 				if datatyper == "Plan":
 					base.debugmsg(9, "gdata before:", gdata)
 					gdata = base.graph_postprocess_data_plan(idr, gdata)
+				if datatyper == "Monitoring":
+					base.debugmsg(9, "gdata before:", gdata)
+					gdata = base.graph_postprocess_data_monitoring(idr, gdata)
 
 				base.debugmsg(9, "gdata:", gdata)
 
@@ -10887,6 +11578,9 @@ class ReporterGUItk(tk.Frame):
 			if datatype == "Plan":
 				base.debugmsg(9, "tdata before:", tdata)
 				tdata = base.table_postprocess_data_plan(id, tdata)
+			if datatype == "Monitoring":
+				base.debugmsg(9, "tdata before:", tdata)
+				tdata = base.table_postprocess_data_monitoring(id, tdata)
 			base.debugmsg(8, "tdata:", tdata)
 
 			# self.contentdata[id]["lblSpacer"] = ttk.Label(self.contentdata[id]["Preview"], text=notetxt)
@@ -10909,7 +11603,7 @@ class ReporterGUItk(tk.Frame):
 							cellname = "h_{}".format(col)
 							base.debugmsg(9, "cellname:", cellname)
 							dispname = base.rt_table_get_colname(id, col)
-							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="{} ".format(dispname.strip()), style='Report.THead.TLabel')
+							self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=f" {dispname.strip()} ", style='Report.THead.TLabel')
 							self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 							colnum += 1
 				i = 0
@@ -10920,8 +11614,8 @@ class ReporterGUItk(tk.Frame):
 					if colours:
 						colnum += 1
 						cellname = "{}_{}".format(i, "colour")
-						# self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text="  ")
 						self.contentdata[id][cellname] = tk.Label(self.contentdata[id]["Preview"], text="  ")
+						# self.contentdata[id][cellname] = tk.Button(self.contentdata[id]["Preview"], text=" ")
 						self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
 
 						base.debugmsg(9, "row:", row)
@@ -10932,8 +11626,11 @@ class ReporterGUItk(tk.Frame):
 						base.debugmsg(9, "label:", label)
 						colour = base.named_colour(label)
 						base.debugmsg(9, "colour:", colour)
-						# self.contentdata[id][cellname].config(background=colour)
 						self.contentdata[id][cellname].config(bg=colour)
+						# self.contentdata[id][cellname].config(background=colour, activebackground=colour)
+
+						# self.contentdata[id][cellname].config(command= lambda a=id, b=cellname, c=label: self.cp_select_hcolour(a, b, c))
+						self.contentdata[id][cellname].bind("<Button-1>", lambda a=id, b=cellname, c=label: self.cp_select_hcolour(a, b, c))
 
 					for col in cols:
 						if col not in ["Colour"]:
@@ -10942,8 +11639,23 @@ class ReporterGUItk(tk.Frame):
 								colnum += 1
 								cellname = "{}_{}".format(i, col)
 								base.debugmsg(9, "cellname:", cellname)
-								self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=str(row[col]), style='Report.TBody.TLabel')
+								self.contentdata[id][cellname] = ttk.Label(self.contentdata[id]["Preview"], text=f" {str(row[col])} ", style='Report.TBody.TLabel')
 								self.contentdata[id][cellname].grid(column=colnum, row=rownum, sticky="nsew")
+
+	def cp_select_hcolour(self, id, cellname, label, *args):
+		base.debugmsg(5, "args:", args)
+		base.debugmsg(5, "id:", id, " cellname:", cellname, " label:", label)
+		colour = base.named_colour(label)
+		base.debugmsg(5, "colour:", colour)
+
+		newcolour = tkac.askcolor(colour, title=f"Choose Colour for {label}")
+		base.debugmsg(5, "newcolour:", newcolour)
+		newcolourhx = newcolour[-1]
+		base.debugmsg(5, "newcolourhx:", newcolourhx)
+		if newcolourhx is not None:
+			base.set_named_colour(label, newcolourhx)
+			regen = threading.Thread(target=self.cp_regenerate_preview)
+			regen.start()
 
 	def cp_errors(self, id):
 		base.debugmsg(5, "id:", id)
@@ -11398,9 +12110,19 @@ class ReporterGUItk(tk.Frame):
 			self.updateTitle()
 			self.updateResults()
 			base.debugmsg(5, "LoadSections")
-			self.LoadSections("TOP")
+			selected = self.sectionstree.focus()
+			base.debugmsg(5, "selected:", selected)
+			if len(selected) > 0:
+				self.LoadSections(selected)
+			else:
+				self.LoadSections("TOP")
 			base.debugmsg(5, "content_load")
-			self.content_load("TOP")
+			selected = self.sectionstree.focus()
+			base.debugmsg(5, "selected:", selected)
+			if len(selected) > 0:
+				self.content_load(selected)
+			else:
+				self.content_load("TOP")
 
 	def mnu_template_New(self, _event=None):
 		base.debugmsg(5, "New Report Template")
@@ -11416,7 +12138,7 @@ class ReporterGUItk(tk.Frame):
 			tkf.askopenfilename(
 				initialdir=base.config['Reporter']['TemplateDir'],
 				title="Select RFSwarm Reporter Template",
-				filetypes=(("RFSwarm Reporter Template", "*.template"), ("all files", "*.*"))
+				filetypes=(("RFSwarm Reporter Template", "*.template"), ("Yaml", "*.yml"), ("Yaml", "*.yaml"), ("JSON", "*.json"), ("all files", "*.*"))
 			)
 		)
 		base.debugmsg(5, "TemplateFile:", TemplateFile)
@@ -11432,9 +12154,18 @@ class ReporterGUItk(tk.Frame):
 			base.debugmsg(5, "ConfigureStyle")
 			self.ConfigureStyle()
 			base.debugmsg(5, "LoadSections")
-			self.LoadSections("TOP")
+			selected = self.sectionstree.focus()
+			base.debugmsg(5, "selected:", selected)
+			if len(selected) > 0:
+				self.LoadSections(selected)
+			else:
+				self.LoadSections("TOP")
 			base.debugmsg(5, "content_load")
-			self.content_load("TOP")
+			base.debugmsg(5, "selected:", selected)
+			if len(selected) > 0:
+				self.content_load(selected)
+			else:
+				self.content_load("TOP")
 			base.debugmsg(5, "updateTemplate")
 			self.updateTemplate()
 			# base.debugmsg(5, "cp_regenerate_preview")
@@ -11457,7 +12188,7 @@ class ReporterGUItk(tk.Frame):
 			tkf.asksaveasfilename(
 				initialdir=base.config['Reporter']['TemplateDir'],
 				title="Save RFSwarm Reporter Template",
-				filetypes=(("Template", "*.template"), ("all files", "*.*")),
+				filetypes=(("RFSwarm Reporter Template", "*.template"), ("Yaml", "*.yml"), ("Yaml", "*.yaml"), ("JSON", "*.json"), ("all files", "*.*")),
 				defaultextension=".template"
 			)
 		)
@@ -11568,6 +12299,13 @@ base = ReporterBase()
 
 core = ReporterCore()
 
-core.mainloop()
+try:
+	core.mainloop()
+except KeyboardInterrupt:
+	core.on_closing()
+except Exception as e:
+	base.debugmsg(1, "core.Exception:", e)
+	core.on_closing()
+
 
 # r = RFSwarm_Reporter()

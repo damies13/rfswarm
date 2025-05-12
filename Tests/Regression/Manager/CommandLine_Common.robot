@@ -2,16 +2,22 @@
 Library 	OperatingSystem
 Library 	Process
 Library 	DatabaseLibrary
+Library		DateTime
 Library 	String
 Library 	Collections
 
 *** Variables ***
+${platform}		${None}
+${global_name} 	${None}
+${global_path} 	${None}
+
 ${cmd_agent} 		rfswarm-agent
 ${cmd_manager} 	rfswarm
 ${pyfile_agent} 		${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py
 ${pyfile_manager} 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
-${process_agent} 		None
-${process_manager} 	None
+${process_agent} 	${None}
+${process_manager} 	${None}
+${platform} 	${None}
 
 # datapath: /home/runner/work/rfswarm/rfswarm/rfswarm_manager/results/PreRun
 # datapath: /opt/hostedtoolcache/Python/3.9.18/x64/lib/python3.9/site-packages/rfswarm_manager/results/PreRun -- let's control the output path rather than leaving it to chance
@@ -108,7 +114,21 @@ Wait For Manager
 	[Arguments]		${timeout}=30min
 	${result}= 	Wait For Process		${process_manager} 	timeout=${timeout} 	on_timeout=terminate
 	# Should Be Equal As Integers 	${result.rc} 	0
-	Log to console 	${result.rc}
+	# Log to console 	Manager exited with: ${result.rc}
+
+	TRY
+		Log 	Manager exited with: ${result.rc} 		console=true
+
+		Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_manager.txt
+		Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_manager.txt
+
+		Log 	stdout_path: ${result.stdout_path} 	console=True
+		Log 	stdout: ${result.stdout} 	console=True
+		Log 	stderr_path: ${result.stderr_path} 	console=True
+		Log 	stderr: ${result.stderr} 	console=True
+	EXCEPT 	AS 	${error}
+		Log 	error: ${error} 		console=true
+	END
 
 Check Agent Is Running
 	[Documentation] 	This keyword checks if the agent is running and returns true or false
@@ -118,31 +138,70 @@ Check Agent Is Running
 	Should Be True 	${result}
 
 Stop Manager
-	${result}= 	Terminate Process		${process_manager}
-	# Should Be Equal As Integers 	${result.rc} 	0
+	${running}= 	Is Process Running 	${process_manager}
+	IF 	${running}
+		Sleep	3s
+		IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
+			${result}= 	Terminate Process		${process_manager}
+		ELSE
+			Send Signal To Process 	SIGINT 	${process_manager}
+			${result}= 	Wait For Process 	${process_manager}	timeout=30	on_timeout=kill
+		END
+	ELSE
+		TRY
+			# get result var for process even if not running any more
+			${result}= 	Get Process Result		${process_manager}
+		EXCEPT 	AS 	${error}
+			Log 	error: ${error} 		console=true
+		END
+	END
 
-	Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_manager.txt
-	Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_manager.txt
+	TRY
+		Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_manager.txt
+		Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_manager.txt
 
-	Log to console 	Terminate Manager Process returned: ${result.rc} 	console=True
-	Log 	stdout_path: ${result.stdout_path} 	console=True
-	Log 	stdout: ${result.stdout} 	console=True
-	Log 	stderr_path: ${result.stderr_path} 	console=True
-	Log 	stderr: ${result.stderr} 	console=True
+		Log to console 	Terminate Manager Process returned: ${result.rc} 	console=True
+		Log 	stdout_path: ${result.stdout_path} 	console=True
+		Log 	stdout: ${result.stdout} 	console=True
+		Log 	stderr_path: ${result.stderr_path} 	console=True
+		Log 	stderr: ${result.stderr} 	console=True
+	EXCEPT 	AS 	${error}
+		Log 	error: ${error} 		console=true
+	END
+
 
 Stop Agent
-	${result}= 	Terminate Process		${process_agent}
-	# Should Be Equal As Integers 	${result.rc} 	0
+	${running}= 	Is Process Running 	${process_agent}
+	IF 	${running}
+		Sleep	3s
+		IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
+			${result} = 	Terminate Process		${process_agent}
+		ELSE
+			Send Signal To Process 	SIGINT 	${process_agent}
+			${result}= 	Wait For Process 	${process_agent}	timeout=30	on_timeout=kill
+		END
+	ELSE
+		TRY
+			# get result var for process even if not running any more
+			${result}= 	Get Process Result		${process_agent}
+		EXCEPT 	AS 	${error}
+			Log 	error: ${error} 		console=true
+		END
+	END
 
-	Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_agent.txt
-	Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_agent.txt
+	TRY
+		Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_agent.txt
+		Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_agent.txt
 
-	Log 	Terminate Agent Process returned: ${result.rc} 	console=True
-	Log 	stdout_path: ${result.stdout_path} 	console=True
-	Log 	stdout: ${result.stdout} 	console=True
-	Log 	stderr_path: ${result.stderr_path} 	console=True
-	Log 	stderr: ${result.stderr} 	console=True
-	Show Dir Contents 	${agent_dir}
+		Log to console 	Agent returned: ${result.rc}
+		Log 	stdout_path: ${result.stdout_path} 	console=True
+		Log 	stdout: ${result.stdout} 	console=True
+		Log 	stderr_path: ${result.stderr_path} 	console=True
+		Log 	stderr: ${result.stderr} 	console=True
+		Show Dir Contents 	${agent_dir}
+	EXCEPT 	AS 	${error}
+		Log 	error: ${error} 		console=true
+	END
 
 Set Global Filename And Default Save Path
 	[Documentation]	Sets global default save path as Test Variable and file name for robot test.
@@ -191,9 +250,10 @@ Get Manager INI Data
 	EXCEPT
 		# --- temp fix:
 		@{mngr_options}= 	Create List 	-g 	1
-		Open Manager GUI 		${mngr_options}
+		Run Manager CLI 		${mngr_options}
+		Sleep 	5
 		# ---
-		Run Keyword		Close Manager GUI ${platform}
+		Run Keyword		Stop Manager
 		File Should Exist	${location}
 		File Should Not Be Empty	${location}
 	END
@@ -240,6 +300,12 @@ Change Manager INI File Settings
 	Log		${ini_content}
 	Append To File	${location}		${ini_content}
 
+Change ${str1} With ${str2} In ${file}
+	${file_content}	Get File	${file}
+	Remove File		${file}
+	${file_content}	Replace String	${file_content}	${str1}	${str2}
+	Create File		${file}	${file_content}
+
 Get Manager PIP Data
 	Run Process	pip	show	rfswarm-manager		alias=data
 	${pip_data}	Get Process Result	data
@@ -264,7 +330,7 @@ Query Result DB
 	Log 	dbfile: ${dbfile} 	console=true
 	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
 	# Log to console 	\${dbfile}: ${dbfile}
-	Connect To Database Using Custom Params 	sqlite3 	database="${dbfile}", isolation_level=None
+	Connect To Database 	sqlite3 	database=${dbfile} 	isolation_level=${None}
 	# Log 	conn: ${conn} 	console=true
 	Log 	sql: ${sql} 	console=true
 	Check If Exists In Database 	${sql}
@@ -312,7 +378,8 @@ Get Modules From Program .py File That Are Not BuildIn
 	...    textwrap	threading	time	timeit	tkinter	token	tokenize	tomllib	trace	traceback	tracemalloc	tty	turtle
 	...    turtledemo	types	typing	unicodedata	unittest	urllib	usercustomize	uu	uuid	venv	warnings	wave
 	...    weakref	webbrowser	winreg	winsound	wsgiref	xdrlib	xml	xmlrpc	zipapp	zipfile	zipimport	zlib	zoneinfo
-	&{replace_names}	Create Dictionary	PIL=pillow
+
+	&{replace_names}	Create Dictionary	PIL=pillow 		yaml=pyyaml
 
 	${manager_content}	Get File	${file_path}
 	${all_imports_lines}	Split String	${manager_content}	separator=\n
@@ -536,3 +603,86 @@ Check Icon Install For Ubuntu
 	File Should Exist 	${pathprefix}${/}applications${/}${projname}.desktop 		Desktop File not found
 
 	File Should Exist 	${pathprefix}${/}icons${/}hicolor${/}128x128${/}apps${/}${projname}.png 		Icon File not found
+
+Set Date Manually
+	[Arguments] 	${input_date}
+	IF 	"${platform}" == "macos"
+		${result}= 	Run Process 	sudo  date  -f  '%Y-%m-%d'  '${input_date}'
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	date  +%Y-%m-%d
+		Should Be Equal As Strings 	${result.stdout} 	${input_date}
+		Log 	New date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
+	IF 	"${platform}" == "windows"
+		${result}= 	Run Process 	powershell.exe  Set-Date  -Date  (Get-Date '${input_date}' -Format 'yyyy-MM-dd') 	shell=${True}
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	powershell.exe  Get-Date  -Format  'yyyy-MM-dd' 	shell=${True}
+		Should Be Equal As Strings 	${result.stdout} 	${input_date}
+		Log 	New date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
+	IF 	"${platform}" == "ubuntu"
+		${result}= 	Run Process 	sudo  timedatectl  set-ntp  false
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${input_date_epoch}= 	Convert Date 	${input_date} 	date_format=%Y-%m-%d 	result_format=epoch
+		${input_date_epoch}= 	Convert To Integer 	${input_date_epoch}
+		${result}= 	Run Process 	sudo  date  +%s  -s  @${input_date_epoch}
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		# ${result}= 	Run Process 	sudo  date  -s  ${input_date}  +%Y-%m-%d
+		# Log 	${result.stdout}
+		# Log 	${result.stderr}
+
+		${result}= 	Run Process 	date  +%Y-%m-%d
+		Should Be Equal As Strings 	${result.stdout} 	${input_date}
+		Log 	New date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
+
+Resync Date With Time Server
+	[Arguments] 	${old_date}
+	IF 	"${platform}" == "macos"
+		${result}= 	Run Process 	sudo  systemsetup  -setusingnetworktime  on
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	sudo  systemsetup  -setnetworktimeserver  time.apple.com
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	date  +%Y-%m-%d
+		Should Not Be Equal As Strings 	${result.stdout} 	${old_date}
+		Log 	Back to original date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
+	IF 	"${platform}" == "windows"
+		${result}= 	Run Process 	powershell.exe  w32tm  /resync 	shell=${True}
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	powershell.exe  Get-Date  -Format  'yyyy-MM-dd' 	shell=${True}
+		Should Not Be Equal As Strings 	${result.stdout} 	${old_date}
+		Log 	Back to original date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
+	IF 	"${platform}" == "ubuntu"
+		${result}= 	Run Process 	sudo  hwclock  --systohc
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	sudo  timedatectl  set-ntp  true
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	sudo  ntpdate  -u  time.google.com
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	date  +%Y-%m-%d
+		Should Not Be Equal As Strings 	${result.stdout} 	${old_date}
+		Log 	Back to original date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END

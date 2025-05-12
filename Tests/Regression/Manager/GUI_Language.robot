@@ -1,5 +1,5 @@
 *** Settings ***
-Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #238 	Languages 	GUI
+Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #238 	Languages
 
 Resource 	GUI_Common.robot
 

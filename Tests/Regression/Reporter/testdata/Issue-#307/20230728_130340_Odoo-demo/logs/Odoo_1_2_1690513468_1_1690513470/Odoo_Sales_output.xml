@@ -1,0 +1,693 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 5.0.1 (Python 3.9.2 on linux)" generated="20230728 03:04:30.337" rpa="false" schemaversion="3">
+<suite id="s1" name="Odoo" source="/tmp/rfswarmagent/scripts/Odoo.robot">
+<test id="s1-t1" name="Odoo Sales" line="23">
+<kw name="Odoo Open Login Screen">
+<doc>Open Odoo Login Screen</doc>
+<kw name="Remove Files" library="OperatingSystem">
+<arg>/tmp/rfswarmagent/scripts/selenium*.png</arg>
+<doc>Uses `Remove File` to remove multiple files one-by-one.</doc>
+<msg timestamp="20230728 03:04:30.716" level="INFO" html="true">File '&lt;a href="file:///tmp/rfswarmagent/scripts/selenium*.png"&gt;/tmp/rfswarmagent/scripts/selenium*.png&lt;/a&gt;' does not exist.</msg>
+<status status="PASS" starttime="20230728 03:04:30.715" endtime="20230728 03:04:30.716"/>
+</kw>
+<kw name="Open Browser" library="SeleniumLibrary">
+<arg>${LoginPage}</arg>
+<arg>Chrome</arg>
+<arg>options=add_argument("--disable-popup-blocking"); add_argument("--ignore-certificate-errors")</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<msg timestamp="20230728 03:04:30.716" level="INFO">Opening browser 'Chrome' to base url 'https://192.168.13.58'.</msg>
+<status status="PASS" starttime="20230728 03:04:30.716" endtime="20230728 03:04:32.497"/>
+</kw>
+<kw name="Set Selenium Implicit Wait" library="SeleniumLibrary">
+<var>${orig wait}</var>
+<arg>1 seconds</arg>
+<doc>Sets the implicit wait value used by Selenium.</doc>
+<msg timestamp="20230728 03:04:32.499" level="INFO">${orig wait} = 0 seconds</msg>
+<status status="PASS" starttime="20230728 03:04:32.497" endtime="20230728 03:04:32.499"/>
+</kw>
+<kw name="Wait Until Element Is Visible" library="SeleniumLibrary">
+<arg>//input[@id="login"]</arg>
+<arg>${WaitTimout}</arg>
+<doc>Waits until the element ``locator`` is visible.</doc>
+<status status="PASS" starttime="20230728 03:04:32.499" endtime="20230728 03:04:32.545"/>
+</kw>
+<status status="PASS" starttime="20230728 03:04:30.715" endtime="20230728 03:04:32.545"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>${ThinkTime}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230728 03:04:33.551" level="INFO">Slept 1 second</msg>
+<status status="PASS" starttime="20230728 03:04:32.550" endtime="20230728 03:04:33.551"/>
+</kw>
+<kw name="Get Data Row" library="perftest">
+<arg>/tmp/rfswarmagent/scripts/SalesUsers.tsv</arg>
+<arg>${RFS_ROBOT}</arg>
+<doc>This keyword gets a row of data from a CSV or TSV file,
+takes 1-2 arguments:
+- FileName (Required)
+- Row (Optional) can be Random, Sequential or a number
+defaults to Random</doc>
+<kw name="Get File" library="OperatingSystem">
+<var>${RAW_FILE}</var>
+<arg>${FileName}</arg>
+<doc>Returns the contents of a specified file.</doc>
+<msg timestamp="20230728 03:04:33.552" level="INFO" html="true">Getting file '&lt;a href="file:///tmp/rfswarmagent/scripts/SalesUsers.tsv"&gt;/tmp/rfswarmagent/scripts/SalesUsers.tsv&lt;/a&gt;'.</msg>
+<msg timestamp="20230728 03:04:33.552" level="INFO">${RAW_FILE} = Username	Password
+Sales001@example.com	Sales123
+Sales002@example.com	Sales123
+Sales003@example.com	Sales123
+Sales004@example.com	Sales123
+Sales005@example.com	Sales123
+</msg>
+<status status="PASS" starttime="20230728 03:04:33.552" endtime="20230728 03:04:33.552"/>
+</kw>
+<kw name="Split To Lines" library="String">
+<var>@{FILE_LINES}</var>
+<arg>${RAW_FILE}</arg>
+<doc>Splits the given string to lines.</doc>
+<msg timestamp="20230728 03:04:33.553" level="INFO">6 lines returned</msg>
+<msg timestamp="20230728 03:04:33.553" level="INFO">@{FILE_LINES} = [ Username	Password | Sales001@example.com	Sales123 | Sales002@example.com	Sales123 | Sales003@example.com	Sales123 | Sales004@example.com	Sales123 | Sales005@example.com	Sales123 ]</msg>
+<status status="PASS" starttime="20230728 03:04:33.552" endtime="20230728 03:04:33.553"/>
+</kw>
+<kw name="Get Length" library="BuiltIn">
+<var>${LINE_COUNT}</var>
+<arg>${FILE_LINES}</arg>
+<doc>Returns and logs the length of the given item as an integer.</doc>
+<msg timestamp="20230728 03:04:33.553" level="INFO">Length is 6</msg>
+<msg timestamp="20230728 03:04:33.553" level="INFO">${LINE_COUNT} = 6</msg>
+<status status="PASS" starttime="20230728 03:04:33.553" endtime="20230728 03:04:33.553"/>
+</kw>
+<kw name="Get Variable Value" library="BuiltIn">
+<var>${FILE_SEQUENTIAL_NUM}</var>
+<arg>${FILE_SEQUENTIAL_NUM}</arg>
+<arg>0</arg>
+<doc>Returns variable value or ``default`` if the variable does not exist.</doc>
+<msg timestamp="20230728 03:04:33.555" level="INFO">${FILE_SEQUENTIAL_NUM} = 0</msg>
+<status status="PASS" starttime="20230728 03:04:33.553" endtime="20230728 03:04:33.555"/>
+</kw>
+<kw name="Split String" library="String">
+<var>@{delim_cols}</var>
+<arg>${FILE_LINES}[0]</arg>
+<arg>,</arg>
+<doc>Splits the ``string`` using ``separator`` as a delimiter string.</doc>
+<msg timestamp="20230728 03:04:33.556" level="INFO">@{delim_cols} = [ Username	Password ]</msg>
+<status status="PASS" starttime="20230728 03:04:33.555" endtime="20230728 03:04:33.556"/>
+</kw>
+<kw name="Get Length" library="BuiltIn">
+<var>${delim_cols_len}</var>
+<arg>${delim_cols}</arg>
+<doc>Returns and logs the length of the given item as an integer.</doc>
+<msg timestamp="20230728 03:04:33.556" level="INFO">Length is 1</msg>
+<msg timestamp="20230728 03:04:33.556" level="INFO">${delim_cols_len} = 1</msg>
+<status status="PASS" starttime="20230728 03:04:33.556" endtime="20230728 03:04:33.556"/>
+</kw>
+<kw name="Set Variable If" library="BuiltIn">
+<var>${DELIMITER}</var>
+<arg>${delim_cols_len} &gt; 1</arg>
+<arg>,</arg>
+<arg>\t</arg>
+<doc>Sets variable based on the given condition.</doc>
+<msg timestamp="20230728 03:04:33.556" level="INFO">${DELIMITER} = 	</msg>
+<status status="PASS" starttime="20230728 03:04:33.556" endtime="20230728 03:04:33.556"/>
+</kw>
+<kw name="Split String" library="String">
+<var>@{FILE_COLUMNS}</var>
+<arg>${FILE_LINES}[0]</arg>
+<arg>${DELIMITER}</arg>
+<doc>Splits the ``string`` using ``separator`` as a delimiter string.</doc>
+<msg timestamp="20230728 03:04:33.557" level="INFO">@{FILE_COLUMNS} = [ Username | Password ]</msg>
+<status status="PASS" starttime="20230728 03:04:33.557" endtime="20230728 03:04:33.557"/>
+</kw>
+<kw name="Get Length" library="BuiltIn">
+<var>${COLUMNS_COUNT}</var>
+<arg>${FILE_COLUMNS}</arg>
+<doc>Returns and logs the length of the given item as an integer.</doc>
+<msg timestamp="20230728 03:04:33.557" level="INFO">Length is 2</msg>
+<msg timestamp="20230728 03:04:33.557" level="INFO">${COLUMNS_COUNT} = 2</msg>
+<status status="PASS" starttime="20230728 03:04:33.557" endtime="20230728 03:04:33.557"/>
+</kw>
+<kw name="Set Variable" library="BuiltIn">
+<var>${ROW_NUM}</var>
+<arg>${Row}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<msg timestamp="20230728 03:04:33.558" level="INFO">${ROW_NUM} = 2</msg>
+<status status="PASS" starttime="20230728 03:04:33.558" endtime="20230728 03:04:33.558"/>
+</kw>
+<kw name="Run Keyword If" library="BuiltIn">
+<var>${ROW_NUM}</var>
+<arg>${Row}=="Random"</arg>
+<arg>Evaluate</arg>
+<arg>random.randint(1, ${LINE_COUNT}-1)</arg>
+<arg>random</arg>
+<arg>ELSE</arg>
+<arg>Set Variable</arg>
+<arg>${ROW_NUM}</arg>
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<kw name="Set Variable" library="BuiltIn">
+<arg>${ROW_NUM}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" starttime="20230728 03:04:33.558" endtime="20230728 03:04:33.558"/>
+</kw>
+<msg timestamp="20230728 03:04:33.559" level="INFO">${ROW_NUM} = 2</msg>
+<status status="PASS" starttime="20230728 03:04:33.558" endtime="20230728 03:04:33.559"/>
+</kw>
+<kw name="Run Keyword If" library="BuiltIn">
+<var>${ROW_NUM}</var>
+<arg>${Row}=="Sequential"</arg>
+<arg>Evaluate</arg>
+<arg>${FILE_SEQUENTIAL_NUM} + 1</arg>
+<arg>ELSE</arg>
+<arg>Set Variable</arg>
+<arg>${ROW_NUM}</arg>
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<kw name="Set Variable" library="BuiltIn">
+<arg>${ROW_NUM}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" starttime="20230728 03:04:33.559" endtime="20230728 03:04:33.559"/>
+</kw>
+<msg timestamp="20230728 03:04:33.560" level="INFO">${ROW_NUM} = 2</msg>
+<status status="PASS" starttime="20230728 03:04:33.559" endtime="20230728 03:04:33.560"/>
+</kw>
+<kw name="Set Test Variable" library="BuiltIn">
+<arg>\${FILE_SEQUENTIAL_NUM}</arg>
+<arg>${FILE_SEQUENTIAL_NUM}</arg>
+<doc>Makes a variable available everywhere within the scope of the current test.</doc>
+<msg timestamp="20230728 03:04:33.560" level="INFO">${FILE_SEQUENTIAL_NUM} = 0</msg>
+<status status="PASS" starttime="20230728 03:04:33.560" endtime="20230728 03:04:33.560"/>
+</kw>
+<kw name="Split String" library="String">
+<var>@{ROW_COLUMNS}</var>
+<arg>${FILE_LINES}[${ROW_NUM}]</arg>
+<arg>${DELIMITER}</arg>
+<doc>Splits the ``string`` using ``separator`` as a delimiter string.</doc>
+<msg timestamp="20230728 03:04:33.561" level="INFO">@{ROW_COLUMNS} = [ Sales002@example.com | Sales123 ]</msg>
+<status status="PASS" starttime="20230728 03:04:33.560" endtime="20230728 03:04:33.561"/>
+</kw>
+<for flavor="IN RANGE">
+<var>${I}</var>
+<value>${COLUMNS_COUNT}</value>
+<iter>
+<var name="${I}">0</var>
+<kw name="Set Variable" library="BuiltIn">
+<var>${VAR_NAME}</var>
+<arg>${FILE_COLUMNS}[${I}]</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<msg timestamp="20230728 03:04:33.561" level="INFO">${VAR_NAME} = Username</msg>
+<status status="PASS" starttime="20230728 03:04:33.561" endtime="20230728 03:04:33.561"/>
+</kw>
+<kw name="Set Variable" library="BuiltIn">
+<var>${VAR_VALUE}</var>
+<arg>${ROW_COLUMNS}[${I}]</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<msg timestamp="20230728 03:04:33.562" level="INFO">${VAR_VALUE} = Sales002@example.com</msg>
+<status status="PASS" starttime="20230728 03:04:33.562" endtime="20230728 03:04:33.562"/>
+</kw>
+<kw name="Set Test Variable" library="BuiltIn">
+<arg>${${VAR_NAME}}</arg>
+<arg>${VAR_VALUE}</arg>
+<doc>Makes a variable available everywhere within the scope of the current test.</doc>
+<msg timestamp="20230728 03:04:33.563" level="INFO">${Username} = Sales002@example.com</msg>
+<status status="PASS" starttime="20230728 03:04:33.562" endtime="20230728 03:04:33.563"/>
+</kw>
+<status status="PASS" starttime="20230728 03:04:33.561" endtime="20230728 03:04:33.564"/>
+</iter>
+<iter>
+<var name="${I}">1</var>
+<kw name="Set Variable" library="BuiltIn">
+<var>${VAR_NAME}</var>
+<arg>${FILE_COLUMNS}[${I}]</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<msg timestamp="20230728 03:04:33.564" level="INFO">${VAR_NAME} = Password</msg>
+<status status="PASS" starttime="20230728 03:04:33.564" endtime="20230728 03:04:33.564"/>
+</kw>
+<kw name="Set Variable" library="BuiltIn">
+<var>${VAR_VALUE}</var>
+<arg>${ROW_COLUMNS}[${I}]</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<msg timestamp="20230728 03:04:33.565" level="INFO">${VAR_VALUE} = Sales123</msg>
+<status status="PASS" starttime="20230728 03:04:33.564" endtime="20230728 03:04:33.565"/>
+</kw>
+<kw name="Set Test Variable" library="BuiltIn">
+<arg>${${VAR_NAME}}</arg>
+<arg>${VAR_VALUE}</arg>
+<doc>Makes a variable available everywhere within the scope of the current test.</doc>
+<msg timestamp="20230728 03:04:33.566" level="INFO">${Password} = Sales123</msg>
+<status status="PASS" starttime="20230728 03:04:33.565" endtime="20230728 03:04:33.566"/>
+</kw>
+<status status="PASS" starttime="20230728 03:04:33.564" endtime="20230728 03:04:33.566"/>
+</iter>
+<status status="PASS" starttime="20230728 03:04:33.561" endtime="20230728 03:04:33.566"/>
+</for>
+<status status="PASS" starttime="20230728 03:04:33.551" endtime="20230728 03:04:33.567"/>
+</kw>
+<kw name="Odoo Login">
+<arg>${Username}</arg>
+<arg>${Password}</arg>
+<doc>Odoo Login</doc>
+<kw name="Input Text" library="SeleniumLibrary">
+<arg>//input[@name="login"]</arg>
+<arg>${User}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<msg timestamp="20230728 03:04:33.568" level="INFO">Typing text 'Sales002@example.com' into text field '//input[@name="login"]'.</msg>
+<status status="PASS" starttime="20230728 03:04:33.567" endtime="20230728 03:04:33.660"/>
+</kw>
+<kw name="Input Text" library="SeleniumLibrary">
+<arg>//input[@name="password"]</arg>
+<arg>${Pass}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<msg timestamp="20230728 03:04:33.661" level="INFO">Typing text 'Sales123' into text field '//input[@name="password"]'.</msg>
+<status status="PASS" starttime="20230728 03:04:33.661" endtime="20230728 03:04:33.747"/>
+</kw>
+<kw name="Click Element" library="SeleniumLibrary">
+<arg>//button[@class="btn btn-primary btn-block"]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<msg timestamp="20230728 03:04:33.748" level="INFO">Clicking element '//button[@class="btn btn-primary btn-block"]'.</msg>
+<status status="PASS" starttime="20230728 03:04:33.748" endtime="20230728 03:04:34.638"/>
+</kw>
+<kw name="Wait Until Page Contains" library="SeleniumLibrary">
+<arg>Discuss</arg>
+<arg>${WaitTimout}</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" starttime="20230728 03:04:34.638" endtime="20230728 03:04:34.786"/>
+</kw>
+<status status="PASS" starttime="20230728 03:04:33.567" endtime="20230728 03:04:34.787"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>${ThinkTime}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230728 03:04:35.789" level="INFO">Slept 1 second</msg>
+<status status="PASS" starttime="20230728 03:04:34.788" endtime="20230728 03:04:35.790"/>
+</kw>
+<kw name="Odoo Open Sales And Expect Salesperson" sourcename="Odoo Open ${Module} And Expect ${Expect}">
+<doc>Odoo Open Module</doc>
+<kw name="Click Element" library="SeleniumLibrary">
+<arg>css:li.dropdown</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<msg timestamp="20230728 03:04:35.791" level="INFO">Clicking element 'css:li.dropdown'.</msg>
+<status status="PASS" starttime="20230728 03:04:35.790" endtime="20230728 03:04:35.843"/>
+</kw>
+<kw name="Wait Until Page Contains" library="SeleniumLibrary">
+<arg>${Module}</arg>
+<arg>${WaitTimout}</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" starttime="20230728 03:04:35.843" endtime="20230728 03:04:35.854"/>
+</kw>
+<kw name="Click Link" library="SeleniumLibrary">
+<arg>${Module}</arg>
+<doc>Clicks a link identified by ``locator``.</doc>
+<msg timestamp="20230728 03:04:35.854" level="INFO">Clicking link 'Sales'.</msg>
+<status status="PASS" starttime="20230728 03:04:35.854" endtime="20230728 03:04:35.904"/>
+</kw>
+<kw name="Wait Until Page Contains" library="SeleniumLibrary">
+<arg>${Expect}</arg>
+<arg>${WaitTimout}</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" starttime="20230728 03:04:35.904" endtime="20230728 03:04:36.436"/>
+</kw>
+<status status="PASS" starttime="20230728 03:04:35.790" endtime="20230728 03:04:36.436"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>${ThinkTime}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230728 03:04:37.438" level="INFO">Slept 1 second</msg>
+<status status="PASS" starttime="20230728 03:04:36.438" endtime="20230728 03:04:37.439"/>
+</kw>
+<kw name="Odoo Create Sale">
+<doc>Odoo Create Sale</doc>
+<kw name="Click Button" library="SeleniumLibrary">
+<arg>Create</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<msg timestamp="20230728 03:04:37.440" level="INFO">Clicking button 'Create'.</msg>
+<status status="PASS" starttime="20230728 03:04:37.439" endtime="20230728 03:04:38.566"/>
+</kw>
+<kw name="Wait Until Page Contains" library="SeleniumLibrary">
+<arg>New</arg>
+<arg>${WaitTimout}</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" starttime="20230728 03:04:38.566" endtime="20230728 03:04:38.934"/>
+</kw>
+<status status="PASS" starttime="20230728 03:04:37.439" endtime="20230728 03:04:38.934"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>${ThinkTime}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230728 03:04:39.935" level="INFO">Slept 1 second</msg>
+<status status="PASS" starttime="20230728 03:04:38.934" endtime="20230728 03:04:39.935"/>
+</kw>
+<kw name="Odoo Fill Sale Data">
+<kw name="Name" library="FakerLibrary">
+<var>${Customer}</var>
+<doc>:example: 'John Doe'</doc>
+<msg timestamp="20230728 03:04:39.936" level="INFO">${Customer} = Ariana Mcdonald</msg>
+<status status="PASS" starttime="20230728 03:04:39.936" endtime="20230728 03:04:39.936"/>
+</kw>
+<kw name="Click Element" library="SeleniumLibrary">
+<arg>//label[text()='Customer']</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<msg timestamp="20230728 03:04:39.938" level="INFO">Clicking element '//label[text()='Customer']'.</msg>
+<status status="PASS" starttime="20230728 03:04:39.938" endtime="20230728 03:04:39.994"/>
+</kw>
+<kw name="Press Keys" library="SeleniumLibrary">
+<arg>None</arg>
+<arg>${Customer}</arg>
+<doc>Simulates the user pressing key(s) to an element or on the active browser.</doc>
+<msg timestamp="20230728 03:04:39.995" level="INFO">Sending key(s) ('Ariana Mcdonald',) to page.</msg>
+<msg timestamp="20230728 03:04:39.995" level="INFO">Sending keys Ariana Mcdonald</msg>
+<status status="PASS" starttime="20230728 03:04:39.995" endtime="20230728 03:04:40.115"/>
+</kw>
+<kw name="Capture Page Screenshot" library="SeleniumLibrary">
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<msg timestamp="20230728 03:04:40.207" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-1.png"&gt;&lt;img src="selenium-screenshot-1.png" width="800px"&gt;&lt;/a&gt;</msg>
+<status status="PASS" starttime="20230728 03:04:40.116" endtime="20230728 03:04:40.207"/>
+</kw>
+<kw name="Click Element" library="SeleniumLibrary">
+<arg>(//li//*[contains(text(),"${Customer}")])[1]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<msg timestamp="20230728 03:04:40.207" level="INFO">Clicking element '(//li//*[contains(text(),"Ariana Mcdonald")])[1]'.</msg>
+<status status="PASS" starttime="20230728 03:04:40.207" endtime="20230728 03:04:40.420"/>
+</kw>
+<kw name="Click Element" library="SeleniumLibrary">
+<arg>//label[text()='Payment Terms']</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<msg timestamp="20230728 03:04:40.421" level="INFO">Clicking element '//label[text()='Payment Terms']'.</msg>
+<status status="PASS" starttime="20230728 03:04:40.421" endtime="20230728 03:04:40.473"/>
+</kw>
+<kw name="Click Link" library="SeleniumLibrary">
+<arg>15 Days</arg>
+<doc>Clicks a link identified by ``locator``.</doc>
+<msg timestamp="20230728 03:04:40.473" level="INFO">Clicking link '15 Days'.</msg>
+<status status="PASS" starttime="20230728 03:04:40.473" endtime="20230728 03:04:40.612"/>
+</kw>
+<status status="PASS" starttime="20230728 03:04:39.935" endtime="20230728 03:04:40.613"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>${ThinkTime}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230728 03:04:41.613" level="INFO">Slept 1 second</msg>
+<status status="PASS" starttime="20230728 03:04:40.613" endtime="20230728 03:04:41.614"/>
+</kw>
+<kw name="Odoo Sale Add Product">
+<doc>Odoo Sale Add Product</doc>
+<kw name="Get Data Row" library="perftest">
+<arg>/tmp/rfswarmagent/scripts/Products.tsv</arg>
+<arg>"Random"</arg>
+<doc>This keyword gets a row of data from a CSV or TSV file,
+takes 1-2 arguments:
+- FileName (Required)
+- Row (Optional) can be Random, Sequential or a number
+defaults to Random</doc>
+<kw name="Get File" library="OperatingSystem">
+<var>${RAW_FILE}</var>
+<arg>${FileName}</arg>
+<doc>Returns the contents of a specified file.</doc>
+<msg timestamp="20230728 03:04:41.615" level="INFO" html="true">Getting file '&lt;a href="file:///tmp/rfswarmagent/scripts/Products.tsv"&gt;/tmp/rfswarmagent/scripts/Products.tsv&lt;/a&gt;'.</msg>
+<msg timestamp="20230728 03:04:41.615" level="INFO">${RAW_FILE} = Products
+Acoustic Bloc Screens
+Cabinet with Doors
+Cable Management Box
+Conference Chair
+Corner Desk Left Sit
+Corner Desk Right Sit
+Customizable Desk
+Desk Combination
+Desk Stand with Screen
+Drawer
+Draw...</msg>
+<status status="PASS" starttime="20230728 03:04:41.615" endtime="20230728 03:04:41.615"/>
+</kw>
+<kw name="Split To Lines" library="String">
+<var>@{FILE_LINES}</var>
+<arg>${RAW_FILE}</arg>
+<doc>Splits the given string to lines.</doc>
+<msg timestamp="20230728 03:04:41.615" level="INFO">25 lines returned</msg>
+<msg timestamp="20230728 03:04:41.616" level="INFO">@{FILE_LINES} = [ Products | Acoustic Bloc Screens | Cabinet with Doors | Cable Management Box | Conference Chair | Corner Desk Left Sit | Corner Desk Right Sit | Customizable Desk | Desk Combination | Desk Stand wit...</msg>
+<status status="PASS" starttime="20230728 03:04:41.615" endtime="20230728 03:04:41.616"/>
+</kw>
+<kw name="Get Length" library="BuiltIn">
+<var>${LINE_COUNT}</var>
+<arg>${FILE_LINES}</arg>
+<doc>Returns and logs the length of the given item as an integer.</doc>
+<msg timestamp="20230728 03:04:41.616" level="INFO">Length is 25</msg>
+<msg timestamp="20230728 03:04:41.616" level="INFO">${LINE_COUNT} = 25</msg>
+<status status="PASS" starttime="20230728 03:04:41.616" endtime="20230728 03:04:41.616"/>
+</kw>
+<kw name="Get Variable Value" library="BuiltIn">
+<var>${FILE_SEQUENTIAL_NUM}</var>
+<arg>${FILE_SEQUENTIAL_NUM}</arg>
+<arg>0</arg>
+<doc>Returns variable value or ``default`` if the variable does not exist.</doc>
+<msg timestamp="20230728 03:04:41.617" level="INFO">${FILE_SEQUENTIAL_NUM} = 0</msg>
+<status status="PASS" starttime="20230728 03:04:41.616" endtime="20230728 03:04:41.617"/>
+</kw>
+<kw name="Split String" library="String">
+<var>@{delim_cols}</var>
+<arg>${FILE_LINES}[0]</arg>
+<arg>,</arg>
+<doc>Splits the ``string`` using ``separator`` as a delimiter string.</doc>
+<msg timestamp="20230728 03:04:41.617" level="INFO">@{delim_cols} = [ Products ]</msg>
+<status status="PASS" starttime="20230728 03:04:41.617" endtime="20230728 03:04:41.617"/>
+</kw>
+<kw name="Get Length" library="BuiltIn">
+<var>${delim_cols_len}</var>
+<arg>${delim_cols}</arg>
+<doc>Returns and logs the length of the given item as an integer.</doc>
+<msg timestamp="20230728 03:04:41.617" level="INFO">Length is 1</msg>
+<msg timestamp="20230728 03:04:41.617" level="INFO">${delim_cols_len} = 1</msg>
+<status status="PASS" starttime="20230728 03:04:41.617" endtime="20230728 03:04:41.617"/>
+</kw>
+<kw name="Set Variable If" library="BuiltIn">
+<var>${DELIMITER}</var>
+<arg>${delim_cols_len} &gt; 1</arg>
+<arg>,</arg>
+<arg>\t</arg>
+<doc>Sets variable based on the given condition.</doc>
+<msg timestamp="20230728 03:04:41.618" level="INFO">${DELIMITER} = 	</msg>
+<status status="PASS" starttime="20230728 03:04:41.618" endtime="20230728 03:04:41.618"/>
+</kw>
+<kw name="Split String" library="String">
+<var>@{FILE_COLUMNS}</var>
+<arg>${FILE_LINES}[0]</arg>
+<arg>${DELIMITER}</arg>
+<doc>Splits the ``string`` using ``separator`` as a delimiter string.</doc>
+<msg timestamp="20230728 03:04:41.618" level="INFO">@{FILE_COLUMNS} = [ Products ]</msg>
+<status status="PASS" starttime="20230728 03:04:41.618" endtime="20230728 03:04:41.618"/>
+</kw>
+<kw name="Get Length" library="BuiltIn">
+<var>${COLUMNS_COUNT}</var>
+<arg>${FILE_COLUMNS}</arg>
+<doc>Returns and logs the length of the given item as an integer.</doc>
+<msg timestamp="20230728 03:04:41.619" level="INFO">Length is 1</msg>
+<msg timestamp="20230728 03:04:41.619" level="INFO">${COLUMNS_COUNT} = 1</msg>
+<status status="PASS" starttime="20230728 03:04:41.619" endtime="20230728 03:04:41.619"/>
+</kw>
+<kw name="Set Variable" library="BuiltIn">
+<var>${ROW_NUM}</var>
+<arg>${Row}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<msg timestamp="20230728 03:04:41.619" level="INFO">${ROW_NUM} = "Random"</msg>
+<status status="PASS" starttime="20230728 03:04:41.619" endtime="20230728 03:04:41.619"/>
+</kw>
+<kw name="Run Keyword If" library="BuiltIn">
+<var>${ROW_NUM}</var>
+<arg>${Row}=="Random"</arg>
+<arg>Evaluate</arg>
+<arg>random.randint(1, ${LINE_COUNT}-1)</arg>
+<arg>random</arg>
+<arg>ELSE</arg>
+<arg>Set Variable</arg>
+<arg>${ROW_NUM}</arg>
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<kw name="Evaluate" library="BuiltIn">
+<arg>random.randint(1, ${LINE_COUNT}-1)</arg>
+<arg>random</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" starttime="20230728 03:04:41.620" endtime="20230728 03:04:41.620"/>
+</kw>
+<msg timestamp="20230728 03:04:41.620" level="INFO">${ROW_NUM} = 19</msg>
+<status status="PASS" starttime="20230728 03:04:41.619" endtime="20230728 03:04:41.620"/>
+</kw>
+<kw name="Run Keyword If" library="BuiltIn">
+<var>${ROW_NUM}</var>
+<arg>${Row}=="Sequential"</arg>
+<arg>Evaluate</arg>
+<arg>${FILE_SEQUENTIAL_NUM} + 1</arg>
+<arg>ELSE</arg>
+<arg>Set Variable</arg>
+<arg>${ROW_NUM}</arg>
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<kw name="Set Variable" library="BuiltIn">
+<arg>${ROW_NUM}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" starttime="20230728 03:04:41.621" endtime="20230728 03:04:41.621"/>
+</kw>
+<msg timestamp="20230728 03:04:41.621" level="INFO">${ROW_NUM} = 19</msg>
+<status status="PASS" starttime="20230728 03:04:41.620" endtime="20230728 03:04:41.621"/>
+</kw>
+<kw name="Set Test Variable" library="BuiltIn">
+<arg>\${FILE_SEQUENTIAL_NUM}</arg>
+<arg>${FILE_SEQUENTIAL_NUM}</arg>
+<doc>Makes a variable available everywhere within the scope of the current test.</doc>
+<msg timestamp="20230728 03:04:41.621" level="INFO">${FILE_SEQUENTIAL_NUM} = 0</msg>
+<status status="PASS" starttime="20230728 03:04:41.621" endtime="20230728 03:04:41.622"/>
+</kw>
+<kw name="Split String" library="String">
+<var>@{ROW_COLUMNS}</var>
+<arg>${FILE_LINES}[${ROW_NUM}]</arg>
+<arg>${DELIMITER}</arg>
+<doc>Splits the ``string`` using ``separator`` as a delimiter string.</doc>
+<msg timestamp="20230728 03:04:41.622" level="INFO">@{ROW_COLUMNS} = [ Office Chair Black ]</msg>
+<status status="PASS" starttime="20230728 03:04:41.622" endtime="20230728 03:04:41.622"/>
+</kw>
+<for flavor="IN RANGE">
+<var>${I}</var>
+<value>${COLUMNS_COUNT}</value>
+<iter>
+<var name="${I}">0</var>
+<kw name="Set Variable" library="BuiltIn">
+<var>${VAR_NAME}</var>
+<arg>${FILE_COLUMNS}[${I}]</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<msg timestamp="20230728 03:04:41.623" level="INFO">${VAR_NAME} = Products</msg>
+<status status="PASS" starttime="20230728 03:04:41.622" endtime="20230728 03:04:41.623"/>
+</kw>
+<kw name="Set Variable" library="BuiltIn">
+<var>${VAR_VALUE}</var>
+<arg>${ROW_COLUMNS}[${I}]</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<msg timestamp="20230728 03:04:41.623" level="INFO">${VAR_VALUE} = Office Chair Black</msg>
+<status status="PASS" starttime="20230728 03:04:41.623" endtime="20230728 03:04:41.623"/>
+</kw>
+<kw name="Set Test Variable" library="BuiltIn">
+<arg>${${VAR_NAME}}</arg>
+<arg>${VAR_VALUE}</arg>
+<doc>Makes a variable available everywhere within the scope of the current test.</doc>
+<msg timestamp="20230728 03:04:41.625" level="INFO">${Products} = Office Chair Black</msg>
+<status status="PASS" starttime="20230728 03:04:41.623" endtime="20230728 03:04:41.625"/>
+</kw>
+<status status="PASS" starttime="20230728 03:04:41.622" endtime="20230728 03:04:41.625"/>
+</iter>
+<status status="PASS" starttime="20230728 03:04:41.622" endtime="20230728 03:04:41.625"/>
+</for>
+<status status="PASS" starttime="20230728 03:04:41.614" endtime="20230728 03:04:41.625"/>
+</kw>
+<kw name="Set Variable" library="BuiltIn">
+<var>${product}</var>
+<arg>${Products}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<msg timestamp="20230728 03:04:41.625" level="INFO">${product} = Office Chair Black</msg>
+<status status="PASS" starttime="20230728 03:04:41.625" endtime="20230728 03:04:41.625"/>
+</kw>
+<kw name="Click Link" library="SeleniumLibrary">
+<arg>Add a product</arg>
+<doc>Clicks a link identified by ``locator``.</doc>
+<msg timestamp="20230728 03:04:41.626" level="INFO">Clicking link 'Add a product'.</msg>
+<status status="PASS" starttime="20230728 03:04:41.626" endtime="20230728 03:04:41.683"/>
+</kw>
+<kw name="Capture Page Screenshot" library="SeleniumLibrary">
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<msg timestamp="20230728 03:04:41.831" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-2.png"&gt;&lt;img src="selenium-screenshot-2.png" width="800px"&gt;&lt;/a&gt;</msg>
+<status status="PASS" starttime="20230728 03:04:41.683" endtime="20230728 03:04:41.831"/>
+</kw>
+<kw name="Click Element" library="SeleniumLibrary">
+<arg>name:product_id</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<msg timestamp="20230728 03:04:41.832" level="INFO">Clicking element 'name:product_id'.</msg>
+<status status="PASS" starttime="20230728 03:04:41.832" endtime="20230728 03:04:41.899"/>
+</kw>
+<kw name="Press Keys" library="SeleniumLibrary">
+<arg>None</arg>
+<arg>${product}</arg>
+<doc>Simulates the user pressing key(s) to an element or on the active browser.</doc>
+<msg timestamp="20230728 03:04:41.900" level="INFO">Sending key(s) ('Office Chair Black',) to page.</msg>
+<msg timestamp="20230728 03:04:41.900" level="INFO">Sending keys Office Chair Black</msg>
+<status status="PASS" starttime="20230728 03:04:41.899" endtime="20230728 03:04:42.064"/>
+</kw>
+<kw name="Click Element" library="SeleniumLibrary">
+<arg>(//li//*[contains(text(),"${product}")])[1]</arg>
+<doc>Click the element identified by ``locator``.</doc>
+<msg timestamp="20230728 03:04:42.065" level="INFO">Clicking element '(//li//*[contains(text(),"Office Chair Black")])[1]'.</msg>
+<status status="PASS" starttime="20230728 03:04:42.065" endtime="20230728 03:04:42.334"/>
+</kw>
+<kw name="Evaluate" library="BuiltIn">
+<var>${random}</var>
+<arg>random.randint(0, 10)</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<msg timestamp="20230728 03:04:42.334" level="INFO">${random} = 3</msg>
+<status status="PASS" starttime="20230728 03:04:42.334" endtime="20230728 03:04:42.334"/>
+</kw>
+<kw name="Input Text" library="SeleniumLibrary">
+<arg>product_uom_qty</arg>
+<arg>${random}</arg>
+<doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
+<msg timestamp="20230728 03:04:42.335" level="INFO">Typing text '3' into text field 'product_uom_qty'.</msg>
+<status status="PASS" starttime="20230728 03:04:42.334" endtime="20230728 03:04:42.519"/>
+</kw>
+<kw name="Capture Page Screenshot" library="SeleniumLibrary">
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<msg timestamp="20230728 03:04:42.654" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-3.png"&gt;&lt;img src="selenium-screenshot-3.png" width="800px"&gt;&lt;/a&gt;</msg>
+<status status="PASS" starttime="20230728 03:04:42.519" endtime="20230728 03:04:42.654"/>
+</kw>
+<status status="PASS" starttime="20230728 03:04:41.614" endtime="20230728 03:04:42.655"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>${ThinkTime}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20230728 03:04:43.656" level="INFO">Slept 1 second</msg>
+<status status="PASS" starttime="20230728 03:04:42.655" endtime="20230728 03:04:43.656"/>
+</kw>
+<kw name="Odoo Confirm Sale">
+<doc>Odoo Confirm Sale</doc>
+<kw name="Click Button" library="SeleniumLibrary">
+<arg>(//button[@name="action_confirm"])[2]</arg>
+<doc>Clicks the button identified by ``locator``.</doc>
+<msg timestamp="20230728 03:04:43.657" level="INFO">Clicking button '(//button[@name="action_confirm"])[2]'.</msg>
+<status status="PASS" starttime="20230728 03:04:43.657" endtime="20230728 03:04:43.775"/>
+</kw>
+<kw name="Wait Until Page Does Not Contain Element" library="SeleniumLibrary">
+<arg>//li[@class="breadcrumb-item active" and text()="New"]</arg>
+<doc>Waits until the element ``locator`` disappears from the current page.</doc>
+<status status="PASS" starttime="20230728 03:04:43.775" endtime="20230728 03:04:45.039"/>
+</kw>
+<kw name="Wait Until Page Contains" library="SeleniumLibrary">
+<arg>Order Date</arg>
+<arg>${WaitTimout}</arg>
+<doc>Waits until ``text`` appears on the current page.</doc>
+<status status="PASS" starttime="20230728 03:04:45.039" endtime="20230728 03:04:45.051"/>
+</kw>
+<kw name="Capture Page Screenshot" library="SeleniumLibrary">
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<msg timestamp="20230728 03:04:45.152" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-4.png"&gt;&lt;img src="selenium-screenshot-4.png" width="800px"&gt;&lt;/a&gt;</msg>
+<status status="PASS" starttime="20230728 03:04:45.051" endtime="20230728 03:04:45.152"/>
+</kw>
+<status status="PASS" starttime="20230728 03:04:43.656" endtime="20230728 03:04:45.152"/>
+</kw>
+<status status="PASS" starttime="20230728 03:04:30.714" endtime="20230728 03:04:45.154"/>
+</test>
+<kw name="Close All Browsers" library="SeleniumLibrary" type="TEARDOWN">
+<doc>Closes all open browsers and resets the browser cache.</doc>
+<status status="PASS" starttime="20230728 03:04:45.154" endtime="20230728 03:04:45.214"/>
+</kw>
+<meta name="File">*.tsv</meta>
+<meta name="RFS_AGENTNAME">RFASelenium0</meta>
+<meta name="RFS_AGENTVERSION">1.1.4</meta>
+<meta name="RFS_DEBUGLEVEL">0</meta>
+<meta name="RFS_EXCLUDELIBRARIES">String,OperatingSystem,perftest,SeleniumLibrary,BuiltIn</meta>
+<meta name="RFS_INDEX">1</meta>
+<meta name="RFS_ITERATION">1</meta>
+<meta name="RFS_ROBOT">2</meta>
+<meta name="RFS_SWARMMANAGER">http://hp-elite-desk-800-g3:8138/</meta>
+<status status="PASS" starttime="20230728 03:04:30.386" endtime="20230728 03:04:45.214"/>
+</suite>
+<statistics>
+<total>
+<stat pass="1" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat pass="1" fail="0" skip="0" id="s1" name="Odoo">Odoo</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>

@@ -106,10 +106,12 @@ jobs:
           tag = "${{ matrix.platform }}"
           tagarr = tag.split("-")
           tag = "{}-latest".format(tagarr[0])
+          platform = "{}".format(tagarr[0])
 
           env_file = os.getenv('GITHUB_ENV')
           with open(env_file, "a") as myfile:
             myfile.write("tag={}\n".format(tag))
+            myfile.write("platformos={}\n".format(platform))
 
       - name: Download packages to dist
         uses: actions/download-artifact@v4
@@ -136,7 +138,7 @@ jobs:
         shell: cmd
         run: for %%f in (rfswarm_reporter-*.whl) do pip install %%f
         working-directory: ./dist
-      - run: pip install -r Tests/Regression/Reporter/pip_requirements.txt
+      - run: pip install -r Tests/Regression/Reporter/pip_requirements_${{ env.platformos }}.txt
 
       - name: Robot Framework
         id: robottest

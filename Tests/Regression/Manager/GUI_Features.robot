@@ -265,8 +265,11 @@ Manager Command Line INI --ini
 Verify the Field Validation Is Working In the Manager Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #126
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
+	...    Show Manager INI Data																AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Show Manager INI Data																AND
 	...    Open Manager GUI													AND
 	...    Create Robot File	name=example.robot	file_content=***Test Case***\nExample Test Case\n
 
@@ -298,14 +301,14 @@ Verify the Field Validation Is Working In the Manager Plan Screen
 
 	END
 
-	[Teardown]	Run Keywords
-	...    Delete Robot File	${robot_data}[0]			AND
-	...    Run Keyword		Close Manager GUI ${platform}
+	[Teardown]	Run Keyword		Close Manager GUI ${platform}
 
 Verify That Files Get Saved With Correct Extension And Names
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #39
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
+	...    Show Manager INI Data																AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Manager GUI													AND
 	...    Open Agent
@@ -577,6 +580,7 @@ Verify the Time Fields In the Plan Screen For Run: Complex Variations
 Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600										AND
 	...    Open Manager GUI															AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]			AND
@@ -598,17 +602,38 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 				${time_in_s}=	Evaluate	str(${i}${j} * 60 + ${i}${j})
 				Type	${time_in_s}
 				Append To List	${run_times_in_s}	${time_in_s}
-
 			END
-
+			# Take A Screenshot
 		END
+		# Take A Screenshot
 		Press Key.tab 2 Times
+		# Take A Screenshot
 		Click Button	selected_runscriptrow
 		Select Robot File OS DIALOG		${robot_data}[0]
-		Click Button	selected_select_test_case
-		Click Button	select_example
-		Press Key.tab 3 Times
+		Take A Screenshot
+		IF  "${platform}" == "windows"
+			Press Key.tab 1 Times
+			Take A Screenshot
+			Press Combination 	key.space
+
+			Take A Screenshot
+			Press Combination 	key.down
+			Sleep	0.5
+			Take A Screenshot
+			Press Combination 	key.enter
+			Take A Screenshot
+			Press Key.tab 2 Times
+			Take A Screenshot
+		ELSE
+			Click Button	selected_select_test_case
+			# Take A Screenshot
+			Click Button	select_example
+			# Take A Screenshot
+			Press Key.tab 3 Times
+		END
+		# Take A Screenshot
 	END
+	# Take A Screenshot
 	Click Button	runsave
 	Save Scenario File OS DIALOG	${scenario_name}
 
@@ -632,6 +657,7 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 Check If the Manager Saves Settings on the Test Row With Example Robot
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600										AND
 	...    Open Manager GUI															AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]			AND
@@ -652,11 +678,37 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 		Press Key.tab 6 Times
 		Click Button	selected_runscriptrow
 		Select Robot File OS DIALOG		${robot_data}[0]
-		Click Button	selected_select_test_case
-		Click Button	select_example
-		Press Key.tab 2 Times
+		Take A Screenshot
+		IF  "${platform}" == "windows"
+			Press Key.tab 1 Times
+			Take A Screenshot
+			Press Combination 	key.space
+
+			Take A Screenshot
+			Press Combination 	key.down
+			Sleep	0.5
+			Take A Screenshot
+			Press Combination 	key.enter
+			Take A Screenshot
+			Press Key.tab 1 Times
+			Take A Screenshot
+		ELSE
+			Click Button	selected_select_test_case
+			# Take A Screenshot
+			Click Button	select_example
+			# Take A Screenshot
+			Press Key.tab 2 Times
+		END
+		IF  "${platform}" == "windows"
+			Set Confidence	0.85
+			# Take A Screenshot
+		END
 		${settings_coordinates}=
-		...    Locate	manager_${platform}_button_selected_runsettingsrow.png
+		...    Locate 	manager_${platform}_button_selected_runsettingsrow.png
+		IF  "${platform}" == "windows"
+			Set Confidence	0.9
+			# Take A Screenshot
+		END
 		Append To List	${settings_locations}	${settings_coordinates}
 		Press Key.tab 1 Times
 	END
@@ -664,6 +716,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 		Click To The Above Of	${settings_locations}[${i}]	0
 		Change Test Group Settings	${row_settings_data}
 	END
+	# Take A Screenshot
 	Click Button	runsave
 	Save Scenario File OS DIALOG	${scenario_name}
 
@@ -719,11 +772,37 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 		Press Key.tab 2 Times
 		Click Button	selected_runscriptrow
 		Select Robot File OS DIALOG		${robot_data}[0]
-		Click Button	selected_select_test_case
-		Click Button	select_example
-		Press Key.tab 2 Times
+		Take A Screenshot
+		IF  "${platform}" == "windows"
+			Press Key.tab 1 Times
+			Take A Screenshot
+			Press Combination 	key.space
+
+			Take A Screenshot
+			Press Combination 	key.down
+			Sleep	0.5
+			Take A Screenshot
+			Press Combination 	key.enter
+			Take A Screenshot
+			Press Key.tab 1 Times
+			Take A Screenshot
+		ELSE
+			Click Button	selected_select_test_case
+			# Take A Screenshot
+			Click Button	select_example
+			# Take A Screenshot
+			Press Key.tab 2 Times
+		END
+		IF  "${platform}" == "windows"
+			Set Confidence	0.85
+			# Take A Screenshot
+		END
 		${settings_coordinates}=
-		...    Locate	manager_${platform}_button_selected_runsettingsrow.png
+		...    Locate 	manager_${platform}_button_selected_runsettingsrow.png
+		IF  "${platform}" == "windows"
+			Set Confidence	0.9
+			# Take A Screenshot
+		END
 		Append To List	${settings_locations}	${settings_coordinates}
 		Press Key.tab 1 Times
 	END
@@ -731,6 +810,7 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 		Click To The Above Of	${settings_locations}[${i}]	0
 		Change Test Group Settings	${row_settings_data}
 	END
+	Take A Screenshot
 	Click Button	runsave
 	Save Scenario File OS DIALOG	${scenario_name}
 
@@ -749,6 +829,7 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 Verify Scenario File Is Updated Correctly When Scripts Are Removed
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #58
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Open Manager GUI													AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -826,6 +907,7 @@ Verify Scenario File Is Updated Correctly When Scripts Are Removed
 Verify the Manager Handles Corrupted Scenario Files And Repairs It
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #58
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Open Manager GUI													AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -889,8 +971,11 @@ Verify the Manager Handles Corrupted Scenario Files And Repairs It
 Verify the Manager Handles Scenario Files With Missing Scripts Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #241
 	[Setup]	Run Keywords
+	# ...			${location}=	Get Manager INI Location					AND
+	# ...			Remove File		${location}												AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Set Test Variable	@{mngr_options}	-g	1						AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Open Manager GUI		${mngr_options}								AND
 	...    Create Robot File	name=example.robot	file_content=***Test Case***\nExample Test Case\n
@@ -942,8 +1027,9 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 Verify If Manager Saves Inject Sleep From Scenario Wide Settings
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
-	...    Set INI Window Size		1200	600										AND
-	...    Open Manager GUI															AND
+	...    Set INI Window Size		1200	600																	AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
+	...    Open Manager GUI																									AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]			AND
 	...    Create Robot File
 
@@ -972,8 +1058,9 @@ Verify If Manager Saves Inject Sleep From Scenario Wide Settings
 Check If the Manager Reopens Inject Sleep From Scenario Wide Settings Correctly
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
-	...    Set INI Window Size		1200	600										AND
-	...    Open Manager GUI															AND
+	...    Set INI Window Size		1200	600																	AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
+	...    Open Manager GUI																									AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]			AND
 	...    Create Robot File
 
@@ -1008,10 +1095,11 @@ Check If the Manager Reopens Inject Sleep From Scenario Wide Settings Correctly
 Check If the Manager (after was closed) Opens Inject Sleep From Scenario Wide Settings Correctly
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
-	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
-	...    Set Test Variable	@{mngr_options}	-g	1					AND
-	...    Set INI Window Size		1200	600								AND
-	...    Open Manager GUI		${mngr_options}							AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]			AND
+	...    Set Test Variable	@{mngr_options}	-g	1													AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
+	...    Set INI Window Size		1200	600																	AND
+	...    Open Manager GUI		${mngr_options}																AND
 	...    Create Robot File
 
 	@{inject_sleep_values}	Create List		11	22
@@ -1043,6 +1131,7 @@ Check If the Manager (after was closed) Opens Inject Sleep From Scenario Wide Se
 Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Settings
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600										AND
 	...    Open Manager GUI															AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]			AND
@@ -1093,6 +1182,7 @@ Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Setting
 Check If Inject Sleep Option Was Executed in the Test
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Remove Directory	${results_dir}	recursive=${True}				AND
@@ -1112,10 +1202,7 @@ Check If Inject Sleep Option Was Executed in the Test
 	Check If The Agent Is Ready
 	Click Tab	Plan
 	Click Button	runplay
-
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish
 
 	Sleep	10
 	Check If The Agent Is Ready
@@ -1179,6 +1266,7 @@ Check If Inject Sleep Option Was Executed in the Test
 Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has Trailing
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #98
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Agent
@@ -1219,6 +1307,7 @@ Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has
 Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has No Trailing
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #98
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Agent
@@ -1261,6 +1350,7 @@ Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has
 Verify If the Port Number And Ip Address Get Written To the INI File
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Set Test Variable	@{mngr_options}	-g	0						AND
@@ -1303,6 +1393,7 @@ Verify If the Port Number And Ip Address Get Written To the INI File
 Verify If Agent Can't Connect On Old Port Number After Port Number Changed And Can Connect To the New One
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #16
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Set Test Variable	@{mngr_options}	-g	0						AND
@@ -1347,6 +1438,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Address On the Manager's Host
 	[Tags]	windows-latest 	ubuntu-latest 	macos-latest 	Issue #16
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Set Test Variable	@{mngr_options}	-g	0						AND
@@ -1625,6 +1717,7 @@ Verify Disable output.xml - Test Row
 Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		800		600												AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
 	...    Open Agent	${agent_options}													AND
@@ -1667,10 +1760,12 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		800		600												AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
+	...    Show Manager INI Data																AND
 	...    Open Agent	${agent_options}													AND
-	...    Open Manager GUI																	AND
+	...    Open Manager GUI																			AND
 	...    Set Global Filename And Default Save Path	main								AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main2.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
 
@@ -1712,6 +1807,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		800		600												AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
 	...    Open Agent	${agent_options}													AND
@@ -1757,6 +1853,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 Verify If __init__.robot Files Get Transfered To the Agent Along With Robot/Resuorce File
 	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #90
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		800		600		AND
 	...    Set Global Filename And Default Save Path	main
 
@@ -1808,6 +1905,7 @@ Verify If __init__.robot Files Get Transfered To the Agent Along With Robot/Resu
 Check If The CSV Report Button Works In the Manager Before There Are Any Results
 	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #128
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600		AND
 	...    Open Agent
 
@@ -1845,9 +1943,7 @@ Check If The CSV Report Button Works In the Manager Before There Are Any Results
 	${len}=		Get Length		${csv_files}
 	Should Be True	${len} > 0	msg=Manager didn't generate any CSV report files. Should generate at least 1 most likely agent_data.csv.
 
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected.
+	Wait For the Scenario Run To Finish
 
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
@@ -1856,6 +1952,7 @@ Check If The CSV Report Button Works In the Manager Before There Are Any Results
 Check If The CSV Report Button Works In The Manager After There Are Results
 	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #254
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600		AND
 	...    Open Agent
 
@@ -1865,10 +1962,7 @@ Check If The CSV Report Button Works In The Manager After There Are Results
 	Check If The Agent Is Ready
 	Click Tab	Plan
 	Click Button	runplay
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
-	Take A Screenshot
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish
 	Click Button	csv_report
 
 	${status}=	Run Keyword And Return Status
@@ -1905,6 +1999,7 @@ Check If The CSV Report Button Works In The Manager After There Are Results
 Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robots
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #31
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Manager GUI													AND
@@ -1953,9 +2048,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 	Click Button	abort
 	Press Key.tab 2 Times
 	Move To	10	10
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish
 
 	Click Tab	Plan
 	Click Button	runplay
@@ -1980,9 +2073,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 	Press Key.enter 1 Times
 	Press Key.tab 2 Times
 	Move To		10	10
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish
 
 	[Teardown]	Run Keywords
 	...    Delete Scenario File		${scenario_name}		AND
@@ -1993,6 +2084,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 Check If Scenario Csv Report Files Contain Correct Data From The Test
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #17
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600		AND
 	...    Open Agent
 
@@ -2002,9 +2094,7 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 	Check If The Agent Is Ready
 	Click Tab	Plan
 	Click Button	runplay
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish
 	Click Button	csv_report
 	Press key.enter 1 Times
 	Sleep	3
@@ -2111,16 +2201,21 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 Verify the Results Directory And db File Gets Created Correctly With Scenario Also After a Restart
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
 	[Setup]	Run Keywords
-	...    Clear Manager Result Directory									AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set INI Window Size		1200	600								AND
-	...    Open Manager GUI													AND
 	...    Open Agent														AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Create Robot File
 	...    file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\tFail this\n\tSleep\t10\n\tFail\n
 
+	VAR 	${scenario_name}	Issue-#35_#69
+	VAR 	${results_dir} 		${results_dir}${/}Issue-#69_1 	scope=TEST
+	VAR 	@{mngr_options} 	-d 		${results_dir}
+	Create Directory 	${results_dir}
+	Clear Manager Result Directory
+	Open Manager GUI 	${mngr_options}
+
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#35_#69${/}Issue-#35_#69.rfs
-	${scenario_name}	Set Variable	Issue-#35_#69
 	Copy File	${scenariofile}		${global_path}
 	Click Button	runopen
 	Open Scenario File OS DIALOG	${scenario_name}
@@ -2132,9 +2227,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	${current_date}=	Get Current Date
 	Log To Console	Current time: ${current_date}
 
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish
 
 	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_*
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
@@ -2153,9 +2246,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	${current_date}=	Get Current Date
 	Log To Console	Current time: ${current_date}
 
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish
 
 	${previous_result_dir}=		Set Variable	${run_result_dirs}[0]
 	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_*
@@ -2174,19 +2265,24 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	[Teardown]	Run Keywords
 	...    Delete Robot File						AND
 	...    Delete Scenario File	${scenario_name}	AND
-	...    Stop Agent					AND
+	...    Stop Agent								AND
 	...    Run Keyword		Close Manager GUI ${platform}
 
 Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
 	[Setup]	Run Keywords
-	...    Clear Manager Result Directory									AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set INI Window Size		1200	600								AND
-	...    Open Manager GUI													AND
 	...    Open Agent														AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Create Robot File
 	...    file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\tFail this\n\tSleep\t10\n\tFail\n
+
+	VAR 	${results_dir} 		${results_dir}${/}Issue-#69_2 	scope=TEST
+	VAR 	@{mngr_options} 	-d 		${results_dir}
+	Create Directory 	${results_dir}
+	Clear Manager Result Directory
+	Open Manager GUI 	${mngr_options}
 
 	${scenario_name}	Set Variable	Scenario
 	Press Key.tab 4 Times
@@ -2205,9 +2301,7 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	${current_date}=	Get Current Date
 	Log To Console	Current time: ${current_date}
 
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${300}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish
 
 	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_*
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
@@ -2218,14 +2312,15 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	Verify Generated Run Result Files	${run_result_dirs}[0]	${scenario_name}
 
 	[Teardown]	Run Keywords
-	...    Delete Robot File						AND
-	...    Stop Agent					AND
+	...    Delete Robot File	AND
+	...    Stop Agent			AND
 	...    Run Keyword		Close Manager GUI ${platform}
 
 Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the robots)
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot	AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600							AND
 	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-2	AND
 	...    Open Agent	${agent_options}														AND
@@ -2253,6 +2348,7 @@ Check If Test Scenario Run Will Stop Gradually
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	example.robot							AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600													AND
 	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-3	AND
 	...    Open Agent	${agent_options}														AND
@@ -2276,9 +2372,38 @@ Check If Test Scenario Run Will Stop Gradually
 	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove File		${global_path}${/}example.robot
 
+Check If Test Scenario Run Will Stop Gradually - TestRepeater
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #133
+	[Setup]	Run Keywords
+	...    Set Global Filename And Default Save Path	example.robot							AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
+	...    Set INI Window Size		1200	600													AND
+	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-3	AND
+	...    Open Agent	${agent_options}														AND
+	...    Open Manager GUI																		AND
+	...    Create Robot File	file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t60\n
+
+	Utilisation Stats
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#133${/}test_scenario.rfs
+	Copy File	${scenariofile}		${global_path}
+	Click Button	runopen
+	Open Scenario File OS DIALOG	${scenario_name}
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Click Button	runplay
+	Stop Test Scenario Run Gradually	${15}	${60}
+
+	[Teardown]	Run Keywords
+	...    Delete Scenario File		${scenario_name}		AND
+	...    Set Confidence	0.9								AND
+	...    Stop Agent							AND
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Remove File		${global_path}${/}example.robot
+
 Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #41
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
@@ -2290,20 +2415,14 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 	Check If The Agent Is Ready
 	Click Tab	Plan
 	Click Button	runplay
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${360}
-	Take A Screenshot
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish 	time=${360}
 
 	Check If The Agent Is Ready
 	Log To Console 	Running scenario one more time to test if iteration counter get reset.
 	Click Tab	Plan
 	Click Button	runplay
 	Sleep	10
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${360}
-	Take A Screenshot
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish 	time=${360}
 	Check If The Agent Is Ready
 
 	Log To Console 	Checking second run Database.
@@ -2348,6 +2467,7 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 Verify the Robot Count Reduces When Stop Agent While Test Is Running
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #57	Issue #269
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
@@ -2383,9 +2503,7 @@ Verify the Robot Count Reduces When Stop Agent While Test Is Running
 	...    Wait For		manager_${platform}_robots_0.png 	timeout=${60}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didnt reduce robot count form 10 to 0 in 60s after disconnecting Agent.
-	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_finished_run.png 	timeout=${120}
-	Run Keyword If	not ${status}	Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+	Wait For the Scenario Run To Finish 	time=${120}
 
 	[Teardown]	Run Keywords
 	...    Run Keyword		Close Manager GUI ${platform}	AND
@@ -2395,6 +2513,7 @@ Verify the Robot Count Reduces When Stop Agent While Test Is Running
 Verify the Files Referenced In the Scenario Are All Using Relative Paths
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #54
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
@@ -2448,6 +2567,7 @@ Verify the Files Referenced In the Scenario Are All Using Relative Paths
 Verify If Upload logs=Immediately Is Being Saved To The Scenario And Read Back Correctly
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Manager GUI
@@ -2484,6 +2604,7 @@ Verify If Upload logs=Immediately Is Being Saved To The Scenario And Read Back C
 Verify If Upload logs=Error Only Is Being Saved To The Scenario And Read Back Correctly
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Manager GUI
@@ -2520,6 +2641,7 @@ Verify If Upload logs=Error Only Is Being Saved To The Scenario And Read Back Co
 Verify If Upload logs=All Deferred Is Being Saved To The Scenario And Read Back Correctly
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Manager GUI
@@ -2556,6 +2678,7 @@ Verify If Upload logs=All Deferred Is Being Saved To The Scenario And Read Back 
 Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardless Of Robot Passes Or Fails
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
@@ -2603,6 +2726,7 @@ Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardl
 Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only When Robot Fails
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
@@ -2652,6 +2776,7 @@ Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only Whe
 Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
@@ -2898,6 +3023,7 @@ Verify Result Name - Test Row
 Verify That Time Gets Correctly Validated For Schelduled Start
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600 	AND
 	...    Open Manager GUI
 
@@ -2945,6 +3071,7 @@ Verify That Time Gets Correctly Validated For Schelduled Start
 Verify Schedule Date And Time Are Always In the Future
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600 	AND
 	...    Open Manager GUI
 
@@ -3011,6 +3138,7 @@ Verify Schedule Date And Time Are Always In the Future
 Verify That When Time Is Entered In the Past It Becomes the Next Day
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600 	AND
 	...    Open Manager GUI
 
@@ -3066,6 +3194,7 @@ Verify That When Time Is Entered In the Past It Becomes the Next Day
 Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time Has Elapsed
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600 	AND
 	...    Open Agent
 
@@ -3079,7 +3208,7 @@ Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time
 	Run Keyword If	${status}	Fail
 	...    msg=The Manager started script before the scheduled start-up!
 	Log To Console	Scenario should start soon.
-	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_button_stoprun.png	timeout=60
+	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_button_stoprun.png	timeout=85
 	Run Keyword If	not ${status}	Fail
 	...    msg=The Manager did not started script after the scheduled time has elapsed!
 
@@ -3089,7 +3218,9 @@ Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time
 
 Verify the Start Time Is Displayed On the Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
-	[Setup]	Set INI Window Size		1200	600
+	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
+	...    Set INI Window Size		1200	600
 
 	${current_time}=	Get Current Date	result_format=%H
 	IF  '${current_time}' == '${3}'
@@ -3114,7 +3245,9 @@ Verify the Start Time Is Displayed On the Plan Screen
 
 Verify the Remaining Time Is Displayed On the Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
-	[Setup]	Set INI Window Size		1200	600
+	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
+	...    Set INI Window Size		1200	600
 
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
 	#adding 10m:20s
@@ -3134,7 +3267,9 @@ Verify the Remaining Time Is Displayed On the Plan Screen
 
 Verify That the Start Time And Time Remaining Are Removed From Plan Screen When Scheduled Start Is Disabled
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
-	[Setup]	Set INI Window Size		1200	600
+	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
+	...    Set INI Window Size		1200	600
 
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
 	#adding 10m:20s
@@ -3163,6 +3298,249 @@ Verify That the Start Time And Time Remaining Are Removed From Plan Screen When 
 
 	[Teardown]	Run Keywords	Close Manager GUI ${platform}
 
+Verify That TPS Is TP And Not TPmS
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #155 	robot:continue-on-failure
+	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY} 	AND
+	...    Set INI Window Size 	1200 	600 	AND
+	...    Open Agent
+
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#155${/}tps.rfs
+	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-d 	${results_dir} 	-g 	3
+	Open Manager GUI 	${mngr_options}
+	Check If The Agent Is Ready
+	Click Tab 	Plan
+	Click Button 	runplay
+	Wait For the Scenario Run To Finish
+	Sleep 	5
+	Take A Screenshot
+	Click Menu 	graphs
+	Click Menu 	NewGraphWindow
+	Click Label With Horizontal Offset 	DataType 	250
+	Select Option 	Result
+	Click Label With Horizontal Offset 	ResultType 	150
+	Select Option 	TPS
+	Click Label With Horizontal Offset 	ShowLegend 	250
+	Sleep 	10
+
+	Take A Screenshot
+	${pvinfo}= 	Get Python Version Info
+	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
+		VAR 	${tpslegend} 	manager_${platform}_label_tpslegend_py3.9.png
+	ELSE
+		VAR 	${tpslegend} 	manager_${platform}_label_tpslegend.png
+	END
+	Wait For 	${tpslegend} 	 timeout=30
+
+	Take A Screenshot
+	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
+		VAR 	${tpsvalue} 	manager_${platform}_label_tpsvaluesaxis_py3.9.png
+	ELSE
+		VAR 	${tpsvalue} 	manager_${platform}_label_tpsvaluesaxis.png
+	END
+	Wait For 	${tpsvalue} 	 timeout=30
+
+	IF 	"${platform}" == "macos"
+		Click Button 	CloseWindow
+	ELSE
+		Click Button With Vertical Offset 	GraphSettings 	offset=-15
+	END
+
+	[Teardown]	Run Keywords
+	...    Run Keyword 	Close Manager GUI ${platform} 	AND
+	...    Stop Agent
+
+# Verify Agent Filter Graphs
+# 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #217 	robot:continue-on-failure
+# 	VAR 	${scenario_name} 	filter_agent
+# 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
+# 	VAR 	${agent_name_1} 	TEST_1
+# 	VAR 	${agent_name_2} 	TEST_2
+# 	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${results_dir} 	-r 	-a 	2
+# 	VAR 	@{agnt_options_1} 	-a 	${agent_name_1}
+# 	VAR 	@{agnt_options_2} 	-a 	${agent_name_2}
+
+# 	Open Agent 			${agnt_options_1}
+# 	VAR 	${process_agent_1} 	${process_agent}
+# 	Open Agent 			${agnt_options_2}
+# 	VAR 	${process_agent_2} 	${process_agent}
+# 	Open Manager GUI 	${mngr_options}
+
+# 	Wait For the Scenario Run To Finish
+# 	Click Button 	Refresh
+# 	Click Label With Horizontal Offset 	FilterAgent 	140
+# 	Take A Screenshot
+# 	Select Option 	TEST_1
+# 	Click Button 	Refresh
+# 	Sleep 	3
+# 	Take A Screenshot
+# 	VAR 	${robots_value} 	manager_${platform}_label_4.0.png
+# 	${status}=	Run Keyword And Return Status	Wait For 	${robots_value} 	 timeout=6
+# 	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph!
+
+# 	[Teardown]	Run Keywords
+# 	...    Set Test Variable 	${process_agent} 	${process_agent_1} 	AND
+# 	...    Stop Agent 	AND
+# 	...    Set Test Variable 	${process_agent} 	${process_agent_2} 	AND
+# 	...    Stop Agent 	AND
+# 	...    Run Keyword 	Close Manager GUI ${platform}
+
+Verify Filter Metric Graphs - Wildcard & Not Wildcard
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure
+	VAR 	${scenario_name} 	filter_metric
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
+	VAR 	${agent_name_1} 	TEST_1
+	VAR 	${agent_name_2} 	TEST_2
+	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${results_dir} 	-r 	-a 	2
+	VAR 	@{agnt_options_1} 	-a 	${agent_name_1}
+	VAR 	@{agnt_options_2} 	-a 	${agent_name_2}
+
+	Open Agent 			${agnt_options_1}
+	VAR 	${process_agent_1} 	${process_agent}
+	Open Agent 			${agnt_options_2}
+	VAR 	${process_agent_2} 	${process_agent}
+	Open Manager GUI 	${mngr_options}
+
+	Wait For the Scenario Run To Finish
+	Click Button 	Refresh 	# re-load settings
+
+	Click Label With Horizontal Offset 	FilterType 	140
+	Press Key.down 2 Times
+	Press Combination	Key.enter
+	Click Label With Horizontal Offset 	FilterPattern 	140
+	VAR 	${filter} 	*21*
+	Evaluate 	clipboard.copy("${filter}") 	modules=clipboard
+	IF  "${platform}" == "macos"
+		Press Combination 	KEY.command 	KEY.a
+		Sleep 	1
+		Press Combination	KEY.command		KEY.v
+	ELSE
+		Double Click
+		Sleep 	1
+		Press Combination	KEY.ctrl		KEY.v
+	END
+
+	Click Button 	Refresh
+	Sleep 	5
+	Take A Screenshot
+	VAR 	${y_value} 	manager_${platform}_label_8.png
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should not be visible on the graph.
+	VAR 	${y_value} 	manager_${platform}_label_4.png
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
+
+	Click Label With Horizontal Offset 	FilterType 	140
+	Press Key.down 3 Times
+	Press Combination	Key.enter
+	Click Label With Horizontal Offset 	FilterPattern 	140
+	VAR 	${filter} 	*Keyword *2
+	Evaluate 	clipboard.copy("${filter}") 	modules=clipboard
+	IF  "${platform}" == "macos"
+		Press Combination 	KEY.command 	KEY.a
+		Sleep 	1
+		Press Combination	KEY.command		KEY.v
+	ELSE
+		Double Click
+		Sleep 	1
+		Press Combination	KEY.ctrl		KEY.v
+	END
+
+	Click Button 	Refresh
+	Sleep 	5
+	Take A Screenshot
+	VAR 	${y_value} 	manager_${platform}_label_8.png
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should not be visible on the graph.
+	VAR 	${y_value} 	manager_${platform}_label_4.png
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
+
+	[Teardown]	Run Keywords
+	...    Set Test Variable 	${process_agent} 	${process_agent_1} 	AND
+	...    Stop Agent 	AND
+	...    Set Test Variable 	${process_agent} 	${process_agent_2} 	AND
+	...    Stop Agent 	AND
+	...    Run Keyword 	Close Manager GUI ${platform}
+
+Verify Filter Result Graphs - Wildcard & Not Wildcard
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure
+	VAR 	${scenario_name} 	filter_result
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
+	VAR 	${agent_name_1} 	TEST_1
+	VAR 	${agent_name_2} 	TEST_2
+	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${results_dir} 	-r 	-a 	2
+	VAR 	@{agnt_options_1} 	-a 	${agent_name_1}
+	VAR 	@{agnt_options_2} 	-a 	${agent_name_2}
+
+	Open Agent 			${agnt_options_1}
+	VAR 	${process_agent_1} 	${process_agent}
+	Open Agent 			${agnt_options_2}
+	VAR 	${process_agent_2} 	${process_agent}
+	Open Manager GUI 	${mngr_options}
+
+	Wait For the Scenario Run To Finish
+	Click Button 	Refresh 	# re-load settings
+
+	Click Label With Horizontal Offset 	FilterType 	140
+	Press Key.down 2 Times
+	Press Combination	Key.enter
+	Click Label With Horizontal Offset 	FilterPattern 	140
+	VAR 	${filter} 	*21*
+	Evaluate 	clipboard.copy("${filter}") 	modules=clipboard
+	IF  "${platform}" == "macos"
+		Press Combination 	KEY.command 	KEY.a
+		Sleep 	1
+		Press Combination	KEY.command		KEY.v
+	ELSE
+		Double Click
+		Sleep 	1
+		Press Combination	KEY.ctrl		KEY.v
+	END
+
+	Click Button 	Refresh
+	Sleep 	5
+	Take A Screenshot
+	VAR 	${y_value} 	manager_${platform}_label_8.png
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}" should not be visible on the graph.
+	VAR 	${y_value} 	manager_${platform}_label_4.png
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
+
+	Click Label With Horizontal Offset 	FilterType 	140
+	Press Key.down 3 Times
+	Press Combination	Key.enter
+	Click Label With Horizontal Offset 	FilterPattern 	140
+	VAR 	${filter} 	*Keyword *2
+	Evaluate 	clipboard.copy("${filter}") 	modules=clipboard
+	IF  "${platform}" == "macos"
+		Press Combination 	KEY.command 	KEY.a
+		Sleep 	1
+		Press Combination	KEY.command		KEY.v
+	ELSE
+		Double Click
+		Sleep 	1
+		Press Combination	KEY.ctrl		KEY.v
+	END
+
+	Click Button 	Refresh
+	Sleep 	5
+	Take A Screenshot
+	VAR 	${y_value} 	manager_${platform}_label_8.png
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}" should not be visible on the graph.
+	VAR 	${y_value} 	manager_${platform}_label_4.png
+	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
+	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
+
+	[Teardown]	Run Keywords
+	...    Set Test Variable 	${process_agent} 	${process_agent_1} 	AND
+	...    Stop Agent 	AND
+	...    Set Test Variable 	${process_agent} 	${process_agent_2} 	AND
+	...    Stop Agent 	AND
+	...    Run Keyword 	Close Manager GUI ${platform}
+
 Check Application Icon or Desktop Shortcut in GUI
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
 
@@ -3176,6 +3554,91 @@ Check Application Icon or Desktop Shortcut in GUI
 	Navigate to and check Desktop Icon
 
 	[Teardown]	Type 	KEY.ESC 	KEY.ESC 	KEY.ESC
+
+Check If Monitoring settings are loaded and used
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #173
+	[Setup]	Run Keywords
+	...    Set Global Filename And Default Save Path	example.robot							AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
+	...    Set INI Window Size		1200	600													AND
+	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-3	AND
+	...    Open Agent	${agent_options}														AND
+	...    Open Manager GUI
+
+	Utilisation Stats
+
+	VAR 	${monitortimebefore}= 		${30}
+	VAR 	${monitortimeafter}= 		${90}
+	VAR 	${robot_test_time}= 		${60}
+	# VAR 	${scenario_name}= 			NewStyle
+
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#173${/}NewStyle.rfs
+	Copy File	${scenariofile}		${global_path}
+	Click Button						runopen
+	Wait For Dialog Button				cancel
+	File Open Dialogue Select File 		${scenariofile}
+
+	# Sleep 	10
+	# Take A Screenshot
+	Click Tab	Monitoring
+	# Take A Screenshot
+
+	Log 	Verify Monitoring screen loaded as expected		console=True
+	Wait For 	manager_${platform}_issue_173_monitoring_settings.png 	 timeout=${default_image_timeout}
+
+	Click Tab	Plan
+	# Take A Screenshot
+
+	Log 	Verify Plan screen loaded as expected		console=True
+	Wait For 	manager_${platform}_issue_173_plan_settings.png 	 timeout=${default_image_timeout}
+
+	# Take A Screenshot
+	Check If The Agent Is Ready
+	Click Tab	Plan
+	Sleep 	0.5
+	Click Button	runplay
+	# Stop Test Scenario Run Gradually	${15}	${60}
+	${START_TIME}= 	Get Current Date
+	# Sleep 	26		# this was needed to get the _monitor_5 screenshot
+	# Take A Screenshot
+
+	Log 	Wait for monitoring robots to start		console=True
+	Wait For   manager_${platform}_monitor_5.png    timeout=${monitortimebefore}
+	${MON_START_TIME}= 	Get Current Date
+	# Take A Screenshot
+
+	${ELAPSED_TIME}= 	Subtract Date From Date 	${MON_START_TIME} 	${START_TIME}
+	${sleeptime}= 		Evaluate    ${monitortimebefore} - ${ELAPSED_TIME} - 2
+	Sleep    ${sleeptime}
+
+	Log 	Verify robots don't start in pre-run monitoring time		console=True
+	Wait For   manager_${platform}_robots_0.png    timeout=1
+	# Take A Screenshot
+
+	Wait For   manager_${platform}_robots_10.png    timeout=${default_image_timeout}
+	# Take A Screenshot
+
+	Wait For   manager_${platform}_robots_0.png    timeout=${robot_test_time + ${default_image_timeout}}
+	${END_TIME}= 	Get Current Date
+
+	# Take A Screenshot
+	Set Confidence 		0.95
+	Log 	Wait for monitoring robots to end		console=True
+	Wait For   manager_${platform}_monitor_0.png    timeout=${monitortimeafter + ${default_image_timeout}}
+	${MON_END_TIME}= 	Get Current Date
+	Take A Screenshot
+
+	Log 	Verify Post run time		console=True
+	${ELAPSED_TIME}= 	Subtract Date From Date 	${MON_END_TIME} 	${END_TIME}
+	Should Be True   ${ELAPSED_TIME} >= ${monitortimeafter} 		Monitoring time after test should be ~${monitortimeafter} seconds, actual was ${ELAPSED_TIME} seconds.
+
+	[Teardown]	Run Keywords
+	...    Delete Scenario File		${scenario_name}		AND
+	...    Set Confidence	0.9								AND
+	...    Stop Agent							AND
+	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Remove File		${global_path}${/}example.robot
+
 
 
 #
