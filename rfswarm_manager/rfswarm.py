@@ -2878,6 +2878,8 @@ class RFSwarmCore:
 			except Exception as e:
 				base.debugmsg(3, "Failed to exit with error:", e)
 				os._exit(1)
+		sys.stdout.flush()
+		sys.stderr.flush()
 
 	def create_icons(self):
 		base.debugmsg(0, "Creating application icons for RFSwarm Manager")

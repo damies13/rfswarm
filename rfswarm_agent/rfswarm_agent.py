@@ -2378,6 +2378,8 @@ class RFSwarmAgent():
 			except Exception as e:
 				self.debugmsg(3, "Failed to exit with error:", e)
 				os._exit(1)
+		sys.stdout.flush()
+		sys.stderr.flush()
 
 
 class RFSwarm():

@@ -29,7 +29,7 @@ Agent Help
 	Should Contain	${result}	AGENTNAME
 
 Agent Command Line INI -i
-	[Tags]	ubuntu-latest 	macos-latest 	Issue #14	# can't get agent output in windows
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 
 	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmAgent.ini
 	VAR		@{agnt_options}		-i	${inifile}
@@ -44,7 +44,7 @@ Agent Command Line INI -i
 	[Teardown]	Stop Agent
 
 Agent Command Line INI --ini
-	[Tags]	ubuntu-latest 	macos-latest 	Issue #14	# can't get agent output in windows
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 
 	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmAgent.ini
 	VAR		@{agnt_options}		--ini	${inifile}
@@ -59,7 +59,7 @@ Agent Command Line INI --ini
 	[Teardown]	Stop Agent
 
 Agent Command Line MANAGER -m
-	[Tags]	ubuntu-latest 	macos-latest 	Issue #14 	# can't get agent output in windows
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 
 	VAR 	@{agnt_options} 	-m 	http://localhost:8138
 	VAR 	@{mngr_options} 	-n
@@ -76,7 +76,7 @@ Agent Command Line MANAGER -m
 	[Teardown]	Run Keywords	Stop Agent	Stop Manager
 
 Agent Command Line MANAGER --manager
-	[Tags]	ubuntu-latest 	macos-latest 	Issue #14 	# can't get agent output in windows
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 
 	VAR 	@{agnt_options} 	--manager 	http://localhost:8138
 	VAR 	@{mngr_options} 	-n
@@ -277,7 +277,7 @@ Agent Command Line PROPERTY -p
 	[Teardown]	Run Keywords	Stop Agent	Stop Manager
 
 Agent Yaml Configuration File
-	[Tags]	ubuntu-latest 	macos-latest 	Issue #172	# can't get agent output in windows
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172
 
 	VAR 	${yamlurl}= 	http://yamlmanager:8001/
 	${yamlfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#172${/}agent-config.yaml
@@ -294,7 +294,7 @@ Agent Yaml Configuration File
 	[Teardown]	Stop Agent
 
 Agent Yml Configuration File
-	[Tags]	ubuntu-latest 	macos-latest 	Issue #172	# can't get agent output in windows
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172
 
 	VAR 	${yamlurl}= 	http://ymlmanager:8003/
 	${yamlfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#172${/}agent-config.yml
@@ -311,7 +311,7 @@ Agent Yml Configuration File
 	[Teardown]	Stop Agent
 
 Agent JSON Configuration File
-	[Tags]	ubuntu-latest 	macos-latest 	Issue #172	# can't get agent output in windows
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172
 
 	VAR 	${jsonurl}= 	http://jsonmanager:8002/
 	${jsonfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#172${/}agent-config.json
