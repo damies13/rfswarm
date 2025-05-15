@@ -209,7 +209,7 @@ class ReporterBase:
 				for itm in msg:
 					msglst.append(str(itm))
 				msglst.append(str(suffix))
-				print(" ".join(msglst), flush = True)
+				print(" ".join(msglst), flush=True)
 			except Exception:
 				pass
 
