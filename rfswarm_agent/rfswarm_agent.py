@@ -558,7 +558,7 @@ class RFSwarmAgent():
 
 				for itm in msg:
 					msglst.append(str(itm))
-				print(" ".join(msglst))
+				print(" ".join(msglst), flush = True)
 			except Exception:
 				pass
 
