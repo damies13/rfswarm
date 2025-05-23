@@ -3311,7 +3311,9 @@ class RFSwarmCore:
 		base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
 		base.debugmsg(6, "ScenarioFile: ", len(base.config['Plan']['ScenarioFile']), base.config['Plan']['ScenarioFile'])
 		if len(base.config['Plan']['ScenarioFile']) > 0:
-			self.OpenFile(base.config['Plan']['ScenarioFile'])
+			load_result = self.OpenFile(base.config['Plan']['ScenarioFile'])
+			if not base.args.nogui and load_result == 1:
+				base.gui.OpenINIGraphs()
 		else:
 			base.addScriptRow()
 
@@ -3322,6 +3324,13 @@ class RFSwarmCore:
 		base.debugmsg(6, "base.config['Plan']['ScenarioFile']: ", base.config['Plan']['ScenarioFile'])
 		base.config['Plan']['ScenarioDir'] = base.inisafedir(os.path.dirname(ScenarioFile))
 		base.debugmsg(6, "base.config['Plan']['ScenarioDir']: ", base.config['Plan']['ScenarioDir'])
+
+		base.debugmsg(6, "Config graph list: ")
+		base.debugmsg(6, "base.config['GUI']['graph_list']: ", base.config['GUI']['graph_list'])
+		iniglist = list(base.config['GUI']['graph_list'].split(","))
+		base.debugmsg(9, "iniglist: ", iniglist)
+		base.config['GUI']['graph_list'] = base.inisafevalue(",".join(set(iniglist)))
+		base.debugmsg(6, "base.config['GUI']['graph_list']: ", base.config['GUI']['graph_list'])
 
 		filedata = configparser.ConfigParser()
 		base.debugmsg(6, "filedata: ", filedata._sections)
@@ -3713,8 +3722,6 @@ class RFSwarmCore:
 		base.debugmsg(9, "config graph_list: ", base.config['GUI']['graph_list'])
 
 		base.debugmsg(9, "graphlist: ", graphlist)
-		# base.config[iniid]		glist = base.config['GUI']['graph_list'].split(",")
-		iniglist = list(base.config['GUI']['graph_list'].split(","))
 		base.debugmsg(9, "iniglist: ", iniglist)
 		base.config['GUI']['graph_list'] = base.inisafevalue(",".join(set(iniglist + graphlist)))
 
@@ -3738,6 +3745,8 @@ class RFSwarmCore:
 			base.gui.pln_graph_update = False
 			t = threading.Thread(target=base.gui.pln_update_graph)
 			t.start()
+
+		return 0
 
 	def ClickPlay(self, _event=None):
 
