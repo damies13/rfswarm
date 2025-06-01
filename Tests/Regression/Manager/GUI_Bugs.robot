@@ -102,7 +102,7 @@ Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
 	Sleep 	1
 	Take A Screenshot
 	Click Menu 	Recent
-	Sleep 	1
+	Sleep 	2
 	Take A Screenshot
 	# Select Option 	InvalidScenarioTestGraph
 	# Sleep 	1
