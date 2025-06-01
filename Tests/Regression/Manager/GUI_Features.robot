@@ -1,5 +1,5 @@
 *** Settings ***
-Test Tags       Features
+Test Tags       Features 	GUI
 
 Library 	Collections
 Library 	String
