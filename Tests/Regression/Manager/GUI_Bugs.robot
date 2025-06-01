@@ -109,22 +109,21 @@ Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
 	Sleep 	2
 	Take A Screenshot
 
-	Click Menu 	File
-	# Select Option 	InvalidScenarioTestGraph
-	# Sleep 	1
-	# Take A Screenshot
+	Select Option 	InvalidScenarioTestGraph
+	Sleep 	1
+	Take A Screenshot
 
-	# IF 	"${platform}" == "macos"
-	# 	Click Button 	CloseWindow
-	# ELSE
-	# 	Click Button With Vertical Offset 	GraphSettings 	offset=-15
-	# END
+	IF 	"${platform}" == "macos"
+		Click Button 	CloseWindow
+	ELSE
+		Click Button With Vertical Offset 	GraphSettings 	offset=-15
+	END
 
 	Run Keyword 	Close Manager GUI ${platform}
 
+	${running}= 	Is Process Running 	${process_manager}
 	Check Logs
 
-	${running}= 	Is Process Running 	${process_manager}
 	[Teardown] 	Run Keyword If 	${running} 	Close Manager GUI ${platform}
 
 # # Test for Issue #171	moved to agent test suite, can easily be tested for via the command line
