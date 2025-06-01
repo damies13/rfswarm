@@ -101,9 +101,15 @@ Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
 	Click Menu 	graphs
 	Sleep 	1
 	Take A Screenshot
-	Click Menu 	Recent
+
+	VAR 	${img} 	manager_${platform}_menu_recent.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Move To 	@{coordinates}
 	Sleep 	2
 	Take A Screenshot
+
+	Click Menu 	File
 	# Select Option 	InvalidScenarioTestGraph
 	# Sleep 	1
 	# Take A Screenshot
