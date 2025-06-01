@@ -88,6 +88,19 @@ Read Log
 	Log 		${filedata}
 	RETURN 		${filedata}
 
+Check Logs
+	${stdout_manager}= 		Read Log 	${OUTPUT DIR}${/}stdout.txt
+	${stderr_manager}= 		Read Log 	${OUTPUT DIR}${/}stderr.txt
+
+	Should Not Contain 	${stdout_manager} 	RuntimeError
+	Should Not Contain 	${stderr_manager} 	RuntimeError
+	Should Not Contain 	${stdout_manager} 	Exception
+	Should Not Contain 	${stderr_manager} 	Exception
+	Should Not Contain 	${stdout_manager}	OSError
+	Should Not Contain 	${stderr_manager} 	OSError
+	Should Not Contain 	${stdout_manager}	KeyError
+	Should Not Contain 	${stderr_manager} 	KeyError
+
 Open Agent
 	[Arguments]		${options}=None
 	IF  ${options} == None
