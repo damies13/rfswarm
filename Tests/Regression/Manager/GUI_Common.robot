@@ -89,8 +89,8 @@ Read Log
 	RETURN 		${filedata}
 
 Check Logs
-	${stdout_manager}= 		Read Log 	${OUTPUT DIR}${/}stdout.txt
-	${stderr_manager}= 		Read Log 	${OUTPUT DIR}${/}stderr.txt
+	${stdout_manager}= 		Read Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	${stderr_manager}= 		Read Log 	${OUTPUT DIR}${/}stderr_manager.txt
 
 	Should Not Contain 	${stdout_manager} 	RuntimeError
 	Should Not Contain 	${stderr_manager} 	RuntimeError

@@ -100,6 +100,8 @@ Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
 
 	Click Menu 	graphs
 	Take A Screenshot
+	Click Menu 	Recent
+	Take A Screenshot
 
 	Run Keyword 	Close Manager GUI ${platform}
 
