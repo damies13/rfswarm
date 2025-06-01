@@ -99,9 +99,20 @@ Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
 	END
 
 	Click Menu 	graphs
+	Sleep 	1
 	Take A Screenshot
 	Click Menu 	Recent
+	Sleep 	1
 	Take A Screenshot
+	# Select Option 	InvalidScenarioTestGraph
+	# Sleep 	1
+	# Take A Screenshot
+
+	# IF 	"${platform}" == "macos"
+	# 	Click Button 	CloseWindow
+	# ELSE
+	# 	Click Button With Vertical Offset 	GraphSettings 	offset=-15
+	# END
 
 	Run Keyword 	Close Manager GUI ${platform}
 
