@@ -10544,7 +10544,9 @@ class RFSwarmGUI(tk.Frame):
 
 			self.CloseGraphs()
 
-			core.OpenFile(ScenarioFile)
+			load_result = core.OpenFile(ScenarioFile)
+			if not base.args.nogui and load_result == 1:
+				base.gui.OpenINIGraphs()
 			base.gui.updateTitle()
 
 			self.plan_scnro_chngd = False
