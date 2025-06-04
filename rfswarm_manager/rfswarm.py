@@ -7508,8 +7508,7 @@ class RFSwarmGUI(tk.Frame):
 			schedWindow.time.set(schedWindow.datetime.strftime("%H:%M:%S"))
 			schedWindow.date.set(schedWindow.datetime.strftime("%Y-%m-%d"))
 
-		schedWindow.time.trace('w', lambda *args: self.ss_validate(schedWindow, args))
-		# schedWindow.time.trace('a', lambda *args: self.ss_validate(schedWindow, args))
+		schedWindow.time.trace_add("write", lambda *args: self.ss_validate(schedWindow, args))
 
 		# https://www.tutorialspoint.com/python/tk_radiobutton.htm
 		schedWindow.enabled = tk.IntVar()
@@ -7894,7 +7893,7 @@ class RFSwarmGUI(tk.Frame):
 		fgf.columnconfigure(scrf, weight=0)
 
 		base.scriptlist[row]["TestVar"] = tk.StringVar(value=base.scriptlist[row]["Test"], name="row{}".format(row))
-		base.scriptlist[row]["TestVar"].trace("w", self.sr_test_validate)
+		base.scriptlist[row]["TestVar"].trace_add("write", self.sr_test_validate)
 		# tst = ttk.OptionMenu(self.scriptgrid, base.scriptlist[row]["TestVar"], None, "test", command=lambda: self.sr_test_validate(row))
 		tst = ttk.OptionMenu(self.scriptgrid, base.scriptlist[row]["TestVar"], None, "test")
 		tst.config(width=20)
@@ -9029,7 +9028,7 @@ class RFSwarmGUI(tk.Frame):
 		mfgf.columnconfigure(mscrf, weight=0)
 
 		base.mscriptlist[row]["TestVar"] = tk.StringVar(value=base.mscriptlist[row]["Test"], name="mrow{}".format(row))
-		base.mscriptlist[row]["TestVar"].trace("w", self.msr_test_validate)
+		base.mscriptlist[row]["TestVar"].trace_add("write", self.msr_test_validate)
 		# mtst = ttk.OptionMenu(self.mscriptgrid, base.mscriptlist[row]["TestVar"], None, "test", command=lambda srow=srow: self.msr_test_validate(srow))
 		mtst = ttk.OptionMenu(self.mscriptgrid, base.mscriptlist[row]["TestVar"], None, "test")
 		mtst.config(width=20)
