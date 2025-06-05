@@ -242,9 +242,9 @@ class RFSwarmAgent():
 
 	def show_additional_versions(self):
 
-		base.debugmsg(0, "	Dependancy Versions")
+		self.debugmsg(0, "	Dependancy Versions")
 		try:
-			base.debugmsg(0, "		Python Version", sys.version)
+			self.debugmsg(0, "		Python Version", sys.version)
 		except Exception:
 			pass
 
