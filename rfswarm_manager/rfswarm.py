@@ -2493,6 +2493,7 @@ class RFSwarmCore:
 			base.debuglvl = int(base.args.debug)
 
 		if base.args.version:
+			self.show_additional_versions()
 			exit()
 
 		if base.args.create:
@@ -2749,6 +2750,24 @@ class RFSwarmCore:
 		base.run_dbthread = True
 		base.dbthread = threading.Thread(target=base.run_db_thread)
 		base.dbthread.start()
+
+	def show_additional_versions(self):
+
+		base.debugmsg(0, "	Dependancy Versions")
+		try:
+			base.debugmsg(0, "		Python Version", sys.version)
+		except:
+			pass
+
+		try:
+			base.debugmsg(0, "		SQLite Version", sqlite3.sqlite_version)
+		except:
+			pass
+
+		try:
+			base.debugmsg(0, "		Tcl/Tk Version", tk.Tcl().call("info", "patchlevel"))
+		except:
+			pass
 
 	def BuildCore(self):
 		base.debugmsg(5, "BuildCore")
