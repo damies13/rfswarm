@@ -245,7 +245,7 @@ class RFSwarmAgent():
 		base.debugmsg(0, "	Dependancy Versions")
 		try:
 			base.debugmsg(0, "		Python Version", sys.version)
-		except:
+		except Exception:
 			pass
 
 	def create_icons(self):

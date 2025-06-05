@@ -2756,17 +2756,17 @@ class RFSwarmCore:
 		base.debugmsg(0, "	Dependancy Versions")
 		try:
 			base.debugmsg(0, "		Python Version", sys.version)
-		except:
+		except Exception:
 			pass
 
 		try:
 			base.debugmsg(0, "		SQLite Version", sqlite3.sqlite_version)
-		except:
+		except Exception:
 			pass
 
 		try:
 			base.debugmsg(0, "		Tcl/Tk Version", tk.Tcl().call("info", "patchlevel"))
-		except:
+		except Exception:
 			pass
 
 	def BuildCore(self):
