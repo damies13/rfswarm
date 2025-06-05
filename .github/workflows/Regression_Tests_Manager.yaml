@@ -152,7 +152,7 @@ jobs:
           path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
           retention-days: 90
 
-  Manager Latest Tcl/TK:
+  Manager_Latest_Tcl-TK:
     strategy:
       matrix:
         platform: [ubuntu-latest, macos-latest]
