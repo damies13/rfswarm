@@ -213,6 +213,7 @@ jobs:
 
       - name: "Brew Path"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
+        shell: bash
         run: |
             echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
 
@@ -351,7 +352,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Reporter-${{ matrix.platform }}-${{ matrix.python }}
-          path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_TclTk_${{ matrix.python }}
           retention-days: 15
 
       - name: Archive Reporter Logs (longer retention if failed)
@@ -359,5 +360,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Reporter-${{ matrix.platform }}-${{ matrix.python }}
-          path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          path: Tests/Regression/Reporter/Logs/${{ matrix.platform }}_TclTk_${{ matrix.python }}
           retention-days: 90

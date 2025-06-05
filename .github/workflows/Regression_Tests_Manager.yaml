@@ -186,13 +186,16 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
 
-      - name: "Brew Path"
-        if: ${{ matrix.platform == 'ubuntu-latest' }}
-        run: |
-            echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
+      # - name: "Brew Path"
+      #   if: ${{ matrix.platform == 'ubuntu-latest' }}
+      #   shell: bash
+      #   run: |
+      #       echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
 
       - name: Brew Tk Update
         run: brew install python-tk@${{ matrix.python }}
+        env:
+          GITHUB_PATH: $GITHUB_PATH:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin
 
       - name: Pip Update
         run: python -m pip install --upgrade pip
@@ -298,7 +301,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}
-          path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
+          path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_TclTk_${{ matrix.tag }}
           retention-days: 15
 
       - name: Archive Manager Logs (longer retention if failed)
@@ -306,5 +309,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Manager-${{ matrix.platform }}-${{ matrix.python }}-${{ matrix.tag }}
-          path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
+          path: Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_TclTk_${{ matrix.tag }}
           retention-days: 90
