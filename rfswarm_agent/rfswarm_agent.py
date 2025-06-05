@@ -248,6 +248,17 @@ class RFSwarmAgent():
 		except Exception:
 			pass
 
+		try:
+			self.findlibraries()
+			self.debugmsg(0, "		RobotFramework:", self.agentproperties["RobotFramework"])
+			liblist = self.agentproperties["RobotFramework: Libraries"].split(", ")
+			for lib in liblist:
+				self.debugmsg(0, "		RobotFramework Library: " + lib, self.agentproperties["RobotFramework: Library: " + lib])
+
+		except Exception:
+			pass
+
+
 	def create_icons(self):
 		self.debugmsg(0, "Creating application icons for RFSwarm Agent")
 		appname = "RFSwarm Agent"
