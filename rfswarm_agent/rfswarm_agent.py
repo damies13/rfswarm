@@ -105,6 +105,7 @@ class RFSwarmAgent():
 			self.debuglvl = int(self.args.debug)
 
 		if self.args.version:
+			self.show_additional_versions()
 			exit()
 
 		if self.args.create:
@@ -238,6 +239,14 @@ class RFSwarmAgent():
 				self.agentproperties["{}".format(prop.strip())] = True
 
 		self.debugmsg(9, "self.agentproperties: ", self.agentproperties)
+
+	def show_additional_versions(self):
+
+		base.debugmsg(0, "	Dependancy Versions")
+		try:
+			base.debugmsg(0, "		Python Version", sys.version)
+		except:
+			pass
 
 	def create_icons(self):
 		self.debugmsg(0, "Creating application icons for RFSwarm Agent")
