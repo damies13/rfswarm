@@ -213,7 +213,8 @@ jobs:
 
       - name: "Brew Path"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
-        run: echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
+        run: |
+            echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
 
       - name: Brew Tk Update
         run: brew install python-tk@${{ matrix.python }}
