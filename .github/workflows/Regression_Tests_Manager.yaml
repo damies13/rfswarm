@@ -196,7 +196,7 @@ jobs:
         run: |
             # brew install tcl-tk@9
             brew install python-tk@${{ matrix.python }}
-            brew install python@${{ matrix.python }}
+            brew reinstall python@${{ matrix.python }} --with-tcl-tk
             which python3
 
       - name: "Brew Path"
