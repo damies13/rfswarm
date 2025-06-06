@@ -390,14 +390,18 @@ Open New Template After Selecting a Section That Is Not In the New Template
 
 	VAR 	${testdata} 			Issue-#363
 	VAR 	${basefolder} 			${CURDIR}${/}testdata${/}${testdata}
-	VAR 	${first_template_dir} 	${basefolder}${/}original.template
+	VAR 	${first_template} 		${basefolder}${/}original.template
 	VAR 	${second_template_dir} 	${basefolder}${/}reduced.template
+	VAR 	${resultdata} 			20230320_185055_demo
+	VAR 	${resultfolder} 		${basefolder}${/}${resultdata}
 
 	# reset ini file
 	${location}=	Get Reporter Default Save Path
 	Remove File 	${location}${/}RFSwarmReporter.ini
 
-	Open GUI	-t 	${first_template_dir}
+	# Change *template* With ${first_template} In ${basefolder}${/}RFSwarmReporter.ini
+	# Change Reporter INI File Settings 	templatedir 	${basefolder}
+	Open GUI	 	-d 	${resultfolder} 	-t 	${first_template}
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
 	Take A Screenshot
 	Click Section 	Errors
