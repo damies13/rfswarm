@@ -166,25 +166,25 @@ jobs:
         run: |
           echo matrix.platform: ${{ matrix.platform }}
           echo matrix.python: ${{ matrix.python }}
-      - name: (MacOS, <3.11) Fix Python's tkinter Issue-649 (https://github.com/actions/setup-python/issues/649)
-        shell: bash
-        if: ${{ startswith(matrix.platform, 'macos-') && contains('3.7;3.8;3.9;3.10', matrix.python) }}
-        run: |
-          brew install tcl-tk pyenv openssl readline sqlite3 xz zlib
-          env \
-            PATH="$(brew --prefix tcl-tk)/bin:$PATH" \
-            LDFLAGS="-L$(brew --prefix tcl-tk)/lib" \
-            CPPFLAGS="-I$(brew --prefix tcl-tk)/include" \
-            PKG_CONFIG_PATH="$(brew --prefix tcl-tk)/lib/pkgconfig" \
-            CFLAGS="-I$(brew --prefix tcl-tk)/include" \
-            PYTHON_CONFIGURE_OPTS="--with-tcltk-includes='-I$(brew --prefix tcl-tk)/include' --with-tcltk-libs='-L$(brew --prefix tcl-tk)/lib -ltcl8.6 -ltk8.6'" \
-            pyenv install ${{matrix.python}}
-          pyenv global ${{matrix.python}}
-      - name: setup-python
-        if: ${{ !startswith(matrix.platform, 'macos-') || contains('3.11;3.12;', matrix.python) }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python }}
+      # - name: (MacOS, <3.11) Fix Python's tkinter Issue-649 (https://github.com/actions/setup-python/issues/649)
+      #   shell: bash
+      #   if: ${{ startswith(matrix.platform, 'macos-') && contains('3.7;3.8;3.9;3.10', matrix.python) }}
+      #   run: |
+      #     brew install tcl-tk pyenv openssl readline sqlite3 xz zlib
+      #     env \
+      #       PATH="$(brew --prefix tcl-tk)/bin:$PATH" \
+      #       LDFLAGS="-L$(brew --prefix tcl-tk)/lib" \
+      #       CPPFLAGS="-I$(brew --prefix tcl-tk)/include" \
+      #       PKG_CONFIG_PATH="$(brew --prefix tcl-tk)/lib/pkgconfig" \
+      #       CFLAGS="-I$(brew --prefix tcl-tk)/include" \
+      #       PYTHON_CONFIGURE_OPTS="--with-tcltk-includes='-I$(brew --prefix tcl-tk)/include' --with-tcltk-libs='-L$(brew --prefix tcl-tk)/lib -ltcl8.6 -ltk8.6'" \
+      #       pyenv install ${{matrix.python}}
+      #     pyenv global ${{matrix.python}}
+      # - name: setup-python
+      #   if: ${{ !startswith(matrix.platform, 'macos-') || contains('3.11;3.12;', matrix.python) }}
+      #   uses: actions/setup-python@v5
+      #   with:
+      #     python-version: ${{ matrix.python }}
 
       - name: "Brew Path"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
@@ -194,9 +194,9 @@ jobs:
 
       - name: Brew Tk Update
         run: |
-            brew install tcl-tk@9
+            # brew install tcl-tk@9
             brew install python-tk@${{ matrix.python }}
-            ln -sf /usr/local/opt/tcl-tk@9 /usr/local/opt/tcl-tk
+            brew install python@${{ matrix.python }}
 
       - name: Pip Update
         run: python -m pip install --upgrade pip
