@@ -221,6 +221,12 @@ jobs:
             # brew install tcl-tk@9
             brew install python-tk@${{ matrix.python }}
             brew install python@${{ matrix.python }}
+            which python3
+
+      - name: "Brew Path"
+        if: ${{ matrix.platform == 'ubuntu-latest' }}
+        shell: bash
+            ls /home/linuxbrew/.linuxbrew/bin/python*
 
       - name: Pip Update
         run: python -m pip install --upgrade pip
