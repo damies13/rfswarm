@@ -398,9 +398,12 @@ Open New Template After Selecting a Section That Is Not In the New Template
 	
 	Open GUI	-t 	${first_template_dir}
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
+	Take A Screenshot
 	Click Section 	Errors
 	Click Button 	OpenTemplate
 	Open Template File OS DIALOG 	reduced
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
+	Take A Screenshot
 
 	Close GUI
 
