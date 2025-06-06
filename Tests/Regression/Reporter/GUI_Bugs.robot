@@ -384,3 +384,27 @@ Auto Generate XLSX Report With GUI Using Template
 	[Teardown] 	Run Keywords
 	...    Close GUI	AND
 	...    Move File 	${resultfolder}${/}${resultdata}.xlsx 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.xlsx
+
+Open New Template After Selecting a Section That Is Not In the New Template
+	[Tags] 	ubuntu-latest 	macos-latest 	windows-latest 	Issue #363
+	[Setup] 	Change Reporter INI File Settings 	win_height 	600
+
+	VAR 	${testdata} 			Issue-#363
+	VAR 	${basefolder} 			${CURDIR}${/}testdata${/}${testdata}
+	VAR 	${first_template_dir} 	${basefolder}${/}original.template
+	VAR 	${second_template_dir} 	${basefolder}${/}reduced.template
+
+	Log To Console	Run Reporter with cutom template and generate html report.
+	
+	Open GUI	-t 	${first_template_dir}
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
+	Click Section 	Errors
+	Click Button 	OpenTemplate
+	Open Template File OS DIALOG 	reduced
+
+	Close GUI
+
+	${running}= 	Is Process Running 	${process}
+	Check Logs
+
+	[Teardown] 	Run Keyword If 	${running} 	Close Manager GUI ${platform}

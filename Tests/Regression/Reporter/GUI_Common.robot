@@ -78,6 +78,19 @@ Read Log
 	Log 		${filedata}
 	RETURN 		${filedata}
 
+Check Logs
+	${stdout}= 		Read Log 	${OUTPUT DIR}${/}stdout.txt
+	${stderr}= 		Read Log 	${OUTPUT DIR}${/}stderr.txt
+
+	Should Not Contain 	${stdout} 	RuntimeError
+	Should Not Contain 	${stderr} 	RuntimeError
+	Should Not Contain 	${stdout} 	Exception
+	Should Not Contain 	${stderr} 	Exception
+	Should Not Contain 	${stdout}	OSError
+	Should Not Contain 	${stderr} 	OSError
+	Should Not Contain 	${stdout}	KeyError
+	Should Not Contain 	${stderr} 	KeyError
+
 Make Clipboard Not None
 	Evaluate    clipboard.copy("You should never see this after copy") 	modules=clipboard
 
@@ -659,6 +672,14 @@ Save Template File OS DIALOG
 	Type	${template_name}
 	# Take A Screenshot
 	Click Dialog Button		save
+	Sleep	1
+
+Open Template File OS DIALOG
+	[Arguments]		${template_name}
+	Sleep	5
+	Type	${template_name}.template
+	# Take A Screenshot
+	Click Dialog Button		open
 	Sleep	1
 
 Get Manager Default Save Path
