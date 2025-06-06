@@ -226,6 +226,7 @@ jobs:
       - name: "Brew Path"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         shell: bash
+        run: |
             ls /home/linuxbrew/.linuxbrew/bin/python*
 
       - name: Pip Update
