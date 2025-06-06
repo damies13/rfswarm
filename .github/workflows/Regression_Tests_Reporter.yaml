@@ -220,6 +220,7 @@ jobs:
         run: |
             brew install tcl-tk@9
             brew install python-tk@${{ matrix.python }}
+            ln -sf /usr/local/opt/tcl-tk@9 /usr/local/opt/tcl-tk
 
       - name: Pip Update
         run: python -m pip install --upgrade pip
