@@ -394,8 +394,7 @@ Open New Template After Selecting a Section That Is Not In the New Template
 	VAR 	${first_template_dir} 	${basefolder}${/}original.template
 	VAR 	${second_template_dir} 	${basefolder}${/}reduced.template
 
-	Log To Console	Run Reporter with cutom template and generate html report.
-	
+	Change Reporter INI File Settings 	templatedir 	${basefolder}
 	Open GUI	-t 	${first_template_dir}
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
 	Take A Screenshot
