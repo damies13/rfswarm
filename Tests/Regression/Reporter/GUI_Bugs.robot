@@ -387,14 +387,16 @@ Auto Generate XLSX Report With GUI Using Template
 
 Open New Template After Selecting a Section That Is Not In the New Template
 	[Tags] 	ubuntu-latest 	macos-latest 	windows-latest 	Issue #363
-	[Setup] 	Change Reporter INI File Settings 	win_height 	600
 
 	VAR 	${testdata} 			Issue-#363
 	VAR 	${basefolder} 			${CURDIR}${/}testdata${/}${testdata}
 	VAR 	${first_template_dir} 	${basefolder}${/}original.template
 	VAR 	${second_template_dir} 	${basefolder}${/}reduced.template
 
-	Change Reporter INI File Settings 	templatedir 	${basefolder}
+	# reset ini file
+	${location}=	Get Reporter Default Save Path
+	Remove File 	${location}${/}RFSwarmReporter.ini
+
 	Open GUI	-t 	${first_template_dir}
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
 	Take A Screenshot
