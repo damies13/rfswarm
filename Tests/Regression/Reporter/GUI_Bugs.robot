@@ -395,8 +395,11 @@ Open New Template After Selecting a Section That Is Not In the New Template
 	VAR 	${resultdata} 			20230320_185055_demo
 	VAR 	${resultfolder} 		${basefolder}${/}${resultdata}
 
-	Change *tdir* With ${basefolder} In ${basefolder}${/}RFSwarmReporter.ini
-	Open GUI	-i 	${basefolder}${/}RFSwarmReporter.ini 	-d 	${resultfolder} 	-t 	${first_template}
+	Change Reporter INI File Settings 	templatedir 	${basefolder}
+	Sleep 	2
+	Open GUI	-d 	${resultfolder} 	-t 	${first_template}
+	${running}= 	Is Process Running 	${process}
+
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
 	Take A Screenshot
 	Click Section 	Errors
