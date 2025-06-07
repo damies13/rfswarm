@@ -205,7 +205,7 @@ jobs:
       #       PYTHON_CONFIGURE_OPTS="--with-tcltk-includes='-I$(brew --prefix tcl-tk)/include' --with-tcltk-libs='-L$(brew --prefix tcl-tk)/lib -ltcl8.6 -ltk8.6'" \
       #       pyenv install ${{matrix.python}}
       #     pyenv global ${{matrix.python}}
-      # - name: setup-python
+      - name: setup-python
         if: ${{ !startswith(matrix.platform, 'macos-') || contains('3.11;3.12;', matrix.python) }}
         uses: actions/setup-python@v5
         with:
