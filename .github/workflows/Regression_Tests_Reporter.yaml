@@ -218,8 +218,8 @@ jobs:
 
       - name: Brew Tk Update
         run: |
-            # brew install tcl-tk@9
-            brew install python-tk@${{ matrix.python }}
+            brew install tcl-tk@9
+            # brew install python-tk@${{ matrix.python }}
             brew install python@${{ matrix.python }} --with-tcl-tk
             # brew reinstall python@${{ matrix.python }}
             which python3
