@@ -312,6 +312,8 @@ Template with Start and End Dates
 	# Take A Screenshot
 	Wait For 	reporter_${platform}_expected_testresultsummary.png 	 timeout=30
 
+	[Teardown] 	Close GUI
+
 Auto Generate HTML Report With GUI Using Template
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #132 	HTML
 
@@ -399,10 +401,14 @@ Open New Template After Selecting a Section That Is Not In the New Template
 	Open GUI	-d 	${resultfolder} 	-t 	${first_template}
 	${running}= 	Is Process Running 	${process}
 
+	Change *tdir* With ${basefolder} In ${basefolder}${/}RFSwarmReporter.ini
+	Open GUI 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-d 	${resultfolder} 	-t 	${first_template}
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
 	Take A Screenshot
 	Click Section 	Errors
+	Take A Screenshot
 	Click Button 	OpenTemplate
+	Open Template File OS DIALOG 	reduced
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
 	Take A Screenshot
 

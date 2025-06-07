@@ -526,7 +526,6 @@ Open GUI macos
 	# Take A Screenshot
 
 Handle Donation Reminder
-	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		${default_image_timeout / 2}
 	VAR 	${DonationReminder} 	${found} 		scope=TEST
 
 Close GUI

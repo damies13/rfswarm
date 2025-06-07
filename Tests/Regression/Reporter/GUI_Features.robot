@@ -7,6 +7,7 @@ Test Teardown 	Close GUI
 *** Test Cases ***
 Verify That Files Get Saved With Correct Extension And Names
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #39 	Issue #257
+	[Setup] 	Change Reporter INI File Settings 	win_height 	600
 	${testdata}=		Set Variable	Issue-#39
 	${resultdata}=		Set Variable	20240622_182505_Issue-#39
 	${basefolder}=		Set Variable	${CURDIR}${/}testdata${/}${testdata}
