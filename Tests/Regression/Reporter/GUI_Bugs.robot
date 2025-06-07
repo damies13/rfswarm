@@ -312,6 +312,8 @@ Template with Start and End Dates
 	# Take A Screenshot
 	Wait For 	reporter_${platform}_expected_testresultsummary.png 	 timeout=30
 
+	[Teardown] 	Close GUI
+
 Auto Generate HTML Report With GUI Using Template
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #132 	HTML
 
@@ -401,7 +403,6 @@ Open New Template After Selecting a Section That Is Not In the New Template
 	Close GUI
 
 	Change Reporter INI File Settings 	templatedir 	${basefolder}
-	Change Reporter INI File Settings 	template 		${first_template}
 	Sleep 	2
 	Open GUI	-d 	${resultfolder} 	-t 	${first_template}
 	${running}= 	Is Process Running 	${process}
