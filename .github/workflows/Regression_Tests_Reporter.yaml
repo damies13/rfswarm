@@ -206,10 +206,10 @@ jobs:
       #       pyenv install ${{matrix.python}}
       #     pyenv global ${{matrix.python}}
       # - name: setup-python
-      #   if: ${{ !startswith(matrix.platform, 'macos-') || contains('3.11;3.12;', matrix.python) }}
-      #   uses: actions/setup-python@v5
-      #   with:
-      #     python-version: ${{ matrix.python }}
+        if: ${{ !startswith(matrix.platform, 'macos-') || contains('3.11;3.12;', matrix.python) }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
 
       - name: "Brew Path"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
@@ -221,7 +221,7 @@ jobs:
             # brew install tcl-tk@9
             brew install python-tk@${{ matrix.python }}
             # brew install python@${{ matrix.python }} --with-tcl-tk
-            brew reinstall python@${{ matrix.python }}
+            # brew reinstall python@${{ matrix.python }}
             which python3
 
       - name: "Brew Path"
