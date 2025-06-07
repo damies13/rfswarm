@@ -675,9 +675,16 @@ Save Template File OS DIALOG
 	Sleep	1
 
 Open Template File OS DIALOG
-	[Arguments]		${template_name}
+	[Arguments]		${template_path}
 	Sleep	5
-	Type	${template_name}.template
+	Evaluate 	clipboard.copy(r"${template_path}") 	modules=clipboard
+	IF  "${platform}" == "macos"
+		Press Combination	KEY.command		KEY.v
+	ELSE
+		Press Combination	KEY.ctrl		KEY.v
+	END
+	Take A Screenshot
+	# Type	${template_name}.template
 	# Take A Screenshot
 	Click Dialog Button		open
 	Sleep	1

@@ -390,21 +390,26 @@ Open New Template After Selecting a Section That Is Not In the New Template
 
 	VAR 	${testdata} 			Issue-#363
 	VAR 	${basefolder} 			${CURDIR}${/}testdata${/}${testdata}
-	VAR 	${first_template} 		${basefolder}${/}original.template
-	VAR 	${second_template_dir} 	${basefolder}${/}reduced.template
+	${first_template} 		Normalize Path 	${basefolder}${/}original.template
+	${second_template_dir} 	Normalize Path 	${basefolder}${/}reduced.template
 	VAR 	${resultdata} 			20230320_185055_demo
 	VAR 	${resultfolder} 		${basefolder}${/}${resultdata}
 
 	Change Reporter INI File Settings 	templatedir 	${basefolder}
+	Change Reporter INI File Settings 	template 		${first_template}
 	Sleep 	2
 	Open GUI	-d 	${resultfolder} 	-t 	${first_template}
 	${running}= 	Is Process Running 	${process}
+
+	${location}=	Get Reporter INI Location
+	${inifile} 	Get File 	${location}
+	Log 	${inifile}
 
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
 	Take A Screenshot
 	Click Section 	Errors
 	Click Button 	OpenTemplate
-	Open Template File OS DIALOG 	reduced
+	Open Template File OS DIALOG 	${second_template_dir}
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
 	Take A Screenshot
 
@@ -413,4 +418,4 @@ Open New Template After Selecting a Section That Is Not In the New Template
 	${running}= 	Is Process Running 	${process}
 	Check Logs
 
-	[Teardown] 	Run Keyword If 	${running} 	Close Manager GUI ${platform}
+	[Teardown] 	Run Keyword If 	${running} 	Close GUI
