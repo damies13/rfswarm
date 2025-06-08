@@ -408,10 +408,10 @@ Open New Template After Selecting a Section That Is Not In the New Template
 	File Open Dialogue Select File 	${second_template_dir}
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
 	Take A Screenshot
+	Click Section 	Report
 
 	Close GUI
 
-	${running}= 	Is Process Running 	${process}
 	Check Logs
 
 	[Teardown] 	Close GUI

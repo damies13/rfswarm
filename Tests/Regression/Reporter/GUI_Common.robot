@@ -873,7 +873,7 @@ Navigate to and check Desktop Icon For Windows
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Sleep 	1
+	Sleep 	10
 	Take A Screenshot
 
 	${img}=	Set Variable		${platform}_start_menu_rfswarm_reporter.png
