@@ -203,8 +203,8 @@ jobs:
       - name: "Tk Path"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
         run: |
-            echo "$(brew --prefix tcl-tk)/bin:" >> "$GITHUB_PATH"
-            echo "$(brew --prefix python-tk)/libexec:" >> "$GITHUB_PATH"
+            echo "$(brew --prefix tcl-tk)/bin" >> "$GITHUB_PATH"
+            echo "$(brew --prefix python-tk)/libexec" >> "$GITHUB_PATH"
 
       - name: "Brew Path2"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
