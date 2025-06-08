@@ -526,6 +526,7 @@ Open GUI macos
 	# Take A Screenshot
 
 Handle Donation Reminder
+	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		${default_image_timeout / 6}
 	VAR 	${DonationReminder} 	${found} 		scope=TEST
 
 Close GUI
@@ -675,7 +676,17 @@ Save Template File OS DIALOG
 
 Open Template File OS DIALOG
 	Sleep	5
+	[Arguments] 	${template_name}
+	Sleep	5
+	# Evaluate 	clipboard.copy(r"${template_path}") 	modules=clipboard
+	# IF  "${platform}" == "macos"
+	# 	Press Combination	KEY.command		KEY.v
+	# ELSE
+	# 	Press Combination	KEY.ctrl		KEY.v
+	# END
 	# Take A Screenshot
+	Type	${template_name}.template
+	Take A Screenshot
 	Click Dialog Button		open
 	Sleep	1
 
