@@ -675,20 +675,70 @@ Save Template File OS DIALOG
 	Sleep	1
 
 Open Template File OS DIALOG
+	[Arguments]		${template_name}
 	Sleep	5
-	[Arguments] 	${template_name}
-	Sleep	5
-	# Evaluate 	clipboard.copy(r"${template_path}") 	modules=clipboard
-	# IF  "${platform}" == "macos"
-	# 	Press Combination	KEY.command		KEY.v
-	# ELSE
-	# 	Press Combination	KEY.ctrl		KEY.v
-	# END
-	# Take A Screenshot
 	Type	${template_name}.template
 	Take A Screenshot
 	Click Dialog Button		open
 	Sleep	1
+
+File Open Dialogue Select File
+	[Arguments]		${filepath}
+	Run Keyword		File Open Dialogue ${platform} Select File 			${filepath}
+	# Take A Screenshot
+
+File Open Dialogue ubuntu Select File
+	[Arguments]		${filepath}
+	Sleep	2
+	# Take A Screenshot
+	Click Label With Horizontal Offset 	file_name 	50
+	Sleep	0.5
+	Type 		${filepath} 	Key.ENTER
+	Sleep	0.5
+	# Take A Screenshot
+	# Click Dialog Button 	open
+
+File Open Dialogue windows Select File
+	[Arguments]		${filepath}
+	Sleep	3
+	# Take A Screenshot
+	${filepath}= 	Normalize Path 	${filepath}
+	${path} 	${file} = 	Split Path 	${filepath}
+	Click Label With Horizontal Offset 	file_name 	50
+	Sleep	0.5
+	Type 		${path} 	Key.ENTER
+	Sleep	0.5
+	Take A Screenshot
+	Type 		${file}
+	Sleep	0.5
+	Take A Screenshot
+	Press key.enter 1 Times
+	# Take A Screenshot
+	# Click Dialog Button 	open
+	Sleep	0.5
+
+File Open Dialogue macos Select File
+	[Arguments]		${filepath}
+	Sleep	3
+	# Take A Screenshot
+	${filepath}=	Convert To Lower Case	${filepath}
+	Evaluate	clipboard.copy(r"${filepath}")	modules=clipboard		#copy path to clipboard
+	Press Combination 	KEY.command 	KEY.shift 	KEY.g
+	Press Combination 	KEY.backspace		#clear text filed
+	Click Label With Horizontal Offset 	file_name 	-10
+	Click	button=right	#show context menu
+	Sleep	2
+	# Take A Screenshot
+	Press Combination 	KEY.down	#choose paste option(should be first)
+	Press key.enter 1 Times		#execute paste option
+	Sleep	0.5
+	# Take A Screenshot
+	Press key.enter 1 Times
+	Sleep	0.5
+	# Take A Screenshot
+	Click Dialog Button 	open
+	# Type 		Key.BACKSPACE 	Key.DELETE
+	# Click Dialog Button 	open
 
 Get Manager Default Save Path
 	${pip_data}=	Get Manager PIP Data

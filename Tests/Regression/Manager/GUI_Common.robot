@@ -1357,7 +1357,7 @@ File Open Dialogue macos Select File
 	Sleep	3
 	# Take A Screenshot
 	${filepath}=	Convert To Lower Case	${filepath}
-	Evaluate	clipboard.copy("${filepath}")	modules=clipboard		#copy path to clipboard
+	Evaluate	clipboard.copy(r"${filepath}")	modules=clipboard		#copy path to clipboard
 	Press Combination 	KEY.command 	KEY.shift 	KEY.g
 	Press Combination 	KEY.backspace		#clear text filed
 	Click Label With Horizontal Offset 	file_name 	-10
