@@ -211,11 +211,6 @@ jobs:
       #   with:
       #     python-version: ${{ matrix.python }}
 
-      - name: "Brew Path"
-        if: ${{ matrix.platform == 'ubuntu-latest' }}
-        run: |
-            echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> "$GITHUB_PATH"
-
       - name: Brew Tk Update
         run: |
             # brew install tcl-tk@9
@@ -226,8 +221,16 @@ jobs:
 
       - name: "Brew Path"
         if: ${{ matrix.platform == 'ubuntu-latest' }}
+        run: |
+            echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:" >> "$GITHUB_PATH"
+            echo "$(brew --prefix tcl-tk)/bin:" >> "$GITHUB_PATH"
+            echo "$(brew --prefix python-tk)/libexec:" >> "$GITHUB_PATH"
+
+      - name: "Brew Path2"
+        if: ${{ matrix.platform == 'ubuntu-latest' }}
         shell: bash
         run: |
+            echo $GITHUB_PATH
             ls /home/linuxbrew/.linuxbrew/bin/python*
 
       - name: Pip Update
