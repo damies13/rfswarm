@@ -238,6 +238,18 @@ jobs:
             echo $GITHUB_PATH
             ls /home/linuxbrew/.linuxbrew/bin/python*
 
+      - name: "Tk macos"
+        if: ${{ matrix.platform == 'macos-latest' }}
+        run: |
+            env \
+            PATH="$(brew --prefix tcl-tk)/bin:$PATH" \
+            LDFLAGS="-L$(brew --prefix tcl-tk)/lib" \
+            CPPFLAGS="-I$(brew --prefix tcl-tk)/include" \
+            PKG_CONFIG_PATH="$(brew --prefix tcl-tk)/lib/pkgconfig" \
+            CFLAGS="-I$(brew --prefix tcl-tk)/include" \
+            PYTHON_CONFIGURE_OPTS="--with-tcltk-includes='-I$(brew --prefix tcl-tk)/include' --with-tcltk-libs='-L$(brew --prefix tcl-tk)/lib -ltcl9 -ltk9'" \
+            pyenv install ${{ matrix.python }}
+
       - name: Pip Update
         run: python -m pip install --upgrade pip
       - name: Checkout
