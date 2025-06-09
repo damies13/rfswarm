@@ -1632,7 +1632,7 @@ Navigate to and check Desktop Icon For Windows
 
 	${img}=	Set Variable		${platform}_start_menu_rfswarm_manager.png
 	Take A Screenshot
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Run Keyword And Continue On Failure 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	Take A Screenshot
 
 	# Navigate Start Menu

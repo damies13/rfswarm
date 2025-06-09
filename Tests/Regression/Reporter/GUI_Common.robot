@@ -869,15 +869,15 @@ Navigate to and check Desktop Icon For Windows
 
 	Take A Screenshot
 	# Open Start Menu
+	Sleep 	0.5
 	${img}=	Set Variable		${platform}_start_menu.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Sleep 	10
 	Take A Screenshot
 
 	${img}=	Set Variable		${platform}_start_menu_rfswarm_reporter.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Run Keyword And Continue On Failure 	Wait For 	${img} 	 timeout=${default_image_timeout}
 
 	# Navigate Start Menu
 	Type 	RFSwarm
