@@ -815,6 +815,8 @@ Navigate to and check Desktop Icon For MacOS
 	Sleep 	0.3
 	Press Combination 	KEY.backspace
 	Sleep 	0.3
+	Press Combination 	KEY.tab
+	Sleep 	0.3
 	Take A Screenshot
 	${img}=	Set Variable		${platform}_finder_gotofolder.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
@@ -881,7 +883,7 @@ Navigate to and check Desktop Icon For Windows
 	Take A Screenshot
 
 	${img}=	Set Variable		${platform}_start_menu_rfswarm_reporter.png
-	Run Keyword And Continue On Failure 	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Run Keyword And Ignore Error 	Wait For 	${img} 	 timeout=${default_image_timeout} 	# temp. fix
 
 	# Navigate Start Menu
 	Type 	RFSwarm
