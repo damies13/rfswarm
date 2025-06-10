@@ -816,7 +816,7 @@ Navigate to and check Desktop Icon For MacOS
 	Press Combination 	KEY.backspace
 	Sleep 	0.3
 	VAR 	@{top_corner} 	100 	100
-	Click To The Below Of 	${top_corner} 	20
+	Click To The Below Of 	${top_corner} 	${20}
 
 	Take A Screenshot
 	${img}=	Set Variable		${platform}_finder_gotofolder.png
