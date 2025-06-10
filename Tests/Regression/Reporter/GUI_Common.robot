@@ -526,7 +526,7 @@ Open GUI macos
 	# Take A Screenshot
 
 Handle Donation Reminder
-	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 	5
+	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 	15
 	VAR 	${DonationReminder} 	${found} 		scope=TEST
 
 Close GUI
@@ -815,8 +815,9 @@ Navigate to and check Desktop Icon For MacOS
 	Sleep 	0.3
 	Press Combination 	KEY.backspace
 	Sleep 	0.3
-	Press Combination 	KEY.tab
-	Sleep 	0.3
+	VAR 	@{top_corner} 	100 	100
+	Click To The Below Of 	${top_corner} 	20
+
 	Take A Screenshot
 	${img}=	Set Variable		${platform}_finder_gotofolder.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
