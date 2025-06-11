@@ -815,7 +815,7 @@ Navigate to and check Desktop Icon For MacOS
 	Sleep 	0.3
 	Press Combination 	KEY.backspace
 	Sleep 	0.3
-	VAR 	@{top_corner} 	100 	100
+	VAR 	@{top_corner} 	${100} 	${100}
 	Click To The Below Of 	${top_corner} 	${20}
 
 	Take A Screenshot
