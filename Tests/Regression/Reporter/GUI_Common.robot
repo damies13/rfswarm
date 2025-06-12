@@ -822,7 +822,7 @@ Navigate to and check Desktop Icon For MacOS
 	${img}=	Set Variable		${platform}_finder_gotofolder.png
 	${status}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=${20}
 	IF  ${status}
-		Click Image		${img}
+		Run Keyword And Ignore Error 	Click Image		${img}
 	END
 
 	# Type 		/Applications
