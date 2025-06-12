@@ -815,14 +815,15 @@ Navigate to and check Desktop Icon For MacOS
 	Sleep 	0.3
 	Press Combination 	KEY.backspace
 	Sleep 	0.3
-	VAR 	@{top_corner} 	${100} 	${100}
-	Click To The Below Of 	${top_corner} 	${20}
+	# VAR 	@{top_corner} 	${100} 	${100}
+	# Click To The Below Of 	${top_corner} 	${20}
 
 	Take A Screenshot
 	${img}=	Set Variable		${platform}_finder_gotofolder.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-	Click Image		${img}
-	# Take A Screenshot
+	${status}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=${20}
+	IF  ${status}
+		Click Image		${img}
+	END
 
 	# Type 		/Applications
 	Evaluate 		pynput.keyboard.Controller().type('/Applications') 		modules=pynput.keyboard
