@@ -526,7 +526,7 @@ Open GUI macos
 	# Take A Screenshot
 
 Handle Donation Reminder
-	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 	15
+	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 	30
 	VAR 	${DonationReminder} 	${found} 		scope=TEST
 
 Close GUI
