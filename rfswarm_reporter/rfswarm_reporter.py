@@ -3956,6 +3956,7 @@ class ReporterCore:
 			base.debuglvl = int(base.args.debug)
 
 		if base.args.version:
+			self.show_additional_versions()
 			exit()
 
 		if base.args.create:
@@ -4137,6 +4138,24 @@ class ReporterCore:
 			for thd in self.t_export.keys():
 				self.t_export[thd].join()
 			self.on_closing()
+
+	def show_additional_versions(self):
+
+		base.debugmsg(0, "	Dependancy Versions")
+		try:
+			base.debugmsg(0, "		Python Version", sys.version)
+		except Exception:
+			pass
+
+		try:
+			base.debugmsg(0, "		SQLite Version", sqlite3.sqlite_version)
+		except Exception:
+			pass
+
+		try:
+			base.debugmsg(0, "		Tcl/Tk Version", tk.Tcl().call("info", "patchlevel"))
+		except Exception:
+			pass
 
 	def mainloop(self):
 
