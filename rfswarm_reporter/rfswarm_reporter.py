@@ -12143,16 +12143,10 @@ class ReporterGUI(tk.Frame):
 			base.debugmsg(5, "LoadSections")
 			selected = self.sectionstree.focus()
 			base.debugmsg(5, "selected:", selected)
-			if len(selected) > 0:
-				self.LoadSections(selected)
-			else:
-				self.LoadSections("TOP")
+			self.LoadSections("TOP")
 			base.debugmsg(5, "content_load")
 			base.debugmsg(5, "selected:", selected)
-			if len(selected) > 0:
-				self.content_load(selected)
-			else:
-				self.content_load("TOP")
+			self.content_load("TOP")
 			base.debugmsg(5, "updateTemplate")
 			self.updateTemplate()
 			# base.debugmsg(5, "cp_regenerate_preview")

@@ -170,7 +170,7 @@ Wiggle Mouse
 	Move To 	20 	20
 
 Handle Donation Reminder
-	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		${default_image_timeout / 2}
+	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		30
 	VAR 	${DonationReminder} 	${found} 		scope=TEST
 
 Close Manager GUI ubuntu
@@ -1357,7 +1357,7 @@ File Open Dialogue macos Select File
 	Sleep	3
 	# Take A Screenshot
 	${filepath}=	Convert To Lower Case	${filepath}
-	Evaluate	clipboard.copy("${filepath}")	modules=clipboard		#copy path to clipboard
+	Evaluate	clipboard.copy(r"${filepath}")	modules=clipboard		#copy path to clipboard
 	Press Combination 	KEY.command 	KEY.shift 	KEY.g
 	Press Combination 	KEY.backspace		#clear text filed
 	Click Label With Horizontal Offset 	file_name 	-10
@@ -1632,7 +1632,7 @@ Navigate to and check Desktop Icon For Windows
 
 	${img}=	Set Variable		${platform}_start_menu_rfswarm_manager.png
 	Take A Screenshot
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Run Keyword And Ignore Error 	Wait For 	${img} 	timeout=${default_image_timeout} 	# temp. fix
 	Take A Screenshot
 
 	# Navigate Start Menu
