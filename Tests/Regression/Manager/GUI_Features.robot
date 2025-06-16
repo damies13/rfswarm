@@ -3250,8 +3250,8 @@ Verify the Remaining Time Is Displayed On the Plan Screen
 	...    Set INI Window Size		1200	600
 
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
-	#adding 10m:20s
-	${new_time}=	Add Time To Date 	${current_time} 	680 		date_format=%H:%M:%S 	result_format=%H:%M:%S
+	#adding 10m:40s
+	${new_time}=	Add Time To Date 	${current_time} 	640 		date_format=%H:%M:%S 	result_format=%H:%M:%S
 	VAR		@{mngr_options}		-t 	${new_time}
 
 	Open Manager GUI	${mngr_options}
@@ -3260,7 +3260,7 @@ Verify the Remaining Time Is Displayed On the Plan Screen
 	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "Remaining" for scheduled start.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_10_00.png 	timeout=${20}
+	...    Wait For	manager_${platform}_label_10_00.png 	timeout=${60}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "10:00" for scheduled start.
 
 	[Teardown]	Run Keyword 	Close Manager GUI ${platform}

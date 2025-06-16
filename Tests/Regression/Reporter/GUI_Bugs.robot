@@ -312,6 +312,8 @@ Template with Start and End Dates
 	# Take A Screenshot
 	Wait For 	reporter_${platform}_expected_testresultsummary.png 	 timeout=30
 
+	[Teardown] 	Close GUI
+
 Auto Generate HTML Report With GUI Using Template
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #132 	HTML
 
@@ -384,3 +386,32 @@ Auto Generate XLSX Report With GUI Using Template
 	[Teardown] 	Run Keywords
 	...    Close GUI	AND
 	...    Move File 	${resultfolder}${/}${resultdata}.xlsx 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.xlsx
+
+Open New Template After Selecting a Section That Is Not In the New Template
+	[Tags] 	ubuntu-latest 	macos-latest 	windows-latest 	Issue #363
+
+	VAR 	${testdata} 			Issue-#363
+	VAR 	${basefolder} 			${CURDIR}${/}testdata${/}${testdata}
+	VAR 	${first_template} 		${basefolder}${/}original.template
+	VAR 	${second_template_dir} 	${basefolder}${/}reduced.template
+	VAR 	${resultdata} 			20230320_185055_demo
+	VAR 	${resultfolder} 		${basefolder}${/}${resultdata}
+
+	Change Reporter INI File Settings 	templatedir 	${basefolder}
+
+	Open GUI 	-d 	${resultfolder} 	-t 	${first_template}
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
+	Take A Screenshot
+	Click Section 	Errors
+	Take A Screenshot
+	Click Button 	OpenTemplate
+	File Open Dialogue Select File 	${second_template_dir}
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
+	Take A Screenshot
+	Click Section 	Report
+
+	Close GUI
+
+	Check Logs
+
+	[Teardown] 	Close GUI

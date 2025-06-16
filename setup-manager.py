@@ -10,7 +10,7 @@ with open("README_PyPi.md", "r", encoding="utf-8") as fh:
 
 setup(
 	name="rfswarm-manager",
-	version="1.5.0",
+	version="1.5.1",
 	author="damies13",
 	author_email="damies13+rfswarm@gmail.com",
 	description="rfswarm manager",
