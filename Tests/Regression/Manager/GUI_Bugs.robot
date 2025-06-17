@@ -75,6 +75,57 @@ Verify If Manager Runs With Existing INI File From Previous Version
 	# [Teardown]	Run Keywords
 	# ...    Run Keyword		Close Manager GUI ${platform}
 
+Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #362
+	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY} 	AND
+	...    Set INI Window Size 	1200 	600
+
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#362${/}invalid.rfs
+	${inifile}= 		Normalize Path 	${CURDIR}${/}testdata${/}Issue-#362${/}RFSwarmManager.ini
+	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-i 	${inifile}
+	Open Manager GUI 	${mngr_options}
+
+	Sleep 	5s
+
+	Take A Screenshot
+	VAR 	${graph_settings} 	manager_${platform}_button_graphsettings.png
+	Wait For 	${graph_settings} 	 timeout=30
+
+	IF 	"${platform}" == "macos"
+		Click Button 	CloseWindow
+	ELSE
+		Click Button With Vertical Offset 	GraphSettings 	offset=-15
+	END
+
+	Click Menu 	graphs
+	Sleep 	1
+	Take A Screenshot
+
+	VAR 	${img} 	manager_${platform}_menu_recent.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Locate		${img}
+	Move To 	@{coordinates}
+	Sleep 	2
+	Take A Screenshot
+
+	Select Option 	InvalidScenarioTestGraph
+	Sleep 	1
+	Take A Screenshot
+
+	IF 	"${platform}" == "macos"
+		Click Button 	CloseWindow
+	ELSE
+		Click Button With Vertical Offset 	GraphSettings 	offset=-15
+	END
+
+	Run Keyword 	Close Manager GUI ${platform}
+
+	${running}= 	Is Process Running 	${process_manager}
+	Check Logs
+
+	[Teardown] 	Run Keyword If 	${running} 	Close Manager GUI ${platform}
+
 # # Test for Issue #171	moved to agent test suite, can easily be tested for via the command line
 # Issue #171
 # 	[Tags]	ubuntu-latest		windows-latest		macos-latest

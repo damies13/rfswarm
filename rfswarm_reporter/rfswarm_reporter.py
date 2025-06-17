@@ -209,7 +209,7 @@ class ReporterBase:
 				for itm in msg:
 					msglst.append(str(itm))
 				msglst.append(str(suffix))
-				print(" ".join(msglst))
+				print(" ".join(msglst), flush=True)
 			except Exception:
 				pass
 
@@ -3956,6 +3956,7 @@ class ReporterCore:
 			base.debuglvl = int(base.args.debug)
 
 		if base.args.version:
+			self.show_additional_versions()
 			exit()
 
 		if base.args.create:
@@ -4138,6 +4139,24 @@ class ReporterCore:
 				self.t_export[thd].join()
 			self.on_closing()
 
+	def show_additional_versions(self):
+
+		base.debugmsg(0, "	Dependancy Versions")
+		try:
+			base.debugmsg(0, "		Python Version", sys.version)
+		except Exception:
+			pass
+
+		try:
+			base.debugmsg(0, "		SQLite Version", sqlite3.sqlite_version)
+		except Exception:
+			pass
+
+		try:
+			base.debugmsg(0, "		Tcl/Tk Version", tk.Tcl().call("info", "patchlevel"))
+		except Exception:
+			pass
+
 	def mainloop(self):
 
 		base.debugmsg(5, "mainloop start")
@@ -4171,6 +4190,8 @@ class ReporterCore:
 			except Exception as e:
 				base.debugmsg(3, "Failed to exit with error:", e)
 				os._exit(1)
+		sys.stdout.flush()
+		sys.stderr.flush()
 
 	def create_icons(self):
 		base.debugmsg(0, "Creating application icons for RFSwarm Reporter")
@@ -12141,16 +12162,10 @@ class ReporterGUI(tk.Frame):
 			base.debugmsg(5, "LoadSections")
 			selected = self.sectionstree.focus()
 			base.debugmsg(5, "selected:", selected)
-			if len(selected) > 0:
-				self.LoadSections(selected)
-			else:
-				self.LoadSections("TOP")
+			self.LoadSections("TOP")
 			base.debugmsg(5, "content_load")
 			base.debugmsg(5, "selected:", selected)
-			if len(selected) > 0:
-				self.content_load(selected)
-			else:
-				self.content_load("TOP")
+			self.content_load("TOP")
 			base.debugmsg(5, "updateTemplate")
 			self.updateTemplate()
 			# base.debugmsg(5, "cp_regenerate_preview")

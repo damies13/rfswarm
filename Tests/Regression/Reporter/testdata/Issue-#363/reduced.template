@@ -1,0 +1,33 @@
+[Report]
+order = FE8AC8FF32F,FE8AC8FF412
+title = Odoo-demo
+
+[FE8AC8FF32F]
+name = Information
+parent = TOP
+type = note
+changed = 1749200194.4452837
+note = Define your template by adding sections and configuring the section settingsx12Each section can be:x12 -  Note (like this) section, free textx12 -  Heading, usefull for grouping sectionsx12 -  Contents like a table of contents or figuresx12 -  Data Table, with data from test resultsx12 -  Data Graph, for graphical representation of test resultsx12 -  Errors, gather error details and screenshots (if applicable) from robot logsx12x12Each section can also have sub sections.x12x12Use the arrows buttons to move sections up and down within the report.x12x12The cover page and overall report settings can be found on the settings pane of the Report item above.x12x12When you have your report how you like it, save it as a report template, so your future test results can use the same report format.x12x12
+
+[Colours]
+defcolours = x35000000,x35008450,x35B81D13,x35EFB700,x35888888,x352c6085,x35705820,x35d4d8f9,x3514746d,x35f77e5a,x3572edd5,x35cfa7ac,x35f39be2,x35a29517,x354ecaaf,x3591408b,x3512f8ea,x359daddd,x354ce242,x352e0c2a,x35bc9294,x35f54a17,x355d7c24,x35e74bf8,x35300568,x3514a236,x355a4c9b,x3574d331,x3590c607,x359a9405,x357ec1a9,x35f56729,x3556cee3,x35bced58,x353dda7c,x3526d809,x353e9ee3,x357c047f,x35551194,x35ed69df,x35b29193,x35c64e92,x355ebf9b,x355000ba,x35e982ca,x35f6dd9e,x350c39e1,x352be9e3,x35bfc501,x35984241,x357ec3b2,x354dea71,x35bf878f,x35141e0e
+namecolours = total,pass,fail,warning,not run,odoo sales /home/dave/documents/tmp/odoo_demo/odoo.robot,odoo deliveries /home/dave/documents/tmp/odoo_demo/odoo.robot,odoo process rfqs /home/dave/documents/tmp/odoo_demo/odoo.robot,odoo receipts /home/dave/documents/tmp/odoo_demo/odoo.robot,open odoo login screen,odoo login,odoo open sales,odoo create sale,:example: 'john doe',odoo fill sale data,odoo open inventory,opening browser 'chrome' to base url 'https://192.168.13.58'.,sets the implicit wait value used by selenium.,waits until the element ``locator`` is visible.,typing text 'fo001@example.com' into text field '//inputx91@name="login"x93'.,typing text 'wh001@example.com' into text field '//inputx91@name="login"x93'.,typing text 'user123' into text field '//inputx91@name="password"x93'.,odoo sale add product,clicking element '//buttonx91@class="btn btn-primary btn-block"x93'.,waits until ``text`` appears on the current page.,clicking element 'css:li.dropdown'.,clicking link 'inventory'.,clicking link 'purchase'.,odoo confirm sale,returns the text value of the element identified by ``locator``.,clicking button '//divx91@name="stock_picking" and div//spanx91text()='receipts'x93x93//button'.,odoo open delivery orders,odoo open delivery order,odoo validate delivery order,odoo return to inventory overview,text 'requests for quotation' did not appear in 2 minutes.,odoo open purchase,takes a screenshot of the current page and embeds it into a log file.,returns the number of elements matching ``locator``.,odoo open rfq,odoo return to requests for quotation,odoo confirm rfq,closes all open browsers and resets the browser cache.,</td></tr><tr><td colspan="3"><a href="selenium-screenshot-1.png"><img src="selenium-screenshot-1.png" width="800px"></a>,clicking element '(//tr/td/spanx91text()='rfq'x93)x911x93'.,elementnotinteractableexception: message: element not interactablex12  (session info: chrome=102.0.5005.61)x12stacktrace:x12x350 0x55732e52ef33 <unknown>x12x351 0x55732e278faf <unknown>x12x352 0x55732e2b04b7 <unknown>x12x353 0x55732e2a45b9 <unknown>x12x354 0x55732e2ccf72 <unknown>x12x355 0x55732e2a3e73 <unknown>x12x356 0x55732e2cd07e <unknown>x12x357 0x55732e2e02e4 <unknown>x12x358 0x55732e2cce63 <unknown>x12x359 0x55732e2a282a <unknown>x12x3510 0x55732e2a3985 <unknown>x12x3511 0x55732e5734cd <unknown>x12x3512 0x55732e5775ec <unknown>x12x3513 0x55732e55d71e <unknown>x12x3514 0x55732e578238 <unknown>x12x3515 0x55732e552870 <unknown>x12x3516 0x55732e594608 <unknown>x12x3517 0x55732e594788 <unknown>x12x3518 0x55732e5aef1d <unknown>x12x3519 0x7f8d9a27aea7 <unknown>x12,text 'scheduled date' did not appear in 2 minutes.,odoo open receipts,odoo open receipt,odoo validate receipt,text 'inventory overview' did not appear in 2 minutes.,20230728_154253_odoo-demo,prerun,rfaselenium0 - rfaselenium0
+
+[FE8AC8FF412]
+name = Test Result Summary
+parent = TOP
+type = table
+changed = 1749200199.2533944
+colours = 0
+datatype = ResultSummary
+col_result_name_show = 1
+col_minimum_show = 0
+col_average_show = 1
+col_90x37ile_show = 1
+col_maximum_show = 1
+col_std_dev_show = 1
+col_pass_show = 1
+col_fail_show = 1
+col_other_show = 0
+sql = SELECT r.result_name as x91Result Namex93 , round(min(rp.elapsed_time),3) 'Minimum', round(avg(rp.elapsed_time),3) 'Average', round(percentile(rp.elapsed_time, 90),3) '90x37ile', round(max(rp.elapsed_time),3) 'Maximum', round(stdev(rp.elapsed_time),3) 'Std. Dev.', count(rp.result) as 'Pass', count(rf.result) as 'Fail', count(ro.result) as 'Other' FROM Results as r LEFT JOIN Results as rp ON r.rowid == rp.rowid AND rp.result == 'PASS' LEFT JOIN Results as rf ON r.rowid == rf.rowid AND rf.result == 'FAIL' LEFT JOIN Results as ro ON r.rowid == ro.rowid AND ro.result <> 'PASS' AND ro.result <> 'FAIL' WHERE r.end_time >= 1690522973 AND r.end_time <= 1690523458 GROUP BY  r.result_name ORDER BY x91Result Namex93
+
