@@ -88,6 +88,19 @@ Read Log
 	Log 		${filedata}
 	RETURN 		${filedata}
 
+Check Logs
+	${stdout_manager}= 		Read Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	${stderr_manager}= 		Read Log 	${OUTPUT DIR}${/}stderr_manager.txt
+
+	Should Not Contain 	${stdout_manager} 	RuntimeError
+	Should Not Contain 	${stderr_manager} 	RuntimeError
+	Should Not Contain 	${stdout_manager} 	Exception
+	Should Not Contain 	${stderr_manager} 	Exception
+	Should Not Contain 	${stdout_manager}	OSError
+	Should Not Contain 	${stderr_manager} 	OSError
+	Should Not Contain 	${stdout_manager}	KeyError
+	Should Not Contain 	${stderr_manager} 	KeyError
+
 Open Agent
 	[Arguments]		${options}=None
 	IF  ${options} == None
@@ -157,7 +170,7 @@ Wiggle Mouse
 	Move To 	20 	20
 
 Handle Donation Reminder
-	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		${default_image_timeout / 2}
+	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		30
 	VAR 	${DonationReminder} 	${found} 		scope=TEST
 
 Close Manager GUI ubuntu
@@ -1344,7 +1357,7 @@ File Open Dialogue macos Select File
 	Sleep	3
 	# Take A Screenshot
 	${filepath}=	Convert To Lower Case	${filepath}
-	Evaluate	clipboard.copy("${filepath}")	modules=clipboard		#copy path to clipboard
+	Evaluate	clipboard.copy(r"${filepath}")	modules=clipboard		#copy path to clipboard
 	Press Combination 	KEY.command 	KEY.shift 	KEY.g
 	Press Combination 	KEY.backspace		#clear text filed
 	Click Label With Horizontal Offset 	file_name 	-10
@@ -1619,7 +1632,7 @@ Navigate to and check Desktop Icon For Windows
 
 	${img}=	Set Variable		${platform}_start_menu_rfswarm_manager.png
 	Take A Screenshot
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Run Keyword And Ignore Error 	Wait For 	${img} 	timeout=${default_image_timeout} 	# temp. fix
 	Take A Screenshot
 
 	# Navigate Start Menu

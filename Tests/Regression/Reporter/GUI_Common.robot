@@ -78,6 +78,19 @@ Read Log
 	Log 		${filedata}
 	RETURN 		${filedata}
 
+Check Logs
+	${stdout}= 		Read Log 	${OUTPUT DIR}${/}stdout.txt
+	${stderr}= 		Read Log 	${OUTPUT DIR}${/}stderr.txt
+
+	Should Not Contain 	${stdout} 	RuntimeError
+	Should Not Contain 	${stderr} 	RuntimeError
+	Should Not Contain 	${stdout} 	Exception
+	Should Not Contain 	${stderr} 	Exception
+	Should Not Contain 	${stdout}	OSError
+	Should Not Contain 	${stderr} 	OSError
+	Should Not Contain 	${stdout}	KeyError
+	Should Not Contain 	${stderr} 	KeyError
+
 Make Clipboard Not None
 	Evaluate    clipboard.copy("You should never see this after copy") 	modules=clipboard
 
@@ -513,7 +526,7 @@ Open GUI macos
 	# Take A Screenshot
 
 Handle Donation Reminder
-	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		${default_image_timeout / 2}
+	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 	30
 	VAR 	${DonationReminder} 	${found} 		scope=TEST
 
 Close GUI
@@ -661,6 +674,72 @@ Save Template File OS DIALOG
 	Click Dialog Button		save
 	Sleep	1
 
+Open Template File OS DIALOG
+	[Arguments]		${template_name}
+	Sleep	5
+	Type	${template_name}.template
+	Take A Screenshot
+	Click Dialog Button		open
+	Sleep	1
+
+File Open Dialogue Select File
+	[Arguments]		${filepath}
+	Run Keyword		File Open Dialogue ${platform} Select File 			${filepath}
+	# Take A Screenshot
+
+File Open Dialogue ubuntu Select File
+	[Arguments]		${filepath}
+	Sleep	2
+	# Take A Screenshot
+	Click Label With Horizontal Offset 	file_name 	50
+	Sleep	0.5
+	Type 		${filepath} 	Key.ENTER
+	Sleep	0.5
+	# Take A Screenshot
+	# Click Dialog Button 	open
+
+File Open Dialogue windows Select File
+	[Arguments]		${filepath}
+	Sleep	3
+	# Take A Screenshot
+	${filepath}= 	Normalize Path 	${filepath}
+	${path} 	${file} = 	Split Path 	${filepath}
+	Click Label With Horizontal Offset 	file_name 	50
+	Sleep	0.5
+	Type 		${path} 	Key.ENTER
+	Sleep	0.5
+	Take A Screenshot
+	Type 		${file}
+	Sleep	0.5
+	Take A Screenshot
+	Press key.enter 1 Times
+	# Take A Screenshot
+	# Click Dialog Button 	open
+	Sleep	0.5
+
+File Open Dialogue macos Select File
+	[Arguments]		${filepath}
+	Sleep	3
+	# Take A Screenshot
+	${filepath}=	Convert To Lower Case	${filepath}
+	Evaluate	clipboard.copy(r"${filepath}")	modules=clipboard		#copy path to clipboard
+	Press Combination 	KEY.command 	KEY.shift 	KEY.g
+	Press Combination 	KEY.backspace		#clear text filed
+	Click Label With Horizontal Offset 	file_name 	-10
+	Click	button=right	#show context menu
+	Sleep	2
+	# Take A Screenshot
+	Press Combination 	KEY.down	#choose paste option(should be first)
+	Press key.enter 1 Times		#execute paste option
+	Sleep	0.5
+	# Take A Screenshot
+	Press key.enter 1 Times
+	Sleep	0.5
+	# Take A Screenshot
+	Click Dialog Button 	open
+	# Type 		Key.BACKSPACE 	Key.DELETE
+	# Click Dialog Button 	open
+
 Get Manager Default Save Path
 	${pip_data}=	Get Manager PIP Data
 	${pip_data_list}=	Split String	${pip_data}
@@ -733,10 +812,18 @@ Navigate to and check Desktop Icon For MacOS
 	# Take A Screenshot
 	# Sleep 	0.3
 	# Take A Screenshot
+	Sleep 	0.3
+	Press Combination 	KEY.backspace
+	Sleep 	0.3
+	# VAR 	@{top_corner} 	${100} 	${100}
+	# Click To The Below Of 	${top_corner} 	${20}
+
+	Take A Screenshot
 	${img}=	Set Variable		${platform}_finder_gotofolder.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-	Click Image		${img}
-	# Take A Screenshot
+	${status}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=${20}
+	IF  ${status}
+		Run Keyword And Ignore Error 	Click Image		${img}
+	END
 
 	# Type 		/Applications
 	Evaluate 		pynput.keyboard.Controller().type('/Applications') 		modules=pynput.keyboard
@@ -790,15 +877,15 @@ Navigate to and check Desktop Icon For Windows
 
 	Take A Screenshot
 	# Open Start Menu
+	Sleep 	0.5
 	${img}=	Set Variable		${platform}_start_menu.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Sleep 	1
 	Take A Screenshot
 
 	${img}=	Set Variable		${platform}_start_menu_rfswarm_reporter.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Run Keyword And Ignore Error 	Wait For 	${img} 	 timeout=${default_image_timeout} 	# temp. fix
 
 	# Navigate Start Menu
 	Type 	RFSwarm

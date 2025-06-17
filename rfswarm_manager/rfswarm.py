@@ -654,7 +654,7 @@ class RFSwarmBase:
 				for itm in msg:
 					msglst.append(str(itm))
 				msglst.append(str(suffix))
-				print(" ".join(msglst))
+				print(" ".join(msglst), flush=True)
 			except Exception:
 				pass
 
@@ -2508,6 +2508,7 @@ class RFSwarmCore:
 			base.debuglvl = int(base.args.debug)
 
 		if base.args.version:
+			self.show_additional_versions()
 			exit()
 
 		if base.args.create:
@@ -2780,6 +2781,24 @@ class RFSwarmCore:
 		base.dbthread = threading.Thread(target=base.run_db_thread)
 		base.dbthread.start()
 
+	def show_additional_versions(self):
+
+		base.debugmsg(0, "	Dependancy Versions")
+		try:
+			base.debugmsg(0, "		Python Version", sys.version)
+		except Exception:
+			pass
+
+		try:
+			base.debugmsg(0, "		SQLite Version", sqlite3.sqlite_version)
+		except Exception:
+			pass
+
+		try:
+			base.debugmsg(0, "		Tcl/Tk Version", tk.Tcl().call("info", "patchlevel"))
+		except Exception:
+			pass
+
 	def BuildCore(self):
 		base.debugmsg(5, "BuildCore")
 
@@ -2908,6 +2927,8 @@ class RFSwarmCore:
 			except Exception as e:
 				base.debugmsg(3, "Failed to exit with error:", e)
 				os._exit(1)
+		sys.stdout.flush()
+		sys.stderr.flush()
 
 	def create_icons(self):
 		base.debugmsg(0, "Creating application icons for RFSwarm Manager")
@@ -3363,7 +3384,9 @@ class RFSwarmCore:
 		base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
 		base.debugmsg(6, "ScenarioFile: ", len(base.config['Plan']['ScenarioFile']), base.config['Plan']['ScenarioFile'])
 		if len(base.config['Plan']['ScenarioFile']) > 0:
-			self.OpenFile(base.config['Plan']['ScenarioFile'])
+			load_result = self.OpenFile(base.config['Plan']['ScenarioFile'])
+			if not base.args.nogui and load_result == 1:
+				base.gui.OpenINIGraphs()
 		else:
 			base.addScriptRow()
 
@@ -3374,6 +3397,13 @@ class RFSwarmCore:
 		base.debugmsg(6, "base.config['Plan']['ScenarioFile']: ", base.config['Plan']['ScenarioFile'])
 		base.config['Plan']['ScenarioDir'] = base.inisafedir(os.path.dirname(ScenarioFile))
 		base.debugmsg(6, "base.config['Plan']['ScenarioDir']: ", base.config['Plan']['ScenarioDir'])
+
+		base.debugmsg(6, "Config graph list: ")
+		base.debugmsg(6, "base.config['GUI']['graph_list']: ", base.config['GUI']['graph_list'])
+		iniglist = list(base.config['GUI']['graph_list'].split(","))
+		base.debugmsg(9, "iniglist: ", iniglist)
+		base.config['GUI']['graph_list'] = base.inisafevalue(",".join(set(iniglist)))
+		base.debugmsg(6, "base.config['GUI']['graph_list']: ", base.config['GUI']['graph_list'])
 
 		filedata = configparser.ConfigParser()
 		base.debugmsg(6, "filedata: ", filedata._sections)
@@ -3765,8 +3795,6 @@ class RFSwarmCore:
 		base.debugmsg(9, "config graph_list: ", base.config['GUI']['graph_list'])
 
 		base.debugmsg(9, "graphlist: ", graphlist)
-		# base.config[iniid]		glist = base.config['GUI']['graph_list'].split(",")
-		iniglist = list(base.config['GUI']['graph_list'].split(","))
 		base.debugmsg(9, "iniglist: ", iniglist)
 		base.config['GUI']['graph_list'] = base.inisafevalue(",".join(set(iniglist + graphlist)))
 
@@ -3790,6 +3818,8 @@ class RFSwarmCore:
 			base.gui.pln_graph_update = False
 			t = threading.Thread(target=base.gui.pln_update_graph)
 			t.start()
+
+		return 0
 
 	def ClickPlay(self, _event=None):
 
@@ -7551,8 +7581,7 @@ class RFSwarmGUItk(tk.Frame):
 			schedWindow.time.set(schedWindow.datetime.strftime("%H:%M:%S"))
 			schedWindow.date.set(schedWindow.datetime.strftime("%Y-%m-%d"))
 
-		schedWindow.time.trace('w', lambda *args: self.ss_validate(schedWindow, args))
-		# schedWindow.time.trace('a', lambda *args: self.ss_validate(schedWindow, args))
+		schedWindow.time.trace_add("write", lambda *args: self.ss_validate(schedWindow, args))
 
 		# https://www.tutorialspoint.com/python/tk_radiobutton.htm
 		schedWindow.enabled = tk.IntVar()
@@ -7937,7 +7966,7 @@ class RFSwarmGUItk(tk.Frame):
 		fgf.columnconfigure(scrf, weight=0)
 
 		base.scriptlist[row]["TestVar"] = tk.StringVar(value=base.scriptlist[row]["Test"], name="row{}".format(row))
-		base.scriptlist[row]["TestVar"].trace("w", self.sr_test_validate)
+		base.scriptlist[row]["TestVar"].trace_add("write", self.sr_test_validate)
 		# tst = ttk.OptionMenu(self.scriptgrid, base.scriptlist[row]["TestVar"], None, "test", command=lambda: self.sr_test_validate(row))
 		tst = ttk.OptionMenu(self.scriptgrid, base.scriptlist[row]["TestVar"], None, "test")
 		tst.config(width=20)
@@ -9072,7 +9101,7 @@ class RFSwarmGUItk(tk.Frame):
 		mfgf.columnconfigure(mscrf, weight=0)
 
 		base.mscriptlist[row]["TestVar"] = tk.StringVar(value=base.mscriptlist[row]["Test"], name="mrow{}".format(row))
-		base.mscriptlist[row]["TestVar"].trace("w", self.msr_test_validate)
+		base.mscriptlist[row]["TestVar"].trace_add("write", self.msr_test_validate)
 		# mtst = ttk.OptionMenu(self.mscriptgrid, base.mscriptlist[row]["TestVar"], None, "test", command=lambda srow=srow: self.msr_test_validate(srow))
 		mtst = ttk.OptionMenu(self.mscriptgrid, base.mscriptlist[row]["TestVar"], None, "test")
 		mtst.config(width=20)
@@ -10587,7 +10616,9 @@ class RFSwarmGUItk(tk.Frame):
 
 			self.CloseGraphs()
 
-			core.OpenFile(ScenarioFile)
+			load_result = core.OpenFile(ScenarioFile)
+			if not base.args.nogui and load_result == 1:
+				base.gui.OpenINIGraphs()
 			base.gui.updateTitle()
 
 			self.plan_scnro_chngd = False
