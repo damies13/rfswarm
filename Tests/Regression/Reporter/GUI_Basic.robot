@@ -1,5 +1,8 @@
 *** Settings ***
-Resource 	GUI_Common.robot
+Resource 	../Common/GUI_Common.resource
+Resource 	GUI_Reporter.resource
+
+Suite Setup 	GUI_Common.Suite Initialization Reporter
 
 Test Teardown 	Close GUI
 
@@ -8,14 +11,12 @@ GUI Runs and Closes
 	[Tags]	macos-latest		windows-latest		ubuntu-latest
 	Open GUI
 	Wait For Status 	PreviewLoaded
-	# Close GUI
 
 Select Preview Tab
 	[Tags]	ubuntu-latest		windows-latest		macos-latest
 	Open GUI
 	Wait For Status 	PreviewLoaded
 	Click Tab 	 Preview
-	# Close GUI
 
 	# Accessability Settings test was to verify Terminal is set to 'check'
 	# 		https://stackoverflow.com/questions/62035751/pyautogui-not-running-on-mac-catalina

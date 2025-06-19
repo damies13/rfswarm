@@ -1,7 +1,8 @@
 *** Settings ***
-Resource 	GUI_Common.robot
+Resource 	../Common/GUI_Common.resource
+Resource 	GUI_Reporter.resource
 
-Suite Setup 	Set Platform
+Suite Setup 	GUI_Common.Suite Initialization Reporter
 Test Teardown 	Close GUI
 
 *** Test Cases ***

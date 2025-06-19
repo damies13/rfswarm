@@ -1,13 +1,10 @@
 *** Settings ***
 Test Tags       Basic 	GUI
 
-Resource 	GUI_Common.robot
+Resource 	../Common/GUI_Common.resource
+Resource 	GUI_Manager.resource
 
-Library 	OperatingSystem
-Library 	Process
-Library 	String
-
-Library	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
+Suite Setup 	GUI_Common.Suite Initialization Manager
 
 *** Variables ***
 ${default_image_timeout} 	${120}

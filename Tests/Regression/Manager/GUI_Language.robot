@@ -1,9 +1,11 @@
 *** Settings ***
 Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #238 	Languages
 
-Resource 	GUI_Common.robot
+Resource 	../Common/GUI_Common.resource
+Resource 	GUI_Manager.resource
 
-Suite Setup 	Set Platform
+Suite Setup 	GUI_Common.Suite Initialization Manager
+
 Test Setup 	Language Test Init
 Test Teardown 	Language Test End
 Test Template 	Add Test In Language

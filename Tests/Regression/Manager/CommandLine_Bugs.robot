@@ -1,7 +1,7 @@
 *** Settings ***
 Test Tags       Bugs 	CommandLine
 
-Resource 	CommandLine_Common.robot
+Resource 	CommandLine_Common.resource
 
 Suite Setup 		Run Keywords
 ...    Create Directory 	${results_dir} 	AND

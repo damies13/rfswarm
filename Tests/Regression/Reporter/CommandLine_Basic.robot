@@ -1,5 +1,5 @@
 *** Settings ***
-Resource 	CommandLine_Common.robot
+Resource 	CommandLine_Common.resource
 
 Suite Setup			Clean Up Old Files
 

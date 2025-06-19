@@ -1,116 +1,30 @@
 *** Settings ***
-Library 	OperatingSystem
-Library 	Process
-Library 	DatabaseLibrary
-Library 	String
-Library		Collections
-Library		DateTime
-Library		XML
+Resource 	../Common/GUI_Common.resource
 
 Library		ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
-
-Library 	ini_file.py
-Library 	get_ip_address.py
 
 # Attempting to record video cause more trouble than help
 # Library		ScreenRecorderLibrary.py
 
 
 *** Variables ***
-${default_image_timeout} 	${120}
-${platform}		None
-${platform}		ubuntu
-${global_path}	None
-${global_name}	None
-@{mngr_options}		None
-@{agent_options}	None
+${global_name}		${None}
+
+@{mngr_options}		${None}
+@{agent_options}	${None}
 ${cmd_agent} 		rfswarm-agent
-${cmd_manager} 	rfswarm-manager
-${IMAGE_DIR} 	${CURDIR}/Images/file_method
-${pyfile_manager}			${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
-${pyfile_agent}			${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py
-${process_manager}		None
-${process_agent}		None
-${results_dir} 			${OUTPUT DIR}${/}results
-${agent_dir} 				${OUTPUT DIR}${/}rfswarm-agent
+${cmd_manager} 		rfswarm-manager
+${pyfile_manager}	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
+${pyfile_agent}		${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py
+${process_manager} 	${None}
+${process_agent}	${None}
+
+${results_dir} 		${OUTPUT DIR}${/}results
+${agent_dir} 		${OUTPUT DIR}${/}rfswarm-agent
+
+${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
 
 *** Keywords ***
-Set Platform
-	Set Platform By Python
-	Set Platform By Tag
-
-Set Platform By Python
-	${system}= 		Evaluate 	platform.system() 	modules=platform
-
-	IF 	"${system}" == "Darwin"
-		Set Suite Variable    ${platform}    macos
-	END
-	IF 	"${system}" == "Windows"
-		Set Suite Variable    ${platform}    windows
-	END
-	IF 	"${system}" == "Linux"
-		Set Suite Variable    ${platform}    ubuntu
-	END
-
-
-Set Platform By Tag
-	# [Arguments]		${ostag}
-	Log 	${OPTIONS}
-	Log 	${OPTIONS}[include]
-	${inclen}= 	Get Length 	${OPTIONS}[include]
-	IF 	${inclen} > 0
-		Log 	${OPTIONS}[include][0]
-		${ostag}= 	Set Variable 	${OPTIONS}[include][0]
-
-		IF 	"${ostag}" == "macos-latest"
-			Set Suite Variable    ${platform}    macos
-		END
-		IF 	"${ostag}" == "windows-latest"
-			Set Suite Variable    ${platform}    windows
-		END
-		IF 	"${ostag}" == "ubuntu-latest"
-			Set Suite Variable    ${platform}    ubuntu
-		END
-	END
-
-Show Log
-	[Arguments]		${filename}
-	Log 		${\n}--VVV--${filename}--VVV-- 		console=True
-	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
-	Log 		${filedata} 		console=True
-	Log 		--ɅɅɅ--${filename}--ɅɅɅ--${\n} 		console=True
-	RETURN 		${filedata}
-
-Read Log
-	[Arguments]		${filename}
-	Log 		${filename}
-	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
-	Log 		${filedata}
-	RETURN 		${filedata}
-
-Check Logs
-	${stdout_manager}= 		Read Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Read Log 	${OUTPUT DIR}${/}stderr_manager.txt
-
-	Should Not Contain 	${stdout_manager} 	RuntimeError
-	Should Not Contain 	${stderr_manager} 	RuntimeError
-	Should Not Contain 	${stdout_manager} 	Exception
-	Should Not Contain 	${stderr_manager} 	Exception
-	Should Not Contain 	${stdout_manager}	OSError
-	Should Not Contain 	${stderr_manager} 	OSError
-	Should Not Contain 	${stdout_manager}	KeyError
-	Should Not Contain 	${stderr_manager} 	KeyError
-
-Open Agent
-	[Arguments]		${options}=None
-	IF  ${options} == None
-		${options}= 	Create List
-		Append To List 	${options} 	-d 	${agent_dir}
-	END
-	Log to console 	${\n}\${options}: ${options}
-	${process}= 	Start Process 	${cmd_agent}  @{options}    alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
-	Set Test Variable 	$process_agent 	${process}
-
 Open Manager GUI
 	[Arguments]		${options}=None
 	# Press Escape and move mouse because on linux the screen save had kicked in
@@ -164,14 +78,6 @@ Open Manager GUI
 			END
 		END
 	END
-
-Wiggle Mouse
-	Move To 	10 	10
-	Move To 	20 	20
-
-Handle Donation Reminder
-	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		30
-	VAR 	${DonationReminder} 	${found} 		scope=TEST
 
 Close Manager GUI ubuntu
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
@@ -263,6 +169,16 @@ Close Manager GUI macos
 Kill Manager If Still Running
 	Kill If Still Running 	${cmd_manager}
 
+Open Agent
+	[Arguments]		${options}=None
+	IF  ${options} == None
+		${options}= 	Create List
+		Append To List 	${options} 	-d 	${agent_dir}
+	END
+	Log to console 	${\n}\${options}: ${options}
+	${process}= 	Start Process 	${cmd_agent}  @{options}    alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
+	Set Test Variable 	$process_agent 	${process}
+
 Stop Agent
 	${running}= 	Is Process Running 	${process_agent}
 	IF 	${running}
@@ -298,7 +214,7 @@ Kill If Still Running
 			END
 		EXCEPT               # Match any error.
 			No Operation
-    END
+	END
 	END
 
 Stop Test Scenario Run Gradually
@@ -338,16 +254,6 @@ Stop Test Scenario Run Quickly
 	Move To	10	10
 	Wait For the Scenario Run To Finish 	time=${robot_test_time + ${default_image_timeout}}
 
-Utilisation Stats
-	${cpupct}= 	Evaluate 	psutil.cpu_percent(interval=1, percpu=True) 				modules=psutil
-	Log 	\n${cpupct} 	console=True
-	${loadavg}= 	Evaluate 	psutil.getloadavg() 															modules=psutil
-	Log 	${loadavg} 	console=True
-	${mem}= 		Evaluate 	psutil.virtual_memory() 														modules=psutil
-	Log 	${mem}
-	${proc}= 		Evaluate 	list(psutil.process_iter(['pid', 'name', 'exe', 'cmdline', 'username'])) 		modules=psutil
-	Log 	${proc}
-
 Check If The Agent Is Ready
 	[Arguments] 	${timeout}=300
 	# Sleep	1
@@ -375,149 +281,6 @@ Check If the Robot Failed
 	# Take A Screenshot
 	${status}=	Run Keyword And Return Status	Locate	manager_${platform}_resource_file_provided.png
 	Run Keyword If	not ${status}	Fail	msg=Test failed. Check screenshots for more informations.
-
-Click Tab
-	[Arguments]		${tabname}
-	${tabnamel}= 	Convert To Lower Case 	${tabname}
-	${img}=	Set Variable		manager_${platform}_tab_${tabnamel}.png
-	Log		${CURDIR}
-	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-	@{coordinates}= 	Locate		${img}
-	Click Image		${img}
-	Sleep 	0.1
-	# Take A Screenshot
-
-Select Option
-	[Arguments]		${optname}
-	${optnamel}= 	Convert To Lower Case 	${optname}
-	${img}=	Set Variable		manager_${platform}_option_${optnamel}.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-	@{coordinates}= 	Locate		${img}
-	Click Image		${img}
-	# Take A Screenshot
-
-Selected Option Should Be
-	[Arguments]		${optname}
-	${optnamel}= 	Convert To Lower Case 	${optname}
-	${img}=	Set Variable		manager_${platform}_option_${optnamel}.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-	@{coordinates}= 	Locate		${img}
-
-
-Click Button
-	[Arguments]		${btnname} 		${timeout}=${default_image_timeout}
-	${btnnamel}= 	Convert To Lower Case 	${btnname}
-	${img}=	Set Variable		manager_${platform}_button_${btnnamel}.png
-	Log		${CURDIR}
-	Log		${IMAGE_DIR}
-	IF  "${platform}" == "windows"
-		Set Confidence	0.85
-	END
-	Wait For 	${img} 	 timeout=${timeout}
-	@{coordinates}= 	Locate		${img}
-	Click Image		${img}
-	Sleep 	0.1
-	# Take A Screenshot
-	IF  "${platform}" == "windows"
-		Set Confidence	0.9
-	END
-
-Click Menu
-	[Arguments]		${menuname}
-	${menunamel}= 	Convert To Lower Case 	${menuname}
-	${img}=	Set Variable		manager_${platform}_menu_${menunamel}.png
-	Log		${CURDIR}
-	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-	@{coordinates}= 	Locate		${img}
-	Click Image		${img}
-	Sleep 	0.1
-	# Take A Screenshot
-
-Wait For Dialog Button
-	[Arguments]		${btnname} 		${timeout}=${default_image_timeout}
-	${btnnamel}= 	Convert To Lower Case 	${btnname}
-	${img}=	Set Variable		${platform}_dlgbtn_${btnnamel}.png
-	Log		${CURDIR}
-	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${timeout}
-	@{coordinates}= 	Locate		${img}
-	# Take A Screenshot
-
-Click Dialog Button
-	[Arguments]		${btnname} 		${timeout}=${default_image_timeout}
-	${btnnamel}= 	Convert To Lower Case 	${btnname}
-	${img}=	Set Variable		${platform}_dlgbtn_${btnnamel}.png
-	Log		${CURDIR}
-	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${timeout}
-	@{coordinates}= 	Locate		${img}
-	Click Image		${img}
-	Sleep 	0.1
-	# Take A Screenshot
-
-Click CheckBox
-	[Arguments]		${status} 		${btnname}
-	${btnnamel}= 	Convert To Lower Case 	${btnname}
-	${statusl}= 	Convert To Lower Case 	${status}
-	${img}=	Set Variable		${platform}_checkbox_${statusl}_${btnnamel}.png
-	Log		${CURDIR}
-	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-	@{coordinates}= 	Locate		${img}
-	Click Image		${img}
-	Sleep 	0.1
-	# Take A Screenshot
-
-Click RadioBtn
-	[Arguments]		${btnname}
-	${btnnamel}= 	Convert To Lower Case 	${btnname}
-	${img}=	Set Variable		${platform}_radiobtn_${btnnamel}.png
-	Log		${CURDIR}
-	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-	@{coordinates}= 	Locate		${img}
-	Click Image		${img}
-	Sleep 	1
-	Take A Screenshot
-
-Press ${key} ${n} Times
-	[Documentation]	Provide full name. For example: Key.tab
-	Sleep	1
-	FOR  ${i}  IN RANGE  0  ${n}
-		Press Combination 	${key}
-	END
-
-Click ${item} With Vertical Offset
-	[Arguments]		${image_name}	${offset}=0
-	[Documentation]	Click the item with the offset. An item can be: Label, Button, ...
-	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down].
-	${image_name}= 	Convert To Lower Case 	${image_name}
-	${item}= 	Convert To Lower Case 	${item}
-	${img}=	Set Variable		manager_${platform}_${item}_${image_name}.png
-	Log		${CURDIR}
-	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-	@{coordinates}= 	Locate		${img}
-	Log	${coordinates}
-	Click To The Below Of	${coordinates}	${offset}
-	Sleep 	0.1
-
-Click ${item} With Horizontal Offset
-	[Arguments]		${image_name}	${offset}=0
-	[Documentation]	Click the item with the offset. An item can be: Label, Button, ...
-	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right].
-	${image_name}= 	Convert To Lower Case 	${image_name}
-	${item}= 	Convert To Lower Case 	${item}
-	${img}=	Set Variable		manager_${platform}_${item}_${image_name}.png
-	Log		${CURDIR}
-	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-	@{coordinates}= 	Locate		${img}
-	Log	${coordinates}
-	Click To The Right Of	${coordinates}	${offset}
-	Sleep 	0.1
 
 #TODO: Chceck if it works
 Resize Window
@@ -550,26 +313,11 @@ Set Global Filename And Default Save Path
 	Set Test Variable 	$file_name 	${global_name}
 	IF  '${optional_path}' != '${None}'
 		Set Test Variable	${global_path}	${optional_path}
-		# ${location}=	Get Manager INI Location
-		# ${ini_content}=		Get Manager INI Data
-		# ${ini_content_list}=	Split String	${ini_content}
-		# ${scriptdir}=	Get Index From List		${ini_content_list}		scriptdir
-		#
-		# ${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${scriptdir + 2}]	${optional_path}
-		# ${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${scriptdir + 5}]	${optional_path}
-		#
-		# Remove File		${location}
-		# Log		${ini_content}
-		# Append To File	${location}		${ini_content}
 		Change Manager INI Option 	Plan 		scriptdir 	${optional_path}
 	END
 
 	Log		${global_name}
 	Log		${global_path}
-
-Get Python Version Info
-	${vinfo}= 	Evaluate    sys.version_info 	modules=sys
-	RETURN		${vinfo}
 
 Get Manager Default Save Path
 	${pip_data}=	Get Manager PIP Data
@@ -594,9 +342,6 @@ Get Manager INI Data
 	Log				${ini_content}
 	RETURN		${ini_content}
 
-#Read INI Data
-#	[Arguments]		${inifile}
-
 Set INI Window Size
 	[Arguments]		${width}=${None}	${height}=${None}
 	IF	"${width}" != "${None}"
@@ -610,7 +355,6 @@ Change Manager INI Option
 	[Arguments]		${section} 		${option}		${new_value}
 	${location}=	Get Manager INI Location
 	Change INI Option 	${location} 	${section} 		${option}		${new_value}
-
 
 Change Manager INI File Settings
 	[Arguments]		${option}	${new_value}
@@ -809,12 +553,6 @@ Test Group Save Settings
 		Click Dialog Button		save
 	END
 
-Change ${str1} With ${str2} In ${file}
-	${file_content}	Get File	${file}
-	Remove File		${file}
-	${file_content}	Replace String	${file_content}	${str1}	${str2}
-	Create File		${file}	${file_content}
-
 Select ${n} Robot Test Case
 	Click Button	select_test_case
 	Press Key.down ${n} Times
@@ -867,44 +605,6 @@ Delete Robot File
 	Remove File		${path}${/}${name}
 	File Should Not Exist	${path}${/}${name}
 
-Find Absolute Paths And Names For Files In Directory
-	[Documentation]	This algorithm analyses the specified path and returns all
-	...    file names with their absolute paths even those that are in subdirectories
-	[Arguments]		${given_path}	@{excluded_files}
-	${example_dir}	Set Variable	${given_path}
-	@{absolute_paths}	Create List
-	@{file_names}	Create List
-
-	${new_dir}		List Directories In Directory	${example_dir}	absolute=${True}
-	#=== Collecting data section
-
-	@{dir_files_path}=		List Files In Directory		${example_dir}	absolute=${True}
-	@{dir_file_names}=		List Files In Directory		${example_dir}
-
-	${length}	Get Length	${dir_files_path}
-	FOR  ${i}  IN RANGE  0  ${length}
-		IF  '${dir_file_names}[${i}]' not in ${excluded_files}
-			Append To List	${absolute_paths}	${dir_files_path}[${i}]
-			Append To List	${file_names}	${dir_file_names}[${i}]
-		END
-	END
-	#=== Merging data section
-	FOR  ${specific_dir}  IN  @{new_dir}
-		${next_absolute_paths}	${next_file_names}
-		...    Find Absolute Paths And Names For Files In Directory	${specific_dir}	@{excluded_files}
-
-		${length}	Get Length	${next_absolute_paths}
-		FOR  ${i}  IN RANGE  0  ${length}
-			${bad_list}	Get Length	${next_absolute_paths}
-			IF  ${bad_list} != ${0}
-				Append To List	${absolute_paths}	${next_absolute_paths}[${i}]
-				Append To List	${file_names}	${next_file_names}[${i}]
-			END
-		END
-	END
-
-	RETURN	${absolute_paths}	${file_names}
-
 Compare Manager and Agent Files
 	[Arguments]	${M_file_names}	${A_file_names}
 	Log To Console	\n${M_file_names}
@@ -927,62 +627,6 @@ Compare Manager and Agent Files Content
 			...    Should Be Equal	${M_file_content}	${A_file_content}
 		END
 	END
-
-Get Relative Paths
-	[Arguments] 	${base} 		${paths_in}
-
-	${paths_out}= 	Create List
-	FOR 	${item} 	IN 		@{paths_in}
-		${relpath}= 	Evaluate     os.path.relpath(r"${item}", start=r"${base}") 	modules=os.path
-		Append To List 	${paths_out} 	${relpath}
-	END
-	RETURN 	${paths_out}
-
-Diff Lists
-	[Arguments] 	${list_a} 		${list_b} 	${message}
-
-	${status}= 	Run Keyword And Return Status 	Lists Should Be Equal 	${list_a} 	${list_b}
-	IF 	not ${status}
-		Log		${list_a}
-		Log		${list_b}
-		${Missing_List_From_A}= 	Create List
-		${Missing_List_From_B}= 	Create List
-
-		FOR 	${item} 	IN 		@{list_b}
-			${status}= 	Run Keyword And Return Status 	List Should Contain Value 	${list_a} 	${item}
-			IF 	not ${status}
-				Append To List 	${Missing_List_From_A} 	${item}
-			END
-		END
-
-		FOR 	${item} 	IN 		@{list_a}
-			${status}= 	Run Keyword And Return Status 	List Should Contain Value 	${list_b} 	${item}
-			IF 	not ${status}
-				Append To List 	${Missing_List_From_B} 	${item}
-			END
-		END
-		Log 		\nItems from list B missing from list A: ${Missing_List_From_A} 	console=True
-		Log 		Items from list A missing from list B: ${Missing_List_From_B} 	console=True
-		Lists Should Be Equal 	${list_a} 	${list_b} 		msg=${message}
-	END
-
-Convert CSV File Cells To a List
-	[Arguments]		${csv_file_path}	${csv_separator}
-	${csv_file_content}=	Get File		${csv_file_path}
-	@{csv_rows_list}=	Split String	${csv_file_content}		separator=\n
-
-	@{csv_rows_content_list}=	Create List
-	FOR  ${row}  IN  @{csv_rows_list}
-		@{csv_row_cells_list}=		Split String	${row}	separator=${csv_separator}
-		Append To List	${csv_rows_content_list}	${csv_row_cells_list}
-	END
-
-	${status}=	Run Keyword And Return Status	Should Be Empty	@{csv_rows_content_list}[-1]
-	IF  ${status} == ${True}
-		@{csv_rows_content_list}	Set Variable	${csv_rows_content_list}[:-1]
-	END
-
-	RETURN	${csv_rows_content_list}
 
 Verify Scenario File Robots
 	[Arguments]		${scenario_content_list}	${run_robots}	${start_group}	${end_group}
@@ -1287,93 +931,35 @@ Create ${lang} Language Scenario
 	RETURN 	${scenariofile}
 
 Click Script Button On Row
-		[Arguments]		${row}
-		${rowheight}= 	Set Variable		30
-		${rowoffset}= 	Evaluate		${rowheight} * ${row}
+	[Arguments]		${row}
+	${rowheight}= 	Set Variable		30
+	${rowoffset}= 	Evaluate		${rowheight} * ${row}
 
-		${labelname}= 	Set Variable    script
-		${labelname}= 	Convert To Lower Case 	${labelname}
-		${img}=	Set Variable		manager_${platform}_label_${labelname}.png
+	${labelname}= 	Set Variable    script
+	${labelname}= 	Convert To Lower Case 	${labelname}
+	${img}=	Set Variable		manager_${platform}_label_${labelname}.png
 
-		# Log		${CURDIR}
-		# Log		${IMAGE_DIR}
-		Wait For 	${img} 	 timeout=${default_image_timeout}
-		# @{coordinates}= 	Locate		${img}
-		# Log	${coordinates}
-		Click To The Below Of Image 	${img} 	 offset=${rowoffset}
+	# Log		${CURDIR}
+	# Log		${IMAGE_DIR}
+	Wait For 	${img} 	 timeout=${default_image_timeout}
+	# @{coordinates}= 	Locate		${img}
+	# Log	${coordinates}
+	Click To The Below Of Image 	${img} 	 offset=${rowoffset}
 
-		# Take A Screenshot
-		Press Key.tab 1 Times
-		# Take A Screenshot
-		# manager_macos_button_selected_runscriptrow.png
-		${img}=	Set Variable		manager_${platform}_button_selected_runscriptrow.png
-		Click Image 	${img}
-		Sleep    0.1
-		# Take A Screenshot
-		# 	macos_dlgbtn_open
-		${img}=	Set Variable		${platform}_dlgbtn_cancel.png
-		Wait For 	${img} 	 timeout=${default_image_timeout}
-		# Take A Screenshot
-
-		# Fail 		Not Implimented
-
-File Open Dialogue Select File
-	[Arguments]		${filepath}
-	Run Keyword		File Open Dialogue ${platform} Select File 			${filepath}
+	# Take A Screenshot
+	Press Key.tab 1 Times
+	# Take A Screenshot
+	# manager_macos_button_selected_runscriptrow.png
+	${img}=	Set Variable		manager_${platform}_button_selected_runscriptrow.png
+	Click Image 	${img}
+	Sleep    0.1
+	# Take A Screenshot
+	# 	macos_dlgbtn_open
+	${img}=	Set Variable		${platform}_dlgbtn_cancel.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 	# Take A Screenshot
 
-File Open Dialogue ubuntu Select File
-	[Arguments]		${filepath}
-	Sleep	2
-	# Take A Screenshot
-	Click Label With Horizontal Offset 	file_name 	50
-	Sleep	0.5
-	Type 		${filepath} 	Key.ENTER
-	Sleep	0.5
-	# Take A Screenshot
-	# Click Dialog Button 	open
-
-File Open Dialogue windows Select File
-	[Arguments]		${filepath}
-	Sleep	3
-	# Take A Screenshot
-	${filepath}= 	Normalize Path 	${filepath}
-	${path} 	${file} = 	Split Path 	${filepath}
-	Click Label With Horizontal Offset 	file_name 	50
-	Sleep	0.5
-	Type 		${path} 	Key.ENTER
-	Sleep	0.5
-	Take A Screenshot
-	Type 		${file}
-	Sleep	0.5
-	Take A Screenshot
-	Press key.enter 1 Times
-	# Take A Screenshot
-	# Click Dialog Button 	open
-	Sleep	0.5
-
-File Open Dialogue macos Select File
-	[Arguments]		${filepath}
-	Sleep	3
-	# Take A Screenshot
-	${filepath}=	Convert To Lower Case	${filepath}
-	Evaluate	clipboard.copy(r"${filepath}")	modules=clipboard		#copy path to clipboard
-	Press Combination 	KEY.command 	KEY.shift 	KEY.g
-	Press Combination 	KEY.backspace		#clear text filed
-	Click Label With Horizontal Offset 	file_name 	-10
-	Click	button=right	#show context menu
-	Sleep	2
-	# Take A Screenshot
-	Press Combination 	KEY.down	#choose paste option(should be first)
-	Press key.enter 1 Times		#execute paste option
-	Sleep	0.5
-	# Take A Screenshot
-	Press key.enter 1 Times
-	Sleep	0.5
-	# Take A Screenshot
-	Click Dialog Button 	open
-	# Type 		Key.BACKSPACE 	Key.DELETE
-	# Click Dialog Button 	open
+	# Fail 		Not Implimented
 
 Select Test Script
 	[Arguments]		${row}	${filepath}
@@ -1387,22 +973,6 @@ Select Test Script
 	File Open Dialogue Select File		${filepath}
 	# Take A Screenshot
 	# Click Dialog Button 	cancel
-
-Wait For File To Exist
-	[Arguments]		${filepath} 	${timeout}=${default_image_timeout}
-	TRY
-		WHILE    True 	limit=${timeout} seconds
-			TRY
-				Sleep 	500 ms
-				File Should Exist 		${filepath}
-			EXCEPT
-				CONTINUE
-			END
-			BREAK
-		END
-	EXCEPT
-		Fail 		File '${filepath}' does not exist after ${timeout} seconds
-	END
 
 Check Agent Downloaded ${lang} Language Test Files
 	${robotfile}= 	Set Variable    ${agent_dir}${/}scripts${/}lang_${lang}.robot
@@ -1421,10 +991,6 @@ Check Agent Downloaded ${lang} Language Test Files
 	${imgfile}= 	Set Variable    ${agent_dir}${/}scripts${/}images${/}lang_${lang}.svg
 	Wait For File To Exist 		${imgfile} 	30
 
-
-
-
-#
 Verify Test Result Directory Name
 	[Arguments]		${result_dir_name}	${scenario_name}	${current_date}
 	@{run_dir_name_fragmented}=	Split String	${result_dir_name}	separator=_		max_split=2
@@ -1687,10 +1253,5 @@ Navigate to and check Desktop Icon For Ubuntu
 	Take A Screenshot
 
 	Press Combination 	KEY.ESC
-
-
-
-
-
 
 #

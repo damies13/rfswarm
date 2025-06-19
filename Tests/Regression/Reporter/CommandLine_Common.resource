@@ -6,7 +6,8 @@ Library 	String
 Library 	Collections
 
 *** Variables ***
-${cmd_reporter} 		rfswarm-reporter
+${platform} 		${None}
+${cmd_reporter} 	rfswarm-reporter
 ${pyfile}			${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
 
 *** Keywords ***

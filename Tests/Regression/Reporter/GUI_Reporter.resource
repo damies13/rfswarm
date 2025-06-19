@@ -1,117 +1,24 @@
 *** Settings ***
-Library 	OperatingSystem
-Library 	Process
-Library 	String
-Library 	Collections
+Resource 	../Common/GUI_Common.resource
+
 Library 	ArchiveLibrary
 Library 	DocTest.VisualTest
 Library 	XML 	use_lxml=True
 
-Library 	ImageHorizonLibrary 	reference_folder=${IMAGE_DIR}
-Library 	OCRLibrary
-
 Library 	read_docx.py
 Library 	read_xlsx.py
 Library 	save_html_image.py
-Library 	img_common.py
 
 Variables 	report_expected_data.yaml
 
 *** Variables ***
-${default_image_timeout} 	${120}
-${platform}		None
 ${cmd_reporter} 		rfswarm-reporter
-${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
-${pyfile}			${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
-${process}		None
-${sssleep}		0.5
-${DonationReminter} 	${False}
+
+# ${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
+${pyfile}		${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
+${process}		${None}
 
 *** Keywords ***
-Set Platform
-	Set Platform By Python
-	Set Platform By Tag
-
-Set Platform By Python
-	${system}= 		Evaluate 	platform.system() 	modules=platform
-
-	IF 	"${system}" == "Darwin"
-		Set Suite Variable    ${platform}    macos
-	END
-	IF 	"${system}" == "Windows"
-		Set Suite Variable    ${platform}    windows
-	END
-	IF 	"${system}" == "Linux"
-		Set Suite Variable    ${platform}    ubuntu
-	END
-
-
-Set Platform By Tag
-	# [Arguments]		${ostag}
-	Log 	${OPTIONS}
-	Log 	${OPTIONS}[include]
-	Log 	${OPTIONS}[include][0]
-	${ostag}= 	Set Variable 	${OPTIONS}[include][0]
-
-	IF 	"${ostag}" == "macos-latest"
-		Set Suite Variable    ${platform}    macos
-	END
-	IF 	"${ostag}" == "windows-latest"
-		Set Suite Variable    ${platform}    windows
-	END
-	IF 	"${ostag}" == "ubuntu-latest"
-		Set Suite Variable    ${platform}    ubuntu
-	END
-
-Show Log
-	[Arguments]		${filename}
-	Log 		${\n}-----${filename}----- 		console=True
-	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
-	Log 		${filedata} 		console=True
-	Log 		-----${filename}-----${\n} 		console=True
-	RETURN 		${filedata}
-
-Read Log
-	[Arguments]		${filename}
-	Log 		${filename}
-	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
-	Log 		${filedata}
-	RETURN 		${filedata}
-
-Check Logs
-	${stdout}= 		Read Log 	${OUTPUT DIR}${/}stdout.txt
-	${stderr}= 		Read Log 	${OUTPUT DIR}${/}stderr.txt
-
-	Should Not Contain 	${stdout} 	RuntimeError
-	Should Not Contain 	${stderr} 	RuntimeError
-	Should Not Contain 	${stdout} 	Exception
-	Should Not Contain 	${stderr} 	Exception
-	Should Not Contain 	${stdout}	OSError
-	Should Not Contain 	${stderr} 	OSError
-	Should Not Contain 	${stdout}	KeyError
-	Should Not Contain 	${stderr} 	KeyError
-
-Make Clipboard Not None
-	Evaluate    clipboard.copy("You should never see this after copy") 	modules=clipboard
-
-Change ${str1} With ${str2} In ${file}
-	${file_content}	Get File	${file}
-	Remove File		${file}
-	${file_content}	Replace String	${file_content}	${str1}	${str2}
-	Create File		${file}	${file_content}
-
-Click Tab
-	[Arguments]		${tabname}
-	${tabnamel}= 	Convert To Lower Case 	${tabname}
-	${img}=	Set Variable		reporter_${platform}_tab_${tabnamel}.png
-	Log		${CURDIR}
-	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=300
-	@{coordinates}= 	Locate		${img}
-	Click Image		${img}
-	Sleep 	${sssleep}
-	# Take A Screenshot
-
 Create New Section
 	[Arguments]		${sectname}
 
@@ -155,43 +62,6 @@ Create New Section
 		# Take A Screenshot
 	END
 
-Press ${key} ${n} Times
-	[Documentation]	Provide full name. For example: Key.tab
-	Sleep	1
-	FOR  ${i}  IN RANGE  0  ${n}
-		Press Combination 	${key}
-	END
-
-Click ${item} With Vertical Offset
-	[Arguments]		${image_name}	${offset}=0
-	[Documentation]	Click the item with the offset. An item can be: Label, Button, ...
-	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down].
-	${image_name}= 	Convert To Lower Case 	${image_name}
-	${item}= 	Convert To Lower Case 	${item}
-	${img}=	Set Variable		reporter_${platform}_${item}_${image_name}.png
-	Log		${CURDIR}
-	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-	@{coordinates}= 	Locate		${img}
-	Log	${coordinates}
-	Click To The Below Of	${coordinates}	${offset}
-	Sleep 	0.1
-
-Click ${item} With Horizontal Offset
-	[Arguments]		${image_name}	${offset}=0
-	[Documentation]	Click the item with the offset. An item can be: Label, Button, ...
-	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right].
-	${image_name}= 	Convert To Lower Case 	${image_name}
-	${item}= 	Convert To Lower Case 	${item}
-	${img}=	Set Variable		reporter_${platform}_${item}_${image_name}.png
-	Log		${CURDIR}
-	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-	@{coordinates}= 	Locate		${img}
-	Log	${coordinates}
-	Click To The Right Of	${coordinates}	${offset}
-	Sleep 	0.1
-
 Click Section
 	[Arguments]		${sectname}
 	${sectnamel}= 	Convert To Lower Case 	${sectname}
@@ -201,19 +71,7 @@ Click Section
 	Wait For 	${img} 	 timeout=300
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
-	Sleep 	${sssleep}
-	# Take A Screenshot
-
-Select Option
-	[Arguments]		${optname}
-	${optnamel}= 	Convert To Lower Case 	${optname}
-	${img}=	Set Variable		reporter_${platform}_option_${optnamel}.png
-	Log		${CURDIR}
- 	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=300
-	@{coordinates}= 	Locate		${img}
-	Click Image		${img}
-	Sleep 	${sssleep}
+	Sleep 	0.1
 	# Take A Screenshot
 
 Select Field With Label
@@ -234,220 +92,8 @@ Select Field With Label
 	@{coordinates}= 	Create List 	${x} 	${y}
 	Move To 	${coordinates}
 	Click
-	Sleep 	${sssleep}
+	Sleep 	0.1
 	Wait For 	${img} 	 timeout=${default_image_timeout}
-	# Take A Screenshot
-
-Find Text
-	[Arguments]		${mytext}
-	Take A Screenshot
-	${img}=		Get Last Screenshot
-	Log 	${img}
-	${processed_img}= 	Read Image 	${img}
-	${bounds}= 	Locate Text Bounds 	${processed_img} 	${mytext}
-	Log 	${bounds}
-	IF 	${bounds}
-		RETURN 	${bounds}
-	ELSE
-		Fail		${mytext} Not Found
-	END
-
-Click Text
-	[Arguments]		${mytext} 	${offsetx}=0 	${offsety}=0
-	${bounds}= 	Find Text		${mytext}
-	${x}= 	Evaluate 	${bounds}[0]+int(${bounds}[2]/2)+${offsetx}
-	${y}= 	Evaluate 	${bounds}[1]+int(${bounds}[3]/2)+${offsety}
-	@{coordinates}= 	Create List 	${x} 	${y}
-	Move To 	${coordinates}
-	Click
-	# Take A Screenshot
-
-Get Text Value To Right Of
-	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
-	${labell}= 	Convert To Lower Case 	${label}
-	${img}= 	Set Variable		reporter_${platform}_label_${labell}.png
-
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-
-	Make Clipboard Not None 	# reset clipboard
-	${b4value}= 	Get Clipboard Content
-	Click To The Right Of Image 	${img} 	${offsetx}
-	Sleep    10 ms
-	Click To The Right Of Image 	${img} 	${offsetx}
-	Sleep    10 ms
-	${value}= 	Copy From The Right Of 	${img} 	${offsetx}
-	Take A Screenshot
-	WHILE 	$b4value == $value 		limit=15
-		Wait For 	${img} 	 timeout=${default_image_timeout}
-		${offsetx}= 	Evaluate 	${offsetx}+10
-		Click To The Right Of Image 	${img} 	${offsetx}
-		${value}= 	Copy From The Right Of 	${img} 	${offsetx}
-		# Take A Screenshot
-		${valuec}= 	Copy
-		IF  $valuec != $value
-			${value}= 	Set Variable 		${valuec}
-		END
-		${valueg}= 	Get Clipboard Content
-		IF  $valueg != $value
-			${value}= 	Set Variable 		${valueg}
-		END
-		IF 	$platform == 'macos' and $b4value == $value
-			# Click To The Right Of Image 	${img} 	${offsetx}
-			# Sleep    10 ms
-			# Click To The Right Of Image 	${img} 	${offsetx}
-			# Sleep    10 ms
-			# Take A Screenshot
-			Click To The Right Of Image 	${img} 	${offsetx} 	clicks=3
-			# Take A Screenshot
-			Press Combination 	KEY.command 	KEY.c
-			# Press Combination 	KEY.command 	KEY.v
-			Sleep    10 ms
-			# Take A Screenshot
-			# Press Combination 	KEY.command 	KEY.v
-			# Sleep    10 ms
-			# Take A Screenshot
-			${valueg}= 	Get Clipboard Content
-			IF  $valueg != $value
-				${value}= 	Set Variable 		${valueg}
-			END
-
-			# ${valueclp}= 	Evaluate 		pyperclip.paste() 		modules=pyperclip
-			# IF  $valueclp != $value
-			# 	${value}= 	Set Variable 		${valueclp}
-			# END
-
-		END
-	END
-	RETURN 	${value}
-
-Set Text Value To Right Of
-	[Arguments]		${label} 	${value} 	${offsetx}=50 	${offsety}=0
-	Log		${offsetx}
-	${value}= 	Convert To String 	${value}
-	${labell}= 	Convert To Lower Case 	${label}
-	${img}= 	Set Variable		reporter_${platform}_label_${labell}.png
-	${imgsize}= 	Get Image Size 	${IMAGE_DIR}${/}${img}
-	Log		${imgsize}
-	${offsetx2}= 	Evaluate 	int(${imgsize}[0]/2)+${offsetx}
-	Log		${offsetx}
-	Log		${CURDIR}
- 	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=300
-	@{coordinates}= 	Locate		${img}
-	${x}= 	Evaluate 	${coordinates}[0]+${offsetx2}
-	${y}= 	Evaluate 	${coordinates}[1]+${offsety}
-	@{coordinates}= 	Create List 	${x} 	${y}
-	Move To 	${coordinates}
-	# Triple Click is broken on MacOS: TypeError: not enough arguments for format string
-	# Triple Click 		button=left 	interval=0.0
-	Click
-	Sleep 	0.3
-	IF  "${platform}" == "macos"
-		Press Combination	KEY.command		KEY.a
-	ELSE
-		Press Combination	KEY.ctrl		KEY.a
-	END
-	Take A Screenshot
-	Sleep 	0.3
-	# Double Click
-	# Take A Screenshot
-
-	# @{characters}= 	Split String 	${value} 	separator=${SPACE}
-	# ${len} 	Get Length 	${characters}
-	# FOR  ${i}  IN RANGE  0  ${len}
-	# 	Type 	${characters}[${i}]
-	# 	Sleep 	0.1s
-	# 	IF  not ${i+1} == ${len}
-	# 		Type 	${SPACE}
-	# 	END
-	# 	Sleep 	0.1s
-	# END
-
-	Evaluate 	clipboard.copy("${value}") 	modules=clipboard
-	IF  "${platform}" == "macos"
-		Press Combination	KEY.command		KEY.v
-	ELSE
-		Press Combination	KEY.ctrl		KEY.v
-	END
-	# Type 	${value}
-	Take A Screenshot
-	IF 	$platform == 'macos'
-		# Take A Screenshot
-
-		# Press Combination 	Key.Home
-		Press Combination 	Key.Shift 	Key.End
-
-		# Take A Screenshot
-		# Type 	${value}
-		Press Combination 	Key.Delete
-		# Take A Screenshot
-
-	ELSE
-		${value2}= 	Get Text Value To Right Of		${label} 		${offsetx}
-		WHILE 	$value2 != $value 		limit=10
-			Log 	${value2} != ${value}
-			${x}= 	Evaluate 	${x}+10
-			${offsetx}= 	Evaluate 	${offsetx}+10
-			@{coordinates}= 	Create List 	${x} 	${y}
-			Move To 	${coordinates}
-			Click
-			Take A Screenshot
-			Double Click
-			Take A Screenshot
-			Evaluate 	clipboard.copy("${value}") 	modules=clipboard
-			IF  "${platform}" == "macos"
-				Press Combination	KEY.command		KEY.v
-			ELSE
-				Press Combination	KEY.ctrl		KEY.v
-			END
-			Take A Screenshot
-			${value2}= 	Get Text Value To Right Of		${label} 		${offsetx}
-		END
-		Should Be Equal As Strings    ${value}    ${value2}
-	END
-
-Get Last Screenshot
-	Log 	${OUTPUT FILE}
-	${path} 	${file}= 	Split Path 	${OUTPUT FILE}
-	@{files}= 	List Files In Directory 	${path} 	*.png 	absolute
-	Sort List 	${files}
-	${fc}= 	Get Length 	${files}
-	IF 	${fc} > 9
-		${len0}= 	Get Length 	${files}[0]
-		WHILE    True    limit=10
-			${lenlast}= 	Get Length 	${files}[-1]
-			IF 	${lenlast} > ${len0}
-				RETURN 	${files}[-1]
-			ELSE
-				Remove From List 	${files} 	-1
-			END
-		END
-	ELSE
-		RETURN 	${files}[-1]
-	END
-
-Click Button
-	[Arguments]		${bttnname} 		${timeout}=300
-	${bttnnamel}= 	Convert To Lower Case 	${bttnname}
-	${img}=	Set Variable		reporter_${platform}_button_${bttnnamel}.png
-	Log		${CURDIR}
-	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${timeout}
-	@{coordinates}= 	Locate		${img}
-	Click Image		${img}
-	Sleep 	${sssleep}
-	# Take A Screenshot
-
-Click Dialog Button
-	[Arguments]		${btnname} 		${timeout}=300
-	${btnnamel}= 	Convert To Lower Case 	${btnname}
-	${img}=	Set Variable		${platform}_dlgbtn_${btnnamel}.png
-	Log		${CURDIR}
-	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${timeout}
-	@{coordinates}= 	Locate		${img}
-	Click Image		${img}
-	Sleep 	1
 	# Take A Screenshot
 
 Wait For Status
@@ -459,14 +105,13 @@ Wait For Status
 	Wiggle Mouse
 	# Take A Screenshot
 	Wait For 	${img} 	 timeout=${timeout}
-	Sleep 	${sssleep}
+	Sleep 	0.1
 	# Take A Screenshot
 
 Open GUI
 	[Arguments]		@{appargs}
 	${var}= 	Get Variables
 	Log 	${var}
-	Get Platform
 
 	# Press Escape and move mouse because on linux the screen save had kicked in
 	Press Combination 	Key.esc
@@ -476,15 +121,6 @@ Open GUI
 	Run Keyword 	${keyword} 	@{appargs}
 	Handle Donation Reminder
 
-Wiggle Mouse
-	Move To 	10 	10
-	Move To 	20 	20
-
-Get Platform
-	&{platforms}= 	Create Dictionary 	Linux=ubuntu 	Darwin=macos 	Java=notsupported 	Windows=windows
-	${os}= 	Evaluate 	platform.system() 	platform
-	Set Suite Variable    ${platform}    ${platforms}[${os}]
-
 Open GUI windows
 	[Arguments]		@{appargs}
 	# Set Suite Variable    ${platform}    windows
@@ -492,7 +128,7 @@ Open GUI windows
 	Set Confidence		0.9
 	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	# ${process}= 	Start Process 	python 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout_reporter.txt 	stderr=${OUTPUT DIR}${/}stderr_reporter.txt
 
 	Set Suite Variable 	$process 	${process}
 	# reporter_windows_status_previewloaded
@@ -507,7 +143,7 @@ Open GUI ubuntu
 	Set Suite Variable    ${platform}    ubuntu
 	Set Confidence		0.9
 	# ${process}= 	Start Process 	python3 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout_reporter.txt 	stderr=${OUTPUT DIR}${/}stderr_reporter.txt
 	Set Suite Variable 	$process 	${process}
 	# Sleep 	60
 	# Capture Screen
@@ -519,15 +155,11 @@ Open GUI macos
 	Set Suite Variable    ${platform}    macos
 	Set Confidence		0.9
 	# ${process}= 	Start Process 	python3 	${pyfile} 	-g 	5 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout_reporter.txt 	stderr=${OUTPUT DIR}${/}stderr_reporter.txt
 	Set Suite Variable 	$process 	${process}
 	# Sleep 	60
 	Set Screenshot Folder 	${OUTPUT DIR}
 	# Take A Screenshot
-
-Handle Donation Reminder
-	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 	30
-	VAR 	${DonationReminder} 	${found} 		scope=TEST
 
 Close GUI
 	${keyword}= 	Set Variable 	Close GUI ${platform}
@@ -599,19 +231,6 @@ End Process If Still Running
 		Fail 	Had to Terminate Process
 	END
 
-Get Python Version Info
-	${vinfo}= 	Evaluate    sys.version_info 	modules=sys
-	RETURN		${vinfo}
-
-Get Image Size
-	[Arguments] 	${imgfile}
-	# ahrrrg windows paths, PIL.Image.open doesn't like them, need to escape / replace \\
-	# ${imgfile}= 	Evaluate    "${imgfile}".replace('\\' '/')
-	${img}= 	Evaluate    PIL.Image.open(r'${imgfile}') 	PIL.Image
-	${imgsize}= 	Set Variable    ${img.size}
-	# Evaluate    ${img.close()}
-	RETURN 	${imgsize}
-
 Get Reporter PIP Data
 	Run Process	pip	show	rfswarm-reporter		alias=data
 	${pip_data}	Get Process Result	data
@@ -681,78 +300,6 @@ Open Template File OS DIALOG
 	Take A Screenshot
 	Click Dialog Button		open
 	Sleep	1
-
-File Open Dialogue Select File
-	[Arguments]		${filepath}
-	Run Keyword		File Open Dialogue ${platform} Select File 			${filepath}
-	# Take A Screenshot
-
-File Open Dialogue ubuntu Select File
-	[Arguments]		${filepath}
-	Sleep	2
-	# Take A Screenshot
-	Click Label With Horizontal Offset 	file_name 	50
-	Sleep	0.5
-	Type 		${filepath} 	Key.ENTER
-	Sleep	0.5
-	# Take A Screenshot
-	# Click Dialog Button 	open
-
-File Open Dialogue windows Select File
-	[Arguments]		${filepath}
-	Sleep	3
-	# Take A Screenshot
-	${filepath}= 	Normalize Path 	${filepath}
-	${path} 	${file} = 	Split Path 	${filepath}
-	Click Label With Horizontal Offset 	file_name 	50
-	Sleep	0.5
-	Type 		${path} 	Key.ENTER
-	Sleep	0.5
-	Take A Screenshot
-	Type 		${file}
-	Sleep	0.5
-	Take A Screenshot
-	Press key.enter 1 Times
-	# Take A Screenshot
-	# Click Dialog Button 	open
-	Sleep	0.5
-
-File Open Dialogue macos Select File
-	[Arguments]		${filepath}
-	Sleep	3
-	# Take A Screenshot
-	${filepath}=	Convert To Lower Case	${filepath}
-	Evaluate	clipboard.copy(r"${filepath}")	modules=clipboard		#copy path to clipboard
-	Press Combination 	KEY.command 	KEY.shift 	KEY.g
-	Press Combination 	KEY.backspace		#clear text filed
-	Click Label With Horizontal Offset 	file_name 	-10
-	Click	button=right	#show context menu
-	Sleep	2
-	# Take A Screenshot
-	Press Combination 	KEY.down	#choose paste option(should be first)
-	Press key.enter 1 Times		#execute paste option
-	Sleep	0.5
-	# Take A Screenshot
-	Press key.enter 1 Times
-	Sleep	0.5
-	# Take A Screenshot
-	Click Dialog Button 	open
-	# Type 		Key.BACKSPACE 	Key.DELETE
-	# Click Dialog Button 	open
-
-Get Manager Default Save Path
-	${pip_data}=	Get Manager PIP Data
-	${pip_data_list}=	Split String	${pip_data}
-	${i}=	Get Index From List	${pip_data_list}	Location:
-	${location}=	Set Variable	${pip_data_list}[${i + 1}]
-	RETURN	${location}${/}rfswarm_manager${/}
-
-Get Manager PIP Data
-	Run Process	pip	show	rfswarm-manager		alias=data
-	${pip_data}	Get Process Result	data
-	Should Not Be Empty		${pip_data.stdout}		msg=Manager must be installed with pip
-	Log	${pip_data.stdout}
-	RETURN		${pip_data.stdout}
 
 Navigate to and check Desktop Icon
 	VAR 	${projname}= 		rfswarm-manager 		scope=TEST

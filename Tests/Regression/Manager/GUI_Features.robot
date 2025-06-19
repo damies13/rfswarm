@@ -1,10 +1,10 @@
 *** Settings ***
 Test Tags       Features 	GUI
 
-Library 	Collections
-Library 	String
-Resource 	GUI_Common.robot
-Suite Setup 	GUI_Common.Set Platform
+Resource 	../Common/GUI_Common.resource
+Resource 	GUI_Manager.resource
+
+Suite Setup 	GUI_Common.Suite Initialization Manager
 
 *** Variables ***
 @{robot_data}=	example.robot	Example Test Case

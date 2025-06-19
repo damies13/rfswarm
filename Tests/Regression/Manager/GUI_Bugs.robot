@@ -1,9 +1,10 @@
 *** Settings ***
 Test Tags       Bugs 	GUI
 
-Resource 	GUI_Common.robot
-Suite Setup 	Set Platform
+Resource 	../Common/GUI_Common.resource
+Resource 	GUI_Manager.resource
 
+Suite Setup 	GUI_Common.Suite Initialization Manager
 Test Teardown 	Run Keyword		Close Manager GUI ${platform}
 
 *** Variables ***

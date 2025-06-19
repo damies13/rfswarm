@@ -6,7 +6,7 @@ Library 	OperatingSystem
 Suite Setup			Clean Up Old Files
 
 *** Variables ***
-${cmd_agent} 		rfswarm-agent
+${cmd_agent} 	rfswarm-agent
 ${cmd_manager} 	rfswarm
 
 *** Test Cases ***

@@ -1,7 +1,9 @@
 *** Settings ***
 Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #97 	Languages
 
-Resource 	GUI_Common.robot
+Resource 	../Common/GUI_Common.resource
+Resource 	GUI_Reporter.resource
+
 Variables 	${CURDIR}${/}testdata${/}Issue-#97${/}lang_samples.yaml
 
 Suite Setup 	Non-ASCII Suite Setup
@@ -153,7 +155,7 @@ Test Non-ASCII Characters
 
 Non-ASCII Suite Setup
 	Remove Directory 	${OUTPUT DIR}${/}results${/}Issue-#97 	recursive=${True}
-	Set Platform
+	GUI_Common.Suite Initialization Reporter
 	Extract Zip File 	${test_data}${/}manager_results.zip 	${test_data}
 
 Non-ASCII Suite Teardown

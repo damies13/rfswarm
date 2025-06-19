@@ -1,7 +1,7 @@
 *** Settings ***
 Test Tags       Features 	CommandLine
 
-Resource 	CommandLine_Common.robot
+Resource 	CommandLine_Common.resource
 
 Suite Setup 	Set Platform
 
