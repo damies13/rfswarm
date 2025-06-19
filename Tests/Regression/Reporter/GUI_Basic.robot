@@ -17,6 +17,7 @@ Select Preview Tab
 	Open GUI
 	Wait For Status 	PreviewLoaded
 	Click Tab 	 Preview
+	Log To Console 	Done 	#del
 
 	# Accessability Settings test was to verify Terminal is set to 'check'
 	# 		https://stackoverflow.com/questions/62035751/pyautogui-not-running-on-mac-catalina
@@ -70,5 +71,3 @@ Select Preview Tab
 # 	[Documentation]		Uncomment this test if you want to trigger updating Screenshots in the git repo
 # 	...								Ensure this is commented out before release or pull request
 # 	Fail
-
-*** Keywords ***

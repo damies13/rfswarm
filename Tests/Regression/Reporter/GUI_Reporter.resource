@@ -4,6 +4,7 @@ Resource 	../Common/GUI_Common.resource
 Library 	ArchiveLibrary
 Library 	DocTest.VisualTest
 Library 	XML 	use_lxml=True
+Library 	ImageHorizonLibrary 	reference_folder=${IMAGE_DIR}
 
 Library 	read_docx.py
 Library 	read_xlsx.py
@@ -12,11 +13,11 @@ Library 	save_html_image.py
 Variables 	report_expected_data.yaml
 
 *** Variables ***
-${cmd_reporter} 		rfswarm-reporter
+${cmd_reporter} 	rfswarm-reporter
+${process} 			${None}
 
-# ${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
+${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
 ${pyfile}		${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
-${process}		${None}
 
 *** Keywords ***
 Create New Section
