@@ -31,6 +31,12 @@ Suite Initialization ${component}
 	ImageHorizonLibrary.Set Reference Folder 	${IMAGE_DIR}
 
 	Set Platform
+	Log To Console 	\n\n\n
+	Log To Console 	[=== Suite has been initiated for ${COMPONENT} ===]
+	Log To Console 	component = ${COMPONENT}
+	Log To Console 	image dir = ${IMAGE_DIR}
+	Log To Console 	platform = ${platform}
+	Log To Console 	\n\n\n
 
 Set Platform
 	Set Platform By Python

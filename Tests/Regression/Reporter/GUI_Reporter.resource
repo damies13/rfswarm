@@ -176,6 +176,8 @@ Close GUI
 	END
 	Set Suite Variable 	$process 	None
 	Sleep 	0.5
+	${running}= 	Is Process Running 	${process} 	#del
+	Log To Console 	${running} 	#del
 
 Check Result
 	[Arguments]		${result}
