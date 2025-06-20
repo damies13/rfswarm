@@ -24,13 +24,13 @@ ${default_image_timeout} 	${120}
 
 *** Keywords ***
 Suite Initialization ${component}
-	[Documentation] 	This keyword must be run to set up the suite. The component must be chosen between: Manager, Reporter
+	[Documentation] 	This keyword must be run to set up the suite for GUI keywords. The component must be chosen between: Manager, Reporter
 	Set Suite Variable 	${COMPONENT} 	${component}
 	Set Suite Variable 	${IMAGE_DIR} 	${CURDIR}${/}..${/}${COMPONENT}${/}Images${/}file_method
 	ImageHorizonLibrary.Set Reference Folder 	${IMAGE_DIR}
 
 	Set Platform
-	Log To Console 	\n\n\n\t[=== Suite has been initiated for ${COMPONENT} ===]
+	Log To Console 	\n\n\n\t[ === Suite has been initiated for ${COMPONENT} === ]
 	Log To Console 	component = ${COMPONENT}
 	Log To Console 	image dir = ${IMAGE_DIR}
 	Log To Console 	platform = ${platform}\n\n\n

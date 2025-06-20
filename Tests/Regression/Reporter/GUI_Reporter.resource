@@ -4,7 +4,6 @@ Resource 	../Common/GUI_Common.resource
 Library 	ArchiveLibrary
 Library 	DocTest.VisualTest
 Library 	XML 	use_lxml=True
-Library 	ImageHorizonLibrary 	reference_folder=${IMAGE_DIR}
 
 Library 	read_docx.py
 Library 	read_xlsx.py
@@ -16,7 +15,7 @@ Variables 	report_expected_data.yaml
 ${cmd_reporter} 	rfswarm-reporter
 ${process} 			${None}
 
-${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
+# ${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
 ${pyfile} 		${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
 
 *** Keywords ***
@@ -198,6 +197,7 @@ Close GUI windows
 	# Press Combination 	Key.f4 	Key.alt
 	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
 	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
+	Log To Console 	2.0 	# del
 	Click Image		reporter_${platform}_button_closewindow.png
 	Log To Console 	2.1 	# del
 	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
