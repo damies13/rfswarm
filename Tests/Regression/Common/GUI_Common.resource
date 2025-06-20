@@ -1,5 +1,7 @@
 *** Settings ***
-Documentation 	This resource file contains keywords related to the basic GUI functions in the rfswarm components (Manager and Reporter)
+Documentation 	
+...    This resource file contains keywords related to the basic GUI functions in the rfswarm components (Manager and Reporter)
+...    Run "GUI Suite Initialization ${component}" keyword to set the GUI and basic suite configuration.
 
 Resource 	Common.resource 	# basic keywords
 
@@ -29,9 +31,7 @@ GUI Suite Initialization ${component}
 
 	Set Platform
 	Log 	\t[ === GUI suite configuration has been initiated for ${COMPONENT} === ] 	console=True
-	Log 	component = ${COMPONENT} 	console=True
 	Log 	image dir = ${IMAGE_DIR} 	console=True
-	Log 	platform = ${platform} 	console=True
 	Log 	confidence level = ${CONFIDENCE} 	console=True
 	Log 	default image timeout = ${default_image_timeout}\n\n\n 	console=True
 
@@ -384,10 +384,10 @@ Set Text Value To Right Of
 	Log		${offsetx}
 	Log		${CURDIR}
  	Log		${IMAGE_DIR}
-	Set Confidence 	0.80
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-	@{coordinates}= 	Locate		${img}
-	Set Confidence 	0.9
+	# Set Confidence 	0.80
+	@{coordinates}= 	Wait For 	${img} 	 timeout=${default_image_timeout}
+	# @{coordinates}= 	Locate		${img}
+	# Set Confidence 	0.9
 	${x}= 	Evaluate 	${coordinates}[0]+${offsetx2}
 	${y}= 	Evaluate 	${coordinates}[1]+${offsety}
 	@{coordinates}= 	Create List 	${x} 	${y}

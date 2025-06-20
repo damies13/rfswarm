@@ -197,14 +197,3 @@ Create Language Files
 	Change __Lang_Sample__ With ${sample} In ${template_file}
 
 	RETURN 	${template_file}
-
-Check Logs
-	${stdout_reporter}= 		Read Log 	${OUTPUT DIR}${/}stdout.txt
-	${stderr_reporter}= 		Read Log 	${OUTPUT DIR}${/}stderr.txt
-
-	Should Not Contain 	${stdout_reporter} 	RuntimeError
-	Should Not Contain 	${stderr_reporter} 	RuntimeError
-	Should Not Contain 	${stdout_reporter} 	Exception
-	Should Not Contain 	${stderr_reporter} 	Exception
-	Should Not Contain 	${stdout_reporter}	OSError
-	Should Not Contain 	${stderr_reporter} 	OSError

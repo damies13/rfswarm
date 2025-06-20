@@ -16,7 +16,6 @@ Suite Teardown 	Non-ASCII Suite Teardown
 *** Variables ***
 ${test_data} 		${CURDIR}${/}testdata${/}Issue-#97
 ${scenario_name} 	${None}
-${results_dir} 		${None}
 ${agent_name} 		${None}
 
 
@@ -81,7 +80,7 @@ Non-ASCII Test Setup
 Non-ASCII Test Teardown
 	Stop Agent
 	Run Keyword		Close Manager GUI ${platform}
-	Check Logs
+	Check Non-ASCII Logs
 
 Create Language Files
 	[Arguments] 	${langcode} 	${sample}
@@ -168,7 +167,7 @@ Check CSV Files
 		END
 	END
 
-Check Logs
+Check Non-ASCII Logs
 	${stdout_manager}= 		Read Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	${stderr_manager}= 		Read Log 	${OUTPUT DIR}${/}stderr_manager.txt
 	${stdout_agent}= 		Read Log 	${OUTPUT DIR}${/}stdout_agent.txt

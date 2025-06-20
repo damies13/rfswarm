@@ -1,5 +1,7 @@
 *** Settings ***
-Documentation 	This resource file contains the basic keywords for all components that are run in the command line.
+Documentation 	
+...    This resource file contains the basic keywords for all components that are run in the command line. 
+...    Run "Basic Suite Initialization ${component}" keyword to set the basic suite configuration.
 
 Library 	OperatingSystem
 Library 	Process
@@ -14,7 +16,7 @@ Library 	get_ip_address.py
 *** Variables ***
 ${COMPONENT} 		${None} 	# currently used rfswarm component (app)
 ${platform} 		${None}
-${results_dir} 		${OUTPUT DIR}${/}results
+${results_dir} 		${None}
 
 *** Keywords ***
 Basic Suite Initialization ${component}
@@ -22,6 +24,7 @@ Basic Suite Initialization ${component}
 	Set Suite Variable 	${COMPONENT} 	${component}
 	Set Platform
 
+	Set Suite Variable 	${results_dir} 		${OUTPUT DIR}${/}results
 	${status}= 	Run Keyword And Return Status 	Directory Should Exist 	${results_dir}
 	IF 	not ${status}
 		Create Directory 	${results_dir}
@@ -120,14 +123,6 @@ Get Python Version Info
 	${vinfo}= 	Evaluate 	sys.version_info 	modules=sys
 	RETURN		${vinfo}
 
-Clean Up Old Files
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
-	# cleanup previous output
-	Log To Console    ${OUTPUT DIR}
-	Remove File    ${OUTPUT DIR}${/}*.txt
-	Remove File    ${OUTPUT DIR}${/}*.png
-	# Remove File    ${OUTPUT DIR}${/}sikuli_captured${/}*.*
-
 Diff Lists
 	[Arguments] 	${list_a} 		${list_b} 	${message}
 
@@ -156,21 +151,9 @@ Diff Lists
 		Lists Should Be Equal 	${list_a} 	${list_b} 		msg=${message}
 	END
 
-Wait For File To Exist
-	[Arguments] 	${filepath} 	${timeout}=${120}
-	TRY
-		WHILE    True 	limit=${timeout} seconds
-			TRY
-				Sleep 	500 ms
-				File Should Exist 		${filepath}
-			EXCEPT
-				CONTINUE
-			END
-			BREAK
-		END
-	EXCEPT
-		Fail 		File '${filepath}' does not exist after ${timeout} seconds
-	END
+# # # # # # # # #
+# System date:  #
+# # # # # # # # #
 
 Resync Date With Time Server
 	[Arguments] 	${old_date}
@@ -214,9 +197,74 @@ Resync Date With Time Server
 		Log 	${result.stderr}
 	END
 
-# # # # # #
-# Paths:  #
-# # # # # #
+Set Date Manually
+	[Arguments] 	${input_date}
+	IF 	"${platform}" == "macos"
+		${result}= 	Run Process 	sudo  date  -f  '%Y-%m-%d'  '${input_date}'
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	date  +%Y-%m-%d
+		Should Be Equal As Strings 	${result.stdout} 	${input_date}
+		Log 	New date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
+	IF 	"${platform}" == "windows"
+		${result}= 	Run Process 	powershell.exe  Set-Date  -Date  (Get-Date '${input_date}' -Format 'yyyy-MM-dd') 	shell=${True}
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	powershell.exe  Get-Date  -Format  'yyyy-MM-dd' 	shell=${True}
+		Should Be Equal As Strings 	${result.stdout} 	${input_date}
+		Log 	New date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
+	IF 	"${platform}" == "ubuntu"
+		${result}= 	Run Process 	sudo  timedatectl  set-ntp  false
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${input_date_epoch}= 	Convert Date 	${input_date} 	date_format=%Y-%m-%d 	result_format=epoch
+		${input_date_epoch}= 	Convert To Integer 	${input_date_epoch}
+		${result}= 	Run Process 	sudo  date  +%s  -s  @${input_date_epoch}
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		# ${result}= 	Run Process 	sudo  date  -s  ${input_date}  +%Y-%m-%d
+		# Log 	${result.stdout}
+		# Log 	${result.stderr}
+
+		${result}= 	Run Process 	date  +%Y-%m-%d
+		Should Be Equal As Strings 	${result.stdout} 	${input_date}
+		Log 	New date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
+
+# # # # # # # # # # # # # # # # #
+# Paths, directories and files: #
+# # # # # # # # # # # # # # # # #
+
+Wait For File To Exist
+	[Arguments] 	${filepath} 	${timeout}=${120}
+	TRY
+		WHILE    True 	limit=${timeout} seconds
+			TRY
+				Sleep 	500 ms
+				File Should Exist 		${filepath}
+			EXCEPT
+				CONTINUE
+			END
+			BREAK
+		END
+	EXCEPT
+		Fail 		File '${filepath}' does not exist after ${timeout} seconds
+	END
+
+Clean Up Old Files
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
+	# cleanup previous output
+	Log To Console    ${OUTPUT DIR}
+	Remove File    ${OUTPUT DIR}${/}*.txt
+	Remove File    ${OUTPUT DIR}${/}*.png
+	# Remove File    ${OUTPUT DIR}${/}sikuli_captured${/}*.*
 
 Show Dir Contents
 	[Arguments]		${dir}
@@ -311,32 +359,32 @@ Find Result DB
 	Log to console 	Result DB: ${file[-1]}
 	RETURN 	${file[-1]}
 
-# Query Result DB
-# 	[Arguments]		${dbfile} 	${sql}
-# 	Log to console 	dbfile: ${dbfile}
-# 	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
-# 	# Log to console 	\${dbfile}: ${dbfile}
-# 	Connect To Database 	sqlite3 	database=${dbfile} 	isolation_level=${None}
-# 	Log to console 	sql: ${sql}
-# 	${result}= 	Query 	${sql}
-# 	Log to console 	sql result: ${result}
-# 	Disconnect From Database
-# 	RETURN 	${result}
-
 Query Result DB
 	[Arguments]		${dbfile} 	${sql}
-	# Disconnect From All Databases
-	Log 	dbfile: ${dbfile} 	console=true
+	Log to console 	dbfile: ${dbfile}
 	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
 	# Log to console 	\${dbfile}: ${dbfile}
 	Connect To Database 	sqlite3 	database=${dbfile} 	isolation_level=${None}
-	# Log 	conn: ${conn} 	console=true
-	Log 	sql: ${sql} 	console=true
-	Check If Exists In Database 	${sql}
+	Log to console 	sql: ${sql}
 	${result}= 	Query 	${sql}
-	Log 	sql result: ${result} 	console=true
+	Log to console 	sql result: ${result}
 	Disconnect From Database
 	RETURN 	${result}
+
+# Query Result DB
+# 	[Arguments]		${dbfile} 	${sql}
+# 	# Disconnect From All Databases
+# 	Log 	dbfile: ${dbfile} 	console=true
+# 	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
+# 	# Log to console 	\${dbfile}: ${dbfile}
+# 	Connect To Database 	sqlite3 	database=${dbfile} 	isolation_level=${None}
+# 	# Log 	conn: ${conn} 	console=true
+# 	Log 	sql: ${sql} 	console=true
+# 	Check If Exists In Database 	${sql}
+# 	${result}= 	Query 	${sql}
+# 	Log 	sql result: ${result} 	console=true
+# 	Disconnect From Database
+# 	RETURN 	${result}
 
 # # # # #
 # CSV:  #
