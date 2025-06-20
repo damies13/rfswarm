@@ -1,6 +1,8 @@
 *** Settings ***
-Resource 	CommandLine_Common.resource
+Resource 	../Common/Common.resource
+Resource 	CommandLine_Reporter.resource
 
+Suite Setup 	Common.Basic Suite Initialization Reporter
 
 *** Test Cases ***
 Check If The Not Buildin Modules Are Included In The Reporter Setup File

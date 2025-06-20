@@ -1,22 +1,14 @@
 *** Settings ***
-Library 	OperatingSystem
-Library 	Process
-Library 	DatabaseLibrary
-Library 	String
-Library 	Collections
-Library 	DateTime
-Library 	OCRLibrary
+Documentation 	This resource file contains keywords related to the basic GUI functions in the rfswarm components (Manager and Reporter)
 
+Resource 	Common.resource 	# basic keywords
+
+Library 	OCRLibrary
 Library 	ImageHorizonLibrary 	reference_folder=${IMAGE_DIR}
 
-Library 	ini_file.py
-Library 	get_ip_address.py
 Library 	img_common.py
 
 *** Variables ***
-${COMPONENT} 		${None} 	# currently used rfswarm component (app)
-${platform}			${None}
-${global_path}		${None}
 ${CONFIDENCE} 		${None}
 ${IMAGE_DIR} 		${CURDIR}${/}Images${/}file_method
 
@@ -26,6 +18,9 @@ ${default_image_timeout} 	${120}
 *** Keywords ***
 GUI Suite Initialization ${component}
 	[Documentation] 	This keyword must be run to set up the suite for GUI keywords. The component must be chosen between: Manager, Reporter
+
+	Basic Suite Initialization ${component} 	# basic configuration
+
 	Set Suite Variable 	${COMPONENT} 	${component}
 	Set Suite Variable 	${IMAGE_DIR} 	${CURDIR}${/}..${/}${COMPONENT}${/}Images${/}file_method
 	Set Suite Variable 	${CONFIDENCE} 	0.9
@@ -33,95 +28,12 @@ GUI Suite Initialization ${component}
 	ImageHorizonLibrary.Set Reference Folder 	${IMAGE_DIR}
 
 	Set Platform
-	Log To Console 	\n\n\n\t[ === GUI Suite has been initiated for ${COMPONENT} === ]
+	Log To Console 	\t[ === GUI suite configuration has been initiated for ${COMPONENT} === ]
 	Log To Console 	component = ${COMPONENT}
 	Log To Console 	image dir = ${IMAGE_DIR}
 	Log To Console 	platform = ${platform}
-	Log To console 	confidence level = ${CONFIDENCE}\n\n\n
-
-Set Platform
-	Set Platform By Python
-	Set Platform By Tag
-
-Set Platform By Python
-	${system}= 		Evaluate 	platform.system() 	modules=platform
-
-	IF 	"${system}" == "Darwin"
-		Set Suite Variable    ${platform}    macos
-	END
-	IF 	"${system}" == "Windows"
-		Set Suite Variable    ${platform}    windows
-	END
-	IF 	"${system}" == "Linux"
-		Set Suite Variable    ${platform}    ubuntu
-	END
-
-Set Platform By Tag
-	Log 	${OPTIONS}
-	Log 	${OPTIONS}[include]
-	${inclen}= 	Get Length 	${OPTIONS}[include]
-	IF 	${inclen} > 0
-		Log 	${OPTIONS}[include][0]
-		${ostag}= 	Set Variable 	${OPTIONS}[include][0]
-
-		IF 	"${ostag}" == "macos-latest"
-			Set Suite Variable    ${platform}    macos
-		END
-		IF 	"${ostag}" == "windows-latest"
-			Set Suite Variable    ${platform}    windows
-		END
-		IF 	"${ostag}" == "ubuntu-latest"
-			Set Suite Variable    ${platform}    ubuntu
-		END
-	END
-
-Show Log
-	[Arguments]		${filename}
-	Log 		${\n}--VVV--${filename}--VVV-- 		console=True
-	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
-	Log 		${filedata} 		console=True
-	Log 		--ɅɅɅ--${filename}--ɅɅɅ--${\n} 		console=True
-	RETURN 		${filedata}
-
-Read Log
-	[Arguments]		${filename}
-	Log 		${filename}
-	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
-	Log 		${filedata}
-	RETURN 		${filedata}
-
-Check Logs
-	${comp} 	Convert To Lower Case 	${COMPONENT}
-	${stdout_component}= 		Read Log 	${OUTPUT DIR}${/}stdout_${comp}.txt
-	${stderr_component}= 		Read Log 	${OUTPUT DIR}${/}stderr_${comp}.txt
-
-	Should Not Contain 	${stdout_component} 	RuntimeError
-	Should Not Contain 	${stderr_component} 	RuntimeError
-	Should Not Contain 	${stdout_component} 	Exception
-	Should Not Contain 	${stderr_component} 	Exception
-	Should Not Contain 	${stdout_component}	OSError
-	Should Not Contain 	${stderr_component} 	OSError
-	Should Not Contain 	${stdout_component}	KeyError
-	Should Not Contain 	${stderr_component} 	KeyError
-
-Utilisation Stats
-	${cpupct}= 	Evaluate 	psutil.cpu_percent(interval=1, percpu=True) 				modules=psutil
-	Log 	\n${cpupct} 	console=True
-	${loadavg}= 	Evaluate 	psutil.getloadavg() 															modules=psutil
-	Log 	${loadavg} 	console=True
-	${mem}= 		Evaluate 	psutil.virtual_memory() 														modules=psutil
-	Log 	${mem}
-	${proc}= 		Evaluate 	list(psutil.process_iter(['pid', 'name', 'exe', 'cmdline', 'username'])) 		modules=psutil
-	Log 	${proc}
-
-Make Clipboard Not None
-	Evaluate 	clipboard.copy("You should never see this after copy") 	modules=clipboard
-
-Change ${str1} With ${str2} In ${file}
-	${file_content}	Get File	${file}
-	Remove File		${file}
-	${file_content}	Replace String	${file_content}	${str1}	${str2}
-	Create File		${file}	${file_content}
+	Log To Console 	confidence level = ${CONFIDENCE}
+	Log To Console 	default image timeout = ${default_image_timeout}\n\n\n
 
 Press ${key} ${n} Times
 	[Documentation]	Provide full name. For example: Key.tab
@@ -165,120 +77,6 @@ Get Last Screenshot
 		END
 	ELSE
 		RETURN 	${files}[-1]
-	END
-
-Get Python Version Info
-	${vinfo}= 	Evaluate 	sys.version_info 	modules=sys
-	RETURN		${vinfo}
-
-Find Absolute Paths And Names For Files In Directory
-	[Documentation]	This algorithm analyses the specified path and returns all
-	...    file names with their absolute paths even those that are in subdirectories
-	[Arguments]		${given_path}	@{excluded_files}
-	${curr_dir}	Set Variable	${given_path}
-	@{absolute_paths}	Create List
-	@{file_names}	Create List
-	${new_dir}		List Directories In Directory	${curr_dir}	absolute=${True}
-
-	#=== Collecting data section ===
-	@{dir_files_path}=		List Files In Directory		${curr_dir}	absolute=${True}
-	@{dir_file_names}=		List Files In Directory		${curr_dir}
-
-	${length}	Get Length	${dir_files_path}
-	FOR  ${i}  IN RANGE  0  ${length}
-		IF  '${dir_file_names}[${i}]' not in ${excluded_files}
-			Append To List	${absolute_paths}	${dir_files_path}[${i}]
-			Append To List	${file_names}	${dir_file_names}[${i}]
-		END
-	END
-
-	#=== Merging data section ===
-	FOR  ${specific_dir}  IN  @{new_dir}
-		${next_absolute_paths}	${next_file_names}
-		...    Find Absolute Paths And Names For Files In Directory	${specific_dir}	@{excluded_files}
-
-		${length}	Get Length	${next_absolute_paths}
-		FOR  ${i}  IN RANGE  0  ${length}
-			${bad_list}	Get Length	${next_absolute_paths}
-			IF  ${bad_list} != ${0}
-				Append To List	${absolute_paths}	${next_absolute_paths}[${i}]
-				Append To List	${file_names}	${next_file_names}[${i}]
-			END
-		END
-	END
-
-	RETURN	${absolute_paths}	${file_names}
-
-Get Relative Paths
-	[Arguments] 	${base} 		${paths_in}
-
-	${paths_out}= 	Create List
-	FOR 	${item} 	IN 		@{paths_in}
-		${relpath}= 	Evaluate 	os.path.relpath(r"${item}", start=r"${base}") 	modules=os.path
-		Append To List 	${paths_out} 	${relpath}
-	END
-	RETURN 	${paths_out}
-
-Diff Lists
-	[Arguments] 	${list_a} 		${list_b} 	${message}
-
-	${status}= 	Run Keyword And Return Status 	Lists Should Be Equal 	${list_a} 	${list_b}
-	IF 	not ${status}
-		Log		${list_a}
-		Log		${list_b}
-		${Missing_List_From_A}= 	Create List
-		${Missing_List_From_B}= 	Create List
-
-		FOR 	${item} 	IN 		@{list_b}
-			${status}= 	Run Keyword And Return Status 	List Should Contain Value 	${list_a} 	${item}
-			IF 	not ${status}
-				Append To List 	${Missing_List_From_A} 	${item}
-			END
-		END
-
-		FOR 	${item} 	IN 		@{list_a}
-			${status}= 	Run Keyword And Return Status 	List Should Contain Value 	${list_b} 	${item}
-			IF 	not ${status}
-				Append To List 	${Missing_List_From_B} 	${item}
-			END
-		END
-		Log 		\nItems from list B missing from list A: ${Missing_List_From_A} 	console=True
-		Log 		Items from list A missing from list B: ${Missing_List_From_B} 	console=True
-		Lists Should Be Equal 	${list_a} 	${list_b} 		msg=${message}
-	END
-
-Convert CSV File Cells To a List
-	[Arguments]		${csv_file_path}	${csv_separator}
-	${csv_file_content}=	Get File		${csv_file_path}
-	@{csv_rows_list}=	Split String	${csv_file_content}		separator=\n
-
-	@{csv_rows_content_list}=	Create List
-	FOR  ${row}  IN  @{csv_rows_list}
-		@{csv_row_cells_list}=		Split String	${row}	separator=${csv_separator}
-		Append To List	${csv_rows_content_list}	${csv_row_cells_list}
-	END
-
-	${status}=	Run Keyword And Return Status	Should Be Empty	@{csv_rows_content_list}[-1]
-	IF  ${status} == ${True}
-		@{csv_rows_content_list}	Set Variable	${csv_rows_content_list}[:-1]
-	END
-
-	RETURN	${csv_rows_content_list}
-
-Wait For File To Exist
-	[Arguments]		${filepath} 	${timeout}=${default_image_timeout}
-	TRY
-		WHILE    True 	limit=${timeout} seconds
-			TRY
-				Sleep 	500 ms
-				File Should Exist 		${filepath}
-			EXCEPT
-				CONTINUE
-			END
-			BREAK
-		END
-	EXCEPT
-		Fail 		File '${filepath}' does not exist after ${timeout} seconds
 	END
 
 # # # # # # #
@@ -586,7 +384,7 @@ Set Text Value To Right Of
 	Log		${offsetx}
 	Log		${CURDIR}
  	Log		${IMAGE_DIR}
-	Set Confidence 	0.85
+	Set Confidence 	0.80
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Set Confidence 	0.9

@@ -1,13 +1,12 @@
 *** Settings ***
+Documentation 	This resource file contains keywords for Manager GUI only.
+
 Resource 	../Common/GUI_Common.resource
 
 # Attempting to record video cause more trouble than help
 # Library		ScreenRecorderLibrary.py
 
-
 *** Variables ***
-${global_name}		${None}
-
 @{mngr_options}		${None}
 @{agent_options}	${None}
 ${cmd_agent} 		rfswarm-agent
@@ -17,7 +16,8 @@ ${pyfile_agent}		${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py
 ${process_manager} 	${None}
 ${process_agent}	${None}
 
-${results_dir} 		${OUTPUT DIR}${/}results
+${global_name} 		${None}
+${global_path} 		${None}
 ${agent_dir} 		${OUTPUT DIR}${/}rfswarm-agent
 
 ${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method

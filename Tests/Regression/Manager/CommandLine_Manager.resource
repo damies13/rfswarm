@@ -1,19 +1,12 @@
 *** Settings ***
-Library 	OperatingSystem
-Library 	Process
-Library 	DatabaseLibrary
-Library		DateTime
-Library 	String
-Library 	Collections
+Documentation 	This resource file contains keywords for Manager command line only.
+
+Resource 	../Common/Common.resource
 
 *** Variables ***
-${platform}		${None}
-${global_name} 	${None}
-${global_path} 	${None}
-
 ${cmd_agent} 		rfswarm-agent
-${cmd_manager} 	rfswarm
-${pyfile_agent} 		${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py
+${cmd_manager} 		rfswarm
+${pyfile_agent} 	${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py
 ${pyfile_manager} 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
 ${process_agent} 	${None}
 ${process_manager} 	${None}
@@ -21,68 +14,11 @@ ${process_manager} 	${None}
 # datapath: /home/runner/work/rfswarm/rfswarm/rfswarm_manager/results/PreRun
 # datapath: /opt/hostedtoolcache/Python/3.9.18/x64/lib/python3.9/site-packages/rfswarm_manager/results/PreRun -- let's control the output path rather than leaving it to chance
 # datapath: /opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/rfswarm_manager/PreRun
-# ${results_dir} 			${EXECDIR}${/}rfswarm_manager${/}results
-# ${results_dir} 			${TEMPDIR}${/}rfswarm_manager${/}results
-${results_dir} 			${OUTPUT DIR}${/}results
-${agent_dir} 				${OUTPUT DIR}${/}rfswarm-agent
+${global_name} 		${None}
+${global_path} 		${None}
+${agent_dir} 		${OUTPUT DIR}${/}rfswarm-agent
 
 *** Keywords ***
-Set Platform
-	Set Platform By Python
-	Set Platform By Tag
-
-Set Platform By Python
-	${system}= 		Evaluate 	platform.system() 	modules=platform
-
-	IF 	"${system}" == "Darwin"
-		Set Suite Variable    ${platform}    macos
-	END
-	IF 	"${system}" == "Windows"
-		Set Suite Variable    ${platform}    windows
-	END
-	IF 	"${system}" == "Linux"
-		Set Suite Variable    ${platform}    ubuntu
-	END
-
-Set Platform By Tag
-	# [Arguments]		${ostag}
-	Log 	${OPTIONS}
-	Log 	${OPTIONS}[include]
-	Log 	${OPTIONS}[include][0]
-	${ostag}= 	Set Variable 	${OPTIONS}[include][0]
-
-	IF 	"${ostag}" == "macos-latest"
-		Set Suite Variable    ${platform}    macos
-	END
-	IF 	"${ostag}" == "windows-latest"
-		Set Suite Variable    ${platform}    windows
-	END
-	IF 	"${ostag}" == "ubuntu-latest"
-		Set Suite Variable    ${platform}    ubuntu
-	END
-
-Show Log
-	[Arguments]		${filename}
-	Log 		${\n}--VVV--${filename}--VVV-- 		console=True
-	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
-	Log 		${filedata} 		console=True
-	Log 		--ɅɅɅ--${filename}--ɅɅɅ--${\n} 		console=True
-	RETURN 		${filedata}
-
-Read Log
-	[Arguments]		${filename}
-	Log 		${filename}
-	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
-	Log 		${filedata}
-	RETURN 		${filedata}
-
-Show Dir Contents
-	[Arguments]		${dir}
-	${filesnfolders}= 	Evaluate    glob.glob("${dir}${/}*", recursive=True) 	modules=glob
-	FOR 	${item} 	IN 	${filesnfolders}
-		Log 	${item} 	console=True
-	END
-
 Run Agent
 	[Arguments]		${options}=None
 	IF  ${options} == None
@@ -167,7 +103,6 @@ Stop Manager
 	EXCEPT 	AS 	${error}
 		Log 	error: ${error} 		console=true
 	END
-
 
 Stop Agent
 	${running}= 	Is Process Running 	${process_agent}
@@ -261,9 +196,6 @@ Get Manager INI Data
 	Should Not Be Empty	${ini_content}
 	RETURN	${ini_content}
 
-#Read INI Data
-#	[Arguments]		${inifile}
-
 Set INI Window Size
 	[Arguments]		${width}=${None}	${height}=${None}
 	${location}=	Get Manager INI Location
@@ -299,165 +231,12 @@ Change Manager INI File Settings
 	Log		${ini_content}
 	Append To File	${location}		${ini_content}
 
-Change ${str1} With ${str2} In ${file}
-	${file_content}	Get File	${file}
-	Remove File		${file}
-	${file_content}	Replace String	${file_content}	${str1}	${str2}
-	Create File		${file}	${file_content}
-
 Get Manager PIP Data
 	Run Process	pip	show	rfswarm-manager		alias=data
 	${pip_data}	Get Process Result	data
 	Should Not Be Empty		${pip_data.stdout}		msg=Manager must be installed with pip
 	Log	${pip_data.stdout}
 	RETURN		${pip_data.stdout}
-
-Find Result DB
-	# ${fols}= 	List Directory 	${results_dir}
-	# Log to console 	${fols}
-	${fols}= 	List Directory 	${results_dir} 	*_* 	absolute=True
-	Log to console 	${fols}
-	# ${files}= 	List Directory 	${fols[0]}
-	# Log to console 	${files}
-	${file}= 	List Directory 	${fols[-1]} 	*.db 	absolute=True
-	Log to console 	Result DB: ${file[-1]}
-	RETURN 	${file[-1]}
-
-Query Result DB
-	[Arguments]		${dbfile} 	${sql}
-	# Disconnect From All Databases
-	Log 	dbfile: ${dbfile} 	console=true
-	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
-	# Log to console 	\${dbfile}: ${dbfile}
-	Connect To Database 	sqlite3 	database=${dbfile} 	isolation_level=${None}
-	# Log 	conn: ${conn} 	console=true
-	Log 	sql: ${sql} 	console=true
-	Check If Exists In Database 	${sql}
-	${result}= 	Query 	${sql}
-	Log 	sql result: ${result} 	console=true
-	Disconnect From Database
-	RETURN 	${result}
-
-CSV to List
-	[Arguments] 	${filepath}
-	File Should Exist 	${filepath}
-	${f}= 	Evaluate    open($filepath)
-	${csvdata}= 	Evaluate    csv.reader($f, delimiter=',') 	modules=csv
-	${data}= 			Evaluate    list($csvdata)
-	Evaluate    str($f.close())
-	${headings}= 			Evaluate    str($data.pop(0))
-	RETURN 	${data}
-
-CSV to Dict
-	[Arguments] 	${filepath}
-	File Should Exist 	${filepath}
-	${f}= 	Evaluate    open($filepath)
-	${csvdata}= 	Evaluate    csv.DictReader($f, delimiter=',') 	modules=csv
-	${data}= 			Evaluate    list($csvdata)
-	Evaluate    str($f.close())
-	RETURN 	${data}
-
-Get Modules From Program .py File That Are Not BuildIn
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123
-	[Arguments]		${file_path}
-	@{buildin}=		Create List	__future__	__main__	_thread	_tkinter	abc	aifc	argparse	array	pkg_resources
-	...    ast	asyncio	atexit	audioop	base64	bdb	binascii	bisect	builtins	bz2	calendar	cgi	cgitb
-	...    chunk	cmath	cmd	code	codecs	codeop	collections	colorsys	compileall	concurrent	configparser
-	...    contextlib	contextvars	copy	copyreg	cProfile	crypt	csv	ctypes	curses	dataclasses	datetime
-	...    dbm	decimal	difflib	dis	doctest	email	encodings	ensurepip	enum	errno	faulthandler	fcntl
-	...    filecmp	fileinput	fnmatch	fractions	ftplib	functools	gc	getopt	getpass	gettext	glob	graphlib
-	...    grp	gzip	hashlib	heapq	hmac	html	http	idlelib	imaplib	imghdr	importlib	inspect	io	ipaddress
-	...    itertools	json	keyword	lib2to3	linecache	locale	logging	lzma	mailbox	mailcap	marshal	math	mimetypes
-	...    mmap	modulefinder	msilib	msvcrt	multiprocessing	netrc	nis	nntplib	numbers	operator	optparse	os
-	...    ossaudiodev	pathlib	pdb	pickle	pickletools	pipes	pkgutil	platform	plistlib	poplib	posix	pprint
-	...    profile	pstats	pty	pwd	py_compile	pyclbr	pydoc	queue	quopri	random	re	readline	reprlib	resource
-	...    rlcompleter	runpy	sched	secrets	select	selectors	shelve	shlex	shutil	signal	site	sitecustomize
-	...    smtplib	sndhdr	socket	socketserver	spwd	sqlite3	ssl	stat	statistics	string	stringprep	struct
-	...    subprocess	sunau	symtable	sys	sysconfig	syslog	tabnanny	tarfile	telnetlib	tempfile	termios	test
-	...    textwrap	threading	time	timeit	tkinter	token	tokenize	tomllib	trace	traceback	tracemalloc	tty	turtle
-	...    turtledemo	types	typing	unicodedata	unittest	urllib	usercustomize	uu	uuid	venv	warnings	wave
-	...    weakref	webbrowser	winreg	winsound	wsgiref	xdrlib	xml	xmlrpc	zipapp	zipfile	zipimport	zlib	zoneinfo
-
-	&{replace_names}	Create Dictionary	PIL=pillow 		yaml=pyyaml
-
-	${manager_content}	Get File	${file_path}
-	${all_imports_lines}	Split String	${manager_content}	separator=\n
-	Log	${all_imports_lines}
-
-	${custom_imports}	Create List
-	${length}	Get Length	${all_imports_lines}
-	FOR  ${i}  IN RANGE  0  ${length}
-		@{import_line_elements}	Create List
-		FOR  ${x}  IN  ${all_imports_lines}[${i}]
-			@{items_form_line}	Split String	${x}
-			Append To List	${import_line_elements}		@{items_form_line}
-		END
-
-		${length2}	Get Length	${import_line_elements}
-		IF  ${length2} != 0
-			IF  '${import_line_elements}[0]' == 'class'
-				BREAK
-			END
-		END
-		FOR  ${j}  IN RANGE  0  ${length2}
-			Log		${import_line_elements}[${j}]
-			IF  '${import_line_elements}[${j}]' == '#'
-				BREAK
-			END
-			IF  '${import_line_elements}[${j}]' == 'import' or '${import_line_elements}[${j}]' == 'from'
-				${module_name}	Split String	${import_line_elements}[${j + 1}]	separator=.
-				IF  '${module_name}[0]' not in ${buildin}
-					Append To List	${custom_imports}	${module_name}[0]
-				END
-				BREAK
-			END
-		END
-	END
-
-	${custom_imports}	Evaluate	list(set(${custom_imports}))
-	${length}	Get Length	${custom_imports}
-	FOR  ${i}  IN RANGE  0  ${length}
-		IF  '${custom_imports}[${i}]' in &{replace_names}
-			${custom_imports}[${i}]  Set Variable  ${replace_names}[${custom_imports}[${i}]]
-		END
-	END
-
-	RETURN	${custom_imports}
-
-Get Install Requires From Setup File
-	[Arguments]		${file_path}
-	${setup_content}	Get File	${file_path}
-	${setup_content_lines}	Split String	${setup_content}	separator=\n
-	FOR  ${line}  IN  @{setup_content_lines}
-		# There is probably better solution for this:
-		${setup_content_elements}	Split String	${line}	separator=s=
-		TRY
-			IF  '${setup_content_elements}[0]' == '\tinstall_require'
-				${install_requires}	Set Variable	${setup_content_elements}[1][2:-3]
-				${install_requires}	Split String	${install_requires}	separator=', '
-
-				${refactored_requires}	Create List
-				FOR  ${items}  IN  @{install_requires}
-					@{sliced_times}		Create List
-					@{sliced_times1}	Split String	${items}	separator=>=
-					Append To List	${sliced_times}		@{sliced_times1}
-					@{sliced_times2}	Split String	${items}	separator=-
-					Append To List	${sliced_times}		@{sliced_times2}
-
-					FOR  ${i}  IN   @{sliced_times}
-						Append To List	${refactored_requires}	${i}
-
-					END
-				END
-
-				BREAK
-			END
-		EXCEPT
-			No Operation
-		END
-	END
-
-	RETURN	${refactored_requires}
 #
 
 Create Testdata Agent INI
@@ -495,56 +274,6 @@ Create Testdata Manager INI
 	Append To File 	${inifile} 	bindip = \n
 	Append To File 	${inifile} 	bindport = 8138\n
 	Append To File 	${inifile} 	\n
-
-List Files In Directory And Sub Directories
-	[Arguments] 	${path} 	${pattern}=None 	${absolute}=False
-	@{files}= 	List Files In Directory 	${path} 	${pattern} 	${absolute}
-	FOR 	${file} 	IN 	@{files}
-		${fpath} 	${ext} = 	Split Extension 	${file}
-		IF 		'${ext}' == 'pyc'
-			Remove Values From List 		${files} 	${file}
-		END
-	END
-	@{dirs}= 	List Directories In Directory 	${path}
-	FOR 	${dir} 	IN 	@{dirs}
-		@{sd_files}= 	List Files In Directory And Sub Directories 	${path}${/}${dir} 	${pattern} 	${absolute}
-		FOR 	${file} 	IN 	@{sd_files}
-			IF 	${absolute}
-				Append To List 	${files} 	${file}
-			ELSE
-				Append To List 	${files} 	${dir}${/}${file}
-			END
-		END
-	END
-	RETURN 	${files}
-
-Diff Lists
-	[Arguments] 	${list_a} 		${list_b} 	${message}
-
-	${status}= 	Run Keyword And Return Status 	Lists Should Be Equal 	${list_a} 	${list_b}
-	IF 	not ${status}
-		Log		${list_a}
-		Log		${list_b}
-		${Missing_List_From_A}= 	Create List
-		${Missing_List_From_B}= 	Create List
-
-		FOR 	${item} 	IN 		@{list_b}
-			${status}= 	Run Keyword And Return Status 	List Should Contain Value 	${list_a} 	${item}
-			IF 	not ${status}
-				Append To List 	${Missing_List_From_A} 	${item}
-			END
-		END
-
-		FOR 	${item} 	IN 		@{list_a}
-			${status}= 	Run Keyword And Return Status 	List Should Contain Value 	${list_b} 	${item}
-			IF 	not ${status}
-				Append To List 	${Missing_List_From_B} 	${item}
-			END
-		END
-		Log 		\nItems from list B missing from list A: ${Missing_List_From_A} 	console=True
-		Log 		Items from list A missing from list B: ${Missing_List_From_B} 	console=True
-		Lists Should Be Equal 	${list_a} 	${list_b} 		msg=${message}
-	END
 
 Check Icon Install
 	VAR 	${projname}= 		rfswarm-manager 		scope=TEST
@@ -641,47 +370,5 @@ Set Date Manually
 		${result}= 	Run Process 	date  +%Y-%m-%d
 		Should Be Equal As Strings 	${result.stdout} 	${input_date}
 		Log 	New date: ${result.stdout} 	console=${True}
-		Log 	${result.stderr}
-	END
-
-Resync Date With Time Server
-	[Arguments] 	${old_date}
-	IF 	"${platform}" == "macos"
-		${result}= 	Run Process 	sudo  systemsetup  -setusingnetworktime  on
-		Log 	${result.stdout}
-		Log 	${result.stderr}
-		${result}= 	Run Process 	sudo  systemsetup  -setnetworktimeserver  time.apple.com
-		Log 	${result.stdout}
-		Log 	${result.stderr}
-
-		${result}= 	Run Process 	date  +%Y-%m-%d
-		Should Not Be Equal As Strings 	${result.stdout} 	${old_date}
-		Log 	Back to original date: ${result.stdout} 	console=${True}
-		Log 	${result.stderr}
-	END
-	IF 	"${platform}" == "windows"
-		${result}= 	Run Process 	powershell.exe  w32tm  /resync 	shell=${True}
-		Log 	${result.stdout}
-		Log 	${result.stderr}
-
-		${result}= 	Run Process 	powershell.exe  Get-Date  -Format  'yyyy-MM-dd' 	shell=${True}
-		Should Not Be Equal As Strings 	${result.stdout} 	${old_date}
-		Log 	Back to original date: ${result.stdout} 	console=${True}
-		Log 	${result.stderr}
-	END
-	IF 	"${platform}" == "ubuntu"
-		${result}= 	Run Process 	sudo  hwclock  --systohc
-		Log 	${result.stdout}
-		Log 	${result.stderr}
-		${result}= 	Run Process 	sudo  timedatectl  set-ntp  true
-		Log 	${result.stdout}
-		Log 	${result.stderr}
-		${result}= 	Run Process 	sudo  ntpdate  -u  time.google.com
-		Log 	${result.stdout}
-		Log 	${result.stderr}
-
-		${result}= 	Run Process 	date  +%Y-%m-%d
-		Should Not Be Equal As Strings 	${result.stdout} 	${old_date}
-		Log 	Back to original date: ${result.stdout} 	console=${True}
 		Log 	${result.stderr}
 	END

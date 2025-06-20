@@ -1,7 +1,10 @@
 *** Settings ***
-Resource 	CommandLine_Common.resource
+Resource 	../Common/Common.resource
+Resource 	CommandLine_Reporter.resource
 
-Suite Setup			Clean Up Old Files
+Suite Setup 	Run Keywords
+...    Common.Basic Suite Initialization Reporter
+...    Clean Up Old Files
 
 *** Test Cases ***
 Robot Version

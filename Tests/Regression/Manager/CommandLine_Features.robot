@@ -1,9 +1,10 @@
 *** Settings ***
 Test Tags       Features 	CommandLine
 
-Resource 	CommandLine_Common.resource
+Resource 	../Common/Common.resource
+Resource 	CommandLine_Manager.resource
 
-Suite Setup 	Set Platform
+Suite Setup 	Common.Basic Suite Initialization Manager
 
 *** Test Cases ***
 Environment Variable Substitution in Robot/Resource files

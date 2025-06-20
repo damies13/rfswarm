@@ -1,4 +1,6 @@
 *** Settings ***
+Documentation 	This resource file contains keywords for Reporter GUI only.
+
 Resource 	../Common/GUI_Common.resource
 
 Library 	ArchiveLibrary

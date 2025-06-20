@@ -1,11 +1,10 @@
 *** Settings ***
 Test Tags       Bugs 	CommandLine
 
-Resource 	CommandLine_Common.resource
+Resource 	../Common/Common.resource
+Resource 	CommandLine_Manager.resource
 
-Suite Setup 		Run Keywords
-...    Create Directory 	${results_dir} 	AND
-...    Set Platform
+Suite Setup 	Common.Basic Suite Initialization Manager
 
 *** Variables ***
 @{robot_data}=	example.robot	Example Test Case

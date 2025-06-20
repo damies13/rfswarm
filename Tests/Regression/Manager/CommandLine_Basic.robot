@@ -3,7 +3,7 @@ Test Tags       Basic 	CommandLine
 
 Library 	OperatingSystem
 
-Suite Setup			Clean Up Old Files
+Suite Setup 	Clean Up Old Files
 
 *** Variables ***
 ${cmd_agent} 	rfswarm-agent

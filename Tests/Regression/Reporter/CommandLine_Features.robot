@@ -1,7 +1,8 @@
 *** Settings ***
-Resource 	CommandLine_Common.resource
+Resource 	../Common/Common.resource
+Resource 	CommandLine_Reporter.resource
 
-Suite Setup 	Set Platform
+Suite Setup 	Common.Basic Suite Initialization Reporter
 
 *** Test Cases ***
 Install Application Icon or Desktop Shortcut
