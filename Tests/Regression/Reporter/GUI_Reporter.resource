@@ -198,6 +198,8 @@ Close GUI windows
 	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
 	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
 	Log To Console 	2.0 	# del
+	@{coordinates}= 	Locate 	reporter_${platform}_button_closewindow.png
+	Log To Console 	${coordinates}
 	Click Image		reporter_${platform}_button_closewindow.png
 	Log To Console 	2.1 	# del
 	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png

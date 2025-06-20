@@ -134,7 +134,6 @@ Handle Donation Reminder
 	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		30
 	VAR 	${DonationReminder} 	${found} 		scope=TEST
 
-
 Get Image Size
 	[Arguments] 	${imgfile}
 	# ahrrrg windows paths, PIL.Image.open doesn't like them, need to escape / replace \\
