@@ -200,15 +200,15 @@ Close GUI windows
 	Log To Console 	2.0 	# del
 	Run Keyword And Ignore Error 	Click Image 	reporter_${platform}_menu_results.png
 	Log To Console 	2.1 	# del
-	Sleep 	1
+	Sleep 	0.1
 	Press Key.esc 3 Times
-	Sleep 	1
-	Press Combination 	x 	Key.ctrl
+	Sleep 	2
+	Press Combination 	Key.ctrl 	x
 	Log To Console 	2.2 	# del
 	# Press Combination 	Key.f4 	Key.alt
 	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
 	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
-	
+
 	# Click Image		reporter_${platform}_button_closewindow.png
 	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
 	Take A Screenshot
