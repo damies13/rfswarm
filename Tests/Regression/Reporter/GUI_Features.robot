@@ -1234,7 +1234,7 @@ Verify Filter Metric For Data Table and Graph - Wildcard
 	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
 
 Verify Filter Metric For Data Table and Graph - Not Wildcard
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #1055 	robot:continue-on-failure
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
 	[Setup] 	Change Reporter INI File Settings 	win_height 	600
 	VAR 	${issue} 	Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}

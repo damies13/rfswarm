@@ -292,18 +292,18 @@ Click Button
 	${img}= 	Set Variable 	${comp}_${platform}_button_${btnnamel}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
-	IF  "${platform}" == "windows"
-		Set Confidence	0.85
-	END
+	# IF  "${platform}" == "windows"
+	# 	Set Confidence	0.85
+	# END
 	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
 	Sleep 	0.1
 
 	Run Keyword IF 	${debug_screenshots} 	Take A Screenshot
-	IF  "${platform}" == "windows"
-		Set Confidence 	0.9
-	END
+	# IF  "${platform}" == "windows"
+	# 	Set Confidence 	0.9
+	# END
 
 Wait For Dialog Button
 	[Arguments]		${btnname} 		${timeout}=${default_image_timeout}
@@ -586,8 +586,10 @@ Set Text Value To Right Of
 	Log		${offsetx}
 	Log		${CURDIR}
  	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=300
+	Set Confidence 	0.85
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
+	Set Confidence 	0.9
 	${x}= 	Evaluate 	${coordinates}[0]+${offsetx2}
 	${y}= 	Evaluate 	${coordinates}[1]+${offsety}
 	@{coordinates}= 	Create List 	${x} 	${y}

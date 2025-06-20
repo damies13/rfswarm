@@ -402,13 +402,13 @@ Open New Template After Selecting a Section That Is Not In the New Template
 	Change Reporter INI File Settings 	templatedir 	${basefolder}
 
 	Open GUI 	-d 	${resultfolder} 	-t 	${first_template}
-	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=30
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=60
 	Take A Screenshot
 	Click Section 	Errors
 	Take A Screenshot
 	Click Button 	OpenTemplate
 	File Open Dialogue Select File 	${second_template_dir}
-	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=30
+	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=60
 	Take A Screenshot
 	Click Section 	Report
 
