@@ -4,7 +4,7 @@ Test Tags       Basic 	GUI
 Resource 	../Common/GUI_Common.resource
 Resource 	GUI_Manager.resource
 
-Suite Setup 	GUI_Common.Suite Initialization Manager
+Suite Setup 	GUI_Common.GUI Suite Initialization Manager
 
 *** Variables ***
 ${default_image_timeout} 	${120}

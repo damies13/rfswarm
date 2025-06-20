@@ -162,23 +162,18 @@ Open GUI macos
 	# Take A Screenshot
 
 Close GUI
-	Log To Console 	1 	# del
 	${keyword}= 	Set Variable 	Close GUI ${platform}
 	IF 	${process}
 		${running}= 	Is Process Running 	${process}
 		IF 	${running}
-			Log To Console 	2 	# del
 			Run Keyword 	${keyword}
-			Log To Console 	3 	# del
 		ELSE
 			# ${result}= 	Get Process Result 	${process}
 			${result}= 	Wait For Process 	${process} 	timeout=60
 			Check Result 	${result}
-			Log To Console 	4 	# del
 		END
 	END
 	Set Suite Variable 	$process 	None
-	Log To Console 	5 	# del
 	Sleep 	0.5
 	${running}= 	Is Process Running 	${process}
 	Run Keyword If 	${running} 	Fail 	Reporter is still running!
@@ -193,19 +188,15 @@ Check Result
 
 Close GUI windows
 	@{coordinates}= 	Locate 	reporter_${platform}_menu_results.png
-	Log To Console 	${coordinates}
+	Log 	${coordinates}
 	@{coordinates}= 	Locate 	reporter_${platform}_button_closewindow.png
-	Log To Console 	${coordinates}
+	Log 	${coordinates}
 
-	Log To Console 	2.0 	# del
 	Run Keyword And Ignore Error 	Click Image 	reporter_${platform}_menu_results.png
-	Log To Console 	2.1 	# del
 	Sleep 	0.1
 	Press Key.esc 3 Times
 	Sleep 	2
 	Press Combination 	Key.ctrl 	x
-	Log To Console 	2.2 	# del
-	# Press Combination 	Key.f4 	Key.alt
 	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
 	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
 
@@ -214,7 +205,6 @@ Close GUI windows
 	Take A Screenshot
 	Sleep 	0.5
 	End Process If Still Running
-	Log To Console 	2.3 	# del
 
 Close GUI ubuntu
 	# Press Combination 	Key.esc

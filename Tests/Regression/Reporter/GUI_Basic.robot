@@ -2,7 +2,7 @@
 Resource 	../Common/GUI_Common.resource
 Resource 	GUI_Reporter.resource
 
-Suite Setup 	GUI_Common.Suite Initialization Reporter
+Suite Setup 	GUI_Common.GUI Suite Initialization Reporter
 
 Test Teardown 	Close GUI
 
@@ -17,7 +17,6 @@ Select Preview Tab
 	Open GUI
 	Wait For Status 	PreviewLoaded
 	Click Tab 	 Preview
-	Log To Console 	Done 	#del
 
 	# Accessability Settings test was to verify Terminal is set to 'check'
 	# 		https://stackoverflow.com/questions/62035751/pyautogui-not-running-on-mac-catalina

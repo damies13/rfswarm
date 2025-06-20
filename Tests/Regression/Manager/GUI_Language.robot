@@ -4,7 +4,7 @@ Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #238 	Languages
 Resource 	../Common/GUI_Common.resource
 Resource 	GUI_Manager.resource
 
-Suite Setup 	GUI_Common.Suite Initialization Manager
+Suite Setup 	GUI_Common.GUI Suite Initialization Manager
 
 Test Setup 	Language Test Init
 Test Teardown 	Language Test End

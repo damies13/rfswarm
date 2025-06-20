@@ -2,7 +2,7 @@
 Resource 	../Common/GUI_Common.resource
 Resource 	GUI_Reporter.resource
 
-Suite Setup 	GUI_Common.Suite Initialization Reporter
+Suite Setup 	GUI_Common.GUI Suite Initialization Reporter
 Test Teardown 	Close GUI
 
 *** Test Cases ***
@@ -1154,7 +1154,7 @@ Change Font
 # 	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
 
 Verify Filter Metric For Data Table and Graph - Wildcard
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
 	[Setup] 	Change Reporter INI File Settings 	win_height 	600
 	VAR 	${issue} 	Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
@@ -1234,7 +1234,7 @@ Verify Filter Metric For Data Table and Graph - Wildcard
 	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
 
 Verify Filter Metric For Data Table and Graph - Not Wildcard
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #1055 	robot:continue-on-failure
 	[Setup] 	Change Reporter INI File Settings 	win_height 	600
 	VAR 	${issue} 	Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
@@ -1314,7 +1314,7 @@ Verify Filter Metric For Data Table and Graph - Not Wildcard
 	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
 
 Verify Filter Result For Data Table and Graph - Wildcard
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
 	[Setup] 	Change Reporter INI File Settings 	win_height 	600
 	VAR 	${issue} 	Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
@@ -1394,7 +1394,7 @@ Verify Filter Result For Data Table and Graph - Wildcard
 	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
 
 Verify Filter Result For Data Table and Graph - Not Wildcard
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
 	[Setup] 	Change Reporter INI File Settings 	win_height 	600
 	VAR 	${issue} 	Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
@@ -1474,7 +1474,7 @@ Verify Filter Result For Data Table and Graph - Not Wildcard
 	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
 
 Verify Filter Result For Data Table and Graph - Filter Result
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
 	[Setup] 	Change Reporter INI File Settings 	win_height 	600
 	VAR 	${issue} 	Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}

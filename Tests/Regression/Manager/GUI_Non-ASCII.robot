@@ -67,7 +67,7 @@ Test Non-ASCII Characters
 
 Non-ASCII Suite Setup
 	Remove Directory 	${OUTPUT DIR}${/}results${/}Issue-#97 	recursive=${True}
-	GUI_Common.Suite Initialization Manager
+	GUI_Common.GUI Suite Initialization Manager
 
 Non-ASCII Suite Teardown
 	Copy Directory 		${test_data} 	${OUTPUT DIR}${/}results${/}Issue-#97

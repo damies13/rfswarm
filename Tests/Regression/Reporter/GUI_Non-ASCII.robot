@@ -155,7 +155,7 @@ Test Non-ASCII Characters
 
 Non-ASCII Suite Setup
 	Remove Directory 	${OUTPUT DIR}${/}results${/}Issue-#97 	recursive=${True}
-	GUI_Common.Suite Initialization Reporter
+	GUI_Common.GUI Suite Initialization Reporter
 	Extract Zip File 	${test_data}${/}manager_results.zip 	${test_data}
 
 Non-ASCII Suite Teardown

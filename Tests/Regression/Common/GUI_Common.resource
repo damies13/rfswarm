@@ -24,7 +24,7 @@ ${debug_screenshots} 		${False}
 ${default_image_timeout} 	${120}
 
 *** Keywords ***
-Suite Initialization ${component}
+GUI Suite Initialization ${component}
 	[Documentation] 	This keyword must be run to set up the suite for GUI keywords. The component must be chosen between: Manager, Reporter
 	Set Suite Variable 	${COMPONENT} 	${component}
 	Set Suite Variable 	${IMAGE_DIR} 	${CURDIR}${/}..${/}${COMPONENT}${/}Images${/}file_method

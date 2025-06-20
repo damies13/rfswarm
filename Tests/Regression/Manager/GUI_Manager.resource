@@ -1,8 +1,6 @@
 *** Settings ***
 Resource 	../Common/GUI_Common.resource
 
-Library		ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
-
 # Attempting to record video cause more trouble than help
 # Library		ScreenRecorderLibrary.py
 
