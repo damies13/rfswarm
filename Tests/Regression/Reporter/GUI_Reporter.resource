@@ -17,7 +17,7 @@ ${cmd_reporter} 	rfswarm-reporter
 ${process} 			${None}
 
 ${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
-${pyfile}		${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
+${pyfile} 		${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
 
 *** Keywords ***
 Create New Section
@@ -163,21 +163,26 @@ Open GUI macos
 	# Take A Screenshot
 
 Close GUI
+	Log To Console 	1 	# del
 	${keyword}= 	Set Variable 	Close GUI ${platform}
 	IF 	${process}
 		${running}= 	Is Process Running 	${process}
 		IF 	${running}
+			Log To Console 	2 	# del
 			Run Keyword 	${keyword}
+			Log To Console 	3 	# del
 		ELSE
 			# ${result}= 	Get Process Result 	${process}
 			${result}= 	Wait For Process 	${process} 	timeout=60
 			Check Result 	${result}
+			Log To Console 	4 	# del
 		END
 	END
 	Set Suite Variable 	$process 	None
+	Log To Console 	5 	# del
 	Sleep 	0.5
-	${running}= 	Is Process Running 	${process} 	#del
-	Log To Console 	${running} 	#del
+	${running}= 	Is Process Running 	${process}
+	Run Keyword If 	${running} 	Fail 	Reporter is still running!
 
 Check Result
 	[Arguments]		${result}
@@ -194,10 +199,13 @@ Close GUI windows
 	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
 	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
 	Click Image		reporter_${platform}_button_closewindow.png
+	Log To Console 	2.1 	# del
 	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
+	Log To Console 	2.2 	# del
 	Take A Screenshot
 	Sleep 	0.5
 	End Process If Still Running
+	Log To Console 	2.3 	# del
 
 Close GUI ubuntu
 	# Press Combination 	Key.esc

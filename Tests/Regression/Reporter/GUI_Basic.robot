@@ -12,12 +12,12 @@ GUI Runs and Closes
 	Open GUI
 	Wait For Status 	PreviewLoaded
 
-# Select Preview Tab
-# 	[Tags]	ubuntu-latest		windows-latest		macos-latest
-# 	Open GUI
-# 	Wait For Status 	PreviewLoaded
-# 	Click Tab 	 Preview
-# 	Log To Console 	Done 	#del
+Select Preview Tab
+	[Tags]	ubuntu-latest		windows-latest		macos-latest
+	Open GUI
+	Wait For Status 	PreviewLoaded
+	Click Tab 	 Preview
+	Log To Console 	Done 	#del
 
 	# Accessability Settings test was to verify Terminal is set to 'check'
 	# 		https://stackoverflow.com/questions/62035751/pyautogui-not-running-on-mac-catalina

@@ -5,10 +5,9 @@ Library 	DatabaseLibrary
 Library 	String
 Library 	Collections
 Library 	DateTime
-Library 	XML
 Library 	OCRLibrary
 
-Library 	ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
+Library 	ImageHorizonLibrary 	reference_folder=${IMAGE_DIR}
 
 Library 	ini_file.py
 Library 	get_ip_address.py
@@ -31,12 +30,10 @@ Suite Initialization ${component}
 	ImageHorizonLibrary.Set Reference Folder 	${IMAGE_DIR}
 
 	Set Platform
-	Log To Console 	\n\n\n
-	Log To Console 	[=== Suite has been initiated for ${COMPONENT} ===]
+	Log To Console 	\n\n\n\t[=== Suite has been initiated for ${COMPONENT} ===]
 	Log To Console 	component = ${COMPONENT}
 	Log To Console 	image dir = ${IMAGE_DIR}
-	Log To Console 	platform = ${platform}
-	Log To Console 	\n\n\n
+	Log To Console 	platform = ${platform}\n\n\n
 
 Set Platform
 	Set Platform By Python
@@ -91,17 +88,17 @@ Read Log
 
 Check Logs
 	${comp} 	Convert To Lower Case 	${COMPONENT}
-	${stdout_manager}= 		Read Log 	${OUTPUT DIR}${/}stdout_${comp}.txt
-	${stderr_manager}= 		Read Log 	${OUTPUT DIR}${/}stderr_${comp}.txt
+	${stdout_component}= 		Read Log 	${OUTPUT DIR}${/}stdout_${comp}.txt
+	${stderr_component}= 		Read Log 	${OUTPUT DIR}${/}stderr_${comp}.txt
 
-	Should Not Contain 	${stdout_manager} 	RuntimeError
-	Should Not Contain 	${stderr_manager} 	RuntimeError
-	Should Not Contain 	${stdout_manager} 	Exception
-	Should Not Contain 	${stderr_manager} 	Exception
-	Should Not Contain 	${stdout_manager}	OSError
-	Should Not Contain 	${stderr_manager} 	OSError
-	Should Not Contain 	${stdout_manager}	KeyError
-	Should Not Contain 	${stderr_manager} 	KeyError
+	Should Not Contain 	${stdout_component} 	RuntimeError
+	Should Not Contain 	${stderr_component} 	RuntimeError
+	Should Not Contain 	${stdout_component} 	Exception
+	Should Not Contain 	${stderr_component} 	Exception
+	Should Not Contain 	${stdout_component}	OSError
+	Should Not Contain 	${stderr_component} 	OSError
+	Should Not Contain 	${stdout_component}	KeyError
+	Should Not Contain 	${stderr_component} 	KeyError
 
 Utilisation Stats
 	${cpupct}= 	Evaluate 	psutil.cpu_percent(interval=1, percpu=True) 				modules=psutil
@@ -517,7 +514,8 @@ Click Text
 Get Text Value To Right Of
 	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
 	${labell}= 	Convert To Lower Case 	${label}
-	${img}= 	Set Variable		reporter_${platform}_label_${labell}.png
+	${comp}= 	Convert To Lower Case 	${COMPONENT}
+	${img}= 	Set Variable		${comp}_${platform}_label_${labell}.png
 
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 
