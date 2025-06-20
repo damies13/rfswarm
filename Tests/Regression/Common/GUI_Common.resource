@@ -10,7 +10,7 @@ Library 	img_common.py
 
 *** Variables ***
 ${CONFIDENCE} 		${None}
-${IMAGE_DIR} 		${CURDIR}${/}Images${/}file_method
+${IMAGE_DIR} 		${None}
 
 ${debug_screenshots} 		${False}
 ${default_image_timeout} 	${120}
@@ -19,7 +19,7 @@ ${default_image_timeout} 	${120}
 GUI Suite Initialization ${component}
 	[Documentation] 	This keyword must be run to set up the suite for GUI keywords. The component must be chosen between: Manager, Reporter
 
-	Basic Suite Initialization ${component} 	# basic configuration
+	Basic Suite Initialization ${component} 	# basic suite configuration
 
 	Set Suite Variable 	${COMPONENT} 	${component}
 	Set Suite Variable 	${IMAGE_DIR} 	${CURDIR}${/}..${/}${COMPONENT}${/}Images${/}file_method
@@ -28,12 +28,12 @@ GUI Suite Initialization ${component}
 	ImageHorizonLibrary.Set Reference Folder 	${IMAGE_DIR}
 
 	Set Platform
-	Log To Console 	\t[ === GUI suite configuration has been initiated for ${COMPONENT} === ]
-	Log To Console 	component = ${COMPONENT}
-	Log To Console 	image dir = ${IMAGE_DIR}
-	Log To Console 	platform = ${platform}
-	Log To Console 	confidence level = ${CONFIDENCE}
-	Log To Console 	default image timeout = ${default_image_timeout}\n\n\n
+	Log 	\t[ === GUI suite configuration has been initiated for ${COMPONENT} === ] 	console=True
+	Log 	component = ${COMPONENT} 	console=True
+	Log 	image dir = ${IMAGE_DIR} 	console=True
+	Log 	platform = ${platform} 	console=True
+	Log 	confidence level = ${CONFIDENCE} 	console=True
+	Log 	default image timeout = ${default_image_timeout}\n\n\n 	console=True
 
 Press ${key} ${n} Times
 	[Documentation]	Provide full name. For example: Key.tab
@@ -459,4 +459,3 @@ Set Text Value To Right Of
 		END
 		Should Be Equal As Strings    ${value}    ${value2}
 	END
-

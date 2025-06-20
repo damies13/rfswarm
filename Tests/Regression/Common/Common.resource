@@ -18,7 +18,7 @@ ${results_dir} 		${OUTPUT DIR}${/}results
 
 *** Keywords ***
 Basic Suite Initialization ${component}
-	[Documentation] 	This keyword must be run to set up the suite for keywords. The component must be chosen between: Manager, Reporter, Agent
+	[Documentation] 	This keyword must be run to set up the basic configuration for suite. The component must be chosen between: Manager, Reporter, Agent
 	Set Suite Variable 	${COMPONENT} 	${component}
 	Set Platform
 
@@ -27,10 +27,10 @@ Basic Suite Initialization ${component}
 		Create Directory 	${results_dir}
 	END
 
-	Log To Console 	\t[ === Basic suite configuration has been initiated for ${COMPONENT} === ]
-	Log To Console 	component = ${COMPONENT}
-	Log To Console 	platform = ${platform}
-	Log To Console 	results dir = ${results_dir}\n\n\n
+	Log 	\t[ === Basic suite configuration has been initiated for ${COMPONENT} === ] 	console=True
+	Log 	component = ${COMPONENT} 	console=True
+	Log 	platform = ${platform} 	console=True
+	Log 	results dir = ${results_dir}\n\n\n 	console=True
 
 Set Platform
 	Set Platform By Python
@@ -128,6 +128,92 @@ Clean Up Old Files
 	Remove File    ${OUTPUT DIR}${/}*.png
 	# Remove File    ${OUTPUT DIR}${/}sikuli_captured${/}*.*
 
+Diff Lists
+	[Arguments] 	${list_a} 		${list_b} 	${message}
+
+	${status}= 	Run Keyword And Return Status 	Lists Should Be Equal 	${list_a} 	${list_b}
+	IF 	not ${status}
+		Log		${list_a}
+		Log		${list_b}
+		${Missing_List_From_A}= 	Create List
+		${Missing_List_From_B}= 	Create List
+
+		FOR 	${item} 	IN 		@{list_b}
+			${status}= 	Run Keyword And Return Status 	List Should Contain Value 	${list_a} 	${item}
+			IF 	not ${status}
+				Append To List 	${Missing_List_From_A} 	${item}
+			END
+		END
+
+		FOR 	${item} 	IN 		@{list_a}
+			${status}= 	Run Keyword And Return Status 	List Should Contain Value 	${list_b} 	${item}
+			IF 	not ${status}
+				Append To List 	${Missing_List_From_B} 	${item}
+			END
+		END
+		Log 		\nItems from list B missing from list A: ${Missing_List_From_A} 	console=True
+		Log 		Items from list A missing from list B: ${Missing_List_From_B} 	console=True
+		Lists Should Be Equal 	${list_a} 	${list_b} 		msg=${message}
+	END
+
+Wait For File To Exist
+	[Arguments] 	${filepath} 	${timeout}=${120}
+	TRY
+		WHILE    True 	limit=${timeout} seconds
+			TRY
+				Sleep 	500 ms
+				File Should Exist 		${filepath}
+			EXCEPT
+				CONTINUE
+			END
+			BREAK
+		END
+	EXCEPT
+		Fail 		File '${filepath}' does not exist after ${timeout} seconds
+	END
+
+Resync Date With Time Server
+	[Arguments] 	${old_date}
+	IF 	"${platform}" == "macos"
+		${result}= 	Run Process 	sudo  systemsetup  -setusingnetworktime  on
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	sudo  systemsetup  -setnetworktimeserver  time.apple.com
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	date  +%Y-%m-%d
+		Should Not Be Equal As Strings 	${result.stdout} 	${old_date}
+		Log 	Back to original date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
+	IF 	"${platform}" == "windows"
+		${result}= 	Run Process 	powershell.exe  w32tm  /resync 	shell=${True}
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	powershell.exe  Get-Date  -Format  'yyyy-MM-dd' 	shell=${True}
+		Should Not Be Equal As Strings 	${result.stdout} 	${old_date}
+		Log 	Back to original date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
+	IF 	"${platform}" == "ubuntu"
+		${result}= 	Run Process 	sudo  hwclock  --systohc
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	sudo  timedatectl  set-ntp  true
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+		${result}= 	Run Process 	sudo  ntpdate  -u  time.google.com
+		Log 	${result.stdout}
+		Log 	${result.stderr}
+
+		${result}= 	Run Process 	date  +%Y-%m-%d
+		Should Not Be Equal As Strings 	${result.stdout} 	${old_date}
+		Log 	Back to original date: ${result.stdout} 	console=${True}
+		Log 	${result.stderr}
+	END
+
 # # # # # #
 # Paths:  #
 # # # # # #
@@ -209,33 +295,48 @@ Get Relative Paths
 	END
 	RETURN 	${paths_out}
 
-Diff Lists
-	[Arguments] 	${list_a} 		${list_b} 	${message}
+# # # # # # #
+# Database: #
+# # # # # # #
 
-	${status}= 	Run Keyword And Return Status 	Lists Should Be Equal 	${list_a} 	${list_b}
-	IF 	not ${status}
-		Log		${list_a}
-		Log		${list_b}
-		${Missing_List_From_A}= 	Create List
-		${Missing_List_From_B}= 	Create List
+Find Result DB
+	[Arguments] 	${directory}=${results_dir} 	${result_pattern}=*_*
+	# ${fols}= 	List Directory 	${results_dir}
+	# Log to console 	${fols}
+	${fols}= 	List Directory 	${directory} 	${result_pattern} 	absolute=True
+	Log to console 	${fols}
+	# ${files}= 	List Directory 	${fols[0]}
+	# Log to console 	${files}
+	${file}= 	List Directory 	${fols[-1]} 	*.db 	absolute=True
+	Log to console 	Result DB: ${file[-1]}
+	RETURN 	${file[-1]}
 
-		FOR 	${item} 	IN 		@{list_b}
-			${status}= 	Run Keyword And Return Status 	List Should Contain Value 	${list_a} 	${item}
-			IF 	not ${status}
-				Append To List 	${Missing_List_From_A} 	${item}
-			END
-		END
+# Query Result DB
+# 	[Arguments]		${dbfile} 	${sql}
+# 	Log to console 	dbfile: ${dbfile}
+# 	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
+# 	# Log to console 	\${dbfile}: ${dbfile}
+# 	Connect To Database 	sqlite3 	database=${dbfile} 	isolation_level=${None}
+# 	Log to console 	sql: ${sql}
+# 	${result}= 	Query 	${sql}
+# 	Log to console 	sql result: ${result}
+# 	Disconnect From Database
+# 	RETURN 	${result}
 
-		FOR 	${item} 	IN 		@{list_a}
-			${status}= 	Run Keyword And Return Status 	List Should Contain Value 	${list_b} 	${item}
-			IF 	not ${status}
-				Append To List 	${Missing_List_From_B} 	${item}
-			END
-		END
-		Log 		\nItems from list B missing from list A: ${Missing_List_From_A} 	console=True
-		Log 		Items from list A missing from list B: ${Missing_List_From_B} 	console=True
-		Lists Should Be Equal 	${list_a} 	${list_b} 		msg=${message}
-	END
+Query Result DB
+	[Arguments]		${dbfile} 	${sql}
+	# Disconnect From All Databases
+	Log 	dbfile: ${dbfile} 	console=true
+	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
+	# Log to console 	\${dbfile}: ${dbfile}
+	Connect To Database 	sqlite3 	database=${dbfile} 	isolation_level=${None}
+	# Log 	conn: ${conn} 	console=true
+	Log 	sql: ${sql} 	console=true
+	Check If Exists In Database 	${sql}
+	${result}= 	Query 	${sql}
+	Log 	sql result: ${result} 	console=true
+	Disconnect From Database
+	RETURN 	${result}
 
 # # # # #
 # CSV:  #
@@ -278,89 +379,9 @@ CSV to Dict
 	Evaluate    str($f.close())
 	RETURN 	${data}
 
-Wait For File To Exist
-	[Arguments] 	${filepath} 	${timeout}=${120}
-	TRY
-		WHILE    True 	limit=${timeout} seconds
-			TRY
-				Sleep 	500 ms
-				File Should Exist 		${filepath}
-			EXCEPT
-				CONTINUE
-			END
-			BREAK
-		END
-	EXCEPT
-		Fail 		File '${filepath}' does not exist after ${timeout} seconds
-	END
-
-Find Result DB
-	# ${fols}= 	List Directory 	${results_dir}
-	# Log to console 	${fols}
-	${fols}= 	List Directory 	${results_dir} 	*_* 	absolute=True
-	Log to console 	${fols}
-	# ${files}= 	List Directory 	${fols[0]}
-	# Log to console 	${files}
-	${file}= 	List Directory 	${fols[-1]} 	*.db 	absolute=True
-	Log to console 	Result DB: ${file[-1]}
-	RETURN 	${file[-1]}
-
-Query Result DB
-	[Arguments]		${dbfile} 	${sql}
-	# Disconnect From All Databases
-	Log 	dbfile: ${dbfile} 	console=true
-	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
-	# Log to console 	\${dbfile}: ${dbfile}
-	Connect To Database 	sqlite3 	database=${dbfile} 	isolation_level=${None}
-	# Log 	conn: ${conn} 	console=true
-	Log 	sql: ${sql} 	console=true
-	Check If Exists In Database 	${sql}
-	${result}= 	Query 	${sql}
-	Log 	sql result: ${result} 	console=true
-	Disconnect From Database
-	RETURN 	${result}
-
-Resync Date With Time Server
-	[Arguments] 	${old_date}
-	IF 	"${platform}" == "macos"
-		${result}= 	Run Process 	sudo  systemsetup  -setusingnetworktime  on
-		Log 	${result.stdout}
-		Log 	${result.stderr}
-		${result}= 	Run Process 	sudo  systemsetup  -setnetworktimeserver  time.apple.com
-		Log 	${result.stdout}
-		Log 	${result.stderr}
-
-		${result}= 	Run Process 	date  +%Y-%m-%d
-		Should Not Be Equal As Strings 	${result.stdout} 	${old_date}
-		Log 	Back to original date: ${result.stdout} 	console=${True}
-		Log 	${result.stderr}
-	END
-	IF 	"${platform}" == "windows"
-		${result}= 	Run Process 	powershell.exe  w32tm  /resync 	shell=${True}
-		Log 	${result.stdout}
-		Log 	${result.stderr}
-
-		${result}= 	Run Process 	powershell.exe  Get-Date  -Format  'yyyy-MM-dd' 	shell=${True}
-		Should Not Be Equal As Strings 	${result.stdout} 	${old_date}
-		Log 	Back to original date: ${result.stdout} 	console=${True}
-		Log 	${result.stderr}
-	END
-	IF 	"${platform}" == "ubuntu"
-		${result}= 	Run Process 	sudo  hwclock  --systohc
-		Log 	${result.stdout}
-		Log 	${result.stderr}
-		${result}= 	Run Process 	sudo  timedatectl  set-ntp  true
-		Log 	${result.stdout}
-		Log 	${result.stderr}
-		${result}= 	Run Process 	sudo  ntpdate  -u  time.google.com
-		Log 	${result.stdout}
-		Log 	${result.stderr}
-
-		${result}= 	Run Process 	date  +%Y-%m-%d
-		Should Not Be Equal As Strings 	${result.stdout} 	${old_date}
-		Log 	Back to original date: ${result.stdout} 	console=${True}
-		Log 	${result.stderr}
-	END
+# # # # # # # # # #
+# Python modules: #
+# # # # # # # # # #
 
 Get Modules From Program .py File That Are Not BuildIn
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123

@@ -4,6 +4,8 @@ Test Tags       Features 	GUI
 Resource 	../Common/GUI_Common.resource
 Resource 	GUI_Manager.resource
 
+Library 	XML
+
 Suite Setup 	GUI_Common.GUI Suite Initialization Manager
 
 *** Variables ***
@@ -1220,36 +1222,36 @@ Check If Inject Sleep Option Was Executed in the Test
 			BREAK
 		END
 	END
-	Variable Should Exist	${xml_file_content}		msg="Not xml file found in manager result directory!"
-	Should Not Be Empty		${xml_file_content}		msg=The xml file is empty!
+	Variable Should Exist 	${xml_file_content} 	msg="Not xml file found in manager result directory!"
+	Should Not Be Empty 	${xml_file_content} 	msg=The xml file is empty!
 	TRY
-		${root}		Parse XML	${xml_file_content}
+		${root} 	Parse XML 	${xml_file_content}
 	EXCEPT
-		Fail	msg=The xml file is invalid!
+		Fail 	msg=The xml file is invalid!
 	END
 
-	${test_element}	Get Element	${root}	suite/test
-	@{keyword_elements}	Get Elements	${test_element}	kw
+	${test_element} 	Get Element 	${root}	suite/test
+	@{keyword_elements} 	Get Elements 	${test_element}	kw
 	FOR  ${upper_keywords}  IN  @{keyword_elements}
-		@{inside_keyword_elements}	Get Elements	${upper_keywords}	kw
-		Append To List		${keyword_elements}		@{inside_keyword_elements}
+		@{inside_keyword_elements} 	Get Elements 	${upper_keywords}	kw
+		Append To List 	${keyword_elements} 	@{inside_keyword_elements}
 	END
 
-	${dont_fail}	Set Variable	${False}
+	${dont_fail} 	Set Variable 	${False}
 	FOR  ${keyword}  IN  @{keyword_elements}
-		@{msg_elements}	Get Elements	 ${keyword}	msg
+		@{msg_elements} 	Get Elements 	${keyword} 	msg
 		FOR  ${msg}  IN  @{msg_elements}
 			IF  '${msg.text}' == 'Sleep added by RFSwarm'
-				Log To Console	Sleep keyword added by RFSwarm found.
-				Log To Console	${msg.text}
+				Log To Console 	Sleep keyword added by RFSwarm found.
+				Log To Console 	${msg.text}
 
-				@{rfswarm_sleep_value}	Get Elements	${keyword}	arg
-				${sleep_value_by_rfswarm}	Set Variable	${rfswarm_sleep_value}[0]
-				Log To Console	RFSwarm Sleep value: ${sleep_value_by_rfswarm.text}
-				Should Be True	${sleep_value_by_rfswarm.text} >= ${inject_sleep_values}[0] and ${sleep_value_by_rfswarm.text} <= ${inject_sleep_values}[1]
+				@{rfswarm_sleep_value} 	Get Elements 	${keyword}	arg
+				${sleep_value_by_rfswarm} 	Set Variable 	${rfswarm_sleep_value}[0]
+				Log To Console 	RFSwarm Sleep value: ${sleep_value_by_rfswarm.text}
+				Should Be True 	${sleep_value_by_rfswarm.text} >= ${inject_sleep_values}[0] and ${sleep_value_by_rfswarm.text} <= ${inject_sleep_values}[1]
 				...    msg=Sleep time is not correct! Should be in <${inject_sleep_values}[0];${inject_sleep_values}[1]>
 
-				${dont_fail}	Set Variable	${True}
+				${dont_fail} 	Set Variable 	${True}
 				BREAK
 			END
 		END

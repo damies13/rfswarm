@@ -105,8 +105,8 @@ Circular Reference Resource Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #261
 	VAR    ${testdata} 		${CURDIR}${/}testdata${/}Issue-#261${/}circular_test      scope=TEST
 	VAR 	${agent_dir} 		${agent_dir}${/}${TEST NAME}      scope=TEST
-	Create Testdata Agent INI 	${testdata}${/}agent.ini
-	Create Testdata Manager INI 	${testdata}${/}manager.ini
+	Create Testdata Agent INI 	${testdata}${/}agent.ini 	${testdata}
+	Create Testdata Manager INI 	${testdata}${/}manager.ini 	${testdata}
 
 	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources 	*.resource
 
@@ -165,8 +165,8 @@ Circular Reference Resource Files 2
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #261
 	VAR    ${testdata} 		${CURDIR}${/}testdata${/}Issue-#261${/}circular_test2      scope=TEST
 	VAR 	${agent_dir} 		${agent_dir}${/}${TEST NAME}      scope=TEST
-	Create Testdata Agent INI 	${testdata}${/}agent.ini
-	Create Testdata Manager INI 	${testdata}${/}manager.ini
+	Create Testdata Agent INI 	${testdata}${/}agent.ini 	${testdata}
+	Create Testdata Manager INI 	${testdata}${/}manager.ini 	${testdata}
 
 	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources
 
@@ -226,8 +226,8 @@ Lots Of Resource Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #261
 	VAR 	${testdata} 		${CURDIR}${/}testdata${/}Issue-#261${/}lotsa_files_test      scope=TEST
 	VAR 	${agent_dir} 		${agent_dir}${/}${TEST NAME}      scope=TEST
-	Create Testdata Agent INI 	${testdata}${/}agent.ini
-	Create Testdata Manager INI 	${testdata}${/}manager.ini
+	Create Testdata Agent INI 	${testdata}${/}agent.ini 	${testdata}
+	Create Testdata Manager INI 	${testdata}${/}manager.ini 	${testdata}
 
 	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources 	*.resource
 

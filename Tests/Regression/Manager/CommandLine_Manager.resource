@@ -240,7 +240,7 @@ Get Manager PIP Data
 #
 
 Create Testdata Agent INI
-	[Arguments] 	${inifile}
+	[Arguments] 	${inifile} 	${testdata}
 	Create File 	${inifile} 	[Agent]\n
 	Append To File 	${inifile} 	agentname = E-5CG2026KN2\n
 	Append To File 	${inifile} 	agentdir = ${testdata}${/}agent-dir\n
@@ -251,7 +251,7 @@ Create Testdata Agent INI
 	Append To File 	${inifile} 	robotcmd = robot\n
 
 Create Testdata Manager INI
-	[Arguments] 	${inifile}
+	[Arguments] 	${inifile} 	${testdata}
 
 	Create File 	${inifile} 	[GUI]\n
 	Append To File 	${inifile} 	win_width = 1280\n
