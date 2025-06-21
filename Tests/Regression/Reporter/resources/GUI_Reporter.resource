@@ -7,11 +7,11 @@ Library 	ArchiveLibrary
 Library 	DocTest.VisualTest
 Library 	XML 	use_lxml=True
 
-Library 	read_docx.py
-Library 	read_xlsx.py
-Library 	save_html_image.py
+Library 	../read_docx.py
+Library 	../read_xlsx.py
+Library 	../save_html_image.py
 
-Variables 	report_expected_data.yaml
+Variables 	../report_expected_data.yaml
 
 *** Variables ***
 ${cmd_reporter} 	rfswarm-reporter
