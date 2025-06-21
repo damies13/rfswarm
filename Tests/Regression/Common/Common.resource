@@ -76,7 +76,7 @@ Show Log
 	Log 		${\n}--VVV--${filename}--VVV-- 		console=True
 	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
 	Log 		${filedata} 		console=True
-	Log 		--ɅɅɅ--${filename}--ɅɅɅ--${\n} 		console=True
+	Log 		--ɅɅɅ--${filename}--ɅɅɅ--${\n}${\n} 		console=True
 	RETURN 		${filedata}
 
 Read Log
