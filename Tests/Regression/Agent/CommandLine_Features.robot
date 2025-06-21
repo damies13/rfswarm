@@ -1,6 +1,8 @@
 *** Settings ***
-Resource 	CommandLine_Common.robot
-Suite Setup 	Set Platform
+Resource 	../Common/Common.resource
+Resource 	resources/CommandLine_Agent.resource
+
+Suite Setup 	Common.Basic Suite Initialization Agent
 
 *** Test Cases ***
 Install Application Icon or Desktop Shortcut

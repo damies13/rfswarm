@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation 	This resource file contains keywords for Reporter command line only.
 
-Resource 	../Common/Common.resource
+Resource 	../../Common/Common.resource
 
 *** Variables ***
 ${cmd_reporter} 	rfswarm-reporter

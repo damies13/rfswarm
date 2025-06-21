@@ -1,6 +1,6 @@
 *** Settings ***
 Resource 	../Common/Common.resource
-Resource 	CommandLine_Reporter.resource
+Resource 	resources/CommandLine_Reporter.resource
 
 Suite Setup 	Common.Basic Suite Initialization Reporter
 

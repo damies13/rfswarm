@@ -2,7 +2,7 @@
 Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #238 	Languages
 
 Resource 	../Common/GUI_Common.resource
-Resource 	GUI_Manager.resource
+Resource 	resources/GUI_Manager.resource
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Manager
 

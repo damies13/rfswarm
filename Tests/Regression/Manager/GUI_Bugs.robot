@@ -2,7 +2,7 @@
 Test Tags       Bugs 	GUI
 
 Resource 	../Common/GUI_Common.resource
-Resource 	GUI_Manager.resource
+Resource 	resources/GUI_Manager.resource
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Manager
 Test Teardown 	Run Keyword		Close Manager GUI ${platform}

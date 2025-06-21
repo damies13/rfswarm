@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation 	This resource file contains keywords for Reporter GUI only.
 
-Resource 	../Common/GUI_Common.resource
+Resource 	../../Common/GUI_Common.resource
 
 Library 	ArchiveLibrary
 Library 	DocTest.VisualTest
@@ -17,7 +17,7 @@ Variables 	report_expected_data.yaml
 ${cmd_reporter} 	rfswarm-reporter
 ${process} 			${None}
 
-# ${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
+# ${IMAGE_DIR} 	${CURDIR}${/}..${/}Images${/}file_method
 ${pyfile} 		${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
 
 *** Keywords ***
@@ -1280,10 +1280,5 @@ Release Fn Key
 		Log    ${result}
 
 	END
-
-
-
-
-
 
 #

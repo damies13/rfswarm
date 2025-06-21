@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation 	This resource file contains keywords for Manager GUI only.
 
-Resource 	../Common/GUI_Common.resource
+Resource 	../../Common/GUI_Common.resource
 
 # Attempting to record video cause more trouble than help
 # Library		ScreenRecorderLibrary.py
@@ -20,7 +20,7 @@ ${global_name} 		${None}
 ${global_path} 		${None}
 ${agent_dir} 		${OUTPUT DIR}${/}rfswarm-agent
 
-${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
+# ${IMAGE_DIR} 	${CURDIR}${/}..${/}Images${/}file_method
 
 *** Keywords ***
 Open Manager GUI
@@ -120,7 +120,7 @@ Close Manager GUI
 		END
 	END
 	Kill Manager If Still Running
-	# stdout=${OUTPUT DIR}${/}stdout_manager.txt    stderr=${OUTPUT DIR}${/}stderr_manager.txt
+
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 
@@ -911,8 +911,8 @@ Start New Scenario
 Create ${lang} Language Scenario
 	# [Arguments] 	${langcode}
 	# Log 	${lang} 	console=True
-	${scenariofile}= 		Set Variable    ${CURDIR}${/}testdata${/}Issue-#238${/}language${/}lang_${lang}.rfs
-	${robotfile}= 		Set Variable    ${CURDIR}${/}testdata${/}Issue-#238${/}language${/}lang_${lang}.robot
+	${scenariofile}= 		Set Variable    ${CURDIR}${/}..${/}testdata${/}Issue-#238${/}language${/}lang_${lang}.rfs
+	${robotfile}= 		Set Variable    ${CURDIR}${/}..${/}testdata${/}Issue-#238${/}language${/}lang_${lang}.robot
 	${robotfilename}= 		Set Variable    lang_${lang}.robot
 	Create File 	${scenariofile} 	[Scenario]\n
 	Append To File 	${scenariofile} 	uploadmode = err\n

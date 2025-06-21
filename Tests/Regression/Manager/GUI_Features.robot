@@ -2,7 +2,7 @@
 Test Tags       Features 	GUI
 
 Resource 	../Common/GUI_Common.resource
-Resource 	GUI_Manager.resource
+Resource 	resources/GUI_Manager.resource
 
 Library 	XML
 

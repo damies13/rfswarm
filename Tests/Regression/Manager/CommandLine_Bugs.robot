@@ -2,7 +2,7 @@
 Test Tags       Bugs 	CommandLine
 
 Resource 	../Common/Common.resource
-Resource 	CommandLine_Manager.resource
+Resource 	resources/CommandLine_Manager.resource
 
 Suite Setup 	Common.Basic Suite Initialization Manager
 

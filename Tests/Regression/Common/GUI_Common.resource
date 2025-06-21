@@ -328,6 +328,7 @@ Get Text Value To Right Of
 	Sleep    10 ms
 	${value}= 	Copy From The Right Of 	${img} 	${offsetx}
 	Take A Screenshot
+
 	WHILE 	$b4value == $value 		limit=15
 		Wait For 	${img} 	 timeout=${default_image_timeout}
 		${offsetx}= 	Evaluate 	${offsetx}+10
@@ -384,16 +385,13 @@ Set Text Value To Right Of
 	Log		${offsetx}
 	Log		${CURDIR}
  	Log		${IMAGE_DIR}
-	# Set Confidence 	0.80
+
 	@{coordinates}= 	Wait For 	${img} 	 timeout=${default_image_timeout}
-	# @{coordinates}= 	Locate		${img}
-	# Set Confidence 	0.9
 	${x}= 	Evaluate 	${coordinates}[0]+${offsetx2}
 	${y}= 	Evaluate 	${coordinates}[1]+${offsety}
 	@{coordinates}= 	Create List 	${x} 	${y}
 	Move To 	${coordinates}
-	# Triple Click is broken on MacOS: TypeError: not enough arguments for format string
-	# Triple Click 		button=left 	interval=0.0
+	Click
 	Click
 	Sleep 	0.3
 	IF  "${platform}" == "macos"
@@ -403,8 +401,6 @@ Set Text Value To Right Of
 	END
 	Take A Screenshot
 	Sleep 	0.3
-	# Double Click
-	# Take A Screenshot
 
 	# @{characters}= 	Split String 	${value} 	separator=${SPACE}
 	# ${len} 	Get Length 	${characters}
@@ -423,18 +419,13 @@ Set Text Value To Right Of
 	ELSE
 		Press Combination	KEY.ctrl		KEY.v
 	END
-	# Type 	${value}
 	Take A Screenshot
-	IF 	$platform == 'macos'
-		# Take A Screenshot
 
-		# Press Combination 	Key.Home
+	IF 	$platform == 'macos'
 		Press Combination 	Key.Shift 	Key.End
 
-		# Take A Screenshot
-		# Type 	${value}
 		Press Combination 	Key.Delete
-		# Take A Screenshot
+		Take A Screenshot
 
 	ELSE
 		${value2}= 	Get Text Value To Right Of		${label} 		${offsetx}
@@ -449,13 +440,17 @@ Set Text Value To Right Of
 			Double Click
 			Take A Screenshot
 			Evaluate 	clipboard.copy("${value}") 	modules=clipboard
+
 			IF  "${platform}" == "macos"
 				Press Combination	KEY.command		KEY.v
 			ELSE
 				Press Combination	KEY.ctrl		KEY.v
 			END
+
 			Take A Screenshot
 			${value2}= 	Get Text Value To Right Of		${label} 		${offsetx}
+
 		END
-		Should Be Equal As Strings    ${value}    ${value2}
+		Should Be Equal As Strings 	${value} 	${value2}
+
 	END

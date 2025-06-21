@@ -1,6 +1,6 @@
 *** Settings ***
 Resource 	../Common/GUI_Common.resource
-Resource 	GUI_Reporter.resource
+Resource 	resources/GUI_Reporter.resource
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Reporter
 
