@@ -1015,10 +1015,12 @@ Verify Generated Run Result Files
 
 	${result_files}=		List Files In Directory		${results_dir}${/}${result_dir_name}
 	Log To Console	${\n}All test run result files: ${result_files}{\n}
+	${db_file}=		Set Variable	${result_files}[0]
+	Remove File 	${db_file}-journal
+
 	${len}=		Get Length	${result_files}
 	Should Be True	${len} > 0	msg=The db file was not created.
 	Should Be True	${len} < 2	msg=Unexpected files have been created in the results folder. There should only be ${result_dir_time}_${scenario_name}.db file.
-	${db_file}=		Set Variable	${result_files}[0]
 	Should Be Equal As Strings		${db_file}		${result_dir_time}_${scenario_name}.db
 	...    msg=Result directory name from scenario is incorrect: expected "${scenario_name}", actual: "${run_dir_name_fragmented}[2]".
 

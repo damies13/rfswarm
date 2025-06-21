@@ -15,7 +15,7 @@ Robot Version
 
 Random Offset
 	[Documentation] 	This just prevents all the test runners doing git push at the same time
-	${random} =	Evaluate	random.randint(0, 60)
+	${random}= 	Evaluate 	random.randint(0, 60)
 	Sleep    ${random}
 
 Reporter Version

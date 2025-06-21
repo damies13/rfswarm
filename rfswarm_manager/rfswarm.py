@@ -349,8 +349,11 @@ class AgentServer(BaseHTTPRequestHandler):
 			httpcode = 500
 			message = str(e)
 		self.send_response(httpcode)
-		self.end_headers()
-		self.wfile.write(bytes(message, "utf-8"))
+		try:
+			self.end_headers()
+			self.wfile.write(bytes(message, "utf-8"))
+		except Exception as e:
+			base.debugmsg(6, "Disconnected before response was sent:", e)
 		threadend = time.time()
 		# base.debugmsg(5, parsed_path.path, "	threadstart:", "%.3f" % threadstart, "threadend:", "%.3f" % threadend, "Time Taken:", "%.3f" % (threadend-threadstart))
 		base.debugmsg(7, "%.3f" % (threadend - threadstart), "seconds for ", parsed_path.path)
@@ -430,8 +433,11 @@ class AgentServer(BaseHTTPRequestHandler):
 			message = str(e)
 
 		self.send_response(httpcode)
-		self.end_headers()
-		self.wfile.write(bytes(message, "utf-8"))
+		try:
+			self.end_headers()
+			self.wfile.write(bytes(message, "utf-8"))
+		except Exception as e:
+			base.debugmsg(6, "Disconnected before response was sent:", e)
 		threadend = time.time()
 		# base.debugmsg(5, parsed_path.path, "		threadstart:", "%.3f" % threadstart, "threadend:", "%.3f" % threadend, "Time Taken:", "%.3f" % (threadend-threadstart))
 		base.debugmsg(5, "%.3f" % (threadend - threadstart), "seconds for ", parsed_path.path)
