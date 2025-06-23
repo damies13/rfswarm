@@ -15,7 +15,6 @@ Suite Teardown 	Non-ASCII Suite Teardown
 ${test_data} 		${CURDIR}${/}testdata${/}Issue-#97
 ${scenario_name} 	${None}
 
-
 *** Test Cases ***
 Latin 		pl
 Icelandic 	ic
@@ -28,7 +27,6 @@ Japanese 	ja
 Korean 		ko
 Arabic 		ar
 Tibetan  	ti
-
 
 *** Keywords ***
 Test Non-ASCII Characters
@@ -164,8 +162,7 @@ Non-ASCII Suite Teardown
 	Remove Directory 	${test_data}${/}manager_results 	recursive=${True}
 
 Non-ASCII Test Setup
-	Change Reporter INI File Settings 	win_width 	1200
-	Change Reporter INI File Settings 	win_height 	700
+	Set Reporter INI Window Size 	1200 	700
 
 Non-ASCII Test Teardown
 	Close GUI

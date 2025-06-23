@@ -52,7 +52,7 @@ Add Test In Language
 
 Language Test Init
 	${mgrini}= 	Get Manager INI Location
-	Set INI Window Size 	1200 	600
+	Set Manager INI Window Size 	1200 	600
 	# ${options}= 	Create List 	 	-d 	${agent_dir}
 	Open Agent
 

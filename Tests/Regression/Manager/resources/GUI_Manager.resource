@@ -293,75 +293,11 @@ Set Global Filename And Default Save Path
 	Set Test Variable	${global_path}	${location}
 
 	Set Test Variable 	$file_name 	${global_name}
-	IF  '${optional_path}' != '${None}'
-		Set Test Variable	${global_path}	${optional_path}
-		Change Manager INI Option 	Plan 		scriptdir 	${optional_path}
-	END
+	Change Manager INI Option 	Plan 	scriptdir 		${optional_path}
+	Change Manager INI Option 	Plan 	scenariodir 	${optional_path}
 
 	Log		${global_name}
 	Log		${global_path}
-
-Get Manager Default Save Path
-	${pip_data}=	Get Manager PIP Data
-	${pip_data_list}=	Split String	${pip_data}
-	${i}=	Get Index From List	${pip_data_list}	Location:
-	${location}=	Set Variable	${pip_data_list}[${i + 1}]
-	RETURN	${location}${/}rfswarm_manager${/}
-
-Get Manager INI Location
-	${location}=	Get Manager Default Save Path
-	RETURN	${location}RFSwarmManager.ini
-
-Show Manager INI Data
-	${location}=	Get Manager INI Location
-	Show Log 	${location}
-
-Get Manager INI Data
-	${location}=	Get Manager INI Location
-	${cfg}= 	Evaluate 		configparser.ConfigParser()		modules=configparser
-	Evaluate 		$cfg.read('${location}')
-	${ini_content}= 	Convert To Dictionary 		${cfg}
-	Log				${ini_content}
-	RETURN		${ini_content}
-
-Set INI Window Size
-	[Arguments]		${width}=${None}	${height}=${None}
-	IF	"${width}" != "${None}"
-		Change Manager INI Option 	GUI 		win_width 	${width}
-	END
-	IF	"${height}" != "${None}"
-		Change Manager INI Option 	GUI 		win_height 	${height}
-	END
-
-Change Manager INI Option
-	[Arguments]		${section} 		${option}		${new_value}
-	${location}=	Get Manager INI Location
-	Change INI Option 	${location} 	${section} 		${option}		${new_value}
-
-Change Manager INI File Settings
-	[Arguments]		${option}	${new_value}
-	Fail 		Deprecated keyword, use: Change Manager INI Option
-
-Get Manager PIP Data
-	Run Process	pip	show	rfswarm-manager		alias=data
-	${pip_data}	Get Process Result	data
-	Should Not Be Empty		${pip_data.stdout}		msg=Manager must be installed with pip
-	Log	${pip_data.stdout}
-	RETURN		${pip_data.stdout}
-
-Get Agent PIP Data
-	Run Process		pip		show	rfswarm-agent		alias=data
-	${pip_data}	Get Process Result	data
-	Should Not Be Empty		${pip_data.stdout}		msg=Agent must be installed with pip
-	Log		${pip_data.stdout}
-	RETURN		${pip_data.stdout}
-
-Get Agent Default Save Path
-	${pip_data}=	Get Agent PIP Data
-	${pip_data_list}=	Split String	${pip_data}
-	${i}=	Get Index From List	${pip_data_list}	Location:
-	${location}=	Set Variable	${pip_data_list}[${i + 1}]
-	RETURN	${location}${/}rfswarm_agent${/}
 
 Create Robot File
 	[Arguments]		${path}=${global_path}	${name}=${global_name}
@@ -372,14 +308,6 @@ Create Robot File
 	Variable Should Exist	${name}	msg="Global file name does not exist or file name is not provided."
 	Create File		${path}${/}${name}	content=${example_robot_content}
 	File Should Exist	${path}${/}${name}
-
-Clear Manager Result Directory
-	[Documentation] 	Clears all files and directories in ${RESULTS_DIR} directory. Use with caution.
-	[Arguments]		${RESULTS_DIR}=${RESULTS_DIR}
-	@{run_result_dirs}=		List Directories In Directory	${RESULTS_DIR}	absolute=${True}
-	FOR  ${dir}  IN  @{run_result_dirs}
-		Remove Directory	${dir}	recursive=${True}
-	END
 
 Change Test Group Settings
 	[Arguments]		${row_settings_data}
@@ -887,7 +815,6 @@ Check That The Scenario File Opens Correctly
 	Log		${scenario_content}
 	Log		${scenario_content_reopened}
 	Should Be Equal		${scenario_content}		${scenario_content_reopened}	msg=Scenario files are not equal!
-
 
 Start New Scenario
 	Click Button	runnew

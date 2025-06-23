@@ -79,7 +79,7 @@ Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #362
 	[Setup]	Run Keywords
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY} 	AND
-	...    Set INI Window Size 	1200 	600
+	...    Set Manager INI Window Size 	1200 	600
 
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#362${/}invalid.rfs
 	${inifile}= 		Normalize Path 	${CURDIR}${/}testdata${/}Issue-#362${/}RFSwarmManager.ini

@@ -17,7 +17,6 @@ Variables 	../report_expected_data.yaml
 ${cmd_reporter} 	rfswarm-reporter
 ${process} 			${None}
 
-# ${IMAGE_DIR} 	${CURDIR}${/}..${/}Images${/}file_method
 ${pyfile} 		${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
 
 *** Keywords ***
@@ -243,59 +242,41 @@ End Process If Still Running
 		Fail 	Had to Terminate Process
 	END
 
-Get Reporter PIP Data
-	Run Process	pip	show	rfswarm-reporter		alias=data
-	${pip_data}	Get Process Result	data
-	Should Not Be Empty		${pip_data.stdout}		msg=Reporter must be installed with pip
-	Log	${pip_data.stdout}
-	RETURN		${pip_data.stdout}
+# Get Reporter INI Data
+# 	${location}=	Get Reporter INI Location
+# 	TRY
+# 		File Should Exist	${location}
+# 		File Should Not Be Empty	${location}
+# 	EXCEPT
+# 		Open GUI
+# 		Close GUI
+# 		File Should Exist	${location}
+# 		File Should Not Be Empty	${location}
+# 	END
+# 	${ini_content}=	Get File	${location}
+# 	Log	${ini_content}
+# 	Should Not Be Empty	${ini_content}
+# 	RETURN	${ini_content}
 
-Get Reporter Default Save Path
-	${pip_data}=	Get Reporter PIP Data
-	${pip_data_list}=	Split String	${pip_data}
-	${i}=	Get Index From List	${pip_data_list}	Location:
-	${location}=	Set Variable	${pip_data_list}[${i + 1}]
-	RETURN	${location}${/}rfswarm_reporter${/}
+# Change Reporter INI File Settings
+# 	[Arguments]		${option}	${new_value}
+# 	${location}=	Get Reporter INI Location
+# 	${ini_content}=		Get Reporter INI Data
+# 	${ini_content_list}=	Split String	${ini_content}
+# 	${option_index}=	Get Index From List		${ini_content_list}		${option}
+# 	Log To Console	${ini_content_list}
 
-Get Reporter INI Location
-	${location}=	Get Reporter Default Save Path
-	RETURN	${location}RFSwarmReporter.ini
+# 	${len}	Get Length	${ini_content_list}
+# 	IF  ${len} > ${option_index + 2}
+# 		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${option_index + 2}]	${new_value}
+# 	ELSE
+# 		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${option_index}] =	${option} = ${new_value}
+# 	END
+# 	Log To Console	${ini_content}
 
-Get Reporter INI Data
-	${location}=	Get Reporter INI Location
-	TRY
-		File Should Exist	${location}
-		File Should Not Be Empty	${location}
-	EXCEPT
-		Open GUI
-		Close GUI
-		File Should Exist	${location}
-		File Should Not Be Empty	${location}
-	END
-	${ini_content}=	Get File	${location}
-	Log	${ini_content}
-	Should Not Be Empty	${ini_content}
-	RETURN	${ini_content}
-
-Change Reporter INI File Settings
-	[Arguments]		${option}	${new_value}
-	${location}=	Get Reporter INI Location
-	${ini_content}=		Get Reporter INI Data
-	${ini_content_list}=	Split String	${ini_content}
-	${option_index}=	Get Index From List		${ini_content_list}		${option}
-	Log To Console	${ini_content_list}
-
-	${len}	Get Length	${ini_content_list}
-	IF  ${len} > ${option_index + 2}
-		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${option_index + 2}]	${new_value}
-	ELSE
-		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${option_index}] =	${option} = ${new_value}
-	END
-	Log To Console	${ini_content}
-
-	Remove File		${location}
-	Log		${ini_content}
-	Append To File	${location}		${ini_content}
+# 	Remove File		${location}
+# 	Log		${ini_content}
+# 	Append To File	${location}		${ini_content}
 
 Save Template File OS DIALOG
 	[Arguments]		${template_name}

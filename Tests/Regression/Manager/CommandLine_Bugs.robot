@@ -299,7 +299,7 @@ Check That the Manager Supports the Missing Scenario File Provided By the -s Arg
 	File Should Not Be Empty 	${inifile}
 	File Should Not Be Empty 	${scenatio_file}
 	Change = new_dir With = ${scenatio_file} In ${inifile}
-	Change Manager INI File Settings 	scenariofile 	${inifile}
+	Change Manager INI Option 	Plan 	scenariofile 	${inifile}
 
 	Run Manager CLI 	${mngr_options}
 	Sleep 	3

@@ -81,8 +81,8 @@ Get Last Screenshot
 #TODO: Chceck if it works
 Resize Window
 	[Arguments]		${x}=0		${y}=0
-	# 											manager_macos_corner_resize
-	${img}=	Set Variable		manager_${PLATFORM}_corner_resize.png
+	${comp}= 		Convert To Lower Case 	${COMPONENT}
+	${img}=	Set Variable		${comp}_${PLATFORM}_corner_resize.png
 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate		${img}
 	@{coordinates2}= 	Create List 	${{${coordinates[0]}+${x}}} 	${{${coordinates[1]}+${y}}}
@@ -91,6 +91,20 @@ Resize Window
 	Move To 	@{coordinates2}
 	# Take A Screenshot
 	Mouse Up
+
+# # # # #
+# INI:  #
+# # # # #
+
+Set ${component_name} INI Window Size
+	[Documentation] 	Pass the: Manager, Reporter or Agent
+	[Arguments]		${width}=${None}	${height}=${None}
+	IF	"${width}" != "${None}"
+		Change ${component_name} INI Option 	GUI 		win_width 	${width}
+	END
+	IF	"${height}" != "${None}"
+		Change ${component_name} INI Option 	GUI 		win_height 	${height}
+	END
 
 # # # # # # #
 # CLICK ... #

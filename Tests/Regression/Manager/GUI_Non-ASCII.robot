@@ -74,7 +74,7 @@ Non-ASCII Suite Teardown
 
 Non-ASCII Test Setup
 	${mgrini}= 	Get Manager INI Location
-	Set INI Window Size 	1200 	600
+	Set Manager INI Window Size 	1200 	600
 
 Non-ASCII Test Teardown
 	Stop Agent

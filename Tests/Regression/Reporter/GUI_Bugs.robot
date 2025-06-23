@@ -210,7 +210,7 @@ Template with Start and End Dates
 	${testresultfolder0}=	Set Variable	${OUTPUT DIR}${/}${templatename}${/}${resultdata0}
 	${testresultfolder1}=	Set Variable	${OUTPUT DIR}${/}${templatename}${/}${resultdata1}
 
-	Change Reporter INI File Settings	templatedir		${templatefolder}
+	Change Reporter INI Option 	Reporter 	templatedir 	${templatefolder}
 	Create Directory		${templatefolder}
 
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
@@ -398,7 +398,7 @@ Open New Template After Selecting a Section That Is Not In the New Template
 	VAR 	${resultdata} 			20230320_185055_demo
 	VAR 	${resultfolder} 		${basefolder}${/}${resultdata}
 
-	Change Reporter INI File Settings 	templatedir 	${basefolder}
+	Change Reporter INI Option 	Reporter 	templatedir 	${basefolder}
 
 	Open GUI 	-d 	${resultfolder} 	-t 	${first_template}
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=60
