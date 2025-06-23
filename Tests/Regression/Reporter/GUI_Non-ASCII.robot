@@ -1,7 +1,6 @@
 *** Settings ***
 Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #97 	Languages
 
-Resource 	../Common/GUI_Common.resource
 Resource 	resources/GUI_Reporter.resource
 
 Variables 	${CURDIR}${/}testdata${/}Issue-#97${/}lang_samples.yaml
@@ -54,7 +53,7 @@ Test Non-ASCII Characters
 	Set Text Value To Right Of 	Heading 	${note_sample_heading}
 	Click Label With Vertical Offset 	Heading 	90
 	Evaluate 	clipboard.copy("${sample}") 	modules=clipboard
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.v
 	ELSE
 		Press Combination	KEY.ctrl		KEY.v

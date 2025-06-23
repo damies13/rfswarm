@@ -15,8 +15,8 @@ Library 	get_ip_address.py
 
 *** Variables ***
 ${COMPONENT} 		${None} 	# currently used rfswarm component (app)
-${platform} 		${None}
-${results_dir} 		${None}
+${PLATFORM} 		${None}
+${RESULTS_DIR} 		${None}
 
 *** Keywords ***
 Basic Suite Initialization ${component}
@@ -24,16 +24,17 @@ Basic Suite Initialization ${component}
 	Set Suite Variable 	${COMPONENT} 	${component}
 	Set Platform
 
-	Set Suite Variable 	${results_dir} 		${OUTPUT DIR}${/}results
-	${status}= 	Run Keyword And Return Status 	Directory Should Exist 	${results_dir}
+	Set Suite Variable 	${RESULTS_DIR} 		${OUTPUT DIR}${/}results
+	${status}= 	Run Keyword And Return Status 	Directory Should Exist 	${RESULTS_DIR}
 	IF 	not ${status}
-		Create Directory 	${results_dir}
+		Create Directory 	${RESULTS_DIR}
 	END
 
 	Log 	\t[ === Basic suite configuration has been initiated for ${COMPONENT} === ] 	console=True
 	Log 	component = ${COMPONENT} 	console=True
-	Log 	platform = ${platform} 	console=True
-	Log 	results dir = ${results_dir}\n\n\n 	console=True
+	Log 	platform = ${PLATFORM} 	console=True
+	Log 	results dir = ${RESULTS_DIR} 	console=True
+	Log 	------------------------------------------------------------------------------\n\n\n 	console=True
 
 Set Platform
 	Set Platform By Python
@@ -43,13 +44,13 @@ Set Platform By Python
 	${system}= 		Evaluate 	platform.system() 	modules=platform
 
 	IF 	"${system}" == "Darwin"
-		Set Suite Variable    ${platform}    macos
+		Set Suite Variable    ${PLATFORM}    macos
 	END
 	IF 	"${system}" == "Windows"
-		Set Suite Variable    ${platform}    windows
+		Set Suite Variable    ${PLATFORM}    windows
 	END
 	IF 	"${system}" == "Linux"
-		Set Suite Variable    ${platform}    ubuntu
+		Set Suite Variable    ${PLATFORM}    ubuntu
 	END
 
 Set Platform By Tag
@@ -61,13 +62,13 @@ Set Platform By Tag
 		${ostag}= 	Set Variable 	${OPTIONS}[include][0]
 
 		IF 	"${ostag}" == "macos-latest"
-			Set Suite Variable    ${platform}    macos
+			Set Suite Variable    ${PLATFORM}    macos
 		END
 		IF 	"${ostag}" == "windows-latest"
-			Set Suite Variable    ${platform}    windows
+			Set Suite Variable    ${PLATFORM}    windows
 		END
 		IF 	"${ostag}" == "ubuntu-latest"
-			Set Suite Variable    ${platform}    ubuntu
+			Set Suite Variable    ${PLATFORM}    ubuntu
 		END
 	END
 
@@ -157,7 +158,7 @@ Diff Lists
 
 Resync Date With Time Server
 	[Arguments] 	${old_date}
-	IF 	"${platform}" == "macos"
+	IF 	"${PLATFORM}" == "macos"
 		${result}= 	Run Process 	sudo  systemsetup  -setusingnetworktime  on
 		Log 	${result.stdout}
 		Log 	${result.stderr}
@@ -170,7 +171,7 @@ Resync Date With Time Server
 		Log 	Back to original date: ${result.stdout} 	console=${True}
 		Log 	${result.stderr}
 	END
-	IF 	"${platform}" == "windows"
+	IF 	"${PLATFORM}" == "windows"
 		${result}= 	Run Process 	powershell.exe  w32tm  /resync 	shell=${True}
 		Log 	${result.stdout}
 		Log 	${result.stderr}
@@ -180,7 +181,7 @@ Resync Date With Time Server
 		Log 	Back to original date: ${result.stdout} 	console=${True}
 		Log 	${result.stderr}
 	END
-	IF 	"${platform}" == "ubuntu"
+	IF 	"${PLATFORM}" == "ubuntu"
 		${result}= 	Run Process 	sudo  hwclock  --systohc
 		Log 	${result.stdout}
 		Log 	${result.stderr}
@@ -199,7 +200,7 @@ Resync Date With Time Server
 
 Set Date Manually
 	[Arguments] 	${input_date}
-	IF 	"${platform}" == "macos"
+	IF 	"${PLATFORM}" == "macos"
 		${result}= 	Run Process 	sudo  date  -f  '%Y-%m-%d'  '${input_date}'
 		Log 	${result.stdout}
 		Log 	${result.stderr}
@@ -209,7 +210,7 @@ Set Date Manually
 		Log 	New date: ${result.stdout} 	console=${True}
 		Log 	${result.stderr}
 	END
-	IF 	"${platform}" == "windows"
+	IF 	"${PLATFORM}" == "windows"
 		${result}= 	Run Process 	powershell.exe  Set-Date  -Date  (Get-Date '${input_date}' -Format 'yyyy-MM-dd') 	shell=${True}
 		Log 	${result.stdout}
 		Log 	${result.stderr}
@@ -219,7 +220,7 @@ Set Date Manually
 		Log 	New date: ${result.stdout} 	console=${True}
 		Log 	${result.stderr}
 	END
-	IF 	"${platform}" == "ubuntu"
+	IF 	"${PLATFORM}" == "ubuntu"
 		${result}= 	Run Process 	sudo  timedatectl  set-ntp  false
 		Log 	${result.stdout}
 		Log 	${result.stderr}
@@ -348,8 +349,8 @@ Get Relative Paths
 # # # # # # #
 
 Find Result DB
-	[Arguments] 	${directory}=${results_dir} 	${result_pattern}=*_*
-	# ${fols}= 	List Directory 	${results_dir}
+	[Arguments] 	${directory}=${RESULTS_DIR} 	${result_pattern}=*_*
+	# ${fols}= 	List Directory 	${RESULTS_DIR}
 	# Log to console 	${fols}
 	${fols}= 	List Directory 	${directory} 	${result_pattern} 	absolute=True
 	Log to console 	${fols}
@@ -526,7 +527,7 @@ Check Icon Install
 	${comp} 	Convert To Lower Case 	${COMPONENT}
 	VAR 	${projname}= 		rfswarm-${comp} 		scope=TEST
 	VAR 	${dispname}= 		RFSwarm ${COMPONENT} 	scope=TEST
-	Run Keyword 	Check Icon Install For ${platform}
+	Run Keyword 	Check Icon Install For ${PLATFORM}
 
 Check Icon Install For Macos
 	${Status}= 	Run Keyword And Return Status 	Directory Should Exist 	%{HOME}${/}Applications${/}${projname}.app

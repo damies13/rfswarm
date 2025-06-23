@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation 	This resource file contains keywords for Agent command line only.
 
-Resource 	../../Common/Common.resource
+Resource 	../../../Common/Common.resource
 
 Library 	HttpCtrl.Server
 
@@ -34,8 +34,8 @@ Run Manager CLI
 		${options}= 	Create List
 	END
 	IF  '-d' not in ${options}
-		Create Directory 	${results_dir}
-		Append To List 	${options} 	-d 	${results_dir}
+		Create Directory 	${RESULTS_DIR}
+		Append To List 	${options} 	-d 	${RESULTS_DIR}
 	END
 	Log to console 	${\n}\${options}: ${options}
 	# ${process}= 	Start Process 	python3 	${pyfile_manager}  @{options}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
@@ -53,7 +53,7 @@ Stop Manager
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
 		Sleep	3s
-		IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
+		IF  '${PLATFORM}' == 'windows'	# Send Signal To Process keyword does not work on Windows
 			${result}= 	Terminate Process		${process_manager}
 		ELSE
 			Send Signal To Process 	SIGINT 	${process_manager}
@@ -73,7 +73,7 @@ Stop Agent
 	${running}= 	Is Process Running 	${process_agent}
 	IF 	${running}
 		Sleep	3s
-		IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
+		IF  '${PLATFORM}' == 'windows'	# Send Signal To Process keyword does not work on Windows
 			${result} = 	Terminate Process		${process_agent}
 		ELSE
 			Send Signal To Process 	SIGINT 	${process_agent}

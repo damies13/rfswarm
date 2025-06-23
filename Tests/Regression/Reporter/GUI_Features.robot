@@ -1,5 +1,4 @@
 *** Settings ***
-Resource 	../Common/GUI_Common.resource
 Resource 	resources/GUI_Reporter.resource
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Reporter
@@ -89,10 +88,10 @@ Whole report time range
 	# check the graph as expected
 	# Take A Screenshot
 	Set Confidence		0.7
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_robots1_py3.9.png
+	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		Locate 	reporter_${PLATFORM}_graph_robots1_py3.9.png
 	ELSE
-		Locate 	reporter_${platform}_graph_robots1.png
+		Locate 	reporter_${PLATFORM}_graph_robots1.png
 	END
 	Set Confidence		0.9
 
@@ -147,10 +146,10 @@ Whole report time range
 
 	# check the graph as expected
 	Set Confidence		0.7
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_robots2_py3.9.png
+	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		Locate 	reporter_${PLATFORM}_graph_robots2_py3.9.png
 	ELSE
-		Locate 	reporter_${platform}_graph_robots2.png
+		Locate 	reporter_${PLATFORM}_graph_robots2.png
 	END
 	Set Confidence		0.9
 
@@ -183,7 +182,7 @@ Verify if reporter handle missing test result file
 	Click	#double click needed. Maybe delete after eel module implemetation
 
 	${status}=	Run Keyword And Return Status
-	...    Wait For	reporter_${platform}_option_datatable.png 	timeout=${30}
+	...    Wait For	reporter_${PLATFORM}_option_datatable.png 	timeout=${30}
 	Run Keyword If	not ${status}	Fail	msg=Reporter is not responding!
 
 	[Teardown]	Run Keywords
@@ -810,10 +809,10 @@ Verify Plan Graph - No Total
 	${pvinfo}= 	Get Python Version Info
 
 	Set Confidence		0.7
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_plannototal_py3.9.png
+	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		Locate 	reporter_${PLATFORM}_graph_plannototal_py3.9.png
 	ELSE
-		Locate 	reporter_${platform}_graph_plannototal.png
+		Locate 	reporter_${PLATFORM}_graph_plannototal.png
 	END
 	Set Confidence		0.9
 
@@ -881,10 +880,10 @@ Verify Plan Graph - With Total
 	${pvinfo}= 	Get Python Version Info
 
 	Set Confidence		0.7
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_plantotal_py3.9.png
+	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		Locate 	reporter_${PLATFORM}_graph_plantotal_py3.9.png
 	ELSE
-		Locate 	reporter_${platform}_graph_plantotal.png
+		Locate 	reporter_${PLATFORM}_graph_plantotal.png
 	END
 	Set Confidence		0.9
 
@@ -948,7 +947,7 @@ Verify Plan Table
 	Take A Screenshot
 
 	Set Confidence		0.7
-	Locate 	reporter_${platform}_table_plan.png
+	Locate 	reporter_${PLATFORM}_table_plan.png
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
@@ -991,11 +990,11 @@ Change Line Colour
 	Click Tab 	 Preview
 
 	${pvinfo}= 	Get Python Version Info
-	# Locate 	reporter_${platform}_graph_plancolourb4.png
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_plancolourb4_py3.9.png
+	# Locate 	reporter_${PLATFORM}_graph_plancolourb4.png
+	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		Locate 	reporter_${PLATFORM}_graph_plancolourb4_py3.9.png
 	ELSE
-		Locate 	reporter_${platform}_graph_plancolourb4.png
+		Locate 	reporter_${PLATFORM}_graph_plancolourb4.png
 	END
 
 	Click Button 		ColourSales
@@ -1012,14 +1011,14 @@ Change Line Colour
 
 	Take A Screenshot
 
-	# Locate 	reporter_${platform}_graph_plancolourafter.png
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_plancolourafter_py3.9.png
+	# Locate 	reporter_${PLATFORM}_graph_plancolourafter.png
+	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		Locate 	reporter_${PLATFORM}_graph_plancolourafter_py3.9.png
 	ELSE
-		Locate 	reporter_${platform}_graph_plancolourafter.png
+		Locate 	reporter_${PLATFORM}_graph_plancolourafter.png
 	END
 	# bring window to foreground so teardown works	reporter_ubuntu_status_previewloaded
-	Click Image 	reporter_${platform}_status_previewloaded.png
+	Click Image 	reporter_${PLATFORM}_status_previewloaded.png
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
@@ -1036,7 +1035,7 @@ Change Font
 	VAR 	${template_dir} 	${test_data}${/}font_test.template
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
-	IF 	"${platform}" == "ubuntu" # impact font is not available in ubuntu
+	IF 	"${PLATFORM}" == "ubuntu" # impact font is not available in ubuntu
 		VAR 	${font_name} 	Standard Symbols PS
 		Change Impact With ${font_name} In ${template_dir}
 		${test} 	Get File 	${template_dir}
@@ -1052,45 +1051,45 @@ Change Font
 	Click Tab 	Preview
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${platform}_customfont_title.png
+	VAR 	${img} 	reporter_${PLATFORM}_customfont_title.png
 	Wait For 	${img} 	 timeout=30
 	Take A Screenshot
 
 	Click Section 	Note
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${platform}_customfont_heading.png
+	VAR 	${img} 	reporter_${PLATFORM}_customfont_heading.png
 	Wait For 	${img} 	 timeout=30
-	VAR 	${img} 	reporter_${platform}_customfont_note.png
+	VAR 	${img} 	reporter_${PLATFORM}_customfont_note.png
 	Wait For 	${img} 	 timeout=30
 
 	Click Section 	Table_of_Contents
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${platform}_customfont_contents.png
+	VAR 	${img} 	reporter_${PLATFORM}_customfont_contents.png
 	Wait For 	${img} 	 timeout=30
 
 	Click Section	TestResultSummary
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${platform}_customfont_tabledata.png
+	VAR 	${img} 	reporter_${PLATFORM}_customfont_tabledata.png
 	Wait For 	${img} 	 timeout=30
 
 	Click Section 	DataGraph
 	Sleep 	1
 	Take A Screenshot
 	${pvinfo}= 	Get Python Version Info
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		VAR 	${img} 	reporter_${platform}_customfont_graph_py3.9.png
+	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		VAR 	${img} 	reporter_${PLATFORM}_customfont_graph_py3.9.png
 	ELSE
-		VAR 	${img} 	reporter_${platform}_customfont_graph.png
+		VAR 	${img} 	reporter_${PLATFORM}_customfont_graph.png
 	END
 	Wait For 	${img} 	 timeout=30
 
 	Click Section 	Errors
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${platform}_customfont_errors.png
+	VAR 	${img} 	reporter_${PLATFORM}_customfont_errors.png
 	Wait For 	${img} 	 timeout=30
 
 
@@ -1578,7 +1577,7 @@ Check Reporter with JSON Configuration File
 	Take A Screenshot
 
 	# Set Confidence		0.7
-	Locate 	reporter_${platform}_windowsize_json.png
+	Locate 	reporter_${PLATFORM}_windowsize_json.png
 	# Set Confidence		0.9
 
 	[Teardown]	Run Keywords
@@ -1603,7 +1602,7 @@ Check Reporter with Yaml Configuration File
 	Take A Screenshot
 
 	# Set Confidence		0.7
-	Locate 	reporter_${platform}_windowsize_yaml.png
+	Locate 	reporter_${PLATFORM}_windowsize_yaml.png
 	# Set Confidence		0.9
 
 	[Teardown]	Run Keywords
@@ -1628,7 +1627,7 @@ Check Reporter with yml Configuration File
 	Take A Screenshot
 
 	# Set Confidence		0.7
-	Locate 	reporter_${platform}_windowsize_yml.png
+	Locate 	reporter_${PLATFORM}_windowsize_yml.png
 	# Set Confidence		0.9
 
 	[Teardown]	Run Keywords

@@ -1,5 +1,4 @@
 *** Settings ***
-Resource 	../Common/Common.resource
 Resource 	resources/CommandLine_Reporter.resource
 
 Suite Setup 	Run Keywords

@@ -1,13 +1,12 @@
 *** Settings ***
 Test Tags       Basic 	GUI
 
-Resource 	../Common/GUI_Common.resource
 Resource 	resources/GUI_Manager.resource
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Manager
 
 *** Variables ***
-${default_image_timeout} 	${120}
+${DEFAULT_IMAGE_TIMEOUT} 	${120}
 ${cmd_agent} 		rfswarm-agent
 ${cmd_manager} 	rfswarm-manager
 ${IMAGE_DIR} 	${CURDIR}/Images/file_method
@@ -21,8 +20,6 @@ Open GUI
 	Press Combination 	Key.esc
 	Wiggle Mouse
 
-	Set Suite Variable    ${platform}    macos
-	Set Confidence		0.9
 	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	${process}= 	Start Process 	${cmd_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}Open_GUI_stdout.txt 	stderr=${OUTPUT DIR}${/}Open_GUI_stderr.txt
 	Set Test Variable 	$process 	${process}
@@ -31,8 +28,8 @@ Open GUI
 
 	Handle Donation Reminder
 
-	${img}=	Set Variable		manager_${platform}_tab_agents.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		manager_${PLATFORM}_tab_agents.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 
 Open GUI
@@ -41,8 +38,6 @@ Open GUI
 	Press Combination 	Key.esc
 	Wiggle Mouse
 
-	Set Suite Variable    ${platform}    windows
-	Set Confidence		0.9
 	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	${process}= 	Start Process 	${cmd_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}Open_GUI_stdout.txt 	stderr=${OUTPUT DIR}${/}Open_GUI_stderr.txt
 	Set Test Variable 	$process 	${process}
@@ -51,8 +46,8 @@ Open GUI
 
 	Handle Donation Reminder
 
-	${img}=	Set Variable		manager_${platform}_tab_agents.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		manager_${PLATFORM}_tab_agents.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 
 Open GUI
@@ -61,8 +56,6 @@ Open GUI
 	Press Combination 	Key.esc
 	Wiggle Mouse
 
-	Set Suite Variable    ${platform}    ubuntu
-	Set Confidence		0.9
 	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	${process}= 	Start Process 	${cmd_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}Open_GUI_stdout.txt 	stderr=${OUTPUT DIR}${/}Open_GUI_stderr.txt
 	Set Test Variable 	$process 	${process}
@@ -71,8 +64,8 @@ Open GUI
 
 	Handle Donation Reminder
 
-	${img}=	Set Variable		manager_${platform}_tab_agents.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		manager_${PLATFORM}_tab_agents.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 
 Select Monitoring Tab
@@ -119,8 +112,8 @@ Close GUI
 	[Tags]	macos-latest
 	# Press Combination 	Key.esc
 	# Press Combination 	q 	Key.command
-	# Click Image		manager_${platform}_menu_python3.png
-	Click Image		manager_${platform}_button_closewindow.png
+	# Click Image		manager_${PLATFORM}_menu_python3.png
+	Click Image		manager_${PLATFORM}_button_closewindow.png
 	Take A Screenshot
 	${result}= 	Wait For Process 	${process} 	timeout=60
 	${running}= 	Is Process Running 	${process}
@@ -144,7 +137,7 @@ Close GUI
 Click Tab
 	[Arguments]		${tabname}
 	${tabnamel}= 	Convert To Lower Case 	${tabname}
-	${img}=	Set Variable		manager_${platform}_tab_${tabnamel}.png
+	${img}=	Set Variable		manager_${PLATFORM}_tab_${tabnamel}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=300

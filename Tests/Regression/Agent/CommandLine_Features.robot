@@ -1,5 +1,4 @@
 *** Settings ***
-Resource 	../Common/Common.resource
 Resource 	resources/CommandLine_Agent.resource
 
 Suite Setup 	Common.Basic Suite Initialization Agent
@@ -156,7 +155,7 @@ Agent Command Line ROBOT -r
 	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 
-	@{test_result}= 	List Directories In Directory	${results_dir}	absolute=${True}	pattern=*_Issue-#14
+	@{test_result}= 	List Directories In Directory	${RESULTS_DIR}	absolute=${True}	pattern=*_Issue-#14
 	Log To Console		Result dir: ${test_result}
 	Should Not Be Empty 	${test_result}
 	@{result_content}=	List Directories In Directory	${test_result}[0]

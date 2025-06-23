@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation 	This resource file contains keywords for Reporter GUI only.
 
-Resource 	../../Common/GUI_Common.resource
+Resource 	../../../Common/GUI_Common.resource
 
 Library 	ArchiveLibrary
 Library 	DocTest.VisualTest
@@ -26,7 +26,7 @@ Create New Section
 
 	Click Button 			AddSection
 	Take A Screenshot
-	${img}=	Set Variable		reporter_${platform}_label_sectionname.png
+	${img}=	Set Variable		reporter_${PLATFORM}_label_sectionname.png
 	Wait For		${img} 	 timeout=300
 	Take A Screenshot
 
@@ -67,7 +67,7 @@ Create New Section
 Click Section
 	[Arguments]		${sectname}
 	${sectnamel}= 	Convert To Lower Case 	${sectname}
-	${img}=	Set Variable		reporter_${platform}_section_${sectnamel}.png
+	${img}=	Set Variable		reporter_${PLATFORM}_section_${sectnamel}.png
 	Log		${CURDIR}
  	Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=300
@@ -79,8 +79,8 @@ Click Section
 Select Field With Label
 	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
 	${labell}= 	Convert To Lower Case 	${label}
-	${img}=	Set Variable		reporter_${platform}_label_${labell}.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		reporter_${PLATFORM}_label_${labell}.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	${imgsize}= 	Get Image Size 	${IMAGE_DIR}${/}${img}
 	Log		${imgsize}
 	${offsetx}= 	Evaluate 	int(${imgsize}[0]/2)+${offsetx}
@@ -95,13 +95,13 @@ Select Field With Label
 	Move To 	${coordinates}
 	Click
 	Sleep 	0.1
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# Take A Screenshot
 
 Wait For Status
 	[Arguments]		${status}	${timeout}=${1800}
 	${statusl}= 	Convert To Lower Case 	${status}
-	${img}=	Set Variable		reporter_${platform}_status_${statusl}.png
+	${img}=	Set Variable		reporter_${PLATFORM}_status_${statusl}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
 	Wiggle Mouse
@@ -119,13 +119,13 @@ Open GUI
 	Press Combination 	Key.esc
 	Wiggle Mouse
 
-	${keyword}= 	Set Variable 	Open GUI ${platform}
+	${keyword}= 	Set Variable 	Open GUI ${PLATFORM}
 	Run Keyword 	${keyword} 	@{appargs}
 	Handle Donation Reminder
 
 Open GUI windows
 	[Arguments]		@{appargs}
-	# Set Suite Variable    ${platform}    windows
+	# Set Suite Variable    ${PLATFORM}    windows
 	${args}= 	Evaluate 	" \t".join(@{appargs})
 	Set Confidence		0.9
 	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
@@ -142,7 +142,7 @@ Open GUI windows
 
 Open GUI ubuntu
 	[Arguments]		@{appargs}
-	Set Suite Variable    ${platform}    ubuntu
+	Set Suite Variable    ${PLATFORM}    ubuntu
 	Set Confidence		0.9
 	# ${process}= 	Start Process 	python3 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout_reporter.txt 	stderr=${OUTPUT DIR}${/}stderr_reporter.txt
@@ -154,7 +154,7 @@ Open GUI ubuntu
 
 Open GUI macos
 	[Arguments]		@{appargs}
-	Set Suite Variable    ${platform}    macos
+	Set Suite Variable    ${PLATFORM}    macos
 	Set Confidence		0.9
 	# ${process}= 	Start Process 	python3 	${pyfile} 	-g 	5 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout_reporter.txt 	stderr=${OUTPUT DIR}${/}stderr_reporter.txt
@@ -164,7 +164,7 @@ Open GUI macos
 	# Take A Screenshot
 
 Close GUI
-	${keyword}= 	Set Variable 	Close GUI ${platform}
+	${keyword}= 	Set Variable 	Close GUI ${PLATFORM}
 	IF 	${process}
 		${running}= 	Is Process Running 	${process}
 		IF 	${running}
@@ -189,21 +189,21 @@ Check Result
 	Should Be Equal As Integers 	${result.rc} 	0
 
 Close GUI windows
-	@{coordinates}= 	Locate 	reporter_${platform}_menu_results.png
+	@{coordinates}= 	Locate 	reporter_${PLATFORM}_menu_results.png
 	Log 	${coordinates}
-	@{coordinates}= 	Locate 	reporter_${platform}_button_closewindow.png
+	@{coordinates}= 	Locate 	reporter_${PLATFORM}_button_closewindow.png
 	Log 	${coordinates}
 
-	Run Keyword And Ignore Error 	Click Image 	reporter_${platform}_menu_results.png
+	Run Keyword And Ignore Error 	Click Image 	reporter_${PLATFORM}_menu_results.png
 	Sleep 	0.1
 	Press Key.esc 3 Times
 	Sleep 	2
 	Press Combination 	Key.ctrl 	x
 	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
-	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
+	# Run Keyword And Ignore Error 	Click Image		reporter_${PLATFORM}_status_previewloaded.png
 
-	# Click Image		reporter_${platform}_button_closewindow.png
-	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
+	# Click Image		reporter_${PLATFORM}_button_closewindow.png
+	# Run Keyword And Ignore Error 	Click Image		reporter_${PLATFORM}_button_closewindow.png
 	Take A Screenshot
 	Sleep 	0.5
 	End Process If Still Running
@@ -212,9 +212,9 @@ Close GUI ubuntu
 	# Press Combination 	Key.esc
 	# Press Combination 	x 	Key.ctrl
 	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
-	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
-	Click Image		reporter_${platform}_button_closewindow.png
-	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
+	# Run Keyword And Ignore Error 	Click Image		reporter_${PLATFORM}_status_previewloaded.png
+	Click Image		reporter_${PLATFORM}_button_closewindow.png
+	Run Keyword And Ignore Error 	Click Image		reporter_${PLATFORM}_button_closewindow.png
 	Take A Screenshot
 	Sleep 	0.5
 	End Process If Still Running
@@ -222,11 +222,11 @@ Close GUI ubuntu
 Close GUI macos
 	# Press Combination 	Key.esc
 	# Press Combination 	q 	Key.command
-	# Click Image		reporter_${platform}_menu_python3.png
+	# Click Image		reporter_${PLATFORM}_menu_python3.png
 	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
-	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
-	Click Image		reporter_${platform}_button_closewindow.png
-	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
+	# Run Keyword And Ignore Error 	Click Image		reporter_${PLATFORM}_status_previewloaded.png
+	Click Image		reporter_${PLATFORM}_button_closewindow.png
+	Run Keyword And Ignore Error 	Click Image		reporter_${PLATFORM}_button_closewindow.png
 	Take A Screenshot
 	Sleep 	0.5
 	End Process If Still Running
@@ -316,7 +316,7 @@ Open Template File OS DIALOG
 Navigate to and check Desktop Icon
 	VAR 	${projname}= 		rfswarm-manager 		scope=TEST
 	VAR 	${dispname}= 		RFSwarm Manager 		scope=TEST
-	Run Keyword 	Navigate to and check Desktop Icon For ${platform}
+	Run Keyword 	Navigate to and check Desktop Icon For ${PLATFORM}
 
 Navigate to and check Desktop Icon For MacOS
 
@@ -325,30 +325,30 @@ Navigate to and check Desktop Icon For MacOS
 	Take A Screenshot
 
 	# open go menu
-	${img}=	Set Variable		${platform}_finder_menu_go.png
+	${img}=	Set Variable		${PLATFORM}_finder_menu_go.png
 	Click Image		${img}
 	# Sleep 	0.3
 	# Take A Screenshot
 
 	# select Go to Folder from Go menu
-	${img}=	Set Variable		${platform}_finder_menu_gotofolder.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_finder_menu_gotofolder.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Click Image		${img}
 	# Sleep 	0.3
 	# Take A Screenshot
 
 
 	# # open finder
-	# ${img}=	Set Variable		${platform}_finder.png
-	# Wait For 	${img} 	 timeout=${default_image_timeout}
+	# ${img}=	Set Variable		${PLATFORM}_finder.png
+	# Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# @{coordinates}= 	Locate		${img}
 	# Click Image		${img}
-	# ${img}=	Set Variable		${platform}_finder_toolbar.png
-	# Wait For 	${img} 	 timeout=${default_image_timeout}
+	# ${img}=	Set Variable		${PLATFORM}_finder_toolbar.png
+	# Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# Take A Screenshot
 	#
 	# # un-maximise finder if maximised
-	# ${img}=	Set Variable		${platform}_finder.png
+	# ${img}=	Set Variable		${PLATFORM}_finder.png
 	# ${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=1
 	# IF 	not ${passed}
 	# 	Take A Screenshot
@@ -357,7 +357,7 @@ Navigate to and check Desktop Icon For MacOS
 	# Sleep 	0.3
 	# Take A Screenshot
 	#
-	# ${img}=	Set Variable		${platform}_finder_toolbar.png
+	# ${img}=	Set Variable		${PLATFORM}_finder_toolbar.png
 	# Click Image 	${img}
 	# Sleep 	0.3
 	# Take A Screenshot
@@ -378,7 +378,7 @@ Navigate to and check Desktop Icon For MacOS
 	# Click To The Below Of 	${top_corner} 	${20}
 
 	Take A Screenshot
-	${img}=	Set Variable		${platform}_finder_gotofolder.png
+	${img}=	Set Variable		${PLATFORM}_finder_gotofolder.png
 	${status}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=${20}
 	IF  ${status}
 		Run Keyword And Ignore Error 	Click Image		${img}
@@ -389,33 +389,33 @@ Navigate to and check Desktop Icon For MacOS
 
 	# Sleep 	0.3
 	# Take A Screenshot
-	${img}=	Set Variable		${platform}_finder_gotoapplications.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_finder_gotoapplications.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# Take A Screenshot
 
 	Press Combination 	KEY.enter
 	# Sleep	0.5
 	# Take A Screenshot
-	${img}=	Set Variable		${platform}_finder_facetime.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_finder_facetime.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# Take A Screenshot
 
 	# Filter/Search /Applications?
 	Type 	RFSwarm
 	# Sleep 	0.3
-	${img}=	Set Variable		${platform}_finder_rfswarm_reporter.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_finder_rfswarm_reporter.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 
 	# Open Launchpad (F4?)
 	# Press Combination   key.f4
-	${img}=	Set Variable		${platform}_launchpad.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_launchpad.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	# Sleep 	1
-	${img}=	Set Variable		${platform}_launchpad_search.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_launchpad_search.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# Take A Screenshot
 
 	# Search Launchpad
@@ -425,8 +425,8 @@ Navigate to and check Desktop Icon For MacOS
 
 	# Check for Icon
 	# macos_launchpad_rfswarm_reporter.png
-	${img}=	Set Variable		${platform}_launchpad_rfswarm_reporter.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_launchpad_rfswarm_reporter.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# Take A Screenshot
 
 	Press Combination 	KEY.ESC
@@ -437,14 +437,14 @@ Navigate to and check Desktop Icon For Windows
 	Take A Screenshot
 	# Open Start Menu
 	Sleep 	0.5
-	${img}=	Set Variable		${platform}_start_menu.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_start_menu.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Take A Screenshot
 
-	${img}=	Set Variable		${platform}_start_menu_rfswarm_reporter.png
-	Run Keyword And Ignore Error 	Wait For 	${img} 	 timeout=${default_image_timeout} 	# temp. fix
+	${img}=	Set Variable		${PLATFORM}_start_menu_rfswarm_reporter.png
+	Run Keyword And Ignore Error 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT} 	# temp. fix
 
 	# Navigate Start Menu
 	Type 	RFSwarm
@@ -452,8 +452,8 @@ Navigate to and check Desktop Icon For Windows
 	Take A Screenshot
 
 	# Check for Icon
-	${img}=	Set Variable		${platform}_search_rfswarm_reporter.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_search_rfswarm_reporter.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 
 	Press Combination 	KEY.ESC
 
@@ -461,8 +461,8 @@ Navigate to and check Desktop Icon For Ubuntu
 
 	Take A Screenshot
 	# Open Menu
-	${img}=	Set Variable		${platform}_lxqt_menu.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_lxqt_menu.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	# Move To 	${coordinates}
@@ -472,16 +472,16 @@ Navigate to and check Desktop Icon For Ubuntu
 
 	# Navigate Menu
 	# lxqt_programming_menu.png
-	${img}=	Set Variable		${platform}_lxqt_programming_menu.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_lxqt_programming_menu.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Click Image		${img}
 	Sleep 	0.5
 	Take A Screenshot
 
 	# Check for Icon
 	# ubuntu_lxqt_rfswarm_reporter_menu.png
-	${img}=	Set Variable		${platform}_lxqt_rfswarm_reporter_menu.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_lxqt_rfswarm_reporter_menu.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 
 	Press Combination 	KEY.ESC
 
@@ -1171,7 +1171,7 @@ Choose Colour With OS Colour Picker
 	...    Colour should be in rrbbgg hex values
 	[Arguments] 	${hex_colour}
 	Log    Hex Colour: ${hex_colour}
-	Run Keyword 	Choose Colour With ${platform} Colour Picker 		${hex_colour}
+	Run Keyword 	Choose Colour With ${PLATFORM} Colour Picker 		${hex_colour}
 
 Choose Colour With macos Colour Picker
 	[Arguments] 	${hex_colour}
@@ -1270,7 +1270,7 @@ Choose Colour With ubuntu Colour Picker
 	# Sleep 	1
 	# Take A Screenshot
 
-	# Locate 	reporter_${platform}_dlg_aaa.png
+	# Locate 	reporter_${PLATFORM}_dlg_aaa.png
 
 Release Fn Key
 

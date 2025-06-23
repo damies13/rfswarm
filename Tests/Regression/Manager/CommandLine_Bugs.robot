@@ -1,7 +1,6 @@
 *** Settings ***
 Test Tags       Bugs 	CommandLine
 
-Resource 	../Common/Common.resource
 Resource 	resources/CommandLine_Manager.resource
 
 Suite Setup 	Common.Basic Suite Initialization Manager
@@ -23,7 +22,7 @@ Next Day For Scheduled Start Is In the Next Month
 	Sleep 	10
 	# ${future_time}=	Subtract Time From Date 	${current_time} 	120 	date_format=%H:%M:%S 	result_format=%H:%M:%S
 	VAR 	${future_time} 		00:00:00
-	VAR 	@{mngr_options} 	-g 	6 	-n 	-d 	${results_dir} 	-t 	${future_time}  -a  0
+	VAR 	@{mngr_options} 	-g 	6 	-n 	-d 	${RESULTS_DIR} 	-t 	${future_time}  -a  0
 	Run Manager CLI 	${mngr_options}
 	Sleep 	10s
 	Stop Manager
@@ -55,7 +54,7 @@ Robot files with same name but different folders
 	Log to console 	${CURDIR}
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#184${/}Issue-#184.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 	Stop Agent
@@ -117,7 +116,7 @@ Circular Reference Resource Files
 	Log to console 	${CURDIR}
 	${scenariofile}= 	Normalize Path 	${testdata}${/}scenario.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${results_dir}
+	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${RESULTS_DIR}
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 	Stop Agent
@@ -178,7 +177,7 @@ Circular Reference Resource Files 2
 	${scenariofile}= 	Normalize Path 	${testdata}${/}scenario.rfs
 	Log to console 	${scenariofile}
 	@{time}= 	Get Time 	hour min sec 	NOW + 2min
-	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${results_dir} 	-t 	${time[0]}:${time[1]}:${time[2]}
+	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${RESULTS_DIR} 	-t 	${time[0]}:${time[1]}:${time[2]}
 	Run Manager CLI 	${mngr_options}
 	Wait For Manager
 	Stop Agent
@@ -247,7 +246,7 @@ Lots Of Resource Files
 	${time}= 	Get Time 	hour min sec 		NOW ${offset}
 	Log 	Now ${offset} ${time} 		console=true
 
-	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${results_dir} 	-t 	${time}[0]:${time}[1]
+	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${RESULTS_DIR} 	-t 	${time}[0]:${time}[1]
 	Run Manager CLI 	${mngr_options}
 	# It can take a while for the agent to download 3500+ files
 	Wait For Manager 	60min

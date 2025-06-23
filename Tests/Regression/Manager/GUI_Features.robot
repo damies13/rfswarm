@@ -1,7 +1,6 @@
 *** Settings ***
 Test Tags       Features 	GUI
 
-Resource 	../Common/GUI_Common.resource
 Resource 	resources/GUI_Manager.resource
 
 Library 	XML
@@ -31,7 +30,7 @@ Manager Command Line PORT -p
 	Click Tab	Plan
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Stop Agent
 
 Manager Command Line IPADDRESS -e
@@ -53,7 +52,7 @@ Manager Command Line IPADDRESS -e
 	Click Tab	Plan
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Stop Agent
 
 Manager Command Line DIR -d
@@ -97,15 +96,15 @@ Manager Command Line STARTTIME -t
 
 	Open Manager GUI	${mngr_options}
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${20}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${20}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
 
-	[Teardown]	Run Keyword		Close Manager GUI ${platform}
+	[Teardown]	Run Keyword		Close Manager GUI ${PLATFORM}
 
 Manager Command Line STARTTIME --starttime
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
@@ -118,15 +117,15 @@ Manager Command Line STARTTIME --starttime
 
 	Open Manager GUI	${mngr_options}
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${20}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${20}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
 
-	[Teardown]	Run Keyword		Close Manager GUI ${platform}
+	[Teardown]	Run Keyword		Close Manager GUI ${PLATFORM}
 
 Manager Command Line SCENARIO -s
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
@@ -143,14 +142,14 @@ Manager Command Line SCENARIO -s
 
 	TRY
 		Click Button	runplay
-		Wait For	manager_${platform}_button_stoprun.png	timeout=30
+		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=30
 	EXCEPT
 		Press key.enter 1 Times 	# warning message
 		Fail	msg=RFSwarm Manager didn't load and run the the example scenario!
 	END
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Stop Agent
 
 Manager Command Line AGENTS -a
@@ -167,11 +166,11 @@ Manager Command Line AGENTS -a
 	Click Tab	Plan
 	Click Button	runplay
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${platform}_warning_label_not_enough_agents.png 	timeout=${10}
+	...    Wait For	${PLATFORM}_warning_label_not_enough_agents.png 	timeout=${10}
 	IF	not ${status}
 		# Try again with alt screenshot
 		${status}=	Run Keyword And Return Status
-		...    Wait For	${platform}_warning_label_not_enough_agents2.png 	timeout=${10}
+		...    Wait For	${PLATFORM}_warning_label_not_enough_agents2.png 	timeout=${10}
 	END
 
 	IF	not ${status}
@@ -181,7 +180,7 @@ Manager Command Line AGENTS -a
 	Press key.enter 1 Times
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Stop Agent
 
 Manager Command Line RUN -r
@@ -195,14 +194,14 @@ Manager Command Line RUN -r
 	Open Manager GUI	${mngr_options}
 	Log To Console	Wait for the Agent to connect, after that the scenario should start automatically.
 	TRY
-		Wait For	manager_${platform}_button_stoprun.png	timeout=60
+		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=60
 	EXCEPT
 		Press key.enter 1 Times
 		Fail	msg=RFSwarm Manager didn't run the scenario automatically after connecting to the Agent!
 	END
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Stop Agent
 
 Manager Command Line RUN --run
@@ -216,14 +215,14 @@ Manager Command Line RUN --run
 	Open Manager GUI	${mngr_options}
 	Log To Console	Wait for the Agent to connect, after that the scenario should start automatically.
 	TRY
-		Wait For	manager_${platform}_button_stoprun.png	timeout=60
+		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=60
 	EXCEPT
 		Press key.enter 1 Times
 		Fail	msg=RFSwarm Manager didn't run the scenario automatically after connecting to the Agent!
 	END
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Stop Agent
 
 Manager Command Line INI -i
@@ -238,12 +237,12 @@ Manager Command Line INI -i
 	Click Tab	Run
 	Log To Console	Check that Index check box is selected.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${platform}_checkbox_checked_default.png 	timeout=${10}
+	...    Wait For	${PLATFORM}_checkbox_checked_default.png 	timeout=${10}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail
 	...    msg=The manager did not load alternate ini file because it cannot find checked check box in the Run tab!
 
-	[Teardown]	Run Keyword		Close Manager GUI ${platform}
+	[Teardown]	Run Keyword		Close Manager GUI ${PLATFORM}
 
 Manager Command Line INI --ini
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
@@ -257,12 +256,12 @@ Manager Command Line INI --ini
 	Click Tab	Run
 	Log To Console	Check that Index check box is selected.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${platform}_checkbox_checked_default.png 	timeout=${10}
+	...    Wait For	${PLATFORM}_checkbox_checked_default.png 	timeout=${10}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail
 	...    msg=The manager did not load alternate ini file because it cannot find checked check box in the Run tab!
 
-	[Teardown]	Run Keyword		Close Manager GUI ${platform}
+	[Teardown]	Run Keyword		Close Manager GUI ${PLATFORM}
 
 Verify the Field Validation Is Working In the Manager Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #126
@@ -295,7 +294,7 @@ Verify the Field Validation Is Working In the Manager Plan Screen
 		Click Button	runplay
 		Sleep	2
 		${status}=	Run Keyword And Return Status
-		...    Wait For	${platform}_warning_label_no_${name}.png 	timeout=${20}
+		...    Wait For	${PLATFORM}_warning_label_no_${name}.png 	timeout=${20}
 		Take A Screenshot
 		Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed warning label that says: ${expected_messages}[${name}].
 		Press key.enter 1 Times
@@ -303,7 +302,7 @@ Verify the Field Validation Is Working In the Manager Plan Screen
 
 	END
 
-	[Teardown]	Run Keyword		Close Manager GUI ${platform}
+	[Teardown]	Run Keyword		Close Manager GUI ${PLATFORM}
 
 Verify That Files Get Saved With Correct Extension And Names
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #39
@@ -330,7 +329,7 @@ Verify That Files Get Saved With Correct Extension And Names
 
 	[Teardown]	Run Keywords
 	...    Delete Scenario File		${scenario_name}		AND
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Stop Agent
 
 Verify the Time Fields In the Plan Screen For Delay
@@ -361,7 +360,7 @@ Verify the Time Fields In the Plan Screen For Delay
 		Press Key.tab 2 Times
 		Take A Screenshot
 		Sleep	1
-		IF  "${platform}" == "macos"
+		IF  "${PLATFORM}" == "macos"
 			Press Combination	KEY.command		KEY.c
 		ELSE
 			Press Combination	KEY.ctrl		KEY.c
@@ -372,7 +371,7 @@ Verify the Time Fields In the Plan Screen For Delay
 		Press Key.tab 7 Times
 	END
 
-	[Teardown]	Run Keyword		Close Manager GUI ${platform}
+	[Teardown]	Run Keyword		Close Manager GUI ${PLATFORM}
 
 Verify the Time Fields In the Plan Screen For Delay: Complex Variations
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
@@ -402,7 +401,7 @@ Verify the Time Fields In the Plan Screen For Delay: Complex Variations
 		Press Key.tab 2 Times
 		Take A Screenshot
 		Sleep	1
-		IF  "${platform}" == "macos"
+		IF  "${PLATFORM}" == "macos"
 			Press Combination	KEY.command		KEY.c
 		ELSE
 			Press Combination	KEY.ctrl		KEY.c
@@ -413,7 +412,7 @@ Verify the Time Fields In the Plan Screen For Delay: Complex Variations
 		Press Key.tab 7 Times
 	END
 
-	[Teardown]	Run Keyword		Close Manager GUI ${platform}
+	[Teardown]	Run Keyword		Close Manager GUI ${PLATFORM}
 
 Verify the Time Fields In the Plan Screen For Ramp Up
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
@@ -443,7 +442,7 @@ Verify the Time Fields In the Plan Screen For Ramp Up
 		Press Key.tab 3 Times
 		Take A Screenshot
 		Sleep	1
-		IF  "${platform}" == "macos"
+		IF  "${PLATFORM}" == "macos"
 			Press Combination	KEY.command		KEY.c
 		ELSE
 			Press Combination	KEY.ctrl		KEY.c
@@ -454,7 +453,7 @@ Verify the Time Fields In the Plan Screen For Ramp Up
 		Press Key.tab 6 Times
 	END
 
-	[Teardown]	Run Keyword		Close Manager GUI ${platform}
+	[Teardown]	Run Keyword		Close Manager GUI ${PLATFORM}
 
 Verify the Time Fields In the Plan Screen For Ramp Up: Complex Variations
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
@@ -484,7 +483,7 @@ Verify the Time Fields In the Plan Screen For Ramp Up: Complex Variations
 		Press Key.tab 3 Times
 		Take A Screenshot
 		Sleep	1
-		IF  "${platform}" == "macos"
+		IF  "${PLATFORM}" == "macos"
 			Press Combination	KEY.command		KEY.c
 		ELSE
 			Press Combination	KEY.ctrl		KEY.c
@@ -495,7 +494,7 @@ Verify the Time Fields In the Plan Screen For Ramp Up: Complex Variations
 		Press Key.tab 6 Times
 	END
 
-	[Teardown]	Run Keyword		Close Manager GUI ${platform}
+	[Teardown]	Run Keyword		Close Manager GUI ${PLATFORM}
 
 Verify the Time Fields In the Plan Screen For Run
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
@@ -525,7 +524,7 @@ Verify the Time Fields In the Plan Screen For Run
 		Press Key.tab 4 Times
 		Take A Screenshot
 		Sleep	1
-		IF  "${platform}" == "macos"
+		IF  "${PLATFORM}" == "macos"
 			Press Combination	KEY.command		KEY.c
 		ELSE
 			Press Combination	KEY.ctrl		KEY.c
@@ -536,7 +535,7 @@ Verify the Time Fields In the Plan Screen For Run
 		Press Key.tab 5 Times
 	END
 
-	[Teardown]	Run Keyword		Close Manager GUI ${platform}
+	[Teardown]	Run Keyword		Close Manager GUI ${PLATFORM}
 
 Verify the Time Fields In the Plan Screen For Run: Complex Variations
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
@@ -566,7 +565,7 @@ Verify the Time Fields In the Plan Screen For Run: Complex Variations
 		Press Key.tab 4 Times
 		Take A Screenshot
 		Sleep	1
-		IF  "${platform}" == "macos"
+		IF  "${PLATFORM}" == "macos"
 			Press Combination	KEY.command		KEY.c
 		ELSE
 			Press Combination	KEY.ctrl		KEY.c
@@ -577,7 +576,7 @@ Verify the Time Fields In the Plan Screen For Run: Complex Variations
 		Press Key.tab 5 Times
 	END
 
-	[Teardown]	Run Keyword		Close Manager GUI ${platform}
+	[Teardown]	Run Keyword		Close Manager GUI ${PLATFORM}
 
 Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
@@ -613,7 +612,7 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 		Click Button	selected_runscriptrow
 		Select Robot File OS DIALOG		${robot_data}[0]
 		Take A Screenshot
-		IF  "${platform}" == "windows"
+		IF  "${PLATFORM}" == "windows"
 			Press Key.tab 1 Times
 			Take A Screenshot
 			Press Combination 	key.space
@@ -652,7 +651,7 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	Verify Scenario File Robot Data	${scenario_content_list}	${robot_data}		${1}	${3}
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Delete Robot File								AND
 	...    Delete Scenario File	${scenario_name}
 
@@ -681,7 +680,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 		Click Button	selected_runscriptrow
 		Select Robot File OS DIALOG		${robot_data}[0]
 		Take A Screenshot
-		IF  "${platform}" == "windows"
+		IF  "${PLATFORM}" == "windows"
 			Press Key.tab 1 Times
 			Take A Screenshot
 			Press Combination 	key.space
@@ -701,13 +700,13 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 			# Take A Screenshot
 			Press Key.tab 2 Times
 		END
-		IF  "${platform}" == "windows"
+		IF  "${PLATFORM}" == "windows"
 			Set Confidence	0.85
 			# Take A Screenshot
 		END
 		${settings_coordinates}=
-		...    Locate 	manager_${platform}_button_selected_runsettingsrow.png
-		IF  "${platform}" == "windows"
+		...    Locate 	manager_${PLATFORM}_button_selected_runsettingsrow.png
+		IF  "${PLATFORM}" == "windows"
 			Set Confidence	0.9
 			# Take A Screenshot
 		END
@@ -733,7 +732,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 	Verify Scenario Test Row Settings	${scenario_content_list}	${row_settings_data}	${1}	${3}
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Delete Scenario File	test_scenario				AND
 	...    Delete Robot File								AND
 	...    Delete Scenario File	${scenario_name}
@@ -775,7 +774,7 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 		Click Button	selected_runscriptrow
 		Select Robot File OS DIALOG		${robot_data}[0]
 		Take A Screenshot
-		IF  "${platform}" == "windows"
+		IF  "${PLATFORM}" == "windows"
 			Press Key.tab 1 Times
 			Take A Screenshot
 			Press Combination 	key.space
@@ -795,13 +794,13 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 			# Take A Screenshot
 			Press Key.tab 2 Times
 		END
-		IF  "${platform}" == "windows"
+		IF  "${PLATFORM}" == "windows"
 			Set Confidence	0.85
 			# Take A Screenshot
 		END
 		${settings_coordinates}=
-		...    Locate 	manager_${platform}_button_selected_runsettingsrow.png
-		IF  "${platform}" == "windows"
+		...    Locate 	manager_${PLATFORM}_button_selected_runsettingsrow.png
+		IF  "${PLATFORM}" == "windows"
 			Set Confidence	0.9
 			# Take A Screenshot
 		END
@@ -818,12 +817,12 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 
 	${scenario_content}=	Get scenario file content	${global_path}	${scenario_name}
 
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 	Open Manager GUI	${mngr_options}
 	Check That The Scenario File Opens Correctly	${scenario_name}	${scenario_content}
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Delete Scenario File	test_scenario				AND
 	...    Delete Robot File								AND
 	...    Delete Scenario File	${scenario_name}
@@ -876,7 +875,7 @@ Verify Scenario File Is Updated Correctly When Scripts Are Removed
 	Open Scenario File OS DIALOG	${scenario_name}
 	Click Button	rundelrow
 	Click Button	rundelrow
-	${img}=		Set Variable	manager_${platform}_button_rundelrow.png
+	${img}=		Set Variable	manager_${PLATFORM}_button_rundelrow.png
 	Wait For 	${img} 	 timeout=300
 	@{coordinates}= 	Locate		${img}
 	Log	${coordinates}
@@ -898,7 +897,7 @@ Verify Scenario File Is Updated Correctly When Scripts Are Removed
 	Verify Scenario Test Row Settings	${scenario_content_list}	${expected_row_settings_data5}	${2}	${2}
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Delete Robot File	name=example1.robot			AND
 	...    Delete Robot File	name=example2.robot			AND
 	...    Delete Robot File	name=example3.robot			AND
@@ -966,7 +965,7 @@ Verify the Manager Handles Corrupted Scenario Files And Repairs It
 	Verify Scenario Test Row Settings	${scenario_content_list}	${expected_row_settings_data7}	${2}	${2}
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Delete Robot File								AND
 	...    Delete Scenario File		${scenario_name}
 
@@ -989,7 +988,7 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	Click Button	runopen
 	Open Scenario File OS DIALOG	${scenario_name}
 
-	Wait For	${platform}_warning_label.png	timeout=30
+	Wait For	${PLATFORM}_warning_label.png	timeout=30
 	Take A Screenshot
 	Press key.enter 1 Times
 	${running}= 	Is Process Running 	${process_manager}
@@ -998,16 +997,16 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	END
 	TRY
 		Click Tab	Run
-		Wait For	manager_${platform}_button_stoprun.png	timeout=30
+		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=30
 		Click Tab	Plan
 	EXCEPT
 		Fail	msg=RFSwarm Manager is not responding!
 	END
 
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 	Open Manager GUI		${mngr_options}
 
-	Wait For	${platform}_warning_label.png	timeout=30
+	Wait For	${PLATFORM}_warning_label.png	timeout=30
 	Press key.enter 1 Times
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	not ${running}
@@ -1015,14 +1014,14 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	END
 	TRY
 		Click Tab	Run
-		Wait For	manager_${platform}_button_stoprun.png	timeout=30
+		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=30
 		Click Tab	Plan
 	EXCEPT
 		Fail	msg=RFSwarm Manager is not responding!
 	END
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Delete Robot File								AND
 	...    Delete Scenario File		${scenario_name}
 
@@ -1052,7 +1051,7 @@ Verify If Manager Saves Inject Sleep From Scenario Wide Settings
 	Verify Scenario Wide Settings Data	${scenario_content_list}	${run_settings_data}
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Delete Scenario File	test_scenario				AND
 	...    Delete Robot File								AND
 	...    Delete Scenario File	${scenario_name}
@@ -1089,7 +1088,7 @@ Check If the Manager Reopens Inject Sleep From Scenario Wide Settings Correctly
 	Check That The Scenario File Opens Correctly	${scenario_name}	${scenario_content}
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Delete Scenario File	test_scenario				AND
 	...    Delete Robot File								AND
 	...    Delete Scenario File	${scenario_name}
@@ -1120,12 +1119,12 @@ Check If the Manager (after was closed) Opens Inject Sleep From Scenario Wide Se
 
 	Verify Scenario Wide Settings Data	${scenario_content_list}	${run_settings_data}
 
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 	Open Manager GUI	${mngr_options}
 	Check That The Scenario File Opens Correctly	${scenario_name}	${scenario_content}
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Delete Scenario File	test_scenario				AND
 	...    Delete Robot File								AND
 	...    Delete Scenario File	${scenario_name}
@@ -1152,7 +1151,7 @@ Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Setting
 	FOR  ${i}  IN RANGE  1  4
 		Press Key.tab 8 Times
 		${settings_coordinates}=
-		...    Locate	manager_${platform}_button_selected_runsettingsrow.png
+		...    Locate	manager_${PLATFORM}_button_selected_runsettingsrow.png
 		Append To List	${settings_locations}	${settings_coordinates}
 		Press Key.tab 1 Times
 	END
@@ -1177,7 +1176,7 @@ Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Setting
 	Verify Scenario Test Row Settings	${scenario_content_list}	${third_row_settings_data}	${3}	${3}
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Delete Robot File								AND
 	...    Delete Scenario File	${scenario_name}
 
@@ -1187,8 +1186,8 @@ Check If Inject Sleep Option Was Executed in the Test
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
 	...    Set INI Window Size		1200	600								AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
-	...    Remove Directory	${results_dir}	recursive=${True}				AND
-	...    Create Directory	${results_dir}									AND
+	...    Remove Directory	${RESULTS_DIR}	recursive=${True}				AND
+	...    Create Directory	${RESULTS_DIR}									AND
 	...    Sleep	3														AND
 	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-1	AND
 	...    Open Agent	${agent_options}														AND
@@ -1211,7 +1210,7 @@ Check If Inject Sleep Option Was Executed in the Test
 
 	@{excluded_files}=	Create List		Example_Test_Case.log	log.html	report.html		Example.log
 	${result_absolute_paths}	${result_file_names}
-	...    Find Absolute Paths And Names For Files In Directory		${results_dir}	@{excluded_files}
+	...    Find Absolute Paths And Names For Files In Directory		${RESULTS_DIR}	@{excluded_files}
 
 	Log		${result_file_names}
 	FOR  ${result_file}  IN  @{result_absolute_paths}
@@ -1262,7 +1261,7 @@ Check If Inject Sleep Option Was Executed in the Test
 	[Teardown]	Run Keywords
 	...    Delete Scenario File	test_scenario				AND
 	...    Stop Agent							AND
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Remove File		${global_path}${/}example.robot
 
 Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has Trailing
@@ -1279,7 +1278,7 @@ Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has
 
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#98${/}Issue-#98.rfs
 	VAR 	${agent_script_dir} 	${agent_dir}${/}scripts
-	VAR 	@{mngr_options} 		-d 	${results_dir} 	-s 	${scenariofile}
+	VAR 	@{mngr_options} 		-d 	${RESULTS_DIR} 	-s 	${scenariofile}
 
 	Open Manager GUI		${mngr_options}
 	Wait Agent Ready
@@ -1291,7 +1290,7 @@ Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has
 
 	Log To Console	Started run, now wait 40s. Check if Agent will send results to the Manager.
 	Sleep	40	#rampup=10
-	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_Issue-#98*	absolute=${True}
+	@{run_result_dirs}=		List Directories In Directory	${RESULTS_DIR}	pattern=*_Issue-#98*	absolute=${True}
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
 	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
 	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
@@ -1301,7 +1300,7 @@ Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has
 	...    msg=Agent is not uploading logs immediately! Should be at least 1 after ~ 40s. Actual number:${logs_num}.
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}		AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}		AND
 	...    Stop Agent											AND
 	...    Remove File 	${agent_script_dir}${/}Issue-#98.robot	AND
 	...    Remove Directory 	${run_result_dirs}[0]	resursive=${True}
@@ -1321,7 +1320,7 @@ Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has
 
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#98${/}Issue-#98.rfs
 	VAR 	${agent_script_dir} 	${agent_dir}${/}scripts
-	VAR 	@{mngr_options} 		-d 	${results_dir} 	-s 	${scenariofile}
+	VAR 	@{mngr_options} 		-d 	${RESULTS_DIR} 	-s 	${scenariofile}
 
 	Open Manager GUI		${mngr_options}
 	Wait Agent Ready
@@ -1333,7 +1332,7 @@ Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has
 
 	Log To Console	Started run, now wait 40s. Check if Agent will send results to the Manager.
 	Sleep	40	#rampup=10
-	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_Issue-#98*	absolute=${True}
+	@{run_result_dirs}=		List Directories In Directory	${RESULTS_DIR}	pattern=*_Issue-#98*	absolute=${True}
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
 	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
 	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
@@ -1343,7 +1342,7 @@ Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has
 	...    msg=Agent is not uploading logs immediately! Should be at least 1 after ~ 40s. Actual number:${logs_num}.
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}		AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}		AND
 	...    Stop Agent											AND
 	...    Change http://localhost:8138 With http://localhost:8138/ In ${agent_def_path}${/}RFSwarmAgent.ini	AND
 	...    Remove File 	${agent_script_dir}${/}Issue-#98.robot	AND
@@ -1369,7 +1368,7 @@ Verify If the Port Number And Ip Address Get Written To the INI File
 	Change Scenario Wide Settings	${run_settings_data}
 	Sleep	2
 	Press key.enter 1 Times
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 	Sleep	2
 	${manager_ini_file_dict}=	Read Ini File	${manager_ini_file}
 	Log		manager ini file dict: ${manager_ini_file_dict}		console=True
@@ -1383,7 +1382,7 @@ Verify If the Port Number And Ip Address Get Written To the INI File
 	Click Button	ok
 	Sleep	2
 	Press key.enter 1 Times
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 
 	Should Be Equal As Strings 	${manager_ini_file_dict}[Server][bindip] 	${run_settings_data}[bind_ip_address]
 	Should Be Equal As Strings 	${manager_ini_file_dict}[Server][bindport] 	${run_settings_data}[bind_port_number]
@@ -1410,7 +1409,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 	Change Scenario Wide Settings	${run_settings_data}
 	Sleep	2
 	Press key.enter 1 Times
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 	Open Manager GUI
 
 	Log To Console	Check if Agent cant connect to the old port number, Old port number: ${old_port_number}.
@@ -1433,7 +1432,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 	Click Tab	Plan
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Stop Agent							AND
 	...    Change = 8148 With = 8138 In ${manager_ini_file}
 
@@ -1456,7 +1455,7 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	Change Scenario Wide Settings	${run_settings_data}
 	Sleep	2
 	Press key.enter 1 Times
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 	Open Manager GUI
 
 	# ${altip}= 	Set Variable    ${ipv4} [1]
@@ -1481,7 +1480,7 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	Click Tab	Plan
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Stop Agent							AND
 	...    Change = ${ipv4}[0] With =${SPACE} In ${manager_ini_file}
 
@@ -1503,7 +1502,7 @@ Verify Disable log.html - Scenario
 	Click Dialog Button 	ok
 	Click Button 	runsave
 
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
@@ -1520,7 +1519,7 @@ Verify Disable log.html - Scenario
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
-	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
+	[Teardown] 	Run Keyword		Close Manager GUI ${PLATFORM}
 
 Verify Disable report.html - Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
@@ -1540,7 +1539,7 @@ Verify Disable report.html - Scenario
 	Click Dialog Button 	ok
 	Click Button 	runsave
 
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
@@ -1557,7 +1556,7 @@ Verify Disable report.html - Scenario
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
-	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
+	[Teardown] 	Run Keyword		Close Manager GUI ${PLATFORM}
 
 Verify Disable output.xml - Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
@@ -1577,7 +1576,7 @@ Verify Disable output.xml - Scenario
 	Click Dialog Button 	ok
 	Click Button 	runsave
 
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
@@ -1594,7 +1593,7 @@ Verify Disable output.xml - Scenario
 	${scenariofileafter2}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
-	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
+	[Teardown] 	Run Keyword		Close Manager GUI ${PLATFORM}
 
 Verify Disable log.html - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
@@ -1616,7 +1615,7 @@ Verify Disable log.html - Test Row
 	Test Group Save Settings
 	Click Button 	runsave
 
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
@@ -1634,7 +1633,7 @@ Verify Disable log.html - Test Row
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
 	Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
-	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
+	[Teardown] 	Run Keyword		Close Manager GUI ${PLATFORM}
 
 Verify Disable report.html - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
@@ -1656,7 +1655,7 @@ Verify Disable report.html - Test Row
 	Test Group Save Settings
 	Click Button 	runsave
 
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
@@ -1674,7 +1673,7 @@ Verify Disable report.html - Test Row
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
 	Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
-	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
+	[Teardown] 	Run Keyword		Close Manager GUI ${PLATFORM}
 
 Verify Disable output.xml - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
@@ -1696,7 +1695,7 @@ Verify Disable output.xml - Test Row
 	Test Group Save Settings
 	Click Button 	runsave
 
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter: ${scenariofileafter1} 	console=True
@@ -1714,7 +1713,7 @@ Verify Disable output.xml - Test Row
 	Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
 	Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
-	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
+	[Teardown] 	Run Keyword		Close Manager GUI ${PLATFORM}
 
 Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
@@ -1757,7 +1756,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main1.robot	${CURDIR}${/}testdata${/}Issue-52	AND
 	...    Stop Agent																AND
-	...    Close Manager GUI ${platform}
+	...    Close Manager GUI ${PLATFORM}
 
 Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
@@ -1804,7 +1803,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main2.robot	${CURDIR}${/}testdata${/}Issue-52	AND
 	...    Stop Agent																AND
-	...    Close Manager GUI ${platform}
+	...    Close Manager GUI ${PLATFORM}
 
 Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
@@ -1850,7 +1849,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main3.robot	${CURDIR}${/}testdata${/}Issue-52	AND
 	...    Stop Agent																AND
-	...    Close Manager GUI ${platform}
+	...    Close Manager GUI ${PLATFORM}
 
 Verify If __init__.robot Files Get Transfered To the Agent Along With Robot/Resuorce File
 	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #90
@@ -1902,7 +1901,7 @@ Verify If __init__.robot Files Get Transfered To the Agent Along With Robot/Resu
 	[Teardown]	Run Keywords
 	...    Remove Directory 	${TEMPDIR}${/}agent_temp_issue90	recursive=${True}	AND
 	...    Stop Agent																	AND
-	...    Close Manager GUI ${platform}
+	...    Close Manager GUI ${PLATFORM}
 
 Check If The CSV Report Button Works In the Manager Before There Are Any Results
 	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #128
@@ -1921,7 +1920,7 @@ Check If The CSV Report Button Works In the Manager Before There Are Any Results
 	Log To Console	Clicking CSV report button before there are any results.
 	Click Button	csv_report
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${platform}_warning_label_no_report_data.png 	timeout=${60}
+	...    Wait For	${PLATFORM}_warning_label_no_report_data.png 	timeout=${60}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed warning label that says: No report data to save.
 	Press key.enter 1 Times
@@ -1934,7 +1933,7 @@ Check If The CSV Report Button Works In the Manager Before There Are Any Results
 	Log To Console	Clicking CSV report button before end of the test.
 	Click Button	csv_report
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${platform}_reportdatasavesto.png 	timeout=${60}
+	...    Wait For		manager_${PLATFORM}_reportdatasavesto.png 	timeout=${60}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed info label that says: Report data saved to:...
 	Press key.enter 1 Times
@@ -1948,7 +1947,7 @@ Check If The CSV Report Button Works In the Manager Before There Are Any Results
 	Wait For the Scenario Run To Finish
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Stop Agent
 
 Check If The CSV Report Button Works In The Manager After There Are Results
@@ -1968,7 +1967,7 @@ Check If The CSV Report Button Works In The Manager After There Are Results
 	Click Button	csv_report
 
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${platform}_reportdatasavesto.png 	timeout=${60}
+	...    Wait For		manager_${PLATFORM}_reportdatasavesto.png 	timeout=${60}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed info label that says: Report data saved to:...
 
@@ -1995,7 +1994,7 @@ Check If The CSV Report Button Works In The Manager After There Are Results
 	...    message=CSV Test Report Files are not generated correctly! List A - Generated CSV Files, List B - Expected CSV Files, Check report for more information.
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Stop Agent
 
 Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robots
@@ -2016,11 +2015,11 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 	Click Button	runplay
 
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${platform}_warning_label_not_enough_agents.png 	timeout=${10}
+	...    Wait For	${PLATFORM}_warning_label_not_enough_agents.png 	timeout=${10}
 	IF	not ${status}
 		# Try again with alt screenshot
 		${status}=	Run Keyword And Return Status
-		...    Wait For	${platform}_warning_label_not_enough_agents2.png 	timeout=${10}
+		...    Wait For	${PLATFORM}_warning_label_not_enough_agents2.png 	timeout=${10}
 	END
 
 	IF	not ${status}
@@ -2030,7 +2029,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 
 	Press key.enter 1 Times
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_button_abort 	timeout=${10}
+	...    Wait For	manager_${PLATFORM}_button_abort 	timeout=${10}
 	Run Keyword If	not ${status}	Fail	msg=The manager is not in waiting for agent status.
 
 	Log To Console	${\n}The manager displayed the expected message. It is now waiting for the agent.${\n}
@@ -2038,7 +2037,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 	Open Agent
 	Check If The Agent Is Ready
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${platform}_info_label_enough_agents_available.png 	timeout=${15}
+	...    Wait For	${PLATFORM}_info_label_enough_agents_available.png 	timeout=${15}
 	Run Keyword If	not ${status}	Fail
 	...    msg=The manager didn't display expected prompt dialogue that says: Enough Agent available to run Robots, test will now resume!
 	Press key.enter 1 Times
@@ -2055,12 +2054,12 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 	Click Tab	Plan
 	Click Button	runplay
 	${status}=	Run Keyword And Return Status
-	...    Wait For	${platform}_warning_label_not_enough_agents.png 	timeout=${10}
+	...    Wait For	${PLATFORM}_warning_label_not_enough_agents.png 	timeout=${10}
 
 	IF	not ${status}
 		# Try again with alt screenshot
 		${status}=	Run Keyword And Return Status
-		...    Wait For	${platform}_warning_label_not_enough_agents2.png 	timeout=${10}
+		...    Wait For	${PLATFORM}_warning_label_not_enough_agents2.png 	timeout=${10}
 	END
 
 	IF	${status}
@@ -2081,7 +2080,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 	...    Delete Scenario File		${scenario_name}		AND
 	...    Delete Robot File								AND
 	...    Stop Agent							AND
-	...    Run Keyword		Close Manager GUI ${platform}
+	...    Run Keyword		Close Manager GUI ${PLATFORM}
 
 Check If Scenario Csv Report Files Contain Correct Data From The Test
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #17
@@ -2197,7 +2196,7 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 	END
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Stop Agent
 
 Verify the Results Directory And db File Gets Created Correctly With Scenario Also After a Restart
@@ -2211,9 +2210,9 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	...    file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\tFail this\n\tSleep\t10\n\tFail\n
 
 	VAR 	${scenario_name}	Issue-#35_#69
-	VAR 	${results_dir} 		${results_dir}${/}Issue-#69_1 	scope=TEST
-	VAR 	@{mngr_options} 	-d 		${results_dir}
-	Create Directory 	${results_dir}
+	VAR 	${RESULTS_DIR} 		${RESULTS_DIR}${/}Issue-#69_1 	scope=TEST
+	VAR 	@{mngr_options} 	-d 		${RESULTS_DIR}
+	Create Directory 	${RESULTS_DIR}
 	Clear Manager Result Directory
 	Open Manager GUI 	${mngr_options}
 
@@ -2225,13 +2224,13 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	Click Tab	Plan
 	Click Button	runplay
 
-	Wait For	manager_${platform}_button_stoprun.png 	timeout=${300}
+	Wait For	manager_${PLATFORM}_button_stoprun.png 	timeout=${300}
 	${current_date}=	Get Current Date
 	Log To Console	Current time: ${current_date}
 
 	Wait For the Scenario Run To Finish
 
-	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_*
+	@{run_result_dirs}=		List Directories In Directory	${RESULTS_DIR}	pattern=*_*
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
 	Length Should Be	${run_result_dirs}	1	msg=The test run result dir was not created or created unexpected directories!
 
@@ -2244,14 +2243,14 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	Click Tab	Plan
 	Click Button	runplay
 
-	Wait For	manager_${platform}_button_stoprun.png 	timeout=${300}
+	Wait For	manager_${PLATFORM}_button_stoprun.png 	timeout=${300}
 	${current_date}=	Get Current Date
 	Log To Console	Current time: ${current_date}
 
 	Wait For the Scenario Run To Finish
 
 	${previous_result_dir}=		Set Variable	${run_result_dirs}[0]
-	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_*
+	@{run_result_dirs}=		List Directories In Directory	${RESULTS_DIR}	pattern=*_*
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
 	Length Should Be	${run_result_dirs}	2	msg=The second test run result dir was not created or created unexpected directories!
 	FOR  ${dir}  IN  @{run_result_dirs}
@@ -2268,7 +2267,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	...    Delete Robot File						AND
 	...    Delete Scenario File	${scenario_name}	AND
 	...    Stop Agent								AND
-	...    Run Keyword		Close Manager GUI ${platform}
+	...    Run Keyword		Close Manager GUI ${PLATFORM}
 
 Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
@@ -2280,9 +2279,9 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	...    Create Robot File
 	...    file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\tFail this\n\tSleep\t10\n\tFail\n
 
-	VAR 	${results_dir} 		${results_dir}${/}Issue-#69_2 	scope=TEST
-	VAR 	@{mngr_options} 	-d 		${results_dir}
-	Create Directory 	${results_dir}
+	VAR 	${RESULTS_DIR} 		${RESULTS_DIR}${/}Issue-#69_2 	scope=TEST
+	VAR 	@{mngr_options} 	-d 		${RESULTS_DIR}
+	Create Directory 	${RESULTS_DIR}
 	Clear Manager Result Directory
 	Open Manager GUI 	${mngr_options}
 
@@ -2299,13 +2298,13 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	Click Tab	Plan
 	Click Button	runplay
 
-	Wait For	manager_${platform}_button_stoprun.png 	timeout=${300}
+	Wait For	manager_${PLATFORM}_button_stoprun.png 	timeout=${300}
 	${current_date}=	Get Current Date
 	Log To Console	Current time: ${current_date}
 
 	Wait For the Scenario Run To Finish
 
-	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_*
+	@{run_result_dirs}=		List Directories In Directory	${RESULTS_DIR}	pattern=*_*
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
 	Length Should Be	${run_result_dirs}	1	msg=The test run result dir was not created or created unexpected directories!
 
@@ -2316,7 +2315,7 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	[Teardown]	Run Keywords
 	...    Delete Robot File	AND
 	...    Stop Agent			AND
-	...    Run Keyword		Close Manager GUI ${platform}
+	...    Run Keyword		Close Manager GUI ${PLATFORM}
 
 Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the robots)
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70
@@ -2343,7 +2342,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	...    Delete Scenario File		${scenario_name}		AND
 	...    Set Confidence	0.9								AND
 	...    Stop Agent							AND
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Remove File		${global_path}${/}example.robot
 
 Check If Test Scenario Run Will Stop Gradually
@@ -2371,7 +2370,7 @@ Check If Test Scenario Run Will Stop Gradually
 	...    Delete Scenario File		${scenario_name}		AND
 	...    Set Confidence	0.9								AND
 	...    Stop Agent							AND
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Remove File		${global_path}${/}example.robot
 
 Check If Test Scenario Run Will Stop Gradually - TestRepeater
@@ -2399,7 +2398,7 @@ Check If Test Scenario Run Will Stop Gradually - TestRepeater
 	...    Delete Scenario File		${scenario_name}		AND
 	...    Set Confidence	0.9								AND
 	...    Stop Agent							AND
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Remove File		${global_path}${/}example.robot
 
 Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
@@ -2410,7 +2409,7 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
 	${scenario_path}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#41${/}Issue-#41.rfs
-	VAR 	@{mngr_options} 	-s 	${scenario_path}	-d 	${results_dir}
+	VAR 	@{mngr_options} 	-s 	${scenario_path}	-d 	${RESULTS_DIR}
 
 	Open Manager GUI	${mngr_options}
 	Open Agent
@@ -2441,7 +2440,7 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 	Should Be Equal 	${third_iter}[0][0] 	${3}
 
 	Log To Console 	Checking second run logs.
-	@{run_result_dirs}= 	List Directories In Directory	${results_dir}	pattern=*_Issue-#41*	absolute=${True}
+	@{run_result_dirs}= 	List Directories In Directory	${RESULTS_DIR}	pattern=*_Issue-#41*	absolute=${True}
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
 	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[-1]	absolute=${True}
 	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
@@ -2463,7 +2462,7 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 	Should Be Equal 	${third_iter} 	${3}
 
 	[Teardown]	Run Keywords
-	...    Close Manager GUI ${platform}	AND
+	...    Close Manager GUI ${PLATFORM}	AND
 	...    Stop Agent
 
 Verify the Robot Count Reduces When Stop Agent While Test Is Running
@@ -2484,31 +2483,31 @@ Verify the Robot Count Reduces When Stop Agent While Test Is Running
 	Sleep	60
 	Set Confidence	0.95	#sometimes cant find 10 robots image
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${platform}_robots_10.png 	timeout=${60}
+	...    Wait For		manager_${PLATFORM}_robots_10.png 	timeout=${60}
 	Run Keyword If	not ${status}	Fail	msg=Manager could not reach 10 robots after 60s.
 
 	Log To Console	Stopping agent while test is running.
 	Stop Agent
 	Click Tab	Agents
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${platform}_agents_offline.png 	timeout=${60}
+	...    Wait For		manager_${PLATFORM}_agents_offline.png 	timeout=${60}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Agent did not get marked as "offline?".
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${platform}_agents_blank.png 	timeout=${60}
+	...    Wait For		manager_${PLATFORM}_agents_blank.png 	timeout=${60}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Agent did not disconnect form Manager completly. It is still connected.
 
 	Log To Console	Checking if robot count will reduce to 0 after shuting down Agent.
 	Click Tab	Run
 	${status}=	Run Keyword And Return Status
-	...    Wait For		manager_${platform}_robots_0.png 	timeout=${60}
+	...    Wait For		manager_${PLATFORM}_robots_0.png 	timeout=${60}
 	Take A Screenshot
 	Run Keyword If	not ${status}	Fail	msg=Manager didnt reduce robot count form 10 to 0 in 60s after disconnecting Agent.
 	Wait For the Scenario Run To Finish 	time=${120}
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Stop Agent							AND
 	...    Set Confidence	0.9
 
@@ -2523,7 +2522,7 @@ Verify the Files Referenced In the Scenario Are All Using Relative Paths
 	${scenario_path}=	Normalize Path 	${test_data_path}${/}${scenario_name}.rfs
 	Copy File	${test_data_path}${/}${scenario_name}_original.rfs	${scenario_path}
 	@{paths}=			Create List
-	...    ${test_data_path}  ${test_data_path}${/}robots  ${results_dir}  ${results_dir}${/}robots
+	...    ${test_data_path}  ${test_data_path}${/}robots  ${RESULTS_DIR}  ${RESULTS_DIR}${/}robots
 	@{robot_names}=		Create List		robot_rel_1  robot_rel_2  robot_rel_3  robot_rel_4
 	@{robot_paths}=		Create List
 	...    ${paths}[0]${/}${robot_names}[0].robot
@@ -2554,7 +2553,7 @@ Verify the Files Referenced In the Scenario Are All Using Relative Paths
 		Log To Console		Scenario file with relative path: ${scenario_file_dict}
 		Run Keyword And Warn On Failure		Should Be Equal As Strings		${scenario_file_dict}[1][script] 	${rel_robot_paths}[${i}]
 
-		Run Keyword If  ${i} != 3		Close Manager GUI ${platform}
+		Run Keyword If  ${i} != 3		Close Manager GUI ${PLATFORM}
 		Delete Scenario File		${scenario_name}
 	END
 
@@ -2564,7 +2563,7 @@ Verify the Files Referenced In the Scenario Are All Using Relative Paths
 	...    Delete Robot File	path=${paths}[2]	name=${robot_names}[2].robot	AND
 	...    Delete Robot File	path=${paths}[3]	name=${robot_names}[3].robot	AND
 	...    Remove File			${scenario_path}									AND
-	...    Close Manager GUI ${platform}
+	...    Close Manager GUI ${PLATFORM}
 
 Verify If Upload logs=Immediately Is Being Saved To The Scenario And Read Back Correctly
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
@@ -2590,7 +2589,7 @@ Verify If Upload logs=Immediately Is Being Saved To The Scenario And Read Back C
 	Should Be Equal As Strings 	${scenario_file_content}[Scenario][uploadmode]		imm
 
 	Log To Console	${\n}Manager is now being restarted. Check if Upload logs=Immediately is read back correctly
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 	@{mngr_options}=	Set Variable	-s	${scenario_path}
 	Open Manager GUI	${mngr_options}
 	Click Button	runsave
@@ -2601,7 +2600,7 @@ Verify If Upload logs=Immediately Is Being Saved To The Scenario And Read Back C
 
 	[Teardown]	Run Keywords
 	...    Delete Scenario File		${scenario_name}	AND
-	...    Run Keyword		Close Manager GUI ${platform}
+	...    Run Keyword		Close Manager GUI ${PLATFORM}
 
 Verify If Upload logs=Error Only Is Being Saved To The Scenario And Read Back Correctly
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
@@ -2627,7 +2626,7 @@ Verify If Upload logs=Error Only Is Being Saved To The Scenario And Read Back Co
 	Should Be Equal As Strings 	${scenario_file_content}[Scenario][uploadmode]		err
 
 	Log To Console	${\n}Manager is now being restarted. Check if Upload logs=Error Only is read back correctly
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 	@{mngr_options}=	Set Variable	-s	${scenario_path}
 	Open Manager GUI	${mngr_options}
 	Click Button	runsave
@@ -2638,7 +2637,7 @@ Verify If Upload logs=Error Only Is Being Saved To The Scenario And Read Back Co
 
 	[Teardown]	Run Keywords
 	...    Delete Scenario File		${scenario_name}	AND
-	...    Run Keyword		Close Manager GUI ${platform}
+	...    Run Keyword		Close Manager GUI ${PLATFORM}
 
 Verify If Upload logs=All Deferred Is Being Saved To The Scenario And Read Back Correctly
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
@@ -2664,7 +2663,7 @@ Verify If Upload logs=All Deferred Is Being Saved To The Scenario And Read Back 
 	Should Be Equal As Strings 	${scenario_file_content}[Scenario][uploadmode]		def
 
 	Log To Console	${\n}Manager is now being restarted. Check if Upload logs=All Deferred is read back correctly
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 	@{mngr_options}=	Set Variable	-s	${scenario_path}
 	Open Manager GUI	${mngr_options}
 	Click Button	runsave
@@ -2675,7 +2674,7 @@ Verify If Upload logs=All Deferred Is Being Saved To The Scenario And Read Back 
 
 	[Teardown]	Run Keywords
 	...    Delete Scenario File		${scenario_name}	AND
-	...    Run Keyword		Close Manager GUI ${platform}
+	...    Run Keyword		Close Manager GUI ${PLATFORM}
 
 Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardless Of Robot Passes Or Fails
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #91
@@ -2691,7 +2690,7 @@ Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardl
 
 	Copy File	${scenariofile}		${global_path}
 	Copy File	${robotfile}		${global_path}
-	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${results_dir}
+	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${RESULTS_DIR}
 	Open Manager GUI	${mngr_options}
 	Open Agent
 	Check If The Agent Is Ready
@@ -2700,7 +2699,7 @@ Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardl
 
 	Log To Console	Started run, now wait 40s.
 	Sleep	40	#rampup=15 run=50
-	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_immediately*	absolute=${True}
+	@{run_result_dirs}=		List Directories In Directory	${RESULTS_DIR}	pattern=*_immediately*	absolute=${True}
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
 	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
 	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
@@ -2722,7 +2721,7 @@ Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardl
 	...    Remove File	${global_path}${/}${robotname}		AND
 	...    Remove File	${global_path}${/}${scenarioname}	AND
 	...    Stop Agent							AND
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
 
 Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only When Robot Fails
@@ -2739,7 +2738,7 @@ Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only Whe
 
 	Copy File	${scenariofile}		${global_path}
 	Copy File	${robotfile}		${global_path}
-	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${results_dir}
+	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${RESULTS_DIR}
 	Open Manager GUI	${mngr_options}
 	Open Agent
 	Check If The Agent Is Ready
@@ -2748,7 +2747,7 @@ Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only Whe
 
 	Log To Console	Started run, now wait 65s.
 	Sleep	65	#rampup=15 run=60
-	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_error_only*	absolute=${True}
+	@{run_result_dirs}=		List Directories In Directory	${RESULTS_DIR}	pattern=*_error_only*	absolute=${True}
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
 	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
 	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
@@ -2772,7 +2771,7 @@ Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only Whe
 	...    Remove File	${global_path}${/}${robotname}		AND
 	...    Remove File	${global_path}${/}${scenarioname}	AND
 	...    Stop Agent							AND
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
 
 Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
@@ -2789,7 +2788,7 @@ Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 
 	Copy File	${scenariofile}		${global_path}
 	Copy File	${robotfile}		${global_path}
-	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${results_dir}
+	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${RESULTS_DIR}
 	Open Manager GUI	${mngr_options}
 	Open Agent
 	Check If The Agent Is Ready
@@ -2798,7 +2797,7 @@ Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 
 	Log To Console	Started run, now wait 60s.
 	Sleep	60	#rampup=15 run=50
-	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_all_deferred*	absolute=${True}
+	@{run_result_dirs}=		List Directories In Directory	${RESULTS_DIR}	pattern=*_all_deferred*	absolute=${True}
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
 	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
 	${logs_dir_num}=	Get Length	${logs_dir}
@@ -2813,7 +2812,7 @@ Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 
 	Press key.enter 1 Times
 	Check If The Agent Is Ready
-	@{run_result_dirs}=		List Directories In Directory	${results_dir}	pattern=*_all_deferred*	absolute=${True}
+	@{run_result_dirs}=		List Directories In Directory	${RESULTS_DIR}	pattern=*_all_deferred*	absolute=${True}
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
 	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
 	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
@@ -2826,7 +2825,7 @@ Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 	...    Remove File	${global_path}${/}${robotname}		AND
 	...    Remove File	${global_path}${/}${scenarioname}	AND
 	...    Stop Agent							AND
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
 
 Verify Result Name - Test Defaults
@@ -2851,7 +2850,7 @@ Verify Result Name - Test Defaults
 	Click Dialog Button 	ok
 	Click Button 	runsave
 
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter: ${scenariofileafter1}
@@ -2868,7 +2867,7 @@ Verify Result Name - Test Defaults
 	Click Dialog Button 	ok
 	Click Button 	runsave
 
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter: ${scenariofileafter1}
@@ -2885,7 +2884,7 @@ Verify Result Name - Test Defaults
 	Click Dialog Button 	ok
 	Click Button 	runsave
 
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter: ${scenariofileafter1}
@@ -2902,7 +2901,7 @@ Verify Result Name - Test Defaults
 	Click Dialog Button 	ok
 	Click Button 	runsave
 
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter: ${scenariofileafter1}
@@ -2923,7 +2922,7 @@ Verify Result Name - Test Defaults
 	Log 	scenariofileafter2: ${scenariofileafter2}
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
 	Log 	Default 	console=True
-	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
+	[Teardown] 	Run Keyword		Close Manager GUI ${PLATFORM}
 
 Verify Result Name - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #154  Issue #154-GUI
@@ -2947,7 +2946,7 @@ Verify Result Name - Test Row
 	Test Group Save Settings
 	Click Button 	runsave
 
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter: ${scenariofileafter1}
@@ -2964,7 +2963,7 @@ Verify Result Name - Test Row
 	Test Group Save Settings
 	Click Button 	runsave
 
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter: ${scenariofileafter1}
@@ -2981,7 +2980,7 @@ Verify Result Name - Test Row
 	Test Group Save Settings
 	Click Button 	runsave
 
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter: ${scenariofileafter1}
@@ -2998,7 +2997,7 @@ Verify Result Name - Test Row
 	Test Group Save Settings
 	Click Button 	runsave
 
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 
 	${scenariofileafter1}= 		Read Ini File 	${scenariofile}
 	Log 	scenariofileafter: ${scenariofileafter1}
@@ -3020,7 +3019,7 @@ Verify Result Name - Test Row
 	Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
 	Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
 	Log 	Default 	console=True
-	[Teardown] 	Run Keyword		Close Manager GUI ${platform}
+	[Teardown] 	Run Keyword		Close Manager GUI ${PLATFORM}
 
 Verify That Time Gets Correctly Validated For Schelduled Start
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
@@ -3036,14 +3035,14 @@ Verify That Time Gets Correctly Validated For Schelduled Start
 	Click Button	runschedule
 	Click RadioBtn	default
 	Click Label With Horizontal Offset	schedule_time	100
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.a
 	ELSE
 		Double Click
 	END
 	FOR  ${i}  IN RANGE  0  ${len}
 		Evaluate	clipboard.copy("${start_times}[${i}]")	modules=clipboard
-		IF  "${platform}" == "macos"
+		IF  "${PLATFORM}" == "macos"
 			Press Combination	KEY.command		KEY.v
 		ELSE
 			Press Combination	KEY.ctrl		KEY.v
@@ -3051,13 +3050,13 @@ Verify That Time Gets Correctly Validated For Schelduled Start
 		Press key.tab 1 Times
 		Sleep	1
 		Click Label With Horizontal Offset	schedule_time	100
-		IF  "${platform}" == "macos"
+		IF  "${PLATFORM}" == "macos"
 			Press Combination	KEY.command		KEY.a
 		ELSE
 			Double Click
 		END
 		Sleep	1
-		IF  "${platform}" == "macos"
+		IF  "${PLATFORM}" == "macos"
 			Press Combination	KEY.command		KEY.c
 		ELSE
 			Press Combination	KEY.ctrl		KEY.c
@@ -3068,7 +3067,7 @@ Verify That Time Gets Correctly Validated For Schelduled Start
 
 	END
 
-	[Teardown]	Run Keywords	Close Manager GUI ${platform}
+	[Teardown]	Run Keywords	Close Manager GUI ${PLATFORM}
 
 Verify Schedule Date And Time Are Always In the Future
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
@@ -3082,12 +3081,12 @@ Verify Schedule Date And Time Are Always In the Future
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
 
 	Click Label With Horizontal Offset	schedule_time	100
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.a
 	ELSE
 		Double Click
 	END
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.c
 	ELSE
 		Press Combination	KEY.ctrl		KEY.c
@@ -3102,7 +3101,7 @@ Verify Schedule Date And Time Are Always In the Future
 	${copied_start_time_value}= 	Get Substring	${copied_start_time_value} 	0	6
 	Log To Console	Applied time: ${copied_start_time_value}
 	Evaluate	clipboard.copy("${copied_start_time_value}")	modules=clipboard
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.v
 	ELSE
 		Press Combination	KEY.ctrl		KEY.v
@@ -3111,12 +3110,12 @@ Verify Schedule Date And Time Are Always In the Future
 	Press key.tab 2 Times
 
 	Click Label With Horizontal Offset	schedule_date	100
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.a
 	ELSE
 		Double Click
 	END
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command 	KEY.c
 	ELSE
 		Press Combination	KEY.ctrl		KEY.c
@@ -3129,13 +3128,13 @@ Verify Schedule Date And Time Are Always In the Future
 
 	Click Dialog Button 	ok
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${20}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${20}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
 
-	[Teardown]	Run Keywords	Close Manager GUI ${platform}
+	[Teardown]	Run Keywords	Close Manager GUI ${PLATFORM}
 
 Verify That When Time Is Entered In the Past It Becomes the Next Day
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
@@ -3147,7 +3146,7 @@ Verify That When Time Is Entered In the Past It Becomes the Next Day
 	Click Button	runschedule
 	Click RadioBtn	default
 	Click Label With Horizontal Offset	schedule_time	100
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.a
 	ELSE
 		Double Click
@@ -3157,7 +3156,7 @@ Verify That When Time Is Entered In the Past It Becomes the Next Day
 	Log To Console	Current time: ${current_time}
 	Log To Console	Applied time that is in the past: ${new_time}
 	Evaluate	clipboard.copy("${new_time}")	modules=clipboard
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.v
 	ELSE
 		Press Combination	KEY.ctrl		KEY.v
@@ -3166,12 +3165,12 @@ Verify That When Time Is Entered In the Past It Becomes the Next Day
 	Press key.tab 2 Times
 
 	Click Label With Horizontal Offset	schedule_date	100
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.a
 	ELSE
 		Double Click
 	END
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.c
 	ELSE
 		Press Combination	KEY.ctrl		KEY.c
@@ -3185,13 +3184,13 @@ Verify That When Time Is Entered In the Past It Becomes the Next Day
 
 	Click Dialog Button 	ok
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${20}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${20}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
 
-	[Teardown]	Run Keywords	Close Manager GUI ${platform}
+	[Teardown]	Run Keywords	Close Manager GUI ${PLATFORM}
 
 Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time Has Elapsed
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
@@ -3206,16 +3205,16 @@ Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time
 	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-t 	${new_time}
 
 	Open Manager GUI	${mngr_options}
-	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_button_stoprun.png	timeout=30
+	${status}=	Run Keyword And Return Status	Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=30
 	Run Keyword If	${status}	Fail
 	...    msg=The Manager started script before the scheduled start-up!
 	Log To Console	Scenario should start soon.
-	${status}=	Run Keyword And Return Status	Wait For	manager_${platform}_button_stoprun.png	timeout=85
+	${status}=	Run Keyword And Return Status	Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=85
 	Run Keyword If	not ${status}	Fail
 	...    msg=The Manager did not started script after the scheduled time has elapsed!
 
 	[Teardown]	Run Keywords
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Stop Agent
 
 Verify the Start Time Is Displayed On the Plan Screen
@@ -3237,13 +3236,13 @@ Verify the Start Time Is Displayed On the Plan Screen
 	Open Manager GUI	${mngr_options}
 	Take A Screenshot
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${20}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "Start Time" for scheduled start.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_${expected_time_image}.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_${expected_time_image}.png 	timeout=${20}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "${scheduled_time}" for scheduled start.
 
-	[Teardown]	Run Keyword 	Close Manager GUI ${platform}
+	[Teardown]	Run Keyword 	Close Manager GUI ${PLATFORM}
 
 Verify the Remaining Time Is Displayed On the Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
@@ -3259,13 +3258,13 @@ Verify the Remaining Time Is Displayed On the Plan Screen
 	Open Manager GUI	${mngr_options}
 	Take A Screenshot
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${20}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "Remaining" for scheduled start.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_10_00.png 	timeout=${60}
+	...    Wait For	manager_${PLATFORM}_label_10_00.png 	timeout=${60}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't displayed "10:00" for scheduled start.
 
-	[Teardown]	Run Keyword 	Close Manager GUI ${platform}
+	[Teardown]	Run Keyword 	Close Manager GUI ${PLATFORM}
 
 Verify That the Start Time And Time Remaining Are Removed From Plan Screen When Scheduled Start Is Disabled
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
@@ -3280,10 +3279,10 @@ Verify That the Start Time And Time Remaining Are Removed From Plan Screen When 
 
 	Open Manager GUI	${mngr_options}
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${20}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Start Time" for scheduled start.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${20}
+	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${20}
 	Run Keyword If	not ${status}	Fail	msg=Manager didn't set a "Remaining" for scheduled start.
 
 	Log To Console	Disabling Scheduled Start
@@ -3292,13 +3291,13 @@ Verify That the Start Time And Time Remaining Are Removed From Plan Screen When 
 	Click Dialog Button 	ok
 	Sleep 	1
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_start_time.png 	timeout=${10}
+	...    Wait For	manager_${PLATFORM}_label_start_time.png 	timeout=${10}
 	Run Keyword If	${status}	Fail	msg=Manager didn't unset a "Start Time" for scheduled start after disabling it.
 	${status}=	Run Keyword And Return Status
-	...    Wait For	manager_${platform}_label_remaining.png 	timeout=${10}
+	...    Wait For	manager_${PLATFORM}_label_remaining.png 	timeout=${10}
 	Run Keyword If	${status}	Fail	msg=Manager didn't unset a "Remaining" for scheduled start after disabling it.
 
-	[Teardown]	Run Keywords	Close Manager GUI ${platform}
+	[Teardown]	Run Keywords	Close Manager GUI ${PLATFORM}
 
 Verify That TPS Is TP And Not TPmS
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #155 	robot:continue-on-failure
@@ -3308,7 +3307,7 @@ Verify That TPS Is TP And Not TPmS
 	...    Open Agent
 
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#155${/}tps.rfs
-	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-d 	${results_dir} 	-g 	3
+	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-d 	${RESULTS_DIR} 	-g 	3
 	Open Manager GUI 	${mngr_options}
 	Check If The Agent Is Ready
 	Click Tab 	Plan
@@ -3327,29 +3326,29 @@ Verify That TPS Is TP And Not TPmS
 
 	Take A Screenshot
 	${pvinfo}= 	Get Python Version Info
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		VAR 	${tpslegend} 	manager_${platform}_label_tpslegend_py3.9.png
+	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		VAR 	${tpslegend} 	manager_${PLATFORM}_label_tpslegend_py3.9.png
 	ELSE
-		VAR 	${tpslegend} 	manager_${platform}_label_tpslegend.png
+		VAR 	${tpslegend} 	manager_${PLATFORM}_label_tpslegend.png
 	END
 	Wait For 	${tpslegend} 	 timeout=30
 
 	Take A Screenshot
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		VAR 	${tpsvalue} 	manager_${platform}_label_tpsvaluesaxis_py3.9.png
+	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		VAR 	${tpsvalue} 	manager_${PLATFORM}_label_tpsvaluesaxis_py3.9.png
 	ELSE
-		VAR 	${tpsvalue} 	manager_${platform}_label_tpsvaluesaxis.png
+		VAR 	${tpsvalue} 	manager_${PLATFORM}_label_tpsvaluesaxis.png
 	END
 	Wait For 	${tpsvalue} 	 timeout=30
 
-	IF 	"${platform}" == "macos"
+	IF 	"${PLATFORM}" == "macos"
 		Click Button 	CloseWindow
 	ELSE
 		Click Button With Vertical Offset 	GraphSettings 	offset=-15
 	END
 
 	[Teardown]	Run Keywords
-	...    Run Keyword 	Close Manager GUI ${platform} 	AND
+	...    Run Keyword 	Close Manager GUI ${PLATFORM} 	AND
 	...    Stop Agent
 
 # Verify Agent Filter Graphs
@@ -3358,7 +3357,7 @@ Verify That TPS Is TP And Not TPmS
 # 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
 # 	VAR 	${agent_name_1} 	TEST_1
 # 	VAR 	${agent_name_2} 	TEST_2
-# 	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${results_dir} 	-r 	-a 	2
+# 	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${RESULTS_DIR} 	-r 	-a 	2
 # 	VAR 	@{agnt_options_1} 	-a 	${agent_name_1}
 # 	VAR 	@{agnt_options_2} 	-a 	${agent_name_2}
 
@@ -3376,7 +3375,7 @@ Verify That TPS Is TP And Not TPmS
 # 	Click Button 	Refresh
 # 	Sleep 	3
 # 	Take A Screenshot
-# 	VAR 	${robots_value} 	manager_${platform}_label_4.0.png
+# 	VAR 	${robots_value} 	manager_${PLATFORM}_label_4.0.png
 # 	${status}=	Run Keyword And Return Status	Wait For 	${robots_value} 	 timeout=6
 # 	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph!
 
@@ -3385,7 +3384,7 @@ Verify That TPS Is TP And Not TPmS
 # 	...    Stop Agent 	AND
 # 	...    Set Test Variable 	${process_agent} 	${process_agent_2} 	AND
 # 	...    Stop Agent 	AND
-# 	...    Run Keyword 	Close Manager GUI ${platform}
+# 	...    Run Keyword 	Close Manager GUI ${PLATFORM}
 
 Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure
@@ -3393,7 +3392,7 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
 	VAR 	${agent_name_1} 	TEST_1
 	VAR 	${agent_name_2} 	TEST_2
-	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${results_dir} 	-r 	-a 	2
+	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${RESULTS_DIR} 	-r 	-a 	2
 	VAR 	@{agnt_options_1} 	-a 	${agent_name_1}
 	VAR 	@{agnt_options_2} 	-a 	${agent_name_2}
 
@@ -3412,7 +3411,7 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	Click Label With Horizontal Offset 	FilterPattern 	140
 	VAR 	${filter} 	*21*
 	Evaluate 	clipboard.copy("${filter}") 	modules=clipboard
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination 	KEY.command 	KEY.a
 		Sleep 	1
 		Press Combination	KEY.command		KEY.v
@@ -3425,10 +3424,10 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
-	VAR 	${y_value} 	manager_${platform}_label_8.png
+	VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
 	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
 	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should not be visible on the graph.
-	VAR 	${y_value} 	manager_${platform}_label_4.png
+	VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
 	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
 	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
 
@@ -3438,7 +3437,7 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	Click Label With Horizontal Offset 	FilterPattern 	140
 	VAR 	${filter} 	*Keyword *2
 	Evaluate 	clipboard.copy("${filter}") 	modules=clipboard
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination 	KEY.command 	KEY.a
 		Sleep 	1
 		Press Combination	KEY.command		KEY.v
@@ -3451,10 +3450,10 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
-	VAR 	${y_value} 	manager_${platform}_label_8.png
+	VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
 	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
 	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should not be visible on the graph.
-	VAR 	${y_value} 	manager_${platform}_label_4.png
+	VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
 	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
 	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
 
@@ -3463,7 +3462,7 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	...    Stop Agent 	AND
 	...    Set Test Variable 	${process_agent} 	${process_agent_2} 	AND
 	...    Stop Agent 	AND
-	...    Run Keyword 	Close Manager GUI ${platform}
+	...    Run Keyword 	Close Manager GUI ${PLATFORM}
 
 Verify Filter Result Graphs - Wildcard & Not Wildcard
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure
@@ -3471,7 +3470,7 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
 	VAR 	${agent_name_1} 	TEST_1
 	VAR 	${agent_name_2} 	TEST_2
-	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${results_dir} 	-r 	-a 	2
+	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${RESULTS_DIR} 	-r 	-a 	2
 	VAR 	@{agnt_options_1} 	-a 	${agent_name_1}
 	VAR 	@{agnt_options_2} 	-a 	${agent_name_2}
 
@@ -3490,7 +3489,7 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	Click Label With Horizontal Offset 	FilterPattern 	140
 	VAR 	${filter} 	*21*
 	Evaluate 	clipboard.copy("${filter}") 	modules=clipboard
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination 	KEY.command 	KEY.a
 		Sleep 	1
 		Press Combination	KEY.command		KEY.v
@@ -3503,10 +3502,10 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
-	VAR 	${y_value} 	manager_${platform}_label_8.png
+	VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
 	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
 	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}" should not be visible on the graph.
-	VAR 	${y_value} 	manager_${platform}_label_4.png
+	VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
 	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
 	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
 
@@ -3516,7 +3515,7 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	Click Label With Horizontal Offset 	FilterPattern 	140
 	VAR 	${filter} 	*Keyword *2
 	Evaluate 	clipboard.copy("${filter}") 	modules=clipboard
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination 	KEY.command 	KEY.a
 		Sleep 	1
 		Press Combination	KEY.command		KEY.v
@@ -3529,10 +3528,10 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
-	VAR 	${y_value} 	manager_${platform}_label_8.png
+	VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
 	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
 	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}" should not be visible on the graph.
-	VAR 	${y_value} 	manager_${platform}_label_4.png
+	VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
 	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
 	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
 
@@ -3541,7 +3540,7 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	...    Stop Agent 	AND
 	...    Set Test Variable 	${process_agent} 	${process_agent_2} 	AND
 	...    Stop Agent 	AND
-	...    Run Keyword 	Close Manager GUI ${platform}
+	...    Run Keyword 	Close Manager GUI ${PLATFORM}
 
 Check Application Icon or Desktop Shortcut in GUI
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
@@ -3586,13 +3585,13 @@ Check If Monitoring settings are loaded and used
 	# Take A Screenshot
 
 	Log 	Verify Monitoring screen loaded as expected		console=True
-	Wait For 	manager_${platform}_issue_173_monitoring_settings.png 	 timeout=${default_image_timeout}
+	Wait For 	manager_${PLATFORM}_issue_173_monitoring_settings.png 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 
 	Click Tab	Plan
 	# Take A Screenshot
 
 	Log 	Verify Plan screen loaded as expected		console=True
-	Wait For 	manager_${platform}_issue_173_plan_settings.png 	 timeout=${default_image_timeout}
+	Wait For 	manager_${PLATFORM}_issue_173_plan_settings.png 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 
 	# Take A Screenshot
 	Check If The Agent Is Ready
@@ -3605,7 +3604,7 @@ Check If Monitoring settings are loaded and used
 	# Take A Screenshot
 
 	Log 	Wait for monitoring robots to start		console=True
-	Wait For   manager_${platform}_monitor_5.png    timeout=${monitortimebefore}
+	Wait For   manager_${PLATFORM}_monitor_5.png    timeout=${monitortimebefore}
 	${MON_START_TIME}= 	Get Current Date
 	# Take A Screenshot
 
@@ -3614,19 +3613,19 @@ Check If Monitoring settings are loaded and used
 	Sleep    ${sleeptime}
 
 	Log 	Verify robots don't start in pre-run monitoring time		console=True
-	Wait For   manager_${platform}_robots_0.png    timeout=1
+	Wait For   manager_${PLATFORM}_robots_0.png    timeout=1
 	# Take A Screenshot
 
-	Wait For   manager_${platform}_robots_10.png    timeout=${default_image_timeout}
+	Wait For   manager_${PLATFORM}_robots_10.png    timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# Take A Screenshot
 
-	Wait For   manager_${platform}_robots_0.png    timeout=${robot_test_time + ${default_image_timeout}}
+	Wait For   manager_${PLATFORM}_robots_0.png    timeout=${robot_test_time + ${DEFAULT_IMAGE_TIMEOUT}}
 	${END_TIME}= 	Get Current Date
 
 	# Take A Screenshot
 	Set Confidence 		0.95
 	Log 	Wait for monitoring robots to end		console=True
-	Wait For   manager_${platform}_monitor_0.png    timeout=${monitortimeafter + ${default_image_timeout}}
+	Wait For   manager_${PLATFORM}_monitor_0.png    timeout=${monitortimeafter + ${DEFAULT_IMAGE_TIMEOUT}}
 	${MON_END_TIME}= 	Get Current Date
 	Take A Screenshot
 
@@ -3638,7 +3637,7 @@ Check If Monitoring settings are loaded and used
 	...    Delete Scenario File		${scenario_name}		AND
 	...    Set Confidence	0.9								AND
 	...    Stop Agent							AND
-	...    Run Keyword		Close Manager GUI ${platform}	AND
+	...    Run Keyword		Close Manager GUI ${PLATFORM}	AND
 	...    Remove File		${global_path}${/}example.robot
 
 

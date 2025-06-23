@@ -1,7 +1,6 @@
 *** Settings ***
 Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #238 	Languages
 
-Resource 	../Common/GUI_Common.resource
 Resource 	resources/GUI_Manager.resource
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Manager
@@ -58,7 +57,7 @@ Language Test Init
 	Open Agent
 
 Language Test End
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 	Stop Agent
 
 

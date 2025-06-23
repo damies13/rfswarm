@@ -1,5 +1,4 @@
 *** Settings ***
-Resource 	../Common/GUI_Common.resource
 Resource 	resources/GUI_Reporter.resource
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Reporter
@@ -23,7 +22,7 @@ Verify If Reporter Runs With Existing INI File From Current Version
 	TRY
 		Click Section	test_result_summary
 		Click	#double click needed. Maybe delete after eel module implemetation
-		Wait For	reporter_${platform}_option_datatable.png 	timeout=${60}
+		Wait For	reporter_${PLATFORM}_option_datatable.png 	timeout=${60}
 	EXCEPT
 		Fail	msg=Reporter is not responding!
 	END
@@ -40,7 +39,7 @@ Verify If Reporter Runs With No Existing INI File From Current Version
 	TRY
 		Click Section	test_result_summary
 		Click	#double click needed. Maybe delete after eel module implemetation
-		Wait For	reporter_${platform}_option_datatable.png 	timeout=${30}
+		Wait For	reporter_${PLATFORM}_option_datatable.png 	timeout=${30}
 	EXCEPT
 		Fail	msg=Reporter is not responding!
 	END
@@ -61,7 +60,7 @@ Verify If Reporter Runs With Existing INI File From Previous Version
 	TRY
 		Click Section	test_result_summary
 		Click	#double click needed. Maybe delete after eel module implemetation
-		Wait For	reporter_${platform}_option_datatable.png 	timeout=${30}
+		Wait For	reporter_${PLATFORM}_option_datatable.png 	timeout=${30}
 	EXCEPT
 		Fail	msg=Reporter is not responding!
 	END
@@ -152,13 +151,13 @@ New Data Table Section
 	# This should click Report
 	Click Section			Report
 	# Click Text			toc 	0 	-20
-	# Click To The Below Of Image 	reporter_${platform}_button_removesection.png 	20
+	# Click To The Below Of Image 	reporter_${PLATFORM}_button_removesection.png 	20
 
 	Take A Screenshot
 
 	Click Button 			AddSection
 
-	Click To The Below Of Image 	reporter_${platform}_label_sectionname.png 	20
+	Click To The Below Of Image 	reporter_${PLATFORM}_label_sectionname.png 	20
 	Type 	Issue #149
 	Click Button 			OK
 	Take A Screenshot
@@ -312,7 +311,7 @@ Template with Start and End Dates
 
 	Click Section			TestResultSummary
 	# Take A Screenshot
-	Wait For 	reporter_${platform}_expected_testresultsummary.png 	 timeout=30
+	Wait For 	reporter_${PLATFORM}_expected_testresultsummary.png 	 timeout=30
 
 	[Teardown] 	Close GUI
 

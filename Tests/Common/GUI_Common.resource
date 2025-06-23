@@ -11,11 +11,11 @@ Library 	ImageHorizonLibrary 	reference_folder=${IMAGE_DIR}
 Library 	img_common.py
 
 *** Variables ***
-${CONFIDENCE} 		${None}
+${CONFIDENCE} 		${0.9}
 ${IMAGE_DIR} 		${None}
 
-${debug_screenshots} 		${False}
-${default_image_timeout} 	${120}
+${DEBUG_SCREENSHOTS} 		${False}
+${DEFAULT_IMAGE_TIMEOUT} 	${120}
 
 *** Keywords ***
 GUI Suite Initialization ${component}
@@ -24,16 +24,15 @@ GUI Suite Initialization ${component}
 	Basic Suite Initialization ${component} 	# basic suite configuration
 
 	Set Suite Variable 	${COMPONENT} 	${component}
-	Set Suite Variable 	${IMAGE_DIR} 	${CURDIR}${/}..${/}${COMPONENT}${/}Images${/}file_method
-	Set Suite Variable 	${CONFIDENCE} 	0.9
+	Set Suite Variable 	${IMAGE_DIR} 	${CURDIR}${/}..${/}Regression${/}${COMPONENT}${/}Images${/}file_method
 	Set Confidence 		${CONFIDENCE}
 	ImageHorizonLibrary.Set Reference Folder 	${IMAGE_DIR}
 
-	Set Platform
 	Log 	\t[ === GUI suite configuration has been initiated for ${COMPONENT} === ] 	console=True
 	Log 	image dir = ${IMAGE_DIR} 	console=True
 	Log 	confidence level = ${CONFIDENCE} 	console=True
-	Log 	default image timeout = ${default_image_timeout}\n\n\n 	console=True
+	Log 	default image timeout = ${DEFAULT_IMAGE_TIMEOUT} 	console=True
+	Log 	------------------------------------------------------------------------------\n\n\n 	console=True
 
 Press ${key} ${n} Times
 	[Documentation]	Provide full name. For example: Key.tab
@@ -79,18 +78,32 @@ Get Last Screenshot
 		RETURN 	${files}[-1]
 	END
 
+#TODO: Chceck if it works
+Resize Window
+	[Arguments]		${x}=0		${y}=0
+	# 											manager_macos_corner_resize
+	${img}=	Set Variable		manager_${PLATFORM}_corner_resize.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
+	@{coordinates}= 	Locate		${img}
+	@{coordinates2}= 	Create List 	${{${coordinates[0]}+${x}}} 	${{${coordinates[1]}+${y}}}
+	Move To 	@{coordinates}
+	Mouse Down
+	Move To 	@{coordinates2}
+	# Take A Screenshot
+	Mouse Up
+
 # # # # # # #
 # CLICK ... #
 # # # # # # #
 
 Click Button
-	[Arguments]		${btnname} 		${timeout}=${default_image_timeout}
+	[Arguments]		${btnname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
-	${img}= 	Set Variable 	${comp}_${platform}_button_${btnnamel}.png
+	${img}= 	Set Variable 	${comp}_${PLATFORM}_button_${btnnamel}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
-	# IF  "${platform}" == "windows"
+	# IF  "${PLATFORM}" == "windows"
 	# 	Set Confidence	0.85
 	# END
 	Wait For 	${img} 	 timeout=${timeout}
@@ -98,102 +111,102 @@ Click Button
 	Click Image 	${img}
 	Sleep 	0.1
 
-	Run Keyword IF 	${debug_screenshots} 	Take A Screenshot
-	# IF  "${platform}" == "windows"
+	IF 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
+	# IF  "${PLATFORM}" == "windows"
 	# 	Set Confidence 	0.9
 	# END
 
 Wait For Dialog Button
-	[Arguments]		${btnname} 		${timeout}=${default_image_timeout}
+	[Arguments]		${btnname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
-	${img}=	Set Variable 	${platform}_dlgbtn_${btnnamel}.png
+	${img}=	Set Variable 	${PLATFORM}_dlgbtn_${btnnamel}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate 	${img}
-	Run Keyword IF 	${debug_screenshots} 	Take A Screenshot
+	IF 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 Click Dialog Button
-	[Arguments]		${btnname} 		${timeout}=${default_image_timeout}
+	[Arguments]		${btnname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
-	${img}=	Set Variable		${platform}_dlgbtn_${btnnamel}.png
+	${img}=	Set Variable		${PLATFORM}_dlgbtn_${btnnamel}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
 	Sleep 	0.1
-	Run Keyword IF 	${debug_screenshots} 	Take A Screenshot
+	IF 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 Click Tab
 	[Arguments]		${tabname}
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${tabnamel}= 	Convert To Lower Case 	${tabname}
-	${img}=	Set Variable		${comp}_${platform}_tab_${tabnamel}.png
+	${img}=	Set Variable		${comp}_${PLATFORM}_tab_${tabnamel}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
 	Sleep 	0.1
-	Run Keyword IF 	${debug_screenshots} 	Take A Screenshot
+	IF 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 Select Option
 	[Arguments]		${optname}
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${optnamel}= 	Convert To Lower Case 	${optname}
-	${img}= 	Set Variable		${comp}_${platform}_option_${optnamel}.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}= 	Set Variable		${comp}_${PLATFORM}_option_${optnamel}.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
 	Sleep 	0.1
-	Run Keyword IF 	${debug_screenshots} 	Take A Screenshot
+	IF 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 Selected Option Should Be
 	[Arguments]		${optname}
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${optnamel}= 	Convert To Lower Case 	${optname}
-	${img}= 	Set Variable		${comp}_${platform}_option_${optnamel}.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}= 	Set Variable		${comp}_${PLATFORM}_option_${optnamel}.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate 	${img}
 
 Click Menu
 	[Arguments]		${menuname}
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${menunamel}= 	Convert To Lower Case 	${menuname}
-	${img}=	Set Variable		${comp}_${platform}_menu_${menunamel}.png
+	${img}=	Set Variable		${comp}_${PLATFORM}_menu_${menunamel}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
 	Sleep 	0.1
-	Run Keyword IF 	${debug_screenshots} 	Take A Screenshot
+	IF 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 Click CheckBox
 	[Arguments]		${status} 		${btnname}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
 	${statusl}= 	Convert To Lower Case 	${status}
-	${img}=	Set Variable		${platform}_checkbox_${statusl}_${btnnamel}.png
+	${img}=	Set Variable		${PLATFORM}_checkbox_${statusl}_${btnnamel}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
 	Sleep 	0.1
-	Run Keyword IF 	${debug_screenshots} 	Take A Screenshot
+	IF 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 Click RadioBtn
 	[Arguments]		${btnname}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
-	${img}=	Set Variable		${platform}_radiobtn_${btnnamel}.png
+	${img}=	Set Variable		${PLATFORM}_radiobtn_${btnnamel}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
 	Sleep 	0.1
-	Run Keyword IF 	${debug_screenshots} 	Take A Screenshot
+	IF 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 Click ${item} With Vertical Offset
 	[Arguments]		${image_name}	${offset}=0
@@ -202,15 +215,15 @@ Click ${item} With Vertical Offset
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${image_name}= 	Convert To Lower Case 	${image_name}
 	${item}= 	Convert To Lower Case 	${item}
-	${img}=	Set Variable		${comp}_${platform}_${item}_${image_name}.png
+	${img}=	Set Variable		${comp}_${PLATFORM}_${item}_${image_name}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate 	${img}
 	Log	${coordinates}
 	Click To The Below Of	${coordinates}	${offset}
 	Sleep 	0.1
-	Run Keyword IF 	${debug_screenshots} 	Take A Screenshot
+	IF 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 Click ${item} With Horizontal Offset
 	[Arguments]		${image_name}	${offset}=0
@@ -219,20 +232,20 @@ Click ${item} With Horizontal Offset
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${image_name}= 	Convert To Lower Case 	${image_name}
 	${item}= 	Convert To Lower Case 	${item}
-	${img}=	Set Variable		${comp}_${platform}_${item}_${image_name}.png
+	${img}=	Set Variable		${comp}_${PLATFORM}_${item}_${image_name}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate 	${img}
 	Log	${coordinates}
 	Click To The Right Of	${coordinates}	${offset}
 	Sleep 	0.1
-	Run Keyword IF 	${debug_screenshots} 	Take A Screenshot
+	IF 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 File Open Dialogue Select File
 	[Arguments]		${filepath}
-	Run Keyword		File Open Dialogue ${platform} Select File 			${filepath}
-	Run Keyword IF 	${debug_screenshots} 	Take A Screenshot
+	Run Keyword		File Open Dialogue ${PLATFORM} Select File 			${filepath}
+	IF 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 File Open Dialogue ubuntu Select File
 	[Arguments]		${filepath}
@@ -241,7 +254,7 @@ File Open Dialogue ubuntu Select File
 	Sleep	0.5
 	Type 		${filepath} 	Key.ENTER
 	Sleep	0.5
-	Run Keyword IF 	${debug_screenshots} 	Take A Screenshot
+	IF 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 	# Click Dialog Button 	open
 
 File Open Dialogue windows Select File
@@ -258,7 +271,7 @@ File Open Dialogue windows Select File
 	Sleep	0.5
 	Take A Screenshot
 	Press key.enter 1 Times
-	Run Keyword IF 	${debug_screenshots} 	Take A Screenshot
+	IF 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 	# Click Dialog Button 	open
 	Sleep	0.5
 
@@ -272,14 +285,14 @@ File Open Dialogue macos Select File
 	Click Label With Horizontal Offset 	file_name 	-10
 	Click	button=right	#show context menu
 	Sleep	2
-	Run Keyword IF 	${debug_screenshots} 	Take A Screenshot
+	IF 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 	Press Combination 	KEY.down	#choose paste option(should be first)
 	Press key.enter 1 Times		#execute paste option
 	Sleep	0.5
-	Run Keyword IF 	${debug_screenshots} 	Take A Screenshot
+	IF 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 	Press key.enter 1 Times
 	Sleep	0.5
-	Run Keyword IF 	${debug_screenshots} 	Take A Screenshot
+	IF 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 	Click Dialog Button 	open
 	# Type 		Key.BACKSPACE 	Key.DELETE
 	# Click Dialog Button 	open
@@ -310,15 +323,15 @@ Click Text
 	@{coordinates}= 	Create List 	${x} 	${y}
 	Move To 	${coordinates}
 	Click
-	Run Keyword IF 	${debug_screenshots} 	Take A Screenshot
+	IF 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 Get Text Value To Right Of
 	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
 	${labell}= 	Convert To Lower Case 	${label}
 	${comp}= 	Convert To Lower Case 	${COMPONENT}
-	${img}= 	Set Variable		${comp}_${platform}_label_${labell}.png
+	${img}= 	Set Variable		${comp}_${PLATFORM}_label_${labell}.png
 
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 
 	Make Clipboard Not None 	# reset clipboard
 	${b4value}= 	Get Clipboard Content
@@ -330,7 +343,7 @@ Get Text Value To Right Of
 	Take A Screenshot
 
 	WHILE 	$b4value == $value 		limit=15
-		Wait For 	${img} 	 timeout=${default_image_timeout}
+		Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 		${offsetx}= 	Evaluate 	${offsetx}+10
 		Click To The Right Of Image 	${img} 	${offsetx}
 		${value}= 	Copy From The Right Of 	${img} 	${offsetx}
@@ -378,7 +391,7 @@ Set Text Value To Right Of
 	${value}= 	Convert To String 	${value}
 	${comp}= 	Convert To Lower Case 	${COMPONENT}
 	${labell}= 	Convert To Lower Case 	${label}
-	${img}= 	Set Variable		${comp}_${platform}_label_${labell}.png
+	${img}= 	Set Variable		${comp}_${PLATFORM}_label_${labell}.png
 	${imgsize}= 	Get Image Size 	${IMAGE_DIR}${/}${img}
 	Log		${imgsize}
 	${offsetx2}= 	Evaluate 	int(${imgsize}[0]/2)+${offsetx}
@@ -386,15 +399,16 @@ Set Text Value To Right Of
 	Log		${CURDIR}
  	Log		${IMAGE_DIR}
 
-	@{coordinates}= 	Wait For 	${img} 	 timeout=${default_image_timeout}
+	@{coordinates}= 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	${x}= 	Evaluate 	${coordinates}[0]+${offsetx2}
 	${y}= 	Evaluate 	${coordinates}[1]+${offsety}
 	@{coordinates}= 	Create List 	${x} 	${y}
 	Move To 	${coordinates}
 	Click
+	Sleep 	0.5
 	Click
 	Sleep 	0.3
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.a
 	ELSE
 		Press Combination	KEY.ctrl		KEY.a
@@ -414,7 +428,7 @@ Set Text Value To Right Of
 	# END
 
 	Evaluate 	clipboard.copy("${value}") 	modules=clipboard
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.v
 	ELSE
 		Press Combination	KEY.ctrl		KEY.v
@@ -441,7 +455,7 @@ Set Text Value To Right Of
 			Take A Screenshot
 			Evaluate 	clipboard.copy("${value}") 	modules=clipboard
 
-			IF  "${platform}" == "macos"
+			IF  "${PLATFORM}" == "macos"
 				Press Combination	KEY.command		KEY.v
 			ELSE
 				Press Combination	KEY.ctrl		KEY.v

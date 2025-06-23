@@ -1,5 +1,4 @@
 *** Settings ***
-Resource 	../Common/Common.resource
 Resource 	resources/CommandLine_Agent.resource
 
 Suite Setup 	Common.Basic Suite Initialization Agent

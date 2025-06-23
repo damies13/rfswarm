@@ -1,7 +1,6 @@
 *** Settings ***
 Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #97 	Languages
 
-Resource 	../Common/GUI_Common.resource
 Resource 	resources/GUI_Manager.resource
 
 Variables 	${CURDIR}${/}testdata${/}Issue-#97${/}lang_samples.yaml
@@ -41,11 +40,11 @@ Test Non-ASCII Characters
 
 	VAR 	${sample} 	${Samples.${langcode}}
 	VAR 	${scenario_name} 	${langcode}_scenario 		scope=TEST
-	VAR 	${results_dir} 		${test_data}${/}results 	scope=TEST
+	VAR 	${RESULTS_DIR} 		${test_data}${/}results 	scope=TEST
 	VAR 	${agent_name} 		${sample} 					scope=TEST
-	Create Directory 	${results_dir}
+	Create Directory 	${RESULTS_DIR}
 	${robot_file} 	${scenario_file}= 	Create Language Files 	${langcode} 	${sample}
-	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${results_dir}
+	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${RESULTS_DIR}
 	VAR 	@{agnt_options} 	-a 	${agent_name}
 
 	Open Agent 			${agnt_options}
@@ -79,7 +78,7 @@ Non-ASCII Test Setup
 
 Non-ASCII Test Teardown
 	Stop Agent
-	Run Keyword		Close Manager GUI ${platform}
+	Run Keyword		Close Manager GUI ${PLATFORM}
 	Check Non-ASCII Logs
 
 Create Language Files
@@ -101,7 +100,7 @@ Create Language Files
 Check DB For Metrics
 	[Arguments] 	${langcode} 	${sample}
 	Log 	\tChecking run Database 	console=${True}
-	${dbfile}= 	Find Result DB 	directory=${results_dir}	result_pattern=*_${scenario_name}*
+	${dbfile}= 	Find Result DB 	directory=${RESULTS_DIR}	result_pattern=*_${scenario_name}*
 	${db_query_result}= 	Query Result DB 	${dbfile}
 	...    SELECT count(*) FROM MetricData WHERE PrimaryMetric='${sample} Keyword'
 
@@ -113,7 +112,7 @@ Check CSV Files
 	Log 	\tChecking CSV Files 	console=${True}
 	VAR 	@{keywords} 	${sample} Keyword 	${sample} Fail Keyword
 
-	@{test_results}=	List Directories In Directory	${results_dir}		absolute=${True}	pattern=*${scenario_name}
+	@{test_results}=	List Directories In Directory	${RESULTS_DIR}		absolute=${True}	pattern=*${scenario_name}
 	@{csv_file_paths}=		List Files In Directory		${test_results}[0]	*.csv	absolute=${True}
 	Length Should Be	${csv_file_paths}	3	msg=Some CSV files are missing!
 
