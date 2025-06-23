@@ -324,7 +324,7 @@ Check That the Manager Supports the Missing Scenario File Provided By the -s Arg
 
 Verify If Manager Runs With Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
-	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+	[Setup] 	Set Global Filename And Default Save Path 	${robot_data}[0]
 
 	@{mngr_options}		Create List		-n
 
@@ -370,7 +370,7 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 
 Verify If Manager Runs With No Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
-	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+	[Setup] 	Set Global Filename And Default Save Path 	${robot_data}[0]
 
 	@{mngr_options}		Create List		-n
 	Remove File		${global_path}${/}RFSwarmManager.ini
@@ -394,7 +394,7 @@ Verify If Manager Runs With No Existing INI File From Current Version NO GUI
 
 Verify If Manager Runs With Existing INI File From Previous Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
-	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+	[Setup] 	Set Global Filename And Default Save Path 	${robot_data}[0]
 
 	@{mngr_options}		Create List		-n
 	Remove File		${global_path}${/}RFSwarmManager.ini

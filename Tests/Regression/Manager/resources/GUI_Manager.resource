@@ -293,8 +293,11 @@ Set Global Filename And Default Save Path
 	Set Test Variable	${global_path}	${location}
 
 	Set Test Variable 	$file_name 	${global_name}
-	Change Manager INI Option 	Plan 	scriptdir 		${optional_path}
-	Change Manager INI Option 	Plan 	scenariodir 	${optional_path}
+	IF  '${optional_path}' != '${None}'
+		Set Test Variable	${global_path}	${optional_path}
+		Change Manager INI Option 	Plan 	scriptdir 		${optional_path}
+		Change Manager INI Option 	Plan 	scenariodir 	${optional_path}
+	END
 
 	Log		${global_name}
 	Log		${global_path}

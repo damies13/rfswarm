@@ -283,8 +283,16 @@ Create ${component_name} INI File If It Does Not Exist
 		File Should Exist	${location}
 		File Should Not Be Empty	${location}
 	EXCEPT
-		${process}= 	Start Process  rfswarm-${comp}  stdout=${OUTPUT DIR}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stderr_${comp}.txt
-		Sleep 	6s
+		Log 	INI file for ${component_name} does not exist or it's empty. Creating new one. 	console=True
+
+		IF  '${component_name}' == 'Manager'
+			${process}= 	Start Process  rfswarm-manager  -n  stdout=${OUTPUT DIR}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stderr_${comp}.txt
+		ELSE IF  '${component_name}' == 'Agent'
+			${process}= 	Start Process  rfswarm-agent  stdout=${OUTPUT DIR}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stderr_${comp}.txt
+		ELSE IF  '${component_name}' == 'Reporter'
+			${process}= 	Start Process  rfswarm-reporter  -n  stdout=${OUTPUT DIR}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stderr_${comp}.txt
+		END
+		Wait For File To Exist 	${location}
 		${result}= 	Terminate Process 	${process}
 
 		File Should Exist 	${location}

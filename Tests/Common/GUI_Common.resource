@@ -99,6 +99,8 @@ Resize Window
 Set ${component_name} INI Window Size
 	[Documentation] 	Pass the: Manager, Reporter or Agent
 	[Arguments]		${width}=${None}	${height}=${None}
+	Log 	${width}
+	Log 	${height}
 	IF	"${width}" != "${None}"
 		Change ${component_name} INI Option 	GUI 		win_width 	${width}
 	END
