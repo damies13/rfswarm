@@ -4,10 +4,9 @@ Documentation 	This resource file contains keywords for Reporter XLSX reports on
 Resource 	../../../Common/Common.resource
 
 Library 	DocTest.VisualTest
+Library 	read_xlsx.py
 
-Library 	../read_xlsx.py
-
-Variables 	../report_expected_data.yaml
+Variables 	report_expected_data.yaml
 
 *** Keywords ***
 

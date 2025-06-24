@@ -5,10 +5,9 @@ Resource 	../../../Common/Common.resource
 
 Library 	DocTest.VisualTest
 Library 	XML 	use_lxml=True
+Library 	save_html_image.py
 
-Library 	../save_html_image.py
-
-Variables 	../report_expected_data.yaml
+Variables 	report_expected_data.yaml
 
 *** Keywords ***
 

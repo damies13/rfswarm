@@ -4,9 +4,9 @@ Documentation 	This resource file contains keywords for Reporter DOCX reports on
 Resource 	../../../Common/Common.resource
 
 Library 	DocTest.VisualTest
-Library 	../read_docx.py
+Library 	read_docx.py
 
-Variables 	../report_expected_data.yaml
+Variables 	report_expected_data.yaml
 
 *** Keywords ***
 Verify DOCX Cover Page

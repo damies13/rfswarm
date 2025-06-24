@@ -7,7 +7,7 @@ Library 	ArchiveLibrary
 Library 	DocTest.VisualTest
 Library 	XML 	use_lxml=True
 
-Variables 	../report_expected_data.yaml
+Variables 	report_expected_data.yaml
 
 *** Variables ***
 ${cmd_reporter} 	rfswarm-reporter
