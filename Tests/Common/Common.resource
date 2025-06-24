@@ -12,6 +12,7 @@ Library 	DateTime
 
 Library 	ini_file.py
 Library 	get_ip_address.py
+Library 	img_common.py
 
 *** Variables ***
 ${COMPONENT} 		${None} 	# currently used rfswarm component (app)
@@ -91,6 +92,7 @@ Check Logs
 	${comp} 	Convert To Lower Case 	${COMPONENT}
 	${stdout_component}= 		Read Log 	${OUTPUT DIR}${/}stdout_${comp}.txt
 	${stderr_component}= 		Read Log 	${OUTPUT DIR}${/}stderr_${comp}.txt
+	# Run Keyword And Warn On Failure 	Should Be Equal As Integers 	${result.rc} 	0
 
 	Should Not Contain 	${stdout_component} 	RuntimeError
 	Should Not Contain 	${stderr_component} 	RuntimeError
@@ -102,13 +104,13 @@ Check Logs
 	Should Not Contain 	${stderr_component} 	KeyError
 
 Utilisation Stats
-	${cpupct}= 	Evaluate 	psutil.cpu_percent(interval=1, percpu=True) 				modules=psutil
+	${cpupct}= 	Evaluate 	psutil.cpu_percent(interval=1, percpu=True) 									modules=psutil
 	Log 	\n${cpupct} 	console=True
-	${loadavg}= 	Evaluate 	psutil.getloadavg() 															modules=psutil
+	${loadavg}= 	Evaluate 	psutil.getloadavg() 														modules=psutil
 	Log 	${loadavg} 	console=True
-	${mem}= 		Evaluate 	psutil.virtual_memory() 														modules=psutil
+	${mem}= 		Evaluate 	psutil.virtual_memory() 													modules=psutil
 	Log 	${mem}
-	${proc}= 		Evaluate 	list(psutil.process_iter(['pid', 'name', 'exe', 'cmdline', 'username'])) 		modules=psutil
+	${proc}= 		Evaluate 	list(psutil.process_iter(['pid', 'name', 'exe', 'cmdline', 'username'])) 	modules=psutil
 	Log 	${proc}
 
 Make Clipboard Not None
@@ -150,6 +152,21 @@ Diff Lists
 		Log 		\nItems from list B missing from list A: ${Missing_List_From_A} 	console=True
 		Log 		Items from list A missing from list B: ${Missing_List_From_B} 	console=True
 		Lists Should Be Equal 	${list_a} 	${list_b} 		msg=${message}
+	END
+
+Kill If Still Running
+	[Documentation] 	Provide command name, for example: rfswarm-agent
+	[Arguments]		${cmd_name}
+	${processes}= 	Evaluate 	list(psutil.process_iter()) 	modules=psutil
+	# Log 	${processes}
+	FOR 	${p} 	IN 	@{processes}
+		TRY
+			IF 	$cmd_name in $p.name()
+				Evaluate 	$p.kill()
+			END
+		EXCEPT 	# Match any error.
+			Log 	Failed to kill process: ${cmd_name}
+		END
 	END
 
 # # # # # # # # #
@@ -293,6 +310,7 @@ Create ${component_name} INI File If It Does Not Exist
 			${process}= 	Start Process  rfswarm-reporter  -n  stdout=${OUTPUT DIR}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stderr_${comp}.txt
 		END
 		Wait For File To Exist 	${location}
+		Sleep 	5s
 		${result}= 	Terminate Process 	${process}
 
 		File Should Exist 	${location}

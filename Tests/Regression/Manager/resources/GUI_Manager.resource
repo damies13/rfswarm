@@ -198,20 +198,24 @@ Stop Agent
 Kill Agent If Still Running
 	Kill If Still Running 	${cmd_agent}
 
-Kill If Still Running
-	[Arguments]		${cmdname}
-	${processes}= 	Evaluate    list(psutil.process_iter()) 	modules=psutil
-	# Log		${processes}
-	FOR 	${p} 	IN 	@{processes}
-		# Log		${p}
-		TRY
-			IF 	$cmdname in $p.name()
-				Evaluate    $p.kill()
-			END
-		EXCEPT               # Match any error.
-			No Operation
+Set Global Filename And Default Save Path
+	[Documentation]	Sets global default save path as Test Variable and file name for robot test.
+	...    You can also provide optional save path.
+	[Arguments]		${input_name}	${optional_path}=${None}
+
+	Set Test Variable	${global_name}	${input_name}
+	${location}=	Get Manager Default Save Path
+	Set Test Variable	${global_path}	${location}
+
+	Set Test Variable 	$file_name 	${global_name}
+	IF  '${optional_path}' != '${None}'
+		Set Test Variable	${global_path}	${optional_path}
+		Change Manager INI Option 	Plan 	scriptdir 		${optional_path}
+		Change Manager INI Option 	Plan 	scenariodir 	${optional_path}
 	END
-	END
+
+	Log		${global_name}
+	Log		${global_path}
 
 Stop Test Scenario Run Gradually
 	[Arguments]	${rumup_time}	${robot_test_time}
@@ -266,41 +270,23 @@ Wait For the Scenario Run To Finish
 	END
 
 Check If the Robot Failed
+	# *** NOT USED
 	[Arguments] 	${expected_time}
-	Sleep	${expected_time}
+	Sleep 	${expected_time}
 	TRY
 		Click Image 	manager_${PLATFORM}_button_abort
-		Press Combination	Key.enter
+		Press Combination 	Key.enter
 	EXCEPT
-		Wait For	manager_${PLATFORM}_button_finished_run.png	timeout=${DEFAULT_IMAGE_TIMEOUT}
+		Wait For 	manager_${PLATFORM}_button_finished_run.png 	timeout=${DEFAULT_IMAGE_TIMEOUT}
 	END
 	# Take A Screenshot
-	${status}=	Run Keyword And Return Status	Locate	manager_${PLATFORM}_resource_file_provided.png
-	Run Keyword If	not ${status}	Fail	msg=Test failed. Check screenshots for more informations.
+	${status}= 	Run Keyword And Return Status 	Locate 	manager_${PLATFORM}_resource_file_provided.png
+	Run Keyword If 	not ${status} 	Fail 	msg=Test failed. Check screenshots for more informations.
 
 Wait Agent Ready
 	Click Tab 	Agents
 	${img}= 	Set Variable 	manager_${PLATFORM}_agents_ready.png
 	Wait For 	${img} 			timeout=${DEFAULT_IMAGE_TIMEOUT}
-
-Set Global Filename And Default Save Path
-	[Documentation]	Sets global default save path as Test Variable and file name for robot test.
-	...    You can also provide optional save path.
-	[Arguments]		${input_name}	${optional_path}=${None}
-
-	Set Test Variable	${global_name}	${input_name}
-	${location}=	Get Manager Default Save Path
-	Set Test Variable	${global_path}	${location}
-
-	Set Test Variable 	$file_name 	${global_name}
-	IF  '${optional_path}' != '${None}'
-		Set Test Variable	${global_path}	${optional_path}
-		Change Manager INI Option 	Plan 	scriptdir 		${optional_path}
-		Change Manager INI Option 	Plan 	scenariodir 	${optional_path}
-	END
-
-	Log		${global_name}
-	Log		${global_path}
 
 Create Robot File
 	[Arguments]		${path}=${global_path}	${name}=${global_name}
@@ -315,7 +301,6 @@ Create Robot File
 Change Test Group Settings
 	[Arguments]		${row_settings_data}
 	Sleep	2
-	#Click Dialog Button		row_settings_frame_name
 	IF  'exclude_libraries' in ${row_settings_data}
 		Click Label With Vertical Offset	exclude_libraries	20
 		IF  "${PLATFORM}" == "macos"
@@ -526,9 +511,9 @@ Compare Manager and Agent Files
 	...    msg="Files are not transferred correctly! Check report for more information."
 
 Compare Manager and Agent Files Content
-	[Arguments]	${M_absolute_paths}	${A_absolute_paths}
+	[Arguments] 	${M_absolute_paths} 	${A_absolute_paths}
 	${length}	Get Length	${M_absolute_paths}
-	@{excluded_files_format}	Create List	png		jpg		xlsx	pdf
+	@{excluded_files_format} 	Create List 	png  jpg  xlsx  pdf
 	FOR  ${i}  IN RANGE  0  ${length}
 		${file_extension}	Split String From Right	${M_absolute_paths}[${i}]	separator=.
 		IF  '${file_extension}[-1]' not in @{excluded_files_format}
@@ -851,27 +836,20 @@ Click Script Button On Row
 	${labelname}= 	Convert To Lower Case 	${labelname}
 	${img}=	Set Variable		manager_${PLATFORM}_label_${labelname}.png
 
-	# Log		${CURDIR}
-	# Log		${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
-	# @{coordinates}= 	Locate		${img}
-	# Log	${coordinates}
 	Click To The Below Of Image 	${img} 	 offset=${rowoffset}
 
-	# Take A Screenshot
+	IF  ${DEBUG_SCREENSHOTS}  Take A Screenshot
 	Press Key.tab 1 Times
-	# Take A Screenshot
-	# manager_macos_button_selected_runscriptrow.png
+	IF  ${DEBUG_SCREENSHOTS}  Take A Screenshot
 	${img}=	Set Variable		manager_${PLATFORM}_button_selected_runscriptrow.png
 	Click Image 	${img}
 	Sleep    0.1
-	# Take A Screenshot
-	# 	macos_dlgbtn_open
+	IF  ${DEBUG_SCREENSHOTS}  Take A Screenshot
+
 	${img}=	Set Variable		${PLATFORM}_dlgbtn_cancel.png
 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
-	# Take A Screenshot
-
-	# Fail 		Not Implimented
+	IF  ${DEBUG_SCREENSHOTS}  Take A Screenshot
 
 Select Test Script
 	[Arguments]		${row}	${filepath}

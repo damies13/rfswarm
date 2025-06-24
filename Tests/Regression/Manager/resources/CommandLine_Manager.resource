@@ -151,61 +151,9 @@ Set Global Filename And Default Save Path
 		Change Manager INI Option 	Plan 	scriptdir 		${optional_path}
 		Change Manager INI Option 	Plan 	scenariodir 	${optional_path}
 	END
-	# IF  '${optional_path}' != '${None}'
-	# 	Set Test Variable	${global_path}	${optional_path}
-	# 	${location}=	Get Manager INI Location
-	# 	${ini_content}=		Get Manager INI Data
-	# 	${ini_content_list}=	Split String	${ini_content}
-	# 	${scriptdir}=	Get Index From List		${ini_content_list}		scriptdir
 
-	# 	${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${scriptdir + 2}]	${optional_path}
-	# 	${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${scriptdir + 5}]	${optional_path}
-
-	# 	Remove File		${location}
-	# 	Log		${ini_content}
-	# 	Append To File	${location}		${ini_content}
-	# END
-
-	Log		${global_name}
-	Log		${global_path}
-
-# Get Manager INI Data
-# 	${location}=	Get Manager INI Location
-# 	TRY
-# 		File Should Exist	${location}
-# 		File Should Not Be Empty	${location}
-# 	EXCEPT
-# 		# --- temp fix:
-# 		@{mngr_options}= 	Create List 	-g 	1
-# 		Run Manager CLI 		${mngr_options}
-# 		Sleep 	5
-# 		# ---
-# 		Run Keyword		Stop Manager
-# 		File Should Exist	${location}
-# 		File Should Not Be Empty	${location}
-# 	END
-# 	${ini_content}=	Get File	${location}
-# 	Log	${ini_content}
-# 	Should Not Be Empty	${ini_content}
-# 	RETURN	${ini_content}
-
-# Change Manager INI File Settings
-# 	[Arguments]		${option}	${new_value}
-# 	${location}=	Get Manager INI Location
-# 	${ini_content}=		Get Manager INI Data
-# 	${ini_content_list}=	Split String	${ini_content}
-# 	${option_index}=	Get Index From List		${ini_content_list}		${option}
-
-# 	${len}	Get Length	${ini_content_list}
-# 	IF  ${len} > ${option_index + 2}
-# 		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${option_index + 2}]	${new_value}
-# 	ELSE
-# 		${ini_content}=		Replace String	${ini_content}	${ini_content_list}[${option_index}] =	${option} = ${new_value}
-# 	END
-
-# 	Remove File		${location}
-# 	Log		${ini_content}
-# 	Append To File	${location}		${ini_content}
+	Log 	${global_name}
+	Log 	${global_path}
 
 Create Testdata Agent INI
 	[Arguments] 	${inifile} 	${testdata}
