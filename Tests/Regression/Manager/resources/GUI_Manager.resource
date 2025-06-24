@@ -279,9 +279,9 @@ Check If the Robot Failed
 	Run Keyword If	not ${status}	Fail	msg=Test failed. Check screenshots for more informations.
 
 Wait Agent Ready
-	Click Tab 	 Agents
-	${img}=	Set Variable		manager_${PLATFORM}_agents_ready.png
-	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
+	Click Tab 	Agents
+	${img}= 	Set Variable 	manager_${PLATFORM}_agents_ready.png
+	Wait For 	${img} 			timeout=${DEFAULT_IMAGE_TIMEOUT}
 
 Set Global Filename And Default Save Path
 	[Documentation]	Sets global default save path as Test Variable and file name for robot test.
