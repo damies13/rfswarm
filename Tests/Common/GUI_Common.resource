@@ -8,8 +8,6 @@ Resource 	Common.resource 	# basic keywords
 Library 	OCRLibrary
 Library 	ImageHorizonLibrary 	reference_folder=${IMAGE_DIR}
 
-Library 	img_common.py
-
 *** Variables ***
 ${CONFIDENCE} 		${0.9}
 ${IMAGE_DIR} 		${None}

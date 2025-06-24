@@ -1,5 +1,8 @@
 *** Settings ***
 Resource 	resources/GUI_Reporter.resource
+Resource 	resources/Reporter_DOCX.resource
+Resource 	resources/Reporter_HTML.resource
+Resource 	resources/Reporter_XLSX.resource
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Reporter
 Test Teardown 	Close GUI
