@@ -53,10 +53,10 @@ import yaml
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure  # required for matplot graphs
 
-sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-
-from percentile import percentile
-from stdevclass import stdevclass
+if True:  # noqa: E402
+	sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+	from percentile import percentile
+	from stdevclass import stdevclass
 
 matplotlib.use("TkAgg")  # required for matplot graphs
 
