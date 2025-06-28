@@ -8,13 +8,6 @@
 # 	Helpful links
 #
 #
-import os
-import sys
-
-sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-
-from percentile import percentile
-from stdevclass import stdevclass
 
 import argparse
 import base64
@@ -29,6 +22,7 @@ import ipaddress
 import json
 import lzma
 import math
+import os
 import platform
 import random
 import re
@@ -36,6 +30,7 @@ import shutil
 import signal
 import socket
 import sqlite3
+import sys
 import tempfile
 import threading
 import time
@@ -57,6 +52,11 @@ import yaml
 # required for matplot graphs
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure  # required for matplot graphs
+
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+
+from percentile import percentile
+from stdevclass import stdevclass
 
 matplotlib.use("TkAgg")  # required for matplot graphs
 
