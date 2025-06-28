@@ -8,6 +8,10 @@
 # 	Helpful links
 #
 #
+import os
+import sys
+
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from percentile import percentile
 from stdevclass import stdevclass
@@ -25,7 +29,6 @@ import ipaddress
 import json
 import lzma
 import math
-import os
 import platform
 import random
 import re
@@ -33,7 +36,6 @@ import shutil
 import signal
 import socket
 import sqlite3
-import sys
 import tempfile
 import threading
 import time
