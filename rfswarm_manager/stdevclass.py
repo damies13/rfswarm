@@ -1,6 +1,7 @@
 
 import math
 
+
 class stdevclass:
 	def __init__(self):
 		self.M = 0.0

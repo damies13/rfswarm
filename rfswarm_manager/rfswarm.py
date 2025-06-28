@@ -9,6 +9,9 @@
 #
 #
 
+from percentile import percentile
+from stdevclass import stdevclass
+
 import argparse
 import base64
 import configparser
@@ -57,8 +60,6 @@ matplotlib.use("TkAgg")  # required for matplot graphs
 
 __name__ = "rfswarm"
 
-from percentile import percentile
-from stdevclass import stdevclass
 
 class AgentServer(BaseHTTPRequestHandler):
 
