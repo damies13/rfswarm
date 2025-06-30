@@ -2,17 +2,21 @@
 import base64
 import configparser
 import csv
+import errno
 import glob
 import hashlib
+import inspect
 import lzma
 import os
 import platform
+import random
 import re
 import sqlite3
 import sys
 import tempfile
 import threading
 import time
+from datetime import datetime, timedelta, timezone
 
 from operator import itemgetter
 from typing import Any
@@ -379,7 +383,7 @@ class RFSwarmBase:
 				except Exception as e:
 					if not os.path.exists(self.resultsdir):
 						self.debugmsg(0, "Unable to create resultsdir:", self.resultsdir, "\n", str(e))
-						core.on_closing()
+						self.core.on_closing()
 
 			self.datapath = os.path.join(self.resultsdir, self.run_name)
 			self.debugmsg(3, "datapath:", self.datapath)
@@ -389,7 +393,7 @@ class RFSwarmBase:
 				except Exception as e:
 					if not os.path.exists(self.datapath):
 						self.debugmsg(0, "Unable to create datapath:", self.datapath, "\n", str(e))
-						core.on_closing()
+						self.core.on_closing()
 
 			# check if db exists
 			self.dbfile = os.path.join(self.datapath, "{}.db".format(self.run_name))

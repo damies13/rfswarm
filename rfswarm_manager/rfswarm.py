@@ -12,26 +12,18 @@
 import argparse
 import base64
 import configparser
-import csv
-import errno
-import glob
-import hashlib
 import importlib.metadata
-import inspect
 import ipaddress
 import json
 import lzma
-import math
 import os
 import platform
-import random
 import re
 import shutil
 import signal
 import socket
 import sqlite3
 import sys
-import tempfile
 import threading
 import time
 import tkinter as tk  # python3
@@ -40,13 +32,11 @@ import tkinter.messagebox as tkm  # python3
 import tkinter.ttk as ttk  # python3
 import urllib.parse
 import webbrowser
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from operator import itemgetter
 from typing import Any
 
 import matplotlib  # required for matplot graphs
-import psutil
 import yaml
 
 # required for matplot graphs
