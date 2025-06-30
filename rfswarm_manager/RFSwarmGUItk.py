@@ -1,6 +1,9 @@
 
 import configparser
+import ipaddress
+import json
 import os
+import platform
 import re
 import signal
 import sys
@@ -10,10 +13,12 @@ import tkinter as tk  # python3
 import tkinter.filedialog as tkf  # python3
 import tkinter.messagebox as tkm  # python3
 import tkinter.ttk as ttk  # python3
+import webbrowser
 from datetime import datetime, timezone
 from typing import Any
 
 import matplotlib  # required for matplot graphs
+import yaml
 
 # required for matplot graphs
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -84,7 +89,7 @@ class RFSwarmGUItk(tk.Frame):
 
 	style_text_colour = "#000"
 
-	base=None
+	base = None
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
@@ -6014,6 +6019,8 @@ class RFSwarmGUItk(tk.Frame):
 	# Messages
 	#
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+	# def get_tk_ver(self):
+	# 	self.base.debugmsg(0, "		Tcl/Tk Version", tk.Tcl().call("info", "patchlevel"))
 
 	def display_warning(self, message):
 		tkm.showwarning("RFSwarm - Warning", message)

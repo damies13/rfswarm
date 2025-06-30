@@ -18,7 +18,6 @@ import json
 import lzma
 import os
 import platform
-import re
 import shutil
 import signal
 import socket
@@ -27,17 +26,11 @@ import sys
 import threading
 import time
 import urllib.parse
-import webbrowser
-from datetime import datetime, timezone
+from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import Any
 
 import matplotlib  # required for matplot graphs
 import yaml
-
-# required for matplot graphs
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure  # required for matplot graphs
 
 if True:  # noqa: E402
 	sys.path.append(os.path.abspath(os.path.dirname(__file__)))
@@ -583,12 +576,7 @@ class RFSwarmCore:
 			if not os.path.exists(base.config['Plan']['ScenarioFile']):
 				if len(base.config['Plan']['ScenarioFile']) > 1:
 					msg = "Scenario file Not found:\n" + base.config['Plan']['ScenarioFile']
-					if not base.args.nogui:
-						tkm.showwarning("RFSwarm - Warning", msg)
-						base.debugmsg(0, msg)
-					else:
-						base.debugmsg(0, msg)
-						self.on_closing(msg)
+					self.display_warning(msg)
 				base.config['Plan']['ScenarioFile'] = ""
 				base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
 				base.config['Plan']['ScriptDir'] = base.inisafedir(base.dir_path)
@@ -681,18 +669,19 @@ class RFSwarmCore:
 		base.debugmsg(0, "	Dependancy Versions")
 		try:
 			base.debugmsg(0, "		Python Version", sys.version)
-		except Exception:
-			pass
+		except Exception as e:
+			base.debugmsg(3, "error:", e)
 
 		try:
 			base.debugmsg(0, "		SQLite Version", sqlite3.sqlite_version)
-		except Exception:
-			pass
+		except Exception as e:
+			base.debugmsg(3, "error:", e)
 
 		try:
+			import tkinter as tk
 			base.debugmsg(0, "		Tcl/Tk Version", tk.Tcl().call("info", "patchlevel"))
-		except Exception:
-			pass
+		except Exception as e:
+			base.debugmsg(3, "error:", e)
 
 	def BuildCore(self):
 		base.debugmsg(5, "BuildCore")
@@ -1915,14 +1904,14 @@ class RFSwarmCore:
 		if not os.path.exists(scriptfile):
 			msg = "The referenced file:\n" + scriptfile + "\n\ncannot be found by RFSwarm Manager."
 			if not base.args.nogui:
-				tkm.showwarning("RFSwarm - Warning", msg)
+				self.display_warning(msg)
 			else:
 				base.debugmsg(0, msg)
 			return False
 		elif not os.path.isfile(scriptfile):
 			msg = "The referenced file:\n" + scriptfile + "\n\nis a directory, not a file."
 			if not base.args.nogui:
-				tkm.showwarning("RFSwarm - Warning", msg)
+				self.display_warning(msg)
 			else:
 				base.debugmsg(0, msg)
 			return False
@@ -2037,11 +2026,9 @@ class RFSwarmCore:
 					if nxtagent is None:
 						base.debugmsg(7, 'next_agent is None !!!')
 						agentwarn = True
-						# MsgBox = tkm.askyesno('Save Scenario','Do you want to save the current scenario?')
 						if not base.args.nogui and not base.run_paused:
 							base.debugmsg(7, 'base.args.nogui:', base.args.nogui, "base.run_paused:", base.run_paused)
-							tkm.showwarning("RFSwarm - Warning", "Not enough Agents available to run Monitoring Robots!\n\nTest run is paused, please add agents to continue or click stop to abort.")
-							# tkm.showinfo("RFSwarm - Warning", "Not enough Agents available to run Robots! Test run is paused, please add agents to continue or click stop to abort.")
+							self.display_warning("Not enough Agents available to run Monitoring Robots!\n\nTest run is paused, please add agents to continue or click stop to abort.")
 							base.debugmsg(7, 'base.args.nogui:', base.args.nogui, "base.run_paused:", base.run_paused)
 
 						base.debugmsg(5, 'Not enough Agents available to run Robots! (Monitoring)')
@@ -2050,7 +2037,7 @@ class RFSwarmCore:
 					elif agentwarn:
 						agentwarn = False
 						if not base.args.nogui:
-							tkm.showinfo("RFSwarm - Info", "Enough Agents available to run Monitoring Robots, test will now resume.")
+							self.display_info("Enough Agents available to run Monitoring Robots, test will now resume.")
 						base.debugmsg(0, 'Enough Agents available to run Monitoring Robots, resuming.')
 				# now we have agent for monitoring rorbot assign robobt
 
@@ -2201,7 +2188,7 @@ class RFSwarmCore:
 				else:
 					base.run_paused = False
 					if not base.args.nogui:
-						tkm.showinfo("RFSwarm - Info", "Enough Agents available to run Robots, test will now resume.")
+						self.display_info("Enough Agents available to run Robots, test will now resume.")
 					base.debugmsg(0, 'Enough Agents available to run Robots, resuming.')
 			else:
 				for grp in base.scriptlist:
@@ -2220,11 +2207,9 @@ class RFSwarmCore:
 
 						if nxtagent is None:
 							base.debugmsg(7, 'next_agent is None !!!')
-							# MsgBox = tkm.askyesno('Save Scenario','Do you want to save the current scenario?')
 							if not base.args.nogui and not base.run_paused:
 								base.debugmsg(7, 'base.args.nogui:', base.args.nogui, "base.run_paused:", base.run_paused)
-								tkm.showwarning("RFSwarm - Warning", "Not enough Agents available to run Robots!\n\nTest run is paused, please add agents to continue or click stop to abort.")
-								# tkm.showinfo("RFSwarm - Warning", "Not enough Agents available to run Robots! Test run is paused, please add agents to continue or click stop to abort.")
+								self.display_warning("Not enough Agents available to run Robots!\n\nTest run is paused, please add agents to continue or click stop to abort.")
 								base.debugmsg(7, 'base.args.nogui:', base.args.nogui, "base.run_paused:", base.run_paused)
 							base.run_paused = True
 
@@ -2464,14 +2449,14 @@ class RFSwarmCore:
 		if not os.path.exists(scriptfile):
 			msg = "The referenced file:\n" + scriptfile + "\n\ncannot be found by RFSwarm Manager."
 			if not base.args.nogui:
-				tkm.showwarning("RFSwarm - Warning", msg)
+				self.display_warning(msg)
 			else:
 				base.debugmsg(0, msg)
 			return False
 		elif not os.path.isfile(scriptfile):
 			msg = "The referenced file:\n" + scriptfile + "\n\nis a directory, not a file."
 			if not base.args.nogui:
-				tkm.showwarning("RFSwarm - Warning", msg)
+				self.display_warning(msg)
 			else:
 				base.debugmsg(0, msg)
 			return False
