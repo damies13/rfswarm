@@ -42,6 +42,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 # required for matplot graphs
 from matplotlib.figure import Figure  # required for matplot graphs
+from PIL import Image
 
 if True:  # noqa: E402
 	sys.path.append(os.path.abspath(os.path.dirname(__file__)))

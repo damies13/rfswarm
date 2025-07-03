@@ -1,67 +1,28 @@
 
 
-
-
 import difflib
-
-
-
-
-
 import os
 import platform
-
-
-
-
-
 import sys
-
 import threading
 import time
 import tkinter as tk  # python3
 import tkinter.colorchooser as tkac
 import tkinter.filedialog as tkf  # python3
 import tkinter.font as tkFont
-
 # import tkinter.messagebox as tkm  # python3
 import tkinter.simpledialog as tksd
 import tkinter.ttk as ttk  # python3
 import webbrowser
 import zoneinfo  # says Requires python 3.9
-
 from datetime import datetime  # , timezone
-
 from typing import Any
-
 import matplotlib  # required for matplot graphs
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # required for matplot graphs
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure  # required for matplot graphs
-
 # required for company logo's (I beleive this is a depandancy of matplotlib anyway)
 from PIL import Image, ImageTk
-
-
-
-
-
-
 
 matplotlib.use("TkAgg") 	# required for matplot graphs
 
