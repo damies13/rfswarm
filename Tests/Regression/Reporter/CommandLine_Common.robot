@@ -89,12 +89,29 @@ Get Modules From Program .py File That Are Not BuildIn
 	...    weakref	webbrowser	winreg	winsound	wsgiref	xdrlib	xml	xmlrpc	zipapp	zipfile	zipimport	zlib	zoneinfo
 
 	&{replace_names}	Create Dictionary	PIL=pillow 		yaml=pyyaml
+	${custom_imports}	Create List
+
+	# add local modules to buildin list and also check them for non builtin import modules
+	${file_location} 	${file_name}= 	Split Path 	${file_path}
+	@{checked_py_files}= 	Create List 	${file_name} 	@{CHECKED_PY_FILES}
+	Set Suite Variable    @CHECKED_PY_FILES      @{checked_py_files}
+	Log		${CHECKED_PY_FILES}
+	@{pyfiles}= 	List Files In Directory 	${file_location} 	*.py
+	Remove Values From List 	${pyfiles}  	@{CHECKED_PY_FILES}
+	Log		${pyfiles}
+	FOR 	${pyfile} 	IN 	@{pyfiles}
+		${module} 	${ext} = 	Split Extension 	${pyfile}
+		Append To List 	${buildin} 	${module}
+
+		@{module_imports}	Get Modules From Program .py File That Are Not BuildIn 	${file_location}${/}${pyfile}
+		Append To List 	${custom_imports} 	@{module_imports}
+
+	END
 
 	${manager_content}	Get File	${file_path}
 	${all_imports_lines}	Split String	${manager_content}	separator=\n
 	Log	${all_imports_lines}
 
-	${custom_imports}	Create List
 	${length}	Get Length	${all_imports_lines}
 	FOR  ${i}  IN RANGE  0  ${length}
 		@{import_line_elements}	Create List
@@ -109,7 +126,6 @@ Get Modules From Program .py File That Are Not BuildIn
 				BREAK
 			END
 		END
-
 		FOR  ${j}  IN RANGE  0  ${length2}
 			Log		${import_line_elements}[${j}]
 			IF  '${import_line_elements}[${j}]' == '#'
