@@ -1,68 +1,30 @@
-import argparse
-import base64  # used for embedding images  # used for xhtml export
+
+
 import configparser
-import difflib
 import glob
-import importlib.metadata
 import inspect
 import json
 import math
 import os
-import platform
 import random
 import re
-import shutil
-import signal
 import sqlite3
 import sys
 import tempfile
 import threading
 import time
-import tkinter as tk  # python3
-import tkinter.colorchooser as tkac
-import tkinter.filedialog as tkf  # python3
 import tkinter.font as tkFont
-
-# import tkinter.messagebox as tkm  # python3
-import tkinter.simpledialog as tksd
-import tkinter.ttk as ttk  # python3
-import webbrowser
 import zoneinfo  # says Requires python 3.9
-from copy import copy  # used for xlsx export
 from datetime import datetime  # , timezone
-from io import BytesIO  # used for embedding images  # used for xhtml export
 from typing import Any
-
-import matplotlib  # required for matplot graphs
-import matplotlib.font_manager as font_manager
-import openpyxl  # used for xlsx export
 import tzlocal
 import yaml
-from docx import Document  # used for docx export
-from docx.enum.style import WD_STYLE_TYPE  # used for docx export
-from docx.enum.text import WD_ALIGN_PARAGRAPH  # used for docx export
-from docx.oxml.shared import OxmlElement, qn  # used for docx export
-from docx.shared import Cm, Pt, RGBColor  # used for docx export
 from lxml import etree  # used for xhtml export
-from lxml.builder import E, ElementMaker  # used for xhtml export
-
-# required for matplot graphs
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-
-# required for matplot graphs
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure  # required for matplot graphs
-
-# required for company logo's (I beleive this is a depandancy of matplotlib anyway)
-from PIL import Image, ImageTk
 
 if True:  # noqa: E402
 	sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 	from percentile import percentile
 	from stdevclass import stdevclass
-
-
-matplotlib.use("TkAgg") 	# required for matplot graphs
 
 
 class ReporterBase:
@@ -806,7 +768,7 @@ class ReporterBase:
 
 		if arrfile[1].lower() not in [".template", ".yml", ".yaml", ".json"]:
 			msg = "Unsupported file type: " + arrfile[1].lower()
-			core.display_message(msg)
+			self.core.display_message(msg)
 			return 1
 
 		templatedata = configparser.ConfigParser()
@@ -832,7 +794,7 @@ class ReporterBase:
 
 		if saved:
 			self.debugmsg(6, "Template Saved:", filename)
-			core.display_message("Template Saved:", filename)
+			self.core.display_message("Template Saved:", filename)
 
 			self.config['Reporter']['Template'] = self.whitespace_set_ini_value(filename)
 			path = os.path.split(self.config['Reporter']['Template'])[0]
@@ -847,12 +809,12 @@ class ReporterBase:
 
 			if len(arrfile) < 2:
 				msg = "Template file ", filename, " missing extention, unable to determine supported format. Plesae use extentions .template, .yaml or .json"
-				core.display_message(msg)
+				self.core.display_message(msg)
 				self.template_create()
 				return 1
 			if arrfile[1].lower() not in [".template", ".yml", ".yaml", ".json"]:
 				msg = "Template file ", filename, " has an invalid extention, unable to determine supported format. Plesae use extentions .template, .yaml or .json"
-				core.display_message(msg)
+				self.core.display_message(msg)
 				self.template_create()
 				return 1
 
