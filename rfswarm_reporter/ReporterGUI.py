@@ -14,9 +14,9 @@ import tkinter.simpledialog as tksd
 import tkinter.ttk as ttk  # python3
 import webbrowser
 import zoneinfo  # says Requires python 3.9
-
 from datetime import datetime  # , timezone
 from typing import Any
+
 import matplotlib  # required for matplot graphs
 
 # required for matplot graphs
