@@ -22,9 +22,10 @@ import time
 import tkinter as tk  # python3
 import zoneinfo  # says Requires python 3.9
 from copy import copy  # used for xlsx export
-from datetime import datetime  # , timezone
+from datetime import datetime
 from io import BytesIO  # used for embedding images  # used for xhtml export
 from typing import Any
+
 import matplotlib  # required for matplot graphs
 import matplotlib.font_manager as font_manager
 import openpyxl  # used for xlsx export

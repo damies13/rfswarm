@@ -9,6 +9,8 @@ Library 	Collections
 ${cmd_reporter} 		rfswarm-reporter
 ${pyfile}			${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
 
+@{CHECKED_PY_FILES} 	__init__.py
+
 *** Keywords ***
 Set Platform
 	Set Platform By Python
