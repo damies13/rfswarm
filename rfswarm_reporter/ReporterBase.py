@@ -23,7 +23,10 @@ import yaml
 from lxml import etree  # used for xhtml export
 
 if True:  # noqa: E402
-	sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+	# sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+	thisdir = os.path.abspath(os.path.dirname(__file__))
+	commondir = os.path.join(os.path.dirname(thisdir), 'rfswarm_common')
+	sys.path.append(commondir)
 	from percentile import percentile
 	from stdevclass import stdevclass
 

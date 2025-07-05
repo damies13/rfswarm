@@ -395,10 +395,21 @@ Get Modules From Program .py File That Are Not BuildIn
 	FOR 	${pyfile} 	IN 	@{pyfiles}
 		${module} 	${ext} = 	Split Extension 	${pyfile}
 		Append To List 	${buildin} 	${module}
-
 		@{module_imports}	Get Modules From Program .py File That Are Not BuildIn 	${file_location}${/}${pyfile}
 		Append To List 	${custom_imports} 	@{module_imports}
-
+	END
+	
+	${parent_location} 	${file_dir_name}= 	Split Path 	${file_location}
+	${common_location}= 	Join Path 	${parent_location}  	rfswram_common
+	Log		${CHECKED_PY_FILES}
+	@{pyfiles}= 	List Files In Directory 	${common_location} 	*.py
+	Remove Values From List 	${pyfiles}  	@{CHECKED_PY_FILES}
+	Log		${pyfiles}
+	FOR 	${pyfile} 	IN 	@{pyfiles}
+		${module} 	${ext} = 	Split Extension 	${pyfile}
+		Append To List 	${buildin} 	${module}
+		@{module_imports}	Get Modules From Program .py File That Are Not BuildIn 	${common_location}${/}${pyfile}
+		Append To List 	${custom_imports} 	@{module_imports}
 	END
 
 	${manager_content}	Get File	${file_path}
