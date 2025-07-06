@@ -20,6 +20,23 @@ ${process_manager} 	${None}
 ${platform} 	${None}
 
 @{CHECKED_PY_FILES} 	__init__.py
+@{BUILTIN_PY_MODULES}	__future__	__main__	_thread	_tkinter	abc	aifc	argparse	array	pkg_resources
+...    ast	asyncio	atexit	audioop	base64	bdb	binascii	bisect	builtins	bz2	calendar	cgi	cgitb
+...    chunk	cmath	cmd	code	codecs	codeop	collections	colorsys	compileall	concurrent	configparser
+...    contextlib	contextvars	copy	copyreg	cProfile	crypt	csv	ctypes	curses	dataclasses	datetime
+...    dbm	decimal	difflib	dis	doctest	email	encodings	ensurepip	enum	errno	faulthandler	fcntl
+...    filecmp	fileinput	fnmatch	fractions	ftplib	functools	gc	getopt	getpass	gettext	glob	graphlib
+...    grp	gzip	hashlib	heapq	hmac	html	http	idlelib	imaplib	imghdr	importlib	inspect	io	ipaddress
+...    itertools	json	keyword	lib2to3	linecache	locale	logging	lzma	mailbox	mailcap	marshal	math	mimetypes
+...    mmap	modulefinder	msilib	msvcrt	multiprocessing	netrc	nis	nntplib	numbers	operator	optparse	os
+...    ossaudiodev	pathlib	pdb	pickle	pickletools	pipes	pkgutil	platform	plistlib	poplib	posix	pprint
+...    profile	pstats	pty	pwd	py_compile	pyclbr	pydoc	queue	quopri	random	re	readline	reprlib	resource
+...    rlcompleter	runpy	sched	secrets	select	selectors	shelve	shlex	shutil	signal	site	sitecustomize
+...    smtplib	sndhdr	socket	socketserver	spwd	sqlite3	ssl	stat	statistics	string	stringprep	struct
+...    subprocess	sunau	symtable	sys	sysconfig	syslog	tabnanny	tarfile	telnetlib	tempfile	termios	test
+...    textwrap	threading	time	timeit	tkinter	token	tokenize	tomllib	trace	traceback	tracemalloc	tty	turtle
+...    turtledemo	types	typing	unicodedata	unittest	urllib	usercustomize	uu	uuid	venv	warnings	wave
+...    weakref	webbrowser	winreg	winsound	wsgiref	xdrlib	xml	xmlrpc	zipapp	zipfile	zipimport	zlib	zoneinfo
 
 # datapath: /home/runner/work/rfswarm/rfswarm/rfswarm_manager/results/PreRun
 # datapath: /opt/hostedtoolcache/Python/3.9.18/x64/lib/python3.9/site-packages/rfswarm_manager/results/PreRun -- let's control the output path rather than leaving it to chance
@@ -360,26 +377,18 @@ CSV to Dict
 	Evaluate    str($f.close())
 	RETURN 	${data}
 
+Update BUILTIN_PY_MODULES
+	[Arguments]		${module}
+	@{buildin}=		Create List		@{BUILTIN_PY_MODULES}
+	Append To List 	${buildin} 	${module}
+	${buildin}	Evaluate	list(set(${buildin}))
+	Set Suite Variable    @BUILTIN_PY_MODULES      @{buildin}
+
 Get Modules From Program .py File That Are Not BuildIn
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123
 	[Arguments]		${file_path}
-	@{buildin}=		Create List	__future__	__main__	_thread	_tkinter	abc	aifc	argparse	array	pkg_resources
-	...    ast	asyncio	atexit	audioop	base64	bdb	binascii	bisect	builtins	bz2	calendar	cgi	cgitb
-	...    chunk	cmath	cmd	code	codecs	codeop	collections	colorsys	compileall	concurrent	configparser
-	...    contextlib	contextvars	copy	copyreg	cProfile	crypt	csv	ctypes	curses	dataclasses	datetime
-	...    dbm	decimal	difflib	dis	doctest	email	encodings	ensurepip	enum	errno	faulthandler	fcntl
-	...    filecmp	fileinput	fnmatch	fractions	ftplib	functools	gc	getopt	getpass	gettext	glob	graphlib
-	...    grp	gzip	hashlib	heapq	hmac	html	http	idlelib	imaplib	imghdr	importlib	inspect	io	ipaddress
-	...    itertools	json	keyword	lib2to3	linecache	locale	logging	lzma	mailbox	mailcap	marshal	math	mimetypes
-	...    mmap	modulefinder	msilib	msvcrt	multiprocessing	netrc	nis	nntplib	numbers	operator	optparse	os
-	...    ossaudiodev	pathlib	pdb	pickle	pickletools	pipes	pkgutil	platform	plistlib	poplib	posix	pprint
-	...    profile	pstats	pty	pwd	py_compile	pyclbr	pydoc	queue	quopri	random	re	readline	reprlib	resource
-	...    rlcompleter	runpy	sched	secrets	select	selectors	shelve	shlex	shutil	signal	site	sitecustomize
-	...    smtplib	sndhdr	socket	socketserver	spwd	sqlite3	ssl	stat	statistics	string	stringprep	struct
-	...    subprocess	sunau	symtable	sys	sysconfig	syslog	tabnanny	tarfile	telnetlib	tempfile	termios	test
-	...    textwrap	threading	time	timeit	tkinter	token	tokenize	tomllib	trace	traceback	tracemalloc	tty	turtle
-	...    turtledemo	types	typing	unicodedata	unittest	urllib	usercustomize	uu	uuid	venv	warnings	wave
-	...    weakref	webbrowser	winreg	winsound	wsgiref	xdrlib	xml	xmlrpc	zipapp	zipfile	zipimport	zlib	zoneinfo
+	@{buildin}=		Create List		@{BUILTIN_PY_MODULES}
+	log 	${buildin}
 
 	&{replace_names}	Create Dictionary	PIL=pillow 		yaml=pyyaml
 	${custom_imports}	Create List
@@ -394,20 +403,20 @@ Get Modules From Program .py File That Are Not BuildIn
 	Log		${pyfiles}
 	FOR 	${pyfile} 	IN 	@{pyfiles}
 		${module} 	${ext} = 	Split Extension 	${pyfile}
-		Append To List 	${buildin} 	${module}
+		Update BUILTIN_PY_MODULES 	${module}
 		@{module_imports}	Get Modules From Program .py File That Are Not BuildIn 	${file_location}${/}${pyfile}
 		Append To List 	${custom_imports} 	@{module_imports}
 	END
-	
+
 	${parent_location} 	${file_dir_name}= 	Split Path 	${file_location}
-	${common_location}= 	Join Path 	${parent_location}  	rfswram_common
+	${common_location}= 	Join Path 	${parent_location}  	rfswarm_common
 	Log		${CHECKED_PY_FILES}
 	@{pyfiles}= 	List Files In Directory 	${common_location} 	*.py
 	Remove Values From List 	${pyfiles}  	@{CHECKED_PY_FILES}
 	Log		${pyfiles}
 	FOR 	${pyfile} 	IN 	@{pyfiles}
 		${module} 	${ext} = 	Split Extension 	${pyfile}
-		Append To List 	${buildin} 	${module}
+		Update BUILTIN_PY_MODULES 	${module}
 		@{module_imports}	Get Modules From Program .py File That Are Not BuildIn 	${common_location}${/}${pyfile}
 		Append To List 	${custom_imports} 	@{module_imports}
 	END
@@ -415,6 +424,8 @@ Get Modules From Program .py File That Are Not BuildIn
 	${manager_content}	Get File	${file_path}
 	${all_imports_lines}	Split String	${manager_content}	separator=\n
 	Log	${all_imports_lines}
+
+	log 	${BUILTIN_PY_MODULES}
 
 	${length}	Get Length	${all_imports_lines}
 	FOR  ${i}  IN RANGE  0  ${length}
@@ -435,9 +446,12 @@ Get Modules From Program .py File That Are Not BuildIn
 			IF  '${import_line_elements}[${j}]' == '#'
 				BREAK
 			END
+			IF  '${import_line_elements}[${j}]' == '='
+				BREAK
+			END
 			IF  '${import_line_elements}[${j}]' == 'import' or '${import_line_elements}[${j}]' == 'from'
 				${module_name}	Split String	${import_line_elements}[${j + 1}]	separator=.
-				IF  '${module_name}[0]' not in ${buildin}
+				IF  '${module_name}[0]' not in ${BUILTIN_PY_MODULES}
 					Append To List	${custom_imports}	${module_name}[0]
 				END
 				BREAK
