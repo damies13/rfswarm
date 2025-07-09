@@ -153,10 +153,12 @@ Close ${component_name} GUI
 				Run Keyword And Ignore Error 	Click Image 	manager_${PLATFORM}_tab_about.png
 				Run Keyword And Ignore Error 	Click Image 	manager_${PLATFORM}_tab_run.png
 			ELSE IF 	'${component_name}' == 'Reporter'
-				Run Keyword And Ignore Error 	Click Image 	reporter_${PLATFORM}_menu_results.png
+				IF  '${PLATFORM}' == 'macos'
+					Run Keyword And Ignore Error 	Click Image 	reporter_macos_button_closewindow.png
+				ELSE
+					Run Keyword And Ignore Error 	Click Image 	reporter_${PLATFORM}_menu_results.png
+				END
 			END
-			# reporter_${PLATFORM}_button_closewindow.png 	# ubuntu reporter
-			# Click Button	closewindow 	#macos
 			Sleep 	1
 			Press Key.esc 3 Times
 			Sleep 	1
@@ -190,7 +192,7 @@ Close ${component_name} GUI
 
 		ELSE
 			Take A Screenshot
-			Run Keyword 	Stop ${component_name} 	# close with cli signal
+			Run Keyword 	Stop ${component_name} CLI 	# close with cli signal
 			${running}= 	Is Process Running 	${process_manager}
 			Take A Screenshot
 			IF 	${running}

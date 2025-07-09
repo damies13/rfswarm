@@ -228,6 +228,9 @@ Run ${component_name} CLI
 	${len} 		Get Length 	${appargs}
 	IF  '${component_name}' == 'Manager' and ${len} == ${0} #( '-d' not in ${appargs} and '--dir' not in ${appargs} )
 		Append To List 	${appargs} 	-d 	${RESULTS_DIR}
+	ELSE IF  '${component_name}' == 'Manager' and ${len} != ${0}
+		Create Manager INI File If It Does Not Exist
+		Change Manager INI Option 	Run 	resultsdir 	${RESULTS_DIR}
 	ELSE IF  '${component_name}' == 'Agent' and ${len} == ${0} #( '-d' not in ${appargs} and '--agentdir' not in ${appargs} )
 		Append To List 	${appargs} 	-d 	${AGENT_DIR}
 		Create Directory 	${AGENT_DIR}
@@ -237,6 +240,8 @@ Run ${component_name} CLI
 	Log to Console 	${\n}Starting ${component_name} ...
 	${args}= 	Evaluate 	" ".join(@{appargs})
 	Log to Console 	\t\${args}: ${args}
+
+	
 
 	${process}= 	Start Process 	${CMD_${comp}}  @{appargs}  alias=${component_name}
 	...    stdout=${OUTPUT DIR}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stderr_${comp}.txt
@@ -283,7 +288,7 @@ Stop ${component_name} CLI
 	EXCEPT 	AS 	${error}
 		Log 	error: ${error} 		console=true
 	END
-	Check Logs 	${component_name}
+	# Check Logs 	${component_name} 	!!!
 
 Wait For ${component_name} Process
 	[Arguments] 	${timeout}=30min

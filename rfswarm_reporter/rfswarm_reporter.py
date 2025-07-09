@@ -4522,7 +4522,7 @@ class ReporterCore:
 		fontsize = base.rs_setting_get_fontsize()
 
 		styledata = ""
-		styledata += "div { font-size: " + str(fontsize) + "px; font-family: \"" + fontname + "\"; }"
+		styledata += "div { font-size: " + str(fontsize) + "px; font-family: \"" + str(fontname) + "\"; }"
 		styledata += ".center { text-align: center; }"
 		styledata += ".title { font-size: 200%;}"
 		styledata += ".subtitle { font-size: 150%;}"

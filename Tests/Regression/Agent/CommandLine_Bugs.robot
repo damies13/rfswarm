@@ -36,7 +36,7 @@ Run agent with -x (xml mode)
 	# ${scenariofile}= 	Normalize Path 	${CURDIR}${/}..${/}..${/}Demo${/}demo.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#171${/}Issue171.rfs
 	Log to console 	${scenariofile}
-	Run Manager CLI 	-g 	1 	-s 	${scenariofile} 	-n
+	Run Manager CLI 	-g 	1 	-s 	${scenariofile} 	-d 	${CURDIR}${/}testdata${/}Issue-#171 	-n
 	Wait For Manager Process
 	Stop Agent CLI
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
@@ -44,7 +44,7 @@ Run agent with -x (xml mode)
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
 
-	${dbfile}= 	Find Result DB
+	${dbfile}= 	Find Result DB 	directory=${CURDIR}${/}testdata${/}Issue-#171 	result_pattern=*_Issue171*
 	# Query Result DB 	${dbfile} 	Select * from Results
 	# ${result}= 	Query Result DB 	${dbfile} 	Select * from ResultSummary;
 	${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;

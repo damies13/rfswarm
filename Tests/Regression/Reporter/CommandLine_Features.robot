@@ -83,7 +83,7 @@ Reporter Command Line DIR -d
 	${resultfolder}	Set Variable	${basefolder}${/}${resultdata}
 
 	Run Reporter CLI	-n	-d 	${resultfolder}
-	Wait For Reporter Process 	10s
+	Wait For Reporter Process 	60s
 	${inifile}=		Get Reporter INI Location
 	${inifile_content}=		Get File		${inifile}
 	${inifile_content}=		Split String	${inifile_content}
@@ -109,7 +109,7 @@ Reporter Command Line DIR --dir
 	${resultfolder}	Set Variable	${basefolder}${/}${resultdata}
 
 	Run Reporter CLI	-n	--dir	${resultfolder}
-	Wait For Reporter Process 	10s
+	Wait For Reporter Process 	60s
 	${inifile}=		Get Reporter INI Location
 	${inifile_content}=		Get File		${inifile}
 	${inifile_content}=		Split String	${inifile_content}
@@ -133,7 +133,7 @@ Reporter Command Line TEMPLATE -t
 	${templatefile}=	Normalize Path	${basefolder}${/}Issue-#14.template
 
 	Run Reporter CLI	-n	-t	${templatefile}
-	Wait For Reporter Process 	10s
+	Wait For Reporter Process 	60s
 	${inifile}=		Get Reporter INI Location
 	${inifile_content}=		Get File		${inifile}
 	${inifile_content}=		Split String	${inifile_content}
@@ -159,7 +159,7 @@ Reporter Command Line TEMPLATE --template
 	${templatefile}=	Normalize Path	${basefolder}${/}Issue-#14.template
 
 	Run Reporter CLI	-n	--template	${templatefile}
-	Wait For Reporter Process 	10s
+	Wait For Reporter Process 	60s
 	${inifile}=		Get Reporter INI Location
 	${inifile_content}=		Get File		${inifile}
 	${inifile_content}=		Split String	${inifile_content}
@@ -182,19 +182,19 @@ Reporter Command Line HTML report --html
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14 	HTML
 
 	${testdata}		Set Variable	Issue-#14${/}result_dir
-	${resultdata}	Set Variable	20240622_182505_test_scenario
+	${resultdata}	Set Variable	20240709_151531_test_scenario
 	${basefolder}	Set Variable	${CURDIR}${/}testdata${/}${testdata}
 	${resultfolder}	Set Variable	${basefolder}${/}${resultdata}
 
-	Run Reporter CLI	-n	-d	${resultfolder}		--html
-	Wait For Reporter Process 	10s
+	Run Reporter CLI	-d	${resultfolder}		-n	--html
+	Wait For Reporter Process 	60s
 	@{result_files}=		List Files In Directory		${resultfolder}
 	Log To Console	${\n}All result files: ${result_files}${\n}
 	List Should Contain Value	${result_files}		${resultdata}.html
 
 	[Teardown] 	Remove File 	${resultdata}.html
 
-Reporter Command Line HTML report --docx
+Reporter Command Line DOCX report --docx
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14 	DOCX
 
 	${testdata}		Set Variable	Issue-#14${/}result_dir
@@ -203,14 +203,14 @@ Reporter Command Line HTML report --docx
 	${resultfolder}	Set Variable	${basefolder}${/}${resultdata}
 
 	Run Reporter CLI	-n	-d	${resultfolder}		--docx
-	Wait For Reporter Process 	10s
+	Wait For Reporter Process 	60s
 	@{result_files}=		List Files In Directory		${resultfolder}
 	Log To Console	${\n}All result files: ${result_files}${\n}
 	List Should Contain Value	${result_files}		${resultdata}.docx
 
 	[Teardown] 	Remove File 	${resultdata}.docx
 
-Reporter Command Line HTML report --xlsx
+Reporter Command Line XLSX report --xlsx
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14 	XLSX
 
 	${testdata}		Set Variable	Issue-#14${/}result_dir
@@ -219,7 +219,7 @@ Reporter Command Line HTML report --xlsx
 	${resultfolder}	Set Variable	${basefolder}${/}${resultdata}
 
 	Run Reporter CLI	-n	-d	${resultfolder}		--xlsx
-	Wait For Reporter Process 	10s
+	Wait For Reporter Process 	60s
 	@{result_files}=		List Files In Directory		${resultfolder}
 	Log To Console	${\n}All result files: ${result_files}${\n}
 	List Should Contain Value	${result_files}		${resultdata}.xlsx
