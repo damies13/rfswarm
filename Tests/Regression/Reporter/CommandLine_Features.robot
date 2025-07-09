@@ -78,7 +78,7 @@ Reporter Command Line DIR -d
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 
 	${testdata}		Set Variable	Issue-#14${/}result_dir
-	${resultdata}	Set Variable	20240622_182505_test_scenario
+	${resultdata}	Set Variable	20240709_151531_test_scenario
 	${basefolder}	Set Variable	${CURDIR}${/}testdata${/}${testdata}
 	${resultfolder}	Set Variable	${basefolder}${/}${resultdata}
 
@@ -104,7 +104,7 @@ Reporter Command Line DIR --dir
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 
 	${testdata}		Set Variable	Issue-#14${/}result_dir
-	${resultdata}	Set Variable	20240622_182505_test_scenario
+	${resultdata}	Set Variable	20240709_151531_test_scenario
 	${basefolder}	Set Variable	${CURDIR}${/}testdata${/}${testdata}
 	${resultfolder}	Set Variable	${basefolder}${/}${resultdata}
 
@@ -198,7 +198,7 @@ Reporter Command Line DOCX report --docx
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14 	DOCX
 
 	${testdata}		Set Variable	Issue-#14${/}result_dir
-	${resultdata}	Set Variable	20240622_182505_test_scenario
+	${resultdata}	Set Variable	20240709_151531_test_scenario
 	${basefolder}	Set Variable	${CURDIR}${/}testdata${/}${testdata}
 	${resultfolder}	Set Variable	${basefolder}${/}${resultdata}
 
@@ -214,7 +214,7 @@ Reporter Command Line XLSX report --xlsx
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14 	XLSX
 
 	${testdata}		Set Variable	Issue-#14${/}result_dir
-	${resultdata}	Set Variable	20240622_182505_test_scenario
+	${resultdata}	Set Variable	20240709_151531_test_scenario
 	${basefolder}	Set Variable	${CURDIR}${/}testdata${/}${testdata}
 	${resultfolder}	Set Variable	${basefolder}${/}${resultdata}
 

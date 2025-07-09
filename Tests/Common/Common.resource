@@ -224,8 +224,8 @@ Kill If Still Running
 Run ${component_name} CLI
 	[Arguments] 	@{appargs}
 	${comp} 	Convert To Lower Case 	${component_name}
-
 	${len} 		Get Length 	${appargs}
+
 	IF  '${component_name}' == 'Manager' and ${len} == ${0} #( '-d' not in ${appargs} and '--dir' not in ${appargs} )
 		Append To List 	${appargs} 	-d 	${RESULTS_DIR}
 	ELSE IF  '${component_name}' == 'Manager' and ${len} != ${0}
@@ -240,8 +240,6 @@ Run ${component_name} CLI
 	Log to Console 	${\n}Starting ${component_name} ...
 	${args}= 	Evaluate 	" ".join(@{appargs})
 	Log to Console 	\t\${args}: ${args}
-
-	
 
 	${process}= 	Start Process 	${CMD_${comp}}  @{appargs}  alias=${component_name}
 	...    stdout=${OUTPUT DIR}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stderr_${comp}.txt
@@ -277,8 +275,10 @@ Stop ${component_name} CLI
 
 	Log To Console 	*=== ${component_name} closed with CLI signal ===*
 	TRY
-		Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_manager.txt
-		Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_manager.txt
+		${dest_out} 	Normalize Path 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_manager.txt
+		${dest_err} 	Normalize Path 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_manager.txt
+		Copy File 	${result.stdout_path} 	${dest_out}
+		Copy File 	${result.stderr_path} 	${dest_err}
 
 		Log to Console 	${component_name} Process returned: ${result.rc} 	console=True
 		Log 	stdout_path: ${result.stdout_path} 	console=True

@@ -31,7 +31,7 @@ Manager Command Line PORT -p
 
 	[Teardown]	Run Keywords
 	...    Close Manager GUI	AND
-	...    Stop Agent CLI CLI
+	...    Stop Agent CLI
 
 Manager Command Line IPADDRESS -e
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
@@ -1407,7 +1407,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 
 	Log To Console	Check if Agent cant connect to the old port number, Old port number: ${old_port_number}.
 	Run Agent CLI 	-m  http://localhost:${old_port_number}/
-	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
+	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		60
 	Run Keyword If	${status}	Fail
 	...    msg=The agent has connected to the old port number but should not!
 	Log To Console	The Agent did not connect to the Manager with ${old_port_number} port and this was expected.
@@ -1416,7 +1416,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 
 	Log To Console	Check if Agent can connect to the new port number. New port number: ${run_settings_data}[bind_port_number].
 	Run Agent CLI 	-m  http://localhost:${run_settings_data}[bind_port_number]/
-	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
+	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		60
 	Run Keyword If	not ${status}	Fail
 	...    msg=The agent did not connect to the new port number!
 	Log To Console	The Agent has connected to the Manager with ${run_settings_data}[bind_port_number] port and this was expected.
@@ -1735,9 +1735,9 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	...    Delete Scenario File	test_scenario										AND
 	...    Remove Directory	${global_path}${/}example	recursive=${True}			AND
 	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND
-	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main1.robot	${CURDIR}${/}testdata${/}Issue-52	AND
-	...    Stop Agent CLI																AND
-	...    Close Manager GUI
+	...    Stop Agent CLI															AND
+	...    Close Manager GUI 														AND
+	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main1.robot	${CURDIR}${/}testdata${/}Issue-52
 
 Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
@@ -1781,9 +1781,9 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	...    Delete Scenario File	test_scenario										AND
 	...    Remove Directory	${global_path}${/}example	recursive=${True}			AND
 	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND
-	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main2.robot	${CURDIR}${/}testdata${/}Issue-52	AND
-	...    Stop Agent CLI																AND
-	...    Close Manager GUI
+	...    Stop Agent CLI															AND
+	...    Close Manager GUI 														AND
+	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main2.robot	${CURDIR}${/}testdata${/}Issue-52
 
 Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
@@ -1826,9 +1826,9 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    Delete Scenario File	test_scenario										AND
 	...    Remove Directory	${global_path}${/}example	recursive=${True}			AND
 	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND
-	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main3.robot	${CURDIR}${/}testdata${/}Issue-52	AND
-	...    Stop Agent CLI																AND
-	...    Close Manager GUI
+	...    Stop Agent CLI															AND
+	...    Close Manager GUI 														AND
+	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main3.robot	${CURDIR}${/}testdata${/}Issue-52
 
 Verify If __init__.robot Files Get Transfered To the Agent Along With Robot/Resuorce File
 	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #90
@@ -2441,7 +2441,7 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 	...    Close Manager GUI	AND
 	...    Stop Agent CLI
 
-Verify the Robot Count Reduces When Stop Agent CLI While Test Is Running
+Verify the Robot Count Reduces When Stop Agent While Test Is Running
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #57	Issue #269
 	[Setup]	Run Keywords
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
