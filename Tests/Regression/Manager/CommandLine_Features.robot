@@ -26,7 +26,7 @@ Environment Variable Substitution in Robot/Resource files
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
 	Run Manager CLI 	@{mngr_options}
 	Wait For Manager Process
-	Stop Agent
+	Stop Agent CLI
 	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -46,8 +46,8 @@ Environment Variable Substitution in Robot/Resource files
 
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Default Result Name Method
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
@@ -78,8 +78,8 @@ Default Result Name Method
 	Should Be Equal 	${result[3][0]} 	Message for Info Keyword
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Documentation Result Name Method - Tests Defaults
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
@@ -108,8 +108,8 @@ Documentation Result Name Method - Tests Defaults
 	Should Be Equal 	${result[2][0]} 	Doc only keyword From Info Library
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Info Result Name Method - Tests Defaults
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
@@ -137,8 +137,8 @@ Info Result Name Method - Tests Defaults
 	Should Be Equal 	${result[1][0]} 	Message for Info Keyword
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Keyword Only Result Name Method - Tests Defaults
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
@@ -171,8 +171,8 @@ Keyword Only Result Name Method - Tests Defaults
 	Should Be Equal 	${result[6][0]} 	Return Only Keyword
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Keyword and Args Result Name Method - Tests Defaults
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
@@ -205,8 +205,8 @@ Keyword and Args Result Name Method - Tests Defaults
 	Should Be Equal 	${result[6][0]} 	Return Only Keyword Hello
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Default Result Name Method - Tests Row
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
@@ -236,8 +236,8 @@ Default Result Name Method - Tests Row
 	Should Be Equal 	${result[3][0]} 	Message for Info Keyword
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Documentation Result Name Method - Tests Row
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
@@ -266,8 +266,8 @@ Documentation Result Name Method - Tests Row
 	Should Be Equal 	${result[2][0]} 	Doc only keyword From Info Library
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Info Result Name Method - Tests Row
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
@@ -295,8 +295,8 @@ Info Result Name Method - Tests Row
 	Should Be Equal 	${result[1][0]} 	Message for Info Keyword
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Keyword Only Result Name Method - Tests Row
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
@@ -329,8 +329,8 @@ Keyword Only Result Name Method - Tests Row
 	Should Be Equal 	${result[6][0]} 	Return Only Keyword
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Keyword and Args Result Name Method - Tests Row
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #154 	Issue #56
@@ -363,8 +363,8 @@ Keyword and Args Result Name Method - Tests Row
 	Should Be Equal 	${result[6][0]} 	Return Only Keyword Hello
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Install Application Icon or Desktop Shortcut
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
@@ -396,7 +396,7 @@ Run Mnager with JSON Configuration and JSON Scenario
 	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 
-	Stop Agent
+	Stop Agent CLI
 
 	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
@@ -417,8 +417,8 @@ Run Mnager with JSON Configuration and JSON Scenario
 	# END
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 
 Run Mnager with Yaml Configuration and Yaml Scenario
@@ -441,7 +441,7 @@ Run Mnager with Yaml Configuration and Yaml Scenario
 	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 
-	Stop Agent
+	Stop Agent CLI
 
 	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
@@ -462,8 +462,8 @@ Run Mnager with Yaml Configuration and Yaml Scenario
 	# END
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Run Mnager with yml Configuration and yml Scenario
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #172
@@ -485,7 +485,7 @@ Run Mnager with yml Configuration and yml Scenario
 	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 
-	Stop Agent
+	Stop Agent CLI
 
 	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
@@ -506,5 +506,5 @@ Run Mnager with yml Configuration and yml Scenario
 	# END
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI

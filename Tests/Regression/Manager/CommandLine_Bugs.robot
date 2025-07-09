@@ -25,7 +25,7 @@ Next Day For Scheduled Start Is In the Next Month
 	VAR 	@{mngr_options} 	-g 	6 	-n 	-d 	${RESULTS_DIR} 	-t 	${future_time}  -a  0
 	Run Manager CLI 	@{mngr_options}
 	Sleep 	10s
-	Stop Manager
+	Stop Manager CLI
 
 	Wait Until Keyword Succeeds 	5x 	1s 	Resync Date With Time Server 	${test_date}
 
@@ -41,7 +41,7 @@ Next Day For Scheduled Start Is In the Next Month
 	Should Not Contain 	${stdout_manager} 	Exception
 	Should Not Contain 	${stderr_manager} 	Exception
 
-	[Teardown] 	Stop Manager
+	[Teardown] 	Stop Manager CLI
 
 Robot files with same name but different folders
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #184
@@ -57,7 +57,7 @@ Robot files with same name but different folders
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
 	Run Manager CLI 	@{mngr_options}
 	Wait For Manager Process
-	Stop Agent
+	Stop Agent CLI
 	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -118,7 +118,7 @@ Circular Reference Resource Files
 	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${RESULTS_DIR}
 	Run Manager CLI 	@{mngr_options}
 	Wait For Manager Process
-	Stop Agent
+	Stop Agent CLI
 
 	${stdout_manager}= 		Read Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	${stderr_manager}= 		Read Log 	${OUTPUT DIR}${/}stderr_manager.txt
@@ -156,8 +156,8 @@ Circular Reference Resource Files
 	Diff Lists    ${expected_files}    ${result_files}    Agent didn't get all files from manager
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Circular Reference Resource Files 2
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #261
@@ -178,7 +178,7 @@ Circular Reference Resource Files 2
 	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${RESULTS_DIR} 	-t 	${time[0]}:${time[1]}:${time[2]}
 	Run Manager CLI 	@{mngr_options}
 	Wait For Manager Process
-	Stop Agent
+	Stop Agent CLI
 
 	${stdout_manager}= 		Read Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	${stderr_manager}= 		Read Log 	${OUTPUT DIR}${/}stderr_manager.txt
@@ -216,8 +216,8 @@ Circular Reference Resource Files 2
 	Diff Lists    ${expected_files}    ${result_files}    Agent didn't get all files from manager
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Lots Of Resource Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #261
@@ -247,7 +247,7 @@ Lots Of Resource Files
 	Run Manager CLI 	@{mngr_options}
 	# It can take a while for the agent to download 3500+ files
 	Wait For Manager Process 	60min
-	Stop Agent
+	Stop Agent CLI
 
 	${stdout_manager}= 		Read Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	${stderr_manager}= 		Read Log 	${OUTPUT DIR}${/}stderr_manager.txt
@@ -280,8 +280,8 @@ Lots Of Resource Files
 	Diff Lists    ${expected_files}    ${result_files}    Agent didn't get all files from manager
 
 	[Teardown]	Run Keywords
-	...    Stop Agent	AND
-	...    Stop Manager
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Check That the Manager Supports the Missing Scenario File Provided By the -s Argument
 	[Tags]	ubuntu-latest	macos-latest	Issue #340
@@ -300,7 +300,7 @@ Check That the Manager Supports the Missing Scenario File Provided By the -s Arg
 
 	Run Manager CLI 	@{mngr_options}
 	Sleep 	3
-	${running}= 	Is Process Running		${process_manager}
+	${running}= 	Is Process Running		${PROCESS_MANAGER}
 	IF 	${running}
 		Fail	msg=Manager is still running!
 	END
@@ -316,7 +316,7 @@ Check That the Manager Supports the Missing Scenario File Provided By the -s Arg
 	# windows does not work with reading logs.
 	Should Contain 	${stdout_manager} 	Scenario file Not found:
 
-	[Teardown]	Stop Manager
+	[Teardown]	Stop Manager CLI
 
 
 Verify If Manager Runs With Existing INI File From Current Version NO GUI
@@ -331,14 +331,14 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 	END
 
 	Run Manager CLI 	-n
-	${running}= 	Is Process Running		${process_manager}
+	${running}= 	Is Process Running		${PROCESS_MANAGER}
 	IF 	not ${running}
 		Fail	msg=Manager is not running!
 	END
 	Wait Until Created  	${global_path}${/}RFSwarmManager.ini
-	Sleep    0.5
-	${result} = 	Terminate Process		${process_manager}
-	${running}= 	Is Process Running		${process_manager}
+	Sleep    1
+	${result} = 	Terminate Process		${PROCESS_MANAGER}
+	${running}= 	Is Process Running		${PROCESS_MANAGER}
 	IF 	${running}
 		Fail	msg=Manager did not close!
 	END
@@ -350,15 +350,16 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
  	File Should Exist	${global_path}${/}RFSwarmManager.ini
 	Show Log 	${global_path}${/}RFSwarmManager.ini
 	File Should Not Be Empty	${global_path}${/}RFSwarmManager.ini
+
 	Log To Console	Running Manager with existing ini file.
 	Run Manager CLI 	-n
-	${running}= 	Is Process Running		${process_manager}
+	${running}= 	Is Process Running		${PROCESS_MANAGER}
 	IF 	not ${running}
 		Fail	msg=Manager is not running!
 	END
 	Sleep    0.5
-	${result} = 	Terminate Process		${process_manager}
-	${running}= 	Is Process Running		${process_manager}
+	${result} = 	Terminate Process		${PROCESS_MANAGER}
+	${running}= 	Is Process Running		${PROCESS_MANAGER}
 	IF 	${running}
 		Fail	msg=Manager did not close!
 	END
@@ -372,12 +373,12 @@ Verify If Manager Runs With No Existing INI File From Current Version NO GUI
 	Log To Console	Running Manager with no existing ini file.
 
 	Run Manager CLI 	-n
-	${running}= 	Is Process Running		${process_manager}
+	${running}= 	Is Process Running		${PROCESS_MANAGER}
 	IF 	not ${running}
 		Fail	msg=Manager is not running!
 	END
-	${result} = 	Terminate Process		${process_manager}
-	${running}= 	Is Process Running		${process_manager}
+	${result} = 	Terminate Process		${PROCESS_MANAGER}
+	${running}= 	Is Process Running		${PROCESS_MANAGER}
 	IF 	${running}
 		Fail	msg=Manager did not close!
 	END
@@ -399,12 +400,12 @@ Verify If Manager Runs With Existing INI File From Previous Version NO GUI
 	Log To Console	Running Manager with existing ini file.
 
 	Run Manager CLI 	-n
-	${running}= 	Is Process Running		${process_manager}
+	${running}= 	Is Process Running		${PROCESS_MANAGER}
 	IF 	not ${running}
 		Fail	msg=Manager is not running!
 	END
-	${result} = 	Terminate Process		${process_manager}
-	${running}= 	Is Process Running		${process_manager}
+	${result} = 	Terminate Process		${PROCESS_MANAGER}
+	${running}= 	Is Process Running		${PROCESS_MANAGER}
 	IF 	${running}
 		Fail	msg=Manager did not close!
 	END

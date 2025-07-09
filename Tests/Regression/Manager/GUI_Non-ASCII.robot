@@ -77,7 +77,7 @@ Non-ASCII Test Setup
 	Set Manager INI Window Size 	1200 	600
 
 Non-ASCII Test Teardown
-	Stop Agent
+	Stop Agent CLI
 	Close Manager GUI
 	Check Non-ASCII Logs
 

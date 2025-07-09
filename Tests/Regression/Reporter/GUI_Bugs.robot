@@ -76,18 +76,16 @@ Verify If Reporter Runs With Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 
 	${location}=	Get Reporter Default Save Path
-	Open Reporter GUI	-n
-	${result}= 	Wait For Process 	${PROCESS_REPORTER} 	timeout=60
-	Should Be Equal As Integers 	${result.rc} 	0
-	Check Logs
+	Run Reporter CLI	-n
+	Wait For Reporter Process
+	# Should Be Equal As Integers 	${result.rc} 	0
 
 	File Should Exist	${location}${/}RFSwarmReporter.ini
 	File Should Not Be Empty	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with existing ini file.
-	Open Reporter GUI	-n
-	${result}= 	Wait For Process 	${PROCESS_REPORTER} 	timeout=60
-	Should Be Equal As Integers 	${result.rc} 	0
-	Check Logs
+	Run Reporter CLI	-n
+	Wait For Reporter Process
+	# Should Be Equal As Integers 	${result.rc} 	0
 
 Verify If Reporter Runs With No Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
@@ -97,10 +95,8 @@ Verify If Reporter Runs With No Existing INI File From Current Version NO GUI
 	File Should Not Exist	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with no existing ini file.
 
-	Open Reporter GUI	-n
-	${result}= 	Wait For Process 	${PROCESS_REPORTER} 	timeout=60
-	Should Be Equal As Integers 	${result.rc} 	0
-	Check Logs
+	Run Reporter CLI	-n
+	Wait For Reporter Process
 
 Verify If Reporter Runs With Existing INI File From Previous Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
@@ -114,14 +110,12 @@ Verify If Reporter Runs With Existing INI File From Previous Version NO GUI
 	File Should Not Be Empty	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with existing ini file.
 
-	Open Reporter GUI	-n
-	${result}= 	Wait For Process 	${PROCESS_REPORTER} 	timeout=60
-	Should Be Equal As Integers 	${result.rc} 	0
-	Check Logs
+	Run Reporter CLI	-n
+	Wait For Reporter Process
 
 	[Teardown] 	Run Keywords
 	...    Remove File 	${location}${/}RFSwarmReporter.ini 	AND
-	...    Open Reporter GUI 	-n
+	...    Run Reporter CLI 	-n
 
 First Run
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #147

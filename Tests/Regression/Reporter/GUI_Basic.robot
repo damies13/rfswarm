@@ -3,7 +3,7 @@ Resource 	resources/GUI_Reporter.resource
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Reporter
 
-Test Teardown 	Close Reporer GUI
+Test Teardown 	Close Reporter GUI
 
 *** Test Cases ***
 GUI Runs and Closes

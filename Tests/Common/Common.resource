@@ -225,17 +225,18 @@ Run ${component_name} CLI
 	[Arguments] 	@{appargs}
 	${comp} 	Convert To Lower Case 	${component_name}
 
-	IF  '${component_name}' == 'Manager' and ( '-d' not in ${appargs} and '--dir' not in ${appargs} )
+	${len} 		Get Length 	${appargs}
+	IF  '${component_name}' == 'Manager' and ${len} == ${0} #( '-d' not in ${appargs} and '--dir' not in ${appargs} )
 		Append To List 	${appargs} 	-d 	${RESULTS_DIR}
-	ELSE IF  '${component_name}' == 'Agent' and ( '-d' not in ${appargs} and '--agentdir' not in ${appargs} )
+	ELSE IF  '${component_name}' == 'Agent' and ${len} == ${0} #( '-d' not in ${appargs} and '--agentdir' not in ${appargs} )
 		Append To List 	${appargs} 	-d 	${AGENT_DIR}
 		Create Directory 	${AGENT_DIR}
 		Empty Directory 	${AGENT_DIR}
 	END
 
-	Log to Console 	${\n}Starting ${component_name}...
+	Log to Console 	${\n}Starting ${component_name} ...
 	${args}= 	Evaluate 	" ".join(@{appargs})
-	Log to Console 	\${args}: ${args}
+	Log to Console 	\t\${args}: ${args}
 
 	${process}= 	Start Process 	${CMD_${comp}}  @{appargs}  alias=${component_name}
 	...    stdout=${OUTPUT DIR}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stderr_${comp}.txt
@@ -247,7 +248,7 @@ Run ${component_name} CLI
 	# Log 	Process Is Running: ${result} 		console=True
 	Log to Console 	*==== ${component_name} started ===*
 
-Stop ${component_name}
+Stop ${component_name} CLI
 	${comp} 	Convert To Lower Case 	${component_name}
 
 	${running}= 	Is Process Running 	${PROCESS_${comp}}
@@ -269,7 +270,7 @@ Stop ${component_name}
 		END
 	END
 
-	Log To Console 	*=== ${component_name} closed with CLI singal ===*
+	Log To Console 	*=== ${component_name} closed with CLI signal ===*
 	TRY
 		Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_manager.txt
 		Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_manager.txt
@@ -292,6 +293,7 @@ Wait For ${component_name} Process
 
 	TRY
 		Log 	${component_name} exited with: ${result.rc} 	console=${True}
+		# Should Be Equal As Integers 	${result.rc} 	0
 
 		Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_${comp}.txt
 		Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_${comp}.txt
@@ -300,6 +302,8 @@ Wait For ${component_name} Process
 		Log 	stdout: ${result.stdout} 	console=${True}
 		Log 	stderr_path: ${result.stderr_path} 	console=${True}
 		Log 	stderr: ${result.stderr} 	console=${True}
+
+		Check Logs 	${component_name}
 
 	EXCEPT 	AS 	${error}
 		Log 	error: ${error} 	console=${True}

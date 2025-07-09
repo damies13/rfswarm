@@ -42,8 +42,7 @@ Add Test In Language
 	[Arguments] 	${langcode}
 	Log 	${langcode} 	console=True
 	${scenariofile}= 		Create ${langcode} Language Scenario
-	@{mngr_options}= 	Create List 	-s 	${scenariofile}
-	Open Manager GUI 		${mngr_options}
+	Open Manager GUI 		-s 	${scenariofile}
 	Check If The Agent Is Ready
 	Click Tab 	Plan
 	Take A Screenshot
@@ -58,7 +57,7 @@ Language Test Init
 
 Language Test End
 	Close Manager GUI
-	Stop Agent
+	Stop Agent CLI
 
 
 

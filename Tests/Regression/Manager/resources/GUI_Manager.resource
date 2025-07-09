@@ -7,9 +7,6 @@ Resource 	../../../Common/GUI_Common.resource
 # Library		ScreenRecorderLibrary.py
 
 *** Variables ***
-@{mngr_options}		${None}
-@{agent_options}	${None}
-
 ${global_name} 		${None}
 ${global_path} 		${None}
 

@@ -106,9 +106,9 @@ Open ${component_name} GUI
 
 	Run Keyword 	Run ${component_name} CLI 	@{appargs}
 
-	IF 	'-n' in ${options} or '--nogui' in ${options}
+	IF 	'-n' in ${appargs} or '--nogui' in ${appargs}
 		Sleep 	10
-	ELSE IF 	'-r' in ${options} or '--run' in ${options}
+	ELSE IF 	'-r' in ${appargs} or '--run' in ${appargs}
 		Handle Donation Reminder
 	ELSE
 		Handle Donation Reminder
@@ -147,7 +147,7 @@ Close ${component_name} GUI
 	IF 	${PROCESS_${comp}}
 		${running}= 	Is Process Running 	${PROCESS_${comp}}
 		IF 	${running}
-			Log to Console 	*=== Closing ${component_name} GUI ===*
+			Log to Console 	${\n}Closing ${component_name} GUI ...
 			# make sure the window is the active window first
 			IF 	'${component_name}' == 'Manager'
 				Run Keyword And Ignore Error 	Click Image 	manager_${PLATFORM}_tab_about.png
@@ -183,14 +183,14 @@ Close ${component_name} GUI
 		${result}= 		Wait For Process 	${process_manager} 	timeout=15
 		${running}= 	Is Process Running 	${PROCESS_${comp}}
 		IF 	not ${running}
-			Log To Console 	*=== ${component_name} GUI closed ===*
+			Log To Console 	*=== ${component_name} closed with GUI ===*
 			Log		${result.stdout}
 			Log		${result.stderr}
 			Should Be Equal As Integers 	${result.rc} 	0
 
 		ELSE
 			Take A Screenshot
-			Run Keyword 	Stop ${component_name}
+			Run Keyword 	Stop ${component_name} 	# close with cli signal
 			${running}= 	Is Process Running 	${process_manager}
 			Take A Screenshot
 			IF 	${running}

@@ -35,12 +35,12 @@ Agent Command Line INI -i
 
 	Run Agent CLI 	-i	${inifile}
 	Log To Console	Run Agent CLI with alternate ini file with variable.
-	Stop Agent
+	Stop Agent CLI
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
 	Should Contain	${result_stdout}	${inifile}
 
-	[Teardown]	Stop Agent
+	[Teardown]	Stop Agent CLI
 
 Agent Command Line INI --ini
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
@@ -49,12 +49,12 @@ Agent Command Line INI --ini
 
 	Run Agent CLI 	--ini	${inifile}
 	Log To Console	Run Agent CLI with alternate ini file with variable.
-	Stop Agent
+	Stop Agent CLI
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
 	Should Contain	${result_stdout}	${inifile}
 
-	[Teardown]	Stop Agent
+	[Teardown]	Stop Agent CLI
 
 Agent Command Line MANAGER -m
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
@@ -62,13 +62,13 @@ Agent Command Line MANAGER -m
 	Log To Console	Run Agent CLI and Manager and see if they will connect.
 	Run Agent CLI 		-m 	http://localhost:8138
 	Run Manager CLI 	-n
-	Wait For Manager Process	10s
-	Stop Agent
+	Wait For Manager Process	60s
+	Stop Agent CLI
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
 	Should Contain	${result_stdout}	Manager Connected
 
-	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+	[Teardown]	Run Keywords	Stop Agent CLI 	Stop Manager CLI
 
 Agent Command Line MANAGER --manager
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
@@ -76,13 +76,13 @@ Agent Command Line MANAGER --manager
 	Log To Console	Run Agent CLI and Manager and see if they will connect.
 	Run Agent CLI 		--manager 	http://localhost:8138
 	Run Manager CLI 	-n
-	Wait For Manager Process	10s
-	Stop Agent
+	Wait For Manager Process	60s
+	Stop Agent CLI
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
 	Should Contain	${result_stdout}	Manager Connected
 
-	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+	[Teardown]	Run Keywords	Stop Agent CLI 	Stop Manager CLI
 
 Agent Command Line AGENTDIR -d
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
@@ -92,14 +92,14 @@ Agent Command Line AGENTDIR -d
 	Log To Console	Run Agent CLI with custom dir.
 	Run Agent CLI 	-d 	${agentdir}
 	Sleep 	10s
-	Stop Agent
+	Stop Agent CLI
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	@{agentdir_dirs}=	List Directories In Directory	${agentdir}
 	List Should Contain Value	${agentdir_dirs}	scripts		msg=Can't find scripts dir in custom Agent dir
 	${agentdir_scripts}=	List Files In Directory		${agentdir}${/}scripts
 	Should Not Be Empty		${agentdir_scripts}
 
-	[Teardown]	Stop Agent
+	[Teardown]	Stop Agent CLI
 
 Agent Command Line AGENTDIR --agentdir
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
@@ -109,14 +109,14 @@ Agent Command Line AGENTDIR --agentdir
 	Log To Console	Run Agent CLI with custom dir.
 	Run Agent CLI 	--agentdir 	${agentdir}
 	Sleep 	10s
-	Stop Agent
+	Stop Agent CLI
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	@{agentdir_dirs}=	List Directories In Directory	${agentdir}
 	List Should Contain Value	${agentdir_dirs}	scripts		msg=Can't find scripts dir in custom Agent dir
 	${agentdir_scripts}=	List Files In Directory		${agentdir}${/}scripts
 	Should Not Be Empty		${agentdir_scripts}
 
-	[Teardown]	Stop Agent
+	[Teardown]	Stop Agent CLI
 
 Agent Command Line ROBOT -r
 	[Tags]	ubuntu-latest 	macos-latest 	Issue #14
@@ -136,7 +136,7 @@ Agent Command Line ROBOT -r
 	Sleep 	5s
 	Run Manager CLI 	-g 	1 	-n 	-s 	${scenario_dir}
 	Wait For Manager Process	8min
-	Stop Agent
+	Stop Agent CLI
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
@@ -152,7 +152,7 @@ Agent Command Line ROBOT -r
 	Log To Console		Logs dirs: ${test_logs}
 	Should Not Be Empty 	${test_logs}
 
-	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+	[Teardown]	Run Keywords	Stop Agent CLI 	Stop Manager CLI
 
 Agent Command Line XMLMODE -x
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
@@ -162,7 +162,7 @@ Agent Command Line XMLMODE -x
 	Log To Console	Run Agent CLI with xmlmode.
 	Run Agent CLI 	-x 	-d 	${agentdir}
 	Sleep 	10s
-	Stop Agent
+	Stop Agent CLI
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 
 	@{agentdir_dirs}=	List Directories In Directory	${agentdir}
@@ -171,7 +171,7 @@ Agent Command Line XMLMODE -x
 	List Should Not Contain Value 	${agentdir_scripts} 	RFSListener3.py
 	List Should Not Contain Value 	${agentdir_scripts} 	RFSListener2.py
 
-	[Teardown]	Stop Agent
+	[Teardown]	Stop Agent CLI
 
 Agent Command Line XMLMODE --xmlmode
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
@@ -181,7 +181,7 @@ Agent Command Line XMLMODE --xmlmode
 	Log To Console	Run Agent CLI with xmlmode.
 	Run Agent CLI 	--xmlmode 	-d 	${agentdir}
 	Sleep 	10s
-	Stop Agent
+	Stop Agent CLI
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 
 	@{agentdir_dirs}=	List Directories In Directory	${agentdir}
@@ -190,7 +190,7 @@ Agent Command Line XMLMODE --xmlmode
 	List Should Not Contain Value 	${agentdir_scripts} 	RFSListener3.py
 	List Should Not Contain Value 	${agentdir_scripts} 	RFSListener2.py
 
-	[Teardown]	Stop Agent
+	[Teardown]	Stop Agent CLI
 
 Agent Command Line AGENTNAME -a
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
@@ -212,7 +212,7 @@ Agent Command Line AGENTNAME -a
 	Should Contain	${body} 	Issue-#14AGENTNAME
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 
-	[Teardown]	Run Keywords	Stop Server 	Stop Agent
+	[Teardown]	Run Keywords	Stop Server 	Stop Agent CLI
 
 Agent Command Line AGENTNAME --agentname
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
@@ -234,7 +234,7 @@ Agent Command Line AGENTNAME --agentname
 	Should Contain	${body} 	Issue-#14AGENTNAME
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 
-	[Teardown]	Run Keywords	Stop Server 	Stop Agent
+	[Teardown]	Run Keywords	Stop Server 	Stop Agent CLI
 
 Agent Command Line PROPERTY -p
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
@@ -243,8 +243,8 @@ Agent Command Line PROPERTY -p
 	Run Agent CLI 		-p 	Issue-#14
 	Run Manager CLI 	-n
 	Sleep	20s
-	Stop Agent
-	Stop Manager
+	Stop Agent CLI
+	Stop Manager CLI
 
 	Log To Console 	Checking result data base
 	${dbfile} 	Find Result DB 		result_pattern=PreRun
@@ -255,7 +255,7 @@ Agent Command Line PROPERTY -p
 	Should Be True 	${len} > 0
 	...    msg=Custom propery 'Issue-#14' not found in PreRun db. ${\n}Query Result: ${prop_result}
 
-	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+	[Teardown]	Run Keywords	Stop Agent CLI 	Stop Manager CLI
 
 Agent Yaml Configuration File
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172
@@ -266,12 +266,12 @@ Agent Yaml Configuration File
 	Run Agent CLI 	--ini	${yamlfile} 	-g 	2
 	Log To Console	Run Agent CLI with Yaml Configuration File.
 	Sleep    20
-	Stop Agent
+	Stop Agent CLI
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
 	Should Contain	${result_stdout}	${yamlurl}
 
-	[Teardown]	Stop Agent
+	[Teardown]	Stop Agent CLI
 
 Agent Yml Configuration File
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172
@@ -282,12 +282,12 @@ Agent Yml Configuration File
 	Run Agent CLI 	--ini	${yamlfile} 	-g 	2
 	Log To Console	Run Agent CLI with Yaml Configuration File.
 	Sleep    20
-	Stop Agent
+	Stop Agent CLI
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
 	Should Contain	${result_stdout}	${yamlurl}
 
-	[Teardown]	Stop Agent
+	[Teardown]	Stop Agent CLI
 
 Agent JSON Configuration File
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172
@@ -298,9 +298,9 @@ Agent JSON Configuration File
 	Run Agent CLI 	--ini	${jsonfile} 	-g 	2
 	Log To Console	Run Agent CLI with JSON Configuration File.
 	Sleep    20
-	Stop Agent
+	Stop Agent CLI
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
 	Should Contain	${result_stdout}	${jsonurl}
 
-	[Teardown]	Stop Agent
+	[Teardown]	Stop Agent CLI

@@ -14,7 +14,7 @@ Exclude Libraries With Spaces
 	Log to console 	scenariofile: ${scenariofile}
 	Run Manager CLI 	-g 	1 	-s 	${scenariofile} 	-n
 	Wait For Manager Process
-	Stop Agent
+	Stop Agent CLI
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -38,7 +38,7 @@ Run agent with -x (xml mode)
 	Log to console 	${scenariofile}
 	Run Manager CLI 	-g 	1 	-s 	${scenariofile} 	-n
 	Wait For Manager Process
-	Stop Agent
+	Stop Agent CLI
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -138,7 +138,7 @@ Verify If Agent Runs With Existing INI File From Previous Version NO GUI
 	...    Remove File 	${location}${/}RFSwarmAgent.ini 	AND
 	...    Run Agent CLI 	AND
 	...    Sleep 	3 	AND
-	...    Stop Agent
+	...    Stop Agent CLI
 
 Verify If Agent Name Has Been Transferred To the Manager (-a command line switch)
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #100
@@ -151,8 +151,8 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 	Run Agent CLI 		-a 	Issue-#100AGENTNAME
 	Run Manager CLI 	-n 	-d 	${test_dir}
 	Sleep	20s
-	Stop Agent
-	Stop Manager
+	Stop Agent CLI
+	Stop Manager CLI
 
 	Log To Console 	Checking PreRun data base.
 	${query_result} 	Query Result DB 	${dbfile}
@@ -161,7 +161,7 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 	Should Be True 	${len} > 0
 	...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}
 
-	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+	[Teardown]	Run Keywords	Stop Agent CLI	Stop Manager CLI
 
 Verify If Agent Name Has Been Transferred To the Manager (ini file)
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #100
@@ -174,8 +174,8 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 	Run Agent CLI 		-i 	${CURDIR}${/}testdata${/}Issue-#100${/}RFSwarmAgent.ini
 	Run Manager CLI 	-n 	-d 	${test_dir}
 	Sleep	20s
-	Stop Agent
-	Stop Manager
+	Stop Agent CLI
+	Stop Manager CLI
 
 	Log To Console 	Checking PreRun data base.
 	${query_result} 	Query Result DB 	${dbfile}
@@ -184,4 +184,4 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 	Should Be True 	${len} > 0
 	...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}
 
-	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+	[Teardown]	Run Keywords	Stop Agent CLI	Stop Manager CLI

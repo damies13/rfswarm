@@ -31,7 +31,7 @@ Manager Command Line PORT -p
 
 	[Teardown]	Run Keywords
 	...    Close Manager GUI	AND
-	...    Stop Agent
+	...    Stop Agent CLI CLI
 
 Manager Command Line IPADDRESS -e
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
@@ -51,7 +51,7 @@ Manager Command Line IPADDRESS -e
 
 	[Teardown]	Run Keywords
 	...    Close Manager GUI	AND
-	...    Stop Agent
+	...    Stop Agent CLI
 
 Manager Command Line DIR -d
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
@@ -148,7 +148,7 @@ Manager Command Line SCENARIO -s
 
 	[Teardown]	Run Keywords
 	...    Close Manager GUI	AND
-	...    Stop Agent
+	...    Stop Agent CLI
 
 Manager Command Line AGENTS -a
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
@@ -179,7 +179,7 @@ Manager Command Line AGENTS -a
 
 	[Teardown]	Run Keywords
 	...    Close Manager GUI	AND
-	...    Stop Agent
+	...    Stop Agent CLI
 
 Manager Command Line RUN -r
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
@@ -200,7 +200,7 @@ Manager Command Line RUN -r
 
 	[Teardown]	Run Keywords
 	...    Close Manager GUI	AND
-	...    Stop Agent
+	...    Stop Agent CLI
 
 Manager Command Line RUN --run
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
@@ -221,7 +221,7 @@ Manager Command Line RUN --run
 
 	[Teardown]	Run Keywords
 	...    Close Manager GUI	AND
-	...    Stop Agent
+	...    Stop Agent CLI
 
 Manager Command Line INI -i
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
@@ -328,7 +328,7 @@ Verify That Files Get Saved With Correct Extension And Names
 	[Teardown]	Run Keywords
 	...    Delete Scenario File		${scenario_name}		AND
 	...    Close Manager GUI	AND
-	...    Stop Agent
+	...    Stop Agent CLI
 
 Verify the Time Fields In the Plan Screen For Delay
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
@@ -998,9 +998,12 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	END
 
 	Close Manager GUI
+	Change Manager INI Option 	Plan 	scenariofile 	${scenariofile}
 	Open Manager GUI 	-g  1
 
 	Wait For	${PLATFORM}_warning_label.png	timeout=30
+	Press key.enter 1 Times
+	Sleep 	1
 	Press key.enter 1 Times
 	${running}= 	Is Process Running 	${PROCESS_MANAGER}
 	IF 	not ${running}
@@ -1252,7 +1255,7 @@ Check If Inject Sleep Option Was Executed in the Test
 
 	[Teardown]	Run Keywords
 	...    Delete Scenario File	test_scenario				AND
-	...    Stop Agent							AND
+	...    Stop Agent CLI							AND
 	...    Close Manager GUI	AND
 	...    Remove File		${global_path}${/}example.robot
 
@@ -1293,7 +1296,7 @@ Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has
 
 	[Teardown]	Run Keywords
 	...    Close Manager GUI		AND
-	...    Stop Agent											AND
+	...    Stop Agent CLI											AND
 	...    Remove File 	${agent_script_dir}${/}Issue-#98.robot	AND
 	...    Remove Directory 	${run_result_dirs}[0]	resursive=${True}
 
@@ -1335,7 +1338,7 @@ Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has
 
 	[Teardown]	Run Keywords
 	...    Close Manager GUI		AND
-	...    Stop Agent											AND
+	...    Stop Agent CLI											AND
 	...    Change http://localhost:8138 With http://localhost:8138/ In ${agent_def_path}${/}RFSwarmAgent.ini	AND
 	...    Remove File 	${agent_script_dir}${/}Issue-#98.robot	AND
 	...    Remove Directory 	${run_result_dirs}[0]	resursive=${True}
@@ -1409,7 +1412,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 	...    msg=The agent has connected to the old port number but should not!
 	Log To Console	The Agent did not connect to the Manager with ${old_port_number} port and this was expected.
 	Click Tab	Plan
-	Stop Agent
+	Stop Agent CLI
 
 	Log To Console	Check if Agent can connect to the new port number. New port number: ${run_settings_data}[bind_port_number].
 	Run Agent CLI 	-m  http://localhost:${run_settings_data}[bind_port_number]/
@@ -1421,7 +1424,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 
 	[Teardown]	Run Keywords
 	...    Close Manager GUI	AND
-	...    Stop Agent							AND
+	...    Stop Agent CLI							AND
 	...    Change = 8148 With = 8138 In ${manager_ini_file}
 
 Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Address On the Manager's Host
@@ -1454,7 +1457,7 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	...    msg=The agent has connected to the Manager via ${altip} but should not!
 	Log To Console	The Agent did not connect to the Manager via ${altip} and this was expected.
 	Click Tab	Plan
-	Stop Agent
+	Stop Agent CLI
 
 	Log To Console	Check if Agent can connect to the Manager via ${ipv4}[0].
 	Run Agent CLI 	-m  http://${ipv4}[0]:8138/
@@ -1466,7 +1469,7 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 
 	[Teardown]	Run Keywords
 	...    Close Manager GUI	AND
-	...    Stop Agent							AND
+	...    Stop Agent CLI							AND
 	...    Change = ${ipv4}[0] With =${SPACE} In ${manager_ini_file}
 
 Verify Disable log.html - Scenario
@@ -1733,7 +1736,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	...    Remove Directory	${global_path}${/}example	recursive=${True}			AND
 	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main1.robot	${CURDIR}${/}testdata${/}Issue-52	AND
-	...    Stop Agent																AND
+	...    Stop Agent CLI																AND
 	...    Close Manager GUI
 
 Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
@@ -1779,7 +1782,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	...    Remove Directory	${global_path}${/}example	recursive=${True}			AND
 	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main2.robot	${CURDIR}${/}testdata${/}Issue-52	AND
-	...    Stop Agent																AND
+	...    Stop Agent CLI																AND
 	...    Close Manager GUI
 
 Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
@@ -1824,7 +1827,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    Remove Directory	${global_path}${/}example	recursive=${True}			AND
 	...    Remove Directory	${TEMPDIR}${/}agent_temp_issue52	recursive=${True}	AND
 	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main${/}main3.robot	${CURDIR}${/}testdata${/}Issue-52	AND
-	...    Stop Agent																AND
+	...    Stop Agent CLI																AND
 	...    Close Manager GUI
 
 Verify If __init__.robot Files Get Transfered To the Agent Along With Robot/Resuorce File
@@ -1876,7 +1879,7 @@ Verify If __init__.robot Files Get Transfered To the Agent Along With Robot/Resu
 
 	[Teardown]	Run Keywords
 	...    Remove Directory 	${TEMPDIR}${/}agent_temp_issue90	recursive=${True}	AND
-	...    Stop Agent																	AND
+	...    Stop Agent CLI																	AND
 	...    Close Manager GUI
 
 Check If The CSV Report Button Works In the Manager Before There Are Any Results
@@ -1924,7 +1927,7 @@ Check If The CSV Report Button Works In the Manager Before There Are Any Results
 
 	[Teardown]	Run Keywords
 	...    Close Manager GUI	AND
-	...    Stop Agent
+	...    Stop Agent CLI
 
 Check If The CSV Report Button Works In The Manager After There Are Results
 	[Tags]	windows-latest	macos-latest	ubuntu-latest	Issue #254
@@ -1971,7 +1974,7 @@ Check If The CSV Report Button Works In The Manager After There Are Results
 
 	[Teardown]	Run Keywords
 	...    Close Manager GUI	AND
-	...    Stop Agent
+	...    Stop Agent CLI
 
 Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robots
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #31
@@ -2055,7 +2058,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 	[Teardown]	Run Keywords
 	...    Delete Scenario File		${scenario_name}		AND
 	...    Delete Robot File								AND
-	...    Stop Agent							AND
+	...    Stop Agent CLI							AND
 	...    Close Manager GUI
 
 Check If Scenario Csv Report Files Contain Correct Data From The Test
@@ -2173,7 +2176,7 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 
 	[Teardown]	Run Keywords
 	...    Close Manager GUI	AND
-	...    Stop Agent
+	...    Stop Agent CLI
 
 Verify the Results Directory And db File Gets Created Correctly With Scenario Also After a Restart
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
@@ -2242,7 +2245,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	[Teardown]	Run Keywords
 	...    Delete Robot File						AND
 	...    Delete Scenario File	${scenario_name}	AND
-	...    Stop Agent								AND
+	...    Stop Agent CLI								AND
 	...    Close Manager GUI
 
 Verify the Results Directory And db File Gets Created Correctly Without Scenario
@@ -2290,7 +2293,7 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 
 	[Teardown]	Run Keywords
 	...    Delete Robot File	AND
-	...    Stop Agent			AND
+	...    Stop Agent CLI			AND
 	...    Close Manager GUI
 
 Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the robots)
@@ -2316,7 +2319,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	[Teardown]	Run Keywords
 	...    Delete Scenario File		${scenario_name}		AND
 	...    Set Confidence	0.9								AND
-	...    Stop Agent							AND
+	...    Stop Agent CLI							AND
 	...    Close Manager GUI	AND
 	...    Remove File		${global_path}${/}example.robot
 
@@ -2343,7 +2346,7 @@ Check If Test Scenario Run Will Stop Gradually
 	[Teardown]	Run Keywords
 	...    Delete Scenario File		${scenario_name}		AND
 	...    Set Confidence	0.9								AND
-	...    Stop Agent							AND
+	...    Stop Agent CLI							AND
 	...    Close Manager GUI	AND
 	...    Remove File		${global_path}${/}example.robot
 
@@ -2370,7 +2373,7 @@ Check If Test Scenario Run Will Stop Gradually - TestRepeater
 	[Teardown]	Run Keywords
 	...    Delete Scenario File		${scenario_name}		AND
 	...    Set Confidence	0.9								AND
-	...    Stop Agent							AND
+	...    Stop Agent CLI							AND
 	...    Close Manager GUI	AND
 	...    Remove File		${global_path}${/}example.robot
 
@@ -2436,9 +2439,9 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 
 	[Teardown]	Run Keywords
 	...    Close Manager GUI	AND
-	...    Stop Agent
+	...    Stop Agent CLI
 
-Verify the Robot Count Reduces When Stop Agent While Test Is Running
+Verify the Robot Count Reduces When Stop Agent CLI While Test Is Running
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #57	Issue #269
 	[Setup]	Run Keywords
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
@@ -2459,7 +2462,7 @@ Verify the Robot Count Reduces When Stop Agent While Test Is Running
 	Run Keyword If	not ${status}	Fail	msg=Manager could not reach 10 robots after 60s.
 
 	Log To Console	Stopping agent while test is running.
-	Stop Agent
+	Stop Agent CLI
 	Click Tab	Agents
 	${status}=	Run Keyword And Return Status
 	...    Wait For		manager_${PLATFORM}_agents_offline.png 	timeout=${60}
@@ -2480,7 +2483,7 @@ Verify the Robot Count Reduces When Stop Agent While Test Is Running
 
 	[Teardown]	Run Keywords
 	...    Close Manager GUI	AND
-	...    Stop Agent							AND
+	...    Stop Agent CLI							AND
 	...    Set Confidence	0.9
 
 Verify the Files Referenced In the Scenario Are All Using Relative Paths
@@ -2687,7 +2690,7 @@ Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardl
 	[Teardown]	Run Keywords
 	...    Remove File	${global_path}${/}${robotname}		AND
 	...    Remove File	${global_path}${/}${scenarioname}	AND
-	...    Stop Agent							AND
+	...    Stop Agent CLI							AND
 	...    Close Manager GUI	AND
 	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
 
@@ -2737,7 +2740,7 @@ Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only Whe
 	[Teardown]	Run Keywords
 	...    Remove File	${global_path}${/}${robotname}		AND
 	...    Remove File	${global_path}${/}${scenarioname}	AND
-	...    Stop Agent							AND
+	...    Stop Agent CLI							AND
 	...    Close Manager GUI	AND
 	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
 
@@ -2791,7 +2794,7 @@ Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 	[Teardown]	Run Keywords
 	...    Remove File	${global_path}${/}${robotname}		AND
 	...    Remove File	${global_path}${/}${scenarioname}	AND
-	...    Stop Agent							AND
+	...    Stop Agent CLI							AND
 	...    Close Manager GUI	AND
 	...    Remove Directory		${run_result_dirs}[0]	recursive=${True}
 
@@ -3180,7 +3183,7 @@ Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time
 
 	[Teardown]	Run Keywords
 	...    Close Manager GUI	AND
-	...    Stop Agent
+	...    Stop Agent CLI
 
 Verify the Start Time Is Displayed On the Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #89
@@ -3311,7 +3314,7 @@ Verify That TPS Is TP And Not TPmS
 
 	[Teardown]	Run Keywords
 	...    Close Manager GUI 	AND
-	...    Stop Agent
+	...    Stop Agent CLI
 
 # Verify Agent Filter Graphs
 # 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #217 	robot:continue-on-failure
@@ -3343,9 +3346,9 @@ Verify That TPS Is TP And Not TPmS
 
 # 	[Teardown]	Run Keywords
 # 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_1} 	AND
-# 	...    Stop Agent 	AND
+# 	...    Stop Agent CLI 	AND
 # 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_2} 	AND
-# 	...    Stop Agent 	AND
+# 	...    Stop Agent CLI 	AND
 # 	...    Close Manager GUI
 
 Verify Filter Metric Graphs - Wildcard & Not Wildcard
@@ -3421,9 +3424,9 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 
 	[Teardown]	Run Keywords
 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_1} 	AND
-	...    Stop Agent 	AND
+	...    Stop Agent CLI 	AND
 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_2} 	AND
-	...    Stop Agent 	AND
+	...    Stop Agent CLI 	AND
 	...    Close Manager GUI
 
 Verify Filter Result Graphs - Wildcard & Not Wildcard
@@ -3499,9 +3502,9 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 
 	[Teardown]	Run Keywords
 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_1} 	AND
-	...    Stop Agent 	AND
+	...    Stop Agent CLI 	AND
 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_2} 	AND
-	...    Stop Agent 	AND
+	...    Stop Agent CLI 	AND
 	...    Close Manager GUI
 
 Check Application Icon or Desktop Shortcut in GUI
@@ -3597,7 +3600,7 @@ Check If Monitoring settings are loaded and used
 	[Teardown]	Run Keywords
 	...    Delete Scenario File		${scenario_name}		AND
 	...    Set Confidence	0.9								AND
-	...    Stop Agent							AND
+	...    Stop Agent CLI							AND
 	...    Close Manager GUI	AND
 	...    Remove File		${global_path}${/}example.robot
 
