@@ -38,7 +38,7 @@ Auto Generate HTML Report Without GUI Using Template
 	Log 	template: ${template} 	console=True
 	Log To Console	Run Reporter with cutom template and generate html report.
 	# ${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --html
-	${result}= 	Run 	${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --html
+	${result}= 	Run 	${CMD_REPORTER} -n -g 1 -d ${resultfolder} -t ${template} --html
 	Log 	result: ${\n}${result} 	console=True
 
 	Should Not Contain 	${result} 	Traceback
@@ -67,7 +67,7 @@ Auto Generate DOCX Report Without GUI Using Template
 	Log 	template: ${template} 	console=True
 	Log To Console	Run Reporter with cutom template and generate docx report.
 	# ${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --docx
-	${result}= 	Run 	${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --docx
+	${result}= 	Run 	${CMD_REPORTER} -n -g 1 -d ${resultfolder} -t ${template} --docx
 	Log 	result: ${\n}${result} 	console=True
 
 	Should Not Contain 	${result} 	Traceback
@@ -92,7 +92,7 @@ Auto Generate XLSX Report Without GUI Using Template
 	Log 	template: ${template} 	console=True
 	Log To Console	Run Reporter with cutom template and generate xlsx report.
 	# ${result}=	Run 	python3 ${pyfile} -n -g 1 -d ${resultfolder} -t ${template} --xlsx
-	${result}= 	Run 	${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --xlsx
+	${result}= 	Run 	${CMD_REPORTER} -n -g 1 -d ${resultfolder} -t ${template} --xlsx
 	Log 	result: ${\n}${result} 	console=True
 
 	Should Not Contain 	${result} 	Traceback
@@ -118,7 +118,7 @@ Generate Reports With Unsupported Characters
 	Log 	template: ${template} 	console=True
 
 	Log To Console	Run Reporter with cutom template and generate html, docx, xlsx reports.
-	${result}= 	Run 	${cmd_reporter} -n -g 1 -d ${resultfolder} -t ${template} --html --docx --xlsx
+	${result}= 	Run 	${CMD_REPORTER} -n -g 1 -d ${resultfolder} -t ${template} --html --docx --xlsx
 	Log 	result: ${\n}${result} 	console=True
 
 	Should Not Contain 	${result} 	Traceback

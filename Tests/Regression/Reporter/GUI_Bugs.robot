@@ -3,21 +3,21 @@ Resource 	resources/GUI_Reporter.resource
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Reporter
 
-Test Teardown 	Close GUI
+Test Teardown 	Close Reporter GUI
 
 *** Test Cases ***
 Verify If Reporter Runs With Existing INI File From Current Version
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 	[Setup]	Run Keywords
-	...    Open GUI		AND
+	...    Open Reporter GUI		AND
 	...    Sleep	5	AND
-	...    Close GUI
+	...    Close Reporter GUI
 
 	${location}=	Get Reporter Default Save Path
 	File Should Exist	${location}${/}RFSwarmReporter.ini
 	File Should Not Be Empty	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with existing ini file.
-	Open GUI
+	Open Reporter GUI
 	Wait For Status 	PreviewLoaded
 	TRY
 		Click Section	test_result_summary
@@ -34,7 +34,7 @@ Verify If Reporter Runs With No Existing INI File From Current Version
 	Remove File		${location}${/}RFSwarmReporter.ini
 	File Should Not Exist	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with no existing ini file.
-	Open GUI
+	Open Reporter GUI
 	Wait For Status 	SelectResultFile
 	TRY
 		Click Section	test_result_summary
@@ -55,7 +55,7 @@ Verify If Reporter Runs With Existing INI File From Previous Version
 	File Should Exist	${location}${/}RFSwarmReporter.ini
 	File Should Not Be Empty	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with existing ini file.
-	Open GUI
+	Open Reporter GUI
 	Wait For Status 	SelectResultFile
 	TRY
 		Click Section	test_result_summary
@@ -64,28 +64,28 @@ Verify If Reporter Runs With Existing INI File From Previous Version
 	EXCEPT
 		Fail	msg=Reporter is not responding!
 	END
-	Close GUI
+	Close Reporter GUI
 
 	[Teardown] 	Run Keywords
 	...    Remove File 	${location}${/}RFSwarmReporter.ini 	AND
-	...    Open GUI 	AND
+	...    Open Reporter GUI 	AND
 	...    Sleep 	5 	AND
-	...    Close GUI
+	...    Close Reporter GUI
 
 Verify If Reporter Runs With Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 
 	${location}=	Get Reporter Default Save Path
-	Open GUI	-n
-	${result}= 	Wait For Process 	${process} 	timeout=60
+	Open Reporter GUI	-n
+	${result}= 	Wait For Process 	${PROCESS_REPORTER} 	timeout=60
 	Should Be Equal As Integers 	${result.rc} 	0
 	Check Logs
 
 	File Should Exist	${location}${/}RFSwarmReporter.ini
 	File Should Not Be Empty	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with existing ini file.
-	Open GUI	-n
-	${result}= 	Wait For Process 	${process} 	timeout=60
+	Open Reporter GUI	-n
+	${result}= 	Wait For Process 	${PROCESS_REPORTER} 	timeout=60
 	Should Be Equal As Integers 	${result.rc} 	0
 	Check Logs
 
@@ -97,8 +97,8 @@ Verify If Reporter Runs With No Existing INI File From Current Version NO GUI
 	File Should Not Exist	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with no existing ini file.
 
-	Open GUI	-n
-	${result}= 	Wait For Process 	${process} 	timeout=60
+	Open Reporter GUI	-n
+	${result}= 	Wait For Process 	${PROCESS_REPORTER} 	timeout=60
 	Should Be Equal As Integers 	${result.rc} 	0
 	Check Logs
 
@@ -114,14 +114,14 @@ Verify If Reporter Runs With Existing INI File From Previous Version NO GUI
 	File Should Not Be Empty	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with existing ini file.
 
-	Open GUI	-n
-	${result}= 	Wait For Process 	${process} 	timeout=60
+	Open Reporter GUI	-n
+	${result}= 	Wait For Process 	${PROCESS_REPORTER} 	timeout=60
 	Should Be Equal As Integers 	${result.rc} 	0
 	Check Logs
 
 	[Teardown] 	Run Keywords
 	...    Remove File 	${location}${/}RFSwarmReporter.ini 	AND
-	...    Open GUI 	-n
+	...    Open Reporter GUI 	-n
 
 First Run
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #147
@@ -135,10 +135,10 @@ First Run
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
 	${epoch}=	Get Time	epoch
-	Open GUI	-i 	blank_${epoch}.ini 	-d 	${resultfolder}
+	Open Reporter GUI	-i 	blank_${epoch}.ini 	-d 	${resultfolder}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
-	# Close GUI
+	# Close Reporter GUI
 
 New Data Table Section
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #149 	Issue #150
@@ -149,7 +149,7 @@ New Data Table Section
 	Should Exist	${basefolder}
 	Log to console 	basefolder: ${basefolder} 	console=True
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
-	Open GUI 	-d 	${resultfolder}
+	Open Reporter GUI 	-d 	${resultfolder}
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 	# Click Section			toc
 	# This should click Report
@@ -192,7 +192,7 @@ New Data Table Section
 
 	Wait For Status 	SavedXHTMLReport
 
-	# Close GUI
+	# Close Reporter GUI
 
 
 Template with Start and End Dates
@@ -223,7 +223,7 @@ Template with Start and End Dates
 	Log 	resultfolder1: ${resultfolder1} 	console=True
 	Log To Console	Open Reporter with resultfolder0 and create template
 
-	Open GUI	-d 	${resultfolder0}
+	Open Reporter GUI	-d 	${resultfolder0}
 	Wait For Status 	PreviewLoaded
 
 	# change the start and end times
@@ -268,7 +268,7 @@ Template with Start and End Dates
 	# Wait For Status 	GeneratingXHTMLReport
 	Wait For Status 	SavedXHTMLReport
 	Sleep    1
-	Close GUI
+	Close Reporter GUI
 
 	Copy Files 	${resultfolder0}/*.report 	${testresultfolder0}
 	Copy Files 	${resultfolder0}/*.html 	${testresultfolder0}
@@ -288,7 +288,7 @@ Template with Start and End Dates
 
 	Log To Console	Open Reporter with resultfolder1 and check template works
 
-	Open GUI	-d 	${resultfolder1}	-t 	${templatefolder}${/}${templatename}.template
+	Open Reporter GUI	-d 	${resultfolder1}	-t 	${templatefolder}${/}${templatename}.template
 	Wait For Status 	PreviewLoaded
 
 	Click Button 	GenerateHTML
@@ -317,7 +317,7 @@ Template with Start and End Dates
 	# Take A Screenshot
 	Wait For 	reporter_${PLATFORM}_expected_testresultsummary.png 	 timeout=30
 
-	[Teardown] 	Close GUI
+	[Teardown] 	Close Reporter GUI
 
 Auto Generate HTML Report With GUI Using Template
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #132 	HTML
@@ -329,9 +329,9 @@ Auto Generate HTML Report With GUI Using Template
 
 	Log To Console	Run Reporter with cutom template and generate html report.
 	${template_dir}=		Normalize Path	${basefolder}${/}Issue-#132.template
-	Open GUI	-d 	${resultfolder} 	-t 	${template_dir} 	--html
+	Open Reporter GUI	-d 	${resultfolder} 	-t 	${template_dir} 	--html
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
-	Close GUI
+	Close Reporter GUI
 	@{html_files}=		List Files In Directory		${resultfolder} 	absolute=True 	pattern=*.html
 	Log To Console	${\n}All result files: ${html_files}${\n}
 	Length Should Be 	${html_files} 	1
@@ -343,7 +343,7 @@ Auto Generate HTML Report With GUI Using Template
 	Should Contain 	${html_content} 	<div class="body"><p>This is a test for Issue-#132</p></div>
 
 	[Teardown] 	Run Keywords
-	...    Close GUI	AND
+	...    Close Reporter GUI	AND
 	...    Move File 	${resultfolder}${/}${resultdata}.html 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.html
 
 Auto Generate DOCX Report With GUI Using Template
@@ -356,9 +356,9 @@ Auto Generate DOCX Report With GUI Using Template
 
 	Log To Console	Run Reporter with cutom template and generate docx report.
 	${template_dir}=		Normalize Path	${basefolder}${/}Issue-#132.template
-	Open GUI	-d 	${resultfolder} 	-t 	${template_dir} 	--docx
+	Open Reporter GUI	-d 	${resultfolder} 	-t 	${template_dir} 	--docx
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
-	Close GUI
+	Close Reporter GUI
 	@{docx_files}=		List Files In Directory		${resultfolder} 	absolute=True 	pattern=*.docx
 	Log To Console	${\n}All result files: ${docx_files}${\n}
 	Length Should Be 	${docx_files} 	1
@@ -366,7 +366,7 @@ Auto Generate DOCX Report With GUI Using Template
 	File Should Not Be Empty 	${docx_files}[0]
 
 	[Teardown] 	Run Keywords
-	...    Close GUI	AND
+	...    Close Reporter GUI	AND
 	...    Move File 	${resultfolder}${/}${resultdata}.docx 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.docx
 
 Auto Generate XLSX Report With GUI Using Template
@@ -379,9 +379,9 @@ Auto Generate XLSX Report With GUI Using Template
 
 	Log To Console	Run Reporter with cutom template and generate xlsx report.
 	${template_dir}=		Normalize Path	${basefolder}${/}Issue-#132.template
-	Open GUI	-d 	${resultfolder} 	-t 	${template_dir} 	--xlsx
+	Open Reporter GUI	-d 	${resultfolder} 	-t 	${template_dir} 	--xlsx
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=10
-	Close GUI
+	Close Reporter GUI
 	@{xlsx_files}=		List Files In Directory		${resultfolder} 	absolute=True 	pattern=*.xlsx
 	Log To Console	${\n}All result files: ${xlsx_files}${\n}
 	Length Should Be 	${xlsx_files} 	1
@@ -389,7 +389,7 @@ Auto Generate XLSX Report With GUI Using Template
 	File Should Not Be Empty 	${xlsx_files}[0]
 
 	[Teardown] 	Run Keywords
-	...    Close GUI	AND
+	...    Close Reporter GUI	AND
 	...    Move File 	${resultfolder}${/}${resultdata}.xlsx 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.xlsx
 
 Open New Template After Selecting a Section That Is Not In the New Template
@@ -404,7 +404,7 @@ Open New Template After Selecting a Section That Is Not In the New Template
 
 	Change Reporter INI Option 	Reporter 	templatedir 	${basefolder}
 
-	Open GUI 	-d 	${resultfolder} 	-t 	${first_template}
+	Open Reporter GUI 	-d 	${resultfolder} 	-t 	${first_template}
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=60
 	Take A Screenshot
 	Click Section 	Errors
@@ -415,8 +415,8 @@ Open New Template After Selecting a Section That Is Not In the New Template
 	Take A Screenshot
 	Click Section 	Report
 
-	Close GUI
+	Close Reporter GUI
 
 	Check Logs
 
-	[Teardown] 	Close GUI
+	[Teardown] 	Close Reporter GUI

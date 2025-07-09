@@ -54,10 +54,10 @@ Language Test Init
 	${mgrini}= 	Get Manager INI Location
 	Set Manager INI Window Size 	1200 	600
 	# ${options}= 	Create List 	 	-d 	${agent_dir}
-	Open Agent
+	Run Agent CLI
 
 Language Test End
-	Run Keyword		Close Manager GUI ${PLATFORM}
+	Close Manager GUI
 	Stop Agent
 
 

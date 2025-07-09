@@ -106,7 +106,7 @@ Close GUI
 		${result} = 	Terminate Process		${process}
 		Fail
 	END
-	Kill Manager If Still Running
+	Kill If Still Running 	${CMD_MANAGER}
 
 Close GUI
 	[Tags]	macos-latest
@@ -124,7 +124,7 @@ Close GUI
 		${result} = 	Terminate Process		${process}
 		Fail
 	END
-	Kill Manager If Still Running
+	Kill If Still Running 	${CMD_MANAGER}
 
 # Intentional Fail
 # 	[Tags]	ubuntu-latest		windows-latest		macos-latest

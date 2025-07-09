@@ -3,17 +3,17 @@ Resource 	resources/GUI_Reporter.resource
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Reporter
 
-Test Teardown 	Close GUI
+Test Teardown 	Close Reporer GUI
 
 *** Test Cases ***
 GUI Runs and Closes
 	[Tags]	macos-latest		windows-latest		ubuntu-latest
-	Open GUI
+	Open Reporter GUI
 	Wait For Status 	PreviewLoaded
 
 Select Preview Tab
 	[Tags]	ubuntu-latest		windows-latest		macos-latest
-	Open GUI
+	Open Reporter GUI
 	Wait For Status 	PreviewLoaded
 	Click Tab 	 Preview
 

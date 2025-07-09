@@ -7,15 +7,13 @@ Suite Setup 	Common.Basic Suite Initialization Agent
 Exclude Libraries With Spaces
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #171 	Issue #177
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
-	@{agnt_options}= 	Create List 	-g 	1 	-m 	http://localhost:8138
-	Run Agent 	${agnt_options}
+	Run Agent CLI 	-g 	1 	-m 	http://localhost:8138
 	Log to console 	${CURDIR}
 	# ${scenariofile}= 	Normalize Path 	${CURDIR}${/}..${/}..${/}Demo${/}demo.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#171${/}Issue171.rfs
 	Log to console 	scenariofile: ${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
-	Run Manager CLI 	${mngr_options}
-	Wait For Manager
+	Run Manager CLI 	-g 	1 	-s 	${scenariofile} 	-n
+	Wait For Manager Process
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
@@ -33,15 +31,13 @@ Exclude Libraries With Spaces
 Run agent with -x (xml mode)
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #180
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
-	@{agnt_options}= 	Create List 	-g 	1 	-x 	-m 	http://localhost:8138
-	Run Agent 	${agnt_options}
+	Run Agent CLI 	-g 	1 	-x 	-m 	http://localhost:8138
 	Log to console 	${CURDIR}
 	# ${scenariofile}= 	Normalize Path 	${CURDIR}${/}..${/}..${/}Demo${/}demo.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#171${/}Issue171.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
-	Run Manager CLI 	${mngr_options}
-	Wait For Manager
+	Run Manager CLI 	-g 	1 	-s 	${scenariofile} 	-n
+	Wait For Manager Process
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
@@ -78,7 +74,7 @@ Verify If Agent Runs With Existing INI File From Current Version
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 
 	${location}=	Get Agent Default Save Path
-	Run Agent
+	Run Agent CLI
 	Sleep	5
 	${running}= 	Is Process Running 	${process_agent}
 	IF 	${running}
@@ -91,7 +87,7 @@ Verify If Agent Runs With Existing INI File From Current Version
 	File Should Not Be Empty	${location}${/}RFSwarmAgent.ini
 	Log To Console	Running Agent with existing ini file.
 
-	Run Agent
+	Run Agent CLI
 	Sleep	5
 	${running}= 	Is Process Running 	${process_agent}
 	IF 	${running}
@@ -108,7 +104,7 @@ Verify If Agent Runs With No Existing INI File From Current Version NO GUI
 	File Should Not Exist	${location}${/}RFSwarmAgent.ini
 	Log To Console	Running Agent with no existing ini file.
 
-	Run Agent
+	Run Agent CLI
 	Sleep	5
 	${running}= 	Is Process Running 	${process_agent}
 	IF 	${running}
@@ -129,7 +125,7 @@ Verify If Agent Runs With Existing INI File From Previous Version NO GUI
 	File Should Not Be Empty	${location}${/}RFSwarmAgent.ini
 	Log To Console	Running Agent with existing ini file.
 
-	Run Agent
+	Run Agent CLI
 	Sleep	5
 	${running}= 	Is Process Running 	${process_agent}
 	IF 	${running}
@@ -140,7 +136,7 @@ Verify If Agent Runs With Existing INI File From Previous Version NO GUI
 
 	[Teardown] 	Run Keywords
 	...    Remove File 	${location}${/}RFSwarmAgent.ini 	AND
-	...    Run Agent 	AND
+	...    Run Agent CLI 	AND
 	...    Sleep 	3 	AND
 	...    Stop Agent
 
@@ -149,13 +145,11 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 
 	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#100${/}command_line
 	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
-	VAR 	@{agnt_options} 	-a 	Issue-#100AGENTNAME
-	VAR 	@{mngr_options} 	-n 	-d 	${test_dir}
 
 	Create Directory 	${test_dir}
-	Log To Console	Run Agent with custom agent name.
-	Run Agent 	${agnt_options}
-	Run Manager CLI 	${mngr_options}
+	Log To Console	Run Agent CLI with custom agent name.
+	Run Agent CLI 		-a 	Issue-#100AGENTNAME
+	Run Manager CLI 	-n 	-d 	${test_dir}
 	Sleep	20s
 	Stop Agent
 	Stop Manager
@@ -174,13 +168,11 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 
 	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#100${/}ini_file
 	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
-	VAR 	@{agnt_options} 	-i 	${CURDIR}${/}testdata${/}Issue-#100${/}RFSwarmAgent.ini
-	VAR 	@{mngr_options} 	-n 	-d 	${test_dir}
 
 	Create Directory 	${test_dir}
-	Log To Console	Run Agent with custom agent name.
-	Run Agent 	${agnt_options}
-	Run Manager CLI 	${mngr_options}
+	Log To Console	Run Agent CLI with custom agent name.
+	Run Agent CLI 		-i 	${CURDIR}${/}testdata${/}Issue-#100${/}RFSwarmAgent.ini
+	Run Manager CLI 	-n 	-d 	${test_dir}
 	Sleep	20s
 	Stop Agent
 	Stop Manager

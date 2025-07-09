@@ -9,12 +9,6 @@ Library 	XML 	use_lxml=True
 
 Variables 	report_expected_data.yaml
 
-*** Variables ***
-${cmd_reporter} 	rfswarm-reporter
-${process} 			${None}
-
-${pyfile} 		${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
-
 *** Keywords ***
 Create New Section
 	[Arguments]		${sectname}
@@ -105,130 +99,130 @@ Wait For Status
 	Sleep 	0.1
 	# Take A Screenshot
 
-Open GUI
-	[Arguments]		@{appargs}
-	${var}= 	Get Variables
-	Log 	${var}
+# Open GUI
+# 	[Arguments]		@{appargs}
+# 	${var}= 	Get Variables
+# 	Log 	${var}
 
-	# Press Escape and move mouse because on linux the screen save had kicked in
-	Press Combination 	Key.esc
-	Wiggle Mouse
+# 	# Press Escape and move mouse because on linux the screen save had kicked in
+# 	Press Combination 	Key.esc
+# 	Wiggle Mouse
 
-	${keyword}= 	Set Variable 	Open GUI ${PLATFORM}
-	Run Keyword 	${keyword} 	@{appargs}
-	Handle Donation Reminder
+# 	${keyword}= 	Set Variable 	Open GUI ${PLATFORM}
+# 	Run Keyword 	${keyword} 	@{appargs}
+# 	Handle Donation Reminder
 
-Open GUI windows
-	[Arguments]		@{appargs}
-	# Set Suite Variable    ${PLATFORM}    windows
-	${args}= 	Evaluate 	" \t".join(@{appargs})
-	Set Confidence		0.9
-	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	# ${process}= 	Start Process 	python 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout_reporter.txt 	stderr=${OUTPUT DIR}${/}stderr_reporter.txt
+# Open GUI windows
+# 	[Arguments]		@{appargs}
+# 	# Set Suite Variable    ${PLATFORM}    windows
+# 	${args}= 	Evaluate 	" \t".join(@{appargs})
+# 	Set Confidence		0.9
+# 	# ${PROCESS_REPORTER}= 	Start Process 	python3 	${PYFILE_REPORTER}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+# 	# ${PROCESS_REPORTER}= 	Start Process 	python 	${PYFILE_REPORTER} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+# 	${PROCESS_REPORTER}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout_reporter.txt 	stderr=${OUTPUT DIR}${/}stderr_reporter.txt
 
-	Set Suite Variable 	$process 	${process}
-	# reporter_windows_status_previewloaded
-	# Wait For Status 	PreviewLoaded
-	# Sleep 	60
-	# Capture Screen
-	Set Screenshot Folder 	${OUTPUT DIR}
-	# Take A Screenshot
+# 	Set Suite Variable 	$process 	${PROCESS_REPORTER}
+# 	# reporter_windows_status_previewloaded
+# 	# Wait For Status 	PreviewLoaded
+# 	# Sleep 	60
+# 	# Capture Screen
+# 	Set Screenshot Folder 	${OUTPUT DIR}
+# 	# Take A Screenshot
 
-Open GUI ubuntu
-	[Arguments]		@{appargs}
-	Set Suite Variable    ${PLATFORM}    ubuntu
-	Set Confidence		0.9
-	# ${process}= 	Start Process 	python3 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout_reporter.txt 	stderr=${OUTPUT DIR}${/}stderr_reporter.txt
-	Set Suite Variable 	$process 	${process}
-	# Sleep 	60
-	# Capture Screen
-	Set Screenshot Folder 	${OUTPUT DIR}
-	# Take A Screenshot
+# Open GUI ubuntu
+# 	[Arguments]		@{appargs}
+# 	Set Suite Variable    ${PLATFORM}    ubuntu
+# 	Set Confidence		0.9
+# 	# ${PROCESS_REPORTER}= 	Start Process 	python3 	${PYFILE_REPORTER} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+# 	${PROCESS_REPORTER}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout_reporter.txt 	stderr=${OUTPUT DIR}${/}stderr_reporter.txt
+# 	Set Suite Variable 	$process 	${PROCESS_REPORTER}
+# 	# Sleep 	60
+# 	# Capture Screen
+# 	Set Screenshot Folder 	${OUTPUT DIR}
+# 	# Take A Screenshot
 
-Open GUI macos
-	[Arguments]		@{appargs}
-	Set Suite Variable    ${PLATFORM}    macos
-	Set Confidence		0.9
-	# ${process}= 	Start Process 	python3 	${pyfile} 	-g 	5 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout_reporter.txt 	stderr=${OUTPUT DIR}${/}stderr_reporter.txt
-	Set Suite Variable 	$process 	${process}
-	# Sleep 	60
-	Set Screenshot Folder 	${OUTPUT DIR}
-	# Take A Screenshot
+# Open GUI macos
+# 	[Arguments]		@{appargs}
+# 	Set Suite Variable    ${PLATFORM}    macos
+# 	Set Confidence		0.9
+# 	# ${PROCESS_REPORTER}= 	Start Process 	python3 	${PYFILE_REPORTER} 	-g 	5 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+# 	${PROCESS_REPORTER}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout_reporter.txt 	stderr=${OUTPUT DIR}${/}stderr_reporter.txt
+# 	Set Suite Variable 	$process 	${PROCESS_REPORTER}
+# 	# Sleep 	60
+# 	Set Screenshot Folder 	${OUTPUT DIR}
+# 	# Take A Screenshot
 
-Close GUI
-	${keyword}= 	Set Variable 	Close GUI ${PLATFORM}
-	IF 	${process}
-		${running}= 	Is Process Running 	${process}
-		IF 	${running}
-			Run Keyword 	${keyword}
-		ELSE
-			# ${result}= 	Get Process Result 	${process}
-			${result}= 	Wait For Process 	${process} 	timeout=60
-			Check Logs
-			Should Be Equal As Integers 	${result.rc} 	0
-		END
-	END
-	Set Suite Variable 	$process 	None
-	Sleep 	0.5
-	${running}= 	Is Process Running 	${process}
-	Run Keyword If 	${running} 	Fail 	Reporter is still running!
+# Close GUI
+# 	${keyword}= 	Set Variable 	Close GUI ${PLATFORM}
+# 	IF 	${PROCESS_REPORTER}
+# 		${running}= 	Is Process Running 	${PROCESS_REPORTER}
+# 		IF 	${running}
+# 			Run Keyword 	${keyword}
+# 		ELSE
+# 			# ${result}= 	Get Process Result 	${PROCESS_REPORTER}
+# 			${result}= 	Wait For Process 	${PROCESS_REPORTER} 	timeout=60
+# 			Check Logs
+# 			Should Be Equal As Integers 	${result.rc} 	0
+# 		END
+# 	END
+# 	Set Suite Variable 	$process 	None
+# 	Sleep 	0.5
+# 	${running}= 	Is Process Running 	${PROCESS_REPORTER}
+# 	Run Keyword If 	${running} 	Fail 	Reporter is still running!
 
-Close GUI windows
-	@{coordinates}= 	Locate 	reporter_${PLATFORM}_menu_results.png
-	Log 	${coordinates}
-	@{coordinates}= 	Locate 	reporter_${PLATFORM}_button_closewindow.png
-	Log 	${coordinates}
+# Close GUI windows
+# 	@{coordinates}= 	Locate 	reporter_${PLATFORM}_menu_results.png
+# 	Log 	${coordinates}
+# 	@{coordinates}= 	Locate 	reporter_${PLATFORM}_button_closewindow.png
+# 	Log 	${coordinates}
 
-	Run Keyword And Ignore Error 	Click Image 	reporter_${PLATFORM}_menu_results.png
-	Sleep 	0.1
-	Press Key.esc 3 Times
-	Sleep 	2
-	Press Combination 	Key.ctrl 	x
-	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
-	# Run Keyword And Ignore Error 	Click Image		reporter_${PLATFORM}_status_previewloaded.png
+# 	Run Keyword And Ignore Error 	Click Image 	reporter_${PLATFORM}_menu_results.png
+# 	Sleep 	0.1
+# 	Press Key.esc 3 Times
+# 	Sleep 	2
+# 	Press Combination 	Key.ctrl 	x
+# 	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
+# 	# Run Keyword And Ignore Error 	Click Image		reporter_${PLATFORM}_status_previewloaded.png
 
-	# Click Image		reporter_${PLATFORM}_button_closewindow.png
-	# Run Keyword And Ignore Error 	Click Image		reporter_${PLATFORM}_button_closewindow.png
-	Take A Screenshot
-	Sleep 	0.5
-	End Process If Still Running
+# 	# Click Image		reporter_${PLATFORM}_button_closewindow.png
+# 	# Run Keyword And Ignore Error 	Click Image		reporter_${PLATFORM}_button_closewindow.png
+# 	Take A Screenshot
+# 	Sleep 	0.5
+# 	End Process If Still Running
 
-Close GUI ubuntu
-	# Press Combination 	Key.esc
-	# Press Combination 	x 	Key.ctrl
-	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
-	# Run Keyword And Ignore Error 	Click Image		reporter_${PLATFORM}_status_previewloaded.png
-	Click Image		reporter_${PLATFORM}_button_closewindow.png
-	Run Keyword And Ignore Error 	Click Image		reporter_${PLATFORM}_button_closewindow.png
-	Take A Screenshot
-	Sleep 	0.5
-	End Process If Still Running
+# Close GUI ubuntu
+# 	# Press Combination 	Key.esc
+# 	# Press Combination 	x 	Key.ctrl
+# 	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
+# 	# Run Keyword And Ignore Error 	Click Image		reporter_${PLATFORM}_status_previewloaded.png
+# 	Click Image		reporter_${PLATFORM}_button_closewindow.png
+# 	Run Keyword And Ignore Error 	Click Image		reporter_${PLATFORM}_button_closewindow.png
+# 	Take A Screenshot
+# 	Sleep 	0.5
+# 	End Process If Still Running
 
-Close GUI macos
-	# Press Combination 	Key.esc
-	# Press Combination 	q 	Key.command
-	# Click Image		reporter_${PLATFORM}_menu_python3.png
-	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
-	# Run Keyword And Ignore Error 	Click Image		reporter_${PLATFORM}_status_previewloaded.png
-	Click Image		reporter_${PLATFORM}_button_closewindow.png
-	Run Keyword And Ignore Error 	Click Image		reporter_${PLATFORM}_button_closewindow.png
-	Take A Screenshot
-	Sleep 	0.5
-	End Process If Still Running
+# Close GUI macos
+# 	# Press Combination 	Key.esc
+# 	# Press Combination 	q 	Key.command
+# 	# Click Image		reporter_${PLATFORM}_menu_python3.png
+# 	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
+# 	# Run Keyword And Ignore Error 	Click Image		reporter_${PLATFORM}_status_previewloaded.png
+# 	Click Image		reporter_${PLATFORM}_button_closewindow.png
+# 	Run Keyword And Ignore Error 	Click Image		reporter_${PLATFORM}_button_closewindow.png
+# 	Take A Screenshot
+# 	Sleep 	0.5
+# 	End Process If Still Running
 
 # need to be moved:
 End Process If Still Running
-	${result}= 	Wait For Process 	${process} 	timeout=60
-	${running}= 	Is Process Running 	${process}
+	${result}= 	Wait For Process 	${PROCESS_REPORTER} 	timeout=60
+	${running}= 	Is Process Running 	${PROCESS_REPORTER}
 	IF 	not ${running}
 		Should Be Equal As Integers 	${result.rc} 	0
 		Check Logs
 	ELSE
 		Take A Screenshot
-		${result} = 	Terminate Process		${process}
+		${result} = 	Terminate Process		${PROCESS_REPORTER}
 		Should Be Equal As Integers 	${result.rc} 	0
 		Check Logs
 		Fail 	Had to Terminate Process

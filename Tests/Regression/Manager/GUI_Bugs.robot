@@ -16,7 +16,7 @@ Verify If Manager Runs With Existing INI File From Current Version
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Manager GUI													AND
-	...    Run Keyword		Close Manager GUI ${PLATFORM}
+	...    Close Manager GUI
 
 	File Should Exist	${global_path}${/}RFSwarmManager.ini
 	File Should Not Be Empty	${global_path}${/}RFSwarmManager.ini
@@ -30,8 +30,7 @@ Verify If Manager Runs With Existing INI File From Current Version
 		Fail	msg=RFSwarm Manager is not responding!
 	END
 
-	# [Teardown]	Run Keywords
-	# ...    Run Keyword		Close Manager GUI ${PLATFORM}
+	[Teardown] 	Close Manager GUI
 
 Verify If Manager Runs With No Existing INI File From Current Version
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
@@ -49,8 +48,7 @@ Verify If Manager Runs With No Existing INI File From Current Version
 		Fail	msg=RFSwarm Manager is not responding!
 	END
 
-	# [Teardown]	Run Keywords
-	# ...    Run Keyword		Close Manager GUI ${PLATFORM}
+	[Teardown]	Close Manager GUI
 
 Verify If Manager Runs With Existing INI File From Previous Version
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
@@ -72,8 +70,7 @@ Verify If Manager Runs With Existing INI File From Previous Version
 		Fail	msg=RFSwarm Manager is not responding!
 	END
 
-	# [Teardown]	Run Keywords
-	# ...    Run Keyword		Close Manager GUI ${PLATFORM}
+	[Teardown]	Run Keyword		Close Manager GUI
 
 Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #362
@@ -83,8 +80,7 @@ Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
 
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#362${/}invalid.rfs
 	${inifile}= 		Normalize Path 	${CURDIR}${/}testdata${/}Issue-#362${/}RFSwarmManager.ini
-	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-i 	${inifile}
-	Open Manager GUI 	${mngr_options}
+	Open Manager GUI 	-s 	${scenariofile} 	-i 	${inifile}
 
 	Sleep 	5s
 
@@ -119,12 +115,10 @@ Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
 		Click Button With Vertical Offset 	GraphSettings 	offset=-15
 	END
 
-	Run Keyword 	Close Manager GUI ${PLATFORM}
-
-	${running}= 	Is Process Running 	${process_manager}
+	Run Keyword 	Close Manager GUI
 	Check Logs
 
-	[Teardown] 	Run Keyword If 	${running} 	Close Manager GUI ${PLATFORM}
+	[Teardown] 	Close Manager GUI
 
 # # Test for Issue #171	moved to agent test suite, can easily be tested for via the command line
 # Issue #171

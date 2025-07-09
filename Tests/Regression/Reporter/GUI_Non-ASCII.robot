@@ -38,7 +38,7 @@ Test Non-ASCII Characters
 	${template_file}= 	Create Language Files 	${langcode} 	${sample}
 	${manager_results} 	Choose Language Manager Result DB 	${langcode}
 
-	Open GUI 	-g 	1 	-d 	${manager_results} 	-t 	${template_file}
+	Open Reporter GUI 	-g 	1 	-d 	${manager_results} 	-t 	${template_file}
 	Wait For Status 	PreviewLoaded
 
 
@@ -166,7 +166,7 @@ Non-ASCII Test Setup
 	Set Reporter INI Window Size 	1200 	700
 
 Non-ASCII Test Teardown
-	Close GUI
+	Close Reporter GUI
 	Check Logs
 
 Choose Language Manager Result DB

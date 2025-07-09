@@ -18,6 +18,37 @@ Library 	img_common.py
 ${COMPONENT} 		${None} 	# currently used rfswarm component (app)
 ${PLATFORM} 		${None}
 ${RESULTS_DIR} 		${None}
+${AGENT_DIR} 		${OUTPUT DIR}${/}rfswarm-agent
+
+${CMD_AGENT} 		rfswarm-agent
+${CMD_MANAGER} 		rfswarm-manager
+${CMD_REPORTER} 	rfswarm-reporter
+${PROCESS_AGENT} 		${None}
+${PROCESS_MANAGER} 		${None}
+${PROCESS_REPORTER} 	${None}
+
+${PYFILE_MANAGER} 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
+${PYFILE_AGENT} 	${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py
+${PYFILE_REPORTER} 	${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
+
+@{CHECKED_PY_FILES} 	__init__.py
+@{BUILTIN_PY_MODULES}	__future__	__main__	_thread	_tkinter	abc	aifc	argparse	array	pkg_resources
+...    ast	asyncio	atexit	audioop	base64	bdb	binascii	bisect	builtins	bz2	calendar	cgi	cgitb
+...    chunk	cmath	cmd	code	codecs	codeop	collections	colorsys	compileall	concurrent	configparser
+...    contextlib	contextvars	copy	copyreg	cProfile	crypt	csv	ctypes	curses	dataclasses	datetime
+...    dbm	decimal	difflib	dis	doctest	email	encodings	ensurepip	enum	errno	faulthandler	fcntl
+...    filecmp	fileinput	fnmatch	fractions	ftplib	functools	gc	getopt	getpass	gettext	glob	graphlib
+...    grp	gzip	hashlib	heapq	hmac	html	http	idlelib	imaplib	imghdr	importlib	inspect	io	ipaddress
+...    itertools	json	keyword	lib2to3	linecache	locale	logging	lzma	mailbox	mailcap	marshal	math	mimetypes
+...    mmap	modulefinder	msilib	msvcrt	multiprocessing	netrc	nis	nntplib	numbers	operator	optparse	os
+...    ossaudiodev	pathlib	pdb	pickle	pickletools	pipes	pkgutil	platform	plistlib	poplib	posix	pprint
+...    profile	pstats	pty	pwd	py_compile	pyclbr	pydoc	queue	quopri	random	re	readline	reprlib	resource
+...    rlcompleter	runpy	sched	secrets	select	selectors	shelve	shlex	shutil	signal	site	sitecustomize
+...    smtplib	sndhdr	socket	socketserver	spwd	sqlite3	ssl	stat	statistics	string	stringprep	struct
+...    subprocess	sunau	symtable	sys	sysconfig	syslog	tabnanny	tarfile	telnetlib	tempfile	termios	test
+...    textwrap	threading	time	timeit	tkinter	token	tokenize	tomllib	trace	traceback	tracemalloc	tty	turtle
+...    turtledemo	types	typing	unicodedata	unittest	urllib	usercustomize	uu	uuid	venv	warnings	wave
+...    weakref	webbrowser	winreg	winsound	wsgiref	xdrlib	xml	xmlrpc	zipapp	zipfile	zipimport	zlib	zoneinfo
 
 *** Keywords ***
 Basic Suite Initialization ${component}
@@ -89,7 +120,8 @@ Read Log
 	RETURN 		${filedata}
 
 Check Logs
-	${comp} 	Convert To Lower Case 	${COMPONENT}
+	[Arguments] 	${component_name}=${COMPONENT}
+	${comp} 	Convert To Lower Case 	${component_name}
 	${stdout_component}= 		Read Log 	${OUTPUT DIR}${/}stdout_${comp}.txt
 	${stderr_component}= 		Read Log 	${OUTPUT DIR}${/}stderr_${comp}.txt
 	# Run Keyword And Warn On Failure 	Should Be Equal As Integers 	${result.rc} 	0
@@ -167,6 +199,111 @@ Kill If Still Running
 		EXCEPT 	# Match any error.
 			Log 	Failed to kill process: ${cmd_name}
 		END
+	END
+
+# End ${component_name} If Still Running
+# 	${comp} 	Convert To Lower Case 	${component_name}
+
+# 	${result}= 	Wait For Process 	${PROCESS_${comp}} 	timeout=60
+# 	${running}= 	Is Process Running 	${PROCESS_${comp}}
+# 	IF 	not ${running}
+# 		Should Be Equal As Integers 	${result.rc} 	0
+# 		Check Logs
+# 	ELSE
+# 		Take A Screenshot
+# 		${result} = 	Terminate Process		${PROCESS_${comp}}
+# 		# Should Be Equal As Integers 	${result.rc} 	0
+# 		Check Logs
+# 		Fail 	Had to Terminate Process
+# 	END
+
+# # # # # # # # # # # # #
+# Open/Close component  #
+# # # # # # # # # # # # #
+
+Run ${component_name} CLI
+	[Arguments] 	@{appargs}
+	${comp} 	Convert To Lower Case 	${component_name}
+
+	IF  '${component_name}' == 'Manager' and ( '-d' not in ${appargs} and '--dir' not in ${appargs} )
+		Append To List 	${appargs} 	-d 	${RESULTS_DIR}
+	ELSE IF  '${component_name}' == 'Agent' and ( '-d' not in ${appargs} and '--agentdir' not in ${appargs} )
+		Append To List 	${appargs} 	-d 	${AGENT_DIR}
+		Create Directory 	${AGENT_DIR}
+		Empty Directory 	${AGENT_DIR}
+	END
+
+	Log to Console 	${\n}Starting ${component_name}...
+	${args}= 	Evaluate 	" ".join(@{appargs})
+	Log to Console 	\${args}: ${args}
+
+	${process}= 	Start Process 	${CMD_${comp}}  @{appargs}  alias=${component_name}
+	...    stdout=${OUTPUT DIR}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stderr_${comp}.txt
+
+	Log 	${process}
+	Set Suite Variable 	${PROCESS_${comp}} 		${process}
+
+	${result}= 	Wait Until Keyword Succeeds 	45sec 	500ms 	Process Should Be Running 	${process}
+	# Log 	Process Is Running: ${result} 		console=True
+	Log to Console 	*==== ${component_name} started ===*
+
+Stop ${component_name}
+	${comp} 	Convert To Lower Case 	${component_name}
+
+	${running}= 	Is Process Running 	${PROCESS_${comp}}
+	IF 	${running}
+		Sleep	2s
+		IF  '${PLATFORM}' == 'windows'	# Send Signal To Process keyword does not work on Windows
+			${result}= 	Terminate Process 	${PROCESS_${comp}}
+		ELSE
+			Send Signal To Process 	SIGINT 	${PROCESS_${comp}}
+			${result}= 	Wait For Process 	${PROCESS_${comp}} 	timeout=30 	on_timeout=kill
+		END
+	ELSE
+		Log To Console 	${component_name} is not running!
+		TRY
+			# get result var for process even if not running any more
+			${result}= 	Get Process Result 	${PROCESS_${comp}}
+		EXCEPT 	AS 	${error}
+			Log 	error: ${error} 		console=true
+		END
+	END
+
+	Log To Console 	*=== ${component_name} closed with CLI singal ===*
+	TRY
+		Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_manager.txt
+		Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_manager.txt
+
+		Log to Console 	${component_name} Process returned: ${result.rc} 	console=True
+		Log 	stdout_path: ${result.stdout_path} 	console=True
+		Log 	stdout: ${result.stdout} 	console=True
+		Log 	stderr_path: ${result.stderr_path} 	console=True
+		Log 	stderr: ${result.stderr} 	console=True
+	EXCEPT 	AS 	${error}
+		Log 	error: ${error} 		console=true
+	END
+	Check Logs 	${component_name}
+
+Wait For ${component_name} Process
+	[Arguments] 	${timeout}=30min
+	${comp} 	Convert To Lower Case 	${component_name}
+
+	${result}= 	Wait For Process 	${PROCESS_${comp}} 	timeout=${timeout} 	on_timeout=terminate
+
+	TRY
+		Log 	${component_name} exited with: ${result.rc} 	console=${True}
+
+		Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_${comp}.txt
+		Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_${comp}.txt
+
+		Log 	stdout_path: ${result.stdout_path} 	console=${True}
+		Log 	stdout: ${result.stdout} 	console=${True}
+		Log 	stderr_path: ${result.stderr_path} 	console=${True}
+		Log 	stderr: ${result.stderr} 	console=${True}
+
+	EXCEPT 	AS 	${error}
+		Log 	error: ${error} 	console=${True}
+
 	END
 
 # # # # # # # # #
@@ -460,24 +597,24 @@ Get Relative Paths
 Find Result DB
 	[Arguments] 	${directory}=${RESULTS_DIR} 	${result_pattern}=*_*
 	# ${fols}= 	List Directory 	${RESULTS_DIR}
-	# Log to console 	${fols}
+	# Log to Console 	${fols}
 	${fols}= 	List Directory 	${directory} 	${result_pattern} 	absolute=True
-	Log to console 	${fols}
+	Log to Console 	${fols}
 	# ${files}= 	List Directory 	${fols[0]}
-	# Log to console 	${files}
+	# Log to Console 	${files}
 	${file}= 	List Directory 	${fols[-1]} 	*.db 	absolute=True
-	Log to console 	Result DB: ${file[-1]}
+	Log to Console 	Result DB: ${file[-1]}
 	RETURN 	${file[-1]}
 
 Query Result DB
 	[Arguments]		${dbfile} 	${sql}
-	Log to console 	dbfile: ${dbfile}
+	Log to Console 	dbfile: ${dbfile}
 	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
-	# Log to console 	\${dbfile}: ${dbfile}
+	# Log to Console 	\${dbfile}: ${dbfile}
 	Connect To Database 	sqlite3 	database=${dbfile} 	isolation_level=${None}
-	Log to console 	sql: ${sql}
+	Log to Console 	sql: ${sql}
 	${result}= 	Query 	${sql}
-	Log to console 	sql result: ${result}
+	Log to Console 	sql result: ${result}
 	Disconnect From Database
 	RETURN 	${result}
 
@@ -526,34 +663,57 @@ CSV to Dict
 # Python modules: #
 # # # # # # # # # #
 
+Update BUILTIN_PY_MODULES
+	[Arguments]		${module}
+	@{buildin}=		Create List		@{BUILTIN_PY_MODULES}
+	Append To List 	${buildin} 	${module}
+	${buildin}	Evaluate	list(set(${buildin}))
+	Set Suite Variable    @BUILTIN_PY_MODULES      @{buildin}
+
+
 Get Modules From Program .py File That Are Not BuildIn
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123
 	[Arguments]		${file_path}
-	@{buildin}=		Create List	__future__	__main__	_thread	_tkinter	abc	aifc	argparse	array	pkg_resources
-	...    ast	asyncio	atexit	audioop	base64	bdb	binascii	bisect	builtins	bz2	calendar	cgi	cgitb
-	...    chunk	cmath	cmd	code	codecs	codeop	collections	colorsys	compileall	concurrent	configparser
-	...    contextlib	contextvars	copy	copyreg	cProfile	crypt	csv	ctypes	curses	dataclasses	datetime
-	...    dbm	decimal	difflib	dis	doctest	email	encodings	ensurepip	enum	errno	faulthandler	fcntl
-	...    filecmp	fileinput	fnmatch	fractions	ftplib	functools	gc	getopt	getpass	gettext	glob	graphlib
-	...    grp	gzip	hashlib	heapq	hmac	html	http	idlelib	imaplib	imghdr	importlib	inspect	io	ipaddress
-	...    itertools	json	keyword	lib2to3	linecache	locale	logging	lzma	mailbox	mailcap	marshal	math	mimetypes
-	...    mmap	modulefinder	msilib	msvcrt	multiprocessing	netrc	nis	nntplib	numbers	operator	optparse	os
-	...    ossaudiodev	pathlib	pdb	pickle	pickletools	pipes	pkgutil	platform	plistlib	poplib	posix	pprint
-	...    profile	pstats	pty	pwd	py_compile	pyclbr	pydoc	queue	quopri	random	re	readline	reprlib	resource
-	...    rlcompleter	runpy	sched	secrets	select	selectors	shelve	shlex	shutil	signal	site	sitecustomize
-	...    smtplib	sndhdr	socket	socketserver	spwd	sqlite3	ssl	stat	statistics	string	stringprep	struct
-	...    subprocess	sunau	symtable	sys	sysconfig	syslog	tabnanny	tarfile	telnetlib	tempfile	termios	test
-	...    textwrap	threading	time	timeit	tkinter	token	tokenize	tomllib	trace	traceback	tracemalloc	tty	turtle
-	...    turtledemo	types	typing	unicodedata	unittest	urllib	usercustomize	uu	uuid	venv	warnings	wave
-	...    weakref	webbrowser	winreg	winsound	wsgiref	xdrlib	xml	xmlrpc	zipapp	zipfile	zipimport	zlib	zoneinfo
+	@{buildin}=		Create List		@{BUILTIN_PY_MODULES}
+	log 	${buildin}
 
 	&{replace_names}	Create Dictionary	PIL=pillow 		yaml=pyyaml
+	${custom_imports}	Create List
 
-	${python_file_content}	Get File	${file_path}
-	${all_imports_lines}	Split String	${python_file_content}	separator=\n
+	# add local modules to buildin list and also check them for non builtin import modules
+	${file_location} 	${file_name}= 	Split Path 	${file_path}
+	@{checked_py_files}= 	Create List 	${file_name} 	@{CHECKED_PY_FILES}
+	Set Suite Variable    @CHECKED_PY_FILES      @{checked_py_files}
+	Log		${CHECKED_PY_FILES}
+	@{pyfiles}= 	List Files In Directory 	${file_location} 	*.py
+	Remove Values From List 	${pyfiles}  	@{CHECKED_PY_FILES}
+	Log		${pyfiles}
+	FOR 	${pyfile} 	IN 	@{pyfiles}
+		${module} 	${ext} = 	Split Extension 	${pyfile}
+		Update BUILTIN_PY_MODULES 	${module}
+		@{module_imports}	Get Modules From Program .py File That Are Not BuildIn 	${file_location}${/}${pyfile}
+		Append To List 	${custom_imports} 	@{module_imports}
+	END
+
+	${parent_location} 	${file_dir_name}= 	Split Path 	${file_location}
+	${common_location}= 	Join Path 	${parent_location}  	rfswarm_common
+	Log		${CHECKED_PY_FILES}
+	@{pyfiles}= 	List Files In Directory 	${common_location} 	*.py
+	Remove Values From List 	${pyfiles}  	@{CHECKED_PY_FILES}
+	Log		${pyfiles}
+	FOR 	${pyfile} 	IN 	@{pyfiles}
+		${module} 	${ext} = 	Split Extension 	${pyfile}
+		Update BUILTIN_PY_MODULES 	${module}
+		@{module_imports}	Get Modules From Program .py File That Are Not BuildIn 	${common_location}${/}${pyfile}
+		Append To List 	${custom_imports} 	@{module_imports}
+	END
+
+	${manager_content}	Get File	${file_path}
+	${all_imports_lines}	Split String	${manager_content}	separator=\n
 	Log	${all_imports_lines}
 
-	${custom_imports}	Create List
+	log 	${BUILTIN_PY_MODULES}
+
 	${length}	Get Length	${all_imports_lines}
 	FOR  ${i}  IN RANGE  0  ${length}
 		@{import_line_elements}	Create List
@@ -573,9 +733,12 @@ Get Modules From Program .py File That Are Not BuildIn
 			IF  '${import_line_elements}[${j}]' == '#'
 				BREAK
 			END
+			IF  '${import_line_elements}[${j}]' == '='
+				BREAK
+			END
 			IF  '${import_line_elements}[${j}]' == 'import' or '${import_line_elements}[${j}]' == 'from'
 				${module_name}	Split String	${import_line_elements}[${j + 1}]	separator=.
-				IF  '${module_name}[0]' not in ${buildin}
+				IF  '${module_name}[0]' not in ${BUILTIN_PY_MODULES}
 					Append To List	${custom_imports}	${module_name}[0]
 				END
 				BREAK

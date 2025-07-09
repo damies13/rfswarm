@@ -25,6 +25,7 @@ GUI Suite Initialization ${component}
 	Set Suite Variable 	${IMAGE_DIR} 	${CURDIR}${/}..${/}Regression${/}${COMPONENT}${/}Images${/}file_method
 	Set Confidence 		${CONFIDENCE}
 	ImageHorizonLibrary.Set Reference Folder 	${IMAGE_DIR}
+	ImageHorizonLibrary.Set Screenshot Folder 	${OUTPUT DIR}
 
 	Log 	\t[ === GUI suite configuration has been initiated for ${COMPONENT} === ] 	console=True
 	Log 	image dir = ${IMAGE_DIR} 	console=True
@@ -89,6 +90,126 @@ Resize Window
 	Move To 	@{coordinates2}
 	# Take A Screenshot
 	Mouse Up
+
+# # # # # # # # # # # # # # #
+# Open/Close component GUI  #
+# # # # # # # # # # # # # # #
+
+Open ${component_name} GUI
+	[Arguments] 	@{appargs}
+	${comp} 	Convert To Lower Case 	${component_name}
+	${var}= 	Get Variables
+	Log 	${var}
+
+	Press Combination 	Key.esc
+	Wiggle Mouse
+
+	Run Keyword 	Run ${component_name} CLI 	@{appargs}
+
+	IF 	'-n' in ${options} or '--nogui' in ${options}
+		Sleep 	10
+	ELSE IF 	'-r' in ${options} or '--run' in ${options}
+		Handle Donation Reminder
+	ELSE
+		Handle Donation Reminder
+
+		# ${img}= 	Set Variable		manager_${PLATFORM}_button_runschedule.png
+		# ${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=${default_image_timeout / 2}
+		# IF 	not ${passed}
+		${running}= 	Is Process Running 	${PROCESS_${comp}}
+		IF 	not ${running}
+			${result}= 	Get Process Result 	${PROCESS_${comp}}
+
+			Log		rc: ${result.rc} 		console=True
+			Log		stdout: ${result.stdout} 		console=True
+			Log		stderr: ${result.stderr} 		console=True
+			Log		stdout_path: ${result.stdout_path} 		console=True
+			Log		stderr_path: ${result.stderr_path} 		console=True
+
+			Show Log 	${result.stdout_path}
+			Show Log 	${result.stderr_path}
+
+			Show Log 	${OUTPUT DIR}${/}stdout_${comp}.txt
+			Show Log 	${OUTPUT DIR}${/}stderr_${comp}.txt
+
+			Fail 		${component_name} not running
+			# ELSE
+			# 	Wait For 	${img} 	 timeout=${default_image_timeout / 2}
+			# END
+		END
+	END
+
+Close ${component_name} GUI
+	${comp} 	Convert To Lower Case 	${component_name}
+	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 	0.01
+	Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
+
+	IF 	${PROCESS_${comp}}
+		${running}= 	Is Process Running 	${PROCESS_${comp}}
+		IF 	${running}
+			Log to Console 	*=== Closing ${component_name} GUI ===*
+			# make sure the window is the active window first
+			IF 	'${component_name}' == 'Manager'
+				Run Keyword And Ignore Error 	Click Image 	manager_${PLATFORM}_tab_about.png
+				Run Keyword And Ignore Error 	Click Image 	manager_${PLATFORM}_tab_run.png
+			ELSE IF 	'${component_name}' == 'Reporter'
+				Run Keyword And Ignore Error 	Click Image 	reporter_${PLATFORM}_menu_results.png
+			END
+			# reporter_${PLATFORM}_button_closewindow.png 	# ubuntu reporter
+			# Click Button	closewindow 	#macos
+			Sleep 	1
+			Press Key.esc 3 Times
+			Sleep 	1
+			Press Combination 	Key.ctrl 	x
+			Sleep	3
+
+			${running}= 	Is Process Running 	${PROCESS_${comp}}
+			IF 	${running}
+				Press Combination 	Key.esc
+				Press Combination 	Key.ctrl 	x
+			END
+
+		ELSE
+			Log To Console 	${component_name} GUI is not running!
+			${result}= 	Wait For Process 	${PROCESS_${comp}} 	timeout=60
+			Check Logs
+			Should Be Equal As Integers 	${result.rc} 	0
+
+		END
+
+		Sleep 	2s
+		Run Keyword And Ignore Error 	Click Dialog Button 	no 		1
+
+		${result}= 		Wait For Process 	${process_manager} 	timeout=15
+		${running}= 	Is Process Running 	${PROCESS_${comp}}
+		IF 	not ${running}
+			Log To Console 	*=== ${component_name} GUI closed ===*
+			Log		${result.stdout}
+			Log		${result.stderr}
+			Should Be Equal As Integers 	${result.rc} 	0
+
+		ELSE
+			Take A Screenshot
+			Run Keyword 	Stop ${component_name}
+			${running}= 	Is Process Running 	${process_manager}
+			Take A Screenshot
+			IF 	${running}
+				Log To Console 	Failed to close ${component_name}
+			END
+		END
+
+	END
+
+	Sleep 	0.5
+	${running}= 	Is Process Running 	${PROCESS_${comp}}
+	Run Keyword If 	${running} 	Fail 	${component_name} is still running!
+	Check Logs 	${component_name}
+
+	[Teardown] 	Run Keywords
+	...    Set Suite Variable 	${PROCESS_${comp}} 	${None} 	AND
+	...    Kill If Still Running 	${CMD_${comp}} 				AND
+	...    Show Log 	${OUTPUT DIR}${/}stdout_${comp}.txt 	AND
+	...    Show Log 	${OUTPUT DIR}${/}stderr_${comp}.txt
 
 # # # # #
 # INI:  #

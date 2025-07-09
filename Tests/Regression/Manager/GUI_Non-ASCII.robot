@@ -47,8 +47,8 @@ Test Non-ASCII Characters
 	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${RESULTS_DIR}
 	VAR 	@{agnt_options} 	-a 	${agent_name}
 
-	Open Agent 			${agnt_options}
-	Open Manager GUI 	${mngr_options}
+	Run Agent CLI 		@{agnt_options}
+	Open Manager GUI 	@{mngr_options}
 	Take A Screenshot
 	Check If The Agent Is Ready
 	Click Tab 	Plan
@@ -78,7 +78,7 @@ Non-ASCII Test Setup
 
 Non-ASCII Test Teardown
 	Stop Agent
-	Run Keyword		Close Manager GUI ${PLATFORM}
+	Close Manager GUI
 	Check Non-ASCII Logs
 
 Create Language Files
