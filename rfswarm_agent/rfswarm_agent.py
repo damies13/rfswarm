@@ -2,7 +2,7 @@
 #
 # 	Robot Framework Swarm
 #
-#    Version 1.5.1
+#    Version 1.6.0
 #
 
 
@@ -40,7 +40,7 @@ import yaml
 
 class RFSwarmAgent():
 
-	version = "1.5.1"
+	version = "1.6.0"
 	config = None
 	isconnected = False
 	isrunning = False
