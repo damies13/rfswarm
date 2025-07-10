@@ -1700,12 +1700,12 @@ Verify Disable output.xml - Test Row
 Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords
+	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main1.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main 	AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		800		600						AND
 	...    Run Agent CLI	-d	${TEMPDIR}${/}agent_temp_issue52			AND
 	...    Open Manager GUI													AND
-	...    Set Global Filename And Default Save Path	main				AND
-	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main1.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
+	...    Set Global Filename And Default Save Path	main
 
 	${M_absolute_paths} 	${M_file_names} 	Find Absolute Paths And Names For Files In Directory
 	...    ${CURDIR}${/}testdata${/}Issue-52${/}example
@@ -1742,13 +1742,13 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords
+	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main2.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main 	AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		800		600						AND
 	...    Show Manager INI Data											AND
 	...    Run Agent CLI	-d	${TEMPDIR}${/}agent_temp_issue52			AND
 	...    Open Manager GUI													AND
-	...    Set Global Filename And Default Save Path	main				AND
-	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main2.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
+	...    Set Global Filename And Default Save Path	main
 
 	${M_absolute_paths}	${M_file_names} 	Find Absolute Paths And Names For Files In Directory
 	...    ${CURDIR}${/}testdata${/}Issue-52${/}example
@@ -1788,12 +1788,12 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #52	Issue #53
 	[Setup]	Run Keywords
+	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main3.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main 	AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		800		600						AND
 	...    Run Agent CLI 	-d  ${TEMPDIR}${/}agent_temp_issue52			AND
 	...    Open Manager GUI													AND
 	...    Set Global Filename And Default Save Path	main				AND
-	...    Move File	${CURDIR}${/}testdata${/}Issue-52${/}main3.robot	${CURDIR}${/}testdata${/}Issue-52${/}example${/}main
 
 	${M_absolute_paths} 	${M_file_names} 	Find Absolute Paths And Names For Files In Directory
 	...    ${CURDIR}${/}testdata${/}Issue-52${/}example
@@ -2252,8 +2252,8 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
 	[Setup]	Run Keywords
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1200	600								AND
-	...    Run Agent CLI														AND
+	...    Set Manager INI Window Size		1200	600						AND
+	...    Run Agent CLI													AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Create Robot File
 	...    file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\tFail this\n\tSleep\t10\n\tFail\n
@@ -2292,9 +2292,9 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	Verify Generated Run Result Files	${run_result_dirs}[0]	${scenario_name}
 
 	[Teardown]	Run Keywords
-	...    Delete Robot File	AND
-	...    Stop Agent CLI			AND
-	...    Close Manager GUI
+	...    Stop Agent CLI		AND
+	...    Close Manager GUI	AND
+	...    Delete Robot File
 
 Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the robots)
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #70

@@ -8,7 +8,7 @@ Suite Setup 	Common.Basic Suite Initialization Manager
 *** Test Cases ***
 Environment Variable Substitution in Robot/Resource files
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #165
-	VAR 	${agent_dir} 		${agent_dir}${/}${TEST NAME}      scope=TEST
+	VAR 	${AGENT_DIR} 		${AGENT_DIR}${/}${TEST NAME}      scope=TEST
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	http://localhost:8138
 	Run Agent CLI 	@{agnt_options}
 	Sleep    1s
@@ -39,7 +39,7 @@ Environment Variable Substitution in Robot/Resource files
 	Should Not Contain 	${stdout_agent} 		please check the log file
 	Should Not Contain 	${stderr_agent} 		please check the log file
 
-	@{result_files}= 	List Files In Directory And Sub Directories 	${agent_dir}${/}scripts
+	@{result_files}= 	List Files In Directory And Sub Directories 	${AGENT_DIR}${/}scripts
 	Remove Values From List 	${result_files} 	RFSListener2.py 	RFSListener3.py 	RFSTestRepeater.py
 
 	Diff Lists    ${expected_files}    ${result_files}    Agent didn't get all files from manager
@@ -62,7 +62,7 @@ Default Result Name Method
 	@{lst_results_dir}= 	List Directories In Directory 	${RESULTS_DIR} 	*default
 	Log 	lst_results_dir: ${lst_results_dir} 	console=true
 	Copy Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
-	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
+	Copy Directory 	${AGENT_DIR} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
 	@{lst_summary}= 	List Files In Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
 	Log 	lst_summary: ${lst_summary} 	console=true
@@ -93,7 +93,7 @@ Documentation Result Name Method - Tests Defaults
 	List Directory 	${RESULTS_DIR}
 	@{lst_results_dir}= 	List Directories In Directory 	${RESULTS_DIR} 	*documentation_td
 	Copy Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
-	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
+	Copy Directory 	${AGENT_DIR} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
 	@{lst_summary}= 	List Files In Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
 	Log 	lst_summary: ${lst_summary} 	console=true
@@ -123,7 +123,7 @@ Info Result Name Method - Tests Defaults
 	List Directory 	${RESULTS_DIR}
 	@{lst_results_dir}= 	List Directories In Directory 	${RESULTS_DIR} 	*info_td
 	Copy Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
-	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
+	Copy Directory 	${AGENT_DIR} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
 	@{lst_summary}= 	List Files In Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
 	Log 	lst_summary: ${lst_summary} 	console=true
@@ -152,7 +152,7 @@ Keyword Only Result Name Method - Tests Defaults
 	List Directory 	${RESULTS_DIR}
 	@{lst_results_dir}= 	List Directories In Directory 	${RESULTS_DIR} 	*keyword_td
 	Copy Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
-	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
+	Copy Directory 	${AGENT_DIR} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
 	@{lst_summary}= 	List Files In Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
 	Log 	lst_summary: ${lst_summary} 	console=true
@@ -186,7 +186,7 @@ Keyword and Args Result Name Method - Tests Defaults
 	List Directory 	${RESULTS_DIR}
 	@{lst_results_dir}= 	List Directories In Directory 	${RESULTS_DIR} 	*keywordargs_td
 	Copy Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
-	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
+	Copy Directory 	${AGENT_DIR} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
 	@{lst_summary}= 	List Files In Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
 	Log 	lst_summary: ${lst_summary} 	console=true
@@ -220,7 +220,7 @@ Default Result Name Method - Tests Row
 	List Directory 	${RESULTS_DIR}
 	@{lst_results_dir}= 	List Directories In Directory 	${RESULTS_DIR} 	*default_tr
 	Copy Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
-	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
+	Copy Directory 	${AGENT_DIR} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
 	@{lst_summary}= 	List Files In Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
 	Log 	lst_summary: ${lst_summary} 	console=true
@@ -251,7 +251,7 @@ Documentation Result Name Method - Tests Row
 	List Directory 	${RESULTS_DIR}
 	@{lst_results_dir}= 	List Directories In Directory 	${RESULTS_DIR} 	*documentation_tr
 	Copy Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
-	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
+	Copy Directory 	${AGENT_DIR} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
 	@{lst_summary}= 	List Files In Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
 	Log 	lst_summary: ${lst_summary} 	console=true
@@ -281,7 +281,7 @@ Info Result Name Method - Tests Row
 	List Directory 	${RESULTS_DIR}
 	@{lst_results_dir}= 	List Directories In Directory 	${RESULTS_DIR} 	*info_tr
 	Copy Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
-	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
+	Copy Directory 	${AGENT_DIR} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
 	@{lst_summary}= 	List Files In Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
 	Log 	lst_summary: ${lst_summary} 	console=true
@@ -310,7 +310,7 @@ Keyword Only Result Name Method - Tests Row
 	List Directory 	${RESULTS_DIR}
 	@{lst_results_dir}= 	List Directories In Directory 	${RESULTS_DIR} 	*keyword_tr
 	Copy Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
-	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
+	Copy Directory 	${AGENT_DIR} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
 	@{lst_summary}= 	List Files In Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
 	Log 	lst_summary: ${lst_summary} 	console=true
@@ -344,7 +344,7 @@ Keyword and Args Result Name Method - Tests Row
 	List Directory 	${RESULTS_DIR}
 	@{lst_results_dir}= 	List Directories In Directory 	${RESULTS_DIR} 	*keywordargs_tr
 	Copy Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	${OUTPUT DIR}${/}${TEST NAME}${/}Results
-	Copy Directory 	${agent_dir} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
+	Copy Directory 	${AGENT_DIR} 	${OUTPUT DIR}${/}${TEST NAME}${/}rfswarm-agent
 
 	@{lst_summary}= 	List Files In Directory 	${RESULTS_DIR}${/}${lst_results_dir}[0] 	*summary.csv 	absolute=true
 	Log 	lst_summary: ${lst_summary} 	console=true

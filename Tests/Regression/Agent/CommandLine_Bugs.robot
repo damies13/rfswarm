@@ -150,7 +150,8 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 	Log To Console	Run Agent CLI with custom agent name.
 	Run Agent CLI 		-a 	Issue-#100AGENTNAME
 	Run Manager CLI 	-n 	-d 	${test_dir}
-	Sleep	20s
+	Wait Until Created 	${dbfile}
+	Sleep	30s
 	Stop Agent CLI
 	Stop Manager CLI
 

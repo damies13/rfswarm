@@ -228,10 +228,10 @@ Run ${component_name} CLI
 
 	IF  '${component_name}' == 'Manager' and ${len} == ${0} #( '-d' not in ${appargs} and '--dir' not in ${appargs} )
 		Append To List 	${appargs} 	-d 	${RESULTS_DIR}
-	ELSE IF  '${component_name}' == 'Manager' and ${len} != ${0}
+	ELSE IF  '${component_name}' == 'Manager' and ${len} != ${0} and ( '-d' not in ${appargs} and '--dir' not in ${appargs} )
 		Create Manager INI File If It Does Not Exist
 		Change Manager INI Option 	Run 	resultsdir 	${RESULTS_DIR}
-	ELSE IF  '${component_name}' == 'Agent' and ${len} == ${0} #( '-d' not in ${appargs} and '--agentdir' not in ${appargs} )
+	ELSE IF  '${component_name}' == 'Agent' and ( '-d' not in ${appargs} and '--agentdir' not in ${appargs} )
 		Append To List 	${appargs} 	-d 	${AGENT_DIR}
 		Create Directory 	${AGENT_DIR}
 		Empty Directory 	${AGENT_DIR}
@@ -275,8 +275,12 @@ Stop ${component_name} CLI
 
 	Log To Console 	*=== ${component_name} closed with CLI signal ===*
 	TRY
-		${dest_out} 	Normalize Path 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_manager.txt
-		${dest_err} 	Normalize Path 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_manager.txt
+		Log 	${component_name} exited with: ${result.rc} 	console=${True}
+		# Should Be Equal As Integers 	${result.rc} 	0
+
+		${name} 		Evaluate 	re.sub(r'(?<=\s)([A-Za-z]:[\\/][\w\s\\/.:-]+)', '_', r'${TEST NAME}') 	modules=re
+		${dest_out} 	Normalize Path 	${OUTPUT DIR}${/}captured_logs${/}${name}${/}stdout_${comp}.txt
+		${dest_err} 	Normalize Path 	${OUTPUT DIR}${/}captured_logs${/}${name}${/}stderr_${comp}.txt
 		Copy File 	${result.stdout_path} 	${dest_out}
 		Copy File 	${result.stderr_path} 	${dest_err}
 
@@ -287,8 +291,9 @@ Stop ${component_name} CLI
 		Log 	stderr: ${result.stderr} 	console=True
 	EXCEPT 	AS 	${error}
 		Log 	error: ${error} 		console=true
+
 	END
-	# Check Logs 	${component_name} 	!!!
+	Run Keyword And Ignore Error 	Check Logs 	${component_name}
 
 Wait For ${component_name} Process
 	[Arguments] 	${timeout}=30min
@@ -300,20 +305,22 @@ Wait For ${component_name} Process
 		Log 	${component_name} exited with: ${result.rc} 	console=${True}
 		# Should Be Equal As Integers 	${result.rc} 	0
 
-		Copy File 	${result.stdout_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stdout_${comp}.txt
-		Copy File 	${result.stderr_path} 	${OUTPUT DIR}${/}${TEST NAME}${/}stderr_${comp}.txt
+		${name} 		Evaluate 	re.sub(r'(?<=\s)([A-Za-z]:[\\/][\w\s\\/.:-]+)', '_', r'${TEST NAME}') 	modules=re
+		${dest_out} 	Normalize Path 	${OUTPUT DIR}${/}captured_logs${/}${name}${/}stdout_${comp}.txt
+		${dest_err} 	Normalize Path 	${OUTPUT DIR}${/}captured_logs${/}${name}${/}stderr_${comp}.txt
+		Copy File 	${result.stdout_path} 	${dest_out}
+		Copy File 	${result.stderr_path} 	${dest_err}
 
 		Log 	stdout_path: ${result.stdout_path} 	console=${True}
 		Log 	stdout: ${result.stdout} 	console=${True}
 		Log 	stderr_path: ${result.stderr_path} 	console=${True}
 		Log 	stderr: ${result.stderr} 	console=${True}
 
-		Check Logs 	${component_name}
-
 	EXCEPT 	AS 	${error}
 		Log 	error: ${error} 	console=${True}
 
 	END
+	Run Keyword And Ignore Error 	Check Logs 	${component_name}
 
 # # # # # # # # #
 # System date:  #

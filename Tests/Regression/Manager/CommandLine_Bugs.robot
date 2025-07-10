@@ -46,7 +46,7 @@ Next Day For Scheduled Start Is In the Next Month
 Robot files with same name but different folders
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #184
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
-	VAR 	${agent_dir} 		${agent_dir}${/}${TEST NAME}      scope=TEST
+	VAR 	${AGENT_DIR} 		${AGENT_DIR}${/}${TEST NAME}      scope=TEST
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	http://localhost:8138
 	Run Agent CLI 	@{agnt_options}
 	Sleep    1s
@@ -102,9 +102,9 @@ Check If The Not Buildin Modules Are Included In The Manager Setup File
 
 Circular Reference Resource Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #261
-	VAR    ${testdata} 		${CURDIR}${/}testdata${/}Issue-#261${/}circular_test      scope=TEST
-	VAR 	${agent_dir} 		${agent_dir}${/}${TEST NAME}      scope=TEST
-	Create Testdata Agent INI 	${testdata}${/}agent.ini 	${testdata}
+	VAR 	${testdata} 		${CURDIR}${/}testdata${/}Issue-#261${/}circular_test      scope=TEST
+	VAR 	${AGENT_DIR} 		${AGENT_DIR}${/}${TEST NAME}      scope=TEST
+	Create Testdata Agent INI 		${testdata}${/}agent.ini 	${testdata}
 	Create Testdata Manager INI 	${testdata}${/}manager.ini 	${testdata}
 
 	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources 	*.resource
@@ -149,8 +149,8 @@ Circular Reference Resource Files
 	# Log 	scripts-dir: ${scripts-dir} 		console=True
 
 	# @{result_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}agent-dir${/}scripts${/}resources 	*.resource
-	@{result_files}= 	List Files In Directory And Sub Directories 	${agent_dir}${/}scripts${/}resources 	*.resource
-	# @{result_files}= 	List Files In Directory And Sub Directories 	${agent_dir}${/}scripts 	*.resource
+	@{result_files}= 	List Files In Directory And Sub Directories 	${AGENT_DIR}${/}scripts${/}resources 	*.resource
+	# @{result_files}= 	List Files In Directory And Sub Directories 	${AGENT_DIR}${/}scripts 	*.resource
 
 
 	Diff Lists    ${expected_files}    ${result_files}    Agent didn't get all files from manager
@@ -162,8 +162,8 @@ Circular Reference Resource Files
 Circular Reference Resource Files 2
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #261
 	VAR    ${testdata} 		${CURDIR}${/}testdata${/}Issue-#261${/}circular_test2      scope=TEST
-	VAR 	${agent_dir} 		${agent_dir}${/}${TEST NAME}      scope=TEST
-	Create Testdata Agent INI 	${testdata}${/}agent.ini 	${testdata}
+	VAR 	${AGENT_DIR} 		${AGENT_DIR}${/}${TEST NAME}      scope=TEST
+	Create Testdata Agent INI 		${testdata}${/}agent.ini 	${testdata}
 	Create Testdata Manager INI 	${testdata}${/}manager.ini 	${testdata}
 
 	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources
@@ -209,8 +209,8 @@ Circular Reference Resource Files 2
 	# Log 	scripts-dir: ${scripts-dir} 		console=True
 
 	# @{result_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}agent-dir${/}scripts${/}resources 	*.resource
-	@{result_files}= 	List Files In Directory And Sub Directories 	${agent_dir}${/}scripts${/}resources
-	# @{result_files}= 	List Files In Directory And Sub Directories 	${agent_dir}${/}scripts 	*.resource
+	@{result_files}= 	List Files In Directory And Sub Directories 	${AGENT_DIR}${/}scripts${/}resources
+	# @{result_files}= 	List Files In Directory And Sub Directories 	${AGENT_DIR}${/}scripts 	*.resource
 
 
 	Diff Lists    ${expected_files}    ${result_files}    Agent didn't get all files from manager
@@ -222,8 +222,8 @@ Circular Reference Resource Files 2
 Lots Of Resource Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #261
 	VAR 	${testdata} 		${CURDIR}${/}testdata${/}Issue-#261${/}lotsa_files_test      scope=TEST
-	VAR 	${agent_dir} 		${agent_dir}${/}${TEST NAME}      scope=TEST
-	Create Testdata Agent INI 	${testdata}${/}agent.ini 	${testdata}
+	VAR 	${AGENT_DIR} 		${AGENT_DIR}${/}${TEST NAME}      scope=TEST
+	Create Testdata Agent INI 		${testdata}${/}agent.ini 	${testdata}
 	Create Testdata Manager INI 	${testdata}${/}manager.ini 	${testdata}
 
 	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources 	*.resource
@@ -269,13 +269,13 @@ Lots Of Resource Files
 	# Log 	testdata-dir: ${testdata-dir} 		console=True
 	# @{agent-dir}= 	List Directory 		${testdata}${/}agent-dir
 	# Log 	agent-dir: ${agent-dir} 		console=True
-	@{scripts-dir}= 	List Directory 		${agent_dir}${/}scripts
+	@{scripts-dir}= 	List Directory 		${AGENT_DIR}${/}scripts
 	Log 	scripts-dir: ${scripts-dir}
-	@{resources-dir}= 	List Directory 		${agent_dir}${/}scripts${/}resources
+	@{resources-dir}= 	List Directory 		${AGENT_DIR}${/}scripts${/}resources
 	Log 	scripts-dir: ${resources-dir}
 
 	# @{result_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}agent-dir${/}scripts${/}resources 	*.resource
-	@{result_files}= 	List Files In Directory And Sub Directories 	${agent_dir}${/}scripts${/}resources 	*.resource
+	@{result_files}= 	List Files In Directory And Sub Directories 	${AGENT_DIR}${/}scripts${/}resources 	*.resource
 
 	Diff Lists    ${expected_files}    ${result_files}    Agent didn't get all files from manager
 
