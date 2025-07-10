@@ -371,7 +371,8 @@ Install Application Icon or Desktop Shortcut
 
 	@{mngr_options}= 	Create List 	-g 	6 	-c 	ICON
 	Run Manager CLI 	@{mngr_options}
-	Sleep    2
+	Wait For Manager Process
+	Sleep 	1
 	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 	Check Icon Install

@@ -256,7 +256,7 @@ Stop ${component_name} CLI
 
 	${running}= 	Is Process Running 	${PROCESS_${comp}}
 	IF 	${running}
-		Sleep	2s
+		Sleep	1s
 		IF  '${PLATFORM}' == 'windows'	# Send Signal To Process keyword does not work on Windows
 			${result}= 	Terminate Process 	${PROCESS_${comp}}
 		ELSE
@@ -278,7 +278,7 @@ Stop ${component_name} CLI
 		Log 	${component_name} exited with: ${result.rc} 	console=${True}
 		# Should Be Equal As Integers 	${result.rc} 	0
 
-		${name} 		Evaluate 	re.sub(r'(?<=\s)([A-Za-z]:[\\/][\w\s\\/.:-]+)', '_', r'${TEST NAME}') 	modules=re
+		${name} 		Evaluate 	re.sub(r'[<>:"/\\|?*]', '_', r'${TEST NAME}').replace(chr(0), '_').rstrip(' .')[:255] 	modules=re
 		${dest_out} 	Normalize Path 	${OUTPUT DIR}${/}captured_logs${/}${name}${/}stdout_${comp}.txt
 		${dest_err} 	Normalize Path 	${OUTPUT DIR}${/}captured_logs${/}${name}${/}stderr_${comp}.txt
 		Copy File 	${result.stdout_path} 	${dest_out}
@@ -305,7 +305,7 @@ Wait For ${component_name} Process
 		Log 	${component_name} exited with: ${result.rc} 	console=${True}
 		# Should Be Equal As Integers 	${result.rc} 	0
 
-		${name} 		Evaluate 	re.sub(r'(?<=\s)([A-Za-z]:[\\/][\w\s\\/.:-]+)', '_', r'${TEST NAME}') 	modules=re
+		${name} 		Evaluate 	re.sub(r'[<>:"/\\|?*]', '_', r'${TEST NAME}').replace(chr(0), '_').rstrip(' .')[:255] 	modules=re
 		${dest_out} 	Normalize Path 	${OUTPUT DIR}${/}captured_logs${/}${name}${/}stdout_${comp}.txt
 		${dest_err} 	Normalize Path 	${OUTPUT DIR}${/}captured_logs${/}${name}${/}stderr_${comp}.txt
 		Copy File 	${result.stdout_path} 	${dest_out}

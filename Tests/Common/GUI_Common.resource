@@ -154,7 +154,8 @@ Close ${component_name} GUI
 				Run Keyword And Ignore Error 	Click Image 	manager_${PLATFORM}_tab_run.png
 			ELSE IF 	'${component_name}' == 'Reporter'
 				IF  '${PLATFORM}' == 'macos'
-					Run Keyword And Ignore Error 	Click Image 	reporter_macos_button_closewindow.png
+					Run Keyword And Ignore Error 	Click Button With Vertical Offset 	OpenTemplate 	18
+					# Run Keyword And Ignore Error 	Click Image 	reporter_macos_button_closewindow.png
 				ELSE
 					Run Keyword And Ignore Error 	Click Image 	reporter_${PLATFORM}_menu_results.png
 				END
@@ -191,6 +192,7 @@ Close ${component_name} GUI
 			Should Be Equal As Integers 	${result.rc} 	0
 
 		ELSE
+			Log To Console 	Closing GUI with CLI
 			Take A Screenshot
 			Run Keyword 	Stop ${component_name} CLI 	# close with cli signal
 			${running}= 	Is Process Running 	${process_manager}
@@ -205,7 +207,7 @@ Close ${component_name} GUI
 	Sleep 	0.5
 	${running}= 	Is Process Running 	${PROCESS_${comp}}
 	Run Keyword If 	${running} 	Fail 	${component_name} is still running!
-	Check Logs 	${component_name}
+	Run Keyword And Ignore Error 	Check Logs 	${component_name}
 
 	[Teardown] 	Run Keywords
 	...    Set Suite Variable 	${PROCESS_${comp}} 	${None} 	AND

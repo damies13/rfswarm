@@ -1793,7 +1793,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    Set Manager INI Window Size		800		600						AND
 	...    Run Agent CLI 	-d  ${TEMPDIR}${/}agent_temp_issue52			AND
 	...    Open Manager GUI													AND
-	...    Set Global Filename And Default Save Path	main				AND
+	...    Set Global Filename And Default Save Path	main
 
 	${M_absolute_paths} 	${M_file_names} 	Find Absolute Paths And Names For Files In Directory
 	...    ${CURDIR}${/}testdata${/}Issue-52${/}example

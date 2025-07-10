@@ -239,15 +239,20 @@ Agent Command Line AGENTNAME --agentname
 Agent Command Line PROPERTY -p
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 
+	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#14${/}property
+	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
+
+	Create Directory 	${test_dir}
 	Log To Console	Run Agent CLI with custom prop.
 	Run Agent CLI 		-p 	Issue-#14
-	Run Manager CLI 	-n
-	Sleep	20s
+	Run Manager CLI 	-n 	-d 	${test_dir}
+	Wait Until Created 	${dbfile}
+	Sleep	30s
 	Stop Agent CLI
 	Stop Manager CLI
 
 	Log To Console 	Checking result data base
-	${dbfile} 	Find Result DB 		result_pattern=PreRun
+	# ${dbfile} 	Find Result DB 		result_pattern=PreRun
 	${prop_result} 	Query Result DB 	${dbfile}
 	...    SELECT * FROM MetricData WHERE MetricType='Agent' AND SecondaryMetric='Issue-#14'
 

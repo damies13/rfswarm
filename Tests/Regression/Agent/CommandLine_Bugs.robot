@@ -174,7 +174,8 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 	Log To Console	Run Agent CLI with custom agent name.
 	Run Agent CLI 		-i 	${CURDIR}${/}testdata${/}Issue-#100${/}RFSwarmAgent.ini
 	Run Manager CLI 	-n 	-d 	${test_dir}
-	Sleep	20s
+	Wait Until Created 	${dbfile}
+	Sleep	30s
 	Stop Agent CLI
 	Stop Manager CLI
 
