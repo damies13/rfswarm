@@ -107,7 +107,7 @@ Open ${component_name} GUI
 	Run Keyword 	Run ${component_name} CLI 	@{appargs}
 
 	IF 	'-n' in ${appargs} or '--nogui' in ${appargs}
-		Sleep 	10
+		Sleep 	5
 	ELSE IF 	'-r' in ${appargs} or '--run' in ${appargs}
 		Handle Donation Reminder
 	ELSE
@@ -154,7 +154,7 @@ Close ${component_name} GUI
 				Run Keyword And Ignore Error 	Click Image 	manager_${PLATFORM}_tab_run.png
 			ELSE IF 	'${component_name}' == 'Reporter'
 				IF  '${PLATFORM}' == 'macos'
-					Run Keyword And Ignore Error 	Click Button With Vertical Offset 	OpenTemplate 	18
+					Run Keyword And Ignore Error 	Click Button With Vertical Offset 	OpenTemplate 	offset=18 	timeout=1
 					# Run Keyword And Ignore Error 	Click Image 	reporter_macos_button_closewindow.png
 				ELSE
 					Run Keyword And Ignore Error 	Click Image 	reporter_${PLATFORM}_menu_results.png
@@ -175,8 +175,9 @@ Close ${component_name} GUI
 		ELSE
 			Log To Console 	${component_name} GUI is not running!
 			${result}= 	Wait For Process 	${PROCESS_${comp}} 	timeout=60
-			Check Logs
+			Run Keyword And Ignore Error 	Check Logs 	${component_name}
 			Should Be Equal As Integers 	${result.rc} 	0
+			RETURN
 
 		END
 
@@ -348,7 +349,7 @@ Click RadioBtn
 	IF 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 Click ${item} With Vertical Offset
-	[Arguments]		${image_name}	${offset}=0
+	[Arguments]		${image_name}	${offset}=0 	${timeout}=${DEFAULT_IMAGE_TIMEOUT}
 	[Documentation]	Click the item with the offset. An item can be: Label, Button, ...
 	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down].
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
@@ -357,7 +358,7 @@ Click ${item} With Vertical Offset
 	${img}=	Set Variable		${comp}_${PLATFORM}_${item}_${image_name}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
+	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate 	${img}
 	Log	${coordinates}
 	Click To The Below Of	${coordinates}	${offset}
@@ -365,7 +366,7 @@ Click ${item} With Vertical Offset
 	IF 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 Click ${item} With Horizontal Offset
-	[Arguments]		${image_name}	${offset}=0
+	[Arguments]		${image_name}	${offset}=0 	${timeout}=${DEFAULT_IMAGE_TIMEOUT}
 	[Documentation]	Click the item with the offset. An item can be: Label, Button, ...
 	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right].
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
@@ -374,7 +375,7 @@ Click ${item} With Horizontal Offset
 	${img}=	Set Variable		${comp}_${PLATFORM}_${item}_${image_name}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
+	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate 	${img}
 	Log	${coordinates}
 	Click To The Right Of	${coordinates}	${offset}
