@@ -45,7 +45,9 @@ Wiggle Mouse
 	Move To 	20 	20
 
 Handle Donation Reminder
-	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		30
+	${comp}= 	Convert To Lower Case 	${COMPONENT}
+	Run Keyword And Ignore Error 	Wait For 	${comp}_${PLATFORM}_button_closewindow.png 	timeout=30
+	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		7
 	VAR 	${DonationReminder} 	${found} 		scope=TEST
 
 Get Image Size
@@ -154,7 +156,7 @@ Close ${component_name} GUI
 				Run Keyword And Ignore Error 	Click Image 	manager_${PLATFORM}_tab_run.png
 			ELSE IF 	'${component_name}' == 'Reporter'
 				IF  '${PLATFORM}' == 'macos'
-					Run Keyword And Ignore Error 	Click Button With Vertical Offset 	OpenTemplate 	offset=18 	timeout=1
+					Run Keyword And Ignore Error 	Click Button With Vertical Offset 	OpenTemplate 	offset=-20 	timeout=1
 					# Run Keyword And Ignore Error 	Click Image 	reporter_macos_button_closewindow.png
 				ELSE
 					Run Keyword And Ignore Error 	Click Image 	reporter_${PLATFORM}_menu_results.png

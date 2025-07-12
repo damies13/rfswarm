@@ -1444,6 +1444,7 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	Click Button	runsettings
 	Change Scenario Wide Settings	${run_settings_data}
 	Sleep	2
+	Take A Screenshot
 	Press key.enter 1 Times
 	Close Manager GUI
 	Open Manager GUI

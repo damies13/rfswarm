@@ -166,6 +166,7 @@ Change Test Group Settings
 	END
 	# TODO: disableloglog, disablelogreport, disablelogoutput
 
+	Take A Screenshot
 	Test Group Save Settings
 
 Change Scenario Wide Settings
@@ -255,6 +256,7 @@ Change Scenario Wide Settings
 	END
 	# TODO: disableloglog, disablelogreport, disablelogoutput
 
+	Take A Screenshot
 	Click Button	ok
 
 Test Group Save Settings
