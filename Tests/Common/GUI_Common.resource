@@ -165,13 +165,13 @@ Close ${component_name} GUI
 			Sleep 	1
 			Press Key.esc 3 Times
 			Sleep 	1
-			Press Combination 	Key.ctrl 	x
+			IF  '${PLATFORM}' == 'macos'  Press Combination  Key.command  q  ELSE  Press Combination  Key.ctrl  x
 			Sleep	3
 
 			${running}= 	Is Process Running 	${PROCESS_${comp}}
 			IF 	${running}
 				Press Combination 	Key.esc
-				Press Combination 	Key.ctrl 	x
+				IF  '${PLATFORM}' == 'macos'  Press Combination  Key.command  q  ELSE  Press Combination  Key.ctrl  x
 			END
 
 		ELSE

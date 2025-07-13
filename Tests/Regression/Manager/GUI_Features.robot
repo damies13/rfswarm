@@ -1447,7 +1447,10 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	Take A Screenshot
 	Press key.enter 1 Times
 	Close Manager GUI
+	Sleep	2
 	Open Manager GUI
+
+	Show Manager INI Data
 
 	# ${altip}= 	Set Variable    ${ipv4} [1]
 	${altip}= 	Set Variable    127.0.0.1
