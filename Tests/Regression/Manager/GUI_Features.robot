@@ -305,9 +305,9 @@ Verify the Field Validation Is Working In the Manager Plan Screen
 Verify That Files Get Saved With Correct Extension And Names
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #39
 	[Setup]	Run Keywords
-	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
-	...    Set Manager INI Window Size		1200	600								AND
-	...    Show Manager INI Data																AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
+	...    Set Manager INI Window Size		1200	600						AND
+	...    Show Manager INI Data											AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Manager GUI													AND
 	...    Run Agent CLI
@@ -333,6 +333,7 @@ Verify That Files Get Saved With Correct Extension And Names
 Verify the Time Fields In the Plan Screen For Delay
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		1200	600		AND
 	...    Open Manager GUI
 
@@ -374,6 +375,7 @@ Verify the Time Fields In the Plan Screen For Delay
 Verify the Time Fields In the Plan Screen For Delay: Complex Variations
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		1200	600		AND
 	...    Open Manager GUI
 
@@ -415,6 +417,7 @@ Verify the Time Fields In the Plan Screen For Delay: Complex Variations
 Verify the Time Fields In the Plan Screen For Ramp Up
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		1200	600		AND
 	...    Open Manager GUI
 
@@ -456,6 +459,7 @@ Verify the Time Fields In the Plan Screen For Ramp Up
 Verify the Time Fields In the Plan Screen For Ramp Up: Complex Variations
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		1200	600		AND
 	...    Open Manager GUI
 
@@ -497,6 +501,7 @@ Verify the Time Fields In the Plan Screen For Ramp Up: Complex Variations
 Verify the Time Fields In the Plan Screen For Run
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		1200	600		AND
 	...    Open Manager GUI
 
@@ -538,6 +543,7 @@ Verify the Time Fields In the Plan Screen For Run
 Verify the Time Fields In the Plan Screen For Run: Complex Variations
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #82
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		1200	600		AND
 	...    Open Manager GUI
 
@@ -738,6 +744,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Set Manager INI Window Size		1200	600						AND
 	...    Open Manager GUI 	-g	1										AND
@@ -827,8 +834,8 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 Verify Scenario File Is Updated Correctly When Scripts Are Removed
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #58
 	[Setup]	Run Keywords
-	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}				AND
-	...    Set Manager INI Window Size		1200	600								AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
+	...    Set Manager INI Window Size		1200	600						AND
 	...    Open Manager GUI													AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Create Robot File	name=example1.robot	file_content=***Test Case***\nExample Test Case1\n	AND

@@ -117,7 +117,7 @@ Check CSV Files
 	Length Should Be	${csv_file_paths}	3	msg=Some CSV files are missing!
 
 	FOR  ${i}  IN RANGE  0  3
-		${csv_rows_content_list}=	Convert CSV File Cells To a List		${csv_file_paths}[${i}]		csv_separator=,
+		@{csv_rows_content_list}= 	Convert CSV File Cells To a List 	${csv_file_paths}[${i}]		csv_separator=,
 		Log To Console	${\n}\tCSV report file found: ${csv_file_paths}[${i}]
 		Log 	${csv_rows_content_list}
 
@@ -138,7 +138,7 @@ Check CSV Files
 			Length Should Be	${third_row}	9	msg=Some columns in summary.csv are missing in third row, should be 9 of them!
 
 		ELSE IF  '${csv_report_file_type}' == 'raw_result_data.csv'
-			${len}=		Get Length	${csv_rows_content_list}
+			${len}= 	Get Length 	${csv_rows_content_list}
 			Should Be True	${len} >= ${3}		msg=Some rows in raw_result_data.csv are missing, should be at least 3!
 
 			FOR  ${j}  IN RANGE  1  ${len}

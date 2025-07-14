@@ -696,7 +696,7 @@ Convert CSV File Cells To a List
 
 	${status}=	Run Keyword And Return Status	Should Be Empty	@{csv_rows_content_list}[-1]
 	IF  ${status} == ${True}
-		VAR 	@{csv_rows_content_list} 	${csv_rows_content_list}[:-1]
+		@{csv_rows_content_list} 	Set Variable 	${csv_rows_content_list}[:-1]
 	END
 
 	RETURN	${csv_rows_content_list}
