@@ -53,10 +53,10 @@ ${PYFILE_REPORTER} 	${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
 *** Keywords ***
 Basic Suite Initialization ${component}
 	[Documentation] 	This keyword must be run to set up the basic configuration for suite. The component must be chosen between: Manager, Reporter, Agent
-	Set Suite Variable 	${COMPONENT} 	${component}
+	VAR 	${COMPONENT} 	${component} 	scope=SUITE
 	Set Platform
 
-	Set Suite Variable 	${RESULTS_DIR} 		${OUTPUT DIR}${/}results
+	VAR 	${RESULTS_DIR} 		${OUTPUT DIR}${/}results 	scope=SUITE
 	${status}= 	Run Keyword And Return Status 	Directory Should Exist 	${RESULTS_DIR}
 	IF 	not ${status}
 		Create Directory 	${RESULTS_DIR}
@@ -76,13 +76,13 @@ Set Platform By Python
 	${system}= 		Evaluate 	platform.system() 	modules=platform
 
 	IF 	"${system}" == "Darwin"
-		Set Suite Variable    ${PLATFORM}    macos
+		VAR    ${PLATFORM}    macos    scope=SUITE
 	END
 	IF 	"${system}" == "Windows"
-		Set Suite Variable    ${PLATFORM}    windows
+		VAR    ${PLATFORM}    windows    scope=SUITE
 	END
 	IF 	"${system}" == "Linux"
-		Set Suite Variable    ${PLATFORM}    ubuntu
+		VAR    ${PLATFORM}    ubuntu    scope=SUITE
 	END
 
 Set Platform By Tag
@@ -91,16 +91,16 @@ Set Platform By Tag
 	${inclen}= 	Get Length 	${OPTIONS}[include]
 	IF 	${inclen} > 0
 		Log 	${OPTIONS}[include][0]
-		${ostag}= 	Set Variable 	${OPTIONS}[include][0]
+		VAR 	${ostag} 	${OPTIONS}[include][0]
 
 		IF 	"${ostag}" == "macos-latest"
-			Set Suite Variable    ${PLATFORM}    macos
+			VAR    ${PLATFORM}    macos    scope=SUITE
 		END
 		IF 	"${ostag}" == "windows-latest"
-			Set Suite Variable    ${PLATFORM}    windows
+			VAR    ${PLATFORM}    windows    scope=SUITE
 		END
 		IF 	"${ostag}" == "ubuntu-latest"
-			Set Suite Variable    ${PLATFORM}    ubuntu
+			VAR    ${PLATFORM}    ubuntu    scope=SUITE
 		END
 	END
 
@@ -222,34 +222,54 @@ Kill If Still Running
 # # # # # # # # # # # # #
 
 Run ${component_name} CLI
-	[Arguments] 	@{appargs}
+	[Arguments] 	@{appargs} 	${noargs}=${False}
 	${comp} 	Convert To Lower Case 	${component_name}
 	${len} 		Get Length 	${appargs}
 
-	IF  '${component_name}' == 'Manager' and ${len} == ${0} #( '-d' not in ${appargs} and '--dir' not in ${appargs} )
-		Append To List 	${appargs} 	-d 	${RESULTS_DIR}
-	ELSE IF  '${component_name}' == 'Manager' and ${len} != ${0} and ( '-d' not in ${appargs} and '--dir' not in ${appargs} )
-		Create Manager INI File If It Does Not Exist
-		Change Manager INI Option 	Run 	resultsdir 	${RESULTS_DIR}
-	ELSE IF  '${component_name}' == 'Agent' and ( '-d' not in ${appargs} and '--agentdir' not in ${appargs} )
-		Append To List 	${appargs} 	-d 	${AGENT_DIR}
-		Create Directory 	${AGENT_DIR}
-		Empty Directory 	${AGENT_DIR}
+	IF  ${noargs} == ${False}
+		IF  '${component_name}' == 'Manager' and ${len} == ${0} #( '-d' not in ${appargs} and '--dir' not in ${appargs} )
+			Append To List 	${appargs} 	-d 	${RESULTS_DIR}
+		ELSE IF  '${component_name}' == 'Manager' and ${len} != ${0} and ( '-d' not in ${appargs} and '--dir' not in ${appargs} )
+			Create Manager INI File If It Does Not Exist
+			Change Manager INI Option 	Run 	resultsdir 	${RESULTS_DIR}
+		ELSE IF  '${component_name}' == 'Agent' and ( '-d' not in ${appargs} and '--agentdir' not in ${appargs} )
+			Append To List 	${appargs} 	-d 	${AGENT_DIR}
+			Create Directory 	${AGENT_DIR}
+			Empty Directory 	${AGENT_DIR}
+		END
 	END
 
-	Log to Console 	${\n}Starting ${component_name} ...
+	Log 	${\n}Starting ${component_name} ... 	console=${True}
 	${args}= 	Evaluate 	" ".join(@{appargs})
-	Log to Console 	\t\${args}: ${args}
+	Log 	\t\${args}: ${args} 	console=${True}
 
+	${tname} 		Evaluate 	re.sub(r'[<>:"/\\|?*]', '_', "${TEST NAME}").replace(chr(0), '_').rstrip(' .')[:60] 	modules=re
+	VAR 	${tname} 	stdout${/}${tname}
+	# Create Directory 	${OUTPUT DIR}${/}${tname}
 	${process}= 	Start Process 	${CMD_${comp}}  @{appargs}  alias=${component_name}
-	...    stdout=${OUTPUT DIR}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stderr_${comp}.txt
+	...    stdout=${OUTPUT DIR}${/}${tname}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}${tname}${/}stderr_${comp}.txt
 
 	Log 	${process}
-	Set Suite Variable 	${PROCESS_${comp}} 		${process}
+	VAR 	${PROCESS_${comp}} 		${process} 	scope=SUITE
 
 	${result}= 	Wait Until Keyword Succeeds 	45sec 	500ms 	Process Should Be Running 	${process}
-	# Log 	Process Is Running: ${result} 		console=True
-	Log to Console 	*==== ${component_name} started ===*
+
+	${running}= 	Is Process Running 	${PROCESS_${comp}}
+	IF 	not ${running}
+		${result}= 	Get Process Result 	${PROCESS_${comp}}
+
+		Log		rc: ${result.rc} 		console=True
+		Log		stdout_path: ${result.stdout_path} 		console=True
+		Log		stderr_path: ${result.stderr_path} 		console=True
+
+		Show Log 	${result.stdout_path}
+		Show Log 	${result.stderr_path}
+
+		Fail 		${component_name} didn't start!
+
+	END
+
+	Log 	*==== ${component_name} started ===* 	console=${True}
 
 Stop ${component_name} CLI
 	${comp} 	Convert To Lower Case 	${component_name}
@@ -266,7 +286,6 @@ Stop ${component_name} CLI
 	ELSE
 		Log To Console 	${component_name} is not running!
 		TRY
-			# get result var for process even if not running any more
 			${result}= 	Get Process Result 	${PROCESS_${comp}}
 		EXCEPT 	AS 	${error}
 			Log 	error: ${error} 		console=true
@@ -278,22 +297,26 @@ Stop ${component_name} CLI
 		Log 	${component_name} exited with: ${result.rc} 	console=${True}
 		# Should Be Equal As Integers 	${result.rc} 	0
 
-		${name} 		Evaluate 	re.sub(r'[<>:"/\\|?*]', '_', "${TEST NAME}").replace(chr(0), '_').rstrip(' .')[:60] 	modules=re
-		${dest_out} 	Normalize Path 	${OUTPUT DIR}${/}captured_logs${/}${name}${/}stdout_${comp}.txt
-		${dest_err} 	Normalize Path 	${OUTPUT DIR}${/}captured_logs${/}${name}${/}stderr_${comp}.txt
-		Copy File 	${result.stdout_path} 	${dest_out}
-		Copy File 	${result.stderr_path} 	${dest_err}
-
 		Log to Console 	${component_name} Process returned: ${result.rc} 	console=True
-		Log 	stdout_path: ${result.stdout_path} 	console=True
-		Log 	stdout: ${result.stdout} 	console=True
-		Log 	stderr_path: ${result.stderr_path} 	console=True
-		Log 	stderr: ${result.stderr} 	console=True
+		Log		rc: ${result.rc} 		console=True
+		Log		stdout_path: ${result.stdout_path} 		console=True
+		Log		stderr_path: ${result.stderr_path} 		console=True
+
+		Show Log 	${result.stdout_path}
+		Show Log 	${result.stderr_path}
+
 	EXCEPT 	AS 	${error}
 		Log 	error: ${error} 		console=true
 
 	END
-	Run Keyword And Ignore Error 	Check Logs 	${component_name}
+
+	Sleep 	0.5
+	Run Keyword And Ignore Error 	Check Logs 	${component_name} 	# TODO: remove ignore error and check if test cases fail. Log issues for failing test cases
+	${running}= 	Is Process Running 	${PROCESS_${comp}}
+	Run Keyword If 	${running} 	Fail 	Failed to close ${component_name}
+
+	[Teardown] 	Run Keywords
+	...    Set Suite Variable 	${PROCESS_${comp}} 	${None} 	AND 	Kill If Still Running 	${CMD_${comp}}
 
 Wait For ${component_name} Process
 	[Arguments] 	${timeout}=30min
@@ -305,21 +328,19 @@ Wait For ${component_name} Process
 		Log 	${component_name} exited with: ${result.rc} 	console=${True}
 		# Should Be Equal As Integers 	${result.rc} 	0
 
-		${name} 		Evaluate 	re.sub(r'[<>:"/\\|?*]', '_', "${TEST NAME}").replace(chr(0), '_').rstrip(' .')[:60] 	modules=re
-		${dest_out} 	Normalize Path 	${OUTPUT DIR}${/}captured_logs${/}${name}${/}stdout_${comp}.txt
-		${dest_err} 	Normalize Path 	${OUTPUT DIR}${/}captured_logs${/}${name}${/}stderr_${comp}.txt
-		Copy File 	${result.stdout_path} 	${dest_out}
-		Copy File 	${result.stderr_path} 	${dest_err}
+		Log		rc: ${result.rc} 		console=True
+		Log		stdout_path: ${result.stdout_path} 		console=True
+		Log		stderr_path: ${result.stderr_path} 		console=True
 
-		Log 	stdout_path: ${result.stdout_path} 	console=${True}
-		Log 	stdout: ${result.stdout} 	console=${True}
-		Log 	stderr_path: ${result.stderr_path} 	console=${True}
-		Log 	stderr: ${result.stderr} 	console=${True}
+		Show Log 	${result.stdout_path}
+		Show Log 	${result.stderr_path}
 
 	EXCEPT 	AS 	${error}
 		Log 	error: ${error} 	console=${True}
 
 	END
+
+	Sleep 	0.5
 	Run Keyword And Ignore Error 	Check Logs 	${component_name}
 
 # # # # # # # # #
@@ -431,7 +452,7 @@ Get ${component_name} Default Save Path
 	${pip_data} 	Get ${component_name} PIP Data
 	${pip_data_list} 	Split String 	${pip_data}
 	${i} 	Get Index From List 	${pip_data_list} 	Location:
-	${location}= 	Set Variable 	${pip_data_list}[${i + 1}]
+	VAR 	${location} 	${pip_data_list}[${i + 1}]
 
 	RETURN 	${location}${/}rfswarm_${comp}${/}
 
@@ -540,7 +561,7 @@ Find Absolute Paths And Names For Files In Directory
 	[Documentation]	This algorithm analyses the specified path and returns all
 	...    file names with their absolute paths even those that are in subdirectories
 	[Arguments]		${given_path}	@{excluded_files}
-	${curr_dir}	Set Variable	${given_path}
+	VAR 	${curr_dir} 	${given_path}
 	@{absolute_paths}	Create List
 	@{file_names}	Create List
 	${new_dir}		List Directories In Directory	${curr_dir}	absolute=${True}
@@ -651,7 +672,7 @@ Convert CSV File Cells To a List
 
 	${status}=	Run Keyword And Return Status	Should Be Empty	@{csv_rows_content_list}[-1]
 	IF  ${status} == ${True}
-		@{csv_rows_content_list}	Set Variable	${csv_rows_content_list}[:-1]
+		VAR 	@{csv_rows_content_list} 	${csv_rows_content_list}[:-1]
 	END
 
 	RETURN	${csv_rows_content_list}
@@ -684,8 +705,7 @@ Update BUILTIN_PY_MODULES
 	@{buildin}=		Create List		@{BUILTIN_PY_MODULES}
 	Append To List 	${buildin} 	${module}
 	${buildin}	Evaluate	list(set(${buildin}))
-	Set Suite Variable    @BUILTIN_PY_MODULES      @{buildin}
-
+	VAR    @BUILTIN_PY_MODULES      @{buildin}    scope=SUITE
 
 Get Modules From Program .py File That Are Not BuildIn
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123
@@ -699,7 +719,7 @@ Get Modules From Program .py File That Are Not BuildIn
 	# add local modules to buildin list and also check them for non builtin import modules
 	${file_location} 	${file_name}= 	Split Path 	${file_path}
 	@{checked_py_files}= 	Create List 	${file_name} 	@{CHECKED_PY_FILES}
-	Set Suite Variable    @CHECKED_PY_FILES      @{checked_py_files}
+	VAR    @CHECKED_PY_FILES      @{checked_py_files}    scope=SUITE
 	Log		${CHECKED_PY_FILES}
 	@{pyfiles}= 	List Files In Directory 	${file_location} 	*.py
 	Remove Values From List 	${pyfiles}  	@{CHECKED_PY_FILES}
@@ -766,7 +786,7 @@ Get Modules From Program .py File That Are Not BuildIn
 	${length}	Get Length	${custom_imports}
 	FOR  ${i}  IN RANGE  0  ${length}
 		IF  '${custom_imports}[${i}]' in &{replace_names}
-			${custom_imports}[${i}]  Set Variable  ${replace_names}[${custom_imports}[${i}]]
+			VAR 	${custom_imports}[${i}] 	${replace_names}[${custom_imports}[${i}]]
 		END
 	END
 
@@ -781,7 +801,7 @@ Get Install Requires From Setup File
 		${setup_content_elements}	Split String	${line}	separator=s=
 		TRY
 			IF  '${setup_content_elements}[0]' == '\tinstall_require'
-				${install_requires}	Set Variable	${setup_content_elements}[1][2:-3]
+				VAR 	${install_requires} 	${setup_content_elements}[1][2:-3]
 				${install_requires}	Split String	${install_requires}	separator=', '
 
 				${refactored_requires}	Create List
@@ -820,9 +840,9 @@ Check Icon Install
 Check Icon Install For Macos
 	${Status}= 	Run Keyword And Return Status 	Directory Should Exist 	%{HOME}${/}Applications${/}${projname}.app
 	IF 	${Status}
-		${appfolder}= 		Set Variable    %{HOME}${/}Applications${/}${dispname}.app
+		VAR 	${appfolder} 	%{HOME}${/}Applications${/}${dispname}.app
 	ELSE
-		${appfolder}= 		Set Variable    ${/}Applications${/}${dispname}.app
+		VAR 	${appfolder} 	${/}Applications${/}${dispname}.app
 	END
 	Directory Should Exist 	${appfolder} 		.app Folder not found
 
@@ -859,9 +879,9 @@ Check Icon Install For Ubuntu
 	# /home/dave/.local/share/applications/rfswarm-manager.desktop
 	${Status}= 	Run Keyword And Return Status 	File Should Exist 	%{HOME}${/}.local${/}share${/}applications${/}${projname}.desktop
 	IF 	${Status}
-		${pathprefix}= 		Set Variable    %{HOME}${/}.local${/}share
+		VAR 	${pathprefix} 	%{HOME}${/}.local${/}share
 	ELSE
-		${pathprefix}= 		Set Variable    ${/}usr${/}share
+		VAR 	${pathprefix} 	${/}usr${/}share
 	END
 
 	File Should Exist 	${pathprefix}${/}applications${/}${projname}.desktop 		Desktop File not found

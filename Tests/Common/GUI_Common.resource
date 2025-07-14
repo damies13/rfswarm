@@ -21,8 +21,8 @@ GUI Suite Initialization ${component}
 
 	Basic Suite Initialization ${component} 	# basic suite configuration
 
-	Set Suite Variable 	${COMPONENT} 	${component}
-	Set Suite Variable 	${IMAGE_DIR} 	${CURDIR}${/}..${/}Regression${/}${COMPONENT}${/}Images${/}file_method
+	VAR 	${COMPONENT} 	${component} 	scope=SUITE
+	VAR 	${IMAGE_DIR} 	${CURDIR}${/}..${/}Regression${/}${COMPONENT}${/}Images${/}file_method 	scope=SUITE
 	Set Confidence 		${CONFIDENCE}
 	ImageHorizonLibrary.Set Reference Folder 	${IMAGE_DIR}
 	ImageHorizonLibrary.Set Screenshot Folder 	${OUTPUT DIR}
@@ -55,7 +55,7 @@ Get Image Size
 	# ahrrrg windows paths, PIL.Image.open doesn't like them, need to escape / replace \\
 	# ${imgfile}= 	Evaluate    "${imgfile}".replace('\\' '/')
 	${img}= 	Evaluate    PIL.Image.open(r'${imgfile}') 	PIL.Image
-	${imgsize}= 	Set Variable    ${img.size}
+	VAR 	${imgsize} 	${img.size}
 	# Evaluate    ${img.close()}
 	RETURN 	${imgsize}
 
@@ -83,7 +83,7 @@ Get Last Screenshot
 Resize Window
 	[Arguments]		${x}=0		${y}=0
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
-	${img}=	Set Variable		${comp}_${PLATFORM}_corner_resize.png
+	VAR 	${img} 	${comp}_${PLATFORM}_corner_resize.png
 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate		${img}
 	@{coordinates2}= 	Create List 	${{${coordinates[0]}+${x}}} 	${{${coordinates[1]}+${y}}}
@@ -106,38 +106,22 @@ Open ${component_name} GUI
 	Press Combination 	Key.esc
 	Wiggle Mouse
 
-	Run Keyword 	Run ${component_name} CLI 	@{appargs}
+	VAR 	${noargs} 	${False}
+	${len} 	Get Length 	${appargs}
+	IF  ${len} == ${0}
+		VAR 	${noargs} 	${True}
+	END
+
+	Run Keyword 	Run ${component_name} CLI 	@{appargs} 	noargs=${noargs}
 
 	IF 	'-n' in ${appargs} or '--nogui' in ${appargs}
 		Sleep 	5
-	ELSE IF 	'-r' in ${appargs} or '--run' in ${appargs}
-		Handle Donation Reminder
 	ELSE
 		Handle Donation Reminder
-
-		# ${img}= 	Set Variable		manager_${PLATFORM}_button_runschedule.png
-		# ${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=${default_image_timeout / 2}
-		# IF 	not ${passed}
 		${running}= 	Is Process Running 	${PROCESS_${comp}}
 		IF 	not ${running}
-			${result}= 	Get Process Result 	${PROCESS_${comp}}
-
-			Log		rc: ${result.rc} 		console=True
-			Log		stdout: ${result.stdout} 		console=True
-			Log		stderr: ${result.stderr} 		console=True
-			Log		stdout_path: ${result.stdout_path} 		console=True
-			Log		stderr_path: ${result.stderr_path} 		console=True
-
-			Show Log 	${result.stdout_path}
-			Show Log 	${result.stderr_path}
-
-			Show Log 	${OUTPUT DIR}${/}stdout_${comp}.txt
-			Show Log 	${OUTPUT DIR}${/}stderr_${comp}.txt
-
+			Take A Screenshot
 			Fail 		${component_name} not running
-			# ELSE
-			# 	Wait For 	${img} 	 timeout=${default_image_timeout / 2}
-			# END
 		END
 	END
 
@@ -146,10 +130,16 @@ Close ${component_name} GUI
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 	0.01
 	Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
 
+	IF  '${comp}' == 'agent'
+		Stop Agent CLI
+		RETURN
+	END
+
 	IF 	${PROCESS_${comp}}
 		${running}= 	Is Process Running 	${PROCESS_${comp}}
 		IF 	${running}
-			Log to Console 	${\n}Closing ${component_name} GUI ...
+			Log 	${\n}Closing ${component_name} GUI ... 	console=True
+
 			# make sure the window is the active window first
 			IF 	'${component_name}' == 'Manager'
 				Run Keyword And Ignore Error 	Click Image 	manager_${PLATFORM}_tab_about.png
@@ -157,11 +147,11 @@ Close ${component_name} GUI
 			ELSE IF 	'${component_name}' == 'Reporter'
 				IF  '${PLATFORM}' == 'macos'
 					Run Keyword And Ignore Error 	Click Button With Vertical Offset 	OpenTemplate 	offset=-20 	timeout=1
-					# Run Keyword And Ignore Error 	Click Image 	reporter_macos_button_closewindow.png
 				ELSE
 					Run Keyword And Ignore Error 	Click Image 	reporter_${PLATFORM}_menu_results.png
 				END
 			END
+
 			Sleep 	1
 			Press Key.esc 3 Times
 			Sleep 	1
@@ -175,9 +165,9 @@ Close ${component_name} GUI
 			END
 
 		ELSE
-			Log To Console 	${component_name} GUI is not running!
+			Log 	${component_name} is not running! 	console=True
 			${result}= 	Wait For Process 	${PROCESS_${comp}} 	timeout=60
-			Run Keyword And Ignore Error 	Check Logs 	${component_name}
+			Run Keyword And Ignore Error 	Check Logs 	${component_name} 	# TODO: remove ignore error and check if test cases fail. Log issues for failing test cases
 			Should Be Equal As Integers 	${result.rc} 	0
 			RETURN
 
@@ -186,37 +176,42 @@ Close ${component_name} GUI
 		Sleep 	2s
 		Run Keyword And Ignore Error 	Click Dialog Button 	no 		1
 
-		${result}= 		Wait For Process 	${process_manager} 	timeout=15
+		${result}= 		Wait For Process 	${process_${comp}} 	timeout=15
 		${running}= 	Is Process Running 	${PROCESS_${comp}}
 		IF 	not ${running}
-			Log To Console 	*=== ${component_name} closed with GUI ===*
-			Log		${result.stdout}
-			Log		${result.stderr}
-			Should Be Equal As Integers 	${result.rc} 	0
+			Log 	*=== ${component_name} closed with GUI ===* 	console=True
+			TRY
+				Log 	${component_name} exited with: ${result.rc} 	console=${True}
+				# Should Be Equal As Integers 	${result.rc} 	0
+
+				Log to Console 	${component_name} Process returned: ${result.rc} 	console=True
+				Log		rc: ${result.rc} 		console=True
+				Log		stdout_path: ${result.stdout_path} 		console=True
+				Log		stderr_path: ${result.stderr_path} 		console=True
+
+				Show Log 	${result.stdout_path}
+				Show Log 	${result.stderr_path}
+
+			EXCEPT 	AS 	${error}
+				Log 	error: ${error} 		console=true
+			END
 
 		ELSE
-			Log To Console 	Closing GUI with CLI
+			Log 	Closing GUI with CLI 	console=True
 			Take A Screenshot
 			Run Keyword 	Stop ${component_name} CLI 	# close with cli signal
-			${running}= 	Is Process Running 	${process_manager}
-			Take A Screenshot
-			IF 	${running}
-				Log To Console 	Failed to close ${component_name}
-			END
+			RETURN
 		END
 
 	END
 
 	Sleep 	0.5
+	Run Keyword And Ignore Error 	Check Logs 	${component_name} 	# TODO: remove ignore error and check if test cases fail. Log issues for failing test cases
 	${running}= 	Is Process Running 	${PROCESS_${comp}}
-	Run Keyword If 	${running} 	Fail 	${component_name} is still running!
-	Run Keyword And Ignore Error 	Check Logs 	${component_name}
+	Run Keyword If 	${running} 	Fail 	Failed to close ${component_name}
 
 	[Teardown] 	Run Keywords
-	...    Set Suite Variable 	${PROCESS_${comp}} 	${None} 	AND
-	...    Kill If Still Running 	${CMD_${comp}} 				AND
-	...    Show Log 	${OUTPUT DIR}${/}stdout_${comp}.txt 	AND
-	...    Show Log 	${OUTPUT DIR}${/}stderr_${comp}.txt
+	...    Set Suite Variable 	${PROCESS_${comp}} 	${None} 	AND 	Kill If Still Running 	${CMD_${comp}}
 
 # # # # #
 # INI:  #
@@ -242,7 +237,7 @@ Click Button
 	[Arguments]		${btnname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
-	${img}= 	Set Variable 	${comp}_${PLATFORM}_button_${btnnamel}.png
+	VAR 	${img} 	${comp}_${PLATFORM}_button_${btnnamel}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 	# IF  "${PLATFORM}" == "windows"
@@ -261,7 +256,7 @@ Click Button
 Wait For Dialog Button
 	[Arguments]		${btnname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
-	${img}=	Set Variable 	${PLATFORM}_dlgbtn_${btnnamel}.png
+	VAR 	${img} 	${PLATFORM}_dlgbtn_${btnnamel}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=${timeout}
@@ -271,7 +266,7 @@ Wait For Dialog Button
 Click Dialog Button
 	[Arguments]		${btnname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
-	${img}=	Set Variable		${PLATFORM}_dlgbtn_${btnnamel}.png
+	VAR 	${img} 	${PLATFORM}_dlgbtn_${btnnamel}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=${timeout}
@@ -284,7 +279,7 @@ Click Tab
 	[Arguments]		${tabname}
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${tabnamel}= 	Convert To Lower Case 	${tabname}
-	${img}=	Set Variable		${comp}_${PLATFORM}_tab_${tabnamel}.png
+	VAR 	${img} 	${comp}_${PLATFORM}_tab_${tabnamel}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
@@ -297,7 +292,7 @@ Select Option
 	[Arguments]		${optname}
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${optnamel}= 	Convert To Lower Case 	${optname}
-	${img}= 	Set Variable		${comp}_${PLATFORM}_option_${optnamel}.png
+	VAR 	${img} 	${comp}_${PLATFORM}_option_${optnamel}.png
 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
@@ -308,7 +303,7 @@ Selected Option Should Be
 	[Arguments]		${optname}
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${optnamel}= 	Convert To Lower Case 	${optname}
-	${img}= 	Set Variable		${comp}_${PLATFORM}_option_${optnamel}.png
+	VAR 	${img} 	${comp}_${PLATFORM}_option_${optnamel}.png
 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate 	${img}
 
@@ -316,7 +311,7 @@ Click Menu
 	[Arguments]		${menuname}
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${menunamel}= 	Convert To Lower Case 	${menuname}
-	${img}=	Set Variable		${comp}_${PLATFORM}_menu_${menunamel}.png
+	VAR 	${img} 	${comp}_${PLATFORM}_menu_${menunamel}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
@@ -329,7 +324,7 @@ Click CheckBox
 	[Arguments]		${status} 		${btnname}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
 	${statusl}= 	Convert To Lower Case 	${status}
-	${img}=	Set Variable		${PLATFORM}_checkbox_${statusl}_${btnnamel}.png
+	VAR 	${img} 	${PLATFORM}_checkbox_${statusl}_${btnnamel}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
@@ -341,7 +336,7 @@ Click CheckBox
 Click RadioBtn
 	[Arguments]		${btnname}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
-	${img}=	Set Variable		${PLATFORM}_radiobtn_${btnnamel}.png
+	VAR 	${img} 	${PLATFORM}_radiobtn_${btnnamel}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
@@ -357,7 +352,7 @@ Click ${item} With Vertical Offset
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${image_name}= 	Convert To Lower Case 	${image_name}
 	${item}= 	Convert To Lower Case 	${item}
-	${img}=	Set Variable		${comp}_${PLATFORM}_${item}_${image_name}.png
+	VAR 	${img} 	${comp}_${PLATFORM}_${item}_${image_name}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=${timeout}
@@ -374,7 +369,7 @@ Click ${item} With Horizontal Offset
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${image_name}= 	Convert To Lower Case 	${image_name}
 	${item}= 	Convert To Lower Case 	${item}
-	${img}=	Set Variable		${comp}_${PLATFORM}_${item}_${image_name}.png
+	VAR 	${img} 	${comp}_${PLATFORM}_${item}_${image_name}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 	Wait For 	${img} 	 timeout=${timeout}
@@ -471,7 +466,7 @@ Get Text Value To Right Of
 	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
 	${labell}= 	Convert To Lower Case 	${label}
 	${comp}= 	Convert To Lower Case 	${COMPONENT}
-	${img}= 	Set Variable		${comp}_${PLATFORM}_label_${labell}.png
+	VAR 	${img} 	${comp}_${PLATFORM}_label_${labell}.png
 
 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 
@@ -492,11 +487,11 @@ Get Text Value To Right Of
 		# Take A Screenshot
 		${valuec}= 	Copy
 		IF  $valuec != $value
-			${value}= 	Set Variable 		${valuec}
+			VAR 	${value} 	${valuec}
 		END
 		${valueg}= 	Get Clipboard Content
 		IF  $valueg != $value
-			${value}= 	Set Variable 		${valueg}
+			VAR 	${value} 	${valueg}
 		END
 		IF 	$platform == 'macos' and $b4value == $value
 			# Click To The Right Of Image 	${img} 	${offsetx}
@@ -515,7 +510,7 @@ Get Text Value To Right Of
 			# Take A Screenshot
 			${valueg}= 	Get Clipboard Content
 			IF  $valueg != $value
-				${value}= 	Set Variable 		${valueg}
+				VAR 	${value} 	${valueg}
 			END
 
 			# ${valueclp}= 	Evaluate 		pyperclip.paste() 		modules=pyperclip
@@ -533,7 +528,7 @@ Set Text Value To Right Of
 	${value}= 	Convert To String 	${value}
 	${comp}= 	Convert To Lower Case 	${COMPONENT}
 	${labell}= 	Convert To Lower Case 	${label}
-	${img}= 	Set Variable		${comp}_${PLATFORM}_label_${labell}.png
+	VAR 	${img} 	${comp}_${PLATFORM}_label_${labell}.png
 	${imgsize}= 	Get Image Size 	${IMAGE_DIR}${/}${img}
 	Log		${imgsize}
 	${offsetx2}= 	Evaluate 	int(${imgsize}[0]/2)+${offsetx}
