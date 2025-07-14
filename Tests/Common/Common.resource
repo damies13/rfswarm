@@ -133,9 +133,7 @@ Read Log
 Check Logs
 	[Arguments] 	${component_name}=${COMPONENT}
 	${comp} 	Convert To Lower Case 	${component_name}
-
-	${tname} 		Convert To Save Path 	${TEST NAME}
-	VAR 	${tname} 	stdout${/}${tname}
+	${tname} 	Convert To Save Path 	${TEST NAME}
 
 	File Should Exist 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt 	Can't find ${component_name} stdout
 	File Should Exist 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt 	Can't find ${component_name} stderr
@@ -266,7 +264,7 @@ Run ${component_name} CLI
 	Log 	\t\${args}: ${args} 	console=${True}
 
 	${tname} 		Convert To Save Path 	${TEST NAME}
-	Create Directory 	${OUTPUT DIR}${/}stdout${/}${tname}
+	Create Directory 	${OUTPUT DIR}${/}stdout${/}${tname}${/}
 	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt
 	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
 	${process}= 	Start Process 	${CMD_${comp}}  @{appargs}  alias=${component_name}
@@ -322,7 +320,6 @@ Stop ${component_name} CLI
 		Log 	${component_name} exited with: ${result.rc} 	console=${True}
 		# Should Be Equal As Integers 	${result.rc} 	0
 
-		Log		rc: ${result.rc} 		console=True
 		Log		stdout_path: ${result.stdout_path} 		console=True
 		Log		stderr_path: ${result.stderr_path} 		console=True
 
@@ -544,7 +541,7 @@ Change ${component_name} INI Option
 
 Convert To Save Path
 	[Arguments] 	${path}
-	${safe_path} 		Evaluate 	re.sub(r'[<>:"/\\|?*]', '_', "${path}").replace(chr(0), '_').rstrip(' .')[:60] 	modules=re
+	${safe_path} 		Evaluate 	re.sub(r'[<>:"/\\|?*]', '_', "${path}".replace(' ', '_')).replace(chr(0), '_').rstrip(' .')[:60] 	modules=re
 
 	RETURN 	${safe_path}
 
