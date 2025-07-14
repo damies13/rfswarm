@@ -245,7 +245,7 @@ Run ${component_name} CLI
 
 	${tname} 		Evaluate 	re.sub(r'[<>:"/\\|?*]', '_', "${TEST NAME}").replace(chr(0), '_').rstrip(' .')[:60] 	modules=re
 	VAR 	${tname} 	stdout${/}${tname}
-	# Create Directory 	${OUTPUT DIR}${/}${tname}
+	Create Directory 	${OUTPUT DIR}${/}${tname}
 	${process}= 	Start Process 	${CMD_${comp}}  @{appargs}  alias=${component_name}
 	...    stdout=${OUTPUT DIR}${/}${tname}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}${tname}${/}stderr_${comp}.txt
 
@@ -284,7 +284,7 @@ Stop ${component_name} CLI
 			${result}= 	Wait For Process 	${PROCESS_${comp}} 	timeout=30 	on_timeout=kill
 		END
 	ELSE
-		Log To Console 	${component_name} is not running!
+		Log 	${component_name} is not running! 	console=${True}
 		TRY
 			${result}= 	Get Process Result 	${PROCESS_${comp}}
 		EXCEPT 	AS 	${error}
@@ -292,12 +292,11 @@ Stop ${component_name} CLI
 		END
 	END
 
-	Log To Console 	*=== ${component_name} closed with CLI signal ===*
+	Log 	*=== ${component_name} closed with CLI signal ===* 	console=${True}
 	TRY
 		Log 	${component_name} exited with: ${result.rc} 	console=${True}
 		# Should Be Equal As Integers 	${result.rc} 	0
 
-		Log to Console 	${component_name} Process returned: ${result.rc} 	console=True
 		Log		rc: ${result.rc} 		console=True
 		Log		stdout_path: ${result.stdout_path} 		console=True
 		Log		stderr_path: ${result.stderr_path} 		console=True
@@ -537,7 +536,7 @@ Wait For File To Exist
 Clean Up Old Files
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
 	# cleanup previous output
-	Log To Console    ${OUTPUT DIR}
+	Log    ${OUTPUT DIR}    console=${True}
 	Remove File    ${OUTPUT DIR}${/}*.txt
 	Remove File    ${OUTPUT DIR}${/}*.png
 	# Remove File    ${OUTPUT DIR}${/}sikuli_captured${/}*.*
@@ -633,25 +632,22 @@ Get Relative Paths
 
 Find Result DB
 	[Arguments] 	${directory}=${RESULTS_DIR} 	${result_pattern}=*_*
-	# ${fols}= 	List Directory 	${RESULTS_DIR}
-	# Log to Console 	${fols}
 	${fols}= 	List Directory 	${directory} 	${result_pattern} 	absolute=True
-	Log to Console 	${fols}
-	# ${files}= 	List Directory 	${fols[0]}
-	# Log to Console 	${files}
+	Log 	${fols} 	console=${True}
+
 	${file}= 	List Directory 	${fols[-1]} 	*.db 	absolute=True
-	Log to Console 	Result DB: ${file[-1]}
+	Log 	Result DB: ${file[-1]} 	console=${True}
 	RETURN 	${file[-1]}
 
 Query Result DB
 	[Arguments]		${dbfile} 	${sql}
-	Log to Console 	dbfile: ${dbfile}
+	Log 	dbfile: ${dbfile} 	console=${True}
 	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
-	# Log to Console 	\${dbfile}: ${dbfile}
+
 	Connect To Database 	sqlite3 	database=${dbfile} 	isolation_level=${None}
-	Log to Console 	sql: ${sql}
+	Log 	sql: ${sql} 	console=${True}
 	${result}= 	Query 	${sql}
-	Log to Console 	sql result: ${result}
+	Log 	sql result: ${result} 	console=${True}
 	Disconnect From Database
 	RETURN 	${result}
 

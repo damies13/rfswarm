@@ -184,7 +184,6 @@ Close ${component_name} GUI
 				Log 	${component_name} exited with: ${result.rc} 	console=${True}
 				# Should Be Equal As Integers 	${result.rc} 	0
 
-				Log to Console 	${component_name} Process returned: ${result.rc} 	console=True
 				Log		rc: ${result.rc} 		console=True
 				Log		stdout_path: ${result.stdout_path} 		console=True
 				Log		stderr_path: ${result.stderr_path} 		console=True
