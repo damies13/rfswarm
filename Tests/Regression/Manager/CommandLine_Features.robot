@@ -27,10 +27,14 @@ Environment Variable Substitution in Robot/Resource files
 	Run Manager CLI 	@{mngr_options}
 	Wait For Manager Process
 	Stop Agent CLI
-	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
-	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	${stdout_manager}= 		Show Log 	${stdout_manager_path}
+	${stderr_manager}= 		Show Log 	${stderr_manager_path}
+
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	${stdout_agent}= 		Show Log 	${stdout_agent_path}
+	${stderr_agent}= 		Show Log 	${stderr_agent_path}
+
 
 	# Should Contain 	${stdout_agent} 		Thirteen
 
@@ -373,8 +377,9 @@ Install Application Icon or Desktop Shortcut
 	Run Manager CLI 	@{mngr_options}
 	Wait For Manager Process
 	Sleep 	1
-	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	${stdout_manager}= 		Show Log 	${stdout_manager_path}
+	${stderr_manager}= 		Show Log 	${stderr_manager_path}
 	Check Icon Install
 
 Run Mnager with JSON Configuration and JSON Scenario
@@ -394,13 +399,15 @@ Run Mnager with JSON Configuration and JSON Scenario
 	Run Manager CLI 	@{mngr_options}
 	Wait For Manager Process
 
-	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	${stdout_manager}= 		Show Log 	${stdout_manager_path}
+	${stderr_manager}= 		Show Log 	${stderr_manager_path}
 
 	Stop Agent CLI
 
-	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	${stdout_agent}= 		Show Log 	${stdout_agent_path}
+	${stderr_agent}= 		Show Log 	${stderr_agent_path}
 
 	# can't get stdout in windows
 	# IF 	"${PLATFORM}" != "windows"
@@ -439,13 +446,15 @@ Run Mnager with Yaml Configuration and Yaml Scenario
 	Run Manager CLI 	@{mngr_options}
 	Wait For Manager Process
 
-	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	${stdout_manager}= 		Show Log 	${stdout_manager_path}
+	${stderr_manager}= 		Show Log 	${stderr_manager_path}
 
 	Stop Agent CLI
 
-	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	${stdout_agent}= 		Show Log 	${stdout_agent_path}
+	${stderr_agent}= 		Show Log 	${stderr_agent_path}
 
 	# can't get stdout in windows
 	# IF 	"${PLATFORM}" != "windows"
@@ -483,13 +492,15 @@ Run Mnager with yml Configuration and yml Scenario
 	Run Manager CLI 	@{mngr_options}
 	Wait For Manager Process
 
-	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	${stdout_manager}= 		Show Log 	${stdout_manager_path}
+	${stderr_manager}= 		Show Log 	${stderr_manager_path}
 
 	Stop Agent CLI
 
-	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	${stdout_agent}= 		Show Log 	${stdout_agent_path}
+	${stderr_agent}= 		Show Log 	${stderr_agent_path}
 
 	# can't get stdout in windows
 	# IF 	"${PLATFORM}" != "windows"

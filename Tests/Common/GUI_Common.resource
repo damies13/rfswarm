@@ -169,8 +169,8 @@ Close ${component_name} GUI
 			${result}= 	Wait For Process 	${PROCESS_${comp}} 	timeout=60
 			Run Keyword And Ignore Error 	Check Logs 	${component_name} 	# TODO: remove ignore error and check if test cases fail. Log issues for failing test cases
 			Should Be Equal As Integers 	${result.rc} 	0
-			RETURN
 
+			RETURN
 		END
 
 		Sleep 	2s

@@ -104,6 +104,17 @@ Set Platform By Tag
 		END
 	END
 
+Find Log
+	[Documentation] 	Returns path to the stdout and stderr log file for current test
+	[Arguments] 	${component_name}=${COMPONENT}
+	${comp} 	Convert To Lower Case 	${component_name}
+	${tname} 		Convert To Save Path 	${TEST NAME}
+
+	File Should Exist 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt
+	File Should Exist 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+
+	RETURN 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+
 Show Log
 	[Arguments]		${filename}
 	Log 		${\n}--VVV--${filename}--VVV-- 		console=True
@@ -122,12 +133,23 @@ Read Log
 Check Logs
 	[Arguments] 	${component_name}=${COMPONENT}
 	${comp} 	Convert To Lower Case 	${component_name}
-	${stdout_component}= 		Read Log 	${OUTPUT DIR}${/}stdout_${comp}.txt
-	${stderr_component}= 		Read Log 	${OUTPUT DIR}${/}stderr_${comp}.txt
+
+	${tname} 		Convert To Save Path 	${TEST NAME}
+	VAR 	${tname} 	stdout${/}${tname}
+
+	File Should Exist 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt 	Can't find ${component_name} stdout
+	File Should Exist 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt 	Can't find ${component_name} stderr
+
+	${stdout_component}= 		Read Log 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt
+	${stderr_component}= 		Read Log 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
 	# Run Keyword And Warn On Failure 	Should Be Equal As Integers 	${result.rc} 	0
 
 	Should Not Contain 	${stdout_component} 	RuntimeError
 	Should Not Contain 	${stderr_component} 	RuntimeError
+	Should Not Contain 	${stdout_component} 	ValueError
+	Should Not Contain 	${stderr_component} 	ValueError
+	Should Not Contain 	${stdout_component} 	Traceback
+	Should Not Contain 	${stderr_component} 	Traceback
 	Should Not Contain 	${stdout_component} 	Exception
 	Should Not Contain 	${stderr_component} 	Exception
 	Should Not Contain 	${stdout_component} 	OSError
@@ -243,11 +265,12 @@ Run ${component_name} CLI
 	${args}= 	Evaluate 	" ".join(@{appargs})
 	Log 	\t\${args}: ${args} 	console=${True}
 
-	${tname} 		Evaluate 	re.sub(r'[<>:"/\\|?*]', '_', "${TEST NAME}").replace(chr(0), '_').rstrip(' .')[:60] 	modules=re
-	VAR 	${tname} 	stdout${/}${tname}
-	Create Directory 	${OUTPUT DIR}${/}${tname}
+	${tname} 		Convert To Save Path 	${TEST NAME}
+	Create Directory 	${OUTPUT DIR}${/}stdout${/}${tname}
+	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt
+	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
 	${process}= 	Start Process 	${CMD_${comp}}  @{appargs}  alias=${component_name}
-	...    stdout=${OUTPUT DIR}${/}${tname}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}${tname}${/}stderr_${comp}.txt
+	...    stdout=${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
 
 	Log 	${process}
 	VAR 	${PROCESS_${comp}} 		${process} 	scope=SUITE
@@ -290,6 +313,8 @@ Stop ${component_name} CLI
 		EXCEPT 	AS 	${error}
 			Log 	error: ${error} 		console=true
 		END
+
+		RETURN
 	END
 
 	Log 	*=== ${component_name} closed with CLI signal ===* 	console=${True}
@@ -476,11 +501,11 @@ Create ${component_name} INI File If It Does Not Exist
 		Log 	INI file for ${component_name} does not exist or it's empty. Creating new one. 	console=True
 
 		IF  '${component_name}' == 'Manager'
-			${process}= 	Start Process  rfswarm-manager  -n  stdout=${OUTPUT DIR}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stderr_${comp}.txt
+			${process}= 	Start Process  rfswarm-manager  -n
 		ELSE IF  '${component_name}' == 'Agent'
-			${process}= 	Start Process  rfswarm-agent  stdout=${OUTPUT DIR}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stderr_${comp}.txt
+			${process}= 	Start Process  rfswarm-agent
 		ELSE IF  '${component_name}' == 'Reporter'
-			${process}= 	Start Process  rfswarm-reporter  -n  stdout=${OUTPUT DIR}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stderr_${comp}.txt
+			${process}= 	Start Process  rfswarm-reporter  -n
 		END
 		Wait For File To Exist 	${location}
 		Sleep 	5s
@@ -516,6 +541,12 @@ Change ${component_name} INI Option
 # # # # # # # # # # # # # # # # #
 # Paths, directories and files: #
 # # # # # # # # # # # # # # # # #
+
+Convert To Save Path
+	[Arguments] 	${path}
+	${safe_path} 		Evaluate 	re.sub(r'[<>:"/\\|?*]', '_', "${path}").replace(chr(0), '_').rstrip(' .')[:60] 	modules=re
+
+	RETURN 	${safe_path}
 
 Wait For File To Exist
 	[Arguments] 	${filepath} 	${timeout}=${120}
@@ -701,7 +732,7 @@ Update BUILTIN_PY_MODULES
 	@{buildin}=		Create List		@{BUILTIN_PY_MODULES}
 	Append To List 	${buildin} 	${module}
 	${buildin}	Evaluate	list(set(${buildin}))
-	VAR    @BUILTIN_PY_MODULES      @{buildin}    scope=SUITE
+	VAR    @{BUILTIN_PY_MODULES}      @{buildin}    scope=SUITE
 
 Get Modules From Program .py File That Are Not BuildIn
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123
@@ -715,7 +746,7 @@ Get Modules From Program .py File That Are Not BuildIn
 	# add local modules to buildin list and also check them for non builtin import modules
 	${file_location} 	${file_name}= 	Split Path 	${file_path}
 	@{checked_py_files}= 	Create List 	${file_name} 	@{CHECKED_PY_FILES}
-	VAR    @CHECKED_PY_FILES      @{checked_py_files}    scope=SUITE
+	VAR    @{CHECKED_PY_FILES}      @{checked_py_files}    scope=SUITE
 	Log		${CHECKED_PY_FILES}
 	@{pyfiles}= 	List Files In Directory 	${file_location} 	*.py
 	Remove Values From List 	${pyfiles}  	@{CHECKED_PY_FILES}
@@ -782,7 +813,7 @@ Get Modules From Program .py File That Are Not BuildIn
 	${length}	Get Length	${custom_imports}
 	FOR  ${i}  IN RANGE  0  ${length}
 		IF  '${custom_imports}[${i}]' in &{replace_names}
-			VAR 	${custom_imports}[${i}] 	${replace_names}[${custom_imports}[${i}]]
+			${custom_imports}[${i}] 	Set Variable 	${replace_names}[${custom_imports}[${i}]]
 		END
 	END
 

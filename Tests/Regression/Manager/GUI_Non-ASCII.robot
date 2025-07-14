@@ -167,10 +167,13 @@ Check CSV Files
 	END
 
 Check Non-ASCII Logs
-	${stdout_manager}= 		Read Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Read Log 	${OUTPUT DIR}${/}stderr_manager.txt
-	${stdout_agent}= 		Read Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${stderr_agent}= 		Read Log 	${OUTPUT DIR}${/}stderr_agent.txt
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+
+	${stdout_manager}= 		Read Log 	${stdout_manager_path}
+	${stderr_manager}= 		Read Log 	${stderr_manager_path}
+	${stdout_agent}= 		Read Log 	${stdout_agent_path}
+	${stderr_agent}= 		Read Log 	${stderr_agent_path}
 
 	Should Not Contain 	${stdout_manager} 	RuntimeError
 	Should Not Contain 	${stderr_manager} 	RuntimeError

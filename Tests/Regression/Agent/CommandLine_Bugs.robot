@@ -15,10 +15,6 @@ Exclude Libraries With Spaces
 	Run Manager CLI 	-g 	1 	-s 	${scenariofile} 	-n
 	Wait For Manager Process
 	Stop Agent CLI
-	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
 
 	${dbfile}= 	Find Result DB
 	# Query Result DB 	${dbfile} 	Select * from Results
@@ -39,10 +35,6 @@ Run agent with -x (xml mode)
 	Run Manager CLI 	-g 	1 	-s 	${scenariofile} 	-d 	${CURDIR}${/}testdata${/}Issue-#171 	-n
 	Wait For Manager Process
 	Stop Agent CLI
-	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
 
 	${dbfile}= 	Find Result DB 	directory=${CURDIR}${/}testdata${/}Issue-#171 	result_pattern=*_Issue171*
 	# Query Result DB 	${dbfile} 	Select * from Results

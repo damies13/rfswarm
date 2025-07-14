@@ -8,9 +8,7 @@ Install Application Icon or Desktop Shortcut
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
 
 	Run Agent CLI 	-g 	6 	-c 	ICON
-	Sleep    2
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+	Wait For Agent Process
 
 	Check Icon Install
 Agent Version
@@ -36,8 +34,8 @@ Agent Command Line INI -i
 	Run Agent CLI 	-i	${inifile}
 	Log To Console	Run Agent CLI with alternate ini file with variable.
 	Stop Agent CLI
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	${result_stdout}=	Get File	${stdout_agent_path}
 	Should Contain	${result_stdout}	${inifile}
 
 	[Teardown]	Stop Agent CLI
@@ -50,8 +48,8 @@ Agent Command Line INI --ini
 	Run Agent CLI 	--ini	${inifile}
 	Log To Console	Run Agent CLI with alternate ini file with variable.
 	Stop Agent CLI
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	${result_stdout}=	Get File	${stdout_agent_path}
 	Should Contain	${result_stdout}	${inifile}
 
 	[Teardown]	Stop Agent CLI
@@ -64,8 +62,8 @@ Agent Command Line MANAGER -m
 	Run Manager CLI 	-n
 	Wait For Manager Process	60s
 	Stop Agent CLI
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	${result_stdout}=	Get File	${stdout_agent_path}
 	Should Contain	${result_stdout}	Manager Connected
 
 	[Teardown]	Run Keywords	Stop Agent CLI 	Stop Manager CLI
@@ -78,8 +76,8 @@ Agent Command Line MANAGER --manager
 	Run Manager CLI 	-n
 	Wait For Manager Process	60s
 	Stop Agent CLI
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	${result_stdout}=	Get File	${stdout_agent_path}
 	Should Contain	${result_stdout}	Manager Connected
 
 	[Teardown]	Run Keywords	Stop Agent CLI 	Stop Manager CLI
@@ -93,7 +91,6 @@ Agent Command Line AGENTDIR -d
 	Run Agent CLI 	-d 	${agentdir}
 	Sleep 	10s
 	Stop Agent CLI
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	@{agentdir_dirs}=	List Directories In Directory	${agentdir}
 	List Should Contain Value	${agentdir_dirs}	scripts		msg=Can't find scripts dir in custom Agent dir
 	${agentdir_scripts}=	List Files In Directory		${agentdir}${/}scripts
@@ -110,7 +107,6 @@ Agent Command Line AGENTDIR --agentdir
 	Run Agent CLI 	--agentdir 	${agentdir}
 	Sleep 	10s
 	Stop Agent CLI
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	@{agentdir_dirs}=	List Directories In Directory	${agentdir}
 	List Should Contain Value	${agentdir_dirs}	scripts		msg=Can't find scripts dir in custom Agent dir
 	${agentdir_scripts}=	List Files In Directory		${agentdir}${/}scripts
@@ -137,10 +133,6 @@ Agent Command Line ROBOT -r
 	Run Manager CLI 	-g 	1 	-n 	-s 	${scenario_dir}
 	Wait For Manager Process	8min
 	Stop Agent CLI
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 
 	@{test_result}= 	List Directories In Directory	${RESULTS_DIR}	absolute=${True}	pattern=*_Issue-#14
 	Log To Console		Result dir: ${test_result}
@@ -163,7 +155,6 @@ Agent Command Line XMLMODE -x
 	Run Agent CLI 	-x 	-d 	${agentdir}
 	Sleep 	10s
 	Stop Agent CLI
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 
 	@{agentdir_dirs}=	List Directories In Directory	${agentdir}
 	List Should Contain Value	${agentdir_dirs}	scripts		msg=Can't find scripts dir in custom Agent dir
@@ -182,7 +173,6 @@ Agent Command Line XMLMODE --xmlmode
 	Run Agent CLI 	--xmlmode 	-d 	${agentdir}
 	Sleep 	10s
 	Stop Agent CLI
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 
 	@{agentdir_dirs}=	List Directories In Directory	${agentdir}
 	List Should Contain Value	${agentdir_dirs}	scripts		msg=Can't find scripts dir in custom Agent dir
@@ -210,7 +200,6 @@ Agent Command Line AGENTNAME -a
 	Should Be Equal 	${method}	POST
 	Log 	${body}
 	Should Contain	${body} 	Issue-#14AGENTNAME
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 
 	[Teardown]	Run Keywords	Stop Server 	Stop Agent CLI
 
@@ -232,7 +221,6 @@ Agent Command Line AGENTNAME --agentname
 	Should Be Equal 	${method}	POST
 	Log 	${body}
 	Should Contain	${body} 	Issue-#14AGENTNAME
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 
 	[Teardown]	Run Keywords	Stop Server 	Stop Agent CLI
 
@@ -272,8 +260,8 @@ Agent Yaml Configuration File
 	Log To Console	Run Agent CLI with Yaml Configuration File.
 	Sleep    20
 	Stop Agent CLI
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	${result_stdout}=	Get File	${stdout_agent_path}
 	Should Contain	${result_stdout}	${yamlurl}
 
 	[Teardown]	Stop Agent CLI
@@ -288,8 +276,8 @@ Agent Yml Configuration File
 	Log To Console	Run Agent CLI with Yaml Configuration File.
 	Sleep    20
 	Stop Agent CLI
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	${result_stdout}=	Get File	${stdout_agent_path}
 	Should Contain	${result_stdout}	${yamlurl}
 
 	[Teardown]	Stop Agent CLI
@@ -304,8 +292,8 @@ Agent JSON Configuration File
 	Log To Console	Run Agent CLI with JSON Configuration File.
 	Sleep    20
 	Stop Agent CLI
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	${result_stdout}=	Get File	${stdout_agent_path}
 	Should Contain	${result_stdout}	${jsonurl}
 
 	[Teardown]	Stop Agent CLI

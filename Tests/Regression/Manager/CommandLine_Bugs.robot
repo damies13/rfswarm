@@ -29,17 +29,7 @@ Next Day For Scheduled Start Is In the Next Month
 
 	Wait Until Keyword Succeeds 	5x 	1s 	Resync Date With Time Server 	${test_date}
 
-	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
-
-	Should Not Contain 	${stdout_manager} 	RuntimeError
-	Should Not Contain 	${stderr_manager} 	RuntimeError
-	Should Not Contain 	${stdout_manager} 	ValueError
-	Should Not Contain 	${stderr_manager} 	ValueError
-	Should Not Contain 	${stdout_manager} 	Traceback
-	Should Not Contain 	${stderr_manager} 	Traceback
-	Should Not Contain 	${stdout_manager} 	Exception
-	Should Not Contain 	${stderr_manager} 	Exception
+	Check Logs
 
 	[Teardown] 	Stop Manager CLI
 
@@ -58,10 +48,14 @@ Robot files with same name but different folders
 	Run Manager CLI 	@{mngr_options}
 	Wait For Manager Process
 	Stop Agent CLI
-	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
-	${stdout_agent}= 		Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${stderr_agent}= 		Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	${stdout_manager}= 		Show Log 	${stdout_manager_path}
+	${stderr_manager}= 		Show Log 	${stderr_manager_path}
+
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	${stdout_agent}= 		Show Log 	${stdout_agent_path}
+	${stderr_agent}= 		Show Log 	${stderr_agent_path}
 
 	Should Not Contain 	${stdout_agent} 		Robot returned an error
 	Should Not Contain 	${stderr_agent} 		Robot returned an error
@@ -120,10 +114,13 @@ Circular Reference Resource Files
 	Wait For Manager Process
 	Stop Agent CLI
 
-	${stdout_manager}= 		Read Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Read Log 	${OUTPUT DIR}${/}stderr_manager.txt
-	${stdout_agent}= 		Read Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${stderr_agent}= 		Read Log 	${OUTPUT DIR}${/}stderr_agent.txt
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+
+	${stdout_manager}= 		Read Log 	${stdout_manager_path}
+	${stderr_manager}= 		Read Log 	${stderr_manager_path}
+	${stdout_agent}= 		Read Log 	${stdout_agent_path}
+	${stderr_agent}= 		Read Log 	${stderr_agent_path}
 
 	Should Not Contain 	${stdout_manager} 		RuntimeError
 	Should Not Contain 	${stderr_manager} 		RuntimeError
@@ -180,10 +177,13 @@ Circular Reference Resource Files 2
 	Wait For Manager Process
 	Stop Agent CLI
 
-	${stdout_manager}= 		Read Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Read Log 	${OUTPUT DIR}${/}stderr_manager.txt
-	${stdout_agent}= 		Read Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${stderr_agent}= 		Read Log 	${OUTPUT DIR}${/}stderr_agent.txt
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+
+	${stdout_manager}= 		Read Log 	${stdout_manager_path}
+	${stderr_manager}= 		Read Log 	${stderr_manager_path}
+	${stdout_agent}= 		Read Log 	${stdout_agent_path}
+	${stderr_agent}= 		Read Log 	${stderr_agent_path}
 
 	Should Not Contain 	${stdout_manager} 		RuntimeError
 	Should Not Contain 	${stderr_manager} 		RuntimeError
@@ -249,10 +249,13 @@ Lots Of Resource Files
 	Wait For Manager Process 	60min
 	Stop Agent CLI
 
-	${stdout_manager}= 		Read Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Read Log 	${OUTPUT DIR}${/}stderr_manager.txt
-	${stdout_agent}= 		Read Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${stderr_agent}= 		Read Log 	${OUTPUT DIR}${/}stderr_agent.txt
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+
+	${stdout_manager}= 		Read Log 	${stdout_manager_path}
+	${stderr_manager}= 		Read Log 	${stderr_manager_path}
+	${stdout_agent}= 		Read Log 	${stdout_agent_path}
+	${stderr_agent}= 		Read Log 	${stderr_agent_path}
 
 	Should Not Contain 	${stdout_manager} 		OSError: [Errno 24] Too many open files
 	Should Not Contain 	${stderr_manager} 		OSError: [Errno 24] Too many open files
@@ -299,19 +302,17 @@ Check That the Manager Supports the Missing Scenario File Provided By the -s Arg
 	Change Manager INI Option 	Plan 	scenariofile 	${inifile}
 
 	Run Manager CLI 	@{mngr_options}
-	Sleep 	3
+	Wait For Manager Process
 	${running}= 	Is Process Running		${PROCESS_MANAGER}
 	IF 	${running}
 		Fail	msg=Manager is still running!
 	END
 
-	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	${stdout_manager}= 		Read Log 	${stdout_manager_path}
+	${stderr_manager}= 		Read Log 	${stderr_manager_path}
 
-	Should Not Contain 	${stdout_manager} 		RuntimeError
-	Should Not Contain 	${stderr_manager} 		RuntimeError
-	Should Not Contain 	${stdout_manager} 		Exception
-	Should Not Contain 	${stderr_manager} 		Exception
+	Check Logs
 
 	# windows does not work with reading logs.
 	Should Contain 	${stdout_manager} 	Scenario file Not found:
@@ -342,10 +343,8 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 	IF 	${running}
 		Fail	msg=Manager did not close!
 	END
-	Log 	${result.stdout}
-	Log 	${result.stderr}
-	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	Show Log 	${result.stdout_path}
+	Show Log 	${result.stderr_path}
 
  	File Should Exist	${global_path}${/}RFSwarmManager.ini
 	Show Log 	${global_path}${/}RFSwarmManager.ini
@@ -382,10 +381,8 @@ Verify If Manager Runs With No Existing INI File From Current Version NO GUI
 	IF 	${running}
 		Fail	msg=Manager did not close!
 	END
-	Log 	${result.stdout}
-	Log 	${result.stderr}
-	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	Show Log 	${result.stdout_path}
+	Show Log 	${result.stderr_path}
 
 Verify If Manager Runs With Existing INI File From Previous Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
@@ -409,7 +406,5 @@ Verify If Manager Runs With Existing INI File From Previous Version NO GUI
 	IF 	${running}
 		Fail	msg=Manager did not close!
 	END
-	Log 	${result.stdout}
-	Log 	${result.stderr}
-	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	Show Log 	${result.stdout_path}
+	Show Log 	${result.stderr_path}
