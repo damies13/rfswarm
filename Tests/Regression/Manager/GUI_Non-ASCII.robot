@@ -2,6 +2,10 @@
 Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #97 	Languages
 
 Resource 	resources/GUI_Manager.resource
+Resource 	../../Common/Logs.resource
+Resource 	../../Common/GUI_RFS_Components.resource
+Resource 	../../Common/CSV.resource
+Resource 	../../Common/Database.resource
 
 Variables 	${CURDIR}${/}testdata${/}Issue-#97${/}lang_samples.yaml
 
@@ -50,7 +54,7 @@ Test Non-ASCII Characters
 	Run Agent CLI 		@{agnt_options}
 	Open Manager GUI 	@{mngr_options}
 	Take A Screenshot
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Click Tab 	Plan
 	Click Button	runplay
 

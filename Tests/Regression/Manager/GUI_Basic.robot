@@ -2,16 +2,13 @@
 Test Tags       Basic 	GUI
 
 Resource 	resources/GUI_Manager.resource
+Resource 	../../Common/GUI_RFS_Components.resource
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Manager
 
 *** Variables ***
-${DEFAULT_IMAGE_TIMEOUT} 	${120}
-${cmd_agent} 		rfswarm-agent
-${cmd_manager} 	rfswarm-manager
-${IMAGE_DIR} 	${CURDIR}/Images/file_method
-${pyfile}			${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
-${process}		None
+${pyfile}		${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
+${process}		${None}
 
 *** Test Cases ***
 Open GUI

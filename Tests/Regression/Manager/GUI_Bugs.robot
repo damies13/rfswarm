@@ -2,6 +2,8 @@
 Test Tags       Bugs 	GUI
 
 Resource 	resources/GUI_Manager.resource
+Resource 	../../Common/Logs.resource
+Resource 	../../Common/GUI_RFS_Components.resource
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Manager
 Test Teardown 	Run Keyword		Close Manager GUI ${PLATFORM}
@@ -128,7 +130,7 @@ Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
 # 	Resize Window 	100 	10
 # 	Take A Screenshot
 #
-# 	Wait Agent Ready
+# 	Wait For the Agent To Be Ready
 # 	Click Tab 	 Plan
 #
 # 	# manager_macos_button_runsettings

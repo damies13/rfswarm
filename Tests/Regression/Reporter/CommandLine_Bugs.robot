@@ -1,5 +1,7 @@
 *** Settings ***
 Resource 	resources/CommandLine_Reporter.resource
+Resource 	../../Common/RFS_code.resource
+Resource 	../../Common/RFS_Components.resource
 
 Suite Setup 	Common.Basic Suite Initialization Reporter
 

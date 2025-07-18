@@ -1,5 +1,8 @@
 *** Settings ***
 Resource 	resources/GUI_Reporter.resource
+Resource 	../../Common/Directories_and_Files.resource
+Resource 	../../Common/Logs.resource
+Resource 	../../Common/GUI_RFS_Components.resource
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Reporter
 

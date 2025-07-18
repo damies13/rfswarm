@@ -4,6 +4,11 @@ Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #97 	Languages
 Resource 	resources/GUI_Reporter.resource
 Resource 	resources/Reporter_HTML.resource
 
+Resource 	../../Common/Directories_and_Files.resource
+Resource 	../../Common/Logs.resource
+Resource 	../../Common/INI_PIP_Data.resource
+Resource 	../../Common/GUI_RFS_Components.resource
+
 Variables 	${CURDIR}${/}testdata${/}Issue-#97${/}lang_samples.yaml
 
 Suite Setup 	Non-ASCII Suite Setup

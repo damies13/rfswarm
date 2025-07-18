@@ -2,6 +2,7 @@
 Test Tags       Features 	CommandLine
 
 Resource 	resources/CommandLine_Manager.resource
+Resource 	../../Common/CSV.resource
 
 Suite Setup 	Common.Basic Suite Initialization Manager
 

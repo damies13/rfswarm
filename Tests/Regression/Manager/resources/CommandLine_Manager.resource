@@ -2,6 +2,10 @@
 Documentation 	This resource file contains keywords for Manager command line only.
 
 Resource 	../../../Common/Common.resource
+Resource 	../../../Common/Directories_and_Files.resource
+Resource 	../../../Common/Logs.resource
+Resource 	../../../Common/INI_PIP_Data.resource
+Resource 	../../../Common/RFS_Components.resource
 
 *** Variables ***
 # datapath: /home/runner/work/rfswarm/rfswarm/rfswarm_manager/results/PreRun

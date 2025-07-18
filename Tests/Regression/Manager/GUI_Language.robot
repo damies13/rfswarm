@@ -2,6 +2,8 @@
 Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #238 	Languages
 
 Resource 	resources/GUI_Manager.resource
+Resource 	../../Common/Logs.resource
+Resource 	../../Common/GUI_RFS_Components.resource
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Manager
 
@@ -43,7 +45,7 @@ Add Test In Language
 	Log 	${langcode} 	console=True
 	${scenariofile}= 		Create ${langcode} Language Scenario
 	Open Manager GUI 		-s 	${scenariofile}
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Click Tab 	Plan
 	Take A Screenshot
 	Check Agent Downloaded ${langcode} Language Test Files

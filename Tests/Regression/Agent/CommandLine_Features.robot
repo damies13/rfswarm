@@ -1,5 +1,9 @@
 *** Settings ***
 Resource 	resources/CommandLine_Agent.resource
+Resource 	../../Common/Directories_and_Files.resource
+Resource 	../../Common/Logs.resource
+Resource 	../../Common/RFS_Components.resource
+Resource 	../../Common/Database.resource
 
 Suite Setup 	Common.Basic Suite Initialization Agent
 

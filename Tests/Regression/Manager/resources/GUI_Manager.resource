@@ -2,6 +2,9 @@
 Documentation 	This resource file contains keywords for Manager GUI only.
 
 Resource 	../../../Common/GUI_Common.resource
+Resource 	../../../Common/Directories_and_Files.resource
+Resource 	../../../Common/INI_PIP_Data.resource
+Resource 	../../../Common/GUI_Click.resource
 
 # Attempting to record video cause more trouble than help
 # Library		ScreenRecorderLibrary.py
@@ -67,11 +70,11 @@ Stop Test Scenario Run Quickly
 	Move To	10	10
 	Wait For the Scenario Run To Finish 	time=${robot_test_time + ${DEFAULT_IMAGE_TIMEOUT}}
 
-Check If The Agent Is Ready
+Wait For the Agent To Be Ready
 	[Arguments] 	${timeout}=300
-	# Sleep	1
 	Click Tab	Agents
-	Wait For 	manager_${PLATFORM}_agents_ready.png	timeout=${timeout}
+	VAR 	${img} 	manager_${PLATFORM}_agents_ready.png
+	Wait For 	${img}	timeout=${timeout}
 
 Wait For the Scenario Run To Finish
 	[Arguments] 	${time}=${300}
@@ -83,7 +86,7 @@ Wait For the Scenario Run To Finish
 	END
 
 Check If the Robot Failed
-	# *** NOT USED
+	# *** NOT USED ***
 	[Arguments] 	${expected_time}
 	Sleep 	${expected_time}
 	TRY
@@ -95,11 +98,6 @@ Check If the Robot Failed
 	# Take A Screenshot
 	${status}= 	Run Keyword And Return Status 	Locate 	manager_${PLATFORM}_resource_file_provided.png
 	Run Keyword If 	not ${status} 	Fail 	msg=Test failed. Check screenshots for more informations.
-
-Wait Agent Ready
-	Click Tab 	Agents
-	${img}= 	Set Variable 	manager_${PLATFORM}_agents_ready.png
-	Wait For 	${img} 			timeout=${DEFAULT_IMAGE_TIMEOUT}
 
 Create Robot File
 	[Arguments]		${path}=${global_path}	${name}=${global_name}
@@ -172,7 +170,6 @@ Change Test Group Settings
 Change Scenario Wide Settings
 	[Arguments]		${wide_settings_data}
 	Sleep	2
-	#Click Label With Vertical Offset	scenario_settings_scenario
 	IF  'exclude_libraries' in ${wide_settings_data}
 		Click Label With Horizontal Offset	exclude_libraries	100
 		IF  "${PLATFORM}" == "macos"
@@ -267,11 +264,13 @@ Test Group Save Settings
 	END
 
 Select ${n} Robot Test Case
+	[Documentation] 	Select n Robot test case in the Plan menu for a single group index
 	Click Button	select_test_case
 	Press Key.down ${n} Times
 	Press Combination	Key.enter
 
 Select Robot File OS DIALOG
+	[Documentation] 	To select a robot file in the Manager, it is required to set the Manager's scriptdir option to the robot file directory
 	[Arguments]		${robot_file_name}
 	# Sleep	5
 	Wait For Dialog Button		cancel
@@ -308,12 +307,13 @@ Get Scenario File Content
 
 Delete Scenario File
 	[Arguments]		${scenario_name}
+	Variable Should Exist	${global_path}	msg="Global save path does not exist"
 	Remove File		${global_path}${/}${scenario_name}.rfs
 	File Should Not Exist	${global_path}${/}${scenario_name}.rfs
 
 Delete Robot File
 	[Arguments]		${path}=${global_path}	${name}=${global_name}
-	Variable Should Exist	${path}	msg="Global save path does not exist or path is not provided."
+	Variable Should Exist	${path}	msg="Global save path does not exist or path is not provided"
 	Variable Should Exist	${name}	msg="Global file name does not exist or file name is not provided"
 	Remove File		${path}${/}${name}
 	File Should Not Exist	${path}${/}${name}

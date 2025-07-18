@@ -2,6 +2,8 @@
 Test Tags       Bugs 	CommandLine
 
 Resource 	resources/CommandLine_Manager.resource
+Resource 	../../Common/RFS_code.resource
+Resource 	../../Common/Database.resource
 
 Suite Setup 	Common.Basic Suite Initialization Manager
 

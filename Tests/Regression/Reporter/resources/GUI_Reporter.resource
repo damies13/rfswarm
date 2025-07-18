@@ -2,6 +2,8 @@
 Documentation 	This resource file contains keywords for Reporter GUI only.
 
 Resource 	../../../Common/GUI_Common.resource
+Resource 	../../../Common/GUI_Click.resource
+Resource 	../../../Common/GUI_Text.resource
 
 Library 	ArchiveLibrary
 Library 	DocTest.VisualTest

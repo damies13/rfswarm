@@ -1,5 +1,9 @@
 *** Settings ***
 Resource 	resources/CommandLine_Reporter.resource
+Resource 	../../Common/Directories_and_Files.resource
+Resource 	../../Common/INI_PIP_Data.resource
+Resource 	../../Common/Logs.resource
+Resource 	../../Common/RFS_Components.resource
 
 Suite Setup 	Common.Basic Suite Initialization Reporter
 

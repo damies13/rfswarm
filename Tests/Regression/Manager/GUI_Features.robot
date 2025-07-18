@@ -2,6 +2,10 @@
 Test Tags       Features 	GUI
 
 Resource 	resources/GUI_Manager.resource
+Resource 	../../Common/Logs.resource
+Resource 	../../Common/GUI_RFS_Components.resource
+Resource 	../../Common/CSV.resource
+Resource 	../../Common/Database.resource
 
 Library 	XML
 
@@ -23,7 +27,7 @@ Manager Command Line PORT -p
 	Open Manager GUI 	@{mngr_options}
 	Log To Console	Check if Agent can connect to the new port number. New port number: ${run_settings_data}[bind_port_number].
 	Run Agent CLI 	@{agent_options}
-	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
+	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready		30
 	Run Keyword If	not ${status}	Fail
 	...    msg=The agent did not connect to the new port number!
 	Log To Console	The Agent has connected to the Manager with ${run_settings_data}[bind_port_number] port and this was expected.
@@ -43,7 +47,7 @@ Manager Command Line IPADDRESS -e
 	Open Manager GUI 	-e  ${ipv4}[0]
 	Log To Console	Check if Agent can connect to the Manager via ${ipv4}[0].
 	Run Agent CLI	-m  http://${ipv4}[0]:8138/
-	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
+	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready		30
 	Run Keyword If	not ${status}	Fail
 	...    msg=The agent did not connect to the Manager via ${ipv4}[0]!
 	Log To Console	The Agent has connected to the Manager via ${ipv4}[0] and this was expected.
@@ -134,7 +138,7 @@ Manager Command Line SCENARIO -s
 
 	Open Manager GUI	@{mngr_options}
 	Run Agent CLI
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Click Tab	Plan
 	Log To Console	Run the example scenario to check that it has been loaded.
 
@@ -160,7 +164,7 @@ Manager Command Line AGENTS -a
 	Open Manager GUI	@{mngr_options}
 	Log To Console	Run Agents only once, but 2 are needed. The Manager should display a special message.
 	Run Agent CLI
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Click Tab	Plan
 	Click Button	runplay
 	${status}=	Run Keyword And Return Status
@@ -1202,13 +1206,13 @@ Check If Inject Sleep Option Was Executed in the Test
 	Copy File	${scenariofile}	${global_path}
 	Click Button	runopen
 	Open Scenario File OS DIALOG	${scenario_name}
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Click Tab	Plan
 	Click Button	runplay
 	Wait For the Scenario Run To Finish
 
 	Sleep	10
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 
 	@{excluded_files}=	Create List		Example_Test_Case.log	log.html	report.html		Example.log
 	${result_absolute_paths}	${result_file_names}
@@ -1283,7 +1287,7 @@ Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has
 	VAR 	@{mngr_options} 		-d 	${RESULTS_DIR} 	-s 	${scenariofile}
 
 	Open Manager GUI		@{mngr_options}
-	Wait Agent Ready
+	Wait For the Agent To Be Ready
 	Sleep	10s
 	Should Exist	${agent_script_dir}${/}Issue-#98.robot
 	Should Not Be Empty 	${agent_script_dir}${/}Issue-#98.robot
@@ -1325,7 +1329,7 @@ Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has
 	VAR 	@{mngr_options} 		-d 	${RESULTS_DIR} 	-s 	${scenariofile}
 
 	Open Manager GUI		@{mngr_options}
-	Wait Agent Ready
+	Wait For the Agent To Be Ready
 	Sleep	10s
 	Should Exist	${agent_script_dir}${/}Issue-#98.robot
 	Should Not Be Empty 	${agent_script_dir}${/}Issue-#98.robot
@@ -1414,7 +1418,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 
 	Log To Console	Check if Agent cant connect to the old port number, Old port number: ${old_port_number}.
 	Run Agent CLI 	-m  http://localhost:${old_port_number}/
-	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		60
+	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready		60
 	Run Keyword If	${status}	Fail
 	...    msg=The agent has connected to the old port number but should not!
 	Log To Console	The Agent did not connect to the Manager with ${old_port_number} port and this was expected.
@@ -1423,7 +1427,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 
 	Log To Console	Check if Agent can connect to the new port number. New port number: ${run_settings_data}[bind_port_number].
 	Run Agent CLI 	-m  http://localhost:${run_settings_data}[bind_port_number]/
-	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		60
+	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready		60
 	Run Keyword If	not ${status}	Fail
 	...    msg=The agent did not connect to the new port number!
 	Log To Console	The Agent has connected to the Manager with ${run_settings_data}[bind_port_number] port and this was expected.
@@ -1463,7 +1467,7 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	${altip}= 	Set Variable    127.0.0.1
 	Log To Console	Check if Agent cant connect to the Manager via ${altip} instead of ${ipv4}[0].
 	Run Agent CLI 	-m  http://${altip}:8138/
-	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
+	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready		30
 	Run Keyword If	${status}	Fail
 	...    msg=The agent has connected to the Manager via ${altip} but should not!
 	Log To Console	The Agent did not connect to the Manager via ${altip} and this was expected.
@@ -1472,7 +1476,7 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 
 	Log To Console	Check if Agent can connect to the Manager via ${ipv4}[0].
 	Run Agent CLI 	-m  http://${ipv4}[0]:8138/
-	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
+	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready		30
 	Run Keyword If	not ${status}	Fail
 	...    msg=The agent did not connect to the Manager via ${ipv4}[0]!
 	Log To Console	The Agent has connected to the Manager via ${ipv4}[0] and this was expected.
@@ -1727,7 +1731,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	Copy File	${CURDIR}${/}testdata${/}Issue-52${/}test_scenario.rfs	${global_path}
 	Click Button	runopen
 	Open Scenario File OS DIALOG	test_scenario
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Sleep	30
 
 	@{excluded_files}=	Create List  RFSListener3.py  RFSListener2.py  RFSTestRepeater.py
@@ -1773,7 +1777,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 
 	Click Button	runopen
 	Open Scenario File OS DIALOG	test_scenario
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Sleep	30
 
 	@{excluded_files}=	Create List  RFSListener3.py  RFSListener2.py  RFSTestRepeater.py
@@ -1818,7 +1822,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 
 	Click Button	runopen
 	Open Scenario File OS DIALOG	test_scenario
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Sleep	30
 
 	@{excluded_files}=	Create List  RFSListener3.py  RFSListener2.py  RFSTestRepeater.py
@@ -1860,7 +1864,7 @@ Verify If __init__.robot Files Get Transfered To the Agent Along With Robot/Resu
 	Log 	${M_absolute_paths}
 	Log 	${M_file_names}
 
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Sleep	30
 
 	Log To Console	Verify if all __init__.robot files get transfered to the Agent script folder
@@ -1904,7 +1908,7 @@ Check If The CSV Report Button Works In the Manager Before There Are Any Results
 	${test_dir}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#128
 	@{mngr_options}= 	Create List 	-d	${test_dir}	-s 	${test_dir}${/}Issue-#128.rfs
 	Open Manager GUI 		@{mngr_options}
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 
 	Click Tab	Run
 	Log To Console	Clicking CSV report button before there are any results.
@@ -1950,7 +1954,7 @@ Check If The CSV Report Button Works In The Manager After There Are Results
 	${test_dir}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#254
 	@{mngr_options}= 	Create List 	-d	${test_dir}	-s 	${test_dir}${/}Issue-#254.rfs
 	Open Manager GUI 		@{mngr_options}
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Click Tab	Plan
 	Click Button	runplay
 	Wait For the Scenario Run To Finish
@@ -2025,7 +2029,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 	Log To Console	${\n}The manager displayed the expected message. It is now waiting for the agent.${\n}
 
 	Run Agent CLI
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	${status}=	Run Keyword And Return Status
 	...    Wait For	${PLATFORM}_info_label_enough_agents_available.png 	timeout=${15}
 	Run Keyword If	not ${status}	Fail
@@ -2082,7 +2086,7 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 	${test_dir}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#17
 	@{mngr_options}= 	Create List 	-d	${test_dir}	-s 	${test_dir}${/}Issue-#17.rfs
 	Open Manager GUI 		@{mngr_options}
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Click Tab	Plan
 	Click Button	runplay
 	Wait For the Scenario Run To Finish
@@ -2210,7 +2214,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	Copy File	${scenariofile}		${global_path}
 	Click Button	runopen
 	Open Scenario File OS DIALOG	${scenario_name}
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Click Tab	Plan
 	Click Button	runplay
 
@@ -2229,7 +2233,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	Verify Generated Run Result Files	${run_result_dirs}[0]	${scenario_name}
 
 	Log To Console	${\n}${\n}All verifications passed. The test run is now being restarted.${\n}${\n}
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Click Tab	Plan
 	Click Button	runplay
 
@@ -2284,7 +2288,7 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	# Select Robot File	${robot_data}[0]
 	Select Robot File OS DIALOG 	${robot_data}[0]
 	Select 1 Robot Test Case
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Click Tab	Plan
 	Click Button	runplay
 
@@ -2322,7 +2326,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	Copy File	${scenariofile}		${global_path}
 	Click Button	runopen
 	Open Scenario File OS DIALOG	${scenario_name}
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Click Tab	Plan
 	Click Button	runplay
 	Stop Test Scenario Run Quickly	${15}	${60}
@@ -2349,7 +2353,7 @@ Check If Test Scenario Run Will Stop Gradually
 	Copy File	${scenariofile}		${global_path}
 	Click Button	runopen
 	Open Scenario File OS DIALOG	${scenario_name}
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Click Tab	Plan
 	Click Button	runplay
 	Stop Test Scenario Run Gradually	${15}	${60}
@@ -2376,7 +2380,7 @@ Check If Test Scenario Run Will Stop Gradually - TestRepeater
 	Copy File	${scenariofile}		${global_path}
 	Click Button	runopen
 	Open Scenario File OS DIALOG	${scenario_name}
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Click Tab	Plan
 	Click Button	runplay
 	Stop Test Scenario Run Gradually	${15}	${60}
@@ -2400,18 +2404,18 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 
 	Open Manager GUI	@{mngr_options}
 	Run Agent CLI
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Click Tab	Plan
 	Click Button	runplay
 	Wait For the Scenario Run To Finish 	time=${360}
 
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Log To Console 	Running scenario one more time to test if iteration counter get reset.
 	Click Tab	Plan
 	Click Button	runplay
 	Sleep	10
 	Wait For the Scenario Run To Finish 	time=${360}
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 
 	Log To Console 	Checking second run Database.
 	${dbfile}= 	Find Result DB 		result_pattern=*_Issue-#41*
@@ -2463,7 +2467,7 @@ Verify the Robot Count Reduces When Stop Agent While Test Is Running
 
 	Open Manager GUI	-s  ${scenario_path}
 	Run Agent CLI
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Click Tab	Plan
 	Click Button	runplay
 	Sleep	60
@@ -2674,7 +2678,7 @@ Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardl
 	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${RESULTS_DIR}
 	Open Manager GUI	@{mngr_options}
 	Run Agent CLI
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Click Tab	Plan
 	Click Button	runplay
 
@@ -2690,7 +2694,7 @@ Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardl
 	...    msg=Agent is not uploading logs immediately! Should be at least 1 after ~ 40s. Actual number:${logs_num}.
 
 	Press key.enter 1 Times
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
 	${logs_num2}=	Get Length	${run_logs}
 	Log To Console	Number of logs at the end of the test: ${logs_num2}
@@ -2722,7 +2726,7 @@ Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only Whe
 	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${RESULTS_DIR}
 	Open Manager GUI	@{mngr_options}
 	Run Agent CLI
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Click Tab	Plan
 	Click Button	runplay
 
@@ -2740,7 +2744,7 @@ Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only Whe
 	...    msg=Agent is uploading every logs but should upload only fail ones! Should be max 15 after ~ 65s. Actual number:${logs_num}.
 
 	Press key.enter 1 Times
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
 	${logs_num2}=	Get Length	${run_logs}
 	Log To Console	Number of logs at the end of the test: ${logs_num2}
@@ -2772,7 +2776,7 @@ Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 	@{mngr_options}=	Set Variable	-s	${scenariofile}	-d	${RESULTS_DIR}
 	Open Manager GUI	@{mngr_options}
 	Run Agent CLI
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Click Tab	Plan
 	Click Button	runplay
 
@@ -2792,7 +2796,7 @@ Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 	END
 
 	Press key.enter 1 Times
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	@{run_result_dirs}=		List Directories In Directory	${RESULTS_DIR}	pattern=*_all_deferred*	absolute=${True}
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
 	@{logs_dir}=	List Directories In Directory	${run_result_dirs}[0]	absolute=${True}
@@ -3285,7 +3289,7 @@ Verify That TPS Is TP And Not TPmS
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#155${/}tps.rfs
 	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-d 	${RESULTS_DIR} 	-g 	3
 	Open Manager GUI 	@{mngr_options}
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Click Tab 	Plan
 	Click Button 	runplay
 	Wait For the Scenario Run To Finish
@@ -3569,7 +3573,7 @@ Check If Monitoring settings are loaded and used
 	Wait For 	manager_${PLATFORM}_issue_173_plan_settings.png 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 
 	# Take A Screenshot
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Click Tab	Plan
 	Sleep 	0.5
 	Click Button	runplay

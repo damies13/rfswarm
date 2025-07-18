@@ -1,5 +1,10 @@
 *** Settings ***
 Resource 	resources/CommandLine_Agent.resource
+Resource 	../../Common/INI_PIP_Data.resource
+Resource 	../../Common/Logs.resource
+Resource 	../../Common/RFS_Components.resource
+Resource 	../../Common/RFS_code.resource
+Resource 	../../Common/Database.resource
 
 Suite Setup 	Common.Basic Suite Initialization Agent
 
