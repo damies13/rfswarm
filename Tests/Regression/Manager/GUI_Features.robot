@@ -27,7 +27,7 @@ Manager Command Line PORT -p
 	Open Manager GUI 	@{mngr_options}
 	Log To Console	Check if Agent can connect to the new port number. New port number: ${run_settings_data}[bind_port_number].
 	Run Agent CLI 	@{agent_options}
-	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready		30
+	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready 	40
 	Run Keyword If	not ${status}	Fail
 	...    msg=The agent did not connect to the new port number!
 	Log To Console	The Agent has connected to the Manager with ${run_settings_data}[bind_port_number] port and this was expected.

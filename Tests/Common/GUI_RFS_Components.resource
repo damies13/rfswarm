@@ -11,8 +11,16 @@ Resource 	GUI_Click.resource
 
 Handle Donation Reminder
 	${comp}= 	Convert To Lower Case 	${COMPONENT}
-	Run Keyword And Ignore Error 	Wait For 	${comp}_${PLATFORM}_button_closewindow.png 	timeout=30
-	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		7
+	Sleep 	3s
+	IF  '${COMPONENT}' == 'Manager'
+		Run Keyword And Ignore Error 	Click Button 	MaybeLater 		1
+		Run Keyword And Ignore Error 	Wait For 	manager_${PLATFORM}_button_runscriptrow.png 	timeout=20
+	ELSE IF  '${COMPONENT}' == 'Reporter'
+		Run Keyword And Ignore Error 	Click Button 	MaybeLater 		1
+		Run Keyword And Ignore Error 	Wait For 	reporter_${PLATFORM}_button_generateexcel.png 	timeout=20
+	END
+
+	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		8
 	VAR 	${DonationReminder} 	${found} 		scope=TEST
 
 Open ${component_name} GUI
