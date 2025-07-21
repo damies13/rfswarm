@@ -41,6 +41,7 @@ Get ${component_name} INI Location
 	RETURN 	${location}${/}RFSwarm${component_name}.ini
 
 Create ${component_name} INI File If It Does Not Exist
+	[Documentation] 	Pass the: Manager, Reporter or Agent
 	${location}= 	Get ${component_name} INI Location
 	${comp} 	Convert To Lower Case 	${component_name}
 
@@ -68,7 +69,18 @@ Create ${component_name} INI File If It Does Not Exist
 Get ${component_name} INI Data
 	[Documentation] 	Pass the: Manager, Reporter or Agent
 	${location}= 	Get ${component_name} INI Location
-	Create ${component_name} INI File If It Does Not Exist
+
+	${status_1}= 	Run Keyword And Return Status 	File Should Exist 			${location}
+	${status_2}= 	Run Keyword And Return Status 	File Should Not Be Empty 	${location}
+	&{OUTPUT} 	Create Dictionary
+	IF  not ${status_1}
+		Log 	The ${component_name} INI data could not be read. INI file does not exists. 	console=${True}
+		RETURN 	&{OUTPUT}
+	ELSE IF 	not ${status_2}
+		Log 	The ${component_name} INI data could not be read. INI file is empty. 	console=${True}
+		RETURN 	&{OUTPUT}
+	END
+
 	${cfg}= 	Evaluate 		configparser.ConfigParser()		modules=configparser
 	Evaluate 		$cfg.read('${location}')
 	${ini_content}= 	Convert To Dictionary 	${cfg}
@@ -78,6 +90,18 @@ Get ${component_name} INI Data
 Show ${component_name} INI Data
 	[Documentation] 	Pass the: Manager, Reporter or Agent
 	${location}= 	Get ${component_name} INI Location
+
+	${status_1}= 	Run Keyword And Return Status 	File Should Exist 			${location}
+	${status_2}= 	Run Keyword And Return Status 	File Should Not Be Empty 	${location}
+	&{OUTPUT} 	Create Dictionary
+	IF  not ${status_1}
+		Log 	The ${component_name} INI data could not be displayed. INI file does not exists. 	console=${True}
+		RETURN 	&{OUTPUT}
+	ELSE IF 	not ${status_2}
+		Log 	The ${component_name} INI data could not be displayed. INI file is empty. 	console=${True}
+		RETURN 	&{OUTPUT}
+	END
+
 	Log 	${location} 	console=${True}
 
 Change ${component_name} INI Option
@@ -85,5 +109,15 @@ Change ${component_name} INI Option
 	[Arguments] 	${section}  ${option}  ${new_value}
 	${location}= 	Get ${component_name} INI Location
 
-	Create ${component_name} INI File If It Does Not Exist
+	${status_1}= 	Run Keyword And Return Status 	File Should Exist 			${location}
+	${status_2}= 	Run Keyword And Return Status 	File Should Not Be Empty 	${location}
+	&{OUTPUT} 	Create Dictionary
+	IF  not ${status_1}
+		Log 	The ${component_name} INI data could not be edited. INI file does not exists. 	console=${True}
+		RETURN 	&{OUTPUT}
+	ELSE IF 	not ${status_2}
+		Log 	The ${component_name} INI data could not be edited. INI file is empty. 	console=${True}
+		RETURN 	&{OUTPUT}
+	END
+
 	Change INI Option 	${location}  ${section}  ${option}  ${new_value}

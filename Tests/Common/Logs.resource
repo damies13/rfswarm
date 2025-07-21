@@ -1,6 +1,8 @@
 *** Settings ***
 Resource 	Common.resource
 
+Resource 	Directories_and_Files.resource
+
 *** Keywords ***
 Find Log
 	[Documentation] 	Returns path to the stdout and stderr log file for current test
@@ -15,6 +17,7 @@ Find Log
 
 Show Log
 	[Arguments]		${filename}
+	File Should Exist 	${filename} 	The log could not be displayed. Provided file does not exists.
 	Log 		${\n}--VVV--${filename}--VVV-- 		console=True
 	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
 	Log 		${filedata} 		console=True

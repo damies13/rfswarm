@@ -34,7 +34,7 @@ GUI Suite Initialization ${component}
 	Log 	------------------------------------------------------------------------------\n\n\n 	console=True
 
 Press ${key} ${n} Times
-	[Documentation]	Provide full name. For example: Key.tab
+	[Documentation] 	Provide full name. For example: Key.tab
 	Sleep	1
 	FOR  ${i}  IN RANGE  0  ${n}
 		Press Combination 	${key}

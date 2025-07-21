@@ -6,6 +6,12 @@ Resource 	Common.resource
 # Paths, directories and files: #
 # # # # # # # # # # # # # # # # #
 
+Convert To Save Path
+	[Arguments] 	${path}
+	${safe_path} 		Evaluate 	re.sub(r'[<>:"/\\|?*]', '_', "${path}".replace(' ', '_')).replace(chr(0), '_').rstrip(' .')[:60] 	modules=re
+
+	RETURN 	${safe_path}
+
 Wait For File To Exist
 	[Arguments] 	${filepath} 	${timeout}=${120}
 	TRY

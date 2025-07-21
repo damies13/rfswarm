@@ -168,6 +168,7 @@ Non-ASCII Suite Teardown
 	Remove Directory 	${test_data}${/}manager_results 	recursive=${True}
 
 Non-ASCII Test Setup
+	Create Reporter INI File If It Does Not Exist
 	Set Reporter INI Window Size 	1200 	700
 
 Non-ASCII Test Teardown

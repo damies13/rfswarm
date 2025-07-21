@@ -15,13 +15,16 @@ Test Teardown 	Close Reporter GUI
 *** Test Cases ***
 Verify That Files Get Saved With Correct Extension And Names
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #39 	Issue #257
-	[Setup] 	Set Reporter INI Window Size 	height=600
+	[Setup] 	Run Keywords
+	...    Create Reporter INI File If It Does Not Exist 	AND
+	...    Set Reporter INI Window Size 	height=600
 	${testdata}=		Set Variable	Issue-#39
 	${resultdata}=		Set Variable	20240622_182505_Issue-#39
 	${basefolder}=		Set Variable	${CURDIR}${/}testdata${/}${testdata}
 	${resultfolder}=	Set Variable	${basefolder}${/}${resultdata}
 	${templatefolder}=	Set Variable	${resultfolder}${/}template_dir
 	${templatename}=	Set Variable	Issue-#39
+	Create Reporter INI File If It Does Not Exist
 	Change Reporter INI Option 	Reporter 	templatedir 	${templatefolder}
 
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
@@ -1035,7 +1038,9 @@ Change Line Colour
 
 Change Font
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #148
-	[Setup] 	Set Reporter INI Window Size 	height=600
+	[Setup] 	Run Keywords
+	...    Create Reporter INI File If It Does Not Exist 	AND
+	...    Set Reporter INI Window Size 	height=600
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}Issue-#148
 	VAR 	${result_name} 	20250327_221800_example
 	VAR 	${result_dir} 	${test_data}${/}${result_name}
@@ -1162,7 +1167,9 @@ Change Font
 
 Verify Filter Metric For Data Table and Graph - Wildcard
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
-	[Setup] 	Set Reporter INI Window Size 	height=600
+	[Setup] 	Run Keywords
+	...    Create Reporter INI File If It Does Not Exist 	AND
+	...    Set Reporter INI Window Size 	height=600
 	VAR 	${issue} 	Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
 	VAR 	${result_name} 	20250501_103943_example
@@ -1242,7 +1249,9 @@ Verify Filter Metric For Data Table and Graph - Wildcard
 
 Verify Filter Metric For Data Table and Graph - Not Wildcard
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
-	[Setup] 	Set Reporter INI Window Size 	height=600
+	[Setup] 	Run Keywords
+	...    Create Reporter INI File If It Does Not Exist 	AND
+	...    Set Reporter INI Window Size 	height=600
 	VAR 	${issue} 	Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
 	VAR 	${result_name} 	20250501_103943_example
@@ -1322,7 +1331,9 @@ Verify Filter Metric For Data Table and Graph - Not Wildcard
 
 Verify Filter Result For Data Table and Graph - Wildcard
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
-	[Setup] 	Set Reporter INI Window Size 	height=600
+	[Setup] 	Run Keywords
+	...    Create Reporter INI File If It Does Not Exist 	AND
+	...    Set Reporter INI Window Size 	height=600
 	VAR 	${issue} 	Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
 	VAR 	${result_name} 	20250501_103943_example
@@ -1402,7 +1413,9 @@ Verify Filter Result For Data Table and Graph - Wildcard
 
 Verify Filter Result For Data Table and Graph - Not Wildcard
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
-	[Setup] 	Set Reporter INI Window Size 	height=600
+	[Setup] 	Run Keywords
+	...    Create Reporter INI File If It Does Not Exist 	AND
+	...    Set Reporter INI Window Size 	height=600
 	VAR 	${issue} 	Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
 	VAR 	${result_name} 	20250501_103943_example
@@ -1482,7 +1495,9 @@ Verify Filter Result For Data Table and Graph - Not Wildcard
 
 Verify Filter Result For Data Table and Graph - Filter Result
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
-	[Setup] 	Set Reporter INI Window Size 	height=600
+	[Setup] 	Run Keywords
+	...    Create Reporter INI File If It Does Not Exist 	AND
+	...    Set Reporter INI Window Size 	height=600
 	VAR 	${issue} 	Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
 	VAR 	${result_name} 	20250501_103943_example

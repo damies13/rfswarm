@@ -24,6 +24,7 @@ Handle Donation Reminder
 	VAR 	${DonationReminder} 	${found} 		scope=TEST
 
 Open ${component_name} GUI
+	[Documentation] 	Open one of the RFSwarm applications for GUI purposes. Pass the: Manager, Reporter or Agent
 	[Arguments] 	@{appargs}
 	${comp} 	Convert To Lower Case 	${component_name}
 	${var}= 	Get Variables
@@ -52,6 +53,7 @@ Open ${component_name} GUI
 	END
 
 Close ${component_name} GUI
+	[Documentation] 	Closes one of the RFSwarm applications with GUI. Pass the: Manager or Reporter
 	${comp} 	Convert To Lower Case 	${component_name}
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 	0.01
 	Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01

@@ -530,6 +530,9 @@ class RFSwarmCore:
 		#
 		# GUI
 		#
+		if not base.args.nogui:
+			base.gui = RFSwarmGUItk(base)
+
 		if 'GUI' not in base.config:
 			base.config['GUI'] = {}
 			base.saveini()
@@ -657,8 +660,6 @@ class RFSwarmCore:
 			base.save_ini = False
 			if not base.args.run:
 				base.args.run = True
-		else:
-			base.gui = RFSwarmGUItk(base)
 
 		self.BuildCore()
 

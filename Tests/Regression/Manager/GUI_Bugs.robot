@@ -77,6 +77,7 @@ Verify If Manager Runs With Existing INI File From Previous Version
 Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #362
 	[Setup]	Run Keywords
+	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY} 	AND
 	...    Set Manager INI Window Size 	1200 	600
 

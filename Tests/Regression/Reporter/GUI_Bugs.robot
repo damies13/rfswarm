@@ -212,6 +212,7 @@ Template with Start and End Dates
 	${testresultfolder0}=	Set Variable	${OUTPUT DIR}${/}${templatename}${/}${resultdata0}
 	${testresultfolder1}=	Set Variable	${OUTPUT DIR}${/}${templatename}${/}${resultdata1}
 
+	Create Reporter INI File If It Does Not Exist
 	Change Reporter INI Option 	Reporter 	templatedir 	${templatefolder}
 	Create Directory		${templatefolder}
 
@@ -400,6 +401,7 @@ Open New Template After Selecting a Section That Is Not In the New Template
 	VAR 	${resultdata} 			20230320_185055_demo
 	VAR 	${resultfolder} 		${basefolder}${/}${resultdata}
 
+	Create Reporter INI File If It Does Not Exist
 	Change Reporter INI Option 	Reporter 	templatedir 	${basefolder}
 
 	Open Reporter GUI 	-d 	${resultfolder} 	-t 	${first_template}

@@ -1,6 +1,7 @@
 *** Settings ***
 Resource 	Common.resource
 
+Resource 	Directories_and_Files.resource
 Resource 	INI_PIP_Data.resource
 Resource 	Logs.resource
 
@@ -23,6 +24,7 @@ ${PYFILE_REPORTER} 	${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
 # # # # # # # # # # # # #
 
 Run ${component_name} CLI
+	[Documentation] 	Open one of the RFSwarm applications for CLI purposes. Pass the: Manager, Reporter or Agent
 	[Arguments] 	@{appargs} 	${noargs}=${False}
 	${comp} 	Convert To Lower Case 	${component_name}
 	${len} 		Get Length 	${appargs}
@@ -74,6 +76,7 @@ Run ${component_name} CLI
 	Log 	*==== ${component_name} started ===* 	console=${True}
 
 Stop ${component_name} CLI
+	[Documentation] 	Closes one of the RFSwarm applications with CLI only. Pass the: Manager, Reporter or Agent
 	${comp} 	Convert To Lower Case 	${component_name}
 
 	${running}= 	Is Process Running 	${PROCESS_${comp}}
@@ -121,6 +124,7 @@ Stop ${component_name} CLI
 	...    Set Suite Variable 	${PROCESS_${comp}} 	${None} 	AND 	Kill If Still Running 	${CMD_${comp}}
 
 Wait For ${component_name} Process
+	[Documentation] 	Pass the: Manager, Reporter or Agent
 	[Arguments] 	${timeout}=30min
 	${comp} 	Convert To Lower Case 	${component_name}
 

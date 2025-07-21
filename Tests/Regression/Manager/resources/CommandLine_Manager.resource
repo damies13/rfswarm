@@ -27,6 +27,7 @@ Set Global Filename And Default Save Path
 	...    You can also provide optional save path.
 	[Arguments]		${input_name}	${optional_path}=${None}
 
+	Create Manager INI File If It Does Not Exist
 	Set Test Variable	${global_name}	${input_name}
 	${location}=	Get Manager Default Save Path
 	Set Test Variable	${global_path}	${location}
