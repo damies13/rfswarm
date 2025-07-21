@@ -530,8 +530,6 @@ class RFSwarmCore:
 		#
 		# GUI
 		#
-		if not base.args.nogui:
-			base.gui = RFSwarmGUItk(base)
 
 		if 'GUI' not in base.config:
 			base.config['GUI'] = {}
@@ -575,6 +573,7 @@ class RFSwarmCore:
 				base.config['Plan']['ScenarioDir'] = base.inisafedir(base.dir_path)
 				base.saveini()
 
+		missing_scenario = False
 		if 'ScenarioFile' not in base.config['Plan']:
 			base.config['Plan']['ScenarioFile'] = ""
 			base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
@@ -584,8 +583,8 @@ class RFSwarmCore:
 			base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
 			if not os.path.exists(base.config['Plan']['ScenarioFile']):
 				if len(base.config['Plan']['ScenarioFile']) > 1:
+					missing_scenario = True
 					msg = "Scenario file Not found:\n" + base.config['Plan']['ScenarioFile']
-					self.display_warning(msg)
 				base.config['Plan']['ScenarioFile'] = ""
 				base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
 				base.config['Plan']['ScriptDir'] = base.inisafedir(base.dir_path)
@@ -660,6 +659,11 @@ class RFSwarmCore:
 			base.save_ini = False
 			if not base.args.run:
 				base.args.run = True
+		else:
+			base.gui = RFSwarmGUItk(base)
+
+		if missing_scenario:
+			self.display_warning(msg)
 
 		self.BuildCore()
 
