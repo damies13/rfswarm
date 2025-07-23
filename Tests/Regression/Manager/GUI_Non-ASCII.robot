@@ -1,7 +1,12 @@
 *** Settings ***
 Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #97 	Languages
 
-Resource 	GUI_Common.robot
+Resource 	resources/GUI_Manager.resource
+Resource 	../../Common/Logs.resource
+Resource 	../../Common/GUI_RFS_Components.resource
+Resource 	../../Common/CSV.resource
+Resource 	../../Common/Database.resource
+
 Variables 	${CURDIR}${/}testdata${/}Issue-#97${/}lang_samples.yaml
 
 Suite Setup 	Non-ASCII Suite Setup
@@ -14,7 +19,6 @@ Suite Teardown 	Non-ASCII Suite Teardown
 *** Variables ***
 ${test_data} 		${CURDIR}${/}testdata${/}Issue-#97
 ${scenario_name} 	${None}
-${results_dir} 		${None}
 ${agent_name} 		${None}
 
 
@@ -40,17 +44,17 @@ Test Non-ASCII Characters
 
 	VAR 	${sample} 	${Samples.${langcode}}
 	VAR 	${scenario_name} 	${langcode}_scenario 		scope=TEST
-	VAR 	${results_dir} 		${test_data}${/}results 	scope=TEST
+	VAR 	${RESULTS_DIR} 		${test_data}${/}results 	scope=TEST
 	VAR 	${agent_name} 		${sample} 					scope=TEST
-	Create Directory 	${results_dir}
+	Create Directory 	${RESULTS_DIR}
 	${robot_file} 	${scenario_file}= 	Create Language Files 	${langcode} 	${sample}
-	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${results_dir}
+	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${RESULTS_DIR}
 	VAR 	@{agnt_options} 	-a 	${agent_name}
 
-	Open Agent 			${agnt_options}
-	Open Manager GUI 	${mngr_options}
+	Run Agent CLI 		@{agnt_options}
+	Open Manager GUI 	@{mngr_options}
 	Take A Screenshot
-	Check If The Agent Is Ready
+	Wait For the Agent To Be Ready
 	Click Tab 	Plan
 	Click Button	runplay
 
@@ -65,7 +69,7 @@ Test Non-ASCII Characters
 
 Non-ASCII Suite Setup
 	Remove Directory 	${OUTPUT DIR}${/}results${/}Issue-#97 	recursive=${True}
-	Set Platform
+	GUI_Common.GUI Suite Initialization Manager
 
 Non-ASCII Suite Teardown
 	Copy Directory 		${test_data} 	${OUTPUT DIR}${/}results${/}Issue-#97
@@ -74,12 +78,13 @@ Non-ASCII Suite Teardown
 
 Non-ASCII Test Setup
 	${mgrini}= 	Get Manager INI Location
-	Set INI Window Size 	1200 	600
+	Create Manager INI File If It Does Not Exist
+	Set Manager INI Window Size 	1200 	600
 
 Non-ASCII Test Teardown
-	Stop Agent
-	Run Keyword		Close Manager GUI ${platform}
-	Check Logs
+	Stop Agent CLI
+	Close Manager GUI
+	Check Non-ASCII Logs
 
 Create Language Files
 	[Arguments] 	${langcode} 	${sample}
@@ -100,7 +105,7 @@ Create Language Files
 Check DB For Metrics
 	[Arguments] 	${langcode} 	${sample}
 	Log 	\tChecking run Database 	console=${True}
-	${dbfile}= 	Find Result DB 	directory=${results_dir}	result_pattern=*_${scenario_name}*
+	${dbfile}= 	Find Result DB 	directory=${RESULTS_DIR}	result_pattern=*_${scenario_name}*
 	${db_query_result}= 	Query Result DB 	${dbfile}
 	...    SELECT count(*) FROM MetricData WHERE PrimaryMetric='${sample} Keyword'
 
@@ -112,12 +117,12 @@ Check CSV Files
 	Log 	\tChecking CSV Files 	console=${True}
 	VAR 	@{keywords} 	${sample} Keyword 	${sample} Fail Keyword
 
-	@{test_results}=	List Directories In Directory	${results_dir}		absolute=${True}	pattern=*${scenario_name}
+	@{test_results}=	List Directories In Directory	${RESULTS_DIR}		absolute=${True}	pattern=*${scenario_name}
 	@{csv_file_paths}=		List Files In Directory		${test_results}[0]	*.csv	absolute=${True}
 	Length Should Be	${csv_file_paths}	3	msg=Some CSV files are missing!
 
 	FOR  ${i}  IN RANGE  0  3
-		${csv_rows_content_list}=	Convert CSV File Cells To a List		${csv_file_paths}[${i}]		csv_separator=,
+		@{csv_rows_content_list}= 	Convert CSV File Cells To a List 	${csv_file_paths}[${i}]		csv_separator=,
 		Log To Console	${\n}\tCSV report file found: ${csv_file_paths}[${i}]
 		Log 	${csv_rows_content_list}
 
@@ -138,7 +143,7 @@ Check CSV Files
 			Length Should Be	${third_row}	9	msg=Some columns in summary.csv are missing in third row, should be 9 of them!
 
 		ELSE IF  '${csv_report_file_type}' == 'raw_result_data.csv'
-			${len}=		Get Length	${csv_rows_content_list}
+			${len}= 	Get Length 	${csv_rows_content_list}
 			Should Be True	${len} >= ${3}		msg=Some rows in raw_result_data.csv are missing, should be at least 3!
 
 			FOR  ${j}  IN RANGE  1  ${len}
@@ -166,11 +171,14 @@ Check CSV Files
 		END
 	END
 
-Check Logs
-	${stdout_manager}= 		Read Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	${stderr_manager}= 		Read Log 	${OUTPUT DIR}${/}stderr_manager.txt
-	${stdout_agent}= 		Read Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	${stderr_agent}= 		Read Log 	${OUTPUT DIR}${/}stderr_agent.txt
+Check Non-ASCII Logs
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+
+	${stdout_manager}= 		Read Log 	${stdout_manager_path}
+	${stderr_manager}= 		Read Log 	${stderr_manager_path}
+	${stdout_agent}= 		Read Log 	${stdout_agent_path}
+	${stderr_agent}= 		Read Log 	${stderr_agent_path}
 
 	Should Not Contain 	${stdout_manager} 	RuntimeError
 	Should Not Contain 	${stderr_manager} 	RuntimeError

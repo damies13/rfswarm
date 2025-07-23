@@ -274,8 +274,11 @@ class AgentServer(BaseHTTPRequestHandler):
 			httpcode = 500
 			message = str(e)
 		self.send_response(httpcode)
-		self.end_headers()
-		self.wfile.write(bytes(message, "utf-8"))
+		try:
+			self.end_headers()
+			self.wfile.write(bytes(message, "utf-8"))
+		except Exception as e:
+			base.debugmsg(6, "Disconnected before response was sent:", e)
 		threadend = time.time()
 		# base.debugmsg(5, parsed_path.path, "	threadstart:", "%.3f" % threadstart, "threadend:", "%.3f" % threadend, "Time Taken:", "%.3f" % (threadend-threadstart))
 		base.debugmsg(7, "%.3f" % (threadend - threadstart), "seconds for ", parsed_path.path)
@@ -355,8 +358,11 @@ class AgentServer(BaseHTTPRequestHandler):
 			message = str(e)
 
 		self.send_response(httpcode)
-		self.end_headers()
-		self.wfile.write(bytes(message, "utf-8"))
+		try:
+			self.end_headers()
+			self.wfile.write(bytes(message, "utf-8"))
+		except Exception as e:
+			base.debugmsg(6, "Disconnected before response was sent:", e)
 		threadend = time.time()
 		# base.debugmsg(5, parsed_path.path, "		threadstart:", "%.3f" % threadstart, "threadend:", "%.3f" % threadend, "Time Taken:", "%.3f" % (threadend-threadstart))
 		base.debugmsg(5, "%.3f" % (threadend - threadstart), "seconds for ", parsed_path.path)
@@ -524,6 +530,7 @@ class RFSwarmCore:
 		#
 		# GUI
 		#
+
 		if 'GUI' not in base.config:
 			base.config['GUI'] = {}
 			base.saveini()
@@ -566,6 +573,7 @@ class RFSwarmCore:
 				base.config['Plan']['ScenarioDir'] = base.inisafedir(base.dir_path)
 				base.saveini()
 
+		missing_scenario = False
 		if 'ScenarioFile' not in base.config['Plan']:
 			base.config['Plan']['ScenarioFile'] = ""
 			base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
@@ -575,8 +583,8 @@ class RFSwarmCore:
 			base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
 			if not os.path.exists(base.config['Plan']['ScenarioFile']):
 				if len(base.config['Plan']['ScenarioFile']) > 1:
+					missing_scenario = True
 					msg = "Scenario file Not found:\n" + base.config['Plan']['ScenarioFile']
-					self.display_warning(msg)
 				base.config['Plan']['ScenarioFile'] = ""
 				base.debugmsg(6, "Plan:scenariofile: ", base.config['Plan']['ScenarioFile'])
 				base.config['Plan']['ScriptDir'] = base.inisafedir(base.dir_path)
@@ -653,6 +661,9 @@ class RFSwarmCore:
 				base.args.run = True
 		else:
 			base.gui = RFSwarmGUItk(base)
+
+		if missing_scenario:
+			self.display_warning(msg)
 
 		self.BuildCore()
 

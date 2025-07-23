@@ -1,21 +1,24 @@
 *** Settings ***
-Resource 	GUI_Common.robot
+Resource 	resources/GUI_Reporter.resource
+Resource 	../../Common/Directories_and_Files.resource
+Resource 	../../Common/Logs.resource
+Resource 	../../Common/GUI_RFS_Components.resource
 
-Test Teardown 	Close GUI
+Suite Setup 	GUI_Common.GUI Suite Initialization Reporter
+
+Test Teardown 	Close Reporter GUI
 
 *** Test Cases ***
 GUI Runs and Closes
 	[Tags]	macos-latest		windows-latest		ubuntu-latest
-	Open GUI
+	Open Reporter GUI
 	Wait For Status 	PreviewLoaded
-	# Close GUI
 
 Select Preview Tab
 	[Tags]	ubuntu-latest		windows-latest		macos-latest
-	Open GUI
+	Open Reporter GUI
 	Wait For Status 	PreviewLoaded
 	Click Tab 	 Preview
-	# Close GUI
 
 	# Accessability Settings test was to verify Terminal is set to 'check'
 	# 		https://stackoverflow.com/questions/62035751/pyautogui-not-running-on-mac-catalina
@@ -25,20 +28,20 @@ Select Preview Tab
 	# 	# setting -> security & privacy -> Accessibility -> Terminal 'check'
 	#
 	# 	# Open Settings
-	# 	${img}=	Set Variable		${platform}_settings.png
-	# 	Wait For 	${img} 	 timeout=${default_image_timeout}
+	# 	${img}=	Set Variable		${PLATFORM}_settings.png
+	# 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# 	@{coordinates}= 	Locate		${img}
 	# 	Click Image		${img}
 	#
 	#
 	# 	# Open security & privacy
-	# 	${img}=	Set Variable		${platform}_settings_privsec.png
-	# 	Wait For 	${img} 	 timeout=${default_image_timeout}
+	# 	${img}=	Set Variable		${PLATFORM}_settings_privsec.png
+	# 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# 	Click Image		${img}
 	#
 	# 	# Open Accessibility
-	# 	${img}=	Set Variable		${platform}_settings_accessibility.png
-	# 	${imgsd}=	Set Variable		${platform}_settings_scrolldown.png
+	# 	${img}=	Set Variable		${PLATFORM}_settings_accessibility.png
+	# 	${imgsd}=	Set Variable		${PLATFORM}_settings_scrolldown.png
 	# 	${found}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=10
 	# 	WHILE 	not ${found}
 	# 		Take A Screenshot
@@ -54,8 +57,8 @@ Select Preview Tab
 	# 	Take A Screenshot
 	# 	Fatal Error 	Intentional Fail
 	#
-	# 	Click Image		reporter_${platform}_button_closewindow.png
-	# 	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
+	# 	Click Image		reporter_${PLATFORM}_button_closewindow.png
+	# 	Run Keyword And Ignore Error 	Click Image		reporter_${PLATFORM}_button_closewindow.png
 	# 	Take A Screenshot
 	# 	Sleep 	0.5
 	#
@@ -69,5 +72,3 @@ Select Preview Tab
 # 	[Documentation]		Uncomment this test if you want to trigger updating Screenshots in the git repo
 # 	...								Ensure this is commented out before release or pull request
 # 	Fail
-
-*** Keywords ***

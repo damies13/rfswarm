@@ -1,9 +1,12 @@
 *** Settings ***
 Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #238 	Languages
 
-Resource 	GUI_Common.robot
+Resource 	resources/GUI_Manager.resource
+Resource 	../../Common/Logs.resource
+Resource 	../../Common/GUI_RFS_Components.resource
 
-Suite Setup 	Set Platform
+Suite Setup 	GUI_Common.GUI Suite Initialization Manager
+
 Test Setup 	Language Test Init
 Test Teardown 	Language Test End
 Test Template 	Add Test In Language
@@ -41,9 +44,8 @@ Add Test In Language
 	[Arguments] 	${langcode}
 	Log 	${langcode} 	console=True
 	${scenariofile}= 		Create ${langcode} Language Scenario
-	@{mngr_options}= 	Create List 	-s 	${scenariofile}
-	Open Manager GUI 		${mngr_options}
-	Check If The Agent Is Ready
+	Open Manager GUI 		-s 	${scenariofile}
+	Wait For the Agent To Be Ready
 	Click Tab 	Plan
 	Take A Screenshot
 	Check Agent Downloaded ${langcode} Language Test Files
@@ -51,13 +53,14 @@ Add Test In Language
 
 Language Test Init
 	${mgrini}= 	Get Manager INI Location
-	Set INI Window Size 	1200 	600
+	Create Manager INI File If It Does Not Exist
+	Set Manager INI Window Size 	1200 	600
 	# ${options}= 	Create List 	 	-d 	${agent_dir}
-	Open Agent
+	Run Agent CLI
 
 Language Test End
-	Run Keyword		Close Manager GUI ${platform}
-	Stop Agent
+	Close Manager GUI
+	Stop Agent CLI
 
 
 

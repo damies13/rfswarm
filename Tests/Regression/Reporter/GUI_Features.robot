@@ -1,27 +1,38 @@
 *** Settings ***
-Resource 	GUI_Common.robot
+Resource 	resources/GUI_Reporter.resource
+Resource 	resources/Reporter_DOCX.resource
+Resource 	resources/Reporter_HTML.resource
+Resource 	resources/Reporter_XLSX.resource
 
-Suite Setup 	Set Platform
-Test Teardown 	Close GUI
+Resource 	../../Common/Directories_and_Files.resource
+Resource 	../../Common/Logs.resource
+Resource 	../../Common/INI_PIP_Data.resource
+Resource 	../../Common/GUI_RFS_Components.resource
+
+Suite Setup 	GUI_Common.GUI Suite Initialization Reporter
+Test Teardown 	Close Reporter GUI
 
 *** Test Cases ***
 Verify That Files Get Saved With Correct Extension And Names
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #39 	Issue #257
-	[Setup] 	Change Reporter INI File Settings 	win_height 	600
+	[Setup] 	Run Keywords
+	...    Create Reporter INI File If It Does Not Exist 	AND
+	...    Set Reporter INI Window Size 	height=600
 	${testdata}=		Set Variable	Issue-#39
 	${resultdata}=		Set Variable	20240622_182505_Issue-#39
 	${basefolder}=		Set Variable	${CURDIR}${/}testdata${/}${testdata}
 	${resultfolder}=	Set Variable	${basefolder}${/}${resultdata}
 	${templatefolder}=	Set Variable	${resultfolder}${/}template_dir
 	${templatename}=	Set Variable	Issue-#39
-	Change Reporter INI File Settings	templatedir		${templatefolder}
+	Create Reporter INI File If It Does Not Exist
+	Change Reporter INI Option 	Reporter 	templatedir 	${templatefolder}
 
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	Log to console 	basefolder: ${basefolder} 	console=True
 	Log 	resultfolder: ${resultfolder} 	console=True
 	Log To Console	Files to check: report file, report template, output files from reporter (html docx xlsx)
 
-	Open GUI	-d 	${resultfolder}
+	Open Reporter GUI	-d 	${resultfolder}
 	Click Button	savetemplate
 	Save Template File OS DIALOG	${templatename}
 	Click Button	generateword
@@ -56,7 +67,7 @@ Verify That Files Get Saved With Correct Extension And Names
 	[Teardown]	Run Keywords
 	...    Remove File	${templatefolder}${/}Issue-#39*						AND
 	...    Create File		${templatefolder}${/}here_will_be_template.txt	AND
-	...    Close GUI
+	...    Close Reporter GUI
 
 Whole report time range
 	[Tags]	ubuntu-latest 	windows-latest 	Issue #138
@@ -74,7 +85,7 @@ Whole report time range
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini
+	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
@@ -88,10 +99,10 @@ Whole report time range
 	# check the graph as expected
 	# Take A Screenshot
 	Set Confidence		0.7
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_robots1_py3.9.png
+	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		Locate 	reporter_${PLATFORM}_graph_robots1_py3.9.png
 	ELSE
-		Locate 	reporter_${platform}_graph_robots1.png
+		Locate 	reporter_${PLATFORM}_graph_robots1.png
 	END
 	Set Confidence		0.9
 
@@ -146,16 +157,16 @@ Whole report time range
 
 	# check the graph as expected
 	Set Confidence		0.7
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_robots2_py3.9.png
+	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		Locate 	reporter_${PLATFORM}_graph_robots2_py3.9.png
 	ELSE
-		Locate 	reporter_${platform}_graph_robots2.png
+		Locate 	reporter_${PLATFORM}_graph_robots2.png
 	END
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI
+	...    Close Reporter GUI
 
 Verify if reporter handle missing test result file
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #157
@@ -169,26 +180,26 @@ Verify if reporter handle missing test result file
 	Log to console 	basefolder: ${basefolder} 	console=True
 	Log 	resultfolder: ${resultfolder} 	console=True
 
-	Open GUI	-d 	${resultfolder}
+	Open Reporter GUI	-d 	${resultfolder}
 	Wait For Status 	PreviewLoaded
-	Close GUI
+	Close Reporter GUI
 
 	Should Exist	${basefolder}${/}result_backup${/}${resultdata}.db
 	Remove File		${resultfolder}${/}${resultdata}.db
 
-	Open GUI	-d 	${resultfolder}
+	Open Reporter GUI	-d 	${resultfolder}
 	Sleep	10
 	Click Section	test_result_summary
 	Click	#double click needed. Maybe delete after eel module implemetation
 
 	${status}=	Run Keyword And Return Status
-	...    Wait For	reporter_${platform}_option_datatable.png 	timeout=${30}
+	...    Wait For	reporter_${PLATFORM}_option_datatable.png 	timeout=${30}
 	Run Keyword If	not ${status}	Fail	msg=Reporter is not responding!
 
 	[Teardown]	Run Keywords
 	...    Copy File	${basefolder}${/}result_backup${/}${resultdata}.db	${resultfolder}		AND
 	...    Remove File	${basefolder}${/}result_backup${/}${resultdata}.db						AND
-	...    Close GUI
+	...    Close Reporter GUI
 
 Verify the Content Of the HTML Report
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #36 	HTML 	robot:continue-on-failure
@@ -205,12 +216,12 @@ Verify the Content Of the HTML Report
 	VAR 	${move_tolerance} 		30
 
 	Log 	template: ${template_dir} 	console=True
-	Open GUI	-d 	${resultfolder} 	-t 	${template_dir}
+	Open Reporter GUI	-d 	${resultfolder} 	-t 	${template_dir}
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=300
 	Take A Screenshot
 	Click Button	generatehtml
 	Wait Until Created 	${html_file}	timeout=9 minutes
-	Close GUI
+	Close Reporter GUI
 
 	Log To Console	Verification of saved data in the RFSwarm HTML report started.
 	${html} 	Parse HTML File 	${html_file}
@@ -381,7 +392,7 @@ Verify the Content Of the HTML Report
 	Verify HTML Report Error Details Content 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path}
 
 	[Teardown] 	Run Keywords
-	...    Close GUI	AND
+	...    Close Reporter GUI	AND
 	...    Move File 	${html_file} 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.html
 
 Verify the Content Of the DOCX Report
@@ -399,12 +410,12 @@ Verify the Content Of the DOCX Report
 	VAR 	${move_tolerance} 		30
 
 	Log 	template: ${template_dir} 	console=True
-	Open GUI	-d 	${resultfolder} 	-t 	${template_dir}
+	Open Reporter GUI	-d 	${resultfolder} 	-t 	${template_dir}
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=300
 	Take A Screenshot
 	Click Button	generateword
 	Wait Until Created 	${resultfolder}${/}${resultdata}.docx	timeout=9 minutes
-	Close GUI
+	Close Reporter GUI
 
 	Log To Console	Verification of saved data in the RFSwarm DOCX report started.
 	File Should Exist 	${docx_file}
@@ -544,7 +555,7 @@ Verify the Content Of the DOCX Report
 	Verify DOCX Report Error Details Content 	${docx_data} 	${section} 	${docx_file} 	${docx_expected_img_path} 	${docx_img_path}
 
 	[Teardown] 	Run Keywords
-	...    Close GUI	AND
+	...    Close Reporter GUI	AND
 	...    Move File 	${docx_file} 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.docx
 
 Verify the Content Of the XLSX Report
@@ -562,12 +573,12 @@ Verify the Content Of the XLSX Report
 	VAR 	${move_tolerance} 		30
 
 	Log 	template: ${template_dir} 	console=True
-	Open GUI	-d 	${resultfolder} 	-t 	${template_dir}
+	Open Reporter GUI	-d 	${resultfolder} 	-t 	${template_dir}
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=300
 	Take A Screenshot
 	Click Button	generateexcel
 	Wait Until Created 	${xlsx_file}	timeout=9 minutes
-	Close GUI
+	Close Reporter GUI
 
 	Log To Console	Verification of saved data in the RFSwarm XLSX report started.
 	File Should Exist 	${xlsx_file}
@@ -743,7 +754,7 @@ Verify the Content Of the XLSX Report
 	Verify XLSX Report Error Details Content 	${xlsx_file} 	${section} 	${xlsx_sheet} 	${xlsx_expected_img_path} 	${xlsx_img_path}
 
 	[Teardown] 	Run Keywords
-	...    Close GUI	AND
+	...    Close Reporter GUI	AND
 	...    Move File 	${xlsx_file} 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.xlsx
 
 Check Application Icon or Desktop Shortcut in GUI
@@ -774,7 +785,7 @@ Verify Plan Graph - No Total
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
+	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
@@ -809,17 +820,17 @@ Verify Plan Graph - No Total
 	${pvinfo}= 	Get Python Version Info
 
 	Set Confidence		0.7
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_plannototal_py3.9.png
+	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		Locate 	reporter_${PLATFORM}_graph_plannototal_py3.9.png
 	ELSE
-		Locate 	reporter_${platform}_graph_plannototal.png
+		Locate 	reporter_${PLATFORM}_graph_plannototal.png
 	END
 	Set Confidence		0.9
 
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI 		AND
+	...    Close Reporter GUI 		AND
 	...    Remove File 		${resultfile}
 
 
@@ -840,7 +851,7 @@ Verify Plan Graph - With Total
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
+	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
@@ -880,16 +891,16 @@ Verify Plan Graph - With Total
 	${pvinfo}= 	Get Python Version Info
 
 	Set Confidence		0.7
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_plantotal_py3.9.png
+	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		Locate 	reporter_${PLATFORM}_graph_plantotal_py3.9.png
 	ELSE
-		Locate 	reporter_${platform}_graph_plantotal.png
+		Locate 	reporter_${PLATFORM}_graph_plantotal.png
 	END
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI 		AND
+	...    Close Reporter GUI 		AND
 	...    Remove File 		${resultfile}
 
 Verify Plan Table
@@ -909,7 +920,7 @@ Verify Plan Table
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
+	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
@@ -947,12 +958,12 @@ Verify Plan Table
 	Take A Screenshot
 
 	Set Confidence		0.7
-	Locate 	reporter_${platform}_table_plan.png
+	Locate 	reporter_${PLATFORM}_table_plan.png
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI 		AND
+	...    Close Reporter GUI 		AND
 	...    Remove File 		${resultfile}
 
 Change Line Colour
@@ -972,7 +983,7 @@ Change Line Colour
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
+	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
@@ -990,11 +1001,11 @@ Change Line Colour
 	Click Tab 	 Preview
 
 	${pvinfo}= 	Get Python Version Info
-	# Locate 	reporter_${platform}_graph_plancolourb4.png
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_plancolourb4_py3.9.png
+	# Locate 	reporter_${PLATFORM}_graph_plancolourb4.png
+	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		Locate 	reporter_${PLATFORM}_graph_plancolourb4_py3.9.png
 	ELSE
-		Locate 	reporter_${platform}_graph_plancolourb4.png
+		Locate 	reporter_${PLATFORM}_graph_plancolourb4.png
 	END
 
 	Click Button 		ColourSales
@@ -1011,23 +1022,25 @@ Change Line Colour
 
 	Take A Screenshot
 
-	# Locate 	reporter_${platform}_graph_plancolourafter.png
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_plancolourafter_py3.9.png
+	# Locate 	reporter_${PLATFORM}_graph_plancolourafter.png
+	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		Locate 	reporter_${PLATFORM}_graph_plancolourafter_py3.9.png
 	ELSE
-		Locate 	reporter_${platform}_graph_plancolourafter.png
+		Locate 	reporter_${PLATFORM}_graph_plancolourafter.png
 	END
 	# bring window to foreground so teardown works	reporter_ubuntu_status_previewloaded
-	Click Image 	reporter_${platform}_status_previewloaded.png
+	Click Image 	reporter_${PLATFORM}_status_previewloaded.png
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI 		AND
+	...    Close Reporter GUI 		AND
 	...    Remove File 		${resultfile}
 
 Change Font
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #148
-	[Setup] 	Change Reporter INI File Settings 	win_height 	600
+	[Setup] 	Run Keywords
+	...    Create Reporter INI File If It Does Not Exist 	AND
+	...    Set Reporter INI Window Size 	height=600
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}Issue-#148
 	VAR 	${result_name} 	20250327_221800_example
 	VAR 	${result_dir} 	${test_data}${/}${result_name}
@@ -1035,7 +1048,7 @@ Change Font
 	VAR 	${template_dir} 	${test_data}${/}font_test.template
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
-	IF 	"${platform}" == "ubuntu" # impact font is not available in ubuntu
+	IF 	"${PLATFORM}" == "ubuntu" # impact font is not available in ubuntu
 		VAR 	${font_name} 	Standard Symbols PS
 		Change Impact With ${font_name} In ${template_dir}
 		${test} 	Get File 	${template_dir}
@@ -1044,52 +1057,52 @@ Change Font
 		VAR 	${font_name} 	Impact
 	END
 
-	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1 	--html 	--docx 	--xlsx
+	Open Reporter GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1 	--html 	--docx 	--xlsx
 	Wait For Status 	PreviewLoaded
 	Sleep 	1
 	Take A Screenshot
 	Click Tab 	Preview
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${platform}_customfont_title.png
+	VAR 	${img} 	reporter_${PLATFORM}_customfont_title.png
 	Wait For 	${img} 	 timeout=30
 	Take A Screenshot
 
 	Click Section 	Note
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${platform}_customfont_heading.png
+	VAR 	${img} 	reporter_${PLATFORM}_customfont_heading.png
 	Wait For 	${img} 	 timeout=30
-	VAR 	${img} 	reporter_${platform}_customfont_note.png
+	VAR 	${img} 	reporter_${PLATFORM}_customfont_note.png
 	Wait For 	${img} 	 timeout=30
 
 	Click Section 	Table_of_Contents
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${platform}_customfont_contents.png
+	VAR 	${img} 	reporter_${PLATFORM}_customfont_contents.png
 	Wait For 	${img} 	 timeout=30
 
 	Click Section	TestResultSummary
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${platform}_customfont_tabledata.png
+	VAR 	${img} 	reporter_${PLATFORM}_customfont_tabledata.png
 	Wait For 	${img} 	 timeout=30
 
 	Click Section 	DataGraph
 	Sleep 	1
 	Take A Screenshot
 	${pvinfo}= 	Get Python Version Info
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		VAR 	${img} 	reporter_${platform}_customfont_graph_py3.9.png
+	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		VAR 	${img} 	reporter_${PLATFORM}_customfont_graph_py3.9.png
 	ELSE
-		VAR 	${img} 	reporter_${platform}_customfont_graph.png
+		VAR 	${img} 	reporter_${PLATFORM}_customfont_graph.png
 	END
 	Wait For 	${img} 	 timeout=30
 
 	Click Section 	Errors
 	Sleep 	1
 	Take A Screenshot
-	VAR 	${img} 	reporter_${platform}_customfont_errors.png
+	VAR 	${img} 	reporter_${PLATFORM}_customfont_errors.png
 	Wait For 	${img} 	 timeout=30
 
 
@@ -1103,7 +1116,7 @@ Change Font
 	Should Contain 	${html_content} 	font-family: "${font_name}"
 
 	[Teardown] 	Run Keywords
-	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
+	...    Close Reporter GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
 
 # Verify Agent Filter Metric For Data Table and Graph
 # 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #217 	robot:continue-on-failure
@@ -1122,7 +1135,7 @@ Change Font
 
 # 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
-# 	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
+# 	Open Reporter GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
 # 	Wait For Status 	PreviewLoaded
 # 	Sleep 	1
 # 	Take A Screenshot
@@ -1153,8 +1166,10 @@ Change Font
 # 	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
 
 Verify Filter Metric For Data Table and Graph - Wildcard
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105
-	[Setup] 	Change Reporter INI File Settings 	win_height 	600
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Setup] 	Run Keywords
+	...    Create Reporter INI File If It Does Not Exist 	AND
+	...    Set Reporter INI Window Size 	height=600
 	VAR 	${issue} 	Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
 	VAR 	${result_name} 	20250501_103943_example
@@ -1170,7 +1185,7 @@ Verify Filter Metric For Data Table and Graph - Wildcard
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
-	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
+	Open Reporter GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
 	Wait For Status 	PreviewLoaded
 	Sleep 	1
 	Take A Screenshot
@@ -1230,11 +1245,13 @@ Verify Filter Metric For Data Table and Graph - Wildcard
 	Remove File 	${result_dir}${/}${result_name}.html
 
 	[Teardown] 	Run Keywords
-	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
+	...    Close Reporter GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
 
 Verify Filter Metric For Data Table and Graph - Not Wildcard
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105
-	[Setup] 	Change Reporter INI File Settings 	win_height 	600
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Setup] 	Run Keywords
+	...    Create Reporter INI File If It Does Not Exist 	AND
+	...    Set Reporter INI Window Size 	height=600
 	VAR 	${issue} 	Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
 	VAR 	${result_name} 	20250501_103943_example
@@ -1250,7 +1267,7 @@ Verify Filter Metric For Data Table and Graph - Not Wildcard
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
-	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
+	Open Reporter GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
 	Wait For Status 	PreviewLoaded
 	Sleep 	1
 	Take A Screenshot
@@ -1310,11 +1327,13 @@ Verify Filter Metric For Data Table and Graph - Not Wildcard
 	Remove File 	${result_dir}${/}${result_name}.html
 
 	[Teardown] 	Run Keywords
-	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
+	...    Close Reporter GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
 
 Verify Filter Result For Data Table and Graph - Wildcard
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105
-	[Setup] 	Change Reporter INI File Settings 	win_height 	600
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Setup] 	Run Keywords
+	...    Create Reporter INI File If It Does Not Exist 	AND
+	...    Set Reporter INI Window Size 	height=600
 	VAR 	${issue} 	Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
 	VAR 	${result_name} 	20250501_103943_example
@@ -1330,7 +1349,7 @@ Verify Filter Result For Data Table and Graph - Wildcard
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
-	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
+	Open Reporter GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
 	Wait For Status 	PreviewLoaded
 	Sleep 	1
 	Take A Screenshot
@@ -1390,11 +1409,13 @@ Verify Filter Result For Data Table and Graph - Wildcard
 	Remove File 	${result_dir}${/}${result_name}.html
 
 	[Teardown] 	Run Keywords
-	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
+	...    Close Reporter GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
 
 Verify Filter Result For Data Table and Graph - Not Wildcard
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105
-	[Setup] 	Change Reporter INI File Settings 	win_height 	600
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Setup] 	Run Keywords
+	...    Create Reporter INI File If It Does Not Exist 	AND
+	...    Set Reporter INI Window Size 	height=600
 	VAR 	${issue} 	Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
 	VAR 	${result_name} 	20250501_103943_example
@@ -1410,7 +1431,7 @@ Verify Filter Result For Data Table and Graph - Not Wildcard
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
-	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
+	Open Reporter GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
 	Wait For Status 	PreviewLoaded
 	Sleep 	1
 	Take A Screenshot
@@ -1470,11 +1491,13 @@ Verify Filter Result For Data Table and Graph - Not Wildcard
 	Remove File 	${result_dir}${/}${result_name}.html
 
 	[Teardown] 	Run Keywords
-	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
+	...    Close Reporter GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
 
 Verify Filter Result For Data Table and Graph - Filter Result
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105
-	[Setup] 	Change Reporter INI File Settings 	win_height 	600
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
+	[Setup] 	Run Keywords
+	...    Create Reporter INI File If It Does Not Exist 	AND
+	...    Set Reporter INI Window Size 	height=600
 	VAR 	${issue} 	Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
 	VAR 	${result_name} 	20250501_103943_example
@@ -1490,7 +1513,7 @@ Verify Filter Result For Data Table and Graph - Filter Result
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
-	Open GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
+	Open Reporter GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
 	Wait For Status 	PreviewLoaded
 	Sleep 	1
 	Take A Screenshot
@@ -1554,7 +1577,7 @@ Verify Filter Result For Data Table and Graph - Filter Result
 	Remove File 	${result_dir}${/}${result_name}.html
 
 	[Teardown] 	Run Keywords
-	...    Close GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
+	...    Close Reporter GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
 
 Check Reporter with JSON Configuration File
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172
@@ -1567,7 +1590,7 @@ Check Reporter with JSON Configuration File
 	${configfile}= 	Set Variable    ${basefolder}${/}RFSwarmReporter-JSON.json
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-i 	${configfile}
+	Open Reporter GUI 	-i 	${configfile}
 
 	Sleep    10s
 	Take A Screenshot
@@ -1577,12 +1600,12 @@ Check Reporter with JSON Configuration File
 	Take A Screenshot
 
 	# Set Confidence		0.7
-	Locate 	reporter_${platform}_windowsize_json.png
+	Locate 	reporter_${PLATFORM}_windowsize_json.png
 	# Set Confidence		0.9
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI
+	...    Close Reporter GUI
 
 Check Reporter with Yaml Configuration File
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172
@@ -1595,19 +1618,19 @@ Check Reporter with Yaml Configuration File
 	${configfile}= 	Set Variable    ${basefolder}${/}RFSwarmReporter-Yaml.yaml
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-i 	${configfile}
+	Open Reporter GUI 	-i 	${configfile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	SelectResultFile
 
 	Take A Screenshot
 
 	# Set Confidence		0.7
-	Locate 	reporter_${platform}_windowsize_yaml.png
+	Locate 	reporter_${PLATFORM}_windowsize_yaml.png
 	# Set Confidence		0.9
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI
+	...    Close Reporter GUI
 
 Check Reporter with yml Configuration File
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172
@@ -1620,19 +1643,19 @@ Check Reporter with yml Configuration File
 	${configfile}= 	Set Variable    ${basefolder}${/}RFSwarmReporter-yml.yml
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-i 	${configfile}
+	Open Reporter GUI 	-i 	${configfile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	SelectResultFile
 
 	Take A Screenshot
 
 	# Set Confidence		0.7
-	Locate 	reporter_${platform}_windowsize_yml.png
+	Locate 	reporter_${PLATFORM}_windowsize_yml.png
 	# Set Confidence		0.9
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI
+	...    Close Reporter GUI
 
 Check Reporter with JSON Template File
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172
@@ -1658,7 +1681,7 @@ Check Reporter with JSON Template File
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
+	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
@@ -1670,7 +1693,7 @@ Check Reporter with JSON Template File
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI 		AND
+	...    Close Reporter GUI 		AND
 	...    Remove File 		${resultfile}
 
 Check Reporter with Yaml Template File
@@ -1697,7 +1720,7 @@ Check Reporter with Yaml Template File
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
+	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
@@ -1709,7 +1732,7 @@ Check Reporter with Yaml Template File
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI 		AND
+	...    Close Reporter GUI 		AND
 	...    Remove File 		${resultfile}
 
 Check Reporter with yml Template File
@@ -1736,7 +1759,7 @@ Check Reporter with yml Template File
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
+	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
@@ -1748,7 +1771,7 @@ Check Reporter with yml Template File
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
-	...    Close GUI 		AND
+	...    Close Reporter GUI 		AND
 	...    Remove File 		${resultfile}
 
 

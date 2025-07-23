@@ -1,7 +1,14 @@
 *** Settings ***
 Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #97 	Languages
 
-Resource 	GUI_Common.robot
+Resource 	resources/GUI_Reporter.resource
+Resource 	resources/Reporter_HTML.resource
+
+Resource 	../../Common/Directories_and_Files.resource
+Resource 	../../Common/Logs.resource
+Resource 	../../Common/INI_PIP_Data.resource
+Resource 	../../Common/GUI_RFS_Components.resource
+
 Variables 	${CURDIR}${/}testdata${/}Issue-#97${/}lang_samples.yaml
 
 Suite Setup 	Non-ASCII Suite Setup
@@ -13,7 +20,6 @@ Suite Teardown 	Non-ASCII Suite Teardown
 *** Variables ***
 ${test_data} 		${CURDIR}${/}testdata${/}Issue-#97
 ${scenario_name} 	${None}
-
 
 *** Test Cases ***
 Latin 		pl
@@ -28,7 +34,6 @@ Korean 		ko
 Arabic 		ar
 Tibetan  	ti
 
-
 *** Keywords ***
 Test Non-ASCII Characters
 	[Documentation] 	Verify all fields handle UTF-8 correctly, especially non Latin characters.
@@ -38,7 +43,7 @@ Test Non-ASCII Characters
 	${template_file}= 	Create Language Files 	${langcode} 	${sample}
 	${manager_results} 	Choose Language Manager Result DB 	${langcode}
 
-	Open GUI 	-g 	1 	-d 	${manager_results} 	-t 	${template_file}
+	Open Reporter GUI 	-g 	1 	-d 	${manager_results} 	-t 	${template_file}
 	Wait For Status 	PreviewLoaded
 
 
@@ -52,7 +57,7 @@ Test Non-ASCII Characters
 	Set Text Value To Right Of 	Heading 	${note_sample_heading}
 	Click Label With Vertical Offset 	Heading 	90
 	Evaluate 	clipboard.copy("${sample}") 	modules=clipboard
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.v
 	ELSE
 		Press Combination	KEY.ctrl		KEY.v
@@ -153,21 +158,21 @@ Test Non-ASCII Characters
 
 Non-ASCII Suite Setup
 	Remove Directory 	${OUTPUT DIR}${/}results${/}Issue-#97 	recursive=${True}
-	Set Platform
+	GUI_Common.GUI Suite Initialization Reporter
 	Extract Zip File 	${test_data}${/}manager_results.zip 	${test_data}
 
 Non-ASCII Suite Teardown
 	Copy Directory 		${test_data} 	${OUTPUT DIR}${/}results${/}Issue-#97
-	Remove File 	${OUTPUT DIR}${/}results${/}Issue-#97${/}manager_results.zip
+	Remove File 		${OUTPUT DIR}${/}results${/}Issue-#97${/}manager_results.zip
 	Remove Directory 	${test_data}${/}files 	recursive=${True}
 	Remove Directory 	${test_data}${/}manager_results 	recursive=${True}
 
 Non-ASCII Test Setup
-	Change Reporter INI File Settings 	win_width 	1200
-	Change Reporter INI File Settings 	win_height 	700
+	Create Reporter INI File If It Does Not Exist
+	Set Reporter INI Window Size 	1200 	700
 
 Non-ASCII Test Teardown
-	Close GUI
+	Close Reporter GUI
 	Check Logs
 
 Choose Language Manager Result DB
@@ -195,14 +200,3 @@ Create Language Files
 	Change __Lang_Sample__ With ${sample} In ${template_file}
 
 	RETURN 	${template_file}
-
-Check Logs
-	${stdout_reporter}= 		Read Log 	${OUTPUT DIR}${/}stdout.txt
-	${stderr_reporter}= 		Read Log 	${OUTPUT DIR}${/}stderr.txt
-
-	Should Not Contain 	${stdout_reporter} 	RuntimeError
-	Should Not Contain 	${stderr_reporter} 	RuntimeError
-	Should Not Contain 	${stdout_reporter} 	Exception
-	Should Not Contain 	${stderr_reporter} 	Exception
-	Should Not Contain 	${stdout_reporter}	OSError
-	Should Not Contain 	${stderr_reporter} 	OSError

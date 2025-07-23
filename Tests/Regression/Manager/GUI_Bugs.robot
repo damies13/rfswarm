@@ -1,10 +1,12 @@
 *** Settings ***
 Test Tags       Bugs 	GUI
 
-Resource 	GUI_Common.robot
-Suite Setup 	Set Platform
+Resource 	resources/GUI_Manager.resource
+Resource 	../../Common/Logs.resource
+Resource 	../../Common/GUI_RFS_Components.resource
 
-Test Teardown 	Run Keyword		Close Manager GUI ${platform}
+Suite Setup 	GUI_Common.GUI Suite Initialization Manager
+Test Teardown 	Run Keyword		Close Manager GUI ${PLATFORM}
 
 *** Variables ***
 @{robot_data}=	example.robot	Example Test Case
@@ -16,7 +18,7 @@ Verify If Manager Runs With Existing INI File From Current Version
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Manager GUI													AND
-	...    Run Keyword		Close Manager GUI ${platform}
+	...    Close Manager GUI
 
 	File Should Exist	${global_path}${/}RFSwarmManager.ini
 	File Should Not Be Empty	${global_path}${/}RFSwarmManager.ini
@@ -24,14 +26,13 @@ Verify If Manager Runs With Existing INI File From Current Version
 	Open Manager GUI
 	TRY
 		Click Tab	Run
-		Wait For	manager_${platform}_button_stoprun.png	timeout=30
+		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=30
 		Click Tab	Plan
 	EXCEPT
 		Fail	msg=RFSwarm Manager is not responding!
 	END
 
-	# [Teardown]	Run Keywords
-	# ...    Run Keyword		Close Manager GUI ${platform}
+	[Teardown] 	Close Manager GUI
 
 Verify If Manager Runs With No Existing INI File From Current Version
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
@@ -43,14 +44,13 @@ Verify If Manager Runs With No Existing INI File From Current Version
 	Open Manager GUI
 	TRY
 		Click Tab	Run
-		Wait For	manager_${platform}_button_stoprun.png	timeout=30
+		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=30
 		Click Tab	Plan
 	EXCEPT
 		Fail	msg=RFSwarm Manager is not responding!
 	END
 
-	# [Teardown]	Run Keywords
-	# ...    Run Keyword		Close Manager GUI ${platform}
+	[Teardown]	Close Manager GUI
 
 Verify If Manager Runs With Existing INI File From Previous Version
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
@@ -66,33 +66,32 @@ Verify If Manager Runs With Existing INI File From Previous Version
 	Open Manager GUI
 	TRY
 		Click Tab	Run
-		Wait For	manager_${platform}_button_stoprun.png	timeout=30
+		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=30
 		Click Tab	Plan
 	EXCEPT
 		Fail	msg=RFSwarm Manager is not responding!
 	END
 
-	# [Teardown]	Run Keywords
-	# ...    Run Keyword		Close Manager GUI ${platform}
+	[Teardown]	Run Keyword		Close Manager GUI
 
 Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #362
 	[Setup]	Run Keywords
+	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY} 	AND
-	...    Set INI Window Size 	1200 	600
+	...    Set Manager INI Window Size 	1200 	600
 
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#362${/}invalid.rfs
 	${inifile}= 		Normalize Path 	${CURDIR}${/}testdata${/}Issue-#362${/}RFSwarmManager.ini
-	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-i 	${inifile}
-	Open Manager GUI 	${mngr_options}
+	Open Manager GUI 	-s 	${scenariofile} 	-i 	${inifile}
 
 	Sleep 	5s
 
 	Take A Screenshot
-	VAR 	${graph_settings} 	manager_${platform}_button_graphsettings.png
+	VAR 	${graph_settings} 	manager_${PLATFORM}_button_graphsettings.png
 	Wait For 	${graph_settings} 	 timeout=30
 
-	IF 	"${platform}" == "macos"
+	IF 	"${PLATFORM}" == "macos"
 		Click Button 	CloseWindow
 	ELSE
 		Click Button With Vertical Offset 	GraphSettings 	offset=-15
@@ -102,8 +101,8 @@ Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
 	Sleep 	1
 	Take A Screenshot
 
-	VAR 	${img} 	manager_${platform}_menu_recent.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	VAR 	${img} 	manager_${PLATFORM}_menu_recent.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate		${img}
 	Move To 	@{coordinates}
 	Sleep 	2
@@ -113,18 +112,16 @@ Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
 	Sleep 	1
 	Take A Screenshot
 
-	IF 	"${platform}" == "macos"
+	IF 	"${PLATFORM}" == "macos"
 		Click Button 	CloseWindow
 	ELSE
 		Click Button With Vertical Offset 	GraphSettings 	offset=-15
 	END
 
-	Run Keyword 	Close Manager GUI ${platform}
-
-	${running}= 	Is Process Running 	${process_manager}
+	Run Keyword 	Close Manager GUI
 	Check Logs
 
-	[Teardown] 	Run Keyword If 	${running} 	Close Manager GUI ${platform}
+	[Teardown] 	Close Manager GUI
 
 # # Test for Issue #171	moved to agent test suite, can easily be tested for via the command line
 # Issue #171
@@ -134,14 +131,14 @@ Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
 # 	Resize Window 	100 	10
 # 	Take A Screenshot
 #
-# 	Wait Agent Ready
+# 	Wait For the Agent To Be Ready
 # 	Click Tab 	 Plan
 #
 # 	# manager_macos_button_runsettings
 # 	Click Button 	runsettings
 # 	Take A Screenshot
 # 	# Click Button 	Cancel
-# 	Click Image		manager_${platform}_button_closewindow.png
+# 	Click Image		manager_${PLATFORM}_button_closewindow.png
 #
-# 	Run Keyword 	Close Manager GUI ${platform}
+# 	Run Keyword 	Close Manager GUI ${PLATFORM}
 # 	Stop Agent

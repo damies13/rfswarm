@@ -1,7 +1,11 @@
 *** Settings ***
-Resource 	CommandLine_Common.robot
+Resource 	resources/CommandLine_Reporter.resource
+Resource 	../../Common/Directories_and_Files.resource
+Resource 	../../Common/RFS_Components.resource
 
-Suite Setup			Clean Up Old Files
+Suite Setup 	Run Keywords
+...    Common.Basic Suite Initialization Reporter
+...    Clean Up Old Files
 
 *** Test Cases ***
 Robot Version
@@ -12,7 +16,7 @@ Robot Version
 
 Random Offset
 	[Documentation] 	This just prevents all the test runners doing git push at the same time
-	${random} =	Evaluate	random.randint(0, 60)
+	${random}= 	Evaluate 	random.randint(0, 60)
 	Sleep    ${random}
 
 Reporter Version
