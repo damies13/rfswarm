@@ -1,0 +1,151 @@
+GET:
+  AgentStatus:
+    URI: "/AgentStatus"
+    Body:
+      AgentName:
+        'Agent Host Name>'
+      AgentName: "<Agent Host Name>"
+      Status: "<Agent Status>"
+      AgentIPs: [
+        "<Agent IP Address>",
+        "<Agent IP Address>"
+      ]
+      Robots: "<sum>"
+      CPU%: "0-100"
+      MEM%: "0-100"
+      NET%: "0-100"
+
+  Jobs:
+    URI: "/Jobs"
+    Body:
+      AgentName: "<Agent Host Name>"
+
+  Scripts:
+    URI: "/Scripts"
+    Body:
+      AgentName: "<Agent Host Name>"
+
+  File:
+    URI: "/File"
+    Body:
+      AgentName: "<Agent Host Name>"
+      Action: "<Upload/Download/Status>"
+      Hash: "<File Hash, provided by /Scripts>"
+
+  Result:
+    URI: "/Result"
+    Body:
+      AgentName: "<Agent Host Name>"
+      ResultName: "<A Text String>"
+      Result: "<PASS | FAIL>"
+      ElapsedTime: "<seconds as decimal number>"
+      StartTime: "<epoch seconds as decimal number>"
+      EndTime: "<epoch seconds as decimal number>"
+      ScriptIndex: "<Index>"
+      Robot: "<user number>"
+      Iteration: "<iteration number>"
+      Sequence: "<sequence number that ResultName occurred in test case>"
+
+  Metric:
+    URI: "/Metric"
+    Body:
+      PrimaryMetric: "<Primary Metric Name, e.g. AUT Hostname>"
+      MetricType: "<Metric Type, e.g. AUT Web Server>"
+      MetricTime: "<Epoch time the metric was recorded>"
+      SecondaryMetrics:
+        Secondary Metric Name, e.g. CPU%: "<Value, e.g. 60>"
+        Secondary Metric Name, e.g. MEMUser: "<Value, e.g. 256Mb>"
+        Secondary Metric Name, e.g. MEMSys: "<Value, e.g. 1Gb>"
+        Secondary Metric Name, e.g. MEMFree: "<Value, e.g. 2Gb>"
+        Secondary Metric Name, e.g. CPUCount: "<Value, e.g. 4>"
+
+POST_AgentStatus:
+  Body:
+      AgentName: "TEST AGENT 1"
+      Status: "Updated"
+
+POST_Jobs:
+  Body:
+    AgentName: "TEST AGENT 1"
+    StartTime: 1572057404,
+    EndTime: 1572064628,
+    RunName: "Scenario_1572057404"
+    Abort: False
+    UploadMode: "imm"
+    EnvironmentVariables:
+      user_path_var:
+        vartype: "path"
+        value: "user_dir"
+      user_var:
+        vartype: "value"
+        value: "TWELVE"
+    Schedule:
+      11:
+        Test: "Example Test Case One One"
+        resultnamemode: 'dflt'
+        excludelibraries: 'BuiltIn,String,OperatingSystem,perftest'
+        robotoptions: '--variablefile test.yaml'
+        testrepeater: 'False'
+        injectsleepenabled: 'False'
+        disableloglog: 'False'
+        disablelogreport: 'False'
+        disablelogoutput: 'False'
+      21:
+        Test: "Example Test Case Two One"
+        resultnamemode: 'dflt'
+        excludelibraries: 'BuiltIn,String,OperatingSystem,perftest'
+        robotoptions: '--variablefile test.yaml'
+        testrepeater: 'False'
+        injectsleepenabled: 'False'
+        disableloglog: 'False'
+        disablelogreport: 'False'
+        disablelogoutput: 'False'
+      22:
+        Test: "Example Test Case Two One"
+        resultnamemode: 'dflt'
+        excludelibraries: 'BuiltIn,String,OperatingSystem,perftest'
+        robotoptions: '--variablefile test.yaml'
+        testrepeater: 'False'
+        injectsleepenabled: 'False'
+        disableloglog: 'False'
+        disablelogreport: 'False'
+        disablelogoutput: 'False'
+
+POST_Scripts:
+  Body:
+    AgentName: "TEST AGENT 1"
+    Scripts: [
+      {
+        File: "1_Issue-#289.robot",
+        Hash: "17960a3ae7b6814867ae7fdb763d0ceb"
+      },
+      {
+        File: "2_Issue-#289.robot",
+        Hash: "d02fd85436a2e106bd70c7a88c71720f"
+      }
+    ]
+
+POST_File:
+  Body_Download:
+    AgentName: "TEST AGENT 1"
+    Hash: "17960a3ae7b6814867ae7fdb763d0ceb" # 1_Issue-#289.robot
+    File: "1_Issue-#289.robot"
+    FileData: /Td6WFoAAATm1rRGAgAhARYAAAB0L+Wj4AEKAH1dABVoEQynM7ZJCjegZcHSddQmOD1+url2wYuojolOPBlLe6r+MdOrSfxIpGHVyFRTHXF82Rr5gnzPqozJ7AnGw9pKDAycjivWPQhkHxLcjguiQuC4R5NzMqCvdyFbWOm+/NlvmLCsRFuLEHogeV9IEX/lC2qmUKLo22Pq+oAAAAAAAESH2BFr+UGxAAGZAYsCAACyX4D9scRn+wIAAAAABFla
+
+  Body_Status_1:
+    AgentName: "TEST AGENT 1"
+    Hash: "d02fd85436a2e106bd70c7a88c71720f" # 2_Issue-#289.robot
+    Exists: "True"
+
+  Body_Status_2:
+    AgentName: "TEST AGENT 1"
+    Hash: "b7c13f92afdd41a0be4c9a2d1e6583fb" # x
+    Exists: "False"
+
+  Body_Upload:
+    AgentName: "TEST AGENT 1"
+    Hash: "efd67fd8816011659e3169cdbfd01d41" # resources/3_Issue-#289.robot
+    Result: "Saved"
+
+  Upload_FileData: /Td6WFoAAATm1rRGAgAhARYAAAB0L+Wj4AEOAIFdABVoEQynM7ZJCjegZcHSddQmOD1+url2wYuR0hWxr8WcL/yskazFIWUu+tplKIq2+0mKaGxNRlrZMbHGj7hwqL4VcQ6CjfRRDih/Ad+MokDCIHeV3eLLDsyR5Tu164sH3yrQ7s27HPmxSQtsPDZmwWb5Z7CLHc+iN8XEjysvqtfq4AAAAADu6Bu4cbtZ/gABnQGPAgAA84pz6bHEZ/sCAAAAAARZWg==
+

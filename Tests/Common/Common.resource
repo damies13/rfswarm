@@ -139,6 +139,38 @@ Kill If Still Running
 		END
 	END
 
+Convert List Items To ${type}
+	[Arguments] 	${list}
+	${len} 	Get Length 	${list}
+	FOR  ${i}  IN RANGE  0  ${len}
+		TRY
+			${list}[${i}]= 	Run Keyword 	Convert To ${type} 	${list}[${i}]
+		EXCEPT
+			Fail 	Invalid type.
+		END
+	END
+
+	RETURN 	${list}
+
+Remove Keys From Dictionary
+	[Documentation] 	The provided keys in the sub-dictionaries will also be deleted.
+	[Arguments] 	${dict} 	@{rm_keys}
+	@{dict_keys}= 	Get Dictionary Keys 	${dict}
+	FOR  ${key}  IN  @{dict_keys}
+		TRY
+			VAR 	${lower_dict} 	${dict}[${key}]
+			IF  type(${lower_dict}) == dict
+				Remove Keys From Dictionary 	${dict}[${key}]  ${rm_keys}
+			END
+		EXCEPT
+			Remove From Dictionary 	${dict}[${key}]  @{rm_keys}
+			CONTINUE
+		END
+		Remove From Dictionary 	${dict}[${key}]  @{rm_keys}
+	END
+
+	Remove From Dictionary 	${dict}  @{rm_keys}
+
 # End ${component_name} If Still Running
 # 	${comp} 	Convert To Lower Case 	${component_name}
 
