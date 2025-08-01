@@ -2,8 +2,6 @@ GET:
   AgentStatus:
     URI: "/AgentStatus"
     Body:
-      AgentName:
-        'Agent Host Name>'
       AgentName: "<Agent Host Name>"
       Status: "<Agent Status>"
       AgentIPs: [
@@ -73,10 +71,10 @@ POST_Jobs:
     Abort: False
     UploadMode: "imm"
     EnvironmentVariables:
-      user_path_var:
+      OS:
         vartype: "path"
         value: "user_dir"
-      user_var:
+      TEMP:
         vartype: "value"
         value: "TWELVE"
     Schedule:
@@ -116,36 +114,52 @@ POST_Scripts:
     AgentName: "TEST AGENT 1"
     Scripts: [
       {
-        File: "1_Issue-#289.robot",
-        Hash: "17960a3ae7b6814867ae7fdb763d0ceb"
+        File: "1_Scripts_Issue-#289.robot", # not used
+        Hash: "6fa60c43ca3b7d387565841b90e39ab2" # not used
       },
       {
-        File: "2_Issue-#289.robot",
-        Hash: "d02fd85436a2e106bd70c7a88c71720f"
+        File: "2_Scripts_Issue-#289.robot", # not used
+        Hash: "74969478624dfa11f0fc6e232d6c5fb1" # not used
       }
     ]
 
 POST_File:
   Body_Download:
     AgentName: "TEST AGENT 1"
-    Hash: "17960a3ae7b6814867ae7fdb763d0ceb" # 1_Issue-#289.robot
+    Hash: "efd67fd8816011659e3169cdbfd01d41" # not used 1_Issue-#289.robot
     File: "1_Issue-#289.robot"
-    FileData: /Td6WFoAAATm1rRGAgAhARYAAAB0L+Wj4AEKAH1dABVoEQynM7ZJCjegZcHSddQmOD1+url2wYuojolOPBlLe6r+MdOrSfxIpGHVyFRTHXF82Rr5gnzPqozJ7AnGw9pKDAycjivWPQhkHxLcjguiQuC4R5NzMqCvdyFbWOm+/NlvmLCsRFuLEHogeV9IEX/lC2qmUKLo22Pq+oAAAAAAAESH2BFr+UGxAAGZAYsCAACyX4D9scRn+wIAAAAABFla
+    FileData: /Td6WFoAAATm1rRGAgAhARYAAAB0L+Wj4AGJAMNdABVoBApmU6YL+XODH8hqUcD43AFtPU3Wq/rtR8SiSyMjIsnUxCBHxkzAcmvBL6yKC74pj/asA2c+GmMar5Yl6/tuHnUl3rRZFarT92hvAoyyK8zx3ZBwj9WThabj2thszFWmGdwnl/Ys0N7DwI740UBXAem9w1fynDP9HqZrDBa8fx4YAovOaVYnLNLPkkAvghZi2YNeSDWNcDsMKEF6n5MRBYkddp9rDtYRiJXCZ9lPa86Rol8LQwWrFJzyLymo9rkJgAAA6gG1K1rwNQYAAd8BigMAAJG7/52xxGf7AgAAAAAEWVo=
+
+  Body_Status:
+    AgentName: "TEST AGENT 1"
+    Hash: "efd67fd8816011659e3169cdbfd01d41" # not used 1_Issue-#289.robot
+    Exists: "False"
 
   Body_Status_1:
     AgentName: "TEST AGENT 1"
-    Hash: "d02fd85436a2e106bd70c7a88c71720f" # 2_Issue-#289.robot
+    Hash: "d02fd85436a2e106bd70c7a88c71720f" # not used 2_Issue-#289.robot
     Exists: "True"
 
   Body_Status_2:
     AgentName: "TEST AGENT 1"
-    Hash: "b7c13f92afdd41a0be4c9a2d1e6583fb" # x
+    Hash: "b7c13f92afdd41a0be4c9a2d1e6583fb" # not used deleted file
     Exists: "False"
 
   Body_Upload:
     AgentName: "TEST AGENT 1"
-    Hash: "efd67fd8816011659e3169cdbfd01d41" # resources/3_Issue-#289.robot
+    Hash: "efd67fd8816011659e3169cdbfd01d41" # not used resources/3_Issue-#289.robot
     Result: "Saved"
 
   Upload_FileData: /Td6WFoAAATm1rRGAgAhARYAAAB0L+Wj4AEOAIFdABVoEQynM7ZJCjegZcHSddQmOD1+url2wYuR0hWxr8WcL/yskazFIWUu+tplKIq2+0mKaGxNRlrZMbHGj7hwqL4VcQ6CjfRRDih/Ad+MokDCIHeV3eLLDsyR5Tu164sH3yrQ7s27HPmxSQtsPDZmwWb5Z7CLHc+iN8XEjysvqtfq4AAAAADu6Bu4cbtZ/gABnQGPAgAA84pz6bHEZ/sCAAAAAARZWg==
 
+POST_Result:
+  Body:
+    AgentName: "TEST AGENT 1"
+    Result: "Queued"
+
+POST_Metric:
+  Body:
+    Metric: "my_test_server"
+    Result: "Queued"
+  
+  AgentName: "TEST AGENT 1"

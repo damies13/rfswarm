@@ -1,5 +1,5 @@
 *** Settings ***
-Resource    resources/2r_Issue-#289.resource
+Resource    1r_Issue-#289.resource
 
 ***Test Cases***
 Example Test Case One One

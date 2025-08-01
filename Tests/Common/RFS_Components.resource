@@ -25,7 +25,7 @@ ${PYFILE_REPORTER} 	${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
 
 Run ${component_name} CLI
 	[Documentation] 	Open one of the RFSwarm applications for CLI purposes. Pass the: Manager, Reporter or Agent
-	[Arguments] 	@{appargs} 	${noargs}=${False}
+	[Arguments] 	@{appargs}  ${noargs}=${False}  ${envargs}=${None}
 	${comp} 	Convert To Lower Case 	${component_name}
 	${len} 		Get Length 	${appargs}
 
@@ -52,6 +52,7 @@ Run ${component_name} CLI
 	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
 	${process}= 	Start Process 	${CMD_${comp}}  @{appargs}  alias=${component_name}
 	...    stdout=${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+	...    env=${envargs}
 
 	Log 	${process}
 	VAR 	${PROCESS_${comp}} 		${process} 	scope=SUITE

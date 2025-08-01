@@ -2,13 +2,10 @@
 Resource    resources/2r_Issue-#289.resource
 
 ***Test Cases***
-Example Test Case One One
-    Log     %{OS}
+Example Test Case Two One
     Test One
 
-Example Test Case One Two
-    Log     %{TEMP}
-    Log     %{PATH}
+Example Test Case Two Two
     Test Two
 
 ***Keywords***

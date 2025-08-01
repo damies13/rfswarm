@@ -1,6 +1,6 @@
 [Scenario]
 uploadmode = imm
-scriptcount = 2
+scriptcount = 3
 graphlist = 
 
 [Script Defaults]
@@ -12,7 +12,7 @@ delay = 0
 rampup = 10
 run = 50
 test = Example Test Case One One
-script = 1_Scripts_Issue-#289.robot
+script = 1_Issue-#289.robot
 
 [2]
 robots = 2
@@ -20,4 +20,12 @@ delay = 0
 rampup = 10
 run = 50
 test = Example Test Case Two One
-script = 2_Scripts_Issue-#289.robot
+script = 2_Issue-#289.robot
+
+[3]
+robots = 1
+delay = 0
+rampup = 10
+run = 50
+test = Example Test Case Three Two
+script = resources/3_Issue-#289.robot
