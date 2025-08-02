@@ -22,6 +22,7 @@ jobs:
             isrelease=1
           fi
           echo "isrelease=$isrelease" >> "$GITHUB_ENV"
+
       - name: Check Milestone
         if: ${{ env.isrelease == 1 }}
         shell: python
@@ -87,17 +88,16 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
 
-      # Still need to have a check all the milestones are complete
+    #   Having another go at auto publishing
+    # https://github.com/pypa/gh-action-pypi-publish
+      - name: Publish package to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+            password: ${{ secrets.PYPI_TOKEN }}
+            repository-url: https://test.pypi.org/legacy/
+
       - name: Do Publish
         if: ${{ env.dopublish == 1 }}
-        # https://github.com/pypa/gh-action-pypi-publish?tab=readme-ov-file#specifying-a-different-username
-        # uses: pypa/gh-action-pypi-publish@release/v1
-        # with:
-        #   verbose: true
-        #   password: ${{ secrets.PYPI_TOKEN }}
-        env:
-          # PYPI_USER: ${{ secrets.PYPI_TOKENU }}
-          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
-        run: |
-          echo ${#PYPI_TOKEN}
-          echo python3 -m twine upload -u __token__ -p ${{ secrets.PYPI_TOKEN }} --verbose dist/rfswarm*
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+            password: ${{ secrets.PYPI_TOKEN }}
