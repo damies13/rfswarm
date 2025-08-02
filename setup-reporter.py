@@ -5,7 +5,7 @@ with open("README_PyPi.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
 	name="rfswarm-reporter",
-	version="1.5.1",
+	version="1.5.2",
 	author="damies13",
 	author_email="damies13+rfswarm@gmail.com",
 	description="rfswarm reporter",
