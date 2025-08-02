@@ -28,6 +28,22 @@ Wait For File To Exist
 		Fail 		File '${filepath}' does not exist after ${timeout} seconds
 	END
 
+Wait Until the File Is Not Empty
+	[Arguments] 	${filepath} 	${timeout}=${120}
+	TRY
+		WHILE    True 	limit=${timeout} seconds
+			TRY
+				Sleep 	500 ms
+				File Should Not Be Empty 		${filepath}
+			EXCEPT
+				CONTINUE
+			END
+			BREAK
+		END
+	EXCEPT
+		Fail 		File '${filepath}' does not exist after ${timeout} seconds
+	END
+
 Clean Up Old Files
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
 	# cleanup previous output

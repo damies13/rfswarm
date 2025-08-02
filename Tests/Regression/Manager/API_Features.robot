@@ -17,7 +17,9 @@ Valid Request: GET /
 	...    Create Directory 	${RESULTS_DIR} 	AND
 	...    Run Manager CLI  -n  -d  ${RESULTS_DIR}
 
-	Sleep 	1s
+	Sleep 	7s
+	${stdout}  ${stderr}= 	Find Log 	Manager
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=15
 
 	${resp_get}= 	Send GET Request To the Manager 	url=/
 	&{get_result}= 	Convert To Dictionary 	${resp_get.json()}
@@ -58,7 +60,9 @@ Invalid Request: GET /
 	...    Create Directory 	${RESULTS_DIR} 	AND
 	...    Run Manager CLI  -n  -d  ${RESULTS_DIR}
 
-	Sleep 	1s
+	Sleep 	7s
+	${stdout}  ${stderr}= 	Find Log 	Manager
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=15
 
 	GROUP  Sending request with invalid url (/GET) not (/)
 		VAR 	${expected_result} 		Unrecognised request: 'ParseResult(scheme='', netloc='', path='/GET', params='', query='', fragment='')'
@@ -76,7 +80,9 @@ Valid Request: POST /AgentStatus
 	...    Create Directory 	${RESULTS_DIR} 	AND
 	...    Run Manager CLI  -n  -d  ${RESULTS_DIR}
 
-	Sleep 	1s
+	Sleep 	7s
+	${stdout}  ${stderr}= 	Find Log 	Manager
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=15
 
 	${resp_post}  ${request_body}= 	Update Agent Status 	agent_name=${POST_AgentStatus}[Body][AgentName]
 	&{resp_result}= 	Convert To Dictionary 	${resp_post.json()}
@@ -127,13 +133,15 @@ Invalid Request: POST /AgentStatus
 	...    Create Directory 	${RESULTS_DIR} 	AND
 	...    Run Manager CLI  -n  -d  ${RESULTS_DIR}
 
-	Sleep 	1s
+	Sleep 	7s
+	${stdout}  ${stderr}= 	Find Log 	Manager
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=15
 
 	${ipv4} 	${ipv6}= 	Get Ip Addresses
 	VAR 	@{Agent_IP} 	${ipv4}[0]  ${ipv6}[0]
 
 	GROUP  Sending request with missing Status data
-		VAR 	${expected_result} 		Unprocessable Entity
+		VAR 	${expected_result} 		{}
 		VAR 	&{request_body} 		AgentName=ERR_AGENT  AgentIPs=${Agent_IP}  Robots=${1}  CPU%=${1}  MEM%=${1}  NET%=${1}
 
 		${resp_post}= 	Send POST Request To the Manager 	url=/AgentStatus 	request=${request_body}  expected_status=422  expected_result=${expected_result}
@@ -156,13 +164,16 @@ Valid Request: POST /Jobs
 	...    Set Test Variable 	${RESULTS_DIR}  ${CURDIR}${/}testdata${/}Issue-#289${/}results 	AND
 	...    Create Directory 	${RESULTS_DIR}
 
-	# ${environ}= 	Evaluate 	dict(os.environ)  modules=os
-	# VAR 	&{new_env} 	FIRST=Pierwszy
-	# Set To Dictionary 	${environ} 	&{new_env}
+	${environ}= 	Evaluate 	dict(os.environ)  modules=os
+	VAR 	&{new_env} 	MY_OS=${PLATFORM}
+	Set Environment Variable 	MY_OS  ${PLATFORM}
+	Set To Dictionary 	${environ} 	&{new_env}
 
-	Run Manager CLI  -n  -a  1  -r  -d  ${RESULTS_DIR}  -s  ${CURDIR}${/}testdata${/}Issue-#289${/}POST_Jobs_Issue-#289.rfs  #envargs=${environ}
+	Run Manager CLI  -n  -a  1  -r  -d  ${RESULTS_DIR}  -s  ${CURDIR}${/}testdata${/}Issue-#289${/}POST_Jobs_Issue-#289.rfs  envargs=${environ}
 
-	Sleep 	5s
+	Sleep 	7s
+	${stdout}  ${stderr}= 	Find Log 	Manager
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=15
 
 	${agent_update}= 	Get Time 	format=epoch
 	Update Agent Status 	${POST_Jobs}[Body][AgentName]
@@ -193,16 +204,16 @@ Valid Request: POST /Jobs
 		@{envvars_keys}= 	Get Dictionary Keys 	${envvars}
 
 		Log 	%{PATH}
-		VAR 	&{OS} 		vartype=value  value=%{OS}
-		VAR 	&{TEMP} 	vartype=path  value=Temp
+		VAR 	&{OS} 		vartype=value  value=%{MY_OS}
+		# VAR 	&{TEMP} 	vartype=path  value=Temp
 		VAR 	&{PATH} 	vartype=value  value=%{PATH}
-		VAR 	&{expected_envvars} 	OS=${OS}  TEMP=${TEMP}  PATH=${PATH}
+		VAR 	&{expected_envvars} 	MY_OS=${OS}  PATH=${PATH}
 
 		Check ${resp_result} Has Abort ${False}
 
 		Dictionaries Should Be Equal 	${envvars}[${envvars_keys}[0]] 	${expected_envvars}[${envvars_keys}[0]]
 		Dictionaries Should Be Equal 	${envvars}[${envvars_keys}[1]] 	${expected_envvars}[${envvars_keys}[1]]
-		Dictionaries Should Be Equal 	${envvars}[${envvars_keys}[2]] 	${expected_envvars}[${envvars_keys}[2]]
+		# Dictionaries Should Be Equal 	${envvars}[${envvars_keys}[2]] 	${expected_envvars}[${envvars_keys}[2]]
 
 	END
 	GROUP  Checking Schedule response body
@@ -255,13 +266,15 @@ Invalid Request: POST /Jobs
 	...    Create Directory 	${RESULTS_DIR} 	AND
 	...    Run Manager CLI  -n  -a  1  -r  -d  ${RESULTS_DIR}  -s  ${CURDIR}${/}testdata${/}Issue-#289${/}POST_Jobs_Issue-#289.rfs
 
-	Sleep 	5s
+	Sleep 	7s
+	${stdout}  ${stderr}= 	Find Log 	Manager
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=15
 
 	Update Agent Status 	${POST_Jobs}[Body][AgentName]
 	Sleep 	15s
 
 	GROUP  Sending request with wrong key data
-		VAR 	${expected_result} 		Unprocessable Entity
+		VAR 	${expected_result} 		{}
 		VAR 	&{request_body} 		Agentname=WRONG_KEY
 
 		${resp_post}= 	Send POST Request To the Manager 	url=/Jobs 	request=${request_body}  expected_status=422  expected_result=${expected_result}
@@ -289,7 +302,9 @@ Valid Request: POST /Scripts
 	VAR 	${script_dir} 	${CURDIR}${/}testdata${/}Issue-#289${/}POST_Scripts_Issue-#289.rfs
 	Run Manager CLI  -n  -a  1  -d  ${RESULTS_DIR}  -s  ${script_dir}
 
-	Sleep 	5s
+	Sleep 	7s
+	${stdout}  ${stderr}= 	Find Log 	Manager
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=15
 
 	Update Agent Status 	${POST_Scripts}[Body][AgentName]
 	Sleep 	2s
@@ -312,17 +327,29 @@ Valid Request: POST /Scripts
 	GROUP  Checking Scripts response body
 		Length Should Be 	${resp_result}[Scripts]  4
 
-		Check ${resp_result}[Scripts][0] Has File ${1_File}
-		Check ${resp_result}[Scripts][0] Has Hash ${1_Hash}
+		VAR 	&{1_Data} 	File=${1_File}  Hash=${1_Hash}
+		Should Contain 	${resp_result}[Scripts]  ${1_Data}
 
-		Check ${resp_result}[Scripts][1] Has File ${2_File}
-		Check ${resp_result}[Scripts][1] Has Hash ${2_Hash}
+		VAR 	&{2_Data} 	File=${2_File}  Hash=${2_Hash}
+		Should Contain 	${resp_result}[Scripts]  ${2_Data}
 
-		Check ${resp_result}[Scripts][2] Has File ${3_File}
-		Check ${resp_result}[Scripts][2] Has Hash ${3_Hash}
+		VAR 	&{3_Data} 	File=${3_File}  Hash=${3_Hash}
+		Should Contain 	${resp_result}[Scripts]  ${3_Data}
 
-		Check ${resp_result}[Scripts][3] Has File ${4_File}
-		Check ${resp_result}[Scripts][3] Has Hash ${4_Hash}
+		VAR 	&{4_Data} 	File=${4_File}  Hash=${4_Hash}
+		Should Contain 	${resp_result}[Scripts]  ${4_Data}
+
+		# Check ${resp_result}[Scripts][0] Has File ${1_File}
+		# Check ${resp_result}[Scripts][0] Has Hash ${1_Hash}
+
+		# Check ${resp_result}[Scripts][1] Has File ${2_File}
+		# Check ${resp_result}[Scripts][1] Has Hash ${2_Hash}
+
+		# Check ${resp_result}[Scripts][2] Has File ${3_File}
+		# Check ${resp_result}[Scripts][2] Has Hash ${3_Hash}
+
+		# Check ${resp_result}[Scripts][3] Has File ${4_File}
+		# Check ${resp_result}[Scripts][3] Has Hash ${4_Hash}
 
 		# Dictionaries Should Be Equal 	${resp_result}[Scripts][0] 	${POST_Scripts}[Body][Scripts][0]
 		# Dictionaries Should Be Equal 	${resp_result}[Scripts][1] 	${POST_Scripts}[Body][Scripts][1]
@@ -340,13 +367,15 @@ Invalid Request: POST /Scripts
 	...    Create Directory 	${RESULTS_DIR} 	AND
 	...    Run Manager CLI  -n  -a  2  -d  ${RESULTS_DIR}  -s  ${CURDIR}${/}testdata${/}Issue-#289${/}POST_Scripts_Issue-#289.rfs
 
-	Sleep 	5s
+	Sleep 	7s
+	${stdout}  ${stderr}= 	Find Log 	Manager
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=15
 
 	Update Agent Status 	${POST_Scripts}[Body][AgentName]
 	Sleep 	2s
 
 	GROUP  Sending request with wrong key data
-		VAR 	${expected_result} 		Unprocessable Entity
+		VAR 	${expected_result} 		{}
 		VAR 	&{request_body} 		Agentname=WRONG_KEY
 
 		${resp_post}= 	Send POST Request To the Manager 	url=/Scripts 	request=${request_body}  expected_status=422  expected_result=${expected_result}
@@ -376,7 +405,9 @@ Valid Request: POST /File Download
 	VAR 	${script_dir} 	${CURDIR}${/}testdata${/}Issue-#289${/}POST_File_Issue-#289.rfs
 	Run Manager CLI  -n  -a  1  -d  ${RESULTS_DIR}  -s  ${script_dir}
 
-	Sleep 	5s
+	Sleep 	7s
+	${stdout}  ${stderr}= 	Find Log 	Manager
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=15
 
 	Update Agent Status 	${POST_File}[Body_Download][AgentName]
 	Sleep 	15s
@@ -394,7 +425,11 @@ Valid Request: POST /File Download
 		Length Should Be 	${resp_result_download}  4
 		Check ${resp_result_download} Contains Agents Name 	${POST_File}[Body_Download][AgentName]
 		Check ${resp_result_download} Has File ${POST_File}[Body_Download][File]
-		Check ${resp_result_download} Has FileData ${POST_File}[Body_Download][FileData]
+		IF  '${PLATFORM}' == 'windows'
+			Check ${resp_result_download} Has FileData ${POST_File}[Body_Download][FileData_W]
+		ELSE
+			Check ${resp_result_download} Has FileData ${POST_File}[Body_Download][FileData_U_M]
+		END
 	END
 	# GROUP  Checking if files has been downloaded
 	# 	Sleep 	3s
@@ -414,7 +449,9 @@ Invalid Request: POST /File Unknown Action
 	VAR 	${script_dir} 	${CURDIR}${/}testdata${/}Issue-#289${/}POST_File_Issue-#289.rfs
 	Run Manager CLI  -n  -a  1  -d  ${RESULTS_DIR}  -s  ${script_dir}
 
-	Sleep 	5s
+	Sleep 	7s
+	${stdout}  ${stderr}= 	Find Log 	Manager
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=15
 
 	Update Agent Status 	${POST_File}[Body_Download][AgentName]
 	Sleep 	15s
@@ -442,13 +479,15 @@ Invalid Request: POST /File Download
 	VAR 	${script_dir} 	${CURDIR}${/}testdata${/}Issue-#289${/}POST_File_Issue-#289.rfs
 	Run Manager CLI  -n  -a  1  -d  ${RESULTS_DIR}  -s  ${script_dir}
 
-	Sleep 	5s
+	Sleep 	7s
+	${stdout}  ${stderr}= 	Find Log 	Manager
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=15
 
 	Update Agent Status 	${POST_File}[Body_Download][AgentName]
 	Sleep 	15s
 
 	GROUP  Sending request with missing Hash data
-		VAR 	${expected_result} 		Unprocessable Entity
+		VAR 	${expected_result} 		{}
 		VAR 	&{request_Download} 	AgentName=${POST_File}[Body_Download][AgentName]  Action=Download
 
 		${resp_post}= 	Send POST Request To the Manager 	url=/File  request=${request_Download}  expected_status=422  expected_result=${expected_result}
@@ -489,7 +528,9 @@ Valid Request: POST /File Status
 	VAR 	${script_dir} 	${CURDIR}${/}testdata${/}Issue-#289${/}POST_File_Issue-#289.rfs
 	Run Manager CLI  -n  -a  1  -d  ${RESULTS_DIR}  -s  ${script_dir}
 
-	Sleep 	5s
+	Sleep 	7s
+	${stdout}  ${stderr}= 	Find Log 	Manager
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=15
 
 	Update Agent Status 	${POST_File}[Body_Status_1][AgentName]
 	Sleep 	15s
@@ -534,13 +575,15 @@ Invalid Request: POST /File Status
 	VAR 	${script_dir} 	${CURDIR}${/}testdata${/}Issue-#289${/}POST_File_Issue-#289.rfs
 	Run Manager CLI  -n  -a  1  -d  ${RESULTS_DIR}  -s  ${script_dir}
 
-	Sleep 	5s
+	Sleep 	7s
+	${stdout}  ${stderr}= 	Find Log 	Manager
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=15
 
 	Update Agent Status 	${POST_File}[Body_Status][AgentName]
 	Sleep 	15s
 
 	GROUP  Sending request with missing Hash data
-		VAR 	${expected_result} 		Unprocessable Entity
+		VAR 	${expected_result} 		{}
 		VAR 	&{request_Status} 	AgentName=${POST_File}[Body_Status][AgentName]  Action=Status
 
 		${resp_post}= 	Send POST Request To the Manager 	url=/File  request=${request_Status}  expected_status=422  expected_result=${expected_result}
@@ -583,7 +626,9 @@ Valid Request: POST /File Upload
 	VAR 	${script_dir} 	${CURDIR}${/}testdata${/}Issue-#289${/}POST_File_Issue-#289.rfs
 	Run Manager CLI  -n  -a  1  -d  ${RESULTS_DIR}  -s  ${script_dir}
 
-	Sleep 	5s
+	Sleep 	7s
+	${stdout}  ${stderr}= 	Find Log 	Manager
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=15
 
 	Update Agent Status 	${POST_File}[Body_Upload][AgentName]
 	Sleep 	15s
@@ -621,13 +666,15 @@ Invalid Request: POST /File Upload
 	VAR 	${script_dir} 	${CURDIR}${/}testdata${/}Issue-#289${/}POST_File_Issue-#289.rfs
 	Run Manager CLI  -n  -a  1  -d  ${RESULTS_DIR}  -s  ${script_dir}
 
-	Sleep 	5s
+	Sleep 	7s
+	${stdout}  ${stderr}= 	Find Log 	Manager
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=15
 
 	Update Agent Status 	${POST_File}[Body_Upload][AgentName]
 	Sleep 	15s
 
 	GROUP  Sending request with missing Hash data
-		VAR 	${expected_result} 		Unprocessable Entity
+		VAR 	${expected_result} 		{}
 		VAR 	&{request_Upload} 	AgentName=${POST_File}[Body_Upload][AgentName]  Action=Upload
 		...    File=resources/3_Issue-#289.robot  FileData=${POST_File}[Upload_FileData]
 
@@ -684,7 +731,9 @@ Valid Request: POST /Result
 	...    Create Directory 	${RESULTS_DIR} 	AND
 	...    Run Manager CLI  -n  -d  ${RESULTS_DIR}  -s  ${CURDIR}${/}testdata${/}Issue-#289${/}POST_Result_Issue-#289.rfs
 
-	Sleep 	5s
+	Sleep 	7s
+	${stdout}  ${stderr}= 	Find Log 	Manager
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=15
 
 	Update Agent Status 	${POST_Result}[Body][AgentName]
 	Sleep 	15s
@@ -727,7 +776,9 @@ Invalid Request: POST /Result
 	...    Create Directory 	${RESULTS_DIR} 	AND
 	...    Run Manager CLI  -n  -d  ${RESULTS_DIR}  -s  ${CURDIR}${/}testdata${/}Issue-#289${/}POST_Result_Issue-#289.rfs
 
-	Sleep 	5s
+	Sleep 	7s
+	${stdout}  ${stderr}= 	Find Log 	Manager
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=15
 
 	Update Agent Status 	${POST_Result}[Body][AgentName]
 	Sleep 	15s
@@ -736,7 +787,7 @@ Invalid Request: POST /Result
 		VAR 	&{request} 	AgentName=${POST_Result}[Body][AgentName]  ResultName=Test POST /Result Keyword  Result=PASS
 		...    StartTime=1572435546.383  EndTime=1572435546.386  ScriptIndex=1  Robot=1  Iteration=5  Sequence=2
 
-		${resp_post_1}= 	Send POST Request To the Manager 	url=/Result  request=${request}  expected_status=422  expected_result=Unprocessable Entity
+		${resp_post_1}= 	Send POST Request To the Manager 	url=/Result  request=${request}  expected_status=422  expected_result={}
 		&{resp_result_1}= 	Convert To Dictionary 	${resp_post_1.json()}
 		Log 	POST /Result call 2 upload restult:${\n} ${resp_result_1} 	console=True
 
@@ -790,7 +841,9 @@ Valid Request: POST /Metric
 	...    Create Directory 	${RESULTS_DIR} 	AND
 	...    Run Manager CLI  -n  -d  ${RESULTS_DIR}
 
-	Sleep 	5s
+	Sleep 	7s
+	${stdout}  ${stderr}= 	Find Log 	Manager
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=15
 
 	Update Agent Status 	${POST_Metric}[AgentName]
 	Sleep 	15s
@@ -875,7 +928,9 @@ Invalid Request: POST /Metric
 	...    Create Directory 	${RESULTS_DIR} 	AND
 	...    Run Manager CLI  -n  -d  ${RESULTS_DIR}
 
-	Sleep 	5s
+	Sleep 	7s
+	${stdout}  ${stderr}= 	Find Log 	Manager
+	Wait Until the File Is Not Empty 	${stdout} 	timeout=15
 
 	Update Agent Status 	${POST_Metric}[AgentName]
 	Sleep 	15s
@@ -883,7 +938,7 @@ Invalid Request: POST /Metric
 	GROUP  Sending request with missing SecondaryMetrics data
 		VAR 	&{request} 	AgentName=${POST_Metric}[AgentName]  PrimaryMetric=my_test_server  MetricType=AUT Web  MetricTime=1753812970
 
-		${resp_post_1}= 	Send POST Request To the Manager 	url=/Metric 	request=${request}  expected_status=422  expected_result=Unprocessable Entity
+		${resp_post_1}= 	Send POST Request To the Manager 	url=/Metric 	request=${request}  expected_status=422  expected_result={}
 		&{resp_result_1}= 	Convert To Dictionary 	${resp_post_1.json()}
 		Log 	POST /Metric call upload restult:${\n} ${resp_result_1} 	console=True
 

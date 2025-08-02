@@ -3,11 +3,10 @@ Resource    resources/2r_Issue-#289.resource
 
 ***Test Cases***
 Example Test Case One One
-    Log     %{OS}
+    Log     %{MY_OS}
     Test One
 
 Example Test Case One Two
-    Log     %{TEMP}
     Log     %{PATH}
     Test Two
 

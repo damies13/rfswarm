@@ -74,7 +74,7 @@ Run ${component_name} CLI
 
 	END
 
-	Log 	*==== ${component_name} started ===* 	console=${True}
+	Log 	*=== ${component_name} started ===* 	console=${True}
 
 Stop ${component_name} CLI
 	[Documentation] 	Closes one of the RFSwarm applications with CLI only. Pass the: Manager, Reporter or Agent
