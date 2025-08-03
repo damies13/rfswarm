@@ -38,7 +38,7 @@ jobs:
           print('milestones:', milestones)
           for milestone in milestones:
             print('milestone:', milestone)
-            ms = milestones[milestone]
+            ms = milestone
             print('title:', ms['title'])
             if ms['title'] == branchname:
               print(ms)
