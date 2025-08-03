@@ -32,14 +32,15 @@ jobs:
           import requests
           branchname = os.getenv("branchname")
           print("branchname:", branchname)
-          milestones = requests.get('https://api.github.com/repos/damies13/rfswarm/milestones')
+          milestonesresp = requests.get('https://api.github.com/repos/damies13/rfswarm/milestones')
+          milestones = milestonesresp.json()
           dopublish = 0
-          print('milestones:', milestones.json())
-          for ms in milestones.json():
-            print('ms:', ms)
-            title = milestones.json()[ms]['title']
-            print('title:', title)
-            if title == branchname:
+          print('milestones:', milestones)
+          for milestone in milestones:
+            print('milestone:', milestone)
+            ms = milestones[milestone]
+            print('title:', ms['title'])
+            if ms['title'] == branchname:
               print(ms)
               open_issues = ms['open_issues']
               closed_issues = ms['closed_issues']
