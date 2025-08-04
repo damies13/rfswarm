@@ -92,16 +92,21 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
 
-    #   Having another go at auto publishing
-    # https://github.com/pypa/gh-action-pypi-publish
-      - name: Publish package to TestPyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-            password: ${{ secrets.TEST_PYPI_TOKEN }}
-            repository-url: https://test.pypi.org/legacy/
-
-      - name: Do Publish
-        if: ${{ env.dopublish == 1 }}
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-            password: ${{ secrets.PYPI_TOKEN }}
+      #   Having another go at auto publishing
+      # https://github.com/pypa/gh-action-pypi-publish
+      #
+      # Trusted publishing cannot be used from within a reusable workflow at this time. It is recommended to instead create a non-reusable workflow that contains a job calling your reusable workflow, and then do the trusted publishing step from a separate job within that non-reusable workflow. Alternatively, you can still use a username/token inside the reusable workflow.
+      #
+      # workflow_call is classified as a reusable workflow, sees this will not work
+      #
+      # - name: Publish package to TestPyPI
+      #   uses: pypa/gh-action-pypi-publish@release/v1
+      #   with:
+      #       password: ${{ secrets.TEST_PYPI_TOKEN }}
+      #       repository-url: https://test.pypi.org/legacy/
+      #
+      # - name: Do Publish
+      #   if: ${{ env.dopublish == 1 }}
+      #   uses: pypa/gh-action-pypi-publish@release/v1
+      #   with:
+      #       password: ${{ secrets.PYPI_TOKEN }}
