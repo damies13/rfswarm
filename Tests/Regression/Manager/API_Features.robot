@@ -1269,6 +1269,7 @@ Send Metric Data to the Manager With Wrong Value Type in Request
 
 	END
 	GROUP  Check the Manager's output for the TypeError exception
+		Sleep 	5s
 		${stdout}  ${stderr} = 		Find Log 	Manager
 		${stderr_content}= 			Read Log 	${stderr}
 		Should Contain 	${stderr_content} 		TypeError 	Missing TypeError Excaption in Manager's stderr file.
