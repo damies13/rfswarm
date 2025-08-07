@@ -60,7 +60,7 @@ Check ${call_result} Contains Agents Name
 
 Check ${call_result} Has ${type} ${expceted}
 	${status}= 	Should Contain 	${call_result}  ${type}
-	IF  not ${status}
+	IF  ${status}
 		Fail 	Result body doesn't contain '${type}' key.
 	ELSE
 		Convert To String 	${call_result}[${type}]
