@@ -28,7 +28,7 @@ Handle Donation Reminder
 
 Open ${component_name} GUI
 	[Documentation] 	Open one of the RFSwarm applications for GUI purposes. Pass the: Manager, Reporter or Agent
-	[Arguments] 	@{appargs}
+	[Arguments] 	@{appargs}  ${envargs}=${None}
 	${comp} 	Convert To Lower Case 	${component_name}
 	${var}= 	Get Variables
 	Log 	${var}
@@ -42,7 +42,7 @@ Open ${component_name} GUI
 		VAR 	${noargs} 	${True}
 	END
 
-	Run Keyword 	Run ${component_name} CLI 	@{appargs} 	noargs=${noargs}
+	Run Keyword 	Run ${component_name} CLI 	@{appargs}  noargs=${noargs}  envargs=${envargs}
 
 	IF 	'-n' in ${appargs} or '--nogui' in ${appargs}
 		Sleep 	5
