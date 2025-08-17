@@ -185,3 +185,38 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 	...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}
 
 	[Teardown]	Run Keywords	Stop Agent CLI	Stop Manager CLI
+
+Run Test Cases With Embedded Variables
+	[Tags] 		ubuntu-latest 	macos-latest 	windows-latest 	Issue #156
+	[Setup] 	Run Keywords
+	...    Create Directory 	${CURDIR}${/}testdata${/}Issue-#156${/}results  AND
+	...    Clear Result Directory 	RES_DIR=${CURDIR}${/}testdata${/}Issue-#156${/}results  AND
+	...    Run Agent CLI  -g 3
+	
+	VAR 	${test_folder} 	${CURDIR}${/}testdata${/}Issue-#156
+	VAR 	${scenario_name} 	test_scenario
+	VAR 	${robot_test_name} 	Send GET on API \${endpoint} on \${env}
+	
+	Run Manager CLI  -n  -s  ${test_folder}${/}${scenario_name}.rfs  -d  ${test_folder}${/}results
+
+	Wait For Manager Process 	timeout=10min
+	Stop Agent CLI
+
+	Check Logs 	Manager
+	Check Logs 	Agent
+
+	@{scenario_res_dirs}= 	List Directories In Directory 	${test_folder}${/}results  pattern=*${scenario_name}*  absolute=${True}
+	@{result_dirs}= 		List Directories In Directory 	${scenario_res_dirs}[0]${/}logs  absolute=${True}
+
+	FOR  ${result_dir}  IN  @{result_dirs}
+		VAR 	${xml_file} 	${robot_test_name}_output.xml
+		${xml_file_content}= 	Get File 	${result_dir}${/}${xml_file}
+		Should Contain 	${xml_file_content}  Send GET on API my endpoint on QAENV
+		Should Not Contain 	${xml_file_content}  status="FAIL"
+	END
+
+	# ${stdout}  ${stderr}= 	Find Log 	Agent
+	# Wait Until the File Is Not Empty 	${stdout} 	timeout=${16}
+
+	[Teardown] 	Run Keywords
+	...    Stop Agent CLI  AND  Stop Manager CLI
