@@ -81,7 +81,7 @@ Another advantage of using ngrok is that you only need to install it in the comp
 Agents do not need to have ngrok installed to be able to connect with Manager using a special ngrok link.
 
 ### Ngrok Configuration
-1. Create an account at (Official ngrok site)[https://ngrok.com/]
+1. Create an account at [Official ngrok site](https://ngrok.com/)
 
 2. Download the ngrok version for your operating system. (*In the following steps, we will use the Linux version.*)
 
@@ -107,7 +107,7 @@ Agents do not need to have ngrok installed to be able to connect with Manager us
     You can select different regions, such as: `us, ap, au, sa, jp, in`
     * Finally, we specify the port of our Manager, whose default value is `8318`. If you have configured a different port in the Manager, you must also specify it here.
 
-    For more information on configuration follow: (ngrok documentation)[https://ngrok.com/docs/]
+    For more information on configuration follow: [ngrok documentation](https://ngrok.com/docs/)
 
 7. After executing this command, if everything went well, the terminal window should transform into the **ngrok session window**.
 
@@ -197,11 +197,11 @@ flowchart TD
 In our case, all agents join the same private Hamachi network together with the Manager and communicate with it using a Manager's virtual IP address.
 
 ### Hamachi Configuration
-1. Create an account on the (Official Hamachi site)[https://vpn.net/]. Click the "Sign up" button at the top of the home page.
+1. Create an account on the [Official Hamachi site](https://vpn.net/). Click the "Sign up" button at the top of the home page.
 
     This step is not required to create a simple virtual network, but we recommend doing so.
 
-2. Download the Hamachi application version for your operating system from the (Official Hamachi site)[https://vpn.net/].
+2. Download the Hamachi application version for your operating system from the [Official Hamachi site](https://vpn.net/).
 
     (*In the following steps, we will use the versions for Linux (**Agent**) and Windows (**Manager**)*) \
     We need to install Hamachi application on every device that will act as the Agent or Manager.
@@ -245,7 +245,7 @@ In our case, all agents join the same private Hamachi network together with the 
 
     \
     Go to this link:
-    (LogMeIn central website)[https://secure.logmein.com/central/Central.aspx] \
+    [LogMeIn central website](https://secure.logmein.com/central/Central.aspx) \
     Next, go to the section: *("Networks" > "My Networks")*
 
     The invitations you created should appear at the top of the page. Go there and accept them.
