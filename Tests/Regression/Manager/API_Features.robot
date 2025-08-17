@@ -24,7 +24,7 @@ Check Connection To Manager
 
 	${resp_get}= 	Send GET Request To the Manager 	url=/
 	&{get_result}= 	Convert To Dictionary 	${resp_get.json()}
-	Log 	GET / call restult:${\n} ${get_result} 	console=True
+	Log 	GET / call result:${\n} ${get_result} 	console=True
 
 	GROUP  Check AgentStatus response body
 		Should Be Equal As Strings 		${get_result}[POST][AgentStatus][URI] 	${GET}[AgentStatus][URI]
@@ -68,7 +68,7 @@ Getting an Invalid Path From Manager
 	GROUP  Send request with invalid url: (/GET) instead of: (/)
 		VAR 	${expected_result} 		Unrecognised request: 'ParseResult(scheme='', netloc='', path='/GET', params='', query='', fragment='')'
 		${resp_get}= 	Send GET Request To the Manager 	url=/GET  expected_status=404  expected_result=${expected_result}
-		Log 	GET / call restult:${\n} ${resp_get.text} 	console=True
+		Log 	GET / call result:${\n} ${resp_get.text} 	console=True
 	END
 
 	[Teardown] 	Run Keywords
@@ -87,7 +87,7 @@ Update Agent Status in Manager
 
 	${resp_post}  ${request_body}= 	Update Agent Status 	agent_name=${POST_AgentStatus}[Body][AgentName]
 	&{resp_result}= 	Convert To Dictionary 	${resp_post.json()}
-	Log 	POST /AgentStatus call restult:${\n} ${resp_result} 	console=True
+	Log 	POST /AgentStatus call result:${\n} ${resp_result} 	console=True
 	Sleep 	2s
 
 	GROUP  Check response body
@@ -150,7 +150,7 @@ Update Agent Status in Manager With Missing Field
 
 		${resp_post}= 	Send POST Request To the Manager
 		...    url=/AgentStatus 	request=${request_body}  expected_status=422  expected_result=${expected_result}
-		Log 	POST /AgentStatus call restult:${\n} ${resp_post.text} 	console=True
+		Log 	POST /AgentStatus call result:${\n} ${resp_post.text} 	console=True
 	END
 
 	[Teardown] 	Run Keywords
@@ -170,12 +170,12 @@ Update Agent Status in Manager With Invalid Field Type
 	${ipv4} 	${ipv6}= 	Get Ip Addresses
 	VAR 	@{Agent_IP} 	${ipv4}[0]  ${ipv6}[0]
 
-	GROUP  Send request with invalid field type. CPU% in (str) type istead of (int) type.
+	GROUP  Send request with invalid field type. CPU% in (str) type instead of (int) type.
 		VAR 	${expected_result} 		'>' not supported between instances of 'int' and 'str'
 		VAR 	&{request_body} 		AgentName=ERR_AGENT  Status=ERR  AgentIPs=${Agent_IP}  Robots=${1}  CPU%=11  MEM%=${1}  NET%=${1}
 
 		${resp_post}= 	Send POST Request To the Manager 	url=/AgentStatus 	request=${request_body}  expected_status=500  expected_result=${expected_result}
-		Log 	POST /AgentStatus call restult:${\n} ${resp_post.text} 	console=True
+		Log 	POST /AgentStatus call result:${\n} ${resp_post.text} 	console=True
 	END
 
 	[Teardown] 	Run Keywords
@@ -200,7 +200,7 @@ Update Agent Status in Manager With Wrong Field Value
 		VAR 	&{request_body} 		AgentName=ERR_AGENT  Status=ERR  AgentIPs=${Agent_IP}  Robots=${1}  CPU%=${110}  MEM%=${1}  NET%=${1}
 
 		${resp_post}= 	Send POST Request To the Manager 	url=/AgentStatus 	request=${request_body}
-		Log 	POST /AgentStatus call restult:${\n} ${resp_post.text} 	console=True
+		Log 	POST /AgentStatus call result:${\n} ${resp_post.text} 	console=True
 	END
 
 	[Teardown] 	Run Keywords
@@ -235,7 +235,7 @@ Get Jobs Assigned to the Agent by Manager
 
 	${resp_post}= 	Send POST Request To the Manager 	url=/Jobs 	request=${request_body}
 	&{resp_result}= 	Convert To Dictionary 	${resp_post.json()}
-	Log 	POST /Jobs call restult:${\n} ${resp_result} 	console=True
+	Log 	POST /Jobs call result:${\n} ${resp_result} 	console=True
 
 	GROUP  Check Agent values in response body. (AgentName, Abort, UploadMode)
 		Should Be Equal As Integers 	${${resp_result}[EndTime] - ${resp_result}[StartTime]} 	${50 + 10}
@@ -321,7 +321,7 @@ Get Jobs Assigned by the Manager to an Agent Whose Field Is Incorrect
 		VAR 	&{request_body} 		Agentname=WRONG_KEY
 
 		${resp_post}= 	Send POST Request To the Manager 	url=/Jobs 	request=${request_body}  expected_status=422  expected_result=${expected_result}
-		Log 	POST /Jobs call restult:${\n} ${resp_post.text} 	console=True
+		Log 	POST /Jobs call result:${\n} ${resp_post.text} 	console=True
 	END
 
 	[Teardown] 	Run Keywords
@@ -345,7 +345,7 @@ Get Jobs Assigned to an Agent Who is Unregistered in the Manager
 		VAR 	&{request_body} 	AgentName=UNKNOWN
 		${resp_post}= 	Send POST Request To the Manager 	url=/Jobs 	request=${request_body}
 		&{resp_result}= 	Convert To Dictionary 	${resp_post.json()}
-		Log 	POST /Jobs call restult:${\n} ${resp_result} 	console=True
+		Log 	POST /Jobs call result:${\n} ${resp_result} 	console=True
 
 		Length Should Be 	${resp_result}[Schedule]  ${0} 	# no jobs for unknown agent
 	END
@@ -382,7 +382,7 @@ Get Scripts Information From Manager
 
 	${resp_post}= 	Send POST Request To the Manager 	url=/Scripts 	request=${request_body}
 	&{resp_result}= 	Convert To Dictionary 	${resp_post.json()}
-	Log 	POST /Scripts call restult:${\n} ${resp_result} 	console=True
+	Log 	POST /Scripts call result:${\n} ${resp_result} 	console=True
 
 	Check ${resp_result} Contains Agents Name 	${POST_Scripts}[Body][AgentName]
 	GROUP  Check Scripts response body
@@ -436,7 +436,7 @@ Get Scripts Information From Manager For Unregistered Agent
 
 		${resp_post}= 	Send POST Request To the Manager 	url=/Scripts 	request=${request_body}
 		&{resp_result}= 	Convert To Dictionary 	${resp_post.json()}
-		Log 	POST /Scripts call restult:${\n} ${resp_result} 	console=True
+		Log 	POST /Scripts call result:${\n} ${resp_result} 	console=True
 
 		Length Should Be 	${resp_result}[Scripts]  4
 
@@ -475,7 +475,7 @@ Get Scripts Information From Manager With Wrong Field in Request
 		VAR 	&{request_body} 		agentName=WRONG_KEY
 
 		${resp_post}= 	Send POST Request To the Manager 	url=/Scripts 	request=${request_body}  expected_status=422  expected_result=${expected_result}
-		Log 	POST /Scripts call restult:${\n} ${resp_post.text} 	console=True
+		Log 	POST /Scripts call result:${\n} ${resp_post.text} 	console=True
 	END
 
 	[Teardown] 	Run Keywords
@@ -506,7 +506,7 @@ Request File Operation With Unknown Action
 
 		${resp_post}= 	Send POST Request To the Manager 	url=/File 	request=${request_body}
 		...    expected_status=404  expected_result=${expected_result}
-		Log 	POST /File call restult:${\n} ${resp_post.text} 	console=True
+		Log 	POST /File call result:${\n} ${resp_post.text} 	console=True
 	END
 
 	[Teardown] 	Run Keywords
@@ -535,7 +535,7 @@ Download a File From Manager
 
 	${resp_post}= 	Send POST Request To the Manager 	url=/File 	request=${request_Download}
 	&{resp_result_download}= 	Convert To Dictionary 	${resp_post.json()}
-	Log 	POST /File call download restult:${\n} ${resp_result_download} 	console=True
+	Log 	POST /File call download result:${\n} ${resp_result_download} 	console=True
 
 	Sleep 	5s
 	GROUP  Check response body
@@ -579,7 +579,7 @@ Download a File From Manager From Unregistered Agent
 		${resp_post}= 	Send POST Request To the Manager 	url=/File 	request=${request_Download}
 		&{resp_result}= 	Convert To Dictionary 	${resp_post.json()}
 		&{resp_result_download}= 	Convert To Dictionary 	${resp_post.json()}
-		Log 	POST /File call download restult:${\n} ${resp_result_download} 	console=True
+		Log 	POST /File call download result:${\n} ${resp_result_download} 	console=True
 
 		Length Should Be 	${resp_result_download}  4
 		Check ${resp_result_download} Contains Agents Name 	UNKNOWN_AGENT
@@ -618,7 +618,7 @@ Download a File From Manager With Missing Field in Request
 
 		${resp_post}= 	Send POST Request To the Manager
 		...    url=/File  request=${request_Download}  expected_status=422  expected_result=${expected_result}
-		Log 	POST /File call restult:${\n} ${resp_post.text} 	console=True
+		Log 	POST /File call result:${\n} ${resp_post.text} 	console=True
 	END
 
 	[Teardown] 	Run Keywords
@@ -647,7 +647,7 @@ Download a File From Manager With Unknown Hash
 
 		${resp_post}= 	Send POST Request To the Manager 	url=/File 	request=${request_Download}  expected_status=404  expected_result=${expected_result}
 		&{resp_result}= 	Convert To Dictionary 	${resp_post.json()}
-		Log 	POST /File call restult:${\n} ${resp_result} 	console=True
+		Log 	POST /File call result:${\n} ${resp_result} 	console=True
 	END
 
 	[Teardown] 	Run Keywords
@@ -676,7 +676,7 @@ Get Available File Status From Manager
 
 	${resp_post_1}= 	Send POST Request To the Manager 	url=/File 	request=${request_Status_1}
 	&{resp_result_status_1}= 	Convert To Dictionary 	${resp_post_1.json()}
-	Log 	POST /File call status restult:${\n} ${resp_result_status_1} 	console=True
+	Log 	POST /File call status result:${\n} ${resp_result_status_1} 	console=True
 
 	GROUP  Check response body from call with available file
 		Length Should Be 	${resp_result_status_1}  3
@@ -710,7 +710,7 @@ Get File Status With Unknown Hash From Manager
 
 	${resp_post_2}= 	Send POST Request To the Manager 	url=/File 	request=${request_Status_2}
 	&{resp_result_status_2}= 	Convert To Dictionary 	${resp_post_2.json()}
-	Log 	POST /File call status restult:${\n} ${resp_result_status_2} 	console=True
+	Log 	POST /File call status result:${\n} ${resp_result_status_2} 	console=True
 
 	GROUP  Check response body from call with unknown hash
 		Length Should Be 	${resp_result_status_2}  3
@@ -746,7 +746,7 @@ Get File Status From Manager From Unregistered Agent
 
 		${resp_post}= 	Send POST Request To the Manager 	url=/File 	request=${request_Status}
 		&{resp_result}= 	Convert To Dictionary 	${resp_post.json()}
-		Log 	POST /File call restult:${\n} ${resp_result} 	console=True
+		Log 	POST /File call result:${\n} ${resp_result} 	console=True
 
 		Length Should Be 	${resp_result}  3
 		Check ${resp_result} Contains Agents Name 	UNKNOWN_AGENT
@@ -778,7 +778,7 @@ Get File Status From Manager With Missing Field in Request
 		VAR 	&{request_Status} 		AgentName=${POST_File}[Body_Status][AgentName]  Action=Status
 
 		${resp_post}= 	Send POST Request To the Manager 	url=/File  request=${request_Status}  expected_status=422  expected_result=${expected_result}
-		Log 	POST /File call restult:${\n} ${resp_post.text} 	console=True
+		Log 	POST /File call result:${\n} ${resp_post.text} 	console=True
 	END
 
 	[Teardown] 	Run Keywords
@@ -808,7 +808,7 @@ Upload a File to the Manager
 
 	${resp_post}= 	Send POST Request To the Manager 	url=/File 	request=${request_Upload}
 	&{resp_result_upload}= 	Convert To Dictionary 	${resp_post.json()}
-	Log 	POST /File call upload restult:${\n} ${resp_result_upload} 	console=True
+	Log 	POST /File call upload result:${\n} ${resp_result_upload} 	console=True
 
 	GROUP  Check response body
 		Length Should Be 	${resp_result_upload}  3
@@ -827,7 +827,7 @@ Upload a File to the Manager
 Upload a File to the Manager From Unregistered Agent
 	[Documentation]
 	...    Unregistered Agent should be able to get files status as part of the Manager's recovery system.
-	...    When Manager closes unexpectedly, Agent continous sending files to the Manager after restarting it.
+	...    When Manager closes unexpectedly, Agent continuous sending files to the Manager after restarting it.
 	[Tags] 	windows-latest  ubuntu-latest  macos-latest  Issue #289  robot:continue-on-failure  Negative-Test
 	[Setup] 	Run Keywords
 	...    Set Test Variable 	${RESULTS_DIR}  ${CURDIR}${/}testdata${/}Issue-#289${/}results 	AND
@@ -852,7 +852,7 @@ Upload a File to the Manager From Unregistered Agent
 
 		${resp_post}= 	Send POST Request To the Manager 	url=/File 	request=${request_Upload}
 		&{resp_result_upload}= 	Convert To Dictionary 	${resp_post.json()}
-		Log 	POST /File call restult:${\n} ${resp_result_upload} 	console=True
+		Log 	POST /File call result:${\n} ${resp_result_upload} 	console=True
 
 		Length Should Be 	${resp_result_upload}  3
 		Check ${resp_result_upload} Contains Agents Name 	UNKNOWN_AGENT
@@ -885,7 +885,7 @@ Upload a File to the Manager With Missing Hash Field in Request
 		...    File=resources/3_Issue-#289.robot  FileData=${POST_File}[Upload_FileData]
 
 		${resp_post}= 	Send POST Request To the Manager 	url=/File  request=${request_Upload}  expected_status=422  expected_result=${expected_result}
-		Log 	POST /File call restult:${\n} ${resp_post.text} 	console=True
+		Log 	POST /File call result:${\n} ${resp_post.text} 	console=True
 	END
 
 	[Teardown] 	Run Keywords
@@ -915,7 +915,7 @@ Upload a File to the Manager With Missing FileData Field in Request
 		VAR 	&{request_Upload} 	AgentName=${POST_File}[Body_Upload][AgentName]  Action=Upload  Hash=${3_Hash}
 
 		${resp_post}= 	Send POST Request To the Manager 	url=/File  request=${request_Upload}  expected_status=500  expected_result=${expected_result}
-		Log 	POST /File call restult:${\n} ${resp_post.text} 	console=True
+		Log 	POST /File call result:${\n} ${resp_post.text} 	console=True
 	END
 
 	[Teardown] 	Run Keywords
@@ -941,9 +941,9 @@ Send Result Data to the Manager
 
 	${resp_post}= 	Send POST Request To the Manager 	url=/Result 	request=${request}
 	&{resp_result_1}= 	Convert To Dictionary 	${resp_post.json()}
-	Log 	POST /Result call upload restult:${\n} ${resp_result_1} 	console=True
+	Log 	POST /Result call upload result:${\n} ${resp_result_1} 	console=True
 
-	GROUP  Check respone body
+	GROUP  Check response body
 		Length Should Be 	${resp_result_1}  2
 		Check ${resp_result_1} Contains Agents Name 	${POST_Result}[Body][AgentName]
 		Check ${resp_result_1} Has Result Queued
@@ -992,7 +992,7 @@ Send Result Data to the Manager With Wrong ScriptIndex Field in Request
 
 		${resp_post_2}= 	Send POST Request To the Manager 	url=/Result  request=${request}
 		&{resp_result_2}= 	Convert To Dictionary 	${resp_post_2.json()}
-		Log 	POST /Result call 1 upload restult:${\n} ${resp_result_2} 	console=True
+		Log 	POST /Result call 1 upload result:${\n} ${resp_result_2} 	console=True
 
 		Length Should Be 	${resp_result_2}  2
 		Check ${resp_result_2} Contains Agents Name 	${POST_Result}[Body][AgentName]
@@ -1022,7 +1022,7 @@ Send Result Data to the Manager With Missing Field in Request
 
 		${resp_post_1}= 	Send POST Request To the Manager 	url=/Result  request=${request}  expected_status=422  expected_result={}
 		&{resp_result_1}= 	Convert To Dictionary 	${resp_post_1.json()}
-		Log 	POST /Result call 2 upload restult:${\n} ${resp_result_1} 	console=True
+		Log 	POST /Result call 2 upload result:${\n} ${resp_result_1} 	console=True
 
 		Length Should Be 	${resp_result_1}  0
 	END
@@ -1053,7 +1053,7 @@ Send Result Data to the Manager From Unregistered Agent
 
 		${resp_post_3}= 	Send POST Request To the Manager 	url=/Result  request=${request}
 		&{resp_result_3}= 	Convert To Dictionary 	${resp_post_3.json()}
-		Log 	POST /Result call 1 upload restult:${\n} ${resp_result_3} 	console=True
+		Log 	POST /Result call 1 upload result:${\n} ${resp_result_3} 	console=True
 
 		Length Should Be 	${resp_result_3}  2
 		Check ${resp_result_3} Contains Agents Name 	UNKNOWN_AGENT
@@ -1084,7 +1084,7 @@ Send Result Data to the Manager With Wrong Field Value in Request
 
 		${resp_post_4}= 	Send POST Request To the Manager 	url=/Result  request=${request}
 		&{resp_result_4}= 	Convert To Dictionary 	${resp_post_4.json()}
-		Log 	POST /Result call 1 upload restult:${\n} ${resp_result_4} 	console=True
+		Log 	POST /Result call 1 upload result:${\n} ${resp_result_4} 	console=True
 
 		Length Should Be 	${resp_result_4}  2
 		Check ${resp_result_4} Contains Agents Name 	${POST_Result}[Body][AgentName]
@@ -1096,7 +1096,7 @@ Send Result Data to the Manager With Wrong Field Value in Request
 
 Send Metric Data to the Manager
 	[Tags] 	windows-latest  ubuntu-latest  macos-latest  Issue #289  robot:continue-on-failure  Positive-Test
-	[Documentation] 	Emulating the agent and monitoring scritps who make this call to the manager.
+	[Documentation] 	Emulating the agent and monitoring scripts who make this call to the manager.
 	[Setup] 	Run Keywords
 	...    Set Test Variable 	${RESULTS_DIR}  ${CURDIR}${/}testdata${/}Issue-#289${/}results 	AND
 	...    Create Directory 	${RESULTS_DIR} 	AND
@@ -1115,7 +1115,7 @@ Send Metric Data to the Manager
 
 	${resp_post}= 	Send POST Request To the Manager 	url=/Metric 	request=${request}
 	&{resp_result}= 	Convert To Dictionary 	${resp_post.json()}
-	Log 	POST /Metric call upload restult:${\n} ${resp_result} 	console=True
+	Log 	POST /Metric call upload result:${\n} ${resp_result} 	console=True
 
 	GROUP  Check response body
 		Length Should Be 	${resp_result}  2
@@ -1203,7 +1203,7 @@ Send Metric Data to the Manager From Unregistered Agent
 
 		${resp_post_2}= 	Send POST Request To the Manager 	url=/Metric 	request=${request}
 		&{resp_result_2}= 	Convert To Dictionary 	${resp_post_2.json()}
-		Log 	POST /Metric call upload restult:${\n} ${resp_result_2} 	console=True
+		Log 	POST /Metric call upload result:${\n} ${resp_result_2} 	console=True
 
 		Length Should Be 	${resp_result_2}  2
 		Check ${resp_result_2} Has Metric my_test_server
@@ -1232,7 +1232,7 @@ Send Metric Data to the Manager With Missing Field in Request
 
 		${resp_post_1}= 	Send POST Request To the Manager 	url=/Metric 	request=${request}  expected_status=422  expected_result={}
 		&{resp_result_1}= 	Convert To Dictionary 	${resp_post_1.json()}
-		Log 	POST /Metric call upload restult:${\n} ${resp_result_1} 	console=True
+		Log 	POST /Metric call upload result:${\n} ${resp_result_1} 	console=True
 
 		Length Should Be 	${resp_result_1}  0
 	END
@@ -1261,7 +1261,7 @@ Send Metric Data to the Manager With Wrong Value Type in Request
 
 		${resp_post_3}= 	Send POST Request To the Manager 	url=/Metric 	request=${request}
 		&{resp_result_3}= 	Convert To Dictionary 	${resp_post_3.json()}
-		Log 	POST /Metric call upload restult:${\n} ${resp_result_3} 	console=True
+		Log 	POST /Metric call upload result:${\n} ${resp_result_3} 	console=True
 
 		Length Should Be 	${resp_result_3}  2
 		Check ${resp_result_3} Has Metric my_test_server
@@ -1272,7 +1272,7 @@ Send Metric Data to the Manager With Wrong Value Type in Request
 		Sleep 	5s
 		${stdout}  ${stderr} = 		Find Log 	Manager
 		${stderr_content}= 			Read Log 	${stderr}
-		Should Contain 	${stderr_content} 		TypeError 	Missing TypeError Excaption in Manager's stderr file.
+		Should Contain 	${stderr_content} 		TypeError 	Missing TypeError Exception in Manager's stderr file.
 	END
 
 	[Teardown] 	Run Keywords
