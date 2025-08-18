@@ -245,7 +245,7 @@ In our case, all agents join the same private Hamachi network together with the 
 
     \
     Go to this link:
-    [LogMeIn central website](https://secure.logmein.com/central/Central.aspx) \
+    [LogMeIn central site](https://secure.logmein.com/central/Central.aspx) \
     Next, go to the section: *("Networks" > "My Networks")*
 
     The invitations you created should appear at the top of the page. Go there and accept them.
