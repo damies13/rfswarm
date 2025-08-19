@@ -17,12 +17,12 @@ In such situations, we offer tools that gives you ability to create and control 
 
 **Methods**:
 1. Port forwarding
-    Port forwarding is a method that allows you to make an application running on your computer available on the Internet.
+    Port forwarding is a method that allows you to make an application running on your computer available on the internet.
     All you need to do is configure your router to redirect traffic from a specific external port (in our case, for example, 8138) to the internal IP address where the Manager and application port are installed (e.g. 192.168.0.10:8138). \
     Each router is different, and we cannot cover all possible models. For information on configuring port forwarding, please refer to your router's documentation.
 2. VPN
     A VPN from your organisation or your personal VPN can be a secure alternative to port forwarding.
-    Instead of making the application directly available on the Internet and exposing yourself to the risks associated with opening router ports, you connect via a virtual private network that creates a secure tunnel between external computers and your internal network.
+    Instead of making the application directly available on the internet and exposing yourself to the risks associated with opening router ports, you connect via a virtual private network that creates a secure tunnel between external computers and your internal network.
 3. [Ngrok](#ngrok)
 4. [Hamachi](#hamachi)
 
