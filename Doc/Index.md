@@ -14,6 +14,6 @@
 1. [Preparing a test case for performance](Preparing_for_perf.md)
 1. [AUT Monitoring](AUT_Monitoring.md)
 1. [Agent Communication](Agent_Communication.md)
-1. [Optional methods for connecting Agents to the Manager](methods_for_connecting_agents.md)
+1. [Optional external network connections](optional_external_network_connections.md)
 1. [Screenshots](Screen_Shots.md)
 1. [FAQ](FAQ.md)
