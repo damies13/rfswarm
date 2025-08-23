@@ -22,7 +22,7 @@ ${scenario_name} 	${None}
 ${agent_name} 		${None}
 
 
-*** Test Cases ***
+*** Test Cases *** 	LangCode
 Latin 		pl
 Icelandic 	ic
 Greek 		gr

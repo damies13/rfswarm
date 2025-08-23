@@ -190,7 +190,6 @@ Run Test Cases With Embedded Variables
 	[Tags] 		ubuntu-latest 	macos-latest 	windows-latest 	Issue #156
 	[Setup] 	Run Keywords
 	...    Create Directory 	${CURDIR}${/}testdata${/}Issue-#156${/}results  AND
-	...    Clear Result Directory 	RES_DIR=${CURDIR}${/}testdata${/}Issue-#156${/}results  AND
 	...    Run Agent CLI  -g 3
 	
 	VAR 	${test_folder} 	${CURDIR}${/}testdata${/}Issue-#156
@@ -209,14 +208,25 @@ Run Test Cases With Embedded Variables
 	@{result_dirs}= 		List Directories In Directory 	${scenario_res_dirs}[0]${/}logs  absolute=${True}
 
 	FOR  ${result_dir}  IN  @{result_dirs}
-		VAR 	${xml_file} 	${robot_test_name}_output.xml
-		${xml_file_content}= 	Get File 	${result_dir}${/}${xml_file}
+		@{files}= 	List Files In Directory 	${result_dir}
+		Log 	${files}
+		# The xml file name is being strangely converted in linux/mac
+		@{xml_file}= 	List Files In Directory 	${result_dir}  pattern=*_output.xml  absolute=${True}
+
+		${xml_file_content}= 	Get File 	${xml_file}[0]
 		Should Contain 	${xml_file_content}  Send GET on API my endpoint on QAENV
 		Should Not Contain 	${xml_file_content}  status="FAIL"
+		Should Not Contain 	${xml_file_content}  Do Not Use Test Case
 	END
 
-	# ${stdout}  ${stderr}= 	Find Log 	Agent
-	# Wait Until the File Is Not Empty 	${stdout} 	timeout=${16}
+	VAR 	${query} 	SELECT result_name FROM Summary
+	@{scenario_DBs}= 	List Files In Directory 	${scenario_res_dirs}[0]  pattern=*.db  absolute=${True}
+	@{query_result}= 	Query Result DB 	${scenario_DBs}[0]  ${query}
+
+	Should Be Equal 	${query_result}[0][0] 	Log Data 1
+	Should Be Equal 	${query_result}[1][0] 	Log Data 2
+	Should Be Equal 	${query_result}[2][0] 	Log Data 3
 
 	[Teardown] 	Run Keywords
-	...    Stop Agent CLI  AND  Stop Manager CLI
+	...    Stop Agent CLI  AND  Stop Manager CLI  AND
+	...    Clear Result Directory 	RES_DIR=${CURDIR}${/}testdata${/}Issue-#156${/}results
