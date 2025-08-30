@@ -64,6 +64,7 @@ Agent Command Line MANAGER -m
 	Log To Console	Run Agent CLI and Manager and see if they will connect.
 	Run Agent CLI 		-m 	http://localhost:8138
 	Run Manager CLI 	-n
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process	60s
 	Stop Agent CLI
 	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
@@ -78,6 +79,7 @@ Agent Command Line MANAGER --manager
 	Log To Console	Run Agent CLI and Manager and see if they will connect.
 	Run Agent CLI 		--manager 	http://localhost:8138
 	Run Manager CLI 	-n
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process	60s
 	Stop Agent CLI
 	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
@@ -133,8 +135,8 @@ Agent Command Line ROBOT -r
 
 	Log To Console	Run Agent CLI with custom robot executable.
 	Run Agent CLI 		-g 	1 	-r 	${robot_exec}
-	Sleep 	5s
 	Run Manager CLI 	-g 	1 	-n 	-s 	${scenario_dir}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process	8min
 	Stop Agent CLI
 
@@ -239,7 +241,7 @@ Agent Command Line PROPERTY -p
 	Run Agent CLI 		-p 	Issue-#14
 	Run Manager CLI 	-n 	-d 	${test_dir}
 	Wait Until Created 	${dbfile}
-	Sleep	30s
+	Wait Until the Agent Connects to the Manager
 	Stop Agent CLI
 	Stop Manager CLI
 

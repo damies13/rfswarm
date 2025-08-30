@@ -27,7 +27,7 @@ Manager Command Line PORT -p
 	Open Manager GUI 	@{mngr_options}
 	Log To Console	Check if Agent can connect to the new port number. New port number: ${run_settings_data}[bind_port_number].
 	Run Agent CLI 	@{agent_options}
-	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready 	40
+	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready
 	Run Keyword If	not ${status}	Fail
 	...    msg=The agent did not connect to the new port number!
 	Log To Console	The Agent has connected to the Manager with ${run_settings_data}[bind_port_number] port and this was expected.
@@ -47,7 +47,7 @@ Manager Command Line IPADDRESS -e
 	Open Manager GUI 	-e  ${ipv4}[0]
 	Log To Console	Check if Agent can connect to the Manager via ${ipv4}[0].
 	Run Agent CLI	-m  http://${ipv4}[0]:8138/
-	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready		30
+	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready
 	Run Keyword If	not ${status}	Fail
 	...    msg=The agent did not connect to the Manager via ${ipv4}[0]!
 	Log To Console	The Agent has connected to the Manager via ${ipv4}[0] and this was expected.
@@ -196,7 +196,7 @@ Manager Command Line RUN -r
 	Open Manager GUI	@{mngr_options}
 	Log To Console	Wait for the Agent to connect, after that the scenario should start automatically.
 	TRY
-		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=60
+		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=150
 	EXCEPT
 		Press key.enter 1 Times
 		Fail	msg=RFSwarm Manager didn't run the scenario automatically after connecting to the Agent!
@@ -217,7 +217,7 @@ Manager Command Line RUN --run
 	Open Manager GUI	@{mngr_options}
 	Log To Console	Wait for the Agent to connect, after that the scenario should start automatically.
 	TRY
-		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=60
+		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=150
 	EXCEPT
 		Press key.enter 1 Times
 		Fail	msg=RFSwarm Manager didn't run the scenario automatically after connecting to the Agent!

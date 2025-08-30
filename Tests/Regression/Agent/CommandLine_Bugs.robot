@@ -19,6 +19,7 @@ Exclude Libraries With Spaces
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#171${/}Issue171.rfs
 	Log to console 	scenariofile: ${scenariofile}
 	Run Manager CLI 	-g 	1 	-s 	${scenariofile} 	-n
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 	Stop Agent CLI
 
@@ -39,6 +40,7 @@ Run agent with -x (xml mode)
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#171${/}Issue171.rfs
 	Log to console 	${scenariofile}
 	Run Manager CLI 	-g 	1 	-s 	${scenariofile} 	-d 	${CURDIR}${/}testdata${/}Issue-#171 	-n
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 	Stop Agent CLI
 
@@ -149,7 +151,7 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 	Run Agent CLI 		-a 	Issue-#100AGENTNAME
 	Run Manager CLI 	-n 	-d 	${test_dir}
 	Wait Until Created 	${dbfile}
-	Sleep	30s
+	Wait Until the Agent Connects to the Manager
 	Stop Agent CLI
 	Stop Manager CLI
 
@@ -173,7 +175,7 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 	Run Agent CLI 		-i 	${CURDIR}${/}testdata${/}Issue-#100${/}RFSwarmAgent.ini
 	Run Manager CLI 	-n 	-d 	${test_dir}
 	Wait Until Created 	${dbfile}
-	Sleep	30s
+	Wait Until the Agent Connects to the Manager
 	Stop Agent CLI
 	Stop Manager CLI
 
@@ -198,6 +200,7 @@ Run Test Cases With Embedded Variables
 	
 	Run Manager CLI  -n  -s  ${test_folder}${/}${scenario_name}.rfs  -d  ${test_folder}${/}results
 
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process 	timeout=10min
 	Stop Agent CLI
 

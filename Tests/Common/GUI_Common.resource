@@ -27,11 +27,30 @@ GUI Suite Initialization ${component}
 	ImageHorizonLibrary.Set Reference Folder 	${IMAGE_DIR}
 	ImageHorizonLibrary.Set Screenshot Folder 	${OUTPUT DIR}
 
+	IF 	'${PLATFORM}' == 'macos'
+		Take A Screenshot
+		Run Keyword And Warn On Failure 	Allow "bash" To Record Screen
+	END
+
 	Log 	\t[ === GUI suite configuration has been initiated for ${COMPONENT} === ] 	console=True
 	Log 	image dir = ${IMAGE_DIR} 	console=True
 	Log 	confidence level = ${CONFIDENCE} 	console=True
 	Log 	default image timeout = ${DEFAULT_IMAGE_TIMEOUT} 	console=True
 	Log 	------------------------------------------------------------------------------\n\n\n 	console=True
+
+Allow "bash" To Record Screen
+	[Tags]  macos-latest
+	[Documentation]  Macos is blocking bash from recording screen and system audio when ImageHorizonLibrary or OCRLibrary is initialized.
+	VAR 	${img} 	macos_dlgbtn_allow.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
+	@{coordinates}= 	Locate 	${img}
+
+	${result}= 	Run Keyword And Return Status
+	...    Click Image
+	...    ${img}
+
+	Sleep 	0.1
+	IF  not ${result}  Press enter 1 Times
 
 Press ${key} ${n} Times
 	[Documentation] 	Provide full name. For example: Key.tab
