@@ -236,6 +236,8 @@ Navigate to and check Desktop Icon For MacOS
 	Press Combination 	KEY.ESC
 	# Take A Screenshot
 
+	[Teardown] 	Press Combination 	KEY.command 	KEY.q
+
 Navigate to and check Desktop Icon For Windows
 
 	Take A Screenshot

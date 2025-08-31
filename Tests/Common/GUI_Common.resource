@@ -29,7 +29,7 @@ GUI Suite Initialization ${component}
 
 	IF 	'${PLATFORM}' == 'macos'
 		Take A Screenshot
-		Run Keyword And Warn On Failure 	Allow "bash" To Record Screen
+		Run Keyword And Ignore Error 	Handle MacOS Pop-ups
 	END
 
 	Log 	\t[ === GUI suite configuration has been initiated for ${COMPONENT} === ] 	console=True
@@ -38,16 +38,25 @@ GUI Suite Initialization ${component}
 	Log 	default image timeout = ${DEFAULT_IMAGE_TIMEOUT} 	console=True
 	Log 	------------------------------------------------------------------------------\n\n\n 	console=True
 
-Allow "bash" To Record Screen
+Handle MacOS Pop-ups
 	[Tags]  macos-latest
-	[Documentation]  Macos is blocking bash from recording screen and system audio when ImageHorizonLibrary or OCRLibrary is initialized.
+	[Documentation]  The MacOS system sometimes displays pop-up windows related to permissions. This keyword is intended to accept/ignore these pop-up windows.
+	[Setup] 	Sleep 	1s
+	Take A Screenshot
+	
+	VAR 	${img} 	macos_dlgbtn_allow_grayed.png
+	Run Keyword And Ignore Error
+	...    Wait For 	${img} 	 timeout=2
+
+	Run Keyword And Ignore Error
+	...    Click Image 	${img}
+
 	VAR 	${img} 	macos_dlgbtn_allow.png
-	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
-	@{coordinates}= 	Locate 	${img}
+	Run Keyword And Ignore Error
+	...    Wait For 	${img} 	 timeout=2
 
 	${result}= 	Run Keyword And Return Status
-	...    Click Image
-	...    ${img}
+	...    Click Image 	${img}
 
 	Sleep 	0.1
 	IF  not ${result}  Press enter 1 Times
