@@ -152,7 +152,7 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 	Run Manager CLI 	-n 	-d 	${test_dir}
 	Wait Until Created 	${dbfile}
 	Wait Until the Agent Connects to the Manager
-	Sleep 	10s
+	Sleep 	30s
 	Stop Agent CLI
 	Stop Manager CLI
 
@@ -177,7 +177,7 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 	Run Manager CLI 	-n 	-d 	${test_dir}
 	Wait Until Created 	${dbfile}
 	Wait Until the Agent Connects to the Manager
-	Sleep 	10s
+	Sleep 	30s
 	Stop Agent CLI
 	Stop Manager CLI
 

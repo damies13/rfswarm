@@ -242,7 +242,7 @@ Agent Command Line PROPERTY -p
 	Run Manager CLI 	-n 	-d 	${test_dir}
 	Wait Until Created 	${dbfile}
 	Wait Until the Agent Connects to the Manager
-	Sleep 	10s
+	Sleep 	30s
 	Stop Agent CLI
 	Stop Manager CLI
 

@@ -47,7 +47,7 @@ Open ${component_name} GUI
 	IF 	'-n' in ${appargs} or '--nogui' in ${appargs}
 		Sleep 	5
 	ELSE
-		Handle MacOS Pop-ups
+		IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
 		Handle Donation Reminder
 		${running}= 	Is Process Running 	${PROCESS_${comp}}
 		IF 	not ${running}
