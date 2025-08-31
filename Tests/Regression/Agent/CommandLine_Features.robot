@@ -261,6 +261,8 @@ Agent Command Line PROPERTY -p
 	Log To Console	Run Agent with custom prop.
 	Run Agent 	${agnt_options}
 	Run Manager CLI 	${mngr_options}
+	Wait Until Created 	${dbfile}
+	Wait Until the Agent Connects to the Manager
 	Sleep	20s
 	Stop Agent
 	Stop Manager

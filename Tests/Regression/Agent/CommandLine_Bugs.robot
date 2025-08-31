@@ -155,6 +155,8 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 	Log To Console	Run Agent with custom agent name.
 	Run Agent 	${agnt_options}
 	Run Manager CLI 	${mngr_options}
+	Wait Until Created 	${dbfile}
+	Wait Until the Agent Connects to the Manager
 	Sleep	20s
 	Stop Agent
 	Stop Manager
@@ -180,6 +182,8 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 	Log To Console	Run Agent with custom agent name.
 	Run Agent 	${agnt_options}
 	Run Manager CLI 	${mngr_options}
+	Wait Until Created 	${dbfile}
+	Wait Until the Agent Connects to the Manager
 	Sleep	20s
 	Stop Agent
 	Stop Manager
