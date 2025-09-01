@@ -124,6 +124,7 @@ Navigate to and check Desktop Icon
 
 Navigate to and check Desktop Icon For MacOS
 
+	Skip 	Skipped this for now due to changes in the new macos runners user interface.
 	# Release Fn Key
 
 	Take A Screenshot
@@ -235,8 +236,6 @@ Navigate to and check Desktop Icon For MacOS
 
 	Press Combination 	KEY.ESC
 	# Take A Screenshot
-
-	[Teardown] 	Press Combination 	KEY.command 	KEY.q
 
 Navigate to and check Desktop Icon For Windows
 
