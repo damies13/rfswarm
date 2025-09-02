@@ -242,14 +242,11 @@ Agent Command Line PROPERTY -p
 	Run Manager CLI 	-n 	-d 	${test_dir}
 	Wait Until Created 	${dbfile}
 	Wait Until the Agent Connects to the Manager
-	Sleep 	30s
-	Stop Agent CLI
-	Stop Manager CLI
 
 	Log To Console 	Checking result data base
-	# ${dbfile} 	Find Result DB 		result_pattern=PreRun
-	${prop_result} 	Query Result DB 	${dbfile}
-	...    SELECT * FROM MetricData WHERE MetricType='Agent' AND SecondaryMetric='Issue-#14'
+	VAR 	${query}= 	SELECT * FROM MetricData WHERE MetricType='Agent' AND SecondaryMetric='Issue-#14'
+	Wait Until the Query Is Not Empty 	${dbfile}  sql=${query}
+	${prop_result} 	Query Result DB 	${dbfile}  sql=${query}
 
 	${len}= 	Get Length 	${prop_result}
 	Should Be True 	${len} > 0

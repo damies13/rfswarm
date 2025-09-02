@@ -153,18 +153,17 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 	Run Manager CLI 	-n 	-d 	${test_dir}
 	Wait Until Created 	${dbfile}
 	Wait Until the Agent Connects to the Manager
-	Sleep 	30s
-	Stop Agent CLI
-	Stop Manager CLI
 
 	# debug:
 	${query_result} 	Query Result DB 	${dbfile}
 	...    SELECT * FROM AgentList
 	Log 	${query_result}
+	# end
 
 	Log To Console 	Checking PreRun data base.
-	${query_result} 	Query Result DB 	${dbfile}
-	...    SELECT * FROM AgentList WHERE AgentName='${agent_name}'
+	VAR 	${query}= 	SELECT * FROM AgentList WHERE AgentName='${agent_name}'
+	Wait Until the Query Is Not Empty 		${dbfile}  sql=SELECT * FROM AgentList
+	${query_result} 	Query Result DB 	${dbfile}  ${query}
 	${len}= 	Get Length 	${query_result}
 	Should Be True 	${len} > 0
 	...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}
@@ -176,6 +175,7 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 
 	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#100${/}ini_file
 	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
+	VAR 	${agent_name} 		Issue-100AGENTNAME
 
 	Create Directory 	${test_dir}
 	Log To Console	Run Agent CLI with custom agent name.
@@ -183,13 +183,11 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 	Run Manager CLI 	-n 	-d 	${test_dir}
 	Wait Until Created 	${dbfile}
 	Wait Until the Agent Connects to the Manager
-	Sleep 	30s
-	Stop Agent CLI
-	Stop Manager CLI
 
 	Log To Console 	Checking PreRun data base.
-	${query_result} 	Query Result DB 	${dbfile}
-	...    SELECT * FROM AgentList WHERE AgentName='Issue-#100AGENTNAME'
+	VAR 	${query}= 	SELECT * FROM AgentList WHERE AgentName='${agent_name}'
+	Wait Until the Query Is Not Empty 		${dbfile}  sql=SELECT * FROM AgentList
+	${query_result} 	Query Result DB 	${dbfile}  ${query}
 	${len}= 	Get Length 	${query_result}
 	Should Be True 	${len} > 0
 	...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}

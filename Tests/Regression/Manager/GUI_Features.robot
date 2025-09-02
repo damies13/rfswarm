@@ -1012,7 +1012,7 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	Open Scenario File OS DIALOG	${scenario_name}
 
 	Wait For	${PLATFORM}_warning_label.png	timeout=30
-	Click		${PLATFORM}_warning_label.png
+	Click Image		${PLATFORM}_warning_label.png
 	Take A Screenshot
 	Press key.enter 1 Times
 	${running}= 	Is Process Running 	${PROCESS_MANAGER}
@@ -3582,20 +3582,6 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	...    Stop Agent CLI 	AND
 	...    Close Manager GUI
 
-Check Application Icon or Desktop Shortcut in GUI
-	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145 	robot:skip-on-failure
-
-	# ${result}= 	Run 	${cmd_agent} -c ICON
-	# Log 		${result}
-
-	${result}= 	Run 	${cmd_manager} -g 6 -c ICON
-	Log 		${result}
-	Sleep    5
-
-	Navigate to and check Desktop Icon
-
-	[Teardown]	Type 	KEY.ESC 	KEY.ESC 	KEY.ESC
-
 Check If Monitoring settings are loaded and used
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #173
 	[Setup]	Run Keywords
@@ -3680,6 +3666,18 @@ Check If Monitoring settings are loaded and used
 	...    Close Manager GUI	AND
 	...    Remove File		${global_path}${/}example.robot
 
+Check Application Icon or Desktop Shortcut in GUI
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145 	robot:skip-on-failure
 
+	# ${result}= 	Run 	${cmd_agent} -c ICON
+	# Log 		${result}
+
+	${result}= 	Run 	${cmd_manager} -g 6 -c ICON
+	Log 		${result}
+	Sleep    5
+
+	Navigate to and check Desktop Icon
+
+	[Teardown]	Type 	KEY.ESC 	KEY.ESC 	KEY.ESC
 
 #
