@@ -143,12 +143,13 @@ Verify If Agent Runs With Existing INI File From Previous Version NO GUI
 Verify If Agent Name Has Been Transferred To the Manager (-a command line switch)
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #100
 
-	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#100${/}command_line
+	VAR 	${test_dir} 		${OUTPUT_DIR}${/}testdata${/}Issue-#100${/}command_line
 	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
+	VAR 	${agent_name} 		Issue-100AGENTNAME
 
 	Create Directory 	${test_dir}
 	Log To Console	Run Agent CLI with custom agent name.
-	Run Agent CLI 		-a 	Issue-#100AGENTNAME
+	Run Agent CLI 		-a 	${agent_name}
 	Run Manager CLI 	-n 	-d 	${test_dir}
 	Wait Until Created 	${dbfile}
 	Wait Until the Agent Connects to the Manager
@@ -156,9 +157,14 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 	Stop Agent CLI
 	Stop Manager CLI
 
+	# debug:
+	${query_result} 	Query Result DB 	${dbfile}
+	...    SELECT * FROM AgentList
+	Log 	${query_result}
+
 	Log To Console 	Checking PreRun data base.
 	${query_result} 	Query Result DB 	${dbfile}
-	...    SELECT * FROM AgentList WHERE AgentName='Issue-#100AGENTNAME'
+	...    SELECT * FROM AgentList WHERE AgentName='${agent_name}'
 	${len}= 	Get Length 	${query_result}
 	Should Be True 	${len} > 0
 	...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}

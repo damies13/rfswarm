@@ -59,7 +59,6 @@ Handle MacOS Pop-ups
 	...    Click Image 	${img}
 
 	Sleep 	0.1
-	IF  not ${result}  Press Combination 	Key.Enter
 
 Press ${key} ${n} Times
 	[Documentation] 	Provide full name. For example: Key.tab
