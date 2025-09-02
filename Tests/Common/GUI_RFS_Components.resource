@@ -49,6 +49,8 @@ Open ${component_name} GUI
 	ELSE
 		IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
 		Handle Donation Reminder
+		IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
+
 		${running}= 	Is Process Running 	${PROCESS_${comp}}
 		IF 	not ${running}
 			Take A Screenshot
