@@ -18,7 +18,9 @@ ${scenario_name}=	test_scenario
 *** Test Cases ***
 Manager Command Line PORT -p
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
-	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+	[Setup]	Run Keywords
+	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
+	...    Set Manager INI Window Size		1000	600
 
 	VAR 	&{run_settings_data} 	bind_port_number=8148
 	VAR 	@{mngr_options} 		-p 	${run_settings_data}[bind_port_number]
@@ -39,7 +41,9 @@ Manager Command Line PORT -p
 
 Manager Command Line IPADDRESS -e
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
-	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+	[Setup]	Run Keywords
+	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
+	...    Set Manager INI Window Size		1000	600
 
 	${ipv4} 	${ipv6} 	Get IP addresses
 	Log To Console		${\n}IPV4 address: ${ipv4} ${\n}IPV6 address: ${ipv6}${\n}
@@ -59,7 +63,9 @@ Manager Command Line IPADDRESS -e
 
 Manager Command Line DIR -d
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
-	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+	[Setup]	Run Keywords
+	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
+	...    Set Manager INI Window Size		1000	600
 
 	VAR		@{mngr_options}		-n	-d	${global_path}${/}Issue-#14
 
@@ -74,7 +80,9 @@ Manager Command Line DIR -d
 
 Manager Command Line DIR --dir
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
-	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+	[Setup]	Run Keywords
+	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
+	...    Set Manager INI Window Size		1000	600
 
 	VAR		@{mngr_options}		-n	--dir	${global_path}${/}Issue-#14
 
@@ -135,7 +143,9 @@ Manager Command Line STARTTIME --starttime
 
 Manager Command Line SCENARIO -s
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
-	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+	[Setup]	Run Keywords
+	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
+	...    Set Manager INI Window Size		1000	600
 
 	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
 	VAR		@{mngr_options}		-s	${scenariofile}
@@ -160,7 +170,9 @@ Manager Command Line SCENARIO -s
 
 Manager Command Line AGENTS -a
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
-	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+	[Setup]	Run Keywords
+	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
+	...    Set Manager INI Window Size		1000	600
 
 	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
 	VAR		@{mngr_options}		-s	${scenariofile} 	-a	2
@@ -191,7 +203,9 @@ Manager Command Line AGENTS -a
 
 Manager Command Line RUN -r
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
-	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+	[Setup]	Run Keywords
+	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
+	...    Set Manager INI Window Size		1000	600
 
 	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
 	VAR 	@{mngr_options} 	-s	${scenariofile} 	-r
@@ -212,7 +226,9 @@ Manager Command Line RUN -r
 
 Manager Command Line RUN --run
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
-	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+	[Setup]	Run Keywords
+	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
+	...    Set Manager INI Window Size		1000	600
 
 	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
 	VAR 	@{mngr_options} 	-s	${scenariofile} 	--run
@@ -233,7 +249,9 @@ Manager Command Line RUN --run
 
 Manager Command Line INI -i
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
-	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+	[Setup]	Run Keywords
+	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
+	...    Set Manager INI Window Size		1000	600
 
 	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmManager.ini
 	VAR		@{mngr_options}		-i	${inifile}
@@ -252,7 +270,9 @@ Manager Command Line INI -i
 
 Manager Command Line INI --ini
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
-	[Setup]	Set Global Filename And Default Save Path	${robot_data}[0]
+	[Setup]	Run Keywords
+	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
+	...    Set Manager INI Window Size		1000	600
 
 	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmManager.ini
 	VAR		@{mngr_options}		--ini	${inifile}
@@ -1031,8 +1051,8 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	Change Manager INI Option 	Plan 	scenariofile 	${scenariofile}
 	Open Manager GUI 	-g  1
 
-	Wait For	${PLATFORM}_warning_label.png	timeout=30
-	Click		${PLATFORM}_warning_label.png
+	Wait For 		${PLATFORM}_warning_label.png	timeout=30
+	Click Image 	${PLATFORM}_warning_label.png
 	Press key.enter 1 Times
 	Sleep 	1
 	Press key.enter 1 Times

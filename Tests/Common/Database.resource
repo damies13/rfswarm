@@ -31,8 +31,15 @@ Query Result DB
 
 Wait Until the Query Is Not Empty
 	[Arguments]		${dbfile}  ${sql}  ${timeout}=${300}
+
+	VAR 	${iter} 	0
 	TRY
 		WHILE    True 	limit=${timeout} seconds
+			${iter}= 	Evaluate  ${iter} + 1
+			IF    ${iter} == 30
+				Log 	Query '${sql}' is returning empty row after ${iter} seconds.  level=WARN
+			END
+			
 			TRY
 				Sleep 	1s
 				${query_result}= 	Query Result DB 	${dbfile}  ${sql}  info=${False}
