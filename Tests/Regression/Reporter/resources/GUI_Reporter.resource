@@ -239,6 +239,7 @@ Navigate to and check Desktop Icon For MacOS
 
 Navigate to and check Desktop Icon For Windows
 
+	Skip 	need to update because of windows 11 changes
 	Take A Screenshot
 	# Open Start Menu
 	Sleep 	0.5
