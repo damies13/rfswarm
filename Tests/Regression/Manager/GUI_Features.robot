@@ -3067,6 +3067,7 @@ Verify That Time Gets Correctly Validated For Schelduled Start
 
 	Click Button	runschedule
 	Click RadioBtn	default
+	Take A Screenshot
 	Click Label With Horizontal Offset	schedule_time	100
 	IF  "${platform}" == "macos"
 		Press Combination	KEY.command		KEY.a
@@ -3617,7 +3618,8 @@ Check If Monitoring settings are loaded and used
 	# Take A Screenshot
 
 	Log 	Verify Plan screen loaded as expected		console=True
-	Wait For 	manager_${platform}_issue_173_plan_settings.png 	 timeout=${default_image_timeout}
+	Take A Screenshot
+	Wait For 	manager_${PLATFORM}_issue_173_plan_settings.png 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 
 	# Take A Screenshot
 	Check If The Agent Is Ready
