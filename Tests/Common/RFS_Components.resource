@@ -38,7 +38,11 @@ Run ${component_name} CLI
 		ELSE IF  '${component_name}' == 'Agent' and ( '-d' not in ${appargs} and '--agentdir' not in ${appargs} )
 			Append To List 	${appargs} 	-d 	${AGENT_DIR}
 			Create Directory 	${AGENT_DIR}
-			Empty Directory 	${AGENT_DIR}
+			TRY
+				Empty Directory 	${AGENT_DIR}
+			EXCEPT
+				Log 	Failed to empty Agent dir: ${AGENT_DIR}
+			END
 		END
 	END
 

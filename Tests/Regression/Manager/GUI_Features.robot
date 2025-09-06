@@ -263,6 +263,10 @@ Manager Command Line INI -i
 	${status}=	Run Keyword And Return Status
 	...    Wait For	${PLATFORM}_checkbox_checked_default.png 	timeout=${10}
 	Take A Screenshot
+	IF  not ${status} and '${PLATFORM}' == 'macos'
+		${status}=	Run Keyword And Return Status
+		...    Wait For 	macos_checkbox_checked_default_2.png 	timeout=${10}
+	END
 	Run Keyword If	not ${status}	Fail
 	...    msg=The manager did not load alternate ini file because it cannot find checked check box in the Run tab!
 
@@ -284,6 +288,10 @@ Manager Command Line INI --ini
 	${status}=	Run Keyword And Return Status
 	...    Wait For	${PLATFORM}_checkbox_checked_default.png 	timeout=${10}
 	Take A Screenshot
+	IF  not ${status} and '${PLATFORM}' == 'macos'
+		${status}=	Run Keyword And Return Status
+		...    Wait For 	macos_checkbox_checked_default_2.png 	timeout=${10}
+	END
 	Run Keyword If	not ${status}	Fail
 	...    msg=The manager did not load alternate ini file because it cannot find checked check box in the Run tab!
 
@@ -3378,10 +3386,15 @@ Verify That TPS Is TP And Not TPmS
 	Take A Screenshot
 	Click Menu 	graphs
 	Click Menu 	NewGraphWindow
+	Take A Screenshot 	#temp
 	Click Label With Horizontal Offset 	DataType 	250
+	Take A Screenshot 	#temp
 	Select Option 	Result
+	Take A Screenshot 	#temp
 	Click Label With Horizontal Offset 	ResultType 	150
+	Take A Screenshot 	#temp
 	Select Option 	TPS
+	Take A Screenshot 	#temp
 	Click Label With Horizontal Offset 	ShowLegend 	250
 	Sleep 	10
 
