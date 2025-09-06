@@ -3645,6 +3645,7 @@ Check If Monitoring settings are loaded and used
 	# Take A Screenshot
 
 	Log 	Verify Monitoring screen loaded as expected		console=True
+	Take A Screenshot
 	Wait For 	manager_${PLATFORM}_issue_173_monitoring_settings.png 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 
 	Click Tab	Plan
