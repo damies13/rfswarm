@@ -174,6 +174,7 @@ New Data Table Section
 
 	Select Option 	Result
 
+	Take A Screenshot 	# temp
 	Select Field With Label 	ResultType
 
 	Select Option 	ResponseTime
