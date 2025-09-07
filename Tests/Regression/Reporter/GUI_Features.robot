@@ -974,6 +974,8 @@ Change Line Colour
 	# pass a default ini file with extended height to ensure that default values are used
 	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
+	Sleep 	5s
+	Take A Screenshot
 	Wait For Status 	PreviewLoaded
 
 	Click Section			Report

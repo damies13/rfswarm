@@ -41,19 +41,20 @@ GUI Suite Initialization ${component}
 Handle MacOS Pop-ups
 	[Tags]  macos-latest
 	[Documentation]  The MacOS system sometimes displays pop-up windows related to permissions. This keyword is intended to accept/ignore these pop-up windows.
-	[Setup] 	Sleep 	1s
+	[Setup] 	Sleep 	2s
 	Take A Screenshot
 	
 	VAR 	${img} 	macos_dlgbtn_allow_grayed.png
-	Run Keyword And Ignore Error
-	...    Wait For 	${img} 	 timeout=2
+	# Run Keyword And Ignore Error
+	# ...    Wait For 	${img} 	 timeout=2
 
 	Run Keyword And Ignore Error
 	...    Click Image 	${img}
 
 	VAR 	${img} 	macos_dlgbtn_allow.png
-	Run Keyword And Ignore Error
-	...    Wait For 	${img} 	 timeout=2
+	Sleep 	2s
+	# Run Keyword And Ignore Error
+	# ...    Wait For 	${img} 	 timeout=2
 
 	${result}= 	Run Keyword And Return Status
 	...    Click Image 	${img}
