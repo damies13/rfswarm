@@ -142,7 +142,7 @@ First Run
 
 New Data Table Section
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #149 	Issue #150
-	[Setup] 	Set Reporter INI Window Size 	height=600
+	[Setup] 	Set Reporter INI Window Size 	height=700
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	${testdata}= 	Set Variable    Issue-#147
 	${resultdata}= 	Set Variable    20230320_185055_demo
@@ -180,6 +180,7 @@ New Data Table Section
 
 	Select Option 	Result
 
+	Take A Screenshot
 	Select Field With Label 	ResultType
 
 	Select Option 	ResponseTime

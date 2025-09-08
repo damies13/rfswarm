@@ -2306,8 +2306,8 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	Length Should Be	${run_result_dirs}	1	msg=The test run result dir was not created or created unexpected directories!
 
 	Sleep	5
-	Verify Test Result Directory Name	${run_result_dirs}[0]	${scenario_name}	${current_date}
-	Verify Generated Run Result Files	${run_result_dirs}[0]	${scenario_name}
+	Verify Test Result Directory Name 	${run_result_dirs}[0] 	${scenario_name} 	${current_date}
+	Verify Generated Run Result Files 	${run_result_dirs}[0] 	${scenario_name}
 
 	Log To Console	${\n}${\n}All verifications passed. The test run is now being restarted.${\n}${\n}
 	Wait For the Agent To Be Ready
@@ -2353,13 +2353,14 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 
 	VAR 	${RESULTS_DIR} 		${RESULTS_DIR}${/}Issue-#69_2 	scope=TEST
 	VAR 	@{mngr_options} 	-d 		${RESULTS_DIR}
+	VAR 	${robots} 			2
 	Create Directory 	${RESULTS_DIR}
 	Clear Result Directory
 	Open Manager GUI 	@{mngr_options}
 
 	${scenario_name}	Set Variable	Scenario
 	Press Key.tab 2 Times
-	Type	2
+	Type	${robots}
 	Press Key.tab 2 Times
 	Type	15
 	Press Key.tab 1 Times
@@ -2383,8 +2384,8 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	Length Should Be	${run_result_dirs}	1	msg=The test run result dir was not created or created unexpected directories!
 
 	Sleep	5
-	Verify Test Result Directory Name	${run_result_dirs}[0]	${scenario_name}	${current_date}
-	Verify Generated Run Result Files	${run_result_dirs}[0]	${scenario_name}
+	Verify Test Result Directory Name 	${run_result_dirs}[0] 	${scenario_name} 	${current_date}
+	Verify Generated Run Result Files 	${run_result_dirs}[0] 	${scenario_name} 	num_of_robots=${robots}
 
 	[Teardown]	Run Keywords
 	...    Stop Agent CLI		AND
@@ -3647,6 +3648,7 @@ Check If Monitoring settings are loaded and used
 
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#173${/}NewStyle.rfs
 	Copy File	${scenariofile}		${global_path}
+	Sleep 	1 day
 	Click Button						runopen
 	Wait For Dialog Button				cancel
 	File Open Dialogue Select File 		${scenariofile}

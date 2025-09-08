@@ -717,7 +717,8 @@ Verify Test Result Directory Name
 	...    msg=Result directory name from scenario is incorrect: expected "${expected_name}", actual: "${result_dir_name}".
 
 Verify Generated Run Result Files
-	[Arguments]		${result_dir_name}		${scenario_name}
+	# NEEDS REFRESHING
+	[Arguments]		${result_dir_name}  ${scenario_name}  ${num_of_robots}=10
 	@{run_dir_name_fragmented}=	Split String	${result_dir_name}	separator=_		max_split=2
 	${result_dir_time}=	Set Variable	${run_dir_name_fragmented}[0]_${run_dir_name_fragmented}[1]
 
@@ -743,7 +744,7 @@ Verify Generated Run Result Files
 	...    Find Absolute Paths And Names For Files In Directory		${RESULTS_DIR}${/}${result_dir_name}${/}${logs}[0]
 	${len}=		Get Length	${logs_file_names}
 	Log To Console	Number of files in the Logs directory: ${len}
-	Should Be True	${len} >= 20	msg=Number of files in the Logs directory is incorrect: should be at least 20, actual: "${len}".
+	Should Be True	${len} >= ${num_of_robots}*2 	msg=Number of files in the Logs directory is incorrect: should be at least 20, actual: "${len}".
 
 Navigate to and check Desktop Icon
 	VAR 	${projname}= 		rfswarm-manager 		scope=TEST
