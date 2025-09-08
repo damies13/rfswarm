@@ -154,9 +154,6 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 	Wait Until Created 	${dbfile}
 	Wait Until the Agent Connects to the Manager
 
-	Sleep 	13s
-	Stop Manager CLI
-
 	Log To Console 	Checking PreRun data base.
 	VAR 	${query}= 	SELECT * FROM AgentList WHERE AgentName='${agent_name}'
 	Wait Until the Query Is Not Empty 		${dbfile}  sql=SELECT * FROM AgentList
