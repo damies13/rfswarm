@@ -888,6 +888,7 @@ Verify Plan Graph - With Total
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
+	...    Take A Screenshot 		AND
 	...    Set Confidence 	0.9 	AND
 	...    Close Reporter GUI 		AND
 	...    Remove File 		${resultfile}
@@ -951,6 +952,7 @@ Verify Plan Table
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
+	...    Take A Screenshot 		AND
 	...    Set Confidence 	0.9 	AND
 	...    Close Reporter GUI 		AND
 	...    Remove File 		${resultfile}

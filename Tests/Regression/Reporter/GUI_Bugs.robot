@@ -7,14 +7,16 @@ Resource 	../../Common/GUI_RFS_Components.resource
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Reporter
 
+Test Setup 		Set Reporter INI Window Size 	height=600
 Test Teardown 	Close Reporter GUI
 
 *** Test Cases ***
 Verify If Reporter Runs With Existing INI File From Current Version
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 	[Setup]	Run Keywords
-	...    Open Reporter GUI		AND
-	...    Sleep	5	AND
+	...    Set Reporter INI Window Size 	height=600 	AND
+	...    Open Reporter GUI 	AND
+	...    Sleep	5 	AND
 	...    Close Reporter GUI
 
 	${location}=	Get Reporter Default Save Path
@@ -140,6 +142,7 @@ First Run
 
 New Data Table Section
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #149 	Issue #150
+	[Setup] 	Set Reporter INI Window Size 	height=600
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	${testdata}= 	Set Variable    Issue-#147
 	${resultdata}= 	Set Variable    20230320_185055_demo
@@ -177,7 +180,6 @@ New Data Table Section
 
 	Select Option 	Result
 
-	Take A Screenshot 	# temp
 	Select Field With Label 	ResultType
 
 	Select Option 	ResponseTime

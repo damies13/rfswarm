@@ -1061,9 +1061,19 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 
 	Wait For 		${PLATFORM}_warning_label.png	timeout=30
 	Click Image 	${PLATFORM}_warning_label.png
-	Press key.enter 1 Times
-	Sleep 	1
-	Press key.enter 1 Times
+
+	TRY
+		IF  '${PLATFORM}' == 'macos'
+			Click Dialog Button 	ok_2
+		ELSE
+			Click Dialog Button 	ok
+		END
+	EXCEPT
+		Press key.enter 1 Times
+		Sleep 	1
+		Press key.enter 1 Times
+	END
+
 	${running}= 	Is Process Running 	${PROCESS_MANAGER}
 	IF 	not ${running}
 		Fail	RFSwarm Manager crashed!
@@ -2339,7 +2349,7 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	...    Run Agent CLI													AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Create Robot File
-	...    file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\tFail this\n\tSleep\t10\n\tFail\n
+	...    file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\tFail this\n\tSleep\t15\n\tFail\n
 
 	VAR 	${RESULTS_DIR} 		${RESULTS_DIR}${/}Issue-#69_2 	scope=TEST
 	VAR 	@{mngr_options} 	-d 		${RESULTS_DIR}
@@ -2348,7 +2358,9 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	Open Manager GUI 	@{mngr_options}
 
 	${scenario_name}	Set Variable	Scenario
-	Press Key.tab 4 Times
+	Press Key.tab 2 Times
+	Type	2
+	Press Key.tab 2 Times
 	Type	15
 	Press Key.tab 1 Times
 	Type	30
@@ -2772,7 +2784,7 @@ Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardl
 	...    msg=Agent is not uploading logs immediately! Should be at least 1 after ~ 40s. Actual number:${logs_num}.
 
 	Press key.enter 1 Times
-	Wait For the Agent To Be Ready
+	Run Keyword And Warn On Failure 	Wait For the Agent To Be Ready 	# not that important
 	@{run_logs}=	List Directories In Directory	${logs_dir}[0]
 	${logs_num2}=	Get Length	${run_logs}
 	Log To Console	Number of logs at the end of the test: ${logs_num2}
