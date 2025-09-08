@@ -1000,11 +1000,23 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	Click Button	runopen
 	Open Scenario File OS DIALOG	${scenario_name}
 
+	Take A Screenshot
 	Wait For	${PLATFORM}_warning_label.png	timeout=30
 	Click Image		${PLATFORM}_warning_label.png
-	Take A Screenshot
-	Press key.enter 1 Times
-	${running}= 	Is Process Running 	${process_manager}
+
+	TRY
+		IF  '${PLATFORM}' == 'macos'
+			Click Dialog Button 	ok_2
+		ELSE
+			Click Dialog Button 	ok
+		END
+	EXCEPT
+		Press key.enter 1 Times
+		Sleep 	1
+		Press key.enter 1 Times
+	END
+
+	${running}= 	Is Process Running 	${PROCESS_MANAGER}
 	IF 	not ${running}
 		Fail	RFSwarm manager crashed!
 	END
@@ -3630,7 +3642,7 @@ Check If Monitoring settings are loaded and used
 
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#173${/}NewStyle.rfs
 	Copy File	${scenariofile}		${global_path}
-	Sleep 	1 day
+
 	Click Button						runopen
 	Wait For Dialog Button				cancel
 	File Open Dialogue Select File 		${scenariofile}
