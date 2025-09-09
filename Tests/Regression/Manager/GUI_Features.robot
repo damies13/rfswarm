@@ -1045,16 +1045,14 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 
 	TRY
 		IF  '${PLATFORM}' == 'macos'
-			Click Dialog Button 	ok_2
+			Run Keyword And Ignore Error 	Click Dialog Button 	ok_3
 		ELSE
-			Click Dialog Button 	ok
+			Run Keyword And Ignore Error 	Click Dialog Button 	ok
 		END
+		IF  '${PLATFORM}' == 'macos' 	Click Dialog Button 	ok_2
 	EXCEPT
-		IF  '${PLATFORM}' == 'macos'
-			Run Keyword And Ignore Error 	Click Image 	macos_dlgbtn_ok_2.png
-		ELSE
-			Run Keyword And Ignore Error 	Click Image 	${PLATFORM}_dlgbtn_ok.png
-		END
+		Run Keyword And Ignore Error 	Click Image 	${PLATFORM}_dlgbtn_ok.png
+		IF  '${PLATFORM}' == 'macos'  Run Keyword And Ignore Error 	Click Image 	macos_dlgbtn_ok_2.png
 		Press key.enter 1 Times
 		Sleep 	1
 		Press key.enter 1 Times
@@ -1081,16 +1079,14 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 
 	TRY
 		IF  '${PLATFORM}' == 'macos'
-			Click Dialog Button 	ok_2
+			Run Keyword And Ignore Error 	Click Dialog Button 	ok_3
 		ELSE
-			Click Dialog Button 	ok
+			Run Keyword And Ignore Error 	Click Dialog Button 	ok
 		END
+		IF  '${PLATFORM}' == 'macos' 	Click Dialog Button 	ok_2
 	EXCEPT
-		IF  '${PLATFORM}' == 'macos'
-			Run Keyword And Ignore Error 	Click Image 	macos_dlgbtn_ok_2.png
-		ELSE
-			Run Keyword And Ignore Error 	Click Image 	${PLATFORM}_dlgbtn_ok.png
-		END
+		Run Keyword And Ignore Error 	Click Image 	${PLATFORM}_dlgbtn_ok.png
+		IF  '${PLATFORM}' == 'macos'  Run Keyword And Ignore Error 	Click Image 	macos_dlgbtn_ok_2.png
 		Press key.enter 1 Times
 		Sleep 	1
 		Press key.enter 1 Times
