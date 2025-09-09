@@ -792,7 +792,7 @@ Verify Plan Graph - No Total
 
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 
-	# Take A Screenshot
+	Take A Screenshot
 	Select Field With Label 	DataType
 
 	# Take A Screenshot

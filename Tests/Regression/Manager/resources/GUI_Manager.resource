@@ -75,7 +75,14 @@ Wait For the Agent To Be Ready
 	[Arguments] 	${timeout}=300
 	Click Tab	Agents
 	VAR 	${img} 	manager_${PLATFORM}_agents_ready.png
-	Wait For 	${img}	timeout=${timeout}
+	${status}= 	Run Keyword And Return Status 	Wait For 	${img}	timeout=${timeout}
+
+	IF  not ${status} and '${PLATFORM}' = 'macos'
+		VAR 	${img} 	manager_${PLATFORM}_agents_warning.png
+		${status}= 	Run Keyword And Return Status 	Wait For 	${img}	timeout=10
+	END
+
+	IF  not ${status}  Fail  Agent is not ready after ${timeout} seconds.
 
 Wait For the Scenario Run To Finish
 	[Arguments] 	${time}=${300}

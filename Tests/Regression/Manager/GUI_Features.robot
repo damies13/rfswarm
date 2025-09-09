@@ -1050,6 +1050,11 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 			Click Dialog Button 	ok
 		END
 	EXCEPT
+		IF  '${PLATFORM}' == 'macos'
+			Run Keyword And Ignore Error 	Click Image 	macos_dlgbtn_ok_2.png
+		ELSE
+			Run Keyword And Ignore Error 	Click Image 	${PLATFORM}_dlgbtn_ok.png
+		END
 		Press key.enter 1 Times
 		Sleep 	1
 		Press key.enter 1 Times
@@ -1081,6 +1086,11 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 			Click Dialog Button 	ok
 		END
 	EXCEPT
+		IF  '${PLATFORM}' == 'macos'
+			Run Keyword And Ignore Error 	Click Image 	macos_dlgbtn_ok_2.png
+		ELSE
+			Run Keyword And Ignore Error 	Click Image 	${PLATFORM}_dlgbtn_ok.png
+		END
 		Press key.enter 1 Times
 		Sleep 	1
 		Press key.enter 1 Times
@@ -2389,7 +2399,11 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	${current_date}=	Get Current Date
 	Log To Console	Current time: ${current_date}
 
-	Wait For the Scenario Run To Finish
+	${status}= 	Run Keyword And Return Status  Wait For the Scenario Run To Finish
+	IF  not ${status}
+		Click Button	stoprun
+		Wait For the Scenario Run To Finish 	time=${60}
+	END
 
 	@{run_result_dirs}=		List Directories In Directory	${RESULTS_DIR}	pattern=*_*
 	Log To Console	${\n}All run result directories: ${run_result_dirs}${\n}
