@@ -355,7 +355,7 @@ Check If The Agent Is Ready
 	VAR 	${img} 	manager_${PLATFORM}_agents_ready.png
 	${status}= 	Run Keyword And Return Status 	Wait For 	${img}	timeout=${timeout}
 
-	IF  not ${status} and '${PLATFORM}' = 'macos'
+	IF  not ${status} and '${PLATFORM}' == 'macos'
 		VAR 	${img} 	manager_${PLATFORM}_agents_warning.png
 		${status}= 	Run Keyword And Return Status 	Wait For 	${img}	timeout=10
 	END
