@@ -157,7 +157,8 @@ New Data Table Section
 
 	Click Button 			AddSection
 
-	Click To The Below Of Image 	reporter_${platform}_label_sectionname.png 	20
+	Sleep 	1s
+	Click To The Below Of Image 	reporter_${PLATFORM}_label_sectionname.png 	20
 	Type 	Issue #149
 	Click Button 			OK
 	Take A Screenshot
