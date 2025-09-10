@@ -808,6 +808,7 @@ Verify Plan Graph - No Total
 
 	${pvinfo}= 	Get Python Version Info
 
+	Take A Screenshot
 	Set Confidence		0.7
 	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
 		Locate 	reporter_${PLATFORM}_graph_plannototal_py3.9.png

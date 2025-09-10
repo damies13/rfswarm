@@ -59,6 +59,11 @@ Handle MacOS Pop-ups
 	${result}= 	Run Keyword And Return Status
 	...    Click Image 	${img}
 
+	VAR 	${img} 	macos_dlgbtn_ignore.png
+	Sleep 	2s
+	Run Keyword And Ignore Error
+	...    Click Image 	${img}
+
 	Sleep 	0.1
 
 Press ${key} ${n} Times
