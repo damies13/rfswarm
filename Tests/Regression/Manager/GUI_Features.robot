@@ -1079,11 +1079,11 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 
 	TRY
 		IF  '${PLATFORM}' == 'macos'
-			Run Keyword And Ignore Error 	Click Dialog Button 	ok_3
+			Click Dialog Button 	ok_3 	timeout=20
 		ELSE
-			Run Keyword And Ignore Error 	Click Dialog Button 	ok
+			Click Dialog Button 	ok 	timeout=20
 		END
-		IF  '${PLATFORM}' == 'macos' 	Click Dialog Button 	ok_2
+		IF  '${PLATFORM}' == 'macos' 	Click Dialog Button 	ok_2 	timeout=20
 	EXCEPT
 		Run Keyword And Ignore Error 	Click Image 	${PLATFORM}_dlgbtn_ok.png
 		IF  '${PLATFORM}' == 'macos'  Run Keyword And Ignore Error 	Click Image 	macos_dlgbtn_ok_2.png
