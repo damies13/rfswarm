@@ -66,27 +66,6 @@ Handle MacOS Pop-ups
 
 	Sleep 	0.1
 
-Handle RFSwarm GUI Pop-ups
-	[Documentation] 	This keyword is intended to get rid of pop-ups displayed by rfswarm apps.
-	VAR 	${status} 	${true}
-
-	TRY
-		IF  '${PLATFORM}' == 'macos'
-			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok_3 	timeout=10
-		ELSE
-			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok 	timeout=10
-		END
-
-		IF  '${PLATFORM}' == 'macos' and not ${status} 	Click Dialog Button 	ok_2 	timeout=3
-	EXCEPT
-		Run Keyword And Ignore Error 	Click Image 	${PLATFORM}_dlgbtn_ok.png
-		IF  '${PLATFORM}' == 'macos'  Run Keyword And Ignore Error 	Click Image 	macos_dlgbtn_ok_2.png
-
-		Press key.enter 1 Times
-		Sleep 	1
-		Press key.enter 1 Times
-	END
-
 Press ${key} ${n} Times
 	[Documentation] 	Provide full name. For example: Key.tab
 	Sleep	1
