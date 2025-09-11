@@ -31,19 +31,23 @@ Handle RFSwarm GUI Pop-ups
 	VAR 	${status} 	${true}
 
 	TRY
+		Take A Screenshot
 		IF  '${PLATFORM}' == 'macos'
-			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok_3 	timeout=10
+			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok_3 	timeout=5
 		ELSE
-			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok 	timeout=10
+			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok 	timeout=5
 		END
 
-		IF  '${PLATFORM}' == 'macos' and not ${status} 	Click Dialog Button 	ok_2 	timeout=3
+		IF  '${PLATFORM}' == 'macos' and not ${status}
+			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok_2 	timeout=1
+		END
 
 		IF  not ${status}  Fail
 
 	EXCEPT
-		Run Keyword And Ignore Error 	Click Image 	${PLATFORM}_dlgbtn_ok.png
-		IF  '${PLATFORM}' == 'macos'  Run Keyword And Ignore Error 	Click Image 	macos_dlgbtn_ok_2.png
+		Take A Screenshot
+		Run Keyword And Ignore Error 	Click Dialog Button 	ok 	timeout=1
+		IF  '${PLATFORM}' == 'macos'  Run Keyword And Ignore Error 	Click Dialog Button 	ok_2 	timeout=1
 
 		Press key.enter 1 Times
 		Sleep 	1
