@@ -1043,20 +1043,7 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	Wait For	${PLATFORM}_warning_label.png	timeout=30
 	Click Image		${PLATFORM}_warning_label.png
 
-	TRY
-		IF  '${PLATFORM}' == 'macos'
-			Click Dialog Button 	ok_3 	timeout=20
-		ELSE
-			Click Dialog Button 	ok 	timeout=20
-		END
-		IF  '${PLATFORM}' == 'macos' 	Click Dialog Button 	ok_2 	timeout=20
-	EXCEPT
-		Run Keyword And Ignore Error 	Click Image 	${PLATFORM}_dlgbtn_ok.png
-		IF  '${PLATFORM}' == 'macos'  Run Keyword And Ignore Error 	Click Image 	macos_dlgbtn_ok_2.png
-		Press key.enter 1 Times
-		Sleep 	1
-		Press key.enter 1 Times
-	END
+	Handle RFSwarm GUI Pop-ups
 
 	${running}= 	Is Process Running 	${PROCESS_MANAGER}
 	IF 	not ${running}
@@ -1077,20 +1064,7 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	Wait For 		${PLATFORM}_warning_label.png	timeout=30
 	Click Image 	${PLATFORM}_warning_label.png
 
-	TRY
-		IF  '${PLATFORM}' == 'macos'
-			Click Dialog Button 	ok_3 	timeout=20
-		ELSE
-			Click Dialog Button 	ok 	timeout=20
-		END
-		IF  '${PLATFORM}' == 'macos' 	Click Dialog Button 	ok_2 	timeout=20
-	EXCEPT
-		Run Keyword And Ignore Error 	Click Image 	${PLATFORM}_dlgbtn_ok.png
-		IF  '${PLATFORM}' == 'macos'  Run Keyword And Ignore Error 	Click Image 	macos_dlgbtn_ok_2.png
-		Press key.enter 1 Times
-		Sleep 	1
-		Press key.enter 1 Times
-	END
+	Handle RFSwarm GUI Pop-ups
 
 	${running}= 	Is Process Running 	${PROCESS_MANAGER}
 	IF 	not ${running}
