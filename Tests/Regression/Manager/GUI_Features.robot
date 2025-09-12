@@ -1071,6 +1071,7 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 		Fail	RFSwarm Manager crashed!
 	END
 	TRY
+		Take A Screenshot
 		Click Tab	Run
 		Wait For	manager_${PLATFORM}_button_stoprun.png	timeout=30
 		Click Tab	Plan

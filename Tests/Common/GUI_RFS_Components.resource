@@ -40,6 +40,8 @@ Handle RFSwarm GUI Pop-ups
 
 		IF  '${PLATFORM}' == 'macos' and not ${status}
 			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok_2 	timeout=1
+			Sleep 	1s
+			IF  ${status}  Click
 		END
 
 		IF  not ${status}  Fail
@@ -53,6 +55,7 @@ Handle RFSwarm GUI Pop-ups
 		Sleep 	1
 		Press key.enter 1 Times
 	END
+	Press key.enter 1 Times
 
 Open ${component_name} GUI
 	[Documentation] 	Open one of the RFSwarm applications for GUI purposes. Pass the: Manager, Reporter or Agent
