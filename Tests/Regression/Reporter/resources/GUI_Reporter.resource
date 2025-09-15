@@ -124,6 +124,7 @@ Navigate to and check Desktop Icon
 
 Navigate to and check Desktop Icon For MacOS
 
+	Skip 	Skipped this for now due to changes in the new macos runners user interface.
 	# Release Fn Key
 
 	Take A Screenshot
@@ -238,6 +239,7 @@ Navigate to and check Desktop Icon For MacOS
 
 Navigate to and check Desktop Icon For Windows
 
+	Skip 	need to update because of windows 11 changes
 	Take A Screenshot
 	# Open Start Menu
 	Sleep 	0.5

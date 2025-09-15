@@ -21,7 +21,7 @@ Suite Teardown 	Non-ASCII Suite Teardown
 ${test_data} 		${CURDIR}${/}testdata${/}Issue-#97
 ${scenario_name} 	${None}
 
-*** Test Cases ***
+*** Test Cases *** 	LangCode
 Latin 		pl
 Icelandic 	ic
 Greek 		gr

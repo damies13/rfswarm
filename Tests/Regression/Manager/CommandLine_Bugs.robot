@@ -48,6 +48,7 @@ Robot files with same name but different folders
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
 	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 	Stop Agent CLI
 
@@ -113,6 +114,7 @@ Circular Reference Resource Files
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${RESULTS_DIR}
 	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 	Stop Agent CLI
 
@@ -176,6 +178,7 @@ Circular Reference Resource Files 2
 	@{time}= 	Get Time 	hour min sec 	NOW + 2min
 	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${RESULTS_DIR} 	-t 	${time[0]}:${time[1]}:${time[2]}
 	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 	Stop Agent CLI
 
@@ -247,6 +250,7 @@ Lots Of Resource Files
 
 	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${RESULTS_DIR} 	-t 	${time}[0]:${time}[1]
 	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	# It can take a while for the agent to download 3500+ files
 	Wait For Manager Process 	60min
 	Stop Agent CLI

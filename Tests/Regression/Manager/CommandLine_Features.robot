@@ -26,6 +26,7 @@ Environment Variable Substitution in Robot/Resource files
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
 	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 	Stop Agent CLI
 	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
@@ -61,6 +62,7 @@ Default Result Name Method
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
 	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 
 	List Directory 	${RESULTS_DIR}
@@ -93,6 +95,7 @@ Documentation Result Name Method - Tests Defaults
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
 	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 
 	List Directory 	${RESULTS_DIR}
@@ -123,6 +126,7 @@ Info Result Name Method - Tests Defaults
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
 	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 
 	List Directory 	${RESULTS_DIR}
@@ -152,6 +156,7 @@ Keyword Only Result Name Method - Tests Defaults
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
 	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 
 	List Directory 	${RESULTS_DIR}
@@ -186,6 +191,7 @@ Keyword and Args Result Name Method - Tests Defaults
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
 	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 
 	List Directory 	${RESULTS_DIR}
@@ -220,6 +226,7 @@ Default Result Name Method - Tests Row
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
 	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 
 	List Directory 	${RESULTS_DIR}
@@ -251,6 +258,7 @@ Documentation Result Name Method - Tests Row
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
 	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 
 	List Directory 	${RESULTS_DIR}
@@ -281,6 +289,7 @@ Info Result Name Method - Tests Row
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
 	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 
 	List Directory 	${RESULTS_DIR}
@@ -310,6 +319,7 @@ Keyword Only Result Name Method - Tests Row
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
 	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 
 	List Directory 	${RESULTS_DIR}
@@ -344,6 +354,7 @@ Keyword and Args Result Name Method - Tests Row
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
 	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 
 	List Directory 	${RESULTS_DIR}
@@ -398,6 +409,7 @@ Run Mnager with JSON Configuration and JSON Scenario
 	Log 	scenariofile: ${scenariofile} 		console=true
 	@{mngr_options}= 	Create List 	-g 	1 	-i 	${configfile} 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
 	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 
 	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
@@ -445,6 +457,7 @@ Run Mnager with Yaml Configuration and Yaml Scenario
 	Log 	scenariofile: ${scenariofile} 		console=true
 	@{mngr_options}= 	Create List 	-g 	1 	-i 	${configfile} 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
 	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 
 	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
@@ -491,6 +504,7 @@ Run Mnager with yml Configuration and yml Scenario
 	Log 	scenariofile: ${scenariofile} 		console=true
 	@{mngr_options}= 	Create List 	-g 	1 	-i 	${configfile} 	-s 	${scenariofile} 	-n 	-d 	${RESULTS_DIR}
 	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 
 	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
