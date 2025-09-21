@@ -467,3 +467,96 @@ Now you can configure performance tests using Agents that do not need to be on t
 **Important note:** The Hamachi service is free, but the default plan has limited capabilities. So if you want to build a large infrastructure with multiple Agents, you will eventually need to purchase a subscription to get more possibilities and resources.
 
 ## Tailscale
+
+
+
+
+
+**General diagram:**
+```mermaid
+flowchart TD
+    subgraph Agents
+        subgraph External Network 1.
+            A1[<h1><i><b>Agent</b></i></h1><br/>Hamachi Client<br/>Virtual IP: 25.x.x.x]
+        end
+
+        subgraph External Network 2.
+            A2[<h1><i><b>Agent</b></i></h1><br/>Hamachi Client<br/>Virtual IP: 25.x.x.x]
+            A3[<h1><i><b>Agent</b></i></h1><br/>Hamachi Client<br/>Virtual IP: 25.x.x.x]
+        end
+
+        ...[...]
+
+        subgraph External Network n.
+            An[<h1><i><b>Agent</b></i></h1><br/>Hamachi Client<br/>Virtual IP: 25.x.x.x]
+        end
+    end
+
+    subgraph Internet
+        TCS@{ shape: dbl-circ, label: "<h1>Tailscale <br>Coordination Server</h1>"}
+        TR1@{ shape: circ, label: "<h1>Tailscale <br>Relay</h1>"}
+        TR2@{ shape: circ, label: "<h1>Tailscale <br>Relay</h1>"}
+        TR3@{ shape: circ, label: "<h1>Tailscale <br>Relay</h1>"}
+        %% TR4@{ shape: circ, label: "<h1>Tailscale <br>Relay</h1>"}
+        TR5@{ shape: circ, label: "<h1>Tailscale <br>Relay</h1>"}
+    end
+
+    A1 <-.-> TCS
+    %% A1 <==> TR1
+    A2 <-.-> TCS
+    A3 <-.-> TCS
+    %% A2 <==> TR1
+    %% A3 <==> TR1
+    ... <-.-> TCS
+    %% ... <==> TR2
+    An <-.-> TCS
+    %% An <==> TR2
+
+
+    %% TR1 <--> TR2
+    %% TR1 <--> TR5
+    %% TR2 <--> TR5
+    %% TR3 <--> TR5
+    %% TR4 <--> TR5
+
+    A1 <==> TR1
+    A2 <==> TR2
+    A3 <==> TR2
+    ... <==> TR3
+    An <==> TR3
+
+    TR1 <==> TR5
+    TR1 <==> TR2
+    TR2 <==> TR3
+    TR3 <==> TR5
+    %% TR4 <==> M
+    %% TR4 <==> TR5
+    TR5 <==> M
+
+    TR1 ~~~ TCS
+    TR2 ~~~ TCS
+    TR3 ~~~ TCS
+
+
+
+    subgraph LAN
+        direction RL
+        M[<h1><i><b>Manager</b></i></h1><br/>Hamachi Client<br/>Virtual IP: 25.x.x.x]
+        AL[<h1><i><b>Agent</b></i></h1>]
+
+    end
+
+    TCS <-.-> M
+    %% TR5 <==> M
+    M <-->|Local IP| AL
+
+
+    style A1 fill:#efae4e,color:#000
+    style A2 fill:#efae4e,color:#000
+    style A3 fill:#efae4e,color:#000
+    style An fill:#efae4e,color:#000
+    style AL fill:#efae4e,color:#000
+    style M fill:#508ca1,color:#000
+    style Internet fill:#228,color:#fff
+    style Agents fill:#000,color:#fff
+```
