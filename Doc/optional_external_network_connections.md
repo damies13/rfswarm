@@ -467,38 +467,56 @@ Now you can configure performance tests using Agents that do not need to be on t
 **Important note:** The Hamachi service is free, but the default plan has limited capabilities. So if you want to build a large infrastructure with multiple Agents, you will eventually need to purchase a subscription to get more possibilities and resources.
 
 ## Tailscale
+> [Official Tailscale site](https://tailscale.net/)
 
+Tailscale is something like a Hybrid between a VPN, ngrok and Hamachi, it uses the Tailscale Coordination Server to direct the Tailscale client to another Tailscale client either directly or via one or more relay servers. The Tailscale client then creates a direct encrypted "VPN" connection to the remote Tailscale client, thus the 2 Tailscale clients appear to be in the same subnet.
 
+1. Create an account on the [Official Tailscale site](https://tailscale.com/). Click the "Get Started - It's Free" button at the top of the home page.
 
+2. Download and configure the Tailscale application version for your operating system from the [Official Tailscale site](https://tailscale.com/download/), on the Manager and all your remote agents.
 
+3. From the [Tailscale Machines Page](https://login.tailscale.com/admin/machines), verify your Manager and Agents are showing in the list as Connected, take not of the IP address provided for your Manager machine (100.x.x.x)
+
+4. There is no need to configure a Tailscale exit node as you don't need to use one.
+
+5. Use the Tailscale IP address or Tailscale Machine Name for your Manager machine, configure the Agents Manager URL with this IP / Machine name
 
 **General diagram:**
 ```mermaid
 flowchart TD
-    subgraph Agents
-        subgraph External Network 1.
-            A1[<h1><i><b>Agent</b></i></h1><br/>Hamachi Client<br/>Virtual IP: 25.x.x.x]
-        end
+    subgraph EA[External Agents]
 
-        subgraph External Network 2.
-            A2[<h1><i><b>Agent</b></i></h1><br/>Hamachi Client<br/>Virtual IP: 25.x.x.x]
-            A3[<h1><i><b>Agent</b></i></h1><br/>Hamachi Client<br/>Virtual IP: 25.x.x.x]
-        end
+        E1
+        E2
+        ...
+        En
 
-        ...[...]
-
-        subgraph External Network n.
-            An[<h1><i><b>Agent</b></i></h1><br/>Hamachi Client<br/>Virtual IP: 25.x.x.x]
-        end
     end
 
+    subgraph E1[External Network 1.]
+        A1[<h1><i><b>Agent</b></i></h1><br/>Tailscale Client<br/>Virtual IP: 100.7x.x.x]
+    end
+
+    subgraph E2[External Network 2.]
+        A2[<h1><i><b>Agent</b></i></h1><br/>Tailscale Client<br/>Virtual IP: 100.7x.x.x]
+        A3[<h1><i><b>Agent</b></i></h1><br/>Tailscale Client<br/>Virtual IP: 100.7x.x.x]
+    end
+
+    ...[...]
+
+    subgraph En[External Network n.]
+        An[<h1><i><b>Agent</b></i></h1><br/>Tailscale Client<br/>Virtual IP: 100.7x.x.x]
+    end
+
+
     subgraph Internet
+
+        %% TR1@{ shape: circ, label: "<h1>Tailscale <br>Relay</h1>"}
+        %% TR2@{ shape: circ, label: "<h1>Tailscale <br>Relay</h1>"}
+        %% TR3@{ shape: circ, label: "<h1>Tailscale <br>Relay</h1>"}
         TCS@{ shape: dbl-circ, label: "<h1>Tailscale <br>Coordination Server</h1>"}
-        TR1@{ shape: circ, label: "<h1>Tailscale <br>Relay</h1>"}
-        TR2@{ shape: circ, label: "<h1>Tailscale <br>Relay</h1>"}
-        TR3@{ shape: circ, label: "<h1>Tailscale <br>Relay</h1>"}
         %% TR4@{ shape: circ, label: "<h1>Tailscale <br>Relay</h1>"}
-        TR5@{ shape: circ, label: "<h1>Tailscale <br>Relay</h1>"}
+        %% TR5@{ shape: circ, label: "<h1>Tailscale <br>Relay</h1>"}
     end
 
     A1 <-.-> TCS
@@ -519,29 +537,31 @@ flowchart TD
     %% TR3 <--> TR5
     %% TR4 <--> TR5
 
-    A1 <==> TR1
-    A2 <==> TR2
-    A3 <==> TR2
-    ... <==> TR3
-    An <==> TR3
+    A1 <==> M
+    A2 <==> M
+    A3 <==> M
+    ... <==> M
+    An <==> M
 
-    TR1 <==> TR5
-    TR1 <==> TR2
-    TR2 <==> TR3
-    TR3 <==> TR5
-    %% TR4 <==> M
-    %% TR4 <==> TR5
-    TR5 <==> M
+    %% TR1 <====> TR5
+    %% TR1 <==> TR2
+    %% TR2 <==> TR3
+    %% TR3 <=====> TR5
+    %% %% TR4 <==> M
+    %% %% TR4 <==> TR5
+    %% TR5 <==> M
 
-    TR1 ~~~ TCS
-    TR2 ~~~ TCS
-    TR3 ~~~ TCS
+    %% TR1 ~~~ TCS
+    %% TR2 ~~~ TCS
+    %% TR3 ~~~ TCS
+    %% %% TR4 ~~~ TCS
+    %% TR5 ~~~ TCS
 
 
 
     subgraph LAN
         direction RL
-        M[<h1><i><b>Manager</b></i></h1><br/>Hamachi Client<br/>Virtual IP: 25.x.x.x]
+        M[<h1><i><b>Manager</b></i></h1><br/>Tailscale Client<br/>Virtual IP: 100.7x.x.x]
         AL[<h1><i><b>Agent</b></i></h1>]
 
     end
@@ -558,5 +578,6 @@ flowchart TD
     style AL fill:#efae4e,color:#000
     style M fill:#508ca1,color:#000
     style Internet fill:#228,color:#fff
-    style Agents fill:#000,color:#fff
+    style EA fill:#000,color:#fff
+
 ```
