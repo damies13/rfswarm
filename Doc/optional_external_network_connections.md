@@ -1,31 +1,168 @@
 # Optional external network connections
 [Return to Index](README.md)
 
-You may already know how to connecting Agent in LAN networks by simply using the Manager IP address with configured port.
+You may already know how to connecting Agent in LAN networks by simply using the Manager IP address with the configured port.
 In this case, it is necessary to configure the Agent by specifying only the correct IP address of the Manager and port. This should allow Agent to connect with Manager without any problems if they are located in the same network. \
 *For more information follow:* [RFSwarm Agent](rfswarm_agent.md) ("3 Run Agent 1st time")
 
 When we want to use Manager with Agents that are deployed in external networks, the situation becomes a little more complicated.
-The Agent and Manager cannot see each other so easily and cannot connect using only local IP address. \
+The Agent and Manager cannot see each other directly and cannot connect using only local IP address. \
 This time, we need to enable them to communicate with each other over the **Internet**. \
 The Agent communicates with the Manager using HTTP requests, which require knowledge of the Manager's network location.
 
 Such situations may occur, for example, when preparing performance tests and we don't have sufficient computing power.
-In this case we may decide to use additional computers outside our project environment, where the Manager component is installed.
+In this case we may decide to use additional computers  (e.g. at a cloud hosting provider) outside our project environment, where the Manager component is installed.
 
-In such situations, we offer tools that gives you ability to create and control distributed architecture that doesn't have to be located entirely within a single network.
+In such situations, here are some tools that give you the ability to create and control distributed architecture that doesn't have to be located entirely within a single network.
 
 **Methods**:
-1. Port forwarding
-    Port forwarding is a method that allows you to make an application running on your computer available on the internet.
-    All you need to do is configure your router to redirect traffic from a specific external port (in our case, for example, 8138) to the internal IP address where the Manager and application port are installed (e.g. 192.168.0.10:8138). \
-    Each router is different, and we cannot cover all possible models. For information on configuring port forwarding, please refer to your router's documentation.
-2. VPN
-    A VPN from your organisation or your personal VPN can be a secure alternative to port forwarding.
-    Instead of making the application directly available on the internet and exposing yourself to the risks associated with opening router ports, you connect via a virtual private network that creates a secure tunnel between external computers and your internal network.
+1. [Port forwarding](#port-forwarding)
+2. [VPN](#vpn)
 3. [Ngrok](#ngrok)
 4. [Hamachi](#hamachi)
+5. [Tailscale](#tailscale)
 
+## Port forwarding
+Port forwarding is a method that allows you to make an application running on your computer available on the internet.
+T use this method, you need to configure your router to redirect traffic from a specific external port (in our case, for example, 8138) on the public IP address provided to you by your ISP to the internal IP address where the Manager and application port are installed (e.g. 192.168.0.10:8138). \
+As each router or firewall is different, and we cannot cover all possible models. For information on configuring port forwarding, please refer to your router's documentation.
+
+**General diagram:**
+```mermaid
+flowchart TD
+    subgraph External Network 1.
+        A1[<h1><i><b>Agent</b></i></h1><br/>Configured with your piblic IP address]
+    end
+
+    subgraph External Network 2.
+        A2[<h1><i><b>Agent</b></i></h1><br/>Configured with your piblic IP address]
+        A3[<h1><i><b>Agent</b></i></h1><br/>Configured with your piblic IP address]
+    end
+
+    subgraph External Network n.
+        An[<h1><i><b>Agent</b></i></h1><br/>Configured with your piblic IP address]
+    end
+
+    ...[...]
+
+    subgraph Internet
+        IR1@{ shape: dbl-circ, label: "Agent's ISP's<br>Internet <br>Router", w: 600, h: 600}
+        IR2@{ shape: dbl-circ, label: "Agent's ISP's<br>Internet <br>Router", w: 600, h: 600}
+        IR.@{ shape: dbl-circ, label: "Agent's ISP's<br>Internet <br>Router", w: 600, h: 600}
+        IR3@{ shape: dbl-circ, label: "Agent's ISP's<br>Internet <br>Router", w: 600, h: 600}
+        IRI@{ shape: dbl-circ, label: "Your ISP's<br>Internet Router", w: 600, h: 600}
+    end
+
+    A1 <==> IR1
+    A2 <==> IR2
+    A3 <==> IR2
+    ... <==> IR.
+    An <==> IR3
+
+    IR1 <==> IRI
+    IR2 <==> IRI
+    IR. <==> IRI
+    IR3 <==> IRI
+
+    IRI <==> RF
+
+    subgraph LAN
+        RF["Your Router / Firewall <br>(public IP address)"]
+        M["<h1><i><b>Manager</b></i></h1>"]
+        AL["<h1><i><b>Agent</b></i></h1>"]
+    end
+
+    RF <-->|Port Forwarded <br>from Router to Manager | M
+    AL <-->|Local IP| M
+
+
+    style A1 fill:#efae4e,color:#000
+    style A2 fill:#efae4e,color:#000
+    style A3 fill:#efae4e,color:#000
+    style AL fill:#efae4e,color:#000
+    style An fill:#efae4e,color:#000
+    style M fill:#508ca1,color:#000
+    style Internet fill:#228,color:#fff
+```
+
+An advantage of using Port forwarding is that you don't need any additional software configuration on your Agents.
+
+
+## VPN
+A VPN from your organisation or your personal VPN can be a secure alternative to port forwarding.
+Instead of making the Manager directly available on the internet and exposing yourself to the risks associated with opening router ports, you connect via a virtual private network that creates a secure tunnel between external computers and your internal network.
+If you already have a VPN setup this could be a better option, but if not this might be a more complicated to setup initially.
+
+**General diagram:**
+```mermaid
+flowchart TD
+    subgraph External Network 1.
+        A1[<h1><i><b>Agent</b></i></h1><br/>Configured with your piblic IP address]
+        VPN1@{ shape: dbl-circ, label: "Agent's <br>VPN <br>Client", w: 600, h: 600}
+    end
+
+    subgraph External Network 2.
+        A2[<h1><i><b>Agent</b></i></h1><br/>Configured with your piblic IP address]
+        A3[<h1><i><b>Agent</b></i></h1><br/>Configured with your piblic IP address]
+        VPN2@{ shape: dbl-circ, label: "Agent's <br>VPN <br>Client", w: 600, h: 600}
+        VPN3@{ shape: dbl-circ, label: "Agent's <br>VPN <br>Client", w: 600, h: 600}
+    end
+
+    subgraph External Network n.
+        An[<h1><i><b>Agent</b></i></h1><br/>Configured with your piblic IP address]
+        VPNn@{ shape: dbl-circ, label: "Agent's <br>VPN <br>Client", w: 600, h: 600}
+    end
+
+    ...[...]
+
+    subgraph Internet
+        IR1@{ shape: dbl-circ, label: "Agent's ISP's<br>Internet <br>Router", w: 600, h: 600}
+        IR2@{ shape: dbl-circ, label: "Agent's ISP's<br>Internet <br>Router", w: 600, h: 600}
+        IR.@{ shape: dbl-circ, label: "Agent's ISP's<br>Internet <br>Router", w: 600, h: 600}
+        IR3@{ shape: dbl-circ, label: "Agent's ISP's<br>Internet <br>Router", w: 600, h: 600}
+        IRI@{ shape: dbl-circ, label: "Your ISP's<br>Internet Router", w: 600, h: 600}
+    end
+
+    A1 <==> VPN1
+    A2 <==> VPN2
+    A3 <==> VPN3
+    ... <-.-> IR.
+    An <==> VPNn
+
+    VPN1 <-.-> IR1
+    VPN2 <-.-> IR2
+    VPN3 <-.-> IR2
+    VPNn <-.-> IR3
+
+
+
+    IR1 <-.-> IRI
+    IR2 <-.-> IRI
+    IR. <-.-> IRI
+    IR3 <-.-> IRI
+
+    IRI <-.-> RF
+
+    subgraph LAN
+        RF["Your VPN Server"]
+        M["<h1><i><b>Manager</b></i></h1>"]
+        AL["<h1><i><b>Agent</b></i></h1>"]
+    end
+
+    RF <==>| | M
+    AL <==>|Local IP| M
+
+
+    style A1 fill:#efae4e,color:#000
+    style A2 fill:#efae4e,color:#000
+    style A3 fill:#efae4e,color:#000
+    style AL fill:#efae4e,color:#000
+    style An fill:#efae4e,color:#000
+    style M fill:#508ca1,color:#000
+    style Internet fill:#228,color:#fff
+```
+
+An advantage of using a VPN is that your Manager is not directly exposed to the internet and the communication between the Agents and Manager is encrypted over the internet.
 
 ## Ngrok
 > [Official ngrok site](https://ngrok.com/)
@@ -55,7 +192,7 @@ flowchart TD
     subgraph Internet
         N@{ shape: dbl-circ, label: "Ngrok URL (Tunnel Endpoint)", w: 600, h: 600}
     end
-    
+
     A1 <==> N
     A2 <==> N
     A3 <==> N
@@ -328,3 +465,5 @@ If everything has been done correctly, the Agent should connect to the Manager a
 Now you can configure performance tests using Agents that do not need to be on the same local network as the Manager.
 
 **Important note:** The Hamachi service is free, but the default plan has limited capabilities. So if you want to build a large infrastructure with multiple Agents, you will eventually need to purchase a subscription to get more possibilities and resources.
+
+## Tailscale
