@@ -757,17 +757,6 @@ Verify the Content Of the XLSX Report
 	...    Close Reporter GUI	AND
 	...    Move File 	${xlsx_file} 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.xlsx
 
-Check Application Icon or Desktop Shortcut in GUI
-	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
-
-	${result}= 	Run 	${cmd_reporter} -g 6 -c ICON
-	Log 		${result}
-	Sleep    1
-
-	Navigate to and check Desktop Icon
-
-	[Teardown]	Type 	KEY.ESC 	KEY.ESC 	KEY.ESC
-
 Verify Plan Graph - No Total
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #140
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
@@ -803,7 +792,7 @@ Verify Plan Graph - No Total
 
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 
-	# Take A Screenshot
+	Take A Screenshot
 	Select Field With Label 	DataType
 
 	# Take A Screenshot
@@ -819,6 +808,7 @@ Verify Plan Graph - No Total
 
 	${pvinfo}= 	Get Python Version Info
 
+	Take A Screenshot
 	Set Confidence		0.7
 	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
 		Locate 	reporter_${PLATFORM}_graph_plannototal_py3.9.png
@@ -899,6 +889,7 @@ Verify Plan Graph - With Total
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
+	...    Take A Screenshot 		AND
 	...    Set Confidence 	0.9 	AND
 	...    Close Reporter GUI 		AND
 	...    Remove File 		${resultfile}
@@ -962,6 +953,7 @@ Verify Plan Table
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
+	...    Take A Screenshot 		AND
 	...    Set Confidence 	0.9 	AND
 	...    Close Reporter GUI 		AND
 	...    Remove File 		${resultfile}
@@ -985,6 +977,8 @@ Change Line Colour
 	# pass a default ini file with extended height to ensure that default values are used
 	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
+	Sleep 	5s
+	Take A Screenshot
 	Wait For Status 	PreviewLoaded
 
 	Click Section			Report
@@ -1774,6 +1768,15 @@ Check Reporter with yml Template File
 	...    Close Reporter GUI 		AND
 	...    Remove File 		${resultfile}
 
+Check Application Icon or Desktop Shortcut in GUI
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
 
+	${result}= 	Run 	${cmd_reporter} -g 6 -c ICON
+	Log 		${result}
+	Sleep    1
+
+	Navigate to and check Desktop Icon
+
+	[Teardown]	Type 	KEY.ESC 	KEY.ESC 	KEY.ESC
 
 #

@@ -38,7 +38,11 @@ Run ${component_name} CLI
 		ELSE IF  '${component_name}' == 'Agent' and ( '-d' not in ${appargs} and '--agentdir' not in ${appargs} )
 			Append To List 	${appargs} 	-d 	${AGENT_DIR}
 			Create Directory 	${AGENT_DIR}
-			Empty Directory 	${AGENT_DIR}
+			TRY
+				Empty Directory 	${AGENT_DIR}
+			EXCEPT
+				Log 	Failed to empty Agent dir: ${AGENT_DIR}
+			END
 		END
 	END
 
@@ -149,3 +153,29 @@ Wait For ${component_name} Process
 
 	Sleep 	0.5
 	Run Keyword And Ignore Error 	Check Logs 	${component_name}
+
+Wait Until the Agent Connects to the Manager
+	[Documentation] 	For this keyword to function correctly, logs from the agent must be available dynamically.
+	VAR    ${timeout}    160
+	TRY
+		${stdout}  ${stderr}= 	Find Log 	Agent
+	EXCEPT
+		Sleep 	5s
+		${stdout}  ${stderr}= 	Find Log 	Agent
+	END
+
+	Log 	Waiting for the Agent to connect with the Manager... 	console=${true}
+	TRY
+		WHILE    True 	limit=${timeout} seconds
+			TRY
+				Sleep 	10 s
+				${stdout_content}= 	Read Log 	${stdout}
+				Should Contain 		${stdout_content}  Manager Connected
+			EXCEPT
+				CONTINUE
+			END
+			BREAK
+		END
+	EXCEPT
+		Fail 	Agent didn't connect to the Manager after ${timeout} seconds
+	END

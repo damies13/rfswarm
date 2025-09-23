@@ -12,12 +12,12 @@ Resource 	GUI_Click.resource
 Handle Donation Reminder
 	${comp}= 	Convert To Lower Case 	${COMPONENT}
 	IF  '${COMPONENT}' == 'Manager'
-		Run Keyword And Ignore Error 	Wait For 	manager_${PLATFORM}_button_runscriptrow.png 	timeout=8
-		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		2
+		Run Keyword And Ignore Error 	Wait For 	manager_${PLATFORM}_button_runscriptrow.png 	timeout=12
+		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3
 		Run Keyword And Ignore Error 	Wait For 	manager_${PLATFORM}_button_runscriptrow.png 	timeout=8
 	ELSE IF  '${COMPONENT}' == 'Reporter'
-		Run Keyword And Ignore Error 	Wait For 	reporter_${PLATFORM}_button_generateexcel.png 	timeout=8
-		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		2
+		Run Keyword And Ignore Error 	Wait For 	reporter_${PLATFORM}_button_generateexcel.png 	timeout=12
+		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3
 		Run Keyword And Ignore Error 	Wait For 	reporter_${PLATFORM}_button_generateexcel.png 	timeout=8
 	END
 
@@ -25,6 +25,37 @@ Handle Donation Reminder
 		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		4
 	END
 	VAR 	${DonationReminder} 	${found} 		scope=TEST
+
+Handle RFSwarm GUI Pop-ups
+	[Documentation] 	This keyword is intended to get rid of pop-ups displayed by rfswarm apps.
+	VAR 	${status} 	${true}
+
+	TRY
+		Take A Screenshot
+		IF  '${PLATFORM}' == 'macos'
+			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok_3 	timeout=5
+		ELSE
+			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok 	timeout=5
+		END
+
+		IF  '${PLATFORM}' == 'macos' and not ${status}
+			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok_2 	timeout=1
+			Sleep 	1s
+			IF  ${status}  Click
+		END
+
+		IF  not ${status}  Fail
+
+	EXCEPT
+		Take A Screenshot
+		Run Keyword And Ignore Error 	Click Dialog Button 	ok 	timeout=1
+		IF  '${PLATFORM}' == 'macos'  Run Keyword And Ignore Error 	Click Dialog Button 	ok_2 	timeout=1
+
+		Press key.enter 1 Times
+		Sleep 	1
+		Press key.enter 1 Times
+	END
+	Press key.enter 1 Times
 
 Open ${component_name} GUI
 	[Documentation] 	Open one of the RFSwarm applications for GUI purposes. Pass the: Manager, Reporter or Agent
@@ -47,7 +78,10 @@ Open ${component_name} GUI
 	IF 	'-n' in ${appargs} or '--nogui' in ${appargs}
 		Sleep 	5
 	ELSE
+		IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
 		Handle Donation Reminder
+		IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
+
 		${running}= 	Is Process Running 	${PROCESS_${comp}}
 		IF 	not ${running}
 			Take A Screenshot

@@ -25,9 +25,9 @@ Show Log
 	RETURN 		${filedata}
 
 Read Log
-	[Arguments]		${filename}
-	Log 		${filename}
-	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
+	[Arguments]		${filepath}
+	Log 		${filepath}
+	${filedata}= 	Get File 	${filepath} 		encoding=SYSTEM 		encoding_errors=ignore
 	Log 		${filedata}
 	RETURN 		${filedata}
 
