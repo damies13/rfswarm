@@ -27,11 +27,44 @@ GUI Suite Initialization ${component}
 	ImageHorizonLibrary.Set Reference Folder 	${IMAGE_DIR}
 	ImageHorizonLibrary.Set Screenshot Folder 	${OUTPUT DIR}
 
+	IF 	'${PLATFORM}' == 'macos'
+		Take A Screenshot
+		Run Keyword And Ignore Error 	Handle MacOS Pop-ups
+	END
+
 	Log 	\t[ === GUI suite configuration has been initiated for ${COMPONENT} === ] 	console=True
 	Log 	image dir = ${IMAGE_DIR} 	console=True
 	Log 	confidence level = ${CONFIDENCE} 	console=True
 	Log 	default image timeout = ${DEFAULT_IMAGE_TIMEOUT} 	console=True
 	Log 	------------------------------------------------------------------------------\n\n\n 	console=True
+
+Handle MacOS Pop-ups
+	[Tags]  macos-latest
+	[Documentation]  The MacOS system sometimes displays pop-up windows related to permissions. This keyword is intended to accept/ignore these pop-up windows.
+	[Setup] 	Sleep 	2s
+	Take A Screenshot
+	
+	VAR 	${img} 	macos_dlgbtn_allow_grayed.png
+	# Run Keyword And Ignore Error
+	# ...    Wait For 	${img} 	 timeout=2
+
+	Run Keyword And Ignore Error
+	...    Click Image 	${img}
+
+	VAR 	${img} 	macos_dlgbtn_allow.png
+	Sleep 	2s
+	# Run Keyword And Ignore Error
+	# ...    Wait For 	${img} 	 timeout=2
+
+	${result}= 	Run Keyword And Return Status
+	...    Click Image 	${img}
+
+	VAR 	${img} 	macos_dlgbtn_ignore.png
+	Sleep 	2s
+	Run Keyword And Ignore Error
+	...    Click Image 	${img}
+
+	Sleep 	0.1
 
 Press ${key} ${n} Times
 	[Documentation] 	Provide full name. For example: Key.tab

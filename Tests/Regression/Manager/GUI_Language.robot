@@ -11,7 +11,7 @@ Test Setup 	Language Test Init
 Test Teardown 	Language Test End
 Test Template 	Add Test In Language
 
-*** Test Cases ***
+*** Test Cases *** 	LangCode
 # Issue #238
 Bulgarian		bg
 Bosnian		bs
