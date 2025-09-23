@@ -1112,52 +1112,415 @@ Change Font
 	[Teardown] 	Run Keywords
 	...    Close Reporter GUI 	AND 	Remove Directory 	${result_dir} 	recursive=${True}
 
-# Verify Agent Filter Metric For Data Table and Graph
-# 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #217 	robot:continue-on-failure
-# 	[Setup] 	Change Reporter INI File Settings 	win_height 	600
-# 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}Issue-#105
-# 	VAR 	${result_name} 	20250501_103943_example
-# 	VAR 	${result_dir} 	${test_data}${/}${result_name}
-# 	VAR 	${result_db} 	${result_dir}${/}${result_name}.db
-# 	VAR 	${template_name} 	filter_metric
-# 	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
+Verify Agent Filter Metric For Data Table
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #121
+	[Setup] 	Set Reporter INI Window Size 	height=600
+	VAR 	${issue} 			Issue-#121
+	VAR 	${result_name} 		20250917_164531_filter_agent
+	VAR 	${test_data} 		${CURDIR}${/}testdata${/}${issue}
+	VAR 	${result_dir} 		${test_data}${/}${result_name}
+	VAR 	${result_db} 		${result_dir}${/}${result_name}.db
+	VAR 	${template_name} 	filter_metric
+	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
 
-# 	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${testdata}${/}html_images
-# 	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}Issue-#105${/}html_images
-# 	VAR 	${img_comp_threshold} 	0.7
-# 	VAR 	${move_tolerance} 		30
+	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
-# 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
+	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  1
+	Wait For Status 	PreviewLoaded
+	Sleep 	1
+	Take A Screenshot
+	Click Section 	ScenarioPlan
+	Sleep 	1
+	Take A Screenshot
 
-# 	Open Reporter GUI 	-d 	${result_db} 	-t 	${template_dir} 	-g 	1
-# 	Wait For Status 	PreviewLoaded
-# 	Sleep 	1
-# 	Take A Screenshot
+	GROUP  Validating data for "TEST_1" Agent
+		Click Label With Horizontal Offset 	FilterAgent 	140
+		Take A Screenshot
+		Select Option 	TEST_1
+		Sleep 	3
+		Click Tab 	Preview
+		Take A Screenshot
+		Click Tab 	Settings
 
-# 	# Enable filters:
-# 	Click Section 	Robots
-# 	Sleep 	1
-# 	Take A Screenshot
-# 	Click Label With Horizontal Offset 	FilterAgent 	140
-# 	Take A Screenshot
-# 	Select Option 	TEST_1
-# 	Sleep 	3
-# 	Click Tab 	Preview
-# 	Take A Screenshot
-# 	Click Tab 	Settings
+		VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+		Click Button 	generatehtml
+		Wait Until Created 	${html_file} 	timeout=9 minutes
+		${html} 	Parse HTML File 	${html_file}
 
+		Log 	\nVerifying Tables: 	console=${True}
+		VAR 	${section} 	Scenario Plan
+		${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+		Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+		VAR 	${section} 	Agent Filter Data Table METRIC 1
+		Run Keyword And Continue On Failure
+		...    Verify HTML Report Table Content
+		...    ${section} 	${section_obj}
 
-# 	# HTML:
-# 	VAR 	${html_file} 	${result_dir}${/}${result_name}.html
-# 	Click Button 	generatehtml
-# 	Wait Until Created 	${html_file} 	timeout=9 minutes
+		Copy File 		${html_file} 	${OUTPUT_DIR}${/}${result_name}_DataTable_METRIC_1.html
+		Remove File 	${html_file}
+	END
 
-# 	Log 	\nVerifying Graphs: 	console=${True}
-# 	VAR 	${section} 	Robots
-# 	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
-# 	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
-# 	VAR 	${section} 	Filter Robots METRIC 1
-# 	Verify HTML Report Graph 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path} 	${img_comp_threshold} 	${move_tolerance}
+	GROUP  Validating data for "TEST_2" Agent
+		Click Label With Horizontal Offset 	FilterAgent 	140
+		Take A Screenshot
+		Select Option 	TEST_2
+		Sleep 	3
+		Click Tab 	Preview
+		Take A Screenshot
+		Click Tab 	Settings
+
+		VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+		Click Button 	generatehtml
+		Wait Until Created 	${html_file} 	timeout=9 minutes
+		${html} 	Parse HTML File 	${html_file}
+
+		Log 	\nVerifying Tables: 	console=${True}
+		VAR 	${section} 	Scenario Plan
+		${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+		Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+		VAR 	${section} 	Agent Filter Data Table METRIC 2
+		Run Keyword And Continue On Failure
+		...    Verify HTML Report Table Content
+		...    ${section} 	${section_obj}
+
+		Copy File 		${html_file} 	${OUTPUT_DIR}${/}${result_name}_DataTable_METRIC_2.html
+		Remove File 	${html_file}
+	END
+
+	[Teardown] 	Run Keywords 	
+	...    Close Reporter GUI 	AND
+	...    Remove Directory 	${CURDIR}${/}testdata${/}Issue-#121${/}${result_name} 	recursive=${true}
+
+Verify Agent Filter Results For Data Table
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #121
+	[Setup] 	Set Reporter INI Window Size 	height=600
+	VAR 	${issue} 			Issue-#121
+	VAR 	${result_name} 		20250917_164531_filter_agent
+	VAR 	${test_data} 		${CURDIR}${/}testdata${/}${issue}
+	VAR 	${result_dir} 		${test_data}${/}${result_name}
+	VAR 	${result_db} 		${result_dir}${/}${result_name}.db
+	VAR 	${template_name} 	filter_result
+	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
+
+	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
+
+	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  1
+	Wait For Status 	PreviewLoaded
+	Sleep 	1
+	Take A Screenshot
+	Click Section 	TestResultSummary
+	Sleep 	1
+	Take A Screenshot
+
+	GROUP  Validating data for "TEST_1" Agent
+		Click Label With Horizontal Offset 	FilterAgent 	140
+		Take A Screenshot
+		Select Option 	TEST_1
+		Sleep 	3
+		Click Tab 	Preview
+		Take A Screenshot
+		Click Tab 	Settings
+
+		VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+		Click Button 	generatehtml
+		Wait Until Created 	${html_file} 	timeout=9 minutes
+		${html} 	Parse HTML File 	${html_file}
+
+		Log 	\nVerifying Tables: 	console=${True}
+		VAR 	${section} 	Test Result Summary
+		${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+		Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+		VAR 	${section} 	Agent Filter Data Table RESULTS 1
+		Run Keyword And Continue On Failure
+		...    Verify HTML Report Table Content
+		...    ${section} 	${section_obj}
+
+		Copy File 		${html_file} 	${OUTPUT_DIR}${/}${result_name}_DataTable_RESULTS_1.html
+		Remove File 	${html_file}
+	END
+
+	GROUP  Validating data for "TEST_2" Agent
+		Click Label With Horizontal Offset 	FilterAgent 	140
+		Take A Screenshot
+		Select Option 	TEST_2
+		Sleep 	3
+		Click Tab 	Preview
+		Take A Screenshot
+		Click Tab 	Settings
+
+		VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+		Click Button 	generatehtml
+		Wait Until Created 	${html_file} 	timeout=9 minutes
+		${html} 	Parse HTML File 	${html_file}
+
+		Log 	\nVerifying Tables: 	console=${True}
+		VAR 	${section} 	Test Result Summary
+		${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+		Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+		VAR 	${section} 	Agent Filter Data Table RESULTS 2
+		Run Keyword And Continue On Failure
+		...    Verify HTML Report Table Content
+		...    ${section} 	${section_obj}
+
+		Copy File 		${html_file} 	${OUTPUT_DIR}${/}${result_name}_DataTable_RESULTS_2.html
+		Remove File 	${html_file}
+	END
+
+	[Teardown] 	Run Keywords 	
+	...    Close Reporter GUI 	AND
+	...    Remove Directory 	${CURDIR}${/}testdata${/}Issue-#121${/}${result_name} 	recursive=${true}
+
+Verify Agent Filter Metric For Graph
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #121
+	[Setup] 	Set Reporter INI Window Size 	height=600
+	VAR 	${issue} 			Issue-#121
+	VAR 	${result_name} 		20250917_164531_filter_agent
+	VAR 	${test_data} 		${CURDIR}${/}testdata${/}${issue}
+	VAR 	${result_dir} 		${test_data}${/}${result_name}
+	VAR 	${result_db} 		${result_dir}${/}${result_name}.db
+	VAR 	${template_name} 	filter_metric
+	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
+
+	VAR 	${html_img_path} 			${OUTPUT_DIR}${/}${issue}${/}html_images
+	VAR 	${html_expected_img_path} 	${test_data}${/}html_images
+	VAR 	${img_comp_threshold} 		0.7
+	VAR 	${move_tolerance} 			30
+
+	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
+
+	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  1
+	Wait For Status 	PreviewLoaded
+	Sleep 	1
+	Take A Screenshot
+	Click Section 	Robots
+	Sleep 	1
+	Take A Screenshot
+
+	GROUP  Validating data for "TEST_1" Agent
+		Click Label With Horizontal Offset 	FilterAgent 	140
+		Take A Screenshot
+		Select Option 	TEST_1
+		Sleep 	3
+		Click Tab 	Preview
+		Take A Screenshot
+		Click Tab 	Settings
+
+		VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+		Click Button 	generatehtml
+		Wait Until Created 	${html_file} 	timeout=9 minutes
+		${html} 	Parse HTML File 	${html_file}
+
+		Log 	\nVerifying Graphs: 	console=${True}
+		VAR 	${section} 	Robots
+		${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+		Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+		VAR 	${section} 	Filter Robots METRIC 1
+		Run Keyword And Continue On Failure
+		...    Verify HTML Report Graph
+		...    ${section}  ${section_obj}  ${html_expected_img_path}  ${html_img_path}  ${img_comp_threshold}  ${move_tolerance}
+
+		Copy File 		${html_file} 	${OUTPUT_DIR}${/}${result_name}_Graph_METRIC_1.html
+		Remove File 	${html_file}
+	END
+
+	GROUP  Validating data for "TEST_2" Agent
+		Click Label With Horizontal Offset 	FilterAgent 	140
+		Take A Screenshot
+		Select Option 	TEST_2
+		Sleep 	3
+		Click Tab 	Preview
+		Take A Screenshot
+		Click Tab 	Settings
+
+		VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+		Click Button 	generatehtml
+		Wait Until Created 	${html_file} 	timeout=9 minutes
+		${html} 	Parse HTML File 	${html_file}
+
+		Log 	\nVerifying Graphs: 	console=${True}
+		VAR 	${section} 	Robots
+		${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+		Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+		VAR 	${section} 	Filter Robots METRIC 2
+		Run Keyword And Continue On Failure
+		...    Verify HTML Report Graph
+		...    ${section}  ${section_obj}  ${html_expected_img_path}  ${html_img_path}  ${img_comp_threshold}  ${move_tolerance}
+
+		Copy File 		${html_file} 	${OUTPUT_DIR}${/}${result_name}_Graph_METRIC_2.html
+		Remove File 	${html_file}
+	END
+
+	[Teardown] 	Run Keywords 	
+	...    Close Reporter GUI 	AND
+	...    Remove Directory 	${CURDIR}${/}testdata${/}Issue-#121${/}${result_name} 	recursive=${true}
+
+Verify Agent Filter Results For Graph
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #121
+	[Setup] 	Set Reporter INI Window Size 	height=600
+	VAR 	${issue} 			Issue-#121
+	VAR 	${result_name} 		20250917_164531_filter_agent
+	VAR 	${test_data} 		${CURDIR}${/}testdata${/}${issue}
+	VAR 	${result_dir} 		${test_data}${/}${result_name}
+	VAR 	${result_db} 		${result_dir}${/}${result_name}.db
+	VAR 	${template_name} 	filter_result
+	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
+
+	VAR 	${html_img_path} 			${OUTPUT_DIR}${/}${issue}${/}html_images
+	VAR 	${html_expected_img_path} 	${test_data}${/}html_images
+	VAR 	${img_comp_threshold} 		0.9
+	VAR 	${move_tolerance} 			0
+
+	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
+
+	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  1
+	Wait For Status 	PreviewLoaded
+	Sleep 	1
+	Take A Screenshot
+	Click Section 	DataGraph
+	Sleep 	1
+	Take A Screenshot
+
+	GROUP  Validating data for "TEST_1" Agent
+		Click Label With Horizontal Offset 	FilterAgent 	140
+		Take A Screenshot
+		Select Option 	TEST_1
+		Sleep 	3
+		Click Tab 	Preview
+		Take A Screenshot
+		Click Tab 	Settings
+
+		VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+		Click Button 	generatehtml
+		Wait Until Created 	${html_file} 	timeout=9 minutes
+		${html} 	Parse HTML File 	${html_file}
+
+		Log 	\nVerifying Graphs: 	console=${True}
+		VAR 	${section} 	Data Graph
+		${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+		Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+		VAR 	${section} 	Filter Data Graph RESULTS 1
+		Run Keyword And Continue On Failure
+		...    Verify HTML Report Graph
+		...    ${section}  ${section_obj}  ${html_expected_img_path}  ${html_img_path}  ${img_comp_threshold}  ${move_tolerance}
+
+		Copy File 		${html_file} 	${OUTPUT_DIR}${/}${result_name}_Graph_RESULTS_1.html
+		Remove File 	${html_file}
+	END
+
+	GROUP  Validating data for "TEST_2" Agent
+		Click Label With Horizontal Offset 	FilterAgent 	140
+		Take A Screenshot
+		Select Option 	TEST_2
+		Sleep 	3
+		Click Tab 	Preview
+		Take A Screenshot
+		Click Tab 	Settings
+
+		VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+		Click Button 	generatehtml
+		Wait Until Created 	${html_file} 	timeout=9 minutes
+		${html} 	Parse HTML File 	${html_file}
+
+		Log 	\nVerifying Graphs: 	console=${True}
+		VAR 	${section} 	Data Graph
+		${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+		Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+		VAR 	${section} 	Filter Data Graph RESULTS 2
+		Run Keyword And Continue On Failure
+		...    Verify HTML Report Graph
+		...    ${section}  ${section_obj}  ${html_expected_img_path}  ${html_img_path}  ${img_comp_threshold}  ${move_tolerance}
+
+		Copy File 		${html_file} 	${OUTPUT_DIR}${/}${result_name}_Graph_RESULTS_2.html
+		Remove File 	${html_file}
+	END
+
+	[Teardown] 	Run Keywords 	
+	...    Close Reporter GUI 	AND
+	...    Remove Directory 	${CURDIR}${/}testdata${/}Issue-#121${/}${result_name} 	recursive=${true}
+
+Verify Agent Filter Results For Error Details
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #121
+	[Setup] 	Set Reporter INI Window Size 	height=600
+	VAR 	${issue} 			Issue-#121
+	VAR 	${result_name} 		20250917_164531_filter_agent
+	VAR 	${test_data} 		${CURDIR}${/}testdata${/}${issue}
+	VAR 	${result_dir} 		${test_data}${/}${result_name}
+	VAR 	${result_db} 		${result_dir}${/}${result_name}.db
+	VAR 	${template_name} 	filter_error
+	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
+
+	VAR 	${html_img_path} 			${OUTPUT_DIR}${/}${issue}${/}html_images
+	VAR 	${html_expected_img_path} 	${test_data}${/}html_images
+	VAR 	${img_comp_threshold} 		0.9
+	VAR 	${move_tolerance} 			0
+
+	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
+
+	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  1
+	Wait For Status 	PreviewLoaded
+	Sleep 	1
+	Take A Screenshot
+	Click Section 	Errors
+	Sleep 	1
+	Take A Screenshot
+
+	GROUP  Validating data for "TEST_1" Agent
+		Click Label With Horizontal Offset 	FilterAgent 	140
+		Take A Screenshot
+		Select Option 	TEST_1
+		Sleep 	3
+		Click Tab 	Preview
+		Take A Screenshot
+		Click Tab 	Settings
+
+		VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+		Click Button 	generatehtml
+		Wait Until Created 	${html_file} 	timeout=9 minutes
+		${html} 	Parse HTML File 	${html_file}
+
+		Log 	\nVerifying Graphs: 	console=${True}
+		VAR 	${section} 	Data Graph
+		${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+		Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+		VAR 	${section} 	Filter Data Graph RESULTS 1
+		Run Keyword And Continue On Failure
+		...    Verify HTML Report Graph
+		...    ${section}  ${section_obj}  ${html_expected_img_path}  ${html_img_path}  ${img_comp_threshold}  ${move_tolerance}
+
+		Copy File 		${html_file} 	${OUTPUT_DIR}${/}${result_name}_Graph_RESULTS_1.html
+		Remove File 	${html_file}
+	END
+
+	GROUP  Validating data for "TEST_2" Agent
+		Click Label With Horizontal Offset 	FilterAgent 	140
+		Take A Screenshot
+		Select Option 	TEST_2
+		Sleep 	3
+		Click Tab 	Preview
+		Take A Screenshot
+		Click Tab 	Settings
+
+		VAR 	${html_file} 	${result_dir}${/}${result_name}.html
+		Click Button 	generatehtml
+		Wait Until Created 	${html_file} 	timeout=9 minutes
+		${html} 	Parse HTML File 	${html_file}
+
+		Log 	\nVerifying Graphs: 	console=${True}
+		VAR 	${section} 	Data Graph
+		${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
+		Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.
+		VAR 	${section} 	Filter Data Graph RESULTS 2
+		Run Keyword And Continue On Failure
+		...    Verify HTML Report Graph
+		...    ${section}  ${section_obj}  ${html_expected_img_path}  ${html_img_path}  ${img_comp_threshold}  ${move_tolerance}
+
+		Copy File 		${html_file} 	${OUTPUT_DIR}${/}${result_name}_Graph_RESULTS_2.html
+		Remove File 	${html_file}
+	END
+
+	[Teardown] 	Run Keywords 	
+	...    Close Reporter GUI 	AND
+	...    Remove Directory 	${CURDIR}${/}testdata${/}Issue-#121${/}${result_name} 	recursive=${true}
 
 Verify Filter Metric For Data Table and Graph - Wildcard
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #105 	robot:continue-on-failure
@@ -1172,10 +1535,10 @@ Verify Filter Metric For Data Table and Graph - Wildcard
 	VAR 	${template_name} 	filter_metric
 	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
 
-	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${issue}${/}html_images
-	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}${issue}${/}html_images
-	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		30
+	VAR 	${html_img_path} 			${OUTPUT_DIR}${/}${issue}${/}html_images
+	VAR 	${html_expected_img_path} 	${test_data}${/}html_images
+	VAR 	${img_comp_threshold} 		0.7
+	VAR 	${move_tolerance} 			30
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
@@ -1211,7 +1574,6 @@ Verify Filter Metric For Data Table and Graph - Wildcard
 	Sleep 	2
 	Take A Screenshot
 	Click Tab 	Settings
-
 
 	# HTML:
 	VAR 	${html_file} 	${result_dir}${/}${result_name}.html
@@ -1254,10 +1616,10 @@ Verify Filter Metric For Data Table and Graph - Not Wildcard
 	VAR 	${template_name} 	filter_metric
 	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
 
-	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${issue}${/}html_images
-	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}${issue}${/}html_images
-	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		30
+	VAR 	${html_img_path} 			${OUTPUT_DIR}${/}${issue}${/}html_images
+	VAR 	${html_expected_img_path} 	${test_data}${/}html_images
+	VAR 	${img_comp_threshold} 		0.7
+	VAR 	${move_tolerance} 			30
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
@@ -1336,10 +1698,10 @@ Verify Filter Result For Data Table and Graph - Wildcard
 	VAR 	${template_name} 	filter_result
 	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
 
-	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${issue}${/}html_images
-	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}${issue}${/}html_images
-	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		30
+	VAR 	${html_img_path} 			${OUTPUT_DIR}${/}${issue}${/}html_images
+	VAR 	${html_expected_img_path} 	${test_data}${/}html_images
+	VAR 	${img_comp_threshold} 		0.7
+	VAR 	${move_tolerance} 			30
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
@@ -1418,10 +1780,10 @@ Verify Filter Result For Data Table and Graph - Not Wildcard
 	VAR 	${template_name} 	filter_result
 	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
 
-	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${issue}${/}html_images
-	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}${issue}${/}html_images
-	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		30
+	VAR 	${html_img_path} 			${OUTPUT_DIR}${/}${issue}${/}html_images
+	VAR 	${html_expected_img_path} 	${test_data}${/}html_images
+	VAR 	${img_comp_threshold} 		0.7
+	VAR 	${move_tolerance} 			30
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
@@ -1492,7 +1854,7 @@ Verify Filter Result For Data Table and Graph - Filter Result
 	[Setup] 	Run Keywords
 	...    Create Reporter INI File If It Does Not Exist 	AND
 	...    Set Reporter INI Window Size 	height=600
-	VAR 	${issue} 	Issue-#105
+	VAR 	${issue} 		Issue-#105
 	VAR 	${test_data} 	${CURDIR}${/}testdata${/}${issue}
 	VAR 	${result_name} 	20250501_103943_example
 	VAR 	${result_dir} 	${test_data}${/}${result_name}
@@ -1500,10 +1862,10 @@ Verify Filter Result For Data Table and Graph - Filter Result
 	VAR 	${template_name} 	filter_result
 	VAR 	${template_dir} 	${test_data}${/}${template_name}.template
 
-	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${issue}${/}html_images
-	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}${issue}${/}html_images
-	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		30
+	VAR 	${html_img_path} 			${OUTPUT_DIR}${/}${issue}${/}html_images
+	VAR 	${html_expected_img_path} 	${test_data}${/}html_images
+	VAR 	${img_comp_threshold} 		0.7
+	VAR 	${move_tolerance} 			30
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
