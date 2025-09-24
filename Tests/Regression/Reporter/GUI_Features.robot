@@ -1136,7 +1136,7 @@ Verify Agent Filter Metric For Data Table
 	GROUP  Validating data for "TEST_1" Agent
 		Click Label With Horizontal Offset 	FilterAgent 	140
 		Take A Screenshot
-		Set Confidence 	${0.93}
+		Set Confidence 	${0.96}
 		Select Option 	TEST_1
 		Set Confidence 	${CONFIDENCE}
 		Sleep 	3
@@ -1165,7 +1165,7 @@ Verify Agent Filter Metric For Data Table
 	GROUP  Validating data for "TEST_2" Agent
 		Click Label With Horizontal Offset 	FilterAgent 	140
 		Take A Screenshot
-		Set Confidence 	${0.93}
+		Set Confidence 	${0.96}
 		Select Option 	TEST_2
 		Set Confidence 	${CONFIDENCE}
 		Sleep 	3
@@ -1220,7 +1220,7 @@ Verify Agent Filter Results For Data Table
 	GROUP  Validating data for "TEST_1" Agent
 		Click Label With Horizontal Offset 	FilterAgent 	140
 		Take A Screenshot
-		Set Confidence 	${0.93}
+		Set Confidence 	${0.96}
 		Select Option 	TEST_1
 		Set Confidence 	${CONFIDENCE}
 		Sleep 	3
@@ -1249,7 +1249,7 @@ Verify Agent Filter Results For Data Table
 	GROUP  Validating data for "TEST_2" Agent
 		Click Label With Horizontal Offset 	FilterAgent 	140
 		Take A Screenshot
-		Set Confidence 	${0.93}
+		Set Confidence 	${0.96}
 		Select Option 	TEST_2
 		Set Confidence 	${CONFIDENCE}
 		Sleep 	3
@@ -1309,7 +1309,7 @@ Verify Agent Filter Metric For Graph
 	GROUP  Validating data for "TEST_1" Agent
 		Click Label With Horizontal Offset 	FilterAgent 	140
 		Take A Screenshot
-		Set Confidence 	${0.93}
+		Set Confidence 	${0.96}
 		Select Option 	TEST_1
 		Set Confidence 	${CONFIDENCE}
 		Sleep 	3
@@ -1338,7 +1338,7 @@ Verify Agent Filter Metric For Graph
 	GROUP  Validating data for "TEST_2" Agent
 		Click Label With Horizontal Offset 	FilterAgent 	140
 		Take A Screenshot
-		Set Confidence 	${0.93}
+		Set Confidence 	${0.96}
 		Select Option 	TEST_2
 		Set Confidence 	${CONFIDENCE}
 		Sleep 	3
@@ -1398,7 +1398,7 @@ Verify Agent Filter Results For Graph
 	GROUP  Validating data for "TEST_1" Agent
 		Click Label With Horizontal Offset 	FilterAgent 	140
 		Take A Screenshot
-		Set Confidence 	${0.93}
+		Set Confidence 	${0.96}
 		Select Option 	TEST_1
 		Set Confidence 	${CONFIDENCE}
 		Sleep 	3
@@ -1427,7 +1427,7 @@ Verify Agent Filter Results For Graph
 	GROUP  Validating data for "TEST_2" Agent
 		Click Label With Horizontal Offset 	FilterAgent 	140
 		Take A Screenshot
-		Set Confidence 	${0.93}
+		Set Confidence 	${0.96}
 		Select Option 	TEST_2
 		Set Confidence 	${CONFIDENCE}
 		Sleep 	3
@@ -1489,7 +1489,7 @@ Verify Agent Filter Results For Graph
 # 	GROUP  Validating data for "TEST_1" Agent
 # 		Click Label With Horizontal Offset 	FilterAgent 	140
 # 		Take A Screenshot
-# 		Set Confidence 	${0.93}
+# 		Set Confidence 	${0.96}
 # 		Select Option 	TEST_1
 # 		Set Confidence 	${CONFIDENCE}
 # 		Sleep 	3
@@ -1518,7 +1518,7 @@ Verify Agent Filter Results For Graph
 # 	GROUP  Validating data for "TEST_2" Agent
 # 		Click Label With Horizontal Offset 	FilterAgent 	140
 # 		Take A Screenshot
-# 		Set Confidence 	${0.93}
+# 		Set Confidence 	${0.96}
 # 		Select Option 	TEST_2
 # 		Set Confidence 	${CONFIDENCE}
 # 		Sleep 	3
