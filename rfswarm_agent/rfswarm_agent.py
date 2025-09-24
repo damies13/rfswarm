@@ -967,8 +967,13 @@ class RFSwarmAgent():
 			self.debugmsg(1, "Exception:", e)
 
 		try:
+			relpath = jsonresp['File']
+			if '\\' in relpath:
+				relpatharr = relpath.split('\\')
+			else:
+				relpatharr = relpath.split('/')
 			self.debugmsg(7, 'scriptdir', self.scriptdir)
-			localfile = os.path.abspath(os.path.join(self.scriptdir, jsonresp['File']))
+			localfile = os.path.abspath(os.path.join(self.scriptdir, *relpatharr))
 			self.debugmsg(5, 'localfile', localfile)
 
 		except Exception as e:
