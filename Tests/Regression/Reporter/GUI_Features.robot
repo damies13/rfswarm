@@ -1136,7 +1136,9 @@ Verify Agent Filter Metric For Data Table
 	GROUP  Validating data for "TEST_1" Agent
 		Click Label With Horizontal Offset 	FilterAgent 	140
 		Take A Screenshot
+		Set Confidence 	${0.93}
 		Select Option 	TEST_1
+		Set Confidence 	${CONFIDENCE}
 		Sleep 	3
 		Click Tab 	Preview
 		Take A Screenshot
@@ -1163,7 +1165,9 @@ Verify Agent Filter Metric For Data Table
 	GROUP  Validating data for "TEST_2" Agent
 		Click Label With Horizontal Offset 	FilterAgent 	140
 		Take A Screenshot
+		Set Confidence 	${0.93}
 		Select Option 	TEST_2
+		Set Confidence 	${CONFIDENCE}
 		Sleep 	3
 		Click Tab 	Preview
 		Take A Screenshot
@@ -1188,6 +1192,7 @@ Verify Agent Filter Metric For Data Table
 	END
 
 	[Teardown] 	Run Keywords 	
+	...    Set Confidence 	${CONFIDENCE} 	AND
 	...    Close Reporter GUI 	AND
 	...    Remove Directory 	${CURDIR}${/}testdata${/}Issue-#121${/}${result_name} 	recursive=${true}
 
@@ -1215,7 +1220,9 @@ Verify Agent Filter Results For Data Table
 	GROUP  Validating data for "TEST_1" Agent
 		Click Label With Horizontal Offset 	FilterAgent 	140
 		Take A Screenshot
+		Set Confidence 	${0.93}
 		Select Option 	TEST_1
+		Set Confidence 	${CONFIDENCE}
 		Sleep 	3
 		Click Tab 	Preview
 		Take A Screenshot
@@ -1242,7 +1249,9 @@ Verify Agent Filter Results For Data Table
 	GROUP  Validating data for "TEST_2" Agent
 		Click Label With Horizontal Offset 	FilterAgent 	140
 		Take A Screenshot
+		Set Confidence 	${0.93}
 		Select Option 	TEST_2
+		Set Confidence 	${CONFIDENCE}
 		Sleep 	3
 		Click Tab 	Preview
 		Take A Screenshot
@@ -1267,6 +1276,7 @@ Verify Agent Filter Results For Data Table
 	END
 
 	[Teardown] 	Run Keywords 	
+	...    Set Confidence 	${CONFIDENCE} 	AND
 	...    Close Reporter GUI 	AND
 	...    Remove Directory 	${CURDIR}${/}testdata${/}Issue-#121${/}${result_name} 	recursive=${true}
 
@@ -1299,7 +1309,9 @@ Verify Agent Filter Metric For Graph
 	GROUP  Validating data for "TEST_1" Agent
 		Click Label With Horizontal Offset 	FilterAgent 	140
 		Take A Screenshot
+		Set Confidence 	${0.93}
 		Select Option 	TEST_1
+		Set Confidence 	${CONFIDENCE}
 		Sleep 	3
 		Click Tab 	Preview
 		Take A Screenshot
@@ -1326,7 +1338,9 @@ Verify Agent Filter Metric For Graph
 	GROUP  Validating data for "TEST_2" Agent
 		Click Label With Horizontal Offset 	FilterAgent 	140
 		Take A Screenshot
+		Set Confidence 	${0.93}
 		Select Option 	TEST_2
+		Set Confidence 	${CONFIDENCE}
 		Sleep 	3
 		Click Tab 	Preview
 		Take A Screenshot
@@ -1351,6 +1365,7 @@ Verify Agent Filter Metric For Graph
 	END
 
 	[Teardown] 	Run Keywords 	
+	...    Set Confidence 	${CONFIDENCE} 	AND
 	...    Close Reporter GUI 	AND
 	...    Remove Directory 	${CURDIR}${/}testdata${/}Issue-#121${/}${result_name} 	recursive=${true}
 
@@ -1383,7 +1398,9 @@ Verify Agent Filter Results For Graph
 	GROUP  Validating data for "TEST_1" Agent
 		Click Label With Horizontal Offset 	FilterAgent 	140
 		Take A Screenshot
+		Set Confidence 	${0.93}
 		Select Option 	TEST_1
+		Set Confidence 	${CONFIDENCE}
 		Sleep 	3
 		Click Tab 	Preview
 		Take A Screenshot
@@ -1410,7 +1427,9 @@ Verify Agent Filter Results For Graph
 	GROUP  Validating data for "TEST_2" Agent
 		Click Label With Horizontal Offset 	FilterAgent 	140
 		Take A Screenshot
+		Set Confidence 	${0.93}
 		Select Option 	TEST_2
+		Set Confidence 	${CONFIDENCE}
 		Sleep 	3
 		Click Tab 	Preview
 		Take A Screenshot
@@ -1435,6 +1454,7 @@ Verify Agent Filter Results For Graph
 	END
 
 	[Teardown] 	Run Keywords 	
+	...    Set Confidence 	${CONFIDENCE} 	AND
 	...    Close Reporter GUI 	AND
 	...    Remove Directory 	${CURDIR}${/}testdata${/}Issue-#121${/}${result_name} 	recursive=${true}
 
@@ -1469,7 +1489,9 @@ Verify Agent Filter Results For Graph
 # 	GROUP  Validating data for "TEST_1" Agent
 # 		Click Label With Horizontal Offset 	FilterAgent 	140
 # 		Take A Screenshot
+# 		Set Confidence 	${0.93}
 # 		Select Option 	TEST_1
+# 		Set Confidence 	${CONFIDENCE}
 # 		Sleep 	3
 # 		Click Tab 	Preview
 # 		Take A Screenshot
@@ -1496,7 +1518,9 @@ Verify Agent Filter Results For Graph
 # 	GROUP  Validating data for "TEST_2" Agent
 # 		Click Label With Horizontal Offset 	FilterAgent 	140
 # 		Take A Screenshot
+# 		Set Confidence 	${0.93}
 # 		Select Option 	TEST_2
+# 		Set Confidence 	${CONFIDENCE}
 # 		Sleep 	3
 # 		Click Tab 	Preview
 # 		Take A Screenshot
@@ -1521,6 +1545,7 @@ Verify Agent Filter Results For Graph
 # 	END
 
 # 	[Teardown] 	Run Keywords 	
+#	...    Set Confidence 	${CONFIDENCE} 	AND
 # 	...    Close Reporter GUI 	AND
 # 	...    Remove Directory 	${CURDIR}${/}testdata${/}Issue-#121${/}${result_name} 	recursive=${true}
 
