@@ -797,6 +797,7 @@ Verify Plan Graph - No Total
 
 	# Take A Screenshot
 	Select Option 	Plan
+	Sleep 	5s
 
 	# Take A Screenshot
 	Wait For Status 	PreviewLoaded
@@ -864,11 +865,13 @@ Verify Plan Graph - With Total
 
 	# Take A Screenshot
 	Select Option 	Plan
+	Sleep 	5s
 
 	Wait For Status 	PreviewLoaded
 
 	# Take A Screenshot
 	Select Field With Label 	ShowTotal
+	Sleep 	5s
 
 	# Take A Screenshot
 	Wait For Status 	PreviewLoaded
