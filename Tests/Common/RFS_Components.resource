@@ -121,7 +121,7 @@ Stop ${component_name} CLI
 	END
 
 	Sleep 	0.5
-	Run Keyword And Ignore Error 	Check Logs 	${component_name} 	# TODO: remove ignore error and check if test cases fail. Log issues for failing test cases
+	Run Keyword And Warn On Failure 	Check Logs 	${component_name} 	# TODO: remove ignore error and check if test cases fail. Log issues for failing test cases
 	${running}= 	Is Process Running 	${PROCESS_${comp}}
 	Run Keyword If 	${running} 	Fail 	Failed to close ${component_name}
 

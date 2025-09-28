@@ -774,7 +774,7 @@ Verify Plan Graph - No Total
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
+	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile} 	-g 	6
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
@@ -841,7 +841,7 @@ Verify Plan Graph - With Total
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
+	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile} 	-g 	6
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
@@ -1125,7 +1125,7 @@ Verify Agent Filter Metric For Data Table
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
-	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  1
+	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  6
 	Wait For Status 	PreviewLoaded
 	Sleep 	1
 	Take A Screenshot
@@ -1209,7 +1209,7 @@ Verify Agent Filter Results For Data Table
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
-	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  1
+	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  6
 	Wait For Status 	PreviewLoaded
 	Sleep 	1
 	Take A Screenshot
@@ -1298,7 +1298,7 @@ Verify Agent Filter Metric For Graph
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
-	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  1
+	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  6
 	Wait For Status 	PreviewLoaded
 	Sleep 	1
 	Take A Screenshot
@@ -1387,7 +1387,7 @@ Verify Agent Filter Results For Graph
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
-	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  1
+	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  6
 	Wait For Status 	PreviewLoaded
 	Sleep 	1
 	Take A Screenshot
