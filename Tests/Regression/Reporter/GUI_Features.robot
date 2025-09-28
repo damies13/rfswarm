@@ -812,10 +812,11 @@ Verify Plan Graph - No Total
 	Take A Screenshot
 	Set Confidence		0.7
 	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
-		Locate 	reporter_${PLATFORM}_graph_plannototal_py3.9.png
+		VAR 	${plannototal_img} 	reporter_${PLATFORM}_graph_plannototal_py3.9.png
 	ELSE
-		Locate 	reporter_${PLATFORM}_graph_plannototal.png
+		VAR 	${plannototal_img} 	reporter_${PLATFORM}_graph_plannototal.png
 	END
+	Wait For 	${plannototal_img} 	timeout=30s
 	Set Confidence		0.9
 
 
@@ -885,10 +886,11 @@ Verify Plan Graph - With Total
 
 	Set Confidence		0.7
 	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
-		Locate 	reporter_${PLATFORM}_graph_plantotal_py3.9.png
+		VAR 	${plantotal_img} 	reporter_${PLATFORM}_graph_plantotal_py3.9.png
 	ELSE
-		Locate 	reporter_${PLATFORM}_graph_plantotal.png
+		VAR 	${plantotal_img} 	reporter_${PLATFORM}_graph_plantotal.png
 	END
+	Wait For 	${plantotal_img} 	timeout=30s
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
