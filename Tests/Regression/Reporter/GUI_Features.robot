@@ -1130,7 +1130,7 @@ Verify Agent Filter Metric For Data Table
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
-	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  6
+	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  2
 	Wait For Status 	PreviewLoaded
 	Sleep 	1
 	Take A Screenshot
@@ -1214,7 +1214,7 @@ Verify Agent Filter Results For Data Table
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
-	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  6
+	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  2
 	Wait For Status 	PreviewLoaded
 	Sleep 	1
 	Take A Screenshot
@@ -1303,7 +1303,7 @@ Verify Agent Filter Metric For Graph
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
-	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  6
+	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  2
 	Wait For Status 	PreviewLoaded
 	Sleep 	1
 	Take A Screenshot
@@ -1392,7 +1392,7 @@ Verify Agent Filter Results For Graph
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
-	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  6
+	Open Reporter GUI 	-d  ${result_db}  -t  ${template_dir}  -g  2
 	Wait For Status 	PreviewLoaded
 	Sleep 	1
 	Take A Screenshot
