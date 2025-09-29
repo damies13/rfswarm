@@ -816,7 +816,7 @@ Verify Plan Graph - No Total
 	ELSE
 		VAR 	${plannototal_img} 	reporter_${PLATFORM}_graph_plannototal.png
 	END
-	Wait For 	${plannototal_img} 	timeout=30s
+	Wait For 	${plannototal_img} 	timeout=30
 	Set Confidence		0.9
 
 
@@ -890,7 +890,7 @@ Verify Plan Graph - With Total
 	ELSE
 		VAR 	${plantotal_img} 	reporter_${PLATFORM}_graph_plantotal.png
 	END
-	Wait For 	${plantotal_img} 	timeout=30s
+	Wait For 	${plantotal_img} 	timeout=30
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
