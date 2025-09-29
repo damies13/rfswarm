@@ -774,7 +774,7 @@ Verify Plan Graph - No Total
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile} 	-g 	6
+	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile} 	-g 	2
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 
@@ -843,7 +843,7 @@ Verify Plan Graph - With Total
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
-	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile} 	-g 	6
+	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile} 	-g  2
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
 	Wait For Status 	PreviewLoaded
 

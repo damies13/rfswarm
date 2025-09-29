@@ -90,7 +90,7 @@ Select Field With Label
 	# Take A Screenshot
 
 Wait For Status
-	[Arguments]		${status}	${timeout}=${1800}
+	[Arguments]		${status}	${timeout}=${180}
 	${statusl}= 	Convert To Lower Case 	${status}
 	${img}=	Set Variable		reporter_${PLATFORM}_status_${statusl}.png
 	Log		${CURDIR}

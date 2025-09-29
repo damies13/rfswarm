@@ -14,12 +14,7 @@ Click Button
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 
-	${status}= 	Run Keyword And Return Status
-	...    Wait For 	${img} 	 timeout=${timeout}
-	IF  not ${status} and '${comp}' == 'reporter' and '${PLATFORM}' == 'macos'
-		Handle Reporter Missing Settings
-		Wait For 	${img} 	 timeout=5s
-	END
+	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
 	Sleep 	0.1
@@ -53,7 +48,7 @@ Click Dialog Button
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 Click Tab
-	[Arguments]		${tabname}
+	[Arguments]		${tabname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
 	[Tags] 	Manager 	Reporter
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${tabnamel}= 	Convert To Lower Case 	${tabname}
@@ -61,12 +56,7 @@ Click Tab
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 
-	${status}= 	Run Keyword And Return Status
-	...    Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
-	IF  not ${status} and '${comp}' == 'reporter' and '${PLATFORM}' == 'macos'
-		Handle Reporter Missing Settings
-		Wait For 	${img} 	 timeout=5s
-	END
+	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
 	Sleep 	0.1
@@ -84,7 +74,7 @@ Select Option
 	...    Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	IF  not ${status} and '${comp}' == 'reporter' and '${PLATFORM}' == 'macos'
 		Handle Reporter Missing Settings
-		Wait For 	${img} 	 timeout=5s
+		Wait For 	${img} 	 timeout=5
 	END
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
@@ -93,24 +83,19 @@ Select Option
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 Selected Option Should Be
-	[Arguments]		${optname}
+	[Arguments]		${optname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
 	[Tags] 	Manager 	Reporter
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${optnamel}= 	Convert To Lower Case 	${optname}
 	VAR 	${img} 	${comp}_${PLATFORM}_option_${optnamel}.png
 
-	${status}= 	Run Keyword And Return Status
-	...    Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
-	IF  not ${status} and '${comp}' == 'reporter' and '${PLATFORM}' == 'macos'
-		Handle Reporter Missing Settings
-		Wait For 	${img} 	 timeout=5s
-	END
+	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate 	${img}
 
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 Click Menu
-	[Arguments]		${menuname}
+	[Arguments]		${menuname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
 	[Tags] 	Manager 	Reporter
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${menunamel}= 	Convert To Lower Case 	${menuname}
@@ -118,12 +103,7 @@ Click Menu
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 
-	${status}= 	Run Keyword And Return Status
-	...    Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
-	IF  not ${status} and '${comp}' == 'reporter' and '${PLATFORM}' == 'macos'
-		Handle Reporter Missing Settings
-		Wait For 	${img} 	 timeout=5s
-	END
+	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
 	Sleep 	0.1
@@ -143,7 +123,7 @@ Click CheckBox
 	...    Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	IF  not ${status} and '${COMPONENT}' == 'Reporter' and '${PLATFORM}' == 'macos'
 		Handle Reporter Missing Settings
-		Wait For 	${img} 	 timeout=5s
+		Wait For 	${img} 	 timeout=5
 	END
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
@@ -161,9 +141,9 @@ Click RadioBtn
 
 	${status}= 	Run Keyword And Return Status
 	...    Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
-	IF  not ${status} and '${COMPONENT}' == 'Reporter' and '${PLATFORM}' == 'macos'
+	IF  not ${status} and '${COMPONENT}' == 'reporter' and '${PLATFORM}' == 'macos'
 		Handle Reporter Missing Settings
-		Wait For 	${img} 	 timeout=5s
+		Wait For 	${img} 	 timeout=5
 	END
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
@@ -187,7 +167,7 @@ Click ${item} With Vertical Offset
 	...    Wait For 	${img} 	 timeout=${timeout}
 	IF  not ${status} and '${comp}' == 'reporter' and '${PLATFORM}' == 'macos'
 		Handle Reporter Missing Settings
-		Wait For 	${img} 	 timeout=5s
+		Wait For 	${img} 	 timeout=5
 	END
 	@{coordinates}= 	Locate 	${img}
 	Log	${coordinates}
@@ -212,7 +192,7 @@ Click ${item} With Horizontal Offset
 	...    Wait For 	${img} 	 timeout=${timeout}
 	IF  not ${status} and '${comp}' == 'reporter' and '${PLATFORM}' == 'macos'
 		Handle Reporter Missing Settings
-		Wait For 	${img} 	 timeout=5s
+		Wait For 	${img} 	 timeout=5
 	END
 	@{coordinates}= 	Locate 	${img}
 	Log	${coordinates}
@@ -290,8 +270,10 @@ Handle Reporter Missing Settings
 	...    This keyword is simply doing these steps but only once.
 	[Tags] 	Reporter 	Issue #382
 	[Setup] 	Should Be Equal 	${COMPONENT} 	Reporter 	msg=This keyword is designed for Reporter only.
+	[Timeout] 	10s
 	Take A Screenshot
-	Click Tab 	Preview
-	Sleep 	1s
-	Click Tab 	Settings
+	Click Tab 	Preview 	timeout=2
+	Sleep 	0.5s
+	Click Tab 	Settings 	timeout=2
 	Take A Screenshot
+
