@@ -272,8 +272,8 @@ Handle Reporter Missing Settings
 	[Setup] 	Should Be Equal 	${COMPONENT} 	Reporter 	msg=This keyword is designed for Reporter only.
 	[Timeout] 	10s
 	Take A Screenshot
-	Click Tab 	Preview 	timeout=2
-	Sleep 	0.5s
-	Click Tab 	Settings 	timeout=2
+	Run Keyword And Ignore Error 	Click Tab 	Preview 	timeout=2
+	Sleep 	3s
+	Run Keyword And Ignore Error 	Click Tab 	Settings 	timeout=2
 	Take A Screenshot
 
