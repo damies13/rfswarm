@@ -3152,11 +3152,13 @@ Verify Schedule Date And Time Are Always In the Future
 	...    Set Manager INI Window Size		1000	600 					AND
 	...    Open Manager GUI
 
+	VAR 	${is_next_day}
+
 	Click Button	runschedule
 	Click RadioBtn	default
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
-
 	Click Label With Horizontal Offset	schedule_time	100
+
 	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.a
 	ELSE
@@ -3168,7 +3170,22 @@ Verify Schedule Date And Time Are Always In the Future
 		Press Combination	KEY.ctrl		KEY.c
 	END
 	${copied_start_time_value}= 	Evaluate	clipboard.paste()	modules=clipboard
-	${time_diff}=	Subtract Date From Date 	${copied_start_time_value} 	${current_time} 	date1_format=%H:%M:%S 	date2_format=%H:%M:%S
+	IF  '${current_time}' < '${copied_start_time_value}'
+		VAR 	${is_next_day} 	${False}
+	ELSE
+		VAR 	${is_next_day} 	${True}
+	END
+
+	${curr_date}= 	Get Current Date 	result_format=%Y-%m-%d
+	IF  ${is_next_day}
+		${copied_date}= 	Get Current Date 	result_format=%Y-%m-%d 	# expected copied date
+		${copied_date}= 	Add Time To Date 	${copied_date} 	1 day 		date_format=%Y-%m-%d 	result_format=%Y-%m-%d
+	ELSE
+		${copied_date}= 	Get Current Date 	result_format=%Y-%m-%d 	# expected copied date
+	END
+	${time_diff}= 	Subtract Date From Date
+	...    ${copied_date}_${copied_start_time_value} 	${curr_date}_${current_time}
+	...    date1_format=%Y-%m-%d_%H:%M:%S 	date2_format=%Y-%m-%d_%H:%M:%S
 	Log To Console	Time diff: ${time_diff} between current time and copied default time from "Schedule Time" filed.
 	Should Be True	${time_diff} >= 300 	msg=The Time diff should be at least grater than 5 minutes. Should be in the future.
 
@@ -3184,7 +3201,6 @@ Verify Schedule Date And Time Are Always In the Future
 	END
 	Sleep	2
 	Press key.tab 2 Times
-
 	Click Label With Horizontal Offset	schedule_date	100
 	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.a
@@ -3196,11 +3212,19 @@ Verify Schedule Date And Time Are Always In the Future
 	ELSE
 		Press Combination	KEY.ctrl		KEY.c
 	END
+
 	${current_date}=	Get Current Date	result_format=%Y-%m-%d
 	${copied_converted_start_date_value}=		Evaluate	clipboard.paste()	modules=clipboard
-	Log To Console	Converted date: ${copied_converted_start_date_value} should be the same as today's date.
-	Should Be Equal 	${current_date} 	${copied_converted_start_date_value}
-	...    msg=The "Schedule Date" did not convert to the current date [ Current Date != Converted ]
+	IF  ${is_next_day}
+		Log To Console	Converted date: ${copied_converted_start_date_value} should be in the next date compared to today's date.
+		${copied_date}= 	Subtract Time From Date 	${copied_converted_start_date_value} 	1 day 		date_format=%Y-%m-%d 	result_format=%Y-%m-%d
+		Should Be Equal 	${current_date} 	${copied_date}
+		...    msg=The "Schedule Date" did not convert to the next date [ Current Date != Converted - 1 day ]
+	ELSE
+		Log To Console	Converted date: ${copied_converted_start_date_value} should be the same as today's date.
+		Should Be Equal 	${current_date} 	${copied_converted_start_date_value}
+		...    msg=The "Schedule Date" did not convert to the current date [ Current Date != Converted ]
+	END
 
 	Click Dialog Button 	ok
 	${status}=	Run Keyword And Return Status
@@ -3223,13 +3247,22 @@ Verify That When Time Is Entered In the Past It Becomes the Next Day
 	Click Button	runschedule
 	Click RadioBtn	default
 	Click Label With Horizontal Offset	schedule_time	100
+
 	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.a
 	ELSE
 		Double Click
 	END
 	${current_time}=	Get Current Date	result_format=%H:%M:
-	${new_time}=	Subtract Time From Date 	${current_time} 	120 		date_format=%H:%M: 	result_format=%H:%M:
+	${new_time}=	Subtract Time From Date 	${current_time} 	60 		date_format=%H:%M: 	result_format=%H:%M:
+	IF  '${new_time}' > '${current_time}'
+		Log 	Time in the past is greater than current time, so we must wait until midnight has passed for the expected time in the past.
+		...    console=${True}
+		Sleep 	61s
+		${current_time}=	Get Current Date	result_format=%H:%M:
+		${new_time}=	Subtract Time From Date 	${current_time} 	60 		date_format=%H:%M: 	result_format=%H:%M:
+	END
+
 	Log To Console	Current time: ${current_time}
 	Log To Console	Applied time that is in the past: ${new_time}
 	Evaluate	clipboard.copy("${new_time}")	modules=clipboard
@@ -3252,6 +3285,7 @@ Verify That When Time Is Entered In the Past It Becomes the Next Day
 	ELSE
 		Press Combination	KEY.ctrl		KEY.c
 	END
+
 	${current_date}=	Get Current Date	result_format=%Y-%m-%d
 	${next_date}=		Add Time To Date 	${current_date} 	1 day 		date_format=%Y-%m-%d 	result_format=%Y-%m-%d
 	${copied_converted_start_date_value}=		Evaluate	clipboard.paste()	modules=clipboard
