@@ -33,6 +33,7 @@ Read Log
 
 Check Logs
 	[Arguments] 	${component_name}=${COMPONENT}
+	Log 		Test name: ${TEST_NAME}
 	${comp} 	Convert To Lower Case 	${component_name}
 	${tname} 	Convert To Save Path 	${TEST NAME}
 

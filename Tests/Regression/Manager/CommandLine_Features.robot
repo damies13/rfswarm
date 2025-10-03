@@ -3,6 +3,7 @@ Test Tags       Features 	CommandLine
 
 Resource 	resources/CommandLine_Manager.resource
 Resource 	../../Common/CSV.resource
+Resource 	../../Common/Database.resource
 
 Suite Setup 	Common.Basic Suite Initialization Manager
 
@@ -380,6 +381,140 @@ Keyword and Args Result Name Method - Tests Row
 
 	[Teardown]	Run Keywords
 	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
+
+Verify Agent Data in Result Database - Metric
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #121
+	VAR 	${scenario_name} 	filter_agent
+	${scenariofile}= 	Normalize Path 		${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
+	VAR 	${agent_name_1} 	TEST_1
+	VAR 	${agent_name_2} 	TEST_2
+	VAR 	@{mngr_options} 	-n  -g  1  -s  ${scenario_file}  -d  ${RESULTS_DIR}  -r  -a  2
+	VAR 	@{agnt_options_1} 	-a  ${agent_name_1}  -d  ${AGENT_DIR}${/}${agent_name_1}
+	VAR 	@{agnt_options_2} 	-a  ${agent_name_2}  -d  ${AGENT_DIR}${/}${agent_name_2}
+
+	Run Agent CLI 		@{agnt_options_1}
+	VAR 	${process_agent_1} 	${PROCESS_AGENT}
+	Run Agent CLI 		@{agnt_options_2}
+	VAR 	${process_agent_2} 	${PROCESS_AGENT}
+	Run Manager CLI 	@{mngr_options}
+
+	Wait For Manager Process
+	${result_db}= 	Find Result DB 		result_pattern=*filter_agent*
+
+	VAR 	${result_query}= 	SELECT * FROM MetricData WHERE PrimaryMetric = 'TEST_1' AND SecondaryMetric = 'AssignedRobots' AND MetricValue = 4
+	${result_query_result}= 	Query Result DB 	${result_db}  sql=${result_query}
+	${len}= 	Get Length 		${result_query_result}
+	Run Keyword And Continue On Failure
+	...    Should Be True
+	...    ${len} > 1
+	...    msg=The expected metric data have not been assigned to the TEST_1 Agent, or the metric is incorrect.
+
+	VAR 	${result_query}= 	SELECT * FROM MetricData WHERE PrimaryMetric = 'TEST_1' AND SecondaryMetric = 'FileCount' AND MetricValue = 3
+	${result_query_result}= 	Query Result DB 	${result_db}  sql=${result_query}
+	${len}= 	Get Length 		${result_query_result}
+	Run Keyword And Continue On Failure
+	...    Should Be True
+	...    ${len} > 1
+	...    msg=The expected metric data have not been assigned to the TEST_1 Agent, or the metric is incorrect.
+
+
+	VAR 	${result_query}= 	SELECT * FROM MetricData WHERE PrimaryMetric = 'TEST_2' AND SecondaryMetric = 'AssignedRobots' AND MetricValue = 8
+	${result_query_result}= 	Query Result DB 	${result_db}  sql=${result_query}
+	${len}= 	Get Length 		${result_query_result}
+	Run Keyword And Continue On Failure
+	...    Should Be True
+	...    ${len} > 1
+	...    msg=The expected metric data have not been assigned to the TEST_2 Agent, or the metric is incorrect.
+
+	VAR 	${result_query}= 	SELECT * FROM MetricData WHERE PrimaryMetric = 'TEST_2' AND SecondaryMetric = 'FileCount' AND MetricValue = 3
+	${result_query_result}= 	Query Result DB 	${result_db}  sql=${result_query}
+	${len}= 	Get Length 		${result_query_result}
+	Run Keyword And Continue On Failure
+	...    Should Be True
+	...    ${len} > 1
+	...    msg=The expected metric data have not been assigned to the TEST_2 Agent, or the metric is incorrect.
+
+	[Teardown]	Run Keywords
+	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_2} 	AND
+	...    Stop Agent CLI 	AND
+	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_1} 	AND
+	...    Stop Agent CLI 	AND
+	...    Stop Manager CLI
+
+Verify Agent Data in Result Database - Result
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #121
+	VAR 	${scenario_name} 	filter_agent
+	${scenariofile}= 	Normalize Path 		${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
+	VAR 	${agent_name_1} 	TEST_1
+	VAR 	${agent_name_2} 	TEST_2
+	VAR 	@{mngr_options} 	-n  -g  1  -s  ${scenario_file}  -d  ${RESULTS_DIR}  -r  -a  2
+	VAR 	@{agnt_options_1} 	-a  ${agent_name_1}  -d  ${AGENT_DIR}${/}${agent_name_1}
+	VAR 	@{agnt_options_2} 	-a  ${agent_name_2}  -d  ${AGENT_DIR}${/}${agent_name_2}
+
+	Run Agent CLI 		@{agnt_options_1}
+	VAR 	${process_agent_1} 	${PROCESS_AGENT}
+	Run Agent CLI 		@{agnt_options_2}
+	VAR 	${process_agent_2} 	${PROCESS_AGENT}
+	Run Manager CLI 	@{mngr_options}
+
+	Wait For Manager Process
+	${result_db}= 	Find Result DB 		result_pattern=*filter_agent*
+
+	VAR 	${result_query}= 	SELECT * FROM Results WHERE agent = 'TEST_1' AND result_name = 'Filter Keyword 11' AND result = 'PASS'
+	${result_query_result}= 	Query Result DB 	${result_db}  sql=${result_query}
+	${len}= 	Get Length 		${result_query_result}
+	Run Keyword And Continue On Failure
+	...    Should Be True
+	...    ${len} > 1
+	...    msg=The expected result data have not been assigned to the TEST_1 Agent, or the result is incorrect.
+
+	VAR 	${result_query}= 	SELECT * FROM Results WHERE agent = 'TEST_1' AND result_name = 'Filter Keyword 12' AND result = 'PASS'
+	${result_query_result}= 	Query Result DB 	${result_db}  sql=${result_query}
+	${len}= 	Get Length 		${result_query_result}
+	Run Keyword And Continue On Failure
+	...    Should Be True
+	...    ${len} > 1
+	...    msg=The expected result data have not been assigned to the TEST_1 Agent, or the result is incorrect.
+
+	VAR 	${result_query}= 	SELECT * FROM Results WHERE agent = 'TEST_1' AND result_name = 'Filter Fail Keyword 1' AND result = 'FAIL'
+	${result_query_result}= 	Query Result DB 	${result_db}  sql=${result_query}
+	${len}= 	Get Length 		${result_query_result}
+	Run Keyword And Continue On Failure
+	...    Should Be True
+	...    ${len} > 1
+	...    msg=The expected result data have not been assigned to the TEST_1 Agent, or the result is incorrect.
+
+
+	VAR 	${result_query}= 	SELECT * FROM Results WHERE agent = 'TEST_2' AND result_name = 'Filter Keyword 21' AND result = 'PASS'
+	${result_query_result}= 	Query Result DB 	${result_db}  sql=${result_query}
+	${len}= 	Get Length 		${result_query_result}
+	Run Keyword And Continue On Failure
+	...    Should Be True
+	...    ${len} > 1
+	...    msg=The expected result data have not been assigned to the TEST_2 Agent, or the result is incorrect.
+
+	VAR 	${result_query}= 	SELECT * FROM Results WHERE agent = 'TEST_2' AND result_name = 'Filter Keyword 22' AND result = 'PASS'
+	${result_query_result}= 	Query Result DB 	${result_db}  sql=${result_query}
+	${len}= 	Get Length 		${result_query_result}
+	Run Keyword And Continue On Failure
+	...    Should Be True
+	...    ${len} > 1
+	...    msg=The expected result data have not been assigned to the TEST_2 Agent, or the result is incorrect.
+
+	VAR 	${result_query}= 	SELECT * FROM Results WHERE agent = 'TEST_2' AND result_name = 'Filter Fail Keyword 2' AND result = 'FAIL'
+	${result_query_result}= 	Query Result DB 	${result_db}  sql=${result_query}
+	${len}= 	Get Length 		${result_query_result}
+	Run Keyword And Continue On Failure
+	...    Should Be True
+	...    ${len} > 1
+	...    msg=The expected result data have not been assigned to the TEST_2 Agent, or the result is incorrect.
+
+	[Teardown]	Run Keywords
+	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_2} 	AND
+	...    Stop Agent CLI 	AND
+	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_1} 	AND
+	...    Stop Agent CLI 	AND
 	...    Stop Manager CLI
 
 Install Application Icon or Desktop Shortcut

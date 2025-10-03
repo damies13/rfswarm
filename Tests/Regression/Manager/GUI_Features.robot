@@ -3435,40 +3435,46 @@ Verify That TPS Is TP And Not TPmS
 	...    Close Manager GUI 	AND
 	...    Stop Agent CLI
 
-# Verify Agent Filter Graphs
-# 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #217 	robot:continue-on-failure
-# 	VAR 	${scenario_name} 	filter_agent
-# 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
-# 	VAR 	${agent_name_1} 	TEST_1
-# 	VAR 	${agent_name_2} 	TEST_2
-# 	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${RESULTS_DIR} 	-r 	-a 	2
-# 	VAR 	@{agnt_options_1} 	-a 	${agent_name_1}
-# 	VAR 	@{agnt_options_2} 	-a 	${agent_name_2}
+Verify Agent Filter Graphs - Metric
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #121
+	VAR 	${scenario_name} 	filter_agent
+	${scenariofile}= 	Normalize Path 		${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
+	VAR 	${agent_name_1} 	TEST_1
+	VAR 	${agent_name_2} 	TEST_2
+	VAR 	@{mngr_options} 	-g  1  -s  ${scenario_file}  -d  ${RESULTS_DIR}  -r  -a  2
+	VAR 	@{agnt_options_1} 	-a  ${agent_name_1}
+	VAR 	@{agnt_options_2} 	-a  ${agent_name_2}
 
-# 	Run Agent CLI 			${agnt_options_1}
-# 	VAR 	${process_agent_1} 	${PROCESS_AGENT}
-# 	Run Agent CLI 			${agnt_options_2}
-# 	VAR 	${process_agent_2} 	${PROCESS_AGENT}
-# 	Open Manager GUI 	@{mngr_options}
+	Run Agent CLI 		@{agnt_options_1}
+	VAR 	${process_agent_1} 	${PROCESS_AGENT}
+	Run Agent CLI 		@{agnt_options_2}
+	VAR 	${process_agent_2} 	${PROCESS_AGENT}
+	Open Manager GUI 	@{mngr_options}
 
-# 	Wait For the Scenario Run To Finish
-# 	Click Button 	Refresh
-# 	Click Label With Horizontal Offset 	FilterAgent 	140
-# 	Take A Screenshot
-# 	Select Option 	TEST_1
-# 	Click Button 	Refresh
-# 	Sleep 	3
-# 	Take A Screenshot
-# 	VAR 	${robots_value} 	manager_${PLATFORM}_label_4.0.png
-# 	${status}=	Run Keyword And Return Status	Wait For 	${robots_value} 	 timeout=6
-# 	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph!
+	Wait For the Scenario Run To Finish
+	Click Button 	Refresh
+	Click Label With Horizontal Offset 		FilterAgent  140
+	Take A Screenshot
+	Select Option 	TEST_1
+	Press key.tab 1 Times
+	Click Button 	Refresh
+	Sleep 	3
+	Take A Screenshot
 
-# 	[Teardown]	Run Keywords
-# 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_1} 	AND
-# 	...    Stop Agent CLI 	AND
-# 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_2} 	AND
-# 	...    Stop Agent CLI 	AND
-# 	...    Close Manager GUI
+	VAR 	${robots_value} 	manager_${PLATFORM}_label_4.0.png
+	${status_4}=	Run Keyword And Return Status	Wait For 	${robots_value} 	 timeout=6
+
+	VAR 	${robots_value} 	manager_${PLATFORM}_label_8.png
+	${status_8}=	Run Keyword And Return Status	Wait For 	${robots_value} 	 timeout=6
+
+	IF  not ${status_4} and ${status_8} 	Fail 	msg=The filter has not been applied to the graph!
+
+	[Teardown]	Run Keywords
+	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_2} 	AND
+	...    Stop Agent CLI 	AND
+	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_1} 	AND
+	...    Stop Agent CLI 	AND
+	...    Close Manager GUI
 
 Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure

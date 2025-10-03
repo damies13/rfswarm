@@ -69,16 +69,21 @@ Click Section
 
 Select Field With Label
 	[Arguments]		${label} 	${offsetx}=50 	${offsety}=0
-	${labell}= 	Convert To Lower Case 	${label}
-	${img}=	Set Variable		reporter_${PLATFORM}_label_${labell}.png
-	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
-	${imgsize}= 	Get Image Size 	${IMAGE_DIR}${/}${img}
+	${labell}= 			Convert To Lower Case 	${label}
+	VAR 	${img}= 	reporter_${PLATFORM}_label_${labell}.png
+	${imgsize}= 		Get Image Size 	${IMAGE_DIR}${/}${img}
 	Log		${imgsize}
 	${offsetx}= 	Evaluate 	int(${imgsize}[0]/2)+${offsetx}
 	Log		${offsetx}
 	Log		${CURDIR}
  	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=300
+
+	${status}= 	Run Keyword And Return Status
+	...    Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
+	IF  not ${status} and '${COMPONENT}' == 'Reporter' and '${PLATFORM}' == 'macos'
+		Handle Reporter Missing Settings
+		Wait For 	${img} 	 timeout=5
+	END
 	@{coordinates}= 	Locate		${img}
 	${x}= 	Evaluate 	${coordinates}[0]+${offsetx}
 	${y}= 	Evaluate 	${coordinates}[1]+${offsety}
@@ -87,10 +92,11 @@ Select Field With Label
 	Click
 	Sleep 	0.1
 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
-	# Take A Screenshot
+
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 Wait For Status
-	[Arguments]		${status}	${timeout}=${1800}
+	[Arguments]		${status}	${timeout}=${180}
 	${statusl}= 	Convert To Lower Case 	${status}
 	${img}=	Set Variable		reporter_${PLATFORM}_status_${statusl}.png
 	Log		${CURDIR}
