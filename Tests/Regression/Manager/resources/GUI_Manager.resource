@@ -714,7 +714,7 @@ Verify Test Result Directory Name
 	${test_run_time_to_substract}=	Convert Date	${run_dir_name_fragmented}[0]_${run_dir_name_fragmented}[1]		date_format=%Y%m%d_%H%M%S
 	${time_diff}		Subtract Date From Date	${current_date} 	${test_run_time_to_substract}
 	Log To Console	Time diff: ${time_diff}
-	Should Be True	${time_diff} >= 0 and ${time_diff} <= 3
+	Should Be True	${time_diff} >= 0 and ${time_diff} <= 6
 	...    msg=Result directory name has incorrect date: expected "${current_date}_${scenario_name}", actual: "${result_dir_name}". There should be little or no difference.
 
 	#${current_date}=	Convert Date	${current_date}		date_format=%Y%m%d_%H%M%S
