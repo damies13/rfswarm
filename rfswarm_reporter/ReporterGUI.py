@@ -667,6 +667,13 @@ class ReporterGUI(tk.Frame):
 		# self.base.debugmsg(5, "clicked:", clicked)
 		clicked = self.sectionstree.identify_row(args[0].y)
 		self.base.debugmsg(5, "clicked:", clicked, type(clicked), id(clicked))
+		if clicked != "TOP" and not self.base.datadb and len(clicked) > 0:
+			self.sectionstree.selection_set(clicked)
+			self.sectionstree.focus(clicked)
+			self.mnu_results_Open()
+			if not self.base.datadb:
+				clicked = 'TOP'
+				self.LoadSections(clicked)
 		if len(clicked) < 1:
 			# unselect
 			clicked = "TOP"
@@ -4669,30 +4676,54 @@ class ReporterGUI(tk.Frame):
 	# Export Functions
 	def mnu_export_html(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		if not self.base.datadb:
+			self.mnu_results_Open()
+			if not self.base.datadb: 
+				return
 		cghtml = threading.Thread(target=self.cg_export_xhtml)
 		cghtml.start()
 
 	def mnu_export_pdf(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		if not self.base.datadb:
+			self.mnu_results_Open()
+			if not self.base.datadb: 
+				return
 		cgpdf = threading.Thread(target=self.cg_export_pdf)
 		cgpdf.start()
 
 	def mnu_export_writer(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		if not self.base.datadb:
+			self.mnu_results_Open()
+			if not self.base.datadb: 
+				return
 		cgwriter = threading.Thread(target=self.cg_export_writer)
 		cgwriter.start()
 
 	def mnu_export_word(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		if not self.base.datadb:
+			self.mnu_results_Open()
+			if not self.base.datadb: 
+				return
 		cgword = threading.Thread(target=self.cg_export_word)
 		cgword.start()
 
 	def mnu_export_calc(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		if not self.base.datadb:
+			self.mnu_results_Open()
+			if not self.base.datadb: 
+				return
 		cgcalc = threading.Thread(target=self.cg_export_calc)
 		cgcalc.start()
 
 	def mnu_export_excel(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		if not self.base.datadb:
+			self.mnu_results_Open()
+			if not self.base.datadb: 
+				return
 		cgxcel = threading.Thread(target=self.cg_export_excel)
 		cgxcel.start()
