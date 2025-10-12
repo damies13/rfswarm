@@ -720,9 +720,9 @@ class ReporterGUI(tk.Frame):
 		self.content.vsb.grid(column=1, row=0, sticky="ns")
 
 		# Horizontal Scroolbar
-		hsb = ttk.Scrollbar(self.contentframe, orient="horizontal", command=self.contentcanvas.xview)
-		self.contentcanvas.configure(xscrollcommand=hsb.set)
-		hsb.grid(column=0, row=1, sticky="ew")
+		self.content.hsb = ttk.Scrollbar(self.contentframe, orient="horizontal", command=self.contentcanvas.xview)
+		self.contentcanvas.configure(xscrollcommand=self.content.hsb.set)
+		self.content.hsb.grid(column=0, row=1, sticky="ew")
 
 		self.tabs.add(self.contentframe, image=self.imgdata[icontext], text=icontext, compound=tk.LEFT, padding=0, sticky="nsew")
 
@@ -732,12 +732,14 @@ class ReporterGUI(tk.Frame):
 
 		# second page
 		icontext = "Settings"
-		self.base.debugmsg(6, icontext)
+		self.base.debugmsg(8, icontext)
+
 		self.contentsettings = tk.Frame(self.tabs, padx=0, pady=0, bd=0)
 		# self.contentsettings.config(bg="linen")
 		self.contentsettings.grid(column=0, row=0, sticky="nsew", padx=0, pady=0)
 		self.contentsettings.columnconfigure(0, weight=1)
 		self.contentsettings.rowconfigure(0, weight=1)
+
 		self.tabs.add(self.contentsettings, image=self.imgdata[icontext], text=icontext, compound=tk.LEFT, padding=0, sticky="nsew")
 
 		self.tabs.grid(column=0, row=0, sticky="nsew")
@@ -3582,6 +3584,8 @@ class ReporterGUI(tk.Frame):
 		self.updateStatus("Preview Loading..... ({})".format(str(row)))
 
 		self.contentdata[id]["Preview"].grid(column=0, row=row, sticky="nsew")
+		self.contentcanvas.yview_moveto(0)
+
 		nextrow = row + 1
 		self.base.debugmsg(9, "nextrow:", nextrow)
 		children = self.base.report_get_order(id)
