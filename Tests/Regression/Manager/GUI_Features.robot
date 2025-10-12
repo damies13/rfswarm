@@ -3152,11 +3152,13 @@ Verify Schedule Date And Time Are Always In the Future
 	...    Set Manager INI Window Size		1000	600 					AND
 	...    Open Manager GUI
 
+	VAR 	${is_next_day}
+
 	Click Button	runschedule
 	Click RadioBtn	default
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
-
 	Click Label With Horizontal Offset	schedule_time	100
+
 	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.a
 	ELSE
@@ -3168,7 +3170,22 @@ Verify Schedule Date And Time Are Always In the Future
 		Press Combination	KEY.ctrl		KEY.c
 	END
 	${copied_start_time_value}= 	Evaluate	clipboard.paste()	modules=clipboard
-	${time_diff}=	Subtract Date From Date 	${copied_start_time_value} 	${current_time} 	date1_format=%H:%M:%S 	date2_format=%H:%M:%S
+	IF  '${current_time}' < '${copied_start_time_value}'
+		VAR 	${is_next_day} 	${False}
+	ELSE
+		VAR 	${is_next_day} 	${True}
+	END
+
+	${curr_date}= 	Get Current Date 	result_format=%Y-%m-%d
+	IF  ${is_next_day}
+		${copied_date}= 	Get Current Date 	result_format=%Y-%m-%d 	# expected copied date
+		${copied_date}= 	Add Time To Date 	${copied_date} 	1 day 		date_format=%Y-%m-%d 	result_format=%Y-%m-%d
+	ELSE
+		${copied_date}= 	Get Current Date 	result_format=%Y-%m-%d 	# expected copied date
+	END
+	${time_diff}= 	Subtract Date From Date
+	...    ${copied_date}_${copied_start_time_value} 	${curr_date}_${current_time}
+	...    date1_format=%Y-%m-%d_%H:%M:%S 	date2_format=%Y-%m-%d_%H:%M:%S
 	Log To Console	Time diff: ${time_diff} between current time and copied default time from "Schedule Time" filed.
 	Should Be True	${time_diff} >= 300 	msg=The Time diff should be at least grater than 5 minutes. Should be in the future.
 
@@ -3184,7 +3201,6 @@ Verify Schedule Date And Time Are Always In the Future
 	END
 	Sleep	2
 	Press key.tab 2 Times
-
 	Click Label With Horizontal Offset	schedule_date	100
 	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.a
@@ -3196,11 +3212,19 @@ Verify Schedule Date And Time Are Always In the Future
 	ELSE
 		Press Combination	KEY.ctrl		KEY.c
 	END
+
 	${current_date}=	Get Current Date	result_format=%Y-%m-%d
 	${copied_converted_start_date_value}=		Evaluate	clipboard.paste()	modules=clipboard
-	Log To Console	Converted date: ${copied_converted_start_date_value} should be the same as today's date.
-	Should Be Equal 	${current_date} 	${copied_converted_start_date_value}
-	...    msg=The "Schedule Date" did not convert to the current date [ Current Date != Converted ]
+	IF  ${is_next_day}
+		Log To Console	Converted date: ${copied_converted_start_date_value} should be in the next date compared to today's date.
+		${copied_date}= 	Subtract Time From Date 	${copied_converted_start_date_value} 	1 day 		date_format=%Y-%m-%d 	result_format=%Y-%m-%d
+		Should Be Equal 	${current_date} 	${copied_date}
+		...    msg=The "Schedule Date" did not convert to the next date [ Current Date != Converted - 1 day ]
+	ELSE
+		Log To Console	Converted date: ${copied_converted_start_date_value} should be the same as today's date.
+		Should Be Equal 	${current_date} 	${copied_converted_start_date_value}
+		...    msg=The "Schedule Date" did not convert to the current date [ Current Date != Converted ]
+	END
 
 	Click Dialog Button 	ok
 	${status}=	Run Keyword And Return Status
@@ -3223,13 +3247,22 @@ Verify That When Time Is Entered In the Past It Becomes the Next Day
 	Click Button	runschedule
 	Click RadioBtn	default
 	Click Label With Horizontal Offset	schedule_time	100
+
 	IF  "${PLATFORM}" == "macos"
 		Press Combination	KEY.command		KEY.a
 	ELSE
 		Double Click
 	END
 	${current_time}=	Get Current Date	result_format=%H:%M:
-	${new_time}=	Subtract Time From Date 	${current_time} 	120 		date_format=%H:%M: 	result_format=%H:%M:
+	${new_time}=	Subtract Time From Date 	${current_time} 	60 		date_format=%H:%M: 	result_format=%H:%M:
+	IF  '${new_time}' > '${current_time}'
+		Log 	Time in the past is greater than current time, so we must wait until midnight has passed for the expected time in the past.
+		...    console=${True}
+		Sleep 	61s
+		${current_time}=	Get Current Date	result_format=%H:%M:
+		${new_time}=	Subtract Time From Date 	${current_time} 	60 		date_format=%H:%M: 	result_format=%H:%M:
+	END
+
 	Log To Console	Current time: ${current_time}
 	Log To Console	Applied time that is in the past: ${new_time}
 	Evaluate	clipboard.copy("${new_time}")	modules=clipboard
@@ -3252,6 +3285,7 @@ Verify That When Time Is Entered In the Past It Becomes the Next Day
 	ELSE
 		Press Combination	KEY.ctrl		KEY.c
 	END
+
 	${current_date}=	Get Current Date	result_format=%Y-%m-%d
 	${next_date}=		Add Time To Date 	${current_date} 	1 day 		date_format=%Y-%m-%d 	result_format=%Y-%m-%d
 	${copied_converted_start_date_value}=		Evaluate	clipboard.paste()	modules=clipboard
@@ -3435,40 +3469,46 @@ Verify That TPS Is TP And Not TPmS
 	...    Close Manager GUI 	AND
 	...    Stop Agent CLI
 
-# Verify Agent Filter Graphs
-# 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #217 	robot:continue-on-failure
-# 	VAR 	${scenario_name} 	filter_agent
-# 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
-# 	VAR 	${agent_name_1} 	TEST_1
-# 	VAR 	${agent_name_2} 	TEST_2
-# 	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${RESULTS_DIR} 	-r 	-a 	2
-# 	VAR 	@{agnt_options_1} 	-a 	${agent_name_1}
-# 	VAR 	@{agnt_options_2} 	-a 	${agent_name_2}
+Verify Agent Filter Graphs - Metric
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #121
+	VAR 	${scenario_name} 	filter_agent
+	${scenariofile}= 	Normalize Path 		${CURDIR}${/}testdata${/}Issue-#105${/}${scenario_name}.rfs
+	VAR 	${agent_name_1} 	TEST_1
+	VAR 	${agent_name_2} 	TEST_2
+	VAR 	@{mngr_options} 	-g  1  -s  ${scenario_file}  -d  ${RESULTS_DIR}  -r  -a  2
+	VAR 	@{agnt_options_1} 	-a  ${agent_name_1}
+	VAR 	@{agnt_options_2} 	-a  ${agent_name_2}
 
-# 	Run Agent CLI 			${agnt_options_1}
-# 	VAR 	${process_agent_1} 	${PROCESS_AGENT}
-# 	Run Agent CLI 			${agnt_options_2}
-# 	VAR 	${process_agent_2} 	${PROCESS_AGENT}
-# 	Open Manager GUI 	@{mngr_options}
+	Run Agent CLI 		@{agnt_options_1}
+	VAR 	${process_agent_1} 	${PROCESS_AGENT}
+	Run Agent CLI 		@{agnt_options_2}
+	VAR 	${process_agent_2} 	${PROCESS_AGENT}
+	Open Manager GUI 	@{mngr_options}
 
-# 	Wait For the Scenario Run To Finish
-# 	Click Button 	Refresh
-# 	Click Label With Horizontal Offset 	FilterAgent 	140
-# 	Take A Screenshot
-# 	Select Option 	TEST_1
-# 	Click Button 	Refresh
-# 	Sleep 	3
-# 	Take A Screenshot
-# 	VAR 	${robots_value} 	manager_${PLATFORM}_label_4.0.png
-# 	${status}=	Run Keyword And Return Status	Wait For 	${robots_value} 	 timeout=6
-# 	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph!
+	Wait For the Scenario Run To Finish
+	Click Button 	Refresh
+	Click Label With Horizontal Offset 		FilterAgent  140
+	Take A Screenshot
+	Select Option 	TEST_1
+	Press key.tab 1 Times
+	Click Button 	Refresh
+	Sleep 	3
+	Take A Screenshot
 
-# 	[Teardown]	Run Keywords
-# 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_1} 	AND
-# 	...    Stop Agent CLI 	AND
-# 	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_2} 	AND
-# 	...    Stop Agent CLI 	AND
-# 	...    Close Manager GUI
+	VAR 	${robots_value} 	manager_${PLATFORM}_label_4.0.png
+	${status_4}=	Run Keyword And Return Status	Wait For 	${robots_value} 	 timeout=6
+
+	VAR 	${robots_value} 	manager_${PLATFORM}_label_8.png
+	${status_8}=	Run Keyword And Return Status	Wait For 	${robots_value} 	 timeout=6
+
+	IF  not ${status_4} and ${status_8} 	Fail 	msg=The filter has not been applied to the graph!
+
+	[Teardown]	Run Keywords
+	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_2} 	AND
+	...    Stop Agent CLI 	AND
+	...    Set Test Variable 	${PROCESS_AGENT} 	${process_agent_1} 	AND
+	...    Stop Agent CLI 	AND
+	...    Close Manager GUI
 
 Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #105 	robot:continue-on-failure

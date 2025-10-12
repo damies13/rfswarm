@@ -559,3 +559,42 @@ Filter Test Result Summary RESULT 3:
   rows_numbers: [1, -1, '_', '_', '_']
   first_row: ['Filter Fail Keyword 1', '5.0', '5.002', '5.003', '5.003', '0.001', '12']
   last_row: ['Filter Fail Keyword 2', '10.0', '10.002', 'None', '10.004', '0.002', '4']
+
+# # # # # # # #
+#  Issue #121 #
+# # # # # # # #
+Agent Filter Data Table METRIC 1:
+  length: 33
+  header: ['PrimaryMetric', 'SecondaryMetric', 'MetricValue']
+  rows_numbers: [1, -1, 9, 16, 24]
+  first_row: ['TEST_1', 'AssignedRobots', '0']
+  last_row: ['TEST_1', 'Status', 'Ready']
+  quater_row: ['TEST_1', 'NET', '0.661737823486328']
+  mid_row: ['TEST_1', 'RFSwarmAgent: Version', '1.5.1']
+  upper_mid_row: ['TEST_1', 'RobotFramework: Library: excellib', '2.0.1']
+
+Agent Filter Data Table METRIC 2:
+  length: 33
+  header: ['PrimaryMetric', 'SecondaryMetric', 'MetricValue']
+  rows_numbers: [1, -1, 9, 16, 24]
+  first_row: ['TEST_2', 'AssignedRobots', '0']
+  last_row: ['TEST_2', 'Status', 'Ready']
+  quater_row: ['TEST_2', 'NET', '0.666027069091797']
+  mid_row: ['TEST_2', 'RFSwarmAgent: Version', '1.5.1']
+  upper_mid_row: ['TEST_2', 'RobotFramework: Library: excellib', '2.0.1']
+
+Agent Filter Data Table RESULTS 1:
+  length: 4
+  header: ['Result Name', 'Minimum', 'Average', '90%ile', 'Maximum', 'Std. Dev.', 'Count']
+  rows_numbers: [1, -1, '_', 2, '_']
+  first_row: ['Filter Fail Keyword 1', '5.0', '5.001', '5.002', '5.002', '0.001', '12']
+  last_row: ['Filter Keyword 12', '6.0', '6.001', '6.001', '6.002', '0.001', '12']
+  mid_row: ['Filter Keyword 11', '3.0', '3.001', '3.002', '3.003', '0.001', '12']
+
+Agent Filter Data Table RESULTS 2:
+  length: 4
+  header: ['Result Name', 'Minimum', 'Average', '90%ile', 'Maximum', 'Std. Dev.', 'Count']
+  rows_numbers: [1, -1, '_', 2, '_']
+  first_row: ['Filter Fail Keyword 2', '10.0', '10.001', '10.001', '10.002', '0.001', '16']
+  last_row: ['Filter Keyword 22', '8.0', '8.001', '8.002', '8.002', '0.001', '16']
+  mid_row: ['Filter Keyword 21', '4.0', '4.001', '4.002', '4.002', '0.001', '16']

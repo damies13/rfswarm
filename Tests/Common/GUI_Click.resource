@@ -7,11 +7,13 @@ Resource 	GUI_Common.resource
 # # # # # # #
 Click Button
 	[Arguments]		${btnname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
+	[Tags] 	Manager 	Reporter
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
 	VAR 	${img} 	${comp}_${PLATFORM}_button_${btnnamel}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
+
 	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
@@ -21,6 +23,7 @@ Click Button
 
 Wait For Dialog Button
 	[Arguments]		${btnname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
+	[Tags] 	Manager 	Reporter
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
 	VAR 	${img} 	${PLATFORM}_dlgbtn_${btnnamel}.png
 	Log 	${CURDIR}
@@ -32,6 +35,7 @@ Wait For Dialog Button
 
 Click Dialog Button
 	[Arguments]		${btnname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
+	[Tags] 	Manager 	Reporter
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
 	VAR 	${img} 	${PLATFORM}_dlgbtn_${btnnamel}.png
 	Log 	${CURDIR}
@@ -44,13 +48,15 @@ Click Dialog Button
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 Click Tab
-	[Arguments]		${tabname}
+	[Arguments]		${tabname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
+	[Tags] 	Manager 	Reporter
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${tabnamel}= 	Convert To Lower Case 	${tabname}
 	VAR 	${img} 	${comp}_${PLATFORM}_tab_${tabnamel}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
+
+	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
 	Sleep 	0.1
@@ -59,10 +65,17 @@ Click Tab
 
 Select Option
 	[Arguments]		${optname}
+	[Tags] 	Manager 	Reporter
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${optnamel}= 	Convert To Lower Case 	${optname}
 	VAR 	${img} 	${comp}_${PLATFORM}_option_${optnamel}.png
-	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
+
+	${status}= 	Run Keyword And Return Status
+	...    Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
+	IF  not ${status} and '${comp}' == 'reporter' and '${PLATFORM}' == 'macos'
+		Handle Reporter Missing Settings
+		Wait For 	${img} 	 timeout=5
+	END
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
 	Sleep 	0.1
@@ -70,23 +83,27 @@ Select Option
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 Selected Option Should Be
-	[Arguments]		${optname}
+	[Arguments]		${optname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
+	[Tags] 	Manager 	Reporter
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${optnamel}= 	Convert To Lower Case 	${optname}
 	VAR 	${img} 	${comp}_${PLATFORM}_option_${optnamel}.png
-	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
+
+	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate 	${img}
 
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 Click Menu
-	[Arguments]		${menuname}
+	[Arguments]		${menuname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
+	[Tags] 	Manager 	Reporter
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
 	${menunamel}= 	Convert To Lower Case 	${menuname}
 	VAR 	${img} 	${comp}_${PLATFORM}_menu_${menunamel}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
+
+	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
 	Sleep 	0.1
@@ -95,12 +112,19 @@ Click Menu
 
 Click CheckBox
 	[Arguments]		${status} 		${btnname}
+	[Tags] 	Manager 	Reporter
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
 	${statusl}= 	Convert To Lower Case 	${status}
 	VAR 	${img} 	${PLATFORM}_checkbox_${statusl}_${btnnamel}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
+
+	${status}= 	Run Keyword And Return Status
+	...    Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
+	IF  not ${status} and '${COMPONENT}' == 'Reporter' and '${PLATFORM}' == 'macos'
+		Handle Reporter Missing Settings
+		Wait For 	${img} 	 timeout=5
+	END
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
 	Sleep 	0.1
@@ -109,11 +133,18 @@ Click CheckBox
 
 Click RadioBtn
 	[Arguments]		${btnname}
+	[Tags] 	Manager 	Reporter
 	${btnnamel}= 	Convert To Lower Case 	${btnname}
 	VAR 	${img} 	${PLATFORM}_radiobtn_${btnnamel}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
+
+	${status}= 	Run Keyword And Return Status
+	...    Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
+	IF  not ${status} and '${COMPONENT}' == 'reporter' and '${PLATFORM}' == 'macos'
+		Handle Reporter Missing Settings
+		Wait For 	${img} 	 timeout=5
+	END
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
 	Sleep 	0.1
@@ -122,6 +153,7 @@ Click RadioBtn
 
 Click ${item} With Vertical Offset
 	[Arguments]		${image_name}	${offset}=0 	${timeout}=${DEFAULT_IMAGE_TIMEOUT}
+	[Tags] 	Manager 	Reporter
 	[Documentation]	Click the item with the offset. An item can be: Label, Button, ...
 	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down].
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
@@ -130,7 +162,13 @@ Click ${item} With Vertical Offset
 	VAR 	${img} 	${comp}_${PLATFORM}_${item}_${image_name}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${timeout}
+
+	${status}= 	Run Keyword And Return Status
+	...    Wait For 	${img} 	 timeout=${timeout}
+	IF  not ${status} and '${comp}' == 'reporter' and '${PLATFORM}' == 'macos'
+		Handle Reporter Missing Settings
+		Wait For 	${img} 	 timeout=5
+	END
 	@{coordinates}= 	Locate 	${img}
 	Log	${coordinates}
 	Click To The Below Of	${coordinates}	${offset}
@@ -140,6 +178,7 @@ Click ${item} With Vertical Offset
 
 Click ${item} With Horizontal Offset
 	[Arguments]		${image_name}	${offset}=0 	${timeout}=${DEFAULT_IMAGE_TIMEOUT}
+	[Tags] 	Manager 	Reporter
 	[Documentation]	Click the item with the offset. An item can be: Label, Button, ...
 	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move right].
 	${comp}= 		Convert To Lower Case 	${COMPONENT}
@@ -148,7 +187,13 @@ Click ${item} With Horizontal Offset
 	VAR 	${img} 	${comp}_${PLATFORM}_${item}_${image_name}.png
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${timeout}
+
+	${status}= 	Run Keyword And Return Status
+	...    Wait For 	${img} 	 timeout=${timeout}
+	IF  not ${status} and '${comp}' == 'reporter' and '${PLATFORM}' == 'macos'
+		Handle Reporter Missing Settings
+		Wait For 	${img} 	 timeout=5
+	END
 	@{coordinates}= 	Locate 	${img}
 	Log	${coordinates}
 	Click To The Right Of	${coordinates}	${offset}
@@ -158,12 +203,14 @@ Click ${item} With Horizontal Offset
 
 File Open Dialogue Select File
 	[Arguments]		${filepath}
+	[Tags] 	Manager 	Reporter
 	Run Keyword		File Open Dialogue ${PLATFORM} Select File 			${filepath}
 
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
 
 File Open Dialogue ubuntu Select File
 	[Arguments]		${filepath}
+	[Tags] 	Manager 	Reporter
 	Sleep	2
 	Click Label With Horizontal Offset 	file_name 	50
 	Sleep	0.5
@@ -175,6 +222,7 @@ File Open Dialogue ubuntu Select File
 
 File Open Dialogue windows Select File
 	[Arguments]		${filepath}
+	[Tags] 	Manager 	Reporter
 	Sleep	3
 	${filepath}= 	Normalize Path 	${filepath}
 	${path} 	${file} = 	Split Path 	${filepath}
@@ -194,6 +242,7 @@ File Open Dialogue windows Select File
 
 File Open Dialogue macos Select File
 	[Arguments]		${filepath}
+	[Tags] 	Manager 	Reporter
 	Sleep	3
 	${filepath}=	Convert To Lower Case	${filepath}
 	Evaluate	clipboard.copy(r"${filepath}")	modules=clipboard		#copy path to clipboard
@@ -213,3 +262,18 @@ File Open Dialogue macos Select File
 	Click Dialog Button 	open
 	# Type 		Key.BACKSPACE 	Key.DELETE
 	# Click Dialog Button 	open
+
+Handle Reporter Missing Settings
+	[Documentation]
+	...    Reporter section settings tab in MacOS environment is sometimes not being fully rendered.
+	...    To cover that, it's possible to regenerate the settings by clicking preview tab and then settings once again.
+	...    This keyword is simply doing these steps but only once.
+	[Tags] 	Reporter 	Issue #382
+	[Setup] 	Should Be Equal 	${COMPONENT} 	Reporter 	msg=This keyword is designed for Reporter only.
+	[Timeout] 	10s
+	Take A Screenshot
+	Run Keyword And Ignore Error 	Click Tab 	Preview 	timeout=2
+	Sleep 	3s
+	Run Keyword And Ignore Error 	Click Tab 	Settings 	timeout=2
+	Take A Screenshot
+
