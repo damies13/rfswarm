@@ -189,11 +189,9 @@ Verify if reporter handle missing test result file
 
 	Open Reporter GUI	-d 	${resultfolder}
 	Sleep	10
-	Click Section	test_result_summary
-	Click	#double click needed. Maybe delete after eel module implemetation
 
 	${status}=	Run Keyword And Return Status
-	...    Wait For	reporter_${PLATFORM}_option_datatable.png 	timeout=${30}
+	...    Wait For	reporter_${PLATFORM}_label_title.png 	timeout=${30}
 	Run Keyword If	not ${status}	Fail	msg=Reporter is not responding!
 
 	[Teardown]	Run Keywords
