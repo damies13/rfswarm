@@ -1353,6 +1353,36 @@ class RFSwarmBase:
 
 					self.remove_hash(chkhash)
 
+		# self.refresh_relative_paths()
+
+	def refresh_relative_paths(self):
+
+		filelist = []
+		localdir = os.path.dirname(localpath)
+		basedir = localdir
+		self.debugmsg(5, "basedir:", basedir)
+		# create a list of file paths
+		checkhashes = list(self.scriptfiles.keys())
+		self.debugmsg(6, "checkhashes:", checkhashes)
+		for chkhash in checkhashes:
+			filelist.append(self.scriptfiles[chkhash]["localpath"])
+
+			if 'basedir' in self.scriptfiles[hash]:
+				basedir = self.scriptfiles[hash]['basedir']
+		self.debugmsg(5, "basedir:", basedir)
+
+		# find common base path for all files
+		for filei in filelist:
+			basedir = os.path.relpath(filei, start=basedir)
+		self.debugmsg(5, "basedir:", basedir)
+
+		# update all files's relative path to new base path
+		for chkhash in checkhashes:
+			# file_data = self.scriptfiles[chkhash]
+			relfile = self.get_relative_path(basedir, self.scriptfiles[chkhash]["localpath"])
+			self.scriptfiles[chkhash]["basedir"] = basedir
+			self.scriptfiles[chkhash]["relpath"] = relfile
+
 	def get_relative_path(self, path1, path2):
 		self.debugmsg(5, "path1:", path1)
 		self.debugmsg(5, "path2:", path2)
