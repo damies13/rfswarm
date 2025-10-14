@@ -670,3 +670,60 @@ Run Mnager with yml Configuration and yml Scenario
 	[Teardown]	Run Keywords
 	...    Stop Agent CLI	AND
 	...    Stop Manager CLI
+
+Check all files remain in agent's script dir
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #351
+	VAR 	${testdata} 		${CURDIR}${/}testdata${/}Issue #351      scope=TEST
+	VAR 	${AGENT_DIR} 		${AGENT_DIR}${/}${TEST NAME}      scope=TEST
+	Create Testdata Agent INI 		${testdata}${/}agent.ini 	${testdata}
+	Create Testdata Manager INI 	${testdata}${/}manager.ini 	${testdata}
+
+	@{expected_robot_files}= 	List Files In Directory And Sub Directories 	${testdata} 	*.robot
+	@{expected_jpg_files}= 	List Files In Directory And Sub Directories 	${testdata} 	*.jpg
+
+	Run Agent CLI 	-i  ${testdata}${/}agent.ini
+	Sleep    1s
+	Check Agent Is Running
+	Log to console 	${CURDIR}
+	${scenariofile}= 	Normalize Path 	${testdata}${/}scenario.rfs
+	Log to console 	${scenariofile}
+	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${RESULTS_DIR}
+	# @{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${RESULTS_DIR} -s ${scenariofile}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
+	Stop Agent CLI
+
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+
+	${stdout_manager}= 		Read Log 	${stdout_manager_path}
+	${stderr_manager}= 		Read Log 	${stderr_manager_path}
+	${stdout_agent}= 		Read Log 	${stdout_agent_path}
+	${stderr_agent}= 		Read Log 	${stderr_agent_path}
+
+	Should Not Contain 	${stdout_manager} 		RuntimeError
+	Should Not Contain 	${stderr_manager} 		RuntimeError
+	Should Not Contain 	${stdout_manager} 		Exception
+	Should Not Contain 	${stderr_manager} 		Exception
+
+	Should Not Contain 	${stdout_manager} 		OSError: [Errno 24] Too many open files
+	Should Not Contain 	${stderr_manager} 		OSError: [Errno 24] Too many open files
+	Should Not Contain 	${stdout_manager}		OSError
+	Should Not Contain 	${stderr_manager} 		OSError
+	Should Not Contain 	${stdout_manager} 		Errno 24
+	Should Not Contain 	${stderr_manager} 		Errno 24
+	Should Not Contain 	${stdout_manager} 		Too many open files
+	Should Not Contain 	${stderr_manager} 		Too many open files
+
+
+	@{result_robot_files}= 	List Files In Directory And Sub Directories 	${AGENT_DIR}${/}scripts${/}resources 	*.robot
+	@{result_jpg_files}= 	List Files In Directory And Sub Directories 	${AGENT_DIR}${/}scripts${/}resources 	*.jpg
+
+
+	Diff Lists    ${expected_robot_files}    ${result_robot_files}    Agent didn't get all files from manager
+	Diff Lists    ${expected_jpg_files}    ${result_jpg_files}    Agent didn't get all files from manager
+
+	[Teardown]	Run Keywords
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
