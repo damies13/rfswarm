@@ -717,8 +717,8 @@ Check all files remain in agent's script dir
 	Should Not Contain 	${stderr_manager} 		Too many open files
 
 
-	@{result_robot_files}= 	List Files In Directory And Sub Directories 	${AGENT_DIR}${/}scripts${/}resources 	*.robot
-	@{result_jpg_files}= 	List Files In Directory And Sub Directories 	${AGENT_DIR}${/}scripts${/}resources 	*.jpg
+	@{result_robot_files}= 	List Files In Directory And Sub Directories 	${AGENT_DIR}${/}scripts 	*.robot
+	@{result_jpg_files}= 	List Files In Directory And Sub Directories 	${AGENT_DIR}${/}scripts 	*.jpg
 
 
 	Diff Lists    ${expected_robot_files}    ${result_robot_files}    Agent didn't get all files from manager
