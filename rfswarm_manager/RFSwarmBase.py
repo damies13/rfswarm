@@ -1088,7 +1088,7 @@ class RFSwarmBase:
 		for t in threads:
 			t.join()
 
-		# self.refresh_relative_paths()
+		self.refresh_relative_paths()
 
 	def is_resfile_prefix(self, prefixname):
 		self.debugmsg(5, "prefixname:", prefixname)
@@ -1365,7 +1365,7 @@ class RFSwarmBase:
 		for t in threads:
 			t.join()
 
-		# self.refresh_relative_paths()
+		self.refresh_relative_paths()
 
 	def refresh_relative_paths(self):
 
