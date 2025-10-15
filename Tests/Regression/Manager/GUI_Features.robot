@@ -1784,10 +1784,10 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	...    Open Manager GUI													AND
 	...    Set Global Filename And Default Save Path	main
 
-	${M_absolute_paths} 	${M_file_names} 	Find Absolute Paths And Names For Files In Directory
-	...    ${CURDIR}${/}testdata${/}Issue-52${/}example
-	Log 	${M_absolute_paths}
-	Log 	${M_file_names}
+	# ${M_absolute_paths} 	${M_file_names} 	Find Absolute Paths And Names For Files In Directory
+	# ...    ${CURDIR}${/}testdata${/}Issue-52${/}example
+	# Log 	${M_absolute_paths}
+	# Log 	${M_file_names}
 
 	Copy Directory	${CURDIR}${/}testdata${/}Issue-52${/}example	${global_path}
 	Copy File	${CURDIR}${/}testdata${/}Issue-52${/}test_scenario.rfs	${global_path}
@@ -1797,15 +1797,24 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	Sleep	30
 
 	@{excluded_files}=	Create List  RFSListener3.py  RFSListener2.py  RFSTestRepeater.py
-	${A_absolute_paths}	${A_file_names} 	Find Absolute Paths And Names For Files In Directory
-	...    ${TEMPDIR}${/}agent_temp_issue52	@{excluded_files}
-	Log 	${A_absolute_paths}
-	Log 	${A_file_names}
+	# ${A_absolute_paths}	${A_file_names} 	Find Absolute Paths And Names For Files In Directory
+	# ...    ${TEMPDIR}${/}agent_temp_issue52	@{excluded_files}
+	# Log 	${A_absolute_paths}
+	# Log 	${A_file_names}
 
 	# Compare Manager and Agent Files	${M_file_names}	${A_file_names}
 	# Compare Manager and Agent Files Content	${M_absolute_paths}	${A_absolute_paths}
-	${M_rel_paths}= 		Get Relative Paths 		${CURDIR}${/}testdata${/}Issue-52${/}example${/}main 		${M_absolute_paths}
-	${A_rel_paths}= 		Get Relative Paths 		${TEMPDIR}${/}agent_temp_issue52${/}scripts		${A_absolute_paths}
+	# ${M_rel_paths}= 		Get Relative Paths 		${CURDIR}${/}testdata${/}Issue-52${/}example${/}main 		${M_absolute_paths}
+	# ${A_rel_paths}= 		Get Relative Paths 		${TEMPDIR}${/}agent_temp_issue52${/}scripts		${A_absolute_paths}
+
+	@{M_rel_paths}= 	List Files In Directory And Sub Directories 	${CURDIR}${/}testdata${/}Issue-52 	!(*.rfs)
+	Log 	${M_rel_paths}
+	@{A_rel_paths}= 	List Files In Directory And Sub Directories 	${TEMPDIR}${/}agent_temp_issue52${/}scripts 	*.*
+	Log 	${A_rel_paths}
+
+	Remove Values From List 	${A_rel_paths} 		@{excluded_files}
+	Log 	${A_rel_paths}
+
 	Diff Lists 		${M_rel_paths} 		${A_rel_paths} 	Files are not transferred correctly! List A - Manager, List B - Agent, Check report for more information.
 
 	[Teardown]	Run Keywords
