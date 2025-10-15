@@ -1807,11 +1807,14 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	# ${M_rel_paths}= 		Get Relative Paths 		${CURDIR}${/}testdata${/}Issue-52${/}example${/}main 		${M_absolute_paths}
 	# ${A_rel_paths}= 		Get Relative Paths 		${TEMPDIR}${/}agent_temp_issue52${/}scripts		${A_absolute_paths}
 
-	@{M_rel_paths}= 	List Files In Directory And Sub Directories 	${CURDIR}${/}testdata${/}Issue-52 	!(*.rfs)
+	# @{M_rel_paths}= 	List Files In Directory And Sub Directories 	${CURDIR}${/}testdata${/}Issue-52 	!(*.rfs)
+	@{M_rel_paths}= 	List Files In Directory And Sub Directories 	${CURDIR}${/}testdata${/}Issue-52 	*.*
 	Log 	${M_rel_paths}
+	Remove Values From List 	${A_rel_paths} 		test_scenario.rfs
+	Log 	${M_rel_paths}
+
 	@{A_rel_paths}= 	List Files In Directory And Sub Directories 	${TEMPDIR}${/}agent_temp_issue52${/}scripts 	*.*
 	Log 	${A_rel_paths}
-
 	Remove Values From List 	${A_rel_paths} 		@{excluded_files}
 	Log 	${A_rel_paths}
 
