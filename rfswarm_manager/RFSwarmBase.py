@@ -1374,30 +1374,31 @@ class RFSwarmBase:
 		checkhashes = list(self.scriptfiles.keys())
 		self.debugmsg(6, "checkhashes:", checkhashes)
 
-		localpath = self.scriptfiles[checkhashes[0]]['localpath']
-		localdir = os.path.dirname(localpath)
-		basedir = localdir
-		self.debugmsg(5, "basedir:", basedir)
+		if len(checkhashes) > 0:
+			localpath = self.scriptfiles[checkhashes[0]]['localpath']
+			localdir = os.path.dirname(localpath)
+			basedir = localdir
+			self.debugmsg(5, "basedir:", basedir)
 
-		for chkhash in checkhashes:
-			filelist.append(self.scriptfiles[chkhash]["localpath"])
+			for chkhash in checkhashes:
+				filelist.append(self.scriptfiles[chkhash]["localpath"])
 
-			if 'basedir' in self.scriptfiles[chkhash]:
-				basedir = self.scriptfiles[chkhash]['basedir']
-		self.debugmsg(5, "basedir:", basedir)
+				if 'basedir' in self.scriptfiles[chkhash]:
+					basedir = self.scriptfiles[chkhash]['basedir']
+			self.debugmsg(5, "basedir:", basedir)
 
-		# find common base path for all files
-		# for filei in filelist:
-		# 	basedir = os.path.relpath(filei, start=basedir)
-		basedir = os.path.commonpath(filelist)
-		self.debugmsg(5, "basedir:", basedir)
+			# find common base path for all files
+			# for filei in filelist:
+			# 	basedir = os.path.relpath(filei, start=basedir)
+			basedir = os.path.commonpath(filelist)
+			self.debugmsg(5, "basedir:", basedir)
 
-		# update all files's relative path to new base path
-		for chkhash in checkhashes:
-			# file_data = self.scriptfiles[chkhash]
-			relfile = self.get_relative_path(basedir, self.scriptfiles[chkhash]["localpath"])
-			self.scriptfiles[chkhash]["basedir"] = basedir
-			self.scriptfiles[chkhash]["relpath"] = relfile
+			# update all files's relative path to new base path
+			for chkhash in checkhashes:
+				# file_data = self.scriptfiles[chkhash]
+				relfile = self.get_relative_path(basedir, self.scriptfiles[chkhash]["localpath"])
+				self.scriptfiles[chkhash]["basedir"] = basedir
+				self.scriptfiles[chkhash]["relpath"] = relfile
 
 	def get_relative_path(self, path1, path2):
 		self.debugmsg(5, "path1:", path1)
