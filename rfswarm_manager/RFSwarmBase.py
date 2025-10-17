@@ -1333,7 +1333,6 @@ class RFSwarmBase:
 		return False
 
 	def check_files_changed(self):
-		# self.scriptfiles[hash]
 		checkhashes = list(self.scriptfiles.keys())
 		self.debugmsg(6, "checkhashes:", checkhashes)
 		threads = []
@@ -1345,7 +1344,6 @@ class RFSwarmBase:
 				self.debugmsg(3, "File's hash has changed: chkhash:", chkhash, "	script_hash:", script_hash, "	localpath:", file_data['localpath'])
 
 				# check if file is in script list and update it's hash
-				# self.scriptlist[r]["ScriptHash"] = script_hash
 				for iid in range(len(self.scriptlist)):
 					self.debugmsg(3, "self.scriptlist[", iid, "]:", self.scriptlist[iid])
 					if "ScriptHash" in self.scriptlist[iid] and chkhash == self.scriptlist[iid]["ScriptHash"]:
@@ -1388,14 +1386,11 @@ class RFSwarmBase:
 			self.debugmsg(5, "basedir:", basedir)
 
 			# find common base path for all files
-			# for filei in filelist:
-			# 	basedir = os.path.relpath(filei, start=basedir)
 			basedir = os.path.commonpath(filelist)
 			self.debugmsg(5, "basedir:", basedir)
 
 			# update all files's relative path to new base path
 			for chkhash in checkhashes:
-				# file_data = self.scriptfiles[chkhash]
 				relfile = self.get_relative_path(basedir, self.scriptfiles[chkhash]["localpath"])
 				self.scriptfiles[chkhash]["basedir"] = basedir
 				self.scriptfiles[chkhash]["relpath"] = relfile
@@ -1403,7 +1398,6 @@ class RFSwarmBase:
 	def get_relative_path(self, path1, path2):
 		self.debugmsg(5, "path1:", path1)
 		self.debugmsg(5, "path2:", path2)
-		# commonpath = os.path.commonpath([path1, path2])
 
 		self.debugmsg(8, "os.path.isdir(path1):", os.path.isdir(path1))
 		self.debugmsg(8, "os.path.isfile(path1):", os.path.isfile(path1))
