@@ -74,7 +74,7 @@ jobs:
           Tests/Regression/Agent
 
       - name: Robot Framework - Retry Failed
-        if: ${{ failure() }}
+        if: steps.robottest.outcome != 'success'
         id: robotretry
         continue-on-error: true
         run: >

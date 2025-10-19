@@ -125,7 +125,7 @@ jobs:
           MATRIX_PYTHON: ${{ matrix.python }}
 
       - name: Robot Framework - Retry Failed
-        if: ${{ failure() }}
+        if: steps.robottest.outcome != 'success'
         id: robotretry
         continue-on-error: true
         run: >
