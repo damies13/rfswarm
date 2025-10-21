@@ -12,57 +12,9 @@ ${process}		${None}
 
 *** Test Cases ***
 Open GUI
-	[Tags]	macos-latest
-	# Press Escape and move mouse because on linux the screen save had kicked in
-	Press Combination 	Key.esc
-	Wiggle Mouse
+	[Tags]	macos-latest		windows-latest		ubuntu-latest
 
-	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	${cmd_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}Open_GUI_stdout.txt 	stderr=${OUTPUT DIR}${/}Open_GUI_stderr.txt
-	Set Test Variable 	$process 	${process}
-	# Sleep 	10 			# not needed now we wait for the agents tab to be visible
-	Set Screenshot Folder 	${OUTPUT DIR}
-
-	Sleep 	10s
-	Handle MacOS Pop-ups
-	Handle Donation Reminder
-	Handle MacOS Pop-ups
-
-	${img}=	Set Variable		manager_${PLATFORM}_tab_agents.png
-	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
-	Take A Screenshot
-
-Open GUI
-	[Tags]	windows-latest
-	# Press Escape and move mouse because on linux the screen save had kicked in
-	Press Combination 	Key.esc
-	Wiggle Mouse
-
-	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	${cmd_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}Open_GUI_stdout.txt 	stderr=${OUTPUT DIR}${/}Open_GUI_stderr.txt
-	Set Test Variable 	$process 	${process}
-	# Sleep 	10 			# not needed now we wait for the agents tab to be visible
-	Set Screenshot Folder 	${OUTPUT DIR}
-
-	Handle Donation Reminder
-
-	${img}=	Set Variable		manager_${PLATFORM}_tab_agents.png
-	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
-	Take A Screenshot
-
-Open GUI
-	[Tags]	ubuntu-latest
-	# Press Escape and move mouse because on linux the screen save had kicked in
-	Press Combination 	Key.esc
-	Wiggle Mouse
-
-	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	${cmd_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}Open_GUI_stdout.txt 	stderr=${OUTPUT DIR}${/}Open_GUI_stderr.txt
-	Set Test Variable 	$process 	${process}
-	# Sleep 	10 			# not needed now we wait for the agents tab to be visible
-	Set Screenshot Folder 	${OUTPUT DIR}
-
-	Handle Donation Reminder
+	Open Manager GUI
 
 	${img}=	Set Variable		manager_${PLATFORM}_tab_agents.png
 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
@@ -93,38 +45,11 @@ Select Plan Tab
 	Click Tab 	 Plan
 	Sleep 	5
 
-Close GUI
-	[Tags]	windows-latest		ubuntu-latest
-	Press Combination 	Key.esc
-	Press Combination 	x 	Key.ctrl
-	${result}= 	Wait For Process 	${process} 	timeout=60
-	${running}= 	Is Process Running 	${process}
-	IF 	not ${running}
-		Should Be Equal As Integers 	${result.rc} 	0
-	ELSE
-		Take A Screenshot
-		${result} = 	Terminate Process		${process}
-		Fail
-	END
-	Kill If Still Running 	${CMD_MANAGER}
 
 Close GUI
-	[Tags]	macos-latest
-	# Press Combination 	Key.esc
-	# Press Combination 	q 	Key.command
-	# Click Image		manager_${PLATFORM}_menu_python3.png
-	Click Image		manager_${PLATFORM}_button_closewindow.png
-	Take A Screenshot
-	${result}= 	Wait For Process 	${process} 	timeout=60
-	${running}= 	Is Process Running 	${process}
-	IF 	not ${running}
-		Should Be Equal As Integers 	${result.rc} 	0
-	ELSE
-		Take A Screenshot
-		${result} = 	Terminate Process		${process}
-		Fail
-	END
-	Kill If Still Running 	${CMD_MANAGER}
+	[Tags]		windows-latest		ubuntu-latest	 	macos-latest
+	Close Manager GUI
+
 
 # Intentional Fail
 # 	[Tags]	ubuntu-latest		windows-latest		macos-latest

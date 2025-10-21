@@ -771,6 +771,7 @@ Verify Plan Graph - No Total
 	${templatefile}= 	Set Variable    ${basefolder}${/}original_base.template
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
+	Remove File 	${resultfile}
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
@@ -840,6 +841,7 @@ Verify Plan Graph - With Total
 	${templatefile}= 	Set Variable    ${basefolder}${/}original_base.template
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
+	Remove File 	${resultfile}
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
@@ -913,7 +915,8 @@ Verify Plan Table
 	${templatefile}= 	Set Variable    ${basefolder}${/}original_base.template
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
-	Should Not Exist	${resultfile}
+	Remove File 	${resultfile}
+	Should Not Exist 	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
 	Open Reporter GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
@@ -977,6 +980,7 @@ Change Line Colour
 	${templatefile}= 	Set Variable    ${basefolder}${/}Issue-#307.template
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
+	Remove File 	${resultfile}
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
@@ -1196,7 +1200,7 @@ Verify Agent Filter Metric For Data Table
 		Remove File 	${html_file}
 	END
 
-	[Teardown] 	Run Keywords 	
+	[Teardown] 	Run Keywords
 	...    Set Confidence 	${CONFIDENCE} 	AND
 	...    Close Reporter GUI 	AND
 	...    Remove Directory 	${CURDIR}${/}testdata${/}Issue-#121${/}${result_name} 	recursive=${true}
@@ -1280,7 +1284,7 @@ Verify Agent Filter Results For Data Table
 		Remove File 	${html_file}
 	END
 
-	[Teardown] 	Run Keywords 	
+	[Teardown] 	Run Keywords
 	...    Set Confidence 	${CONFIDENCE} 	AND
 	...    Close Reporter GUI 	AND
 	...    Remove Directory 	${CURDIR}${/}testdata${/}Issue-#121${/}${result_name} 	recursive=${true}
@@ -1369,7 +1373,7 @@ Verify Agent Filter Metric For Graph
 		Remove File 	${html_file}
 	END
 
-	[Teardown] 	Run Keywords 	
+	[Teardown] 	Run Keywords
 	...    Set Confidence 	${CONFIDENCE} 	AND
 	...    Close Reporter GUI 	AND
 	...    Remove Directory 	${CURDIR}${/}testdata${/}Issue-#121${/}${result_name} 	recursive=${true}
@@ -1458,7 +1462,7 @@ Verify Agent Filter Results For Graph
 		Remove File 	${html_file}
 	END
 
-	[Teardown] 	Run Keywords 	
+	[Teardown] 	Run Keywords
 	...    Set Confidence 	${CONFIDENCE} 	AND
 	...    Close Reporter GUI 	AND
 	...    Remove Directory 	${CURDIR}${/}testdata${/}Issue-#121${/}${result_name} 	recursive=${true}
@@ -1549,7 +1553,7 @@ Verify Agent Filter Results For Graph
 # 		Remove File 	${html_file}
 # 	END
 
-# 	[Teardown] 	Run Keywords 	
+# 	[Teardown] 	Run Keywords
 #	...    Set Confidence 	${CONFIDENCE} 	AND
 # 	...    Close Reporter GUI 	AND
 # 	...    Remove Directory 	${CURDIR}${/}testdata${/}Issue-#121${/}${result_name} 	recursive=${true}
@@ -2066,6 +2070,7 @@ Check Reporter with JSON Template File
 	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
+	Remove File 	${resultfile}
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
@@ -2105,6 +2110,7 @@ Check Reporter with Yaml Template File
 	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
+	Remove File 	${resultfile}
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
@@ -2144,6 +2150,7 @@ Check Reporter with yml Template File
 	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
+	Remove File 	${resultfile}
 	Should Not Exist	${resultfile}
 
 	# pass a default ini file with extended height to ensure that default values are used
