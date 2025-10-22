@@ -97,7 +97,7 @@ Whole report time range
 	${pvinfo}= 	Get Python Version Info
 
 	# check the graph as expected
-	# Take A Screenshot
+	Take A Screenshot
 	Set Confidence		0.7
 	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
 		Locate 	reporter_${PLATFORM}_graph_robots1_py3.9.png
@@ -156,6 +156,7 @@ Whole report time range
 	Wait For Status 	PreviewLoaded
 
 	# check the graph as expected
+	Take A Screenshot
 	Set Confidence		0.7
 	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
 		Locate 	reporter_${PLATFORM}_graph_robots2_py3.9.png
@@ -996,6 +997,8 @@ Change Line Colour
 	Wait For Status 	PreviewLoaded
 
 	Click Tab 	 Preview
+
+	Take A Screenshot
 
 	${pvinfo}= 	Get Python Version Info
 	# Locate 	reporter_${PLATFORM}_graph_plancolourb4.png
