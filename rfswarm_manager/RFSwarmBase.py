@@ -1056,6 +1056,7 @@ class RFSwarmBase:
 					if self.is_section_to_check(match.group(1)):
 						checking = True
 
+		threads = []
 		if len(filequeue) > 0:
 			for file in filequeue:
 				self.debugmsg(7, "file:", file)
@@ -1077,11 +1078,17 @@ class RFSwarmBase:
 					if fileext.lower() in ['.robot', '.resource']:
 						t = threading.Thread(target=self.find_dependancies, args=(newhash, ))
 						t.start()
+						threads.append(t)
 
 						self.debugmsg(9, "threading active count:", threading.active_count())
 						while threading.active_count() > self.threadcount:
 							self.debugmsg(9, "threading active count:", threading.active_count())
 							time.sleep(0.1)
+
+		for t in threads:
+			t.join()
+
+		self.refresh_relative_paths()
 
 	def is_resfile_prefix(self, prefixname):
 		self.debugmsg(5, "prefixname:", prefixname)
@@ -1326,9 +1333,9 @@ class RFSwarmBase:
 		return False
 
 	def check_files_changed(self):
-		# self.scriptfiles[hash]
 		checkhashes = list(self.scriptfiles.keys())
 		self.debugmsg(6, "checkhashes:", checkhashes)
+		threads = []
 		for chkhash in checkhashes:
 			file_data = self.scriptfiles[chkhash]
 			script_hash = self.hash_file(file_data['localpath'], file_data['relpath'])
@@ -1337,7 +1344,6 @@ class RFSwarmBase:
 				self.debugmsg(3, "File's hash has changed: chkhash:", chkhash, "	script_hash:", script_hash, "	localpath:", file_data['localpath'])
 
 				# check if file is in script list and update it's hash
-				# self.scriptlist[r]["ScriptHash"] = script_hash
 				for iid in range(len(self.scriptlist)):
 					self.debugmsg(3, "self.scriptlist[", iid, "]:", self.scriptlist[iid])
 					if "ScriptHash" in self.scriptlist[iid] and chkhash == self.scriptlist[iid]["ScriptHash"]:
@@ -1350,13 +1356,48 @@ class RFSwarmBase:
 
 					t = threading.Thread(target=self.find_dependancies, args=(script_hash, ))
 					t.start()
+					threads.append(t)
 
 					self.remove_hash(chkhash)
+
+		for t in threads:
+			t.join()
+
+		self.refresh_relative_paths()
+
+	def refresh_relative_paths(self):
+
+		filelist = []
+		# create a list of file paths
+		checkhashes = list(self.scriptfiles.keys())
+		self.debugmsg(6, "checkhashes:", checkhashes)
+
+		if len(checkhashes) > 0:
+			localpath = self.scriptfiles[checkhashes[0]]['localpath']
+			localdir = os.path.dirname(localpath)
+			basedir = localdir
+			self.debugmsg(5, "basedir:", basedir)
+
+			for chkhash in checkhashes:
+				filelist.append(self.scriptfiles[chkhash]["localpath"])
+
+				if 'basedir' in self.scriptfiles[chkhash]:
+					basedir = self.scriptfiles[chkhash]['basedir']
+			self.debugmsg(5, "basedir:", basedir)
+
+			# find common base path for all files
+			basedir = os.path.commonpath(filelist)
+			self.debugmsg(5, "basedir:", basedir)
+
+			# update all files's relative path to new base path
+			for chkhash in checkhashes:
+				relfile = self.get_relative_path(basedir, self.scriptfiles[chkhash]["localpath"])
+				self.scriptfiles[chkhash]["basedir"] = basedir
+				self.scriptfiles[chkhash]["relpath"] = relfile
 
 	def get_relative_path(self, path1, path2):
 		self.debugmsg(5, "path1:", path1)
 		self.debugmsg(5, "path2:", path2)
-		# commonpath = os.path.commonpath([path1, path2])
 
 		self.debugmsg(8, "os.path.isdir(path1):", os.path.isdir(path1))
 		self.debugmsg(8, "os.path.isfile(path1):", os.path.isfile(path1))

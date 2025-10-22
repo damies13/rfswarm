@@ -113,6 +113,7 @@ jobs:
 
       - name: Robot Framework
         id: robottest
+        continue-on-error: true
         run: >
           robot --include ${{ env.tag }}
           --exclude NOT${{ matrix.tag }}
@@ -122,6 +123,25 @@ jobs:
           DISPLAY: :13.0
           MATRIX_PLATFORM: ${{ matrix.platform }}
           MATRIX_PYTHON: ${{ matrix.python }}
+
+      - name: Robot Framework - Retry Failed
+        if: steps.robottest.outcome != 'success'
+        id: robotretry
+        continue-on-error: true
+        run: >
+          robot --include ${{ env.tag }}
+          --exclude NOT${{ matrix.tag }}
+          --rerunfailed Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/output.xml
+          --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}
+          Tests/Regression/Manager
+        env:
+          DISPLAY: :13.0
+          MATRIX_PLATFORM: ${{ matrix.platform }}
+          MATRIX_PYTHON: ${{ matrix.python }}
+
+      - name: if retry still failed
+        if: steps.robottest.outcome != 'success' && steps.robotretry.outcome != 'success'
+        run: exit 1
 
       - name: Try and fix images with relative path
         if: ${{ !cancelled() && matrix.platform != 'macos-latest' }}

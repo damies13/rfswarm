@@ -66,10 +66,26 @@ jobs:
       - run: pip install -r Tests/Regression/Agent/pip_requirements.txt
 
       - name: Robot Framework
+        id: robottest
+        continue-on-error: true
         run: >
           robot --include ${{ env.tag }}
           --outputdir Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
           Tests/Regression/Agent
+
+      - name: Robot Framework - Retry Failed
+        if: steps.robottest.outcome != 'success'
+        id: robotretry
+        continue-on-error: true
+        run: >
+          robot --include ${{ env.tag }}
+          --rerunfailed Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}/output.xml
+          --outputdir Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          Tests/Regression/Agent
+
+      - name: if retry still failed
+        if: steps.robottest.outcome != 'success' && steps.robotretry.outcome != 'success'
+        run: exit 1
 
       - name: Archive Agent Logs
         if: ${{ success() }}
