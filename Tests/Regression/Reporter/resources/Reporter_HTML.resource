@@ -156,7 +156,7 @@ Extract All Images From HTML Report Section
 		${image_data}= 	Get Element Attribute 	${img} 	src
 		Log 	${image_data}
 		Log 	${img_num}
-		@{splitted_img_data} 	Split String 	${image_data} 	, 	max_split=1 	# Need to separate img data from informations.
+		@{splitted_img_data} 	Split String 	${image_data} 	, 	max_split=1 	# Need to separate img data from information.
 		Log 	${splitted_img_data}[1]
 		${base64_string} 	Convert To String 	${splitted_img_data}[1]
 		Save Html Embeded Image 	${base64_string} 	${base_name}_${img_num} 	${output_folder}

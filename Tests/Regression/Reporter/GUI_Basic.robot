@@ -12,12 +12,17 @@ Test Teardown 	Close Reporter GUI
 GUI Runs and Closes
 	[Tags]	macos-latest		windows-latest		ubuntu-latest
 	Open Reporter GUI
-	Wait For Status 	PreviewLoaded
+
+	${status}=	Run Keyword And Return Status
+	...    Wait For 	reporter_${PLATFORM}_label_title.png 	timeout=${30}
+	Run Keyword If 		not ${status} 	Fail 	msg=Reporter is not responding!
 
 Select Preview Tab
 	[Tags]	ubuntu-latest		windows-latest		macos-latest
 	Open Reporter GUI
-	Wait For Status 	PreviewLoaded
+	${status}=	Run Keyword And Return Status
+	...    Wait For 	reporter_${PLATFORM}_label_title.png 	timeout=${30}
+	Run Keyword If 		not ${status} 	Fail 	msg=Reporter is not responding!
 	Click Tab 	 Preview
 
 	# Accessability Settings test was to verify Terminal is set to 'check'

@@ -90,7 +90,7 @@ Wait For the Scenario Run To Finish
 	...    Wait For	manager_${PLATFORM}_button_finished_run.png 	timeout=${time}
 	IF  not ${status}
 		Take A Screenshot
-		Fail	msg=Test didn't finish as fast as expected. Check screenshots for more informations.
+		Fail	msg=Test didn't finish as fast as expected. Check screenshots for more information.
 	END
 
 Check If the Robot Failed
@@ -105,7 +105,7 @@ Check If the Robot Failed
 	END
 	# Take A Screenshot
 	${status}= 	Run Keyword And Return Status 	Locate 	manager_${PLATFORM}_resource_file_provided.png
-	Run Keyword If 	not ${status} 	Fail 	msg=Test failed. Check screenshots for more informations.
+	Run Keyword If 	not ${status} 	Fail 	msg=Test failed. Check screenshots for more information.
 
 Create Robot File
 	[Arguments]		${path}=${global_path}	${name}=${global_name}
