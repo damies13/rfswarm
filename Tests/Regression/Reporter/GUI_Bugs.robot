@@ -330,7 +330,9 @@ Template with Start and End Dates
 	# Take A Screenshot
 	Wait For 	reporter_${PLATFORM}_expected_testresultsummary.png 	 timeout=30
 
-	[Teardown] 	Close Reporter GUI
+	[Teardown] 	Run Keywords 	Close Reporter GUI 		AND
+	...    Copy File 	${templatefolder}${/}${templatename}.template 	${templatefolder}${/}${templatename}_bak.template 	AND
+	...    Remove File 	${templatefolder}${/}${templatename}.template
 
 Auto Generate HTML Report With GUI Using Template
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #132 	HTML
