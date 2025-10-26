@@ -68,9 +68,9 @@ Verify XLSX Report Graph
 	Log 	\t- ${section} 	console=${True}
 
 	${img}= 	Extract Image From Xlsx Sheet 	${xlsx_file} 	${xlsx_sheet} 	${cell_id} 	${xlsx_img_path}
-	Convert Image To Black And White 	${xlsx_img_path}${/}${img}
+	# Convert Image To Black And White 	${xlsx_img_path}${/}${img}
 	Compare Images 	${xlsx_expected_img_path}${/}${img} 	${xlsx_img_path}${/}${img}
-	...    threshold=${img_comp_threshold} 	move_tolerance=${move_tolerance} 	blur=${True}
+	...    threshold=${img_comp_threshold} 	move_tolerance=${move_tolerance}  # 	blur=${True}
 
 Verify XLSX Report Table Content
 	[Documentation]

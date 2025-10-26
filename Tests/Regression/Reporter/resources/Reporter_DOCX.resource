@@ -60,9 +60,9 @@ Verify DOCX Report Graph
 
 	@{img_names}= 	Extract DOCX Images Under Heading 	${section} 	${docx_file} 	${docx_img_path}
 	VAR 	${img_name} 	${img_names}[0]
-	Convert Image To Black And White 	${docx_img_path}${/}${img_name}
+	# Convert Image To Black And White 	${docx_img_path}${/}${img_name}
 	Compare Images 	${docx_expected_img_path}${/}${img_name} 	${docx_img_path}${/}${img_name}
-	...    threshold=${img_comp_threshold} 	move_tolerance=${move_tolerance} 	blur=${True}
+	...    threshold=${img_comp_threshold} 	move_tolerance=${move_tolerance}  # 	blur=${True}
 
 Verify DOCX Report Table Content
 	[Documentation]

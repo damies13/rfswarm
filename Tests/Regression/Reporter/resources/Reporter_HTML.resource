@@ -213,9 +213,9 @@ Verify HTML Report Graph
 	${img_count} 	Extract All Images From HTML Report Section 	${section_obj} 	${html_img_path} 	${section}
 	${normalized_section} 	Replace String 	${section} 	${SPACE} 	_
 	VAR 	${img_name} 	${normalized_section}_${img_count - 1}_image.png
-	Convert Image To Black And White 	${html_img_path}${/}${img_name}
+	# Convert Image To Black And White 	${html_img_path}${/}${img_name}
 	Compare Images 	${html_expected_img_path}${/}${img_name} 	${html_img_path}${/}${img_name}
-	...    threshold=${img_comp_threshold} 	move_tolerance=${move_tolerance} 	blur=${True}
+	...    threshold=${img_comp_threshold} 	move_tolerance=${move_tolerance}  # 	blur=${True}
 
 Verify HTML Report Table Content
 	[Documentation]
