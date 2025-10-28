@@ -759,6 +759,7 @@ Navigate to and check Desktop Icon
 	Run Keyword 	Navigate to and check Desktop Icon For ${PLATFORM}
 
 Navigate to and check Desktop Icon For MacOS
+	Skip 	Skipped this for now due to changes in the new macos runners user interface.
 	Take A Screenshot
 
 	# open finder
