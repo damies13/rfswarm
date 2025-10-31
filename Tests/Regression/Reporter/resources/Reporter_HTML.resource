@@ -156,7 +156,7 @@ Extract All Images From HTML Report Section
 		${image_data}= 	Get Element Attribute 	${img} 	src
 		Log 	${image_data}
 		Log 	${img_num}
-		@{splitted_img_data} 	Split String 	${image_data} 	, 	max_split=1 	# Need to separate img data from informations.
+		@{splitted_img_data} 	Split String 	${image_data} 	, 	max_split=1 	# Need to separate img data from information.
 		Log 	${splitted_img_data}[1]
 		${base64_string} 	Convert To String 	${splitted_img_data}[1]
 		Save Html Embeded Image 	${base64_string} 	${base_name}_${img_num} 	${output_folder}
@@ -213,9 +213,9 @@ Verify HTML Report Graph
 	${img_count} 	Extract All Images From HTML Report Section 	${section_obj} 	${html_img_path} 	${section}
 	${normalized_section} 	Replace String 	${section} 	${SPACE} 	_
 	VAR 	${img_name} 	${normalized_section}_${img_count - 1}_image.png
-	Convert Image To Black And White 	${html_img_path}${/}${img_name}
+	# Convert Image To Black And White 	${html_img_path}${/}${img_name}
 	Compare Images 	${html_expected_img_path}${/}${img_name} 	${html_img_path}${/}${img_name}
-	...    threshold=${img_comp_threshold} 	move_tolerance=${move_tolerance} 	blur=${True}
+	...    threshold=${img_comp_threshold} 	move_tolerance=${move_tolerance}  # 	blur=${True}
 
 Verify HTML Report Table Content
 	[Documentation]

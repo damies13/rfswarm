@@ -667,6 +667,13 @@ class ReporterGUI(tk.Frame):
 		# self.base.debugmsg(5, "clicked:", clicked)
 		clicked = self.sectionstree.identify_row(args[0].y)
 		self.base.debugmsg(5, "clicked:", clicked, type(clicked), id(clicked))
+		if clicked != "TOP" and not self.base.datadb and len(clicked) > 0:
+			self.sectionstree.selection_set(clicked)
+			self.sectionstree.focus(clicked)
+			self.mnu_results_Open()
+			if not self.base.datadb:
+				clicked = 'TOP'
+				self.LoadSections(clicked)
 		if len(clicked) < 1:
 			# unselect
 			clicked = "TOP"
@@ -713,9 +720,9 @@ class ReporterGUI(tk.Frame):
 		self.content.vsb.grid(column=1, row=0, sticky="ns")
 
 		# Horizontal Scroolbar
-		hsb = ttk.Scrollbar(self.contentframe, orient="horizontal", command=self.contentcanvas.xview)
-		self.contentcanvas.configure(xscrollcommand=hsb.set)
-		hsb.grid(column=0, row=1, sticky="ew")
+		self.content.hsb = ttk.Scrollbar(self.contentframe, orient="horizontal", command=self.contentcanvas.xview)
+		self.contentcanvas.configure(xscrollcommand=self.content.hsb.set)
+		self.content.hsb.grid(column=0, row=1, sticky="ew")
 
 		self.tabs.add(self.contentframe, image=self.imgdata[icontext], text=icontext, compound=tk.LEFT, padding=0, sticky="nsew")
 
@@ -725,12 +732,14 @@ class ReporterGUI(tk.Frame):
 
 		# second page
 		icontext = "Settings"
-		self.base.debugmsg(6, icontext)
+		self.base.debugmsg(8, icontext)
+
 		self.contentsettings = tk.Frame(self.tabs, padx=0, pady=0, bd=0)
 		# self.contentsettings.config(bg="linen")
 		self.contentsettings.grid(column=0, row=0, sticky="nsew", padx=0, pady=0)
 		self.contentsettings.columnconfigure(0, weight=1)
 		self.contentsettings.rowconfigure(0, weight=1)
+
 		self.tabs.add(self.contentsettings, image=self.imgdata[icontext], text=icontext, compound=tk.LEFT, padding=0, sticky="nsew")
 
 		self.tabs.grid(column=0, row=0, sticky="nsew")
@@ -3575,6 +3584,8 @@ class ReporterGUI(tk.Frame):
 		self.updateStatus("Preview Loading..... ({})".format(str(row)))
 
 		self.contentdata[id]["Preview"].grid(column=0, row=row, sticky="nsew")
+		self.contentcanvas.yview_moveto(0)
+
 		nextrow = row + 1
 		self.base.debugmsg(9, "nextrow:", nextrow)
 		children = self.base.report_get_order(id)
@@ -4669,30 +4680,54 @@ class ReporterGUI(tk.Frame):
 	# Export Functions
 	def mnu_export_html(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		if not self.base.datadb:
+			self.mnu_results_Open()
+			if not self.base.datadb:
+				return
 		cghtml = threading.Thread(target=self.cg_export_xhtml)
 		cghtml.start()
 
 	def mnu_export_pdf(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		if not self.base.datadb:
+			self.mnu_results_Open()
+			if not self.base.datadb:
+				return
 		cgpdf = threading.Thread(target=self.cg_export_pdf)
 		cgpdf.start()
 
 	def mnu_export_writer(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		if not self.base.datadb:
+			self.mnu_results_Open()
+			if not self.base.datadb:
+				return
 		cgwriter = threading.Thread(target=self.cg_export_writer)
 		cgwriter.start()
 
 	def mnu_export_word(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		if not self.base.datadb:
+			self.mnu_results_Open()
+			if not self.base.datadb:
+				return
 		cgword = threading.Thread(target=self.cg_export_word)
 		cgword.start()
 
 	def mnu_export_calc(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		if not self.base.datadb:
+			self.mnu_results_Open()
+			if not self.base.datadb:
+				return
 		cgcalc = threading.Thread(target=self.cg_export_calc)
 		cgcalc.start()
 
 	def mnu_export_excel(self, _event=None):
 		self.base.debugmsg(5, "_event:", _event)
+		if not self.base.datadb:
+			self.mnu_results_Open()
+			if not self.base.datadb:
+				return
 		cgxcel = threading.Thread(target=self.cg_export_excel)
 		cgxcel.start()
