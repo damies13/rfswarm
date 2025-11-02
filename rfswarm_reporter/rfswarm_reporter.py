@@ -2,7 +2,7 @@
 #
 # 	Robot Framework Swarm
 # 		Reporter
-#    Version 1.5.2
+#    Version 1.5.3
 #
 
 import argparse
@@ -136,7 +136,7 @@ class stdevclass:
 
 
 class ReporterBase:
-	version = "1.5.2"
+	version = "1.5.3"
 	debuglvl = 0
 
 	save_ini = True
