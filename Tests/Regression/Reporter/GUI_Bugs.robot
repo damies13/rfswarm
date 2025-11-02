@@ -19,11 +19,14 @@ Verify If Reporter Runs With Existing INI File From Current Version
 	...    Sleep	5 	AND
 	...    Close Reporter GUI
 
+	VAR 	${result_name} 	20240709_151531_test_scenario
+	VAR 	${db_file} 		${CURDIR}${/}testdata${/}Issue-#49${/}${result_name}${/}${result_name}.db
+
 	${location}=	Get Reporter Default Save Path
 	File Should Exist	${location}${/}RFSwarmReporter.ini
 	File Should Not Be Empty	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with existing ini file.
-	Open Reporter GUI
+	Open Reporter GUI  -d  ${db_file}
 	Wait For Status 	PreviewLoaded
 	TRY
 		Click Section	test_result_summary
@@ -36,12 +39,15 @@ Verify If Reporter Runs With Existing INI File From Current Version
 Verify If Reporter Runs With No Existing INI File From Current Version
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 
+	VAR 	${result_name} 	20240709_151531_test_scenario
+	VAR 	${db_file} 		${CURDIR}${/}testdata${/}Issue-#49${/}${result_name}${/}${result_name}.db
+
 	${location}=	Get Reporter Default Save Path
 	Remove File		${location}${/}RFSwarmReporter.ini
 	File Should Not Exist	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with no existing ini file.
-	Open Reporter GUI
-	Wait For Status 	SelectResultFile
+	Open Reporter GUI  -d  ${db_file}
+	Wait For Status 	PreviewLoaded
 	TRY
 		Click Section	test_result_summary
 		Click	#double click needed. Maybe delete after eel module implemetation
@@ -53,6 +59,9 @@ Verify If Reporter Runs With No Existing INI File From Current Version
 Verify If Reporter Runs With Existing INI File From Previous Version
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 
+	VAR 	${result_name} 	20240709_151531_test_scenario
+	VAR 	${db_file} 		${CURDIR}${/}testdata${/}Issue-#49${/}${result_name}${/}${result_name}.db
+
 	${location}=	Get Reporter Default Save Path
 	Remove File		${location}${/}RFSwarmReporter.ini
 	File Should Not Exist	${location}${/}RFSwarmReporter.ini
@@ -61,8 +70,8 @@ Verify If Reporter Runs With Existing INI File From Previous Version
 	File Should Exist	${location}${/}RFSwarmReporter.ini
 	File Should Not Be Empty	${location}${/}RFSwarmReporter.ini
 	Log To Console	Running Reporter with existing ini file.
-	Open Reporter GUI
-	Wait For Status 	SelectResultFile
+	Open Reporter GUI  -d  ${db_file}
+	Wait For Status 	PreviewLoaded
 	TRY
 		Click Section	test_result_summary
 		Click	#double click needed. Maybe delete after eel module implemetation
@@ -321,7 +330,9 @@ Template with Start and End Dates
 	# Take A Screenshot
 	Wait For 	reporter_${PLATFORM}_expected_testresultsummary.png 	 timeout=30
 
-	[Teardown] 	Close Reporter GUI
+	[Teardown] 	Run Keywords 	Close Reporter GUI 		AND
+	...    Copy File 	${templatefolder}${/}${templatename}.template 	${templatefolder}${/}${templatename}_bak.template 	AND
+	...    Remove File 	${templatefolder}${/}${templatename}.template
 
 Auto Generate HTML Report With GUI Using Template
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #132 	HTML
