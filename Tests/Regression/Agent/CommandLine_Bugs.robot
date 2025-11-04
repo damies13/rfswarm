@@ -152,6 +152,7 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
 	VAR 	@{agnt_options} 	-a 	Issue-#100AGENTNAME
 	VAR 	@{mngr_options} 	-n 	-d 	${test_dir}
+	VAR 	${agent_name} 		Issue-#100AGENTNAME
 
 	Create Directory 	${test_dir}
 	Log To Console	Run Agent with custom agent name.
@@ -176,6 +177,8 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#100${/}ini_file
 	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
 	VAR 	${agent_name} 		Issue-100AGENTNAME
+	VAR 	@{agnt_options} 	-i 	${CURDIR}${/}testdata${/}Issue-#100${/}RFSwarmAgent.ini
+	VAR 	@{mngr_options} 	-n 	-d 	${test_dir}
 
 	Create Directory 	${test_dir}
 	Log To Console	Run Agent with custom agent name.

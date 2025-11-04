@@ -15,7 +15,7 @@ Manager Command Line PORT -p
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
-	...    Set Manager INI Window Size		1000	600
+	...    Set INI Window Size		1000	600
 
 	VAR 	&{run_settings_data} 	bind_port_number=8148
 	VAR 	@{mngr_options} 		-p 	${run_settings_data}[bind_port_number]
@@ -38,7 +38,7 @@ Manager Command Line IPADDRESS -e
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
-	...    Set Manager INI Window Size		1000	600
+	...    Set INI Window Size		1000	600
 
 	${ipv4} 	${ipv6} 	Get IP addresses
 	Log To Console		${\n}IPV4 address: ${ipv4} ${\n}IPV6 address: ${ipv6}${\n}
@@ -62,7 +62,7 @@ Manager Command Line DIR -d
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
-	...    Set Manager INI Window Size		1000	600
+	...    Set INI Window Size		1000	600
 
 	VAR		@{mngr_options}		-n	-d	${global_path}${/}Issue-#14
 
@@ -79,7 +79,7 @@ Manager Command Line DIR --dir
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
-	...    Set Manager INI Window Size		1000	600
+	...    Set INI Window Size		1000	600
 
 	VAR		@{mngr_options}		-n	--dir	${global_path}${/}Issue-#14
 
@@ -96,7 +96,7 @@ Manager Command Line STARTTIME -t
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
-	...    Set Manager INI Window Size		1000	600
+	...    Set INI Window Size		1000	600
 
 	${current_date}=	Get Current Date	result_format=%H:%M:%S
 	Log To Console	Current time: ${current_date}
@@ -119,7 +119,7 @@ Manager Command Line STARTTIME --starttime
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
-	...    Set Manager INI Window Size		1000	600
+	...    Set INI Window Size		1000	600
 
 	${current_date}=	Get Current Date	result_format=%H:%M:%S
 	Log To Console	Current time: ${current_date}
@@ -142,7 +142,7 @@ Manager Command Line SCENARIO -s
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
-	...    Set Manager INI Window Size		1000	600
+	...    Set INI Window Size		1000	600
 
 	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
 	VAR		@{mngr_options}		-s	${scenariofile}
@@ -169,7 +169,7 @@ Manager Command Line AGENTS -a
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
-	...    Set Manager INI Window Size		1000	600
+	...    Set INI Window Size		1000	600
 
 	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
 	VAR		@{mngr_options}		-s	${scenariofile} 	-a	2
@@ -202,7 +202,7 @@ Manager Command Line RUN -r
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
-	...    Set Manager INI Window Size		1000	600
+	...    Set INI Window Size		1000	600
 
 	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
 	VAR 	@{mngr_options} 	-s	${scenariofile} 	-r
@@ -225,7 +225,7 @@ Manager Command Line RUN --run
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
-	...    Set Manager INI Window Size		1000	600
+	...    Set INI Window Size		1000	600
 
 	${scenariofile}=	Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
 	VAR 	@{mngr_options} 	-s	${scenariofile} 	--run
@@ -248,7 +248,7 @@ Manager Command Line INI -i
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
-	...    Set Manager INI Window Size		1000	600
+	...    Set INI Window Size		1000	600
 
 	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmManager.ini
 	VAR		@{mngr_options}		-i	${inifile}
@@ -273,7 +273,7 @@ Manager Command Line INI --ini
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #14
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]  AND
-	...    Set Manager INI Window Size		1000	600
+	...    Set INI Window Size		1000	600
 
 	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmManager.ini
 	VAR		@{mngr_options}		--ini	${inifile}
@@ -298,7 +298,7 @@ Verify the Field Validation Is Working In the Manager Plan Screen
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #126
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Show Manager INI Data											AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -756,7 +756,7 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Test Variable	@{mngr_options}	-g	1						AND
 	...    Open Manager GUI		${mngr_options}								AND
 	...    Create Robot File
@@ -988,7 +988,7 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Set Test Variable	@{mngr_options}	-g	1						AND
 	...    Create Manager INI File If It Does Not Exist						AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Open Manager GUI		${mngr_options}								AND
 	...    Create Robot File	name=example.robot	file_content=***Test Case***\nExample Test Case\n
@@ -1048,7 +1048,7 @@ Verify If Manager Saves Inject Sleep From Scenario Wide Settings
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Open Manager GUI													AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -1080,7 +1080,7 @@ Check If the Manager Reopens Inject Sleep From Scenario Wide Settings Correctly
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Open Manager GUI													AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -1120,7 +1120,7 @@ Check If the Manager (after was closed) Opens Inject Sleep From Scenario Wide Se
 	...    Set Test Variable	@{mngr_options}	-g	1													AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Create Manager INI File If It Does Not Exist						AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Open Manager GUI		${mngr_options}																AND
 	...    Create Robot File
@@ -1156,7 +1156,7 @@ Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Setting
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Manager GUI													AND
 	...    Create Robot File
@@ -1208,7 +1208,7 @@ Check If Inject Sleep Option Was Executed in the Test
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Remove Directory	${results_dir}	recursive=${True}				AND
 	...    Create Directory	${results_dir}									AND
@@ -1293,7 +1293,7 @@ Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has
 	[Setup]	Run Keywords
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Create Manager INI File If It Does Not Exist						AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Agent
 
@@ -1335,7 +1335,7 @@ Verify If the Agent Can Connect To the Manager And Download/Send Files - URL Has
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Agent
 
@@ -1379,7 +1379,7 @@ Verify If the Port Number And Ip Address Get Written To the INI File
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Set Test Variable	@{mngr_options}	-g	0						AND
 	...    Open Manager GUI		${mngr_options}
@@ -1423,7 +1423,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Set Test Variable	@{mngr_options}	-g	0						AND
 	...    Open Manager GUI		${mngr_options}
@@ -1469,7 +1469,7 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Set Test Variable	@{mngr_options}	-g	0						AND
 	...    Open Manager GUI		${mngr_options}
@@ -1937,7 +1937,7 @@ Check If The CSV Report Button Works In the Manager Before There Are Any Results
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Open Agent
 
 	# !!! Checking that the CSV report button works in the manager after results is being checked in Test Case for Issue #254 !!!
@@ -1985,7 +1985,7 @@ Check If The CSV Report Button Works In The Manager After There Are Results
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Open Agent
 
 	${test_dir}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#254
@@ -2033,7 +2033,7 @@ Verify If Manager Displays Prompt Dialogue When No Agents Available To Run Robot
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Manager GUI													AND
 	...    Create Robot File
@@ -2119,7 +2119,7 @@ Check If Scenario Csv Report Files Contain Correct Data From The Test
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Open Agent
 
 	${test_dir}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#17
@@ -2236,7 +2236,7 @@ Verify the Results Directory And db File Gets Created Correctly With Scenario Al
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
 	[Setup]	Run Keywords
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Open Agent														AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Create Robot File
@@ -2306,7 +2306,7 @@ Verify the Results Directory And db File Gets Created Correctly Without Scenario
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #35	Issue #69
 	[Setup]	Run Keywords
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Open Agent														AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Create Robot File
@@ -2363,7 +2363,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	...    Set Global Filename And Default Save Path	example.robot		AND
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-2	AND
 	...    Open Agent	${agent_options}														AND
 	...    Open Manager GUI												AND
@@ -2392,7 +2392,7 @@ Check If Test Scenario Run Will Stop Gradually
 	...    Set Global Filename And Default Save Path	example.robot		AND
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-3	AND
 	...    Open Agent	${agent_options}														AND
 	...    Open Manager GUI																		AND
@@ -2421,7 +2421,7 @@ Check If Test Scenario Run Will Stop Gradually - TestRepeater
 	...    Set Global Filename And Default Save Path	example.robot		AND
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-3	AND
 	...    Open Agent	${agent_options}														AND
 	...    Open Manager GUI																		AND
@@ -2449,7 +2449,7 @@ Verify the Iteration Counters Get Reset When a New Test Starts On the Agent
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
 	${scenario_path}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#41${/}Issue-#41.rfs
@@ -2514,7 +2514,7 @@ Verify the Robot Count Reduces When Stop Agent While Test Is Running
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
 	${scenario_path}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#57${/}Issue-#57.rfs
@@ -2561,7 +2561,7 @@ Verify the Files Referenced In the Scenario Are All Using Relative Paths
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
 	${test_data_path}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#54
@@ -2616,7 +2616,7 @@ Verify If Upload logs=Immediately Is Being Saved To The Scenario And Read Back C
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Manager GUI
 
@@ -2654,7 +2654,7 @@ Verify If Upload logs=Error Only Is Being Saved To The Scenario And Read Back Co
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Manager GUI
 
@@ -2692,7 +2692,7 @@ Verify If Upload logs=All Deferred Is Being Saved To The Scenario And Read Back 
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Open Manager GUI
 
@@ -2730,7 +2730,7 @@ Verify If Upload logs=Immediately Uploads Logs As Soon As Robot Finishes Regardl
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
 	${scenarioname}=	Set Variable	immediately.rfs
@@ -2779,7 +2779,7 @@ Verify If Upload logs=Error Only Uploads Logs As Soon As Robot Finishes Only Whe
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
 	${scenarioname}=	Set Variable	error_only.rfs
@@ -2830,7 +2830,7 @@ Verify If Upload logs=All Deferred Doesn't Upload Any Logs During the Test
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
 	${scenarioname}=	Set Variable	all_deferred.rfs
@@ -3078,7 +3078,7 @@ Verify That Time Gets Correctly Validated For Schelduled Start
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600 					AND
+	...    Set INI Window Size		1000	600 					AND
 	...    Open Manager GUI
 
 	VAR 	@{start_times} 			2:56:30   1:50:2    17:5:1  8:3:12     7:43      53:9      12::      :38:      ::42
@@ -3128,7 +3128,7 @@ Verify Schedule Date And Time Are Always In the Future
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600 					AND
+	...    Set INI Window Size		1000	600 					AND
 	...    Open Manager GUI
 
 	Click Button	runschedule
@@ -3196,7 +3196,7 @@ Verify That When Time Is Entered In the Past It Becomes the Next Day
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600 					AND
+	...    Set INI Window Size		1000	600 					AND
 	...    Open Manager GUI
 
 	Click Button	runschedule
@@ -3253,7 +3253,7 @@ Verify Test Doesn't Start Until Scheduled To Start And Will Start After the Time
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600 					AND
+	...    Set INI Window Size		1000	600 					AND
 	...    Open Agent
 
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
@@ -3279,7 +3279,7 @@ Verify the Start Time Is Displayed On the Plan Screen
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600
+	...    Set INI Window Size		1000	600
 
 	${current_time}=	Get Current Date	result_format=%H
 	IF  '${current_time}' == '${3}'
@@ -3307,7 +3307,7 @@ Verify the Remaining Time Is Displayed On the Plan Screen
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600
+	...    Set INI Window Size		1000	600
 
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
 	#adding 10m:40s
@@ -3330,7 +3330,7 @@ Verify That the Start Time And Time Remaining Are Removed From Plan Screen When 
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600
+	...    Set INI Window Size		1000	600
 
 	${current_time}=	Get Current Date	result_format=%H:%M:%S
 	#adding 10m:20s
@@ -3363,7 +3363,7 @@ Verify That TPS Is TP And Not TPmS
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #155 	robot:continue-on-failure
 	[Setup]	Run Keywords
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY} 	AND
-	...    Set Manager INI Window Size 	1000 	600 	AND
+	...    Set INI Window Size 	1000 	600 	AND
 	...    Open Agent
 
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#155${/}tps.rfs
@@ -3613,7 +3613,7 @@ Check If Monitoring settings are loaded and used
 	...    Set Global Filename And Default Save Path	example.robot		AND
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set Manager INI Window Size		1000	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-3	AND
 	...    Open Agent	${agent_options}														AND
 	...    Open Manager GUI

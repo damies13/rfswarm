@@ -260,6 +260,8 @@ Agent Command Line PROPERTY -p
 
 	VAR 	@{agnt_options} 	-p 	Issue-#14
 	VAR 	@{mngr_options} 	-n
+	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#14${/}property
+	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
 
 	Log To Console	Run Agent with custom prop.
 	Run Agent 	${agnt_options}
