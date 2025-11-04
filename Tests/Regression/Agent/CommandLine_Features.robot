@@ -67,6 +67,7 @@ Agent Command Line MANAGER -m
 	Log To Console	Run Agent and Manager and see if they will connect.
 	Run Agent 	${agnt_options}
 	Run Manager CLI 	${mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager	10s
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -84,6 +85,7 @@ Agent Command Line MANAGER --manager
 	Log To Console	Run Agent and Manager and see if they will connect.
 	Run Agent 	${agnt_options}
 	Run Manager CLI 	${mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager	10s
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -147,6 +149,7 @@ Agent Command Line ROBOT -r
 	Run Agent 	${agnt_options}
 	Sleep 	5s
 	Run Manager CLI 	${mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager	8min
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt

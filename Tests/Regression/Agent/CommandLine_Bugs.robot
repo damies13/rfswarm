@@ -14,6 +14,7 @@ Exclude Libraries With Spaces
 	Log to console 	scenariofile: ${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
 	Run Manager CLI 	${mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
@@ -40,6 +41,7 @@ Run agent with -x (xml mode)
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
 	Run Manager CLI 	${mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
