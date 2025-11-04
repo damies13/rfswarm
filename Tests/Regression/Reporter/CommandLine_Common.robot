@@ -8,7 +8,6 @@ Library 	Collections
 *** Variables ***
 ${cmd_reporter} 		rfswarm-reporter
 ${pyfile}			${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
-${platform}
 
 *** Keywords ***
 Set Platform

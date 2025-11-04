@@ -67,7 +67,6 @@ Agent Command Line MANAGER -m
 	Log To Console	Run Agent and Manager and see if they will connect.
 	Run Agent 	${agnt_options}
 	Run Manager CLI 	${mngr_options}
-	Wait Until the Agent Connects to the Manager
 	Wait For Manager	10s
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -85,7 +84,6 @@ Agent Command Line MANAGER --manager
 	Log To Console	Run Agent and Manager and see if they will connect.
 	Run Agent 	${agnt_options}
 	Run Manager CLI 	${mngr_options}
-	Wait Until the Agent Connects to the Manager
 	Wait For Manager	10s
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -149,7 +147,6 @@ Agent Command Line ROBOT -r
 	Run Agent 	${agnt_options}
 	Sleep 	5s
 	Run Manager CLI 	${mngr_options}
-	Wait Until the Agent Connects to the Manager
 	Wait For Manager	8min
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -260,22 +257,18 @@ Agent Command Line PROPERTY -p
 
 	VAR 	@{agnt_options} 	-p 	Issue-#14
 	VAR 	@{mngr_options} 	-n
-	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#14${/}property
-	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
 
 	Log To Console	Run Agent with custom prop.
 	Run Agent 	${agnt_options}
 	Run Manager CLI 	${mngr_options}
-	Wait Until Created 	${dbfile}
-	Wait Until the Agent Connects to the Manager
 	Sleep	20s
 	Stop Agent
 	Stop Manager
 
 	Log To Console 	Checking result data base
-	VAR 	${query}= 	SELECT * FROM MetricData WHERE MetricType='Agent' AND SecondaryMetric='Issue-#14'
-	Wait Until the Query Is Not Empty 	${dbfile}  sql=${query}
-	${prop_result} 	Query Result DB 	${dbfile}  sql=${query}
+	${dbfile} 	Find Result DB 		result_pattern=PreRun
+	${prop_result} 	Query Result DB 	${dbfile}
+	...    SELECT * FROM MetricData WHERE MetricType='Agent' AND SecondaryMetric='Issue-#14'
 
 	${len}= 	Get Length 	${prop_result}
 	Should Be True 	${len} > 0

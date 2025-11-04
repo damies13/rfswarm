@@ -18,7 +18,6 @@ ${pyfile_manager} 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
 ${process_agent} 	${None}
 ${process_manager} 	${None}
 ${platform} 	${None}
-${COMPONENT} 	Manager
 
 # datapath: /home/runner/work/rfswarm/rfswarm/rfswarm_manager/results/PreRun
 # datapath: /opt/hostedtoolcache/Python/3.9.18/x64/lib/python3.9/site-packages/rfswarm_manager/results/PreRun -- let's control the output path rather than leaving it to chance
@@ -69,6 +68,13 @@ Show Log
 	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
 	Log 		${filedata} 		console=True
 	Log 		--ɅɅɅ--${filename}--ɅɅɅ--${\n} 		console=True
+	RETURN 		${filedata}
+
+Read Log
+	[Arguments]		${filename}
+	Log 		${filename}
+	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
+	Log 		${filedata}
 	RETURN 		${filedata}
 
 Show Dir Contents
@@ -317,6 +323,21 @@ Find Result DB
 	${file}= 	List Directory 	${fols[-1]} 	*.db 	absolute=True
 	Log to console 	Result DB: ${file[-1]}
 	RETURN 	${file[-1]}
+
+Query Result DB
+	[Arguments]		${dbfile} 	${sql}
+	# Disconnect From All Databases
+	Log 	dbfile: ${dbfile} 	console=true
+	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
+	# Log to console 	\${dbfile}: ${dbfile}
+	Connect To Database 	sqlite3 	database=${dbfile} 	isolation_level=${None}
+	# Log 	conn: ${conn} 	console=true
+	Log 	sql: ${sql} 	console=true
+	Check If Exists In Database 	${sql}
+	${result}= 	Query 	${sql}
+	Log 	sql result: ${result} 	console=true
+	Disconnect From Database
+	RETURN 	${result}
 
 CSV to List
 	[Arguments] 	${filepath}
@@ -664,93 +685,4 @@ Resync Date With Time Server
 		Should Not Be Equal As Strings 	${result.stdout} 	${old_date}
 		Log 	Back to original date: ${result.stdout} 	console=${True}
 		Log 	${result.stderr}
-	END
-
-###
-
-Query Result DB
-	[Arguments]		${dbfile} 	${sql} 	${info}=${True}
-	Log 	dbfile: ${dbfile} 	console=${info}
-	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
-
-	Connect To Database 	sqlite3 	database=${dbfile} 	isolation_level=${None}
-	Log 	sql: ${sql} 	console=${info}
-	${result}= 	Query 	${sql}
-	Log 	sql result: ${result} 	console=${info}
-	Disconnect From Database
-	RETURN 	${result}
-
-Find Log
-	[Documentation] 	Returns path to the stdout and stderr log file for current test
-	[Arguments] 	${component_name}=${COMPONENT}
-	${comp} 	Convert To Lower Case 	${component_name}
-	${tname} 		Convert To Save Path 	${TEST NAME}
-
-	File Should Exist 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt
-	File Should Exist 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
-
-	RETURN 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
-
-Read Log
-	[Arguments]		${filepath}
-	Log 		${filepath}
-	${filedata}= 	Get File 	${filepath} 		encoding=SYSTEM 		encoding_errors=ignore
-	Log 		${filedata}
-	RETURN 		${filedata}
-
-Convert To Save Path
-	[Arguments] 	${path}
-	${safe_path} 		Evaluate 	re.sub(r'[<>:"/\\|?*]', '_', "${path}".replace(' ', '_')).replace(chr(0), '_').rstrip(' .')[:60] 	modules=re
-
-	RETURN 	${safe_path}
-
-Wait Until the Agent Connects to the Manager
-	[Documentation] 	For this keyword to function correctly, logs from the agent must be available dynamically.
-	VAR    ${timeout}    160
-	TRY
-		${stdout}  ${stderr}= 	Find Log 	Agent
-	EXCEPT
-		Sleep 	5s
-		${stdout}  ${stderr}= 	Find Log 	Agent
-	END
-
-	Log 	Waiting for the Agent to connect with the Manager... 	console=${true}
-	TRY
-		WHILE    True 	limit=${timeout} seconds
-			TRY
-				Sleep 	10 s
-				${stdout_content}= 	Read Log 	${stdout}
-				Should Contain 		${stdout_content}  Manager Connected
-			EXCEPT
-				CONTINUE
-			END
-			BREAK
-		END
-	EXCEPT
-		Fail 	Agent didn't connect to the Manager after ${timeout} seconds
-	END
-
-Wait Until the Query Is Not Empty
-	[Arguments]		${dbfile}  ${sql}  ${timeout}=${300}
-
-	VAR 	${iter} 	0
-	TRY
-		WHILE    True 	limit=${timeout} seconds
-			${iter}= 	Evaluate  ${iter} + 1
-			IF    ${iter} == 30
-				Log 	Query '${sql}' is returning empty row after ${iter} seconds.  level=WARN
-			END
-			
-			TRY
-				Sleep 	1s
-				${query_result}= 	Query Result DB 	${dbfile}  ${sql}  info=${False}
-				${len}= 	Get Length 	${query_result}
-				Should Be True 	${len} > 0
-			EXCEPT
-				CONTINUE
-			END
-			BREAK
-		END
-	EXCEPT
-		Fail 		Query '${sql}' is returning empty row after ${timeout} seconds.
 	END

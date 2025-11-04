@@ -14,7 +14,6 @@ Exclude Libraries With Spaces
 	Log to console 	scenariofile: ${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
 	Run Manager CLI 	${mngr_options}
-	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
@@ -41,7 +40,6 @@ Run agent with -x (xml mode)
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
 	Run Manager CLI 	${mngr_options}
-	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
@@ -148,23 +146,22 @@ Verify If Agent Runs With Existing INI File From Previous Version NO GUI
 Verify If Agent Name Has Been Transferred To the Manager (-a command line switch)
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #100
 
-	VAR 	${test_dir} 		${OUTPUT_DIR}${/}testdata${/}Issue-#100${/}command_line
+	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#100${/}command_line
 	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
 	VAR 	@{agnt_options} 	-a 	Issue-#100AGENTNAME
 	VAR 	@{mngr_options} 	-n 	-d 	${test_dir}
-	VAR 	${agent_name} 		Issue-#100AGENTNAME
 
 	Create Directory 	${test_dir}
 	Log To Console	Run Agent with custom agent name.
 	Run Agent 	${agnt_options}
 	Run Manager CLI 	${mngr_options}
-	Wait Until Created 	${dbfile}
-	Wait Until the Agent Connects to the Manager
+	Sleep	20s
+	Stop Agent
+	Stop Manager
 
 	Log To Console 	Checking PreRun data base.
-	VAR 	${query}= 	SELECT * FROM AgentList WHERE AgentName='${agent_name}'
-	Wait Until the Query Is Not Empty 		${dbfile}  sql=SELECT * FROM AgentList
-	${query_result} 	Query Result DB 	${dbfile}  ${query}
+	${query_result} 	Query Result DB 	${dbfile}
+	...    SELECT * FROM AgentList WHERE AgentName='Issue-#100AGENTNAME'
 	${len}= 	Get Length 	${query_result}
 	Should Be True 	${len} > 0
 	...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}
@@ -176,7 +173,6 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 
 	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#100${/}ini_file
 	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
-	VAR 	${agent_name} 		Issue-100AGENTNAME
 	VAR 	@{agnt_options} 	-i 	${CURDIR}${/}testdata${/}Issue-#100${/}RFSwarmAgent.ini
 	VAR 	@{mngr_options} 	-n 	-d 	${test_dir}
 
@@ -184,13 +180,13 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 	Log To Console	Run Agent with custom agent name.
 	Run Agent 	${agnt_options}
 	Run Manager CLI 	${mngr_options}
-	Wait Until Created 	${dbfile}
-	Wait Until the Agent Connects to the Manager
+	Sleep	20s
+	Stop Agent
+	Stop Manager
 
 	Log To Console 	Checking PreRun data base.
-	VAR 	${query}= 	SELECT * FROM AgentList WHERE AgentName='${agent_name}'
-	Wait Until the Query Is Not Empty 		${dbfile}  sql=SELECT * FROM AgentList
-	${query_result} 	Query Result DB 	${dbfile}  ${query}
+	${query_result} 	Query Result DB 	${dbfile}
+	...    SELECT * FROM AgentList WHERE AgentName='Issue-#100AGENTNAME'
 	${len}= 	Get Length 	${query_result}
 	Should Be True 	${len} > 0
 	...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}

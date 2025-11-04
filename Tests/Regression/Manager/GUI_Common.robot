@@ -33,8 +33,6 @@ ${process_manager}		None
 ${process_agent}		None
 ${results_dir} 			${OUTPUT DIR}${/}results
 ${agent_dir} 				${OUTPUT DIR}${/}rfswarm-agent
-${component_name} 	Manager
-${COMPONENT} 		Manager
 
 *** Keywords ***
 Set Platform
@@ -113,7 +111,7 @@ Open Agent
 	${process}= 	Start Process 	${cmd_agent}  @{options}    alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
 	Set Test Variable 	$process_agent 	${process}
 
-Open Manager GUI old
+Open Manager GUI
 	[Arguments]		${options}=None
 	# Press Escape and move mouse because on linux the screen save had kicked in
 	Press Combination 	Key.esc
@@ -171,6 +169,10 @@ Wiggle Mouse
 	Move To 	10 	10
 	Move To 	20 	20
 
+Handle Donation Reminder
+	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		30
+	VAR 	${DonationReminder} 	${found} 		scope=TEST
+
 Close Manager GUI ubuntu
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
 	Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
@@ -181,7 +183,7 @@ Close Manager GUI windows
 	Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
 	Close Manager GUI
 
-Close Manager GUI old
+Close Manager GUI
 	[Tags]	windows-latest		ubuntu-latest
 	# make sure the window is the active window first, Unlikely the about tab has been selected
 	Run Keyword And Ignore Error 	Click Tab 	 About
@@ -350,15 +352,7 @@ Check If The Agent Is Ready
 	[Arguments] 	${timeout}=300
 	# Sleep	1
 	Click Tab	Agents
-	VAR 	${img} 	manager_${PLATFORM}_agents_ready.png
-	${status}= 	Run Keyword And Return Status 	Wait For 	${img}	timeout=${timeout}
-
-	IF  not ${status} and '${PLATFORM}' == 'macos'
-		VAR 	${img} 	manager_${PLATFORM}_agents_warning.png
-		${status}= 	Run Keyword And Return Status 	Wait For 	${img}	timeout=10
-	END
-
-	IF  not ${status}  Fail  Agent is not ready after ${timeout} seconds.
+	Wait For 	manager_${platform}_agents_ready.png	timeout=${timeout}
 
 Wait For the Scenario Run To Finish
 	[Arguments] 	${time}=${300}
@@ -496,7 +490,7 @@ Press ${key} ${n} Times
 	END
 
 Click ${item} With Vertical Offset
-	[Arguments]		${image_name}	${offset}=0 	${timeout}=${default_image_timeout}
+	[Arguments]		${image_name}	${offset}=0
 	[Documentation]	Click the item with the offset. An item can be: Label, Button, ...
 	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down].
 	${image_name}= 	Convert To Lower Case 	${image_name}
@@ -504,7 +498,7 @@ Click ${item} With Vertical Offset
 	${img}=	Set Variable		manager_${platform}_${item}_${image_name}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${timeout}
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 	@{coordinates}= 	Locate		${img}
 	Log	${coordinates}
 	Click To The Below Of	${coordinates}	${offset}
@@ -1451,8 +1445,7 @@ Verify Test Result Directory Name
 	...    msg=Result directory name from scenario is incorrect: expected "${expected_name}", actual: "${result_dir_name}".
 
 Verify Generated Run Result Files
-	# NEEDS REFRESHING
-	[Arguments]		${result_dir_name}  ${scenario_name}  ${num_of_robots}=10
+	[Arguments]		${result_dir_name}		${scenario_name}
 	@{run_dir_name_fragmented}=	Split String	${result_dir_name}	separator=_		max_split=2
 	${result_dir_time}=	Set Variable	${run_dir_name_fragmented}[0]_${run_dir_name_fragmented}[1]
 
@@ -1476,7 +1469,7 @@ Verify Generated Run Result Files
 	...    Find Absolute Paths And Names For Files In Directory		${results_dir}${/}${result_dir_name}${/}${logs}[0]
 	${len}=		Get Length	${logs_file_names}
 	Log To Console	Number of files in the Logs directory: ${len}
-	Should Be True	${len} >= ${num_of_robots}*2 	msg=Number of files in the Logs directory is incorrect: should be at least 20, actual: "${len}".
+	Should Be True	${len} >= 20	msg=Number of files in the Logs directory is incorrect: should be at least 20, actual: "${len}".
 
 Find Result DB
 	[Arguments] 	${directory}=${results_dir} 	${result_pattern}=*_*
@@ -1695,234 +1688,7 @@ Navigate to and check Desktop Icon For Ubuntu
 
 	Press Combination 	KEY.ESC
 
-###
 
-Handle Donation Reminder
-	${comp}= 	Convert To Lower Case 	${COMPONENT_NAME}
-	IF  '${COMPONENT}' == 'Manager'
-		Run Keyword And Ignore Error 	Wait For 	manager_${PLATFORM}_button_runscriptrow.png 	timeout=12
-		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3
-		Run Keyword And Ignore Error 	Wait For 	manager_${PLATFORM}_button_runscriptrow.png 	timeout=8
-	ELSE IF  '${COMPONENT}' == 'Reporter'
-		Run Keyword And Ignore Error 	Wait For 	reporter_${PLATFORM}_button_generateexcel.png 	timeout=12
-		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3
-		Run Keyword And Ignore Error 	Wait For 	reporter_${PLATFORM}_button_generateexcel.png 	timeout=8
-	END
-
-	IF  not ${found}
-		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		4
-	END
-	VAR 	${DonationReminder} 	${found} 		scope=TEST
-
-Handle MacOS Pop-ups
-	[Tags]  macos-latest
-	[Documentation]  The MacOS system sometimes displays pop-up windows related to permissions. This keyword is intended to accept/ignore these pop-up windows.
-	[Setup] 	Sleep 	2s
-	Take A Screenshot
-	
-	VAR 	${img} 	macos_dlgbtn_allow_grayed.png
-	# Run Keyword And Ignore Error
-	# ...    Wait For 	${img} 	 timeout=2
-
-	Run Keyword And Ignore Error
-	...    Click Image 	${img}
-
-	VAR 	${img} 	macos_dlgbtn_allow.png
-	Sleep 	2s
-	# Run Keyword And Ignore Error
-	# ...    Wait For 	${img} 	 timeout=2
-
-	${result}= 	Run Keyword And Return Status
-	...    Click Image 	${img}
-
-	VAR 	${img} 	macos_dlgbtn_ignore.png
-	Sleep 	2s
-	Run Keyword And Ignore Error
-	...    Click Image 	${img}
-
-	Sleep 	0.1
-
-Open Manager GUI
-	[Documentation] 	Open one of the RFSwarm applications for GUI purposes. Pass the: Manager, Reporter or Agent
-	[Arguments] 	@{appargs}  ${envargs}=${None}
-	${comp} 	Convert To Lower Case 	${component_name}
-	${var}= 	Get Variables
-	Log 	${var}
-
-	Press Combination 	Key.esc
-	Wiggle Mouse
-
-	VAR 	${noargs} 	${False}
-	${len} 	Get Length 	${appargs}
-	IF  ${len} == ${0}
-		VAR 	${noargs} 	${True}
-	END
-
-	Run Keyword 	Run ${component_name} CLI 	@{appargs}  noargs=${noargs}  envargs=${envargs}
-
-	IF 	'-n' in ${appargs} or '--nogui' in ${appargs}
-		Sleep 	5
-	ELSE
-		IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
-		Handle Donation Reminder
-		IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
-
-		${running}= 	Is Process Running 	${PROCESS_${comp}}
-		IF 	not ${running}
-			Take A Screenshot
-			Fail 		${component_name} not running
-		END
-	END
-
-Close Manager GUI
-	[Documentation] 	Closes one of the RFSwarm applications with GUI. Pass the: Manager or Reporter
-	${comp} 	Convert To Lower Case 	${component_name}
-	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 	0.01
-	Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
-
-	IF 	${PROCESS_${comp}}
-		${running}= 	Is Process Running 	${PROCESS_${comp}}
-		IF 	${running}
-			Log 	${\n}Closing ${component_name} GUI ... 	console=True
-
-			# make sure the window is the active window first
-			IF 	'${component_name}' == 'Manager'
-				Run Keyword And Ignore Error 	Click Image 	manager_${PLATFORM}_tab_about.png
-				Run Keyword And Ignore Error 	Click Image 	manager_${PLATFORM}_tab_run.png
-			ELSE IF 	'${component_name}' == 'Reporter'
-				IF  '${PLATFORM}' == 'macos'
-					Run Keyword And Ignore Error 	Click Button With Vertical Offset 	OpenTemplate 	offset=-20 	timeout=1
-				ELSE
-					Run Keyword And Ignore Error 	Click Image 	reporter_${PLATFORM}_menu_results.png
-				END
-			END
-
-			Sleep 	1
-			Press Key.esc 3 Times
-			Sleep 	1
-			IF  '${PLATFORM}' == 'macos'  Press Combination  Key.command  q  ELSE  Press Combination  Key.ctrl  x
-			Sleep	3
-
-			${running}= 	Is Process Running 	${PROCESS_${comp}}
-			IF 	${running}
-				Press Combination 	Key.esc
-				IF  '${PLATFORM}' == 'macos'  Press Combination  Key.command  q  ELSE  Press Combination  Key.ctrl  x
-			END
-
-		ELSE
-			Log 	${component_name} is not running! 	console=True
-			${result}= 	Wait For Process 	${PROCESS_${comp}} 	timeout=60
-			# Should Be Equal As Integers 	${result.rc} 	0
-
-			RETURN
-		END
-
-		Sleep 	2s
-		Run Keyword And Ignore Error 	Click Dialog Button 	no 		1
-
-		${result}= 		Wait For Process 	${process_${comp}} 	timeout=15
-		${running}= 	Is Process Running 	${PROCESS_${comp}}
-		IF 	not ${running}
-			Log 	*=== ${component_name} closed with GUI ===* 	console=True
-			TRY
-				Log 	${component_name} exited with: ${result.rc} 	console=${True}
-				# Should Be Equal As Integers 	${result.rc} 	0
-
-				Log		stdout_path: ${result.stdout_path} 		console=True
-				Log		stderr_path: ${result.stderr_path} 		console=True
-
-				Show Log 	${result.stdout_path}
-				Show Log 	${result.stderr_path}
-
-			EXCEPT 	AS 	${error}
-				Log 	error: ${error} 		console=true
-			END
-
-		ELSE
-			Log 	Closing GUI with CLI 	console=True
-			Take A Screenshot
-			Run Keyword 	Stop ${component_name} CLI 	# close with cli signal
-			RETURN
-		END
-
-	END
-
-	Sleep 	0.5
-	${running}= 	Is Process Running 	${PROCESS_${comp}}
-	Run Keyword If 	${running} 	Fail 	Failed to close ${component_name}
-
-	[Teardown] 	Set Suite Variable 	${PROCESS_${comp}} 	${None}
-
-Create Manager INI File If It Does Not Exist
-	[Documentation] 	Pass the: Manager, Reporter or Agent
-	VAR 	${component_name} 	Manager
-	${location}= 	Get Manager INI Location
-	${comp} 	Convert To Lower Case 	${component_name}
-
-	TRY
-		File Should Exist	${location}
-		File Should Not Be Empty	${location}
-	EXCEPT
-		Log 	INI file for ${component_name} does not exist or it's empty. Creating new one. 	console=True
-
-		IF  '${component_name}' == 'Manager'
-			${process}= 	Start Process  rfswarm-manager  -n
-		ELSE IF  '${component_name}' == 'Agent'
-			${process}= 	Start Process  rfswarm-agent
-		ELSE IF  '${component_name}' == 'Reporter'
-			${process}= 	Start Process  rfswarm-reporter  -n
-		END
-		Wait For File To Exist 	${location}
-		Sleep 	5s
-		${result}= 	Terminate Process 	${process}
-
-		File Should Exist 	${location}
-		File Should Not Be Empty 	${location}
-	END
-
-Handle RFSwarm GUI Pop-ups
-	[Documentation] 	This keyword is intended to get rid of pop-ups displayed by rfswarm apps.
-	VAR 	${status} 	${true}
-
-	TRY
-		Take A Screenshot
-		IF  '${PLATFORM}' == 'macos'
-			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok_3 	timeout=5
-		ELSE
-			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok 	timeout=5
-		END
-
-		IF  '${PLATFORM}' == 'macos' and not ${status}
-			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok_2 	timeout=1
-			Sleep 	1s
-			IF  ${status}  Click
-		END
-
-		IF  not ${status}  Fail
-
-	EXCEPT
-		Take A Screenshot
-		Run Keyword And Ignore Error 	Click Dialog Button 	ok 	timeout=1
-		IF  '${PLATFORM}' == 'macos'  Run Keyword And Ignore Error 	Click Dialog Button 	ok_2 	timeout=1
-
-		Press key.enter 1 Times
-		Sleep 	1
-		Press key.enter 1 Times
-	END
-	Press key.enter 1 Times
-
-Wait For the Agent To Be Ready
-	[Arguments] 	${timeout}=300
-	Click Tab	Agents
-	VAR 	${img} 	manager_${PLATFORM}_agents_ready.png
-	${status}= 	Run Keyword And Return Status 	Wait For 	${img}	timeout=${timeout}
-
-	IF  not ${status} and '${PLATFORM}' == 'macos'
-		VAR 	${img} 	manager_${PLATFORM}_agents_warning.png
-		${status}= 	Run Keyword And Return Status 	Wait For 	${img}	timeout=10
-	END
-
-	IF  not ${status}  Fail  Agent is not ready after ${timeout} seconds.
 
 
 
