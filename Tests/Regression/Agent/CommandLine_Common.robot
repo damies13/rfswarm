@@ -69,15 +69,15 @@ Show Log
 	Log 	${filedata} 	console=True
 	Log to console 	--ɅɅɅ--${filename}--ɅɅɅ--${\n}
 
-# Run Agent old
-# 	[Arguments]		${options}=None
-# 	IF  ${options} == None
-# 		${options}= 	Create List
-# 	END
-# 	Log to console 	${\n}\${options}: ${options}
-# 	# ${process}= 	Start Process 	python3 	${pyfile_agent}  @{options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
-# 	${process}= 	Start Process 	${cmd_agent}  @{options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
-# 	Set Test Variable 	$process_agent 	${process}
+Run Agent
+	[Arguments]		${options}=None
+	IF  ${options} == None
+		${options}= 	Create List
+	END
+	Log to console 	${\n}\${options}: ${options}
+	# ${process}= 	Start Process 	python3 	${pyfile_agent}  @{options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
+	${process}= 	Start Process 	${cmd_agent}  @{options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
+	Set Test Variable 	$process_agent 	${process}
 
 Run Manager CLI
 	[Arguments]		${options}=None
@@ -357,9 +357,10 @@ Check Icon Install For Ubuntu
 
 ### v1.6.0 ###
 
-Run Agent
-	[Arguments] 	@{appargs}
-	Run Agent CLI 	${appargs}
+# Run Agent
+# 	[Arguments] 	${appargs}
+# 	@{appargs} 	Convert To List 	${appargs}
+# 	Run Agent CLI 	@{appargs}
 
 Run ${component_name} CLI
 	[Documentation] 	Open one of the RFSwarm applications for CLI purposes. Pass the: Manager, Reporter or Agent

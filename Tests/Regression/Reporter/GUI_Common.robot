@@ -24,9 +24,12 @@ ${platform}		None
 ${cmd_reporter} 		rfswarm-reporter
 ${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
 ${pyfile}			${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
-${process}		None
+${process}		${process_reporter}
 ${sssleep}		0.5
 ${DonationReminter} 	${False}
+${COMPONENT} 		Reporter
+${component_name} 	Reporter
+${process_reporter} 	${None}
 
 *** Keywords ***
 Set Platform
@@ -530,20 +533,20 @@ Handle Donation Reminder
 	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 	30
 	VAR 	${DonationReminder} 	${found} 		scope=TEST
 
-Close GUI
-	${keyword}= 	Set Variable 	Close GUI ${platform}
-	IF 	${process}
-		${running}= 	Is Process Running 	${process}
-		IF 	${running}
-			Run Keyword 	${keyword}
-		ELSE
-			# ${result}= 	Get Process Result 	${process}
-			${result}= 	Wait For Process 	${process} 	timeout=60
-			Check Result 	${result}
-		END
-	END
-	Set Suite Variable 	$process 	None
-	Sleep 	0.5
+# Close GUI
+# 	${keyword}= 	Set Variable 	Close GUI ${platform}
+# 	IF 	${process}
+# 		${running}= 	Is Process Running 	${process}
+# 		IF 	${running}
+# 			Run Keyword 	${keyword}
+# 		ELSE
+# 			# ${result}= 	Get Process Result 	${process}
+# 			${result}= 	Wait For Process 	${process} 	timeout=60
+# 			Check Result 	${result}
+# 		END
+# 	END
+# 	Set Suite Variable 	$process 	None
+# 	Sleep 	0.5
 
 Check Result
 	[Arguments]		${result}
@@ -1832,6 +1835,9 @@ Open GUI ${platform}
 			Fail 		${component_name} not running
 		END
 	END
+
+Close GUI
+	Close GUI ${platform}
 
 Close GUI ${platform}
 	[Documentation] 	Closes one of the RFSwarm applications with GUI. Pass the: Manager or Reporter

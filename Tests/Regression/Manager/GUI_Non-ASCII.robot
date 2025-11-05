@@ -47,8 +47,8 @@ Test Non-ASCII Characters
 	VAR 	@{mngr_options} 	-g 	1 	-s 	${scenario_file} 	-d 	${results_dir}
 	VAR 	@{agnt_options} 	-a 	${agent_name}
 
-	Open Agent 			${agnt_options}
-	Open Manager GUI 	${mngr_options}
+	Open Agent 			@{agnt_options}
+	Open Manager GUI 	@{mngr_options}
 	Take A Screenshot
 	Check If The Agent Is Ready
 	Click Tab 	Plan

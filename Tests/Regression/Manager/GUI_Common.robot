@@ -1944,7 +1944,7 @@ Open Manager GUI
 		END
 	END
 
-Close Manager GUI
+Close ${component_name} GUI
 	[Documentation] 	Closes one of the RFSwarm applications with GUI. Pass the: Manager or Reporter
 	${comp} 	Convert To Lower Case 	${component_name}
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 	0.01

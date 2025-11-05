@@ -693,7 +693,7 @@ Resync Date With Time Server
 
 Run Agent
 	[Arguments] 	@{appargs}
-	Run Agent CLI 	${appargs}
+	Run Agent CLI 	@{appargs}
 
 Run ${component_name} CLI
 	[Documentation] 	Open one of the RFSwarm applications for CLI purposes. Pass the: Manager, Reporter or Agent

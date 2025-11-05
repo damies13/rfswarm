@@ -84,7 +84,7 @@ Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#362${/}invalid.rfs
 	${inifile}= 		Normalize Path 	${CURDIR}${/}testdata${/}Issue-#362${/}RFSwarmManager.ini
 	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-i 	${inifile}
-	Open Manager GUI 	${mngr_options}
+	Open Manager GUI 	@{mngr_options}
 
 	Sleep 	5s
 

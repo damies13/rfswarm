@@ -7,13 +7,14 @@ Exclude Libraries With Spaces
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #171 	Issue #177
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	http://localhost:8138
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Log to console 	${CURDIR}
 	# ${scenariofile}= 	Normalize Path 	${CURDIR}${/}..${/}..${/}Demo${/}demo.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#171${/}Issue171.rfs
 	Log to console 	scenariofile: ${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
@@ -33,13 +34,14 @@ Run agent with -x (xml mode)
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #180
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	@{agnt_options}= 	Create List 	-g 	1 	-x 	-m 	http://localhost:8138
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Log to console 	${CURDIR}
 	# ${scenariofile}= 	Normalize Path 	${CURDIR}${/}..${/}..${/}Demo${/}demo.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#171${/}Issue171.rfs
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
@@ -153,14 +155,10 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 
 	Create Directory 	${test_dir}
 	Log To Console	Run Agent with custom agent name.
-	Run Agent 	${agnt_options}
-	Run Manager CLI 	${mngr_options}
-	Sleep	120s
-	Stop Agent
-	Stop Manager
-
-	# make copy of prerun
-	Copy Directory 		${test_dir}${/}PreRun 		${OUTPUT DIR}${/}results${/}${TEST NAME}${/}PreRun
+	Run Agent 	@{agnt_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until Created 	${dbfile}
+	Wait Until the Agent Connects to the Manager
 
 	Log To Console 	Checking PreRun data base.
 	${query_result} 	Query Result DB 	${dbfile}
@@ -181,14 +179,10 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 
 	Create Directory 	${test_dir}
 	Log To Console	Run Agent with custom agent name.
-	Run Agent 	${agnt_options}
-	Run Manager CLI 	${mngr_options}
-	Sleep	120s
-	Stop Agent
-	Stop Manager
-
-	# make copy of prerun
-	Copy Directory 		${test_dir}${/}PreRun 		${OUTPUT DIR}${/}results${/}${TEST NAME}${/}PreRun
+	Run Agent 	@{agnt_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until Created 	${dbfile}
+	Wait Until the Agent Connects to the Manager
 
 	Log To Console 	Checking PreRun data base.
 	${query_result} 	Query Result DB 	${dbfile}

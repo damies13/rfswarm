@@ -42,7 +42,7 @@ Add Test In Language
 	Log 	${langcode} 	console=True
 	${scenariofile}= 		Create ${langcode} Language Scenario
 	@{mngr_options}= 	Create List 	-s 	${scenariofile}
-	Open Manager GUI 		${mngr_options}
+	Open Manager GUI 		@{mngr_options}
 	Check If The Agent Is Ready
 	Click Tab 	Plan
 	Take A Screenshot
