@@ -155,69 +155,69 @@ Check Logs
 	Should Not Contain 	${stdout_manager}	KeyError
 	Should Not Contain 	${stderr_manager} 	KeyError
 
-Open Agent
-	[Arguments]		${options}=None
-	IF  ${options} == None
-		${options}= 	Create List
-		Append To List 	${options} 	-d 	${agent_dir}
-	END
-	Log to console 	${\n}\${options}: ${options}
-	${process}= 	Start Process 	${cmd_agent}  @{options}    alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
-	Set Test Variable 	$process_agent 	${process}
+# Open Agent old
+# 	[Arguments]		${options}=None
+# 	IF  ${options} == None
+# 		${options}= 	Create List
+# 		Append To List 	${options} 	-d 	${agent_dir}
+# 	END
+# 	Log to console 	${\n}\${options}: ${options}
+# 	${process}= 	Start Process 	${cmd_agent}  @{options}    alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
+# 	Set Test Variable 	$process_agent 	${process}
 
-Open Manager GUI
-	[Arguments]		${options}=None
-	# Press Escape and move mouse because on linux the screen save had kicked in
-	Press Combination 	Key.esc
-	Wiggle Mouse
+# Open Manager GUI old
+# 	[Arguments]		${options}=None
+# 	# Press Escape and move mouse because on linux the screen save had kicked in
+# 	Press Combination 	Key.esc
+# 	Wiggle Mouse
 
-	IF  ${options} == None
-		${options}= 	Create List
-		Create Directory 	${results_dir}
-		Append To List 	${options} 	-d 	${results_dir}
-	END
-	Log to console 	${\n}\${options}: ${options}
-	Set Confidence		0.9
-	${process}= 	Start Process 	${cmd_manager}  @{options}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
-	Set Test Variable 	$process_manager 	${process}
-	# Sleep 	10
-	Set Screenshot Folder 	${OUTPUT DIR}
-	# Take A Screenshot
-	${result}= 	Wait Until Keyword Succeeds 	${default_image_timeout} sec 	500ms 	Process Should Be Running 	${process_manager}
-	Log		Process Is Running: ${result} 		console=True
+# 	IF  ${options} == None
+# 		${options}= 	Create List
+# 		Create Directory 	${results_dir}
+# 		Append To List 	${options} 	-d 	${results_dir}
+# 	END
+# 	Log to console 	${\n}\${options}: ${options}
+# 	Set Confidence		0.9
+# 	${process}= 	Start Process 	${cmd_manager}  @{options}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
+# 	Set Test Variable 	$process_manager 	${process}
+# 	# Sleep 	10
+# 	Set Screenshot Folder 	${OUTPUT DIR}
+# 	# Take A Screenshot
+# 	${result}= 	Wait Until Keyword Succeeds 	${default_image_timeout} sec 	500ms 	Process Should Be Running 	${process_manager}
+# 	Log		Process Is Running: ${result} 		console=True
 
-	IF 	'-n' in ${options}
-		Sleep 	10
-	ELSE IF 	'-r' in ${options} or '--run' in ${options}
-		Handle Donation Reminder
-	ELSE
-		Handle Donation Reminder
+# 	IF 	'-n' in ${options}
+# 		Sleep 	10
+# 	ELSE IF 	'-r' in ${options} or '--run' in ${options}
+# 		Handle Donation Reminder
+# 	ELSE
+# 		Handle Donation Reminder
 
-		${img}=	Set Variable		manager_${platform}_button_runschedule.png
-		${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=${default_image_timeout / 2}
-		IF 	not ${passed}
-			${running}= 	Is Process Running 	${process_manager}
-			IF 	not ${running}
-				${result}= 		Get Process Result 	${process_manager}
+# 		${img}=	Set Variable		manager_${platform}_button_runschedule.png
+# 		${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=${default_image_timeout / 2}
+# 		IF 	not ${passed}
+# 			${running}= 	Is Process Running 	${process_manager}
+# 			IF 	not ${running}
+# 				${result}= 		Get Process Result 	${process_manager}
 
-				Log		rc: ${result.rc} 		console=True
-				Log		stdout: ${result.stdout} 		console=True
-				Log		stderr: ${result.stderr} 		console=True
-				Log		stdout_path: ${result.stdout_path} 		console=True
-				Log		stderr_path: ${result.stderr_path} 		console=True
+# 				Log		rc: ${result.rc} 		console=True
+# 				Log		stdout: ${result.stdout} 		console=True
+# 				Log		stderr: ${result.stderr} 		console=True
+# 				Log		stdout_path: ${result.stdout_path} 		console=True
+# 				Log		stderr_path: ${result.stderr_path} 		console=True
 
-				Show Log 	${result.stdout_path}
-				Show Log 	${result.stderr_path}
+# 				Show Log 	${result.stdout_path}
+# 				Show Log 	${result.stderr_path}
 
-				Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-				Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+# 				Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+# 				Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 
-				Fail 		Manager not running
-			ELSE
-				Wait For 	${img} 	 timeout=${default_image_timeout / 2}
-			END
-		END
-	END
+# 				Fail 		Manager not running
+# 			ELSE
+# 				Wait For 	${img} 	 timeout=${default_image_timeout / 2}
+# 			END
+# 		END
+# 	END
 
 	# IF 		'${platform}' == 'macos'
 	# 	Remove Screen Capture Nag
@@ -232,117 +232,117 @@ Handle Donation Reminder
 	VAR 	${DonationReminder} 	${found} 		scope=TEST
 
 Close Manager GUI ubuntu
-	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
-	Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
+	# Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
+	# Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
 	Close Manager GUI
 
 Close Manager GUI windows
-	IF 		${TEST STATUS} == FAIL
-		Take A Screenshot
-	END
-	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
-	Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
+	# Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
+	# Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
 	Close Manager GUI
 
-Close Manager GUI
-	[Tags]	windows-latest		ubuntu-latest
-	# make sure the window is the active window first, Unlikely the about tab has been selected
-	Run Keyword And Ignore Error 	Click Tab 	 About
-	Run Keyword And Ignore Error 	Click Tab 	 Run
-	Press Combination 	Key.esc
-	Press Combination 	x 	Key.ctrl
-	Sleep	5
-	${running}= 	Is Process Running 	${process_manager}
-	IF 	${running}
-		Press Combination 	Key.esc
-		Press Combination 	x 	Key.ctrl
-		Sleep	3
-		Run Keyword And Ignore Error 	Click Dialog Button		no 		10
-	END
-	${result}= 		Wait For Process 	${process_manager} 	timeout=55
-	${running}= 	Is Process Running 	${process_manager}
-	IF 	not ${running}
-		Log		${result.stdout}
-		Log		${result.stderr}
-		Should Be Equal As Integers 	${result.rc} 	0
-	ELSE
-		Take A Screenshot
-		${result} = 	Terminate Process		${process_manager}
-		Log 	${result.stdout}
-		Log 	${result.stderr}
-		${running}= 	Is Process Running 	${process_manager}
-		Take A Screenshot
-		IF 	${running}
-			Fail
-		END
-	END
-	Kill Manager If Still Running
-	# stdout=${OUTPUT DIR}${/}stdout_manager.txt    stderr=${OUTPUT DIR}${/}stderr_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+# Close Manager GUI old
+# 	[Tags]	windows-latest		ubuntu-latest
+# 	# make sure the window is the active window first, Unlikely the about tab has been selected
+# 	Run Keyword And Ignore Error 	Click Tab 	 About
+# 	Run Keyword And Ignore Error 	Click Tab 	 Run
+# 	Press Combination 	Key.esc
+# 	Press Combination 	x 	Key.ctrl
+# 	Sleep	5
+# 	${running}= 	Is Process Running 	${process_manager}
+# 	IF 	${running}
+# 		Press Combination 	Key.esc
+# 		Press Combination 	x 	Key.ctrl
+# 		Sleep	3
+# 		Run Keyword And Ignore Error 	Click Dialog Button		no 		10
+# 	END
+# 	${result}= 		Wait For Process 	${process_manager} 	timeout=55
+# 	${running}= 	Is Process Running 	${process_manager}
+# 	IF 	not ${running}
+# 		Log		${result.stdout}
+# 		Log		${result.stderr}
+# 		Should Be Equal As Integers 	${result.rc} 	0
+# 	ELSE
+# 		Take A Screenshot
+# 		${result} = 	Terminate Process		${process_manager}
+# 		Log 	${result.stdout}
+# 		Log 	${result.stderr}
+# 		${running}= 	Is Process Running 	${process_manager}
+# 		Take A Screenshot
+# 		IF 	${running}
+# 			Fail
+# 		END
+# 	END
+# 	Kill Manager If Still Running
+# 	# stdout=${OUTPUT DIR}${/}stdout_manager.txt    stderr=${OUTPUT DIR}${/}stderr_manager.txt
+# 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+# 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 
 Close Manager GUI macos
-	[Tags]	macos-latest
-	# Sleep	3
-	${running}= 	Is Process Running 	${process_manager}
-	IF 	${running}
-		Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
-		Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
-		# make sure the window is the active window first, Unlikely the about tab has been selected
-		Run Keyword And Ignore Error 	Click Tab 	 About
-		Run Keyword And Ignore Error 	Click Tab 	 Run
-		# Click Image		manager_${platform}_titlebar_rfswarm.png
-		Click Button	closewindow
-		# Sleep	3
-		Run Keyword And Ignore Error 	Click Dialog Button		no 		1
-	END
-	${result}= 		Wait For Process 	${process_manager} 	timeout=55
-	${running}= 	Is Process Running 	${process_manager}
-	IF 	not ${running}
-		Log 	${result.stdout}
-		Log 	${result.stderr}
-		Should Be Equal As Integers 	${result.rc} 	0
-		Take A Screenshot
-		Log		${result.stdout}
-		Log		${result.stderr}
-		Should Be Equal As Integers 	${result.rc} 	0
-	ELSE
-		Take A Screenshot
-		${result} = 	Terminate Process		${process_manager}
-		Log 	${result.stdout}
-		Log 	${result.stderr}
-		${running}= 	Is Process Running 	${process_manager}
-		Take A Screenshot
-		IF 	${running}
-			Fail
-		END
-	END
-	Kill Manager If Still Running
-	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	Close Manager GUI
+
+# Close Manager GUI macos old
+# 	[Tags]	macos-latest
+# 	# Sleep	3
+# 	${running}= 	Is Process Running 	${process_manager}
+# 	IF 	${running}
+# 		Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
+# 		Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
+# 		# make sure the window is the active window first, Unlikely the about tab has been selected
+# 		Run Keyword And Ignore Error 	Click Tab 	 About
+# 		Run Keyword And Ignore Error 	Click Tab 	 Run
+# 		# Click Image		manager_${platform}_titlebar_rfswarm.png
+# 		Click Button	closewindow
+# 		# Sleep	3
+# 		Run Keyword And Ignore Error 	Click Dialog Button		no 		1
+# 	END
+# 	${result}= 		Wait For Process 	${process_manager} 	timeout=55
+# 	${running}= 	Is Process Running 	${process_manager}
+# 	IF 	not ${running}
+# 		Log 	${result.stdout}
+# 		Log 	${result.stderr}
+# 		Should Be Equal As Integers 	${result.rc} 	0
+# 		Take A Screenshot
+# 		Log		${result.stdout}
+# 		Log		${result.stderr}
+# 		Should Be Equal As Integers 	${result.rc} 	0
+# 	ELSE
+# 		Take A Screenshot
+# 		${result} = 	Terminate Process		${process_manager}
+# 		Log 	${result.stdout}
+# 		Log 	${result.stderr}
+# 		${running}= 	Is Process Running 	${process_manager}
+# 		Take A Screenshot
+# 		IF 	${running}
+# 			Fail
+# 		END
+# 	END
+# 	Kill Manager If Still Running
+# 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+# 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 
 Kill Manager If Still Running
 	Kill If Still Running 	${cmd_manager}
 
-Stop Agent
-	${running}= 	Is Process Running 	${process_agent}
-	IF 	${running}
-		Sleep	3s
-		IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
-			${result} = 	Terminate Process		${process_agent}
-		ELSE
-			Send Signal To Process 	SIGINT 	${process_agent}
-			${result}= 	Wait For Process 	${process_agent}	timeout=30	on_timeout=kill
-		END
-		Log		${result.stdout}
-		Log		${result.stderr}
-		# Should Be Equal As Integers 	${result.rc} 	0
-	END
+# Stop Agent old
+# 	${running}= 	Is Process Running 	${process_agent}
+# 	IF 	${running}
+# 		Sleep	3s
+# 		IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
+# 			${result} = 	Terminate Process		${process_agent}
+# 		ELSE
+# 			Send Signal To Process 	SIGINT 	${process_agent}
+# 			${result}= 	Wait For Process 	${process_agent}	timeout=30	on_timeout=kill
+# 		END
+# 		Log		${result.stdout}
+# 		Log		${result.stderr}
+# 		# Should Be Equal As Integers 	${result.rc} 	0
+# 	END
 
-	Kill Agent If Still Running
-	#	 stdout=${OUTPUT DIR}${/}stdout_agent.txt    stderr=${OUTPUT DIR}${/}stderr_agent.txt
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+# 	Kill Agent If Still Running
+# 	#	 stdout=${OUTPUT DIR}${/}stdout_agent.txt    stderr=${OUTPUT DIR}${/}stderr_agent.txt
+# 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+# 	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
 
 Kill Agent If Still Running
 	Kill If Still Running 	${cmd_agent}
@@ -1749,6 +1749,350 @@ Navigate to and check Desktop Icon For Ubuntu
 
 	Press Combination 	KEY.ESC
 
+### 1.6.0 ###
+
+Handle Donation Reminder
+	${comp}= 	Convert To Lower Case 	${COMPONENT_NAME}
+	IF  '${COMPONENT}' == 'Manager'
+		Run Keyword And Ignore Error 	Wait For 	manager_${PLATFORM}_button_runscriptrow.png 	timeout=12
+		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3
+		Run Keyword And Ignore Error 	Wait For 	manager_${PLATFORM}_button_runscriptrow.png 	timeout=8
+	ELSE IF  '${COMPONENT}' == 'Reporter'
+		Run Keyword And Ignore Error 	Wait For 	reporter_${PLATFORM}_button_generateexcel.png 	timeout=12
+		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3
+		Run Keyword And Ignore Error 	Wait For 	reporter_${PLATFORM}_button_generateexcel.png 	timeout=8
+	END
+
+	IF  not ${found}
+		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		4
+	END
+	VAR 	${DonationReminder} 	${found} 		scope=TEST
+
+Handle MacOS Pop-ups
+	[Tags]  macos-latest
+	[Documentation]  The MacOS system sometimes displays pop-up windows related to permissions. This keyword is intended to accept/ignore these pop-up windows.
+	[Setup] 	Sleep 	2s
+	Take A Screenshot
+	
+	VAR 	${img} 	macos_dlgbtn_allow_grayed.png
+	# Run Keyword And Ignore Error
+	# ...    Wait For 	${img} 	 timeout=2
+
+	Run Keyword And Ignore Error
+	...    Click Image 	${img}
+
+	VAR 	${img} 	macos_dlgbtn_allow.png
+	Sleep 	2s
+	# Run Keyword And Ignore Error
+	# ...    Wait For 	${img} 	 timeout=2
+
+	${result}= 	Run Keyword And Return Status
+	...    Click Image 	${img}
+
+	VAR 	${img} 	macos_dlgbtn_ignore.png
+	Sleep 	2s
+	Run Keyword And Ignore Error
+	...    Click Image 	${img}
+
+	Sleep 	0.1
+
+Convert To Save Path
+	[Arguments] 	${path}
+	${safe_path} 		Evaluate 	re.sub(r'[<>:"/\\|?*]', '_', "${path}".replace(' ', '_')).replace(chr(0), '_').rstrip(' .')[:60] 	modules=re
+
+	RETURN 	${safe_path}
+
+Open Agent
+	[Arguments] 	@{appargs}
+	Run Agent CLI 	${appargs}
+
+Run ${component_name} CLI
+	[Documentation] 	Open one of the RFSwarm applications for CLI purposes. Pass the: Manager, Reporter or Agent
+	[Arguments] 	@{appargs}  ${noargs}=${False}  ${envargs}=${None}
+	${comp} 	Convert To Lower Case 	${component_name}
+	${len} 		Get Length 	${appargs}
+
+	IF  ${noargs} == ${False}
+		IF  '${component_name}' == 'Manager' and ${len} == ${0} #( '-d' not in ${appargs} and '--dir' not in ${appargs} )
+			Append To List 	${appargs} 	-d 	${RESULTS_DIR}
+		ELSE IF  '${component_name}' == 'Manager' and ${len} != ${0} and ( '-d' not in ${appargs} and '--dir' not in ${appargs} )
+			Create Manager INI File If It Does Not Exist
+			Change Manager INI Option 	Run 	resultsdir 	${RESULTS_DIR}
+		ELSE IF  '${component_name}' == 'Agent' and ( '-d' not in ${appargs} and '--agentdir' not in ${appargs} )
+			Append To List 	${appargs} 	-d 	${AGENT_DIR}
+			Create Directory 	${AGENT_DIR}
+			TRY
+				Empty Directory 	${AGENT_DIR}
+			EXCEPT
+				Log 	Failed to empty Agent dir: ${AGENT_DIR}
+			END
+		END
+	END
+
+	Log 	${\n}Starting ${component_name} ... 	console=${True}
+	${args}= 	Evaluate 	" ".join(@{appargs})
+	Log 	\t\${args}: ${args} 	console=${True}
+
+	${tname} 		Convert To Save Path 	${TEST NAME}
+	Create Directory 	${OUTPUT DIR}${/}stdout${/}${tname}${/}
+	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt
+	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+	${process}= 	Start Process 	${CMD_${comp}}  @{appargs}  alias=${component_name}
+	...    stdout=${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+	...    env=${envargs}
+
+	Log 	${process}
+	VAR 	${PROCESS_${comp}} 		${process} 	scope=SUITE
+
+	${result}= 	Wait Until Keyword Succeeds 	45sec 	500ms 	Process Should Be Running 	${process}
+
+	${running}= 	Is Process Running 	${PROCESS_${comp}}
+	IF 	not ${running}
+		${result}= 	Get Process Result 	${PROCESS_${comp}}
+
+		Log		rc: ${result.rc} 		console=True
+		Log		stdout_path: ${result.stdout_path} 		console=True
+		Log		stderr_path: ${result.stderr_path} 		console=True
+
+		Show Log 	${result.stdout_path}
+		Show Log 	${result.stderr_path}
+
+		Fail 		${component_name} didn't start!
+
+	END
+
+	Log 	*=== ${component_name} started ===* 	console=${True}
+
+Stop Agent
+	Stop Agent CLI
+
+Stop ${component_name} CLI
+	[Documentation] 	Closes one of the RFSwarm applications with CLI only. Pass the: Manager, Reporter or Agent
+	${comp} 	Convert To Lower Case 	${component_name}
+
+	${running}= 	Is Process Running 	${PROCESS_${comp}}
+	IF 	${running}
+		Sleep	1s
+		IF  '${PLATFORM}' == 'windows'	# Send Signal To Process keyword does not work on Windows
+			${result}= 	Terminate Process 	${PROCESS_${comp}}
+		ELSE
+			Send Signal To Process 	SIGINT 	${PROCESS_${comp}}
+			${result}= 	Wait For Process 	${PROCESS_${comp}} 	timeout=30 	on_timeout=kill
+		END
+	ELSE
+		Log 	${component_name} is not running! 	console=${True}
+		TRY
+			${result}= 	Get Process Result 	${PROCESS_${comp}}
+		EXCEPT 	AS 	${error}
+			Log 	error: ${error} 		console=true
+		END
+
+		RETURN
+	END
+
+	Log 	*=== ${component_name} closed with CLI signal ===* 	console=${True}
+	TRY
+		Log 	${component_name} exited with: ${result.rc} 	console=${True}
+		# Should Be Equal As Integers 	${result.rc} 	0
+
+		Log		stdout_path: ${result.stdout_path} 		console=True
+		Log		stderr_path: ${result.stderr_path} 		console=True
+
+		Show Log 	${result.stdout_path}
+		Show Log 	${result.stderr_path}
+
+	EXCEPT 	AS 	${error}
+		Log 	error: ${error} 		console=true
+
+	END
+
+	Sleep 	0.5
+	${running}= 	Is Process Running 	${PROCESS_${comp}}
+	Run Keyword If 	${running} 	Fail 	Failed to close ${component_name}
+
+	[Teardown] 	Set Suite Variable 	${PROCESS_${comp}} 	${None}
+
+Open Manager GUI
+	[Documentation] 	Open one of the RFSwarm applications for GUI purposes. Pass the: Manager, Reporter or Agent
+	[Arguments] 	@{appargs}  ${envargs}=${None}
+	${comp} 	Convert To Lower Case 	${component_name}
+	${var}= 	Get Variables
+	Log 	${var}
+
+	Press Combination 	Key.esc
+	Wiggle Mouse
+
+	VAR 	${noargs} 	${False}
+	${len} 	Get Length 	${appargs}
+	IF  ${len} == ${0}
+		VAR 	${noargs} 	${True}
+	END
+
+	Run Keyword 	Run ${component_name} CLI 	@{appargs}  noargs=${noargs}  envargs=${envargs}
+
+	IF 	'-n' in ${appargs} or '--nogui' in ${appargs}
+		Sleep 	5
+	ELSE
+		IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
+		Handle Donation Reminder
+		IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
+
+		${running}= 	Is Process Running 	${PROCESS_${comp}}
+		IF 	not ${running}
+			Take A Screenshot
+			Fail 		${component_name} not running
+		END
+	END
+
+Close Manager GUI
+	[Documentation] 	Closes one of the RFSwarm applications with GUI. Pass the: Manager or Reporter
+	${comp} 	Convert To Lower Case 	${component_name}
+	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 	0.01
+	Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
+
+	IF 	${PROCESS_${comp}}
+		${running}= 	Is Process Running 	${PROCESS_${comp}}
+		IF 	${running}
+			Log 	${\n}Closing ${component_name} GUI ... 	console=True
+
+			# make sure the window is the active window first
+			IF 	'${component_name}' == 'Manager'
+				Run Keyword And Ignore Error 	Click Image 	manager_${PLATFORM}_tab_about.png
+				Run Keyword And Ignore Error 	Click Image 	manager_${PLATFORM}_tab_run.png
+			ELSE IF 	'${component_name}' == 'Reporter'
+				IF  '${PLATFORM}' == 'macos'
+					Run Keyword And Ignore Error 	Click Button With Vertical Offset 	OpenTemplate 	offset=-20 	timeout=1
+				ELSE
+					Run Keyword And Ignore Error 	Click Image 	reporter_${PLATFORM}_menu_results.png
+				END
+			END
+
+			Sleep 	1
+			Press Key.esc 3 Times
+			Sleep 	1
+			IF  '${PLATFORM}' == 'macos'  Press Combination  Key.command  q  ELSE  Press Combination  Key.ctrl  x
+			Sleep	3
+
+			${running}= 	Is Process Running 	${PROCESS_${comp}}
+			IF 	${running}
+				Press Combination 	Key.esc
+				IF  '${PLATFORM}' == 'macos'  Press Combination  Key.command  q  ELSE  Press Combination  Key.ctrl  x
+			END
+
+		ELSE
+			Log 	${component_name} is not running! 	console=True
+			${result}= 	Wait For Process 	${PROCESS_${comp}} 	timeout=60
+			# Should Be Equal As Integers 	${result.rc} 	0
+
+			RETURN
+		END
+
+		Sleep 	2s
+		Run Keyword And Ignore Error 	Click Dialog Button 	no 		1
+
+		${result}= 		Wait For Process 	${process_${comp}} 	timeout=15
+		${running}= 	Is Process Running 	${PROCESS_${comp}}
+		IF 	not ${running}
+			Log 	*=== ${component_name} closed with GUI ===* 	console=True
+			TRY
+				Log 	${component_name} exited with: ${result.rc} 	console=${True}
+				# Should Be Equal As Integers 	${result.rc} 	0
+
+				Log		stdout_path: ${result.stdout_path} 		console=True
+				Log		stderr_path: ${result.stderr_path} 		console=True
+
+				Show Log 	${result.stdout_path}
+				Show Log 	${result.stderr_path}
+
+			EXCEPT 	AS 	${error}
+				Log 	error: ${error} 		console=true
+			END
+
+		ELSE
+			Log 	Closing GUI with CLI 	console=True
+			Take A Screenshot
+			Run Keyword 	Stop ${component_name} CLI 	# close with cli signal
+			RETURN
+		END
+
+	END
+
+	Sleep 	0.5
+	${running}= 	Is Process Running 	${PROCESS_${comp}}
+	Run Keyword If 	${running} 	Fail 	Failed to close ${component_name}
+
+	[Teardown] 	Set Suite Variable 	${PROCESS_${comp}} 	${None}
+
+Create Manager INI File If It Does Not Exist
+	[Documentation] 	Pass the: Manager, Reporter or Agent
+	VAR 	${component_name} 	Manager
+	${location}= 	Get Manager INI Location
+	${comp} 	Convert To Lower Case 	${component_name}
+
+	TRY
+		File Should Exist	${location}
+		File Should Not Be Empty	${location}
+	EXCEPT
+		Log 	INI file for ${component_name} does not exist or it's empty. Creating new one. 	console=True
+
+		IF  '${component_name}' == 'Manager'
+			${process}= 	Start Process  rfswarm-manager  -n
+		ELSE IF  '${component_name}' == 'Agent'
+			${process}= 	Start Process  rfswarm-agent
+		ELSE IF  '${component_name}' == 'Reporter'
+			${process}= 	Start Process  rfswarm-reporter  -n
+		END
+		Wait For File To Exist 	${location}
+		Sleep 	5s
+		${result}= 	Terminate Process 	${process}
+
+		File Should Exist 	${location}
+		File Should Not Be Empty 	${location}
+	END
+
+Handle RFSwarm GUI Pop-ups
+	[Documentation] 	This keyword is intended to get rid of pop-ups displayed by rfswarm apps.
+	VAR 	${status} 	${true}
+
+	TRY
+		Take A Screenshot
+		IF  '${PLATFORM}' == 'macos'
+			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok_3 	timeout=5
+		ELSE
+			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok 	timeout=5
+		END
+
+		IF  '${PLATFORM}' == 'macos' and not ${status}
+			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok_2 	timeout=1
+			Sleep 	1s
+			IF  ${status}  Click
+		END
+
+		IF  not ${status}  Fail
+
+	EXCEPT
+		Take A Screenshot
+		Run Keyword And Ignore Error 	Click Dialog Button 	ok 	timeout=1
+		IF  '${PLATFORM}' == 'macos'  Run Keyword And Ignore Error 	Click Dialog Button 	ok_2 	timeout=1
+
+		Press key.enter 1 Times
+		Sleep 	1
+		Press key.enter 1 Times
+	END
+	Press key.enter 1 Times
+
+Wait For the Agent To Be Ready
+	[Arguments] 	${timeout}=300
+	Click Tab	Agents
+	VAR 	${img} 	manager_${PLATFORM}_agents_ready.png
+	${status}= 	Run Keyword And Return Status 	Wait For 	${img}	timeout=${timeout}
+
+	IF  not ${status} and '${PLATFORM}' == 'macos'
+		VAR 	${img} 	manager_${PLATFORM}_agents_warning.png
+		${status}= 	Run Keyword And Return Status 	Wait For 	${img}	timeout=10
+	END
+
+	IF  not ${status}  Fail  Agent is not ready after ${timeout} seconds.
 
 
 

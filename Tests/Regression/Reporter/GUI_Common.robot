@@ -14,6 +14,7 @@ Library 	read_docx.py
 Library 	read_xlsx.py
 Library 	save_html_image.py
 Library 	img_common.py
+Library 	ini_file_r.py
 
 Variables 	report_expected_data.yaml
 
@@ -1722,7 +1723,286 @@ Release Fn Key
 
 	END
 
+### v1.6.0 ###
 
+Handle Donation Reminder
+	${comp}= 	Convert To Lower Case 	${COMPONENT_NAME}
+	IF  '${COMPONENT}' == 'Manager'
+		Run Keyword And Ignore Error 	Wait For 	manager_${PLATFORM}_button_runscriptrow.png 	timeout=12
+		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3
+		Run Keyword And Ignore Error 	Wait For 	manager_${PLATFORM}_button_runscriptrow.png 	timeout=8
+	ELSE IF  '${COMPONENT}' == 'Reporter'
+		Run Keyword And Ignore Error 	Wait For 	reporter_${PLATFORM}_button_generateexcel.png 	timeout=12
+		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3
+		Run Keyword And Ignore Error 	Wait For 	reporter_${PLATFORM}_button_generateexcel.png 	timeout=8
+	END
+
+	IF  not ${found}
+		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		4
+	END
+	VAR 	${DonationReminder} 	${found} 		scope=TEST
+
+Handle RFSwarm GUI Pop-ups
+	[Documentation] 	This keyword is intended to get rid of pop-ups displayed by rfswarm apps.
+	VAR 	${status} 	${true}
+
+	TRY
+		Take A Screenshot
+		IF  '${PLATFORM}' == 'macos'
+			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok_3 	timeout=5
+		ELSE
+			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok 	timeout=5
+		END
+
+		IF  '${PLATFORM}' == 'macos' and not ${status}
+			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok_2 	timeout=1
+			Sleep 	1s
+			IF  ${status}  Click
+		END
+
+		IF  not ${status}  Fail
+
+	EXCEPT
+		Take A Screenshot
+		Run Keyword And Ignore Error 	Click Dialog Button 	ok 	timeout=1
+		IF  '${PLATFORM}' == 'macos'  Run Keyword And Ignore Error 	Click Dialog Button 	ok_2 	timeout=1
+
+		Press key.enter 1 Times
+		Sleep 	1
+		Press key.enter 1 Times
+	END
+	Press key.enter 1 Times
+
+Handle MacOS Pop-ups
+	[Tags]  macos-latest
+	[Documentation]  The MacOS system sometimes displays pop-up windows related to permissions. This keyword is intended to accept/ignore these pop-up windows.
+	[Setup] 	Sleep 	2s
+	Take A Screenshot
+	
+	VAR 	${img} 	macos_dlgbtn_allow_grayed.png
+	# Run Keyword And Ignore Error
+	# ...    Wait For 	${img} 	 timeout=2
+
+	Run Keyword And Ignore Error
+	...    Click Image 	${img}
+
+	VAR 	${img} 	macos_dlgbtn_allow.png
+	Sleep 	2s
+	# Run Keyword And Ignore Error
+	# ...    Wait For 	${img} 	 timeout=2
+
+	${result}= 	Run Keyword And Return Status
+	...    Click Image 	${img}
+
+	VAR 	${img} 	macos_dlgbtn_ignore.png
+	Sleep 	2s
+	Run Keyword And Ignore Error
+	...    Click Image 	${img}
+
+	Sleep 	0.1
+
+Open GUI ${platform}
+	[Documentation] 	Open one of the RFSwarm applications for GUI purposes. Pass the: Manager, Reporter or Agent
+	[Arguments] 	@{appargs}  ${envargs}=${None}
+	${comp} 	Convert To Lower Case 	${component_name}
+	${var}= 	Get Variables
+	Log 	${var}
+
+	Press Combination 	Key.esc
+	Wiggle Mouse
+
+	VAR 	${noargs} 	${False}
+	${len} 	Get Length 	${appargs}
+	IF  ${len} == ${0}
+		VAR 	${noargs} 	${True}
+	END
+
+	Run Keyword 	Run ${component_name} CLI 	@{appargs}  noargs=${noargs}  envargs=${envargs}
+
+	IF 	'-n' in ${appargs} or '--nogui' in ${appargs}
+		Sleep 	5
+	ELSE
+		IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
+		Handle Donation Reminder
+		IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
+
+		${running}= 	Is Process Running 	${PROCESS_${comp}}
+		IF 	not ${running}
+			Take A Screenshot
+			Fail 		${component_name} not running
+		END
+	END
+
+Close GUI ${platform}
+	[Documentation] 	Closes one of the RFSwarm applications with GUI. Pass the: Manager or Reporter
+	${comp} 	Convert To Lower Case 	${component_name}
+	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 	0.01
+	Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
+
+	IF 	${PROCESS_${comp}}
+		${running}= 	Is Process Running 	${PROCESS_${comp}}
+		IF 	${running}
+			Log 	${\n}Closing ${component_name} GUI ... 	console=True
+
+			# make sure the window is the active window first
+			IF 	'${component_name}' == 'Manager'
+				Run Keyword And Ignore Error 	Click Image 	manager_${PLATFORM}_tab_about.png
+				Run Keyword And Ignore Error 	Click Image 	manager_${PLATFORM}_tab_run.png
+			ELSE IF 	'${component_name}' == 'Reporter'
+				IF  '${PLATFORM}' == 'macos'
+					Run Keyword And Ignore Error 	Click Button With Vertical Offset 	OpenTemplate 	offset=-20 	timeout=1
+				ELSE
+					Run Keyword And Ignore Error 	Click Image 	reporter_${PLATFORM}_menu_results.png
+				END
+			END
+
+			Sleep 	1
+			Press Key.esc 3 Times
+			Sleep 	1
+			IF  '${PLATFORM}' == 'macos'  Press Combination  Key.command  q  ELSE  Press Combination  Key.ctrl  x
+			Sleep	3
+
+			${running}= 	Is Process Running 	${PROCESS_${comp}}
+			IF 	${running}
+				Press Combination 	Key.esc
+				IF  '${PLATFORM}' == 'macos'  Press Combination  Key.command  q  ELSE  Press Combination  Key.ctrl  x
+			END
+
+		ELSE
+			Log 	${component_name} is not running! 	console=True
+			${result}= 	Wait For Process 	${PROCESS_${comp}} 	timeout=60
+			# Should Be Equal As Integers 	${result.rc} 	0
+
+			RETURN
+		END
+
+		Sleep 	2s
+		Run Keyword And Ignore Error 	Click Dialog Button 	no 		1
+
+		${result}= 		Wait For Process 	${process_${comp}} 	timeout=15
+		${running}= 	Is Process Running 	${PROCESS_${comp}}
+		IF 	not ${running}
+			Log 	*=== ${component_name} closed with GUI ===* 	console=True
+			TRY
+				Log 	${component_name} exited with: ${result.rc} 	console=${True}
+				# Should Be Equal As Integers 	${result.rc} 	0
+
+				Log		stdout_path: ${result.stdout_path} 		console=True
+				Log		stderr_path: ${result.stderr_path} 		console=True
+
+				Show Log 	${result.stdout_path}
+				Show Log 	${result.stderr_path}
+
+			EXCEPT 	AS 	${error}
+				Log 	error: ${error} 		console=true
+			END
+
+		ELSE
+			Log 	Closing GUI with CLI 	console=True
+			Take A Screenshot
+			Run Keyword 	Stop ${component_name} CLI 	# close with cli signal
+			RETURN
+		END
+
+	END
+
+	Sleep 	0.5
+	${running}= 	Is Process Running 	${PROCESS_${comp}}
+	Run Keyword If 	${running} 	Fail 	Failed to close ${component_name}
+
+	[Teardown] 	Set Suite Variable 	${PROCESS_${comp}} 	${None}
+
+Convert To Save Path
+	[Arguments] 	${path}
+	${safe_path} 		Evaluate 	re.sub(r'[<>:"/\\|?*]', '_', "${path}".replace(' ', '_')).replace(chr(0), '_').rstrip(' .')[:60] 	modules=re
+
+	RETURN 	${safe_path}
+
+Run ${component_name} CLI
+	[Documentation] 	Open one of the RFSwarm applications for CLI purposes. Pass the: Manager, Reporter or Agent
+	[Arguments] 	@{appargs}  ${noargs}=${False}  ${envargs}=${None}
+	${comp} 	Convert To Lower Case 	${component_name}
+	${len} 		Get Length 	${appargs}
+
+	Log 	${\n}Starting ${component_name} ... 	console=${True}
+	${args}= 	Evaluate 	" ".join(@{appargs})
+	Log 	\t\${args}: ${args} 	console=${True}
+
+	${tname} 		Convert To Save Path 	${TEST NAME}
+	Create Directory 	${OUTPUT DIR}${/}stdout${/}${tname}${/}
+	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt
+	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+	${process}= 	Start Process 	${CMD_${comp}}  @{appargs}  alias=${component_name}
+	...    stdout=${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+	...    env=${envargs}
+
+	Log 	${process}
+	VAR 	${PROCESS_${comp}} 		${process} 	scope=SUITE
+
+	${result}= 	Wait Until Keyword Succeeds 	45sec 	500ms 	Process Should Be Running 	${process}
+
+	${running}= 	Is Process Running 	${PROCESS_${comp}}
+	IF 	not ${running}
+		${result}= 	Get Process Result 	${PROCESS_${comp}}
+
+		Log		rc: ${result.rc} 		console=True
+		Log		stdout_path: ${result.stdout_path} 		console=True
+		Log		stderr_path: ${result.stderr_path} 		console=True
+
+		Show Log 	${result.stdout_path}
+		Show Log 	${result.stderr_path}
+
+		Fail 		${component_name} didn't start!
+
+	END
+
+	Log 	*=== ${component_name} started ===* 	console=${True}
+
+Stop ${component_name} CLI
+	[Documentation] 	Closes one of the RFSwarm applications with CLI only. Pass the: Manager, Reporter or Agent
+	${comp} 	Convert To Lower Case 	${component_name}
+
+	${running}= 	Is Process Running 	${PROCESS_${comp}}
+	IF 	${running}
+		Sleep	1s
+		IF  '${PLATFORM}' == 'windows'	# Send Signal To Process keyword does not work on Windows
+			${result}= 	Terminate Process 	${PROCESS_${comp}}
+		ELSE
+			Send Signal To Process 	SIGINT 	${PROCESS_${comp}}
+			${result}= 	Wait For Process 	${PROCESS_${comp}} 	timeout=30 	on_timeout=kill
+		END
+	ELSE
+		Log 	${component_name} is not running! 	console=${True}
+		TRY
+			${result}= 	Get Process Result 	${PROCESS_${comp}}
+		EXCEPT 	AS 	${error}
+			Log 	error: ${error} 		console=true
+		END
+
+		RETURN
+	END
+
+	Log 	*=== ${component_name} closed with CLI signal ===* 	console=${True}
+	TRY
+		Log 	${component_name} exited with: ${result.rc} 	console=${True}
+		# Should Be Equal As Integers 	${result.rc} 	0
+
+		Log		stdout_path: ${result.stdout_path} 		console=True
+		Log		stderr_path: ${result.stderr_path} 		console=True
+
+		Show Log 	${result.stdout_path}
+		Show Log 	${result.stderr_path}
+
+	EXCEPT 	AS 	${error}
+		Log 	error: ${error} 		console=true
+
+	END
+
+	Sleep 	0.5
+	${running}= 	Is Process Running 	${PROCESS_${comp}}
+	Run Keyword If 	${running} 	Fail 	Failed to close ${component_name}
+
+	[Teardown] 	Set Suite Variable 	${PROCESS_${comp}} 	${None}
 
 
 
