@@ -168,8 +168,7 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 
 	[Teardown]	Run Keywords	Stop Agent	Stop Manager
 
-Verify If Agent Name Has Been Transferred To Library 	XML
-the Manager (ini file)
+Verify If Agent Name Has Been Transferred To the Manager (ini file)
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #100
 
 	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#100${/}ini_file
@@ -197,10 +196,10 @@ the Manager (ini file)
 Verify listener doesn't generate KeyError when using inject sleep
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #392
 
-	VAR 	${results_dir} 		${OUTPUT DIR}${/}results${/}Issue-#392
+	VAR 	${results_dir} 		${OUTPUT DIR}${/}results
 	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#392
-	VAR 	${scenariofile} 	${test_dir}${/}scenario.rfs
-	VAR 	${dbfile} 			${results_dir}${/}PreRun${/}PreRun.db
+	VAR 	${scenariofile} 	${test_dir}${/}Issue-#392.rfs
+	# VAR 	${dbfile} 			${results_dir}${/}PreRun${/}PreRun.db
 	VAR 	@{agnt_options} 	-g 	1
 	VAR 	@{mngr_options} 	-n 	-s 	${scenariofile} 	-d 	${results_dir}
 
@@ -208,11 +207,11 @@ Verify listener doesn't generate KeyError when using inject sleep
 	Log To Console	Run Agent with custom agent name.
 	Run Agent 	${agnt_options}
 	Run Manager CLI 	${mngr_options}
-	Sleep	20s
+	Wait For Manager
 	Stop Agent
-	Stop Manager
+	# Stop Manager
 
-	${dbfile}= 	Find Result DB
+	${dbfile}= 	Find Result DB 		*_Issue-#392
 	${dbpath} 	${dbfilename}= 	Split Path 	${dbfile}
 
 	@{xmlfiles} = 	List Files In Directory 	${dbpath}${/}logs 	*.xml 	absolute
