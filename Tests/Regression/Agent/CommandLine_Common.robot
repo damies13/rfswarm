@@ -5,6 +5,7 @@ Library 	DatabaseLibrary
 Library 	String
 Library 	Collections
 Library 	HttpCtrl.Server
+Library 	XML
 
 *** Variables ***
 ${cmd_agent} 		rfswarm-agent

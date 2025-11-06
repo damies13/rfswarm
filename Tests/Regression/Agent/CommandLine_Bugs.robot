@@ -168,7 +168,8 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 
 	[Teardown]	Run Keywords	Stop Agent	Stop Manager
 
-Verify If Agent Name Has Been Transferred To the Manager (ini file)
+Verify If Agent Name Has Been Transferred To Library 	XML
+the Manager (ini file)
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #100
 
 	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#100${/}ini_file
@@ -190,5 +191,41 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 	${len}= 	Get Length 	${query_result}
 	Should Be True 	${len} > 0
 	...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}
+
+	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+
+Verify listener doesn't generate KeyError when using inject sleep
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #392
+
+	var 	${results_dir} 		${OUTPUT DIR}${/}results${/}Issue-#392
+	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#392
+	VAR 	${scenariofile} 	${test_dir}${/}scenario.rfs
+	VAR 	${dbfile} 			${results_dir}${/}PreRun${/}PreRun.db
+	VAR 	@{agnt_options} 	-g 	1
+	VAR 	@{mngr_options} 	-n 	-s 	${scenariofile} 	-d 	${results_dir}
+
+	Create Directory 	${results_dir}
+	Log To Console	Run Agent with custom agent name.
+	Run Agent 	${agnt_options}
+	Run Manager CLI 	${mngr_options}
+	Sleep	20s
+	Stop Agent
+	Stop Manager
+
+	${dbfile}= 	Find Result DB
+	${dbpath} 	${dbfilename}= 	Split Path 	${dbfile}
+
+	@{xmlfiles} = 	List Files In Directory 	${dbpath}${/}logs 	*.xml 	absolute
+
+	Log  	xmlfiles: ${xmlfiles} 	console=true
+
+	${root}= 	Parse XML 	${xmlfiles}[0]
+
+	# Log To Console 	Checking PreRun data base.
+	# ${query_result} 	Query Result DB 	${dbfile}
+	# ...    SELECT * FROM AgentList WHERE AgentName='Issue-#100AGENTNAME'
+	# ${len}= 	Get Length 	${query_result}
+	# Should Be True 	${len} > 0
+	# ...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}
 
 	[Teardown]	Run Keywords	Stop Agent	Stop Manager
