@@ -149,13 +149,13 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#100${/}command_line
 	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
 	VAR 	@{agnt_options} 	-a 	Issue-#100AGENTNAME
-	VAR 	@{mngr_options} 	-n 	-d 	${test_dir}
+	VAR 	@{mngr_options} 	-n 	-d 	${test_dir} 	-a 	2
 
 	Create Directory 	${test_dir}
 	Log To Console	Run Agent with custom agent name.
 	Run Agent 	${agnt_options}
 	Run Manager CLI 	${mngr_options}
-	Sleep	20s
+	Sleep	30s
 	Stop Agent
 	Stop Manager
 
@@ -174,13 +174,13 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#100${/}ini_file
 	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
 	VAR 	@{agnt_options} 	-i 	${CURDIR}${/}testdata${/}Issue-#100${/}RFSwarmAgent.ini
-	VAR 	@{mngr_options} 	-n 	-d 	${test_dir}
+	VAR 	@{mngr_options} 	-n 	-d 	${test_dir} 	-a 	2
 
 	Create Directory 	${test_dir}
 	Log To Console	Run Agent with custom agent name.
 	Run Agent 	${agnt_options}
 	Run Manager CLI 	${mngr_options}
-	Sleep	20s
+	Sleep	30s
 	Stop Agent
 	Stop Manager
 
@@ -214,7 +214,10 @@ Verify listener doesn't generate KeyError when using inject sleep
 	${dbfile}= 	Find Result DB 		*_Issue-#392
 	${dbpath} 	${dbfilename}= 	Split Path 	${dbfile}
 
-	@{xmlfiles} = 	List Files In Directory 	${dbpath}${/}logs${/}* 	*.xml 	absolute
+	@{logdirs}= 	List Directories In Directory 	${dbpath}${/}logs
+	Log  	logdirs: ${logdirs} 	console=true
+
+	@{xmlfiles} = 	List Files In Directory 	${dbpath}${/}logs 	*${/}*.xml 	absolute
 
 	Log  	xmlfiles: ${xmlfiles} 	console=true
 
