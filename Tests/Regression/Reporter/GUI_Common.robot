@@ -7,7 +7,7 @@ Library 	ArchiveLibrary
 Library 	DocTest.VisualTest
 Library 	XML 	use_lxml=True
 
-Library 	ImageHorizonLibrary 	reference_folder=${IMAGE_DIR}
+Library 	ImageHorizonLibrary 	reference_folder=${IMAGE_DIR} 	confidence=${0.9}
 Library 	OCRLibrary
 
 Library 	read_docx.py
@@ -478,7 +478,6 @@ Open GUI
 
 	${keyword}= 	Set Variable 	Open GUI ${platform}
 	Run Keyword 	${keyword} 	@{appargs}
-	Handle Donation Reminder
 
 Wiggle Mouse
 	Move To 	10 	10

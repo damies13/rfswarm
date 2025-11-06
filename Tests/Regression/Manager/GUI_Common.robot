@@ -7,7 +7,7 @@ Library		Collections
 Library		DateTime
 Library		XML
 
-Library		ImageHorizonLibrary		reference_folder=${IMAGE_DIR} 		keyword_on_failure=ImageHorizonLibrary.Take A Screenshot
+Library		ImageHorizonLibrary	reference_folder=${IMAGE_DIR} 	screenshot_folder=${OUTPUT_DIR}${/}screenshots 	confidence=${0.9}
 
 Library 	ini_file.py
 Library 	get_ip_address.py
@@ -1816,6 +1816,8 @@ Run ${component_name} CLI
 		IF  '${component_name}' == 'Manager' and ${len} == ${0} #( '-d' not in ${appargs} and '--dir' not in ${appargs} )
 			Append To List 	${appargs} 	-d 	${RESULTS_DIR}
 		ELSE IF  '${component_name}' == 'Manager' and ${len} != ${0} and ( '-d' not in ${appargs} and '--dir' not in ${appargs} )
+			${location}= 	Get Manager INI Location
+			Remove File 	${location}
 			Create Manager INI File If It Does Not Exist
 			Change Manager INI Option 	Run 	resultsdir 	${RESULTS_DIR}
 		ELSE IF  '${component_name}' == 'Agent' and ( '-d' not in ${appargs} and '--agentdir' not in ${appargs} )

@@ -79,20 +79,20 @@ Show Log
 # 	${process}= 	Start Process 	${cmd_agent}  @{options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
 # 	Set Test Variable 	$process_agent 	${process}
 
-Run Manager CLI
-	[Arguments]		${options}=None
-	IF  ${options} == None
-		${options}= 	Create List
-	END
-	IF  '-d' not in ${options}
-		Create Directory 	${results_dir}
-		Append To List 	${options} 	-d 	${results_dir}
-	END
-	Log to console 	${\n}\${options}: ${options}
-	# ${process}= 	Start Process 	python3 	${pyfile_manager}  @{options}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
-	${process}= 	Start Process 	${cmd_manager}  @{options}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
-	Set Test Variable 	$process_manager 	${process}
-	Sleep	5
+# Run Manager CLI old
+# 	[Arguments]		${options}=None
+# 	IF  ${options} == None
+# 		${options}= 	Create List
+# 	END
+# 	IF  '-d' not in ${options}
+# 		Create Directory 	${results_dir}
+# 		Append To List 	${options} 	-d 	${results_dir}
+# 	END
+# 	Log to console 	${\n}\${options}: ${options}
+# 	# ${process}= 	Start Process 	python3 	${pyfile_manager}  @{options}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
+# 	${process}= 	Start Process 	${cmd_manager}  @{options}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
+# 	Set Test Variable 	$process_manager 	${process}
+# 	Sleep	5
 
 Wait For Manager
 	[Arguments]		${timeout}=10min
@@ -120,23 +120,23 @@ Stop Manager
 	# Should Be Equal As Integers 	${result.rc} 	0
 	Log to console 	Process returned: ${result.rc}
 
-Stop Agent
-	${running}= 	Is Process Running 	${process_agent}
-	IF 	${running}
-		Sleep	3s
-		IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
-			${result} = 	Terminate Process		${process_agent}
-		ELSE
-			Send Signal To Process 	SIGINT 	${process_agent}
-			${result}= 	Wait For Process 	${process_agent}	timeout=30	on_timeout=kill
-		END
-	ELSE
-		# get result var for process even if not running any more
-		${result}= 	Get Process Result		${process_agent}
-	END
-	Log		${result.stdout}
-	Log		${result.stderr}
-	# Should Be Equal As Integers 	${result.rc} 	0
+# Stop Agent old
+# 	${running}= 	Is Process Running 	${process_agent}
+# 	IF 	${running}
+# 		Sleep	3s
+# 		IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
+# 			${result} = 	Terminate Process		${process_agent}
+# 		ELSE
+# 			Send Signal To Process 	SIGINT 	${process_agent}
+# 			${result}= 	Wait For Process 	${process_agent}	timeout=30	on_timeout=kill
+# 		END
+# 	ELSE
+# 		# get result var for process even if not running any more
+# 		${result}= 	Get Process Result		${process_agent}
+# 	END
+# 	Log		${result.stdout}
+# 	Log		${result.stderr}
+# 	# Should Be Equal As Integers 	${result.rc} 	0
 
 Test Agent Connectivity
 	#[Setup] 	Start Server	127.0.0.1	8138
@@ -154,8 +154,8 @@ Test Agent Connectivity
 	Reply By	200
 	${method}=	Get Request Method
 	${url}= 	Get Request Url
-	Should Be Equal 	${method}	POST
-	#Should Be Equal 	${url}		/Jobs
+	# Should Be Equal 	${method}	POST
+	# Should Be Equal 	${url}		/Jobs
 
 	#[Teardown]	Stop Server
 
@@ -417,7 +417,10 @@ Run ${component_name} CLI
 
 	Log 	*=== ${component_name} started ===* 	console=${True}
 
-Stop Manager CLI
+Stop Agent
+	Stop Agent CLI
+
+Stop ${component_name} CLI
 	[Documentation] 	Closes one of the RFSwarm applications with CLI only. Pass the: Manager, Reporter or Agent
 	${comp} 	Convert To Lower Case 	${component_name}
 

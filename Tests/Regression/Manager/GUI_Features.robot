@@ -3362,9 +3362,9 @@ Verify That TPS Is TP And Not TPmS
 # 	VAR 	@{agnt_options_1} 	-a 	${agent_name_1}
 # 	VAR 	@{agnt_options_2} 	-a 	${agent_name_2}
 
-# 	Open Agent 			${agnt_options_1}
+# 	Open Agent 			@{agnt_options_1}
 # 	VAR 	${process_agent_1} 	${process_agent}
-# 	Open Agent 			${agnt_options_2}
+# 	Open Agent 			@{agnt_options_2}
 # 	VAR 	${process_agent_2} 	${process_agent}
 # 	Open Manager GUI 	@{mngr_options}
 
@@ -3397,9 +3397,9 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	VAR 	@{agnt_options_1} 	-a 	${agent_name_1}
 	VAR 	@{agnt_options_2} 	-a 	${agent_name_2}
 
-	Open Agent 			${agnt_options_1}
+	Open Agent 			@{agnt_options_1}
 	VAR 	${process_agent_1} 	${process_agent}
-	Open Agent 			${agnt_options_2}
+	Open Agent 			@{agnt_options_2}
 	VAR 	${process_agent_2} 	${process_agent}
 	Open Manager GUI 	@{mngr_options}
 
@@ -3475,9 +3475,9 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	VAR 	@{agnt_options_1} 	-a 	${agent_name_1}
 	VAR 	@{agnt_options_2} 	-a 	${agent_name_2}
 
-	Open Agent 			${agnt_options_1}
+	Open Agent 			@{agnt_options_1}
 	VAR 	${process_agent_1} 	${process_agent}
-	Open Agent 			${agnt_options_2}
+	Open Agent 			@{agnt_options_2}
 	VAR 	${process_agent_2} 	${process_agent}
 	Open Manager GUI 	@{mngr_options}
 
