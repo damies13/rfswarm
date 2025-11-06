@@ -148,7 +148,7 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 
 	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#100${/}command_line
 	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
-	VAR 	@{agnt_options} 	-a 	Issue-#100AGENTNAME
+	VAR 	@{agnt_options} 	-a 	Issue-#100AGENTNAME-a
 	VAR 	@{mngr_options} 	-n 	-d 	${test_dir} 	-a 	2
 
 	Create Directory 	${test_dir}
@@ -159,9 +159,12 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 	Stop Agent
 	Stop Manager
 
+	# make copy of prerun
+	Copy Directory 		${test_dir}${/}PreRun 		${OUTPUT DIR}${/}results${/}${TEST NAME}${/}PreRun 
+
 	Log To Console 	Checking PreRun data base.
 	${query_result} 	Query Result DB 	${dbfile}
-	...    SELECT * FROM AgentList WHERE AgentName='Issue-#100AGENTNAME'
+	...    SELECT * FROM AgentList WHERE AgentName='Issue-#100AGENTNAME-a'
 	${len}= 	Get Length 	${query_result}
 	Should Be True 	${len} > 0
 	...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}
@@ -184,9 +187,12 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 	Stop Agent
 	Stop Manager
 
+	# make copy of prerun
+	Copy Directory 		${test_dir}${/}PreRun 		${OUTPUT DIR}${/}results${/}${TEST NAME}${/}PreRun
+
 	Log To Console 	Checking PreRun data base.
 	${query_result} 	Query Result DB 	${dbfile}
-	...    SELECT * FROM AgentList WHERE AgentName='Issue-#100AGENTNAME'
+	...    SELECT * FROM AgentList WHERE AgentName='Issue-#100AGENTNAMEINI'
 	${len}= 	Get Length 	${query_result}
 	Should Be True 	${len} > 0
 	...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}
@@ -217,12 +223,15 @@ Verify listener doesn't generate KeyError when using inject sleep
 	@{logdirs}= 	List Directories In Directory 	${dbpath}${/}logs
 	Log  	logdirs: ${logdirs} 	console=true
 
-	@{xmlfiles} = 	List Files In Directory 	${dbpath}${/}logs 	*${/}*.xml 	absolute
+	@{xmlfiles} = 	List Files In Directory 	${logdirs}[0] 	*.xml 	absolute
 
 	Log  	xmlfiles: ${xmlfiles} 	console=true
 
 	# ${root}= 	Parse XML 	${xmlfiles}[0]
 	${errors}= 	Get Elements 	${xmlfiles}[0] 		//errors/msg
+
+	Log  	errors: ${errors} 	console=true
+
 
 	# Log To Console 	Checking PreRun data base.
 	# ${query_result} 	Query Result DB 	${dbfile}

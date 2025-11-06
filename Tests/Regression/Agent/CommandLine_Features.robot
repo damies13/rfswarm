@@ -78,7 +78,7 @@ Agent Command Line MANAGER -m
 Agent Command Line MANAGER --manager
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 
-	VAR 	@{agnt_options} 	--manager 	http://localhost:8138
+	VAR 	@{agnt_options} 	-g 	1 	--manager 	http://localhost:8138
 	VAR 	@{mngr_options} 	-n
 
 	Log To Console	Run Agent and Manager and see if they will connect.
@@ -267,6 +267,9 @@ Agent Command Line PROPERTY -p
 
 	Log To Console 	Checking result data base
 	${dbfile} 	Find Result DB 		result_pattern=PreRun
+	${agent_result} 	Query Result DB 	${dbfile}
+	...    SELECT * FROM MetricData WHERE MetricType='Agent'
+
 	${prop_result} 	Query Result DB 	${dbfile}
 	...    SELECT * FROM MetricData WHERE MetricType='Agent' AND SecondaryMetric='Issue-#14'
 
