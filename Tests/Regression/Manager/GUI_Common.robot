@@ -1804,7 +1804,7 @@ Convert To Save Path
 
 Open Agent
 	[Arguments] 	@{appargs}
-	Run Agent CLI 	${appargs}
+	Run Agent CLI 	@{appargs}
 
 Run ${component_name} CLI
 	[Documentation] 	Open one of the RFSwarm applications for CLI purposes. Pass the: Manager, Reporter or Agent
@@ -1834,11 +1834,10 @@ Run ${component_name} CLI
 	Log 	\t\${args}: ${args} 	console=${True}
 
 	${tname} 		Convert To Save Path 	${TEST NAME}
-	Create Directory 	${OUTPUT DIR}${/}stdout${/}${tname}${/}
-	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt
-	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+	Create File 		${OUTPUT DIR}${/}stdout_${comp}.txt
+	Create File 		${OUTPUT DIR}${/}stderr_${comp}.txt
 	${process}= 	Start Process 	${CMD_${comp}}  @{appargs}  alias=${component_name}
-	...    stdout=${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+	...    stdout=${OUTPUT DIR}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stderr_${comp}.txt
 	...    env=${envargs}
 
 	Log 	${process}

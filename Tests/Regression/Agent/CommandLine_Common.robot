@@ -69,15 +69,15 @@ Show Log
 	Log 	${filedata} 	console=True
 	Log to console 	--ɅɅɅ--${filename}--ɅɅɅ--${\n}
 
-Run Agent
-	[Arguments]		${options}=None
-	IF  ${options} == None
-		${options}= 	Create List
-	END
-	Log to console 	${\n}\${options}: ${options}
-	# ${process}= 	Start Process 	python3 	${pyfile_agent}  @{options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
-	${process}= 	Start Process 	${cmd_agent}  @{options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
-	Set Test Variable 	$process_agent 	${process}
+# Run Agent old
+# 	[Arguments]		${options}=None
+# 	IF  ${options} == None
+# 		${options}= 	Create List
+# 	END
+# 	Log to console 	${\n}\${options}: ${options}
+# 	# ${process}= 	Start Process 	python3 	${pyfile_agent}  @{options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
+# 	${process}= 	Start Process 	${cmd_agent}  @{options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
+# 	Set Test Variable 	$process_agent 	${process}
 
 Run Manager CLI
 	[Arguments]		${options}=None
@@ -357,10 +357,9 @@ Check Icon Install For Ubuntu
 
 ### v1.6.0 ###
 
-# Run Agent
-# 	[Arguments] 	${appargs}
-# 	@{appargs} 	Convert To List 	${appargs}
-# 	Run Agent CLI 	@{appargs}
+Run Agent
+	[Arguments] 	@{appargs}
+	Run Agent CLI 	@{appargs}
 
 Run ${component_name} CLI
 	[Documentation] 	Open one of the RFSwarm applications for CLI purposes. Pass the: Manager, Reporter or Agent
@@ -390,11 +389,10 @@ Run ${component_name} CLI
 	Log 	\t\${args}: ${args} 	console=${True}
 
 	${tname} 		Convert To Save Path 	${TEST NAME}
-	Create Directory 	${OUTPUT DIR}${/}stdout${/}${tname}${/}
-	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt
-	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+	Create File 		${OUTPUT DIR}${/}stdout_${comp}.txt
+	Create File 		${OUTPUT DIR}${/}stderr_${comp}.txt
 	${process}= 	Start Process 	${CMD_${comp}}  @{appargs}  alias=${component_name}
-	...    stdout=${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+	...    stdout=${OUTPUT DIR}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stderr_${comp}.txt
 	...    env=${envargs}
 
 	Log 	${process}
@@ -531,6 +529,92 @@ Wait For File To Exist
 		Fail 		File '${filepath}' does not exist after ${timeout} seconds
 	END
 
+Query Result DB
+	[Arguments]		${dbfile} 	${sql} 	${info}=${True}
+	Log 	dbfile: ${dbfile} 	console=${info}
+	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
+
+	Connect To Database 	sqlite3 	database=${dbfile} 	isolation_level=${None}
+	Log 	sql: ${sql} 	console=${info}
+	${result}= 	Query 	${sql}
+	Log 	sql result: ${result} 	console=${info}
+	Disconnect From Database
+	RETURN 	${result}
+
+Find Log
+	[Documentation] 	Returns path to the stdout and stderr log file for current test
+	[Arguments] 	${component_name}=${COMPONENT}
+	${comp} 	Convert To Lower Case 	${component_name}
+	${tname} 		Convert To Save Path 	${TEST NAME}
+
+	File Should Exist 	${OUTPUT DIR}${/}stdout_${comp}.txt
+	File Should Exist 	${OUTPUT DIR}${/}stderr_${comp}.txt
+
+	RETURN 		${OUTPUT DIR}${/}stdout_${comp}.txt 	${OUTPUT DIR}${/}stderr_${comp}.txt
+
+Read Log
+	[Arguments]		${filepath}
+	Log 		${filepath}
+	${filedata}= 	Get File 	${filepath} 		encoding=SYSTEM 		encoding_errors=ignore
+	Log 		${filedata}
+	RETURN 		${filedata}
+
+Convert To Save Path
+	[Arguments] 	${path}
+	${safe_path} 		Evaluate 	re.sub(r'[<>:"/\\|?*]', '_', "${path}".replace(' ', '_')).replace(chr(0), '_').rstrip(' .')[:60] 	modules=re
+
+	RETURN 	${safe_path}
+
+Wait Until the Agent Connects to the Manager
+	[Documentation] 	For this keyword to function correctly, logs from the agent must be available dynamically.
+	VAR    ${timeout}    160
+	TRY
+		${stdout}  ${stderr}= 	Find Log 	Agent
+	EXCEPT
+		Sleep 	5s
+		${stdout}  ${stderr}= 	Find Log 	Agent
+	END
+
+	Log 	Waiting for the Agent to connect with the Manager... 	console=${true}
+	TRY
+		WHILE    True 	limit=${timeout} seconds
+			TRY
+				Sleep 	10 s
+				${stdout_content}= 	Read Log 	${stdout}
+				Should Contain 		${stdout_content}  Manager Connected
+			EXCEPT
+				CONTINUE
+			END
+			BREAK
+		END
+	EXCEPT
+		Fail 	Agent didn't connect to the Manager after ${timeout} seconds
+	END
+
+Wait Until the Query Is Not Empty
+	[Arguments]		${dbfile}  ${sql}  ${timeout}=${300}
+
+	VAR 	${iter} 	0
+	TRY
+		WHILE    True 	limit=${timeout} seconds
+			${iter}= 	Evaluate  ${iter} + 1
+			IF    ${iter} == 30
+				Log 	Query '${sql}' is returning empty row after ${iter} seconds.  level=WARN
+			END
+			
+			TRY
+				Sleep 	1s
+				${query_result}= 	Query Result DB 	${dbfile}  ${sql}  info=${False}
+				${len}= 	Get Length 	${query_result}
+				Should Be True 	${len} > 0
+			EXCEPT
+				CONTINUE
+			END
+			BREAK
+		END
+	EXCEPT
+		Fail 		Query '${sql}' is returning empty row after ${timeout} seconds.
+	END
 
 	#
 #

@@ -100,17 +100,17 @@ Show Dir Contents
 # 	${process}= 	Start Process 	${cmd_agent}  @{options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
 # 	Set Test Variable 	$process_agent 	${process}
 
-Run Manager CLI
-	[Arguments]		${options}=None
-	IF  ${options} == None
-		${options}= 	Create List
-		Create Directory 	${results_dir}
-		Append To List 	${options} 	-d 	${results_dir}
-	END
-	Log to console 	${\n}\${options}: ${options}
-	# ${process}= 	Start Process 	python3 	${pyfile_manager}  @{options}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
-	${process}= 	Start Process 	${cmd_manager}  @{options}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
-	Set Test Variable 	$process_manager 	${process}
+# Run Manager CLI old
+# 	[Arguments]		${options}=None
+# 	IF  ${options} == None
+# 		${options}= 	Create List
+# 		Create Directory 	${results_dir}
+# 		Append To List 	${options} 	-d 	${results_dir}
+# 	END
+# 	Log to console 	${\n}\${options}: ${options}
+# 	# ${process}= 	Start Process 	python3 	${pyfile_manager}  @{options}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
+# 	${process}= 	Start Process 	${cmd_manager}  @{options}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
+# 	Set Test Variable 	$process_manager 	${process}
 
 Wait For Manager
 	[Arguments]		${timeout}=30min
@@ -252,7 +252,7 @@ Get Manager INI Data
 	EXCEPT
 		# --- temp fix:
 		@{mngr_options}= 	Create List 	-g 	1
-		Run Manager CLI 		${mngr_options}
+		Run Manager CLI 		@{mngr_options}
 		Sleep 	5
 		# ---
 		Run Keyword		Stop Manager
@@ -723,11 +723,10 @@ Run ${component_name} CLI
 	Log 	\t\${args}: ${args} 	console=${True}
 
 	${tname} 		Convert To Save Path 	${TEST NAME}
-	Create Directory 	${OUTPUT DIR}${/}stdout${/}${tname}${/}
-	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt
-	Create File 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+	Create File 		${OUTPUT DIR}${/}stdout_${comp}.txt
+	Create File 		${OUTPUT DIR}${/}stderr_${comp}.txt
 	${process}= 	Start Process 	${CMD_${comp}}  @{appargs}  alias=${component_name}
-	...    stdout=${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+	...    stdout=${OUTPUT DIR}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stderr_${comp}.txt
 	...    env=${envargs}
 
 	Log 	${process}
@@ -867,10 +866,10 @@ Find Log
 	${comp} 	Convert To Lower Case 	${component_name}
 	${tname} 		Convert To Save Path 	${TEST NAME}
 
-	File Should Exist 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt
-	File Should Exist 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+	File Should Exist 	${OUTPUT DIR}${/}stdout_${comp}.txt
+	File Should Exist 	${OUTPUT DIR}${/}stderr_${comp}.txt
 
-	RETURN 		${OUTPUT DIR}${/}stdout${/}${tname}${/}stdout_${comp}.txt 	${OUTPUT DIR}${/}stdout${/}${tname}${/}stderr_${comp}.txt
+	RETURN 		${OUTPUT DIR}${/}stdout_${comp}.txt 	${OUTPUT DIR}${/}stderr_${comp}.txt
 
 Read Log
 	[Arguments]		${filepath}
