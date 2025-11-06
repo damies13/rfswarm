@@ -197,7 +197,7 @@ the Manager (ini file)
 Verify listener doesn't generate KeyError when using inject sleep
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #392
 
-	var 	${results_dir} 		${OUTPUT DIR}${/}results${/}Issue-#392
+	VAR 	${results_dir} 		${OUTPUT DIR}${/}results${/}Issue-#392
 	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#392
 	VAR 	${scenariofile} 	${test_dir}${/}scenario.rfs
 	VAR 	${dbfile} 			${results_dir}${/}PreRun${/}PreRun.db
