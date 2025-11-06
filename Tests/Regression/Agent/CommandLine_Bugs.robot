@@ -214,11 +214,12 @@ Verify listener doesn't generate KeyError when using inject sleep
 	${dbfile}= 	Find Result DB 		*_Issue-#392
 	${dbpath} 	${dbfilename}= 	Split Path 	${dbfile}
 
-	@{xmlfiles} = 	List Files In Directory 	${dbpath}${/}logs 	*.xml 	absolute
+	@{xmlfiles} = 	List Files In Directory 	${dbpath}${/}logs${/}* 	*.xml 	absolute
 
 	Log  	xmlfiles: ${xmlfiles} 	console=true
 
-	${root}= 	Parse XML 	${xmlfiles}[0]
+	# ${root}= 	Parse XML 	${xmlfiles}[0]
+	${errors}= 	Get Elements 	${xmlfiles}[0] 		//errors/msg
 
 	# Log To Console 	Checking PreRun data base.
 	# ${query_result} 	Query Result DB 	${dbfile}
