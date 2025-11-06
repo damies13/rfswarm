@@ -155,12 +155,12 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 	Log To Console	Run Agent with custom agent name.
 	Run Agent 	${agnt_options}
 	Run Manager CLI 	${mngr_options}
-	Sleep	30s
+	Sleep	60s
 	Stop Agent
 	Stop Manager
 
 	# make copy of prerun
-	Copy Directory 		${test_dir}${/}PreRun 		${OUTPUT DIR}${/}results${/}${TEST NAME}${/}PreRun 
+	Copy Directory 		${test_dir}${/}PreRun 		${OUTPUT DIR}${/}results${/}${TEST NAME}${/}PreRun
 
 	Log To Console 	Checking PreRun data base.
 	${query_result} 	Query Result DB 	${dbfile}
@@ -183,7 +183,7 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 	Log To Console	Run Agent with custom agent name.
 	Run Agent 	${agnt_options}
 	Run Manager CLI 	${mngr_options}
-	Sleep	30s
+	Sleep	60s
 	Stop Agent
 	Stop Manager
 
@@ -220,7 +220,7 @@ Verify listener doesn't generate KeyError when using inject sleep
 	${dbfile}= 	Find Result DB 		*_Issue-#392
 	${dbpath} 	${dbfilename}= 	Split Path 	${dbfile}
 
-	@{logdirs}= 	List Directories In Directory 	${dbpath}${/}logs
+	@{logdirs}= 	List Directories In Directory 	${dbpath}${/}logs 	absolute
 	Log  	logdirs: ${logdirs} 	console=true
 
 	@{xmlfiles} = 	List Files In Directory 	${logdirs}[0] 	*.xml 	absolute

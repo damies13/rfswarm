@@ -67,7 +67,7 @@ Agent Command Line MANAGER -m
 	Log To Console	Run Agent and Manager and see if they will connect.
 	Run Manager CLI 	${mngr_options}
 	Run Agent 	${agnt_options}
-	Wait For Manager	30s
+	Wait For Manager	60s
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
@@ -84,7 +84,7 @@ Agent Command Line MANAGER --manager
 	Log To Console	Run Agent and Manager and see if they will connect.
 	Run Manager CLI 	${mngr_options}
 	Run Agent 	${agnt_options}
-	Wait For Manager	30s
+	Wait For Manager	60s
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
@@ -269,6 +269,7 @@ Agent Command Line PROPERTY -p
 	${dbfile} 	Find Result DB 		result_pattern=PreRun
 	${agent_result} 	Query Result DB 	${dbfile}
 	...    SELECT * FROM MetricData WHERE MetricType='Agent'
+	Log 	${agent_result}
 
 	${prop_result} 	Query Result DB 	${dbfile}
 	...    SELECT * FROM MetricData WHERE MetricType='Agent' AND SecondaryMetric='Issue-#14'
