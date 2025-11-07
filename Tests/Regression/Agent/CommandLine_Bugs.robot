@@ -220,17 +220,30 @@ Verify listener doesn't generate KeyError when using inject sleep
 	${dbfile}= 	Find Result DB 		*_Issue-#392
 	${dbpath} 	${dbfilename}= 	Split Path 	${dbfile}
 
-	@{logdirs}= 	List Directories In Directory 	${dbpath}${/}logs 	absolute
+	@{logdirs}= 	List Directories In Directory 	${dbpath}${/}logs
 	Log  	logdirs: ${logdirs} 	console=true
 
-	@{xmlfiles} = 	List Files In Directory 	${logdirs}[0] 	*.xml 	absolute
+	VAR 	${logdir} 		${dbpath}${/}logs${/}${logdirs}[0]
+	@{xmlfiles} = 	List Files In Directory 	${logdir} 	*.xml
+	# @{xmlfiles} = 	List Files In Directory 	${dbpath}${/}logs${/}${logdirs}[0] 	*.xml 	absolute
 
 	Log  	xmlfiles: ${xmlfiles} 	console=true
 
+	${root}= 	Parse XML 	${logdir}${/}${xmlfiles}[0]
 	# ${root}= 	Parse XML 	${xmlfiles}[0]
-	${errors}= 	Get Elements 	${xmlfiles}[0] 		//errors/msg
-
-	Log  	errors: ${errors} 	console=true
+	# ${errors}= 	Get Elements 	${xmlfiles}[0] 		//errors/msg
+	${errorcount}= 	Get Element Count 	${root} 		.//errors/msg
+	IF 	${errorcount} > 0
+		${errors}= 	Get Elements 	${root} 		.//errors/msg
+		Log  	errors: ${errors} 	console=true
+		VAR 	${ftext} 		${EMPTY}
+		FOR 	${error} 	IN 		@{errors}
+			${etext} = 	Get Element Text 	${error}
+			Log  	error: ${etext}
+			VAR 	${ftext} 		${ftext}\n${etext}
+		END
+		Fail  	errors: ${ftext}
+	END
 
 
 	# Log To Console 	Checking PreRun data base.
