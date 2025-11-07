@@ -143,7 +143,7 @@ Agent Command Line ROBOT -r
 	VAR 	${robot_exec} 		${pip_data_list}[1]
 	# VAR 	${scenario_dir} 	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
 	VAR 	@{agnt_options} 	-g 	1 	-r 	${robot_exec}
-	VAR 	@{mngr_options} 	-g 	1 	-n 	-s 	${scenario_dir}
+	VAR 	@{mngr_options} 	-g 	1 	-n 	-s 	${scenario_dir} 	-d 	${results_dir}
 
 	Log To Console	Run Agent with custom robot executable.
 	Run Agent 	@{agnt_options}
@@ -258,16 +258,15 @@ Agent Command Line AGENTNAME --agentname
 Agent Command Line PROPERTY -p
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 
-	VAR 	@{agnt_options} 	-p 	Issue-#14
-	VAR 	@{mngr_options} 	-n
+	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#14${/}property
+	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
 
-	Log To Console	Run Agent with custom prop.
-	Run Agent 	@{agnt_options}
-	Run Manager CLI 	@{mngr_options}
+	Create Directory 	${test_dir}
+	Log To Console	Run Agent CLI with custom prop.
+	Run Agent CLI 		-p 	Issue-#14
+	Run Manager CLI 	-n 	-d 	${test_dir}
 	Wait Until Created 	${dbfile}
 	Wait Until the Agent Connects to the Manager
-	Sleep	20s
-	Stop Agent
 
 	Log To Console 	Checking result data base
 	${dbfile} 	Find Result DB 		result_pattern=PreRun
@@ -282,7 +281,7 @@ Agent Command Line PROPERTY -p
 	Should Be True 	${len} > 0
 	...    msg=Custom propery 'Issue-#14' not found in PreRun db. ${\n}Query Result: ${prop_result}
 
-	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+	[Teardown]	Run Keywords	Stop Agent 	Stop Manager
 
 Agent Yaml Configuration File
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172

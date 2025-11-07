@@ -160,15 +160,12 @@ Test Agent Connectivity
 	#[Teardown]	Stop Server
 
 Find Result DB
-	[Arguments] 	${result_pattern}=*_*
-	# ${fols}= 	List Directory 	${results_dir}
-	# Log to console 	${fols}
-	${fols}= 	List Directory 	${results_dir} 	${result_pattern} 	absolute=True
-	Log to console 	${fols}
-	# ${files}= 	List Directory 	${fols[0]}
-	# Log to console 	${files}
+	[Arguments] 	${directory}=${RESULTS_DIR} 	${result_pattern}=*_*
+	${fols}= 	List Directory 	${directory} 	${result_pattern} 	absolute=True
+	Log 	${fols} 	console=${True}
+
 	${file}= 	List Directory 	${fols[-1]} 	*.db 	absolute=True
-	Log to console 	Result DB: ${file[-1]}
+	Log 	Result DB: ${file[-1]} 	console=${True}
 	RETURN 	${file[-1]}
 
 Query Result DB

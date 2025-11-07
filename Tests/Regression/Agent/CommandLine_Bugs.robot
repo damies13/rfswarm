@@ -12,7 +12,7 @@ Exclude Libraries With Spaces
 	# ${scenariofile}= 	Normalize Path 	${CURDIR}${/}..${/}..${/}Demo${/}demo.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#171${/}Issue171.rfs
 	Log to console 	scenariofile: ${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
 	Run Manager CLI 	@{mngr_options}
 	Wait Until the Agent Connects to the Manager
 	Wait For Manager

@@ -764,35 +764,36 @@ Navigate to and check Desktop Icon
 
 Navigate to and check Desktop Icon For MacOS
 
+	Skip 	Skipped this for now due to changes in the new macos runners user interface.
 	# Release Fn Key
 
 	Take A Screenshot
 
 	# open go menu
-	${img}=	Set Variable		${platform}_finder_menu_go.png
+	${img}=	Set Variable		${PLATFORM}_finder_menu_go.png
 	Click Image		${img}
 	# Sleep 	0.3
 	# Take A Screenshot
 
 	# select Go to Folder from Go menu
-	${img}=	Set Variable		${platform}_finder_menu_gotofolder.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_finder_menu_gotofolder.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Click Image		${img}
 	# Sleep 	0.3
 	# Take A Screenshot
 
 
 	# # open finder
-	# ${img}=	Set Variable		${platform}_finder.png
-	# Wait For 	${img} 	 timeout=${default_image_timeout}
+	# ${img}=	Set Variable		${PLATFORM}_finder.png
+	# Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# @{coordinates}= 	Locate		${img}
 	# Click Image		${img}
-	# ${img}=	Set Variable		${platform}_finder_toolbar.png
-	# Wait For 	${img} 	 timeout=${default_image_timeout}
+	# ${img}=	Set Variable		${PLATFORM}_finder_toolbar.png
+	# Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# Take A Screenshot
 	#
 	# # un-maximise finder if maximised
-	# ${img}=	Set Variable		${platform}_finder.png
+	# ${img}=	Set Variable		${PLATFORM}_finder.png
 	# ${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=1
 	# IF 	not ${passed}
 	# 	Take A Screenshot
@@ -801,7 +802,7 @@ Navigate to and check Desktop Icon For MacOS
 	# Sleep 	0.3
 	# Take A Screenshot
 	#
-	# ${img}=	Set Variable		${platform}_finder_toolbar.png
+	# ${img}=	Set Variable		${PLATFORM}_finder_toolbar.png
 	# Click Image 	${img}
 	# Sleep 	0.3
 	# Take A Screenshot
@@ -822,7 +823,7 @@ Navigate to and check Desktop Icon For MacOS
 	# Click To The Below Of 	${top_corner} 	${20}
 
 	Take A Screenshot
-	${img}=	Set Variable		${platform}_finder_gotofolder.png
+	${img}=	Set Variable		${PLATFORM}_finder_gotofolder.png
 	${status}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=${20}
 	IF  ${status}
 		Run Keyword And Ignore Error 	Click Image		${img}
@@ -833,33 +834,33 @@ Navigate to and check Desktop Icon For MacOS
 
 	# Sleep 	0.3
 	# Take A Screenshot
-	${img}=	Set Variable		${platform}_finder_gotoapplications.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_finder_gotoapplications.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# Take A Screenshot
 
 	Press Combination 	KEY.enter
 	# Sleep	0.5
 	# Take A Screenshot
-	${img}=	Set Variable		${platform}_finder_facetime.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_finder_facetime.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# Take A Screenshot
 
 	# Filter/Search /Applications?
 	Type 	RFSwarm
 	# Sleep 	0.3
-	${img}=	Set Variable		${platform}_finder_rfswarm_reporter.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_finder_rfswarm_reporter.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 
 	# Open Launchpad (F4?)
 	# Press Combination   key.f4
-	${img}=	Set Variable		${platform}_launchpad.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_launchpad.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	# Sleep 	1
-	${img}=	Set Variable		${platform}_launchpad_search.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_launchpad_search.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# Take A Screenshot
 
 	# Search Launchpad
@@ -869,8 +870,8 @@ Navigate to and check Desktop Icon For MacOS
 
 	# Check for Icon
 	# macos_launchpad_rfswarm_reporter.png
-	${img}=	Set Variable		${platform}_launchpad_rfswarm_reporter.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_launchpad_rfswarm_reporter.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# Take A Screenshot
 
 	Press Combination 	KEY.ESC
@@ -878,17 +879,18 @@ Navigate to and check Desktop Icon For MacOS
 
 Navigate to and check Desktop Icon For Windows
 
+	Skip 	need to update because of windows 11 changes
 	Take A Screenshot
 	# Open Start Menu
 	Sleep 	0.5
-	${img}=	Set Variable		${platform}_start_menu.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_start_menu.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Take A Screenshot
 
-	${img}=	Set Variable		${platform}_start_menu_rfswarm_reporter.png
-	Run Keyword And Ignore Error 	Wait For 	${img} 	 timeout=${default_image_timeout} 	# temp. fix
+	${img}=	Set Variable		${PLATFORM}_start_menu_rfswarm_reporter.png
+	Run Keyword And Ignore Error 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT} 	# temp. fix
 
 	# Navigate Start Menu
 	Type 	RFSwarm
@@ -896,8 +898,8 @@ Navigate to and check Desktop Icon For Windows
 	Take A Screenshot
 
 	# Check for Icon
-	${img}=	Set Variable		${platform}_search_rfswarm_reporter.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_search_rfswarm_reporter.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 
 	Press Combination 	KEY.ESC
 
@@ -905,8 +907,8 @@ Navigate to and check Desktop Icon For Ubuntu
 
 	Take A Screenshot
 	# Open Menu
-	${img}=	Set Variable		${platform}_lxqt_menu.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_lxqt_menu.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	# Move To 	${coordinates}
@@ -916,16 +918,16 @@ Navigate to and check Desktop Icon For Ubuntu
 
 	# Navigate Menu
 	# lxqt_programming_menu.png
-	${img}=	Set Variable		${platform}_lxqt_programming_menu.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_lxqt_programming_menu.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Click Image		${img}
 	Sleep 	0.5
 	Take A Screenshot
 
 	# Check for Icon
 	# ubuntu_lxqt_rfswarm_reporter_menu.png
-	${img}=	Set Variable		${platform}_lxqt_rfswarm_reporter_menu.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_lxqt_rfswarm_reporter_menu.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 
 	Press Combination 	KEY.ESC
 

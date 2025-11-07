@@ -7,7 +7,7 @@ Library		Collections
 Library		DateTime
 Library		XML
 
-Library		ImageHorizonLibrary	reference_folder=${IMAGE_DIR} 	screenshot_folder=${OUTPUT_DIR}${/}screenshots 	confidence=${0.9}
+Library		ImageHorizonLibrary	reference_folder=${IMAGE_DIR} 	screenshot_folder=${OUTPUT_DIR} 	confidence=${0.9}
 
 Library 	ini_file.py
 Library 	get_ip_address.py

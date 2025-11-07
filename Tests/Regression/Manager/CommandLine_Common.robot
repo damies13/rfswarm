@@ -705,6 +705,8 @@ Run ${component_name} CLI
 		IF  '${component_name}' == 'Manager' and ${len} == ${0} #( '-d' not in ${appargs} and '--dir' not in ${appargs} )
 			Append To List 	${appargs} 	-d 	${RESULTS_DIR}
 		ELSE IF  '${component_name}' == 'Manager' and ${len} != ${0} and ( '-d' not in ${appargs} and '--dir' not in ${appargs} )
+			${location}= 	Get Manager INI Location
+			Remove File 	${location}
 			Create Manager INI File If It Does Not Exist
 			Change Manager INI Option 	Run 	resultsdir 	${RESULTS_DIR}
 		ELSE IF  '${component_name}' == 'Agent' and ( '-d' not in ${appargs} and '--agentdir' not in ${appargs} )
