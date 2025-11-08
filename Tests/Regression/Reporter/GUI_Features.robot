@@ -91,7 +91,11 @@ Whole report time range
 	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
 		Locate 	reporter_${PLATFORM}_graph_robots1_py3.9.png
 	ELSE
-		Locate 	reporter_${PLATFORM}_graph_robots1.png
+		TRY
+			Locate 	reporter_${PLATFORM}_graph_robots1.png
+		EXCEPT
+			Locate 	reporter_${PLATFORM}_graph_robots1_py3.9.png
+		END
 	END
 	Set Confidence		0.9
 
@@ -997,7 +1001,11 @@ Change Line Colour
 	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
 		Locate 	reporter_${PLATFORM}_graph_plancolourb4_py3.9.png
 	ELSE
-		Locate 	reporter_${PLATFORM}_graph_plancolourb4.png
+		TRY
+			Locate 	reporter_${PLATFORM}_graph_plancolourb4.png
+		EXCEPT
+			Locate 	reporter_${PLATFORM}_graph_plancolourb4_py3.9.png
+		END
 	END
 
 	Click Button 		ColourSales

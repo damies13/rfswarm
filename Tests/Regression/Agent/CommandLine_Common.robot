@@ -29,6 +29,7 @@ ${AGENT_DIR} 		${OUTPUT DIR}${/}rfswarm-agent
 ${results_dir} 			${OUTPUT DIR}${/}results
 *** Keywords ***
 Set Platform
+	Create Directory 	${results_dir}
 	Set Platform By Python
 	Set Platform By Tag
 
