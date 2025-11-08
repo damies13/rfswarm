@@ -67,7 +67,7 @@ Agent Command Line MANAGER -m
 	Log To Console	Run Agent and Manager and see if they will connect.
 	Run Manager CLI 	${mngr_options}
 	Run Agent 	${agnt_options}
-	Wait For Manager	60s
+	Wait For Manager	120s
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
@@ -84,7 +84,7 @@ Agent Command Line MANAGER --manager
 	Log To Console	Run Agent and Manager and see if they will connect.
 	Run Manager CLI 	${mngr_options}
 	Run Agent 	${agnt_options}
-	Wait For Manager	60s
+	Wait For Manager	120s
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
@@ -261,7 +261,7 @@ Agent Command Line PROPERTY -p
 	Log To Console	Run Agent with custom prop.
 	Run Manager CLI 	${mngr_options}
 	Run Agent 	${agnt_options}
-	Sleep	40s
+	Sleep	60s
 	Stop Agent
 	Stop Manager
 

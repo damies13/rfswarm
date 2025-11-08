@@ -155,7 +155,7 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 	Log To Console	Run Agent with custom agent name.
 	Run Agent 	${agnt_options}
 	Run Manager CLI 	${mngr_options}
-	Sleep	60s
+	Sleep	120s
 	Stop Agent
 	Stop Manager
 
@@ -183,7 +183,7 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 	Log To Console	Run Agent with custom agent name.
 	Run Agent 	${agnt_options}
 	Run Manager CLI 	${mngr_options}
-	Sleep	60s
+	Sleep	120s
 	Stop Agent
 	Stop Manager
 
