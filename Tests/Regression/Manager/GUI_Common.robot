@@ -38,7 +38,7 @@ ${agent_dir} 				${OUTPUT DIR}${/}rfswarm-agent
 Set Platform
 	Set Platform By Python
 	Set Platform By Tag
-	IF 		${platform} == macos
+	IF 		'${platform}' == 'macos'
 		Remove Screen Capture Nag
 	END
 
