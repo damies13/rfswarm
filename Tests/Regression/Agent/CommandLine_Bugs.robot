@@ -205,7 +205,6 @@ Verify listener doesn't generate KeyError when using inject sleep
 	VAR 	${results_dir} 		${OUTPUT DIR}${/}results
 	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#392
 	VAR 	${scenariofile} 	${test_dir}${/}Issue-#392.rfs
-	# VAR 	${dbfile} 			${results_dir}${/}PreRun${/}PreRun.db
 	VAR 	@{agnt_options} 	-g 	1
 	VAR 	@{mngr_options} 	-n 	-s 	${scenariofile} 	-d 	${results_dir}
 
@@ -218,7 +217,6 @@ Verify listener doesn't generate KeyError when using inject sleep
 	Wait For Manager
 	Log To Console	Stop Agent
 	Stop Agent
-	# Stop Manager
 
 	${dbfile}= 	Find Result DB 		*_Issue-#392
 	${dbpath} 	${dbfilename}= 	Split Path 	${dbfile}
@@ -228,7 +226,6 @@ Verify listener doesn't generate KeyError when using inject sleep
 
 	VAR 	${logdir} 		${dbpath}${/}logs${/}${logdirs}[0]
 	@{xmlfiles} = 	List Files In Directory 	${logdir} 	*.xml
-	# @{xmlfiles} = 	List Files In Directory 	${dbpath}${/}logs${/}${logdirs}[0] 	*.xml 	absolute
 
 	Log To Console	Check for Errors In Agents Robot Logs
 	Log  	xmlfiles: ${xmlfiles} 	console=true
@@ -246,14 +243,6 @@ Verify listener doesn't generate KeyError when using inject sleep
 		Fail  	errors: ${ftext}
 	END
 
-
-	# Log To Console 	Checking PreRun data base.
-	# ${query_result} 	Query Result DB 	${dbfile}
-	# ...    SELECT * FROM AgentList WHERE AgentName='Issue-#100AGENTNAME'
-	# ${len}= 	Get Length 	${query_result}
-	# Should Be True 	${len} > 0
-	# ...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}
-
 	[Teardown]	Run Keywords	Stop Agent	Stop Manager
 
 Verify listener doesn't over inject sleeps
@@ -262,7 +251,6 @@ Verify listener doesn't over inject sleeps
 	VAR 	${results_dir} 		${OUTPUT DIR}${/}results
 	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#394
 	VAR 	${scenariofile} 	${test_dir}${/}Issue-#394.rfs
-	# VAR 	${dbfile} 			${results_dir}${/}PreRun${/}PreRun.db
 	VAR 	@{agnt_options} 	-g 	1
 	VAR 	@{mngr_options} 	-n 	-s 	${scenariofile} 	-d 	${results_dir}
 
@@ -275,7 +263,6 @@ Verify listener doesn't over inject sleeps
 	Wait For Manager
 	Log To Console	Stop Agent
 	Stop Agent
-	# Stop Manager
 
 	Log To Console	Check Counts Of Injected Sleeps In Agents Robot Logs
 	${dbfile}= 	Find Result DB 		*_Issue-#394
@@ -286,42 +273,17 @@ Verify listener doesn't over inject sleeps
 
 	VAR 	${logdir} 		${dbpath}${/}logs${/}${logdirs}[0]
 	@{xmlfiles} = 	List Files In Directory 	${logdir} 	*.xml
-	# @{xmlfiles} = 	List Files In Directory 	${dbpath}${/}logs${/}${logdirs}[0] 	*.xml 	absolute
 
 	Log  	xmlfiles: ${xmlfiles} 	console=true
 
 	${root}= 	Parse XML 	${logdir}${/}${xmlfiles}[0]
-	# ${root}= 	Parse XML 	${xmlfiles}[0]
-	# ${errors}= 	Get Elements 	${xmlfiles}[0] 		//errors/msg
-	# ${errorcount}= 	Get Element Count 	${root} 		.//errors/msg
-	# IF 	${errorcount} > 0
-	# 	${errors}= 	Get Elements 	${root} 		.//errors/msg
-	# 	Log  	errors: ${errors} 	console=true
-	# 	VAR 	${ftext} 		${EMPTY}
-	# 	FOR 	${error} 	IN 		@{errors}
-	# 		${etext} = 	Get Element Text 	${error}
-	# 		Log  	error: ${etext}
-	# 		VAR 	${ftext} 		${ftext}\n${etext}
-	# 	END
-	# 	Fail  	errors: ${ftext}
-	# END
-
-	# # //test[1]
-	# ${test_1}= 	Get Element 	${root} 	.//test[1]
-	# # //test[2]
-	# ${test_2}= 	Get Element 	${root} 	.//test[2]
 
 	# //kw[arg[text()='Sleep added by RFSwarm']]
 	${inj_sleep_count_1}= 	Get Element Count 	${root} 		.//test[1]//kw[arg = 'Sleep added by RFSwarm']
+	Log  	Count of injected sleeps for test 1: ${inj_sleep_count_1} 	console=true
 	${inj_sleep_count_2}= 	Get Element Count 	${root} 		.//test[2]//kw[arg = 'Sleep added by RFSwarm']
+	Log  	Count of injected sleeps for test 2: ${inj_sleep_count_2} 	console=true
 
 	Should Be Equal As Numbers 		${inj_sleep_count_1} 		${inj_sleep_count_2}
-
-	# Log To Console 	Checking PreRun data base.
-	# ${query_result} 	Query Result DB 	${dbfile}
-	# ...    SELECT * FROM AgentList WHERE AgentName='Issue-#100AGENTNAME'
-	# ${len}= 	Get Length 	${query_result}
-	# Should Be True 	${len} > 0
-	# ...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}
 
 	[Teardown]	Run Keywords	Stop Agent	Stop Manager
