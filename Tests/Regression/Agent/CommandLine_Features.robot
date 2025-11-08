@@ -261,9 +261,8 @@ Agent Command Line PROPERTY -p
 	Log To Console	Run Agent with custom prop.
 	Run Manager CLI 	${mngr_options}
 	Run Agent 	${agnt_options}
-	Sleep	120s
+	Wait For Manager	120s
 	Stop Agent
-	Stop Manager
 
 	Log To Console 	Checking result data base
 	${dbfile} 	Find Result DB 		result_pattern=PreRun
