@@ -38,9 +38,9 @@ ${agent_dir} 				${OUTPUT DIR}${/}rfswarm-agent
 Set Platform
 	Set Platform By Python
 	Set Platform By Tag
-	IF 		'${platform}' == 'macos'
-		Remove Screen Capture Nag
-	END
+	# IF 		'${platform}' == 'macos'
+	# 	Remove Screen Capture Nag
+	# END
 
 Set Platform By Python
 	${system}= 		Evaluate 	platform.system() 	modules=platform
@@ -78,7 +78,8 @@ Set Platform By Tag
 Remove Screen Capture Nag
 	# https://github.com/luckman212/screencapture-nag-remover
 	# ~/Library/Group Containers/group.com.apple.replayd/ScreenCaptureApprovals.plist
-	VAR 	${ScreenCaptureApprovals} 	~/Library/Group Containers/group.com.apple.replayd/ScreenCaptureApprovals.plist
+	${ScreenCaptureApprovals}= 		Normalize Path 		~/Library/Group Containers/group.com.apple.replayd/ScreenCaptureApprovals.plist
+	Log  	${ScreenCaptureApprovals} 		console=true
 	${filedata}= 	Get File 	${ScreenCaptureApprovals}
 	Log  	${filedata}
 	${root}= 	Parse XML 	${ScreenCaptureApprovals}
@@ -174,6 +175,10 @@ Open Manager GUI
 				Wait For 	${img} 	 timeout=${default_image_timeout / 2}
 			END
 		END
+	END
+
+	IF 		'${platform}' == 'macos'
+		Remove Screen Capture Nag
 	END
 
 Wiggle Mouse

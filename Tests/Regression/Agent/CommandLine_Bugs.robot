@@ -254,3 +254,69 @@ Verify listener doesn't generate KeyError when using inject sleep
 	# ...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}
 
 	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+
+Verify listener doesn't over inject sleeps
+	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #394
+
+	VAR 	${results_dir} 		${OUTPUT DIR}${/}results
+	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#394
+	VAR 	${scenariofile} 	${test_dir}${/}Issue-#394.rfs
+	# VAR 	${dbfile} 			${results_dir}${/}PreRun${/}PreRun.db
+	VAR 	@{agnt_options} 	-g 	1
+	VAR 	@{mngr_options} 	-n 	-s 	${scenariofile} 	-d 	${results_dir}
+
+	Create Directory 	${results_dir}
+	Log To Console	Run Agent with custom agent name.
+	Run Agent 	${agnt_options}
+	Run Manager CLI 	${mngr_options}
+	Wait For Manager
+	Stop Agent
+	# Stop Manager
+
+	${dbfile}= 	Find Result DB 		*_Issue-#394
+	${dbpath} 	${dbfilename}= 	Split Path 	${dbfile}
+
+	@{logdirs}= 	List Directories In Directory 	${dbpath}${/}logs
+	Log  	logdirs: ${logdirs} 	console=true
+
+	VAR 	${logdir} 		${dbpath}${/}logs${/}${logdirs}[0]
+	@{xmlfiles} = 	List Files In Directory 	${logdir} 	*.xml
+	# @{xmlfiles} = 	List Files In Directory 	${dbpath}${/}logs${/}${logdirs}[0] 	*.xml 	absolute
+
+	Log  	xmlfiles: ${xmlfiles} 	console=true
+
+	${root}= 	Parse XML 	${logdir}${/}${xmlfiles}[0]
+	# ${root}= 	Parse XML 	${xmlfiles}[0]
+	# ${errors}= 	Get Elements 	${xmlfiles}[0] 		//errors/msg
+	# ${errorcount}= 	Get Element Count 	${root} 		.//errors/msg
+	# IF 	${errorcount} > 0
+	# 	${errors}= 	Get Elements 	${root} 		.//errors/msg
+	# 	Log  	errors: ${errors} 	console=true
+	# 	VAR 	${ftext} 		${EMPTY}
+	# 	FOR 	${error} 	IN 		@{errors}
+	# 		${etext} = 	Get Element Text 	${error}
+	# 		Log  	error: ${etext}
+	# 		VAR 	${ftext} 		${ftext}\n${etext}
+	# 	END
+	# 	Fail  	errors: ${ftext}
+	# END
+
+	# # //test[1]
+	# ${test_1}= 	Get Element 	${root} 	.//test[1]
+	# # //test[2]
+	# ${test_2}= 	Get Element 	${root} 	.//test[2]
+
+	# //kw[arg[text()='Sleep added by RFSwarm']]
+	${inj_sleep_count_1}= 	Get Element Count 	${root} 		.//test[1]//kw[arg[text()='Sleep added by RFSwarm']]
+	${inj_sleep_count_2}= 	Get Element Count 	${root} 		.//test[2]//kw[arg[text()='Sleep added by RFSwarm']]
+
+	Should Be Equal As Numbers 		${inj_sleep_count_1} 		${inj_sleep_count_2}
+
+	# Log To Console 	Checking PreRun data base.
+	# ${query_result} 	Query Result DB 	${dbfile}
+	# ...    SELECT * FROM AgentList WHERE AgentName='Issue-#100AGENTNAME'
+	# ${len}= 	Get Length 	${query_result}
+	# Should Be True 	${len} > 0
+	# ...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}
+
+	[Teardown]	Run Keywords	Stop Agent	Stop Manager
