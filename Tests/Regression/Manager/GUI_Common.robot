@@ -7,7 +7,7 @@ Library		Collections
 Library		DateTime
 Library		XML
 
-Library		ImageHorizonLibrary	reference_folder=${IMAGE_DIR}
+Library		ImageHorizonLibrary		reference_folder=${IMAGE_DIR} 		keyword_on_failure=ImageHorizonLibrary.Take A Screenshot
 
 Library 	ini_file.py
 Library 	get_ip_address.py
@@ -179,6 +179,9 @@ Close Manager GUI ubuntu
 	Close Manager GUI
 
 Close Manager GUI windows
+	IF 		${TEST STATUS} == FAIL
+		Take A Screenshot
+	END
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
 	Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
 	Close Manager GUI
