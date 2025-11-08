@@ -38,6 +38,9 @@ ${agent_dir} 				${OUTPUT DIR}${/}rfswarm-agent
 Set Platform
 	Set Platform By Python
 	Set Platform By Tag
+	IF 		${platform} == macos
+		Remove Screen Capture Nag
+	END
 
 Set Platform By Python
 	${system}= 		Evaluate 	platform.system() 	modules=platform
@@ -51,7 +54,6 @@ Set Platform By Python
 	IF 	"${system}" == "Linux"
 		Set Suite Variable    ${platform}    ubuntu
 	END
-
 
 Set Platform By Tag
 	# [Arguments]		${ostag}
@@ -72,6 +74,15 @@ Set Platform By Tag
 			Set Suite Variable    ${platform}    ubuntu
 		END
 	END
+
+Remove Screen Capture Nag
+	# https://github.com/luckman212/screencapture-nag-remover
+	# ~/Library/Group Containers/group.com.apple.replayd/ScreenCaptureApprovals.plist
+	VAR 	${ScreenCaptureApprovals} 	~/Library/Group Containers/group.com.apple.replayd/ScreenCaptureApprovals.plist
+	${filedata}= 	Get File 	${ScreenCaptureApprovals}
+	Log  	${filedata}
+	${root}= 	Parse XML 	${ScreenCaptureApprovals}
+	Log  	${root}
 
 Show Log
 	[Arguments]		${filename}
