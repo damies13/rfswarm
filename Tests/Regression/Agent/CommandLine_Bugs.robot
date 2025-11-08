@@ -210,10 +210,13 @@ Verify listener doesn't generate KeyError when using inject sleep
 	VAR 	@{mngr_options} 	-n 	-s 	${scenariofile} 	-d 	${results_dir}
 
 	Create Directory 	${results_dir}
-	Log To Console	Run Agent with custom agent name.
+	Log To Console	Run Agent
 	Run Agent 	${agnt_options}
+	Log To Console	Run Manager with Issue #392 Scenario
 	Run Manager CLI 	${mngr_options}
+	Log To Console	Wait For Manager To Finish
 	Wait For Manager
+	Log To Console	Stop Agent
 	Stop Agent
 	# Stop Manager
 
@@ -227,11 +230,9 @@ Verify listener doesn't generate KeyError when using inject sleep
 	@{xmlfiles} = 	List Files In Directory 	${logdir} 	*.xml
 	# @{xmlfiles} = 	List Files In Directory 	${dbpath}${/}logs${/}${logdirs}[0] 	*.xml 	absolute
 
+	Log To Console	Check for Errors In Agents Robot Logs
 	Log  	xmlfiles: ${xmlfiles} 	console=true
-
 	${root}= 	Parse XML 	${logdir}${/}${xmlfiles}[0]
-	# ${root}= 	Parse XML 	${xmlfiles}[0]
-	# ${errors}= 	Get Elements 	${xmlfiles}[0] 		//errors/msg
 	${errorcount}= 	Get Element Count 	${root} 		.//errors/msg
 	IF 	${errorcount} > 0
 		${errors}= 	Get Elements 	${root} 		.//errors/msg
@@ -266,13 +267,17 @@ Verify listener doesn't over inject sleeps
 	VAR 	@{mngr_options} 	-n 	-s 	${scenariofile} 	-d 	${results_dir}
 
 	Create Directory 	${results_dir}
-	Log To Console	Run Agent with custom agent name.
+	Log To Console	Run Agent
 	Run Agent 	${agnt_options}
+	Log To Console	Run Manager with Issue #392 Scenario
 	Run Manager CLI 	${mngr_options}
+	Log To Console	Wait For Manager To Finish
 	Wait For Manager
+	Log To Console	Stop Agent
 	Stop Agent
 	# Stop Manager
 
+	Log To Console	Check Counts Of Injected Sleeps In Agents Robot Logs
 	${dbfile}= 	Find Result DB 		*_Issue-#394
 	${dbpath} 	${dbfilename}= 	Split Path 	${dbfile}
 
@@ -307,8 +312,8 @@ Verify listener doesn't over inject sleeps
 	# ${test_2}= 	Get Element 	${root} 	.//test[2]
 
 	# //kw[arg[text()='Sleep added by RFSwarm']]
-	${inj_sleep_count_1}= 	Get Element Count 	${root} 		.//test[1]//kw[arg[text()='Sleep added by RFSwarm']]
-	${inj_sleep_count_2}= 	Get Element Count 	${root} 		.//test[2]//kw[arg[text()='Sleep added by RFSwarm']]
+	${inj_sleep_count_1}= 	Get Element Count 	${root} 		.//test[1]//kw[arg = 'Sleep added by RFSwarm']
+	${inj_sleep_count_2}= 	Get Element Count 	${root} 		.//test[2]//kw[arg = 'Sleep added by RFSwarm']
 
 	Should Be Equal As Numbers 		${inj_sleep_count_1} 		${inj_sleep_count_2}
 
