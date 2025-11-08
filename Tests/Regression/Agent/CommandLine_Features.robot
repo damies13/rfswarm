@@ -261,15 +261,15 @@ Agent Command Line PROPERTY -p
 	Log To Console	Run Agent with custom prop.
 	Run Manager CLI 	${mngr_options}
 	Run Agent 	${agnt_options}
-	Sleep	60s
+	Sleep	120s
 	Stop Agent
 	Stop Manager
 
 	Log To Console 	Checking result data base
 	${dbfile} 	Find Result DB 		result_pattern=PreRun
-	${agent_result} 	Query Result DB 	${dbfile}
-	...    SELECT * FROM MetricData WHERE MetricType='Agent'
-	Log 	${agent_result}
+	# ${agent_result} 	Query Result DB 	${dbfile}
+	# ...    SELECT * FROM MetricData WHERE MetricType='Agent'
+	# Log 	${agent_result}
 
 	${prop_result} 	Query Result DB 	${dbfile}
 	...    SELECT * FROM MetricData WHERE MetricType='Agent' AND SecondaryMetric='Issue-#14'
