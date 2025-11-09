@@ -210,7 +210,7 @@ Agent Command Line AGENTNAME -a
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 	[Setup] 	Start Server	127.0.0.1	8138
 
-	VAR 	${agent_name} 		Issue-#14AGENTNAME
+	VAR 	${agent_name} 		Issue-#14-a
 	VAR 	@{agnt_options} 	-a 	${agent_name}
 
 	Log To Console	Run Agent with custom agent name.
@@ -224,7 +224,7 @@ Agent Command Line AGENTNAME -a
 
 	Should Be Equal 	${method}	POST
 	Log 	${body}
-	Should Contain	${body} 	Issue-#14AGENTNAME
+	Should Contain	${body} 	${agent_name}
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 
 	[Teardown]	Run Keywords	Stop Server 	Stop Agent
@@ -233,7 +233,7 @@ Agent Command Line AGENTNAME --agentname
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 	[Setup] 	Start Server	127.0.0.1	8138
 
-	VAR 	${agent_name} 		Issue-#14AGENTNAME
+	VAR 	${agent_name} 		Issue-#14--agentname
 	VAR 	@{agnt_options} 	--agentname 	${agent_name}
 
 	Log To Console	Run Agent with custom agent name.
@@ -247,7 +247,7 @@ Agent Command Line AGENTNAME --agentname
 
 	Should Be Equal 	${method}	POST
 	Log 	${body}
-	Should Contain	${body} 	Issue-#14AGENTNAME
+	Should Contain	${body} 	${agent_name}
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 
 	[Teardown]	Run Keywords	Stop Server 	Stop Agent
@@ -255,8 +255,9 @@ Agent Command Line AGENTNAME --agentname
 Agent Command Line PROPERTY -p
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 
-	VAR 	@{agnt_options} 	-p 	Issue-#14
-	VAR 	@{mngr_options} 	-n
+	VAR 	${property} 		Issue-14-p
+	VAR 	@{agnt_options} 	-p 	${property}
+	VAR 	@{mngr_options}
 
 	Log To Console	Run Agent with custom prop.
 	Run Manager CLI 	${mngr_options}
@@ -271,11 +272,11 @@ Agent Command Line PROPERTY -p
 	# Log 	${agent_result}
 
 	${prop_result} 	Query Result DB 	${dbfile}
-	...    SELECT * FROM MetricData WHERE MetricType='Agent' AND SecondaryMetric='Issue-#14'
+	...    SELECT * FROM MetricData WHERE MetricType='Agent' AND SecondaryMetric='${property}'
 
 	${len}= 	Get Length 	${prop_result}
 	Should Be True 	${len} > 0
-	...    msg=Custom propery 'Issue-#14' not found in PreRun db. ${\n}Query Result: ${prop_result}
+	...    msg=Custom propery '${property}' not found in PreRun db. ${\n}Query Result: ${prop_result}
 
 	[Teardown]	Run Keywords	Stop Agent	Stop Manager
 

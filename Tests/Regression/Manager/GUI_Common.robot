@@ -129,6 +129,8 @@ Remove Screen Capture Nag
 	...						</plist>
 
 	Create File 	${ScreenCaptureApprovals} 	${plistconten}
+	${filedata}= 	Get File 	${ScreenCaptureApprovals}
+	Log  	${filedata}
 
 Show Log
 	[Arguments]		${filename}
