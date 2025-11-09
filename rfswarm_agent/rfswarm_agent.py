@@ -2346,7 +2346,15 @@ class RFSwarmAgent():
 		fd.append("				self.testname = test.name")
 		fd.append("			newname = \"{} {}\".format(self.testname, newiteration)")
 		fd.append("			copy = test.copy(name=newname)")
+		fd.append("			copy = self.__remove_injected_sleeps(copy)")
 		fd.append("			test.parent.tests.append(copy)")
+		fd.append("")
+		fd.append("	def __remove_injected_sleeps(self, testobj):")
+		fd.append("		# print('RFSTestRepeater', '__remove_injected_sleeps', 'testobj:', testobj)")
+		fd.append("		# print('RFSTestRepeater', '__remove_injected_sleeps', 'testobj.body:', testobj.body)")
+		fd.append("		testobj.body = [item for item in testobj.body if not (item.name=='Sleep' and item.args[1]=='Sleep added by RFSwarm')]")
+		fd.append("		# print('RFSTestRepeater', '__remove_injected_sleeps', 'testobj.body:', testobj.body)")
+		fd.append("		return testobj")
 		fd.append("")
 
 		rfver = self.agentproperties["RobotFramework"]
