@@ -109,24 +109,37 @@ Remove Screen Capture Nag
 	# </plist>
 	VAR     ${futuretime}     ${{ (datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=2)).strftime("%Y-%m-%dT%H:%M:%SZ") }}
 	VAR 	${plistconten} 	<?xml version="1.0" encoding="UTF-8"?>
-	...						<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">;
-	...						<plist version="1.0">
-	...						<dict>
-	...							<key>/opt/hca/hosted-compute-agent</key>
-	...							<dict>
-	...								<key>kScreenCaptureAlertableUsageCount</key>
-	...								<integer>2704</integer>
-	...								<key>kScreenCaptureApprovalLastAlerted</key>
-	...								<date>${futuretime}</date>
-	...								<key>kScreenCaptureApprovalLastUsed</key>
-	...								<date>${futuretime}</date>
-	...								<key>kScreenCapturePrivacyHintDate</key>
-	...								<date>${futuretime}</date>
-	...								<key>kScreenCapturePrivacyHintPolicy</key>
-	...								<integer>2592000</integer>
-	...							</dict>
-	...						</dict>
-	...						</plist>
+	...						\n<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">;
+	...						\n<plist version="1.0">
+	...						\n<dict>
+	...						\n	<key>/opt/hca/hosted-compute-agent</key>
+	...						\n	<dict>
+	...						\n		<key>kScreenCaptureAlertableUsageCount</key>
+	...						\n		<integer>2704</integer>
+	...						\n		<key>kScreenCaptureApprovalLastAlerted</key>
+	...						\n		<date>${futuretime}</date>
+	...						\n		<key>kScreenCaptureApprovalLastUsed</key>
+	...						\n		<date>${futuretime}</date>
+	...						\n		<key>kScreenCapturePrivacyHintDate</key>
+	...						\n		<date>${futuretime}</date>
+	...						\n		<key>kScreenCapturePrivacyHintPolicy</key>
+	...						\n		<integer>2592000</integer>
+	...						\n	</dict>
+	...						\n	<key>/bin/bash</key>
+	...						\n	<dict>
+	...						\n		<key>kScreenCaptureAlertableUsageCount</key>
+	...						\n		<integer>2704</integer>
+	...						\n		<key>kScreenCaptureApprovalLastAlerted</key>
+	...						\n		<date>${futuretime}</date>
+	...						\n		<key>kScreenCaptureApprovalLastUsed</key>
+	...						\n		<date>${futuretime}</date>
+	...						\n		<key>kScreenCapturePrivacyHintDate</key>
+	...						\n		<date>${futuretime}</date>
+	...						\n		<key>kScreenCapturePrivacyHintPolicy</key>
+	...						\n		<integer>2592000</integer>
+	...						\n	</dict>
+	...						\n</dict>
+	...						\n</plist>
 
 	Create File 	${ScreenCaptureApprovals} 	${plistconten}
 	${filedata}= 	Get File 	${ScreenCaptureApprovals}
