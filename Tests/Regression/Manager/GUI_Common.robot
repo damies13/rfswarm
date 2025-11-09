@@ -80,8 +80,11 @@ Remove Screen Capture Nag
 	# ~/Library/Group Containers/group.com.apple.replayd/ScreenCaptureApprovals.plist
 	${ScreenCaptureApprovals}= 		Normalize Path 		~/Library/Group Containers/group.com.apple.replayd/ScreenCaptureApprovals.plist
 	Log  	${ScreenCaptureApprovals} 		console=true
-	${filedata}= 	Get File 	${ScreenCaptureApprovals}
-	Log  	${filedata}
+	${exists}= 	Run Keyword And Return Status 	File Should Exist 	${ScreenCaptureApprovals}
+	IF 		${exists}
+		${filedata}= 	Get File 	${ScreenCaptureApprovals}
+		Log  	${filedata}
+	END
 	# ${root}= 	Parse XML 	${ScreenCaptureApprovals}
 	# Log  	${root}
 	# Try 1 lets try overwriting the ScreenCaptureApprovals.plist file with one configured with a future date
