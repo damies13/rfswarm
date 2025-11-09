@@ -250,6 +250,9 @@ Handle Donation Reminder
 	VAR 	${DonationReminder} 	${found} 		scope=TEST
 
 Close Manager GUI ubuntu
+	IF 		${TEST STATUS} == FAIL
+		Take A Screenshot
+	END
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
 	Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
 	Close Manager GUI
@@ -302,6 +305,9 @@ Close Manager GUI
 Close Manager GUI macos
 	[Tags]	macos-latest
 	# Sleep	3
+	IF 		${TEST STATUS} == FAIL
+		Take A Screenshot
+	END
 	${running}= 	Is Process Running 	${process_manager}
 	IF 	${running}
 		Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
