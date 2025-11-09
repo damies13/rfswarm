@@ -659,7 +659,10 @@ Get Manager INI Data
 #	[Arguments]		${inifile}
 
 Set INI Window Size
+	[Documentation] 	Pass the: Manager, Reporter or Agent
 	[Arguments]		${width}=${None}	${height}=${None}
+	Log 	${width}
+	Log 	${height}
 	IF	"${width}" != "${None}"
 		Change Manager INI Option 	GUI 		win_width 	${width}
 	END
@@ -667,15 +670,42 @@ Set INI Window Size
 		Change Manager INI Option 	GUI 		win_height 	${height}
 	END
 
-Change Manager INI Option
-	[Arguments]		${section} 		${option}		${new_value}
-	${location}=	Get Manager INI Location
-	Change INI Option 	${location} 	${section} 		${option}		${new_value}
+# Change Manager INI Option
+# 	[Arguments]		${section} 		${option}		${new_value}
+# 	${location}=	Get Manager INI Location
+# 	Change INI Option 	${location} 	${section} 		${option}		${new_value}
+# 	${file}= 	Get File 	${location}
+# 	Log 	${file}
 
+Change ${component_name} INI Option
+	[Documentation] 	Pass the: Manager, Reporter or Agent
+	[Arguments] 	${section}  ${option}  ${new_value}
+	${location}= 	Get Manager INI Location
 
-Change Manager INI File Settings
-	[Arguments]		${option}	${new_value}
-	Fail 		Deprecated keyword, use: Change Manager INI Option
+	${file}= 	Get File 	${location}
+	Log 	${file}
+
+	${status_1}= 	Run Keyword And Return Status 	File Should Exist 			${location}
+	${status_2}= 	Run Keyword And Return Status 	File Should Not Be Empty 	${location}
+	&{OUTPUT} 	Create Dictionary
+	IF  not ${status_1}
+		Log 	The ${component_name} INI data could not be edited. INI file does not exists. 	console=${True}
+		RETURN 	&{OUTPUT}
+	ELSE IF 	not ${status_2}
+		Log 	The ${component_name} INI data could not be edited. INI file is empty. 	console=${True}
+		RETURN 	&{OUTPUT}
+	END
+
+	Change INI Option 	${location}  ${section}  ${option}  ${new_value}
+
+	${file}= 	Get File 	${location}
+	Log 	${file}
+
+	Sleep 	2s
+
+# Change Manager INI File Settings
+# 	[Arguments]		${option}	${new_value}
+# 	Fail 		Deprecated keyword, use: Change Manager INI Option
 
 Get Manager PIP Data
 	Run Process	pip	show	rfswarm-manager		alias=data

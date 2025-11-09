@@ -7,7 +7,7 @@ Library 	ArchiveLibrary
 Library 	DocTest.VisualTest
 Library 	XML 	use_lxml=True
 
-Library 	ImageHorizonLibrary 	reference_folder=${IMAGE_DIR} 	confidence=${0.9}
+Library 	ImageHorizonLibrary 	reference_folder=${IMAGE_DIR} 	confidence=${0.9} 	screenshot_folder=${OUTPUT_DIR}
 Library 	OCRLibrary
 
 Library 	read_docx.py

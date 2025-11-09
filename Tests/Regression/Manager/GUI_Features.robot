@@ -595,6 +595,7 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	...    Create Manager INI File If It Does Not Exist 					AND
 	...    Set INI Window Size		1000	600								AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
+	...    Open Manager GUI 												AND
 	...    Create Robot File
 
 	@{run_robots}	Create List
@@ -671,6 +672,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 	...    Create Manager INI File If It Does Not Exist 					AND
 	...    Set INI Window Size		1000	600								AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
+	...    Open Manager GUI 												AND
 	...    Create Robot File
 
 	@{settings_locations}	Create List
@@ -752,6 +754,7 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	...    Create Manager INI File If It Does Not Exist 					AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Set INI Window Size		1000	600								AND
 	...    Set Test Variable	@{mngr_options}	-g	1						AND
 	...    Open Manager GUI		@{mngr_options}								AND
 	...    Create Robot File
@@ -920,7 +923,7 @@ Verify the Manager Handles Corrupted Scenario Files And Repairs It
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #58
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist 					AND
-	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set INI Window Size		1000	600								AND
 	...    Open Manager GUI													AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
@@ -990,7 +993,7 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	...    Set Test Variable	@{mngr_options}	-g	1						AND
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set INI Window Size		1200	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Open Manager GUI		@{mngr_options}								AND
 	...    Create Robot File	name=example.robot	file_content=***Test Case***\nExample Test Case\n
 
@@ -1615,7 +1618,7 @@ Verify Disable log.html - Test Row
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set INI Window Size		1200	600						AND
+	...    Set INI Window Size		1000	600
 
 	${testkey}= 	Set Variable 		disableloglog
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
@@ -1660,7 +1663,7 @@ Verify Disable report.html - Test Row
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set INI Window Size		1200	600						AND
+	...    Set INI Window Size		1000	600
 
 	${testkey}= 	Set Variable 		disablelogreport
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
@@ -1705,7 +1708,7 @@ Verify Disable output.xml - Test Row
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set INI Window Size		1200	600						AND
+	...    Set INI Window Size		1000	600
 
 	${testkey}= 	Set Variable 		disablelogoutput
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
@@ -2546,7 +2549,7 @@ Verify the Files Referenced In the Scenario Are All Using Relative Paths
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set INI Window Size		1200	600						AND
+	...    Set INI Window Size		1000	600						AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]
 
 	${test_data_path}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#54
@@ -2960,7 +2963,7 @@ Verify Result Name - Test Row
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set INI Window Size		1200	600						AND
+	...    Set INI Window Size		1000	600
 
 	${testkey}= 	Set Variable 		resultnamemode
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default.rfs
@@ -3551,7 +3554,7 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	Click Label With Horizontal Offset 	FilterPattern 	140
 	VAR 	${filter} 	*Keyword *2
 	Evaluate 	clipboard.copy("${filter}") 	modules=clipboard
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination 	KEY.command 	KEY.a
 		Sleep 	1
 		Press Combination	KEY.command		KEY.v
@@ -3564,10 +3567,10 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
-	VAR 	${y_value} 	manager_${platform}_label_8.png
+	VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
 	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
 	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}" should not be visible on the graph.
-	VAR 	${y_value} 	manager_${platform}_label_4.png
+	VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
 	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
 	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
 
