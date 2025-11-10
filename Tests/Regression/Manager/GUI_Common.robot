@@ -250,7 +250,7 @@ Handle Donation Reminder
 	VAR 	${DonationReminder} 	${found} 		scope=TEST
 
 Close Manager GUI ubuntu
-	IF 		${TEST STATUS} == FAIL
+	IF 		'${TEST STATUS}' == 'FAIL'
 		Take A Screenshot
 	END
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
@@ -258,7 +258,7 @@ Close Manager GUI ubuntu
 	Close Manager GUI
 
 Close Manager GUI windows
-	IF 		${TEST STATUS} == FAIL
+	IF 		'${TEST STATUS}' == 'FAIL'
 		Take A Screenshot
 	END
 	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
@@ -305,7 +305,7 @@ Close Manager GUI
 Close Manager GUI macos
 	[Tags]	macos-latest
 	# Sleep	3
-	IF 		${TEST STATUS} == FAIL
+	IF 		'${TEST STATUS}' == 'FAIL'
 		Take A Screenshot
 	END
 	${running}= 	Is Process Running 	${process_manager}
