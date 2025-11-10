@@ -995,8 +995,8 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	...    Set Test Variable	@{mngr_options}	-g	1						AND
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set INI Window Size		1000	600						AND
-	...    Open Manager GUI		@{mngr_options}								AND
+	...    Set INI Window Size		1000	600								AND
+	...    Open Manager GUI													AND
 	...    Create Robot File	name=example.robot	file_content=***Test Case***\nExample Test Case\n
 
 	${scenario_name}=	Set Variable	test_scenario_missing_file
@@ -1023,7 +1023,7 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 
 	Run Keyword		Close Manager GUI ${platform}
 	Change Manager INI Option 	Plan 	scenariofile 	${scenariofile}
-	Open Manager GUI		@{mngr_options}
+	Open Manager GUI
 
 	Wait For	${platform}_warning_label.png	timeout=30
 	Press key.enter 1 Times

@@ -37,3 +37,4 @@ def change_ini_option(filename, section, optionname, new_value):
 		config.write(configfile)
 
 	print("After:", config, dict(config))
+ 

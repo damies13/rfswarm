@@ -670,13 +670,12 @@ Set INI Window Size
 		Change Manager INI Option 	GUI 		win_height 	${height}
 	END
 
+	# temp. fix for v1.5.3 branch:
 	Sleep 	2s
 
-	IF  '${component_name}' == 'Manager'
-		${process}= 	Start Process  rfswarm-manager
-	END
+	Open Manager GUI
 	Sleep 	5s
-	${result}= 	Terminate Process 	${process}
+	Close Manager GUI
 
 # Change Manager INI Option
 # 	[Arguments]		${section} 		${option}		${new_value}
