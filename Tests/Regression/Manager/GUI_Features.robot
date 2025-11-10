@@ -592,10 +592,11 @@ Verify the Time Fields In the Plan Screen For Run: Complex Variations
 Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords
-	...    Create Manager INI File If It Does Not Exist 					AND
-	...    Set INI Window Size		1000	600								AND
+	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Open Manager GUI 												AND
+	...    Set INI Window Size		1000	600								AND
+	...    Open Manager GUI													AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Create Robot File
 
 	@{run_robots}	Create List
@@ -669,10 +670,11 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 Check If the Manager Saves Settings on the Test Row With Example Robot
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
 	[Setup]	Run Keywords
-	...    Create Manager INI File If It Does Not Exist 					AND
-	...    Set INI Window Size		1000	600								AND
+	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Open Manager GUI 												AND
+	...    Set INI Window Size		1000	600						AND
+	...    Open Manager GUI													AND
+	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Create Robot File
 
 	@{settings_locations}	Create List
@@ -1020,6 +1022,7 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	END
 
 	Run Keyword		Close Manager GUI ${platform}
+	Change Manager INI Option 	Plan 	scenariofile 	${scenariofile}
 	Open Manager GUI		@{mngr_options}
 
 	Wait For	${platform}_warning_label.png	timeout=30

@@ -51,6 +51,8 @@ Add Test In Language
 
 Language Test Init
 	${mgrini}= 	Get Manager INI Location
+	Create Manager INI File If It Does Not Exist
+	Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}
 	Set INI Window Size 	1200 	600
 	# ${options}= 	Create List 	 	-d 	${agent_dir}
 	Open Agent
@@ -58,7 +60,5 @@ Language Test Init
 Language Test End
 	Run Keyword		Close Manager GUI ${platform}
 	Stop Agent
-
-
 
 #

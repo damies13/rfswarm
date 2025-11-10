@@ -670,6 +670,14 @@ Set INI Window Size
 		Change Manager INI Option 	GUI 		win_height 	${height}
 	END
 
+	Sleep 	2s
+
+	IF  '${component_name}' == 'Manager'
+		${process}= 	Start Process  rfswarm-manager
+	END
+	Sleep 	5s
+	${result}= 	Terminate Process 	${process}
+
 # Change Manager INI Option
 # 	[Arguments]		${section} 		${option}		${new_value}
 # 	${location}=	Get Manager INI Location
@@ -700,8 +708,6 @@ Change ${component_name} INI Option
 
 	${file}= 	Get File 	${location}
 	Log 	${file}
-
-	Sleep 	2s
 
 # Change Manager INI File Settings
 # 	[Arguments]		${option}	${new_value}
