@@ -3453,7 +3453,7 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	Click Label With Horizontal Offset 	FilterPattern 	140
 	VAR 	${filter} 	*21*
 	Evaluate 	clipboard.copy("${filter}") 	modules=clipboard
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination 	KEY.command 	KEY.a
 		Sleep 	1
 		Press Combination	KEY.command		KEY.v
@@ -3466,10 +3466,10 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
-	VAR 	${y_value} 	manager_${platform}_label_8.png
+	VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
 	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
-	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should not be visible on the graph.
-	VAR 	${y_value} 	manager_${platform}_label_4.png
+	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}" should not be visible on the graph.
+	VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
 	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
 	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
 
@@ -3479,7 +3479,7 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	Click Label With Horizontal Offset 	FilterPattern 	140
 	VAR 	${filter} 	*Keyword *2
 	Evaluate 	clipboard.copy("${filter}") 	modules=clipboard
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination 	KEY.command 	KEY.a
 		Sleep 	1
 		Press Combination	KEY.command		KEY.v
@@ -3492,10 +3492,10 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
-	VAR 	${y_value} 	manager_${platform}_label_8.png
+	VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
 	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
-	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should not be visible on the graph.
-	VAR 	${y_value} 	manager_${platform}_label_4.png
+	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}" should not be visible on the graph.
+	VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
 	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
 	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
 
@@ -3531,7 +3531,7 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	Click Label With Horizontal Offset 	FilterPattern 	140
 	VAR 	${filter} 	*21*
 	Evaluate 	clipboard.copy("${filter}") 	modules=clipboard
-	IF  "${platform}" == "macos"
+	IF  "${PLATFORM}" == "macos"
 		Press Combination 	KEY.command 	KEY.a
 		Sleep 	1
 		Press Combination	KEY.command		KEY.v
@@ -3544,10 +3544,10 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
-	VAR 	${y_value} 	manager_${platform}_label_8.png
+	VAR 	${y_value} 	manager_${PLATFORM}_label_8.png
 	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
 	Run Keyword If	${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}" should not be visible on the graph.
-	VAR 	${y_value} 	manager_${platform}_label_4.png
+	VAR 	${y_value} 	manager_${PLATFORM}_label_4.png
 	${status}=	Run Keyword And Return Status	Wait For 	${y_value} 	 timeout=8
 	Run Keyword If	not ${status}	Fail 	msg=The filter has not been applied to the graph! \nThis value "${y_value}"" should be visible on the graph.
 

@@ -670,12 +670,7 @@ Set INI Window Size
 		Change Manager INI Option 	GUI 		win_height 	${height}
 	END
 
-	# temp. fix for v1.5.3 branch:
 	Sleep 	2s
-
-	Open Manager GUI
-	Sleep 	5s
-	Close Manager GUI
 
 # Change Manager INI Option
 # 	[Arguments]		${section} 		${option}		${new_value}
@@ -1851,8 +1846,6 @@ Run ${component_name} CLI
 		IF  '${component_name}' == 'Manager' and ${len} == ${0} #( '-d' not in ${appargs} and '--dir' not in ${appargs} )
 			Append To List 	${appargs} 	-d 	${RESULTS_DIR}
 		ELSE IF  '${component_name}' == 'Manager' and ${len} != ${0} and ( '-d' not in ${appargs} and '--dir' not in ${appargs} )
-			${location}= 	Get Manager INI Location
-			Remove File 	${location}
 			Create Manager INI File If It Does Not Exist
 			Change Manager INI Option 	Run 	resultsdir 	${RESULTS_DIR}
 		ELSE IF  '${component_name}' == 'Agent' and ( '-d' not in ${appargs} and '--agentdir' not in ${appargs} )
