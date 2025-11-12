@@ -137,6 +137,7 @@ First Run
 
 New Data Table Section
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #149 	Issue #150
+	[Setup] 	Set Reporter INI Window Size 	height=700
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	${testdata}= 	Set Variable    Issue-#147
 	${resultdata}= 	Set Variable    20230320_185055_demo
@@ -156,7 +157,8 @@ New Data Table Section
 
 	Click Button 			AddSection
 
-	Click To The Below Of Image 	reporter_${platform}_label_sectionname.png 	20
+	Sleep 	1s
+	Click To The Below Of Image 	reporter_${PLATFORM}_label_sectionname.png 	20
 	Type 	Issue #149
 	Click Button 			OK
 	Take A Screenshot
@@ -174,6 +176,7 @@ New Data Table Section
 
 	Select Option 	Result
 
+	Take A Screenshot
 	Select Field With Label 	ResultType
 
 	Select Option 	ResponseTime

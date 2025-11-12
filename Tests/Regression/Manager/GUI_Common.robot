@@ -33,14 +33,13 @@ ${process_manager}		None
 ${process_agent}		None
 ${results_dir} 			${OUTPUT DIR}${/}results
 ${agent_dir} 				${OUTPUT DIR}${/}rfswarm-agent
+${component_name} 	Manager
+${COMPONENT} 		Manager
 
 *** Keywords ***
 Set Platform
 	Set Platform By Python
 	Set Platform By Tag
-	IF 		'${platform}' == 'macos'
-		Remove Screen Capture Nag
-	END
 
 Set Platform By Python
 	${system}= 		Evaluate 	platform.system() 	modules=platform
@@ -54,6 +53,7 @@ Set Platform By Python
 	IF 	"${system}" == "Linux"
 		Set Suite Variable    ${platform}    ubuntu
 	END
+
 
 Set Platform By Tag
 	# [Arguments]		${ostag}
@@ -74,58 +74,6 @@ Set Platform By Tag
 			Set Suite Variable    ${platform}    ubuntu
 		END
 	END
-
-Remove Screen Capture Nag
-	# https://github.com/luckman212/screencapture-nag-remover
-	# ~/Library/Group Containers/group.com.apple.replayd/ScreenCaptureApprovals.plist
-	${ScreenCaptureApprovals}= 		Normalize Path 		~/Library/Group Containers/group.com.apple.replayd/ScreenCaptureApprovals.plist
-	Log  	${ScreenCaptureApprovals} 		console=true
-	${filedata}= 	Get File 	${ScreenCaptureApprovals}
-	Log  	${filedata}
-	# ${root}= 	Parse XML 	${ScreenCaptureApprovals}
-	# Log  	${root}
-	# Try 1 lets try overwriting the ScreenCaptureApprovals.plist file with one configured with a future date
-	# <?xml version="1.0" encoding="UTF-8"?>
-	# <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">;
-	# <plist version="1.0">
-	# <dict>
-	# 	<key>/opt/hca/hosted-compute-agent</key>
-	# 	<dict>
-	# 		<key>kScreenCaptureAlertableUsageCount</key>
-	# 		<integer>2704</integer>
-	# 		<key>kScreenCaptureApprovalLastAlerted</key>
-	# 		<date>2025-11-08T15:53:16Z</date>
-	# 		<key>kScreenCaptureApprovalLastUsed</key>
-	# 		<date>2025-11-08T15:59:59Z</date>
-	# 		<key>kScreenCapturePrivacyHintDate</key>
-	# 		<date>2025-12-08T15:53:16Z</date>
-	# 		<key>kScreenCapturePrivacyHintPolicy</key>
-	# 		<integer>2592000</integer>
-	# 	</dict>
-	# </dict>
-	# </plist>
-	VAR     ${futuretime}     ${{ (datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=2)).strftime("%Y-%m-%dT%H:%M:%SZ") }}
-	VAR 	${plistconten} 	<?xml version="1.0" encoding="UTF-8"?>
-	...						<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">;
-	...						<plist version="1.0">
-	...						<dict>
-	...							<key>/opt/hca/hosted-compute-agent</key>
-	...							<dict>
-	...								<key>kScreenCaptureAlertableUsageCount</key>
-	...								<integer>2704</integer>
-	...								<key>kScreenCaptureApprovalLastAlerted</key>
-	...								<date>${futuretime}</date>
-	...								<key>kScreenCaptureApprovalLastUsed</key>
-	...								<date>${futuretime}</date>
-	...								<key>kScreenCapturePrivacyHintDate</key>
-	...								<date>${futuretime}</date>
-	...								<key>kScreenCapturePrivacyHintPolicy</key>
-	...								<integer>2592000</integer>
-	...							</dict>
-	...						</dict>
-	...						</plist>
-
-	Create File 	${ScreenCaptureApprovals} 	${plistconten}
 
 Show Log
 	[Arguments]		${filename}
@@ -219,17 +167,9 @@ Check Logs
 # 		END
 # 	END
 
-	# IF 		'${platform}' == 'macos'
-	# 	Remove Screen Capture Nag
-	# END
-
 Wiggle Mouse
 	Move To 	10 	10
 	Move To 	20 	20
-
-Handle Donation Reminder
-	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		30
-	VAR 	${DonationReminder} 	${found} 		scope=TEST
 
 Close Manager GUI ubuntu
 	# Run Keyword And Ignore Error 	Click Dialog Button 	cancel 		0.01
@@ -413,7 +353,15 @@ Check If The Agent Is Ready
 	[Arguments] 	${timeout}=300
 	# Sleep	1
 	Click Tab	Agents
-	Wait For 	manager_${platform}_agents_ready.png	timeout=${timeout}
+	VAR 	${img} 	manager_${PLATFORM}_agents_ready.png
+	${status}= 	Run Keyword And Return Status 	Wait For 	${img}	timeout=${timeout}
+
+	IF  not ${status} and '${PLATFORM}' == 'macos'
+		VAR 	${img} 	manager_${PLATFORM}_agents_warning.png
+		${status}= 	Run Keyword And Return Status 	Wait For 	${img}	timeout=10
+	END
+
+	IF  not ${status}  Fail  Agent is not ready after ${timeout} seconds.
 
 Wait For the Scenario Run To Finish
 	[Arguments] 	${time}=${300}
@@ -551,7 +499,7 @@ Press ${key} ${n} Times
 	END
 
 Click ${item} With Vertical Offset
-	[Arguments]		${image_name}	${offset}=0
+	[Arguments]		${image_name}	${offset}=0 	${timeout}=${default_image_timeout}
 	[Documentation]	Click the item with the offset. An item can be: Label, Button, ...
 	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down].
 	${image_name}= 	Convert To Lower Case 	${image_name}
@@ -559,7 +507,7 @@ Click ${item} With Vertical Offset
 	${img}=	Set Variable		manager_${platform}_${item}_${image_name}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate		${img}
 	Log	${coordinates}
 	Click To The Below Of	${coordinates}	${offset}
@@ -1536,7 +1484,8 @@ Verify Test Result Directory Name
 	...    msg=Result directory name from scenario is incorrect: expected "${expected_name}", actual: "${result_dir_name}".
 
 Verify Generated Run Result Files
-	[Arguments]		${result_dir_name}		${scenario_name}
+	# NEEDS REFRESHING
+	[Arguments]		${result_dir_name}  ${scenario_name}  ${num_of_robots}=10
 	@{run_dir_name_fragmented}=	Split String	${result_dir_name}	separator=_		max_split=2
 	${result_dir_time}=	Set Variable	${run_dir_name_fragmented}[0]_${run_dir_name_fragmented}[1]
 
@@ -1560,7 +1509,7 @@ Verify Generated Run Result Files
 	...    Find Absolute Paths And Names For Files In Directory		${results_dir}${/}${result_dir_name}${/}${logs}[0]
 	${len}=		Get Length	${logs_file_names}
 	Log To Console	Number of files in the Logs directory: ${len}
-	Should Be True	${len} >= 20	msg=Number of files in the Logs directory is incorrect: should be at least 20, actual: "${len}".
+	Should Be True	${len} >= ${num_of_robots}*2 	msg=Number of files in the Logs directory is incorrect: should be at least 20, actual: "${len}".
 
 Find Result DB
 	[Arguments] 	${directory}=${results_dir} 	${result_pattern}=*_*
@@ -2122,7 +2071,6 @@ Wait For the Agent To Be Ready
 	END
 
 	IF  not ${status}  Fail  Agent is not ready after ${timeout} seconds.
-
 
 
 

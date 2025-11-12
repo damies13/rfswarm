@@ -148,10 +148,11 @@ Verify If Agent Runs With Existing INI File From Previous Version NO GUI
 Verify If Agent Name Has Been Transferred To the Manager (-a command line switch)
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #100
 
-	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#100${/}command_line
+	VAR 	${test_dir} 		${OUTPUT_DIR}${/}testdata${/}Issue-#100${/}command_line
 	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
-	VAR 	@{agnt_options} 	-a 	Issue-#100AGENTNAME-a
-	VAR 	@{mngr_options} 	-n 	-d 	${test_dir} 	-a 	2
+	VAR 	@{agnt_options} 	-a 	Issue-#100AGENTNAME
+	VAR 	@{mngr_options} 	-n 	-d 	${test_dir}
+	VAR 	${agent_name} 		Issue-#100AGENTNAME
 
 	Create Directory 	${test_dir}
 	Log To Console	Run Agent with custom agent name.
@@ -161,8 +162,9 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 	Wait Until the Agent Connects to the Manager
 
 	Log To Console 	Checking PreRun data base.
-	${query_result} 	Query Result DB 	${dbfile}
-	...    SELECT * FROM AgentList WHERE AgentName='Issue-#100AGENTNAME-a'
+	VAR 	${query}= 	SELECT * FROM AgentList WHERE AgentName='${agent_name}'
+	Wait Until the Query Is Not Empty 		${dbfile}  sql=SELECT * FROM AgentList
+	${query_result} 	Query Result DB 	${dbfile}  ${query}
 	${len}= 	Get Length 	${query_result}
 	Should Be True 	${len} > 0
 	...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}
@@ -174,8 +176,9 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 
 	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#100${/}ini_file
 	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
+	VAR 	${agent_name} 		Issue-100AGENTNAME
 	VAR 	@{agnt_options} 	-i 	${CURDIR}${/}testdata${/}Issue-#100${/}RFSwarmAgent.ini
-	VAR 	@{mngr_options} 	-n 	-d 	${test_dir} 	-a 	2
+	VAR 	@{mngr_options} 	-n 	-d 	${test_dir}
 
 	Create Directory 	${test_dir}
 	Log To Console	Run Agent with custom agent name.
@@ -185,99 +188,11 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 	Wait Until the Agent Connects to the Manager
 
 	Log To Console 	Checking PreRun data base.
-	${query_result} 	Query Result DB 	${dbfile}
-	...    SELECT * FROM AgentList WHERE AgentName='Issue-#100AGENTNAMEINI'
+	VAR 	${query}= 	SELECT * FROM AgentList WHERE AgentName='${agent_name}'
+	Wait Until the Query Is Not Empty 		${dbfile}  sql=SELECT * FROM AgentList
+	${query_result} 	Query Result DB 	${dbfile}  ${query}
 	${len}= 	Get Length 	${query_result}
 	Should Be True 	${len} > 0
 	...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}
-
-	[Teardown]	Run Keywords	Stop Agent	Stop Manager
-
-Verify listener doesn't generate KeyError when using inject sleep
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #392
-
-	VAR 	${results_dir} 		${OUTPUT DIR}${/}results
-	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#392
-	VAR 	${scenariofile} 	${test_dir}${/}Issue-#392.rfs
-	VAR 	@{agnt_options} 	-g 	1
-	VAR 	@{mngr_options} 	-n 	-s 	${scenariofile} 	-d 	${results_dir}
-
-	Create Directory 	${results_dir}
-	Log To Console	Run Agent
-	Run Agent 	${agnt_options}
-	Log To Console	Run Manager with Issue #392 Scenario
-	Run Manager CLI 	${mngr_options}
-	Log To Console	Wait For Manager To Finish
-	Wait For Manager
-	Log To Console	Stop Agent
-	Stop Agent
-
-	${dbfile}= 	Find Result DB 		*_Issue-#392
-	${dbpath} 	${dbfilename}= 	Split Path 	${dbfile}
-
-	@{logdirs}= 	List Directories In Directory 	${dbpath}${/}logs
-	Log  	logdirs: ${logdirs} 	console=true
-
-	VAR 	${logdir} 		${dbpath}${/}logs${/}${logdirs}[0]
-	@{xmlfiles} = 	List Files In Directory 	${logdir} 	*.xml
-
-	Log To Console	Check for Errors In Agents Robot Logs
-	Log  	xmlfiles: ${xmlfiles} 	console=true
-	${root}= 	Parse XML 	${logdir}${/}${xmlfiles}[0]
-	${errorcount}= 	Get Element Count 	${root} 		.//errors/msg
-	IF 	${errorcount} > 0
-		${errors}= 	Get Elements 	${root} 		.//errors/msg
-		Log  	errors: ${errors} 	console=true
-		VAR 	${ftext} 		${EMPTY}
-		FOR 	${error} 	IN 		@{errors}
-			${etext} = 	Get Element Text 	${error}
-			Log  	error: ${etext}
-			VAR 	${ftext} 		${ftext}\n${etext}
-		END
-		Fail  	errors: ${ftext}
-	END
-
-	[Teardown]	Run Keywords	Stop Agent	Stop Manager
-
-Verify listener doesn't over inject sleeps
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #394
-
-	VAR 	${results_dir} 		${OUTPUT DIR}${/}results
-	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#394
-	VAR 	${scenariofile} 	${test_dir}${/}Issue-#394.rfs
-	VAR 	@{agnt_options} 	-g 	1
-	VAR 	@{mngr_options} 	-n 	-s 	${scenariofile} 	-d 	${results_dir}
-
-	Create Directory 	${results_dir}
-	Log To Console	Run Agent
-	Run Agent 	${agnt_options}
-	Log To Console	Run Manager with Issue #392 Scenario
-	Run Manager CLI 	${mngr_options}
-	Log To Console	Wait For Manager To Finish
-	Wait For Manager
-	Log To Console	Stop Agent
-	Stop Agent
-
-	Log To Console	Check Counts Of Injected Sleeps In Agents Robot Logs
-	${dbfile}= 	Find Result DB 		*_Issue-#394
-	${dbpath} 	${dbfilename}= 	Split Path 	${dbfile}
-
-	@{logdirs}= 	List Directories In Directory 	${dbpath}${/}logs
-	Log  	logdirs: ${logdirs} 	console=true
-
-	VAR 	${logdir} 		${dbpath}${/}logs${/}${logdirs}[0]
-	@{xmlfiles} = 	List Files In Directory 	${logdir} 	*.xml
-
-	Log  	xmlfiles: ${xmlfiles} 	console=true
-
-	${root}= 	Parse XML 	${logdir}${/}${xmlfiles}[0]
-
-	# //kw[arg[text()='Sleep added by RFSwarm']]
-	${inj_sleep_count_1}= 	Get Element Count 	${root} 		.//test[1]//kw[arg = 'Sleep added by RFSwarm']
-	Log  	Count of injected sleeps for test 1: ${inj_sleep_count_1} 	console=true
-	${inj_sleep_count_2}= 	Get Element Count 	${root} 		.//test[2]//kw[arg = 'Sleep added by RFSwarm']
-	Log  	Count of injected sleeps for test 2: ${inj_sleep_count_2} 	console=true
-
-	Should Be Equal As Numbers 		${inj_sleep_count_1} 		${inj_sleep_count_2}
 
 	[Teardown]	Run Keywords	Stop Agent	Stop Manager

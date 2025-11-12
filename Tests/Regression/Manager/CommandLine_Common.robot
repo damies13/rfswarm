@@ -20,6 +20,7 @@ ${pyfile_manager} 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
 ${process_agent} 	${None}
 ${process_manager} 	${None}
 ${platform} 	${None}
+${COMPONENT} 	Manager
 
 # datapath: /home/runner/work/rfswarm/rfswarm/rfswarm_manager/results/PreRun
 # datapath: /opt/hostedtoolcache/Python/3.9.18/x64/lib/python3.9/site-packages/rfswarm_manager/results/PreRun -- let's control the output path rather than leaving it to chance
@@ -70,13 +71,6 @@ Show Log
 	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
 	Log 		${filedata} 		console=True
 	Log 		--ɅɅɅ--${filename}--ɅɅɅ--${\n} 		console=True
-	RETURN 		${filedata}
-
-Read Log
-	[Arguments]		${filename}
-	Log 		${filename}
-	${filedata}= 	Get File 	${filename} 		encoding=SYSTEM 		encoding_errors=ignore
-	Log 		${filedata}
 	RETURN 		${filedata}
 
 Show Dir Contents
@@ -325,21 +319,6 @@ Find Result DB
 	${file}= 	List Directory 	${fols[-1]} 	*.db 	absolute=True
 	Log to console 	Result DB: ${file[-1]}
 	RETURN 	${file[-1]}
-
-Query Result DB
-	[Arguments]		${dbfile} 	${sql}
-	# Disconnect From All Databases
-	Log 	dbfile: ${dbfile} 	console=true
-	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
-	# Log to console 	\${dbfile}: ${dbfile}
-	Connect To Database 	sqlite3 	database=${dbfile} 	isolation_level=${None}
-	# Log 	conn: ${conn} 	console=true
-	Log 	sql: ${sql} 	console=true
-	Check If Exists In Database 	${sql}
-	${result}= 	Query 	${sql}
-	Log 	sql result: ${result} 	console=true
-	Disconnect From Database
-	RETURN 	${result}
 
 CSV to List
 	[Arguments] 	${filepath}

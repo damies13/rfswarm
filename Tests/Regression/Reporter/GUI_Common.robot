@@ -167,7 +167,7 @@ Press ${key} ${n} Times
 	END
 
 Click ${item} With Vertical Offset
-	[Arguments]		${image_name}	${offset}=0
+	[Arguments]		${image_name}	${offset}=0 	${timeout}=${default_image_timeout}
 	[Documentation]	Click the item with the offset. An item can be: Label, Button, ...
 	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down].
 	${image_name}= 	Convert To Lower Case 	${image_name}
@@ -175,7 +175,7 @@ Click ${item} With Vertical Offset
 	${img}=	Set Variable		reporter_${platform}_${item}_${image_name}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate		${img}
 	Log	${coordinates}
 	Click To The Below Of	${coordinates}	${offset}
@@ -488,49 +488,45 @@ Get Platform
 	${os}= 	Evaluate 	platform.system() 	platform
 	Set Suite Variable    ${platform}    ${platforms}[${os}]
 
-Open GUI windows
-	[Arguments]		@{appargs}
-	# Set Suite Variable    ${platform}    windows
-	${args}= 	Evaluate 	" \t".join(@{appargs})
-	Set Confidence		0.9
-	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	# ${process}= 	Start Process 	python 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+# Open GUI windows
+# 	[Arguments]		@{appargs}
+# 	# Set Suite Variable    ${platform}    windows
+# 	${args}= 	Evaluate 	" \t".join(@{appargs})
+# 	Set Confidence		0.9
+# 	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+# 	# ${process}= 	Start Process 	python 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+# 	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 
-	Set Suite Variable 	$process 	${process}
-	# reporter_windows_status_previewloaded
-	# Wait For Status 	PreviewLoaded
-	# Sleep 	60
-	# Capture Screen
-	Set Screenshot Folder 	${OUTPUT DIR}
-	# Take A Screenshot
+# 	Set Suite Variable 	$process 	${process}
+# 	# reporter_windows_status_previewloaded
+# 	# Wait For Status 	PreviewLoaded
+# 	# Sleep 	60
+# 	# Capture Screen
+# 	Set Screenshot Folder 	${OUTPUT DIR}
+# 	# Take A Screenshot
 
-Open GUI ubuntu
-	[Arguments]		@{appargs}
-	Set Suite Variable    ${platform}    ubuntu
-	Set Confidence		0.9
-	# ${process}= 	Start Process 	python3 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	Set Suite Variable 	$process 	${process}
-	# Sleep 	60
-	# Capture Screen
-	Set Screenshot Folder 	${OUTPUT DIR}
-	# Take A Screenshot
+# Open GUI ubuntu
+# 	[Arguments]		@{appargs}
+# 	Set Suite Variable    ${platform}    ubuntu
+# 	Set Confidence		0.9
+# 	# ${process}= 	Start Process 	python3 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+# 	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+# 	Set Suite Variable 	$process 	${process}
+# 	# Sleep 	60
+# 	# Capture Screen
+# 	Set Screenshot Folder 	${OUTPUT DIR}
+# 	# Take A Screenshot
 
-Open GUI macos
-	[Arguments]		@{appargs}
-	Set Suite Variable    ${platform}    macos
-	Set Confidence		0.9
-	# ${process}= 	Start Process 	python3 	${pyfile} 	-g 	5 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	Set Suite Variable 	$process 	${process}
-	# Sleep 	60
-	Set Screenshot Folder 	${OUTPUT DIR}
-	# Take A Screenshot
-
-Handle Donation Reminder
-	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 	30
-	VAR 	${DonationReminder} 	${found} 		scope=TEST
+# Open GUI macos
+# 	[Arguments]		@{appargs}
+# 	Set Suite Variable    ${platform}    macos
+# 	Set Confidence		0.9
+# 	# ${process}= 	Start Process 	python3 	${pyfile} 	-g 	5 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+# 	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+# 	Set Suite Variable 	$process 	${process}
+# 	# Sleep 	60
+# 	Set Screenshot Folder 	${OUTPUT DIR}
+# 	# Take A Screenshot
 
 # Close GUI
 # 	${keyword}= 	Set Variable 	Close GUI ${platform}
@@ -555,40 +551,40 @@ Check Result
 	Should Not Contain 	${result.stderr} 	Traceback
 	Should Be Equal As Integers 	${result.rc} 	0
 
-Close GUI windows
-	# Press Combination 	Key.esc
-	# Press Combination 	x 	Key.ctrl
-	# Press Combination 	Key.f4 	Key.alt
-	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
-	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
-	Click Image		reporter_${platform}_button_closewindow.png
-	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
-	Take A Screenshot
-	Sleep 	0.5
-	End Process If Still Running
+# Close GUI windows
+# 	# Press Combination 	Key.esc
+# 	# Press Combination 	x 	Key.ctrl
+# 	# Press Combination 	Key.f4 	Key.alt
+# 	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
+# 	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
+# 	Click Image		reporter_${platform}_button_closewindow.png
+# 	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
+# 	Take A Screenshot
+# 	Sleep 	0.5
+# 	End Process If Still Running
 
-Close GUI ubuntu
-	# Press Combination 	Key.esc
-	# Press Combination 	x 	Key.ctrl
-	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
-	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
-	Click Image		reporter_${platform}_button_closewindow.png
-	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
-	Take A Screenshot
-	Sleep 	0.5
-	End Process If Still Running
+# Close GUI ubuntu
+# 	# Press Combination 	Key.esc
+# 	# Press Combination 	x 	Key.ctrl
+# 	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
+# 	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
+# 	Click Image		reporter_${platform}_button_closewindow.png
+# 	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
+# 	Take A Screenshot
+# 	Sleep 	0.5
+# 	End Process If Still Running
 
-Close GUI macos
-	# Press Combination 	Key.esc
-	# Press Combination 	q 	Key.command
-	# Click Image		reporter_${platform}_menu_python3.png
-	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
-	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
-	Click Image		reporter_${platform}_button_closewindow.png
-	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
-	Take A Screenshot
-	Sleep 	0.5
-	End Process If Still Running
+# Close GUI macos
+# 	# Press Combination 	Key.esc
+# 	# Press Combination 	q 	Key.command
+# 	# Click Image		reporter_${platform}_menu_python3.png
+# 	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
+# 	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
+# 	Click Image		reporter_${platform}_button_closewindow.png
+# 	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
+# 	Take A Screenshot
+# 	Sleep 	0.5
+# 	End Process If Still Running
 
 End Process If Still Running
 	${result}= 	Wait For Process 	${process} 	timeout=60
@@ -2010,7 +2006,35 @@ Stop ${component_name} CLI
 
 	[Teardown] 	Set Suite Variable 	${PROCESS_${comp}} 	${None}
 
+Change Reporter INI Option
+	[Documentation] 	Pass the: Manager, Reporter or Agent
+	[Arguments] 	${section}  ${option}  ${new_value}
+	VAR    ${component_name}    Reporter
+	${location}= 	Get Reporter INI Location
 
+	${status_1}= 	Run Keyword And Return Status 	File Should Exist 			${location}
+	${status_2}= 	Run Keyword And Return Status 	File Should Not Be Empty 	${location}
+	&{OUTPUT} 	Create Dictionary
+	IF  not ${status_1}
+		Log 	The ${component_name} INI data could not be edited. INI file does not exists. 	console=${True}
+		RETURN 	&{OUTPUT}
+	ELSE IF 	not ${status_2}
+		Log 	The ${component_name} INI data could not be edited. INI file is empty. 	console=${True}
+		RETURN 	&{OUTPUT}
+	END
 
+	Change INI Option 	${location}  ${section}  ${option}  ${new_value}
+
+Set Reporter INI Window Size
+	[Documentation] 	Pass the: Manager, Reporter or Agent
+	[Arguments]		${width}=${None}	${height}=${None}
+	Log 	${width}
+	Log 	${height}
+	IF	"${width}" != "${None}"
+		Change Reporter INI Option 	GUI 		win_width 	${width}
+	END
+	IF	"${height}" != "${None}"
+		Change Reporter INI Option 	GUI 		win_height 	${height}
+	END
 
 #

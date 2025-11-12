@@ -5,7 +5,6 @@ Library 	DatabaseLibrary
 Library 	String
 Library 	Collections
 Library 	HttpCtrl.Server
-Library 	XML
 
 Library 	ini_file_a.py
 
@@ -168,18 +167,6 @@ Find Result DB
 	${file}= 	List Directory 	${fols[-1]} 	*.db 	absolute=True
 	Log 	Result DB: ${file[-1]} 	console=${True}
 	RETURN 	${file[-1]}
-
-Query Result DB
-	[Arguments]		${dbfile} 	${sql}
-	Log to console 	dbfile: ${dbfile}
-	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
-	# Log to console 	\${dbfile}: ${dbfile}
-	Connect To Database 	sqlite3 	database=${dbfile} 	isolation_level=${None}
-	Log to console 	sql: ${sql}
-	${result}= 	Query 	${sql}
-	Log to console 	sql result: ${result}
-	Disconnect From Database
-	RETURN 	${result}
 
 Get Modules From Program .py File That Are Not BuildIn
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123
