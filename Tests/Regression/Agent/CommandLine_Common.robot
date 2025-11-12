@@ -5,6 +5,7 @@ Library 	DatabaseLibrary
 Library 	String
 Library 	Collections
 Library 	HttpCtrl.Server
+Library 	XML
 
 Library 	ini_file_a.py
 

@@ -75,6 +75,58 @@ Set Platform By Tag
 		END
 	END
 
+Remove Screen Capture Nag
+	# https://github.com/luckman212/screencapture-nag-remover
+	# ~/Library/Group Containers/group.com.apple.replayd/ScreenCaptureApprovals.plist
+	${ScreenCaptureApprovals}= 		Normalize Path 		~/Library/Group Containers/group.com.apple.replayd/ScreenCaptureApprovals.plist
+	Log  	${ScreenCaptureApprovals} 		console=true
+	${filedata}= 	Get File 	${ScreenCaptureApprovals}
+	Log  	${filedata}
+	# ${root}= 	Parse XML 	${ScreenCaptureApprovals}
+	# Log  	${root}
+	# Try 1 lets try overwriting the ScreenCaptureApprovals.plist file with one configured with a future date
+	# <?xml version="1.0" encoding="UTF-8"?>
+	# <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">;
+	# <plist version="1.0">
+	# <dict>
+	# 	<key>/opt/hca/hosted-compute-agent</key>
+	# 	<dict>
+	# 		<key>kScreenCaptureAlertableUsageCount</key>
+	# 		<integer>2704</integer>
+	# 		<key>kScreenCaptureApprovalLastAlerted</key>
+	# 		<date>2025-11-08T15:53:16Z</date>
+	# 		<key>kScreenCaptureApprovalLastUsed</key>
+	# 		<date>2025-11-08T15:59:59Z</date>
+	# 		<key>kScreenCapturePrivacyHintDate</key>
+	# 		<date>2025-12-08T15:53:16Z</date>
+	# 		<key>kScreenCapturePrivacyHintPolicy</key>
+	# 		<integer>2592000</integer>
+	# 	</dict>
+	# </dict>
+	# </plist>
+	VAR     ${futuretime}     ${{ (datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=2)).strftime("%Y-%m-%dT%H:%M:%SZ") }}
+	VAR 	${plistconten} 	<?xml version="1.0" encoding="UTF-8"?>
+	...						<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">;
+	...						<plist version="1.0">
+	...						<dict>
+	...							<key>/opt/hca/hosted-compute-agent</key>
+	...							<dict>
+	...								<key>kScreenCaptureAlertableUsageCount</key>
+	...								<integer>2704</integer>
+	...								<key>kScreenCaptureApprovalLastAlerted</key>
+	...								<date>${futuretime}</date>
+	...								<key>kScreenCaptureApprovalLastUsed</key>
+	...								<date>${futuretime}</date>
+	...								<key>kScreenCapturePrivacyHintDate</key>
+	...								<date>${futuretime}</date>
+	...								<key>kScreenCapturePrivacyHintPolicy</key>
+	...								<integer>2592000</integer>
+	...							</dict>
+	...						</dict>
+	...						</plist>
+
+	Create File 	${ScreenCaptureApprovals} 	${plistconten}
+
 Show Log
 	[Arguments]		${filename}
 	Log 		${\n}--VVV--${filename}--VVV-- 		console=True
@@ -166,6 +218,10 @@ Check Logs
 # 			END
 # 		END
 # 	END
+
+	# IF 		'${platform}' == 'macos'
+	# 	Remove Screen Capture Nag
+	# END
 
 Wiggle Mouse
 	Move To 	10 	10
@@ -2071,6 +2127,7 @@ Wait For the Agent To Be Ready
 	END
 
 	IF  not ${status}  Fail  Agent is not ready after ${timeout} seconds.
+
 
 
 
