@@ -101,25 +101,25 @@ Wait For Manager
 	# Should Be Equal As Integers 	${result.rc} 	0
 	Log to console 	${result.rc}
 
-Stop Manager
-	${running}= 	Is Process Running 	${process_manager}
-	IF 	${running}
-		Sleep	3s
-		IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
-			${result}= 	Terminate Process		${process_manager}
-		ELSE
-			Send Signal To Process 	SIGINT 	${process_manager}
-			${result}= 	Wait For Process 	${process_manager}	timeout=30	on_timeout=kill
-		END
-	ELSE
-		# get result var for process even if not running any more
-		${result}= 	Get Process Result		${process_manager}
-	END
-	Log		${result.stdout}
-	Log		${result.stderr}
+# Stop Manager old
+# 	${running}= 	Is Process Running 	${process_manager}
+# 	IF 	${running}
+# 		Sleep	3s
+# 		IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
+# 			${result}= 	Terminate Process		${process_manager}
+# 		ELSE
+# 			Send Signal To Process 	SIGINT 	${process_manager}
+# 			${result}= 	Wait For Process 	${process_manager}	timeout=30	on_timeout=kill
+# 		END
+# 	ELSE
+# 		# get result var for process even if not running any more
+# 		${result}= 	Get Process Result		${process_manager}
+# 	END
+# 	Log		${result.stdout}
+# 	Log		${result.stderr}
 
-	# Should Be Equal As Integers 	${result.rc} 	0
-	Log to console 	Process returned: ${result.rc}
+# 	# Should Be Equal As Integers 	${result.rc} 	0
+# 	Log to console 	Process returned: ${result.rc}
 
 # Stop Agent old
 # 	${running}= 	Is Process Running 	${process_agent}
@@ -405,6 +405,9 @@ Run ${component_name} CLI
 
 Stop Agent
 	Stop Agent CLI
+
+Stop Manager
+	Stop Manager CLI
 
 Stop ${component_name} CLI
 	[Documentation] 	Closes one of the RFSwarm applications with CLI only. Pass the: Manager, Reporter or Agent

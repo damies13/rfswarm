@@ -65,7 +65,7 @@ Test Non-ASCII Characters
 	VAR 	${data_table_sample_heading} 	${sample} TestResultSummary
 	Set Text Value To Right Of 	Heading 	${data_table_sample_heading}
 	Sleep 	3
-	Set Text Value To Right Of 	ResultName 	${sample} 	offsetx=70
+	Set Text Value To Right Of 	ResultName 	${sample} 	offsetx=80
 	Take A Screenshot
 	Click Tab 	Preview
 	Click Tab 	Settings

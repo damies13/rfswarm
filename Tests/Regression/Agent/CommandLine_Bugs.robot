@@ -208,15 +208,15 @@ Verify listener doesn't generate KeyError when using inject sleep
 
 	Create Directory 	${results_dir}
 	Log To Console	Run Agent
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Log To Console	Run Manager with Issue #392 Scenario
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
 	Log To Console	Wait For Manager To Finish
 	Wait For Manager
 	Log To Console	Stop Agent
 	Stop Agent
 
-	${dbfile}= 	Find Result DB 		*_Issue-#392
+	${dbfile}= 	Find Result DB 		result_pattern=*_Issue-#392
 	${dbpath} 	${dbfilename}= 	Split Path 	${dbfile}
 
 	@{logdirs}= 	List Directories In Directory 	${dbpath}${/}logs
@@ -254,16 +254,16 @@ Verify listener doesn't over inject sleeps
 
 	Create Directory 	${results_dir}
 	Log To Console	Run Agent
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Log To Console	Run Manager with Issue #392 Scenario
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
 	Log To Console	Wait For Manager To Finish
 	Wait For Manager
 	Log To Console	Stop Agent
 	Stop Agent
 
 	Log To Console	Check Counts Of Injected Sleeps In Agents Robot Logs
-	${dbfile}= 	Find Result DB 		*_Issue-#394
+	${dbfile}= 	Find Result DB 		result_pattern=*_Issue-#394
 	${dbpath} 	${dbfilename}= 	Split Path 	${dbfile}
 
 	@{logdirs}= 	List Directories In Directory 	${dbpath}${/}logs
