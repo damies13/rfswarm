@@ -149,13 +149,13 @@ Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
 Check if exception is generated when a file is removed
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #396
 
-	VAR 	${agent_dir} 		${agent_dir}${/}${TEST NAME}      scope=TEST
+	VAR 	${agent_dir} 		${agent_dir}${/}Issue_#396      scope=TEST
 	VAR 	${agent_scripts_dir} 		${agent_dir}${/}scripts      scope=TEST
 
 	${testfolder}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#396
 	${scenariofile}= 	Normalize Path 	${testfolder}{/}Issue-#396.rfs
 	VAR 	@{mngr_options} 	-s 	${scenariofile}
-	VAR		@{agent_options} 	--agentdir 	${agent_dir}
+	VAR		@{agent_options} 	-g 	3 	--agentdir 	${agent_dir}
 
 	Open Manager GUI	@{mngr_options}
 	Open Agent	@{agent_options}
