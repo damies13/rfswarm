@@ -160,18 +160,23 @@ Check if exception is generated when a file is removed
 	Open Manager GUI	@{mngr_options}
 	Open Agent	@{agent_options}
 
-	Wait Until Created 	${agent_scripts_dir}${/}robot_swarm_a.jpg
+	Sleep    10s
+
+	Wait Until Created 	${agent_scripts_dir}${/}robot_swarm_a.jpg 		3 minutes
 
 	Remove Files 	${testfolder}${/}__init__.robot 		${testfolder}${/}robot_swarm_a.jpg
 
 	Sleep    30s
 
-	Run Keyword 	Close Manager GUI ${platform}
+	Stop Agent CLI
+	Run Keyword 	Close Manager GUI
 
-	${running}= 	Is Process Running 	${process_manager}
 	Check Logs
 
-	[Teardown] 	Run Keyword If 	${running} 	Close Manager GUI ${platform}
+	[Teardown]	Run Keywords
+	...    Stop Agent CLI	AND
+	...    Close Manager GUI	AND
+	...    Check Logs
 
 
 
