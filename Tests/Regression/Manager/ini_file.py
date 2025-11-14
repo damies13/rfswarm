@@ -24,7 +24,7 @@ def change_ini_option(filename, section, optionname, new_value):
 
 	config = configparser.ConfigParser()
 	print("Before:", config, dict(config))
-	config.read(filename)
+	config.read(filename, encoding="utf8")
 	print("Read:", config, dict(config))
 
 	if section not in config:

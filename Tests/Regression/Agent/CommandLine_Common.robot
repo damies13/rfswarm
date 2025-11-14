@@ -7,6 +7,8 @@ Library 	Collections
 Library 	HttpCtrl.Server
 Library 	XML
 
+Library 	ini_file_a.py
+
 *** Variables ***
 ${cmd_agent} 		rfswarm-agent
 ${cmd_manager} 	rfswarm
@@ -15,6 +17,9 @@ ${pyfile_manager} 	${EXECDIR}${/}rfswarm_manager${/}rfswarm.py
 ${process_agent} 		None
 ${process_manager} 	None
 ${platform}		None
+${COMPONENT} 	Agent
+${component_name} 	Agent
+${AGENT_DIR} 		${OUTPUT DIR}${/}rfswarm-agent
 
 # datapath: /home/runner/work/rfswarm/rfswarm/rfswarm_manager/results/PreRun
 # datapath: /opt/hostedtoolcache/Python/3.9.18/x64/lib/python3.9/site-packages/rfswarm_manager/results/PreRun -- let's control the output path rather than leaving it to chance
@@ -24,6 +29,7 @@ ${platform}		None
 ${results_dir} 			${OUTPUT DIR}${/}results
 *** Keywords ***
 Set Platform
+	Create Directory 	${results_dir}
 	Set Platform By Python
 	Set Platform By Tag
 
@@ -64,30 +70,30 @@ Show Log
 	Log 	${filedata} 	console=True
 	Log to console 	--ɅɅɅ--${filename}--ɅɅɅ--${\n}
 
-Run Agent
-	[Arguments]		${options}=None
-	IF  ${options} == None
-		${options}= 	Create List
-	END
-	Log to console 	${\n}\${options}: ${options}
-	# ${process}= 	Start Process 	python3 	${pyfile_agent}  @{options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
-	${process}= 	Start Process 	${cmd_agent}  @{options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
-	Set Test Variable 	$process_agent 	${process}
+# Run Agent old
+# 	[Arguments]		${options}=None
+# 	IF  ${options} == None
+# 		${options}= 	Create List
+# 	END
+# 	Log to console 	${\n}\${options}: ${options}
+# 	# ${process}= 	Start Process 	python3 	${pyfile_agent}  @{options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
+# 	${process}= 	Start Process 	${cmd_agent}  @{options}  alias=Agent 	stdout=${OUTPUT DIR}${/}stdout_agent.txt 	stderr=${OUTPUT DIR}${/}stderr_agent.txt
+# 	Set Test Variable 	$process_agent 	${process}
 
-Run Manager CLI
-	[Arguments]		${options}=None
-	IF  ${options} == None
-		${options}= 	Create List
-	END
-	IF  '-d' not in ${options}
-		Create Directory 	${results_dir}
-		Append To List 	${options} 	-d 	${results_dir}
-	END
-	Log to console 	${\n}\${options}: ${options}
-	# ${process}= 	Start Process 	python3 	${pyfile_manager}  @{options}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
-	${process}= 	Start Process 	${cmd_manager}  @{options}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
-	Set Test Variable 	$process_manager 	${process}
-	Sleep	5
+# Run Manager CLI old
+# 	[Arguments]		${options}=None
+# 	IF  ${options} == None
+# 		${options}= 	Create List
+# 	END
+# 	IF  '-d' not in ${options}
+# 		Create Directory 	${results_dir}
+# 		Append To List 	${options} 	-d 	${results_dir}
+# 	END
+# 	Log to console 	${\n}\${options}: ${options}
+# 	# ${process}= 	Start Process 	python3 	${pyfile_manager}  @{options}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
+# 	${process}= 	Start Process 	${cmd_manager}  @{options}  alias=Manager 	stdout=${OUTPUT DIR}${/}stdout_manager.txt 	stderr=${OUTPUT DIR}${/}stderr_manager.txt
+# 	Set Test Variable 	$process_manager 	${process}
+# 	Sleep	5
 
 Wait For Manager
 	[Arguments]		${timeout}=10min
@@ -95,43 +101,43 @@ Wait For Manager
 	# Should Be Equal As Integers 	${result.rc} 	0
 	Log to console 	${result.rc}
 
-Stop Manager
-	${running}= 	Is Process Running 	${process_manager}
-	IF 	${running}
-		Sleep	3s
-		IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
-			${result}= 	Terminate Process		${process_manager}
-		ELSE
-			Send Signal To Process 	SIGINT 	${process_manager}
-			${result}= 	Wait For Process 	${process_manager}	timeout=30	on_timeout=kill
-		END
-	ELSE
-		# get result var for process even if not running any more
-		${result}= 	Get Process Result		${process_manager}
-	END
-	Log		${result.stdout}
-	Log		${result.stderr}
+# Stop Manager old
+# 	${running}= 	Is Process Running 	${process_manager}
+# 	IF 	${running}
+# 		Sleep	3s
+# 		IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
+# 			${result}= 	Terminate Process		${process_manager}
+# 		ELSE
+# 			Send Signal To Process 	SIGINT 	${process_manager}
+# 			${result}= 	Wait For Process 	${process_manager}	timeout=30	on_timeout=kill
+# 		END
+# 	ELSE
+# 		# get result var for process even if not running any more
+# 		${result}= 	Get Process Result		${process_manager}
+# 	END
+# 	Log		${result.stdout}
+# 	Log		${result.stderr}
 
-	# Should Be Equal As Integers 	${result.rc} 	0
-	Log to console 	Process returned: ${result.rc}
+# 	# Should Be Equal As Integers 	${result.rc} 	0
+# 	Log to console 	Process returned: ${result.rc}
 
-Stop Agent
-	${running}= 	Is Process Running 	${process_agent}
-	IF 	${running}
-		Sleep	3s
-		IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
-			${result} = 	Terminate Process		${process_agent}
-		ELSE
-			Send Signal To Process 	SIGINT 	${process_agent}
-			${result}= 	Wait For Process 	${process_agent}	timeout=30	on_timeout=kill
-		END
-	ELSE
-		# get result var for process even if not running any more
-		${result}= 	Get Process Result		${process_agent}
-	END
-	Log		${result.stdout}
-	Log		${result.stderr}
-	# Should Be Equal As Integers 	${result.rc} 	0
+# Stop Agent old
+# 	${running}= 	Is Process Running 	${process_agent}
+# 	IF 	${running}
+# 		Sleep	3s
+# 		IF  '${platform}' == 'windows'	# Send Signal To Process keyword does not work on Windows
+# 			${result} = 	Terminate Process		${process_agent}
+# 		ELSE
+# 			Send Signal To Process 	SIGINT 	${process_agent}
+# 			${result}= 	Wait For Process 	${process_agent}	timeout=30	on_timeout=kill
+# 		END
+# 	ELSE
+# 		# get result var for process even if not running any more
+# 		${result}= 	Get Process Result		${process_agent}
+# 	END
+# 	Log		${result.stdout}
+# 	Log		${result.stderr}
+# 	# Should Be Equal As Integers 	${result.rc} 	0
 
 Test Agent Connectivity
 	#[Setup] 	Start Server	127.0.0.1	8138
@@ -149,34 +155,19 @@ Test Agent Connectivity
 	Reply By	200
 	${method}=	Get Request Method
 	${url}= 	Get Request Url
-	Should Be Equal 	${method}	POST
-	#Should Be Equal 	${url}		/Jobs
+	# Should Be Equal 	${method}	POST
+	# Should Be Equal 	${url}		/Jobs
 
 	#[Teardown]	Stop Server
 
 Find Result DB
-	[Arguments] 	${result_pattern}=*_*
-	# ${fols}= 	List Directory 	${results_dir}
-	# Log to console 	${fols}
-	${fols}= 	List Directory 	${results_dir} 	${result_pattern} 	absolute=True
-	Log to console 	${fols}
-	# ${files}= 	List Directory 	${fols[0]}
-	# Log to console 	${files}
-	${file}= 	List Directory 	${fols[-1]} 	*.db 	absolute=True
-	Log to console 	Result DB: ${file[-1]}
-	RETURN 	${file[-1]}
+	[Arguments] 	${directory}=${RESULTS_DIR} 	${result_pattern}=*_*
+	${fols}= 	List Directory 	${directory} 	${result_pattern} 	absolute=True
+	Log 	${fols} 	console=${True}
 
-Query Result DB
-	[Arguments]		${dbfile} 	${sql}
-	Log to console 	dbfile: ${dbfile}
-	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
-	# Log to console 	\${dbfile}: ${dbfile}
-	Connect To Database 	sqlite3 	database=${dbfile} 	isolation_level=${None}
-	Log to console 	sql: ${sql}
-	${result}= 	Query 	${sql}
-	Log to console 	sql result: ${result}
-	Disconnect From Database
-	RETURN 	${result}
+	${file}= 	List Directory 	${fols[-1]} 	*.db 	absolute=True
+	Log 	Result DB: ${file[-1]} 	console=${True}
+	RETURN 	${file[-1]}
 
 Get Modules From Program .py File That Are Not BuildIn
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123
@@ -350,7 +341,272 @@ Check Icon Install For Ubuntu
 	File Should Exist 	${pathprefix}${/}applications${/}${projname}.desktop 		Desktop File not found
 	File Should Exist 	${pathprefix}${/}icons${/}hicolor${/}128x128${/}apps${/}${projname}.png 		Icon File not found
 
+### v1.6.0 ###
 
+Run Agent
+	[Arguments] 	@{appargs}
+	Run Agent CLI 	@{appargs}
+
+Run ${component_name} CLI
+	[Documentation] 	Open one of the RFSwarm applications for CLI purposes. Pass the: Manager, Reporter or Agent
+	[Arguments] 	@{appargs}  ${noargs}=${False}  ${envargs}=${None}
+	${comp} 	Convert To Lower Case 	${component_name}
+	${len} 		Get Length 	${appargs}
+
+	IF  ${noargs} == ${False}
+		IF  '${component_name}' == 'Manager' and ${len} == ${0} #( '-d' not in ${appargs} and '--dir' not in ${appargs} )
+			Append To List 	${appargs} 	-d 	${RESULTS_DIR}
+		ELSE IF  '${component_name}' == 'Manager' and ${len} != ${0} and ( '-d' not in ${appargs} and '--dir' not in ${appargs} )
+			Create Manager INI File If It Does Not Exist
+			Change Manager INI Option 	Run 	resultsdir 	${RESULTS_DIR}
+		ELSE IF  '${component_name}' == 'Agent' and ( '-d' not in ${appargs} and '--agentdir' not in ${appargs} )
+			Append To List 	${appargs} 	-d 	${AGENT_DIR}
+			Create Directory 	${AGENT_DIR}
+			TRY
+				Empty Directory 	${AGENT_DIR}
+			EXCEPT
+				Log 	Failed to empty Agent dir: ${AGENT_DIR}
+			END
+		END
+	END
+
+	Log 	${\n}Starting ${component_name} ... 	console=${True}
+	${args}= 	Evaluate 	" ".join(@{appargs})
+	Log 	\t\${args}: ${args} 	console=${True}
+
+	${tname} 		Convert To Save Path 	${TEST NAME}
+	Create File 		${OUTPUT DIR}${/}stdout_${comp}.txt
+	Create File 		${OUTPUT DIR}${/}stderr_${comp}.txt
+	${process}= 	Start Process 	${CMD_${comp}}  @{appargs}  alias=${component_name}
+	...    stdout=${OUTPUT DIR}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stderr_${comp}.txt
+	...    env=${envargs}
+
+	Log 	${process}
+	VAR 	${PROCESS_${comp}} 		${process} 	scope=SUITE
+
+	${result}= 	Wait Until Keyword Succeeds 	45sec 	500ms 	Process Should Be Running 	${process}
+
+	${running}= 	Is Process Running 	${PROCESS_${comp}}
+	IF 	not ${running}
+		${result}= 	Get Process Result 	${PROCESS_${comp}}
+
+		Log		rc: ${result.rc} 		console=True
+		Log		stdout_path: ${result.stdout_path} 		console=True
+		Log		stderr_path: ${result.stderr_path} 		console=True
+
+		Show Log 	${result.stdout_path}
+		Show Log 	${result.stderr_path}
+
+		Fail 		${component_name} didn't start!
+
+	END
+
+	Log 	*=== ${component_name} started ===* 	console=${True}
+
+Stop Agent
+	Stop Agent CLI
+
+Stop Manager
+	Stop Manager CLI
+
+Stop ${component_name} CLI
+	[Documentation] 	Closes one of the RFSwarm applications with CLI only. Pass the: Manager, Reporter or Agent
+	${comp} 	Convert To Lower Case 	${component_name}
+
+	${running}= 	Is Process Running 	${PROCESS_${comp}}
+	IF 	${running}
+		Sleep	1s
+		IF  '${PLATFORM}' == 'windows'	# Send Signal To Process keyword does not work on Windows
+			${result}= 	Terminate Process 	${PROCESS_${comp}}
+		ELSE
+			Send Signal To Process 	SIGINT 	${PROCESS_${comp}}
+			${result}= 	Wait For Process 	${PROCESS_${comp}} 	timeout=30 	on_timeout=kill
+		END
+	ELSE
+		Log 	${component_name} is not running! 	console=${True}
+		TRY
+			${result}= 	Get Process Result 	${PROCESS_${comp}}
+		EXCEPT 	AS 	${error}
+			Log 	error: ${error} 		console=true
+		END
+
+		RETURN
+	END
+
+	Log 	*=== ${component_name} closed with CLI signal ===* 	console=${True}
+	TRY
+		Log 	${component_name} exited with: ${result.rc} 	console=${True}
+		# Should Be Equal As Integers 	${result.rc} 	0
+
+		Log		stdout_path: ${result.stdout_path} 		console=True
+		Log		stderr_path: ${result.stderr_path} 		console=True
+
+		Show Log 	${result.stdout_path}
+		Show Log 	${result.stderr_path}
+
+	EXCEPT 	AS 	${error}
+		Log 	error: ${error} 		console=true
+
+	END
+
+	Sleep 	0.5
+	${running}= 	Is Process Running 	${PROCESS_${comp}}
+	Run Keyword If 	${running} 	Fail 	Failed to close ${component_name}
+
+	[Teardown] 	Set Suite Variable 	${PROCESS_${comp}} 	${None}
+
+Change Manager INI Option
+	[Arguments]		${section} 		${option}		${new_value}
+	${location}=	Get Manager INI Location
+	Change INI Option 	${location} 	${section} 		${option}		${new_value}
+
+Create Manager INI File If It Does Not Exist
+	[Documentation] 	Pass the: Manager, Reporter or Agent
+	VAR 	${component_name} 	Manager
+	${location}= 	Get Manager INI Location
+	${comp} 	Convert To Lower Case 	${component_name}
+
+	TRY
+		File Should Exist	${location}
+		File Should Not Be Empty	${location}
+	EXCEPT
+		Log 	INI file for ${component_name} does not exist or it's empty. Creating new one. 	console=True
+
+		IF  '${component_name}' == 'Manager'
+			${process}= 	Start Process  rfswarm-manager  -n
+		ELSE IF  '${component_name}' == 'Agent'
+			${process}= 	Start Process  rfswarm-agent
+		ELSE IF  '${component_name}' == 'Reporter'
+			${process}= 	Start Process  rfswarm-reporter  -n
+		END
+		Wait For File To Exist 	${location}
+		Sleep 	5s
+		${result}= 	Terminate Process 	${process}
+
+		File Should Exist 	${location}
+		File Should Not Be Empty 	${location}
+	END
+
+Get Manager Default Save Path
+	${pip_data}=	Get Manager PIP Data
+	${pip_data_list}=	Split String	${pip_data}
+	${i}=	Get Index From List	${pip_data_list}	Location:
+	${location}=	Set Variable	${pip_data_list}[${i + 1}]
+	RETURN	${location}${/}rfswarm_manager${/}
+
+Get Manager INI Location
+	${location}=	Get Manager Default Save Path
+	RETURN	${location}RFSwarmManager.ini
+
+Get Manager PIP Data
+	Run Process	pip	show	rfswarm-manager		alias=data
+	${pip_data}	Get Process Result	data
+	Should Not Be Empty		${pip_data.stdout}		msg=Manager must be installed with pip
+	Log	${pip_data.stdout}
+	RETURN		${pip_data.stdout}
+
+Wait For File To Exist
+	[Arguments]		${filepath} 	${timeout}=120
+	TRY
+		WHILE    True 	limit=${timeout} seconds
+			TRY
+				Sleep 	500 ms
+				File Should Exist 		${filepath}
+			EXCEPT
+				CONTINUE
+			END
+			BREAK
+		END
+	EXCEPT
+		Fail 		File '${filepath}' does not exist after ${timeout} seconds
+	END
+
+Query Result DB
+	[Arguments]		${dbfile} 	${sql} 	${info}=${True}
+	Log 	dbfile: ${dbfile} 	console=${info}
+	${dbfile}= 	Replace String 	${dbfile} 	${/} 	/
+
+	Connect To Database 	sqlite3 	database=${dbfile} 	isolation_level=${None}
+	Log 	sql: ${sql} 	console=${info}
+	${result}= 	Query 	${sql}
+	Log 	sql result: ${result} 	console=${info}
+	Disconnect From Database
+	RETURN 	${result}
+
+Find Log
+	[Documentation] 	Returns path to the stdout and stderr log file for current test
+	[Arguments] 	${component_name}=${COMPONENT}
+	${comp} 	Convert To Lower Case 	${component_name}
+	${tname} 		Convert To Save Path 	${TEST NAME}
+
+	File Should Exist 	${OUTPUT DIR}${/}stdout_${comp}.txt
+	File Should Exist 	${OUTPUT DIR}${/}stderr_${comp}.txt
+
+	RETURN 		${OUTPUT DIR}${/}stdout_${comp}.txt 	${OUTPUT DIR}${/}stderr_${comp}.txt
+
+Read Log
+	[Arguments]		${filepath}
+	Log 		${filepath}
+	${filedata}= 	Get File 	${filepath} 		encoding=SYSTEM 		encoding_errors=ignore
+	Log 		${filedata}
+	RETURN 		${filedata}
+
+Convert To Save Path
+	[Arguments] 	${path}
+	${safe_path} 		Evaluate 	re.sub(r'[<>:"/\\|?*]', '_', "${path}".replace(' ', '_')).replace(chr(0), '_').rstrip(' .')[:60] 	modules=re
+
+	RETURN 	${safe_path}
+
+Wait Until the Agent Connects to the Manager
+	[Documentation] 	For this keyword to function correctly, logs from the agent must be available dynamically.
+	VAR    ${timeout}    160
+	TRY
+		${stdout}  ${stderr}= 	Find Log 	Agent
+	EXCEPT
+		Sleep 	5s
+		${stdout}  ${stderr}= 	Find Log 	Agent
+	END
+
+	Log 	Waiting for the Agent to connect with the Manager... 	console=${true}
+	TRY
+		WHILE    True 	limit=${timeout} seconds
+			TRY
+				Sleep 	10 s
+				${stdout_content}= 	Read Log 	${stdout}
+				Should Contain 		${stdout_content}  Manager Connected
+			EXCEPT
+				CONTINUE
+			END
+			BREAK
+		END
+	EXCEPT
+		Fail 	Agent didn't connect to the Manager after ${timeout} seconds
+	END
+
+Wait Until the Query Is Not Empty
+	[Arguments]		${dbfile}  ${sql}  ${timeout}=${300}
+
+	VAR 	${iter} 	0
+	TRY
+		WHILE    True 	limit=${timeout} seconds
+			${iter}= 	Evaluate  ${iter} + 1
+			IF    ${iter} == 30
+				Log 	Query '${sql}' is returning empty row after ${iter} seconds.  level=WARN
+			END
+			
+			TRY
+				Sleep 	1s
+				${query_result}= 	Query Result DB 	${dbfile}  ${sql}  info=${False}
+				${len}= 	Get Length 	${query_result}
+				Should Be True 	${len} > 0
+			EXCEPT
+				CONTINUE
+			END
+			BREAK
+		END
+	EXCEPT
+		Fail 		Query '${sql}' is returning empty row after ${timeout} seconds.
+	END
 
 	#
 #

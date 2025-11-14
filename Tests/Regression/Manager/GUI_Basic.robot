@@ -32,7 +32,10 @@ Open GUI
 	# Sleep 	10 			# not needed now we wait for the agents tab to be visible
 	Set Screenshot Folder 	${OUTPUT DIR}
 
+	Sleep 	10s
+	Handle MacOS Pop-ups
 	Handle Donation Reminder
+	Handle MacOS Pop-ups
 
 	${img}=	Set Variable		manager_${platform}_tab_agents.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}

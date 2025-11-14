@@ -10,7 +10,7 @@ Environment Variable Substitution in Robot/Resource files
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #165
 	VAR 	${agent_dir} 		${agent_dir}${/}${TEST NAME}      scope=TEST
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	http://localhost:8138
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Sleep    1s
 	Check Agent Is Running
 	Log to console 	${CURDIR}
@@ -24,7 +24,8 @@ Environment Variable Substitution in Robot/Resource files
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#165${/}Issue-#165.rfs
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 	Stop Agent
 	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
@@ -55,7 +56,8 @@ Default Result Name Method
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default.rfs
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 
 	List Directory 	${results_dir}
@@ -87,7 +89,8 @@ Documentation Result Name Method - Tests Defaults
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}documentation_td.rfs
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 
 	List Directory 	${results_dir}
@@ -117,7 +120,8 @@ Info Result Name Method - Tests Defaults
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}info_td.rfs
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 
 	List Directory 	${results_dir}
@@ -146,7 +150,8 @@ Keyword Only Result Name Method - Tests Defaults
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keyword_td.rfs
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 
 	List Directory 	${results_dir}
@@ -180,7 +185,8 @@ Keyword and Args Result Name Method - Tests Defaults
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keywordargs_td.rfs
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 
 	List Directory 	${results_dir}
@@ -214,7 +220,8 @@ Default Result Name Method - Tests Row
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default_tr.rfs
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 
 	List Directory 	${results_dir}
@@ -245,7 +252,8 @@ Documentation Result Name Method - Tests Row
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}documentation_tr.rfs
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 
 	List Directory 	${results_dir}
@@ -275,7 +283,8 @@ Info Result Name Method - Tests Row
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}info_tr.rfs
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 
 	List Directory 	${results_dir}
@@ -304,7 +313,8 @@ Keyword Only Result Name Method - Tests Row
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keyword_tr.rfs
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 
 	List Directory 	${results_dir}
@@ -338,7 +348,8 @@ Keyword and Args Result Name Method - Tests Row
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}keywordargs_tr.rfs
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 
 	List Directory 	${results_dir}
@@ -370,7 +381,7 @@ Install Application Icon or Desktop Shortcut
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
 
 	@{mngr_options}= 	Create List 	-g 	6 	-c 	ICON
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
 	Sleep    2
 	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	${stderr_manager}= 		Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
@@ -383,14 +394,15 @@ Run Mnager with JSON Configuration and JSON Scenario
 	# we can infer that the manager read the configuration correctly if the agent connects sucessfully
 	VAR 	${managerurl} 		http://localhost:8152
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	${managerurl}
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 
 	${configfile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}RFSwarmManager.json
 	Log 	configfile: ${configfile} 		console=true
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}NewStyle_small_json.json
 	Log 	scenariofile: ${scenariofile} 		console=true
 	@{mngr_options}= 	Create List 	-g 	1 	-i 	${configfile} 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 
 	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
@@ -428,14 +440,15 @@ Run Mnager with Yaml Configuration and Yaml Scenario
 	# we can infer that the manager read the configuration correctly if the agent connects sucessfully
 	VAR 	${managerurl} 		http://localhost:8141
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	${managerurl}
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 
 	${configfile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}RFSwarmManager.yaml
 	Log 	configfile: ${configfile} 		console=true
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}NewStyle_small_yaml.yaml
 	Log 	scenariofile: ${scenariofile} 		console=true
 	@{mngr_options}= 	Create List 	-g 	1 	-i 	${configfile} 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 
 	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
@@ -472,14 +485,15 @@ Run Mnager with yml Configuration and yml Scenario
 	# we can infer that the manager read the configuration correctly if the agent connects sucessfully
 	VAR 	${managerurl} 		http://localhost:8171
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	${managerurl}
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 
 	${configfile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}RFSwarmManager.yml
 	Log 	configfile: ${configfile} 		console=true
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#172${/}NewStyle_small_yml.yml
 	Log 	scenariofile: ${scenariofile} 		console=true
 	@{mngr_options}= 	Create List 	-g 	1 	-i 	${configfile} 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 
 	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt

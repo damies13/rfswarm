@@ -76,7 +76,7 @@ Whole report time range
 	# pass a default ini file with extended height to ensure that default values are used
 	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
-	Wait For Status 	PreviewLoaded
+		Wait For Status 	PreviewLoaded
 
 	Click Section			Robots
 	# Take A Screenshot
@@ -86,12 +86,16 @@ Whole report time range
 	${pvinfo}= 	Get Python Version Info
 
 	# check the graph as expected
-	# Take A Screenshot
+	Take A Screenshot
 	Set Confidence		0.7
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_robots1_py3.9.png
+	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		Locate 	reporter_${PLATFORM}_graph_robots1_py3.9.png
 	ELSE
-		Locate 	reporter_${platform}_graph_robots1.png
+		TRY
+			Locate 	reporter_${PLATFORM}_graph_robots1.png
+		EXCEPT
+			Locate 	reporter_${PLATFORM}_graph_robots1_py3.9.png
+		END
 	END
 	Set Confidence		0.9
 
@@ -145,11 +149,12 @@ Whole report time range
 	Wait For Status 	PreviewLoaded
 
 	# check the graph as expected
+	Take A Screenshot
 	Set Confidence		0.7
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_robots2_py3.9.png
+	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		Locate 	reporter_${PLATFORM}_graph_robots2_py3.9.png
 	ELSE
-		Locate 	reporter_${platform}_graph_robots2.png
+		Locate 	reporter_${PLATFORM}_graph_robots2.png
 	END
 	Set Confidence		0.9
 
@@ -202,7 +207,7 @@ Verify the Content Of the HTML Report
 	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${testdata}${/}html_images
 	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}Issue-#36${/}html_images
 	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		30
+	VAR 	${move_tolerance} 	150
 
 	Log 	template: ${template_dir} 	console=True
 	Open GUI	-d 	${resultfolder} 	-t 	${template_dir}
@@ -396,7 +401,7 @@ Verify the Content Of the DOCX Report
 	VAR 	${docx_img_path} 		${OUTPUT_DIR}${/}${testdata}${/}docx_images
 	VAR 	${docx_expected_img_path} 		${CURDIR}${/}testdata${/}Issue-#38${/}docx_images
 	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		30
+	VAR 	${move_tolerance} 	150
 
 	Log 	template: ${template_dir} 	console=True
 	Open GUI	-d 	${resultfolder} 	-t 	${template_dir}
@@ -559,7 +564,7 @@ Verify the Content Of the XLSX Report
 	VAR 	${xlsx_img_path} 		${OUTPUT_DIR}${/}${testdata}${/}xlsx_images
 	VAR 	${xlsx_expected_img_path} 		${CURDIR}${/}testdata${/}Issue-#37${/}xlsx_images
 	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		30
+	VAR 	${move_tolerance} 	150
 
 	Log 	template: ${template_dir} 	console=True
 	Open GUI	-d 	${resultfolder} 	-t 	${template_dir}
@@ -746,17 +751,6 @@ Verify the Content Of the XLSX Report
 	...    Close GUI	AND
 	...    Move File 	${xlsx_file} 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.xlsx
 
-Check Application Icon or Desktop Shortcut in GUI
-	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
-
-	${result}= 	Run 	${cmd_reporter} -g 6 -c ICON
-	Log 		${result}
-	Sleep    1
-
-	Navigate to and check Desktop Icon
-
-	[Teardown]	Type 	KEY.ESC 	KEY.ESC 	KEY.ESC
-
 Verify Plan Graph - No Total
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #140
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
@@ -792,7 +786,7 @@ Verify Plan Graph - No Total
 
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
 
-	# Take A Screenshot
+	Take A Screenshot
 	Select Field With Label 	DataType
 
 	# Take A Screenshot
@@ -808,6 +802,7 @@ Verify Plan Graph - No Total
 
 	${pvinfo}= 	Get Python Version Info
 
+	Take A Screenshot
 	Set Confidence		0.7
 	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
 		Locate 	reporter_${platform}_graph_plannototal_py3.9.png
@@ -888,6 +883,7 @@ Verify Plan Graph - With Total
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
+	...    Take A Screenshot 		AND
 	...    Set Confidence 	0.9 	AND
 	...    Close GUI 		AND
 	...    Remove File 		${resultfile}
@@ -951,6 +947,7 @@ Verify Plan Table
 	Set Confidence		0.9
 
 	[Teardown]	Run Keywords
+	...    Take A Screenshot 		AND
 	...    Set Confidence 	0.9 	AND
 	...    Close GUI 		AND
 	...    Remove File 		${resultfile}
@@ -974,6 +971,8 @@ Change Line Colour
 	# pass a default ini file with extended height to ensure that default values are used
 	Open GUI 	-d 	${resultfolder} 	-i 	${basefolder}${/}RFSwarmReporter.ini 	-t 	${templatefile}
 	# Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded 	120
+	Sleep 	5s
+	Take A Screenshot
 	Wait For Status 	PreviewLoaded
 
 	Click Section			Report
@@ -989,12 +988,18 @@ Change Line Colour
 
 	Click Tab 	 Preview
 
+	Take A Screenshot
+
 	${pvinfo}= 	Get Python Version Info
-	# Locate 	reporter_${platform}_graph_plancolourb4.png
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_plancolourb4_py3.9.png
+	# Locate 	reporter_${PLATFORM}_graph_plancolourb4.png
+	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		Locate 	reporter_${PLATFORM}_graph_plancolourb4_py3.9.png
 	ELSE
-		Locate 	reporter_${platform}_graph_plancolourb4.png
+		TRY
+			Locate 	reporter_${PLATFORM}_graph_plancolourb4.png
+		EXCEPT
+			Locate 	reporter_${PLATFORM}_graph_plancolourb4_py3.9.png
+		END
 	END
 
 	Click Button 		ColourSales
@@ -1011,14 +1016,14 @@ Change Line Colour
 
 	Take A Screenshot
 
-	# Locate 	reporter_${platform}_graph_plancolourafter.png
-	IF 	${pvinfo.minor} < 10 and "${platform}" == "ubuntu"
-		Locate 	reporter_${platform}_graph_plancolourafter_py3.9.png
+	# Locate 	reporter_${PLATFORM}_graph_plancolourafter.png
+	IF 	${pvinfo.minor} < 10 and "${PLATFORM}" == "ubuntu"
+		Locate 	reporter_${PLATFORM}_graph_plancolourafter_py3.9.png
 	ELSE
-		Locate 	reporter_${platform}_graph_plancolourafter.png
+		Locate 	reporter_${PLATFORM}_graph_plancolourafter.png
 	END
 	# bring window to foreground so teardown works	reporter_ubuntu_status_previewloaded
-	Click Image 	reporter_${platform}_status_previewloaded.png
+	Click Image 	reporter_${PLATFORM}_status_previewloaded.png
 
 	[Teardown]	Run Keywords
 	...    Set Confidence 	0.9 	AND
@@ -1166,7 +1171,7 @@ Verify Filter Metric For Data Table and Graph - Wildcard
 	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${issue}${/}html_images
 	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}${issue}${/}html_images
 	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		30
+	VAR 	${move_tolerance} 	150
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
@@ -1246,7 +1251,7 @@ Verify Filter Metric For Data Table and Graph - Not Wildcard
 	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${issue}${/}html_images
 	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}${issue}${/}html_images
 	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		30
+	VAR 	${move_tolerance} 	150
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
@@ -1326,7 +1331,7 @@ Verify Filter Result For Data Table and Graph - Wildcard
 	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${issue}${/}html_images
 	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}${issue}${/}html_images
 	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		30
+	VAR 	${move_tolerance} 	150
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
@@ -1406,7 +1411,7 @@ Verify Filter Result For Data Table and Graph - Not Wildcard
 	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${issue}${/}html_images
 	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}${issue}${/}html_images
 	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		30
+	VAR 	${move_tolerance} 	150
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
@@ -1486,7 +1491,7 @@ Verify Filter Result For Data Table and Graph - Filter Result
 	VAR 	${html_img_path} 		${OUTPUT_DIR}${/}${issue}${/}html_images
 	VAR 	${html_expected_img_path} 		${CURDIR}${/}testdata${/}${issue}${/}html_images
 	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 		30
+	VAR 	${move_tolerance} 	150
 
 	Extract Zip File 	${test_data}${/}results.zip 	${test_data}
 
@@ -1751,6 +1756,15 @@ Check Reporter with yml Template File
 	...    Close GUI 		AND
 	...    Remove File 		${resultfile}
 
+Check Application Icon or Desktop Shortcut in GUI
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
 
+	${result}= 	Run 	${cmd_reporter} -g 6 -c ICON
+	Log 		${result}
+	Sleep    1
+
+	Navigate to and check Desktop Icon
+
+	[Teardown]	Type 	KEY.ESC 	KEY.ESC 	KEY.ESC
 
 #

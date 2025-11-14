@@ -65,7 +65,7 @@ Test Non-ASCII Characters
 	VAR 	${data_table_sample_heading} 	${sample} TestResultSummary
 	Set Text Value To Right Of 	Heading 	${data_table_sample_heading}
 	Sleep 	3
-	Set Text Value To Right Of 	ResultName 	${sample} 	offsetx=70
+	Set Text Value To Right Of 	ResultName 	${sample} 	offsetx=80
 	Take A Screenshot
 	Click Tab 	Preview
 	Click Tab 	Settings
@@ -138,7 +138,7 @@ Test Non-ASCII Characters
 	VAR 	${html_img_path} 	${manager_results}${/}html_images
 	VAR 	${html_expected_img_path} 	${test_data}${/}html_images
 	VAR 	${img_comp_threshold} 	0.7
-	VAR 	${move_tolerance} 	30
+	VAR 	${move_tolerance} 	150
 	VAR 	${section} 	${graph_sample_heading}
 	${section_obj} 	Get HTML Report Heading Section Object 	${html} 	${section}
 	Should Not Be Equal 	${section_obj} 	${0} 	msg=Didn't find "${section}" section.

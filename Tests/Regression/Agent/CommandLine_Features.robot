@@ -7,7 +7,7 @@ Install Application Icon or Desktop Shortcut
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
 
 	@{agent_options}= 	Create List 	-g 	6 	-c 	ICON
-	Run Agent 	${agent_options}
+	Run Agent 	@{agent_options}
 	Sleep    2
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
@@ -34,7 +34,7 @@ Agent Command Line INI -i
 	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmAgent.ini
 	VAR		@{agnt_options}		-i	${inifile}
 
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Log To Console	Run Agent with alternate ini file with variable.
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -49,7 +49,7 @@ Agent Command Line INI --ini
 	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmAgent.ini
 	VAR		@{agnt_options}		--ini	${inifile}
 
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Log To Console	Run Agent with alternate ini file with variable.
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -65,9 +65,10 @@ Agent Command Line MANAGER -m
 	VAR 	@{mngr_options} 	-n
 
 	Log To Console	Run Agent and Manager and see if they will connect.
-	Run Manager CLI 	${mngr_options}
-	Run Agent 	${agnt_options}
-	Wait For Manager	120s
+	Run Agent 	@{agnt_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager	10s
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
@@ -78,13 +79,14 @@ Agent Command Line MANAGER -m
 Agent Command Line MANAGER --manager
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 
-	VAR 	@{agnt_options} 	-g 	1 	--manager 	http://localhost:8138
+	VAR 	@{agnt_options} 	--manager 	http://localhost:8138
 	VAR 	@{mngr_options} 	-n
 
 	Log To Console	Run Agent and Manager and see if they will connect.
-	Run Manager CLI 	${mngr_options}
-	Run Agent 	${agnt_options}
-	Wait For Manager	120s
+	Run Agent 	@{agnt_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager	10s
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	${result_stdout}=	Get File	${OUTPUT DIR}${/}stdout_agent.txt
@@ -99,7 +101,7 @@ Agent Command Line AGENTDIR -d
 	VAR 	@{agnt_options} 	-d 	${agentdir}
 
 	Log To Console	Run Agent with custom dir.
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Sleep 	10s
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -117,7 +119,7 @@ Agent Command Line AGENTDIR --agentdir
 	VAR 	@{agnt_options} 	--agentdir 	${agentdir}
 
 	Log To Console	Run Agent with custom dir.
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Sleep 	10s
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -141,12 +143,13 @@ Agent Command Line ROBOT -r
 	VAR 	${robot_exec} 		${pip_data_list}[1]
 	# VAR 	${scenario_dir} 	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
 	VAR 	@{agnt_options} 	-g 	1 	-r 	${robot_exec}
-	VAR 	@{mngr_options} 	-g 	1 	-n 	-s 	${scenario_dir}
+	VAR 	@{mngr_options} 	-g 	1 	-n 	-s 	${scenario_dir} 	-d 	${results_dir}
 
 	Log To Console	Run Agent with custom robot executable.
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Sleep 	5s
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager	8min
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -173,7 +176,7 @@ Agent Command Line XMLMODE -x
 	VAR 	@{agnt_options} 	-x 	-d 	${agentdir}
 
 	Log To Console	Run Agent with xmlmode.
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Sleep 	10s
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -193,7 +196,7 @@ Agent Command Line XMLMODE --xmlmode
 	VAR 	@{agnt_options} 	--xmlmode 	-d 	${agentdir}
 
 	Log To Console	Run Agent with xmlmode.
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Sleep 	10s
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -214,7 +217,7 @@ Agent Command Line AGENTNAME -a
 	VAR 	@{agnt_options} 	-a 	${agent_name}
 
 	Log To Console	Run Agent with custom agent name.
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Test Agent Connectivity
 	Wait For Request 		20
 	Reply By	200
@@ -237,7 +240,7 @@ Agent Command Line AGENTNAME --agentname
 	VAR 	@{agnt_options} 	--agentname 	${agent_name}
 
 	Log To Console	Run Agent with custom agent name.
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Test Agent Connectivity
 	Wait For Request 		20
 	Reply By	200
@@ -255,29 +258,26 @@ Agent Command Line AGENTNAME --agentname
 Agent Command Line PROPERTY -p
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 
-	VAR 	@{agnt_options} 	-p 	Issue-#14
-	VAR 	@{mngr_options} 	-n
+	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#14${/}property
+	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
 
-	Log To Console	Run Agent with custom prop.
-	Run Manager CLI 	${mngr_options}
-	Run Agent 	${agnt_options}
-	Wait For Manager	120s
-	Stop Agent
+	Create Directory 	${test_dir}
+	Log To Console	Run Agent CLI with custom prop.
+	Run Agent CLI 		-p 	Issue-#14
+	Run Manager CLI 	-n 	-d 	${test_dir}
+	Wait Until Created 	${dbfile}
+	Wait Until the Agent Connects to the Manager
 
 	Log To Console 	Checking result data base
-	${dbfile} 	Find Result DB 		result_pattern=PreRun
-	# ${agent_result} 	Query Result DB 	${dbfile}
-	# ...    SELECT * FROM MetricData WHERE MetricType='Agent'
-	# Log 	${agent_result}
-
-	${prop_result} 	Query Result DB 	${dbfile}
-	...    SELECT * FROM MetricData WHERE MetricType='Agent' AND SecondaryMetric='Issue-#14'
+	VAR 	${query}= 	SELECT * FROM MetricData WHERE MetricType='Agent' AND SecondaryMetric='Issue-#14'
+	Wait Until the Query Is Not Empty 	${dbfile}  sql=${query}
+	${prop_result} 	Query Result DB 	${dbfile}  sql=${query}
 
 	${len}= 	Get Length 	${prop_result}
 	Should Be True 	${len} > 0
 	...    msg=Custom propery 'Issue-#14' not found in PreRun db. ${\n}Query Result: ${prop_result}
 
-	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+	[Teardown]	Run Keywords	Stop Agent 	Stop Manager
 
 Agent Yaml Configuration File
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #172
@@ -286,7 +286,7 @@ Agent Yaml Configuration File
 	${yamlfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#172${/}agent-config.yaml
 	VAR		@{agnt_options}		--ini	${yamlfile} 	-g 	2
 
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Log To Console	Run Agent with Yaml Configuration File.
 	Sleep    20
 	Stop Agent
@@ -303,7 +303,7 @@ Agent Yml Configuration File
 	${yamlfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#172${/}agent-config.yml
 	VAR		@{agnt_options}		--ini	${yamlfile} 	-g 	2
 
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Log To Console	Run Agent with Yaml Configuration File.
 	Sleep    20
 	Stop Agent
@@ -320,7 +320,7 @@ Agent JSON Configuration File
 	${jsonfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#172${/}agent-config.json
 	VAR		@{agnt_options}		--ini	${jsonfile} 	-g 	2
 
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Log To Console	Run Agent with JSON Configuration File.
 	Sleep    20
 	Stop Agent

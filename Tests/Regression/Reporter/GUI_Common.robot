@@ -7,13 +7,14 @@ Library 	ArchiveLibrary
 Library 	DocTest.VisualTest
 Library 	XML 	use_lxml=True
 
-Library 	ImageHorizonLibrary 	reference_folder=${IMAGE_DIR}
+Library 	ImageHorizonLibrary 	reference_folder=${IMAGE_DIR} 	confidence=${0.9} 	screenshot_folder=${OUTPUT_DIR}
 Library 	OCRLibrary
 
 Library 	read_docx.py
 Library 	read_xlsx.py
 Library 	save_html_image.py
 Library 	img_common.py
+Library 	ini_file_r.py
 
 Variables 	report_expected_data.yaml
 
@@ -23,9 +24,12 @@ ${platform}		None
 ${cmd_reporter} 		rfswarm-reporter
 ${IMAGE_DIR} 	${CURDIR}${/}Images${/}file_method
 ${pyfile}			${EXECDIR}${/}rfswarm_reporter${/}rfswarm_reporter.py
-${process}		None
+${process}		${process_reporter}
 ${sssleep}		0.5
 ${DonationReminter} 	${False}
+${COMPONENT} 		Reporter
+${component_name} 	Reporter
+${process_reporter} 	${None}
 
 *** Keywords ***
 Set Platform
@@ -163,7 +167,7 @@ Press ${key} ${n} Times
 	END
 
 Click ${item} With Vertical Offset
-	[Arguments]		${image_name}	${offset}=0
+	[Arguments]		${image_name}	${offset}=0 	${timeout}=${default_image_timeout}
 	[Documentation]	Click the item with the offset. An item can be: Label, Button, ...
 	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down].
 	${image_name}= 	Convert To Lower Case 	${image_name}
@@ -171,7 +175,7 @@ Click ${item} With Vertical Offset
 	${img}=	Set Variable		reporter_${platform}_${item}_${image_name}.png
 	Log		${CURDIR}
 	Log		${IMAGE_DIR}
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate		${img}
 	Log	${coordinates}
 	Click To The Below Of	${coordinates}	${offset}
@@ -474,7 +478,6 @@ Open GUI
 
 	${keyword}= 	Set Variable 	Open GUI ${platform}
 	Run Keyword 	${keyword} 	@{appargs}
-	Handle Donation Reminder
 
 Wiggle Mouse
 	Move To 	10 	10
@@ -485,64 +488,60 @@ Get Platform
 	${os}= 	Evaluate 	platform.system() 	platform
 	Set Suite Variable    ${platform}    ${platforms}[${os}]
 
-Open GUI windows
-	[Arguments]		@{appargs}
-	# Set Suite Variable    ${platform}    windows
-	${args}= 	Evaluate 	" \t".join(@{appargs})
-	Set Confidence		0.9
-	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	# ${process}= 	Start Process 	python 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+# Open GUI windows
+# 	[Arguments]		@{appargs}
+# 	# Set Suite Variable    ${platform}    windows
+# 	${args}= 	Evaluate 	" \t".join(@{appargs})
+# 	Set Confidence		0.9
+# 	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+# 	# ${process}= 	Start Process 	python 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+# 	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
 
-	Set Suite Variable 	$process 	${process}
-	# reporter_windows_status_previewloaded
-	# Wait For Status 	PreviewLoaded
-	# Sleep 	60
-	# Capture Screen
-	Set Screenshot Folder 	${OUTPUT DIR}
-	# Take A Screenshot
+# 	Set Suite Variable 	$process 	${process}
+# 	# reporter_windows_status_previewloaded
+# 	# Wait For Status 	PreviewLoaded
+# 	# Sleep 	60
+# 	# Capture Screen
+# 	Set Screenshot Folder 	${OUTPUT DIR}
+# 	# Take A Screenshot
 
-Open GUI ubuntu
-	[Arguments]		@{appargs}
-	Set Suite Variable    ${platform}    ubuntu
-	Set Confidence		0.9
-	# ${process}= 	Start Process 	python3 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	Set Suite Variable 	$process 	${process}
-	# Sleep 	60
-	# Capture Screen
-	Set Screenshot Folder 	${OUTPUT DIR}
-	# Take A Screenshot
+# Open GUI ubuntu
+# 	[Arguments]		@{appargs}
+# 	Set Suite Variable    ${platform}    ubuntu
+# 	Set Confidence		0.9
+# 	# ${process}= 	Start Process 	python3 	${pyfile} 	-g 	6 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+# 	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+# 	Set Suite Variable 	$process 	${process}
+# 	# Sleep 	60
+# 	# Capture Screen
+# 	Set Screenshot Folder 	${OUTPUT DIR}
+# 	# Take A Screenshot
 
-Open GUI macos
-	[Arguments]		@{appargs}
-	Set Suite Variable    ${platform}    macos
-	Set Confidence		0.9
-	# ${process}= 	Start Process 	python3 	${pyfile} 	-g 	5 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	Set Suite Variable 	$process 	${process}
-	# Sleep 	60
-	Set Screenshot Folder 	${OUTPUT DIR}
-	# Take A Screenshot
+# Open GUI macos
+# 	[Arguments]		@{appargs}
+# 	Set Suite Variable    ${platform}    macos
+# 	Set Confidence		0.9
+# 	# ${process}= 	Start Process 	python3 	${pyfile} 	-g 	5 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+# 	${process}= 	Start Process 	${cmd_reporter} 	@{appargs}    alias=Reporter 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
+# 	Set Suite Variable 	$process 	${process}
+# 	# Sleep 	60
+# 	Set Screenshot Folder 	${OUTPUT DIR}
+# 	# Take A Screenshot
 
-Handle Donation Reminder
-	${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 	30
-	VAR 	${DonationReminder} 	${found} 		scope=TEST
-
-Close GUI
-	${keyword}= 	Set Variable 	Close GUI ${platform}
-	IF 	${process}
-		${running}= 	Is Process Running 	${process}
-		IF 	${running}
-			Run Keyword 	${keyword}
-		ELSE
-			# ${result}= 	Get Process Result 	${process}
-			${result}= 	Wait For Process 	${process} 	timeout=60
-			Check Result 	${result}
-		END
-	END
-	Set Suite Variable 	$process 	None
-	Sleep 	0.5
+# Close GUI
+# 	${keyword}= 	Set Variable 	Close GUI ${platform}
+# 	IF 	${process}
+# 		${running}= 	Is Process Running 	${process}
+# 		IF 	${running}
+# 			Run Keyword 	${keyword}
+# 		ELSE
+# 			# ${result}= 	Get Process Result 	${process}
+# 			${result}= 	Wait For Process 	${process} 	timeout=60
+# 			Check Result 	${result}
+# 		END
+# 	END
+# 	Set Suite Variable 	$process 	None
+# 	Sleep 	0.5
 
 Check Result
 	[Arguments]		${result}
@@ -552,40 +551,40 @@ Check Result
 	Should Not Contain 	${result.stderr} 	Traceback
 	Should Be Equal As Integers 	${result.rc} 	0
 
-Close GUI windows
-	# Press Combination 	Key.esc
-	# Press Combination 	x 	Key.ctrl
-	# Press Combination 	Key.f4 	Key.alt
-	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
-	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
-	Click Image		reporter_${platform}_button_closewindow.png
-	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
-	Take A Screenshot
-	Sleep 	0.5
-	End Process If Still Running
+# Close GUI windows
+# 	# Press Combination 	Key.esc
+# 	# Press Combination 	x 	Key.ctrl
+# 	# Press Combination 	Key.f4 	Key.alt
+# 	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
+# 	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
+# 	Click Image		reporter_${platform}_button_closewindow.png
+# 	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
+# 	Take A Screenshot
+# 	Sleep 	0.5
+# 	End Process If Still Running
 
-Close GUI ubuntu
-	# Press Combination 	Key.esc
-	# Press Combination 	x 	Key.ctrl
-	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
-	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
-	Click Image		reporter_${platform}_button_closewindow.png
-	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
-	Take A Screenshot
-	Sleep 	0.5
-	End Process If Still Running
+# Close GUI ubuntu
+# 	# Press Combination 	Key.esc
+# 	# Press Combination 	x 	Key.ctrl
+# 	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
+# 	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
+# 	Click Image		reporter_${platform}_button_closewindow.png
+# 	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
+# 	Take A Screenshot
+# 	Sleep 	0.5
+# 	End Process If Still Running
 
-Close GUI macos
-	# Press Combination 	Key.esc
-	# Press Combination 	q 	Key.command
-	# Click Image		reporter_${platform}_menu_python3.png
-	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
-	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
-	Click Image		reporter_${platform}_button_closewindow.png
-	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
-	Take A Screenshot
-	Sleep 	0.5
-	End Process If Still Running
+# Close GUI macos
+# 	# Press Combination 	Key.esc
+# 	# Press Combination 	q 	Key.command
+# 	# Click Image		reporter_${platform}_menu_python3.png
+# 	# Run Keyword And Ignore Error 	Wait For Status 	PreviewLoaded 	10
+# 	# Run Keyword And Ignore Error 	Click Image		reporter_${platform}_status_previewloaded.png
+# 	Click Image		reporter_${platform}_button_closewindow.png
+# 	Run Keyword And Ignore Error 	Click Image		reporter_${platform}_button_closewindow.png
+# 	Take A Screenshot
+# 	Sleep 	0.5
+# 	End Process If Still Running
 
 End Process If Still Running
 	${result}= 	Wait For Process 	${process} 	timeout=60
@@ -761,35 +760,36 @@ Navigate to and check Desktop Icon
 
 Navigate to and check Desktop Icon For MacOS
 
+	Skip 	Skipped this for now due to changes in the new macos runners user interface.
 	# Release Fn Key
 
 	Take A Screenshot
 
 	# open go menu
-	${img}=	Set Variable		${platform}_finder_menu_go.png
+	${img}=	Set Variable		${PLATFORM}_finder_menu_go.png
 	Click Image		${img}
 	# Sleep 	0.3
 	# Take A Screenshot
 
 	# select Go to Folder from Go menu
-	${img}=	Set Variable		${platform}_finder_menu_gotofolder.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_finder_menu_gotofolder.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Click Image		${img}
 	# Sleep 	0.3
 	# Take A Screenshot
 
 
 	# # open finder
-	# ${img}=	Set Variable		${platform}_finder.png
-	# Wait For 	${img} 	 timeout=${default_image_timeout}
+	# ${img}=	Set Variable		${PLATFORM}_finder.png
+	# Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# @{coordinates}= 	Locate		${img}
 	# Click Image		${img}
-	# ${img}=	Set Variable		${platform}_finder_toolbar.png
-	# Wait For 	${img} 	 timeout=${default_image_timeout}
+	# ${img}=	Set Variable		${PLATFORM}_finder_toolbar.png
+	# Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# Take A Screenshot
 	#
 	# # un-maximise finder if maximised
-	# ${img}=	Set Variable		${platform}_finder.png
+	# ${img}=	Set Variable		${PLATFORM}_finder.png
 	# ${passed}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=1
 	# IF 	not ${passed}
 	# 	Take A Screenshot
@@ -798,7 +798,7 @@ Navigate to and check Desktop Icon For MacOS
 	# Sleep 	0.3
 	# Take A Screenshot
 	#
-	# ${img}=	Set Variable		${platform}_finder_toolbar.png
+	# ${img}=	Set Variable		${PLATFORM}_finder_toolbar.png
 	# Click Image 	${img}
 	# Sleep 	0.3
 	# Take A Screenshot
@@ -819,7 +819,7 @@ Navigate to and check Desktop Icon For MacOS
 	# Click To The Below Of 	${top_corner} 	${20}
 
 	Take A Screenshot
-	${img}=	Set Variable		${platform}_finder_gotofolder.png
+	${img}=	Set Variable		${PLATFORM}_finder_gotofolder.png
 	${status}= 	Run Keyword And Return Status 	Wait For 	${img} 	 timeout=${20}
 	IF  ${status}
 		Run Keyword And Ignore Error 	Click Image		${img}
@@ -830,33 +830,33 @@ Navigate to and check Desktop Icon For MacOS
 
 	# Sleep 	0.3
 	# Take A Screenshot
-	${img}=	Set Variable		${platform}_finder_gotoapplications.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_finder_gotoapplications.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# Take A Screenshot
 
 	Press Combination 	KEY.enter
 	# Sleep	0.5
 	# Take A Screenshot
-	${img}=	Set Variable		${platform}_finder_facetime.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_finder_facetime.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# Take A Screenshot
 
 	# Filter/Search /Applications?
 	Type 	RFSwarm
 	# Sleep 	0.3
-	${img}=	Set Variable		${platform}_finder_rfswarm_reporter.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_finder_rfswarm_reporter.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Take A Screenshot
 
 	# Open Launchpad (F4?)
 	# Press Combination   key.f4
-	${img}=	Set Variable		${platform}_launchpad.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_launchpad.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	# Sleep 	1
-	${img}=	Set Variable		${platform}_launchpad_search.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_launchpad_search.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# Take A Screenshot
 
 	# Search Launchpad
@@ -866,8 +866,8 @@ Navigate to and check Desktop Icon For MacOS
 
 	# Check for Icon
 	# macos_launchpad_rfswarm_reporter.png
-	${img}=	Set Variable		${platform}_launchpad_rfswarm_reporter.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_launchpad_rfswarm_reporter.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	# Take A Screenshot
 
 	Press Combination 	KEY.ESC
@@ -875,17 +875,18 @@ Navigate to and check Desktop Icon For MacOS
 
 Navigate to and check Desktop Icon For Windows
 
+	Skip 	need to update because of windows 11 changes
 	Take A Screenshot
 	# Open Start Menu
 	Sleep 	0.5
-	${img}=	Set Variable		${platform}_start_menu.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_start_menu.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	Take A Screenshot
 
-	${img}=	Set Variable		${platform}_start_menu_rfswarm_reporter.png
-	Run Keyword And Ignore Error 	Wait For 	${img} 	 timeout=${default_image_timeout} 	# temp. fix
+	${img}=	Set Variable		${PLATFORM}_start_menu_rfswarm_reporter.png
+	Run Keyword And Ignore Error 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT} 	# temp. fix
 
 	# Navigate Start Menu
 	Type 	RFSwarm
@@ -893,8 +894,8 @@ Navigate to and check Desktop Icon For Windows
 	Take A Screenshot
 
 	# Check for Icon
-	${img}=	Set Variable		${platform}_search_rfswarm_reporter.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_search_rfswarm_reporter.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 
 	Press Combination 	KEY.ESC
 
@@ -902,8 +903,8 @@ Navigate to and check Desktop Icon For Ubuntu
 
 	Take A Screenshot
 	# Open Menu
-	${img}=	Set Variable		${platform}_lxqt_menu.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_lxqt_menu.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	@{coordinates}= 	Locate		${img}
 	Click Image		${img}
 	# Move To 	${coordinates}
@@ -913,16 +914,16 @@ Navigate to and check Desktop Icon For Ubuntu
 
 	# Navigate Menu
 	# lxqt_programming_menu.png
-	${img}=	Set Variable		${platform}_lxqt_programming_menu.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_lxqt_programming_menu.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	Click Image		${img}
 	Sleep 	0.5
 	Take A Screenshot
 
 	# Check for Icon
 	# ubuntu_lxqt_rfswarm_reporter_menu.png
-	${img}=	Set Variable		${platform}_lxqt_rfswarm_reporter_menu.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
+	${img}=	Set Variable		${PLATFORM}_lxqt_rfswarm_reporter_menu.png
+	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 
 	Press Combination 	KEY.ESC
 
@@ -1722,9 +1723,318 @@ Release Fn Key
 
 	END
 
+### v1.6.0 ###
 
+Handle Donation Reminder
+	${comp}= 	Convert To Lower Case 	${COMPONENT_NAME}
+	IF  '${COMPONENT}' == 'Manager'
+		Run Keyword And Ignore Error 	Wait For 	manager_${PLATFORM}_button_runscriptrow.png 	timeout=12
+		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3
+		Run Keyword And Ignore Error 	Wait For 	manager_${PLATFORM}_button_runscriptrow.png 	timeout=8
+	ELSE IF  '${COMPONENT}' == 'Reporter'
+		Run Keyword And Ignore Error 	Wait For 	reporter_${PLATFORM}_button_generateexcel.png 	timeout=12
+		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		3
+		Run Keyword And Ignore Error 	Wait For 	reporter_${PLATFORM}_button_generateexcel.png 	timeout=8
+	END
 
+	IF  not ${found}
+		${found}= 	Run Keyword And Return Status 	Click Button 	MaybeLater 		4
+	END
+	VAR 	${DonationReminder} 	${found} 		scope=TEST
 
+Handle RFSwarm GUI Pop-ups
+	[Documentation] 	This keyword is intended to get rid of pop-ups displayed by rfswarm apps.
+	VAR 	${status} 	${true}
 
+	TRY
+		Take A Screenshot
+		IF  '${PLATFORM}' == 'macos'
+			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok_3 	timeout=5
+		ELSE
+			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok 	timeout=5
+		END
+
+		IF  '${PLATFORM}' == 'macos' and not ${status}
+			${status}= 	Run Keyword And Return Status 	Click Dialog Button 	ok_2 	timeout=1
+			Sleep 	1s
+			IF  ${status}  Click
+		END
+
+		IF  not ${status}  Fail
+
+	EXCEPT
+		Take A Screenshot
+		Run Keyword And Ignore Error 	Click Dialog Button 	ok 	timeout=1
+		IF  '${PLATFORM}' == 'macos'  Run Keyword And Ignore Error 	Click Dialog Button 	ok_2 	timeout=1
+
+		Press key.enter 1 Times
+		Sleep 	1
+		Press key.enter 1 Times
+	END
+	Press key.enter 1 Times
+
+Handle MacOS Pop-ups
+	[Tags]  macos-latest
+	[Documentation]  The MacOS system sometimes displays pop-up windows related to permissions. This keyword is intended to accept/ignore these pop-up windows.
+	[Setup] 	Sleep 	2s
+	Take A Screenshot
+	
+	VAR 	${img} 	macos_dlgbtn_allow_grayed.png
+	# Run Keyword And Ignore Error
+	# ...    Wait For 	${img} 	 timeout=2
+
+	Run Keyword And Ignore Error
+	...    Click Image 	${img}
+
+	VAR 	${img} 	macos_dlgbtn_allow.png
+	Sleep 	2s
+	# Run Keyword And Ignore Error
+	# ...    Wait For 	${img} 	 timeout=2
+
+	${result}= 	Run Keyword And Return Status
+	...    Click Image 	${img}
+
+	VAR 	${img} 	macos_dlgbtn_ignore.png
+	Sleep 	2s
+	Run Keyword And Ignore Error
+	...    Click Image 	${img}
+
+	Sleep 	0.1
+
+Open GUI ${platform}
+	[Documentation] 	Open one of the RFSwarm applications for GUI purposes. Pass the: Manager, Reporter or Agent
+	[Arguments] 	@{appargs}  ${envargs}=${None}
+	${comp} 	Convert To Lower Case 	${component_name}
+	${var}= 	Get Variables
+	Log 	${var}
+
+	Press Combination 	Key.esc
+	Wiggle Mouse
+
+	VAR 	${noargs} 	${False}
+	${len} 	Get Length 	${appargs}
+	IF  ${len} == ${0}
+		VAR 	${noargs} 	${True}
+	END
+
+	Run Keyword 	Run ${component_name} CLI 	@{appargs}  noargs=${noargs}  envargs=${envargs}
+
+	IF 	'-n' in ${appargs} or '--nogui' in ${appargs}
+		Sleep 	5
+	ELSE
+		IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
+		Handle Donation Reminder
+		IF  '${PLATFORM}' == 'macos'  Handle MacOS Pop-ups
+
+		${running}= 	Is Process Running 	${PROCESS_${comp}}
+		IF 	not ${running}
+			Take A Screenshot
+			Fail 		${component_name} not running
+		END
+	END
+
+Close GUI
+	Close GUI ${platform}
+
+Close GUI ${platform}
+	[Documentation] 	Closes one of the RFSwarm applications with GUI. Pass the: Manager or Reporter
+	${comp} 	Convert To Lower Case 	${component_name}
+	Run Keyword And Ignore Error 	Click Dialog Button 	cancel 	0.01
+	Run Keyword And Ignore Error 	Click Dialog Button 	no 		0.01
+
+	IF 	${PROCESS_${comp}}
+		${running}= 	Is Process Running 	${PROCESS_${comp}}
+		IF 	${running}
+			Log 	${\n}Closing ${component_name} GUI ... 	console=True
+
+			# make sure the window is the active window first
+			IF 	'${component_name}' == 'Manager'
+				Run Keyword And Ignore Error 	Click Image 	manager_${PLATFORM}_tab_about.png
+				Run Keyword And Ignore Error 	Click Image 	manager_${PLATFORM}_tab_run.png
+			ELSE IF 	'${component_name}' == 'Reporter'
+				IF  '${PLATFORM}' == 'macos'
+					Run Keyword And Ignore Error 	Click Button With Vertical Offset 	OpenTemplate 	offset=-20 	timeout=1
+				ELSE
+					Run Keyword And Ignore Error 	Click Image 	reporter_${PLATFORM}_menu_results.png
+				END
+			END
+
+			Sleep 	1
+			Press Key.esc 3 Times
+			Sleep 	1
+			IF  '${PLATFORM}' == 'macos'  Press Combination  Key.command  q  ELSE  Press Combination  Key.ctrl  x
+			Sleep	3
+
+			${running}= 	Is Process Running 	${PROCESS_${comp}}
+			IF 	${running}
+				Press Combination 	Key.esc
+				IF  '${PLATFORM}' == 'macos'  Press Combination  Key.command  q  ELSE  Press Combination  Key.ctrl  x
+			END
+
+		ELSE
+			Log 	${component_name} is not running! 	console=True
+			${result}= 	Wait For Process 	${PROCESS_${comp}} 	timeout=60
+			# Should Be Equal As Integers 	${result.rc} 	0
+
+			RETURN
+		END
+
+		Sleep 	2s
+		Run Keyword And Ignore Error 	Click Dialog Button 	no 		1
+
+		${result}= 		Wait For Process 	${process_${comp}} 	timeout=15
+		${running}= 	Is Process Running 	${PROCESS_${comp}}
+		IF 	not ${running}
+			Log 	*=== ${component_name} closed with GUI ===* 	console=True
+			TRY
+				Log 	${component_name} exited with: ${result.rc} 	console=${True}
+				# Should Be Equal As Integers 	${result.rc} 	0
+
+				Log		stdout_path: ${result.stdout_path} 		console=True
+				Log		stderr_path: ${result.stderr_path} 		console=True
+
+				Show Log 	${result.stdout_path}
+				Show Log 	${result.stderr_path}
+
+			EXCEPT 	AS 	${error}
+				Log 	error: ${error} 		console=true
+			END
+
+		ELSE
+			Log 	Closing GUI with CLI 	console=True
+			Take A Screenshot
+			Run Keyword 	Stop ${component_name} CLI 	# close with cli signal
+			RETURN
+		END
+
+	END
+
+	Sleep 	0.5
+	${running}= 	Is Process Running 	${PROCESS_${comp}}
+	Run Keyword If 	${running} 	Fail 	Failed to close ${component_name}
+
+	[Teardown] 	Set Suite Variable 	${PROCESS_${comp}} 	${None}
+
+Convert To Save Path
+	[Arguments] 	${path}
+	${safe_path} 		Evaluate 	re.sub(r'[<>:"/\\|?*]', '_', "${path}".replace(' ', '_')).replace(chr(0), '_').rstrip(' .')[:60] 	modules=re
+
+	RETURN 	${safe_path}
+
+Run ${component_name} CLI
+	[Documentation] 	Open one of the RFSwarm applications for CLI purposes. Pass the: Manager, Reporter or Agent
+	[Arguments] 	@{appargs}  ${noargs}=${False}  ${envargs}=${None}
+	${comp} 	Convert To Lower Case 	${component_name}
+	${len} 		Get Length 	${appargs}
+
+	Log 	${\n}Starting ${component_name} ... 	console=${True}
+	${args}= 	Evaluate 	" ".join(@{appargs})
+	Log 	\t\${args}: ${args} 	console=${True}
+
+	${tname} 		Convert To Save Path 	${TEST NAME}
+	Create File 		${OUTPUT DIR}${/}stdout_${comp}.txt
+	Create File 		${OUTPUT DIR}${/}stderr_${comp}.txt
+	${process}= 	Start Process 	${CMD_${comp}}  @{appargs}  alias=${component_name}
+	...    stdout=${OUTPUT DIR}${/}stdout_${comp}.txt  stderr=${OUTPUT DIR}${/}stderr_${comp}.txt
+	...    env=${envargs}
+
+	Log 	${process}
+	VAR 	${PROCESS_${comp}} 		${process} 	scope=SUITE
+
+	${result}= 	Wait Until Keyword Succeeds 	45sec 	500ms 	Process Should Be Running 	${process}
+
+	${running}= 	Is Process Running 	${PROCESS_${comp}}
+	IF 	not ${running}
+		${result}= 	Get Process Result 	${PROCESS_${comp}}
+
+		Log		rc: ${result.rc} 		console=True
+		Log		stdout_path: ${result.stdout_path} 		console=True
+		Log		stderr_path: ${result.stderr_path} 		console=True
+
+		Show Log 	${result.stdout_path}
+		Show Log 	${result.stderr_path}
+
+		Fail 		${component_name} didn't start!
+
+	END
+
+	Log 	*=== ${component_name} started ===* 	console=${True}
+
+Stop ${component_name} CLI
+	[Documentation] 	Closes one of the RFSwarm applications with CLI only. Pass the: Manager, Reporter or Agent
+	${comp} 	Convert To Lower Case 	${component_name}
+
+	${running}= 	Is Process Running 	${PROCESS_${comp}}
+	IF 	${running}
+		Sleep	1s
+		IF  '${PLATFORM}' == 'windows'	# Send Signal To Process keyword does not work on Windows
+			${result}= 	Terminate Process 	${PROCESS_${comp}}
+		ELSE
+			Send Signal To Process 	SIGINT 	${PROCESS_${comp}}
+			${result}= 	Wait For Process 	${PROCESS_${comp}} 	timeout=30 	on_timeout=kill
+		END
+	ELSE
+		Log 	${component_name} is not running! 	console=${True}
+		TRY
+			${result}= 	Get Process Result 	${PROCESS_${comp}}
+		EXCEPT 	AS 	${error}
+			Log 	error: ${error} 		console=true
+		END
+
+		RETURN
+	END
+
+	Log 	*=== ${component_name} closed with CLI signal ===* 	console=${True}
+	TRY
+		Log 	${component_name} exited with: ${result.rc} 	console=${True}
+		# Should Be Equal As Integers 	${result.rc} 	0
+
+		Log		stdout_path: ${result.stdout_path} 		console=True
+		Log		stderr_path: ${result.stderr_path} 		console=True
+
+		Show Log 	${result.stdout_path}
+		Show Log 	${result.stderr_path}
+
+	EXCEPT 	AS 	${error}
+		Log 	error: ${error} 		console=true
+
+	END
+
+	Sleep 	0.5
+	${running}= 	Is Process Running 	${PROCESS_${comp}}
+	Run Keyword If 	${running} 	Fail 	Failed to close ${component_name}
+
+	[Teardown] 	Set Suite Variable 	${PROCESS_${comp}} 	${None}
+
+Change Reporter INI Option
+	[Documentation] 	Pass the: Manager, Reporter or Agent
+	[Arguments] 	${section}  ${option}  ${new_value}
+	VAR    ${component_name}    Reporter
+	${location}= 	Get Reporter INI Location
+
+	${status_1}= 	Run Keyword And Return Status 	File Should Exist 			${location}
+	${status_2}= 	Run Keyword And Return Status 	File Should Not Be Empty 	${location}
+	&{OUTPUT} 	Create Dictionary
+	IF  not ${status_1}
+		Log 	The ${component_name} INI data could not be edited. INI file does not exists. 	console=${True}
+		RETURN 	&{OUTPUT}
+	ELSE IF 	not ${status_2}
+		Log 	The ${component_name} INI data could not be edited. INI file is empty. 	console=${True}
+		RETURN 	&{OUTPUT}
+	END
+
+	Change INI Option 	${location}  ${section}  ${option}  ${new_value}
+
+Set Reporter INI Window Size
+	[Documentation] 	Pass the: Manager, Reporter or Agent
+	[Arguments]		${width}=${None}	${height}=${None}
+	Log 	${width}
+	Log 	${height}
+	IF	"${width}" != "${None}"
+		Change Reporter INI Option 	GUI 		win_width 	${width}
+	END
+	IF	"${height}" != "${None}"
+		Change Reporter INI Option 	GUI 		win_height 	${height}
+	END
 
 #

@@ -7,13 +7,14 @@ Exclude Libraries With Spaces
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #171 	Issue #177
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	http://localhost:8138
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Log to console 	${CURDIR}
 	# ${scenariofile}= 	Normalize Path 	${CURDIR}${/}..${/}..${/}Demo${/}demo.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#171${/}Issue171.rfs
 	Log to console 	scenariofile: ${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
-	Run Manager CLI 	${mngr_options}
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
@@ -33,13 +34,14 @@ Run agent with -x (xml mode)
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #180
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	@{agnt_options}= 	Create List 	-g 	1 	-x 	-m 	http://localhost:8138
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Log to console 	${CURDIR}
 	# ${scenariofile}= 	Normalize Path 	${CURDIR}${/}..${/}..${/}Demo${/}demo.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#171${/}Issue171.rfs
 	Log to console 	${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n
-	Run Manager CLI 	${mngr_options}
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 	Stop Agent
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
@@ -146,25 +148,23 @@ Verify If Agent Runs With Existing INI File From Previous Version NO GUI
 Verify If Agent Name Has Been Transferred To the Manager (-a command line switch)
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #100
 
-	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#100${/}command_line
+	VAR 	${test_dir} 		${OUTPUT_DIR}${/}testdata${/}Issue-#100${/}command_line
 	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
-	VAR 	@{agnt_options} 	-a 	Issue-#100AGENTNAME-a
-	VAR 	@{mngr_options} 	-n 	-d 	${test_dir} 	-a 	2
+	VAR 	@{agnt_options} 	-a 	Issue-#100AGENTNAME
+	VAR 	@{mngr_options} 	-n 	-d 	${test_dir}
+	VAR 	${agent_name} 		Issue-#100AGENTNAME
 
 	Create Directory 	${test_dir}
 	Log To Console	Run Agent with custom agent name.
-	Run Agent 	${agnt_options}
-	Run Manager CLI 	${mngr_options}
-	Sleep	120s
-	Stop Agent
-	Stop Manager
-
-	# make copy of prerun
-	Copy Directory 		${test_dir}${/}PreRun 		${OUTPUT DIR}${/}results${/}${TEST NAME}${/}PreRun
+	Run Agent 	@{agnt_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until Created 	${dbfile}
+	Wait Until the Agent Connects to the Manager
 
 	Log To Console 	Checking PreRun data base.
-	${query_result} 	Query Result DB 	${dbfile}
-	...    SELECT * FROM AgentList WHERE AgentName='Issue-#100AGENTNAME-a'
+	VAR 	${query}= 	SELECT * FROM AgentList WHERE AgentName='${agent_name}'
+	Wait Until the Query Is Not Empty 		${dbfile}  sql=SELECT * FROM AgentList
+	${query_result} 	Query Result DB 	${dbfile}  ${query}
 	${len}= 	Get Length 	${query_result}
 	Should Be True 	${len} > 0
 	...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}
@@ -176,23 +176,21 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 
 	VAR 	${test_dir} 		${CURDIR}${/}testdata${/}Issue-#100${/}ini_file
 	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
+	VAR 	${agent_name} 		Issue-100AGENTNAME
 	VAR 	@{agnt_options} 	-i 	${CURDIR}${/}testdata${/}Issue-#100${/}RFSwarmAgent.ini
-	VAR 	@{mngr_options} 	-n 	-d 	${test_dir} 	-a 	2
+	VAR 	@{mngr_options} 	-n 	-d 	${test_dir}
 
 	Create Directory 	${test_dir}
 	Log To Console	Run Agent with custom agent name.
-	Run Agent 	${agnt_options}
-	Run Manager CLI 	${mngr_options}
-	Sleep	120s
-	Stop Agent
-	Stop Manager
-
-	# make copy of prerun
-	Copy Directory 		${test_dir}${/}PreRun 		${OUTPUT DIR}${/}results${/}${TEST NAME}${/}PreRun
+	Run Agent 	@{agnt_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until Created 	${dbfile}
+	Wait Until the Agent Connects to the Manager
 
 	Log To Console 	Checking PreRun data base.
-	${query_result} 	Query Result DB 	${dbfile}
-	...    SELECT * FROM AgentList WHERE AgentName='Issue-#100AGENTNAMEINI'
+	VAR 	${query}= 	SELECT * FROM AgentList WHERE AgentName='${agent_name}'
+	Wait Until the Query Is Not Empty 		${dbfile}  sql=SELECT * FROM AgentList
+	${query_result} 	Query Result DB 	${dbfile}  ${query}
 	${len}= 	Get Length 	${query_result}
 	Should Be True 	${len} > 0
 	...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}
@@ -210,15 +208,15 @@ Verify listener doesn't generate KeyError when using inject sleep
 
 	Create Directory 	${results_dir}
 	Log To Console	Run Agent
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Log To Console	Run Manager with Issue #392 Scenario
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
 	Log To Console	Wait For Manager To Finish
 	Wait For Manager
 	Log To Console	Stop Agent
 	Stop Agent
 
-	${dbfile}= 	Find Result DB 		*_Issue-#392
+	${dbfile}= 	Find Result DB 		result_pattern=*_Issue-#392
 	${dbpath} 	${dbfilename}= 	Split Path 	${dbfile}
 
 	@{logdirs}= 	List Directories In Directory 	${dbpath}${/}logs
@@ -256,16 +254,16 @@ Verify listener doesn't over inject sleeps
 
 	Create Directory 	${results_dir}
 	Log To Console	Run Agent
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Log To Console	Run Manager with Issue #392 Scenario
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
 	Log To Console	Wait For Manager To Finish
 	Wait For Manager
 	Log To Console	Stop Agent
 	Stop Agent
 
 	Log To Console	Check Counts Of Injected Sleeps In Agents Robot Logs
-	${dbfile}= 	Find Result DB 		*_Issue-#394
+	${dbfile}= 	Find Result DB 		result_pattern=*_Issue-#394
 	${dbpath} 	${dbfilename}= 	Split Path 	${dbfile}
 
 	@{logdirs}= 	List Directories In Directory 	${dbpath}${/}logs

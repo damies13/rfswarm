@@ -25,7 +25,7 @@ Next Day For Scheduled Start Is In the Next Month
 	# ${future_time}=	Subtract Time From Date 	${current_time} 	120 	date_format=%H:%M:%S 	result_format=%H:%M:%S
 	VAR 	${future_time} 		00:00:00
 	VAR 	@{mngr_options} 	-g 	6 	-n 	-d 	${results_dir} 	-t 	${future_time}  -a  0
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
 	Sleep 	10s
 	Stop Manager
 
@@ -50,14 +50,15 @@ Robot files with same name but different folders
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	VAR 	${agent_dir} 		${agent_dir}${/}${TEST NAME}      scope=TEST
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	http://localhost:8138
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Sleep    1s
 	Check Agent Is Running
 	Log to console 	${CURDIR}
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#184${/}Issue-#184.rfs
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 	Stop Agent
 	${stdout_manager}= 		Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
@@ -112,14 +113,15 @@ Circular Reference Resource Files
 	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources 	*.resource
 
 	@{agnt_options}= 	Create List 	-i 	${testdata}${/}agent.ini
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Sleep    1s
 	Check Agent Is Running
 	Log to console 	${CURDIR}
 	${scenariofile}= 	Normalize Path 	${testdata}${/}scenario.rfs
 	Log to console 	${scenariofile}
 	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${results_dir}
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 	Stop Agent
 
@@ -172,7 +174,7 @@ Circular Reference Resource Files 2
 	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources
 
 	@{agnt_options}= 	Create List 	-i 	${testdata}${/}agent.ini
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Sleep    1s
 	Check Agent Is Running
 	Log to console 	${CURDIR}
@@ -180,7 +182,8 @@ Circular Reference Resource Files 2
 	Log to console 	${scenariofile}
 	@{time}= 	Get Time 	hour min sec 	NOW + 2min
 	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${results_dir} 	-t 	${time[0]}:${time[1]}:${time[2]}
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	Wait For Manager
 	Stop Agent
 
@@ -233,7 +236,7 @@ Lots Of Resource Files
 	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources 	*.resource
 
 	@{agnt_options}= 	Create List 	-i 	${testdata}${/}agent.ini
-	Run Agent 	${agnt_options}
+	Run Agent 	@{agnt_options}
 	Sleep    1s
 	Check Agent Is Running
 	Log 	${CURDIR} 	console=true
@@ -249,7 +252,8 @@ Lots Of Resource Files
 	Log 	Now ${offset} ${time} 		console=true
 
 	@{mngr_options}= 	Create List 	-i 	${testdata}${/}manager.ini 	-n 	-d 	${results_dir} 	-t 	${time}[0]:${time}[1]
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
 	# It can take a while for the agent to download 3500+ files
 	Wait For Manager 	60min
 	Stop Agent
@@ -303,7 +307,7 @@ Check That the Manager Supports the Missing Scenario File Provided By the -s Arg
 	Change = new_dir With = ${scenatio_file} In ${inifile}
 	Change Manager INI File Settings 	scenariofile 	${inifile}
 
-	Run Manager CLI 	${mngr_options}
+	Run Manager CLI 	@{mngr_options}
 	Sleep 	3
 	${running}= 	Is Process Running		${process_manager}
 	IF 	${running}
@@ -337,7 +341,7 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 		File Should Not Exist 	${global_path}${/}RFSwarmManager.ini
 	END
 
-	Run Manager CLI	${mngr_options}
+	Run Manager CLI	@{mngr_options}
 	${running}= 	Is Process Running		${process_manager}
 	IF 	not ${running}
 		Fail	msg=Manager is not running!
@@ -358,7 +362,7 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 	Show Log 	${global_path}${/}RFSwarmManager.ini
 	File Should Not Be Empty	${global_path}${/}RFSwarmManager.ini
 	Log To Console	Running Manager with existing ini file.
-	Run Manager CLI	${mngr_options}
+	Run Manager CLI	@{mngr_options}
 	${running}= 	Is Process Running		${process_manager}
 	IF 	not ${running}
 		Fail	msg=Manager is not running!
@@ -379,7 +383,7 @@ Verify If Manager Runs With No Existing INI File From Current Version NO GUI
 	File Should Not Exist	${global_path}${/}RFSwarmManager.ini
 	Log To Console	Running Manager with no existing ini file.
 
-	Run Manager CLI	${mngr_options}
+	Run Manager CLI	@{mngr_options}
 	${running}= 	Is Process Running		${process_manager}
 	IF 	not ${running}
 		Fail	msg=Manager is not running!
@@ -407,7 +411,7 @@ Verify If Manager Runs With Existing INI File From Previous Version NO GUI
 	File Should Not Be Empty	${global_path}${/}RFSwarmManager.ini
 	Log To Console	Running Manager with existing ini file.
 
-	Run Manager CLI	${mngr_options}
+	Run Manager CLI	@{mngr_options}
 	${running}= 	Is Process Running		${process_manager}
 	IF 	not ${running}
 		Fail	msg=Manager is not running!
