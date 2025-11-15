@@ -449,7 +449,7 @@ Check if exception is generated when a file is renamed
 	# Show Log    ${manageriniile}
 
 	Run Manager CLI	@{mngr_options}
-	Open Agent	@{agent_options}
+	Run Agent	@{agent_options}
 
 	# Sleep    10s
 
@@ -473,9 +473,9 @@ Check if exception is generated when a file is renamed
 	Check Logs
 
 	[Teardown]	Run Keywords
-	...    	Move File 	${testfolder}${/}robot_swarm_b.jpg 		${testfolder}${/}robot_swarm_a.jpg
-	...    Stop Agent CLI	AND
-	...    Close Manager CLI	AND
+	...    	Move File 	${testfolder}${/}robot_swarm_b.jpg 		${testfolder}${/}robot_swarm_a.jpg 	AND
+	...    Stop Agent CLI 	AND
+	...    Close Manager CLI 	AND
 	...    Check Logs
 
 Check if exception is generated when a file is removed
@@ -501,7 +501,7 @@ Check if exception is generated when a file is removed
 	# Show Log    ${manageriniile}
 
 	Run Manager CLI	@{mngr_options}
-	Open Agent	@{agent_options}
+	Run Agent	@{agent_options}
 
 	# Sleep    10s
 
