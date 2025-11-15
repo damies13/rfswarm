@@ -468,14 +468,14 @@ Check if exception is generated when a file is renamed
 	@{scripts}= 	List Directory 	${agent_scripts_dir}
 
 	Stop Agent CLI
-	Run Keyword 	Close Manager CLI
+	Stop Manager CLI
 
 	Check Logs
 
 	[Teardown]	Run Keywords
 	...    	Move File 	${testfolder}${/}robot_swarm_b.jpg 		${testfolder}${/}robot_swarm_a.jpg 	AND
 	...    Stop Agent CLI 	AND
-	...    Close Manager CLI 	AND
+	...    Stop Manager CLI 	AND
 	...    Check Logs
 
 Check if exception is generated when a file is removed
@@ -519,11 +519,11 @@ Check if exception is generated when a file is removed
 	@{scripts}= 	List Directory 	${agent_scripts_dir}
 
 	Stop Agent CLI
-	Run Keyword 	Close Manager CLI
+	Stop Manager CLI
 
 	Check Logs
 
 	[Teardown]	Run Keywords
 	...    Stop Agent CLI	AND
-	...    Close Manager CLI	AND
+	...    Stop Manager CLI	AND
 	...    Check Logs

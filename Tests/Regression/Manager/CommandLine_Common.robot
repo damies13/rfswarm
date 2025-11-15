@@ -901,7 +901,7 @@ Wait Until the Query Is Not Empty
 			IF    ${iter} == 30
 				Log 	Query '${sql}' is returning empty row after ${iter} seconds.  level=WARN
 			END
-			
+
 			TRY
 				Sleep 	1s
 				${query_result}= 	Query Result DB 	${dbfile}  ${sql}  info=${False}
@@ -915,3 +915,16 @@ Wait Until the Query Is Not Empty
 	EXCEPT
 		Fail 		Query '${sql}' is returning empty row after ${timeout} seconds.
 	END
+
+Check Logs
+	${stdout_manager}= 		Read Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	${stderr_manager}= 		Read Log 	${OUTPUT DIR}${/}stderr_manager.txt
+
+	Should Not Contain 	${stdout_manager} 	RuntimeError
+	Should Not Contain 	${stderr_manager} 	RuntimeError
+	Should Not Contain 	${stdout_manager} 	Exception
+	Should Not Contain 	${stderr_manager} 	Exception
+	Should Not Contain 	${stdout_manager}	OSError
+	Should Not Contain 	${stderr_manager} 	OSError
+	Should Not Contain 	${stdout_manager}	KeyError
+	Should Not Contain 	${stderr_manager} 	KeyError
