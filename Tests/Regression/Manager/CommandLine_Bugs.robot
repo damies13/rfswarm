@@ -448,7 +448,7 @@ Check if exception is generated when a file is renamed
 	# Configuration File:  /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/rfswarm_manager/RFSwarmManager.ini
 	# Show Log    ${manageriniile}
 
-	Open Manager GUI	@{mngr_options}
+	Run Manager CLI	@{mngr_options}
 	Open Agent	@{agent_options}
 
 	# Sleep    10s
@@ -500,7 +500,7 @@ Check if exception is generated when a file is removed
 	# Configuration File:  /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/rfswarm_manager/RFSwarmManager.ini
 	# Show Log    ${manageriniile}
 
-	Open Manager GUI	@{mngr_options}
+	Run Manager CLI	@{mngr_options}
 	Open Agent	@{agent_options}
 
 	# Sleep    10s
