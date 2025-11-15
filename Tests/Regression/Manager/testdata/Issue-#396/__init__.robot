@@ -1,3 +1,3 @@
 *** Settings ***
 
-metadata 	file 	robot_swarm_a.jpg
+metadata 	file 	*.jpg

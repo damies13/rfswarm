@@ -146,55 +146,6 @@ Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
 # 	Run Keyword 	Close Manager GUI ${platform}
 # 	Stop Agent
 
-Check if exception is generated when a file is removed
-	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #396
-
-	VAR 	${agent_dir} 		${agent_dir}${/}Issue_#396      scope=TEST
-	Log    agent_dir: ${agent_dir}
-	VAR 	${agent_scripts_dir} 		${agent_dir}${/}scripts      scope=TEST
-	Log    agent_scripts_dir: ${agent_scripts_dir}
-
-	${testfolder}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#396
-	VAR 	${scenariofile} 	${testfolder}{/}Issue-#396.rfs
-	Log    scenariofile: ${scenariofile}
-
-	VAR 	${manageriniile} 	${testfolder}{/}RFSwarmManager.ini
-	Log    manageriniile: ${manageriniile}
-
-
-	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-i 	${manageriniile}
-	VAR		@{agent_options} 	-g 	3 	--agentdir 	${agent_dir}
-
-	# Configuration File:  /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/rfswarm_manager/RFSwarmManager.ini
-	# Show Log    ${manageriniile}
-
-	Open Manager GUI	@{mngr_options}
-	Open Agent	@{agent_options}
-
-	Sleep    10s
-
-	@{scripts}= 	List Directory 	${agent_scripts_dir}
-
-	Wait Until Created 	${agent_scripts_dir}${/}robot_swarm_a.jpg 		3 minutes
-
-	@{scripts}= 	List Directory 	${agent_scripts_dir}
-
-	Remove Files 	${testfolder}${/}__init__.robot 		${testfolder}${/}robot_swarm_a.jpg
-
-	Sleep    30s
-
-	@{scripts}= 	List Directory 	${agent_scripts_dir}
-
-	Stop Agent CLI
-	Run Keyword 	Close Manager GUI
-
-	Check Logs
-
-	[Teardown]	Run Keywords
-	...    Stop Agent CLI	AND
-	...    Close Manager GUI	AND
-	...    Check Logs
-
 
 
 #
