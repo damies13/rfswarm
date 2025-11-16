@@ -429,7 +429,7 @@ Verify If Manager Runs With Existing INI File From Previous Version NO GUI
 Check if exception is generated when a file is renamed
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #396
 
-	VAR 	${agent_dir} 		${agent_dir}${/}Issue_#396      scope=TEST
+	VAR 	${agent_dir} 		${agent_dir}${/}Issue_#396_name      scope=TEST
 	Log    agent_dir: ${agent_dir}
 	VAR 	${agent_scripts_dir} 		${agent_dir}${/}scripts      scope=TEST
 	Log    agent_scripts_dir: ${agent_scripts_dir}
@@ -438,7 +438,7 @@ Check if exception is generated when a file is renamed
 	VAR 	${scenariofile} 	${testfolder}${/}Issue-#396.rfs
 	Log    scenariofile: ${scenariofile}
 
-	VAR 	${manageriniile} 	${testfolder}{/}RFSwarmManager.ini
+	VAR 	${manageriniile} 	${testfolder}${/}RFSwarmManager.ini
 	Log    manageriniile: ${manageriniile}
 
 
@@ -451,7 +451,8 @@ Check if exception is generated when a file is renamed
 	Run Manager CLI	@{mngr_options}
 	Run Agent	@{agent_options}
 
-	# Sleep    10s
+	# give agent time to create scripts dir
+	Sleep    1s
 
 	@{scripts}= 	List Directory 	${agent_scripts_dir}
 
@@ -481,7 +482,7 @@ Check if exception is generated when a file is renamed
 Check if exception is generated when a file is removed
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #396
 
-	VAR 	${agent_dir} 		${agent_dir}${/}Issue_#396      scope=TEST
+	VAR 	${agent_dir} 		${agent_dir}${/}Issue_#396_del      scope=TEST
 	Log    agent_dir: ${agent_dir}
 	VAR 	${agent_scripts_dir} 		${agent_dir}${/}scripts      scope=TEST
 	Log    agent_scripts_dir: ${agent_scripts_dir}
@@ -490,7 +491,7 @@ Check if exception is generated when a file is removed
 	VAR 	${scenariofile} 	${testfolder}${/}Issue-#396.rfs
 	Log    scenariofile: ${scenariofile}
 
-	VAR 	${manageriniile} 	${testfolder}{/}RFSwarmManager.ini
+	VAR 	${manageriniile} 	${testfolder}${/}RFSwarmManager.ini
 	Log    manageriniile: ${manageriniile}
 
 
@@ -503,7 +504,8 @@ Check if exception is generated when a file is removed
 	Run Manager CLI	@{mngr_options}
 	Run Agent	@{agent_options}
 
-	# Sleep    10s
+	# give agent time to create scripts dir
+	Sleep    1s
 
 	@{scripts}= 	List Directory 	${agent_scripts_dir}
 
