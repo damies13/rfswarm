@@ -1754,7 +1754,8 @@ class RFSwarmBase:
 			file_data = self.scriptfiles[chkhash]
 			try:
 				script_hash = base.hash_file(file_data['localpath'], file_data['relpath'])
-			except:
+			except Exception as e:
+				self.debugmsg(8, "FileNotFoundError handled - Exception:", e)
 				script_hash = None
 				self.remove_hash(chkhash)
 
