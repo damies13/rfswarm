@@ -2352,7 +2352,7 @@ class RFSwarmAgent():
 		fd.append("	def __remove_injected_sleeps(self, testobj):")
 		fd.append("		# print('RFSTestRepeater', '__remove_injected_sleeps', 'testobj:', testobj)")
 		fd.append("		# print('RFSTestRepeater', '__remove_injected_sleeps', 'testobj.body:', testobj.body)")
-		fd.append("		testobj.body = [item for item in testobj.body if not (item.name=='Sleep' and item.args[1]=='Sleep added by RFSwarm')]")
+		fd.append("		testobj.body = [item for item in testobj.body if not (item.name=='Sleep' and len(item.args) > 1 and item.args[1]=='Sleep added by RFSwarm')]")
 		fd.append("		# print('RFSTestRepeater', '__remove_injected_sleeps', 'testobj.body:', testobj.body)")
 		fd.append("		return testobj")
 		fd.append("")

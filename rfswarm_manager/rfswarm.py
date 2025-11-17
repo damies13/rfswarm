@@ -3217,6 +3217,7 @@ class RFSwarmCore:
 			return False
 		except Exception as e:
 			base.debugmsg(5, "e:", e)
+			base.debugmsg(0, e, "Shutting down...")
 			self.on_closing()
 			return False
 
@@ -7481,7 +7482,7 @@ class RFSwarmGUI(tk.Frame):
 
 			else:
 				try:
-					base.debugmsg(9, "start")
+					base.debugmsg(9, "try start")
 					if 'lbl_sched_start_time' in self.display_plan and base.keeprunning:
 						base.debugmsg(9, "lbl_sched_start_time")
 						self.display_plan['lbl_sched_start_time'].set("")
@@ -7494,7 +7495,7 @@ class RFSwarmGUI(tk.Frame):
 					if 'time_remaining' in self.display_plan and base.keeprunning:
 						base.debugmsg(9, "time_remaining")
 						self.display_plan['time_remaining'].set("")
-					base.debugmsg(9, "stop")
+					base.debugmsg(9, "try end")
 				except Exception:
 					pass
 
