@@ -22,7 +22,7 @@ Exclude Libraries With Spaces
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
 	Run Manager CLI 	@{mngr_options}
 	Wait Until the Agent Connects to the Manager
-	Wait For Manager
+	Wait For Manager Process
 	Stop Agent CLI
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
@@ -49,7 +49,7 @@ Run agent with -x (xml mode)
 	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
 	Run Manager CLI 	@{mngr_options}
 	Wait Until the Agent Connects to the Manager
-	Wait For Manager
+	Wait For Manager Process
 	Stop Agent CLI
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
@@ -218,8 +218,8 @@ Verify listener doesn't generate KeyError when using inject sleep
 	Run Agent CLI 	@{agnt_options}
 	Log To Console	Run Manager with Issue #392 Scenario
 	Run Manager CLI 	@{mngr_options}
-	Log To Console	Wait For Manager To Finish
-	Wait For Manager
+	Log To Console	Wait For Manager Process To Finish
+	Wait For Manager Process
 	Log To Console	Stop Agent CLI
 	Stop Agent CLI
 	${dbfile}= 	Find Result DB 		result_pattern=*_Issue-#392
@@ -263,8 +263,8 @@ Verify listener doesn't over inject sleeps
 	Run Agent CLI 	@{agnt_options}
 	Log To Console	Run Manager with Issue #392 Scenario
 	Run Manager CLI 	@{mngr_options}
-	Log To Console	Wait For Manager To Finish
-	Wait For Manager
+	Log To Console	Wait For Manager Process To Finish
+	Wait For Manager Process
 	Log To Console	Stop Agent CLI	Stop Agent CLI
 
 	Log To Console	Check Counts Of Injected Sleeps In Agents Robot Logs
@@ -304,7 +304,7 @@ Run Test Cases With Embedded Variables
 	Run Manager CLI  -n  -s  ${test_folder}${/}${scenario_name}.rfs  -d  ${test_folder}${/}results
 
 	Wait Until the Agent Connects to the Manager
-	Wait For Manager Process 	timeout=10min
+	Wait For Manager Process Process 	timeout=10min
 	Stop Agent CLI
 
 	Check Logs 	Manager
