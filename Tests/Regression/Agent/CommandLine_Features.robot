@@ -12,7 +12,7 @@ Install Application Icon or Desktop Shortcut
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
 
 	@{agent_options}= 	Create List 	-g 	6 	-c 	ICON
-	Run Agent 	@{agent_options}
+	Run Agent CLI 	@{agent_options}
 	Sleep    2
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
@@ -38,7 +38,7 @@ Agent Command Line INI -i
 
 	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmAgent.ini
 
-	Run Agent 	@{agnt_options}
+	Run Agent CLI 	@{agnt_options}
 	Log To Console	Run Agent CLI with alternate ini file with variable.
 	Stop Agent
 	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
@@ -52,7 +52,7 @@ Agent Command Line INI --ini
 
 	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmAgent.ini
 
-	Run Agent 	@{agnt_options}
+	Run Agent CLI 	@{agnt_options}
 	Log To Console	Run Agent CLI with alternate ini file with variable.
 	Stop Agent
 	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
@@ -68,7 +68,7 @@ Agent Command Line MANAGER -m
 	VAR 	@{mngr_options} 	-n
 
 	Log To Console	Run Agent CLI and Manager and see if they will connect.
-	Run Agent 	@{agnt_options}
+	Run Agent CLI 	@{agnt_options}
 	Run Manager CLI 	@{mngr_options}
 	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process	60s
@@ -86,7 +86,7 @@ Agent Command Line MANAGER --manager
 	VAR 	@{mngr_options} 	-n
 
 	Log To Console	Run Agent CLI and Manager and see if they will connect.
-	Run Agent 	@{agnt_options}
+	Run Agent CLI 	@{agnt_options}
 	Run Manager CLI 	@{mngr_options}
 	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process	60s
@@ -145,7 +145,7 @@ Agent Command Line ROBOT -r
 	VAR 	@{mngr_options} 	-g 	1 	-n 	-s 	${scenario_dir} 	-d 	${results_dir}
 
 	Log To Console	Run Agent with custom robot executable.
-	Run Agent 	@{agnt_options}
+	Run Agent CLI 	@{agnt_options}
 	Sleep 	5s
 	Run Manager CLI 	@{mngr_options}
 	Wait Until the Agent Connects to the Manager

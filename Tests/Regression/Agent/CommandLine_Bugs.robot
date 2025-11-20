@@ -14,7 +14,7 @@ Exclude Libraries With Spaces
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #171 	Issue #177
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	@{agnt_options}= 	Create List 	-g 	1 	-m 	http://localhost:8138
-	Run Agent 	@{agnt_options}
+	Run Agent CLI 	@{agnt_options}
 	Log to console 	${CURDIR}
 	# ${scenariofile}= 	Normalize Path 	${CURDIR}${/}..${/}..${/}Demo${/}demo.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#171${/}Issue171.rfs
@@ -23,7 +23,7 @@ Exclude Libraries With Spaces
 	Run Manager CLI 	@{mngr_options}
 	Wait Until the Agent Connects to the Manager
 	Wait For Manager
-	Stop Agent
+	Stop Agent CLI
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -41,7 +41,7 @@ Run agent with -x (xml mode)
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #180
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
 	@{agnt_options}= 	Create List 	-g 	1 	-x 	-m 	http://localhost:8138
-	Run Agent 	@{agnt_options}
+	Run Agent CLI 	@{agnt_options}
 	Log to console 	${CURDIR}
 	# ${scenariofile}= 	Normalize Path 	${CURDIR}${/}..${/}..${/}Demo${/}demo.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#171${/}Issue171.rfs
@@ -50,7 +50,7 @@ Run agent with -x (xml mode)
 	Run Manager CLI 	@{mngr_options}
 	Wait Until the Agent Connects to the Manager
 	Wait For Manager
-	Stop Agent
+	Stop Agent CLI
 	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
@@ -162,7 +162,7 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 
 	Create Directory 	${test_dir}
 	Log To Console	Run Agent with custom agent name.
-	Run Agent 	@{agnt_options}
+	Run Agent CLI 	@{agnt_options}
 	Run Manager CLI 	@{mngr_options}
 	VAR 	@{agnt_options} 	-a 	Issue-#100AGENTNAME
 	Wait Until Created 	${dbfile}
@@ -176,7 +176,7 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 	Should Be True 	${len} > 0
 	...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}
 
-	[Teardown]	Run Keywords	Stop Agent CLI	Stop Manager CLI
+	[Teardown]	Run Keywords	Stop Agent CLI  AND 	Stop Manager CLI
 
 Verify If Agent Name Has Been Transferred To the Manager (ini file)
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #100
@@ -189,7 +189,7 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 
 	Create Directory 	${test_dir}
 	Log To Console	Run Agent with custom agent name.
-	Run Agent 	@{agnt_options}
+	Run Agent CLI 	@{agnt_options}
 	Run Manager CLI 	@{mngr_options}
 	Wait Until Created 	${dbfile}
 	Wait Until the Agent Connects to the Manager
@@ -202,7 +202,7 @@ Verify If Agent Name Has Been Transferred To the Manager (ini file)
 	Should Be True 	${len} > 0
 	...    msg=Custom Agent name not found in PreRun db. ${\n}Query Result: ${query_result}
 
-	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+	[Teardown]	Run Keywords	Stop Agent CLI  AND 	Stop Manager CLI
 
 Verify listener doesn't generate KeyError when using inject sleep
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #392
@@ -215,14 +215,13 @@ Verify listener doesn't generate KeyError when using inject sleep
 
 	Create Directory 	${results_dir}
 	Log To Console	Run Agent
-	Run Agent 	@{agnt_options}
+	Run Agent CLI 	@{agnt_options}
 	Log To Console	Run Manager with Issue #392 Scenario
 	Run Manager CLI 	@{mngr_options}
 	Log To Console	Wait For Manager To Finish
 	Wait For Manager
-	Log To Console	Stop Agent
-	Stop Agent
-
+	Log To Console	Stop Agent CLI
+	Stop Agent CLI
 	${dbfile}= 	Find Result DB 		result_pattern=*_Issue-#392
 	${dbpath} 	${dbfilename}= 	Split Path 	${dbfile}
 
@@ -248,7 +247,7 @@ Verify listener doesn't generate KeyError when using inject sleep
 		Fail  	errors: ${ftext}
 	END
 
-	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+	[Teardown]	Run Keywords	Stop Agent CLI  AND 	Stop Manager CLI
 
 Verify listener doesn't over inject sleeps
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #394
@@ -261,13 +260,12 @@ Verify listener doesn't over inject sleeps
 
 	Create Directory 	${results_dir}
 	Log To Console	Run Agent
-	Run Agent 	@{agnt_options}
+	Run Agent CLI 	@{agnt_options}
 	Log To Console	Run Manager with Issue #392 Scenario
 	Run Manager CLI 	@{mngr_options}
 	Log To Console	Wait For Manager To Finish
 	Wait For Manager
-	Log To Console	Stop Agent
-	Stop Agent
+	Log To Console	Stop Agent CLI	Stop Agent CLI
 
 	Log To Console	Check Counts Of Injected Sleeps In Agents Robot Logs
 	${dbfile}= 	Find Result DB 		result_pattern=*_Issue-#394
@@ -291,18 +289,18 @@ Verify listener doesn't over inject sleeps
 
 	Should Be Equal As Numbers 		${inj_sleep_count_1} 		${inj_sleep_count_2}
 
-	[Teardown]	Run Keywords	Stop Agent	Stop Manager
+	[Teardown]	Run Keywords	Stop Agent CLI  AND 	Stop Manager CLI
 
 Run Test Cases With Embedded Variables
 	[Tags] 		ubuntu-latest 	macos-latest 	windows-latest 	Issue #156
 	[Setup] 	Run Keywords
 	...    Create Directory 	${CURDIR}${/}testdata${/}Issue-#156${/}results  AND
 	...    Run Agent CLI  -g 3
-	
+
 	VAR 	${test_folder} 	${CURDIR}${/}testdata${/}Issue-#156
 	VAR 	${scenario_name} 	test_scenario
 	VAR 	${robot_test_name} 	Send GET on API \${endpoint} on \${env}
-	
+
 	Run Manager CLI  -n  -s  ${test_folder}${/}${scenario_name}.rfs  -d  ${test_folder}${/}results
 
 	Wait Until the Agent Connects to the Manager
