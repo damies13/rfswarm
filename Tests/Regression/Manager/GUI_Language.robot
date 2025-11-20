@@ -44,7 +44,8 @@ Add Test In Language
 	[Arguments] 	${langcode}
 	Log 	${langcode} 	console=True
 	${scenariofile}= 		Create ${langcode} Language Scenario
-	Open Manager GUI 		-s 	${scenariofile}
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Wait For the Agent To Be Ready
 	Click Tab 	Plan
 	Take A Screenshot
@@ -54,6 +55,7 @@ Add Test In Language
 Language Test Init
 	${mgrini}= 	Get Manager INI Location
 	Create Manager INI File If It Does Not Exist
+	Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}
 	Set Manager INI Window Size 	1200 	600
 	# ${options}= 	Create List 	 	-d 	${agent_dir}
 	Run Agent CLI
@@ -61,7 +63,5 @@ Language Test Init
 Language Test End
 	Close Manager GUI
 	Stop Agent CLI
-
-
 
 #

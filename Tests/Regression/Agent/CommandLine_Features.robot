@@ -11,8 +11,11 @@ Suite Setup 	Common.Basic Suite Initialization Agent
 Install Application Icon or Desktop Shortcut
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #145
 
-	Run Agent CLI 	-g 	6 	-c 	ICON
-	Wait For Agent Process
+	@{agent_options}= 	Create List 	-g 	6 	-c 	ICON
+	Run Agent 	@{agent_options}
+	Sleep    2
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
 
 	Check Icon Install
 Agent Version
@@ -35,9 +38,9 @@ Agent Command Line INI -i
 
 	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmAgent.ini
 
-	Run Agent CLI 	-i	${inifile}
+	Run Agent 	@{agnt_options}
 	Log To Console	Run Agent CLI with alternate ini file with variable.
-	Stop Agent CLI
+	Stop Agent
 	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
 	${result_stdout}=	Get File	${stdout_agent_path}
 	Should Contain	${result_stdout}	${inifile}
@@ -49,9 +52,9 @@ Agent Command Line INI --ini
 
 	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmAgent.ini
 
-	Run Agent CLI 	--ini	${inifile}
+	Run Agent 	@{agnt_options}
 	Log To Console	Run Agent CLI with alternate ini file with variable.
-	Stop Agent CLI
+	Stop Agent
 	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
 	${result_stdout}=	Get File	${stdout_agent_path}
 	Should Contain	${result_stdout}	${inifile}
@@ -61,12 +64,15 @@ Agent Command Line INI --ini
 Agent Command Line MANAGER -m
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 
+	VAR 	@{agnt_options} 	-m 	http://localhost:8138
+	VAR 	@{mngr_options} 	-n
+
 	Log To Console	Run Agent CLI and Manager and see if they will connect.
-	Run Agent CLI 		-m 	http://localhost:8138
-	Run Manager CLI 	-n
+	Run Agent 	@{agnt_options}
+	Run Manager CLI 	@{mngr_options}
 	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process	60s
-	Stop Agent CLI
+	Stop Agent
 	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
 	${result_stdout}=	Get File	${stdout_agent_path}
 	Should Contain	${result_stdout}	Manager Connected
@@ -76,12 +82,15 @@ Agent Command Line MANAGER -m
 Agent Command Line MANAGER --manager
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 
+	VAR 	@{agnt_options} 	--manager 	http://localhost:8138
+	VAR 	@{mngr_options} 	-n
+
 	Log To Console	Run Agent CLI and Manager and see if they will connect.
-	Run Agent CLI 		--manager 	http://localhost:8138
-	Run Manager CLI 	-n
+	Run Agent 	@{agnt_options}
+	Run Manager CLI 	@{mngr_options}
 	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process	60s
-	Stop Agent CLI
+	Stop Agent
 	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
 	${result_stdout}=	Get File	${stdout_agent_path}
 	Should Contain	${result_stdout}	Manager Connected
@@ -93,7 +102,7 @@ Agent Command Line AGENTDIR -d
 
 	VAR 	${agentdir} 		${CURDIR}${/}testdata${/}Issue-#14${/}agentdir
 
-	Log To Console	Run Agent CLI with custom dir.
+	Log To Console	Run Agent with custom dir.
 	Run Agent CLI 	-d 	${agentdir}
 	Sleep 	10s
 	Stop Agent CLI
@@ -109,7 +118,7 @@ Agent Command Line AGENTDIR --agentdir
 
 	VAR 	${agentdir} 		${CURDIR}${/}testdata${/}Issue-#14${/}agentdir
 
-	Log To Console	Run Agent CLI with custom dir.
+	Log To Console	Run Agent with custom dir.
 	Run Agent CLI 	--agentdir 	${agentdir}
 	Sleep 	10s
 	Stop Agent CLI
@@ -132,13 +141,20 @@ Agent Command Line ROBOT -r
 	${scenario_dir}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
 	VAR 	${robot_exec} 		${pip_data_list}[1]
 	# VAR 	${scenario_dir} 	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
+	VAR 	@{agnt_options} 	-g 	1 	-r 	${robot_exec}
+	VAR 	@{mngr_options} 	-g 	1 	-n 	-s 	${scenario_dir} 	-d 	${results_dir}
 
-	Log To Console	Run Agent CLI with custom robot executable.
-	Run Agent CLI 		-g 	1 	-r 	${robot_exec}
-	Run Manager CLI 	-g 	1 	-n 	-s 	${scenario_dir}
+	Log To Console	Run Agent with custom robot executable.
+	Run Agent 	@{agnt_options}
+	Sleep 	5s
+	Run Manager CLI 	@{mngr_options}
 	Wait Until the Agent Connects to the Manager
-	Wait For Manager Process	8min
-	Stop Agent CLI
+	Wait For Manager	8min
+	Stop Agent
+	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
+	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
 
 	@{test_result}= 	List Directories In Directory	${RESULTS_DIR}	absolute=${True}	pattern=*_Issue-#14
 	Log To Console		Result dir: ${test_result}
@@ -157,7 +173,7 @@ Agent Command Line XMLMODE -x
 
 	VAR 	${agentdir} 		${CURDIR}${/}testdata${/}Issue-#14${/}xmlmode_dir
 
-	Log To Console	Run Agent CLI with xmlmode.
+	Log To Console	Run Agent with xmlmode.
 	Run Agent CLI 	-x 	-d 	${agentdir}
 	Sleep 	10s
 	Stop Agent CLI
@@ -175,7 +191,7 @@ Agent Command Line XMLMODE --xmlmode
 
 	VAR 	${agentdir} 		${CURDIR}${/}testdata${/}Issue-#14${/}xmlmode_dir
 
-	Log To Console	Run Agent CLI with xmlmode.
+	Log To Console	Run Agent with xmlmode.
 	Run Agent CLI 	--xmlmode 	-d 	${agentdir}
 	Sleep 	10s
 	Stop Agent CLI
@@ -194,7 +210,7 @@ Agent Command Line AGENTNAME -a
 
 	VAR 	${agent_name} 		Issue-#14AGENTNAME
 
-	Log To Console	Run Agent CLI with custom agent name.
+	Log To Console	Run Agent with custom agent name.
 	Run Agent CLI 	-a 	${agent_name}
 	Test Agent Connectivity
 	Wait For Request 		20
@@ -215,7 +231,7 @@ Agent Command Line AGENTNAME --agentname
 
 	VAR 	${agent_name} 		Issue-#14AGENTNAME
 
-	Log To Console	Run Agent CLI with custom agent name.
+	Log To Console	Run Agent with custom agent name.
 	Run Agent CLI 	--agentname 	${agent_name}
 	Test Agent Connectivity
 	Wait For Request 		20
@@ -261,7 +277,7 @@ Agent Yaml Configuration File
 	${yamlfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#172${/}agent-config.yaml
 
 	Run Agent CLI 	--ini	${yamlfile} 	-g 	2
-	Log To Console	Run Agent CLI with Yaml Configuration File.
+	Log To Console	Run Agent with Yaml Configuration File.
 	Sleep    20
 	Stop Agent CLI
 	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
@@ -277,7 +293,7 @@ Agent Yml Configuration File
 	${yamlfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#172${/}agent-config.yml
 
 	Run Agent CLI 	--ini	${yamlfile} 	-g 	2
-	Log To Console	Run Agent CLI with Yaml Configuration File.
+	Log To Console	Run Agent with Yaml Configuration File.
 	Sleep    20
 	Stop Agent CLI
 	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
@@ -293,7 +309,7 @@ Agent JSON Configuration File
 	${jsonfile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#172${/}agent-config.json
 
 	Run Agent CLI 	--ini	${jsonfile} 	-g 	2
-	Log To Console	Run Agent CLI with JSON Configuration File.
+	Log To Console	Run Agent with JSON Configuration File.
 	Sleep    20
 	Stop Agent CLI
 	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent

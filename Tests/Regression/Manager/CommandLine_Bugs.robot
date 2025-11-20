@@ -106,7 +106,8 @@ Circular Reference Resource Files
 
 	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources 	*.resource
 
-	Run Agent CLI 	-i  ${testdata}${/}agent.ini
+	@{agnt_options}= 	Create List 	-i 	${testdata}${/}agent.ini
+	Run Agent 	@{agnt_options}
 	Sleep    1s
 	Check Agent Is Running
 	Log to console 	${CURDIR}
@@ -169,7 +170,8 @@ Circular Reference Resource Files 2
 
 	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources
 
-	Run Agent CLI 	-i  ${testdata}${/}agent.ini
+	@{agnt_options}= 	Create List 	-i 	${testdata}${/}agent.ini
+	Run Agent 	@{agnt_options}
 	Sleep    1s
 	Check Agent Is Running
 	Log to console 	${CURDIR}
@@ -233,7 +235,8 @@ Lots Of Resource Files
 
 	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources 	*.resource
 
-	Run Agent CLI 	-i  ${testdata}${/}agent.ini
+	@{agnt_options}= 	Create List 	-i 	${testdata}${/}agent.ini
+	Run Agent 	@{agnt_options}
 	Sleep    1s
 	Check Agent Is Running
 	Log 	${CURDIR} 	console=true
@@ -379,6 +382,8 @@ Verify If Manager Runs With No Existing INI File From Current Version NO GUI
 
 	Run Manager CLI 	-n
 	${running}= 	Is Process Running		${PROCESS_MANAGER}
+	Run Manager CLI	@{mngr_options}
+	${running}= 	Is Process Running		${process_manager}
 	IF 	not ${running}
 		Fail	msg=Manager is not running!
 	END
@@ -412,5 +417,111 @@ Verify If Manager Runs With Existing INI File From Previous Version NO GUI
 	IF 	${running}
 		Fail	msg=Manager did not close!
 	END
+	Log 	${result.stdout}
+	Log 	${result.stderr}
 	Show Log 	${result.stdout_path}
 	Show Log 	${result.stderr_path}
+
+Check if exception is generated when a file is renamed
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #396
+
+	VAR 	${agent_dir} 		${agent_dir}${/}Issue_#396_name      scope=TEST
+	Log    agent_dir: ${agent_dir}
+	VAR 	${agent_scripts_dir} 		${agent_dir}${/}scripts      scope=TEST
+	Log    agent_scripts_dir: ${agent_scripts_dir}
+
+	${testfolder}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#396
+	VAR 	${scenariofile} 	${testfolder}${/}Issue-#396.rfs
+	Log    scenariofile: ${scenariofile}
+
+	VAR 	${manageriniile} 	${testfolder}${/}RFSwarmManager.ini
+	Log    manageriniile: ${manageriniile}
+
+
+	VAR 	@{mngr_options} 	-n 	-a 	2 	-s 	${scenariofile} 	-i 	${manageriniile}
+	VAR		@{agent_options} 	-g 	3 	--agentdir 	${agent_dir}
+
+	# Configuration File:  /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/rfswarm_manager/RFSwarmManager.ini
+	# Show Log    ${manageriniile}
+
+	Run Manager CLI	@{mngr_options}
+	Run Agent	@{agent_options}
+
+	# give agent time to create scripts dir
+	Sleep    1s
+
+	@{scripts}= 	List Directory 	${agent_scripts_dir}
+
+	Wait Until Created 	${agent_scripts_dir}${/}robot_swarm_a.jpg 		3 minutes
+
+	@{scripts}= 	List Directory 	${agent_scripts_dir}
+
+	# Remove Files 	${testfolder}${/}__init__.robot 		${testfolder}${/}robot_swarm_a.jpg
+	Move File 	${testfolder}${/}robot_swarm_a.jpg 		${testfolder}${/}robot_swarm_b.jpg
+
+	# need to wait long enough for the manager to poll the files
+	Sleep    15s
+
+	@{scripts}= 	List Directory 	${agent_scripts_dir}
+
+	Stop Agent CLI
+	Stop Manager CLI
+
+	Check Logs
+
+	[Teardown]	Run Keywords
+	...    	Move File 	${testfolder}${/}robot_swarm_b.jpg 		${testfolder}${/}robot_swarm_a.jpg 	AND
+	...    Stop Agent CLI 	AND
+	...    Stop Manager CLI 	AND
+	...    Check Logs
+
+Check if exception is generated when a file is removed
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #396
+
+	VAR 	${agent_dir} 		${agent_dir}${/}Issue_#396_del      scope=TEST
+	Log    agent_dir: ${agent_dir}
+	VAR 	${agent_scripts_dir} 		${agent_dir}${/}scripts      scope=TEST
+	Log    agent_scripts_dir: ${agent_scripts_dir}
+
+	${testfolder}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#396
+	VAR 	${scenariofile} 	${testfolder}${/}Issue-#396.rfs
+	Log    scenariofile: ${scenariofile}
+
+	VAR 	${manageriniile} 	${testfolder}${/}RFSwarmManager.ini
+	Log    manageriniile: ${manageriniile}
+
+
+	VAR 	@{mngr_options} 	-n 	-a 	2 	-s 	${scenariofile} 	-i 	${manageriniile}
+	VAR		@{agent_options} 	-g 	3 	--agentdir 	${agent_dir}
+
+	# Configuration File:  /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/rfswarm_manager/RFSwarmManager.ini
+	# Show Log    ${manageriniile}
+
+	Run Manager CLI	@{mngr_options}
+	Run Agent	@{agent_options}
+
+	# give agent time to create scripts dir
+	Sleep    1s
+
+	@{scripts}= 	List Directory 	${agent_scripts_dir}
+
+	Wait Until Created 	${agent_scripts_dir}${/}robot_swarm_a.jpg 		3 minutes
+
+	@{scripts}= 	List Directory 	${agent_scripts_dir}
+
+	Remove Files 	${testfolder}${/}__init__.robot 		${testfolder}${/}robot_swarm_a.jpg
+
+	# need to wait long enough for the manager to poll the files
+	Sleep    15s
+
+	@{scripts}= 	List Directory 	${agent_scripts_dir}
+
+	Stop Agent CLI
+	Stop Manager CLI
+
+	Check Logs
+
+	[Teardown]	Run Keywords
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI	AND
+	...    Check Logs

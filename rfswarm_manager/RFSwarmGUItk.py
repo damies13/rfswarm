@@ -2775,7 +2775,7 @@ class RFSwarmGUItk(tk.Frame):
 
 			else:
 				try:
-					self.base.debugmsg(9, "start")
+					self.base.debugmsg(9, "try start")
 					if 'lbl_sched_start_time' in self.display_plan and self.base.keeprunning:
 						self.base.debugmsg(9, "lbl_sched_start_time")
 						self.display_plan['lbl_sched_start_time'].set("")
@@ -2788,7 +2788,7 @@ class RFSwarmGUItk(tk.Frame):
 					if 'time_remaining' in self.display_plan and self.base.keeprunning:
 						self.base.debugmsg(9, "time_remaining")
 						self.display_plan['time_remaining'].set("")
-					self.base.debugmsg(9, "stop")
+					self.base.debugmsg(9, "try end")
 				except Exception:
 					pass
 
