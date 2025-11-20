@@ -219,12 +219,12 @@ Verify the Content Of the HTML Report
 	VAR 	${move_tolerance} 	150
 
 	Log 	template: ${template_dir} 	console=True
-	Open GUI	-d 	${resultfolder} 	-t 	${template_dir}
+	Open Reporter GUI	-d 	${resultfolder} 	-t 	${template_dir}
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=300
 	Take A Screenshot
 	Click Button	generatehtml
 	Wait Until Created 	${html_file}	timeout=9 minutes
-	Close GUI
+	Close Reporter GUI
 
 	Log To Console	Verification of saved data in the RFSwarm HTML report started.
 	${html} 	Parse HTML File 	${html_file}
@@ -395,7 +395,7 @@ Verify the Content Of the HTML Report
 	Verify HTML Report Error Details Content 	${section} 	${section_obj} 	${html_expected_img_path} 	${html_img_path}
 
 	[Teardown] 	Run Keywords
-	...    Close GUI	AND
+	...    Close Reporter GUI	AND
 	...    Move File 	${html_file} 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.html
 
 Verify the Content Of the DOCX Report
@@ -413,12 +413,12 @@ Verify the Content Of the DOCX Report
 	VAR 	${move_tolerance} 	150
 
 	Log 	template: ${template_dir} 	console=True
-	Open GUI	-d 	${resultfolder} 	-t 	${template_dir}
+	Open Reporter GUI	-d 	${resultfolder} 	-t 	${template_dir}
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=300
 	Take A Screenshot
 	Click Button	generateword
 	Wait Until Created 	${resultfolder}${/}${resultdata}.docx	timeout=9 minutes
-	Close GUI
+	Close Reporter GUI
 
 	Log To Console	Verification of saved data in the RFSwarm DOCX report started.
 	File Should Exist 	${docx_file}
@@ -558,7 +558,7 @@ Verify the Content Of the DOCX Report
 	Verify DOCX Report Error Details Content 	${docx_data} 	${section} 	${docx_file} 	${docx_expected_img_path} 	${docx_img_path}
 
 	[Teardown] 	Run Keywords
-	...    Close GUI	AND
+	...    Close Reporter GUI	AND
 	...    Move File 	${docx_file} 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.docx
 
 Verify the Content Of the XLSX Report
@@ -576,12 +576,12 @@ Verify the Content Of the XLSX Report
 	VAR 	${move_tolerance} 	150
 
 	Log 	template: ${template_dir} 	console=True
-	Open GUI	-d 	${resultfolder} 	-t 	${template_dir}
+	Open Reporter GUI	-d 	${resultfolder} 	-t 	${template_dir}
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded	timeout=300
 	Take A Screenshot
 	Click Button	generateexcel
 	Wait Until Created 	${xlsx_file}	timeout=9 minutes
-	Close GUI
+	Close Reporter GUI
 
 	Log To Console	Verification of saved data in the RFSwarm XLSX report started.
 	File Should Exist 	${xlsx_file}
@@ -757,7 +757,7 @@ Verify the Content Of the XLSX Report
 	Verify XLSX Report Error Details Content 	${xlsx_file} 	${section} 	${xlsx_sheet} 	${xlsx_expected_img_path} 	${xlsx_img_path}
 
 	[Teardown] 	Run Keywords
-	...    Close GUI	AND
+	...    Close Reporter GUI	AND
 	...    Move File 	${xlsx_file} 	${OUTPUT_DIR}${/}${testdata}${/}${resultdata}.xlsx
 
 Verify Plan Graph - No Total
