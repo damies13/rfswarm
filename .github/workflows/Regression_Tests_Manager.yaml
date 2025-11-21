@@ -126,12 +126,14 @@ jobs:
 
       - name: Try and fix images with relative path
         if: ${{ !cancelled() && matrix.platform != 'macos-latest' }}
+        continue-on-error: true
         run: |
           cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/run
           sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}\/run/img src="./g' ./output.xml
           rebot ./output.xml
       - name: Try and fix images with relative path (macos)
         if: ${{ !cancelled() &&  matrix.platform == 'macos-latest' }}
+        continue-on-error: true
         run: |
           cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/run
           sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}\/run/img src="./g' ./output.xml
@@ -154,12 +156,14 @@ jobs:
 
       - name: Try and fix images with relative path
         if: ${{ steps.robottest.outcome != 'success' && !cancelled() && matrix.platform != 'macos-latest' }}
+        continue-on-error: true
         run: |
           cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/retry
           sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}\/retry/img src="./g' ./output.xml
           rebot ./output.xml
       - name: Try and fix images with relative path (macos)
         if: ${{ steps.robottest.outcome != 'success' && !cancelled() &&  matrix.platform == 'macos-latest' }}
+        continue-on-error: true
         run: |
           cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/retry
           sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}\/retry/img src="./g' ./output.xml
