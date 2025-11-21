@@ -31,7 +31,8 @@ Next Day For Scheduled Start Is In the Next Month
 
 	Wait Until Keyword Succeeds 	5x 	1s 	Resync Date With Time Server 	${test_date}
 
-	Check Logs
+	Check Logs 	Manager
+	Check Logs 	Agent
 
 	[Teardown] 	Stop Manager CLI
 
@@ -321,7 +322,8 @@ Check That the Manager Supports the Missing Scenario File Provided By the -s Arg
 	${stdout_manager}= 		Read Log 	${stdout_manager_path}
 	${stderr_manager}= 		Read Log 	${stderr_manager_path}
 
-	Check Logs
+	Check Logs 	Manager
+	Check Logs 	Agent
 
 	# windows does not work with reading logs.
 	Should Contain 	${stdout_manager} 	Scenario file Not found:
@@ -439,11 +441,12 @@ Check if exception is generated when a file is renamed
 	Log    manageriniile: ${manageriniile}
 
 
-	VAR 	@{mngr_options} 	-n 	-a 	2 	-s 	${scenariofile} 	-i 	${manageriniile}
+	VAR 	@{mngr_options} 	-g 	3 	-n 	-a 	2 	-s 	${scenariofile} 	-i 	${manageriniile}
 	VAR		@{agent_options} 	-g 	3 	--agentdir 	${agent_dir}
 
 	# Configuration File:  /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/rfswarm_manager/RFSwarmManager.ini
 	# Show Log    ${manageriniile}
+	@{sourcefolder}= 	List Directory 	${testfolder}
 
 	Run Manager CLI	@{mngr_options}
 	Run Agent CLI	@{agent_options}
@@ -468,13 +471,15 @@ Check if exception is generated when a file is renamed
 	Stop Agent CLI
 	Stop Manager CLI
 
-	Check Logs
+	Check Logs 	Manager
+	Check Logs 	Agent
 
 	[Teardown]	Run Keywords
 	...    	Move File 	${testfolder}${/}robot_swarm_b.jpg 		${testfolder}${/}robot_swarm_a.jpg 	AND
 	...    Stop Agent CLI 	AND
 	...    Stop Manager CLI 	AND
-	...    Check Logs
+	...    Check Logs 	Manager
+	...    Check Logs 	Agent
 
 Check if exception is generated when a file is removed
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #396
@@ -497,6 +502,7 @@ Check if exception is generated when a file is removed
 
 	# Configuration File:  /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/rfswarm_manager/RFSwarmManager.ini
 	# Show Log    ${manageriniile}
+	@{sourcefolder}= 	List Directory 	${testfolder}
 
 	Run Manager CLI	@{mngr_options}
 	Run Agent CLI	@{agent_options}
@@ -520,9 +526,11 @@ Check if exception is generated when a file is removed
 	Stop Agent CLI
 	Stop Manager CLI
 
-	Check Logs
+	Check Logs 	Manager
+	Check Logs 	Agent
 
 	[Teardown]	Run Keywords
 	...    Stop Agent CLI	AND
 	...    Stop Manager CLI	AND
-	...    Check Logs
+	...    Check Logs 	Manager
+	...    Check Logs 	Agent
