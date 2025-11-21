@@ -1485,7 +1485,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 	Log To Console	Check if Agent cant connect to the old port number, Old port number: ${old_port_number}.
 	@{agent_options}	Set Variable	-m	http://localhost:${old_port_number}/
 	Run Agent CLI	@{agent_options}
-	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
+	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready		30
 	Run Keyword If	${status}	Fail
 	...    msg=The agent has connected to the old port number but should not!
 	Log To Console	The Agent did not connect to the Manager with ${old_port_number} port and this was expected.
@@ -1495,7 +1495,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 	Log To Console	Check if Agent can connect to the new port number. New port number: ${run_settings_data}[bind_port_number].
 	@{agent_options}	Set Variable	-m	http://localhost:${run_settings_data}[bind_port_number]/
 	Run Agent CLI	@{agent_options}
-	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
+	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready		30
 	Run Keyword If	not ${status}	Fail
 	...    msg=The agent did not connect to the new port number!
 	Log To Console	The Agent has connected to the Manager with ${run_settings_data}[bind_port_number] port and this was expected.
@@ -1538,7 +1538,7 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	Log To Console	Check if Agent cant connect to the Manager via ${altip} instead of ${ipv4}[0].
 	@{agent_options}	Set Variable	-m	http://${altip}:8138/
 	Run Agent CLI	@{agent_options}
-	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
+	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready		30
 	Run Keyword If	${status}	Fail
 	...    msg=The agent has connected to the Manager via ${altip} but should not!
 	Log To Console	The Agent did not connect to the Manager via ${altip} and this was expected.
@@ -1548,7 +1548,7 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	Log To Console	Check if Agent can connect to the Manager via ${ipv4}[0].
 	@{agent_options}	Set Variable	-m	http://${ipv4}[0]:8138/
 	Run Agent CLI	@{agent_options}
-	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
+	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready		30
 	Run Keyword If	not ${status}	Fail
 	...    msg=The agent did not connect to the Manager via ${ipv4}[0]!
 	Log To Console	The Agent has connected to the Manager via ${ipv4}[0] and this was expected.
