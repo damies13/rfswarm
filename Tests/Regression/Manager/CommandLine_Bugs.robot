@@ -107,7 +107,7 @@ Circular Reference Resource Files
 	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources 	*.resource
 
 	@{agnt_options}= 	Create List 	-i 	${testdata}${/}agent.ini
-	Run Agent 	@{agnt_options}
+	Run Agent CLI 	@{agnt_options}
 	Sleep    1s
 	Check Agent Is Running
 	Log to console 	${CURDIR}
@@ -171,7 +171,7 @@ Circular Reference Resource Files 2
 	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources
 
 	@{agnt_options}= 	Create List 	-i 	${testdata}${/}agent.ini
-	Run Agent 	@{agnt_options}
+	Run Agent CLI 	@{agnt_options}
 	Sleep    1s
 	Check Agent Is Running
 	Log to console 	${CURDIR}
@@ -236,7 +236,7 @@ Lots Of Resource Files
 	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources 	*.resource
 
 	@{agnt_options}= 	Create List 	-i 	${testdata}${/}agent.ini
-	Run Agent 	@{agnt_options}
+	Run Agent CLI 	@{agnt_options}
 	Sleep    1s
 	Check Agent Is Running
 	Log 	${CURDIR} 	console=true
@@ -328,7 +328,6 @@ Check That the Manager Supports the Missing Scenario File Provided By the -s Arg
 
 	[Teardown]	Stop Manager CLI
 
-
 Verify If Manager Runs With Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 	[Setup] 	Set Global Filename And Default Save Path 	${robot_data}[0]
@@ -340,7 +339,8 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 		File Should Not Exist 	${global_path}${/}RFSwarmManager.ini
 	END
 
-	Run Manager CLI 	-n
+	@{mngr_options}= 	Create List 	-n
+	Run Manager CLI 	@{mngr_options}
 	${running}= 	Is Process Running		${PROCESS_MANAGER}
 	IF 	not ${running}
 		Fail	msg=Manager is not running!
@@ -360,7 +360,7 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 	File Should Not Be Empty	${global_path}${/}RFSwarmManager.ini
 
 	Log To Console	Running Manager with existing ini file.
-	Run Manager CLI 	-n
+	Run Manager CLI 	@{mngr_options}
 	${running}= 	Is Process Running		${PROCESS_MANAGER}
 	IF 	not ${running}
 		Fail	msg=Manager is not running!
@@ -380,9 +380,10 @@ Verify If Manager Runs With No Existing INI File From Current Version NO GUI
 	File Should Not Exist	${global_path}${/}RFSwarmManager.ini
 	Log To Console	Running Manager with no existing ini file.
 
-	Run Manager CLI 	-n
+	@{mngr_options}= 	Create List 	-n
+	Run Manager CLI 	@{mngr_options}
 	${running}= 	Is Process Running		${PROCESS_MANAGER}
-	Run Manager CLI	@{mngr_options}
+	Run Manager CLI 	@{mngr_options}
 	${running}= 	Is Process Running		${process_manager}
 	IF 	not ${running}
 		Fail	msg=Manager is not running!
@@ -445,7 +446,7 @@ Check if exception is generated when a file is renamed
 	# Show Log    ${manageriniile}
 
 	Run Manager CLI	@{mngr_options}
-	Run Agent	@{agent_options}
+	Run Agent CLI	@{agent_options}
 
 	# give agent time to create scripts dir
 	Sleep    1s
@@ -498,7 +499,7 @@ Check if exception is generated when a file is removed
 	# Show Log    ${manageriniile}
 
 	Run Manager CLI	@{mngr_options}
-	Run Agent	@{agent_options}
+	Run Agent CLI	@{agent_options}
 
 	# give agent time to create scripts dir
 	Sleep    1s
