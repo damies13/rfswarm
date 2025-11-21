@@ -154,13 +154,13 @@ jobs:
         if: ${{ !cancelled() && matrix.platform != 'macos-latest' }}
         run: |
           cd Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/run
-          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}/run/img src="./g' ./output.xml
+          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}\/run/img src="./g' ./output.xml
           rebot ./output.xml
       - name: Try and fix images with relative path (macos)
         if: ${{ !cancelled() &&  matrix.platform == 'macos-latest' }}
         run: |
           cd Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/run
-          sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}/run/img src="./g' ./output.xml
+          sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}\/run/img src="./g' ./output.xml
           rebot ./output.xml
 
       - name: Robot Framework - Retry Failed
@@ -179,13 +179,13 @@ jobs:
         if: ${{ steps.robottest.outcome != 'success' && !cancelled() && matrix.platform != 'macos-latest' }}
         run: |
           cd Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/retry
-          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}/retry/img src="./g' ./output.xml
+          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}\/retry/img src="./g' ./output.xml
           rebot ./output.xml
       - name: Try and fix images with relative path (macos)
         if: ${{ steps.robottest.outcome != 'success' && !cancelled() &&  matrix.platform == 'macos-latest' }}
         run: |
           cd Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/retry
-          sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}/retry/img src="./g' ./output.xml
+          sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}\/retry/img src="./g' ./output.xml
           rebot ./output.xml
 
       - name: if retry still failed
