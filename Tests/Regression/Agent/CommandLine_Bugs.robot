@@ -61,7 +61,7 @@ Run agent with -x (xml mode)
 	Show Log 	${stdout_agent_path}
 	Show Log 	${stderr_agent_path}
 
-	${dbfile}= 	Find Result DB 	directory=${CURDIR}${/}testdata${/}Issue-#171 	result_pattern=*_Issue171*
+	${dbfile}= 	Find Result DB 	directory=${results_dir} 	result_pattern=*_Issue171*
 	# Query Result DB 	${dbfile} 	Select * from Results
 	# ${result}= 	Query Result DB 	${dbfile} 	Select * from ResultSummary;
 	${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;

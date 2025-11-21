@@ -17,55 +17,9 @@ Open GUI
 	Open Manager GUI
 	Sleep 	5
 
-	Sleep 	10s
-	Handle MacOS Pop-ups
-	Handle Donation Reminder
-	Handle MacOS Pop-ups
-
 	${img}=	Set Variable		manager_${platform}_tab_agents.png
 	Wait For 	${img} 	 timeout=${default_image_timeout}
 	Take A Screenshot
-
-Open GUI
-	[Tags]	windows-latest
-	# Press Escape and move mouse because on linux the screen save had kicked in
-	Press Combination 	Key.esc
-	Wiggle Mouse
-
-	Set Suite Variable    ${platform}    windows
-	Set Confidence		0.9
-	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	${cmd_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}Open_GUI_stdout.txt 	stderr=${OUTPUT DIR}${/}Open_GUI_stderr.txt
-	Set Test Variable 	$process 	${process}
-	# Sleep 	10 			# not needed now we wait for the agents tab to be visible
-	Set Screenshot Folder 	${OUTPUT DIR}
-
-	Handle Donation Reminder
-
-	${img}=	Set Variable		manager_${platform}_tab_agents.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-	Take A Screenshot
-
-Open GUI
-	[Tags]	ubuntu-latest
-	# Press Escape and move mouse because on linux the screen save had kicked in
-	Press Combination 	Key.esc
-	Wiggle Mouse
-
-	Set Suite Variable    ${platform}    ubuntu
-	Set Confidence		0.9
-	# ${process}= 	Start Process 	python3 	${pyfile}    alias=Manager 	stdout=${OUTPUT DIR}${/}stdout.txt 	stderr=${OUTPUT DIR}${/}stderr.txt
-	${process}= 	Start Process 	${cmd_manager}    alias=Manager 	stdout=${OUTPUT DIR}${/}Open_GUI_stdout.txt 	stderr=${OUTPUT DIR}${/}Open_GUI_stderr.txt
-	Set Test Variable 	$process 	${process}
-	# Sleep 	10 			# not needed now we wait for the agents tab to be visible
-	Set Screenshot Folder 	${OUTPUT DIR}
-
-	Handle Donation Reminder
-
-	${img}=	Set Variable		manager_${platform}_tab_agents.png
-	Wait For 	${img} 	 timeout=${default_image_timeout}
-	Take A Screenshot
-	Sleep 	5
 
 Select Monitoring Tab
 	[Tags]	ubuntu-latest		windows-latest		macos-latest	Issue #173

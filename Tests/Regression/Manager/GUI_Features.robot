@@ -347,8 +347,6 @@ Verify That Files Get Saved With Correct Extension And Names
 	...    Set Manager INI Window Size		1000	600						AND
 	...    Show Manager INI Data											AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
-	...    Set INI Window Size		1000	600								AND
-	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Open Manager GUI													AND
 	...    Run Agent CLI
 
@@ -1258,7 +1256,7 @@ Check If Inject Sleep Option Was Executed in the Test
 	...    Create Directory	${RESULTS_DIR}									AND
 	...    Sleep	3														AND
 	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-1	AND
-	...    Open Agent	@{agent_options}														AND
+	...    Run Agent CLI	@{agent_options}														AND
 	...    Open Manager GUI 	-d  ${results_dir}												AND
 	...    Create Robot File	file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t9s\n\tSleep\t9\n
 
@@ -1486,7 +1484,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 
 	Log To Console	Check if Agent cant connect to the old port number, Old port number: ${old_port_number}.
 	@{agent_options}	Set Variable	-m	http://localhost:${old_port_number}/
-	Open Agent	@{agent_options}
+	Run Agent CLI	@{agent_options}
 	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
 	Run Keyword If	${status}	Fail
 	...    msg=The agent has connected to the old port number but should not!
@@ -1496,7 +1494,7 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 
 	Log To Console	Check if Agent can connect to the new port number. New port number: ${run_settings_data}[bind_port_number].
 	@{agent_options}	Set Variable	-m	http://localhost:${run_settings_data}[bind_port_number]/
-	Open Agent	@{agent_options}
+	Run Agent CLI	@{agent_options}
 	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
 	Run Keyword If	not ${status}	Fail
 	...    msg=The agent did not connect to the new port number!
@@ -1539,7 +1537,7 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	${altip}= 	Set Variable    127.0.0.1
 	Log To Console	Check if Agent cant connect to the Manager via ${altip} instead of ${ipv4}[0].
 	@{agent_options}	Set Variable	-m	http://${altip}:8138/
-	Open Agent	@{agent_options}
+	Run Agent CLI	@{agent_options}
 	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
 	Run Keyword If	${status}	Fail
 	...    msg=The agent has connected to the Manager via ${altip} but should not!
@@ -1549,7 +1547,7 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 
 	Log To Console	Check if Agent can connect to the Manager via ${ipv4}[0].
 	@{agent_options}	Set Variable	-m	http://${ipv4}[0]:8138/
-	Open Agent	@{agent_options}
+	Run Agent CLI	@{agent_options}
 	${status}=	Run Keyword And Return Status	Check If The Agent Is Ready		30
 	Run Keyword If	not ${status}	Fail
 	...    msg=The agent did not connect to the Manager via ${ipv4}[0]!
@@ -1677,7 +1675,7 @@ Verify Disable log.html - Test Row
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set INI Window Size		1000	600
+	...    Set Manager INI Window Size		1000	600
 
 	${testkey}= 	Set Variable 		disableloglog
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
@@ -1722,7 +1720,7 @@ Verify Disable report.html - Test Row
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set INI Window Size		1000	600
+	...    Set Manager INI Window Size		1000	600
 
 	${testkey}= 	Set Variable 		disablelogreport
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
@@ -1767,7 +1765,7 @@ Verify Disable output.xml - Test Row
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set INI Window Size		1000	600
+	...    Set Manager INI Window Size		1000	600
 
 	${testkey}= 	Set Variable 		disablelogoutput
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
@@ -1815,7 +1813,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		800		600						AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
-	...    Open Agent	@{agent_options}													AND
+	...    Run Agent CLI	@{agent_options}													AND
 	...    Open Manager GUI													AND
 	...    Set Global Filename And Default Save Path	main
 	${M_absolute_paths} 	${M_file_names} 	Find Absolute Paths And Names For Files In Directory
@@ -1864,7 +1862,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	...    Set Manager INI Window Size		800		600						AND
 	...    Show Manager INI Data											AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
-	...    Open Agent	@{agent_options}													AND
+	...    Run Agent CLI	@{agent_options}													AND
 	...    Open Manager GUI													AND
 	...    Set Global Filename And Default Save Path	main
 
@@ -1916,7 +1914,7 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		800		600						AND
 	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
-	...    Open Agent	@{agent_options}													AND
+	...    Run Agent CLI	@{agent_options}													AND
 	...    Open Manager GUI													AND
 	...    Set Global Filename And Default Save Path	main
 
@@ -2452,7 +2450,7 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		1000	600						AND
 	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-2	AND
-	...    Open Agent	@{agent_options}														AND
+	...    Run Agent CLI	@{agent_options}														AND
 	...    Open Manager GUI													AND
 	...    Create Robot File
 	...    file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n
@@ -2481,7 +2479,7 @@ Check If Test Scenario Run Will Stop Gradually
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		1000	600						AND
 	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-3	AND
-	...    Open Agent	@{agent_options}														AND
+	...    Run Agent CLI	@{agent_options}														AND
 	...    Open Manager GUI													AND
 	...    Create Robot File	file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t60\n
 
@@ -2510,7 +2508,7 @@ Check If Test Scenario Run Will Stop Gradually - TestRepeater
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		1000	600						AND
 	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-3	AND
-	...    Open Agent	@{agent_options}														AND
+	...    Run Agent CLI	@{agent_options}														AND
 	...    Open Manager GUI													AND
 	...    Create Robot File	file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t60\n
 
@@ -3065,7 +3063,7 @@ Verify Result Name - Test Row
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set INI Window Size		1000	600
+	...    Set Manager INI Window Size		1000	600
 
 	${testkey}= 	Set Variable 		resultnamemode
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default.rfs
@@ -3741,7 +3739,8 @@ Check If Monitoring settings are loaded and used
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		1000	600						AND
-	...    Run Agent CLI	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-3		AND
+	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-3	AND
+	...    Run Agent CLI	@{agent_options}													AND
 	...    Open Manager GUI
 
 	Utilisation Stats
@@ -3821,96 +3820,6 @@ Check If Monitoring settings are loaded and used
 	...    Set Confidence	0.9								AND
 	...    Stop Agent CLI							AND
 	...    Close Manager GUI	AND
-	...    Remove File		${global_path}${/}example.robot
-
-Check If Monitoring settings are loaded and used
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #173
-	[Setup]	Run Keywords
-	...    Set Global Filename And Default Save Path	example.robot		AND
-	...    Create Manager INI File If It Does Not Exist						AND
-	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
-	...    Set INI Window Size		1000	600						AND
-	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-3	AND
-	...    Open Agent	@{agent_options}														AND
-	...    Open Manager GUI
-
-	Utilisation Stats
-
-	VAR 	${monitortimebefore}= 		${30}
-	VAR 	${monitortimeafter}= 		${90}
-	VAR 	${robot_test_time}= 		${60}
-	# VAR 	${scenario_name}= 			NewStyle
-
-	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#173${/}NewStyle.rfs
-	Copy File	${scenariofile}		${global_path}
-
-	Click Button						runopen
-	Wait For Dialog Button				cancel
-	File Open Dialogue Select File 		${scenariofile}
-
-	# Sleep 	10
-	# Take A Screenshot
-	Click Tab	Monitoring
-	# Take A Screenshot
-
-	Log 	Verify Monitoring screen loaded as expected		console=True
-	Take A Screenshot
-	Wait For 	manager_${PLATFORM}_issue_173_monitoring_settings.png 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
-
-	Click Tab	Plan
-	# Take A Screenshot
-
-	Log 	Verify Plan screen loaded as expected		console=True
-	Take A Screenshot
-	Wait For 	manager_${PLATFORM}_issue_173_plan_settings.png 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
-
-	# Take A Screenshot
-	Check If The Agent Is Ready
-	Click Tab	Plan
-	Sleep 	0.5
-	Click Button	runplay
-	# Stop Test Scenario Run Gradually	${15}	${60}
-	${START_TIME}= 	Get Current Date
-	# Sleep 	26		# this was needed to get the _monitor_5 screenshot
-	# Take A Screenshot
-
-	Log 	Wait for monitoring robots to start		console=True
-	Wait For   manager_${platform}_monitor_5.png    timeout=${monitortimebefore}
-	${MON_START_TIME}= 	Get Current Date
-	# Take A Screenshot
-
-	${ELAPSED_TIME}= 	Subtract Date From Date 	${MON_START_TIME} 	${START_TIME}
-	${sleeptime}= 		Evaluate    ${monitortimebefore} - ${ELAPSED_TIME} - 2
-	Sleep    ${sleeptime}
-
-	Log 	Verify robots don't start in pre-run monitoring time		console=True
-	Wait For   manager_${platform}_robots_0.png    timeout=1
-	# Take A Screenshot
-
-	Sleep 	35s
-	Handle RFSwarm GUI Pop-ups 	# macos may display a pop-up: not enough Agents available to run Robots.
-	Wait For   manager_${PLATFORM}_robots_10.png    timeout=${DEFAULT_IMAGE_TIMEOUT}
-	# Take A Screenshot
-
-	Wait For   manager_${platform}_robots_0.png    timeout=${robot_test_time + ${default_image_timeout}}
-	${END_TIME}= 	Get Current Date
-
-	# Take A Screenshot
-	Set Confidence 		0.95
-	Log 	Wait for monitoring robots to end		console=True
-	Wait For   manager_${platform}_monitor_0.png    timeout=${monitortimeafter + ${default_image_timeout}}
-	${MON_END_TIME}= 	Get Current Date
-	Take A Screenshot
-
-	Log 	Verify Post run time		console=True
-	${ELAPSED_TIME}= 	Subtract Date From Date 	${MON_END_TIME} 	${END_TIME}
-	Should Be True   ${ELAPSED_TIME} >= ${monitortimeafter} 		Monitoring time after test should be ~${monitortimeafter} seconds, actual was ${ELAPSED_TIME} seconds.
-
-	[Teardown]	Run Keywords
-	...    Delete Scenario File		${scenario_name}		AND
-	...    Set Confidence	0.9								AND
-	...    Stop Agent							AND
-	...    Run Keyword		Close Manager GUI ${platform}	AND
 	...    Remove File		${global_path}${/}example.robot
 
 Check Application Icon or Desktop Shortcut in GUI
