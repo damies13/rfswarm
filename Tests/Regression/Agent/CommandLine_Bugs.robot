@@ -24,10 +24,13 @@ Exclude Libraries With Spaces
 	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 	Stop Agent CLI
-	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	Show Log 	${stdout_manager_path}
+	Show Log 	${stderr_manager_path}
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	Show Log 	${stdout_agent_path}
+	Show Log 	${stderr_agent_path}
 
 	${dbfile}= 	Find Result DB
 	# Query Result DB 	${dbfile} 	Select * from Results
@@ -51,10 +54,12 @@ Run agent with -x (xml mode)
 	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 	Stop Agent CLI
-	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	Show Log 	${stdout_manager_path}
+	Show Log 	${stderr_manager_path}
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	Show Log 	${stdout_agent_path}
+	Show Log 	${stderr_agent_path}
 
 	${dbfile}= 	Find Result DB 	directory=${CURDIR}${/}testdata${/}Issue-#171 	result_pattern=*_Issue171*
 	# Query Result DB 	${dbfile} 	Select * from Results
@@ -159,6 +164,7 @@ Verify If Agent Name Has Been Transferred To the Manager (-a command line switch
 	VAR 	${dbfile} 			${test_dir}${/}PreRun${/}PreRun.db
 	VAR 	@{mngr_options} 	-n 	-d 	${test_dir}
 	VAR 	${agent_name} 		Issue-#100AGENTNAME
+	VAR 	@{agnt_options} 	-a 	${agent_name}
 
 	Create Directory 	${test_dir}
 	Log To Console	Run Agent with custom agent name.
@@ -304,7 +310,7 @@ Run Test Cases With Embedded Variables
 	Run Manager CLI  -n  -s  ${test_folder}${/}${scenario_name}.rfs  -d  ${test_folder}${/}results
 
 	Wait Until the Agent Connects to the Manager
-	Wait For Manager Process Process 	timeout=10min
+	Wait For Manager Process 	timeout=10min
 	Stop Agent CLI
 
 	Check Logs 	Manager

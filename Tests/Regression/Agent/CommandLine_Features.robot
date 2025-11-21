@@ -14,10 +14,12 @@ Install Application Icon or Desktop Shortcut
 	@{agent_options}= 	Create List 	-g 	6 	-c 	ICON
 	Run Agent CLI 	@{agent_options}
 	Sleep    2
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	Show Log 	${stdout_agent_path}
+	Show Log 	${stderr_agent_path}
 
 	Check Icon Install
+
 Agent Version
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
 	# ${result}= 	Run 	python3 ${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py -v
@@ -37,10 +39,11 @@ Agent Command Line INI -i
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 
 	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmAgent.ini
+	VAR 	@{agnt_options} 	-i	${inifile}
 
 	Run Agent CLI 	@{agnt_options}
 	Log To Console	Run Agent CLI with alternate ini file with variable.
-	Stop Agent
+	Stop Agent CLI
 	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
 	${result_stdout}=	Get File	${stdout_agent_path}
 	Should Contain	${result_stdout}	${inifile}
@@ -51,10 +54,11 @@ Agent Command Line INI --ini
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
 
 	${inifile}=		Normalize Path	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmAgent.ini
+	VAR 	@{agnt_options} 	--ini	${inifile}
 
 	Run Agent CLI 	@{agnt_options}
 	Log To Console	Run Agent CLI with alternate ini file with variable.
-	Stop Agent
+	Stop Agent CLI
 	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
 	${result_stdout}=	Get File	${stdout_agent_path}
 	Should Contain	${result_stdout}	${inifile}
@@ -72,7 +76,7 @@ Agent Command Line MANAGER -m
 	Run Manager CLI 	@{mngr_options}
 	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process	60s
-	Stop Agent
+	Stop Agent CLI
 	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
 	${result_stdout}=	Get File	${stdout_agent_path}
 	Should Contain	${result_stdout}	Manager Connected
@@ -90,7 +94,7 @@ Agent Command Line MANAGER --manager
 	Run Manager CLI 	@{mngr_options}
 	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process	60s
-	Stop Agent
+	Stop Agent CLI
 	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
 	${result_stdout}=	Get File	${stdout_agent_path}
 	Should Contain	${result_stdout}	Manager Connected
@@ -149,12 +153,14 @@ Agent Command Line ROBOT -r
 	Sleep 	5s
 	Run Manager CLI 	@{mngr_options}
 	Wait Until the Agent Connects to the Manager
-	Wait For Manager	8min
-	Stop Agent
-	Show Log 	${OUTPUT DIR}${/}stdout_agent.txt
-	Show Log 	${OUTPUT DIR}${/}stdout_manager.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_agent.txt
-	Show Log 	${OUTPUT DIR}${/}stderr_manager.txt
+	Wait For Manager Process	8min
+	Stop Agent CLI
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	Show Log 	${stdout_manager_path}
+	Show Log 	${stderr_manager_path}
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	Show Log 	${stdout_agent_path}
+	Show Log 	${stderr_agent_path}
 
 	@{test_result}= 	List Directories In Directory	${RESULTS_DIR}	absolute=${True}	pattern=*_Issue-#14
 	Log To Console		Result dir: ${test_result}

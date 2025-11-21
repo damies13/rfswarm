@@ -1,6 +1,6 @@
 *** Settings ***
-Documentation 	
-...    This resource file contains the basic keywords for all components that are run in the command line. 
+Documentation
+...    This resource file contains the basic keywords for all components that are run in the command line.
 ...    Run "Basic Suite Initialization ${component}" keyword to set the basic suite configuration.
 
 Library 	OperatingSystem
@@ -8,6 +8,7 @@ Library 	Process
 Library 	String
 Library 	Collections
 Library 	DateTime
+Library 	XML
 
 Library 	ini_file.py
 Library 	get_ip_address.py
@@ -273,4 +274,3 @@ Set Date Manually
 		Log 	New date: ${result.stdout} 	console=${True}
 		Log 	${result.stderr}
 	END
-
