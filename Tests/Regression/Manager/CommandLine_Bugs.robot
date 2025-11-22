@@ -32,7 +32,6 @@ Next Day For Scheduled Start Is In the Next Month
 	Wait Until Keyword Succeeds 	5x 	1s 	Resync Date With Time Server 	${test_date}
 
 	Check Logs 	Manager
-	Check Logs 	Agent
 
 	[Teardown] 	Stop Manager CLI
 
@@ -323,7 +322,6 @@ Check That the Manager Supports the Missing Scenario File Provided By the -s Arg
 	${stderr_manager}= 		Read Log 	${stderr_manager_path}
 
 	Check Logs 	Manager
-	Check Logs 	Agent
 
 	# windows does not work with reading logs.
 	Should Contain 	${stdout_manager} 	Scenario file Not found:
@@ -478,7 +476,7 @@ Check if exception is generated when a file is renamed
 	...    	Move File 	${testfolder}${/}robot_swarm_b.jpg 		${testfolder}${/}robot_swarm_a.jpg 	AND
 	...    Stop Agent CLI 	AND
 	...    Stop Manager CLI 	AND
-	...    Check Logs 	Manager
+	...    Check Logs 	Manager 	AND
 	...    Check Logs 	Agent
 
 Check if exception is generated when a file is removed
@@ -532,5 +530,5 @@ Check if exception is generated when a file is removed
 	[Teardown]	Run Keywords
 	...    Stop Agent CLI	AND
 	...    Stop Manager CLI	AND
-	...    Check Logs 	Manager
+	...    Check Logs 	Manager 	AND
 	...    Check Logs 	Agent
