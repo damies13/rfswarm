@@ -372,6 +372,8 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 		Fail	msg=Manager did not close!
 	END
 
+	[Teardown] 	Stop Manager CLI
+
 Verify If Manager Runs With No Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 	[Setup] 	Set Global Filename And Default Save Path 	${robot_data}[0]
@@ -395,6 +397,8 @@ Verify If Manager Runs With No Existing INI File From Current Version NO GUI
 	END
 	Show Log 	${result.stdout_path}
 	Show Log 	${result.stderr_path}
+
+	[Teardown] 	Stop Manager CLI
 
 Verify If Manager Runs With Existing INI File From Previous Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
@@ -422,6 +426,8 @@ Verify If Manager Runs With Existing INI File From Previous Version NO GUI
 	Log 	${result.stderr}
 	Show Log 	${result.stdout_path}
 	Show Log 	${result.stderr_path}
+
+	[Teardown] 	Stop Manager CLI
 
 Check if exception is generated when a file is renamed
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #396
