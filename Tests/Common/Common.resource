@@ -8,7 +8,6 @@ Library 	Process
 Library 	String
 Library 	Collections
 Library 	DateTime
-Library 	XML 	use_lxml=${True}
 
 Library 	ini_file.py
 Library 	get_ip_address.py
