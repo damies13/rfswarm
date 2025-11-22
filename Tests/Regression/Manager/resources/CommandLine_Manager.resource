@@ -7,7 +7,6 @@ Resource 	../../../Common/Logs.resource
 Resource 	../../../Common/INI_PIP_Data.resource
 Resource 	../../../Common/RFS_Components.resource
 
-Library 	XML
 
 *** Variables ***
 # datapath: /home/runner/work/rfswarm/rfswarm/rfswarm_manager/results/PreRun
