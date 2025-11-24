@@ -169,7 +169,12 @@ class AgentServer(BaseHTTPRequestHandler):
 											logdir = os.path.join(base.datapath, "logs" + str(int(time.time())))
 
 										base.debugmsg(7, "logdir:", logdir)
-										localpath = os.path.join(logdir, jsonreq['File'])
+										relpath = jsonreq['File']
+										if '\\' in relpath:
+											relpatharr = relpath.split('\\')
+										else:
+											relpatharr = relpath.split('/')
+										localpath = os.path.join(logdir, *relpatharr)
 										base.debugmsg(7, "localpath:", localpath)
 										jsonreq['LocalFile'] = localpath
 										base.uploadfiles[jsonreq["Hash"]] = jsonreq
@@ -1139,6 +1144,7 @@ class RFSwarmCore:
 			return False
 		except Exception as e:
 			base.debugmsg(5, "e:", e)
+			base.debugmsg(0, e, "Shutting down...")
 			self.on_closing()
 			return False
 

@@ -206,7 +206,6 @@ New Data Table Section
 
 	# Close Reporter GUI
 
-
 Template with Start and End Dates
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #250
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
@@ -294,9 +293,9 @@ Template with Start and End Dates
 	# ${html}= 	Evaluate 			lxml.etree.fromstring('${rawhtml}', lxml.etree.HTMLParser()) 	modules=lxml.etree
 	# ${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[text()='2 Test Result Summary']/..
 	# ${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[text()='4 Test Result Summary']/..
-	${sectionid}= 		Get Element Attribute 	${html} 	id 	//h1[contains(text(), 'Test Result Summary')]/..
+	${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[contains(text(), 'Test Result Summary')]/..
 	# FB9D1A0486F		//div[@id='FB9D1A0486F']//table
-	${table}= 		Get Element 	${html} 	//div[@id='${sectionid}']//table
+	${table}= 		Get Element 	${html} 	.//div[@id='${sectionid}']//table
 	${expected}= 	Get Elements Texts 	${table} 	tr/td[1]
 
 	Log To Console	Open Reporter with resultfolder1 and check template works
@@ -316,7 +315,7 @@ Template with Start and End Dates
 	# ${rawhtml}= 	Get File 	${resultfolder1}${/}${resultdata1}.html
 	# ${html}= 	Evaluate 			lxml.etree.fromstring('${rawhtml}', lxml.etree.HTMLParser()) 	modules=lxml.etree
 	# ${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[text()='2 Test Result Summary']/..
-	${sectionid}= 		Get Element Attribute 	${html} 	id 	//h1[contains(text(), 'Test Result Summary')]/..
+	${sectionid}= 		Get Element Attribute 	${html} 	id 	.//h1[contains(text(), 'Test Result Summary')]/..
 	${table}= 		Get Element 	${html} 	.//div[@id='${sectionid}']//table
 	FOR 	${index}    ${item}    IN ENUMERATE    @{expected}
 		${row}= 	Evaluate    ${index} + 2

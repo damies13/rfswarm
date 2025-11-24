@@ -794,7 +794,8 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Set Manager INI Window Size		1000	600						AND
-	...    Open Manager GUI 	-g	1										AND
+	...    Set Test Variable	@{mngr_options}	-g	1						AND
+	...    Open Manager GUI		@{mngr_options}								AND
 	...    Create Robot File
 
 	@{settings_locations}	Create List
@@ -869,7 +870,7 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 	${scenario_content}=	Get scenario file content	${global_path}	${scenario_name}
 
 	Close Manager GUI
-	Open Manager GUI	-g  1
+	Open Manager GUI	@{mngr_options}
 	Check That The Scenario File Opens Correctly	${scenario_name}	${scenario_content}
 
 	[Teardown]	Run Keywords
@@ -1026,6 +1027,7 @@ Verify the Manager Handles Scenario Files With Missing Scripts Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #241
 	[Setup]	Run Keywords
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
+	...    Set Test Variable	@{mngr_options}	-g	1						AND
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		1000	600						AND
@@ -1157,11 +1159,12 @@ Check If the Manager Reopens Inject Sleep From Scenario Wide Settings Correctly
 Check If the Manager (after was closed) Opens Inject Sleep From Scenario Wide Settings Correctly
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #174
 	[Setup]	Run Keywords
+	...    Set Test Variable	@{mngr_options}	-g	1													AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		1000	600						AND
-	...    Open Manager GUI		-g 	1										AND
+	...    Open Manager GUI		@{mngr_options}																AND
 	...    Create Robot File
 
 	@{inject_sleep_values}	Create List		11	22
@@ -1181,7 +1184,7 @@ Check If the Manager (after was closed) Opens Inject Sleep From Scenario Wide Se
 	Verify Scenario Wide Settings Data	${scenario_content_list}	${run_settings_data}
 
 	Close Manager GUI
-	Open Manager GUI 	-g  1
+	Open Manager GUI	@{mngr_options}
 	Check That The Scenario File Opens Correctly	${scenario_name}	${scenario_content}
 
 	[Teardown]	Run Keywords
@@ -1252,8 +1255,9 @@ Check If Inject Sleep Option Was Executed in the Test
 	...    Remove Directory	${RESULTS_DIR}	recursive=${True}				AND
 	...    Create Directory	${RESULTS_DIR}									AND
 	...    Sleep	3														AND
-	...    Run Agent CLI 	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-1		AND
-	...    Open Manager GUI													AND
+	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-1	AND
+	...    Run Agent CLI	@{agent_options}														AND
+	...    Open Manager GUI 	-d  ${results_dir}												AND
 	...    Create Robot File	file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t9s\n\tSleep\t9\n
 
 	@{inject_sleep_values}	Create List		10	15
@@ -1419,7 +1423,8 @@ Verify If the Port Number And Ip Address Get Written To the INI File
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		1000	600						AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
-	...    Open Manager GUI 	-g  1
+	...    Set Test Variable	@{mngr_options}	-g	0						AND
+	...    Open Manager GUI		@{mngr_options}
 
 	${ipv4}		${ipv6}		Get IP addresses
 	Log To Console		${\n}IPV4 address: ${ipv4} ${\n}IPV6 address: ${ipv6}${\n}
@@ -1462,7 +1467,8 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		1000	600						AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
-	...    Open Manager GUI 	-g  1
+	...    Set Test Variable	@{mngr_options}	-g	0						AND
+	...    Open Manager GUI		@{mngr_options}
 
 	${old_port_number}=		Set Variable	8138
 	&{run_settings_data}	Create Dictionary	bind_port_number=8148
@@ -1477,8 +1483,9 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 	Open Manager GUI
 
 	Log To Console	Check if Agent cant connect to the old port number, Old port number: ${old_port_number}.
-	Run Agent CLI 	-m  http://localhost:${old_port_number}/
-	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready		60
+	@{agent_options}	Set Variable	-m	http://localhost:${old_port_number}/
+	Run Agent CLI	@{agent_options}
+	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready		30
 	Run Keyword If	${status}	Fail
 	...    msg=The agent has connected to the old port number but should not!
 	Log To Console	The Agent did not connect to the Manager with ${old_port_number} port and this was expected.
@@ -1486,8 +1493,9 @@ Verify If Agent Can't Connect On Old Port Number After Port Number Changed And C
 	Stop Agent CLI
 
 	Log To Console	Check if Agent can connect to the new port number. New port number: ${run_settings_data}[bind_port_number].
-	Run Agent CLI 	-m  http://localhost:${run_settings_data}[bind_port_number]/
-	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready		60
+	@{agent_options}	Set Variable	-m	http://localhost:${run_settings_data}[bind_port_number]/
+	Run Agent CLI	@{agent_options}
+	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready		30
 	Run Keyword If	not ${status}	Fail
 	...    msg=The agent did not connect to the new port number!
 	Log To Console	The Agent has connected to the Manager with ${run_settings_data}[bind_port_number] port and this was expected.
@@ -1505,7 +1513,8 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		1000	600						AND
 	...    Set Global Filename And Default Save Path	${robot_data}[0]	AND
-	...    Open Manager GUI 	-g  1
+	...    Set Test Variable	@{mngr_options}	-g	0						AND
+	...    Open Manager GUI		@{mngr_options}
 
 	${ipv4}		${ipv6}		Get IP addresses
 	Log To Console		${\n}IPV4 address: ${ipv4} ${\n}IPV6 address: ${ipv6}${\n}
@@ -1527,7 +1536,8 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	# ${altip}= 	Set Variable    ${ipv4} [1]
 	${altip}= 	Set Variable    127.0.0.1
 	Log To Console	Check if Agent cant connect to the Manager via ${altip} instead of ${ipv4}[0].
-	Run Agent CLI 	-m  http://${altip}:8138/
+	@{agent_options}	Set Variable	-m	http://${altip}:8138/
+	Run Agent CLI	@{agent_options}
 	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready		30
 	Run Keyword If	${status}	Fail
 	...    msg=The agent has connected to the Manager via ${altip} but should not!
@@ -1536,7 +1546,8 @@ Verify If Agent Can Only Connect Via the Specified Ip Address And Not Any Ip Add
 	Stop Agent CLI
 
 	Log To Console	Check if Agent can connect to the Manager via ${ipv4}[0].
-	Run Agent CLI 	-m  http://${ipv4}[0]:8138/
+	@{agent_options}	Set Variable	-m	http://${ipv4}[0]:8138/
+	Run Agent CLI	@{agent_options}
 	${status}=	Run Keyword And Return Status	Wait For the Agent To Be Ready		30
 	Run Keyword If	not ${status}	Fail
 	...    msg=The agent did not connect to the Manager via ${ipv4}[0]!
@@ -1559,7 +1570,8 @@ Verify Disable log.html - Scenario
 	Log 	scenariofilebefore: ${scenariofilebefore} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
 
-	Open Manager GUI 		-s 	${scenariofile}
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	runsettings
 	Click CheckBox 	unchecked 	loghtml
 	Click Dialog Button 	ok
@@ -1573,7 +1585,7 @@ Verify Disable log.html - Scenario
 	Dictionary Should Contain Key 	${scenariofileafter1}[Script Defaults] 	disableloglog
 	Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][disableloglog] 	True
 
-	Open Manager GUI 		-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	runsettings
 	Click CheckBox 	checked 	loghtml
 	Click Dialog Button 	ok
@@ -1595,7 +1607,8 @@ Verify Disable report.html - Scenario
 	Log 	scenariofilebefore: ${scenariofilebefore} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
 
-	Open Manager GUI 		-s 	${scenariofile}
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	runsettings
 	Click CheckBox 	unchecked 	reporthtml
 	Click Dialog Button 	ok
@@ -1609,7 +1622,7 @@ Verify Disable report.html - Scenario
 	Dictionary Should Contain Key 	${scenariofileafter1}[Script Defaults] 	disablelogreport
 	Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][disablelogreport] 	True
 
-	Open Manager GUI 		-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	runsettings
 	Click CheckBox 	checked 	reporthtml
 	Click Dialog Button 	ok
@@ -1631,7 +1644,8 @@ Verify Disable output.xml - Scenario
 	Log 	scenariofilebefore: ${scenariofilebefore} 	console=True
 	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
 
-	Open Manager GUI 		-s 	${scenariofile}
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	runsettings
 	Click CheckBox 	unchecked 	outputxml
 	Click Dialog Button 	ok
@@ -1645,7 +1659,7 @@ Verify Disable output.xml - Scenario
 	Dictionary Should Contain Key 	${scenariofileafter1}[Script Defaults] 	disablelogoutput
 	Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][disablelogoutput] 	True
 
-	Open Manager GUI 		-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	runsettings
 	Click CheckBox 	checked 	outputxml
 	Click Dialog Button 	ok
@@ -1658,6 +1672,11 @@ Verify Disable output.xml - Scenario
 
 Verify Disable log.html - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	[Setup]	Run Keywords
+	...    Create Manager INI File If It Does Not Exist						AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
+	...    Set Manager INI Window Size		1000	600
+
 	${testkey}= 	Set Variable 		disableloglog
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-trl.rfs
@@ -1669,7 +1688,8 @@ Verify Disable log.html - Test Row
 	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
 	Dictionary Should Not Contain Key 	${scenariofilebefore}[1] 	${testkey}
 
-	Open Manager GUI 		-s 	${scenariofile}
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	trsettings
 	Click CheckBox 	unchecked 	loghtml
 	Test Group Save Settings
@@ -1683,7 +1703,7 @@ Verify Disable log.html - Test Row
 	Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
 	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	True
 
-	Open Manager GUI 		-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	trsettings
 	Click CheckBox 	checked 	loghtml
 	Test Group Save Settings
@@ -1697,6 +1717,11 @@ Verify Disable log.html - Test Row
 
 Verify Disable report.html - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	[Setup]	Run Keywords
+	...    Create Manager INI File If It Does Not Exist						AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
+	...    Set Manager INI Window Size		1000	600
+
 	${testkey}= 	Set Variable 		disablelogreport
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-trl.rfs
@@ -1708,7 +1733,8 @@ Verify Disable report.html - Test Row
 	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
 	Dictionary Should Not Contain Key 	${scenariofilebefore}[1] 	${testkey}
 
-	Open Manager GUI 		-s 	${scenariofile}
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	trsettings
 	Click CheckBox 	unchecked 	reporthtml
 	Test Group Save Settings
@@ -1722,7 +1748,7 @@ Verify Disable report.html - Test Row
 	Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
 	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	True
 
-	Open Manager GUI 		-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	trsettings
 	Click CheckBox 	checked 	reporthtml
 	Test Group Save Settings
@@ -1736,6 +1762,11 @@ Verify Disable report.html - Test Row
 
 Verify Disable output.xml - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #151
+	[Setup]	Run Keywords
+	...    Create Manager INI File If It Does Not Exist						AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
+	...    Set Manager INI Window Size		1000	600
+
 	${testkey}= 	Set Variable 		disablelogoutput
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#151${/}Issue-#151-trl.rfs
@@ -1747,7 +1778,8 @@ Verify Disable output.xml - Test Row
 	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
 	Dictionary Should Not Contain Key 	${scenariofilebefore}[1] 	${testkey}
 
-	Open Manager GUI 		-s 	${scenariofile}
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	trsettings
 	Click CheckBox 	unchecked 	outputxml
 	Test Group Save Settings
@@ -1761,7 +1793,7 @@ Verify Disable output.xml - Test Row
 	Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
 	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	True
 
-	Open Manager GUI 		-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	trsettings
 	Click CheckBox 	checked 	outputxml
 	Test Group Save Settings
@@ -1780,9 +1812,14 @@ Verify If Agent Copies Every File From Manager. FORMAT: '.{/}dir1{/}'
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		800		600						AND
-	...    Run Agent CLI	-d	${TEMPDIR}${/}agent_temp_issue52			AND
+	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
+	...    Run Agent CLI	@{agent_options}													AND
 	...    Open Manager GUI													AND
 	...    Set Global Filename And Default Save Path	main
+	${M_absolute_paths} 	${M_file_names} 	Find Absolute Paths And Names For Files In Directory
+	...    ${CURDIR}${/}testdata${/}Issue-52${/}example
+	Log 	${M_absolute_paths}
+	Log 	${M_file_names}
 
 	Copy Directory	${CURDIR}${/}testdata${/}Issue-52${/}example	${global_path}
 	Copy File	${CURDIR}${/}testdata${/}Issue-52${/}test_scenario.rfs	${global_path}
@@ -1824,9 +1861,15 @@ Verify If Agent Copies Every File From Manager. FORMAT: '{CURDIR}{/}dir1{/}'
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		800		600						AND
 	...    Show Manager INI Data											AND
-	...    Run Agent CLI	-d	${TEMPDIR}${/}agent_temp_issue52			AND
+	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
+	...    Run Agent CLI	@{agent_options}													AND
 	...    Open Manager GUI													AND
 	...    Set Global Filename And Default Save Path	main
+
+	${M_absolute_paths}	${M_file_names} 	Find Absolute Paths And Names For Files In Directory
+	...    ${CURDIR}${/}testdata${/}Issue-52${/}example
+	Log 	${M_absolute_paths}
+	Log 	${M_file_names}
 
 	Copy Directory	${CURDIR}${/}testdata${/}Issue-52${/}example	${global_path}
 	Copy File	${CURDIR}${/}testdata${/}Issue-52${/}test_scenario.rfs	${global_path}
@@ -1870,9 +1913,15 @@ Verify If Agent Copies Every File From Manager. FORMAT: 'dir1{/}'
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		800		600						AND
-	...    Run Agent CLI 	-d  ${TEMPDIR}${/}agent_temp_issue52			AND
+	...    Set Test Variable	@{agent_options}	-d	${TEMPDIR}${/}agent_temp_issue52	AND
+	...    Run Agent CLI	@{agent_options}													AND
 	...    Open Manager GUI													AND
 	...    Set Global Filename And Default Save Path	main
+
+	${M_absolute_paths} 	${M_file_names} 	Find Absolute Paths And Names For Files In Directory
+	...    ${CURDIR}${/}testdata${/}Issue-52${/}example
+	Log 	${M_absolute_paths}
+	Log 	${M_file_names}
 
 	Copy Directory	${CURDIR}${/}testdata${/}Issue-52${/}example	${global_path}
 	Copy File	${CURDIR}${/}testdata${/}Issue-52${/}test_scenario.rfs	${global_path}
@@ -2400,7 +2449,8 @@ Check If Test Scenario Run Will Stop Fast (Agent sends terminate singal to the r
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		1000	600						AND
-	...    Run Agent CLI 	-d  ${OUTPUT DIR}${/}rfswarm-agent-Test-2		AND
+	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-2	AND
+	...    Run Agent CLI	@{agent_options}														AND
 	...    Open Manager GUI													AND
 	...    Create Robot File
 	...    file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n\tSleep\t15\n
@@ -2428,7 +2478,8 @@ Check If Test Scenario Run Will Stop Gradually
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		1000	600						AND
-	...    Run Agent CLI	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-3		AND
+	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-3	AND
+	...    Run Agent CLI	@{agent_options}														AND
 	...    Open Manager GUI													AND
 	...    Create Robot File	file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t60\n
 
@@ -2456,7 +2507,8 @@ Check If Test Scenario Run Will Stop Gradually - TestRepeater
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		1000	600						AND
-	...    Run Agent CLI 	-d  ${OUTPUT DIR}${/}rfswarm-agent-Test-3		AND
+	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-3	AND
+	...    Run Agent CLI	@{agent_options}														AND
 	...    Open Manager GUI													AND
 	...    Create Robot File	file_content=***Test Cases***\nExample Test Case\n\tTest\n***Keywords***\nTest\n\t[Documentation]\t60s\n\tSleep\t60\n
 
@@ -2667,7 +2719,8 @@ Verify If Upload logs=Immediately Is Being Saved To The Scenario And Read Back C
 
 	Log To Console	${\n}Manager is now being restarted. Check if Upload logs=Immediately is read back correctly
 	Close Manager GUI
-	Open Manager GUI 	-s  ${scenario_path}
+	@{mngr_options}=	Set Variable	-s	${scenario_path}
+	Open Manager GUI	@{mngr_options}
 	Click Button	runsave
 	Log To Console	Scenario file content after Manager restart: ${scenario_file_content}
 	Dictionary Should Contain Key	${scenario_file_content}		Scenario
@@ -2704,7 +2757,8 @@ Verify If Upload logs=Error Only Is Being Saved To The Scenario And Read Back Co
 
 	Log To Console	${\n}Manager is now being restarted. Check if Upload logs=Error Only is read back correctly
 	Close Manager GUI
-	Open Manager GUI 	-s 	${scenario_path}
+	@{mngr_options}=	Set Variable	-s	${scenario_path}
+	Open Manager GUI	@{mngr_options}
 	Click Button	runsave
 	Log To Console	Scenario file content after Manager restart: ${scenario_file_content}
 	Dictionary Should Contain Key	${scenario_file_content}		Scenario
@@ -2741,7 +2795,8 @@ Verify If Upload logs=All Deferred Is Being Saved To The Scenario And Read Back 
 
 	Log To Console	${\n}Manager is now being restarted. Check if Upload logs=All Deferred is read back correctly
 	Close Manager GUI
-	Open Manager GUI 	-s 	${scenario_path}
+	@{mngr_options}=	Set Variable	-s	${scenario_path}
+	Open Manager GUI	@{mngr_options}
 	Click Button	runsave
 	Log To Console	Scenario file content after Manager restart: ${scenario_file_content}
 	Dictionary Should Contain Key	${scenario_file_content}		Scenario
@@ -2920,7 +2975,8 @@ Verify Result Name - Test Defaults
 	Log 	scenariofilebefore: ${scenariofilebefore}
 	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
 
-	Open Manager GUI 	-s 	${scenariofile}
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	runsettings
 	Selected Option Should Be 	Default
 	Click Label With Horizontal Offset 	result_name 	100
@@ -2937,7 +2993,7 @@ Verify Result Name - Test Defaults
 	Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][${testkey}] 	doco
 	Log 	Documentation 	console=True
 
-	Open Manager GUI 	-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	runsettings
 	Selected Option Should Be 	Documentation
 	Click Label With Horizontal Offset 	result_name 	100
@@ -2954,7 +3010,7 @@ Verify Result Name - Test Defaults
 	Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][${testkey}] 	info
 	Log 	Information 	console=True
 
-	Open Manager GUI 	-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	runsettings
 	Selected Option Should Be 	Information
 	Click Label With Horizontal Offset 	result_name 	100
@@ -2971,7 +3027,7 @@ Verify Result Name - Test Defaults
 	Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][${testkey}] 	kywrd
 	Log 	Keyword 	console=True
 
-	Open Manager GUI 	-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	runsettings
 	Selected Option Should Be 	Keyword
 	Click Label With Horizontal Offset 	result_name 	100
@@ -2988,7 +3044,7 @@ Verify Result Name - Test Defaults
 	Should Be Equal As Strings 	${scenariofileafter1}[Script Defaults][${testkey}] 	kywrdargs
 	Log 	Keyword & Argsuments 	console=True
 
-	Open Manager GUI 	-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	runsettings
 	Selected Option Should Be 	KeywordArgs
 	Click Label With Horizontal Offset 	result_name 	100
@@ -3004,6 +3060,11 @@ Verify Result Name - Test Defaults
 
 Verify Result Name - Test Row
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #154  Issue #154-GUI
+	[Setup]	Run Keywords
+	...    Create Manager INI File If It Does Not Exist						AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
+	...    Set Manager INI Window Size		1000	600
+
 	${testkey}= 	Set Variable 		resultnamemode
 	${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}default.rfs
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#154${/}Issue-#154-GUI-TR.rfs
@@ -3015,7 +3076,8 @@ Verify Result Name - Test Row
 	Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
 	Dictionary Should Not Contain Key 	${scenariofilebefore}[1] 	${testkey}
 
-	Open Manager GUI 	-s 	${scenariofile}
+	@{mngr_options}= 	Create List 	-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	trsettings
 	Selected Option Should Be 	Default
 	Click Label With Vertical Offset 	result_name 	20
@@ -3032,7 +3094,7 @@ Verify Result Name - Test Row
 	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	doco
 	Log 	Documentation 	console=True
 
-	Open Manager GUI 	-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	trsettings
 	Selected Option Should Be 	Documentation
 	Click Label With Vertical Offset 	result_name 	20
@@ -3049,7 +3111,7 @@ Verify Result Name - Test Row
 	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	info
 	Log 	Information 	console=True
 
-	Open Manager GUI 	-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	trsettings
 	Selected Option Should Be 	Information
 	Click Label With Vertical Offset 	result_name 	20
@@ -3066,7 +3128,7 @@ Verify Result Name - Test Row
 	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	kywrd
 	Log 	Keyword 	console=True
 
-	Open Manager GUI 	-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	trsettings
 	Selected Option Should Be 	Keyword
 	Click Label With Vertical Offset 	result_name 	20
@@ -3083,7 +3145,7 @@ Verify Result Name - Test Row
 	Should Be Equal As Strings 	${scenariofileafter1}[1][${testkey}] 	kywrdargs
 	Log 	Keyword & Argsuments 	console=True
 
-	Open Manager GUI 	-s 	${scenariofile}
+	Open Manager GUI 		@{mngr_options}
 	Click Button	trsettings
 	Selected Option Should Be 	KeywordArgs
 	Click Label With Vertical Offset 	result_name 	20
@@ -3677,7 +3739,8 @@ Check If Monitoring settings are loaded and used
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
 	...    Set Manager INI Window Size		1000	600						AND
-	...    Run Agent CLI	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-3		AND
+	...    Set Test Variable	@{agent_options}	-d	${OUTPUT DIR}${/}rfswarm-agent-Test-3	AND
+	...    Run Agent CLI	@{agent_options}													AND
 	...    Open Manager GUI
 
 	Utilisation Stats

@@ -1,0 +1,3 @@
+*** Settings ***
+
+metadata 	file 	*.jpg

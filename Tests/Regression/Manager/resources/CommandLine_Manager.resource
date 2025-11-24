@@ -7,6 +7,7 @@ Resource 	../../../Common/Logs.resource
 Resource 	../../../Common/INI_PIP_Data.resource
 Resource 	../../../Common/RFS_Components.resource
 
+
 *** Variables ***
 # datapath: /home/runner/work/rfswarm/rfswarm/rfswarm_manager/results/PreRun
 # datapath: /opt/hostedtoolcache/Python/3.9.18/x64/lib/python3.9/site-packages/rfswarm_manager/results/PreRun -- let's control the output path rather than leaving it to chance

@@ -31,7 +31,7 @@ Next Day For Scheduled Start Is In the Next Month
 
 	Wait Until Keyword Succeeds 	5x 	1s 	Resync Date With Time Server 	${test_date}
 
-	Check Logs
+	Check Logs 	Manager
 
 	[Teardown] 	Stop Manager CLI
 
@@ -106,7 +106,8 @@ Circular Reference Resource Files
 
 	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources 	*.resource
 
-	Run Agent CLI 	-i  ${testdata}${/}agent.ini
+	@{agnt_options}= 	Create List 	-i 	${testdata}${/}agent.ini
+	Run Agent CLI 	@{agnt_options}
 	Sleep    1s
 	Check Agent Is Running
 	Log to console 	${CURDIR}
@@ -169,7 +170,8 @@ Circular Reference Resource Files 2
 
 	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources
 
-	Run Agent CLI 	-i  ${testdata}${/}agent.ini
+	@{agnt_options}= 	Create List 	-i 	${testdata}${/}agent.ini
+	Run Agent CLI 	@{agnt_options}
 	Sleep    1s
 	Check Agent Is Running
 	Log to console 	${CURDIR}
@@ -233,7 +235,8 @@ Lots Of Resource Files
 
 	@{expected_files}= 	List Files In Directory And Sub Directories 	${testdata}${/}resources 	*.resource
 
-	Run Agent CLI 	-i  ${testdata}${/}agent.ini
+	@{agnt_options}= 	Create List 	-i 	${testdata}${/}agent.ini
+	Run Agent CLI 	@{agnt_options}
 	Sleep    1s
 	Check Agent Is Running
 	Log 	${CURDIR} 	console=true
@@ -318,13 +321,12 @@ Check That the Manager Supports the Missing Scenario File Provided By the -s Arg
 	${stdout_manager}= 		Read Log 	${stdout_manager_path}
 	${stderr_manager}= 		Read Log 	${stderr_manager_path}
 
-	Check Logs
+	Check Logs 	Manager
 
 	# windows does not work with reading logs.
 	Should Contain 	${stdout_manager} 	Scenario file Not found:
 
 	[Teardown]	Stop Manager CLI
-
 
 Verify If Manager Runs With Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
@@ -337,7 +339,8 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 		File Should Not Exist 	${global_path}${/}RFSwarmManager.ini
 	END
 
-	Run Manager CLI 	-n
+	@{mngr_options}= 	Create List 	-n
+	Run Manager CLI 	@{mngr_options}
 	${running}= 	Is Process Running		${PROCESS_MANAGER}
 	IF 	not ${running}
 		Fail	msg=Manager is not running!
@@ -357,7 +360,7 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 	File Should Not Be Empty	${global_path}${/}RFSwarmManager.ini
 
 	Log To Console	Running Manager with existing ini file.
-	Run Manager CLI 	-n
+	Run Manager CLI 	@{mngr_options}
 	${running}= 	Is Process Running		${PROCESS_MANAGER}
 	IF 	not ${running}
 		Fail	msg=Manager is not running!
@@ -369,6 +372,8 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 		Fail	msg=Manager did not close!
 	END
 
+	[Teardown] 	Stop Manager CLI
+
 Verify If Manager Runs With No Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 	[Setup] 	Set Global Filename And Default Save Path 	${robot_data}[0]
@@ -377,8 +382,11 @@ Verify If Manager Runs With No Existing INI File From Current Version NO GUI
 	File Should Not Exist	${global_path}${/}RFSwarmManager.ini
 	Log To Console	Running Manager with no existing ini file.
 
-	Run Manager CLI 	-n
+	@{mngr_options}= 	Create List 	-n
+	Run Manager CLI 	@{mngr_options}
 	${running}= 	Is Process Running		${PROCESS_MANAGER}
+	Run Manager CLI 	@{mngr_options}
+	${running}= 	Is Process Running		${process_manager}
 	IF 	not ${running}
 		Fail	msg=Manager is not running!
 	END
@@ -389,6 +397,8 @@ Verify If Manager Runs With No Existing INI File From Current Version NO GUI
 	END
 	Show Log 	${result.stdout_path}
 	Show Log 	${result.stderr_path}
+
+	[Teardown] 	Stop Manager CLI
 
 Verify If Manager Runs With Existing INI File From Previous Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
@@ -412,5 +422,119 @@ Verify If Manager Runs With Existing INI File From Previous Version NO GUI
 	IF 	${running}
 		Fail	msg=Manager did not close!
 	END
+	Log 	${result.stdout}
+	Log 	${result.stderr}
 	Show Log 	${result.stdout_path}
 	Show Log 	${result.stderr_path}
+
+	[Teardown] 	Stop Manager CLI
+
+Check if exception is generated when a file is renamed
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #396
+
+	VAR 	${agent_dir} 		${agent_dir}${/}Issue_#396_name      scope=TEST
+	Log    agent_dir: ${agent_dir}
+	VAR 	${agent_scripts_dir} 		${agent_dir}${/}scripts      scope=TEST
+	Log    agent_scripts_dir: ${agent_scripts_dir}
+
+	${testfolder}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#396
+	VAR 	${scenariofile} 	${testfolder}${/}Issue-#396.rfs
+	Log    scenariofile: ${scenariofile}
+
+	VAR 	${manageriniile} 	${testfolder}${/}RFSwarmManager.ini
+	Log    manageriniile: ${manageriniile}
+
+
+	VAR 	@{mngr_options} 	-g 	3 	-n 	-a 	2 	-s 	${scenariofile} 	-i 	${manageriniile}
+	VAR		@{agent_options} 	-g 	3 	--agentdir 	${agent_dir}
+
+	# Configuration File:  /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/rfswarm_manager/RFSwarmManager.ini
+	# Show Log    ${manageriniile}
+	@{sourcefolder}= 	List Directory 	${testfolder}
+
+	Run Manager CLI	@{mngr_options}
+	Run Agent CLI	@{agent_options}
+
+	# give agent time to create scripts dir
+	Sleep    1s
+
+	@{scripts}= 	List Directory 	${agent_scripts_dir}
+
+	Wait Until Created 	${agent_scripts_dir}${/}robot_swarm_a.jpg 		3 minutes
+
+	@{scripts}= 	List Directory 	${agent_scripts_dir}
+
+	# Remove Files 	${testfolder}${/}__init__.robot 		${testfolder}${/}robot_swarm_a.jpg
+	Move File 	${testfolder}${/}robot_swarm_a.jpg 		${testfolder}${/}robot_swarm_b.jpg
+
+	# need to wait long enough for the manager to poll the files
+	Sleep    15s
+
+	@{scripts}= 	List Directory 	${agent_scripts_dir}
+
+	Stop Agent CLI
+	Stop Manager CLI
+
+	Check Logs 	Manager
+	Check Logs 	Agent
+
+	[Teardown]	Run Keywords
+	...    	Move File 	${testfolder}${/}robot_swarm_b.jpg 		${testfolder}${/}robot_swarm_a.jpg 	AND
+	...    Stop Agent CLI 	AND
+	...    Stop Manager CLI 	AND
+	...    Check Logs 	Manager 	AND
+	...    Check Logs 	Agent
+
+Check if exception is generated when a file is removed
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #396
+
+	VAR 	${agent_dir} 		${agent_dir}${/}Issue_#396_del      scope=TEST
+	Log    agent_dir: ${agent_dir}
+	VAR 	${agent_scripts_dir} 		${agent_dir}${/}scripts      scope=TEST
+	Log    agent_scripts_dir: ${agent_scripts_dir}
+
+	${testfolder}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#396
+	VAR 	${scenariofile} 	${testfolder}${/}Issue-#396.rfs
+	Log    scenariofile: ${scenariofile}
+
+	VAR 	${manageriniile} 	${testfolder}${/}RFSwarmManager.ini
+	Log    manageriniile: ${manageriniile}
+
+
+	VAR 	@{mngr_options} 	-n 	-a 	2 	-s 	${scenariofile} 	-i 	${manageriniile}
+	VAR		@{agent_options} 	-g 	3 	--agentdir 	${agent_dir}
+
+	# Configuration File:  /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/rfswarm_manager/RFSwarmManager.ini
+	# Show Log    ${manageriniile}
+	@{sourcefolder}= 	List Directory 	${testfolder}
+
+	Run Manager CLI	@{mngr_options}
+	Run Agent CLI	@{agent_options}
+
+	# give agent time to create scripts dir
+	Sleep    1s
+
+	@{scripts}= 	List Directory 	${agent_scripts_dir}
+
+	Wait Until Created 	${agent_scripts_dir}${/}robot_swarm_a.jpg 		3 minutes
+
+	@{scripts}= 	List Directory 	${agent_scripts_dir}
+
+	Remove Files 	${testfolder}${/}__init__.robot 		${testfolder}${/}robot_swarm_a.jpg
+
+	# need to wait long enough for the manager to poll the files
+	Sleep    15s
+
+	@{scripts}= 	List Directory 	${agent_scripts_dir}
+
+	Stop Agent CLI
+	Stop Manager CLI
+
+	Check Logs 	Manager
+	Check Logs 	Agent
+
+	[Teardown]	Run Keywords
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI	AND
+	...    Check Logs 	Manager 	AND
+	...    Check Logs 	Agent

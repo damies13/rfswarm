@@ -83,7 +83,8 @@ Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
 
 	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#362${/}invalid.rfs
 	${inifile}= 		Normalize Path 	${CURDIR}${/}testdata${/}Issue-#362${/}RFSwarmManager.ini
-	Open Manager GUI 	-s 	${scenariofile} 	-i 	${inifile}
+	VAR 	@{mngr_options} 	-s 	${scenariofile} 	-i 	${inifile}
+	Open Manager GUI 	@{mngr_options}
 
 	Sleep 	5s
 
@@ -142,3 +143,7 @@ Verify That INI Graphs Are Loaded When the Provided Scenario Is Invalid
 #
 # 	Run Keyword 	Close Manager GUI ${PLATFORM}
 # 	Stop Agent
+
+
+
+#

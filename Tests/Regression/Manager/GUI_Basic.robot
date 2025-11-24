@@ -17,11 +17,9 @@ Open GUI
 	Open Manager GUI
 	Sleep 	5
 
-	${img}= 	Set Variable		manager_${PLATFORM}_tab_agents.png
-	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
-	Click Image 	${img}
+	${img}=	Set Variable		manager_${platform}_tab_agents.png
+	Wait For 	${img} 	 timeout=${default_image_timeout}
 	Take A Screenshot
-	Sleep 	5
 
 Select Monitoring Tab
 	[Tags]	ubuntu-latest		windows-latest		macos-latest	Issue #173

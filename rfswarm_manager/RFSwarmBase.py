@@ -1338,8 +1338,14 @@ class RFSwarmBase:
 		threads = []
 		for chkhash in checkhashes:
 			file_data = self.scriptfiles[chkhash]
-			script_hash = self.hash_file(file_data['localpath'], file_data['relpath'])
-			if script_hash != chkhash:
+			try:
+				script_hash = self.hash_file(file_data['localpath'], file_data['relpath'])
+			except Exception as e:
+				self.debugmsg(8, "FileNotFoundError handled - Exception:", e)
+				script_hash = None
+				self.remove_hash(chkhash)
+
+			if script_hash is not None and script_hash != chkhash:
 				# file changed
 				self.debugmsg(3, "File's hash has changed: chkhash:", chkhash, "	script_hash:", script_hash, "	localpath:", file_data['localpath'])
 

@@ -70,7 +70,7 @@ jobs:
         continue-on-error: true
         run: >
           robot --include ${{ env.tag }}
-          --outputdir Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          --outputdir Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}/run
           Tests/Regression/Agent
 
       - name: Robot Framework - Retry Failed
@@ -79,8 +79,8 @@ jobs:
         continue-on-error: true
         run: >
           robot --include ${{ env.tag }}
-          --rerunfailed Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}/output.xml
-          --outputdir Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}
+          --rerunfailed Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}/run/output.xml
+          --outputdir Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}/retry
           Tests/Regression/Agent
 
       - name: if retry still failed
