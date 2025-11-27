@@ -2166,9 +2166,12 @@ class ReporterGUI(tk.Frame):
 
 		iST = self.base.rt_setting_get_starttime(pid)
 		iET = self.base.rt_setting_get_endtime(pid)
+		sLX = self.base.report_item_get_str(pid, 'label_x')
 
 		axisenl = self.base.rt_graph_get_axisen(idl)
 		axisenr = self.base.rt_graph_get_axisen(idr)
+		sLYl = self.base.report_item_get_str(idl, 'label_y')
+		sLYr = self.base.report_item_get_str(idr, 'label_y')
 		datatypel = self.base.rt_graph_get_dt(idl)
 		datatyper = self.base.rt_graph_get_dt(idr)
 		self.contentdata[pid]["LFrame"].columnconfigure(99, weight=1)
@@ -2212,6 +2215,23 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[pid]["lblBlank"] = ttk.Label(self.contentdata[pid]["RFrame"], text=" ")
 		self.contentdata[pid]["lblBlank"].grid(column=0, row=rownum, sticky="nsew")
 
+		# 		X Label
+		rownum += 1
+		self.contentdata[pid]["lblLX"] = ttk.Label(self.contentdata[pid]["LFrame"], text="X-Axis Label:")
+		self.contentdata[pid]["lblLX"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[pid]["strLX"] = tk.StringVar()
+		self.contentdata[pid]["strLX"].set(sLX)
+
+		self.contentdata[pid]["eLX"] = ttk.Entry(self.contentdata[pid]["LFrame"], textvariable=self.contentdata[pid]["strLX"])
+		self.contentdata[pid]["eLX"].grid(column=1, row=rownum, sticky="nsew")
+		# <Leave> makes UI to jumpy
+		# self.contentdata[pid]["eET"].bind('<Leave>', self.cs_graph_update)
+		self.contentdata[pid]["eLX"].bind('<FocusOut>', self.cs_graph_update)
+
+		self.contentdata[pid]["lblBlank"] = ttk.Label(self.contentdata[pid]["RFrame"], text=" ")
+		self.contentdata[pid]["lblBlank"].grid(column=0, row=rownum, sticky="nsew")
+
 		# 		blank row
 		rownum += 1
 		self.contentdata[pid]["lblBlank"] = ttk.Label(self.contentdata[pid]["LFrame"], text=" ")
@@ -2247,6 +2267,22 @@ class ReporterGUI(tk.Frame):
 		self.contentdata[idr]["chkAxsEn"] = ttk.Checkbutton(self.contentdata[pid]["RFrame"], variable=self.contentdata[idr]["intAxsEn"], command=self.cs_graph_update)
 		self.contentdata[idr]["intAxsEn"].set(axisenr)
 		self.contentdata[idr]["chkAxsEn"].grid(column=1, row=rownum, sticky="nsew")
+
+		rownum += 1
+		self.contentdata[id]["lblLY"] = ttk.Label(self.contentdata[pid]["LFrame"], text="Y-Axis Label:")
+		self.contentdata[id]["lblLY"].grid(column=0, row=rownum, sticky="nsew")
+
+		self.contentdata[idl]["strLY"] = tk.StringVar()
+		self.contentdata[idl]["eLYL"] = ttk.Entry(self.contentdata[pid]["LFrame"], textvariable=self.contentdata[idl]["strLY"])
+		self.contentdata[idl]["strLY"].set(sLYl)
+		self.contentdata[idl]["eLYL"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[idl]["eLYL"].bind('<FocusOut>', self.cs_graph_update)
+
+		self.contentdata[idr]["strLY"] = tk.StringVar()
+		self.contentdata[idr]["eLYR"] = ttk.Entry(self.contentdata[pid]["RFrame"], textvariable=self.contentdata[idr]["strLY"])
+		self.contentdata[idr]["strLY"].set(sLYr)
+		self.contentdata[idr]["eLYR"].grid(column=1, row=rownum, sticky="nsew")
+		self.contentdata[idr]["eLYR"].bind('<FocusOut>', self.cs_graph_update)
 
 		rownum += 1
 		self.contentdata[id]["lblDT"] = ttk.Label(self.contentdata[pid]["LFrame"], text="Data Type:")
@@ -2306,6 +2342,12 @@ class ReporterGUI(tk.Frame):
 			fET = "{} {}".format(self.base.report_formatdate(iET), self.base.report_formattime(iET))
 			self.contentdata[id]["strET"].set(fET)
 			self.contentdata[id]["fET"] = fET
+
+		# 	strLX
+		if "strLX" in self.contentdata[pid]:
+			lx = self.contentdata[pid]["strLX"].get()
+			self.base.debugmsg(5, "label x (lx):", lx)
+			changes += self.base.report_item_set_str(pid, "label_x", lx)
 
 		# intIsNum
 		if "intIsNum" in self.contentdata[idl]:
@@ -2434,6 +2476,16 @@ class ReporterGUI(tk.Frame):
 		if "intAxsEn" in self.contentdata[idr]:
 			value = self.contentdata[idr]["intAxsEn"].get()
 			changes += self.base.rt_graph_set_axisen(idr, value)
+
+		# 	strLX
+		if "strLY" in self.contentdata[idl]:
+			ly = self.contentdata[idl]["strLY"].get()
+			self.base.debugmsg(5, "label y left (ly):", ly)
+			changes += self.base.report_item_set_str(idl, "label_y", ly)
+		if "strLY" in self.contentdata[idr]:
+			ly = self.contentdata[idr]["strLY"].get()
+			self.base.debugmsg(5, "label y right (ly):", ly)
+			changes += self.base.report_item_set_str(idr, "label_y", ly)
 
 		if "intSTot" in self.contentdata[idl]:
 			value = self.contentdata[idl]["intSTot"].get()
@@ -3770,6 +3822,10 @@ class ReporterGUI(tk.Frame):
 		datatypel = self.base.rt_graph_get_dt(idl)
 		datatyper = self.base.rt_graph_get_dt(idr)
 
+		label_x = self.base.report_item_get_str(pid, 'label_x')
+		label_yl = self.base.report_item_get_str(idl, 'label_y')
+		label_yr = self.base.report_item_get_str(idr, 'label_y')
+
 		tz = zoneinfo.ZoneInfo(self.base.rs_setting_get_timezone())
 
 		if datatypel == "SQL":
@@ -3951,6 +4007,7 @@ class ReporterGUI(tk.Frame):
 
 				# Left axis Limits
 				if axisenl > 0:
+					self.contentdata[id]["axisL"].set_ylabel(label_yl)
 					self.contentdata[id]["axisL"].grid(True, 'major', 'y')
 					self.contentdata[id]["axisL"].tick_params(labelleft=True, length=5)
 
@@ -3965,6 +4022,7 @@ class ReporterGUI(tk.Frame):
 
 				# Right axis Limits
 				if axisenr > 0:
+					self.contentdata[id]["axisR"].set_ylabel(label_yr)
 					self.contentdata[id]["axisR"].grid(True, 'major', 'y')
 					self.contentdata[id]["axisR"].tick_params(labelright=True, length=5)
 
@@ -3976,6 +4034,8 @@ class ReporterGUI(tk.Frame):
 						self.contentdata[id]["axisR"].set_ylim(0, 100)
 					else:
 						self.contentdata[id]["axisR"].set_ylim(0)
+
+				self.contentdata[id]["axisL"].set_xlabel(label_x)
 
 				self.contentdata[id]["fig"].set_tight_layout(True)
 				self.contentdata[id]["fig"].autofmt_xdate(bottom=0.2, rotation=30, ha='right')

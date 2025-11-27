@@ -1481,6 +1481,17 @@ class ReporterBase:
 		changes = self.report_item_set_int(id, name, value)
 		return changes
 
+	def report_item_get_str(self, id, name):
+		value = self.report_item_get_value(id, name)
+		if value is None:
+			return ""
+		else:
+			return value
+
+	def report_item_set_str(self, id, name, value):
+		changes = self.report_item_set_value(id, name, value)
+		return changes
+
 	#
 	# Report Item Type: contents
 	#

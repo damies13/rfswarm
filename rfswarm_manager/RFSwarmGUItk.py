@@ -850,7 +850,6 @@ class RFSwarmGUItk(tk.Frame):
 
 		grphWindow.axis.set_ylabel(grphWindow.settings["LabelY"].get())
 
-
 		# other settings? Metric Type, Primary metric, Secondary metric, filter?
 		row += 1
 		grphWindow.fmeSettings.lblDT = ttk.Label(grphWindow.fmeSettings, text="Data Type:")
