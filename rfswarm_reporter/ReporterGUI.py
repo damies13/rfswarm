@@ -22,6 +22,7 @@ import matplotlib  # required for matplot graphs
 # required for matplot graphs
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure  # required for matplot graphs
+from matplotlib.font_manager import FontProperties
 
 # required for company logo's (I beleive this is a depandancy of matplotlib anyway)
 from PIL import Image, ImageTk
@@ -35,6 +36,7 @@ class ReporterGUI(tk.Frame):
 	style_feild_colour = "white"
 	style_text_colour = "#000"
 	style_head_colour = "#00F"
+	style_mp_fontproperty = None
 	imgdata: Any = {}
 	b64: Any = {}
 	contentdata: Any = {}
@@ -424,6 +426,7 @@ class ReporterGUI(tk.Frame):
 		self.base.debugmsg(9, "Head.TLabel 	layout:", layout)
 
 		matplotlib.rcParams['font.family'] = fontname
+		self.style_mp_fontproperty = FontProperties(fontname)
 
 		self.style.configure('Report.TLabel', font=(fontname, fontsize))
 
@@ -4007,7 +4010,7 @@ class ReporterGUI(tk.Frame):
 
 				# Left axis Limits
 				if axisenl > 0:
-					self.contentdata[id]["axisL"].set_ylabel(label_yl)
+					self.contentdata[id]["axisL"].set_ylabel(label_yl, fontproperties=self.style_mp_fontproperty)
 					self.contentdata[id]["axisL"].grid(True, 'major', 'y')
 					self.contentdata[id]["axisL"].tick_params(labelleft=True, length=5)
 
@@ -4022,7 +4025,7 @@ class ReporterGUI(tk.Frame):
 
 				# Right axis Limits
 				if axisenr > 0:
-					self.contentdata[id]["axisR"].set_ylabel(label_yr)
+					self.contentdata[id]["axisR"].set_ylabel(label_yr, fontproperties=self.style_mp_fontproperty)
 					self.contentdata[id]["axisR"].grid(True, 'major', 'y')
 					self.contentdata[id]["axisR"].tick_params(labelright=True, length=5)
 
@@ -4035,7 +4038,7 @@ class ReporterGUI(tk.Frame):
 					else:
 						self.contentdata[id]["axisR"].set_ylim(0)
 
-				self.contentdata[id]["axisL"].set_xlabel(label_x)
+				self.contentdata[id]["axisL"].set_xlabel(label_x, fontproperties=self.style_mp_fontproperty)
 
 				self.contentdata[id]["fig"].set_tight_layout(True)
 				self.contentdata[id]["fig"].autofmt_xdate(bottom=0.2, rotation=30, ha='right')
