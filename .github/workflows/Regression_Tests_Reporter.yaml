@@ -113,40 +113,35 @@ jobs:
             myfile.write("tag={}\n".format(tag))
             myfile.write("platformos={}\n".format(platform))
 
+      - name: Install poetry
+        run: python -m pip install poetry
+      - name: Install Manager Tests requirements
+        working-directory: ./Tests
+        run: poetry install --with reporter
+
       - name: Download packages to dist
         uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist
-      - name: Show Dist UM
-        if: ${{ matrix.platform != 'windows-latest' }}
+      - name: Show Dist
+        shell: bash
         run: |
           ls -la dist
-      - name: Show Dist W
-        if: ${{ matrix.platform == 'windows-latest' }}
-        run: |
-          dir dist
-      # - name: "Ubuntu pip installs"
-      #   if: ${{ matrix.platform == 'ubuntu-latest' }}
-      #   run: pip install gtk PyQt4
-      - name: Install Reporter from dist UM
-        if: ${{ matrix.platform != 'windows-latest' }}
-        run: pip install rfswarm_reporter-*.whl
-        working-directory: ./dist
-      - name: Install Reporter from dist W
-        if: ${{ matrix.platform == 'windows-latest' }}
-        shell: cmd
-        run: for %%f in (rfswarm_reporter-*.whl) do pip install %%f
-        working-directory: ./dist
-      - run: pip install -r Tests/Regression/Reporter/pip_requirements_${{ env.platformos }}.txt
+      - name: Install Reporter from dist
+        working-directory: ./Tests
+        shell: bash
+        run: poetry run pip install ../dist/rfswarm_reporter-*.whl
 
       - name: Robot Framework
         id: robottest
         continue-on-error: true
+        working-directory: ./Tests
         run: >
-          robot --include ${{ env.tag }}
-          --outputdir Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/run
-          Tests/Regression/Reporter
+          poetry run robot
+          --include ${{ env.tag }}
+          --outputdir Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/run
+          Regression/Reporter
         env:
           DISPLAY: :13.0
 
@@ -156,24 +151,26 @@ jobs:
         run: |
           cd Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/run
           sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}\/run/img src="./g' ./output.xml
-          rebot ./output.xml
+          poetry run rebot ./output.xml
       - name: Try and fix images with relative path (macos)
         if: ${{ !cancelled() &&  matrix.platform == 'macos-latest' }}
         continue-on-error: true
         run: |
           cd Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/run
           sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}\/run/img src="./g' ./output.xml
-          rebot ./output.xml
+          poetry run rebot ./output.xml
 
       - name: Robot Framework - Retry Failed
         if: steps.robottest.outcome != 'success'
         id: robotretry
         continue-on-error: true
+        working-directory: ./Tests
         run: >
-          robot --include ${{ env.tag }}
-          --rerunfailed Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/run/output.xml
-          --outputdir Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/retry
-          Tests/Regression/Reporter
+          poetry run robot
+          --include ${{ env.tag }}
+          --rerunfailed Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/run/output.xml
+          --outputdir Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/retry
+          Regression/Reporter
         env:
           DISPLAY: :13.0
 
@@ -183,14 +180,14 @@ jobs:
         run: |
           cd Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/retry
           sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}\/retry/img src="./g' ./output.xml
-          rebot ./output.xml
+          poetry run rebot ./output.xml
       - name: Try and fix images with relative path (macos)
         if: ${{ steps.robottest.outcome != 'success' && !cancelled() &&  matrix.platform == 'macos-latest' }}
         continue-on-error: true
         run: |
           cd Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/retry
           sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}\/retry/img src="./g' ./output.xml
-          rebot ./output.xml
+          poetry run rebot ./output.xml
 
       - name: if retry still failed
         if: steps.robottest.outcome != 'success' && steps.robotretry.outcome != 'success'
