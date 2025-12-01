@@ -663,6 +663,9 @@ class ReporterCore:
 		fontname = base.rs_setting_get_font()
 		fontsize = base.rs_setting_get_fontsize()
 
+		matplotlib.rcParams['font.family'] = [fontname, 'sans-serif', 'serif', 'monospace']
+		matplotlib.rcParams['axes.unicode_minus'] = False
+
 		styledata = ""
 		styledata += "div { font-size: " + str(fontsize) + "px; font-family: \"" + str(fontname) + "\"; }"
 		styledata += ".center { text-align: center; }"
@@ -1059,6 +1062,10 @@ class ReporterCore:
 		datatypel = base.rt_graph_get_dt(idl)
 		datatyper = base.rt_graph_get_dt(idr)
 
+		label_x = base.report_item_get_str(pid, 'label_x')
+		label_yl = base.report_item_get_str(idl, 'label_y')
+		label_yr = base.report_item_get_str(idr, 'label_y')
+
 		tz = zoneinfo.ZoneInfo(base.rs_setting_get_timezone())
 
 		if datatypel == "SQL":
@@ -1210,6 +1217,7 @@ class ReporterCore:
 				if axisenl > 0:
 					axisl.grid(True, 'major', 'y')
 					axisl.tick_params(labelleft=True, length=5)
+					axisl.set_ylabel(label_yl)
 
 					SMetric = "Other"
 					if datatypel == "Metric":
@@ -1224,6 +1232,7 @@ class ReporterCore:
 				if axisenr > 0:
 					axisr.grid(True, 'major', 'y')
 					axisr.tick_params(labelright=True, length=5)
+					axisr.set_ylabel(label_yr)
 
 					SMetric = "Other"
 					if datatyper == "Metric":
@@ -1233,6 +1242,8 @@ class ReporterCore:
 						axisr.set_ylim(0, 100)
 					else:
 						axisr.set_ylim(0)
+
+				axisl.set_xlabel(label_x)
 
 				fig.set_tight_layout(True)
 				fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
@@ -1616,6 +1627,10 @@ class ReporterCore:
 		fontname = base.rs_setting_get_font()
 		fontsize = base.rs_setting_get_fontsize()
 
+		# Configure font for graphs
+		matplotlib.rcParams['font.family'] = [fontname, 'sans-serif', 'serif', 'monospace']
+		matplotlib.rcParams['axes.unicode_minus'] = False
+
 		# rgb_basecolour = RGBColor.from_string('000000')
 		rgb_highlightcolour = RGBColor.from_string(highlightcolour)
 		base.debugmsg(5, "rgb_highlightcolour:", rgb_highlightcolour)
@@ -1925,6 +1940,10 @@ class ReporterCore:
 		datatypel = base.rt_graph_get_dt(idl)
 		datatyper = base.rt_graph_get_dt(idr)
 
+		label_x = base.report_item_get_str(pid, 'label_x')
+		label_yl = base.report_item_get_str(idl, 'label_y')
+		label_yr = base.report_item_get_str(idr, 'label_y')
+
 		tz = zoneinfo.ZoneInfo(base.rs_setting_get_timezone())
 
 		if datatypel == "SQL":
@@ -2075,6 +2094,7 @@ class ReporterCore:
 				if axisenl > 0:
 					axisl.grid(True, 'major', 'y')
 					axisl.tick_params(labelleft=True, length=5)
+					axisl.set_ylabel(label_yl)
 
 					SMetric = "Other"
 					if datatypel == "Metric":
@@ -2089,6 +2109,7 @@ class ReporterCore:
 				if axisenr > 0:
 					axisr.grid(True, 'major', 'y')
 					axisr.tick_params(labelright=True, length=5)
+					axisr.set_ylabel(label_yr)
 
 					SMetric = "Other"
 					if datatyper == "Metric":
@@ -2098,6 +2119,8 @@ class ReporterCore:
 						axisr.set_ylim(0, 100)
 					else:
 						axisr.set_ylim(0)
+
+				axisl.set_xlabel(label_x)
 
 				fig.set_tight_layout(True)
 				fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
@@ -2688,6 +2711,10 @@ class ReporterCore:
 		fontname = base.rs_setting_get_font()
 		fontsize = base.rs_setting_get_fontsize()
 
+		# Configure font for graphs
+		matplotlib.rcParams['font.family'] = [fontname, 'sans-serif', 'serif', 'monospace']
+		matplotlib.rcParams['axes.unicode_minus'] = False
+
 		wb = self.cg_data["xlsx"]["Workbook"]
 
 		default = openpyxl.styles.NamedStyle(name="Default")
@@ -3049,6 +3076,10 @@ class ReporterCore:
 		datatypel = base.rt_graph_get_dt(idl)
 		datatyper = base.rt_graph_get_dt(idr)
 
+		label_x = base.report_item_get_str(pid, 'label_x')
+		label_yl = base.report_item_get_str(idl, 'label_y')
+		label_yr = base.report_item_get_str(idr, 'label_y')
+
 		tz = zoneinfo.ZoneInfo(base.rs_setting_get_timezone())
 
 		if datatypel == "SQL":
@@ -3199,6 +3230,7 @@ class ReporterCore:
 				if axisenl > 0:
 					axisl.grid(True, 'major', 'y')
 					axisl.tick_params(labelleft=True, length=5)
+					axisl.set_ylabel(label_yl)
 
 					SMetric = "Other"
 					if datatypel == "Metric":
@@ -3213,6 +3245,7 @@ class ReporterCore:
 				if axisenr > 0:
 					axisr.grid(True, 'major', 'y')
 					axisr.tick_params(labelright=True, length=5)
+					axisr.set_ylabel(label_yr)
 
 					SMetric = "Other"
 					if datatyper == "Metric":
@@ -3222,6 +3255,8 @@ class ReporterCore:
 						axisr.set_ylim(0, 100)
 					else:
 						axisr.set_ylim(0)
+
+				axisl.set_xlabel(label_x)
 
 				fig.set_tight_layout(True)
 				fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
