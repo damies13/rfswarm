@@ -294,6 +294,11 @@ class ReporterCore:
 		except Exception:
 			pass
 
+		try:
+			base.debugmsg(0, "		Matplotlib Version", matplotlib.__version__)
+		except Exception:
+			pass
+
 	def mainloop(self):
 
 		base.debugmsg(5, "mainloop start")
