@@ -172,6 +172,12 @@ jobs:
           head -10  setup-manager.py
           echo "--------------- end head setup-manager.py ---------------"
 
+      - name: Install poetry
+        run: python -m pip install poetry
+      - name: Change development project .toml file name
+        shell: bash
+        run: mv pyproject.toml pyproject-dev.toml
+
       - name: Clear Dist
         run: |
           rm -fR dist/
@@ -179,23 +185,36 @@ jobs:
         run: |
           rm -fR build/
       - name: Build Manager
+        shell: bash
         run: |
-          python3 setup-manager.py sdist bdist_wheel
+          mv /rfswarm_manager/pyproject.toml ./
+          poetry build
+          mv pyproject.toml /rfswarm_manager
       - name: Clear Build for Agent
         run: |
           rm -fR build/
       - name: Build Agent
+        shell: bash
         run: |
-          python3 setup-agent.py sdist bdist_wheel
+          mv /rfswarm_agent/pyproject.toml ./
+          poetry build
+          mv pyproject.toml /rfswarm_agent
       - name: Clear Build for Reporter
         run: |
           rm -fR build/
       - name: Build Reporter
+        shell: bash
         run: |
-          python3 setup-reporter.py sdist bdist_wheel
+          mv /rfswarm_reporter/pyproject.toml ./
+          poetry build
+          mv pyproject.toml /rfswarm_reporter
       - name: Show Dist
         run: |
           ls -la dist
+
+      - name: Change development project .toml file name to original
+        shell: bash
+        run: mv pyproject-dev.toml pyproject.toml
 
       - name: Archive pip packages in dist
         uses: actions/upload-artifact@v4
