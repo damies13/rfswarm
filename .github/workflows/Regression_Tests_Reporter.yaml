@@ -116,8 +116,7 @@ jobs:
       - name: Install poetry
         run: python -m pip install poetry
       - name: Install Manager Tests requirements
-        working-directory: ./Tests
-        run: poetry install --with reporter
+        run: poetry install --with reporter_test
 
       - name: Download packages to dist
         uses: actions/download-artifact@v4
@@ -129,19 +128,17 @@ jobs:
         run: |
           ls -la dist
       - name: Install Reporter from dist
-        working-directory: ./Tests
         shell: bash
-        run: poetry run pip install ../dist/rfswarm_reporter-*.whl
+        run: poetry run pip install dist/rfswarm_reporter-*.whl
 
       - name: Robot Framework
         id: robottest
         continue-on-error: true
-        working-directory: ./Tests
         run: >
           poetry run robot
           --include ${{ env.tag }}
-          --outputdir Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/run
-          Regression/Reporter
+          --outputdir Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/run
+          Tests/Regression/Reporter
         env:
           DISPLAY: :13.0
 
@@ -164,13 +161,12 @@ jobs:
         if: steps.robottest.outcome != 'success'
         id: robotretry
         continue-on-error: true
-        working-directory: ./Tests
         run: >
           poetry run robot
           --include ${{ env.tag }}
-          --rerunfailed Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/run/output.xml
-          --outputdir Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/retry
-          Regression/Reporter
+          --rerunfailed Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/run/output.xml
+          --outputdir Tests/Regression/Reporter/Logs/${{ matrix.platform }}_${{ matrix.python }}/retry
+          Tests/Regression/Reporter
         env:
           DISPLAY: :13.0
 

@@ -1,37 +1,44 @@
 [project]
-name = "rfswarm-test-env"
-version = "0.1.0"
-description = "Test environment for rfswarm"
-requires-python = ">=3.9,<3.14"
+name = "RFSwarm_development"
+version = "1.6.0"
+description = "rfswarm dev environment."
+readme = "README.md"
+requires-python = ">=3.9,<4.0"
 
-dependencies = [
-    "robotframework (>=7.3.2,<8.0.0)",
-]
+rfswarm-agent = { path = "./rfswarm_agent", develop = true }
+rfswarm-manager = { path = "./rfswarm_manager", develop = true }
+rfswarm-reporter = { path = "./rfswarm_reporter", develop = true }
+
+[tool.poetry]
+package-mode = false
 
 [dependency-groups]
-agent = [
+agent_test = [
+    "rfswarm-agent",
+    "rfswarm-manager",
     "robotframework-databaselibrary (>=2.1.4,<3.0.0)",
     "robotframework-httpctrl (>=0.3.1,<0.4.0)",
 ]
-manager = [
-    "pyscreeze (==0.1.28)",
+manager_test = [
+    "rfswarm-manager",
+    "rfswarm-agent",
     "numpy (<2) ; python_version < '3.11'",
     "pymupdf (>=1.23.1)",
     "pyautogui (!=0.9.54)",
     "clipboard (>=0.0.4,<0.0.5)",
     "pyyaml (>=6.0.3,<7.0.0)",
+    "pyscreeze (>=1.0.1,<2.0.0)",
     "opencv-python",
-
     "robotframework-imagehorizonlibrary (>=1.0,<2.0)",
     "robotframework-databaselibrary (>=2.3.3,<3.0.0)",
     "robotframework-ocrlibrary (>=2.0.0,<3.0.0)",
-    "robotframework-requests (>=0.9.7,<0.10.0)"
+    "robotframework-requests (>=0.9.7,<0.10.0)",
 ]
-reporter = [
+reporter_test = [
+    "rfswarm-reporter",
     "pydantic (>=2.12.4,<3.0.0)",
     "opencv-python",
     "pillow (>=11.3.0,<12.0.0)",
-    "pyscreeze (==0.1.28)",
     "pyautogui (!=0.9.54)",
     "clipboard (>=0.0.4,<0.0.5)",
     "python-docx (>=1.2.0,<2.0.0)",
@@ -40,23 +47,29 @@ reporter = [
     "pandas (>=2.3.3,<3.0.0)",
     "psutil (>=7.1.3,<8.0.0)",
     "pyyaml (>=6.0.3,<7.0.0)",
-
     "robotframework-imagehorizonlibrary (>=1.0,<2.0)",
     "robotframework-databaselibrary (>=2.3.3,<3.0.0)",
     "robotframework-ocrlibrary (>=2.0.0,<3.0.0)",
     "robotframework-doctestlibrary (>=0.29.1,<0.30.0)",
     "robotframework-archivelibrary (>=0.4.3,<0.5.0)",
+    "pyscreeze (>=1.0.1,<2.0.0)",
+]
+dev = [
+    { include-group = "agent_test" },
+    { include-group = "manager_test" },
+    { include-group = "reporter_test" },
 ]
 
-[tool.poetry]
-package-mode = false
+[tool.poetry.group.agent_test]
+optional = true
+[tool.poetry.group.manager_test]
+optional = true
+[tool.poetry.group.reporter_test]
+optional = true
+[tool.poetry.group.dev]
+optional = true
 
-[tool.poetry.group.agent]
-optional = true
-[tool.poetry.group.manager]
-optional = true
-[tool.poetry.group.reporter]
-optional = true
+
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

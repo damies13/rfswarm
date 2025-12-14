@@ -81,8 +81,7 @@ jobs:
       - name: Install poetry
         run: python -m pip install poetry
       - name: Install Manager Tests requirements
-        working-directory: ./Tests
-        run: poetry install --with manager
+        run: poetry install --with manager_test
 
       - name: Download packages to dist
         uses: actions/download-artifact@v4
@@ -94,24 +93,21 @@ jobs:
         run: |
           ls -la dist
       - name: Install Manager from dist
-        working-directory: ./Tests
         shell: bash
-        run: poetry run pip install ../dist/rfswarm_manager-*.whl
+        run: poetry run pip install dist/rfswarm_manager-*.whl
       - name: Install Agent from dist (for testing Issues)
-        working-directory: ./Tests
         shell: bash
-        run: poetry run pip install ../dist/rfswarm_agent-*.whl
+        run: poetry run pip install dist/rfswarm_agent-*.whl
 
       - name: Robot Framework
         id: robottest
         continue-on-error: true
-        working-directory: ./Tests
         run: >
           poetry run robot
           --include ${{ env.tag }}
           --exclude NOT${{ matrix.tag }}
-          --outputdir Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/run
-          Regression/Manager
+          --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/run
+          Tests/Regression/Manager
         env:
           DISPLAY: :13.0
           MATRIX_PLATFORM: ${{ matrix.platform }}
@@ -136,14 +132,13 @@ jobs:
         if: steps.robottest.outcome != 'success'
         id: robotretry
         continue-on-error: true
-        working-directory: ./Tests
         run: >
           poetry run robot
           --include ${{ env.tag }}
           --exclude NOT${{ matrix.tag }}
-          --rerunfailed Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/run/output.xml
-          --outputdir Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/retry
-          Regression/Manager
+          --rerunfailed Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/run/output.xml
+          --outputdir Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/retry
+          Tests/Regression/Manager
         env:
           DISPLAY: :13.0
           MATRIX_PLATFORM: ${{ matrix.platform }}
