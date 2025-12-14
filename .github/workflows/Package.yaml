@@ -187,7 +187,7 @@ jobs:
       - name: Build Manager
         shell: bash
         run: |
-          mv /rfswarm_manager/pyproject.toml ./
+          mv rfswarm_manager/pyproject.toml ./
           poetry build
           mv pyproject.toml /rfswarm_manager
       - name: Clear Build for Agent
@@ -196,7 +196,7 @@ jobs:
       - name: Build Agent
         shell: bash
         run: |
-          mv /rfswarm_agent/pyproject.toml ./
+          mv rfswarm_agent/pyproject.toml ./
           poetry build
           mv pyproject.toml /rfswarm_agent
       - name: Clear Build for Reporter
@@ -205,7 +205,7 @@ jobs:
       - name: Build Reporter
         shell: bash
         run: |
-          mv /rfswarm_reporter/pyproject.toml ./
+          mv rfswarm_reporter/pyproject.toml ./
           poetry build
           mv pyproject.toml /rfswarm_reporter
       - name: Show Dist
