@@ -19,6 +19,10 @@ agent_test = [
     "robotframework-databaselibrary (>=2.1.4,<3.0.0)",
     "robotframework-httpctrl (>=0.3.1,<0.4.0)",
 ]
+
+# pyscreeze 0.1.29 doesn't seem to work with pyautogui 0.9.53
+# pyautogui 0.9.54 has issues on MacOS https://github.com/asweigart/pyautogui/issues/783
+# pyautogui is a prerequisite of imagehorizonlibrary
 manager_test = [
     "rfswarm-manager",
     "rfswarm-agent",
@@ -27,7 +31,7 @@ manager_test = [
     "pyautogui (!=0.9.54)",
     "clipboard (>=0.0.4,<0.0.5)",
     "pyyaml (>=6.0.3,<7.0.0)",
-    "pyscreeze (>=1.0.1,<2.0.0)",
+    "pyscreeze (==0.1.28)",
     "opencv-python",
     "robotframework-imagehorizonlibrary (>=1.0,<2.0)",
     "robotframework-databaselibrary (>=2.3.3,<3.0.0)",
@@ -52,7 +56,7 @@ reporter_test = [
     "robotframework-ocrlibrary (>=2.0.0,<3.0.0)",
     "robotframework-doctestlibrary (>=0.29.1,<0.30.0)",
     "robotframework-archivelibrary (>=0.4.3,<0.5.0)",
-    "pyscreeze (>=1.0.1,<2.0.0)",
+    "pyscreeze (==0.1.28)",
 ]
 dev = [
     { include-group = "agent_test" },
