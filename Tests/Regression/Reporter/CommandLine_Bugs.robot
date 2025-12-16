@@ -60,7 +60,7 @@ Auto Generate DOCX Report Without GUI Using Template
 	${resultdata}= 	Set Variable    20230320_185055_demo
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True

@@ -139,7 +139,7 @@ First Run
 	${resultdata}= 	Set Variable    20230320_185055_demo
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
@@ -157,7 +157,7 @@ New Data Table Section
 	${resultdata}= 	Set Variable    20230320_185055_demo
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	Open Reporter GUI 	-d 	${resultfolder}
 	Run Keyword And Continue On Failure 	Wait For Status 	PreviewLoaded
@@ -230,7 +230,7 @@ Template with Start and End Dates
 	Create Directory		${templatefolder}
 
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	Log 	resultfolder0: ${resultfolder0} 	console=True
 	Log 	resultfolder1: ${resultfolder1} 	console=True
 	Log To Console	Open Reporter with resultfolder0 and create template
