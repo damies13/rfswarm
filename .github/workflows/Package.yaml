@@ -205,10 +205,6 @@ jobs:
         run: |
           ls -la dist
 
-      - name: Change development project .toml file name to original
-        shell: bash
-        run: mv pyproject-dev.toml pyproject.toml
-
       - name: Archive pip packages in dist
         uses: actions/upload-artifact@v4
         # https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts#passing-data-between-jobs-in-a-workflow
