@@ -5,10 +5,11 @@ description = "rfswarm dev environment."
 readme = "README.md"
 requires-python = ">=3.9,<4.0"
 
-[tool.poetry.dependencies]
-rfswarm-agent = { path = "./rfswarm_agent", develop = true }
-rfswarm-manager = { path = "./rfswarm_manager", develop = true }
-rfswarm-reporter = { path = "./rfswarm_reporter", develop = true }
+
+# [tool.poetry.dependencies]
+# rfswarm-agent = { path = "./rfswarm_agent", develop = true }
+# rfswarm-manager = { path = "./rfswarm_manager", develop = true }
+# rfswarm-reporter = { path = "./rfswarm_reporter", develop = true }
 
 [tool.poetry]
 package-mode = false
@@ -28,8 +29,6 @@ package-mode = false
 # C:\hostedtoolcache\windows\Python\3.13.2\x64\Lib\site-packages\numpy\core\getlimits.py:52: RuntimeWarning: invalid value encountered in log10  self.precision = int(-log10(self.eps))
 
 agent_test = [
-    # "rfswarm-agent",
-    # "rfswarm-manager",
     "robotframework-databaselibrary (>=2.1.4,<3.0.0)",
     "robotframework-httpctrl (>=0.3.1,<0.4.0)",
 ]
@@ -39,8 +38,6 @@ agent_test = [
 # pyautogui is a prerequisite of imagehorizonlibrary
 # pymupdf has to be >=1.23.1 beacuse it require numpy > 2
 manager_test = [
-    # "rfswarm-manager",
-    # "rfswarm-agent",
     "numpy (<2) ; python_version < '3.11'",
     "numpy (!=2.2.3)",
     "pymupdf (>=1.23.1)",
@@ -60,7 +57,6 @@ manager_test = [
 # pyautogui is a prerequisite of imagehorizonlibrary
 # pymupdf has to be >=1.23.1 beacuse it require numpy > 2
 reporter_test = [
-    # "rfswarm-reporter",
     "numpy (<2) ; python_version < '3.11'",
     "numpy (>=1.25,<2.0) ; python_version <'3.10'",
     "numpy (>=2.1.0) ; python_version >='3.13'",
