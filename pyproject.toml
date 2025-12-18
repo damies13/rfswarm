@@ -5,6 +5,7 @@ description = "rfswarm dev environment."
 readme = "README.md"
 requires-python = ">=3.9,<4.0"
 
+[tool.poetry.dependencies]
 rfswarm-agent = { path = "./rfswarm_agent", develop = true }
 rfswarm-manager = { path = "./rfswarm_manager", develop = true }
 rfswarm-reporter = { path = "./rfswarm_reporter", develop = true }
@@ -61,6 +62,8 @@ manager_test = [
 reporter_test = [
     "rfswarm-reporter",
     "numpy (<2) ; python_version < '3.11'",
+    "numpy (>=1.25,<2.0) ; python_version <'3.10'",
+    "numpy (>=2.1.0) ; python_version >='3.13'",
     "numpy (!=2.2.3)",
     "pymupdf (>=1.23.1)",
     "pydantic (>=2.12.4,<3.0.0)",
