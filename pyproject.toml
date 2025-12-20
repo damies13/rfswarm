@@ -38,17 +38,17 @@ agent_test = [
 # pyautogui is a prerequisite of imagehorizonlibrary
 # pymupdf has to be >=1.23.1 beacuse it require numpy > 2
 manager_test = [
-    "numpy (!=2.2.3)",
+    "numpy (>2) ; python_version > '3.12'",
     "pymupdf (>=1.23.1)",
     "pyautogui (!=0.9.54)",
     "clipboard (>=0.0.4,<0.0.5)",
     "pyyaml (>=6.0.3,<7.0.0)",
     "pyscreeze (==0.1.28)",
-    "opencv-python",
     "robotframework-imagehorizonlibrary (>=1.0,<2.0)",
     "robotframework-databaselibrary (>=2.3.3,<3.0.0)",
     "robotframework-ocrlibrary (>=2.0.0,<3.0.0)",
     "robotframework-requests (>=0.9.7,<0.10.0)",
+    "opencv-python-headless (>=4.12.0.88,<5.0.0.0)",
 ]
 
 # pyscreeze 0.1.29 doesn't seem to work with pyautogui 0.9.53 - this version works with robotframework-imagehorizonlibrary 1.0.0
@@ -56,7 +56,7 @@ manager_test = [
 # pyautogui is a prerequisite of imagehorizonlibrary
 # pymupdf has to be >=1.23.1 beacuse it require numpy > 2
 reporter_test = [
-    "numpy (!=2.2.3)",
+    "numpy (>2) ; python_version > '3.12'",
     "pymupdf (>=1.23.1)",
     "pydantic (>=2.12.4,<3.0.0)",
     "pillow (>=11.3.0,<12.0.0)",
@@ -71,10 +71,11 @@ reporter_test = [
     "robotframework-imagehorizonlibrary (>=1.0,<2.0)",
     "robotframework-databaselibrary (>=2.3.3,<3.0.0)",
     "robotframework-ocrlibrary (>=2.0.0,<3.0.0)",
-    "robotframework-doctestlibrary",
     "robotframework-archivelibrary (>=0.4.3,<0.5.0)",
+    "robotframework-doctestlibrary (>=0.20.0,<0.31.0)",
     "pyscreeze (==0.1.28)",
     "pynput (>=1.8.1,<2.0.0)",
+    "opencv-python-headless (>=4.12.0.88,<5.0.0.0)",
 ]
 
 dev = [
