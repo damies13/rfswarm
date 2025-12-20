@@ -115,7 +115,7 @@ jobs:
 
       - name: Install poetry
         run: python -m pip install poetry
-      - name: Install Manager Tests requirements
+      - name: Install Reporter Tests requirements
         run: poetry install --with reporter_test
 
       - name: Download packages to dist
