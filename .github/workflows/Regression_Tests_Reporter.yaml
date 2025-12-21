@@ -131,6 +131,12 @@ jobs:
         shell: bash
         run: poetry run pip install dist/rfswarm_reporter-*.whl
 
+      - name: Reinstall opencv
+        shell: bash
+        run: |
+          poetry run pip uninstall -y opencv-python
+          poetry run pip install --force-reinstall opencv-python-headless
+
       - name: Robot Framework
         id: robottest
         continue-on-error: true
