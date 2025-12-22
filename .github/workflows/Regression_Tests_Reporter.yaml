@@ -131,8 +131,9 @@ jobs:
         shell: bash
         run: poetry run pip install dist/rfswarm_reporter-*.whl
 
+      # The cv2 directory gets overwritten when the installation of the wand packages takes place in the windows environment
       - name: Reinstall opencv
-        shell: bash
+        if: ${{ matrix.platform == 'windows-latest' }}
         run: |
           poetry run pip uninstall -y opencv-python
           poetry run pip install --force-reinstall opencv-python-headless

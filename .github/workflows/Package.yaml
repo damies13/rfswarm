@@ -143,7 +143,7 @@ jobs:
           echo numver: ${{ env.numver }}
           echo version: ${{ env.version }}
 
-      - name: Update Version Number in python files
+      - name: Update Version Number in python & toml files
         run: |
           pwd
           ls -la
@@ -157,14 +157,12 @@ jobs:
             # echo "version comment : $file"
             sed -i -e "s/#    Version .*/#    Version ${numver}/" "$file"
           done
-          files=$(find . -name 'setup-*.py')
+          files=$(find . -name 'pyproject.toml')
           for file in $files
           do
             # echo "version variable : $file"
-            sed -i -e "s/version = \"[^\"]*\"/version=\"${numver}\"/" "$file"
-            sed -i -e "s/version=\"[^\"]*\"/version=\"${numver}\"/" "$file"
+            sed -i -e "s/version = \"[^\"]*\"/version = \"${numver}\"/" "$file"
             # echo "version comment : $file"
-            # sed -i -e "s/#    Version .*/#    Version ${numver}/" "$file"
           done
           # echo "--------------- head rfswarm_agent.py ---------------"
           # head -50  rfswarm_agent/rfswarm_agent.py
