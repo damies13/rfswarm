@@ -143,7 +143,7 @@ jobs:
           echo numver: ${{ env.numver }}
           echo version: ${{ env.version }}
 
-      - name: Update Version Number in python & toml files
+      - name: Update Version Number in python & pyproject files
         run: |
           pwd
           ls -la
@@ -189,7 +189,7 @@ jobs:
       - name: Build Agent
         shell: bash
         run: |
-          cp rfswarm_agent/pyproject.toml ./
+          cp rfswarm_agent/pyproject.toml ./pyproject.toml
           poetry build
       - name: Clear Build for Reporter
         run: |
@@ -197,7 +197,7 @@ jobs:
       - name: Build Reporter
         shell: bash
         run: |
-          cp rfswarm_reporter/pyproject.toml ./
+          cp rfswarm_reporter/pyproject.toml ./pyproject.toml
           poetry build
       - name: Show Dist
         run: |
