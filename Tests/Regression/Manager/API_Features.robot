@@ -1277,3 +1277,4 @@ Send Metric Data to the Manager With Wrong Value Type in Request
 
 	[Teardown] 	Run Keywords
 	...    Stop Manager CLI 	AND 	Clear Result Directory
+

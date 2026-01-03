@@ -28,7 +28,7 @@ Verify That Files Get Saved With Correct Extension And Names
 	Change Reporter INI Option 	Reporter 	templatedir 	${templatefolder}
 
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
 	Log To Console	Files to check: report file, report template, output files from reporter (html docx xlsx)
 
@@ -80,7 +80,7 @@ Whole report time range
 	${resultdata}= 	Set Variable    20230928_141103_OCDemo_Requests
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	Should Exist	${resultfolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
@@ -182,7 +182,7 @@ Verify if reporter handle missing test result file
 	Copy File	${resultfolder}${/}${resultdata}.db		${basefolder}${/}result_backup${/}
 
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	Log 	resultfolder: ${resultfolder} 	console=True
 
 	Open Reporter GUI	-d 	${resultfolder}
@@ -768,7 +768,7 @@ Verify Plan Graph - No Total
 	${resultdata}= 	Set Variable    20230728_130340_Odoo-demo
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
 	${templatefile}= 	Set Variable    ${basefolder}${/}original_base.template
@@ -838,7 +838,7 @@ Verify Plan Graph - With Total
 	${resultdata}= 	Set Variable    20230728_130340_Odoo-demo
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
 	${templatefile}= 	Set Variable    ${basefolder}${/}original_base.template
@@ -912,7 +912,7 @@ Verify Plan Table
 	${resultdata}= 	Set Variable    20230728_130340_Odoo-demo
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
 	${templatefile}= 	Set Variable    ${basefolder}${/}original_base.template
@@ -977,7 +977,7 @@ Change Line Colour
 	${resultdata}= 	Set Variable    20230728_130340_Odoo-demo
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${resultfolder}= 	Set Variable    ${basefolder}${/}${resultdata}
 	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
 	${templatefile}= 	Set Variable    ${basefolder}${/}Issue-#307.template
@@ -1987,7 +1987,7 @@ Check Reporter with JSON Configuration File
 	${testdata}= 	Set Variable    Issue-#172
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${configfile}= 	Set Variable    ${basefolder}${/}RFSwarmReporter-JSON.json
 
 	# pass a default ini file with extended height to ensure that default values are used
@@ -2015,7 +2015,7 @@ Check Reporter with Yaml Configuration File
 	${testdata}= 	Set Variable    Issue-#172
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${configfile}= 	Set Variable    ${basefolder}${/}RFSwarmReporter-Yaml.yaml
 
 	# pass a default ini file with extended height to ensure that default values are used
@@ -2040,7 +2040,7 @@ Check Reporter with yml Configuration File
 	${testdata}= 	Set Variable    Issue-#172
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${configfile}= 	Set Variable    ${basefolder}${/}RFSwarmReporter-yml.yml
 
 	# pass a default ini file with extended height to ensure that default values are used
@@ -2066,7 +2066,7 @@ Check Reporter with JSON Template File
 	${testdata}= 	Set Variable    Issue-#172
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${templatefile}= 	Set Variable    ${basefolder}${/}template-JSON.json
 
 
@@ -2074,7 +2074,7 @@ Check Reporter with JSON Template File
 	${resultdata}= 	Set Variable    20230728_130340_Odoo-demo
 	${basefolder2}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata2}
 	Should Exist	${basefolder2}
-	Log to console 	basefolder2: ${basefolder2} 	console=True
+	Log to console 	basefolder2: ${basefolder2}
 	${resultfolder}= 	Set Variable    ${basefolder2}${/}${resultdata}
 	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
 	Should Exist	${resultfolder}
@@ -2106,7 +2106,7 @@ Check Reporter with Yaml Template File
 	${testdata}= 	Set Variable    Issue-#172
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${templatefile}= 	Set Variable    ${basefolder}${/}template-Yaml.yaml
 
 
@@ -2114,7 +2114,7 @@ Check Reporter with Yaml Template File
 	${resultdata}= 	Set Variable    20230728_130340_Odoo-demo
 	${basefolder2}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata2}
 	Should Exist	${basefolder2}
-	Log to console 	basefolder2: ${basefolder2} 	console=True
+	Log to console 	basefolder2: ${basefolder2}
 	${resultfolder}= 	Set Variable    ${basefolder2}${/}${resultdata}
 	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
 	Should Exist	${resultfolder}
@@ -2146,7 +2146,7 @@ Check Reporter with yml Template File
 	${testdata}= 	Set Variable    Issue-#172
 	${basefolder}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata}
 	Should Exist	${basefolder}
-	Log to console 	basefolder: ${basefolder} 	console=True
+	Log to console 	basefolder: ${basefolder}
 	${templatefile}= 	Set Variable    ${basefolder}${/}template-yml.yml
 
 
@@ -2154,7 +2154,7 @@ Check Reporter with yml Template File
 	${resultdata}= 	Set Variable    20230728_130340_Odoo-demo
 	${basefolder2}= 	Set Variable    ${CURDIR}${/}testdata${/}${testdata2}
 	Should Exist	${basefolder2}
-	Log to console 	basefolder2: ${basefolder2} 	console=True
+	Log to console 	basefolder2: ${basefolder2}
 	${resultfolder}= 	Set Variable    ${basefolder2}${/}${resultdata}
 	${resultfile}= 	Set Variable    ${basefolder}${/}${resultdata}${/}${resultdata}.report
 	Should Exist	${resultfolder}

@@ -32,44 +32,33 @@ jobs:
           with open(env_file, "a") as myfile:
             myfile.write("tag={}\n".format(tag))
 
+      - name: Install poetry
+        run: python -m pip install poetry
+      - name: Install Agent Tests requirements
+        run: poetry install --with agent_test
+
       - name: Download packages to dist
         uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist
-      - name: Show Dist UM
-        if: ${{ matrix.platform != 'windows-latest' }}
+      - name: Show Dist
+        shell: bash
         run: |
           ls -la dist
-      - name: Show Dist W
-        if: ${{ matrix.platform == 'windows-latest' }}
-        run: |
-          dir dist
-      - name: Install Agent from dist UM
-        if: ${{ matrix.platform != 'windows-latest' }}
-        run: pip install rfswarm_agent-*.whl
-        working-directory: ./dist
-      - name: Install Agent from dist W
-        if: ${{ matrix.platform == 'windows-latest' }}
-        shell: cmd
-        run: for %%f in (rfswarm_agent-*.whl) do pip install %%f
-        working-directory: ./dist
-      - name: Install Manager from dist (for testing Issues) UM
-        if: ${{ matrix.platform != 'windows-latest' }}
-        run: pip install rfswarm_manager-*.whl
-        working-directory: ./dist
-      - name: Install Manager from dist (for testing Issues) W
-        if: ${{ matrix.platform == 'windows-latest' }}
-        shell: cmd
-        run: for %%f in (rfswarm_manager-*.whl) do pip install %%f
-        working-directory: ./dist
-      - run: pip install -r Tests/Regression/Agent/pip_requirements.txt
+      - name: Install Agent from dist
+        shell: bash
+        run: poetry run pip install dist/rfswarm_agent-*.whl
+      - name: Install Manager from dist (for testing Issues)
+        shell: bash
+        run: poetry run pip install dist/rfswarm_manager-*.whl
 
       - name: Robot Framework
         id: robottest
         continue-on-error: true
         run: >
-          robot --include ${{ env.tag }}
+          poetry run robot
+          --include ${{ env.tag }}
           --outputdir Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}/run
           Tests/Regression/Agent
 
@@ -78,7 +67,8 @@ jobs:
         id: robotretry
         continue-on-error: true
         run: >
-          robot --include ${{ env.tag }}
+          poetry run robot
+          --include ${{ env.tag }}
           --rerunfailed Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}/run/output.xml
           --outputdir Tests/Regression/Agent/Logs/${{ matrix.platform }}_${{ matrix.python }}/retry
           Tests/Regression/Agent
