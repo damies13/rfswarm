@@ -271,7 +271,7 @@ Verify listener doesn't over inject sleeps
 	Run Manager CLI 	@{mngr_options}
 	Log To Console	Wait For Manager Process To Finish
 	Wait For Manager Process
-	Log To Console	Stop Agent CLI	Stop Agent CLI
+	# Log To Console	Stop Agent CLI	Stop Agent CLI
 
 	Log To Console	Check Counts Of Injected Sleeps In Agents Robot Logs
 	${dbfile}= 	Find Result DB 		result_pattern=*_Issue-#394
