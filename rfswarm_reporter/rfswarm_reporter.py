@@ -663,7 +663,10 @@ class ReporterCore:
 		fontname = base.rs_setting_get_font()
 		fontsize = base.rs_setting_get_fontsize()
 
-		matplotlib.rcParams['font.family'] = [fontname, 'sans-serif', 'serif', 'monospace']
+		if fontname is not None:
+			matplotlib.rcParams['font.family'] = [fontname, 'sans-serif', 'serif', 'monospace']
+		else:
+			matplotlib.rcParams['font.family'] = ['sans-serif', 'serif', 'monospace']
 		matplotlib.rcParams['axes.unicode_minus'] = False
 
 		styledata = ""
@@ -1628,7 +1631,10 @@ class ReporterCore:
 		fontsize = base.rs_setting_get_fontsize()
 
 		# Configure font for graphs
-		matplotlib.rcParams['font.family'] = [fontname, 'sans-serif', 'serif', 'monospace']
+		if fontname is not None:
+			matplotlib.rcParams['font.family'] = [fontname, 'sans-serif', 'serif', 'monospace']
+		else:
+			matplotlib.rcParams['font.family'] = ['sans-serif', 'serif', 'monospace']
 		matplotlib.rcParams['axes.unicode_minus'] = False
 
 		# rgb_basecolour = RGBColor.from_string('000000')
@@ -2712,7 +2718,10 @@ class ReporterCore:
 		fontsize = base.rs_setting_get_fontsize()
 
 		# Configure font for graphs
-		matplotlib.rcParams['font.family'] = [fontname, 'sans-serif', 'serif', 'monospace']
+		if fontname is not None:
+			matplotlib.rcParams['font.family'] = [fontname, 'sans-serif', 'serif', 'monospace']
+		else:
+			matplotlib.rcParams['font.family'] = ['sans-serif', 'serif', 'monospace']
 		matplotlib.rcParams['axes.unicode_minus'] = False
 
 		wb = self.cg_data["xlsx"]["Workbook"]
