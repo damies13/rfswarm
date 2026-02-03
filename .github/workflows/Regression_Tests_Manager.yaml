@@ -66,6 +66,12 @@ jobs:
           # lxqt
           startlxqt &
 
+      - name: "Windows Set Display Resolution"
+        if: ${{ matrix.platform == 'windows-latest' }}
+        shell: pwsh
+        run: |
+          Set-DisplayResolution -Width 1920 -Height 1080 -Force
+
       - name: Update Robot Tag
         shell: python
         run: |
@@ -98,6 +104,13 @@ jobs:
       - name: Install Agent from dist (for testing Issues)
         shell: bash
         run: poetry run pip install dist/rfswarm_agent-*.whl
+
+      # The cv2 directory gets overwritten when the installation of the wand packages takes place in the windows environment
+      - name: Reinstall opencv
+        if: ${{ matrix.platform == 'windows-latest' }}
+        run: |
+          poetry run pip uninstall -y opencv-python
+          poetry run pip install --force-reinstall opencv-python-headless
 
       - name: Robot Framework
         id: robottest
