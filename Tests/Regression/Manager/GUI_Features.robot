@@ -3674,7 +3674,9 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh 	# re-load settings
 
 	Click Label With Horizontal Offset 	FilterType 	140
+	Take A Screenshot
 	Press Key.down 2 Times
+	Take A Screenshot
 	Press Combination	Key.enter
 	Click Label With Horizontal Offset 	FilterPattern 	140
 	VAR 	${filter} 	*21*
@@ -3689,6 +3691,7 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 		Press Combination	KEY.ctrl		KEY.v
 	END
 
+	Sleep 	1
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
@@ -3715,6 +3718,7 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 		Press Combination	KEY.ctrl		KEY.v
 	END
 
+	Sleep 	1
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
