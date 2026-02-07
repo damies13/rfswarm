@@ -3545,11 +3545,13 @@ Verify Agent Filter Graphs - Metric
 	VAR 	@{agnt_options_1} 	-a  ${agent_name_1}
 	VAR 	@{agnt_options_2} 	-a  ${agent_name_2}
 
+	Open Manager GUI 	@{mngr_options}
 	Run Agent CLI 		@{agnt_options_1}
 	VAR 	${process_agent_1} 	${PROCESS_AGENT}
+	# ensure agent 1 connects to manager before agent 2
+	Sleep    15
 	Run Agent CLI 		@{agnt_options_2}
 	VAR 	${process_agent_2} 	${PROCESS_AGENT}
-	Open Manager GUI 	@{mngr_options}
 
 	Wait For the Scenario Run To Finish
 	Click Button 	Refresh
