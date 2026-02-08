@@ -3598,8 +3598,9 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh 	# re-load settings
 
 	Click Label With Horizontal Offset 	FilterType 	140
-	Press Key.down 2 Times
-	Press Combination	Key.enter
+	# Press Key.down 2 Times
+	# Press Combination	Key.enter
+	Select Option 	Wildcard
 	Click Label With Horizontal Offset 	FilterPattern 	140
 	VAR 	${filter} 	*21*
 	Evaluate 	clipboard.copy("${filter}") 	modules=clipboard
@@ -3677,8 +3678,9 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 
 	Click Label With Horizontal Offset 	FilterType 	140
 	Take A Screenshot
-	Press Key.down 2 Times
-	Take A Screenshot
+	# Press Key.down 2 Times
+	# Take A Screenshot
+	Select Option 	Wildcard
 	Press Combination	Key.enter
 	Click Label With Horizontal Offset 	FilterPattern 	140
 	VAR 	${filter} 	*21*
