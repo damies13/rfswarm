@@ -3545,11 +3545,13 @@ Verify Agent Filter Graphs - Metric
 	VAR 	@{agnt_options_1} 	-a  ${agent_name_1}
 	VAR 	@{agnt_options_2} 	-a  ${agent_name_2}
 
+	Open Manager GUI 	@{mngr_options}
 	Run Agent CLI 		@{agnt_options_1}
 	VAR 	${process_agent_1} 	${PROCESS_AGENT}
+	# ensure agent 1 connects to manager before agent 2
+	Sleep    15
 	Run Agent CLI 		@{agnt_options_2}
 	VAR 	${process_agent_2} 	${PROCESS_AGENT}
-	Open Manager GUI 	@{mngr_options}
 
 	Wait For the Scenario Run To Finish
 	Click Button 	Refresh
@@ -3596,8 +3598,9 @@ Verify Filter Metric Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh 	# re-load settings
 
 	Click Label With Horizontal Offset 	FilterType 	140
-	Press Key.down 2 Times
-	Press Combination	Key.enter
+	# Press Key.down 2 Times
+	# Press Combination	Key.enter
+	Select Option 	Wildcard
 	Click Label With Horizontal Offset 	FilterPattern 	140
 	VAR 	${filter} 	*21*
 	Evaluate 	clipboard.copy("${filter}") 	modules=clipboard
@@ -3674,7 +3677,10 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 	Click Button 	Refresh 	# re-load settings
 
 	Click Label With Horizontal Offset 	FilterType 	140
-	Press Key.down 2 Times
+	Take A Screenshot
+	# Press Key.down 2 Times
+	# Take A Screenshot
+	Select Option 	Wildcard
 	Press Combination	Key.enter
 	Click Label With Horizontal Offset 	FilterPattern 	140
 	VAR 	${filter} 	*21*
@@ -3689,6 +3695,7 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 		Press Combination	KEY.ctrl		KEY.v
 	END
 
+	Sleep 	1
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot
@@ -3715,6 +3722,7 @@ Verify Filter Result Graphs - Wildcard & Not Wildcard
 		Press Combination	KEY.ctrl		KEY.v
 	END
 
+	Sleep 	1
 	Click Button 	Refresh
 	Sleep 	5
 	Take A Screenshot

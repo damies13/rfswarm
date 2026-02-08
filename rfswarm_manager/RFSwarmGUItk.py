@@ -460,16 +460,16 @@ class RFSwarmGUItk(tk.Frame):
 		gph_example_menu = tk.Menu(self.gph_menu)
 		self.gph_menu.add_cascade(label="Examples", menu=gph_example_menu)
 
-		gph_example_menu.add_command(label="Running Robots", command=lambda: self.OpenGraph({'name': 'Running Robots', 'show_settings': False, 'show_legend': 0, 'data_type': 'Metric', 'metric_type': 'Scenario', 'primary_metric': '', 'secondary_metric': 'total_robots'}))
-		gph_example_menu.add_command(label="Agent Robots", command=lambda: self.OpenGraph({'name': 'Agent Robots', 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Robots'}))
-		gph_example_menu.add_command(label="Agent Load", command=lambda: self.OpenGraph({'name': 'Agent Load', 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Load'}))
-		gph_example_menu.add_command(label="Agent CPU", command=lambda: self.OpenGraph({'name': 'Agent CPU', 'win_location_x': 38, 'win_location_y': 500, 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'CPU'}))
-		gph_example_menu.add_command(label="Agent Memory", command=lambda: self.OpenGraph({'name': 'Agent Memory', 'win_location_x': 500, 'win_location_y': 500, 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'MEM'}))
-		gph_example_menu.add_command(label="Agent Network", command=lambda: self.OpenGraph({'name': 'Agent Network', 'win_location_x': 960, 'win_location_y': 500, 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'NET'}))
-		gph_example_menu.add_command(label="Response Time", command=lambda: self.OpenGraph({'name': 'Response Time', 'win_width': 1200, 'win_height': 600, 'show_settings': False, 'show_legend': 1, 'data_type': 'Result', 'result_type': 'Response Time', 'flter_result': 'Pass', 'filter_name': 'None', 'filter_pattern': ''}))
-		gph_example_menu.add_command(label="Passing Keywords", command=lambda: self.OpenGraph({'name': 'Passing Keywords', 'show_settings': False, 'show_legend': 0, 'data_type': 'Result', 'result_type': 'TPS', 'flter_result': 'Pass', 'filter_name': 'None', 'filter_pattern': ''}))
-		gph_example_menu.add_command(label="Failing Keywords", command=lambda: self.OpenGraph({'name': 'Failing Keywords', 'show_settings': False, 'show_legend': 1, 'data_type': 'Result', 'result_type': 'TPS', 'flter_result': 'Fail', 'filter_name': 'None', 'filter_pattern': ''}))
-		gph_example_menu.add_command(label="Total TPS", command=lambda: self.OpenGraph({'name': 'Total TPS', 'show_settings': False, 'show_legend': 1, 'data_type': 'Result', 'result_type': 'Total TPS', 'flter_result': 'None', 'filter_name': 'None', 'filter_pattern': ''}))
+		gph_example_menu.add_command(label="Running Robots", command=lambda: self.OpenGraph({'name': 'Running Robots', 'show_settings': False, 'show_legend': 0, 'data_type': 'Metric', 'metric_type': 'Scenario', 'primary_metric': '', 'secondary_metric': 'total_robots', 'label_y': 'Robots'}))
+		gph_example_menu.add_command(label="Agent Robots", command=lambda: self.OpenGraph({'name': 'Agent Robots', 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Robots', 'label_y': 'Robots'}))
+		gph_example_menu.add_command(label="Agent Load", command=lambda: self.OpenGraph({'name': 'Agent Load', 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Load', 'label_y': 'Agent % Load'}))
+		gph_example_menu.add_command(label="Agent CPU", command=lambda: self.OpenGraph({'name': 'Agent CPU', 'win_location_x': 38, 'win_location_y': 500, 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'CPU', 'label_y': 'Agent % CPU'}))
+		gph_example_menu.add_command(label="Agent Memory", command=lambda: self.OpenGraph({'name': 'Agent Memory', 'win_location_x': 500, 'win_location_y': 500, 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'MEM', 'label_y': 'Agent % Memory'}))
+		gph_example_menu.add_command(label="Agent Network", command=lambda: self.OpenGraph({'name': 'Agent Network', 'win_location_x': 960, 'win_location_y': 500, 'show_settings': False, 'show_legend': 1, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'NET', 'label_y': 'Agent % Network Utilisation'}))
+		gph_example_menu.add_command(label="Response Time", command=lambda: self.OpenGraph({'name': 'Response Time', 'win_width': 1200, 'win_height': 600, 'show_settings': False, 'show_legend': 1, 'data_type': 'Result', 'result_type': 'Response Time', 'flter_result': 'Pass', 'filter_name': 'None', 'filter_pattern': '', 'label_y': 'Response Time (Seconds)'}))
+		gph_example_menu.add_command(label="Passing Keywords", command=lambda: self.OpenGraph({'name': 'Passing Keywords', 'show_settings': False, 'show_legend': 0, 'data_type': 'Result', 'result_type': 'TPS', 'flter_result': 'Pass', 'filter_name': 'None', 'filter_pattern': '', 'label_y': 'Passes / Second'}))
+		gph_example_menu.add_command(label="Failing Keywords", command=lambda: self.OpenGraph({'name': 'Failing Keywords', 'show_settings': False, 'show_legend': 1, 'data_type': 'Result', 'result_type': 'TPS', 'flter_result': 'Fail', 'filter_name': 'None', 'filter_pattern': '', 'label_y': 'Fails / Second'}))
+		gph_example_menu.add_command(label="Total TPS", command=lambda: self.OpenGraph({'name': 'Total TPS', 'show_settings': False, 'show_legend': 1, 'data_type': 'Result', 'result_type': 'Total TPS', 'flter_result': 'None', 'filter_name': 'None', 'filter_pattern': '', 'label_y': 'TPS'}))
 
 		self.gph_recent_menu = tk.Menu(self.gph_menu)
 		self.gph_menu.add_cascade(label="Recent", menu=self.gph_recent_menu)
@@ -820,13 +820,42 @@ class RFSwarmGUItk(tk.Frame):
 			grphWindow.showlegend.set(settings['show_legend'])
 		grphWindow.fmeSettings.inpLGD.grid(column=1, row=row, sticky="nsew")
 
+		grphWindow.settings = {}
+
+		row += 1
+		grphWindow.fmeSettings.lblLX = ttk.Label(grphWindow.fmeSettings, text="X Label:")
+		grphWindow.fmeSettings.lblLX.grid(column=0, row=row, sticky="nsew")
+
+		grphWindow.settings["LabelX"] = tk.StringVar()
+		grphWindow.fmeSettings.inpLX = ttk.Entry(grphWindow.fmeSettings, textvariable=grphWindow.settings["LabelX"])
+		if 'label_x' in settings and len(settings['label_x']) > 1:
+			self.base.debugmsg(5, "label_x:", settings['label_x'])
+			grphWindow.settings["LabelX"].set(settings['label_x'])
+			self.base.debugmsg(5, "LabelX:", grphWindow.settings["LabelX"].get())
+		grphWindow.fmeSettings.inpLX.grid(column=1, row=row, sticky="nsew")
+
+		grphWindow.axis.set_xlabel(grphWindow.settings["LabelX"].get())
+
+		row += 1
+		grphWindow.fmeSettings.lblLY = ttk.Label(grphWindow.fmeSettings, text="Y Label:")
+		grphWindow.fmeSettings.lblLY.grid(column=0, row=row, sticky="nsew")
+
+		grphWindow.settings["LabelY"] = tk.StringVar()
+		grphWindow.fmeSettings.inpLY = ttk.Entry(grphWindow.fmeSettings, textvariable=grphWindow.settings["LabelY"])
+		if 'label_y' in settings and len(settings['label_y']) > 1:
+			self.base.debugmsg(5, "label_y:", settings['label_y'])
+			grphWindow.settings["LabelY"].set(settings['label_y'])
+			self.base.debugmsg(5, "LabelY:", grphWindow.settings["LabelY"].get())
+		grphWindow.fmeSettings.inpLY.grid(column=1, row=row, sticky="nsew")
+
+		grphWindow.axis.set_ylabel(grphWindow.settings["LabelY"].get())
+
 		# other settings? Metric Type, Primary metric, Secondary metric, filter?
 		row += 1
 		grphWindow.fmeSettings.lblDT = ttk.Label(grphWindow.fmeSettings, text="Data Type:")
 		grphWindow.fmeSettings.lblDT.grid(column=0, row=row, sticky="nsew")
 
 		DataTypes = [None, "Metric", "Result"]
-		grphWindow.settings = {}
 		grphWindow.settings["DataType"] = tk.StringVar()
 		grphWindow.fmeSettings.omDT = ttk.OptionMenu(grphWindow.fmeSettings, grphWindow.settings["DataType"], command=lambda *args: self.gs_switchdt(grphWindow), *DataTypes)
 		# grphsettings: {'name': 'Agent Load', 'show_settings': False, 'data_type': 'Metric', 'metric_type': 'Agent', 'primary_metric': '', 'secondary_metric': 'Load'}
@@ -1350,6 +1379,9 @@ class RFSwarmGUItk(tk.Frame):
 		settings["show_settings"] = grphWindow.fmeSettings.show
 		settings["show_legend"] = grphWindow.showlegend.get()
 
+		settings["label_x"] = grphWindow.settings["LabelX"].get()
+		settings["label_y"] = grphWindow.settings["LabelY"].get()
+
 		settings["data_type"] = grphWindow.settings["DataType"].get()
 		if settings["data_type"] == "Metric":
 			settings["metric_type"] = grphWindow.settings["MType"].get()
@@ -1643,6 +1675,12 @@ class RFSwarmGUItk(tk.Frame):
 						# grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),&nbsp; shadow=True, ncol=2)
 						grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
 
+					# and also update axis labels
+					self.base.debugmsg(5, "LabelX:", grphWindow.settings["LabelX"].get())
+					grphWindow.axis.set_xlabel(grphWindow.settings["LabelX"].get())
+					self.base.debugmsg(5, "LabelY:", grphWindow.settings["LabelY"].get())
+					grphWindow.axis.set_ylabel(grphWindow.settings["LabelY"].get())
+
 					grphWindow.fig.set_tight_layout(True)
 					grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
 					try:
@@ -1787,6 +1825,12 @@ class RFSwarmGUItk(tk.Frame):
 						# grphWindow.axis.legend()
 						# grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),&nbsp; shadow=True, ncol=2)
 						grphWindow.axis.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
+
+					# and also update axis labels
+					self.base.debugmsg(5, "LabelX:", grphWindow.settings["LabelX"].get())
+					grphWindow.axis.set_xlabel(grphWindow.settings["LabelX"].get())
+					self.base.debugmsg(5, "LabelY:", grphWindow.settings["LabelY"].get())
+					grphWindow.axis.set_ylabel(grphWindow.settings["LabelY"].get())
 
 					grphWindow.fig.set_tight_layout(True)
 					grphWindow.fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
