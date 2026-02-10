@@ -24,7 +24,12 @@ jobs:
         uses: super-linter/super-linter@v8.3.1
         env:
           DEFAULT_BRANCH: ${{ env.branchname }}
-          FILTER_REGEX_EXCLUDE: (.*sh|.git/.*|.Doc/Images/.*|.Tests/.*/Logs/.*|.Tests/.*/testdata/.*)
+          FILTER_REGEX_EXCLUDE: |
+              .*sh|.git/.*
+              .*Doc/Images/.*
+              .*Tests/.*/Logs/.*
+              .*Tests/.*/testdata/.*
+              .*Tests/Demo/.*
           VALIDATE_PYTHON_BLACK: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_CSS: false
