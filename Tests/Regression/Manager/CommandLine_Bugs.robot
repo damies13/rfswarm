@@ -3,7 +3,6 @@ Test Tags       Bugs 	CommandLine
 
 Resource 	resources/CommandLine_Manager.resource
 Resource 	../../Common/RFS_code.resource
-Resource 	../../Common/Database.resource
 
 Suite Setup 	Common.Basic Suite Initialization Manager
 
@@ -538,3 +537,12 @@ Check if exception is generated when a file is removed
 	...    Stop Manager CLI	AND
 	...    Check Logs 	Manager 	AND
 	...    Check Logs 	Agent
+
+Verify Data in Database From Runned Tests With Different Log Levels
+	[Template] 	Verify Data in Database From Runned Test With ${log_level} Log Level
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #216
+	ERROR
+	WARN
+	INFO
+	DEBUG
+	TRACE
