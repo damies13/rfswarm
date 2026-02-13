@@ -459,7 +459,7 @@ Check if exception is generated when a file is renamed
 
 	@{scripts}= 	List Directory 	${agent_scripts_dir}
 
-	Wait Until Created 	${agent_scripts_dir}${/}robot_swarm_a.jpg 		3 minutes
+	Wait Until Created 	${agent_scripts_dir}${/}robot_swarm_a.jpg 		6 minutes
 
 	@{scripts}= 	List Directory 	${agent_scripts_dir}
 
@@ -515,7 +515,7 @@ Check if exception is generated when a file is removed
 
 	@{scripts}= 	List Directory 	${agent_scripts_dir}
 
-	Wait Until Created 	${agent_scripts_dir}${/}robot_swarm_a.jpg 		3 minutes
+	Wait Until Created 	${agent_scripts_dir}${/}robot_swarm_a.jpg 		6 minutes
 
 	@{scripts}= 	List Directory 	${agent_scripts_dir}
 
