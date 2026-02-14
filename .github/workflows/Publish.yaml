@@ -82,6 +82,10 @@ jobs:
         if: ${{ env.dopublish == 1 && matrix.platform != 'windows-latest' }}
         run: |
           ls -la dist
+      - name: Show Dist UM - no publish
+        if: ${{ env.dopublish == 0 && matrix.platform != 'windows-latest' }}
+        run: |
+          ls -la dist
       - name: Show Dist W
         if: ${{ env.dopublish == 1 && matrix.platform == 'windows-latest' }}
         run: |
@@ -99,14 +103,24 @@ jobs:
       #
       # workflow_call is classified as a reusable workflow, sees this will not work
       #
-      # - name: Publish package to TestPyPI
-      #   uses: pypa/gh-action-pypi-publish@release/v1
-      #   with:
-      #       password: ${{ secrets.TEST_PYPI_TOKEN }}
-      #       repository-url: https://test.pypi.org/legacy/
-      #
+      - name: Publish package to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+            password: ${{ secrets.TEST_PYPI_TOKEN }}
+            repository-url: https://test.pypi.org/legacy/
+
       # - name: Do Publish
       #   if: ${{ env.dopublish == 1 }}
       #   uses: pypa/gh-action-pypi-publish@release/v1
       #   with:
       #       password: ${{ secrets.PYPI_TOKEN }}
+
+      # if: ${{ env.dopublish == 1 }}
+      # python3 -m twine upload -u __token__ -p <token string> --verbose dist/rfswarm*
+
+      # if: ${{ env.dopublish == 0 }}
+      # twine upload --repository testpypi dist/*
+
+
+      # publish with poetry:
+      #     https://stackoverflow.com/questions/68882603/using-python-poetry-to-publish-to-test-pypi-org
