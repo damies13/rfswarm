@@ -119,9 +119,9 @@ jobs:
         if: ${{ env.ismilestone == 1 }}
         run: |
           numver=$(echo "$milestone" | sed -E 's/v([^-]*)/\1/')
+          echo "relnumver=$numver" >> "$GITHUB_ENV"
           numver=$numver.dev$datestr
           echo "numver=$numver" >> "$GITHUB_ENV"
-          echo "relnumver=$numver" >> "$GITHUB_ENV"
           version=v$numver
           echo "version=$version" >> "$GITHUB_ENV"
 
