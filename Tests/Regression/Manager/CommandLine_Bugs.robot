@@ -478,7 +478,7 @@ Check if exception is generated when a file is renamed
 	Check Logs 	Agent
 
 	[Teardown]	Run Keywords
-	...    	Move File 	${testfolder}${/}robot_swarm_b.jpg 		${testfolder}${/}robot_swarm_a.jpg 	AND
+	...    Move File 	${testfolder}${/}robot_swarm_b.jpg 		${testfolder}${/}robot_swarm_a.jpg 	AND
 	...    Stop Agent CLI 	AND
 	...    Stop Manager CLI 	AND
 	...    Check Logs 	Manager 	AND
@@ -506,7 +506,7 @@ Check if exception is generated when a file is removed
 	# Show Log    ${manageriniile}
 	@{sourcefolder}= 	List Directory 	${testfolder}
 
-
+	Run Agent CLI	@{agent_options}
 	Run Manager CLI	@{mngr_options}
 
 	# give agent time to create scripts dir
