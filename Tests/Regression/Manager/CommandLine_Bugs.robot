@@ -537,8 +537,8 @@ Check if exception is generated when a file is removed
 	...    Check Logs 	Manager 	AND
 	...    Check Logs 	Agent
 
-Verify Data in Database From Runned Tests With Different Log Levels
-	[Template] 	Verify Data in Database From Runned Test With ${log_level} Log Level
+Verify Data in Database From Test Results With Different Log Levels
+	[Template] 	Verify Data in Database From Test Results With ${log_level} Log Level
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #216
 	ERROR
 	WARN
