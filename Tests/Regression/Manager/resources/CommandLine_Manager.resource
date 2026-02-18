@@ -79,7 +79,7 @@ Create Testdata Manager INI
 	Append To File 	${inifile} 	bindport = 8138\n
 	Append To File 	${inifile} 	\n
 
-Verify Data in Database From Runned Test With ${log_level} Log Level
+Verify Data in Database From Test Results With ${log_level} Log Level
 	[Documentation] 	Keyword for "Verify Data in Database From Runned Tests With Different Log Levels" Test Case.
 	${testfolder}= 	Normalize Path 	${CURDIR}${/}..${/}testdata${/}Issue-#216
 	VAR 	${scenariofile} 	${testfolder}${/}${log_level}_scenario.rfs
