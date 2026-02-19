@@ -120,7 +120,8 @@ jobs:
         run: |
           numver=$(echo "$milestone" | sed -E 's/v([^-]*)/\1/')
           echo "relnumver=$numver" >> "$GITHUB_ENV"
-          numver=$numver.dev$datestr
+          # numver=$numver.dev$datestr
+          numver=$numver
           echo "numver=$numver" >> "$GITHUB_ENV"
           version=v$numver
           echo "version=$version" >> "$GITHUB_ENV"
@@ -139,7 +140,8 @@ jobs:
             numver=${numverparts[0]}.0.1
           fi
           echo "relnumver=$numver" >> "$GITHUB_ENV"
-          numver=$numver.dev$datestr
+          # numver=$numver.dev$datestr
+          numver=$numver
           echo "numver=$numver" >> "$GITHUB_ENV"
           version=v$numver
           echo "version=$version" >> "$GITHUB_ENV"
@@ -155,6 +157,7 @@ jobs:
           milestonesresp = requests.get('https://api.github.com/repos/damies13/rfswarm/milestones')
           milestones = milestonesresp.json()
           milestonedone = 0
+          devstatus = "dev"
           print('milestones:', milestones)
           for milestone in milestones:
             print('milestone:', milestone)
@@ -168,17 +171,24 @@ jobs:
               print('open', open_issues, 'closed', closed_issues, 'total', total_issues)
               pct = (closed_issues/total_issues) * 100
               print(pct, "%")
+              if pct > 50:
+                devstatus = "a"
+              if pct > 80:
+                devstatus = "b"
+              if pct > 95:
+                devstatus = "rc"
               if pct == 100:
                 milestonedone = 1
           print('milestonedone', milestonedone)
           env_file = os.getenv('GITHUB_ENV')
           with open(env_file, "a") as myfile:
             myfile.write("milestonedone={}\n".format(milestonedone))
+            myfile.write("devstatus={}\n".format(devstatus))
 
       - name: Add dev build number
         if: ${{ env.relnumver == env.numver && env.milestonedone == 0}}
         run: |
-          numver=$numver.dev$datestr
+          numver=$numver.$devstatus$datestr
           echo "numver=$numver" >> "$GITHUB_ENV"
           version=v$numver
           echo "version=$version" >> "$GITHUB_ENV"
@@ -209,11 +219,23 @@ jobs:
             # echo "version variable : $file"
             sed -i -e "s/version = \"[^\"]*\"/version = \"${numver}\"/" "$file"
             if [ "$milestonedone" -eq "0" ]; then
+                $fulldevstatus = "Development Status :: 2 - Pre-Alpha"
+                if [ "$devstatus" -eq "dev" ]; then
+                    $fulldevstatus = "Development Status :: 2 - Pre-Alpha"
+                if [ "$devstatus" -eq "a" ]; then
+                    $fulldevstatus = "Development Status :: 3 - Alpha"
+                if [ "$devstatus" -eq "b" ]; then
+                    $fulldevstatus = "Development Status :: 4 - Beta"
+                if [ "$devstatus" -eq "c" ]; then
+                    $fulldevstatus = "Development Status :: 4 - Beta"
+                if [ "$devstatus" -eq "rc" ]; then
+                    $fulldevstatus = "Development Status :: 4 - Beta"
+
                 # replace:
                 #     "Development Status :: 5 - Production/Stable",
                 # with
                 # Development Status :: 3 - Alpha
-                sed -i -e "s/Development Status :: 5 - Production\/Stable/Development Status :: 3 - Alpha/" "$file"
+                sed -i -e "s/Development Status :: 5 - Production\/Stable/$fulldevstatus/" "$file"
             fi
             # echo "version comment : $file"
           done
