@@ -179,6 +179,9 @@ class RFSwarmAgent():
 
 		self.xmlmode = self.str2bool(self.config['Agent']['xmlmode'])
 		if self.args.xmlmode:
+			self.debugmsg(0, "Warning! RFSwarm Agent is running with XML mode enabled")
+			self.debugmsg(0, "This feature will soon be deprecated due to changes related to output.xml file in Robot Framework 7.0")
+			self.debugmsg(0, "Future versions of Robot framework are expected to completely abandon legacy XML output file format")
 			self.debugmsg(6, "self.args.xmlmode: ", self.args.xmlmode)
 			self.xmlmode = self.str2bool(self.args.xmlmode)
 
