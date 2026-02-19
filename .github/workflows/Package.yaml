@@ -183,6 +183,7 @@ jobs:
           env_file = os.getenv('GITHUB_ENV')
           with open(env_file, "a") as myfile:
             myfile.write("milestonedone={}\n".format(milestonedone))
+            myfile.write("milestonepct={}\n".format(pct))
             myfile.write("devstatus={}\n".format(devstatus))
 
       - name: Add dev build number
@@ -222,15 +223,19 @@ jobs:
                 $fulldevstatus = "Development Status :: 2 - Pre-Alpha"
                 if [ "$devstatus" -eq "dev" ]; then
                     $fulldevstatus = "Development Status :: 2 - Pre-Alpha"
+                fi
                 if [ "$devstatus" -eq "a" ]; then
                     $fulldevstatus = "Development Status :: 3 - Alpha"
+                fi
                 if [ "$devstatus" -eq "b" ]; then
                     $fulldevstatus = "Development Status :: 4 - Beta"
+                fi
                 if [ "$devstatus" -eq "c" ]; then
                     $fulldevstatus = "Development Status :: 4 - Beta"
+                fi
                 if [ "$devstatus" -eq "rc" ]; then
                     $fulldevstatus = "Development Status :: 4 - Beta"
-
+                fi
                 # replace:
                 #     "Development Status :: 5 - Production/Stable",
                 # with
