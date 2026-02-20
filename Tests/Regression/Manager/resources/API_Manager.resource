@@ -38,9 +38,13 @@ Send ${type} Request To the Manager
 Update Agent Status
 	[Arguments] 	${agent_name}=myagent  ${status}=Ready  ${Agent_IP}=${None}
 	...    ${Robots}=${0}  ${CPU}=${4.7}  ${MEM}=${30.97}  ${NET}=${0.01}
-	IF  ${Agent_IP} == ${None}
+	WHILE  ${Agent_IP} == ${None}  limit=3
 		${ipv4} 	${ipv6}= 	Get Ip Addresses
-		VAR 	@{Agent_IP} 	${ipv4}[0]  ${ipv6}[0]
+		TRY
+			VAR 	@{Agent_IP} 	${ipv4}[0]  ${ipv6}[0]
+		EXCEPT
+			Sleep 	3s
+		END
 	END
 	VAR 	&{request_body} 	AgentName=${agent_name}  Status=${status}  AgentIPs=${Agent_IP}
 	...    Robots=${Robots}  CPU%=${CPU}  MEM%=${MEM}  NET%=${NET}

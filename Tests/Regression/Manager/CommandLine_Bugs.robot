@@ -3,7 +3,6 @@ Test Tags       Bugs 	CommandLine
 
 Resource 	resources/CommandLine_Manager.resource
 Resource 	../../Common/RFS_code.resource
-Resource 	../../Common/Database.resource
 
 Suite Setup 	Common.Basic Suite Initialization Manager
 
@@ -12,6 +11,24 @@ Suite Setup 	Common.Basic Suite Initialization Manager
 ${scenario_name}=	test_scenario
 
 *** Test Cases ***
+Check If The Not Buildin Modules Are Included In The Manager Setup File
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123
+	${imports}	Get Modules From Program .py File That Are Not BuildIn
+	...    ${CURDIR}..${/}..${/}..${/}..${/}rfswarm_manager${/}rfswarm.py
+
+	Log	${imports}
+
+	${requires}	Get Install Requires From Setup File
+	...    ${CURDIR}..${/}..${/}..${/}..${/}setup-manager.py
+
+	Log	${requires}
+
+	FOR  ${i}  IN  @{imports}
+		Run Keyword And Continue On Failure
+		...    Should Contain	${requires}	${i}
+		...    msg="Some modules are not in Manager setup file"
+	END
+
 Next Day For Scheduled Start Is In the Next Month
 	[Tags]	ubuntu-latest		macos-latest 	Issue #328
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
@@ -79,23 +96,9 @@ Robot files with same name but different folders
 	Should Contain 	${result} 	${{ ('Folder A Log Variables AAA',) }}
 	Should Contain 	${result} 	${{ ('Folder B Log Variables BBB',) }}
 
-Check If The Not Buildin Modules Are Included In The Manager Setup File
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #123
-	${imports}	Get Modules From Program .py File That Are Not BuildIn
-	...    ${CURDIR}..${/}..${/}..${/}..${/}rfswarm_manager${/}rfswarm.py
-
-	Log	${imports}
-
-	${requires}	Get Install Requires From Setup File
-	...    ${CURDIR}..${/}..${/}..${/}..${/}setup-manager.py
-
-	Log	${requires}
-
-	FOR  ${i}  IN  @{imports}
-		Run Keyword And Continue On Failure
-		...    Should Contain	${requires}	${i}
-		...    msg="Some modules are not in Manager setup file"
-	END
+	[Teardown]	Run Keywords
+	...    Stop Agent CLI	AND
+	...    Stop Manager CLI
 
 Circular Reference Resource Files
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #261
@@ -268,7 +271,7 @@ Lots Of Resource Files
 
 	Should Not Contain 	${stdout_manager} 		OSError: [Errno 24] Too many open files
 	Should Not Contain 	${stderr_manager} 		OSError: [Errno 24] Too many open files
-	Should Not Contain 	${stdout_manager}			OSError
+	Should Not Contain 	${stdout_manager} 		OSError
 	Should Not Contain 	${stderr_manager} 		OSError
 	Should Not Contain 	${stdout_manager} 		Errno 24
 	Should Not Contain 	${stderr_manager} 		Errno 24
@@ -323,23 +326,26 @@ Check That the Manager Supports the Missing Scenario File Provided By the -s Arg
 
 	Check Logs 	Manager
 
-	# windows does not work with reading logs.
 	Should Contain 	${stdout_manager} 	Scenario file Not found:
 
-	[Teardown]	Stop Manager CLI
+	[Teardown]	Run Keywords
+	...    Stop Manager CLI 	AND
+	...    Run Keyword And Ignore Error 	Change = ${scenatio_file} With = new_dir In ${inifile}
 
 Verify If Manager Runs With Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 	[Setup] 	Set Global Filename And Default Save Path 	${robot_data}[0]
 
-	${passed} = 	Run Keyword And Return Status 	File Should Exist 	${global_path}${/}RFSwarmManager.ini
-	IF 	${passed}
+	VAR 	@{mngr_options}= 	-n
+
+	${ini_exist} = 	Run Keyword And Return Status
+	...    File Should Exist 	${global_path}${/}RFSwarmManager.ini
+	IF 	${ini_exist}
 		Show Log 	${global_path}${/}RFSwarmManager.ini
 		Remove File 	${global_path}${/}RFSwarmManager.ini
 		File Should Not Exist 	${global_path}${/}RFSwarmManager.ini
 	END
 
-	@{mngr_options}= 	Create List 	-n
 	Run Manager CLI 	@{mngr_options}
 	${running}= 	Is Process Running		${PROCESS_MANAGER}
 	IF 	not ${running}
@@ -347,13 +353,12 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 	END
 	Wait Until Created  	${global_path}${/}RFSwarmManager.ini
 	Sleep    1
-	${result} = 	Terminate Process		${PROCESS_MANAGER}
+	Stop Manager CLI
 	${running}= 	Is Process Running		${PROCESS_MANAGER}
 	IF 	${running}
 		Fail	msg=Manager did not close!
 	END
-	Show Log 	${result.stdout_path}
-	Show Log 	${result.stderr_path}
+	Check Logs 	Manager
 
  	File Should Exist	${global_path}${/}RFSwarmManager.ini
 	Show Log 	${global_path}${/}RFSwarmManager.ini
@@ -365,8 +370,8 @@ Verify If Manager Runs With Existing INI File From Current Version NO GUI
 	IF 	not ${running}
 		Fail	msg=Manager is not running!
 	END
-	Sleep    0.5
-	${result} = 	Terminate Process		${PROCESS_MANAGER}
+	Sleep    1
+	Stop Manager CLI
 	${running}= 	Is Process Running		${PROCESS_MANAGER}
 	IF 	${running}
 		Fail	msg=Manager did not close!
@@ -378,25 +383,23 @@ Verify If Manager Runs With No Existing INI File From Current Version NO GUI
 	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #49
 	[Setup] 	Set Global Filename And Default Save Path 	${robot_data}[0]
 
+	VAR 	@{mngr_options}= 	-n
+
 	Remove File		${global_path}${/}RFSwarmManager.ini
 	File Should Not Exist	${global_path}${/}RFSwarmManager.ini
 	Log To Console	Running Manager with no existing ini file.
 
-	@{mngr_options}= 	Create List 	-n
 	Run Manager CLI 	@{mngr_options}
 	${running}= 	Is Process Running		${PROCESS_MANAGER}
-	Run Manager CLI 	@{mngr_options}
-	${running}= 	Is Process Running		${process_manager}
 	IF 	not ${running}
 		Fail	msg=Manager is not running!
 	END
-	${result} = 	Terminate Process		${PROCESS_MANAGER}
+	Stop Manager CLI
 	${running}= 	Is Process Running		${PROCESS_MANAGER}
 	IF 	${running}
 		Fail	msg=Manager did not close!
 	END
-	Show Log 	${result.stdout_path}
-	Show Log 	${result.stderr_path}
+	Check Logs 	Manager
 
 	[Teardown] 	Stop Manager CLI
 
@@ -417,15 +420,12 @@ Verify If Manager Runs With Existing INI File From Previous Version NO GUI
 	IF 	not ${running}
 		Fail	msg=Manager is not running!
 	END
-	${result} = 	Terminate Process		${PROCESS_MANAGER}
+	Stop Manager CLI
 	${running}= 	Is Process Running		${PROCESS_MANAGER}
 	IF 	${running}
 		Fail	msg=Manager did not close!
 	END
-	Log 	${result.stdout}
-	Log 	${result.stderr}
-	Show Log 	${result.stdout_path}
-	Show Log 	${result.stderr_path}
+	Check Logs 	Manager
 
 	[Teardown] 	Stop Manager CLI
 
@@ -445,22 +445,21 @@ Check if exception is generated when a file is renamed
 	Log    manageriniile: ${manageriniile}
 
 
-	VAR 	@{mngr_options} 	-g 	3 	-n 	-a 	2 	-s 	${scenariofile} 	-i 	${manageriniile}
 	VAR		@{agent_options} 	-g 	3 	--agentdir 	${agent_dir}
+	VAR 	@{mngr_options} 	-g 	3 	-n 	-a 	2 	-s 	${scenariofile} 	-i 	${manageriniile}
 
 	# Configuration File:  /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/rfswarm_manager/RFSwarmManager.ini
 	# Show Log    ${manageriniile}
 	@{sourcefolder}= 	List Directory 	${testfolder}
 
-	Run Manager CLI	@{mngr_options}
 	Run Agent CLI	@{agent_options}
+	Run Manager CLI	@{mngr_options}
 
 	# give agent time to create scripts dir
 	Sleep    1s
-
 	@{scripts}= 	List Directory 	${agent_scripts_dir}
 
-	Wait Until Created 	${agent_scripts_dir}${/}robot_swarm_a.jpg 		3 minutes
+	Wait Until Created 	${agent_scripts_dir}${/}robot_swarm_a.jpg 	3 minutes
 
 	@{scripts}= 	List Directory 	${agent_scripts_dir}
 
@@ -479,7 +478,7 @@ Check if exception is generated when a file is renamed
 	Check Logs 	Agent
 
 	[Teardown]	Run Keywords
-	...    	Move File 	${testfolder}${/}robot_swarm_b.jpg 		${testfolder}${/}robot_swarm_a.jpg 	AND
+	...    Move File 	${testfolder}${/}robot_swarm_b.jpg 		${testfolder}${/}robot_swarm_a.jpg 	AND
 	...    Stop Agent CLI 	AND
 	...    Stop Manager CLI 	AND
 	...    Check Logs 	Manager 	AND
@@ -500,23 +499,22 @@ Check if exception is generated when a file is removed
 	VAR 	${manageriniile} 	${testfolder}${/}RFSwarmManager.ini
 	Log    manageriniile: ${manageriniile}
 
-
-	VAR 	@{mngr_options} 	-n 	-a 	2 	-s 	${scenariofile} 	-i 	${manageriniile}
 	VAR		@{agent_options} 	-g 	3 	--agentdir 	${agent_dir}
+	VAR 	@{mngr_options} 	-n 	-a 	2 	-s 	${scenariofile} 	-i 	${manageriniile}
 
 	# Configuration File:  /opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/rfswarm_manager/RFSwarmManager.ini
 	# Show Log    ${manageriniile}
 	@{sourcefolder}= 	List Directory 	${testfolder}
 
-	Run Manager CLI	@{mngr_options}
 	Run Agent CLI	@{agent_options}
+	Run Manager CLI	@{mngr_options}
 
 	# give agent time to create scripts dir
 	Sleep    1s
 
 	@{scripts}= 	List Directory 	${agent_scripts_dir}
 
-	Wait Until Created 	${agent_scripts_dir}${/}robot_swarm_a.jpg 		3 minutes
+	Wait Until Created 	${agent_scripts_dir}${/}robot_swarm_a.jpg 	3 minutes
 
 	@{scripts}= 	List Directory 	${agent_scripts_dir}
 
@@ -538,3 +536,12 @@ Check if exception is generated when a file is removed
 	...    Stop Manager CLI	AND
 	...    Check Logs 	Manager 	AND
 	...    Check Logs 	Agent
+
+Verify Data in Database From Test Results With Different Log Levels
+	[Template] 	Verify Data in Database From Test Results With ${log_level} Log Level
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #216
+	ERROR
+	WARN
+	INFO
+	DEBUG
+	TRACE

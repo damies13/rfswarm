@@ -60,7 +60,7 @@ jobs:
           echo branchname: ${{ env.branchname }}
           echo isrelease: ${{ env.isrelease }}
       - name: Apt Update
-        if: ${{ env.dopublish == 1 }}
+        # if: ${{ env.dopublish == 1 }}
         run: |
           sudo apt update -y
       - name: Setup Python
@@ -69,24 +69,22 @@ jobs:
         with:
           python-version: 3.x
       - name: PIP Install
-        if: ${{ env.dopublish == 1 }}
+        # if: ${{ env.dopublish == 1 }}
         run: pip install --upgrade build setuptools twine wheel
       - name: Download packages to dist
-        if: ${{ env.dopublish == 1 }}
+        # if: ${{ env.dopublish == 1 }}
         uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist
       - name: Show Dist UM
-        if: ${{ env.isrelease == 1 && matrix.platform != 'windows-latest' }}
-        run: |
-          ls -la dist
-      - name: Show Dist UM - no publish
-        if: ${{ env.isrelease == 0 && matrix.platform != 'windows-latest' }}
+        # if: ${{ env.dopublish == 1 && matrix.platform != 'windows-latest' }}
+        if: ${{ matrix.platform != 'windows-latest' }}
         run: |
           ls -la dist
       - name: Show Dist W
-        if: ${{ env.isrelease == 1 && matrix.platform == 'windows-latest' }}
+        # if: ${{ env.dopublish == 1 && matrix.platform == 'windows-latest' }}
+        if: ${{ matrix.platform == 'windows-latest' }}
         run: |
           dir dist
 

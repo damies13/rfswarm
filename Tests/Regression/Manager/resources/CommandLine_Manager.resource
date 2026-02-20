@@ -6,6 +6,7 @@ Resource 	../../../Common/Directories_and_Files.resource
 Resource 	../../../Common/Logs.resource
 Resource 	../../../Common/INI_PIP_Data.resource
 Resource 	../../../Common/RFS_Components.resource
+Resource 	../../../Common/Database.resource
 
 
 *** Variables ***
@@ -77,3 +78,31 @@ Create Testdata Manager INI
 	Append To File 	${inifile} 	bindip = \n
 	Append To File 	${inifile} 	bindport = 8138\n
 	Append To File 	${inifile} 	\n
+
+Verify Data in Database From Test Results With ${log_level} Log Level
+	[Documentation] 	Keyword for "Verify Data in Database From Runned Tests With Different Log Levels" Test Case.
+	${testfolder}= 	Normalize Path 	${CURDIR}${/}..${/}testdata${/}Issue-#216
+	VAR 	${scenariofile} 	${testfolder}${/}${log_level}_scenario.rfs
+	VAR 	@{mngr_options} 	-n  -s  ${scenariofile}  -d  ${RESULTS_DIR}
+
+	Run Agent CLI
+	Run Manager CLI 	@{mngr_options}
+	Wait For Manager Process
+
+	${dbfile}= 	Find Result DB 	result_pattern=*_${log_level}_*
+	${result}= 	Query Result DB 	${dbfile} 	Select * from Summary;
+	Log 	${result}
+	Should Be True 	len(${result[0]}) > 0
+	Should Be Equal 	${result[0][0]} 	This is a ${log_level} keyword.
+
+	@{run_result_dirs}= 	List Directories In Directory 	${RESULTS_DIR} 	pattern=*_${log_level}_* 	absolute=${True}
+	@{logs_dir}= 	List Directories In Directory 	${run_result_dirs}[-1] 	absolute=${True}
+	@{run_logs}= 	List Directories In Directory 	${logs_dir}[0]
+	${logs_num}= 	Get Length 	${run_logs}
+	Should Be True 	${logs_num} > 0
+
+	[Teardown]	Run Keywords
+	...    Stop Agent CLI 		AND
+	...    Stop Manager CLI 	AND
+	...    Check Logs 	Manager 	AND
+	...    Check Logs 	Agent
