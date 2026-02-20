@@ -171,7 +171,7 @@ jobs:
               total_issues = open_issues + closed_issues
               print('open', open_issues, 'closed', closed_issues, 'total', total_issues)
               pct = (closed_issues/total_issues) * 100
-              print(pct, "%")
+              print('milestone pct:', pct, "%")
               if pct > 50:
                 devstatus = "a"
               if pct > 80:
@@ -221,21 +221,21 @@ jobs:
             # echo "version variable : $file"
             sed -i -e "s/version = \"[^\"]*\"/version = \"${numver}\"/" "$file"
             if [ "$milestonedone" -eq "0" ]; then
-                $fulldevstatus = "Development Status :: 2 - Pre-Alpha"
+                fulldevstatus = "Development Status :: 2 - Pre-Alpha"
                 if [ "$devstatus" -eq "dev" ]; then
-                    $fulldevstatus = "Development Status :: 2 - Pre-Alpha"
+                    fulldevstatus = "Development Status :: 2 - Pre-Alpha"
                 fi
                 if [ "$devstatus" -eq "a" ]; then
-                    $fulldevstatus = "Development Status :: 3 - Alpha"
+                    fulldevstatus = "Development Status :: 3 - Alpha"
                 fi
                 if [ "$devstatus" -eq "b" ]; then
-                    $fulldevstatus = "Development Status :: 4 - Beta"
+                    fulldevstatus = "Development Status :: 4 - Beta"
                 fi
                 if [ "$devstatus" -eq "c" ]; then
-                    $fulldevstatus = "Development Status :: 4 - Beta"
+                    fulldevstatus = "Development Status :: 4 - Beta"
                 fi
                 if [ "$devstatus" -eq "rc" ]; then
-                    $fulldevstatus = "Development Status :: 4 - Beta"
+                    fulldevstatus = "Development Status :: 4 - Beta"
                 fi
                 # replace:
                 #     "Development Status :: 5 - Production/Stable",
