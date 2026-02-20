@@ -157,13 +157,14 @@ jobs:
           milestonesresp = requests.get('https://api.github.com/repos/damies13/rfswarm/milestones')
           milestones = milestonesresp.json()
           milestonedone = 0
+          pct = 0
           devstatus = "dev"
           print('milestones:', milestones)
           for milestone in milestones:
-            print('milestone:', milestone)
+            print('milestone:', milestone, '    relnumver:', relnumver)
             ms = milestone
             print('title:', ms['title'])
-            if ms['title'] == relnumver:
+            if relnumver in ms['title']:
               print(ms)
               open_issues = ms['open_issues']
               closed_issues = ms['closed_issues']
