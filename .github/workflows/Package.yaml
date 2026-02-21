@@ -220,21 +220,23 @@ jobs:
           do
             # echo "version variable : $file"
             sed -i -e "s/version = \"[^\"]*\"/version = \"${numver}\"/" "$file"
+            # Compare intergers
             if [ "$milestonedone" -eq "0" ]; then
                 fulldevstatus="Development Status :: 2 - Pre-Alpha"
-                if [ "$devstatus" -eq "dev" ]; then
+                # Compare strings
+                if [ "$devstatus" == "dev" ]; then
                     fulldevstatus="Development Status :: 2 - Pre-Alpha"
                 fi
-                if [ "$devstatus" -eq "a" ]; then
+                if [ "$devstatus" == "a" ]; then
                     fulldevstatus="Development Status :: 3 - Alpha"
                 fi
-                if [ "$devstatus" -eq "b" ]; then
+                if [ "$devstatus" == "b" ]; then
                     fulldevstatus="Development Status :: 4 - Beta"
                 fi
-                if [ "$devstatus" -eq "c" ]; then
+                if [ "$devstatus" == "c" ]; then
                     fulldevstatus="Development Status :: 4 - Beta"
                 fi
-                if [ "$devstatus" -eq "rc" ]; then
+                if [ "$devstatus" == "rc" ]; then
                     fulldevstatus="Development Status :: 4 - Beta"
                 fi
                 # replace:
