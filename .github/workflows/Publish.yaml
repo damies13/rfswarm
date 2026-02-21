@@ -6,8 +6,8 @@ on: workflow_call
 jobs:
   Publish_PIP:
     runs-on: ubuntu-latest
-    # permissions:
-    #   id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+    permissions:
+      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -104,8 +104,6 @@ jobs:
       - name: Publish package to TestPyPI
         if: ${{ env.isrelease == 0 }}
         uses: pypa/gh-action-pypi-publish@release/v1
-        permissions:
-          id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
         with:
             repository-url: https://test.pypi.org/legacy/
             # password: ${{ secrets.TEST_PYPI_TOKEN }}
@@ -113,8 +111,6 @@ jobs:
       - name: Do Publish
         if: ${{ env.isrelease == 1 }}
         uses: pypa/gh-action-pypi-publish@release/v1
-        permissions:
-          id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing        
         # with:
         #     password: ${{ secrets.PYPI_TOKEN }}
 
