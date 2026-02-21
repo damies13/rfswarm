@@ -100,18 +100,23 @@ jobs:
       #
       # workflow_call is classified as a reusable workflow, sees this will not work
       #
+      # I don't think we need the tokens now as I have enabled the trusted publishing option on both pypi.org and test.pypi.org
       - name: Publish package to TestPyPI
         if: ${{ env.isrelease == 0 }}
         uses: pypa/gh-action-pypi-publish@release/v1
+        permissions:
+          id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
         with:
-            password: ${{ secrets.TEST_PYPI_TOKEN }}
             repository-url: https://test.pypi.org/legacy/
+            # password: ${{ secrets.TEST_PYPI_TOKEN }}
 
       - name: Do Publish
         if: ${{ env.isrelease == 1 }}
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-            password: ${{ secrets.PYPI_TOKEN }}
+        permissions:
+          id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing        
+        # with:
+        #     password: ${{ secrets.PYPI_TOKEN }}
 
       # if: ${{ env.dopublish == 1 }}
       # python3 -m twine upload -u __token__ -p <token string> --verbose dist/rfswarm*
