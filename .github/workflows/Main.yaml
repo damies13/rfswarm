@@ -44,6 +44,8 @@ jobs:
     - Regression_Tests_Agent
     - Regression_Tests_Manager
     - Regression_Tests_Reporter
+    permissions:
+      id-token: write
     uses: ./.github/workflows/Publish.yaml
     secrets: inherit
 
