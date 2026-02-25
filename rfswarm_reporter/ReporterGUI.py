@@ -4581,13 +4581,15 @@ class ReporterGUI(tk.Frame):
 		# if type(_event) is not type(""):
 		if not isinstance(_event, str):
 			# self.mnu_file_Close()	# ensure any previous scenario is closed and saved if required
-			ResultsFile = str(
-				tkf.askopenfilename(
-					initialdir=self.base.config['Reporter']['ResultDir'],
-					title="Select RFSwarm Results File",
-					filetypes=(("RFSwarm Results", "*.db"), ("all files", "*.*"))
-				)
+			filename = tkf.askopenfilename(
+				initialdir=self.base.config['Reporter']['ResultDir'],
+				title="Select RFSwarm Results File",
+				filetypes=(("RFSwarm Results", "*.db"), ("all files", "*.*"))
 			)
+			if filename:
+				ResultsFile = str(filename)
+			else:
+				ResultsFile = ""
 		else:
 			ResultsFile = _event
 

@@ -209,6 +209,9 @@ class RFSwarmAgent():
 			self.config['Agent']['properties'] = ""
 			self.saveini()
 
+		if not self.args.create:
+			self.check_icons("RFSwarm Agent")
+
 		self.findlibraries() 	# Need to wait for findlibraries() to finish before calling ensure_listner_file() for RF version check
 		self.ensure_listner_file()
 		self.ensure_repeater_listner_file()
@@ -319,12 +322,12 @@ class RFSwarmAgent():
 			desktopdata.append('Keywords=rfswarm;agent;\n')
 			# desktopdata.append('\n')
 
-			dektopfilename = os.path.join(fileprefix, "applications", projname + ".desktop")
-			dektopdir = os.path.dirname(dektopfilename)
-			self.ensuredir(dektopdir)
+			desktopfilename = os.path.join(fileprefix, "applications", projname + ".desktop")
+			desktopdir = os.path.dirname(desktopfilename)
+			self.ensuredir(desktopdir)
 
-			self.debugmsg(5, "dektopfilename:", dektopfilename)
-			with open(dektopfilename, 'w') as df:
+			self.debugmsg(5, "desktopfilename:", desktopfilename)
+			with open(desktopfilename, 'w') as df:
 				df.writelines(desktopdata)
 
 			self.debugmsg(5, "Copy icons")
@@ -506,6 +509,35 @@ class RFSwarmAgent():
 		# self.debugmsg(6, "cmd:", cmd)
 		# response = os.popen(cmd).read()
 		# self.debugmsg(6, "response:", response)
+
+	def check_icons(self, appname):
+		projname = "-".join(appname.split()).lower()
+		if platform.system() == 'Linux':
+			fileprefix = "~/.local/share"
+			if os.access("/usr/share", os.W_OK):
+				fileprefix = "/usr/share"
+			fileprefix = os.path.expanduser(fileprefix)
+			desktopfilename = os.path.join(fileprefix, "applications", projname + ".desktop")
+			if not os.path.exists(desktopfilename):
+				self.debugmsg(1, f"{appname} icon / shortcut is not installed. You can create it using the -c or --create flags.")
+
+		elif platform.system() == 'Darwin':
+			appspath = "~/Applications"
+			if os.access("/Applications", os.W_OK):
+				appspath = "/Applications"
+			appspath = os.path.expanduser(appspath)
+			apppath = os.path.join(appspath, appname + ".app")
+			ResourcesFolder = os.path.join(apppath, "Contents", "Resources")
+			iconset = os.path.join(ResourcesFolder, projname + ".iconset")
+			if not os.path.exists(iconset):
+				self.debugmsg(1, f"{appname} icon / shortcut is not installed. You can create it using the -c or --create flags.")
+
+		elif platform.system() == 'Windows':
+			roam_appdata = os.environ["APPDATA"]
+			scutpath = os.path.join(roam_appdata, "Microsoft", "Windows", "Start Menu", appname + ".lnk")
+			# directorydir = os.path.dirname(scutpath)
+			if not os.path.exists(scutpath):
+				self.debugmsg(1, f"{appname} icon / shortcut is not installed. You can create it using the -c or --create flags.")
 
 	def findiniloctaion(self):
 

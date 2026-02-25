@@ -223,6 +223,9 @@ class ReporterCore:
 				base.config['Reporter']['TemplateDir'] = ""
 				base.saveini()
 
+		if not base.args.create and not base.args.nogui:
+			self.check_icons("RFSwarm Reporter")
+
 		usetemplate = False
 		if base.args.template:
 			usetemplate = True
@@ -403,12 +406,12 @@ class ReporterCore:
 			desktopdata.append('Keywords=rfswarm;reporter;\n')
 			# desktopdata.append('\n')
 
-			dektopfilename = os.path.join(fileprefix, "applications", projname + ".desktop")
-			dektopdir = os.path.dirname(dektopfilename)
-			base.ensuredir(dektopdir)
+			desktopfilename = os.path.join(fileprefix, "applications", projname + ".desktop")
+			desktopdir = os.path.dirname(desktopfilename)
+			base.ensuredir(desktopdir)
 
-			base.debugmsg(5, "dektopfilename:", dektopfilename)
-			with open(dektopfilename, 'w') as df:
+			base.debugmsg(5, "desktopfilename:", desktopfilename)
+			with open(desktopfilename, 'w') as df:
 				df.writelines(desktopdata)
 
 			base.debugmsg(5, "Copy icons")
@@ -592,6 +595,35 @@ class ReporterCore:
 		# base.debugmsg(6, "cmd:", cmd)
 		# response = os.popen(cmd).read()
 		# base.debugmsg(6, "response:", response)
+
+	def check_icons(self, appname):
+		projname = "-".join(appname.split()).lower()
+		if platform.system() == 'Linux':
+			fileprefix = "~/.local/share"
+			if os.access("/usr/share", os.W_OK):
+				fileprefix = "/usr/share"
+			fileprefix = os.path.expanduser(fileprefix)
+			desktopfilename = os.path.join(fileprefix, "applications", projname + ".desktop")
+			if not os.path.exists(desktopfilename):
+				base.debugmsg(1, f"{appname} icon / shortcut is not installed. You can create it using the -c or --create flags.")
+
+		elif platform.system() == 'Darwin':
+			appspath = "~/Applications"
+			if os.access("/Applications", os.W_OK):
+				appspath = "/Applications"
+			appspath = os.path.expanduser(appspath)
+			apppath = os.path.join(appspath, appname + ".app")
+			ResourcesFolder = os.path.join(apppath, "Contents", "Resources")
+			iconset = os.path.join(ResourcesFolder, projname + ".iconset")
+			if not os.path.exists(iconset):
+				base.debugmsg(1, f"{appname} icon / shortcut is not installed. You can create it using the -c or --create flags.")
+
+		elif platform.system() == 'Windows':
+			roam_appdata = os.environ["APPDATA"]
+			scutpath = os.path.join(roam_appdata, "Microsoft", "Windows", "Start Menu", appname + ".lnk")
+			# directorydir = os.path.dirname(scutpath)
+			if not os.path.exists(scutpath):
+				base.debugmsg(1, f"{appname} icon / shortcut is not installed. You can create it using the -c or --create flags.")
 
 	def selectResults(self, resultsfile):
 		base.debugmsg(5, "resultsfile:", resultsfile)
