@@ -2684,6 +2684,18 @@ class RFSwarmGUItk(tk.Frame):
 					self.plan_scnro_chngd = True
 
 			# self.base.scriptdefaults["testrepeater"]
+			tt = setingsWindow.boolTT.get()
+			self.base.debugmsg(7, "tt:", tt)
+			# setingsWindow.testrepeatercurrent = setingsWindow.testrepeaterdefault
+			if tt != setingsWindow.includetesttimedefault:
+				self.base.scriptdefaults["includetesttime"] = str(tt)
+				self.plan_scnro_chngd = True
+			else:
+				if "includetesttime" in self.base.scriptdefaults:
+					del self.base.scriptdefaults["includetesttime"]
+					self.plan_scnro_chngd = True
+
+			# self.base.scriptdefaults["testrepeater"]
 			tr = setingsWindow.boolTR.get()
 			self.base.debugmsg(7, "tr:", tr)
 			# setingsWindow.testrepeatercurrent = setingsWindow.testrepeaterdefault
@@ -3753,6 +3765,15 @@ class RFSwarmGUItk(tk.Frame):
 			stgsWindow.robotoptionscurrent = self.base.scriptlist[r]["robotoptions"]
 		self.base.debugmsg(5, "robotoptionscurrent:", stgsWindow.robotoptionscurrent)
 
+		stgsWindow.includetesttimedefault = self.base.includetesttimedefault
+		if "includetesttime" in self.base.scriptdefaults:
+			stgsWindow.includetesttimedefault = self.base.str2bool(self.base.scriptdefaults["includetesttime"])
+
+		stgsWindow.includetesttimecurrent = stgsWindow.includetesttimedefault
+		if "includetesttime" in self.base.scriptlist[r]:
+			stgsWindow.includetesttimecurrent = self.base.str2bool(self.base.scriptlist[r]["includetesttime"])
+		self.base.debugmsg(5, "includetesttimecurrent:", stgsWindow.includetesttimecurrent)
+
 		stgsWindow.testrepeaterdefault = self.base.testrepeaterdefault
 		if "testrepeater" in self.base.scriptdefaults:
 			stgsWindow.testrepeaterdefault = self.base.str2bool(self.base.scriptdefaults["testrepeater"])
@@ -3857,6 +3878,20 @@ class RFSwarmGUItk(tk.Frame):
 		stgsWindow.inpRO.delete(0, 'end')
 		stgsWindow.inpRO.insert(0, stgsWindow.robotoptionscurrent)
 		stgsWindow.inpRO.grid(column=0, row=row, columnspan=10, sticky="nsew")
+
+		# includetesttime		stgsWindow.boolTT
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblTT = ttk.Label(stgsWindow, text="Include Test Time:")
+		stgsWindow.lblTT.grid(column=0, row=row, sticky="nsew")
+
+		stgsWindow.boolTT = tk.BooleanVar()
+		stgsWindow.boolTT.set(stgsWindow.includetesttimecurrent)
+		stgsWindow.inpTT = tk.Checkbutton(stgsWindow, variable=stgsWindow.boolTT, onvalue=True, offvalue=False)
+		stgsWindow.inpTT.grid(column=1, row=row, sticky="nsew")
 
 		row += 1
 		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
@@ -4012,6 +4047,17 @@ class RFSwarmGUItk(tk.Frame):
 			if "robotoptions" in self.base.scriptlist[r]:
 				del self.base.scriptlist[r]["robotoptions"]
 			self.plan_scnro_chngd = True
+
+		# includetesttime		stgsWindow.boolTT
+		tt = stgsWindow.boolTT.get()
+		self.base.debugmsg(7, "tt:", tt)
+		if tt != stgsWindow.includetesttimedefault:
+			self.base.scriptlist[r]["includetesttime"] = str(tt)
+			self.plan_scnro_chngd = True
+		else:
+			if "includetesttime" in self.base.scriptlist[r]:
+				del self.base.scriptlist[r]["includetesttime"]
+				self.plan_scnro_chngd = True
 
 		tr = stgsWindow.boolTR.get()
 		self.base.debugmsg(7, "tr:", tr)
