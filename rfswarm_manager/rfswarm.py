@@ -2146,6 +2146,13 @@ class RFSwarmCore:
 					if "robotoptions" in base.scriptdefaults:
 						base.robot_schedule["Agents"][nxtagent][grurid]["robotoptions"] = base.scriptdefaults["robotoptions"]
 
+				tt = base.includetesttimedefault
+				if "includetesttime" in base.scriptdefaults:
+					tt = base.scriptdefaults["includetesttime"]
+				if "includetesttime" in grp:
+					tt = grp["includetesttime"]
+				base.robot_schedule["Agents"][nxtagent][grurid]["includetesttime"] = str(tt)
+
 				tr = base.testrepeaterdefault
 				if "testrepeater" in base.scriptdefaults:
 					tr = base.scriptdefaults["testrepeater"]
@@ -2358,6 +2365,13 @@ class RFSwarmCore:
 										else:
 											if "robotoptions" in base.scriptdefaults:
 												base.robot_schedule["Agents"][nxtagent][grurid]["robotoptions"] = base.scriptdefaults["robotoptions"]
+
+										tt = base.includetesttimedefault
+										if "includetesttime" in base.scriptdefaults:
+											tt = base.scriptdefaults["includetesttime"]
+										if "includetesttime" in grp:
+											tt = grp["includetesttime"]
+										base.robot_schedule["Agents"][nxtagent][grurid]["includetesttime"] = str(tt)
 
 										tr = base.testrepeaterdefault
 										if "testrepeater" in base.scriptdefaults:
