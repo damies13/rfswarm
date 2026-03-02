@@ -7,6 +7,26 @@ Library 	RequestsLibrary
 Library 	hash_file.py
 
 *** Keywords ***
+Wait Until the Manager is listening
+	[Arguments] 	${managerurl}=http://localhost:8138 	${timeout}=${120}
+	Create Session 	Manager API  ${managerurl}
+	VAR 	${expected_status}= 	OK
+	TRY
+		WHILE    True 	limit=${timeout} seconds
+			TRY
+				${response}= 	Run Keyword 	${type} On Session
+				...    Manager API  ${url}
+				...    expected_status=${expected_status}
+			EXCEPT
+				Sleep 	500 ms
+				CONTINUE
+			END
+			BREAK
+		END
+	EXCEPT
+		Fail 		File '${filepath}' does not exist after ${timeout} seconds
+	END
+
 Send ${type} Request To the Manager
 	[Arguments] 	${url}=/  ${request}=${None}  ${expected_status}=OK  ${expected_result}=OK
 	Create Session 	Manager API  http://localhost:8138

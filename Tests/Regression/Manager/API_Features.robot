@@ -84,6 +84,7 @@ Update Agent Status in Manager
 	Sleep 	7s
 	${stdout}  ${stderr}= 	Find Log 	Manager
 	Wait Until the File Is Not Empty 	${stdout} 	timeout=30
+	Wait Until the Manager is listening
 
 	${resp_post}  ${request_body}= 	Update Agent Status 	agent_name=${POST_AgentStatus}[Body][AgentName]
 	&{resp_result}= 	Convert To Dictionary 	${resp_post.json()}
@@ -108,12 +109,12 @@ Update Agent Status in Manager
 
 		List Should Contain Sub List 	${query_result}[0] 	${expected_row_0}[:-1]
 		...    msg=The saved row in the PreRun database after POST request is invalid.
-		List Should Contain Value 	${expected_ips} 	${query_result}[0][-1] 	
+		List Should Contain Value 	${expected_ips} 	${query_result}[0][-1]
 		...    msg=The saved row in the PreRun database after POST request is invalid. (wrong ip)
 
 		List Should Contain Sub List 	${query_result}[1] 	${expected_row_1}[:-1]
 		...    msg=The saved row in the PreRun database after POST request is invalid.
-		List Should Contain Value 	${expected_ips} 	${query_result}[1][-1] 	
+		List Should Contain Value 	${expected_ips} 	${query_result}[1][-1]
 		...    msg=The saved row in the PreRun database after POST request is invalid. (wrong ip)
 	END
 	GROUP  Check Agent values are in Manager PreRun database. (AgentName, AgentStatus, AgentRobots, AgentCPU, AgentMEM, AgentNET)
@@ -789,7 +790,7 @@ Upload a File to the Manager
 	[Setup] 	Run Keywords
 	...    Set Test Variable 	${RESULTS_DIR}  ${CURDIR}${/}testdata${/}Issue-#289${/}results 	AND
 	...    Create Directory 	${RESULTS_DIR}
-	
+
 	VAR 	${basefolder} 	${CURDIR}${/}testdata${/}Issue-#289
 	VAR 	${scenario_dir} 	${CURDIR}${/}testdata${/}Issue-#289${/}POST_File_Issue-#289.rfs
 	Run Manager CLI  -n  -a  1  -d  ${RESULTS_DIR}  -s  ${scenario_dir}
@@ -972,7 +973,7 @@ Send Result Data to the Manager With Wrong ScriptIndex Field in Request
 	...    Emulating listener who make this call to the manager.
 	...
 	...    This is the part of the Manager's recovery system.
-	...    If the Manager crashes the Agent could send the missing result data to the Manager PreRun DB 
+	...    If the Manager crashes the Agent could send the missing result data to the Manager PreRun DB
 	...    (we can recover stuff from PreRun DB into result db and then generate result from it)
 	[Setup] 	Run Keywords
 	...    Set Test Variable 	${RESULTS_DIR}  ${CURDIR}${/}testdata${/}Issue-#289${/}results 	AND
@@ -1277,4 +1278,3 @@ Send Metric Data to the Manager With Wrong Value Type in Request
 
 	[Teardown] 	Run Keywords
 	...    Stop Manager CLI 	AND 	Clear Result Directory
-
