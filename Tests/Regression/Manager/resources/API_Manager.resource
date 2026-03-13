@@ -14,7 +14,7 @@ Wait Until the Manager is listening
 	TRY
 		WHILE    True 	limit=${timeout} seconds
 			TRY
-				${response}= 	Run Keyword 	${type} On Session
+				${response}= 	Get On Session
 				...    Manager API  ${url}
 				...    expected_status=${expected_status}
 			EXCEPT
@@ -24,7 +24,7 @@ Wait Until the Manager is listening
 			BREAK
 		END
 	EXCEPT
-		Fail 		File '${filepath}' does not exist after ${timeout} seconds
+		Fail 		Un able to connect to '${managerurl}' after ${timeout} seconds
 	END
 
 Send ${type} Request To the Manager
