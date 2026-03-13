@@ -157,11 +157,12 @@ Change Test Group Settings
 		Type	${row_settings_data['inject_sleep_max']}
 	END
 	IF  'test_repeater' in ${row_settings_data}
-		IF  '${row_settings_data['test_repeater']}' == 'True'
-			Click CheckBox	unchecked	default
-		ELSE IF  '${row_settings_data['test_repeater']}' == 'False'
-			Click CheckBox	checked	default
-		END
+		Click Label With Horizontal Offset    TestRepeater    55
+		# IF  '${row_settings_data['test_repeater']}' == 'True'
+		# 	Click CheckBox	unchecked	default
+		# ELSE IF  '${row_settings_data['test_repeater']}' == 'False'
+		# 	Click CheckBox	checked	default
+		# END
 	END
 	IF  'inject_sleep' in ${row_settings_data}
 		IF  '${row_settings_data['inject_sleep']}' == 'True'
