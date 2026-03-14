@@ -156,12 +156,18 @@ Change Test Group Settings
 		END
 		Type	${row_settings_data['inject_sleep_max']}
 	END
+	IF  'include_test_time' in ${row_settings_data}
+	    # offsets:
+		VAR    &{offset}     windows=110     ubuntu=120     macos=90
+
+		Click Label With Horizontal Offset    IncludeTestTime    ${offset}[${PLATFORM}]
+	END
 	IF  'test_repeater' in ${row_settings_data}
 	    # offsets:
 		#     windows: 110
 		#     linux: 120
 		#     macos: 90
-		VAR    &{offset}     windows=110     linux=120     macos=90
+		VAR    &{offset}     windows=110     ubuntu=120     macos=90
 
 		Click Label With Horizontal Offset    TestRepeater    ${offset}[${PLATFORM}]
 		# IF  '${row_settings_data['test_repeater']}' == 'True'

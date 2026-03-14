@@ -719,6 +719,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 	...    exclude_libraries=builtin,string,operatingsystem,perftest,collections
 	...    robot_options=-v var:examplevariable
 	...    test_repeater=True
+	...    include_test_time=True
 	...    inject_sleep=True
 	...    inject_sleep_min=30
 	...    inject_sleep_max=60
