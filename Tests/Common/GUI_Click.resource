@@ -199,7 +199,7 @@ Click ${item} With Horizontal Offset
 	Click To The Right Of	${coordinates}	${offset}
 	Sleep 	0.1
 
-	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 File Open Dialogue Select File
 	[Arguments]		${filepath}
