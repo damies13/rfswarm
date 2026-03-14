@@ -15,7 +15,7 @@ Wait Until the Manager is listening
 		WHILE    True 	limit=${timeout} seconds
 			TRY
 				${response}= 	Get On Session
-				...    Manager API  ${url}
+				...    Manager API  ${managerurl}
 				...    expected_status=${expected_status}
 			EXCEPT
 				Sleep 	500 ms
