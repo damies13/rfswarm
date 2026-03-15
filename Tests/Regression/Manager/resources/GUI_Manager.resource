@@ -158,7 +158,7 @@ Change Test Group Settings
 	END
 	IF  'include_test_time' in ${row_settings_data}
 	    # offsets:
-		VAR    &{offset}     windows=110     ubuntu=120     macos=90
+		VAR    &{offset}     windows=90     ubuntu=110     macos=80
 
 		Click Label With Horizontal Offset    IncludeTestTime    ${offset}[${PLATFORM}]
 	END
