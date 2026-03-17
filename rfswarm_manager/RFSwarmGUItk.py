@@ -4727,8 +4727,8 @@ class RFSwarmGUItk(tk.Frame):
 			stgsWindow.includetesttimedefault = self.base.str2bool(self.base.scriptdefaults["includetesttime"])
 
 		stgsWindow.includetesttimecurrent = stgsWindow.includetesttimedefault
-		if "includetesttime" in self.base.scriptlist[r]:
-			stgsWindow.includetesttimecurrent = self.base.str2bool(self.base.scriptlist[r]["includetesttime"])
+		if "includetesttime" in self.base.mscriptlist[r]:
+			stgsWindow.includetesttimecurrent = self.base.str2bool(self.base.mscriptlist[r]["includetesttime"])
 		self.base.debugmsg(5, "includetesttimecurrent:", stgsWindow.includetesttimecurrent)
 
 		stgsWindow.testrepeaterdefault = self.base.testrepeaterdefault
@@ -5009,11 +5009,11 @@ class RFSwarmGUItk(tk.Frame):
 		tt = stgsWindow.boolTT.get()
 		self.base.debugmsg(7, "tt:", tt)
 		if tt != stgsWindow.includetesttimedefault:
-			self.base.scriptlist[r]["includetesttime"] = str(tt)
+			self.base.mscriptlist[r]["includetesttime"] = str(tt)
 			self.plan_scnro_chngd = True
 		else:
 			if "includetesttime" in self.base.scriptlist[r]:
-				del self.base.scriptlist[r]["includetesttime"]
+				del self.base.mscriptlist[r]["includetesttime"]
 				self.plan_scnro_chngd = True
 
 		tr = stgsWindow.boolTR.get()

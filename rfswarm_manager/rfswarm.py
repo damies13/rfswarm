@@ -1557,6 +1557,9 @@ class RFSwarmCore:
 				# testrepeater = True
 				if "testrepeater" in filedata[istr]:
 					base.scriptlist[rowcount]["testrepeater"] = base.str2bool(filedata[istr]["testrepeater"])
+				# includetesttime = True
+				if "includetesttime" in filedata[istr]:
+					base.scriptlist[rowcount]["includetesttime"] = base.str2bool(filedata[istr]["includetesttime"])
 				# injectsleepenabled = True
 				if "injectsleepenabled" in filedata[istr]:
 					base.scriptlist[rowcount]["injectsleepenabled"] = base.str2bool(filedata[istr]["injectsleepenabled"])
@@ -1678,6 +1681,9 @@ class RFSwarmCore:
 				# testrepeater = True
 				if "testrepeater" in filedata[istr]:
 					base.mscriptlist[rowcount]["testrepeater"] = base.str2bool(filedata[istr]["testrepeater"])
+				# includetesttime = True
+				if "includetesttime" in filedata[istr]:
+					base.mscriptlist[rowcount]["includetesttime"] = base.str2bool(filedata[istr]["includetesttime"])
 				# injectsleepenabled = True
 				if "injectsleepenabled" in filedata[istr]:
 					base.mscriptlist[rowcount]["injectsleepenabled"] = base.str2bool(filedata[istr]["injectsleepenabled"])

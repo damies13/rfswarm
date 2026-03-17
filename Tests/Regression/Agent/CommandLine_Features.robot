@@ -346,6 +346,7 @@ Report Test Case Times
 	Show Log 	${stderr_agent_path}
 
 	${dbfile}= 	Find Result DB
+	${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;
 	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from Summary;
 	Should Be True	${result[0][0]} > 0
 	Should Be Equal As Numbers	${result[0][0]} 	5
