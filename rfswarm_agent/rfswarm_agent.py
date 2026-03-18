@@ -901,28 +901,29 @@ class RFSwarmAgent():
 		except Exception as e:
 			self.debugmsg(1, "Exception:", e)
 
-		for s in jsonresp["Scripts"]:
-			hash = s['Hash']
-			self.debugmsg(6, "hash:", hash)
-			if hash not in self.scriptlist:
-				self.debugmsg(6, "getfile")
-				self.scriptlist[hash] = {'id': hash}
-				if hash not in self.download_queue:
-					self.download_queue.append(hash)
-			else:
-				self.debugmsg(6, "Check file")
-				if 'localfile' in self.scriptlist[hash]:
-					if not os.path.isfile(self.scriptlist[hash]['localfile']):
-						if hash not in self.download_queue:
-							self.download_queue.append(hash)
-				else:
+		if "Scripts" in jsonresp:
+			for s in jsonresp["Scripts"]:
+				hash = s['Hash']
+				self.debugmsg(6, "hash:", hash)
+				if hash not in self.scriptlist:
 					self.debugmsg(6, "getfile")
 					self.scriptlist[hash] = {'id': hash}
 					if hash not in self.download_queue:
 						self.download_queue.append(hash)
+				else:
+					self.debugmsg(6, "Check file")
+					if 'localfile' in self.scriptlist[hash]:
+						if not os.path.isfile(self.scriptlist[hash]['localfile']):
+							if hash not in self.download_queue:
+								self.download_queue.append(hash)
+					else:
+						self.debugmsg(6, "getfile")
+						self.scriptlist[hash] = {'id': hash}
+						if hash not in self.download_queue:
+							self.download_queue.append(hash)
 
-		if len(self.download_queue):
-			self.process_file_download_queue()
+			if len(self.download_queue):
+				self.process_file_download_queue()
 
 	def process_file_download_queue(self):
 
