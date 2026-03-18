@@ -354,6 +354,8 @@ Report Test Case Times
 	@{query_result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;
 
 	Should Be Equal 	${query_result}[0][0] 	RFSwarm Demo Test
-	Should Be Equal 	${query_result}[1][0] 	Log Data 1
-	Should Be Equal 	${query_result}[2][0] 	Log Data 2
-	Should Be Equal 	${query_result}[3][0] 	Log Data 3
+	Should Be Equal 	${query_result}[1][0] 	Create Some Files
+	Should Be Equal 	${query_result}[2][0] 	List Some Files
+	Should Be Equal 	${query_result}[3][0] 	Remove Some Files
+	Should Be Equal 	${query_result}[4][0] 	Show the RFS Variables
+
