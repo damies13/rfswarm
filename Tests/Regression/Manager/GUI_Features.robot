@@ -705,7 +705,7 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 	...    Delete Scenario File	${scenario_name}
 
 Check If the Manager Saves Settings on the Test Row With Example Robot
-	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #1     Issue #376
 	[Setup]	Run Keywords
 	...    Create Manager INI File If It Does Not Exist						AND
 	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
@@ -719,6 +719,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 	...    exclude_libraries=builtin,string,operatingsystem,perftest,collections
 	...    robot_options=-v var:examplevariable
 	...    test_repeater=True
+	...    include_test_time=True
 	...    inject_sleep=True
 	...    inject_sleep_min=30
 	...    inject_sleep_max=60

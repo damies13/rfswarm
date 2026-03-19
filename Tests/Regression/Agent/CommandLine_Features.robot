@@ -323,3 +323,39 @@ Agent JSON Configuration File
 	Should Contain	${result_stdout}	${jsonurl}
 
 	[Teardown]	Stop Agent CLI
+
+Report Test Case Times
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #376
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	@{agnt_options}= 	Create List 	-g 	1 	-m 	http://localhost:8138
+	Run Agent CLI 	@{agnt_options}
+	Log to console 	${CURDIR}
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#376${/}Issue376.rfs
+	Log to console 	scenariofile: ${scenariofile}
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
+	Stop Agent CLI
+
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	Show Log 	${stdout_manager_path}
+	Show Log 	${stderr_manager_path}
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	Show Log 	${stdout_agent_path}
+	Show Log 	${stderr_agent_path}
+
+	${dbfile}= 	Find Result DB
+	${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;
+	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from Summary;
+	Should Be True	${result[0][0]} > 0
+	Should Be Equal As Numbers	${result[0][0]} 	5
+
+	@{query_result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;
+
+	Should Be Equal 	${query_result}[0][0] 	RFSwarm Demo Test
+	Should Be Equal 	${query_result}[1][0] 	Create Some Files
+	Should Be Equal 	${query_result}[2][0] 	List Some Files
+	Should Be Equal 	${query_result}[3][0] 	Remove Some Files
+	Should Be Equal 	${query_result}[4][0] 	Show the RFS Variables
+

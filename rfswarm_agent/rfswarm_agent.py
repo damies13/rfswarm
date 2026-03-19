@@ -901,28 +901,29 @@ class RFSwarmAgent():
 		except Exception as e:
 			self.debugmsg(1, "Exception:", e)
 
-		for s in jsonresp["Scripts"]:
-			hash = s['Hash']
-			self.debugmsg(6, "hash:", hash)
-			if hash not in self.scriptlist:
-				self.debugmsg(6, "getfile")
-				self.scriptlist[hash] = {'id': hash}
-				if hash not in self.download_queue:
-					self.download_queue.append(hash)
-			else:
-				self.debugmsg(6, "Check file")
-				if 'localfile' in self.scriptlist[hash]:
-					if not os.path.isfile(self.scriptlist[hash]['localfile']):
-						if hash not in self.download_queue:
-							self.download_queue.append(hash)
-				else:
+		if "Scripts" in jsonresp:
+			for s in jsonresp["Scripts"]:
+				hash = s['Hash']
+				self.debugmsg(6, "hash:", hash)
+				if hash not in self.scriptlist:
 					self.debugmsg(6, "getfile")
 					self.scriptlist[hash] = {'id': hash}
 					if hash not in self.download_queue:
 						self.download_queue.append(hash)
+				else:
+					self.debugmsg(6, "Check file")
+					if 'localfile' in self.scriptlist[hash]:
+						if not os.path.isfile(self.scriptlist[hash]['localfile']):
+							if hash not in self.download_queue:
+								self.download_queue.append(hash)
+					else:
+						self.debugmsg(6, "getfile")
+						self.scriptlist[hash] = {'id': hash}
+						if hash not in self.download_queue:
+							self.download_queue.append(hash)
 
-		if len(self.download_queue):
-			self.process_file_download_queue()
+			if len(self.download_queue):
+				self.process_file_download_queue()
 
 	def process_file_download_queue(self):
 
@@ -1331,6 +1332,9 @@ class RFSwarmAgent():
 		metavars.append("RFS_SWARMMANAGER:{}".format(self.swarmmanager))
 		metavars.append("RFS_EXCLUDELIBRARIES:{}".format(excludelibraries))
 		metavars.append("RFS_ROBOTTYPE:{}".format(self.jobs[jobid]["RobotType"]))
+
+		if "includetesttime" in self.jobs[jobid]:
+			metavars.append("RFS_INCLUDETESTTIME:{}".format(self.jobs[jobid]["includetesttime"]))
 
 		if "injectsleepenabled" in self.jobs[jobid]:
 			metavars.append("RFS_INJECTSLEEP:{}".format(self.jobs[jobid]["injectsleepenabled"]))
@@ -1887,6 +1891,7 @@ class RFSwarmAgent():
 		fd.append("	ROBOT_LISTENER_API_VERSION = 3")
 		fd.append("")
 		fd.append("	msg = None")
+		fd.append("	agentname = socket.gethostname()")
 		fd.append("	swarmmanager = \"http://localhost:8138/\"")
 		fd.append("	excludelibraries = [\"BuiltIn\",\"String\",\"OperatingSystem\",\"perftest\"]")
 		fd.append("	resultnamemode = \"dflt\"")
@@ -1898,6 +1903,7 @@ class RFSwarmAgent():
 		fd.append("	injectsleep = False")
 		fd.append("	sleepminimum = 15")
 		fd.append("	sleepmaximum = 45")
+		fd.append("	includetesttime = False")
 		fd.append("")
 		fd.append("	def start_suite(self, suite: running.TestSuite, result: result.TestSuite):")
 		fd.append("		if 'RFS_DEBUGLEVEL' in result.metadata:")
@@ -1912,12 +1918,18 @@ class RFSwarmAgent():
 		fd.append("		if 'RFS_ROBOT' in result.metadata:")
 		fd.append("			self.robot = result.metadata['RFS_ROBOT']")
 		fd.append("			self.debugmsg(6, 'robot: ', self.robot)")
+		fd.append("		if 'RFS_AGENTNAME' in result.metadata:")
+		fd.append("			self.agentname = result.metadata['RFS_AGENTNAME']")
+		fd.append("			self.debugmsg(6, 'agentname: ', self.agentname)")
 		fd.append("		if 'RFS_SWARMMANAGER' in result.metadata:")
 		fd.append("			self.swarmmanager = result.metadata['RFS_SWARMMANAGER']")
 		fd.append("			self.debugmsg(6, 'swarmmanager: ', self.swarmmanager)")
 		fd.append("		if 'RFS_EXCLUDELIBRARIES' in result.metadata:")
 		fd.append("			self.excludelibraries = result.metadata['RFS_EXCLUDELIBRARIES'].split(\",\")")
 		fd.append("			self.debugmsg(6, 'excludelibraries: ', self.excludelibraries)")
+		fd.append("		if 'RFS_INCLUDETESTTIME' in result.metadata:")
+		fd.append("			self.includetesttime = result.metadata['RFS_INCLUDETESTTIME']")
+		fd.append("			self.debugmsg(6, 'includetesttime: ', self.includetesttime)")
 		fd.append("		if 'RFS_INJECTSLEEP' in result.metadata:")
 		fd.append("			self.injectsleep = result.metadata['RFS_INJECTSLEEP']")
 		fd.append("			self.debugmsg(6, 'injectsleep: ', self.injectsleep)")
@@ -1947,6 +1959,37 @@ class RFSwarmAgent():
 		fd.append("			self.msg = message")
 		# fd.append("			self.debugmsg(6, 'message: ', message)")
 		# fd.append("			self.debugmsg(6, 'self.msg: ', self.msg)")
+		fd.append("")
+		fd.append("	def end_test(self, data: running.TestCase, result: result.TestCase):")
+		fd.append("		self.debugmsg(5, 'includetesttime: ', self.includetesttime)")
+		fd.append("		if str(self.includetesttime).lower() in ('true', 't', 'yes', '1'):")
+		fd.append("			self.debugmsg(8, 'data: ', data, data.to_dict())")
+		fd.append("			self.debugmsg(8, 'result: ', result, result.to_dict())")
+		fd.append("			self.debugmsg(5, 'Test name: ', result.name)")
+		fd.append("			self.debugmsg(8, 'Test status: ', result.status)")
+		fd.append("			self.debugmsg(8, 'Test elapsed_time: ', result.elapsed_time)")
+		fd.append("			iter = BuiltIn().get_variable_value(\"${RFS_ITERATION}\")")
+		fd.append("			tstname = result.name")
+		fd.append("			if tstname.endswith(iter):")
+		fd.append("				tstname = tstname[:(len(iter)*-1)].strip()")
+		fd.append("			self.debugmsg(5, 'tstname: ', tstname)")
+		fd.append("			startdate = result.start_time")
+		fd.append("			enddate = datetime.fromtimestamp(startdate.timestamp() + result.elapsed_time.total_seconds())")
+		fd.append("			payload = {")
+		fd.append("				'AgentName': self.agentname,")
+		fd.append("				'ResultName': tstname,")
+		fd.append("				'Result': result.status,")
+		fd.append("				'ElapsedTime': result.elapsed_time.total_seconds(),")
+		fd.append("				'StartTime': startdate.timestamp(),")
+		fd.append("				'EndTime': enddate.timestamp(),")
+		fd.append("				'ScriptIndex': self.index,")
+		fd.append("				'Robot': self.robot,")
+		fd.append("				'Iteration': iter,")
+		fd.append("				'Sequence': 0")
+		fd.append("			}")
+		fd.append("			self.debugmsg(7, 'payload: ', payload)")
+		fd.append("			t = threading.Thread(target=self.send_result, args=(payload,))")
+		fd.append("			t.start()")
 		fd.append("")
 		fd.append("	def end_keyword(self, data: running.Keyword, result: result.Keyword):")
 		fd.append("		self.debugmsg(8, 'data: ', data, data.to_dict())")
@@ -2122,6 +2165,7 @@ class RFSwarmAgent():
 		fd.append("	ROBOT_LISTENER_API_VERSION = 2")
 		fd.append("")
 		fd.append("	msg = None")
+		fd.append("	agentname = socket.gethostname()")
 		fd.append("	swarmmanager = \"http://localhost:8138/\"")
 		fd.append("	excludelibraries = [\"BuiltIn\",\"String\",\"OperatingSystem\",\"perftest\"]")
 		fd.append("	resultnamemode = \"dflt\"")
@@ -2133,6 +2177,7 @@ class RFSwarmAgent():
 		fd.append("	injectsleep = False")
 		fd.append("	sleepminimum = 15")
 		fd.append("	sleepmaximum = 45")
+		fd.append("	includetesttime = False")
 		fd.append("")
 		fd.append("	def start_suite(self, name, attrs):")
 		fd.append("		if 'RFS_DEBUGLEVEL' in attrs['metadata']:")
@@ -2147,12 +2192,18 @@ class RFSwarmAgent():
 		fd.append("		if 'RFS_ROBOT' in attrs['metadata']:")
 		fd.append("			self.robot = attrs['metadata']['RFS_ROBOT']")
 		fd.append("			self.debugmsg(6, 'robot: ', self.robot)")
+		fd.append("		if 'RFS_AGENTNAME' in attrs['metadata']:")
+		fd.append("			self.agentname = attrs['metadata']['RFS_AGENTNAME']")
+		fd.append("			self.debugmsg(6, 'agentname: ', self.agentname)")
 		fd.append("		if 'RFS_SWARMMANAGER' in attrs['metadata']:")
 		fd.append("			self.swarmmanager = attrs['metadata']['RFS_SWARMMANAGER']")
 		fd.append("			self.debugmsg(6, 'swarmmanager: ', self.swarmmanager)")
 		fd.append("		if 'RFS_EXCLUDELIBRARIES' in attrs['metadata']:")
 		fd.append("			self.excludelibraries = attrs['metadata']['RFS_EXCLUDELIBRARIES'].split(\",\")")
 		fd.append("			self.debugmsg(6, 'excludelibraries: ', self.excludelibraries)")
+		fd.append("		if 'RFS_INCLUDETESTTIME' in attrs['metadata']:")
+		fd.append("			self.includetesttime = attrs['metadata']['RFS_INCLUDETESTTIME']")
+		fd.append("			self.debugmsg(6, 'includetesttime: ', self.includetesttime)")
 		fd.append("		if 'RFS_INJECTSLEEP' in attrs['metadata']:")
 		fd.append("			self.injectsleep = attrs['metadata']['RFS_INJECTSLEEP']")
 		fd.append("			self.debugmsg(6, 'injectsleep: ', self.injectsleep)")
@@ -2182,6 +2233,36 @@ class RFSwarmAgent():
 		fd.append("			self.msg = message")
 		# fd.append("			self.debugmsg(6, 'message: ', message)")
 		# fd.append("			self.debugmsg(6, 'self.msg: ', self.msg)")
+		fd.append("")
+		fd.append("	def end_test(self, name, attrs):")
+		fd.append("		self.debugmsg(5, 'includetesttime: ', self.includetesttime)")
+		fd.append("		if str(self.includetesttime).lower() in ('true', 't', 'yes', '1'):")
+		fd.append("			self.debugmsg(5, 'Test name: ', name)")
+		fd.append("			self.debugmsg(8, 'attrs: ', attrs)")
+		fd.append("			self.debugmsg(8, 'Test status: ', attrs['status'])")
+		fd.append("			self.debugmsg(8, 'Test elapsed_time: ', (attrs['elapsedtime']/1000))")
+		fd.append("			iter = BuiltIn().get_variable_value(\"${RFS_ITERATION}\")")
+		fd.append("			tstname = name")
+		fd.append("			if tstname.endswith(iter):")
+		fd.append("				tstname = tstname[:(len(iter)*-1)].strip()")
+		fd.append("			self.debugmsg(5, 'tstname: ', tstname)")
+		fd.append("			startdate = datetime.strptime(attrs['starttime'], '%Y%m%d %H:%M:%S.%f')")
+		fd.append("			enddate = datetime.strptime(attrs['endtime'], '%Y%m%d %H:%M:%S.%f')")
+		fd.append("			payload = {")
+		fd.append("				'AgentName': self.agentname,")
+		fd.append("				'ResultName': tstname,")
+		fd.append("				'Result': attrs['status'],")
+		fd.append("				'ElapsedTime': (attrs['elapsedtime']/1000),")
+		fd.append("				'StartTime': startdate.timestamp(),")
+		fd.append("				'EndTime': enddate.timestamp(),")
+		fd.append("				'ScriptIndex': self.index,")
+		fd.append("				'Robot': self.robot,")
+		fd.append("				'Iteration': iter,")
+		fd.append("				'Sequence': 0")
+		fd.append("			}")
+		fd.append("			self.debugmsg(7, 'payload: ', payload)")
+		fd.append("			t = threading.Thread(target=self.send_result, args=(payload,))")
+		fd.append("			t.start()")
 		fd.append("")
 		fd.append("	def end_keyword(self, name, attrs):")
 		fd.append("		self.debugmsg(3, 'Keyword name: ', name)")

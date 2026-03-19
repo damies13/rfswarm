@@ -1557,6 +1557,9 @@ class RFSwarmCore:
 				# testrepeater = True
 				if "testrepeater" in filedata[istr]:
 					base.scriptlist[rowcount]["testrepeater"] = base.str2bool(filedata[istr]["testrepeater"])
+				# includetesttime = True
+				if "includetesttime" in filedata[istr]:
+					base.scriptlist[rowcount]["includetesttime"] = base.str2bool(filedata[istr]["includetesttime"])
 				# injectsleepenabled = True
 				if "injectsleepenabled" in filedata[istr]:
 					base.scriptlist[rowcount]["injectsleepenabled"] = base.str2bool(filedata[istr]["injectsleepenabled"])
@@ -1678,6 +1681,9 @@ class RFSwarmCore:
 				# testrepeater = True
 				if "testrepeater" in filedata[istr]:
 					base.mscriptlist[rowcount]["testrepeater"] = base.str2bool(filedata[istr]["testrepeater"])
+				# includetesttime = True
+				if "includetesttime" in filedata[istr]:
+					base.mscriptlist[rowcount]["includetesttime"] = base.str2bool(filedata[istr]["includetesttime"])
 				# injectsleepenabled = True
 				if "injectsleepenabled" in filedata[istr]:
 					base.mscriptlist[rowcount]["injectsleepenabled"] = base.str2bool(filedata[istr]["injectsleepenabled"])
@@ -2146,6 +2152,13 @@ class RFSwarmCore:
 					if "robotoptions" in base.scriptdefaults:
 						base.robot_schedule["Agents"][nxtagent][grurid]["robotoptions"] = base.scriptdefaults["robotoptions"]
 
+				tt = base.includetesttimedefault
+				if "includetesttime" in base.scriptdefaults:
+					tt = base.scriptdefaults["includetesttime"]
+				if "includetesttime" in grp:
+					tt = grp["includetesttime"]
+				base.robot_schedule["Agents"][nxtagent][grurid]["includetesttime"] = str(tt)
+
 				tr = base.testrepeaterdefault
 				if "testrepeater" in base.scriptdefaults:
 					tr = base.scriptdefaults["testrepeater"]
@@ -2358,6 +2371,13 @@ class RFSwarmCore:
 										else:
 											if "robotoptions" in base.scriptdefaults:
 												base.robot_schedule["Agents"][nxtagent][grurid]["robotoptions"] = base.scriptdefaults["robotoptions"]
+
+										tt = base.includetesttimedefault
+										if "includetesttime" in base.scriptdefaults:
+											tt = base.scriptdefaults["includetesttime"]
+										if "includetesttime" in grp:
+											tt = grp["includetesttime"]
+										base.robot_schedule["Agents"][nxtagent][grurid]["includetesttime"] = str(tt)
 
 										tr = base.testrepeaterdefault
 										if "testrepeater" in base.scriptdefaults:
