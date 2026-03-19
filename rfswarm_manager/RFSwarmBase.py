@@ -51,6 +51,7 @@ class RFSwarmBase:
 	disableloglogdefault = False
 	disablelogreportdefault = False
 	disablelogoutputdefault = False
+	includetesttimedefault = False
 
 	scriptcount = 0
 	scriptlist: Any = [{}]

@@ -2298,6 +2298,12 @@ class RFSwarmGUItk(tk.Frame):
 			setingsWindow.robotoptionscurrent = self.base.scriptdefaults["robotoptions"]
 		self.base.debugmsg(5, "robotoptionscurrent:", setingsWindow.robotoptionscurrent)
 
+		setingsWindow.includetesttimedefault = self.base.includetesttimedefault
+		setingsWindow.includetesttimecurrent = setingsWindow.includetesttimedefault
+		if "includetesttime" in self.base.scriptdefaults:
+			setingsWindow.includetesttimecurrent = self.base.str2bool(self.base.scriptdefaults["includetesttime"])
+		self.base.debugmsg(5, "includetesttimecurrent:", setingsWindow.includetesttimecurrent)
+
 		setingsWindow.testrepeaterdefault = self.base.testrepeaterdefault
 		setingsWindow.testrepeatercurrent = setingsWindow.testrepeaterdefault
 		if "testrepeater" in self.base.scriptdefaults:
@@ -2426,6 +2432,15 @@ class RFSwarmGUItk(tk.Frame):
 		setingsWindow.inpRO.delete(0, 'end')
 		setingsWindow.inpRO.insert(0, setingsWindow.robotoptionscurrent)
 		setingsWindow.inpRO.grid(column=1, row=rownum, columnspan=10, sticky="nsew")
+
+		rownum += 1
+		setingsWindow.lblTT = ttk.Label(setingsWindow.fmeTestDefaults, text="Include Test Time:")
+		setingsWindow.lblTT.grid(column=0, row=rownum, sticky="nsew")
+
+		setingsWindow.boolTT = tk.BooleanVar()
+		setingsWindow.boolTT.set(setingsWindow.includetesttimecurrent)
+		setingsWindow.inpTT = tk.Checkbutton(setingsWindow.fmeTestDefaults, variable=setingsWindow.boolTT, onvalue=True, offvalue=False)
+		setingsWindow.inpTT.grid(column=1, row=rownum, sticky="nsew")
 
 		rownum += 1
 		setingsWindow.lblTR = ttk.Label(setingsWindow.fmeTestDefaults, text="Test Repeater:")
