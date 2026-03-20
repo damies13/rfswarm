@@ -2137,9 +2137,13 @@ class RFSwarmGUItk(tk.Frame):
 		tst = ttk.Label(self.scriptgrid, text="Test")
 		tst.grid(column=self.plancoltst, row=0, sticky="nsew")
 
-		self.scriptgrid.columnconfigure(self.plancoltst, weight=5)
-		tst = ttk.Label(self.scriptgrid, text="Settings")
-		tst.grid(column=self.plancolset, row=0, sticky="nsew")
+		self.scriptgrid.columnconfigure(self.plancolset, weight=5)
+		stg = ttk.Label(self.scriptgrid, text="Settings")
+		stg.grid(column=self.plancolset, row=0, sticky="nsew")
+
+		self.scriptgrid.columnconfigure(self.plancoldup, weight=5)
+		cpy = ttk.Label(self.scriptgrid, text="Copy")
+		cpy.grid(column=self.plancoldup, row=0, sticky="nsew")
 
 		icontext = "AddRow"
 		self.scriptgrid.columnconfigure(self.plancoladd, weight=0)
@@ -4378,9 +4382,13 @@ class RFSwarmGUItk(tk.Frame):
 		tst = ttk.Label(self.mscriptgrid, text="Test")
 		tst.grid(column=self.mtrngcoltst, row=0, sticky="nsew")
 
-		self.mscriptgrid.columnconfigure(self.mtrngcoltst, weight=5)
-		tst = ttk.Label(self.mscriptgrid, text="Settings")
-		tst.grid(column=self.mtrngcolset, row=0, sticky="nsew")
+		self.mscriptgrid.columnconfigure(self.mtrngcolset, weight=5)
+		stg = ttk.Label(self.mscriptgrid, text="Settings")
+		stg.grid(column=self.mtrngcolset, row=0, sticky="nsew")
+
+		self.mscriptgrid.columnconfigure(self.mtrngcoldup, weight=5)
+		cpy = ttk.Label(self.mscriptgrid, text="Copy")
+		cpy.grid(column=self.mtrngcoldup, row=0, sticky="nsew")
 
 		icontext = "AddRow"
 		self.mscriptgrid.columnconfigure(self.mtrngcoladd, weight=0)
