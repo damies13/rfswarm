@@ -61,6 +61,7 @@ class RFSwarmGUItk(tk.Frame):
 	plancolscr = 6
 	plancoltst = 7
 	plancolset = 8
+	plancoldup = 90
 	plancoladd = 99
 
 	mtrngcolidx = 0
@@ -72,6 +73,7 @@ class RFSwarmGUItk(tk.Frame):
 	mtrngcolscr = 6
 	mtrngcoltst = 7
 	mtrngcolset = 8
+	mtrngcoldup = 90
 	mtrngcoladd = 99
 
 	display_agents: Any = {}
@@ -164,6 +166,7 @@ class RFSwarmGUItk(tk.Frame):
 		self.icoAbort = self.get_icon("Abort")
 		self.icoAborted = self.get_icon("Aborted")
 		self.icoRefresh = self.get_icon("Refresh")
+		self.icoRefresh = self.get_icon("Copy")
 
 	def set_app_icon(self):
 		script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -216,6 +219,7 @@ class RFSwarmGUItk(tk.Frame):
 		# # https://www.daniweb.com/programming/software-development/code/216634/jpeg-image-embedded-in-python
 		self.base.debugmsg(7, "icontext:", icontext)
 		# http://www.famfamfam.com/lab/icons/silk/
+		# https://github.com/legacy-icons/famfamfam-silk/tree/master/src
 		files = {}
 		# files["New"] = "famfamfam_silk_icons/icons/page_white.edt.gif"
 		# files["Save"] = "famfamfam_silk_icons/icons/disk.gif"
@@ -238,6 +242,9 @@ class RFSwarmGUItk(tk.Frame):
 		# files["AddRow"] = "../famfamfam_silk_icons/icons/add.gif"
 
 		# files["StartTime"] = "../famfamfam_silk_icons/icons/time.gif"
+
+		# files["Copy"] = "../Doc/Images/icons/src/page_copy.gif"
+
 
 		if icontext in files:
 			self.base.debugmsg(6, "icontext:", icontext)
@@ -304,6 +311,8 @@ class RFSwarmGUItk(tk.Frame):
 		self.b64["Advanced"] = b'GIF87a\x10\x00\x10\x00\xc4\x00\x00\x00\x00\x00GGGMMMTTT[[[ccclllpppyyy\x82\x82\x82\x8d\x8d\x8d\x94\x94\x94\x9c\x9c\x9c\xa5\xa5\xa5\xac\xac\xac\xb4\xb4\xb4\xbc\xbc\xbc\xc4\xc4\xc4\xcb\xcb\xcb\xd4\xd4\xd4\xdc\xdc\xdc\xe5\xe5\xe5\xeb\xeb\xeb\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00\x18\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x05\x91 &\x8e\x92\x14Ac\xaaFU\xe5\xa8\xe3Tb\x11E=\x98\xd341eQ\xa7\xc9\xe4\xe1\x90T \n\x91\x892\xb1\t\x99%\xc4a\x14\x91I \x8cFd\x8bTn)\xd7\x04"\xa1\xd8J\x14\x89D\xc4bm$D\x0c\xc7\xa9f`M"\x92\xc7B\xb4\x90C\xaa\x05\r\x0b\rw\x12\x0c\x0c\x0be\x10\x10\x05\x03\x03"rf\x0e~D\x06#:\x85V&\x10\x12\x06\x05"\r\x10\x14nj\x11\x06\x06\x84\t\x8f"\t\x9e\x18\t%\x9f\x03\x02\x010\xac\x10\x0f\x04\xb6*\x06\xb3\xab)!\x00;'
 
 		self.b64["Refresh"] = b'GIF87a\x10\x00\x10\x00\xd5\x00\x00\x00\x00\x00\x00U\x00\x1c^\x17\x1cb\x1a\x1fb\x16!e\x1d&j (m!.u\'/v)4}.7~1:\x833?\x887?\x888B\x8b7B\x8c:I\x8cCF\x91>I\x92>O\x92IK\x95CR\x96LN\x9bER\x9cJU\xa4Lb\xa4[Y\xa7Nf\xa9^U\xaaUg\xab`^\xacRk\xaecm\xb1ev\xb4oc\xb5[f\xb9\\k\xbbai\xbc^|\xbes\x81\xbfzo\xc0b~\xc0ul\xc1_\x7f\xc2yq\xc3c\x81\xc3w\x84\xc4{\x87\xc5\x80\x8b\xc6\x83\x85\xc8{\x8e\xc9\x86\x8f\xca\x88\x94\xcc\x8b\x99\xcf\x8f\x9c\xd0\x93\xa0\xd2\x97\xa3\xd4\x9a\xa8\xd8\x9f\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\xf9\x04\t\x00\x00<\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x06\x8c@\x9ep8\xcc\x10\x8f\xc8\xcb\x04),\x8d>\x1bL\x85\xa3Q I\xaf\xdam[\x9b\xc1,\x06"i\x96\xb3\xddj\xb5\xd8\x8b\x15\x19\x0cG\xaa\xdcm\xc6a,\x12\x956\xf1\x13KC\x18C\x05\x02G\x19\x17\x12\r\x80C\x83\x1f\x85\x13\x0f\x15\x7f\x0b\x08<-D\x85\x87\x89C)&CR14"\tD+2.\x8c\x17 131\x18aB&/:9rh//\x1a\xaeB#\'8g]( \x14\x05H\x19!\x1e\x7f\n\x08\x07\xc3L\x13\x0eL\xd0V\xd0A\x00;'
+
+		self.b64["Copy"] = b'GIF89a\x10\x00\x10\x00\xc6n\x00?s\xc6At\xc6Bu\xc7Bu\xc8Bu\xc9Cu\xc9Dy\xc8Fy\xc8Hy\xc8Iy\xc9E}\xc4L|\xc9Q\x7f\xcbR\x80\xcbN\x83\xcbT\x81\xcfQ\x82\xd0P\x83\xcdQ\x83\xcbP\x84\xcbS\x83\xcdQ\x85\xccR\x85\xcbS\x85\xccS\x85\xd0R\x86\xccS\x86\xccS\x86\xcdT\x86\xccT\x86\xcdU\x87\xccU\x87\xcdV\x87\xcdT\x88\xccT\x88\xcdU\x88\xcd^\x97\xcdd\x96\xcel\x9f\xd1k\xa1\xd2\x88\xbc\xea\x91\xbb\xe5\x91\xbc\xe5\x93\xbc\xe5\x94\xbc\xe5\x97\xbf\xe6\x97\xc0\xe6\x94\xc2\xec\x9e\xc4\xea\xb0\xd2\xf3\xb5\xd4\xf5\xbc\xd8\xf6\xbd\xda\xf7\xc3\xdd\xf9\xc3\xdd\xfa\xc5\xde\xf9\xc5\xdf\xf9\xc6\xdf\xfc\xc9\xe0\xfa\xc8\xe1\xfb\xcb\xe1\xfa\xc5\xe3\xfa\xcd\xe3\xfb\xcc\xe3\xff\xce\xe3\xfc\xcc\xe4\xfb\xce\xe4\xfc\xd1\xe5\xfc\xd2\xe5\xfc\xd2\xe6\xfd\xd3\xe6\xfc\xd3\xe6\xff\xd5\xe6\xfd\xd6\xe7\xfe\xd6\xe7\xff\xd7\xe7\xfd\xd8\xe7\xff\xda\xe9\xff\xde\xe9\xf5\xdc\xea\xff\xe4\xef\xfa\xe5\xef\xfa\xe7\xf0\xfa\xe7\xf1\xef\xe8\xf1\xfa\xe8\xf2\xef\xe9\xf1\xfb\xe7\xf2\xfa\xe7\xf2\xfd\xe8\xf2\xfc\xea\xf2\xfb\xeb\xf2\xfb\xe8\xf3\xfe\xe9\xf3\xfd\xea\xf3\xfd\xeb\xf3\xfa\xec\xf3\xfc\xee\xf4\xfd\xed\xf5\xfe\xee\xf5\xfb\xef\xf6\xfb\xf0\xf6\xfe\xf0\xf7\xff\xf1\xf7\xfe\xf1\xf7\xff\xf2\xf7\xff\xf3\xf8\xfb\xf3\xf9\xfe\xfe\xff\xff\xff\xff\xff5FT5FT5FT5FT5FT5FT5FT5FT5FT5FT5FT5FT5FT5FT5FT5FT5FT5FT!\xf9\x04\x01\n\x00\x7f\x00,\x00\x00\x00\x00\x10\x00\x10\x00\x00\x07\xb5\x80\x06\x1b#!"\x1e\x0e\x7f\x89\x8a\x8a\x16m]^YPW(\x18\x8b\x8a\x1cb9;52k=/\n\x96\x7f\x1ae@B:4N_j%\xa2\x1agFD>70.++\'&$\x8a\x19iIIE<-l\x8f\x91\x93\x95\x15fJKHC,\x99\x9b\x9d\x9f\n\x13hMOML+\xa5\xa7\xa9\xab\x12\x11c\xd7\xd9+\xb0\xb2731Q \x10S\xe3L*\xbe\xc0<84X\x1f\x0b`TRVZ)\xca\xcc\x86\x04\xb1\xc1\xa5\x03\x82\x04\x04\x06$\xac\xf6\xee\xc8\x0f4\x17D\x85k\xf8\x83\x0c\x05Q\xed(Vy \xea\x80>~Z\xb4l\t\xd3@\x14\x00\x01\t\x13\x0e(\x10\x80A \x00;' 
 
 		# png's
 		# b64["New"] = """iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAABGdBTUEAAK/INwWK6QAAABl0RVh0\nU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAC4SURBVCjPdZFbDsIgEEWnrsMm7oGGfZro\nhxvU+Iq1TyjU60Bf1pac4Yc5YS4ZAtGWBMk/drQBOVwJlZrWYkLhsB8UV9K0BUrPGy9cWbng2CtE\nEUmLGppPjRwpbixUKHBiZRS0p+ZGhvs4irNEvWD8heHpbsyDXznPhYFOyTjJc13olIqzZCHBouE0\nFRMUjA+s1gTjaRgVFpqRwC8mfoXPPEVPS7LbRaJL2y7bOifRCTEli3U7BMWgLzKlW/CuebZPAAAA\nAElFTkSuQmCC\n"""
@@ -3280,6 +3289,14 @@ class RFSwarmGUItk(tk.Frame):
 		scr = ttk.Entry(fgf, state="readonly", justify="right")
 		scr.grid(column=0, row=0, sticky="nsew")
 		fgf.columnconfigure(scr, weight=1)
+		if 'Script' in self.base.scriptlist[row] and len(self.base.scriptlist[row]['Script'])>0:
+			relpath = self.base.get_relative_path(self.base.config['Plan']['ScriptDir'], self.base.scriptlist[self.base.scriptcount]['Script'])
+			self.base.debugmsg(7, "relpath:", relpath)
+			scr.configure(state='normal')
+			scr.select_clear()
+			scr.delete(0, 'end')
+			scr.insert(0, relpath)
+			scr.configure(state='readonly')
 
 		icontext = "Script"
 		scrf = ttk.Button(fgf, image=self.imgdata[icontext], text="...", width=1)
@@ -3294,10 +3311,18 @@ class RFSwarmGUItk(tk.Frame):
 		tst.config(width=20)
 		tst.grid(column=self.plancoltst, row=self.base.scriptcount, sticky="nsew")
 
+		if 'Script' in self.base.scriptlist[row] and len(self.base.scriptlist[row]['Script'])>0:
+			self.sr_test_genlist(row)
+
 		icontext = "Advanced"
 		self.scriptgrid.columnconfigure(self.plancoladd, weight=0)
 		new = ttk.Button(self.scriptgrid, image=self.imgdata[icontext], text="Settings", command=lambda: self.sr_row_settings(row), width=1)
 		new.grid(column=self.plancolset, row=self.base.scriptcount, sticky="nsew")
+
+		icontext = "Copy"	# Duplicate
+		self.scriptgrid.columnconfigure(self.plancoldup, weight=0)
+		new = ttk.Button(self.scriptgrid, image=self.imgdata[icontext], text="Copy", command=lambda: self.sr_duplicate_row(row), width=1)
+		new.grid(column=self.plancoldup, row=self.base.scriptcount, sticky="nsew")
 
 		icontext = "Delete"
 		self.scriptgrid.columnconfigure(self.plancoladd, weight=0)
@@ -4203,6 +4228,16 @@ class RFSwarmGUItk(tk.Frame):
 
 		stgsWindow.update_idletasks()
 
+	def sr_duplicate_row(self, r):
+		self.base.copyScriptRow(r)
+		self.plan_scnro_chngd = True
+		try:
+			# self.pln_update_graph()
+			t = threading.Thread(target=self.pln_update_graph)
+			t.start()
+		except Exception:
+			pass
+
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#
 	# Monitoring
@@ -4449,6 +4484,14 @@ class RFSwarmGUItk(tk.Frame):
 		mscr = ttk.Entry(mfgf, state="readonly", justify="right")
 		mscr.grid(column=0, row=0, sticky="nsew")
 		mfgf.columnconfigure(mscr, weight=1)
+		if 'Script' in self.base.mscriptlist[row] and len(self.base.mscriptlist[row]['Script'])>0:
+			relpath = self.base.get_relative_path(self.base.config['Monitoring']['ScriptDir'], self.base.mscriptlist[row]['Script'])
+			self.base.debugmsg(5, "relpath:", relpath)
+			mscr.configure(state='normal')
+			mscr.select_clear()
+			mscr.delete(0, 'end')
+			mscr.insert(0, relpath)
+			mscr.configure(state='readonly')
 
 		icontext = "Script"
 		mscrf = ttk.Button(mfgf, image=self.imgdata[icontext], text="...", width=1)
@@ -4463,10 +4506,19 @@ class RFSwarmGUItk(tk.Frame):
 		mtst.config(width=20)
 		mtst.grid(column=self.mtrngcoltst, row=self.base.mscriptcount, sticky="nsew")
 
+		if 'Script' in self.base.mscriptlist[row] and len(self.base.mscriptlist[row]['Script'])>0:
+			self.base.debugmsg(5, "msr_test_genlist(", row, ")")
+			self.msr_test_genlist(row)
+
 		icontext = "Advanced"
-		self.mscriptgrid.columnconfigure(self.mtrngcoladd, weight=0)
+		self.mscriptgrid.columnconfigure(self.mtrngcolset, weight=0)
 		mnew = ttk.Button(self.mscriptgrid, image=self.imgdata[icontext], text="Settings", command=lambda: self.msr_row_settings(row), width=1)
 		mnew.grid(column=self.mtrngcolset, row=self.base.mscriptcount, sticky="nsew")
+
+		icontext = "Copy"	# Duplicate
+		self.scriptgrid.columnconfigure(self.mtrngcoldup, weight=0)
+		mdel = ttk.Button(self.mscriptgrid, image=self.imgdata[icontext], text="Copy", command=lambda: self.msr_duplicate_row(row), width=1)
+		mdel.grid(column=self.mtrngcoldup, row=self.base.mscriptcount, sticky="nsew")
 
 		icontext = "Delete"
 		self.scriptgrid.columnconfigure(self.mtrngcoladd, weight=0)
@@ -5159,6 +5211,11 @@ class RFSwarmGUItk(tk.Frame):
 		del stgsWindow.Filters[r]
 
 		stgsWindow.update_idletasks()
+
+	def msr_duplicate_row(self, r):
+		self.base.copyMScriptRow(r)
+		self.plan_scnro_chngd = True
+
 
 	# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	#

@@ -1,6 +1,7 @@
 
 import base64
 import configparser
+import copy
 import csv
 import errno
 import glob
@@ -1638,6 +1639,41 @@ class RFSwarmBase:
 				return loadtpl[0][0]
 			else:
 				return None
+
+	def copyScriptRow(self, r, *args):
+		self.debugmsg(5, "copyScriptRow: ", r, "	original:", self.scriptlist[r])
+		rowdata = {}
+		# deepcopy of the entire dict gets thread lock error, try this way
+		for key in self.scriptlist[r].keys():
+			skipkeys = ['TestVar', 'Index']
+			if key not in skipkeys:
+				rowdata[key] = copy.deepcopy(self.scriptlist[r][key])
+			if key == 'Index':
+				rowdata[key] = self.scriptcount + 1
+		self.scriptlist.append(rowdata)
+		self.scriptcount += 1
+		row = int("{}".format(self.scriptcount))
+		self.debugmsg(5, "self.scriptlist[", row, "]:", self.scriptlist[row])
+		if not self.args.nogui and self.gui:
+			self.gui.addScriptRow()
+
+	def copyMScriptRow(self, r, *args):
+		self.debugmsg(5, "copyScriptRow: ", r, "	original:", self.mscriptlist[r])
+		rowdata = {}
+		# deepcopy of the entire dict gets thread lock error, try this way
+		for key in self.mscriptlist[r].keys():
+			skipkeys = ['TestVar', 'Index']
+			if key not in skipkeys:
+				rowdata[key] = copy.deepcopy(self.mscriptlist[r][key])
+			if key == 'Index':
+				rowdata[key] = self.mscriptcount + 1
+		self.mscriptlist.append(rowdata)
+		self.mscriptcount += 1
+		row = int("{}".format(self.mscriptcount))
+		self.debugmsg(5, "self.mscriptlist[", row, "]:", self.mscriptlist[row])
+		if not self.args.nogui and self.gui:
+			self.gui.addMScriptRow()
+
 
 	def addScriptRow(self, *args):
 		self.scriptcount += 1
