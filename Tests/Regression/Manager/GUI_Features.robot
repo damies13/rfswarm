@@ -389,7 +389,7 @@ Verify the Time Fields In the Plan Screen For Delay
 		Press Key.tab 2 Times
 		Take A Screenshot
 		Type	${delay_times_in_s}[${i}]
-		Press Key.tab 7 Times
+		Press Key.tab 8 Times
 	END
 
 	Click Button	runaddrow
@@ -406,7 +406,7 @@ Verify the Time Fields In the Plan Screen For Delay
 		${copied_converted_delay_value}=		Evaluate	clipboard.paste()	modules=clipboard
 		Should Be Equal 	${updated_delay_times}[${i}]	${copied_converted_delay_value}
 		...    msg=The updated delay time did not convert to the time as expected [ Expected != Converted ]
-		Press Key.tab 7 Times
+		Press Key.tab 8 Times
 	END
 
 	[Teardown]	Close Manager GUI
@@ -432,7 +432,7 @@ Verify the Time Fields In the Plan Screen For Delay: Complex Variations
 		Press Key.tab 2 Times
 		Take A Screenshot
 		Type	${delay_times}[${i}]
-		Press Key.tab 7 Times
+		Press Key.tab 8 Times
 	END
 
 	Click Button	runaddrow
@@ -449,7 +449,7 @@ Verify the Time Fields In the Plan Screen For Delay: Complex Variations
 		${copied_converted_delay_value}=		Evaluate	clipboard.paste()	modules=clipboard
 		Should Be Equal 	${updated_delay_times}[${i}]	${copied_converted_delay_value}
 		...    msg=The updated delay time did not convert to the time as expected [ Expected != Converted ]
-		Press Key.tab 7 Times
+		Press Key.tab 8 Times
 	END
 
 	[Teardown]	Close Manager GUI
@@ -475,7 +475,7 @@ Verify the Time Fields In the Plan Screen For Ramp Up
 		Press Key.tab 3 Times
 		Take A Screenshot
 		Type	${ramp_up_times_in_s}[${i}]
-		Press Key.tab 6 Times
+		Press Key.tab 7 Times
 	END
 
 	Click Button	runaddrow
@@ -492,7 +492,7 @@ Verify the Time Fields In the Plan Screen For Ramp Up
 		${copied_converted_ramp_up_value}=		Evaluate	clipboard.paste()	modules=clipboard
 		Should Be Equal 	${updated_ramp_up_times}[${i}]	${copied_converted_ramp_up_value}
 		...    msg=The updated ramp up time did not convert to the time as expected [ Expected != Converted ]
-		Press Key.tab 6 Times
+		Press Key.tab 7 Times
 	END
 
 	[Teardown]	Close Manager GUI
@@ -518,7 +518,7 @@ Verify the Time Fields In the Plan Screen For Ramp Up: Complex Variations
 		Press Key.tab 3 Times
 		Take A Screenshot
 		Type	${ramp_up_times}[${i}]
-		Press Key.tab 6 Times
+		Press Key.tab 7 Times
 	END
 
 	Click Button	runaddrow
@@ -535,7 +535,7 @@ Verify the Time Fields In the Plan Screen For Ramp Up: Complex Variations
 		${copied_converted_ramp_up_value}=		Evaluate	clipboard.paste()	modules=clipboard
 		Should Be Equal 	${updated_ramp_up_times}[${i}]	${copied_converted_ramp_up_value}
 		...    msg=The updated ramp up time did not convert to the time as expected [ Expected != Converted ]
-		Press Key.tab 6 Times
+		Press Key.tab 7 Times
 	END
 
 	[Teardown]	Close Manager GUI
@@ -561,7 +561,7 @@ Verify the Time Fields In the Plan Screen For Run
 		Press Key.tab 4 Times
 		Take A Screenshot
 		Type	${run_times_in_s}[${i}]
-		Press Key.tab 5 Times
+		Press Key.tab 6 Times
 	END
 
 	Click Button	runaddrow
@@ -578,7 +578,7 @@ Verify the Time Fields In the Plan Screen For Run
 		${copied_converted_run_value}=		Evaluate	clipboard.paste()	modules=clipboard
 		Should Be Equal 	${updated_run_times}[${i}]	${copied_converted_run_value}
 		...    msg=The updated run time did not convert to the time as expected [ Expected != Converted ]
-		Press Key.tab 5 Times
+		Press Key.tab 6 Times
 	END
 
 	[Teardown]	Close Manager GUI
@@ -604,7 +604,7 @@ Verify the Time Fields In the Plan Screen For Run: Complex Variations
 		Press Key.tab 4 Times
 		Take A Screenshot
 		Type	${run_times}[${i}]
-		Press Key.tab 5 Times
+		Press Key.tab 6 Times
 	END
 
 	Click Button	runaddrow
@@ -621,7 +621,7 @@ Verify the Time Fields In the Plan Screen For Run: Complex Variations
 		${copied_converted_run_value}=		Evaluate	clipboard.paste()	modules=clipboard
 		Should Be Equal 	${updated_run_times}[${i}]	${copied_converted_run_value}
 		...    msg=The updated run time did not convert to the time as expected [ Expected != Converted ]
-		Press Key.tab 5 Times
+		Press Key.tab 6 Times
 	END
 
 	[Teardown]	Close Manager GUI
@@ -672,14 +672,14 @@ Check If the Manager Saves Times and Robots to the Scenario with Example Robot
 			Take A Screenshot
 			Press Combination 	key.enter
 			Take A Screenshot
-			Press Key.tab 2 Times
+			Press Key.tab 3 Times
 			Take A Screenshot
 		ELSE
 			Click Button	selected_select_test_case
 			# Take A Screenshot
 			Click Button	select_example
 			# Take A Screenshot
-			Press Key.tab 3 Times
+			Press Key.tab 4 Times
 		END
 		# Take A Screenshot
 	END
@@ -762,7 +762,7 @@ Check If the Manager Saves Settings on the Test Row With Example Robot
 			# Take A Screenshot
 		END
 		Append To List	${settings_locations}	${settings_coordinates}
-		Press Key.tab 1 Times
+		Press Key.tab 2 Times
 	END
 	FOR  ${i}  IN RANGE  0  3
 		Click To The Above Of	${settings_locations}[${i}]	0
@@ -858,7 +858,7 @@ Check If the Manager Opens Scenario File Correctly With Data From the Test Rows
 			# Take A Screenshot
 		END
 		Append To List	${settings_locations}	${settings_coordinates}
-		Press Key.tab 1 Times
+		Press Key.tab 2 Times
 	END
 	FOR  ${i}  IN RANGE  0  3
 		Click To The Above Of	${settings_locations}[${i}]	0
@@ -1219,7 +1219,7 @@ Verify If Row Specific Settings Override Inject Sleep From Scenario Wide Setting
 		${settings_coordinates}=
 		...    Locate	manager_${PLATFORM}_button_selected_runsettingsrow.png
 		Append To List	${settings_locations}	${settings_coordinates}
-		Press Key.tab 1 Times
+		Press Key.tab 2 Times
 	END
 	Click Button	runsettings
 	Change Scenario Wide Settings	${run_settings_data}
