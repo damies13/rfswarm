@@ -72,7 +72,8 @@ jobs:
         run: |
           brew install screenresolution
           screenresolution list
-          screenresolution set 1920x1080x32@60
+          # screenresolution set 1920x1080x32@60
+          screenresolution set 1280x960x32@60
 
       - name: "Windows Set Display Resolution"
         if: ${{ matrix.platform == 'windows-latest' }}
