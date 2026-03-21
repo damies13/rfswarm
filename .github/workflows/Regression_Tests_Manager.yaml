@@ -66,6 +66,14 @@ jobs:
           # lxqt
           startlxqt &
 
+      - name: "MacOS Set Display Resolution"
+        if: ${{ matrix.platform == 'macos-latest' }}
+        continue-on-error: true
+        run: |
+          brew install screenresolution
+          screenresolution list
+          # screenresolution set X
+
       - name: "Windows Set Display Resolution"
         if: ${{ matrix.platform == 'windows-latest' }}
         shell: pwsh
