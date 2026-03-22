@@ -3875,13 +3875,13 @@ Verify copy test row
 	END
 
 	Open Manager GUI 	-s 		${scenariofile}
-	Click test row 1 in column Copy
+	Click row 1 in column Copy
 	Take A Screenshot
 	Set Value for row 2 of column Robots 	200
 	# Select Option
 	Take A Screenshot
 	Click Tab	Monitoring
-	Click test row 1 in column Copy
+	Click row 1 in column Copy
 	Take A Screenshot
 	Click Button 	runsave
 
