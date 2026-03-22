@@ -3906,5 +3906,5 @@ Verify copy test row
 	# Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
 	# Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
 	# Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
-	# [Teardown] 	Close Manager GUI
+	[Teardown] 	Close Manager GUI
 
