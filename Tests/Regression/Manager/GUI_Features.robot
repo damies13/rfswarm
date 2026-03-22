@@ -3869,15 +3869,16 @@ Verify copy test row
 		# Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
 		# Dictionary Should Not Contain Key 	${scenariofilebefore}[1] 	${testkey}
 		# scriptcount
-		Should Be Equal As Strings 	${scenariofileafter1}[scenario][scriptcount] 	1
+		Should Be Equal As Strings 	${scenariofilebefore}[scenario][scriptcount] 	1
 		# monitorcount
-		Should Be Equal As Strings 	${scenariofileafter1}[scenario][monitorcount] 	True
+		Should Be Equal As Strings 	${scenariofilebefore}[scenario][monitorcount] 	True
 	END
 
 	Open Manager GUI 	-s 		${scenariofile}
 	Click test row 1 in column Copy
 	Take A Screenshot
 	Set Value for row 2 of column Robots 	200
+	# Select Option
 	Take A Screenshot
 	Click Tab	Monitoring
 	Click test row 1 in column Copy
@@ -3887,11 +3888,11 @@ Verify copy test row
 	Close Manager GUI
 
 	GROUP 	Check copied test row saved
-		${scenariofileafter1}= 		Read Ini File 	${scenariofile}
-		Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+		${scenariofileafter}= 		Read Ini File 	${scenariofile}
+		Log 	scenariofileafter: ${scenariofileafter} 	console=True
 		# Dictionary Should Not Contain Key 	${scenariofileafter1} 	Script Defaults
 		# Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
-		Should Be Equal As Strings 	${scenariofileafter1}[scenario][scriptcount] 	2
+		Should Be Equal As Strings 	${scenariofileafter}[scenario][scriptcount] 	2
 	END
 	
 
