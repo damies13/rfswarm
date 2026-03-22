@@ -3871,7 +3871,7 @@ Verify copy test row
 		# scriptcount
 		Should Be Equal As Strings 	${scenariofilebefore}[Scenario][scriptcount] 	1
 		# monitorcount
-		Should Be Equal As Strings 	${scenariofilebefore}[Scenario][monitorcount] 	True
+		Should Be Equal As Strings 	${scenariofilebefore}[Scenario][monitorcount] 	1
 	END
 
 	Open Manager GUI 	-s 		${scenariofile}
