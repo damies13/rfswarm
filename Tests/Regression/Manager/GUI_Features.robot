@@ -3869,9 +3869,9 @@ Verify copy test row
 		# Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
 		# Dictionary Should Not Contain Key 	${scenariofilebefore}[1] 	${testkey}
 		# scriptcount
-		Should Be Equal As Strings 	${scenariofilebefore}[scenario][scriptcount] 	1
+		Should Be Equal As Strings 	${scenariofilebefore}[Scenario][scriptcount] 	1
 		# monitorcount
-		Should Be Equal As Strings 	${scenariofilebefore}[scenario][monitorcount] 	True
+		Should Be Equal As Strings 	${scenariofilebefore}[Scenario][monitorcount] 	True
 	END
 
 	Open Manager GUI 	-s 		${scenariofile}
@@ -3892,7 +3892,7 @@ Verify copy test row
 		Log 	scenariofileafter: ${scenariofileafter} 	console=True
 		# Dictionary Should Not Contain Key 	${scenariofileafter1} 	Script Defaults
 		# Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
-		Should Be Equal As Strings 	${scenariofileafter}[scenario][scriptcount] 	2
+		Should Be Equal As Strings 	${scenariofileafter}[Scenario][scriptcount] 	2
 	END
 	
 
