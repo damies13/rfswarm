@@ -15,7 +15,7 @@ Suite Setup 	GUI_Common.GUI Suite Initialization Manager
 @{robot_data}=	example.robot	Example Test Case
 ${scenario_name}=	test_scenario
 
-${windowsizex}    1030
+${windowsizex}    1050
 ${windowsizey}    600
 
 *** Test Cases ***
@@ -3849,3 +3849,61 @@ Check Application Icon or Desktop Shortcut in GUI
 	[Teardown]	Type 	KEY.ESC 	KEY.ESC 	KEY.ESC
 
 #
+
+Verify copy test row
+	[Tags]	windows-latest	ubuntu-latest	macos-latest	Issue #414
+	[Setup]	Run Keywords
+	...    Create Manager INI File If It Does Not Exist						AND
+	...    Change Manager INI Option 	Plan 	scenariofile 	${EMPTY}	AND
+	...    Set Manager INI Window Size		${windowsizex}	${windowsizey}
+
+	GROUP 	Setup Scenario File for Test
+		${testkey}= 	Set Variable 		disableloglog
+		${sourcefile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#414${/}Issue-#414.rfs
+		${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#414${/}Issue-#414-tst.rfs
+		Copy File 	${sourcefile} 	${scenariofile}
+		Log 	scenariofile: ${scenariofile} 	console=True
+
+		${scenariofilebefore}= 		Read Ini File 	${scenariofile}
+		Log 	scenariofilebefore: ${scenariofilebefore} 	console=True
+		# Dictionary Should Not Contain Key 	${scenariofilebefore} 	Script Defaults
+		# Dictionary Should Not Contain Key 	${scenariofilebefore}[1] 	${testkey}
+		# scriptcount
+		Should Be Equal As Strings 	${scenariofileafter1}[scenario][scriptcount] 	1
+		# monitorcount
+		Should Be Equal As Strings 	${scenariofileafter1}[scenario][monitorcount] 	True
+	END
+
+	Open Manager GUI 	-s 		${scenariofile}
+	Click test row 1 in column Copy
+	Take A Screenshot
+	Set Value for row 2 of column Robots 	200
+	Take A Screenshot
+	Click Tab	Monitoring
+	Click test row 1 in column Copy
+	Take A Screenshot
+	Click Button 	runsave
+
+	Close Manager GUI
+
+	GROUP 	Check copied test row saved
+		${scenariofileafter1}= 		Read Ini File 	${scenariofile}
+		Log 	scenariofileafter: ${scenariofileafter1} 	console=True
+		# Dictionary Should Not Contain Key 	${scenariofileafter1} 	Script Defaults
+		# Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
+		Should Be Equal As Strings 	${scenariofileafter1}[scenario][scriptcount] 	2
+	END
+	
+
+	# Open Manager GUI 		@{mngr_options}
+	# Click Button	trsettings
+	# Click CheckBox 	checked 	loghtml
+	# Test Group Save Settings
+	# Click Button 	runsave
+
+	# ${scenariofileafter2}= 		Read Ini File 	${scenariofile}
+	# Log 	scenariofileafter2: ${scenariofileafter2} 	console=True
+	# Dictionary Should Not Contain Key 	${scenariofileafter2} 	Script Defaults
+	# Dictionary Should Not Contain Key 	${scenariofileafter2}[1] 	${testkey}
+	# [Teardown] 	Close Manager GUI
+

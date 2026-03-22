@@ -930,7 +930,6 @@ Navigate to and check Desktop Icon For Windows
 	Press Combination 	KEY.ESC
 
 Navigate to and check Desktop Icon For Ubuntu
-
 	# Open Menu
 	${img}=	Set Variable		${PLATFORM}_lxqt_menu.png
 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
@@ -959,5 +958,41 @@ Navigate to and check Desktop Icon For Ubuntu
 	Take A Screenshot
 
 	Press Combination 	KEY.ESC
+
+Click test row ${rownum} in column ${colname}
+	VAR 	&{rowoffset}    windows=27 	macos=30 	ubuntu=27
+	VAR 	${offset} 	${rownum} * ${rowoffset[${PLATFORM}]}
+	Click Column With Vertical Offset	${colname}
+	Take A Screenshot
+
+Get Value from row ${rownum} of column ${colname}
+	Click test row ${rownum} in column ${colname}
+	VAR 	&{seqselectall}    windows=[Key.ctrl, a] 	macos=[Key.command, a] 	ubuntu=[Key.ctrl, a]
+	VAR 	&{seqcopy}    windows=[Key.ctrl, c] 	macos=[Key.command, c] 	ubuntu=[Key.ctrl, c]
+	Press Combination 	@{seqselectall[${PLATFORM}]}
+	Press Combination 	@{seqcopy[${PLATFORM}]}
+	${currvalue}= 	Get Clipboard Content
+	Take A Screenshot
+	RETURN 	${currvalue}
+
+Set Value for row ${rownum} of column ${colname}
+	[Arguments] 	${newvalue}
+	Click test row ${rownum} in column ${colname}
+	VAR 	&{seqselectall}    windows=[Key.ctrl, a] 	macos=[Key.command, a] 	ubuntu=[Key.ctrl, a]
+	VAR 	&{seqcopy}    windows=[Key.ctrl, c] 	macos=[Key.command, c] 	ubuntu=[Key.ctrl, c]
+	Press Combination 	@{seqselectall[${PLATFORM}]}
+	Press Combination 	@{seqcopy[${PLATFORM}]}
+	${beforevalue}= 	Get Clipboard Content
+	Take A Screenshot
+	Press Combination 	@{seqselectall[${PLATFORM}]}
+	Type 	${newvalue}
+	Take A Screenshot
+	Press Combination 	@{seqselectall[${PLATFORM}]}
+	Press Combination 	@{seqcopy[${PLATFORM}]}
+	${aftervalue}= 	Get Clipboard Content
+	IF 	${beforevalue} != ${newvalue}
+		Should Not Be Equal As Strings 	${beforevalue} 	${aftervalue}
+	END
+	RETURN 	${aftervalue}
 
 #
