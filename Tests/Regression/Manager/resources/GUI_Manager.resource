@@ -967,10 +967,9 @@ Click row ${rownum} in column ${colname}
 
 Get Value from row ${rownum} of column ${colname}
 	Click row ${rownum} in column ${colname}
-	VAR 	&{seqselectall}    windows=[Key.ctrl, a] 	macos=[Key.command, a] 	ubuntu=[Key.ctrl, a]
-	VAR 	&{seqcopy}    windows=[Key.ctrl, c] 	macos=[Key.command, c] 	ubuntu=[Key.ctrl, c]
-	Press Combination 	@{seqselectall["${PLATFORM}"]}
-	Press Combination 	@{seqcopy["${PLATFORM}"]}
+	VAR 	&{ctrlkey}    windows=Key.ctrl 	macos=Key.command 	ubuntu=Key
+	Press Combination 	${ctrlkey["${PLATFORM}"]} 	a		# Select All
+	Press Combination 	${ctrlkey["${PLATFORM}"]} 	c		# Copy
 	${currvalue}= 	Get Clipboard Content
 	Take A Screenshot
 	RETURN 	${currvalue}
@@ -978,17 +977,16 @@ Get Value from row ${rownum} of column ${colname}
 Set Value for row ${rownum} of column ${colname}
 	[Arguments] 	${newvalue}
 	Click row ${rownum} in column ${colname}
-	VAR 	&{seqselectall}    windows=[Key.ctrl, a] 	macos=[Key.command, a] 	ubuntu=[Key.ctrl, a]
-	VAR 	&{seqcopy}    windows=[Key.ctrl, c] 	macos=[Key.command, c] 	ubuntu=[Key.ctrl, c]
-	Press Combination 	@{seqselectall["${PLATFORM}"]}
-	Press Combination 	@{seqcopy["${PLATFORM}"]}
+	VAR 	&{ctrlkey}    windows=Key.ctrl 	macos=Key.command 	ubuntu=Key
+	Press Combination 	${ctrlkey["${PLATFORM}"]} 	a		# Select All
+	Press Combination 	${ctrlkey["${PLATFORM}"]} 	c		# Copy
 	${beforevalue}= 	Get Clipboard Content
 	Take A Screenshot
-	Press Combination 	@{seqselectall["${PLATFORM}"]}
+	Press Combination 	${ctrlkey["${PLATFORM}"]} 	a		# Select All
 	Type 	${newvalue}
 	Take A Screenshot
-	Press Combination 	@{seqselectall["${PLATFORM}"]}
-	Press Combination 	@{seqcopy["${PLATFORM}"]}
+	Press Combination 	${ctrlkey["${PLATFORM}"]} 	a		# Select All
+	Press Combination 	${ctrlkey["${PLATFORM}"]} 	c		# Copy
 	${aftervalue}= 	Get Clipboard Content
 	IF 	${beforevalue} != ${newvalue}
 		Should Not Be Equal As Strings 	${beforevalue} 	${aftervalue}
