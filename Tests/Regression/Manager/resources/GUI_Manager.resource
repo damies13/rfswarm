@@ -962,12 +962,12 @@ Navigate to and check Desktop Icon For Ubuntu
 Click row ${rownum} in column ${colname}
 	VAR 	&{rowoffset}    windows=27 	macos=30 	ubuntu=27
 	VAR 	${offset} 	${rownum} * ${rowoffset["${PLATFORM}"]}
-	Click Column With Vertical Offset	${colname}
+	Click Column With Vertical Offset	${colname} 	${offset}
 	Take A Screenshot
 
 Get Value from row ${rownum} of column ${colname}
 	Click row ${rownum} in column ${colname}
-	VAR 	&{ctrlkey}    windows=Key.ctrl 	macos=Key.command 	ubuntu=Key
+	VAR 	&{ctrlkey}    windows=KEY.ctrl 	macos=KEY.command 	ubuntu=KEY.ctrl
 	Press Combination 	${ctrlkey["${PLATFORM}"]} 	a		# Select All
 	Press Combination 	${ctrlkey["${PLATFORM}"]} 	c		# Copy
 	${currvalue}= 	Get Clipboard Content
@@ -977,7 +977,7 @@ Get Value from row ${rownum} of column ${colname}
 Set Value for row ${rownum} of column ${colname}
 	[Arguments] 	${newvalue}
 	Click row ${rownum} in column ${colname}
-	VAR 	&{ctrlkey}    windows=Key.ctrl 	macos=Key.command 	ubuntu=Key
+	VAR 	&{ctrlkey}    windows=KEY.ctrl 	macos=KEY.command 	ubuntu=KEY.ctrl
 	Press Combination 	${ctrlkey["${PLATFORM}"]} 	a		# Select All
 	Press Combination 	${ctrlkey["${PLATFORM}"]} 	c		# Copy
 	${beforevalue}= 	Get Clipboard Content
