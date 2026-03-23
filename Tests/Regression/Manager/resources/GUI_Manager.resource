@@ -961,7 +961,7 @@ Navigate to and check Desktop Icon For Ubuntu
 
 Click row ${rownum} in column ${colname}
 	VAR 	&{rowoffset}    windows=27 	macos=30 	ubuntu=27
-	VAR 	${offset} 	${rownum} * ${rowoffset["${PLATFORM}"]}
+	VAR 	${offset} 	int(${rownum}) * int(${rowoffset["${PLATFORM}"]})
 	Click Column With Vertical Offset	${colname} 	${offset}
 	Take A Screenshot
 
