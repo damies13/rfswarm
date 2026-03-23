@@ -19,7 +19,7 @@ Click Button
 	Click Image 	${img}
 	Sleep 	0.1
 
-	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Wait For Dialog Button
 	[Arguments]		${btnname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
@@ -31,7 +31,7 @@ Wait For Dialog Button
 	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate 	${img}
 
-	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Click Dialog Button
 	[Arguments]		${btnname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
@@ -45,7 +45,7 @@ Click Dialog Button
 	Click Image 	${img}
 	Sleep 	0.1
 
-	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Click Tab
 	[Arguments]		${tabname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
@@ -61,7 +61,7 @@ Click Tab
 	Click Image 	${img}
 	Sleep 	0.1
 
-	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Select Option
 	[Arguments]		${optname}
@@ -80,7 +80,7 @@ Select Option
 	Click Image 	${img}
 	Sleep 	0.1
 
-	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Selected Option Should Be
 	[Arguments]		${optname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
@@ -92,7 +92,7 @@ Selected Option Should Be
 	Wait For 	${img} 	 timeout=${timeout}
 	@{coordinates}= 	Locate 	${img}
 
-	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Click Menu
 	[Arguments]		${menuname} 		${timeout}=${DEFAULT_IMAGE_TIMEOUT}
@@ -108,7 +108,7 @@ Click Menu
 	Click Image 	${img}
 	Sleep 	0.1
 
-	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Click CheckBox
 	[Arguments]		${status} 		${btnname}
@@ -129,7 +129,7 @@ Click CheckBox
 	Click Image 	${img}
 	Sleep 	0.1
 
-	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Click RadioBtn
 	[Arguments]		${btnname}
@@ -149,7 +149,7 @@ Click RadioBtn
 	Click Image 	${img}
 	Sleep 	0.1
 
-	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Click ${item} With Vertical Offset
 	[Arguments]		${image_name}	${offset}=0 	${timeout}=${DEFAULT_IMAGE_TIMEOUT}
@@ -174,7 +174,7 @@ Click ${item} With Vertical Offset
 	Click To The Below Of	${coordinates}	${offset}
 	Sleep 	0.1
 
-	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Click ${item} With Horizontal Offset
 	[Arguments]		${image_name}	${offset}=0 	${timeout}=${DEFAULT_IMAGE_TIMEOUT}
@@ -206,7 +206,7 @@ File Open Dialogue Select File
 	[Tags] 	Manager 	Reporter
 	Run Keyword		File Open Dialogue ${PLATFORM} Select File 			${filepath}
 
-	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 File Open Dialogue ubuntu Select File
 	[Arguments]		${filepath}
@@ -218,7 +218,7 @@ File Open Dialogue ubuntu Select File
 	Sleep	0.5
 
 	# Click Dialog Button 	open
-	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 File Open Dialogue windows Select File
 	[Arguments]		${filepath}
@@ -238,7 +238,7 @@ File Open Dialogue windows Select File
 
 	# Click Dialog Button 	open
 	Sleep	0.5
-	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} 	Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 File Open Dialogue macos Select File
 	[Arguments]		${filepath}
