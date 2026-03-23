@@ -964,6 +964,7 @@ Click row ${rownum} in column ${colname}
 	VAR 	${offset} 	int(${rownum}) * int(${rowoffset["${PLATFORM}"]})
 	Click Column With Vertical Offset	${colname} 	${offset}
 	Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Get Value from row ${rownum} of column ${colname}
 	Click row ${rownum} in column ${colname}
@@ -973,6 +974,7 @@ Get Value from row ${rownum} of column ${colname}
 	${currvalue}= 	Get Clipboard Content
 	Take A Screenshot
 	RETURN 	${currvalue}
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 Set Value for row ${rownum} of column ${colname}
 	[Arguments] 	${newvalue}
@@ -992,5 +994,6 @@ Set Value for row ${rownum} of column ${colname}
 		Should Not Be Equal As Strings 	${beforevalue} 	${aftervalue}
 	END
 	RETURN 	${aftervalue}
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 #
