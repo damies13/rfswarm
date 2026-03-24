@@ -961,7 +961,7 @@ Navigate to and check Desktop Icon For Ubuntu
 
 Click row ${rownum} in column ${colname}
 	VAR 	&{rowoffset}    windows=27 	macos=30 	ubuntu=27
-	VAR 	${offset} 	int(${rownum}) * int(${rowoffset["${PLATFORM}"]})
+	${offset}= 	Evaluate 	${rownum} * ${rowoffset["${PLATFORM}"]}
 	Click Column With Vertical Offset	${colname} 	${offset}
 	Take A Screenshot
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
