@@ -966,10 +966,18 @@ Click row ${rownum} in column ${colname}
 	Take A Screenshot
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
+DoubleClick row ${rownum} in column ${colname}
+	VAR 	&{rowoffset}    windows=27 	macos=30 	ubuntu=27
+	${offset}= 	Evaluate 	${rownum} * ${rowoffset["${PLATFORM}"]}
+	DoubleClick Column With Vertical Offset	${colname} 	${offset}
+	Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
+
+
 Get Value from row ${rownum} of column ${colname}
-	Click row ${rownum} in column ${colname}
+	DoubleClick row ${rownum} in column ${colname}
 	VAR 	&{ctrlkey}    windows=KEY.ctrl 	macos=KEY.command 	ubuntu=KEY.ctrl
-	Press Combination 	${ctrlkey["${PLATFORM}"]} 	a		# Select All
+	# Press Combination 	${ctrlkey["${PLATFORM}"]} 	a		# Select All - Actually opens the save as dialogue
 	Press Combination 	${ctrlkey["${PLATFORM}"]} 	c		# Copy
 	${currvalue}= 	Get Clipboard Content
 	Take A Screenshot
@@ -978,16 +986,14 @@ Get Value from row ${rownum} of column ${colname}
 
 Set Value for row ${rownum} of column ${colname}
 	[Arguments] 	${newvalue}
-	Click row ${rownum} in column ${colname}
+	DoubleClick row ${rownum} in column ${colname}
 	VAR 	&{ctrlkey}    windows=KEY.ctrl 	macos=KEY.command 	ubuntu=KEY.ctrl
-	Press Combination 	${ctrlkey["${PLATFORM}"]} 	a		# Select All
 	Press Combination 	${ctrlkey["${PLATFORM}"]} 	c		# Copy
 	${beforevalue}= 	Get Clipboard Content
 	Take A Screenshot
-	Press Combination 	${ctrlkey["${PLATFORM}"]} 	a		# Select All
 	Type 	${newvalue}
 	Take A Screenshot
-	Press Combination 	${ctrlkey["${PLATFORM}"]} 	a		# Select All
+	DoubleClick row ${rownum} in column ${colname}
 	Press Combination 	${ctrlkey["${PLATFORM}"]} 	c		# Copy
 	${aftervalue}= 	Get Clipboard Content
 	IF 	${beforevalue} != ${newvalue}

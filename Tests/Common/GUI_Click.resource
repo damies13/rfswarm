@@ -176,6 +176,35 @@ Click ${item} With Vertical Offset
 
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
+DoubleClick ${item} With Vertical Offset
+	[Arguments]		${image_name}	${offset}=0 	${timeout}=${DEFAULT_IMAGE_TIMEOUT}
+	[Tags] 	Manager 	Reporter
+	[Documentation]	Click the item with the offset. An item can be: Label, Button, ...
+	...	[the point (0.0) is in the top left corner of the screen, so give positive values when you want to move down].
+	${comp}= 		Convert To Lower Case 	${COMPONENT}
+	${image_name}= 	Convert To Lower Case 	${image_name}
+	${item}= 	Convert To Lower Case 	${item}
+	VAR 	${img} 	${comp}_${PLATFORM}_${item}_${image_name}.png
+	Log 	${CURDIR}
+	Log 	${IMAGE_DIR}
+
+	${status}= 	Run Keyword And Return Status
+	...    Wait For 	${img} 	 timeout=${timeout}
+	IF  not ${status} and '${comp}' == 'reporter' and '${PLATFORM}' == 'macos'
+		Handle Reporter Missing Settings
+		Wait For 	${img} 	 timeout=5
+	END
+	@{coordinates}= 	Locate 	${img}
+	Log	${coordinates}
+	Click To The Below Of	${coordinates}	${offset}
+	${newy} 	Evaluate 	${coordinates}[1] + ${offset}
+	VAR 	@{newcoordinates} 	${coordinates}[0] 	${newy}
+	# Move To 	${newcoordinates}
+	Double Click
+	Sleep 	0.1
+
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
+
 Click ${item} With Horizontal Offset
 	[Arguments]		${image_name}	${offset}=0 	${timeout}=${DEFAULT_IMAGE_TIMEOUT}
 	[Tags] 	Manager 	Reporter
