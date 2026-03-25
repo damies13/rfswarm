@@ -3883,6 +3883,10 @@ Verify copy test row
 	Click Tab	Monitoring
 	Click row 1 in column Copy
 	Take A Screenshot
+	Click row 2 in column Test
+	Take A Screenshot
+	Select Option 	DBServer
+
 	Click Button 	runsave
 
 	Close Manager GUI
@@ -3893,6 +3897,18 @@ Verify copy test row
 		# Dictionary Should Not Contain Key 	${scenariofileafter1} 	Script Defaults
 		# Dictionary Should Contain Key 	${scenariofileafter1}[1] 	${testkey}
 		Should Be Equal As Strings 	${scenariofileafter}[Scenario][scriptcount] 	2
+		# scenariofileafter: {
+		# 'Scenario': {'uploadmode': 'err', 'scriptcount': '2', 'monitortimebefore': '0', 'monitortimeafter': '0', 'monitorcount': '2', 'graphlist': ''}, 
+		# '1': {'robots': '100', 'delay': '0', 'rampup': '60', 'run': '540', 'test': 'Example Business Process', 'script': 'runtests.robot', 'testrepeater': 'True'}, 
+		# '2': {'robots': '200', 'delay': '0', 'rampup': '60', 'run': '540', 'test': 'Example Business Process', 'script': 'runtests.robot', 'testrepeater': 'True'}, 
+		# 'm1': {'robots': '1', 'delay': '0', 'rampup': '0', 'run': '0', 'test': 'Web Server 1', 'script': 'montests.robot', 'testrepeater': 'True'}, 
+		# 'm2': {'robots': '1', 'delay': '0', 'rampup': '0', 'run': '0', 'test': 'Web Server 1', 'script': 'montests.robot', 'testrepeater': 'True'}
+		# }
+		Should Be Equal As Strings 	${scenariofileafter}[Scenario][monitorcount] 	2
+		Should Be Equal As Strings 	${scenariofileafter}[1][robots] 	100
+		Should Be Equal As Strings 	${scenariofileafter}[2][robots] 	200
+		Should Be Equal As Strings 	${scenariofileafter}[m1][test] 	Web Server 1
+		Should Be Equal As Strings 	${scenariofileafter}[m2][test] 	DB Server
 	END
 	
 

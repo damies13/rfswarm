@@ -991,6 +991,9 @@ Set Value for row ${rownum} of column ${colname}
 	Press Combination 	${ctrlkey["${PLATFORM}"]} 	c		# Copy
 	${beforevalue}= 	Get Clipboard Content
 	Take A Screenshot
+	# maybe macos might need delete? actually this is only here because macos didn't type over the number
+	Press Combination 	${ctrlkey["${PLATFORM}"]} 	backspace
+	Take A Screenshot
 	Type 	${newvalue}
 	Take A Screenshot
 	DoubleClick row ${rownum} in column ${colname}
