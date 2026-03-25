@@ -992,7 +992,7 @@ Set Value for row ${rownum} of column ${colname}
 	${beforevalue}= 	Get Clipboard Content
 	Take A Screenshot
 	# maybe macos might need delete? actually this is only here because macos didn't type over the number
-	Press Combination 	${ctrlkey["${PLATFORM}"]} 	backspace
+	Press Combination 	${ctrlkey["${PLATFORM}"]} 	KEY.backspace
 	Take A Screenshot
 	Type 	${newvalue}
 	Take A Screenshot
