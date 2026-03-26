@@ -6,6 +6,7 @@ Resource 	../../../Common/Directories_and_Files.resource
 Resource 	../../../Common/INI_PIP_Data.resource
 Resource 	../../../Common/GUI_Click.resource
 
+Library    String
 # Attempting to record video cause more trouble than help
 # Library		ScreenRecorderLibrary.py
 
@@ -992,9 +993,16 @@ Set Value for row ${rownum} of column ${colname}
 	${beforevalue}= 	Get Clipboard Content
 	Take A Screenshot
 	# maybe macos might need delete? actually this is only here because macos didn't type over the number
-	Press Combination 	${ctrlkey["${PLATFORM}"]} 	KEY.backspace
+	Press Combination 	KEY.backspace
 	Take A Screenshot
 	Type 	${newvalue}
+	# this will be my next try:
+	# IF 	"${PLATFORM}" == "macos" 
+	# 	${characters}=   Split String To Characters    ${newvalue}
+	# 	FOR    ${key}    IN    @{characters}
+	# 		Press Combination 	KEY.${key}
+	# 	END
+	# END
 	Take A Screenshot
 	DoubleClick row ${rownum} in column ${colname}
 	Press Combination 	${ctrlkey["${PLATFORM}"]} 	c		# Copy
