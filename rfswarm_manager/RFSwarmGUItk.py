@@ -3374,8 +3374,9 @@ class RFSwarmGUItk(tk.Frame):
 			if not self.base.args.nogui:
 				usrs = self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].get()
 			self.base.debugmsg(5, "Row:", r, "Robots:", usrs)
-			self.base.scriptlist[r]["Robots"] = int(usrs)
-			self.plan_scnro_chngd = True
+			if len(usrs) > 0:
+				self.base.scriptlist[r]["Robots"] = int(usrs)
+				self.plan_scnro_chngd = True
 			if not self.base.args.nogui:
 				try:
 					# self.pln_update_graph()
@@ -3390,8 +3391,9 @@ class RFSwarmGUItk(tk.Frame):
 			if r > 0:
 				usrs = self.scriptgrid.grid_slaves(column=self.plancolusr, row=r)[0].get()
 				self.base.debugmsg(9, "Row:", r, "Robots:", usrs)
-				self.base.scriptlist[r]["Robots"] = int(usrs)
-				self.plan_scnro_chngd = True
+				if len(usrs) > 0:
+					self.base.scriptlist[r]["Robots"] = int(usrs)
+					self.plan_scnro_chngd = True
 		if not self.base.args.nogui:
 			try:
 				# self.pln_update_graph()
