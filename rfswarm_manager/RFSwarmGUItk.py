@@ -1854,24 +1854,42 @@ class RFSwarmGUItk(tk.Frame):
 
 	def gs_refresh(self, grphWindow):
 
-		self.base.debugmsg(6, "save")
-		tgr = threading.Thread(target=lambda: self.gph_refresh(grphWindow))
-		tgr.start()
-		self.base.debugmsg(6, "start")
-		tgn = threading.Thread(target=lambda: self.gs_updatename(grphWindow))
-		tgn.start()
-		self.base.debugmsg(6, "tgn")
-		tmt = threading.Thread(target=lambda: self.gs_updatemetrictypes(grphWindow))
-		tmt.start()
-		self.base.debugmsg(6, "tmt")
-		tpm = threading.Thread(target=lambda: self.gs_updateprimetrics(grphWindow))
-		tpm.start()
-		self.base.debugmsg(6, "tpm")
-		tsm = threading.Thread(target=lambda: self.gs_updatesecmetrics(grphWindow))
-		tsm.start()
-		self.base.debugmsg(6, "tsm")
-		tal = threading.Thread(target=lambda: self.gs_updateagents(grphWindow))
-		tal.start()
+		try:
+			self.base.debugmsg(6, "save")
+			tgr = threading.Thread(target=lambda: self.gph_refresh(grphWindow))
+			tgr.start()
+		except Exception as e:
+			self.base.debugmsg(5, "save - gph_refresh error:", e)
+		try:
+			self.base.debugmsg(6, "start")
+			tgn = threading.Thread(target=lambda: self.gs_updatename(grphWindow))
+			tgn.start()
+		except Exception as e:
+			self.base.debugmsg(5, "start - gs_updatename error:", e)
+		try:
+			self.base.debugmsg(6, "tgn")
+			tmt = threading.Thread(target=lambda: self.gs_updatemetrictypes(grphWindow))
+			tmt.start()
+		except Exception as e:
+			self.base.debugmsg(5, "tgn - gs_updatemetrictypes error:", e)
+		try:
+			self.base.debugmsg(6, "tmt")
+			tpm = threading.Thread(target=lambda: self.gs_updateprimetrics(grphWindow))
+			tpm.start()
+		except Exception as e:
+			self.base.debugmsg(5, "tmt - gs_updateprimetrics error:", e)
+		try:
+			self.base.debugmsg(6, "tpm")
+			tsm = threading.Thread(target=lambda: self.gs_updatesecmetrics(grphWindow))
+			tsm.start()
+		except Exception as e:
+			self.base.debugmsg(5, "tpm - gs_updatesecmetrics error:", e)
+		try:
+			self.base.debugmsg(6, "tsm")
+			tal = threading.Thread(target=lambda: self.gs_updateagents(grphWindow))
+			tal.start()
+		except Exception as e:
+			self.base.debugmsg(5, "tsm - gs_updateagents error:", e)
 
 	def gs_dbolnames(self):
 
