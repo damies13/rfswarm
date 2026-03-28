@@ -996,17 +996,10 @@ Set Value for row ${rownum} of column ${colname}
 	Press Combination 	KEY.backspace
 	# Type 	${newvalue}
 	IF 	"${PLATFORM}" == "macos" 
-		Take A Screenshot
-		# ${characters}=   Split String To Characters    ${newvalue}
-		# FOR    ${key}    IN    @{characters}
-		# 	Press Combination 	KEY.${key}
-		# 	Sleep 	100
-		# 	Take A Screenshot
-		# END
-
+		# Take A Screenshot
 		Set Clipboard Value 	${newvalue}
 		Press Combination 	${ctrlkey["${PLATFORM}"]} 	v		# paste
-		Take A Screenshot
+		# Take A Screenshot
 		Make Clipboard Not None
 	ELSE
 		Type 	${newvalue}
