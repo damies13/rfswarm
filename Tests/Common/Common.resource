@@ -86,6 +86,14 @@ Utilisation Stats
 Make Clipboard Not None
 	Evaluate 	clipboard.copy("You should never see this after copy") 	modules=clipboard
 
+Set Clipboard Value
+	[Arguments] 	${nevalue}
+	Evaluate 	clipboard.copy("${nevalue}") 	modules=clipboard
+
+Get Clipboard Value
+	${clpvalue}= 	Evaluate 	clipboard.paste() 	modules=clipboard
+	RETURN 	${clpvalue}
+
 Change ${str1} With ${str2} In ${file}
 	${file_content}	Get File	${file}
 	Remove File		${file}
