@@ -995,16 +995,19 @@ Set Value for row ${rownum} of column ${colname}
 	# maybe macos might need delete? actually this is only here because macos didn't type over the number
 	Press Combination 	KEY.backspace
 	# Type 	${newvalue}
-	# this will be my next try:
 	IF 	"${PLATFORM}" == "macos" 
 		Take A Screenshot
-		${characters}=   Split String To Characters    ${newvalue}
-		FOR    ${key}    IN    @{characters}
-			Press Combination 	KEY.${key}
-			Sleep 	100
-			Take A Screenshot
-		END
+		# ${characters}=   Split String To Characters    ${newvalue}
+		# FOR    ${key}    IN    @{characters}
+		# 	Press Combination 	KEY.${key}
+		# 	Sleep 	100
+		# 	Take A Screenshot
+		# END
+
+		Set Clipboard Value 	${newvalue}
+		Press Combination 	${ctrlkey["${PLATFORM}"]} 	v		# paste
 		Take A Screenshot
+		Make Clipboard Not None
 	ELSE
 		Type 	${newvalue}
 	END
