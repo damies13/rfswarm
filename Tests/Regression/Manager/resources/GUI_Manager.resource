@@ -994,16 +994,20 @@ Set Value for row ${rownum} of column ${colname}
 	# Take A Screenshot
 	# maybe macos might need delete? actually this is only here because macos didn't type over the number
 	Press Combination 	KEY.backspace
-	# Take A Screenshot
-	Type 	${newvalue}
+	# Type 	${newvalue}
 	# this will be my next try:
-	# IF 	"${PLATFORM}" == "macos" 
-	# 	${characters}=   Split String To Characters    ${newvalue}
-	# 	FOR    ${key}    IN    @{characters}
-	# 		Press Combination 	KEY.${key}
-	# 	END
-	# END
-	Take A Screenshot
+	IF 	"${PLATFORM}" == "macos" 
+		Take A Screenshot
+		${characters}=   Split String To Characters    ${newvalue}
+		FOR    ${key}    IN    @{characters}
+			Press Combination 	KEY.${key}
+			Sleep 	100
+			Take A Screenshot
+		END
+		Take A Screenshot
+	ELSE
+		Type 	${newvalue}
+	END
 	DoubleClick row ${rownum} in column ${colname}
 	Press Combination 	${ctrlkey["${PLATFORM}"]} 	c		# Copy
 	${aftervalue}= 	Get Clipboard Content
