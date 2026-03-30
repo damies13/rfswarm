@@ -89,7 +89,7 @@ Verify Data in Database From Test Results With ${log_level} Log Level
 	Run Manager CLI 	@{mngr_options}
 	Wait For Manager Process
 
-	${dbfile}= 	Find Result DB 	result_pattern=*_${log_level}_*
+	${dbfile}= 	Find Result DB 	result_pattern=*_${log_level}_* 	# Find Result DataBase with ${log_level}
 	${result}= 	Query Result DB 	${dbfile} 	Select * from Summary;
 	Log 	${result}
 	Should Be True 	len(${result[0]}) > 0
