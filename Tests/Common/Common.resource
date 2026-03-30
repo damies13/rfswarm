@@ -21,7 +21,8 @@ ${AGENT_DIR} 		${OUTPUT DIR}${/}rfswarm-agent
 
 *** Keywords ***
 Basic Suite Initialization ${component}
-	[Documentation] 	This keyword must be run to set up the basic configuration for suite. The component must be chosen between: Manager, Reporter, Agent
+	[Documentation] 	This keyword must be run to set up the basic configuration for suite. 
+	...    The component must be chosen between: Manager, Reporter, Agent
 	VAR 	${COMPONENT} 	${component} 	scope=SUITE
 	Set Platform
 
@@ -128,7 +129,6 @@ Kill If Still Running
 	[Documentation] 	Provide command name, for example: rfswarm-agent
 	[Arguments]		${cmd_name}
 	${processes}= 	Evaluate 	list(psutil.process_iter()) 	modules=psutil
-	# Log 	${processes}
 	FOR 	${p} 	IN 	@{processes}
 		TRY
 			IF 	$cmd_name in $p.name()
@@ -170,6 +170,16 @@ Remove Keys From Dictionary
 	END
 
 	Remove From Dictionary 	${dict}  @{rm_keys}
+
+Find Robot Framework Executable
+	[Documentation] 	This keyword only works on MacOS and Linux
+	Run Process 	whereis 	robot 	alias=data
+	${pip_data} 	Get Process Result	data
+	Should Not Be Empty 	${pip_data.stdout}		msg=Cant find robotframework pip informations
+	${pip_data_list}=	Split String	${pip_data.stdout}
+	Log 	robot executable: ${pip_data_list}[1] 	console=${True}
+
+	RETURN 	${pip_data_list}[1]
 
 # End ${component_name} If Still Running
 # 	${comp} 	Convert To Lower Case 	${component_name}
