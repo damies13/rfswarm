@@ -1,10 +1,10 @@
 *** Settings ***
 Documentation 	This resource file contains keywords for Manager GUI only.
 
-Resource 	../../../Common/GUI_Common.resource
-Resource 	../../../Common/Directories_and_Files.resource
-Resource 	../../../Common/INI_PIP_Data.resource
-Resource 	../../../Common/GUI_Click.resource
+Resource 	../../Common/GUI_Common.resource
+Resource 	../../Common/Directories_and_Files.resource
+Resource 	../../Common/INI_PIP_Data.resource
+Resource 	../../Common/GUI_Click.resource
 
 Library    String
 # Attempting to record video cause more trouble than help

@@ -1,12 +1,12 @@
 *** Settings ***
 Documentation 	This resource file contains keywords for Agent command line only.
 
-Resource 	../../../Common/Common.resource
-Resource 	../../../Common/Directories_and_Files.resource
-Resource 	../../../Common/INI_PIP_Data.resource
-Resource 	../../../Common/Logs.resource
-Resource 	../../../Common/RFS_Components.resource
-Resource 	../../../Common/Database.resource
+Resource 	../../Common/Common.resource
+Resource 	../../Common/Directories_and_Files.resource
+Resource 	../../Common/INI_PIP_Data.resource
+Resource 	../../Common/Logs.resource
+Resource 	../../Common/RFS_Components.resource
+Resource 	../../Common/Database.resource
 
 Library 	HttpCtrl.Server
 Library 	XML

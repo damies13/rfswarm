@@ -2,7 +2,7 @@
 Resource 	../../Resources/CommandLine/Agent/CommandLine_Agent.resource
 Resource 	../../Resources/Business/Agent/common.resource
 
-Resource 	../../Common/RFS_code.resource
+Resource 	../../Resources/Common/RFS_code.resource
 
 
 Suite Setup 	Common.Basic Suite Initialization Agent

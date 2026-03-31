@@ -1,8 +1,8 @@
 *** Settings ***
 Test Tags       Bugs 	CommandLine
 
-Resource 	resources/CommandLine_Manager.resource
-Resource 	../../Common/RFS_code.resource
+Resource 	../../Resources/CommandLine/Manager/CommandLine_Manager.resource
+Resource 	../../Resources/Common/RFS_code.resource
 
 Suite Setup 	Common.Basic Suite Initialization Manager
 

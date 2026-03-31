@@ -6,7 +6,7 @@ Documentation
 Resource 	Common.resource 	# basic keywords
 
 Library 	OCRLibrary
-Library 	ImageHorizonLibrary 	reference_folder=${IMAGE_DIR}
+Library 	ImageHorizonLibrary
 
 *** Variables ***
 ${CONFIDENCE} 		${0.9}
@@ -22,7 +22,7 @@ GUI Suite Initialization ${component}
 	Basic Suite Initialization ${component} 	# basic suite configuration
 
 	VAR 	${COMPONENT} 	${component} 	scope=SUITE
-	VAR 	${IMAGE_DIR} 	${CURDIR}${/}..${/}Regression${/}${COMPONENT}${/}Images${/}file_method 	scope=SUITE
+	VAR 	${IMAGE_DIR} 	${CURDIR}${/}..${/}..${/}Regression${/}${COMPONENT}${/}Images${/}file_method 	scope=SUITE
 	Set Confidence 		${CONFIDENCE}
 	ImageHorizonLibrary.Set Reference Folder 	${IMAGE_DIR}
 	ImageHorizonLibrary.Set Screenshot Folder 	${OUTPUT DIR}

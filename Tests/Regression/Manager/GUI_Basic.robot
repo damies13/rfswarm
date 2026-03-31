@@ -1,8 +1,8 @@
 *** Settings ***
 Test Tags       Basic 	GUI
 
-Resource 	resources/GUI_Manager.resource
-Resource 	../../Common/GUI_RFS_Components.resource
+Resource 	../../Resources/Tk_GUI/Manager/GUI_Manager.resource
+Resource 	../../Resources/Common/GUI_RFS_Components.resource
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Manager
 

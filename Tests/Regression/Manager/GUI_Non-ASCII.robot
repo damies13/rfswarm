@@ -1,11 +1,11 @@
 *** Settings ***
 Test Tags 	windows-latest 	ubuntu-latest 	macos-latest 	Issue #97 	Languages
 
-Resource 	resources/GUI_Manager.resource
-Resource 	../../Common/Logs.resource
-Resource 	../../Common/GUI_RFS_Components.resource
-Resource 	../../Common/CSV.resource
-Resource 	../../Common/Database.resource
+Resource 	../../Resources/Tk_GUI/Manager/GUI_Manager.resource
+Resource 	../../Resources/Common/Logs.resource
+Resource 	../../Resources/Common/GUI_RFS_Components.resource
+Resource 	../../Resources/Common/CSV.resource
+Resource 	../../Resources/Common/Database.resource
 
 Variables 	${CURDIR}${/}testdata${/}Issue-#97${/}lang_samples.yaml
 

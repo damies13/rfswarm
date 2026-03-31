@@ -1,11 +1,11 @@
 *** Settings ***
 Test Tags 	CommandLine 	Features 	API
 
-Resource 	resources/CommandLine_Manager.resource
-Resource 	resources/API_Manager.resource
-Resource 	../../Common/Database.resource
+Resource 	../../Resources/Common/Database.resource
+Resource 	../../Resources/CommandLine/Manager/CommandLine_Manager.resource
+Resource 	../../Resources/CommandLine/Manager/API_Manager.resource
 
-Variables 	resources${/}API_expected_responses.yaml
+Variables 	../../Resources/CommandLine/Manager/API_expected_responses.yaml
 
 Suite Setup 	Common.Basic Suite Initialization Manager
 
