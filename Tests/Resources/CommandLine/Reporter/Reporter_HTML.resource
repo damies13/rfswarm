@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation 	This resource file contains keywords for Reporter HTML reports only.
 
-Resource 	../../../Common/Common.resource
+Resource 	../../Common/Common.resource
 
 Library 	DocTest.VisualTest
 Library 	XML 	use_lxml=True

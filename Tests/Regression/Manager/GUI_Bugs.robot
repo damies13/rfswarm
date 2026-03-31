@@ -1,9 +1,9 @@
 *** Settings ***
 Test Tags       Bugs 	GUI
 
-Resource 	resources/GUI_Manager.resource
-Resource 	../../Common/Logs.resource
-Resource 	../../Common/GUI_RFS_Components.resource
+Resource 	../../Resources/Tk_GUI/Manager/GUI_Manager.resource
+Resource 	../../Resources/Common/Logs.resource
+Resource 	../../Resources/Common/GUI_RFS_Components.resource
 
 Suite Setup 	GUI_Common.GUI Suite Initialization Manager
 Test Teardown 	Run Keyword		Close Manager GUI ${PLATFORM}
