@@ -2530,6 +2530,7 @@ class RFSwarmGUItk(tk.Frame):
 			colnum += 1
 			itemno = colnum - 1
 			setingsWindow.lblXSL.append(ttk.Label(setingsWindow.fmeTestDefaults, text=v))
+			setingsWindow.lblXSL[itemno].configure(anchor="center")
 			setingsWindow.lblXSL[itemno].grid(column=colnum, row=rownum, sticky="nsew")
 
 		rownum += 1
