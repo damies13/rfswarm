@@ -2544,6 +2544,11 @@ class RFSwarmGUItk(tk.Frame):
 			setingsWindow.inpXS.append(tk.Radiobutton(setingsWindow.fmeTestDefaults, variable=setingsWindow.intXS, value=int(itemno)))
 			setingsWindow.inpXS[itemno].grid(column=colnum, row=rownum, sticky="nsew")
 
+		self.base.debugmsg(5, "excludesleep:", setingsWindow.excludesleep)
+		optnum = list(self.base.exclude_sleep_opt.keys()).index(setingsWindow.excludesleep)
+		self.base.debugmsg(5, "optnum:", optnum)
+		setingsWindow.intXS.set(optnum)
+
 		rownum += 1
 		setingsWindow.lblDL = ttk.Label(setingsWindow.fmeTestDefaults, text="Disable Robot Logs:")
 		setingsWindow.lblDL.grid(column=0, row=rownum, sticky="nsew")
@@ -2819,6 +2824,13 @@ class RFSwarmGUItk(tk.Frame):
 			xs = setingsWindow.intXS.get()
 			xsv = list(self.base.exclude_sleep_opt.keys())[xs]
 			self.base.debugmsg(5, "xs:", xs, "xsv:", xsv, "default:", setingsWindow.excludesleepdefault, "Value at Open:", setingsWindow.excludesleep)
+			if xsv != setingsWindow.excludesleepdefault:
+				self.base.scriptdefaults["excludesleep"] = str(xsv)
+				self.plan_scnro_chngd = True
+			else:
+				if "excludesleep" in self.base.scriptdefaults:
+					del self.base.scriptdefaults["excludesleep"]
+					self.plan_scnro_chngd = True
 
 			# disableloglogdefault = False
 			dll = setingsWindow.boolDLL.get()
