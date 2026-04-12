@@ -2195,6 +2195,14 @@ class RFSwarmCore:
 						ismx = grp["injectsleepmaximum"]
 					base.robot_schedule["Agents"][nxtagent][grurid]["injectsleepmaximum"] = str(ismx)
 
+				# excludesleep = False
+				xs = base.excludesleepdefault
+				if "excludesleep" in base.scriptdefaults:
+					xs = base.scriptdefaults["excludesleep"]
+				if "excludesleep" in grp:
+					xs = grp["excludesleep"]
+				base.robot_schedule["Agents"][nxtagent][grurid]["excludesleep"] = str(xs)
+
 				# disableloglogdefault = False
 				dll = base.disableloglogdefault
 				if "disableloglog" in base.scriptdefaults:
@@ -2414,6 +2422,14 @@ class RFSwarmCore:
 											if "injectsleepmaximum" in grp:
 												ismx = grp["injectsleepmaximum"]
 											base.robot_schedule["Agents"][nxtagent][grurid]["injectsleepmaximum"] = str(ismx)
+
+										# excludesleep = False
+										xs = base.excludesleepdefault
+										if "excludesleep" in base.scriptdefaults:
+											xs = base.scriptdefaults["excludesleep"]
+										if "excludesleep" in grp:
+											xs = grp["excludesleep"]
+										base.robot_schedule["Agents"][nxtagent][grurid]["excludesleep"] = str(xs)
 
 										# disableloglogdefault = False
 										dll = base.disableloglogdefault
