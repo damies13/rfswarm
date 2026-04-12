@@ -1569,6 +1569,9 @@ class RFSwarmCore:
 				# injectsleepmaximum = 33
 				if "injectsleepmaximum" in filedata[istr] and len(filedata[istr]["injectsleepmaximum"]) > 0:
 					base.scriptlist[rowcount]["injectsleepmaximum"] = int(filedata[istr]["injectsleepmaximum"])
+				# exclude sleep from time Issue #401
+				if "excludesleep" in filedata[istr]:
+					base.scriptlist[rowcount]["excludesleep"] = filedata[istr]["excludesleep"]
 				# disableloglog
 				if "disableloglog" in filedata[istr]:
 					base.scriptlist[rowcount]["disableloglog"] = base.str2bool(filedata[istr]["disableloglog"])
@@ -1693,6 +1696,9 @@ class RFSwarmCore:
 				# injectsleepmaximum = 33
 				if "injectsleepmaximum" in filedata[istr] and len(filedata[istr]["injectsleepmaximum"]) > 0:
 					base.mscriptlist[rowcount]["injectsleepmaximum"] = int(filedata[istr]["injectsleepmaximum"])
+				# exclude sleep from time Issue #401
+				if "excludesleep" in filedata[istr]:
+					base.mscriptlist[rowcount]["excludesleep"] = filedata[istr]["excludesleep"]
 				# disableloglog
 				if "disableloglog" in filedata[istr]:
 					base.mscriptlist[rowcount]["disableloglog"] = base.str2bool(filedata[istr]["disableloglog"])

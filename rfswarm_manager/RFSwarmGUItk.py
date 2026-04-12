@@ -4257,6 +4257,18 @@ class RFSwarmGUItk(tk.Frame):
 				del self.base.scriptlist[r]["injectsleepmaximum"]
 				self.plan_scnro_chngd = True
 
+		# exclude sleep from time Issue #401
+		xs = stgsWindow.intXS.get()
+		xsv = list(self.base.exclude_sleep_opt.keys())[xs]
+		self.base.debugmsg(5, "xs:", xs, "xsv:", xsv)
+		if xsv != stgsWindow.excludesleepdefault:
+			self.base.scriptlist[r]["excludesleep"] = str(xsv)
+			self.plan_scnro_chngd = True
+		else:
+			if "excludesleep" in self.base.scriptlist[r]:
+				del self.base.scriptlist[r]["excludesleep"]
+				self.plan_scnro_chngd = True
+
 		# disableloglogdefault = False
 		dll = stgsWindow.boolDLL.get()
 		self.base.debugmsg(7, "ise:", ise)
