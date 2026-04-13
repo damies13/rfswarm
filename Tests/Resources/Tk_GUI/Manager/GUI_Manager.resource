@@ -6,6 +6,7 @@ Resource 	../../Common/Directories_and_Files.resource
 Resource 	../../Common/INI_PIP_Data.resource
 Resource 	../../Common/GUI_Click.resource
 
+Library    String
 # Attempting to record video cause more trouble than help
 # Library		ScreenRecorderLibrary.py
 
@@ -930,7 +931,6 @@ Navigate to and check Desktop Icon For Windows
 	Press Combination 	KEY.ESC
 
 Navigate to and check Desktop Icon For Ubuntu
-
 	# Open Menu
 	${img}=	Set Variable		${PLATFORM}_lxqt_menu.png
 	Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
@@ -959,5 +959,58 @@ Navigate to and check Desktop Icon For Ubuntu
 	Take A Screenshot
 
 	Press Combination 	KEY.ESC
+
+Click row ${rownum} in column ${colname}
+	VAR 	&{rowoffset}    windows=27 	macos=30 	ubuntu=27
+	${offset}= 	Evaluate 	${rownum} * ${rowoffset["${PLATFORM}"]}
+	Click Column With Vertical Offset	${colname} 	${offset}
+	# Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
+
+DoubleClick row ${rownum} in column ${colname}
+	VAR 	&{rowoffset}    windows=27 	macos=30 	ubuntu=27
+	${offset}= 	Evaluate 	${rownum} * ${rowoffset["${PLATFORM}"]}
+	DoubleClick Column With Vertical Offset	${colname} 	${offset}
+	# Take A Screenshot
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
+
+
+Get Value from row ${rownum} of column ${colname}
+	DoubleClick row ${rownum} in column ${colname}
+	VAR 	&{ctrlkey}    windows=KEY.ctrl 	macos=KEY.command 	ubuntu=KEY.ctrl
+	# Press Combination 	${ctrlkey["${PLATFORM}"]} 	a		# Select All - Actually opens the save as dialogue
+	Press Combination 	${ctrlkey["${PLATFORM}"]} 	c		# Copy
+	${currvalue}= 	Get Clipboard Content
+	# Take A Screenshot
+	RETURN 	${currvalue}
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
+
+Set Value for row ${rownum} of column ${colname}
+	[Arguments] 	${newvalue}
+	DoubleClick row ${rownum} in column ${colname}
+	VAR 	&{ctrlkey}    windows=KEY.ctrl 	macos=KEY.command 	ubuntu=KEY.ctrl
+	Press Combination 	${ctrlkey["${PLATFORM}"]} 	c		# Copy
+	${beforevalue}= 	Get Clipboard Content
+	# Take A Screenshot
+	# maybe macos might need delete? actually this is only here because macos didn't type over the number
+	Press Combination 	KEY.backspace
+	# Type 	${newvalue}
+	IF 	"${PLATFORM}" == "macos" 
+		# Take A Screenshot
+		Set Clipboard Value 	${newvalue}
+		Press Combination 	${ctrlkey["${PLATFORM}"]} 	v		# paste
+		# Take A Screenshot
+		Make Clipboard Not None
+	ELSE
+		Type 	${newvalue}
+	END
+	DoubleClick row ${rownum} in column ${colname}
+	Press Combination 	${ctrlkey["${PLATFORM}"]} 	c		# Copy
+	${aftervalue}= 	Get Clipboard Content
+	IF 	${beforevalue} != ${newvalue}
+		Should Not Be Equal As Strings 	${beforevalue} 	${aftervalue}
+	END
+	RETURN 	${aftervalue}
+	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
 #

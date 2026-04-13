@@ -66,6 +66,15 @@ jobs:
           # lxqt
           startlxqt &
 
+      - name: "MacOS Set Display Resolution"
+        if: ${{ matrix.platform == 'macos-latest' }}
+        continue-on-error: true
+        run: |
+          brew install screenresolution
+          screenresolution list
+          # screenresolution set 1920x1080x32@60
+          screenresolution set 1280x960x32@60
+
       - name: "Windows Set Display Resolution"
         if: ${{ matrix.platform == 'windows-latest' }}
         shell: pwsh
@@ -126,19 +135,26 @@ jobs:
           MATRIX_PLATFORM: ${{ matrix.platform }}
           MATRIX_PYTHON: ${{ matrix.python }}
 
-      - name: Try and fix images with relative path
-        if: ${{ !cancelled() && matrix.platform != 'macos-latest' }}
+      - name: Try and fix images with relative path (ubuntu)
+        if: ${{ !cancelled() && matrix.platform == 'ubuntu-latest' }}
         continue-on-error: true
         run: |
           cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/run
           sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}\/run/img src="./g' ./output.xml
           poetry run rebot ./output.xml
       - name: Try and fix images with relative path (macos)
-        if: ${{ !cancelled() &&  matrix.platform == 'macos-latest' }}
+        if: ${{ !cancelled() && matrix.platform == 'macos-latest' }}
         continue-on-error: true
         run: |
           cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/run
           sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}\/run/img src="./g' ./output.xml
+          poetry run rebot ./output.xml
+      - name: Try and fix images with relative path (windows)
+        if: ${{ !cancelled() && matrix.platform == 'windows-latest' }}
+        continue-on-error: true
+        run: |
+          cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/run
+          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}\run/img src="./g' ./output.xml
           poetry run rebot ./output.xml
 
       - name: Robot Framework - Retry Failed
@@ -157,19 +173,26 @@ jobs:
           MATRIX_PLATFORM: ${{ matrix.platform }}
           MATRIX_PYTHON: ${{ matrix.python }}
 
-      - name: Try and fix images with relative path
-        if: ${{ steps.robottest.outcome != 'success' && !cancelled() && matrix.platform != 'macos-latest' }}
+      - name: Try and fix images with relative path (ubuntu)
+        if: ${{ steps.robottest.outcome != 'success' && !cancelled() && matrix.platform == 'ubuntu-latest' }}
         continue-on-error: true
         run: |
           cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/retry
           sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}\/retry/img src="./g' ./output.xml
           poetry run rebot ./output.xml
       - name: Try and fix images with relative path (macos)
-        if: ${{ steps.robottest.outcome != 'success' && !cancelled() &&  matrix.platform == 'macos-latest' }}
+        if: ${{ steps.robottest.outcome != 'success' && !cancelled() && matrix.platform == 'macos-latest' }}
         continue-on-error: true
         run: |
           cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/retry
           sed -i.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}\/retry/img src="./g' ./output.xml
+          poetry run rebot ./output.xml
+      - name: Try and fix images with relative path (windows)
+        if: ${{ steps.robottest.outcome != 'success' && !cancelled() && matrix.platform == 'windows-latest' }}
+        continue-on-error: true
+        run: |
+          cd Tests/Regression/Manager/Logs/${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}/retry
+          sed --in-place=.bak 's/img src=".*${{ matrix.platform }}_${{ matrix.python }}_${{ matrix.tag }}\retry/img src="./g' ./output.xml
           poetry run rebot ./output.xml
 
 
