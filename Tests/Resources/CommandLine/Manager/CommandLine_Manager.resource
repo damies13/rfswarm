@@ -81,7 +81,7 @@ Create Testdata Manager INI
 
 Verify Data in Database From Test Results With ${log_level} Log Level
 	[Documentation] 	Keyword for "Verify Data in Database From Runned Tests With Different Log Levels" Test Case.
-	${testfolder}= 	Normalize Path 	${CURDIR}${/}..${/}testdata${/}Issue-#216
+	${testfolder}= 	Normalize Path 	${CURDIR}${/}..${/}..${/}..${/}Regression${/}Manager${/}testdata${/}Issue-#216
 	VAR 	${scenariofile} 	${testfolder}${/}${log_level}_scenario.rfs
 	VAR 	@{mngr_options} 	-n  -s  ${scenariofile}  -d  ${RESULTS_DIR}
 
