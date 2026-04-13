@@ -644,11 +644,10 @@ Start New Scenario
 	Click Button	runnew
 
 Create ${lang} Language Scenario
-	# [Arguments] 	${langcode}
-	# Log 	${lang} 	console=True
-	${scenariofile}= 		Set Variable    ${CURDIR}${/}..${/}testdata${/}Issue-#238${/}language${/}lang_${lang}.rfs
-	${robotfile}= 		Set Variable    ${CURDIR}${/}..${/}testdata${/}Issue-#238${/}language${/}lang_${lang}.robot
-	${robotfilename}= 		Set Variable    lang_${lang}.robot
+	[Arguments] 	${path}
+	VAR 	${scenariofile}= 	${path}${/}language${/}lang_${lang}.rfs
+	VAR 	${robotfile}= 		${path}${/}language${/}lang_${lang}.robot
+	VAR 	${robotfilename}= 	lang_${lang}.robot
 	Create File 	${scenariofile} 	[Scenario]\n
 	Append To File 	${scenariofile} 	uploadmode = err\n
 	Append To File 	${scenariofile} 	scriptcount = 1\n
@@ -661,6 +660,7 @@ Create ${lang} Language Scenario
 	Append To File 	${scenariofile} 	run = 60\n
 	Append To File 	${scenariofile} 	test = First Test\n
 	Append To File 	${scenariofile} 	script = ${robotfilename}\n
+
 	RETURN 	${scenariofile}
 
 Click Script Button On Row
