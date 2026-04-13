@@ -11,6 +11,9 @@ Test Setup 	Language Test Init
 Test Teardown 	Language Test End
 Test Template 	Add Test In Language
 
+*** Variables ***
+${test_dir} 	${CURDIR}${/}testdata${/}Issue-#238
+
 *** Test Cases *** 	LangCode
 # Issue #238
 Bulgarian		bg
@@ -43,7 +46,7 @@ Chinese Traditional		zh_tw
 Add Test In Language
 	[Arguments] 	${langcode}
 	Log 	${langcode} 	console=True
-	${scenariofile}= 		Create ${langcode} Language Scenario
+	${scenariofile}= 		Create ${langcode} Language Scenario 	path=${test_dir}
 	@{mngr_options}= 	Create List 	-s 	${scenariofile}
 	Open Manager GUI 		@{mngr_options}
 	Wait For the Agent To Be Ready
