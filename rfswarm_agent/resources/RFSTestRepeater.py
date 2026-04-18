@@ -60,12 +60,14 @@ class RFSTestRepeater:
 		# print('RFSTestRepeater', '__remove_injected_sleeps', 'testobj.body:', testobj.body)
 		return testobj
 
-	def start_keyword(self, data, result):
-		# This prevents the error:
-		# [ ERROR ] Calling method 'start_keyword' of listener 'TestRepeater.py' failed: TypeError: end_suite() takes 2 positional arguments but 3 were given
-		pass
+	# I beleive these are related to https://github.com/robotframework/robotframework/issues/5154 and are not needed now
 
-	def end_keyword(self, data, result):
-		# This prevents the error:
-		# [ ERROR ] Calling method 'end_keyword' of listener 'TestRepeater.py' failed: TypeError: end_suite() takes 2 positional arguments but 3 were given
-		pass
+	# def start_keyword(self, data, result):
+	# 	# This prevents the error:
+	# 	# [ ERROR ] Calling method 'start_keyword' of listener 'TestRepeater.py' failed: TypeError: end_suite() takes 2 positional arguments but 3 were given
+	# 	pass
+
+	# def end_keyword(self, data, result):
+	# 	# This prevents the error:
+	# 	# [ ERROR ] Calling method 'end_keyword' of listener 'TestRepeater.py' failed: TypeError: end_suite() takes 2 positional arguments but 3 were given
+	# 	pass
