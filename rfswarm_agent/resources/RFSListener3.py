@@ -20,12 +20,14 @@ class RFSListener3:
 	swarmmanager = "http://localhost:8138/"
 	excludelibraries = ["BuiltIn","String","OperatingSystem","perftest"]
 	resultnamemode = "dflt"
+	excludesleep = "dis"
 	debuglevel = 0
 	index = 0
 	robot = 0
 	iter = 0
 	seq = 0
 	injectsleep = False
+	injectsleepmsg = 'Sleep added by RFSwarm'
 	sleepminimum = 15
 	sleepmaximum = 45
 	includetesttime = False
@@ -67,6 +69,11 @@ class RFSListener3:
 		if 'RFS_RESULTNAMEMODE' in result.metadata:
 			self.resultnamemode = result.metadata['RFS_RESULTNAMEMODE']
 			self.debugmsg(6, 'resultnamemode: ', self.resultnamemode)
+		# RFS_EXCLUDESLEEP
+		if 'RFS_EXCLUDESLEEP' in result.metadata:
+			self.excludesleep = result.metadata['RFS_EXCLUDESLEEP']
+			self.debugmsg(6, 'excludesleep: ', self.excludesleep)
+
 		self.seedseed()
 
 	def seedseed(self):
@@ -94,13 +101,25 @@ class RFSListener3:
 			if tstname.endswith(iter):
 				tstname = tstname[:(len(iter)*-1)].strip()
 			self.debugmsg(5, 'tstname: ', tstname)
+
+			elapsed_time = result.elapsed_time.total_seconds()
+			# calculate time spent sleeping
+			sleeps = self.calculate_sleeps(result.to_dict())
+			self.debugmsg(5, 'sleeps: ', sleeps)
+			if self.excludesleep == "inj":
+				self.debugmsg(5, 'elapsed_time: ', elapsed_time, "-", sleeps["injected"], "=", elapsed_time - sleeps["injected"])
+				elapsed_time = elapsed_time - sleeps["injected"]
+			if self.excludesleep == "all":
+				self.debugmsg(5, 'elapsed_time: ', elapsed_time, "-", sleeps["total"], "=", elapsed_time - sleeps["total"])
+				elapsed_time = elapsed_time - sleeps["total"]
+
 			startdate = result.start_time
 			enddate = datetime.fromtimestamp(startdate.timestamp() + result.elapsed_time.total_seconds())
 			payload = {
 				'AgentName': self.agentname,
 				'ResultName': tstname,
 				'Result': result.status,
-				'ElapsedTime': result.elapsed_time.total_seconds(),
+				'ElapsedTime': elapsed_time,
 				'StartTime': startdate.timestamp(),
 				'EndTime': enddate.timestamp(),
 				'ScriptIndex': self.index,
@@ -145,10 +164,25 @@ class RFSListener3:
 			lResultName = [data.name]
 			if 'args' in attrs:
 				for arg in attrs['args']:
+					self.debugmsg(8, 'arg: ', arg, str(arg))
+					self.debugmsg(8, 'arg: ', str(BuiltIn().replace_variables(arg)))
 					lResultName.append(str(arg))
+					# 20226-04-19 this what I originally wanted this option to do but didn't figure it out at the time, maybe I'll change it in v2?
+					# lResultName.append(str(BuiltIn().replace_variables(arg))) 
 			ResultName = ' '.join(lResultName)
 		self.debugmsg(3, 'ResultName: ', ResultName, '	:', len(ResultName))
-		
+
+		elapsed_time = attrs['elapsed_time']
+		# calculate time spent sleeping
+		sleeps = self.calculate_sleeps(result.to_dict())
+		self.debugmsg(5, 'sleeps: ', sleeps)
+		if self.excludesleep == "inj":
+			self.debugmsg(5, 'elapsed_time: ', elapsed_time, "-", sleeps["injected"], "=", elapsed_time - sleeps["injected"])
+			elapsed_time = elapsed_time - sleeps["injected"]
+		if self.excludesleep == "all":
+			self.debugmsg(5, 'elapsed_time: ', elapsed_time, "-", sleeps["total"], "=", elapsed_time - sleeps["total"])
+			elapsed_time = elapsed_time - sleeps["total"]
+
 		if 'owner' not in attrs:
 			attrs['owner'] = 'None'
 		
@@ -158,17 +192,18 @@ class RFSListener3:
 				self.debugmsg(5, attrs['owner'], 'library OK')
 				self.seq += 1
 				self.debugmsg(8, 'self.seq: ', self.seq)
-				self.debugmsg(8, 'elapsed_time: ', attrs['elapsed_time'])
+				self.debugmsg(8, 'elapsed_time: ', elapsed_time)
 				self.debugmsg(8, 'start_time: ', attrs['start_time'])
 				startdate = datetime.strptime(attrs['start_time'], '%Y-%m-%dT%H:%M:%S.%f')
 				enddate = datetime.fromtimestamp(startdate.timestamp() + attrs['elapsed_time'])
+				# enddate = datetime.fromtimestamp(startdate.timestamp() + elapsed_time)
 				self.debugmsg(8, 'startdate: ', enddate, enddate.timestamp())
 				self.debugmsg(5, 'Send ResultName: ', ResultName)
 				payload = {
 					'AgentName': self.agentname,
 					'ResultName': ResultName,
 					'Result': attrs['status'],
-					'ElapsedTime': attrs['elapsed_time'],
+					'ElapsedTime': elapsed_time,
 					'StartTime': startdate.timestamp(),
 					'EndTime': enddate.timestamp(),
 					'ScriptIndex': self.index,
@@ -189,12 +224,47 @@ class RFSListener3:
 						self.debugmsg(7, 'data.parent.to_dict(): ', data.parent.to_dict())
 						index = data.parent.to_dict()['body'].index(data.to_dict())
 						self.debugmsg(7, 'index: ', index)
-						data.parent.body.insert(index + 1, running.Keyword('Sleep', [tmeslp, 'Sleep added by RFSwarm']))
-
+						data.parent.body.insert(index + 1, running.Keyword('Sleep', [tmeslp, self.injectsleepmsg]))
 			else:
 				self.debugmsg(5, attrs['owner'], 'is an excluded library')
 		
 		self.msg = None
+
+	def calculate_sleeps(self, resultdict):
+		sleeps = {"total": 0, "injected": 0}
+		self.debugmsg(5, 'resultdict: ', resultdict)
+
+		if "name" in resultdict and resultdict["name"] == "Sleep":
+			self.debugmsg(5, 'resultdict["elapsed_time"]: ', resultdict["elapsed_time"])
+			sleeps["total"] += resultdict["elapsed_time"]
+			self.debugmsg(5, 'resultdict args: ', resultdict['args'])
+			if len(resultdict['args']) > 1 and resultdict['args'][1] == self.injectsleepmsg:
+				sleeps["injected"] += resultdict["elapsed_time"]
+
+			self.debugmsg(5, resultdict["name"], 'sleeps: ', sleeps)
+
+		if "body" in resultdict:
+			for kw in resultdict["body"]:
+				self.debugmsg(5, 'kw: ', kw)
+				# if "name" in kw and kw["name"] == "Sleep":
+				# 	self.debugmsg(5, 'kw["elapsed_time"]: ', kw["elapsed_time"])
+				# 	sleeps["total"] += kw["elapsed_time"]
+				# 	self.debugmsg(5, 'kw args: ', kw['args'])
+				# 	if len(kw['args']) > 1 and kw['args'][1] == self.injectsleepmsg:
+				# 		sleeps["injected"] += kw["elapsed_time"]
+				if "body" in kw:
+					subsleeps = self.calculate_sleeps(kw)
+					if "name" in kw:
+						self.debugmsg(5, kw["name"], 'subsleeps: ', subsleeps)
+					else:
+						self.debugmsg(5, 'subsleeps: ', subsleeps)
+					sleeps["total"] += subsleeps["total"]
+					sleeps["injected"] += subsleeps["injected"]
+		if "name" in resultdict:
+			self.debugmsg(5, resultdict["name"], 'sleeps: ', sleeps)
+		else:
+			self.debugmsg(5, 'sleeps: ', sleeps)
+		return sleeps
 
 	def randsleep(self, min, max):
 		isfloat = False
@@ -214,7 +284,9 @@ class RFSListener3:
 					stack = inspect.stack()
 					the_class = stack[1][0].f_locals["self"].__class__.__name__
 					the_method = stack[1][0].f_code.co_name
-					prefix = "{}: {}: [{}:{}]	".format(str(the_class), the_method, self.debuglevel, lvl)
+					the_line = stack[1][0].f_lineno
+					# prefix = "{}: {}: [{}:{}]	".format(str(the_class), the_method, self.debuglevel, lvl)
+					prefix = "{}: {}({}): [{}:{}]	".format(str(the_class), the_method, the_line, self.debuglevel, lvl)
 					if len(prefix.strip())<32:
 						prefix = "{}	".format(prefix)
 					if len(prefix.strip())<24:

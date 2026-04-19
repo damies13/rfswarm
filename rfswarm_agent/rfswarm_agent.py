@@ -1341,6 +1341,9 @@ class RFSwarmAgent():
 		metavars.append("RFS_EXCLUDELIBRARIES:{}".format(excludelibraries))
 		metavars.append("RFS_ROBOTTYPE:{}".format(self.jobs[jobid]["RobotType"]))
 
+		if "excludesleep" in self.jobs[jobid]:
+			metavars.append("RFS_EXCLUDESLEEP:{}".format(self.jobs[jobid]["excludesleep"]))
+
 		if "includetesttime" in self.jobs[jobid]:
 			metavars.append("RFS_INCLUDETESTTIME:{}".format(self.jobs[jobid]["includetesttime"]))
 
