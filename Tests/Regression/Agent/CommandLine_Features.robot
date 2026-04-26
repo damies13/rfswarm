@@ -359,6 +359,8 @@ Report Test Case Times
 	Should Be Equal 	${query_result}[3][0] 	Remove Some Files
 	Should Be Equal 	${query_result}[4][0] 	Show the RFS Variables
 
+	[Teardown]	Run Keywords	Stop Manager CLI 	Stop Agent CLI
+
 Exclude Sleep Default
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
@@ -406,6 +408,8 @@ Exclude Sleep Default
 	Log 	${query_result}
 
 	Should Be True 	${query_result}[0][2] > 144
+
+	[Teardown]	Run Keywords	Stop Manager CLI 	Stop Agent CLI
 
 Exclude Sleep Default Injected
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
@@ -457,6 +461,8 @@ Exclude Sleep Default Injected
 	Should Be True 	${query_result}[0][2] < 144
 	Should Be True 	${query_result}[0][2] > 7.8
 
+	[Teardown]	Run Keywords	Stop Manager CLI 	Stop Agent CLI
+
 Exclude Sleep Default All
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
@@ -503,6 +509,8 @@ Exclude Sleep Default All
 	Log 	${query_result}
 
 	Should Be True 	${query_result}[0][2] < 7.8
+
+	[Teardown]	Run Keywords	Stop Manager CLI 	Stop Agent CLI
 
 Exclude Sleep Script Injected
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
@@ -554,6 +562,8 @@ Exclude Sleep Script Injected
 	Should Be True 	${query_result}[0][2] < 144
 	Should Be True 	${query_result}[0][2] > 7.8
 
+	[Teardown]	Run Keywords	Stop Manager CLI 	Stop Agent CLI
+
 Exclude Sleep Script All
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
 	Log To Console 	${\n}TAGS: ${TEST TAGS}
@@ -600,5 +610,7 @@ Exclude Sleep Script All
 	Log 	${query_result}
 
 	Should Be True 	${query_result}[0][2] < 7.8
+
+	[Teardown]	Run Keywords	Stop Manager CLI 	Stop Agent CLI
 
 
