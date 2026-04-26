@@ -66,6 +66,7 @@ The test group buttons are:
 | Add | ![image](Images/GUI_btn_add.gif) | Add another test group |
 | Select | ![image](Images/GUI_btn_script.gif) | Select a robot file |
 | Settings | ![image](Images/GUI_btn_cog.gif) | Configure additional settings for a test group |
+| Copy | ![image](Images/GUI_btn_copy.gif) | Make a copy of the current test group to a new test group with all the same settings (aka duplicate) |
 | Remove | ![image](Images/GUI_btn_cross.gif) | Remove this test group |
 
 
@@ -85,7 +86,7 @@ The columns under the graph:
 * For Delay, Ramp Up and Run, you can either type the time in HH:MM:SS or just a number of seconds or MM:SS, the plan screen will auto update it to HH:MM:SS. For example if you typed 300 it will update to 00:05:00, 7200 will update to 02:00:00, also if you type 5:30 it will update to 00:05:30.
 
 #### Settings for the scenario and rfswarm ![image](Images/GUI_btn_cog.gif)
-> ![image](Images/Linux_Plan_v1.4.0_Settings.png)
+> ![image](Images/Linux_Plan_v1.6.0_Settings.png)
 
 ##### Scenario settings
 At the moment there is only one scenario setting, the upload logs setting, this allows you to control when the agent will upload the logs for the test cases being run.
@@ -101,7 +102,7 @@ The options are:
 \* In earlier releases before v1.0.0 the agent always followed the default case.
 ##### Test Defaults settings
 The test defaults settings allow you to set default default setting values for all test groups. These settings allow you to change and define what the default values are but can still be overridden for an individual test group in the [Additional settings for test group](./rfswarm_manager.md#additional-settings-for-test-group-) screen
-> ![image](Images/Linux_Plan_v1.4.0_Settings.png)
+> ![image](Images/Linux_Plan_v1.6.0_Settings.png)
 
 ###### Result Name Mode
 By configuring this setting you can adjust response times named in the test results. The Options are:
@@ -152,6 +153,21 @@ If you want the amount of sleep time to always be the same, set the minimum and 
 
 Enabling this setting here will enable it for all test groups
 
+###### Exclude Sleep
+This setting allows you to controll if and when sleep time is included in the result time.
+why this is needed:
+- The Inject Sleep sleep option above can impact the result time of a keyword if the sleep is injected after the child keywords
+- you may include manual sleep time in your keywords while waiting for an external even to happen but don't want this sleep included in the result time
+
+There are 3 settings for Exclude Sleep
+| setting  | impact on result time |
+| --- 	   | ---					  |
+| Disabled | The default setting, no impact, this retains the same behaviour as previous versions of RFSwarm, all sleeps are included in result time |
+| Injected | This calculates the total sleep time from only the sleeps that were injected in the current keyword and in all child keywords and substracts this from the elapsed time of the keyword |
+| All	   | This calculates the total sleep time from the sleeps in the current keyword and all child keywords and substracts this from the elapsed time of the keyword |
+
+Enabling this setting here will enable it for all test groups
+
 ###### Disable Robot Logs
 These settings when enabled will disable the generation of the selected files on the agent machine by instructing robot framework not to generate these files.
 
@@ -162,7 +178,7 @@ Enabling these settings here will enable it for all test groups
 
 ##### Manager settings
 The manager settings allows you to access settings that were previously only accessible from the ini file
-> ![image](Images/Linux_Plan_v1.4.0_Settings.png)
+> ![image](Images/Linux_Plan_v1.6.0_Settings.png)
 
 ###### Bind IP Address
 
@@ -198,7 +214,7 @@ e.g. 2 - if the time now is 9:05 PM and you planned to start at 9:00 AM, so ente
 #### Additional settings for test group ![image](Images/GUI_btn_cog.gif)
 
 When clicking on this button a dialogue will be presented that allows you to configure some additional settings for the test group, by default the dialogue will look like this:
-> ![image](Images/Linux_Plan_v1.4.0_Test_Settings.png)
+> ![image](Images/Linux_Plan_v1.6.0_Test_Settings.png)
 
 ##### Result Name Mode - Test Group
 This setting allows you to adjust how response times are named in the test results. This has the same default and option values as [Result Name Mode](./rfswarm_manager.md#result-name-mode) in Test Defaults Settings, however here you can override the default settings for this particular test group.
@@ -228,6 +244,21 @@ Enabling/disabling this setting here will enable it for this test group
 This setting when enabled will add the Sleep keyword after each timed keyword, the amount of sleep time added in seconds will be randomly chosen between the minimum and maximum values.
 
 If you want the amount of sleep time to always be the same, set the minimum and maximum values to the same value.
+
+Enabling/disabling this setting here will enable it for this test group
+
+###### Exclude Sleep - Test Group
+This setting allows you to controll if and when sleep time is included in the result time.
+why this is needed:
+- The Inject Sleep sleep option above can impact the result time of a keyword if the sleep is injected after the child keywords
+- you may include manual sleep time in your keywords while waiting for an external even to happen but don't want this sleep included in the result time
+
+There are 3 settings for Exclude Sleep
+| setting  | impact on result time |
+| --- 	   | ---					  |
+| Disabled | The default setting, no impact, this retains the same behaviour as previous versions of RFSwarm, all sleeps are included in result time |
+| Injected | This calculates the total sleep time from only the sleeps that were injected in the current keyword and in all child keywords and substracts this from the elapsed time of the keyword |
+| All	   | This calculates the total sleep time from the sleeps in the current keyword and all child keywords and substracts this from the elapsed time of the keyword |
 
 Enabling/disabling this setting here will enable it for this test group
 
@@ -295,6 +326,7 @@ The monitoring group buttons are:
 | Add | ![image](Images/GUI_btn_add.gif) | Add another monitoring group |
 | Select | ![image](Images/GUI_btn_script.gif) | Select a robot file |
 | Settings | ![image](Images/GUI_btn_cog.gif) | Configure additional settings for a monitoring group |
+| Copy | ![image](Images/GUI_btn_copy.gif) | Make a copy of the current monitoring group to a new monitoring group with all the same settings (aka duplicate) |
 | Remove | ![image](Images/GUI_btn_cross.gif) | Remove this monitoring group |
 
 The columns in the monitoring group are:
