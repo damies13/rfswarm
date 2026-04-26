@@ -7,8 +7,8 @@ Library    checkprime.py
 My Example Test Case
     [Documentation]    run a test case
 	Do Some Things
-	# Do Some Fruity Things
-	# Do Something
+	Do Some Fruity Things
+	Do Something
 
 *** Keywords ***
 Do Some Things

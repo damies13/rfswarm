@@ -232,16 +232,16 @@ class RFSListener3:
 
 	def calculate_sleeps(self, resultdict):
 		sleeps = {"total": 0, "injected": 0}
-		self.debugmsg(5, 'resultdict: ', resultdict)
+		self.debugmsg(6, 'resultdict: ', resultdict)
 
 		if "name" in resultdict and resultdict["name"] == "Sleep":
-			self.debugmsg(5, 'resultdict["elapsed_time"]: ', resultdict["elapsed_time"])
+			self.debugmsg(7, 'resultdict["elapsed_time"]: ', resultdict["elapsed_time"])
 			sleeps["total"] += resultdict["elapsed_time"]
-			self.debugmsg(5, 'resultdict args: ', resultdict['args'])
+			self.debugmsg(7, 'resultdict args: ', resultdict['args'])
 			if len(resultdict['args']) > 1 and resultdict['args'][1] == self.injectsleepmsg:
 				sleeps["injected"] += resultdict["elapsed_time"]
 
-			self.debugmsg(5, resultdict["name"], 'sleeps: ', sleeps)
+			self.debugmsg(6, resultdict["name"], 'sleeps: ', sleeps)
 
 		if "body" in resultdict:
 			for kw in resultdict["body"]:
@@ -255,15 +255,15 @@ class RFSListener3:
 				if "body" in kw:
 					subsleeps = self.calculate_sleeps(kw)
 					if "name" in kw:
-						self.debugmsg(5, kw["name"], 'subsleeps: ', subsleeps)
+						self.debugmsg(8, kw["name"], 'subsleeps: ', subsleeps)
 					else:
-						self.debugmsg(5, 'subsleeps: ', subsleeps)
+						self.debugmsg(8, 'subsleeps: ', subsleeps)
 					sleeps["total"] += subsleeps["total"]
 					sleeps["injected"] += subsleeps["injected"]
 		if "name" in resultdict:
-			self.debugmsg(5, resultdict["name"], 'sleeps: ', sleeps)
+			self.debugmsg(6, resultdict["name"], 'sleeps: ', sleeps)
 		else:
-			self.debugmsg(5, 'sleeps: ', sleeps)
+			self.debugmsg(6, 'sleeps: ', sleeps)
 		return sleeps
 
 	def randsleep(self, min, max):

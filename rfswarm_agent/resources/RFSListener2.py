@@ -19,15 +19,19 @@ class RFSListener2:
 	swarmmanager = "http://localhost:8138/"
 	excludelibraries = ["BuiltIn","String","OperatingSystem","perftest"]
 	resultnamemode = "dflt"
+	excludesleep = "dis"
 	debuglevel = 0
 	index = 0
 	robot = 0
 	iter = 0
 	seq = 0
 	injectsleep = False
+	injectsleepmsg = 'Sleep added by RFSwarm'
 	sleepminimum = 15
 	sleepmaximum = 45
 	includetesttime = False
+
+	activekeywords = {}
 
 	def start_suite(self, name, attrs):
 		if 'RFS_DEBUGLEVEL' in attrs['metadata']:
@@ -66,6 +70,10 @@ class RFSListener2:
 		if 'RFS_RESULTNAMEMODE' in attrs['metadata']:
 			self.resultnamemode = attrs['metadata']['RFS_RESULTNAMEMODE']
 			self.debugmsg(6, 'resultnamemode: ', self.resultnamemode)
+		# RFS_EXCLUDESLEEP
+		if 'RFS_EXCLUDESLEEP' in attrs['metadata']:
+			self.excludesleep = attrs['metadata']['RFS_EXCLUDESLEEP']
+			self.debugmsg(6, 'excludesleep: ', self.excludesleep)
 		self.seedseed()
 
 	def seedseed(self):
@@ -80,6 +88,18 @@ class RFSListener2:
 			self.msg = None
 			self.msg = message
 
+	def start_test(self, name, attrs):
+		# as this is the start of the test there should be no active keywords, reset to empty (just in case)
+		self.activekeywords = {}
+		if name not in self.activekeywords:
+			self.activekeywords[name] = []
+		self.activekeywords[name].append({"total": 0, "injected": 0})
+
+	def start_keyword(self, name, attrs):
+		if name not in self.activekeywords:
+			self.activekeywords[name] = []
+		self.activekeywords[name].append({"total": 0, "injected": 0})
+
 	def end_test(self, name, attrs):
 		self.debugmsg(5, 'includetesttime: ', self.includetesttime)
 		if str(self.includetesttime).lower() in ('true', 't', 'yes', '1'):
@@ -87,6 +107,19 @@ class RFSListener2:
 			self.debugmsg(8, 'attrs: ', attrs)
 			self.debugmsg(8, 'Test status: ', attrs['status'])
 			self.debugmsg(8, 'Test elapsed_time: ', (attrs['elapsedtime']/1000))
+
+			elapsed_time = (attrs['elapsedtime']/1000)
+			# calculate time spent sleeping
+			sleeps = self.calculate_sleeps(name, attrs)
+			self.debugmsg(6, 'sleeps: ', sleeps)
+			if self.excludesleep == "inj":
+				self.debugmsg(6, 'elapsed_time: ', elapsed_time, "-", sleeps["injected"], "=", elapsed_time - sleeps["injected"])
+				elapsed_time = elapsed_time - sleeps["injected"]
+			if self.excludesleep == "all":
+				self.debugmsg(6, 'elapsed_time: ', elapsed_time, "-", sleeps["total"], "=", elapsed_time - sleeps["total"])
+				elapsed_time = elapsed_time - sleeps["total"]
+			self.debugmsg(6, 'elapsed_time: ', elapsed_time)
+
 			iter = BuiltIn().get_variable_value("${RFS_ITERATION}")
 			tstname = name
 			if tstname.endswith(iter):
@@ -98,7 +131,7 @@ class RFSListener2:
 				'AgentName': self.agentname,
 				'ResultName': tstname,
 				'Result': attrs['status'],
-				'ElapsedTime': (attrs['elapsedtime']/1000),
+				'ElapsedTime': elapsed_time,
 				'StartTime': startdate.timestamp(),
 				'EndTime': enddate.timestamp(),
 				'ScriptIndex': self.index,
@@ -115,7 +148,16 @@ class RFSListener2:
 		self.debugmsg(8, 'attrs: ', attrs)
 		self.debugmsg(5, 'attrs[doc]: ', attrs['doc'])
 		self.debugmsg(5, 'self.msg: ', self.msg)
-		
+
+		if attrs['kwname'] == "Sleep":
+			if 'args' in attrs and len(attrs['args']) > 0:
+				self.debugmsg(6, 'attrs[args]: ', attrs['args'], 'len:', len(attrs['args']))
+				if len(attrs['args']) > 1:
+					if attrs['args'][1] != self.injectsleepmsg:
+						self.addsleeepto_activekeywords("total", attrs['args'][0])
+				else:
+					self.addsleeepto_activekeywords("total", attrs['args'][0])
+
 		ResultName = ''
 		istrace = False
 		if self.msg is not None and 'level' in self.msg and self.msg['level'] == 'TRACE':
@@ -146,7 +188,19 @@ class RFSListener2:
 			self.debugmsg(8, 'lResultName: ', lResultName)
 			ResultName = ' '.join(lResultName)
 		self.debugmsg(3, 'ResultName: ', ResultName, '	:', len(ResultName))
-		
+
+		elapsed_time = (attrs['elapsedtime']/1000)
+		# calculate time spent sleeping
+		sleeps = self.calculate_sleeps(name, attrs)
+		self.debugmsg(6, 'sleeps: ', sleeps)
+		if self.excludesleep == "inj":
+			self.debugmsg(6, 'elapsed_time: ', elapsed_time, "-", sleeps["injected"], "=", elapsed_time - sleeps["injected"])
+			elapsed_time = elapsed_time - sleeps["injected"]
+		if self.excludesleep == "all":
+			self.debugmsg(6, 'elapsed_time: ', elapsed_time, "-", sleeps["total"], "=", elapsed_time - sleeps["total"])
+			elapsed_time = elapsed_time - sleeps["total"]
+		self.debugmsg(6, 'elapsed_time: ', elapsed_time)
+
 		if len(ResultName)>0:
 			self.debugmsg(8, 'self.msg: attrs[libname]: ', attrs['libname'], '	excludelibraries:', self.excludelibraries)
 			if attrs['libname'] not in self.excludelibraries:
@@ -160,7 +214,7 @@ class RFSListener2:
 					'AgentName': self.agentname,
 					'ResultName': ResultName,
 					'Result': attrs['status'],
-					'ElapsedTime': (attrs['elapsedtime']/1000),
+					'ElapsedTime': elapsed_time,
 					'StartTime': startdate.timestamp(),
 					'EndTime': enddate.timestamp(),
 					'ScriptIndex': self.index,
@@ -176,12 +230,42 @@ class RFSListener2:
 				if str(self.injectsleep).lower() in ('true', 't', 'yes', '1'):
 					tmeslp = self.randsleep(self.sleepminimum, self.sleepmaximum)
 					self.debugmsg(7, 'tmeslp: ', tmeslp)
-					BuiltIn().run_keyword('Sleep', tmeslp, 'Sleep added by RFSwarm')
+					self.addsleeepto_activekeywords("injected", tmeslp)
+					BuiltIn().run_keyword('Sleep', tmeslp, self.injectsleepmsg)
 
 			else:
 				self.debugmsg(5, attrs['libname'], 'is an excluded library')
 		
 		self.msg = None
+
+	def addsleeepto_activekeywords(self, sleeptype, ammount):
+		self.debugmsg(6, 'sleeptype: ', sleeptype, '	ammount:', ammount)
+		self.debugmsg(8, 'self.activekeywords: ', self.activekeywords)
+		try:
+			numammount = float(ammount)
+		except:
+			numammount = 0.0
+
+		for kw in self.activekeywords:
+			self.debugmsg(8, 'kw: ', kw, self.activekeywords[kw])
+			for idx, item in enumerate(self.activekeywords[kw]):
+				self.debugmsg(8, 'idx:', idx, 'kw:', kw)
+				self.debugmsg(8, self.activekeywords[kw][idx])
+				self.activekeywords[kw][idx]["total"] += numammount
+				if sleeptype == "injected":
+					self.activekeywords[kw][idx]["injected"] += numammount
+		self.debugmsg(8, 'self.activekeywords: ', self.activekeywords)
+
+	def calculate_sleeps(self, name, attrs):
+		sleepsforkw = {"total": 0, "injected": 0}
+		self.debugmsg(6, 'name: ', name)
+		if name in self.activekeywords:
+			self.debugmsg(7, 'self.activekeywords[name]: ', self.activekeywords[name])
+			sleepsforkw = self.activekeywords[name].pop()
+			if len(self.activekeywords[name]) < 1:
+				del self.activekeywords[name]
+			self.debugmsg(8, 'self.activekeywords: ', self.activekeywords)
+		return sleepsforkw
 
 	def randsleep(self, min, max):
 		isfloat = False
