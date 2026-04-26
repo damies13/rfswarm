@@ -359,3 +359,149 @@ Report Test Case Times
 	Should Be Equal 	${query_result}[3][0] 	Remove Some Files
 	Should Be Equal 	${query_result}[4][0] 	Show the RFS Variables
 
+Exclude Sleep Default
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	@{agnt_options}= 	Create List 	-m 	http://localhost:8138
+	Run Agent CLI 	@{agnt_options}
+	Log to console 	${CURDIR}
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#401${/}Issue-#401-default.rfs
+	Log to console 	scenariofile: ${scenariofile}
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
+	Stop Agent CLI
+
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	Show Log 	${stdout_manager_path}
+	Show Log 	${stderr_manager_path}
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	Show Log 	${stdout_agent_path}
+	Show Log 	${stderr_agent_path}
+
+	${dbfile}= 	Find Result DB
+	${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;
+	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from Summary;
+	Should Be True	${result[0][0]} > 0
+	Should Be Equal As Numbers	${result[0][0]} 	5
+
+	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary;
+
+Exclude Sleep Default Injected
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	@{agnt_options}= 	Create List 	-m 	http://localhost:8138
+	Run Agent CLI 	@{agnt_options}
+	Log to console 	${CURDIR}
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#401${/}Issue-#401-defult-inj.rfs
+	Log to console 	scenariofile: ${scenariofile}
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
+	Stop Agent CLI
+
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	Show Log 	${stdout_manager_path}
+	Show Log 	${stderr_manager_path}
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	Show Log 	${stdout_agent_path}
+	Show Log 	${stderr_agent_path}
+
+	${dbfile}= 	Find Result DB
+	${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;
+	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from Summary;
+	Should Be True	${result[0][0]} > 0
+	Should Be Equal As Numbers	${result[0][0]} 	5
+
+	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary;
+
+Exclude Sleep Default All
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	@{agnt_options}= 	Create List 	-m 	http://localhost:8138
+	Run Agent CLI 	@{agnt_options}
+	Log to console 	${CURDIR}
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#401${/}Issue-#401-defult-all.rfs
+	Log to console 	scenariofile: ${scenariofile}
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
+	Stop Agent CLI
+
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	Show Log 	${stdout_manager_path}
+	Show Log 	${stderr_manager_path}
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	Show Log 	${stdout_agent_path}
+	Show Log 	${stderr_agent_path}
+
+	${dbfile}= 	Find Result DB
+	${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;
+	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from Summary;
+	Should Be True	${result[0][0]} > 0
+	Should Be Equal As Numbers	${result[0][0]} 	5
+
+	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary;
+
+Exclude Sleep Script Injected
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	@{agnt_options}= 	Create List 	-m 	http://localhost:8138
+	Run Agent CLI 	@{agnt_options}
+	Log to console 	${CURDIR}
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#401${/}Issue-#401-script-inj.rfs
+	Log to console 	scenariofile: ${scenariofile}
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
+	Stop Agent CLI
+
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	Show Log 	${stdout_manager_path}
+	Show Log 	${stderr_manager_path}
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	Show Log 	${stdout_agent_path}
+	Show Log 	${stderr_agent_path}
+
+	${dbfile}= 	Find Result DB
+	${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;
+	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from Summary;
+	Should Be True	${result[0][0]} > 0
+	Should Be Equal As Numbers	${result[0][0]} 	5
+
+	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary;
+
+Exclude Sleep Script All
+	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
+	Log To Console 	${\n}TAGS: ${TEST TAGS}
+	@{agnt_options}= 	Create List 	-m 	http://localhost:8138
+	Run Agent CLI 	@{agnt_options}
+	Log to console 	${CURDIR}
+	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#401${/}Issue-#401-script-all.rfs
+	Log to console 	scenariofile: ${scenariofile}
+	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
+	Run Manager CLI 	@{mngr_options}
+	Wait Until the Agent Connects to the Manager
+	Wait For Manager Process
+	Stop Agent CLI
+
+	${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
+	Show Log 	${stdout_manager_path}
+	Show Log 	${stderr_manager_path}
+	${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
+	Show Log 	${stdout_agent_path}
+	Show Log 	${stderr_agent_path}
+
+	${dbfile}= 	Find Result DB
+	${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;
+	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from Summary;
+	Should Be True	${result[0][0]} > 0
+	Should Be Equal As Numbers	${result[0][0]} 	5
+
+	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary;
+
+
