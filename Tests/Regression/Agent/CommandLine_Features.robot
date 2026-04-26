@@ -389,8 +389,23 @@ Exclude Sleep Default
 	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary;
 	Log 	${query_result}
 
+	# Do Some Things		6 sec of non-injected sleep (1 + 2 + 3)	(10 + 20 + 30 + 6, 66 sec injected sleeps)
 	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'Do Some Things';
 	Log 	${query_result}
+
+	Should Be True 	${query_result}[0][2] > 66
+
+	# Do Some Fruity Things		1.8 sec of non-injected sleep (6 x 0.3) (6 x 13, 78 sec injected sleeps)
+	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'Do Some Fruity Things';
+	Log 	${query_result}
+
+	Should Be True 	${query_result}[0][2] > 78
+
+	# My Example Test Case		8.8 sec of non-injected sleep (6 x 0.3 + 1 + 2 + 3 + 1)
+	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'My Example Test Case';
+	Log 	${query_result}
+
+	Should Be True 	${query_result}[0][2] > 144
 
 Exclude Sleep Default Injected
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
@@ -421,8 +436,26 @@ Exclude Sleep Default Injected
 	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary;
 	Log 	${query_result}
 
+	# Do Some Things		6 sec of non-injected sleep (1 + 2 + 3)	(10 + 20 + 30 + 6, 66 sec injected sleeps)
 	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'Do Some Things';
 	Log 	${query_result}
+
+	Should Be True 	${query_result}[0][2] < 66
+	Should Be True 	${query_result}[0][2] > 6
+
+	# Do Some Fruity Things		1.8 sec of non-injected sleep (6 x 0.3) (6 x 13, 78 sec injected sleeps)
+	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'Do Some Fruity Things';
+	Log 	${query_result}
+
+	Should Be True 	${query_result}[0][2] < 78
+	Should Be True 	${query_result}[0][2] > 1.8
+
+	# My Example Test Case		8.8 sec of non-injected sleep (6 x 0.3 + 1 + 2 + 3 + 1)
+	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'My Example Test Case';
+	Log 	${query_result}
+
+	Should Be True 	${query_result}[0][2] < 144
+	Should Be True 	${query_result}[0][2] > 7.8
 
 Exclude Sleep Default All
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
@@ -453,8 +486,23 @@ Exclude Sleep Default All
 	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary;
 	Log 	${query_result}
 
+	# Do Some Things		6 sec of non-injected sleep (1 + 2 + 3)	(10 + 20 + 30 + 6, 66 sec injected sleeps)
 	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'Do Some Things';
 	Log 	${query_result}
+
+	Should Be True 	${query_result}[0][2] < 6
+
+	# Do Some Fruity Things		1.8 sec of non-injected sleep (6 x 0.3) (6 x 13, 78 sec injected sleeps)
+	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'Do Some Fruity Things';
+	Log 	${query_result}
+
+	Should Be True 	${query_result}[0][2] < 1.8
+
+	# My Example Test Case		8.8 sec of non-injected sleep (6 x 0.3 + 1 + 2 + 3 + 1)
+	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'My Example Test Case';
+	Log 	${query_result}
+
+	Should Be True 	${query_result}[0][2] < 7.8
 
 Exclude Sleep Script Injected
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
@@ -485,8 +533,26 @@ Exclude Sleep Script Injected
 	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary;
 	Log 	${query_result}
 
+	# Do Some Things		6 sec of non-injected sleep (1 + 2 + 3)	(10 + 20 + 30 + 6, 66 sec injected sleeps)
 	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'Do Some Things';
 	Log 	${query_result}
+
+	Should Be True 	${query_result}[0][2] < 66
+	Should Be True 	${query_result}[0][2] > 6
+
+	# Do Some Fruity Things		1.8 sec of non-injected sleep (6 x 0.3) (6 x 13, 78 sec injected sleeps)
+	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'Do Some Fruity Things';
+	Log 	${query_result}
+
+	Should Be True 	${query_result}[0][2] < 78
+	Should Be True 	${query_result}[0][2] > 1.8
+
+	# My Example Test Case		8.8 sec of non-injected sleep (6 x 0.3 + 1 + 2 + 3 + 1)
+	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'My Example Test Case';
+	Log 	${query_result}
+
+	Should Be True 	${query_result}[0][2] < 144
+	Should Be True 	${query_result}[0][2] > 7.8
 
 Exclude Sleep Script All
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
@@ -517,7 +583,22 @@ Exclude Sleep Script All
 	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary;
 	Log 	${query_result}
 
+	# Do Some Things		6 sec of non-injected sleep (1 + 2 + 3)	(10 + 20 + 30 + 6, 66 sec injected sleeps)
 	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'Do Some Things';
 	Log 	${query_result}
+
+	Should Be True 	${query_result}[0][2] < 6
+
+	# Do Some Fruity Things		1.8 sec of non-injected sleep (6 x 0.3) (6 x 13, 78 sec injected sleeps)
+	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'Do Some Fruity Things';
+	Log 	${query_result}
+
+	Should Be True 	${query_result}[0][2] < 1.8
+
+	# My Example Test Case		8.8 sec of non-injected sleep (6 x 0.3 + 1 + 2 + 3 + 1)
+	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'My Example Test Case';
+	Log 	${query_result}
+
+	Should Be True 	${query_result}[0][2] < 7.8
 
 
