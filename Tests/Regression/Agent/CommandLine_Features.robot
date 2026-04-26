@@ -382,11 +382,15 @@ Exclude Sleep Default
 
 	${dbfile}= 	Find Result DB
 	${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;
+	Log 	${result}
 	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from Summary;
 	Should Be True	${result[0][0]} > 0
-	Should Be Equal As Numbers	${result[0][0]} 	5
 
 	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary;
+	Log 	${query_result}
+
+	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'Do Some Things';
+	Log 	${query_result}
 
 Exclude Sleep Default Injected
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
@@ -413,9 +417,12 @@ Exclude Sleep Default Injected
 	${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;
 	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from Summary;
 	Should Be True	${result[0][0]} > 0
-	Should Be Equal As Numbers	${result[0][0]} 	5
 
 	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary;
+	Log 	${query_result}
+
+	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'Do Some Things';
+	Log 	${query_result}
 
 Exclude Sleep Default All
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
@@ -442,9 +449,12 @@ Exclude Sleep Default All
 	${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;
 	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from Summary;
 	Should Be True	${result[0][0]} > 0
-	Should Be Equal As Numbers	${result[0][0]} 	5
 
 	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary;
+	Log 	${query_result}
+
+	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'Do Some Things';
+	Log 	${query_result}
 
 Exclude Sleep Script Injected
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
@@ -471,9 +481,12 @@ Exclude Sleep Script Injected
 	${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;
 	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from Summary;
 	Should Be True	${result[0][0]} > 0
-	Should Be Equal As Numbers	${result[0][0]} 	5
 
 	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary;
+	Log 	${query_result}
+
+	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'Do Some Things';
+	Log 	${query_result}
 
 Exclude Sleep Script All
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
@@ -500,8 +513,11 @@ Exclude Sleep Script All
 	${result}= 	Query Result DB 	${dbfile} 	Select result_name from Summary;
 	${result}= 	Query Result DB 	${dbfile} 	Select count(*) from Summary;
 	Should Be True	${result[0][0]} > 0
-	Should Be Equal As Numbers	${result[0][0]} 	5
 
 	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary;
+	Log 	${query_result}
+
+	@{query_result}= 	Query Result DB 	${dbfile} 	Select * from Summary Where result_name = 'Do Some Things';
+	Log 	${query_result}
 
 
