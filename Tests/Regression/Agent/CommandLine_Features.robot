@@ -22,14 +22,14 @@ Agent Command Line INI -i
 		${inifile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmAgent.ini
 		Run Agent CLI 	-g  1  -i  ${inifile}
 	END
-	Stop Agent CLI
+	Stop Agent
 	GROUP 	Check in logs if Agent loaded INI file
 		${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
 		${result_stdout}=	Get File	${stdout_agent_path}
 		Should Contain	${result_stdout}	${inifile}
 	END
 
-	[Teardown]	Stop Agent CLI
+	[Teardown]	Stop Agent
 
 Agent Command Line INI --ini
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
@@ -38,14 +38,14 @@ Agent Command Line INI --ini
 		${inifile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#14${/}RFSwarmAgent.ini
 		Run Agent CLI 	-g  1  --ini  ${inifile}
 	END
-	Stop Agent CLI
+	Stop Agent
 	GROUP 	Check in logs if Agent loaded INI file
 		${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
 		${result_stdout}=	Get File	${stdout_agent_path}
 		Should Contain	${result_stdout}	${inifile}
 	END
 
-	[Teardown]	Stop Agent CLI
+	[Teardown]	Stop Agent
 
 Agent Command Line MANAGER -m
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
@@ -134,12 +134,12 @@ Agent Command Line ROBOT -r
 
 	GROUP 	Set Test Variables
 		${robot_exec}= 		Find Robot Framework Executable
-		${scenario_dir}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
+		${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#14${/}Issue-#14.rfs
 	END
 	GROUP 	Run Agent with the -r argument (custom robot executable)
 		Run Agent CLI 	-g  1  -r  ${robot_exec}
 	END
-	Run Manager with "${scenario_dir}" and "${results_dir}"
+	Run Manager with "${scenariofile}" and "${results_dir}"
 	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process 	8min
 	Stop Agent
@@ -220,7 +220,7 @@ Agent Command Line AGENTNAME -a
 		Should Contain 		${body} 	Issue-#14AGENTNAME
 	END
 
-	[Teardown]	Run Keywords	Stop Server 	Stop Agent CLI
+	[Teardown]	Run Keywords	Stop Server 	Stop Agent
 
 Agent Command Line AGENTNAME --agentname
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
@@ -243,7 +243,7 @@ Agent Command Line AGENTNAME --agentname
 		Should Contain 		${body} 	Issue-#14AGENTNAME
 	END
 
-	[Teardown]	Run Keywords	Stop Server 	Stop Agent CLI
+	[Teardown]	Run Keywords	Stop Server 	Stop Agent
 
 Agent Command Line PROPERTY -p
 	[Tags]	ubuntu-latest 	macos-latest 	windows-latest 	Issue #14
@@ -338,10 +338,10 @@ Report Test Case Times
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #376
 	
 	GROUP 	Set Test Variables
-		${scenario_dir}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#376${/}Issue376.rfs
+		${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#376${/}Issue376.rfs
 	END
 	Run Agent with Default Settings
-	Run Manager with "${scenario_dir}" and "${results_dir}"
+	Run Manager with "${scenariofile}" and "${results_dir}"
 	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
 	Stop Agent
@@ -366,30 +366,21 @@ Report Test Case Times
 	END
 
 	[Teardown] 	Stop Agent and Manager
-	[Teardown]	Run Keywords	Stop Manager CLI 	Stop Agent CLI
 
 Exclude Sleep Default
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
-	Log To Console 	${\n}TAGS: ${TEST TAGS}
-	@{agnt_options}= 	Create List 	-m 	http://localhost:8138
-	Run Agent CLI 	@{agnt_options}
-	Log to console 	${CURDIR}
-	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#401${/}Issue-#401-default.rfs
-	Log to console 	scenariofile: ${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	@{mngr_options}
+	Show Test Information
+	Run Agent with Default Settings
+	GROUP 	Set Test Variables
+		${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#401${/}Issue-#401-default.rfs
+	END
+	Run Manager with "${scenariofile}" and "${results_dir}"
 	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
-	Stop Agent CLI
+	Stop Agent
 
-	GROUP    Show Logs
-		${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
-		Show Log 	${stdout_manager_path}
-		Show Log 	${stderr_manager_path}
-		${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
-		Show Log 	${stdout_agent_path}
-		Show Log 	${stderr_agent_path}
-	END
+	Show Manager Logs
+	Show Agent Logs
 
 	GROUP    Verify behaviour from previous versions are retained by defaut
 
@@ -433,30 +424,22 @@ Exclude Sleep Default
 
 	END
 
-	[Teardown]	Run Keywords	Stop Manager CLI 	Stop Agent CLI
+	[Teardown]	Stop Agent and Manager
 
 Exclude Sleep Default Injected
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
-	Log To Console 	${\n}TAGS: ${TEST TAGS}
-	@{agnt_options}= 	Create List 	-m 	http://localhost:8138
-	Run Agent CLI 	@{agnt_options}
-	Log to console 	${CURDIR}
-	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#401${/}Issue-#401-defult-inj.rfs
-	Log to console 	scenariofile: ${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	@{mngr_options}
+	Show Test Information
+	Run Agent with Default Settings
+	GROUP 	Set Test Variables
+		${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#401${/}Issue-#401-defult-inj.rfs
+	END
+	Run Manager with "${scenariofile}" and "${results_dir}"
 	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
-	Stop Agent CLI
+	Stop Agent
 
-	GROUP    Show Logs
-		${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
-		Show Log 	${stdout_manager_path}
-		Show Log 	${stderr_manager_path}
-		${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
-		Show Log 	${stdout_agent_path}
-		Show Log 	${stderr_agent_path}
-	END
+	Show Manager Logs
+	Show Agent Logs
 
 	GROUP    Verify Only injected sleeps are removed when set at scenario level
 
@@ -502,21 +485,19 @@ Exclude Sleep Default Injected
 
 	END
 
-	[Teardown]	Run Keywords	Stop Manager CLI 	Stop Agent CLI
+	[Teardown]	Stop Agent and Manager
 
 Exclude Sleep Default All
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
-	Log To Console 	${\n}TAGS: ${TEST TAGS}
-	@{agnt_options}= 	Create List 	-m 	http://localhost:8138
-	Run Agent CLI 	@{agnt_options}
-	Log to console 	${CURDIR}
-	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#401${/}Issue-#401-default-all.rfs
-	Log to console 	scenariofile: ${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	@{mngr_options}
+	Show Test Information
+	Run Agent with Default Settings
+	GROUP 	Set Test Variables
+		${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#401${/}Issue-#401-default-all.rfs
+	END
+	Run Manager with "${scenariofile}" and "${results_dir}"
 	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
-	Stop Agent CLI
+	Stop Agent
 
 	GROUP    Show Logs
 		${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
@@ -568,30 +549,22 @@ Exclude Sleep Default All
 
 	END
 
-	[Teardown]	Run Keywords	Stop Manager CLI 	Stop Agent CLI
+	[Teardown]	Stop Agent and Manager
 
 Exclude Sleep Script Injected
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
-	Log To Console 	${\n}TAGS: ${TEST TAGS}
-	@{agnt_options}= 	Create List 	-m 	http://localhost:8138
-	Run Agent CLI 	@{agnt_options}
-	Log to console 	${CURDIR}
-	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#401${/}Issue-#401-script-inj.rfs
-	Log to console 	scenariofile: ${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	@{mngr_options}
+	Show Test Information
+	Run Agent with Default Settings
+	GROUP 	Set Test Variables
+		${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#401${/}Issue-#401-script-inj.rfs
+	END
+	Run Manager with "${scenariofile}" and "${results_dir}"
 	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
-	Stop Agent CLI
+	Stop Agent
 
-	GROUP    Show Logs
-		${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
-		Show Log 	${stdout_manager_path}
-		Show Log 	${stderr_manager_path}
-		${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
-		Show Log 	${stdout_agent_path}
-		Show Log 	${stderr_agent_path}
-	END
+	Show Manager Logs
+	Show Agent Logs
 
 	GROUP    Verify Only injected sleeps are removed when set at test group level
 
@@ -637,30 +610,22 @@ Exclude Sleep Script Injected
 
 	END
 
-	[Teardown]	Run Keywords	Stop Manager CLI 	Stop Agent CLI
+	[Teardown]	Stop Agent and Manager
 
 Exclude Sleep Script All
 	[Tags]	ubuntu-latest		windows-latest		macos-latest 	Issue #401
-	Log To Console 	${\n}TAGS: ${TEST TAGS}
-	@{agnt_options}= 	Create List 	-m 	http://localhost:8138
-	Run Agent CLI 	@{agnt_options}
-	Log to console 	${CURDIR}
-	${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#401${/}Issue-#401-script-all.rfs
-	Log to console 	scenariofile: ${scenariofile}
-	@{mngr_options}= 	Create List 	-g 	1 	-s 	${scenariofile} 	-n 	-d 	${results_dir}
-	Run Manager CLI 	@{mngr_options}
+	Show Test Information
+	Run Agent with Default Settings
+	GROUP 	Set Test Variables
+		${scenariofile}= 	Normalize Path 	${CURDIR}${/}testdata${/}Issue-#401${/}Issue-#401-script-all.rfs
+	END
+	Run Manager with "${scenariofile}" and "${results_dir}"
 	Wait Until the Agent Connects to the Manager
 	Wait For Manager Process
-	Stop Agent CLI
+	Stop Agent
 
-	GROUP    Show Logs
-		${stdout_manager_path} 	${stderr_manager_path} 	Find Log 	Manager
-		Show Log 	${stdout_manager_path}
-		Show Log 	${stderr_manager_path}
-		${stdout_agent_path} 	${stderr_agent_path} 	Find Log 	Agent
-		Show Log 	${stdout_agent_path}
-		Show Log 	${stderr_agent_path}
-	END
+	Show Manager Logs
+	Show Agent Logs
 
 	GROUP    Verify all sleeps are removed when set at test group level
 
@@ -703,5 +668,5 @@ Exclude Sleep Script All
 
 	END
 
-	[Teardown]	Run Keywords	Stop Manager CLI 	Stop Agent CLI
+	[Teardown]	Stop Agent and Manager
 
