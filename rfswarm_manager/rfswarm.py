@@ -1569,6 +1569,9 @@ class RFSwarmCore:
 				# injectsleepmaximum = 33
 				if "injectsleepmaximum" in filedata[istr] and len(filedata[istr]["injectsleepmaximum"]) > 0:
 					base.scriptlist[rowcount]["injectsleepmaximum"] = int(filedata[istr]["injectsleepmaximum"])
+				# exclude sleep from time Issue #401
+				if "excludesleep" in filedata[istr]:
+					base.scriptlist[rowcount]["excludesleep"] = filedata[istr]["excludesleep"]
 				# disableloglog
 				if "disableloglog" in filedata[istr]:
 					base.scriptlist[rowcount]["disableloglog"] = base.str2bool(filedata[istr]["disableloglog"])
@@ -1693,6 +1696,9 @@ class RFSwarmCore:
 				# injectsleepmaximum = 33
 				if "injectsleepmaximum" in filedata[istr] and len(filedata[istr]["injectsleepmaximum"]) > 0:
 					base.mscriptlist[rowcount]["injectsleepmaximum"] = int(filedata[istr]["injectsleepmaximum"])
+				# exclude sleep from time Issue #401
+				if "excludesleep" in filedata[istr]:
+					base.mscriptlist[rowcount]["excludesleep"] = filedata[istr]["excludesleep"]
 				# disableloglog
 				if "disableloglog" in filedata[istr]:
 					base.mscriptlist[rowcount]["disableloglog"] = base.str2bool(filedata[istr]["disableloglog"])
@@ -2189,6 +2195,14 @@ class RFSwarmCore:
 						ismx = grp["injectsleepmaximum"]
 					base.robot_schedule["Agents"][nxtagent][grurid]["injectsleepmaximum"] = str(ismx)
 
+				# excludesleep = False
+				xs = base.excludesleepdefault
+				if "excludesleep" in base.scriptdefaults:
+					xs = base.scriptdefaults["excludesleep"]
+				if "excludesleep" in grp:
+					xs = grp["excludesleep"]
+				base.robot_schedule["Agents"][nxtagent][grurid]["excludesleep"] = str(xs)
+
 				# disableloglogdefault = False
 				dll = base.disableloglogdefault
 				if "disableloglog" in base.scriptdefaults:
@@ -2408,6 +2422,14 @@ class RFSwarmCore:
 											if "injectsleepmaximum" in grp:
 												ismx = grp["injectsleepmaximum"]
 											base.robot_schedule["Agents"][nxtagent][grurid]["injectsleepmaximum"] = str(ismx)
+
+										# excludesleep = False
+										xs = base.excludesleepdefault
+										if "excludesleep" in base.scriptdefaults:
+											xs = base.scriptdefaults["excludesleep"]
+										if "excludesleep" in grp:
+											xs = grp["excludesleep"]
+										base.robot_schedule["Agents"][nxtagent][grurid]["excludesleep"] = str(xs)
 
 										# disableloglogdefault = False
 										dll = base.disableloglogdefault

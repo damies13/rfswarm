@@ -1,0 +1,31 @@
+[Scenario]
+uploadmode = err
+scriptcount = 1
+monitortimebefore = 0
+monitortimeafter = 0
+monitorcount = 1
+graphlist = 
+
+[Script Defaults]
+excludesleep = inj
+
+[1]
+robots = 100
+delay = 0
+rampup = 60
+run = 540
+test = Example Business Process
+script = runtests.robot
+testrepeater = True
+excludesleep = all
+
+[m1]
+robots = 1
+delay = 0
+rampup = 0
+run = 0
+test = Web Server 1
+script = montests.robot
+testrepeater = True
+excludesleep = dis
+

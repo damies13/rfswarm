@@ -49,6 +49,7 @@ class RFSwarmBase:
 	injectsleepenableddefault = False
 	injectsleepminimumdefault = 15
 	injectsleepmaximumdefault = 45
+	excludesleepdefault = "dis"
 	disableloglogdefault = False
 	disablelogreportdefault = False
 	disablelogoutputdefault = False
@@ -71,6 +72,8 @@ class RFSwarmBase:
 	uploadmodes = {'imm': "Immediately", 'err': "On Error Only", 'def': "All Deferred"}
 	uploadmode = "err" 	# modes are imm, err, def
 	uploadfiles: Any = {}
+
+	exclude_sleep_opt = {"dis": "Disabled", "inj": "Injected", "all": "All"}
 
 	resultnamemodes = {'dflt': "Default", 'doco': "Documentation", 'info': "Information", 'kywrd': "Keyword", "kywrdargs": "Keyword & Arguments"}
 	resultnamemodedefault = "dflt" 	# modes are dflt, doco, kywrd, kywrdargs

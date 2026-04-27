@@ -2360,6 +2360,14 @@ class RFSwarmGUItk(tk.Frame):
 			setingsWindow.injectsleepmaximum = int(self.base.scriptdefaults["injectsleepmaximum"])
 		self.base.debugmsg(5, "injectsleepmaximum:", setingsWindow.injectsleepmaximum)
 
+		# exclude sleep from time Issue #401
+		# self.base.exclude_sleep_opt
+		setingsWindow.excludesleepdefault = self.base.excludesleepdefault
+		setingsWindow.excludesleep = setingsWindow.excludesleepdefault
+		if "excludesleep" in self.base.scriptdefaults:
+			setingsWindow.excludesleep = self.base.scriptdefaults["excludesleep"]
+		self.base.debugmsg(5, "excludesleep:", setingsWindow.excludesleep)
+
 		# disableloglogdefault = False
 		setingsWindow.disableloglogdefault = self.base.disableloglogdefault
 		setingsWindow.disableloglog = setingsWindow.disableloglogdefault
@@ -2508,6 +2516,39 @@ class RFSwarmGUItk(tk.Frame):
 		setingsWindow.inpISMX.delete(0, 'end')
 		setingsWindow.inpISMX.insert(0, setingsWindow.injectsleepmaximum)
 		setingsWindow.inpISMX.grid(column=3, row=rownum, sticky="nsew")
+
+		# exclude sleep from time Issue #401
+		# self.base.exclude_sleep_opt
+		rownum += 1
+		setingsWindow.lblXS = ttk.Label(setingsWindow.fmeTestDefaults, text="Exclude Sleep:")
+		setingsWindow.lblXS.grid(column=0, row=rownum, sticky="nsew")
+
+		setingsWindow.lblXSL = []
+		colnum = 0
+		itemno = 0
+		for k, v in self.base.exclude_sleep_opt.items():
+			colnum += 1
+			itemno = colnum - 1
+			setingsWindow.lblXSL.append(ttk.Label(setingsWindow.fmeTestDefaults, text=v))
+			setingsWindow.lblXSL[itemno].configure(anchor="center")
+			setingsWindow.lblXSL[itemno].grid(column=colnum, row=rownum, sticky="nsew")
+
+		rownum += 1
+		setingsWindow.intXS = tk.IntVar()
+		setingsWindow.inpXS = []
+		colnum = 0
+		itemno = 0
+		for k, v in self.base.exclude_sleep_opt.items():
+			colnum += 1
+			itemno = colnum - 1
+			# setingsWindow.lblXSL.append(tk.Radiobutton(setingsWindow.fmeTestDefaults, text="Option 1", variable=setingsWindow.intXS, value=itemno, command=sel)
+			setingsWindow.inpXS.append(tk.Radiobutton(setingsWindow.fmeTestDefaults, variable=setingsWindow.intXS, value=int(itemno)))
+			setingsWindow.inpXS[itemno].grid(column=colnum, row=rownum, sticky="nsew")
+
+		self.base.debugmsg(5, "excludesleep:", setingsWindow.excludesleep)
+		optnum = list(self.base.exclude_sleep_opt.keys()).index(setingsWindow.excludesleep)
+		self.base.debugmsg(5, "optnum:", optnum)
+		setingsWindow.intXS.set(optnum)
 
 		rownum += 1
 		setingsWindow.lblDL = ttk.Label(setingsWindow.fmeTestDefaults, text="Disable Robot Logs:")
@@ -2779,6 +2820,17 @@ class RFSwarmGUItk(tk.Frame):
 			else:
 				if "injectsleepmaximum" in self.base.scriptdefaults:
 					del self.base.scriptdefaults["injectsleepmaximum"]
+					self.plan_scnro_chngd = True
+
+			xs = setingsWindow.intXS.get()
+			xsv = list(self.base.exclude_sleep_opt.keys())[xs]
+			self.base.debugmsg(5, "xs:", xs, "xsv:", xsv, "default:", setingsWindow.excludesleepdefault, "Value at Open:", setingsWindow.excludesleep)
+			if xsv != setingsWindow.excludesleepdefault:
+				self.base.scriptdefaults["excludesleep"] = str(xsv)
+				self.plan_scnro_chngd = True
+			else:
+				if "excludesleep" in self.base.scriptdefaults:
+					del self.base.scriptdefaults["excludesleep"]
 					self.plan_scnro_chngd = True
 
 			# disableloglogdefault = False
@@ -3856,6 +3908,18 @@ class RFSwarmGUItk(tk.Frame):
 			stgsWindow.injectsleepmaximum = int(self.base.scriptlist[r]["injectsleepmaximum"])
 		self.base.debugmsg(5, "injectsleepmaximum:", stgsWindow.injectsleepmaximum)
 
+		# exclude sleep from time Issue #401
+		# self.base.exclude_sleep_opt
+		stgsWindow.excludesleepdefault = self.base.excludesleepdefault
+		self.base.debugmsg(5, "excludesleepdefault:", stgsWindow.excludesleepdefault)
+		if "excludesleep" in self.base.scriptdefaults:
+			stgsWindow.excludesleepdefault = self.base.scriptdefaults["excludesleep"]
+		stgsWindow.excludesleep = stgsWindow.excludesleepdefault
+		self.base.debugmsg(5, "excludesleep:", stgsWindow.excludesleep)
+		if "excludesleep" in self.base.scriptlist[r]:
+			stgsWindow.excludesleep = self.base.scriptlist[r]["excludesleep"]
+		self.base.debugmsg(5, "excludesleep:", stgsWindow.excludesleep)
+
 		# disableloglogdefault = False
 		stgsWindow.disableloglogdefault = self.base.disableloglogdefault
 		if "disableloglog" in self.base.scriptdefaults:
@@ -3985,6 +4049,42 @@ class RFSwarmGUItk(tk.Frame):
 		stgsWindow.inpISMX.delete(0, 'end')
 		stgsWindow.inpISMX.insert(0, stgsWindow.injectsleepmaximum)
 		stgsWindow.inpISMX.grid(column=3, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		# exclude sleep from time Issue #401
+		# self.base.exclude_sleep_opt
+		row += 1
+		stgsWindow.lblXS = ttk.Label(stgsWindow, text="Exclude Sleep:")
+		stgsWindow.lblXS.grid(column=0, row=row, sticky="nsew")
+
+		stgsWindow.lblXSL = []
+		colnum = 0
+		itemno = 0
+		for k, v in self.base.exclude_sleep_opt.items():
+			colnum += 1
+			itemno = colnum - 1
+			stgsWindow.lblXSL.append(ttk.Label(stgsWindow, text=v))
+			stgsWindow.lblXSL[itemno].configure(anchor="center")
+			stgsWindow.lblXSL[itemno].grid(column=colnum, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.intXS = tk.IntVar()
+		stgsWindow.inpXS = []
+		colnum = 0
+		itemno = 0
+		for k, v in self.base.exclude_sleep_opt.items():
+			colnum += 1
+			itemno = colnum - 1
+			stgsWindow.inpXS.append(tk.Radiobutton(stgsWindow, variable=stgsWindow.intXS, value=int(itemno)))
+			stgsWindow.inpXS[itemno].grid(column=colnum, row=row, sticky="nsew")
+
+		self.base.debugmsg(5, "excludesleep:", stgsWindow.excludesleep)
+		optnum = list(self.base.exclude_sleep_opt.keys()).index(stgsWindow.excludesleep)
+		self.base.debugmsg(5, "optnum:", optnum)
+		stgsWindow.intXS.set(optnum)
 
 		row += 1
 		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
@@ -4155,6 +4255,18 @@ class RFSwarmGUItk(tk.Frame):
 		else:
 			if "injectsleepmaximum" in self.base.scriptlist[r]:
 				del self.base.scriptlist[r]["injectsleepmaximum"]
+				self.plan_scnro_chngd = True
+
+		# exclude sleep from time Issue #401
+		xs = stgsWindow.intXS.get()
+		xsv = list(self.base.exclude_sleep_opt.keys())[xs]
+		self.base.debugmsg(5, "xs:", xs, "xsv:", xsv)
+		if xsv != stgsWindow.excludesleepdefault:
+			self.base.scriptlist[r]["excludesleep"] = str(xsv)
+			self.plan_scnro_chngd = True
+		else:
+			if "excludesleep" in self.base.scriptlist[r]:
+				del self.base.scriptlist[r]["excludesleep"]
 				self.plan_scnro_chngd = True
 
 		# disableloglogdefault = False
@@ -4844,6 +4956,18 @@ class RFSwarmGUItk(tk.Frame):
 			stgsWindow.injectsleepmaximum = int(self.base.mscriptlist[r]["injectsleepmaximum"])
 		self.base.debugmsg(5, "injectsleepmaximum:", stgsWindow.injectsleepmaximum)
 
+		# exclude sleep from time Issue #401
+		# self.base.exclude_sleep_opt
+		stgsWindow.excludesleepdefault = self.base.excludesleepdefault
+		self.base.debugmsg(5, "excludesleepdefault:", stgsWindow.excludesleepdefault)
+		if "excludesleep" in self.base.scriptdefaults:
+			stgsWindow.excludesleepdefault = self.base.scriptdefaults["excludesleep"]
+		stgsWindow.excludesleep = stgsWindow.excludesleepdefault
+		self.base.debugmsg(5, "excludesleep:", stgsWindow.excludesleep)
+		if "excludesleep" in self.base.mscriptlist[r]:
+			stgsWindow.excludesleep = self.base.mscriptlist[r]["excludesleep"]
+		self.base.debugmsg(5, "excludesleep:", stgsWindow.excludesleep)
+
 		# disableloglogdefault = False
 		stgsWindow.disableloglogdefault = self.base.disableloglogdefault
 		if "disableloglog" in self.base.scriptdefaults:
@@ -4973,6 +5097,42 @@ class RFSwarmGUItk(tk.Frame):
 		stgsWindow.inpISMX.delete(0, 'end')
 		stgsWindow.inpISMX.insert(0, stgsWindow.injectsleepmaximum)
 		stgsWindow.inpISMX.grid(column=3, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		# exclude sleep from time Issue #401
+		# self.base.exclude_sleep_opt
+		row += 1
+		stgsWindow.lblXS = ttk.Label(stgsWindow, text="Exclude Sleep:")
+		stgsWindow.lblXS.grid(column=0, row=row, sticky="nsew")
+
+		stgsWindow.lblXSL = []
+		colnum = 0
+		itemno = 0
+		for k, v in self.base.exclude_sleep_opt.items():
+			colnum += 1
+			itemno = colnum - 1
+			stgsWindow.lblXSL.append(ttk.Label(stgsWindow, text=v))
+			stgsWindow.lblXSL[itemno].configure(anchor="center")
+			stgsWindow.lblXSL[itemno].grid(column=colnum, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.intXS = tk.IntVar()
+		stgsWindow.inpXS = []
+		colnum = 0
+		itemno = 0
+		for k, v in self.base.exclude_sleep_opt.items():
+			colnum += 1
+			itemno = colnum - 1
+			stgsWindow.inpXS.append(tk.Radiobutton(stgsWindow, variable=stgsWindow.intXS, value=int(itemno)))
+			stgsWindow.inpXS[itemno].grid(column=colnum, row=row, sticky="nsew")
+
+		self.base.debugmsg(5, "excludesleep:", stgsWindow.excludesleep)
+		optnum = list(self.base.exclude_sleep_opt.keys()).index(stgsWindow.excludesleep)
+		self.base.debugmsg(5, "optnum:", optnum)
+		stgsWindow.intXS.set(optnum)
 
 		row += 1
 		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
@@ -5143,6 +5303,18 @@ class RFSwarmGUItk(tk.Frame):
 		else:
 			if "injectsleepmaximum" in self.base.mscriptlist[r]:
 				del self.base.mscriptlist[r]["injectsleepmaximum"]
+				self.plan_scnro_chngd = True
+
+		# exclude sleep from time Issue #401
+		xs = stgsWindow.intXS.get()
+		xsv = list(self.base.exclude_sleep_opt.keys())[xs]
+		self.base.debugmsg(5, "xs:", xs, "xsv:", xsv)
+		if xsv != stgsWindow.excludesleepdefault:
+			self.base.mscriptlist[r]["excludesleep"] = str(xsv)
+			self.plan_scnro_chngd = True
+		else:
+			if "excludesleep" in self.base.mscriptlist[r]:
+				del self.base.mscriptlist[r]["excludesleep"]
 				self.plan_scnro_chngd = True
 
 		# disableloglogdefault = False

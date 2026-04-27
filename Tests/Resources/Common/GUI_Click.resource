@@ -119,6 +119,7 @@ Click CheckBox
 	Log 	${CURDIR}
 	Log 	${IMAGE_DIR}
 
+	Set Confidence 		${0.85}	#temporarily lower Confidence
 	${status}= 	Run Keyword And Return Status
 	...    Wait For 	${img} 	 timeout=${DEFAULT_IMAGE_TIMEOUT}
 	IF  not ${status} and '${COMPONENT}' == 'Reporter' and '${PLATFORM}' == 'macos'
@@ -128,6 +129,7 @@ Click CheckBox
 	@{coordinates}= 	Locate 	${img}
 	Click Image 	${img}
 	Sleep 	0.1
+	Set Confidence 		${CONFIDENCE}	#return Confidence to default
 
 	[Teardown] 	Run Keyword If 	${DEBUG_SCREENSHOTS} or "${KEYWORD STATUS}" == "FAIL"     Take A Screenshot
 
