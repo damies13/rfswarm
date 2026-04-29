@@ -4,21 +4,36 @@ Library 	OperatingSystem
 *** Test Cases ***
 Robot Version
 	[Documentation] 	Logs the robot framework version used
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
-	${Robot_Version} =	Evaluate	robot.__version__ 	modules=robot
-	Log 	${\n}Robot Version: ${Robot_Version} 	console=True
+	[Tags] 	ubuntu-latest 	macos-latest 	windows-latest
+	${Robot_Version}= 	Get Robot Framework version
+	Log 	Robot Version: ${Robot_Version} 	console=True
 
 Agent Version
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
-	# ${result}= 	Run 	python3 ${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py -v
-	${result}= 	Run 	rfswarm-agent -v
-	Log to console 	${\n}${result}
+	[Documentation] 	Logs the Agent version to console
+	[Tags] 	ubuntu-latest 	macos-latest 	windows-latest
+	${result}= 	Get Agent Version
+	Log 	${\n}${result} 	console=True
+
 	Should Contain	${result}	Version
 	Should Contain	${result}	Agent
 
 Agent Help
-	[Tags]	ubuntu-latest 	macos-latest 	windows-latest
-	# ${result}=	Run 	python3 ${EXECDIR}${/}rfswarm_agent${/}rfswarm_agent.py -h
-	${result}= 	Run 	rfswarm-agent -h
-	Log to console 	${\n}${result}
+	[Documentation] 	Logs the Agent Help to console
+	[Tags] 	ubuntu-latest 	macos-latest 	windows-latest
+	${result}= 	Get Agent help
+	Log 	${\n}${result} 	console=True
+
 	Should Contain	${result}	AGENTNAME
+
+*** Keywords ***
+Get Robot Framework version
+	${Robot_Version} =	Evaluate	robot.__version__ 	modules=robot
+	RETURN 	${Robot_Version}
+
+Get Agent Version
+	${agent_version}= 	Run 	rfswarm-agent -v
+	RETURN 	${agent_version}
+
+Get Agent Help
+	${agent_help}= 	Run 	rfswarm-agent -h
+	RETURN 	${agent_help}

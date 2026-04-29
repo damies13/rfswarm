@@ -1,13 +1,13 @@
 *** Settings ***
-Resource 	resources/CommandLine_Reporter.resource
-Resource 	resources/Reporter_DOCX.resource
-Resource 	resources/Reporter_HTML.resource
-Resource 	resources/Reporter_XLSX.resource
+Resource 	../../Resources/CommandLine/Reporter/CommandLine_Reporter.resource
+Resource 	../../Resources/CommandLine/Reporter/Reporter_DOCX.resource
+Resource 	../../Resources/CommandLine/Reporter/Reporter_HTML.resource
+Resource 	../../Resources/CommandLine/Reporter/Reporter_XLSX.resource
 
-Resource 	../../Common/Directories_and_Files.resource
-Resource 	../../Common/INI_PIP_Data.resource
-Resource 	../../Common/Logs.resource
-Resource 	../../Common/RFS_Components.resource
+Resource 	../../Resources/Common/Directories_and_Files.resource
+Resource 	../../Resources/Common/INI_PIP_Data.resource
+Resource 	../../Resources/Common/Logs.resource
+Resource 	../../Resources/Common/RFS_Components.resource
 
 
 Suite Setup 	Common.Basic Suite Initialization Reporter
