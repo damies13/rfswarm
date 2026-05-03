@@ -2368,6 +2368,26 @@ class RFSwarmGUItk(tk.Frame):
 			setingsWindow.excludesleep = self.base.scriptdefaults["excludesleep"]
 		self.base.debugmsg(5, "excludesleep:", setingsWindow.excludesleep)
 
+		# applypacingenableddefault = False
+		setingsWindow.applypacingenableddefault = self.base.applypacingenableddefault
+		setingsWindow.applypacingenabled = setingsWindow.applypacingenableddefault
+		if "applypacingenabled" in self.base.scriptdefaults:
+			setingsWindow.applypacingenabled = self.base.scriptdefaults["applypacingenabled"]
+		self.base.debugmsg(5, "applypacingenabled:", setingsWindow.applypacingenabled)
+		# applypacingtimedefault = 0
+		setingsWindow.applypacingtimedefault = int(self.base.applypacingtimedefault)
+		setingsWindow.applypacingtime = setingsWindow.applypacingtimedefault
+		if "applypacingtime" in self.base.scriptdefaults and len(self.base.scriptdefaults["applypacingtime"]) > 0:
+			setingsWindow.applypacingtime = int(self.base.scriptdefaults["applypacingtime"])
+		self.base.debugmsg(5, "applypacingtime:", setingsWindow.applypacingtime)
+		# applypacingafterdefault = False
+		setingsWindow.applypacingafterdefault = int(self.base.applypacingafterdefault)
+		setingsWindow.applypacingafter = setingsWindow.applypacingafterdefault
+		if "applypacingafter" in self.base.scriptdefaults and len(self.base.scriptdefaults["applypacingafter"]) > 0:
+			setingsWindow.applypacingafter = int(self.base.scriptdefaults["applypacingafter"])
+		self.base.debugmsg(5, "applypacingafter:", setingsWindow.applypacingafter)
+
+
 		# disableloglogdefault = False
 		setingsWindow.disableloglogdefault = self.base.disableloglogdefault
 		setingsWindow.disableloglog = setingsWindow.disableloglogdefault
@@ -2549,6 +2569,36 @@ class RFSwarmGUItk(tk.Frame):
 		optnum = list(self.base.exclude_sleep_opt.keys()).index(setingsWindow.excludesleep)
 		self.base.debugmsg(5, "optnum:", optnum)
 		setingsWindow.intXS.set(optnum)
+
+		rownum += 1
+		setingsWindow.lblAP = ttk.Label(setingsWindow.fmeTestDefaults, text="Apply Pacing:")
+		setingsWindow.lblAP.grid(column=0, row=rownum, sticky="nsew")
+
+		setingsWindow.lblAPE = ttk.Label(setingsWindow.fmeTestDefaults, text="Enabled")
+		setingsWindow.lblAPE.configure(anchor="center")
+		setingsWindow.lblAPE.grid(column=1, row=rownum, sticky="nsew")
+		setingsWindow.lblAPT = ttk.Label(setingsWindow.fmeTestDefaults, text="Time")
+		setingsWindow.lblAPT.configure(anchor="center")
+		setingsWindow.lblAPT.grid(column=2, row=rownum, sticky="nsew")
+		setingsWindow.lblAPA = ttk.Label(setingsWindow.fmeTestDefaults, text="After Test")
+		setingsWindow.lblAPA.configure(anchor="center")
+		setingsWindow.lblAPA.grid(column=3, row=rownum, sticky="nsew")
+
+		rownum += 1
+		setingsWindow.boolAPE = tk.BooleanVar()
+		setingsWindow.boolAPE.set(setingsWindow.applypacingenabled)
+		setingsWindow.inpAPE = tk.Checkbutton(setingsWindow.fmeTestDefaults, variable=setingsWindow.boolAPE, onvalue=True, offvalue=False)
+		setingsWindow.inpAPE.grid(column=1, row=rownum, sticky="nsew")
+
+		setingsWindow.inpAPT = ttk.Entry(setingsWindow.fmeTestDefaults, width=5, justify=tk.RIGHT)
+		setingsWindow.inpAPT.delete(0, 'end')
+		setingsWindow.inpAPT.insert(0, setingsWindow.applypacingtime)
+		setingsWindow.inpAPT.grid(column=2, row=rownum, sticky="nsew")
+
+		setingsWindow.boolAPA = tk.BooleanVar()
+		setingsWindow.boolAPA.set(setingsWindow.applypacingafter)
+		setingsWindow.inpAPA = tk.Checkbutton(setingsWindow.fmeTestDefaults, variable=setingsWindow.boolAPA, onvalue=True, offvalue=False)
+		setingsWindow.inpAPA.grid(column=3, row=rownum, sticky="nsew")
 
 		rownum += 1
 		setingsWindow.lblDL = ttk.Label(setingsWindow.fmeTestDefaults, text="Disable Robot Logs:")
