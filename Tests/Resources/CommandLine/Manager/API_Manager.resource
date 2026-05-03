@@ -1,7 +1,7 @@
 *** Settings ***
 Documentation 	This resource file contains keywords for Manager command line only.
 
-Resource 	../../../Common/Common.resource
+Resource 	../../Common/Common.resource
 
 Library 	RequestsLibrary
 Library 	hash_file.py

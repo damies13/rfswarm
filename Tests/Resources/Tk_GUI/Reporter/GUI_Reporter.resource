@@ -1,15 +1,15 @@
 *** Settings ***
 Documentation 	This resource file contains keywords for Reporter GUI only.
 
-Resource 	../../../Common/GUI_Common.resource
-Resource 	../../../Common/GUI_Click.resource
-Resource 	../../../Common/GUI_Text.resource
+Resource 	../../Common/GUI_Common.resource
+Resource 	../../Common/GUI_Click.resource
+Resource 	../../Common/GUI_Text.resource
 
 Library 	ArchiveLibrary
 Library 	DocTest.VisualTest
 Library 	XML 	use_lxml=True
 
-Variables 	report_expected_data.yaml
+Variables 	../../CommandLine/Reporter/report_expected_data.yaml
 
 *** Keywords ***
 Create New Section

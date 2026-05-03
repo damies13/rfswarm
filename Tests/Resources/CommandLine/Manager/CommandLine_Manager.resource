@@ -1,12 +1,12 @@
 *** Settings ***
 Documentation 	This resource file contains keywords for Manager command line only.
 
-Resource 	../../../Common/Common.resource
-Resource 	../../../Common/Directories_and_Files.resource
-Resource 	../../../Common/Logs.resource
-Resource 	../../../Common/INI_PIP_Data.resource
-Resource 	../../../Common/RFS_Components.resource
-Resource 	../../../Common/Database.resource
+Resource 	../../Common/Common.resource
+Resource 	../../Common/Directories_and_Files.resource
+Resource 	../../Common/Logs.resource
+Resource 	../../Common/INI_PIP_Data.resource
+Resource 	../../Common/RFS_Components.resource
+Resource 	../../Common/Database.resource
 
 
 *** Variables ***
@@ -81,7 +81,7 @@ Create Testdata Manager INI
 
 Verify Data in Database From Test Results With ${log_level} Log Level
 	[Documentation] 	Keyword for "Verify Data in Database From Runned Tests With Different Log Levels" Test Case.
-	${testfolder}= 	Normalize Path 	${CURDIR}${/}..${/}testdata${/}Issue-#216
+	${testfolder}= 	Normalize Path 	${CURDIR}${/}..${/}..${/}..${/}Regression${/}Manager${/}testdata${/}Issue-#216
 	VAR 	${scenariofile} 	${testfolder}${/}${log_level}_scenario.rfs
 	VAR 	@{mngr_options} 	-n  -s  ${scenariofile}  -d  ${RESULTS_DIR}
 
@@ -89,7 +89,7 @@ Verify Data in Database From Test Results With ${log_level} Log Level
 	Run Manager CLI 	@{mngr_options}
 	Wait For Manager Process
 
-	${dbfile}= 	Find Result DB 	result_pattern=*_${log_level}_*
+	${dbfile}= 	Find Result DB 	result_pattern=*_${log_level}_* 	# Find Result DataBase with ${log_level}
 	${result}= 	Query Result DB 	${dbfile} 	Select * from Summary;
 	Log 	${result}
 	Should Be True 	len(${result[0]}) > 0

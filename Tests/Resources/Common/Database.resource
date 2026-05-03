@@ -15,6 +15,7 @@ Find Result DB
 
 	${file}= 	List Directory 	${fols[-1]} 	*.db 	absolute=True
 	Log 	Result DB: ${file[-1]} 	console=${True}
+
 	RETURN 	${file[-1]}
 
 Query Result DB
