@@ -5108,6 +5108,24 @@ class RFSwarmGUItk(tk.Frame):
 			stgsWindow.excludesleep = self.base.mscriptlist[r]["excludesleep"]
 		self.base.debugmsg(5, "excludesleep:", stgsWindow.excludesleep)
 
+		# applypacingtimedefault = 0
+		stgsWindow.applypacingtimedefault = self.base.applypacingtimedefault
+		if "applypacingtime" in self.base.scriptdefaults:
+			stgsWindow.applypacingtimedefault = float(self.base.scriptdefaults["applypacingtime"])
+		stgsWindow.applypacingtime = stgsWindow.applypacingtimedefault
+		if "applypacingtime" in self.base.mscriptlist[r]:
+			stgsWindow.applypacingtime = float(self.base.mscriptlist[r]["applypacingtime"])
+		self.base.debugmsg(5, "applypacingtime:", stgsWindow.applypacingtime)
+
+		# applypacingstartdefault = True
+		stgsWindow.applypacingstartdefault =  self.base.applypacingstartdefault
+		if "applypacingstart" in self.base.scriptdefaults:
+			stgsWindow.applypacingstartdefault = self.base.str2bool(self.base.scriptdefaults["applypacingstart"])
+		stgsWindow.applypacingstart = stgsWindow.applypacingstartdefault
+		if "applypacingstart" in self.base.mscriptlist[r]:
+			stgsWindow.applypacingstart = self.base.str2bool(self.base.mscriptlist[r]["applypacingstart"])
+		self.base.debugmsg(5, "applypacingstart:", stgsWindow.applypacingstart)
+
 		# disableloglogdefault = False
 		stgsWindow.disableloglogdefault = self.base.disableloglogdefault
 		if "disableloglog" in self.base.scriptdefaults:
@@ -5279,6 +5297,37 @@ class RFSwarmGUItk(tk.Frame):
 		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
 
 		row += 1
+		stgsWindow.lblAP = ttk.Label(stgsWindow, text="Apply Pacing:")
+		stgsWindow.lblAP.grid(column=0, row=row, sticky="nsew")
+
+		stgsWindow.lblAPT = ttk.Label(stgsWindow, text="Time")
+		stgsWindow.lblAPT.configure(anchor="center")
+		stgsWindow.lblAPT.grid(column=1, row=row, sticky="nsew")
+		stgsWindow.lblAPA = ttk.Label(stgsWindow, text="From Start")
+		stgsWindow.lblAPA.configure(anchor="center")
+		stgsWindow.lblAPA.grid(column=2, row=row, sticky="nsew")
+		stgsWindow.lblAPA = ttk.Label(stgsWindow, text="From End")
+		stgsWindow.lblAPA.configure(anchor="center")
+		stgsWindow.lblAPA.grid(column=3, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.inpAPT = ttk.Entry(stgsWindow, width=5, justify=tk.RIGHT)
+		stgsWindow.inpAPT.delete(0, 'end')
+		stgsWindow.inpAPT.insert(0, stgsWindow.applypacingtime)
+		stgsWindow.inpAPT.grid(column=1, row=row, sticky="nsew")
+
+		stgsWindow.boolAPS = tk.BooleanVar()
+		stgsWindow.boolAPS.set(stgsWindow.applypacingstart)
+		stgsWindow.inpAPS = tk.Radiobutton(stgsWindow, variable=stgsWindow.boolAPS, value=True)
+		stgsWindow.inpAPS.grid(column=2, row=row, sticky="nsew")
+		stgsWindow.inpAPE = tk.Radiobutton(stgsWindow, variable=stgsWindow.boolAPS, value=False)
+		stgsWindow.inpAPE.grid(column=3, row=row, sticky="nsew")
+
+		row += 1
+		stgsWindow.lblBLNK = ttk.Label(stgsWindow, text=" ")	 # just a blank row as a spacer
+		stgsWindow.lblBLNK.grid(column=0, row=row, sticky="nsew")
+
+		row += 1
 		stgsWindow.lblDL = ttk.Label(stgsWindow, text="Disable Robot Log:")
 		stgsWindow.lblDL.grid(column=0, row=row, sticky="nsew")
 
@@ -5392,7 +5441,7 @@ class RFSwarmGUItk(tk.Frame):
 			self.base.mscriptlist[r]["includetesttime"] = str(tt)
 			self.plan_scnro_chngd = True
 		else:
-			if "includetesttime" in self.base.scriptlist[r]:
+			if "includetesttime" in self.base.mscriptlist[r]:
 				del self.base.mscriptlist[r]["includetesttime"]
 				self.plan_scnro_chngd = True
 
@@ -5455,6 +5504,32 @@ class RFSwarmGUItk(tk.Frame):
 		else:
 			if "excludesleep" in self.base.mscriptlist[r]:
 				del self.base.mscriptlist[r]["excludesleep"]
+				self.plan_scnro_chngd = True
+
+		# setingsWindow.inpAPT
+		apt = stgsWindow.inpAPT.get()
+		if len(apt) > 0:
+			apt = float(apt)
+		else:
+			apt = stgsWindow.applypacingtimedefault
+		self.base.debugmsg(7, "apt:", apt)
+		if apt != stgsWindow.applypacingtimedefault:
+			self.base.mscriptlist[r]["applypacingtime"] = str(apt)
+			self.plan_scnro_chngd = True
+		else:
+			if "applypacingtime" in self.base.mscriptlist[r]:
+				del self.base.mscriptlist[r]["applypacingtime"]
+				self.plan_scnro_chngd = True
+
+		# setingsWindow.boolAPS
+		aps = stgsWindow.boolAPS.get()
+		self.base.debugmsg(7, "aps:", aps)
+		if aps != stgsWindow.applypacingstartdefault:
+			self.base.mscriptlist[r]["applypacingstart"] = str(aps)
+			self.plan_scnro_chngd = True
+		else:
+			if "applypacingstart" in self.base.mscriptlist[r]:
+				del self.base.mscriptlist[r]["applypacingstart"]
 				self.plan_scnro_chngd = True
 
 		# disableloglogdefault = False
