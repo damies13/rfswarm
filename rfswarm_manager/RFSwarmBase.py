@@ -50,9 +50,8 @@ class RFSwarmBase:
 	injectsleepminimumdefault = 15
 	injectsleepmaximumdefault = 45
 	excludesleepdefault = "dis"
-	applypacingenableddefault = False
 	applypacingtimedefault = 0
-	applypacingafterdefault = False
+	applypacingstartdefault = True
 	disableloglogdefault = False
 	disablelogreportdefault = False
 	disablelogoutputdefault = False

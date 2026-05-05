@@ -1572,6 +1572,10 @@ class RFSwarmCore:
 				# exclude sleep from time Issue #401
 				if "excludesleep" in filedata[istr]:
 					base.scriptlist[rowcount]["excludesleep"] = filedata[istr]["excludesleep"]
+				if "applypacingtime" in filedata[istr]:
+					base.scriptlist[rowcount]["applypacingtime"] = filedata[istr]["applypacingtime"]
+				if "applypacingstart" in filedata[istr]:
+					base.scriptlist[rowcount]["applypacingstart"] = filedata[istr]["applypacingstart"]
 				# disableloglog
 				if "disableloglog" in filedata[istr]:
 					base.scriptlist[rowcount]["disableloglog"] = base.str2bool(filedata[istr]["disableloglog"])
@@ -1699,6 +1703,10 @@ class RFSwarmCore:
 				# exclude sleep from time Issue #401
 				if "excludesleep" in filedata[istr]:
 					base.mscriptlist[rowcount]["excludesleep"] = filedata[istr]["excludesleep"]
+				if "applypacingtime" in filedata[istr]:
+					base.mscriptlist[rowcount]["applypacingtime"] = filedata[istr]["applypacingtime"]
+				if "applypacingstart" in filedata[istr]:
+					base.mscriptlist[rowcount]["applypacingstart"] = filedata[istr]["applypacingstart"]
 				# disableloglog
 				if "disableloglog" in filedata[istr]:
 					base.mscriptlist[rowcount]["disableloglog"] = base.str2bool(filedata[istr]["disableloglog"])
