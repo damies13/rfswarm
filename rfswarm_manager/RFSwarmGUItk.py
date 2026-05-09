@@ -2373,7 +2373,10 @@ class RFSwarmGUItk(tk.Frame):
 		setingsWindow.applypacingtime = setingsWindow.applypacingtimedefault
 		if "applypacingtime" in self.base.scriptdefaults and len(self.base.scriptdefaults["applypacingtime"]) > 0:
 			setingsWindow.applypacingtime = float(self.base.scriptdefaults["applypacingtime"])
+		if setingsWindow.applypacingtime % 1 == 0.0:
+			setingsWindow.applypacingtime = int(setingsWindow.applypacingtime)
 		self.base.debugmsg(5, "applypacingtime:", setingsWindow.applypacingtime)
+
 		# applypacingstartdefault = True
 		setingsWindow.applypacingstartdefault = self.base.applypacingstartdefault
 		setingsWindow.applypacingstart = setingsWindow.applypacingstartdefault
@@ -2876,9 +2879,9 @@ class RFSwarmGUItk(tk.Frame):
 
 
 			# setingsWindow.inpAPT
-			apt = setingsWindow.inpAPT.get()
+			apt = float(setingsWindow.inpAPT.get())
 			self.base.debugmsg(5, "apt:", apt, "default:", setingsWindow.applypacingtimedefault, "Value at Open:", setingsWindow.applypacingtime)
-			if apt != setingsWindow.applypacingtimedefault:
+			if apt != float(setingsWindow.applypacingtimedefault):
 				self.base.scriptdefaults["applypacingtime"] = str(apt)
 				self.plan_scnro_chngd = True
 			else:
@@ -3992,6 +3995,8 @@ class RFSwarmGUItk(tk.Frame):
 		stgsWindow.applypacingtime = stgsWindow.applypacingtimedefault
 		if "applypacingtime" in self.base.scriptlist[r]:
 			stgsWindow.applypacingtime = float(self.base.scriptlist[r]["applypacingtime"])
+		if stgsWindow.applypacingtime % 1 == 0.0:
+			stgsWindow.applypacingtime = int(stgsWindow.applypacingtime)
 		self.base.debugmsg(5, "applypacingtime:", stgsWindow.applypacingtime)
 
 		# applypacingstartdefault = True
@@ -4388,9 +4393,9 @@ class RFSwarmGUItk(tk.Frame):
 		if len(apt) > 0:
 			apt = float(apt)
 		else:
-			apt = stgsWindow.applypacingtimedefault
+			apt = float(stgsWindow.applypacingtimedefault)
 		self.base.debugmsg(7, "apt:", apt)
-		if apt != stgsWindow.applypacingtimedefault:
+		if apt != float(stgsWindow.applypacingtimedefault):
 			self.base.scriptlist[r]["applypacingtime"] = str(apt)
 			self.plan_scnro_chngd = True
 		else:
@@ -5115,6 +5120,8 @@ class RFSwarmGUItk(tk.Frame):
 		stgsWindow.applypacingtime = stgsWindow.applypacingtimedefault
 		if "applypacingtime" in self.base.mscriptlist[r]:
 			stgsWindow.applypacingtime = float(self.base.mscriptlist[r]["applypacingtime"])
+		if stgsWindow.applypacingtime % 1 == 0.0:
+			stgsWindow.applypacingtime = int(stgsWindow.applypacingtime)
 		self.base.debugmsg(5, "applypacingtime:", stgsWindow.applypacingtime)
 
 		# applypacingstartdefault = True
@@ -5511,9 +5518,9 @@ class RFSwarmGUItk(tk.Frame):
 		if len(apt) > 0:
 			apt = float(apt)
 		else:
-			apt = stgsWindow.applypacingtimedefault
+			apt = float(stgsWindow.applypacingtimedefault)
 		self.base.debugmsg(7, "apt:", apt)
-		if apt != stgsWindow.applypacingtimedefault:
+		if apt != float(stgsWindow.applypacingtimedefault):
 			self.base.mscriptlist[r]["applypacingtime"] = str(apt)
 			self.plan_scnro_chngd = True
 		else:
