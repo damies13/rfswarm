@@ -82,7 +82,7 @@ class RFSListener3:
 			self.debugmsg(6, 'applypacingtime: ', self.applypacingtime)
 		# RFS_APPLYPACINGSTART
 		if 'RFS_APPLYPACINGSTART' in result.metadata:
-			self.applypacingstart = bool(result.metadata['RFS_APPLYPACINGSTART'])
+			self.applypacingstart = result.metadata['RFS_APPLYPACINGSTART']
 			self.debugmsg(6, 'applypacingstart: ', self.applypacingstart)
 
 		self.seedseed()
@@ -147,7 +147,7 @@ class RFSListener3:
 			self.debugmsg(5, 'result: ', result.to_dict())
 
 			pacingtime = self.applypacingtime
-			if self.applypacingstart:
+			if str(self.applypacingstart).lower() in ('true', 't', 'yes', '1'):
 				self.debugmsg(5, 'elapsed_time: ', result.to_dict()['elapsed_time'])
 				pacingtime = self.applypacingtime - result.to_dict()['elapsed_time']
 				self.debugmsg(5, 'pacingtime: ', self.applypacingtime, "-", result.to_dict()['elapsed_time'], "=", pacingtime)
