@@ -75,15 +75,17 @@ jobs:
       - name: "Windows Download Tesseract"
         if: ${{ matrix.platform == 'windows-latest' }}
         shell: pwsh
+        # old url "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.3.1.20230401.exe" - now gets 403 forbiddin
+        # new url "https://github.com/tesseract-ocr/tesseract/releases/download/5.5.0/tesseract-ocr-w64-setup-5.5.0.20241111.exe"
         run: >
           Invoke-WebRequest
-          -Uri "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.3.1.20230401.exe"
-          -OutFile "$($ENV:Temp)\tesseract-ocr-w64-setup-5.3.1.20230401.exe"
+          -Uri "https://github.com/tesseract-ocr/tesseract/releases/download/5.5.0/tesseract-ocr-w64-setup-5.5.0.20241111.exe"
+          -OutFile "$($ENV:Temp)\tesseract-ocr-w64-setup-5.5.0.20241111.exe"
       - name: "Windows Install Tesseract"
         if: ${{ matrix.platform == 'windows-latest' }}
         shell: cmd
         run: |
-          "%Temp%\tesseract-ocr-w64-setup-5.3.1.20230401.exe" /S
+          "%Temp%\tesseract-ocr-w64-setup-5.5.0.20241111.exe" /S
       - name: "Windows Add Tesseract to Path"
         if: ${{ matrix.platform == 'windows-latest' }}
         shell: pwsh
